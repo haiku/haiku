@@ -292,8 +292,9 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 	generic_size_t length = request->Length();
 
 	status_t error = B_OK;
+	bool partial = false;
 
-	for (; error == B_OK && length > 0
+	for (; error == B_OK && length > 0 && !partial
 			&& buffer->GetNextVirtualVec(virtualVecCookie, vector) == B_OK;) {
 		uint8* vecBase = (uint8*)vector.iov_base;
 		generic_size_t vecLength = min_c(vector.iov_len, length);
@@ -301,10 +302,20 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 		while (error == B_OK && vecLength > 0) {
 			file_io_vec fileVecs[8];
 			size_t fileVecCount = 8;
-			error = getVecs(cookie, request, offset, vecLength, fileVecs,
-				&fileVecCount);
-			if (error != B_OK || fileVecCount == 0)
+			if (getVecs != NULL) {
+				error = getVecs(cookie, request, offset, vecLength, fileVecs,
+					&fileVecCount);
+			} else {
+				fileVecs[0].offset = offset;
+				fileVecs[0].length = vecLength;
+				fileVecCount = 1;
+			}
+			if (error != B_OK)
 				break;
+			if (fileVecCount == 0) {
+				partial = true;
+				break;
+			}
 
 			for (size_t i = 0; i < fileVecCount; i++) {
 				const file_io_vec& fileVec = fileVecs[i];
@@ -319,18 +330,21 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 				vecBase += transferred;
 				vecLength -= transferred;
 
-				if (transferred != toTransfer)
+				if (transferred != toTransfer) {
+					partial = true;
 					break;
+				}
 			}
 		}
 	}
 
 	buffer->FreeVirtualVecCookie(virtualVecCookie);
 
-	bool partial = length > 0;
+	partial = (partial || length > 0);
 	size_t bytesTransferred = request->Length() - length;
 	request->SetTransferredBytes(partial, bytesTransferred);
-	finished(cookie, request, error, partial, bytesTransferred);
+	if (finished != NULL)
+		finished(cookie, request, error, partial, bytesTransferred);
 	request->SetStatusAndNotify(error);
 	return error;
 }
@@ -350,8 +364,12 @@ synchronous_io(io_request* request, DoIO& io)
 	off_t offset = request->Offset();
 	generic_size_t length = request->Length();
 
-	for (; length > 0
-			&& buffer->GetNextVirtualVec(virtualVecCookie, vector) == B_OK;) {
+	status_t status = B_OK;
+	while (length > 0) {
+		status = buffer->GetNextVirtualVec(virtualVecCookie, vector);
+		if (status != B_OK)
+			break;
+
 		void* vecBase = (void*)(addr_t)vector.iov_base;
 		size_t vecLength = min_c(vector.iov_len, length);
 
@@ -359,13 +377,9 @@ synchronous_io(io_request* request, DoIO& io)
 			find_thread(NULL), offset, vecBase, vecLength);
 
 		size_t transferred = vecLength;
-		status_t error = io.IO(offset, vecBase, &transferred);
-		if (error != B_OK) {
-			TRACE_RIO("[%ld]   I/O failed: %#lx\n", find_thread(NULL), error);
-			buffer->FreeVirtualVecCookie(virtualVecCookie);
-			request->SetStatusAndNotify(error);
-			return error;
-		}
+		status = io.IO(offset, vecBase, &transferred);
+		if (status != B_OK)
+			break;
 
 		offset += transferred;
 		length -= transferred;
@@ -374,12 +388,13 @@ synchronous_io(io_request* request, DoIO& io)
 			break;
 	}
 
-	TRACE_RIO("[%ld] synchronous_io() succeeded\n", find_thread(NULL));
+	TRACE_RIO("[%ld] synchronous_io() finished: %#lx\n",
+		find_thread(NULL), status);
 
 	buffer->FreeVirtualVecCookie(virtualVecCookie);
 	request->SetTransferredBytes(length > 0, request->Length() - length);
-	request->SetStatusAndNotify(B_OK);
-	return B_OK;
+	request->SetStatusAndNotify(status);
+	return status;
 }
 
 
@@ -469,16 +484,7 @@ vfs_asynchronous_write_pages(struct vnode* vnode, void* cookie, off_t pos,
 status_t
 do_fd_io(int fd, io_request* request)
 {
-	struct vnode* vnode;
-	file_descriptor* descriptor = get_fd_and_vnode(fd, &vnode, true);
-	if (descriptor == NULL) {
-		request->SetStatusAndNotify(B_FILE_ERROR);
-		return B_FILE_ERROR;
-	}
-
-	FileDescriptorPutter descriptorPutter(descriptor);
-
-	return vfs_vnode_io(vnode, descriptor->cookie, request);
+	return do_iterative_fd_io(fd, request, NULL, NULL, NULL);
 }
 
 
@@ -493,7 +499,8 @@ do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 	struct vnode* vnode;
 	file_descriptor* descriptor = get_fd_and_vnode(fd, &vnode, true);
 	if (descriptor == NULL) {
-		finished(cookie, request, B_FILE_ERROR, true, 0);
+		if (finished != NULL)
+			finished(cookie, request, B_FILE_ERROR, true, 0);
 		request->SetStatusAndNotify(B_FILE_ERROR);
 		return B_FILE_ERROR;
 	}
@@ -526,22 +533,27 @@ do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 		&iterationCookie->next_finished_cookie);
 
 	request->SetFinishedCallback(&do_iterative_fd_io_finish, iterationCookie);
-	request->SetIterationCallback(&do_iterative_fd_io_iterate, iterationCookie);
+	if (getVecs != NULL)
+		request->SetIterationCallback(&do_iterative_fd_io_iterate, iterationCookie);
 
 	descriptorPutter.Detach();
 		// From now on the descriptor is put by our finish callback.
 
-	bool partialTransfer = false;
-	status_t error = do_iterative_fd_io_iterate(iterationCookie, request,
-		&partialTransfer);
-	if (error != B_OK || partialTransfer) {
-		if (partialTransfer) {
-			request->SetTransferredBytes(partialTransfer,
-				request->TransferredBytes());
-		}
+	if (getVecs != NULL) {
+		bool partialTransfer = false;
+		status_t error = do_iterative_fd_io_iterate(iterationCookie, request,
+			&partialTransfer);
+		if (error != B_OK || partialTransfer) {
+			if (partialTransfer) {
+				request->SetTransferredBytes(partialTransfer,
+					request->TransferredBytes());
+			}
 
-		request->SetStatusAndNotify(error);
-		return error;
+			request->SetStatusAndNotify(error);
+			return error;
+		}
+	} else {
+		return vfs_vnode_io(vnode, descriptor->cookie, request);
 	}
 
 	return B_OK;

@@ -22,15 +22,16 @@ public:
 		TRAVERSE_LEAF_LINK = 0x02,
 		LAZY_ALLOC = 0x04
 	};
+
 public:
-								KPath(size_t bufferSize = B_PATH_NAME_LENGTH + 1);
+								KPath(size_t bufferSize = B_PATH_NAME_LENGTH);
 								KPath(const char* path, int32 flags = DEFAULT,
-									size_t bufferSize = B_PATH_NAME_LENGTH + 1);
+									size_t bufferSize = B_PATH_NAME_LENGTH);
 								KPath(const KPath& other);
 								~KPath();
 
 			status_t			SetTo(const char* path, int32 flags = DEFAULT,
-									size_t bufferSize = B_PATH_NAME_LENGTH + 1);
+									size_t bufferSize = B_PATH_NAME_LENGTH);
 			void				Adopt(KPath& other);
 
 			status_t			InitCheck() const;

@@ -1,26 +1,30 @@
-// KFileDiskDevice.h
-
+/*
+ * Copyright 2003-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _K_FILE_DISK_DEVICE_H
 #define _K_FILE_DISK_DEVICE_H
+
 
 #include <OS.h>
 
 #include "KDiskDevice.h"
 
+
 namespace BPrivate {
 namespace DiskDevice {
 
+
 class KPath;
 
-class KFileDiskDevice : public KDiskDevice {
+
+class KFileDiskDevice final : public KDiskDevice {
 public:
 	KFileDiskDevice(partition_id id = -1);
 	virtual ~KFileDiskDevice();
 
 	status_t SetTo(const char *filePath, const char *devicePath = NULL);
 	void Unset();
-	virtual status_t InitCheck() const;
-		// TODO: probably superfluous
 
 	const char *FilePath() const;
 
@@ -40,9 +44,12 @@ private:
 	char			*fFilePath;
 };
 
+
 } // namespace DiskDevice
 } // namespace BPrivate
 
+
 using BPrivate::DiskDevice::KFileDiskDevice;
+
 
 #endif	// _K_FILE_DISK_DEVICE_H

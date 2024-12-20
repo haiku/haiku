@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	636899528
+1	english	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		另存为查询模板：
 Current folder	ContainerWindow		当前目录
 Finish: %time - Over %finishtime left	StatusWindow		完成：%time - 剩余 %finishtime
 Mount all disks now	AutoMounterSettings		挂载所有磁盘
-Name	PoseView		名称
 Location:	InfoWindow		位置：
+Name	PoseView		名称
 Kind:	InfoWindow		种类:
 contains	FindPanel		包含
 Open	FilePanelPriv		打开
@@ -36,7 +36,7 @@ Error emptying Trash	FSUtils		清空垃圾箱出错!
 Opens with:	InfoWindow		打开方式：
 Size	QueryPoseView		大小
 Disk mount	TrackerSettingsWindow		磁盘挂载
-Type	AttributesView		种类
+Type	AttributesView		类型
 Prompt	FSUtils		提示
 Error in regular expression:\n\n'%errstring'	PoseView		正则表达式错误：\n\n'%errstring'
 Small bitmap icon	AttributesView		小尺寸位图图标
@@ -111,12 +111,12 @@ Company	Person Query Columns		公司
 Select folders…	FindPanel		选择目录…
 Recent documents	FavoritesMenu		最近文本
 Edit templates…	TemplatesMenu		编辑模版...
-{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# 字节} other{# 字节}}
 8-bit integer	AttributesView		8位整数
 8-bit unsigned integer	AttributesView		8位无符号整数
 %s info	InfoWindow	window title	%s 详情
 %capacity (%used used -- %free free)	InfoWindow		%capacity（已用 %used -- 空闲 %free）
-Hide dotfiles	SettingsView		隐藏 dotfiles
+Hide dotfiles	SettingsView		隐藏 .开头文件
 Trash	Model		垃圾箱
 Enable type-ahead filtering	SettingsView		启用输入提示过滤
 copy	FSUtils	filename copy	复制
@@ -153,7 +153,7 @@ New submenu	ContainerWindow	Folder name of New-template submenu	新建子菜单
 OK	Email Query Columns		确定
 Location	QueryPoseView		位置
 Edit query	ContainerWindow		编辑查询
-{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# 字节)} other{(# 字节)}}
 Previously mounted disks	AutoMounterSettings		已挂载磁盘
 You cannot replace a file with a folder or a symbolic link.	FSUtils		您无法使用目录或符号链接替换文件。
 The target disk does not support creating links.	FSUtils		目标磁盘不支持创建链接。
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		到：%dir
 Paste layout	ContainerWindow		粘贴布局
 Cancel	Tracker		取消
 yes	AttributesView		是
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		复制 \"%name\" 出错:\n\t%error\n\n
 Make active printer	ContainerWindow		创建活动打印机
 Copy to	ContainerWindow		复制到
 Name	SelectionWindow		名称
@@ -356,7 +355,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		完成：%time
 Messenger	AttributesView		消息
 after	FindPanel		之后
-{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# data byte>} other{<# bytes of data>}}
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# 字节数据>} other{<# 字节的数据>}}
 Version	OpenWithWindow		版本
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些选中项目无法移动到垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
 The entered file name is too long.	FSUtils		输入的文件名太长。
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		复制布局
 Duplicate	ContainerWindow		副本
 16-bit integer	AttributesView		16位整数
 Untitled clipping	PoseView		未命名片段
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		注意：目标文件系统中的文件名不区分大小写。\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定目录中已经存在 \"%name\" 文件。您确定要将其替换吗？
 , indexed	InfoWindow		，已索引
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		您必须放置项目到 \"Disks\" 窗口中的磁盘图标。
@@ -514,7 +512,7 @@ If you alter the home folder, %osName may not behave properly!\n\nAre you sure y
 Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
 Invert selection	VirtualDirectoryWindow		反选
 New folder	FilePanelPriv		新建目录
-{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} other{# items}}
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# 个项目} other{# 个项目}}
 Name	AttributesView		名称
 Invalid bracket range.	libtracker		无效的等级范围。
 the settings folder	FSUtils		设置文件夹

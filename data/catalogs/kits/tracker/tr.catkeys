@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2310771024
+1	turkish	x-vnd.Haiku-libtracker	1617112834
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Sorgu şablonu olarak kaydet:
 Current folder	ContainerWindow		Geçerli klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time — Yaklaşık %finishtime kaldı
 Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
-Name	PoseView		Ad
 Location:	InfoWindow		Konum:
+Name	PoseView		Ad
 Kind:	InfoWindow		Tür:
 contains	FindPanel		içerir:
 Open	FilePanelPriv		Aç
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		Konum: %dir
 Paste layout	ContainerWindow		Yerleşimi yapıştır
 Cancel	Tracker		Vazgeç
 yes	AttributesView		evet
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		“%name” dosyasını kopyalarken hata:\n\t%error\n\n
 Make active printer	ContainerWindow		Etkin yazıcı kıl
 Copy to	ContainerWindow		Kopyala
 Name	SelectionWindow		Ad
@@ -488,7 +487,6 @@ Copy layout	ContainerWindow		Yerleşimi kopyala
 Duplicate	ContainerWindow		Çoğalt
 16-bit integer	AttributesView		16 bit tamsayı
 Untitled clipping	PoseView		Adsız kırpma
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Not: Hedef dosya sistemindeki dosya adları BÜYÜK/küçük harf duyarlı değil.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		“%name” adı belirtilen klasörde hâlihazırda var. Değiştirmek istiyor musunuz?
 , indexed	InfoWindow		, indeksli
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ögeleri, “Diskler” penceresinin içindeki herhangi bir disk simgesinin üzerine bırakmalısınız.

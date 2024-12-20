@@ -11,8 +11,8 @@ Ignore case	SelectionWindow		Ignorovať veľkosť písmen
 Current folder	ContainerWindow		Aktuálny priečinok
 Finish: %time - Over %finishtime left	StatusWindow		(Koniec: %time - zostáva viac ako %finishtime)
 Mount all disks now	AutoMounterSettings		Pripojiť všetky disky teraz
-Name	PoseView		Názov
 Location:	InfoWindow		Umiestnenie:
+Name	PoseView		Názov
 Kind:	InfoWindow		Druh:
 contains	FindPanel		obsahuje
 Open	FilePanelPriv		Otvoriť

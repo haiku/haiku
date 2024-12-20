@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	636899528
+1	spanish; castilian	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Guardar como plantilla de consulta:
 Current folder	ContainerWindow		Carpeta actual
 Finish: %time - Over %finishtime left	StatusWindow		Terminar: %time - alrededor de %finishtime restante
 Mount all disks now	AutoMounterSettings		Montar todos los discos ahora
-Name	PoseView		Nombre
 Location:	InfoWindow		Ubicación:
+Name	PoseView		Nombre
 Kind:	InfoWindow		Tipo:
 contains	FindPanel		contiene
 Open	FilePanelPriv		Abrir
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Pegar distribución
 Cancel	Tracker		Cancelar
 yes	AttributesView		sí
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Error al copiar el archivo \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Convertir en la impresora activa
 Copy to	ContainerWindow		Copiar a 
 Name	SelectionWindow		Nombre
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		Copia de la disposición
 Duplicate	ContainerWindow		Duplicar
 16-bit integer	AttributesView		Entero de 16 bits
 Untitled clipping	PoseView		Recorte sin título
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Nota: el sistema de archivos de destino no distingue mayúsculas de minúsculas en los nombres de archivos.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		El archivo \"%name\" ya existe en la carpeta especificada. ¿Quieres reemplazarlo?
 , indexed	InfoWindow		, indexado
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Debe arrastrar elementos a uno de los iconos de disco en la ventana \"Discos\".

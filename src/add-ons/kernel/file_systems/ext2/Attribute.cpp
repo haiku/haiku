@@ -64,8 +64,7 @@ Attribute::InitCheck()
 status_t
 Attribute::CheckAccess(const char* name, int openMode)
 {
-	return fInode->CheckPermissions(open_mode_to_access(openMode)
-		| (openMode & O_TRUNC ? W_OK : 0));
+	return fInode->CheckPermissions(open_mode_to_access(openMode));
 }
 
 

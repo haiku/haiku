@@ -923,7 +923,7 @@ private:
 
 			teamLocker.Unlock();
 
-			fPreAllocatedThreadStates.MoveFrom(&fThreadStates);
+			fPreAllocatedThreadStates.TakeFrom(&fThreadStates);
 			if (!_PreAllocateThreadStates(missing))
 				return false;
 

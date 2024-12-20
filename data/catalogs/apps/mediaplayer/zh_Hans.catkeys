@@ -67,7 +67,7 @@ never	MediaPlayer-SettingsWindow		从不
 Loop audio	MediaPlayer-SettingsWindow		循环播放音频
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部错误（异常消息）。保存播放列表失败。
 Open…	MediaPlayer-PlaylistWindow		打开…
-Revert	MediaPlayer-SettingsWindow		还原
+Revert	MediaPlayer-SettingsWindow		恢复
 Low volume	MediaPlayer-SettingsWindow		低音量
 Audio	MediaPlayer-Main		音频
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Channels}}

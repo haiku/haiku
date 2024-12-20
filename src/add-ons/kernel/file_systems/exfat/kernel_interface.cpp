@@ -71,6 +71,7 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
 {
 	Inode* inode = (Inode*)cookie;
 	rw_lock_read_unlock(inode->Lock());
+	put_vnode(inode->GetVolume()->FSVolume(), inode->ID());
 	return B_OK;
 }
 
@@ -328,6 +329,8 @@ exfat_io(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	// We lock the node here and will unlock it in the "finished" hook.
 	rw_lock_read_lock(inode->Lock());
 
+	acquire_vnode(_volume, inode->ID());
+
 	return do_iterative_fd_io(volume->Device(), request,
 		iterative_io_get_vecs_hook, iterative_io_finished_hook, inode);
 }
@@ -459,8 +462,7 @@ exfat_open(fs_volume* /*_volume*/, fs_vnode* _node, int openMode,
 	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0)
 		return B_IS_A_DIRECTORY;
 
-	status_t status =  inode->CheckPermissions(open_mode_to_access(openMode)
-		| (openMode & O_TRUNC ? W_OK : 0));
+	status_t status =  inode->CheckPermissions(open_mode_to_access(openMode));
 	if (status != B_OK)
 		return status;
 

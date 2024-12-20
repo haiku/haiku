@@ -99,7 +99,7 @@ service x-vnd.MyGreatServer {
 	if {
 		file_exists /path/to/license/file
 	}
-	not_safemode
+	no_safemode
 	on_demand
 }
 \endcode
@@ -109,7 +109,7 @@ braces completely:
 service x-vnd.MyGreatServer {
 	launch /path/to/my/great/server
 	if file_exists /path/to/license/file
-	not_safemode
+	no_safemode
 	on demand
 }
 \endcode

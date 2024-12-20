@@ -53,6 +53,7 @@ struct exfat_super_block {
 	uint8	boot_code[390];
 	uint16	signature;
 
+	bool IsMagicValid();
 	bool IsValid();
 		// implemented in Volume.cpp
 	uint64 FirstBlock() const { return B_LENDIAN_TO_HOST_INT64(first_block); }

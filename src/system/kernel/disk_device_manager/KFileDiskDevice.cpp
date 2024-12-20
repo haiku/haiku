@@ -40,11 +40,11 @@ KFileDiskDevice::~KFileDiskDevice()
 status_t
 KFileDiskDevice::SetTo(const char* filePath, const char* devicePath)
 {
-	// check params
 	if (!filePath || strlen(filePath) > B_PATH_NAME_LENGTH
 		|| (devicePath && strlen(devicePath) > B_PATH_NAME_LENGTH)) {
 		return B_BAD_VALUE;
 	}
+
 	// normalize the file path
 	// (should actually not be necessary, since this method is only invoked
 	// by the DDM, which has already normalized the path)
@@ -52,35 +52,32 @@ KFileDiskDevice::SetTo(const char* filePath, const char* devicePath)
 	status_t error = tmpFilePath.SetTo(filePath, KPath::NORMALIZE);
 	if (error != B_OK)
 		return error;
+
 	// check the file
 	struct stat st;
 	if (stat(filePath, &st) != 0)
 		return errno;
 	if (!S_ISREG(st.st_mode))
 		return B_BAD_VALUE;
+
 	// create the device, if requested
 	KPath tmpDevicePath;
 	if (devicePath == NULL) {
 		// no device path: we shall create a new device entry
 		if (tmpDevicePath.InitCheck() != B_OK)
 			return tmpDevicePath.InitCheck();
-// TODO: Cleanup. The directory creation is done automatically by the devfs.
-//		// make the file devices dir
-//		if (mkdir(kFileDevicesDir, 0777) != 0) {
-//			if (errno != B_FILE_EXISTS)
-//				return errno;
-//		}
+
 		// make the directory
 		status_t error = _GetDirectoryPath(ID(), &tmpDevicePath);
 		if (error != B_OK)
 			return error;
-//		if (mkdir(tmpDevicePath.Path(), 0777) != 0)
-//			return errno;
+
 		// get the device path name
 		error = tmpDevicePath.Append("raw");
 		if (error != B_OK)
 			return error;
 		devicePath = tmpDevicePath.Path();
+
 		// register the file as virtual disk device
 		error = _RegisterDevice(filePath, devicePath);
 		if (error != B_OK)
@@ -94,8 +91,7 @@ KFileDiskDevice::SetTo(const char* filePath, const char* devicePath)
 	if (error != B_OK)
 		return error;
 
-	// reset the B_DISK_DEVICE_IS_FILE flag -- KDiskDevice::SetTo() has cleared
-	// it
+	// reset the B_DISK_DEVICE_IS_FILE flag -- KDiskDevice::SetTo() has cleared it
 	SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_IS_FILE);
 
 	return B_OK;
@@ -113,16 +109,11 @@ KFileDiskDevice::Unset()
 //		if (_GetDirectoryPath(ID(), &dirPath) == B_OK)
 //			rmdir(dirPath.Path());
 	}
-	// free file path
+
 	free(fFilePath);
 	fFilePath = NULL;
-}
 
-
-status_t
-KFileDiskDevice::InitCheck() const
-{
-	return KDiskDevice::InitCheck();
+	KDiskDevice::Unset();
 }
 
 
@@ -211,4 +202,3 @@ KFileDiskDevice::_GetDirectoryPath(partition_id id, KPath* path)
 	}
 	return error;
 }
-

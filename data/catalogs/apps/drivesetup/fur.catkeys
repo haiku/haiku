@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	1140196651
+1	friulian	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispositîf
 Initialize	MainWindow		Inizialize
 Could not change the parameters of the selected partition.	MainWindow		Impussibil cambiâ i parametris de partizion selezionade.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis al disc daurman?\n\nDucj i dâts de partizionon \"%s\" a laran pierdûts in mût insanabil se tu lu fasis!
 PGP encrypted	Encryption utils		Cifrât cun PGP
 Delete partition	MainWindow		Elimine partizion
 Error: 	MainWindow	in any error alert	Erôr: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		Convalide dai parametris 
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Formatâ pardabon la partizion \"%s\"? Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.
 DriveSetup	System name		Gjestion disc
 Mounted at	PartitionList		Montât su
+Disk system %s not found!	MainWindow		Disc par system %s no cjatât!
 Create…	MainWindow		Cree…
 Write changes	MainWindow		Scrîf lis modifichis
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		La inizializazion de partizion %s e je falide. (Nissune modifiche e je stade scrite sul disc.)
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		La partizion %s e je stade za
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Cambiâ pardabon i parametris de partizion selezionade?\n\nAltris sistemis operatîfs a podaressin no ricognossi plui la partizion!
 Boot	PartitionList		Inviament
 OK	AbstractParametersPanel		Va ben
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis al disc daurman?\n\nDucj i dâts sul disc \"%s\" a laran pierdûts in mût insanabil se tu lu fasis!
 Virtual	PartitionList		Virtuâl
 Virtual	DiskView		Virtuâl
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon cumò lis modifichis sul disc?\n\nSe si lu fâs ducj i dâts dal disc selezionât a laran pierdûts in mût irimediabil!

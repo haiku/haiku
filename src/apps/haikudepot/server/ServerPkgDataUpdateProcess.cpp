@@ -98,6 +98,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	PackageLocalizedTextRef localizedText = PackageUtils::NewLocalizedText(package);
 	PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
+	PackageCoreInfoRef coreInfo = PackageUtils::NewCoreInfo(package);
 
 	localizedText->SetHasChangelog(pkg->HasChangelog());
 
@@ -120,8 +121,16 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		if (!pkgVersion->PayloadLengthIsNull())
 			localInfo->SetSize(static_cast<off_t>(pkgVersion->PayloadLength()));
 
-		if (!pkgVersion->CreateTimestampIsNull())
-			package->SetVersionCreateTimestamp(pkgVersion->CreateTimestamp());
+		if (!pkgVersion->CreateTimestampIsNull()) {
+			PackageVersionRef version = coreInfo->Version();
+
+			if (!version.IsSet()) {
+				version = PackageVersionRef(new PackageVersion(), true);
+				coreInfo->SetVersion(version);
+			}
+
+			version->SetCreateTimestamp(pkgVersion->CreateTimestamp());
+		}
 	}
 
 	int32 countPkgCategories = pkg->CountPkgCategories();
@@ -164,6 +173,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 	package->SetScreenshotInfo(screenshotInfo);
 	package->SetLocalizedText(localizedText);
 	package->SetLocalInfo(localInfo);
+	package->SetCoreInfo(coreInfo);
 
 	HDTRACE("did populate data for [%s] (%s)", pkg->Name()->String(),
 			fDepotName.String());

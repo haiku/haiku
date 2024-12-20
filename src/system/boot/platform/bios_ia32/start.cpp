@@ -139,6 +139,7 @@ platform_start_kernel(void)
 	smp_init_other_cpus();
 	debug_cleanup();
 	mmu_init_for_kernel();
+	heap_release();
 
 	// We're about to enter the kernel -- disable console output.
 	stdout = NULL;

@@ -321,7 +321,9 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 		fCache->temporary = 1;
 		fCache->virtual_end = fDeviceSize;
 
-		error = fCache->Commit(fDeviceSize, VM_PRIORITY_SYSTEM);
+		fCache->Lock();
+		error = fCache->Commit(fDeviceSize, VM_PRIORITY_USER);
+		fCache->Unlock();
 		if (error != B_OK) {
 			Unprepare();
 			return error;

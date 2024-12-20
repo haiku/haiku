@@ -151,7 +151,6 @@ VMTranslationMap::ProtectPage(VMArea* area, addr_t address, uint32 attributes)
 }
 
 
-#include <vm/VMArea.h>
 inline status_t
 VMTranslationMap::ProtectArea(VMArea* area, uint32 attributes)
 {

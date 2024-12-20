@@ -412,6 +412,7 @@ extern status_t		_kern_get_real_time_clock_is_gmt(bool *_isGMT);
 
 extern status_t		_kern_get_clock(clockid_t clockID, bigtime_t* _time);
 extern status_t		_kern_set_clock(clockid_t clockID, bigtime_t time);
+extern status_t		_kern_get_cpuclockid(thread_id id, int32 which, clockid_t* _clockID);
 
 extern bigtime_t	_kern_system_time();
 extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags,

@@ -145,7 +145,7 @@ public:
 
 	inline void Swap(Element *a, Element *b);
 
-	inline void MoveFrom(DOUBLY_LINKED_QUEUE_CLASS_NAME *fromList);
+	inline void TakeFrom(DOUBLY_LINKED_QUEUE_CLASS_NAME *fromList);
 
 	inline void RemoveAll();
 	inline void MakeEmpty()			{ RemoveAll(); }
@@ -281,10 +281,10 @@ DOUBLY_LINKED_QUEUE_CLASS_NAME::Swap(Element *a, Element *b)
 	}
 }
 
-// MoveFrom
+// TakeFrom
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
-DOUBLY_LINKED_QUEUE_CLASS_NAME::MoveFrom(DOUBLY_LINKED_QUEUE_CLASS_NAME *fromList)
+DOUBLY_LINKED_QUEUE_CLASS_NAME::TakeFrom(DOUBLY_LINKED_QUEUE_CLASS_NAME *fromList)
 {
 	if (fromList && fromList->fFirst) {
 		if (fFirst) {

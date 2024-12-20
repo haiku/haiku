@@ -8,7 +8,7 @@ Log to file	PoorMan		输出日志到文件
 Shutting down.	PoorMan		关闭.
 Error Dir	PoorMan		目录错误
 Web folder:	PoorMan		Web 目录：
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		请选择j将要在网络上发布的目录。\n\n 您可以使用 PoorMan 在 home 目录中创建默认的  \"public_html\"。\n或者选择自定义的目录。
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		请选择将要在网络上发布的目录。\n\n 您可以使用 PoorMan 在 home 目录中创建默认的  \"public_html\"。\n或者选择自定义的目录。
 Log To Console	PoorMan		控制台日志
 File Name	PoorMan		文件名称
 Starting up... 	PoorMan		启动...
@@ -46,7 +46,7 @@ PoorMan	System name		PoorMan
 Clear console log	PoorMan		清空控制台日志
 Run server	PoorMan		运行服务器
 Create	PoorMan		创建
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# 个连接} other{# 个连接}}
 done.\n	PoorMan		完成。\n
 PoorMan settings	PoorMan		PoorMan 设置
 Console Logging	PoorMan		控制台日志

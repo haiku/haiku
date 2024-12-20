@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	636899528
+1	czech	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Uložit jako šablonu dotazu:
 Current folder	ContainerWindow		Současný adresář
 Finish: %time - Over %finishtime left	StatusWindow		Konec: %time - zbývá přes %finishtime
 Mount all disks now	AutoMounterSettings		Připojit teď všechny disky
-Name	PoseView		Jméno
 Location:	InfoWindow		Umístnění:
+Name	PoseView		Jméno
 Kind:	InfoWindow		Druh:
 contains	FindPanel		obsahuje
 Open	FilePanelPriv		Otevřít
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		Do: %dir
 Paste layout	ContainerWindow		Vložit rozložení
 Cancel	Tracker		Zrušit
 yes	AttributesView		ano
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Chyba kopírování souboru \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Aktivovat tiskárnu
 Copy to	ContainerWindow		Kopírovat do
 Name	SelectionWindow		Název
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		Kopírovat rozložení
 Duplicate	ContainerWindow		Duplikovat
 16-bit integer	AttributesView		16 bitové celé číslo
 Untitled clipping	PoseView		Nepojmenovaný výstřižek
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Poznámka: názvy souborů na cílovém systému souborů nerozlišují velikost písmen.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Soubor \"%name\" již existuje ve zvolené složce. Přejete si ho nahradit?
 , indexed	InfoWindow		, indexováno
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Položky musíte pustit na ikonu jednoho z disků v okně \"Disky\".

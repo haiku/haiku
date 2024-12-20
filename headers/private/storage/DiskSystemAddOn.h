@@ -19,12 +19,10 @@ class BPartitioningInfo;
 
 class BDiskSystemAddOn {
 public:
-								BDiskSystemAddOn(const char* name,
-									uint32 flags);
+								BDiskSystemAddOn(const char* name);
 	virtual						~BDiskSystemAddOn();
 
 			const char*			Name() const;
-			uint32				Flags() const;
 
 	virtual	status_t			CreatePartitionHandle(
 									BMutablePartition* partition,
@@ -48,7 +46,6 @@ public:
 
 private:
 			BString				fName;
-			uint32				fFlags;
 };
 
 

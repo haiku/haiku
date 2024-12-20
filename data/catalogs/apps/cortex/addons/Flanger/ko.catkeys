@@ -1,0 +1,16 @@
+1	korean	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 노드 정보를 가져올 수 없습니다 (%ld):\n%s\n
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode의 애드온 버전.\nby Eric Moon (16 June, 1999)
+Delay	CortexAddOnsFlanger		지연
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 노드를 찾을 수 없습니다 (%ld):\n%s\n
+Depth	CortexAddOnsFlanger		깊이
+Feedback	CortexAddOnsFlanger		피드백
+Sweep rate	CortexAddOnsFlanger		스윕 비율
+Mix ratio	CortexAddOnsFlanger		믹싱 비율
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode 매개변수
+OK	CortexAddOnsCommonMediaNodeControlApp		확인
+controls	CortexAddOnsCommonMediaNodeControlApp		컨트롤
+Mix output	CortexAddOnsFlanger		믹싱 출력
+Flanger	CortexAddOnsFlanger		플랜저
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 노드에 매개변수가 없습니다 (%ld):\n%s\n
+Audio input	CortexAddOnsFlanger		오디오 입력

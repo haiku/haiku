@@ -154,14 +154,10 @@ fork(void)
 	thread = _kern_fork();
 	if (thread == 0) {
 		// we are the child
-		// ToDo: initialize child
 		__main_thread_id = find_thread(NULL);
 		pthread_self()->id = __main_thread_id;
 
 		mutex_init(&sForkLock, FORK_LOCK_NAME);
-			// TODO: The lock is already initialized and we in the fork()ing
-			// process we should make sure that it is in a consistent state when
-			// calling the kernel.
 		__gRuntimeLoader->reinit_after_fork();
 		__heap_after_fork_child();
 		__reinit_pwd_backend_after_fork();
@@ -189,6 +185,11 @@ fork(void)
 pid_t
 vfork(void)
 {
-	return fork();
+	thread_id thread = _kern_fork();
+	if (thread < 0) {
+		// something went wrong
+		__set_errno(thread);
+		thread = -1;
+	}
+	return thread;
 }
-

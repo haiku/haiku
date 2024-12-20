@@ -321,7 +321,7 @@ SystemProfiler::~SystemProfiler()
 
 	// stop wait object listening
 	if (fWaitObjectNotificationsRequested) {
-		InterruptsSpinLocker locker(gWaitObjectListenerLock);
+		InterruptsWriteSpinLocker locker(gWaitObjectListenerLock);
 		remove_wait_object_listener(this);
 	}
 
@@ -514,7 +514,7 @@ SystemProfiler::Init()
 		scheduler_add_listener(this);
 		fSchedulerNotificationsRequested = true;
 
-		InterruptsSpinLocker waitObjectLocker(gWaitObjectListenerLock);
+		InterruptsWriteSpinLocker waitObjectLocker(gWaitObjectListenerLock);
 		add_wait_object_listener(this);
 		fWaitObjectNotificationsRequested = true;
 		waitObjectLocker.Unlock();
@@ -1227,7 +1227,7 @@ SystemProfiler::_WaitObjectCreated(addr_t object, uint32 type)
 	// If found, remove it and add it to the free list. This might sound weird,
 	// but it makes sense, since we lazily track *used* wait objects only.
 	// I.e. the object in the table is now guaranteedly obsolete.
-	if (waitObject) {
+	if (waitObject != NULL) {
 		fWaitObjectTable.RemoveUnchecked(waitObject);
 		fUsedWaitObjects.Remove(waitObject);
 		fFreeWaitObjects.Add(waitObject, false);
@@ -1290,6 +1290,11 @@ SystemProfiler::_WaitObjectUsed(addr_t object, uint32 type)
 		}
 
 		case THREAD_BLOCK_TYPE_OTHER_OBJECT:
+		{
+			name = "other object";
+			break;
+		}
+
 		case THREAD_BLOCK_TYPE_SNOOZE:
 		case THREAD_BLOCK_TYPE_SIGNAL:
 		default:

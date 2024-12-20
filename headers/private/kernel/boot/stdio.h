@@ -36,13 +36,11 @@ extern FILE *stderr;
 #	define EOF (-1)
 #endif
 
-#define __PRINTFLIKE(a, b)
-
-extern int printf(char const *format, ...) __PRINTFLIKE(1,2);
-extern int fprintf(FILE *stream, char const *format, ...) __PRINTFLIKE(2,3);
-extern int sprintf(char *str, char const *format, ...) __PRINTFLIKE(2,3);
-extern int snprintf(char *str, size_t size, char const *format, ...) __PRINTFLIKE(3,4);
-extern int asprintf(char **ret, char const *format, ...) __PRINTFLIKE(2,3);
+extern int printf(char const *format, ...) _PRINTFLIKE(1,2);
+extern int fprintf(FILE *stream, char const *format, ...) _PRINTFLIKE(2,3);
+extern int sprintf(char *str, char const *format, ...) _PRINTFLIKE(2,3);
+extern int snprintf(char *str, size_t size, char const *format, ...) _PRINTFLIKE(3,4);
+extern int asprintf(char **ret, char const *format, ...) _PRINTFLIKE(2,3);
 extern int vprintf(char const *format, va_list ap);
 extern int vfprintf(FILE *stream, char const *format, va_list ap);
 extern int vsprintf(char *str, char const *format, va_list ap);

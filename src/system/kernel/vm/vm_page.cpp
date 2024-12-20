@@ -2504,6 +2504,28 @@ page_writer(void* /*unused*/)
 
 			cache->AcquireRefLocked();
 			numPages++;
+
+			// Write adjacent pages at the same time, if they're also modified.
+			if (cache->temporary)
+				continue;
+			while (page->cache_next != NULL && numPages < kNumPages) {
+				page = page->cache_next;
+				if (page->busy || page->State() != PAGE_STATE_MODIFIED)
+					break;
+				if (page->WiredCount() > 0)
+					break;
+
+				DEBUG_PAGE_ACCESS_START(page);
+				sModifiedPageQueue.RequeueUnlocked(page, true);
+				run.AddPage(page);
+				DEBUG_PAGE_ACCESS_END(page);
+
+				cache->AcquireStoreRef();
+				cache->AcquireRefLocked();
+				numPages++;
+				if (maxPagesToSee > 0)
+					maxPagesToSee--;
+			}
 		}
 
 #ifdef TRACE_VM_PAGE
@@ -3409,6 +3431,9 @@ vm_page_init(kernel_args *args)
 	// prevent future allocations from the kernel args ranges
 	args->num_physical_allocated_ranges = 0;
 
+	// report initially available memory
+	vm_unreserve_memory(vm_page_num_free_pages() * B_PAGE_SIZE);
+
 	// The target of actually free pages. This must be at least the system
 	// reserve, but should be a few more pages, so we don't have to extract
 	// a cached page with each allocation.
@@ -3859,7 +3884,7 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 
 	// add pages to target queue
 	if (pageState < PAGE_STATE_FIRST_UNQUEUED) {
-		freePages.MoveFrom(&clearPages);
+		freePages.TakeFrom(&clearPages);
 		sPageQueues[pageState].AppendUnlocked(freePages, length);
 	}
 

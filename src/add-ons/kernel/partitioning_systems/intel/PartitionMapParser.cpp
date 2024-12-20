@@ -25,19 +25,20 @@
 //#define TRACE_ENABLED
 #ifdef TRACE_ENABLED
 #	ifdef _USER_MODE
-#		define TRACE(x) printf x
+#		define TRACE(x...)	printf("intel: " x)
 #	else
-#		define TRACE(x) dprintf x
+#		define TRACE(x...)	dprintf("intel: " x)
 #	endif
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 #ifdef _USER_MODE
-#	define ERROR(x) printf x
+#	define ERROR(x...) printf("intel: " x)
 #else
-#	define ERROR(x) dprintf x
+#	define ERROR(x...) dprintf("intel: " x)
 #endif
+
 
 using std::nothrow;
 
@@ -49,7 +50,6 @@ static const int32 kGPTSignatureSize = 8;
 static const char kGPTSignature[8] = { 'E', 'F', 'I', ' ', 'P', 'A', 'R', 'T' };
 
 
-// constructor
 PartitionMapParser::PartitionMapParser(int deviceFD, off_t sessionOffset,
 		off_t sessionSize, uint32 blockSize)
 	:
@@ -63,13 +63,11 @@ PartitionMapParser::PartitionMapParser(int deviceFD, off_t sessionOffset,
 }
 
 
-// destructor
 PartitionMapParser::~PartitionMapParser()
 {
 }
 
 
-// Parse
 status_t
 PartitionMapParser::Parse(const uint8* block, PartitionMap* map)
 {
@@ -99,7 +97,7 @@ PartitionMapParser::Parse(const uint8* block, PartitionMap* map)
 				// results
 				int32 previousPartitionCount = fMap->CountNonEmptyPartitions();
 				uint32 previousBlockSize = fBlockSize;
-				TRACE(("intel: Parse(): trying with a fixed 512 block size\n"));
+				TRACE("Parse(): trying with a fixed 512 block size\n");
 
 				fBlockSize = 512;
 				fMap->Unset();
@@ -109,7 +107,7 @@ PartitionMapParser::Parse(const uint8* block, PartitionMap* map)
 					|| error != B_OK || hadToReFitSize
 					|| !fMap->Check(fSessionSize)) {
 					// That didn't improve anything, let's revert.
-					TRACE(("intel: Parse(): try failed, reverting\n"));
+					TRACE("Parse(): try failed, reverting\n");
 					fBlockSize = previousBlockSize;
 					fMap->Unset();
 					error = _ParsePrimary(&table, hadToReFitSize);
@@ -127,7 +125,6 @@ PartitionMapParser::Parse(const uint8* block, PartitionMap* map)
 }
 
 
-// _ParsePrimary
 status_t
 PartitionMapParser::_ParsePrimary(const partition_table* table,
 	bool& hadToReFitSize)
@@ -137,8 +134,8 @@ PartitionMapParser::_ParsePrimary(const partition_table* table,
 
 	// check the signature
 	if (table->signature != kPartitionTableSectorSignature) {
-		TRACE(("intel: _ParsePrimary(): invalid PartitionTable signature: %lx\n",
-			(uint32)table->signature));
+		TRACE("invalid PartitionTable signature: %" B_PRIx32 "\n",
+			(uint32)table->signature);
 		return B_BAD_DATA;
 	}
 
@@ -155,8 +152,7 @@ PartitionMapParser::_ParsePrimary(const partition_table* table,
 
 		// ignore, if location is bad
 		if (!partition->CheckLocation(fSessionSize)) {
-			TRACE(("intel: _ParsePrimary(): partition %ld: bad location, "
-				"ignoring\n", i));
+			TRACE("partition %" B_PRId32 ": bad location, ignoring\n", i);
 			partition->Unset();
 		}
 	}
@@ -182,7 +178,6 @@ PartitionMapParser::_ParsePrimary(const partition_table* table,
 }
 
 
-// _ParseExtended
 status_t
 PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 {
@@ -191,8 +186,8 @@ PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 	while (error == B_OK) {
 		// check for cycles
 		if (++partitionCount > kMaxLogicalPartitionCount) {
-			TRACE(("intel: _ParseExtended(): Maximal number of logical "
-				   "partitions for extended partition reached. Cycle?\n"));
+			ERROR("ParseExtended: Maximal number of logical "
+				"partitions for extended partition reached. Cycle?\n");
 			error = B_BAD_DATA;
 		}
 
@@ -203,14 +198,14 @@ PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 		// check the signature
 		if (error == B_OK
 			&& fPartitionTable->signature != kPartitionTableSectorSignature) {
-			TRACE(("intel: _ParseExtended(): invalid partition table signature: "
-				"%lx\n", (uint32)fPartitionTable->signature));
+			ERROR("ParseExtended: invalid partition table signature: %" B_PRIx32 "\n",
+				(uint32)fPartitionTable->signature);
 			error = B_BAD_DATA;
 		}
 
 		// ignore the partition table, if any error occured till now
 		if (error != B_OK) {
-			TRACE(("intel: _ParseExtended(): ignoring this partition table\n"));
+			TRACE("ParseExtended: ignoring this partition table\n");
 			error = B_OK;
 			break;
 		}
@@ -239,8 +234,7 @@ PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 				} else {
 					// only one extended partition allowed
 					error = B_BAD_DATA;
-					TRACE(("intel: _ParseExtended(): "
-						   "only one extended partition allowed\n"));
+					ERROR("ParseExtended: only one extended partition allowed\n");
 				}
 			} else {
 				if (nonExtended.IsEmpty()) {
@@ -249,8 +243,7 @@ PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 				} else {
 					// only one non-extended partition allowed
 					error = B_BAD_DATA;
-					TRACE(("intel: _ParseExtended(): only one "
-						   "non-extended partition allowed\n"));
+					ERROR("ParseExtended: only one non-extended partition allowed\n");
 				}
 			}
 			if (partition == NULL)
@@ -262,10 +255,10 @@ PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 			// check the partition's location
 			if (!partition->CheckLocation(fSessionSize)) {
 				error = B_BAD_DATA;
-				TRACE(("intel: _ParseExtended(): Invalid partition "
-					"location: pts: %lld, offset: %lld, size: %lld\n",
+				ERROR("ParseExtended: invalid partition location: "
+					"pts: %" B_PRIdOFF ", offset: %" B_PRIdOFF ", size: %" B_PRIdOFF "\n",
 					partition->PartitionTableOffset(), partition->Offset(),
-					partition->Size()));
+					partition->Size());
 			}
 		}
 
@@ -290,7 +283,6 @@ PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 }
 
 
-// _ReadPartitionTable
 status_t
 PartitionMapParser::_ReadPartitionTable(off_t offset, partition_table* table)
 {
@@ -298,7 +290,7 @@ PartitionMapParser::_ReadPartitionTable(off_t offset, partition_table* table)
 
 	// check the offset
 	if (offset < 0 || offset + toRead > fSessionSize) {
-		TRACE(("intel: _ReadPartitionTable(): bad offset: %lld\n", offset));
+		ERROR("ReadPartitionTable: bad offset: %" B_PRIdOFF "\n", offset);
 		return B_BAD_VALUE;
 	}
 
@@ -309,8 +301,7 @@ PartitionMapParser::_ReadPartitionTable(off_t offset, partition_table* table)
 	ssize_t bytesRead = read_pos(fDeviceFD, fSessionOffset + offset,
 		table, toRead);
 	if (bytesRead != (ssize_t)toRead) {
-		TRACE(("intel: _ReadPartitionTable(): reading the partition "
-			"table failed: %lx\n", errno));
+		ERROR("reading the partition table failed: %" B_PRIx32 "\n", errno);
 		return bytesRead < 0 ? errno : B_IO_ERROR;
 	}
 
@@ -321,15 +312,13 @@ PartitionMapParser::_ReadPartitionTable(off_t offset, partition_table* table)
 	bytesRead = read_pos(fDeviceFD, fSessionOffset + offset
 		+ sizeof(partition_table), &gptSignature, toRead);
 	if (bytesRead != (ssize_t)toRead) {
-		TRACE(("intel: _ReadPartitionTable(): checking for GPT "
-			"signature failed: %lx\n", errno));
+		ERROR("checking for GPT signature failed: %" B_PRIx32 "\n", errno);
 		return bytesRead < 0 ? errno : B_IO_ERROR;
 	}
 	if (memcmp(gptSignature, kGPTSignature, kGPTSignatureSize) == 0) {
-		ERROR(("intel: Found GPT signature, ignoring.\n"));
+		ERROR("Found GPT signature, ignoring.\n");
 		return B_BAD_DATA;
 	}
 
 	return B_OK;
 }
-

@@ -31,14 +31,6 @@ struct random_data  {
     int *end_ptr;
 };
 
-struct drand48_data  {
-    unsigned short int x[3];
-    unsigned short int a[3];
-    unsigned short int c;
-    unsigned short int old_x[3];
-    int init;
-};
-
 
 #ifdef  __cplusplus
 extern "C" {
@@ -68,6 +60,7 @@ extern int		system(const char *command);
 extern char		*mktemp(char *name);
 extern char		*mkdtemp(char *templat);
 extern int		mkstemp(char *templat);
+extern int		mkostemp(char *templat, int oflags);
 
 extern char		*ecvt(double value, int digits, int *_decimalPoint, int *_sign);
 extern char		*fcvt(double value, int precision, int *_decimalPoint,
@@ -124,21 +117,6 @@ extern long		jrand48(unsigned short int xsubi[3]);
 extern void		srand48(long int seed);
 extern unsigned short *seed48(unsigned short int seed16v[3]);
 extern void		lcong48(unsigned short int param[7]);
-
-extern int		drand48_r(struct drand48_data *data, double *result);
-extern int		erand48_r(unsigned short int xsubi[3],
-					struct drand48_data *data, double *result);
-extern int		lrand48_r(struct drand48_data *data, long int *result);
-extern int		nrand48_r(unsigned short int xsubi[3],
-					struct drand48_data *data, long int *result);
-extern int		mrand48_r(struct drand48_data *data, long int *result);
-extern int		jrand48_r(unsigned short int xsubi[3],
-					struct drand48_data *data, long int *result);
-extern int		srand48_r(long int seed, struct drand48_data *data);
-extern int		seed48_r(unsigned short int seed16v[3],
-					struct drand48_data *data);
-extern int		lcong48_r(unsigned short int param[7],
-					struct drand48_data *data);
 
 /* search and sort functions */
 typedef int (*_compare_function)(const void *, const void *);

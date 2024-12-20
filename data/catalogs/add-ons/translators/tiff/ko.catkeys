@@ -1,2 +1,16 @@
-1	korean	x-vnd.Haiku-TIFFTranslator	2591143631
+1	korean	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		TIFF 라이브러리:
+RLE (Packbits)	TIFFView		RLE (Packbits)
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: 잘못된 문서 인덱스입니다\n
+Use compression:	TIFFView		압축 사용:
+TIFF image translator	TIFFView		TIFF 이미지 변환기
+TIFF image	TIFFTranslator		TIFF 이미지
 TIFF Settings	TIFFMain		TIFF 설정
+TIFF image translator	TIFFTranslator		TIFF 이미지 변환기
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: 디렉터리를 설정할 수 없습니다\n
+Version %d.%d.%d, %s	TIFFView		버전 %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFF 변환기 설정
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF 이미지
+None	TIFFView		없음

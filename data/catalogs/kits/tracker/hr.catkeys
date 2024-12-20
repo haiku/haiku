@@ -10,8 +10,8 @@ Volume icons	TrackerSettingsWindow		Ikone diskova
 Ignore case	SelectionWindow		Ignoriraj slučaj
 Current folder	ContainerWindow		Trenutna mapa
 Mount all disks now	AutoMounterSettings		Montiraj sve diskove
-Name	PoseView		Ime
 Location:	InfoWindow		Lokacija:
+Name	PoseView		Ime
 Kind:	InfoWindow		Vrsta:
 contains	FindPanel		sadrži
 Open	FilePanelPriv		Otvori

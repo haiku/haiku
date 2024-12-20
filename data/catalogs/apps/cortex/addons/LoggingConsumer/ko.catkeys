@@ -1,0 +1,22 @@
+1	korean	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 노드 정보를 가져올 수 없습니다 (%ld):\n%s\n
+Priority	CortexAddOnsLoggingConsumer		우선순위
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 노드를 찾을 수 없습니다 (%ld):\n%s\n
+Latency	CortexAddOnsLoggingConsumer		레이턴시
+Logged input	CortexAddOnsLoggingConsumer		로그 입력
+CPU spin percentage	CortexAddOnsLoggingConsumer		CPU 점유율
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		시작
+Thread priority	CortexAddOnsLoggingConsumer		스레드 우선순위
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer 매개변수
+Latency control	CortexAddOnsLoggingConsumer		레이턴시 컨트롤
+CPU percentage	CortexAddOnsLoggingConsumer		CPU 사용율
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		정지
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		LoggingConsumer 노드의 애드온 버전.\n1999년 5월 5일자 Be 개발자 뉴스레터 III.18을 보세요\nadapted by Eric Moon (4 June, 1999)
+OK	CortexAddOnsCommonMediaNodeControlApp		확인
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		컨트롤
+controls	CortexAddOnsCommonMediaNodeControlApp		컨트롤
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		연결
+percent	CortexAddOnsLoggingConsumer		퍼센트
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 노드에 매개변수가 없습니다 (%ld):\n%s\n

@@ -731,7 +731,7 @@ Volume::ProcessPendingNodeMonitorEvents()
 	NodeMonitorEventList events;
 	{
 		AutoLocker<BLocker> eventsLock(fPendingNodeMonitorEventsLock);
-		events.MoveFrom(&fPendingNodeMonitorEvents);
+		events.TakeFrom(&fPendingNodeMonitorEvents);
 	}
 
 	// process them

@@ -1,0 +1,26 @@
+1	korean	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		'%name%' 노드가 해제되었습니다
+OK	CortexRouteApp		확인
+About Cortex/Route…	CortexRouteApp		Cortex/Route에 대하여…
+File	CortexRouteApp		파일
+Connection '%name%' made	CortexRouteApp		'%name%' 연결이 생성되었습니다
+Save nodes…	CortexRouteApp		노드 저장…
+%producer% and %consumer%	CortexRouteApp		%producer% 와(과) %consumer%
+Node '%name%' created	CortexRouteApp		'%name%' 노드가 생성되었습니다
+Negotiated format:	CortexRouteApp		협상된 형식:
+Window	CortexRouteApp		창
+Transport	CortexRouteApp		전송
+Connection broken	CortexRouteApp		연결이 끊어졌습니다
+Untitled group	CortexRouteApp		이름없는 그룹
+Connection failed	CortexRouteApp		연결이 실패했습니다
+Connection '%name%' broken	CortexRouteApp		'%name%' 연결이 끊어졌습니다
+Between:	CortexRouteApp		다음 사이:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		열기…
+Pull palettes	CortexRouteApp		팔레트 당겨오기
+Connection made	CortexRouteApp		연결이 생성되었습니다
+Show transport	CortexRouteApp		전송 보기
+Show add-ons	CortexRouteApp		애드온 보기
+Quit	CortexRouteApp		종료
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, 백엔드\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<여러분의 이름이 들어갈 곳>\n\n여기에 사용된 특정 아이콘들의 저작권은\nBe, Inc.의 소유이며 허가 하에 사용되었습니다.
+Tried format:	CortexRouteApp		시도된 형식:

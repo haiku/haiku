@@ -379,6 +379,11 @@ LoggingConsumer::BufferReceived(BBuffer* buffer)
 	logMsg.now = now;
 	logMsg.buffer_data.start_time = bufferStart;
 	logMsg.buffer_data.offset = how_early;
+	logMsg.buffer_data.size_available = buffer->SizeAvailable();
+	logMsg.buffer_data.size_used = buffer->SizeUsed();
+	logMsg.buffer_data.flags = buffer->Flags();
+	logMsg.buffer_data.id = buffer->ID();
+	logMsg.buffer_data.type = buffer->Type();
 	mLogger->Log(LOG_BUFFER_RECEIVED, logMsg);
 
 	// There's a special case here with handling B_MEDIA_PARAMETERS buffers.

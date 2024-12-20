@@ -15,7 +15,6 @@ class BBitmapBuffer : public RenderingBuffer {
 	virtual						~BBitmapBuffer();
 
 	virtual	status_t			InitCheck() const;
-	virtual	bool				IsGraphicsMemory() const { return false; }
 
 	virtual	color_space			ColorSpace() const;
 	virtual	void*				Bits() const;

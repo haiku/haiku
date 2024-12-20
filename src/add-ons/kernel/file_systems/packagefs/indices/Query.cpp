@@ -94,13 +94,9 @@ struct Query::QueryPolicy {
 		index.index = NULL;
 	}
 
-	static int32 IndexGetWeightedScore(Index& index, int32 score)
+	static int32 IndexGetSize(Index& index)
 	{
-		// should be inversely proportional to the index size; max input score
-		// is 2048
-		static const int32 maxFactor = (1024 * 1024) - 1;
-		return score * (maxFactor /
-			std::min(maxFactor, std::max((int32)1, index.index->CountEntries())));
+		return index.index->CountEntries();
 	}
 
 	static type_code IndexGetType(Index& index)

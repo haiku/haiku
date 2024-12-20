@@ -533,28 +533,43 @@ RatePackageWindow::_QueryRatingThread()
 		return;
 	}
 
+	PackageCoreInfoRef coreInfo = package->CoreInfo();
+
+	if (!coreInfo.IsSet()) {
+		HDERROR("rating query: No package core info");
+		_SetWorkerThread(-1);
+		return;
+	}
+
+	PackageVersionRef version = coreInfo->Version();
+
+	if (!version.IsSet()) {
+		HDERROR("rating query: No package version");
+		_SetWorkerThread(-1);
+		return;
+	}
+
 	WebAppInterface* interface = fModel.GetWebAppInterface();
 
 	BMessage info;
-	const DepotInfo* depot = fModel.DepotForName(package->DepotName());
 	BString webAppRepositoryCode;
 	BString webAppRepositorySourceCode;
+	BString depotName = PackageUtils::DepotName(package);
+	DepotInfoRef depot = fModel.DepotForName(depotName);
 
-	if (depot != NULL) {
+	if (depot.IsSet()) {
 		webAppRepositoryCode = depot->WebAppRepositoryCode();
 		webAppRepositorySourceCode = depot->WebAppRepositorySourceCode();
 	}
 
-	if (webAppRepositoryCode.IsEmpty()
-			|| webAppRepositorySourceCode.IsEmpty()) {
-		HDERROR("unable to obtain the repository code or repository source "
-			"code for depot; %s", package->DepotName().String());
+	if (webAppRepositoryCode.IsEmpty() || webAppRepositorySourceCode.IsEmpty()) {
+		HDERROR("unable to obtain the repository code or repository source code for depot; %s",
+			depotName.String());
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 	} else {
-		status_t status = interface->RetrieveUserRatingForPackageAndVersionByUser(
-				package->Name(), package->Version(), package->Architecture(),
-				webAppRepositoryCode, webAppRepositorySourceCode,
-				nickname, info);
+		status_t status = interface->RetrieveUserRatingForPackageAndVersionByUser(package->Name(),
+			*(version.Get()), coreInfo->Architecture(), webAppRepositoryCode,
+			webAppRepositorySourceCode, nickname, info);
 
 		if (status == B_OK) {
 				// could be an error or could be a valid response envelope
@@ -609,6 +624,34 @@ RatePackageWindow::_SendRatingThreadEntry(void* data)
 void
 RatePackageWindow::_SendRatingThread()
 {
+	PackageCoreInfoRef coreInfo = fPackage->CoreInfo();
+
+	if (!coreInfo.IsSet()) {
+		HDERROR("upload rating: package core info not set");
+		return;
+	}
+
+	PackageVersionRef version = coreInfo->Version();
+
+	if (!version.IsSet()) {
+		HDERROR("upload rating: package version not set");
+		return;
+	}
+
+	BString depotName = coreInfo->DepotName();
+
+	if (depotName.IsEmpty()) {
+		HDERROR("upload rating: depot name not set");
+		return;
+	}
+
+	BString architecture = coreInfo->Architecture();
+
+	if (architecture.IsEmpty()) {
+		HDERROR("upload rating: architecture not set");
+		return;
+	}
+
 	if (!Lock()) {
 		HDERROR("upload rating: Failed to lock window");
 		return;
@@ -616,7 +659,6 @@ RatePackageWindow::_SendRatingThread()
 
 	BMessenger messenger = BMessenger(this);
 	BString package = fPackage->Name();
-	BString architecture = fPackage->Architecture();
 	BString webAppRepositoryCode;
 	BString webAppRepositorySourceCode;
 	int rating = (int)fRating;
@@ -630,9 +672,9 @@ RatePackageWindow::_SendRatingThread()
 	if (!fRatingDeterminate)
 		rating = RATING_NONE;
 
-	const DepotInfo* depot = fModel.DepotForName(fPackage->DepotName());
+	const DepotInfoRef depot = fModel.DepotForName(depotName);
 
-	if (depot != NULL) {
+	if (depot.IsSet()) {
 		webAppRepositoryCode = depot->WebAppRepositoryCode();
 		webAppRepositorySourceCode = depot->WebAppRepositorySourceCode();
 	}
@@ -642,16 +684,14 @@ RatePackageWindow::_SendRatingThread()
 	Unlock();
 
 	if (webAppRepositoryCode.IsEmpty()) {
-		HDERROR("unable to find the web app repository code for the "
-			"local depot %s",
-			fPackage->DepotName().String());
+		HDERROR("unable to find the web app repository code for the local depot %s",
+			depotName.String());
 		return;
 	}
 
 	if (webAppRepositorySourceCode.IsEmpty()) {
-		HDERROR("unable to find the web app repository source code for the "
-			"local depot %s",
-			fPackage->DepotName().String());
+		HDERROR("unable to find the web app repository source code for the local depot %s",
+			depotName.String());
 		return;
 	}
 
@@ -662,13 +702,13 @@ RatePackageWindow::_SendRatingThread()
 	BMessage info;
 	if (ratingID.Length() > 0) {
 		HDINFO("will update the existing user rating [%s]", ratingID.String());
-		status = interface->UpdateUserRating(ratingID,
-			languageId, comment, stability, rating, active, info);
+		status = interface->UpdateUserRating(ratingID, languageId, comment, stability, rating,
+			active, info);
 	} else {
 		HDINFO("will create a new user rating for pkg [%s]", package.String());
-		status = interface->CreateUserRating(package, fPackage->Version(),
-			architecture, webAppRepositoryCode, webAppRepositorySourceCode,
-			languageId, comment, stability, rating, info);
+		status = interface->CreateUserRating(package, *(version.Get()), architecture,
+			webAppRepositoryCode, webAppRepositorySourceCode, languageId, comment, stability,
+			rating, info);
 	}
 
 	if (status == B_OK) {

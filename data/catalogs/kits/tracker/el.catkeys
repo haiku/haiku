@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Αγνόηση
 Current folder	ContainerWindow		Τρέχων κατάλογος
 Finish: %time - Over %finishtime left	StatusWindow		Ολοκλήρωση: %time - Παραμένουν πάνω από %finishtime
 Mount all disks now	AutoMounterSettings		Προσάρτηση όλων των δίσκων τώρα
-Name	PoseView		Όνομα
 Location:	InfoWindow		Τοποθεσία:
+Name	PoseView		Όνομα
 Kind:	InfoWindow		Είδος:
 contains	FindPanel		περιέχει
 Open	FilePanelPriv		Άνοιγμα

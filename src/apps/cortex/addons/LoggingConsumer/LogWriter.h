@@ -36,11 +36,14 @@
 #define LogWriter_H 1
 
 #include <kernel/OS.h>
-//#include <storage/Entry.h>
-//#include <storage/File.h>
+
+#include <media/Buffer.h>
+
 #include <Entry.h>
 #include <File.h>
+
 #include <support/String.h>
+
 #include <set>
 
 // logging message data structure
@@ -54,6 +57,11 @@ struct log_message
 		{
 			bigtime_t start_time;		// buffer's start time stamp
 			bigtime_t offset;				// how late or early the buffer was handled
+			size_t size_available;
+			size_t size_used;
+			uint32 flags;
+			media_buffer_id id;
+			media_type type;
 		} buffer_data;
 		struct
 		{

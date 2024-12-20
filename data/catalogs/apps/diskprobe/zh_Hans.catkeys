@@ -40,7 +40,7 @@ Undo	ProbeView		撤销
 Flattened bitmap	TypeEditors		平面位图
 Cancel	OpenWindow		取消
 Unknown format	TypeEditors		未知类型
-File: 	ProbeView		文件：
+File: 	ProbeView		文件: 
 Stop	ProbeView		停止
 Cancel	ProbeView		取消
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	无法打开 \“%s\”：\n%s

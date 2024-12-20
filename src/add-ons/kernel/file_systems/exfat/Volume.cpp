@@ -81,10 +81,17 @@ LabelVisitor::VisitLabel(struct exfat_entry* entry)
 
 
 bool
+exfat_super_block::IsMagicValid()
+{
+	return strncmp(filesystem, EXFAT_SUPER_BLOCK_MAGIC, sizeof(filesystem)) == 0;
+}
+
+
+bool
 exfat_super_block::IsValid()
 {
 	// TODO: check some more values!
-	if (strncmp(filesystem, EXFAT_SUPER_BLOCK_MAGIC, sizeof(filesystem)) != 0)
+	if (!IsMagicValid())
 		return false;
 	if (signature != 0xaa55)
 		return false;
@@ -345,6 +352,9 @@ Volume::Identify(int fd, exfat_super_block* superBlock)
 	if (read_pos(fd, EXFAT_SUPER_BLOCK_OFFSET, superBlock,
 			sizeof(exfat_super_block)) != sizeof(exfat_super_block))
 		return B_IO_ERROR;
+
+	if (!superBlock->IsMagicValid())
+		return B_BAD_VALUE;
 
 	if (!superBlock->IsValid()) {
 		ERROR("invalid superblock!\n");

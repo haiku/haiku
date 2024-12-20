@@ -7,8 +7,8 @@ Password:	ScreenSaver		비밀번호:
 Password lock	ScreenSaver		비밀번호로 잠그기
 Screensavers	ScreenSaver		화면보호기
 Display Power Management Signaling not available	ScreenSaver		디스플레이 전원 관리 신호를 사용 할 수 없음
-ScreenSaver	System name		ScreenSaver
-Test	ScreenSaver		시험
+ScreenSaver	System name		화면보호기
+Test	ScreenSaver		미리보기
 General	ScreenSaver		일반
 Fade now when mouse is here	ScreenSaver		화면보호기를 작동시킬 마우스 포인터 위치
 Enable screensaver	ScreenSaver		화면보호기 사용
@@ -20,7 +20,7 @@ Password Window	ScreenSaver		비밀번호 창
 Screensaver settings	ScreenSaver		화면보호기 설정
 Passwords don't match. Please try again.	ScreenSaver		비밀번호가 맞지 않습니다. 다시 시도하세요.
 OK	ScreenSaver		확인
-Blackness	ScreenSaver		캄캄함
+Blackness	ScreenSaver		검은화면
 Use custom password	ScreenSaver		사용자 정의 비밀번호 사용
 Done	ScreenSaver		완료
 Confirm password:	ScreenSaver		비밀번호 확인:

@@ -90,9 +90,6 @@ public:
 	virtual	void			SetTransform(const BAffineTransform& transform,
 								int32 xOffset, int32 yOffset);
 
-			void			SuspendAutoSync();
-			void			Sync();
-
 	// drawing functions
 	virtual	void			CopyRegion(/*const*/ BRegion* region,
 								int32 xOffset, int32 yOffset);
@@ -203,15 +200,13 @@ public:
 private:
 	friend class DrawTransaction;
 
-			void			_CopyRect(bool isGraphicsMemory, uint8* bits,
+			void			_CopyRect(uint8* bits,
 								uint32 width, uint32 height, uint32 bytesPerRow,
 								int32 xOffset, int32 yOffset) const;
 
 			ObjectDeleter<Painter>
 							fPainter;
 			HWInterface*	fGraphicsCard;
-			uint32			fAvailableHWAccleration;
-			int32			fSuspendSyncLevel;
 			bool			fCopyToFront;
 };
 

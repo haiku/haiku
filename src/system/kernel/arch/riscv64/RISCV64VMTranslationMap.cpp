@@ -479,7 +479,7 @@ RISCV64VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	VMAreaMappings mappings;
-	mappings.MoveFrom(&area->mappings);
+	mappings.TakeFrom(&area->mappings);
 
 	for (VMAreaMappings::Iterator it = mappings.GetIterator();
 			vm_page_mapping* mapping = it.Next();) {
@@ -656,23 +656,6 @@ status_t RISCV64VMTranslationMap::Protect(addr_t base, addr_t top,
 	}
 
 	return B_OK;
-}
-
-
-status_t
-RISCV64VMTranslationMap::ProtectPage(VMArea* area, addr_t address,
-	uint32 attributes)
-{
-	NOT_IMPLEMENTED_PANIC();
-	return B_OK;
-}
-
-
-status_t
-RISCV64VMTranslationMap::ProtectArea(VMArea* area, uint32 attributes)
-{
-	NOT_IMPLEMENTED_PANIC();
-	return B_NOT_SUPPORTED;
 }
 
 

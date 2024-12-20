@@ -424,7 +424,7 @@ static status_t dir_vnode_to_path(struct vnode* vnode, char* buffer,
 	size_t bufferSize, bool kernel);
 static status_t fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
 	VnodePutter& _vnode, ino_t* _parentID, bool kernel);
-static void inc_vnode_ref_count(struct vnode* vnode);
+static int32 inc_vnode_ref_count(struct vnode* vnode);
 static status_t dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree,
 	bool reenter);
 static inline void put_vnode(struct vnode* vnode);
@@ -733,7 +733,7 @@ get_mount(dev_t id, struct fs_mount** _mount)
 
 	struct vnode* rootNode = mount->root_vnode;
 	if (mount->unmounting || rootNode == NULL || rootNode->IsBusy()
-		|| rootNode->ref_count == 0) {
+			|| rootNode->ref_count == 0) {
 		// might have been called during a mount/unmount operation
 		return B_BUSY;
 	}
@@ -998,9 +998,10 @@ free_vnode(struct vnode* vnode, bool reenter)
 	// file_cache_create()), so that this vnode's ref count has the chance to
 	// ever drop to 0. Deleting the file cache now, will cause the next to last
 	// cache reference to be released, which will also release a (no longer
-	// existing) vnode reference. To avoid problems, we set the vnode's ref
-	// count, so that it will neither become negative nor 0.
-	vnode->ref_count = 2;
+	// existing) vnode reference. To ensure that will be ignored, and that no
+	// other consumers will acquire this vnode in the meantime, we make the
+	// vnode's ref count negative.
+	vnode->ref_count = -1;
 
 	if (!vnode->IsUnpublished()) {
 		if (vnode->IsRemoved())
@@ -1056,7 +1057,6 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 	AutoLocker<Vnode> nodeLocker(vnode);
 
 	const int32 oldRefCount = atomic_add(&vnode->ref_count, -1);
-
 	ASSERT_PRINT(oldRefCount > 0, "vnode %p\n", vnode);
 
 	TRACE(("dec_vnode_ref_count: vnode %p, ref now %" B_PRId32 "\n", vnode,
@@ -1107,13 +1107,16 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 	node.
 
 	\param vnode the vnode.
+	\returns the old reference count.
 */
-static void
+static int32
 inc_vnode_ref_count(struct vnode* vnode)
 {
-	atomic_add(&vnode->ref_count, 1);
+	const int32 oldCount = atomic_add(&vnode->ref_count, 1);
 	TRACE(("inc_vnode_ref_count: vnode %p, ref now %" B_PRId32 "\n", vnode,
-		vnode->ref_count));
+		oldCount + 1));
+	ASSERT(oldCount >= 0);
+	return oldCount;
 }
 
 
@@ -1161,9 +1164,23 @@ get_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode, bool canWait,
 	int32 tries = BUSY_VNODE_RETRIES;
 restart:
 	struct vnode* vnode = lookup_vnode(mountID, vnodeID);
+
+	if (vnode != NULL && !vnode->IsBusy()) {
+		// Try to increment the vnode's reference count without locking.
+		// (We can't use atomic_add here, as if the vnode is unused,
+		// we need to hold its lock to mark it used again.)
+		const int32 oldRefCount = atomic_get(&vnode->ref_count);
+		if (oldRefCount > 0 && atomic_test_and_set(&vnode->ref_count,
+				oldRefCount + 1, oldRefCount) == oldRefCount) {
+			rw_lock_read_unlock(&sVnodeLock);
+			*_vnode = vnode;
+			return B_OK;
+		}
+	}
+
 	AutoLocker<Vnode> nodeLocker(vnode);
 
-	if (vnode && vnode->IsBusy()) {
+	if (vnode != NULL && vnode->IsBusy()) {
 		// vnodes in the Removed state (except ones still Unpublished)
 		// which are also Busy will disappear soon, so we do not wait for them.
 		const bool doNotWait = vnode->IsRemoved() && !vnode->IsUnpublished();
@@ -1184,14 +1201,11 @@ restart:
 
 	TRACE(("get_vnode: tried to lookup vnode, got %p\n", vnode));
 
-	status_t status;
-
-	if (vnode) {
-		if (vnode->ref_count == 0) {
+	if (vnode != NULL) {
+		if (inc_vnode_ref_count(vnode) == 0) {
 			// this vnode has been unused before
 			vnode_used(vnode);
 		}
-		inc_vnode_ref_count(vnode);
 
 		nodeLocker.Unlock();
 		rw_lock_read_unlock(&sVnodeLock);
@@ -1200,7 +1214,7 @@ restart:
 		rw_lock_read_unlock(&sVnodeLock);
 			// unlock -- create_new_vnode_and_lock() write-locks on success
 		bool nodeCreated;
-		status = create_new_vnode_and_lock(mountID, vnodeID, vnode,
+		status_t status = create_new_vnode_and_lock(mountID, vnodeID, vnode,
 			nodeCreated);
 		if (status != B_OK)
 			return status;
@@ -1337,8 +1351,10 @@ free_unused_vnodes(int32 level)
 		// has been touched in the meantime, i.e. it is no longer the least
 		// recently used unused vnode and we rather don't free it.
 		unusedVnodesLocker.Lock();
-		if (vnode != sUnusedVnodeList.First())
+		if (vnode != sUnusedVnodeList.First()) {
+			unusedVnodesLocker.Unlock();
 			continue;
+		}
 		unusedVnodesLocker.Unlock();
 
 		ASSERT(!vnode->IsBusy());
@@ -2154,8 +2170,6 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 	status_t status = B_OK;
 	ino_t lastParentID = vnode->id;
 	while (true) {
-		char* nextPath;
-
 		TRACE(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path,
 			path));
 
@@ -2165,16 +2179,17 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 
 		// walk to find the next path component ("path" will point to a single
 		// path component), and filter out multiple slashes
-		for (nextPath = path + 1; *nextPath != '\0' && *nextPath != '/';
-				nextPath++);
+		char* nextPath = path + 1;
+		while (*nextPath != '\0' && *nextPath != '/')
+			nextPath++;
 
 		bool directoryFound = false;
 		if (*nextPath == '/') {
 			directoryFound = true;
 			*nextPath = '\0';
-			do
+			do {
 				nextPath++;
-			while (*nextPath == '/');
+			} while (*nextPath == '/');
 		}
 
 		// See if the '..' is at a covering vnode move to the covered
@@ -2211,27 +2226,22 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 		}
 
 		if (status != B_OK) {
-			if (leafName != NULL) {
+			if (leafName != NULL && !directoryFound) {
 				strlcpy(leafName, path, B_FILE_NAME_LENGTH);
 				_vnode.SetTo(vnode.Detach());
 			}
 			return status;
 		}
 
-		// If the new node is a symbolic link, resolve it (if we've been told
-		// to do it)
-		if (S_ISLNK(nextVnode->Type())
-			&& (traverseLeafLink || directoryFound)) {
-			size_t bufferSize;
-			char* buffer;
-
+		// If the new node is a symbolic link, resolve it (if we've been told to)
+		if (S_ISLNK(nextVnode->Type()) && (traverseLeafLink || directoryFound)) {
 			TRACE(("traverse link\n"));
 
-			if (count + 1 > B_MAX_SYMLINKS)
+			if ((count + 1) > B_MAX_SYMLINKS)
 				return B_LINK_LIMIT;
 
-			bufferSize = B_PATH_NAME_LENGTH;
-			buffer = (char*)object_cache_alloc(sPathNameCache, 0);
+			size_t bufferSize = B_PATH_NAME_LENGTH;
+			char* buffer = (char*)object_cache_alloc(sPathNameCache, 0);
 			if (buffer == NULL)
 				return B_NO_MEMORY;
 
@@ -2289,8 +2299,9 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 					_vnode.SetTo(nextVnode.Detach());
 				return status;
 			}
-		} else
+		} else {
 			lastParentID = vnode->id;
+		}
 
 		// decrease the ref count on the old dir we just looked up into
 		vnode.Unset();
@@ -2304,7 +2315,7 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 	}
 
 	_vnode.SetTo(vnode.Detach());
-	if (_parentID)
+	if (_parentID != NULL)
 		*_parentID = lastParentID;
 
 	return B_OK;
@@ -2824,12 +2835,14 @@ get_new_fd(struct fd_ops* ops, struct fs_mount* mount, struct vnode* vnode,
 
 	// If the vnode is locked, we don't allow creating a new file/directory
 	// file_descriptor for it
-	if (vnode && vnode->mandatory_locked_by != NULL
-		&& (ops == &sFileOps || ops == &sDirectoryOps))
+	if (vnode != NULL && vnode->mandatory_locked_by != NULL
+			&& (ops == &sFileOps || ops == &sDirectoryOps))
 		return B_BUSY;
 
 	if ((openMode & O_RDWR) != 0 && (openMode & O_WRONLY) != 0)
 		return B_BAD_VALUE;
+	if ((openMode & O_RWMASK) == O_RDONLY && (openMode & O_TRUNC) != 0)
+		return B_NOT_ALLOWED;
 
 	descriptor = alloc_fd();
 	if (!descriptor)
@@ -5270,7 +5283,7 @@ vfs_init(kernel_args* args)
 		panic("vfs_init: error creating mounts hash table\n");
 
 	sPathNameCache = create_object_cache("vfs path names",
-		B_PATH_NAME_LENGTH + 1, 8, NULL, NULL, NULL);
+		B_PATH_NAME_LENGTH, 8, NULL, NULL, NULL);
 	if (sPathNameCache == NULL)
 		panic("vfs_init: error creating path name object_cache\n");
 
@@ -5404,16 +5417,16 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 				status = vnode_path_to_vnode(directory, clonedName, true,
 					kernel, vnode, NULL, clonedName);
 				if (status != B_OK) {
+					if (status != B_ENTRY_NOT_FOUND || !vnode.IsSet())
+						return status;
+
 					// vnode is not found, but maybe it has a parent and we can create it from
 					// there. In that case, vnode_path_to_vnode has set vnode to the latest
-					// directory found in the path
-					if (status == B_ENTRY_NOT_FOUND) {
-						directory = vnode.Detach();
-						dirPutter.SetTo(directory);
-						name = clonedName;
-						create = true;
-					} else
-						return status;
+					// directory found in the path.
+					directory = vnode.Detach();
+					dirPutter.SetTo(directory);
+					name = clonedName;
+					create = true;
 				}
 			}
 
@@ -5437,10 +5450,8 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 		status = FS_CALL(directory, create, name, openMode | O_EXCL, perms,
 			&cookie, &newID);
-		if (status != B_OK
-			&& ((openMode & O_EXCL) != 0 || status != B_FILE_EXISTS)) {
+		if (status != B_OK && ((openMode & O_EXCL) != 0 || status != B_FILE_EXISTS))
 			return status;
-		}
 	}
 
 	if (status != B_OK)
@@ -7661,9 +7672,8 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		inc_vnode_ref_count(sRoot);
 	}
 
-	// supply the partition (if any) with the mount cookie and mark it mounted
+	// supply the partition (if any) with the mount ID and mark it mounted
 	if (partition) {
-		partition->SetMountCookie(mount->volume->private_volume);
 		partition->SetVolumeID(mount->id);
 
 		// keep a partition reference as long as the partition is mounted
@@ -7906,7 +7916,6 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	// dereference the partition and mark it unmounted
 	if (partition) {
 		partition->SetVolumeID(-1);
-		partition->SetMountCookie(NULL);
 
 		if (mount->owns_file_device)
 			KDiskDeviceManager::Default()->DeleteFileDevice(partition->ID());
@@ -7975,11 +7984,10 @@ fs_sync(dev_t device)
 		if (vnode == NULL || vnode->IsBusy())
 			continue;
 
-		if (vnode->ref_count == 0) {
+		if (inc_vnode_ref_count(vnode) == 0) {
 			// this vnode has been unused before
 			vnode_used(vnode);
 		}
-		inc_vnode_ref_count(vnode);
 
 		locker.Unlock();
 

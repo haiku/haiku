@@ -23,12 +23,8 @@
 PackageInfo::PackageInfo()
 	:
 	fName(),
-	fVersion(),
-	fVersionCreateTimestamp(0),
-	fPublisher(),
-	fArchitecture(),
-	fDepotName(""),
 
+	fCoreInfo(),
 	fLocalizedText(),
 	fClassificationInfo(),
 	fScreenshotInfo(),
@@ -45,11 +41,6 @@ PackageInfo::PackageInfo()
 PackageInfo::PackageInfo(const BPackageInfo& info)
 	:
 	fName(info.Name()),
-	fVersion(info.Version()),
-	fVersionCreateTimestamp(0),
-	fPublisher(),
-	fArchitecture(info.ArchitectureName()),
-	fDepotName(""),
 
 	fClassificationInfo(),
 	fScreenshotInfo(),
@@ -59,6 +50,9 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fIsCollatingChanges(false),
 	fCollatedChanges(0)
 {
+
+	// TODO; factor this material out.
+
 	BString publisherURL;
 	if (info.URLList().CountStrings() > 0)
 		publisherURL = info.URLList().StringAt(0);
@@ -77,7 +71,11 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	if (!publisherName.IsEmpty())
 		publisherName.Prepend("© ");
 
-	fPublisher = PublisherInfo(publisherName, publisherURL);
+	fCoreInfo = PackageCoreInfoRef(new PackageCoreInfo(), true);
+	fCoreInfo->SetArchitecture(info.ArchitectureName());
+	fCoreInfo->SetVersion(new PackageVersion(info.Version()));
+	fCoreInfo->SetPublisher(
+		PackagePublisherInfoRef(new PackagePublisherInfo(publisherName, publisherURL), true));
 
 	fLocalizedText = PackageLocalizedTextRef(new PackageLocalizedText(), true);
 	fLocalizedText->SetTitle(info.Name());
@@ -94,12 +92,8 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 PackageInfo::PackageInfo(const PackageInfo& other)
 	:
 	fName(other.fName),
-	fVersion(other.fVersion),
-	fVersionCreateTimestamp(other.fVersionCreateTimestamp),
-	fPublisher(other.fPublisher),
-	fArchitecture(other.fArchitecture),
-	fDepotName(other.fDepotName),
 
+	fCoreInfo(other.fCoreInfo),
 	fLocalizedText(other.fLocalizedText),
 	fClassificationInfo(other.fClassificationInfo),
 	fScreenshotInfo(other.fScreenshotInfo),
@@ -117,15 +111,11 @@ PackageInfo&
 PackageInfo::operator=(const PackageInfo& other)
 {
 	fName = other.fName;
-	fVersion = other.fVersion;
-	fVersionCreateTimestamp = other.fVersionCreateTimestamp;
-	fPublisher = other.fPublisher;
+	fCoreInfo = other.fCoreInfo;
 	fLocalizedText = other.fLocalizedText;
 	fClassificationInfo = other.fClassificationInfo;
 	fScreenshotInfo = other.fScreenshotInfo;
 	fUserRatingInfo = other.fUserRatingInfo;
-	fArchitecture = other.fArchitecture;
-	fDepotName = other.fDepotName;
 	fLocalInfo = other.fLocalInfo;
 
 	return *this;
@@ -136,15 +126,12 @@ bool
 PackageInfo::operator==(const PackageInfo& other) const
 {
 	return fName == other.fName
+		&& fCoreInfo == other.fCoreInfo
 		&& fLocalInfo == other.fLocalInfo
-		&& fVersion == other.fVersion
-		&& fPublisher == other.fPublisher
 		&& fLocalizedText == other.fLocalizedText
 		&& fClassificationInfo == other.fClassificationInfo
 		&& fScreenshotInfo == other.fScreenshotInfo
-		&& fUserRatingInfo == fUserRatingInfo
-		&& fArchitecture == other.fArchitecture
-		&& fVersionCreateTimestamp == other.fVersionCreateTimestamp;
+		&& fUserRatingInfo == fUserRatingInfo;
 }
 
 
@@ -159,6 +146,7 @@ uint32
 PackageInfo::DiffMask(const PackageInfo& other) const
 {
 	uint32 result = 0;
+
 	if (fLocalizedText != fLocalizedText)
 		result |= PKG_CHANGED_LOCALIZED_TEXT;
 	if (fScreenshotInfo != other.fScreenshotInfo)
@@ -169,9 +157,20 @@ PackageInfo::DiffMask(const PackageInfo& other) const
 		result |= PKG_CHANGED_LOCAL_INFO;
 	if (fClassificationInfo != other.fClassificationInfo)
 		result |= PKG_CHANGED_CLASSIFICATION;
-	if (fVersionCreateTimestamp != other.fVersionCreateTimestamp)
-		result |= PKG_CHANGED_VERSION_CREATE_TIMESTAMP;
+	if (fCoreInfo != other.fCoreInfo)
+		result |= PKG_CHANGED_CORE_INFO;
+
 	return result;
+}
+
+
+void
+PackageInfo::SetCoreInfo(PackageCoreInfoRef value)
+{
+	if (value != fCoreInfo) {
+		fCoreInfo = value;
+		_NotifyListeners(PKG_CHANGED_CORE_INFO);
+	}
 }
 
 
@@ -245,23 +244,6 @@ PackageInfo::SetScreenshotInfo(PackageScreenshotInfoRef value)
 		fScreenshotInfo = value;
 		_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
 	}
-}
-
-
-void
-PackageInfo::SetVersionCreateTimestamp(uint64 value)
-{
-	if (fVersionCreateTimestamp != value) {
-		fVersionCreateTimestamp = value;
-		_NotifyListeners(PKG_CHANGED_VERSION_CREATE_TIMESTAMP);
-	}
-}
-
-
-void
-PackageInfo::SetDepotName(const BString& depotName)
-{
-	fDepotName = depotName;
 }
 
 

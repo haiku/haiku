@@ -96,7 +96,7 @@ I agree to the usage conditions	UserLoginWindow		我同意使用条款
 Logged in as %User%	MainWindow		使用%User%登录
 A reboot is necessary to complete the installation process.	PackageManager		需要重启以完成安装过程。
 Yes	MainWindow		是
-{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{我满一岁了}other{我已年满 # 岁}}
 Pending…	PackageListView		挂起…
 Search terms:	FilterView		搜索项目：
 Quit	App		退出
@@ -147,7 +147,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		用户评分
 Installed packages	MainWindow		已安装软件包
 Date	PackageListView		日期
-The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		密码必须至少为%MinPasswordLength%个字符。%MinPasswordUppercaseChar%必须为大写字母，%MinPasswordDigitsChar%必须为数字。
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		密码必须至少为%MinPasswordLength%个字符。必须有 %MinPasswordUppercaseChar% 个为大写字母，%MinPasswordDigitsChar% 个为数字。
 Error	App		错误
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		下载使用条款时出现错误。请查看日志了解详细信息，然后重试。\n有关如何查看日志的信息，请参阅 Haiku 用户指南的 HaikuDepot 部分。
 There was a puzzling response from the web service.	UserLoginWindow		网络服务响应无法解析。
@@ -173,9 +173,9 @@ Inactive	PackageListView		未激活
 Nickname:	UserLoginWindow		昵称:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		正在同步仓库元数据信息
 OK	MainWindow		确定
-Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		用户年龄需高于 {0, plural, one{# year of age} other{# years of age}} 岁.
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		用户年龄需高于 {0, plural, one{# 岁} other{# 岁}}。
 Version %Code%	UserUsageConditions		版本 %Code%
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# 个项目} other{# 个项目}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		卸载 \"%PackageName%\"
 Downloading:	PackageInfoView		下载中：
 Quit	MainWindow		退出

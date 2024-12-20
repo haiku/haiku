@@ -1,6 +1,8 @@
-1	korean	x-vnd.Haiku-STXTTranslator	3302294301
+1	korean	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Be 스타일 텍스트 파일
-Plain text file	STXTTranslator		보통 텍스트 파일
-STXTTranslator Settings	STXTTranslator		STXT변환기 설정
+Plain text file	STXTTranslator		일반 텍스트 파일
+STXTTranslator Settings	STXTTranslator		STXT 변환기 설정
+StyledEdit file translator	STXTView		스타일드편집기 파일 변환기
 StyledEdit files	STXTTranslator		스타일드편집기 파일
+StyledEdit file translator	STXTTranslator		스타일드편집기 파일 변환기
 STXT Settings	STXTMain		STXT 설정

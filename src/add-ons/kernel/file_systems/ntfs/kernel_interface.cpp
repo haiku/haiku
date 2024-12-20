@@ -63,8 +63,11 @@ fs_identify_partition(int fd, partition_data* partition, void** _cookie)
 		return -1;
 	}
 
+	if (strncmp(((const char*)&boot) + 3, "NTFS", 4) != 0)
+		return -1;
+
 	if (!ntfs_boot_sector_is_ntfs(&boot)) {
-		ERROR("identify_partition: boot signature doesn't match\n");
+		ERROR("identify_partition: boot signature invalid\n");
 		return -1;
 	}
 
@@ -1391,6 +1394,7 @@ static file_system_module_info sNtfsFileSystem = {
 	0
 	| B_DISK_SYSTEM_IS_FILE_SYSTEM
 	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
 	| B_DISK_SYSTEM_SUPPORTS_WRITING
 	,
 

@@ -148,7 +148,7 @@ class SinglyLinkedList {
 		inline bool Remove(Element* element);
 		inline void Remove(Element* previous, Element* element);
 
-		inline void MoveFrom(SINGLY_LINKED_LIST_CLASS_NAME* fromList);
+		inline void TakeFrom(SINGLY_LINKED_LIST_CLASS_NAME* fromList);
 			// O(1) if either list is empty, otherwise O(n).
 
 		inline void RemoveAll();
@@ -240,7 +240,7 @@ SINGLY_LINKED_LIST_CLASS_NAME::Remove(Element* previous, Element* element)
 
 SINGLY_LINKED_LIST_TEMPLATE_LIST
 void
-SINGLY_LINKED_LIST_CLASS_NAME::MoveFrom(SINGLY_LINKED_LIST_CLASS_NAME* fromList)
+SINGLY_LINKED_LIST_CLASS_NAME::TakeFrom(SINGLY_LINKED_LIST_CLASS_NAME* fromList)
 {
 	if (fromList->fFirst == NULL)
 		return;

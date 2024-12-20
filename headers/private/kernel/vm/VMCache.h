@@ -15,6 +15,7 @@
 #include <util/DoublyLinkedList.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
+#include <vm/VMArea.h>
 
 #include "kernel_debug_config.h"
 
@@ -135,7 +136,7 @@ public:
 	virtual	status_t			Adopt(VMCache* source, off_t offset, off_t size,
 									off_t newOffset);
 
-	virtual	status_t			Discard(off_t offset, off_t size);
+	virtual	ssize_t				Discard(off_t offset, off_t size);
 
 			status_t			FlushAndRemoveAllPages();
 
@@ -149,6 +150,7 @@ public:
 									{ return fRefCount; }
 
 	// backing store operations
+	virtual	bool				CanOvercommit();
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
 
@@ -187,7 +189,7 @@ protected:
 	virtual	void				DeleteObject() = 0;
 
 public:
-			VMArea*				areas;
+			VMArea::CacheList	areas;
 			ConsumerList		consumers;
 				// list of caches that use this cache as a source
 			VMCachePagesTree	pages;
@@ -198,7 +200,6 @@ public:
 				// TODO: Remove!
 			uint32				page_count;
 			uint32				temporary : 1;
-			uint32				unmergeable : 1;
 			uint32				type : 6;
 
 #if DEBUG_CACHE_LIST
@@ -219,7 +220,7 @@ private:
 			void				_RemoveConsumer(VMCache* consumer);
 
 			bool				_FreePageRange(VMCachePagesTree::Iterator it,
-									page_num_t* toPage);
+									page_num_t* toPage, page_num_t* freedPages);
 
 private:
 			int32				fRefCount;

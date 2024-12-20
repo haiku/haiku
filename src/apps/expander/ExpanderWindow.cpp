@@ -127,7 +127,6 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fScrollView = new BScrollView("", fListingText,	B_INVALIDATE_AFTER_LAYOUT,
 		true, true);
 
-	const float spacing = be_control_look->DefaultItemSpacing();
 	BGroupLayout* pathLayout;
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(fBar)
@@ -146,8 +145,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 				.Add(fExpandButton)
 				.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING)
 					.GetLayout(&pathLayout)
-					.Add(fShowContents = new BCheckBox(
-						B_TRANSLATE("Show contents"),
+					.Add(fShowContents = new BCheckBox(B_TRANSLATE("Show contents"),
 						new BMessage(MSG_SHOWCONTENTS)))
 					.Add(fStatusView = new StatusView())
 					.End()
@@ -158,7 +156,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 
 	pathLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	size = GetLayout()->View()->PreferredSize();
-	fSizeLimit = size.Height() - fScrollView->PreferredSize().height - spacing;
+	fSizeLimit = size.Height() - fScrollView->PreferredSize().height;
 
 	fStatusView->SetExplicitMinSize(BSize(50.0f, B_SIZE_UNSET));
 	fStatusView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));

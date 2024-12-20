@@ -1,2 +1,25 @@
-1	korean	x-vnd.Haiku-WebPTranslator	1475550615
+1	korean	x-vnd.Haiku-WebPTranslator	828165164
+High	ConfigView		높음
+WebPTranslator Settings	ConfigView		WebP 변환기 설정
+Low	ConfigView		낮음
+WebP image translator	ConfigView		WebP 이미지 변환기
+Photo	ConfigView		사진
+WebP image translator	WebPTranslator		WebP 이미지 변환기
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		그림
+Default	ConfigView		기본값
+Text	ConfigView		텍스트
+Preprocessing filter	ConfigView		전처리 필터
+Compression method:	ConfigView		압축 방식:
+Preset	ConfigView		프리셋
+Drawing	ConfigView		드로잉
+Output preset:	ConfigView		출력 프리셋:
 WebP Settings	main		WebP 설정
+Icon	ConfigView		아이콘
+WebP image	WebPTranslator		WebP 이미지
+Output quality:	ConfigView		출력 품질:
+Slower but better	ConfigView		느리지만 고품질
+Based on libwebp %version%	ConfigView		libwebp %version%에 기반함
+Fast	ConfigView		빠름
+WebP images	WebPTranslator		WebP 이미지

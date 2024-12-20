@@ -57,7 +57,7 @@ After two seconds	DefaultPartitionPage		2초 후
 Partition table not compatible	BootManagerController	Title	파티션 테이블이 호환되지 않음
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		부트 장치(%DISK)의 마스터 부트 레코드가 %FILE로부터 성공적으로 복구되었습니다.
 Done	BootManagerController	Button	완료
-BootManager	System name		BootManager
+BootManager	System name		부트관리자
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		복구할 마스터 부트 레코드(MBR) 파일을 선택해 주십시오. 해당 파일은 부트 관리자를 처음 설치할 때 만들어졌습니다.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		복구할 마스터 부트 레코드(MBR) 파일을 선택해 주십시오. 해당 파일은 부트 관리자를 처음 설치할 때 만들어졌습니다.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%file로부터 %disk의 마스터 부트 레코드(MBR)를 복구합니다. 계속 하시겠습니까?

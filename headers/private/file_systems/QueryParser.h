@@ -267,7 +267,7 @@ private:
 						Equation& operator=(const Equation& other);
 							// no implementation
 
-			status_t	ConvertValue(type_code type);
+			status_t	ConvertValue(type_code type, uint32 size);
 			bool		CompareTo(const uint8* value, size_t size);
 			uint8*		Value() const { return (uint8*)&fValue; }
 
@@ -275,7 +275,7 @@ private:
 			char*		fString;
 			union value<QueryPolicy> fValue;
 			type_code	fType;
-			size_t		fSize;
+			uint32		fSize;
 			bool		fIsPattern;
 
 			int32		fScore;
@@ -368,7 +368,8 @@ Equation<QueryPolicy>::Equation(const char** expr)
 	fAttribute(NULL),
 	fString(NULL),
 	fType(0),
-	fIsPattern(false)
+	fIsPattern(false),
+	fScore(INT32_MAX)
 {
 	const char* string = *expr;
 	const char* start = string;
@@ -585,8 +586,14 @@ Equation<QueryPolicy>::_IsOperatorChar(char c) const
 
 template<typename QueryPolicy>
 status_t
-Equation<QueryPolicy>::ConvertValue(type_code type)
+Equation<QueryPolicy>::ConvertValue(type_code type, uint32 size)
 {
+	// Perform type coercion up-front, so we don't re-convert every time.
+	if (type == B_MIME_STRING_TYPE)
+		type = B_STRING_TYPE;
+	else if (type == B_TIME_TYPE)
+		type = (size == 4) ? B_INT32_TYPE : B_INT64_TYPE;
+
 	// Has the type already been converted?
 	if (type == fType)
 		return B_OK;
@@ -594,9 +601,6 @@ Equation<QueryPolicy>::ConvertValue(type_code type)
 	char* string = fString;
 
 	switch (type) {
-		case B_MIME_STRING_TYPE:
-			type = B_STRING_TYPE;
-			// supposed to fall through
 		case B_STRING_TYPE:
 			strncpy(fValue.String, string, QueryPolicy::kMaxFileNameLength);
 			fValue.String[QueryPolicy::kMaxFileNameLength - 1] = '\0';
@@ -610,9 +614,6 @@ Equation<QueryPolicy>::ConvertValue(type_code type)
 			fValue.Int32 = strtoul(string, &string, 0);
 			fSize = sizeof(uint32);
 			break;
-		case B_TIME_TYPE:
-			type = B_INT64_TYPE;
-			// supposed to fall through
 		case B_INT64_TYPE:
 			fValue.Int64 = strtoll(string, &string, 0);
 			fSize = sizeof(int64);
@@ -744,7 +745,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 	}
 
 	// prepare own value for use, if it is possible to convert it
-	status_t status = ConvertValue(type);
+	status_t status = ConvertValue(type, size);
 	if (status == B_OK)
 		status = CompareTo(buffer, size) ? MATCH_OK : NO_MATCH;
 
@@ -760,34 +761,35 @@ Equation<QueryPolicy>::CalculateScore(Index &index)
 	// And the code could also need some real world testing :-)
 
 	// do we have to operate on a "foreign" index?
-	if (Term<QueryPolicy>::fOp == OP_UNEQUAL
-		|| QueryPolicy::IndexSetTo(index, fAttribute) < B_OK) {
-		fScore = 0;
+	if (QueryPolicy::IndexSetTo(index, fAttribute) < B_OK) {
+		fScore = INT32_MAX;
+		return;
+	}
+
+	fScore = QueryPolicy::IndexGetSize(index);
+
+	if (Term<QueryPolicy>::fOp == OP_UNEQUAL) {
+		// we'll need to scan the whole index
 		return;
 	}
 
 	// if we have a pattern, how much does it help our search?
 	if (fIsPattern) {
-		fScore = getFirstPatternSymbol(fString) << 3;
+		const int32 firstSymbolIndex = getFirstPatternSymbol(fString);
 
-		// Even if the first pattern symbol is at position 0,
-		// there's still an index, so don't let our score revert to zero.
-		if (fScore == 0)
-			fScore = 1;
+		// Guess how much of the index we will be able to skip.
+		const int32 divisor = (firstSymbolIndex > 3) ? 4 : (firstSymbolIndex + 1);
+		fScore /= divisor;
 	} else {
 		// Score by operator
 		if (Term<QueryPolicy>::fOp == OP_EQUAL) {
-			// higher than pattern="255 chars+*"
-			fScore = 2048;
+			// higher than most patterns
+			fScore /= (fSize > 8) ? 8 : fSize;
 		} else {
-			// the pattern search is regarded cheaper when you have at
-			// least one character to set your index to
-			fScore = 5;
+			// better than nothing, anyway
+			fScore /= 2;
 		}
 	}
-
-	// take index size into account
-	fScore = QueryPolicy::IndexGetWeightedScore(index, fScore);
 }
 
 
@@ -803,6 +805,7 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 		return B_ENTRY_NOT_FOUND;
 
 	type_code type;
+	int32 keySize;
 
 	// Special case for OP_UNEQUAL - it will always operate through the whole
 	// index but we need the call to the original index to get the correct type
@@ -810,7 +813,13 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 		// Try to get an index that holds all files (name)
 		// Also sets the default type for all attributes without index
 		// to string.
-		type = status < B_OK ? B_STRING_TYPE : QueryPolicy::IndexGetType(index);
+		if (status == B_OK) {
+			type = QueryPolicy::IndexGetType(index);
+			keySize = QueryPolicy::IndexGetKeySize(index);
+		} else {
+			type = B_STRING_TYPE;
+			keySize = 0;
+		}
 
 		if (QueryPolicy::IndexSetTo(index, "name") != B_OK)
 			return B_ENTRY_NOT_FOUND;
@@ -819,9 +828,10 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 	} else {
 		fHasIndex = true;
 		type = QueryPolicy::IndexGetType(index);
+		keySize = QueryPolicy::IndexGetKeySize(index);
 	}
 
-	if (ConvertValue(type) < B_OK)
+	if (ConvertValue(type, keySize) < B_OK)
 		return B_BAD_VALUE;
 
 	*iterator = QueryPolicy::IndexCreateIterator(index);
@@ -833,8 +843,6 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 			|| Term<QueryPolicy>::fOp == OP_GREATER_THAN_OR_EQUAL || fIsPattern)
 		&& fHasIndex) {
 		// set iterator to the exact position
-
-		int32 keySize = QueryPolicy::IndexGetKeySize(index);
 
 		// At this point, fIsPattern is only true if it's a string type, and fOp
 		// is either OP_EQUAL or OP_UNEQUAL
@@ -1036,7 +1044,7 @@ Operator<QueryPolicy>::Match(Entry* entry, Node* node, const char* attribute,
 		// choose the term with the better score for OP_OR
 		Term<QueryPolicy>* first;
 		Term<QueryPolicy>* second;
-		if (fRight->Score() > fLeft->Score()) {
+		if (fRight->Score() < fLeft->Score()) {
 			first = fLeft;
 			second = fRight;
 		} else {
@@ -1083,16 +1091,14 @@ Operator<QueryPolicy>::Score() const
 {
 	if (Term<QueryPolicy>::fOp == OP_AND) {
 		// return the one with the better score
-		if (fRight->Score() > fLeft->Score())
+		if (fRight->Score() < fLeft->Score())
 			return fRight->Score();
-
 		return fLeft->Score();
 	}
 
 	// for OP_OR, be honest, and return the one with the worse score
-	if (fRight->Score() < fLeft->Score())
+	if (fRight->Score() > fLeft->Score())
 		return fRight->Score();
-
 	return fLeft->Score();
 }
 
@@ -1497,13 +1503,13 @@ Query<QueryPolicy>::Rewind()
 			} else {
 				// For OP_AND, we can use the scoring system to decide which
 				// path to add
-				if (op->Right()->Score() > op->Left()->Score())
+				if (op->Right()->Score() < op->Left()->Score())
 					stack.Push(op->Right());
 				else
 					stack.Push(op->Left());
 			}
 		} else if (term->Op() == OP_EQUATION
-			|| fStack.Push((Equation<QueryPolicy>*)term) != B_OK)
+				|| fStack.Push((Equation<QueryPolicy>*)term) != B_OK)
 			QUERY_FATAL("Unknown term on stack or stack error\n");
 	}
 

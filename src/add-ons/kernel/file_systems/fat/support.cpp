@@ -927,7 +927,9 @@ get_location(mount* bsdVolume, ino_t vnid, u_long* dirclust, u_long* diroffset)
 	msdosfsmount* fatVolume = reinterpret_cast<msdosfsmount*>(bsdVolume->mnt_data);
 	ino_t location = -1;
 
-	vcache_vnid_to_loc(bsdVolume, vnid, &location);
+	status_t status = vcache_vnid_to_loc(bsdVolume, vnid, &location);
+	if (status != B_OK)
+		return status;
 
 	if (dirclust != NULL && diroffset != NULL) {
 		// do the reverse of DETOI

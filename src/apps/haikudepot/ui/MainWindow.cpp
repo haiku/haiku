@@ -290,10 +290,7 @@ MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 	fSinglePackageMode(true),
 	fIncrementViewCounterDelayedRunner(NULL)
 {
-	BString title = B_TRANSLATE("HaikuDepot - %PackageName% %PackageVersion%");
-	title.ReplaceAll("%PackageName%", package->Name());
-	title.ReplaceAll("%PackageVersion%", package->Version().ToString());
-	SetTitle(title);
+	SetTitle(_WindowTitleForPackage(package));
 
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
 		debugger("unable to create the process coordinator semaphore");
@@ -317,7 +314,7 @@ MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 
 	// add the single package into the model so that any internal
 	// business logic is able to find the package.
-	DepotInfoRef depot(new DepotInfo("single-pkg-depot"), true);
+	DepotInfoRef depot(new DepotInfo(SINGLE_PACKAGE_DEPOT_NAME), true);
 	depot->AddPackage(package);
 	fModel.MergeOrAddDepot(depot);
 
@@ -1373,7 +1370,7 @@ bool
 MainWindow::_SelectedPackageHasWebAppRepositoryCode()
 {
 	const PackageInfoRef& package = fPackageInfoView->Package();
-	const BString depotName = package->DepotName();
+	const BString depotName = PackageUtils::DepotName(package);
 
 	if (depotName.IsEmpty()) {
 		HDDEBUG("the package [%s] has no depot name", package->Name().String());
@@ -1706,4 +1703,21 @@ MainWindow::_HandleScreenshotCached(const BMessage* message)
 {
 	ScreenshotCoordinate coordinate(message);
 	fPackageInfoView->HandleScreenshotCached(coordinate);
+}
+
+
+/*static*/ const BString
+MainWindow::_WindowTitleForPackage(const PackageInfoRef& pkg)
+{
+	PackageVersionRef version = PackageUtils::Version(pkg);
+	BString versionString = "???";
+
+	if (version.IsSet())
+		versionString = version->ToString();
+
+	BString title = B_TRANSLATE("HaikuDepot - %PackageName% %PackageVersion%");
+	title.ReplaceAll("%PackageName%", pkg->Name());
+	title.ReplaceAll("%PackageVersion%", versionString);
+
+	return title;
 }

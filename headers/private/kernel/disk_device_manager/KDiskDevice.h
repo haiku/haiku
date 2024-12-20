@@ -27,8 +27,6 @@ public:
 
 	status_t SetTo(const char *path);
 	void Unset();
-	virtual status_t InitCheck() const;
-		// TODO: probably superfluous
 
 	// A read lock owner can be sure that the device (incl. all of its
 	// partitions won't be changed).
@@ -60,16 +58,11 @@ public:
 
 	void UpdateGeometry();
 
-	status_t SetPath(const char *path);
-		// TODO: Remove this method or make it private. Once initialized the
-		// path must not be changed.
 	const char *Path() const;
 	virtual	status_t GetFileName(char* buffer, size_t size) const;
 	virtual status_t GetPath(KPath *path) const;
 
-	// File descriptor: Set only from a kernel thread, valid only for
-	// kernel threads.
-	void SetFD(int fd);
+	// File descriptor: valid only for kernel threads.
 	int FD() const;
 
 	// access to C style device data
@@ -101,6 +94,8 @@ private:
 } // namespace DiskDevice
 } // namespace BPrivate
 
+
 using BPrivate::DiskDevice::KDiskDevice;
+
 
 #endif	// _K_DISK_DEVICE_H

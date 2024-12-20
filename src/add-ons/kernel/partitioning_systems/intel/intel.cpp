@@ -34,14 +34,21 @@
 #include "PartitionMap.h"
 #include "PartitionMapParser.h"
 
-#ifndef _BOOT_MODE
-#	include <DiskDeviceTypes.h>
-#	include "write_support.h"
-#	define TRACE(x) dprintf x
-#else
+
+//#define TRACE_INTEL 1
+#ifdef _BOOT_MODE
 #	include <boot/partitions.h>
 #	include <util/kernel_cpp.h>
-#	define TRACE(x) ;
+#	undef TRACE_INTEL
+#else
+#	include <DiskDeviceTypes.h>
+#	include "write_support.h"
+#endif
+
+#if TRACE_INTEL
+#	define TRACE(x...)		dprintf("intel: " x)
+#else
+#	define TRACE(x...) ;
 #endif
 
 
@@ -60,8 +67,7 @@ using std::nothrow;
 static status_t
 get_type_for_content_type(const char* contentType, char* type)
 {
-	TRACE(("intel: get_type_for_content_type(%s)\n",
-		   contentType));
+	TRACE("get_type_for_content_type(%s)\n", contentType);
 
 	if (!contentType || !type)
 		return B_BAD_VALUE;
@@ -81,11 +87,10 @@ get_type_for_content_type(const char* contentType, char* type)
 // #pragma mark - Intel Partition Map Module
 
 
-// pm_std_ops
 static status_t
 pm_std_ops(int32 op, ...)
 {
-	TRACE(("intel: pm_std_ops(0x%" B_PRIx32 ")\n", op));
+	TRACE("pm_std_ops(0x%" B_PRIx32 ")\n", op);
 	switch(op) {
 		case B_MODULE_INIT:
 		case B_MODULE_UNINIT:
@@ -95,7 +100,6 @@ pm_std_ops(int32 op, ...)
 }
 
 
-// pm_identify_partition
 static float
 pm_identify_partition(int fd, partition_data* partition, void** cookie)
 {
@@ -103,12 +107,13 @@ pm_identify_partition(int fd, partition_data* partition, void** cookie)
 	if (fd < 0 || !partition || !cookie)
 		return -1;
 
-	TRACE(("intel: pm_identify_partition(%d, %" B_PRId32 ": %" B_PRId64 ", "
+	TRACE("pm_identify_partition(%d, %" B_PRId32 ": %" B_PRId64 ", "
 		"%" B_PRId64 ", %" B_PRId32 ")\n", fd, partition->id, partition->offset,
-		partition->size, partition->block_size));
+		partition->size, partition->block_size);
+
 	// reject extended partitions
-	if (partition->type
-		&& !strcmp(partition->type, kPartitionTypeIntelExtended)) {
+	if (partition->type != NULL
+			&& !strcmp(partition->type, kPartitionTypeIntelExtended)) {
 		return -1;
 	}
 
@@ -160,7 +165,6 @@ pm_identify_partition(int fd, partition_data* partition, void** cookie)
 }
 
 
-// pm_scan_partition
 static status_t
 pm_scan_partition(int fd, partition_data* partition, void* cookie)
 {
@@ -168,9 +172,9 @@ pm_scan_partition(int fd, partition_data* partition, void* cookie)
 	if (fd < 0 || !partition || !cookie)
 		return B_ERROR;
 
-	TRACE(("intel: pm_scan_partition(%d, %" B_PRId32 ": %" B_PRId64 ", "
+	TRACE("pm_scan_partition(%d, %" B_PRId32 ": %" B_PRId64 ", "
 		"%" B_PRId64 ", %" B_PRId32 ")\n", fd, partition->id, partition->offset,
-		partition->size, partition->block_size));
+		partition->size, partition->block_size);
 
 	PartitionMapCookie* map = (PartitionMapCookie*)cookie;
 	// fill in the partition_data structure
@@ -232,7 +236,6 @@ pm_scan_partition(int fd, partition_data* partition, void* cookie)
 }
 
 
-// pm_free_identify_partition_cookie
 static void
 pm_free_identify_partition_cookie(partition_data*/* partition*/, void* cookie)
 {
@@ -244,7 +247,6 @@ pm_free_identify_partition_cookie(partition_data*/* partition*/, void* cookie)
 }
 
 
-// pm_free_partition_cookie
 static void
 pm_free_partition_cookie(partition_data* partition)
 {
@@ -255,7 +257,6 @@ pm_free_partition_cookie(partition_data* partition)
 }
 
 
-// pm_free_partition_content_cookie
 static void
 pm_free_partition_content_cookie(partition_data* partition)
 {
@@ -269,11 +270,10 @@ pm_free_partition_content_cookie(partition_data* partition)
 // #pragma mark - Intel Extended Partition Module
 
 
-// ep_std_ops
 static status_t
 ep_std_ops(int32 op, ...)
 {
-	TRACE(("intel: ep_std_ops(0x%" B_PRIx32 ")\n", op));
+	TRACE("ep_std_ops(0x%" B_PRIx32 ")\n", op);
 	switch(op) {
 		case B_MODULE_INIT:
 		case B_MODULE_UNINIT:
@@ -283,7 +283,6 @@ ep_std_ops(int32 op, ...)
 }
 
 
-// ep_identify_partition
 static float
 ep_identify_partition(int fd, partition_data* partition, void** cookie)
 {
@@ -291,9 +290,9 @@ ep_identify_partition(int fd, partition_data* partition, void** cookie)
 	if (fd < 0 || !partition || !cookie || !partition->cookie)
 		return -1;
 
-	TRACE(("intel: ep_identify_partition(%d, %" B_PRId64 ", %" B_PRId64 ", "
+	TRACE("ep_identify_partition(%d, %" B_PRId64 ", %" B_PRId64 ", "
 		"%" B_PRId32 ")\n", fd, partition->offset, partition->size,
-		partition->block_size));
+		partition->block_size);
 
 	// our parent must be a intel partition map partition and we must have
 	// extended partition type
@@ -312,7 +311,6 @@ ep_identify_partition(int fd, partition_data* partition, void** cookie)
 }
 
 
-// ep_scan_partition
 static status_t
 ep_scan_partition(int fd, partition_data* partition, void* cookie)
 {
@@ -320,9 +318,9 @@ ep_scan_partition(int fd, partition_data* partition, void* cookie)
 	if (fd < 0 || !partition || !partition->cookie)
 		return B_ERROR;
 
-	TRACE(("intel: ep_scan_partition(%d, %" B_PRId64 ", %" B_PRId64 ", "
+	TRACE("ep_scan_partition(%d, %" B_PRId64 ", %" B_PRId64 ", "
 		"%" B_PRId32 ")\n", fd, partition->offset, partition->size,
-		partition->block_size));
+		partition->block_size);
 
 	partition_data* parent = get_parent_partition(partition->id);
 	if (!parent)
@@ -347,8 +345,7 @@ ep_scan_partition(int fd, partition_data* partition, void* cookie)
 		index++;
 		if (!child) {
 			// something went wrong
-			TRACE(("intel: ep_scan_partition(): failed to create child "
-				"partition\n"));
+			TRACE("ep_scan_partition(): failed to create child partition\n");
 			error = B_ERROR;
 			break;
 		}
@@ -368,8 +365,8 @@ ep_scan_partition(int fd, partition_data* partition, void* cookie)
 		child->cookie = logical;
 		// check for allocation problems
 		if (!child->type || !child->parameters) {
-			TRACE(("intel: ep_scan_partition(): failed to allocation type "
-				"or parameters\n"));
+			TRACE("ep_scan_partition(): failed to allocation type "
+				"or parameters\n");
 			error = B_NO_MEMORY;
 			break;
 		}
@@ -387,7 +384,6 @@ ep_scan_partition(int fd, partition_data* partition, void* cookie)
 }
 
 
-// ep_free_identify_partition_cookie
 static void
 ep_free_identify_partition_cookie(partition_data* partition, void* cookie)
 {
@@ -395,7 +391,6 @@ ep_free_identify_partition_cookie(partition_data* partition, void* cookie)
 }
 
 
-// ep_free_partition_cookie
 static void
 ep_free_partition_cookie(partition_data* partition)
 {
@@ -405,7 +400,6 @@ ep_free_partition_cookie(partition_data* partition)
 }
 
 
-// ep_free_partition_content_cookie
 static void
 ep_free_partition_content_cookie(partition_data* partition)
 {

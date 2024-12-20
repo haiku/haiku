@@ -3,11 +3,14 @@
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
+#include "Node.h"
+
+#include <util/AutoLock.h>
+
 #include "AllocationInfo.h"
 #include "DebugSupport.h"
 #include "EntryIterator.h"
 #include "LastModifiedIndex.h"
-#include "Node.h"
 #include "Volume.h"
 
 
@@ -191,40 +194,39 @@ Node::AddAttribute(Attribute *attribute)
 status_t
 Node::RemoveAttribute(Attribute *attribute)
 {
-	status_t error = (attribute && attribute->GetNode() == this
-					  ? B_OK : B_BAD_VALUE);
+	if (attribute == NULL || attribute->GetNode() != this)
+		return B_BAD_VALUE;
+
+	RecursiveLocker locker(GetVolume()->AttributeIteratorLocker());
+	if (!locker.IsLocked())
+		return B_ERROR;
+
+	// move all iterators pointing to the attribute to the next attribute
+	Attribute *nextAttr = fAttributes.GetNext(attribute);
+	DoublyLinkedList<AttributeIterator> *iterators
+		= attribute->GetAttributeIteratorList();
+	for (AttributeIterator *iterator = iterators->First();
+			iterator != NULL; iterator = iterators->GetNext(iterator)) {
+		iterator->SetCurrent(nextAttr, true);
+	}
+
+	// Move the iterators from one list to the other, or just remove
+	// them, if there is no next attribute.
+	if (nextAttr != NULL) {
+		DoublyLinkedList<AttributeIterator> *nextIterators
+			= nextAttr->GetAttributeIteratorList();
+		nextIterators->TakeFrom(iterators);
+	} else
+		iterators->RemoveAll();
+
+	locker.Unlock();
+
+	// remove the attribute
+	status_t error = GetVolume()->NodeAttributeRemoved(GetID(), attribute);
 	if (error == B_OK) {
-		// move all iterators pointing to the attribute to the next attribute
-		if (GetVolume()->IteratorLock()) {
-			// set the iterators' current entry
-			Attribute *nextAttr = fAttributes.GetNext(attribute);
-			DoublyLinkedList<AttributeIterator> *iterators
-				= attribute->GetAttributeIteratorList();
-			for (AttributeIterator *iterator = iterators->First();
-				 iterator;
-				 iterator = iterators->GetNext(iterator)) {
-				iterator->SetCurrent(nextAttr, true);
-			}
-			// Move the iterators from one list to the other, or just remove
-			// them, if there is no next attribute.
-			if (nextAttr) {
-				DoublyLinkedList<AttributeIterator> *nextIterators
-					= nextAttr->GetAttributeIteratorList();
-				nextIterators->MoveFrom(iterators);
-			} else
-				iterators->RemoveAll();
-			GetVolume()->IteratorUnlock();
-		} else
-			error = B_ERROR;
-		// remove the attribute
-		if (error == B_OK) {
-			error = GetVolume()->NodeAttributeRemoved(GetID(), attribute);
-			if (error == B_OK) {
-				fAttributes.Remove(attribute);
-				attribute->SetNode(NULL);
-				MarkModified(B_STAT_MODIFICATION_TIME);
-			}
-		}
+		fAttributes.Remove(attribute);
+		attribute->SetNode(NULL);
+		MarkModified(B_STAT_MODIFICATION_TIME);
 	}
 	return error;
 }

@@ -671,7 +671,7 @@ void
 ColumnResizeState::DrawLine()
 {
 	BPoseView* poseView = fTitleView->PoseView();
-	ASSERT(!poseView->IsDesktopWindow());
+	ASSERT(!poseView->IsDesktopView());
 
 	BRect poseViewBounds(poseView->Bounds());
 	// remember the line location

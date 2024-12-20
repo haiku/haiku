@@ -86,12 +86,6 @@ KPartitionListener::VolumeIDChanged(KPartition *partition, dev_t volumeID)
 {
 }
 
-// MountCookieChanged
-void
-KPartitionListener::MountCookieChanged(KPartition *partition, void *cookie)
-{
-}
-
 // ParametersChanged
 void
 KPartitionListener::ParametersChanged(KPartition *partition,

@@ -247,6 +247,7 @@ rtwn_attach(struct rtwn_softc *sc)
 	    | IEEE80211_HTCAP_SMPS_OFF		/* SM PS mode disabled */
 	    /* s/w capabilities */
 	    | IEEE80211_HTC_HT			/* HT operation */
+	    | IEEE80211_HTC_RX_AMSDU_AMPDU	/* A-MSDU in A-MPDU */
 	    | IEEE80211_HTC_AMPDU		/* A-MPDU tx */
 	    | IEEE80211_HTC_AMSDU		/* A-MSDU tx */
 	    ;
@@ -325,12 +326,15 @@ rtwn_sysctlattach(struct rtwn_softc *sc)
 	struct sysctl_ctx_list *ctx = device_get_sysctl_ctx(sc->sc_dev);
 	struct sysctl_oid *tree = device_get_sysctl_tree(sc->sc_dev);
 
-#if 1
 	sc->sc_ht40 = 0;
 	SYSCTL_ADD_INT(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
 	    "ht40", CTLFLAG_RDTUN, &sc->sc_ht40,
 	    sc->sc_ht40, "Enable 40 MHz mode support");
-#endif
+
+	sc->sc_ena_tsf64 = 0;
+	SYSCTL_ADD_INT(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
+	    "ena_tsf64", CTLFLAG_RWTUN, &sc->sc_ena_tsf64,
+	    sc->sc_ena_tsf64, "Enable/disable per-packet TSF64 reporting");
 
 #ifdef RTWN_DEBUG
 	SYSCTL_ADD_U32(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,

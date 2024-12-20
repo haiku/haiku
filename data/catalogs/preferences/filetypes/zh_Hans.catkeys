@@ -24,7 +24,7 @@ Gamma	Application Type Window		候选版
 Cancel	Application Type Window		取消
 Attribute	Attribute Window		属性
 Multiple launch	Application Type Window		多种方式启动
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Application type could be removed} other{# Application types could be removed}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# 个可以删除的应用程序类型} other{# 个可以删除的应用程序类型}}
 Edit…	Application Types Window		编辑：
 Could not set preferred application	FileTypes Window		无法设置首选程序
 Description	FileTypes Window		描述

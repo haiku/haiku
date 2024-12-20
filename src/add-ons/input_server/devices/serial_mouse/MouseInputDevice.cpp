@@ -276,7 +276,7 @@ MouseInputDevice::DeviceWatcher(void* arg)
 			message = new BMessage(B_MOUSE_UP);
 
 			message->AddInt64("when", movements.timestamp);
-			message->AddInt32("be:device_subtype", B_MOUSE_DEVICE_SUBTYPE);
+			message->AddInt32("be:device_subtype", B_MOUSE_POINTING_DEVICE);
 			message->AddInt32("buttons", movements.buttons);
 
 			if ((buttons & movements.buttons) > 0) {
@@ -334,7 +334,7 @@ MouseInputDevice::DeviceWatcher(void* arg)
 			message = new BMessage(B_MOUSE_MOVED);
 			if (message) {
 				message->AddInt64("when", movements.timestamp);
-				message->AddInt32("be:device_subtype", B_MOUSE_DEVICE_SUBTYPE);
+				message->AddInt32("be:device_subtype", B_MOUSE_POINTING_DEVICE);
 				message->AddInt32("buttons", movements.buttons);
 				message->AddInt32("x", xdelta);
 				message->AddInt32("y", ydelta);
@@ -347,7 +347,7 @@ MouseInputDevice::DeviceWatcher(void* arg)
 			message = new BMessage(B_MOUSE_WHEEL_CHANGED);
 			if (message) {
 				message->AddInt64("when", movements.timestamp);
-				message->AddInt32("be:device_subtype", B_MOUSE_DEVICE_SUBTYPE);
+				message->AddInt32("be:device_subtype", B_MOUSE_POINTING_DEVICE);
 				message->AddFloat("be:wheel_delta_x", movements.wheel_xdelta);
 				message->AddFloat("be:wheel_delta_y", movements.wheel_ydelta);
 

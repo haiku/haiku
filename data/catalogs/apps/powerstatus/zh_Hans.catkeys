@@ -7,7 +7,7 @@ Design capacity low warning: 	PowerStatus		设计低容量警告：
 The battery level is critical, please plug in the device immediately.	PowerStatus		电池电量严重不足，请及时连接充电电源。
 non-rechargeable	PowerStatus		不可再充电
 Last full charge: 	PowerStatus		上次完全充电：
- mV	PowerStatus		 毫伏
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		当前速度：
 Show text label	PowerStatus		显示文字标签
 Quit	PowerStatus		退出
@@ -25,12 +25,12 @@ discharging	PowerStatus		放电
 rechargeable	PowerStatus		可再充电
 Battery info…	PowerStatus		电池信息...
 Show time	PowerStatus		显示时间
- mA	PowerStatus		 毫安
+ mA	PowerStatus		 mA
 About…	PowerStatus		关于...
 Serial number: 	PowerStatus		编号：
 Battery critical	PowerStatus		电池电量严重不足
 Capacity: 	PowerStatus		容量：
- mW	PowerStatus		 毫瓦
+ mW	PowerStatus		 mW
 No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		未检测到支持的电池。PowerStatus 无法在您的系统上使用。
 Show percent	PowerStatus		显示百分比
 Capacity granularity 1: 	PowerStatus		容量粒度1：
@@ -40,7 +40,7 @@ Capacity granularity 2: 	PowerStatus		容量粒度2：
 Too bad!	PowerStatus		真遗憾！
 Technology: 	PowerStatus		技术支持：
 not charging	PowerStatus		不在充电中
- mWh	PowerStatus		 兆瓦时
+ mWh	PowerStatus		 mWh
 PowerStatus	System name		电源状态
 Design capacity: 	PowerStatus		设计容量：
 OEM info: 	PowerStatus		OEM 信息：

@@ -28,7 +28,7 @@ Spanish (Dvorak)	KeymapNames		西班牙(德沃夏克)
 Option	Keyboard Layout View	Option key	选项
 US-International	KeymapNames		美国-国际
 Turkish (Type-Q)	KeymapNames		土耳其 (Q型)
-Revert	Modifier keys window		还原
+Revert	Modifier keys window		恢复
 Slovak	KeymapNames		斯洛伐克
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -118,7 +118,7 @@ Belarusian (Latin)	KeymapNames		白俄罗斯语(拉丁语)
 Hebrew	KeymapNames		希伯来语
 Layout	Keymap window		布局
 Greek	KeymapNames		希腊语
-Revert	Keymap window		还原
+Revert	Keymap window		恢复
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		触发雕刻字符
 Menu	Keyboard Layout View	Menu key	菜单

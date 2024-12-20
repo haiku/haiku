@@ -47,4 +47,4 @@ Focus follows mouse	SettingsView		焦点跟随鼠标
 Focus mode:	SettingsView		焦点模式：
 Double-click test area	SettingsView		双击测试区
 3-Button	SettingsView		3键
-Revert	TouchpadPrefView		反转
+Revert	TouchpadPrefView		恢复

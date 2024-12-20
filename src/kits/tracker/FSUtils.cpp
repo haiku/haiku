@@ -1307,27 +1307,6 @@ CopyFile(BEntry* srcFile, StatStruct* srcStat, BDirectory* destDir,
 		if (err == kCopyCanceled)
 			throw (status_t)err;
 
-		if (err == B_FILE_EXISTS) {
-			// A file with the same name was created after BDirectory::FindEntry was called and
-			// before LowLevelCopy could finish.  In a move operation, if the standard file error
-			// alert were displayed and the user chose to continue, the file that we just failed
-			// to copy would be lost.  Don't offer the option to continue.
-			BString lowLevelExistsString(
-				B_TRANSLATE("Error copying file \"%name\":\n\t%error\n\n"));
-			// The error may have resulted from the user dragging a set of selected files to a
-			// case-insensitive volume, when 2 files in the set differ only in case.
-			node_ref destRef;
-			destDir->GetNodeRef(&destRef);
-			fs_info destInfo;
-			_kern_read_fs_info(destRef.device, &destInfo);
-			if (strcmp(destInfo.fsh_name, "fat") == 0) {
-				lowLevelExistsString += B_TRANSLATE("Note: file names in the destination file "
-					"system are not case-sensitive.\n");
-			}
-			loopControl->FileError(lowLevelExistsString.String(), destName, err, false);
-			throw (status_t)err;
-		}
-
 		if (err != B_OK) {
 			if (!loopControl->FileError(
 					B_TRANSLATE_NOCOLLECT(kFileErrorString), destName, err,

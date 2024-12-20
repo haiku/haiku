@@ -12,10 +12,9 @@
 // #pragma mark - BDiskSystemAddOn
 
 
-BDiskSystemAddOn::BDiskSystemAddOn(const char* name, uint32 flags)
+BDiskSystemAddOn::BDiskSystemAddOn(const char* name)
 	:
-	fName(name),
-	fFlags(flags)
+	fName(name)
 {
 }
 
@@ -29,13 +28,6 @@ const char*
 BDiskSystemAddOn::Name() const
 {
 	return fName.String();
-}
-
-
-uint32
-BDiskSystemAddOn::Flags() const
-{
-	return fFlags;
 }
 
 

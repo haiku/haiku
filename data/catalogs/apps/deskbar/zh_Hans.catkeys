@@ -7,12 +7,12 @@ Tracker always first	PreferencesWindow		文件浏览器置顶
 Hide clock	TimeView		隐藏时钟
 Large	PreferencesWindow		大
 <Deskbar folder is empty>	DeskbarMenu		<桌面栏目录为空>
-Recent documents	DeskbarMenu		最近文档：
+Recent documents	DeskbarMenu		最近文档
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		应用程序
-Always on top	PreferencesWindow		置顶
+Always on top	PreferencesWindow		总在最上
 Restart system	DeskbarMenu		重启系统
 Recent documents:	PreferencesWindow		最近文档：
-Auto-raise	PreferencesWindow		自动
+Auto-raise	PreferencesWindow		自动提升
 Mount	DeskbarMenu		挂载
 Icon size	PreferencesWindow		图标大小
 About Haiku	DeskbarMenu		关于Haiku

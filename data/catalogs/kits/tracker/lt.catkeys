@@ -11,8 +11,8 @@ Ignore case	SelectionWindow		Nepaisyti raidžių registro
 Current folder	ContainerWindow		Šis aplankas
 Finish: %time - Over %finishtime left	StatusWindow		Pabaiga: %time – liko dar virš %finishtime
 Mount all disks now	AutoMounterSettings		Prijungti visus tomus dabar
-Name	PoseView		Vardas
 Location:	InfoWindow		Vieta:
+Name	PoseView		Vardas
 Kind:	InfoWindow		Tipas:
 contains	FindPanel		savyje turi
 Open	FilePanelPriv		Atverti

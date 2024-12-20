@@ -497,10 +497,21 @@ AcpiOsMapMemory(ACPI_PHYSICAL_ADDRESS where, ACPI_SIZE length)
 	// map_physical_memory() defaults to uncached memory if no type is specified.
 	// But ACPICA handles flushing caches itself, so we don't need it uncached,
 	// and on some architectures (e.g. ARM) uncached memory does not support
-	// unaligned accesses. Hence we specify "writeback" to avoid the default.
+	// unaligned accesses.
+	//
+	// However, if ACPICA maps (or re-maps) memory that's also used by some other
+	// module (e.g. PCI configuration space), then we'll end up with the same
+	// physical memory mapped twice with different attributes. On many arches,
+	// this is invalid. So we stick with the default type where possible.
+#if defined(__HAIKU_ARCH_ARM) || defined(__HAIKU_ARCH_ARM64)
+	const uint32 memoryType = B_WRITE_BACK_MEMORY;
+#else
+	const uint32 memoryType = 0;
+#endif
+
 	void *there;
 	area_id area = map_physical_memory("acpi_physical_mem_area", (phys_addr_t)where, length,
-		B_ANY_KERNEL_ADDRESS | B_WRITE_BACK_MEMORY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		B_ANY_KERNEL_ADDRESS | memoryType, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		&there);
 
 	DEBUG_FUNCTION_F("addr: 0x%08lx; length: %lu; mapped: %p; area: %" B_PRId32,

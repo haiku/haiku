@@ -11,7 +11,7 @@ Get name of the printer add-on used for this printer	Printer Scripting		获取�
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		确定
 Cancel	ConfigWindow		取消
-Printer server	ConfigWindow		打印机组件
+Printer server	ConfigWindow		打印服务
 Page %1 to %2, %3 copies	ConfigWindow		页面%1到%2，%3拷贝
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		使用该名称的打印机已存在，但是并未发现它的驱动！是否替换？
 Yes	PrintServerApp		是

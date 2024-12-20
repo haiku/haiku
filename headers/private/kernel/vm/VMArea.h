@@ -113,15 +113,19 @@ private:
 
 public:
 	VMCache*				cache;
-	vint32					no_cache_change;
 	off_t					cache_offset;
 	uint32					cache_type;
 	VMAreaMappings			mappings;
 	uint8*					page_protections;
 
 	struct VMAddressSpace*	address_space;
-	struct VMArea*			cache_next;
-	struct VMArea*			cache_prev;
+
+private:
+	DoublyLinkedListLink<VMArea> fCacheLink;
+
+public:
+	typedef DoublyLinkedList<VMArea,
+		DoublyLinkedListMemberGetLink<VMArea, &VMArea::fCacheLink> > CacheList;
 
 			addr_t				Base() const	{ return fBase; }
 			size_t				Size() const	{ return fSize; }

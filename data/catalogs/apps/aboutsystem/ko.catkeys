@@ -2,7 +2,7 @@
 The Haikuware team and their bounty program\n	AboutView		Haikuware 팀과 현상금 프로그램\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
 \n\nSpecial thanks to:\n	AboutView		\n\n다음 분들께 특별히 감사드립니다:\n
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (그리고 NewOS 커널)\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (그리고 그의 NewOS 커널)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. All rights reserved. 
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google, Google Summer of Code 및 Google Code-In 프로그램\n
 Contributors:\n	AboutView		공헌자:\n
@@ -43,7 +43,7 @@ About this system	AboutWindow		시스템 정보
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. All rights reserved.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. All rights reserved.
-AboutSystem	System name		AboutSystem
+AboutSystem	System name		시스템 정보
 Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Copyright © 2019 Joe Drago. All rights reserved.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. All rights reserved.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd 와 Clark Cooper. 

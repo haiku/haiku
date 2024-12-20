@@ -603,8 +603,7 @@ ieee80211_validate_frame(struct mbuf *m,
 		return (EINVAL);
 
 	wh = mtod(m, struct ieee80211_frame *);
-	if ((wh->i_fc[0] & IEEE80211_FC0_VERSION_MASK) !=
-	    IEEE80211_FC0_VERSION_0)
+	if (!IEEE80211_IS_FC0_CHECK_VER(wh, IEEE80211_FC0_VERSION_0))
 		return (EINVAL);
 
 	type = wh->i_fc[0] & IEEE80211_FC0_TYPE_MASK;
@@ -772,13 +771,11 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m,
 	 * a raw 802.11 frame.
 	 */
 #ifdef __HAIKU__
-	// FIXME why is this different on Haiku?
 	if (!dst || dst->sa_family != AF_IEEE80211)
-		return ieee80211_vap_xmitpkt(vap, m);
 #else
 	if (dst->sa_family != AF_IEEE80211)
-		return vap->iv_output(ifp, m, dst, ro);
 #endif
+		return vap->iv_output(ifp, m, dst, ro);
 #ifdef MAC
 	error = mac_ifnet_check_transmit(ifp, m);
 	if (error)

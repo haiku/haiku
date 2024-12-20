@@ -269,7 +269,7 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fIsWatchingDateFormatChange(false),
 	fHasPosesInClipboard(false),
 	fCursorCheck(false),
-	fFiltering(false),
+	fTypeAheadFiltering(false),
 	fFilterStrings(4, true),
 	fLastFilterStringCount(1),
 	fLastFilterStringLength(0),
@@ -1152,7 +1152,7 @@ BPoseView::CommitActivePose(bool saveChanges)
 	BPose* activePose = ActivePose();
 	if (activePose != NULL) {
 		int32 index = fPoseList->IndexOf(ActivePose());
-		if (fFiltering)
+		if (IsFiltering())
 			index = fFilteredPoseList->IndexOf(ActivePose());
 
 		BPoint loc(0, index * fListElemHeight);
@@ -1162,7 +1162,7 @@ BPoseView::CommitActivePose(bool saveChanges)
 		activePose->Commit(saveChanges, loc, this, index);
 		BPose* pose = fActivePose;
 		fActivePose = NULL;
-		if (fFiltering && !FilterPose(pose))
+		if (IsFiltering() && !FilterPose(pose))
 			RemoveFilteredPose(pose, index);
 	}
 }
@@ -1951,10 +1951,10 @@ BPoseView::CreatePoses(Model** models, PoseInfo* poseInfoArray, int32 count,
 		switch (ViewMode()) {
 			case kListMode:
 			{
-				AddPoseToList(fPoseList, !fFiltering, insertionSort, pose,
-					viewBounds, listViewScrollBy, forceDraw, &poseIndex);
+				AddPoseToList(fPoseList, !IsFiltering(), insertionSort, pose, viewBounds,
+					listViewScrollBy, forceDraw, &poseIndex);
 
-				if (fFiltering && FilterPose(pose)) {
+				if (IsFiltering() && FilterPose(pose)) {
 					AddPoseToList(fFilteredPoseList, true, insertionSort, pose,
 						viewBounds, listViewScrollBy, forceDraw, &poseIndex);
 				}
@@ -2040,14 +2040,13 @@ BPoseView::ShouldShowPose(const Model* model, const PoseInfo* poseInfo)
 		return false;
 
 	// check filter before adding item
-	if (!fRefFilter)
+	if (!IsFiltering())
 		return true;
 
 	struct stat_beos stat;
 	convert_to_stat_beos(model->StatBuf(), &stat);
 
-	return fRefFilter->Filter(model->EntryRef(), model->Node(), &stat,
-		model->MimeType());
+	return fRefFilter->Filter(model->EntryRef(), model->Node(), &stat, model->MimeType());
 }
 
 
@@ -2335,8 +2334,8 @@ BPoseView::MessageReceived(BMessage* message)
 		case B_CANCEL:
 			if (FSClipboardHasRefs())
 				FSClipboardClear();
-			else if (fFiltering)
-				StopFiltering();
+			if (IsTypeAheadFiltering())
+				StopTypeAheadFiltering();
 			break;
 
 		case kCancelSelectionToClipboard:
@@ -2448,8 +2447,7 @@ BPoseView::MessageReceived(BMessage* message)
 
 			BPose* pose = fSelectionList->FirstItem();
 			if (pose != NULL) {
-				BPoint where(0,
-					CurrentPoseList()->IndexOf(pose) * fListElemHeight);
+				BPoint where(0, CurrentPoseList()->IndexOf(pose) * fListElemHeight);
 				pose->EditFirstWidget(where, this);
 			}
 			break;
@@ -2668,10 +2666,8 @@ BPoseView::MessageReceived(BMessage* message)
 					{
 						TrackerSettings settings;
 						bool hideDotFiles;
-						if (message->FindBool("HideDotFiles",
-								&hideDotFiles) == B_OK) {
+						if (message->FindBool("HideDotFiles", &hideDotFiles) == B_OK)
 							settings.SetHideDotFiles(hideDotFiles);
-						}
 
 						Refresh();
 						break;
@@ -2680,14 +2676,12 @@ BPoseView::MessageReceived(BMessage* message)
 					case kTypeAheadFilteringChanged:
 					{
 						TrackerSettings settings;
-						bool typeAheadFiltering;
-						if (message->FindBool("TypeAheadFiltering",
-								&typeAheadFiltering) == B_OK) {
-							settings.SetTypeAheadFiltering(typeAheadFiltering);
+						bool typeAheadFilter;
+						if (message->FindBool("TypeAheadFiltering", &typeAheadFilter) == B_OK) {
+							settings.SetTypeAheadFiltering(typeAheadFilter);
+							if (IsTypeAheadFiltering() && !typeAheadFilter)
+								StopTypeAheadFiltering();
 						}
-
-						if (fFiltering && !typeAheadFiltering)
-							StopFiltering();
 						break;
 					}
 				}
@@ -2764,13 +2758,13 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 
 	fStateNeedsSaving = true;
 
-	if (fFiltering) {
+	if (IsFiltering()) {
 		// the column we removed might just be the one that was used to filter
 		int32 poseCount = fFilteredPoseList->CountItems();
-		for (int32 i = poseCount - 1; i >= 0; i--) {
-			BPose* pose = fFilteredPoseList->ItemAt(i);
+		for (int32 index = poseCount - 1; index >= 0; index--) {
+			BPose* pose = fFilteredPoseList->ItemAt(index);
 			if (!FilterPose(pose))
-				RemoveFilteredPose(pose, i);
+				RemoveFilteredPose(pose, index);
 		}
 	}
 
@@ -2841,11 +2835,9 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 
 	fStateNeedsSaving =  true;
 
-	if (fFiltering) {
+	if (IsFiltering()) {
 		// the column we added might just add new poses to be showed
-		fFilteredPoseList->MakeEmpty();
-		fFiltering = false;
-		StartFiltering();
+		RebuildFilteringPoseList();
 	}
 
 	return true;
@@ -3086,8 +3078,8 @@ BPoseView::SetViewMode(uint32 newMode)
 	// toggle view layout between listmode and non-listmode, if necessary
 	BContainerWindow* window = ContainerWindow();
 	if (oldMode == kListMode) {
-		if (fFiltering)
-			ClearFilter();
+		if (IsTypeAheadFiltering())
+			ClearTypeAheadFiltering();
 
 		if (window != NULL)
 			window->HideAttributesMenu();
@@ -3291,10 +3283,8 @@ BPoseView::UpdatePosesClipboardModeFromClipboard(BMessage* clipboardReport)
 
 			if (!fullInvalidateNeeded) {
 				if (ViewMode() == kListMode) {
-					if (fFiltering) {
-						pose = fFilteredPoseList->FindPose(&clipNode->node,
-							&foundNodeIndex);
-					}
+					if (IsFiltering())
+						pose = fFilteredPoseList->FindPose(&clipNode->node, &foundNodeIndex);
 
 					if (pose != NULL) {
 						loc.y = foundNodeIndex * fListElemHeight;
@@ -3451,12 +3441,11 @@ BPoseView::NewFolder(const BMessage* message)
 		BPose* pose = EntryCreated(targetModel->NodeRef(), &nodeRef, ref.name,
 			&index);
 
-		if (fFiltering) {
+		if (IsFiltering()) {
 			if (fFilteredPoseList->FindPose(&nodeRef, &index) == NULL) {
 				float scrollBy = 0;
 				BRect bounds = Bounds();
-				AddPoseToList(fFilteredPoseList, true, true, pose, bounds,
-					scrollBy, true, &index);
+				AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy, true, &index);
 			}
 		}
 
@@ -5664,7 +5653,7 @@ BPoseView::EntryMoved(const BMessage* message)
 		BPose* pose = fPoseList->FindPose(&itemNode, &index);
 		int32 poseListIndex = index;
 		bool visible = true;
-		if (fFiltering)
+		if (IsFiltering())
 			visible = fFilteredPoseList->FindPose(&itemNode, &index) != NULL;
 
 		if (pose != NULL) {
@@ -5688,12 +5677,11 @@ BPoseView::EntryMoved(const BMessage* message)
 				pose->UpdateAllWidgets(index, loc, this);
 				poseModel->CloseNode();
 				_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
-				if (fFiltering) {
+				if (IsFiltering()) {
 					if (!visible && FilterPose(pose)) {
 						BRect bounds = Bounds();
 						float scrollBy = 0;
-						AddPoseToList(fFilteredPoseList, true, true, pose,
-							bounds, scrollBy, true);
+						AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy, true);
 					} else if (visible && !FilterPose(pose))
 						RemoveFilteredPose(pose, index);
 					else if (visible)
@@ -5860,10 +5848,8 @@ BPoseView::AttributeChanged(const BMessage* message)
 			&index) != NULL;
 		int32 poseListIndex = index;
 
-		if (fFiltering) {
-			visible = fFilteredPoseList->FindPose(
-				poseModel->NodeRef(), &index) != NULL;
-		}
+		if (IsFiltering())
+			visible = fFilteredPoseList->FindPose(poseModel->NodeRef(), &index) != NULL;
 
 		BPoint loc(0, index * fListElemHeight);
 		if (attrName != NULL && poseModel->Node() != NULL) {
@@ -5879,13 +5865,12 @@ BPoseView::AttributeChanged(const BMessage* message)
 				visible);
 		}
 		poseModel->CloseNode();
-		if (fFiltering) {
+		if (IsFiltering()) {
 			if (!visible && FilterPose(pose)) {
 				visible = true;
 				float scrollBy = 0;
 				BRect bounds = Bounds();
-				AddPoseToList(fFilteredPoseList, true, true, pose, bounds,
-					scrollBy, true);
+				AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy, true);
 				continue;
 			} else if (visible && !FilterPose(pose)) {
 				RemoveFilteredPose(pose, index);
@@ -5899,7 +5884,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 			uint32 attrHash = AttrHashString(attrName, info.type);
 			if (attrHash == PrimarySort() || attrHash == SecondarySort()) {
 				_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
-				if (fFiltering && visible)
+				if (IsFiltering() && visible)
 					_CheckPoseSortOrder(fFilteredPoseList, pose, index);
 			}
 		} else {
@@ -5913,7 +5898,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 					|| sAttrColumnMap[i].attrHash == SecondarySort()) {
 					if ((fields & sAttrColumnMap[i].fieldMask) != 0) {
 						_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
-						if (fFiltering && visible)
+						if (IsFiltering() && visible)
 							_CheckPoseSortOrder(fFilteredPoseList, pose, index);
 						break;
 					}
@@ -6620,13 +6605,15 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 		}
 
 		case B_RETURN:
-			if (fFiltering && CountSelected() == 0)
+			if (IsFiltering() && CountSelected() == 0)
 				SelectPose(fFilteredPoseList->FirstItem(), 0);
 
 			OpenSelection();
 
-			if (fFiltering && (modifiers() & B_SHIFT_KEY) != 0)
-				StopFiltering();
+			if (IsTypeAheadFiltering() && (modifiers() & B_SHIFT_KEY) != 0) {
+				// Discard type-ahead filtering by opening a pose with Shift+Return.
+				StopTypeAheadFiltering();
+			}
 
 			break;
 
@@ -6688,10 +6675,8 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 			if (IsFilePanel())
 				_inherited::KeyDown(bytes, count);
 			else {
-				if (ViewMode() == kListMode
-					&& TrackerSettings().TypeAheadFiltering()) {
+				if (ViewMode() == kListMode && TrackerSettings().TypeAheadFiltering())
 					break;
-				}
 
 				if (fSelectionList->IsEmpty())
 					sMatchString.Truncate(0);
@@ -6727,7 +6712,7 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 
 		case B_BACKSPACE:
 		{
-			if (fFiltering) {
+			if (IsTypeAheadFiltering()) {
 				BString* lastString = fFilterStrings.LastItem();
 				if (lastString->Length() == 0) {
 					int32 stringCount = fFilterStrings.CountItems();
@@ -6739,7 +6724,7 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 					lastString->TruncateChars(lastString->CountChars() - 1);
 
 				fCountView->RemoveFilterCharacter();
-				FilterChanged();
+				TypeAheadFilteringChanged();
 				break;
 			}
 
@@ -6781,9 +6766,8 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 		{
 			// handle typeahead selection / filtering
 
-			if (ViewMode() == kListMode
-				&& TrackerSettings().TypeAheadFiltering()) {
-				if (key == ' ' && modifiers() & B_SHIFT_KEY) {
+			if (ViewMode() == kListMode && TrackerSettings().TypeAheadFiltering()) {
+				if (key == ' ' && (modifiers() & B_SHIFT_KEY) != 0) {
 					if (fFilterStrings.LastItem()->Length() == 0)
 						break;
 
@@ -6794,7 +6778,7 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 
 				fFilterStrings.LastItem()->AppendChars(bytes, 1);
 				fCountView->AddFilterCharacter(bytes);
-				FilterChanged();
+				TypeAheadFilteringChanged();
 				break;
 			}
 
@@ -6812,10 +6796,8 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 			// figure out the time at which the keypress happened
 			bigtime_t eventTime;
 			BMessage* message = Window()->CurrentMessage();
-			if (message == NULL
-				|| message->FindInt64("when", &eventTime) < B_OK) {
+			if (message == NULL || message->FindInt64("when", &eventTime) < B_OK)
 				eventTime = system_time();
-			}
 
 			// add char to existing matchString or start new match string
 			if (eventTime - fLastKeyTime < (doubleClickSpeed * 2))
@@ -8048,7 +8030,7 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 		fPoseList->RemoveItemAt(index);
 
 		bool visible = true;
-		if (fFiltering) {
+		if (IsFiltering()) {
 			if (fFilteredPoseList->FindPose(itemNode, &index) != NULL)
 				fFilteredPoseList->RemoveItemAt(index);
 			else
@@ -8369,10 +8351,11 @@ BPoseView::ClearPoses()
 {
 	CommitActivePose();
 	SavePoseLocations();
-	ClearFilter();
+	ClearTypeAheadFiltering();
 
 	// clear all pose lists
 	fPoseList->MakeEmpty();
+	fFilteredPoseList->MakeEmpty();
 	fMimeTypeListIsDirty = true;
 	fVSPoseList->MakeEmpty();
 	fZombieList->MakeEmpty();
@@ -8509,10 +8492,8 @@ BPoseView::Refresh()
 	AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
-	if (fRefFilter != NULL) {
-		fFiltering = false;
-		StartFiltering();
-	}
+	if (IsFiltering())
+		RebuildFilteringPoseList();
 
 	Invalidate();
 	ResetOrigin();
@@ -9353,7 +9334,7 @@ BPoseView::_CheckPoseSortOrder(PoseList* poseList, BPose* pose, int32 oldIndex)
 		return;
 	}
 
-	if (fFiltering && poseList != fFilteredPoseList) {
+	if (IsFiltering() && poseList != fFilteredPoseList) {
 		poseList->AddItem(pose, newIndex);
 		return;
 	}
@@ -9585,7 +9566,7 @@ BPoseView::SortPoses()
 		PoseList::Private(fPoseList).AsBList()->Items());
 	std::stable_sort(poses, &poses[fPoseList->CountItems()],
 		PoseComparator(this));
-	if (fFiltering) {
+	if (IsFiltering()) {
 		poses = reinterpret_cast<BPose**>(
 			PoseList::Private(fFilteredPoseList).AsBList()->Items());
 		std::stable_sort(poses, &poses[fFilteredPoseList->CountItems()],
@@ -9839,8 +9820,7 @@ BPoseView::FrameForPose(BPose* targetPose, bool convert, BRect* poseRect)
 				frameIsValid = false;
 		}
 	} else {
-		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top
-			- IconPoseHeight()), true);
+		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()), true);
 		int32 poseCount = fVSPoseList->CountItems();
 
 		for (int32 index = startIndex; index < poseCount; index++) {
@@ -9985,8 +9965,7 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 				break;
 		}
 	} else {
-		int32 startIndex = FirstIndexAtOrBelow(
-			(int32)(bounds.top - IconPoseHeight()), true);
+		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()), true);
 		int32 poseCount = fVSPoseList->CountItems();
 
 		for (int32 index = startIndex; index < poseCount; index++) {
@@ -10368,7 +10347,7 @@ BPoseView::RemoveFilteredPose(BPose* pose, int32 index)
 
 
 void
-BPoseView::FilterChanged()
+BPoseView::TypeAheadFilteringChanged()
 {
 	if (ViewMode() != kListMode)
 		return;
@@ -10376,27 +10355,21 @@ BPoseView::FilterChanged()
 	int32 stringCount = fFilterStrings.CountItems();
 	int32 length = fFilterStrings.LastItem()->CountChars();
 
-	if (!fFiltering && (length > 0 || fRefFilter != NULL))
-		StartFiltering();
-	else if (fFiltering && stringCount == 1 && length == 0
-		&& fRefFilter == NULL) {
-		ClearFilter();
+	if (!IsTypeAheadFiltering() && length > 0) {
+		StartTypeAheadFiltering();
+	} else if (IsTypeAheadFiltering() && stringCount == 1 && length == 0) {
+		ClearTypeAheadFiltering();
+	} else if (fLastFilterStringCount > stringCount
+		|| (fLastFilterStringCount == stringCount && fLastFilterStringLength > length)) {
+		// something was removed, need to start over
+		RebuildFilteringPoseList();
+		Invalidate();
 	} else {
-		if (fLastFilterStringCount > stringCount
-			|| (fLastFilterStringCount == stringCount
-				&& fLastFilterStringLength > length)
-			|| fRefFilter != NULL) {
-			// something was removed, need to start over
-			fFilteredPoseList->MakeEmpty();
-			fFiltering = false;
-			StartFiltering();
-		} else {
-			int32 poseCount = fFilteredPoseList->CountItems();
-			for (int32 i = poseCount - 1; i >= 0; i--) {
-				BPose* pose = fFilteredPoseList->ItemAt(i);
-				if (!FilterPose(pose))
-					RemoveFilteredPose(pose, i);
-			}
+		int32 poseCount = fFilteredPoseList->CountItems();
+		for (int32 index = poseCount - 1; index >= 0; index--) {
+			BPose* pose = fFilteredPoseList->ItemAt(index);
+			if (!FilterPose(pose))
+				RemoveFilteredPose(pose, index);
 		}
 	}
 
@@ -10428,10 +10401,10 @@ BPoseView::UpdateAfterFilterChange()
 bool
 BPoseView::FilterPose(BPose* pose)
 {
-	if (!fFiltering || pose == NULL)
+	if (pose == NULL || !(IsFiltering() || IsTypeAheadFiltering()))
 		return false;
 
-	if (fRefFilter != NULL) {
+	if (IsFiltering()) {
 		PoseInfo poseInfo;
 		ReadPoseInfo(pose->TargetModel(), &poseInfo);
 		if (pose->TargetModel()->OpenNode() != B_OK)
@@ -10475,45 +10448,33 @@ BPoseView::FilterPose(BPose* pose)
 
 
 void
-BPoseView::StartFiltering()
+BPoseView::StartTypeAheadFiltering()
 {
-	if (fFiltering)
+	if (fTypeAheadFiltering)
 		return;
 
-	fFiltering = true;
-	int32 poseCount = fPoseList->CountItems();
-	for (int32 i = 0; i < poseCount; i++) {
-		BPose* pose = fPoseList->ItemAt(i);
-		if (FilterPose(pose))
-			fFilteredPoseList->AddItem(pose);
-		else
-			EnsurePoseUnselected(pose);
-	}
+	fTypeAheadFiltering = true;
 
+	RebuildFilteringPoseList();
 	Invalidate();
 }
 
 
-bool
-BPoseView::IsFiltering() const
-{
-	return fFiltering;
-}
-
-
 void
-BPoseView::StopFiltering()
+BPoseView::StopTypeAheadFiltering()
 {
-	ClearFilter();
+	ClearTypeAheadFiltering();
 	UpdateAfterFilterChange();
 }
 
 
 void
-BPoseView::ClearFilter()
+BPoseView::ClearTypeAheadFiltering()
 {
-	if (!fFiltering)
+	if (!fTypeAheadFiltering)
 		return;
+
+	fTypeAheadFiltering = false;
 
 	fCountView->CancelFilter();
 
@@ -10525,12 +10486,29 @@ BPoseView::ClearFilter()
 	fLastFilterStringCount = 1;
 	fLastFilterStringLength = 0;
 
-	if (fRefFilter == NULL)
-		fFiltering = false;
-
-	fFilteredPoseList->MakeEmpty();
+	if (IsFiltering())
+		RebuildFilteringPoseList();
 
 	Invalidate();
+}
+
+
+void
+BPoseView::RebuildFilteringPoseList()
+{
+	fFilteredPoseList->MakeEmpty();
+
+	int32 poseCount = fPoseList->CountItems();
+	for (int32 index = 0; index < poseCount; index++) {
+		BPose* pose = fPoseList->ItemAt(index);
+		if (pose == NULL)
+			continue;
+
+		if (FilterPose(pose))
+			fFilteredPoseList->AddItem(pose);
+		else
+			EnsurePoseUnselected(pose);
+	}
 }
 
 

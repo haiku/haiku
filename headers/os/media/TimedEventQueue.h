@@ -1,24 +1,20 @@
 /*
- * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Copyright 2009-2024, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TIMED_EVENT_QUEUE_H
 #define _TIMED_EVENT_QUEUE_H
 
-#include <MediaDefs.h>
 
-struct _event_queue_imp;
+#include <MediaDefs.h>
 
 
 struct media_timed_event {
 								media_timed_event();
-								media_timed_event(bigtime_t inTime,
-									int32 inType);
-								media_timed_event(bigtime_t inTime,
-									int32 inType, void*inPointer,
-									uint32 inCleanup);
-								media_timed_event(
-									bigtime_t inTime, int32 inType,
+								media_timed_event(bigtime_t inTime, int32 inType);
+								media_timed_event(bigtime_t inTime, int32 inType,
+									void* inPointer, uint32 inCleanup);
+								media_timed_event(bigtime_t inTime, int32 inType,
 									void* inPointer, uint32 inCleanup,
 									int32 inData, int64 inBigdata,
 									const char* inUserData, size_t dataSize = 0);
@@ -28,9 +24,9 @@ struct media_timed_event {
 
 								~media_timed_event();
 
-			// TODO: Should this not return "media_timed_event&" ?!
 			void				operator=(const media_timed_event& other);
 
+public:
 			bigtime_t			event_time;
 			int32				type;
 			void*				pointer;
@@ -39,6 +35,7 @@ struct media_timed_event {
 			int64				bigdata;
 			char				user_data[64];
 
+private:
 			uint32				_reserved_media_timed_event_[8];
 };
 
@@ -49,15 +46,16 @@ bool operator<(const media_timed_event& a, const media_timed_event& b);
 bool operator>(const media_timed_event& a, const media_timed_event&b);
 
 
-/*!	A priority queue for holding media_timed_events. Sorts by increasing time,
-	so events near the front of the queue are to occur earlier.
-*/
+namespace BPrivate {
+	class TimedEventQueueData;
+};
+
 class BTimedEventQueue {
 public:
-
 			enum event_type {
-				B_NO_EVENT = -1,	// Pushing this type will always fail.
-				B_ANY_EVENT = 0,	// Pushing this type will always fail.
+				B_NO_EVENT = -1,
+				B_ANY_EVENT = 0,
+
 				B_START,
 				B_STOP,
 				B_SEEK,
@@ -68,16 +66,13 @@ public:
 				B_HARDWARE,
 				B_PARAMETER,
 
-				// User defined events are greater than this value.
 				B_USER_EVENT = 0x4000
 			};
 
 			enum cleanup_flag {
 				B_NO_CLEANUP = 0,
-				B_RECYCLE_BUFFER,	// Specifies to recycle buffers handled by
-									// BTimedEventQueue.
-				B_EXPIRE_TIMER,		// Specifies to call TimerExpired() on the
-									// event->data.
+				B_RECYCLE_BUFFER,
+				B_EXPIRE_TIMER,
 				B_USER_CLEANUP = 0x4000
 			};
 
@@ -88,12 +83,17 @@ public:
 				B_AFTER_TIME
 			};
 
-
+public:
 			void*				operator new(size_t size);
 			void				operator delete(void* ptr, size_t size);
 
 								BTimedEventQueue();
 	virtual						~BTimedEventQueue();
+
+			typedef void (*cleanup_hook)(const media_timed_event* event,
+				void* context);
+			void				SetCleanupHook(cleanup_hook hook,
+									void* context);
 
 			status_t			AddEvent(const media_timed_event& event);
 			status_t			RemoveEvent(const media_timed_event* event);
@@ -102,7 +102,6 @@ public:
 
 			bool				HasEvents() const;
 			int32				EventCount() const;
-
 
 			const media_timed_event* FirstEvent() const;
 			bigtime_t			FirstEventTime() const;
@@ -114,12 +113,6 @@ public:
 								bool inclusive = true,
 								int32 eventType = B_ANY_EVENT);
 
-
-	// Queue manipulation
-	// Call DoForEach to perform a function on each event in the queue.
-	// Return an appropriate status defining an action to take for that event.
-	// DoForEach is an atomic operation ensuring the consistency of the queue
-	// during the call.
 			enum queue_action {
 				B_DONE = -1,
 				B_NO_ACTION = 0,
@@ -135,14 +128,6 @@ public:
 									bool inclusive = true,
 									int32 eventType = B_ANY_EVENT);
 
-
-	// Flushing events
-	// The cleanup hook is called when events are flushed from the queue and
-	// the cleanup is not B_NO_CLEANUP or B_RECYCLE_BUFFER.
-			typedef void (*cleanup_hook)(const media_timed_event* event,
-				void* context);
-			void				SetCleanupHook(cleanup_hook hook,
-									void* context);
 			status_t			FlushEvents(bigtime_t eventTime,
 									time_direction direction,
 									bool inclusive = true,
@@ -150,39 +135,45 @@ public:
 
 private:
 	// FBC padding and forbidden methods
-								BTimedEventQueue(
-									const BTimedEventQueue& other);
-			BTimedEventQueue&	operator=(const BTimedEventQueue& other);
+	virtual	void				_ReservedTimedEventQueue0();
+	virtual	void				_ReservedTimedEventQueue1();
+	virtual	void				_ReservedTimedEventQueue2();
+	virtual	void				_ReservedTimedEventQueue3();
+	virtual	void				_ReservedTimedEventQueue4();
+	virtual	void				_ReservedTimedEventQueue5();
+	virtual	void				_ReservedTimedEventQueue6();
+	virtual	void				_ReservedTimedEventQueue7();
+	virtual	void				_ReservedTimedEventQueue8();
+	virtual	void				_ReservedTimedEventQueue9();
+	virtual	void				_ReservedTimedEventQueue10();
+	virtual	void				_ReservedTimedEventQueue11();
+	virtual	void				_ReservedTimedEventQueue12();
+	virtual	void				_ReservedTimedEventQueue13();
+	virtual	void				_ReservedTimedEventQueue14();
+	virtual	void				_ReservedTimedEventQueue15();
+	virtual	void				_ReservedTimedEventQueue16();
+	virtual	void				_ReservedTimedEventQueue17();
+	virtual	void				_ReservedTimedEventQueue18();
+	virtual	void				_ReservedTimedEventQueue19();
+	virtual	void				_ReservedTimedEventQueue20();
+	virtual	void				_ReservedTimedEventQueue21();
+	virtual	void				_ReservedTimedEventQueue22();
+	virtual	void				_ReservedTimedEventQueue23();
 
-	virtual	status_t			_Reserved_BTimedEventQueue_0(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_1(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_2(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_3(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_4(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_5(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_6(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_7(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_8(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_9(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_10(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_11(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_12(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_13(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_14(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_15(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_16(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_17(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_18(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_19(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_20(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_21(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_22(void*, ...);
-	virtual	status_t			_Reserved_BTimedEventQueue_23(void*, ...);
+								BTimedEventQueue(const BTimedEventQueue&);
+			BTimedEventQueue&	operator=(const BTimedEventQueue&);
 
 private:
-			_event_queue_imp* 	fImp;
+	static	int					_Match(const media_timed_event& event,
+										 bigtime_t eventTime,
+										 time_direction direction,
+										 bool inclusive, int32 eventType);
 
-			uint32 				_reserved_timed_event_queue_[6];
+private:
+			BPrivate::TimedEventQueueData* fData;
+
+			uint32 				_reserved[6];
 };
+
 
 #endif

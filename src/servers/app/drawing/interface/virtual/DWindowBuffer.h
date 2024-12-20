@@ -21,8 +21,6 @@ public:
 	virtual	uint32				Width() const;
 	virtual	uint32				Height() const;
 
-	virtual	bool				IsGraphicsMemory() const { return true; /* TODO! */ }
-
 			void				SetTo(direct_buffer_info* info);
 
 			void				SetTo(frame_buffer_config* config,

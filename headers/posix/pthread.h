@@ -196,6 +196,7 @@ extern int pthread_atfork(void (*prepare)(void), void (*parent)(void),
 	void (*child)(void));
 extern int pthread_once(pthread_once_t *once_control,
 	void (*init_routine)(void));
+extern int pthread_getcpuclockid(pthread_t thread_id, clockid_t* clock_id);
 
 /* thread attributes functions */
 extern int pthread_attr_destroy(pthread_attr_t *attr);

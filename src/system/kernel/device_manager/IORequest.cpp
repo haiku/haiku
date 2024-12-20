@@ -165,9 +165,10 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 	}
 
 	if (cookie->vec_index == 0
-		&& (fVecCount > 1 || fVecs[0].length > B_PAGE_SIZE)) {
+			&& (fVecCount > 1 || fVecs[0].length > B_PAGE_SIZE)) {
 		void* mappedAddress;
 		addr_t mappedSize;
+		ASSERT(cookie->mapped_area < 0);
 
 // TODO: This is a potential violation of the VIP requirement, since
 // vm_map_physical_memory_vecs() allocates memory without special flags!
@@ -185,9 +186,9 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 	}
 
 	// fallback to page wise mapping
-	generic_io_vec& currentVec = fVecs[cookie->vec_index];
-	generic_addr_t address = currentVec.base + cookie->vec_offset;
-	size_t pageOffset = address % B_PAGE_SIZE;
+	const generic_io_vec& currentVec = fVecs[cookie->vec_index];
+	const generic_addr_t address = currentVec.base + cookie->vec_offset;
+	const size_t pageOffset = address % B_PAGE_SIZE;
 
 // TODO: This is a potential violation of the VIP requirement, since
 // vm_get_physical_page() may allocate memory without special flags!
@@ -216,9 +217,9 @@ void
 IOBuffer::FreeVirtualVecCookie(void* _cookie)
 {
 	virtual_vec_cookie* cookie = (virtual_vec_cookie*)_cookie;
+
 	if (cookie->mapped_area >= 0)
 		delete_area(cookie->mapped_area);
-
 	cookie->PutPhysicalPageIfNeeded();
 
 	free_etc(cookie, fVIP ? HEAP_PRIORITY_VIP : 0);

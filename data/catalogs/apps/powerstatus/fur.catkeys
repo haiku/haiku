@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-PowerStatus	1876447050
+1	friulian	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		Eseguìs tal barcon
 Extended battery info	PowerStatus		Infomazions batarie estesis
 Show status icon	PowerStatus		Mostre icone di stât
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		Numar model:
 Battery unused	PowerStatus		Batarie no doprade
 Type: 	PowerStatus		Gjenar: 
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Tu puedis eseguî Stât de Batarie intun barcon o instalâlu tal Deskbar.
+Damaged or missing battery	PowerStatus		Ruvinade opûr e mancje la batarie
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Batarie in scjarie
 Design voltage: 	PowerStatus		Voltaç di progjetazion: 

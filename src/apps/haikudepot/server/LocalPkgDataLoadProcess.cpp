@@ -203,16 +203,18 @@ LocalPkgDataLoadProcess::RunInternal()
 		}
 
 		PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(modelInfo);
+		PackageCoreInfoRef coreInfo = PackageUtils::NewCoreInfo(modelInfo);
 
 		// The package list here considers those packages that are installed
 		// in the system as well as those that exist in remote repositories.
 		// It is better if the 'depot name' is from the remote repository
 		// because then it will be possible to perform a rating on it later.
 
-		if (modelInfo->DepotName().IsEmpty()
-			|| modelInfo->DepotName() == REPOSITORY_NAME_SYSTEM
-			|| modelInfo->DepotName() == REPOSITORY_NAME_INSTALLED) {
-			modelInfo->SetDepotName(repositoryName);
+		BString depotName = PackageUtils::DepotName(modelInfo);
+
+		if (depotName.IsEmpty() || depotName == REPOSITORY_NAME_SYSTEM
+			|| depotName == REPOSITORY_NAME_INSTALLED) {
+			coreInfo->SetDepotName(repositoryName);
 		}
 
 		modelInfo->AddListener(fPackageInfoListener);
@@ -258,6 +260,7 @@ LocalPkgDataLoadProcess::RunInternal()
 			systemFlaggedPackages.Add(repoPackageInfo.FileName());
 
 		modelInfo->SetLocalInfo(localInfo);
+		modelInfo->SetCoreInfo(coreInfo);
 	}
 
 	BAutolock lock(fModel->Lock());

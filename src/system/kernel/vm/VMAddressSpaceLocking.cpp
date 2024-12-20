@@ -524,9 +524,9 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 
 	while (true) {
 		// add all areas
-		VMArea* firstArea = cache->areas;
+		VMArea* firstArea = cache->areas.First();
 		for (VMArea* current = firstArea; current;
-				current = current->cache_next) {
+				current = cache->areas.GetNext(current)) {
 			error = AddArea(current,
 				current == area ? writeLockThisOne : writeLockOthers);
 			if (error != B_OK) {
@@ -558,7 +558,7 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 
 		// If neither the area's cache has changed nor its area list we're
 		// done.
-		if (cache == oldCache && firstArea == cache->areas) {
+		if (cache == oldCache && firstArea == cache->areas.First()) {
 			_area = area;
 			if (_cache != NULL)
 				*_cache = cache;

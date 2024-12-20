@@ -10,7 +10,6 @@
 #include "blue_screen.h"
 
 #include <KernelExport.h>
-#include <frame_buffer_console.h>
 #include <console.h>
 #include <debug.h>
 #include <arch/debug_console.h>
@@ -63,7 +62,7 @@ struct screen_info {
 	int32	args[MAX_ARGS];
 } sScreen;
 
-console_module_info *sModule;
+console_module_info *sModule = NULL;
 
 
 static inline void
@@ -594,16 +593,31 @@ set_paging(int argc, char **argv)
 
 
 status_t
-blue_screen_init(void)
+blue_screen_init_early()
 {
-	extern console_module_info gFrameBufferConsoleModule;
-
 	// we can't use get_module() here, since it's too early in the boot process
-
-	if (!frame_buffer_console_available())
-		return B_ERROR;
-
+	extern console_module_info gFrameBufferConsoleModule;
 	sModule = &gFrameBufferConsoleModule;
+
+	if (sModule->info.std_ops(B_MODULE_INIT) != B_OK) {
+		sModule = NULL;
+		return B_ERROR;
+	}
+
+	sScreen.paging = sScreen.paging_timeout = false;
+	return B_OK;
+}
+
+
+status_t
+blue_screen_init()
+{
+	if (sModule == NULL) {
+		// Early initialization must have previously failed, or never run.
+		if (blue_screen_init_early() != B_OK)
+			return B_ERROR;
+	}
+
 	sScreen.paging = !get_safemode_boolean(
 		"disable_onscreen_paging", false);
 	sScreen.paging_timeout = false;

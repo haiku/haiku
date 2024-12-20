@@ -253,6 +253,7 @@ struct btrfs_super_block {
 	btrfs_backup_roots backup_roots[BTRFS_NUM_ROOT_BACKUPS];
 
 	// implemented in Volume.cpp:
+	bool IsMagicValid() const;
 	bool IsValid() const;
 	void Initialize(const char* name, off_t numBlocks,
 			uint32 blockSize, uint32 sectorSize);

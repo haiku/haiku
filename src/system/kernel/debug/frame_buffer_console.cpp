@@ -455,8 +455,27 @@ frame_buffer_console_init(kernel_args* args)
 	if (!args->frame_buffer.enabled)
 		return B_OK;
 
+#if KERNEL_PMAP_BASE
+	const addr_t frameBuffer = (KERNEL_PMAP_BASE
+		+ args->frame_buffer.physical_buffer.start);
+	frame_buffer_update((addr_t)frameBuffer, args->frame_buffer.width,
+		args->frame_buffer.height, args->frame_buffer.depth,
+		args->frame_buffer.bytes_per_row);
+	return B_OK;
+#else
+	return B_NO_INIT;
+#endif
+}
+
+
+status_t
+frame_buffer_console_init_post_vm(kernel_args* args)
+{
+	if (!args->frame_buffer.enabled)
+		return B_OK;
+
 	void* frameBuffer;
-	sConsole.area = map_physical_memory("vesa frame buffer",
+	sConsole.area = map_physical_memory("frame buffer",
 		args->frame_buffer.physical_buffer.start,
 		args->frame_buffer.physical_buffer.size, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,

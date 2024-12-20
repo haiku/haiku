@@ -340,6 +340,8 @@ struct ufs2_super_block {
 	int32_t		fs_spare5[2];		/* old fs_postbloff */
 					/* old fs_rotbloff */
 	int32_t		fs_magic;		/* magic number */
+
+	bool		IsMagicValid();
 	bool		IsValid();
 };
 

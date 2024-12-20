@@ -1,0 +1,147 @@
+1	korean	application/x-vnd.Cortex.support	761210807
+Header has flags	MediaString		헤더에 플래그가 있습니다
+32 bit HLS	MediaString		32비트 HLS
+Recording	MediaString		기록
+(unknown format)	MediaString		(알 수 없는 형식)
+Clean buffers	MediaString		버퍼 비우기
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# 프레임 전달}other{# 프레임 전달}}
+Rear-right	MediaString		후방 우측
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# 픽셀} other{# 픽셀}}
+Mono	MediaString		모노
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		ASF 형식 묶음
+Encoded video	MediaString		인코딩 된 비디오
+YUV444	MediaString		YUV444
+Port	MediaString		포트
+Top-Front-left	MediaString		상부 전방 좌측
+24 bit LAB	MediaString		24비트 LAB
+16 bit integer	MediaString		16비트 정수
+32 bit HSVA	MediaString		32비트 HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		오프라인
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(알 수 없는 비디오 방향)
+QuickTime	MediaString		퀵타임
+32 bit HLSA	MediaString		32비트 HLSA
+Top-Front-center	MediaString		상부 전방 중앙
+BeOS format family	MediaString		BeOS 형식 묶음
+24 bit HSV	MediaString		24비트 HSV
+Back-center	MediaString		후방 중앙
+32 bit CMY	MediaString		32비트 CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{#비트 정수}}
+Ambisonic WXYZ	MediaString		엠비소닉 WXYZ
+(unknown video format)	MediaString		(알 수 없는 비디오 형식)
+Video data between line %lu and %lu	MediaString		라인 %lu와(과) %lu 사이의 비디오 데이터
+AVI format family	MediaString		AVI 형식 묶음
+Homogenous buffers	MediaString		동차 버퍼
+Interlaced 	MediaString		인터레이스 됨 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# 채널}other{# 채널}}
+15 bit RGBA	MediaString		15비트 RGBA
+Drop data	MediaString		데이터 드롭
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		우측
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
+32 bit RGB	MediaString		32비트 RGB
+System mixer	MediaString		시스템 믹서
+Physical output	MediaString		물리적 출력
+Top-Back-center	MediaString		상부 후방 중앙
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		위에서 아래로, 왼쪽에서 오른쪽으로
+(unknown run mode)	MediaString		(알 수 없는 작동 모드)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		24비트 HSI
+User-defined media type	MediaString		사용자 정의 미디어 형식
+32 bit CMYA	MediaString		32비트 CMYA
+Rear-left	MediaString		후방 좌측
+QuickTime format family	MediaString		퀵타임 형식 묶음
+Any format family	MediaString		모든 형식 묶음
+Timecode	MediaString		타임코드
+Top-Front-right	MediaString		상부 전방 우측
+32 bit float	MediaString		32비트 실수
+Controllable	MediaString		컨트롤 가능
+32 bit integer	MediaString		32비트 정수
+Front-right-center	MediaString		전방 우측 중앙
+Side-right	MediaString		측방 우측
+ kHz	MediaString		 kHz
+Little endian	MediaString		리틀 엔디안
+(unknown matrix mask)	MediaString		(알 수 없는 매트릭스 마스크)
+32 bit LAB	MediaString		32비트 LAB
+Side-left	MediaString		측방 좌측
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# 바이트/버퍼} other{# 바이트/버퍼}}
+32 bit CMYK	MediaString		32비트 CMYK
+(unknown multistream format)	MediaString		(알 수 없는 다중 스트림 형식)
+8 bit integer	MediaString		8비트 정수
+8 bit grayscale-index	MediaString		8비트 회색조 인덱스
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		버퍼 생성자
+Buffer consumer	MediaString		버퍼 소비자
+Increase latency	MediaString		레이턴시 증가
+Front-left-center	MediaString		전방 좌측 중앙
+MPEG format family	MediaString		MPEG 형식 묶음
+(none)	MediaString		(없음)
+Center	MediaString		중앙
+ kb/s (max)	MediaString		 kb/s(최대)
+Monochrome	MediaString		단색조
+Private Be media type	MediaString		사설 Be 미디어 형식
+24 bit UVL	MediaString		24비트 UVL
+32 bit HSV	MediaString		32비트 HSV
+ID	MediaString		ID
+AIFF format family	MediaString		AIFF 형식 묶음
+Top-Back-left	MediaString		상부 후방 좌측
+16 bit RGB	MediaString		16비트 RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		원본 오디오
+32 bit LABA	MediaString		32비트 LABA
+24 bit HLS	MediaString		24비트 HLS
+Non-interlaced 	MediaString		인터레이스 되지 않음 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# 바이트 (평균)}other{# 바이트 (평균)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		웨이브 형식 묶음
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		물리적 입력
+Big endian	MediaString		빅 엔디안
+Sub	MediaString		서브
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# 바이트 (최대)}other{# 바이트 (최대)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		다중 스트림 미디어
+Encoded audio	MediaString		인코딩 된 오디오
+Decrease precision	MediaString		정확도 감소
+File interface	MediaString		파일 인터페이스
+(unknown byte order)	MediaString		(알 수 없는 바이트 배열)
+32 bit HSI	MediaString		32비트 HSI
+Typeless media	MediaString		형식 없는 미디어
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		32비트 RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (평균)
+HTML	MediaString		HTML
+Time source	MediaString		시간 원천
+15 bit RGB	MediaString		15비트 RGB
+ProLogic LR	MediaString		프로로직 LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# 바이트/프레임}other{# 바이트/프레임}}
+Parameters	MediaString		매개변수
+Raw data from VBL area	MediaString		VBL 영역의 원본 데이터
+Top-Back-right	MediaString		상부 후방 우측
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# 바이트/행}other{# 바이트/행}}
+Left	MediaString		왼쪽
+BeOS video	MediaString		BeOS 비디오
+24 bit CMY	MediaString		24비트 CMY
+32 bit UVLA	MediaString		32비트 UVLA
+Top-center	MediaString		상부 중앙
+Entity interface	MediaString		항목 인터페이스
+Stereo	MediaString		스테레오
+8 bit color-index	MediaString		8비트 색상 인덱스
+Bottom to top, left to right	MediaString		아래에서 위로, 왼쪽에서 오른쪽으로
+32 bit UVL	MediaString		32비트 UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# 라인} other{# 라인}}
+Text	MediaString		텍스트
+Unknown media type	MediaString		알 수 없는 미디어 형식
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		여러가지 형식 묶음
+24 bit RGB	MediaString		24비트 RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# 프레임 뒤로}other{# 프레임 뒤로}}
+32 bit HSIA	MediaString		32비트 HSIA
+Raw video	MediaString		원본 비디오

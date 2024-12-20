@@ -12,9 +12,9 @@ Notifications preflet sample	PrefletWin		通知演示示例
 Mute notifications from this application	NotificationView		屏蔽来自这个应用程序的通知
 wide	GeneralView	Window width: Slider high text	宽
 narrow	GeneralView	Window width: Slider low text	窄
-Revert	PrefletWin		还原
+Revert	PrefletWin		恢复
 Applications	PrefletView		应用程序
-{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{超时: # second}other{超时: # seconds}}
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{超时: # 秒}other{超时: # 秒}}
 Upper right	GeneralView		右上方
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		首选项保存时发生错误。\n可能硬盘空间不足。
 Defaults	PrefletWin		默认
@@ -23,7 +23,7 @@ Window width	GeneralView		窗口宽度
 Applications	NotificationView		应用程序
 General	PrefletView		常规
 OK	NotificationView		确定
-Follow Deskbar	GeneralView		跟随 Deskbar
+Follow Deskbar	GeneralView		跟随桌面栏
 Notifications	System name		通知
 Allowed	NotificationView		允许
 Duration:	GeneralView		时长：

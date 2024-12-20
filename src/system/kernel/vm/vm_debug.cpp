@@ -331,13 +331,13 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 	}
 
 	// areas
-	if (cache->areas != NULL) {
-		VMArea* area = cache->areas;
+	if (!cache->areas.IsEmpty()) {
+		VMArea* area = cache->areas.First();
 		kprintf(", areas: %" B_PRId32 " (%s, team: %" B_PRId32 ")", area->id,
 			area->name, area->address_space->ID());
 
-		while (area->cache_next != NULL) {
-			area = area->cache_next;
+		while (cache->areas.GetNext(area) != NULL) {
+			area = cache->areas.GetNext(area);
 			kprintf(", %" B_PRId32, area->id);
 		}
 	}
@@ -479,8 +479,8 @@ dump_area_struct(VMArea* area, bool mappings)
 	kprintf("cache:\t\t%p\n", area->cache);
 	kprintf("cache_type:\t%s\n", vm_cache_type_to_string(area->cache_type));
 	kprintf("cache_offset:\t0x%" B_PRIx64 "\n", area->cache_offset);
-	kprintf("cache_next:\t%p\n", area->cache_next);
-	kprintf("cache_prev:\t%p\n", area->cache_prev);
+	kprintf("cache_next:\t%p\n", VMArea::CacheList::GetNext(area));
+	kprintf("cache_prev:\t%p\n", VMArea::CacheList::GetPrevious(area));
 
 	VMAreaMappings::Iterator iterator = area->mappings.GetIterator();
 	if (mappings) {

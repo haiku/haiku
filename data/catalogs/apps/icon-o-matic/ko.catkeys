@@ -1,110 +1,187 @@
-1	korean	x-vnd.haiku-icon_o_matic	4180942047
+1	korean	x-vnd.haiku-icon_o_matic	3910800047
 None	Icon-O-Matic-Properties		없음
-Add empty	Icon-O-Matic-ShapesList		빈 공간 더하기
-Opening the icon failed!	Icon-O-Matic-Main		아이콘 열기 실패!
-Add with path	Icon-O-Matic-ShapesList		경로와 함께 더하기
+Clean up path	Icon-O-Matic-CleanUpPathCmd		패스 정리하기
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16×16
+Add empty	Icon-O-Matic-ShapesList		빈 도형 추가
+Opening the icon failed!	Icon-O-Matic-Main		아이콘을 열 수 없습니다!
+Reverse path	Icon-O-Matic-ReversePathCmd		패스 반전
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	삐빅!
+Add with path	Icon-O-Matic-ShapesList		패스와 함께 추가
+Paste properties	Icon-O-Matic-Properties		속성 붙여넣기
 Copy	Icon-O-Matic-Properties		복사
 Color	Icon-O-Matic-PropertyNames		색상
 Format	Icon-O-Matic-SavePanel		서식
 Color	Icon-O-Matic-StyleTypes		색상
 Select	Icon-O-Matic-Properties		선택
-Reset transformation	Icon-O-Matic-ShapesList		변환 재설정
+Reset transformation	Icon-O-Matic-ShapesList		변형 재설정
 Duplicate	Icon-O-Matic-StylesList		복제
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32×32
 Rotate	Icon-O-Matic-TransformationBoxStates		회전
-Shorten	Icon-O-Matic-PropertyNames		짧게 하기
+Shorten	Icon-O-Matic-PropertyNames		줄이기
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		{0, plural, one{변형기} other{변형기}} 이동
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		가져오려는 텍스트가 너무 깁니다. 계속 하시겠습니까?
 Paste	Icon-O-Matic-Properties		붙여넣기
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		스타일이 너무 많습니다. HVIF 형식은 최대 255개까지 지원합니다.
 Close	Icon-O-Matic-Menu-File		닫기
-Add rect	Icon-O-Matic-PathsList		직각 더하기
+Add rect	Icon-O-Matic-PathsList		사각형 추가
 Rotation	Icon-O-Matic-PropertyNames		회전
-Transform	Icon-O-Matic-PathManipulator		변환
-Add shape with style	Icon-O-Matic-Menu-Shape		스타일에 모양 더하기
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	색상 (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON 속성
+Transform	Icon-O-Matic-PathManipulator		변형
+Add shape with style	Icon-O-Matic-Menu-Shape		도형과 스타일 추가
+Change color	Icon-O-Matic-SetColorCmd		색상 변경
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		{0, plural, one{버텍스} other{버텍스}} 제거
+Unassign path	Icon-O-Matic-UnassignPathCmd		할당되지 않은 패스
 Remove	Icon-O-Matic-StylesList		제거
 Cancel	Icon-O-Matic-Menu-Settings		취소
-Transformation	Icon-O-Matic-TransformationBoxStates		변환
+PNG set	Icon-O-Matic-SavePanel		PNG 모음
+Transformation	Icon-O-Matic-TransformationBoxStates		변형
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		{0, plural, one{패스} other{패스}} 이동
 Closed	Icon-O-Matic-PropertyNames		닫힘
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<다시 실행 할 것이 없음>
 Height	Icon-O-Matic-PropertyNames		높이
 warning	Icon-O-Matic-SVGExport		경고
 File	Icon-O-Matic-Menus		파일
-Properties	Icon-O-Matic-Menus		특성
-Path	Icon-O-Matic-PropertyNames		경로
-Path	Icon-O-Matic-Menus		경로
-Stroke	Transformation		획
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	다른 목록에 있는
+Properties	Icon-O-Matic-Menus		속성
+Path	Icon-O-Matic-PropertyNames		패스
+Path	Icon-O-Matic-Menus		패스
+Stroke	Transformation		선 긋기
 Flip	Icon-O-Matic-PathManipulator		뒤집기
-Opacity	Icon-O-Matic-PropertyNames		붕투명
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	아무 객체나 선택하십시오.
+Move pivot	Icon-O-Matic-TransformationBoxStates		기준점 이동
+Opacity	Icon-O-Matic-PropertyNames		불투명도
 OK	Icon-O-Matic-ColorPicker		확인
 Error: 	Icon-O-Matic-Main		오류:
-Saving your document failed!	Icon-O-Matic-Exporter		당신의 문서를 저장하기 실패함!
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		{0, plural, one{변형} other{변형}} 되돌리기
+Assign style	Icon-O-Matic-AssignStyleCmd		스타일 할당
+Saving your document failed!	Icon-O-Matic-Exporter		문서를 저장할 수 없습니다!
 Snap to grid	Icon-O-Matic-Menu-Settings		격자에 맞추기
-Opening the document failed!	Icon-O-Matic-Main		문서 열기 실패함!
-Add with path & style	Icon-O-Matic-ShapesList		경로& 스타일 함께 더하기
-Shape	Icon-O-Matic-Menus		모양
-<unavailable>	Icon-O-Matic-StyleTypes		<가능하지 않음>
-Min LOD	Icon-O-Matic-PropertyNames		최소 LOD 
-Add	Icon-O-Matic-TransformersList		더하기
-Scale X	Icon-O-Matic-PropertyNames		x 축
-Add	Icon-O-Matic-PathsList		더하기
+Opening the document failed!	Icon-O-Matic-Main		문서를 열 수 없습니다!
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		{0, plural, one{스타일} other{스타일}} 제거
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		버텍스를 너무 많이 가진 패스가 하나 이상 존재합니다. HVIF 형식은 패스 하나 당 최대 255개의 버텍스를 지원합니다.
+Add with path & style	Icon-O-Matic-ShapesList		패스 및 스타일과 함께 추가
+Shape	Icon-O-Matic-Menus		도형
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		{0, plural, one{버텍스} other{버텍스}} 나누기
+<unavailable>	Icon-O-Matic-StyleTypes		<사용할 수 없음>
+Edit gradient	Icon-O-Matic-SetGradientCmd		그라데이션 편집
+Min LOD	Icon-O-Matic-PropertyNames		최소 LOD
+Redo: %action%	Icon-O-Matic-Main		다시하기: %action%
+Add	Icon-O-Matic-TransformersList		추가
+Settings	Icon-O-Matic-Menus		설정
+Scale X	Icon-O-Matic-PropertyNames		X축
+Add	Icon-O-Matic-PathsList		추가
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		{0, plural, one{스타일} other{스타일}} 추가
 Remove	Icon-O-Matic-PathManipulator		제거
 Duplicate	Icon-O-Matic-ShapesList		복제
-Contour	Transformation		윤곽
-Rounding	Icon-O-Matic-PropertyNames		원모양
+Alpha	Icon-O-Matic-PropertyNames		투명도
+Contour	Transformation		경계
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		{0, plural, one{변형기} other{변형기}} 추가
+Miter limit	Icon-O-Matic-PropertyNames		마이터 제한
+Insert vertex	Icon-O-Matic-InsertPointCmd		버텍스 추가
+Rounding	Icon-O-Matic-PropertyNames		둥글게
 Joins	Icon-O-Matic-PropertyNames		연결
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		도형이 너무 많습니다. HVIF 형식은 최대 255개를 지원합니다.
 Cancel	Icon-O-Matic-ColorPicker		취소
 Duplicate	Icon-O-Matic-PathsList		복제
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		{0, plural, one{도형} other{도형}} 이동
 Save	Icon-O-Matic-Menu-Settings		저장
+Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	속성을 편집하려면
 Export as…	Icon-O-Matic-Menu-File		다른 형식으로 내보내기...
+Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		{0, plural, one{도형} other{도형}} 잠그기
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		{0, plural, one{도형} other{도형}} 제거
+Undo: %action%	Icon-O-Matic-Main		되돌리기: %action%
 Diamond	Icon-O-Matic-StyleTypes		마름모꼴
-Add shape with path	Icon-O-Matic-Menu-Shape		경로에 모양 더하기
+Don't save	Icon-O-Matic-Menu-Settings		저장하지 않기
+Add shape with path	Icon-O-Matic-Menu-Shape		패스와 함께 도형 추가
+Bummer	Icon-O-Matic-Main	Cancel button - error alert	젠장
 Translation X	Icon-O-Matic-PropertyNames		X 변환
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		그것이 로드될 때 Icon-O-Matic는 SVG에서 모든 데이터를 해석하지 않을 수 있습니다. 원래 파일을 덮어 씀으로써, 그 정보는 지금 없어질 것입니다.
-Rotate indices backwards	Icon-O-Matic-PathsList		거꾸로 회전 지수
-Overwrite	Icon-O-Matic-SVGExport		덮어 쓰기
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		SVG를 불러들일 때 Icon-O-Matic이 데이터를 모두 해석하지 못했습니다. 원본 파일을 덮어씌울 경우 정보를 잃어버릴 수 있습니다.
+Rotate indices backwards	Icon-O-Matic-PathsList		역방향 인덱스 순환
+Overwrite	Icon-O-Matic-SVGExport		덮어쓰기
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		{0, plural, one{도형} other{도형}} 추가
 Cancel	Icon-O-Matic-SVGExport		취소
 Open…	Icon-O-Matic-Menu-File		열기...
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		{0, plural, one{변형기} other{변형기}} 제거
+Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	변환기를 추가하려면
 Remove	Icon-O-Matic-ShapesList		제거
+Bad news	Title of error alert		나쁜 소식
+HVIF source code	Icon-O-Matic-SavePanel		HVIF 소스 코드
+Save icon	Icon-O-Matic-SavePanel	Dialog title	아이콘 저장
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{패스} other{패스}} 할당
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		{0, plural, one{항목} other{항목}} 제거
 Linear	Icon-O-Matic-StyleTypes		직선
-Clean up	Icon-O-Matic-PathsList		깨끗하게 하기
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		{0, plural, one{항목} other{항목}} 이동
+Add vertex	Icon-O-Matic-AddPointCmd		버텍스 추가
+Clean up	Icon-O-Matic-PathsList		정리하기
 Split	Icon-O-Matic-PathManipulator		나누기
 Move	Icon-O-Matic-TransformationBoxStates		이동
-Conic	Icon-O-Matic-StyleTypes		원뿔
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		패스가 너무 많습니다. HVIF 형식은 최대 255개를 지원합니다.
+Conic	Icon-O-Matic-StyleTypes		원뿔형
 Name	Icon-O-Matic-PropertyNames		이름
 Reset transformation	Icon-O-Matic-StylesList		변환 재설정
-Reverse	Icon-O-Matic-PathsList		뒤집기
+Reverse	Icon-O-Matic-PathsList		반전
 Remove	Icon-O-Matic-PathsList		지우기
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64×64
+Load error	Icon-O-Matic-SVGImport		불러오기 오류
 Style type	Icon-O-Matic-StyleTypes		스타일 형식
-Quit	Icon-O-Matic-Menu-File		끝내기
-Gradient	Icon-O-Matic-StyleTypes		기울기
-Add shape with path & style	Icon-O-Matic-Menu-Shape		경로&스타일을 함께 모양에 더하기
+Quit	Icon-O-Matic-Menu-File		종료
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		변환기를 너무 많이 가진 도형이 하나 이상 존재합니다. HVIF 형식은 도형 하나 당 최대 255개의 변환기를 지원합니다.
+Gradient	Icon-O-Matic-StyleTypes		그라데이션
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	색상 (#%02x%02x%02x)
+Detect orient.	Icon-O-Matic-PropertyNames		방향 인식
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{패스} other{패스}} 추가
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		패스를 너무 많이 가진 도형이 하나 이상 존재합니다. HVIF 형식은 도형 하나 당 최대 255개의 패스를 지원합니다.
+Add shape with path & style	Icon-O-Matic-Menu-Shape		도형과 함께 패스 및 스타일 추가
 Radial	Icon-O-Matic-StyleTypes		방사형
-Caps	Icon-O-Matic-PropertyNames		캡스
+Text too long	Icon-O-Matic-StyledTextImport		텍스트가 너무 깁니다
+Caps	Icon-O-Matic-PropertyNames		끝단처리
 OK	Icon-O-Matic-SVGImport		확인
+Import text	Icon-O-Matic-StyledTextImport		텍스트 가져오기
 Append…	Icon-O-Matic-Menu-File		추가...
-Scale Y	Icon-O-Matic-PropertyNames		Y 축
-Rotate indices forwards	Icon-O-Matic-PathsList		회전 전달 지수
+Scale Y	Icon-O-Matic-PropertyNames		Y축
+Export icon	Icon-O-Matic-SavePanel	Dialog title	아이콘 내보내기
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		패스 인덱스 순환
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		{0, plural, one{항목} other{항목}} 추가
+Rotate indices forwards	Icon-O-Matic-PathsList		정방향 인덱스 순환
 Save	Icon-O-Matic-Menu-File		저장
-Add circle	Icon-O-Matic-PathsList		원 더하기
+Cancel	Icon-O-Matic-StyledTextImport		취소
+Add circle	Icon-O-Matic-PathsList		원 추가
 Freeze transformation	Icon-O-Matic-ShapesList		변환 고정
+META:ICON attribute	Icon-O-Matic-SavePanel		META:ICON 속성
 Untitled	Icon-O-Matic-Main		제목없음
 Max LOD	Icon-O-Matic-PropertyNames		최대 LOD
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		닫기 전에 현재 아이콘의 변경사항을 저장하시겠습니까?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		'%s' 파일을 SVG형식으로 열 수 없습니다.\n\n
 Save as…	Icon-O-Matic-Menu-File		다른 이름으로 저장...
-Swatches	Icon-O-Matic-Menus		견본
-<modify path>	Icon-O-Matic-PathCmd		<수정된 경로>
-Icon-O-Matic	System name		아이콘-오-매틱
+Swatches	Icon-O-Matic-Menus		스와치
+<modify path>	Icon-O-Matic-PathCmd		<패스 수정>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	%property% 설정
+Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<실행 취소할 것이 없음>
-Add	Icon-O-Matic-StylesList		더하기
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		{0, plural, one{패스} other{패스}} 제거
+Add	Icon-O-Matic-StylesList		추가
 Translation Y	Icon-O-Matic-PropertyNames		Y 변환
+Modify vertex	Icon-O-Matic-ChangePointCmd		버텍스 수정
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		{0, plural, one{스타일} other{스타일}} 제거
 Scale	Icon-O-Matic-TransformationBoxStates		비율
 All	Icon-O-Matic-Properties		모두
-Transformer	Icon-O-Matic-Menus		트랜스포머
+Transformer	Icon-O-Matic-Menus		변환기
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		{0, plural, one{버텍스} other{버텍스}} 전환
 Invert selection	Icon-O-Matic-Properties		선택 반전
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	도형을 선택하십시오.
 <unkown property>	Icon-O-Matic-PropertyNames		<알 수 없는 속성>
 Pick a color	Icon-O-Matic-ColorPicker		색상 선택
 Settings…	Icon-O-Matic-SavePanel		설정...
-Add with style	Icon-O-Matic-ShapesList		스타일과 함께 더하기
+Select all	Icon-O-Matic-PathManipulator		전체 선택
+Add with style	Icon-O-Matic-ShapesList		스타일과 함께 추가
 New	Icon-O-Matic-Menu-File		새 파일
-Gradient type	Icon-O-Matic-StyleTypes		경사 종류
+Change perspective	Icon-O-Matic-PerspectiveCommand		원근감 수정
+Gradient type	Icon-O-Matic-StyleTypes		그라데이션 종류
+Perspective	Transformation		원근감
 Export	Icon-O-Matic-Menu-File		내보내기
 Width	Icon-O-Matic-PropertyNames		너비
+Add reference image	Icon-O-Matic-ShapesList		참조 이미지 추가
 Style	Icon-O-Matic-Menus		스타일
 Off	Icon-O-Matic-Menu-Settings		끄기
 Edit	Icon-O-Matic-Menus		편집

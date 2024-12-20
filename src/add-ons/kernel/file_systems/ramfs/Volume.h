@@ -53,7 +53,7 @@ class SizeIndex;
 
 const ino_t kRootParentID = 0;
 
-// NodeListenerValue
+
 class NodeListenerValue {
 public:
 	inline NodeListenerValue() {}
@@ -70,7 +70,7 @@ public:
 };
 typedef List<NodeListenerValue> NodeListenerList;
 
-// EntryListenerValue
+
 class EntryListenerValue {
 public:
 	inline EntryListenerValue() {}
@@ -88,7 +88,7 @@ public:
 };
 typedef List<EntryListenerValue> EntryListenerList;
 
-// Volume
+
 class Volume {
 public:
 							Volume(fs_volume* volume);
@@ -167,28 +167,35 @@ public:
 	bool IteratorLock();
 	void IteratorUnlock();
 
+	recursive_lock&	AttributeIteratorLocker() { return fAttributeIteratorLocker; }
+
 protected:
 	fs_volume*				fVolume;
 
 private:
 	typedef DoublyLinkedList<Query>	QueryList;
 
+	rw_lock					fLocker;
+	String					fName;
 	ino_t					fNextNodeID;
 	NodeTable				*fNodeTable;
 	DirectoryEntryTable		*fDirectoryEntryTable;
 	IndexDirectory			*fIndexDirectory;
 	Directory				*fRootDirectory;
-	String					fName;
-	rw_lock					fLocker;
-	recursive_lock			fIteratorLocker;
-	recursive_lock			fQueryLocker;
 	NodeListenerTree		*fNodeListeners;
 	NodeListenerList		fAnyNodeListeners;
 	EntryListenerTree		*fEntryListeners;
 	EntryListenerList		fAnyEntryListeners;
+
+	recursive_lock			fIteratorLocker;
+	recursive_lock			fAttributeIteratorLocker;
+
+	recursive_lock			fQueryLocker;
 	QueryList				fQueries;
+
 	bigtime_t				fAccessTime;
 	bool					fMounted;
 };
+
 
 #endif	// VOLUME_H

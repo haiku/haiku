@@ -17,7 +17,7 @@ About Pulse…	PulseView		关于系统脉搏...
 Pulse	NormalPulseView		系统脉搏
 Deskbar mode	NormalPulseView		桌面栏模式
 Pulse settings	PulseApp		Pulse设置
-Remove replicant	CPUButton		删除复制件
+Remove replicant	CPUButton		删除克隆控件
 You can't disable the last active CPU.	PulseView		您不能禁用最后一个活动的CPU。
 Width of icon:	ConfigView		图标宽度：
 Deskbar mode	MiniPulseView		桌面栏模式

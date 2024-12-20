@@ -768,28 +768,28 @@ PackageRow::UpdateSize()
 void
 PackageRow::UpdateRepository()
 {
-	if (!fPackage.IsSet())
-		return;
-	SetField(new BStringField(fPackage->DepotName()), kRepositoryColumn);
+	BString depotName = PackageUtils::DepotName(fPackage);
+	SetField(new BStringField(depotName), kRepositoryColumn);
 }
 
 
 void
 PackageRow::UpdateVersion()
 {
-	if (!fPackage.IsSet())
-		return;
-	SetField(new BStringField(fPackage->Version().ToString()), kVersionColumn);
+	PackageVersionRef version = PackageUtils::Version(fPackage);
+	BString versionString;
+	if (version.IsSet())
+		versionString = version->ToString();
+	SetField(new BStringField(versionString), kVersionColumn);
 }
 
 
 void
 PackageRow::UpdateVersionCreateTimestamp()
 {
-	if (!fPackage.IsSet())
-		return;
-	SetField(new DateField(fPackage->VersionCreateTimestamp()),
-		kVersionCreateTimestampColumn);
+	PackageVersionRef version = PackageUtils::Version(fPackage);
+	if (version.IsSet())
+		SetField(new DateField(version->CreateTimestamp()), kVersionCreateTimestampColumn);
 }
 
 
@@ -1026,7 +1026,7 @@ PackageListView::MessageReceived(BMessage* message)
 				}
 				if ((changes & PKG_CHANGED_ICON) != 0)
 					row->UpdateIconAndTitle();
-				if ((changes & PKG_CHANGED_VERSION_CREATE_TIMESTAMP) != 0)
+				if ((changes & PKG_CHANGED_CORE_INFO) != 0)
 					row->UpdateVersionCreateTimestamp();
 			}
 			break;

@@ -199,7 +199,7 @@ SizeIndex::NodeChanged(Node* node, uint32 statFields,
 	const OldNodeAttributes& oldAttributes)
 {
 	IteratorList iterators;
-	iterators.MoveFrom(fIteratorsToUpdate);
+	iterators.TakeFrom(fIteratorsToUpdate);
 
 	off_t oldSize = oldAttributes.FileSize();
 	off_t newSize = node->FileSize();

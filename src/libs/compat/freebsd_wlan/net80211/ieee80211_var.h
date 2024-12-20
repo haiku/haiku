@@ -165,8 +165,12 @@ struct ieee80211com {
 	uint32_t		ic_caps;	/* capabilities */
 	uint32_t		ic_htcaps;	/* HT capabilities */
 	uint32_t		ic_htextcaps;	/* HT extended capabilities */
-	uint32_t		ic_cryptocaps;	/* crypto capabilities */
+				/* driver-supported software crypto caps */
+	uint32_t		ic_sw_cryptocaps;
+	uint32_t		ic_cryptocaps;	/* hardware crypto caps */
 						/* set of mode capabilities */
+				/* driver/net80211 sw KEYMGMT capabilities */
+	uint32_t		ic_sw_keymgmtcaps;
 	uint8_t			ic_modecaps[IEEE80211_MODE_BYTES];
 	uint8_t			ic_promisc;	/* vap's needing promisc mode */
 	uint8_t			ic_allmulti;	/* vap's needing all multicast*/
@@ -724,7 +728,7 @@ MALLOC_DECLARE(M_80211_VAP);
 
 #define	IEEE80211_FHT_BITS \
 	"\20\1NONHT_PR" \
-	"\23GF\24HT\25AMPDU_TX\26AMPDU_TX" \
+	"\21LDPC_TX\22LDPC_RX\23GF\24HT\25AMPDU_TX\26AMPDU_RX" \
 	"\27AMSDU_TX\30AMSDU_RX\31USEHT40\32PUREN\33SHORTGI20\34SHORTGI40" \
 	"\35HTCOMPAT\36RIFS\37STBC_TX\40STBC_RX"
 
@@ -735,12 +739,20 @@ MALLOC_DECLARE(M_80211_VAP);
 #define	IEEE80211_FVHT_USEVHT80	0x000000004	/* CONF: Use VHT80 */
 #define	IEEE80211_FVHT_USEVHT160	0x000000008	/* CONF: Use VHT160 */
 #define	IEEE80211_FVHT_USEVHT80P80	0x000000010	/* CONF: Use VHT 80+80 */
-#define	IEEE80211_FVHT_MASK						\
+#define	IEEE80211_FVHT_STBC_TX	0x00000020	/* CONF: STBC tx enabled */
+#define	IEEE80211_FVHT_STBC_RX	0x00000040	/* CONF: STBC rx enabled */
+
+#define	IEEE80211_FVHT_CHANWIDTH_MASK					\
 	(IEEE80211_FVHT_VHT | IEEE80211_FVHT_USEVHT40 |			\
 	IEEE80211_FVHT_USEVHT80 | IEEE80211_FVHT_USEVHT160 |		\
 	IEEE80211_FVHT_USEVHT80P80)
+
+#define	IEEE80211_FVHT_MASK						\
+	(IEEE80211_FVHT_CHANWIDTH_MASK |				\
+	IEEE80211_FVHT_STBC_TX | IEEE80211_FVHT_STBC_RX)
+
 #define	IEEE80211_VFHT_BITS \
-	"\20\1VHT\2VHT40\3VHT80\4VHT160\5VHT80P80"
+	"\20\1VHT\2VHT40\3VHT80\4VHT160\5VHT80P80\6STBC_TX\7STBC_RX"
 
 #define	IEEE80211_COM_DETACHED	0x00000001	/* ieee80211_ifdetach called */
 #define	IEEE80211_COM_REF_ADD	0x00000002	/* add / remove reference */
@@ -751,6 +763,12 @@ MALLOC_DECLARE(M_80211_VAP);
 int	ic_printf(struct ieee80211com *, const char *, ...) __printflike(2, 3);
 void	ieee80211_ifattach(struct ieee80211com *);
 void	ieee80211_ifdetach(struct ieee80211com *);
+void	ieee80211_set_software_ciphers(struct ieee80211com *,
+	    uint32_t cipher_suite);
+void	ieee80211_set_hardware_ciphers(struct ieee80211com *,
+	    uint32_t cipher_suite);
+void	ieee80211_set_driver_keymgmt_suites(struct ieee80211com *ic,
+	    uint32_t keymgmt_set);
 int	ieee80211_vap_setup(struct ieee80211com *, struct ieee80211vap *,
 		const char name[IFNAMSIZ], int unit,
 		enum ieee80211_opmode opmode, int flags,
@@ -815,6 +833,11 @@ char	ieee80211_channel_type_char(const struct ieee80211_channel *c);
 #define	ieee80211_get_current_channel(_ic)	((_ic)->ic_curchan)
 #define	ieee80211_get_home_channel(_ic)		((_ic)->ic_bsschan)
 #define	ieee80211_get_vap_desired_channel(_iv)	((_iv)->iv_des_chan)
+
+bool	ieee80211_is_key_global(const struct ieee80211vap *vap,
+	    const struct ieee80211_key *key);
+bool	ieee80211_is_key_unicast(const struct ieee80211vap *vap,
+	    const struct ieee80211_key *key);
 
 void	ieee80211_radiotap_attach(struct ieee80211com *,
 	    struct ieee80211_radiotap_header *th, int tlen,

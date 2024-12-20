@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-JPEGTranslator	1627696380
+1	korean	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		불러오기
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be 비트맵 형식 (JPEG 변환기)
 Show warning messages	JPEGTranslator		경고 메세지 표시
@@ -9,6 +9,7 @@ None	JPEGTranslator		없음
 About	JPEGTranslator		대하여
 Version %d.%d.%d	JPEGTranslator		버전 %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		흑백 이미지를 RGB24 형식으로 기록
+Output smoothing strength	JPEGTranslator		출력 보정 강도
 Use progressive compression	JPEGTranslator		프로그레시브 압축 사용
 Make file smaller (sligthtly worse quality)	JPEGTranslator		파일을 더 작게 만들기 (품질이 조금 낮아짐)
 High	JPEGTranslator		높음

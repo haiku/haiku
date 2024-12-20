@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	316454464
+1	japanese	x-vnd.Haiku-libtracker	3917763570
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		クエリテンプレートとして保存:
 Current folder	ContainerWindow		現在のフォルダー
 Finish: %time - Over %finishtime left	StatusWindow		終了: %time - 残り %finishtime 超
 Mount all disks now	AutoMounterSettings		すべてのディスクをただちにマウント
-Name	PoseView		名前
 Location:	InfoWindow		場所:
+Name	PoseView		名前
 Kind:	InfoWindow		種類:
 contains	FindPanel		含む
 Open	FilePanelPriv		開く
@@ -342,7 +342,6 @@ To: %dir	StatusWindow		%dir
 Paste layout	ContainerWindow		レイアウトを貼り付け
 Cancel	Tracker		中止
 yes	AttributesView		はい
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		ファイル \"%name\"をコピー中に以下のエラー発生:\n\t%error\n\n
 Make active printer	ContainerWindow		プリンターを有効にする
 Copy to	ContainerWindow		次へコピー
 Name	SelectionWindow		名前
@@ -488,7 +487,6 @@ Copy layout	ContainerWindow		レイアウトのコピー
 Duplicate	ContainerWindow		複製
 16-bit integer	AttributesView		16 ビット整数
 Untitled clipping	PoseView		無名クリッピング
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		注意: 転送先ファイルシステムのファイル名は大文字小文字を区別しません。\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに \"%name\" というファイルがすでに存在します。置き換えますか?
 , indexed	InfoWindow		, インデックス有
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。

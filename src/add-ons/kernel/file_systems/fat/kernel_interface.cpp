@@ -791,7 +791,9 @@ dosfs_walk(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
 	status_t status = B_FROM_POSIX_ERROR(
 		msdosfs_lookup_ino(bsdDir, NULL, bsdName.Data(), &dirClust, &dirOffset));
 	if (status != B_OK) {
-		entry_cache_add_missing(volume->id, fatDir->de_inode, bsdName.Data()->cn_nameptr);
+		// we don't add a 'missing' entry to the entry cache because it would persist after a file
+		// with this name is created, if the created entry is not in the same case as the entry
+		// cache entry
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 	}
 	// msdosfs_lookup_ino will return 0 for cluster number if looking up .. in a directory
@@ -1031,6 +1033,7 @@ dosfs_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
 	mount* bsdVolume = reinterpret_cast<mount*>(volume->private_volume);
 	msdosfsmount* fatVolume = reinterpret_cast<msdosfsmount*>(bsdVolume->mnt_data);
 	struct vnode* bsdNode = reinterpret_cast<struct vnode*>(vnode->private_node);
+	denode* fatNode = reinterpret_cast<denode*>(bsdNode->v_data);
 
 #ifndef FS_SHELL
 	if (io_request_is_write(request) && MOUNTED_READ_ONLY(fatVolume) != 0) {
@@ -1052,6 +1055,8 @@ dosfs_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
 		return B_UNSUPPORTED;
 
 	rw_lock_read_lock(&bsdNode->v_vnlock->haikuRW);
+
+	acquire_vnode(volume, fatNode->de_inode);
 
 	RETURN_ERROR(do_iterative_fd_io(fatVolume->pm_dev->si_fd, request, iterative_io_get_vecs_hook,
 		iterative_io_finished_hook, bsdNode));
@@ -2171,9 +2176,6 @@ dosfs_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 
 	if ((bsdVolume->mnt_flag & MNT_RDONLY) != 0 || (fatNode->de_Attributes & ATTR_READONLY) != 0)
 		openMode = (openMode & ~O_RWMASK) | O_RDONLY;
-
-	if ((openMode & O_TRUNC) != 0 && (openMode & O_RWMASK) == O_RDONLY)
-		return B_NOT_ALLOWED;
 
 	status_t status = _dosfs_access(bsdVolume, bsdNode, open_mode_to_access(openMode));
 	if (status != B_OK)
@@ -3870,8 +3872,10 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status, b
 	size_t bytesTransferred)
 {
 	vnode* bsdNode = reinterpret_cast<vnode*>(cookie);
+	denode* fatNode = reinterpret_cast<denode*>(bsdNode->v_data);
 
 	rw_lock_read_unlock(&bsdNode->v_vnlock->haikuRW);
+	put_vnode(bsdNode->v_mount->mnt_fsvolume, fatNode->de_inode);
 
 	return B_OK;
 }

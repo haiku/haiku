@@ -1,4 +1,4 @@
-1	korean	x-vnd.haiku-softwareupdater	153492771
+1	korean	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	업데이트 될 버전
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		{0, plural, one{#개의 패키지} other{#개의 패키지}} 업데이트를 설치하려면 여기를 클릭하세요.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	제거 될 패키지
@@ -15,6 +15,7 @@ There were no updates found.	CheckAction		업데이트를 찾을 수 없습니�
 No updates available	UpdateAction		사용 가능한 업데이트가 없습니다.
 New packages to be installed	SoftwareUpdaterWindow	List super item label	새로 설치 될 패키지
 Packages to be updated	SoftwareUpdaterWindow	List super item label	업데이트 될 패키지
+to	SoftwareUpdaterWindow	List item text	에서
 Attempting to cancel the updates…	SoftwareUpdaterWindow		업데이트를 취소하려고 시도하는 중…
 Contacting software repositories to check for package updates.	CheckManager		패키지 업데이트 확인을 위해 소프트웨어 저장소와 통신 중입니다.
 Available updates found	CheckManager		사용 가능한 업데이트를 발견했습니다

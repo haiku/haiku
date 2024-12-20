@@ -37,7 +37,7 @@ No changelog available.	PackageInfoView		변경이력 정보 없음.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		동의하여야 하는 현재 사용자 약관입니다.
 Cancel	PackageProblem		취소
 Version	PackageListView		버전
-No, quit HaikuDepot	App		아니오, HaikuDepot를 종료합니다
+No, quit HaikuDepot	App		아니오, HaikuDepot을 종료합니다
 Not logged in	MainWindow		로그인 되지 않음
 Featured packages	FeaturedPackagesView		추천 패키지
 Available	PackageListView		사용 가능

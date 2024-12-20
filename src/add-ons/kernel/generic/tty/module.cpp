@@ -28,17 +28,19 @@ dump_tty_settings(struct tty_settings& settings)
 	kprintf("  session_id:   %" B_PRId32 "\n", settings.session_id);
 
 	kprintf("  termios:\n");
-	kprintf("    c_iflag:    0x%08" B_PRIx32 "\n", settings.termios.c_iflag);
-	kprintf("    c_oflag:    0x%08" B_PRIx32 "\n", settings.termios.c_oflag);
-	kprintf("    c_cflag:    0x%08" B_PRIx32 "\n", settings.termios.c_cflag);
-	kprintf("    c_lflag:    0x%08" B_PRIx32 "\n", settings.termios.c_lflag);
-	kprintf("    c_line:     %d\n", settings.termios.c_line);
-	kprintf("    c_ispeed:   %u\n", settings.termios.c_ispeed);
-	kprintf("    c_ospeed:   %u\n", settings.termios.c_ospeed);
+	kprintf("    c_iflag:          0x%08" B_PRIx32 "\n", settings.termios.c_iflag);
+	kprintf("    c_oflag:          0x%08" B_PRIx32 "\n", settings.termios.c_oflag);
+	kprintf("    c_cflag:          0x%08" B_PRIx32 "\n", settings.termios.c_cflag);
+	kprintf("    c_lflag:          0x%08" B_PRIx32 "\n", settings.termios.c_lflag);
+	kprintf("    c_line:           %d\n", settings.termios.c_line);
+	kprintf("    c_ispeed:         %u\n", settings.termios.c_ispeed
+		+ ((uint32_t)settings.termios.c_ispeed_high << 16));
+	kprintf("    c_ospeed:         %u\n", settings.termios.c_ospeed
+		+ ((uint32_t)settings.termios.c_ospeed_high << 16));
 	for (int i = 0; i < NCCS; i++)
-		kprintf("    c_cc[%02d]:   %d\n", i, settings.termios.c_cc[i]);
+		kprintf("    c_cc[%02d]:       %d\n", i, settings.termios.c_cc[i]);
 
-	kprintf("  wsize:        %u x %u c, %u x %u pxl\n",
+	kprintf("  wsize:              %u x %u c, %u x %u pxl\n",
 		settings.window_size.ws_row, settings.window_size.ws_col,
 		settings.window_size.ws_xpixel, settings.window_size.ws_ypixel);
 }

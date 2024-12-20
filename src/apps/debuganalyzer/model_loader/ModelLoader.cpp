@@ -241,7 +241,7 @@ struct ModelLoader::ExtendedThreadSchedulingState
 	bool PrepareThreadIORequests(Model::IORequest**& _requests,
 		size_t& _requestCount)
 	{
-		fIORequests.MoveFrom(&fPendingIORequests);
+		fIORequests.TakeFrom(&fPendingIORequests);
 		size_t requestCount = fIORequests.Count();
 
 		if (requestCount == 0) {

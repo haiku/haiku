@@ -7,7 +7,7 @@ Short format:	TimeFormatSettings		짧은 형식:
 24 hour	TimeFormatSettings		24 시간
 Locale	Locale Preflet Window		로케일
 Time	TimeFormatSettings		시간
-Defaults	Locale Preflet Window		기본설정
+Defaults	Locale Preflet Window		기본값
 Locale	System name		로케일
 Date	TimeFormatSettings		날짜
 OK	Locale Preflet Window		확인

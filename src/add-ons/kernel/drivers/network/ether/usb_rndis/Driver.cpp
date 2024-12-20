@@ -26,18 +26,6 @@ usb_rndis_device_added(usb_device device, void **cookie)
 
 	// check if this is a replug of an existing device first
 	mutex_lock(&gDriverLock);
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gRNDISDevices[i] == NULL)
-			continue;
-
-		if (gRNDISDevices[i]->CompareAndReattach(device) != B_OK)
-			continue;
-
-		TRACE_ALWAYS("rndis device %" B_PRId32 " replugged\n", i);
-		*cookie = gRNDISDevices[i];
-		mutex_unlock(&gDriverLock);
-		return B_OK;
-	}
 
 	// no such device yet, create a new one
 	RNDISDevice *rndisDevice = new RNDISDevice(device);

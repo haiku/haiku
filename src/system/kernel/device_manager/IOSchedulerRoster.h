@@ -25,7 +25,7 @@
 typedef DoublyLinkedList<IOScheduler> IOSchedulerList;
 
 
-class IOSchedulerRoster {
+class IOSchedulerRoster final {
 public:
 	static	void				Init();
 	static	IOSchedulerRoster*	Default()	{ return &sDefaultInstance; }
@@ -47,6 +47,8 @@ public:
 									IOOperation* operation = NULL);
 
 			int32				NextID();
+
+			void				Dump() const;
 
 private:
 								IOSchedulerRoster();

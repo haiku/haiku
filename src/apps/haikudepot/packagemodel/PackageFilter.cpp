@@ -112,9 +112,8 @@ public:
 
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
-		if (!package.IsSet())
-			return false;
-		return package->DepotName() == fName;
+		BString depotName = PackageUtils::DepotName(package);
+		return !depotName.IsEmpty() && depotName == fName;
 	}
 
 	const BString& Name() const
@@ -181,7 +180,7 @@ public:
 		for (int32 i = fSearchTerms.CountStrings() - 1; i >= 0; i--) {
 			const BString& term = fSearchTerms.StringAt(i);
 			if (!_TextContains(package->Name(), term)
-				&& !_TextContains(package->Publisher().Name(), term)
+				&& !_AcceptsPackageFromPublisher(package, term)
 				&& !_AcceptsPackageFromLocalizedText(package, term)) {
 				return false;
 			}
@@ -210,6 +209,13 @@ private:
  		int32 index = text.FindFirst(string);
  		return index >= 0;
  	}
+
+	bool _AcceptsPackageFromPublisher(const PackageInfoRef& package,
+		const BString& searchTerm) const
+	{
+		BString publisherName = PackageUtils::PublisherName(package);
+		return _TextContains(publisherName, searchTerm);
+	}
 
 	bool _AcceptsPackageFromLocalizedText(const PackageInfoRef& package,
 		const BString& searchTerm) const

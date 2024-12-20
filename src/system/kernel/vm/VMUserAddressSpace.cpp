@@ -227,6 +227,9 @@ VMUserAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 	VMUserArea* next = fAreas.Next(static_cast<VMUserArea*>(area));
 	addr_t newEnd = area->Base() + (newSize - 1);
 
+	if (newEnd < area->Base())
+		return false;
+
 	if (next == NULL)
 		return fEndAddress >= newEnd;
 

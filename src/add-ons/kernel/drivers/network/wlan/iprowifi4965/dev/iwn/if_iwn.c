@@ -3650,6 +3650,11 @@ iwn_tx_done(struct iwn_softc *sc, struct iwn_rx_desc *desc, int rtsfailcnt,
 		return;
 	}
 
+#ifdef __HAIKU__
+	if (!data->ni || !data->m)
+		return;
+#endif
+
 	KASSERT(data->ni != NULL, ("no node"));
 	KASSERT(data->m != NULL, ("no mbuf"));
 

@@ -273,10 +273,20 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 			return result;
 		}
 
-		if (fStatusRead != B_OK && fStatusRead != B_CANCELED && !fRemoved) {
+		if (fStatusRead == B_CANCELED) {
+			// The transfer was canceled, so no data was actually received.
+			*numBytes = 0;
+			return fStatusRead;
+		}
+
+		if ((fStatusRead != B_OK) && !fRemoved) {
+			// In other error cases (triggered by the device), we need to clear the "halt" feature
+			// so that the next transfers will work.
 			TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusRead);
-			result = gUSBModule->clear_feature(fReadEndpoint,
-				USB_FEATURE_ENDPOINT_HALT);
+
+			gUSBModule->cancel_queued_transfers(fReadEndpoint);
+
+			result = gUSBModule->clear_feature(fReadEndpoint, USB_FEATURE_ENDPOINT_HALT);
 			if (result != B_OK) {
 				TRACE_ALWAYS("failed to clear halt state on read\n");
 				*numBytes = 0;
@@ -401,10 +411,18 @@ RNDISDevice::Write(const uint8 *buffer, size_t *numBytes)
 		return result;
 	}
 
-	if (fStatusWrite != B_OK && fStatusWrite != B_CANCELED && !fRemoved) {
+	if (fStatusWrite == B_CANCELED) {
+		// The transfer was canceled, so no data was actually sent.
+		*numBytes = 0;
+		return fStatusWrite;
+	}
+
+	if ((fStatusWrite != B_OK) && !fRemoved) {
 		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusWrite);
-		result = gUSBModule->clear_feature(fWriteEndpoint,
-			USB_FEATURE_ENDPOINT_HALT);
+
+		gUSBModule->cancel_queued_transfers(fReadEndpoint);
+
+		result = gUSBModule->clear_feature(fWriteEndpoint, USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK) {
 			TRACE_ALWAYS("failed to clear halt state on write\n");
 			*numBytes = 0;
@@ -479,59 +497,6 @@ RNDISDevice::Removed()
 
 	if (fLinkStateChangeSem >= B_OK)
 		release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
-}
-
-
-status_t
-RNDISDevice::CompareAndReattach(usb_device device)
-{
-	const usb_device_descriptor *deviceDescriptor
-		= gUSBModule->get_device_descriptor(device);
-
-	if (deviceDescriptor == NULL) {
-		TRACE_ALWAYS("failed to get device descriptor\n");
-		return B_ERROR;
-	}
-
-	if (deviceDescriptor->vendor_id != fVendorID
-		&& deviceDescriptor->product_id != fProductID) {
-		// this certainly isn't the same device
-		return B_BAD_VALUE;
-	}
-
-	// this might be the same device that was replugged - read the MAC address
-	// (which should be at the same index) to make sure
-	uint8 macBuffer[6];
-	if (_ReadMACAddress(device, macBuffer) != B_OK
-		|| memcmp(macBuffer, fMACAddress, sizeof(macBuffer)) != 0) {
-		// reading the MAC address failed or they are not the same
-		return B_BAD_VALUE;
-	}
-
-	// this is the same device that was replugged - clear the removed state,
-	// re-setup the endpoints and transfers and open the device if it was
-	// previously opened
-	fDevice = device;
-	fRemoved = false;
-	status_t result = _SetupDevice();
-	if (result != B_OK) {
-		fRemoved = true;
-		return result;
-	}
-
-	// in case notifications do not work we will have a hardcoded connection
-	// need to register that and notify the network stack ourselfs if this is
-	// the case as the open will not result in a corresponding notification
-	bool noNotifications = (fMediaConnectState == MEDIA_STATE_CONNECTED);
-
-	if (fOpen) {
-		fOpen = false;
-		result = Open();
-		if (result == B_OK && noNotifications && fLinkStateChangeSem >= B_OK)
-			release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
-	}
-
-	return B_OK;
 }
 
 
@@ -879,6 +844,7 @@ RNDISDevice::_NotifyCallback(void *cookie, int32 status, void *_data,
 
 	if (status != B_OK) {
 		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", status);
+
 		if (gUSBModule->clear_feature(device->fNotifyEndpoint,
 			USB_FEATURE_ENDPOINT_HALT) != B_OK)
 			TRACE_ALWAYS("failed to clear halt state in notify hook\n");

@@ -31,7 +31,7 @@ Failed	TaskLooper	Failed task status message	실패함
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	좋은 소식입니다! 저장소 %name%에 대한 작업이 완료되었습니다.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	일부 작업이 아직 실행 주입니다. 모두 중단하고 종료하시겠습니까?
 This repository URL already exists.	RepositoriesView	Error message	저장소 URL이 이미 존재합니다.
-Repositories	System name		Repositories
+Repositories	System name		저장소
 Changes pending:	RepositoriesView	Status view text	대기중인 변경사항:
 Remove	RepositoriesView	Button label	제거
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	저장소를 제거하시겠습니까?

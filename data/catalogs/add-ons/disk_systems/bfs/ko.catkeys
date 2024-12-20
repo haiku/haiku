@@ -1,6 +1,6 @@
 1	korean	x-vnd.Haiku-BFSAddOn	1570987954
 Enable query support	BFS_Initialize_Parameter		쿼리 기능 활성화
-Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		쿼리 지원을 비활성화하면 특정 파일 시스템 작업 속도가 빨라지지만\n쿼리가 필요하지 않다고 확신하는 경우에만 사용하십시오.\nHaiku 부팅을위한 모든 볼륨에는 쿼리 지원이 활성화되어 있어야합니다.
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		쿼리 지원을 비활성화하면 특정 파일 시스템 작업 속도가 빨라지지만\n쿼리가 필요하지 않다고 확신하는 경우에만 사용하십시오.\nHaiku 부팅용 볼륨에는 반드시 쿼리 지원이 활성화되어 있어야합니다.
 Name:	BFS_Initialize_Parameter		이름:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (대용량 파일이 대부분인 경우)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (권장)

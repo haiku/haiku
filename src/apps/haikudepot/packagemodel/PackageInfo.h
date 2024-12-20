@@ -13,17 +13,17 @@
 #include "Language.h"
 #include "List.h"
 #include "PackageClassificationInfo.h"
+#include "PackageCoreInfo.h"
 #include "PackageInfoListener.h"
 #include "PackageLocalInfo.h"
 #include "PackageLocalizedText.h"
+#include "PackagePublisherInfo.h"
 #include "PackageScreenshotInfo.h"
-#include "PublisherInfo.h"
 #include "ScreenshotInfo.h"
 #include "UserRatingInfo.h"
 
 
 using BPackageKit::BPackageInfo;
-using BPackageKit::BPackageVersion;
 
 
 class PackageInfo : public BReferenceable {
@@ -41,18 +41,13 @@ public:
 			const BString&		Name() const
 									{ return fName; }
 
+			PackageCoreInfoRef	CoreInfo() const
+									{ return fCoreInfo; }
+			void				SetCoreInfo(PackageCoreInfoRef value);
+
 			PackageLocalizedTextRef
 								LocalizedText() const;
 			void				SetLocalizedText(PackageLocalizedTextRef value);
-
-			const BPackageVersion&
-								Version() const
-									{ return fVersion; }
-			const PublisherInfo& Publisher() const
-									{ return fPublisher; }
-
-			const BString		Architecture() const
-									{ return fArchitecture; }
 
 			void				SetPackageClassificationInfo(
 									PackageClassificationInfoRef value);
@@ -71,14 +66,6 @@ public:
 									{ return fScreenshotInfo; }
 			void				SetScreenshotInfo(PackageScreenshotInfoRef value);
 
-			void				SetVersionCreateTimestamp(uint64 value);
-			uint64				VersionCreateTimestamp() const
-									{ return fVersionCreateTimestamp; }
-
-			void				SetDepotName(const BString& depotName);
-			const BString&		DepotName() const
-									{ return fDepotName; }
-
 			bool				AddListener(
 									const PackageInfoListenerRef& listener);
 			void				RemoveListener(
@@ -94,13 +81,8 @@ private:
 
 private:
 			BString				fName;
-			BPackageVersion		fVersion;
-				// milliseconds since epoch
-			uint64				fVersionCreateTimestamp;
-			PublisherInfo		fPublisher;
-			BString				fArchitecture;
-			BString				fDepotName;
 
+			PackageCoreInfoRef	fCoreInfo;
 			PackageLocalizedTextRef
 								fLocalizedText;
 			PackageClassificationInfoRef

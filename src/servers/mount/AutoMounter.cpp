@@ -89,6 +89,14 @@ public:
 	virtual	bool				Visit(BPartition* partition, int32 level);
 
 private:
+		enum {
+			MATCHES_VOLUME_NAME	= (1 << 0),
+			MATCHES_DEVICE_NAME	= (1 << 1),
+			MATCHES_FS_NAME		= (1 << 2),
+			MATCHES_BLOCK_SIZE	= (1 << 3),
+			MATCHES_CAPACITY	= (1 << 4),
+		};
+
 			int					_Score(BPartition* partition);
 
 private:
@@ -235,12 +243,17 @@ MountArchivedVisitor::MountArchivedVisitor(const BDiskDeviceList& devices,
 
 MountArchivedVisitor::~MountArchivedVisitor()
 {
-	if (fBestScore >= 6) {
-		uint32 mountFlags = fArchived.GetUInt32("mountFlags", 0);
-		BPartition* partition = fDevices.PartitionWithID(fBestID);
-		if (partition != NULL)
-			partition->Mount(NULL, mountFlags);
-	}
+	// At least these fields, plus one other besides, must match for us to auto-mount.
+	const int requiredMatches = MATCHES_FS_NAME | MATCHES_CAPACITY | MATCHES_BLOCK_SIZE;
+	if ((fBestScore & requiredMatches) != requiredMatches)
+		return;
+	if ((fBestScore & ~requiredMatches) == 0)
+		return;
+
+	uint32 mountFlags = fArchived.GetUInt32("mountFlags", 0);
+	BPartition* partition = fDevices.PartitionWithID(fBestID);
+	if (partition != NULL)
+		partition->Mount(NULL, mountFlags);
 }
 
 
@@ -272,29 +285,29 @@ MountArchivedVisitor::_Score(BPartition* partition)
 {
 	BPath path;
 	if (partition->GetPath(&path) != B_OK)
-		return false;
+		return 0;
 
 	int score = 0;
 
-	int64 capacity = fArchived.GetInt64("capacity", 0);
-	if (capacity == partition->ContentSize())
-		score += 4;
+	BString volumeName = fArchived.GetString("volumeName");
+	if (volumeName == partition->ContentName())
+		score |= MATCHES_VOLUME_NAME;
 
 	BString deviceName = fArchived.GetString("deviceName");
 	if (deviceName == path.Path())
-		score += 3;
-
-	BString volumeName = fArchived.GetString("volumeName");
-	if (volumeName == partition->ContentName())
-		score += 2;
+		score |= MATCHES_DEVICE_NAME;
 
 	BString fsName = fArchived.FindString("fsName");
 	if (fsName == partition->ContentType())
-		score += 1;
+		score |= MATCHES_FS_NAME;
+
+	int64 capacity = fArchived.GetInt64("capacity", 0);
+	if (capacity == partition->ContentSize())
+		score |= MATCHES_CAPACITY;
 
 	uint32 blockSize = fArchived.GetUInt32("blockSize", 0);
 	if (blockSize == partition->BlockSize())
-		score += 1;
+		score |= MATCHES_BLOCK_SIZE;
 
 	return score;
 }

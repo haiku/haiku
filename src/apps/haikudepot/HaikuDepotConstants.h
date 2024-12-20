@@ -119,4 +119,8 @@ enum UserUsageConditionsSelectionMode {
 #define PROMINANCE_ORDERING_MAX				1000
 	// this is the highest prominence value possible.
 
+#define SINGLE_PACKAGE_DEPOT_NAME "__hd_single_pkg_depot"
+	// used as a fake depot name for the case where the application is looking
+	// at a single package based on a file.
+
 #endif // HAIKU_DEPOT_CONSTANTS_H

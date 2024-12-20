@@ -665,8 +665,8 @@ BBitmap::SetBits(const void* data, int32 length, int32 offset,
 	int32 inBPR = -1;
 	// tweaks to mimic R5 behavior
 	if (error == B_OK) {
-		if (colorSpace == B_RGB32) {
-			// B_RGB32 means actually unpadded B_RGB24_BIG
+		if (colorSpace == B_RGB32 && (length % 3) == 0) {
+			// B_RGB32 could actually mean unpadded B_RGB24_BIG
 			colorSpace = B_RGB24_BIG;
 			inBPR = width * 3;
 		} else if (colorSpace == B_CMAP8 && fColorSpace != B_CMAP8) {

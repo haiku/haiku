@@ -14,8 +14,10 @@
 #include <OS.h>
 
 #include <errno_private.h>
-#include <time_private.h>
+#include <pthread_private.h>
+#include <syscall_clock_info.h>
 #include <syscall_utils.h>
+#include <time_private.h>
 
 #include <syscalls.h>
 
@@ -145,9 +147,7 @@ clock_getcpuclockid(pid_t pid, clockid_t* _clockID)
 		return 0;
 	}
 
-	// test-get the time to verify the team exists and we have permission
-	bigtime_t microSeconds;
-	status_t error = _kern_get_clock(pid, &microSeconds);
+	status_t error = _kern_get_cpuclockid(pid, TEAM_ID, _clockID);
 	if (error != B_OK) {
 		// Since pid is > 0, B_BAD_VALUE always means a team with that ID
 		// doesn't exist. Translate the error code accordingly.
@@ -156,6 +156,24 @@ clock_getcpuclockid(pid_t pid, clockid_t* _clockID)
 		return error;
 	}
 
-	*_clockID = pid;
+	return 0;
+}
+
+
+int
+pthread_getcpuclockid(pthread_t thread, clockid_t* _clockID)
+{
+	if (thread->id < 0)
+		return ESRCH;
+
+	status_t error = _kern_get_cpuclockid(thread->id, THREAD_ID, _clockID);
+	if (error != B_OK) {
+		// Since thread->id is > 0, B_BAD_VALUE always means a thread with that ID
+		// doesn't exist. Translate the error code accordingly.
+		if (error == B_BAD_VALUE)
+			return ESRCH;
+		return error;
+	}
+
 	return 0;
 }

@@ -30,8 +30,8 @@ Printer name:	AddPrinterDialog		프린터 이름:
 Yellow	TestPageView		노랑
 Black	TestPageView		검정
 Printer type:	AddPrinterDialog		프린터 종류:
-Printers	System name		Printers
-{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{보류된작업 없음}=1{1개 작업 보류 중}other{#개 작업 보류 중}
+Printers	System name		프린터
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{보류된 작업 없음}=1{1개 작업 보류 중}other{#개 작업 보류 중}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		프린터: %printer_name%\n드라이버: %driver%\n
 Green	TestPageView		녹색
 Print test page	PrintersWindow		테스트 페이지 인쇄

@@ -1,0 +1,7 @@
+1	korean	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		시스템 오디오 믹서
+System video output	NodeManager		시스템 비디오 출력
+System video input	NodeManager		시스템 비디오 입력
+No name	NodeManager		이름 없음
+System audio input	NodeManager		시스템 오디오 입력
+Time sources	NodeManager		시간 원천

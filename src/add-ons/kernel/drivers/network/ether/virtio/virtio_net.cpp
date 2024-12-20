@@ -9,7 +9,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
-#include <new>
+#include <sys/sockio.h>
 
 #include <ethernet.h>
 #include <kernel.h>
@@ -925,6 +925,9 @@ virtio_net_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			if (!IS_KERNEL_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
 			return virtio_net_receive(cookie, (net_buffer**)buffer);
+
+		case SIOCGIFSTATS:
+			break;
 
 		default:
 			ERROR("ioctl: unknown message %" B_PRIx32 "\n", op);

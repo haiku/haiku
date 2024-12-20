@@ -217,9 +217,9 @@ typedef BOpenHashTable<TransactionHash> TransactionTable;
 struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	BlockTable*		hash;
 	mutex			lock;
-	int				fd;
+	const int		fd;
 	off_t			max_blocks;
-	size_t			block_size;
+	const size_t	block_size;
 	int32			next_transaction_id;
 	cache_transaction* last_transaction;
 	TransactionTable* transaction_hash;
@@ -240,7 +240,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	bigtime_t		last_block_write_duration;
 
 	uint32			num_dirty_blocks;
-	bool			read_only;
+	const bool		read_only;
 
 	NotificationList pending_notifications;
 	ConditionVariable condition_variable;
@@ -338,18 +338,16 @@ public:
 								~BlockPrefetcher();
 
 			status_t			Allocate();
-			status_t			ReadAsync();
-
-	static	status_t			IterativeIOGetVecsHook(void* cookie, io_request* request,
-									off_t offset, size_t size, struct file_io_vec* vecs,
-									size_t* _count);
-	static	status_t			IterativeIOFinishedHook(void* cookie, io_request* request,
-									status_t status, bool partialTransfer,
-									size_t bytesTransferred);
+			status_t			ReadAsync(MutexLocker& cacheLocker);
 
 			size_t				NumAllocated() { return fNumAllocated; }
 
 private:
+	static	void			_IOFinishedCallback(void* cookie, io_request* request,
+									status_t status, bool partialTransfer,
+									generic_size_t bytesTransferred);
+			void			_IOFinished(status_t status, generic_size_t bytesTransferred);
+
 			void				_RemoveAllocated(size_t unbusyCount, size_t removeCount);
 
 private:
@@ -1531,11 +1529,10 @@ BlockPrefetcher::Allocate()
 
 
 /*!	Schedules reads from disk to cache.
-	@return If an error is returned, then the previously allocated blocks have been cleaned up.
-	@post The calling object will eventually be deleted by IterativeIOFinishedHook.
+	\post The calling object will eventually be deleted by IOFinishedCallback.
 */
 status_t
-BlockPrefetcher::ReadAsync()
+BlockPrefetcher::ReadAsync(MutexLocker& cacheLocker)
 {
 	TRACE(("BlockPrefetcher::Read: reading %" B_PRIuSIZE " blocks\n", fNumAllocated));
 
@@ -1555,69 +1552,52 @@ BlockPrefetcher::ReadAsync()
 		TRACE_ALWAYS("BlockPrefetcher::Read: failed to initialize IO request for %" B_PRIuSIZE
 			" blocks starting with %" B_PRIdOFF ": %s\n",
 			fNumAllocated, fBlockNumber, strerror(status));
+
 		_RemoveAllocated(fNumAllocated, fNumAllocated);
 		delete request;
 		return status;
 	}
 
-	return do_iterative_fd_io(fCache->fd, request, IterativeIOGetVecsHook, IterativeIOFinishedHook,
-		this);
+	request->SetFinishedCallback(_IOFinishedCallback, this);
+
+	// do_fd_io() may invoke callbacks directly, so we need to have unlocked the cache.
+	cacheLocker.Unlock();
+
+	return do_fd_io(fCache->fd, request);
 }
 
 
-/*static*/ status_t
-BlockPrefetcher::IterativeIOGetVecsHook(void* cookie, io_request* request, off_t offset,
-	size_t size, struct file_io_vec* vecs, size_t* _count)
+/*static*/ void
+BlockPrefetcher::_IOFinishedCallback(void* cookie, io_request* request, status_t status,
+	bool partialTransfer, generic_size_t bytesTransferred)
 {
-	TRACE(("BlockPrefetcher::IterativeIOGetVecsHook: setting offset %" B_PRIdOFF " and length %"
-		B_PRIuSIZE "\n", offset, size));
-
-	if (*_count == 0)
-		return B_OK;
-
-	vecs[0].offset = offset;
-		// the requested offset was volume-relative to begin with
-	vecs[0].length = size;
-		// the request is always for a contiguous run of blocks
-	*_count = 1;
-
-	return B_OK;
+	TRACE(("BlockPrefetcher::_IOFinishedCallback: status %s, partial %d\n",
+		strerror(status), partialTransfer));
+	((BlockPrefetcher*)cookie)->_IOFinished(status, bytesTransferred);
 }
 
 
-/*static*/ status_t
-BlockPrefetcher::IterativeIOFinishedHook(void* cookie, io_request* request, status_t status,
-	bool partialTransfer, size_t bytesTransferred)
+void
+BlockPrefetcher::_IOFinished(status_t status, generic_size_t bytesTransferred)
 {
-	TRACE(("BlockPrefetcher::IterativeIOFinishedHook: status %s, partial %d\n", strerror(status),
-		partialTransfer));
+	MutexLocker locker(&fCache->lock);
 
-	BlockPrefetcher* blockPrefetcher = reinterpret_cast<BlockPrefetcher*>(cookie);
-	block_cache* cache = blockPrefetcher->fCache;
-	cached_block** blocks = blockPrefetcher->fBlocks;
-	size_t blockSize = cache->block_size;
-	off_t blockNumber = blockPrefetcher->fBlockNumber;
-	size_t numBlocks = blockPrefetcher->fNumAllocated;
+	if (bytesTransferred < (fNumAllocated * fCache->block_size)) {
+		_RemoveAllocated(fNumAllocated, fNumAllocated);
 
-	MutexLocker locker(&cache->lock);
-
-	if (bytesTransferred < numBlocks * blockSize) {
-		blockPrefetcher->_RemoveAllocated(numBlocks, numBlocks);
-		TB(Error(cache, blockNumber, "prefetch starting here failed", status));
-		TRACE_ALWAYS("prefetch_iterative_io_finished_hook: transferred only %" B_PRIuSIZE
+		TB(Error(cache, fBlockNumber, "prefetch starting here failed", status));
+		TRACE_ALWAYS("BlockPrefetcher::_IOFinished: transferred only %" B_PRIuGENADDR
 			" bytes in attempt to read %" B_PRIuSIZE " blocks (start block %" B_PRIdOFF "): %s\n",
-			bytesTransferred, numBlocks, blockNumber, strerror(status));
+			bytesTransferred, fNumAllocated, fBlockNumber, strerror(status));
 	} else {
-		for (size_t i = 0; i < numBlocks; ++i) {
-			TB(Read(cache, blockNumber + i));
-			mark_block_unbusy_reading(cache, blocks[i]);
-			blocks[i]->last_accessed = system_time() / 1000000L;
+		for (size_t i = 0; i < fNumAllocated; i++) {
+			TB(Read(cache, fBlockNumber + i));
+			mark_block_unbusy_reading(fCache, fBlocks[i]);
+			fBlocks[i]->last_accessed = system_time() / 1000000L;
 		}
 	}
 
-	delete blockPrefetcher;
-
-	return status;
+	delete this;
 }
 
 
@@ -1998,7 +1978,7 @@ mark_block_unbusy_reading(block_cache* cache, cached_block* block)
 	cache->busy_reading_count--;
 
 	if ((cache->busy_reading_waiters && cache->busy_reading_count == 0)
-		|| block->busy_reading_waiters) {
+			|| block->busy_reading_waiters) {
 		cache->busy_reading_waiters = false;
 		block->busy_reading_waiters = false;
 		cache->busy_reading_condition.NotifyAll();
@@ -2018,9 +1998,7 @@ wait_for_busy_reading_block(block_cache* cache, cached_block* block)
 		block->busy_reading_waiters = true;
 
 		mutex_unlock(&cache->lock);
-
 		entry.Wait();
-
 		mutex_lock(&cache->lock);
 	}
 }
@@ -2038,9 +2016,7 @@ wait_for_busy_reading_blocks(block_cache* cache)
 		cache->busy_reading_waiters = true;
 
 		mutex_unlock(&cache->lock);
-
 		entry.Wait();
-
 		mutex_lock(&cache->lock);
 	}
 }
@@ -2058,9 +2034,7 @@ wait_for_busy_writing_block(block_cache* cache, cached_block* block)
 		block->busy_writing_waiters = true;
 
 		mutex_unlock(&cache->lock);
-
 		entry.Wait();
-
 		mutex_lock(&cache->lock);
 	}
 }
@@ -2078,9 +2052,7 @@ wait_for_busy_writing_blocks(block_cache* cache)
 		cache->busy_writing_waiters = true;
 
 		mutex_unlock(&cache->lock);
-
 		entry.Wait();
-
 		mutex_lock(&cache->lock);
 	}
 }
@@ -2190,6 +2162,9 @@ retry:
 	} else if (block->busy_reading) {
 		// The block is currently busy_reading - wait and try again later
 		wait_for_busy_reading_block(cache, block);
+
+		// The block may have been deleted or replaced in the meantime,
+		// so we must look it up in the hash again after waiting.
 		goto retry;
 	}
 
@@ -4026,13 +4001,12 @@ block_cache_prefetch(void* _cache, off_t blockNumber, size_t* _numBlocks)
 
 	numBlocks = blockPrefetcher->NumAllocated();
 
-	status = blockPrefetcher->ReadAsync();
+	status = blockPrefetcher->ReadAsync(locker);
 
 	if (status == B_OK)
 		*_numBlocks = numBlocks;
 
 	return status;
-
 #else // BUILDING_USERLAND_FS_SERVER
 	*_numBlocks = 0;
 	return B_UNSUPPORTED;

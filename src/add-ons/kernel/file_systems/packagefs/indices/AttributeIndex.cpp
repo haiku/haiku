@@ -332,7 +332,7 @@ AttributeIndex::NodeChanged(Node* node, uint32 statFields,
 	const OldNodeAttributes& oldAttributes)
 {
 	IteratorList iterators;
-	iterators.MoveFrom(fIteratorsToUpdate);
+	iterators.TakeFrom(fIteratorsToUpdate);
 
 	TreeValue* oldTreeValue
 		= (TreeValue*)oldAttributes.IndexCookieForAttribute(Name());

@@ -611,7 +611,7 @@ VMCacheRef::VMCacheRef(VMCache* cache)
 bool
 VMCache::_IsMergeable() const
 {
-	return areas == NULL && temporary && !unmergeable
+	return areas.IsEmpty() && temporary
 		&& !consumers.IsEmpty() && consumers.Head() == consumers.Tail();
 }
 
@@ -625,6 +625,8 @@ VMCache::VMCache()
 
 VMCache::~VMCache()
 {
+	ASSERT(fRefCount == 0 && page_count == 0);
+
 	object_cache_delete(gCacheRefObjectCache, fCacheRef);
 }
 
@@ -634,14 +636,12 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 {
 	mutex_init(&fLock, "VMCache");
 
-	areas = NULL;
 	fRefCount = 1;
 	source = NULL;
 	virtual_base = 0;
 	virtual_end = 0;
 	committed_size = 0;
 	temporary = 0;
-	unmergeable = 0;
 	page_count = 0;
 	fWiredPagesCount = 0;
 	type = cacheType;
@@ -675,7 +675,7 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 void
 VMCache::Delete()
 {
-	if (areas != NULL)
+	if (!areas.IsEmpty())
 		panic("cache %p to be deleted still has areas", this);
 	if (!consumers.IsEmpty())
 		panic("cache %p to be deleted still has consumers", this);
@@ -692,6 +692,7 @@ VMCache::Delete()
 		// remove it
 		pages.Remove(page);
 		page->SetCacheRef(NULL);
+		page_count--;
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
 			page->physical_page_number));
@@ -852,6 +853,7 @@ VMCache::MovePage(vm_page* page, off_t offset)
 
 	AssertLocked();
 	oldCache->AssertLocked();
+	ASSERT(offset >= virtual_base && (offset + B_PAGE_SIZE) <= virtual_end);
 
 	// remove from old cache
 	oldCache->pages.Remove(page);
@@ -956,10 +958,11 @@ void
 VMCache::AddConsumer(VMCache* consumer)
 {
 	TRACE(("add consumer vm cache %p to cache %p\n", consumer, this));
+	T(AddConsumer(this, consumer));
+
 	AssertLocked();
 	consumer->AssertLocked();
-
-	T(AddConsumer(this, consumer));
+	ASSERT(consumer->source == NULL);
 
 	consumer->source = this;
 	consumers.Add(consumer);
@@ -976,15 +979,11 @@ status_t
 VMCache::InsertAreaLocked(VMArea* area)
 {
 	TRACE(("VMCache::InsertAreaLocked(cache %p, area %p)\n", this, area));
-	AssertLocked();
-
 	T(InsertArea(this, area));
 
-	area->cache_next = areas;
-	if (area->cache_next)
-		area->cache_next->cache_prev = area;
-	area->cache_prev = NULL;
-	areas = area;
+	AssertLocked();
+
+	areas.Insert(area, false);
 
 	AcquireStoreRef();
 
@@ -1007,12 +1006,7 @@ VMCache::RemoveArea(VMArea* area)
 
 	AutoLocker<VMCache> locker(this);
 
-	if (area->cache_prev)
-		area->cache_prev->cache_next = area->cache_next;
-	if (area->cache_next)
-		area->cache_next->cache_prev = area->cache_prev;
-	if (areas == area)
-		areas = area->cache_next;
+	areas.Remove(area);
 
 	return B_OK;
 }
@@ -1026,12 +1020,11 @@ VMCache::TransferAreas(VMCache* fromCache)
 {
 	AssertLocked();
 	fromCache->AssertLocked();
-	ASSERT(areas == NULL);
+	ASSERT(areas.IsEmpty());
 
-	areas = fromCache->areas;
-	fromCache->areas = NULL;
+	areas.TakeFrom(&fromCache->areas);
 
-	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+	for (VMArea* area = areas.First(); area != NULL; area = areas.GetNext(area)) {
 		area->cache = this;
 		AcquireRefLocked();
 		fromCache->ReleaseRefLocked();
@@ -1047,7 +1040,7 @@ VMCache::CountWritableAreas(VMArea* ignoreArea) const
 {
 	uint32 count = 0;
 
-	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+	for (VMArea* area = areas.First(); area != NULL; area = areas.GetNext(area)) {
 		if (area != ignoreArea
 			&& (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
 			count++;
@@ -1106,7 +1099,7 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 
 bool
 VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
-	page_num_t* toPage = NULL)
+	page_num_t* toPage = NULL, page_num_t* freedPages = NULL)
 {
 	for (vm_page* page = it.Next();
 		page != NULL && (toPage == NULL || page->cache_offset < *toPage);
@@ -1118,6 +1111,8 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 				// as we might cause a deadlock this way
 				page->busy_writing = false;
 					// this will notify the writer to free the page
+				if (freedPages != NULL)
+					(*freedPages)++;
 				continue;
 			}
 
@@ -1138,6 +1133,8 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 			// removing the current node is safe.
 
 		vm_page_free(this, page);
+		if (freedPages != NULL)
+			(*freedPages)++;
 	}
 
 	return false;
@@ -1168,15 +1165,16 @@ VMCache::Resize(off_t newSize, int priority)
 		>> PAGE_SHIFT);
 
 	if (newPageCount < oldPageCount) {
-		// we need to remove all pages in the cache outside of the new virtual
-		// size
+		// Remove all pages in the cache outside of the new virtual size.
 		while (_FreePageRange(pages.GetIterator(newPageCount, true, true)))
 			;
 	}
 
-	status_t status = Commit(newSize - virtual_base, priority);
-	if (status != B_OK)
-		return status;
+	if (priority >= 0) {
+		status_t status = Commit(PAGE_ALIGN(newSize - virtual_base), priority);
+		if (status != B_OK)
+			return status;
+	}
 
 	virtual_end = newSize;
 	return B_OK;
@@ -1196,21 +1194,22 @@ VMCache::Rebase(off_t newBase, int priority)
 {
 	TRACE(("VMCache::Rebase(cache %p, newBase %lld) old base %lld\n",
 		this, newBase, this->virtual_base));
-	this->AssertLocked();
-
 	T(Rebase(this, newBase));
 
-	status_t status = Commit(virtual_end - newBase, priority);
-	if (status != B_OK)
-		return status;
+	AssertLocked();
 
 	page_num_t basePage = (page_num_t)(newBase >> PAGE_SHIFT);
 
 	if (newBase > virtual_base) {
-		// we need to remove all pages in the cache outside of the new virtual
-		// base
+		// Remove all pages in the cache outside of the new virtual base.
 		while (_FreePageRange(pages.GetIterator(), &basePage))
 			;
+	}
+
+	if (priority >= 0) {
+		status_t status = Commit(PAGE_ALIGN(virtual_end - newBase), priority);
+		if (status != B_OK)
+			return status;
 	}
 
 	virtual_base = newBase;
@@ -1241,15 +1240,16 @@ VMCache::Adopt(VMCache* source, off_t offset, off_t size, off_t newOffset)
 
 
 /*! Discards pages in the given range. */
-status_t
+ssize_t
 VMCache::Discard(off_t offset, off_t size)
 {
+	page_num_t discarded = 0;
 	page_num_t startPage = offset >> PAGE_SHIFT;
 	page_num_t endPage = (offset + size + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
-	while (_FreePageRange(pages.GetIterator(startPage, true, true), &endPage))
+	while (_FreePageRange(pages.GetIterator(startPage, true, true), &endPage, &discarded))
 		;
 
-	return B_OK;
+	return (discarded * B_PAGE_SIZE);
 }
 
 
@@ -1295,6 +1295,13 @@ VMCache::FlushAndRemoveAllPages()
 	}
 
 	return B_OK;
+}
+
+
+bool
+VMCache::CanOvercommit()
+{
+	return false;
 }
 
 
@@ -1377,8 +1384,14 @@ VMCache::Fault(struct VMAddressSpace *aspace, off_t offset)
 void
 VMCache::Merge(VMCache* source)
 {
-	for (VMCachePagesTree::Iterator it = source->pages.GetIterator();
-			vm_page* page = it.Next();) {
+	const page_num_t firstOffset = ROUNDDOWN(virtual_base, B_PAGE_SIZE) >> PAGE_SHIFT,
+		endOffset = (page_num_t)((virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+
+	VMCachePagesTree::Iterator it = source->pages.GetIterator();
+	while (vm_page* page = it.Next()) {
+		if (page->cache_offset < firstOffset || page->cache_offset >= endOffset)
+			continue;
+
 		// Note: Removing the current node while iterating through a
 		// IteratableSplayTree is safe.
 		vm_page* consumerPage = LookupPage(
@@ -1394,7 +1407,7 @@ VMCache::Merge(VMCache* source)
 status_t
 VMCache::AcquireUnreferencedStoreRef()
 {
-	return B_OK;
+	return B_ERROR;
 }
 
 
@@ -1447,7 +1460,7 @@ VMCache::Dump(bool showPages) const
 #endif
 	kprintf("  areas:\n");
 
-	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+	for (VMArea* area = areas.First(); area != NULL; area = areas.GetNext(area)) {
 		kprintf("    area 0x%" B_PRIx32 ", %s\n", area->id, area->name);
 		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->Base(),
 			area->Size());
@@ -1547,21 +1560,22 @@ void
 VMCache::_RemoveConsumer(VMCache* consumer)
 {
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, this));
-	consumer->AssertLocked();
-
 	T(RemoveConsumer(this, consumer));
 
-	// Remove the store ref before locking the cache. Otherwise we'd call into
-	// the VFS while holding the cache lock, which would reverse the usual
-	// locking order.
-	ReleaseStoreRef();
+	consumer->AssertLocked();
 
-	// remove the consumer from the cache, but keep its reference until later
+	// Remove the consumer from the cache, but keep its reference until the end.
 	Lock();
 	consumers.Remove(consumer);
 	consumer->source = NULL;
+	Unlock();
 
-	ReleaseRefAndUnlock();
+	// Release the store ref without holding the cache lock, as calling into
+	// the VFS while holding the cache lock would reverse the usual locking order.
+	ReleaseStoreRef();
+
+	// Now release the consumer's reference.
+	ReleaseRef();
 }
 
 

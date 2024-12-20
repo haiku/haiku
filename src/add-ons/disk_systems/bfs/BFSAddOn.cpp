@@ -71,7 +71,7 @@ size_string(double size)
 
 
 BFSAddOn::BFSAddOn()
-	: BDiskSystemAddOn(kPartitionTypeBFS, kDiskSystemFlags)
+	: BDiskSystemAddOn(kPartitionTypeBFS)
 {
 }
 

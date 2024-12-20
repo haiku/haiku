@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Niet hoofd-/kleine lettergevoelig
 Current folder	ContainerWindow		Huidige map
 Finish: %time - Over %finishtime left	StatusWindow		Einde: %time - Meer dan %finishtime resterend
 Mount all disks now	AutoMounterSettings		Betrek alle schijven nu
-Name	PoseView		Naam
 Location:	InfoWindow		Locatie:
+Name	PoseView		Naam
 Kind:	InfoWindow		Soort:
 contains	FindPanel		bevat
 Open	FilePanelPriv		Openen
