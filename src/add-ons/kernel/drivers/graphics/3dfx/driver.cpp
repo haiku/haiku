@@ -147,7 +147,7 @@ MapDevice(DeviceInfo& di)
 		B_READ_AREA + B_WRITE_AREA,
 		(void**)&si.videoMemAddr);
 
-	TRACE("Video memory, area: %ld,  addr: 0x%lX, size: %ld\n",
+	TRACE("Video memory, area: %" B_PRId32 ",  addr: 0x%" B_PRIx32 ", size: %" B_PRId32 "\n",
 		si.videoMemArea, (uint32)(si.videoMemAddr), videoRamSize);
 
 	if (si.videoMemArea < 0) {
@@ -182,7 +182,7 @@ MapDevice(DeviceInfo& di)
 		si.videoMemArea = -1;
 	}
 
-	TRACE("leave MapDevice(); result: %ld\n", si.regsArea);
+	TRACE("leave MapDevice(); result: %" B_PRId32 "\n", si.regsArea);
 	return si.regsArea;
 }
 
@@ -354,7 +354,7 @@ init_driver(void)
 
 	gDeviceNames[count] = NULL;	// terminate list with null pointer
 
-	TRACE("init_driver() %ld supported devices\n", count);
+	TRACE("init_driver() %" B_PRIu32 " supported devices\n", count);
 
 	return B_OK;
 }
@@ -400,7 +400,7 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 {
 	status_t status = B_OK;
 
-	TRACE("device_open() - name: %s, cookie: 0x%08lx)\n", name, (uint32)cookie);
+	TRACE("device_open() - name: %s, cookie: %p)\n", name, cookie);
 
 	// Find the device name in the list of devices.
 
@@ -425,7 +425,7 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 		*cookie = &di;		// send cookie to opener
 	}
 
-	TRACE("device_open() returning 0x%lx,  open count: %ld\n", status,
+	TRACE("device_open() returning 0x%" B_PRIx32 ",  open count: %" B_PRIu32 "\n", status,
 		di.openCount);
 	return status;
 }
@@ -491,7 +491,7 @@ device_free(void* dev)
 
 	gLock.Release();	// unlock driver
 
-	TRACE("exit device_free() openCount: %ld\n", di.openCount);
+	TRACE("exit device_free() openCount: %" B_PRId32 "\n", di.openCount);
 	return B_OK;
 }
 
