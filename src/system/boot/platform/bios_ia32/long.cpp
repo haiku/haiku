@@ -216,7 +216,7 @@ long_mmu_init()
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);
 
-	dprintf("A phys memory ranges:\n");
+	dprintf("phys memory ranges:\n");
 	for (uint32 i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
 		dprintf("    base %#018" B_PRIx64 ", length %#018" B_PRIx64 "\n",
 			gKernelArgs.physical_memory_range[i].start,
@@ -304,9 +304,7 @@ convert_kernel_args()
 	}
 
 	// Fix bios drive checksums
-	dprintf("SKE bdc at 0x%llx\n", gKernelArgs.platform_args.bios_drive_checksums.Get());
 	fix_address(gKernelArgs.platform_args.bios_drive_checksums);
-	dprintf("SKE fixed bdc at 0x%llx\n", gKernelArgs.platform_args.bios_drive_checksums.Get());
 }
 
 

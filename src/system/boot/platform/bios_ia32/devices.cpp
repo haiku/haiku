@@ -879,7 +879,7 @@ platform_add_boot_device(struct stage2_args* args, NodeList* devicesList)
 	devicesList->Add(drive);
 	drive->FillIdentifier();
 
-	// TODO : call find_unique_checksums() here instead of inside ofo add_block_devices ?
+	// TODO : call find_unique_checksums() here instead of inside of add_block_devices ?
 	add_block_devices(args, devicesList);
 		// Always call to find_checksum of other disk
 
