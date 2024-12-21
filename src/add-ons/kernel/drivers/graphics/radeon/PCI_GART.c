@@ -162,8 +162,7 @@ static status_t initGATT( GART_info *gart )
 	get_memory_map(gart->GATT.ptr, B_PAGE_SIZE, PTB_map, 1);
 	gart->GATT.phys = PTB_map[0].address;
 
-	SHOW_INFO(3, "GATT_ptr=%p, GATT_phys=%p", gart->GATT.ptr,
-		(void *)gart->GATT.phys);
+	SHOW_INFO(3, "GATT_ptr=%p, GATT_phys=%#" B_PRIx32, gart->GATT.ptr, gart->GATT.phys);
 
 	// get address mapping
 	memset(gart->GATT.ptr, 0, num_pages * sizeof(uint32));

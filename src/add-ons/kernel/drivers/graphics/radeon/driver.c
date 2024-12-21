@@ -217,8 +217,7 @@ open_hook(const char *name, uint32 flags, void **cookie)
 	device_info *di;
 	status_t result = B_OK;
 
-	SHOW_FLOW( 3, "name=%s, flags=%" B_PRIu32 ", cookie=0x%08" B_PRIx32,
-		name, flags, (uint32)cookie );
+	SHOW_FLOW( 3, "name=%s, flags=%" B_PRIu32 ", cookie=%p", name, flags, cookie);
 
 	// find device info
 	while (devices->device_names[index]
