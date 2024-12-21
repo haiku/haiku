@@ -672,7 +672,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel drivers graphics intel_i810 ;
 	EnableWerror src add-ons kernel drivers graphics intel_extreme ;
 	EnableWerror src add-ons kernel drivers graphics matrox ;
-#	EnableWerror src add-ons kernel drivers graphics neomagic ;
+	EnableWerror src add-ons kernel drivers graphics neomagic ;
 #	EnableWerror src add-ons kernel drivers graphics nvidia ;
 #	EnableWerror src add-ons kernel drivers graphics radeon ;
 	EnableWerror src add-ons kernel drivers graphics radeon_hd ;

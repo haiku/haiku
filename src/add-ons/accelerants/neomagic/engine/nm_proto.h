@@ -28,7 +28,7 @@ void dump_specs(void);
 
 /*DAC functions*/
 status_t nm_dac_mode(int,float);
-status_t nm_dac_palette(uint8*,uint8*,uint8*, uint16);
+status_t nm_dac_palette(uint8[256], uint8[256], uint8[256], uint16);
 status_t nm_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *);
 status_t nm_dac_set_pix_pll(display_mode target);
 
