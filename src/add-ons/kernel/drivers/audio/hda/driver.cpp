@@ -17,7 +17,7 @@ uint32 gNumCards;
 pci_module_info* gPci;
 
 
-static struct {
+static const struct {
 	uint16	vendor;
 	uint16	device;
 } kSupportedDevices[] = {
