@@ -37,7 +37,7 @@
 #include "IOSchedulerSimple.h"
 
 
-#define TRACE_SCSI_DISK
+//#define TRACE_SCSI_DISK
 #ifdef TRACE_SCSI_DISK
 #	define TRACE(x...) dprintf("scsi_disk: " x)
 #else
@@ -250,10 +250,8 @@ compute_check_sum(char sector[512])
 	uint32* array = (uint32 *)sector;
 	uint32 sum = 0;
 
-	dprintf("SKE BBB\n");
 	for (uint32 i = 0; i <(512 / sizeof(uint32)); i++) {
-	dprintf(" %x ", array[i]);
-	sum += array[i];
+		sum += array[i];
 	}
 
 	return sum;
@@ -277,16 +275,9 @@ das_init_device(void* _info, void** _cookie)
 	info->scsi->free_ccb(request);
 
 	size_t sizeChecksums = 0;
-	bios_drive_checksum *bios_drive_checksums =
-		(bios_drive_checksum *)get_boot_item(BIOS_DRIVES_CHECKSUMS_BOOT_INFO, &sizeChecksums);
-	TRACE("[scsi_disk] SKE das_init_device : get bdc %p\n", bios_drive_checksums);
-	for(uint32 k = 0 ; k < (uint32)sizeChecksums ; k++) {
-		dprintf("%x", ((uint8 *)bios_drive_checksums)[k]);
-	}
-	TRACE("\nSKE bdc end\n");
+	bios_drive_checksum *bios_drive_checksums = (bios_drive_checksum *)get_boot_item(BIOS_DRIVES_CHECKSUMS_BOOT_INFO, &sizeChecksums);
 	bool found_drive = false;
 	long unsigned int i;
-	TRACE("SKE : will iterate on %ld bios drives", sizeChecksums/sizeof(bios_drive_checksum));
 	for( i = 0; i < sizeChecksums/sizeof(bios_drive_checksum) && !found_drive; i++) {
 		check_sum *bios_checksum = bios_drive_checksums[i].checksum;
 		bool potential_drive = true;
@@ -327,7 +318,7 @@ das_init_device(void* _info, void** _cookie)
 			vm_memcpy_from_physical(sector, entry.address, 512, false);
 			if ((status == B_OK || (request->sense[0] & 0x7f) != 0x70) && bytesTransferred >= 512 ) {
 				uint32 mycheck_sum = compute_check_sum(sector);
-				TRACE("SKE drive %ld offset= %lx mycheck_sum = %x, reference check_sum = %x\n",i,bios_checksum[j].offset, mycheck_sum, bios_checksum[j].sum);
+				TRACE("drive %ld offset= %lx mycheck_sum = %x, reference check_sum = %x\n",i,bios_checksum[j].offset, mycheck_sum, bios_checksum[j].sum);
 				if (mycheck_sum != bios_checksum[j].sum) {
 					potential_drive = false;
 				}
@@ -339,11 +330,12 @@ das_init_device(void* _info, void** _cookie)
 		found_drive = potential_drive;
 		if (found_drive)
 		{
-			TRACE("SKE okay, i'm bdc %ld, drive %d\n", i, bios_drive_checksums[i].drive_id);
+			TRACE("Okay, i'm drive %d\n", bios_drive_checksums[i].drive_id);
 			info->drive_id = bios_drive_checksums[i].drive_id;
 		} else {
-			TRACE("SKE no luck i didn't match my checksums\n");
+			TRACE("No luck i didn't match my checksums\n");
 			info->drive_id = 0x42;
+				//TODO which value to put ? 0xff could be for a floppy
 		}
 	}
 

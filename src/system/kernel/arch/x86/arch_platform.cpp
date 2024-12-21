@@ -16,7 +16,7 @@
 #include <debug.h>
 
 static phys_addr_t sACPIRootPointer = 0;
-static  bios_drive_checksum* sCheckSums = NULL;;
+static  bios_drive_checksum* sCheckSums = NULL;
 
 status_t
 arch_platform_init(struct kernel_args *args)
