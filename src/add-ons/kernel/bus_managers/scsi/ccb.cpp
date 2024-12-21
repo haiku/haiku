@@ -58,6 +58,9 @@ scsi_free_ccb(scsi_ccb *ccb)
 	if (ccb->state != SCSI_STATE_FINISHED)
 		panic("Tried to free ccb that's still in use (state %d)\n", ccb->state);
 
+	// Ensure no other thread still holds the condition variable's spinlock.
+	ccb->completion_cond.NotifyAll(B_ERROR);
+
 	object_cache_free(sCcbPool, ccb, 0);
 }
 
