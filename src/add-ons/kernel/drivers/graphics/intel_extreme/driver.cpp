@@ -104,6 +104,7 @@ const struct supported_device {
 	{0x0412, INTEL_MODEL_HAS, "Haswell GT2 Desktop"},
 	{0x0416, INTEL_MODEL_HASM, "Haswell GT2 Mobile"},
 	{0x0a16, INTEL_MODEL_HASM, "Haswell ULT GT2 Mobile"},
+	{0x0a2e, INTEL_MODEL_HASM, "Haswell ULT GT3 Mobile"},
 	{0x0d26, INTEL_MODEL_HASM, "Haswell CRW GT3 Mobile"},
 
 #if 0
