@@ -840,7 +840,7 @@ nv_interrupt(void *data)
 	int32 handled = B_UNHANDLED_INTERRUPT;
 	device_info *di = (device_info *)data;
 	shared_info *si = di->si;
-	int32 *flags = &(si->flags);
+	int32 *flags = (int32*)&(si->flags);
 	vuint32 *regs;
 
 	/* is someone already handling an interrupt for this device? */
