@@ -53,21 +53,34 @@ HWindow::HWindow(BRect rect, const char* name)
 {
 	_InitGUI();
 
-	fFilePanel = new BFilePanel();
-	fFilePanel->SetTarget(this);
-
 	BPath path;
+	// set default path
+	find_directory(B_SYSTEM_SOUNDS_DIRECTORY, &path);
+	get_ref_for_path(path.Path(), &fPathRef);
+
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(kSettingsFile);
 		BFile file(path.Path(), B_READ_ONLY);
 
 		BMessage msg;
-		if (file.InitCheck() == B_OK && msg.Unflatten(&file) == B_OK
-			&& msg.FindRect("frame", &fFrame) == B_OK) {
-			MoveTo(fFrame.LeftTop());
-			ResizeTo(fFrame.Width(), fFrame.Height());
+		if (file.InitCheck() == B_OK && msg.Unflatten(&file) == B_OK) {
+			if (msg.FindRect("frame", &fFrame) == B_OK) {
+				MoveTo(fFrame.LeftTop());
+				ResizeTo(fFrame.Width(), fFrame.Height());
+			}
+
+			entry_ref ref;
+			if (msg.FindRef("last_path", &ref) == B_OK) {
+				BNode node(&ref);
+				if (node.InitCheck() == B_OK && node.IsDirectory())
+					fPathRef = ref;
+			}
 		}
 	}
+
+	fFilePanel = new BFilePanel();
+	fFilePanel->SetPanelDirectory(&fPathRef);
+	fFilePanel->SetTarget(this);
 
 	MoveOnScreen();
 }
@@ -86,6 +99,7 @@ HWindow::~HWindow()
 
 		if (file.InitCheck() == B_OK) {
 			msg.AddRect("frame", fFrame);
+			msg.AddRef("last_path", &fPathRef);
 			msg.Flatten(&file);
 		}
 	}
@@ -159,6 +173,8 @@ HWindow::MessageReceived(BMessage* message)
 						B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
+					// reset file panel location
+					fFilePanel->SetPanelDirectory(&fPathRef);
 					break;
 				}
 
@@ -174,6 +190,11 @@ HWindow::MessageReceived(BMessage* message)
 				// check file menu
 				if (menuitem != NULL)
 					menuitem->SetMarked(true);
+
+				// save as last used path and set as file panel location
+				path.GetParent(&path);
+				get_ref_for_path(path.Path(), &fPathRef);
+				fFilePanel->SetPanelDirectory(&fPathRef);
 
 				fPlayButton->SetEnabled(true);
 			}
