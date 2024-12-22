@@ -23,9 +23,6 @@
 #include "NotificationWindow.h"
 #include "NotificationView.h"
 
-const float kCloseSize				= 6;
-const float kEdgePadding			= 2;
-
 
 AppGroupView::AppGroupView(const BMessenger& messenger, const char* label)
 	:
@@ -38,8 +35,7 @@ AppGroupView::AppGroupView(const BMessenger& messenger, const char* label)
 {
 	SetFlags(Flags() | B_WILL_DRAW);
 
-	fHeaderSize = be_bold_font->Size()
-		+ be_control_look->ComposeSpacing(B_USE_ITEM_SPACING);
+	fHeaderSize = be_bold_font->Size() + be_control_look->ComposeSpacing(B_USE_ITEM_SPACING);
 	static_cast<BGroupLayout*>(GetLayout())->SetInsets(0, fHeaderSize, 0, 0);
 }
 
@@ -55,34 +51,36 @@ AppGroupView::Draw(BRect updateRect)
 	SetHighColor(tint_color(menuColor, 1.22));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	StrokeLine(bounds.LeftTop(), bounds.LeftBottom());
-	uint32 borders = BControlLook::B_TOP_BORDER
-		| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
-	be_control_look->DrawButtonBackground(this, bounds, bounds, menuColor,
-		0, borders);
+	uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER
+		| BControlLook::B_RIGHT_BORDER;
+	be_control_look->DrawButtonBackground(this, bounds, bounds, menuColor, 0, borders);
 
 	// Draw the buttons
-	fCollapseRect.top = (fHeaderSize - kExpandSize) / 2;
-	fCollapseRect.left = kEdgePadding * 3;
-	fCollapseRect.right = fCollapseRect.left + 1.5 * kExpandSize;
-	fCollapseRect.bottom = fCollapseRect.top + kExpandSize;
+	float buttonSize = CloseButtonSize();
+	float arrowButtonSize = buttonSize * 1.5;
+		// make arrow button a bit larger
+
+	fCollapseRect.top = (fHeaderSize - arrowButtonSize) / 2;
+	fCollapseRect.left = buttonSize + 1;
+		// button left padding
+	fCollapseRect.right = fCollapseRect.left + arrowButtonSize;
+	fCollapseRect.bottom = fCollapseRect.top + arrowButtonSize;
 
 	fCloseRect = bounds;
-	fCloseRect.top = (fHeaderSize - kCloseSize) / 2;
-	// Take off the 1 to line this up with the close button on the
-	// notification view
-	fCloseRect.right -= kEdgePadding * 3 - 1;
-	fCloseRect.left = fCloseRect.right - kCloseSize;
-	fCloseRect.bottom = fCloseRect.top + kCloseSize;
+	fCloseRect.top = (fHeaderSize - buttonSize) / 2;
+	fCloseRect.right -= buttonSize - 1;
+	fCloseRect.left = fCloseRect.right - buttonSize;
+	fCloseRect.bottom = fCloseRect.top + buttonSize;
 
-	uint32 arrowDirection = fCollapsed
-		? BControlLook::B_DOWN_ARROW : BControlLook::B_UP_ARROW;
-	be_control_look->DrawArrowShape(this, fCollapseRect, fCollapseRect,
-		LowColor(), arrowDirection, 0, B_DARKEN_3_TINT);
+	SetPenSize(1);
 
-	SetPenSize(kPenSize);
+	// Draw the arrow button
+	uint32 direction = fCollapsed ? BControlLook::B_DOWN_ARROW : BControlLook::B_UP_ARROW;
+	be_control_look->DrawArrowShape(this, fCollapseRect, fCollapseRect, LowColor(), direction, 0,
+		B_DARKEN_3_TINT);
 
 	// Draw the dismiss widget
-	_DrawCloseButton(updateRect);
+	DrawCloseButton(updateRect);
 
 	// Draw the label
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
@@ -96,13 +94,13 @@ AppGroupView::Draw(BRect updateRect)
 	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
 		- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
 
-	DrawString(label.String(),
-		BPoint(fCollapseRect.right + 4 * kEdgePadding, y));
+	float x = fCollapseRect.right + buttonSize * 1.5;
+	DrawString(label.String(), BPoint(x, y));
 }
 
 
 void
-AppGroupView::_DrawCloseButton(const BRect& updateRect)
+AppGroupView::DrawCloseButton(const BRect& updateRect)
 {
 	PushState();
 	BRect closeRect = fCloseRect;
@@ -112,11 +110,10 @@ AppGroupView::_DrawCloseButton(const BRect& updateRect)
 
 	if (fCloseClicked) {
 		BRect buttonRect(closeRect.InsetByCopy(-4, -4));
-		be_control_look->DrawButtonFrame(this, buttonRect, updateRect,
-			base, base,
+		be_control_look->DrawButtonFrame(this, buttonRect, updateRect, base, base,
 			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
-		be_control_look->DrawButtonBackground(this, buttonRect, updateRect,
-			base, BControlLook::B_ACTIVATED);
+		be_control_look->DrawButtonBackground(this, buttonRect, updateRect, base,
+			BControlLook::B_ACTIVATED);
 		tint *= 1.2;
 		closeRect.OffsetBy(1, 1);
 	}
@@ -127,6 +124,13 @@ AppGroupView::_DrawCloseButton(const BRect& updateRect)
 	StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
 	StrokeLine(closeRect.LeftBottom(), closeRect.RightTop());
 	PopState();
+}
+
+
+float
+AppGroupView::CloseButtonSize() const
+{
+	return be_control_look->DefaultLabelSpacing() + 1;
 }
 
 

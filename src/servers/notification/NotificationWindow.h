@@ -41,8 +41,7 @@ public:
 	virtual	void					WorkspaceActivated(int32, bool);
 	virtual	void					FrameResized(float width, float height);
 	virtual	void					ScreenChanged(BRect frame, color_space mode);
-										
-			icon_size				IconSize();
+
 			int32					Timeout();
 			float					Width();
 
@@ -61,7 +60,7 @@ private:
 			appfilter_t				fAppFilters;
 
 			float					fWidth;
-			icon_size				fIconSize;
+			int32					fIconSize;
 			int32					fTimeout;
 			uint32					fPosition;
 			bool					fShouldRun;

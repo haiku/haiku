@@ -14,19 +14,17 @@
 #include <View.h>
 
 
+class AppGroupView;
 class BBitmap;
 class BMessageRunner;
 class BNotification;
 
 const uint32 kRemoveView = 'ReVi';
-const float kExpandSize				= 8;
-const float kPenSize				= 1;
 
 
 class NotificationView : public BView {
 public:
-								NotificationView(BNotification* notification,
-									bigtime_t timeout, float iconSize,
+								NotificationView(BNotification* notification, bigtime_t timeout,
 									bool disableTimeout = false);
 	virtual						~NotificationView();
 
@@ -65,9 +63,10 @@ private:
 
 			BNotification*		fNotification;
 			bigtime_t			fTimeout;
-			float				fIconSize;
+			int32				fIconSize;
 			bool				fDisableTimeout;
 
+			AppGroupView*		fGroupView;
 			BMessageRunner*		fRunner;
 
 			BBitmap*			fBitmap;

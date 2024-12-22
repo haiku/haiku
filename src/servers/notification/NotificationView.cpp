@@ -38,9 +38,6 @@
 
 
 const int kIconStripeWidth			= 32;
-const float kCloseSize				= 6;
-const float kEdgePadding			= 2;
-const float kSmallPadding			= 2;
 
 property_info message_prop_list[] = {
 	{ "type", {B_GET_PROPERTY, B_SET_PROPERTY, 0},
@@ -61,20 +58,23 @@ property_info message_prop_list[] = {
 
 
 NotificationView::NotificationView(BNotification* notification, bigtime_t timeout,
-	float iconSize, bool disableTimeout)
+	bool disableTimeout)
 	:
 	BView("NotificationView", B_WILL_DRAW),
 	fNotification(notification),
 	fTimeout(timeout),
-	fIconSize(iconSize),
+	fIconSize(kDefaultIconSize),
 	fDisableTimeout(disableTimeout),
+	fGroupView(NULL),
 	fRunner(NULL),
 	fBitmap(NULL),
 	fCloseClicked(false),
 	fPreviewModeOn(false)
 {
-	if (fNotification->Icon() != NULL)
+	if (fNotification->Icon() != NULL) {
 		fBitmap = new BBitmap(fNotification->Icon());
+		fIconSize = fNotification->Icon()->Bounds().IntegerWidth();
+	}
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
@@ -131,7 +131,9 @@ void
 NotificationView::AttachedToWindow()
 {
 	SetText();
-	
+
+	fGroupView = dynamic_cast<AppGroupView*>(Parent());
+
 	if (!fDisableTimeout) {
 		BMessage msg(kRemoveView);
 		msg.AddPointer("view", this);
@@ -250,8 +252,7 @@ NotificationView::Draw(BRect updateRect)
 
 	BRect stripeRect = Bounds();
 	stripeRect.right = kIconStripeWidth;
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT));
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
 
 	SetHighColor(fStripeColor);
@@ -259,21 +260,20 @@ NotificationView::Draw(BRect updateRect)
 	FillRect(stripeRect);
 
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-	// Rectangle for icon and overlay icon
-	BRect iconRect(0, 0, 0, 0);
 
 	// Draw icon
-	if (fBitmap) {
+	if (fBitmap != NULL) {
 		float ix = 18;
 		float iy = (Bounds().Height() - fIconSize) / 4.0;
 			// Icon is vertically centered in view
 
 		if (fNotification->Type() == B_PROGRESS_NOTIFICATION) {
 			// Move icon up by half progress bar height if it's present
-			iy -= (progRect.Height() + kEdgePadding);
+			iy -= (progRect.Height() + fGroupView->CloseButtonSize());
 		}
 
-		iconRect.Set(ix, iy, ix + fIconSize - 1.0, iy + fIconSize - 1.0);
+		// stretch icon to composed size
+		BRect iconRect = fBitmap->Bounds().OffsetByCopy(BPoint(ix, iy));
 		DrawBitmapAsync(fBitmap, fBitmap->Bounds(), iconRect);
 	}
 
@@ -286,14 +286,12 @@ NotificationView::Draw(BRect updateRect)
 		// Truncate the string. We have already line-wrapped the text but if
 		// there is a very long 'word' we can only truncate it.
 		BString text(l->text);
-		TruncateString(&text, B_TRUNCATE_END,
-			Bounds().Width() - l->location.x);
+		TruncateString(&text, B_TRUNCATE_END, Bounds().Width() - l->location.x);
 		DrawString(text.String(), text.Length(), l->location);
 	}
 
-	AppGroupView* groupView = dynamic_cast<AppGroupView*>(Parent());
-	if (groupView != NULL && groupView->ChildrenCount() > 1)
-		_DrawCloseButton(updateRect);
+	if (fGroupView != NULL && fGroupView->ChildrenCount() > 1)
+		fGroupView->DrawCloseButton(updateRect);
 
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	BPoint left(Bounds().left, Bounds().top);
@@ -301,39 +299,6 @@ NotificationView::Draw(BRect updateRect)
 	StrokeLine(left, right);
 
 	Sync();
-}
-
-
-void
-NotificationView::_DrawCloseButton(const BRect& updateRect)
-{
-	PushState();
-	BRect closeRect = Bounds();
-
-	closeRect.InsetBy(3 * kEdgePadding, 3 * kEdgePadding);
-	closeRect.left = closeRect.right - kCloseSize;
-	closeRect.bottom = closeRect.top + kCloseSize;
-
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	float tint = B_DARKEN_2_TINT;
-
-	if (fCloseClicked) {
-		BRect buttonRect(closeRect.InsetByCopy(-4, -4));
-		be_control_look->DrawButtonFrame(this, buttonRect, updateRect,
-			base, base,
-			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
-		be_control_look->DrawButtonBackground(this, buttonRect, updateRect,
-			base, BControlLook::B_ACTIVATED);
-		tint *= 1.2;
-		closeRect.OffsetBy(1, 1);
-	}
-
-	base = tint_color(base, tint);
-	SetHighColor(base);
-	SetPenSize(2);
-	StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
-	StrokeLine(closeRect.LeftBottom(), closeRect.RightTop());
-	PopState();
 }
 
 
@@ -350,9 +315,10 @@ NotificationView::MouseDown(BPoint point)
 	switch (buttons) {
 		case B_PRIMARY_MOUSE_BUTTON:
 		{
-			BRect closeRect = Bounds().InsetByCopy(2,2);
-			closeRect.left = closeRect.right - kCloseSize;
-			closeRect.bottom = closeRect.top + kCloseSize;
+			BRect closeRect = Bounds().InsetByCopy(2, 2);
+			float buttonSize = fGroupView->CloseButtonSize();
+			closeRect.left = closeRect.right - buttonSize;
+			closeRect.bottom = closeRect.top + buttonSize;
 
 			if (!closeRect.Contains(point)) {
 				entry_ref launchRef;
@@ -456,39 +422,35 @@ NotificationView::SetText(float newMaxWidth)
 		delete (*lIt);
 	fLines.clear();
 
-	float iconRight = kIconStripeWidth;
-	if (fBitmap != NULL)
-		iconRight += fIconSize;
-	else
-		iconRight += 32;
+	float iconRight = kIconStripeWidth + fIconSize;
+	float buttonSize = fGroupView->CloseButtonSize();
 
 	font_height fh;
 	be_bold_font->GetHeight(&fh);
-	float fontHeight = ceilf(fh.leading) + ceilf(fh.descent)
-		+ ceilf(fh.ascent);
-	float y = fontHeight + kEdgePadding * 2;
+	float fontHeight = ceilf(fh.leading) + ceilf(fh.descent) + ceilf(fh.ascent);
+	float y = fontHeight + buttonSize;
 
 	// Title
 	LineInfo* titleLine = new LineInfo;
 	titleLine->text = fNotification->Title();
 	titleLine->font = *be_bold_font;
+	titleLine->location = BPoint(iconRight + buttonSize, y);
 
-	titleLine->location = BPoint(iconRight + kEdgePadding, y);
-
-	fLines.push_front(titleLine);
-	y += fontHeight;
+	if (titleLine->text.Length() > 0) {
+		fLines.push_front(titleLine);
+		y += fontHeight;
+	}
 
 	// Rest of text is rendered with be_plain_font.
 	be_plain_font->GetHeight(&fh);
-	fontHeight = ceilf(fh.leading) + ceilf(fh.descent)
-		+ ceilf(fh.ascent);
+	fontHeight = ceilf(fh.leading) + ceilf(fh.descent) + ceilf(fh.ascent);
 
 	// Split text into chunks between certain characters and compose the lines.
 	const char kSeparatorCharacters[] = " \n-\\";
 	BString textBuffer = fNotification->Content();
 	textBuffer.ReplaceAll("\t", "    ");
 	const char* chunkStart = textBuffer.String();
-	float maxWidth = newMaxWidth - kEdgePadding - iconRight;
+	float maxWidth = newMaxWidth - buttonSize - iconRight;
 	LineInfo* line = NULL;
 	ssize_t length = textBuffer.Length();
 	while (chunkStart - textBuffer.String() < length) {
@@ -504,7 +466,7 @@ NotificationView::SetText(float newMaxWidth)
 			|| StringWidth(tempText) > maxWidth) {
 			line = new LineInfo;
 			line->font = *be_plain_font;
-			line->location = BPoint(iconRight + kEdgePadding, y);
+			line->location = BPoint(iconRight + buttonSize, y);
 
 			fLines.push_front(line);
 			y += fontHeight;
@@ -540,20 +502,14 @@ NotificationView::SetText(float newMaxWidth)
 		chunkStart += chunkLength;
 	}
 
-	fHeight = y + (kEdgePadding * 2);
+	fHeight = y + buttonSize;
 
 	// Make sure icon fits
-	if (fBitmap != NULL) {
-		float minHeight = fBitmap->Bounds().Height() + 2 * kEdgePadding;
+	if (fBitmap != NULL)
+		fHeight = std::max(fHeight, fIconSize + buttonSize);
 
-		if (fHeight < minHeight)
-			fHeight = minHeight;
-	}
-
-	// Make sure the progress bar is below the text, and the window is big
-	// enough.
-	static_cast<BGroupLayout*>(GetLayout())->SetInsets(kIconStripeWidth + 8,
-		fHeight, 8, 8);
+	// Make sure the progress bar is below the text, and the window is big enough.
+	static_cast<BGroupLayout*>(GetLayout())->SetInsets(kIconStripeWidth + 8, fHeight, 8, 8);
 
 	_CalculateSize();
 }
@@ -582,8 +538,7 @@ NotificationView::_CalculateSize()
 		font_height fh;
 		be_plain_font->GetHeight(&fh);
 		float fontHeight = fh.ascent + fh.descent + fh.leading;
-		height += 9 + (kSmallPadding * 2) + (kEdgePadding * 1)
-			+ fontHeight * 2;
+		height += fGroupView->CloseButtonSize() + fontHeight * 2;
 	}
 
 	SetExplicitMinSize(BSize(0, height));

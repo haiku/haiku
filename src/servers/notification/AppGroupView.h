@@ -25,9 +25,9 @@ class AppGroupView : public BGroupView {
 public:
 								AppGroupView(const BMessenger& messenger, const char* label);
 
+	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint point);
 	virtual	void				MessageReceived(BMessage* msg);
-			void				Draw(BRect updateRect);
 
 			bool				HasChildren();
 			int32				ChildrenCount();
@@ -38,9 +38,10 @@ public:
 			const BString&		Group() const;
 			void				SetGroup(const char* group);
 
-private:
-			void				_DrawCloseButton(const BRect& updateRect);
+			void				DrawCloseButton(const BRect& updateRect);
+			float				CloseButtonSize() const;
 
+private:
 			BString				fLabel;
 			BMessenger			fMessenger;
 			infoview_t			fInfo;
