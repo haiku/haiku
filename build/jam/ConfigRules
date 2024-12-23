@@ -42,6 +42,10 @@ rule SetConfigVar
 	local config = [ ConfigObject $(2) ] ;
 	local scope = $(4:E=global) ;
 
+	if ! $(3) {
+		Exit "Error: no value specified for ConfigVar '$(var)'!" ;
+	}
+
 	$(var) on $(config) = $(3) ;
 	__set_$(var) on $(config) = $(scope) ;
 
