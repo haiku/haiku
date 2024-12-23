@@ -97,8 +97,10 @@ rule ProcessCommandLineArguments
 		# A target starting with "@" is a build profile.
 		case @* : {
 			HAIKU_BUILD_PROFILE = [ Match "@(.*)" : $(JAM_TARGETS[1]) ] ;
-			HAIKU_BUILD_PROFILE_ACTION = $(JAM_TARGETS[2]:E=build) ;
-			HAIKU_BUILD_PROFILE_PARAMETERS = $(JAM_TARGETS[3-]) ;
+			JAM_TARGETS = $(JAM_TARGETS[2-]) ;
+
+			HAIKU_BUILD_PROFILE_ACTION = $(JAM_TARGETS[1]:E=build) ;
+			HAIKU_BUILD_PROFILE_PARAMETERS = $(JAM_TARGETS[2-]) ;
 			HAIKU_BUILD_PROFILE_DEFINED = ;
 		}
 
