@@ -5,117 +5,120 @@ rule ProcessCommandLineArguments
 	# analyze and optionally replace jam's target parameters
 	HAIKU_ORIGINAL_JAM_TARGETS = $(JAM_TARGETS) ;
 	HAIKU_BUILD_PROFILE = ;
-	if $(JAM_TARGETS) {
-		switch $(JAM_TARGETS[1]) {
-			# If the target to be built is "all" (i.e. the default) and we're in
-			# the output directory, the root directory of the build system, or
-			# in "src/", we change the target to be built to "haiku-image".
-			case all : {
-				if ! $(INVOCATION_SUBDIR) || $(INVOCATION_SUBDIR) = src {
+
+	if ! $(JAM_TARGETS) {
+		Exit "Error: No targets specified!" ;
+	}
+
+	switch $(JAM_TARGETS[1]) {
+		# If the target to be built is "all" (i.e. the default) and we're in
+		# the output directory, the root directory of the build system, or
+		# in "src/", we change the target to be built to "haiku-image".
+		case all : {
+			if ! $(INVOCATION_SUBDIR) || $(INVOCATION_SUBDIR) = src {
+				JAM_TARGETS = haiku-image ;
+			}
+		}
+
+		# Print usage text.
+		case help : {
+			Echo "Individual targets (applications, libraries, drivers,"
+				"...) can be built by just" ;
+			Echo "passing them as arguments to jam. The recommended method"
+				"to build or update a" ;
+			Echo "Haiku image or installation is to use a build profile"
+				"with one of the build" ;
+			Echo "profile actions. Typical command lines using a build"
+				"profile looks like this:" ;
+			Echo "  jam @nightly-anyboot" ;
+			Echo "  jam @install update libbe.so" ;
+			Echo "  jam @nightly-vmware mount" ;
+			Echo ;
+			Echo "Default build profiles (minimal set of packages and"
+				"configuration):" ;
+			Echo "  image            - A raw disk image." ;
+			Echo "  anyboot-image    - A custom image for either CD or"
+				"disk." ;
+			Echo "  cd-image         - An ISO9660 CD image." ;
+			Echo "  vmware-image     - A VMware disk image." ;
+			Echo "  install          - A Haiku installation in a"
+				"directory." ;
+			Echo ;
+			Echo "Nightly build profiles (small set of packages used in"
+				"nightly builds and default configuration):" ;
+			Echo "  nightly-raw      - A raw disk image." ;
+			Echo "  nightly-anyboot  - A custom image for either CD or"
+				"disk." ;
+			Echo "  nightly-cd       - An ISO9660 CD image." ;
+			Echo "  nightly-vmware   - A VMware disk image." ;
+			Echo ;
+			Echo "Release build profiles (bigger and more complete set of"
+				"packages used in releases and default configuration):" ;
+			Echo "  release-raw      - A raw disk image." ;
+			Echo "  release-anyboot  - A custom image for either CD or"
+				"disk." ;
+			Echo "  release-cd       - An ISO9660 CD image." ;
+			Echo "  release-vmware   - A VMware disk image." ;
+			Echo ;
+			Echo "Bootstrap build profiles (minimal image used for"
+				"initial build of HPKG packages):" ;
+			Echo "  bootstrap-raw    - A raw disk image." ;
+			Echo "  bootstrap-vmware - A VMware disk image." ;
+			Echo ;
+			Echo "Build profile actions:" ;
+			Echo "  build                - Build a Haiku"
+				"image/installation. This is the default" ;
+			Echo "                         action, i.e. it can be"
+				"omitted." ;
+			Echo "  update <target> ...  - Update the specified targets in"
+				"the Haiku" ;
+			Echo "                         image/installation." ;
+			Echo "  update-all           - Update all targets in the Haiku"
+				"image/installation." ;
+			Echo "  mount                - Mount the Haiku image in the"
+				" bfs_shell." ;
+			Echo ;
+			Echo "For more details on how to customize Haiku builds read" ;
+			Echo "build/jam/UserBuildConfig.ReadMe." ;
+			Exit ;
+		}
+
+		# The "run" target allows for running arbitrary command lines
+		# containing build system targets, which are built and replaced
+		# accordingly.
+		case run : {
+			if $(JAM_TARGETS[2]) {
+				JAM_TARGETS = [ RunCommandLine $(JAM_TARGETS[2-]) ] ;
+			} else {
+				Exit "\"jam run\" requires parameters!" ;
+			}
+		}
+
+		# A target starting with "@" is a build profile.
+		case @* : {
+			HAIKU_BUILD_PROFILE = [ Match "@(.*)" : $(JAM_TARGETS[1]) ] ;
+			HAIKU_BUILD_PROFILE_ACTION = $(JAM_TARGETS[2]:E=build) ;
+			HAIKU_BUILD_PROFILE_PARAMETERS = $(JAM_TARGETS[3-]) ;
+			HAIKU_BUILD_PROFILE_DEFINED = ;
+		}
+
+		case * : {
+			# "update-image", "update-vmware-image", and "update-install"
+			# targets allow for updating only specific targets in the
+			# image/installation dir.
+			if $(JAM_TARGETS[1]) in update-image update-vmware-image
+					update-install {
+				SetUpdateHaikuImageOnly 1 ;
+				HAIKU_PACKAGES_UPDATE_ONLY = 1 ;
+				HAIKU_INCLUDE_IN_IMAGE on $(JAM_TARGETS[2-]) = 1 ;
+				HAIKU_INCLUDE_IN_PACKAGES on $(JAM_TARGETS[2-]) = 1 ;
+
+				if $(JAM_TARGETS[1]) = update-image {
 					JAM_TARGETS = haiku-image ;
-				}
-			}
-
-			# Print usage text.
-			case help : {
-				Echo "Individual targets (applications, libraries, drivers,"
-					"...) can be built by just" ;
-				Echo "passing them as arguments to jam. The recommended method"
-					"to build or update a" ;
-				Echo "Haiku image or installation is to use a build profile"
-					"with one of the build" ;
-				Echo "profile actions. Typical command lines using a build"
-					"profile looks like this:" ;
-				Echo "  jam @nightly-anyboot" ;
-				Echo "  jam @install update libbe.so" ;
-				Echo "  jam @nightly-vmware mount" ;
-				Echo ;
-				Echo "Default build profiles (minimal set of packages and"
-					"configuration):" ;
-				Echo "  image            - A raw disk image." ;
-				Echo "  anyboot-image    - A custom image for either CD or"
-					"disk." ;
-				Echo "  cd-image         - An ISO9660 CD image." ;
-				Echo "  vmware-image     - A VMware disk image." ;
-				Echo "  install          - A Haiku installation in a"
-					"directory." ;
-				Echo ;
-				Echo "Nightly build profiles (small set of packages used in"
-                	"nightly builds and default configuration):" ;
-				Echo "  nightly-raw      - A raw disk image." ;
-				Echo "  nightly-anyboot  - A custom image for either CD or"
-					"disk." ;
-				Echo "  nightly-cd       - An ISO9660 CD image." ;
-				Echo "  nightly-vmware   - A VMware disk image." ;
-				Echo ;
-				Echo "Release build profiles (bigger and more complete set of"
-					"packages used in releases and default configuration):" ;
-				Echo "  release-raw      - A raw disk image." ;
-				Echo "  release-anyboot  - A custom image for either CD or"
-					"disk." ;
-				Echo "  release-cd       - An ISO9660 CD image." ;
-				Echo "  release-vmware   - A VMware disk image." ;
-				Echo ;
-				Echo "Bootstrap build profiles (minimal image used for"
-                	"initial build of HPKG packages):" ;
-				Echo "  bootstrap-raw    - A raw disk image." ;
-				Echo "  bootstrap-vmware - A VMware disk image." ;
-				Echo ;
-				Echo "Build profile actions:" ;
-				Echo "  build                - Build a Haiku"
-					"image/installation. This is the default" ;
-				Echo "                         action, i.e. it can be"
-					"omitted." ;
-				Echo "  update <target> ...  - Update the specified targets in"
-					"the Haiku" ;
-				Echo "                         image/installation." ;
-				Echo "  update-all           - Update all targets in the Haiku"
-					"image/installation." ;
-				Echo "  mount                - Mount the Haiku image in the"
-					" bfs_shell." ;
-				Echo ;
-				Echo "For more details on how to customize Haiku builds read" ;
-				Echo "build/jam/UserBuildConfig.ReadMe." ;
-				Exit ;
-			}
-
-			# The "run" target allows for running arbitrary command lines
-			# containing build system targets, which are built and replaced
-			# accordingly.
-			case run : {
-				if $(JAM_TARGETS[2]) {
-					JAM_TARGETS = [ RunCommandLine $(JAM_TARGETS[2-]) ] ;
+				} else if $(JAM_TARGETS[1]) = update-vmware-image {
+					JAM_TARGETS = haiku-vmware-image ;
 				} else {
-					Exit "\"jam run\" requires parameters!" ;
-				}
-			}
-
-			# A target starting with "@" is a build profile.
-			case @* : {
-				HAIKU_BUILD_PROFILE = [ Match "@(.*)" : $(JAM_TARGETS[1]) ] ;
-				HAIKU_BUILD_PROFILE_ACTION = $(JAM_TARGETS[2]:E=build) ;
-				HAIKU_BUILD_PROFILE_PARAMETERS = $(JAM_TARGETS[3-]) ;
-				HAIKU_BUILD_PROFILE_DEFINED = ;
-			}
-
-			case * : {
-				# "update-image", "update-vmware-image", and "update-install"
-				# targets allow for updating only specific targets in the
-				# image/installation dir.
-				if $(JAM_TARGETS[1]) in update-image update-vmware-image
-						update-install {
-					SetUpdateHaikuImageOnly 1 ;
-					HAIKU_PACKAGES_UPDATE_ONLY = 1 ;
-					HAIKU_INCLUDE_IN_IMAGE on $(JAM_TARGETS[2-]) = 1 ;
-					HAIKU_INCLUDE_IN_PACKAGES on $(JAM_TARGETS[2-]) = 1 ;
-
-					if $(JAM_TARGETS[1]) = update-image {
-						JAM_TARGETS = haiku-image ;
-					} else if $(JAM_TARGETS[1]) = update-vmware-image {
-						JAM_TARGETS = haiku-vmware-image ;
-					} else {
-						JAM_TARGETS = install-haiku ;
-					}
+					JAM_TARGETS = install-haiku ;
 				}
 			}
 		}
