@@ -14,6 +14,7 @@
 
 #include <Beep.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -218,7 +219,8 @@ MailDaemonApplication::ReadyToRun()
 
 	app_info info;
 	be_roster->GetAppInfo(B_MAIL_DAEMON_SIGNATURE, &info);
-	BBitmap icon(BRect(0, 0, 32, 32), B_RGBA32);
+
+	BBitmap icon(BRect(B_ORIGIN, be_control_look->ComposeIconSize(32)), B_RGBA32);
 	BNode node(&info.ref);
 	BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon);
 	fNotification->SetIcon(&icon);

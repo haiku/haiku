@@ -29,6 +29,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Bitmap.h>
 #include <Deskbar.h>
 #include <Dragger.h>
@@ -168,7 +169,8 @@ NetworkStatusView::_UpdateBitmaps()
 				delete trayIcon;
 
 			// Scale notification icon
-			BBitmap* notifyIcon = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
+			BBitmap* notifyIcon
+				= new BBitmap(BRect(B_ORIGIN, be_control_look->ComposeIconSize(32)), B_RGBA32);
 			if (notifyIcon->InitCheck() == B_OK
 				&& BIconUtils::GetVectorIcon((const uint8 *)data,
 					size, notifyIcon) == B_OK) {
