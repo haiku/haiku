@@ -301,6 +301,8 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fVisibleTextBufferChanged = false;
 	fScrollBar = NULL;
 	fInline = NULL;
+	fTextForeColor = kBlackColor;
+	fTextBackColor = kWhiteColor;
 	fSelectForeColor = kWhiteColor;
 	fSelectBackColor = kBlackColor;
 	fScrollOffset = 0;
