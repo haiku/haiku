@@ -7,8 +7,6 @@
  */
 
 
-#include <stdio.h>
-
 #include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <fs_interface.h>

@@ -11,13 +11,18 @@
 
 #include <arpa/inet.h>
 #include <errno.h>
+#ifdef USER
+#include <netdb.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <AutoDeleter.h>
+#ifdef _KERNEL_MODE
 #include <net/dns_resolver.h>
+#endif
 #include <util/kernel_cpp.h>
 #include <util/Random.h>
 
@@ -221,7 +226,8 @@ AddressResolver::AddressResolver(const char* name)
 
 AddressResolver::~AddressResolver()
 {
-	freeaddrinfo(fHead);
+	if (fHead != NULL)
+		freeaddrinfo(fHead);
 }
 
 

@@ -166,8 +166,12 @@ IdMap::_Repair()
 	strlcat(path, "/nfs4_idmapper_server", sizeof(path));
 
 	const char* args[] = { path, NULL };
+#ifdef _KERNEL_MODE
 	thread_id thread = load_image_etc(1, args, NULL, B_NORMAL_PRIORITY,
 		B_SYSTEM_TEAM, 0);
+#else
+	thread_id thread = load_image(1, args, const_cast<const char**>(environ));
+#endif // _KERNEL_MODE
 	if (thread < B_OK) {
 		delete_port(fReplyPort);
 		delete_port(fRequestPort);

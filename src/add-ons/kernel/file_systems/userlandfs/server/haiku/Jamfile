@@ -26,9 +26,12 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	# kernelland_emu
 	condition_variable.cpp
 	debug.cpp
+	heap.cpp
+	KernelReferenceable.cpp
 	lock.cpp
 	low_resource_manager.cpp
 	misc.cpp
+	Random.cpp
 	slab.cpp
 	vm.cpp
 

@@ -1,0 +1,62 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs nfs4 ;
+
+local nfs4Top = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems nfs4 ] ;
+
+SEARCH_SOURCE += $(nfs4Top) ;
+
+# set some additional defines
+{
+	local defines =
+		USER=1
+	;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirC++Flags $(defines) -fno-rtti ;
+}
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
+
+Addon <userland>nfs4
+	:
+	Cookie.cpp
+	Connection.cpp
+	Delegation.cpp
+	DirectoryCache.cpp
+	FileInfo.cpp
+	FileSystem.cpp
+	IdMap.cpp
+	Inode.cpp
+	InodeIdMap.cpp
+	InodeDir.cpp
+	InodeRegular.cpp
+	kernel_interface.cpp
+	MetadataCache.cpp
+	NFS4Inode.cpp
+	NFS4Object.cpp
+	NFS4Server.cpp
+	OpenState.cpp
+	ReplyBuilder.cpp
+	ReplyInterpreter.cpp
+	Request.cpp
+	RequestBuilder.cpp
+	RequestInterpreter.cpp
+	RootInode.cpp
+	RPCAuth.cpp
+	RPCCall.cpp
+	RPCCallback.cpp
+	RPCCallbackReply.cpp
+	RPCCallbackRequest.cpp
+	RPCCallbackServer.cpp
+	RPCReply.cpp
+	RPCServer.cpp
+	VnodeToInode.cpp
+	WorkQueue.cpp
+	XDR.cpp
+	:
+	libnetwork.so
+	libuserlandfs_haiku_kernel.so
+	[ TargetLibsupc++ ]
+;
+
+SubInclude HAIKU_TOP src add-ons kernel file_systems nfs4 idmapper ;
