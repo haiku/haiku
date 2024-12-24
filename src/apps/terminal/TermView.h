@@ -80,7 +80,7 @@ public:
 			void				GetTermFont(BFont* font) const;
 			void				SetTermFont(const BFont* font);
 
-			void				GetFontSize(float* width, float* height);
+			void				GetFontSize(float* width, float* height) const;
 			int					Rows() const;
 			int					Columns() const;
 			BRect				SetTermSize(int rows, int columns,
@@ -88,14 +88,14 @@ public:
 			void				SetTermSize(BRect rect,
 									bool notifyShell = false);
 			void				GetTermSizeFromRect(const BRect &rect,
-									int *rows, int *columns);
+									int *rows, int *columns) const;
 
 			void				SetTextColor(rgb_color fore, rgb_color back);
 			void				SetCursorColor(rgb_color fore, rgb_color back);
 			void				SetSelectColor(rgb_color fore, rgb_color back);
 			void				SetTermColor(uint index, rgb_color color,
 									bool dynamic = false);
-			status_t			GetTermColor(uint index, rgb_color* color);
+			status_t			GetTermColor(uint index, rgb_color* color) const;
 
 			int					Encoding() const;
 			void				SetEncoding(int encoding);
@@ -121,10 +121,10 @@ public:
 			void				Clear();
 
 			// Other
-			void				GetFrameSize(float* width, float* height);
+			void				GetFrameSize(float* width, float* height) const;
 			bool				Find(const BString& str, bool forwardSearch,
 									bool matchCase, bool matchWord);
-			void				GetSelection(BString& string);
+			void				GetSelection(BString& string) const;
 
 			bool				CheckShellGone() const;
 
@@ -186,10 +186,10 @@ private:
 
 private:
 			// point and text offset conversion
-	inline	int32				_LineAt(float y);
-	inline	float				_LineOffset(int32 index);
-			TermPos				_ConvertToTerminal(const BPoint& point);
-	inline	BPoint				_ConvertFromTerminal(const TermPos& pos);
+	inline	int32				_LineAt(float y) const;
+	inline	float				_LineOffset(int32 index) const;
+			TermPos				_ConvertToTerminal(const BPoint& point) const;
+	inline	BPoint				_ConvertFromTerminal(const TermPos& pos) const;
 
 	inline	void				_InvalidateTextRect(int32 x1, int32 y1,
 									int32 x2, int32 y2);
@@ -198,7 +198,7 @@ private:
 									const ShellParameters& shellParameters);
 
 			status_t			_AttachShell(Shell* shell);
-			void				_DetachShell();
+			Shell*				_DetachShell();
 
 			void				_Activate();
 			void				_Deactivate();

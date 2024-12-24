@@ -255,14 +255,14 @@ TermView::TermView(BMessage* archive)
 
 	// TODO: Retrieve colors, history size, etc. from archive
 	status_t status = _InitObject(ShellParameters(argc, argv));
+	delete[] argv;
+
 	if (status != B_OK)
 		throw status;
 
 	bool useRect = false;
 	if ((archive->FindBool("use_rect", &useRect) == B_OK) && useRect)
 		SetTermSize(frame);
-
-	delete[] argv;
 }
 
 
@@ -391,10 +391,8 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 
 TermView::~TermView()
 {
-	Shell* shell = fShell;
+	Shell* shell = _DetachShell();
 		// _DetachShell sets fShell to NULL
-
-	_DetachShell();
 
 	delete fDefaultState;
 	delete fSelectState;
@@ -489,7 +487,7 @@ TermView::BackgroundColor()
 
 
 inline int32
-TermView::_LineAt(float y)
+TermView::_LineAt(float y) const
 {
 	int32 location = int32(y + fScrollOffset);
 
@@ -502,7 +500,7 @@ TermView::_LineAt(float y)
 
 
 inline float
-TermView::_LineOffset(int32 index)
+TermView::_LineOffset(int32 index) const
 {
 	return index * fFontHeight - fScrollOffset;
 }
@@ -510,7 +508,7 @@ TermView::_LineOffset(int32 index)
 
 // convert view coordinates to terminal text buffer position
 TermPos
-TermView::_ConvertToTerminal(const BPoint &p)
+TermView::_ConvertToTerminal(const BPoint &p) const
 {
 	return TermPos(p.x >= 0 ? (int32)p.x / fFontWidth : -1, _LineAt(p.y));
 }
@@ -518,7 +516,7 @@ TermView::_ConvertToTerminal(const BPoint &p)
 
 // convert terminal text buffer position to view coordinates
 inline BPoint
-TermView::_ConvertFromTerminal(const TermPos &pos)
+TermView::_ConvertFromTerminal(const TermPos &pos) const
 {
 	return BPoint(fFontWidth * pos.x, _LineOffset(pos.y));
 }
@@ -558,7 +556,7 @@ TermView::TerminalName() const
 
 //! Get width and height for terminal font
 void
-TermView::GetFontSize(float* _width, float* _height)
+TermView::GetFontSize(float* _width, float* _height) const
 {
 	*_width = fFontWidth;
 	*_height = fFontHeight;
@@ -646,7 +644,7 @@ TermView::SetTermSize(BRect rect, bool notifyShell)
 
 void
 TermView::GetTermSizeFromRect(const BRect &rect, int *_rows,
-	int *_columns)
+	int *_columns) const
 {
 	int columns = int((rect.IntegerWidth() + 1) / fFontWidth);
 	int rows = int((rect.IntegerHeight() + 1) / fFontHeight);
@@ -724,7 +722,7 @@ TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
 
 
 status_t
-TermView::GetTermColor(uint index, rgb_color* color)
+TermView::GetTermColor(uint index, rgb_color* color) const
 {
 	if (color == NULL)
 		return B_BAD_VALUE;
@@ -1005,11 +1003,13 @@ TermView::_AttachShell(Shell *shell)
 }
 
 
-void
+Shell*
 TermView::_DetachShell()
 {
+	Shell* shell = fShell;
 	fShell->DetachBuffer();
 	fShell = NULL;
+	return shell;
 }
 
 
@@ -2873,7 +2873,7 @@ TermView::_CheckHighlightRegion(int32 row, int32 firstColumn,
 
 
 void
-TermView::GetFrameSize(float *width, float *height)
+TermView::GetFrameSize(float *width, float *height) const
 {
 	int32 historySize;
 	{
@@ -2926,7 +2926,7 @@ TermView::Find(const BString &str, bool forwardSearch, bool matchCase,
 
 //! Get the selected text and copy to str
 void
-TermView::GetSelection(BString &str)
+TermView::GetSelection(BString &str) const
 {
 	str.SetTo("");
 	BAutolock _(fTextBuffer);
