@@ -102,7 +102,7 @@ static const int32 kPageUsageDecline = 1;
 
 int32 gMappedPagesCount;
 
-static VMPageQueue sPageQueues[PAGE_STATE_COUNT];
+static VMPageQueue sPageQueues[PAGE_STATE_FIRST_UNQUEUED];
 
 static VMPageQueue& sFreePageQueue = sPageQueues[PAGE_STATE_FREE];
 static VMPageQueue& sClearPageQueue = sPageQueues[PAGE_STATE_CLEAR];
@@ -2756,10 +2756,9 @@ idle_scan_active_pages(page_stats& pageStats)
 		// wouldn't notice when those would become unused and could thus be
 		// moved to the cached list.
 		int32 usageCount;
-		if (page->WiredCount() > 0 || page->usage_count > 0
-			|| !cache->temporary) {
+		if (page->WiredCount() > 0 || page->usage_count > 0 || !cache->temporary)
 			usageCount = vm_clear_page_mapping_accessed_flags(page);
-		} else
+		else
 			usageCount = vm_remove_all_page_mappings_if_unaccessed(page);
 
 		if (usageCount > 0) {
