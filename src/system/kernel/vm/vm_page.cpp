@@ -4093,6 +4093,8 @@ vm_page_free_etc(VMCache* cache, vm_page* page,
 	free_page(page, false);
 	if (reservation == NULL)
 		unreserve_pages(1);
+	else
+		reservation->count++;
 }
 
 
