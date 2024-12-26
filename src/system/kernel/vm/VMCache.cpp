@@ -683,6 +683,7 @@ VMCache::Delete()
 	T(Delete(this));
 
 	// free all of the pages in the cache
+	vm_page_reservation reservation = {};
 	while (vm_page* page = pages.Root()) {
 		if (!page->mappings.IsEmpty() || page->WiredCount() != 0) {
 			panic("remove page %p from cache %p: page still has mappings!\n"
@@ -697,8 +698,9 @@ VMCache::Delete()
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
 			page->physical_page_number));
 		DEBUG_PAGE_ACCESS_START(page);
-		vm_page_free(this, page);
+		vm_page_free_etc(this, page, &reservation);
 	}
+	vm_page_unreserve_pages(&reservation);
 
 	// remove the ref to the source
 	if (source)

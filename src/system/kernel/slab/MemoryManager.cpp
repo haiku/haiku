@@ -1533,6 +1533,7 @@ MemoryManager::_UnmapChunk(VMArea* vmArea, addr_t address, size_t size,
 	translationMap->Unlock();
 
 	// free the pages
+	vm_page_reservation reservation = {};
 	addr_t areaPageOffset = (address - vmArea->Base()) / B_PAGE_SIZE;
 	addr_t areaPageEndOffset = areaPageOffset + size / B_PAGE_SIZE;
 	VMCachePagesTree::Iterator it = cache->pages.GetIterator(
@@ -1547,13 +1548,13 @@ MemoryManager::_UnmapChunk(VMArea* vmArea, addr_t address, size_t size,
 
 		cache->RemovePage(page);
 			// the iterator is remove-safe
-		vm_page_free(cache, page);
+		vm_page_free_etc(cache, page, &reservation);
 	}
+	vm_page_unreserve_pages(&reservation);
 
 	cache->ReleaseRefAndUnlock();
 
 	vm_unreserve_memory(size);
-
 	return B_OK;
 }
 

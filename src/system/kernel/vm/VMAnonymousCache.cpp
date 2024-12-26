@@ -1230,6 +1230,7 @@ VMAnonymousCache::_MergePagesSmallerConsumer(VMAnonymousCache* source)
 	// the time we unlock, that should be fine.
 
 	VMCachePagesTree::Iterator it = pages.GetIterator();
+	vm_page_reservation reservation = {};
 	while (vm_page* page = it.Next()) {
 		// If a source page is in the way, remove and free it.
 		vm_page* sourcePage = source->LookupPage(
@@ -1241,13 +1242,14 @@ VMAnonymousCache::_MergePagesSmallerConsumer(VMAnonymousCache* source)
 					&& sourcePage->mappings.IsEmpty(),
 				"sourcePage: %p, page: %p", sourcePage, page);
 			source->RemovePage(sourcePage);
-			vm_page_free(source, sourcePage);
+			vm_page_free_etc(source, sourcePage, &reservation);
 		}
 
 		// Note: Removing the current node while iterating through a
 		// IteratableSplayTree is safe.
 		source->MovePage(page);
 	}
+	vm_page_unreserve_pages(&reservation);
 
 	MoveAllPages(source);
 }
