@@ -412,8 +412,9 @@ public:
 	void StopWatchDateFormatChange();
 
 	// type ahead filtering
-	bool IsFiltering() const { return fRefFilter != NULL; };
-	bool IsTypeAheadFiltering() const { return fTypeAheadFiltering; };
+	inline bool IsFiltering() const { return IsRefFiltering() || IsTypeAheadFiltering(); };
+	inline bool IsRefFiltering() const { return fRefFilter != NULL; };
+	inline bool IsTypeAheadFiltering() const { return fTypeAheadFiltering; };
 
 	void UpdateDateColumns(BMessage*);
 	virtual void AdaptToVolumeChange(BMessage*);
@@ -1284,7 +1285,7 @@ BPoseView::SetHasPosesInClipboard(bool hasPoses)
 inline PoseList*
 BPoseView::CurrentPoseList() const
 {
-	return (IsFiltering() || IsTypeAheadFiltering()) ? fFilteredPoseList : fPoseList;
+	return IsFiltering() ? fFilteredPoseList : fPoseList;
 }
 
 

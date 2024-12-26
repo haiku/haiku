@@ -2040,7 +2040,7 @@ BPoseView::ShouldShowPose(const Model* model, const PoseInfo* poseInfo)
 		return false;
 
 	// check filter before adding item
-	if (!IsFiltering())
+	if (fRefFilter == NULL)
 		return true;
 
 	struct stat_beos stat;
@@ -8026,10 +8026,9 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 
 		bool visible = true;
 		if (IsFiltering()) {
-			if (fFilteredPoseList->FindPose(itemNode, &index) != NULL)
+			visible = fFilteredPoseList->FindPose(itemNode, &index) != NULL;
+			if (visible)
 				fFilteredPoseList->RemoveItemAt(index);
-			else
-				visible = false;
 		}
 
 		fMimeTypeListIsDirty = true;
@@ -8486,7 +8485,7 @@ BPoseView::Refresh()
 	AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
-	if (IsFiltering())
+	if (IsRefFiltering())
 		RebuildFilteringPoseList();
 
 	Invalidate();
@@ -10393,10 +10392,10 @@ BPoseView::UpdateAfterFilterChange()
 bool
 BPoseView::FilterPose(BPose* pose)
 {
-	if (pose == NULL || !(IsFiltering() || IsTypeAheadFiltering()))
+	if (pose == NULL || !IsFiltering())
 		return false;
 
-	if (IsFiltering()) {
+	if (IsRefFiltering()) {
 		PoseInfo poseInfo;
 		ReadPoseInfo(pose->TargetModel(), &poseInfo);
 		if (pose->TargetModel()->OpenNode() != B_OK)
@@ -10478,7 +10477,7 @@ BPoseView::ClearTypeAheadFiltering()
 	fLastFilterStringCount = 1;
 	fLastFilterStringLength = 0;
 
-	if (IsFiltering())
+	if (IsRefFiltering())
 		RebuildFilteringPoseList();
 
 	Invalidate();
