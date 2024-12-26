@@ -293,8 +293,6 @@ status_t	_user_set_debugger_breakpoint(void *address, uint32 type,
 				int32 length, bool watchpoint);
 status_t	_user_clear_debugger_breakpoint(void *address, bool watchpoint);
 
-ssize_t		_user_get_stack_trace(size_t addressCount, addr_t* returnAddresses);
-
 #ifdef __cplusplus
 }	// extern "C"
 #endif
