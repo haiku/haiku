@@ -4751,13 +4751,14 @@ vm_unreserve_memory(size_t amount)
 status_t
 vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 {
+	ASSERT((amount % B_PAGE_SIZE) == 0);
 	ASSERT(priority >= 0 && priority < (int)B_COUNT_OF(kMemoryReserveForPriority));
-	size_t reserve = kMemoryReserveForPriority[priority];
 
 	MutexLocker locker(sAvailableMemoryLock);
 
 	//dprintf("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory);
 
+	const size_t reserve = kMemoryReserveForPriority[priority];
 	if (sAvailableMemory >= (off_t)(amount + reserve)) {
 		sAvailableMemory -= amount;
 		return B_OK;

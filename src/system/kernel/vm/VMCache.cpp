@@ -1086,7 +1086,7 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 	// of the area...
 	if (committed_size < commitment) {
 #if KDEBUG
-		const off_t size = ROUNDUP(virtual_end - virtual_base, B_PAGE_SIZE);
+		const off_t size = PAGE_ALIGN(virtual_end - virtual_base);
 		ASSERT_PRINT(commitment <= size, "cache %p, commitment %" B_PRIdOFF ", size %" B_PRIdOFF,
 			this, commitment, size);
 #endif
