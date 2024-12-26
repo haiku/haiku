@@ -5844,8 +5844,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 			continue;
 		}
 
-		bool visible = fPoseList->FindPose(poseModel->NodeRef(),
-			&index) != NULL;
+		bool visible = fPoseList->FindPose(poseModel->NodeRef(), &index) != NULL;
 		int32 poseListIndex = index;
 
 		if (IsFiltering())
@@ -5856,13 +5855,11 @@ BPoseView::AttributeChanged(const BMessage* message)
 			memset(&info, 0, sizeof(attr_info));
 			// the call below might fail if the attribute has been removed
 			poseModel->Node()->GetAttrInfo(attrName, &info);
-			pose->UpdateWidgetAndModel(poseModel, attrName, info.type, index,
-				loc, this, visible);
+			pose->UpdateWidgetAndModel(poseModel, attrName, info.type, index, loc, this, visible);
 			if (strcmp(attrName, kAttrMIMEType) == 0)
 				RefreshMimeTypeList();
 		} else {
-			pose->UpdateWidgetAndModel(poseModel, 0, 0, index, loc, this,
-				visible);
+			pose->UpdateWidgetAndModel(poseModel, 0, 0, index, loc, this, visible);
 		}
 		poseModel->CloseNode();
 		if (IsFiltering()) {
@@ -7681,8 +7678,7 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint,
 		}
 	} else {
 		// add rects for visible poses only (uses VSList!!)
-		int32 startIndex
-			= FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()));
+		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()));
 		int32 poseCount = fVSPoseList->CountItems();
 
 		for (int32 index = startIndex; index < poseCount; index++) {
@@ -7760,8 +7756,7 @@ BPoseView::GetDragRect(int32 clickedPoseIndex)
 
 		// add rects for visible poses only (uses VSList!!)
 		int32 poseCount = fVSPoseList->CountItems();
-		for (int32 index = FirstIndexAtOrBelow(
-					(int32)(bounds.top - IconPoseHeight()));
+		for (int32 index = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()));
 				index < poseCount; index++) {
 			BPose* pose = fVSPoseList->ItemAt(index);
 			if (pose != NULL) {
@@ -8066,8 +8061,7 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 
 				if (pose == NULL && bounds.top > 0) {
 					// scroll up a little
-					BView::ScrollTo(bounds.left,
-						std::max(bounds.top - fListElemHeight, 0.0f));
+					BView::ScrollTo(bounds.left, std::max(bounds.top - fListElemHeight, 0.0f));
 				}
 			}
 		}
@@ -9567,10 +9561,8 @@ BPoseView::SortPoses()
 	std::stable_sort(poses, &poses[fPoseList->CountItems()],
 		PoseComparator(this));
 	if (IsFiltering()) {
-		poses = reinterpret_cast<BPose**>(
-			PoseList::Private(fFilteredPoseList).AsBList()->Items());
-		std::stable_sort(poses, &poses[fFilteredPoseList->CountItems()],
-			PoseComparator(this));
+		poses = reinterpret_cast<BPose**>(PoseList::Private(fFilteredPoseList).AsBList()->Items());
+		std::stable_sort(poses, &poses[fFilteredPoseList->CountItems()], PoseComparator(this));
 	}
 }
 
