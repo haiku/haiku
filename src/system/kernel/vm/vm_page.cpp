@@ -2405,7 +2405,7 @@ page_writer(void* /*unused*/)
 #if ENABLE_SWAP_SUPPORT
 		page_stats pageStats;
 		get_page_stats(pageStats);
-		bool activePaging = do_active_paging(pageStats);
+		const bool activePaging = do_active_paging(pageStats);
 #endif
 
 		// depending on how urgent it becomes to get pages to disk, we adjust
@@ -3099,42 +3099,42 @@ page_daemon(void* /*unused*/)
 /*!	Returns how many pages could *not* be reserved.
 */
 static uint32
-reserve_pages(uint32 count, int priority, bool dontWait)
+reserve_pages(uint32 missing, int priority, bool dontWait)
 {
-	const uint32 requested = count;
+	const uint32 requested = missing;
 	const int32 dontTouch = kPageReserveForPriority[priority];
 
 	while (true) {
-		count -= reserve_some_pages(count, dontTouch);
-		if (count == 0)
+		missing -= reserve_some_pages(missing, dontTouch);
+		if (missing == 0)
 			return 0;
 
 		if (sUnsatisfiedPageReservations == 0) {
-			count -= free_cached_pages(count, dontWait);
-			if (count == 0)
+			missing -= free_cached_pages(missing, dontWait);
+			if (missing == 0)
 				return 0;
 		}
 
 		if (dontWait)
-			return count;
+			return missing;
 
 		// we need to wait for pages to become available
 
 		MutexLocker pageDeficitLocker(sPageDeficitLock);
-
 		if (atomic_get(&sUnreservedFreePages) > dontTouch) {
 			// the situation changed
+			pageDeficitLocker.Unlock();
 			continue;
 		}
 
 		const bool notifyDaemon = (sUnsatisfiedPageReservations == 0);
-		sUnsatisfiedPageReservations += count;
+		sUnsatisfiedPageReservations += missing;
 
 		PageReservationWaiter waiter;
 		waiter.thread = thread_get_current_thread();
 		waiter.dontTouch = dontTouch;
 		waiter.requested = requested;
-		waiter.reserved = requested - count;
+		waiter.reserved = requested - missing;
 
 		// insert ordered (i.e. after all waiters with higher or equal priority)
 		PageReservationWaiter* otherWaiter = NULL;
@@ -3145,10 +3145,10 @@ reserve_pages(uint32 count, int priority, bool dontWait)
 				break;
 		}
 
-		// If we're higher-priority than the head waiter, steal its reservation.
 		if (otherWaiter != NULL && sPageReservationWaiters.Head() == otherWaiter) {
-			if (otherWaiter->reserved >= count) {
-				otherWaiter->reserved -= count;
+			// We're higher-priority than the head waiter; steal its reservation.
+			if (otherWaiter->reserved >= missing) {
+				otherWaiter->reserved -= missing;
 				return 0;
 			}
 
@@ -3166,10 +3166,8 @@ reserve_pages(uint32 count, int priority, bool dontWait)
 
 		pageDeficitLocker.Unlock();
 
-		low_resource(B_KERNEL_RESOURCE_PAGES, count, B_RELATIVE_TIMEOUT, 0);
+		low_resource(B_KERNEL_RESOURCE_PAGES, missing, B_RELATIVE_TIMEOUT, 0);
 		thread_block();
-
-		pageDeficitLocker.Lock();
 
 		return 0;
 	}
