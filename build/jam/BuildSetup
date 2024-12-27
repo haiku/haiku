@@ -234,12 +234,17 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 }
 
 HOST_CPU ?= $(OSPLAT:L) ;
-
-# Jam doesn't know x86_64, so override HOST_CPU, if 64 bit.
+# Jam doesn't know 32 vs 64 bit, so fill in the gaps based on our
+# host platform 64-bit knowledge.
 if $(HOST_CPU) = x86 && $(HOST_PLATFORM_IS_64_BIT) {
 	HOST_CPU = x86_64 ;
 }
-
+if $(HOST_CPU) = arm && $(HOST_PLATFORM_IS_64_BIT) {
+	HOST_CPU = arm64 ;
+}
+if $(HOST_CPU) = riscv && $(HOST_PLATFORM_IS_64_BIT) {
+	HOST_CPU = riscv64 ;
+}
 HOST_ARCH ?= $(HOST_CPU) ;
 HOST_ARCHS = $(HOST_ARCH) ;
 HOST_KERNEL_ARCH = host ;
