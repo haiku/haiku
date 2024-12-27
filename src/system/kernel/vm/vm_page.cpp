@@ -3178,6 +3178,7 @@ reserve_pages(uint32 missing, int priority, bool dontWait)
 		low_resource(B_KERNEL_RESOURCE_PAGES, missing, B_RELATIVE_TIMEOUT, 0);
 		thread_block();
 
+		ASSERT(waiter.requested == waiter.reserved);
 		return 0;
 	}
 }
