@@ -31,7 +31,7 @@ namespace BPrivate {
 
 
 #if defined(_KERNEL_MODE)
-void* PackageFileHeapAccessorBase::sChunkCache = NULL;
+void* PackageFileHeapAccessorBase::sQuadChunkCache = NULL;
 #endif
 
 
@@ -218,7 +218,7 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 
 	// allocate buffers for compressed and uncompressed data
 	uint16* compressedDataBuffer, *uncompressedDataBuffer;
-	MemoryDeleter compressedMemoryDeleter, uncompressedMemoryDeleter;
+	iovec* scratch = NULL;
 
 #if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
 	struct ObjectCacheDeleter {
@@ -238,21 +238,24 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 		}
 	};
 
-	ObjectCacheDeleter compressedCacheDeleter((object_cache*)sChunkCache),
-		uncompressedCacheDeleter((object_cache*)sChunkCache);
-	if (sChunkCache != NULL) {
-		compressedDataBuffer = (uint16*)object_cache_alloc((object_cache*)sChunkCache, 0);
-		uncompressedDataBuffer = (uint16*)object_cache_alloc((object_cache*)sChunkCache, 0);
-		compressedCacheDeleter.object = compressedDataBuffer;
-		uncompressedCacheDeleter.object = uncompressedDataBuffer;
-	} else
+	ObjectCacheDeleter chunkBufferDeleter((object_cache*)sQuadChunkCache);
+	uint8* quadChunkBuffer = (uint8*)object_cache_alloc((object_cache*)sQuadChunkCache, 0);
+	chunkBufferDeleter.object = quadChunkBuffer;
+
+	// segment data buffer
+	iovec localScratch;
+	compressedDataBuffer = (uint16*)(quadChunkBuffer + 0);
+	uncompressedDataBuffer = (uint16*)(quadChunkBuffer + kChunkSize);
+	localScratch.iov_base = (quadChunkBuffer + (kChunkSize * 2));
+	localScratch.iov_len = kChunkSize * 2;
+	scratch = &localScratch;
+#else
+	MemoryDeleter compressedMemoryDeleter, uncompressedMemoryDeleter;
+	compressedDataBuffer = (uint16*)malloc(kChunkSize);
+	uncompressedDataBuffer = (uint16*)malloc(kChunkSize);
+	compressedMemoryDeleter.SetTo(compressedDataBuffer);
+	uncompressedMemoryDeleter.SetTo(uncompressedDataBuffer);
 #endif
-	{
-		compressedDataBuffer = (uint16*)malloc(kChunkSize);
-		uncompressedDataBuffer = (uint16*)malloc(kChunkSize);
-		compressedMemoryDeleter.SetTo(compressedDataBuffer);
-		uncompressedMemoryDeleter.SetTo(uncompressedDataBuffer);
-	}
 
 	if (compressedDataBuffer == NULL || uncompressedDataBuffer == NULL)
 		return B_NO_MEMORY;
@@ -264,7 +267,7 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 
 	while (remainingBytes > 0) {
 		status_t error = ReadAndDecompressChunk(chunkIndex,
-			compressedDataBuffer, uncompressedDataBuffer);
+			compressedDataBuffer, uncompressedDataBuffer, scratch);
 		if (error != B_OK)
 			return error;
 
@@ -289,8 +292,9 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 
 status_t
 PackageFileHeapAccessorBase::ReadAndDecompressChunkData(uint64 offset,
-	size_t compressedSize, size_t uncompressedSize, void* compressedDataBuffer,
-	void* uncompressedDataBuffer)
+	size_t compressedSize, size_t uncompressedSize,
+	void* compressedDataBuffer, void* uncompressedDataBuffer,
+	iovec* scratchBuffer)
 {
 	// if uncompressed, read directly into the uncompressed data buffer
 	if (compressedSize == uncompressedSize)
@@ -301,27 +305,26 @@ PackageFileHeapAccessorBase::ReadAndDecompressChunkData(uint64 offset,
 	if (error != B_OK)
 		return error;
 
-	return DecompressChunkData(compressedDataBuffer, compressedSize,
-		uncompressedDataBuffer, uncompressedSize);
+	iovec compressed = { compressedDataBuffer, compressedSize },
+		uncompressed = { uncompressedDataBuffer, uncompressedSize };
+	return DecompressChunkData(compressed, uncompressed, scratchBuffer);
 }
 
 
 status_t
-PackageFileHeapAccessorBase::DecompressChunkData(void* compressedDataBuffer,
-	size_t compressedSize, void* uncompressedDataBuffer,
-	size_t uncompressedSize)
+PackageFileHeapAccessorBase::DecompressChunkData(const iovec& compressed,
+	iovec& uncompressed, iovec* scratchBuffer)
 {
-	size_t actualSize;
+	const size_t uncompressedSize = uncompressed.iov_len;
 	status_t error = fDecompressionAlgorithm->algorithm->DecompressBuffer(
-		compressedDataBuffer, compressedSize, uncompressedDataBuffer,
-		uncompressedSize, actualSize, fDecompressionAlgorithm->parameters);
+		compressed, uncompressed, fDecompressionAlgorithm->parameters, scratchBuffer);
 	if (error != B_OK) {
 		fErrorOutput->PrintError("Failed to decompress chunk data: %s\n",
 			strerror(error));
 		return error;
 	}
 
-	if (actualSize != uncompressedSize) {
+	if (uncompressed.iov_len != uncompressedSize) {
 		fErrorOutput->PrintError("Failed to decompress chunk data: size "
 			"mismatch\n");
 		return B_ERROR;

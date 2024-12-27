@@ -57,7 +57,8 @@ public:
 protected:
 	virtual	status_t			ReadAndDecompressChunk(size_t chunkIndex,
 									void* compressedDataBuffer,
-									void* uncompressedDataBuffer);
+									void* uncompressedDataBuffer,
+									iovec* scratchBuffer = NULL);
 
 private:
 			struct Chunk;

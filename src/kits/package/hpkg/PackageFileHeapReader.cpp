@@ -153,7 +153,8 @@ PackageFileHeapReader::Clone() const
 
 status_t
 PackageFileHeapReader::ReadAndDecompressChunk(size_t chunkIndex,
-	void* compressedDataBuffer, void* uncompressedDataBuffer)
+	void* compressedDataBuffer, void* uncompressedDataBuffer,
+	iovec* scratchBuffer)
 {
 	uint64 offset = fOffsets[chunkIndex];
 	bool isLastChunk
@@ -166,7 +167,7 @@ PackageFileHeapReader::ReadAndDecompressChunk(size_t chunkIndex,
 		: kChunkSize;
 
 	return ReadAndDecompressChunkData(offset, compressedSize, uncompressedSize,
-		compressedDataBuffer, uncompressedDataBuffer);
+		compressedDataBuffer, uncompressedDataBuffer, scratchBuffer);
 }
 
 

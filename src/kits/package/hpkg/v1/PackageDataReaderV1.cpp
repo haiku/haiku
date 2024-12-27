@@ -293,12 +293,11 @@ private:
 			if (error != B_OK)
 				return error;
 
-			size_t actuallyUncompressedSize;
-			BZlibCompressionAlgorithm().DecompressBuffer(
-				readBuffer->Buffer(), compressedSize,
-				fUncompressBuffer->Buffer(), uncompressedSize,
-				actuallyUncompressedSize);
-			if (error == B_OK && actuallyUncompressedSize != uncompressedSize)
+			iovec compressed = { readBuffer->Buffer(), compressedSize },
+				uncompressed = { fUncompressBuffer->Buffer(), uncompressedSize };
+			error = BZlibCompressionAlgorithm().DecompressBuffer(
+				compressed, uncompressed);
+			if (error == B_OK && uncompressed.iov_len != uncompressedSize)
 				error = B_BAD_DATA;
 		}
 

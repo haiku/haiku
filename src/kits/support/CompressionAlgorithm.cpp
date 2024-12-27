@@ -84,18 +84,16 @@ BCompressionAlgorithm::CreateDecompressingOutputStream(BDataIO* output,
 
 
 status_t
-BCompressionAlgorithm::CompressBuffer(const void* input, size_t inputSize,
-	void* output, size_t outputSize, size_t& _compressedSize,
-	const BCompressionParameters* parameters)
+BCompressionAlgorithm::CompressBuffer(const iovec& input, iovec& output,
+	const BCompressionParameters* parameters, iovec* scratch)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 status_t
-BCompressionAlgorithm::DecompressBuffer(const void* input,
-	size_t inputSize, void* output, size_t outputSize,
-	size_t& _uncompressedSize, const BDecompressionParameters* parameters)
+BCompressionAlgorithm::DecompressBuffer(const iovec& input, iovec& output,
+	const BDecompressionParameters* parameters, iovec* scratch)
 {
 	return B_NOT_SUPPORTED;
 }

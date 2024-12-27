@@ -99,23 +99,23 @@ public:
 public:
 	static	const size_t		kChunkSize = 64 * 1024;
 #if defined(_KERNEL_MODE)
-	static	void*				sChunkCache;
+	static	void*				sQuadChunkCache;
 #endif
 
 protected:
 	virtual	status_t			ReadAndDecompressChunk(size_t chunkIndex,
 									void* compressedDataBuffer,
-									void* uncompressedDataBuffer) = 0;
+									void* uncompressedDataBuffer,
+									iovec* scratchBuffer = NULL) = 0;
 			status_t			ReadAndDecompressChunkData(uint64 offset,
 									size_t compressedSize,
 									size_t uncompressedSize,
 									void* compressedDataBuffer,
-									void* uncompressedDataBuffer);
-			status_t			DecompressChunkData(
-									void* compressedDataBuffer,
-									size_t compressedSize,
 									void* uncompressedDataBuffer,
-									size_t uncompressedSize);
+									iovec* scratchBuffer = NULL);
+			status_t			DecompressChunkData(const iovec& compressedBuffer,
+									iovec& uncompressedBuffer,
+									iovec* scratchBuffer = NULL);
 			status_t			ReadFileData(uint64 offset, void* buffer,
 									size_t size);
 

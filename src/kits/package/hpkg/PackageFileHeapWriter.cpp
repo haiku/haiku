@@ -409,9 +409,9 @@ PackageFileHeapWriter::RemoveDataRanges(
 		} else if (decompressedChunk == &chunk) {
 			uncompressedData = decompressionBuffer;
 		} else {
-			status_t error = DecompressChunkData(chunk.buffer,
-				chunk.compressedSize, decompressionBuffer,
-				chunk.uncompressedSize);
+			iovec compressed = { chunk.buffer, chunk.compressedSize },
+				uncompressed = { decompressionBuffer, chunk.uncompressedSize };
+			status_t error = DecompressChunkData(compressed, uncompressed);
 			if (error != B_OK)
 				throw error;
 
@@ -479,7 +479,8 @@ PackageFileHeapWriter::Finish()
 
 status_t
 PackageFileHeapWriter::ReadAndDecompressChunk(size_t chunkIndex,
-	void* compressedDataBuffer, void* uncompressedDataBuffer)
+	void* compressedDataBuffer, void* uncompressedDataBuffer,
+	iovec* scratchBuffer)
 {
 	if (uint64(chunkIndex + 1) * kChunkSize > fUncompressedHeapSize) {
 		// The chunk has not been written to disk yet. Its data are still in the
@@ -496,7 +497,7 @@ PackageFileHeapWriter::ReadAndDecompressChunk(size_t chunkIndex,
 		: fOffsets[chunkIndex + 1] - offset;
 
 	return ReadAndDecompressChunkData(offset, compressedSize, kChunkSize,
-		compressedDataBuffer, uncompressedDataBuffer);
+		compressedDataBuffer, uncompressedDataBuffer, scratchBuffer);
 }
 
 
@@ -562,9 +563,10 @@ PackageFileHeapWriter::_WriteDataCompressed(const void* data, size_t size)
 	if (fCompressionAlgorithm == NULL)
 		return B_BUFFER_OVERFLOW;
 
-	size_t compressedSize;
-	status_t error = fCompressionAlgorithm->algorithm->CompressBuffer(data,
-		size, fCompressedDataBuffer, size, compressedSize,
+	const iovec uncompressed = { (void*)data, size };
+	iovec compressed = { fCompressedDataBuffer, size };
+	status_t error = fCompressionAlgorithm->algorithm->CompressBuffer(
+		uncompressed, compressed,
 		fCompressionAlgorithm->parameters);
 	if (error != B_OK) {
 		if (error != B_BUFFER_OVERFLOW) {
@@ -575,10 +577,10 @@ PackageFileHeapWriter::_WriteDataCompressed(const void* data, size_t size)
 	}
 
 	// only use compressed data when we've actually saved space
-	if (compressedSize == size)
+	if (compressed.iov_len == size)
 		return B_BUFFER_OVERFLOW;
 
-	return _WriteDataUncompressed(fCompressedDataBuffer, compressedSize);
+	return _WriteDataUncompressed(fCompressedDataBuffer, compressed.iov_len);
 }
 
 

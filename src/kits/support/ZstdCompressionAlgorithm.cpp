@@ -18,6 +18,7 @@
   #include <zstd_errors.h>
 #endif
 
+#include <AutoDeleter.h>
 #include <DataIO.h>
 
 
@@ -367,23 +368,23 @@ BZstdCompressionAlgorithm::CreateDecompressingOutputStream(BDataIO* output,
 
 
 status_t
-BZstdCompressionAlgorithm::CompressBuffer(const void* input,
-	size_t inputSize, void* output, size_t outputSize, size_t& _compressedSize,
-	const BCompressionParameters* parameters)
+BZstdCompressionAlgorithm::CompressBuffer(const iovec& input, iovec& output,
+	const BCompressionParameters* parameters, iovec* scratch)
 {
 #ifdef B_ZSTD_COMPRESSION_SUPPORT
+	// TODO: Make use of scratch buffer (if available.)
 	const BZstdCompressionParameters* zstdParameters
 		= dynamic_cast<const BZstdCompressionParameters*>(parameters);
 	int compressionLevel = zstdParameters != NULL
 		? zstdParameters->CompressionLevel()
 		: B_ZSTD_COMPRESSION_DEFAULT;
 
-	size_t zstdError = ZSTD_compress(output, outputSize, input,
-		inputSize, compressionLevel);
+	size_t zstdError = ZSTD_compress(output.iov_base, output.iov_len,
+		input.iov_base, input.iov_len, compressionLevel);
 	if (ZSTD_isError(zstdError))
 		return _TranslateZstdError(zstdError);
 
-	_compressedSize = zstdError;
+	output.iov_len = zstdError;
 	return B_OK;
 #else
 	return B_NOT_SUPPORTED;
@@ -392,17 +393,26 @@ BZstdCompressionAlgorithm::CompressBuffer(const void* input,
 
 
 status_t
-BZstdCompressionAlgorithm::DecompressBuffer(const void* input,
-	size_t inputSize, void* output, size_t outputSize,
-	size_t& _uncompressedSize, const BDecompressionParameters* parameters)
+BZstdCompressionAlgorithm::DecompressBuffer(const iovec& input, iovec& output,
+	const BDecompressionParameters* parameters, iovec* scratch)
 {
 #ifdef ZSTD_ENABLED
-	size_t zstdError = ZSTD_decompress(output, outputSize, input,
-		inputSize);
+	ZSTD_DCtx* dctx;
+	CObjectDeleter<ZSTD_DCtx, size_t, ZSTD_freeDCtx> dctxDeleter;
+#if defined(ZSTD_STATIC_LINKING_ONLY)
+	if (scratch != NULL)
+		dctx = ZSTD_initStaticDCtx(scratch->iov_base, scratch->iov_len);
+	else
+#endif
+		dctxDeleter.SetTo(dctx = ZSTD_createDCtx());
+
+	size_t zstdError = ZSTD_decompressDCtx(dctx,
+		output.iov_base, output.iov_len,
+		input.iov_base, input.iov_len);
 	if (ZSTD_isError(zstdError))
 		return _TranslateZstdError(zstdError);
 
-	_uncompressedSize = zstdError;
+	output.iov_len = zstdError;
 	return B_OK;
 #else
 	return B_NOT_SUPPORTED;

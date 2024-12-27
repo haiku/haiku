@@ -1144,11 +1144,13 @@ packagefs_std_ops(int32 op, ...)
 				return error;
 			}
 
-			PackageFileHeapAccessorBase::sChunkCache =
-				create_object_cache_etc("pkgfs heap buffers",
-					PackageFileHeapAccessorBase::kChunkSize, sizeof(void*),
-					0, /* magazine capacity, count */ 2, 1,
-					0, NULL, NULL, NULL, NULL);
+			object_cache* quadChunkCache;
+			PackageFileHeapAccessorBase::sQuadChunkCache = quadChunkCache =
+				create_object_cache("pkgfs heap buffers",
+					PackageFileHeapAccessorBase::kChunkSize * 4,
+					0, NULL, NULL, NULL);
+			object_cache_set_minimum_reserve(quadChunkCache, 1);
+
 			TwoKeyAVLTreeNode<void*>::sNodeCache =
 				create_object_cache_etc("pkgfs TKAVLTreeNodes",
 					sizeof(TwoKeyAVLTreeNode<void*>), 8,
@@ -1172,7 +1174,7 @@ packagefs_std_ops(int32 op, ...)
 			PackageFSRoot::GlobalUninit();
 			delete_object_cache(TwoKeyAVLTreeNode<void*>::sNodeCache);
 			delete_object_cache((object_cache*)
-				PackageFileHeapAccessorBase::sChunkCache);
+				PackageFileHeapAccessorBase::sQuadChunkCache);
 			StringConstants::Cleanup();
 			StringPool::Cleanup();
 			exit_debugging();

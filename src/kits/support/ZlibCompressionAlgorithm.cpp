@@ -366,9 +366,8 @@ BZlibCompressionAlgorithm::CreateDecompressingOutputStream(BDataIO* output,
 
 
 status_t
-BZlibCompressionAlgorithm::CompressBuffer(const void* input,
-	size_t inputSize, void* output, size_t outputSize, size_t& _compressedSize,
-	const BCompressionParameters* parameters)
+BZlibCompressionAlgorithm::CompressBuffer(const iovec& input, iovec& output,
+	const BCompressionParameters* parameters, iovec* scratch)
 {
 #ifdef B_ZLIB_COMPRESSION_SUPPORT
 	const BZlibCompressionParameters* zlibParameters
@@ -377,13 +376,13 @@ BZlibCompressionAlgorithm::CompressBuffer(const void* input,
 		? zlibParameters->CompressionLevel()
 		: B_ZLIB_COMPRESSION_DEFAULT;
 
-	uLongf bytesUsed = outputSize;
-	int zlibError = compress2((Bytef*)output, &bytesUsed, (const Bytef*)input,
-		(uLong)inputSize, compressionLevel);
+	uLongf bytesUsed = output.iov_len;
+	int zlibError = compress2((Bytef*)output.iov_base, &bytesUsed,
+		(const Bytef*)input.iov_base, (uLong)input.iov_len, compressionLevel);
 	if (zlibError != Z_OK)
 		return _TranslateZlibError(zlibError);
 
-	_compressedSize = (size_t)bytesUsed;
+	output.iov_len = (size_t)bytesUsed;
 	return B_OK;
 #else
 	return B_NOT_SUPPORTED;
@@ -392,17 +391,16 @@ BZlibCompressionAlgorithm::CompressBuffer(const void* input,
 
 
 status_t
-BZlibCompressionAlgorithm::DecompressBuffer(const void* input,
-	size_t inputSize, void* output, size_t outputSize,
-	size_t& _uncompressedSize, const BDecompressionParameters* parameters)
+BZlibCompressionAlgorithm::DecompressBuffer(const iovec& input, iovec& output,
+	const BDecompressionParameters* parameters, iovec* scratch)
 {
-	uLongf bytesUsed = outputSize;
-	int zlibError = uncompress((Bytef*)output, &bytesUsed, (const Bytef*)input,
-		(uLong)inputSize);
+	uLongf bytesUsed = output.iov_len;
+	int zlibError = uncompress((Bytef*)output.iov_base, &bytesUsed,
+		(const Bytef*)input.iov_base, (uLong)input.iov_len);
 	if (zlibError != Z_OK)
 		return _TranslateZlibError(zlibError);
 
-	_uncompressedSize = (size_t)bytesUsed;
+	output.iov_len = (size_t)bytesUsed;
 	return B_OK;
 }
 

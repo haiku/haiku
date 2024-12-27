@@ -12,7 +12,7 @@ if [ FIsBuildFeatureEnabled zstd ] {
 	UseBuildFeatureHeaders zstd ;
 	Includes [ FGristFiles $(zstdSources) ]
 		: [ BuildFeatureAttribute zstd : headers ] ;
-	SubDirC++Flags -DZSTD_ENABLED ;
+	SubDirC++Flags -DZSTD_ENABLED -DZSTD_STATIC_LINKING_ONLY ;
 }
 
 local subDirs =

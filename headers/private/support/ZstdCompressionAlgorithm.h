@@ -69,17 +69,12 @@ public:
 									const BDecompressionParameters* parameters,
 									BDataIO*& _stream);
 
-	virtual	status_t			CompressBuffer(const void* input,
-									size_t inputSize, void* output,
-									size_t outputSize, size_t& _compressedSize,
-									const BCompressionParameters* parameters
-										= NULL);
-	virtual	status_t			DecompressBuffer(const void* input,
-									size_t inputSize, void* output,
-									size_t outputSize,
-									size_t& _uncompressedSize,
-									const BDecompressionParameters* parameters
-										= NULL);
+	virtual	status_t			CompressBuffer(const iovec& input, iovec& output,
+									const BCompressionParameters* parameters = NULL,
+									iovec* scratch = NULL);
+	virtual	status_t			DecompressBuffer(const iovec& input, iovec& output,
+									const BDecompressionParameters* parameters = NULL,
+									iovec* scratch = NULL);
 
 private:
 			struct CompressionStrategy;
