@@ -27,7 +27,10 @@ scsi_alloc_ccb(scsi_device_info *device)
 {
 	SHOW_FLOW0( 3, "" );
 
-	scsi_ccb* ccb = (scsi_ccb*)object_cache_alloc(sCcbPool, 0);
+	scsi_ccb* ccb = (scsi_ccb*)object_cache_alloc(sCcbPool, CACHE_DONT_WAIT_FOR_MEMORY);
+	if (ccb == NULL)
+		return NULL;
+
 	ccb->completion_cond.Init(ccb, "scsi ccb");
 
 	ccb->bus = device->bus;

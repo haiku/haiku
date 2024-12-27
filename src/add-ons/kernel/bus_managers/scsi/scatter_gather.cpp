@@ -105,7 +105,8 @@ create_temp_sg(scsi_ccb *ccb)
 	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%" B_PRIu32, ccb, ccb->data,
 		ccb->data_length);
 
-	ccb->sg_list = temp_sg = (physical_entry*)object_cache_alloc(sTempScatterGatherPool, 0);
+	ccb->sg_list = temp_sg = (physical_entry*)object_cache_alloc(sTempScatterGatherPool,
+		CACHE_DONT_WAIT_FOR_MEMORY);
 	if (temp_sg == NULL) {
 		SHOW_ERROR0(2, "cannot allocate memory for IO request!");
 		return false;
