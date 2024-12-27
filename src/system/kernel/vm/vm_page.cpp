@@ -3156,7 +3156,7 @@ reserve_pages(uint32 missing, int priority, bool dontWait)
 
 			waiter.reserved += otherWaiter->reserved;
 			otherWaiter->reserved = 0;
-		} else if (otherWaiter != NULL && waiter.reserved != 0) {
+		} else if (!sPageReservationWaiters.IsEmpty() && waiter.reserved != 0) {
 			// We're lower-priority than the head waiter, but we have a reservation.
 			// We must have raced with other threads somehow. Unreserve and try again.
 			sUnsatisfiedPageReservations -= missing;
