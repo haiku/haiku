@@ -4103,7 +4103,7 @@ vm_page_free_etc(VMCache* cache, vm_page* page,
 	PAGE_ASSERT(page, page->State() != PAGE_STATE_FREE
 		&& page->State() != PAGE_STATE_CLEAR);
 
-	if (page->State() == PAGE_STATE_MODIFIED && cache->temporary)
+	if (page->State() == PAGE_STATE_MODIFIED && (cache != NULL && cache->temporary))
 		atomic_add(&sModifiedTemporaryPages, -1);
 
 	free_page(page, false);
@@ -4120,11 +4120,7 @@ vm_page_set_state(vm_page *page, int pageState)
 	PAGE_ASSERT(page, page->State() != PAGE_STATE_FREE
 		&& page->State() != PAGE_STATE_CLEAR);
 
-	if (pageState == PAGE_STATE_FREE || pageState == PAGE_STATE_CLEAR) {
-		free_page(page, pageState == PAGE_STATE_CLEAR);
-		unreserve_pages(1);
-	} else
-		set_page_state(page, pageState);
+	set_page_state(page, pageState);
 }
 
 

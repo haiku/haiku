@@ -143,7 +143,9 @@ VMSAv8TranslationMap::~VMSAv8TranslationMap()
 	ThreadCPUPinner pinner(thread_get_current_thread());
 	InterruptsSpinLocker locker(sAsidLock);
 
-	FreeTable(fPageTable, 0, fInitialLevel);
+	vm_page_reservation reservation = {};
+	FreeTable(fPageTable, 0, fInitialLevel, &reservation);
+	vm_page_unreserve_pages(&reservation);
 
 	if (fASID != -1) {
 		sAsidMapping[fASID] = NULL;
@@ -285,7 +287,8 @@ VMSAv8TranslationMap::TableFromPa(phys_addr_t pa)
 
 
 void
-VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level)
+VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level,
+	vm_page_reservation* reservation)
 {
 	ASSERT(level < 4);
 
@@ -302,7 +305,7 @@ VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level)
 		uint64_t oldPte = (uint64_t) atomic_get_and_set64((int64*) &pt[i], 0);
 
 		if (level < 3 && (oldPte & kPteTypeMask) == kPteTypeL012Table) {
-			FreeTable(oldPte & kPteAddrMask, nextVa, level + 1);
+			FreeTable(oldPte & kPteAddrMask, nextVa, level + 1, reservation);
 		} else if ((oldPte & kPteTypeMask) != 0) {
 			uint64_t fullVa = (fIsKernel ? ~vaMask : 0) | nextVa;
 
@@ -316,7 +319,7 @@ VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level)
 
 	vm_page* page = vm_lookup_page(ptPa >> fPageBits);
 	DEBUG_PAGE_ACCESS_START(page);
-	vm_page_set_state(page, PAGE_STATE_FREE);
+	vm_page_free_etc(NULL, page, reservation);
 }
 
 
@@ -361,7 +364,7 @@ VMSAv8TranslationMap::GetOrMakeTable(phys_addr_t ptPa, int level, int index,
 			// setup and use the one they installed instead.
 			ASSERT((oldPteRefetch & kPteTypeMask) == kPteTypeL012Table);
 			DEBUG_PAGE_ACCESS_START(page);
-			vm_page_set_state(page, PAGE_STATE_FREE);
+			vm_page_free_etc(NULL, page, reservation);
 			return oldPteRefetch & kPteAddrMask;
 		}
 

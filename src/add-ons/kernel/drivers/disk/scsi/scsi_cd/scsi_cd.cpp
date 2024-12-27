@@ -180,8 +180,7 @@ test_capacity(cd_driver_info *info)
 	info->scsi->free_ccb(request);
 
 	for (size_t i = 0; i < numEntries; i++) {
-		vm_page_set_state(vm_lookup_page(entries[i].address / B_PAGE_SIZE),
-			PAGE_STATE_FREE);
+		vm_page_free(NULL, vm_lookup_page(entries[i].address / B_PAGE_SIZE));
 	}
 
 	if (info->capacity != info->original_capacity) {

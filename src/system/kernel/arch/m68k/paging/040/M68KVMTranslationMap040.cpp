@@ -54,6 +54,7 @@ M68KVMTranslationMap040::~M68KVMTranslationMap040()
 		fPageMapper->Delete();
 
 	if (fPagingStructures->pgroot_virt != NULL) {
+		vm_page_reservation reservation = {};
 		page_root_entry *pgroot_virt = fPagingStructures->pgroot_virt;
 
 		// cycle through and free all of the user space pgdirs & pgtables
@@ -97,14 +98,14 @@ M68KVMTranslationMap040::~M68KVMTranslationMap040()
 					return;
 				}
 				DEBUG_PAGE_ACCESS_START(page);
-				vm_page_set_state(page, PAGE_STATE_FREE);
+				vm_page_free_etc(NULL, page, &reservation);
 			}
 			if (((i + 1) % NUM_DIRTBL_PER_PAGE) == 0) {
 				DEBUG_PAGE_ACCESS_END(dirpage);
-				vm_page_set_state(dirpage, PAGE_STATE_FREE);
+				vm_page_free_etc(NULL, dirpage, &reservation);
 			}
 		}
-
+		vm_page_unreserve_pages(&reservation);
 
 
 #if 0
@@ -118,7 +119,7 @@ M68KVMTranslationMap040::~M68KVMTranslationMap040()
 				if (!page)
 					panic("destroy_tmap: didn't find pgtable page\n");
 				DEBUG_PAGE_ACCESS_START(page);
-				vm_page_set_state(page, PAGE_STATE_FREE);
+				vm_page_free_etc(NULL, page, &reservation);
 			}
 		}
 #endif

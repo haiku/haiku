@@ -338,6 +338,8 @@ destroy_tmap(vm_translation_map *map)
 	restore_interrupts(state);
 
 	if (map->arch_data->rtdir_virt != NULL) {
+		vm_page_reservation reservation = {};
+
 		// cycle through and free all of the user space pgtables
 		// since the size of tables don't match B_PAGE_SIZE,
 		// we alloc several at once, based on modulos,
@@ -377,14 +379,15 @@ destroy_tmap(vm_translation_map *map)
 					return;
 				}
 				DEBUG_PAGE_ACCESS_START(page);
-				vm_page_set_state(page, PAGE_STATE_FREE);
+				vm_page_free_etc(NULL, page, &reservation);
 			}
 			if (((i + 1) % NUM_DIRTBL_PER_PAGE) == 0) {
 				DEBUG_PAGE_ACCESS_END(dirpage);
-				vm_page_set_state(dirpage, PAGE_STATE_FREE);
+				vm_page_free_etc(NULL, dirpage, &reservation);
 			}
 		}
 		free(map->arch_data->rtdir_virt);
+		vm_page_unreserve_pages(&reservation);
 	}
 
 	free(map->arch_data);

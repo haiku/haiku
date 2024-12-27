@@ -1955,7 +1955,7 @@ err1:
 			if (page == NULL)
 				panic("couldn't lookup physical page just allocated\n");
 
-			vm_page_set_state(page, PAGE_STATE_FREE);
+			vm_page_free(NULL, page);
 		}
 	}
 
@@ -3462,24 +3462,28 @@ unmap_and_free_physical_pages(VMTranslationMap* map, addr_t start, addr_t end)
 {
 	// free all physical pages in the specified range
 
+	vm_page_reservation reservation = {};
 	for (addr_t current = start; current < end; current += B_PAGE_SIZE) {
 		phys_addr_t physicalAddress;
 		uint32 flags;
 
 		if (map->Query(current, &physicalAddress, &flags) == B_OK
-			&& (flags & PAGE_PRESENT) != 0) {
+				&& (flags & PAGE_PRESENT) != 0) {
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page != NULL && page->State() != PAGE_STATE_FREE
 					&& page->State() != PAGE_STATE_CLEAR
 					&& page->State() != PAGE_STATE_UNUSED) {
 				DEBUG_PAGE_ACCESS_START(page);
-				vm_page_set_state(page, PAGE_STATE_FREE);
+				vm_page_free_etc(NULL, page, &reservation);
 			}
 		}
 	}
 
 	// unmap the memory
 	map->Unmap(start, end);
+
+	// unreserve the memory
+	vm_page_unreserve_pages(&reservation);
 }
 
 
@@ -4306,7 +4310,7 @@ fault_get_page(PageFaultContext& context)
 
 				cache->NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 				cache->RemovePage(page);
-				vm_page_set_state(page, PAGE_STATE_FREE);
+				vm_page_free_etc(cache, page, &context.reservation);
 
 				cache->ReleaseRefAndUnlock();
 				return status;

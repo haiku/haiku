@@ -718,7 +718,7 @@ Aperture::_Free(aperture_memory *memory)
 		vm_page *page = memory->page;
 		for (uint32 i = 0; i < count; i++, page++) {
 			DEBUG_PAGE_ACCESS_TRANSFER(page, memory->allocating_thread);
-			vm_page_set_state(page, PAGE_STATE_FREE);
+			vm_page_free(NULL, page);
 		}
 
 		memory->page = NULL;
@@ -726,7 +726,7 @@ Aperture::_Free(aperture_memory *memory)
 		for (uint32 i = 0; i < count; i++) {
 			DEBUG_PAGE_ACCESS_TRANSFER(memory->pages[i],
 				memory->allocating_thread);
-			vm_page_set_state(memory->pages[i], PAGE_STATE_FREE);
+			vm_page_free(NULL, memory->pages[i]);
 		}
 
 		free(memory->pages);

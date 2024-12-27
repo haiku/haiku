@@ -60,6 +60,7 @@ ARMVMTranslationMap32Bit::~ARMVMTranslationMap32Bit()
 
 	if (fPagingStructures->pgdir_virt != NULL) {
 		// cycle through and free all of the user space pgtables
+		vm_page_reservation reservation = {};
 		for (uint32 i = VADDR_TO_PDENT(USER_BASE);
 				i <= VADDR_TO_PDENT(USER_BASE + (USER_SIZE - 1)); i++) {
 			if ((fPagingStructures->pgdir_virt[i] & ARM_PDE_TYPE_MASK) != 0) {
@@ -69,9 +70,10 @@ ARMVMTranslationMap32Bit::~ARMVMTranslationMap32Bit()
 				if (!page)
 					panic("destroy_tmap: didn't find pgtable page\n");
 				DEBUG_PAGE_ACCESS_START(page);
-				vm_page_set_state(page, PAGE_STATE_FREE);
+				vm_page_free_etc(NULL, page, &reservation);
 			}
 		}
+		vm_page_unreserve_pages(&reservation);
 	}
 
 	fPagingStructures->RemoveReference();

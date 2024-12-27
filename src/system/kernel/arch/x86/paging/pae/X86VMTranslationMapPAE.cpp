@@ -246,6 +246,7 @@ X86VMTranslationMapPAE::~X86VMTranslationMapPAE()
 	STATIC_ASSERT(KERNEL_BASE == 0x80000000 && KERNEL_SIZE == 0x80000000);
 		// assuming 1-1 split of the address space
 
+	vm_page_reservation reservation = {};
 	for (uint32 k = 0; k < 2; k++) {
 		pae_page_directory_entry* pageDir
 			= fPagingStructures->VirtualPageDirs()[k];
@@ -263,10 +264,11 @@ X86VMTranslationMapPAE::~X86VMTranslationMapPAE()
 						address,
 						(k * kPAEPageDirEntryCount + i) * kPAEPageTableRange);
 				DEBUG_PAGE_ACCESS_START(page);
-				vm_page_set_state(page, PAGE_STATE_FREE);
+				vm_page_free_etc(NULL, page, &reservation);
 			}
 		}
 	}
+	vm_page_unreserve_pages(&reservation);
 
 	fPagingStructures->RemoveReference();
 }

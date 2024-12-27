@@ -35,7 +35,7 @@ extern uint32 gPlatform;
 
 
 static void
-FreePageTable(page_num_t ppn, bool isKernel, uint32 level = 2)
+FreePageTable(vm_page_reservation* reservation, page_num_t ppn, bool isKernel, uint32 level = 2)
 {
 	if (level > 0) {
 		Pte* pte = (Pte*)VirtFromPhys(ppn * B_PAGE_SIZE);
@@ -47,12 +47,13 @@ FreePageTable(page_num_t ppn, bool isKernel, uint32 level = 2)
 		}
 		for (uint64 i = beg; i <= end; i++) {
 			if (pte[i].isValid)
-				FreePageTable(pte[i].ppn, isKernel, level - 1);
+				FreePageTable(reservation, pte[i].ppn, isKernel, level - 1);
 		}
 	}
+
 	vm_page* page = vm_lookup_page(ppn);
 	DEBUG_PAGE_ACCESS_START(page);
-	vm_page_set_state(page, PAGE_STATE_FREE);
+	vm_page_free_etc(NULL, page, reservation);
 }
 
 
@@ -180,7 +181,9 @@ RISCV64VMTranslationMap::~RISCV64VMTranslationMap()
 	// Can't delete currently used page table
 	ASSERT_ALWAYS(::Satp() != Satp());
 
-	FreePageTable(fPageTable / B_PAGE_SIZE, fIsKernel);
+	vm_page_reservation reservation = {};
+	FreePageTable(&reservation, fPageTable / B_PAGE_SIZE, fIsKernel);
+	vm_page_unreserve_pages(&reservation);
 }
 
 

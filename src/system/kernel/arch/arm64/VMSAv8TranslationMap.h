@@ -115,7 +115,7 @@ private:
 	static uint8_t MairIndex(uint8_t type);
 	bool ValidateVa(addr_t va);
 	uint64_t* TableFromPa(phys_addr_t pa);
-	void FreeTable(phys_addr_t ptPa, uint64_t va, int level);
+	void FreeTable(phys_addr_t ptPa, uint64_t va, int level, vm_page_reservation* reservation);
 	phys_addr_t GetOrMakeTable(phys_addr_t ptPa, int level, int index, vm_page_reservation* reservation);
 	template<typename UpdatePte>
 	void ProcessRange(phys_addr_t ptPa, int level, addr_t va, size_t size,

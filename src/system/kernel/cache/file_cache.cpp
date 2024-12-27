@@ -223,7 +223,7 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 		DEBUG_PAGE_ACCESS_TRANSFER(fPages[i], fAllocatingThread);
 		fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
 		fCache->RemovePage(fPages[i]);
-		vm_page_set_state(fPages[i], PAGE_STATE_FREE);
+		vm_page_free(fCache, fPages[i]);
 	}
 
 	delete this;
@@ -319,7 +319,7 @@ reserve_pages(file_cache_ref* ref, vm_page_reservation* reservation,
 						ASSERT(!page->IsMapped());
 						ASSERT(!page->modified);
 						cache->RemovePage(page);
-						vm_page_set_state(page, PAGE_STATE_FREE);
+						vm_page_free(cache, page);
 						left--;
 					}
 				}
@@ -421,7 +421,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		for (int32 i = 0; i < pageIndex; i++) {
 			cache->NotifyPageEvents(pages[i], PAGE_EVENT_NOT_BUSY);
 			cache->RemovePage(pages[i]);
-			vm_page_set_state(pages[i], PAGE_STATE_FREE);
+			vm_page_free(cache, pages[i]);
 		}
 
 		return status;
