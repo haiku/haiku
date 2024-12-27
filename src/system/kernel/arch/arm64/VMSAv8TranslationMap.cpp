@@ -681,49 +681,10 @@ VMSAv8TranslationMap::UnmapPages(VMArea* area, addr_t address, size_t size, bool
 			if (area->cache_type == CACHE_TYPE_DEVICE)
 				return;
 
-			// get the page
-			vm_page* page = vm_lookup_page((oldPte & kPteAddrMask) >> fPageBits);
-			ASSERT(page != NULL);
-
-			DEBUG_PAGE_ACCESS_START(page);
-
-			// transfer the accessed/dirty flags to the page
-			page->accessed = is_pte_accessed(oldPte);
-			page->modified = is_pte_dirty(oldPte);
-
-			// remove the mapping object/decrement the wired_count of the
-			// page
-			if (area->wiring == B_NO_LOCK) {
-				vm_page_mapping* mapping = NULL;
-				vm_page_mappings::Iterator iterator
-					= page->mappings.GetIterator();
-				while ((mapping = iterator.Next()) != NULL) {
-					if (mapping->area == area)
-						break;
-				}
-
-				ASSERT(mapping != NULL);
-
-				area->mappings.Remove(mapping);
-				page->mappings.Remove(mapping);
-				queue.Add(mapping);
-			} else
-				page->DecrementWiredCount();
-
-			if (!page->IsMapped()) {
-				atomic_add(&gMappedPagesCount, -1);
-
-				if (updatePageQueue) {
-					if (page->Cache()->temporary)
-						vm_page_set_state(page, PAGE_STATE_INACTIVE);
-					else if (page->modified)
-						vm_page_set_state(page, PAGE_STATE_MODIFIED);
-					else
-						vm_page_set_state(page, PAGE_STATE_CACHED);
-				}
-			}
-
-			DEBUG_PAGE_ACCESS_END(page);
+			page_num_t page = (oldPte & kPteAddrMask) >> fPageBits;
+			PageUnmapped(area, page,
+				is_pte_accessed(oldPte), is_pte_dirty(oldPte),
+				updatePageQueue, &queue);
 		});
 
 	// TODO: As in UnmapPage() we can lose page dirty flags here. ATM it's not

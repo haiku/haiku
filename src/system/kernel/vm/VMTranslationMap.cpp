@@ -158,13 +158,18 @@ VMTranslationMap::DebugGetReverseMappingInfo(phys_addr_t physicalAddress,
 /*!	Called by UnmapPage() after performing the architecture specific part.
 	Looks up the page, updates its flags, removes the page-area mapping, and
 	requeues the page, if necessary.
+
+	If \c mappingsQueue is unspecified, then it unlocks the map and frees the
+	page-area mapping. If \c mappingsQueue is specified, then it adds the removed
+	mapping to the queue and does NOT unlock the map.
 */
 void
 VMTranslationMap::PageUnmapped(VMArea* area, page_num_t pageNumber,
-	bool accessed, bool modified, bool updatePageQueue)
+	bool accessed, bool modified, bool updatePageQueue, VMAreaMappings* mappingsQueue)
 {
 	if (area->cache_type == CACHE_TYPE_DEVICE) {
-		recursive_lock_unlock(&fLock);
+		if (mappingsQueue == NULL)
+			recursive_lock_unlock(&fLock);
 		return;
 	}
 
@@ -172,6 +177,12 @@ VMTranslationMap::PageUnmapped(VMArea* area, page_num_t pageNumber,
 	vm_page* page = vm_lookup_page(pageNumber);
 	ASSERT_PRINT(page != NULL, "page number: %#" B_PRIxPHYSADDR
 		", accessed: %d, modified: %d", pageNumber, accessed, modified);
+
+	if (mappingsQueue != NULL) {
+		DEBUG_PAGE_ACCESS_START(page);
+	} else {
+		DEBUG_PAGE_ACCESS_CHECK(page);
+	}
 
 	// transfer the accessed/dirty flags to the page
 	page->accessed |= accessed;
@@ -195,7 +206,8 @@ VMTranslationMap::PageUnmapped(VMArea* area, page_num_t pageNumber,
 	} else
 		page->DecrementWiredCount();
 
-	recursive_lock_unlock(&fLock);
+	if (mappingsQueue == NULL)
+		recursive_lock_unlock(&fLock);
 
 	if (!page->IsMapped()) {
 		atomic_add(&gMappedPagesCount, -1);
@@ -210,11 +222,19 @@ VMTranslationMap::PageUnmapped(VMArea* area, page_num_t pageNumber,
 		}
 	}
 
+	if (mappingsQueue != NULL) {
+		DEBUG_PAGE_ACCESS_END(page);
+	}
+
 	if (mapping != NULL) {
-		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
-		vm_free_page_mapping(pageNumber, mapping,
-			CACHE_DONT_WAIT_FOR_MEMORY
-				| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0));
+		if (mappingsQueue == NULL) {
+			bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
+			vm_free_page_mapping(pageNumber, mapping,
+				CACHE_DONT_WAIT_FOR_MEMORY
+					| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0));
+		} else {
+			mappingsQueue->Add(mapping);
+		}
 	}
 }
 

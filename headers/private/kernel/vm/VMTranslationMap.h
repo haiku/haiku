@@ -84,7 +84,8 @@ public:
 protected:
 			void				PageUnmapped(VMArea* area,
 									page_num_t pageNumber, bool accessed,
-									bool modified, bool updatePageQueue);
+									bool modified, bool updatePageQueue,
+									VMAreaMappings* mappingsQueue = NULL);
 			void				UnaccessedPageUnmapped(VMArea* area,
 									page_num_t pageNumber);
 
