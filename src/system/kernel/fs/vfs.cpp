@@ -5286,6 +5286,7 @@ vfs_init(kernel_args* args)
 		B_PATH_NAME_LENGTH, 8, NULL, NULL, NULL);
 	if (sPathNameCache == NULL)
 		panic("vfs_init: error creating path name object_cache\n");
+	object_cache_set_minimum_reserve(sPathNameCache, 1);
 
 	sVnodeCache = create_object_cache("vfs vnodes",
 		sizeof(struct vnode), 8, NULL, NULL, NULL);
