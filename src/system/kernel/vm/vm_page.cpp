@@ -3880,7 +3880,7 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 		if (freedCachedPages > 0)
 			unreserve_pages(freedCachedPages);
 
-		if (nextIndex - start < length) {
+		if ((nextIndex - start) < length) {
 			// failed to allocate all cached pages -- free all that we've got
 			freeClearQueueLocker.Lock();
 			allocate_page_run_cleanup(freePages, clearPages);
@@ -3903,9 +3903,6 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 		freePages.TakeFrom(&clearPages);
 		sPageQueues[pageState].AppendUnlocked(freePages, length);
 	}
-
-	// Note: We don't unreserve the pages since we pulled them out of the
-	// free/clear queues without adjusting sUnreservedFreePages.
 
 #if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
 	AbstractTraceEntryWithStackTrace* traceEntry
@@ -3988,7 +3985,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 	// ones, the odds are that we won't find enough contiguous ones, so we skip
 	// the first iteration in this case.
 	int32 freePages = sUnreservedFreePages;
-	int useCached = freePages > 0 && (page_num_t)freePages > 2 * length ? 0 : 1;
+	bool useCached = (freePages > 0) && ((page_num_t)freePages > (length * 2));
 
 	for (;;) {
 		if (alignmentMask != 0 || boundaryMask != 0) {
@@ -4000,7 +3997,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 
 			// enforce boundary
 			if (boundaryMask != 0 && ((offsetStart ^ (offsetStart
-				+ length - 1)) & boundaryMask) != 0) {
+					+ length - 1)) & boundaryMask) != 0) {
 				offsetStart = (offsetStart + length - 1) & boundaryMask;
 			}
 
@@ -4008,10 +4005,10 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 		}
 
 		if (start + length > end) {
-			if (useCached == 0) {
+			if (!useCached) {
 				// The first iteration with free pages only was unsuccessful.
 				// Try again also considering cached pages.
-				useCached = 1;
+				useCached = true;
 				start = requestedStart;
 				continue;
 			}
@@ -4033,7 +4030,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 			uint32 pageState = sPages[start + i].State();
 			if (pageState != PAGE_STATE_FREE
 				&& pageState != PAGE_STATE_CLEAR
-				&& (pageState != PAGE_STATE_CACHED || useCached == 0)) {
+				&& (pageState != PAGE_STATE_CACHED || !useCached)) {
 				foundRun = false;
 				break;
 			}
