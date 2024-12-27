@@ -1515,7 +1515,7 @@ reserve_some_pages(uint32 count, uint32 dontTouch)
 static void
 wake_up_page_reservation_waiters()
 {
-	MutexLocker pageDeficitLocker(sPageDeficitLock);
+	ASSERT_LOCKED_MUTEX(&sPageDeficitLock);
 
 	// TODO: If this is a low priority thread, we might want to disable
 	// interrupts or otherwise ensure that we aren't unscheduled. Otherwise
@@ -1544,8 +1544,10 @@ static inline void
 unreserve_pages(uint32 count)
 {
 	atomic_add(&sUnreservedFreePages, count);
-	if (atomic_get(&sUnsatisfiedPageReservations) != 0)
+	if (atomic_get(&sUnsatisfiedPageReservations) != 0) {
+		MutexLocker pageDeficitLocker(sPageDeficitLock);
 		wake_up_page_reservation_waiters();
+	}
 }
 
 
@@ -3154,6 +3156,13 @@ reserve_pages(uint32 missing, int priority, bool dontWait)
 
 			waiter.reserved += otherWaiter->reserved;
 			otherWaiter->reserved = 0;
+		} else if (otherWaiter != NULL && waiter.reserved != 0) {
+			// We're lower-priority than the head waiter, but we have a reservation.
+			// We must have raced with other threads somehow. Unreserve and try again.
+			sUnsatisfiedPageReservations -= missing;
+			atomic_add(&sUnreservedFreePages, waiter.reserved);
+			wake_up_page_reservation_waiters();
+			continue;
 		}
 
 		sPageReservationWaiters.InsertBefore(otherWaiter, &waiter);
