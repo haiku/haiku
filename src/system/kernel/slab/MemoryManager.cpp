@@ -1505,7 +1505,6 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 	cache->ReleaseRefAndUnlock();
 
 	vm_page_unreserve_pages(&reservation);
-
 	return B_OK;
 }
 
@@ -1550,10 +1549,10 @@ MemoryManager::_UnmapChunk(VMArea* vmArea, addr_t address, size_t size,
 			// the iterator is remove-safe
 		vm_page_free_etc(cache, page, &reservation);
 	}
-	vm_page_unreserve_pages(&reservation);
 
 	cache->ReleaseRefAndUnlock();
 
+	vm_page_unreserve_pages(&reservation);
 	vm_unreserve_memory(size);
 	return B_OK;
 }
