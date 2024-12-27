@@ -3161,6 +3161,7 @@ reserve_pages(uint32 missing, int priority, bool dontWait)
 			// We're lower-priority than the head waiter, but we have a reservation.
 			// We must have raced with other threads somehow. Unreserve and try again.
 			sUnsatisfiedPageReservations -= missing;
+			missing += waiter.reserved;
 			atomic_add(&sUnreservedFreePages, waiter.reserved);
 			wake_up_page_reservation_waiters();
 			continue;
