@@ -3483,6 +3483,7 @@ unmap_and_free_physical_pages(VMTranslationMap* map, addr_t start, addr_t end)
 	map->Unmap(start, end);
 
 	// unreserve the memory
+	vm_unreserve_memory(reservation.count * B_PAGE_SIZE);
 	vm_page_unreserve_pages(&reservation);
 }
 
