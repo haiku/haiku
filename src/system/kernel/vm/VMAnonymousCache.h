@@ -77,6 +77,8 @@ public:
 
 	virtual	void				Merge(VMCache* source);
 
+	virtual	status_t			AcquireUnreferencedStoreRef();
+
 protected:
 	virtual	void				DeleteObject();
 

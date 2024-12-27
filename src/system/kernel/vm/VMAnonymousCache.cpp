@@ -1055,6 +1055,14 @@ VMAnonymousCache::Merge(VMCache* _source)
 }
 
 
+status_t
+VMAnonymousCache::AcquireUnreferencedStoreRef()
+{
+	// No reference needed.
+	return B_OK;
+}
+
+
 void
 VMAnonymousCache::DeleteObject()
 {
