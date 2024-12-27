@@ -369,8 +369,7 @@ get_free_pgtable(kernel_args* args, phys_addr_t* phys_addr, addr_t* virt_addr)
 
 status_t
 ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
-	phys_addr_t physicalAddress, uint8 attributes,
-	page_num_t (*get_free_page)(kernel_args*))
+	phys_addr_t physicalAddress, uint8 attributes)
 {
 	// check to see if a page table exists for this range
 	int index = VADDR_TO_PDENT(virtualAddress);

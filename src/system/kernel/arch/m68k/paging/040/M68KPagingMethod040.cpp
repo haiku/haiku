@@ -467,8 +467,7 @@ M68KPagingMethod040::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 
 status_t
 M68KPagingMethod040::MapEarly(kernel_args* args, addr_t virtualAddress,
-	phys_addr_t physicalAddress, uint8 attributes,
-	phys_addr_t (*get_free_page)(kernel_args*))
+	phys_addr_t physicalAddress, uint8 attributes)
 {
 	// XXX horrible back door to map a page quickly regardless of translation
 	// map object, etc. used only during VM setup.
@@ -494,7 +493,7 @@ M68KPagingMethod040::MapEarly(kernel_args* args, addr_t virtualAddress,
 	if (PRE_TYPE(pr[index]) != DT_ROOT) {
 		unsigned aindex = index & ~(NUM_DIRTBL_PER_PAGE-1); /* aligned */
 		TRACE("missing page root entry %d ai %d\n", index, aindex);
-		tbl = get_free_page(args) * B_PAGE_SIZE;
+		tbl = vm_allocate_early_physical_page(args) * B_PAGE_SIZE;
 		if (!tbl)
 			return ENOMEM;
 		TRACE("040::MapEarly: asked for free page for pgdir. 0x%lx\n", tbl);
@@ -518,7 +517,7 @@ M68KPagingMethod040::MapEarly(kernel_args* args, addr_t virtualAddress,
 	if (PDE_TYPE(pd[index]) != DT_DIR) {
 		unsigned aindex = index & ~(NUM_PAGETBL_PER_PAGE-1); /* aligned */
 		TRACE("missing page dir entry %d ai %d\n", index, aindex);
-		tbl = get_free_page(args) * B_PAGE_SIZE;
+		tbl = vm_allocate_early_physical_page(args) * B_PAGE_SIZE;
 		if (!tbl)
 			return ENOMEM;
 		TRACE("early_map: asked for free page for pgtable. 0x%lx\n", tbl);
@@ -555,7 +554,7 @@ M68KPagingMethod040::MapEarly(kernel_args* args, addr_t virtualAddress,
 		phys_addr_t pgtable;
 		page_directory_entry *e;
 		// we need to allocate a pgtable
-		pgtable = get_free_page(args);
+		pgtable = vm_allocate_early_physical_page(args);
 		// pgtable is in pages, convert to physical address
 		pgtable *= B_PAGE_SIZE;
 

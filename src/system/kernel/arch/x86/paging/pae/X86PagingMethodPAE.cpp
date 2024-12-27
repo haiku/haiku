@@ -284,7 +284,7 @@ private:
 	phys_addr_t _Allocate32BitPage()
 	{
 		phys_addr_t physicalAddress
-			= (phys_addr_t)vm_allocate_early_physical_page_etc(fKernelArgs, 0xffffffff)
+			= (phys_addr_t)vm_allocate_early_physical_page(fKernelArgs, 0xffffffff)
 				* B_PAGE_SIZE;
 		if (physicalAddress == 0 || physicalAddress > 0xffffffff) {
 			panic("Failed to allocate 32-bit-addressable page for the switch "
@@ -674,8 +674,7 @@ X86PagingMethodPAE::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 
 status_t
 X86PagingMethodPAE::MapEarly(kernel_args* args, addr_t virtualAddress,
-	phys_addr_t physicalAddress, uint8 attributes,
-	page_num_t (*get_free_page)(kernel_args*))
+	phys_addr_t physicalAddress, uint8 attributes)
 {
 	// check to see if a page table exists for this range
 	pae_page_directory_entry* pageDirEntry = PageDirEntryForAddress(
@@ -683,7 +682,7 @@ X86PagingMethodPAE::MapEarly(kernel_args* args, addr_t virtualAddress,
 	pae_page_table_entry* pageTable;
 	if ((*pageDirEntry & X86_PAE_PDE_PRESENT) == 0) {
 		// we need to allocate a page table
-		phys_addr_t physicalPageTable = get_free_page(args) * B_PAGE_SIZE;
+		phys_addr_t physicalPageTable = vm_allocate_early_physical_page(args) * B_PAGE_SIZE;
 
 		TRACE("X86PagingMethodPAE::MapEarly(): asked for free page for "
 			"page table: %#" B_PRIxPHYSADDR "\n", physicalPageTable);

@@ -392,8 +392,7 @@ X86PagingMethod32Bit::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 
 status_t
 X86PagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
-	phys_addr_t physicalAddress, uint8 attributes,
-	page_num_t (*get_free_page)(kernel_args*))
+	phys_addr_t physicalAddress, uint8 attributes)
 {
 	// XXX horrible back door to map a page quickly regardless of translation
 	// map object, etc. used only during VM setup.
@@ -408,7 +407,7 @@ X86PagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 		phys_addr_t pgtable;
 		page_directory_entry *e;
 		// we need to allocate a pgtable
-		pgtable = get_free_page(args);
+		pgtable = vm_allocate_early_physical_page(args);
 		// pgtable is in pages, convert to physical address
 		pgtable *= B_PAGE_SIZE;
 

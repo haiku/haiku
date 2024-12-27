@@ -30,8 +30,7 @@ public:
 	virtual	status_t			MapEarly(kernel_args* args,
 									addr_t virtualAddress,
 									phys_addr_t physicalAddress,
-									uint8 attributes,
-									page_num_t (*get_free_page)(kernel_args*));
+									uint8 attributes);
 
 	virtual	bool				IsKernelPageAccessible(addr_t virtualAddress,
 									uint32 protection);

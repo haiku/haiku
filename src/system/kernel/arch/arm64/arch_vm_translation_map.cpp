@@ -155,7 +155,7 @@ TableFromPa(phys_addr_t pa)
 
 static void
 map_page_early(phys_addr_t ptPa, int level, addr_t va, phys_addr_t pa,
-	phys_addr_t (*get_free_page)(kernel_args*), kernel_args* args)
+	kernel_args* args)
 {
 	int tableBits = page_bits - 3;
 	uint64_t tableMask = (1UL << tableBits) - 1;
@@ -176,7 +176,7 @@ map_page_early(phys_addr_t ptPa, int level, addr_t va, phys_addr_t pa,
 		if (type == 0x3) {
 			table = pteVal & kPteAddrMask;
 		} else {
-			table = get_free_page(args) << page_bits;
+			table = vm_allocate_early_physical_page(args) << page_bits;
 			dprintf("early: pulling page %lx\n", table);
 			uint64_t* newTableVa = TableFromPa(table);
 
@@ -195,14 +195,13 @@ map_page_early(phys_addr_t ptPa, int level, addr_t va, phys_addr_t pa,
 			atomic_set64((int64*) pte, table | 0x3);
 		}
 
-		map_page_early(table, level + 1, va, pa, get_free_page, args);
+		map_page_early(table, level + 1, va, pa, args);
 	}
 }
 
 
 status_t
-arch_vm_translation_map_early_map(kernel_args* args, addr_t va, phys_addr_t pa, uint8 attributes,
-	phys_addr_t (*get_free_page)(kernel_args*))
+arch_vm_translation_map_early_map(kernel_args* args, addr_t va, phys_addr_t pa, uint8 attributes)
 {
 	int va_bits = 64 - tsz;
 	uint64_t va_mask = (1UL << va_bits) - 1;
@@ -213,7 +212,7 @@ arch_vm_translation_map_early_map(kernel_args* args, addr_t va, phys_addr_t pa, 
 	va &= va_mask;
 	pa |= VMSAv8TranslationMap::GetMemoryAttr(attributes, 0, true);
 
-	map_page_early(ptPa, level, va, pa, get_free_page, args);
+	map_page_early(ptPa, level, va, pa, args);
 
 	return B_OK;
 }

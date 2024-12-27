@@ -42,8 +42,7 @@ char sPhysicalPageMapperData[sizeof(RISCV64VMPhysicalPageMapper)];
 // TODO: Consolidate function with RISCV64VMTranslationMap
 
 static Pte*
-LookupPte(addr_t virtAdr, bool alloc, kernel_args* args,
-	phys_addr_t (*get_free_page)(kernel_args *))
+LookupPte(addr_t virtAdr, bool alloc, kernel_args* args)
 {
 	Pte *pte = (Pte*)VirtFromPhys(sPageTable);
 	for (int level = 2; level > 0; level --) {
@@ -51,7 +50,7 @@ LookupPte(addr_t virtAdr, bool alloc, kernel_args* args,
 		if (!pte->isValid) {
 			if (!alloc)
 				return NULL;
-			page_num_t ppn = get_free_page(args);
+			page_num_t ppn = vm_allocate_early_physical_page(args);
 			if (ppn == 0)
 				return NULL;
 			memset((Pte*)VirtFromPhys(B_PAGE_SIZE * ppn), 0, B_PAGE_SIZE);
@@ -70,11 +69,10 @@ LookupPte(addr_t virtAdr, bool alloc, kernel_args* args,
 
 
 static void
-Map(addr_t virtAdr, phys_addr_t physAdr, uint64 flags, kernel_args* args,
-	phys_addr_t (*get_free_page)(kernel_args *))
+Map(addr_t virtAdr, phys_addr_t physAdr, uint64 flags, kernel_args* args)
 {
 	// dprintf("Map(0x%" B_PRIxADDR ", 0x%" B_PRIxADDR ")\n", virtAdr, physAdr);
-	Pte* pte = LookupPte(virtAdr, true, args, get_free_page);
+	Pte* pte = LookupPte(virtAdr, true, args);
 	if (pte == NULL) panic("can't allocate page table");
 
 	Pte newPte {
@@ -162,8 +160,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 
 status_t
 arch_vm_translation_map_early_map(kernel_args *args,
-	addr_t virtAdr, phys_addr_t physAdr, uint8 attributes,
-	phys_addr_t (*get_free_page)(kernel_args *))
+	addr_t virtAdr, phys_addr_t physAdr, uint8 attributes)
 {
 	//dprintf("early_map(%#" B_PRIxADDR ", %#" B_PRIxADDR ")\n", virtAdr, physAdr);
 	Pte flags {
@@ -171,7 +168,7 @@ arch_vm_translation_map_early_map(kernel_args *args,
 		.isWrite = (attributes & B_KERNEL_WRITE_AREA)   != 0,
 		.isExec  = (attributes & B_KERNEL_EXECUTE_AREA) != 0,
 	};
-	Map(virtAdr, physAdr, flags.val, args, get_free_page);
+	Map(virtAdr, physAdr, flags.val, args);
 	return B_OK;
 }
 

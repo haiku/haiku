@@ -123,8 +123,7 @@ X86PagingMethod64Bit::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 
 status_t
 X86PagingMethod64Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
-	phys_addr_t physicalAddress, uint8 attributes,
-	page_num_t (*get_free_page)(kernel_args*))
+	phys_addr_t physicalAddress, uint8 attributes)
 {
 	TRACE("X86PagingMethod64Bit::MapEarly(%#" B_PRIxADDR ", %#" B_PRIxPHYSADDR
 		", %#" B_PRIx8 ")\n", virtualAddress, physicalAddress, attributes);
@@ -148,7 +147,7 @@ X86PagingMethod64Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 	uint64* pdpte = &virtualPDPT[VADDR_TO_PDPTE(virtualAddress)];
 	uint64* virtualPageDir;
 	if ((*pdpte & X86_64_PDPTE_PRESENT) == 0) {
-		phys_addr_t physicalPageDir = get_free_page(args) * B_PAGE_SIZE;
+		phys_addr_t physicalPageDir = vm_allocate_early_physical_page(args) * B_PAGE_SIZE;
 
 		TRACE("X86PagingMethod64Bit::MapEarly(): creating page directory for va"
 			" %#" B_PRIxADDR " at %#" B_PRIxPHYSADDR "\n", virtualAddress,
@@ -172,7 +171,7 @@ X86PagingMethod64Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 	uint64* pde = &virtualPageDir[VADDR_TO_PDE(virtualAddress)];
 	uint64* virtualPageTable;
 	if ((*pde & X86_64_PDE_PRESENT) == 0) {
-		phys_addr_t physicalPageTable = get_free_page(args) * B_PAGE_SIZE;
+		phys_addr_t physicalPageTable = vm_allocate_early_physical_page(args) * B_PAGE_SIZE;
 
 		TRACE("X86PagingMethod64Bit::MapEarly(): creating page table for va"
 			" %#" B_PRIxADDR " at %#" B_PRIxPHYSADDR "\n", virtualAddress,

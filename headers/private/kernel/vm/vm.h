@@ -58,8 +58,7 @@ status_t vm_init_post_thread(struct kernel_args *args);
 status_t vm_init_post_modules(struct kernel_args *args);
 void vm_free_kernel_args(struct kernel_args *args);
 void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
-page_num_t vm_allocate_early_physical_page(kernel_args *args);
-page_num_t vm_allocate_early_physical_page_etc(kernel_args *args, phys_addr_t maxAddress = 0);
+page_num_t vm_allocate_early_physical_page(kernel_args *args, phys_addr_t maxAddress = 0);
 addr_t vm_allocate_early(struct kernel_args *args, size_t virtualSize,
 	size_t physicalSize, uint32 attributes, addr_t alignment);
 

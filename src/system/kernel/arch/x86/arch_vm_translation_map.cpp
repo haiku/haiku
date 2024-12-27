@@ -143,12 +143,12 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 
 status_t
 arch_vm_translation_map_early_map(kernel_args *args, addr_t va, phys_addr_t pa,
-	uint8 attributes, phys_addr_t (*get_free_page)(kernel_args *))
+	uint8 attributes)
 {
 	TRACE("early_tmap: entry pa %#" B_PRIxPHYSADDR " va %#" B_PRIxADDR "\n", pa,
 		va);
 
-	return gX86PagingMethod->MapEarly(args, va, pa, attributes, get_free_page);
+	return gX86PagingMethod->MapEarly(args, va, pa, attributes);
 }
 
 

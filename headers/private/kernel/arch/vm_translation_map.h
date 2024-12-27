@@ -25,10 +25,9 @@ status_t arch_vm_translation_map_init_post_area(struct kernel_args *args);
 status_t arch_vm_translation_map_init_post_sem(struct kernel_args *args);
 
 // Quick function to map a page in regardless of map context. Used in VM
-// initialization before most vm data structures exist.
+// initialization before most VM data structures exist.
 status_t arch_vm_translation_map_early_map(struct kernel_args *args, addr_t va,
-	phys_addr_t pa, uint8 attributes,
-	phys_addr_t (*get_free_page)(struct kernel_args *));
+	phys_addr_t pa, uint8 attributes);
 
 bool arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	uint32 protection);
