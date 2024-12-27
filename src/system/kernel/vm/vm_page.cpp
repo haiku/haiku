@@ -179,8 +179,8 @@ struct PageReservationWaiter
 		: public DoublyLinkedListLinkImpl<PageReservationWaiter> {
 	Thread*	thread;
 	uint32	dontTouch;		// reserve not to touch
-	uint32	missing;		// pages missing for the reservation
-	int32	threadPriority;
+	uint32	requested;		// total pages requested
+	uint32	reserved;		// pages reserved so far
 
 	bool operator<(const PageReservationWaiter& other) const
 	{
@@ -188,7 +188,7 @@ struct PageReservationWaiter
 		// and (secondarily) descending thread priority.
 		if (dontTouch != other.dontTouch)
 			return dontTouch < other.dontTouch;
-		return threadPriority > other.threadPriority;
+		return thread->priority > other.thread->priority;
 	}
 };
 
@@ -1197,9 +1197,9 @@ dump_page_stats(int argc, char **argv)
 	for (PageReservationWaiterList::Iterator it
 			= sPageReservationWaiters.GetIterator();
 		PageReservationWaiter* waiter = it.Next();) {
-		kprintf("  %6" B_PRId32 ": missing: %6" B_PRIu32
+		kprintf("  %6" B_PRId32 ": requested: %6" B_PRIu32 ", reserved: %6" B_PRIu32
 			", don't touch: %6" B_PRIu32 "\n", waiter->thread->id,
-			waiter->missing, waiter->dontTouch);
+			waiter->requested, waiter->reserved, waiter->dontTouch);
 	}
 
 	kprintf("\nfree queue: %p, count = %" B_PRIuPHYSADDR "\n", &sFreePageQueue,
@@ -1523,19 +1523,18 @@ wake_up_page_reservation_waiters()
 	// prevents us from running.
 
 	while (PageReservationWaiter* waiter = sPageReservationWaiters.Head()) {
-		int32 reserved = reserve_some_pages(waiter->missing,
+		int32 reserved = reserve_some_pages(waiter->requested - waiter->reserved,
 			waiter->dontTouch);
 		if (reserved == 0)
 			return;
 
-		atomic_add(&sUnsatisfiedPageReservations, -reserved);
-		waiter->missing -= reserved;
+		sUnsatisfiedPageReservations -= reserved;
+		waiter->reserved += reserved;
 
-		if (waiter->missing > 0)
+		if (waiter->reserved != waiter->requested)
 			return;
 
 		sPageReservationWaiters.Remove(waiter);
-
 		thread_unblock(waiter->thread, B_OK);
 	}
 }
@@ -3102,7 +3101,8 @@ page_daemon(void* /*unused*/)
 static uint32
 reserve_pages(uint32 count, int priority, bool dontWait)
 {
-	int32 dontTouch = kPageReserveForPriority[priority];
+	const uint32 requested = count;
+	const int32 dontTouch = kPageReserveForPriority[priority];
 
 	while (true) {
 		count -= reserve_some_pages(count, dontTouch);
@@ -3112,7 +3112,7 @@ reserve_pages(uint32 count, int priority, bool dontWait)
 		if (sUnsatisfiedPageReservations == 0) {
 			count -= free_cached_pages(count, dontWait);
 			if (count == 0)
-				return count;
+				return 0;
 		}
 
 		if (dontWait)
@@ -3122,28 +3122,38 @@ reserve_pages(uint32 count, int priority, bool dontWait)
 
 		MutexLocker pageDeficitLocker(sPageDeficitLock);
 
-		bool notifyDaemon = sUnsatisfiedPageReservations == 0;
-		sUnsatisfiedPageReservations += count;
-
 		if (atomic_get(&sUnreservedFreePages) > dontTouch) {
 			// the situation changed
-			sUnsatisfiedPageReservations -= count;
 			continue;
 		}
 
+		const bool notifyDaemon = (sUnsatisfiedPageReservations == 0);
+		sUnsatisfiedPageReservations += count;
+
 		PageReservationWaiter waiter;
-		waiter.dontTouch = dontTouch;
-		waiter.missing = count;
 		waiter.thread = thread_get_current_thread();
-		waiter.threadPriority = waiter.thread->priority;
+		waiter.dontTouch = dontTouch;
+		waiter.requested = requested;
+		waiter.reserved = requested - count;
 
 		// insert ordered (i.e. after all waiters with higher or equal priority)
 		PageReservationWaiter* otherWaiter = NULL;
 		for (PageReservationWaiterList::Iterator it
-				= sPageReservationWaiters.GetIterator();
-			(otherWaiter = it.Next()) != NULL;) {
+					= sPageReservationWaiters.GetIterator();
+				(otherWaiter = it.Next()) != NULL;) {
 			if (waiter < *otherWaiter)
 				break;
+		}
+
+		// If we're higher-priority than the head waiter, steal its reservation.
+		if (otherWaiter != NULL && sPageReservationWaiters.Head() == otherWaiter) {
+			if (otherWaiter->reserved >= count) {
+				otherWaiter->reserved -= count;
+				return 0;
+			}
+
+			waiter.reserved += otherWaiter->reserved;
+			otherWaiter->reserved = 0;
 		}
 
 		sPageReservationWaiters.InsertBefore(otherWaiter, &waiter);
@@ -3443,7 +3453,7 @@ vm_page_init(kernel_args *args)
 	// keep things tight. free + cached is the pool of immediately allocatable
 	// pages. We want a few inactive pages, so when we're actually paging, we
 	// have a reasonably large set of pages to work with.
-	if (sUnreservedFreePages < 16 * 1024) {
+	if (sUnreservedFreePages < (16 * 1024)) {
 		sFreeOrCachedPagesTarget = sFreePagesTarget + 128;
 		sInactivePagesTarget = sFreePagesTarget / 3;
 	} else {
