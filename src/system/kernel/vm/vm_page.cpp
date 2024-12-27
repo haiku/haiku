@@ -3154,6 +3154,7 @@ reserve_pages(uint32 missing, int priority, bool dontWait)
 				return 0;
 			}
 
+			missing -= otherWaiter->reserved;
 			waiter.reserved += otherWaiter->reserved;
 			otherWaiter->reserved = 0;
 		} else if (!sPageReservationWaiters.IsEmpty() && waiter.reserved != 0) {
