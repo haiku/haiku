@@ -649,10 +649,10 @@ Team::LockTeamAndParent(bool dontLockParentIfKernel)
 
 	while (true) {
 		// If the team doesn't have a parent, we're done. Otherwise try to lock
-		// the parent.This will succeed in most cases, simplifying things.
+		// the parent. This will succeed in most cases, simplifying things.
 		Team* parent = this->parent;
 		if (parent == NULL || (dontLockParentIfKernel && parent == sKernelTeam)
-			|| parent->TryLock()) {
+				|| parent->TryLock()) {
 			return;
 		}
 
@@ -734,10 +734,7 @@ Team::LockTeamAndProcessGroup()
 		// Try to lock the group. This will succeed in most cases, simplifying
 		// things.
 		ProcessGroup* group = this->group;
-		if (group == NULL)
-			return;
-
-		if (group->TryLock())
+		if (group == NULL || group->TryLock())
 			return;
 
 		// get a temporary reference to the group, unlock this team, lock the
