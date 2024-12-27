@@ -384,6 +384,9 @@ io_request_length(const io_request* request)
 status_t
 read_from_io_request(io_request* _request, void* buffer, size_t size)
 {
+	if (size == 0)
+		return B_OK;
+
 	HaikuKernelIORequest* request = (HaikuKernelIORequest*)_request;
 
 	// send the request

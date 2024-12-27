@@ -1022,6 +1022,9 @@ FUSEVolume::DoIO(void* _node, void* _cookie, const IORequestInfo& requestInfo)
 	FUSENode* node = (FUSENode*)_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
 
+	if (requestInfo.length == 0)
+		return B_OK;
+
 	NodeReadLocker nodeLocker(this, node, true);
 	if (nodeLocker.Status() != B_OK)
 		RETURN_ERROR(nodeLocker.Status());

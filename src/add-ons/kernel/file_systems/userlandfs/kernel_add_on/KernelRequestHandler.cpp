@@ -803,7 +803,7 @@ KernelRequestHandler::_HandleRequest(ReadFromIORequestRequest* request)
 	reply->error = result;
 
 	// send the reply
-	if (reply->error == B_OK && size > 0) {
+	if (reply->error == B_OK) {
 		SingleReplyRequestHandler handler(RECEIPT_ACK_REPLY);
 		return fPort->SendRequest(&allocator, &handler);
 	}
