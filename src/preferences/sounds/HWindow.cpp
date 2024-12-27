@@ -418,6 +418,7 @@ HWindow::_SetupMenuField()
 
 	for (size_t i = 0;
 		i < sizeof(whichDirectories) / sizeof(whichDirectories[0]); i++) {
+		struct stat fileStat;
 		BPath path;
 		BDirectory dir;
 		BEntry entry;
@@ -430,6 +431,11 @@ HWindow::_SetupMenuField()
 			err = dir.GetNextEntry(&entry, true);
 			if (entry.InitCheck() != B_NO_ERROR)
 				break;
+
+			if (entry.GetStat(&fileStat) == B_OK) {
+				if (S_ISDIR(fileStat.st_mode))
+					continue;
+			}
 
 			entry.GetPath(&item_path);
 
