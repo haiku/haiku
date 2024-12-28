@@ -46,7 +46,7 @@ VMTranslationMap::DebugMarkRangePresent(addr_t start, addr_t end,
 */
 void
 VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
-	bool updatePageQueue)
+	bool updatePageQueue, bool deletingAddressSpace)
 {
 	ASSERT(base % B_PAGE_SIZE == 0);
 	ASSERT(size % B_PAGE_SIZE == 0);
@@ -62,57 +62,113 @@ VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page != NULL) {
 				DEBUG_PAGE_ACCESS_START(page);
-				UnmapPage(area, address, updatePageQueue);
+				UnmapPage(area, address, updatePageQueue, deletingAddressSpace);
 				DEBUG_PAGE_ACCESS_END(page);
 			} else
-				UnmapPage(area, address, updatePageQueue);
+				UnmapPage(area, address, updatePageQueue, deletingAddressSpace);
 		}
 	}
 #else
 	for (; address != end; address += B_PAGE_SIZE)
-		UnmapPage(area, address, updatePageQueue);
+		UnmapPage(area, address, updatePageQueue, deletingAddressSpace);
 #endif
 }
 
 
 /*!	Unmaps all of an area's pages.
+
 	If \a deletingAddressSpace is \c true, the address space the area belongs to
 	is in the process of being destroyed and isn't used by anyone anymore. For
 	some architectures this can be used for optimizations (e.g. not unmapping
 	pages or at least not needing to invalidate TLB entries).
+
 	If \a ignoreTopCachePageFlags is \c true, the area is in the process of
 	being destroyed and its top cache is otherwise unreferenced. I.e. all mapped
 	pages that live in the top cache area going to be freed and the page
 	accessed and modified flags don't need to be propagated.
 
-	The default implementation just iterates over all virtual pages of the
-	area and calls UnmapPage(). This is obviously not particularly efficient.
+	The default implementation iterates over all mapping objects, and calls
+	UnmapPage() (with \c _flags specified to avoid calls to PageUnmapped).
+	It skips unmapping pages owned by the top cache if \a deletingAddressSpace
+	is \c true, or if \a ignoreTopCachePageFlags is set. This behavior should
+	be sufficient for most (if not all) architectures.
 */
 void
 VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	bool ignoreTopCachePageFlags)
 {
-	addr_t address = area->Base();
-	addr_t end = address + area->Size();
-#if DEBUG_PAGE_ACCESS
-	for (; address != end; address += B_PAGE_SIZE) {
-		phys_addr_t physicalAddress;
-		uint32 flags;
-		if (Query(address, &physicalAddress, &flags) == B_OK
-			&& (flags & PAGE_PRESENT) != 0) {
-			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
-			if (page != NULL) {
+	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
+		UnmapPages(area, area->Base(), area->Size(), true, deletingAddressSpace);
+		return;
+	}
+
+	const bool unmapPages = !deletingAddressSpace || !ignoreTopCachePageFlags;
+
+	Lock();
+
+	VMAreaMappings mappings;
+	mappings.TakeFrom(&area->mappings);
+
+	for (VMAreaMappings::Iterator it = mappings.GetIterator();
+			vm_page_mapping* mapping = it.Next();) {
+		vm_page* page = mapping->page;
+		page->mappings.Remove(mapping);
+
+		VMCache* cache = page->Cache();
+
+		bool pageFullyUnmapped = false;
+		if (!page->IsMapped()) {
+			atomic_add(&gMappedPagesCount, -1);
+			pageFullyUnmapped = true;
+		}
+
+		if (unmapPages || cache != area->cache) {
+			const addr_t address = area->Base()
+				+ ((page->cache_offset * B_PAGE_SIZE) - area->cache_offset);
+
+			// UnmapPage should skip flushing and calling PageUnmapped when we pass &flags.
+			uint32 flags = 0;
+			status_t status = UnmapPage(area, address, false, deletingAddressSpace, &flags);
+			if (status == B_ENTRY_NOT_FOUND) {
+				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
+					"has no translation map entry", page, area, address);
+				continue;
+			}
+			if (status != B_OK) {
+				panic("unmapping page %p for area %p (%#" B_PRIxADDR ") failed: %x",
+					page, area, address, status);
+				continue;
+			}
+
+			// Transfer the accessed/dirty flags to the page.
+			if ((flags & PAGE_ACCESSED) != 0)
+				page->accessed = true;
+			if ((flags & PAGE_MODIFIED) != 0)
+				page->modified = true;
+
+			if (pageFullyUnmapped) {
 				DEBUG_PAGE_ACCESS_START(page);
-				UnmapPage(area, address, true);
+
+				if (cache->temporary)
+					vm_page_set_state(page, PAGE_STATE_INACTIVE);
+				else if (page->modified)
+					vm_page_set_state(page, PAGE_STATE_MODIFIED);
+				else
+					vm_page_set_state(page, PAGE_STATE_CACHED);
+
 				DEBUG_PAGE_ACCESS_END(page);
-			} else
-				UnmapPage(area, address, true);
+			}
 		}
 	}
-#else
-	for (; address != end; address += B_PAGE_SIZE)
-		UnmapPage(area, address, true);
-#endif
+
+	// This should Flush(), if necessary.
+	Unlock();
+
+	bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
+	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
+		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
+	while (vm_page_mapping* mapping = mappings.RemoveHead())
+		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
 }
 
 

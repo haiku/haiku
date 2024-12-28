@@ -400,7 +400,8 @@ flush_va_if_accessed(uint64_t pte, addr_t va, int asid)
 }
 
 bool
-VMSAv8TranslationMap::FlushVAIfAccessed(uint64_t pte, addr_t va) {
+VMSAv8TranslationMap::FlushVAIfAccessed(uint64_t pte, addr_t va)
+{
 	InterruptsSpinLocker locker(sAsidLock);
 	return flush_va_if_accessed(pte, va, fASID);
 }
@@ -633,8 +634,12 @@ VMSAv8TranslationMap::Unmap(addr_t start, addr_t end)
 
 
 status_t
-VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQueue)
+VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address,
+	bool updatePageQueue, bool deletingAddressSpace, uint32* _flags)
 {
+	ASSERT(address % B_PAGE_SIZE == 0);
+	ASSERT(_flags == NULL || !updatePageQueue);
+
 	TRACE("VMSAv8TranslationMap::UnmapPage(0x%" B_PRIxADDR "(%s), 0x%"
 		B_PRIxADDR ", %d)\n", (addr_t)area, area->name, address,
 		updatePageQueue);
@@ -647,23 +652,35 @@ VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQue
 	ProcessRange(fPageTable, fInitialLevel, address, B_PAGE_SIZE, nullptr,
 		[=, &oldPte](uint64_t* ptePtr, uint64_t effectiveVa) {
 			oldPte = atomic_get_and_set64((int64_t*)ptePtr, 0);
-			FlushVAIfAccessed(oldPte, effectiveVa);
+			if (!deletingAddressSpace)
+				FlushVAIfAccessed(oldPte, effectiveVa);
 		});
 
 	if ((oldPte & kPteValidMask) == 0)
 		return B_ENTRY_NOT_FOUND;
 
 	pinner.Unlock();
-	locker.Detach();
-	PageUnmapped(area, (oldPte & kPteAddrMask) >> fPageBits, is_pte_accessed(oldPte),
-		is_pte_dirty(oldPte), updatePageQueue);
+
+	if (_flags != NULL) {
+		locker.Detach();
+		PageUnmapped(area, (oldPte & kPteAddrMask) >> fPageBits, is_pte_accessed(oldPte),
+			is_pte_dirty(oldPte), updatePageQueue);
+	} else {
+		uint32 flags = PAGE_PRESENT;
+		if (is_pte_accessed(oldPte))
+			flags |= PAGE_ACCESSED;
+		if (is_pte_dirty(oldPte))
+			flags |= PAGE_MODIFIED;
+		*_flags = flags;
+	}
 
 	return B_OK;
 }
 
 
 void
-VMSAv8TranslationMap::UnmapPages(VMArea* area, addr_t address, size_t size, bool updatePageQueue)
+VMSAv8TranslationMap::UnmapPages(VMArea* area, addr_t address, size_t size,
+	bool updatePageQueue, bool deletingAddressSpace)
 {
 	TRACE("VMSAv8TranslationMap::UnmapPages(0x%" B_PRIxADDR "(%s), 0x%"
 		B_PRIxADDR ", 0x%" B_PRIxSIZE ", %d)\n", (addr_t)area,
@@ -703,99 +720,6 @@ VMSAv8TranslationMap::UnmapPages(VMArea* area, addr_t address, size_t size, bool
 		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
 
 	while (vm_page_mapping* mapping = queue.RemoveHead())
-		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
-}
-
-
-void
-VMSAv8TranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
-	bool ignoreTopCachePageFlags)
-{
-	TRACE("VMSAv8TranslationMap::UnmapArea(0x%" B_PRIxADDR "(%s), 0x%"
-		B_PRIxADDR ", 0x%" B_PRIxSIZE ", %d, %d)\n", (addr_t)area,
-		area->name, area->Base(), area->Size(), deletingAddressSpace,
-		ignoreTopCachePageFlags);
-
-	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
-		UnmapPages(area, area->Base(), area->Size(), true);
-		return;
-	}
-
-	bool unmapPages = !deletingAddressSpace || !ignoreTopCachePageFlags;
-
-	RecursiveLocker locker(fLock);
-	ThreadCPUPinner pinner(thread_get_current_thread());
-
-	VMAreaMappings mappings;
-	mappings.TakeFrom(&area->mappings);
-
-	for (VMAreaMappings::Iterator it = mappings.GetIterator();
-			vm_page_mapping* mapping = it.Next();) {
-
-		vm_page* page = mapping->page;
-		page->mappings.Remove(mapping);
-
-		VMCache* cache = page->Cache();
-
-		bool pageFullyUnmapped = false;
-		if (!page->IsMapped()) {
-			atomic_add(&gMappedPagesCount, -1);
-			pageFullyUnmapped = true;
-		}
-
-		if (unmapPages || cache != area->cache) {
-			addr_t address = area->Base()
-				+ ((page->cache_offset * B_PAGE_SIZE)
-				- area->cache_offset);
-
-			uint64_t oldPte = 0;
-			ProcessRange(fPageTable, fInitialLevel, address, B_PAGE_SIZE, nullptr,
-				[=, &oldPte](uint64_t* ptePtr, uint64_t effectiveVa) {
-					oldPte = atomic_get_and_set64((int64_t*)ptePtr, 0);
-					if (!deletingAddressSpace)
-						FlushVAIfAccessed(oldPte, effectiveVa);
-				});
-
-			if ((oldPte & kPteValidMask) == 0) {
-				panic("page %p has mapping for area %p "
-					"(%#" B_PRIxADDR "), but has no "
-					"page table", page, area, address);
-				continue;
-			}
-
-			// transfer the accessed/dirty flags to the page and
-			// invalidate the mapping, if necessary
-			if (is_pte_dirty(oldPte))
-				page->modified = true;
-			if (is_pte_accessed(oldPte))
-				page->accessed = true;
-
-			if (pageFullyUnmapped) {
-				DEBUG_PAGE_ACCESS_START(page);
-
-				if (cache->temporary) {
-					vm_page_set_state(page,
-						PAGE_STATE_INACTIVE);
-				} else if (page->modified) {
-					vm_page_set_state(page,
-						PAGE_STATE_MODIFIED);
-				} else {
-					vm_page_set_state(page,
-						PAGE_STATE_CACHED);
-				}
-
-				DEBUG_PAGE_ACCESS_END(page);
-			}
-		}
-	}
-
-	locker.Unlock();
-
-	bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
-	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
-		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
-
-	while (vm_page_mapping* mapping = mappings.RemoveHead())
 		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
 }
 

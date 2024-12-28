@@ -337,9 +337,10 @@ X86VMTranslationMap64Bit::DebugMarkRangePresent(addr_t start, addr_t end,
 
 status_t
 X86VMTranslationMap64Bit::UnmapPage(VMArea* area, addr_t address,
-	bool updatePageQueue)
+	bool updatePageQueue, bool deletingAddressSpace, uint32* _flags)
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
+	ASSERT(_flags == NULL || !updatePageQueue);
 
 	TRACE("X86VMTranslationMap64Bit::UnmapPage(%#" B_PRIxADDR ")\n", address);
 
@@ -367,9 +368,13 @@ X86VMTranslationMap64Bit::UnmapPage(VMArea* area, addr_t address,
 		// Note, that we only need to invalidate the address, if the
 		// accessed flags was set, since only then the entry could have been
 		// in any TLB.
-		InvalidatePage(address);
+		if (!deletingAddressSpace)
+			InvalidatePage(address);
 
-		Flush();
+		if (_flags == NULL) {
+			Flush();
+				// flush explicitly, since we directly use the lock
+		}
 
 		// NOTE: Between clearing the page table entry and Flush() other
 		// processors (actually even this processor with another thread of the
@@ -383,12 +388,21 @@ X86VMTranslationMap64Bit::UnmapPage(VMArea* area, addr_t address,
 		// (cf. pmap_remove_all()), unless I've missed something.
 	}
 
-	locker.Detach();
-		// PageUnmapped() will unlock for us
+	if (_flags == NULL) {
+		locker.Detach();
+			// PageUnmapped() will unlock for us
 
-	PageUnmapped(area, (oldEntry & X86_64_PTE_ADDRESS_MASK) / B_PAGE_SIZE,
-		(oldEntry & X86_64_PTE_ACCESSED) != 0,
-		(oldEntry & X86_64_PTE_DIRTY) != 0, updatePageQueue);
+		PageUnmapped(area, (oldEntry & X86_64_PTE_ADDRESS_MASK) / B_PAGE_SIZE,
+			(oldEntry & X86_64_PTE_ACCESSED) != 0,
+			(oldEntry & X86_64_PTE_DIRTY) != 0, updatePageQueue);
+	} else {
+		uint32 flags = PAGE_PRESENT;
+		if ((oldEntry & X86_64_PTE_ACCESSED) != 0)
+			flags |= PAGE_ACCESSED;
+		if ((oldEntry & X86_64_PTE_DIRTY) != 0)
+			flags |= PAGE_MODIFIED;
+		*_flags = flags;
+	}
 
 	return B_OK;
 }
@@ -396,7 +410,7 @@ X86VMTranslationMap64Bit::UnmapPage(VMArea* area, addr_t address,
 
 void
 X86VMTranslationMap64Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
-	bool updatePageQueue)
+	bool updatePageQueue, bool deletingAddressSpace)
 {
 	if (size == 0)
 		return;
@@ -436,7 +450,8 @@ X86VMTranslationMap64Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 				// Note, that we only need to invalidate the address, if the
 				// accessed flags was set, since only then the entry could have
 				// been in any TLB.
-				InvalidatePage(start);
+				if (!deletingAddressSpace)
+					InvalidatePage(start);
 			}
 
 			if (area->cache_type != CACHE_TYPE_DEVICE) {
@@ -464,102 +479,6 @@ X86VMTranslationMap64Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
 		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
 	while (vm_page_mapping* mapping = queue.RemoveHead())
-		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
-}
-
-
-void
-X86VMTranslationMap64Bit::UnmapArea(VMArea* area, bool deletingAddressSpace,
-	bool ignoreTopCachePageFlags)
-{
-	TRACE("X86VMTranslationMap64Bit::UnmapArea(%p)\n", area);
-
-	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
-		X86VMTranslationMap64Bit::UnmapPages(area, area->Base(), area->Size(),
-			true);
-		return;
-	}
-
-	bool unmapPages = !deletingAddressSpace || !ignoreTopCachePageFlags;
-
-	RecursiveLocker locker(fLock);
-	ThreadCPUPinner pinner(thread_get_current_thread());
-
-	VMAreaMappings mappings;
-	mappings.TakeFrom(&area->mappings);
-
-	for (VMAreaMappings::Iterator it = mappings.GetIterator();
-			vm_page_mapping* mapping = it.Next();) {
-		vm_page* page = mapping->page;
-		page->mappings.Remove(mapping);
-
-		VMCache* cache = page->Cache();
-
-		bool pageFullyUnmapped = false;
-		if (!page->IsMapped()) {
-			atomic_add(&gMappedPagesCount, -1);
-			pageFullyUnmapped = true;
-		}
-
-		if (unmapPages || cache != area->cache) {
-			addr_t address = area->Base()
-				+ ((page->cache_offset * B_PAGE_SIZE) - area->cache_offset);
-
-			uint64* entry = X86PagingMethod64Bit::PageTableEntryForAddress(
-				fPagingStructures->VirtualPMLTop(), address, fIsKernelMap,
-				false, NULL, fPageMapper, fMapCount);
-			if (entry == NULL) {
-				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
-					"has no page table", page, area, address);
-				continue;
-			}
-
-			uint64 oldEntry = X86PagingMethod64Bit::ClearTableEntry(entry);
-
-			if ((oldEntry & X86_64_PTE_PRESENT) == 0) {
-				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
-					"has no page table entry", page, area, address);
-				continue;
-			}
-
-			// transfer the accessed/dirty flags to the page and invalidate
-			// the mapping, if necessary
-			if ((oldEntry & X86_64_PTE_ACCESSED) != 0) {
-				page->accessed = true;
-
-				if (!deletingAddressSpace)
-					InvalidatePage(address);
-			}
-
-			if ((oldEntry & X86_64_PTE_DIRTY) != 0)
-				page->modified = true;
-
-			if (pageFullyUnmapped) {
-				DEBUG_PAGE_ACCESS_START(page);
-
-				if (cache->temporary)
-					vm_page_set_state(page, PAGE_STATE_INACTIVE);
-				else if (page->modified)
-					vm_page_set_state(page, PAGE_STATE_MODIFIED);
-				else
-					vm_page_set_state(page, PAGE_STATE_CACHED);
-
-				DEBUG_PAGE_ACCESS_END(page);
-			}
-		}
-
-		fMapCount--;
-	}
-
-	Flush();
-		// flush explicitely, since we directly use the lock
-
-	locker.Unlock();
-
-	bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
-	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
-		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
-	while (vm_page_mapping* mapping = mappings.RemoveHead())
 		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
 }
 

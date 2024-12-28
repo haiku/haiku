@@ -644,14 +644,12 @@ PPCVMTranslationMapClassic::DebugMarkRangePresent(addr_t start, addr_t end,
 }
 
 
-/*!	Caller must have locked the cache of the page to be unmapped.
-	This object shouldn't be locked.
-*/
 status_t
 PPCVMTranslationMapClassic::UnmapPage(VMArea* area, addr_t address,
-	bool updatePageQueue)
+	bool updatePageQueue, bool deletingAddressSpace, uint32* _flags)
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
+	ASSERT(_flags == NULL || !updatePageQueue);
 
 	RecursiveLocker locker(fLock);
 
@@ -675,10 +673,19 @@ PPCVMTranslationMapClassic::UnmapPage(VMArea* area, addr_t address,
 
 	fMapCount--;
 
-	locker.Detach();
-		// PageUnmapped() will unlock for us
+	if (_flags == NULL) {
+		locker.Detach();
+			// PageUnmapped() will unlock for us
 
-	PageUnmapped(area, pageNumber, accessed, modified, updatePageQueue);
+		PageUnmapped(area, pageNumber, accessed, modified, updatePageQueue);
+	} else {
+		uint32 flags = PAGE_PRESENT;
+		if (accessed)
+			flags |= PAGE_ACCESSED;
+		if (modified)
+			flags |= PAGE_MODIFIED;
+		*_flags = flags;
+	}
 
 	return B_OK;
 
@@ -747,7 +754,7 @@ PPCVMTranslationMapClassic::UnmapPage(VMArea* area, addr_t address,
 
 void
 PPCVMTranslationMapClassic::UnmapPages(VMArea* area, addr_t base, size_t size,
-	bool updatePageQueue)
+	bool updatePageQueue, bool deletingAddressSpace)
 {
 	panic("%s: UNIMPLEMENTED", __FUNCTION__);
 #if 0//X86
@@ -794,7 +801,8 @@ PPCVMTranslationMapClassic::UnmapPages(VMArea* area, addr_t base, size_t size,
 				// Note, that we only need to invalidate the address, if the
 				// accessed flags was set, since only then the entry could have
 				// been in any TLB.
-				InvalidatePage(start);
+				if (!deletingAddressSpace)
+					InvalidatePage(start);
 			}
 
 			if (area->cache_type != CACHE_TYPE_DEVICE) {
@@ -822,111 +830,6 @@ PPCVMTranslationMapClassic::UnmapPages(VMArea* area, addr_t base, size_t size,
 	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
 		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
 	while (vm_page_mapping* mapping = queue.RemoveHead())
-		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
-#endif
-}
-
-
-void
-PPCVMTranslationMapClassic::UnmapArea(VMArea* area, bool deletingAddressSpace,
-	bool ignoreTopCachePageFlags)
-{
-	panic("%s: UNIMPLEMENTED", __FUNCTION__);
-#if 0//X86
-	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
-		PPCVMTranslationMapClassic::UnmapPages(area, area->Base(), area->Size(),
-			true);
-		return;
-	}
-
-	bool unmapPages = !deletingAddressSpace || !ignoreTopCachePageFlags;
-
-	page_directory_entry* pd = fPagingStructures->pgdir_virt;
-
-	RecursiveLocker locker(fLock);
-
-	VMAreaMappings mappings;
-	mappings.TakeFrom(&area->mappings);
-
-	for (VMAreaMappings::Iterator it = mappings.GetIterator();
-			vm_page_mapping* mapping = it.Next();) {
-		vm_page* page = mapping->page;
-		page->mappings.Remove(mapping);
-
-		VMCache* cache = page->Cache();
-
-		bool pageFullyUnmapped = false;
-		if (!page->IsMapped()) {
-			atomic_add(&gMappedPagesCount, -1);
-			pageFullyUnmapped = true;
-		}
-
-		if (unmapPages || cache != area->cache) {
-			addr_t address = area->Base()
-				+ ((page->cache_offset * B_PAGE_SIZE) - area->cache_offset);
-
-			int index = VADDR_TO_PDENT(address);
-			if ((pd[index] & PPC_PDE_PRESENT) == 0) {
-				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
-					"has no page dir entry", page, area, address);
-				continue;
-			}
-
-			ThreadCPUPinner pinner(thread_get_current_thread());
-
-			page_table_entry* pt
-				= (page_table_entry*)fPageMapper->GetPageTableAt(
-					pd[index] & PPC_PDE_ADDRESS_MASK);
-			page_table_entry oldEntry
-				= PPCPagingMethodClassic::ClearPageTableEntry(
-					&pt[VADDR_TO_PTENT(address)]);
-
-			pinner.Unlock();
-
-			if ((oldEntry & PPC_PTE_PRESENT) == 0) {
-				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
-					"has no page table entry", page, area, address);
-				continue;
-			}
-
-			// transfer the accessed/dirty flags to the page and invalidate
-			// the mapping, if necessary
-			if ((oldEntry & PPC_PTE_ACCESSED) != 0) {
-				page->accessed = true;
-
-				if (!deletingAddressSpace)
-					InvalidatePage(address);
-			}
-
-			if ((oldEntry & PPC_PTE_DIRTY) != 0)
-				page->modified = true;
-
-			if (pageFullyUnmapped) {
-				DEBUG_PAGE_ACCESS_START(page);
-
-				if (cache->temporary)
-					vm_page_set_state(page, PAGE_STATE_INACTIVE);
-				else if (page->modified)
-					vm_page_set_state(page, PAGE_STATE_MODIFIED);
-				else
-					vm_page_set_state(page, PAGE_STATE_CACHED);
-
-				DEBUG_PAGE_ACCESS_END(page);
-			}
-		}
-
-		fMapCount--;
-	}
-
-	Flush();
-		// flush explicitely, since we directly use the lock
-
-	locker.Unlock();
-
-	bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
-	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
-		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
-	while (vm_page_mapping* mapping = mappings.RemoveHead())
 		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
 #endif
 }

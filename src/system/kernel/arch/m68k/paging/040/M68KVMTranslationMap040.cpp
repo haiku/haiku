@@ -418,14 +418,12 @@ M68KVMTranslationMap040::Unmap(addr_t start, addr_t end)
 }
 
 
-/*!	Caller must have locked the cache of the page to be unmapped.
-	This object shouldn't be locked.
-*/
 status_t
 M68KVMTranslationMap040::UnmapPage(VMArea* area, addr_t address,
-	bool updatePageQueue)
+	bool updatePageQueue, bool deletingAddressSpace, uint32* _flags)
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
+	ASSERT(_flags == NULL || !updatePageQueue);
 
 	page_root_entry* pr = fPagingStructures->pgroot_virt;
 
@@ -475,8 +473,11 @@ M68KVMTranslationMap040::UnmapPage(VMArea* area, addr_t address,
 		// Note, that we only need to invalidate the address, if the
 		// accessed flags was set, since only then the entry could have been
 		// in any TLB.
-		InvalidatePage(address);
-		Flush();
+		if (!deletingAddressSpace)
+			InvalidatePage(address);
+
+		if (_flags == NULL)
+			Flush();
 
 		// NOTE: Between clearing the page table entry and Flush() other
 		// processors (actually even this processor with another thread of the
@@ -490,12 +491,21 @@ M68KVMTranslationMap040::UnmapPage(VMArea* area, addr_t address,
 		// (cf. pmap_remove_all()), unless I've missed something.
 	}
 
-	locker.Detach();
-		// PageUnmapped() will unlock for us
+	if (_flags == NULL) {
+		locker.Detach();
+			// PageUnmapped() will unlock for us
 
-	PageUnmapped(area, (oldEntry & M68K_PTE_ADDRESS_MASK) / B_PAGE_SIZE,
-		(oldEntry & M68K_PTE_ACCESSED) != 0, (oldEntry & M68K_PTE_DIRTY) != 0,
-		updatePageQueue);
+		PageUnmapped(area, (oldEntry & M68K_PTE_ADDRESS_MASK) / B_PAGE_SIZE,
+			(oldEntry & M68K_PTE_ACCESSED) != 0, (oldEntry & M68K_PTE_DIRTY) != 0,
+			updatePageQueue);
+	} else {
+		uint32 flags = PAGE_PRESENT;
+		if ((oldEntry & M68K_PTE_ACCESSED) != 0)
+			flags |= PAGE_ACCESSED;
+		if ((oldEntry & M68K_PTE_DIRTY) != 0)
+			flags |= PAGE_MODIFIED;
+		*_flags = flags;
+	}
 
 	return B_OK;
 }
@@ -503,7 +513,7 @@ M68KVMTranslationMap040::UnmapPage(VMArea* area, addr_t address,
 
 void
 M68KVMTranslationMap040::UnmapPages(VMArea* area, addr_t base, size_t size,
-	bool updatePageQueue)
+	bool updatePageQueue, bool deletingAddressSpace)
 {
 	int index;
 
@@ -570,7 +580,8 @@ M68KVMTranslationMap040::UnmapPages(VMArea* area, addr_t base, size_t size,
 				// Note, that we only need to invalidate the address, if the
 				// accessed flags was set, since only then the entry could have
 				// been in any TLB.
-				InvalidatePage(start);
+				if (!deletingAddressSpace)
+					InvalidatePage(start);
 			}
 
 			if (area->cache_type != CACHE_TYPE_DEVICE) {
@@ -598,123 +609,6 @@ M68KVMTranslationMap040::UnmapPages(VMArea* area, addr_t base, size_t size,
 	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
 		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
 	while (vm_page_mapping* mapping = queue.RemoveHead())
-		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
-}
-
-
-void
-M68KVMTranslationMap040::UnmapArea(VMArea* area, bool deletingAddressSpace,
-	bool ignoreTopCachePageFlags)
-{
-	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
-		M68KVMTranslationMap040::UnmapPages(area, area->Base(), area->Size(),
-			true);
-		return;
-	}
-
-	bool unmapPages = !deletingAddressSpace || !ignoreTopCachePageFlags;
-
-	page_root_entry* pr = fPagingStructures->pgroot_virt;
-
-	RecursiveLocker locker(fLock);
-
-	VMAreaMappings mappings;
-	mappings.TakeFrom(&area->mappings);
-
-	for (VMAreaMappings::Iterator it = mappings.GetIterator();
-			vm_page_mapping* mapping = it.Next();) {
-		vm_page* page = mapping->page;
-		page->mappings.Remove(mapping);
-
-		VMCache* cache = page->Cache();
-
-		bool pageFullyUnmapped = false;
-		if (!page->IsMapped()) {
-			atomic_add(&gMappedPagesCount, -1);
-			pageFullyUnmapped = true;
-		}
-
-		if (unmapPages || cache != area->cache) {
-			addr_t address = area->Base()
-				+ ((page->cache_offset * B_PAGE_SIZE) - area->cache_offset);
-
-			int index;
-			index = VADDR_TO_PRENT(address);
-			if (PRE_TYPE(pr[index]) != DT_ROOT) {
-				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
-					"has no page root entry", page, area, address);
-				continue;
-			}
-
-			ThreadCPUPinner pinner(thread_get_current_thread());
-
-			page_directory_entry* pd
-				= (page_directory_entry*)MapperGetPageTableAt(
-					pr[index] & M68K_PRE_ADDRESS_MASK);
-
-			index = VADDR_TO_PDENT(address);
-			if (PDE_TYPE(pr[index]) != DT_DIR) {
-				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
-					"has no page dir entry", page, area, address);
-				continue;
-			}
-
-			page_table_entry* pt
-				= (page_table_entry*)MapperGetPageTableAt(
-					pd[index] & M68K_PDE_ADDRESS_MASK);
-
-			//XXX:M68K: DT_INDIRECT here?
-
-			page_table_entry oldEntry
-				= M68KPagingMethod040::ClearPageTableEntry(
-					&pt[VADDR_TO_PTENT(address)]);
-
-			pinner.Unlock();
-
-			if (PTE_TYPE(oldEntry) != DT_PAGE) {
-				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
-					"has no page table entry", page, area, address);
-				continue;
-			}
-
-			// transfer the accessed/dirty flags to the page and invalidate
-			// the mapping, if necessary
-			if ((oldEntry & M68K_PTE_ACCESSED) != 0) {
-				page->accessed = true;
-
-				if (!deletingAddressSpace)
-					InvalidatePage(address);
-			}
-
-			if ((oldEntry & M68K_PTE_DIRTY) != 0)
-				page->modified = true;
-
-			if (pageFullyUnmapped) {
-				DEBUG_PAGE_ACCESS_START(page);
-
-				if (cache->temporary)
-					vm_page_set_state(page, PAGE_STATE_INACTIVE);
-				else if (page->modified)
-					vm_page_set_state(page, PAGE_STATE_MODIFIED);
-				else
-					vm_page_set_state(page, PAGE_STATE_CACHED);
-
-				DEBUG_PAGE_ACCESS_END(page);
-			}
-		}
-
-		fMapCount--;
-	}
-
-	Flush();
-		// flush explicitely, since we directly use the lock
-
-	locker.Unlock();
-
-	bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
-	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
-		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
-	while (vm_page_mapping* mapping = mappings.RemoveHead())
 		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
 }
 
