@@ -501,15 +501,20 @@ if $(HOST_PLATFORM) = freebsd {
 if $(HOST_PLATFORM) = darwin {
 	HOST_HDRS += [ FDirName $(HAIKU_TOP) src build libgnuregex ] ;
 
-	# Mac OS X users may be using macports libraries, in which case the headers
+	# macOS users may be using macports libraries, in which case the headers
 	# and the libs are located in /opt/local/.
 	HOST_HDRS += /opt/local/include ;
 	HOST_LINKFLAGS += -L/opt/local/lib ;
 
-	# Mac OS X users may be using homebrew libraries, in which case the headers
-	# and the libs are locted in the /usr/local/.
+	# macOS users may be using homebrew libraries, in which case the headers
+	# and the libs are located in /usr/local/.
 	HOST_HDRS += /usr/local/include ;
 	HOST_LINKFLAGS += -L/usr/local/lib ;
+
+	# macOS users on Apple Silicon will usually have homebrew installed
+	# in /opt/homebrew instead of /usr/local.
+	HOST_HDRS += /opt/homebrew/include ;
+	HOST_LINKFLAGS += -L/opt/homebrew/lib ;
 }
 
 HOST_BE_API_HEADERS =
