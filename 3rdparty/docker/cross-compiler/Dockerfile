@@ -1,7 +1,7 @@
 FROM debian:bookworm-slim
 
-# docker build --no-cache --tag docker.io/haiku/cross-compiler:x86_64 .
-# docker push docker.io/haiku/cross-compiler:x86_64
+# docker build --no-cache --tag ghcr.io/haiku/cross-compiler:x86_64 .
+# docker push ghcr.io/haiku/cross-compiler:x86_64
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   autoconf \
@@ -14,7 +14,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   file \
   flex \
   g++ \
-  g++-multilib \
   gawk \
   git \
   libcurl4-openssl-dev \
@@ -28,7 +27,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   vim \
   wget \
   xz-utils \
-  zlib1g-dev
+  zlib1g-dev; \
+  if [ $(uname -m) = "x86_64" ]; then apt-get install -y g++-multilib; fi
 
 # source revision to build
 ARG BUILDTOOLS_REV=master

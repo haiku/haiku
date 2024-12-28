@@ -32,9 +32,14 @@ git clone --depth=1 --branch $BUILDTOOLS_REV https://review.haiku-os.org/buildto
 # The Haiku build requires the ability to find a hrev tag. In case a specific branch is selected
 # (like `r1beta4`)`, we will get the entire history just to be sure that the tag will exist.
 cd haiku
-if ! `git describe --dirty --tags --match=hrev* --abbrev=1`; then
+if [ ! "$(git describe --dirty --tags --match=hrev* --abbrev=1)" ]; then
 	git fetch --unshallow
 fi
+
+# Scale up cores to speed up, but don't go crazy since Jam starts
+# to lose its mind at 8+
+NCPU=$(nproc)
+if [ $NCPU -gt 8 ]; then NCPU=8; fi
 
 # Build a cross-compiler
 cd $BUILDTOOLS/jam
@@ -57,14 +62,23 @@ if [ -n "$SECONDARY_ARCH" ]; then
 fi
 
 # Build needed packages and tools for the cross-compiler
-jam -q haiku.hpkg haiku_devel.hpkg '<build>package'
+jam -j$NCPU -q haiku.hpkg haiku_devel.hpkg '<build>package'
 if [ -n "$SECONDARY_ARCH" ]; then
-	jam -q haiku_${SECONDARY_ARCH}.hpkg haiku_${SECONDARY_ARCH}_devel.hpkg
+	jam -j$NCPU -q haiku_${SECONDARY_ARCH}.hpkg haiku_${SECONDARY_ARCH}_devel.hpkg
 fi
 
 # Set up our sysroot
-cp $OUTPUT/objects/linux/lib/*.so /lib/x86_64-linux-gnu
-cp $OUTPUT/objects/linux/x86_64/release/tools/package/package /bin/
+HOST_ARCH=$(uname -m)
+case $HOST_ARCH in
+	aarch64)
+		HOST_ARCH=arm64
+		;;
+	*)
+		;;
+esac
+
+cp $OUTPUT/objects/linux/lib/*.so /lib/$(uname -m)-linux-gnu
+cp $OUTPUT/objects/linux/$HOST_ARCH/release/tools/package/package /bin/
 for file in $SYSROOT/../bin/*; do
 	ln -s $file /bin/$(basename $file)
 done
