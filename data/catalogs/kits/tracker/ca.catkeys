@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	4238208634
+1	catalan; valencian	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Desmunta
 Eject when unmounting	AutoMounterSettings		Expulsa'l quan es desmunti
 Searching for disks to mount…	StatusWindow		Se cerquen els discs per muntar...
 Value	AttributesView		Valor
-Multiple selections	FindPanel		Seleccions múltiples
 Information	InfoWindow		Informació
 Error emptying Trash	FSUtils		Error en buidar la paperera
 Opens with:	InfoWindow		S'obre amb:

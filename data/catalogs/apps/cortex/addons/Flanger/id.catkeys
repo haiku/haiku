@@ -1,4 +1,5 @@
-1	indonesian	application/x-vnd.moon-Flanger.media_addon	3593038814
+1	indonesian	application/x-vnd.moon-Flanger.media_addon	455620896
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Sebuah versi add-on dari FlangerNode.\noleh Eric Moon (16 Juni, 1999)
 Delay	CortexAddOnsFlanger		Tunda
 Depth	CortexAddOnsFlanger		Kedalaman
 Feedback	CortexAddOnsFlanger		Umpan balik
@@ -8,4 +9,5 @@ FlangerNode parameters	CortexAddOnsFlanger		Parameter FlangerNode
 OK	CortexAddOnsCommonMediaNodeControlApp		OK
 controls	CortexAddOnsCommonMediaNodeControlApp		kendali
 Mix output	CortexAddOnsFlanger		Keluaran mix
+Flanger	CortexAddOnsFlanger		Flanger
 Audio input	CortexAddOnsFlanger		Masukan audio

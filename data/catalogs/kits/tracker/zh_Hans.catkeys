@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	4238208634
+1	english	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		卸载
 Eject when unmounting	AutoMounterSettings		卸载并弹出
 Searching for disks to mount…	StatusWindow		搜索挂载磁盘...
 Value	AttributesView		值
-Multiple selections	FindPanel		多重选择
 Information	InfoWindow		信息
 Error emptying Trash	FSUtils		清空垃圾箱出错!
 Opens with:	InfoWindow		打开方式：

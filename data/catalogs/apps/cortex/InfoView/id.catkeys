@@ -1,15 +1,27 @@
-1	indonesian	application/x-vnd.Cortex.InfoView	514429199
+1	indonesian	application/x-vnd.Cortex.InfoView	3076911357
+Offset	InfoView		Ofset
 Description	DormantNodeInfoView		Deskripsi
 Byte order	InfoView		Urutan bita
 Connection	InfoView		Koneksi
 Output formats	DormantNodeInfoView		Format keluaran
 History	InfoView		Riwayat
 Input formats	DormantNodeInfoView		Format masukan
+Video data between	InfoView		Data Video antara
 Flags	InfoView		Tanda
+Media output	InfoView		Keluaran Media
+\n- Quality:	FileNodeInfoView		\n- Kualitas:
+Kinds	LiveNodeInfoView		Jenis
+Application	AppNodeInfoView		Aplikasi
+\n- Duration:	FileNodeInfoView		\n- Durasi:
 Kinds	DormantNodeInfoView		Jenis
 Resolution	InfoView		Resolusi
+File format	AppNodeInfoView		Format berkas
 Orientation	InfoView		Orientasi
 Channels	InfoView		Kanal
 (no file)	FileNodeInfoView		(tidak ada berkas)
+Input format	DormantNodeInfoView		Format masukan
 Format	InfoView		Format
 Version	AppNodeInfoView		Versi
+AddOn ID	DormantNodeInfoView		AddOn ID
+\n- Codec:	FileNodeInfoView		\n- Codec:
+ID:	FileNodeInfoView		ID:

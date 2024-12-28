@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	4238208634
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Avmonter
 Eject when unmounting	AutoMounterSettings		Løs ut ved avmontering
 Searching for disks to mount…	StatusWindow		Søker etter disker å montere...
 Value	AttributesView		Verdi
-Multiple selections	FindPanel		Flere valg
 Information	InfoWindow		Informasjon
 Error emptying Trash	FSUtils		Feil ved tømming av papirkurven
 Opens with:	InfoWindow		Åpnes med:

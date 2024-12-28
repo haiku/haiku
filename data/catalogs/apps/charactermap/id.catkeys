@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-CharacterMap	107627562
+1	indonesian	x-vnd.Haiku-CharacterMap	2107398441
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Simbol matematika lain-lain B
 Dogra	UnicodeBlocks		Dogra
@@ -129,6 +129,7 @@ Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		Bentuk angka
 Avestan	UnicodeBlocks		Avestan
 Latin extended A	UnicodeBlocks		Latin diperluas A
+Zanabazar Square	UnicodeBlocks		Zanabazar Square
 Sundanese	UnicodeBlocks		Sunda
 Geometric shapes	UnicodeBlocks		Bentuk Geometrik
 Clear	CharacterWindow		Bersih

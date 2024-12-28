@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-GLTeapot	400822745
+1	indonesian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Kanan
 Backface culling	TeapotWindow		Memusnahkan Backface
 Add a teapot	TeapotWindow		Tambahkan teko
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Kiri bawah
 Fog	TeapotWindow		Kabut
 FPS display	TeapotWindow		Tampilan FPS
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Batasi FPS ke kecepatan refresh
 Settings	TeapotWindow		Pengaturan
 Gouraud shading	TeapotWindow		Bayangan Gouraud
 Lighting	TeapotWindow		Pencahayaan

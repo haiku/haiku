@@ -1,10 +1,11 @@
-1	indonesian	x-vnd.Haiku-Expander	3300517306
+1	indonesian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Tujuan
 Other	ExpanderPreferences		Lainnya
 Automatically show contents listing	ExpanderPreferences		Tampilkan daftar kandungan secara otomatis
 Expander	System name		Expander
 Expander: Choose destination	DirectoryFilePanel		Expander: Pilih tujuan
 Set source…	ExpanderMenu		Set sumber…
+OK	ExpanderWindow		OKE
 The destination is not a folder.	ExpanderWindow		Tujuannya bukan suatu folder.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Foldernya pernah dipindah, dinamakan ulang atau tidak didukung.
 Close window when done expanding	ExpanderPreferences		Tutup jendela saat selesai mengembangkan

@@ -1,6 +1,7 @@
-1	indonesian	application/x-vnd.Be.LoggingConsumerApp	3832649534
+1	indonesian	application/x-vnd.Be.LoggingConsumerApp	1484319323
 Priority	CortexAddOnsLoggingConsumer		Prioritas
 Latency	CortexAddOnsLoggingConsumer		Latensi
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Mulai
 Thread priority	CortexAddOnsLoggingConsumer		Prioritas thread
 OK	CortexAddOnsCommonMediaNodeControlApp		OK
+percent	CortexAddOnsLoggingConsumer		persen

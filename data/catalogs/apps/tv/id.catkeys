@@ -1,7 +1,8 @@
-1	indonesian	x-vnd.Haiku.TV	3120244932
+1	indonesian	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Tidak ada menu
 No border	MainWin		Tanpa tepian
 Error, connecting to interface failed:\n\n	MainWin		Galat, koneksi ke antarmuka gagal:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	paksa 720 × 576, aspek tampilan 4:3
 Full screen	MainWin		Layar penuh
 Scale to native size	MainWin		Skalakan ke ukuran asli
 unknown	MainWin		tidak diketahui
@@ -16,7 +17,10 @@ Channel	MainWin		Saluran
 Previous channel	MainWin		Saluran sebelumnya
 OK	MainWin		OKE
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	paksa 544 × 576, aspek tampilan 4:3
 Settings	MainWin		Pengaturan
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	paksa 704 × 576, aspek tampilan 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Pengaturan…
 None	MainWin		tidak ada

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.haiku-icon_o_matic	1244334028
+1	indonesian	x-vnd.haiku-icon_o_matic	466334521
 None	Icon-O-Matic-Properties		Tidak ada
 Add empty	Icon-O-Matic-ShapesList		Tambah kosong
 Opening the icon failed!	Icon-O-Matic-Main		Membuka ikon gagal!
@@ -87,8 +87,10 @@ Append…	Icon-O-Matic-Menu-File		Tambah…
 Scale Y	Icon-O-Matic-PropertyNames		Skala Y
 Rotate indices forwards	Icon-O-Matic-PathsList		Putar indeks ke depan
 Save	Icon-O-Matic-Menu-File		Simpan
+Cancel	Icon-O-Matic-StyledTextImport		Batal
 Add circle	Icon-O-Matic-PathsList		Tambah lingkaran
 Freeze transformation	Icon-O-Matic-ShapesList		Transformasi beku
+META:ICON attribute	Icon-O-Matic-SavePanel		Atribut META:ICON 
 Untitled	Icon-O-Matic-Main		Tanpa judul
 Max LOD	Icon-O-Matic-PropertyNames		LOD Maks
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Simpan perubahan ikon sekarang sebelum menutup?
@@ -96,6 +98,7 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Gag
 Save as…	Icon-O-Matic-Menu-File		Simpan sebagai…
 Swatches	Icon-O-Matic-Menus		Carikan
 <modify path>	Icon-O-Matic-PathCmd		<modify path>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Atur %property%
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nothing to undo>
 Add	Icon-O-Matic-StylesList		Menambahkan

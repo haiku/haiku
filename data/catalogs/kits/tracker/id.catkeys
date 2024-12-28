@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	2113020779
+1	indonesian	x-vnd.Haiku-libtracker	3161828597
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -42,6 +42,7 @@ Small bitmap icon	AttributesView		Ikon bitmap kecil
 Would you like to find a suitable application to open the file?	FSUtils		Apakah anda ingin menemukan aplikasi yang cocok untuk membuka file?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Anda tidak dapat mengganti folder atau link symbolis dengan file.
 (unknown)	InfoWindow		(tidak dikenal)
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dates>}}
 Trailing \\.	libtracker		Membuntuti \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Di %func \nfind_directory() gagal. \nSebabnya: %error
 Handles any file	OpenWithWindow		Tangani setiap file
@@ -60,6 +61,7 @@ starts with	FindPanel		diawali dengan
 Replace	FSUtils		Ganti
 ?+* follows nothing.	libtracker		?+* tidak mengikuti apapun.
 Rectangle	AttributesView		Persegi
+Include Trash	FindPanel		Sertakan Sampah
 Move to	ContainerWindow		Pindahkan ke
 Status	Email Query Columns		Kondisi
 New folder	FSUtils		Folder baru
@@ -93,6 +95,7 @@ Atom	AttributesView		Atom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed dari %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Menyiapkan pengembalian item…
 Mount	ContainerWindow		Memasang
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# rectangles>}}
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 Corrupted pointers.	libtracker		Pointer rusak.
 Link to:	InfoWindow		Hubungkan ke:
@@ -104,6 +107,7 @@ Window	ContainerWindow		Jendela
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Hapus
 Company	Person Query Columns		Perusahaan
+Select folders…	FindPanel		Pilih folder…
 Recent documents	FavoritesMenu		Dokumen terbaru
 Edit templates…	TemplatesMenu		Sunting template…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} lain{# bytes}}
@@ -172,12 +176,14 @@ Open selection with:	OpenWithWindow		Buka seleksi dengan:
 Preferences…	ContainerWindow		Preferensi…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Tidak bisa buka \"%document\" karena aplikasi \"%app\" ada di dalam Trash. 
 Work Phone	Person Query Columns		Telepon Kantor
+Select folders	FindPanel		Pilih folder
 Close	ContainerWindow		Tutup
 Get info	ContainerWindow		Dapatkan info
 MIME Type	AttributesView		Tipe MIME
 Show folder location in title tab	SettingsView		Tampilkan folder lokasi di tab judul
 There was an error resolving the link.	Tracker		Terjadi kesalahan saat menyelesaikan tautan.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Terjadi masalah saat mencoba menyimpan di folder yang Anda tentukan. Silakan coba yang lain.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# values>}}
 Desktop	TrackerSettingsWindow		Desktop
 Nested *?+.	libtracker		Tanda *?+ bersarang.
 Move	FSUtils	button label	Pindah
@@ -311,6 +317,7 @@ Open	ContainerWindow		Buka
 Settings…	MountMenu		Pengaturan…
 You cannot put the selected item(s) into the trash.	FSUtils		Anda tidak dapat menempatkan item(-item) yang dipilih ke tempat sampah.
 Increase size	DeskWindow		Naikkan ukuran
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Target:
 starts with	SelectionWindow		diawali dengan
 Any	AttributesView		Apa saja
 New	DeskWindow		Baru
@@ -410,6 +417,7 @@ Emptying Trash… 	StatusWindow		Mengosongkan Tempat Sampah…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
 Revert	TrackerSettingsWindow		Kembali ke asal
 trash	B_TRASH_DIRECTORY		tempat sampah
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jika Anda memindahkan folder sistem atau isinya, Anda tidak akan bisa boot %osName!\n\nApakah Anda yakin ingin melakukan ini?\n\nUntuk memindahkan folder sistem atau isinya pula, tahan tombol Shift dan klik \"Pindah\".
 Close all in workspace	ContainerWindow		Tutup semua di workspace
 Corrupted expression.	libtracker		Exspresi rusak.
@@ -425,6 +433,7 @@ Name	QueryPoseView		Nama
 Error %error loading add-On %name.	ContainerWindow		Kesalahan %error memuat pengaya %name.
 Does not handle file	OpenWithWindow		Tidak menangani berkas
 E-mail	Person Query Columns		E-mail
+Templates	FindPanel		Template
 Arrange by	ContainerWindow		Atur berdasarkan
 Attributes	AttributesView		Atribut
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Maaf, menyimpan lebih dari satu item tidak diijinkan.
@@ -433,6 +442,7 @@ Move here	ContainerWindow		Pindah ke sini
 the config folder	FSUtils		folder konfigurasi
 Sorry, could not create a new folder.	FSUtils		Maaf, tidak bisa membuat folder baru.
 Select all	VirtualDirectoryWindow		Pilih Semua
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Ubah nama
 Clean up all	ContainerWindow		Bersihkan semua
 Add current folder	FilePanelPriv		Tambah folder ini
@@ -489,6 +499,7 @@ Move to Trash	FSUtils		Buang ke Tong Sampah
 Cancel	PoseView		Batal
 Handles %type	OpenWithWindow		Menangani %type
 Delete	PoseView		Hapus
+Options	FindPanel		Pengaturan
 Media parameter	AttributesView		Parameter media
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jika Anda mengubah folder rumah, %osName mungkin tidak berperilaku dengan semestinya!\n\nApakah Anda yakin ingin melakukan ini?\n\nUntuk tetap mengubah folder rumah jua, tahan tombol Shift dan klik \"Saya tahu apa yang saya lakukan\".
 Sorry, you can't copy items to the Trash.	PoseView		Maaf, Anda tidak dapat menyalin item ke tempat sampah.
@@ -503,6 +514,7 @@ Create a Query	FindPanel		Buat kueri
 Close	QueryContainerWindow		Tutup
 I know what I'm doing	FSUtils	button label	Saya tahu apa yang saya lakukan
 Preparing to copy items…	StatusWindow		Bersiap untuk menyalin item…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Icon view	ContainerWindow		Tampilan ikon
 The entered folder name is too long.	FSUtils		Nama folder yang dimasukkan terlalu panjang.
 Name	ContainerWindow		Nama

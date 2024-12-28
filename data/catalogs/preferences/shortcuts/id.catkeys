@@ -39,7 +39,7 @@ Append KeySet…	ShortcutsWindow		Tambah Keyset...
 Right	ShortcutsSpec		Kanan
 OK	ShortcutsWindow		OKE
 Add new shortcut	ShortcutsWindow		Tambahkan pintasan baru
-(None)	ShortcutsSpec		(tiada)
+(None)	ShortcutsSpec		(Tiada)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Buka Keyset...
 File	ShortcutsWindow		Berkas

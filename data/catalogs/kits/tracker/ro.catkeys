@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	4238208634
+1	romanian	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Demontează
 Eject when unmounting	AutoMounterSettings		Scoate la demontare
 Searching for disks to mount…	StatusWindow		Se caută discuri de montat…
 Value	AttributesView		Valoare
-Multiple selections	FindPanel		Selecții multiple
 Information	InfoWindow		Informații
 Error emptying Trash	FSUtils		Eroare la golirea gunoiului
 Opens with:	InfoWindow		Se deschide cu:

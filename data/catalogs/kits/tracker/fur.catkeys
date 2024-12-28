@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	4238208634
+1	friulian	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Dismonte
 Eject when unmounting	AutoMounterSettings		Pare fûr une volte che al è dismontât
 Searching for disks to mount…	StatusWindow		Daûr a cirî discs di montâ…
 Value	AttributesView		Valôr
-Multiple selections	FindPanel		Selezions multiplis
 Information	InfoWindow		Informazions
 Error emptying Trash	FSUtils		Erôr tal disvuedâ la scovacere
 Opens with:	InfoWindow		Vierç cun:

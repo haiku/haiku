@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-libtracker	4238208634
+1	korean	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		생성일
 Icon	AttributesView		아이콘
 Open and make preferred	OpenWithWindow		열고 연결 프로그램으로 지정
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		마운트 해제
 Eject when unmounting	AutoMounterSettings		마운트 해제 시 꺼내기
 Searching for disks to mount…	StatusWindow		마운트할 디스크 찾는 중...
 Value	AttributesView		값
-Multiple selections	FindPanel		다중 선택
 Information	InfoWindow		정보
 Error emptying Trash	FSUtils		휴지통 비우기 오류
 Opens with:	InfoWindow		연결 프로그램:

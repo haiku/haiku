@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	4238208634
+1	finnish	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Irrota
 Eject when unmounting	AutoMounterSettings		Poista laitteesta irrotettaessa
 Searching for disks to mount…	StatusWindow		Etsitään liitettäviä levyjä...
 Value	AttributesView		Arvo
-Multiple selections	FindPanel		Useita valintoja
 Information	InfoWindow		Tietoja
 Error emptying Trash	FSUtils		Virhe tyhjennettäessä roskakoria
 Opens with:	InfoWindow		Avautuu sovelluksella:

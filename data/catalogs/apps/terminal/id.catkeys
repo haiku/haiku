@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Terminal	3964119708
+1	indonesian	x-vnd.Haiku-Terminal	2382644655
 Close other tabs	Terminal TermWindow		Tutup tab yang lain
 Insert path	Terminal TermView		Sisipkan jalur
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal tidak dapat memulai shell. Maaf.
@@ -7,6 +7,7 @@ OK	Terminal SetTitleWindow		OKE
 Edit	Terminal TermWindow		Sunting
 Select all	Terminal TermWindow		Pilih semua
 Confirm exit if active programs exist	Terminal AppearancePrefView		Konfirmasi keluar jika ada program aktif
+Color scheme:	Terminal ThemeView		Skema warna:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDirektori aktif saat ini dari proses aktif di\n\t\t\ttab saat ini. Secara opsional jumlah komponen jalur maksimum\n\t\t\tdapat ditentukan. Misal. '%2d' untuk paling banyak dua komponen.\n\t%T\t-\tNama aplikasi Terminal untuk lokal saat ini.\n\t%e\t-\tPengkodean tab saat ini. Tidak ditampilkan untuk UTF-8.\n\t%i\t-\tIndeks jendela.\n\t%p\t-\tNama proses aktif di tab saat ini.\n\t%t\t-\tJudul tab saat ini.
 Copy	Terminal TermWindow		Salin
 Edit tab title…	Terminal TermWindow		Edit judul tab ...

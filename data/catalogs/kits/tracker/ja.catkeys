@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3917763570
+1	japanese	x-vnd.Haiku-libtracker	1591593913
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		マウント解除
 Eject when unmounting	AutoMounterSettings		マウント解除時メディアを取り出す
 Searching for disks to mount…	StatusWindow		マウントできるディスクを探しています...
 Value	AttributesView		値
-Multiple selections	FindPanel		複数選択
 Information	InfoWindow		情報
 Error emptying Trash	FSUtils		ごみ箱を空にしている際にエラーが発生しました。
 Opens with:	InfoWindow		アプリケーション:

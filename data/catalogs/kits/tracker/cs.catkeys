@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	4238208634
+1	czech	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Odpojit
 Eject when unmounting	AutoMounterSettings		Vysunout při odpojení
 Searching for disks to mount…	StatusWindow		Vyhledávání disků pro připojení...
 Value	AttributesView		Hodnota
-Multiple selections	FindPanel		Vícenásobný výběr
 Information	InfoWindow		Informace
 Error emptying Trash	FSUtils		Chyba při vysypávání koše
 Opens with:	InfoWindow		Otevřít pomocí:

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Appearance	663472720
+1	indonesian	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Kontrol batas
 Control mark	Colors tab		Penanda kontrol
 Off	AntialiasingSettingsView		Mati
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Teks item menu terpilih
 Size:	Font Selection view		Ukuran:
 Panel background	Colors tab		Latar-belakang panel
 Plain font:	Font view		Fon polos:
+Automatically pick secondary colors	Colors tab		Pilih warna sekunder secara otomatis
 Window tab text	Colors tab		Teks tab jendela
 Navigation pulse	Colors tab		Denyut navigasi
 LCD subpixel	AntialiasingSettingsView		Subpiksel LCD
@@ -72,7 +73,7 @@ Monospaced fonts only	AntialiasingSettingsView		Hanya fon monospace
 Document text	Colors tab		Teks dokumen
 Inactive window border	Colors tab		Batas jendela non-aktif
 Colors	APRWindow		Warna
-About control look	DecorSettingsView		Tentang controlLook
+About control look	DecorSettingsView		Tentang control look
 Control highlight	Colors tab		Kontrol sorot
 Status bar	Colors tab		Status bar
 Link hover	Colors tab		Link melayang

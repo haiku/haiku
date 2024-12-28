@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	4238208634
+1	hungarian	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Leválasztás
 Eject when unmounting	AutoMounterSettings		Kiadás leválasztáskor
 Searching for disks to mount…	StatusWindow		Csatolandó lemezek keresése…
 Value	AttributesView		Érték
-Multiple selections	FindPanel		Többszörös kijelölés
 Information	InfoWindow		Információ
 Error emptying Trash	FSUtils		Hiba történt a Szemetes ürítése közben.
 Opens with:	InfoWindow		Megnyitás ezzel:

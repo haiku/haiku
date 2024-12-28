@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libbe	2519775385
+1	indonesian	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Hak Cipta dilindungi undang-undang.
 gold master	AboutWindow		master emas
 Undo	TextView		Batal
@@ -40,6 +40,7 @@ Error	PrintJob		Galat
 %s TiB/s	StringForRate	units per second	%s TiB/d
 About %app…	Dragger		Tentang %app…
 About %app%	AboutWindow		Tentang %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s bita} other{%s bita}}
 %s GiB/s	StringForRate	units per second	%s GiB/d
 Version history:	AboutWindow		Sejarah versi:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Tidak dapat menemukan aplikasi untuk replicant tersebut. Tidak ada tanda tangan aplikasi yang disediakan.\n%error

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	1617112834
+1	turkish	x-vnd.Haiku-libtracker	3585910473
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Bağlantıyı kes
 Eject when unmounting	AutoMounterSettings		Bağlantıyı keserken çıkar
 Searching for disks to mount…	StatusWindow		Bağlanacak disk aranıyor…
 Value	AttributesView		Değer
-Multiple selections	FindPanel		Çoklu seçimler
 Information	InfoWindow		Bilgi
 Error emptying Trash	FSUtils		Çöp boşaltılırken hata
 Opens with:	InfoWindow		Şununla açılır:

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-LaunchBox	1530497419
+1	indonesian	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Atur deskripsi…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sungguhan menutup pad ini?\n(Padnya tidak akan diingat.)
 OK	LaunchBox		OKE
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Tampilkan batas jendela
 Failed to launch 'something', error in Pad data.	LaunchBox		Gagal meluncurkan 'sesuatu', kesalahan dalam data Pad.
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Oto-bangkit
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Ukuran ikon
 Open containing folder	LaunchBox		Buka folder yang berisi
 Add button here	LaunchBox		Tambah tombol di sini

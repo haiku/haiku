@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	1700274453
+1	indonesian	x-vnd.Haiku-WebPositive	3236552681
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
 Previous	WebPositive Window		Sebelumnya
 (Finish: %date)	Download Window		(Selesai: %date)
@@ -129,6 +129,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Klik ganda atau klik 
 Next	WebPositive Window		Selanjutnya
 Bookmark error	WebPositive Window		Kesalahan bookmark
 OK	WebPositive Window		OKE
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% dari %expectedSize%, %rate%/d)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Perbesar teks saja
 Save page as…	WebPositive Window		Simpan halaman sebagai…

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	4238208634
+1	ukrainian	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Відключити
 Eject when unmounting	AutoMounterSettings		Вийняти після відключення
 Searching for disks to mount…	StatusWindow		Пошук дисків для підключення…
 Value	AttributesView		Значення
-Multiple selections	FindPanel		Вибрано декілька…
 Information	InfoWindow		Інформація
 Error emptying Trash	FSUtils		Помилка спустошення смітника!
 Opens with:	InfoWindow		Відкривати у програмі:

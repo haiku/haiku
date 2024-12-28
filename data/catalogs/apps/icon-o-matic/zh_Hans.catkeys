@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	930740271
+1	english	x-vnd.haiku-icon_o_matic	1648958363
 None	Icon-O-Matic-Properties		无
 Clean up path	Icon-O-Matic-CleanUpPathCmd		清理路径
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -34,6 +34,7 @@ Unassign path	Icon-O-Matic-UnassignPathCmd		取消路径分配
 Remove	Icon-O-Matic-StylesList		删除
 Cancel	Icon-O-Matic-Menu-Settings		取消
 Transformation	Icon-O-Matic-TransformationBoxStates		转换
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		移动 {0, plural, one{条路径} other{条路径}}
 Closed	Icon-O-Matic-PropertyNames		关闭
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<无恢复内容>
 Height	Icon-O-Matic-PropertyNames		高度
@@ -50,6 +51,7 @@ Move pivot	Icon-O-Matic-TransformationBoxStates		移动枢轴
 Opacity	Icon-O-Matic-PropertyNames		透明度
 OK	Icon-O-Matic-ColorPicker		确定
 Error: 	Icon-O-Matic-Main		错误：
+Assign style	Icon-O-Matic-AssignStyleCmd		指定样式
 Saving your document failed!	Icon-O-Matic-Exporter		文档保存失败！
 Snap to grid	Icon-O-Matic-Menu-Settings		对齐网格
 Opening the document failed!	Icon-O-Matic-Main		打开文档失败！
@@ -140,6 +142,7 @@ Swatches	Icon-O-Matic-Menus		调色板
 Set %property%	Icon-O-Matic-Properties	Don't translate %property%	设置 %property%
 Icon-O-Matic	System name		图标套件
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<无撤销任务>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		移除 {0, plural, one{条路径} other{条路径}}
 Add	Icon-O-Matic-StylesList		添加
 Translation Y	Icon-O-Matic-PropertyNames		平移 Y
 Modify vertex	Icon-O-Matic-ChangePointCmd		修改顶点

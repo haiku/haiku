@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	4238208634
+1	spanish; castilian	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Desmontar
 Eject when unmounting	AutoMounterSettings		Expulsar al momento de desmontar
 Searching for disks to mount…	StatusWindow		Buscando discos para montar…
 Value	AttributesView		Valor
-Multiple selections	FindPanel		Selecciones múltiples
 Information	InfoWindow		Información
 Error emptying Trash	FSUtils		Error al vaciar la papelera
 Opens with:	InfoWindow		Abrir con:

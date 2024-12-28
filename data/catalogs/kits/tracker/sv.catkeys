@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	4238208634
+1	swedish	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Avmontera
 Eject when unmounting	AutoMounterSettings		Mata ut vid avmontering
 Searching for disks to mount…	StatusWindow		Letar efter diskar för montering...
 Value	AttributesView		Värde
-Multiple selections	FindPanel		Flera val
 Information	InfoWindow		Information
 Error emptying Trash	FSUtils		Ett fel uppstod när Papperskorgen skulle tömmas
 Opens with:	InfoWindow		Öppnas med:

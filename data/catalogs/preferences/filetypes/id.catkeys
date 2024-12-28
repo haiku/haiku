@@ -75,7 +75,7 @@ Rating	Attribute ListView		Peringkat
 duration	Attribute ListView		durasi
 File could not be opened	Preferred App Menu		Berkas tidak dapat dibuka
 Args only	Application Type Window		Hanya args
-Could not open \"%s\":\n%s	FileTypes		tidak bisa membuka \"%s\":\n%s
+Could not open \"%s\":\n%s	FileTypes		Tidak bisa membuka \"%s\":\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Kanan
 Save changes before closing?	Application Type Window		Simpan perubahan sebelum ditutup?
 Background app	Application Type Window		Aplikasi latar

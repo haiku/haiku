@@ -1,4 +1,4 @@
-1	indonesian	application/x-vnd.Cortex.support	989862702
+1	indonesian	application/x-vnd.Cortex.support	1168605395
 24 bit HSV	MediaString		HSV 24 bit
 Back-center	MediaString		Belakang tengah
 32 bit CMY	MediaString		CMY 32 bit
@@ -21,6 +21,7 @@ User-defined media type	MediaString		Tipe media tetapan pengguna
 Rear-left	MediaString		Belakang kiri
 Top-Front-right	MediaString		Kanan depan atas
 32 bit float	MediaString		float 32 bit
+Controllable	MediaString		Dapat dikendalikan
 32 bit integer	MediaString		integer 32 bit
 Front-right-center	MediaString		Tengah depan kanan
 Side-right	MediaString		Samping kanan
@@ -28,6 +29,7 @@ Side-right	MediaString		Samping kanan
 32 bit LAB	MediaString		LAB 32 bit
 Side-left	MediaString		Samping kiri
 32 bit CMYK	MediaString		CMYK 32 bit
+8 bit integer	MediaString		8 bit integer
 YCbCr444	MediaString		YCbCr444
 Center	MediaString		Tengah
  kb/s (max)	MediaString		 kb/s (maks)
@@ -52,3 +54,7 @@ YCbCr420	MediaString		YCbCr420
 HTML	MediaString		HTML
 Time source	MediaString		Sumber waktu
 15 bit RGB	MediaString		RGB 15 bit
+Parameters	MediaString		Parameter
+Entity interface	MediaString		Antarmuka entitas
+Unknown media type	MediaString		Tipe media tidak dikenali
+MPEG2	MediaString		MPEG2

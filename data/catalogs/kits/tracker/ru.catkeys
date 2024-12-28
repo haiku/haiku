@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4238208634
+1	russian	x-vnd.Haiku-libtracker	1912038977
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -30,7 +30,6 @@ Unmount	ContainerWindow		Отключить
 Eject when unmounting	AutoMounterSettings		Выдвигать лоток диска при отключении
 Searching for disks to mount…	StatusWindow		Поиск дисков для подключения…
 Value	AttributesView		Значение
-Multiple selections	FindPanel		Выбрано несколько папок…
 Information	InfoWindow		Информация
 Error emptying Trash	FSUtils		Ошибка при очищении корзины!
 Opens with:	InfoWindow		Открывать в:

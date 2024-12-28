@@ -1,15 +1,19 @@
-1	indonesian	x-vnd.Haiku-FirstBootPrompt	585808223
+1	indonesian	x-vnd.Haiku-FirstBootPrompt	1164515543
 Japanese	KeymapNames		Jepang
 US	KeymapNames		AS
+Cancel	BootPromptWindow		Batal
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Belarusia
 Brazilian	KeymapNames		Brazil
 Dvorak	KeymapNames		Dvorak
 Polish	KeymapNames		Polandia
+Try Haiku	BootPromptWindow		Coba Haiku
 Latin-American	KeymapNames		Amerika-latin
 Ukrainian	KeymapNames		Ukraina
 Russian (Yawert)	KeymapNames		Rusia (Yawert)
 United-Kingdom	KeymapNames		Britania Raya
+Welcome!	BootPromptWindow		Selamat datang!
+Quit Haiku	System name		Keluar Haiku
 Turkish (Type-F)	KeymapNames		Turki(Type-F)
 Serbian (Cyrillic)	KeymapNames		Serbia (sirilik)
 Belgian (point)	KeymapNames		Belgia (point)
@@ -41,9 +45,12 @@ Faeroese	KeymapNames		Faero
 Polish (Typewriter)	KeymapNames		Polandia (Typewriter)
 French (Mac)	KeymapNames		Perancis (Mac)
 Spanish	KeymapNames		Sepanyol
+Try it out	BootPromptWindow		Coba
 Ukrainian (Mac)	KeymapNames		Ukraina (Mac)
 Estonian	KeymapNames		Estonia
+Install Haiku	BootPromptWindow		Instal Haiku
 French (Bépo)	KeymapNames		Perancis (Bépo)
+Restart system	BootPromptWindow		Muat ulang sistem
 Serbian (Latin)	KeymapNames		Serbia (Latin)
 Russian (Typewriter)	KeymapNames		Rusia (Typewriter)
 French	KeymapNames		Perancis
@@ -63,10 +70,12 @@ Norwegian	KeymapNames		Norwegia
 Danish	KeymapNames		Denmark
 Bulgarian (Phonetic)	KeymapNames		Bulgaria (Fonetik)
 Canadian-French	KeymapNames		Kanada-Perancis
+Welcome to Haiku!	BootPromptWindow		Selamat datang di Haiku!
 Russian	KeymapNames		Rusia
 Hungarian	KeymapNames		Hunggaria
 Irish	KeymapNames		Irlandia
 Romanian	KeymapNames		Rumania
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Apakah Anda yakin ingin menutup jendela ini? Ini akan memulai ulang sistem Anda!
 Czech (Mac)	KeymapNames		Ceko (Mac)
 Macedonian	KeymapNames		Makedonia
 Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)

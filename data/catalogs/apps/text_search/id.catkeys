@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku.TextSearch	2224690775
+1	indonesian	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Silakan pilih file yang ingin Anda pilih untuk Anda di Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Gagal memulai program xargs!
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Buka seleksi
 Actions	GrepWindow		Tindakan
 New window	GrepWindow		Jendela baru
 Encoding	GrepWindow		Penyandian
+Set target to parent folder	GrepWindow		Atur target ke folder induk
 OK	GrepWindow		Oke
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Tutup
@@ -30,6 +31,7 @@ Skip folders starting with a dot	GrepWindow		Lewati folder yang dimulai dengan t
 Failed to open output pipe!	Grepper		Gagal membuka pipa keluaran!
 Cancel	GrepWindow		Batal
 History	GrepWindow		Sejarah
+TextSearch	System name		TextSearch
 File	GrepWindow		Berkas
 Case-sensitive	GrepWindow		sensitif besar-kecil
 Select all	GrepWindow		Pilih Semua
