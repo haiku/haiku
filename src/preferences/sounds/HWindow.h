@@ -11,6 +11,9 @@
 #define __HWINDOW_H__
 
 
+#include "SoundFilePanel.h"
+
+
 #include <FileGameSound.h>
 #include <FilePanel.h>
 #include <Window.h>
@@ -51,7 +54,7 @@ private:
 
 private:
 			HEventList*			fEventList;
-			BFilePanel*			fFilePanel;
+			SoundFilePanel*		fFilePanel;
 			BButton*			fPlayButton;
 			BFileGameSound*		fPlayer;
 			BRect				fFrame;
