@@ -15,6 +15,7 @@
 #include <Button.h>
 #include <CheckBox.h>
 #include <ColorControl.h>
+#include <ColorPreview.h>
 #include <ListItem.h>
 #include <ListView.h>
 #include <Menu.h>
@@ -32,7 +33,10 @@
 
 
 class APRWindow;
-class ColorPreview;
+
+
+using BPrivate::BColorPreview;
+
 
 class APRView : public BView {
 public:
@@ -69,7 +73,7 @@ private:
 
 			BScrollView*		fScrollView;
 
-			ColorPreview*		fColorPreview;
+			BColorPreview*		fColorPreview;
 
 			BMessage			fPrevColors;
 			BMessage			fDefaultColors;

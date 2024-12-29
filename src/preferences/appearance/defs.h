@@ -37,10 +37,6 @@
 #define SET_UI_COLORS 'suic'
 #define PREFS_CHOSEN 'prch'
 
-// constants
-static const char* const kRGBColor = "RGBColor";
-static const char* const kWhich = "which";
-
 // user interface
 const uint32 kBorderSpace = 10;
 const uint32 kItemSpace = 7;

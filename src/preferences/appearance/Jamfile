@@ -13,10 +13,7 @@ Preference Appearance :
 	FontView.cpp
 	APRView.cpp
 	APRWindow.cpp
-	ColorPreview.cpp
 	Colors.cpp
-	ColorWhichItem.cpp
-	ColorWhichListView.cpp
 
 	# These are currently disabled while everything else is being worked on
 	#CurView.cpp
@@ -33,9 +30,7 @@ DoCatalogs Appearance :
 	AntialiasingSettingsView.cpp
 	APRView.cpp
 	APRWindow.cpp
-	ColorPreview.cpp
 	Colors.cpp
-	ColorWhichItem.cpp
 	LookAndFeelSettingsView.cpp
 	FontView.cpp
 	FontSelectionView.cpp

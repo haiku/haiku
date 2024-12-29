@@ -32,6 +32,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			BitmapButton.cpp
 			CalendarView.cpp
 			ColorItem.cpp
+			ColorListView.cpp
+			ColorPreview.cpp
 			ColorQuantizer.cpp
 			CommandPipe.cpp
 			DateTimeEdit.cpp

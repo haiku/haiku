@@ -1641,14 +1641,6 @@ TermView::MessageReceived(BMessage *message)
 				_DoFileDrop(ref);
 			}
 			return;
-#if 0
-		} else if (message->FindData("RGBColor", B_RGB_COLOR_TYPE,
-				(const void **)&color, &numBytes) == B_OK
-				&& numBytes == sizeof(color)) {
-			// TODO: handle color drop
-			// maybe only on replicants ?
-			return;
-#endif
 		} else if (message->FindData("text/plain", B_MIME_TYPE,
 				(const void **)&text, &numBytes) == B_OK) {
 			_WritePTY(text, numBytes);

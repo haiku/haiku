@@ -12,6 +12,7 @@
 
 #include "ConfigView.h"
 
+#include <ColorItem.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <ScrollView.h>
@@ -19,9 +20,11 @@
 #include <StringView.h>
 #include <View.h>
 
-#include "ColorItem.h"
 #include "Gravity.h"
 #include "RainbowItem.h"
+
+
+using BPrivate::BColorItem;
 
 
 static const int32 kMsgSize = 'size';
@@ -44,12 +47,12 @@ ConfigView::ConfigView(BRect frame, Gravity* parent)
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fShadeList->SetSelectionMessage(new BMessage(kMsgShade));
-	fShadeList->AddItem(new ColorItem("Red", (rgb_color){ 255, 65, 54 }));
-	fShadeList->AddItem(new ColorItem("Green", (rgb_color){ 46, 204, 64 }));
-	fShadeList->AddItem(new ColorItem("Blue", (rgb_color){ 0, 116, 217 }));
-	fShadeList->AddItem(new ColorItem("Orange", (rgb_color){ 255, 133, 27 }));
-	fShadeList->AddItem(new ColorItem("Purple", (rgb_color){ 177, 13, 201 }));
-	fShadeList->AddItem(new ColorItem("White", (rgb_color){ 255, 255, 255 }));
+	fShadeList->AddItem(new BColorItem("Red",    make_color(255, 65, 54)));
+	fShadeList->AddItem(new BColorItem("Green",  make_color(46, 204, 64)));
+	fShadeList->AddItem(new BColorItem("Blue",   make_color(0, 116, 217)));
+	fShadeList->AddItem(new BColorItem("Orange", make_color(255, 133, 27)));
+	fShadeList->AddItem(new BColorItem("Purple", make_color(177, 13, 201)));
+	fShadeList->AddItem(new BColorItem("White",  make_color(255, 255, 255)));
 	fShadeList->AddItem(new RainbowItem("Rainbow"));
 
 	fShadeScroll = new BScrollView(B_EMPTY_STRING, fShadeList,

@@ -11,8 +11,6 @@ Application Terminal :
 	Arguments.cpp
 	BasicTerminalBuffer.cpp
 	Colors.cpp
-	ColorListView.cpp
-	ColorPreview.cpp
 	FindWindow.cpp
 	Globals.cpp
 	HistoryBuffer.cpp

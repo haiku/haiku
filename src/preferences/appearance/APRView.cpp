@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,6 +16,8 @@
 
 #include <Alert.h>
 #include <Catalog.h>
+#include <ColorItem.h>
+#include <ColorListView.h>
 #include <DefaultColors.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -29,17 +31,20 @@
 
 #include "APRWindow.h"
 #include "defs.h"
-#include "ColorPreview.h"
 #include "Colors.h"
-#include "ColorWhichListView.h"
-#include "ColorWhichItem.h"
 
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Colors tab"
 
+
 #define COLOR_DROPPED 'cldp'
 #define AUTO_ADJUST_CHANGED 'madj'
+
+
+using BPrivate::BColorItem;
+using BPrivate::BColorListView;
+using BPrivate::BColorPreview;
 
 
 APRView::APRView(const char* name)
@@ -55,16 +60,14 @@ APRView::APRView(const char* name)
 	fAutoSelectCheckBox->SetValue(true);
 
 	// Set up list of color attributes
-	fAttrList = new ColorWhichListView("AttributeList");
+	fAttrList = new BColorListView("AttributeList");
 
 	fScrollView = new BScrollView("ScrollView", fAttrList, 0, false, true);
 	fScrollView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	_CreateItems();
 
-	fColorPreview = new ColorPreview(new BMessage(COLOR_DROPPED), 0);
-	fColorPreview->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
-		B_ALIGN_VERTICAL_CENTER));
+	fColorPreview = new BColorPreview("color preview", "", new BMessage(COLOR_DROPPED));
 
 	fPicker = new BColorControl(B_ORIGIN, B_CELLS_32x8, 8.0,
 		"picker", new BMessage(UPDATE_COLOR));
@@ -79,8 +82,7 @@ APRView::APRView(const char* name)
 			.End()
 		.SetInsets(B_USE_WINDOW_SPACING);
 
-	fColorPreview->Parent()->SetExplicitMaxSize(
-		BSize(B_SIZE_UNSET, fPicker->Bounds().Height()));
+	fColorPreview->Parent()->SetExplicitMaxSize(BSize(B_SIZE_UNSET, fPicker->Bounds().Height()));
 	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 }
 
@@ -104,32 +106,54 @@ APRView::AttachedToWindow()
 
 
 void
-APRView::MessageReceived(BMessage *msg)
+APRView::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
-		case SET_COLOR:
+	if (message->WasDropped()) {
+		// Received from color preview when dropped on
+		char* name;
+		type_code type;
+		rgb_color* color;
+		ssize_t size;
+		if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type) == B_OK
+			&& message->FindData(name, type, (const void**)&color, &size) == B_OK) {
+			_SetCurrentColor(*color);
+			Window()->PostMessage(kMsgUpdate);
+		}
+
+		return BView::MessageReceived(message);
+	}
+
+	switch (message->what) {
+		// Received from color preview when dropped on
+		case COLOR_DROPPED:
+		// Received from the color list view when color changes
+		case BColorListView::B_MESSAGE_SET_CURRENT_COLOR:
 		{
+			char* name;
+			type_code type;
 			rgb_color* color;
 			ssize_t size;
-			color_which which;
 
-			if (msg->FindData(kRGBColor, B_RGB_COLOR_TYPE,
-					(const void**)&color, &size) == B_OK
-				&& msg->FindUInt32(kWhich, (uint32*)&which) == B_OK) {
-				_SetColor(which, *color);
+			if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type) == B_OK
+				&& message->FindData(name, type, (const void**)&color, &size) == B_OK) {
+				_SetCurrentColor(*color);
 				Window()->PostMessage(kMsgUpdate);
 			}
 			break;
 		}
 
-		case SET_CURRENT_COLOR:
+		case BColorListView::B_MESSAGE_SET_COLOR:
 		{
+			char* name;
+			type_code type;
 			rgb_color* color;
 			ssize_t size;
+			color_which which;
 
-			if (msg->FindData(kRGBColor, B_RGB_COLOR_TYPE,
-					(const void**)&color, &size) == B_OK) {
-				_SetCurrentColor(*color);
+			if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type) == B_OK
+				&& message->FindData(name, type, (const void**)&color, &size) == B_OK
+				&& message->FindUInt32("which", (uint32*)&which) == B_OK) {
+				_SetColor(which, *color);
 				Window()->PostMessage(kMsgUpdate);
 			}
 			break;
@@ -140,7 +164,6 @@ APRView::MessageReceived(BMessage *msg)
 			// Received from the color fPicker when its color changes
 			rgb_color color = fPicker->ValueAsColor();
 			_SetCurrentColor(color);
-
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
@@ -149,11 +172,8 @@ APRView::MessageReceived(BMessage *msg)
 		{
 			// Received when the user chooses a GUI fAttribute from the list
 
-			ColorWhichItem* item = (ColorWhichItem*)
-				fAttrList->ItemAt(fAttrList->CurrentSelection());
-			if (item == NULL)
-				break;
-
+			BColorItem* item
+				= static_cast<BColorItem*>(fAttrList->ItemAt(fAttrList->CurrentSelection()));
 			fWhich = item->ColorWhich();
 			rgb_color color = ui_color(fWhich);
 			_SetCurrentColor(color);
@@ -167,7 +187,7 @@ APRView::MessageReceived(BMessage *msg)
 		}
 
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 			break;
 	}
 }
@@ -206,8 +226,7 @@ APRView::Revert()
 	_SetUIColors(fPrevColors);
 	_UpdatePreviews(fPrevColors);
 
-	rgb_color color = fPrevColors.GetColor(ui_color_name(fWhich),
-		make_color(255, 0, 255));
+	rgb_color color = fPrevColors.GetColor(ui_color_name(fWhich), make_color(255, 0, 255));
 	fPicker->SetValue(color);
 	fColorPreview->SetColor(color);
 	fColorPreview->Invalidate();
@@ -250,7 +269,7 @@ APRView::_CreateItems()
 		}
 
 		const char* text = B_TRANSLATE_NOCOLLECT(description.text);
-		fAttrList->AddItem(new ColorWhichItem(text, which, ui_color(which)));
+		fAttrList->AddItem(new BColorItem(text, which, ui_color(which)));
 	}
 
 	if (Window() != NULL)
@@ -263,7 +282,7 @@ APRView::_UpdatePreviews(const BMessage& colors)
 {
 	rgb_color color;
 	for (int32 i = color_description_count() - 1; i >= 0; i--) {
-		ColorWhichItem* item = static_cast<ColorWhichItem*>(fAttrList->ItemAt(i));
+		BColorItem* item = static_cast<BColorItem*>(fAttrList->ItemAt(i));
 		if (item == NULL)
 			continue;
 
@@ -290,7 +309,7 @@ APRView::_SetCurrentColor(rgb_color color)
 	_SetColor(fWhich, color);
 
 	int32 currentIndex = fAttrList->CurrentSelection();
-	ColorWhichItem* item = (ColorWhichItem*)fAttrList->ItemAt(currentIndex);
+	BColorItem* item = static_cast<BColorItem*>(fAttrList->ItemAt(currentIndex));
 	if (item != NULL) {
 		item->SetColor(color);
 		fAttrList->InvalidateItem(currentIndex);
@@ -298,7 +317,6 @@ APRView::_SetCurrentColor(rgb_color color)
 
 	fPicker->SetValue(color);
 	fColorPreview->SetColor(color);
-	fColorPreview->Invalidate();
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2025 Haiku, Inc. All rights reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
@@ -26,10 +26,11 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
-#include <ControlLook.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <Clipboard.h>
+#include <ColorListView.h>
+#include <ControlLook.h>
 #include <Dragger.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -50,8 +51,8 @@
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
-#include <UnicodeChar.h>
 #include <UTF8.h>
+#include <UnicodeChar.h>
 
 #include <AutoLocker.h>
 
@@ -706,6 +707,9 @@ TermWindow::MessageReceived(BMessage *message)
 	int32 encodingId;
 	bool findresult;
 
+	if (message->WasDropped())
+		_SetTermColors();
+
 	switch (message->what) {
 		case B_KEY_MAP_LOADED:
 			_UpdateKeymap();
@@ -1003,18 +1007,12 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_COLOR_SCHEME_CHANGED:
-		case MSG_SET_CURRENT_COLOR:
-		case MSG_SET_COLOR:
+		case BColorListView::B_MESSAGE_SET_CURRENT_COLOR:
+		case BColorListView::B_MESSAGE_SET_COLOR:
 		case MSG_UPDATE_COLOR:
-		{
-			for (int32 i = fTabView->CountTabs() - 1; i >= 0; i--) {
-				TermViewContainerView* container = _TermViewContainerViewAt(i);
-				_SetTermColors(container);
-				container->Invalidate();
-			}
-			_ActiveTermView()->Invalidate();
+			_SetTermColors();
 			break;
-		}
+
 		case MSG_SAVE_AS_DEFAULT:
 		{
 			BPath path;
@@ -1217,6 +1215,19 @@ TermWindow::WindowActivated(bool activated)
 {
 	if (activated)
 		_UpdateSwitchTerminalsMenuItem();
+}
+
+
+void
+TermWindow::_SetTermColors()
+{
+	for (int32 index = fTabView->CountTabs() - 1; index >= 0; index--) {
+		TermViewContainerView* container = _TermViewContainerViewAt(index);
+		_SetTermColors(container);
+		container->Invalidate();
+	}
+
+	_ActiveTermView()->Invalidate();
 }
 
 

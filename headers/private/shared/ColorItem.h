@@ -1,9 +1,6 @@
 /*
- * Copyright 2016-2022 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2024 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		John Scipione, jscipione@gmail.com
  *
  * Based on ColorWhichItem by DarkWyrm (bpmagic@columbus.rr.com)
  */
@@ -15,17 +12,32 @@
 #include <StringItem.h>
 
 
-class ColorItem : public BStringItem {
+namespace BPrivate {
+
+
+class BColorItem : public BStringItem {
 public:
-							ColorItem(const char* string, rgb_color color);
+							BColorItem(const char* text, rgb_color color);
+							BColorItem(const char* text, color_which which, rgb_color color);
 
 	virtual	void			DrawItem(BView* owner, BRect frame, bool complete);
-			void			SetColor(rgb_color color) { fColor = color; }
-			rgb_color		Color() const { return fColor; }
+
+			void			SetColor(rgb_color color) { fColor = color; };
+			rgb_color		Color() { return fColor; };
+
+			color_which		ColorWhich() { return fColorWhich; };
 
 private:
 			rgb_color		fColor;
+			color_which		fColorWhich;
 };
 
 
-#endif	// _COLOR_ITEM_H
+} // namespace BPrivate
+
+
+// remove once apps have been updated to use BColorItem
+typedef BPrivate::BColorItem ColorItem;
+
+
+#endif // _COLOR_ITEM_H
