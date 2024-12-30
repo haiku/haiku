@@ -103,20 +103,16 @@ struct ChainHash {
 	typedef chain_key	KeyType;
 	typedef	chain		ValueType;
 
-// TODO: check if this makes a good hash...
-#define HASH(o) ((uint32)(((o)->family) ^ ((o)->type) ^ ((o)->protocol)))
-
 	size_t HashKey(KeyType key) const
 	{
-		return HASH(&key);
+		// TODO: check if this makes a good hash...
+		return (uint32)(key.family ^ key.type ^ key.protocol);
 	}
 
 	size_t Hash(ValueType* value) const
 	{
-		return HASH(value);
+		return HashKey(chain_key { value->family, value->type, value->protocol });
 	}
-
-#undef HASH
 
 	bool Compare(KeyType key, ValueType* chain) const
 	{
