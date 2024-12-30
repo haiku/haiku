@@ -486,9 +486,13 @@ put_domain_protocols(net_socket* socket)
 		MutexLocker _(sChainLock);
 
 		chain = chain::Lookup(sProtocolChains, socket->family, socket->type,
-			socket->protocol);
-		if (chain == NULL)
+			socket->type == SOCK_RAW ? 0 : socket->protocol);
+		if (chain == NULL) {
+			ASSERT_PRINT(socket->first_protocol == NULL,
+				"socket has first protocol but no chain for %d:%d:%d",
+					socket->family, socket->type, socket->protocol);
 			return B_ERROR;
+		}
 	}
 
 	uninit_domain_protocols(socket);
