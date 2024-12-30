@@ -21,10 +21,10 @@
 
 
 const char* kSoundNames[] = {
-	"Information notification",
-	"Important notification",
-	"Error notification",
-	"Progress notification",
+	"Notification information",
+	"Notification important",
+	"Notification error",
+	"Notification progress",
 	NULL
 };
 
