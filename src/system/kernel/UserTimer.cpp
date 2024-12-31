@@ -1509,10 +1509,10 @@ user_timer_get_clock(clockid_t clockID, bigtime_t& _time)
 		default:
 		{
 			// get the ID of the target team (or the respective placeholder)
-			team_id teamID;
+			team_id teamID = 0;
 			if (clockID == CLOCK_PROCESS_CPUTIME_ID) {
 				teamID = B_CURRENT_TEAM;
-			} else if ((clockID & CPUCLOCK_THREAD) == CPUCLOCK_THREAD) {
+			} else if ((clockID & CPUCLOCK_SPECIAL) == CPUCLOCK_THREAD) {
 				thread_id threadID = clockID & CPUCLOCK_ID_MASK;
 				// get the thread
 				Thread* thread = Thread::Get(threadID);
@@ -1526,10 +1526,12 @@ user_timer_get_clock(clockid_t clockID, bigtime_t& _time)
 				_time = thread->CPUTime(false);
 
 				return B_OK;
-			} else if ((clockID & CPUCLOCK_TEAM) == CPUCLOCK_TEAM) {
+			} else if ((clockID & CPUCLOCK_SPECIAL) == CPUCLOCK_TEAM) {
 				teamID = clockID & CPUCLOCK_ID_MASK;
 				if (teamID == team_get_kernel_team_id())
 					return B_NOT_ALLOWED;
+			} else {
+				return B_BAD_VALUE;
 			}
 
 			// get the team
