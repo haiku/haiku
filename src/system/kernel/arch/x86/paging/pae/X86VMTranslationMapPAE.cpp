@@ -620,12 +620,21 @@ X86VMTranslationMapPAE::UnmapPage(VMArea* area, addr_t address,
 		// (cf. pmap_remove_all()), unless I've missed something.
 	}
 
-	locker.Detach();
-		// PageUnmapped() will unlock for us
+	if (_flags == NULL) {
+		locker.Detach();
+			// PageUnmapped() will unlock for us
 
-	PageUnmapped(area, (oldEntry & X86_PAE_PTE_ADDRESS_MASK) / B_PAGE_SIZE,
-		(oldEntry & X86_PAE_PTE_ACCESSED) != 0,
-		(oldEntry & X86_PAE_PTE_DIRTY) != 0, updatePageQueue);
+		PageUnmapped(area, (oldEntry & X86_PAE_PTE_ADDRESS_MASK) / B_PAGE_SIZE,
+			(oldEntry & X86_PAE_PTE_ACCESSED) != 0,
+			(oldEntry & X86_PAE_PTE_DIRTY) != 0, updatePageQueue);
+	} else {
+		uint32 flags = PAGE_PRESENT;
+		if ((oldEntry & X86_PAE_PTE_ACCESSED) != 0)
+			flags |= PAGE_ACCESSED;
+		if ((oldEntry & X86_PAE_PTE_DIRTY) != 0)
+			flags |= PAGE_MODIFIED;
+		*_flags = flags;
+	}
 
 	return B_OK;
 }
