@@ -4750,10 +4750,9 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 {
 	ASSERT((amount % B_PAGE_SIZE) == 0);
 	ASSERT(priority >= 0 && priority < (int)B_COUNT_OF(kMemoryReserveForPriority));
+	TRACE(("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory));
 
 	MutexLocker locker(sAvailableMemoryLock);
-
-	//dprintf("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory);
 
 	const size_t reserve = kMemoryReserveForPriority[priority];
 	if (sAvailableMemory >= (off_t)(amount + reserve)) {
@@ -4772,7 +4771,8 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 	// turn timeout into an absolute timeout
 	timeout += system_time();
 
-	// loop until we've got the memory or the timeout occurs
+	// loop until we're out of retries or the timeout occurs
+	int32 retries = 3;
 	do {
 		sNeededMemory += amount;
 
@@ -4788,7 +4788,7 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 			sAvailableMemory -= amount;
 			return B_OK;
 		}
-	} while (timeout > system_time());
+	} while (--retries > 0 && timeout > system_time());
 
 	return B_NO_MEMORY;
 }
