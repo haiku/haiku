@@ -1331,12 +1331,13 @@ free_unused_vnodes(int32 level)
 
 	for (uint32 i = 0; i < count; i++) {
 		ReadLocker vnodesReadLocker(sVnodeLock);
-		ReadLocker hotVnodesReadLocker(sHotVnodesLock);
 
 		// get the first node
+		rw_lock_read_lock(&sHotVnodesLock);
 		InterruptsSpinLocker unusedVnodesLocker(sUnusedVnodesLock);
 		struct vnode* vnode = sUnusedVnodeList.First();
 		unusedVnodesLocker.Unlock();
+		rw_lock_read_unlock(&sHotVnodesLock);
 
 		if (vnode == NULL)
 			break;
@@ -1346,16 +1347,16 @@ free_unused_vnodes(int32 level)
 
 		// Check whether the node is still unused -- since we only append to the
 		// tail of the unused queue, the vnode should still be at its head.
+		//
 		// Alternatively we could check its ref count for 0 and its busy flag,
 		// but if the node is no longer at the head of the queue, it means it
 		// has been touched in the meantime, i.e. it is no longer the least
 		// recently used unused vnode and we rather don't free it.
-		unusedVnodesLocker.Lock();
-		if (vnode != sUnusedVnodeList.First()) {
-			unusedVnodesLocker.Unlock();
+		//
+		// (We skip acquiring the unused lock here, since the vnode can't be
+		// removed from the unused list without its lock being held.)
+		if (vnode != sUnusedVnodeList.First())
 			continue;
-		}
-		unusedVnodesLocker.Unlock();
 
 		ASSERT(!vnode->IsBusy());
 
@@ -1365,7 +1366,6 @@ free_unused_vnodes(int32 level)
 
 		// write back changes and free the node
 		nodeLocker.Unlock();
-		hotVnodesReadLocker.Unlock();
 		vnodesReadLocker.Unlock();
 
 		if (vnode->cache != NULL)
