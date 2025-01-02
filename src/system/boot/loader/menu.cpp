@@ -1294,9 +1294,20 @@ add_boot_volume_menu()
 	menu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
 	item->SetType(MENU_ITEM_NO_CHOICE);
 
-	if (gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false))
-		menu->SetChoiceText("CD-ROM or hard drive");
-
+	if (gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
+		int32 bootMethod = gBootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
+		switch (bootMethod) {
+			case BOOT_METHOD_CD:
+				menu->SetChoiceText("CD-ROM");
+				break;
+			case BOOT_METHOD_HARD_DISK:
+				menu->SetChoiceText("Hard drive");
+				break;
+			case BOOT_METHOD_NET:
+				menu->SetChoiceText("Network");
+				break;
+		}
+	}
 	return menu;
 }
 

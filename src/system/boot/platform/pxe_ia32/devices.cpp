@@ -78,6 +78,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 			}
 
 			gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, true);
+			gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_NET);
 			devicesList->Add(disk);
 			return B_OK;
 		} else {

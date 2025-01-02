@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system boot loader file_systems tarfs ;
 
+UsePrivateKernelHeaders
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders kernel shared storage ;
 

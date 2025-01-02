@@ -22,6 +22,7 @@
 
 #include <boot/partitions.h>
 #include <boot/platform.h>
+#include <boot/stage2.h>
 #include <util/DoublyLinkedList.h>
 
 
@@ -733,6 +734,18 @@ TarFS::Volume::Init(boot::Partition* partition)
 		return status;
 
 	regionDeleter.Detach();
+	int32 bootMethod = gBootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
+	switch (bootMethod) {
+		case BOOT_METHOD_CD:
+			fName = "CD-ROM";
+			break;
+		case BOOT_METHOD_NET:
+			fName = (char*)malloc(64);
+				// Same size as in platform_add_boot_device() (file pxe_ia32/devices.cpp).
+			get_node_from(partition->FD())->GetName((char*)fName, 64);
+			break;
+	}
+
 	return B_OK;
 }
 
