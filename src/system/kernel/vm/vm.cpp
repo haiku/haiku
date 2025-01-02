@@ -249,11 +249,11 @@ static uint32 sPageMappingsMask;
 
 static rw_lock sAreaCacheLock = RW_LOCK_INITIALIZER("area->cache");
 
+static rw_spinlock sAvailableMemoryLock = B_RW_SPINLOCK_INITIALIZER;
 static off_t sAvailableMemory;
 static off_t sNeededMemory;
-static mutex sAvailableMemoryLock = MUTEX_INITIALIZER("available memory lock");
-static uint32 sPageFaults;
 
+static uint32 sPageFaults;
 static VMPhysicalPageMapper* sPhysicalPageMapper;
 
 
@@ -4677,7 +4677,7 @@ vm_get_info(system_info* info)
 {
 	swap_get_info(info);
 
-	MutexLocker locker(sAvailableMemoryLock);
+	InterruptsWriteSpinLocker locker(sAvailableMemoryLock);
 	info->needed_memory = sNeededMemory;
 	info->free_memory = sAvailableMemory;
 }
@@ -4693,7 +4693,7 @@ vm_num_page_faults(void)
 off_t
 vm_available_memory(void)
 {
-	MutexLocker locker(sAvailableMemoryLock);
+	InterruptsWriteSpinLocker locker(sAvailableMemoryLock);
 	return sAvailableMemory;
 }
 
@@ -4711,7 +4711,7 @@ vm_available_memory_debug(void)
 off_t
 vm_available_not_needed_memory(void)
 {
-	MutexLocker locker(sAvailableMemoryLock);
+	InterruptsWriteSpinLocker locker(sAvailableMemoryLock);
 	return sAvailableMemory - sNeededMemory;
 }
 
@@ -4739,9 +4739,8 @@ vm_unreserve_memory(size_t amount)
 	if (amount == 0)
 		return;
 
-	mutex_lock(&sAvailableMemoryLock);
-	sAvailableMemory += amount;
-	mutex_unlock(&sAvailableMemoryLock);
+	InterruptsReadSpinLocker readLocker(sAvailableMemoryLock);
+	atomic_add64(&sAvailableMemory, amount);
 }
 
 
@@ -4752,10 +4751,24 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 	ASSERT(priority >= 0 && priority < (int)B_COUNT_OF(kMemoryReserveForPriority));
 	TRACE(("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory));
 
-	MutexLocker locker(sAvailableMemoryLock);
-
 	const size_t reserve = kMemoryReserveForPriority[priority];
-	if (sAvailableMemory >= (off_t)(amount + reserve)) {
+	const off_t amountPlusReserve = amount + reserve;
+
+	// Try with a read-lock and atomics first, but only if there's more than double
+	// the amount of memory we're trying to reserve available, to avoid races.
+	InterruptsReadSpinLocker readLocker(sAvailableMemoryLock);
+	if (atomic_get64(&sAvailableMemory) > (off_t)(amountPlusReserve + amount)) {
+		if (atomic_add64(&sAvailableMemory, -amount) >= amountPlusReserve)
+			return B_OK;
+
+		// There wasn't actually enough, we must've raced. Undo what we just did.
+		atomic_add64(&sAvailableMemory, amount);
+	}
+	readLocker.Unlock();
+
+	InterruptsWriteSpinLocker writeLocker(sAvailableMemoryLock);
+
+	if (sAvailableMemory >= amountPlusReserve) {
 		sAvailableMemory -= amount;
 		return B_OK;
 	}
@@ -4772,14 +4785,15 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 		sNeededMemory += amount;
 
 		// call the low resource manager
-		locker.Unlock();
-		low_resource(B_KERNEL_RESOURCE_MEMORY, sNeededMemory - sAvailableMemory,
+		uint64 requirement = sNeededMemory - (sAvailableMemory - reserve);
+		writeLocker.Unlock();
+		low_resource(B_KERNEL_RESOURCE_MEMORY, requirement,
 			B_ABSOLUTE_TIMEOUT, timeout);
-		locker.Lock();
+		writeLocker.Lock();
 
 		sNeededMemory -= amount;
 
-		if (sAvailableMemory >= (off_t)(amount + reserve)) {
+		if (sAvailableMemory >= amountPlusReserve) {
 			sAvailableMemory -= amount;
 			return B_OK;
 		}
