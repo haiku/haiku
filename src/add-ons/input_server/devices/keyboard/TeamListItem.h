@@ -36,10 +36,13 @@ public:
 	const	char*				AppSignature() { return fAppInfo.signature; };
 
 			bool				IsSystemServer();
-			bool				IsApplication() const;
+			bool				IsApplication() const { return fIsApplication; }
 
 			bool				Found() const { return fFound; }
 			void				SetFound(bool found) { fFound = found; }
+
+			bool				IsParent() const { return fIsParent; }
+			void				SetIsParent(bool isParent) { fIsParent = isParent; }
 
 			void				SetRefusingToQuit(bool refusing);
 			bool				IsRefusingToQuit();
@@ -55,6 +58,8 @@ private:
 			BString				fLocalizedName;
 			bool				fFound;
 			bool				fRefusingToQuit;
+			bool				fIsParent;
+			bool				fIsApplication;
 };
 
 

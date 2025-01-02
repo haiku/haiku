@@ -28,7 +28,8 @@ TeamListItem::TeamListItem(team_info &teamInfo)
 	fMiniIcon(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON)), B_RGBA32),
 	fLargeIcon(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_LARGE_ICON)), B_RGBA32),
 	fFound(false),
-	fRefusingToQuit(false)
+	fRefusingToQuit(false),
+	fIsParent(false)
 {
 	int32 cookie = 0;
 	image_info info;
@@ -40,8 +41,7 @@ TeamListItem::TeamListItem(team_info &teamInfo)
 		nodeInfo.GetTrackerIcon(&fLargeIcon, (icon_size)-1);
 	}
 
-	if (be_roster->GetRunningAppInfo(fTeamInfo.team, &fAppInfo) != B_OK)
-		fAppInfo.signature[0] = '\0';
+	fIsApplication = be_roster->GetRunningAppInfo(fTeamInfo.team, &fAppInfo) == B_OK;
 
 	CacheLocalizedName();
 }
@@ -178,13 +178,6 @@ TeamListItem::IsSystemServer()
 		return true;
 
 	return false;
-}
-
-
-bool
-TeamListItem::IsApplication() const
-{
-	return fAppInfo.signature[0] != '\0';
 }
 
 

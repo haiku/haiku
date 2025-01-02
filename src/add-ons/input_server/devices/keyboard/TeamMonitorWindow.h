@@ -12,8 +12,9 @@
 
 #include <Box.h>
 #include <Button.h>
-#include <ListView.h>
+#include <HashMap.h>
 #include <MessageFilter.h>
+#include <OutlineListView.h>
 #include <Window.h>
 
 #include "TeamListItem.h"
@@ -42,13 +43,14 @@ private:
 
 			bool			fQuitting;
 			BMessageRunner*	fUpdateRunner;
-			BListView*		fListView;
+			BOutlineListView*	fListView;
 			BButton*		fCancelButton;
 			BButton*		fKillButton;
 			BButton*		fQuitButton;
 			BButton*		fRestartButton;
 			TeamDescriptionView*	fDescriptionView;
 			BList			fTeamQuitterList;
+			HashMap<HashKey32<int32>, TeamListItem*>	fItemMap;
 };
 
 static const uint32 kMsgCtrlAltDelPressed = 'TMcp';
