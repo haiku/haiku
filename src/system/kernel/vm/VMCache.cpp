@@ -599,8 +599,7 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 
 VMCacheRef::VMCacheRef(VMCache* cache)
 	:
-	cache(cache),
-	ref_count(1)
+	cache(cache)
 {
 }
 

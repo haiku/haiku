@@ -107,7 +107,6 @@ typedef phys_addr_t page_num_t;
 
 struct VMCacheRef {
 			VMCache*			cache;
-			int32				ref_count;
 
 								VMCacheRef(VMCache* cache);
 };
