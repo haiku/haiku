@@ -50,7 +50,6 @@ typedef void miibus_mediainit_t(device_t dev);
 struct device_method {
 	const char* name;
 	const int32 id;
-		/* interfaces w/o function pointer structs use IDs for method lookups */
 	device_method_signature_t method;
 };
 

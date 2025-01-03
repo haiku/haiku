@@ -302,35 +302,33 @@ device_set_driver(device_t dev, driver_t *driver)
 	for (i = 0; driver->methods[i].name != NULL; i++) {
 		device_method_t *mth = &driver->methods[i];
 
-		if (mth->id == ID_device_register)
-			dev->methods.device_register = (void *)mth->method;
-		else if (mth->id == ID_device_probe)
-			dev->methods.probe = (void *)mth->method;
-		else if (mth->id == ID_device_attach)
-			dev->methods.attach = (void *)mth->method;
-		else if (mth->id == ID_device_detach)
-			dev->methods.detach = (void *)mth->method;
-		else if (mth->id == ID_device_suspend)
-			dev->methods.suspend = (void *)mth->method;
-		else if (mth->id == ID_device_resume)
-			dev->methods.resume = (void *)mth->method;
-		else if (mth->id == ID_device_shutdown)
-			dev->methods.shutdown = (void *)mth->method;
-#define METHOD(NAME) if (mth->id == ID_##NAME) dev->methods.NAME = (void*)mth->method;
-		else METHOD(miibus_readreg)
-		else METHOD(miibus_writereg)
-		else METHOD(miibus_statchg)
-		else METHOD(miibus_linkchg)
-		else METHOD(miibus_mediainit)
-		else METHOD(bus_child_location_str)
-		else METHOD(bus_child_pnpinfo_str)
-		else METHOD(bus_hinted_child)
-		else METHOD(bus_print_child)
-		else METHOD(bus_read_ivar)
-		else METHOD(bus_get_dma_tag)
+		switch (mth->id) {
+#define METHOD(NAME) case ID_##NAME: dev->methods.NAME = (void*)mth->method; break;
+			METHOD(device_register)
+			METHOD(device_probe)
+			METHOD(device_attach)
+			METHOD(device_detach)
+			METHOD(device_suspend)
+			METHOD(device_resume)
+			METHOD(device_shutdown)
+
+			METHOD(miibus_readreg)
+			METHOD(miibus_writereg)
+			METHOD(miibus_statchg)
+			METHOD(miibus_linkchg)
+			METHOD(miibus_mediainit)
+
+			METHOD(bus_child_location_str)
+			METHOD(bus_child_pnpinfo_str)
+			METHOD(bus_hinted_child)
+			METHOD(bus_print_child)
+			METHOD(bus_read_ivar)
+			METHOD(bus_get_dma_tag)
 #undef METHOD
-		else
-			panic("device_set_driver: method %s not found\n", mth->name);
+			default:
+				panic("device_set_driver: method %s not found\n", mth->name);
+				break;
+		}
 
 	}
 
@@ -466,10 +464,10 @@ device_attach(device_t device)
 	int result;
 
 	if (device->driver == NULL
-		|| device->methods.attach == NULL)
+		|| device->methods.device_attach == NULL)
 		return B_ERROR;
 
-	result = device->methods.attach(device);
+	result = device->methods.device_attach(device);
 
 	if (result == 0)
 		atomic_or(&device->flags, DEVICE_ATTACHED);
@@ -488,7 +486,7 @@ device_detach(device_t device)
 		return B_ERROR;
 
 	if ((atomic_and(&device->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
-			&& device->methods.detach != NULL) {
+			&& device->methods.device_detach != NULL) {
 		int result = 0;
 		if (HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE))
 			result = stop_wlan(device);
@@ -497,7 +495,7 @@ device_detach(device_t device)
 			return result;
 		}
 
-		result = device->methods.detach(device);
+		result = device->methods.device_detach(device);
 		if (result != 0) {
 			atomic_or(&device->flags, DEVICE_ATTACHED);
 			return result;
@@ -524,7 +522,7 @@ bus_generic_attach(device_t dev)
 			} else
 				device_set_driver(child, driver);
 		} else
-			child->methods.probe(child);
+			child->methods.device_probe(child);
 
 		if (child->driver != NULL) {
 			int result = device_attach(child);
@@ -586,14 +584,15 @@ __haiku_probe_miibus(device_t dev, driver_t *drivers[])
 	for (i = 0; drivers[i]; i++) {
 		device_probe_t *probe = (device_probe_t *)
 			resolve_device_method(drivers[i], ID_device_probe);
-		if (probe) {
-			int result = probe(dev);
-			if (result >= 0) {
-				if (selected == NULL || result < selectedResult) {
-					selected = drivers[i];
-					selectedResult = result;
-					device_printf(dev, "Found MII: %s\n", selected->name);
-				}
+		if (probe == NULL)
+			continue;
+
+		int result = probe(dev);
+		if (result >= 0) {
+			if (selected == NULL || result < selectedResult) {
+				selected = drivers[i];
+				selectedResult = result;
+				device_printf(dev, "Found MII: %s\n", selected->name);
 			}
 		}
 	}

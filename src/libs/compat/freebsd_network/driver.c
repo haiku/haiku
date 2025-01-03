@@ -155,10 +155,10 @@ init_hardware_pci(driver_t* drivers[])
 			// (Any drivers which don't support this should be patched.)
 			device.methods.device_register
 				= resolve_device_method(drivers[index], ID_device_register);
-			device.methods.probe
+			device.methods.device_probe
 				= resolve_device_method(drivers[index], ID_device_probe);
 
-			int result = device.methods.probe(&device);
+			int result = device.methods.device_probe(&device);
 			if (result >= 0 && (driver == NULL || result > best)) {
 				TRACE(("%s, found %s at %d (%d)\n", gDriverName,
 					device_get_desc(device), i, result));
@@ -233,10 +233,10 @@ init_hardware_uhub(driver_t* drivers[])
 		for (int index = 0; drivers[index] != NULL; index++) {
 			device.methods.device_register
 				= resolve_device_method(drivers[index], ID_device_register);
-			device.methods.probe
+			device.methods.device_probe
 				= resolve_device_method(drivers[index], ID_device_probe);
 
-			int result = device.methods.probe(&device);
+			int result = device.methods.device_probe(&device);
 			if (result >= 0 && (driver == NULL || result > best)) {
 				TRACE(("%s, found %s at %d (%d)\n", gDriverName,
 					device_get_desc(device), i, result));
@@ -341,7 +341,7 @@ _fbsd_init_drivers()
 
 		// some drivers expect probe() to be called before attach()
 		// (i.e. they set driver softc in probe(), etc.)
-		if (device->methods.probe(device) >= 0
+		if (device->methods.device_probe(device) >= 0
 				&& device_attach(device) == 0) {
 			dprintf("%s: init_driver(%p)\n", gDriverName,
 				sProbedDevices[p].driver);
