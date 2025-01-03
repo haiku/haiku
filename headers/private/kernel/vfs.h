@@ -59,7 +59,6 @@ typedef struct io_context {
 	struct list node_monitors;
 	uint32		num_monitors;
 	uint32		max_monitors;
-	bool		inherit_fds;
 } io_context;
 
 

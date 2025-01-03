@@ -1788,8 +1788,9 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	inherit_parent_user_and_group(team, parent);
 
 	// get a reference to the parent's I/O context -- we need it to create ours
-	parentIOContext = parent->io_context;
-	vfs_get_io_context(parentIOContext);
+	parentIOContext = (parent->id == B_SYSTEM_TEAM) ? NULL : parent->io_context;
+	if (parentIOContext != NULL)
+		vfs_get_io_context(parentIOContext);
 
 	team->Unlock();
 	parent->UnlockTeamAndProcessGroup();
@@ -1808,18 +1809,18 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	team->SetArgs(path, teamArgs->flat_args + 1, argCount - 1);
 
 	// create a new io_context for this team
+	// remove any fds that have the CLOEXEC flag set (emulating BeOS behaviour)
 	team->io_context = vfs_new_io_context(parentIOContext, true);
-	if (!team->io_context) {
+	if (team->io_context == NULL) {
 		status = B_NO_MEMORY;
 		goto err2;
 	}
 
-	// We don't need the parent's I/O context any longer.
-	vfs_put_io_context(parentIOContext);
-	parentIOContext = NULL;
-
-	// remove any fds that have the CLOEXEC flag set (emulating BeOS behaviour)
-	vfs_exec_io_context(team->io_context);
+	if (parentIOContext != NULL) {
+		// We don't need the parent's I/O context any longer.
+		vfs_put_io_context(parentIOContext);
+		parentIOContext = NULL;
+	}
 
 	// create an address space for this team
 	status = VMAddressSpace::Create(team->id, USER_BASE, USER_SIZE, false,

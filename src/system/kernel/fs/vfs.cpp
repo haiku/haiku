@@ -4968,35 +4968,34 @@ vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 	if (parentContext != NULL) {
 		mutex_lock(&sIOContextRootLock);
 		context->root = parentContext->root;
-		if (context->root)
+		if (context->root != NULL)
 			inc_vnode_ref_count(context->root);
 		mutex_unlock(&sIOContextRootLock);
 
 		context->cwd = parentContext->cwd;
-		if (context->cwd)
+		if (context->cwd != NULL)
 			inc_vnode_ref_count(context->cwd);
 
-		if (parentContext->inherit_fds) {
-			for (size_t i = 0; i < tableSize; i++) {
-				struct file_descriptor* descriptor = parentContext->fds[i];
-
-				if (descriptor != NULL
-						&& (descriptor->open_mode & O_DISCONNECTED) == 0) {
-					const bool closeOnExec = fd_close_on_exec(parentContext, i);
-					if (closeOnExec && purgeCloseOnExec)
-						continue;
-
-					TFD(InheritFD(context, i, descriptor, parentContext));
-
-					context->fds[i] = descriptor;
-					context->num_used_fds++;
-					atomic_add(&descriptor->ref_count, 1);
-					atomic_add(&descriptor->open_count, 1);
-
-					if (closeOnExec)
-						fd_set_close_on_exec(context, i, true);
-				}
+		for (size_t i = 0; i < tableSize; i++) {
+			struct file_descriptor* descriptor = parentContext->fds[i];
+			if (descriptor == NULL
+					|| (descriptor->open_mode & O_DISCONNECTED) != 0) {
+				continue;
 			}
+
+			const bool closeOnExec = fd_close_on_exec(parentContext, i);
+			if (closeOnExec && purgeCloseOnExec)
+				continue;
+
+			TFD(InheritFD(context, i, descriptor, parentContext));
+
+			context->fds[i] = descriptor;
+			context->num_used_fds++;
+			atomic_add(&descriptor->ref_count, 1);
+			atomic_add(&descriptor->open_count, 1);
+
+			if (closeOnExec)
+				fd_set_close_on_exec(context, i, true);
 		}
 
 		parentLocker.Unlock();
@@ -5012,7 +5011,6 @@ vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 	}
 
 	context->table_size = tableSize;
-	context->inherit_fds = parentContext != NULL;
 
 	list_init(&context->node_monitors);
 	context->max_monitors = DEFAULT_NODE_MONITORS;
