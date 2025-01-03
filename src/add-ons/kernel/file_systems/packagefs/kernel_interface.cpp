@@ -164,9 +164,13 @@ packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 
 	// resolve ".."
 	if (strcmp(entryName, "..") == 0) {
-		Node* parent;
-		*_vnid = dir->GetParentUnchecked()->ID();
-		return volume->GetVNode(*_vnid, parent);
+		BReference<Directory> parent = dir->GetParent();
+		if (parent == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		Node* dummy;
+		*_vnid = parent->ID();
+		return volume->GetVNode(*_vnid, dummy);
 	}
 
 	// resolve normal entries -- look up the node
