@@ -87,6 +87,7 @@ class TransformerListView : public SimpleListView,
 			BMenuItem*			fContourMI;
 			BMenuItem*			fStrokeMI;
 			BMenuItem*			fPerspectiveMI;
+			BMenuItem*			fRemoveItem;
 };
 
 #endif // TRANSFORMER_LIST_VIEW_H

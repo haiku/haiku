@@ -103,7 +103,7 @@ private:
 			BMenuItem*			fAddMI;
 			BMenuItem*			fDuplicateMI;
 			BMenuItem*			fResetTransformationMI;
-			BMenuItem*			fRemoveMI;
+			BMenuItem*			fRemoveItem;
 };
 
 

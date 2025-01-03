@@ -664,8 +664,8 @@ StyleListView::SetMenu(BMenu* menu)
 
 	fMenu->AddSeparatorItem();
 
-	fRemoveMI = new BMenuItem(B_TRANSLATE("Remove"), new BMessage(MSG_REMOVE));
-	fMenu->AddItem(fRemoveMI);
+	fRemoveItem = new BMenuItem(B_TRANSLATE("Remove"), new BMessage(MSG_REMOVE));
+	fMenu->AddItem(fRemoveItem);
 
 	fMenu->SetTargetForItems(this);
 
@@ -838,6 +838,6 @@ StyleListView::_UpdateMenu()
 	// TODO: only enable fResetTransformationMI if styles
 	// with gradients are selected!
 	fResetTransformationMI->SetEnabled(gotSelection);
-	fRemoveMI->SetEnabled(gotSelection);
+	fRemoveItem->SetEnabled(gotSelection);
 }
 
