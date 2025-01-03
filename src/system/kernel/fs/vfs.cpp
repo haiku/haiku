@@ -5046,17 +5046,22 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 	select_info** oldSelectInfos = context->select_infos;
 	uint8* oldCloseOnExecTable = context->fds_close_on_exec;
 
-	// allocate new tables
+	// allocate new tables (separately to reduce the chances of needing a raw allocation)
 	file_descriptor** newFDs = (file_descriptor**)malloc(
-		sizeof(struct file_descriptor*) * newSize
-		+ sizeof(struct select_infos**) * newSize
-		+ newCloseOnExitBitmapSize);
-	if (newFDs == NULL)
+		sizeof(struct file_descriptor*) * newSize);
+	select_info** newSelectInfos = (select_info**)malloc(
+		+ sizeof(select_info**) * newSize);
+	uint8* newCloseOnExecTable = (uint8*)malloc(newCloseOnExitBitmapSize);
+	if (newFDs == NULL || newSelectInfos == NULL || newCloseOnExecTable == NULL) {
+		free(newFDs);
+		free(newSelectInfos);
+		free(newCloseOnExecTable);
 		return B_NO_MEMORY;
+	}
 
 	context->fds = newFDs;
-	context->select_infos = (select_info**)(context->fds + newSize);
-	context->fds_close_on_exec = (uint8*)(context->select_infos + newSize);
+	context->select_infos = newSelectInfos;
+	context->fds_close_on_exec = newCloseOnExecTable;
 	context->table_size = newSize;
 
 	if (oldSize != 0) {
@@ -5079,6 +5084,8 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 	}
 
 	free(oldFDs);
+	free(oldSelectInfos);
+	free(oldCloseOnExecTable);
 
 	return B_OK;
 }
