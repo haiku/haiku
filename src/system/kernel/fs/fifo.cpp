@@ -27,6 +27,7 @@
 #include <syscall_restart.h>
 #include <team.h>
 #include <thread.h>
+#include <slab/Slab.h>
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
 #include <util/ring_buffer.h>
@@ -48,6 +49,9 @@ namespace fifo {
 
 struct file_cookie;
 class Inode;
+
+static object_cache* sRingBufferCache;
+static const size_t kRingBufferCacheObjectSize = VFS_FIFO_BUFFER_CAPACITY + sizeof(ring_buffer);
 
 
 class RingBuffer {
@@ -272,8 +276,12 @@ RingBuffer::CreateBuffer()
 	if (fBuffer != NULL)
 		return B_OK;
 
-	fBuffer = create_ring_buffer(VFS_FIFO_BUFFER_CAPACITY);
-	return fBuffer != NULL ? B_OK : B_NO_MEMORY;
+	void* buffer = object_cache_alloc(sRingBufferCache, 0);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	fBuffer = create_ring_buffer_etc(buffer, kRingBufferCacheObjectSize, 0);
+	return B_OK;
 }
 
 
@@ -281,7 +289,7 @@ void
 RingBuffer::DeleteBuffer()
 {
 	if (fBuffer != NULL) {
-		delete_ring_buffer(fBuffer);
+		object_cache_free(sRingBufferCache, fBuffer, 0);
 		fBuffer = NULL;
 	}
 }
@@ -1324,6 +1332,10 @@ create_fifo_vnode(fs_volume* superVolume, fs_vnode* vnode)
 void
 fifo_init()
 {
+	sRingBufferCache = create_object_cache_etc("fifo ring buffers",
+		kRingBufferCacheObjectSize, 0, 0, 0, 0, CACHE_NO_DEPOT,
+		NULL, NULL, NULL, NULL);
+
 	add_debugger_command_etc("fifo", &Inode::Dump,
 		"Print info about the specified FIFO node",
 		"[ \"-d\" ] <address>\n"
