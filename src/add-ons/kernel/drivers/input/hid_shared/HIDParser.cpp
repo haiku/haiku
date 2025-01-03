@@ -481,8 +481,10 @@ HIDParser::SetReport(status_t status, uint8 *report, size_t length)
 	// transfer to happen needs to reschedule one now.
 	for (int32 i = 0; i < fReports.Count(); i++) {
 		if (fReports[i] == NULL
-			|| fReports[i]->Type() != HID_REPORT_TYPE_INPUT)
+			|| (fReports[i]->Type() != HID_REPORT_TYPE_INPUT
+				&& fReports[i]->Type() != HID_REPORT_TYPE_FEATURE)) {
 			continue;
+		}
 
 		if (fReports[i]->ID() == targetID)
 			fReports[i]->SetReport(status, report, length);
