@@ -37,7 +37,11 @@ VMVnodeCache::Init(struct vnode* vnode, uint32 allocationFlags)
 status_t
 VMVnodeCache::Commit(off_t size, int priority)
 {
-	// We don't need to commit memory.
+	// We don't need to commit memory here.
+	// TODO: We do need to commit memory when pages are mapped, though,
+	// as mapped pages can't be stolen like CACHED ones can.
+	// (When the system is low on memory, the page daemon will unmap
+	// unused pages, and they can be decommitted then.)
 	return B_OK;
 }
 
