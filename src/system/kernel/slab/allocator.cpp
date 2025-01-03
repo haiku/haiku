@@ -35,7 +35,9 @@ static const size_t kBlockSizes[] = {
 	320, 384, 448, 512,
 	640, 768, 896, 1024,
 	1280, 1536, 1792, 2048,
-	2560, 3072, 3584, 4096, 4608, 5120, 5632, 6144, 6656, 7168, 7680, 8192,
+	2560, 3072, 3584, 4096,
+	5120, 6144, 7168, 8192,
+	10240, 12288, 14336, 16384,
 };
 
 static const size_t kNumBlockSizes = B_COUNT_OF(kBlockSizes);
@@ -67,8 +69,12 @@ size_to_index(size_t size)
 		return 17 + (size - 512 - 1) / 128;
 	if (size <= 2048)
 		return 21 + (size - 1024 - 1) / 256;
-	if (size <= 8192)
+	if (size <= 4096)
 		return 25 + (size - 2048 - 1) / 512;
+	if (size <= 8192)
+		return 29 + (size - 4096 - 1) / 1024;
+	if (size <= 16384)
+		return 33 + (size - 8192 - 1) / 2048;
 
 	return -1;
 }
