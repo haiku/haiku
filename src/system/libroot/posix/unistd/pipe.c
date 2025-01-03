@@ -10,8 +10,8 @@
 #include <syscalls.h>
 
 
-int
-pipe2(int streams[2], int flags)
+static int
+common_pipe(int streams[2], int flags)
 {
 	status_t error = _kern_create_pipe(streams, flags);
 	if (error != B_OK) {
@@ -24,7 +24,14 @@ pipe2(int streams[2], int flags)
 
 
 int
+pipe2(int streams[2], int flags)
+{
+	return common_pipe(streams, flags);
+}
+
+
+int
 pipe(int streams[2])
 {
-	return pipe2(streams, 0);
+	return common_pipe(streams, 0);
 }
