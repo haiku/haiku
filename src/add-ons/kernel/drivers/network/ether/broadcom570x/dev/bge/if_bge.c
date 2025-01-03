@@ -2716,6 +2716,9 @@ bge_probe(device_t dev)
 	uint16_t did, vid;
 
 	sc = device_get_softc(dev);
+#ifdef __HAIKU__
+	if (sc != NULL)
+#endif
 	sc->bge_dev = dev;
 	vid = pci_get_vendor(dev);
 	did = pci_get_device(dev);
