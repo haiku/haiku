@@ -4934,6 +4934,7 @@ vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 
 	memset(context, 0, sizeof(io_context));
 	context->ref_count = 1;
+	rw_lock_init(&context->lock, "I/O context");
 
 	ReadLocker parentLocker;
 
@@ -4944,24 +4945,10 @@ vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 	} else
 		tableSize = DEFAULT_FD_TABLE_SIZE;
 
-	// allocate space for FDs and their close-on-exec flag
-	context->fds = (file_descriptor**)malloc(
-		sizeof(struct file_descriptor*) * tableSize
-		+ sizeof(struct select_info**) * tableSize
-		+ (tableSize + 7) / 8);
-	if (context->fds == NULL) {
+	if (vfs_resize_fd_table(context, tableSize) != B_OK) {
 		free(context);
 		return NULL;
 	}
-
-	context->select_infos = (select_info**)(context->fds + tableSize);
-	context->fds_close_on_exec = (uint8*)(context->select_infos + tableSize);
-
-	memset(context->fds, 0, sizeof(struct file_descriptor*) * tableSize
-		+ sizeof(struct select_info**) * tableSize
-		+ (tableSize + 7) / 8);
-
-	rw_lock_init(&context->lock, "I/O context");
 
 	// Copy all parent file descriptors
 
@@ -5009,8 +4996,6 @@ vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 		if (context->cwd)
 			inc_vnode_ref_count(context->cwd);
 	}
-
-	context->table_size = tableSize;
 
 	list_init(&context->node_monitors);
 	context->max_monitors = DEFAULT_NODE_MONITORS;
@@ -5074,13 +5059,15 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 	context->fds_close_on_exec = (uint8*)(context->select_infos + newSize);
 	context->table_size = newSize;
 
-	// copy entries from old tables
-	uint32 toCopy = min_c(oldSize, newSize);
+	if (oldSize != 0) {
+		// copy entries from old tables
+		uint32 toCopy = min_c(oldSize, newSize);
 
-	memcpy(context->fds, oldFDs, sizeof(void*) * toCopy);
-	memcpy(context->select_infos, oldSelectInfos, sizeof(void*) * toCopy);
-	memcpy(context->fds_close_on_exec, oldCloseOnExecTable,
-		min_c(oldCloseOnExitBitmapSize, newCloseOnExitBitmapSize));
+		memcpy(context->fds, oldFDs, sizeof(void*) * toCopy);
+		memcpy(context->select_infos, oldSelectInfos, sizeof(void*) * toCopy);
+		memcpy(context->fds_close_on_exec, oldCloseOnExecTable,
+			min_c(oldCloseOnExitBitmapSize, newCloseOnExitBitmapSize));
+	}
 
 	// clear additional entries, if the tables grow
 	if (newSize > oldSize) {
