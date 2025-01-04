@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Bogmærker
 Use proxy server to connect to the internet	Settings Window		Brug proxyserver til at oprette forbindelse til internettet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url færdig
 Auto-hide interface in full screen mode	Settings Window		Skjul automatisk brugerfladen i fuldskærmstilstand
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Der opstod en fejl ved forsøg på at hente bogmærkemappen.\n\nFejl: %error
 Delete	Cookie Manager		Slet
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Der opstod en fejl ved forsøg på at hente bogmærkemappen.\n\nFejl: %error
 (Finish: %date - Over %duration left)	Download Window		(færdig: %date - Over %duration tilbage)
 Open containing folder	Download Window		Åbn indeholdende mappe
 Find previous	WebPositive Window		Find forrige
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Cookies til %s
 Close	Download Window		Luk
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - søgeterm
-Reload	WebPositive Window		Genindlæs
 Expiration	Cookie Manager		Udløb
+Reload	WebPositive Window		Genindlæs
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Din CPU er for gammel og understøtter ikke SSE2-udvidelser uden hvilke WebPositive ikke kan køre. Vi anbefaler, du installerer NetSurf i stedet for.
 Download finished	Download Window		Hentning fuldført
 Cookie manager	WebPositive Window		Cookiehåndtering
-OK	Authentication Panel		O.k.
-Hide password text	Authentication Panel		Skjul adgangskodetekst
 Username:	Authentication Panel		Brugernavn:
+Hide password text	Authentication Panel		Skjul adgangskodetekst
+OK	Authentication Panel		O.k.
 Name	Cookie Manager		Navn
 Remove finished	Download Window		Fjern fuldførte
 Earlier	WebPositive Window		Tidligere
@@ -81,8 +81,8 @@ View	WebPositive Window		Vis
 Paste	URL Bar		Indsæt
 Find next	WebPositive Window		Find næste
 Open search page	Settings Window		Åbn søgeside
-Increase size	WebPositive Window		Forøg størrelse
 New tab	WebPositive Window		Nyt faneblad
+Increase size	WebPositive Window		Forøg størrelse
 Today	WebPositive Window		I dag
 Open location	WebPositive Window		Åbn placering
 New browser window	Download Window		Nyt browservindue
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Forvalgt størrelse for forvalgt sk
 Custom	Settings Window		Tilpasset
 Bookmark this page	WebPositive Window		Bogmærk denne side
 Show tabs if only one page is open	Settings Window		Vis faneblade, hvis der kun er én side åben
-Close tab	WebPositive Window		Luk faneblad
 Remove	Download Window		Fjern
+Close tab	WebPositive Window		Luk faneblad
 About	WebPositive Window		Om
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Der er stadig igangværende overførsler, vil du virkelig afslutte WebPositive nu?
 Continue downloads	WebPositive		Fortsæt hentninger
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Der er stadig igangværende overførsler, vil du virkelig afslutte WebPositive nu?
 Proxy server requires authentication	Settings Window		Proxy-server kræver godkendelse
 Cancel	Settings Window		Afbryd
 Reset size	WebPositive Window		Nulstil størrelse
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Bogmærkefejl
 OK	WebPositive Window		O.k.
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% af %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Zoom kun tekst
 Save page as…	WebPositive Window		Gem side som…
+Zoom text only	WebPositive Window		Zoom kun tekst
 Page source error	WebPositive Window		Fejl ved sidekilde
 Auto-hide mouse pointer	Settings Window		Skjul automatisk musemarkør
 Requesting %url	WebPositive Window		Anmoder %url

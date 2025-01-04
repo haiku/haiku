@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1912038977
+1	catalan; valencian	x-vnd.Haiku-libtracker	4267788442
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -293,6 +293,7 @@ The Tracker must be running to set the default printer.	PoseView		El Rastrejador
 calculating…	InfoWindow		es calcula...
 Preferred for file	OpenWithWindow		Preferit pel fitxer
 OK	AutoMounterSettings		D'acord
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# de seleccionat} other{# de seleccionats}}
 copying	FSUtils		es copia
 Get info	FilePanelPriv		Informació
 MIME String	AttributesView		Cadena MIME

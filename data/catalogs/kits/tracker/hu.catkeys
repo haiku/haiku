@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1912038977
+1	hungarian	x-vnd.Haiku-libtracker	4267788442
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -293,6 +293,7 @@ The Tracker must be running to set the default printer.	PoseView		A Nyomkövető
 calculating…	InfoWindow		számolás…
 Preferred for file	OpenWithWindow		Előnyben részesítve a fájlnak
 OK	AutoMounterSettings		Rendben
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# kijelölve} other{# kijelölve}}
 copying	FSUtils		másolni
 Get info	FilePanelPriv		Információ
 MIME String	AttributesView		MIME Szöveg

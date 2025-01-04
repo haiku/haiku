@@ -1,15 +1,13 @@
-1	portuguese (brazil)	x-vnd.Haiku-Sounds	1784495232
+1	portuguese (brazil)	x-vnd.Haiku-Sounds	2763165148
 Sounds	System name		Sons
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sons\n  Trazido para você por :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Trabalho original de Atsushi Takamatsu.\nDireitos autorais ©2003-2006 Haiku
 No such file or directory	HEventList		Arquivo ou pasta inexistente
-OK	HWindow		OK
 Other…	HWindow		Outros...
 OK	SoundsHApp		OK
 Sound file:	HWindow		Arquivo de som:
-This is not an audio file.	HWindow		Isto não é um arquivo de áudio.
 <none>	HEventList		<nenhum>
-OK	HEventList		OK
 About Sounds	SoundsHApp		Sobre Sons
+OK	HEventList		OK
 Sound	HEventList		Som
 Event	HEventList		Evento
 <none>	HWindow		<nenhum>

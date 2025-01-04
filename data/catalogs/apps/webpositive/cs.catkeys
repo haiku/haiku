@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Záložky
 Use proxy server to connect to the internet	Settings Window		Použít proxy server pro připojení k internetu
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url hotovo
 Auto-hide interface in full screen mode	Settings Window		Automaticky skrývat rozhraní v režimu celé obrazovky
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Při načítání složky záložek došlo k chybě.\n\nChyba: %error
 Delete	Cookie Manager		Smazat
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Při načítání složky záložek došlo k chybě.\n\nChyba: %error
 (Finish: %date - Over %duration left)	Download Window		(Dokončeno: %date - Zbývá přes %duration)
 Open containing folder	Download Window		Otevřít nahrazenou složku
 Find previous	WebPositive Window		Najít předchozí
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Sušenky pro %s
 Close	Download Window		Zavřít
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hledat výraz
-Reload	WebPositive Window		Obnovit
 Expiration	Cookie Manager		Expirace
+Reload	WebPositive Window		Obnovit
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Váš procesor je moc starý a nepodporuje rozšíření SSE2, bez kterého WebPositive nemaká. Doporučujeme raději nainstalovat NetSurf.
 Download finished	Download Window		Stahování dokončeno
 Cookie manager	WebPositive Window		Správce sušenek
-OK	Authentication Panel		OK
-Hide password text	Authentication Panel		Skrýt text hesla
 Username:	Authentication Panel		Uživatelské jméno:
+Hide password text	Authentication Panel		Skrýt text hesla
+OK	Authentication Panel		OK
 Name	Cookie Manager		Název
 Remove finished	Download Window		Odstranit dokončené
 Earlier	WebPositive Window		Dříve
@@ -81,8 +81,8 @@ View	WebPositive Window		Zobrazení
 Paste	URL Bar		Vložit
 Find next	WebPositive Window		Najít další
 Open search page	Settings Window		Otevřít stránku vyhledávání
-Increase size	WebPositive Window		Zvětšit velikost
 New tab	WebPositive Window		Nová karta
+Increase size	WebPositive Window		Zvětšit velikost
 Today	WebPositive Window		Dnes
 Open location	WebPositive Window		Otevřít umístění
 New browser window	Download Window		Nové okno prohlížeče
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Výchozí velikost standardního p�
 Custom	Settings Window		Vlastní
 Bookmark this page	WebPositive Window		Přidat tuto stránku do záložek
 Show tabs if only one page is open	Settings Window		Zobrazit karty, je-li otevřena pouze jedna karta
-Close tab	WebPositive Window		Zavřít kartu
 Remove	Download Window		Odebrat
+Close tab	WebPositive Window		Zavřít kartu
 About	WebPositive Window		O aplikaci
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Stále probíhá stahování, opravdu ukončit WebPositive?
 Continue downloads	WebPositive		Pokračovat ve stahování
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Stále probíhá stahování, opravdu ukončit WebPositive?
 Proxy server requires authentication	Settings Window		Proxy server vyžaduje ověření
 Cancel	Settings Window		Zrušit
 Reset size	WebPositive Window		Obnovit velikost
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Chyba záložky
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% z %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Zvětšovat pouze text
 Save page as…	WebPositive Window		Uložit stránku jako...
+Zoom text only	WebPositive Window		Zvětšovat pouze text
 Page source error	WebPositive Window		Chyba zdroje stránky
 Auto-hide mouse pointer	Settings Window		Automaticky skrývat ukazatel myši
 Requesting %url	WebPositive Window		Požadavek na %url

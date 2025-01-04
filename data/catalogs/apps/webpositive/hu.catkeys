@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Könyvjelzők
 Use proxy server to connect to the internet	Settings Window		Proxy kiszolgáló használata az internethez kapcsolódáshoz
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url kész
 Auto-hide interface in full screen mode	Settings Window		Felhasználói felület automatikus elrejtése teljes képernyős módban
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
 Delete	Cookie Manager		Töröl
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
 (Finish: %date - Over %duration left)	Download Window		(Elkészül: %date - %duration van hátra)
 Open containing folder	Download Window		Tartalmazó mappa megnyitása
 Find previous	WebPositive Window		Előző találat
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		%s sütik
 Close	Download Window		Bezár
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Keresési feltétel
-Reload	WebPositive Window		Újratöltés
 Expiration	Cookie Manager		Érvényesség
+Reload	WebPositive Window		Újratöltés
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		A processzor túl régi, és nem támogatja az SSE2 kiterjesztést, amelyek nélkül a WebPositive nem futhat. Javasoljuk a NetSurf telepítését helyette.
 Download finished	Download Window		Elkészült a letöltés
 Cookie manager	WebPositive Window		Süti kezelő
-OK	Authentication Panel		Rendben
-Hide password text	Authentication Panel		Jelszó elrejtése
 Username:	Authentication Panel		Felhasználónév:
+Hide password text	Authentication Panel		Jelszó elrejtése
+OK	Authentication Panel		Rendben
 Name	Cookie Manager		Név
 Remove finished	Download Window		Elkészültek eltávolítása
 Earlier	WebPositive Window		Korábban
@@ -81,8 +81,8 @@ View	WebPositive Window		Nézet
 Paste	URL Bar		Beilleszt
 Find next	WebPositive Window		Következő keresése
 Open search page	Settings Window		Keresőoldal megnyitása
-Increase size	WebPositive Window		Méret növelése
 New tab	WebPositive Window		Új fül
+Increase size	WebPositive Window		Méret növelése
 Today	WebPositive Window		Ma
 Open location	WebPositive Window		Cél megnyitása
 New browser window	Download Window		Új böngésző ablak
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Alapértelmezett betűméret:
 Custom	Settings Window		Egyéni
 Bookmark this page	WebPositive Window		Könyvjelző az oldalhoz
 Show tabs if only one page is open	Settings Window		Fülek megjelenítése egy oldal esetén is
-Close tab	WebPositive Window		Fül bezárása
 Remove	Download Window		Eltávolít
+Close tab	WebPositive Window		Fül bezárása
 About	WebPositive Window		Névjegy
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Letöltések vannak folyamatban, biztosan bezárjuk a WebPositive-ot?
 Continue downloads	WebPositive		Letöltések folytatása
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Letöltések vannak folyamatban, biztosan bezárjuk a WebPositive-ot?
 Proxy server requires authentication	Settings Window		A proxy szerver azonosítást igényel
 Cancel	Settings Window		Mégse
 Reset size	WebPositive Window		Méret visszaállítása
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Könyvjelző hiba
 OK	WebPositive Window		Rendben
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% / %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Csak a szöveg nagyítása
 Save page as…	WebPositive Window		Oldal mentése mint…
+Zoom text only	WebPositive Window		Csak a szöveg nagyítása
 Page source error	WebPositive Window		Hibás az oldal forrása
 Auto-hide mouse pointer	Settings Window		Egerkurzor automatikus elrejtése
 Requesting %url	WebPositive Window		%url lekérése

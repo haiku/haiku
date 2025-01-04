@@ -13,8 +13,8 @@ Bookmarks	WebPositive Window		Záložky
 Use proxy server to connect to the internet	Settings Window		Použiť na pripojenie k internetu server proxy
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url hotovo
 Auto-hide interface in full screen mode	Settings Window		Automaticky skrývať rozhranie v celoobrazovkovom režime
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Nastala chyba pri sťahovaní priečinka záložiek.\n\nChyba: %error
 Delete	Cookie Manager		Zmazať
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Nastala chyba pri sťahovaní priečinka záložiek.\n\nChyba: %error
 (Finish: %date - Over %duration left)	Download Window		(Dokončenie: %date - Zostáva viac ako %duration)
 Open containing folder	Download Window		Otvoriť nadradený priečinok
 Find previous	WebPositive Window		Nájsť predošlé
@@ -50,13 +50,13 @@ The download could not be opened.	Download Window		Sťahovanie sa nepodarilo otv
 Cookies for %s	Cookie Manager		Cookies pre %s
 Close	Download Window		Zatvoriť
 WebPositive	System name		WebPositive
-Reload	WebPositive Window		Obnoviť
 Expiration	Cookie Manager		Expirácia
+Reload	WebPositive Window		Obnoviť
 Download finished	Download Window		Sťahovanie dokončené
 Cookie manager	WebPositive Window		Správca cookies
-OK	Authentication Panel		OK
-Hide password text	Authentication Panel		Skryť text hesla
 Username:	Authentication Panel		Meno používateľa:
+Hide password text	Authentication Panel		Skryť text hesla
+OK	Authentication Panel		OK
 Name	Cookie Manager		Názov
 Remove finished	Download Window		Odstrániť dokončené
 Earlier	WebPositive Window		Skôr
@@ -74,8 +74,8 @@ View	WebPositive Window		Zobrazenie
 Paste	URL Bar		Vložiť
 Find next	WebPositive Window		Nájsť ďalší
 Open search page	Settings Window		Otvoriť vyhľadávaciu stránku
-Increase size	WebPositive Window		Zväčšiť veľkosť
 New tab	WebPositive Window		Nová karta
+Increase size	WebPositive Window		Zväčšiť veľkosť
 Today	WebPositive Window		Dnes
 Open location	WebPositive Window		Otvoriť umiestnenie
 New browser window	Download Window		Nové okno prehliadača
@@ -99,11 +99,11 @@ Copy	WebPositive Window		Skopírovať
 Default standard font size:	Settings Window		Predvolená veľkosť štandardného písma:
 Bookmark this page	WebPositive Window		Uložiť stránku do záložiek
 Show tabs if only one page is open	Settings Window		Zobrazovať karty ak je otvorená iba jedna karta
-Close tab	WebPositive Window		Zatvoriť kartu
 Remove	Download Window		Odstrániť
+Close tab	WebPositive Window		Zatvoriť kartu
 About	WebPositive Window		O aplikácii
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Priebieha sťahovanie. Skutočne chcete teraz ukončiť WebPositive?
 Continue downloads	WebPositive		Pokračovať v sťahovaní
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Priebieha sťahovanie. Skutočne chcete teraz ukončiť WebPositive?
 Proxy server requires authentication	Settings Window		Server proxy vyžaduje overenie totožnosti
 Cancel	Settings Window		Zrušiť
 Reset size	WebPositive Window		Znovu nastaviť veľkosť
@@ -126,8 +126,8 @@ Next	WebPositive Window		Ďalší
 Bookmark error	WebPositive Window		Chyba záložky
 OK	WebPositive Window		OK
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Zväčšovať iba text
 Save page as…	WebPositive Window		Uložiť stránku ako…
+Zoom text only	WebPositive Window		Zväčšovať iba text
 Page source error	WebPositive Window		Chyba zdroja stránky
 Auto-hide mouse pointer	Settings Window		Automaticky skrývať ukazovateľ myši
 Requesting %url	WebPositive Window		Požiadavka na %url

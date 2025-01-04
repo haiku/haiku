@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Segnelibris
 Use proxy server to connect to the internet	Settings Window		Doprâ un servidôr proxy par conetisi a internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url completât
 Auto-hide interface in full screen mode	Settings Window		Plate in automatic la interface in modalitât plen visôr
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Al è vignût fûr un erôr tal recuperâ la cartele dai segnelibris.\n\nErôr: %error
 Delete	Cookie Manager		Elimine
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Al è vignût fûr un erôr tal recuperâ la cartele dai segnelibris.\n\nErôr: %error
 (Finish: %date - Over %duration left)	Download Window		(Fin: %date - A mancjin plui di %duration)
 Open containing folder	Download Window		Mostre te cartele
 Find previous	WebPositive Window		Cjate precedent
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Cookie par %s
 Close	Download Window		Siere
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Tiermin di cirî
-Reload	WebPositive Window		Torne cjarie
 Expiration	Cookie Manager		Scjadince
+Reload	WebPositive Window		Torne cjarie
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La tô CPU e je masse vecje e no supuarte lis estensions SSE2, cence di chês WebPositive nol pues zirâ. O conseìn di instalâ NetSurf al so puest.
 Download finished	Download Window		Discjariament completât
 Cookie manager	WebPositive Window		Gjestôr dai Cookie
-OK	Authentication Panel		Va ben
-Hide password text	Authentication Panel		Plate test peraule di ordin
 Username:	Authentication Panel		Non utent:
+Hide password text	Authentication Panel		Plate test peraule di ordin
+OK	Authentication Panel		Va ben
 Name	Cookie Manager		Non
 Remove finished	Download Window		Gjave completâts
 Earlier	WebPositive Window		Prime
@@ -81,8 +81,8 @@ View	WebPositive Window		Viodude
 Paste	URL Bar		Tache
 Find next	WebPositive Window		Cjate sucessîf
 Open search page	Settings Window		Vierç pagjine di ricercje
-Increase size	WebPositive Window		Aumente dimensions
 New tab	WebPositive Window		Gnove schede
+Increase size	WebPositive Window		Aumente dimensions
 Today	WebPositive Window		Vuê
 Open location	WebPositive Window		Vierç posizion
 New browser window	Download Window		Gnûf barcon dal navigadôr
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Dimension predefinide dal caratar s
 Custom	Settings Window		Personalizât
 Bookmark this page	WebPositive Window		Zonte cheste pagjine ai segnelibris
 Show tabs if only one page is open	Settings Window		Mostre schedis ancje se e je vierte dome une pagjine
-Close tab	WebPositive Window		Siere schede
 Remove	Download Window		Gjave
+Close tab	WebPositive Window		Siere schede
 About	WebPositive Window		Informazions
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Al è ancjemò in pîts cualchi discjariament, vûstu pardabon lâ fûr di WebPositive cumò?
 Continue downloads	WebPositive		Ripie i discjariaments
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Al è ancjemò in pîts cualchi discjariament, vûstu pardabon lâ fûr di WebPositive cumò?
 Proxy server requires authentication	Settings Window		Il servidôr proxy al domande autenticazion
 Cancel	Settings Window		Anule
 Reset size	WebPositive Window		Ristabilìs dimensions
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Erôr di segnelibri
 OK	WebPositive Window		Va ben
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% di %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Ingrandìs dome il test
 Save page as…	WebPositive Window		Salve pagjine come…
+Zoom text only	WebPositive Window		Ingrandìs dome il test
 Page source error	WebPositive Window		Erôr sorzint pagjine
 Auto-hide mouse pointer	Settings Window		Plate in automatic il pontadôr dal mouse
 Requesting %url	WebPositive Window		In spiete di %url

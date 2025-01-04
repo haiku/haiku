@@ -1,15 +1,13 @@
-1	romanian	x-vnd.Haiku-Sounds	1784495232
+1	romanian	x-vnd.Haiku-Sounds	2763165148
 Sounds	System name		Sounds
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sunete\n  Furnizat de:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Lucrare originală de la Atsushi Takamatsu.\nDrepturi de autor ©2003-2006 Haiku
 No such file or directory	HEventList		Nu există un astfel de fișier sau director
-OK	HWindow		OK
 Other…	HWindow		Altele…
 OK	SoundsHApp		OK
 Sound file:	HWindow		Fișier de sunet:
-This is not an audio file.	HWindow		Acesta nu este un fișier audio.
 <none>	HEventList		<none>
-OK	HEventList		OK
 About Sounds	SoundsHApp		Despre Sounds
+OK	HEventList		OK
 Sound	HEventList		Sunet
 Event	HEventList		Eveniment
 <none>	HWindow		<none>

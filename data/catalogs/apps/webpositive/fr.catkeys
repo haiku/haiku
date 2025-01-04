@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Signets
 Use proxy server to connect to the internet	Settings Window		Utiliser un serveur mandataire pour se connecter à Internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminé
 Auto-hide interface in full screen mode	Settings Window		Cacher automatiquement l’interface en mode plein écran
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Une erreur est survenue en récupérant le dossier des signets.\n\nErreur : %error
 Delete	Cookie Manager		Supprimer
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Une erreur est survenue en récupérant le dossier des signets.\n\nErreur : %error
 (Finish: %date - Over %duration left)	Download Window		(Fin : %date - il reste plus de %duration)
 Open containing folder	Download Window		Ouvrir le dossier contenant le fichier
 Find previous	WebPositive Window		Rechercher le précédent
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Cookies pour %s
 Close	Download Window		Fermer
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Terme à rechercher
-Reload	WebPositive Window		Recharger
 Expiration	Cookie Manager		Expiration
+Reload	WebPositive Window		Recharger
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Votre CPU est trop vieux et ne supporte pas les extensions SSE2, sans lesquelles WebPositive ne peut pas fonctionner. À la place, nous vous recommandons d’installer NetSurf.
 Download finished	Download Window		Téléchargement terminé
 Cookie manager	WebPositive Window		Gestionnaire de cookies
-OK	Authentication Panel		OK
-Hide password text	Authentication Panel		Camoufler le mot de passe
 Username:	Authentication Panel		Utilisateur :
+Hide password text	Authentication Panel		Camoufler le mot de passe
+OK	Authentication Panel		OK
 Name	Cookie Manager		Nom
 Remove finished	Download Window		Nettoyer les éléments achevés
 Earlier	WebPositive Window		Avant
@@ -81,8 +81,8 @@ View	WebPositive Window		Vue
 Paste	URL Bar		Coller
 Find next	WebPositive Window		Rechercher le suivant
 Open search page	Settings Window		Ouvrir la page de recherche
-Increase size	WebPositive Window		Augmenter la taille
 New tab	WebPositive Window		Nouvel onglet
+Increase size	WebPositive Window		Augmenter la taille
 Today	WebPositive Window		Aujourd’hui
 Open location	WebPositive Window		Ouvrir l’emplacement
 New browser window	Download Window		Nouvelle fenêtre de navigation
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Taille par défaut de la police sta
 Custom	Settings Window		Personnalisé
 Bookmark this page	WebPositive Window		Placer un signet sur cette page
 Show tabs if only one page is open	Settings Window		Afficher les onglets même s’il n’y a qu’une page ouverte
-Close tab	WebPositive Window		Fermer l’onglet
 Remove	Download Window		Enlever
+Close tab	WebPositive Window		Fermer l’onglet
 About	WebPositive Window		À propos
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Il y a encore des téléchargements en cours. Voulez vous vraiment quitter WebPositive maintenant ?
 Continue downloads	WebPositive		Continuer les téléchargements
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Il y a encore des téléchargements en cours. Voulez vous vraiment quitter WebPositive maintenant ?
 Proxy server requires authentication	Settings Window		Le serveur mandataire requière une authentification
 Cancel	Settings Window		Annuler
 Reset size	WebPositive Window		Réinitialiser la taille
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Erreur de signet
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% sur %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Grossir uniquement le texte
 Save page as…	WebPositive Window		Enregistrer la page sous…
+Zoom text only	WebPositive Window		Grossir uniquement le texte
 Page source error	WebPositive Window		Erreur dans la page source
 Auto-hide mouse pointer	Settings Window		Cacher automatiquement le pointeur de souris
 Requesting %url	WebPositive Window		Requête de %url

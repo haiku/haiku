@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1912038977
+1	swedish	x-vnd.Haiku-libtracker	4267788442
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -293,6 +293,7 @@ The Tracker must be running to set the default printer.	PoseView		Tracker måste
 calculating…	InfoWindow		beräknar...
 Preferred for file	OpenWithWindow		Föredras för fil
 OK	AutoMounterSettings		OK
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# vald} other{# valda}}
 copying	FSUtils		kopierar
 Get info	FilePanelPriv		Få info
 MIME String	AttributesView		MIME-sträng

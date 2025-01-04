@@ -13,8 +13,8 @@ Bookmarks	WebPositive Window		Bladwijzers
 Use proxy server to connect to the internet	Settings Window		Gebruik een proxyserver om met het internet te verbinden
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url gereed
 Auto-hide interface in full screen mode	Settings Window		Verberg interface automatisch in volledig-scherm modus
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Er was een fout bij het ophalen van de bladwijzermap.\n\nFout: %error
 Delete	Cookie Manager		Verwijderen
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Er was een fout bij het ophalen van de bladwijzermap.\n\nFout: %error
 (Finish: %date - Over %duration left)	Download Window		(Voltooid: %date - Meer dan %duration te doen)
 Open containing folder	Download Window		Bijbehorende map openen
 Find previous	WebPositive Window		Vorige zoeken
@@ -54,14 +54,14 @@ Cookies for %s	Cookie Manager		Cookies voor %s
 Close	Download Window		Sluiten
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Zoek term
-Reload	WebPositive Window		Herladen
 Expiration	Cookie Manager		Vervaldatum
+Reload	WebPositive Window		Herladen
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Je CPU is te oud en ondersteund geen SSE2 extensies, zonder deze werkt WebPositive niet. We raden je aan om NetSurf te installeren in de plaats.
 Download finished	Download Window		Download gereed
 Cookie manager	WebPositive Window		Cookiemanager
-OK	Authentication Panel		Ok
-Hide password text	Authentication Panel		Wachtwoordtekst verbergen
 Username:	Authentication Panel		Gebruikersnaam:
+Hide password text	Authentication Panel		Wachtwoordtekst verbergen
+OK	Authentication Panel		Ok
 Name	Cookie Manager		Naam
 Remove finished	Download Window		Voltooide verwijderen
 Earlier	WebPositive Window		Vroeger
@@ -79,8 +79,8 @@ View	WebPositive Window		Beeld
 Paste	URL Bar		Plakken
 Find next	WebPositive Window		Volgende zoeken
 Open search page	Settings Window		Zoekpagina openen
-Increase size	WebPositive Window		Vergroten
 New tab	WebPositive Window		Nieuw tabblad
+Increase size	WebPositive Window		Vergroten
 Today	WebPositive Window		Vandaag
 Open location	WebPositive Window		Locatie openen
 New browser window	Download Window		Nieuw browservenster
@@ -105,11 +105,11 @@ Default standard font size:	Settings Window		Standaard lettertypegrootte:
 Custom	Settings Window		Aangepast
 Bookmark this page	WebPositive Window		Bladwijzer van deze pagina maken
 Show tabs if only one page is open	Settings Window		Tabbladen ook tonen als slechts een pagina open is
-Close tab	WebPositive Window		Tabblad sluiten
 Remove	Download Window		Verwijderen
+Close tab	WebPositive Window		Tabblad sluiten
 About	WebPositive Window		Over
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Er zijn nog downloads bezig, wilt u WebPositive echt afsluiten?
 Continue downloads	WebPositive		Downloads hervatten
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Er zijn nog downloads bezig, wilt u WebPositive echt afsluiten?
 Proxy server requires authentication	Settings Window		Proxyserver vereist authenticatie
 Cancel	Settings Window		Annuleren
 Reset size	WebPositive Window		Grootte opnieuw instellen
@@ -134,8 +134,8 @@ Bookmark error	WebPositive Window		Bladwijzerfout
 OK	WebPositive Window		Ok
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% van %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Alleen tekst inzoomen
 Save page as…	WebPositive Window		Pagina opslaan als…
+Zoom text only	WebPositive Window		Alleen tekst inzoomen
 Page source error	WebPositive Window		Paginabronfout
 Auto-hide mouse pointer	Settings Window		Muisaanwijzer automatisch verbergen
 Requesting %url	WebPositive Window		Opvragen van %url

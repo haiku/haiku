@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Bokmärken
 Use proxy server to connect to the internet	Settings Window		Använd proxyserver för att koppla upp mot internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url färdig
 Auto-hide interface in full screen mode	Settings Window		Dölj gränssnittet automatiskt i helskärmsläge
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Det inträffade ett fel vid hämtning av bokmärkesmappen.\n\nFel: %error
 Delete	Cookie Manager		Ta bort
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Det inträffade ett fel vid hämtning av bokmärkesmappen.\n\nFel: %error
 (Finish: %date - Over %duration left)	Download Window		(Färdig: %date - Över %duration kvar)
 Open containing folder	Download Window		Öppna innehållande mapp
 Find previous	WebPositive Window		Hitta tidigare
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Kakor för %s
 Close	Download Window		Stäng
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Sökterm
-Reload	WebPositive Window		Ladda om
 Expiration	Cookie Manager		Upphör
+Reload	WebPositive Window		Ladda om
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Din CPU är för gammal och stöder inte SSE2-tillägg, vilka krävs för att WebPositive ska fungera. Vi rekommenderar att du installerar NetSurf istället.
 Download finished	Download Window		Nedladdning avslutad
 Cookie manager	WebPositive Window		Kakhanterare
-OK	Authentication Panel		OK
-Hide password text	Authentication Panel		Dölj lösenord
 Username:	Authentication Panel		Användarnamn:
+Hide password text	Authentication Panel		Dölj lösenord
+OK	Authentication Panel		OK
 Name	Cookie Manager		Namn
 Remove finished	Download Window		Ta bort avslutade
 Earlier	WebPositive Window		Tidigare
@@ -81,8 +81,8 @@ View	WebPositive Window		Vy
 Paste	URL Bar		Klistra in
 Find next	WebPositive Window		Hitta nästa
 Open search page	Settings Window		Öppna söksida
-Increase size	WebPositive Window		Öka storlek
 New tab	WebPositive Window		Ny flik
+Increase size	WebPositive Window		Öka storlek
 Today	WebPositive Window		Idag
 Open location	WebPositive Window		Öppna plats
 New browser window	Download Window		Nytt webbläsarfönster
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Förinställd storlek för standard
 Custom	Settings Window		Egen inställning
 Bookmark this page	WebPositive Window		Bokmärk den här sidan
 Show tabs if only one page is open	Settings Window		Visa flikar om endast en sida är öppen
-Close tab	WebPositive Window		Stäng flik
 Remove	Download Window		Ta bort
+Close tab	WebPositive Window		Stäng flik
 About	WebPositive Window		Om
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Nedladdningar pågår fortfarande. Vill du verkligen stänga WebPositive nu?
 Continue downloads	WebPositive		Återuppta nedladdningar
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Nedladdningar pågår fortfarande. Vill du verkligen stänga WebPositive nu?
 Proxy server requires authentication	Settings Window		Proxyservern kräver autentisiering
 Cancel	Settings Window		Avbryt
 Reset size	WebPositive Window		Återställ storlek
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Bokmärkesfel
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% av %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Zooma endast text
 Save page as…	WebPositive Window		Spara sida som…
+Zoom text only	WebPositive Window		Zooma endast text
 Page source error	WebPositive Window		Sidkällsfel
 Auto-hide mouse pointer	Settings Window		Dölj muspekare automatiskt
 Requesting %url	WebPositive Window		Begär %url

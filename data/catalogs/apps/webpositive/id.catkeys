@@ -13,8 +13,8 @@ Bookmarks	WebPositive Window		Bookmark
 Use proxy server to connect to the internet	Settings Window		Gunakan server proksi untuk terhubung ke internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url selesai
 Auto-hide interface in full screen mode	Settings Window		Otomatis sembunyikan antarmuka pada jendela mode penuh
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Terjadi kesalahan saat mengambil folder bookmark.\n\nKesalahan: %error
 Delete	Cookie Manager		Hapus
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Terjadi kesalahan saat mengambil folder bookmark.\n\nKesalahan: %error
 (Finish: %date - Over %duration left)	Download Window		(Selesai: %date - Diatas %duration tersisa)
 Open containing folder	Download Window		Buka folder yang berisi
 Find previous	WebPositive Window		Cari sebelumnya
@@ -53,13 +53,13 @@ Cookies for %s	Cookie Manager		Kuki untuk %s
 Close	Download Window		Tutup
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Istilah pencarian
-Reload	WebPositive Window		Muat ulang
 Expiration	Cookie Manager		Kedaluwarsa
+Reload	WebPositive Window		Muat ulang
 Download finished	Download Window		Unduhan selesai
 Cookie manager	WebPositive Window		Manajer kuki
-OK	Authentication Panel		OKE
-Hide password text	Authentication Panel		Sembunyikan teks sandi
 Username:	Authentication Panel		Nama pengguna:
+Hide password text	Authentication Panel		Sembunyikan teks sandi
+OK	Authentication Panel		OKE
 Name	Cookie Manager		Nama
 Remove finished	Download Window		Penghapusan selesai
 Earlier	WebPositive Window		Sebelumnya
@@ -77,8 +77,8 @@ View	WebPositive Window		Tampilan
 Paste	URL Bar		Tempel
 Find next	WebPositive Window		Cari selanjutnya
 Open search page	Settings Window		Buka laman pencarian
-Increase size	WebPositive Window		Perbesar ukuran
 New tab	WebPositive Window		Tab baru
+Increase size	WebPositive Window		Perbesar ukuran
 Today	WebPositive Window		Hari ini
 Open location	WebPositive Window		Buka lokasi
 New browser window	Download Window		Jendela peramban baru
@@ -102,11 +102,11 @@ Copy	WebPositive Window		Salin
 Default standard font size:	Settings Window		Ukuran fon standar bawaan:
 Bookmark this page	WebPositive Window		Tandai halaman ini
 Show tabs if only one page is open	Settings Window		Tampilkan tab ketika hanya satu laman yang terbuka
-Close tab	WebPositive Window		Tutup tab
 Remove	Download Window		Hilangkan
+Close tab	WebPositive Window		Tutup tab
 About	WebPositive Window		Tentang
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Masih ada unduhan yang berjalan, apakah Anda ingin keluar dari WebPositive sekarang?
 Continue downloads	WebPositive		Lanjutkan unduhan
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Masih ada unduhan yang berjalan, apakah Anda ingin keluar dari WebPositive sekarang?
 Proxy server requires authentication	Settings Window		Server proksi membutuhkan otentikasi
 Cancel	Settings Window		Batal
 Reset size	WebPositive Window		Atur ulang ukuran
@@ -131,8 +131,8 @@ Bookmark error	WebPositive Window		Kesalahan bookmark
 OK	WebPositive Window		OKE
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% dari %expectedSize%, %rate%/d)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Perbesar teks saja
 Save page as…	WebPositive Window		Simpan halaman sebagai…
+Zoom text only	WebPositive Window		Perbesar teks saja
 Page source error	WebPositive Window		Kesalahan sumber laman
 Auto-hide mouse pointer	Settings Window		Sembunyikan otomatis penunjuk tetikus
 Requesting %url	WebPositive Window		Meminta %url

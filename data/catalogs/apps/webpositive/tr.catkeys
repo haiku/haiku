@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Yer imleri
 Use proxy server to connect to the internet	Settings Window		İnternete bağlanmak için vekil sunucu kullan
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url yüklendi
 Auto-hide interface in full screen mode	Settings Window		Tam ekran kipinde arayüzü kendiliğinden gizle
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Yer imleri klasörü getirilirken bir hata oluştu.\n\nHata: %error
 Delete	Cookie Manager		Sil
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Yer imleri klasörü getirilirken bir hata oluştu.\n\nHata: %error
 (Finish: %date - Over %duration left)	Download Window		(Bitiş: %date — %duration kaldı)
 Open containing folder	Download Window		İndirildiği klasörü aç
 Find previous	WebPositive Window		Öncekini bul
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		%s için çerezler
 Close	Download Window		Kapat
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s — Arama terimi
-Reload	WebPositive Window		Yeniden yükle
 Expiration	Cookie Manager		Son kullanım süresi
+Reload	WebPositive Window		Yeniden yükle
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU’nuz pek eski ve WebPositive’in çalışması için gerekli olan SSE2 uzantılarını desteklemiyor. Yerine NetSurf kurmanızı öneririz.
 Download finished	Download Window		İndirme bitti
 Cookie manager	WebPositive Window		Çerez yöneticisi
-OK	Authentication Panel		Tamam
-Hide password text	Authentication Panel		Parola metnini gizle
 Username:	Authentication Panel		Kullanıcı adı:
+Hide password text	Authentication Panel		Parola metnini gizle
+OK	Authentication Panel		Tamam
 Name	Cookie Manager		Ad
 Remove finished	Download Window		Bitenleri kaldır
 Earlier	WebPositive Window		Daha önce
@@ -81,8 +81,8 @@ View	WebPositive Window		Görüntü
 Paste	URL Bar		Yapıştır
 Find next	WebPositive Window		Sonrakini bul
 Open search page	Settings Window		Arama sayfasını aç
-Increase size	WebPositive Window		Büyüt
 New tab	WebPositive Window		Yeni sekme
+Increase size	WebPositive Window		Büyüt
 Today	WebPositive Window		Bugün
 Open location	WebPositive Window		Konum aç
 New browser window	Download Window		Yeni tarayıcı penceresi
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Saptanmış standart yazıtipi boyu
 Custom	Settings Window		Özel
 Bookmark this page	WebPositive Window		Bu sayfayı yer imlerine ekle
 Show tabs if only one page is open	Settings Window		Tek bir sayfa açıksa bile sekmeleri göster
-Close tab	WebPositive Window		Sekmeyi kapat
 Remove	Download Window		Kaldır
+Close tab	WebPositive Window		Sekmeyi kapat
 About	WebPositive Window		Hakkında
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Hâlâ süren indirmeler var, WebPositive’den çıkmak istediğinizden emin misiniz?
 Continue downloads	WebPositive		İndirmeleri sürdür
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Hâlâ süren indirmeler var, WebPositive’den çıkmak istediğinizden emin misiniz?
 Proxy server requires authentication	Settings Window		Vekil sunucu oturum açma gerektirir
 Cancel	Settings Window		Vazgeç
 Reset size	WebPositive Window		Boyutu sıfırla
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Yer imi hatası
 OK	WebPositive Window		Tamam
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize%/%expectedSize%, %rate%/sn)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Yalnızca metni büyüt
 Save page as…	WebPositive Window		Sayfayı farklı kaydet…
+Zoom text only	WebPositive Window		Yalnızca metni büyüt
 Page source error	WebPositive Window		Sayfa kaynağı hatası
 Auto-hide mouse pointer	Settings Window		Fare imlecini kendiliğinden gizle
 Requesting %url	WebPositive Window		%url isteniyor

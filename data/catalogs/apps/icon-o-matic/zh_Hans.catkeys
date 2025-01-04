@@ -18,7 +18,7 @@ Duplicate	Icon-O-Matic-StylesList		副本
 32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		旋转
 Shorten	Icon-O-Matic-PropertyNames		缩短
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		您希望导入的文本文件太长，是否确定？
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		您希望导入的文本太长，是否确定？
 Paste	Icon-O-Matic-Properties		粘贴
 There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		样式太多了。HVIF 格式最多支持 255 种。
 Close	Icon-O-Matic-Menu-File		关闭

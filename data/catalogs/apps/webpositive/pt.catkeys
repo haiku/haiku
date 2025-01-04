@@ -13,8 +13,8 @@ Bookmarks	WebPositive Window		Marcadores
 Use proxy server to connect to the internet	Settings Window		Utilizar servidor proxy para ligar à internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminado
 Auto-hide interface in full screen mode	Settings Window		Esconder a interface automaticamente no modo de ecrã completo
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Ocorreu um erro ao recuperar a pasta de marcadores.\n\nErro: %error
 Delete	Cookie Manager		Eliminar
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Ocorreu um erro ao recuperar a pasta de marcadores.\n\nErro: %error
 (Finish: %date - Over %duration left)	Download Window		(Fim: %date - Falta mais do que %duration)
 Open containing folder	Download Window		Mostrar na pasta correspondente
 Find previous	WebPositive Window		Procurar anterior
@@ -54,14 +54,14 @@ Cookies for %s	Cookie Manager		Cookies para %s
 Close	Download Window		Fechar
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Termo de pesquisa
-Reload	WebPositive Window		Atualizar
 Expiration	Cookie Manager		Validade
+Reload	WebPositive Window		Atualizar
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		O seu processador é demasiado antigo e não suporta as extensões SSE2, sem as quais não pode ser executado o WebPositive. Recomendamos como alternativa a instalação do NetSurf.
 Download finished	Download Window		A descarga finalizou
 Cookie manager	WebPositive Window		Gestor de cookies
-OK	Authentication Panel		OK
-Hide password text	Authentication Panel		Esconder palavra-passe
 Username:	Authentication Panel		Utilizador:
+Hide password text	Authentication Panel		Esconder palavra-passe
+OK	Authentication Panel		OK
 Name	Cookie Manager		Nome
 Remove finished	Download Window		Remover terminados
 Earlier	WebPositive Window		Mais cedo
@@ -79,8 +79,8 @@ View	WebPositive Window		Visualização
 Paste	URL Bar		Colar
 Find next	WebPositive Window		Procurar seguinte
 Open search page	Settings Window		Abrir página de pesquisa
-Increase size	WebPositive Window		Aumentar tamanho
 New tab	WebPositive Window		Novo separador
+Increase size	WebPositive Window		Aumentar tamanho
 Today	WebPositive Window		Hoje
 Open location	WebPositive Window		Abrir localização
 New browser window	Download Window		Nova janela de navegação
@@ -105,11 +105,11 @@ Default standard font size:	Settings Window		Tamanho de texto predefinido:
 Custom	Settings Window		Personalizado
 Bookmark this page	WebPositive Window		Adicionar marcador para esta página
 Show tabs if only one page is open	Settings Window		Mostrar separadores se estiver aberta apenas uma página
-Close tab	WebPositive Window		Fechar separador
 Remove	Download Window		Eliminar
+Close tab	WebPositive Window		Fechar separador
 About	WebPositive Window		Acerca
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ainda há descargas em curso. Tem a certeza de que pretende sair agora do WebPositive?
 Continue downloads	WebPositive		Continuar descargas
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ainda há descargas em curso. Tem a certeza de que pretende sair agora do WebPositive?
 Proxy server requires authentication	Settings Window		O servidor proxy requer autenticação
 Cancel	Settings Window		Cancelar
 Reset size	WebPositive Window		Redefinir tamanho
@@ -134,8 +134,8 @@ Bookmark error	WebPositive Window		Erro de marcador
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Ampliar apenas o texto
 Save page as…	WebPositive Window		Guardar página como…
+Zoom text only	WebPositive Window		Ampliar apenas o texto
 Page source error	WebPositive Window		Erro de código-fonte da página
 Auto-hide mouse pointer	Settings Window		Esconder automaticamente o ponteiro do rato
 Requesting %url	WebPositive Window		A solicitar %url

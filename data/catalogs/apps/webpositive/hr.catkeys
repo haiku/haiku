@@ -36,13 +36,13 @@ The download could not be opened.	Download Window		Preuzimanje se ne može otvor
 Cookies for %s	Cookie Manager		Kolačići za %s
 Close	Download Window		Zatvori
 WebPositive	System name		WebPositive
-Reload	WebPositive Window		Ponovno učitaj
 Expiration	Cookie Manager		Istjecanje
+Reload	WebPositive Window		Ponovno učitaj
 Download finished	Download Window		Preuzimanje završeno
 Cookie manager	WebPositive Window		Upravitelj kolačićima
-OK	Authentication Panel		U redu
-Hide password text	Authentication Panel		Sakrije tekst lozinke
 Username:	Authentication Panel		Korisničko ime:
+Hide password text	Authentication Panel		Sakrije tekst lozinke
+OK	Authentication Panel		U redu
 Name	Cookie Manager		Ime
 Remove finished	Download Window		Uklanjanje završeno
 Earlier	WebPositive Window		Ranije
@@ -58,8 +58,8 @@ Cut	URL Bar		Izreži
 View	WebPositive Window		Pogled
 Paste	URL Bar		Zalijepi
 Find next	WebPositive Window		Nađi slijedeće
-Increase size	WebPositive Window		Povećaj veličinu
 New tab	WebPositive Window		Nova kartica
+Increase size	WebPositive Window		Povećaj veličinu
 Today	WebPositive Window		Danas
 Open location	WebPositive Window		Otvori lokaciju
 New browser window	Download Window		Novi prozor preglednika
@@ -80,11 +80,11 @@ Copy	WebPositive Window		Kopiraj
 Default standard font size:	Settings Window		Zadana standardna veličina fonta:
 Bookmark this page	WebPositive Window		Zabilježi ovu stranicu
 Show tabs if only one page is open	Settings Window		Pokaži kartice ako je otvorena samo jedna stranica
-Close tab	WebPositive Window		Zatvori karticu
 Remove	Download Window		Ukloni
+Close tab	WebPositive Window		Zatvori karticu
 About	WebPositive Window		O programu
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Još ima preuzimanja u tijeku, želite li zaista sada isključiti WebPositive?
 Continue downloads	WebPositive		Nastavite sa preuzimanjima
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Još ima preuzimanja u tijeku, želite li zaista sada isključiti WebPositive?
 Cancel	Settings Window		Otkaži
 History	WebPositive Window		Povijest
 Do you really want to clear the browsing history?	WebPositive Window		Želite li doista očistiti povijest pregledavanja?

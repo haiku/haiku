@@ -1,15 +1,13 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Sounds	1784495232
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Sounds	2763165148
 Sounds	System name		Lyder
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sound\nGitt til deg av:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\nOriginalt fra Atsushi Takamatsu.\nOpphavsrett ©2003-2006 Haiku
 No such file or directory	HEventList		Filen eller mappen eksisterer ikke
-OK	HWindow		OK
 Other…	HWindow		Andre...
 OK	SoundsHApp		OK
 Sound file:	HWindow		Lydfil:
-This is not an audio file.	HWindow		Dette er ingen lydfil.
 <none>	HEventList		<ingen>
-OK	HEventList		OK
 About Sounds	SoundsHApp		Om Lyder
+OK	HEventList		OK
 Sound	HEventList		Lyd
 Event	HEventList		Hendelse 
 <none>	HWindow		<ingen>

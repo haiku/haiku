@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Marcaje
 Use proxy server to connect to the internet	Settings Window		Utilizează serverul proxy pentru conectare la internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url finalizată
 Auto-hide interface in full screen mode	Settings Window		Ascunde automat interfața în modul ecran complet
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	A apărut o eroare la recuperarea dosarului de marcaje.\n\nEroare: %error
 Delete	Cookie Manager		Șterge
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	A apărut o eroare la recuperarea dosarului de marcaje.\n\nEroare: %error
 (Finish: %date - Over %duration left)	Download Window		(Finalizare: %date - peste %duration rămase)
 Open containing folder	Download Window		Deschide dosarul conținător
 Find previous	WebPositive Window		Găsește anteriorul
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Cookies pentru %s
 Close	Download Window		Închide
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - termen de căutare
-Reload	WebPositive Window		Reîncarcă
 Expiration	Cookie Manager		Expirare
+Reload	WebPositive Window		Reîncarcă
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Procesorul este prea vechi și nu suportă extensiile SSE2, fără de care WebPositive nu poate să ruleze. Recomandăm să instalați în schimb NetSurf.
 Download finished	Download Window		Descărcare finalizată
 Cookie manager	WebPositive Window		Manager de cookie
-OK	Authentication Panel		OK
-Hide password text	Authentication Panel		Ascunde textul parolei
 Username:	Authentication Panel		Nume de utilizator:
+Hide password text	Authentication Panel		Ascunde textul parolei
+OK	Authentication Panel		OK
 Name	Cookie Manager		Nume
 Remove finished	Download Window		Elimină finalizate
 Earlier	WebPositive Window		Mai devreme
@@ -81,8 +81,8 @@ View	WebPositive Window		Vizualizare
 Paste	URL Bar		Lipește
 Find next	WebPositive Window		Găsește următorul
 Open search page	Settings Window		Deschide pagina de căutare
-Increase size	WebPositive Window		Mărește dimensiunea
 New tab	WebPositive Window		Filă nouă
+Increase size	WebPositive Window		Mărește dimensiunea
 Today	WebPositive Window		Astăzi
 Open location	WebPositive Window		Deschide locația
 New browser window	Download Window		Fereastră de navigator nouă
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Dimensiunea standard implicită a f
 Custom	Settings Window		Personalizat
 Bookmark this page	WebPositive Window		Marchează această pagină
 Show tabs if only one page is open	Settings Window		Arată filele dacă este deschisă o singură pagină
-Close tab	WebPositive Window		Închide fila
 Remove	Download Window		Elimină
+Close tab	WebPositive Window		Închide fila
 About	WebPositive Window		Despre
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Există încă descărcări în desfășurare, chiar doriți să ieșiți din WebPositive acum?
 Continue downloads	WebPositive		Continuă descărcările
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Există încă descărcări în desfășurare, chiar doriți să ieșiți din WebPositive acum?
 Proxy server requires authentication	Settings Window		Serverul proxy necesită autentificare
 Cancel	Settings Window		Anulează
 Reset size	WebPositive Window		Restabilește dimensiunea
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Eroare de marcaj
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% din %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Focalizează doar textul
 Save page as…	WebPositive Window		Salvează pagina ca...
+Zoom text only	WebPositive Window		Focalizează doar textul
 Page source error	WebPositive Window		Eroare de sursă a paginii
 Auto-hide mouse pointer	Settings Window		Ascunde automat indicatorul mausului
 Requesting %url	WebPositive Window		Se cere %url

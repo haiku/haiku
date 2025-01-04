@@ -13,8 +13,8 @@ Bookmarks	WebPositive Window		Legosignaro
 Use proxy server to connect to the internet	Settings Window		Konekti al interreto per prokurilo
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url elŝutita
 Auto-hide interface in full screen mode	Settings Window		Aŭtomate kaŝi interfacon dum la plenekrana reĝimo
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Eraro dum ricevado el legosigna dosierujo.\n\nEraro: %error
 Delete	Cookie Manager		Forigi
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Eraro dum ricevado el legosigna dosierujo.\n\nEraro: %error
 (Finish: %date - Over %duration left)	Download Window		(Fino: %date - Ĉirkaŭ %duration restis)
 Open containing folder	Download Window		Uzi enhavantan dosierujon
 Find previous	WebPositive Window		Antaŭserĉi
@@ -53,13 +53,13 @@ Cookies for %s	Cookie Manager		Retkuketo por %s
 Close	Download Window		Fermi
 WebPositive	System name		Retprospero
 %s - Search term	Settings Window		%s - Serĉvorto
-Reload	WebPositive Window		Reŝargi
 Expiration	Cookie Manager		Eksvalidiĝo
+Reload	WebPositive Window		Reŝargi
 Download finished	Download Window		Ŝargado finiĝis
 Cookie manager	WebPositive Window		Administrilo de retkuketoj
-OK	Authentication Panel		Bone
-Hide password text	Authentication Panel		Kaŝi pasvorton
 Username:	Authentication Panel		Uzantnomo:
+Hide password text	Authentication Panel		Kaŝi pasvorton
+OK	Authentication Panel		Bone
 Name	Cookie Manager		Nomo
 Remove finished	Download Window		Forigado finiĝis
 Earlier	WebPositive Window		Antaŭa
@@ -77,8 +77,8 @@ View	WebPositive Window		Vido
 Paste	URL Bar		Alglui
 Find next	WebPositive Window		Pluserĉi
 Open search page	Settings Window		Uzi paĝon de serĉado
-Increase size	WebPositive Window		Pligrandigi
 New tab	WebPositive Window		Nova langeto
+Increase size	WebPositive Window		Pligrandigi
 Today	WebPositive Window		Hodiaŭ
 Open location	WebPositive Window		Uzi lokon
 New browser window	Download Window		Nova fenestro de retumilo
@@ -103,11 +103,11 @@ Default standard font size:	Settings Window		Defaŭlta grado de implica tiparo:
 Custom	Settings Window		Adaptita
 Bookmark this page	WebPositive Window		Konservi ligilon de ĉi paĝo
 Show tabs if only one page is open	Settings Window		Montri panelon de langetoj eĉ se nur unu paĝo estas uzata
-Close tab	WebPositive Window		Fermi langeton
 Remove	Download Window		Forigi
+Close tab	WebPositive Window		Fermi langeton
 About	WebPositive Window		Pri
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La elŝutado daŭras, ĉu vi certas ke vi volas ĉesigi Retprosperon nun?
 Continue downloads	WebPositive		Daŭrigi elŝutadon
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La elŝutado daŭras, ĉu vi certas ke vi volas ĉesigi Retprosperon nun?
 Proxy server requires authentication	Settings Window		La prokurilo postulas aŭtentigon
 Cancel	Settings Window		Nuligi
 Reset size	WebPositive Window		Restarigi grandon
@@ -132,8 +132,8 @@ Bookmark error	WebPositive Window		Eraro de legosignoj
 OK	WebPositive Window		Bone
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% el %expectedSize%, %rate%/s)
 WebPositive	Download Window		Retprospero
-Zoom text only	WebPositive Window		Zomi nur tekston
 Save page as…	WebPositive Window		Konservi paĝon kiel...
+Zoom text only	WebPositive Window		Zomi nur tekston
 Page source error	WebPositive Window		Eraro de paĝa fonto
 Auto-hide mouse pointer	Settings Window		Aŭtomatkaŝi musan montrilon
 Requesting %url	WebPositive Window		Datumpetado de %url

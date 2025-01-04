@@ -7,7 +7,7 @@ Grid life delay: %d×	This is a factor: the × represents 'times', don't transla
 Grid border: %d	GLife ScreenSaver		Rastergrenze: %d
 Grid width: %d	GLife ScreenSaver		Rasterbreite: %d
 Grid border: 	GLife ScreenSaver		Rastergrenze: 
-OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL „Spiel des Lebens“
+OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Spiel des Lebens\"
 Grid height: 	GLife ScreenSaver		Rasterhöhe: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
 Grid life delay: 	GLife ScreenSaver		Verzögerung: 

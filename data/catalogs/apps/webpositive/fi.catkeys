@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Kirjanmerkit
 Use proxy server to connect to the internet	Settings Window		Käytä välityspalvelinta internet-yhteydellä
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url päättyi
 Auto-hide interface in full screen mode	Settings Window		Piilota käyttöliittymä automaattisesti kokonäyttötilassa
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Kirjanmerkkikansion noutaminen epäonnistui.\n\nVirhe: %error
 Delete	Cookie Manager		Poista
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Kirjanmerkkikansion noutaminen epäonnistui.\n\nVirhe: %error
 (Finish: %date - Over %duration left)	Download Window		(Päättyy: %date - Yli %duration jäljellä)
 Open containing folder	Download Window		Avaa sisältyvä kansio
 Find previous	WebPositive Window		Etsi edellinen
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Evästeet kohteelle %s
 Close	Download Window		Sulje
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hakutermi
-Reload	WebPositive Window		Lataa uudelleen
 Expiration	Cookie Manager		Erääntymisaika
+Reload	WebPositive Window		Lataa uudelleen
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Prosessorisi on liian vanha ja ei tue SSE2-laajennuksia, mitä ilman WebPositive-sovellus ei toimi. Suosittelemme sen sijaan asentamaan NetSurf-sovelluksen.
 Download finished	Download Window		Lataus päättyi
 Cookie manager	WebPositive Window		Evästehallinta
-OK	Authentication Panel		Valmis
-Hide password text	Authentication Panel		Piilota salasanateksti
 Username:	Authentication Panel		Käyttäjätunnus:
+Hide password text	Authentication Panel		Piilota salasanateksti
+OK	Authentication Panel		Valmis
 Name	Cookie Manager		Nimi
 Remove finished	Download Window		Poista päättyneet
 Earlier	WebPositive Window		Aikaisempi
@@ -81,8 +81,8 @@ View	WebPositive Window		Näkymä
 Paste	URL Bar		Liitä
 Find next	WebPositive Window		Etsi seuraava
 Open search page	Settings Window		Avaa hakusivu
-Increase size	WebPositive Window		Kasvata kokoa
 New tab	WebPositive Window		Uusi välilehti
+Increase size	WebPositive Window		Kasvata kokoa
 Today	WebPositive Window		Tänään
 Open location	WebPositive Window		Avaa sijainti
 New browser window	Download Window		Uusi selainikkuna
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Vakiokirjasimen oletuskoko:
 Custom	Settings Window		Mukautettu
 Bookmark this page	WebPositive Window		Merkitse tämä sivu kirjanmerkillä
 Show tabs if only one page is open	Settings Window		Näytä välilehdet jos vain yksi sivu on avoinna
-Close tab	WebPositive Window		Sulje välilehti
 Remove	Download Window		Poista
+Close tab	WebPositive Window		Sulje välilehti
 About	WebPositive Window		Ohjelmasta
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä käynnissä, haluatko todella poistua WebPositive-ohjelmasta nyt?
 Continue downloads	WebPositive		Jatka latauksia
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä käynnissä, haluatko todella poistua WebPositive-ohjelmasta nyt?
 Proxy server requires authentication	Settings Window		Välityspalvelin vaatii todentamista
 Cancel	Settings Window		Peru
 Reset size	WebPositive Window		Palauta oletuskoko
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Kirjanmerkkivirhe
 OK	WebPositive Window		Valmis
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% / %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Kavenna tai avarra vain tekstiä
 Save page as…	WebPositive Window		Tallenna sivu nimellä...
+Zoom text only	WebPositive Window		Kavenna tai avarra vain tekstiä
 Page source error	WebPositive Window		Sivulähdevirhe
 Auto-hide mouse pointer	Settings Window		Piilota hiiren osoitin automaattisesti
 Requesting %url	WebPositive Window		Pyydetään verkko-osoite %url

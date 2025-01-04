@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Закладки
 Use proxy server to connect to the internet	Settings Window		Использовать прокси-сервер для соединения с интернетом
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен
 Auto-hide interface in full screen mode	Settings Window		Автоматически скрывать интерфейс в полноэкранном режиме
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Произошла ошибка при открытии папки с закладками.\n\nОшибка: %error
 Delete	Cookie Manager		Удалить
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Произошла ошибка при открытии папки с закладками.\n\nОшибка: %error
 (Finish: %date - Over %duration left)	Download Window		(Окончание: %date - Более %duration осталось)
 Open containing folder	Download Window		Открыть папку с файлом
 Find previous	WebPositive Window		Найти ранее
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Куки для %s
 Close	Download Window		Закрыть
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Условия поиска
-Reload	WebPositive Window		Обновить
 Expiration	Cookie Manager		Срок действия
+Reload	WebPositive Window		Обновить
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Ваш процессор слишком старый и не поддерживает расширения SSE2, без которых WebPositive не может работать. Рекомендуем установить NetSurf.
 Download finished	Download Window		Загрузка завершена
 Cookie manager	WebPositive Window		Менеджер куков
-OK	Authentication Panel		OK
-Hide password text	Authentication Panel		Скрыть текст пароля
 Username:	Authentication Panel		Имя пользователя:
+Hide password text	Authentication Panel		Скрыть текст пароля
+OK	Authentication Panel		OK
 Name	Cookie Manager		Имя
 Remove finished	Download Window		Убрать загруженные
 Earlier	WebPositive Window		Ранее
@@ -81,8 +81,8 @@ View	WebPositive Window		Вид
 Paste	URL Bar		Вставить
 Find next	WebPositive Window		Найти далее
 Open search page	Settings Window		Открыть поисковую страницу
-Increase size	WebPositive Window		Увеличить размер
 New tab	WebPositive Window		Новая вкладка
+Increase size	WebPositive Window		Увеличить размер
 Today	WebPositive Window		Сегодня
 Open location	WebPositive Window		Открыть адрес
 New browser window	Download Window		Новое окно браузера
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Размер стандартног
 Custom	Settings Window		Вручную
 Bookmark this page	WebPositive Window		Добавить в закладки
 Show tabs if only one page is open	Settings Window		Всегда показывать панель вкладок, даже если открыта только одна вкладка.
-Close tab	WebPositive Window		Закрыть вкладку
 Remove	Download Window		Удалить
+Close tab	WebPositive Window		Закрыть вкладку
 About	WebPositive Window		О программе
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		WebPositive всё ещё загружает файлы, Вы уверены, что хотите закрыть его сейчас?
 Continue downloads	WebPositive		Продолжить загрузку
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		WebPositive всё ещё загружает файлы, Вы уверены, что хотите закрыть его сейчас?
 Proxy server requires authentication	Settings Window		Прокси требует проверки подлинности
 Cancel	Settings Window		Отмена
 Reset size	WebPositive Window		Сбросить размер
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Ошибка закладки
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% из %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Масштабировать только текст
 Save page as…	WebPositive Window		Сохранить страницу как…
+Zoom text only	WebPositive Window		Масштабировать только текст
 Page source error	WebPositive Window		Ошибка в исходном коде страницы
 Auto-hide mouse pointer	Settings Window		Автоматически скрывать курсор
 Requesting %url	WebPositive Window		Запрашивается %url

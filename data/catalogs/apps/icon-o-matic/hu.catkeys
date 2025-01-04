@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	1614073665
+1	hungarian	x-vnd.haiku-icon_o_matic	2383010798
 None	Icon-O-Matic-Properties		Nincs
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Útvonal megtisztítása
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -88,6 +88,7 @@ Diamond	Icon-O-Matic-StyleTypes		Rombusz
 Don't save	Icon-O-Matic-Menu-Settings		Ne mentse
 Add shape with path	Icon-O-Matic-Menu-Shape		Hozzáadás útvonallal
 Translation X	Icon-O-Matic-PropertyNames		X fordítás
+Multi-paste properties	Icon-O-Matic-Properties		Többszörös beillesztés tulajdonságai
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Az Icon-O-Matic nem biztos hogy az SVG fájl betöltésekor annak minden részét értelmezte. Az eredeti fájl felülírásával ezeket az adatok elvésznek.
 Rotate indices backwards	Icon-O-Matic-PathsList		Forgatás balra
 Overwrite	Icon-O-Matic-SVGExport		Felülírás
@@ -97,6 +98,8 @@ Open…	Icon-O-Matic-Menu-File		Megnyitás…
 Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		{0, plural, one{Átalakítás} other{Átalakítás}} eltávolítása
 Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Kattints egy fenti alakzatra
 Remove	Icon-O-Matic-ShapesList		Eltávolítás
+Multi-paste	Icon-O-Matic-Properties		Többszörös beillesztés
+Bad news	Title of error alert		Rossz hír
 HVIF source code	Icon-O-Matic-SavePanel		HVIF forráskód
 Drop shapes	Icon-O-Matic-ShapesList		Alakzatok eldobása
 Save icon	Icon-O-Matic-SavePanel	Dialog title	Ikon mentése

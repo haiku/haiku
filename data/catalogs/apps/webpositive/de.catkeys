@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Lesezeichen
 Use proxy server to connect to the internet	Settings Window		Proxy-Server zur Verbindung mit dem Internet nutzen
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url geladen
 Auto-hide interface in full screen mode	Settings Window		Bedienelemente im Vollbildmodus ausblenden
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Auf den Lesezeichen-Ordner kann nicht zugegriffen werden.\n\nFehler: %error
 Delete	Cookie Manager		Löschen
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Auf den Lesezeichen-Ordner kann nicht zugegriffen werden.\n\nFehler: %error
 (Finish: %date - Over %duration left)	Download Window		(Fertig: %date - über %duration übrig)
 Open containing folder	Download Window		Speicherort öffnen
 Find previous	WebPositive Window		Vorheriger Treffer
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Cookies für %s
 Close	Download Window		Schließen
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Suchbegriff
-Reload	WebPositive Window		Aktualisieren
 Expiration	Cookie Manager		Ablaufdatum
+Reload	WebPositive Window		Aktualisieren
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Der Prozessor ist zu alt und unterstützt keine SSE2-Erweiterungen, ohne die WebPositive nicht läuft. Es wird empfohlen NetSurf zu installieren.
 Download finished	Download Window		Download abgeschlossen
 Cookie manager	WebPositive Window		Cookieverwaltung
-OK	Authentication Panel		OK
-Hide password text	Authentication Panel		Passwort verstecken
 Username:	Authentication Panel		Benutzername:
+Hide password text	Authentication Panel		Passwort verstecken
+OK	Authentication Panel		OK
 Name	Cookie Manager		Name
 Remove finished	Download Window		Fertige entfernen
 Earlier	WebPositive Window		Früher
@@ -81,8 +81,8 @@ View	WebPositive Window		Ansicht
 Paste	URL Bar		Einfügen
 Find next	WebPositive Window		Nächster Treffer
 Open search page	Settings Window		Suchmaschine öffnen
-Increase size	WebPositive Window		Vergrößern
 New tab	WebPositive Window		Neuer Reiter
+Increase size	WebPositive Window		Vergrößern
 Today	WebPositive Window		Heute
 Open location	WebPositive Window		URL öffnen
 New browser window	Download Window		Neues Browser-Fenster
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Größe der Standard-Schrift:
 Custom	Settings Window		Benutzerdefiniert
 Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen
 Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
-Close tab	WebPositive Window		Reiter schließen
 Remove	Download Window		Entfernen
+Close tab	WebPositive Window		Reiter schließen
 About	WebPositive Window		Über
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
 Continue downloads	WebPositive		Downloads fortsetzen
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
 Proxy server requires authentication	Settings Window		Der Proxy-Server verlangt eine Authentifizierung
 Cancel	Settings Window		Abbrechen
 Reset size	WebPositive Window		Größe zurücksetzen
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Lesezeichen Fehler
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% von %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Nur Text vergrößern
 Save page as…	WebPositive Window		Seite speichern unter …
+Zoom text only	WebPositive Window		Nur Text vergrößern
 Page source error	WebPositive Window		Fehler im Quellcode der Seite
 Auto-hide mouse pointer	Settings Window		Mauszeiger automatisch ausblenden
 Requesting %url	WebPositive Window		%url wird angefordert

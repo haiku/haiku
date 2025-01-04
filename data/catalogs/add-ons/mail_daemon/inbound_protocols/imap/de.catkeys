@@ -1,5 +1,5 @@
 1	german	x-vnd.Haiku-IMAP	1343128980
-Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Keine Verbindung zum Server „%server%“:\n%error%
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Keine Verbindung zum Server \"%server%\":\n%error%
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Abonnements der IMAP-Ordner werden aktualisiert, bitte warten …
 Failed to fetch available storage.	IMAPFolderConfig		Keine der vorhandenen Ablagen konnte übertragen werden.
 Cancel	IMAPFolderConfig		Abbrechen

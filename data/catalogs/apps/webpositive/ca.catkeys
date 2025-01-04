@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Adreces d'interès
 Use proxy server to connect to the internet	Settings Window		Useu un servidor intermediari per connectar-vos a Internet.
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url acabat
 Auto-hide interface in full screen mode	Settings Window		Amaga la interfície automàticament en mode de pantalla completa
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Hi ha hagut un error en obtenir la carpeta d'adreces d'interès.\n\nError: %error
 Delete	Cookie Manager		Suprimeix
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Hi ha hagut un error en obtenir la carpeta d'adreces d'interès.\n\nError: %error
 (Finish: %date - Over %duration left)	Download Window		(Acabament: %date - Pendent: %duration)
 Open containing folder	Download Window		Obre la carpeta que ho conté
 Find previous	WebPositive Window		Troba'n l'anterior
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Galetes per a %s
 Close	Download Window		Tanca
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - terme de cerca
-Reload	WebPositive Window		Torna a carregar
 Expiration	Cookie Manager		Venciment
+Reload	WebPositive Window		Torna a carregar
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La CPU és massa antiga i no admet les extensions SSE2, sense les quals el WebPositive no pot funcionar. Us recomanem que instal·leu el NetSurf.
 Download finished	Download Window		Baixada acabada
 Cookie manager	WebPositive Window		Gestor de galetes
-OK	Authentication Panel		D'acord
-Hide password text	Authentication Panel		Amaga el text de la contrasenya
 Username:	Authentication Panel		Nom d'usuari:
+Hide password text	Authentication Panel		Amaga el text de la contrasenya
+OK	Authentication Panel		D'acord
 Name	Cookie Manager		Nom
 Remove finished	Download Window		Supressió acabada
 Earlier	WebPositive Window		Abans
@@ -81,8 +81,8 @@ View	WebPositive Window		Vista
 Paste	URL Bar		Enganxa
 Find next	WebPositive Window		Troba'n el següent
 Open search page	Settings Window		Obre la pàgina de cerca
-Increase size	WebPositive Window		Augmenta'n la mida
 New tab	WebPositive Window		Pestanya nova
+Increase size	WebPositive Window		Augmenta'n la mida
 Today	WebPositive Window		Avui
 Open location	WebPositive Window		Obre la ubicació
 New browser window	Download Window		Finestra de navegació nova
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Mida de la lletra estàndard per de
 Custom	Settings Window		Personalitzat
 Bookmark this page	WebPositive Window		Afegeix aquesta pàgina a les adreces d'interès
 Show tabs if only one page is open	Settings Window		Mostra les pestanyes si només s’obre una pàgina.
-Close tab	WebPositive Window		Tanca la pestanya
 Remove	Download Window		Suprimeix
+Close tab	WebPositive Window		Tanca la pestanya
 About	WebPositive Window		Quant a
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Encara hi ha baixades en curs, realment voleu sortir del WebPositive ara?
 Continue downloads	WebPositive		Continua les baixades
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Encara hi ha baixades en curs, realment voleu sortir del WebPositive ara?
 Proxy server requires authentication	Settings Window		El servidor intermediari requereix autenticació.
 Cancel	Settings Window		Cancel·la
 Reset size	WebPositive Window		Restableix-ne la mida
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Error d'adreça d'interès
 OK	WebPositive Window		D'acord
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Amplia només el text
 Save page as…	WebPositive Window		Desa la pàgina com a...
+Zoom text only	WebPositive Window		Amplia només el text
 Page source error	WebPositive Window		Error del codi font de la pàgina
 Auto-hide mouse pointer	Settings Window		Amaga automàticament el punter del ratolí
 Requesting %url	WebPositive Window		Se sol·licita %url

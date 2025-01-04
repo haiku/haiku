@@ -1,15 +1,13 @@
-1	czech	x-vnd.Haiku-Sounds	1784495232
+1	czech	x-vnd.Haiku-Sounds	2763165148
 Sounds	System name		Zvuky
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Zvuky\n  Vytvořili:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Původní autor Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 No such file or directory	HEventList		Takový soubor ani adresář neexistuje
-OK	HWindow		OK
 Other…	HWindow		Jiný...
 OK	SoundsHApp		OK
 Sound file:	HWindow		Zvukový soubor:
-This is not an audio file.	HWindow		Toto není zvukový soubor.
 <none>	HEventList		<žádný>
-OK	HEventList		OK
 About Sounds	SoundsHApp		O Zvucích
+OK	HEventList		OK
 Sound	HEventList		Zvuk
 Event	HEventList		Událost
 <none>	HWindow		<žádný>

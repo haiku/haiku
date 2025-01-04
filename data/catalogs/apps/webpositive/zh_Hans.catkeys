@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		书签
 Use proxy server to connect to the internet	Settings Window		使用代理服务器连接互联网
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 已完成
 Auto-hide interface in full screen mode	Settings Window		在全屏模式下自动隐藏界面
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	获取书签文件夹时发生错误。\n\n错误：%error
 Delete	Cookie Manager		删除
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	获取书签文件夹时发生错误。\n\n错误：%error
 (Finish: %date - Over %duration left)	Download Window		（完成时间：%date - 还需大于%duration）
 Open containing folder	Download Window		打开所在文件夹
 Find previous	WebPositive Window		查找上一个
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		%s 的 Cookie
 Close	Download Window		关闭
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - 搜索术语
-Reload	WebPositive Window		刷新
 Expiration	Cookie Manager		有效期
+Reload	WebPositive Window		刷新
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		您的 CPU 太旧，不支持 SSE2 扩展，没有这些扩展，WebPositive 无法运行。我们建议改为安装 NetSurf。
 Download finished	Download Window		下载完成
 Cookie manager	WebPositive Window		Cookie管理器
-OK	Authentication Panel		确定
-Hide password text	Authentication Panel		隐藏密码文本
 Username:	Authentication Panel		用户名:
+Hide password text	Authentication Panel		隐藏密码文本
+OK	Authentication Panel		确定
 Name	Cookie Manager		名称
 Remove finished	Download Window		移除已完成
 Earlier	WebPositive Window		更早
@@ -81,8 +81,8 @@ View	WebPositive Window		视图
 Paste	URL Bar		粘贴
 Find next	WebPositive Window		查找下一个
 Open search page	Settings Window		打开搜索页面
-Increase size	WebPositive Window		增加大小
 New tab	WebPositive Window		新建标签
+Increase size	WebPositive Window		增加大小
 Today	WebPositive Window		今天
 Open location	WebPositive Window		打开位置
 New browser window	Download Window		新建浏览窗口
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		默认标准字体大小：
 Custom	Settings Window		自定义
 Bookmark this page	WebPositive Window		添加页面到书签
 Show tabs if only one page is open	Settings Window		只打开一个页面时仍显示选项卡
-Close tab	WebPositive Window		关闭标签页
 Remove	Download Window		移除
+Close tab	WebPositive Window		关闭标签页
 About	WebPositive Window		关于
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		仍有文件下载中，是否现在退出WebPositive?
 Continue downloads	WebPositive		继续下载
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		仍有文件下载中，是否现在退出WebPositive?
 Proxy server requires authentication	Settings Window		代理服务器需要认证
 Cancel	Settings Window		取消
 Reset size	WebPositive Window		重置大小
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		书签错误
 OK	WebPositive Window		确定
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% of %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		仅缩放文本
 Save page as…	WebPositive Window		页面保存为…
+Zoom text only	WebPositive Window		仅缩放文本
 Page source error	WebPositive Window		网页源代码错误
 Auto-hide mouse pointer	Settings Window		自动隐藏鼠标指针
 Requesting %url	WebPositive Window		正在请求 %url

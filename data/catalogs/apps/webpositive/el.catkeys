@@ -15,8 +15,8 @@ Bookmarks	WebPositive Window		Σελιδοδείκτες
 Use proxy server to connect to the internet	Settings Window		Χρήση μεσολαβητή για την σύνδεση στο διαδίκτυο
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url ολοκληρώθηκε
 Auto-hide interface in full screen mode	Settings Window		Να γίνεται αυτόματη απόκρυψη διεπαφής σε λειτουργία πλήρης οθόνης
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Προέκυψε ένα σφάλμα κατά την ανάγνωση του φακέλου σελιδοδεικτών.\n\nΣφάλμα: %error
 Delete	Cookie Manager		Διαγραφή
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Προέκυψε ένα σφάλμα κατά την ανάγνωση του φακέλου σελιδοδεικτών.\n\nΣφάλμα: %error
 (Finish: %date - Over %duration left)	Download Window		(Ολοκλήρωση: %date - Απομένει παραπάνω από %duration)
 Open containing folder	Download Window		Άνοιγμα εμπεριεχόμενου φακέλου
 Find previous	WebPositive Window		Εύρεση προηγούμενου
@@ -56,14 +56,14 @@ Cookies for %s	Cookie Manager		Cookies για %s
 Close	Download Window		Κλείσιμο
 WebPositive	System name		Περιηγητής Ιστού
 %s - Search term	Settings Window		%s – όρος αναζήτησης
-Reload	WebPositive Window		Ανανέωση
 Expiration	Cookie Manager		Λήξη
+Reload	WebPositive Window		Ανανέωση
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Η ΚΜΕ σας είναι πολύ παλιά και δεν υποστηρίζει τις επεκτάσεις SSE2, χωρίς τις οποίες δεν μπορεί να τρέξει ο WebPositive. Συνιστούμε να εγκαταστήσετε την εφαρμογή NetSurf για την πλοήγηση στο Διαδίκτυο.
 Download finished	Download Window		Η λήψη ολοκληρώθηκε
 Cookie manager	WebPositive Window		Διαχειριστής Cookie
-OK	Authentication Panel		Εντάξει
-Hide password text	Authentication Panel		Απόκρυψη κωδικού
 Username:	Authentication Panel		Όνομα χρήστης:
+Hide password text	Authentication Panel		Απόκρυψη κωδικού
+OK	Authentication Panel		Εντάξει
 Name	Cookie Manager		Όνομα
 Remove finished	Download Window		Αφαίρεση ολοκληρωμένων λήψεων
 Earlier	WebPositive Window		Νωρίτερα
@@ -81,8 +81,8 @@ View	WebPositive Window		Προβολή
 Paste	URL Bar		Επικόλληση
 Find next	WebPositive Window		Εύρεση επόμενου
 Open search page	Settings Window		Άνοιγμα σελίδας αναζήτησης
-Increase size	WebPositive Window		Μεγέθυνση
 New tab	WebPositive Window		Νέα καρτέλα
+Increase size	WebPositive Window		Μεγέθυνση
 Today	WebPositive Window		Σήμερα
 Open location	WebPositive Window		Άνοιγμα τοποθεσίας
 New browser window	Download Window		Νέο παράθυρο περιηγητή
@@ -108,11 +108,11 @@ Default standard font size:	Settings Window		Προεπιλεγμένο μέγε
 Custom	Settings Window		Προσαρμογή
 Bookmark this page	WebPositive Window		Προσθήκη στους σελιδοδείκτες
 Show tabs if only one page is open	Settings Window		Να εμφανίζονται οι καρτέλες όταν μόνο μία σελίδα είναι ανοιχτή
-Close tab	WebPositive Window		Κλείσιμο καρτέλας
 Remove	Download Window		Αφαίρεση
+Close tab	WebPositive Window		Κλείσιμο καρτέλας
 About	WebPositive Window		Σχετικά
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Υπάρχουν ακόμα λήψεις που βρίσκονται σε εξέλιξη, είστε σίγουρος ότι θέλετε να κλείσετε τον Περιηγητή Ιστού τώρα;
 Continue downloads	WebPositive		Συνέχιση λήψεων
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Υπάρχουν ακόμα λήψεις που βρίσκονται σε εξέλιξη, είστε σίγουρος ότι θέλετε να κλείσετε τον Περιηγητή Ιστού τώρα;
 Proxy server requires authentication	Settings Window		Ο μεσολαβητής απαιτεί ταυτοποίηση
 Cancel	Settings Window		Άκυρο
 Reset size	WebPositive Window		Επαναφορά μεγέθους
@@ -137,8 +137,8 @@ Bookmark error	WebPositive Window		Σφάλμα σελιδοδείκτη
 OK	WebPositive Window		Εντάξει
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% από %expectedSize%, %rate%/δευτ.)
 WebPositive	Download Window		Περιηγητής Ιστού
-Zoom text only	WebPositive Window		Να μεγενθυθεί το κείμενο μόνο
 Save page as…	WebPositive Window		Αποθήκευση σελίδας ως…
+Zoom text only	WebPositive Window		Να μεγενθυθεί το κείμενο μόνο
 Page source error	WebPositive Window		Σφάλμα πηγαίου κώδικα σελίδας
 Auto-hide mouse pointer	Settings Window		Αυτόματη απόκρυψη δείκτη ποντικιού
 Requesting %url	WebPositive Window		Γίνεται αίτημα για %url
