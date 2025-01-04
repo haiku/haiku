@@ -84,9 +84,9 @@ class TransformerListView : public SimpleListView,
 			CommandStack*		fCommandStack;
 
 			BMenu*				fMenu;
-			BMenuItem*			fContourMI;
-			BMenuItem*			fStrokeMI;
-			BMenuItem*			fPerspectiveMI;
+			BMenuItem*			fContourItem;
+			BMenuItem*			fStrokeItem;
+			BMenuItem*			fPerspectiveItem;
 			BMenuItem*			fRemoveItem;
 };
 

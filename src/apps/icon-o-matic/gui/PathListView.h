@@ -91,16 +91,16 @@ class PathListView : public SimpleListView,
 			BMessage*				fMessage;
 
 			BMenu*					fMenu;
-			BMenuItem*				fAddMI;
-			BMenuItem*				fAddRectMI;
-			BMenuItem*				fAddCircleMI;
-			BMenuItem*				fAddArcMI;
-			BMenuItem*				fDuplicateMI;
-			BMenuItem*				fReverseMI;
-			BMenuItem*				fCleanUpMI;
-			BMenuItem*				fRotateIndicesLeftMI;
-			BMenuItem*				fRotateIndicesRightMI;
-			BMenuItem*				fRemoveMI;
+			BMenuItem*				fAddItem;
+			BMenuItem*				fAddRectItem;
+			BMenuItem*				fAddCircleItem;
+			BMenuItem*				fAddArcItem;
+			BMenuItem*				fDuplicateItem;
+			BMenuItem*				fReverseItem;
+			BMenuItem*				fCleanUpItem;
+			BMenuItem*				fRotateIndicesLeftItem;
+			BMenuItem*				fRotateIndicesRightItem;
+			BMenuItem*				fRemoveItem;
 
 			Container<VectorPath>*	fPathContainer;
 			Container<Shape>*		fShapeContainer;

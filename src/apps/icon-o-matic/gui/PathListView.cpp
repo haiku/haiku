@@ -779,46 +779,46 @@ PathListView::SetMenu(BMenu* menu)
 	if (fMenu == NULL)
 		return;
 
-	fAddMI = new BMenuItem(B_TRANSLATE("Add"),
+	fAddItem = new BMenuItem(B_TRANSLATE("Add"),
 		new BMessage(MSG_ADD));
-	fAddRectMI = new BMenuItem(B_TRANSLATE("Add rect"), 
+	fAddRectItem = new BMenuItem(B_TRANSLATE("Add rect"),
 		new BMessage(MSG_ADD_RECT));
-	fAddCircleMI = new BMenuItem(B_TRANSLATE("Add circle"/*B_UTF8_ELLIPSIS*/),
+	fAddCircleItem = new BMenuItem(B_TRANSLATE("Add circle"/*B_UTF8_ELLIPSIS*/),
 		new BMessage(MSG_ADD_CIRCLE));
-//	fAddArcMI = new BMenuItem("Add arc" B_UTF8_ELLIPSIS,
+//	fAddArcItem = new BMenuItem("Add arc" B_UTF8_ELLIPSIS,
 //		new BMessage(MSG_ADD_ARC));
-	fDuplicateMI = new BMenuItem(B_TRANSLATE("Duplicate"), 
+	fDuplicateItem = new BMenuItem(B_TRANSLATE("Duplicate"),
 		new BMessage(MSG_DUPLICATE));
-	fReverseMI = new BMenuItem(B_TRANSLATE("Reverse"),
+	fReverseItem = new BMenuItem(B_TRANSLATE("Reverse"),
 		new BMessage(MSG_REVERSE));
-	fCleanUpMI = new BMenuItem(B_TRANSLATE("Clean up"),
+	fCleanUpItem = new BMenuItem(B_TRANSLATE("Clean up"),
 		new BMessage(MSG_CLEAN_UP));
-	fRotateIndicesRightMI = new BMenuItem(B_TRANSLATE("Rotate indices forwards"),
+	fRotateIndicesRightItem = new BMenuItem(B_TRANSLATE("Rotate indices forwards"),
 		new BMessage(MSG_ROTATE_INDICES_CCW), 'R');
-	fRotateIndicesLeftMI = new BMenuItem(B_TRANSLATE("Rotate indices backwards"),
+	fRotateIndicesLeftItem = new BMenuItem(B_TRANSLATE("Rotate indices backwards"),
 		new BMessage(MSG_ROTATE_INDICES_CW), 'R', B_SHIFT_KEY);
-	fRemoveMI = new BMenuItem(B_TRANSLATE("Remove"),
+	fRemoveItem = new BMenuItem(B_TRANSLATE("Remove"),
 		new BMessage(MSG_REMOVE));
 
-	fMenu->AddItem(fAddMI);
-	fMenu->AddItem(fAddRectMI);
-	fMenu->AddItem(fAddCircleMI);
-//	fMenu->AddItem(fAddArcMI);
+	fMenu->AddItem(fAddItem);
+	fMenu->AddItem(fAddRectItem);
+	fMenu->AddItem(fAddCircleItem);
+//	fMenu->AddItem(fAddArcItem);
 
 	fMenu->AddSeparatorItem();
 
-	fMenu->AddItem(fDuplicateMI);
-	fMenu->AddItem(fReverseMI);
-	fMenu->AddItem(fCleanUpMI);
+	fMenu->AddItem(fDuplicateItem);
+	fMenu->AddItem(fReverseItem);
+	fMenu->AddItem(fCleanUpItem);
 
 	fMenu->AddSeparatorItem();
 
-	fMenu->AddItem(fRotateIndicesRightMI);
-	fMenu->AddItem(fRotateIndicesLeftMI);
+	fMenu->AddItem(fRotateIndicesRightItem);
+	fMenu->AddItem(fRotateIndicesLeftItem);
 
 	fMenu->AddSeparatorItem();
 
-	fMenu->AddItem(fRemoveMI);
+	fMenu->AddItem(fRemoveItem);
 
 	fMenu->SetTargetForItems(this);
 
@@ -935,14 +935,14 @@ PathListView::_UpdateMenu()
 	if (fMenu == NULL)
 		return;
 
-	bool gotSelection = CurrentSelection(0) >= 0;
+	bool hasSelection = CurrentSelection(0) >= 0;
 
-	fDuplicateMI->SetEnabled(gotSelection);
-	fReverseMI->SetEnabled(gotSelection);
-	fCleanUpMI->SetEnabled(gotSelection);
-	fRotateIndicesLeftMI->SetEnabled(gotSelection);
-	fRotateIndicesRightMI->SetEnabled(gotSelection);
-	fRemoveMI->SetEnabled(gotSelection);
+	fDuplicateItem->SetEnabled(hasSelection);
+	fReverseItem->SetEnabled(hasSelection);
+	fCleanUpItem->SetEnabled(hasSelection);
+	fRotateIndicesLeftItem->SetEnabled(hasSelection);
+	fRotateIndicesRightItem->SetEnabled(hasSelection);
+	fRemoveItem->SetEnabled(hasSelection);
 }
 
 

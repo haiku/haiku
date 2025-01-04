@@ -100,9 +100,9 @@ private:
 			ShapeStyleListener*	fShapeListener;
 
 			BMenu*				fMenu;
-			BMenuItem*			fAddMI;
-			BMenuItem*			fDuplicateMI;
-			BMenuItem*			fResetTransformationMI;
+			BMenuItem*			fAddItem;
+			BMenuItem*			fDuplicateItem;
+			BMenuItem*			fResetTransformationItem;
 			BMenuItem*			fRemoveItem;
 };
 

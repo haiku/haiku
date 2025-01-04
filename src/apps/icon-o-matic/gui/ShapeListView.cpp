@@ -626,59 +626,59 @@ ShapeListView::SetMenu(BMenu* menu)
 		return;
 
 	BMessage* message = new BMessage(MSG_ADD_SHAPE);
-	fAddEmptyMI = new BMenuItem(B_TRANSLATE("Add empty"), message);
+	fAddEmptyItem = new BMenuItem(B_TRANSLATE("Add empty"), message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("path", true);
-	fAddWidthPathMI = new BMenuItem(B_TRANSLATE("Add with path"), message);
+	fAddWidthPathItem = new BMenuItem(B_TRANSLATE("Add with path"), message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("style", true);
-	fAddWidthStyleMI = new BMenuItem(B_TRANSLATE("Add with style"), message);
+	fAddWidthStyleItem = new BMenuItem(B_TRANSLATE("Add with style"), message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("path", true);
 	message->AddBool("style", true);
-	fAddWidthPathAndStyleMI = new BMenuItem(
+	fAddWidthPathAndStyleItem = new BMenuItem(
 		B_TRANSLATE("Add with path & style"), message);
 
 	message = new BMessage(MSG_OPEN);
 	message->AddBool("reference image", true);
-	fAddReferenceImageMI = new BMenuItem(B_TRANSLATE("Add reference image"), message);
+	fAddReferenceImageItem = new BMenuItem(B_TRANSLATE("Add reference image"), message);
 
-	fDuplicateMI = new BMenuItem(B_TRANSLATE("Duplicate"), 
+	fDuplicateItem = new BMenuItem(B_TRANSLATE("Duplicate"),
 		new BMessage(MSG_DUPLICATE));
-	fResetTransformationMI = new BMenuItem(B_TRANSLATE("Reset transformation"),
+	fResetTransformationItem = new BMenuItem(B_TRANSLATE("Reset transformation"),
 		new BMessage(MSG_RESET_TRANSFORMATION));
-	fFreezeTransformationMI = new BMenuItem(
+	fFreezeTransformationItem = new BMenuItem(
 		B_TRANSLATE("Freeze transformation"), 
 		new BMessage(MSG_FREEZE_TRANSFORMATION));
 
-	fRemoveMI = new BMenuItem(B_TRANSLATE("Remove"), new BMessage(MSG_REMOVE));
+	fRemoveItem = new BMenuItem(B_TRANSLATE("Remove"), new BMessage(MSG_REMOVE));
 
 
-	fMenu->AddItem(fAddEmptyMI);
-	fMenu->AddItem(fAddWidthPathMI);
-	fMenu->AddItem(fAddWidthStyleMI);
-	fMenu->AddItem(fAddWidthPathAndStyleMI);
-
-	fMenu->AddSeparatorItem();
-
-	fMenu->AddItem(fAddReferenceImageMI);
+	fMenu->AddItem(fAddEmptyItem);
+	fMenu->AddItem(fAddWidthPathItem);
+	fMenu->AddItem(fAddWidthStyleItem);
+	fMenu->AddItem(fAddWidthPathAndStyleItem);
 
 	fMenu->AddSeparatorItem();
 
-	fMenu->AddItem(fDuplicateMI);
-	fMenu->AddItem(fResetTransformationMI);
-	fMenu->AddItem(fFreezeTransformationMI);
+	fMenu->AddItem(fAddReferenceImageItem);
+
 	fMenu->AddSeparatorItem();
 
-	fMenu->AddItem(fRemoveMI);
+	fMenu->AddItem(fDuplicateItem);
+	fMenu->AddItem(fResetTransformationItem);
+	fMenu->AddItem(fFreezeTransformationItem);
+	fMenu->AddSeparatorItem();
 
-	fDuplicateMI->SetTarget(this);
-	fResetTransformationMI->SetTarget(this);
-	fFreezeTransformationMI->SetTarget(this);
-	fRemoveMI->SetTarget(this);
+	fMenu->AddItem(fRemoveItem);
+
+	fDuplicateItem->SetTarget(this);
+	fResetTransformationItem->SetTarget(this);
+	fFreezeTransformationItem->SetTarget(this);
+	fRemoveItem->SetTarget(this);
 
 	_UpdateMenu();
 }
@@ -784,14 +784,14 @@ ShapeListView::_UpdateMenu()
 	if (fMenu == NULL)
 		return;
 
-	bool gotSelection = CurrentSelection(0) >= 0;
+	bool hasSelection = CurrentSelection(0) >= 0;
 
-	fDuplicateMI->SetEnabled(gotSelection);
-	fResetTransformationMI->SetEnabled(gotSelection);
-	fFreezeTransformationMI->SetEnabled(gotSelection);
-	fRemoveMI->SetEnabled(gotSelection);
+	fDuplicateItem->SetEnabled(hasSelection);
+	fResetTransformationItem->SetEnabled(hasSelection);
+	fFreezeTransformationItem->SetEnabled(hasSelection);
+	fRemoveItem->SetEnabled(hasSelection);
 
-	if (gotSelection) {
+	if (hasSelection) {
 		bool hasPathSourceShape = false;
 
 		int32 count = CountSelectedItems();
@@ -803,7 +803,7 @@ ShapeListView::_UpdateMenu()
 			hasPathSourceShape |= isPathSourceShape;
 		}
 
-		fFreezeTransformationMI->SetEnabled(hasPathSourceShape);
+		fFreezeTransformationItem->SetEnabled(hasPathSourceShape);
 	}
 }
 

@@ -92,15 +92,15 @@ class ShapeListView : public SimpleListView,
 			CommandStack*			fCommandStack;
 
 			BMenu*					fMenu;
-			BMenuItem*				fAddEmptyMI;
-			BMenuItem*				fAddWidthPathMI;
-			BMenuItem*				fAddWidthStyleMI;
-			BMenuItem*				fAddWidthPathAndStyleMI;
-			BMenuItem*				fAddReferenceImageMI;
-			BMenuItem*				fDuplicateMI;
-			BMenuItem*				fResetTransformationMI;
-			BMenuItem*				fFreezeTransformationMI;
-			BMenuItem*				fRemoveMI;
+			BMenuItem*				fAddEmptyItem;
+			BMenuItem*				fAddWidthPathItem;
+			BMenuItem*				fAddWidthStyleItem;
+			BMenuItem*				fAddWidthPathAndStyleItem;
+			BMenuItem*				fAddReferenceImageItem;
+			BMenuItem*				fDuplicateItem;
+			BMenuItem*				fResetTransformationItem;
+			BMenuItem*				fFreezeTransformationItem;
+			BMenuItem*				fRemoveItem;
 };
 
 #endif // SHAPE_LIST_VIEW_H
