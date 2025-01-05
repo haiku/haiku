@@ -44,10 +44,11 @@ BookmarkBar::BookmarkBar(const char* title, BHandler* target,
 	fOverflowMenuAdded = false;
 
 	fPopUpMenu = new BPopUpMenu("Bookmark Popup", false, false);
-	fPopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Open in New Tab"),
-		new BMessage(kOpenNewTabMsg)));
-	fPopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Delete"), new BMessage(kDeleteMsg)));
+	fPopUpMenu->AddItem(
+		new BMenuItem(B_TRANSLATE("Open in new tab"), new BMessage(kOpenNewTabMsg)));
 	fPopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Rename"), new BMessage(kAskBookmarkNameMsg)));
+	fPopUpMenu->AddItem(new BSeparatorItem());
+	fPopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Delete"), new BMessage(kDeleteMsg)));
 }
 
 
@@ -237,7 +238,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 				// Remove the bookmark file
 				if (entry.Remove() != B_OK) {
 					// handle error case if necessary
-					BString errorMessage = B_TRANSLATE("Failed to delete bookmark %path%");
+					BString errorMessage = B_TRANSLATE("Failed to delete bookmark:\n'%path%'");
 					errorMessage.ReplaceFirst("%path%", path.Path());
 					BAlert* alert = new BAlert("Error", errorMessage.String(), B_TRANSLATE("OK"));
 					alert->Go();
@@ -247,9 +248,9 @@ BookmarkBar::MessageReceived(BMessage* message)
 				// Remove the item from the bookmark bar
 				if (!RemoveItem(fSelectedItemIndex)) {
 					// handle error case if necessary
-					BString errorMessage = B_TRANSLATE("Failed to remove bookmark %path% "
-						"from path");
-					errorMessage.ReplaceFirst("%path%", path.Path());
+					BString errorMessage = B_TRANSLATE("Failed to remove bookmark '%leaf%' "
+							"from boookmark bar.");
+					errorMessage.ReplaceFirst("%leaf%", path.Leaf());
 					BAlert* alert = new BAlert("Error", errorMessage.String(), B_TRANSLATE("OK"));
 					alert->Go();
 				}
@@ -396,7 +397,7 @@ BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 	// make sure the item doesn't already exists
 	if (fItemsMap[inode] != NULL)
 		return;
-		
+
 	entry_ref ref;
 	entry->GetRef(&ref);
 
