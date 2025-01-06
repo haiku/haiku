@@ -21,6 +21,7 @@ static const int32 kColorWhichCount = kColorWhichLastContinuous + 3;
 
 
 struct server_read_only_memory {
+	color_map	colormap;
 	rgb_color	colors[kColorWhichCount];
 };
 

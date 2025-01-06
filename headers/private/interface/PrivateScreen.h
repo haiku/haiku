@@ -107,10 +107,8 @@ private:
 private:
 			int32				fID;
 			int32				fReferenceCount;
-			color_map*			fColorMap;
 			sem_id				fRetraceSem;
 			bool				fRetraceSemValid;
-			bool				fOwnsColorMap;
 			BRect				fFrame;
 			bigtime_t			fLastUpdate;
 };

@@ -141,7 +141,6 @@ string_for_message_code(uint32 code)
 		CODE(AS_GET_PIXEL_CLOCK_LIMITS);
 		CODE(AS_GET_TIMING_CONSTRAINTS);
 
-		CODE(AS_SCREEN_GET_COLORMAP);
 		CODE(AS_GET_DESKTOP_COLOR);
 		CODE(AS_SET_DESKTOP_COLOR);
 		CODE(AS_GET_SCREEN_ID_FROM_WINDOW);
@@ -320,9 +319,6 @@ string_for_message_code(uint32 code)
 		// BDirectWindow codes
 		CODE(AS_DIRECT_WINDOW_GET_SYNC_DATA);
 		CODE(AS_DIRECT_WINDOW_SET_FULLSCREEN);
-
-		// Internal messages
-		CODE(AS_COLOR_MAP_UPDATED);
 
 		default:
 			return "unknown code";

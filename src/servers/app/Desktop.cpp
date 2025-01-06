@@ -38,6 +38,7 @@
 
 #include <PrivateScreen.h>
 #include <ServerProtocol.h>
+#include <ServerReadOnlyMemory.h>
 #include <ViewPrivate.h>
 #include <WindowInfo.h>
 
@@ -494,7 +495,7 @@ Desktop::Init()
 	// desktop settings, since it is used there already
 	InitializeColorMap();
 
-	const size_t areaSize = B_PAGE_SIZE;
+	const size_t areaSize = sizeof(server_read_only_memory);
 	char name[B_OS_NAME_LENGTH];
 	snprintf(name, sizeof(name), "d:%d:shared read only", fUserID);
 	fSharedReadOnlyArea = create_area(name, (void **)&fServerReadOnlyMemory,

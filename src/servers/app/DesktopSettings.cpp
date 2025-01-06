@@ -28,6 +28,7 @@
 #include "GlobalFontManager.h"
 #include "GlobalSubpixelSettings.h"
 #include "ServerConfig.h"
+#include "SystemPalette.h"
 
 
 DesktopSettingsPrivate::DesktopSettingsPrivate(server_read_only_memory* shared)
@@ -79,6 +80,8 @@ DesktopSettingsPrivate::_SetDefaults()
 	fWorkspacesColumns = 2;
 	fWorkspacesRows = 2;
 
+	memcpy((void*)&fShared.colormap, SystemColorMap(),
+		sizeof(color_map));
 	memcpy((void*)fShared.colors, BPrivate::kDefaultColors,
 		sizeof(rgb_color) * kColorWhichCount);
 
