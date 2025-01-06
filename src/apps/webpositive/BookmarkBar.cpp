@@ -12,11 +12,14 @@
 #include <Entry.h>
 #include <GroupLayout.h>
 #include <IconMenuItem.h>
+#include <MessageRunner.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
 #include <PromptWindow.h>
 #include <TextControl.h>
 #include <Window.h>
+
+#include "tracker_private.h"
 
 #include "BrowserWindow.h"
 #include "NavMenu.h"
@@ -29,7 +32,9 @@
 const uint32 kOpenNewTabMsg = 'opnt';
 const uint32 kDeleteMsg = 'dele';
 const uint32 kAskBookmarkNameMsg = 'askn';
+const uint32 kShowInTrackerMsg = 'otrk';
 const uint32 kRenameBookmarkMsg = 'rena';
+const uint32 kFolderMsg = 'fold';
 
 
 BookmarkBar::BookmarkBar(const char* title, BHandler* target,
@@ -47,6 +52,8 @@ BookmarkBar::BookmarkBar(const char* title, BHandler* target,
 	fPopUpMenu->AddItem(
 		new BMenuItem(B_TRANSLATE("Open in new tab"), new BMessage(kOpenNewTabMsg)));
 	fPopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Rename"), new BMessage(kAskBookmarkNameMsg)));
+	fPopUpMenu->AddItem(
+		new BMenuItem(B_TRANSLATE("Show in Tracker"), new BMessage(kShowInTrackerMsg)));
 	fPopUpMenu->AddItem(new BSeparatorItem());
 	fPopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Delete"), new BMessage(kDeleteMsg)));
 }
@@ -83,13 +90,11 @@ BookmarkBar::MouseDown(BPoint where)
 				if (foundItem) {
 					BPoint screenWhere(where);
 					ConvertToScreen(&screenWhere);
-
-					if (ItemAt(fSelectedItemIndex)->Message() == NULL) {
+					if (ItemAt(fSelectedItemIndex)->Message()->what == kFolderMsg) {
 						// This is a directory item, disable "open in new tab"
 						fPopUpMenu->ItemAt(0)->SetEnabled(false);
-					} else {
+					} else
 						fPopUpMenu->ItemAt(0)->SetEnabled(true);
-					}
 
 					// Pop up the menu
 					fPopUpMenu->SetTargetForItems(this);
@@ -113,7 +118,7 @@ BookmarkBar::AttachedToWindow()
 	// Enumerate initial directory content
 	BDirectory dir(&fNodeRef);
 	BEntry bookmark;
-	while (dir.GetNextEntry(&bookmark, true) == B_OK) {
+	while (dir.GetNextEntry(&bookmark, false) == B_OK) {
 		node_ref ref;
 		if (bookmark.GetNodeRef(&ref) == B_OK)
 			_AddItem(ref.node, &bookmark);
@@ -140,7 +145,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 					message->FindString("name", &name);
 					ref.set_name(name);
 
-					BEntry entry(&ref, true);
+					BEntry entry(&ref);
 					if (entry.InitCheck() == B_OK)
 						_AddItem(inode, &entry);
 					break;
@@ -155,8 +160,10 @@ BookmarkBar::MessageReceived(BMessage* message)
 					message->FindString("name", &name);
 					ref.set_name(name);
 
+					BEntry entry(&ref);
+					BEntry followedEntry(&ref, true); // traverse in case it's a symlink
+
 					if (fItemsMap[inode] == NULL) {
-						BEntry entry(&ref, true);
 						_AddItem(inode, &entry);
 						break;
 					} else {
@@ -171,7 +178,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 								fItemsMap[inode]->SetLabel(name);
 
 							BMessage* itemMessage = new BMessage(
-								B_REFS_RECEIVED);
+								followedEntry.IsDirectory() ? kFolderMsg : B_REFS_RECEIVED);
 							itemMessage->AddRef("refs", &ref);
 							fItemsMap[inode]->SetMessage(itemMessage);
 
@@ -205,13 +212,13 @@ BookmarkBar::MessageReceived(BMessage* message)
 				// Get the bookmark refs
 				entry_ref ref;
 				BMenuItem* selectedItem = ItemAt(fSelectedItemIndex);
-				if (selectedItem->Message() == NULL
+				if (selectedItem->Message()->what == kFolderMsg
 						|| selectedItem->Message()->FindRef("refs", &ref) != B_OK) {
 					break;
 				}
 
 				// Use the entry_ref to create a BEntry instance and get its path
-				BEntry entry(&ref, true);
+				BEntry entry(&ref);
 				BPath path;
 				entry.GetPath(&path);
 
@@ -231,7 +238,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 					break;
 
 				// Use the entry_ref to create a BEntry instance and get its path
-				BEntry entry(&ref, true);
+				BEntry entry(&ref);
 				BPath path;
 				entry.GetPath(&path);
 
@@ -254,6 +261,39 @@ BookmarkBar::MessageReceived(BMessage* message)
 					BAlert* alert = new BAlert("Error", errorMessage.String(), B_TRANSLATE("OK"));
 					alert->Go();
 				}
+			}
+			break;
+		}
+		case kShowInTrackerMsg:
+		{
+			entry_ref ref;
+			if (fSelectedItemIndex >= 0 && fSelectedItemIndex < CountItems()) {
+				BMenuItem* selectedItem = ItemAt(fSelectedItemIndex);
+				// Get the bookmark refs
+				if (selectedItem->Message()->FindRef("refs", &ref) != B_OK)
+					break;
+
+				BEntry entry(&ref);
+				BEntry parent;
+				entry.GetParent(&parent);
+				entry_ref folderRef;
+				parent.GetRef(&folderRef);
+				BMessenger msgr(kTrackerSignature);
+				// Open parent folder in Tracker
+				BMessage refMsg(B_REFS_RECEIVED);
+				refMsg.AddRef("refs", &folderRef);
+				msgr.SendMessage(&refMsg);
+
+				// Select file
+				BMessage selectMessage(kSelect);
+				entry_ref target;
+				if (entry.GetRef(&target) != B_OK)
+					break;
+
+				selectMessage.AddRef("refs", &target);
+				// wait 0.3 sec to give Tracker time to populate
+				BMessageRunner::StartSending(BMessenger(kTrackerSignature),
+					&selectMessage, 300000, 1);
 			}
 			break;
 		}
@@ -288,7 +328,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 			// Rename the bookmark file
 			entry_ref ref;
 			if (selectedItem->Message()->FindRef("refs", &ref) == B_OK) {
-				BEntry entry(&ref, true);
+				BEntry entry(&ref);
 				entry.Rename(newName.String());
 
 				// Update the menu item label
@@ -401,18 +441,22 @@ BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 	entry_ref ref;
 	entry->GetRef(&ref);
 
+	// In case it's a symlink, follow link to get the right icon,
+	// but add the symlink's entry_ref for the IconMenuItem so it gets renamed/deleted/etc.
+	BEntry followedLink(&ref, true); // traverse link
+
 	IconMenuItem* item = NULL;
 
-	if (entry->IsDirectory()) {
+	if (followedLink.IsDirectory()) {
 		BNavMenu* menu = new BNavMenu(name, B_REFS_RECEIVED, Window());
 		menu->SetNavDir(&ref);
-		item = new IconMenuItem(menu, NULL,
-			"application/x-vnd.Be-directory", B_MINI_ICON);
+		BMessage* message = new BMessage(kFolderMsg);
+		message->AddRef("refs", &ref);
+		item = new IconMenuItem(menu, message, "application/x-vnd.Be-directory", B_MINI_ICON);
 
 	} else {
-		BNode node(entry);
+		BNode node(&followedLink);
 		BNodeInfo info(&node);
-
 		BMessage* message = new BMessage(B_REFS_RECEIVED);
 		message->AddRef("refs", &ref);
 		item = new IconMenuItem(name, message, &info, B_MINI_ICON);
