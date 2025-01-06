@@ -289,6 +289,12 @@ Thread::Create(const char* name, Thread*& _thread)
 /*static*/ Thread*
 Thread::Get(thread_id id)
 {
+	if (id == thread_get_current_thread_id()) {
+		Thread* thread = thread_get_current_thread();
+		thread->AcquireReference();
+		return thread;
+	}
+
 	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 	Thread* thread = sThreadHash.Lookup(id);
 	if (thread != NULL)
@@ -300,6 +306,13 @@ Thread::Get(thread_id id)
 /*static*/ Thread*
 Thread::GetAndLock(thread_id id)
 {
+	if (id == thread_get_current_thread_id()) {
+		Thread* thread = thread_get_current_thread();
+		thread->AcquireReference();
+		thread->Lock();
+		return thread;
+	}
+
 	// look it up and acquire a reference
 	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 	Thread* thread = sThreadHash.Lookup(id);
