@@ -74,8 +74,6 @@ struct PackageNode : DoublyLinkedListLinkImpl<PackageNode> {
 		fNodeID(0),
 		fMode(mode)
 	{
-		fModifiedTime.tv_sec = 0;
-		fModifiedTime.tv_nsec = 0;
 	}
 
 	virtual ~PackageNode()
@@ -112,16 +110,6 @@ struct PackageNode : DoublyLinkedListLinkImpl<PackageNode> {
 		return fMode;
 	}
 
-	void SetModifiedTime(const timespec& time)
-	{
-		fModifiedTime = time;
-	}
-
-	const timespec& ModifiedTime() const
-	{
-		return fModifiedTime;
-	}
-
 	virtual void RemoveEntry(const char* path)
 	{
 	}
@@ -132,7 +120,6 @@ protected:
 	char*				fName;
 	ino_t				fNodeID;
 	mode_t				fMode;
-	timespec			fModifiedTime;
 };
 
 
@@ -457,8 +444,6 @@ struct PackageLoaderContentHandler : BPackageContentHandler {
 			delete node;
 			RETURN_ERROR(error);
 		}
-
-		node->SetModifiedTime(entry->ModifiedTime());
 
 		// add it to the parent directory
 		parentDir->AddChild(node);
