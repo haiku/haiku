@@ -132,7 +132,7 @@ struct ProcessGroupHashDefinition {
 
 	ProcessGroup*& GetLink(ProcessGroup* value) const
 	{
-		return value->next;
+		return value->hash_next;
 	}
 };
 
@@ -431,7 +431,7 @@ Team::Team(team_id id, bool kernel)
 	this->id = id;
 	visible = true;
 
-	hash_next = siblings_next = parent = children = group_next = NULL;
+	hash_next = parent = NULL;
 	serial_number = -1;
 
 	group_id = session_id = -1;
@@ -990,7 +990,6 @@ Team::UserCPUTime() const
 ProcessGroup::ProcessGroup(pid_t id)
 	:
 	id(id),
-	teams(NULL),
 	fSession(NULL),
 	fInOrphanedCheckList(false)
 {
@@ -1074,7 +1073,7 @@ ProcessGroup::IsOrphaned() const
 	// group's session." (Open Group Base Specs Issue 7)
 	bool orphaned = true;
 
-	Team* team = teams;
+	Team* team = teams.First();
 	while (orphaned && team != NULL) {
 		team->LockTeamAndParent(false);
 
@@ -1086,7 +1085,7 @@ ProcessGroup::IsOrphaned() const
 
 		team->UnlockTeamAndParent();
 
-		team = team->group_next;
+		team = teams.GetNext(team);
 	}
 
 	return orphaned;
@@ -1152,7 +1151,7 @@ _dump_team_info(Team* team)
 	} else
 		kprintf("\n");
 
-	kprintf("children:         %p\n", team->children);
+	kprintf("children:         %p\n", team->children.First());
 	kprintf("num_threads:      %d\n", team->num_threads);
 	kprintf("state:            %d\n", team->state);
 	kprintf("flags:            0x%" B_PRIx32 "\n", team->flags);
@@ -1282,8 +1281,7 @@ insert_team_into_parent(Team* parent, Team* team)
 {
 	ASSERT(parent != NULL);
 
-	team->siblings_next = parent->children;
-	parent->children = team;
+	parent->children.Add(team, false);
 	team->parent = parent;
 }
 
@@ -1298,22 +1296,8 @@ insert_team_into_parent(Team* parent, Team* team)
 static void
 remove_team_from_parent(Team* parent, Team* team)
 {
-	Team* child;
-	Team* last = NULL;
-
-	for (child = parent->children; child != NULL;
-			child = child->siblings_next) {
-		if (child == team) {
-			if (last == NULL)
-				parent->children = child->siblings_next;
-			else
-				last->siblings_next = child->siblings_next;
-
-			team->parent = NULL;
-			break;
-		}
-		last = child;
-	}
+	parent->children.Remove(team);
+	team->parent = NULL;
 }
 
 
@@ -1348,8 +1332,7 @@ insert_team_into_group(ProcessGroup* group, Team* team)
 	team->group_id = group->id;
 	team->session_id = group->Session()->id;
 
-	team->group_next = group->teams;
-	group->teams = team;
+	group->teams.Add(team, false);
 	group->AcquireReference();
 }
 
@@ -1365,28 +1348,14 @@ static void
 remove_team_from_group(Team* team)
 {
 	ProcessGroup* group = team->group;
-	Team* current;
-	Team* last = NULL;
 
 	// the team must be in a process group to let this function have any effect
 	if (group == NULL)
 		return;
 
-	for (current = group->teams; current != NULL;
-			current = current->group_next) {
-		if (current == team) {
-			if (last == NULL)
-				group->teams = current->group_next;
-			else
-				last->group_next = current->group_next;
-
-			break;
-		}
-		last = current;
-	}
+	group->teams.Remove(team);
 
 	team->group = NULL;
-	team->group_next = NULL;
 	team->group_id = -1;
 
 	group->ReleaseReference();
@@ -2329,8 +2298,8 @@ err1:
 static bool
 has_children_in_group(Team* parent, pid_t groupID)
 {
-	for (Team* child = parent->children; child != NULL;
-			child = child->siblings_next) {
+	for (Team* child = parent->children.First(); child != NULL;
+			child = parent->children.GetNext(child)) {
 		TeamLocker childLocker(child);
 		if (child->group_id == groupID)
 			return true;
@@ -2534,7 +2503,7 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info,
 			// to the process group specification at all.
 			bool childrenExist = false;
 			if (child == -1) {
-				childrenExist = team->children != NULL;
+				childrenExist = !team->children.IsEmpty();
 			} else if (child < -1) {
 				childrenExist = has_children_in_group(team, -child);
 			} else if (child != team->id) {
@@ -2734,7 +2703,7 @@ fill_team_info(Team* team, team_info* info, size_t size)
 static bool
 process_group_has_stopped_processes(ProcessGroup* group)
 {
-	Team* team = group->teams;
+	Team* team = group->teams.First();
 	while (team != NULL) {
 		// the parent team's lock guards the job control entry -- acquire it
 		team->LockTeamAndParent(false);
@@ -2747,7 +2716,7 @@ process_group_has_stopped_processes(ProcessGroup* group)
 
 		team->UnlockTeamAndParent();
 
-		team = team->group_next;
+		team = group->teams.GetNext(team);
 	}
 
 	return false;
@@ -2833,8 +2802,8 @@ common_get_team_usage_info(team_id id, int32 who, team_usage_info* info,
 
 		case B_TEAM_USAGE_CHILDREN:
 		{
-			Team* child = team->children;
-			for (; child != NULL; child = child->siblings_next) {
+			Team* child = team->children.First();
+			for (; child != NULL; child = team->children.GetNext(team)) {
 				TeamLocker childLocker(child);
 
 				Thread* thread = team->thread_list;
@@ -3160,7 +3129,7 @@ team_remove_team(Team* team, pid_t& _signalGroup)
 	remove_team_from_group(team);
 
 	// move the team's children to the kernel team
-	while (Team* child = team->children) {
+	while (Team* child = team->children.First()) {
 		// remove the child from the current team and add it to the kernel team
 		TeamLocker childLocker(child);
 

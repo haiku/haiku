@@ -1828,7 +1828,7 @@ send_signal_to_process_group_locked(ProcessGroup* group, const Signal& signal,
 
 	bool firstTeam = true;
 
-	for (Team* team = group->teams; team != NULL; team = team->group_next) {
+	for (Team* team = group->teams.First(); team != NULL; team = group->teams.GetNext(team)) {
 		status_t error = send_signal_to_team(team, signal,
 			flags | B_DO_NOT_RESCHEDULE);
 		// If sending to the first team in the group failed, let the whole call
