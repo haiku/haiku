@@ -2,6 +2,5 @@ SubDir HAIKU_TOP src tests system boot heap ;
 
 UsePrivateKernelHeaders ;
 
-SimpleTest boot_heap_test :
-	heap_test.cpp
-;
+SimpleTest boot_heap_test : heap_test.cpp ;
+SimpleTest boot_heap_replay_test : heap_replay_test.cpp ;
