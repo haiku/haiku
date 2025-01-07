@@ -16,11 +16,16 @@
 #include <util/OpenHashTable.h>
 
 
+#if KDEBUG
 #define DEBUG_ALLOCATIONS
-	// if defined, freed memory is filled with 0xcc
+	// if defined, allocated memory is filled with 0xcc and freed memory with 0xdeadbeef
 #define DEBUG_MAX_HEAP_USAGE
 	// if defined, the maximum heap usage is determined and printed before
 	// entering the kernel
+#define DEBUG_VALIDATE_HEAP_ON_FREE
+	// if defined, the heap integrity is checked on every free
+	// (must have DEBUG_MAX_HEAP_USAGE defined also)
+#endif
 
 #include <util/SimpleAllocator.h>
 

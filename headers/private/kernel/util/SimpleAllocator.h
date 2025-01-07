@@ -266,6 +266,9 @@ public:
 #ifdef DEBUG_MAX_HEAP_USAGE
 		fMaxHeapUsage = std::max(fMaxHeapUsage, fMaxHeapSize - fAvailable);
 #endif
+#ifdef DEBUG_ALLOCATIONS
+		memset(allocated, 0xcc, chunk->Size());
+#endif
 
 		return allocated;
 	}
@@ -306,7 +309,7 @@ public:
 
 		FreeChunk* freedChunk = FreeChunk::SetToAllocated(allocated);
 
-#ifdef DEBUG_ALLOCATIONS
+#ifdef DEBUG_VALIDATE_HEAP_ON_FREE
 		if (freedChunk->Size() > (fMaxHeapSize - fAvailable)) {
 			panic("freed chunk %p clobbered (%#zx)!\n", freedChunk,
 				freedChunk->Size());
@@ -320,6 +323,10 @@ public:
 				chunk = chunk->Next();
 			}
 		}
+#endif
+#ifdef DEBUG_ALLOCATIONS
+		for (uint32 i = 0; i < (freedChunk->Size() / 4); i++)
+			((uint32*)allocated)[i] = 0xdeadbeef;
 #endif
 
 		// try to join the new free chunk with an existing one
