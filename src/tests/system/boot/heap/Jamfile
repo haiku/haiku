@@ -2,9 +2,7 @@ SubDir HAIKU_TOP src tests system boot heap ;
 
 UsePrivateKernelHeaders ;
 
-ObjectDefines heap.cpp :
-	malloc=heap_malloc free=heap_free realloc=heap_realloc
-	HEAP_TEST=1 ;
+ObjectDefines heap.cpp : HEAP_TEST=1 ;
 
 SimpleTest boot_heap_test :
 	heap_test.cpp

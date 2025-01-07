@@ -13,9 +13,9 @@
 #include <stdarg.h>
 
 
-extern "C" void* heap_malloc(size_t size);
-extern "C" void* heap_realloc(void* oldBuffer, size_t size);
-extern "C" void heap_free(void* buffer);
+void* heap_malloc(size_t size);
+void* heap_realloc(void* oldBuffer, size_t size);
+void heap_free(void* buffer);
 extern void dump_chunks(void);
 extern uint32 heap_available(void);
 
@@ -26,23 +26,21 @@ int32 gVerbosity = 1;
 
 
 void
-platform_release_heap(struct stage2_args* args, void* base)
+platform_free_heap_region(void *_base, size_t size)
 {
-	free(base);
+	free(_base);
 }
 
 
-status_t
-platform_init_heap(struct stage2_args* args, void** _base, void** _top)
+ssize_t
+platform_allocate_heap_region(size_t size, void **_base)
 {
 	void* base = malloc(kHeapSize);
 	if (base == NULL)
 		return B_NO_MEMORY;
 
 	*_base = base;
-	*_top = (void*)((uint8*)base + kHeapSize);
-
-	return B_OK;
+	return kHeapSize;
 }
 
 
@@ -56,17 +54,6 @@ panic(const char* format, ...)
 	va_end(args);
 
 	exit(-1);
-}
-
-
-void
-dprintf(const char* format, ...)
-{
-	va_list args;
-
-	va_start(args, format);
-	vfprintf(stdout, format, args);
-	va_end(args);
 }
 
 
@@ -168,7 +155,7 @@ main(int argc, char** argv)
 		return -1;
 	}
 
-	printf("heap size == %ld\n", kHeapSize);
+	printf("heap size == %" B_PRId32 "\n", kHeapSize);
 	if (gVerbosity > 2)
 		dump_chunks();
 
@@ -219,7 +206,7 @@ main(int argc, char** argv)
 	for (i = 0; i < 100; i++) {
 		array[i] = test_malloc(kHeapSize / 64);
 		if (array[i] == NULL) {
-			printf("\tallocation %ld failed - could allocate %ld bytes (64th should fail).\n", i + 1, (kHeapSize / 64) * (i + 1));
+			printf("\tallocation %ld failed - could allocate %" B_PRId32 " bytes (64th should fail).\n", i + 1, (kHeapSize / 64) * (i + 1));
 
 			if (gVerbosity > 2)
 				dump_chunks();
@@ -288,7 +275,7 @@ main(int argc, char** argv)
 	if (memcmp(newBuffer, "haiku", 5))
 		panic("  contents differ!");
 
-	heap_release(&args);
+	heap_release();
 	return 0;
 }
 

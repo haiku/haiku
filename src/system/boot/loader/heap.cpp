@@ -6,9 +6,6 @@
 
 #include <boot/heap.h>
 
-#ifdef HEAP_TEST
-#	include <stdio.h>
-#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,6 +14,16 @@
 #include <boot/platform.h>
 #include <util/OpenHashTable.h>
 #include <util/SplayTree.h>
+
+#ifdef HEAP_TEST
+#include <stdio.h>
+#define dprintf printf
+#define malloc heap_malloc
+#define free heap_free
+#define realloc heap_realloc
+void panic(const char* format, ...);
+void free(void*);
+#endif
 
 
 //#define TRACE_HEAP
@@ -458,6 +465,7 @@ dump_chunks(void)
 	}
 }
 #endif
+
 
 uint32
 heap_available(void)
