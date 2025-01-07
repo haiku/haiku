@@ -2,15 +2,6 @@ SubDir HAIKU_TOP src tests system boot heap ;
 
 UsePrivateKernelHeaders ;
 
-ObjectDefines heap.cpp : HEAP_TEST=1 ;
-
 SimpleTest boot_heap_test :
 	heap_test.cpp
-
-	# from the boot loader
-	heap.cpp
 ;
-
-SEARCH on [ FGristFiles
-		heap.cpp
-	] = [ FDirName $(HAIKU_TOP) src system boot loader ] ;
