@@ -220,13 +220,10 @@ public:
 	{
 		FreeChunk* chunk = (FreeChunk*)base;
 		chunk->SetTo(size);
-		fFreeChunkTree.Insert(chunk);
-
-		fAvailable += chunk->Size();
 #ifdef DEBUG_MAX_HEAP_USAGE
 		fMaxHeapSize += chunk->Size();
-		fMaxHeapUsage = fMaxHeapSize - fAvailable;
 #endif
+		_InsertChunk(chunk);
 	}
 
 	uint32 Available() const { return fAvailable; }
@@ -329,13 +326,35 @@ public:
 			((uint32*)allocated)[i] = 0xdeadbeef;
 #endif
 
+		_InsertChunk(freedChunk);
+	}
+
+#ifdef DEBUG_MAX_HEAP_USAGE
+	uint32 MaxHeapSize() const { return fMaxHeapSize; }
+	uint32 MaxHeapUsage() const { return fMaxHeapUsage; }
+#endif
+
+	void DumpChunks()
+	{
+		FreeChunk* chunk = fFreeChunkTree.FindMin();
+		while (chunk != NULL) {
+			printf("\t%p: chunk size = %ld, end = %p, next = %p\n", chunk,
+				chunk->Size(), (uint8*)chunk + chunk->CompleteSize(),
+				chunk->Next());
+			chunk = chunk->Next();
+		}
+	}
+
+private:
+	void _InsertChunk(FreeChunk* freedChunk)
+	{
 		// try to join the new free chunk with an existing one
 		// it may be joined with up to two chunks
 
 		FreeChunk* chunk = fFreeChunkTree.FindMin();
 		int32 joinCount = 0;
 
-		while (chunk) {
+		while (chunk != NULL) {
 			FreeChunk* nextChunk = chunk->Next();
 
 			if (chunk->IsTouching(freedChunk)) {
@@ -356,22 +375,6 @@ public:
 #ifdef DEBUG_MAX_HEAP_USAGE
 		fMaxHeapUsage = std::max(fMaxHeapUsage, fMaxHeapSize - fAvailable);
 #endif
-	}
-
-#ifdef DEBUG_MAX_HEAP_USAGE
-	uint32 MaxHeapSize() const { return fMaxHeapSize; }
-	uint32 MaxHeapUsage() const { return fMaxHeapUsage; }
-#endif
-
-	void DumpChunks()
-	{
-		FreeChunk* chunk = fFreeChunkTree.FindMin();
-		while (chunk != NULL) {
-			printf("\t%p: chunk size = %ld, end = %p, next = %p\n", chunk,
-				chunk->Size(), (uint8*)chunk + chunk->CompleteSize(),
-				chunk->Next());
-			chunk = chunk->Next();
-		}
 	}
 
 private:

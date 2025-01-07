@@ -31,6 +31,10 @@ const static size_t kHeapGrowthAlignment = 32 * 1024;
 static const char* const kLockName = "runtime_loader heap";
 static recursive_lock sLock = RECURSIVE_LOCK_INITIALIZER(kLockName);
 
+static void* sLastHeapBase;
+static size_t sLastHeapAreaSize;
+static area_id sLastHeapArea;
+
 static SimpleAllocator<kAlignment> sAllocator;
 
 
@@ -40,11 +44,25 @@ static SimpleAllocator<kAlignment> sAllocator;
 static status_t
 add_area(size_t size)
 {
+	if (sLastHeapAreaSize != 0) {
+		// Try to resize the previous area instead of creating a new one.
+		status_t status = _kern_resize_area(sLastHeapArea, sLastHeapAreaSize + size);
+		if (status == B_OK) {
+			sAllocator.AddChunk((uint8*)sLastHeapBase + sLastHeapAreaSize, size);
+			sLastHeapAreaSize += size;
+			return B_OK;
+		}
+	}
+
 	void* base;
 	area_id area = _kern_create_area("rld heap", &base,
 		B_RANDOMIZED_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (area < 0)
 		return area;
+
+	sLastHeapBase = base;
+	sLastHeapArea = area;
+	sLastHeapAreaSize = size;
 
 	sAllocator.AddChunk(base, size);
 	return B_OK;
@@ -54,7 +72,8 @@ add_area(size_t size)
 static status_t
 grow_heap(size_t bytes)
 {
-	return add_area(sAllocator.Align(kAlignment + bytes, kHeapGrowthAlignment));
+	// Add kAlignment so that the heap has enough space for bookkeeping data.
+	return add_area(sAllocator.Align(bytes + kAlignment, kHeapGrowthAlignment));
 }
 
 
@@ -72,6 +91,7 @@ status_t
 heap_reinit_after_fork()
 {
 	recursive_lock_init(&sLock, kLockName);
+	sLastHeapArea = _kern_area_for(sLastHeapBase);
 	return B_OK;
 }
 
