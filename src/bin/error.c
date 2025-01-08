@@ -296,6 +296,9 @@ struct error_pair {
 #ifdef EOWNERDEAD
 	E(EOWNERDEAD),
 #endif
+#ifdef ESOCKTNOSUPPORT
+	E(ESOCKTNOSUPPORT),
+#endif
 	E(EWOULDBLOCK),
 	E(EXDEV),
 	{ 0, NULL }
