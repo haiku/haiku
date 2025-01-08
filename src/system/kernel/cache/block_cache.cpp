@@ -2190,9 +2190,12 @@ retry:
 			cache->RemoveBlock(block);
 			TB(Error(cache, blockNumber, "read failed", bytesRead));
 
+			status_t error = errno;
 			TRACE_ALWAYS("could not read block %" B_PRIdOFF ": bytesRead: %zd,"
 				" error: %s\n", blockNumber, bytesRead, strerror(errno));
-			return errno;
+			if (error == B_OK)
+				error = B_IO_ERROR;
+			return error;
 		}
 		TB(Read(cache, block));
 
