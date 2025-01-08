@@ -1344,11 +1344,11 @@ BlockWriter::_WriteBlocks(cached_block** blocks, uint32 count)
 
 	if (written != (ssize_t)(blockSize * count)) {
 		TB(Error(fCache, block->block_number, "write failed", written));
-		TRACE_ALWAYS("could not write back %" B_PRIu32 " blocks (start block %" B_PRIdOFF "): %s\n",
-			count, blocks[0]->block_number, strerror(errno));
-		if (written < 0)
-			return errno;
-
+		status_t error = errno;
+		TRACE_ALWAYS("could not write back %" B_PRIu32 " blocks (start block %" B_PRIdOFF
+			"): %s\n", count, blocks[0]->block_number, strerror(error));
+		if (written < 0 && error != 0)
+			return error;
 		return B_IO_ERROR;
 	}
 
@@ -2192,9 +2192,9 @@ retry:
 
 			status_t error = errno;
 			TRACE_ALWAYS("could not read block %" B_PRIdOFF ": bytesRead: %zd,"
-				" error: %s\n", blockNumber, bytesRead, strerror(errno));
+				" error: %s\n", blockNumber, bytesRead, strerror(error));
 			if (error == B_OK)
-				error = B_IO_ERROR;
+				return B_IO_ERROR;
 			return error;
 		}
 		TB(Read(cache, block));
