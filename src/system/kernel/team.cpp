@@ -2803,7 +2803,7 @@ common_get_team_usage_info(team_id id, int32 who, team_usage_info* info,
 		case B_TEAM_USAGE_CHILDREN:
 		{
 			Team* child = team->children.First();
-			for (; child != NULL; child = team->children.GetNext(team)) {
+			for (; child != NULL; child = team->children.GetNext(child)) {
 				TeamLocker childLocker(child);
 
 				Thread* thread = team->thread_list;
