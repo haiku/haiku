@@ -6174,11 +6174,6 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 	if (addressSpec == B_EXACT_ADDRESS && IS_KERNEL_ADDRESS(address))
 		return B_BAD_VALUE;
 
-	if (addressSpec == B_ANY_ADDRESS)
-		addressSpec = B_RANDOMIZED_ANY_ADDRESS;
-	if (addressSpec == B_BASE_ADDRESS)
-		addressSpec = B_RANDOMIZED_BASE_ADDRESS;
-
 	fix_protection(&protection);
 
 	virtual_address_restrictions virtualRestrictions = {};
