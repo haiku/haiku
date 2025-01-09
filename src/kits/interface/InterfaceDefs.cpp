@@ -1587,10 +1587,10 @@ set_decorator(const BString& path)
 	link.StartMessage(AS_SET_DECORATOR);
 
 	link.AttachString(path.String());
-	link.Flush();
 
 	status_t error = B_OK;
-	link.Read<status_t>(&error);
+	if (link.FlushWithReply(error) != B_OK)
+		return B_ERROR;
 
 	return error;
 }

@@ -675,7 +675,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			status_t error = gDecorManager.SetDecorator(path, fDesktop);
 
-			fLink.Attach<status_t>(error);
+			fLink.StartMessage(error);
 			fLink.Flush();
 
 			if (error == B_OK)
