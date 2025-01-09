@@ -506,7 +506,7 @@ dtb_get_interrupt(const void* fdt, int node)
 			panic("unsupported interruptCells");
 		}
 	}
-	dprintf("[!] no interrupt field\n");
+	dprintf("%s: no interrupt field on node %d\n", __func__, node);
 	return 0;
 }
 
@@ -534,7 +534,8 @@ dtb_get_clock_frequency(const void* fdt, int node)
 		}
 	}
 
-	return 0;
+	dprintf("%s: no clock-frequency field on node %d\n", __func__, node);
+	return -1;
 }
 
 
@@ -665,7 +666,7 @@ dtb_set_kernel_args()
 		dprintf("  kind: %s\n", uart.kind);
 		dprintf("  regs: %#" B_PRIx64 ", %#" B_PRIx64 "\n", uart.regs.start, uart.regs.size);
 		dprintf("  irq: %" B_PRIu32 "\n", uart.irq);
-		dprintf("  clock: %" B_PRIu64 "\n", uart.clock);
+		dprintf("  clock: %" B_PRId64 "\n", uart.clock);
 	}
 
 	arch_dtb_set_kernel_args();
