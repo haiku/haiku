@@ -1,18 +1,19 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems packagefs ;
 
-
-UseBuildFeatureHeaders zlib ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders package shared storage support file_systems ;
 
-local zstdKernelLib ;
+UseBuildFeatureHeaders zlib ;
+Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]
+	: [ BuildFeatureAttribute zlib : headers ] ;
 
+local zstdKernelLib ;
 if [ FIsBuildFeatureEnabled zstd ] {
-	zstdKernelLib = kernel_libzstd.a ;
-	UseBuildFeatureHeaders zstd ;
-	Includes [ FGristFiles $(zstdSources) ]
-		: [ BuildFeatureAttribute zstd : headers ] ;
 	SubDirC++Flags -DZSTD_ENABLED -DZSTD_STATIC_LINKING_ONLY ;
+	UseBuildFeatureHeaders zstd ;
+	Includes [ FGristFiles ZstdCompressionAlgorithm.cpp ]
+		: [ BuildFeatureAttribute zstd : headers ] ;
+	zstdKernelLib = kernel_libzstd.a ;
 }
 
 local subDirs =
@@ -95,9 +96,6 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	PackageReaderImpl.cpp
 	ReaderImplBase.cpp
 ;
-
-Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]
-	: [ BuildFeatureAttribute zlib : headers ] ;
 
 local libSharedSources =
 	NaturalCompare.cpp
