@@ -37,7 +37,13 @@ ArchUARTSifive::Init()
 void
 ArchUARTSifive::InitPort(uint32 baud)
 {
-	uint64 quotient = (Clock() + baud - 1) / baud;
+	int64 clock = Clock();
+
+	// if we get an invalid clock for some reason, just accept the currently set baud.
+	if (clock < 0)
+		return;
+
+	uint64 quotient = (clock + baud - 1) / baud;
 
 	if (quotient == 0)
 		Regs()->div = 0;
