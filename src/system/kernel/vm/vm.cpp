@@ -2545,14 +2545,30 @@ vm_clone_area(team_id team, const char* name, void** address,
 	AreaCacheLocker cacheLocker(sourceArea);
 	VMCache* cache = cacheLocker.Get();
 
-	if (!kernel && sourceAddressSpace != targetAddressSpace
-			&& (sourceArea->protection & B_CLONEABLE_AREA) == 0) {
+	int protectionMax = sourceArea->protection_max;
+	if (!kernel && sourceAddressSpace != targetAddressSpace) {
+		if ((sourceArea->protection & B_CLONEABLE_AREA) == 0) {
 #if KDEBUG
-		Team* team = thread_get_current_thread()->team;
-		dprintf("team \"%s\" (%" B_PRId32 ") attempted to clone area \"%s\" (%"
-			B_PRId32 ")!\n", team->Name(), team->id, sourceArea->name, sourceID);
+			Team* team = thread_get_current_thread()->team;
+			dprintf("team \"%s\" (%" B_PRId32 ") attempted to clone area \"%s\" (%"
+				B_PRId32 ")!\n", team->Name(), team->id, sourceArea->name, sourceID);
 #endif
-		return B_NOT_ALLOWED;
+			return B_NOT_ALLOWED;
+		}
+
+		if (protectionMax == 0)
+			protectionMax = B_USER_PROTECTION;
+		if ((sourceArea->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0)
+			protectionMax &= ~B_WRITE_AREA;
+		if (((protection & B_USER_PROTECTION) & ~protectionMax) != 0) {
+#if KDEBUG
+			Team* team = thread_get_current_thread()->team;
+			dprintf("team \"%s\" (%" B_PRId32 ") attempted to clone area \"%s\" (%"
+				B_PRId32 ") with extra permissions (0x%x)!\n", team->Name(), team->id,
+				sourceArea->name, sourceID, protection);
+#endif
+			return B_NOT_ALLOWED;
+		}
 	}
 	if (sourceArea->cache_type == CACHE_TYPE_NULL)
 		return B_NOT_ALLOWED;
@@ -2567,7 +2583,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 	addressRestrictions.address_specification = addressSpec;
 	status = map_backing_store(targetAddressSpace, cache,
 		sourceArea->cache_offset, name, sourceArea->Size(),
-		sourceArea->wiring, protection, sourceArea->protection_max,
+		sourceArea->wiring, protection, protectionMax,
 		mapping, mappingFlags, &addressRestrictions,
 		kernel, &newArea, address);
 	if (status < B_OK)
@@ -3089,18 +3105,22 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 		// enforce restrictions
 		if (!kernel && (area->address_space == VMAddressSpace::Kernel()
 				|| (area->protection & B_KERNEL_AREA) != 0)) {
+#if KDEBUG
 			dprintf("vm_set_area_protection: team %" B_PRId32 " tried to "
 				"set protection %#" B_PRIx32 " on kernel area %" B_PRId32
 				" (%s)\n", team, newProtection, areaID, area->name);
+#endif
 			return B_NOT_ALLOWED;
 		}
 		if (!kernel && area->protection_max != 0
 			&& (newProtection & area->protection_max)
 				!= (newProtection & B_USER_PROTECTION)) {
+#if KDEBUG
 			dprintf("vm_set_area_protection: team %" B_PRId32 " tried to "
-				"set protection %#" B_PRIx32 " (max %#" B_PRIx32 ") on kernel "
-				"area %" B_PRId32 " (%s)\n", team, newProtection,
+				"set protection %#" B_PRIx32 " (max %#" B_PRIx32 ") on area "
+				"%" B_PRId32 " (%s)\n", team, newProtection,
 				area->protection_max, areaID, area->name);
+#endif
 			return B_NOT_ALLOWED;
 		}
 		if (team != VMAddressSpace::KernelID()
