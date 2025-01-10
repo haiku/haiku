@@ -306,24 +306,42 @@ ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize,
 	}
 
 	// find the text and data segment -- we need load address and size
-	*_textAddress = 0;
-	*_textSize = 0;
-	*_dataAddress = 0;
-	*_dataSize = 0;
+	// in case of multiple segments of the same type, combine them
+	addr_t textBase = 0;
+	addr_t textEnd = 0;
+	addr_t dataBase = 0;
+	addr_t dataEnd = 0;
 	for (int32 i = 0; i < programHeaderCount; i++) {
 		elf_phdr* header = (elf_phdr*)
 			((uint8*)programHeaders + i * elfHeader->e_phentsize);
-		if (header->p_type == PT_LOAD) {
-			if ((header->p_flags & PF_WRITE) == 0) {
-				*_textAddress = header->p_vaddr;
-				*_textSize = header->p_memsz;
+		if (header->p_type != PT_LOAD)
+			continue;
+
+		addr_t base = header->p_vaddr;
+		addr_t end = base + header->p_memsz;
+		if ((header->p_flags & PF_WRITE) == 0) {
+			if (textEnd == 0) {
+				textBase = base;
+				textEnd = end;
 			} else {
-				*_dataAddress = header->p_vaddr;
-				*_dataSize = header->p_memsz;
-				break;
+				textBase = min_c(textBase, base);
+				textEnd = max_c(textEnd, end);
+			}
+		} else {
+			if (dataEnd == 0) {
+				dataBase = base;
+				dataEnd = end;
+			} else {
+				dataBase = min_c(dataBase, base);
+				dataEnd = max_c(dataEnd, end);
 			}
 		}
 	}
+
+	*_textAddress = textBase;
+	*_textSize = textEnd - textBase;
+	*_dataAddress = dataBase;
+	*_dataSize = dataEnd - dataBase;
 
 	status_t error = _FindTableInSection(elfHeader, SHT_SYMTAB);
 	if (error != B_OK)
