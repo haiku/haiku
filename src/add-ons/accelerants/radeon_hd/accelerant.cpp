@@ -139,6 +139,7 @@ init_common(int device, bool isClone)
 		return status;
 	}
 
+	// XXX: We *should* only need B_READ_AREA here, but AtomBIOS calls fail with it RO #19348
 	gInfo->rom_area = clone_area("radeon hd AtomBIOS",
 		(void**)&gInfo->rom, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->rom_area);
