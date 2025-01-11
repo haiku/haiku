@@ -597,10 +597,7 @@ SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 	bool exactMatch = false;
 	const char *symbolName = NULL;
 
-	int32 symbolCount = fSymbolLookup->Read(fImage->symhash[1]);
-	const elf_region_t *textRegion = fImage->regions;				// local
-
-	for (int32 i = 0; i < symbolCount; i++) {
+	for (int32 i = 0; i < fSymbolCount; i++) {
 		const elf_sym *symbol = &fSymbolLookup->Read(fImage->syms[i]);
 
 		// The symbol table contains not only symbols referring to functions
@@ -612,13 +609,12 @@ SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 		// though).
 		if ((symbol->Type() != STT_FUNC && symbol->Type() != STT_OBJECT)
 			|| symbol->st_value == 0
-			|| symbol->st_value + symbol->st_size + textRegion->delta
-				> textRegion->vmstart + textRegion->size) {
+			|| (symbol->st_value + symbol->st_size) > (size_t)fInfo.text_size) {
 			continue;
 		}
 
 		// skip symbols starting after the given address
-		addr_t symbolAddress = symbol->st_value + textRegion->delta;
+		addr_t symbolAddress = symbol->st_value + fLoadDelta;
 
 		if (symbolAddress > address)
 			continue;
@@ -646,7 +642,7 @@ SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 
 	if (symbolFound != NULL) {
 		if (_baseAddress)
-			*_baseAddress = symbolFound->st_value + textRegion->delta;
+			*_baseAddress = symbolFound->st_value + fLoadDelta;
 		if (_symbolName)
 			*_symbolName = symbolName;
 		if (_exactMatch)

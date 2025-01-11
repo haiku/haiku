@@ -1420,7 +1420,9 @@ public:
 		const uint32* hashBuckets = image.symhash + 2;
 		const uint32* hashChains = image.symhash + 2 + hashTabSize;
 
-		const elf_region_t& textRegion = image.regions[0];
+		const addr_t loadDelta = image.regions[0].delta;
+		// TODO: add a way to get other text regions' size!
+		size_t regionsSize = image.regions[0].size;
 
 		// search the image for the symbol
 		elf_sym symbolFound;
@@ -1452,13 +1454,12 @@ public:
 				// -- couldn't verify that in the specs though).
 				if ((symbol.Type() != STT_FUNC && symbol.Type() != STT_OBJECT)
 					|| symbol.st_value == 0
-					|| symbol.st_value + symbol.st_size + textRegion.delta
-						> textRegion.vmstart + textRegion.size) {
+					|| (symbol.st_value + symbol.st_size) > regionsSize) {
 					continue;
 				}
 
 				// skip symbols starting after the given address
-				addr_t symbolAddress = symbol.st_value + textRegion.delta;
+				addr_t symbolAddress = symbol.st_value + loadDelta;
 				if (symbolAddress > address)
 					continue;
 				addr_t symbolDelta = address - symbolAddress;
@@ -1495,9 +1496,9 @@ public:
 
 		if (_baseAddress) {
 			if (deltaFound < INT_MAX)
-				*_baseAddress = symbolFound.st_value + textRegion.delta;
+				*_baseAddress = symbolFound.st_value + loadDelta;
 			else
-				*_baseAddress = textRegion.vmstart;
+				*_baseAddress = image.regions[0].vmstart;
 		}
 
 		if (_exactMatch)
@@ -1517,6 +1518,7 @@ public:
 			if (!_Read(imageAddress, image))
 				return B_BAD_ADDRESS;
 
+			// TODO: text may be more than just the first region.
 			if (image.regions[0].vmstart <= address
 				&& address < image.regions[0].vmstart + image.regions[0].size) {
 				return B_OK;
