@@ -1,11 +1,13 @@
-1	german	x-vnd.Haiku-WebPositive	2942427387
+1	german	x-vnd.Haiku-WebPositive	2670512085
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
 Copy	Console Window		Kopieren
 (Finish: %date)	Download Window		(Fertig: %date)
 Open bookmarks confirmation	WebPositive Window		Lesezeichen öffnen
+Delete	BookmarkBar		Entfernen
 Download folder:	Settings Window		Download-Ordner:
 Close window	WebPositive Window		Fenster schließen
+Rename	BookmarkBar		Umbenennen
 Find:	WebPositive Window		Suchen:
 Script console	WebPositive Window		Skript-Konsole
 There was an error setting up the bookmark.	WebPositive Window		Fehler beim erstellen des Lesezeichens.
@@ -56,6 +58,7 @@ Cookies for %s	Cookie Manager		Cookies für %s
 Close	Download Window		Schließen
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Suchbegriff
+Old name: %s	BookmarkBar		Alter Name: %s
 Expiration	Cookie Manager		Ablaufdatum
 Reload	WebPositive Window		Aktualisieren
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Der Prozessor ist zu alt und unterstützt keine SSE2-Erweiterungen, ohne die WebPositive nicht läuft. Es wird empfohlen NetSurf zu installieren.
@@ -95,6 +98,7 @@ Style:	Font Selection view		Stil:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Das Lesezeichen konnte nicht angelegt werden.\n\nFehler: %error
 OK	Download Window		OK
 Proxy username:	Settings Window		Proxy-Nutzername:
+Rename bookmark	BookmarkBar		Lesezeichen umbenennen
 Manage bookmarks	WebPositive Window		Lesezeichen verwalten
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Neustarten
@@ -150,9 +154,11 @@ Settings	WebPositive Window		Einstellungen
 Clear	URL Bar		Leeren
 Loading %url	WebPositive Window		%url wird geladen
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.
+OK	BookmarkBar		OK
 Start up:	Settings Window		Start:
 Confirmation	WebPositive Window		Bestätigung
 Session cookie	Cookie Manager		Sitzungs-Cookie
+New name:	BookmarkBar		Neuer Name:
 No SSE2 support	WebPositive		Keine SSE2-Unterstützung
 Open all	WebPositive Window		Alle öffnen
 Cut	WebPositive Window		Ausschneiden

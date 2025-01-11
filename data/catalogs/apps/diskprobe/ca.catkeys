@@ -74,7 +74,7 @@ Contents:	TypeEditors		Contingut:
 Could not open file \"%s\": %s\n	DiskProbe		No s'ha pogut obrir el fitxer \"%s\": %s\n
 Probe file…	OpenWindow		Examina el fitxer...
 Block: 	ProbeView		Bloc: 
-Bookmarks	ProbeView		Adreces d'interès
+Bookmarks	ProbeView		Marcadors
 Probe device	OpenWindow		Prova del dispositiu
 none	ProbeView	No attributes	cap
 Case sensitive	FindWindow		Distingeix les majúscules de les minúscules

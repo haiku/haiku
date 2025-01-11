@@ -1,11 +1,13 @@
-1	swedish	x-vnd.Haiku-WebPositive	2942427387
+1	swedish	x-vnd.Haiku-WebPositive	2670512085
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 Copy	Console Window		Kopiera
 (Finish: %date)	Download Window		(Avsluta: %date)
 Open bookmarks confirmation	WebPositive Window		Öppna bokmärkesbekräftelse
+Delete	BookmarkBar		Radera
 Download folder:	Settings Window		Nedladdningskatalog:
 Close window	WebPositive Window		Stäng fönster
+Rename	BookmarkBar		Döpa om
 Find:	WebPositive Window		Hitta:
 Script console	WebPositive Window		Skriptkonsoll
 There was an error setting up the bookmark.	WebPositive Window		Det uppstod ett fel när bokmärket skulle ställas in.
@@ -56,6 +58,7 @@ Cookies for %s	Cookie Manager		Kakor för %s
 Close	Download Window		Stäng
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Sökterm
+Old name: %s	BookmarkBar		Gammalt namn: %s
 Expiration	Cookie Manager		Upphör
 Reload	WebPositive Window		Ladda om
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Din CPU är för gammal och stöder inte SSE2-tillägg, vilka krävs för att WebPositive ska fungera. Vi rekommenderar att du installerar NetSurf istället.
@@ -95,6 +98,7 @@ Style:	Font Selection view		Stil:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Det uppstod ett fel vid skapandet av bokmärkesfilen.\n\nFel: %error
 OK	Download Window		OK
 Proxy username:	Settings Window		Användarnamn för proxy:
+Rename bookmark	BookmarkBar		Byt namn på bokmärke
 Manage bookmarks	WebPositive Window		Hantera bokmärken
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Starta om
@@ -150,9 +154,11 @@ Settings	WebPositive Window		Inställningar
 Clear	URL Bar		Rensa
 Loading %url	WebPositive Window		Laddar %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Yxmördaren Julia Blomqvist på fäktning i Schweiz.
+OK	BookmarkBar		OK
 Start up:	Settings Window		Börja:
 Confirmation	WebPositive Window		Bekräftelse
 Session cookie	Cookie Manager		Sessionskaka
+New name:	BookmarkBar		Nytt namn:
 No SSE2 support	WebPositive		Inget stöd för SSE2
 Open all	WebPositive Window		Öppna alla
 Cut	WebPositive Window		Klipp ut

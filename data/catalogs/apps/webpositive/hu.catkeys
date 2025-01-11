@@ -1,11 +1,13 @@
-1	hungarian	x-vnd.Haiku-WebPositive	2942427387
+1	hungarian	x-vnd.Haiku-WebPositive	2670512085
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 Copy	Console Window		Másolás
 (Finish: %date)	Download Window		(Befejezés: %date)
 Open bookmarks confirmation	WebPositive Window		Könyvjelzők megnyitásának megerősítése
+Delete	BookmarkBar		Törlés
 Download folder:	Settings Window		Letöltések mappája:
 Close window	WebPositive Window		Ablak bezárása
+Rename	BookmarkBar		Átnevezés
 Find:	WebPositive Window		Keres:
 Script console	WebPositive Window		Script konzol
 There was an error setting up the bookmark.	WebPositive Window		Hiba történt a könyvjelző mentésekor.
@@ -56,6 +58,7 @@ Cookies for %s	Cookie Manager		%s sütik
 Close	Download Window		Bezár
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Keresési feltétel
+Old name: %s	BookmarkBar		Előző név: %s
 Expiration	Cookie Manager		Érvényesség
 Reload	WebPositive Window		Újratöltés
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		A processzor túl régi, és nem támogatja az SSE2 kiterjesztést, amelyek nélkül a WebPositive nem futhat. Javasoljuk a NetSurf telepítését helyette.
@@ -95,6 +98,7 @@ Style:	Font Selection view		Stílus:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
 OK	Download Window		Rendben
 Proxy username:	Settings Window		Proxy felhasználónév:
+Rename bookmark	BookmarkBar		Könyvjelző átnevezése
 Manage bookmarks	WebPositive Window		Könyvjelzők kezelése
 /s)	Download Window	...as in 'per second'	/mp)
 Restart	Download Window		Újraindítás
@@ -150,9 +154,11 @@ Settings	WebPositive Window		Beállítások
 Clear	URL Bar		Töröl
 Loading %url	WebPositive Window		%url betöltése
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép
+OK	BookmarkBar		Rendben
 Start up:	Settings Window		Indítás:
 Confirmation	WebPositive Window		Megerősítés
 Session cookie	Cookie Manager		Folyamat-süti
+New name:	BookmarkBar		Új név:
 No SSE2 support	WebPositive		Az SSE2 nem támogatott
 Open all	WebPositive Window		Összes megnyitása
 Cut	WebPositive Window		Kivág
