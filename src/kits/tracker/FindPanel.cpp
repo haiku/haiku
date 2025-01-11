@@ -240,8 +240,9 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 		BDirectory directory(GetQueriesDirectory().Path());
 		BEntry entry(&directory, "default");
 
-		if (entry.Exists())
-			fFile = TryOpening(&fRef);
+		entry_ref defaultRef;
+		if (entry.Exists() && entry.GetRef(&defaultRef) == B_OK)
+			fFile = TryOpening(&defaultRef);
 		else {
 			// no default query template yet
 			fFile = new BFile(&entry, O_RDWR | O_CREAT);
