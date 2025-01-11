@@ -31,47 +31,16 @@
 using namespace BPrivate::Debug;
 
 
-// PrepareAddress
 const void *
-Area::PrepareAddress(debug_context* debugContext, const void *address)
+Area::TranslateAddress(const void *address)
 {
-	TRACE(("Area::PrepareAddress(%p): area: %" B_PRId32 "\n", address, fRemoteID));
-
-	// clone the area, if not done already
-	if (fLocalID < 0) {
-		debug_nub_clone_area message;
-		message.reply_port = debugContext->reply_port;
-		message.address = address;
-
-		debug_nub_clone_area_reply reply;
-		status_t error = send_debug_message(debugContext, B_DEBUG_MESSAGE_CLONE_AREA,
-			&message, sizeof(message), &reply, sizeof(reply));
-		if (error != B_OK)
-			throw Exception(error);
-
-		fLocalID = reply.area;
-		if (fLocalID < 0) {
-			TRACE(("Area::PrepareAddress(): Failed to clone area %" B_PRId32
-				": %s\n", fRemoteID, strerror(fLocalID)));
-			throw Exception(fLocalID);
-		}
-
-		area_info info;
-		error = get_area_info(fLocalID, &info);
-		if (error < 0) {
-			TRACE(("Area::PrepareAddress(): Failed to get info for %" B_PRId32
-				": %s\n", fLocalID, strerror(info)));
-			throw Exception(fLocalID);
-		}
-
-		fLocalAddress = info.address;
-	}
+	TRACE(("Area::TranslateAddress(%p): area: %" B_PRId32 "\n", address, fLocalID));
 
 	// translate the address
 	const void *result = (const void*)((addr_t)address - (addr_t)fRemoteAddress
 		+ (addr_t)fLocalAddress);
 
-	TRACE(("Area::PrepareAddress(%p) done: %p\n", address, result));
+	TRACE(("Area::TranslateAddress(%p) done: %p\n", address, result));
 
 	return result;
 }
@@ -79,14 +48,13 @@ Area::PrepareAddress(debug_context* debugContext, const void *address)
 
 // #pragma mark -
 
-// constructor
+
 RemoteMemoryAccessor::RemoteMemoryAccessor(debug_context* debugContext)
 	: fDebugContext(debugContext),
 	  fAreas()
 {
 }
 
-// destructor
 RemoteMemoryAccessor::~RemoteMemoryAccessor()
 {
 	// delete the areas
@@ -96,70 +64,40 @@ RemoteMemoryAccessor::~RemoteMemoryAccessor()
 	}
 }
 
-// Init
-status_t
-RemoteMemoryAccessor::Init()
-{
-	// If we don't have a debug context, then there's nothing we can do.
-	// Only SymbolLookup's image file functionality will be available.
-	if (fDebugContext == NULL || fDebugContext->nub_port < 0)
-		return B_OK;
 
-	// get a list of the team's areas
-	area_info areaInfo;
-	ssize_t cookie = 0;
-	status_t error;
-	while ((error = get_next_area_info(fDebugContext->team, &cookie, &areaInfo)) == B_OK) {
-		TRACE(("area %" B_PRId32 ": address: %p, size: %ld, name: %s\n",
-			areaInfo.area, areaInfo.address, areaInfo.size, areaInfo.name));
-
-		Area *area = new(std::nothrow) Area(areaInfo.area, areaInfo.address,
-			areaInfo.size);
-		if (!area)
-			return B_NO_MEMORY;
-
-		fAreas.Add(area);
-	}
-
-	if (fAreas.IsEmpty())
-		return error;
-
-	return B_OK;
-}
-
-// PrepareAddress
 const void *
 RemoteMemoryAccessor::PrepareAddress(const void *remoteAddress,
-	int32 size) const
+	int32 size)
 {
 	TRACE(("RemoteMemoryAccessor::PrepareAddress(%p, %" B_PRId32 ")\n",
 		remoteAddress, size));
 
-	if (!remoteAddress) {
+	if (remoteAddress == NULL) {
 		TRACE(("RemoteMemoryAccessor::PrepareAddress(): Got null address!\n"));
 		throw Exception(B_BAD_VALUE);
 	}
 
-	return _FindArea(remoteAddress, size).PrepareAddress(fDebugContext, remoteAddress);
+	return _GetArea(remoteAddress, size).TranslateAddress(remoteAddress);
 }
 
 
 const void *
 RemoteMemoryAccessor::PrepareAddressNoThrow(const void *remoteAddress,
-	int32 size) const
+	int32 size)
 {
 	if (remoteAddress == NULL)
 		return NULL;
 
-	Area* area = _FindAreaNoThrow(remoteAddress, size);
-	if (area == NULL)
+	Area* area;
+	status_t status = _GetAreaNoThrow(remoteAddress, size, area);
+	if (status != B_OK)
 		return NULL;
 
-	return area->PrepareAddress(fDebugContext, remoteAddress);
+	return area->TranslateAddress(remoteAddress);
 }
 
 
-// AreaForLocalAddress
+
 Area*
 RemoteMemoryAccessor::AreaForLocalAddress(const void* address) const
 {
@@ -176,36 +114,78 @@ RemoteMemoryAccessor::AreaForLocalAddress(const void* address) const
 }
 
 
-// _FindArea
 Area &
-RemoteMemoryAccessor::_FindArea(const void *address, int32 size) const
+RemoteMemoryAccessor::_GetArea(const void *address, int32 size)
 {
-	TRACE(("RemoteMemoryAccessor::_FindArea(%p, %" B_PRId32 ")\n", address,
+	TRACE(("RemoteMemoryAccessor::_GetArea(%p, %" B_PRId32 ")\n", address,
 		size));
 
-	for (AreaList::ConstIterator it = fAreas.GetIterator(); it.HasNext();) {
-		Area *area = it.Next();
-		if (area->ContainsAddress(address, size))
-			return *area;
+	Area* area;
+	status_t status = _GetAreaNoThrow(address, size, area);
+	if (status != B_OK) {
+		TRACE(("RemoteMemoryAccessor::_GetArea(): Failed to get address %p\n",
+			address));
+		throw Exception(status);
 	}
 
-	TRACE(("RemoteMemoryAccessor::_FindArea(): No area found for address %p\n",
-		address));
-	throw Exception(B_ENTRY_NOT_FOUND);
+	return *area;
 }
 
 
-// _FindAreaNoThrow
-Area*
-RemoteMemoryAccessor::_FindAreaNoThrow(const void *address, int32 size) const
+status_t
+RemoteMemoryAccessor::_GetAreaNoThrow(const void *address, int32 size, Area *&_area)
 {
-	for (AreaList::ConstIterator it = fAreas.GetIterator(); it.HasNext();) {
+	for (AreaList::Iterator it = fAreas.GetIterator(); it.HasNext();) {
 		Area *area = it.Next();
-		if (area->ContainsAddress(address, size))
-			return area;
+		if (area->ContainsAddress(address, size)) {
+			_area = area;
+			return B_OK;
+		}
 	}
 
-	return NULL;
+	// If we don't have a debug context, then there's nothing we can do.
+	// SymbolLookup's image file functionality will still be available, though.
+	if (fDebugContext == NULL || fDebugContext->nub_port < 0)
+		return B_NO_INIT;
+
+	// we need to clone a new area
+	debug_nub_clone_area message;
+	message.reply_port = fDebugContext->reply_port;
+	message.address = address;
+
+	debug_nub_clone_area_reply reply;
+	status_t error = send_debug_message(fDebugContext, B_DEBUG_MESSAGE_CLONE_AREA,
+		&message, sizeof(message), &reply, sizeof(reply));
+	if (error != B_OK)
+		return error;
+
+	area_id localID = reply.area;
+	if (localID < 0) {
+		TRACE(("RemoteMemoryAccessor: Failed to clone area for %p: %s\n",
+			address, strerror(localID)));
+		return localID;
+	}
+
+	area_info areaInfo;
+	error = get_area_info(localID, &areaInfo);
+	if (error < 0) {
+		TRACE(("RemoteMemoryAccessor: Failed to get info for %" B_PRId32
+			": %s\n", localID, strerror(error)));
+		return error;
+	}
+
+	const addr_t remoteBaseAddress = (addr_t)address
+		- ((addr_t)reply.address - (addr_t)areaInfo.address);
+
+	Area *area = new(std::nothrow) Area(localID,
+		remoteBaseAddress, areaInfo.address, areaInfo.size);
+	if (area == NULL)
+		return B_NO_MEMORY;
+
+	fAreas.Add(area);
+
+	_area = area;
+	return B_OK;
 }
 
 
@@ -265,9 +245,7 @@ SymbolLookup::Init()
 {
 	TRACE(("SymbolLookup::Init()\n"));
 
-	status_t error = RemoteMemoryAccessor::Init();
-	if (error != B_OK)
-		return error;
+	status_t error = 0;
 
 	if (fDebugContext->team != B_SYSTEM_TEAM) {
 		TRACE(("SymbolLookup::Init(): searching debug area...\n"));
@@ -444,7 +422,7 @@ SymbolLookup::GetSymbol(image_id imageID, const char* name, int32 symbolType,
 
 // _FindLoadedImageAtAddress
 const image_t *
-SymbolLookup::_FindLoadedImageAtAddress(addr_t address) const
+SymbolLookup::_FindLoadedImageAtAddress(addr_t address)
 {
 	TRACE(("SymbolLookup::_FindLoadedImageAtAddress(%p)\n", (void*)address));
 
@@ -469,7 +447,7 @@ SymbolLookup::_FindLoadedImageAtAddress(addr_t address) const
 
 // _FindLoadedImageByID
 const image_t*
-SymbolLookup::_FindLoadedImageByID(image_id id) const
+SymbolLookup::_FindLoadedImageByID(image_id id)
 {
 	TRACE(("SymbolLookup::_FindLoadedImageByID(%" B_PRId32 ")\n", id));
 
