@@ -388,7 +388,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	of events from more than one producer to one consumer at the same time.
 
 	The article Introduction to MIDI, Part 2 in <A
-	HREF="https://open-beos.sourceforge.net/nsl.php?mode=display&id=36">OpenBeOS
+	HREF="https://www.haiku-os.org/legacy-docs/openbeosnewsletter/nsl36.html">OpenBeOS
 	Newsletter 36</A> describes this problem in more detail, and provides a
 	solution. Go read it now!
 

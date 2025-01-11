@@ -5,7 +5,7 @@ The Midi Kit consists of the midi_server and two shared libraries,
 libmidi2.so and libmidi.so. The latter is the "old" pre-R5 Midi Kit and
 has been re-implemented using the facilities from libmidi2, which makes
 it fully compatible with the new kit. This document describes the design
-and implementation of the OpenBeOS midi_server and libmidi2.so.
+and implementation of the Haiku midi_server and libmidi2.so.
 
 The midi_server has two jobs: it keeps track of the endpoints that the
 client apps have created, and it publishes endpoints for the devices

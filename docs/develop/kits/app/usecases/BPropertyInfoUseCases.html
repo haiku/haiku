@@ -131,7 +131,7 @@ properties.</P></LI>
 
 <A NAME="implement"></A><H2>BPropertyInfo Implementation:</H2>
 
-<P>There is a key difference between the OpenBeOS BPropertyInfo class and the Be implementation
+<P>There is a key difference between the Haiku BPropertyInfo class and the Be implementation
 is support for BeOS R3 compiled executables.  The elements in the property_info structure changed
 in R4 versus the one which was used in R3.  Be did the following to handle this:</P>
 
@@ -146,7 +146,7 @@ constructor would be called because the old one was made private.</LI>
 R3 based BPropertyInfo instances.  I have not done serious checking on this however.</LI>
 </UL>
 
-<P>For the OpenBeOS implementation, we have decided not to implement this R3 compatibility at
+<P>For the Haiku implementation, we have decided not to implement this R3 compatibility at
 this time but we are not going to rule it out.  The header file for BPropertyInfo will be changed
 to "remove" the R3 compatibility interfaces using an "ifdef R3_compatible".   The interfaces will
 still appear to the human reader but not be there as far as the compiler is concerned.  If we
@@ -154,15 +154,15 @@ revise out decision in the future, it will be a simple matter of removing the if
 these R3 compatibility interfaces.  For now, we have decided not to do this because:</P>
 
 <UL>
-<LI>There is no binary compatibility between R3 and R4 of BeOS Intel.  The ability for OpenBeOS
+<LI>There is no binary compatibility between R3 and R4 of BeOS Intel.  The ability for Haiku
 to be binary compatible with these old R3 interfaces buys us nothing on Intel.</LI>
 <LI>There is binary compatibility with R3 with R4 and R5 on BeOS PPC.  Without these interfaces
 implemented, it may not be possible for R3 compiled binaries for PPC to operate against the
-OpenBeOS implementation.  However, there are no specific plans to support PPC.  Also, the informal
+Haiku implementation.  However, there are no specific plans to support PPC.  Also, the informal
 PPC ports that have been discussed were considering using the gcc toolset which I believe precludes
 any backward compatibility, even with R5 binaries.</LI>
 <LI>There is some risk that a flattened BPropertyInfo instance on someone's hard disk was created
-against the old R3 implementation.  The OpenBeOS implementation may not be able to read this
+against the old R3 implementation.  The Haiku implementation may not be able to read this
 flattened BPropertyInfo.  However, we believe the chance of this happening to be very low and
 not worth the cost of the implementation.</LI>
 </UL>

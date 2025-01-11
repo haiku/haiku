@@ -1,7 +1,7 @@
 Testing the Midi Kit
 ====================
 
-Most of the OpenBeOS source code has unit tests in the current/src/tests
+Most of the Haiku source code has unit tests in the current/src/tests
 directory. I looked into building CppUnit tests for the midi2 kit, but
 decided that it doesn't really make much sense. Unit tests work best if
 you can test something in isolation, but in the case of the midi2 kit

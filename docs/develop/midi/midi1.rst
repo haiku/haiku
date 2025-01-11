@@ -36,7 +36,7 @@ do, while it is likely that no applications use them anyway. However,
 problems.
 
 ``BSamples`` doesn't do anything; its functions are mostly empty. In
-other words, with the OpenBeOS Midi Kit you cannot push waveform data
+other words, with the Haiku Midi Kit you cannot push waveform data
 into the output of the softsynth.
 
 For simplicity's sake, ``BMidiSynthFile`` is implemented using

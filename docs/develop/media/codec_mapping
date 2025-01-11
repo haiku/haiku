@@ -1,5 +1,5 @@
 # This file belongs into /boot/home/config/settings/Media and is called codec_mapping 
-# It contains codec assignments for the new OpenBeOS media kit
+# It contains codec assignments for the new Haiku media kit
 #
 # WARNIG! This format is experimental and will possibly be changed!
 #

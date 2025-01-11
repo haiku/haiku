@@ -212,7 +212,7 @@ void \_SetFocus(void)
 
 This hook function is primarily used to change colors used when a
 window changes focus states and is called immediately after the state
-is changed. If, for example, a decorator does not use OpenBeOS' GUI
+is changed. If, for example, a decorator does not use Haiku' GUI
 color set, it would change its drawing colors to reflect the change in
 focus.
 

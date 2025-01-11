@@ -1,7 +1,7 @@
 The BeOS R5 Midi Kit protocol
 =============================
 
-In the course of writing the OpenBeOS Midi Kit, I spent some time
+In the course of writing the Haiku Midi Kit, I spent some time
 looking at how BeOS R5's libmidi2.so and midi_server communicate. Not
 out of a compulsion to clone this protocol, but to learn from it. After
 all, the Be engineers spent a lot of time thinking about this already,
@@ -358,7 +358,7 @@ has a zero refcount, libmidi still sends out the 'Mdel' message. It also
 drops you into the debugger. (I think it should return an error code
 instead, it already has a status_t.) However, if you Release() proxies a
 few times too many, your app does not jump into the debugger. (Again, I
-think the return result should be an error code here -- for OpenBeOS R1
+think the return result should be an error code here -- for Haiku R1
 I think we should jump into the debugger just like with local objects).
 Hmm, actually, whether you end up in the debugger depends on the
 contents of memory after the object is deleted, because you perform the

@@ -292,8 +292,8 @@ if (endpoint->GetProperties(&props) == B_OK)
 	<TR><TD>field type</TD><TD>'MICN'</TD></TR>
 	</TABLE>
 
-	The MidiUtil package (downloadable from the OpenBeOS website) contains a
-	number of convenient functions to associate icons with endpoints, so you
+	The MidiUtil package (downloadable from https://www.haiku-os.org/files/MidiUtil-1_0.zip)
+	contains a number of convenient functions to associate icons with endpoints, so you
 	don't have to write that code all over again.
 
 	\sa GetProperties()

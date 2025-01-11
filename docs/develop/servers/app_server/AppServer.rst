@@ -135,7 +135,7 @@ Attached Data:
 GET_SCREEN_MODE
 ---------------
 
-Received from the OpenBeOS Input Server when requesting the current
+Received from the Haiku Input Server when requesting the current
 screen settings via synchronous PortLink messaging. This is a
 temporary solution which will be deprecated as soon as the BScreen
 class is complete.

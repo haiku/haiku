@@ -8,7 +8,7 @@ Author(s): Axel Dörfler
 This document describes the feature of the BeOS kernel to monitor nodes.
 First, there is an explanation of what kind of functionality we have to
 reproduce (along with the higher level API), then we will present the
-implementation in OpenBeOS.
+implementation in Haiku.
 
 Requirements - Exported Functionality in BeOS
 ---------------------------------------------
@@ -95,7 +95,7 @@ use any application kit services.
 
 | 
 
-Meeting the Requirements in an Optimal Way - Implementation in OpenBeOS
+Meeting the Requirements in an Optimal Way - Implementation in Haiku
 -----------------------------------------------------------------------
 
 If you assume that every file operation could trigger a notification
@@ -189,17 +189,17 @@ implementation, there are some notable differences between the two.
 
 BeOS reserves a certain number of slots for calls to ``watch_node()`` -
 each call to that function will use one slot, even if you call it twice
-for the same node. OpenBeOS, however, will always use one slot per node
+for the same node. Haiku, however, will always use one slot per node
 - you could call ``watch_node()`` several times, but you would waste
 only one slot.
 
 While this is an implementational detail, it also causes a change in
 behaviour for applications; in BeOS, applications will get one message
-for every ``watch_node()`` call, in OpenBeOS, you'll get only one
+for every ``watch_node()`` call, in Haiku, you'll get only one
 message per node. If an application relies on this strange behaviour of
 the BeOS kernel, it will no longer work correctly.
 
-The other difference is that OpenBeOS exports its node monitoring
+The other difference is that Haiku exports its node monitoring
 functionality to kernel modules as well, and provides an extra plain C
 API for them to use.
 
@@ -250,4 +250,4 @@ is much larger then - but for applications like Tracker, the complexity
 would be removed from the application without extra cost.
 
 However, none of the discussed feature extensions have been implemented
-for the currently developed version R1 of OpenBeOS.
+for the currently developed version R1 of Haiku.
