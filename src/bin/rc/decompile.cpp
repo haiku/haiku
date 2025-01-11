@@ -900,7 +900,10 @@ write_data(int32 id, const char *name, type_code type,
 			break;
 
 		case 'APPV':
-			if (!strcmp(name, "BEOS:APP_VERSION") && length == sizeof(version_info) * 2) {
+			if (!strcmp(name, "BEOS:APP_VERSION")
+				&& (length == sizeof(version_info)
+					// length can be twice the size for the old BeOS resource
+					|| length == sizeof(version_info) * 2)) {
 				write_app_version(data, length);
 				return;
 			}
