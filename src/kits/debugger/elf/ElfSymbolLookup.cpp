@@ -137,7 +137,7 @@ public:
 
 	ElfSymbolLookupImpl(ElfSymbolLookupSource* source, uint64 symbolTable,
 		uint64 symbolHash, uint64 stringTable, uint32 symbolCount,
-		uint32 symbolTableEntrySize, uint64 textDelta, bool swappedByteOrder)
+		uint32 symbolTableEntrySize, uint64 loadDelta, bool swappedByteOrder)
 		:
 		fSource(NULL),
 		fSymbolTable(symbolTable),
@@ -145,7 +145,7 @@ public:
 		fStringTable(stringTable),
 		fSymbolCount(symbolCount),
 		fSymbolTableEntrySize(symbolTableEntrySize),
-		fTextDelta(textDelta),
+		fLoadDelta(loadDelta),
 		fSwappedByteOrder(swappedByteOrder)
 	{
 		SetSource(source);
@@ -233,7 +233,7 @@ public:
 			}
 
 			// get the values
-			target_addr_t address = Get(symbol.st_value) + fTextDelta;
+			target_addr_t address = Get(symbol.st_value) + fLoadDelta;
 			target_size_t size = Get(symbol.st_size);
 			uint32 type = symbol.Type() == STT_FUNC
 				? B_SYMBOL_TYPE_TEXT : B_SYMBOL_TYPE_DATA;
@@ -309,7 +309,7 @@ private:
 	uint64					fStringTable;
 	uint32					fSymbolCount;
 	uint32					fSymbolTableEntrySize;
-	uint64					fTextDelta;
+	uint64					fLoadDelta;
 	bool					fSwappedByteOrder;
 };
 
@@ -325,7 +325,7 @@ ElfSymbolLookup::~ElfSymbolLookup()
 /*static*/ status_t
 ElfSymbolLookup::Create(ElfSymbolLookupSource* source, uint64 symbolTable,
 	uint64 symbolHash, uint64 stringTable, uint32 symbolCount,
-	uint32 symbolTableEntrySize, uint64 textDelta, bool is64Bit,
+	uint32 symbolTableEntrySize, uint64 loadDelta, bool is64Bit,
 	bool swappedByteOrder, bool cacheSource, ElfSymbolLookup*& _lookup)
 {
 	// create
@@ -333,11 +333,11 @@ ElfSymbolLookup::Create(ElfSymbolLookupSource* source, uint64 symbolTable,
 	if (is64Bit) {
 		lookup = new(std::nothrow) ElfSymbolLookupImpl<ElfClass64>(source,
 			symbolTable, symbolHash, stringTable, symbolCount,
-			symbolTableEntrySize, textDelta, swappedByteOrder);
+			symbolTableEntrySize, loadDelta, swappedByteOrder);
 	} else {
 		lookup = new(std::nothrow) ElfSymbolLookupImpl<ElfClass32>(source,
 			symbolTable, symbolHash, stringTable, symbolCount,
-			symbolTableEntrySize, textDelta, swappedByteOrder);
+			symbolTableEntrySize, loadDelta, swappedByteOrder);
 	}
 
 	if (lookup == NULL)

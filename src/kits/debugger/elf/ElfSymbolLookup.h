@@ -30,7 +30,7 @@ public:
 									uint64 symbolTable, uint64 symbolHash,
 									uint64 stringTable, uint32 symbolCount,
 									uint32 symbolTableEntrySize,
-									uint64 textDelta, bool is64Bit,
+									uint64 loadDelta, bool is64Bit,
 									bool swappedByteOrder, bool cacheSource,
 									ElfSymbolLookup*& _lookup);
 

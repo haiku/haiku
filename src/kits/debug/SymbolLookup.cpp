@@ -213,7 +213,7 @@ private:
 			SymbolLookup*			fSymbolLookup;
 			const image_t*			fImage;
 			int32					fSymbolCount;
-			size_t					fTextDelta;
+			size_t					fLoadDelta;
 };
 
 
@@ -567,7 +567,7 @@ SymbolLookup::LoadedImage::LoadedImage(SymbolLookup* symbolLookup,
 	fSymbolLookup(symbolLookup),
 	fImage(image),
 	fSymbolCount(symbolCount),
-	fTextDelta(image->regions[0].delta)
+	fLoadDelta(image->regions[0].delta)
 {
 	// init info
 	fInfo.id = fImage->id;
@@ -686,7 +686,7 @@ SymbolLookup::LoadedImage::NextSymbol(int32& iterator, const char** _symbolName,
 		*_symbolName = (const char*)fSymbolLookup->PrepareAddressNoThrow(
 			SYMNAME(fImage, symbol), 1);
 		*_symbolNameLen = fSymbolLookup->_SymbolNameLen(*_symbolName);
-		*_symbolAddress = symbol->st_value + fTextDelta;
+		*_symbolAddress = symbol->st_value + fLoadDelta;
 		*_symbolSize = symbol->st_size;
 		*_symbolType = symbol->Type() == STT_FUNC ? B_SYMBOL_TYPE_TEXT
 			: B_SYMBOL_TYPE_DATA;
