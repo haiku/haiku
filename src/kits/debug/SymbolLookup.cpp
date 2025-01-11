@@ -195,6 +195,7 @@ RemoteMemoryAccessor::_GetAreaNoThrow(const void *address, int32 size, Area *&_a
 class SymbolLookup::LoadedImage : public Image {
 public:
 								LoadedImage(SymbolLookup* symbolLookup,
+									const image_info& info,
 									const image_t* image, int32 symbolCount);
 	virtual						~LoadedImage();
 
@@ -550,8 +551,8 @@ SymbolLookup::_LoadImageInfo(const image_info& imageInfo)
 		if (loadedImage == NULL)
 			return B_OK;
 
-		image = new(std::nothrow) LoadedImage(this, loadedImage,
-			Read(loadedImage->symhash[1]));
+		image = new(std::nothrow) LoadedImage(this, imageInfo,
+			loadedImage, Read(loadedImage->symhash[1]));
 		if (image == NULL)
 			return B_NO_MEMORY;
 
@@ -566,27 +567,14 @@ SymbolLookup::_LoadImageInfo(const image_info& imageInfo)
 
 
 SymbolLookup::LoadedImage::LoadedImage(SymbolLookup* symbolLookup,
-	const image_t* image, int32 symbolCount)
+	const image_info& info, const image_t* image, int32 symbolCount)
 	:
 	fSymbolLookup(symbolLookup),
 	fImage(image),
 	fSymbolCount(symbolCount),
 	fLoadDelta(image->regions[0].delta)
 {
-	// init info
-	fInfo.id = fImage->id;
-	fInfo.type = fImage->type;
-	fInfo.sequence = 0;
-	fInfo.init_order = 0;
-	fInfo.init_routine = (void (*)())fImage->init_routine;
-	fInfo.term_routine = (void (*)())fImage->term_routine;
-	fInfo.device = -1;
-	fInfo.node = -1;
-	strlcpy(fInfo.name, fImage->path, sizeof(fInfo.name));
-	fInfo.text = (void*)fImage->regions[0].vmstart;
-	fInfo.data = (void*)fImage->regions[1].vmstart;
-	fInfo.text_size = fImage->regions[0].vmsize;
-	fInfo.data_size = fImage->regions[1].vmsize;
+	fInfo = info;
 }
 
 
