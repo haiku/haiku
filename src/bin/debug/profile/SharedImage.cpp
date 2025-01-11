@@ -38,10 +38,12 @@ SharedImage::~SharedImage()
 status_t
 SharedImage::Init(team_id owner, image_id imageID)
 {
+	debug_context debugContext = {owner, -1, -1};
+
 	// we need a temporary symbol lookup context
 	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(owner, imageID,
-		&lookupContext);
+	status_t error = debug_create_symbol_lookup_context(&debugContext,
+		imageID, &lookupContext);
 	if (error != B_OK) {
 		fprintf(stderr, "%s: Failed to create symbol lookup context "
 			"for team %" B_PRId32 ": %s\n",

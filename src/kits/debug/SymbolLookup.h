@@ -15,6 +15,7 @@
 #include <util/DoublyLinkedList.h>
 
 
+struct debug_context;
 struct image_t;
 struct runtime_loader_debug_area;
 
@@ -79,7 +80,7 @@ public:
 			&& (addr_t)address < (addr_t)fLocalAddress + fSize;
 	}
 
-	const void *PrepareAddress(const void *address);
+	const void *PrepareAddress(debug_context* debugContext, const void *address);
 
 private:
 	area_id		fRemoteID;
@@ -93,7 +94,7 @@ private:
 // RemoteMemoryAccessor
 class RemoteMemoryAccessor {
 public:
-	RemoteMemoryAccessor(team_id team);
+	RemoteMemoryAccessor(debug_context* debugContext);
 	~RemoteMemoryAccessor();
 
 	status_t Init();
@@ -120,7 +121,7 @@ private:
 	typedef DoublyLinkedList<Area>	AreaList;
 
 protected:
-	team_id		fTeam;
+	debug_context* fDebugContext;
 
 private:
 	AreaList	fAreas;
@@ -137,7 +138,7 @@ struct SymbolIterator {
 // SymbolLookup
 class SymbolLookup : private RemoteMemoryAccessor {
 public:
-	SymbolLookup(team_id team, image_id image);
+	SymbolLookup(debug_context* debugContext, image_id image);
 	~SymbolLookup();
 
 	status_t Init();

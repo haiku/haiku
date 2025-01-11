@@ -1752,6 +1752,7 @@ debug_nub_thread(void *)
 		union {
 			debug_nub_read_memory_reply			read_memory;
 			debug_nub_write_memory_reply		write_memory;
+			debug_nub_clone_area_reply			clone_area;
 			debug_nub_get_cpu_state_reply		get_cpu_state;
 			debug_nub_set_breakpoint_reply		set_breakpoint;
 			debug_nub_set_watchpoint_reply		set_watchpoint;
@@ -1832,6 +1833,51 @@ debug_nub_thread(void *)
 				reply.write_memory.size = bytesWritten;
 				sendReply = true;
 				replySize = sizeof(debug_nub_write_memory_reply);
+				break;
+			}
+
+			case B_DEBUG_MESSAGE_CLONE_AREA:
+			{
+				// get the parameters
+				replyPort = message.clone_area.reply_port;
+				const void *address = message.clone_area.address;
+				area_id result = 0;
+
+				// check the parameters
+				if (!IS_USER_ADDRESS(address))
+					result = B_NOT_ALLOWED;
+
+				// find the area
+				area_id sourceArea;
+				addr_t addressOffset;
+				if (result == B_OK) {
+					sourceArea = _user_area_for((void*)address);
+					if (sourceArea < 0) {
+						result = sourceArea;
+					} else {
+						area_info info;
+						result = get_area_info(sourceArea, &info);
+						addressOffset = (addr_t)address - (addr_t)info.address;
+					}
+				}
+
+				// clone it
+				if (result == B_OK) {
+					void* newAddress = NULL;
+					result = vm_clone_area(nubThread->team->debug_info.debugger_team,
+						"debugger-cloned area", &newAddress, B_ANY_ADDRESS, B_READ_AREA,
+						REGION_NO_PRIVATE_MAP, sourceArea, true);
+					reply.clone_area.address = (void*)((addr_t)newAddress + addressOffset);
+				}
+
+				reply.clone_area.area = result;
+
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_CLONE_AREA: "
+					"reply port: %" B_PRId32 ", address: %p, result: %" B_PRIx32 "\n",
+					nubThread->id, replyPort, address, result));
+
+				sendReply = true;
+				replySize = sizeof(debug_nub_clone_area_reply);
 				break;
 			}
 

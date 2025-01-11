@@ -12,6 +12,7 @@
 
 #include <new>
 
+#include <debug_support.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
 
@@ -32,19 +33,38 @@ using namespace BPrivate::Debug;
 
 // PrepareAddress
 const void *
-Area::PrepareAddress(const void *address)
+Area::PrepareAddress(debug_context* debugContext, const void *address)
 {
 	TRACE(("Area::PrepareAddress(%p): area: %" B_PRId32 "\n", address, fRemoteID));
 
 	// clone the area, if not done already
 	if (fLocalID < 0) {
-		fLocalID = clone_area("cloned area", &fLocalAddress, B_ANY_ADDRESS,
-			B_READ_AREA, fRemoteID);
+		debug_nub_clone_area message;
+		message.reply_port = debugContext->reply_port;
+		message.address = address;
+
+		debug_nub_clone_area_reply reply;
+		status_t error = send_debug_message(debugContext, B_DEBUG_MESSAGE_CLONE_AREA,
+			&message, sizeof(message), &reply, sizeof(reply));
+		if (error != B_OK)
+			throw Exception(error);
+
+		fLocalID = reply.area;
 		if (fLocalID < 0) {
 			TRACE(("Area::PrepareAddress(): Failed to clone area %" B_PRId32
 				": %s\n", fRemoteID, strerror(fLocalID)));
 			throw Exception(fLocalID);
 		}
+
+		area_info info;
+		error = get_area_info(fLocalID, &info);
+		if (error < 0) {
+			TRACE(("Area::PrepareAddress(): Failed to get info for %" B_PRId32
+				": %s\n", fLocalID, strerror(info)));
+			throw Exception(fLocalID);
+		}
+
+		fLocalAddress = info.address;
 	}
 
 	// translate the address
@@ -60,8 +80,8 @@ Area::PrepareAddress(const void *address)
 // #pragma mark -
 
 // constructor
-RemoteMemoryAccessor::RemoteMemoryAccessor(team_id team)
-	: fTeam(team),
+RemoteMemoryAccessor::RemoteMemoryAccessor(debug_context* debugContext)
+	: fDebugContext(debugContext),
 	  fAreas()
 {
 }
@@ -80,16 +100,16 @@ RemoteMemoryAccessor::~RemoteMemoryAccessor()
 status_t
 RemoteMemoryAccessor::Init()
 {
-	// If the team is the kernel team, we don't try to clone the areas. Only
-	// SymbolLookup's image file functionality will be available.
-	if (fTeam == B_SYSTEM_TEAM)
+	// If we don't have a debug context, then there's nothing we can do.
+	// Only SymbolLookup's image file functionality will be available.
+	if (fDebugContext == NULL || fDebugContext->nub_port < 0)
 		return B_OK;
 
 	// get a list of the team's areas
 	area_info areaInfo;
 	ssize_t cookie = 0;
 	status_t error;
-	while ((error = get_next_area_info(fTeam, &cookie, &areaInfo)) == B_OK) {
+	while ((error = get_next_area_info(fDebugContext->team, &cookie, &areaInfo)) == B_OK) {
 		TRACE(("area %" B_PRId32 ": address: %p, size: %ld, name: %s\n",
 			areaInfo.area, areaInfo.address, areaInfo.size, areaInfo.name));
 
@@ -120,7 +140,7 @@ RemoteMemoryAccessor::PrepareAddress(const void *remoteAddress,
 		throw Exception(B_BAD_VALUE);
 	}
 
-	return _FindArea(remoteAddress, size).PrepareAddress(remoteAddress);
+	return _FindArea(remoteAddress, size).PrepareAddress(fDebugContext, remoteAddress);
 }
 
 
@@ -135,7 +155,7 @@ RemoteMemoryAccessor::PrepareAddressNoThrow(const void *remoteAddress,
 	if (area == NULL)
 		return NULL;
 
-	return area->PrepareAddress(remoteAddress);
+	return area->PrepareAddress(fDebugContext, remoteAddress);
 }
 
 
@@ -221,9 +241,9 @@ private:
 
 
 // constructor
-SymbolLookup::SymbolLookup(team_id team, image_id image)
+SymbolLookup::SymbolLookup(debug_context* debugContext, image_id image)
 	:
-	RemoteMemoryAccessor(team),
+	RemoteMemoryAccessor(debugContext),
 	fDebugArea(NULL),
 	fImages(),
 	fImageID(image)
@@ -249,14 +269,14 @@ SymbolLookup::Init()
 	if (error != B_OK)
 		return error;
 
-	if (fTeam != B_SYSTEM_TEAM) {
+	if (fDebugContext->team != B_SYSTEM_TEAM) {
 		TRACE(("SymbolLookup::Init(): searching debug area...\n"));
 
 		// find the runtime loader debug area
 		runtime_loader_debug_area *remoteDebugArea = NULL;
 		ssize_t cookie = 0;
 		area_info areaInfo;
-		while (get_next_area_info(fTeam, &cookie, &areaInfo) == B_OK) {
+		while (get_next_area_info(fDebugContext->team, &cookie, &areaInfo) == B_OK) {
 			if (strcmp(areaInfo.name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0) {
 				remoteDebugArea = (runtime_loader_debug_area*)areaInfo.address;
 				break;
@@ -287,7 +307,7 @@ SymbolLookup::Init()
 	if (fImageID < 0) {
 		// create a list of the team's images
 		int32 cookie = 0;
-		while (get_next_image_info(fTeam, &cookie, &imageInfo) == B_OK) {
+		while (get_next_image_info(fDebugContext->team, &cookie, &imageInfo) == B_OK) {
 			error = _LoadImageInfo(imageInfo);
 			if (error != B_OK)
 				return error;
@@ -325,7 +345,7 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 		_symbolName, _symbolNameLen, _exactMatch);
 
 	TRACE(("SymbolLookup::LookupSymbolAddress(): done: symbol: %p, image name: "
-		"%s, exact match: %d\n", symbolFound, image->name, exactMatch));
+		"%s, exact match: %d\n", symbolFound, image->Name(), _exactMatch ? *_exactMatch : -1));
 
 	if (symbolFound != NULL)
 		return B_OK;
@@ -432,9 +452,11 @@ SymbolLookup::_FindLoadedImageAtAddress(addr_t address) const
 		return NULL;
 
 	// iterate through the loaded images
-	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
-		 image;
-		 image = &Read(*image->next)) {
+	const image_t *_image = Read(fDebugArea->loaded_images->head);
+	while (_image != NULL) {
+		const image_t *image = &Read(*_image);
+		_image = image->next;
+
 		if (image->regions[0].vmstart <= address
 			&& address < image->regions[0].vmstart + image->regions[0].size) {
 			return image;
@@ -449,13 +471,17 @@ SymbolLookup::_FindLoadedImageAtAddress(addr_t address) const
 const image_t*
 SymbolLookup::_FindLoadedImageByID(image_id id) const
 {
+	TRACE(("SymbolLookup::_FindLoadedImageByID(%" B_PRId32 ")\n", id));
+
 	if (fDebugArea == NULL)
 		return NULL;
 
-	// iterate through the images
-	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
-		 image;
-		 image = &Read(*image->next)) {
+	// iterate through the loaded images
+	const image_t *_image = Read(fDebugArea->loaded_images->head);
+	while (_image != NULL) {
+		const image_t *image = &Read(*_image);
+		_image = image->next;
+
 		if (image->id == id)
 			return image;
 	}
@@ -512,7 +538,7 @@ SymbolLookup::_LoadImageInfo(const image_info& imageInfo)
 	status_t error = B_OK;
 
 	Image* image;
-	if (fTeam == B_SYSTEM_TEAM) {
+	if (fDebugContext->team == B_SYSTEM_TEAM) {
 		// kernel image
 		KernelImage* kernelImage = new(std::nothrow) KernelImage;
 		if (kernelImage == NULL)

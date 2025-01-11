@@ -345,10 +345,10 @@ debug_get_stack_frame(debug_context *context, void *stackFrameAddress,
 
 // debug_create_symbol_lookup_context
 status_t
-debug_create_symbol_lookup_context(team_id team, image_id image,
+debug_create_symbol_lookup_context(debug_context *context, image_id image,
 	debug_symbol_lookup_context **_lookupContext)
 {
-	if (team < 0 || !_lookupContext)
+	if (context == NULL || _lookupContext == NULL)
 		return B_BAD_VALUE;
 
 	// create the lookup context
@@ -359,7 +359,7 @@ debug_create_symbol_lookup_context(team_id team, image_id image,
 	ObjectDeleter<debug_symbol_lookup_context> contextDeleter(lookupContext);
 
 	// create and init symbol lookup
-	SymbolLookup *lookup = new(std::nothrow) SymbolLookup(team, image);
+	SymbolLookup *lookup = new(std::nothrow) SymbolLookup(context, image);
 	if (lookup == NULL)
 		return B_NO_MEMORY;
 	ObjectDeleter<SymbolLookup> lookupDeleter(lookup);

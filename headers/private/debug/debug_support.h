@@ -62,7 +62,7 @@ status_t debug_get_stack_frame(debug_context *context,
 typedef struct debug_symbol_lookup_context debug_symbol_lookup_context;
 typedef struct debug_symbol_iterator debug_symbol_iterator;
 
-status_t debug_create_symbol_lookup_context(team_id team, image_id image,
+status_t debug_create_symbol_lookup_context(debug_context *context, image_id image,
 			debug_symbol_lookup_context **lookupContext);
 				// imageID can be -1 if all images in the target team are
 				// desired, otherwise a valid image id is expected.

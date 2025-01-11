@@ -165,6 +165,7 @@ typedef enum {
 	B_DEBUG_MESSAGE_GET_SIGNAL_MASKS,	//  the debugger is interested in
 	B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER,	// set/get the team's signal handler for
 	B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER,	//  a signal
+	B_DEBUG_MESSAGE_CLONE_AREA,			// clone a team area into the debugger team
 
 	B_DEBUG_MESSAGE_PREPARE_HANDOVER,	// prepares the debugged team for being
 										// handed over to another debugger;
@@ -174,7 +175,7 @@ typedef enum {
 	B_DEBUG_START_PROFILER,				// start/stop sampling
 	B_DEBUG_STOP_PROFILER,				//
 
-	B_DEBUG_WRITE_CORE_FILE				// write a core file
+	B_DEBUG_WRITE_CORE_FILE,			// write a core file
 } debug_nub_message;
 
 // messages sent to the debugger
@@ -253,6 +254,18 @@ typedef struct {
 	status_t	error;			// B_OK, if writing went fine
 	int32		size;			// the number of bytes actually written
 } debug_nub_write_memory_reply;
+
+// B_DEBUG_MESSAGE_CLONE_AREA
+
+typedef struct {
+	port_id		reply_port;		// port to send the reply to
+	const void	*address;		// address within area to clone
+} debug_nub_clone_area;
+
+typedef struct {
+	area_id		area;			// the ID of the newly cloned area, or an error
+	const void	*address;		// corresponding address in clone
+} debug_nub_clone_area_reply;
 
 // B_DEBUG_MESSAGE_SET_TEAM_FLAGS
 
@@ -445,6 +458,7 @@ typedef struct {
 typedef union {
 	debug_nub_read_memory			read_memory;
 	debug_nub_write_memory			write_memory;
+	debug_nub_clone_area			clone_area;
 	debug_nub_set_team_flags		set_team_flags;
 	debug_nub_set_thread_flags		set_thread_flags;
 	debug_nub_continue_thread		continue_thread;
