@@ -92,13 +92,13 @@ private:
 			BChannelSlider&		operator=(const BChannelSlider&);
 
 
-	virtual	void				_Reserved_BChannelSlider_0(void*, ...);
 	virtual	void				_Reserved_BChannelSlider_1(void*, ...);
 	virtual	void				_Reserved_BChannelSlider_2(void*, ...);
 	virtual	void				_Reserved_BChannelSlider_3(void*, ...);
 	virtual	void				_Reserved_BChannelSlider_4(void*, ...);
 	virtual	void				_Reserved_BChannelSlider_5(void*, ...);
 	virtual	void				_Reserved_BChannelSlider_6(void*, ...);
+	virtual	void				_Reserved_BChannelSlider_7(void*, ...);
 
 private:
 			void				_InitData();

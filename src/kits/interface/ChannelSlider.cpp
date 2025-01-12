@@ -18,6 +18,8 @@
 #include <Screen.h>
 #include <Window.h>
 
+#include <binary_compatibility/Support.h>
+
 
 const static unsigned char
 kVerticalKnobData[] = {
@@ -899,10 +901,22 @@ BChannelSlider::_MouseMovedCommon(BPoint point, BPoint point2)
 // #pragma mark - FBC padding
 
 
-void BChannelSlider::_Reserved_BChannelSlider_0(void*, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_1(void*, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_2(void*, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_3(void*, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_4(void*, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_5(void*, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_6(void*, ...) {}
+void BChannelSlider::_Reserved_BChannelSlider_7(void*, ...) {}
+
+
+//	#pragma mark - binary compatibility
+
+
+extern "C" void
+B_IF_GCC_2(_Reserved_BChannelSlider_0__14BChannelSliderPve,
+	_ZN14BChannelSlider26_Reserved_BChannelSlider_0EPvz)(
+	BChannelSlider* channelSlider, int32 currentValue)
+{
+	channelSlider->BChannelSlider::UpdateToolTip(currentValue);
+}
