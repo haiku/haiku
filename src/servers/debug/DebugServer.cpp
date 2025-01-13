@@ -783,7 +783,7 @@ TeamDebugHandler::_WriteCoreFile()
 
 	debug_nub_write_core_file_reply reply;
 
-	error = send_debug_message(&fDebugContext, B_DEBUG_WRITE_CORE_FILE,
+	error = send_debug_message(&fDebugContext, B_DEBUG_MESSAGE_WRITE_CORE_FILE,
 			&message, sizeof(message), &reply, sizeof(reply));
 	if (error == B_OK)
 		error = reply.error;

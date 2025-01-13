@@ -150,7 +150,7 @@ Team::InitThread(Thread* thread)
 
 		debug_nub_start_profiler_reply reply;
 		status_t error = send_debug_message(&fDebugContext,
-			B_DEBUG_START_PROFILER, &message, sizeof(message), &reply,
+			B_DEBUG_MESSAGE_START_PROFILER, &message, sizeof(message), &reply,
 			sizeof(reply));
 		if (error != B_OK || (error = reply.error) != B_OK) {
 			fprintf(stderr,

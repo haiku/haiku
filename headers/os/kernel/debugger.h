@@ -167,15 +167,14 @@ typedef enum {
 	B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER,	//  a signal
 	B_DEBUG_MESSAGE_CLONE_AREA,			// clone a team area into the debugger team
 
-	B_DEBUG_MESSAGE_PREPARE_HANDOVER,	// prepares the debugged team for being
+	B_DEBUG_MESSAGE_PREPARE_HANDOVER = 1000, // prepares the debugged team for being
 										// handed over to another debugger;
 										// the new debugger can just invoke
 										// install_team_debugger()
+	B_DEBUG_MESSAGE_WRITE_CORE_FILE,	// write a core file
 
-	B_DEBUG_START_PROFILER,				// start/stop sampling
-	B_DEBUG_STOP_PROFILER,				//
-
-	B_DEBUG_WRITE_CORE_FILE,			// write a core file
+	B_DEBUG_MESSAGE_START_PROFILER = 2000, // start/stop sampling
+	B_DEBUG_MESSAGE_STOP_PROFILER,		//
 } debug_nub_message;
 
 // messages sent to the debugger

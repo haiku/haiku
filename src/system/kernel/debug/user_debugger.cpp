@@ -2345,7 +2345,7 @@ debug_nub_thread(void *)
 				break;
 			}
 
-			case B_DEBUG_START_PROFILER:
+			case B_DEBUG_MESSAGE_START_PROFILER:
 			{
 				// get the parameters
 				thread_id threadID = message.start_profiler.thread;
@@ -2457,7 +2457,7 @@ debug_nub_thread(void *)
 				break;
 			}
 
-			case B_DEBUG_STOP_PROFILER:
+			case B_DEBUG_MESSAGE_STOP_PROFILER:
 			{
 				// get the parameters
 				thread_id threadID = message.stop_profiler.thread;
@@ -2539,7 +2539,7 @@ debug_nub_thread(void *)
 				break;
 			}
 
-			case B_DEBUG_WRITE_CORE_FILE:
+			case B_DEBUG_MESSAGE_WRITE_CORE_FILE:
 			{
 				// get the parameters
 				replyPort = message.write_core_file.reply_port;

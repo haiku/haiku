@@ -749,7 +749,7 @@ LocalDebuggerInterface::WriteCoreFile(const char* path)
 	strlcpy(message.path, path, sizeof(message.path));
 
 	status_t error = send_debug_message(contextGetter.Context(),
-		B_DEBUG_WRITE_CORE_FILE, &message, sizeof(message), &reply,
+		B_DEBUG_MESSAGE_WRITE_CORE_FILE, &message, sizeof(message), &reply,
 		sizeof(reply));
 	if (error == B_OK)
 		error = reply.error;
