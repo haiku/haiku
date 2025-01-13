@@ -1806,6 +1806,19 @@ AboutView::_CreateCreditsView()
 		StringVector(),
 		"https://www.freebsd.org");
 
+	// NetBSD copyrights
+	AddCopyrightEntry("The NetBSD Project",
+		B_TRANSLATE("Contains software developed by the NetBSD "
+		"Foundation, Inc. and its contributors:\n"
+		"netresolv\n"
+		COPYRIGHT_STRING "1998-2023 The NetBSD Project, "
+		COPYRIGHT_STRING "2004-2009 by Internet Systems Consortium, Inc. (\"ISC\"), "
+		COPYRIGHT_STRING "1996-2003 by Internet Software Consortium. "
+		"All rights reserved."),
+		StringVector("ISC", kBSDTwoClause, kBSDThreeClause, NULL),
+		StringVector(),
+		"https://www.netbsd.org");
+
 	// FFmpeg copyrights
 	_AddPackageCredit(PackageCredit("FFmpeg")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000-2019 Fabrice "
