@@ -1850,12 +1850,6 @@ AboutView::_CreateCreditsView()
 		.SetLicense("MIT")
 		.SetURL("https://www.mesa3d.org"));
 
-	// SGI's GLU implementation copyrights
-	_AddPackageCredit(PackageCredit("GLU")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1991-2000 "
-			"Silicon Graphics, Inc. All rights reserved."))
-		.SetLicense("SGI Free B"));
-
 	// GLUT implementation copyrights
 	_AddPackageCredit(PackageCredit("GLUT")
 		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1994-1997 Mark Kilgard. "
