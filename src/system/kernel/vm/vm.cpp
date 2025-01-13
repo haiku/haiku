@@ -3467,6 +3467,9 @@ vm_area_for(addr_t address, bool kernel)
 				&& (area->protection & (B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA)) == 0)
 			return B_ERROR;
 
+		if (area->id == RESERVED_AREA_ID)
+			return EADDRINUSE;
+
 		return area->id;
 	}
 
