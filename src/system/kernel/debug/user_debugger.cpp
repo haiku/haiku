@@ -2989,23 +2989,31 @@ _user_remove_team_debugger(team_id teamID)
 	Team* team;
 	ConditionVariable debugChangeCondition;
 	debugChangeCondition.Init(NULL, "debug change condition");
-	status_t error = prepare_debugger_change(teamID, debugChangeCondition,
+	status_t status = prepare_debugger_change(teamID, debugChangeCondition,
 		team);
-	if (error != B_OK)
-		return error;
+	if (status != B_OK)
+		return status;
 
 	InterruptsSpinLocker debugInfoLocker(team->debug_info.lock);
 
 	thread_id nubThread = -1;
 	port_id nubPort = -1;
 
-	if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
-		// there's a debugger installed
+	if ((team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) == 0) {
+		// no debugger installed
+		status = B_BAD_VALUE;
+	}
+
+	if (status == B_OK) {
+		if (geteuid() != 0 && team->effective_uid != geteuid()
+				&& team->debug_info.debugger_team != team_get_current_team_id())
+			status = B_PERMISSION_DENIED;
+	}
+
+	if (status == B_OK) {
+		// there's a debugger installed, and we're allowed to remove it
 		nubThread = team->debug_info.nub_thread;
 		nubPort = team->debug_info.nub_port;
-	} else {
-		// no debugger installed
-		error = B_BAD_VALUE;
 	}
 
 	debugInfoLocker.Unlock();
@@ -3021,7 +3029,7 @@ _user_remove_team_debugger(team_id teamID)
 	if (nubThread >= 0)
 		wait_for_thread(nubThread, NULL);
 
-	return error;
+	return status;
 }
 
 
@@ -3041,6 +3049,10 @@ _user_debug_thread(thread_id threadID)
 	// we can't debug the kernel team
 	if (thread->team == team_get_kernel_team())
 		return B_NOT_ALLOWED;
+
+	if (geteuid() != 0 && thread->team->effective_uid != geteuid()
+			&& thread->team->debug_info.debugger_team != team_get_current_team_id())
+		return B_PERMISSION_DENIED;
 
 	InterruptsLocker interruptsLocker;
 	SpinLocker threadDebugInfoLocker(thread->debug_info.lock);
