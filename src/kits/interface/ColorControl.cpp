@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2025 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -363,6 +363,18 @@ BColorControl::AttachedToWindow()
 void
 BColorControl::MessageReceived(BMessage* message)
 {
+	if (message->WasDropped() && IsEnabled()) {
+		char* name;
+		type_code type;
+		rgb_color* color;
+		ssize_t size;
+		if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type) == B_OK
+			&& message->FindData(name, type, (const void**)&color, &size) == B_OK) {
+			SetValue(*color);
+			Invoke(message);
+		}
+	}
+
 	switch (message->what) {
 		case kMsgColorEntered:
 		{
@@ -408,6 +420,7 @@ BColorControl::MessageReceived(BMessage* message)
 
 		default:
 			BControl::MessageReceived(message);
+			break;
 	}
 }
 
