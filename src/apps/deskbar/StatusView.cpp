@@ -180,11 +180,7 @@ TReplicantTray::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	if (be_control_look != NULL) {
-		AdoptParentColors();
-	} else {
-		SetViewUIColor(B_MENU_BACKGROUND_COLOR,	B_DARKEN_1_TINT);
-	}
+	AdoptParentColors();
 	SetDrawingMode(B_OP_COPY);
 
 	Window()->SetPulseRate(1000000);
@@ -1373,10 +1369,7 @@ TDragRegion::AttachedToWindow()
 
 	CalculateRegions();
 
-	if (be_control_look != NULL)
-		SetViewUIColor(B_MENU_BACKGROUND_COLOR, 1.1);
-	else
-		SetViewUIColor(B_MENU_BACKGROUND_COLOR);
+	SetViewUIColor(B_MENU_BACKGROUND_COLOR, 1.1);
 
 	ResizeToPreferred();
 }
@@ -1789,10 +1782,7 @@ TResizeControl::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	if (be_control_look != NULL)
-		SetViewUIColor(B_MENU_BACKGROUND_COLOR, 1.1);
-	else
-		SetViewUIColor(B_MENU_BACKGROUND_COLOR);
+	SetViewUIColor(B_MENU_BACKGROUND_COLOR, 1.1);
 }
 
 
