@@ -150,8 +150,7 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 		= std::max(gMinReplicantHeight, (float)static_cast<TBarApp*>(be_app)->TeamIconSize());
 	// but not bigger than TabHeight which depends on be_bold_font
 	// TODO this should only apply to mini-mode but we set it once here for all
-	fMaxReplicantHeight = std::min(fMaxReplicantHeight,
-		fBarView->TabHeight() - 4);
+	fMaxReplicantHeight = std::min(fMaxReplicantHeight, fBarView->TabHeight() - 1);
 	// TODO: depends on window size... (so use something like
 	// max(129, height * 3), and restrict the minimum window width for it)
 	// Use bold font because it depends on the window tab height.
@@ -164,7 +163,7 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 	}
 
 	// Create the time view
-	fTime = new TTimeView(fMinimumTrayWidth, fMaxReplicantHeight - 1, fBarView);
+	fTime = new TTimeView(fMinimumTrayWidth, fMaxReplicantHeight + 1, fBarView);
 }
 
 
@@ -267,7 +266,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 		// if mini-mode set to tab height
 		// else if horizontal mode set to team menu item height
 		if (fBarView->MiniState())
-			height = std::max(fMinTrayHeight, fBarView->TabHeight());
+			height = std::max(fMinTrayHeight, fBarView->TabHeight() - 1);
 		else
 			height = fBarView->TeamMenuItemHeight();
 	}
@@ -1180,7 +1179,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 		if (fBarView->Vertical() && !fBarView->Left())
 			loc.x += gDragWidth; // move past dragger on left
 
-		loc.y = floorf((fBarView->TabHeight() - fMaxReplicantHeight) / 2) - 1;
+		loc.y = floorf((fBarView->TabHeight() - 1 - fMaxReplicantHeight) / 2);
 	} else {
 		loc.x -= 2; // keeps everything lined up nicely
 		const int32 iconSize = static_cast<TBarApp*>(be_app)->TeamIconSize();
