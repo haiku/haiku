@@ -464,7 +464,6 @@ Team::Team(team_id id, bool kernel)
 	thread_list = NULL;
 	loading_info = NULL;
 
-	list_init(&image_list);
 	list_init(&watcher_list);
 	list_init(&sem_list);
 	list_init_etc(&port_list, port_team_link_offset());

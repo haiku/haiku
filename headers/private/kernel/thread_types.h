@@ -260,7 +260,7 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	Thread			*thread_list;	// protected by fLock, signal_lock and
 									// gThreadCreationLock
 	struct team_loading_info *loading_info;	// protected by fLock
-	struct list		image_list;		// protected by sImageMutex
+	DoublyLinkedList<image> image_list; // protected by sImageMutex
 	struct list		watcher_list;
 	struct list		sem_list;		// protected by sSemsSpinlock
 	struct list		port_list;		// protected by sPortsLock

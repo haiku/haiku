@@ -1495,9 +1495,8 @@ public:
 
 	status_t _FindImageAtAddress(addr_t address, struct image*& _image)
 	{
-		struct image* image = NULL;
-		while ((image = (struct image*)list_get_next_item(&fTeam->image_list,
-				image)) != NULL) {
+		for (struct image* image = fTeam->image_list.First();
+				image != NULL; image = fTeam->image_list.GetNext(image)) {
 			image_info *info = &image->info.basic_info;
 
 			if ((address < (addr_t)info->text

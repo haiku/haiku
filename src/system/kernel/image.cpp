@@ -103,9 +103,9 @@ register_image(Team *team, extended_image_info *info, size_t size, bool locked)
 	// Add the app image to the head of the list. Some code relies on it being
 	// the first image to be returned by get_next_image_info().
 	if (image->info.basic_info.type == B_APP_IMAGE)
-		list_add_link_to_head(&team->image_list, image);
+		team->image_list.Add(image, false);
 	else
-		list_add_item(&team->image_list, image);
+		team->image_list.Add(image);
 	sImageTable->Insert(image);
 
 	// notify listeners
@@ -139,7 +139,7 @@ unregister_image(Team *team, image_id id)
 
 	struct image *image = sImageTable->Lookup(id);
 	if (image != NULL && image->team == team->id) {
-		list_remove_link(image);
+		team->image_list.Remove(image);
 		sImageTable->Remove(image);
 		status = B_OK;
 	}
@@ -171,9 +171,8 @@ copy_images(team_id fromTeamId, Team *toTeam)
 
 	MutexLocker locker(sImageMutex);
 
-	struct image *image = NULL;
-	while ((image = (struct image*)list_get_next_item(&fromTeam->image_list,
-			image)) != NULL) {
+	for (struct image* image = fromTeam->image_list.First();
+			image != NULL; image = fromTeam->image_list.GetNext(image)) {
 		image_id id = register_image(toTeam, &image->info, sizeof(image->info),
 			true);
 		if (id < 0)
@@ -190,13 +189,11 @@ copy_images(team_id fromTeamId, Team *toTeam)
 int32
 count_images(Team *team)
 {
-	struct image *image = NULL;
-	int32 count = 0;
-
 	MutexLocker locker(sImageMutex);
 
-	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
-			!= NULL) {
+	int32 count = 0;
+	for (struct image* image = team->image_list.First();
+			image != NULL; image = team->image_list.GetNext(image)) {
 		count++;
 	}
 
@@ -210,25 +207,22 @@ count_images(Team *team)
 status_t
 remove_images(Team *team)
 {
-	struct image *image = NULL;
-
 	ASSERT(team != NULL);
 
 	mutex_lock(&sImageMutex);
 
-	struct list images = {};
-	list_move_to_list(&team->image_list, &images);
-	while ((image = (struct image*)list_get_next_item(&images,
-			image)) != NULL) {
+	DoublyLinkedList<struct image> images;
+	images.TakeFrom(&team->image_list);
+
+	for (struct image* image = images.First();
+			image != NULL; image = images.GetNext(image)) {
 		sImageTable->Remove(image);
 	}
 
 	mutex_unlock(&sImageMutex);
 
-	while ((image = (struct image*)list_remove_head_item(&images))
-			!= NULL) {
+	while (struct image* image = images.RemoveHead())
 		free(image);
-	}
 
 	return B_OK;
 }
@@ -272,11 +266,10 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info,
 	// iterate through the team's images
 	MutexLocker imageLocker(sImageMutex);
 
-	struct image* image = NULL;
 	int32 count = 0;
 
-	while ((image = (struct image*)list_get_next_item(&team->image_list,
-			image)) != NULL) {
+	for (struct image* image = team->image_list.First();
+			image != NULL; image = team->image_list.GetNext(image)) {
 		if (count == *cookie) {
 			memcpy(info, &image->info.basic_info, size);
 			(*cookie)++;
@@ -293,7 +286,6 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info,
 static int
 dump_images_list(int argc, char **argv)
 {
-	struct image *image = NULL;
 	Team *team;
 
 	if (argc > 1) {
@@ -310,8 +302,8 @@ dump_images_list(int argc, char **argv)
 	kprintf("    ID %-*s   size    %-*s   size    name\n",
 		B_PRINTF_POINTER_WIDTH, "text", B_PRINTF_POINTER_WIDTH, "data");
 
-	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
-			!= NULL) {
+	for (struct image* image = team->image_list.First();
+			image != NULL; image = team->image_list.GetNext(image)) {
 		image_info *info = &image->info.basic_info;
 
 		kprintf("%6" B_PRId32 " %p %-7" B_PRId32 " %p %-7" B_PRId32 " %s\n",
@@ -353,10 +345,9 @@ image_iterate_through_team_images(team_id teamID,
 	// iterate through the team's images
 	MutexLocker imageLocker(sImageMutex);
 
-	struct image* image = NULL;
-
-	while ((image = (struct image*)list_get_next_item(&team->image_list,
-			image)) != NULL) {
+	struct image *image = NULL;
+	for (image = team->image_list.First();
+			image != NULL; image = team->image_list.GetNext(image)) {
 		if (callback(image, cookie))
 			break;
 	}
