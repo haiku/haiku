@@ -36,6 +36,8 @@ const uint TAP_CONTROL_CHANGED = '&tcc';
 const uint DEFAULT_SETTINGS = '&dse';
 const uint REVERT_SETTINGS = '&rse';
 const uint PADBLOCK_TIME_CHANGED = '&ptc';
+const uint PAD_SPEED_CHANGED = '&psc';
+const uint PAD_ACCELERATION_CHANGED = '&pac';
 
 class DeviceListView;
 
@@ -92,6 +94,7 @@ public:
 private:
 			TouchpadPref	fTouchpadPref;
 			TouchpadView*	fTouchpadView;
+			BCheckBox*		fScrollReverseBox;
 			BCheckBox*		fTwoFingerBox;
 			BCheckBox*		fTwoFingerHorizontalBox;
 			BSlider*		fScrollStepXSlider;
@@ -99,6 +102,8 @@ private:
 			BSlider*		fScrollAccelSlider;
 			BSlider*		fPadBlockerSlider;
 			BSlider*		fTapSlider;
+			BSlider*		fSpeedSlider;
+			BSlider*		fAccelSlider;
 			BButton*		fDefaultButton;
 			BButton*		fRevertButton;
 };

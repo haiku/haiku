@@ -80,12 +80,13 @@ void
 MovementMaker::GetScrolling(uint32 posX, uint32 posY)
 {
 	int32 stepsX = 0, stepsY = 0;
+	int32 directionMultiplier = fSettings.scroll_reverse ? -1 : 1;
 
 	_GetRawMovement(posX, posY);
 	_ComputeAcceleration(fSettings.scroll_acceleration);
 
 	if (fSettings.scroll_xstepsize > 0) {
-		scrolling_x += xDelta;
+		scrolling_x += directionMultiplier * xDelta;
 
 		stepsX = make_small(scrolling_x / fSettings.scroll_xstepsize);
 
@@ -95,8 +96,9 @@ MovementMaker::GetScrolling(uint32 posX, uint32 posY)
 		scrolling_x = 0;
 		xDelta = 0;
 	}
+
 	if (fSettings.scroll_ystepsize > 0) {
-		scrolling_y += yDelta;
+		scrolling_y += directionMultiplier * yDelta;
 
 		stepsY = make_small(scrolling_y / fSettings.scroll_ystepsize);
 

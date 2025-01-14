@@ -379,15 +379,22 @@ MouseDevice::_ControlThread()
 		BPath path;
 		status_t status = _GetTouchpadSettingsPath(path);
 		BFile settingsFile(path.Path(), B_READ_ONLY);
-		if (status == B_OK && settingsFile.InitCheck() == B_OK) {
-			if (settingsFile.Read(&settings, sizeof(touchpad_settings))
-					!= sizeof(touchpad_settings)) {
+
+		BMessage settingsMsg;
+		status = settingsMsg.Unflatten(&settingsFile);
+		if (status != B_OK) {
+			off_t size;
+			settingsFile.Seek(0, SEEK_SET);
+			if (settingsFile.GetSize(&size) == B_OK && size == 28) {
+				if (settingsFile.Read(&settings, 20) != 20)
+					TRACE("failed to load old settings\n");
+			} else
 				TRACE("failed to load settings\n");
-			}
-		}
+			fTouchpadMovementMaker.SetSettings(settings);
+		} else
+			_UpdateTouchpadSettings(&settingsMsg);
 
 		fTouchpadMovementMaker.SetSpecs(touchpadSpecs);
-		fTouchpadMovementMaker.SetSettings(settings);
 	}
 
 	_UpdateSettings();
@@ -461,10 +468,9 @@ MouseDevice::_ControlThread()
 					_UpdateTouchpadSettings(fTouchpadSettingsMessage);
 					delete fTouchpadSettingsMessage;
 					fTouchpadSettingsMessage = NULL;
-				} else
-					_UpdateSettings();
-			} else
-				_UpdateSettings();
+				}
+			}
+			_UpdateSettings();
 		}
 
 		uint32 buttons = lastButtons ^ movements.buttons;
@@ -606,6 +612,7 @@ status_t
 MouseDevice::_UpdateTouchpadSettings(BMessage* message)
 {
 	touchpad_settings settings;
+	message->FindBool("scroll_reverse", &settings.scroll_reverse);
 	message->FindBool("scroll_twofinger", &settings.scroll_twofinger);
 	message->FindBool("scroll_twofinger_horizontal",
 		&settings.scroll_twofinger_horizontal);

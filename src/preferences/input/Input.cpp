@@ -57,6 +57,8 @@ InputApplication::MessageReceived(BMessage* message)
 		case SCROLL_AREA_CHANGED:
 		case SCROLL_CONTROL_CHANGED:
 		case TAP_CONTROL_CHANGED:
+		case PAD_SPEED_CHANGED:
+		case PAD_ACCELERATION_CHANGED:
 		case DEFAULT_SETTINGS:
 		case REVERT_SETTINGS:
 		{

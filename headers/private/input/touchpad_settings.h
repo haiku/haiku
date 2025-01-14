@@ -18,8 +18,13 @@ typedef struct {
 	uint8	scroll_acceleration;	// from 0 to 20
 
 	uint8	tapgesture_sensibility;	// 0 : no tapgesture
-									// 20: very light tip is enough (default)
+									// 20: very light tap is enough (default)
 	uint16  padblocker_threshold;	//0 to 100
+
+	int32  trackpad_speed;
+	int32  trackpad_acceleration;
+
+	bool	scroll_reverse;
 } touchpad_settings;
 
 
@@ -32,7 +37,10 @@ const static touchpad_settings kDefaultTouchpadSettings = {
 	10,
 	10,
 	20,
-	30
+	30,
+	65536,
+	65536,
+	false
 };
 
 #define TOUCHPAD_SETTINGS_FILE "Touchpad_settings"
