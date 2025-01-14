@@ -30,6 +30,7 @@ KernelAddon ramfs
 	NodeListener.cpp
 	NodeTable.cpp
 	Query.cpp
+	SpecialNode.cpp
 	SizeIndex.cpp
 	SymLink.cpp
 	Volume.cpp

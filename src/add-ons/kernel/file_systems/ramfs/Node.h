@@ -22,6 +22,7 @@ enum {
 	NODE_TYPE_DIRECTORY,
 	NODE_TYPE_FILE,
 	NODE_TYPE_SYMLINK,
+	NODE_TYPE_SPECIAL,
 };
 
 // access modes
@@ -115,6 +116,8 @@ private:
 	Volume					*fVolume;
 	ino_t					fID;
 	int32					fRefCount;
+
+protected:
 	mode_t					fMode;
 	uid_t					fUID;
 	uid_t					fGID;

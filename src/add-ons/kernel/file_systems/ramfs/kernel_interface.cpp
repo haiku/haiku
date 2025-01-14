@@ -58,6 +58,7 @@
 #include "Node.h"
 #include "Query.h"
 #include "ramfs_ioctl.h"
+#include "SpecialNode.h"
 #include "SymLink.h"
 #include "Volume.h"
 
@@ -873,6 +874,71 @@ ramfs_create(fs_volume* _volume, fs_vnode* _dir, const char *name, int openMode,
 		notify_entry_created(volume->GetID(), dir->GetID(), name, *vnid);
 
 	RETURN_ERROR(error);
+}
+
+
+static status_t
+ramfs_create_special_node(fs_volume *_volume, fs_vnode *_dir, const char *name,
+	fs_vnode *subVnode, mode_t mode, uint32 flags, fs_vnode *_superVnode,
+	ino_t *vnid)
+{
+	FUNCTION(("name: `%s', mode: %x\n", name, mode));
+	Volume* volume = (Volume*)_volume->private_volume;
+	Directory* dir = dynamic_cast<Directory*>((Node*)_dir->private_node);
+
+	if (name == NULL || subVnode != NULL)
+		RETURN_ERROR(B_UNSUPPORTED);
+	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+		RETURN_ERROR(B_FILE_EXISTS);
+
+	VolumeWriteLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
+	NodeMTimeUpdater mTimeUpdater(dir);
+	status_t error = B_OK;
+
+	// directory deleted?
+	bool removed;
+	if (get_vnode_removed(volume->FSVolume(), dir->GetID(), &removed)
+			!= B_OK || removed) {
+		SET_ERROR(error, B_NOT_ALLOWED);
+	}
+
+	Node *existingNode = NULL;
+	if (dir->FindNode(name, &existingNode) == B_OK)
+		RETURN_ERROR(B_FILE_EXISTS);
+
+	error = dir->CheckPermissions(ACCESS_W);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	SpecialNode* node = new(std::nothrow) SpecialNode(volume, mode);
+	if (node == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	*vnid = node->GetID();
+
+	node->SetUID(geteuid());
+	node->SetGID(getegid());
+
+	Entry* entry;
+	error = node->InitCheck();
+	if (error == B_OK) {
+		// add node to directory
+		error = dir->CreateEntry(node, name, &entry);
+	}
+	if (error != B_OK) {
+		delete node;
+		RETURN_ERROR(error);
+	}
+
+	NodeMTimeUpdater mTimeUpdater2(node);
+
+	// notify listeners
+	notify_entry_created(volume->GetID(), dir->GetID(), name, *vnid);
+
+	return B_OK;
 }
 
 
@@ -2248,7 +2314,7 @@ fs_vnode_ops gRamFSVnodeOps = {
 	&ramfs_remove_attr,
 
 	/* special nodes */
-	NULL	// create_special_node
+	&ramfs_create_special_node,
 };
 
 static file_system_module_info sRamFSModuleInfo = {
