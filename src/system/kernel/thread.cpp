@@ -2604,7 +2604,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 		// remove our death entry now.
 		thread = Thread::GetAndLock(id);
 		if (thread != NULL) {
-			list_remove_link(&death);
+			list_remove_link(&death.link);
 			thread->UnlockAndReleaseReference();
 		} else {
 			// The thread is already gone, so we need to wait uninterruptibly

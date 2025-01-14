@@ -81,10 +81,8 @@ list_add_link_to_tail(struct list *list, void *_link)
  */
 
 void
-list_remove_link(void *_link)
+list_remove_link(list_link *link)
 {
-	list_link *link = (list_link *)_link;
-
 	link->next->prev = link->prev;
 	link->prev->next = link->next;
 

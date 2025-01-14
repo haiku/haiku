@@ -339,7 +339,7 @@ NodeMonitorService::_RemoveListener(monitor_listener *listener)
 
 	// remove it from the listener and I/O context lists
 	monitor->listeners.Remove(listener);
-	list_remove_link(listener);
+	list_remove_link(&listener->context_link);
 
 	if (dynamic_cast<UserNodeListener*>(listener->listener) != NULL) {
 		// This is a listener we copied ourselves in UpdateUserListener(),

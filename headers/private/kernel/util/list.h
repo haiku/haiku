@@ -54,7 +54,7 @@ extern void list_init(struct list *list);
 extern void list_init_etc(struct list *list, int32 offset);
 extern void list_add_link_to_head(struct list *list, void *_link);
 extern void list_add_link_to_tail(struct list *list, void *_link);
-extern void list_remove_link(void *_link);
+extern void list_remove_link(struct list_link *_link);
 extern void *list_get_next_item(struct list *list, void *item);
 extern void *list_get_prev_item(struct list *list, void *item);
 extern void *list_get_last_item(struct list *list);
