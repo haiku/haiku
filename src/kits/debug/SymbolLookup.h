@@ -95,6 +95,8 @@ public:
 	RemoteMemoryAccessor(debug_context* debugContext);
 	~RemoteMemoryAccessor();
 
+	status_t InitCheck() const;
+
 	const void *PrepareAddress(const void *remoteAddress, int32 size);
 	const void *PrepareAddressNoThrow(const void *remoteAddress,
 		int32 size);

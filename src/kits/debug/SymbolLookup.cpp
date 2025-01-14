@@ -65,6 +65,18 @@ RemoteMemoryAccessor::~RemoteMemoryAccessor()
 }
 
 
+status_t
+RemoteMemoryAccessor::InitCheck() const
+{
+	// If we don't have a debug context, then there's nothing we can do.
+	// SymbolLookup's image file functionality will still be available, though.
+	if (fDebugContext == NULL || fDebugContext->nub_port < 0)
+		return B_NO_INIT;
+
+	return B_OK;
+}
+
+
 const void *
 RemoteMemoryAccessor::PrepareAddress(const void *remoteAddress,
 	int32 size)
@@ -95,7 +107,6 @@ RemoteMemoryAccessor::PrepareAddressNoThrow(const void *remoteAddress,
 
 	return area->TranslateAddress(remoteAddress);
 }
-
 
 
 Area*
@@ -143,9 +154,7 @@ RemoteMemoryAccessor::_GetAreaNoThrow(const void *address, int32 size, Area *&_a
 		}
 	}
 
-	// If we don't have a debug context, then there's nothing we can do.
-	// SymbolLookup's image file functionality will still be available, though.
-	if (fDebugContext == NULL || fDebugContext->nub_port < 0)
+	if (InitCheck() != B_OK)
 		return B_NO_INIT;
 
 	// we need to clone a new area
@@ -221,7 +230,6 @@ private:
 // #pragma mark -
 
 
-// constructor
 SymbolLookup::SymbolLookup(debug_context* debugContext, image_id image)
 	:
 	RemoteMemoryAccessor(debugContext),
@@ -232,7 +240,6 @@ SymbolLookup::SymbolLookup(debug_context* debugContext, image_id image)
 }
 
 
-// destructor
 SymbolLookup::~SymbolLookup()
 {
 	while (Image* image = fImages.RemoveHead())
@@ -240,7 +247,6 @@ SymbolLookup::~SymbolLookup()
 }
 
 
-// Init
 status_t
 SymbolLookup::Init()
 {
@@ -248,7 +254,7 @@ SymbolLookup::Init()
 
 	status_t error = 0;
 
-	if (fDebugContext->team != B_SYSTEM_TEAM) {
+	if (RemoteMemoryAccessor::InitCheck() == B_OK) {
 		TRACE(("SymbolLookup::Init(): searching debug area...\n"));
 
 		// find the runtime loader debug area
@@ -305,7 +311,6 @@ SymbolLookup::Init()
 }
 
 
-// LookupSymbolAddress
 status_t
 SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 	const char **_symbolName, size_t *_symbolNameLen, const char **_imageName,
@@ -350,7 +355,6 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 }
 
 
-// InitSymbolIterator
 status_t
 SymbolLookup::InitSymbolIterator(image_id imageID,
 	SymbolIterator& iterator) const
@@ -374,7 +378,6 @@ SymbolLookup::InitSymbolIterator(image_id imageID,
 }
 
 
-// InitSymbolIterator
 status_t
 SymbolLookup::InitSymbolIteratorByAddress(addr_t address,
 	SymbolIterator& iterator) const
@@ -396,7 +399,6 @@ SymbolLookup::InitSymbolIteratorByAddress(addr_t address,
 }
 
 
-// NextSymbol
 status_t
 SymbolLookup::NextSymbol(SymbolIterator& iterator, const char** _symbolName,
 	size_t* _symbolNameLen, addr_t* _symbolAddress, size_t* _symbolSize,
@@ -407,7 +409,6 @@ SymbolLookup::NextSymbol(SymbolIterator& iterator, const char** _symbolName,
 }
 
 
-// GetSymbol
 status_t
 SymbolLookup::GetSymbol(image_id imageID, const char* name, int32 symbolType,
 	void** _symbolLocation, size_t* _symbolSize, int32* _symbolType) const
@@ -421,7 +422,6 @@ SymbolLookup::GetSymbol(image_id imageID, const char* name, int32 symbolType,
 }
 
 
-// _FindLoadedImageAtAddress
 const image_t *
 SymbolLookup::_FindLoadedImageAtAddress(addr_t address)
 {
@@ -446,7 +446,6 @@ SymbolLookup::_FindLoadedImageAtAddress(addr_t address)
 }
 
 
-// _FindLoadedImageByID
 const image_t*
 SymbolLookup::_FindLoadedImageByID(image_id id)
 {
@@ -469,7 +468,6 @@ SymbolLookup::_FindLoadedImageByID(image_id id)
 }
 
 
-// _FindImageAtAddress
 Image*
 SymbolLookup::_FindImageAtAddress(addr_t address) const
 {
@@ -484,7 +482,6 @@ SymbolLookup::_FindImageAtAddress(addr_t address) const
 }
 
 
-// _FindImageByID
 Image*
 SymbolLookup::_FindImageByID(image_id id) const
 {
@@ -498,7 +495,6 @@ SymbolLookup::_FindImageByID(image_id id) const
 }
 
 
-// _SymbolNameLen
 size_t
 SymbolLookup::_SymbolNameLen(const char* address) const
 {
