@@ -1357,22 +1357,6 @@ public:
 
 	status_t Init(Team* team)
 	{
-		// find the runtime loader debug area
-		VMArea* area;
-		for (VMAddressSpace::AreaIterator it
-					= team->address_space->GetAreaIterator();
-				(area = it.Next()) != NULL;) {
-			if (strcmp(area->name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0)
-				break;
-		}
-
-		if (area == NULL)
-			return B_ERROR;
-
-		// copy the runtime loader data structure
-		if (!_Read((runtime_loader_debug_area*)area->Base(), fDebugArea))
-			return B_BAD_ADDRESS;
-
 		fTeam = team;
 		return B_OK;
 	}
@@ -1390,7 +1374,7 @@ public:
 		// from the shared object.
 
 		// get the image for the address
-		image_t image;
+		struct image *image;
 		status_t error = _FindImageAtAddress(address, image);
 		if (error != B_OK) {
 			// commpage requires special treatment since kernel stores symbol
@@ -1409,20 +1393,22 @@ public:
 			return error;
 		}
 
-		strlcpy(fImageName, image.name, sizeof(fImageName));
+		const extended_image_info& info = image->info;
+		const uint32 *symhash = (uint32 *)info.symbol_hash;
+		elf_sym *syms = (elf_sym *)info.symbol_table;
+
+		strlcpy(fImageName, info.basic_info.name, sizeof(fImageName));
 
 		// symbol hash table size
 		uint32 hashTabSize;
-		if (!_Read(image.symhash, hashTabSize))
+		if (!_Read(symhash, hashTabSize))
 			return B_BAD_ADDRESS;
 
 		// remote pointers to hash buckets and chains
-		const uint32* hashBuckets = image.symhash + 2;
-		const uint32* hashChains = image.symhash + 2 + hashTabSize;
+		const uint32* hashBuckets = symhash + 2;
+		const uint32* hashChains = symhash + 2 + hashTabSize;
 
-		const addr_t loadDelta = image.regions[0].delta;
-		// TODO: add a way to get other text regions' size!
-		size_t regionsSize = image.regions[0].size;
+		const addr_t loadDelta = (addr_t)info.basic_info.text;
 
 		// search the image for the symbol
 		elf_sym symbolFound;
@@ -1442,7 +1428,7 @@ public:
 					_Read(&hashChains[j], j) ? 0 : j = STN_UNDEF) {
 
 				elf_sym symbol;
-				if (!_Read(image.syms + j, symbol))
+				if (!_Read(syms + j, symbol))
 					continue;
 
 				// The symbol table contains not only symbols referring to
@@ -1454,7 +1440,7 @@ public:
 				// -- couldn't verify that in the specs though).
 				if ((symbol.Type() != STT_FUNC && symbol.Type() != STT_OBJECT)
 					|| symbol.st_value == 0
-					|| (symbol.st_value + symbol.st_size) > regionsSize) {
+					|| (symbol.st_value + symbol.st_size) > (elf_addr)info.basic_info.text_size) {
 					continue;
 				}
 
@@ -1484,7 +1470,7 @@ public:
 			*_symbolName = NULL;
 
 			if (deltaFound < INT_MAX) {
-				if (_ReadString(image, symbolFound.st_name, fSymbolName,
+				if (_ReadString(info, symbolFound.st_name, fSymbolName,
 						sizeof(fSymbolName))) {
 					*_symbolName = fSymbolName;
 				} else {
@@ -1498,7 +1484,7 @@ public:
 			if (deltaFound < INT_MAX)
 				*_baseAddress = symbolFound.st_value + loadDelta;
 			else
-				*_baseAddress = image.regions[0].vmstart;
+				*_baseAddress = loadDelta;
 		}
 
 		if (_exactMatch)
@@ -1507,33 +1493,31 @@ public:
 		return B_OK;
 	}
 
-	status_t _FindImageAtAddress(addr_t address, image_t& image)
+	status_t _FindImageAtAddress(addr_t address, struct image*& _image)
 	{
-		image_queue_t imageQueue;
-		if (!_Read(fDebugArea.loaded_images, imageQueue))
-			return B_BAD_ADDRESS;
+		struct image* image = NULL;
+		while ((image = (struct image*)list_get_next_item(&fTeam->image_list,
+				image)) != NULL) {
+			image_info *info = &image->info.basic_info;
 
-		image_t* imageAddress = imageQueue.head;
-		while (imageAddress != NULL) {
-			if (!_Read(imageAddress, image))
-				return B_BAD_ADDRESS;
+			if ((address < (addr_t)info->text
+					|| address >= (addr_t)info->text + info->text_size)
+				&& (address < (addr_t)info->data
+					|| address >= (addr_t)info->data + info->data_size))
+				continue;
 
-			// TODO: text may be more than just the first region.
-			if (image.regions[0].vmstart <= address
-				&& address < image.regions[0].vmstart + image.regions[0].size) {
-				return B_OK;
-			}
-
-			imageAddress = image.next;
+			// found image
+			_image = image;
+			return B_OK;
 		}
 
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	bool _ReadString(const image_t& image, uint32 offset, char* buffer,
+	bool _ReadString(const extended_image_info& info, uint32 offset, char* buffer,
 		size_t bufferSize)
 	{
-		const char* address = image.strtab + offset;
+		const char* address = (char *)info.string_table + offset;
 
 		if (!IS_USER_ADDRESS(address))
 			return false;
@@ -1550,7 +1534,6 @@ public:
 
 private:
 	Team*						fTeam;
-	runtime_loader_debug_area	fDebugArea;
 	char						fImageName[B_OS_NAME_LENGTH];
 	char						fSymbolName[256];
 	static UserSymbolLookup		sLookup;

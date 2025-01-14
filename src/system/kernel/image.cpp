@@ -366,39 +366,6 @@ image_iterate_through_team_images(team_id teamID,
 
 
 status_t
-image_debug_lookup_user_symbol_address(Team *team, addr_t address,
-	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
-	bool *_exactMatch)
-{
-	// TODO: Work together with ELF reader and runtime_loader. For regular user
-	// images we have the symbol and string table addresses.
-
-	struct image *image = NULL;
-
-	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
-			!= NULL) {
-		image_info *info = &image->info.basic_info;
-
-		if ((address < (addr_t)info->text
-				|| address >= (addr_t)info->text + info->text_size)
-			&& (address < (addr_t)info->data
-				|| address >= (addr_t)info->data + info->data_size))
-			continue;
-
-		// found image
-		*_symbolName = NULL;
-		*_imageName = info->name;
-		*_baseAddress = (addr_t)info->text;
-		*_exactMatch = false;
-
-		return B_OK;
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-status_t
 image_init(void)
 {
 	sImageTable = new(std::nothrow) ImageTable;

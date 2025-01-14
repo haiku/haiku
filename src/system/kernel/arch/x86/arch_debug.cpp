@@ -116,12 +116,6 @@ lookup_symbol(Thread* thread, addr_t address, addr_t* _baseAddress,
 		// try a lookup using the userland runtime loader structures
 		status = elf_debug_lookup_user_symbol_address(thread->team, address,
 			_baseAddress, _symbolName, _imageName, _exactMatch);
-
-		if (status != B_OK) {
-			// try to locate the image in the images loaded into user space
-			status = image_debug_lookup_user_symbol_address(thread->team,
-				address, _baseAddress, _symbolName, _imageName, _exactMatch);
-		}
 	}
 
 	return status;

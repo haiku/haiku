@@ -96,7 +96,7 @@ print_stack_frame(Thread *thread, addr_t ip, addr_t framePointer,
 		&image, &exactMatch);
 	if (status != B_OK && !IS_KERNEL_ADDRESS(ip) && thread) {
 		// try to locate the image in the images loaded into user space
-		status = image_debug_lookup_user_symbol_address(thread->team, ip,
+		status = elf_debug_lookup_user_symbol_address(thread->team, ip,
 			&baseAddress, &symbol, &image, &exactMatch);
 	}
 	if (status == B_OK) {
