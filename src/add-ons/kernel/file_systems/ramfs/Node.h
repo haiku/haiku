@@ -25,13 +25,6 @@ enum {
 	NODE_TYPE_SPECIAL,
 };
 
-// access modes
-enum {
-	ACCESS_R	= S_IROTH,
-	ACCESS_W	= S_IWOTH,
-	ACCESS_X	= S_IXOTH,
-};
-
 class Node : public DoublyLinkedListLinkImpl<Node> {
 public:
 	Node(Volume *volume, uint8 type);
@@ -149,23 +142,6 @@ Node::MarkUnmodified()
 	}
 	return modified;
 }
-
-// open_mode_to_access
-inline static
-int
-open_mode_to_access(int openMode)
-{
-	switch (openMode & O_RWMASK) {
-		case O_RDONLY:
-			return ACCESS_R;
-		case O_WRONLY:
-			return ACCESS_W;
-		case O_RDWR:
-			return ACCESS_R | ACCESS_W;
-	}
-	return 0;
-}
-
 
 // NodeMTimeUpdater
 class NodeMTimeUpdater {
