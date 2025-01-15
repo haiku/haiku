@@ -6595,6 +6595,10 @@ _user_get_memory_properties(team_id teamID, const void* address,
 	if (!IS_USER_ADDRESS(_protected) || !IS_USER_ADDRESS(_lock))
 		return B_BAD_ADDRESS;
 
+	if (teamID != B_CURRENT_TEAM && teamID != team_get_current_team_id()
+			&& geteuid() != 0)
+		return B_NOT_ALLOWED;
+
 	AddressSpaceReadLocker locker;
 	status_t error = locker.SetTo(teamID);
 	if (error != B_OK)
