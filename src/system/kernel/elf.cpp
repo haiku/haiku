@@ -1954,8 +1954,9 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
 				addressSpec, fileUpperBound,
-				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP, false,
-				fd, ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+				REGION_PRIVATE_MAP, false, fd,
+				ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file data: %s!\n", strerror(id));
 				return B_NOT_AN_EXECUTABLE;
@@ -1976,9 +1977,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 			size_t amount = fileUpperBound
 				- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				- (programHeaders[i].p_filesz);
-			arch_cpu_enable_user_access();
 			memset((void *)start, 0, amount);
-			arch_cpu_disable_user_access();
 
 			// Check if we need extra storage for the bss - we have to do this if
 			// the above region doesn't already comprise the memory size, too.
@@ -1994,7 +1993,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 				virtualRestrictions.address_specification = B_EXACT_ADDRESS;
 				physical_address_restrictions physicalRestrictions = {};
 				id = create_area_etc(team->id, regionName, bssSize, B_NO_LOCK,
-					B_READ_AREA | B_WRITE_AREA, 0, 0, &virtualRestrictions,
+					B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, 0, &virtualRestrictions,
 					&physicalRestrictions, (void**)&regionAddress);
 				if (id < B_OK) {
 					dprintf("error allocating bss area: %s!\n", strerror(id));
@@ -2003,14 +2002,15 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 			}
 		} else {
 			// assume ro/text segment
-			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%dro", baseName, i);
+			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%drx", baseName, i);
 
 			size_t segmentSize = ROUNDUP(programHeaders[i].p_memsz
 				+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
 				addressSpec, segmentSize,
-				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP, false, fd,
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+				REGION_PRIVATE_MAP, false, fd,
 				ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file text: %s!\n", strerror(id));
@@ -2038,20 +2038,13 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 	// modify the dynamic ptr by the delta of the regions
 	image->dynamic_section += image->text_region.delta;
 
-	arch_cpu_enable_user_access();
 	status = elf_parse_dynamic_section(image);
-	if (status != B_OK) {
-		arch_cpu_disable_user_access();
+	if (status != B_OK)
 		return status;
-	}
 
 	status = elf_relocate(image, image);
-	if (status != B_OK) {
-		arch_cpu_disable_user_access();
+	if (status != B_OK)
 		return status;
-	}
-
-	arch_cpu_disable_user_access();
 
 	// set correct area protection
 	for (int i = 0; i < elfHeader.e_phnum; i++) {
@@ -2059,7 +2052,6 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 			continue;
 
 		uint32 protection = 0;
-
 		if (programHeaders[i].p_flags & PF_EXECUTE)
 			protection |= B_EXECUTE_AREA;
 		if (programHeaders[i].p_flags & PF_WRITE)
