@@ -131,64 +131,46 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 					flags |= RFLAG_EXECUTABLE;
 				}
 
+				elf_region_t& region = image->regions[regcount];
+				region.start = pheader->p_vaddr;
+				region.vmstart = PAGE_BASE(pheader->p_vaddr);
+				region.fdstart = pheader->p_offset;
+				region.fdsize = pheader->p_filesz;
+				region.delta = 0;
+				region.flags = flags;
+
 				if (pheader->p_memsz == pheader->p_filesz) {
-					/*
-					 * everything in one area
-					 */
-					image->regions[regcount].start = pheader->p_vaddr;
-					image->regions[regcount].size = pheader->p_memsz;
-					image->regions[regcount].vmstart
-						= PAGE_BASE(pheader->p_vaddr);
-					image->regions[regcount].vmsize
-						= TO_PAGE_SIZE(pheader->p_memsz
-							+ PAGE_OFFSET(pheader->p_vaddr));
-					image->regions[regcount].fdstart = pheader->p_offset;
-					image->regions[regcount].fdsize = pheader->p_filesz;
-					image->regions[regcount].delta = 0;
-					image->regions[regcount].flags = flags;
+					// everything in one area
+					region.size = pheader->p_memsz;
+					region.vmsize = TO_PAGE_SIZE(pheader->p_memsz
+						+ PAGE_OFFSET(pheader->p_vaddr));
 				} else {
-					/*
-					 * may require splitting
-					 */
-					addr_t A = TO_PAGE_SIZE(pheader->p_vaddr
-						+ pheader->p_memsz);
-					addr_t B = TO_PAGE_SIZE(pheader->p_vaddr
-						+ pheader->p_filesz);
+					// may require splitting
+					region.size = pheader->p_filesz;
+					region.vmsize = TO_PAGE_SIZE(pheader->p_filesz
+						+ PAGE_OFFSET(pheader->p_vaddr));
 
-					image->regions[regcount].start = pheader->p_vaddr;
-					image->regions[regcount].size = pheader->p_filesz;
-					image->regions[regcount].vmstart
-						= PAGE_BASE(pheader->p_vaddr);
-					image->regions[regcount].vmsize
-						= TO_PAGE_SIZE(pheader->p_filesz
-							+ PAGE_OFFSET(pheader->p_vaddr));
-					image->regions[regcount].fdstart = pheader->p_offset;
-					image->regions[regcount].fdsize = pheader->p_filesz;
-					image->regions[regcount].delta = 0;
-					image->regions[regcount].flags = flags;
-
+					addr_t A = TO_PAGE_SIZE(pheader->p_vaddr + pheader->p_memsz);
+					addr_t B = TO_PAGE_SIZE(pheader->p_vaddr + pheader->p_filesz);
 					if (A != B) {
-						/*
-						 * yeah, it requires splitting
-						 */
-						regcount += 1;
-						image->regions[regcount].start = pheader->p_vaddr;
-						image->regions[regcount].size
-							= pheader->p_memsz - pheader->p_filesz;
-						image->regions[regcount].vmstart
-							= image->regions[regcount-1].vmstart
-								+ image->regions[regcount-1].vmsize;
-						image->regions[regcount].vmsize
-							= TO_PAGE_SIZE(pheader->p_memsz
+						// yeah, it requires splitting
+						regcount++;
+						elf_region_t& regionB = image->regions[regcount];
+
+						regionB.start = pheader->p_vaddr;
+						regionB.size = pheader->p_memsz - pheader->p_filesz;
+						regionB.vmstart = region.vmstart + region.vmsize;
+						regionB.vmsize
+								= TO_PAGE_SIZE(pheader->p_memsz
 									+ PAGE_OFFSET(pheader->p_vaddr))
-								- image->regions[regcount-1].vmsize;
-						image->regions[regcount].fdstart = 0;
-						image->regions[regcount].fdsize = 0;
-						image->regions[regcount].delta = 0;
-						image->regions[regcount].flags = flags | RFLAG_ANON;
+								- region.vmsize;
+						regionB.fdstart = 0;
+						regionB.fdsize = 0;
+						regionB.delta = 0;
+						regionB.flags = flags | RFLAG_ANON;
 					}
 				}
-				regcount += 1;
+				regcount++;
 				break;
 			}
 			case PT_DYNAMIC:

@@ -347,11 +347,13 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 		return B_NO_MEMORY;
 
 	for (uint32 i = 0; i < image->num_regions; i++) {
+		elf_region_t& region = image->regions[i];
+
 		char regionName[B_OS_NAME_LENGTH];
 		snprintf(regionName, sizeof(regionName), "%s_seg%" B_PRIu32 "%s",
-			baseName, i, (image->regions[i].flags & RFLAG_EXECUTABLE) ?
-				((image->regions[i].flags & RFLAG_WRITABLE) ? "rwx" : "rx")
-				: (image->regions[i].flags & RFLAG_WRITABLE) ? "rw" : "ro");
+			baseName, i, (region.flags & RFLAG_EXECUTABLE) ?
+				((region.flags & RFLAG_WRITABLE) ? "rwx" : "rx")
+				: (region.flags & RFLAG_WRITABLE) ? "rw" : "ro");
 
 		get_image_region_load_address(image, i,
 			i > 0 ? image->regions[i - 1].delta : 0, fixed, loadAddress,
@@ -362,15 +364,15 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 		if (addressSpecifier != B_EXACT_ADDRESS)
 			loadAddress = reservedAddress;
 
-		if ((image->regions[i].flags & RFLAG_ANON) != 0) {
-			image->regions[i].id = _kern_create_area(regionName,
+		if ((region.flags & RFLAG_ANON) != 0) {
+			region.id = _kern_create_area(regionName,
 				(void**)&loadAddress, B_EXACT_ADDRESS,
-				image->regions[i].vmsize, B_NO_LOCK,
+				region.vmsize, B_NO_LOCK,
 				B_READ_AREA | B_WRITE_AREA);
 
-			if (image->regions[i].id < 0) {
+			if (region.id < 0) {
 				_kern_unreserve_address_range(reservedAddress, reservedSize);
-				return image->regions[i].id;
+				return region.id;
 			}
 		} else {
 			// Map all segments r/w first -- write access might be needed for
@@ -381,30 +383,30 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 			// of memory to be committed for them temporarily, just because we
 			// have to write map them.
 			uint32 protection = B_READ_AREA | B_WRITE_AREA
-				| ((image->regions[i].flags & RFLAG_WRITABLE) != 0
+				| ((region.flags & RFLAG_WRITABLE) != 0
 					? 0 : B_OVERCOMMITTING_AREA);
-			image->regions[i].id = _kern_map_file(regionName,
+			region.id = _kern_map_file(regionName,
 				(void**)&loadAddress, B_EXACT_ADDRESS,
-				image->regions[i].vmsize, protection, REGION_PRIVATE_MAP, false,
-				fd, PAGE_BASE(image->regions[i].fdstart));
+				region.vmsize, protection, REGION_PRIVATE_MAP, false,
+				fd, PAGE_BASE(region.fdstart));
 
-			if (image->regions[i].id < 0) {
+			if (region.id < 0) {
 				_kern_unreserve_address_range(reservedAddress, reservedSize);
-				return image->regions[i].id;
+				return region.id;
 			}
 
 			TRACE(("\"%s\" at %p, 0x%lx bytes (%s)\n", path,
-				(void *)loadAddress, image->regions[i].vmsize,
-				image->regions[i].flags & RFLAG_WRITABLE ? "rw" : "read-only"));
+				(void *)loadAddress, region.vmsize,
+				region.flags & RFLAG_WRITABLE ? "rw" : "read-only"));
 
 			// handle trailer bits in data segment
-			if (image->regions[i].flags & RFLAG_WRITABLE) {
+			if (region.flags & RFLAG_WRITABLE) {
 				addr_t startClearing = loadAddress
-					+ PAGE_OFFSET(image->regions[i].start)
-					+ image->regions[i].size;
-				addr_t toClear = image->regions[i].vmsize
-					- PAGE_OFFSET(image->regions[i].start)
-					- image->regions[i].size;
+					+ PAGE_OFFSET(region.start)
+					+ region.size;
+				addr_t toClear = region.vmsize
+					- PAGE_OFFSET(region.start)
+					- region.size;
 
 				TRACE(("cleared 0x%lx and the following 0x%lx bytes\n",
 					startClearing, toClear));
@@ -412,8 +414,8 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 			}
 		}
 
-		image->regions[i].delta = loadAddress - image->regions[i].vmstart;
-		image->regions[i].vmstart = loadAddress;
+		region.delta = loadAddress - region.vmstart;
+		region.vmstart = loadAddress;
 		if (i == 0) {
 			TLSBlockTemplates::Get().SetBaseAddress(image->dso_tls_id,
 				loadAddress);
