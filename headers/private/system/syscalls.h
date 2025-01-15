@@ -173,8 +173,6 @@ extern void			_kern_exit_thread(status_t returnValue);
 extern status_t		_kern_cancel_thread(thread_id threadID,
 						void (*cancelFunction)(int));
 extern void			_kern_thread_yield(void);
-extern status_t		_kern_wait_for_thread(thread_id thread,
-						status_t *_returnCode);
 extern status_t		_kern_wait_for_thread_etc(thread_id thread, uint32 flags,
 						bigtime_t timeout, status_t *_returnCode);
 extern bool			_kern_has_data(thread_id thread);

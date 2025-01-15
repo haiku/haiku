@@ -3718,26 +3718,6 @@ _user_find_thread(const char *userName)
 
 
 status_t
-_user_wait_for_thread(thread_id id, status_t *userReturnCode)
-{
-	status_t returnCode;
-	status_t status;
-
-	if (userReturnCode != NULL && !IS_USER_ADDRESS(userReturnCode))
-		return B_BAD_ADDRESS;
-
-	status = wait_for_thread_etc(id, B_CAN_INTERRUPT, 0, &returnCode);
-
-	if (status == B_OK && userReturnCode != NULL
-		&& user_memcpy(userReturnCode, &returnCode, sizeof(status_t)) < B_OK) {
-		return B_BAD_ADDRESS;
-	}
-
-	return syscall_restart_handle_post(status);
-}
-
-
-status_t
 _user_wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *userReturnCode)
 {
 	status_t returnCode;
