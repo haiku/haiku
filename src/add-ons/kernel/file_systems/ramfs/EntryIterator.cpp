@@ -8,44 +8,48 @@
 #include "EntryIterator.h"
 #include "Volume.h"
 
-// constructor
+
 EntryIterator::EntryIterator(Directory *directory)
-	: fDirectory(directory),
-	  fEntry(NULL),
-	  fSuspended(false),
-	  fIsNext(false),
-	  fDone(false)
+	:
+	fDirectory(directory),
+	fEntry(NULL),
+	fSuspended(false),
+	fIsNext(false),
+	fDone(false)
 {
 }
 
-// destructor
+
 EntryIterator::~EntryIterator()
 {
 	Unset();
 }
 
-// SetTo
+
 status_t
 EntryIterator::SetTo(Directory *directory)
 {
 	Unset();
-	status_t error = (directory ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		fDirectory = directory;
-		fEntry = NULL;
-		fSuspended = false;
-		fIsNext = false;
-		fDone = false;
-	}
-	return error;
+
+	if (directory == NULL)
+		return B_BAD_VALUE;
+
+	fDirectory = directory;
+	fEntry = NULL;
+	fSuspended = false;
+	fIsNext = false;
+	fDone = false;
+
+	return B_OK;
 }
 
-// Unset
+
 void
 EntryIterator::Unset()
 {
-	if (fDirectory && fSuspended)
+	if (fDirectory != NULL && fSuspended)
 		Resume();
+
 	fDirectory = NULL;
 	fEntry = NULL;
 	fSuspended = false;
@@ -53,51 +57,51 @@ EntryIterator::Unset()
 	fDone = false;
 }
 
-// Suspend
+
 status_t
 EntryIterator::Suspend()
 {
-	status_t error = (fDirectory ? B_OK : B_ERROR);
-	if (error == B_OK) {
-		if (fDirectory->GetVolume()->IteratorLock()) {
-			if (!fSuspended) {
-				if (fEntry)
-					fEntry->AttachEntryIterator(this);
-				fDirectory->GetVolume()->IteratorUnlock();
-				fSuspended = true;
-			} else
-				error = B_ERROR;
-		} else
-			error = B_ERROR;
-	}
-	return error;
+	if (fDirectory == NULL || fSuspended)
+		return B_ERROR;
+
+	if (!fDirectory->GetVolume()->IteratorLock())
+		return B_ERROR;
+
+	if (fEntry != NULL)
+		fEntry->AttachEntryIterator(this);
+
+	fDirectory->GetVolume()->IteratorUnlock();
+	fSuspended = true;
+	return B_OK;
 }
 
-// Resume
+
 status_t
 EntryIterator::Resume()
 {
-	status_t error = (fDirectory ? B_OK : B_ERROR);
-	if (error == B_OK) {
-		if (fDirectory->GetVolume()->IteratorLock()) {
-			if (fSuspended) {
-				if (fEntry)
-					fEntry->DetachEntryIterator(this);
-				fSuspended = false;
-			}
-			fDirectory->GetVolume()->IteratorUnlock();
-		} else
-			error = B_ERROR;
-	}
-	return error;
+	if (fDirectory == NULL)
+		return B_ERROR;
+
+	if (!fDirectory->GetVolume()->IteratorLock())
+		return B_ERROR;
+
+	if (fSuspended && fEntry != NULL)
+		fEntry->DetachEntryIterator(this);
+
+	fSuspended = false;
+	fDirectory->GetVolume()->IteratorUnlock();
+	return B_OK;
 }
 
-// GetNext
+
 status_t
 EntryIterator::GetNext(Entry **entry)
 {
+	if (fDirectory == NULL || entry == NULL)
+		return B_BAD_VALUE;
+
 	status_t error = B_ENTRY_NOT_FOUND;
-	if (!fDone && fDirectory && entry) {
+	if (!fDone) {
 		if (fIsNext) {
 			fIsNext = false;
 			if (fEntry)
@@ -110,26 +114,28 @@ EntryIterator::GetNext(Entry **entry)
 	return error;
 }
 
-// Rewind
+
 status_t
 EntryIterator::Rewind()
 {
-	status_t error = (fDirectory ? B_OK : B_ERROR);
-	if (error == B_OK) {
-		if (fDirectory->GetVolume()->IteratorLock()) {
-			if (fSuspended && fEntry)
-				fEntry->DetachEntryIterator(this);
-			fEntry = NULL;
-			fIsNext = false;
-			fDone = false;
-			fDirectory->GetVolume()->IteratorUnlock();
-		} else
-			error = B_ERROR;
-	}
-	return error;
+	if (fDirectory == NULL)
+		return B_ERROR;
+
+	if (!fDirectory->GetVolume()->IteratorLock())
+		return B_ERROR;
+
+	if (fSuspended && fEntry != NULL)
+		fEntry->DetachEntryIterator(this);
+
+	fEntry = NULL;
+	fIsNext = false;
+	fDone = false;
+	fDirectory->GetVolume()->IteratorUnlock();
+
+	return B_OK;
 }
 
-// SetCurrent
+
 void
 EntryIterator::SetCurrent(Entry *entry, bool isNext)
 {
@@ -137,4 +143,3 @@ EntryIterator::SetCurrent(Entry *entry, bool isNext)
 	fEntry = entry;
 	fDone = !fEntry;
 }
-
