@@ -439,6 +439,7 @@ unmap_image(image_t* image)
 
 /*!	This function will change the protection of all read-only segments to really
 	be read-only (and executable).
+
 	The areas have to be read/write first, so that they can be relocated.
 	If at least one image is in compatibility mode then we allow execution of
 	all areas.
@@ -449,22 +450,18 @@ remap_images()
 	for (image_t* image = sLoadedImages.head; image != NULL;
 			image = image->next) {
 		for (uint32 i = 0; i < image->num_regions; i++) {
-			// we only need to do this once, so we remember those we've already
-			// mapped
-			if ((image->regions[i].flags & RFLAG_REMAPPED) != 0)
+			// we only need to do this once, so we remember those we've already mapped
+			elf_region_t& region = image->regions[i];
+			if ((region.flags & RFLAG_REMAPPED) != 0)
 				continue;
 
-			status_t result = B_OK;
-			if ((image->regions[i].flags & RFLAG_RW) == 0) {
-				result = _kern_set_area_protection(image->regions[i].id,
-						B_READ_AREA | B_EXECUTE_AREA);
-			} else if (image->abi < B_HAIKU_ABI_GCC_2_HAIKU) {
-				result = _kern_set_area_protection(image->regions[i].id,
-						B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA);
-			}
+			uint32 protection = B_READ_AREA | B_EXECUTE_AREA;
+			if ((region.flags & RFLAG_RW) != 0 || image->abi < B_HAIKU_ABI_GCC_2_HAIKU)
+				protection |= B_WRITE_AREA;
 
+			status_t result = _kern_set_area_protection(region.id, protection);
 			if (result == B_OK)
-				image->regions[i].flags |= RFLAG_REMAPPED;
+				region.flags |= RFLAG_REMAPPED;
 		}
 	}
 }
