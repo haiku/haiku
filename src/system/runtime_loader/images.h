@@ -16,8 +16,9 @@
 enum {
 	// the lower two bits are reserved for RTLD_NOW and RTLD_GLOBAL
 
-	RFLAG_RW					= 0x0010,
-	RFLAG_ANON					= 0x0020,
+	RFLAG_WRITABLE				= 0x0010,
+	RFLAG_EXECUTABLE			= 0x0020,
+	RFLAG_ANON					= 0x0040,
 
 	RFLAG_TERMINATED			= 0x0200,
 	RFLAG_INITIALIZED			= 0x0400,

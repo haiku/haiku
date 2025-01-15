@@ -120,6 +120,17 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 				/* NOP header */
 				break;
 			case PT_LOAD:
+			{
+				uint32 flags = 0;
+				if (pheader->p_flags & PF_WRITE) {
+					// this is a writable segment
+					flags |= RFLAG_WRITABLE;
+				}
+				if (pheader->p_flags & PF_EXECUTE) {
+					// this is an executable segment
+					flags |= RFLAG_EXECUTABLE;
+				}
+
 				if (pheader->p_memsz == pheader->p_filesz) {
 					/*
 					 * everything in one area
@@ -134,11 +145,7 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 					image->regions[regcount].fdstart = pheader->p_offset;
 					image->regions[regcount].fdsize = pheader->p_filesz;
 					image->regions[regcount].delta = 0;
-					image->regions[regcount].flags = 0;
-					if (pheader->p_flags & PF_WRITE) {
-						// this is a writable segment
-						image->regions[regcount].flags |= RFLAG_RW;
-					}
+					image->regions[regcount].flags = flags;
 				} else {
 					/*
 					 * may require splitting
@@ -158,11 +165,7 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 					image->regions[regcount].fdstart = pheader->p_offset;
 					image->regions[regcount].fdsize = pheader->p_filesz;
 					image->regions[regcount].delta = 0;
-					image->regions[regcount].flags = 0;
-					if (pheader->p_flags & PF_WRITE) {
-						// this is a writable segment
-						image->regions[regcount].flags |= RFLAG_RW;
-					}
+					image->regions[regcount].flags = flags;
 
 					if (A != B) {
 						/*
@@ -182,15 +185,12 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 						image->regions[regcount].fdstart = 0;
 						image->regions[regcount].fdsize = 0;
 						image->regions[regcount].delta = 0;
-						image->regions[regcount].flags = RFLAG_ANON;
-						if (pheader->p_flags & PF_WRITE) {
-							// this is a writable segment
-							image->regions[regcount].flags |= RFLAG_RW;
-						}
+						image->regions[regcount].flags = flags | RFLAG_ANON;
 					}
 				}
 				regcount += 1;
 				break;
+			}
 			case PT_DYNAMIC:
 				image->dynamic_ptr = pheader->p_vaddr;
 				break;
