@@ -1116,27 +1116,32 @@ public:
 	DirectoryCookie(Directory *directory = NULL)
 		:
 		fIterator(directory),
-		fDotIndex(DOT_INDEX),
-		// debugging
-		fIteratorID(atomic_add(&fNextIteratorID, 1)),
-		fGetNextCounter(0)
+		fDotIndex(DOT_INDEX)
 	{
 	}
 
 	void Unset() { fIterator.Unset(); }
 
-//	EntryIterator *GetIterator() const { return &fIterator; }
-
-	status_t GetNext(ino_t *nodeID, const char **entryName)
+	status_t Next()
 	{
-fGetNextCounter++;
+		status_t error = B_OK;
+		if (fDotIndex < ENTRY_INDEX)
+			fDotIndex++;
+		if (fDotIndex == ENTRY_INDEX) {
+			Entry* entry = NULL;
+			error = fIterator.GetNext(&entry);
+		}
+		return error;
+	}
+
+	status_t GetCurrent(ino_t *nodeID, const char **entryName)
+	{
 		status_t error = B_OK;
 		if (fDotIndex == DOT_INDEX) {
 			// "."
 			Node *entry = fIterator.GetDirectory();
 			*nodeID = entry->GetID();
 			*entryName = ".";
-			fDotIndex++;
 		} else if (fDotIndex == DOT_DOT_INDEX) {
 			// ".."
 			Directory *dir = fIterator.GetDirectory();
@@ -1145,19 +1150,20 @@ fGetNextCounter++;
 			else
 				*nodeID = dir->GetID();
 			*entryName = "..";
-			fDotIndex++;
 		} else {
 			// ordinary entries
-			Entry *entry = NULL;
-			error = fIterator.GetNext(&entry);
+			Entry *entry = fIterator.GetCurrent();
+			if (entry == NULL)
+				error = B_ENTRY_NOT_FOUND;
 			if (error == B_OK) {
 				*nodeID = entry->GetNode()->GetID();
 				*entryName = entry->GetName();
 			}
 		}
-		PRINT("EntryIterator %" B_PRId32 ", GetNext() counter: %" B_PRId32 ", entry: %p (%lld)\n",
-		fIteratorID, fGetNextCounter, fIterator.GetCurrent(),
-			(fIterator.GetCurrent()
+
+		PRINT("EntryIterator<%p>::GetNext(): entry: %p (%" B_PRIdINO ")\n",
+			this, fIterator.GetCurrent(),
+			(fIterator.GetCurrent() != NULL
 				? fIterator.GetCurrent()->GetNode()->GetID() : -1));
 		return error;
 	}
@@ -1181,15 +1187,7 @@ private:
 private:
 	EntryIterator	fIterator;
 	uint32			fDotIndex;
-
-	// debugging
-	int32			fIteratorID;
-	int32			fGetNextCounter;
-	static int32	fNextIteratorID;
 };
-
-
-int32 DirectoryCookie::fNextIteratorID = 0;
 
 
 static status_t
@@ -1359,7 +1357,7 @@ ramfs_free_dir_cookie(fs_volume* /*fs*/, fs_vnode* /*_node*/, void* _cookie)
 
 static status_t
 ramfs_read_dir(fs_volume* _volume, fs_vnode* DARG(_node), void* _cookie,
-	struct dirent *buffer, size_t bufferSize, uint32 *count)
+	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
@@ -1372,34 +1370,48 @@ ramfs_read_dir(fs_volume* _volume, fs_vnode* DARG(_node), void* _cookie,
 	if (!locker.IsLocked())
 		RETURN_ERROR(B_ERROR);
 
-	status_t error = cookie->Resume();
-	if (error == B_OK) {
-		// read one entry
+	status_t status = cookie->Resume();
+	if (status != B_OK)
+		RETURN_ERROR(status);
+
+	uint32 maxCount = *_num;
+	uint32 count = 0;
+
+	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
+		size_t length = bufferSize - offsetof(struct dirent, d_name);
+
 		ino_t nodeID = -1;
 		const char *name = NULL;
-		if (cookie->GetNext(&nodeID, &name) == B_OK) {
-			PRINT("  entry: `%s'\n", name);
-			size_t nameLen = strlen(name);
-			// check, whether the entry fits into the buffer,
-			// and fill it in
-			size_t length = (buffer->d_name + nameLen + 1) - (char*)buffer;
-			if (length <= bufferSize) {
-				buffer->d_dev = volume->GetID();
-				buffer->d_ino = nodeID;
-				memcpy(buffer->d_name, name, nameLen);
-				buffer->d_name[nameLen] = '\0';
-				buffer->d_reclen = length;
-				*count = 1;
-			} else {
-				SET_ERROR(error, B_BUFFER_OVERFLOW);
-			}
-		} else
-			*count = 0;
+		if (cookie->GetCurrent(&nodeID, &name) != B_OK)
+			break;
 
-		cookie->Suspend();
+		PRINT("  entry: `%s'\n", name);
+
+		size_t nameLength = strlen(name);
+		if (length < (nameLength + 1)) {
+			// the remaining name buffer length is too small
+			if (count == 0)
+				RETURN_ERROR(B_BUFFER_OVERFLOW);
+			break;
+		}
+		length = nameLength;
+
+		dirent->d_dev = volume->GetID();
+		dirent->d_ino = nodeID;
+		memcpy(dirent->d_name, name, nameLength);
+		dirent->d_name[nameLength] = '\0';
+
+		dirent = next_dirent(dirent, length, bufferSize);
+		count++;
+
+		if (cookie->Next() != B_OK)
+			break;
 	}
 
-	RETURN_ERROR(error);
+	cookie->Suspend();
+
+	*_num = count;
+	return B_OK;
 }
 
 
