@@ -64,13 +64,13 @@ EntryIterator::Suspend()
 	if (fDirectory == NULL || fSuspended)
 		return B_ERROR;
 
-	if (!fDirectory->GetVolume()->IteratorLock())
-		return B_ERROR;
-
-	if (fEntry != NULL)
+	if (fEntry != NULL) {
+		if (!fDirectory->GetVolume()->IteratorLock())
+			return B_ERROR;
 		fEntry->AttachEntryIterator(this);
+		fDirectory->GetVolume()->IteratorUnlock();
+	}
 
-	fDirectory->GetVolume()->IteratorUnlock();
 	fSuspended = true;
 	return B_OK;
 }
@@ -82,14 +82,14 @@ EntryIterator::Resume()
 	if (fDirectory == NULL)
 		return B_ERROR;
 
-	if (!fDirectory->GetVolume()->IteratorLock())
-		return B_ERROR;
-
-	if (fSuspended && fEntry != NULL)
+	if (fSuspended && fEntry != NULL) {
+		if (!fDirectory->GetVolume()->IteratorLock())
+			return B_ERROR;
 		fEntry->DetachEntryIterator(this);
+		fDirectory->GetVolume()->IteratorUnlock();
+	}
 
 	fSuspended = false;
-	fDirectory->GetVolume()->IteratorUnlock();
 	return B_OK;
 }
 
