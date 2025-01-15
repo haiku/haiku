@@ -391,9 +391,6 @@ patch_events()
 	wait_for_child->ParameterAt(2)->SetOut(true);
 	wait_for_child->ParameterAt(3)->SetOut(true);
 
-	Syscall *wait_for_thread = get_syscall("_kern_wait_for_thread");
-	wait_for_thread->ParameterAt(1)->SetOut(true);
-
 	Syscall *wait_for_thread_etc = get_syscall("_kern_wait_for_thread_etc");
 	wait_for_thread_etc->ParameterAt(3)->SetOut(true);
 }
