@@ -1510,9 +1510,6 @@ vm_set_kernel_area_debug_protection(void* cookie, void* _address, size_t size,
 status_t
 vm_block_address_range(const char* name, void* address, addr_t size)
 {
-	if (!arch_vm_supports_protection(0))
-		return B_NOT_SUPPORTED;
-
 	AddressSpaceWriteLocker locker;
 	status_t status = locker.SetTo(VMAddressSpace::KernelID());
 	if (status != B_OK)
@@ -1520,10 +1517,8 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 
 	VMAddressSpace* addressSpace = locker.AddressSpace();
 
-	// create an anonymous cache
 	VMCache* cache;
-	status = VMCacheFactory::CreateAnonymousCache(cache, false, 0, 0, false,
-		VM_PRIORITY_SYSTEM);
+	status = VMCacheFactory::CreateNullCache(VM_PRIORITY_SYSTEM, cache);
 	if (status != B_OK)
 		return status;
 
@@ -1536,15 +1531,15 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 	addressRestrictions.address = address;
 	addressRestrictions.address_specification = B_EXACT_ADDRESS;
 	status = map_backing_store(addressSpace, cache, 0, name, size,
-		B_ALREADY_WIRED, 0, REGION_NO_PRIVATE_MAP, 0, 0, &addressRestrictions,
-		true, &area, NULL);
+		B_NO_LOCK, 0, REGION_NO_PRIVATE_MAP, 0, CREATE_AREA_DONT_COMMIT_MEMORY,
+		&addressRestrictions, true, &area, NULL);
 	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
 		return status;
 	}
 
 	cache->Unlock();
-	area->cache_type = CACHE_TYPE_RAM;
+	area->cache_type = CACHE_TYPE_NULL;
 	return area->id;
 }
 
@@ -4013,12 +4008,35 @@ vm_init(kernel_args* args)
 	vm_block_address_range("overflow protection", lastPage, B_PAGE_SIZE);
 
 #if PARANOID_KERNEL_MALLOC
+	addr_t blockAddress = 0xcccccccc;
+	if (blockAddress < KERNEL_BASE)
+		blockAddress |= KERNEL_BASE;
 	vm_block_address_range("uninitialized heap memory",
-		(void *)ROUNDDOWN(0xcccccccc, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+		(void *)ROUNDDOWN(blockAddress, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+
+#if B_HAIKU_64_BIT
+	blockAddress = 0xcccccccccccccccc;
+	if (blockAddress < KERNEL_BASE)
+		blockAddress |= KERNEL_BASE;
+	vm_block_address_range("uninitialized heap memory",
+		(void *)ROUNDDOWN(blockAddress, B_PAGE_SIZE), B_PAGE_SIZE * 64);
 #endif
+#endif
+
 #if PARANOID_KERNEL_FREE
+	blockAddress = 0xdeadbeef;
+	if (blockAddress < KERNEL_BASE)
+		blockAddress |= KERNEL_BASE;
 	vm_block_address_range("freed heap memory",
-		(void *)ROUNDDOWN(0xdeadbeef, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+		(void *)ROUNDDOWN(blockAddress, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+
+#if B_HAIKU_64_BIT
+	blockAddress = 0xdeadbeefdeadbeef;
+	if (blockAddress < KERNEL_BASE)
+		blockAddress |= KERNEL_BASE;
+	vm_block_address_range("freed heap memory",
+		(void *)ROUNDDOWN(blockAddress, B_PAGE_SIZE), B_PAGE_SIZE * 64);
+#endif
 #endif
 
 	create_page_mappings_object_caches();
