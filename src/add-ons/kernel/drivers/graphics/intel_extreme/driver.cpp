@@ -208,6 +208,10 @@ const struct supported_device {
 	{0x9a60, INTEL_MODEL_TGLM,	"TigerLake"},
 	{0x9a68, INTEL_MODEL_TGLM,	"TigerLake"},
 	{0x9a70, INTEL_MODEL_TGLM,	"TigerLake"},
+
+	{0x46a6, INTEL_MODEL_ALDM,  "Alder Lake-P GT2"},
+	{0x46d1, INTEL_MODEL_ALDM,  "Alder Lake-N"},
+
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -323,6 +327,7 @@ detect_intel_pch()
 			case INTEL_PCH_ADP2_DEVICE_ID:
 			case INTEL_PCH_ADP3_DEVICE_ID:
 			case INTEL_PCH_ADP4_DEVICE_ID:
+			case INTEL_PCH_ADP5_DEVICE_ID:
 				ERROR("%s: Found Alder Lake PCH\n", __func__);
 				return INTEL_PCH_ADP;
 		}

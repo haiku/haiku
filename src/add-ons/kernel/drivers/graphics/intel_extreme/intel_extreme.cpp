@@ -518,7 +518,7 @@ init_interrupt_handler(intel_info &info)
 					write32(info, GEN11_TBT_HOTPLUG_CTL, 0);
 
 					if (info.shared_info->pch_info >= INTEL_PCH_ICP) {
-						if (info.shared_info->pch_info <= INTEL_PCH_TGP)
+						if (info.shared_info->pch_info <= INTEL_PCH_ADP)
 							write32(info, SHPD_FILTER_CNT, SHPD_FILTER_CNT_500_ADJ);
 						read32(info, SDEIMR);
 						write32(info, SDEIMR, 0x3f023f07);

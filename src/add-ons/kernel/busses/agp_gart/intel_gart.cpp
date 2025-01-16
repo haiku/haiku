@@ -237,6 +237,9 @@ const struct supported_device {
 	{0x9a36, 0x9a68, INTEL_MODEL_TGLM, "TigerLake-LP GT1"},
 	{0x9a26, 0x9a60, INTEL_MODEL_TGLM, "TigerLake-LP GT1"},
 	{0x9a26, 0x9a68, INTEL_MODEL_TGLM, "TigerLake-LP GT1"},
+	
+	{0x4621, 0x46a6, INTEL_MODEL_ALDM, "Alder Lake-P GT2"},
+	{0x4621, 0x46d1, INTEL_MODEL_ALDM, "Alder Lake-N GT2"},
 };
 
 struct intel_info {
