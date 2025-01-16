@@ -47,7 +47,7 @@ BEGIN {
 	# store vendor ID for possible devices afterwards
 	vendorid = $1
 	vendor = substr($0, 7)
-	gsub( /\"/, "&&", vendor )
+	gsub( /"/, "&&", vendor )
 
 	# Remove double interrogation points that may be interpreted as trigraphs
 	gsub( /\?\?\?/, "xxx", vendor )
@@ -61,7 +61,7 @@ BEGIN {
 
 	device = substr($0, 8)
 	gsub( /\\/, "&&", device )
-	gsub( /\"/, "&&", device )
+	gsub( /"/, "&&", device )
 
 	# Remove double interrogation points that may be interpreted as trigraphs
 	gsub( /\?\?\?/, "xxx", device )
@@ -81,7 +81,7 @@ BEGIN {
 /^\t\t[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]] / { 
 
 	device = substr($0, 14)
-	gsub( /\"/, "\\\"", device )
+	gsub( /"/, "\\\"", device )
 
 	devicecount++
 	devices[devicecount, 1] = vendorid
@@ -96,7 +96,7 @@ BEGIN {
 
 	class = $2
 	classname = substr($0, 7)
-	gsub( /\"/, "\\\"", classname )
+	gsub( /"/, "\\\"", classname )
 }
 
 # match subclass, use device class data captured earlier, and output
@@ -104,7 +104,7 @@ BEGIN {
 
 	subclass = $1
 	subclassname = substr($0, 6)
-	gsub( /\"/, "\\\"", subclassname )
+	gsub( /"/, "\\\"", subclassname )
 
 	classcount++
 	classes[classcount, 1] = class
@@ -120,7 +120,7 @@ BEGIN {
 
 	proginterface = $1
 	proginterfacename = substr($0, 7)
-	gsub( /\"/, "\\\"", proginterfacename )
+	gsub( /"/, "\\\"", proginterfacename )
 
 	classcount++
 	classes[classcount, 1] = class

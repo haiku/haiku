@@ -49,7 +49,7 @@ BEGIN {
 	# store vendor ID for possible devices afterwards
 	vendorid = $1
 	vendor = substr($0, 7)
-	gsub( /\"/, "&&", vendor )
+	gsub( /"/, "&&", vendor )
 
 	# Remove double interrogation points that may be interpreted as trigraphs
 	gsub( /\?\?\?/, "xxx", vendor )
@@ -63,7 +63,7 @@ BEGIN {
 
 	device = substr($0, 8)
 	gsub( /\\/, "&&", device )
-	gsub( /\"/, "&&", device )
+	gsub( /"/, "&&", device )
 
 	# Remove double interrogation points that may be interpreted as trigraphs
 	gsub( /\?\?\?/, "xxx", device )
@@ -82,7 +82,7 @@ BEGIN {
 
 	class = $2
 	classname = substr($0, 7)
-	gsub( /\"/, "\\\"", classname )
+	gsub( /"/, "\\\"", classname )
 
 	inClassesDefinition = 1
 
@@ -99,7 +99,7 @@ BEGIN {
 inClassesDefinition && (/^\t[[:xdigit:]][[:xdigit:]]  /) {
 	subclass = $1
 	subclassname = substr($0, 6)
-	gsub( /\"/, "\\\"", subclassname )
+	gsub( /"/, "\\\"", subclassname )
 
 	classcount++
 	classes[classcount, 1] = class
@@ -115,7 +115,7 @@ inClassesDefinition && (/^\t\t[[:xdigit:]][[:xdigit:]]  /) {
 
 	protocol = $1
 	protocolname = substr($0, 7)
-	gsub( /\"/, "\\\"", protocolname )
+	gsub( /"/, "\\\"", protocolname )
 
 	classcount++
 	classes[classcount, 1] = class
