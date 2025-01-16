@@ -261,6 +261,9 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 		case 0xDD:	// Wacom Bamboo Pen/Connect (CTL-470) (from Linux Wacom Project)
 			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
 			break;
+		case 0xDE:	// Wacom Bamboo Fun Pen & Touch (CTH-470)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
 		case 0x0301: // One by Wacom CTL-671
 			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO_PT);
 			break;
@@ -876,6 +879,9 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 			break;
 		case 0xDD:
 			*name = "Wacom Bamboo Pen/Connect (CTL-470)";
+			break;
+		case 0xDE:
+			*name = "Wacom Bamboo Fun Pen & Touch (CTH-470)";
 			break;
 		case 0x0301:
 			*name = "One by Wacom (CTL-671)";
