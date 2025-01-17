@@ -140,6 +140,7 @@ Volume::Volume(fs_volume* volume)
 	fMounted(false)
 {
 	rw_lock_init(&fLocker, "ramfs volume");
+	recursive_lock_init(&fListenersLock, "ramfs listeners");
 	recursive_lock_init(&fIteratorLock, "ramfs iterators");
 	recursive_lock_init(&fAttributeIteratorLock, "ramfs attribute iterators");
 	recursive_lock_init(&fQueryLocker, "ramfs queries");
@@ -153,6 +154,7 @@ Volume::~Volume()
 	recursive_lock_destroy(&fAttributeIteratorLock);
 	recursive_lock_destroy(&fIteratorLock);
 	recursive_lock_destroy(&fQueryLocker);
+	recursive_lock_destroy(&fListenersLock);
 	rw_lock_destroy(&fLocker);
 }
 
@@ -461,7 +463,9 @@ Volume::AddNodeListener(NodeListener *listener, Node *node, uint32 flags)
 		|| !(flags & NODE_LISTEN_ALL)) {
 		return B_BAD_VALUE;
 	}
+
 	// add the listener to the right container
+	RecursiveLocker locker(fListenersLock);
 	status_t error = B_OK;
 	NodeListenerValue value(listener, node, flags);
 	if (flags & NODE_LISTEN_ANY_NODE) {
@@ -478,6 +482,8 @@ Volume::RemoveNodeListener(NodeListener *listener, Node *node)
 {
 	if (!listener)
 		return B_BAD_VALUE;
+
+	RecursiveLocker locker(fListenersLock);
 	status_t error = B_OK;
 	if (node)
 		error = fNodeListeners->Remove(node, listener);
@@ -573,7 +579,9 @@ Volume::AddEntryListener(EntryListener *listener, Entry *entry, uint32 flags)
 		|| !(flags & ENTRY_LISTEN_ALL)) {
 		return B_BAD_VALUE;
 	}
+
 	// add the listener to the right container
+	RecursiveLocker locker(fListenersLock);
 	status_t error = B_OK;
 	EntryListenerValue value(listener, entry, flags);
 	if (flags & ENTRY_LISTEN_ANY_ENTRY) {
@@ -590,6 +598,8 @@ Volume::RemoveEntryListener(EntryListener *listener, Entry *entry)
 {
 	if (!listener)
 		return B_BAD_VALUE;
+
+	RecursiveLocker locker(fListenersLock);
 	status_t error = B_OK;
 	if (entry)
 		error = fEntryListeners->Remove(entry, listener);

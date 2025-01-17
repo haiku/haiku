@@ -181,6 +181,8 @@ private:
 	DirectoryEntryTable		*fDirectoryEntryTable;
 	IndexDirectory			*fIndexDirectory;
 	Directory				*fRootDirectory;
+
+	recursive_lock			fListenersLock;
 	NodeListenerTree		*fNodeListeners;
 	NodeListenerList		fAnyNodeListeners;
 	EntryListenerTree		*fEntryListeners;
