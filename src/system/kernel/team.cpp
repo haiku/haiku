@@ -1870,11 +1870,10 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		// responsible for unsetting `loading_info` in the team structure.
 		loadingWaitEntry.Wait();
 
-		// We must synchronize with the thread that woke us up, to ensure
-		// there are no remaining consumers of the team_loading_info.
+		// We must synchronize by temporarily reacquiring the Team lock, to
+		// ensure there are no remaining consumers of the team_loading_info.
 		team->Lock();
-		if (team->loading_info != NULL)
-			panic("team loading wait complete, but loading_info != NULL");
+		ASSERT(team->loading_info == NULL);
 		team->Unlock();
 		teamLoadingReference.Unset();
 
