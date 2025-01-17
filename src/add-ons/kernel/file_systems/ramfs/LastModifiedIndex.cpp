@@ -147,6 +147,8 @@ LastModifiedIndex::CountEntries() const
 status_t
 LastModifiedIndex::Changed(Node *node, time_t oldModified)
 {
+	fVolume->AssertWriteLocked();
+
 	status_t error = B_BAD_VALUE;
 	if (node) {
 		NodeTree::Iterator it;

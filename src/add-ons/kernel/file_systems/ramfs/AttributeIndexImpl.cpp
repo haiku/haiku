@@ -237,6 +237,8 @@ status_t
 AttributeIndexImpl::Changed(Attribute *attribute, const uint8 *oldKey,
 							size_t oldLength)
 {
+	fVolume->AssertWriteLocked();
+
 	status_t error = B_BAD_VALUE;
 	if (attribute && attribute->GetIndex() == this) {
 		// update the iterators and remove the attribute from the tree

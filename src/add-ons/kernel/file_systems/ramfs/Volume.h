@@ -163,6 +163,7 @@ public:
 	void ReadUnlock();
 	bool WriteLock();
 	void WriteUnlock();
+	inline void AssertWriteLocked() { ASSERT_WRITE_LOCKED_RW_LOCK(&fLocker); }
 
 	bool IteratorLock();
 	void IteratorUnlock();

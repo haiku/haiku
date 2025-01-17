@@ -145,6 +145,8 @@ SizeIndex::CountEntries() const
 status_t
 SizeIndex::Changed(Node *node, off_t oldSize)
 {
+	fVolume->AssertWriteLocked();
+
 	status_t error = B_BAD_VALUE;
 	if (node) {
 		NodeTree::Iterator it;
