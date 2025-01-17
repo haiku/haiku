@@ -952,8 +952,8 @@ ramfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 
 	FUNCTION(("node: %lld\n", node->GetID()));
 
-	VolumeReadLocker locker(volume);
-	if (!locker.IsLocked())
+	VolumeReadLocker readLocker(volume);
+	if (!readLocker.IsLocked())
 		RETURN_ERROR(B_ERROR);
 
 	status_t error = B_OK;
@@ -974,10 +974,16 @@ ramfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 		if (!cookie)
 			SET_ERROR(error, B_NO_MEMORY);
 	}
+	readLocker.Unlock();
+
 	// truncate if requested
-	if (error == B_OK && (openMode & O_TRUNC))
+	if (error == B_OK && (openMode & O_TRUNC)) {
+		VolumeWriteLocker writeLocker(volume);
+
 		error = node->SetSize(0);
-	NodeMTimeUpdater mTimeUpdater(node);
+		NodeMTimeUpdater mTimeUpdater(node);
+	}
+
 	// set result / cleanup on failure
 	if (error == B_OK)
 		*_cookie = cookie;
