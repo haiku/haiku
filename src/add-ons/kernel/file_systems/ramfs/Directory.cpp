@@ -190,7 +190,7 @@ Directory::RemoveEntry(Entry *entry)
 														  : B_BAD_VALUE);
 	if (error == B_OK) {
 		// move all iterators pointing to the entry to the next entry
-		if (GetVolume()->IteratorLock()) {
+		if (recursive_lock_lock(&GetVolume()->GetIteratorLock()) == B_OK) {
 			// set the iterators' current entry
 			Entry *nextEntry = fEntries.GetNext(entry);
 			DoublyLinkedList<EntryIterator> *iterators
@@ -208,7 +208,7 @@ Directory::RemoveEntry(Entry *entry)
 				nextIterators->TakeFrom(iterators);
 			} else
 				iterators->RemoveAll();
-			GetVolume()->IteratorUnlock();
+			recursive_lock_unlock(&GetVolume()->GetIteratorLock());
 		} else
 			error = B_ERROR;
 		// remove the entry

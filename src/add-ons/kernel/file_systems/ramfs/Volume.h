@@ -165,10 +165,8 @@ public:
 	void WriteUnlock();
 	inline void AssertWriteLocked() { ASSERT_WRITE_LOCKED_RW_LOCK(&fLocker); }
 
-	bool IteratorLock();
-	void IteratorUnlock();
-
-	recursive_lock&	AttributeIteratorLocker() { return fAttributeIteratorLocker; }
+	recursive_lock&	GetIteratorLock() { return fIteratorLock; }
+	recursive_lock&	GetAttributeIteratorLock() { return fAttributeIteratorLock; }
 
 protected:
 	fs_volume*				fVolume;
@@ -188,8 +186,8 @@ private:
 	EntryListenerTree		*fEntryListeners;
 	EntryListenerList		fAnyEntryListeners;
 
-	recursive_lock			fIteratorLocker;
-	recursive_lock			fAttributeIteratorLocker;
+	recursive_lock			fIteratorLock;
+	recursive_lock			fAttributeIteratorLock;
 
 	recursive_lock			fQueryLocker;
 	QueryList				fQueries;

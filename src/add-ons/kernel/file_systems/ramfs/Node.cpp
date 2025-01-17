@@ -198,7 +198,7 @@ Node::RemoveAttribute(Attribute *attribute)
 	if (attribute == NULL || attribute->GetNode() != this)
 		return B_BAD_VALUE;
 
-	RecursiveLocker locker(GetVolume()->AttributeIteratorLocker());
+	RecursiveLocker locker(GetVolume()->GetAttributeIteratorLock());
 	if (!locker.IsLocked())
 		return B_ERROR;
 

@@ -8,6 +8,8 @@
 #include "EntryIterator.h"
 #include "Volume.h"
 
+#include <util/AutoLock.h>
+
 
 EntryIterator::EntryIterator(Directory *directory)
 	:
@@ -65,10 +67,10 @@ EntryIterator::Suspend()
 		return B_ERROR;
 
 	if (fEntry != NULL) {
-		if (!fDirectory->GetVolume()->IteratorLock())
+		RecursiveLocker locker(fDirectory->GetVolume()->GetIteratorLock());
+		if (!locker.IsLocked())
 			return B_ERROR;
 		fEntry->AttachEntryIterator(this);
-		fDirectory->GetVolume()->IteratorUnlock();
 	}
 
 	fSuspended = true;
@@ -83,10 +85,10 @@ EntryIterator::Resume()
 		return B_ERROR;
 
 	if (fSuspended && fEntry != NULL) {
-		if (!fDirectory->GetVolume()->IteratorLock())
+		RecursiveLocker locker(fDirectory->GetVolume()->GetIteratorLock());
+		if (!locker.IsLocked())
 			return B_ERROR;
 		fEntry->DetachEntryIterator(this);
-		fDirectory->GetVolume()->IteratorUnlock();
 	}
 
 	fSuspended = false;
@@ -121,7 +123,8 @@ EntryIterator::Rewind()
 	if (fDirectory == NULL)
 		return B_ERROR;
 
-	if (!fDirectory->GetVolume()->IteratorLock())
+	RecursiveLocker locker(fDirectory->GetVolume()->GetIteratorLock());
+	if (!locker.IsLocked())
 		return B_ERROR;
 
 	if (fSuspended && fEntry != NULL)
@@ -130,7 +133,6 @@ EntryIterator::Rewind()
 	fEntry = NULL;
 	fIsNext = false;
 	fDone = false;
-	fDirectory->GetVolume()->IteratorUnlock();
 
 	return B_OK;
 }

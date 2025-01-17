@@ -64,7 +64,7 @@ AttributeIterator::Suspend()
 	if (fNode == NULL)
 		return B_ERROR;
 
-	RecursiveLocker locker(fNode->GetVolume()->AttributeIteratorLocker());
+	RecursiveLocker locker(fNode->GetVolume()->GetAttributeIteratorLock());
 	if (!locker.IsLocked())
 		return B_ERROR;
 
@@ -85,7 +85,7 @@ AttributeIterator::Resume()
 	if (fNode == NULL)
 		return B_ERROR;
 
-	RecursiveLocker locker(fNode->GetVolume()->AttributeIteratorLocker());
+	RecursiveLocker locker(fNode->GetVolume()->GetAttributeIteratorLock());
 	if (!locker.IsLocked())
 		return B_ERROR;
 
@@ -127,7 +127,7 @@ AttributeIterator::Rewind()
 	if (fNode == NULL)
 		return B_ERROR;
 
-	RecursiveLocker locker(fNode->GetVolume()->AttributeIteratorLocker());
+	RecursiveLocker locker(fNode->GetVolume()->GetAttributeIteratorLock());
 	if (!locker.IsLocked())
 		return B_ERROR;
 
