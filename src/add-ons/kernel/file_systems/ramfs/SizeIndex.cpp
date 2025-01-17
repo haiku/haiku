@@ -13,6 +13,9 @@
 #include "SizeIndex.h"
 #include "Volume.h"
 
+#include <util/AutoLock.h>
+
+
 // SizeIndexPrimaryKey
 class SizeIndexPrimaryKey {
 public:
@@ -225,6 +228,7 @@ SizeIndex::InternalFind(const uint8 *key, size_t length)
 void
 SizeIndex::_AddIterator(Iterator *iterator)
 {
+	RecursiveLocker locker(fVolume->GetAttributeIteratorLock());
 	fIterators->Insert(iterator);
 }
 
@@ -232,6 +236,7 @@ SizeIndex::_AddIterator(Iterator *iterator)
 void
 SizeIndex::_RemoveIterator(Iterator *iterator)
 {
+	RecursiveLocker locker(fVolume->GetAttributeIteratorLock());
 	fIterators->Remove(iterator);
 }
 

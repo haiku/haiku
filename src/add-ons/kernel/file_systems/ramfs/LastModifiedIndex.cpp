@@ -14,6 +14,9 @@
 #include "NodeListener.h"
 #include "Volume.h"
 
+#include <util/AutoLock.h>
+
+
 // LastModifiedIndexPrimaryKey
 class LastModifiedIndexPrimaryKey {
 public:
@@ -226,6 +229,7 @@ LastModifiedIndex::InternalFind(const uint8 *key, size_t length)
 void
 LastModifiedIndex::_AddIterator(Iterator *iterator)
 {
+	RecursiveLocker locker(fVolume->GetAttributeIteratorLock());
 	fIterators->Insert(iterator);
 }
 
@@ -233,6 +237,7 @@ LastModifiedIndex::_AddIterator(Iterator *iterator)
 void
 LastModifiedIndex::_RemoveIterator(Iterator *iterator)
 {
+	RecursiveLocker locker(fVolume->GetAttributeIteratorLock());
 	fIterators->Remove(iterator);
 }
 
