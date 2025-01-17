@@ -3657,6 +3657,9 @@ free_io_context(io_context* context)
 	rw_lock_destroy(&context->lock);
 
 	remove_node_monitors(context);
+
+	free(context->fds_close_on_exec);
+	free(context->select_infos);
 	free(context->fds);
 	free(context);
 
@@ -5036,7 +5039,7 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 	// If the tables shrink, make sure none of the fds being dropped are in use.
 	if (newSize < oldSize) {
 		for (uint32 i = oldSize; i-- > newSize;) {
-			if (context->fds[i])
+			if (context->fds[i] != NULL)
 				return B_BUSY;
 		}
 	}
