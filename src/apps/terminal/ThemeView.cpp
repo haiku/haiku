@@ -12,6 +12,7 @@
 #include <Catalog.h>
 #include <ColorItem.h>
 #include <ColorListView.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -114,7 +115,8 @@ ThemeView::ThemeView(const char* name, const BMessenger& messenger)
 
 	fColorPreview->Parent()->SetExplicitMaxSize(BSize(B_SIZE_UNSET, fPicker->Bounds().Height()));
 	fAttrList->SetSelectionMessage(new BMessage(MSG_COLOR_ATTRIBUTE_CHOSEN));
-	fScrollView->SetExplicitMinSize(BSize(B_SIZE_UNSET, 22 * 16));
+	float minHeight = be_control_look->DefaultItemSpacing() * 20;
+	fScrollView->SetExplicitMinSize(BSize(B_SIZE_UNSET, minHeight));
 	fColorSchemeField->SetAlignment(B_ALIGN_RIGHT);
 
 	_MakeColorSchemeMenu();
