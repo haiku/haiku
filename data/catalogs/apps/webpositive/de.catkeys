@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	2670512085
+1	german	x-vnd.Haiku-WebPositive	371749163
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
 Copy	Console Window		Kopieren
@@ -14,6 +14,7 @@ There was an error setting up the bookmark.	WebPositive Window		Fehler beim erst
 Fonts	Settings Window		Schriftarten
 Path	Cookie Manager		Pfad
 Bookmarks	WebPositive Window		Lesezeichen
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		'%leaf%' konnte nicht aus der Lesezeichenleiste entfernt werden.
 Use proxy server to connect to the internet	Settings Window		Proxy-Server zur Verbindung mit dem Internet nutzen
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url geladen
 Auto-hide interface in full screen mode	Settings Window		Bedienelemente im Vollbildmodus ausblenden
@@ -36,6 +37,7 @@ Resume prior session	Settings Window		Vorige Sitzung fortsetzen
 Match case	WebPositive Window		Groß-/Kleinschreibung beachten
 Proxy password:	Settings Window		Proxy-Passwort:
 Size:	Font Selection view		Größe:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Das Lesezeichen konnte nicht entfernt werden:\n'%path%'
 Page source	WebPositive Window		Quelltext der Seite
 Proxy server port:	Settings Window		Proxy-Serverport:
 Error opening downloads folder	Download Window		Fehler beim Öffnen des Download-Ordners
@@ -168,4 +170,5 @@ Clear history	WebPositive Window		Verlauf leeren
 Cancel	WebPositive Window		Abbrechen
 Script console	Console Window		Skript-Konsole
 Copy	URL Bar		Kopieren
+Open in new tab	BookmarkBar		In neuem Reiter öffnen
 Open start page	Settings Window		Startseite öffnen

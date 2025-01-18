@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	1912038977
+1	spanish; castilian	x-vnd.Haiku-libtracker	4267788442
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -293,6 +293,7 @@ The Tracker must be running to set the default printer.	PoseView		Tracker debe e
 calculating…	InfoWindow		calculando…
 Preferred for file	OpenWithWindow		Preferencia para el archivo
 OK	AutoMounterSettings		Aceptar
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# seleccionado} other{# seleccionados}}
 copying	FSUtils		Copiando
 Get info	FilePanelPriv		Obtener información
 MIME String	AttributesView		Cadena MIME

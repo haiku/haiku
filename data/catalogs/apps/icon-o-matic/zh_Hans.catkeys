@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	1648958363
+1	english	x-vnd.haiku-icon_o_matic	4044863267
 None	Icon-O-Matic-Properties		无
 Clean up path	Icon-O-Matic-CleanUpPathCmd		清理路径
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -87,6 +87,7 @@ Bummer	Icon-O-Matic-Main	Cancel button - error alert	糟糕
 Translation X	Icon-O-Matic-PropertyNames		平移 X
 Multi-paste properties	Icon-O-Matic-Properties		批量粘贴属性
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		数据加载时，图标套件 并未从 SVG 中解析所有数据。覆盖原文件，将不会再显示该信息。
+Remove	Icon-O-Matic-TransformersList		移除
 Rotate indices backwards	Icon-O-Matic-PathsList		逆时针旋转
 Overwrite	Icon-O-Matic-SVGExport		覆盖
 Cancel	Icon-O-Matic-SVGExport		取消

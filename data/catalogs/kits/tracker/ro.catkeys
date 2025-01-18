@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1912038977
+1	romanian	x-vnd.Haiku-libtracker	4267788442
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -293,6 +293,7 @@ The Tracker must be running to set the default printer.	PoseView		Tracker-ul tre
 calculating…	InfoWindow		se calculează…
 Preferred for file	OpenWithWindow		Preferat pentru fișier
 OK	AutoMounterSettings		OK
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# selected} other{# selected}}
 copying	FSUtils		se copiază
 Get info	FilePanelPriv		Obține informații
 MIME String	AttributesView		Șir MIME

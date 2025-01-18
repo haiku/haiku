@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-icon_o_matic	3174700455
+1	catalan; valencian	x-vnd.haiku-icon_o_matic	1275638063
 None	Icon-O-Matic-Properties		Cap
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Neteja el camí
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -99,6 +99,7 @@ Bummer	Icon-O-Matic-Main	Cancel button - error alert	Problema
 Translation X	Icon-O-Matic-PropertyNames		Traducció X
 Multi-paste properties	Icon-O-Matic-Properties		Enganxament múltiple de propietats
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		L’Iconamàtic pot no haver interpretat totes les dades de l'SVG quan s'ha carregat. En sobreescriure el fitxer original, aquesta informació es perdria.
+Remove	Icon-O-Matic-TransformersList		Suprimeix
 Rotate indices backwards	Icon-O-Matic-PathsList		Gira els índexs enrere
 Overwrite	Icon-O-Matic-SVGExport		Sobreescriu
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Afegeix {0, plural, one{forma} other{formes}}

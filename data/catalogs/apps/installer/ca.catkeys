@@ -46,7 +46,7 @@ Quit	InstallerApp		Surt
 Quit BootManager and DriveSetup	InstallerWindow		Surt del Gestor d'arrencada i del Gestor de discs
 Error writing boot sector.	InstallProgress		Error en escriure el sector d'arrencada.
 OK	InstallerWindow		D'acord
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quan arrenqueu amb èxit el Haiku per primera vegada, assegureu-vos de llegir la nostra Guia de l'usuari i de fer-ne la Visita ràpida. N'hi ha enllaços a l'escriptori i a les adreces d'interès del WebPositive.\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quan arrenqueu amb èxit el Haiku per primera vegada, assegureu-vos de llegir la nostra Guia de l'usuari i de fer-ne la Visita ràpida. N'hi ha enllaços a l'escriptori i als marcadors del WebPositive.\n\n
 Try installing anyway	InstallProgress		Intenta la instal·lació tanmateix
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACIÓ IMPORTANT ABANS D'INSTAL·LAR EL HAIKU\n\n
 Additional disk space required: %s	InstallerWindow		Espai de disc addicional necessari: %s

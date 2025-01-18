@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1912038977
+1	english	x-vnd.Haiku-libtracker	4267788442
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -293,6 +293,7 @@ The Tracker must be running to set the default printer.	PoseView		文件管理�
 calculating…	InfoWindow		计算...
 Preferred for file	OpenWithWindow		文件首选
 OK	AutoMounterSettings		确定
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# 个被选中} other{# 个被选中}}
 copying	FSUtils		复制中
 Get info	FilePanelPriv		获取信息
 MIME String	AttributesView		MIME字符串

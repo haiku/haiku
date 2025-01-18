@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	2670512085
+1	catalan; valencian	x-vnd.Haiku-WebPositive	371749163
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copia
@@ -14,6 +14,7 @@ There was an error setting up the bookmark.	WebPositive Window		Hi ha hagut un e
 Fonts	Settings Window		Lletres
 Path	Cookie Manager		Camí
 Bookmarks	WebPositive Window		Marcadors
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		No s'ha pogut suprimir el marcador %leaf% de la barra.
 Use proxy server to connect to the internet	Settings Window		Useu un servidor intermediari per connectar-vos a Internet.
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url acabat
 Auto-hide interface in full screen mode	Settings Window		Amaga la interfície automàticament en mode de pantalla completa
@@ -36,6 +37,7 @@ Resume prior session	Settings Window		Continua la sessió anterior
 Match case	WebPositive Window		Coincidència de caixa
 Proxy password:	Settings Window		Contrasenya del servidor intermediari:
 Size:	Font Selection view		Mida:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		No s'ha pogut suprimir el marcador:\n%path%
 Page source	WebPositive Window		Codi font de la pàgina
 Proxy server port:	Settings Window		Port del servidor intermediari:
 Error opening downloads folder	Download Window		Error en obrir la carpeta de baixades
@@ -168,4 +170,5 @@ Clear history	WebPositive Window		Neteja'n l'historial
 Cancel	WebPositive Window		Cancel·la
 Script console	Console Window		Script de consola
 Copy	URL Bar		Copia
+Open in new tab	BookmarkBar		Obre en una pestanya nova
 Open start page	Settings Window		Obre la pàgina d'inici

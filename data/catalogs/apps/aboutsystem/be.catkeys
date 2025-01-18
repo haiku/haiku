@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-About	908284476
+1	belarusian	x-vnd.Haiku-About	4182359090
 The Haikuware team and their bounty program\n	AboutView		Каманда Haikuware і ихнія ахвяраванні\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Аўтарскае права © 1999-2007 Michael C. Ring. Правы захаваныя.
 \n\nSpecial thanks to:\n	AboutView		\n\nАсабістыя падзякі:\n
@@ -8,7 +8,6 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 Contributors:\n	AboutView		Удзельнікі:\n
 Kernel:	AboutView		Ядро:
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
-Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Аўтарскае права © 1991-2000 Silicon Graphics, Inc. Правы захаваныя.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Аўтарскае права © 1990-2002 Info-ZIP. Правы захаваныя.
 Copyright © 2003 Peter Hanappe and others.	AboutView		Аўтарскае права © 2003 Peter Hanappe і іншыя.
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Код, якi з'яўляецца ўласнасцю Haiku, асаблiва ядро и праграмы, могуць распаўсюджвацца ў станаўленнi з ўмовами <MIT license>. Некаторыя сiстэмныя бiблiятэки змяшчаюць староннi код, якi распаўсюджваюцца пад лицэнзiяй <LGPL license>. Аўтарскiя правы на староннi код вы можаце знайсцi нiжэй.\n\n

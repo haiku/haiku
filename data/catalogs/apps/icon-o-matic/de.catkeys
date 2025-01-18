@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-icon_o_matic	3174700455
+1	german	x-vnd.haiku-icon_o_matic	1275638063
 None	Icon-O-Matic-Properties		Keine
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Pfad optimieren
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -99,6 +99,7 @@ Bummer	Icon-O-Matic-Main	Cancel button - error alert	Herrje!
 Translation X	Icon-O-Matic-PropertyNames		Verschiebung X
 Multi-paste properties	Icon-O-Matic-Properties		Mehrere Eigenschaften einfügen
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic konnte vielleicht nicht alle Daten aus dem SVG interpretieren, als es geladen wurde. Wird die Originaldatei überschrieben, werden diese Informationen verloren gehen.
+Remove	Icon-O-Matic-TransformersList		Entfernen
 Rotate indices backwards	Icon-O-Matic-PathsList		Indizes rückwärts rotieren
 Overwrite	Icon-O-Matic-SVGExport		Überschreiben
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		{0, plural, one{Form} other{Formen}} hinzufügen

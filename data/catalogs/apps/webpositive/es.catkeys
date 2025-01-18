@@ -1,11 +1,13 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	2942427387
+1	spanish; castilian	x-vnd.Haiku-WebPositive	3076065254
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiar
 (Finish: %date)	Download Window		(Finaliza: %date)
 Open bookmarks confirmation	WebPositive Window		Confirmación para abrir marcadores
+Delete	BookmarkBar		Eliminar
 Download folder:	Settings Window		Carpeta de descargas:
 Close window	WebPositive Window		Cerrar ventana
+Rename	BookmarkBar		Renombrar
 Find:	WebPositive Window		Buscar:
 Script console	WebPositive Window		Consola de scripts
 There was an error setting up the bookmark.	WebPositive Window		Ha ocurrido un error al configurar el marcador.
@@ -150,6 +152,7 @@ Settings	WebPositive Window		Configuración
 Clear	URL Bar		Limpiar
 Loading %url	WebPositive Window		Cargando %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	El pingüino Wenceslao hizo kilómetros bajo exhaustiva lluvia y frío, añoraba a su querido cachorro.
+OK	BookmarkBar		Aceptar
 Start up:	Settings Window		Iniciar:
 Confirmation	WebPositive Window		Confirmación
 Session cookie	Cookie Manager		Cookie de sesión
@@ -162,4 +165,5 @@ Clear history	WebPositive Window		Borrar historial
 Cancel	WebPositive Window		Cancelar
 Script console	Console Window		Consola de scripts
 Copy	URL Bar		Copiar
+Open in new tab	BookmarkBar		Abrir en una nueva pestaña
 Open start page	Settings Window		Abrir página de inicio

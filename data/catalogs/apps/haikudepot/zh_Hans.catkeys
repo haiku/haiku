@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	1756064119
+1	english	x-vnd.Haiku-HaikuDepot	2400534211
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条款下载出错
 Available packages	MainWindow		可用软件包
 It was not possible to create the new user.	UserLoginWindow		无法创建新用户。
@@ -163,6 +163,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		与 Haiku 仓�
 Close	PackageManager		关闭
 Changelog	PackageInfoView		更新记录
 About	PackageInfoView		关于
+Password requirements download problem	UserLoginWindow		下载密码要求出错
 Password:	UserLoginWindow		密码：
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		此应用程序太旧，无法与服务器通信。请更新系统，获取新版本的应用程序。此应用程序要求的最低版本为 \"%s\"。
 Stability	RatePackageWindow		稳定性
@@ -214,6 +215,7 @@ Rate package	RatePackageWindow		软件包评分
 Sending anonymous usage data	MainWindow		发送匿名使用数据
 Log in	UserLoginWindow		登陆
 Usage conditions	UserUsageConditions		使用条款
+Populating package sizes	PopulatePkgSizesProcess		正在获取软件包大小
 HaikuDepot	System name		Haiku 软件库
 Screenshot	ScreenshotWindow		屏幕截图
 Email address:	UserLoginWindow		邮箱地址:
