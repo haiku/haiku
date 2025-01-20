@@ -57,6 +57,8 @@ public:
 	virtual	bool				QuitRequested();
 
 private:
+/*!			@param[in,out] _pagesCreated if set, the pointed integer will be incremented by the number of created pages
+*/
 			void				_RefsReceived(BMessage* message,
 									int32* pagesCreated = NULL,
 									bool* fullscreen = NULL);
@@ -66,6 +68,7 @@ private:
 									bool useBlankTab = true);
 			BrowserWindow*		_CreateNewWindow(const BString& url,
 									bool fullscreen = false);
+			BrowserWindow* 		_FindWindowOnCurrentWorkspace();
 			void				_CreateNewTab(BrowserWindow* window,
 									const BString& url, bool select);
 			void				_ShowWindow(const BMessage* message,
