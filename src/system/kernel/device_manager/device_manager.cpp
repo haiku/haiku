@@ -1654,6 +1654,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 				switch (subType) {
 					case PCI_data_acquisition_other:
 						_AddPath(*stack, "busses", "i2c");
+						_AddPath(*stack, "drivers");
 						break;
 					default:
 						_AddPath(*stack, "drivers");
