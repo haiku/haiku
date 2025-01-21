@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src add-ons kernel drivers power amd_thermal ;
+
+UsePrivateKernelHeaders ;
+
+KernelAddon amd_thermal :
+	amd_thermal.cpp
+	;
+
