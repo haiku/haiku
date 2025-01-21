@@ -345,7 +345,12 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures
-	acpi_button@x86,x86_64
+	x86,x86_64 @{
+		acpi_button
+		acpi_thermal
+		amd_thermal
+		pch_thermal
+	}@ # x86,x86_64
 ] ;
 
 SYSTEM_ADD_ONS_DRIVERS_SENSOR = [ FFilterByBuildFeatures
