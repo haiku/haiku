@@ -788,14 +788,15 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 {
 	TRACE(("VMCache::InsertPage(): cache %p, page %p, offset %" B_PRIdOFF "\n",
 		this, page, offset));
+	T2(InsertPage(this, page, offset));
+
 	AssertLocked();
+	ASSERT(offset >= virtual_base && offset <= virtual_end);
 
 	if (page->CacheRef() != NULL) {
 		panic("insert page %p into cache %p: page cache is set to %p\n",
 			page, this, page->Cache());
 	}
-
-	T2(InsertPage(this, page, offset));
 
 	page->cache_offset = (page_num_t)(offset >> PAGE_SHIFT);
 	page_count++;
@@ -854,7 +855,7 @@ VMCache::MovePage(vm_page* page, off_t offset)
 
 	AssertLocked();
 	oldCache->AssertLocked();
-	ASSERT(offset >= virtual_base && (offset + B_PAGE_SIZE) <= virtual_end);
+	ASSERT(offset >= virtual_base && offset <= virtual_end);
 
 	// remove from old cache
 	oldCache->pages.Remove(page);
