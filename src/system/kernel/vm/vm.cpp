@@ -4367,10 +4367,8 @@ fault_get_page(PageFaultContext& context)
 	}
 
 	if (page == NULL) {
-		// There was no adequate page, determine the cache for a clean one.
-		// Read-only pages come in the deepest cache, only the top most cache
-		// may have direct write access.
-		cache = context.isWrite ? context.topCache : lastCache;
+		// There was no adequate page. Insert a clean one into the topmost cache.
+		cache = context.topCache;
 
 		// allocate a clean page
 		page = vm_page_allocate_page(&context.reservation,
