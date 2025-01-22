@@ -2,7 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2017-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -41,7 +41,7 @@ class MainWindow :
 public:
 								MainWindow(const BMessage& settings);
 								MainWindow(const BMessage& settings,
-									PackageInfoRef& package);
+									const PackageInfoRef package);
 	virtual						~MainWindow();
 
 	// BWindow interface
@@ -63,12 +63,13 @@ public:
 									const UserDetail& userDetail);
 
 	// services PackageInfoListener via MainWindowPackageInfoListener
-			void				PackageChanged(
-									const PackageInfoEvent& event);
+			void				PackagesChanged(const PackageInfoEvents& events);
 
 private:
 	static	const BString		_WindowTitleForPackage(const PackageInfoRef& pkg);
 
+			const std::vector<PackageInfoRef>
+								_CreateSnapshotOfFilteredPackages();
 			std::vector<DepotInfoRef>
 								_CreateSnapshotOfDepots();
 
@@ -95,8 +96,6 @@ private:
 
 			void				_AdoptModelControls();
 			void				_AdoptModel();
-			void				_AddRemovePackageFromLists(
-									const PackageInfoRef& package);
 
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
@@ -128,6 +127,9 @@ private:
 			void				_HandleProcessCoordinatorChanged(
 									ProcessCoordinatorState& coordinatorState);
 
+			void				_HandlePackagesChanged(const BMessage* message);
+			void				_HandlePackagesChanged(const PackageInfoEvents& events);
+
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 	static	status_t			_PopulatePackageWorker(void* arg);
 	static	status_t			_PackagesToShowWorker(void* arg);
@@ -148,6 +150,11 @@ private:
 									const UserDetail& userDetail);
 
 			void				_HandleScreenshotCached(const BMessage* message);
+			void				_HandleIconsChanged();
+
+			void				_SetStateForPackagesByName(
+									BStringList& packageNames,
+									PackageState state);
 
 private:
 			FilterView*			fFilterView;

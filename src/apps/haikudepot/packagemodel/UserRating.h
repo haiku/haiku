@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef USER_RATING_H
@@ -23,7 +23,6 @@ public:
 									uint64 createTimestamp);
 								UserRating(const UserRating& other);
 
-			UserRating&			operator=(const UserRating& other);
 			bool				operator==(const UserRating& other) const;
 			bool				operator!=(const UserRating& other) const;
 

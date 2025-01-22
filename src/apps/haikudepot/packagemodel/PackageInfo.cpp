@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +15,7 @@
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
+#include "PackageInfoListener.h"
 
 
 // #pragma mark - PackageInfo
@@ -29,63 +30,8 @@ PackageInfo::PackageInfo()
 	fClassificationInfo(),
 	fScreenshotInfo(),
 	fUserRatingInfo(),
-	fLocalInfo(),
-
-	fListeners(),
-	fIsCollatingChanges(false),
-	fCollatedChanges(0)
+	fLocalInfo()
 {
-}
-
-
-PackageInfo::PackageInfo(const BPackageInfo& info)
-	:
-	fName(info.Name()),
-
-	fClassificationInfo(),
-	fScreenshotInfo(),
-	fUserRatingInfo(),
-
-	fListeners(),
-	fIsCollatingChanges(false),
-	fCollatedChanges(0)
-{
-
-	// TODO; factor this material out.
-
-	BString publisherURL;
-	if (info.URLList().CountStrings() > 0)
-		publisherURL = info.URLList().StringAt(0);
-
-	BString publisherName = info.Vendor();
-	const BStringList& copyrightList = info.CopyrightList();
-	if (!copyrightList.IsEmpty()) {
-		publisherName = "";
-
-		for (int32 i = 0; i < copyrightList.CountStrings(); i++) {
-			if (!publisherName.IsEmpty())
-				publisherName << ", ";
-			publisherName << copyrightList.StringAt(i);
-		}
-	}
-	if (!publisherName.IsEmpty())
-		publisherName.Prepend("© ");
-
-	fCoreInfo = PackageCoreInfoRef(new PackageCoreInfo(), true);
-	fCoreInfo->SetArchitecture(info.ArchitectureName());
-	fCoreInfo->SetVersion(new PackageVersion(info.Version()));
-	fCoreInfo->SetPublisher(
-		PackagePublisherInfoRef(new PackagePublisherInfo(publisherName, publisherURL), true));
-
-	fLocalizedText = PackageLocalizedTextRef(new PackageLocalizedText(), true);
-	fLocalizedText->SetTitle(info.Name());
-	fLocalizedText->SetSummary(info.Summary());
-	fLocalizedText->SetDescription(info.Description());
-
-	// TODO: Retrieve local file size
-	fLocalInfo = PackageLocalInfoRef(new PackageLocalInfo(), true);
-	fLocalInfo->SetFlags(info.Flags());
-	fLocalInfo->SetFileName(info.FileName());
 }
 
 
@@ -98,27 +44,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fClassificationInfo(other.fClassificationInfo),
 	fScreenshotInfo(other.fScreenshotInfo),
 	fUserRatingInfo(other.fUserRatingInfo),
-	fLocalInfo(other.fLocalInfo),
-
-	fListeners(),
-	fIsCollatingChanges(false),
-	fCollatedChanges(0)
+	fLocalInfo(other.fLocalInfo)
 {
-}
-
-
-PackageInfo&
-PackageInfo::operator=(const PackageInfo& other)
-{
-	fName = other.fName;
-	fCoreInfo = other.fCoreInfo;
-	fLocalizedText = other.fLocalizedText;
-	fClassificationInfo = other.fClassificationInfo;
-	fScreenshotInfo = other.fScreenshotInfo;
-	fUserRatingInfo = other.fUserRatingInfo;
-	fLocalInfo = other.fLocalInfo;
-
-	return *this;
 }
 
 
@@ -142,8 +69,43 @@ PackageInfo::operator!=(const PackageInfo& other) const
 }
 
 
+const BString&
+PackageInfo::Name() const
+{
+	return fName;
+}
+
+
+const PackageCoreInfoRef
+PackageInfo::CoreInfo() const
+{
+	return fCoreInfo;
+}
+
+
+const PackageClassificationInfoRef
+PackageInfo::PackageClassificationInfo() const
+{
+	return fClassificationInfo;
+}
+
+
+const PackageScreenshotInfoRef
+PackageInfo::ScreenshotInfo() const
+{
+	return fScreenshotInfo;
+}
+
+
+void
+PackageInfo::SetName(const BString& value)
+{
+	fName = value;
+}
+
+
 uint32
-PackageInfo::DiffMask(const PackageInfo& other) const
+PackageInfo::ChangeMask(const PackageInfo& other) const
 {
 	uint32 result = 0;
 
@@ -167,14 +129,11 @@ PackageInfo::DiffMask(const PackageInfo& other) const
 void
 PackageInfo::SetCoreInfo(PackageCoreInfoRef value)
 {
-	if (value != fCoreInfo) {
-		fCoreInfo = value;
-		_NotifyListeners(PKG_CHANGED_CORE_INFO);
-	}
+	fCoreInfo = value;
 }
 
 
-PackageLocalizedTextRef
+const PackageLocalizedTextRef
 PackageInfo::LocalizedText() const
 {
 	return fLocalizedText;
@@ -184,16 +143,11 @@ PackageInfo::LocalizedText() const
 void
 PackageInfo::SetLocalizedText(PackageLocalizedTextRef value)
 {
-	if (fLocalizedText != value) {
-		fLocalizedText = value;
-		_NotifyListeners(PKG_CHANGED_LOCALIZED_TEXT);
-			// TODO; separate out these later - they are bundled for now to keep the existing
-			// logic working.
-	}
+	fLocalizedText = value;
 }
 
 
-UserRatingInfoRef
+const PackageUserRatingInfoRef
 PackageInfo::UserRatingInfo() const
 {
 	return fUserRatingInfo;
@@ -201,16 +155,13 @@ PackageInfo::UserRatingInfo() const
 
 
 void
-PackageInfo::SetUserRatingInfo(UserRatingInfoRef value)
+PackageInfo::SetUserRatingInfo(PackageUserRatingInfoRef& value)
 {
-	if (fUserRatingInfo != value) {
-		fUserRatingInfo = value;
-		_NotifyListeners(PKG_CHANGED_RATINGS);
-	}
+	fUserRatingInfo = value;
 }
 
 
-PackageLocalInfoRef
+const PackageLocalInfoRef
 PackageInfo::LocalInfo() const
 {
 	return fLocalInfo;
@@ -220,99 +171,137 @@ PackageInfo::LocalInfo() const
 void
 PackageInfo::SetLocalInfo(PackageLocalInfoRef& localInfo)
 {
-	if (fLocalInfo != localInfo) {
-		fLocalInfo = localInfo;
-		_NotifyListeners(PKG_CHANGED_LOCAL_INFO);
-	}
+	fLocalInfo = localInfo;
 }
 
 
 void
 PackageInfo::SetPackageClassificationInfo(PackageClassificationInfoRef value)
 {
-	if (value != fClassificationInfo) {
-		fClassificationInfo = value;
-		_NotifyListeners(PKG_CHANGED_CLASSIFICATION);
-	}
+	fClassificationInfo = value;
 }
 
 
 void
 PackageInfo::SetScreenshotInfo(PackageScreenshotInfoRef value)
 {
-	if (value != fScreenshotInfo) {
-		fScreenshotInfo = value;
-		_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
-	}
+	fScreenshotInfo = value;
 }
 
 
-bool
-PackageInfo::AddListener(const PackageInfoListenerRef& listener)
+// #pragma mark - PackageLocalInfoBuilder
+
+
+PackageInfoBuilder::PackageInfoBuilder(const BString& name)
+	:
+	fName(name),
+	fCoreInfo(),
+	fLocalizedText(),
+	fClassificationInfo(),
+	fScreenshotInfo(),
+	fUserRatingInfo(),
+	fLocalInfo()
 {
-	fListeners.push_back(listener);
-	return true;
 }
 
 
-void
-PackageInfo::RemoveListener(const PackageInfoListenerRef& listener)
+PackageInfoBuilder::PackageInfoBuilder(const PackageInfoRef& value)
+	:
+	fName(),
+	fCoreInfo(),
+	fLocalizedText(),
+	fClassificationInfo(),
+	fScreenshotInfo(),
+	fUserRatingInfo(),
+	fLocalInfo()
 {
-	fListeners.erase(std::remove(fListeners.begin(), fListeners.end(),
-		listener), fListeners.end());
+	if (value.IsSet())
+		_Init(value.Get());
 }
 
 
-void
-PackageInfo::NotifyChangedIcon()
+PackageInfoBuilder::PackageInfoBuilder(const PackageInfo& value)
 {
-	_NotifyListeners(PKG_CHANGED_ICON);
+	_Init(&value);
 }
 
 
-void
-PackageInfo::StartCollatingChanges()
+PackageInfoBuilder::~PackageInfoBuilder()
 {
-	fIsCollatingChanges = true;
-	fCollatedChanges = 0;
-}
-
-
-void
-PackageInfo::EndCollatingChanges()
-{
-	if (fIsCollatingChanges && fCollatedChanges != 0)
-		_NotifyListenersImmediate(fCollatedChanges);
-	fIsCollatingChanges = false;
-	fCollatedChanges = 0;
-}
-
-
-void
-PackageInfo::_NotifyListeners(uint32 changes)
-{
-	if (fIsCollatingChanges)
-		fCollatedChanges |= changes;
-	else
-		_NotifyListenersImmediate(changes);
 }
 
 
 void
-PackageInfo::_NotifyListenersImmediate(uint32 changes)
+PackageInfoBuilder::_Init(const PackageInfo* value)
 {
-	if (fListeners.empty())
-		return;
+	fName = value->Name();
+	fCoreInfo = value->CoreInfo();
+	fLocalizedText = value->LocalizedText();
+	fClassificationInfo = value->PackageClassificationInfo();
+	fScreenshotInfo = value->ScreenshotInfo();
+	fUserRatingInfo = value->UserRatingInfo();
+	fLocalInfo = value->LocalInfo();
+}
 
-	// Clone list to avoid listeners detaching themselves in notifications
-	// to screw up the list while iterating it.
-	std::vector<PackageInfoListenerRef> listeners(fListeners);
-	PackageInfoEvent event(PackageInfoRef(this), changes);
 
-	std::vector<PackageInfoListenerRef>::iterator it;
-	for (it = listeners.begin(); it != listeners.end(); it++) {
-		const PackageInfoListenerRef listener = *it;
-		if (listener.IsSet())
-			listener->PackageChanged(event);
-	}
+PackageInfoRef
+PackageInfoBuilder::BuildRef()
+{
+	PackageInfo* info = new PackageInfo();
+	info->SetName(fName);
+	info->SetCoreInfo(fCoreInfo);
+	info->SetLocalizedText(fLocalizedText);
+	info->SetPackageClassificationInfo(fClassificationInfo);
+	info->SetScreenshotInfo(fScreenshotInfo);
+	info->SetUserRatingInfo(fUserRatingInfo);
+	info->SetLocalInfo(fLocalInfo);
+	return PackageInfoRef(info, true);
+}
+
+
+PackageInfoBuilder&
+PackageInfoBuilder::WithCoreInfo(PackageCoreInfoRef value)
+{
+	fCoreInfo = value;
+	return *this;
+}
+
+
+PackageInfoBuilder&
+PackageInfoBuilder::WithLocalizedText(PackageLocalizedTextRef value)
+{
+	fLocalizedText = value;
+	return *this;
+}
+
+
+PackageInfoBuilder&
+PackageInfoBuilder::WithPackageClassificationInfo(PackageClassificationInfoRef value)
+{
+	fClassificationInfo = value;
+	return *this;
+}
+
+
+PackageInfoBuilder&
+PackageInfoBuilder::WithUserRatingInfo(PackageUserRatingInfoRef value)
+{
+	fUserRatingInfo = value;
+	return *this;
+}
+
+
+PackageInfoBuilder&
+PackageInfoBuilder::WithLocalInfo(PackageLocalInfoRef value)
+{
+	fLocalInfo = value;
+	return *this;
+}
+
+
+PackageInfoBuilder&
+PackageInfoBuilder::WithScreenshotInfo(PackageScreenshotInfoRef value)
+{
+	fScreenshotInfo = value;
+	return *this;
 }

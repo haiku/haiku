@@ -1,11 +1,10 @@
 /*
- * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "PackageIconTarRepository.h"
 
 #include <AutoDeleter.h>
-#include <Autolock.h>
 #include <File.h>
 #include <IconUtils.h>
 #include <StopWatch.h>
@@ -87,8 +86,7 @@ IconTarPtrEntryListener::Handle(const TarArchiveHeader& header,
 	BString packageName;
 	BString leafName;
 	fileName.CopyInto(packageName, 5, secondSlashIdx - 5);
-	fileName.CopyInto(leafName, secondSlashIdx + 1,
-		fileName.Length() - (secondSlashIdx + 1));
+	fileName.CopyInto(leafName, secondSlashIdx + 1, fileName.Length() - (secondSlashIdx + 1));
 	BitmapSize storedSize;
 
 	if (_LeafNameToBitmapSize(leafName, &storedSize) == B_OK)
@@ -121,31 +119,21 @@ IconTarPtrEntryListener::_LeafNameToBitmapSize(BString& leafName, BitmapSize* st
 }
 
 
-PackageIconTarRepository::PackageIconTarRepository()
+PackageIconTarRepository::PackageIconTarRepository(BPath& tarPath)
 	:
+	fTarPath(tarPath),
 	fTarIo(NULL),
 	fIconCache(LIMIT_ICON_CACHE),
-	fDefaultIconVectorData(NULL),
-	fDefaultIconVectorDataSize(0),
-	fDefaultIconCache(LIMIT_ICON_CACHE),
-	fIconDataBuffer(new BMallocIO())
+	fIconDataBuffer(new BMallocIO()),
+	fFallbackRepository(PackageIconDefaultRepository())
 {
-	_InitDefaultVectorIcon();
 }
 
 
 PackageIconTarRepository::~PackageIconTarRepository()
 {
+	_Close();
 	delete fIconDataBuffer;
-	delete fDefaultIconVectorData;
-}
-
-
-void
-PackageIconTarRepository::Clear() {
-	BAutolock locker(&fLock);
-	fIconCache.Clear();
-	fDefaultIconCache.Clear();
 }
 
 
@@ -155,27 +143,25 @@ PackageIconTarRepository::Clear() {
 */
 
 status_t
-PackageIconTarRepository::Init(BPath& tarPath)
+PackageIconTarRepository::Init()
 {
-	BAutolock locker(&fLock);
-
 	_Close();
 
 	status_t result = B_OK;
 
-	if (tarPath.Path() == NULL) {
+	if (fTarPath.Path() == NULL) {
 		HDINFO("empty path to tar-ball");
 		result = B_BAD_VALUE;
 	}
 
-	BFile *tarIo = NULL;
+	BFile* tarIo = NULL;
 
 	if (result == B_OK) {
-		HDINFO("will init icon model from tar [%s]", tarPath.Path());
-		tarIo = new BFile(tarPath.Path(), O_RDONLY);
+		HDINFO("will init icon model from tar [%s]", fTarPath.Path());
+		tarIo = new BFile(fTarPath.Path(), O_RDONLY);
 
 		if (!tarIo->IsReadable()) {
-			HDERROR("unable to read the tar [%s]", tarPath.Path());
+			HDERROR("unable to read the tar [%s]", fTarPath.Path());
 			result = B_IO_ERROR;
 		}
 	}
@@ -184,15 +170,14 @@ PackageIconTarRepository::Init(BPath& tarPath)
 
 	if (result == B_OK) {
 		BStopWatch watch("PackageIconTarRepository::Init", true);
-		HDINFO("will read [%s] and collect the tar pointers", tarPath.Path());
+		HDINFO("will read [%s] and collect the tar pointers", fTarPath.Path());
 
 		IconTarPtrEntryListener* listener = new IconTarPtrEntryListener(this);
 		ObjectDeleter<IconTarPtrEntryListener> listenerDeleter(listener);
 		TarArchiveService::ForEachEntry(*tarIo, listener);
 
 		double secs = watch.ElapsedTime() / 1000000.0;
-		HDINFO("did collect %" B_PRIi32 " tar pointers (%6.3g secs)",
-			fIconTarPtrs.Size(), secs);
+		HDINFO("did collect %" B_PRIi32 " tar pointers (%6.3g secs)", fIconTarPtrs.Size(), secs);
 	}
 
 	if (result == B_OK)
@@ -214,29 +199,19 @@ PackageIconTarRepository::_Close()
 	delete fTarIo;
 	fTarIo = NULL;
 	fIconTarPtrs.Clear();
-	fDefaultIconCache.Clear();
 }
 
 
-/*!	This method should be treated private and only called from a situation
-	in which the class's lock is acquired.  It is used to populate data from
-	the parsing of the tar headers.  It is called from the listener above.
+/*!	This method is used to populate data from the parsing of the tar headers.
+	It is called from the listener above.
 */
+// TODO; should be friend to the listener
 void
 PackageIconTarRepository::AddIconTarPtr(const BString& packageName, BitmapSize storedSize,
 	off_t offset)
 {
 	IconTarPtrRef tarPtrRef = _GetOrCreateIconTarPtr(packageName);
 	tarPtrRef->SetOffset(storedSize, offset);
-}
-
-
-bool
-PackageIconTarRepository::HasAnyIcon(const BString& pkgName)
-{
-	BAutolock locker(&fLock);
-	HashString key(pkgName);
-	return fIconTarPtrs.ContainsKey(key);
 }
 
 
@@ -250,39 +225,44 @@ PackageIconTarRepository::GetIcon(const BString& pkgName, uint32 size,
 		return B_BAD_VALUE;
 	}
 
+	status_t result = B_OK;
 	bitmapHolderRef.Unset();
 
-	BAutolock locker(&fLock);
-	status_t result = B_OK;
-	off_t iconDataTarOffset = -1;
-	const IconTarPtrRef tarPtrRef = _GetIconTarPtr(pkgName);
-	BitmapSize storedSize;
+	if (fTarIo == NULL) {
+		// get the default icon in this case.
+		HDDEBUG("the tar io was not configured indicating a possible initialization error");
+	} else {
+		off_t iconDataTarOffset = -1;
+		const IconTarPtrRef tarPtrRef = _GetIconTarPtr(pkgName);
+		BitmapSize storedSize;
 
-	if (tarPtrRef.IsSet()) {
-		storedSize = _BestStoredSize(tarPtrRef, size);
-		iconDataTarOffset = tarPtrRef->Offset(storedSize);
-	}
+		if (tarPtrRef.IsSet()) {
+			storedSize = _BestStoredSize(tarPtrRef, size);
+			iconDataTarOffset = tarPtrRef->Offset(storedSize);
+		}
 
-	if (iconDataTarOffset >= 0) {
-		HashString key = _ToIconCacheKey(pkgName, storedSize, size);
+		if (iconDataTarOffset >= 0) {
+			HashString key = _ToIconCacheKey(pkgName, storedSize, size);
 
-		if (fIconCache.ContainsKey(key)) {
-			bitmapHolderRef.SetTo(fIconCache.Get(key).Get());
-		} else {
-			result = _CreateIconFromTarOffset(iconDataTarOffset, storedSize, size, bitmapHolderRef);
-			if (result == B_OK) {
-				HDTRACE("loaded package icon [%s] of size %" B_PRId32, pkgName.String(), size);
-				fIconCache.Put(key, bitmapHolderRef);
+			if (fIconCache.ContainsKey(key)) {
 				bitmapHolderRef.SetTo(fIconCache.Get(key).Get());
 			} else {
-				HDERROR("failure to read image for package [%s] at offset %"
-					B_PRIdOFF, pkgName.String(), iconDataTarOffset);
+				result = _CreateIconFromTarOffset(iconDataTarOffset, storedSize, size,
+					bitmapHolderRef);
+				if (result == B_OK) {
+					HDTRACE("loaded package icon [%s] of size %" B_PRId32, pkgName.String(), size);
+					fIconCache.Put(key, bitmapHolderRef);
+					bitmapHolderRef.SetTo(fIconCache.Get(key).Get());
+				} else {
+					HDERROR("failure to read image for package [%s] at offset %" B_PRIdOFF,
+						pkgName.String(), iconDataTarOffset);
+				}
 			}
 		}
 	}
 
 	if (!bitmapHolderRef.IsSet())
-		result = _GetDefaultIcon(size, bitmapHolderRef);
+		result = fFallbackRepository.GetIcon(pkgName, size, bitmapHolderRef);
 
 	return result;
 }
@@ -324,8 +304,6 @@ PackageIconTarRepository::_ToIconCacheKey(const BString& pkgName, BitmapSize sto
 }
 
 
-/*!	This method must only be invoked with the class locked.
- */
 status_t
 PackageIconTarRepository::_CreateIconFromTarOffset(off_t offset, BitmapSize storedSize, uint32 size,
 	BitmapHolderRef& bitmapHolderRef)
@@ -409,7 +387,6 @@ PackageIconTarRepository::_BestStoredSize(const IconTarPtrRef iconTarPtrRef, int
 IconTarPtrRef
 PackageIconTarRepository::_GetOrCreateIconTarPtr(const BString& pkgName)
 {
-	BAutolock locker(&fLock);
 	HashString key(pkgName);
 	if (!fIconTarPtrs.ContainsKey(key)) {
 		IconTarPtrRef value(new IconTarPtr(pkgName));
@@ -417,81 +394,4 @@ PackageIconTarRepository::_GetOrCreateIconTarPtr(const BString& pkgName)
 		return value;
 	}
 	return fIconTarPtrs.Get(key);
-}
-
-
-status_t
-PackageIconTarRepository::_GetDefaultIcon(uint32 size, BitmapHolderRef& bitmapHolderRef)
-{
-	if (fDefaultIconVectorData == NULL)
-		return B_NOT_INITIALIZED;
-
-	bitmapHolderRef.Unset();
-
-	status_t status = B_OK;
-	HashString key(BString() << size);
-
-	if (!fDefaultIconCache.ContainsKey(key)) {
-		BBitmap* bitmap = NULL;
-
-		if (status == B_OK) {
-			bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
-			status = bitmap->InitCheck();
-		}
-
-		if (status == B_OK) {
-			status = BIconUtils::GetVectorIcon(fDefaultIconVectorData, fDefaultIconVectorDataSize,
-				bitmap);
-		}
-
-		if (status == B_OK) {
-			HDINFO("did create default package icon size %" B_PRId32, size);
-			BitmapHolderRef bitmapHolder(new(std::nothrow) BitmapHolder(bitmap), true);
-			fDefaultIconCache.Put(key, bitmapHolder);
-		} else {
-			delete bitmap;
-			bitmap = NULL;
-		}
-	}
-
-	if (status == B_OK)
-		bitmapHolderRef.SetTo(fDefaultIconCache.Get(key).Get());
-	else
-		HDERROR("failed to create default package icon size %" B_PRId32, size);
-
-	return status;
-}
-
-
-void
-PackageIconTarRepository::_InitDefaultVectorIcon()
-{
-	if (fDefaultIconVectorData != NULL) {
-		delete fDefaultIconVectorData;
-		fDefaultIconVectorData = NULL;
-	}
-
-	fDefaultIconVectorDataSize = 0;
-
-	BMimeType mimeType("application/x-vnd.haiku-package");
-	status_t status = mimeType.InitCheck();
-
-	uint8* data;
-	size_t dataSize;
-
-	if (status == B_OK)
-		status = mimeType.GetIcon(&data, &dataSize);
-
-	if (status == B_OK) {
-		fDefaultIconVectorData = new(std::nothrow) uint8[dataSize];
-
-		if (fDefaultIconVectorData == NULL)
-			HDFATAL("unable to allocate memory for the default icon");
-
-		memcpy(fDefaultIconVectorData, data, dataSize);
-		fDefaultIconVectorDataSize = dataSize;
-	} else {
-		fDefaultIconVectorData = NULL;
-		fDefaultIconVectorDataSize = 0;
-	}
 }

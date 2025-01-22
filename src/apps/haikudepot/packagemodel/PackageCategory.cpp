@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -41,12 +41,10 @@ PackageCategory::PackageCategory(const PackageCategory& other)
 }
 
 
-PackageCategory&
-PackageCategory::operator=(const PackageCategory& other)
+bool
+PackageCategory::operator<(const PackageCategory& other) const
 {
-	fCode = other.fCode;
-	fName = other.fName;
-	return *this;
+	return Compare(other) < 0;
 }
 
 
@@ -68,18 +66,17 @@ int
 PackageCategory::Compare(const PackageCategory& other) const
 {
 	BCollator* collator = LocaleUtils::GetSharedCollator();
-	int32 result = collator->Compare(Name().String(),
-		other.Name().String());
+	int32 result = collator->Compare(Name().String(), other.Name().String());
 	if (result == 0)
 		result = Code().Compare(other.Code());
 	return result;
 }
 
 
-bool IsPackageCategoryBefore(const CategoryRef& c1,
-	const CategoryRef& c2)
+bool
+IsPackageCategoryRefLess(const CategoryRef& c1, const CategoryRef& c2)
 {
 	if (!c1.IsSet() || !c2.IsSet())
-		HDFATAL("unexpected NULL reference in a referencable");
-	return c1->Compare(*c2) < 0;
+		HDFATAL("illegal state in package category less");
+	return *(c1.Get()) < *(c2.Get());
 }

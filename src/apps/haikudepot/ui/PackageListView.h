@@ -1,7 +1,7 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_LIST_VIEW_H
@@ -18,7 +18,6 @@
 
 
 class PackageRow;
-class PackageListener;
 class WorkStatusView;
 
 
@@ -30,19 +29,26 @@ public:
 	virtual void				AttachedToWindow();
 	virtual	void				AllAttached();
 
-	virtual	void				MessageReceived(BMessage* message);
-
 	virtual void				SelectionChanged();
 
 	virtual void				Clear();
-			void				AddPackage(const PackageInfoRef& package);
-			void				RemovePackage(const PackageInfoRef& package);
+			void				RetainPackages(const std::vector<PackageInfoRef>& packages);
+			void				AddRemovePackages(const std::vector<PackageInfoRef>& addedPackages,
+									const std::vector<PackageInfoRef>& removedPackages);
 
 			void				SelectPackage(const PackageInfoRef& package);
 
 			void				AttachWorkStatusView(WorkStatusView* view);
 
+			void				HandleIconsChanged();
+			void				HandlePackagesChanged(const PackageInfoEvents& events);
+
 private:
+			void				_HandlePackageChanged(const PackageInfoEvent& event);
+
+			void				_AddPackage(const PackageInfoRef& package);
+			void				_RemovePackage(const PackageInfoRef& package);
+
 			PackageRow*			_FindRow(const PackageInfoRef& package);
 			PackageRow*			_FindRow(const BString& packageName);
 
@@ -53,7 +59,6 @@ private:
 
 			Model*				fModel;
 			ItemCountView*		fItemCountView;
-			PackageListener*	fPackageListener;
 			RowByNameTable*		fRowByNameTable;
 
 			WorkStatusView*		fWorkStatusView;

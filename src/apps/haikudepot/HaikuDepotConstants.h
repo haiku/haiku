@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef HAIKU_DEPOT_CONSTANTS_H
@@ -118,9 +118,19 @@ enum UserUsageConditionsSelectionMode {
 	// any prominence ordering value greater than this is not prominent.
 #define PROMINANCE_ORDERING_MAX				1000
 	// this is the highest prominence value possible.
+#define PROMINANCE_ORDERING_NONE			0
 
 #define SINGLE_PACKAGE_DEPOT_NAME "__hd_single_pkg_depot"
 	// used as a fake depot name for the case where the application is looking
 	// at a single package based on a file.
+
+#define SINGLE_PACKAGE_DEPOT_IDENTIFIER "__hd_single_pkg_depot_id_c07fb16620f4"
+	// used as a fake depot name for the case where the application is looking
+	// at a single package based on a file.
+
+#define LOCAL_DEPOT_IDENTIFIER "__hd_local_depot_id_008922773013"
+	// used as a fake depot identifier that is a placeholder used to convey
+	// packages that are only installed locally and do not exist in a remote
+	// repository.
 
 #endif // HAIKU_DEPOT_CONSTANTS_H

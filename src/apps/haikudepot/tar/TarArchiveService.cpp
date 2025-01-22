@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "TarArchiveService.h"
@@ -30,7 +30,7 @@
 	data for the parsed entry.
 */
 
-/*static*/	status_t
+/*static*/ status_t
 TarArchiveService::GetEntry(BPositionIO& tarIo, TarArchiveHeader& header)
 {
 	uint8 buffer[LENGTH_BLOCK];
@@ -46,7 +46,7 @@ TarArchiveService::GetEntry(BPositionIO& tarIo, TarArchiveHeader& header)
 	useful for obtaining a catalog of items in the tar file for example.
 */
 
-/*status*/	status_t
+/*status*/ status_t
 TarArchiveService::ForEachEntry(BPositionIO& tarIo, TarEntryListener* listener)
 {
 	uint8 buffer[LENGTH_BLOCK];
@@ -58,21 +58,17 @@ TarArchiveService::ForEachEntry(BPositionIO& tarIo, TarEntryListener* listener)
 	memset(zero_buffer, 0, sizeof zero_buffer);
 	tarIo.Seek(offset, SEEK_SET);
 
-	while (result == B_OK
-			&& B_OK == (result = tarIo.ReadExactly(
-				buffer, LENGTH_BLOCK))) {
+	while (result == B_OK && B_OK == (result = tarIo.ReadExactly(buffer, LENGTH_BLOCK))) {
 
 		if (memcmp(zero_buffer, buffer, sizeof zero_buffer) == 0) {
-			HDDEBUG("detected end of tar-ball after %" B_PRIu32 " items",
-				countItemsRead);
+			HDTRACE("detected end of tar-ball after %" B_PRIu32 " items", countItemsRead);
 			return B_OK; // end of tar-ball.
 		}
 
 		TarArchiveHeader header;
 		result = _ReadHeader(buffer, header);
 
-		HDTRACE("did read tar entry header for [%s]",
-			header.FileName().String());
+		HDTRACE("did read tar entry header for [%s]", header.FileName().String());
 
 		if (result == B_OK) {
 			countItemsRead++;
@@ -81,8 +77,7 @@ TarArchiveService::ForEachEntry(BPositionIO& tarIo, TarEntryListener* listener)
 			// and/or just process the header information.
 
 			if (listener != NULL) {
-				BDataIO *entryData = new ConstraintedDataIO(&tarIo,
-					header.Length());
+				BDataIO* entryData = new ConstraintedDataIO(&tarIo, header.Length());
 				ObjectDeleter<BDataIO> entryDataDeleter(entryData);
 				result = listener->Handle(header, offset, entryData);
 			}
@@ -105,7 +100,8 @@ TarArchiveService::ForEachEntry(BPositionIO& tarIo, TarEntryListener* listener)
 
 
 tar_file_type
-TarArchiveService::_ReadHeaderFileType(unsigned char data) {
+TarArchiveService::_ReadHeaderFileType(unsigned char data)
+{
 	switch (data) {
 		case 0:
 		case '0':
@@ -117,22 +113,20 @@ TarArchiveService::_ReadHeaderFileType(unsigned char data) {
 
 
 /*static*/ int32
-TarArchiveService::_ReadHeaderStringLength(const uint8* data,
-	size_t maxStringLength)
+TarArchiveService::_ReadHeaderStringLength(const uint8* data, size_t maxStringLength)
 {
-	int32 actualLength = 0;
-	while (actualLength < (int32) maxStringLength && data[actualLength] != 0)
+	size_t actualLength = 0;
+
+	while (actualLength < maxStringLength && data[actualLength] != 0)
 		actualLength++;
-	return actualLength;
+	return static_cast<int32>(actualLength);
 }
 
 
 void
-TarArchiveService::_ReadHeaderString(const uint8 *data, size_t maxStringLength,
-	BString& result)
+TarArchiveService::_ReadHeaderString(const uint8* data, size_t maxStringLength, BString& result)
 {
-	result.SetTo((const char *) data,
-		_ReadHeaderStringLength(data, maxStringLength));
+	result.SetTo((const char*)data, _ReadHeaderStringLength(data, maxStringLength));
 }
 
 
@@ -140,7 +134,8 @@ TarArchiveService::_ReadHeaderString(const uint8 *data, size_t maxStringLength,
 	character in an number expressed in octal.
 */
 
-static bool tar_is_octal_digit(unsigned char c)
+static bool
+tar_is_octal_digit(unsigned char c)
 {
 	switch (c) {
 		case '0':
@@ -159,7 +154,7 @@ static bool tar_is_octal_digit(unsigned char c)
 
 
 /*static*/ uint32
-TarArchiveService::_ReadHeaderNumeric(const uint8 *data, size_t dataLength)
+TarArchiveService::_ReadHeaderNumeric(const uint8* data, size_t dataLength)
 {
 	uint32 actualLength = 0;
 
@@ -187,7 +182,7 @@ TarArchiveService::_CalculateBlockChecksum(const uint8* block)
 		if (i >= OFFSET_CHECKSUM && i < OFFSET_CHECKSUM + LENGTH_CHECKSUM)
 			result += 32;
 		else
-			result += (uint32) block[i];
+			result += static_cast<uint32>(block[i]);
 	}
 
 	return result;
@@ -198,12 +193,10 @@ TarArchiveService::_CalculateBlockChecksum(const uint8* block)
 TarArchiveService::_ReadHeader(const uint8* block, TarArchiveHeader& header)
 {
 	uint32 actualChecksum = _CalculateBlockChecksum(block);
-	uint32 expectedChecksum = _ReadHeaderNumeric(&block[OFFSET_CHECKSUM],
-		LENGTH_CHECKSUM);
+	uint32 expectedChecksum = _ReadHeaderNumeric(&block[OFFSET_CHECKSUM], LENGTH_CHECKSUM);
 
-	if(actualChecksum != expectedChecksum) {
-		HDERROR("tar archive header has bad checksum;"
-			"expected %" B_PRIu32 " actual %" B_PRIu32,
+	if (actualChecksum != expectedChecksum) {
+		HDERROR("tar archive header has bad checksum; expected %" B_PRIu32 " actual %" B_PRIu32,
 			expectedChecksum, actualChecksum);
 		return B_BAD_DATA;
 	}
@@ -212,10 +205,8 @@ TarArchiveService::_ReadHeader(const uint8* block, TarArchiveHeader& header)
 	_ReadHeaderString(&block[OFFSET_FILENAME], LENGTH_FILENAME, fileName);
 
 	header.SetFileName(fileName);
-	header.SetLength(
-		_ReadHeaderNumeric(&block[OFFSET_LENGTH], LENGTH_LENGTH));
-	header.SetFileType(
-		_ReadHeaderFileType(block[OFFSET_FILETYPE]));
+	header.SetLength(_ReadHeaderNumeric(&block[OFFSET_LENGTH], LENGTH_LENGTH));
+	header.SetFileType(_ReadHeaderFileType(block[OFFSET_FILETYPE]));
 
 	return B_OK;
 }

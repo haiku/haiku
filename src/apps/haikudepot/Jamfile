@@ -57,6 +57,7 @@ local dumpExportReferenceModelTargetFile =
 # source directories
 local sourceDirs =
 	edits_generic
+	icon
 	model
 	packagemanagement
 	packagemodel
@@ -124,21 +125,18 @@ local applicationSources =
 	FeaturedPackagesView.cpp
 	FilterView.cpp
 	GeneralContentScrollView.cpp
-	IconTarPtr.cpp
+	IdentityAndAccessUtils.cpp
 	IncrementViewCounterProcess.cpp
 	JobStateListener.cpp
 	JwtTokenHelper.cpp
-	LanguageRepository.cpp
 	LinkView.cpp
 	LinkedBitmapView.cpp
 	Logger.cpp
 	main.cpp
 	MainWindow.cpp
 	MarkupTextView.cpp
-	MessagePackageListener.cpp
 	Model.cpp
 	PackageContentsView.cpp
-	PackageIconTarRepository.cpp
 	PackageInfoListener.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
@@ -165,6 +163,11 @@ local applicationSources =
 	ValidationUtils.cpp
 	WorkStatusView.cpp
 
+	# icon
+	IconTarPtr.cpp
+	PackageIconDefaultRepository.cpp
+	PackageIconTarRepository.cpp
+
 	# packagemanagement
 	AbstractPackageProcess.cpp
 	InstallPackageProcess.cpp
@@ -180,17 +183,17 @@ local applicationSources =
 	PackageClassificationInfo.cpp
 	PackageCoreInfo.cpp
 	PackageFilter.cpp
-	PackageFilterModel.cpp
+	PackageFilterSpecification.cpp
 	PackageInfo.cpp
 	PackageLocalInfo.cpp
 	PackageLocalizedText.cpp
 	PackagePublisherInfo.cpp
 	PackageScreenshotInfo.cpp
+	PackageUserRatingInfo.cpp
 	PackageVersion.cpp
 	ScreenshotInfo.cpp
 	UserInfo.cpp
 	UserRating.cpp
-	UserRatingInfo.cpp
 	UserRatingSummary.cpp
 
 	# network + server / local processes
@@ -231,7 +234,6 @@ local applicationSources =
 	PackageUtils.cpp
 	StorageUtils.cpp
 	StringUtils.cpp
-	LoggingUrlProtocolListener.cpp
 
 	# package_daemon
 	ProblemWindow.cpp

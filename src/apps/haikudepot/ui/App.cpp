@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2017-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -13,19 +13,20 @@
 #include <Catalog.h>
 #include <Entry.h>
 #include <Message.h>
-#include <package/PackageDefs.h>
-#include <package/PackageInfo.h>
-#include <package/PackageRoster.h>
 #include <Path.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
+#include <package/PackageDefs.h>
+#include <package/PackageInfo.h>
+#include <package/PackageRoster.h>
 
 #include "support.h"
 
 #include "AppUtils.h"
 #include "Logger.h"
 #include "MainWindow.h"
+#include "PackageKitUtils.h"
 #include "PackageUtils.h"
 #include "ServerHelper.h"
 #include "ServerSettings.h"
@@ -44,7 +45,7 @@ App::App()
 	fWindowCount(0),
 	fSettingsRead(false)
 {
-	srand((unsigned int) time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 	_CheckPackageDaemonRuns();
 	fIsFirstRun = _CheckIsFirstRun();
 }
@@ -62,13 +63,10 @@ App::~App()
 bool
 App::QuitRequested()
 {
-	if (fMainWindow != NULL
-		&& fMainWindow->LockLooperWithTimeout(1500000) == B_OK) {
+	if (fMainWindow != NULL && fMainWindow->LockLooperWithTimeout(1500000) == B_OK) {
 		BMessage windowSettings;
 		fMainWindow->StoreSettings(windowSettings);
-
 		fMainWindow->UnlockLooper();
-
 		_StoreSettings(windowSettings);
 	}
 
@@ -111,10 +109,8 @@ App::MessageReceived(BMessage* message)
 		case MSG_MAIN_WINDOW_CLOSED:
 		{
 			BMessage windowSettings;
-			if (message->FindMessage(KEY_WINDOW_SETTINGS,
-					&windowSettings) == B_OK) {
+			if (message->FindMessage(KEY_WINDOW_SETTINGS, &windowSettings) == B_OK)
 				_StoreSettings(windowSettings);
-			}
 
 			fWindowCount--;
 			if (fWindowCount == 0)
@@ -199,7 +195,7 @@ app_print_help()
 
 
 static arg_switch
-app_resolve_switch(char *arg)
+app_resolve_switch(char* arg)
 {
 	int arglen = strlen(arg);
 
@@ -223,18 +219,14 @@ app_resolve_switch(char *arg)
 
 			if (0 == strcmp(&arg[2], "dropcache"))
 				return DROP_CACHE_SWITCH;
-		} else {
-			if (arglen == 2) { // short form
-				switch (arg[1]) {
-					case 'u':
-						return WEB_APP_BASE_URL_SWITCH;
-
-					case 'h':
-						return HELP_SWITCH;
-
-					case 'v':
-						return VERBOSITY_SWITCH;
-				}
+		} else if (arglen == 2) { // short form
+			switch (arg[1]) {
+				case 'h':
+					return HELP_SWITCH;
+				case 'u':
+					return WEB_APP_BASE_URL_SWITCH;
+				case 'v':
+					return VERBOSITY_SWITCH;
 			}
 		}
 
@@ -250,15 +242,14 @@ App::ArgvReceived(int32 argc, char* argv[])
 {
 	for (int i = 1; i < argc;) {
 
-			// check to make sure that if there is a value for the switch,
-			// that the value is in fact supplied.
+		// check to make sure that if there is a value for the switch,
+		// that the value is in fact supplied.
 
 		switch (app_resolve_switch(argv[i])) {
 			case VERBOSITY_SWITCH:
 			case WEB_APP_BASE_URL_SWITCH:
-				if (i == argc-1) {
-					fprintf(stdout, "unexpected end of arguments; missing "
-						"value for switch [%s]\n", argv[i]);
+				if (i == argc - 1) {
+					HDERROR("unexpected end of arguments; missing value for switch [%s]", argv[i]);
 					Quit();
 					return;
 				}
@@ -268,12 +259,12 @@ App::ArgvReceived(int32 argc, char* argv[])
 				break;
 		}
 
-			// now process each switch.
+		// now process each switch.
 
 		switch (app_resolve_switch(argv[i])) {
 
 			case VERBOSITY_SWITCH:
-				if (!Logger::SetLevelByName(argv[i+1])) {
+				if (!Logger::SetLevelByName(argv[i + 1])) {
 					fprintf(stdout, "unknown log level [%s]\n", argv[i + 1]);
 					Quit();
 				}
@@ -287,13 +278,10 @@ App::ArgvReceived(int32 argc, char* argv[])
 
 			case WEB_APP_BASE_URL_SWITCH:
 				if (ServerSettings::SetBaseUrl(BUrl(argv[i + 1])) != B_OK) {
-					fprintf(stdout, "malformed web app base url; %s\n",
-						argv[i + 1]);
+					HDERROR("malformed web app base url; %s", argv[i + 1]);
 					Quit();
-				}
-				else {
-					fprintf(stdout, "did configure the web base url; %s\n",
-						argv[i + 1]);
+				} else {
+					HDERROR("did configure the web base url; %s", argv[i + 1]);
 				}
 
 				i++; // also move past the url value
@@ -330,8 +318,8 @@ App::ArgvReceived(int32 argc, char* argv[])
 }
 
 
-/*! This method will display an alert based on a message.  This message arrives
-    from a number of possible background threads / processes in the application.
+/*!	This method will display an alert based on a message.  This message arrives
+	from a number of possible background threads / processes in the application.
 */
 
 void
@@ -350,8 +338,8 @@ App::_AlertSimpleError(BMessage* message)
 	if (message->FindInt32(KEY_ALERT_TYPE, &typeInt) != B_OK)
 		typeInt = B_INFO_ALERT;
 
-	BAlert* alert = new BAlert(alertTitle, alertText, B_TRANSLATE("OK"),
-		NULL, NULL, B_WIDTH_AS_USUAL, static_cast<alert_type>(typeInt));
+	BAlert* alert = new BAlert(alertTitle, alertText, B_TRANSLATE("OK"), NULL, NULL,
+		B_WIDTH_AS_USUAL, static_cast<alert_type>(typeInt));
 
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
@@ -366,7 +354,7 @@ App::_Open(const BEntry& entry)
 {
 	BPath path;
 	if (!entry.Exists() || entry.GetPath(&path) != B_OK) {
-		fprintf(stderr, "Package file not found: %s\n", path.Path());
+		HDERROR("package file not found: %s", path.Path());
 		return;
 	}
 
@@ -374,20 +362,16 @@ App::_Open(const BEntry& entry)
 	BPackageKit::BPackageInfo info;
 	status_t status = info.ReadFromPackageFile(path.Path());
 	if (status != B_OK) {
-		fprintf(stderr, "Failed to parse package file: %s\n",
-			strerror(status));
+		HDERROR("failed to parse package file: %s", strerror(status));
 		return;
 	}
 
 	// Transfer information into PackageInfo
-	PackageInfoRef package(new(std::nothrow) PackageInfo(info), true);
-	if (!package.IsSet()) {
-		fprintf(stderr, "Could not allocate PackageInfo\n");
-		return;
-	}
+	PackageInfoRef filePackageInfo = PackageKitUtils::CreatePackageInfo(info);
+	PackageInfoBuilder packageBuilder(filePackageInfo);
 
-	PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
-	localInfo->SetLocalFilePath(path.Path());
+	PackageLocalInfoBuilder localInfoBuilder(filePackageInfo->LocalInfo());
+	localInfoBuilder.WithLocalFilePath(path.Path());
 
 	// Set if the package is active
 	//
@@ -396,33 +380,30 @@ App::_Open(const BEntry& entry)
 	// package kit have to know about these locations?
 	bool active = false;
 	BPackageKit::BPackageRoster roster;
-	status = roster.IsPackageActive(
-		BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, info, &active);
+	status = roster.IsPackageActive(BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, info,
+		&active);
 	if (status != B_OK) {
-		fprintf(stderr, "Could not check if package was active in system: %s\n",
-			strerror(status));
+		HDERROR("could not check if package was active in system: %s", strerror(status));
 		return;
 	}
 	if (!active) {
-		status = roster.IsPackageActive(
-			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME, info, &active);
+		status = roster.IsPackageActive(BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME, info,
+			&active);
 		if (status != B_OK) {
-			fprintf(stderr,
-				"Could not check if package was active in home: %s\n",
-				strerror(status));
+			HDERROR("could not check if package was active in home: %s", strerror(status));
 			return;
 		}
 	}
 
 	if (active)
-		localInfo->SetState(ACTIVATED);
+		localInfoBuilder.WithState(ACTIVATED);
 
-	package->SetLocalInfo(localInfo);
+	packageBuilder.WithLocalInfo(localInfoBuilder.BuildRef());
 
 	BMessage settings;
 	_LoadSettings(settings);
 
-	MainWindow* window = new MainWindow(settings, package);
+	MainWindow* window = new MainWindow(settings, packageBuilder.BuildRef());
 	_ShowWindow(window);
 }
 
@@ -478,21 +459,19 @@ App::_StoreSettings(const BMessage& settings)
 // #pragma mark -
 
 
-static const char* kPackageDaemonSignature
-	= "application/x-vnd.haiku-package_daemon";
+static const char* kPackageDaemonSignature = "application/x-vnd.haiku-package_daemon";
+
 
 void
 App::_CheckPackageDaemonRuns()
 {
 	while (!be_roster->IsRunning(kPackageDaemonSignature)) {
-		BAlert* alert = new BAlert(
-			B_TRANSLATE("Start package daemon"),
+		BAlert* alert = new BAlert(B_TRANSLATE("Start package daemon"),
 			B_TRANSLATE("HaikuDepot needs the package daemon to function, "
-				"and it appears to be not running.\n"
-				"Would you like to start it now?"),
-			B_TRANSLATE("No, quit HaikuDepot"),
-			B_TRANSLATE("Start package daemon"), NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT);
+						"and it appears to be not running.\n"
+						"Would you like to start it now?"),
+			B_TRANSLATE("No, quit HaikuDepot"), B_TRANSLATE("Start package daemon"), NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go() == 0)
@@ -509,14 +488,11 @@ App::_LaunchPackageDaemon()
 {
 	status_t ret = be_roster->Launch(kPackageDaemonSignature);
 	if (ret != B_OK) {
-		BString errorMessage
-			= B_TRANSLATE("Starting the package daemon failed:\n\n%Error%");
+		BString errorMessage = B_TRANSLATE("Starting the package daemon failed:\n\n%Error%");
 		errorMessage.ReplaceAll("%Error%", strerror(ret));
 
-		BAlert* alert = new BAlert(
-			B_TRANSLATE("Package daemon problem"), errorMessage,
-			B_TRANSLATE("Quit HaikuDepot"),
-			B_TRANSLATE("Try again"), NULL, B_WIDTH_AS_USUAL,
+		BAlert* alert = new BAlert(B_TRANSLATE("Package daemon problem"), errorMessage,
+			B_TRANSLATE("Quit HaikuDepot"), B_TRANSLATE("Try again"), NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 
@@ -535,20 +511,18 @@ App::_CheckIsFirstRun()
 {
 	BPath testFilePath;
 	bool exists = false;
-	status_t status = StorageUtils::LocalWorkingFilesPath("testfile.txt",
-		testFilePath, false);
-	if (status != B_OK) {
+	status_t status = StorageUtils::LocalWorkingFilesPath("testfile.txt", testFilePath, false);
+	if (status != B_OK)
 		HDERROR("unable to establish the location of the test file");
-	}
 	else
 		status = StorageUtils::ExistsObject(testFilePath, &exists, NULL, NULL);
 	return !exists;
 }
 
 
-/*! \brief Checks to ensure that a working file is able to be written.
-    \return false if the startup should be stopped and the application should
-            quit.
+/*!	\brief Checks to ensure that a working file is able to be written.
+	\return false if the startup should be stopped and the application should
+			quit.
 */
 
 bool
@@ -556,8 +530,7 @@ App::_CheckTestFile()
 {
 	BPath testFilePath;
 	BString pathDescription = "???";
-	status_t result = StorageUtils::LocalWorkingFilesPath("testfile.txt",
-		testFilePath, false);
+	status_t result = StorageUtils::LocalWorkingFilesPath("testfile.txt", testFilePath, false);
 
 	if (result == B_OK) {
 		pathDescription = testFilePath.Path();
@@ -567,19 +540,18 @@ App::_CheckTestFile()
 	if (result != B_OK) {
 		StorageUtils::SetWorkingFilesUnavailable();
 
-		BString msg = B_TRANSLATE("This application writes and reads some"
-			" working files on your computer in order to function. It appears"
-			" that there are problems writing a test file at [%TestFilePath%]."
-			" Check that there are no issues with your local disk or"
-			" permissions that might prevent this application from writing"
-			" files into that directory location. You may choose to acknowledge"
-			" this problem and continue, but some functionality may be"
-			" disabled.");
+		BString msg
+			= B_TRANSLATE("This application writes and reads some"
+						  " working files on your computer in order to function. It appears"
+						  " that there are problems writing a test file at [%TestFilePath%]."
+						  " Check that there are no issues with your local disk or"
+						  " permissions that might prevent this application from writing"
+						  " files into that directory location. You may choose to acknowledge"
+						  " this problem and continue, but some functionality may be"
+						  " disabled.");
 		msg.ReplaceAll("%TestFilePath%", pathDescription);
 
-		BAlert* alert = new(std::nothrow) BAlert(
-			B_TRANSLATE("Problem with working files"),
-			msg,
+		BAlert* alert = new(std::nothrow) BAlert(B_TRANSLATE("Problem with working files"), msg,
 			B_TRANSLATE("Quit"), B_TRANSLATE("Continue"));
 
 		if (alert->Go() == 0)
@@ -611,8 +583,7 @@ App::_ClearCacheOnVersionChange()
 	}
 
 	BPath lastVersionPath;
-	if (StorageUtils::LocalWorkingFilesPath(
-			"version.txt", lastVersionPath) != B_OK) {
+	if (StorageUtils::LocalWorkingFilesPath("version.txt", lastVersionPath) != B_OK) {
 		HDERROR("clear cache; unable to get version file path");
 		return;
 	}
@@ -620,30 +591,26 @@ App::_ClearCacheOnVersionChange()
 	bool exists;
 	off_t size;
 
-	if (StorageUtils::ExistsObject(
-		lastVersionPath, &exists, NULL, &size) != B_OK) {
+	if (StorageUtils::ExistsObject(lastVersionPath, &exists, NULL, &size) != B_OK) {
 		HDERROR("clear cache; unable to check version file exists");
 		return;
 	}
 
 	BString lastVersion;
 
-	if (exists && StorageUtils::AppendToString(lastVersionPath, lastVersion)
-			!= B_OK) {
-		HDERROR("clear cache; unable to read the version from [%s]",
-			lastVersionPath.Path());
+	if (exists && StorageUtils::AppendToString(lastVersionPath, lastVersion) != B_OK) {
+		HDERROR("clear cache; unable to read the version from [%s]", lastVersionPath.Path());
 		return;
 	}
 
 	if (lastVersion != version) {
-		HDINFO("last version [%s] and current version [%s] do not match"
-			" -> will flush cache", lastVersion.String(), version.String());
+		HDINFO("last version [%s] and current version [%s] do not match -> will flush cache",
+			lastVersion.String(), version.String());
 		StorageUtils::RemoveWorkingDirectoryContents();
-		HDINFO("will write version [%s] to [%s]",
-			version.String(), lastVersionPath.Path());
+		HDINFO("will write version [%s] to [%s]", version.String(), lastVersionPath.Path());
 		StorageUtils::AppendToFile(version, lastVersionPath);
 	} else {
-		HDINFO("last version [%s] and current version [%s] match"
-		 	" -> cache retained", lastVersion.String(), version.String());
+		HDINFO("last version [%s] and current version [%s] match -> cache retained",
+			lastVersion.String(), version.String());
 	}
 }

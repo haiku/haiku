@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # =====================================
-# Copyright 2017-2023, Andrew Lindesay
+# Copyright 2017-2025, Andrew Lindesay
 # Distributed under the terms of the MIT License.
 # =====================================
 
@@ -38,21 +38,21 @@ public:
 
     void Reset();
 {{#propertyarray}}{{#property.iscppscalartype}}
-    {{property.cpptype}} {{property.cppname}}();
+    {{property.cpptype}} {{property.cppname}}() const;
     void Set{{property.cppname}}({{property.cpptype}} value);
     void Set{{property.cppname}}Null();
-    bool {{property.cppname}}IsNull();
+    bool {{property.cppname}}IsNull() const;
 {{/property.iscppscalartype}}{{#property.isarray}}
     void AddTo{{property.cppname}}({{property.items.cpptype}}* value);
     void Set{{property.cppname}}({{property.cpptype}}* value);
-    int32 Count{{property.cppname}}();
-    {{property.items.cpptype}}* {{property.cppname}}ItemAt(int32 index);
-    bool {{property.cppname}}IsNull();
+    int32 Count{{property.cppname}}() const;
+    {{property.items.cpptype}}* {{property.cppname}}ItemAt(int32 index) const;
+    bool {{property.cppname}}IsNull() const;
 {{/property.isarray}}{{#property.iscppnonscalarnoncollectiontype}}
-    {{property.cpptype}}* {{property.cppname}}();
+    {{property.cpptype}}* {{property.cppname}}() const;
     void Set{{property.cppname}}({{property.cpptype}}* value);
     void Set{{property.cppname}}Null();
-    bool {{property.cppname}}IsNull();
+    bool {{property.cppname}}IsNull() const;
 {{/property.iscppnonscalarnoncollectiontype}}
 {{/propertyarray}}
 
@@ -112,7 +112,7 @@ void
 }
 
 {{#propertyarray}}{{#property.iscppscalartype}}{{property.cpptype}}
-{{cppobjectname}}::{{property.cppname}}()
+{{cppobjectname}}::{{property.cppname}}() const
 {
     return {{property.cppmembername}};
 }
@@ -135,7 +135,7 @@ void
 
 
 bool
-{{cppobjectname}}::{{property.cppname}}IsNull()
+{{cppobjectname}}::{{property.cppname}}IsNull() const
 {
     return 0 == (fHasValueBitmask & k{{property.cppname}}Bitmask);
 }
@@ -160,7 +160,7 @@ void
 
 
 int32
-{{cppobjectname}}::Count{{property.cppname}}()
+{{cppobjectname}}::Count{{property.cppname}}() const
 {
     if ({{property.cppmembername}} == NULL)
         return 0;
@@ -169,20 +169,20 @@ int32
 
 
 {{property.items.cpptype}}*
-{{cppobjectname}}::{{property.cppname}}ItemAt(int32 index)
+{{cppobjectname}}::{{property.cppname}}ItemAt(int32 index) const
 {
     return {{property.cppmembername}}->ItemAt(index);
 }
 
 
 bool
-{{cppobjectname}}::{{property.cppname}}IsNull()
+{{cppobjectname}}::{{property.cppname}}IsNull() const
 {
     return {{property.cppmembername}} == NULL;
 }
 
 {{/property.isarray}}{{#property.iscppnonscalarnoncollectiontype}}{{property.cpptype}}*
-{{cppobjectname}}::{{property.cppname}}()
+{{cppobjectname}}::{{property.cppname}}() const
 {
     return {{property.cppmembername}};
 }
@@ -206,7 +206,7 @@ void
 
 
 bool
-{{cppobjectname}}::{{property.cppname}}IsNull()
+{{cppobjectname}}::{{property.cppname}}IsNull() const
 {
     return {{property.cppmembername}} == NULL;
 }

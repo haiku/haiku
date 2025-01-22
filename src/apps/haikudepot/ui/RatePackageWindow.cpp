@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -10,10 +10,10 @@
 #include <stdio.h>
 
 #include <Alert.h>
-#include <Autolock.h>
 #include <AutoLocker.h>
-#include <Catalog.h>
+#include <Autolock.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <LayoutBuilder.h>
 #include <MenuField.h>
@@ -112,14 +112,12 @@ public:
 		SetRating(fPermanentRating);
 	}
 
-	virtual void MouseMoved(BPoint where, uint32 transit,
-		const BMessage* dragMessage)
+	virtual void MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 	{
 		if (dragMessage != NULL)
 			return;
 
-		if ((transit != B_INSIDE_VIEW && transit != B_ENTERED_VIEW)
-			|| where.x > MinSize().width) {
+		if ((transit != B_INSIDE_VIEW && transit != B_ENTERED_VIEW) || where.x > MinSize().width) {
 			SetRating(fPermanentRating);
 			return;
 		}
@@ -142,12 +140,13 @@ public:
 		SetRating(rating);
 	}
 
-/*! By setting this to false, this indicates that there is no rating for the
-    set; ie NULL.  The indeterminate rating is indicated by a pale grey
-    colored star.
-*/
+	/*!	By setting this to false, this indicates that there is no rating for the
+		set; ie NULL.  The indeterminate rating is indicated by a pale grey
+		colored star.
+	*/
 
-	void SetRatingDeterminate(bool value) {
+	void SetRatingDeterminate(bool value)
+	{
 		fRatingDeterminate = value;
 		Invalidate();
 	}
@@ -186,18 +185,16 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame, Model& model)
 {
 	AddToSubset(parent);
 
-	BStringView* ratingLabel = new BStringView("rating label",
-		B_TRANSLATE("Your rating:"));
+	BStringView* ratingLabel = new BStringView("rating label", B_TRANSLATE("Your rating:"));
 
 	fSetRatingView = new SetRatingView();
 	fSetRatingView->SetRatingDeterminate(false);
-	fRatingDeterminateCheckBox = new BCheckBox("has rating", NULL,
-		new BMessage(MSG_RATING_DETERMINATE_CHANGED));
+	fRatingDeterminateCheckBox
+		= new BCheckBox("has rating", NULL, new BMessage(MSG_RATING_DETERMINATE_CHANGED));
 	fRatingDeterminateCheckBox->SetValue(B_CONTROL_OFF);
 
 	fTextView = new TextDocumentView();
-	ScrollView* textScrollView = new ScrollView(
-		"rating scroll view", fTextView);
+	ScrollView* textScrollView = new ScrollView("rating scroll view", fTextView);
 
 	// Get a TextDocument with default paragraph and character style
 	MarkupParser parser;
@@ -210,29 +207,25 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame, Model& model)
 
 	// Construct stability rating popup
 	BPopUpMenu* stabilityMenu = new BPopUpMenu(B_TRANSLATE("Stability"));
-	fStabilityField = new BMenuField("stability",
-		B_TRANSLATE("Stability:"), stabilityMenu);
+	fStabilityField = new BMenuField("stability", B_TRANSLATE("Stability:"), stabilityMenu);
 	_InitStabilitiesMenu(stabilityMenu);
 
 	// Construct languages popup
 	BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
-	fCommentLanguageField = new BMenuField("language",
-		B_TRANSLATE("Comment language:"), languagesMenu);
+	fCommentLanguageField
+		= new BMenuField("language", B_TRANSLATE("Comment language:"), languagesMenu);
 	_InitLanguagesMenu(languagesMenu);
 
-	fRatingActiveCheckBox = new BCheckBox("rating active",
-		B_TRANSLATE("This rating is visible to other users"),
-		new BMessage(MSG_RATING_ACTIVE_CHANGED));
+	fRatingActiveCheckBox
+		= new BCheckBox("rating active", B_TRANSLATE("This rating is visible to other users"),
+			new BMessage(MSG_RATING_ACTIVE_CHANGED));
 	// Hide the check mark by default, it will be made visible when
 	// the user already made a rating and it is loaded
 	fRatingActiveCheckBox->Hide();
 
 	// Construct buttons
-	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
-		new BMessage(B_QUIT_REQUESTED));
-
-	fSendButton = new BButton("send", B_TRANSLATE("Send"),
-		new BMessage(MSG_SEND));
+	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"), new BMessage(B_QUIT_REQUESTED));
+	fSendButton = new BButton("send", B_TRANSLATE("Send"), new BMessage(MSG_SEND));
 
 	// Build layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -252,8 +245,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame, Model& model)
 			.Add(fCancelButton)
 			.Add(fSendButton)
 		.End()
-		.SetInsets(B_USE_WINDOW_INSETS)
-	;
+		.SetInsets(B_USE_WINDOW_INSETS);
 
 	// NOTE: Do not make Send the default button. The user might want
 	// to type line-breaks instead of sending when hitting RETURN.
@@ -270,7 +262,6 @@ RatePackageWindow::~RatePackageWindow()
 void
 RatePackageWindow::_InitLanguagesMenu(BPopUpMenu* menu)
 {
-	AutoLocker<BLocker> locker(fModel.Lock());
 	fCommentLanguageId = fModel.PreferredLanguage()->ID();
 
 	LanguageMenuUtils::AddLanguagesToMenu(fModel.Languages(), menu);
@@ -282,28 +273,26 @@ RatePackageWindow::_InitLanguagesMenu(BPopUpMenu* menu)
 void
 RatePackageWindow::_InitStabilitiesMenu(BPopUpMenu* menu)
 {
-	AutoLocker<BLocker> locker(fModel.Lock());
-	int32 countStabilities = fModel.CountRatingStabilities();
+	std::vector<RatingStabilityRef> ratingStabilities = fModel.RatingStabilities();
 
 	menu->SetTargetForItems(this);
 
-	if (0 == countStabilities) {
+	if (ratingStabilities.empty()) {
 		menu->SetEnabled(false);
 		return;
 	}
 
-	for (int32 i = 0; i < countStabilities; i++) {
-		const RatingStabilityRef stability = fModel.RatingStabilityAtIndex(i);
+	std::vector<RatingStabilityRef>::const_iterator it;
+	for (it = ratingStabilities.begin(); it != ratingStabilities.end(); it++) {
+		const RatingStabilityRef ratingStability = *it;
 		BMessage* message = new BMessage(MSG_STABILITY_SELECTED);
-		message->AddString("code", stability->Code());
-		BMenuItem* item = new BMenuItem(stability->Name(), message);
+		message->AddString("code", ratingStability->Code());
+		BMenuItem* item = new BMenuItem(ratingStability->Name(), message);
 		menu->AddItem(item);
-
-		if (i == 0) {
-			fStabilityCode = stability->Code();
-			item->SetMarked(true);
-		}
 	}
+
+	fStabilityCode = (*ratingStabilities.begin())->Code();
+	menu->ItemAt(0)->SetMarked(true);
 }
 
 
@@ -327,8 +316,7 @@ RatePackageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_RATING_DETERMINATE_CHANGED:
-			fRatingDeterminate = fRatingDeterminateCheckBox->Value()
-				== B_CONTROL_ON;
+			fRatingDeterminate = fRatingDeterminateCheckBox->Value() == B_CONTROL_ON;
 			fSetRatingView->SetRatingDeterminate(fRatingDeterminate);
 			break;
 
@@ -342,13 +330,10 @@ RatePackageWindow::MessageReceived(BMessage* message)
 
 		case MSG_DID_ADD_USER_RATING:
 		{
-			BAlert* alert = new(std::nothrow) BAlert(
-				B_TRANSLATE("User rating"),
-				B_TRANSLATE("Your rating was uploaded successfully. "
-					"You can update or remove it at the HaikuDepot Server "
-					"website."),
-				B_TRANSLATE("Close"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			BAlert* alert = new(std::nothrow) BAlert(B_TRANSLATE("User rating"),
+				B_TRANSLATE("Your rating was uploaded successfully. You can update or remove it at "
+							"the HaikuDepot Server website."),
+				B_TRANSLATE("Close"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->Go();
 			_RefreshPackageData();
 			break;
@@ -356,11 +341,9 @@ RatePackageWindow::MessageReceived(BMessage* message)
 
 		case MSG_DID_UPDATE_USER_RATING:
 		{
-			BAlert* alert = new(std::nothrow) BAlert(
-				B_TRANSLATE("User rating"),
-				B_TRANSLATE("Your rating was updated."),
-				B_TRANSLATE("Close"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			BAlert* alert = new(std::nothrow)
+				BAlert(B_TRANSLATE("User rating"), B_TRANSLATE("Your rating was updated."),
+					B_TRANSLATE("Close"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->Go();
 			_RefreshPackageData();
 			break;
@@ -376,10 +359,10 @@ RatePackageWindow::MessageReceived(BMessage* message)
 	}
 }
 
-/*! Refresh the data shown about the current page.  This may be useful, for
-    example when somebody adds a rating and that changes the rating of the
-    package or they add a rating and want to see that immediately.  The logic
-    should round-trip to the server so that actual data is shown.
+/*!	Refresh the data shown about the current page.  This may be useful, for
+	example when somebody adds a rating and that changes the rating of the
+	package or they add a rating and want to see that immediately.  The logic
+	should round-trip to the server so that actual data is shown.
 */
 
 void
@@ -422,8 +405,8 @@ RatePackageWindow::SetPackage(const PackageInfoRef& package)
 void
 RatePackageWindow::_SendRating()
 {
-	thread_id thread = spawn_thread(&_SendRatingThreadEntry,
-		"Send rating", B_NORMAL_PRIORITY, this);
+	thread_id thread
+		= spawn_thread(&_SendRatingThreadEntry, "Send rating", B_NORMAL_PRIORITY, this);
 	if (thread >= 0)
 		_SetWorkerThread(thread);
 }
@@ -461,9 +444,9 @@ RatePackageWindow::_QueryRatingThreadEntry(void* data)
 }
 
 
-/*! A server request has been made to the server and the server has responded
-    with some data.  The data is known not to be an error and now the data can
-    be extracted into the user interface elements.
+/*!	A server request has been made to the server and the server has responded
+	with some data.  The data is known not to be an error and now the data can
+	be extracted into the user interface elements.
 */
 
 void
@@ -478,15 +461,14 @@ RatePackageWindow::_RelayServerDataToUI(BMessage& response)
 			fRatingText = parser.CreateDocumentFromMarkup(comment);
 			fTextView->SetTextDocument(fRatingText);
 		}
-		if (response.FindString("userRatingStabilityCode",
-				&fStabilityCode) == B_OK) {
+		if (response.FindString("userRatingStabilityCode", &fStabilityCode) == B_OK) {
 			BMenu* menu = fStabilityField->Menu();
 			AppUtils::MarkItemWithKeyValueInMenu(menu, "code", fStabilityCode);
 		}
-		if (response.FindString("naturalLanguageCode",
-			&fCommentLanguageId) == B_OK && !comment.IsEmpty()) {
-			LanguageMenuUtils::MarkLanguageInMenu(
-				fCommentLanguageId, fCommentLanguageField->Menu());
+		if (response.FindString("naturalLanguageCode", &fCommentLanguageId) == B_OK
+			&& !comment.IsEmpty()) {
+			LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageId,
+				fCommentLanguageField->Menu());
 		}
 		double rating;
 		if (response.FindDouble("rating", &rating) == B_OK) {
@@ -498,16 +480,16 @@ RatePackageWindow::_RelayServerDataToUI(BMessage& response)
 		}
 
 		fSetRatingView->SetRatingDeterminate(fRatingDeterminate);
-		fRatingDeterminateCheckBox->SetValue(
-			fRatingDeterminate ? B_CONTROL_ON : B_CONTROL_OFF);
+		fRatingDeterminateCheckBox->SetValue(fRatingDeterminate ? B_CONTROL_ON : B_CONTROL_OFF);
 		fRatingActiveCheckBox->SetValue(fRatingActive);
 		fRatingActiveCheckBox->Show();
 
 		fSendButton->SetLabel(B_TRANSLATE("Update"));
 
 		Unlock();
-	} else
+	} else {
 		HDERROR("unable to acquire lock to update the ui");
+	}
 }
 
 
@@ -523,9 +505,7 @@ RatePackageWindow::_QueryRatingThread()
 
 	Unlock();
 
-	BAutolock locker(fModel.Lock());
 	BString nickname = fModel.Nickname();
-	locker.Unlock();
 
 	if (!package.IsSet()) {
 		HDERROR("rating query: No package");
@@ -549,7 +529,7 @@ RatePackageWindow::_QueryRatingThread()
 		return;
 	}
 
-	WebAppInterface* interface = fModel.GetWebAppInterface();
+	WebAppInterfaceRef interface = fModel.WebApp();
 
 	BMessage info;
 	BString webAppRepositoryCode;
@@ -563,7 +543,7 @@ RatePackageWindow::_QueryRatingThread()
 	}
 
 	if (webAppRepositoryCode.IsEmpty() || webAppRepositorySourceCode.IsEmpty()) {
-		HDERROR("unable to obtain the repository code or repository source code for depot; %s",
+		HDERROR("unable to obtain the repository code or repository source code for depot [%s]",
 			depotName.String());
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 	} else {
@@ -572,12 +552,11 @@ RatePackageWindow::_QueryRatingThread()
 			webAppRepositorySourceCode, nickname, info);
 
 		if (status == B_OK) {
-				// could be an error or could be a valid response envelope
-				// containing data.
+			// could be an error or could be a valid response envelope
+			// containing data.
 			switch (WebAppInterface::ErrorCodeFromResponse(info)) {
 				case ERROR_CODE_NONE:
 				{
-					//info.PrintToStream();
 					BMessage result;
 					if (info.FindMessage("result", &result) == B_OK) {
 						_RelayServerDataToUI(result);
@@ -589,10 +568,10 @@ RatePackageWindow::_QueryRatingThread()
 					break;
 				}
 				case ERROR_CODE_OBJECTNOTFOUND:
-						// an expected response
+					// an expected response
 					HDINFO("there was no previous rating for this"
-						" user on this version of this package so a new rating"
-						" will be added.");
+						   " user on this version of this package so a new rating"
+						   " will be added.");
 					break;
 				default:
 					ServerHelper::NotifyServerJsonRpcError(info);
@@ -600,8 +579,8 @@ RatePackageWindow::_QueryRatingThread()
 					break;
 			}
 		} else {
-			HDERROR("an error has arisen communicating with the"
-				" server to obtain data for an existing rating [%s]",
+			HDERROR("an error has arisen communicating with the server to obtain data for an "
+					"existing rating [%s]",
 				strerror(status));
 			ServerHelper::NotifyTransportError(status);
 			BMessenger(this).SendMessage(B_QUIT_REQUESTED);
@@ -679,18 +658,18 @@ RatePackageWindow::_SendRatingThread()
 		webAppRepositorySourceCode = depot->WebAppRepositorySourceCode();
 	}
 
-	WebAppInterface* interface = fModel.GetWebAppInterface();
+	WebAppInterfaceRef interface = fModel.WebApp();
 
 	Unlock();
 
 	if (webAppRepositoryCode.IsEmpty()) {
-		HDERROR("unable to find the web app repository code for the local depot %s",
+		HDERROR("unable to find the web app repository code for the local depot [%s]",
 			depotName.String());
 		return;
 	}
 
 	if (webAppRepositorySourceCode.IsEmpty()) {
-		HDERROR("unable to find the web app repository source code for the local depot %s",
+		HDERROR("unable to find the web app repository source code for the local depot [%s]",
 			depotName.String());
 		return;
 	}
@@ -712,8 +691,8 @@ RatePackageWindow::_SendRatingThread()
 	}
 
 	if (status == B_OK) {
-			// could be an error or could be a valid response envelope
-			// containing data.
+		// could be an error or could be a valid response envelope
+		// containing data.
 		switch (WebAppInterface::ErrorCodeFromResponse(info)) {
 			case ERROR_CODE_NONE:
 			{
@@ -728,8 +707,8 @@ RatePackageWindow::_SendRatingThread()
 				break;
 		}
 	} else {
-		HDERROR("an error has arisen communicating with the"
-			" server to obtain data for an existing rating [%s]",
+		HDERROR("an error has arisen communicating with the server to obtain data for an existing "
+				"rating [%s]",
 			strerror(status));
 		ServerHelper::NotifyTransportError(status);
 	}

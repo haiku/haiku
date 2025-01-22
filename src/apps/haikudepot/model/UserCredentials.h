@@ -18,11 +18,11 @@
 
 class UserCredentials : public BArchivable {
 public:
+								UserCredentials();
 								UserCredentials(BMessage* from);
 								UserCredentials(const BString& nickname,
 									const BString& passwordClear);
 								UserCredentials(const UserCredentials& other);
-								UserCredentials();
 	virtual						~UserCredentials();
 
 			UserCredentials&	operator=(const UserCredentials& other);

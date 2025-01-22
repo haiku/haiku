@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2024, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2025, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,16 +18,17 @@
 
 #include <algorithm>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 #include <Catalog.h>
 #include <Locker.h>
 
-#include <package/manager/Exceptions.h>
 #include <package/hpkg/NoErrorOutput.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReader.h>
+#include <package/manager/Exceptions.h>
 #include <package/solver/SolverPackage.h>
 
 #include "AppUtils.h"
@@ -57,6 +58,13 @@ using BPackageKit::BHPKG::BPackageReader;
 
 class DownloadProgress {
 public:
+	DownloadProgress()
+		:
+		fPackageName(),
+		fProgress(0)
+	{
+	}
+
 	DownloadProgress(BString packageName, float progress)
 		:
 		fPackageName(packageName),
@@ -84,14 +92,13 @@ private:
 };
 
 
-InstallPackageProcess::InstallPackageProcess(
-	PackageInfoRef package, Model* model)
+InstallPackageProcess::InstallPackageProcess(const BString& packageName, Model* model)
 	:
-	AbstractPackageProcess(package, model),
+	AbstractPackageProcess(packageName, model),
 	fLastDownloadUpdate(0)
 {
 	fDescription = B_TRANSLATE("Installing \"%PackageName%\"");
-	fDescription.ReplaceAll("%PackageName%", package->Name());
+	fDescription.ReplaceAll("%PackageName%", packageName);
 }
 
 
@@ -120,14 +127,20 @@ InstallPackageProcess::Progress()
 	if (ProcessState() == PROCESS_RUNNING && !fDownloadProgresses.empty()) {
 		AutoLocker<BLocker> locker(&fLock);
 		float sum = 0.0;
-		std::vector<DownloadProgress>::const_iterator it;
-		for (it = fDownloadProgresses.begin();
-				it != fDownloadProgresses.end(); it++) {
-			DownloadProgress downloadProgress = *it;
-			sum += downloadProgress.Progress();
+		int32 count = 0;
+
+		std::map<BString, DownloadProgress>::const_iterator it;
+
+		for (it = fDownloadProgresses.begin(); it != fDownloadProgresses.end(); it++) {
+			DownloadProgress downloadProgress = it->second;
+
+			if (!downloadProgress.PackageName().IsEmpty()) {
+				sum += downloadProgress.Progress();
+				count++;
+			}
 		}
 		if (sum > 0.0)
-			return sum / (float) fDownloadProgresses.size();
+			return sum / static_cast<float>(count);
 	}
 	return kProgressIndeterminate;
 }
@@ -136,57 +149,61 @@ InstallPackageProcess::Progress()
 status_t
 InstallPackageProcess::RunInternal()
 {
-	PackageInfoRef ref(fPackage);
-	SetPackageState(ref, PENDING);
+	// TODO: allow configuring the installation location
 
-	fPackageManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
-		| BPackageManager::B_ADD_REMOTE_REPOSITORIES
-		| BPackageManager::B_REFRESH_REPOSITORIES);
+	PackageManager* packageManager = new(std::nothrow)
+		PackageManager(static_cast<BPackageInstallationLocation>(InstallLocation()));
+	ObjectDeleter<PackageManager> solverDeleter(packageManager);
 
-	PackageState state = PackageUtils::State(ref);
+	SetPackageState(fPackageName, PENDING);
 
-	fPackageManager->SetCurrentActionPackage(ref, true);
-	fPackageManager->AddProgressListener(this);
+	packageManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
+		| BPackageManager::B_ADD_REMOTE_REPOSITORIES | BPackageManager::B_REFRESH_REPOSITORIES);
 
-	BString packageName = ref->Name();
-	PackageLocalInfoRef localInfo = ref->LocalInfo();
+
+	PackageInfoRef package = FindPackageByName(fPackageName);
+	PackageState state = PackageUtils::State(package);
+
+	packageManager->SetCurrentActionPackage(package, true);
+	packageManager->AddProgressListener(this);
+
+	BString packageName = fPackageName;
+	PackageLocalInfoRef localInfo = package->LocalInfo();
 
 	if (localInfo.IsSet() && localInfo->IsLocalFile())
 		packageName = localInfo->LocalFilePath();
 
 	const char* packageNameString = packageName.String();
+
 	try {
-		fPackageManager->Install(&packageNameString, 1);
+		packageManager->Install(&packageNameString, 1);
 	} catch (BFatalErrorException& ex) {
 		BString errorString;
-		errorString.SetToFormat(
-			"Fatal error occurred while installing package %s: "
-			"%s (%s)\n", packageNameString, ex.Message().String(),
-			ex.Details().String());
-		AppUtils::NotifySimpleError(B_TRANSLATE("Fatal error"), errorString,
-			B_STOP_ALERT);
+		errorString.SetToFormat("Fatal error occurred while installing package %s: %s (%s)\n",
+			packageNameString, ex.Message().String(), ex.Details().String());
+		AppUtils::NotifySimpleError(B_TRANSLATE("Fatal error"), errorString, B_STOP_ALERT);
 		_SetDownloadedPackagesState(NONE);
-		SetPackageState(ref, state);
+		SetPackageState(fPackageName, state);
 		return ex.Error();
 	} catch (BAbortedByUserException& ex) {
-		HDINFO("Installation of package %s is aborted by user: %s",
-			packageNameString, ex.Message().String());
+		HDINFO("Installation of package %s is aborted by user: %s", packageNameString,
+			ex.Message().String());
 		_SetDownloadedPackagesState(NONE);
-		SetPackageState(ref, state);
+		SetPackageState(fPackageName, state);
 		return B_OK;
 	} catch (BNothingToDoException& ex) {
-		HDINFO("Nothing to do while installing package %s: %s",
-			packageNameString, ex.Message().String());
+		HDINFO("Nothing to do while installing package %s: %s", packageNameString,
+			ex.Message().String());
 		return B_OK;
 	} catch (BException& ex) {
-		HDERROR("Exception occurred while installing package %s: %s",
-			packageNameString, ex.Message().String());
+		HDERROR("Exception occurred while installing package %s: %s", packageNameString,
+			ex.Message().String());
 		_SetDownloadedPackagesState(NONE);
-		SetPackageState(ref, state);
+		SetPackageState(fPackageName, state);
 		return B_ERROR;
 	}
 
-	fPackageManager->RemoveProgressListener(this);
+	packageManager->RemoveProgressListener(this);
 
 	_SetDownloadedPackagesState(ACTIVATED);
 
@@ -198,26 +215,20 @@ InstallPackageProcess::RunInternal()
 
 
 void
-InstallPackageProcess::DownloadProgressChanged(
-	const char* packageName, float progress)
+InstallPackageProcess::DownloadProgressChanged(const char* packageName, float progress)
 {
-	bigtime_t now = system_time();
-	if (now - fLastDownloadUpdate < 250000 && progress != 1.0)
+	if (!_ShouldProcessProgress() && progress != 1.0)
 		return;
-	fLastDownloadUpdate = now;
+
 	BString simplePackageName;
+
 	if (_DeriveSimplePackageName(packageName, simplePackageName) != B_OK) {
 		HDERROR("malformed canonical package name [%s]", packageName);
 		return;
 	}
-	PackageInfoRef ref(FindPackageByName(simplePackageName));
-	if (ref.IsSet()) {
-		SetPackageDownloadProgress(ref, progress);
-		_SetDownloadProgress(simplePackageName, progress);
-	} else {
-		HDERROR("unable to find the package info for simple package name [%s]",
-			simplePackageName.String());
-	}
+
+	SetPackageDownloadProgress(simplePackageName, progress);
+	_SetDownloadProgress(simplePackageName, progress);
 }
 
 
@@ -230,29 +241,21 @@ InstallPackageProcess::DownloadProgressComplete(const char* packageName)
 		return;
 	}
 	_SetDownloadProgress(simplePackageName, 1.0);
-	PackageInfoRef ref(FindPackageByName(simplePackageName));
-	if (!ref.IsSet()) {
-		HDERROR("unable to find the package info for simple package name [%s]",
-			simplePackageName.String());
-		return;
-	}
-	SetPackageDownloadProgress(ref, 1.0);
-	fDownloadedPackages.insert(ref);
+	SetPackageDownloadProgress(simplePackageName, 1.0);
+	fDownloadedPackageNames.insert(simplePackageName);
 }
 
 
 void
-InstallPackageProcess::ConfirmedChanges(
-	BPackageManager::InstalledRepository& repository)
+InstallPackageProcess::ConfirmedChanges(BPackageManager::InstalledRepository& repository)
 {
-	BPackageManager::InstalledRepository::PackageList& activationList =
-		repository.PackagesToActivate();
+	BPackageManager::InstalledRepository::PackageList& activationList
+		= repository.PackagesToActivate();
 
 	BSolverPackage* package = NULL;
 	for (int32 i = 0; (package = activationList.ItemAt(i)); i++) {
-		PackageInfoRef ref(FindPackageByName(package->Info().Name()));
-		if (ref.IsSet())
-			SetPackageState(ref, PENDING);
+		BString packageName = package->Info().Name();
+		SetPackageState(packageName, PENDING);
 	}
 }
 
@@ -260,19 +263,11 @@ InstallPackageProcess::ConfirmedChanges(
 void
 InstallPackageProcess::_SetDownloadedPackagesState(PackageState state)
 {
-	for (PackageInfoSet::iterator it = fDownloadedPackages.begin();
-			it != fDownloadedPackages.end(); ++it) {
-		PackageInfoRef ref = (*it);
-		SetPackageState(ref, state);
+	std::set<BString>::const_iterator it;
+	for (it = fDownloadedPackageNames.begin(); it != fDownloadedPackageNames.end(); ++it) {
+		BString packageName = *it;
+		SetPackageState(packageName, state);
 	}
-}
-
-
-static bool
-_IsDownloadProgressBefore(const DownloadProgress& dp1,
-	const DownloadProgress& dp2)
-{
-	return dp1.PackageName().Compare(dp2.PackageName()) < 0;
 }
 
 
@@ -293,22 +288,9 @@ InstallPackageProcess::_DeriveSimplePackageName(const BString& canonicalForm,
 
 
 void
-InstallPackageProcess::_SetDownloadProgress(const BString& simplePackageName,
-	float progress)
+InstallPackageProcess::_SetDownloadProgress(const BString& simplePackageName, float progress)
 {
-	AutoLocker<BLocker> locker(&fLock);
 	DownloadProgress downloadProgress(simplePackageName, progress);
-	std::vector<DownloadProgress>::iterator itInsertionPt
-		= std::lower_bound(
-			fDownloadProgresses.begin(), fDownloadProgresses.end(),
-			downloadProgress, &_IsDownloadProgressBefore);
-
-	if (itInsertionPt != fDownloadProgresses.end()) {
-		if ((*itInsertionPt).PackageName() == simplePackageName) {
-			itInsertionPt = fDownloadProgresses.erase(itInsertionPt);
-		}
-	}
-
-	fDownloadProgresses.insert(itInsertionPt, downloadProgress);
+	fDownloadProgresses[simplePackageName] = downloadProgress;
 	_NotifyChanged();
 }

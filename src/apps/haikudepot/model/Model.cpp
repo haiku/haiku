@@ -1,16 +1,16 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "Model.h"
 
 #include <algorithm>
 #include <ctime>
-#include <vector>
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <time.h>
 
 #include <Autolock.h>
@@ -35,11 +35,8 @@
 #define B_TRANSLATION_CONTEXT "Model"
 
 
-#define KEY_STORE_IDENTIFIER_PREFIX "hds.password."
-	// this prefix is added before the nickname in the keystore
-	// so that HDS username/password pairs can be identified.
-
-static const char* kHaikuDepotKeyring = "HaikuDepot";
+static const uint32 kChangeMaskAll = UINT32_MAX;
+	// covers all of the possible values.
 
 
 ModelListener::~ModelListener()
@@ -56,58 +53,107 @@ Model::Model()
 	fDepots(),
 	fCategories(),
 	fPackageListViewMode(PROMINENT),
-	fCanShareAnonymousUsageData(false)
+	fCanShareAnonymousUsageData(false),
+	fWebApp(WebAppInterfaceRef(new WebAppInterface(UserCredentials()), true)),
+	fLanguages(LocaleUtils::WellKnownLanguages())
 {
+	fIconRepository = PackageIconRepositoryRef(new PackageIconDefaultRepository(), true);
 
-	// setup the language into a default state with a hard-coded language so
-	// that there is a language at all.
-	fLanguageRepository = new LanguageRepository();
-	fLanguageRepository->AddLanguage(fPreferredLanguage);
+	fFilterSpecification = PackageFilterSpecificationBuilder().BuildRef();
+	fFilter = PackageFilterFactory::CreateFilter(fFilterSpecification);
 
-	fPackageFilterModel = new PackageFilterModel();
-	fPackageScreenshotRepository = new PackageScreenshotRepository(
-		PackageScreenshotRepositoryListenerRef(this),
-		&fWebAppInterface);
+	fPackageScreenshotRepository
+		= new PackageScreenshotRepository(PackageScreenshotRepositoryListenerRef(this), this);
 }
 
 
 Model::~Model()
 {
-	delete fPackageFilterModel;
 	delete fPackageScreenshotRepository;
-	delete fLanguageRepository;
 }
 
 
-LanguageRepository*
-Model::Languages()
+const std::vector<LanguageRef>
+Model::Languages() const
 {
-	return fLanguageRepository;
+	BAutolock locker(&fLock);
+	return fLanguages;
 }
 
 
-PackageFilterModel*
-Model::PackageFilter()
+void
+Model::SetLanguagesAndPreferred(const std::vector<LanguageRef>& value, const LanguageRef& preferred)
 {
-	return fPackageFilterModel;
+	if (value.empty())
+		HDFATAL("unable to set the languages to an empty list");
+
+	if (std::find(value.begin(), value.end(), preferred) == value.end())
+		HDFATAL("the preferred language is not in the list of languages");
+
+	BAutolock locker(&fLock);
+	fLanguages = value;
+	std::sort(fLanguages.begin(), fLanguages.end(), IsLanguageRefLess);
+	SetPreferredLanguage(preferred);
+
+	HDINFO("did configure %" B_PRIu32 " languages with default [%s]",
+		static_cast<uint32>(fLanguages.size()), preferred->ID());
 }
 
 
-PackageIconRepository&
-Model::GetPackageIconRepository()
+void
+Model::SetFilterSpecification(const PackageFilterSpecificationRef& value)
 {
-	return fPackageIconRepository;
+	BAutolock locker(&fLock);
+	if (value != fFilterSpecification) {
+		fFilterSpecification = value;
+		fFilter = PackageFilterFactory::CreateFilter(value);
+		_NotifyPackageFilterChanged();
+	}
 }
 
 
-status_t
-Model::InitPackageIconRepository()
+const PackageFilterSpecificationRef
+Model::FilterSpecification() const
 {
-	BPath tarPath;
-	status_t result = StorageUtils::IconTarPath(tarPath);
-	if (result == B_OK)
-		result = fPackageIconRepository.Init(tarPath);
-	return result;
+	BAutolock locker(&fLock);
+	return fFilterSpecification;
+}
+
+
+PackageFilterRef
+Model::Filter() const
+{
+	BAutolock locker(&fLock);
+	return fFilter;
+}
+
+
+PackageIconRepositoryRef
+Model::IconRepository()
+{
+	BAutolock locker(&fLock);
+	return fIconRepository;
+}
+
+
+void
+Model::SetIconRepository(PackageIconRepositoryRef value)
+{
+	BAutolock locker(&fLock);
+	fIconRepository = value;
+	_NotifyIconsChanged();
+}
+
+
+void
+Model::_NotifyIconsChanged()
+{
+	std::vector<ModelListenerRef>::const_iterator it;
+	for (it = fListeners.begin(); it != fListeners.end(); it++) {
+		const ModelListenerRef& listener = *it;
+		if (listener.IsSet())
+			listener->IconsChanged();
+	}
 }
 
 
@@ -125,101 +171,286 @@ Model::AddListener(const ModelListenerRef& listener)
 }
 
 
-LanguageRef
+void
+Model::AddPackageListener(const PackageInfoListenerRef& packageListener)
+{
+	fPackageListeners.push_back(packageListener);
+}
+
+
+/*!	This method will take the event info data stored in the supplied message
+	and turn it back into an instance of `PackageInfoEvents`. It is done in
+	this way because the lookup of the packages within each `PackageInfoEvent`
+	has to come from the model.
+*/
+status_t
+Model::DearchiveInfoEvents(const BMessage* message, PackageInfoEvents& packageInfoEvents) const
+{
+	BAutolock locker(&fLock);
+	int32 i = 0;
+	BMessage eventMessage;
+	BString packageName;
+	uint32 changeMask;
+
+	while (message->FindMessage(kPackageInfoEventsKey, i, &eventMessage) == B_OK) {
+		status_t result = B_OK;
+
+		if (result == B_OK)
+			result = eventMessage.FindString(kPackageInfoPackageNameKey, &packageName);
+
+		if (result == B_OK)
+			result = eventMessage.FindUInt32(kPackageInfoChangesKey, &changeMask);
+
+		if (result == B_OK) {
+			PackageInfoRef package = PackageForName(packageName);
+
+			if (package.IsSet()) {
+				PackageInfoEvent event(package, changeMask);
+				packageInfoEvents.AddEvent(event);
+			}
+		} else {
+			HDFATAL("broken event info found processing events");
+				// should not occur as the data assembly is entirely inside the application
+		}
+
+		i++;
+	}
+
+	return B_OK;
+}
+
+
+const LanguageRef
 Model::PreferredLanguage() const
 {
+	BAutolock locker(&fLock);
 	return fPreferredLanguage;
 }
 
 
 void
-Model::SetPreferredLanguage(LanguageRef value)
+Model::SetPreferredLanguage(const LanguageRef& value)
 {
 	if (value.IsSet()) {
-		if (fPreferredLanguage != value)
-			fPreferredLanguage = value;
+		BAutolock locker(&fLock);
+		fPreferredLanguage = value;
 	}
-}
-
-
-// TODO; part of a wider change; cope with the package being in more than one
-// depot
-PackageInfoRef
-Model::PackageForName(const BString& name)
-{
-	std::vector<DepotInfoRef>::iterator it;
-	for (it = fDepots.begin(); it != fDepots.end(); it++) {
-		DepotInfoRef depotInfoRef = *it;
-		PackageInfoRef packageInfoRef = depotInfoRef->PackageByName(name);
-		if (packageInfoRef.Get() != NULL)
-			return packageInfoRef;
-	}
-	return PackageInfoRef();
 }
 
 
 void
-Model::MergeOrAddDepot(const DepotInfoRef& depot)
+Model::SetDepots(const DepotInfoRef& depot)
 {
-	BString depotName = depot->Name();
-	for(uint32 i = 0; i < fDepots.size(); i++) {
-		if (fDepots[i]->Name() == depotName) {
-			DepotInfoRef ersatzDepot(new DepotInfo(*(fDepots[i].Get())), true);
-			ersatzDepot->SyncPackagesFromDepot(depot);
-			fDepots[i] = ersatzDepot;
-			return;
-		}
-	}
-	fDepots.push_back(depot);
+	BAutolock locker(&fLock);
+	std::vector<DepotInfoRef> depots;
+	depots.push_back(depot);
+	SetDepots(depots);
 }
 
 
-bool
-Model::HasDepot(const BString& name) const
+void
+Model::SetDepots(const std::vector<DepotInfoRef>& depots)
 {
-	return NULL != DepotForName(name).Get();
+	BAutolock locker(&fLock);
+	fDepots.clear();
+
+	std::vector<DepotInfoRef>::const_iterator it;
+
+	for (it = depots.begin(); it != depots.end(); it++) {
+		DepotInfoRef depot = *it;
+
+		if (!depot.IsSet()) {
+			HDFATAL("attempt to add an unset depot");
+		} else {
+			if (depot->Name().IsEmpty())
+				HDFATAL("depot has no name");
+
+			if (depot->Identifier().IsEmpty())
+				HDFATAL("depot has no identifier");
+
+			fDepots[depot->Name()] = depot;
+		}
+	}
+}
+
+
+const std::vector<DepotInfoRef>
+Model::Depots() const
+{
+	BAutolock locker(&fLock);
+	std::vector<DepotInfoRef> result;
+	std::map<BString, DepotInfoRef>::const_iterator it;
+
+	for (it = fDepots.begin(); it != fDepots.end(); it++)
+		result.push_back(it->second);
+
+	return result;
 }
 
 
 const DepotInfoRef
 Model::DepotForName(const BString& name) const
 {
-	if (name.IsEmpty())
-		return DepotInfoRef();
-
-	std::vector<DepotInfoRef>::const_iterator it;
-	for (it = fDepots.begin(); it != fDepots.end(); it++) {
-		DepotInfoRef aDepot = *it;
-		if (aDepot->Name() == name)
-			return aDepot;
-	}
+	BAutolock locker(&fLock);
+	std::map<BString, DepotInfoRef>::const_iterator it = fDepots.find(name);
+	if (it != fDepots.end())
+		return it->second;
 	return DepotInfoRef();
 }
 
 
-int32
-Model::CountDepots() const
+const DepotInfoRef
+Model::DepotForIdentifier(const BString& identifier) const
 {
-	return fDepots.size();
+	BAutolock locker(&fLock);
+	std::map<BString, DepotInfoRef>::const_iterator it;
+
+	for (it = fDepots.begin(); it != fDepots.end(); it++) {
+		if (it->second->Identifier() == identifier)
+			return it->second;
+	}
+
+	return DepotInfoRef();
 }
 
 
-DepotInfoRef
-Model::DepotAtIndex(int32 index) const
+const std::vector<PackageInfoRef>
+Model::FilteredPackages() const
 {
-	return fDepots[index];
+	BAutolock locker(&fLock);
+	std::map<BString, PackageInfoRef>::const_iterator it;
+	std::vector<PackageInfoRef> result;
+
+	for (it = fPackages.begin(); it != fPackages.end(); it++) {
+		PackageInfoRef package = it->second;
+		if (fFilter->AcceptsPackage(package))
+			result.push_back(package);
+	}
+
+	return result;
+}
+
+
+const std::vector<PackageInfoRef>
+Model::Packages() const
+{
+	BAutolock locker(&fLock);
+	std::map<BString, PackageInfoRef>::const_iterator it;
+	std::vector<PackageInfoRef> result;
+
+	for (it = fPackages.begin(); it != fPackages.end(); it++)
+		result.push_back(it->second);
+
+	return result;
+}
+
+
+uint32
+Model::_ChangeDiff(const PackageInfoRef& package)
+{
+	uint32 changeMask = kChangeMaskAll;
+	const PackageInfoRef existingPackage = PackageForName(package->Name());
+
+	if (existingPackage.IsSet())
+		changeMask = package->ChangeMask(*(existingPackage.Get()));
+
+	return changeMask;
+}
+
+
+void
+Model::AddPackage(const PackageInfoRef& package)
+{
+	if (!package.IsSet())
+		HDFATAL("attempt to add an unset package");
+	BAutolock locker(&fLock);
+	uint32 changeMask = _ChangeDiff(package);
+	fPackages[package->Name()] = package;
+	_NotifyPackageChange(PackageInfoEvent(package, changeMask));
+}
+
+
+void
+Model::AddPackages(const std::vector<PackageInfoRef>& packages)
+{
+	if (packages.empty())
+		return;
+
+	BAutolock locker(&fLock);
+	PackageInfoEvents events;
+	std::vector<PackageInfoRef>::const_iterator it;
+
+	for (it = packages.begin(); it != packages.end(); it++) {
+		PackageInfoRef package = *it;
+		events.AddEvent(PackageInfoEvent(package, _ChangeDiff(package)));
+		fPackages[package->Name()] = package;
+	}
+
+	_NotifyPackageChanges(events);
+}
+
+
+void
+Model::AddPackagesWithChange(const std::vector<PackageInfoRef>& packages, uint32 changeMask)
+{
+	if (packages.empty())
+		return;
+
+	BAutolock locker(&fLock);
+	PackageInfoEvents events;
+
+	std::vector<PackageInfoRef>::const_iterator it;
+	for (it = packages.begin(); it != packages.end(); it++) {
+		PackageInfoRef package = *it;
+		events.AddEvent(PackageInfoEvent(package, changeMask));
+		fPackages[package->Name()] = package;
+	}
+
+	_NotifyPackageChanges(events);
+}
+
+
+const PackageInfoRef
+Model::PackageForName(const BString& name) const
+{
+	BAutolock locker(&fLock);
+	std::map<BString, PackageInfoRef>::const_iterator it = fPackages.find(name);
+	if (it != fPackages.end())
+		return it->second;
+	return PackageInfoRef();
+}
+
+
+bool
+Model::HasPackage(const BString& packageName) const
+{
+	BAutolock locker(&fLock);
+	if (fPackages.find(packageName) != fPackages.end())
+		return true;
+	return false;
 }
 
 
 bool
 Model::HasAnyProminentPackages()
 {
-	std::vector<DepotInfoRef>::iterator it;
-	for (it = fDepots.begin(); it != fDepots.end(); it++) {
-		DepotInfoRef aDepot = *it;
-		if (aDepot->HasAnyProminentPackages())
-			return true;
+	BAutolock locker(&fLock);
+	std::map<BString, PackageInfoRef>::iterator it;
+
+	for (it = fPackages.begin(); it != fPackages.end(); it++) {
+		const PackageInfoRef package = it->second;
+
+		if (package.IsSet()) {
+			const PackageClassificationInfoRef classificationInfo
+				= package->PackageClassificationInfo();
+
+			if (classificationInfo.IsSet()) {
+				if (classificationInfo->IsProminent())
+					return true;
+			}
+		}
 	}
+
 	return false;
 }
 
@@ -227,47 +458,41 @@ Model::HasAnyProminentPackages()
 void
 Model::Clear()
 {
-	GetPackageIconRepository().Clear();
+	BAutolock locker(&fLock);
+	fIconRepository = PackageIconRepositoryRef(new PackageIconDefaultRepository(), true);
 	fDepots.clear();
-	fPopulatedPackageNames.MakeEmpty();
+	fPackages.clear();
 }
 
 
-void
-Model::SetStateForPackagesByName(BStringList& packageNames, PackageState state)
+package_list_view_mode
+Model::PackageListViewMode() const
 {
-	for (int32 i = 0; i < packageNames.CountStrings(); i++) {
-		BString packageName = packageNames.StringAt(i);
-		PackageInfoRef packageInfo = PackageForName(packageName);
-
-		if (packageInfo.IsSet()) {
-			// TODO; make this immutable
-
-			PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(packageInfo);
-			localInfo->SetState(state);
-			packageInfo->SetLocalInfo(localInfo);
-
-			HDINFO("did update package [%s] with state [%s]", packageName.String(),
-				PackageUtils::StateToString(state));
-		}
-		else {
-			HDINFO("was unable to find package [%s] so was not possible to set the state to [%s]",
-				packageName.String(), PackageUtils::StateToString(state));
-		}
-	}
+	BAutolock locker(&fLock);
+	return fPackageListViewMode;
 }
 
 
 void
 Model::SetPackageListViewMode(package_list_view_mode mode)
 {
+	BAutolock locker(&fLock);
 	fPackageListViewMode = mode;
+}
+
+
+bool
+Model::CanShareAnonymousUsageData() const
+{
+	BAutolock locker(&fLock);
+	return fCanShareAnonymousUsageData;
 }
 
 
 void
 Model::SetCanShareAnonymousUsageData(bool value)
 {
+	BAutolock locker(&fLock);
 	fCanShareAnonymousUsageData = value;
 }
 
@@ -293,104 +518,29 @@ Model::CanPopulatePackage(const PackageInfoRef& package)
 }
 
 
-static void
-model_remove_key_for_user(const BString& nickname)
+WebAppInterfaceRef
+Model::WebApp()
 {
-	if (nickname.IsEmpty())
-		return;
-	BKeyStore keyStore;
-	BPasswordKey key;
-	BString passwordIdentifier = BString(KEY_STORE_IDENTIFIER_PREFIX)
-		<< nickname;
-	status_t result = keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD,
-			passwordIdentifier, key);
-
-	switch (result) {
-		case B_OK:
-			result = keyStore.RemoveKey(kHaikuDepotKeyring, key);
-			if (result != B_OK) {
-				HDERROR("error occurred when removing password for nickname "
-					"[%s] : %s", nickname.String(), strerror(result));
-			}
-			break;
-		case B_ENTRY_NOT_FOUND:
-			return;
-		default:
-			HDERROR("error occurred when finding password for nickname "
-				"[%s] : %s", nickname.String(), strerror(result));
-			break;
-	}
-}
-
-
-void
-Model::SetNickname(BString nickname)
-{
-	BString password;
-	BString existingNickname = Nickname();
-
-	// this happens when the user is logging out.  Best to remove the password
-	// stored for the existing user since it is no longer required.
-
-	if (!existingNickname.IsEmpty() && nickname.IsEmpty())
-		model_remove_key_for_user(existingNickname);
-
-	if (nickname.Length() > 0) {
-		BPasswordKey key;
-		BKeyStore keyStore;
-		BString passwordIdentifier = BString(KEY_STORE_IDENTIFIER_PREFIX)
-			<< nickname;
-		if (keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD,
-				passwordIdentifier, key) == B_OK) {
-			password = key.Password();
-		}
-		if (password.IsEmpty())
-			nickname = "";
-	}
-
-	SetCredentials(nickname, password, false);
+	BAutolock locker(&fLock);
+	return fWebApp;
 }
 
 
 const BString&
 Model::Nickname()
 {
-	return fWebAppInterface.Nickname();
+	BAutolock locker(&fLock);
+	return fWebApp->Nickname();
 }
 
 
 void
-Model::SetCredentials(const BString& nickname, const BString& passwordClear,
-	bool storePassword)
+Model::SetCredentials(const UserCredentials& credentials)
 {
-	BString existingNickname = Nickname();
-
-	if (storePassword) {
-		// no point continuing to store the password for the previous user.
-
-		if (!existingNickname.IsEmpty())
-			model_remove_key_for_user(existingNickname);
-
-		// adding a key that is already there does not seem to override the
-		// existing key so the old key needs to be removed first.
-
-		if (!nickname.IsEmpty())
-			model_remove_key_for_user(nickname);
-
-		if (!nickname.IsEmpty() && !passwordClear.IsEmpty()) {
-			BString keyIdentifier = BString(KEY_STORE_IDENTIFIER_PREFIX)
-				<< nickname;
-			BPasswordKey key(passwordClear, B_KEY_PURPOSE_WEB, keyIdentifier);
-			BKeyStore keyStore;
-			keyStore.AddKeyring(kHaikuDepotKeyring);
-			keyStore.AddKey(kHaikuDepotKeyring, key);
-		}
-	}
-
 	BAutolock locker(&fLock);
-	fWebAppInterface.SetCredentials(UserCredentials(nickname, passwordClear));
-
-	if (nickname != existingNickname)
+	const BString existingNickname = Nickname();
+	fWebApp = WebAppInterfaceRef(new WebAppInterface(credentials));
+	if (credentials.Nickname() != existingNickname)
 		_NotifyAuthorizationChanged();
 }
 
@@ -398,6 +548,22 @@ Model::SetCredentials(const BString& nickname, const BString& passwordClear,
 // #pragma mark - listener notification methods
 
 
+/*!	Assumes that the class is locked.
+ */
+void
+Model::_NotifyPackageFilterChanged()
+{
+	std::vector<ModelListenerRef>::const_iterator it;
+	for (it = fListeners.begin(); it != fListeners.end(); it++) {
+		const ModelListenerRef& listener = *it;
+		if (listener.IsSet())
+			listener->PackageFilterChanged();
+	}
+}
+
+
+/*!	Assumes that the class is locked.
+ */
 void
 Model::_NotifyAuthorizationChanged()
 {
@@ -423,8 +589,35 @@ Model::_NotifyCategoryListChanged()
 
 
 void
-Model::_MaybeLogJsonRpcError(const BMessage &responsePayload,
-	const char *sourceDescription) const
+Model::_NotifyPackageChange(const PackageInfoEvent& event)
+{
+	std::vector<PackageInfoListenerRef>::const_iterator it;
+	for (it = fPackageListeners.begin(); it != fPackageListeners.end(); it++) {
+		const PackageInfoListenerRef& listener = *it;
+		if (listener.IsSet())
+			listener->PackagesChanged(PackageInfoEvents(event));
+	}
+}
+
+
+// TODO: future work to optimize how this is conveyed to the listener in one go.
+void
+Model::_NotifyPackageChanges(const PackageInfoEvents& events)
+{
+	if (events.IsEmpty())
+		return;
+
+	std::vector<PackageInfoListenerRef>::const_iterator it;
+	for (it = fPackageListeners.begin(); it != fPackageListeners.end(); it++) {
+		const PackageInfoListenerRef& listener = *it;
+		if (listener.IsSet())
+			listener->PackagesChanged(events);
+	}
+}
+
+
+void
+Model::_MaybeLogJsonRpcError(const BMessage& responsePayload, const char* sourceDescription) const
 {
 	BMessage error;
 	BString errorMessage;
@@ -433,143 +626,66 @@ Model::_MaybeLogJsonRpcError(const BMessage &responsePayload,
 	if (responsePayload.FindMessage("error", &error) == B_OK
 		&& error.FindString("message", &errorMessage) == B_OK
 		&& error.FindDouble("code", &errorCode) == B_OK) {
-		HDERROR("[%s] --> error : [%s] (%f)", sourceDescription,
-			errorMessage.String(), errorCode);
-	} else
+		HDERROR("[%s] --> error : [%s] (%f)", sourceDescription, errorMessage.String(), errorCode);
+	} else {
 		HDERROR("[%s] --> an undefined error has occurred", sourceDescription);
+	}
 }
 
 
 // #pragma mark - Rating Stabilities
 
 
-int32
-Model::CountRatingStabilities() const
+const std::vector<RatingStabilityRef>
+Model::RatingStabilities() const
 {
-	return fRatingStabilities.size();
-}
-
-
-RatingStabilityRef
-Model::RatingStabilityByCode(BString& code) const
-{
-	std::vector<RatingStabilityRef>::const_iterator it;
-	for (it = fRatingStabilities.begin(); it != fRatingStabilities.end();
-			it++) {
-		RatingStabilityRef aRatingStability = *it;
-		if (aRatingStability->Code() == code)
-			return aRatingStability;
-	}
-	return RatingStabilityRef();
-}
-
-
-RatingStabilityRef
-Model::RatingStabilityAtIndex(int32 index) const
-{
-	return fRatingStabilities[index];
+	BAutolock locker(&fLock);
+	return fRatingStabilities;
 }
 
 
 void
-Model::AddRatingStabilities(std::vector<RatingStabilityRef>& values)
+Model::SetRatingStabilities(const std::vector<RatingStabilityRef> value)
 {
-	std::vector<RatingStabilityRef>::const_iterator it;
-	for (it = values.begin(); it != values.end(); it++)
-		_AddRatingStability(*it);
-}
-
-
-void
-Model::_AddRatingStability(const RatingStabilityRef& value)
-{
-	std::vector<RatingStabilityRef>::const_iterator itInsertionPtConst
-		= std::lower_bound(
-			fRatingStabilities.begin(),
-			fRatingStabilities.end(),
-			value,
-			&IsRatingStabilityBefore);
-	std::vector<RatingStabilityRef>::iterator itInsertionPt =
-		fRatingStabilities.begin()
-			+ (itInsertionPtConst - fRatingStabilities.begin());
-
-	if (itInsertionPt != fRatingStabilities.end()
-		&& (*itInsertionPt)->Code() == value->Code()) {
-		itInsertionPt = fRatingStabilities.erase(itInsertionPt);
-			// replace the one with the same code.
-	}
-
-	fRatingStabilities.insert(itInsertionPt, value);
+	BAutolock locker(&fLock);
+	fRatingStabilities = value;
+	std::sort(fRatingStabilities.begin(), fRatingStabilities.end(), IsRatingStabilityRefLess);
 }
 
 
 // #pragma mark - Categories
 
 
-int32
-Model::CountCategories() const
+bool
+Model::HasCategories()
 {
-	return fCategories.size();
+	BAutolock locker(&fLock);
+	return !fCategories.empty();
 }
 
 
-CategoryRef
-Model::CategoryByCode(BString& code) const
+const std::vector<CategoryRef>
+Model::Categories() const
 {
-	std::vector<CategoryRef>::const_iterator it;
-	for (it = fCategories.begin(); it != fCategories.end(); it++) {
-		CategoryRef aCategory = *it;
-		if (aCategory->Code() == code)
-			return aCategory;
-	}
-	return CategoryRef();
-}
-
-
-CategoryRef
-Model::CategoryAtIndex(int32 index) const
-{
-	return fCategories[index];
+	BAutolock locker(&fLock);
+	return fCategories;
 }
 
 
 void
-Model::AddCategories(std::vector<CategoryRef>& values)
+Model::SetCategories(const std::vector<CategoryRef> value)
 {
-	std::vector<CategoryRef>::iterator it;
-	for (it = values.begin(); it != values.end(); it++)
-		_AddCategory(*it);
+	BAutolock locker(&fLock);
+	fCategories = value;
+	std::sort(fCategories.begin(), fCategories.end(), IsPackageCategoryRefLess);
 	_NotifyCategoryListChanged();
-}
-
-/*! This will insert the category in order.
- */
-
-void
-Model::_AddCategory(const CategoryRef& category)
-{
-	std::vector<CategoryRef>::const_iterator itInsertionPtConst
-		= std::lower_bound(
-			fCategories.begin(),
-			fCategories.end(),
-			category,
-			&IsPackageCategoryBefore);
-	std::vector<CategoryRef>::iterator itInsertionPt =
-		fCategories.begin() + (itInsertionPtConst - fCategories.begin());
-
-	if (itInsertionPt != fCategories.end()
-		&& (*itInsertionPt)->Code() == category->Code()) {
-		itInsertionPt = fCategories.erase(itInsertionPt);
-			// replace the one with the same code.
-	}
-
-	fCategories.insert(itInsertionPt, category);
 }
 
 
 void
 Model::ScreenshotCached(const ScreenshotCoordinate& coord)
 {
+	BAutolock locker(&fLock);
 	std::vector<ModelListenerRef>::const_iterator it;
 	for (it = fListeners.begin(); it != fListeners.end(); it++) {
 		const ModelListenerRef& listener = *it;

@@ -1,12 +1,12 @@
 /*
- * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "AbstractProcess.h"
 
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
@@ -18,6 +18,9 @@
 #include "ProcessListener.h"
 
 
+static const bigtime_t kProcessUpdateMinimumDelay = 250000;
+
+
 AbstractProcess::AbstractProcess()
 	:
 	fLock(),
@@ -25,7 +28,8 @@ AbstractProcess::AbstractProcess()
 	fWasStopped(false),
 	fProcessState(PROCESS_INITIAL),
 	fErrorStatus(B_OK),
-	fDurationSeconds(0.0)
+	fDurationSeconds(0.0),
+	fLastProgressUpdate(0)
 {
 }
 
@@ -72,7 +76,7 @@ AbstractProcess::Run()
 
 	BStopWatch stopWatch("process", true);
 	status_t runResult = RunInternal();
-	fDurationSeconds = ((double) stopWatch.ElapsedTime() / 1000000.0);
+	fDurationSeconds = static_cast<double>(stopWatch.ElapsedTime()) / 1000000.0;
 
 	if (runResult != B_OK)
 		HDERROR("[%s] an error has arisen; %s", Name(), strerror(runResult));
@@ -109,11 +113,11 @@ AbstractProcess::ErrorStatus()
 }
 
 
-/*! This method will stop the process.  The actual process may carry on to
-    perform some tidy-ups on its thread so this does not stop the thread or
-    change the state of the process; just indicates to the running thread that
-    it should stop.  If it has not yet been started then it will be put into
-    finished state.
+/*!	This method will stop the process.  The actual process may carry on to
+	perform some tidy-ups on its thread so this does not stop the thread or
+	change the state of the process; just indicates to the running thread that
+	it should stop.  If it has not yet been started then it will be put into
+	finished state.
 */
 
 status_t
@@ -193,6 +197,22 @@ AbstractProcess::LogReport()
 	result.SetToFormat("%s [%c] %6.3f", Name(), _ProcessStateIdentifier(ProcessState()),
 		fDurationSeconds);
 	return result;
+}
+
+
+/*!	This method should be called before processing any progress. It will prevent
+	progress updates from coming through too frequently.
+*/
+bool
+AbstractProcess::_ShouldProcessProgress()
+{
+	bigtime_t now = system_time();
+
+	if (now - fLastProgressUpdate < kProcessUpdateMinimumDelay)
+		return false;
+
+	fLastProgressUpdate = now;
+	return true;
 }
 
 

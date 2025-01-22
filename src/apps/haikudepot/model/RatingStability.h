@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef RATING_STABILITY_H
@@ -20,12 +20,9 @@ public:
 								RatingStability(
 									const RatingStability& other);
 
-			RatingStability&
-								operator=(const RatingStability& other);
-			bool				operator==(const RatingStability& other)
-									const;
-			bool				operator!=(const RatingStability& other)
-									const;
+			bool				operator<(const RatingStability& other) const;
+			bool				operator==(const RatingStability& other) const;
+			bool				operator!=(const RatingStability& other) const;
 
 			const BString&		Code() const
 									{ return fCode; }
@@ -46,7 +43,7 @@ private:
 typedef BReference<RatingStability> RatingStabilityRef;
 
 
-extern bool IsRatingStabilityBefore(const RatingStabilityRef& rs1,
+extern bool IsRatingStabilityRefLess(const RatingStabilityRef& rs1,
 	const RatingStabilityRef& rs2);
 
 

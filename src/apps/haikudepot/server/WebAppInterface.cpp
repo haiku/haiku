@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "WebAppInterface.h"
@@ -14,8 +14,8 @@
 #include <HttpHeaders.h>
 #include <HttpRequest.h>
 #include <Json.h>
-#include <JsonTextWriter.h>
 #include <JsonMessageWriter.h>
+#include <JsonTextWriter.h>
 #include <UrlContext.h>
 #include <UrlProtocolListener.h>
 #include <UrlProtocolRoster.h>
@@ -89,12 +89,10 @@ public:
 
 
 static BHttpRequest*
-make_http_request(const BUrl& url, BDataIO* output,
-	BUrlProtocolListener* listener = NULL,
+make_http_request(const BUrl& url, BDataIO* output, BUrlProtocolListener* listener = NULL,
 	BUrlContext* context = NULL)
 {
-	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url, output,
-		listener, context);
+	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url, output, listener, context);
 	BHttpRequest* httpRequest = dynamic_cast<BHttpRequest*>(request);
 	if (httpRequest == NULL) {
 		delete request;
@@ -109,8 +107,9 @@ enum {
 };
 
 
-WebAppInterface::WebAppInterface()
+WebAppInterface::WebAppInterface(const UserCredentials& value)
 {
+	_SetCredentials(value);
 }
 
 
@@ -120,9 +119,8 @@ WebAppInterface::~WebAppInterface()
 
 
 void
-WebAppInterface::SetCredentials(const UserCredentials& value)
+WebAppInterface::_SetCredentials(const UserCredentials& value)
 {
-	AutoLocker<BLocker> lock(&fLock);
 	if (fCredentials != value) {
 		fCredentials = value;
 		fAccessToken.Clear();
@@ -133,7 +131,6 @@ WebAppInterface::SetCredentials(const UserCredentials& value)
 const BString&
 WebAppInterface::Nickname()
 {
-	AutoLocker<BLocker> lock(&fLock);
 	return fCredentials.Nickname();
 }
 
@@ -212,21 +209,18 @@ WebAppInterface::RetrieveUserRatingsForPackageForDisplay(
 
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("user-rating/search-user-ratings",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		0, message);
+	return _SendJsonRequest("user-rating/search-user-ratings", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
 }
 
 
 status_t
-WebAppInterface::RetrieveUserRatingForPackageAndVersionByUser(
-	const BString& packageName, const BPackageVersion& version,
-	const BString& architecture,
-	const BString& webAppRepositoryCode,
-	const BString& webAppRepositorySourceCode,
+WebAppInterface::RetrieveUserRatingForPackageAndVersionByUser(const BString& packageName,
+	const BPackageVersion& version, const BString& architecture,
+	const BString& webAppRepositoryCode, const BString& webAppRepositorySourceCode,
 	const BString& userNickname, BMessage& message)
 {
-		// BHttpRequest later takes ownership of this.
+	// BHttpRequest later takes ownership of this.
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
@@ -270,10 +264,8 @@ WebAppInterface::RetrieveUserRatingForPackageAndVersionByUser(
 
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest(
-		"user-rating/get-user-rating-by-user-and-pkg-version",
-		requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
+	return _SendJsonRequest("user-rating/get-user-rating-by-user-and-pkg-version",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
 		message);
 }
 
@@ -285,12 +277,12 @@ WebAppInterface::RetrieveUserRatingForPackageAndVersionByUser(
 */
 
 status_t
-WebAppInterface::RetrieveUserDetailForCredentials(
-	const UserCredentials& credentials, BMessage& message)
+WebAppInterface::RetrieveUserDetailForCredentials(const UserCredentials& credentials,
+	BMessage& message)
 {
 	if (!credentials.IsValid()) {
 		debugger("the credentials supplied are invalid so it is not possible "
-			"to obtain the user detail");
+				 "to obtain the user detail");
 	}
 
 	status_t result = B_OK;
@@ -301,9 +293,7 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 	BMessage authenticateResponseEnvelopeMessage;
 
 	if (result == B_OK) {
-		result = AuthenticateUser(
-			credentials.Nickname(),
-			credentials.PasswordClear(),
+		result = AuthenticateUser(credentials.Nickname(), credentials.PasswordClear(),
 			authenticateResponseEnvelopeMessage);
 	}
 
@@ -313,7 +303,7 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 		result = UnpackAccessToken(authenticateResponseEnvelopeMessage, accessToken);
 
 	if (result == B_OK) {
-			// BHttpRequest later takes ownership of this.
+		// BHttpRequest later takes ownership of this.
 		BMallocIO* requestEnvelopeData = new BMallocIO();
 		BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
@@ -322,9 +312,8 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 		requestEnvelopeWriter.WriteString(credentials.Nickname().String());
 		requestEnvelopeWriter.WriteObjectEnd();
 
-		result = _SendJsonRequest("user/get-user", accessToken,
-			requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-			NEEDS_AUTHORIZATION, message);
+		result = _SendJsonRequest("user/get-user", accessToken, requestEnvelopeData,
+			_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION, message);
 			// note that the credentials used here are passed in as args.
 	}
 
@@ -350,12 +339,10 @@ WebAppInterface::RetrieveCurrentUserDetail(BMessage& message)
 */
 
 /*static*/ status_t
-WebAppInterface::UnpackUserDetail(BMessage& responseEnvelopeMessage,
-	UserDetail& userDetail)
+WebAppInterface::UnpackUserDetail(BMessage& responseEnvelopeMessage, UserDetail& userDetail)
 {
 	BMessage resultMessage;
-	status_t result = responseEnvelopeMessage.FindMessage(
-		"result", &resultMessage);
+	status_t result = responseEnvelopeMessage.FindMessage("result", &resultMessage);
 
 	if (result != B_OK) {
 		HDERROR("bad response envelope missing 'result' entry");
@@ -367,29 +354,24 @@ WebAppInterface::UnpackUserDetail(BMessage& responseEnvelopeMessage,
 	userDetail.SetNickname(nickname);
 
 	BMessage agreementMessage;
-	if (resultMessage.FindMessage("userUsageConditionsAgreement",
-		&agreementMessage) == B_OK) {
+	if (resultMessage.FindMessage("userUsageConditionsAgreement", &agreementMessage) == B_OK) {
 		BString code;
 		BDateTime agreedToTimestamp;
 		BString userUsageConditionsCode;
 		UserUsageConditionsAgreement agreement = userDetail.Agreement();
 		bool isLatest;
 
-		if (agreementMessage.FindString("userUsageConditionsCode",
-			&userUsageConditionsCode) == B_OK) {
+		if (agreementMessage.FindString("userUsageConditionsCode", &userUsageConditionsCode)
+			== B_OK) {
 			agreement.SetCode(userUsageConditionsCode);
 		}
 
 		double timestampAgreedMillis;
-		if (agreementMessage.FindDouble("timestampAgreed",
-			&timestampAgreedMillis) == B_OK) {
-			agreement.SetTimestampAgreed((uint64) timestampAgreedMillis);
-		}
+		if (agreementMessage.FindDouble("timestampAgreed", &timestampAgreedMillis) == B_OK)
+			agreement.SetTimestampAgreed((uint64)timestampAgreedMillis);
 
-		if (agreementMessage.FindBool("isLatest", &isLatest)
-			== B_OK) {
+		if (agreementMessage.FindBool("isLatest", &isLatest) == B_OK)
 			agreement.SetIsLatest(isLatest);
-		}
 
 		userDetail.SetAgreement(agreement);
 	}
@@ -399,20 +381,18 @@ WebAppInterface::UnpackUserDetail(BMessage& responseEnvelopeMessage,
 
 
 /*! When an authentication API call is made, the response (if successful) will
-    return an access token in the response. This method will take the response
-    from the server and will parse out the access token data into the supplied
-    object.
+	return an access token in the response. This method will take the response
+	from the server and will parse out the access token data into the supplied
+	object.
 */
 
 /*static*/ status_t
-WebAppInterface::UnpackAccessToken(BMessage& responseEnvelopeMessage,
-	AccessToken& accessToken)
+WebAppInterface::UnpackAccessToken(BMessage& responseEnvelopeMessage, AccessToken& accessToken)
 {
 	status_t result;
 
 	BMessage resultMessage;
-	result = responseEnvelopeMessage.FindMessage(
-		"result", &resultMessage);
+	result = responseEnvelopeMessage.FindMessage("result", &resultMessage);
 
 	if (result != B_OK) {
 		HDERROR("bad response envelope missing 'result' entry");
@@ -469,12 +449,10 @@ WebAppInterface::UnpackAccessToken(BMessage& responseEnvelopeMessage,
 */
 
 status_t
-WebAppInterface::RetrieveUserUsageConditions(const BString& code,
-	UserUsageConditions& conditions)
+WebAppInterface::RetrieveUserUsageConditions(const BString& code, UserUsageConditions& conditions)
 {
 	BMessage responseEnvelopeMessage;
-	status_t result = _RetrieveUserUsageConditionsMeta(code,
-		responseEnvelopeMessage);
+	status_t result = _RetrieveUserUsageConditionsMeta(code, responseEnvelopeMessage);
 
 	if (result != B_OK)
 		return result;
@@ -489,11 +467,10 @@ WebAppInterface::RetrieveUserUsageConditions(const BString& code,
 	double metaDataMinimumAge;
 	BString copyMarkdown;
 
-	if ( (resultMessage.FindString("code", &metaDataCode) != B_OK)
-			|| (resultMessage.FindDouble(
-				"minimumAge", &metaDataMinimumAge) != B_OK) ) {
+	if ((resultMessage.FindString("code", &metaDataCode) != B_OK)
+		|| (resultMessage.FindDouble("minimumAge", &metaDataMinimumAge) != B_OK)) {
 		HDERROR("unexpected response from server with missing user usage "
-			"conditions data");
+				"conditions data");
 		return B_BAD_DATA;
 	}
 
@@ -505,17 +482,15 @@ WebAppInterface::RetrieveUserUsageConditions(const BString& code,
 
 	conditions.SetCode(metaDataCode);
 	conditions.SetMinimumAge(metaDataMinimumAge);
-	conditions.SetCopyMarkdown(
-		BString(static_cast<const char*>(copyMarkdownData->Buffer()),
-			copyMarkdownData->BufferLength()));
+	conditions.SetCopyMarkdown(BString(static_cast<const char*>(copyMarkdownData->Buffer()),
+		copyMarkdownData->BufferLength()));
 
 	return B_OK;
 }
 
 
 status_t
-WebAppInterface::AgreeUserUsageConditions(const BString& code,
-	BMessage& responsePayload)
+WebAppInterface::AgreeUserUsageConditions(const BString& code, BMessage& responsePayload)
 {
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
@@ -529,15 +504,13 @@ WebAppInterface::AgreeUserUsageConditions(const BString& code,
 
 	// now fetch this information into an object.
 
-	return _SendJsonRequest("user/agree-user-usage-conditions",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		NEEDS_AUTHORIZATION, responsePayload);
+	return _SendJsonRequest("user/agree-user-usage-conditions", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION, responsePayload);
 }
 
 
 status_t
-WebAppInterface::_RetrieveUserUsageConditionsMeta(const BString& code,
-	BMessage& message)
+WebAppInterface::_RetrieveUserUsageConditionsMeta(const BString& code, BMessage& message)
 {
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
@@ -553,33 +526,26 @@ WebAppInterface::_RetrieveUserUsageConditionsMeta(const BString& code,
 
 	// now fetch this information into an object.
 
-	return _SendJsonRequest("user/get-user-usage-conditions",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		0, message);
+	return _SendJsonRequest("user/get-user-usage-conditions", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
 }
 
 
 status_t
-WebAppInterface::_RetrieveUserUsageConditionsCopy(const BString& code,
-	BDataIO* stream)
+WebAppInterface::_RetrieveUserUsageConditionsCopy(const BString& code, BDataIO* stream)
 {
-	return _SendRawGetRequest(
-		BString("/__user/usageconditions/") << code << "/document.md",
+	return _SendRawGetRequest(BString("/__user/usageconditions/") << code << "/document.md",
 		stream);
 }
 
 
 status_t
-WebAppInterface::CreateUserRating(const BString& packageName,
-	const BPackageVersion& version,
-	const BString& architecture,
-	const BString& webAppRepositoryCode,
-	const BString& webAppRepositorySourceCode,
-	const BString& naturalLanguageCode,
-		// This is the "ID" in the ICU system; the term `code` is used with the
-		// server system.
-	const BString& comment,
-	const BString& stability, int rating, BMessage& message)
+WebAppInterface::CreateUserRating(const BString& packageName, const BPackageVersion& version,
+	const BString& architecture, const BString& webAppRepositoryCode,
+	const BString& webAppRepositorySourceCode, const BString& naturalLanguageCode,
+	// This is the "ID" in the ICU system; the term `code` is used with the
+	// server system.
+	const BString& comment, const BString& stability, int rating, BMessage& message)
 {
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 		// BHttpRequest later takes ownership of this.
@@ -628,7 +594,7 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 
 	if (rating > 0.0f) {
 		requestEnvelopeWriter.WriteObjectName("rating");
-    	requestEnvelopeWriter.WriteInteger(rating);
+		requestEnvelopeWriter.WriteInteger(rating);
 	}
 
 	if (stability.Length() > 0) {
@@ -643,19 +609,16 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("user-rating/create-user-rating",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		NEEDS_AUTHORIZATION, message);
+	return _SendJsonRequest("user-rating/create-user-rating", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION, message);
 }
 
 
 status_t
-WebAppInterface::UpdateUserRating(const BString& ratingID,
-	const BString& naturalLanguageCode,
-		// This is the "ID" in the ICU system; the term `code` is used with the
-		// server system.
-	const BString& comment,
-	const BString& stability, int rating, bool active, BMessage& message)
+WebAppInterface::UpdateUserRating(const BString& ratingID, const BString& naturalLanguageCode,
+	// This is the "ID" in the ICU system; the term `code` is used with the
+	// server system.
+	const BString& comment, const BString& stability, int rating, bool active, BMessage& message)
 {
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 		// BHttpRequest later takes ownership of this.
@@ -696,23 +659,21 @@ WebAppInterface::UpdateUserRating(const BString& ratingID,
 
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("user-rating/update-user-rating",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		NEEDS_AUTHORIZATION, message);
+	return _SendJsonRequest("user-rating/update-user-rating", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION, message);
 }
 
 
 /*! This method will call to the server to get a screenshot that will fit into
-    the specified width and height.
+	the specified width and height.
 */
 
 status_t
-WebAppInterface::RetrieveScreenshot(const BString& code,
-	int32 width, int32 height, BDataIO* stream)
+WebAppInterface::RetrieveScreenshot(const BString& code, int32 width, int32 height, BDataIO* stream)
 {
-	return _SendRawGetRequest(
-		BString("/__pkgscreenshot/") << code << ".png" << "?tw="
-			<< width << "&th=" << height, stream);
+	return _SendRawGetRequest(BString("/__pkgscreenshot/")
+			<< code << ".png" << "?tw=" << width << "&th=" << height,
+		stream);
 }
 
 
@@ -726,25 +687,20 @@ WebAppInterface::RequestCaptcha(BMessage& message)
 	requestEnvelopeWriter.WriteObjectStart();
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("captcha/generate-captcha",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		0, message);
+	return _SendJsonRequest("captcha/generate-captcha", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
 }
 
 
 status_t
-WebAppInterface::CreateUser(const BString& nickName,
-	const BString& passwordClear,
-	const BString& email,
-	const BString& captchaToken,
-	const BString& captchaResponse,
+WebAppInterface::CreateUser(const BString& nickName, const BString& passwordClear,
+	const BString& email, const BString& captchaToken, const BString& captchaResponse,
 	const BString& naturalLanguageCode,
-		// This is the "ID" in the ICU system; the term `code` is used with the
-		// server system.
-	const BString& userUsageConditionsCode,
-	BMessage& message)
+	// This is the "ID" in the ICU system; the term `code` is used with the
+	// server system.
+	const BString& userUsageConditionsCode, BMessage& message)
 {
-		// BHttpRequest later takes ownership of this.
+	// BHttpRequest later takes ownership of this.
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
@@ -776,7 +732,7 @@ WebAppInterface::CreateUser(const BString& nickName,
 
 
 /*! This method will authenticate the user set in the credentials and will
-    retain the resultant access token for authenticating any latter API calls.
+	retain the resultant access token for authenticating any latter API calls.
 */
 
 status_t
@@ -796,7 +752,8 @@ WebAppInterface::AuthenticateUserRetainingAccessToken()
 
 status_t
 WebAppInterface::_AuthenticateUserRetainingAccessToken(const BString& nickName,
-	const BString& passwordClear) {
+	const BString& passwordClear)
+{
 	AutoLocker<BLocker> lock(&fLock);
 
 	fAccessToken.Clear();
@@ -817,8 +774,8 @@ WebAppInterface::_AuthenticateUserRetainingAccessToken(const BString& nickName,
 
 
 status_t
-WebAppInterface::AuthenticateUser(const BString& nickName,
-	const BString& passwordClear, BMessage& message)
+WebAppInterface::AuthenticateUser(const BString& nickName, const BString& passwordClear,
+	BMessage& message)
 {
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 		// BHttpRequest later takes ownership of this.
@@ -833,9 +790,8 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("user/authenticate-user",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		0, message);
+	return _SendJsonRequest("user/authenticate-user", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
 }
 
 
@@ -893,19 +849,16 @@ WebAppInterface::IncrementViewCounter(const PackageInfoRef package, const DepotI
 
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("pkg/increment-view-counter",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		0, message);
+	return _SendJsonRequest("pkg/increment-view-counter", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
 }
 
 
 status_t
-WebAppInterface::RetrievePasswordRequirements(
-	PasswordRequirements& passwordRequirements)
+WebAppInterface::RetrievePasswordRequirements(PasswordRequirements& passwordRequirements)
 {
 	BMessage responseEnvelopeMessage;
-	status_t result = _RetrievePasswordRequirementsMeta(
-		responseEnvelopeMessage);
+	status_t result = _RetrievePasswordRequirementsMeta(responseEnvelopeMessage);
 
 	if (result != B_OK)
 		return result;
@@ -922,13 +875,13 @@ WebAppInterface::RetrievePasswordRequirements(
 	double value;
 
 	if (resultMessage.FindDouble("minPasswordLength", &value) == B_OK)
-		passwordRequirements.SetMinPasswordLength((uint32) value);
+		passwordRequirements.SetMinPasswordLength((uint32)value);
 
 	if (resultMessage.FindDouble("minPasswordUppercaseChar", &value) == B_OK)
-		passwordRequirements.SetMinPasswordUppercaseChar((uint32) value);
+		passwordRequirements.SetMinPasswordUppercaseChar((uint32)value);
 
 	if (resultMessage.FindDouble("minPasswordDigitsChar", &value) == B_OK)
-		passwordRequirements.SetMinPasswordDigitsChar((uint32) value);
+		passwordRequirements.SetMinPasswordDigitsChar((uint32)value);
 
 	return result;
 }
@@ -944,9 +897,8 @@ WebAppInterface::_RetrievePasswordRequirementsMeta(BMessage& message)
 	requestEnvelopeWriter.WriteObjectStart();
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("user/get-password-requirements",
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		0, message);
+	return _SendJsonRequest("user/get-password-requirements", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
 }
 
 
@@ -966,7 +918,7 @@ WebAppInterface::ErrorCodeFromResponse(BMessage& responseEnvelopeMessage)
 
 	if (responseEnvelopeMessage.FindMessage("error", &error) == B_OK
 		&& error.FindDouble("code", &code) == B_OK) {
-		return (int32) code;
+		return (int32)code;
 	}
 
 	return 0;
@@ -977,9 +929,8 @@ WebAppInterface::ErrorCodeFromResponse(BMessage& responseEnvelopeMessage)
 
 
 status_t
-WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
-	BPositionIO* requestData, size_t requestDataSize, uint32 flags,
-	BMessage& reply)
+WebAppInterface::_SendJsonRequest(const char* urlPathComponents, BPositionIO* requestData,
+	size_t requestDataSize, uint32 flags, BMessage& reply)
 {
 	bool needsAuthorization = (flags & NEEDS_AUTHORIZATION) != 0;
 	AccessToken accessToken;
@@ -987,15 +938,14 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 	if (needsAuthorization)
 		accessToken = _ObtainValidAccessToken();
 
-	return _SendJsonRequest(urlPathComponents, accessToken, requestData,
-		requestDataSize, flags, reply);
+	return _SendJsonRequest(urlPathComponents, accessToken, requestData, requestDataSize, flags,
+		reply);
 }
 
 
 /*static*/ status_t
-WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
-	const AccessToken& accessToken, BPositionIO* requestData,
-	size_t requestDataSize, uint32 flags, BMessage& reply)
+WebAppInterface::_SendJsonRequest(const char* urlPathComponents, const AccessToken& accessToken,
+	BPositionIO* requestData, size_t requestDataSize, uint32 flags, BMessage& reply)
 {
 	if (requestDataSize == 0) {
 		HDINFO("%s; empty request payload", PROTOCOL_NAME);
@@ -1004,14 +954,15 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 
 	if (!ServerHelper::IsNetworkAvailable()) {
 		HDDEBUG("%s; dropping request to ...[%s] as network is not"
-			" available", PROTOCOL_NAME, urlPathComponents);
+				" available",
+			PROTOCOL_NAME, urlPathComponents);
 		delete requestData;
 		return HD_NETWORK_INACCESSIBLE;
 	}
 
 	if (ServerSettings::IsClientTooOld()) {
-		HDDEBUG("%s; dropping request to ...[%s] as client is too old",
-			PROTOCOL_NAME, urlPathComponents);
+		HDDEBUG("%s; dropping request to ...[%s] as client is too old", PROTOCOL_NAME,
+			urlPathComponents);
 		delete requestData;
 		return HD_CLIENT_TOO_OLD;
 	}
@@ -1019,16 +970,14 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 	bool needsAuthorization = (flags & NEEDS_AUTHORIZATION) != 0;
 
 	if (needsAuthorization && !accessToken.IsValid()) {
-		HDDEBUG("%s; dropping request to ...[%s] as access token is not valid",
-			PROTOCOL_NAME, urlPathComponents);
+		HDDEBUG("%s; dropping request to ...[%s] as access token is not valid", PROTOCOL_NAME,
+			urlPathComponents);
 		delete requestData;
 		return B_NOT_ALLOWED;
 	}
 
-	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v2/")
-		<< urlPathComponents);
-	HDDEBUG("%s; will make request to [%s]", PROTOCOL_NAME,
-		url.UrlString().String());
+	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v2/") << urlPathComponents);
+	HDDEBUG("%s; will make request to [%s]", PROTOCOL_NAME, url.UrlString().String());
 
 	// If the request payload is logged then it must be copied to local memory
 	// from the stream.  This then requires that the request data is then
@@ -1071,13 +1020,12 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 	thread_id thread = request->Run();
 	wait_for_thread(thread, NULL);
 
-	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request->Result());
+	const BHttpResult& result = dynamic_cast<const BHttpResult&>(request->Result());
 
 	int32 statusCode = result.StatusCode();
 
-	HDDEBUG("%s; did receive http-status [%" B_PRId32 "] from [%s]",
-		PROTOCOL_NAME, statusCode, url.UrlString().String());
+	HDDEBUG("%s; did receive http-status [%" B_PRId32 "] from [%s]", PROTOCOL_NAME, statusCode,
+		url.UrlString().String());
 
 	switch (statusCode) {
 		case B_HTTP_STATUS_OK:
@@ -1089,8 +1037,8 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 
 		default:
 			HDERROR("%s; request to endpoint [.../%s] failed with http "
-				"status [%" B_PRId32 "]\n", PROTOCOL_NAME, urlPathComponents,
-				statusCode);
+					"status [%" B_PRId32 "]\n",
+				PROTOCOL_NAME, urlPathComponents, statusCode);
 			return B_ERROR;
 	}
 
@@ -1108,7 +1056,7 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 	status_t status = jsonMessageWriter.ErrorStatus();
 
 	if (Logger::IsTraceEnabled() && status == B_BAD_DATA) {
-		BString resultString(static_cast<const char *>(replyData.Buffer()),
+		BString resultString(static_cast<const char*>(replyData.Buffer()),
 			replyData.BufferLength());
 		HDERROR("Parser choked on JSON:\n%s", resultString.String());
 	}
@@ -1117,33 +1065,29 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 
 
 status_t
-WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
-	const BString& jsonString, uint32 flags, BMessage& reply)
+WebAppInterface::_SendJsonRequest(const char* urlPathComponents, const BString& jsonString,
+	uint32 flags, BMessage& reply)
 {
 	// gets 'adopted' by the subsequent http request.
-	BMemoryIO* data = new BMemoryIO(jsonString.String(),
-		jsonString.Length() - 1);
+	BMemoryIO* data = new BMemoryIO(jsonString.String(), jsonString.Length() - 1);
 
-	return _SendJsonRequest(urlPathComponents, data, jsonString.Length() - 1,
-		flags, reply);
+	return _SendJsonRequest(urlPathComponents, data, jsonString.Length() - 1, flags, reply);
 }
 
 
 status_t
-WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
-	BDataIO* stream)
+WebAppInterface::_SendRawGetRequest(const BString urlPathComponents, BDataIO* stream)
 {
 	BUrl url = ServerSettings::CreateFullUrl(urlPathComponents);
 
-	HDDEBUG("http-get; will make request to [%s]",
-		url.UrlString().String());
+	HDDEBUG("http-get; will make request to [%s]", url.UrlString().String());
 
 	ProtocolListener listener;
 
 	BHttpHeaders headers;
 	ServerSettings::AugmentHeaders(headers);
 
-	BHttpRequest *request = make_http_request(url, stream, &listener);
+	BHttpRequest* request = make_http_request(url, stream, &listener);
 	ObjectDeleter<BHttpRequest> _(request);
 	if (request == NULL)
 		return B_ERROR;
@@ -1153,19 +1097,17 @@ WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
 	thread_id thread = request->Run();
 	wait_for_thread(thread, NULL);
 
-	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request->Result());
+	const BHttpResult& result = dynamic_cast<const BHttpResult&>(request->Result());
 
 	int32 statusCode = result.StatusCode();
 
-	HDDEBUG("http-get; did receive http-status [%" B_PRId32 "] from [%s]",
-		statusCode, url.UrlString().String());
+	HDDEBUG("http-get; did receive http-status [%" B_PRId32 "] from [%s]", statusCode,
+		url.UrlString().String());
 
 	if (statusCode == 200)
 		return B_OK;
 
-	HDERROR("failed to get data from '%s': %" B_PRIi32 "",
-		url.UrlString().String(), statusCode);
+	HDERROR("failed to get data from '%s': %" B_PRIi32 "", url.UrlString().String(), statusCode);
 	return B_ERROR;
 }
 
@@ -1183,17 +1125,16 @@ WebAppInterface::_LogPayload(BPositionIO* requestData, size_t size)
 		printf("%s; error logging payload", PROTOCOL_NAME);
 	} else {
 		for (uint32 i = 0; i < size; i++) {
-    		bool esc = buffer[i] > 126 ||
-    			(buffer[i] < 0x20 && buffer[i] != 0x0a);
+			bool esc = buffer[i] > 126 || (buffer[i] < 0x20 && buffer[i] != 0x0a);
 
-    		if (esc)
-    			printf("\\u%02x", buffer[i]);
-    		else
-    			putchar(buffer[i]);
-    	}
+			if (esc)
+				printf("\\u%02x", buffer[i]);
+			else
+				putchar(buffer[i]);
+		}
 
-    	if (size == LOG_PAYLOAD_LIMIT)
-    		printf("...(continues)");
+		if (size == LOG_PAYLOAD_LIMIT)
+			printf("...(continues)");
 	}
 
 	requestData->Seek(requestDataOffset, SEEK_SET);
@@ -1209,15 +1150,14 @@ off_t
 WebAppInterface::_LengthAndSeekToZero(BPositionIO* data)
 {
 	off_t dataSize = data->Position();
-    data->Seek(0, SEEK_SET);
-    return dataSize;
+	data->Seek(0, SEEK_SET);
+	return dataSize;
 }
 
 
 UserCredentials
 WebAppInterface::_Credentials()
 {
-	AutoLocker<BLocker> lock(&fLock);
 	return fCredentials;
 }
 

@@ -3,7 +3,7 @@
  * Copyright 2011, Ingo Weinhold, <ingo_weinhold@gmx.de>
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2021-2025, Andrew Lindesay <apl@lindesay.co.nz>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -23,7 +23,7 @@ class UninstallPackageProcess
 		private PackageProgressListener {
 public:
 								UninstallPackageProcess(
-									PackageInfoRef package, Model* model);
+									const BString& packageName, Model* model);
 	virtual						~UninstallPackageProcess();
 
 	virtual	const char*			Name() const;
@@ -41,8 +41,7 @@ protected:
 
 private:
 			BString				fDescription;
-			std::vector<PackageInfoRef>
-								fRemovedPackages;
+			std::set<BString>	fRemovedPackageNames;
 };
 
 #endif // INSTALL_PACKAGE_PROCESS_H

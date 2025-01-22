@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -19,14 +19,6 @@ PackageScreenshotInfo::PackageScreenshotInfo(const PackageScreenshotInfo& other)
 }
 
 
-PackageScreenshotInfo&
-PackageScreenshotInfo::operator=(const PackageScreenshotInfo& other)
-{
-	fScreenshotInfos = other.fScreenshotInfos;
-	return *this;
-}
-
-
 bool
 PackageScreenshotInfo::operator==(const PackageScreenshotInfo& other) const
 {
@@ -41,13 +33,6 @@ PackageScreenshotInfo::operator!=(const PackageScreenshotInfo& other) const
 }
 
 
-void
-PackageScreenshotInfo::Clear()
-{
-	fScreenshotInfos.clear();
-}
-
-
 int32
 PackageScreenshotInfo::Count() const
 {
@@ -55,7 +40,7 @@ PackageScreenshotInfo::Count() const
 }
 
 
-ScreenshotInfoRef
+const ScreenshotInfoRef
 PackageScreenshotInfo::ScreenshotAtIndex(int32 index) const
 {
 	return fScreenshotInfos[index];
@@ -66,4 +51,73 @@ void
 PackageScreenshotInfo::AddScreenshot(const ScreenshotInfoRef& info)
 {
 	fScreenshotInfos.push_back(info);
+}
+
+
+// #pragma mark - PackageScreenshotInfoBuilder
+
+
+PackageScreenshotInfoBuilder::PackageScreenshotInfoBuilder()
+	:
+	fSource(),
+	fScreenshotInfos()
+{
+}
+
+
+PackageScreenshotInfoBuilder::PackageScreenshotInfoBuilder(const PackageScreenshotInfoRef& other)
+	:
+	fScreenshotInfos()
+{
+	fSource = other;
+}
+
+
+PackageScreenshotInfoBuilder::~PackageScreenshotInfoBuilder()
+{
+}
+
+
+void
+PackageScreenshotInfoBuilder::_InitFromSource()
+{
+	if (fSource.IsSet()) {
+		_Init(fSource.Get());
+		fSource.Unset();
+	}
+}
+
+
+void
+PackageScreenshotInfoBuilder::_Init(const PackageScreenshotInfo* value)
+{
+	int32 count = value->Count();
+	for (int32 i = 0; i < count; i++)
+		fScreenshotInfos.push_back(value->ScreenshotAtIndex(i));
+}
+
+
+PackageScreenshotInfoRef
+PackageScreenshotInfoBuilder::BuildRef()
+{
+	if (fSource.IsSet())
+		return fSource;
+
+	PackageScreenshotInfo* screenshotInfo = new PackageScreenshotInfo();
+
+	std::vector<ScreenshotInfoRef>::const_iterator it;
+	for (it = fScreenshotInfos.begin(); it != fScreenshotInfos.end(); it++)
+		screenshotInfo->AddScreenshot(*it);
+
+	return PackageScreenshotInfoRef(screenshotInfo, true);
+}
+
+
+PackageScreenshotInfoBuilder&
+PackageScreenshotInfoBuilder::AddScreenshot(const ScreenshotInfoRef& value)
+{
+	if (fSource.IsSet())
+		_InitFromSource();
+	fScreenshotInfos.push_back(value);
+	return *this;
 }

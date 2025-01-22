@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -116,4 +116,128 @@ bool
 PackageLocalizedText::operator!=(const PackageLocalizedText& other) const
 {
 	return !(*this == other);
+}
+
+
+// #pragma mark - PackageLocalInfoBuilder
+
+
+PackageLocalizedTextBuilder::PackageLocalizedTextBuilder()
+	:
+	fTitle(),
+	fSummary(),
+	fDescription(),
+	fHasChangelog(false),
+	fChangelog()
+{
+}
+
+
+PackageLocalizedTextBuilder::PackageLocalizedTextBuilder(const PackageLocalizedTextRef& value)
+	:
+	fTitle(),
+	fSummary(),
+	fDescription(),
+	fHasChangelog(false),
+	fChangelog()
+{
+	fSource = value;
+}
+
+
+PackageLocalizedTextBuilder::~PackageLocalizedTextBuilder()
+{
+}
+
+
+void
+PackageLocalizedTextBuilder::_InitFromSource()
+{
+	if (fSource.IsSet()) {
+		_Init(fSource);
+		fSource.Unset();
+	}
+}
+
+
+void
+PackageLocalizedTextBuilder::_Init(const PackageLocalizedText* value)
+{
+	fTitle = value->Title();
+	fSummary = value->Summary();
+	fDescription = value->Description();
+	fHasChangelog = value->HasChangelog();
+	fChangelog = value->Changelog();
+}
+
+
+PackageLocalizedTextRef
+PackageLocalizedTextBuilder::BuildRef()
+{
+	if (fSource.IsSet())
+		return fSource;
+
+	PackageLocalizedText* localizedText = new PackageLocalizedText();
+	localizedText->SetTitle(fTitle);
+	localizedText->SetSummary(fSummary);
+	localizedText->SetDescription(fDescription);
+	localizedText->SetHasChangelog(fHasChangelog);
+	localizedText->SetChangelog(fChangelog);
+
+	return PackageLocalizedTextRef(localizedText, true);
+}
+
+
+PackageLocalizedTextBuilder&
+PackageLocalizedTextBuilder::WithTitle(const BString& value)
+{
+	if (!fSource.IsSet() || fSource->Title() != value) {
+		_InitFromSource();
+		fTitle = value;
+	}
+	return *this;
+}
+
+
+PackageLocalizedTextBuilder&
+PackageLocalizedTextBuilder::WithSummary(const BString& value)
+{
+	if (!fSource.IsSet() || fSource->Summary() != value) {
+		_InitFromSource();
+		fSummary = value;
+	}
+	return *this;
+}
+
+
+PackageLocalizedTextBuilder&
+PackageLocalizedTextBuilder::WithDescription(const BString& value)
+{
+	if (!fSource.IsSet() || fSource->Description() != value) {
+		_InitFromSource();
+		fDescription = value;
+	}
+	return *this;
+}
+
+
+PackageLocalizedTextBuilder&
+PackageLocalizedTextBuilder::WithHasChangelog(bool value)
+{
+	if (!fSource.IsSet() || fSource->HasChangelog() != value) {
+		_InitFromSource();
+		fHasChangelog = value;
+	}
+	return *this;
+}
+
+
+PackageLocalizedTextBuilder&
+PackageLocalizedTextBuilder::WithChangelog(const BString& value)
+{
+	if (!fSource.IsSet() || fSource->Changelog() != value) {
+		_InitFromSource();
+		fChangelog = value;
+	}
+	return *this;
 }

@@ -22,8 +22,7 @@ UserCredentials::UserCredentials(BMessage* from)
 }
 
 
-UserCredentials::UserCredentials(const BString& nickname,
-	const BString& passwordClear)
+UserCredentials::UserCredentials(const BString& nickname, const BString& passwordClear)
 	:
 	fNickname(nickname),
 	fPasswordClear(passwordClear),

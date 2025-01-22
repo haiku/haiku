@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
 
  */
@@ -31,7 +31,7 @@ class PkgDataLoadState;
 class PopulatePkgChangelogFromServerProcess : public AbstractProcess
 {
 public:
-								PopulatePkgChangelogFromServerProcess(PackageInfoRef packageInfo,
+								PopulatePkgChangelogFromServerProcess(const BString& packageName,
 									Model *model);
 	virtual						~PopulatePkgChangelogFromServerProcess();
 
@@ -42,8 +42,11 @@ protected:
 	virtual status_t			RunInternal();
 
 private:
+			status_t			_UpdateChangelog(const BString& value);
+
+private:
 			Model*				fModel;
-			PackageInfoRef		fPackageInfo;
+			BString				fPackageName;
 };
 
 #endif // POPULATE_PKG_CHANGELOG_FROM_SERVER_PROCESS__H

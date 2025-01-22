@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef ABSTRACT_PROCESS_H
@@ -50,6 +50,8 @@ protected:
 
 	static	char				_ProcessStateIdentifier(process_state value);
 
+			bool				_ShouldProcessProgress();
+
 protected:
 			BLocker				fLock;
 
@@ -59,6 +61,7 @@ private:
 			process_state		fProcessState;
 			status_t			fErrorStatus;
 			double				fDurationSeconds;
+			bigtime_t			fLastProgressUpdate;
 };
 
 #endif // ABSTRACT_PROCESS_H

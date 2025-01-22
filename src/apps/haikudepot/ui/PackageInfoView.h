@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2020-2023, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_VIEW_H
@@ -35,7 +35,6 @@ public:
 	virtual						~PackageInfoView();
 
 	virtual void				AttachedToWindow();
-	virtual	void				MessageReceived(BMessage* message);
 
 			void				SetPackage(const PackageInfoRef& package);
 			const PackageInfoRef& Package() const
@@ -43,6 +42,8 @@ public:
 			void				Clear();
 
 			void				HandleScreenshotCached(const ScreenshotCoordinate& coordinate);
+			void				HandleIconsChanged();
+			void				HandlePackagesChanged(const PackageInfoEvents& events);
 
 private:
 	static const ScreenshotCoordinate
@@ -50,6 +51,8 @@ private:
 			void				_SetPackageScreenshotThumb(const PackageInfoRef& package);
 			void				_HandleScreenshotCached(const PackageInfoRef& package,
 									const ScreenshotCoordinate& coordinate);
+
+			void				_HandlePackageChanged(const PackageInfoEvent& event);
 
 private:
 			Model*				fModel;

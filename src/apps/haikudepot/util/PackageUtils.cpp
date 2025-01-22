@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -113,6 +113,20 @@ PackageUtils::PublisherName(const PackageInfoRef& package)
 
 
 /*static*/ bool
+PackageUtils::IsProminent(const PackageInfoRef& package)
+{
+	if (package.IsSet()) {
+		PackageClassificationInfoRef classificationInfo = package->PackageClassificationInfo();
+
+		if (classificationInfo.IsSet())
+			return classificationInfo->IsProminent();
+	}
+
+	return false;
+}
+
+
+/*static*/ bool
 PackageUtils::IsNativeDesktop(const PackageInfoRef& package)
 {
 	if (package.IsSet()) {
@@ -123,21 +137,6 @@ PackageUtils::IsNativeDesktop(const PackageInfoRef& package)
 	}
 
 	return false;
-}
-
-
-/*static*/ PackageLocalizedTextRef
-PackageUtils::NewLocalizedText(const PackageInfoRef& package)
-{
-	if (!package.IsSet())
-		HDFATAL("it is not possible to get the `LocalizedText` from a not-existing package");
-
-	PackageLocalizedTextRef localizedText = package->LocalizedText();
-
-	if (localizedText.IsSet())
-		return PackageLocalizedTextRef(new PackageLocalizedText(*(localizedText.Get())), true);
-
-	return PackageLocalizedTextRef(new PackageLocalizedText(), true);
 }
 
 
@@ -222,36 +221,6 @@ PackageUtils::Flags(const PackageInfoRef& package)
 	}
 
 	return false;
-}
-
-
-/*static*/ PackageLocalInfoRef
-PackageUtils::NewLocalInfo(const PackageInfoRef& package)
-{
-	if (!package.IsSet())
-		HDFATAL("it is not possible to get the `LocalInfo` from a not-existing package");
-
-	PackageLocalInfoRef localInfo = package->LocalInfo();
-
-	if (localInfo.IsSet())
-		return PackageLocalInfoRef(new PackageLocalInfo(*(localInfo.Get())), true);
-
-	return PackageLocalInfoRef(new PackageLocalInfo(), true);
-}
-
-
-/*static*/ PackageCoreInfoRef
-PackageUtils::NewCoreInfo(const PackageInfoRef& package)
-{
-	if (!package.IsSet())
-		HDFATAL("it is not possible to get the `CoreInfo` from a not-existing package");
-
-	PackageCoreInfoRef coreInfo = package->CoreInfo();
-
-	if (coreInfo.IsSet())
-		return PackageCoreInfoRef(new PackageCoreInfo(*(coreInfo.Get())), true);
-
-	return PackageCoreInfoRef(new PackageCoreInfo(), true);
 }
 
 

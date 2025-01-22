@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "ServerIconExportUpdateProcess.h"
@@ -8,13 +8,14 @@
 #include <time.h>
 
 #include <AutoDeleter.h>
-#include <AutoLocker.h>
+#include <BufferIO.h>
 #include <Catalog.h>
 #include <FileIO.h>
 
 #include "DataIOUtils.h"
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
+#include "PackageIconTarRepository.h"
 #include "ServerHelper.h"
 #include "StandardMetaDataJsonEventListener.h"
 #include "StorageUtils.h"
@@ -55,6 +56,7 @@ InfoJsonExtractEntryListener::InfoJsonExtractEntryListener()
 {
 }
 
+
 InfoJsonExtractEntryListener::~InfoJsonExtractEntryListener()
 {
 }
@@ -68,14 +70,12 @@ InfoJsonExtractEntryListener::GetInfoJsonData()
 
 
 status_t
-InfoJsonExtractEntryListener::Handle( const TarArchiveHeader& header,
-	size_t offset, BDataIO *data)
+InfoJsonExtractEntryListener::Handle(const TarArchiveHeader& header, size_t offset, BDataIO* data)
 {
 	if (header.Length() > 0 && header.FileName() == ENTRY_PATH_METADATA) {
 		status_t copyResult = DataIOUtils::CopyAll(&fInfoJsonData, data);
 		if (copyResult == B_OK) {
-			HDINFO("[InfoJsonExtractEntryListener] did extract [%s]",
-				ENTRY_PATH_METADATA);
+			HDINFO("[InfoJsonExtractEntryListener] did extract [%s]", ENTRY_PATH_METADATA);
 			fInfoJsonData.Seek(0, SEEK_SET);
 			return B_CANCELED;
 				// this will prevent further scanning of the tar file
@@ -88,10 +88,8 @@ InfoJsonExtractEntryListener::Handle( const TarArchiveHeader& header,
 
 
 /*!	This constructor will locate the cached data in a standardized location
-*/
-
-ServerIconExportUpdateProcess::ServerIconExportUpdateProcess(
-	Model* model,
+ */
+ServerIconExportUpdateProcess::ServerIconExportUpdateProcess(Model* model,
 	uint32 serverProcessOptions)
 	:
 	AbstractSingleFileServerProcess(serverProcessOptions),
@@ -122,8 +120,20 @@ ServerIconExportUpdateProcess::Description() const
 status_t
 ServerIconExportUpdateProcess::ProcessLocalData()
 {
-	status_t result = fModel->InitPackageIconRepository();
-	_NotifyPackagesWithIconsInDepots();
+	BPath tarPath;
+	status_t result = GetLocalPath(tarPath);
+
+	if (result == B_OK) {
+		PackageIconTarRepository* tarRepository = new PackageIconTarRepository(tarPath);
+
+		result = tarRepository->Init();
+
+		if (result == B_OK)
+			fModel->SetIconRepository(PackageIconRepositoryRef(tarRepository, true));
+		else
+			delete tarRepository;
+	}
+
 	return result;
 }
 
@@ -144,7 +154,7 @@ ServerIconExportUpdateProcess::GetLocalPath(BPath& path) const
 */
 
 status_t
-ServerIconExportUpdateProcess::IfModifiedSinceHeaderValue(BString& headerValue) const
+ServerIconExportUpdateProcess::IfModifiedSinceHeaderValue(BString& headerValue)
 {
 	headerValue.SetTo("");
 
@@ -164,13 +174,13 @@ ServerIconExportUpdateProcess::IfModifiedSinceHeaderValue(BString& headerValue) 
 	}
 
 	if (result == B_OK) {
-		BFile *tarIo = new BFile(tarPath.Path(), O_RDONLY);
-		ObjectDeleter<BFile> tarIoDeleter(tarIo);
-		InfoJsonExtractEntryListener* extractDataListener
-			= new InfoJsonExtractEntryListener();
-		ObjectDeleter<InfoJsonExtractEntryListener> extractDataListenerDeleter(
-			extractDataListener);
-		result = TarArchiveService::ForEachEntry(*tarIo, extractDataListener);
+		BFile* tarIo = new BFile(tarPath.Path(), O_RDONLY);
+		BBufferIO* bufferTarIo = new BBufferIO(tarIo, 10 * 1024, true);
+		ObjectDeleter<BBufferIO> tarIoDeleter(bufferTarIo);
+
+		InfoJsonExtractEntryListener* extractDataListener = new InfoJsonExtractEntryListener();
+		ObjectDeleter<InfoJsonExtractEntryListener> extractDataListenerDeleter(extractDataListener);
+		result = TarArchiveService::ForEachEntry(*bufferTarIo, extractDataListener);
 
 		if (result == B_CANCELED) {
 			// the cancellation is expected because it will cancel when it finds
@@ -181,26 +191,20 @@ ServerIconExportUpdateProcess::IfModifiedSinceHeaderValue(BString& headerValue) 
 			StandardMetaData metaData;
 			BString metaDataJsonPath;
 			GetStandardMetaDataJsonPath(metaDataJsonPath);
-			StandardMetaDataJsonEventListener parseInfoJsonListener(
-				metaDataJsonPath, metaData);
-			BPrivate::BJson::Parse(
-				&(extractDataListener->GetInfoJsonData()),
+			StandardMetaDataJsonEventListener parseInfoJsonListener(metaDataJsonPath, metaData);
+			BPrivate::BJson::Parse(&(extractDataListener->GetInfoJsonData()),
 				&parseInfoJsonListener);
 
 			result = parseInfoJsonListener.ErrorStatus();
 
-		// An example of this output would be; 'Fri, 24 Oct 2014 19:32:27 +0000'
+			// An example of this output would be; 'Fri, 24 Oct 2014 19:32:27 +0000'
 
-			if (result == B_OK) {
-				SetIfModifiedSinceHeaderValueFromMetaData(
-					headerValue, metaData);
-			} else {
-				HDERROR("[%s] unable to parse the meta data from the tar file",
-					Name());
-			}
+			if (result == B_OK)
+				SetIfModifiedSinceHeaderValueFromMetaData(headerValue, metaData);
+			else
+				HDERROR("[%s] unable to parse the meta data from the tar file", Name());
 		} else {
-			HDERROR("[%s] did not find the metadata [%s] in the tar",
-				Name(), ENTRY_PATH_METADATA);
+			HDERROR("[%s] did not find the metadata [%s] in the tar", Name(), ENTRY_PATH_METADATA);
 			result = B_BAD_DATA;
 		}
 	}
@@ -218,8 +222,7 @@ ServerIconExportUpdateProcess::GetStandardMetaDataPath(BPath& path) const
 
 
 void
-ServerIconExportUpdateProcess::GetStandardMetaDataJsonPath(
-	BString& jsonPath) const
+ServerIconExportUpdateProcess::GetStandardMetaDataJsonPath(BString& jsonPath) const
 {
 	jsonPath.SetTo("$");
 		// the "$" here indicates that the data is at the top level.
@@ -230,28 +233,4 @@ BString
 ServerIconExportUpdateProcess::UrlPathComponent()
 {
 	return "/__pkgicon/all.tar.gz";
-}
-
-
-void
-ServerIconExportUpdateProcess::_NotifyPackagesWithIconsInDepots() const
-{
-	for (int32 d = 0; d < fModel->CountDepots(); d++) {
-		_NotifyPackagesWithIconsInDepot(fModel->DepotAtIndex(d));
-	}
-}
-
-
-void
-ServerIconExportUpdateProcess::_NotifyPackagesWithIconsInDepot(
-	const DepotInfoRef& depot) const
-{
-	PackageIconRepository& packageIconRepository
-		= fModel->GetPackageIconRepository();
-	for (int32 p = 0; p < depot->CountPackages(); p++) {
-		AutoLocker<BLocker> locker(fModel->Lock());
-		const PackageInfoRef& packageInfoRef = depot->PackageAtIndex(p);
-		if (packageIconRepository.HasAnyIcon(packageInfoRef->Name()))
-			packageInfoRef->NotifyChangedIcon();
-	}
 }

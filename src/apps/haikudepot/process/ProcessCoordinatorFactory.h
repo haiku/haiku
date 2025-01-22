@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PROCESS_COORDINATOR_FACTORY_H
@@ -26,13 +26,10 @@ public:
 	static	ProcessCoordinator*	CreateIncrementViewCounter(Model* model,
 									const PackageInfoRef package);
 
-	static	ProcessCoordinator*	CreateBulkLoadCoordinator(
-									PackageInfoListenerRef packageInfoListener,
-									Model* model, bool forceLocalUpdate);
+	static	ProcessCoordinator*	CreateBulkLoadCoordinator(Model* model, bool forceLocalUpdate);
 
 	static	ProcessCoordinator*	CreateUserDetailVerifierCoordinator(
-									UserDetailVerifierListener*
-										userDetailVerifierListener,
+									UserDetailVerifierListener* userDetailVerifierListener,
 									Model* model);
 
 	static	ProcessCoordinator*	CreatePackageActionCoordinator(
@@ -42,16 +39,15 @@ public:
 									Model* model, ScreenshotCoordinate& screenshotCoordinate);
 
 	static	ProcessCoordinator*	PopulatePkgChangelogCoordinator(Model* model,
-									PackageInfoRef package);
+									const BString& packageName);
 
 	static	ProcessCoordinator*	PopulatePkgUserRatingsCoordinator(Model* model,
-									PackageInfoRef package);
+									const BString& packageName);
 
 private:
 	static	uint32				_CalculateServerProcessOptions();
 
-	static	PackageInfoRef		_ExtractPackageFromMessage(
-									Model* model, BMessage* message);
+	static	BString				_ExtractPackageNameFromMessage(BMessage* message);
 
 	static	ProcessCoordinator*	_CreateInstallPackageActionCoordinator(
 									Model* model, BMessage* message);

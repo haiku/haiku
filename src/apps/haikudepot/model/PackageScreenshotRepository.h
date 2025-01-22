@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SCREENSHOT_REPOSITORY_H
@@ -12,9 +12,10 @@
 
 #include "BitmapHolder.h"
 #include "ScreenshotCoordinate.h"
+#include "WebAppInterface.h"
 
 
-class WebAppInterface;
+class Model;
 
 
 class PackageScreenshotRepositoryListener : public BReferenceable {
@@ -36,7 +37,7 @@ public:
 
 								PackageScreenshotRepository(
 									PackageScreenshotRepositoryListenerRef listener,
-									WebAppInterface* webAppInterface);
+									Model* model);
 								~PackageScreenshotRepository();
 
 			status_t			LoadScreenshot(const ScreenshotCoordinate& coord,
@@ -48,6 +49,8 @@ public:
 			status_t			CacheScreenshot(const ScreenshotCoordinate& coord);
 
 private:
+			WebAppInterfaceRef	_WebApp();
+
 			status_t			_Init();
 
 			status_t			_CleanCache();
@@ -61,7 +64,7 @@ private:
 private:
 			PackageScreenshotRepositoryListenerRef
 								fListener;
-			WebAppInterface*	fWebAppInterface;
+			Model*				fModel;
 			BPath				fBaseDirectory;
 };
 

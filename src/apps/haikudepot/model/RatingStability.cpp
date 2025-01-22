@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -12,12 +12,12 @@
 #include "Logger.h"
 
 
-bool IsRatingStabilityBefore(const RatingStabilityRef& rs1,
-	const RatingStabilityRef& rs2)
+bool
+IsRatingStabilityRefLess(const RatingStabilityRef& rs1, const RatingStabilityRef& rs2)
 {
 	if (!rs1.IsSet() || !rs2.IsSet())
-		HDFATAL("unexpected NULL reference in a referencable");
-	return rs1->Compare(*rs2) < 0;
+		debugger("illegal state in rating stability less");
+	return *(rs1.Get()) < *(rs2.Get());
 }
 
 
@@ -30,8 +30,7 @@ RatingStability::RatingStability()
 }
 
 
-RatingStability::RatingStability(const BString& code,
-		const BString& name, int64 ordering)
+RatingStability::RatingStability(const BString& code, const BString& name, int64 ordering)
 	:
 	fCode(code),
 	fName(name),
@@ -49,21 +48,17 @@ RatingStability::RatingStability(const RatingStability& other)
 }
 
 
-RatingStability&
-RatingStability::operator=(const RatingStability& other)
+bool
+RatingStability::operator<(const RatingStability& other) const
 {
-	fCode = other.fCode;
-	fName = other.fName;
-	fOrdering = other.fOrdering;
-	return *this;
+	return Compare(other) < 0;
 }
 
 
 bool
 RatingStability::operator==(const RatingStability& other) const
 {
-	return fCode == other.fCode && fName == other.fName
-		&& fOrdering == other.fOrdering;
+	return fCode == other.fCode && fName == other.fName && fOrdering == other.fOrdering;
 }
 
 

@@ -6,6 +6,8 @@
 
 #include "LocaleUtilsTest.h"
 
+#include <algorithm>
+
 #include <String.h>
 
 #include <cppunit/TestCaller.h>
@@ -13,7 +15,6 @@
 
 #include <string.h>
 
-#include "LanguageRepository.h"
 #include "LocaleUtils.h"
 
 
@@ -34,7 +35,7 @@ LocaleUtilsTest::TestLanguageIsBeforeFalseAfter()
 	LanguageRef languageDeCh = LanguageRef(new Language("de_CH", "German (Swiss)", true), true);
 
 	// ----------------------
-	bool actual = IsLanguageBefore(languageZh, languageDeCh);
+	bool actual = languageZh < languageDeCh;
 	// ----------------------
 
 	CPPUNIT_ASSERT_EQUAL(false, actual);
@@ -47,7 +48,7 @@ LocaleUtilsTest::TestLanguageIsBeforeFalseEqual()
 	LanguageRef languageDeCh = LanguageRef(new Language("de_CH", "German (Swiss)", true), true);
 
 	// ----------------------
-	bool actual = IsLanguageBefore(languageDeCh, languageDeCh);
+	bool actual = languageDeCh < languageDeCh;
 	// ----------------------
 
 	CPPUNIT_ASSERT_EQUAL(false, actual);
@@ -61,7 +62,7 @@ LocaleUtilsTest::TestLanguageIsBeforeTrueBefore()
 	LanguageRef languageDeCh = LanguageRef(new Language("de_CH", "German (Swiss)", true), true);
 
 	// ----------------------
-	bool actual = IsLanguageBefore(languageDeCh, languageZh);
+	bool actual = languageDeCh < languageZh;
 	// ----------------------
 
 	CPPUNIT_ASSERT_EQUAL(true, actual);
@@ -71,7 +72,7 @@ LocaleUtilsTest::TestLanguageIsBeforeTrueBefore()
 void
 LocaleUtilsTest::TestLanguageSorting()
 {
-	LanguageRepository* repository = new LanguageRepository();
+	std::vector<LanguageRef> languages;
 
 	LanguageRef languageZh = LanguageRef(new Language("zh", "Chinese", true), true);
 	LanguageRef languageDeCh = LanguageRef(new Language("de_CH", "German (Swiss)", true), true);
@@ -79,18 +80,20 @@ LocaleUtilsTest::TestLanguageSorting()
 	LanguageRef languageFr = LanguageRef(new Language("fr", "French", true), true);
 	LanguageRef languageEs = LanguageRef(new Language("es", "Spanish", true), true);
 
-	repository->AddLanguage(languageZh);
-	repository->AddLanguage(languageDeCh);
-	repository->AddLanguage(languageDe1996);
-	repository->AddLanguage(languageFr);
-	repository->AddLanguage(languageEs);
+	languages.push_back(languageZh);
+	languages.push_back(languageDeCh);
+	languages.push_back(languageDe1996);
+	languages.push_back(languageFr);
+	languages.push_back(languageEs);
+
+	std::sort(languages.begin(), languages.end(), IsLanguageRefLess);
 
 	// ----------------------
-	LanguageRef language0 = repository->LanguageAtIndex(0);
-	LanguageRef language1 = repository->LanguageAtIndex(1);
-	LanguageRef language2 = repository->LanguageAtIndex(2);
-	LanguageRef language3 = repository->LanguageAtIndex(3);
-	LanguageRef language4 = repository->LanguageAtIndex(4);
+	LanguageRef language0 = languages[0];
+	LanguageRef language1 = languages[1];
+	LanguageRef language2 = languages[2];
+	LanguageRef language3 = languages[3];
+	LanguageRef language4 = languages[4];
 	// ----------------------
 
 	CPPUNIT_ASSERT_EQUAL(BString("de_CH"), BString(language0->ID()));
@@ -104,23 +107,23 @@ LocaleUtilsTest::TestLanguageSorting()
 	CPPUNIT_ASSERT_EQUAL(0, language2->Compare(*languageEs.Get()));
 	CPPUNIT_ASSERT_EQUAL(0, language3->Compare(*languageFr.Get()));
 	CPPUNIT_ASSERT_EQUAL(0, language4->Compare(*languageZh.Get()));
-
-	delete repository;
 }
 
 
 void
 LocaleUtilsTest::TestDeriveDefaultLanguageCodeOnly()
 {
-	LanguageRepository* repository = new LanguageRepository();
+	std::vector<LanguageRef> languages;
 	LocaleUtils::SetForcedSystemDefaultLanguageID("de");
 
-	repository->AddLanguage(LanguageRef(new Language("zh", "Chinese", true), true));
-	repository->AddLanguage(LanguageRef(new Language("de", "German", true), true));
-	repository->AddLanguage(LanguageRef(new Language("fr", "French", true), true));
+	languages.push_back(LanguageRef(new Language("zh", "Chinese", true), true));
+	languages.push_back(LanguageRef(new Language("de", "German", true), true));
+	languages.push_back(LanguageRef(new Language("fr", "French", true), true));
+
+	std::sort(languages.begin(), languages.end(), IsLanguageRefLess);
 
 	// ----------------------
-	LanguageRef defaultLanguage = LocaleUtils::DeriveDefaultLanguage(repository);
+	LanguageRef defaultLanguage = LocaleUtils::DeriveDefaultLanguage(languages);
 	// ----------------------
 
 	CPPUNIT_ASSERT_EQUAL(BString("de"), BString(defaultLanguage->Code()));
@@ -128,7 +131,6 @@ LocaleUtilsTest::TestDeriveDefaultLanguageCodeOnly()
 	CPPUNIT_ASSERT(NULL == defaultLanguage->ScriptCode());
 
 	LocaleUtils::SetForcedSystemDefaultLanguageID("");
-	delete repository;
 }
 
 
@@ -138,15 +140,17 @@ LocaleUtilsTest::TestDeriveDefaultLanguageCodeOnly()
 void
 LocaleUtilsTest::TestDeriveDefaultLanguageSystemDefaultMoreSpecific()
 {
-	LanguageRepository* repository = new LanguageRepository();
+	std::vector<LanguageRef> languages;
 	LocaleUtils::SetForcedSystemDefaultLanguageID("de_CH");
 
-	repository->AddLanguage(LanguageRef(new Language("zh", "Chinese", true), true));
-	repository->AddLanguage(LanguageRef(new Language("de", "German", true), true));
-	repository->AddLanguage(LanguageRef(new Language("fr", "French", true), true));
+	languages.push_back(LanguageRef(new Language("zh", "Chinese", true), true));
+	languages.push_back(LanguageRef(new Language("de", "German", true), true));
+	languages.push_back(LanguageRef(new Language("fr", "French", true), true));
+
+	std::sort(languages.begin(), languages.end(), IsLanguageRefLess);
 
 	// ----------------------
-	LanguageRef defaultLanguage = LocaleUtils::DeriveDefaultLanguage(repository);
+	LanguageRef defaultLanguage = LocaleUtils::DeriveDefaultLanguage(languages);
 	// ----------------------
 
 	CPPUNIT_ASSERT_EQUAL(BString("de"), BString(defaultLanguage->Code()));
@@ -154,7 +158,6 @@ LocaleUtilsTest::TestDeriveDefaultLanguageSystemDefaultMoreSpecific()
 	CPPUNIT_ASSERT(NULL == defaultLanguage->ScriptCode());
 
 	LocaleUtils::SetForcedSystemDefaultLanguageID("");
-	delete repository;
 }
 
 
@@ -164,17 +167,19 @@ LocaleUtilsTest::TestDeriveDefaultLanguageSystemDefaultMoreSpecific()
 void
 LocaleUtilsTest::TestDeriveDefaultLanguageSystemDefaultLessSpecific()
 {
-	LanguageRepository* repository = new LanguageRepository();
+	std::vector<LanguageRef> languages;
 	LocaleUtils::SetForcedSystemDefaultLanguageID("de");
 
-	repository->AddLanguage(LanguageRef(new Language("zh", "Chinese", true), true));
-	repository->AddLanguage(LanguageRef(new Language("de_CH", "German (Swiss)", true), true));
-	repository->AddLanguage(LanguageRef(new Language("de__1996", "German (1996)", true), true));
-	repository->AddLanguage(LanguageRef(new Language("fr", "French", true), true));
-	repository->AddLanguage(LanguageRef(new Language("es", "Spanish", true), true));
+	languages.push_back(LanguageRef(new Language("zh", "Chinese", true), true));
+	languages.push_back(LanguageRef(new Language("de_CH", "German (Swiss)", true), true));
+	languages.push_back(LanguageRef(new Language("de__1996", "German (1996)", true), true));
+	languages.push_back(LanguageRef(new Language("fr", "French", true), true));
+	languages.push_back(LanguageRef(new Language("es", "Spanish", true), true));
+
+	std::sort(languages.begin(), languages.end(), IsLanguageRefLess);
 
 	// ----------------------
-	LanguageRef defaultLanguage = LocaleUtils::DeriveDefaultLanguage(repository);
+	LanguageRef defaultLanguage = LocaleUtils::DeriveDefaultLanguage(languages);
 	// ----------------------
 
 	CPPUNIT_ASSERT_EQUAL(BString("de"), BString(defaultLanguage->Code()));
@@ -182,7 +187,6 @@ LocaleUtilsTest::TestDeriveDefaultLanguageSystemDefaultLessSpecific()
 	CPPUNIT_ASSERT(NULL == defaultLanguage->ScriptCode());
 
 	LocaleUtils::SetForcedSystemDefaultLanguageID("");
-	delete repository;
 }
 
 

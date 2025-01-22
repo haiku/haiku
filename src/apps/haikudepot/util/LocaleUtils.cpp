@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "LocaleUtils.h"
@@ -57,8 +57,7 @@ LocaleUtils::TimestampToDateTimeString(uint64 millis)
 
 	BDateTimeFormat format;
 	BString buffer;
-	if (format.Format(buffer, millis / 1000, B_SHORT_DATE_FORMAT,
-			B_SHORT_TIME_FORMAT) != B_OK)
+	if (format.Format(buffer, millis / 1000, B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT) != B_OK)
 		return "!";
 
 	return buffer;
@@ -73,8 +72,7 @@ LocaleUtils::TimestampToDateString(uint64 millis)
 
 	BDateFormat format;
 	BString buffer;
-	if (format.Format(buffer, millis / 1000, B_SHORT_DATE_FORMAT)
-			!= B_OK)
+	if (format.Format(buffer, millis / 1000, B_SHORT_DATE_FORMAT) != B_OK)
 		return "!";
 
 	return buffer;
@@ -106,7 +104,7 @@ LocaleUtils::CreateTranslatedIAmMinimumAgeSlug(int minimumAge)
 */
 
 /*static*/ LanguageRef
-LocaleUtils::DeriveDefaultLanguage(LanguageRepository* repository)
+LocaleUtils::DeriveDefaultLanguage(const std::vector<LanguageRef>& languages)
 {
 	LanguageRef defaultLanguage = _DeriveSystemDefaultLanguage();
 	HDDEBUG("derived system default language [%s]", defaultLanguage->ID());
@@ -117,7 +115,7 @@ LocaleUtils::DeriveDefaultLanguage(LanguageRepository* repository)
 	// 'known' at the HDS end so it doesn't matter if it is invalid when the
 	// HaikuDepot application requests data from the HaikuDepotServer system.
 
-	if (repository->IsEmpty()) {
+	if (languages.empty()) {
 		HDTRACE("no supported languages --> will use default language");
 		return defaultLanguage;
 	}
@@ -125,26 +123,27 @@ LocaleUtils::DeriveDefaultLanguage(LanguageRepository* repository)
 	// if there are supported languages defined then the preferred language
 	// needs to be one of the supported ones.
 
-	LanguageRef foundSupportedLanguage = _FindBestMatchingLanguage(repository,
+	LanguageRef foundSupportedLanguage = _FindBestMatchingLanguage(languages,
 		defaultLanguage->Code(), defaultLanguage->CountryCode(), defaultLanguage->ScriptCode());
 
 	if (!foundSupportedLanguage.IsSet()) {
 		Language appDefaultLanguage(LANGUAGE_DEFAULT_ID, "English", true);
 		HDERROR("unable to find the language [%s] so will look for app default [%s]",
 			defaultLanguage->ID(), appDefaultLanguage.ID());
-		foundSupportedLanguage = _FindBestMatchingLanguage(repository, appDefaultLanguage.Code(),
+		foundSupportedLanguage = _FindBestMatchingLanguage(languages, appDefaultLanguage.Code(),
 			appDefaultLanguage.CountryCode(), appDefaultLanguage.ScriptCode());
 
 		if (!foundSupportedLanguage.IsSet()) {
-			foundSupportedLanguage = repository->LanguageAtIndex(0);
+			foundSupportedLanguage = languages[0];
 			HDERROR("unable to find the app default language [%s] in the supported language so"
 					" will use the first supported language [%s]",
 				appDefaultLanguage.ID(), foundSupportedLanguage->ID());
 		}
 	} else {
-		HDTRACE("did find supported language [%s] as best match to [%s] from %" B_PRIu32
+		HDTRACE("did find supported language [%s] as best match to [%s] from %" B_PRIu64
 				" supported languages",
-			foundSupportedLanguage->ID(), defaultLanguage->ID(), repository->CountLanguages());
+			foundSupportedLanguage->ID(), defaultLanguage->ID(),
+			static_cast<uint64>(languages.size()));
 	}
 
 	return foundSupportedLanguage;
@@ -155,6 +154,25 @@ LocaleUtils::DeriveDefaultLanguage(LanguageRepository* repository)
 LocaleUtils::SetForcedSystemDefaultLanguageID(const BString& id)
 {
 	sForcedSystemDefaultLanguageID = id;
+}
+
+/*!	Returns a set of popular languages that can be used in the case that the loading
+	of supported languages from the server is not working. These languages are
+	assured to be present on the server.
+*/
+/*static*/ std::vector<LanguageRef>
+LocaleUtils::WellKnownLanguages()
+{
+	std::vector<LanguageRef> languages;
+	languages.push_back(LanguageRef(new Language("en", "English", true)));
+	languages.push_back(LanguageRef(new Language("fr", "French", true)));
+	languages.push_back(LanguageRef(new Language("de", "German", true)));
+	languages.push_back(LanguageRef(new Language("ja", "Japanese", true)));
+	languages.push_back(LanguageRef(new Language("ru", "Russian", true)));
+	languages.push_back(LanguageRef(new Language("pt", "Portugese", true)));
+	languages.push_back(LanguageRef(new Language("es", "Spanish", true)));
+	languages.push_back(LanguageRef(new Language("zh", "Mandarin", true)));
+	return languages;
 }
 
 
@@ -186,12 +204,12 @@ LocaleUtils::_DeriveSystemDefaultLanguage()
 */
 
 /*static*/ LanguageRef
-LocaleUtils::_FindBestMatchingLanguage(LanguageRepository* repository, const char* code,
+LocaleUtils::_FindBestMatchingLanguage(const std::vector<LanguageRef>& languages, const char* code,
 	const char* countryCode, const char* scriptCode)
 {
-	int32 index = _IndexOfBestMatchingLanguage(repository, code, countryCode, scriptCode);
+	int32 index = _IndexOfBestMatchingLanguage(languages, code, countryCode, scriptCode);
 	if (-1 != index)
-		return repository->LanguageAtIndex(index);
+		return languages[index];
 	return LanguageRef();
 }
 
@@ -202,32 +220,41 @@ LocaleUtils::_FindBestMatchingLanguage(LanguageRepository* repository, const cha
 */
 
 /*static*/ int32
-LocaleUtils::_IndexOfBestMatchingLanguage(LanguageRepository* repository, const char* code,
-	const char* countryCode, const char* scriptCode)
+LocaleUtils::_IndexOfBestMatchingLanguage(const std::vector<LanguageRef>& languages,
+	const char* code, const char* countryCode, const char* scriptCode)
 {
-	int32 languagesCount = repository->CountLanguages();
+	int32 languageSize = languages.size();
 
 	if (NULL != scriptCode) {
-		int32 index = repository->IndexOfLanguage(code, countryCode, scriptCode);
-			// looking for an exact match
-		if (-1 == index)
-			return index;
+		for (int32 i = 0; i < languageSize; i++) {
+			const char* lCode = languages[i]->Code();
+			const char* lCountryCode = languages[i]->CountryCode();
+			const char* lScriptCode = languages[i]->ScriptCode();
+
+			if (0 == StringUtils::NullSafeCompare(code, lCode)
+				&& 0 == StringUtils::NullSafeCompare(countryCode, lCountryCode)
+				&& 0 == StringUtils::NullSafeCompare(scriptCode, lScriptCode)) {
+				return i;
+			}
+		}
 	}
 
 	if (NULL != countryCode) {
-		for (int32 i = 0; i < languagesCount; i++) {
-			LanguageRef language = repository->LanguageAtIndex(i);
-			if (0 == StringUtils::NullSafeCompare(code, language->Code())
-				&& 0 == StringUtils::NullSafeCompare(countryCode, language->CountryCode())) {
+		for (int32 i = 0; i < languageSize; i++) {
+			const char* lCode = languages[i]->Code();
+			const char* lCountryCode = languages[i]->CountryCode();
+
+			if (0 == StringUtils::NullSafeCompare(code, lCode)
+				&& 0 == StringUtils::NullSafeCompare(countryCode, lCountryCode)) {
 				return i;
 			}
 		}
 	}
 
 	if (NULL != code) {
-		for (int32 i = 0; i < languagesCount; i++) {
-			LanguageRef language = repository->LanguageAtIndex(i);
-			if (0 == StringUtils::NullSafeCompare(code, language->Code()))
+		for (int32 i = 0; i < languageSize; i++) {
+			const char* lCode = languages[i]->Code();
+			if (0 == StringUtils::NullSafeCompare(code, lCode))
 				return i;
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -68,8 +68,7 @@ RatingUtils::Draw(BView* target, BPoint at, float value)
 
 
 /*static*/ void
-RatingUtils::Draw(BView* target, BPoint at, float value,
-	const BBitmap* star)
+RatingUtils::Draw(BView* target, BPoint at, float value, const BBitmap* star)
 {
 	if (star == NULL) {
 		HDFATAL("no star icon found in application resources.");
@@ -108,7 +107,7 @@ RatingUtils::Draw(BView* target, BPoint at, float value,
 	also does not make any sense.
 */
 /*static*/ bool
-RatingUtils::ShouldTryPopulateUserRatings(UserRatingInfoRef userRatingInfo)
+RatingUtils::ShouldTryPopulateUserRatings(PackageUserRatingInfoRef userRatingInfo)
 {
 	if (!userRatingInfo.IsSet())
 		return true;

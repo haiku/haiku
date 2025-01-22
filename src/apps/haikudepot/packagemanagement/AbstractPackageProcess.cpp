@@ -1,13 +1,15 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
- * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "AbstractPackageProcess.h"
+
+#include <Autolock.h>
 
 #include "Logger.h"
 #include "Model.h"
@@ -18,78 +20,93 @@
 
 using namespace BPackageKit;
 
-// #pragma mark - PackageAction
 
-
-AbstractPackageProcess::AbstractPackageProcess(
-		PackageInfoRef package, Model* model)
+AbstractPackageProcess::AbstractPackageProcess(const BString& packageName, Model* model)
 	:
-	fPackage(package),
+	fPackageName(packageName),
 	fModel(model)
 {
-	if (package.IsSet())
-		fInstallLocation = PackageKitUtils::DeriveInstallLocation(package.Get());
-	else
-		fInstallLocation = B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
-
-	// TODO: ideally if the package is installed at multiple locations,
-	// the user should be able to pick which one to remove.
-	// TODO: allow configuring the installation location
-	fPackageManager = new(std::nothrow) PackageManager(
-		(BPackageInstallationLocation)fInstallLocation);
 }
 
 
 AbstractPackageProcess::~AbstractPackageProcess()
 {
-	delete fPackageManager;
+}
+
+
+int32
+AbstractPackageProcess::InstallLocation() const
+{
+	PackageInfoRef package = FindPackageByName(fPackageName);
+	if (package.IsSet())
+		return PackageKitUtils::DeriveInstallLocation(package.Get());
+	return B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 }
 
 
 PackageInfoRef
-AbstractPackageProcess::FindPackageByName(const BString& name)
+AbstractPackageProcess::FindPackageByName(const BString& packageName) const
 {
-	return fModel->PackageForName(name);
+	return fModel->PackageForName(packageName);
 }
 
 
-// TODO; will refactor once the models go immutable.
 void
-AbstractPackageProcess::SetPackageState(PackageInfoRef& package, PackageState state)
+AbstractPackageProcess::SetPackageState(const BString& packageName, PackageState state)
 {
+	PackageInfoRef package = fModel->PackageForName(packageName);
+
 	if (package.IsSet()) {
-		PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
-		localInfo->SetState(state);
-		package->SetLocalInfo(localInfo);
+		PackageLocalInfoRef localInfo
+			= PackageLocalInfoBuilder(package->LocalInfo()).WithState(state).BuildRef();
+
+		PackageInfoRef updatedPackage
+			= PackageInfoBuilder(package).WithLocalInfo(localInfo).BuildRef();
+
+		fModel->AddPackage(updatedPackage);
+
 	} else {
-		HDERROR("setting state, but the package is not set");
+		HDERROR("setting state, but the package [%s] is not present", packageName.String());
 	}
 }
 
 
-// TODO; will refactor once the models go immutable.
 void
-AbstractPackageProcess::SetPackageDownloadProgress(PackageInfoRef& package, float value)
+AbstractPackageProcess::SetPackageDownloadProgress(const BString& packageName, float value)
 {
+	PackageInfoRef package = fModel->PackageForName(packageName);
+
 	if (package.IsSet()) {
-		PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
-		localInfo->SetDownloadProgress(value);
-		package->SetLocalInfo(localInfo);
+		PackageLocalInfoRef localInfo
+			= PackageLocalInfoBuilder(package->LocalInfo()).WithDownloadProgress(value).BuildRef();
+
+		PackageInfoRef updatedPackage
+			= PackageInfoBuilder(package).WithLocalInfo(localInfo).BuildRef();
+
+		fModel->AddPackage(updatedPackage);
+
 	} else {
-		HDERROR("setting progress, but the package is not set");
+		HDERROR("setting progress, but the package [%s] is not present", packageName.String());
 	}
 }
 
 
-// TODO; will refactor once the models go immutable.
 void
-AbstractPackageProcess::ClearPackageInstallationLocations(PackageInfoRef& package)
+AbstractPackageProcess::ClearPackageInstallationLocations(const BString& packageName)
 {
+	PackageInfoRef package = fModel->PackageForName(packageName);
+
 	if (package.IsSet()) {
-		PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
-		localInfo->ClearInstallationLocations();
-		package->SetLocalInfo(localInfo);
+		PackageLocalInfoRef localInfo
+			= PackageLocalInfoBuilder(package->LocalInfo()).ClearInstallationLocations().BuildRef();
+
+		PackageInfoRef updatedPackage
+			= PackageInfoBuilder(package).WithLocalInfo(localInfo).BuildRef();
+
+		fModel->AddPackage(updatedPackage);
+
 	} else {
-		HDERROR("clearing installation locations, but the package is not set");
+		HDERROR("clearing installation locations, but the package [%s] is not present",
+			packageName.String());
 	}
 }

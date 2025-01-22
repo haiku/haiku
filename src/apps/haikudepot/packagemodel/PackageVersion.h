@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_VERSION_H
@@ -18,17 +18,16 @@ class PackageVersion : public BPackageVersion, public BReferenceable
 {
 public:
 								PackageVersion();
+								PackageVersion(uint64 createTimestamp);
 								PackageVersion(const PackageVersion& other);
+								PackageVersion(const PackageVersion& other, uint64 createTimestamp);
 								PackageVersion(const BPackageVersion& other);
 	virtual						~PackageVersion();
 
-			PackageVersion&		operator=(const PackageVersion& other);
 			bool				operator==(const PackageVersion& other) const;
 			bool				operator!=(const PackageVersion& other) const;
 
-			uint64				CreateTimestamp() const
-									{ return fCreateTimestamp; }
-			void				SetCreateTimestamp(uint64 value);
+			uint64				CreateTimestamp() const;
 
 private:
 			uint64				fCreateTimestamp;

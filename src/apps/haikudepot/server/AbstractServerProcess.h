@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef ABSTRACT_SERVER_PROCESS_H
@@ -34,6 +34,11 @@ public:
 								AbstractServerProcess(uint32 options);
 	virtual						~AbstractServerProcess();
 
+	virtual float				Progress();
+
+			void				SetDownloadProgress(float value);
+			void				SetDataProcessingProgress(float value);
+
 protected:
 	virtual	status_t			GetStandardMetaDataPath(
 									BPath& path) const = 0;
@@ -41,11 +46,11 @@ protected:
 									BString& jsonPath) const = 0;
 
 	virtual	status_t			IfModifiedSinceHeaderValue(
-									BString& headerValue) const;
+									BString& headerValue);
 			status_t			IfModifiedSinceHeaderValue(
 									BString& headerValue,
 									const BPath& metaDataPath,
-									const BString& jsonPath) const;
+									const BString& jsonPath);
 	static	void				SetIfModifiedSinceHeaderValueFromMetaData(
 									BString& headerValue,
 									const StandardMetaData& metaData);
@@ -53,11 +58,11 @@ protected:
 			status_t			PopulateMetaData(
 									StandardMetaData& metaData,
 									const BPath& path,
-									const BString& jsonPath) const;
+									const BString& jsonPath);
 
 			status_t			ParseJsonFromFileWithListener(
 									BJsonEventListener *listener,
-									const BPath& path) const;
+									const BPath& path);
 
 	virtual	status_t			DownloadToLocalFileAtomically(
 									const BPath& targetFilePath,
@@ -81,13 +86,16 @@ private:
 									const BUrl& url,
 									uint32 redirects, uint32 failures);
 
-	static bool					_LooksLikeGzip(const char *pathStr);
-	static status_t				_DeGzipInSitu(const BPath& path);
+	static	bool				_LooksLikeGzip(const char *pathStr);
+	static	status_t			_DeGzipInSitu(const BPath& path);
 
 private:
 			uint32				fOptions;
 
 			BHttpRequest*		fRequest;
+
+			float				fDownloadProgress;
+			float				fDataProcessingProgress;
 };
 
 #endif // ABSTRACT_SERVER_PROCESS_H

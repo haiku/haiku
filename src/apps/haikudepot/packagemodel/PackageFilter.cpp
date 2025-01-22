@@ -1,15 +1,16 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Note that this file included code earlier from `Model.cpp` and
  * copyrights have been latterly been carried across in 2024.
  */
-
-
 #include "PackageFilter.h"
+
+#include "Logger.h"
+#include "PackageFilterSpecification.h"
 #include "PackageUtils.h"
 
 
@@ -50,6 +51,20 @@ AndFilter::AcceptsPackage(const PackageInfoRef& package) const
 	}
 	return true;
 }
+
+
+class FalseFilter : public PackageFilter
+{
+public:
+	FalseFilter()
+	{
+	}
+
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
+	{
+		return false;
+	}
+};
 
 
 class StateFilter : public PackageFilter
@@ -138,16 +153,14 @@ public:
 };
 
 
-class DevelopmentFilter : public PackageFilter
-{
+class DevelopmentFilter : public PackageFilter {
 public:
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		if (!package.IsSet())
 			return false;
 		const BString& packageName = package->Name();
-		return packageName.EndsWith("_devel")
-			|| packageName.EndsWith("_debuginfo");
+		return packageName.EndsWith("_devel") || packageName.EndsWith("_debuginfo");
 	}
 };
 
@@ -179,8 +192,7 @@ public:
 		// Every search term must be found in one of the package texts
 		for (int32 i = fSearchTerms.CountStrings() - 1; i >= 0; i--) {
 			const BString& term = fSearchTerms.StringAt(i);
-			if (package->Name().FindFirst(term) < 0
-				&& !_AcceptsPackageFromPublisher(package, term)
+			if (package->Name().FindFirst(term) < 0 && !_AcceptsPackageFromPublisher(package, term)
 				&& !_AcceptsPackageFromLocalizedText(package, term)) {
 				return false;
 			}
@@ -199,15 +211,15 @@ public:
 				searchTerms.Append(" ");
 			searchTerms.Append(term);
 		}
- 		return searchTerms;
+		return searchTerms;
 	}
 
 private:
- 	bool _TextContains(BString text, const BString& string) const
- 	{
+	bool _TextContains(BString text, const BString& string) const
+	{
 		int32 index = text.IFindFirst(string);
- 		return index >= 0;
- 	}
+		return index >= 0;
+	}
 
 	bool _AcceptsPackageFromPublisher(const PackageInfoRef& package,
 		const BString& searchTerm) const
@@ -228,12 +240,12 @@ private:
 			return false;
 
 		return _TextContains(localizedText->Title(), searchTerm)
-        	|| _TextContains(localizedText->Summary(), searchTerm)
-        	|| _TextContains(localizedText->Description(), searchTerm);
+			|| _TextContains(localizedText->Summary(), searchTerm)
+			|| _TextContains(localizedText->Description(), searchTerm);
 	}
 
 private:
- 	BStringList fSearchTerms;
+	BStringList fSearchTerms;
 };
 
 
@@ -279,4 +291,44 @@ PackageFilterFactory::CreateSourceFilter()
 PackageFilterFactory::CreateDevelopmentFilter()
 {
 	return PackageFilterRef(new DevelopmentFilter(), true);
+}
+
+
+/*static*/ PackageFilterRef
+PackageFilterFactory::CreateFalseFilter()
+{
+	return PackageFilterRef(new FalseFilter(), true);
+}
+
+
+/*static*/ PackageFilterRef
+PackageFilterFactory::CreateFilter(const PackageFilterSpecificationRef specification)
+{
+	if (!specification.IsSet())
+		return CreateFalseFilter();
+
+	AndFilter* andFilter = new AndFilter();
+
+	if (!specification->SearchTerms().IsEmpty())
+		andFilter->AddFilter(CreateSearchTermsFilter(specification->SearchTerms()));
+
+	if (!specification->DepotName().IsEmpty())
+		andFilter->AddFilter(CreateDepotFilter(specification->DepotName()));
+
+	if (!specification->Category().IsEmpty())
+		andFilter->AddFilter(CreateCategoryFilter(specification->Category()));
+
+	if (!specification->ShowAvailablePackages())
+		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateStateFilter(NONE)), true));
+
+	if (!specification->ShowInstalledPackages())
+		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateStateFilter(ACTIVATED)), true));
+
+	if (!specification->ShowSourcePackages())
+		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateSourceFilter()), true));
+
+	if (!specification->ShowDevelopPackages())
+		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateDevelopmentFilter()), true));
+
+	return PackageFilterRef(andFilter, true);
 }

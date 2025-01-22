@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LANGUAGE_MENU_UTILS_H
@@ -8,6 +8,7 @@
 
 #include <vector>
 
+#include <Array.h>
 #include <Menu.h>
 
 #include "Model.h"
@@ -18,7 +19,7 @@ class LanguageMenuUtils {
 
 public:
 	static	void			AddLanguagesToMenu(
-								const LanguageRepository* repository,
+								const std::vector<LanguageRef>& languages,
 								BMenu* menu);
 	static	void			MarkLanguageInMenu(
 								const BString& languageId,

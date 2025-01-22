@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -12,27 +12,6 @@
 
 #include "Logger.h"
 #include "PackageUtils.h"
-
-
-// #pragma mark - Sorting Functions
-
-
-static bool
-_IsPackageBeforeByName(const PackageInfoRef& p1, const BString& packageName)
-{
-	return p1->Name().Compare(packageName) < 0;
-}
-
-
-/*!	This function is used in order to provide an ordering on the packages
-	that are stored on a Depot.
- */
-
-static bool
-_IsPackageBefore(const PackageInfoRef& p1, const PackageInfoRef& p2)
-{
-	return _IsPackageBeforeByName(p1, p2->Name());
-}
 
 
 // #pragma mark - Class implementation
@@ -61,31 +40,16 @@ DepotInfo::DepotInfo(const DepotInfo& other)
 	:
 	fName(other.fName),
 	fIdentifier(other.fIdentifier),
-	fPackages(other.fPackages),
 	fWebAppRepositoryCode(other.fWebAppRepositoryCode),
 	fWebAppRepositorySourceCode(other.fWebAppRepositorySourceCode)
 {
 }
 
 
-DepotInfo&
-DepotInfo::operator=(const DepotInfo& other)
-{
-	fName = other.fName;
-	fIdentifier = other.fIdentifier;
-	fPackages = other.fPackages;
-	fWebAppRepositoryCode = other.fWebAppRepositoryCode;
-	fWebAppRepositorySourceCode = other.fWebAppRepositorySourceCode;
-	return *this;
-}
-
-
 bool
 DepotInfo::operator==(const DepotInfo& other) const
 {
-	return fName == other.fName
-		&& fIdentifier == fIdentifier
-		&& fPackages == other.fPackages;
+	return fName == other.fName && fIdentifier == fIdentifier;
 }
 
 
@@ -96,127 +60,31 @@ DepotInfo::operator!=(const DepotInfo& other) const
 }
 
 
-int32
-DepotInfo::CountPackages() const
+const BString&
+DepotInfo::Name() const
 {
-	return fPackages.size();
+	return fName;
 }
 
 
-PackageInfoRef
-DepotInfo::PackageAtIndex(int32 index)
+const BString&
+DepotInfo::Identifier() const
 {
-	return fPackages[index];
+	return fIdentifier;
 }
 
 
-/*! This method will insert the package into the list of packages
-    in order so that the list of packages remains in order.
- */
-
-void
-DepotInfo::AddPackage(PackageInfoRef& package)
+const BString&
+DepotInfo::WebAppRepositoryCode() const
 {
-	std::vector<PackageInfoRef>::iterator itInsertionPt
-		= std::lower_bound(
-			fPackages.begin(),
-			fPackages.end(),
-			package,
-			&_IsPackageBefore);
-	if (fPackages.end() != itInsertionPt && (*itInsertionPt)->Name() == package->Name())
-		*itInsertionPt = package;
-	else
-		fPackages.insert(itInsertionPt, package);
+	return fWebAppRepositoryCode;
 }
 
 
-bool
-DepotInfo::HasPackage(const BString& packageName)
+const BString&
+DepotInfo::WebAppRepositorySourceCode() const
 {
-	std::vector<PackageInfoRef>::const_iterator it
-		= std::lower_bound(
-			fPackages.begin(),
-			fPackages.end(),
-			packageName,
-			&_IsPackageBeforeByName);
-	if (it != fPackages.end()) {
-		PackageInfoRef candidate = *it;
-		return (candidate.Get() != NULL
-			&& candidate.Get()->Name() == packageName);
-	}
-	return false;
-}
-
-
-PackageInfoRef
-DepotInfo::PackageByName(const BString& packageName)
-{
-	std::vector<PackageInfoRef>::const_iterator it
-		= std::lower_bound(
-			fPackages.begin(),
-			fPackages.end(),
-			packageName,
-			&_IsPackageBeforeByName);
-
-	if (it != fPackages.end()) {
-		PackageInfoRef candidate = *it;
-		if (candidate.Get() != NULL && candidate.Get()->Name() == packageName)
-			return candidate;
-	}
-	return PackageInfoRef();
-}
-
-
-void
-DepotInfo::SyncPackagesFromDepot(const DepotInfoRef& other)
-{
-	for (int32 i = other->CountPackages() - 1; i >= 0; i--) {
-		PackageInfoRef otherPackage = other->PackageAtIndex(i);
-		PackageInfoRef myPackage = PackageByName(otherPackage->Name());
-
-		if (myPackage.IsSet()) {
-			PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(myPackage);
-			PackageLocalInfoRef otherLocalInfo = otherPackage->LocalInfo();
-
-			if (otherLocalInfo.IsSet()) {
-				localInfo->SetState(otherLocalInfo->State());
-				localInfo->SetLocalFilePath(otherLocalInfo->LocalFilePath());
-				localInfo->SetSystemDependency(otherLocalInfo->IsSystemDependency());
-			}
-
-			myPackage->SetLocalInfo(localInfo);
-		} else {
-			HDINFO("%s: new package: '%s'", fName.String(),
-				otherPackage->Name().String());
-			AddPackage(otherPackage);
-		}
-	}
-
-	for (int32 i = CountPackages() - 1; i >= 0; i--) {
-		PackageInfoRef myPackage = PackageAtIndex(i);
-		if (!other->HasPackage(myPackage->Name())) {
-			HDINFO("%s: removing package: '%s'", fName.String(),
-				myPackage->Name().String());
-			fPackages.erase(fPackages.begin() + i);
-		}
-	}
-}
-
-
-bool
-DepotInfo::HasAnyProminentPackages() const
-{
-	std::vector<PackageInfoRef>::const_iterator it;
-	for (it = fPackages.begin(); it != fPackages.end(); it++) {
-		const PackageInfoRef& package = *it;
-		const PackageClassificationInfoRef& classification = package->PackageClassificationInfo();
-
-		if (classification.IsSet()) {
-			if (classification->IsProminent())
-				return true;
-		}
-	}
-	return false;
+	return fWebAppRepositorySourceCode;
 }
 
 
@@ -238,4 +106,111 @@ void
 DepotInfo::SetWebAppRepositorySourceCode(const BString& code)
 {
 	fWebAppRepositorySourceCode = code;
+}
+
+
+// #pragma mark - DepotInfoBuilder
+
+
+DepotInfoBuilder::DepotInfoBuilder()
+	:
+	fName(),
+	fIdentifier(),
+	fWebAppRepositoryCode(),
+	fWebAppRepositorySourceCode()
+{
+}
+
+
+DepotInfoBuilder::DepotInfoBuilder(const DepotInfoRef& value)
+	:
+	fName(),
+	fIdentifier(),
+	fWebAppRepositoryCode(),
+	fWebAppRepositorySourceCode()
+{
+	fSource = value;
+}
+
+
+DepotInfoBuilder::~DepotInfoBuilder()
+{
+}
+
+
+void
+DepotInfoBuilder::_InitFromSource()
+{
+	if (fSource.IsSet()) {
+		_Init(fSource.Get());
+		fSource.Unset();
+	}
+}
+
+
+void
+DepotInfoBuilder::_Init(const DepotInfo* value)
+{
+	fName = value->Name();
+	fIdentifier = value->Identifier();
+	fWebAppRepositoryCode = value->WebAppRepositoryCode();
+	fWebAppRepositorySourceCode = value->WebAppRepositorySourceCode();
+}
+
+
+DepotInfoRef
+DepotInfoBuilder::BuildRef() const
+{
+	if (fSource.IsSet())
+		return fSource;
+
+	DepotInfo* depotInfo = new DepotInfo(fName);
+	depotInfo->SetIdentifier(fIdentifier);
+	depotInfo->SetWebAppRepositoryCode(fWebAppRepositoryCode);
+	depotInfo->SetWebAppRepositorySourceCode(fWebAppRepositorySourceCode);
+	return DepotInfoRef(depotInfo, true);
+}
+
+
+DepotInfoBuilder&
+DepotInfoBuilder::WithName(const BString& value)
+{
+	if (!fSource.IsSet() || fSource->Name() != value) {
+		_InitFromSource();
+		fName = value;
+	}
+	return *this;
+}
+
+
+DepotInfoBuilder&
+DepotInfoBuilder::WithIdentifier(const BString& value)
+{
+	if (!fSource.IsSet() || fSource->Identifier() != value) {
+		_InitFromSource();
+		fIdentifier = value;
+	}
+	return *this;
+}
+
+
+DepotInfoBuilder&
+DepotInfoBuilder::WithWebAppRepositoryCode(const BString& value)
+{
+	if (!fSource.IsSet() || fSource->WebAppRepositoryCode() != value) {
+		_InitFromSource();
+		fWebAppRepositoryCode = value;
+	}
+	return *this;
+}
+
+
+DepotInfoBuilder&
+DepotInfoBuilder::WithWebAppRepositorySourceCode(const BString& value)
+{
+	if (!fSource.IsSet() || fSource->WebAppRepositorySourceCode() != value) {
+		_InitFromSource();
+		fWebAppRepositorySourceCode = value;
+	}
+	return *this;
 }

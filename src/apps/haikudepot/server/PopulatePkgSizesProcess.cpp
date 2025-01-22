@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
 
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -23,7 +23,8 @@
 
 PopulatePkgSizesProcess::PopulatePkgSizesProcess(Model* model)
 	:
-	fModel(model)
+	fModel(model),
+	fProgress(0)
 {
 }
 
@@ -47,52 +48,94 @@ PopulatePkgSizesProcess::Description() const
 }
 
 
+float
+PopulatePkgSizesProcess::Progress()
+{
+	return fProgress;
+}
+
+
 status_t
 PopulatePkgSizesProcess::RunInternal()
 {
-	int32 countPkgs = 0;
+	int32 countPkgs;
 	int32 countPkgSized = 0;
 	int32 countPkgUnsized = 0;
 
 	HDINFO("[%s] will populate size for pkgs without a size", Name());
 
-	for (int32 d = 0; d < fModel->CountDepots() && !WasStopped(); d++) {
-		DepotInfoRef depotInfo = fModel->DepotAtIndex(d);
-		countPkgs += depotInfo->CountPackages();
+	const std::vector<PackageInfoRef> packages = _SnapshotOfPackages();
+	std::vector<PackageInfoRef> updatedPackages;
 
-		for (int32 p = 0; p < depotInfo->CountPackages(); p++) {
-			PackageInfoRef packageInfo = depotInfo->PackageAtIndex(p);
+	countPkgs = static_cast<int32>(packages.size());
 
-			if (!packageInfo.IsSet())
-				HDFATAL("package is not set");
+	for (int32 i = 0; i < countPkgs; i++) {
+		PackageInfoRef package = packages[i];
+		const char* packageName = package->Name().String();
 
-			PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(packageInfo);
-			PackageState state = localInfo->State();
+		if (!package.IsSet())
+			HDFATAL("package is not set");
 
-			if (localInfo->Size() <= 0 && (state == ACTIVATED || state == INSTALLED)) {
-				off_t derivedSize = _DeriveSize(packageInfo);
+		PackageLocalInfoRef localInfo = package->LocalInfo();
 
-				if (derivedSize > 0) {
-					localInfo->SetSize(derivedSize);
-					countPkgSized++;
-					HDDEBUG("[%s] did derive a size for package [%s]", Name(),
-						packageInfo->Name().String());
-				} else {
-					countPkgUnsized++;
-					HDDEBUG("[%s] unable to derive a size for package [%s]", Name(),
-						packageInfo->Name().String());
-				}
+		if (_ShouldDeriveSize(localInfo)) {
+			off_t derivedSize = _DeriveSize(package);
+
+			if (derivedSize > 0) {
+				PackageLocalInfoBuilder localInfoBuilder;
+
+				if (localInfo.IsSet())
+					localInfoBuilder = PackageLocalInfoBuilder(localInfo);
+
+				localInfoBuilder.WithSize(derivedSize);
+
+				PackageLocalInfoRef localInfo = localInfoBuilder.BuildRef();
+
+				updatedPackages.push_back(
+					PackageInfoBuilder(package).WithLocalInfo(localInfo).BuildRef());
+
+				countPkgSized++;
+				HDDEBUG("[%s] did derive a size for package [%s]", Name(), packageName);
+			} else {
+				countPkgUnsized++;
+				HDDEBUG("[%s] unable to derive a size for package [%s]", Name(), packageName);
 			}
-
-			packageInfo->SetLocalInfo(localInfo);
 		}
+
+		_SetProgress(static_cast<float>(i) / static_cast<float>(countPkgs));
 	}
 
+	fModel->AddPackagesWithChange(updatedPackages, PKG_CHANGED_LOCAL_INFO);
+
+	_SetProgress(1.0);
+
 	HDINFO("[%s] did populate size for %" B_PRId32 " packages with %" B_PRId32
-		" already having a size and %" B_PRId32 " unable to derive a size",
-		Name(), countPkgSized, countPkgs - countPkgSized, countPkgUnsized);
+		   " already having a size and %" B_PRId32 " unable to derive a size",
+		Name(), countPkgSized, countPkgs - (countPkgSized + countPkgUnsized), countPkgUnsized);
 
 	return B_OK;
+}
+
+
+const std::vector<PackageInfoRef>
+PopulatePkgSizesProcess::_SnapshotOfPackages() const
+{
+	return fModel->Packages();
+}
+
+
+bool
+PopulatePkgSizesProcess::_ShouldDeriveSize(PackageLocalInfoRef localInfo) const
+{
+	if (!localInfo.IsSet())
+		return true;
+
+	if (localInfo->Size() > 0)
+		return false;
+
+	PackageState state = localInfo->State();
+
+	return state == ACTIVATED || state == INSTALLED;
 }
 
 
@@ -111,4 +154,14 @@ PopulatePkgSizesProcess::_DeriveSize(const PackageInfoRef package) const
 		HDDEBUG("unable to get the local file of package [%s]", package->Name().String());
 	}
 	return 0;
+}
+
+
+void
+PopulatePkgSizesProcess::_SetProgress(float value)
+{
+	if (!_ShouldProcessProgress() && value != 1.0 && (value - fProgress) < 0.1)
+		return;
+	fProgress = value;
+	_NotifyChanged();
 }

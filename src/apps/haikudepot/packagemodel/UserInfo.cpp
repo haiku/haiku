@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -27,14 +27,6 @@ UserInfo::UserInfo(const UserInfo& other)
 	:
 	fNickName(other.fNickName)
 {
-}
-
-
-UserInfo&
-UserInfo::operator=(const UserInfo& other)
-{
-	fNickName = other.fNickName;
-	return *this;
 }
 
 

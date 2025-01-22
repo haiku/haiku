@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2024 Haiku, Inc. All rights reserved.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -7,8 +7,8 @@
 #include "ToLatestUserUsageConditionsWindow.h"
 
 #include <Alert.h>
+
 #include <Autolock.h>
-#include <AutoLocker.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -17,14 +17,15 @@
 #include <SeparatorView.h>
 
 #include "AppUtils.h"
+#include "IdentityAndAccessUtils.h"
 #include "LinkView.h"
 #include "LocaleUtils.h"
 #include "Logger.h"
 #include "Model.h"
-#include "UserUsageConditionsWindow.h"
 #include "ServerHelper.h"
-#include "WebAppInterface.h"
 #include "TextView.h"
+#include "UserUsageConditionsWindow.h"
+#include "WebAppInterface.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ToLatestUserUsageConditionsWindow"
@@ -123,20 +124,17 @@ ToLatestUserUsageConditionsWindow::_InitUiControls()
 			// is filled in when the user usage conditions data is available
 		new BMessage(MSG_AGREE_MINIMUM_AGE_TOGGLE));
 
-	fConfirmUserUsageConditionsCheckBox = new BCheckBox(
-		"confirm usage conditions",
-		B_TRANSLATE("I agree to the usage conditions"),
-		new BMessage(MSG_AGREE_USER_USAGE_CONDITIONS_TOGGLE));
+	fConfirmUserUsageConditionsCheckBox
+		= new BCheckBox("confirm usage conditions", B_TRANSLATE("I agree to the usage conditions"),
+			new BMessage(MSG_AGREE_USER_USAGE_CONDITIONS_TOGGLE));
 
-	fUserUsageConditionsLink = new LinkView("usage conditions view",
-		B_TRANSLATE("View the usage conditions"),
-		new BMessage(MSG_VIEW_LATEST_USER_USAGE_CONDITIONS));
+	fUserUsageConditionsLink
+		= new LinkView("usage conditions view", B_TRANSLATE("View the usage conditions"),
+			new BMessage(MSG_VIEW_LATEST_USER_USAGE_CONDITIONS));
 	fUserUsageConditionsLink->SetTarget(this);
 
-	fLogoutButton = new BButton("logout", B_TRANSLATE("Logout"),
-		new BMessage(MSG_LOG_OUT));
-	fAgreeButton = new BButton("agree", B_TRANSLATE("Agree"),
-		new BMessage(MSG_AGREE));
+	fLogoutButton = new BButton("logout", B_TRANSLATE("Logout"), new BMessage(MSG_LOG_OUT));
+	fAgreeButton = new BButton("agree", B_TRANSLATE("Agree"), new BMessage(MSG_AGREE));
 
 	fWorkerIndicator = new BarberPole("fetch data worker indicator");
 	BSize workerIndicatorSize;
@@ -154,8 +152,7 @@ ToLatestUserUsageConditionsWindow::_EnableMutableControls()
 	bool ageChecked = fConfirmMinimumAgeCheckBox->Value() == 1;
 	bool conditionsChecked = fConfirmUserUsageConditionsCheckBox->Value() == 1;
 	fUserUsageConditionsLink->SetEnabled(fMutableControlsEnabled);
-	fAgreeButton->SetEnabled(fMutableControlsEnabled && ageChecked
-		&& conditionsChecked);
+	fAgreeButton->SetEnabled(fMutableControlsEnabled && ageChecked && conditionsChecked);
 	fLogoutButton->SetEnabled(fMutableControlsEnabled);
 	fConfirmUserUsageConditionsCheckBox->SetEnabled(fMutableControlsEnabled);
 	fConfirmMinimumAgeCheckBox->SetEnabled(fMutableControlsEnabled);
@@ -169,10 +166,8 @@ ToLatestUserUsageConditionsWindow::MessageReceived(BMessage* message)
 		case MSG_USER_USAGE_CONDITIONS_DATA:
 		{
 			BMessage userUsageConditionsMessage;
-			message->FindMessage(KEY_USER_USAGE_CONDITIONS,
-				&userUsageConditionsMessage);
-			UserUsageConditions userUsageConditions(
-				&userUsageConditionsMessage);
+			message->FindMessage(KEY_USER_USAGE_CONDITIONS, &userUsageConditionsMessage);
+			UserUsageConditions userUsageConditions(&userUsageConditionsMessage);
 			_DisplayData(userUsageConditions);
 			fWorkerIndicator->Stop();
 			break;
@@ -206,9 +201,10 @@ ToLatestUserUsageConditionsWindow::QuitRequested()
 	BAutolock locker(&fLock);
 
 	if (fWorkerThread >= 0) {
-		if (Logger::IsDebugEnabled())
-			HDINFO("quit requested while worker thread is operating -- will "
-				"try again once the worker thread has completed");
+		if (Logger::IsDebugEnabled()) {
+			HDINFO("quit requested while worker thread is operating -- will try again once the "
+				   "worker thread has completed");
+		}
 		fQuitRequestedDuringWorkerThread = true;
 		return false;
 	}
@@ -251,20 +247,17 @@ ToLatestUserUsageConditionsWindow::_FetchData()
 {
 	{
 		BAutolock locker(&fLock);
-		if (-1 != fWorkerThread) {
-			debugger("illegal state - attempt to fetch, but thread in "
-				"progress");
-		}
+		if (-1 != fWorkerThread)
+			debugger("illegal state - attempt to fetch, but thread in progress");
 	}
 
-	thread_id thread = spawn_thread(&_FetchDataThreadEntry,
-		"Fetch usage conditions data", B_NORMAL_PRIORITY, this);
+	thread_id thread = spawn_thread(&_FetchDataThreadEntry, "Fetch usage conditions data",
+		B_NORMAL_PRIORITY, this);
 	if (thread >= 0) {
 		fWorkerIndicator->Start();
 		_SetWorkerThreadLocked(thread);
 	} else {
-		debugger("unable to start a thread to fetch the user usage "
-			"conditions.");
+		debugger("unable to start a thread to fetch the user usage conditions.");
 	}
 }
 
@@ -292,14 +285,13 @@ void
 ToLatestUserUsageConditionsWindow::_FetchDataPerform()
 {
 	UserUsageConditions conditions;
-	WebAppInterface* interface = fModel.GetWebAppInterface();
+	WebAppInterfaceRef interface = fModel.WebApp();
 
 	if (interface->RetrieveUserUsageConditions("", conditions) == B_OK) {
 		BMessage userUsageConditionsMessage;
 		conditions.Archive(&userUsageConditionsMessage, true);
 		BMessage dataMessage(MSG_USER_USAGE_CONDITIONS_DATA);
-		dataMessage.AddMessage(KEY_USER_USAGE_CONDITIONS,
-			&userUsageConditionsMessage);
+		dataMessage.AddMessage(KEY_USER_USAGE_CONDITIONS, &userUsageConditionsMessage);
 		BMessenger(this).SendMessage(&dataMessage);
 	} else {
 		_NotifyFetchProblem();
@@ -313,11 +305,9 @@ ToLatestUserUsageConditionsWindow::_FetchDataPerform()
 void
 ToLatestUserUsageConditionsWindow::_NotifyFetchProblem()
 {
-	AppUtils::NotifySimpleError(
-		B_TRANSLATE("Usage conditions download problem"),
-		B_TRANSLATE("An error has arisen downloading the usage "
-			"conditions. Check the log for details and try again. "
-			ALERT_MSG_LOGS_USER_GUIDE));
+	AppUtils::NotifySimpleError(B_TRANSLATE("Usage conditions download problem"),
+		B_TRANSLATE("An error has arisen downloading the usage conditions. Check the log for "
+					"details and try again. " ALERT_MSG_LOGS_USER_GUIDE));
 }
 
 
@@ -326,22 +316,19 @@ ToLatestUserUsageConditionsWindow::_Agree()
 {
 	{
 		BAutolock locker(&fLock);
-		if (-1 != fWorkerThread) {
-			debugger("illegal state - attempt to agree, but thread in "
-				"progress");
-		}
+		if (-1 != fWorkerThread)
+			debugger("illegal state - attempt to agree, but thread in progress");
 	}
 
 	fMutableControlsEnabled = false;
 	_EnableMutableControls();
-	thread_id thread = spawn_thread(&_AgreeThreadEntry,
-		"Agree usage conditions", B_NORMAL_PRIORITY, this);
+	thread_id thread
+		= spawn_thread(&_AgreeThreadEntry, "Agree usage conditions", B_NORMAL_PRIORITY, this);
 	if (thread >= 0) {
 		fWorkerIndicator->Start();
 		_SetWorkerThreadLocked(thread);
 	} else {
-		debugger("unable to start a thread to fetch the user usage "
-			"conditions.");
+		debugger("unable to start a thread to fetch the user usage conditions.");
 	}
 }
 
@@ -361,9 +348,9 @@ ToLatestUserUsageConditionsWindow::_AgreePerform()
 {
 	BMessenger messenger(this);
 	BMessage responsePayload;
-	WebAppInterface* webApp = fModel.GetWebAppInterface();
-	status_t result = webApp->AgreeUserUsageConditions(
-		fUserUsageConditions.Code(), responsePayload);
+	WebAppInterfaceRef webApp = fModel.WebApp();
+	status_t result
+		= webApp->AgreeUserUsageConditions(fUserUsageConditions.Code(), responsePayload);
 
 	if (result != B_OK) {
 		ServerHelper::NotifyTransportError(result);
@@ -371,14 +358,10 @@ ToLatestUserUsageConditionsWindow::_AgreePerform()
 	} else {
 		int32 errorCode = WebAppInterface::ErrorCodeFromResponse(responsePayload);
 		if (errorCode == ERROR_CODE_NONE) {
-			AppUtils::NotifySimpleError(
-				B_TRANSLATE("Usage conditions agreed"),
-				B_TRANSLATE("The current usage conditions have been agreed "
-					"to."));
+			AppUtils::NotifySimpleError(B_TRANSLATE("Usage conditions agreed"),
+				B_TRANSLATE("The current usage conditions have been agreed to."));
 			messenger.SendMessage(B_QUIT_REQUESTED);
-		}
-		else {
-			AutoLocker<BLocker> locker(fModel.Lock());
+		} else {
 			ServerHelper::NotifyServerJsonRpcError(responsePayload);
 			messenger.SendMessage(MSG_AGREE_FAILED);
 		}
@@ -398,13 +381,11 @@ ToLatestUserUsageConditionsWindow::_HandleAgreeFailed()
 
 
 void
-ToLatestUserUsageConditionsWindow::_DisplayData(
-	const UserUsageConditions& userUsageConditions)
+ToLatestUserUsageConditionsWindow::_DisplayData(const UserUsageConditions& userUsageConditions)
 {
 	fUserUsageConditions = userUsageConditions;
 	fConfirmMinimumAgeCheckBox->SetLabel(
-		LocaleUtils::CreateTranslatedIAmMinimumAgeSlug(
-			fUserUsageConditions.MinimumAge()));
+		LocaleUtils::CreateTranslatedIAmMinimumAgeSlug(fUserUsageConditions.MinimumAge()));
 	fMutableControlsEnabled = true;
 	_EnableMutableControls();
 }
@@ -414,17 +395,19 @@ void
 ToLatestUserUsageConditionsWindow::_HandleViewUserUsageConditions()
 {
 	if (!fUserUsageConditions.Code().IsEmpty()) {
-		UserUsageConditionsWindow* window = new UserUsageConditionsWindow(
-			fModel, fUserUsageConditions);
+		UserUsageConditionsWindow* window
+			= new UserUsageConditionsWindow(fModel, fUserUsageConditions);
 		window->Show();
 	}
 }
 
+
 void
 ToLatestUserUsageConditionsWindow::_HandleLogout()
 {
-	AutoLocker<BLocker> locker(fModel.Lock());
-	fModel.SetNickname("");
+	if (IdentityAndAccessUtils::ClearCredentials() != B_OK)
+		HDERROR("unable to remove stored credentials");
+	fModel.SetCredentials(UserCredentials());
 	BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 }
 

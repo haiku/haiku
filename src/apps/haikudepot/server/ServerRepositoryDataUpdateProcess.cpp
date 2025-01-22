@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "ServerRepositoryDataUpdateProcess.h"
@@ -17,10 +17,10 @@
 #include "DumpExportRepository.h"
 #include "DumpExportRepositoryJsonListener.h"
 #include "DumpExportRepositorySource.h"
+#include "Logger.h"
 #include "PackageInfo.h"
 #include "ServerSettings.h"
 #include "StorageUtils.h"
-#include "Logger.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -28,13 +28,12 @@
 
 
 /*! This repository listener (not at the JSON level) is feeding in the
-    repositories as they are parsed and processing them.  Processing
-    includes finding the matching depot record and coupling the data
-    from the server with the data about the depot.
+	repositories as they are parsed and processing them.  Processing
+	includes finding the matching depot record and coupling the data
+	from the server with the data about the depot.
 */
 
-class DepotMatchingRepositoryListener :
-	public DumpExportRepositoryListener {
+class DepotMatchingRepositoryListener : public DumpExportRepositoryListener {
 public:
 								DepotMatchingRepositoryListener(Model* model,
 									Stoppable* stoppable);
@@ -60,14 +59,16 @@ private:
 private:
 			Model*				fModel;
 			Stoppable*			fStoppable;
+			std::vector<DepotInfoRef>
+								fDepots;
 };
 
 
-DepotMatchingRepositoryListener::DepotMatchingRepositoryListener(
-	Model* model, Stoppable* stoppable)
+DepotMatchingRepositoryListener::DepotMatchingRepositoryListener(Model* model, Stoppable* stoppable)
 	:
 	fModel(model),
-	fStoppable(stoppable)
+	fStoppable(stoppable),
+	fDepots()
 {
 }
 
@@ -79,43 +80,41 @@ DepotMatchingRepositoryListener::~DepotMatchingRepositoryListener()
 
 void
 DepotMatchingRepositoryListener::_SetupRepositoryData(DepotInfoRef& depot,
-	DumpExportRepository* repository,
-	DumpExportRepositorySource* repositorySource)
+	DumpExportRepository* repository, DumpExportRepositorySource* repositorySource)
 {
 	BString* repositoryCode = repository->Code();
 	BString* repositorySourceCode = repositorySource->Code();
 
-	depot->SetWebAppRepositoryCode(*repositoryCode);
-	depot->SetWebAppRepositorySourceCode(*repositorySourceCode);
+	DepotInfoBuilder depotBuilder(depot);
+
+	depotBuilder.WithWebAppRepositoryCode(*repositoryCode);
+	depotBuilder.WithWebAppRepositorySourceCode(*repositorySourceCode);
+
+	DepotInfoRef depotInfo = depotBuilder.BuildRef();
+	fDepots.push_back(depotInfo);
 
 	if (Logger::IsDebugEnabled()) {
 		HDDEBUG("[DepotMatchingRepositoryListener] associated depot [%s] (%s) "
-			"with server repository source [%s] (%s)",
-			depot->Name().String(),
-			depot->Identifier().String(),
-			repositorySourceCode->String(),
+				"with server repository source [%s] (%s)",
+			depot->Name().String(), depot->Identifier().String(), repositorySourceCode->String(),
 			repositorySource->Identifier()->String());
 	} else {
 		HDINFO("[DepotMatchingRepositoryListener] associated depot [%s] with "
-			"server repository source [%s]",
-			depot->Name().String(),
-			repositorySourceCode->String());
+			   "server repository source [%s]",
+			depot->Name().String(), repositorySourceCode->String());
 	}
 }
 
 
 void
-DepotMatchingRepositoryListener::Handle(const BString& identifier,
-	DumpExportRepository* repository,
+DepotMatchingRepositoryListener::Handle(const BString& identifier, DumpExportRepository* repository,
 	DumpExportRepositorySource* repositorySource)
 {
 	if (!identifier.IsEmpty()) {
-		AutoLocker<BLocker> locker(fModel->Lock());
-		for (int32 i = 0; i < fModel->CountDepots(); i++) {
-			DepotInfoRef depot = fModel->DepotAtIndex(i);
-			if (identifier == depot->Identifier())
-				_SetupRepositoryData(depot, repository, repositorySource);
-		}
+		DepotInfoRef depotForIdentifier = fModel->DepotForIdentifier(identifier);
+
+		if (depotForIdentifier.IsSet())
+			_SetupRepositoryData(depotForIdentifier, repository, repositorySource);
 	}
 }
 
@@ -130,13 +129,8 @@ DepotMatchingRepositoryListener::Handle(DumpExportRepository* repository,
 	// there may be additional identifiers for the remote repository and
 	// these should also be taken into consideration.
 
-	for(int32 i = 0;
-			i < repositorySource->CountExtraIdentifiers();
-			i++)
-	{
-		Handle(*(repositorySource->ExtraIdentifiersItemAt(i)), repository,
-			repositorySource);
-	}
+	for (int32 i = 0; i < repositorySource->CountExtraIdentifiers(); i++)
+		Handle(*(repositorySource->ExtraIdentifiersItemAt(i)), repository, repositorySource);
 }
 
 
@@ -153,11 +147,11 @@ DepotMatchingRepositoryListener::Handle(DumpExportRepository* repository)
 void
 DepotMatchingRepositoryListener::Complete()
 {
+	fModel->SetDepots(fDepots);
 }
 
 
-ServerRepositoryDataUpdateProcess::ServerRepositoryDataUpdateProcess(
-	Model* model,
+ServerRepositoryDataUpdateProcess::ServerRepositoryDataUpdateProcess(Model* model,
 	uint32 serverProcessOptions)
 	:
 	AbstractSingleFileServerProcess(serverProcessOptions),
@@ -189,7 +183,6 @@ BString
 ServerRepositoryDataUpdateProcess::UrlPathComponent()
 {
 	BString result;
-	AutoLocker<BLocker> locker(fModel->Lock());
 	result.SetToFormat("/__repository/all-%s.json.gz", fModel->PreferredLanguage()->ID());
 	return result;
 }
@@ -198,7 +191,6 @@ ServerRepositoryDataUpdateProcess::UrlPathComponent()
 status_t
 ServerRepositoryDataUpdateProcess::GetLocalPath(BPath& path) const
 {
-	AutoLocker<BLocker> locker(fModel->Lock());
 	return StorageUtils::DumpExportRepositoryDataPath(path, fModel->PreferredLanguage());
 }
 
@@ -206,15 +198,13 @@ ServerRepositoryDataUpdateProcess::GetLocalPath(BPath& path) const
 status_t
 ServerRepositoryDataUpdateProcess::ProcessLocalData()
 {
-	DepotMatchingRepositoryListener* itemListener =
-		new DepotMatchingRepositoryListener(fModel, this);
-	ObjectDeleter<DepotMatchingRepositoryListener>
-		itemListenerDeleter(itemListener);
+	DepotMatchingRepositoryListener* itemListener
+		= new DepotMatchingRepositoryListener(fModel, this);
+	ObjectDeleter<DepotMatchingRepositoryListener> itemListenerDeleter(itemListener);
 
-	BulkContainerDumpExportRepositoryJsonListener* listener =
-		new BulkContainerDumpExportRepositoryJsonListener(itemListener);
-	ObjectDeleter<BulkContainerDumpExportRepositoryJsonListener>
-		listenerDeleter(listener);
+	BulkContainerDumpExportRepositoryJsonListener* listener
+		= new BulkContainerDumpExportRepositoryJsonListener(itemListener);
+	ObjectDeleter<BulkContainerDumpExportRepositoryJsonListener> listenerDeleter(listener);
 
 	BPath localPath;
 	status_t result = GetLocalPath(localPath);
@@ -239,8 +229,7 @@ ServerRepositoryDataUpdateProcess::GetStandardMetaDataPath(BPath& path) const
 
 
 void
-ServerRepositoryDataUpdateProcess::GetStandardMetaDataJsonPath(
-	BString& jsonPath) const
+ServerRepositoryDataUpdateProcess::GetStandardMetaDataJsonPath(BString& jsonPath) const
 {
 	jsonPath.SetTo("$.info");
 }

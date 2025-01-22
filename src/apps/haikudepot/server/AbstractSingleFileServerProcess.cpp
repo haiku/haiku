@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -16,12 +16,11 @@
 #include "StorageUtils.h"
 
 
-AbstractSingleFileServerProcess::AbstractSingleFileServerProcess(
-	uint32 options)
+AbstractSingleFileServerProcess::AbstractSingleFileServerProcess(uint32 options)
 	:
 	AbstractServerProcess(options),
 	fDownloadDurationSeconds(0.0),
-    fProcessLocalDataDurationSeconds(0.0)
+	fProcessLocalDataDurationSeconds(0.0)
 {
 }
 
@@ -56,25 +55,25 @@ AbstractSingleFileServerProcess::RunInternal()
 
 	if (IsSuccess(result) && ShouldAttemptNetworkDownload(hasData)) {
 		BStopWatch stopWatch("download", true);
-		result = DownloadToLocalFileAtomically(
-			localPath,
+		result = DownloadToLocalFileAtomically(localPath,
 			ServerSettings::CreateFullUrl(urlPathComponent));
-		fDownloadDurationSeconds = ((double) stopWatch.ElapsedTime() / 1000000.0);
+		fDownloadDurationSeconds = ((double)stopWatch.ElapsedTime() / 1000000.0);
 
 		if (!IsSuccess(result)) {
 			if (hasData) {
-				HDINFO("[%s] failed to update data, but have old data "
-					"anyway so carry on with that", Name());
+				HDINFO("[%s] failed to update data, but have old data anyway so carry on with that",
+					Name());
 				result = B_OK;
-			} else
+			} else {
 				HDERROR("[%s] failed to obtain data", Name());
-		} else
+			}
+		} else {
 			HDINFO("[%s] did fetch data", Name());
+		}
 	}
 
 	if (IsSuccess(result)) {
-		status_t hasDataResult = StorageUtils::ExistsObject(
-			localPath, &hasData, NULL, &size);
+		status_t hasDataResult = StorageUtils::ExistsObject(localPath, &hasData, NULL, &size);
 
 		hasData = hasData && size > 0;
 
@@ -89,7 +88,7 @@ AbstractSingleFileServerProcess::RunInternal()
 
 		BStopWatch stopWatch("process local data", true);
 		result = ProcessLocalData();
-		fProcessLocalDataDurationSeconds = ((double) stopWatch.ElapsedTime() / 1000000.0);
+		fProcessLocalDataDurationSeconds = ((double)stopWatch.ElapsedTime() / 1000000.0);
 
 		switch (result) {
 			case B_OK:
@@ -124,8 +123,7 @@ AbstractSingleFileServerProcess::LogReport()
 	if (ProcessState() == PROCESS_COMPLETE) {
 		BString downloadLogLine;
 		BString localDataLogLine;
-		downloadLogLine.SetToFormat("\n - download %6.3f",
-			fDownloadDurationSeconds);
+		downloadLogLine.SetToFormat("\n - download %6.3f", fDownloadDurationSeconds);
 		localDataLogLine.SetToFormat("\n - process local data %6.3f",
 			fProcessLocalDataDurationSeconds);
 		result.Append(downloadLogLine);

@@ -1,9 +1,11 @@
 /*
- * Copyright 2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2023-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef POPULATE_PKG_SIZES_PROCESS_H
 #define POPULATE_PKG_SIZES_PROCESS_H
+
+#include <vector>
 
 #include <String.h>
 
@@ -23,15 +25,22 @@ public:
 
 	virtual	const char*			Name() const;
 	virtual	const char*			Description() const;
+	virtual float				Progress();
 
 protected:
 	virtual	status_t			RunInternal();
 
 private:
+			const std::vector<PackageInfoRef>
+								_SnapshotOfPackages() const;
+			bool				_ShouldDeriveSize(PackageLocalInfoRef localInfo) const;
 			off_t				_DeriveSize(const PackageInfoRef modelInfo) const;
+
+			void				_SetProgress(float value);
 
 private:
 			Model*				fModel;
+			float				fProgress;
 };
 
 

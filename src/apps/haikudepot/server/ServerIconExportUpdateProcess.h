@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SERVER_ICON_EXPORT_UPDATE_PROCESS_H
@@ -32,7 +32,7 @@ public:
 
 	virtual	status_t			GetLocalPath(BPath& path) const;
 	virtual	status_t			IfModifiedSinceHeaderValue(
-									BString& headerValue) const;
+									BString& headerValue);
 
 
 	virtual	status_t			GetStandardMetaDataPath(BPath& path) const;
@@ -41,11 +41,6 @@ public:
 
 protected:
 	virtual	BString				UrlPathComponent();
-
-private:
-			void				_NotifyPackagesWithIconsInDepots() const;
-			void				_NotifyPackagesWithIconsInDepot(
-									const DepotInfoRef& depotInfo) const;
 
 private:
 			Model*				fModel;

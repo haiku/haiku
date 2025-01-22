@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef POPULATE_PKG_USER_RATINGS_FROM_SERVER_PROCESS__H
@@ -29,7 +29,7 @@ class PkgDataLoadState;
 class PopulatePkgUserRatingsFromServerProcess : public AbstractProcess
 {
 public:
-								PopulatePkgUserRatingsFromServerProcess(PackageInfoRef packageInfo,
+								PopulatePkgUserRatingsFromServerProcess(const BString& packageName,
 									Model *model);
 	virtual						~PopulatePkgUserRatingsFromServerProcess();
 
@@ -40,8 +40,11 @@ protected:
 	virtual status_t			RunInternal();
 
 private:
+			const BString		_WebAppRepositoryCode() const;
+
+private:
 			Model*				fModel;
-			PackageInfoRef		fPackageInfo;
+			BString				fPackageName;
 };
 
 #endif // POPULATE_PKG_USER_RATINGS_FROM_SERVER_PROCESS__H

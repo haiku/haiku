@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2025, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -64,8 +64,7 @@ public:
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry, BPackageEntryAttribute* attribute)
 	{
 		return B_OK;
 	}
@@ -75,8 +74,7 @@ public:
 		return B_OK;
 	}
 
-	virtual status_t HandlePackageAttribute(
-		const BPackageInfoAttributeValue& value)
+	virtual status_t HandlePackageAttribute(const BPackageInfoAttributeValue& value)
 	{
 		return B_OK;
 	}
@@ -105,10 +103,10 @@ private:
 // #pragma mark - OpenPackageProcess
 
 
-OpenPackageProcess::OpenPackageProcess(PackageInfoRef package, Model* model,
-		const DeskbarLink& link)
+OpenPackageProcess::OpenPackageProcess(const BString& packageName, Model* model,
+	const DeskbarLink& link)
 	:
-	AbstractPackageProcess(package, model),
+	AbstractPackageProcess(packageName, model),
 	fDeskbarLink(link)
 {
 	fDescription = _DeriveDescription();
@@ -192,7 +190,7 @@ OpenPackageProcess::_DeriveDescription()
 
 /*static*/ bool
 OpenPackageProcess::FindAppToLaunch(const PackageInfoRef& package,
-		std::vector<DeskbarLink>& foundLinks)
+	std::vector<DeskbarLink>& foundLinks)
 {
 	if (!package.IsSet())
 		return false;
@@ -208,8 +206,7 @@ OpenPackageProcess::FindAppToLaunch(const PackageInfoRef& package,
 
 	status_t status = reader.Init(packagePath.Path());
 	if (status != B_OK) {
-		HDINFO("OpenPackageAction::FindAppToLaunch(): "
-			"failed to init BPackageReader(%s): %s",
+		HDINFO("OpenPackageAction::FindAppToLaunch(): failed to init BPackageReader(%s): %s",
 			packagePath.Path(), strerror(status));
 		return false;
 	}
@@ -218,8 +215,7 @@ OpenPackageProcess::FindAppToLaunch(const PackageInfoRef& package,
 	DeskbarLinkFinder contentHandler(foundLinks);
 	status = reader.ParseContent(&contentHandler);
 	if (status != B_OK) {
-		HDINFO("OpenPackageAction::FindAppToLaunch(): "
-			"failed parse package contents (%s): %s",
+		HDINFO("OpenPackageAction::FindAppToLaunch(): failed parse package contents (%s): %s",
 			packagePath.Path(), strerror(status));
 		return false;
 	}

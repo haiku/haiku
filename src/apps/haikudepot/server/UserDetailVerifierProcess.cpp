@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -63,7 +63,7 @@ UserDetailVerifierProcess::RunInternal()
 			case B_OK:
 				if (!userDetail.Agreement().IsLatest()) {
 					HDINFO("the user has not agreed to the latest user usage"
-						" conditions.");
+						   " conditions.");
 					fListener->UserUsageConditionsNotLatest(userDetail);
 				}
 				break;
@@ -84,12 +84,9 @@ UserDetailVerifierProcess::_ShouldVerify()
 		return false;
 	}
 
-	{
-		AutoLocker<BLocker> locker(fModel->Lock());
-		if (fModel->Nickname().IsEmpty()) {
-			HDINFO("no nickname --> will not verify user");
-			return false;
-		}
+	if (fModel->Nickname().IsEmpty()) {
+		HDINFO("no nickname --> will not verify user");
+		return false;
 	}
 
 	return true;
@@ -99,16 +96,14 @@ UserDetailVerifierProcess::_ShouldVerify()
 status_t
 UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 {
-	WebAppInterface* interface = fModel->GetWebAppInterface();
+	WebAppInterfaceRef interface = fModel->WebApp();
 	BMessage userDetailResponse;
 	status_t result;
 
 	result = interface->RetrieveCurrentUserDetail(userDetailResponse);
 
-	if (result != B_OK) {
-		HDERROR("a problem has arisen retrieving the current user detail: %s",
-			strerror(result));
-	}
+	if (result != B_OK)
+		HDERROR("a problem has arisen retrieving the current user detail: %s", strerror(result));
 
 	if (result == B_OK) {
 		int32 errorCode = WebAppInterface::ErrorCodeFromResponse(userDetailResponse);
@@ -120,7 +115,7 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 				break;
 			default:
 				HDERROR("a problem has arisen retrieving the current user "
-					"detail for user [%s]: jrpc error code %" B_PRId32 "",
+						"detail for user [%s]: jrpc error code %" B_PRId32 "",
 					fModel->Nickname().String(), errorCode);
 				result = B_ERROR;
 				break;

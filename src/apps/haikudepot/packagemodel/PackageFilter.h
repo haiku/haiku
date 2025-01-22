@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Note that this file included code earlier from `Model.cpp` and
@@ -14,9 +14,13 @@
 #include <Referenceable.h>
 #include <String.h>
 
+#include "PackageFilterSpecification.h"
 #include "PackageInfo.h"
 
 
+/*!	See the class PackageFilterFactory for static factory methods that will
+	create concrete instances of this abstract superclass.
+*/
 class PackageFilter : public BReferenceable
 {
 public:
@@ -61,6 +65,8 @@ public:
 	static	PackageFilterRef	CreateStateFilter(PackageState state);
 	static	PackageFilterRef	CreateSourceFilter();
 	static	PackageFilterRef	CreateDevelopmentFilter();
+	static	PackageFilterRef	CreateFalseFilter();
+	static	PackageFilterRef	CreateFilter(const PackageFilterSpecificationRef specification);
 };
 
 
