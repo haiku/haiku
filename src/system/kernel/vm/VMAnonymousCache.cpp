@@ -750,7 +750,7 @@ VMAnonymousCache::CanOvercommit()
 
 
 bool
-VMAnonymousCache::HasPage(off_t offset)
+VMAnonymousCache::StoreHasPage(off_t offset)
 {
 	if (_SwapBlockGetAddress(offset >> PAGE_SHIFT) != SWAP_SLOT_NONE)
 		return true;
@@ -760,7 +760,7 @@ VMAnonymousCache::HasPage(off_t offset)
 
 
 bool
-VMAnonymousCache::DebugHasPage(off_t offset)
+VMAnonymousCache::DebugStoreHasPage(off_t offset)
 {
 	off_t pageIndex = offset >> PAGE_SHIFT;
 	swap_hash_key key = { this, pageIndex };
@@ -991,7 +991,7 @@ VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 		}
 	}
 
-	if (fCanOvercommit && LookupPage(offset) == NULL && !HasPage(offset)) {
+	if (fCanOvercommit && LookupPage(offset) == NULL && !StoreHasPage(offset)) {
 		if (fPrecommittedPages == 0) {
 			// never commit more than needed
 			if (committed_size / B_PAGE_SIZE > page_count)

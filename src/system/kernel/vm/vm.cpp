@@ -4316,7 +4316,7 @@ fault_get_page(PageFaultContext& context)
 		// The current cache does not contain the page we're looking for.
 
 		// see if the backing store has it
-		if (cache->HasPage(context.cacheOffset)) {
+		if (cache->StoreHasPage(context.cacheOffset)) {
 			// insert a fresh page and mark it busy -- we're going to read it in
 			page = vm_page_allocate_page(&context.reservation,
 				PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);

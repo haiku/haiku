@@ -2587,7 +2587,7 @@ free_page_swap_space(int32 index)
 
 	VMCache* cache = page->Cache();
 	if (cache->temporary && page->WiredCount() == 0
-			&& cache->HasPage(page->cache_offset << PAGE_SHIFT)
+			&& cache->StoreHasPage(page->cache_offset << PAGE_SHIFT)
 			&& page->usage_count > 0) {
 		// TODO: how to judge a page is highly active?
 		if (swap_free_page_swap_space(page)) {

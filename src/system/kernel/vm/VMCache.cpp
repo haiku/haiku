@@ -1323,7 +1323,7 @@ VMCache::Commit(off_t size, int priority)
 	changes in the meantime).
 */
 bool
-VMCache::HasPage(off_t offset)
+VMCache::StoreHasPage(off_t offset)
 {
 	// In accordance with Fault() the default implementation doesn't have a
 	// backing store and doesn't allow faults.
@@ -1425,14 +1425,14 @@ VMCache::ReleaseStoreRef()
 }
 
 
-/*!	Kernel debugger version of HasPage().
+/*!	Kernel debugger version of StoreHasPage().
 	Does not do any locking.
 */
 bool
-VMCache::DebugHasPage(off_t offset)
+VMCache::DebugStoreHasPage(off_t offset)
 {
 	// default that works for all subclasses that don't lock anyway
-	return HasPage(offset);
+	return StoreHasPage(offset);
 }
 
 

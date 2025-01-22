@@ -51,8 +51,8 @@ public:
 
 	virtual	bool				CanOvercommit();
 	virtual	status_t			Commit(off_t size, int priority);
-	virtual	bool				HasPage(off_t offset);
-	virtual	bool				DebugHasPage(off_t offset);
+	virtual	bool				StoreHasPage(off_t offset);
+	virtual	bool				DebugStoreHasPage(off_t offset);
 
 	virtual	int32				GuardSize()	{ return fGuardedSize; }
 	virtual	void				SetGuardSize(int32 guardSize)

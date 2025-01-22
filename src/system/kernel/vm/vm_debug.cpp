@@ -809,7 +809,7 @@ vm_debug_copy_page_memory(team_id teamID, void* unsafeMemory, void* buffer,
 
 		// Page not found in this cache -- if it is paged out, we must not try
 		// to get it from lower caches.
-		if (cache->DebugHasPage(cacheOffset))
+		if (cache->DebugStoreHasPage(cacheOffset))
 			break;
 
 		cache = cache->source;

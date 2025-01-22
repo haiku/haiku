@@ -113,7 +113,7 @@ VMAnonymousNoSwapCache::CanOvercommit()
 
 
 bool
-VMAnonymousNoSwapCache::HasPage(off_t offset)
+VMAnonymousNoSwapCache::StoreHasPage(off_t offset)
 {
 	return false;
 }
