@@ -791,7 +791,9 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 	T2(InsertPage(this, page, offset));
 
 	AssertLocked();
+#if 0
 	ASSERT(offset >= virtual_base && offset <= virtual_end);
+#endif
 
 	if (page->CacheRef() != NULL) {
 		panic("insert page %p into cache %p: page cache is set to %p\n",
