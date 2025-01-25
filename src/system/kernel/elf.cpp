@@ -1376,20 +1376,19 @@ public:
 		// get the image for the address
 		struct image *image;
 		status_t error = _FindImageAtAddress(address, image);
-		if (error != B_OK) {
+		if (error != B_OK)
+			return error;
+
+		if (image->info.basic_info.text == fTeam->commpage_address) {
 			// commpage requires special treatment since kernel stores symbol
 			// information
-			addr_t commPageAddress = (addr_t)fTeam->commpage_address;
-			if (address >= commPageAddress
-				&& address < commPageAddress + COMMPAGE_SIZE) {
-				if (*_imageName)
-					*_imageName = "commpage";
-				address -= (addr_t)commPageAddress;
-				error = elf_debug_lookup_symbol_address(address, _baseAddress,
-					_symbolName, NULL, _exactMatch);
-				if (_baseAddress)
-					*_baseAddress += (addr_t)fTeam->commpage_address;
-			}
+			if (*_imageName != NULL)
+				*_imageName = "commpage";
+			address -= (addr_t)fTeam->commpage_address;
+			error = elf_debug_lookup_symbol_address(address, _baseAddress,
+				_symbolName, NULL, _exactMatch);
+			if (_baseAddress != NULL)
+				*_baseAddress += (addr_t)fTeam->commpage_address;
 			return error;
 		}
 
