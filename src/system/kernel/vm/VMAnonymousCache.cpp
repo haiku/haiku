@@ -1036,7 +1036,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 	committed_size += source->committed_size;
 	source->committed_size = 0;
 
-	off_t actualSize = virtual_end - virtual_base;
+	off_t actualSize = PAGE_ALIGN(virtual_end - virtual_base);
 	if (committed_size > actualSize)
 		_Commit(actualSize, VM_PRIORITY_USER);
 

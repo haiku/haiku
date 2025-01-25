@@ -197,7 +197,7 @@ VMAnonymousNoSwapCache::Merge(VMCache* _source)
 	committed_size += source->committed_size;
 	source->committed_size = 0;
 
-	off_t actualSize = virtual_end - virtual_base;
+	off_t actualSize = PAGE_ALIGN(virtual_end - virtual_base);
 	if (committed_size > actualSize) {
 		vm_unreserve_memory(committed_size - actualSize);
 		committed_size = actualSize;
