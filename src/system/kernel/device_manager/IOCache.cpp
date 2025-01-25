@@ -113,6 +113,7 @@ IOCache::Init(const char* name)
 		return B_ERROR;
 	}
 	fCache = area->cache;
+	fCache->virtual_end = INT64_MAX;
 
 	// allocate arrays for pages and io vecs
 	fPages = new(std::nothrow) vm_page*[fPagesPerLine];
