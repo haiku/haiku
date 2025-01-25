@@ -1849,7 +1849,7 @@ debug_nub_thread(void *)
 
 				// find the area
 				area_id sourceArea;
-				addr_t addressOffset;
+				addr_t addressOffset = 0;
 				if (result == B_OK) {
 					sourceArea = _user_area_for((void*)address);
 					if (sourceArea < 0) {
