@@ -508,6 +508,11 @@ pcn_probe(dev)
 	int			rid;
 	u_int32_t		chip_id;
 
+#ifdef __HAIKU__
+	sc = __builtin_alloca(offsetof(struct pcn_softc, pcn_ldata));
+	device_set_softc(dev, sc);
+#endif
+
 	t = pcn_match(pci_get_vendor(dev), pci_get_device(dev));
 	if (t == NULL)
 		return (ENXIO);
@@ -528,6 +533,10 @@ pcn_probe(dev)
 	chip_id = pcn_chip_id(dev);
 
 	bus_release_resource(dev, PCN_RES, PCN_RID, sc->pcn_res);
+
+#ifdef __HAIKU__
+	device_set_softc(dev, NULL);
+#endif
 
 	switch((chip_id >> 12) & PART_MASK) {
 	case Am79C971:
