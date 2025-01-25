@@ -4779,6 +4779,8 @@ vm_kernel_address_space_left(void)
 void
 vm_unreserve_memory(size_t amount)
 {
+	ASSERT((amount % B_PAGE_SIZE) == 0);
+
 	if (amount == 0)
 		return;
 
