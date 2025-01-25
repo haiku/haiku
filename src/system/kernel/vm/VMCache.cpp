@@ -791,9 +791,7 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 	T2(InsertPage(this, page, offset));
 
 	AssertLocked();
-#if 0
-	ASSERT(offset >= virtual_base && offset <= virtual_end);
-#endif
+	ASSERT(offset >= virtual_base && offset < virtual_end);
 
 	if (page->CacheRef() != NULL) {
 		panic("insert page %p into cache %p: page cache is set to %p\n",
@@ -857,7 +855,7 @@ VMCache::MovePage(vm_page* page, off_t offset)
 
 	AssertLocked();
 	oldCache->AssertLocked();
-	ASSERT(offset >= virtual_base && offset <= virtual_end);
+	ASSERT(offset >= virtual_base && offset < virtual_end);
 
 	// remove from old cache
 	oldCache->pages.Remove(page);
