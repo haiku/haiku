@@ -4370,6 +4370,10 @@ fault_get_page(PageFaultContext& context)
 		// There was no adequate page. Insert a clean one into the topmost cache.
 		cache = context.topCache;
 
+		// We don't need the other caches anymore.
+		context.cacheChainLocker.Unlock(context.topCache);
+		context.cacheChainLocker.SetTo(context.topCache);
+
 		// allocate a clean page
 		page = vm_page_allocate_page(&context.reservation,
 			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_CLEAR);
