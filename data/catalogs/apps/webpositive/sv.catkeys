@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	2670512085
+1	swedish	x-vnd.Haiku-WebPositive	371749163
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 Copy	Console Window		Kopiera
@@ -14,6 +14,7 @@ There was an error setting up the bookmark.	WebPositive Window		Det uppstod ett 
 Fonts	Settings Window		Teckensnitt
 Path	Cookie Manager		Sökväg
 Bookmarks	WebPositive Window		Bokmärken
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Det gick inte att ta bort bokmärket '%leaf%' från bokmärkesfältet.
 Use proxy server to connect to the internet	Settings Window		Använd proxyserver för att koppla upp mot internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url färdig
 Auto-hide interface in full screen mode	Settings Window		Dölj gränssnittet automatiskt i helskärmsläge
@@ -36,6 +37,7 @@ Resume prior session	Settings Window		Återuppta föregående session
 Match case	WebPositive Window		Matcha skiftläge
 Proxy password:	Settings Window		Lösenord för proxy:
 Size:	Font Selection view		Storlek:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Det gick inte att ta bort bokmärke:\n'%path%'
 Page source	WebPositive Window		Sidkälla
 Proxy server port:	Settings Window		Proxyserverport:
 Error opening downloads folder	Download Window		Fel vid öppning av nedladdningsmapp
@@ -168,4 +170,5 @@ Clear history	WebPositive Window		Töm historik
 Cancel	WebPositive Window		Avbryt
 Script console	Console Window		Skriptkonsoll
 Copy	URL Bar		Kopiera
+Open in new tab	BookmarkBar		Öppna i ny flik
 Open start page	Settings Window		Öppna startsida

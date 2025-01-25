@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	1912038977
+1	friulian	x-vnd.Haiku-libtracker	4267788442
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -293,6 +293,7 @@ The Tracker must be running to set the default printer.	PoseView		Al è necessar
 calculating…	InfoWindow		daûr a calcolâ…
 Preferred for file	OpenWithWindow		Preferît par file
 OK	AutoMounterSettings		Va ben
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# selezionât} other{# selezionâts}}
 copying	FSUtils		copiant
 Get info	FilePanelPriv		Oten informazions
 MIME String	AttributesView		Stringhe MIME

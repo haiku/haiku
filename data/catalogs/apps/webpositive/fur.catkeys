@@ -1,17 +1,20 @@
-1	friulian	x-vnd.Haiku-WebPositive	2942427387
+1	friulian	x-vnd.Haiku-WebPositive	371749163
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 Copy	Console Window		Copie
 (Finish: %date)	Download Window		(Terminât: %date)
 Open bookmarks confirmation	WebPositive Window		Conferme vierzidure dai segnelibris
+Delete	BookmarkBar		Elimine
 Download folder:	Settings Window		Cartele dai file discjariâts:
 Close window	WebPositive Window		Siere barcon
+Rename	BookmarkBar		Cambie non
 Find:	WebPositive Window		Cjate:
 Script console	WebPositive Window		Console script
 There was an error setting up the bookmark.	WebPositive Window		Al è vignût fûr un erôr tal configurâ il segnelibri.
 Fonts	Settings Window		Caratars
 Path	Cookie Manager		Percors
 Bookmarks	WebPositive Window		Segnelibris
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Impussibil gjavâ il segnelibri '%leaf%' de sbare dai segnelibris.
 Use proxy server to connect to the internet	Settings Window		Doprâ un servidôr proxy par conetisi a internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url completât
 Auto-hide interface in full screen mode	Settings Window		Plate in automatic la interface in modalitât plen visôr
@@ -34,6 +37,7 @@ Resume prior session	Settings Window		Ripie la session precedente
 Match case	WebPositive Window		Corispondence maiusc./minusc.
 Proxy password:	Settings Window		Peraule di ordin dal proxy:
 Size:	Font Selection view		Dimension:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Impussibil eliminâ il segnelibri:\n'%path%'
 Page source	WebPositive Window		Sorzint de pagjine
 Proxy server port:	Settings Window		Puarte servidôr proxy:
 Error opening downloads folder	Download Window		Erôr tal vierzi la cartele dai files discjariâts
@@ -56,6 +60,7 @@ Cookies for %s	Cookie Manager		Cookie par %s
 Close	Download Window		Siere
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Tiermin di cirî
+Old name: %s	BookmarkBar		Non vecjo: %s
 Expiration	Cookie Manager		Scjadince
 Reload	WebPositive Window		Torne cjarie
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La tô CPU e je masse vecje e no supuarte lis estensions SSE2, cence di chês WebPositive nol pues zirâ. O conseìn di instalâ NetSurf al so puest.
@@ -95,6 +100,7 @@ Style:	Font Selection view		Stîl:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Al è vignût fûr un erôr tal creâ il file dal segnelibri.\n\nErôr: %error
 OK	Download Window		Va ben
 Proxy username:	Settings Window		Non utent dal proxy:
+Rename bookmark	BookmarkBar		Cambie non al segnelibri
 Manage bookmarks	WebPositive Window		Gjestìs segnelibris
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Torne invie
@@ -150,9 +156,11 @@ Settings	WebPositive Window		Impostazions
 Clear	URL Bar		Nete
 Loading %url	WebPositive Window		Daûr a cjariâ %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ogni mês si fâs la lune, ogni dì si impare une.
+OK	BookmarkBar		Va ben
 Start up:	Settings Window		Inviament:
 Confirmation	WebPositive Window		Conferme
 Session cookie	Cookie Manager		Cookie di session
+New name:	BookmarkBar		Gnûf non:
 No SSE2 support	WebPositive		Nissun supuart aes SSE2
 Open all	WebPositive Window		Vierç ducj
 Cut	WebPositive Window		Taie
@@ -162,4 +170,5 @@ Clear history	WebPositive Window		Nete cronologjie
 Cancel	WebPositive Window		Anule
 Script console	Console Window		Console script
 Copy	URL Bar		Copie
+Open in new tab	BookmarkBar		Vierç intune gnove schede
 Open start page	Settings Window		Vierç pagjine iniziâl

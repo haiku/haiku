@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	2670512085
+1	japanese	x-vnd.Haiku-WebPositive	371749163
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 Copy	Console Window		コピー
@@ -14,6 +14,7 @@ There was an error setting up the bookmark.	WebPositive Window		ブックマー�
 Fonts	Settings Window		フォント
 Path	Cookie Manager		パス
 Bookmarks	WebPositive Window		ブックマーク
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		ブックマークバーからブックマーク '%leaf%' を削除できませんでした。
 Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシサーバーを使用
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url の読み込み完了
 Auto-hide interface in full screen mode	Settings Window		全画面表示で自動的にインターフェースを隠す
@@ -36,6 +37,7 @@ Resume prior session	Settings Window		以前のセッションを再開
 Match case	WebPositive Window		大文字小文字を区別
 Proxy password:	Settings Window		プロキシのパスワード:
 Size:	Font Selection view		サイズ:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		以下のブックマークを削除できませんでした:\n'%path%'
 Page source	WebPositive Window		ページのソース
 Proxy server port:	Settings Window		ポート:
 Error opening downloads folder	Download Window		ダウンロードフォルダーを開けません
@@ -168,4 +170,5 @@ Clear history	WebPositive Window		履歴の消去
 Cancel	WebPositive Window		中止
 Script console	Console Window		スクリプトコンソール
 Copy	URL Bar		コピー
+Open in new tab	BookmarkBar		新規タブに開く
 Open start page	Settings Window		スタートページを開く

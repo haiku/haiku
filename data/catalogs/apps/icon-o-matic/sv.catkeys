@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	3174700455
+1	swedish	x-vnd.haiku-icon_o_matic	1275638063
 None	Icon-O-Matic-Properties		Ingen
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Rensa vägen
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -99,6 +99,7 @@ Bummer	Icon-O-Matic-Main	Cancel button - error alert	Besvikelse
 Translation X	Icon-O-Matic-PropertyNames		Förflyttning X
 Multi-paste properties	Icon-O-Matic-Properties		Multipaste egenskaper
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		IkonRedigeraren har kanske inte tolkat all data från SVGn när den laddades. Genom att skriva över originalfilen förloras denna information.
+Remove	Icon-O-Matic-TransformersList		Ta bort
 Rotate indices backwards	Icon-O-Matic-PathsList		Rotera indexpunkter moturs
 Overwrite	Icon-O-Matic-SVGExport		Skriv över
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Lägg till {0, plural, one{form} other{former}}

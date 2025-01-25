@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	2654448748
+1	german	x-vnd.Haiku-About	506608794
 The Haikuware team and their bounty program\n	AboutView		Das Haikuware-Team und deren Bounty-Programm\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Alle Rechte vorbehalten.
 \n\nSpecial thanks to:\n	AboutView		\n\nBesonderer Dank an:\n
@@ -31,6 +31,7 @@ Time running:	AboutView		Laufzeit:
 Visit the Haiku website	AboutView		Besuche die Haiku Webseite
 Version: %s	AboutView	Version: R1 or hrev99999	Version: %s
 Make a donation	AboutView		Gib eine Spende
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nnetresolv\nCopyright © 1998-2023 The NetBSD Project, Copyright © 2004-2009 by Internet Systems Consortium, Inc. (\"ISC\"), Copyright © 1996-2003 by Internet Software Consortium. All rights reserved.	AboutView		Enthält Software der NetBSD Foundation, Inc. und deren Mitwirkenden:\nnetresolv\nCopyright © 1998-2023 The NetBSD Project, Copyright © 2004-2009 Internet Systems Consortium, Inc. (\"ISC\"), Copyright © 1996-2003 Internet Software Consortium. Alle Rechte vorbehalten.
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB Speicher:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Alle Rechte vorbehalten.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
