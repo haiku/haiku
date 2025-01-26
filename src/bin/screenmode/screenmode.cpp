@@ -26,6 +26,7 @@ static struct option const kLongOptions[] = {
 	{"list", no_argument, 0, 'l'},
 	{"help", no_argument, 0, 'h'},
 	{"brightness", required_argument, 0, 'b'},
+	{"get-brightness", no_argument, 0, 'B'},
 	{NULL}
 };
 
@@ -93,12 +94,14 @@ usage(int status)
 		"      --fall-back\tchanges to the standard fallback mode, and "
 			"displays a\n"
 		"\t\t\tnotification requester.\n"
-		"  -s  --short\t\twhen no mode is given the current screen mode is\n"
-			"\t\t\tprinted in short form.\n"
+		"  -s  --short\t\twhen no mode is given the current screen mode or\n\n"
+			"\t\t\tthe screen brightness is printed in short form.\n"
 		"  -l  --list\t\tdisplay a list of the available modes.\n"
 		"  -q  --dont-confirm\tdo not confirm the mode after setting it.\n"
 		"  -b  --brightness f\tset brightness (range 0 to 1).\n"
 		"  -b  --brightness +/-f\tchange brightness by given amount.\n"
+		"  -B  --get-brightness\tprint the current brightness to stdout.\n"
+		"\t\t\tinstead of the screen mode\n"
 		"  -m  --modeline\taccept and print X-style modeline modes:\n"
 		"\t\t\t  <pclk> <h-display> <h-sync-start> <h-sync-end> <h-total>\n"
 		"\t\t\t  <v-disp> <v-sync-start> <v-sync-end> <v-total> [flags] "
@@ -118,6 +121,7 @@ main(int argc, char** argv)
 	bool shortOutput = false;
 	bool listModes = false;
 	bool modeLine = false;
+	bool getBrightness = false;
 	bool confirm = true;
 	int width = -1;
 	int height = -1;
@@ -131,7 +135,7 @@ main(int argc, char** argv)
 	// the display resolution!
 
 	int c;
-	while ((c = getopt_long(argc, argv, "shlfqmb:", kLongOptions, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "shlfqmb:B", kLongOptions, NULL)) != -1) {
 		switch (c) {
 			case 0:
 				break;
@@ -156,6 +160,9 @@ main(int argc, char** argv)
 				if (optarg[0] == '+' || optarg[0] == '-')
 					relativeBrightness = true;
 				brightness = atof(optarg);
+				break;
+			case 'B':
+				getBrightness = true;
 				break;
 			case 'h':
 				usage(0);
@@ -243,7 +250,6 @@ main(int argc, char** argv)
 	ScreenMode screenMode(NULL);
 	screen_mode currentMode;
 	screenMode.Get(currentMode);
-
 	if (!isnan(brightness)) {
 		BScreen screen;
 		if (relativeBrightness) {
@@ -280,7 +286,7 @@ main(int argc, char** argv)
 		return 0;
 	}
 
-	if (!setMode) {
+	if (!setMode && !getBrightness) {
 		// Just print the current mode
 		if (modeLine) {
 			display_mode mode;
@@ -291,6 +297,22 @@ main(int argc, char** argv)
 				printf("Resolution: ");
 			print_mode(currentMode, shortOutput);
 		}
+		return 0;
+	}
+
+	status_t status;
+
+	if (getBrightness) {
+		float brightnessToPrint = std::nanf("0");
+		BScreen screen;
+		status = screen.GetBrightness(&brightnessToPrint);
+		if (status != B_OK) {
+			fprintf(stderr, "Error retrieving brightness: %s\n", strerror(status));
+			return 1;
+		}
+		if (!shortOutput)
+			printf("Brightness: ");
+		printf("%f\n", brightnessToPrint);
 		return 0;
 	}
 
@@ -327,7 +349,6 @@ main(int argc, char** argv)
 			newMode.refresh = 60;
 	}
 
-	status_t status;
 	if (modeLine)
 		status = screenMode.Set(mode);
 	else
