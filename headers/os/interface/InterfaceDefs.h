@@ -41,27 +41,29 @@ struct key_info {
 };
 
 enum {
+	B_HOME				= 0x01,
+
+	B_END				= 0x04,
+	B_INSERT			= 0x05,
+
 	B_BACKSPACE			= 0x08,
+	B_TAB				= 0x09,
 	B_RETURN			= 0x0a,
 	B_ENTER				= 0x0a,
-	B_SPACE				= 0x20,
-	B_TAB				= 0x09,
-	B_ESCAPE			= 0x1b,
-	B_SUBSTITUTE		= 0x1a,
-
-	B_LEFT_ARROW		= 0x1c,
-	B_RIGHT_ARROW		= 0x1d,
-	B_UP_ARROW			= 0x1e,
-	B_DOWN_ARROW		= 0x1f,
-
-	B_INSERT			= 0x05,
-	B_DELETE			= 0x7f,
-	B_HOME				= 0x01,
-	B_END				= 0x04,
 	B_PAGE_UP			= 0x0b,
 	B_PAGE_DOWN			= 0x0c,
 
 	B_FUNCTION_KEY		= 0x10,
+
+	B_SUBSTITUTE		= 0x1a,
+	B_ESCAPE			= 0x1b,
+	B_LEFT_ARROW		= 0x1c,
+	B_RIGHT_ARROW		= 0x1d,
+	B_UP_ARROW			= 0x1e,
+	B_DOWN_ARROW		= 0x1f,
+	B_SPACE				= 0x20,
+
+	B_DELETE			= 0x7f,
 
 	// For Japanese keyboards, two modifier keys are mapped to invalid UTF-8, with just a single
 	// byte having the 8th bit set.
@@ -85,10 +87,14 @@ enum {
 	B_PRINT_KEY			= 0x0e,
 	B_SCROLL_KEY		= 0x0f,
 	B_PAUSE_KEY			= 0x10,
+
 	B_NUM_LOCK_KEY		= 0x22,
+
 	B_CAPS_LOCK_KEY		= 0x3b,
+
 	B_SPACE_BAR_KEY		= 0x5e,
 	B_NUMPAD_EQUAL_KEY	= 0x6a,
+
 	// For Korean keyboards
 	B_HANGUL_KEY		= 0xf0,
 	B_HANGUL_HANJA_KEY	= 0xf1
