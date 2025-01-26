@@ -119,7 +119,6 @@ typedef agg::conv_transform<FontCacheEntry::ContourConverter, Transformable>
 class AGGTextRenderer::StringRenderer {
 public:
 	StringRenderer(const IntRect& clippingFrame, bool dryRun,
-			bool subpixelAntiAliased, bool underscore, bool strikeout,
 			FontCacheEntry::TransformedOutline& transformedGlyph,
 			FontCacheEntry::TransformedContourOutline& transformedContour,
 			const Transformable& transform,
@@ -131,10 +130,7 @@ public:
 		fTransformOffset(transformOffset),
 		fClippingFrame(clippingFrame),
 		fDryRun(dryRun),
-		fSubpixelAntiAliased(subpixelAntiAliased),
 		fVector(false),
-		fUnderscore(underscore),
-		fStrikeout(strikeout),
 		fBounds(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
 		fNextCharPos(nextCharPos),
 
@@ -143,6 +139,7 @@ public:
 
 		fRenderer(renderer)
 	{
+		fSubpixelAntiAliased = gSubpixelAntialiasing && fRenderer.Antialiasing();
 	}
 
 	bool NeedsVector()
@@ -171,56 +168,14 @@ public:
 			}
 		}
 
-		if (fUnderscore && !fDryRun) {
-			agg::path_storage path;
-			IntRect bounds = fBounds;
-			bounds.bottom = (int)y;
-			bounds.OffsetBy(fTransformOffset);
-			path.move_to(bounds.left + 0.5, bounds.bottom + 2.5);
-			path.line_to(bounds.right + 0.5, bounds.bottom + 2.5);
-			path.close_polygon();
-			agg::conv_stroke<agg::path_storage> pathStorage(path);
-			pathStorage.width(fRenderer.fFont.Size() / 12.0f);
-			if (fRenderer.fMaskedScanline != NULL) {
-				fRenderer.fRasterizer.add_path(pathStorage);
-				agg::render_scanlines(fRenderer.fRasterizer,
-					*fRenderer.fMaskedScanline, fRenderer.fSolidRenderer);
-			} else if (fSubpixelAntiAliased) {
-				fRenderer.fSubpixRasterizer.add_path(pathStorage);
-				agg::render_scanlines(fRenderer.fSubpixRasterizer,
-					fRenderer.fSubpixScanline, fRenderer.fSubpixRenderer);
-			} else {
-				fRenderer.fRasterizer.add_path(pathStorage);
-				agg::render_scanlines(fRenderer.fRasterizer,
-					fRenderer.fScanline, fRenderer.fSolidRenderer);
-			}
-		}
+		if (!fDryRun) {
+			if ((fRenderer.fFont.Face() & B_UNDERSCORE_FACE) != 0)
+				_DrawHorizontalLine(y + 2);
 
-		if (fStrikeout && !fDryRun) {
-			agg::path_storage path;
-			font_height fontHeight;
-			IntRect bounds = fBounds;
-			fRenderer.fFont.GetHeight(fontHeight);
-			float totalFontHeight = fontHeight.ascent + fontHeight.descent;
-			bounds.bottom = (int)y;
-			bounds.OffsetBy(fTransformOffset);
-			path.move_to(bounds.left + 0.5, round(bounds.bottom - totalFontHeight * 0.25) + 0.5);
-			path.line_to(bounds.right + 0.5, round(bounds.bottom - totalFontHeight * 0.25) + 0.5);
-			path.close_polygon();
-			agg::conv_stroke<agg::path_storage> pathStorage(path);
-			pathStorage.width(fRenderer.fFont.Size() / 12.0f);
-			if (fRenderer.fMaskedScanline != NULL) {
-				fRenderer.fRasterizer.add_path(pathStorage);
-				agg::render_scanlines(fRenderer.fRasterizer,
-					*fRenderer.fMaskedScanline, fRenderer.fSolidRenderer);
-			} else if (fSubpixelAntiAliased) {
-				fRenderer.fSubpixRasterizer.add_path(pathStorage);
-				agg::render_scanlines(fRenderer.fSubpixRasterizer,
-					fRenderer.fSubpixScanline, fRenderer.fSubpixRenderer);
-			} else {
-				fRenderer.fRasterizer.add_path(pathStorage);
-				agg::render_scanlines(fRenderer.fRasterizer,
-					fRenderer.fScanline, fRenderer.fSolidRenderer);
+			if ((fRenderer.fFont.Face() & B_STRIKEOUT_FACE) != 0) {
+				font_height fontHeight;
+				fRenderer.fFont.GetHeight(fontHeight);
+				_DrawHorizontalLine(y - (fontHeight.ascent + fontHeight.descent) / 4);
 			}
 		}
 
@@ -369,14 +324,39 @@ public:
 	}
 
 private:
+	void _DrawHorizontalLine(float y)
+	{
+		agg::path_storage path;
+		IntRect bounds = fBounds;
+		bounds.bottom = (int)y;
+		bounds.OffsetBy(fTransformOffset);
+		path.move_to(bounds.left + 0.5, bounds.bottom + 0.5);
+		path.line_to(bounds.right + 0.5, bounds.bottom + 0.5);
+		path.close_polygon();
+		agg::conv_stroke<agg::path_storage> pathStorage(path);
+		pathStorage.width(fRenderer.fFont.Size() / 12.0f);
+		if (fRenderer.fMaskedScanline != NULL) {
+			fRenderer.fRasterizer.add_path(pathStorage);
+			agg::render_scanlines(fRenderer.fRasterizer,
+				*fRenderer.fMaskedScanline, fRenderer.fSolidRenderer);
+		} else if (fSubpixelAntiAliased) {
+			fRenderer.fSubpixRasterizer.add_path(pathStorage);
+			agg::render_scanlines(fRenderer.fSubpixRasterizer,
+				fRenderer.fSubpixScanline, fRenderer.fSubpixRenderer);
+		} else {
+			fRenderer.fRasterizer.add_path(pathStorage);
+			agg::render_scanlines(fRenderer.fRasterizer,
+				fRenderer.fScanline, fRenderer.fSolidRenderer);
+		}
+	}
+
+private:
 	const Transformable& fTransform;
 	const BPoint&		fTransformOffset;
 	const IntRect&		fClippingFrame;
 	bool				fDryRun;
 	bool				fSubpixelAntiAliased;
 	bool				fVector;
-	bool				fUnderscore;
-	bool				fStrikeout;
 	IntRect				fBounds;
 	BPoint*				fNextCharPos;
 
@@ -413,12 +393,8 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 	transform.Transform(&transformOffset);
 	IntRect clippingIntFrame(clippingFrame);
 
-	bool underscore = (fFont.Face() & B_UNDERSCORE_FACE) != 0;
-	bool strikeout = (fFont.Face() & B_STRIKEOUT_FACE) != 0;
-
-	StringRenderer renderer(clippingIntFrame, dryRun, gSubpixelAntialiasing && fAntialias,
-		underscore, strikeout, transformedOutline, transformedContourOutline, transform,
-		transformOffset, nextCharPos, *this);
+	StringRenderer renderer(clippingIntFrame, dryRun, transformedOutline, transformedContourOutline,
+		transform, transformOffset, nextCharPos, *this);
 
 	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, INT32_MAX,
 		delta, fFont.Spacing(), NULL, cacheReference);
@@ -452,12 +428,8 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 	transform.Transform(&transformOffset);
 	IntRect clippingIntFrame(clippingFrame);
 
-	bool underscore = (fFont.Face() & B_UNDERSCORE_FACE) != 0;
-	bool strikeout = (fFont.Face() & B_STRIKEOUT_FACE) != 0;
-
-	StringRenderer renderer(clippingIntFrame, dryRun, gSubpixelAntialiasing && fAntialias,
-		underscore, strikeout, transformedOutline, transformedContourOutline, transform,
-		transformOffset, nextCharPos, *this);
+	StringRenderer renderer(clippingIntFrame, dryRun, transformedOutline, transformedContourOutline,
+		transform, transformOffset, nextCharPos, *this);
 
 	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, INT32_MAX,
 		NULL, fFont.Spacing(), offsets, cacheReference);
