@@ -459,13 +459,17 @@ TextOutput::Command(RTF::Command *command)
 		PrepareTextRun(fCurrentRun);
 		set_font_face(fCurrentRun->font, B_BOLD_FACE, command->Option() != 0);
 	} else if (!strcmp(name, "i")) {
-		// bold style
+		// italic style
 		PrepareTextRun(fCurrentRun);
 		set_font_face(fCurrentRun->font, B_ITALIC_FACE, command->Option() != 0);
 	} else if (!strcmp(name, "ul")) {
-		// bold style
+		// underscore style
 		PrepareTextRun(fCurrentRun);
 		set_font_face(fCurrentRun->font, B_UNDERSCORE_FACE, command->Option() != 0);
+	} else if (!strcmp(name, "strike")) {
+		// strikeout style
+		PrepareTextRun(fCurrentRun);
+		set_font_face(fCurrentRun->font, B_STRIKEOUT_FACE, command->Option() != 0);
 	} else if (!strcmp(name, "fs")) {
 		// font size in half points
 		PrepareTextRun(fCurrentRun);
@@ -779,6 +783,8 @@ status_t convert_styled_text_to_rtf(
 				rtfFile << "\\ul";
 			if (fontFace & B_BOLD_FACE)
 				rtfFile << "\\b";
+			if (fontFace & B_STRIKEOUT_FACE)
+				rtfFile << "\\strike";
 
 			// RTF font size unit is half-points, but BFont::Size() returns
 			// points
