@@ -154,6 +154,101 @@ static ThreadNotificationService sNotificationService;
 static object_cache* sThreadCache;
 
 
+// #pragma mark - kernel stack cache
+
+
+struct CachedKernelStack : public DoublyLinkedListLinkImpl<CachedKernelStack> {
+	VMArea* area;
+	addr_t base;
+	addr_t top;
+};
+
+
+static spinlock sCachedKernelStacksLock = B_SPINLOCK_INITIALIZER;
+static DoublyLinkedList<CachedKernelStack> sCachedKernelStacks;
+
+
+static area_id
+allocate_kernel_stack(const char* name, addr_t* base, addr_t* top)
+{
+	InterruptsSpinLocker locker(sCachedKernelStacksLock);
+	CachedKernelStack* cachedStack = sCachedKernelStacks.RemoveHead();
+	locker.Unlock();
+
+	if (cachedStack == NULL) {
+		panic("out of cached stacks!");
+		return B_NO_MEMORY;
+	}
+
+	memcpy(cachedStack->area->name, name, B_OS_NAME_LENGTH);
+
+	*base = cachedStack->base;
+	*top = cachedStack->top;
+
+	return cachedStack->area->id;
+}
+
+
+static void
+free_kernel_stack(area_id areaID, addr_t base, addr_t top)
+{
+#if defined(STACK_GROWS_DOWNWARDS)
+	const addr_t stackStart = base + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
+#else
+	const addr_t stackStart = base;
+#endif
+
+	CachedKernelStack* cachedStack = (CachedKernelStack*)stackStart;
+	cachedStack->area = VMAreas::Lookup(areaID);
+	cachedStack->base = base;
+	cachedStack->top = top;
+
+	strcpy(cachedStack->area->name, "cached kstack");
+
+	InterruptsSpinLocker locker(sCachedKernelStacksLock);
+	sCachedKernelStacks.Add(cachedStack);
+}
+
+
+static status_t
+create_kernel_stack(void* cookie, void* object)
+{
+	// We could theoretically cast the passed object to Thread* and assign
+	// the kstack to it directly, but this would be incompatible with the
+	// debug filling of blocks on allocate/free. It also is probably good
+	// to not reuse kstacks quite so rapidly, anyway.
+
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+
+	addr_t base;
+	area_id area = create_area_etc(B_SYSTEM_TEAM, "",
+		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE,
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA
+			| B_KERNEL_STACK_AREA, 0, KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE,
+		&virtualRestrictions, &physicalRestrictions, (void**)&base);
+	if (area < 0)
+		return area;
+
+	addr_t top = base + KERNEL_STACK_SIZE
+		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
+	free_kernel_stack(area, base, top);
+	return B_OK;
+}
+
+
+static void
+destroy_kernel_stack(void* cookie, void* object)
+{
+	InterruptsSpinLocker locker(sCachedKernelStacksLock);
+	CachedKernelStack* cachedStack = sCachedKernelStacks.RemoveHead();
+	locker.Unlock();
+
+	delete_area(cachedStack->area->id);
+}
+
+
 // #pragma mark - Thread
 
 
@@ -247,7 +342,7 @@ Thread::~Thread()
 	// delete the resources, that may remain in either case
 
 	if (kernel_stack_area >= 0)
-		delete_area(kernel_stack_area);
+		free_kernel_stack(kernel_stack_area, kernel_stack_base, kernel_stack_top);
 
 	fPendingSignals.Clear();
 
@@ -943,17 +1038,9 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 	char stackName[B_OS_NAME_LENGTH];
 	snprintf(stackName, B_OS_NAME_LENGTH, "%s_%" B_PRId32 "_kstack",
 		thread->name, thread->id);
-	virtual_address_restrictions virtualRestrictions = {};
-	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
-	physical_address_restrictions physicalRestrictions = {};
 
-	thread->kernel_stack_area = create_area_etc(B_SYSTEM_TEAM, stackName,
-		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE,
-		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA
-			| B_KERNEL_STACK_AREA, 0, KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE,
-		&virtualRestrictions, &physicalRestrictions,
-		(void**)&thread->kernel_stack_base);
-
+	thread->kernel_stack_area = allocate_kernel_stack(stackName,
+		&thread->kernel_stack_base, &thread->kernel_stack_top);
 	if (thread->kernel_stack_area < 0) {
 		// we're not yet part of a team, so we can just bail out
 		status = thread->kernel_stack_area;
@@ -963,9 +1050,6 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 
 		return status;
 	}
-
-	thread->kernel_stack_top = thread->kernel_stack_base + KERNEL_STACK_SIZE
-		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
 	if (kernel) {
 		// Init the thread's kernel stack. It will start executing
@@ -2744,7 +2828,7 @@ thread_init(kernel_args *args)
 
 	// create the thread structure object cache
 	sThreadCache = create_object_cache_etc("threads", sizeof(Thread), 64,
-		0, 0, 0, 0, NULL, NULL, NULL, NULL);
+		0, 0, 0, 0, NULL, create_kernel_stack, destroy_kernel_stack, NULL);
 		// Note: The x86 port requires 64 byte alignment of thread structures.
 	if (sThreadCache == NULL)
 		panic("thread_init(): failed to allocate thread object cache!");
