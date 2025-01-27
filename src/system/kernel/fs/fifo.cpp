@@ -1332,9 +1332,8 @@ create_fifo_vnode(fs_volume* superVolume, fs_vnode* vnode)
 void
 fifo_init()
 {
-	sRingBufferCache = create_object_cache_etc("fifo ring buffers",
-		kRingBufferCacheObjectSize, 0, 0, 0, 0, CACHE_NO_DEPOT,
-		NULL, NULL, NULL, NULL);
+	sRingBufferCache = create_object_cache("fifo ring buffers",
+		kRingBufferCacheObjectSize, CACHE_NO_DEPOT);
 
 	add_debugger_command_etc("fifo", &Inode::Dump,
 		"Print info about the specified FIFO node",

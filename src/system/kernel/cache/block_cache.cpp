@@ -2971,13 +2971,13 @@ wait_for_notifications(block_cache* cache)
 status_t
 block_cache_init(void)
 {
-	sBlockCache = create_object_cache_etc("cached blocks", sizeof(cached_block),
-		8, 0, 0, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
+	sBlockCache = create_object_cache("cached blocks", sizeof(cached_block),
+		CACHE_LARGE_SLAB);
 	if (sBlockCache == NULL)
 		return B_NO_MEMORY;
 
 	sCacheNotificationCache = create_object_cache("cache notifications",
-		sizeof(cache_listener), 8, NULL, NULL, NULL);
+		sizeof(cache_listener), 0);
 	if (sCacheNotificationCache == NULL)
 		return B_NO_MEMORY;
 

@@ -71,7 +71,7 @@ scsi_free_ccb(scsi_ccb *ccb)
 status_t
 init_ccb_alloc()
 {
-	sCcbPool = create_object_cache("scsi ccb", sizeof(scsi_ccb), 0, NULL, NULL, NULL);
+	sCcbPool = create_object_cache("scsi ccb", sizeof(scsi_ccb), 0);
 	if (sCcbPool == NULL)
 		return B_NO_MEMORY;
 

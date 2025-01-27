@@ -2316,12 +2316,12 @@ std_ops(int32 op, ...)
 			//	and keep around half-constructed buffers in the slab
 
 			sNetBufferCache = create_object_cache("net buffer cache",
-				sizeof(net_buffer_private), 8, NULL, NULL, NULL);
+				sizeof(net_buffer_private), 0);
 			if (sNetBufferCache == NULL)
 				return B_NO_MEMORY;
 
-			sDataNodeCache = create_object_cache("data node cache", BUFFER_SIZE,
-				0, NULL, NULL, NULL);
+			sDataNodeCache = create_object_cache("data node cache",
+				BUFFER_SIZE, 0);
 			if (sDataNodeCache == NULL) {
 				delete_object_cache(sNetBufferCache);
 				return B_NO_MEMORY;

@@ -1551,8 +1551,7 @@ void
 swap_init(void)
 {
 	// create swap block cache
-	sSwapBlockCache = create_object_cache("swapblock", sizeof(swap_block),
-		sizeof(void*), NULL, NULL, NULL);
+	sSwapBlockCache = create_object_cache("swapblock", sizeof(swap_block), 0);
 	if (sSwapBlockCache == NULL)
 		panic("swap_init(): can't create object cache for swap blocks\n");
 

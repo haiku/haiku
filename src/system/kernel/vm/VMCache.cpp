@@ -507,20 +507,19 @@ vm_cache_init(kernel_args* args)
 {
 	// Create object caches for the structures we allocate here.
 	gCacheRefObjectCache = create_object_cache("cache refs", sizeof(VMCacheRef),
-		0, NULL, NULL, NULL);
+		0);
 #if ENABLE_SWAP_SUPPORT
 	gAnonymousCacheObjectCache = create_object_cache("anon caches",
-		sizeof(VMAnonymousCache), 0, NULL, NULL, NULL);
+		sizeof(VMAnonymousCache), 0);
 #endif
 	gAnonymousNoSwapCacheObjectCache = create_object_cache(
-		"anon no-swap caches", sizeof(VMAnonymousNoSwapCache), 0, NULL, NULL,
-		NULL);
+		"anon no-swap caches", sizeof(VMAnonymousNoSwapCache), 0);
 	gVnodeCacheObjectCache = create_object_cache("vnode caches",
-		sizeof(VMVnodeCache), 0, NULL, NULL, NULL);
+		sizeof(VMVnodeCache), 0);
 	gDeviceCacheObjectCache = create_object_cache("device caches",
-		sizeof(VMDeviceCache), 0, NULL, NULL, NULL);
+		sizeof(VMDeviceCache), 0);
 	gNullCacheObjectCache = create_object_cache("null caches",
-		sizeof(VMNullCache), 0, NULL, NULL, NULL);
+		sizeof(VMNullCache), 0);
 
 	if (gCacheRefObjectCache == NULL
 #if ENABLE_SWAP_SUPPORT

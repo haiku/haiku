@@ -5278,18 +5278,18 @@ vfs_init(kernel_args* args)
 		panic("vfs_init: error creating mounts hash table\n");
 
 	sPathNameCache = create_object_cache("vfs path names",
-		B_PATH_NAME_LENGTH, 8, NULL, NULL, NULL);
+		B_PATH_NAME_LENGTH, 0);
 	if (sPathNameCache == NULL)
 		panic("vfs_init: error creating path name object_cache\n");
 	object_cache_set_minimum_reserve(sPathNameCache, 1);
 
 	sVnodeCache = create_object_cache("vfs vnodes",
-		sizeof(struct vnode), 8, NULL, NULL, NULL);
+		sizeof(struct vnode), 0);
 	if (sVnodeCache == NULL)
 		panic("vfs_init: error creating vnode object_cache\n");
 
 	sFileDescriptorCache = create_object_cache("vfs fds",
-		sizeof(file_descriptor), 8, NULL, NULL, NULL);
+		sizeof(file_descriptor), 0);
 	if (sFileDescriptorCache == NULL)
 		panic("vfs_init: error creating file descriptor object_cache\n");
 

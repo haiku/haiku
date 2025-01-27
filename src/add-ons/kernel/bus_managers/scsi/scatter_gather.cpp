@@ -163,8 +163,7 @@ int
 init_temp_sg(void)
 {
 	sTempScatterGatherPool = create_object_cache("scsi temp s/g",
-		MAX_TEMP_SG_FRAGMENTS * sizeof(physical_entry), 0,
-		NULL, NULL, NULL);
+		MAX_TEMP_SG_FRAGMENTS * sizeof(physical_entry), 0);
 	if (sTempScatterGatherPool == NULL)
 		return B_NO_MEMORY;
 

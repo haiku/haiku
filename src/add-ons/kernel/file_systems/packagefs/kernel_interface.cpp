@@ -1152,13 +1152,12 @@ packagefs_std_ops(int32 op, ...)
 			PackageFileHeapAccessorBase::sQuadChunkCache = quadChunkCache =
 				create_object_cache("pkgfs heap buffers",
 					PackageFileHeapAccessorBase::kChunkSize * 4,
-					0, NULL, NULL, NULL);
+					0);
 			object_cache_set_minimum_reserve(quadChunkCache, 1);
 
 			TwoKeyAVLTreeNode<void*>::sNodeCache =
-				create_object_cache_etc("pkgfs TKAVLTreeNodes",
-					sizeof(TwoKeyAVLTreeNode<void*>), 8,
-					0, 0, 0, CACHE_NO_DEPOT, NULL, NULL, NULL, NULL);
+				create_object_cache("pkgfs TKAVLTreeNodes",
+					sizeof(TwoKeyAVLTreeNode<void*>), CACHE_NO_DEPOT);
 
 			error = PackageFSRoot::GlobalInit();
 			if (error != B_OK) {

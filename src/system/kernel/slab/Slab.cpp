@@ -1151,12 +1151,10 @@ object_cache_maintainer(void*)
 
 
 object_cache*
-create_object_cache(const char* name, size_t object_size, size_t alignment,
-	void* cookie, object_cache_constructor constructor,
-	object_cache_destructor destructor)
+create_object_cache(const char* name, size_t object_size, uint32 flags)
 {
-	return create_object_cache_etc(name, object_size, alignment, 0, 0, 0, 0,
-		cookie, constructor, destructor, NULL);
+	return create_object_cache_etc(name, object_size, 0, 0, 0, 0, flags,
+		NULL, NULL, NULL, NULL);
 }
 
 
