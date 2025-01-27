@@ -323,10 +323,12 @@ init_mbufs()
 	sChunkCache = create_object_cache("mbuf chunks", MCLBYTES, 0);
 	if (sChunkCache == NULL)
 		goto clean;
-	sJumbo9ChunkCache = create_object_cache("mbuf jumbo9 chunks", MJUM9BYTES, 0);
+	sJumbo9ChunkCache = create_object_cache("mbuf jumbo9 chunks", MJUM9BYTES,
+		CACHE_NO_DEPOT);
 	if (sJumbo9ChunkCache == NULL)
 		goto clean;
-	sJumboPageSizeCache = create_object_cache("mbuf page chunks", MJUMPAGESIZE, 0);
+	sJumboPageSizeCache = create_object_cache("mbuf page chunks", MJUMPAGESIZE,
+		CACHE_NO_DEPOT);
 	if (sJumboPageSizeCache == NULL)
 		goto clean;
 	return B_OK;
