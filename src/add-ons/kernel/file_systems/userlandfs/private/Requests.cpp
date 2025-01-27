@@ -5,12 +5,13 @@
 #include "Debug.h"
 #include "Requests.h"
 
-#define _ADD_ADDRESS(_address, _flags) {			\
+#define _ADD_ADDRESS(_address, _flags) do {			\
 	if (*count >= MAX_REQUEST_ADDRESS_COUNT)		\
 		return B_BAD_VALUE;							\
 	infos[*count].address = &_address;				\
 	infos[*count].flags = _flags;					\
-	infos[(*count)++].max_size = INT32_MAX;	} // TODO:...
+	infos[(*count)++].max_size = INT32_MAX;			\
+} while (0) // TODO:...
 
 #define ADD_ADDRESS(address)	_ADD_ADDRESS(address, 0)
 #define ADD_STRING(address)		_ADD_ADDRESS(address, ADDRESS_IS_STRING)

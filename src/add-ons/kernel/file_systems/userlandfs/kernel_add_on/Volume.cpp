@@ -2219,7 +2219,7 @@ Volume::Write(void* _node, void* cookie, off_t pos, const void* buffer,
 	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 	request->pos = pos;
-	error = allocator.AllocateData(request->buffer, buffer, size, 1);
+	error = allocator.AllocateData(request->buffer, buffer, size, 1, false, sizeof(DoIORequest));
 	if (error != B_OK)
 		return error;
 

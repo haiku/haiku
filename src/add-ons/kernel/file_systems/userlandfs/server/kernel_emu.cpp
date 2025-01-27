@@ -829,7 +829,7 @@ UserlandFS::KernelEmu::file_cache_write(dev_t mountID, ino_t vnodeID,
 
 	if (buffer != NULL) {
 		error = allocator.AllocateData(request->buffer, buffer, *_size, 1,
-			false);
+			false, sizeof(DoIterativeFDIORequest));
 		if (error != B_OK)
 			return error;
 	}

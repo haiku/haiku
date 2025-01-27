@@ -1259,7 +1259,7 @@ UserlandRequestHandler::_HandleRequest(ReadRequest* request)
 	void* buffer;
 	if (result == B_OK) {
 		result = allocator.AllocateAddress(reply->buffer, size, 1, &buffer,
-			true);
+			true, sizeof(FileCacheReadRequest) + sizeof(ReceiptAckReply));
 	}
 
 	// execute the request

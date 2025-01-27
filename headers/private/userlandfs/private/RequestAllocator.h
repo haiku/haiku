@@ -37,10 +37,10 @@ public:
 
 			status_t			AllocateAddress(Address& address, int32 size,
 									int32 align, void** data,
-									bool deferredInit = false);
+									bool deferredInit = false, int32 reserveForNextRequests = 0);
 			status_t			AllocateData(Address& address, const void* data,
 									int32 size, int32 align,
-									bool deferredInit = false);
+									bool deferredInit = false, int32 reserveForNextRequests = 0);
 			status_t			AllocateString(Address& address,
 									const char* data,
 									bool deferredInit = false);
