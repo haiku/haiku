@@ -504,19 +504,22 @@ pcn_probe(dev)
 	device_t		dev;
 {
 	const struct pcn_type	*t;
-	struct pcn_softc	*sc;
+	struct pcn_softc	*sc, *local_sc;
 	int			rid;
 	u_int32_t		chip_id;
-
-#ifdef __HAIKU__
-	sc = __builtin_alloca(offsetof(struct pcn_softc, pcn_ldata));
-	device_set_softc(dev, sc);
-#endif
 
 	t = pcn_match(pci_get_vendor(dev), pci_get_device(dev));
 	if (t == NULL)
 		return (ENXIO);
 	sc = device_get_softc(dev);
+
+#ifdef __HAIKU__
+	local_sc = NULL;
+	if (sc == NULL) {
+		sc = local_sc = __builtin_alloca(offsetof(struct pcn_softc, pcn_ldata));
+		device_set_softc(dev, local_sc);
+	}
+#endif
 
 	/*
 	 * Temporarily map the I/O space so we can read the chip ID register.
@@ -524,6 +527,10 @@ pcn_probe(dev)
 	rid = PCN_RID;
 	sc->pcn_res = bus_alloc_resource_any(dev, PCN_RES, &rid, RF_ACTIVE);
 	if (sc->pcn_res == NULL) {
+#ifdef __HAIKU__
+		if (local_sc != NULL)
+			device_set_softc(dev, NULL);
+#endif
 		device_printf(dev, "couldn't map ports/memory\n");
 		return(ENXIO);
 	}
@@ -535,7 +542,8 @@ pcn_probe(dev)
 	bus_release_resource(dev, PCN_RES, PCN_RID, sc->pcn_res);
 
 #ifdef __HAIKU__
-	device_set_softc(dev, NULL);
+	if (local_sc != NULL)
+		device_set_softc(dev, NULL);
 #endif
 
 	switch((chip_id >> 12) & PART_MASK) {
