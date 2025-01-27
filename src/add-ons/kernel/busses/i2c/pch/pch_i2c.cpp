@@ -408,22 +408,26 @@ init_bus(device_node* node, void** bus_cookie)
 		bus->base_addr, bus->map_size, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&bus->registers);
-	// init bus
-	bus->capabilities = read32(bus->registers + PCH_SUP_CAPABLITIES);
-	TRACE_ALWAYS("init_bus() 0x%" B_PRIx32 " (0x%" B_PRIx32 ")\n",
-		(bus->capabilities >> PCH_SUP_CAPABLITIES_TYPE_SHIFT)
-			& PCH_SUP_CAPABLITIES_TYPE_MASK,
-		bus->capabilities);
-	if (((bus->capabilities >> PCH_SUP_CAPABLITIES_TYPE_SHIFT)
-			& PCH_SUP_CAPABLITIES_TYPE_MASK) != 0) {
-		status = B_ERROR;
-		ERROR("init_bus() device type not supported\n");
-		goto err;
-	}
 
-	write32(bus->registers + PCH_SUP_RESETS, 0);
-	write32(bus->registers + PCH_SUP_RESETS,
-		PCH_SUP_RESETS_FUNC | PCH_SUP_RESETS_IDMA);
+	// init bus
+	uint32 version = read32(bus->registers + PCH_IC_COMP_VERSION);
+	TRACE_ALWAYS("version 0x%" B_PRIx32 "\n", version);
+
+	if (bus->version >= PCH_SKYLAKE) {
+		bus->capabilities = read32(bus->registers + PCH_SUP_CAPABLITIES);
+		TRACE_ALWAYS("init_bus() 0x%" B_PRIx32 " (0x%" B_PRIx32 ")\n",
+			(bus->capabilities >> PCH_SUP_CAPABLITIES_TYPE_SHIFT) & PCH_SUP_CAPABLITIES_TYPE_MASK,
+			bus->capabilities);
+		if (((bus->capabilities >> PCH_SUP_CAPABLITIES_TYPE_SHIFT) & PCH_SUP_CAPABLITIES_TYPE_MASK)
+			!= 0) {
+			status = B_ERROR;
+			ERROR("init_bus() device type not supported\n");
+			goto err;
+		}
+
+		write32(bus->registers + PCH_SUP_RESETS, 0);
+		write32(bus->registers + PCH_SUP_RESETS, PCH_SUP_RESETS_FUNC | PCH_SUP_RESETS_IDMA);
+	}
 
 	if (bus->ss_hcnt == 0)
 		bus->ss_hcnt = read32(bus->registers + PCH_IC_SS_SCL_HCNT);
@@ -459,8 +463,8 @@ init_bus(device_node* node, void** bus_cookie)
 		bus->tx_fifo_depth = 32;
 		bus->rx_fifo_depth = 32;
 		uint32 reg = read32(bus->registers + PCH_IC_COMP_PARAM1);
-		uint8 rx_fifo_depth = PCH_IC_COMP_PARAM1_RX(reg);
-		uint8 tx_fifo_depth = PCH_IC_COMP_PARAM1_TX(reg);
+		uint32 rx_fifo_depth = PCH_IC_COMP_PARAM1_RX(reg);
+		uint32 tx_fifo_depth = PCH_IC_COMP_PARAM1_TX(reg);
 		if (rx_fifo_depth > 1 && rx_fifo_depth < bus->rx_fifo_depth)
 			bus->rx_fifo_depth = rx_fifo_depth;
 		if (tx_fifo_depth > 1 && tx_fifo_depth < bus->tx_fifo_depth)

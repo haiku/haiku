@@ -51,6 +51,19 @@ acpi_status pch_i2c_scan_bus_callback(acpi_handle object, uint32 nestingLevel,
 	void *context, void** returnValue);
 
 
+enum pch_version {
+	PCH_NONE,
+	PCH_EMAG,
+	PCH_HASWELL,
+	PCH_ATOM,
+	PCH_SKYLAKE,
+	PCH_APL,
+	PCH_CANNONLAKE,
+	PCH_TIGERLAKE,
+	PCH_GEMINILAKE
+};
+
+
 struct pch_i2c_crs {
 	uint16	i2c_addr;
 	uint32	irq;
@@ -78,6 +91,8 @@ typedef struct {
 
 	device_node* node;
 	device_node* driver_node;
+
+	pch_version version;
 
 	area_id registersArea;
 	addr_t registers;

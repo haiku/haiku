@@ -15,6 +15,31 @@
 #include "pch_i2c.h"
 
 
+struct {
+	const char* name;
+	pch_version version;
+} pch_acpi_devices [] = {
+	{"INT33C2", PCH_ATOM},
+	{"INT33C3", PCH_ATOM},
+	{"INT3332", PCH_ATOM},
+	{"INT3433", PCH_ATOM},
+	{"INT3442", PCH_ATOM},
+	{"INT3443", PCH_ATOM},
+	{"INT3444", PCH_ATOM},
+	{"INT3445", PCH_ATOM},
+	{"INT3446", PCH_ATOM},
+	{"INT3447", PCH_ATOM},
+	{"80860AAC", PCH_ATOM},
+	{"80865AAC", PCH_ATOM},
+	{"80860F41", PCH_ATOM},
+	{"808662C1", PCH_ATOM},
+	{"AMD0010", PCH_ATOM},
+	{"AMDI0010", PCH_ATOM},
+	{"AMDI0510", PCH_ATOM},
+	{"APMC0D0F", PCH_EMAG},
+	{NULL, PCH_NONE}
+};
+
 typedef struct {
 	pch_i2c_sim_info info;
 	acpi_device_module_info* acpi;
@@ -117,6 +142,22 @@ init_device(device_node* node, void** device_cookie)
 		device_node* acpiParent = gDeviceManager->get_parent_node(node);
 		gDeviceManager->get_driver(acpiParent, (driver_module_info**)&acpi,
 			(void**)&device);
+
+		const char* name;
+		if (gDeviceManager->get_attr_string(acpiParent, ACPI_DEVICE_HID_ITEM, &name, false)
+			== B_OK) {
+
+			size_t device = 0;
+
+			while (pch_acpi_devices[device].name) {
+				if (strcmp(name, pch_acpi_devices[device].name) == 0) {
+					bus->info.version = pch_acpi_devices[device].version;
+					break;
+				}
+				device++;
+			}
+		}
+
 		gDeviceManager->put_node(acpiParent);
 	}
 
@@ -206,22 +247,14 @@ supports_device(device_node* parent)
 	}
 	TRACE("found an acpi device hid %s\n", name);
 
-	if (strcmp(name, "INT33C2") == 0
-		|| strcmp(name, "INT33C3") == 0
-		|| strcmp(name, "INT3432") == 0
-		|| strcmp(name, "INT3433") == 0
-		|| strcmp(name, "INT3442") == 0
-		|| strcmp(name, "INT3443") == 0
-		|| strcmp(name, "INT3444") == 0
-		|| strcmp(name, "INT3445") == 0
-		|| strcmp(name, "INT3446") == 0
-		|| strcmp(name, "INT3447") == 0
-		|| strcmp(name, "80860AAC") == 0
-		|| strcmp(name, "80865AAC") == 0
-		|| strcmp(name, "80860F41") == 0
-		|| strcmp(name, "808622C1") == 0) {
-		TRACE("PCH I2C device found! name %s\n", name);
-		return 0.6f;
+	size_t device = 0;
+
+	while (pch_acpi_devices[device].name) {
+		if (strcmp(name, pch_acpi_devices[device].name) == 0) {
+			TRACE("PCH I2C device found! name %s\n", name);
+			return 0.6f;
+		}
+		device++;
 	}
 
 	return 0.0f;
