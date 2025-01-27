@@ -43,7 +43,7 @@ If you're submitting a patch to us, please make sure you're following the
 If you're having trouble finding something in the source tree, you can use
 one of our web-based source code browsers:
 
- * https://xref.landonf.org/ (OpenGrok, provided by Landon Fuller)
+ * https://grok.nikisoft.one/opengrok/ (OpenGrok, provided by Niklas Poslovski)
  * https://git.haiku-os.org/ (git, provided by Haiku, Inc.)
 
 ### Contributing documentation
