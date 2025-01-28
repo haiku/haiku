@@ -4405,6 +4405,7 @@ fault_get_page(PageFaultContext& context)
 
 		context.cacheChainLocker.RelockCaches(true);
 		sourcePage->Cache()->MarkPageUnbusy(sourcePage);
+		sourcePage->Cache()->IncrementCopiedPagesCount();
 
 		// insert the new page into our cache
 		context.topCache->InsertPage(page, context.cacheOffset);
@@ -4666,8 +4667,9 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 			*wirePage = context.page;
 		}
 
-		DEBUG_PAGE_ACCESS_END(context.page);
+		context.page->Cache()->IncrementFaultCount();
 
+		DEBUG_PAGE_ACCESS_END(context.page);
 		break;
 	}
 
@@ -4920,15 +4922,17 @@ fill_area_info(struct VMArea* area, area_info* info, size_t size)
 	info->protection = area->protection;
 	info->lock = area->wiring;
 	info->team = area->address_space->ID();
-	info->copy_count = 0;
-	info->in_count = 0;
-	info->out_count = 0;
-		// TODO: retrieve real values here!
 
 	VMCache* cache = vm_area_get_locked_cache(area);
 
 	// Note, this is a simplification; the cache could be larger than this area
 	info->ram_size = cache->page_count * B_PAGE_SIZE;
+
+	info->copy_count = cache->CopiedPagesCount();
+
+	info->in_count = 0;
+	info->out_count = 0;
+		// TODO: retrieve real values here!
 
 	vm_area_put_locked_cache(cache);
 }

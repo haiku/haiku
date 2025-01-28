@@ -174,6 +174,16 @@ public:
 	virtual	status_t			Fault(struct VMAddressSpace *aspace,
 									off_t offset);
 
+	inline	uint64				FaultCount() const
+									{ return fFaultCount; }
+	inline	void				IncrementFaultCount()
+									{ fFaultCount++; }
+
+	inline	uint64				CopiedPagesCount() const
+									{ return fCopiedPagesCount; }
+	inline	void				IncrementCopiedPagesCount()
+									{ fCopiedPagesCount++; }
+
 	virtual	void				Merge(VMCache* source);
 
 	virtual	status_t			AcquireUnreferencedStoreRef();
@@ -228,7 +238,10 @@ private:
 			PageEventWaiter*	fPageEventWaiters;
 			void*				fUserData;
 			VMCacheRef*			fCacheRef;
+
 			page_num_t			fWiredPagesCount;
+			uint64				fFaultCount;
+			uint64				fCopiedPagesCount;
 };
 
 

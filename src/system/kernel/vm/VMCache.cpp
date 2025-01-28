@@ -642,6 +642,8 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 	temporary = 0;
 	page_count = 0;
 	fWiredPagesCount = 0;
+	fFaultCount = 0;
+	fCopiedPagesCount = 0;
 	type = cacheType;
 	fPageEventWaiters = NULL;
 
