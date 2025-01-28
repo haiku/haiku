@@ -21,7 +21,6 @@
 
 #include "AntialiasingSettingsView.h"
 #include "APRView.h"
-#include "defs.h"
 #include "FontView.h"
 #include "LookAndFeelSettingsView.h"
 

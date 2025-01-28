@@ -30,7 +30,6 @@
 #include <SpaceLayoutItem.h>
 
 #include "APRWindow.h"
-#include "defs.h"
 #include "Colors.h"
 
 
@@ -40,7 +39,8 @@
 
 #define COLOR_DROPPED 'cldp'
 #define AUTO_ADJUST_CHANGED 'madj'
-
+#define UPDATE_COLOR 'upcl'
+#define ATTRIBUTE_CHOSEN 'atch'
 
 using BPrivate::BColorItem;
 using BPrivate::BColorListView;

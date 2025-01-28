@@ -8,13 +8,12 @@
 #include "APRMain.h"
 #include "APRWindow.h"
 #include <stdio.h>
-#include "defs.h"
 
 #include <Catalog.h>
 #include <Locale.h>
 
 APRApplication::APRApplication(void)
- :	BApplication(APPEARANCE_APP_SIGNATURE)
+ :	BApplication("application/x-vnd.Haiku-Appearance")
 {
 	fWindow = new APRWindow(BRect(100, 100, 550, 420));
 	fWindow->Show();
