@@ -388,7 +388,7 @@ if [ $isCD ]; then
 	echo "Copying boot image ..."
 	$cp "$cdBootFloppy" "$outputDir"
 
-	if [ $(which xorriso) ]; then
+	if command -v xorriso; then
 		# build the iso image using xorriso
 		echo "Building CD image..."
 		xorriso -as mkisofs -r -b `basename $cdBootFloppy` \
