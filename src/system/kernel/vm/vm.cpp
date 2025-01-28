@@ -2417,10 +2417,11 @@ _vm_map_file(team_id team, const char* name, void** _address,
 		cache->ReleaseRefLocked();
 	}
 
-	if (status == B_OK && (protection & B_READ_AREA) != 0) {
-		// Pre-map at most 10MB worth of pages.
+	if (status == B_OK && (protection & B_READ_AREA) != 0 && cache->page_count > 0) {
+		// Pre-map up to 1 MB for every time the cache has been faulted "in full".
 		pre_map_area_pages(area, cache, &reservation,
-			(10LL * 1024 * 1024) / B_PAGE_SIZE);
+			(cache->FaultCount() / cache->page_count)
+				* ((1 * 1024 * 1024) / B_PAGE_SIZE));
 	}
 
 	cache->Unlock();
