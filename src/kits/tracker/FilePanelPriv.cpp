@@ -694,6 +694,11 @@ TFilePanel::Init(const BMessage*)
 	BRect windRect(Bounds());
 	fBackView = new BView(Bounds(), "View", B_FOLLOW_ALL, 0);
 	fBackView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
+	// BButton adopts the parent's high color instead of its own,
+	// hence this mismatched color set here
+	fBackView->SetHighUIColor(B_CONTROL_TEXT_COLOR);
+
 	AddChild(fBackView);
 
 	// add poseview menu bar
