@@ -1049,7 +1049,7 @@ BTextControl::_UpdateTextViewColors(bool enable)
 	if (!enable) {
 		textColor = disable_color(textColor, ViewColor());
 		viewColor = disable_color(ViewColor(), viewColor);
-	} else if (fLook & BControlLook::B_INVALID) {
+	} else if ((fLook & BControlLook::B_INVALID) != 0) {
 		hsl_color normalViewColor = hsl_color::from_rgb(viewColor);
 		rgb_color failureColor = ui_color(B_FAILURE_COLOR);
 		hsl_color newViewColor = hsl_color::from_rgb(failureColor);
