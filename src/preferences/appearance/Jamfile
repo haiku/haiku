@@ -5,20 +5,15 @@ AddSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders shared app interface [ FDirName servers app ] ;
 
 Preference Appearance :
-	APRMain.cpp
 	AntialiasingSettingsView.cpp
-	LookAndFeelSettingsView.cpp
+	Appearance.cpp
+	AppearanceWindow.cpp
+	Colors.cpp
+	ColorsView.cpp
 	FakeScrollBar.cpp
 	FontSelectionView.cpp
 	FontView.cpp
-	APRView.cpp
-	APRWindow.cpp
-	Colors.cpp
-
-	# These are currently disabled while everything else is being worked on
-	#CurView.cpp
-	#CursorWhichItem.cpp
-	#SysCursorAPI.cpp
+	LookAndFeelSettingsView.cpp
 
 	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub shared
 	: Appearance.rdef
@@ -28,8 +23,8 @@ DoCatalogs Appearance :
 	x-vnd.Haiku-Appearance
 	:
 	AntialiasingSettingsView.cpp
-	APRView.cpp
-	APRWindow.cpp
+	ColorsView.cpp
+	AppearanceWindow.cpp
 	Colors.cpp
 	LookAndFeelSettingsView.cpp
 	FontView.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Haiku. All rights reserved.
+ * Copyright 2002-2025, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,7 +9,7 @@
  */
 
 
-#include "APRWindow.h"
+#include "AppearanceWindow.h"
 
 #include <Button.h>
 #include <Catalog.h>
@@ -20,11 +20,12 @@
 #include <TabView.h>
 
 #include "AntialiasingSettingsView.h"
-#include "APRView.h"
+#include "ColorsView.h"
 #include "FontView.h"
 #include "LookAndFeelSettingsView.h"
 
 
+// This file used to be called APRWindow, left this to avoid retranslating everything
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "APRWindow"
 
@@ -33,7 +34,7 @@ static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 
 
-APRWindow::APRWindow(BRect frame)
+AppearanceWindow::AppearanceWindow(BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Appearance"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS
@@ -49,7 +50,7 @@ APRWindow::APRWindow(BRect frame)
 
 	fFontSettings = new FontView(B_TRANSLATE("Fonts"));
 
-	fColorsView = new APRView(B_TRANSLATE("Colors"));
+	fColorsView = new ColorsView(B_TRANSLATE("Colors"));
 
 	fLookAndFeelSettings = new LookAndFeelSettingsView(
 		B_TRANSLATE("Look and feel"));
@@ -79,7 +80,7 @@ APRWindow::APRWindow(BRect frame)
 
 
 void
-APRWindow::MessageReceived(BMessage *message)
+AppearanceWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgUpdate:
@@ -112,7 +113,7 @@ APRWindow::MessageReceived(BMessage *message)
 
 
 void
-APRWindow::_UpdateButtons()
+AppearanceWindow::_UpdateButtons()
 {
 	fDefaultsButton->SetEnabled(_IsDefaultable());
 	fRevertButton->SetEnabled(_IsRevertable());
@@ -120,7 +121,7 @@ APRWindow::_UpdateButtons()
 
 
 bool
-APRWindow::_IsDefaultable() const
+AppearanceWindow::_IsDefaultable() const
 {
 //	printf("fonts defaultable: %d\n", fFontSettings->IsDefaultable());
 //	printf("colors defaultable: %d\n", fColorsView->IsDefaultable());
@@ -134,7 +135,7 @@ APRWindow::_IsDefaultable() const
 
 
 bool
-APRWindow::_IsRevertable() const
+AppearanceWindow::_IsRevertable() const
 {
 //	printf("fonts revertable: %d\n", fFontSettings->IsRevertable());
 //	printf("colors revertable: %d\n", fColorsView->IsRevertable());

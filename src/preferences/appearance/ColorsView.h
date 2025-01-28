@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015, Haiku. All rights reserved.
+ * Copyright 2002-2025, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Joseph Groover <looncraz@looncraz.net>
  */
-#ifndef APR_VIEW_H_
-#define APR_VIEW_H_
+#ifndef COLORS_VIEW_H_
+#define COLORS_VIEW_H_
 
 
 #include <Button.h>
@@ -38,10 +38,10 @@ class APRWindow;
 using BPrivate::BColorPreview;
 
 
-class APRView : public BView {
+class ColorsView : public BView {
 public:
-								APRView(const char *name);
-	virtual						~APRView();
+								ColorsView(const char *name);
+	virtual						~ColorsView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage *msg);
@@ -80,4 +80,4 @@ private:
 			BMessage			fCurrentColors;
 };
 
-#endif	// APR_VIEW_H_
+#endif	// COLORS_VIEW_H_

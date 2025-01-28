@@ -25,7 +25,7 @@
 #include <MessageRunner.h>
 #include <SpaceLayoutItem.h>
 
-#include "APRWindow.h"
+#include "AppearanceWindow.h"
 #include "FontSelectionView.h"
 
 #undef B_TRANSLATION_CONTEXT

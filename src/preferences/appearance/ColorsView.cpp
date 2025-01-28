@@ -10,7 +10,6 @@
  */
 
 
-#include "APRView.h"
 
 #include <stdio.h>
 
@@ -29,8 +28,9 @@
 #include <Path.h>
 #include <SpaceLayoutItem.h>
 
-#include "APRWindow.h"
+#include "AppearanceWindow.h"
 #include "Colors.h"
+#include "ColorsView.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -47,7 +47,7 @@ using BPrivate::BColorListView;
 using BPrivate::BColorPreview;
 
 
-APRView::APRView(const char* name)
+ColorsView::ColorsView(const char* name)
 	:
 	BView(name, B_WILL_DRAW)
 {
@@ -87,13 +87,13 @@ APRView::APRView(const char* name)
 }
 
 
-APRView::~APRView()
+ColorsView::~ColorsView()
 {
 }
 
 
 void
-APRView::AttachedToWindow()
+ColorsView::AttachedToWindow()
 {
 	fAutoSelectCheckBox->SetTarget(this);
 	fPicker->SetTarget(this);
@@ -106,7 +106,7 @@ APRView::AttachedToWindow()
 
 
 void
-APRView::MessageReceived(BMessage* message)
+ColorsView::MessageReceived(BMessage* message)
 {
 	if (message->WasDropped()) {
 		// Received from color preview when dropped on
@@ -194,7 +194,7 @@ APRView::MessageReceived(BMessage* message)
 
 
 void
-APRView::LoadSettings()
+ColorsView::LoadSettings()
 {
 	get_default_colors(&fDefaultColors);
 	get_current_colors(&fCurrentColors);
@@ -203,7 +203,7 @@ APRView::LoadSettings()
 
 
 void
-APRView::SetDefaults()
+ColorsView::SetDefaults()
 {
 	_SetUIColors(fDefaultColors);
 	_UpdatePreviews(fDefaultColors);
@@ -221,7 +221,7 @@ APRView::SetDefaults()
 
 
 void
-APRView::Revert()
+ColorsView::Revert()
 {
 	_SetUIColors(fPrevColors);
 	_UpdatePreviews(fPrevColors);
@@ -236,21 +236,21 @@ APRView::Revert()
 
 
 bool
-APRView::IsDefaultable()
+ColorsView::IsDefaultable()
 {
 	return !fDefaultColors.HasSameData(fCurrentColors);
 }
 
 
 bool
-APRView::IsRevertable()
+ColorsView::IsRevertable()
 {
 	return !fPrevColors.HasSameData(fCurrentColors);
 }
 
 
 void
-APRView::_CreateItems()
+ColorsView::_CreateItems()
 {
 	while (fAttrList->CountItems() > 0)
 		delete fAttrList->RemoveItem((int32)0);
@@ -278,7 +278,7 @@ APRView::_CreateItems()
 
 
 void
-APRView::_UpdatePreviews(const BMessage& colors)
+ColorsView::_UpdatePreviews(const BMessage& colors)
 {
 	rgb_color color;
 	for (int32 i = color_description_count() - 1; i >= 0; i--) {
@@ -296,7 +296,7 @@ APRView::_UpdatePreviews(const BMessage& colors)
 
 
 void
-APRView::_SetUIColors(const BMessage& colors)
+ColorsView::_SetUIColors(const BMessage& colors)
 {
 	set_ui_colors(&colors);
 	fCurrentColors = colors;
@@ -304,7 +304,7 @@ APRView::_SetUIColors(const BMessage& colors)
 
 
 void
-APRView::_SetCurrentColor(rgb_color color)
+ColorsView::_SetCurrentColor(rgb_color color)
 {
 	_SetColor(fWhich, color);
 
@@ -321,7 +321,7 @@ APRView::_SetCurrentColor(rgb_color color)
 
 
 void
-APRView::_SetColor(color_which which, rgb_color color)
+ColorsView::_SetColor(color_which which, rgb_color color)
 {
 	_SetOneColor(which, color);
 
@@ -437,7 +437,7 @@ APRView::_SetColor(color_which which, rgb_color color)
 
 
 void
-APRView::_SetOneColor(color_which which, rgb_color color)
+ColorsView::_SetOneColor(color_which which, rgb_color color)
 {
 	if (ui_color(which) == color)
 		return;

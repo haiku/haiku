@@ -5,22 +5,22 @@
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
  */
-#ifndef APR_MAIN_H
-#define APR_MAIN_H
+#ifndef APPEARANCE_H
+#define APPEARANCE_H
 
 #include <Application.h>
 #include <Catalog.h>
 
-class APRWindow;
+class AppearanceWindow;
 
-class APRApplication : public BApplication 
+class AppearanceApplication : public BApplication 
 {
 public:
-	APRApplication(void);
+	AppearanceApplication(void);
 
 private:
 	
-	APRWindow *fWindow;
+	AppearanceWindow *fWindow;
 };
 
-#endif
+#endif /* APPEARANCE_H */

@@ -5,24 +5,24 @@
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
  */
-#include "APRMain.h"
-#include "APRWindow.h"
+#include "Appearance.h"
+#include "AppearanceWindow.h"
 #include <stdio.h>
 
 #include <Catalog.h>
 #include <Locale.h>
 
-APRApplication::APRApplication(void)
+AppearanceApplication::AppearanceApplication(void)
  :	BApplication("application/x-vnd.Haiku-Appearance")
 {
-	fWindow = new APRWindow(BRect(100, 100, 550, 420));
+	fWindow = new AppearanceWindow(BRect(100, 100, 550, 420));
 	fWindow->Show();
 }
 
 int
 main(int, char**)
 {	
-	APRApplication myApplication;
+	AppearanceApplication myApplication;
 	myApplication.Run();
 
 	return(0);

@@ -40,7 +40,7 @@
 #include <StringView.h>
 #include <TextView.h>
 
-#include "APRWindow.h"
+#include "AppearanceWindow.h"
 #include "FakeScrollBar.h"
 
 
