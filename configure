@@ -890,7 +890,7 @@ if [ -z "$HOST_PYTHON" ]; then
 	elif python --version < /dev/null > /dev/null 2>&1; then
 		HOST_PYTHON="python"
 	else
-		echo "a python interpreter is required"
+		echo "Python interpreter not found (maybe specify one in HOST_PYTHON?)"
 		exit 1
 	fi
 fi
@@ -902,7 +902,7 @@ PYTHON_VERSION=$("$HOST_PYTHON" --version 2>&1 | sed -e 's/Python //')
 case $PYTHON_VERSION in
 	2.* | 3.[1-8].*)
 		echo "Python $PYTHON_VERSION is too old; need at least Python 3.9."
-		echo "(maybe specify a Python interpreter to use in HOST_PYTHON?)"
+		echo "(maybe specify a newer one in HOST_PYTHON?)"
 		exit 1
 		;;
 	*)
