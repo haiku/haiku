@@ -81,8 +81,8 @@ public:
 								VMCache();
 	virtual						~VMCache();
 
-			status_t			Init(uint32 cacheType, uint32 allocationFlags,
-									const char* name);
+			status_t			Init(const char* name, uint32 cacheType,
+									uint32 allocationFlags);
 
 	virtual	void				Delete();
 

@@ -630,7 +630,7 @@ VMCache::~VMCache()
 
 
 status_t
-VMCache::Init(uint32 cacheType, uint32 allocationFlags, const char* name)
+VMCache::Init(const char* name, uint32 cacheType, uint32 allocationFlags)
 {
 	mutex_init(&fLock, name);
 
