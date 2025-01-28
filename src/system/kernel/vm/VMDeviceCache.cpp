@@ -16,7 +16,7 @@ status_t
 VMDeviceCache::Init(addr_t baseAddress, uint32 allocationFlags)
 {
 	fBaseAddress = baseAddress;
-	return VMCache::Init(CACHE_TYPE_DEVICE, allocationFlags);
+	return VMCache::Init(CACHE_TYPE_DEVICE, allocationFlags, "VMDeviceCache");
 }
 
 

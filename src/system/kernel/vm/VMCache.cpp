@@ -630,9 +630,9 @@ VMCache::~VMCache()
 
 
 status_t
-VMCache::Init(uint32 cacheType, uint32 allocationFlags)
+VMCache::Init(uint32 cacheType, uint32 allocationFlags, const char* name)
 {
-	mutex_init(&fLock, "VMCache");
+	mutex_init(&fLock, name);
 
 	fRefCount = 1;
 	source = NULL;

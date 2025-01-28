@@ -12,7 +12,7 @@
 status_t
 VMNullCache::Init(uint32 allocationFlags)
 {
-	return VMCache::Init(CACHE_TYPE_NULL, allocationFlags);
+	return VMCache::Init(CACHE_TYPE_NULL, allocationFlags, "VMNullCache");
 }
 
 

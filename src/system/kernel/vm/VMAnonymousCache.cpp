@@ -463,7 +463,7 @@ VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 		")\n", this, canOvercommit ? "yes" : "no", numPrecommittedPages,
 		numGuardPages);
 
-	status_t error = VMCache::Init(CACHE_TYPE_RAM, allocationFlags);
+	status_t error = VMCache::Init(CACHE_TYPE_RAM, allocationFlags, "VMAnonymousCache");
 	if (error != B_OK)
 		return error;
 

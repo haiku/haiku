@@ -20,7 +20,7 @@
 status_t
 VMVnodeCache::Init(struct vnode* vnode, uint32 allocationFlags)
 {
-	status_t error = VMCache::Init(CACHE_TYPE_VNODE, allocationFlags);
+	status_t error = VMCache::Init(CACHE_TYPE_VNODE, allocationFlags, "VMVnodeCache");
 	if (error != B_OK)
 		return error;
 
