@@ -1445,11 +1445,6 @@ detect_cpu(int currentCPU, bool full = true)
 			cpu->arch.feature[FEATURE_EXT_AMD] &= IA32_FEATURES_INTEL_EXT;
 	}
 
-	if (maxBasicLeaf >= 5) {
-		get_current_cpuid(&cpuid, 5, 0);
-		cpu->arch.feature[FEATURE_5_ECX] = cpuid.regs.ecx;
-	}
-
 	if (maxBasicLeaf >= 6) {
 		get_current_cpuid(&cpuid, 6, 0);
 		cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
@@ -1627,23 +1622,23 @@ init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
 	cpuid_info cpuid;
 	get_current_cpuid(&cpuid, 0, 0);
 	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;
-	if (maxBasicLeaf < 0x15)
+	if (maxBasicLeaf < IA32_CPUID_LEAF_TSC)
 		return;
 
-	get_current_cpuid(&cpuid, 0x15, 0);
+	get_current_cpuid(&cpuid, IA32_CPUID_LEAF_TSC, 0);
 	if (cpuid.regs.eax == 0 || cpuid.regs.ebx == 0)
 		return;
 	uint32 khz = cpuid.regs.ecx / 1000;
 	uint32 denominator = cpuid.regs.eax;
 	uint32 numerator = cpuid.regs.ebx;
 	if (khz == 0 && model == 0x5f) {
-		// CPUID 0x16 isn't supported, hardcoding
+		// CPUID_LEAF_FREQUENCY isn't supported, hardcoding
 		khz = 25000;
 	}
 
-	if (khz == 0 && maxBasicLeaf >= 0x16) {
+	if (khz == 0 && maxBasicLeaf >= IA32_CPUID_LEAF_FREQUENCY) {
 		// for these CPUs the base frequency is also the tsc frequency
-		get_current_cpuid(&cpuid, 0x16, 0);
+		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_FREQUENCY, 0);
 		khz = cpuid.regs.eax * 1000 * denominator / numerator;
 	}
 	if (khz == 0)
@@ -1908,10 +1903,10 @@ arch_cpu_init_post_vm(kernel_args* args)
 		call_all_cpus_sync(&enable_osxsave, NULL);
 		gXsaveMask = IA32_XCR0_X87 | IA32_XCR0_SSE;
 		cpuid_info cpuid;
-		get_current_cpuid(&cpuid, 0xd, 0);
+		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_XSTATE, 0);
 		gXsaveMask |= (cpuid.regs.eax & IA32_XCR0_AVX);
 		call_all_cpus_sync(&enable_xsavemask, NULL);
-		get_current_cpuid(&cpuid, 0xd, 0);
+		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_XSTATE, 0);
 		gFPUSaveLength = cpuid.regs.ebx;
 		if (gFPUSaveLength > sizeof(((struct arch_thread *)0)->fpu_state))
 			gFPUSaveLength = 832;
