@@ -155,6 +155,14 @@ init_cstates()
 	if ((cpuid.regs.ecx & CPUID_MWAIT_ECX_SUPPORT) != CPUID_MWAIT_ECX_SUPPORT)
 		return B_ERROR;
 
+	cpu_ent* cpu = &gCPU[0];
+	uint8 model = cpu->arch.model + (cpu->arch.extended_model << 4);
+	if (cpu->arch.family == 6) {
+		// disable C5 and C6 states on Skylake (same as Linux)
+		if (model == 0x5e && (mwaitSubStates & (0xf << 28)) != 0)
+			mwaitSubStates &= 0xf00fffff;
+	}
+
 	char cStates[64];
 	unsigned int offset = 0;
 	for (int32 i = 1; i < CPUIDLE_CSTATE_MAX; i++) {
