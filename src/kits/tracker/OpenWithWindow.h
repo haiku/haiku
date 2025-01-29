@@ -214,6 +214,9 @@ public:
 
 	OpenWithContainerWindow* ContainerWindow() const;
 
+	virtual void AdoptSystemColors();
+	virtual bool HasSystemColors() const;
+
 	virtual bool AddPosesThreadValid(const entry_ref*) const;
 
 protected:
@@ -222,9 +225,6 @@ protected:
 	virtual void InitialStartWatching() {}
 	virtual void FinalStopWatching() {}
 
-	virtual void AttachedToWindow();
-	virtual rgb_color TextColor(bool selected = false) const;
-	virtual rgb_color BackColor(bool selected = false) const;
 	virtual EntryListBase* InitDirentIterator(const entry_ref* ref);
 	virtual void ReturnDirentIterator(EntryListBase* iterator);
 

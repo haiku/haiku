@@ -265,7 +265,6 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fDragEnabled(true),
 	fDropEnabled(true),
 	fMimeTypeListIsDirty(false),
-	fIsDesktop(false),
 	fWidgetTextOutline(false),
 	fTrackRightMouseUp(false),
 	fTrackMouseUp(false),
@@ -368,6 +367,33 @@ BPoseView::InitCommon()
 		AddTrashPoses();
 	else
 		AddPoses(TargetModel());
+}
+
+
+void
+BPoseView::AdoptSystemColors()
+{
+	if (!TargetVolumeIsReadOnly())
+		SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+	else
+		SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, ReadOnlyTint(B_DOCUMENT_BACKGROUND_COLOR));
+	SetLowUIColor(ViewUIColor());
+
+	SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
+}
+
+
+bool
+BPoseView::HasSystemColors() const
+{
+	float tint = B_NO_TINT;
+	float readOnlyTint = ReadOnlyTint(B_DOCUMENT_BACKGROUND_COLOR);
+
+	return ViewUIColor(&tint) == B_DOCUMENT_BACKGROUND_COLOR
+		&& (tint == B_NO_TINT || tint == readOnlyTint)
+		&& LowUIColor(&tint) == B_DOCUMENT_BACKGROUND_COLOR
+		&& (tint == B_NO_TINT || tint == readOnlyTint)
+		&& HighUIColor(&tint) == B_DOCUMENT_TEXT_COLOR && tint == B_NO_TINT;
 }
 
 
@@ -552,7 +578,7 @@ BPoseView::RestoreState(AttributeStreamNode* node)
 		}
 	}
 
-	if (IsDesktop() && ViewMode() == kListMode) {
+	if (IsDesktopView() && ViewMode() == kListMode) {
 		// recover if desktop window view state set wrong
 		fViewState->SetViewMode(kIconMode);
 	}
@@ -570,7 +596,7 @@ BPoseView::RestoreState(const BMessage &message)
 		fViewState = viewstate;
 	}
 
-	if (IsDesktop() && ViewMode() == kListMode) {
+	if (IsDesktopView() && ViewMode() == kListMode) {
 		// recover if desktop window view state set wrong
 		fViewState->SetViewMode(kIconMode);
 	}
@@ -763,7 +789,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 		return;
 	}
 
-	bool isDesktop = IsDesktop() && (frameIfDesktop != NULL);
+	bool isDesktop = !IsFilePanel() && IsDesktopView() && (frameIfDesktop != NULL);
 
 	int32 poseCount = fPoseList->CountItems();
 	for (int32 index = 0; index < poseCount; index++) {
@@ -969,11 +995,7 @@ BPoseView::ScrollTo(BPoint where)
 void
 BPoseView::AttachedToWindow()
 {
-	fIsDesktop = dynamic_cast<BDeskWindow*>(Window()) != NULL;
-	if (fIsDesktop)
-		AddFilter(new TPoseViewFilter(this));
-	else
-		ApplyBackgroundColor();
+	AdoptSystemColors();
 
 	AddFilter(new ShortcutFilter(B_RETURN, B_OPTION_KEY, kOpenSelection,
 		this));
@@ -1007,6 +1029,8 @@ BPoseView::AttachedToWindow()
 	}
 
 	FSClipboardStartWatch(this);
+
+	BView::AttachedToWindow();
 }
 
 
@@ -3060,7 +3084,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	// if we are the desktop.
 	BPoint scaleOffset(0, 0);
 	bool iconSizeChanged = newMode == kIconMode && oldMode == kIconMode;
-	if (!IsDesktop() && iconSizeChanged) {
+	if (!IsDesktopView() && iconSizeChanged) {
 		// definitely changing the icon size, so we will need to scroll
 		BRect bounds(Bounds());
 		BPoint center(bounds.LeftTop());
@@ -3105,7 +3129,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	}
 
 	// check if we need to re-place poses when they are out of view
-	bool checkLocations = IsDesktop() && iconSizeChanged;
+	bool checkLocations = IsDesktopView() && iconSizeChanged;
 
 	BPoint oldOffset;
 	BPoint oldGrid;
@@ -3560,7 +3584,7 @@ BPoseView::PlacePose(BPose* pose, BRect &viewBounds)
 	// make pose rect a little bigger to ensure space between poses
 	rect.InsetBy(-3, 0);
 
-	bool checkValidLocation = IsDesktop();
+	bool checkValidLocation = IsDesktopView();
 
 	// find an empty slot to put pose into
 	while (SlotOccupied(rect, viewBounds)
@@ -3589,7 +3613,7 @@ BPoseView::PlacePose(BPose* pose, BRect &viewBounds)
 bool
 BPoseView::IsValidLocation(const BPose* pose)
 {
-	if (!IsDesktop())
+	if (!IsDesktopView())
 		return true;
 
 	BRect rect(pose->CalcRect(this));
@@ -3601,7 +3625,7 @@ BPoseView::IsValidLocation(const BPose* pose)
 bool
 BPoseView::IsValidLocation(const BRect& rect)
 {
-	if (!IsDesktop())
+	if (!IsDesktopView())
 		return true;
 
 	// on the desktop, don't allow icons outside of the view bounds
@@ -3679,7 +3703,7 @@ BPoseView::CheckAutoPlacedPoses()
 void
 BPoseView::CheckPoseVisibility(BRect* newFrame)
 {
-	bool desktop = IsDesktop() && newFrame != 0;
+	bool desktop = IsDesktopView() && newFrame != 0;
 
 	BRect deskFrame;
 	if (desktop) {
@@ -3995,7 +4019,7 @@ BPoseView::ScrollIntoView(BPose* pose, int32 index)
 void
 BPoseView::ScrollIntoView(BRect poseRect)
 {
-	if (IsDesktop())
+	if (IsDesktopView())
 		return;
 
 	BPoint oldPos = Bounds().LeftTop(), newPos = oldPos;
@@ -7307,7 +7331,7 @@ BPoseView::MouseDown(BPoint where)
 	if (window == NULL)
 		return;
 
-	if (IsDesktop()) {
+	if (IsDesktopView()) {
 		BScreen screen(Window());
 		rgb_color color = screen.DesktopColor();
 		SetLowColor(color);
@@ -8126,7 +8150,7 @@ BPoseView::OpenSelection(BPose* clickedPose, int32* index)
 	}
 
 	// check if we can use the single window mode
-	if (settings.SingleWindowBrowse() && !IsDesktop() && !IsFilePanel()
+	if (settings.SingleWindowBrowse() && !IsDesktopView() && !IsFilePanel()
 		&& (modifiers() & B_OPTION_KEY) == 0 && TargetModel()->IsDirectory()
 		&& singleWindowBrowsePose && singleWindowBrowsePose->ResolvedModel()
 		&& singleWindowBrowsePose->ResolvedModel()->IsDirectory()) {
@@ -8164,7 +8188,7 @@ BPoseView::OpenSelectionCommon(BPose* clickedPose, int32* poseIndex, bool openWi
 		// close parent window if option down and we're not the desktop
 		// and we're not in single window mode
 		if (dynamic_cast<TTracker*>(be_app) == NULL || (modifiers() & B_OPTION_KEY) == 0
-			|| IsFilePanel() || IsDesktop() || TrackerSettings().SingleWindowBrowse()) {
+			|| IsFilePanel() || IsDesktopView() || TrackerSettings().SingleWindowBrowse()) {
 			continue;
 		}
 
@@ -8217,16 +8241,6 @@ BPoseView::DrawOpenAnimation(BRect rect)
 	}
 
 	SetDrawingMode(B_OP_OVER);
-}
-
-
-void
-BPoseView::ApplyBackgroundColor()
-{
-	float bgTint = TargetVolumeIsReadOnly()
-		? ReadOnlyTint(ui_color(B_DOCUMENT_BACKGROUND_COLOR)) : B_NO_TINT;
-	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, bgTint);
-	SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR, bgTint);
 }
 
 
@@ -8412,8 +8426,9 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 		AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
-	if (!IsDesktop()) {
-		ApplyBackgroundColor();
+	AdoptSystemColors();
+
+	if (!IsDesktopView()) {
 		if (ContainerWindow() != NULL)
 			ContainerWindow()->UpdateBackgroundImage();
 	}
@@ -8577,7 +8592,7 @@ BPoseView::CanOpenParent()
 		}
 	} else {
 		// deny Desktop, allow Desktop folder
-		if (IsDesktop() || TargetModel()->IsRoot())
+		if (IsDesktopView() || TargetModel()->IsRoot())
 			return false;
 	}
 
@@ -8808,13 +8823,19 @@ BPoseView::SelectedVolumeIsReadOnly() const
 	} else if (selectCount > 0) {
 		// only check first item's volume, assume rest are the same
 		pose = fSelectionList->FirstItem();
-		if (pose->TargetModel()->IsRoot())
+		if (pose->TargetModel()->IsRoot()) {
+			// root pose is always considered read-only
 			return true;
-
-		entry.SetTo(pose->TargetModel()->EntryRef());
-		if (FSGetParentVirtualDirectoryAware(entry, parent) == B_OK) {
-			parent.GetNodeRef(&nref);
-			volume.SetTo(nref.device);
+		} else if (pose->TargetModel()->IsVolume()) {
+			// determine if read-only based on pose's volume
+			volume.SetTo(pose->TargetModel()->NodeRef()->device);
+		} else {
+			// determine if read-only based on pose's parent directory
+			entry.SetTo(pose->TargetModel()->EntryRef());
+			if (FSGetParentVirtualDirectoryAware(entry, parent) == B_OK) {
+				parent.GetNodeRef(&nref);
+				volume.SetTo(nref.device);
+			}
 		}
 	} else {
 		// no items selected, check target volume instead
@@ -9042,70 +9063,45 @@ BPoseView::DrawPose(BPose* pose, int32 index, bool fullDraw)
 }
 
 
-rgb_color
-BPoseView::TextColor(bool selected) const
-{
-	if (selected)
-		return ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	else
-		return ui_color(B_DOCUMENT_TEXT_COLOR);
-}
-
-
-rgb_color
-BPoseView::BackColor(bool selected) const
-{
-	if (selected) {
-		return InvertedBackColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
-	} else {
-		rgb_color background = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-		return tint_color(background,
-			TargetVolumeIsReadOnly() ? ReadOnlyTint(background) : B_NO_TINT);
-	}
-}
-
-
 void
 BPoseView::Draw(BRect updateRect)
 {
-	if (IsDesktop()) {
-		BScreen screen(Window());
-		rgb_color color = screen.DesktopColor();
-		SetLowColor(color);
-		SetViewColor(color);
-	}
 	DrawViewCommon(updateRect);
 
 	if ((Flags() & B_DRAW_ON_CHILDREN) == 0)
 		DrawAfterChildren(updateRect);
+
+	BView::Draw(updateRect);
 }
 
 
 void
 BPoseView::DrawAfterChildren(BRect updateRect)
 {
-	if (fTransparentSelection && fSelectionRectInfo.rect.IsValid()) {
-		SetDrawingMode(B_OP_ALPHA);
-		rgb_color color = ui_color(B_NAVIGATION_BASE_COLOR);
-		color.alpha = 128;
-		SetHighColor(color);
-		if (fSelectionRectInfo.rect.Width() == 0
-			|| fSelectionRectInfo.rect.Height() == 0) {
-			StrokeLine(fSelectionRectInfo.rect.LeftTop(),
-				fSelectionRectInfo.rect.RightBottom());
-		} else {
-			StrokeRect(fSelectionRectInfo.rect);
-			BRect interior = fSelectionRectInfo.rect;
-			interior.InsetBy(1, 1);
-			if (interior.IsValid()) {
-				color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
-				color.alpha = 90;
-				SetHighColor(color);
-				FillRect(interior);
-			}
+	if (!fTransparentSelection || !fSelectionRectInfo.rect.IsValid())
+		return;
+
+	PushState();
+
+	SetDrawingMode(B_OP_ALPHA);
+	rgb_color color = ui_color(B_NAVIGATION_BASE_COLOR);
+	color.alpha = 128;
+	SetHighColor(color);
+	if (fSelectionRectInfo.rect.Width() == 0 || fSelectionRectInfo.rect.Height() == 0) {
+		StrokeLine(fSelectionRectInfo.rect.LeftTop(), fSelectionRectInfo.rect.RightBottom());
+	} else {
+		StrokeRect(fSelectionRectInfo.rect);
+		BRect interior = fSelectionRectInfo.rect;
+		interior.InsetBy(1, 1);
+		if (interior.IsValid()) {
+			color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+			color.alpha = 90;
+			SetHighColor(color);
+			FillRect(interior);
 		}
-		SetDrawingMode(B_OP_OVER);
 	}
+
+	PopState();
 }
 
 
@@ -9132,14 +9128,11 @@ BPoseView::DrawViewCommon(const BRect& updateRect)
 	if (ViewMode() == kListMode) {
 		const PoseList* poseList = CurrentPoseList();
 		int32 poseCount = poseList->CountItems();
-		int32 startIndex
-			= (int32)((updateRect.top - fListElemHeight) / fListElemHeight);
-
+		int32 startIndex = (int32)((updateRect.top - fListElemHeight) / fListElemHeight);
 		if (startIndex < 0)
 			startIndex = 0;
 
 		BPoint location(0, startIndex * fListElemHeight);
-
 		for (int32 index = startIndex; index < poseCount; index++) {
 			BPose* pose = poseList->ItemAt(index);
 			BRect poseRect(pose->CalcRect(location, this, true));
@@ -9167,7 +9160,7 @@ BPoseView::ColumnRedraw(BRect updateRect)
 	ASSERT(ViewMode() == kListMode);
 
 #if COLUMN_MODE_ON_DESKTOP
-	if (IsDesktop()) {
+	if (IsDesktopView()) {
 		BScreen screen(Window());
 		rgb_color d = screen.DesktopColor();
 		SetLowColor(d);
@@ -9184,6 +9177,9 @@ BPoseView::ColumnRedraw(BRect updateRect)
 	if (poseCount <= 0)
 		return;
 
+	PushState();
+	SetDrawingMode(B_OP_COPY);
+
 	BPoint location(0, startIndex * fListElemHeight);
 	BRect srcRect = poseList->ItemAt(0)->CalcRect(B_ORIGIN, this, false);
 	srcRect.right += 1024;	// need this to erase correctly
@@ -9193,22 +9189,20 @@ BPoseView::ColumnRedraw(BRect updateRect)
 	BRegion updateRegion;
 	updateRegion.Set(updateRect);
 	ConstrainClippingRegion(&updateRegion);
+	offscreenView->SetDrawingMode(B_OP_COPY);
+	offscreenView->SetLowColor(LowColor());
 
 	for (int32 index = startIndex; index < poseCount; index++) {
 		BPose* pose = poseList->ItemAt(index);
+		if (pose == NULL)
+			break;
 
-		offscreenView->SetDrawingMode(B_OP_COPY);
-		offscreenView->SetLowColor(LowColor());
 		offscreenView->FillRect(offscreenView->Bounds(), B_SOLID_LOW);
-
-		BRect dstRect = srcRect;
-		dstRect.OffsetTo(location);
-
+		BRect dstRect = srcRect.OffsetByCopy(location);
 		BPoint offsetBy(0, -(index * ListElemHeight()));
 		pose->Draw(dstRect, updateRect, this, offscreenView, true, offsetBy, pose->IsSelected());
 
 		offscreenView->Sync();
-		SetDrawingMode(B_OP_COPY);
 		DrawBitmap(sOffscreen->Bitmap(), srcRect, dstRect);
 		location.y += fListElemHeight;
 		if (location.y > updateRect.bottom)
@@ -9217,6 +9211,7 @@ BPoseView::ColumnRedraw(BRect updateRect)
 
 	sOffscreen->DoneUsing();
 	ConstrainClippingRegion(0);
+	PopState();
 }
 
 

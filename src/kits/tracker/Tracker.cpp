@@ -530,12 +530,12 @@ TTracker::MessageReceived(BMessage* message)
 			MountServer().SendMessage(message);
 			break;
 
-
 		case kRestoreBackgroundImage:
 		{
 			BDeskWindow* desktop = GetDeskWindow();
 			AutoLock<BWindow> lock(desktop);
 			desktop->UpdateDesktopBackgroundImages();
+			desktop->PostMessage(message, desktop->PoseView());
 			break;
 		}
 

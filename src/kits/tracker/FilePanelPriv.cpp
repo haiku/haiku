@@ -1728,7 +1728,7 @@ BFilePanelPoseView::FSNotification(const BMessage* message)
 	switch (message->FindInt32("opcode")) {
 		case B_DEVICE_MOUNTED:
 		{
-			if (IsDesktopView()) {
+			if (IsDesktop()) {
 				// Pretty much copied straight from DesktopPoseView.
 				// Would be better if the code could be shared somehow.
 				dev_t device;
@@ -1795,7 +1795,7 @@ BFilePanelPoseView::SavePoseLocations(BRect*)
 EntryListBase*
 BFilePanelPoseView::InitDirentIterator(const entry_ref* ref)
 {
-	if (IsDesktopView())
+	if (IsDesktop())
 		return DesktopPoseView::InitDesktopDirentIterator(this, ref);
 
 	return _inherited::InitDirentIterator(ref);
@@ -1806,29 +1806,15 @@ void
 BFilePanelPoseView::AddPosesCompleted()
 {
 	_inherited::AddPosesCompleted();
-	if (IsDesktopView())
+	if (IsDesktop())
 		CreateTrashPose();
-}
-
-
-void
-BFilePanelPoseView::SetIsDesktop(bool on)
-{
-	fIsDesktop = on;
-}
-
-
-bool
-BFilePanelPoseView::IsDesktopView() const
-{
-	return fIsDesktop;
 }
 
 
 void
 BFilePanelPoseView::ShowVolumes(bool visible, bool showShared)
 {
-	if (IsDesktopView()) {
+	if (IsDesktop()) {
 		if (!visible)
 			RemoveRootPoses();
 		else

@@ -49,8 +49,13 @@ class DesktopPoseView : public BPoseView {
 public:
 	DesktopPoseView(Model*, uint32 viewMode);
 
-	static EntryListBase* InitDesktopDirentIterator(BPoseView*,
-		const entry_ref*);
+	virtual void AttachedToWindow();
+	virtual void MessageReceived(BMessage* message);
+
+	virtual void AdoptSystemColors();
+	virtual bool HasSystemColors() const;
+
+	static EntryListBase* InitDesktopDirentIterator(BPoseView*, const entry_ref*);
 
 	void ShowVolumes(bool visible, bool showShared);
 
@@ -71,11 +76,10 @@ protected:
 
 	void AdaptToVolumeChange(BMessage*);
 	void AdaptToDesktopIntegrationChange(BMessage*);
-
-	virtual rgb_color TextColor(bool selected = false) const;
-	virtual rgb_color BackColor(bool selected = false) const;
+	void AdaptToBackgroundColorChange();
 
 private:
+
 	typedef BPoseView _inherited;
 };
 

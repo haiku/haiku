@@ -819,7 +819,7 @@ BContainerWindow::Init(const BMessage* message)
 	CheckScreenIntersect();
 
 	bool isListMode = PoseView()->ViewMode() == kListMode;
-	if (fBackgroundImage != NULL && !PoseView()->IsDesktop() && !isListMode)
+	if (fBackgroundImage != NULL && !PoseView()->IsDesktopView() && !isListMode)
 		fBackgroundImage->Show(PoseView(), current_workspace());
 
 	Show();
@@ -904,7 +904,7 @@ BContainerWindow::RestoreStateCommon()
 		// don't pick up backgrounds in safe mode
 		return;
 
-	bool isDesktop = PoseView()->IsDesktop();
+	bool isDesktop = PoseView()->IsDesktopView();
 
 	WindowStateNodeOpener opener(this, false);
 	if (!TargetModel()->IsRoot() && opener.Node() != NULL) {
@@ -1589,7 +1589,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 						break;
 
 					case kSingleWindowBrowseChanged:
-						if (PoseView()->IsFilePanel() || PoseView()->IsDesktop()) {
+						if (PoseView()->IsFilePanel() || PoseView()->IsDesktopView()) {
 							SetSingleWindowBrowseShortcuts(settings.SingleWindowBrowse());
 							break;
 						}
@@ -3938,7 +3938,7 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 void
 BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 {
-	if (TargetModel() != NULL && PoseView()->IsDesktop()) {
+	if (TargetModel() != NULL && PoseView()->IsDesktopView()) {
 		// don't save window state if we are the Desktop
 		return;
 	}

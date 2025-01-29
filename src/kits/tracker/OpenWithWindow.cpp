@@ -548,8 +548,7 @@ OpenWithPoseView::~OpenWithPoseView()
 OpenWithContainerWindow*
 OpenWithPoseView::ContainerWindow() const
 {
-	OpenWithContainerWindow* window
-		= dynamic_cast<OpenWithContainerWindow*>(Window());
+	OpenWithContainerWindow* window = dynamic_cast<OpenWithContainerWindow*>(Window());
 	ASSERT(window != NULL);
 
 	return window;
@@ -557,32 +556,21 @@ OpenWithPoseView::ContainerWindow() const
 
 
 void
-OpenWithPoseView::AttachedToWindow()
+OpenWithPoseView::AdoptSystemColors()
 {
-	_inherited::AttachedToWindow();
-
 	SetViewUIColor(B_TOOL_TIP_BACKGROUND_COLOR);
 	SetLowUIColor(B_TOOL_TIP_BACKGROUND_COLOR);
+	SetHighUIColor(B_TOOL_TIP_TEXT_COLOR);
 }
 
 
-rgb_color
-OpenWithPoseView::TextColor(bool selected) const
+bool
+OpenWithPoseView::HasSystemColors() const
 {
-	if (selected)
-		return ui_color(B_TOOL_TIP_BACKGROUND_COLOR);
-	else
-		return ui_color(B_TOOL_TIP_TEXT_COLOR);
-}
-
-
-rgb_color
-OpenWithPoseView::BackColor(bool selected) const
-{
-	if (selected)
-		return InvertedBackColor(ui_color(B_TOOL_TIP_BACKGROUND_COLOR));
-	else
-		return ui_color(B_TOOL_TIP_BACKGROUND_COLOR);
+	float tint = B_NO_TINT;
+	return ViewUIColor(&tint) == B_TOOL_TIP_BACKGROUND_COLOR && tint == B_NO_TINT
+		&& LowUIColor(&tint) == B_TOOL_TIP_BACKGROUND_COLOR && tint == B_NO_TINT
+		&& HighUIColor(&tint) == B_TOOL_TIP_TEXT_COLOR && tint == B_NO_TINT;
 }
 
 

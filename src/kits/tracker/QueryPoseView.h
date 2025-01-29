@@ -54,6 +54,9 @@ public:
 
 	virtual void MessageReceived(BMessage* message);
 
+	virtual void AdoptSystemColors();
+	virtual bool HasSystemColors() const;
+
 	const char* SearchForType() const;
 	BQueryContainerWindow* ContainerWindow() const;
 	bool ActiveOnDevice(dev_t) const;

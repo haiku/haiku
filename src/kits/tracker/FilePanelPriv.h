@@ -178,7 +178,8 @@ public:
 	virtual bool IsFilePanel() const;
 	virtual bool FSNotification(const BMessage*);
 
-	void SetIsDesktop(bool);
+	virtual bool IsDesktop() const { return fIsDesktop; };
+	void SetIsDesktop(bool on) { fIsDesktop = on; };
 
 protected:
 	// don't do any volume watching and memtamime watching in file panels
@@ -192,7 +193,6 @@ protected:
 
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 	virtual void AddPosesCompleted();
-	virtual bool IsDesktopView() const;
 
 	void ShowVolumes(bool visible, bool showShared);
 

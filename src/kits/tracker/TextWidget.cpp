@@ -447,25 +447,48 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 
 	view->SetActiveTextWidget(this);
 
+	// The initial text color has to be set differently on Desktop
+	rgb_color initialTextColor;
+	if (view->IsDesktopView())
+		initialTextColor = InvertColor(view->HighColor());
+	else
+		initialTextColor = view->HighColor();
+
 	BRect rect(bounds);
 	rect.OffsetBy(view->ViewMode() == kListMode ? -2 : 0, -2);
-	BTextView* textView
-		= new BTextView(rect, "WidgetTextView", rect, be_plain_font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
+	BTextView* textView = new BTextView(rect, "WidgetTextView", rect, be_plain_font,
+		&initialTextColor, B_FOLLOW_ALL, B_WILL_DRAW);
 
 	textView->SetWordWrap(false);
 	textView->SetInsets(2, 2, 2, 2);
 	DisallowMetaKeys(textView);
 	fText->SetupEditing(textView);
 
-	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewKeyDownFilter));
+	if (view->IsDesktopView()) {
+		// force text view colors to be inverse of Desktop text color, white or black
+		rgb_color backColor = view->HighColor();
+		rgb_color textColor = InvertColor(backColor);
+		backColor = tint_color(backColor,
+			view->SelectedVolumeIsReadOnly() ? ReadOnlyTint(backColor) : B_NO_TINT);
+
+		textView->SetViewColor(backColor);
+		textView->SetLowColor(backColor);
+		textView->SetHighColor(textColor);
+	} else {
+		// document colors or tooltip colors on Open with... window
+		textView->SetViewUIColor(view->ViewUIColor());
+		textView->SetLowUIColor(view->LowUIColor());
+		textView->SetHighUIColor(view->HighUIColor());
+	}
 
 	if (view->SelectedVolumeIsReadOnly()) {
-		textView->AdoptSystemColors();
 		textView->MakeEditable(false);
 		textView->MakeSelectable(true);
-	} else {
-		textView->AddFilter(new BMessageFilter(B_PASTE, TextViewPasteFilter));
 	}
+
+	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewKeyDownFilter));
+	if (!view->SelectedVolumeIsReadOnly())
+		textView->AddFilter(new BMessageFilter(B_PASTE, TextViewPasteFilter));
 
 	// get full text length
 	rect.right = rect.left + textView->LineWidth();
@@ -603,7 +626,7 @@ BTextWidget::SelectAll(BPoseView* view)
 
 void
 BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView* drawView,
-	bool selected, uint32 clipboardMode, BPoint offset, bool direct)
+	bool selected, uint32 clipboardMode, BPoint offset)
 {
 	ASSERT(view != NULL);
 	ASSERT(view->Window() != NULL);
@@ -619,28 +642,34 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 	// selection rect is alpha-blended on top. This all happens in
 	// BPose::Draw before and after calling this function.
 
-	if (direct) {
-		// draw selection box if selected
-		if (selected) {
+	bool direct = drawView == view;
+
+	if (selected) {
+		if (direct) {
+			// erase selection rect background
 			drawView->SetDrawingMode(B_OP_COPY);
 			drawView->FillRect(textRect, B_SOLID_LOW);
-		} else
-			drawView->SetDrawingMode(B_OP_OVER);
-
-		// set high color
-		rgb_color highColor;
-		highColor = view->TextColor(selected && view->Window()->IsActive());
-
-		if (clipboardMode == kMoveSelectionTo && !selected) {
-			drawView->SetDrawingMode(B_OP_ALPHA);
-			drawView->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-			highColor.alpha = 64;
 		}
-		drawView->SetHighColor(highColor);
-	} else if (selected && view->Window()->IsActive())
-		drawView->SetHighColor(view->BackColor(true)); // inverse
-	else if (!selected)
-		drawView->SetHighColor(view->TextColor());
+		drawView->SetDrawingMode(B_OP_OVER);
+
+		// High color is set to inverted low, then the whole thing is
+		// inverted again so that the background color "shines through".
+		drawView->SetHighColor(InvertColorSmart(drawView->LowColor()));
+	} else if (clipboardMode == kMoveSelectionTo) {
+		drawView->SetDrawingMode(B_OP_ALPHA);
+		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+		uint8 alpha = 64; // set the level of opacity by value
+		if (view->LowColor().IsLight())
+			drawView->SetHighColor(0, 0, 0, alpha);
+		else
+			drawView->SetHighColor(255, 255, 255, alpha);
+	} else {
+		drawView->SetDrawingMode(B_OP_OVER);
+		if (view->IsDesktopView())
+			drawView->SetHighColor(view->HighColor());
+		else
+			drawView->SetHighUIColor(view->HighUIColor());
+	}
 
 	BPoint location;
 	location.y = textRect.bottom - view->FontInfo().descent + 1;
@@ -663,7 +692,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 		BFont font;
 		drawView->GetFont(&font);
 
-		rgb_color textColor = view->TextColor();
+		rgb_color textColor = drawView->HighColor();
 		if (textColor.IsDark()) {
 			// dark text on light outline
 			rgb_color glowColor = ui_color(B_SHINE_COLOR);
@@ -714,7 +743,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 		// TODO:
 		// this should be exported to the WidgetAttribute class, probably
 		// by having a per widget kind style
-		if (direct) {
+		if (direct && clipboardMode != kMoveSelectionTo) {
 			rgb_color underlineColor = drawView->HighColor();
 			underlineColor.alpha = 180;
 			drawView->SetHighColor(underlineColor);
@@ -725,5 +754,8 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 		textRect.right = textRect.left + fText->Width(view);
 			// only underline text part
 		drawView->StrokeLine(textRect.LeftBottom(), textRect.RightBottom(), B_MIXED_COLORS);
+
+		if (direct && clipboardMode != kMoveSelectionTo)
+			drawView->SetDrawingMode(B_OP_OVER);
 	}
 }

@@ -152,6 +152,27 @@ BQueryPoseView::MessageReceived(BMessage* message)
 
 
 void
+BQueryPoseView::AdoptSystemColors()
+{
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, ReadOnlyTint(B_DOCUMENT_BACKGROUND_COLOR));
+	SetLowUIColor(ViewUIColor());
+	SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
+}
+
+
+bool
+BQueryPoseView::HasSystemColors() const
+{
+	float tint = B_NO_TINT;
+	float readOnlyTint = ReadOnlyTint(B_DOCUMENT_BACKGROUND_COLOR);
+
+	return ViewUIColor(&tint) == B_DOCUMENT_BACKGROUND_COLOR && tint == readOnlyTint
+		&& LowUIColor(&tint) == B_DOCUMENT_BACKGROUND_COLOR && tint == readOnlyTint
+		&& HighUIColor(&tint) == B_DOCUMENT_TEXT_COLOR && tint == B_NO_TINT;
+}
+
+
+void
 BQueryPoseView::EditQueries()
 {
 	BMessage message(kEditQuery);
