@@ -14,7 +14,6 @@
 #include "DiskSystemAddOnManager.h"
 
 
-// constructor
 BDiskSystem::BDiskSystem()
 	:
 	fID(B_NO_INIT),
@@ -23,7 +22,6 @@ BDiskSystem::BDiskSystem()
 }
 
 
-// copy constructor
 BDiskSystem::BDiskSystem(const BDiskSystem& other)
 	:
 	fID(other.fID),
@@ -35,13 +33,11 @@ BDiskSystem::BDiskSystem(const BDiskSystem& other)
 }
 
 
-// destructor
 BDiskSystem::~BDiskSystem()
 {
 }
 
 
-// InitCheck
 status_t
 BDiskSystem::InitCheck() const
 {
@@ -49,7 +45,6 @@ BDiskSystem::InitCheck() const
 }
 
 
-// Name
 const char*
 BDiskSystem::Name() const
 {
@@ -57,7 +52,6 @@ BDiskSystem::Name() const
 }
 
 
-// ShortName
 const char*
 BDiskSystem::ShortName() const
 {
@@ -65,7 +59,6 @@ BDiskSystem::ShortName() const
 }
 
 
-// PrettyName
 const char*
 BDiskSystem::PrettyName() const
 {
@@ -73,7 +66,6 @@ BDiskSystem::PrettyName() const
 }
 
 
-// SupportsDefragmenting
 bool
 BDiskSystem::SupportsDefragmenting(bool* whileMounted) const
 {
@@ -93,7 +85,6 @@ BDiskSystem::SupportsDefragmenting(bool* whileMounted) const
 }
 
 
-// SupportsRepairing
 bool
 BDiskSystem::SupportsRepairing(bool checkOnly, bool* whileMounted) const
 {
@@ -118,7 +109,6 @@ BDiskSystem::SupportsRepairing(bool checkOnly, bool* whileMounted) const
 }
 
 
-// SupportsResizing
 bool
 BDiskSystem::SupportsResizing(bool* whileMounted) const
 {
@@ -138,7 +128,6 @@ BDiskSystem::SupportsResizing(bool* whileMounted) const
 }
 
 
-// SupportsResizingChild
 bool
 BDiskSystem::SupportsResizingChild() const
 {
@@ -147,7 +136,6 @@ BDiskSystem::SupportsResizingChild() const
 }
 
 
-// SupportsMoving
 bool
 BDiskSystem::SupportsMoving(bool* whileMounted) const
 {
@@ -167,7 +155,6 @@ BDiskSystem::SupportsMoving(bool* whileMounted) const
 }
 
 
-// SupportsMovingChild
 bool
 BDiskSystem::SupportsMovingChild() const
 {
@@ -176,7 +163,6 @@ BDiskSystem::SupportsMovingChild() const
 }
 
 
-// SupportsName
 bool
 BDiskSystem::SupportsName() const
 {
@@ -185,7 +171,6 @@ BDiskSystem::SupportsName() const
 }
 
 
-// SupportsContentName
 bool
 BDiskSystem::SupportsContentName() const
 {
@@ -194,7 +179,6 @@ BDiskSystem::SupportsContentName() const
 }
 
 
-// SupportsSettingName
 bool
 BDiskSystem::SupportsSettingName() const
 {
@@ -203,7 +187,6 @@ BDiskSystem::SupportsSettingName() const
 }
 
 
-// SupportsSettingContentName
 bool
 BDiskSystem::SupportsSettingContentName(bool* whileMounted) const
 {
@@ -224,7 +207,6 @@ BDiskSystem::SupportsSettingContentName(bool* whileMounted) const
 }
 
 
-// SupportsSettingType
 bool
 BDiskSystem::SupportsSettingType() const
 {
@@ -233,7 +215,6 @@ BDiskSystem::SupportsSettingType() const
 }
 
 
-// SupportsSettingParameters
 bool
 BDiskSystem::SupportsSettingParameters() const
 {
@@ -242,7 +223,6 @@ BDiskSystem::SupportsSettingParameters() const
 }
 
 
-// SupportsSettingContentParameters
 bool
 BDiskSystem::SupportsSettingContentParameters(bool* whileMounted) const
 {
@@ -263,7 +243,6 @@ BDiskSystem::SupportsSettingContentParameters(bool* whileMounted) const
 }
 
 
-// SupportsCreatingChild
 bool
 BDiskSystem::SupportsCreatingChild() const
 {
@@ -272,7 +251,6 @@ BDiskSystem::SupportsCreatingChild() const
 }
 
 
-// SupportsDeletingChild
 bool
 BDiskSystem::SupportsDeletingChild() const
 {
@@ -281,7 +259,6 @@ BDiskSystem::SupportsDeletingChild() const
 }
 
 
-// SupportsInitializing
 bool
 BDiskSystem::SupportsInitializing() const
 {
@@ -301,7 +278,6 @@ BDiskSystem::SupportsWriting() const
 }
 
 
-// GetTypeForContentType
 status_t
 BDiskSystem::GetTypeForContentType(const char* contentType, BString* type) const
 {
@@ -311,7 +287,6 @@ BDiskSystem::GetTypeForContentType(const char* contentType, BString* type) const
 	if (!contentType || !type || !IsPartitioningSystem())
 		return B_BAD_VALUE;
 
-	// get the disk system add-on
 	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
 	BDiskSystemAddOn* addOn = manager->GetAddOn(fName.String());
 	if (!addOn)
@@ -319,14 +294,12 @@ BDiskSystem::GetTypeForContentType(const char* contentType, BString* type) const
 
 	status_t result = addOn->GetTypeForContentType(contentType, type);
 
-	// put the add-on
 	manager->PutAddOn(addOn);
 
 	return result;
 }
 
 
-// IsPartitioningSystem
 bool
 BDiskSystem::IsPartitioningSystem() const
 {
@@ -334,7 +307,6 @@ BDiskSystem::IsPartitioningSystem() const
 }
 
 
-// IsFileSystem
 bool
 BDiskSystem::IsFileSystem() const
 {
@@ -342,7 +314,6 @@ BDiskSystem::IsFileSystem() const
 }
 
 
-// =
 BDiskSystem&
 BDiskSystem::operator=(const BDiskSystem& other)
 {
@@ -356,7 +327,6 @@ BDiskSystem::operator=(const BDiskSystem& other)
 }
 
 
-// _SetTo
 status_t
 BDiskSystem::_SetTo(disk_system_id id)
 {
@@ -374,7 +344,6 @@ BDiskSystem::_SetTo(disk_system_id id)
 }
 
 
-// _SetTo
 status_t
 BDiskSystem::_SetTo(const user_disk_system_info* info)
 {
@@ -393,7 +362,6 @@ BDiskSystem::_SetTo(const user_disk_system_info* info)
 }
 
 
-// _Unset
 void
 BDiskSystem::_Unset()
 {
