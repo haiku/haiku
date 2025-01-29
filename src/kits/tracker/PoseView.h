@@ -79,6 +79,10 @@ const uint32 kListMode = 'Tlst';
 
 const uint32 kCheckTypeahead = 'Tcty';
 
+const uint32 kMsgMouseDragged = 'Mdrg';
+const uint32 kMsgMouseLongDown = 'Mold';
+
+
 class BPoseView : public BView {
 public:
 	BPoseView(Model*, uint32 viewMode);

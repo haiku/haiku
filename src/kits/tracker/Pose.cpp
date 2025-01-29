@@ -569,6 +569,9 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 		fBackgroundClean = false;
 
 	bool direct = drawView == poseView;
+	bool dragging = false;
+	if (poseView->Window()->CurrentMessage() != NULL)
+		dragging = poseView->Window()->CurrentMessage()->what == kMsgMouseDragged;
 	bool windowActive = poseView->Window()->IsActive();
 	bool showSelectionWhenInactive = poseView->ShowSelectionWhenInactive();
 	bool drawIconUnselected = !windowActive && !showSelectionWhenInactive;
@@ -625,8 +628,8 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 				if (columnRect.Intersects(updateRect)) {
 					BRect widgetRect(widget->CalcRect(rect.LeftTop(), column, poseView));
 
-					// draw all columns after the first one unselected
-					if (index > 0)
+					// draw dragged text and all columns after the first one unselected
+					if (dragging || index > 0)
 						selected = false;
 
 					// draw text
@@ -648,6 +651,10 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 		if (widget != NULL && widget->IsVisible()) {
 			BRect widgetRect(widget->CalcRect(location, NULL, poseView));
 			if (widgetRect.Intersects(updateRect)) {
+				// draw dragged text unselected
+				if (dragging)
+					selected = false;
+
 				// draw text
 				DrawTextWidget(widgetRect, widgetRect, column->Width(), widget, poseView, drawView,
 					selected, fClipboardMode, offset);
@@ -788,8 +795,7 @@ BPose::WidgetFor(uint32 attr, int32* index) const
 
 
 BTextWidget*
-BPose::WidgetFor(BColumn* column, BPoseView* poseView,
-	ModelNodeLazyOpener &opener, int32* index)
+BPose::WidgetFor(BColumn* column, BPoseView* poseView, ModelNodeLazyOpener& opener, int32* index)
 {
 	if (column == NULL)
 		return NULL;

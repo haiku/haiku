@@ -109,8 +109,6 @@ const float kDoubleClickTresh = 6;
 const uint32 kAddNewPoses = 'Tanp';
 const uint32 kAddPosesCompleted = 'Tapc';
 const int32 kMaxAddPosesChunk = 50;
-const uint32 kMsgMouseDragged = 'Mdrg';
-const uint32 kMsgMouseLongDown = 'Mold';
 
 const int32 kRoomForLine = 2;
 
@@ -9551,8 +9549,7 @@ BPoseView::ResizeColumnToWidest(BColumn* column)
 
 
 BPoint
-BPoseView::ResizeColumn(BColumn* column, float newSize,
-	float* lastLineDrawPos,
+BPoseView::ResizeColumn(BColumn* column, float newSize, float* lastLineDrawPos,
 	void (*drawLineFunc)(BPoseView*, BPoint, BPoint),
 	void (*undrawLineFunc)(BPoseView*, BPoint, BPoint))
 {

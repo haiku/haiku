@@ -643,32 +643,38 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 	// BPose::Draw before and after calling this function.
 
 	bool direct = drawView == view;
+	bool dragging = false;
+	if (view->Window()->CurrentMessage() != NULL)
+		dragging = view->Window()->CurrentMessage()->what == kMsgMouseDragged;
 
-	if (selected) {
-		if (direct) {
-			// erase selection rect background
-			drawView->SetDrawingMode(B_OP_COPY);
-			drawView->FillRect(textRect, B_SOLID_LOW);
+	if (!dragging) {
+		if (selected) {
+			if (direct) {
+				// erase selection rect background
+				drawView->SetDrawingMode(B_OP_COPY);
+				drawView->FillRect(textRect, B_SOLID_LOW);
+			}
+			drawView->SetDrawingMode(B_OP_OVER);
+
+			// High color is set to inverted low, then the whole thing is
+			// inverted again so that the background color "shines through".
+			drawView->SetHighColor(InvertColorSmart(drawView->LowColor()));
+		} else if (clipboardMode == kMoveSelectionTo) {
+			drawView->SetDrawingMode(B_OP_ALPHA);
+			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+			uint8 alpha = 64; // set the level of opacity by value
+			if (view->LowColor().IsLight())
+				drawView->SetHighColor(0, 0, 0, alpha);
+			else
+				drawView->SetHighColor(255, 255, 255, alpha);
+		} else {
+			drawView->SetDrawingMode(B_OP_OVER);
+			if (view->IsDesktopView())
+				drawView->SetHighColor(view->HighColor());
+			else
+				drawView->SetHighUIColor(view->HighUIColor());
 		}
 		drawView->SetDrawingMode(B_OP_OVER);
-
-		// High color is set to inverted low, then the whole thing is
-		// inverted again so that the background color "shines through".
-		drawView->SetHighColor(InvertColorSmart(drawView->LowColor()));
-	} else if (clipboardMode == kMoveSelectionTo) {
-		drawView->SetDrawingMode(B_OP_ALPHA);
-		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-		uint8 alpha = 64; // set the level of opacity by value
-		if (view->LowColor().IsLight())
-			drawView->SetHighColor(0, 0, 0, alpha);
-		else
-			drawView->SetHighColor(255, 255, 255, alpha);
-	} else {
-		drawView->SetDrawingMode(B_OP_OVER);
-		if (view->IsDesktopView())
-			drawView->SetHighColor(view->HighColor());
-		else
-			drawView->SetHighUIColor(view->HighUIColor());
 	}
 
 	BPoint location;
@@ -677,17 +683,16 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 
 	const char* fittingText = fText->FittingText(view);
 
-	// TODO: Comparing view and drawView here to avoid rendering
-	// the text outline when producing a drag bitmap. The check is
-	// not fully correct, since an offscreen view is also used in some
-	// other rare cases (something to do with columns). But for now, this
-	// fixes the broken drag bitmaps when dragging icons from the Desktop.
-	if (direct && !selected && view->WidgetTextOutline()) {
+	// Draw text outline unless selected or column resizing.
+	// The direct parameter is false when dragging or column resizing.
+	if (!selected && (direct || dragging) && view->WidgetTextOutline()) {
 		// draw a halo around the text by using the "false bold"
 		// feature for text rendering. Either black or white is used for
 		// the glow (whatever acts as contrast) with a some alpha value,
-		drawView->SetDrawingMode(B_OP_ALPHA);
-		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		if (direct && clipboardMode != kMoveSelectionTo) {
+			drawView->SetDrawingMode(B_OP_ALPHA);
+			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		}
 
 		BFont font;
 		drawView->GetFont(&font);
@@ -733,8 +738,10 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 			drawView->DrawString(fittingText, location + BPoint(1, 1));
 		}
 
-		drawView->SetDrawingMode(B_OP_OVER);
-		drawView->SetHighColor(textColor);
+		if (direct && clipboardMode != kMoveSelectionTo) {
+			drawView->SetDrawingMode(B_OP_OVER);
+			drawView->SetHighColor(textColor);
+		}
 	}
 
 	drawView->DrawString(fittingText, location);
@@ -746,9 +753,10 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 		if (direct && clipboardMode != kMoveSelectionTo) {
 			rgb_color underlineColor = drawView->HighColor();
 			underlineColor.alpha = 180;
-			drawView->SetHighColor(underlineColor);
+
 			drawView->SetDrawingMode(B_OP_ALPHA);
 			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+			drawView->SetHighColor(underlineColor);
 		}
 
 		textRect.right = textRect.left + fText->Width(view);

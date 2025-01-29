@@ -180,11 +180,12 @@ BTextWidget::SetActive(bool on)
 
 
 inline void
-BTextWidget::Draw(BRect widgetRect, BRect widgetTextRect, float width,
-	BPoseView* view, bool selected, uint32 clipboardMode)
+BTextWidget::Draw(BRect widgetRect, BRect widgetTextRect, float width, BPoseView* view,
+	bool selected, uint32 clipboardMode)
 {
 	Draw(widgetRect, widgetTextRect, width, view, (BView*)view, selected, clipboardMode, B_ORIGIN);
 }
+
 
 } // namespace BPrivate
 
