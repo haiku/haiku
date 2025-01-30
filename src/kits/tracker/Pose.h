@@ -133,8 +133,8 @@ private:
 	void EditPreviousNextWidgetCommon(BPoseView* poseView, bool next);
 	void CreateWidgets(BPoseView*);
 
-			BRect				_IconRect(const BPoseView* poseView,
-									BPoint location) const;
+	BRect _ListIconRect(const BPoseView* poseView, BPoint location) const;
+	BRect _IconRect(const BPoseView* poseView, BPoint location) const;
 
 	Model* fModel;
 	BObjectList<BTextWidget> fWidgetList;

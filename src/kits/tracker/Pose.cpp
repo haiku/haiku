@@ -479,43 +479,18 @@ BPose::EditPreviousWidget(BPoseView* poseView)
 bool
 BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 {
+	ASSERT(poseView != NULL);
 	ASSERT(poseView->ViewMode() != kListMode);
 
 	BPoint location = Location(poseView);
+	BRect rect = _IconRect(poseView, location);
 
-	if (poseView->ViewMode() == kIconMode) {
-		// check icon rect, then actual icon pixel
-		BRect rect(location, location);
-		rect.right += poseView->IconSizeInt() - 1;
-		rect.bottom += poseView->IconSizeInt() - 1;
-
-		if (rect.Contains(where)) {
-			return IconCache::sIconCache->IconHitTest(where - location,
-				ResolvedModel(), kNormalIcon, poseView->IconSize());
-		}
-
-		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-		if (widget) {
-			float textWidth = ceilf(widget->TextWidth(poseView) + 1);
-			rect.left += (poseView->IconSizeInt() - textWidth) / 2;
-			rect.right = rect.left + textWidth;
-		}
-
-		rect.top = location.y + poseView->IconSizeInt();
-		rect.bottom = rect.top + ActualFontHeight(poseView);
-
-		return rect.Contains(where);
+	if (rect.Contains(where)) {
+		return IconCache::sIconCache->IconHitTest(where - location, ResolvedModel(), kNormalIcon,
+			poseView->IconSize());
 	}
 
-	// MINI_ICON_MODE rect calc
-	BRect rect(location, location);
-	rect.right += B_MINI_ICON + kMiniIconSeparator;
-	rect.bottom += poseView->IconPoseHeight();
-	BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-	if (widget != NULL)
-		rect.right += ceil(widget->TextWidth(poseView) + 1);
-
-	return rect.Contains(where);
+	return CalcRect(poseView).Contains(where);
 }
 
 
@@ -530,7 +505,7 @@ BPose::PointInPose(BPoint poseLoc, const BPoseView* poseView, BPoint where,
 		*hitWidget = NULL;
 
 	// check intersection with icon
-	BRect rect = _IconRect(poseView, where);
+	BRect rect = _ListIconRect(poseView, where);
 	if (rect.Contains(where))
 		return true;
 
@@ -607,7 +582,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 
 	if (poseView->ViewMode() == kListMode) {
 		// draw in list mode
-		BRect iconRect = _IconRect(poseView, rect.LeftTop());
+		BRect iconRect = _ListIconRect(poseView, rect.LeftTop());
 		if (updateRect.Intersects(iconRect)) {
 			iconRect.OffsetBy(offset);
 			DrawIcon(iconRect.LeftTop(), drawView, poseView->IconSize(), drawIconUnselected);
@@ -940,38 +915,50 @@ BPose::CalcRect(BPoint loc, const BPoseView* poseView, bool minimalRect) const
 BRect
 BPose::CalcRect(const BPoseView* poseView) const
 {
+	ASSERT(poseView != NULL);
 	ASSERT(poseView->ViewMode() != kListMode);
 
-	BRect rect;
+	BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 	BPoint location = Location(poseView);
-	if (poseView->ViewMode() == kIconMode) {
-		rect.left = location.x;
-		rect.right = rect.left + poseView->IconSizeInt();
+	BRect rect(_IconRect(poseView, location));
 
-		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
+	if (poseView->ViewMode() == kIconMode) {
+		// icon mode
 		if (widget != NULL) {
-			float textWidth = ceilf(widget->TextWidth(poseView) + 1);
-			if (textWidth > poseView->IconSizeInt()) {
-				rect.left += (poseView->IconSizeInt() - textWidth) / 2;
+			float textWidth = widget->TextWidth(poseView);
+			if (textWidth > rect.Width()) {
+				rect.left += roundf((rect.Width() - textWidth) / 2);
 				rect.right = rect.left + textWidth;
 			}
 		}
 
-		rect.top = location.y;
-		rect.bottom = rect.top + poseView->IconPoseHeight();
+		rect.bottom = rect.top + ceilf(poseView->IconPoseHeight());
 	} else {
-		// MINI_ICON_MODE rect calc
-		rect.left = location.x;
-		rect.right = rect.left + B_MINI_ICON + kMiniIconSeparator;
-
-		// big font sizes can push top above icon location top
-		rect.bottom = location.y
-			+ roundf((B_MINI_ICON + ActualFontHeight(poseView)) / 2) + 1;
-		rect.top = rect.bottom - floorf(ActualFontHeight(poseView));
-		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
+		// mini icon mode
 		if (widget != NULL)
-			rect.right += ceil(widget->TextWidth(poseView) + 1);
+			rect.right += kMiniIconSeparator + widget->TextWidth(poseView);
+
+		float iconSize = (float)poseView->IconSizeInt();
+		float fontHeight = ActualFontHeight(poseView);
+		rect.bottom = rect.top + roundf((iconSize + fontHeight) / 2);
 	}
+
+	return rect;
+}
+
+
+BRect
+BPose::_ListIconRect(const BPoseView* poseView, BPoint location) const
+{
+	ASSERT(poseView != NULL);
+
+	BRect rect;
+	uint32 iconSize = poseView->IconSizeInt();
+
+	rect.left = location.x + poseView->ListOffset();
+	rect.right = rect.left + iconSize;
+	rect.top = location.y + roundf((poseView->ListElemHeight() - iconSize) / 2);
+	rect.bottom = rect.top + iconSize;
 
 	return rect;
 }
@@ -980,12 +967,16 @@ BPose::CalcRect(const BPoseView* poseView) const
 BRect
 BPose::_IconRect(const BPoseView* poseView, BPoint location) const
 {
-	uint32 size = poseView->IconSizeInt();
+	ASSERT(poseView != NULL);
+
 	BRect rect;
-	rect.left = location.x + poseView->ListOffset();
-	rect.right = rect.left + size;
-	rect.top = location.y + (poseView->ListElemHeight() - size) / 2.f;
-	rect.bottom = rect.top + size;
+	uint32 iconSize = poseView->IconSizeInt();
+
+	rect.left = location.x;
+	rect.right = rect.left + iconSize;
+	rect.top = location.y;
+	rect.bottom = rect.top + iconSize;
+
 	return rect;
 }
 
