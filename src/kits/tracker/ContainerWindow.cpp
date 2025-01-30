@@ -2173,9 +2173,22 @@ BContainerWindow::SetupMountMenu(BMenu* parent, MenuContext context, const entry
 	if (!(model.IsDesktop() || model.IsRoot() || model.IsVolume()))
 		return;
 
-	// insert menu at the last position, add-ons gets added after
-	// (lower down on Desktop window context menu)
+	// Insert "Mount >" menu after "Select all" on Desktop,
+	// or after "Edit name" on volume/root menu.
+	// Add-ons and custom Tracker add-ons gets added after this.
 	int32 mountIndex = parent->CountItems() - 1;
+		// fall back to last item in the menu if all else fails
+	if (model.IsDesktop()) {
+		BMenuItem* selectAll = parent->FindItem(B_SELECT_ALL);
+		if (selectAll != NULL)
+			mountIndex = parent->IndexOf(selectAll) + 2;
+				// skip separator
+	} else if (model.IsRoot() || model.IsVolume()) {
+		BMenuItem* editName = parent->FindItem(kEditName);
+		if (editName != NULL)
+			mountIndex = parent->IndexOf(editName) + 2;
+				// skip separator
+	}
 
 	delete fMountItem;
 	fMountItem = Shortcuts()->MountItem(new MountMenu(Shortcuts()->MountLabel()));
