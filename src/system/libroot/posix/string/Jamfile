@@ -20,12 +20,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			bcmp.c
 			bcopy.c
 			bzero.c
-			memccpy.c
 			memchr.c
 			memcmp.c
-			memmem.c
 			memmove.c
-			stpcpy.c
 			strcasecmp.c
 			strcasestr.c
 			strcat.c
@@ -44,10 +41,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			strncpy.cpp
 			strndup.cpp
 			strnlen.cpp
-			strpbrk.c
 			strrchr.c
-			strspn.c
-			strstr.c
 			strtok.c
 			strupr.c
 			strxfrm.cpp

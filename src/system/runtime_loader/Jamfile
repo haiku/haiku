@@ -54,6 +54,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			<src!system!libroot!posix!musl!string!$(architecture)>strchrnul.o
 			<src!system!libroot!posix!musl!string!$(architecture)>strcspn.o
+			<src!system!libroot!posix!musl!string!$(architecture)>strpbrk.o
+			<src!system!libroot!posix!musl!string!$(architecture)>strspn.o
+			<src!system!libroot!posix!musl!string!$(architecture)>strstr.o
 
 			<src!system!libroot!posix!string!$(architecture)>memchr.o
 			<src!system!libroot!posix!string!$(architecture)>memcmp.o
@@ -70,10 +73,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			<src!system!libroot!posix!string!$(architecture)>strlen.o
 			<src!system!libroot!posix!string!$(architecture)>strncmp.o
 			<src!system!libroot!posix!string!$(architecture)>strnlen.o
-			<src!system!libroot!posix!string!$(architecture)>strpbrk.o
 			<src!system!libroot!posix!string!$(architecture)>strrchr.o
-			<src!system!libroot!posix!string!$(architecture)>strspn.o
-			<src!system!libroot!posix!string!$(architecture)>strstr.o
 		;
 
 		SEARCH on [ FGristFiles kernel_cpp.cpp ]

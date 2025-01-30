@@ -9,10 +9,16 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		MergeObject <$(architecture)>posix_musl_string.o :
+			memccpy.c
+			memmem.c
 			memrchr.c
+			stpcpy.c
 			stpncpy.c
 			strchrnul.c
 			strcspn.c
+			strpbrk.c
+			strspn.c
+			strstr.c
 			swab.c
 			;
 	}

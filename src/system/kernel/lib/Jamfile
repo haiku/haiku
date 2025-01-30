@@ -52,8 +52,13 @@ local muslSources =
 	rand.c
 	rand_r.c
 
+	memmem.c
+	stpcpy.c
 	strchrnul.c
 	strcspn.c
+	strpbrk.c
+	strspn.c
+	strstr.c
 	;
 
 SourceHdrs $(muslSources) :
@@ -117,7 +122,6 @@ KernelMergeObject kernel_lib_posix.o :
 	# string
 	memchr.c
 	memcmp.c
-	memmem.c
 	memmove.c
 	strcasecmp.c
 	strcasestr.c
@@ -135,13 +139,9 @@ KernelMergeObject kernel_lib_posix.o :
 	strncpy.cpp
 	strndup.cpp
 	strnlen.cpp
-	strpbrk.c
 	strrchr.c
-	strspn.c
-	strstr.c
 	strtok.c
 	strupr.c
-	stpcpy.c
 
 	$(muslSources)
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
