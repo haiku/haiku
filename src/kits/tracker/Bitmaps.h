@@ -78,12 +78,12 @@ public:
 		// this is a wrapper around LoadResource(), for retrieving
 		// the vector icon data
 
- 	status_t GetBitmapResource(type_code type, int32 id, BBitmap** out) const;
- 		// this is a wrapper around LoadResource(), for retrieving
- 		// arbitrary bitmaps.  the resource with the given type and
- 		// id is looked up, and a BBitmap created from it and returned
- 		// in <out>.  currently it can only create bitmaps from data
- 		// that is an archived bitmap object.
+	status_t GetBitmapResource(type_code type, int32 id, BBitmap** out) const;
+		// this is a wrapper around LoadResource(), for retrieving
+		// arbitrary bitmaps.  the resource with the given type and
+		// id is looked up, and a BBitmap created from it and returned
+		// in <out>.  currently it can only create bitmaps from data
+		// that is an archived bitmap object.
 
 private:
 	image_id find_image(void* memAddr) const;

@@ -125,8 +125,7 @@ public:
 	uint32 ViewMode() const;
 
 	// re-use the pose view for a new directory
- 	virtual void SwitchDir(const entry_ref*,
- 		AttributeStreamNode* node = NULL);
+	virtual void SwitchDir(const entry_ref*, AttributeStreamNode* node = NULL);
 
 	// in the rare cases where a pose view needs to be explicitly
 	// refreshed (for instance in a query window with a dynamic
@@ -471,15 +470,13 @@ protected:
 	BPose* EntryCreated(const node_ref*, const node_ref*, const char*,
 		int32* index = 0);
 
-	void AddPoseToList(PoseList* list, bool visibleList,
-		bool insertionSort, BPose* pose, BRect&viewBounds,
-		float& listViewScrollBy, bool forceDraw, int32* indexPtr = NULL);
-	BPose* CreatePose(Model*, PoseInfo*, bool insertionSort = true,
-		int32* index = 0, BRect* boundsPointer = 0, bool forceDraw = true);
-	virtual void CreatePoses(Model**models, PoseInfo* poseInfoArray,
-		int32 count, BPose** resultingPoses, bool insertionSort = true,
-		int32* lastPoseIndexPointer = 0, BRect* boundsPointer = 0,
-		bool forceDraw = false);
+	void AddPoseToList(PoseList* list, bool visibleList, bool insertionSort, BPose* pose,
+		BRect& viewBounds, float& listViewScrollBy, bool forceDraw, int32* indexPtr = NULL);
+	BPose* CreatePose(Model*, PoseInfo*, bool insertionSort = true, int32* index = NULL,
+		BRect* boundsPointer = NULL, bool forceDraw = true);
+	virtual void CreatePoses(Model**models, PoseInfo* poseInfoArray, int32 count,
+		BPose** resultingPoses, bool insertionSort = true, int32* lastPoseIndexPointer = 0,
+		BRect* boundsPointer = 0, bool forceDraw = false);
 	virtual bool ShouldShowPose(const Model*, const PoseInfo*);
 		// filter, subclasses override to control which poses show up
 		// subclasses should always call inherited
@@ -505,16 +502,13 @@ protected:
 	virtual void RemoveRootPoses();
 	virtual void AddTrashPoses();
 
-	virtual bool DeletePose(const node_ref*, BPose* pose = NULL,
-		int32 index = 0);
-	virtual void DeleteSymLinkPoseTarget(const node_ref* itemNode,
-		BPose* pose, int32 index);
+	virtual bool DeletePose(const node_ref*, BPose* pose = NULL, int32 index = 0);
+	virtual void DeleteSymLinkPoseTarget(const node_ref* itemNode, BPose* pose, int32 index);
 		// the pose itself wasn't deleted but it's target node was - the
 		// pose must be a symlink
-	static void PoseHandleDeviceUnmounted(BPose* pose, Model* model,
-		int32 index, BPoseView* poseView, dev_t device);
-	static void RemoveNonBootDesktopModels(BPose*, Model* model, int32,
-		BPoseView* poseView, dev_t);
+	static void PoseHandleDeviceUnmounted(BPose* pose, Model* model, int32 index,
+		BPoseView* poseView, dev_t device);
+	static void RemoveNonBootDesktopModels(BPose*, Model* model, int32, BPoseView*, dev_t);
 
 	// pose placement
 	void CheckAutoPlacedPoses();
@@ -535,19 +529,15 @@ protected:
 	BPose* ConvertZombieToPose(Model* zombie, int32 index);
 
 	// pose handling
-	BRect CalcPoseRect(const BPose*, int32 index,
-		bool firstColumnOnly = false) const;
+	BRect CalcPoseRect(const BPose*, int32 index, bool firstColumnOnly = false) const;
 	BRect CalcPoseRectIcon(const BPose*) const;
-	BRect CalcPoseRectList(const BPose*, int32 index,
-		bool firstColumnOnly = false) const;
+	BRect CalcPoseRectList(const BPose*, int32 index, bool firstColumnOnly = false) const;
 	void DrawPose(BPose*, int32 index, bool fullDraw = true);
 	void DrawViewCommon(const BRect&updateRect);
 
 	// pose list handling
-	int32 BSearchList(PoseList* poseList, const BPose*, int32* index,
-		int32 oldIndex);
-	void InsertPoseAfter(BPose* pose, int32* index, int32 orientation,
-		BRect* invalidRect);
+	int32 BSearchList(PoseList* poseList, const BPose*, int32* index, int32 oldIndex);
+	void InsertPoseAfter(BPose* pose, int32* index, int32 orientation, BRect* invalidRect);
 		// does a CopyBits to scroll poses making room for a new pose,
 		// returns rectangle that needs invalidating
 	void CloseGapInList(BRect* invalidRect);
@@ -575,31 +565,26 @@ protected:
 
 	// drag&drop handling
 	static bool EachItemInDraggedSelection(const BMessage* message,
-		bool (*)(BPose*, BPoseView*, void*), BPoseView* poseView,
-		void* = NULL);
+		bool (*)(BPose*, BPoseView*, void*), BPoseView* poseView, void* = NULL);
 		// iterates through each pose in current selectiond in the source
 		// window of the current drag message; locks the window
 		// add const version
-	BRect GetDragRect(int32 clickedPoseIndex);
-	BBitmap* MakeDragBitmap(BRect dragRect, BPoint clickedPoint,
-		int32 clickedPoseIndex, BPoint&offset);
-	static bool FindDragNDropAction(const BMessage* dragMessage,
-		bool&canCopy, bool&canMove, bool&canLink, bool&canErase);
+	BRect GetDragRect(int32 poseIndex);
+	BBitmap* MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 poseIndex, BPoint& offset);
+	static bool FindDragNDropAction(const BMessage* dragMessage, bool& canCopy, bool& canMove,
+		bool& canLink, bool& canErase);
 
 	static bool CanTrashForeignDrag(const Model*);
 	static bool CanCopyOrMoveForeignDrag(const Model*, const BMessage*);
-	static bool DragSelectionContains(const BPose* target,
-		const BMessage* dragMessage);
-	static status_t CreateClippingFile(BPoseView* poseView, BFile&result,
-		char* resultingName, BDirectory* directory, BMessage* message,
-		const char* fallbackName, bool setLocation = false,
-		BPoint dropPoint = BPoint(0, 0));
+	static bool DragSelectionContains(const BPose* target, const BMessage* dragMessage);
+	static status_t CreateClippingFile(BPoseView* poseView, BFile&result, char* resultingName,
+		BDirectory* directory, BMessage* message, const char* fallbackName,
+		bool setLocation = false, BPoint dropPoint = B_ORIGIN);
 
 	// opening files, lanunching
 	void OpenSelectionCommon(BPose*, int32*, bool);
 		// used by OpenSelection and OpenSelectionUsing
-	static void LaunchAppWithSelection(Model*, const BMessage*,
-		bool checkTypes = true);
+	static void LaunchAppWithSelection(Model*, const BMessage*, bool checkTypes = true);
 
 	// node monitoring calls
 	virtual bool EntryMoved(const BMessage*);
@@ -608,14 +593,12 @@ protected:
 	virtual void MetaMimeChanged(const char*, const char*);
 
 	// click handling
-	bool WasDoubleClick(const BPose*, BPoint point, int32 buttons);
-	bool WasClickInPath(const BPose*, int32 index,
-		BPoint mouseLocation) const;
+	bool WasDoubleClick(const BPose*, BPoint where, int32 buttons);
+	bool WasClickInPath(const BPose*, int32 index, BPoint where) const;
 
 	// selection
 	void SelectPoses(BRect, BList**);
-	void AddRemoveSelectionRange(BPoint where, bool extendSelection,
-		BPose* pose);
+	void AddRemoveSelectionRange(BPoint where, bool extendSelection, BPose* pose);
 
 	void _BeginSelectionRect(const BPoint& point, bool extendSelection);
 	void _UpdateSelectionRect(const BPoint& point);

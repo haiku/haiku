@@ -659,7 +659,7 @@ DraggableIcon::MouseDown(BPoint point)
 	view->FillRect(view->Bounds());
 	view->SetDrawingMode(B_OP_ALPHA);
 	view->SetHighColor(0, 0, 0, 128);
-		// set the level of transparency by value
+		// set the level of opacity by value
 	view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 	view->DrawBitmap(fBitmap);
 	view->Sync();

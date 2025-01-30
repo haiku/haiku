@@ -567,7 +567,7 @@ TFilePanel::SwitchDirectory(const entry_ref* ref)
 	fDirMenu->Populate(&entry, 0, true, true, false, true);
 
 	ModelMenuItem* item = dynamic_cast<ModelMenuItem*>(fDirMenuField->MenuBar()->ItemAt(0));
-	ASSERT(item);
+	ASSERT(item != NULL);
 
 	// set dir menu to the new directory
 	item->SetEntry(&entry);

@@ -385,7 +385,7 @@ RecentsMenu::StartBuildingItemList()
 	int32 count = CountItems()-1;
 	for (int32 index = count; index >= 0; index--) {
 		BMenuItem* item = ItemAt(index);
-		ASSERT(item);
+		ASSERT(item != NULL);
 
 		RemoveItem(index);
 		delete item;

@@ -320,12 +320,10 @@ BTitleView::MouseDown(BPoint where)
 
 	if (resizedTitle) {
 		bool force = static_cast<bool>(buttons & B_TERTIARY_MOUSE_BUTTON);
-		if (force || buttons & B_PRIMARY_MOUSE_BUTTON) {
+		if (force || (buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
 			if (force || fPreviouslyClickedColumnTitle != 0) {
-				if (force || system_time() - fPreviousLeftClickTime
-						< doubleClickSpeed) {
-					if (fPoseView->
-							ResizeColumnToWidest(resizedTitle->Column())) {
+				if (force || system_time() - fPreviousLeftClickTime < doubleClickSpeed) {
+					if (fPoseView->ResizeColumnToWidest(resizedTitle->Column())) {
 						Invalidate();
 						return;
 					}
@@ -337,8 +335,7 @@ BTitleView::MouseDown(BPoint where)
 	} else if (!title)
 		return;
 
-	SetMouseEventMask(B_POINTER_EVENTS,
-		B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
+	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
 
 	// track the mouse
 	if (resizedTitle) {
@@ -642,8 +639,7 @@ ColumnResizeState::Moved(BPoint where, uint32)
 	//bool shrink = (newWidth < fTitle->fColumn->Width());
 
 	// resize the column
-	poseView->ResizeColumn(fTitle->fColumn, newWidth, &fLastLineDrawPos,
-		_DrawLine, _UndrawLine);
+	poseView->ResizeColumn(fTitle->fColumn, newWidth, &fLastLineDrawPos, _DrawLine, _UndrawLine);
 
 	BRect bounds(fTitleView->Bounds());
 	bounds.left = fTitle->fColumn->Offset();
@@ -679,8 +675,7 @@ ColumnResizeState::DrawLine()
 	fLastLineDrawPos = poseViewBounds.left;
 
 	// draw the line in the new location
-	_DrawLine(poseView, poseViewBounds.LeftTop(),
-		poseViewBounds.LeftBottom());
+	_DrawLine(poseView, poseViewBounds.LeftTop(), poseViewBounds.LeftBottom());
 }
 
 
@@ -693,8 +688,7 @@ ColumnResizeState::UndrawLine()
 	BRect poseViewBounds(fTitleView->PoseView()->Bounds());
 	poseViewBounds.left = fLastLineDrawPos;
 
-	_UndrawLine(fTitleView->PoseView(), poseViewBounds.LeftTop(),
-		poseViewBounds.LeftBottom());
+	_UndrawLine(fTitleView->PoseView(), poseViewBounds.LeftTop(), poseViewBounds.LeftBottom());
 }
 
 
@@ -725,12 +719,10 @@ ColumnDragState::Moved(BPoint where, uint32)
 	// figure out where we are with the mouse
 	BRect titleBounds(fTitleView->Bounds());
 	bool overTitleView = titleBounds.Contains(where);
-	BColumnTitle* overTitle = overTitleView
-		? fTitleView->FindColumnTitle(where) : 0;
+	BColumnTitle* overTitle = overTitleView ? fTitleView->FindColumnTitle(where) : 0;
 	BRect titleBoundsWithMargin(titleBounds);
 	titleBoundsWithMargin.InsetBy(0, -kRemoveTitleMargin);
-	bool inMarginRect = overTitleView
-		|| titleBoundsWithMargin.Contains(where);
+	bool inMarginRect = overTitleView || titleBoundsWithMargin.Contains(where);
 
 	bool drawOutline = false;
 	bool undrawOutline = false;
@@ -763,22 +755,19 @@ ColumnDragState::Moved(BPoint where, uint32)
 			fColumnArchive.Seek(0, SEEK_SET);
 			fTitle->Column()->ArchiveToStream(&fColumnArchive);
 			fInitialMouseTrackOffset -= fTitle->Bounds().left;
-			if (fTitleView->PoseView()->RemoveColumn(fTitle->Column(),
-					false)) {
+			if (fTitleView->PoseView()->RemoveColumn(fTitle->Column(), false)) {
 				fTitle = 0;
 				fTitleView->BeginRectTracking(rect);
 				fTrackingRemovedColumn = true;
 				undrawOutline = true;
 			}
 		} else if (overTitle && overTitle != fTitle
-					// over a different column
-				&& (overTitle->Bounds().left >= fTitle->Bounds().right
-						// over the one to the right
-					|| where.x < overTitle->Bounds().left
-							+ fTitle->Bounds().Width())) {
-						// over the one to the left, far enough to not snap
-						// right back
-
+				// over a different column
+			&& (overTitle->Bounds().left >= fTitle->Bounds().right
+					// over the one to the right
+				|| where.x < overTitle->Bounds().left + fTitle->Bounds().Width())) {
+					// over the one to the left, far enough to not snap
+					// right back
 			BColumn* column = fTitle->Column();
 			fInitialMouseTrackOffset -= fTitle->Bounds().left;
 			// swap the columns

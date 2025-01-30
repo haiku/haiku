@@ -70,8 +70,7 @@ CalcFreeSpace(BVolume* volume)
 // symlink pose uses the resolved model to retrieve the icon, if not broken
 // everything else, like the attributes, etc. is retrieved directly from the
 // symlink itself
-BPose::BPose(Model* model, BPoseView* view, uint32 clipboardMode,
-	bool selected)
+BPose::BPose(Model* model, BPoseView* view, uint32 clipboardMode, bool selected)
 	:
 	fModel(model),
 	fWidgetList(4),
@@ -521,15 +520,18 @@ BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 
 
 bool
-BPose::PointInPose(BPoint where, const BPoseView* poseView, BPoint point,
+BPose::PointInPose(BPoint poseLoc, const BPoseView* poseView, BPoint where,
 	BTextWidget** hitWidget) const
 {
+	ASSERT(poseView != NULL);
+	ASSERT(poseView->ViewMode() == kListMode);
+
 	if (hitWidget != NULL)
 		*hitWidget = NULL;
 
 	// check intersection with icon
 	BRect rect = _IconRect(poseView, where);
-	if (rect.Contains(point))
+	if (rect.Contains(where))
 		return true;
 
 	for (int32 index = 0; ; index++) {
@@ -538,8 +540,7 @@ BPose::PointInPose(BPoint where, const BPoseView* poseView, BPoint point,
 			break;
 
 		BTextWidget* widget = WidgetFor(column->AttrHash());
-		if (widget != NULL
-			&& widget->CalcClickRect(where, column, poseView).Contains(point)) {
+		if (widget != NULL && widget->CalcClickRect(poseLoc, column, poseView).Contains(where)) {
 			if (hitWidget != NULL)
 				*hitWidget = widget;
 
@@ -552,8 +553,8 @@ BPose::PointInPose(BPoint where, const BPoseView* poseView, BPoint point,
 
 
 void
-BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
-	BView* drawView, bool fullDraw, BPoint offset, bool selected)
+BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* drawView,
+	bool fullDraw, BPoint offset, bool selected)
 {
 	// If the background wasn't cleared and Draw() is not called after
 	// having edited a name or similar (with fullDraw)
@@ -564,7 +565,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 	} else
 		fBackgroundClean = false;
 
-	bool direct = (drawView == poseView);
+	bool direct = drawView == poseView;
 	bool windowActive = poseView->Window()->IsActive();
 	bool showSelectionWhenInactive = poseView->fShowSelectionWhenInactive;
 	bool isDrawingSelectionRect = poseView->fIsDrawingSelectionRect;
@@ -737,16 +738,14 @@ BPose::MoveTo(BPoint point, BPoseView* poseView, bool invalidate)
 	// might need to move a text view if we're active
 	if (poseView->ActivePose() == this) {
 		BView* border_view = poseView->FindView("BorderView");
-		if (border_view) {
-			border_view->MoveBy(point.x - oldLocation.x,
-				point.y - oldLocation.y);
-		}
+		if (border_view != NULL)
+			border_view->MoveBy(point.x - oldLocation.x, point.y - oldLocation.y);
 	}
 
 	float scale = 1.0;
-	if (poseView->ViewMode() == kIconMode) {
+	if (poseView->ViewMode() == kIconMode)
 		scale = (float)poseView->IconSizeInt() / 32.0;
-	}
+
 	fLocation.x = point.x / scale;
 	fLocation.y = point.y / scale;
 
@@ -816,8 +815,7 @@ BPose::DrawIcon(BPoint where, BView* view, BSize size, bool direct,
 		view->SetDrawingMode(B_OP_OVER);
 
 	IconCache::sIconCache->Draw(ResolvedModel(), view, where,
-		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, size,
-		true);
+		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, size, true);
 
 	if (fPercent != -1)
 		DrawBar(where, view, size);
@@ -825,33 +823,36 @@ BPose::DrawIcon(BPoint where, BView* view, BSize size, bool direct,
 
 
 void
-BPose::DrawBar(BPoint where, BView* view, BSize iconSize)
+BPose::DrawBar(BPoint where, BView* view, BSize size)
 {
 	view->PushState();
 
-	int32 size = iconSize.IntegerWidth();
+	int32 iconSize = size.IntegerWidth();
 	int32 yOffset;
-	int32 barWidth = (int32)(7.0f / 32.0f * (float)(size + 1));
+	int32 barWidth = (int32)(7.0f / 32.0f * (float)(iconSize + 1));
 	if (barWidth < 4) {
 		barWidth = 4;
 		yOffset = 0;
 	} else
 		yOffset = 2;
-	int32 barHeight = size - 4 - 2 * yOffset;
+
+	int32 barHeight = iconSize - 4 - 2 * yOffset;
 
 	// the black shadowed line
 	view->SetHighColor(32, 32, 32, 92);
-	view->MovePenTo(BPoint(where.x + size, where.y + 1 + yOffset));
-	view->StrokeLine(BPoint(where.x + size, where.y + size - yOffset));
-	view->StrokeLine(BPoint(where.x + size - barWidth + 1,
-		where.y + size - yOffset));
+	view->MovePenTo(BPoint(where.x + iconSize, where.y + 1 + yOffset));
+	view->StrokeLine(BPoint(where.x + iconSize, where.y + iconSize - yOffset));
+	view->StrokeLine(BPoint(where.x + iconSize - barWidth + 1, where.y + iconSize - yOffset));
 
 	view->SetDrawingMode(B_OP_ALPHA);
 
 	// the gray frame
 	view->SetHighColor(76, 76, 76, 192);
-	BRect rect(where.x + size - barWidth,where.y + yOffset,
-		where.x + size - 1,where.y + size - 1 - yOffset);
+	float left = where.x + iconSize - barWidth;
+	float top = where.y + yOffset;
+	float right = where.x + iconSize - 1;
+	float bottom = where.y + iconSize - 1 - yOffset;
+	BRect rect(left, top, right, bottom);
 	view->StrokeRect(rect);
 
 	// calculate bar height

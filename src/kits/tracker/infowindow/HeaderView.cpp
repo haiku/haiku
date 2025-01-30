@@ -490,8 +490,7 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 void
 HeaderView::MouseUp(BPoint where)
 {
-	if ((fTrackingState == icon_track
-			|| fTrackingState == open_only_track)
+	if ((fTrackingState == icon_track || fTrackingState == open_only_track)
 		&& fIconRect.Contains(where)) {
 		// If it was a double click, then tell Tracker to open the item
 		// The CurrentMessage() here does* not* have a "clicks" field,

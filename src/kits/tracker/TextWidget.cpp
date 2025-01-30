@@ -207,24 +207,21 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 
 
 BRect
-BTextWidget::CalcRect(BPoint poseLoc, const BColumn* column,
-	const BPoseView* view)
+BTextWidget::CalcRect(BPoint poseLoc, const BColumn* column, const BPoseView* view)
 {
 	return CalcRectCommon(poseLoc, column, view, fText->Width(view));
 }
 
 
 BRect
-BTextWidget::CalcOldRect(BPoint poseLoc, const BColumn* column,
-	const BPoseView* view)
+BTextWidget::CalcOldRect(BPoint poseLoc, const BColumn* column, const BPoseView* view)
 {
 	return CalcRectCommon(poseLoc, column, view, fText->CurrentWidth());
 }
 
 
 BRect
-BTextWidget::CalcClickRect(BPoint poseLoc, const BColumn* column,
-	const BPoseView* view)
+BTextWidget::CalcClickRect(BPoint poseLoc, const BColumn* column, const BPoseView* view)
 {
 	BRect result = CalcRect(poseLoc, column, view);
 	if (result.Width() < kWidthMargin) {
@@ -445,8 +442,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 
 	BRect rect(bounds);
 	rect.OffsetBy(view->ViewMode() == kListMode ? -2 : 0, -2);
-	BTextView* textView = new BTextView(rect, "WidgetTextView", rect,
-		be_plain_font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
+	BTextView* textView
+		= new BTextView(rect, "WidgetTextView", rect, be_plain_font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
 
 	textView->SetWordWrap(false);
 	textView->SetInsets(2, 2, 2, 2);
@@ -503,8 +500,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 			break;
 	}
 
-	BScrollView* scrollView = new BScrollView("BorderView", textView, 0, 0,
-		false, false, B_PLAIN_BORDER);
+	BScrollView* scrollView
+		= new BScrollView("BorderView", textView, 0, 0, false, false, B_PLAIN_BORDER);
 	view->AddChild(scrollView);
 
 	bool tooWide = textView->TextRect().Width() > fMaxWidth;
@@ -545,8 +542,7 @@ BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView* view,
 	if (scrollView == NULL)
 		return;
 
-	BTextView* textView = dynamic_cast<BTextView*>(
-		scrollView->FindView("WidgetTextView"));
+	BTextView* textView = dynamic_cast<BTextView*>(scrollView->FindView("WidgetTextView"));
 	ASSERT(textView != NULL);
 	if (textView == NULL)
 		return;
@@ -578,18 +574,17 @@ BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView* view,
 
 
 void
-BTextWidget::CheckAndUpdate(BPoint loc, const BColumn* column,
-	BPoseView* view, bool visible)
+BTextWidget::CheckAndUpdate(BPoint loc, const BColumn* column, BPoseView* view, bool visible)
 {
 	BRect oldRect;
 	if (view->ViewMode() != kListMode)
 		oldRect = CalcOldRect(loc, column, view);
 
-	if (fText->CheckAttributeChanged() && fText->CheckViewChanged(view)
-		&& visible) {
+	if (fText->CheckAttributeChanged() && fText->CheckViewChanged(view) && visible) {
 		BRect invalRect(ColumnRect(loc, column, view));
 		if (view->ViewMode() != kListMode)
 			invalRect = invalRect | oldRect;
+
 		view->Invalidate(invalRect);
 	}
 }
@@ -598,17 +593,15 @@ BTextWidget::CheckAndUpdate(BPoint loc, const BColumn* column,
 void
 BTextWidget::SelectAll(BPoseView* view)
 {
-	BTextView* text = dynamic_cast<BTextView*>(
-		view->FindView("WidgetTextView"));
+	BTextView* text = dynamic_cast<BTextView*>(view->FindView("WidgetTextView"));
 	if (text != NULL)
 		text->SelectAll();
 }
 
 
 void
-BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
-	BView* drawView, bool selected, uint32 clipboardMode, BPoint offset,
-	bool direct)
+BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView* drawView,
+	bool selected, uint32 clipboardMode, BPoint offset, bool direct)
 {
 	textRect.OffsetBy(offset);
 
@@ -725,7 +718,6 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 
 		textRect.right = textRect.left + fText->Width(view);
 			// only underline text part
-		drawView->StrokeLine(textRect.LeftBottom(), textRect.RightBottom(),
-			B_MIXED_COLORS);
+		drawView->StrokeLine(textRect.LeftBottom(), textRect.RightBottom(), B_MIXED_COLORS);
 	}
 }

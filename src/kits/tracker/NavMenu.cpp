@@ -82,8 +82,7 @@ enum nav_flags {
 
 
 bool
-SpringLoadedFolderCompareMessages(const BMessage* incoming,
-	const BMessage* dragMessage)
+SpringLoadedFolderCompareMessages(const BMessage* incoming, const BMessage* dragMessage)
 {
 	if (incoming == NULL || dragMessage == NULL)
 		return false;
