@@ -74,7 +74,6 @@ HeaderView::HeaderView(Model* model)
 	fIconModel(model),
 	fTitleEditView(NULL),
 	fTrackingState(no_track),
-	fMouseDown(false),
 	fIsDropTarget(false),
 	fDoubleClick(false),
 	fDragging(false)
@@ -375,7 +374,6 @@ HeaderView::MouseDown(BPoint where)
 	}
 
 	fClickPoint = where;
-	fMouseDown = true;
 	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 }
 
@@ -399,81 +397,90 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 
 	switch (fTrackingState) {
 		case icon_track:
-			if (fMouseDown && !fDragging
-				&& (abs((int32)(where.x - fClickPoint.x)) > kDragSlop
-					|| abs((int32)(where.y - fClickPoint.y)) > kDragSlop)) {
-				// Find the required height
-				BFont font;
-				GetFont(&font);
+		{
+			if (fDragging)
+				break;
 
-				float height = CurrentFontHeight()
-					+ fIconRect.Height() + 8;
-				BRect rect(0, 0, std::min(fIconRect.Width()
-						+ font.StringWidth(fModel->Name()) + 4,
-					fIconRect.Width() * 3), height);
-				BBitmap* dragBitmap = new BBitmap(rect, B_RGBA32, true);
-				dragBitmap->Lock();
-				BView* view = new BView(dragBitmap->Bounds(), "",
-					B_FOLLOW_NONE, 0);
-				dragBitmap->AddChild(view);
-				view->SetOrigin(0, 0);
-				BRect clipRect(view->Bounds());
-				BRegion newClip;
-				newClip.Set(clipRect);
-				view->ConstrainClippingRegion(&newClip);
+			uint32 buttons = Window()->CurrentMessage()->GetInt32("buttons", 0);
+			if (buttons == 0)
+				break;
 
-				// Transparent draw magic
-				view->SetHighColor(0, 0, 0, 0);
-				view->FillRect(view->Bounds());
-				view->SetDrawingMode(B_OP_ALPHA);
-				rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
-				textColor.alpha = 128;
-					// set transparency by value
-				view->SetHighColor(textColor);
-				view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-
-				// Draw the icon
-				float hIconOffset = (rect.Width() - fIconRect.Width()) / 2;
-				IconCache::sIconCache->Draw(fIconModel, view,
-					BPoint(hIconOffset, 0), kNormalIcon, fIconRect.Size(), true);
-
-				// See if we need to truncate the string
-				BString nameString(fModel->Name());
-				if (view->StringWidth(fModel->Name()) > rect.Width()) {
-					view->TruncateString(&nameString, B_TRUNCATE_END,
-						rect.Width() - 5);
-				}
-
-				// Draw the label
-				font_height fontHeight;
-				font.GetHeight(&fontHeight);
-				float leftText = (view->StringWidth(nameString.String())
-					- fIconRect.Width()) / 2;
-				view->MovePenTo(BPoint(hIconOffset - leftText + 2,
-					fIconRect.Height() + (fontHeight.ascent + 2)));
-				view->DrawString(nameString.String());
-
-				view->Sync();
-				dragBitmap->Unlock();
-
-				BMessage dragMessage(B_REFS_RECEIVED);
-				dragMessage.AddPoint("click_pt", fClickPoint);
-				BPoint tmpLoc;
-				uint32 button;
-				GetMouse(&tmpLoc, &button);
-				if (button)
-					dragMessage.AddInt32("buttons", (int32)button);
-
-				dragMessage.AddInt32("be:actions",
-					(modifiers() & B_OPTION_KEY) != 0
-						? B_COPY_TARGET : B_MOVE_TARGET);
-				dragMessage.AddRef("refs", fModel->EntryRef());
-				DragMessage(&dragMessage, dragBitmap, B_OP_ALPHA,
-					BPoint((fClickPoint.x - fIconRect.left)
-					+ hIconOffset, fClickPoint.y - fIconRect.top), this);
-				fDragging = true;
+			if (abs((int32)(where.x - fClickPoint.x)) <= kDragSlop
+				&& abs((int32)(where.y - fClickPoint.y)) <= kDragSlop) {
+				break;
 			}
+
+			// Find the required height
+			BFont font;
+			GetFont(&font);
+			float width = std::min(fIconRect.Width() + font.StringWidth(fModel->Name()) + 4,
+				fIconRect.Width() * 3);
+			float height = CurrentFontHeight() + fIconRect.Height() + 8;
+
+			BRect rect(0, 0, width, height);
+			BBitmap* dragBitmap = new BBitmap(rect, B_RGBA32, true);
+			dragBitmap->Lock();
+
+			BView* view = new BView(dragBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
+			dragBitmap->AddChild(view);
+			view->SetOrigin(0, 0);
+
+			BRect clipRect(view->Bounds());
+			BRegion newClip;
+			newClip.Set(clipRect);
+			view->ConstrainClippingRegion(&newClip);
+
+			// Transparent draw magic
+			view->SetHighColor(0, 0, 0, 0);
+			view->FillRect(view->Bounds());
+			view->SetDrawingMode(B_OP_ALPHA);
+
+			rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+			textColor.alpha = 128;
+				// set transparency by value
+			view->SetHighColor(textColor);
+			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+
+			// Draw the icon
+			float hIconOffset = (rect.Width() - fIconRect.Width()) / 2;
+			IconCache::sIconCache->Draw(fIconModel, view, BPoint(hIconOffset, 0), kNormalIcon,
+				fIconRect.Size(), true);
+
+			// See if we need to truncate the string
+			BString nameString(fModel->Name());
+			if (view->StringWidth(fModel->Name()) > rect.Width())
+				view->TruncateString(&nameString, B_TRUNCATE_END, rect.Width() - 5);
+
+			// Draw the label
+			font_height fontHeight;
+			font.GetHeight(&fontHeight);
+			float leftText
+				= roundf((view->StringWidth(nameString.String()) - fIconRect.Width()) / 2);
+			float x = hIconOffset - leftText + 2;
+			float y = fIconRect.Height() + fontHeight.ascent + 2;
+			view->MovePenTo(BPoint(x, y));
+			view->DrawString(nameString.String());
+
+			view->Sync();
+			dragBitmap->Unlock();
+
+			BMessage dragMessage(B_REFS_RECEIVED);
+			dragMessage.AddPoint("click_pt", fClickPoint);
+			BPoint tmpLoc;
+			uint32 button;
+			GetMouse(&tmpLoc, &button);
+			if (button)
+				dragMessage.AddInt32("buttons", (int32)button);
+
+			dragMessage.AddInt32("be:actions",
+				(modifiers() & B_OPTION_KEY) != 0 ? B_COPY_TARGET : B_MOVE_TARGET);
+			dragMessage.AddRef("refs", fModel->EntryRef());
+			x = fClickPoint.x - fIconRect.left + hIconOffset;
+			y = fClickPoint.y - fIconRect.top;
+			DragMessage(&dragMessage, dragBitmap, B_OP_ALPHA, BPoint(x, y), this);
+			fDragging = true;
 			break;
+		}
 
 		case open_only_track :
 			// Special type of entry that can't be renamed or drag and dropped
@@ -509,7 +516,6 @@ HeaderView::MouseUp(BPoint where)
 	}
 
 	// End mouse tracking
-	fMouseDown = false;
 	fDragging = false;
 	fTrackingState = no_track;
 }

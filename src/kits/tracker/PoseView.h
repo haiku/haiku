@@ -215,7 +215,7 @@ public:
 	virtual rgb_color TextColor(bool selected = false) const;
 	virtual rgb_color BackColor(bool selected = false) const;
 
-	bool WidgetTextOutline() const;
+	bool WidgetTextOutline() const { return fWidgetTextOutline; };
 	void SetWidgetTextOutline(bool);
 		// used to not erase when we have a background image and
 		// invalidate instead
@@ -357,37 +357,30 @@ public:
 
 	// drag&drop handling
 	virtual bool HandleMessageDropped(BMessage*);
-	static bool HandleDropCommon(BMessage* dragMessage, Model* target,
-		BPose*, BView* view, BPoint dropPoint);
+	static bool HandleDropCommon(BMessage* dragMessage, Model* target, BPose*, BView* view,
+		BPoint dropPoint);
 		// used by pose views and info windows
-	static bool CanHandleDragSelection(const Model* target,
-		const BMessage* dragMessage, bool ignoreTypes);
-	virtual void DragSelectedPoses(const BPose* clickedPose, BPoint);
+	static bool CanHandleDragSelection(const Model* target, const BMessage* dragMessage,
+		bool ignoreTypes);
+	virtual void DragSelectedPoses(const BPose* pose, BPoint, uint32 buttons);
 
-	void MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
-		bool forceCopy, bool forceMove = false, bool createLink = false,
-		bool relativeLink = false);
-	static void MoveSelectionInto(Model* destFolder,
-		BContainerWindow* srcWindow, BContainerWindow* destWindow,
-		uint32 buttons, BPoint loc, bool forceCopy,
-		bool forceMove = false, bool createLink = false,
-		bool relativeLink = false, BPoint clickPoint = BPoint(0, 0),
-		bool pinToGrid = false);
+	void MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow, bool forceCopy,
+		bool forceMove = false, bool createLink = false, bool relativeLink = false);
+	static void MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
+		BContainerWindow* destWindow, uint32 buttons, BPoint loc, bool forceCopy,
+		bool forceMove = false, bool createLink = false, bool relativeLink = false,
+		BPoint where = B_ORIGIN, bool pinToGrid = false);
 
-	bool UpdateDropTarget(BPoint, const BMessage*,
-		bool trackingContextMenu);
+	bool UpdateDropTarget(BPoint, const BMessage*, bool trackingContextMenu);
 		// return true if drop target changed
 	void HiliteDropTarget(bool hiliteState);
-
-	void DragStop();
-		// throw away cached up structures
 
 	static bool MenuTrackingHook(BMenu* menu, void* castToThis);
 		// hook for spring loaded nav-menus
 
 	// scripting
-	virtual BHandler* ResolveSpecifier(BMessage* message, int32 index,
-		BMessage* specifier, int32 form, const char* property);
+	virtual BHandler* ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
+		int32 form, const char* property);
 	virtual status_t GetSupportedSuites(BMessage*);
 
 	// string width calls that use local width caches, faster than using
@@ -403,10 +396,22 @@ public:
 	void ShowBarberPole();
 	void HideBarberPole();
 
-	bool fShowSelectionWhenInactive;
-	bool fIsDrawingSelectionRect;
+	// drag & drop support
+	status_t DragStart(const BMessage*);
+	void DragStop();
+	inline bool IsDragging() const { return fDragMessage != NULL && fCachedTypesList != NULL; };
 
-	bool IsWatchingDateFormatChange();
+	inline BMessage* DragMessage() const { return fDragMessage; };
+
+	inline bool WaitingForRefs() const { return fWaitingForRefs; };
+	void SetWaitingForRefs(bool waiting) { fWaitingForRefs = waiting; };
+
+	inline BStringList* CachedTypesList() const { return fCachedTypesList; };
+
+	inline bool ShowSelectionWhenInactive() const { return fShowSelectionWhenInactive; };
+	bool IsDrawingSelectionRect() const { return fIsDrawingSelectionRect; };
+
+	inline bool IsWatchingDateFormatChange() const { return fIsWatchingDateFormatChange; };
 	void StartWatchDateFormatChange();
 	void StopWatchDateFormatChange();
 
@@ -593,7 +598,7 @@ protected:
 	virtual void MetaMimeChanged(const char*, const char*);
 
 	// click handling
-	bool WasDoubleClick(const BPose*, BPoint where, int32 buttons);
+	bool WasDoubleClick(const BPose*, BPoint where);
 	bool WasClickInPath(const BPose*, int32 index, BPoint where) const;
 
 	// selection
@@ -704,12 +709,6 @@ protected:
 
 protected:
 	BViewState* fViewState;
-	bool fStateNeedsSaving;
-
-	bool fSavePoseLocations : 1;
-	bool fMultipleSelection : 1;
-	bool fDragEnabled : 1;
-	bool fDropEnabled : 1;
 
 	BLooper* fSelectionHandler;
 
@@ -735,7 +734,6 @@ private:
 	BObjectList<BColumn, true>* fColumnList;
 	BStringList fMimeTypeList;
 	BObjectList<Model>* fBrokenLinks;
-	bool fMimeTypeListIsDirty;
 	BCountView* fCountView;
 	float fListElemHeight;
 	float fListOffset;
@@ -754,12 +752,11 @@ private:
 	BPoint fHintLocation;
 	float fAutoScrollInc;
 	int32 fAutoScrollState;
-	bool fWidgetTextOutline;
 	const BPose* fSelectionPivotPose;
 	const BPose* fRealPivotPose;
 	BMessageRunner* fKeyRunner;
-	bool fTrackRightMouseUp;
-	bool fTrackMouseUp;
+	BMessage* fDragMessage;
+	BStringList* fCachedTypesList;
 
 	struct SelectionRectInfo {
 		SelectionRectInfo()
@@ -777,22 +774,6 @@ private:
 		BList* selection;
 	};
 	SelectionRectInfo fSelectionRectInfo;
-
-	bool fSelectionVisible : 1;
-	bool fSelectionRectEnabled : 1;
-	bool fTransparentSelection : 1;
-	bool fAlwaysAutoPlace : 1;
-	bool fAllowPoseEditing : 1;
-	bool fSelectionChangedHook : 1;
-		// get rid of this
-	bool fOkToMapIcons : 1;
-	bool fEnsurePosesVisible : 1;
-	bool fShouldAutoScroll : 1;
-	bool fIsDesktop : 1;
-	bool fIsWatchingDateFormatChange : 1;
-	bool fHasPosesInClipboard : 1;
-	bool fCursorCheck : 1;
-	bool fTypeAheadFiltering : 1;
 
 	BObjectList<BString, true> fFilterStrings;
 	int32 fLastFilterStringCount;
@@ -819,6 +800,37 @@ private:
 	mutable BSize fCachedIconSize;
 
 	typedef BView _inherited;
+
+protected:
+	bool fStateNeedsSaving : 1;
+	bool fSavePoseLocations : 1;
+	bool fMultipleSelection : 1;
+	bool fDragEnabled : 1;
+	bool fDropEnabled : 1;
+
+private:
+	bool fMimeTypeListIsDirty : 1;
+	bool fIsDesktop : 1;
+	bool fWidgetTextOutline : 1;
+	bool fTrackRightMouseUp : 1;
+	bool fTrackMouseUp : 1;
+	bool fSelectionVisible : 1;
+	bool fSelectionRectEnabled : 1;
+	bool fAlwaysAutoPlace : 1;
+	bool fAllowPoseEditing : 1;
+	bool fSelectionChangedHook : 1;
+		// get rid of this
+	bool fOkToMapIcons : 1;
+	bool fEnsurePosesVisible : 1;
+	bool fShouldAutoScroll : 1;
+	bool fIsWatchingDateFormatChange : 1;
+	bool fHasPosesInClipboard : 1;
+	bool fCursorCheck : 1;
+	bool fTypeAheadFiltering : 1;
+	bool fShowSelectionWhenInactive : 1;
+	bool fIsDrawingSelectionRect : 1;
+	bool fTransparentSelection : 1;
+	bool fWaitingForRefs : 1;
 };
 
 

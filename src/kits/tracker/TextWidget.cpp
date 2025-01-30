@@ -434,6 +434,9 @@ TextViewPasteFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 void
 BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 {
+	ASSERT(view != NULL);
+	ASSERT(view->Window() != NULL);
+
 	view->SetTextWidgetToCheck(NULL, this);
 	if (!IsEditable() || IsActive())
 		return;
@@ -520,13 +523,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	// make this text widget invisible while we edit it
 	SetVisible(false);
 
-	ASSERT(view->Window() != NULL);
-		// how can I not have a Window here???
-
-	if (view->Window()) {
-		// force immediate redraw so TextView appears instantly
-		view->Window()->UpdateIfNeeded();
-	}
+	// force immediate redraw so TextView appears instantly
+	view->Window()->UpdateIfNeeded();
 }
 
 
@@ -603,6 +601,10 @@ void
 BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView* drawView,
 	bool selected, uint32 clipboardMode, BPoint offset, bool direct)
 {
+	ASSERT(view != NULL);
+	ASSERT(view->Window() != NULL);
+	ASSERT(drawView != NULL);
+
 	textRect.OffsetBy(offset);
 
 	// We are only concerned with setting the correct text color.

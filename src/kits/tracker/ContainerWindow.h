@@ -193,12 +193,6 @@ public:
 	BMessage* AddOnMessage(int32);
 	BPopUpMenu* ContextMenu();
 
-	// drag&drop support
-	status_t DragStart(const BMessage*);
-	void DragStop();
-	bool Dragging() const;
-	BMessage* DragMessage() const;
-
 	void ShowSelectionWindow();
 
 	void ShowNavigator(bool);
@@ -346,9 +340,6 @@ private:
 
 	static BRect sNewWindRect;
 
-	BMessage* fDragMessage;
-	BStringList* fCachedTypesList;
-	bool fWaitingForRefs;
 	bool fSaveStateIsEnabled;
 	bool fIsWatchingPath;
 
@@ -441,20 +432,6 @@ inline BPopUpMenu*
 BContainerWindow::ContextMenu()
 {
 	return fContextMenu;
-}
-
-
-inline bool
-BContainerWindow::Dragging() const
-{
-	return fDragMessage && fCachedTypesList;
-}
-
-
-inline BMessage*
-BContainerWindow::DragMessage() const
-{
-	return fDragMessage;
 }
 
 

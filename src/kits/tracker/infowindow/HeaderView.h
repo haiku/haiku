@@ -98,7 +98,6 @@ private:
 
 	// Mouse tracking
 	track_state fTrackingState;
-	bool fMouseDown;
 	bool fIsDropTarget;
 	bool fDoubleClick;
 	bool fDragging;
