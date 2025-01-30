@@ -618,9 +618,9 @@ rule ArchitectureSetupWarnings architecture
 		# enable stack protector, if requested
 		if $(HAIKU_USE_STACK_PROTECTOR) = 1 {
 			AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens) :
-				-fstack-protector : $(scope) ;
+				-fstack-protector-strong -fstack-clash-protection : $(scope) ;
 			AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens) :
-				-fstack-protector : $(scope) ;
+				-fstack-protector-strong -fstack-clash-protection : $(scope) ;
 		}
 	}
 
@@ -795,6 +795,12 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src system libroot posix wchar ;
 	EnableWerror src system runtime_loader ;
 
+	EnableStackProtector src add-ons input_server ;
+	EnableStackProtector src add-ons media ;
+	EnableStackProtector src add-ons print ;
+	EnableStackProtector src add-ons screen_savers ;
+	EnableStackProtector src add-ons translators ;
+	EnableStackProtector src bin ;
 	EnableStackProtector src apps ;
 	EnableStackProtector src kits ;
 	EnableStackProtector src preferences ;
