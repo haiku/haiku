@@ -7464,7 +7464,7 @@ BPoseView::WasClickInPath(const BPose* pose, int32 index,
 	if (entry.GetRef(&ref) == B_OK) {
 		BMessage message(B_REFS_RECEIVED);
 		message.AddRef("refs", &ref);
-		Window()->PostMessage(&message);
+		BMessenger(kTrackerSignature).SendMessage(&message);
 		return true;
 	}
 
