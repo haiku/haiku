@@ -38,6 +38,7 @@
 // Modified to support the Haiku FAT driver.
 
 #ifdef FS_SHELL
+#include "sys/types.h"
 #include "fssh_api_wrapper.h"
 #else
 #include <real_time_clock.h>

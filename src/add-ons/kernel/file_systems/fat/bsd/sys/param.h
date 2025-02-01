@@ -39,12 +39,11 @@
 
 // Modified to support the Haiku FAT driver.
 
-#include <sys/time.h>
-
 #ifndef FS_SHELL
-#include <errno.h>
-#include_next <sys/param.h>
-#endif // !FS_SHELL
+#	include <errno.h>
+#	include <sys/time.h>
+#	include_next <sys/param.h>
+#endif
 
 #include "sys/types.h"
 

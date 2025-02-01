@@ -32,6 +32,7 @@ Copyright 2024, Haiku, Inc. All rights reserved.
 
 
 #ifdef FS_SHELL
+#include "sys/types.h"
 #include "fssh_api_wrapper.h"
 #else
 #include <SupportDefs.h>

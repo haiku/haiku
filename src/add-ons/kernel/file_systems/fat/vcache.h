@@ -7,7 +7,9 @@
 #define _DOSFS_VCACHE_H_
 
 
+#ifndef FS_SHELL
 #include <sys/mount.h>
+#endif
 
 #include "dosfs.h"
 

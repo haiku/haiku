@@ -37,6 +37,8 @@
 
 #include <fs_info.h>
 #include <libs/iconv/iconv.h>
+#else
+#include <fssh_api_wrapper.h>
 #endif
 
 

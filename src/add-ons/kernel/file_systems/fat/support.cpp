@@ -57,9 +57,7 @@
 
 #include "support.h"
 
-#ifdef FS_SHELL
-#include "fssh_api_wrapper.h"
-#else // !FS_SHELL
+#ifndef FS_SHELL
 #include <dirent.h>
 #include <malloc.h>
 

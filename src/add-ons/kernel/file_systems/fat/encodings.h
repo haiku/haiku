@@ -11,6 +11,7 @@
 #else // FS_SHELL
 typedef unsigned char uchar;
 
+#include "sys/types.h"
 #include "fssh_api_wrapper.h"
 #endif // FS_SHELL
 

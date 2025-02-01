@@ -5,20 +5,18 @@
 
 
 #include "encodings.h"
+#include "support.h"
 
 #include <ctype.h>
 #ifndef FS_SHELL
 #include <stdio.h>
-#endif // !FS_SHELL
 #include <stdlib.h>
 #include <string.h>
-
-#include "support.h"
+#endif // !FS_SHELL
 
 #define TOUCH(x) ((void)(x))
 
 #ifdef USER
-	#include <stdio.h>
 	#define dprintf printf
 	#undef DEBUG
 	int _assert_(char *,int,char *) {return 0;}

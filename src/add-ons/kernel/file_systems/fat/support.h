@@ -60,14 +60,14 @@
 // Support functions for C++ driver code.
 
 #ifdef FS_SHELL
+#include "sys/types.h"
 #include "fssh_api_wrapper.h"
 #else
 #include <lock.h>
 #endif // FS_SHELL
 
 #define _KERNEL
-extern "C"
-{
+extern "C" {
 #include "sys/param.h"	
 #include "sys/buf.h"
 #include "sys/conf.h"

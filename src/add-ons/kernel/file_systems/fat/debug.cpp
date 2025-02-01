@@ -7,16 +7,13 @@
 
 #include "debug.h"
 
+#ifndef FS_SHELL
 #include <stdlib.h>
-
-#ifdef FS_SHELL
-#include "fssh_api_wrapper.h"
 #endif
 
 #define _KERNEL
 
-extern "C"
-{
+extern "C" {
 #include "sys/param.h"
 #include "sys/buf.h"
 #include "sys/conf.h"

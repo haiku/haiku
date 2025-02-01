@@ -36,10 +36,11 @@
 // Modified to support the Haiku FAT driver.
 
 #ifdef FS_SHELL
+#include "sys/types.h"
 #include "fssh_api_wrapper.h"
 #else
 #include <fs_cache.h>
-#endif // FS_SHELL
+#endif
 
 #include "sys/param.h"
 #include "sys/systm.h"

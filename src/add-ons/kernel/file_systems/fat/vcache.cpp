@@ -43,21 +43,20 @@ without calling get_vnode().
 */
 
 
-#include "vcache.h"
-
 #ifdef FS_SHELL
+#include "sys/types.h"
 #include "fssh_api_wrapper.h"
 #else // !FS_SHELL
 #include <new>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#endif // !FS_SHELL
 
-#ifndef FS_SHELL
 #include <fs_cache.h>
 #include <fs_interface.h>
 #endif // !FS_SHELL
+
+#include "vcache.h"
 
 #define _KERNEL
 #include "sys/vnode.h"

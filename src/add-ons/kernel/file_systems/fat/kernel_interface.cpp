@@ -56,6 +56,7 @@
 
 
 #ifdef FS_SHELL
+#include "sys/types.h"
 #include "fssh_api_wrapper.h"
 #else // !FS_SHELL
 #include <dirent.h>
