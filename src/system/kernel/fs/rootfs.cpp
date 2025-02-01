@@ -35,7 +35,6 @@
 
 #if FS_SHELL
 	using namespace FSShell;
-#	define user_strlcpy(to, from, len)	(strlcpy(to, from, len), FSSH_B_OK)
 #endif
 
 
