@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src build libgnuregex ;
 
+MakeLocate libgnuregex_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
+
 BuildPlatformSharedLibrary libgnuregex_build.so :
 	regex.c
 	printchar.c

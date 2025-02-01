@@ -6,25 +6,16 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin keymap ] ;
 
 USES_BE_API on <build>keymap = true ;
 
-local regexSources ;
 local regexLib ;
-
-if $(HOST_PLATFORM) = freebsd {
-	# FreeBSD isolates the GNU regex functions into their own library.
-	regexLib = gnuregex ;
-} else if $(HOST_PLATFORM) = darwin {
-	# Darwin does not have them at all, so we use the bundled version.
+if $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = freebsd {
+	UseHeaders [ FDirName $(HAIKU_TOP) src build libgnuregex ] : true ;
 	regexLib = libgnuregex_build.so ;
 }
 
 BuildPlatformMain <build>keymap :
 	main.cpp
 	Keymap.cpp
-	$(regexSources)
 	: libshared_build.a $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(regexLib)
 ;
 
 LinkAgainst <build>keymap : $(HOST_LIBBE) ;
-
-SEARCH on [ FGristFiles $(regexSources) ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc regex ] ;
