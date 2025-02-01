@@ -327,7 +327,9 @@ RemoteMessage::ReadRegion(BRegion& region)
 	region.MakeEmpty();
 
 	int32 rectCount;
-	Read(rectCount);
+	status_t result = Read(rectCount);
+	if (result != B_OK)
+		return B_ERROR;
 
 	for (int32 i = 0; i < rectCount; i++) {
 		BRect rect;
