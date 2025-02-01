@@ -428,7 +428,7 @@ create_file(const char* path)
 	if (error == FSSH_B_OK) {
 
 		// TODO file/directory exists. Update access/modification time
-		fprintf(stderr, "TODO file/directory exists. update time stamp\n", path);
+		fprintf(stderr, "TODO file/directory exists. update time stamp: %s\n", path);
 		return FSSH_B_FILE_EXISTS;
 	}
 
