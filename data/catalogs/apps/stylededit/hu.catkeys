@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Cserél
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Ne mentse
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Mented a \"%s\" dokumentum változtatásait?
-Font	Menus		Betűtípus
 Align	Menus		Igazítás
+Font	Menus		Betűtípus
 Select all	Menus		Összes kijelölése
 Right	Menus		Jobbra

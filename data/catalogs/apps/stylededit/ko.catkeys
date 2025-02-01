@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		바꾸기
 Characters:	Statistics		문자:
 Don't save	QuitAlert		저장 안함
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		이 파일은 읽기 전용으로 표시되어 있습니다. 변경사항을 \"%s\" 문서에 저장 하시겠습니까? 
-Font	Menus		글꼴
 Align	Menus		정렬
+Font	Menus		글꼴
 Select all	Menus		모두 선택
 Right	Menus		오른쪽

@@ -1,50 +1,50 @@
 1	catalan; valencian	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Desplaçament
 Defaults	InputMouse		Valors predeterminats
+Scrolling	TouchpadPrefView		Desplaçament
 Long	KeyboardView		Llarg
 Cancel	TouchpadPrefView		Cancel·la
-4-Button	SettingsView		Botó 4
 Slow	TouchpadPrefView		Lent
-Tapping sensitivity	TouchpadPrefView		Sensibilitat del toc
 Device List	InputWindow		Llista de dispositius
 Double-click speed	SettingsView		Velocitat del clic doble
 5-Button	SettingsView		Botó 5
 Typing test area	KeyboardView		Àrea de prova per al tecleig
-Mouse type:	SettingsView		Tipus de ratolí:
-Revert	InputKeyboard		Reverteix
 Fast	KeyboardView		Ràpid
+Please confirm	TouchpadPrefView		Confirmeu-ho, si us plau
+Mouse speed	SettingsView		Velocitat del ratolí
+Horizontal scrolling	TouchpadPrefView		Desplaçament horitzontal
+Keyboard lock delay	TouchpadPrefView		Retard del blocatge del teclat
+Input	System name		Entrada
+Quick	TouchpadPrefView		Ràpid
+Short	KeyboardView		Curt
+Revert	InputMouse		Reverteix
+Slow	KeyboardView		Lent
+2-Button	SettingsView		2 botons
+Click to focus and raise	SettingsView		Clic per al focus i l'alçament
+Vertical	TouchpadPrefView		Vertical
+Focus follows mouse	SettingsView		El focus segueix el ratolí
+Double-click test area	SettingsView		Àrea de prova per al clic doble
+Focus mode:	SettingsView		Mode del focus:
+Revert	TouchpadPrefView		Reverteix
+4-Button	SettingsView		Botó 4
+Tapping sensitivity	TouchpadPrefView		Sensibilitat del toc
+Revert	InputKeyboard		Reverteix
+Mouse type:	SettingsView		Tipus de ratolí:
 Off	TouchpadPrefView		Desactivat
 Never	TouchpadPrefView		Mai
 Fast	TouchpadPrefView		Ràpid
 6-Button	SettingsView		Botó 6
-Please confirm	TouchpadPrefView		Confirmeu-ho, si us plau
 Click to focus	SettingsView		Clic per al focus
 Acceleration	TouchpadPrefView		Acceleració
-Mouse speed	SettingsView		Velocitat del ratolí
 Accept first click	SettingsView		Accepta el primer clic
 OK	TouchpadPrefView		D'acord
-Horizontal scrolling	TouchpadPrefView		Desplaçament horitzontal
 Delay until key repeat	KeyboardView		Retard fins a la repetició de tecla
-Keyboard lock delay	TouchpadPrefView		Retard del blocatge del teclat
 Two finger scrolling	TouchpadPrefView		Desplaçament amb dos dits
-Input	System name		Entrada
-Mouse acceleration	SettingsView		Acceleració del ratolí
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		L'àrea de desplaçament nova és molt grossa i pot impedir el funcionament normal del ratolí. Realment voleu canviar-ho?
+Mouse acceleration	SettingsView		Acceleració del ratolí
 High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Valors predeterminats
 1-Button	SettingsView		1 botó
 Defaults	InputKeyboard		Valors predeterminats
-Quick	TouchpadPrefView		Ràpid
-Short	KeyboardView		Curt
-Slow	KeyboardView		Lent
-Revert	InputMouse		Reverteix
 Key repeat rate	KeyboardView		Freqüència de repetició de tecla
-2-Button	SettingsView		2 botons
-Click to focus and raise	SettingsView		Clic per al focus i l'alçament
-Vertical	TouchpadPrefView		Vertical
 Horizontal	TouchpadPrefView		Horitzontal
-Focus follows mouse	SettingsView		El focus segueix el ratolí
-Focus mode:	SettingsView		Mode del focus:
-Double-click test area	SettingsView		Àrea de prova per al clic doble
 3-Button	SettingsView		3 botons
-Revert	TouchpadPrefView		Reverteix

@@ -1,50 +1,50 @@
 1	friulian	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Scoriment
 Defaults	InputMouse		Predefinîts
+Scrolling	TouchpadPrefView		Scoriment
 Long	KeyboardView		Lunc
 Cancel	TouchpadPrefView		Anule
-4-Button	SettingsView		4-Botons
 Slow	TouchpadPrefView		Lente
-Tapping sensitivity	TouchpadPrefView		Sensibilitât dal batuçâ
 Device List	InputWindow		Liste dispositîfs
 Double-click speed	SettingsView		Velocitât dopli-clic
 5-Button	SettingsView		5-Botons
 Typing test area	KeyboardView		Aree di prove batidure
-Mouse type:	SettingsView		Gjenar di mouse:
-Revert	InputKeyboard		Ripristine
 Fast	KeyboardView		Svelte
+Please confirm	TouchpadPrefView		Par plasê conferme
+Mouse speed	SettingsView		Velocitât dal mouse
+Horizontal scrolling	TouchpadPrefView		Scoriment orizontâl
+Keyboard lock delay	TouchpadPrefView		Ritart dal bloc de tastiere
+Input	System name		Input
+Quick	TouchpadPrefView		Veloç
+Short	KeyboardView		Curt
+Revert	InputMouse		Ripristine
+Slow	KeyboardView		Lente
+2-Button	SettingsView		2-Botons
+Click to focus and raise	SettingsView		Clic par meti a fûc e parâ denant
+Vertical	TouchpadPrefView		Verticâl
+Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
+Double-click test area	SettingsView		Aree di prove dopli-clic
+Focus mode:	SettingsView		Mût par meti a fûc:
+Revert	TouchpadPrefView		Ripristine
+4-Button	SettingsView		4-Botons
+Tapping sensitivity	TouchpadPrefView		Sensibilitât dal batuçâ
+Revert	InputKeyboard		Ripristine
+Mouse type:	SettingsView		Gjenar di mouse:
 Off	TouchpadPrefView		Distudât
 Never	TouchpadPrefView		Mai
 Fast	TouchpadPrefView		Svelte
 6-Button	SettingsView		6 Botons
-Please confirm	TouchpadPrefView		Par plasê conferme
 Click to focus	SettingsView		Clic par meti a fûc
 Acceleration	TouchpadPrefView		Acelerazion
-Mouse speed	SettingsView		Velocitât dal mouse
 Accept first click	SettingsView		Acete il prin clic
 OK	TouchpadPrefView		VA BEN
-Horizontal scrolling	TouchpadPrefView		Scoriment orizontâl
 Delay until key repeat	KeyboardView		Ritart pe ripetizion dal tast
-Keyboard lock delay	TouchpadPrefView		Ritart dal bloc de tastiere
 Two finger scrolling	TouchpadPrefView		Scoriment cun doi dêts
-Input	System name		Input
-Mouse acceleration	SettingsView		Acelerazion dal mouse
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La gnove aree di scorimetn e je une vore largje e e podarès impedî il normâl funzionament dal mouse. Cambiâle pardabon?
+Mouse acceleration	SettingsView		Acelerazion dal mouse
 High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Predefinîts
 1-Button	SettingsView		1-Boton
 Defaults	InputKeyboard		Predefinîts
-Quick	TouchpadPrefView		Veloç
-Short	KeyboardView		Curt
-Slow	KeyboardView		Lente
-Revert	InputMouse		Ripristine
 Key repeat rate	KeyboardView		Velocitât ripetizion tast
-2-Button	SettingsView		2-Botons
-Click to focus and raise	SettingsView		Clic par meti a fûc e parâ denant
-Vertical	TouchpadPrefView		Verticâl
 Horizontal	TouchpadPrefView		Orizontâl
-Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
-Focus mode:	SettingsView		Mût par meti a fûc:
-Double-click test area	SettingsView		Aree di prove dopli-clic
 3-Button	SettingsView		3-Botons
-Revert	TouchpadPrefView		Ripristine

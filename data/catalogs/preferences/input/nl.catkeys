@@ -1,49 +1,49 @@
 1	dutch; flemish	x-vnd.Haiku-Input	4063065788
-Scrolling	TouchpadPrefView		Scrollen
 Defaults	InputMouse		Standaarden
+Scrolling	TouchpadPrefView		Scrollen
 Long	KeyboardView		Lang
 Cancel	TouchpadPrefView		Annuleren
-4-Button	SettingsView		4 knoppen
 Slow	TouchpadPrefView		Langzaam
-Tapping sensitivity	TouchpadPrefView		Druk gevoeligheid
 Device List	InputWindow		Apparatenlijst
 Double-click speed	SettingsView		Dubbelkliksnelheid
 5-Button	SettingsView		5 knoppen
 Typing test area	KeyboardView		Testgebied om te typen
-Mouse type:	SettingsView		Muistype:
-Revert	InputKeyboard		Herstellen
 Fast	KeyboardView		Snel
+Please confirm	TouchpadPrefView		Gelieve te bevestigen
+Mouse speed	SettingsView		Muissnelheid
+Horizontal scrolling	TouchpadPrefView		Horizontaal scrollen
+Input	System name		Invoer
+Quick	TouchpadPrefView		Snel
+Short	KeyboardView		Kort
+Revert	InputMouse		Herstellen
+Slow	KeyboardView		Langzaam
+2-Button	SettingsView		2 knoppen
+Click to focus and raise	SettingsView		Klik om te focussen en naar voren te halen
+Vertical	TouchpadPrefView		Verticaal
+Focus follows mouse	SettingsView		Focus volgt muis
+Double-click test area	SettingsView		Dubbelkik testgebied
+Focus mode:	SettingsView		Focusmodus:
+Revert	TouchpadPrefView		Herstellen
+4-Button	SettingsView		4 knoppen
+Tapping sensitivity	TouchpadPrefView		Druk gevoeligheid
+Revert	InputKeyboard		Herstellen
+Mouse type:	SettingsView		Muistype:
 Off	TouchpadPrefView		Uit
 Never	TouchpadPrefView		Nooit
 Fast	TouchpadPrefView		Snel
 6-Button	SettingsView		6-knoppen
-Please confirm	TouchpadPrefView		Gelieve te bevestigen
 Click to focus	SettingsView		Klik om focus te krijgen
 Acceleration	TouchpadPrefView		Acceleratie
-Mouse speed	SettingsView		Muissnelheid
 Accept first click	SettingsView		Eerste klik accepteren
 OK	TouchpadPrefView		Okee
-Horizontal scrolling	TouchpadPrefView		Horizontaal scrollen
 Delay until key repeat	KeyboardView		Vertragen totdat de toets herhaalt
 Two finger scrolling	TouchpadPrefView		Met twee vingers scrollen
-Input	System name		Invoer
-Mouse acceleration	SettingsView		Muisversnelling
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Het nieuwe scrollgebied is erg groot en kan het moeilijk maken om de muis goed te gebruiken. Weet u zeker dat u het wilt veranderen?
+Mouse acceleration	SettingsView		Muisversnelling
 High	TouchpadPrefView		Hoog
 Defaults	TouchpadPrefView		Standaarden
 1-Button	SettingsView		1 knop
 Defaults	InputKeyboard		Standaarden
-Quick	TouchpadPrefView		Snel
-Short	KeyboardView		Kort
-Slow	KeyboardView		Langzaam
-Revert	InputMouse		Herstellen
 Key repeat rate	KeyboardView		Snelheid van toetsherhalingen
-2-Button	SettingsView		2 knoppen
-Click to focus and raise	SettingsView		Klik om te focussen en naar voren te halen
-Vertical	TouchpadPrefView		Verticaal
 Horizontal	TouchpadPrefView		Horizontaal
-Focus follows mouse	SettingsView		Focus volgt muis
-Focus mode:	SettingsView		Focusmodus:
-Double-click test area	SettingsView		Dubbelkik testgebied
 3-Button	SettingsView		3 knoppen
-Revert	TouchpadPrefView		Herstellen

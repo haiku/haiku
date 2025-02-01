@@ -36,8 +36,8 @@ Browse…	Settings Window		Navigare…
 Resume prior session	Settings Window		Reia sesiunea anterioară
 Match case	WebPositive Window		Potrivește majusculele
 Proxy password:	Settings Window		Parolă proxy:
-Size:	Font Selection view		Dimensiune:
 Failed to delete bookmark:\n'%path%'	BookmarkBar		Nu s-a putut șterge marcajul:\n„%path%”
+Size:	Font Selection view		Dimensiune:
 Page source	WebPositive Window		Sursa paginii
 Proxy server port:	Settings Window		Portul serverului proxy:
 Error opening downloads folder	Download Window		Eroare la deschiderea dosarului de descărcări

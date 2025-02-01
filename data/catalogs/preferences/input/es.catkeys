@@ -1,50 +1,50 @@
 1	spanish; castilian	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Desplazamiento
 Defaults	InputMouse		Valores predeterminados
+Scrolling	TouchpadPrefView		Desplazamiento
 Long	KeyboardView		Largo
 Cancel	TouchpadPrefView		Cancelar
-4-Button	SettingsView		4 botones
 Slow	TouchpadPrefView		Lento
-Tapping sensitivity	TouchpadPrefView		Sensibilidad de toque
 Device List	InputWindow		Lista de dispositivos
 Double-click speed	SettingsView		Velocidad de doble clic
 5-Button	SettingsView		5 botones
 Typing test area	KeyboardView		Área de prueba de tipeo
-Mouse type:	SettingsView		Tipo de ratón:
-Revert	InputKeyboard		Revertir
 Fast	KeyboardView		Rápido
+Please confirm	TouchpadPrefView		Por favor confirme
+Mouse speed	SettingsView		Velocidad del ratón
+Horizontal scrolling	TouchpadPrefView		Desplazamiento horizontal
+Keyboard lock delay	TouchpadPrefView		Retraso del bloqueo de teclado
+Input	System name		Entrada
+Quick	TouchpadPrefView		Rápido
+Short	KeyboardView		Corto
+Revert	InputMouse		Revertir
+Slow	KeyboardView		Lento
+2-Button	SettingsView		2 botones
+Click to focus and raise	SettingsView		Clic para enfocar y subir
+Vertical	TouchpadPrefView		Vertical
+Focus follows mouse	SettingsView		El foco sigue al ratón
+Double-click test area	SettingsView		Área de prueba de doble clic
+Focus mode:	SettingsView		Modo de enfoque:
+Revert	TouchpadPrefView		Revertir
+4-Button	SettingsView		4 botones
+Tapping sensitivity	TouchpadPrefView		Sensibilidad de toque
+Revert	InputKeyboard		Revertir
+Mouse type:	SettingsView		Tipo de ratón:
 Off	TouchpadPrefView		Inactivo
 Never	TouchpadPrefView		Nunca
 Fast	TouchpadPrefView		Rápido
 6-Button	SettingsView		6 botones
-Please confirm	TouchpadPrefView		Por favor confirme
 Click to focus	SettingsView		Clic para enfocar
 Acceleration	TouchpadPrefView		Aceleración
-Mouse speed	SettingsView		Velocidad del ratón
 Accept first click	SettingsView		Aceptar primer clic
 OK	TouchpadPrefView		Aceptar
-Horizontal scrolling	TouchpadPrefView		Desplazamiento horizontal
 Delay until key repeat	KeyboardView		Demora hasta que se repita la tecla
-Keyboard lock delay	TouchpadPrefView		Retraso del bloqueo de teclado
 Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
-Input	System name		Entrada
-Mouse acceleration	SettingsView		Aceleración del ratón
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nueva área de desplazamiento es muy grande y puede impedir el funcionamiento normal del ratón. ¿Realmente desea cambiarla?
+Mouse acceleration	SettingsView		Aceleración del ratón
 High	TouchpadPrefView		Alto
 Defaults	TouchpadPrefView		Por defecto
 1-Button	SettingsView		1 botón
 Defaults	InputKeyboard		Por defecto
-Quick	TouchpadPrefView		Rápido
-Short	KeyboardView		Corto
-Slow	KeyboardView		Lento
-Revert	InputMouse		Revertir
 Key repeat rate	KeyboardView		Tasa de repetición de tecla
-2-Button	SettingsView		2 botones
-Click to focus and raise	SettingsView		Clic para enfocar y subir
-Vertical	TouchpadPrefView		Vertical
 Horizontal	TouchpadPrefView		Horizontal
-Focus follows mouse	SettingsView		El foco sigue al ratón
-Focus mode:	SettingsView		Modo de enfoque:
-Double-click test area	SettingsView		Área de prueba de doble clic
 3-Button	SettingsView		3 botones
-Revert	TouchpadPrefView		Revertir

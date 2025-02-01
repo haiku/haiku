@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Remplacer
 Characters:	Statistics		Caractères :
 Don't save	QuitAlert		Ne pas enregistrer
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
-Font	Menus		Police
 Align	Menus		Aligner
+Font	Menus		Police
 Select all	Menus		Selectionner tout
 Right	Menus		À droite

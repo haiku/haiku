@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Substituir
 Characters:	Statistics		Personagens:
 Don't save	QuitAlert		Não guardar
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este ficheiro está marcado como só de leitura. Guardar as alterações ao documento \"%s\"? 
-Font	Menus		Tipo de letra
 Align	Menus		Alinhar
+Font	Menus		Tipo de letra
 Select all	Menus		Seleccionar tudo
 Right	Menus		À Direita

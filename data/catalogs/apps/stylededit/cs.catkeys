@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Nahradit
 Characters:	Statistics		Znaky:
 Don't save	QuitAlert		Neukládat
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tento soubor je označený jen pro čtení. Uložit změny v dokumentu \"%s\"? 
-Font	Menus		Písmo
 Align	Menus		Zarovnání
+Font	Menus		Písmo
 Select all	Menus		Vybrat vše
 Right	Menus		Vpravo

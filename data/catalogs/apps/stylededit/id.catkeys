@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Ganti
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Jangan simpan
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Berkas ini ditandai hanya baca. Simpan perubahan ke dokumen \"%s\"? 
-Font	Menus		Fon
 Align	Menus		Rata
+Font	Menus		Fon
 Select all	Menus		Pilih semua
 Right	Menus		Kanan

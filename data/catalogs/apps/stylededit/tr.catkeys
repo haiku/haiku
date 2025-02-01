@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Değiştir
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Kaydetme
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Bu dosya saltokunur olarak imlenmiş. “%s” belgesindeki değişiklikler kaydedilsin mi? 
-Font	Menus		Yazıtipi
 Align	Menus		Hizalama
+Font	Menus		Yazıtipi
 Select all	Menus		Tümünü seç
 Right	Menus		Sağ

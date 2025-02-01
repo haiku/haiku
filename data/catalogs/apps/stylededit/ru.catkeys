@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Заменить
 Characters:	Statistics		Символов:
 Don't save	QuitAlert		Не сохранять
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
-Font	Menus		Шрифт
 Align	Menus		Выровнять
+Font	Menus		Шрифт
 Select all	Menus		Выделить всё
 Right	Menus		По правому краю

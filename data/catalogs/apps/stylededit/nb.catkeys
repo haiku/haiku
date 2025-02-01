@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Erstatt
 Characters:	Statistics		Bokstaver:
 Don't save	QuitAlert		Ikke lagre
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Denne filen er merket som skrivebeskyttet. Vil du lagre endringer i dokumentet \"%s\"? 
-Font	Menus		Skrifttype
 Align	Menus		Juster
+Font	Menus		Skrifttype
 Select all	Menus		Merk alle
 Right	Menus		Høyre

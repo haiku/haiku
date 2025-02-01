@@ -84,7 +84,7 @@ Replace	FindandReplaceWindow		Ersetzen
 Characters:	Statistics		Zeichen:
 Don't save	QuitAlert		Verwerfen
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
-Font	Menus		Schrift
 Align	Menus		Ausrichtung
+Font	Menus		Schrift
 Select all	Menus		Alles auswählen
 Right	Menus		Rechts

@@ -1,50 +1,50 @@
 1	indonesian	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Menggulung
 Defaults	InputMouse		Bawaan
+Scrolling	TouchpadPrefView		Menggulung
 Long	KeyboardView		Panjang
 Cancel	TouchpadPrefView		Batalkan
-4-Button	SettingsView		4-Tombol
 Slow	TouchpadPrefView		Lambat
-Tapping sensitivity	TouchpadPrefView		Sensitivitas penekanan
 Device List	InputWindow		Daftar perangkat
 Double-click speed	SettingsView		Kecepatan klik dua kali
 5-Button	SettingsView		5-Tombol
 Typing test area	KeyboardView		Area tes pengetikan
-Mouse type:	SettingsView		Jenis mouse:
-Revert	InputKeyboard		Pulihkan
 Fast	KeyboardView		Cepat
+Please confirm	TouchpadPrefView		Mohon konfirmasi
+Mouse speed	SettingsView		Kecepatan mouse
+Horizontal scrolling	TouchpadPrefView		Pengguliran horizontal
+Keyboard lock delay	TouchpadPrefView		Jeda kuncian papan ketik
+Input	System name		Masukan
+Quick	TouchpadPrefView		Cepat
+Short	KeyboardView		Cepat
+Revert	InputMouse		Pulihkan
+Slow	KeyboardView		Lambat
+2-Button	SettingsView		2-Tombol
+Click to focus and raise	SettingsView		Klik untuk fokus dan naikkan
+Vertical	TouchpadPrefView		Vertikal
+Focus follows mouse	SettingsView		Fokus mengikuti mouse
+Double-click test area	SettingsView		Area pengujian klik dua kali
+Focus mode:	SettingsView		Mode fokus:
+Revert	TouchpadPrefView		Pulihkan
+4-Button	SettingsView		4-Tombol
+Tapping sensitivity	TouchpadPrefView		Sensitivitas penekanan
+Revert	InputKeyboard		Pulihkan
+Mouse type:	SettingsView		Jenis mouse:
 Off	TouchpadPrefView		Mati
 Never	TouchpadPrefView		Tidak pernah
 Fast	TouchpadPrefView		Cepat
 6-Button	SettingsView		6-Tombol
-Please confirm	TouchpadPrefView		Mohon konfirmasi
 Click to focus	SettingsView		Klik untuk fokus
 Acceleration	TouchpadPrefView		Percepatan
-Mouse speed	SettingsView		Kecepatan mouse
 Accept first click	SettingsView		Terima klik pertama
 OK	TouchpadPrefView		Oke
-Horizontal scrolling	TouchpadPrefView		Pengguliran horizontal
 Delay until key repeat	KeyboardView		Tunda hingga tombol berulang
-Keyboard lock delay	TouchpadPrefView		Jeda kuncian papan ketik
 Two finger scrolling	TouchpadPrefView		Pengguliran dua jari
-Input	System name		Masukan
-Mouse acceleration	SettingsView		Akselerasi mouse
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah anda benar-benar ingin mengubahnya?
+Mouse acceleration	SettingsView		Akselerasi mouse
 High	TouchpadPrefView		Tinggi
 Defaults	TouchpadPrefView		Bawaan
 1-Button	SettingsView		1-Tombol
 Defaults	InputKeyboard		Bawaan
-Quick	TouchpadPrefView		Cepat
-Short	KeyboardView		Cepat
-Slow	KeyboardView		Lambat
-Revert	InputMouse		Pulihkan
 Key repeat rate	KeyboardView		Rasio pengulangan tombol
-2-Button	SettingsView		2-Tombol
-Click to focus and raise	SettingsView		Klik untuk fokus dan naikkan
-Vertical	TouchpadPrefView		Vertikal
 Horizontal	TouchpadPrefView		Horisontal
-Focus follows mouse	SettingsView		Fokus mengikuti mouse
-Focus mode:	SettingsView		Mode fokus:
-Double-click test area	SettingsView		Area pengujian klik dua kali
 3-Button	SettingsView		3-Tombol
-Revert	TouchpadPrefView		Pulihkan

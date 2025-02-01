@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Αντικατάσταση
 Characters:	Statistics		Χαρακτήρες:
 Don't save	QuitAlert		Χωρίς αποθήκευση
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Αυτό το αρχείο είναι μόνο για ανάγνωση. Θέλετε να αποθηκεύσετε τις αλλαγές σας στο έγγραφο \"%s\"; 
-Font	Menus		Γραμματοσειρά
 Align	Menus		Στοίχιση
+Font	Menus		Γραμματοσειρά
 Select all	Menus		Επιλογή όλων
 Right	Menus		Δεξιά

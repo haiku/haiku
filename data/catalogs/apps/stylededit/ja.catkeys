@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		置換
 Characters:	Statistics		文字数:
 Don't save	QuitAlert		保存しない
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更をドキュメント\"%s\"に保存しますか?
-Font	Menus		フォント
 Align	Menus		配置
+Font	Menus		フォント
 Select all	Menus		すべて選択
 Right	Menus		右揃え

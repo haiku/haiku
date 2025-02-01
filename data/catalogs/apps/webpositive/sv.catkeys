@@ -36,8 +36,8 @@ Browse…	Settings Window		Bläddra…
 Resume prior session	Settings Window		Återuppta föregående session
 Match case	WebPositive Window		Matcha skiftläge
 Proxy password:	Settings Window		Lösenord för proxy:
-Size:	Font Selection view		Storlek:
 Failed to delete bookmark:\n'%path%'	BookmarkBar		Det gick inte att ta bort bokmärke:\n'%path%'
+Size:	Font Selection view		Storlek:
 Page source	WebPositive Window		Sidkälla
 Proxy server port:	Settings Window		Proxyserverport:
 Error opening downloads folder	Download Window		Fel vid öppning av nedladdningsmapp

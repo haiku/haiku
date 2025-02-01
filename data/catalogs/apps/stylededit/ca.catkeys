@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Reemplaça
 Characters:	Statistics		Caràcters:
 Don't save	QuitAlert		No ho desis
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Aquest fitxer és només de lectura. Voleu desar els canvis al document \"%s\"? 
-Font	Menus		Lletra
 Align	Menus		Alinea
+Font	Menus		Lletra
 Select all	Menus		Selecciona-ho tot
 Right	Menus		Dreta

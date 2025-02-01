@@ -5,22 +5,22 @@ Slow	TouchpadPrefView		Sporo
 Device List	InputWindow		Lista uređaja
 Double-click speed	SettingsView		Brzina dvostrukog klika
 Typing test area	KeyboardView		Područje testiranja tipkanja
-Mouse type:	SettingsView		Vrsta miša:
-Revert	InputKeyboard		Obrnuto
 Fast	KeyboardView		Brzo
-Fast	TouchpadPrefView		Brzo
 Please confirm	TouchpadPrefView		Molim potvrdite
-Acceleration	TouchpadPrefView		Ubrzanje
 Mouse speed	SettingsView		Brzina miša
+Short	KeyboardView		Kratko
+Revert	InputMouse		Obrnuto
+Slow	KeyboardView		Sporo
+Vertical	TouchpadPrefView		Okomito
+Revert	TouchpadPrefView		Obrnuto
+Revert	InputKeyboard		Obrnuto
+Mouse type:	SettingsView		Vrsta miša:
+Fast	TouchpadPrefView		Brzo
+Acceleration	TouchpadPrefView		Ubrzanje
 Accept first click	SettingsView		Prihvati prvi klik
 OK	TouchpadPrefView		U redu
 Mouse acceleration	SettingsView		Ubrzanje miša
 High	TouchpadPrefView		Visoko
 Defaults	TouchpadPrefView		Zadani
 Defaults	InputKeyboard		Zadani
-Short	KeyboardView		Kratko
-Slow	KeyboardView		Sporo
-Revert	InputMouse		Obrnuto
-Vertical	TouchpadPrefView		Okomito
 Horizontal	TouchpadPrefView		Vodoravno
-Revert	TouchpadPrefView		Obrnuto

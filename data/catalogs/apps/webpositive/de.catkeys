@@ -36,8 +36,8 @@ Browse…	Settings Window		Auswählen …
 Resume prior session	Settings Window		Vorige Sitzung fortsetzen
 Match case	WebPositive Window		Groß-/Kleinschreibung beachten
 Proxy password:	Settings Window		Proxy-Passwort:
-Size:	Font Selection view		Größe:
 Failed to delete bookmark:\n'%path%'	BookmarkBar		Das Lesezeichen konnte nicht entfernt werden:\n'%path%'
+Size:	Font Selection view		Größe:
 Page source	WebPositive Window		Quelltext der Seite
 Proxy server port:	Settings Window		Proxy-Serverport:
 Error opening downloads folder	Download Window		Fehler beim Öffnen des Download-Ordners

@@ -82,7 +82,7 @@ Replace	FindandReplaceWindow		Pakeisti
 Characters:	Statistics		Simbolių:
 Don't save	QuitAlert		Neįrašyti
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Šis failas pažymėtas kaip skirtas tik skaitymui. Ar įrašyti dokumento „%s“ pakeitimus? 
-Font	Menus		Šriftas
 Align	Menus		Lygiuotė
+Font	Menus		Šriftas
 Select all	Menus		Pažymėti viską
 Right	Menus		Dešininė

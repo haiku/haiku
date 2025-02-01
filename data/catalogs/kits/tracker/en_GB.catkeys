@@ -1,4 +1,4 @@
-1	english (united kingdom)	x-vnd.Haiku-libtracker	3406606676
+1	english (united kingdom)	x-vnd.Haiku-libtracker	850392540
 Error moving \"%name\" to Trash. (%error)	FSUtils		Error moving \"%name\" to the Rubbish Bin. (%error)
 Error emptying Trash	FSUtils		Error emptying the Rubbish Bin
 OK	OpenWithWindow		Alright
@@ -23,7 +23,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Sorry, you can't copy ite
 Emptying Trash… 	StatusWindow		Emptying Rubbish… 
 trash	B_TRASH_DIRECTORY		rubbish bin
 Grayscale picture	AttributesView		Greyscale picture
-Move to Trash	FilePanelPriv		Move to the Rubbish Bin
 Color	AttributesView		Colour
 OK	PoseView		Alright
 True-color picture	AttributesView		True-colour picture

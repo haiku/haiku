@@ -1,45 +1,45 @@
 1	thai	x-vnd.Haiku-Input	3272444562
-Scrolling	TouchpadPrefView		เลื่อน
 Defaults	InputMouse		ค่าเริ่มต้น
+Scrolling	TouchpadPrefView		เลื่อน
 Long	KeyboardView		ยาว
 Cancel	TouchpadPrefView		ยกเลิก
-4-Button	SettingsView		4 ปุ่ม
 Slow	TouchpadPrefView		ช้า
 Device List	InputWindow		รายการอุปกรณ์
 Double-click speed	SettingsView		ความเร็วดับเบิลคลิก
 5-Button	SettingsView		5 ปุ่ม
 Typing test area	KeyboardView		พื้นที่ทดสอบพิมพ์ดีด
-Mouse type:	SettingsView		ชนิดเมาส์:
-Revert	InputKeyboard		เปลี่ยนกลับ
 Fast	KeyboardView		็เร็ว
+Please confirm	TouchpadPrefView		กรุณายืนยัน
+Mouse speed	SettingsView		ความเร็วเมาส์
+Horizontal scrolling	TouchpadPrefView		เลื่อนแนวนอน
+Input	System name		อินพุต
+Short	KeyboardView		สั้น
+Revert	InputMouse		เปลี่ยนกลับ
+Slow	KeyboardView		ช้า
+2-Button	SettingsView		2 ปุ่ม
+Click to focus and raise	SettingsView		คลิดเพื่อดูและขยาย
+Vertical	TouchpadPrefView		แนวตั้ง
+Focus follows mouse	SettingsView		โฟกัสตามเมาส์
+Double-click test area	SettingsView		พื้นที่ทดสอบดับเบิลคลิก
+Focus mode:	SettingsView		โหมดโฟกัส:
+Revert	TouchpadPrefView		เปลี่ยนกลับ
+4-Button	SettingsView		4 ปุ่ม
+Revert	InputKeyboard		เปลี่ยนกลับ
+Mouse type:	SettingsView		ชนิดเมาส์:
 Off	TouchpadPrefView		ปิด
 Fast	TouchpadPrefView		เร็ว
-Please confirm	TouchpadPrefView		กรุณายืนยัน
 Click to focus	SettingsView		คลิกเพื่อดู
 Acceleration	TouchpadPrefView		เร่งความเร็ว
-Mouse speed	SettingsView		ความเร็วเมาส์
 Accept first click	SettingsView		ยอมรับการคลิกครั้งแรก
 OK	TouchpadPrefView		ตกลง
-Horizontal scrolling	TouchpadPrefView		เลื่อนแนวนอน
 Delay until key repeat	KeyboardView		หน่วงเวลาจนกว่าจะกดปุ่มซ้ำ
 Two finger scrolling	TouchpadPrefView		เลื่อนสองนิ้ว
-Input	System name		อินพุต
-Mouse acceleration	SettingsView		ความเร็วเมาส์
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		พื้นที่เลื่อนใหม่มีขนาดใหญ่มากและอาจขัดขวางการทำงานของเมาส์ปกติ คุณต้องการเปลี่ยนหรือไม่?
+Mouse acceleration	SettingsView		ความเร็วเมาส์
 High	TouchpadPrefView		สูง
 Defaults	TouchpadPrefView		ค่าเริ่มต้น
 1-Button	SettingsView		1 ปุ่ม
 Defaults	InputKeyboard		ค่าเริ่มต้น
-Short	KeyboardView		สั้น
-Slow	KeyboardView		ช้า
-Revert	InputMouse		เปลี่ยนกลับ
 Key repeat rate	KeyboardView		อัตราการกดคีย์ซ้ำ
-2-Button	SettingsView		2 ปุ่ม
-Click to focus and raise	SettingsView		คลิดเพื่อดูและขยาย
-Vertical	TouchpadPrefView		แนวตั้ง
 Horizontal	TouchpadPrefView		แนวนอน
-Focus follows mouse	SettingsView		โฟกัสตามเมาส์
-Focus mode:	SettingsView		โหมดโฟกัส:
-Double-click test area	SettingsView		พื้นที่ทดสอบดับเบิลคลิก
 3-Button	SettingsView		3 ปุ่ม
-Revert	TouchpadPrefView		เปลี่ยนกลับ

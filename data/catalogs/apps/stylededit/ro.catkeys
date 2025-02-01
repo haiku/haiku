@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Înlocuiește
 Characters:	Statistics		Caractere:
 Don't save	QuitAlert		Nu salva
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat doar citire. Salvați modificările la documentul \„%s\”? 
-Font	Menus		Font
 Align	Menus		Aliniază
+Font	Menus		Font
 Select all	Menus		Selectează toate
 Right	Menus		Dreapta

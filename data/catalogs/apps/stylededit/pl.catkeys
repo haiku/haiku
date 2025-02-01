@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Zamień
 Characters:	Statistics		Znaków:
 Don't save	QuitAlert		Nie zapisuj
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie „%s”? 
-Font	Menus		Font
 Align	Menus		Wyrównaj
+Font	Menus		Font
 Select all	Menus		Zaznacz wszystko
 Right	Menus		Prawo

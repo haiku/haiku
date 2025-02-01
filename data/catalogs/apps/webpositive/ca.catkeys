@@ -36,8 +36,8 @@ Browse…	Settings Window		Navega...
 Resume prior session	Settings Window		Continua la sessió anterior
 Match case	WebPositive Window		Coincidència de caixa
 Proxy password:	Settings Window		Contrasenya del servidor intermediari:
-Size:	Font Selection view		Mida:
 Failed to delete bookmark:\n'%path%'	BookmarkBar		No s'ha pogut suprimir el marcador:\n%path%
+Size:	Font Selection view		Mida:
 Page source	WebPositive Window		Codi font de la pàgina
 Proxy server port:	Settings Window		Port del servidor intermediari:
 Error opening downloads folder	Download Window		Error en obrir la carpeta de baixades

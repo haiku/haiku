@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Vervangen
 Characters:	Statistics		Karakters:
 Don't save	QuitAlert		Niet opslaan
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Dit bestand is aangeduid als alleen-lezen. Wijzigingen opslaan in document \"%s\"? 
-Font	Menus		Lettertype
 Align	Menus		Uitlijnen
+Font	Menus		Lettertype
 Select all	Menus		Alles selecteren
 Right	Menus		Rechts

@@ -1,50 +1,50 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Κύλιση
 Defaults	InputMouse		Προεπιλογές
+Scrolling	TouchpadPrefView		Κύλιση
 Long	KeyboardView		Μικρή
 Cancel	TouchpadPrefView		Άκυρο
-4-Button	SettingsView		4 κουμπιών
 Slow	TouchpadPrefView		Αργή
-Tapping sensitivity	TouchpadPrefView		Ευαισθησία αγγίγματος
 Device List	InputWindow		Λίστα Συσκευών
 Double-click speed	SettingsView		Ταχύτητα διπλού κλικ
 5-Button	SettingsView		5 κουμπιών
 Typing test area	KeyboardView		Περιοχή δοκιμής πληκτρολόγησης
-Mouse type:	SettingsView		Τύπος ποντικιού:
-Revert	InputKeyboard		Επαναφορά
 Fast	KeyboardView		Γρήγορη
+Please confirm	TouchpadPrefView		Παρακαλώ επιβεβαιώστε
+Mouse speed	SettingsView		Ταχύτητα ποντικιού
+Horizontal scrolling	TouchpadPrefView		Οριζόντια κύλιση
+Keyboard lock delay	TouchpadPrefView		Καθυστέρηση κλειδώματος πληκτρολογίου
+Input	System name		Εισαγωγή
+Quick	TouchpadPrefView		Γρήγορα
+Short	KeyboardView		Μικρή
+Revert	InputMouse		Επαναφορά
+Slow	KeyboardView		Αρχή
+2-Button	SettingsView		2 κουμπιών
+Click to focus and raise	SettingsView		Να γίνεται κλικ για εστίαση και ανύψωση
+Vertical	TouchpadPrefView		Κάθετο
+Focus follows mouse	SettingsView		Να εστιάζεται όποιο παράθυρο δείχνει ο κέρσορας
+Double-click test area	SettingsView		Περιοχή δοκιμής διπλού κλικ
+Focus mode:	SettingsView		Λειτουργία εστίασης:
+Revert	TouchpadPrefView		Επαναφορά
+4-Button	SettingsView		4 κουμπιών
+Tapping sensitivity	TouchpadPrefView		Ευαισθησία αγγίγματος
+Revert	InputKeyboard		Επαναφορά
+Mouse type:	SettingsView		Τύπος ποντικιού:
 Off	TouchpadPrefView		Κλειστό
 Never	TouchpadPrefView		Ποτέ
 Fast	TouchpadPrefView		Γρήγορη
 6-Button	SettingsView		6 κουμπιών
-Please confirm	TouchpadPrefView		Παρακαλώ επιβεβαιώστε
 Click to focus	SettingsView		Να γίνεται κλικ για εστίαση
 Acceleration	TouchpadPrefView		Επιτάχυνση
-Mouse speed	SettingsView		Ταχύτητα ποντικιού
 Accept first click	SettingsView		Αποδοχή πρώτου κλικ
 OK	TouchpadPrefView		Εντάξει
-Horizontal scrolling	TouchpadPrefView		Οριζόντια κύλιση
 Delay until key repeat	KeyboardView		Καθυστέρηση μέχρι την επανάληψη πλήκτρου
-Keyboard lock delay	TouchpadPrefView		Καθυστέρηση κλειδώματος πληκτρολογίου
 Two finger scrolling	TouchpadPrefView		Κύλιση δύο δαχτύλων
-Input	System name		Εισαγωγή
-Mouse acceleration	SettingsView		Επιτάχυνση δείκτη
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Η νέα επιφάνεια κύλισης είναι πολύ μεγάλη και ίσως να επηρεάσει την ομαλή λειτουργία του ποντικιού. Είστε σίγουρος πως θέλετε να την αλλάξετε;
+Mouse acceleration	SettingsView		Επιτάχυνση δείκτη
 High	TouchpadPrefView		Υψηλή
 Defaults	TouchpadPrefView		Προεπιλογές
 1-Button	SettingsView		1 κουμπιού
 Defaults	InputKeyboard		Προεπιλογές
-Quick	TouchpadPrefView		Γρήγορα
-Short	KeyboardView		Μικρή
-Slow	KeyboardView		Αρχή
-Revert	InputMouse		Επαναφορά
 Key repeat rate	KeyboardView		Συχνότητα επανάληψης πλήκτρου
-2-Button	SettingsView		2 κουμπιών
-Click to focus and raise	SettingsView		Να γίνεται κλικ για εστίαση και ανύψωση
-Vertical	TouchpadPrefView		Κάθετο
 Horizontal	TouchpadPrefView		Οριζόντιο
-Focus follows mouse	SettingsView		Να εστιάζεται όποιο παράθυρο δείχνει ο κέρσορας
-Focus mode:	SettingsView		Λειτουργία εστίασης:
-Double-click test area	SettingsView		Περιοχή δοκιμής διπλού κλικ
 3-Button	SettingsView		3 κουμπιών
-Revert	TouchpadPrefView		Επαναφορά

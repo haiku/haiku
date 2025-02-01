@@ -1,50 +1,50 @@
 1	ukrainian	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Прокрутка
 Defaults	InputMouse		Типові настройки
+Scrolling	TouchpadPrefView		Прокрутка
 Long	KeyboardView		Більше
 Cancel	TouchpadPrefView		Скасувати
-4-Button	SettingsView		4 кнопки
 Slow	TouchpadPrefView		Повільно
-Tapping sensitivity	TouchpadPrefView		Чутливість дотику
 Device List	InputWindow		Список пристроїв
 Double-click speed	SettingsView		Швидкість подвійного натискання
 5-Button	SettingsView		5 кнопок
 Typing test area	KeyboardView		Поле для перевірки набору тексту
-Mouse type:	SettingsView		Тип миші:
-Revert	InputKeyboard		Відкат змін
 Fast	KeyboardView		Більше
+Please confirm	TouchpadPrefView		Будь ласка підтвердіть
+Mouse speed	SettingsView		Швидкість миші
+Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
+Keyboard lock delay	TouchpadPrefView		Затримка блокування клавіатури
+Input	System name		Input
+Quick	TouchpadPrefView		Швидко
+Short	KeyboardView		Меньше
+Revert	InputMouse		Відкат змін
+Slow	KeyboardView		Меньше
+2-Button	SettingsView		2 кнопки
+Click to focus and raise	SettingsView		Натиснути для фокусу та підняти
+Vertical	TouchpadPrefView		Вертикальна
+Focus follows mouse	SettingsView		Фокус слідує за мишею
+Double-click test area	SettingsView		Тестова зона подвійного натискання
+Focus mode:	SettingsView		Режим фокусу:
+Revert	TouchpadPrefView		Відкат змін
+4-Button	SettingsView		4 кнопки
+Tapping sensitivity	TouchpadPrefView		Чутливість дотику
+Revert	InputKeyboard		Відкат змін
+Mouse type:	SettingsView		Тип миші:
 Off	TouchpadPrefView		Вимкнути
 Never	TouchpadPrefView		Ніколи
 Fast	TouchpadPrefView		Швидко
 6-Button	SettingsView		6 кнопок
-Please confirm	TouchpadPrefView		Будь ласка підтвердіть
 Click to focus	SettingsView		Натиснути для фокусу
 Acceleration	TouchpadPrefView		Прискорення
-Mouse speed	SettingsView		Швидкість миші
 Accept first click	SettingsView		По першому кліку
 OK	TouchpadPrefView		ОК
-Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
 Delay until key repeat	KeyboardView		Затримка до повтору клавіші
-Keyboard lock delay	TouchpadPrefView		Затримка блокування клавіатури
 Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
-Input	System name		Input
-Mouse acceleration	SettingsView		Прискорення миші
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Нова область прокрутки дуже велика і може перешкоджати нормальній роботі миші. Ви дійсно хочете це змінити?
+Mouse acceleration	SettingsView		Прискорення миші
 High	TouchpadPrefView		Висока
 Defaults	TouchpadPrefView		Типові настройки
 1-Button	SettingsView		1 кнопка
 Defaults	InputKeyboard		Типові настройки
-Quick	TouchpadPrefView		Швидко
-Short	KeyboardView		Меньше
-Slow	KeyboardView		Меньше
-Revert	InputMouse		Відкат змін
 Key repeat rate	KeyboardView		Швидкість повтору
-2-Button	SettingsView		2 кнопки
-Click to focus and raise	SettingsView		Натиснути для фокусу та підняти
-Vertical	TouchpadPrefView		Вертикальна
 Horizontal	TouchpadPrefView		Горизонтальна
-Focus follows mouse	SettingsView		Фокус слідує за мишею
-Focus mode:	SettingsView		Режим фокусу:
-Double-click test area	SettingsView		Тестова зона подвійного натискання
 3-Button	SettingsView		3 кнопки
-Revert	TouchpadPrefView		Відкат змін

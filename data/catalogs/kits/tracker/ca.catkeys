@@ -1,9 +1,9 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	4267788442
+1	catalan; valencian	x-vnd.Haiku-libtracker	4192200646
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
-Kind	ContainerWindow		Tipus
 Open with…	ContainerWindow		Obre amb...
+Kind	ContainerWindow		Tipus
 Error moving \"%name\" to Trash. (%error)	FSUtils		Error en moure \"%name\" a la paperera. (%error)
 Or	FindPanel		O
 MIME Description	AttributesView		Descripció de MIME
@@ -12,8 +12,8 @@ before	FindPanel		abans
 New folder%d	FSUtils		Carpeta nova %d
 Volume icons	TrackerSettingsWindow		Icones dels volums
 Ignore case	SelectionWindow		Ignora les diferències de majúscules i minúscules
-Save query:	FindPanel		Desa la consulta:
 Save as query template:	FindPanel		Desa la consulta com a plantilla:
+Save query:	FindPanel		Desa la consulta:
 Current folder	ContainerWindow		Carpeta actual
 Finish: %time - Over %finishtime left	StatusWindow		Fi: %time - falten %finishtime
 Mount all disks now	AutoMounterSettings		Munta tots els discs ara
@@ -24,7 +24,6 @@ contains	FindPanel		conté
 Open	FilePanelPriv		Obre
 Bitmap icon	AttributesView		Icona de mapa de bits
 You can't replace a folder with one of its sub-folders.	FSUtils		No podeu reemplaçar una carpeta per alguna de les subcarpetes.
-Select…	VirtualDirectoryWindow		Seleccioneu...
 Name	Default Query Columns		Nom
 Unmount	ContainerWindow		Desmunta
 Eject when unmounting	AutoMounterSettings		Expulsa'l quan es desmunti
@@ -60,13 +59,13 @@ Create link	ContainerWindow		Crea un enllaç
 starts with	FindPanel		comença amb
 Replace	FSUtils		Reemplaça
 ?+* follows nothing.	libtracker		?+* sense res després.
-Rectangle	AttributesView		Rectangle
 Include Trash	FindPanel		Inclou-hi la paperera
+Rectangle	AttributesView		Rectangle
 Move to	ContainerWindow		Mou a
 Status	Email Query Columns		Estat
 New folder	FSUtils		Carpeta nova
-Junk on end.	libtracker		Brossa al final.
 New Query	FindPanel		Consulta nova
+Junk on end.	libtracker		Brossa al final.
 system	B_SYSTEM_DIRECTORY		sistema
 Preparing to delete items…	StatusWindow		Es prepara la supressió d'elements...
 Open %name with:	OpenWithWindow		Obre %name amb:
@@ -83,15 +82,13 @@ OK	OpenWithWindow		D'acord
 Clean up	ContainerWindow		Neteja
 Modified	FindPanel		Modificat
  (block size: 	InfoWindow		 (mida de bloc: 
-Select all	QueryContainerWindow		Selecciona-ho tot
 Generate image thumbnails	SettingsView		Genera miniatures d’imatges
-Select…	FilePanelPriv		Seleccioneu...
 An item named '%filename%' already exists.	FSUtils		Ja existeix un element anomenat %filename%.
 preferences	B_PREFERENCES_DIRECTORY		preferències
 Name	Person Query Columns		Nom
 Skip all	FSUtils		Omet-ho tot
-Corrupted opcode.	libtracker		Opcode corrupte.
 Atom	AttributesView		Àtom
+Corrupted opcode.	libtracker		Opcode corrupte.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed de %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Es prepara la restauració dels elements...
 Mount	ContainerWindow		Munta
@@ -117,16 +114,15 @@ Edit templates…	TemplatesMenu		Edita les plantilles...
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used usat -- %free lliure)
 Hide dotfiles	SettingsView		Amaga els fitxers amb un punt inicial
 Trash	Model		Paperera
-Enable type-ahead filtering	SettingsView		Habilita el filtratge d'anticipació de tecleig
 copy	FSUtils	filename copy	copia
+Enable type-ahead filtering	SettingsView		Habilita el filtratge d'anticipació de tecleig
 Location	OpenWithWindow		Ubicació
-Resize to fit	QueryContainerWindow		Ajusta a l'espai
-List folders first	SettingsView		Mostra primer les carpetes
 Find	FSUtils		Troba
+List folders first	SettingsView		Mostra primer les carpetes
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ja existeix un element amb el nom \"%name\" en aquesta carpeta. El voleu reemplaçar per l'enllaç simbòlic que creeu?
 List view	ContainerWindow		Vista de llista
-Modified	QueryPoseView		Modificat
 Create relative link	ContainerWindow		Crea un enllaç relatiu
+Modified	QueryPoseView		Modificat
 Owner	FilePermissionsView		Propietari
 Cancel	FSClipBoard		Cancel·la
 Modified	PoseView		Modificat
@@ -147,7 +143,6 @@ Cut	ContainerWindow		Retalla
 Disks	Model		Discs
 Create a Query template	FindPanel		Crea una plantilla de consulta
 Size	FindPanel		Mida
-Window	FilePanelPriv		Finestra
 New submenu	ContainerWindow	Folder name of New-template submenu	Submenú nou
 OK	Email Query Columns		D'acord
 Location	QueryPoseView		Ubicació
@@ -157,8 +152,8 @@ Previously mounted disks	AutoMounterSettings		Discs muntats prèviament
 You cannot replace a file with a folder or a symbolic link.	FSUtils		No podeu reemplaçar un fitxer per una carpeta o un enllaç simbòlic.
 The target disk does not support creating links.	FSUtils		El disc de destinació no permet crear enllaços.
 develop	B_SYSTEM_DEVELOP_DIRECTORY		desenvolupa
-64-bit integer	AttributesView		Enter de 64 bits
 Cut more	ContainerWindow		Retalla'n més
+64-bit integer	AttributesView		Enter de 64 bits
 The Tracker must be running to see Info windows.	PoseView		Cal que el Rastrejador s'executi per veure les finestres d'informació.
 Tracker preferences	TrackerSettingsWindow		Preferències del Rastrejador
 Read	FilePermissionsView		Lectura
@@ -172,42 +167,36 @@ If you move the home folder, %osName may not behave properly!\n\nAre you sure yo
 Property info	AttributesView		Informació de propietat
 Sorry, you can't create links in the Trash.	PoseView		Disculpeu, no podeu fer enllaços amb la paperera.
 From	Email Query Columns		De
-Invert selection	QueryContainerWindow		Selecció inversa
 Open selection with:	OpenWithWindow		Obre la selecció amb:
-Preferences…	ContainerWindow		Preferències...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		No s'ha pogut obrir \"%document\" ja que l'aplicació \"%app\" és a la paperera. 
 Work Phone	Person Query Columns		Telèfon de la feina
 Select folders	FindPanel		Selecció de carpetes
 Close	ContainerWindow		Tanca
 Get info	ContainerWindow		Informació
 MIME Type	AttributesView		Tipus MIME
-Show folder location in title tab	SettingsView		Mostra la ubicació de la carpeta al títol de la pestanya
 There was an error resolving the link.	Tracker		Hi ha hagut un error en resoldre l'enllaç.
+Show folder location in title tab	SettingsView		Mostra la ubicació de la carpeta al títol de la pestanya
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Hi ha hagut un problema en intentar desar-ho a la carpeta que heu especificat. Si us plau, intenteu-ho en una altra.
 {0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# valors>}}
 Desktop	TrackerSettingsWindow		Escriptori
 Nested *?+.	libtracker		Imbricació de *?+.
 Move	FSUtils	button label	Mou
-Clean up	DeskWindow		Neteja
 Group	FilePermissionsView		Grup
 Could not find an application to open \"%name\" (%error). 	FSUtils		No s'ha pogut trobar cap aplicació per obrir \"%name\" (%error). 
 Internal error.	libtracker		Error intern.
-Mini icon view	DeskWindow		Mostra les icones petites
 Geometric size	AttributesView		Mida geomètrica
-contains	SelectionWindow		conté
 Replace	FilePanelPriv		Reemplaça
+contains	SelectionWindow		conté
 is not	FindPanel		no és
-Icon view	DeskWindow		Mostra les icones
-Mount settings…	ContainerWindow		Paràmetres del muntatge...
 Keywords	Bookmark Query Columns		Paraules clau
-Media parameter web	AttributesView		Paràmetre web multimèdia
 Copy more	ContainerWindow		Copia'n més
 by name	FindPanel		per nom
+Media parameter web	AttributesView		Paràmetre web multimèdia
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Disculpeu, no podeu desar fitxers a la carpeta d'arrel del sistema.
 Restore	ContainerWindow		Restaura
 Location	ContainerWindow		Ubicació
-Warning space color	SettingsView		L'espai de color és feble
 Skip	FSUtils		Omet
+Warning space color	SettingsView		L'espai de color és feble
 Text list	AttributesView		Llista de text
 Used space color	SettingsView		Espai de color usat
 Cancel	FSUtils		Cancel·la
@@ -225,16 +214,13 @@ Cancel	FilePanelPriv		Cancel·la
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Disculpeu, no podeu editar aquest atribut.
 Memory pointer	AttributesView		Punter de memòria
 Cancel	OpenWithWindow		Cancel·la
-Select…	DeskWindow		Seleccioneu...
-Files cannot be moved or deleted from a read-only volume.	PoseView		No es poden moure o suprimir fitxers d'un volum només de lectura.
-Edit name	FilePanelPriv		Edita el nom
 There was an error deleting \"%name\":\n\t%error	FSUtils		Hi ha hagut un error en suprimir \"%name\":\n\t%error
+Files cannot be moved or deleted from a read-only volume.	PoseView		No es poden moure o suprimir fitxers d'un volum només de lectura.
 Resize to fit	ContainerWindow		Ajusta a l'espai
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Enllaça \"%name\" amb:
 Mount server error	AutoMounterSettings		Error del servidor de muntatge
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si canvieu de nom la carpeta personal, el sistema %osName podria no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu canviar-la de nom, mantingueu premuda la tecla Maj. i cliqueu a Canvia'n el nom.
 Boolean	AttributesView		Booleà
-Invert selection	FilePanelPriv		Selecció inversa
 Memory size	AttributesView		Mida de la memòria
 New folder	TemplatesMenu		Carpeta nova
  (broken)	InfoWindow		 (trencat)
@@ -243,7 +229,6 @@ The application \"%appname\" does not support the type of document you are about
 Reverse order	ContainerWindow		Inverteix l'ordre
 Copying: 	StatusWindow		Es copia:
 Show navigator	SettingsView		Mostra el navegador
-Select all	DeskWindow		Selecciona-ho tot
 Double-precision floating point number	AttributesView		Número de punt flotant de doble precisió
 Decrease size	ContainerWindow		Redueix-ne la mida
 Recent queries	FindPanel		Consultes recents
@@ -257,10 +242,9 @@ Tracker status	StatusWindow		Estat del Rastrejador
 Handles any %type	OpenWithWindow		Gestiona qualsevol %type
 The mount server could not be contacted.	AutoMounterSettings		No s'ha pogut contactar amb el servidor de muntatge.
 Query template	FindPanel		Plantilla de consulta
-ends with	SelectionWindow		acaba amb
 Open	OpenWithWindow		Obre
+ends with	SelectionWindow		acaba amb
 You must have at least one attribute showing.	PoseView		Heu de tenir almenys un atribut visible.
-Cut	FilePanelPriv		Retalla
 Finish: after several years	StatusWindow		Acabament: al cap d'uns quants anys
 Favorites	FilePanelPriv		Preferits
 Point	AttributesView		Punt
@@ -274,17 +258,17 @@ Could not find application \"%appname\"	OpenWithWindow		No s'ha pogut trobar l'a
 Unmatched parenthesis.	libtracker		Parèntesis no coincidents.
 New folder %d	FSUtils		Carpeta nova %d
 Extended attribute	AttributesView		Atribut ampliat
-Unmatched brackets.	libtracker		Claudàtors no coincidents.
 Error %error loading Add-On %name.	ContainerWindow		Hi ha hagut un error (%error) en carregar el complement %name.
+Unmatched brackets.	libtracker		Claudàtors no coincidents.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Esteu intentant reemplaçar l'element\n\t%name%dest\nper\n\t%name%src\n\nSegur que el voleu reemplaçar per %movemode?
 Empty Trash	ContainerWindow		Buida la paperera
 no supporting apps	OpenWithWindow		aplicacions no compatibles
 32-bit unsigned integer	AttributesView		Enter de 32 bits no signat
 Preparing to empty Trash…	StatusWindow		Es prepara el buidatge de la paperera...
 Deleting: 	StatusWindow		Se suprimeix: 
-label too long	PoseView		l'etiqueta és massa llarga
 the MIME settings	FSUtils		els paràmetres de MIME
 You can't move or copy the trash.	FSUtils		No podeu moure o copiar la paperera.
+label too long	PoseView		l'etiqueta és massa llarga
 Error creating link to \"%name\".	FSUtils		Hi ha hagut un error en enllaçar amb \"%name\".
 Unknown	FilePermissionsView		Desconegut
 Paste links	ContainerWindow		Enganxa els enllaços
@@ -292,56 +276,51 @@ Restoring: 	StatusWindow		Es restaura:
 The Tracker must be running to set the default printer.	PoseView		El Rastrejador ha d'executar-se per establir la impressora predeterminada.
 calculating…	InfoWindow		es calcula...
 Preferred for file	OpenWithWindow		Preferit pel fitxer
-OK	AutoMounterSettings		D'acord
 {0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# de seleccionat} other{# de seleccionats}}
+OK	AutoMounterSettings		D'acord
 copying	FSUtils		es copia
-Get info	FilePanelPriv		Informació
 MIME String	AttributesView		Cadena MIME
 Delete	ContainerWindow		Suprimeix
 Execute	FilePermissionsView		Executa
-Show volumes on Desktop	SettingsView		Mostra els volums a l'escriptori
 no	AttributesView		no
+Show volumes on Desktop	SettingsView		Mostra els volums a l'escriptori
 Recent folders	ContainerWindow		Carpetes recents
 Desktop	Model		Escriptori
 Select all	ContainerWindow		Selecciona-ho tot
 apps	B_APPS_DIRECTORY		aplicacions
 Error calculating folder size.	InfoWindow		Error en calcular la mida de la carpeta.
 Delete	FSUtils		Suprimeix
-Duplicate	FilePanelPriv		Duplica
 Edit name	ContainerWindow		Edita el nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No s'ha pogut obrir \"%document\" (Falta el símbol %symbol). \n
 ASCII Text	AttributesView		Text ASCII
 Atom reference	AttributesView		Referència d'àtom
 config	B_USER_CONFIG_DIRECTORY		configuració
 Error moving \"%name\".	FSUtils		Error en moure \"%name\".
-Select…	QueryContainerWindow		Seleccioneu...
 Open	ContainerWindow		Obre
 Settings…	MountMenu		Paràmetres...
 You cannot put the selected item(s) into the trash.	FSUtils		No podeu posar els elements seleccionats a la paperera.
-Increase size	DeskWindow		Augmenta'n la mida
 Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Destinació:
 starts with	SelectionWindow		comença amb
 Any	AttributesView		Qualsevol
-New	DeskWindow		Nou
 Invert	SelectionWindow		Inverteix
 Open…	FindPanel		Obre...
 Would you like to find some other suitable application?	FSUtils		Voleu trobar una altra aplicació adequada?
-*+? operand may be empty.	libtracker		L'operador *+? pot estar buit.
 (unknown)	AttributesView		(desconegut)
+*+? operand may be empty.	libtracker		L'operador *+? pot estar buit.
 Recent folders	FavoritesMenu		Carpetes recents
 Signed memory size	AttributesView		Mida de memòria signada
 The specified name is illegal. Please choose another name.	FilePanelPriv		El nom especificat és il·legal. Si us plau, trieu-ne un altre.
 of %items	StatusWindow		de %items
-MIME Path	AttributesView		Camí de MIME
-less than	FindPanel		menys que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error en copiar el fitxer \"%name\":\n\t%error\n\nVoleu continuar?
+less than	FindPanel		menys que
+MIME Path	AttributesView		Camí de MIME
 Creating links: 	StatusWindow		Es creen els enllaços: 
-Create %s clipping	PoseView		Crea un retall de %s
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No s'ha pogut obrir \"%document\" amb l'aplicació \"%app\" (%error). 
+Create %s clipping	PoseView		Crea un retall de %s
 Error moving \"%name\"	FSUtils		Error en moure \"%name\"
 To: %dir	StatusWindow		A: %dir
-Paste layout	ContainerWindow		Enganxa la disposició
 Cancel	Tracker		Cancel·la
+Paste layout	ContainerWindow		Enganxa la disposició
 yes	AttributesView		sí
 Make active printer	ContainerWindow		Estableix com a impressora activa
 Copy to	ContainerWindow		Copia a
@@ -353,19 +332,18 @@ If you alter the system folder or its contents, you won't be able to boot %osNam
 Save	FilePanelPriv		Desa
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		No s'ha pogut obrir \"%document\" amb l'aplicació \"%app\" (Falten biblioteques: %library). \n
 Finish: %time	StatusWindow		Fi: %time
-Messenger	AttributesView		Missatger
 after	FindPanel		després
+Messenger	AttributesView		Missatger
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte de dades>} other{<# bytes de dades>}}
 Version	OpenWithWindow		Versió
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dels elements seleccionats no es poden moure a la paperera. Els voleu suprimir? (Aquesta operació no es pot desfer.)
 The entered file name is too long.	FSUtils		El nom de fitxer introduït és massa llarg.
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dels elements seleccionats no es poden moure a la paperera. Els voleu suprimir? (Aquesta operació no es pot desfer.)
 Add printer…	ContainerWindow		Afegeix-hi una impressora...
 Permissions	ContainerWindow		Permisos
 Size:	InfoWindow		Mida:
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'element seleccionat no es pot moure a la paperera. El voleu suprimir? (Aquesta operació no es pot desfer.)
 Copy	ContainerWindow		Copia
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'element seleccionat no es pot moure a la paperera. El voleu suprimir? (Aquesta operació no es pot desfer.)
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Disculpeu, l'atribut "Caràcter" no pot contenir un glif multibyte.
-Open parent	VirtualDirectoryWindow		Obre la carpeta superior
 And	FindPanel		I
 Palette-indexed picture	AttributesView		Una imatge indexada per paleta
 Drawing pattern	AttributesView		Patró de dibuix
@@ -374,7 +352,6 @@ Name = %name	FindPanel	FindResultTitle	Nom = %name
 Subject	Email Query Columns		Assumpte
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error en copiar la carpeta \"%name\":\n\t%error\n\nVoleu continuar?
 You cannot create a link to the root directory.	FSUtils		No podeu fer cap enllaç amb la carpeta d'arrel.
-Select all	FilePanelPriv		Selecciona-ho tot
 Other	FilePermissionsView		Altres
 Automatic disk mounting	AutoMounterSettings		Muntatge automàtic de discs
 parent folder	NavMenu		carpeta pare
@@ -386,10 +363,10 @@ Disks	DirMenu		Discs
 Open parent	ContainerWindow		Obre la carpeta superior
 Find…	ContainerWindow		Troba...
 moving	FSUtils		es mou
-Single window navigation	SettingsView		Navega en una sola finestra
-greater than	FindPanel		més gran que
 Add	FindPanel		Afegeix
+greater than	FindPanel		més gran que
 Created:	InfoWindow		Creat:
+Single window navigation	SettingsView		Navega en una sola finestra
 Edit Query template	FindPanel		Edita la plantilla de consulta
 Save query as template…	FindPanel		Desa la consulta com a plantilla...
 All disks	AutoMounterSettings		Tots els discs
@@ -416,12 +393,10 @@ There was a problem trying to replace \"%name\". The item might be open or busy.
 Windows	TrackerSettingsWindow		Finestres
 Show space bars on volumes	SettingsView		Mostra les barres d'espai dels volums
 Could not update permissions of file \"%name\". %error	FSUtils		No s'han pogut actualitzar els permisos del fitxer \"%name\". %error
-Decrease size	DeskWindow		Redueix-ne la mida
 Emptying Trash… 	StatusWindow		Es buida la paperera... 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{per a # fitxer} other{per a # fitxers}}
 Revert	TrackerSettingsWindow		Torna a l'estat anterior
 trash	B_TRASH_DIRECTORY		paperera
-%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta de sistema o el que hi ha, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, mantingueu premuda la tecla Maj. i cliqueu a Mou.
 Open query:	FindPanel		Obre una consulta:
 Close all in workspace	ContainerWindow		Tanca-ho tot de l'espai de treball
@@ -430,7 +405,6 @@ Network address	AttributesView		Adreça de xarxa
 Finish: %time - %finishtime left	StatusWindow		Acabarà: %time - falten %finishtime
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		No s'ha pogut obrir \"%document\" (Falten biblioteques: %library). \n
 Create relative link here	ContainerWindow		Crea un enllaç relatiu aquí
-Copy	FilePanelPriv		Copia
 All Haiku disks	AutoMounterSettings		Tots els discs del Haiku
 Close all	ContainerWindow		Tanca-ho tot
 Paused: click to resume or stop	StatusWindow		En pausa: cliqueu per continuar o aturar
@@ -447,21 +421,16 @@ Move here	ContainerWindow		Mou aquí
 the config folder	FSUtils		la carpeta de configuració
 Sorry, could not create a new folder.	FSUtils		Disculpeu, no s'ha pogut preparar una carpeta nova.
 MIME Signature	AttributesView		Signatura de MIME
-Select all	VirtualDirectoryWindow		Selecciona-ho tot
-%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Canvia'n el nom
 Clean up all	ContainerWindow		Neteja-ho tot
 Add current folder	FilePanelPriv		Afegeix la carpeta actual
 Description:	InfoWindow		Descripció:
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Segur que voleu suprimir els elements seleccionats? Aquesta operació no es pot desfer.
 Grayscale picture	AttributesView		Imatge d'escala de grisos
-Mount	DeskWindow		Munta
 ends with	FindPanel		acaba amb
 Show Disks icon	SettingsView		Mostra la icona dels discs
 Outline selection rectangle only	SettingsView		Només els contorns del rectangle de selecció
 by formula	FindPanel		per fórmula
-Resize to fit	VirtualDirectoryWindow		Ajusta a l'espai
-Move to Trash	FilePanelPriv		Mou a la paperera
 is	FindPanel		és
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si canvieu de nom la carpeta de sistema, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, manteniu premuda la tecla Maj. i cliqueu a \"Canvia'n el nom\".
 Permissions	FilePermissionsView		Permisos
@@ -471,18 +440,16 @@ Message	AttributesView		Missatge
 Modified	Default Query Columns		Modificat
 Default application	InfoWindow		Aplicació per defecte
 Untitled bitmap	PoseView		Imatge sense nom
-matches regular expression	SelectionWindow		es correspon amb l'expressió regular
 Invert selection	ContainerWindow		Selecció inversa
-Close	VirtualDirectoryWindow		Tanca
+matches regular expression	SelectionWindow		es correspon amb l'expressió regular
 Monochrome picture	AttributesView		Imatge monocroma
 Real name	ContainerWindow		Nom real
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		No es pot obrir \"%name\". Aquest fitxer està erròniament marcat com a executable. 
-Go to parent	FilePanelPriv		Vés al pare
 Save	FindPanel		Desa
 Name	FindPanel		Nom
 Cancel	WidgetAttributeText		Cancel·la
-Memory corruption.	libtracker		Corrupció de memòria.
 Expression too long.	libtracker		Expressió massa llarga.
+Memory corruption.	libtracker		Corrupció de memòria.
 Color	AttributesView		Color
 Copy layout	ContainerWindow		Copia la disposició
 Duplicate	ContainerWindow		Duplica
@@ -493,32 +460,27 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Heu de deixar anar els elements a una de les icones de la finestra \"Discs\".
 Version:	InfoWindow		Versió:
 OK	PoseView		D'acord
-Add-ons	DeskWindow		Complements
 Add new submenu…	TemplatesMenu		Afegiu-hi un submenú nou...
 Find	FindPanel		Troba
 Empty folder	NavMenu		Carpeta buida
 Defaults	TrackerSettingsWindow		Valors predeterminats
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Disculpeu, al volum de destinació no hi ha prou espai per copiar-hi la selecció.
 True-color picture	AttributesView		Imatge de colors veritables
-Add-ons	FilePanelPriv		Complements
 Alignment	AttributesView		Alineament
 Move to Trash	FSUtils		Mou a la paperera
-Cancel	PoseView		Cancel·la
 Handles %type	OpenWithWindow		Gestiona el tipus %type
-Delete	PoseView		Suprimeix
+Cancel	PoseView		Cancel·la
 Options	FindPanel		Opcions
+Delete	PoseView		Suprimeix
 Media parameter	AttributesView		Paràmetre multimèdia
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si altereu la capeta personal, el sistema %osName pot no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix la voleu alterar, mantingueu premuda la tecla Maj. i cliqueu a \"Sé el que faig\".
 Sorry, you can't copy items to the Trash.	PoseView		Disculpeu, no podeu copiar elements a la paperera.
-Invert selection	VirtualDirectoryWindow		Selecció inversa
-New folder	FilePanelPriv		Carpeta nova
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# element} other{# elements}}
 Name	AttributesView		Nom
 Invalid bracket range.	libtracker		Interval de claudàtors no vàlid.
 the settings folder	FSUtils		la carpeta de paràmetres
 If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si moveu %target, el sistema %osName pot no comportar-se correctament!\n\nSegur que ho voleu fer?
 Create a Query	FindPanel		Consulta nova
-Close	QueryContainerWindow		Tanca
 I know what I'm doing	FSUtils	button label	Sé el que faig
 Preparing to copy items…	StatusWindow		Es prepara la còpia d'elements...
 %lld B	WidgetAttributeText	The filesize symbol for byte	%lld B

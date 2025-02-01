@@ -1,50 +1,50 @@
 1	polish	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Przewijanie
 Defaults	InputMouse		Przywróć domyślne
+Scrolling	TouchpadPrefView		Przewijanie
 Long	KeyboardView		Długie
 Cancel	TouchpadPrefView		Anuluj
-4-Button	SettingsView		4-przyciskowa
 Slow	TouchpadPrefView		Wolny
-Tapping sensitivity	TouchpadPrefView		Czułość na stuknięcia
 Device List	InputWindow		Lista urządzeń
 Double-click speed	SettingsView		Szybkość dwukliku
 5-Button	SettingsView		5-przyciskowa
 Typing test area	KeyboardView		Strefa testowania
-Mouse type:	SettingsView		Typ myszy:
-Revert	InputKeyboard		Przywróć
 Fast	KeyboardView		Duża
+Please confirm	TouchpadPrefView		Potwierdź
+Mouse speed	SettingsView		Szybkość myszy
+Horizontal scrolling	TouchpadPrefView		Przesuwanie poziome
+Keyboard lock delay	TouchpadPrefView		Opóźnienie blokady klawiatury
+Input	System name		Urządzenia wejściowe
+Quick	TouchpadPrefView		Szybkie
+Short	KeyboardView		Krótkie
+Revert	InputMouse		Cofnij
+Slow	KeyboardView		Mała
+2-Button	SettingsView		2-przyciskowa
+Click to focus and raise	SettingsView		Kliknij aby aktywować i wynieść na wierzch
+Vertical	TouchpadPrefView		Poziomy
+Focus follows mouse	SettingsView		Aktywacja podąża za wskaźnikiem
+Double-click test area	SettingsView		Obszar testowania dwukliku
+Focus mode:	SettingsView		Tryb aktywacji:
+Revert	TouchpadPrefView		Cofnij
+4-Button	SettingsView		4-przyciskowa
+Tapping sensitivity	TouchpadPrefView		Czułość na stuknięcia
+Revert	InputKeyboard		Przywróć
+Mouse type:	SettingsView		Typ myszy:
 Off	TouchpadPrefView		Wyłączone
 Never	TouchpadPrefView		Nigdy
 Fast	TouchpadPrefView		Szybki
 6-Button	SettingsView		6-przyciskowa
-Please confirm	TouchpadPrefView		Potwierdź
 Click to focus	SettingsView		Kliknij aby aktywować
 Acceleration	TouchpadPrefView		Przyspieszenie
-Mouse speed	SettingsView		Szybkość myszy
 Accept first click	SettingsView		Akceptuj pierwsze kliknięcie
 OK	TouchpadPrefView		OK
-Horizontal scrolling	TouchpadPrefView		Przesuwanie poziome
 Delay until key repeat	KeyboardView		Opóźnienie przed powtórzeniem
-Keyboard lock delay	TouchpadPrefView		Opóźnienie blokady klawiatury
 Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
-Input	System name		Urządzenia wejściowe
-Mouse acceleration	SettingsView		Przyspieszenie myszy
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nowy obszar przesuwania jest bardzo duży i może przeszkadzać w normalnym używaniu wskaźnika myszy. Na pewno chcesz go ustawić?
+Mouse acceleration	SettingsView		Przyspieszenie myszy
 High	TouchpadPrefView		Wysoka
 Defaults	TouchpadPrefView		Przywróć domyślne
 1-Button	SettingsView		1-przyciskowa
 Defaults	InputKeyboard		Przywróć domyślne
-Quick	TouchpadPrefView		Szybkie
-Short	KeyboardView		Krótkie
-Slow	KeyboardView		Mała
-Revert	InputMouse		Cofnij
 Key repeat rate	KeyboardView		Częstotliwość powtarzania klawiszy
-2-Button	SettingsView		2-przyciskowa
-Click to focus and raise	SettingsView		Kliknij aby aktywować i wynieść na wierzch
-Vertical	TouchpadPrefView		Poziomy
 Horizontal	TouchpadPrefView		Pionowy
-Focus follows mouse	SettingsView		Aktywacja podąża za wskaźnikiem
-Focus mode:	SettingsView		Tryb aktywacji:
-Double-click test area	SettingsView		Obszar testowania dwukliku
 3-Button	SettingsView		3-przyciskowa
-Revert	TouchpadPrefView		Cofnij

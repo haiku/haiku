@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Korvaa
 Characters:	Statistics		Merkkejä:
 Don't save	QuitAlert		Älä tallenna
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
-Font	Menus		Kirjasin
 Align	Menus		Tasaa
+Font	Menus		Kirjasin
 Select all	Menus		Valitse kaikki
 Right	Menus		Oikea

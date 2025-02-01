@@ -36,8 +36,8 @@ Browse…	Settings Window		ブラウズ...
 Resume prior session	Settings Window		以前のセッションを再開
 Match case	WebPositive Window		大文字小文字を区別
 Proxy password:	Settings Window		プロキシのパスワード:
-Size:	Font Selection view		サイズ:
 Failed to delete bookmark:\n'%path%'	BookmarkBar		以下のブックマークを削除できませんでした:\n'%path%'
+Size:	Font Selection view		サイズ:
 Page source	WebPositive Window		ページのソース
 Proxy server port:	Settings Window		ポート:
 Error opening downloads folder	Download Window		ダウンロードフォルダーを開けません

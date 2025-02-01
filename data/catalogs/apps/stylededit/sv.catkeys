@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Ersätt
 Characters:	Statistics		Tecken:
 Don't save	QuitAlert		Spara inte
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet \"%s\"?  
-Font	Menus		Font
 Align	Menus		Justera
+Font	Menus		Font
 Select all	Menus		Markera allt
 Right	Menus		Höger

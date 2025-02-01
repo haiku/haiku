@@ -1,49 +1,49 @@
 1	esperanto	x-vnd.Haiku-Input	4063065788
-Scrolling	TouchpadPrefView		Rulumado
 Defaults	InputMouse		Defaŭltoj
+Scrolling	TouchpadPrefView		Rulumado
 Long	KeyboardView		Longa
 Cancel	TouchpadPrefView		Nuligi
-4-Button	SettingsView		4-butona
 Slow	TouchpadPrefView		Malrapida
-Tapping sensitivity	TouchpadPrefView		Frapsentemo
 Device List	InputWindow		Listo de aparatoj
 Double-click speed	SettingsView		Rapideco de duobla alklako
 5-Button	SettingsView		5-butona
 Typing test area	KeyboardView		Areo por testi tajpadon
-Mouse type:	SettingsView		Speco de muso:
-Revert	InputKeyboard		Malfari
 Fast	KeyboardView		Rapide
+Please confirm	TouchpadPrefView		Konfirmu
+Mouse speed	SettingsView		Rapideco de muso
+Horizontal scrolling	TouchpadPrefView		Horizontala rulumado
+Input	System name		Enigo
+Quick	TouchpadPrefView		Rapide
+Short	KeyboardView		Mallonge
+Revert	InputMouse		Malfari
+Slow	KeyboardView		Malrapide
+2-Button	SettingsView		2-butona
+Click to focus and raise	SettingsView		Alklaki por enfokusigi kaj suprenigi
+Vertical	TouchpadPrefView		Vertikala
+Focus follows mouse	SettingsView		Fokuso sekvas muson
+Double-click test area	SettingsView		Loko por testi duoblalklakon
+Focus mode:	SettingsView		Reĝimo de fokusigo:
+Revert	TouchpadPrefView		Malfari
+4-Button	SettingsView		4-butona
+Tapping sensitivity	TouchpadPrefView		Frapsentemo
+Revert	InputKeyboard		Malfari
+Mouse type:	SettingsView		Speco de muso:
 Off	TouchpadPrefView		Malŝalti
 Never	TouchpadPrefView		Neniam
 Fast	TouchpadPrefView		Rapide
 6-Button	SettingsView		6-butona
-Please confirm	TouchpadPrefView		Konfirmu
 Click to focus	SettingsView		Klaki por fokusigi
 Acceleration	TouchpadPrefView		Akcelado
-Mouse speed	SettingsView		Rapideco de muso
 Accept first click	SettingsView		Akcepti unuan klakon
 OK	TouchpadPrefView		Bone
-Horizontal scrolling	TouchpadPrefView		Horizontala rulumado
 Delay until key repeat	KeyboardView		Prokrasto dum klava ripeto
 Two finger scrolling	TouchpadPrefView		Rulumado per du fingroj
-Input	System name		Enigo
-Mouse acceleration	SettingsView		Akcelado de muso
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nova areo por rulumo estas tre vasta kaj povas malhelpi operaciojn per muso. Ĉu vi vere volas ŝanĝi ĝin?
+Mouse acceleration	SettingsView		Akcelado de muso
 High	TouchpadPrefView		Alta
 Defaults	TouchpadPrefView		Defaŭltoj
 1-Button	SettingsView		1-butona
 Defaults	InputKeyboard		Defaŭltoj
-Quick	TouchpadPrefView		Rapide
-Short	KeyboardView		Mallonge
-Slow	KeyboardView		Malrapide
-Revert	InputMouse		Malfari
 Key repeat rate	KeyboardView		Klavripeta rapido
-2-Button	SettingsView		2-butona
-Click to focus and raise	SettingsView		Alklaki por enfokusigi kaj suprenigi
-Vertical	TouchpadPrefView		Vertikala
 Horizontal	TouchpadPrefView		Horizontala
-Focus follows mouse	SettingsView		Fokuso sekvas muson
-Focus mode:	SettingsView		Reĝimo de fokusigo:
-Double-click test area	SettingsView		Loko por testi duoblalklakon
 3-Button	SettingsView		3-butona
-Revert	TouchpadPrefView		Malfari

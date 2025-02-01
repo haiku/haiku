@@ -84,7 +84,7 @@ Replace	FindandReplaceWindow		แทนที่
 Characters:	Statistics		ตัวอักษร:
 Don't save	QuitAlert		ไม่บันทึก
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		ไฟล์นี้ถูกทำเครื่องหมายว่าอ่านอย่างเดียว บันทึกการเปลี่ยนแปลงเอกสาร \"%s\" หรือไม่?
-Font	Menus		ตัวอักษร
 Align	Menus		ตําแหน่ง
+Font	Menus		ตัวอักษร
 Select all	Menus		เลือกทั้งหมด
 Right	Menus		ขวา:

@@ -36,8 +36,8 @@ Browse…	Settings Window		Böngészés…
 Resume prior session	Settings Window		Előző munkamenet folytatása
 Match case	WebPositive Window		Egyező betűméret
 Proxy password:	Settings Window		Proxy jelszó:
-Size:	Font Selection view		Méret:
 Failed to delete bookmark:\n'%path%'	BookmarkBar		Nem sikerült a könyvjelző törlése:\n%path%
+Size:	Font Selection view		Méret:
 Page source	WebPositive Window		Oldal forrása
 Proxy server port:	Settings Window		Proxy kiszolgáló port:
 Error opening downloads folder	Download Window		A letöltések mappa nem nyitható meg

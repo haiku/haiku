@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		替换
 Characters:	Statistics		字符数：
 Don't save	QuitAlert		不保存
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		文件标记为只读。是否将修改保存到文档 \"%s\" ?
-Font	Menus		字体
 Align	Menus		对齐
+Font	Menus		字体
 Select all	Menus		全选
 Right	Menus		居右

@@ -1,50 +1,50 @@
 1	czech	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Rolování
 Defaults	InputMouse		Výchozí hodnoty
+Scrolling	TouchpadPrefView		Rolování
 Long	KeyboardView		Dlouhá
 Cancel	TouchpadPrefView		Zrušit
-4-Button	SettingsView		4-tlačítková
 Slow	TouchpadPrefView		Pomalý
-Tapping sensitivity	TouchpadPrefView		Citlivost klepnutí
 Device List	InputWindow		Seznam zařízení
 Double-click speed	SettingsView		Rychlost poklepání
 5-Button	SettingsView		5-tlačítková
 Typing test area	KeyboardView		Oblast pro zkoušení psaní
-Mouse type:	SettingsView		Typ myši:
-Revert	InputKeyboard		Vrátit
 Fast	KeyboardView		Rychlá
+Please confirm	TouchpadPrefView		Prosím potvrďte
+Mouse speed	SettingsView		Rychlost myši
+Horizontal scrolling	TouchpadPrefView		Vodorovné rolování
+Keyboard lock delay	TouchpadPrefView		Prodleva zamčení klávesnice
+Input	System name		Vstup
+Quick	TouchpadPrefView		Rychlá
+Short	KeyboardView		Krátká
+Revert	InputMouse		Vrátit
+Slow	KeyboardView		Pomalá
+2-Button	SettingsView		2-tlačítková
+Click to focus and raise	SettingsView		Aktivovat a vyzdvihnout klepnutím
+Vertical	TouchpadPrefView		Svislý
+Focus follows mouse	SettingsView		Aktivace najetím myši nad okno
+Double-click test area	SettingsView		Oblast zkoušení poklepání
+Focus mode:	SettingsView		Režim aktivace:
+Revert	TouchpadPrefView		Vrátit
+4-Button	SettingsView		4-tlačítková
+Tapping sensitivity	TouchpadPrefView		Citlivost klepnutí
+Revert	InputKeyboard		Vrátit
+Mouse type:	SettingsView		Typ myši:
 Off	TouchpadPrefView		Vypnuto
 Never	TouchpadPrefView		Nikdy
 Fast	TouchpadPrefView		Rychlá
 6-Button	SettingsView		6-tlačítková
-Please confirm	TouchpadPrefView		Prosím potvrďte
 Click to focus	SettingsView		Aktivace okna klepnutím
 Acceleration	TouchpadPrefView		Zrychlení
-Mouse speed	SettingsView		Rychlost myši
 Accept first click	SettingsView		Přijmout první klepnutí
 OK	TouchpadPrefView		OK
-Horizontal scrolling	TouchpadPrefView		Vodorovné rolování
 Delay until key repeat	KeyboardView		Zpoždění opakování
-Keyboard lock delay	TouchpadPrefView		Prodleva zamčení klávesnice
 Two finger scrolling	TouchpadPrefView		Rolování dvěma prsty
-Input	System name		Vstup
-Mouse acceleration	SettingsView		Zrychlení myši
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nová rolovací oblast je velmi velká a může zamezit běžnému používání myši. Opravdu ji chcete změnit?
+Mouse acceleration	SettingsView		Zrychlení myši
 High	TouchpadPrefView		Velký
 Defaults	TouchpadPrefView		Výchozí hodnoty
 1-Button	SettingsView		1-tlačítková
 Defaults	InputKeyboard		Výchozí hodnoty
-Quick	TouchpadPrefView		Rychlá
-Short	KeyboardView		Krátká
-Slow	KeyboardView		Pomalá
-Revert	InputMouse		Vrátit
 Key repeat rate	KeyboardView		Rychlost opakování kláves
-2-Button	SettingsView		2-tlačítková
-Click to focus and raise	SettingsView		Aktivovat a vyzdvihnout klepnutím
-Vertical	TouchpadPrefView		Svislý
 Horizontal	TouchpadPrefView		Vodorovný
-Focus follows mouse	SettingsView		Aktivace najetím myši nad okno
-Focus mode:	SettingsView		Režim aktivace:
-Double-click test area	SettingsView		Oblast zkoušení poklepání
 3-Button	SettingsView		3-tlačítková
-Revert	TouchpadPrefView		Vrátit

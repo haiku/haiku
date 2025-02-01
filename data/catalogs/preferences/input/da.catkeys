@@ -1,50 +1,50 @@
 1	danish	x-vnd.Haiku-Input	130668644
-Scrolling	TouchpadPrefView		Rulning
 Defaults	InputMouse		Forvalg
+Scrolling	TouchpadPrefView		Rulning
 Long	KeyboardView		Lang
 Cancel	TouchpadPrefView		Afbryd
-4-Button	SettingsView		4-knap
 Slow	TouchpadPrefView		Langsom
-Tapping sensitivity	TouchpadPrefView		Trykfølsomhed
 Device List	InputWindow		Enhedsliste
 Double-click speed	SettingsView		Hastighed for dobbeltklik
 5-Button	SettingsView		5-knap
 Typing test area	KeyboardView		Testområde for indtastning
-Mouse type:	SettingsView		Musetype:
-Revert	InputKeyboard		Omvendt
 Fast	KeyboardView		Hurtig
+Please confirm	TouchpadPrefView		Bekræft venligst
+Mouse speed	SettingsView		Musehastighed
+Horizontal scrolling	TouchpadPrefView		Vandret rulning
+Keyboard lock delay	TouchpadPrefView		Forsinkelse for tastaturlås
+Input	System name		Input
+Quick	TouchpadPrefView		Hurtigt
+Short	KeyboardView		Kort
+Revert	InputMouse		Omvendt
+Slow	KeyboardView		Langsom
+2-Button	SettingsView		2-knap
+Click to focus and raise	SettingsView		Klik for fokusér og løft
+Vertical	TouchpadPrefView		Lodret
+Focus follows mouse	SettingsView		Fokus følger mus
+Double-click test area	SettingsView		Testområde for dobbeltklik
+Focus mode:	SettingsView		Fokustilstand:
+Revert	TouchpadPrefView		Omvendt
+4-Button	SettingsView		4-knap
+Tapping sensitivity	TouchpadPrefView		Trykfølsomhed
+Revert	InputKeyboard		Omvendt
+Mouse type:	SettingsView		Musetype:
 Off	TouchpadPrefView		Fra
 Never	TouchpadPrefView		Aldrig
 Fast	TouchpadPrefView		Hurtig
 6-Button	SettingsView		6-knap
-Please confirm	TouchpadPrefView		Bekræft venligst
 Click to focus	SettingsView		Klik for at fokusere
 Acceleration	TouchpadPrefView		Acceleration
-Mouse speed	SettingsView		Musehastighed
 Accept first click	SettingsView		Acceptér første klik
 OK	TouchpadPrefView		O.k.
-Horizontal scrolling	TouchpadPrefView		Vandret rulning
 Delay until key repeat	KeyboardView		Forsinkelse før gentagelse af tast
-Keyboard lock delay	TouchpadPrefView		Forsinkelse for tastaturlås
 Two finger scrolling	TouchpadPrefView		Rulning med 2 fingre
-Input	System name		Input
-Mouse acceleration	SettingsView		Museacceleration
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Det nye rulleområde er meget stort og kan vanskeliggøre normal musehandling. Vil du virkelig ændre det?
+Mouse acceleration	SettingsView		Museacceleration
 High	TouchpadPrefView		Høj
 Defaults	TouchpadPrefView		Forvalg
 1-Button	SettingsView		1-knap
 Defaults	InputKeyboard		Forvalg
-Quick	TouchpadPrefView		Hurtigt
-Short	KeyboardView		Kort
-Slow	KeyboardView		Langsom
-Revert	InputMouse		Omvendt
 Key repeat rate	KeyboardView		Hastighed for gentagelse af tast
-2-Button	SettingsView		2-knap
-Click to focus and raise	SettingsView		Klik for fokusér og løft
-Vertical	TouchpadPrefView		Lodret
 Horizontal	TouchpadPrefView		Vandret
-Focus follows mouse	SettingsView		Fokus følger mus
-Focus mode:	SettingsView		Fokustilstand:
-Double-click test area	SettingsView		Testområde for dobbeltklik
 3-Button	SettingsView		3-knap
-Revert	TouchpadPrefView		Omvendt

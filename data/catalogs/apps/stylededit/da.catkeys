@@ -85,7 +85,7 @@ Replace	FindandReplaceWindow		Erstat
 Characters:	Statistics		Tegn:
 Don't save	QuitAlert		Gem ikke
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Filen er markeret som skrivebeskyttet. Gem ændringer til dokumentet \"%s\"? 
-Font	Menus		Skrifttype
 Align	Menus		Justér
+Font	Menus		Skrifttype
 Select all	Menus		Vælg alt
 Right	Menus		Højre
