@@ -560,3 +560,46 @@
 
 	\since BeOS R3
 */
+
+
+/*!
+	\name Color Adoption
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BButton::AdoptSystemColors()
+	\brief Adopts document colors tinted to match panel background if uneditable.
+
+	- \c B_CONTROL_BACKGROUND_COLOR for ViewUIColor()
+	- \c B_CONTROL_BACKGROUND_COLOR for LowUIColor()
+	- \c B_CONTROL_TEXT_COLOR for HighUIColor()
+
+	This is reimplemented from BView which uses panel colors.
+
+	\see BView::AdoptSystemColors(), HasSystemColors()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BButton::HasSystemColors() const
+	\brief Tests whether or not the button is using system colors.
+
+	- \c B_DOCUMENT_BACKGROUND_COLOR for ViewUIColor()
+	- \c B_DOCUMENT_BACKGROUND_COLOR for LowUIColor()
+	- \c B_DOCUMENT_TEXT_COLOR for HighUIColor()
+
+	\returns \c true if button is using system colors, \c false otherwise.
+
+	\see AdoptSystemColors()
+
+	\since Haiku R1
+*/
+
+
+//! @}
