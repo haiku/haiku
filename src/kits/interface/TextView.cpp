@@ -1601,6 +1601,20 @@ BTextView::AdoptSystemColors()
 }
 
 
+bool
+BTextView::HasSystemColors() const
+{
+	float tint = B_NO_TINT;
+	float uneditableTint = _UneditableTint();
+
+	return ViewUIColor(&tint) == B_DOCUMENT_BACKGROUND_COLOR
+		&& (tint == B_NO_TINT || tint == uneditableTint)
+		&& LowUIColor(&tint) == B_DOCUMENT_BACKGROUND_COLOR
+		&& (tint == B_NO_TINT || tint == uneditableTint)
+		&& HighUIColor(&tint) == B_DOCUMENT_TEXT_COLOR && tint == B_NO_TINT;
+}
+
+
 void
 BTextView::SetFontAndColor(const BFont* font, uint32 mode, const rgb_color* color)
 {
@@ -2385,7 +2399,7 @@ BTextView::MakeEditable(bool editable)
 	fEditable = editable;
 
 	// apply uneditable colors or unapply them
-	if (_UsesSystemColors())
+	if (HasSystemColors())
 		AdoptSystemColors();
 
 	// TextControls change the color of the text when
@@ -6226,20 +6240,9 @@ BTextView::_TextRect()
 
 
 float
-BTextView::_UneditableTint()
+BTextView::_UneditableTint() const
 {
 	return ui_color(B_DOCUMENT_BACKGROUND_COLOR).IsLight() ? B_DARKEN_1_TINT : 0.853;
-}
-
-
-bool
-BTextView::_UsesSystemColors()
-{
-	float tint = B_NO_TINT;
-
-	return ViewUIColor(&tint) == B_DOCUMENT_BACKGROUND_COLOR
-		&& LowUIColor(&tint) == B_DOCUMENT_BACKGROUND_COLOR
-		&& HighUIColor() == B_DOCUMENT_TEXT_COLOR;
 }
 
 
