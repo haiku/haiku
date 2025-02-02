@@ -424,8 +424,8 @@ BeControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 
 void
 BeControlLook::DrawScrollBarButton(BView* view, BRect rect,
-	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	int32 direction, orientation orientation, bool down)
+	const BRect& updateRect, const rgb_color& base, const rgb_color& text,
+	uint32 flags, int32 direction, orientation orientation, bool down)
 {
 	view->PushState();
 

@@ -360,8 +360,8 @@ FlatControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 
 void
 FlatControlLook::DrawScrollBarButton(BView* view, BRect rect,
-	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	int32 direction, orientation orientation, bool down)
+	const BRect& updateRect, const rgb_color& base, const rgb_color& text,
+	uint32 flags, int32 direction, orientation orientation, bool down)
 {
 	if (!ShouldDraw(view, rect, updateRect))
 		return;
@@ -371,16 +371,16 @@ FlatControlLook::DrawScrollBarButton(BView* view, BRect rect,
 	bool isEnabled = (flags & B_DISABLED) == 0;
 
 	if (isEnabled) {
-		arrowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.6);
+		arrowColor = tint_color(text, 0.6);
 		// if the base color is too dark, then lets make it lighter
 		if (base.IsDark()) {
-			arrowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.3);;
+			arrowColor = tint_color(text, 1.3);
 		}
 	} else {
-		arrowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.4);
+		arrowColor = tint_color(text, 0.4);
 		// if the base color is too dark, then lets make it lighter
 		if (base.IsDark()) {
-			arrowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.5);;
+			arrowColor = tint_color(text, 1.5);
 		}
 	}
 

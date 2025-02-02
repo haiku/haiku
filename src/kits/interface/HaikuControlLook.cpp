@@ -615,8 +615,8 @@ HaikuControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 
 void
 HaikuControlLook::DrawScrollBarButton(BView* view, BRect rect,
-	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	int32 direction, orientation orientation, bool down)
+	const BRect& updateRect, const rgb_color& base, const rgb_color& text,
+	uint32 flags, int32 direction, orientation orientation, bool down)
 {
 	if (!ShouldDraw(view, rect, updateRect))
 		return;
@@ -634,8 +634,7 @@ HaikuControlLook::DrawScrollBarButton(BView* view, BRect rect,
 		BControlLook::B_ALL_BORDERS, orientation);
 
 	rect.InsetBy(-1, -1);
-	DrawArrowShape(view, rect, updateRect, base, direction, flags, 1.9f);
-		// almost but not quite B_DARKEN_MAX_TINT
+	DrawArrowShape(view, rect, updateRect, text, direction, flags, 1);
 
 	// revert clipping constraints
 	view->PopState();

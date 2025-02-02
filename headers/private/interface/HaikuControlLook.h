@@ -161,8 +161,8 @@ public:
 									orientation orientation);
 	virtual	void				DrawScrollBarButton(BView* view,
 									BRect rect, const BRect& updateRect,
-									const rgb_color& base, uint32 flags,
-									int32 direction, orientation orientation,
+									const rgb_color& base, const rgb_color& text,
+									uint32 flags, int32 direction, orientation orientation,
 									bool down = false);
 	virtual	void				DrawScrollBarBackground(BView* view,
 									BRect& rect1, BRect& rect2,

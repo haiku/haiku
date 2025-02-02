@@ -151,11 +151,11 @@ extern "C" void
 B_IF_GCC_2(_ReservedControlLook2__Q28BPrivate12BControlLook,
 		_ZN8BPrivate12BControlLook21_ReservedControlLook2Ev)(
 	BControlLook* controlLook, BView* view, BRect rect,
-		const BRect& updateRect, const rgb_color& base, uint32 flags,
-		int32 direction, orientation orientation, bool down)
+		const BRect& updateRect, const rgb_color& base, const rgb_color& text,
+		uint32 flags, int32 direction, orientation orientation, bool down)
 {
-	controlLook->DrawScrollBarButton(view, rect, updateRect, base, flags,
-		direction, orientation, down);
+	controlLook->DrawScrollBarButton(view, rect, updateRect, base, text,
+		flags, direction, orientation, down);
 }
 
 
