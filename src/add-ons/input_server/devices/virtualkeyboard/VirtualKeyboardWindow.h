@@ -20,6 +20,7 @@ class VirtualKeyboardWindow : public BWindow {
 public:
 							VirtualKeyboardWindow(BInputServerDevice* dev);
 		virtual void		MessageReceived(BMessage* message);
+		virtual void		ScreenChanged(BRect screenRect, color_space depth);
 
 private:
 		KeyboardLayoutView* fKeyboardView;

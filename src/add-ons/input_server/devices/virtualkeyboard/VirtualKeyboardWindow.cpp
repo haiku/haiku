@@ -38,9 +38,7 @@ VirtualKeyboardWindow::VirtualKeyboardWindow(BInputServerDevice* dev)
 {
 	BScreen screen;
 	BRect screenRect(screen.Frame());
-
-	ResizeTo(screenRect.Width(), screenRect.Height() / 3);
-	MoveTo(0, screenRect.Height() - screenRect.Height() / 3);
+	ScreenChanged(screenRect, screen.ColorSpace());
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -158,4 +156,12 @@ void
 VirtualKeyboardWindow::MessageReceived(BMessage* message)
 {
 	BWindow::MessageReceived(message);
+}
+
+
+void
+VirtualKeyboardWindow::ScreenChanged(BRect screenRect, color_space depth)
+{
+	ResizeTo(screenRect.Width(), screenRect.Height() / 3);
+	MoveTo(0, screenRect.Height() - screenRect.Height() / 3);
 }
