@@ -40,22 +40,36 @@ struct key_info {
 	uint8	key_states[16];
 };
 
+// Control characters from the ASCII table
 enum {
-	B_HOME				= 0x01,
-
-	B_END				= 0x04,
-	B_INSERT			= 0x05,
-
-	B_BACKSPACE			= 0x08,
-	B_TAB				= 0x09,
-	B_RETURN			= 0x0a,
+	B_ASCII_NUL,
+	B_HOME				= 0x01,	// Ctrl + A
+	B_ASCII_START_TEXT,			// Ctrl + B
+	B_ASCII_END_TEXT,			// Ctrl + C
+	B_END				= 0x04,	// Ctrl + D
+	B_INSERT			= 0x05,	// Ctrl + E
+	B_ASCII_ACKNOWLEDGE, 		// Ctrl + F
+	B_ASCII_BELL, 				// Ctrl + G
+	B_BACKSPACE			= 0x08,	// Ctrl + H
+	B_TAB				= 0x09,	// Ctrl + I
+	B_RETURN			= 0x0a,	// Ctrl + J
 	B_ENTER				= 0x0a,
-	B_PAGE_UP			= 0x0b,
-	B_PAGE_DOWN			= 0x0c,
-
-	B_FUNCTION_KEY		= 0x10,
-
-	B_SUBSTITUTE		= 0x1a,
+	B_PAGE_UP			= 0x0b,	// Ctrl + K
+	B_PAGE_DOWN			= 0x0c,	// Ctrl + L
+	B_ASCII_CARRIAGE_RETURN,	// Ctrl + M
+	B_ASCII_SHIFT_OUT,			// Ctrl + N
+	B_ASCII_SHIFT_IN,			// Ctrl + O
+	B_FUNCTION_KEY		= 0x10, // Ctrl + P
+	B_ASCII_XON,				// Ctrl + Q
+	B_DEVICE_CONTROL_2,			// Ctrl + R
+	B_ASCII_XOFF,				// Ctrl + S
+	B_DEVICE_CONTROL_4,			// Ctrl + T
+	B_ASCII_NEGATIVE_ACK,		// Ctrl + U
+	B_ASCII_SYNC_IDLE,			// Ctrl + V
+	B_ASCII_END_TRANSMISSION_BLOCK, // Ctrl + W
+	B_ASCII_CANCEL,				// Ctrl + X
+	B_ASCII_END_MEDIUM,			// Ctrl + Y
+	B_SUBSTITUTE		= 0x1a, // Ctrl + Z
 	B_ESCAPE			= 0x1b,
 	B_LEFT_ARROW		= 0x1c,
 	B_RIGHT_ARROW		= 0x1d,
