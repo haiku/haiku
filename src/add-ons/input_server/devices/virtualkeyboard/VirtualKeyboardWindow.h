@@ -16,10 +16,10 @@ class BDirectory;
 class BListView;
 class BMenu;
 
-class VirtualKeyboardWindow : public BWindow{
+class VirtualKeyboardWindow : public BWindow {
 public:
 							VirtualKeyboardWindow(BInputServerDevice* dev);
-		virtual void		MessageReceived(BMessage* message);			
+		virtual void		MessageReceived(BMessage* message);
 
 private:
 		KeyboardLayoutView* fKeyboardView;

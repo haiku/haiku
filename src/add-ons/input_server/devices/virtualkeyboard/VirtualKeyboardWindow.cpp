@@ -32,20 +32,19 @@ compare_key_list_items(const void* a, const void* b)
 
 VirtualKeyboardWindow::VirtualKeyboardWindow(BInputServerDevice* dev)
 	:
-	BWindow(BRect(0,0,0,0),"Virtual Keyboard",
-	B_NO_BORDER_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
-	B_WILL_ACCEPT_FIRST_CLICK | B_AVOID_FOCUS),
+	BWindow(BRect(0, 0, 0, 0), "Virtual Keyboard", B_NO_BORDER_WINDOW_LOOK,
+		B_FLOATING_ALL_WINDOW_FEEL, B_WILL_ACCEPT_FIRST_CLICK | B_AVOID_FOCUS),
 	fDevice(dev)
 {
 	BScreen screen;
 	BRect screenRect(screen.Frame());
 
 	ResizeTo(screenRect.Width(), screenRect.Height() / 3);
-	MoveTo(0,screenRect.Height() - screenRect.Height() / 3);
+	MoveTo(0, screenRect.Height() - screenRect.Height() / 3);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	//Add to an options window later, use as list for now
+	// Add to an options window later, use as list for now
 	fMapListView = new BListView("Maps");
 	fFontMenu = new BMenu("Font");
 	fLayoutMenu = new BMenu("Layout");
@@ -54,17 +53,15 @@ VirtualKeyboardWindow::VirtualKeyboardWindow(BInputServerDevice* dev)
 	_LoadLayouts(fLayoutMenu);
 	_LoadFonts();
 
-	KeymapListItem* current =
-		static_cast<KeymapListItem*>(fMapListView->LastItem());
+	KeymapListItem* current = static_cast<KeymapListItem*>(fMapListView->LastItem());
 	fCurrentKeymap.Load(current->EntryRef());
 
 
-	fKeyboardView = new KeyboardLayoutView("Keyboard",fDevice);
+	fKeyboardView = new KeyboardLayoutView("Keyboard", fDevice);
 	fKeyboardView->GetKeyboardLayout()->SetDefault();
 	fKeyboardView->SetKeymap(&fCurrentKeymap);
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(fKeyboardView));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL).Add(fKeyboardView));
 }
 
 
@@ -78,7 +75,7 @@ VirtualKeyboardWindow::_LoadLayouts(BMenu* menu)
 		B_SYSTEM_DATA_DIRECTORY,
 	};
 
-	for (uint i = 0; i < sizeof(dataDirectories)/sizeof(directory_which); i++) {
+	for (uint i = 0; i < sizeof(dataDirectories) / sizeof(directory_which); i++) {
 		BPath path;
 		if (find_directory(dataDirectories[i], &path) != B_OK)
 			continue;
@@ -108,8 +105,8 @@ VirtualKeyboardWindow::_LoadLayoutMenu(BMenu* menu, BDirectory directory)
 			_LoadLayoutMenu(submenu, subdirectory);
 			menu->AddItem(submenu);
 		} else {
-			//BMessage* message = new BMessage(kChangeKeyboardLayout);
-			//message->AddRed("ref",&ref);
+			// BMessage* message = new BMessage(kChangeKeyboardLayout);
+			// message->AddRed("ref",&ref);
 			menu->AddItem(new BMenuItem(ref.name, NULL));
 		}
 	}
@@ -144,11 +141,11 @@ VirtualKeyboardWindow::_LoadFonts()
 	font_style currentStyle;
 	uint32 flags;
 
-	be_plain_font->GetFamilyAndStyle(&currentFamily,&currentStyle);
+	be_plain_font->GetFamilyAndStyle(&currentFamily, &currentStyle);
 
-	for (int32 i = 0; i< numFamilies; i++) {
+	for (int32 i = 0; i < numFamilies; i++) {
 		if (get_font_family(i, &family, &flags) == B_OK) {
-			BMenuItem* item = new BMenuItem(family, NULL);	//new BMessage(kMsgMenuFontChanged));
+			BMenuItem* item = new BMenuItem(family, NULL);	// new BMessage(kMsgMenuFontChanged));
 			fFontMenu->AddItem(item);
 			if (!strcmp(family, currentFamily))
 				item->SetMarked(true);
