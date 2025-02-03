@@ -59,5 +59,7 @@ status_t
 VirtualKeyboardInputDevice::Control(const char* name, void* cookie, uint32 command,
 	BMessage* message)
 {
+	if (command == B_KEY_MAP_CHANGED)
+		fKeyboardWindow->PostMessage(kKeymapChange);
 	return B_OK;
 }

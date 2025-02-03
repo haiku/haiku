@@ -16,6 +16,9 @@ class BDirectory;
 class BListView;
 class BMenu;
 
+static const uint32 kKeymapChange = 'vKCG';
+
+
 class VirtualKeyboardWindow : public BWindow {
 public:
 							VirtualKeyboardWindow(BInputServerDevice* dev);
