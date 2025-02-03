@@ -162,9 +162,8 @@ Stream::_SetupBuffers()
 	uint32 samplingRate = fAlternates[fActiveAlternate]->GetSamplingRate();
 	uint32 sampleSize = format->fNumChannels * format->fSubframeSize;
 
-	// data size pro 1 ms USB 1 frame or 1/8 ms USB 2 microframe
-	size_t packetSize = samplingRate * sampleSize
-		/ (fDevice->fUSBVersion < 0x0200 ? 1000 : 8000);
+	// data size pro 1 ms USB 1 frame
+	size_t packetSize = samplingRate * sampleSize / 1000;
 	TRACE(INF, "packetSize:%ld\n", packetSize);
 
 	if (packetSize == 0) {

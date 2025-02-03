@@ -935,6 +935,8 @@ AudioControlInterface::~AudioControlInterface()
 status_t
 AudioControlInterface::Init(size_t interface, usb_interface_info* Interface)
 {
+	fStatus = B_NO_INIT;
+
 	for (size_t i = 0; i < Interface->generic_count; i++) {
 		usb_audiocontrol_header_descriptor* Header
 			= (usb_audiocontrol_header_descriptor* )Interface->generic[i];
@@ -956,7 +958,12 @@ AudioControlInterface::Init(size_t interface, usb_interface_info* Interface)
 				TRACE(ERR, "Ignore Audio Control of undefined sub-type\n");
 				break;
 			case USB_AUDIO_AC_HEADER:
-				InitACHeader(interface, Header);
+				if (Header->bcd_release_no != USB_AUDIO_CLASS_VERSION_1) {
+					TRACE(ERR, "Ignore Audio Control of unknown version %#04x.\n",
+						Header->bcd_release_no);
+					continue;
+				}
+				fStatus = InitACHeader(interface, Header);
 				break;
 			case USB_AUDIO_AC_INPUT_TERMINAL:
 				control = new(std::nothrow) InputTerminal(this, Header);
@@ -1017,7 +1024,7 @@ AudioControlInterface::Init(size_t interface, usb_interface_info* Interface)
 			delete control;
 	}
 
-	return fStatus = B_OK;
+	return fStatus;
 }
 
 
