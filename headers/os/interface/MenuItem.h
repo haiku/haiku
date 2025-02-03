@@ -93,7 +93,6 @@ private:
 			void				_DrawShortcutSymbol(bool);
 			void				_DrawSubmenuSymbol();
 			void				_DrawControlChar(char shortcut, BPoint where);
-			void				_DrawFunctionChar(uint32 rawKey, BPoint where);
 
 private:
 			char*				fLabel;
