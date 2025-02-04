@@ -278,7 +278,9 @@ SetIncludePropertiesVariables HOST ;
 HOST_ASFLAGS = ;
 
 # linker flags
-HOST_LINKFLAGS += -Wl,--no-as-needed ;
+if $(HOST_PLATFORM) != darwin {
+	HOST_LINKFLAGS += -Wl,--no-as-needed ;
+}
 
 # C/C++ flags
 HOST_CCFLAGS += -Wno-multichar ;
