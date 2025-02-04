@@ -41,6 +41,7 @@ All rights reserved.
 #include <Debug.h>
 #include <Menu.h>
 #include <MenuField.h>
+#include <MenuPrivate.h>
 #include <NodeInfo.h>
 
 #include "IconCache.h"
@@ -126,10 +127,10 @@ ModelMenuItem::DrawContent()
 {
 	if (fDrawText) {
 		BPoint drawPoint(ContentLocation());
-		drawPoint.x += ListIconSize() + (ListIconSize() / 4)
-			+ (fExtraPad ? 6 : 0);
+		drawPoint.x += ListIconSize() + ListIconSize() / 4 + _ExtraLeftPadding();
 		if (fHeightDelta > 0)
-			drawPoint.y += ceil(fHeightDelta / 2);
+			drawPoint.y += ceilf(fHeightDelta / 2);
+
 		Menu()->MovePenTo(drawPoint);
 		_inherited::DrawContent();
 	}
@@ -154,10 +155,9 @@ ModelMenuItem::DrawIcon()
 	// center icon with text.
 
 	float deltaHeight = fHeightDelta < 0 ? -fHeightDelta : 0;
-	where.y += ceil(deltaHeight / 2);
+	where.y += ceilf(deltaHeight / 2);
 
-	if (fExtraPad)
-		where.x += 6;
+	where.x += _ExtraLeftPadding();
 
 	Menu()->SetDrawingMode(B_OP_OVER);
 	Menu()->SetLowColor(B_TRANSPARENT_32_BIT);
@@ -177,6 +177,56 @@ ModelMenuItem::DrawIcon()
 }
 
 
+float
+ModelMenuItem::_ExtraLeftPadding()
+{
+	if (!fExtraPad)
+		return 0;
+
+	// BMenu and BMenuBar have different margins,
+	// we want to make them the same. See fExtraPad.
+	float leftDelta;
+	_GetHorizontalItemMarginDelta(&leftDelta, NULL);
+
+	return leftDelta;
+}
+
+
+float
+ModelMenuItem::_ExtraPadding()
+{
+	if (!fExtraPad)
+		return 0;
+
+	// BMenu and BMenuBar have different margins,
+	// we want to make them the same. See fExtraPad.
+	float leftDelta, rightDelta;
+	_GetHorizontalItemMarginDelta(&leftDelta, &rightDelta);
+
+	return leftDelta + rightDelta;
+}
+
+
+void
+ModelMenuItem::_GetHorizontalItemMarginDelta(float* _leftDelta, float* _rightDelta)
+{
+	float menuLeft, menuRight, menuBarLeft, menuBarRight;
+
+	BMenu tempMenu("temp");
+	BPrivate::MenuPrivate menuPrivate(&tempMenu);
+	menuPrivate.GetItemMargins(&menuLeft, NULL, &menuRight, NULL);
+
+	BPrivate::MenuPrivate menuBarPrivate(Menu());
+	menuBarPrivate.GetItemMargins(&menuBarLeft, NULL, &menuBarRight, NULL);
+
+	if (_leftDelta != NULL)
+		*_leftDelta = menuLeft - menuBarLeft;
+
+	if (_rightDelta != NULL)
+		*_rightDelta = menuRight - menuBarRight;
+}
+
+
 void
 ModelMenuItem::GetContentSize(float* width, float* height)
 {
@@ -186,7 +236,8 @@ ModelMenuItem::GetContentSize(float* width, float* height)
 	fHeightDelta = iconSize - *height;
 	if (*height < iconSize)
 		*height = iconSize;
-	*width += iconSize / 4 + iconSize + (fExtraPad ? 18 : 0);
+
+	*width += iconSize + iconSize / 4 + _ExtraPadding();
 }
 
 
