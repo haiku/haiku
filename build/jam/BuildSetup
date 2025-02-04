@@ -212,6 +212,11 @@ HOST_LINKFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(LINKFLAGS) ;
 HOST_DEFINES		?= $(DEFINES) ;
 HOST_HDRS			?= $(HDRS) ;
 
+# we shouldn't build anything for the kernel under HOST
+HOST_KERNEL_ARCH = host ;
+HOST_KERNEL_CCFLAGS = host ;
+HOST_KERNEL_C++FLAGS = host ;
+
 
 # split up HOST_AR into the command name and flags
 HOST_AR				= [ Match "([^ ]*) *(.*)" : $(HOST_AR[1]) ]
@@ -247,7 +252,6 @@ if $(HOST_CPU) = riscv && $(HOST_PLATFORM_IS_64_BIT) {
 }
 HOST_ARCH ?= $(HOST_CPU) ;
 HOST_ARCHS = $(HOST_ARCH) ;
-HOST_KERNEL_ARCH = host ;
 
 # set packaging architecture
 HOST_PACKAGING_ARCH		?= $(HOST_CPU) ;
@@ -273,6 +277,9 @@ SetIncludePropertiesVariables HOST ;
 # assembler flags
 HOST_ASFLAGS = ;
 
+# linker flags
+HOST_LINKFLAGS += -Wl,--no-as-needed ;
+
 # C/C++ flags
 HOST_CCFLAGS += -Wno-multichar ;
 HOST_C++FLAGS += -Wno-multichar ;
@@ -282,44 +289,11 @@ HOST_PIC_C++FLAGS += -fPIC ;
 
 HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-delete-null-pointer-checks ;
 
-HOST_KERNEL_CCFLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
-	-D_KERNEL_MODE ;
-HOST_KERNEL_C++FLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
-	-fno-exceptions -D_KERNEL_MODE ;
-HOST_KERNEL_DEFINES += _KERNEL_MODE ;
-
-HOST_KERNEL_PIC_CCFLAGS = -fno-pic ;
-HOST_KERNEL_PIC_LINKFLAGS = ;
-if $(HOST_ARCH) = ppc {
-	# Build a position independent PPC kernel. We need to be able to relocate
-	# the kernel, since the virtual address space layout at boot time is not
-	# fixed.
-	HOST_KERNEL_PIC_CCFLAGS = -fPIE ;
-	HOST_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
-}
-if $(HOST_ARCH) = m68k {
-	# Build a position independent M68K kernel. We need to be able to relocate
-	# the kernel, since the virtual address space layout at boot time is not
-	# fixed.
-	HOST_KERNEL_PIC_CCFLAGS = $(HAIKU_KERNEL_PIC_CCFLAGS) ;
-	HOST_KERNEL_PIC_LINKFLAGS = $(HAIKU_KERNEL_PIC_LINKFLAGS) ;
-}
-
-if $(HOST_PLATFORM) != darwin {
-	# fix for new changes to DSO linking policies
-	HOST_LINKFLAGS += -Xlinker --no-as-needed ;
-	HOST_LINKFLAGS += -Wl,--copy-dt-needed-entries ;
-}
-
-
 # warning flags
 HOST_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes -Wpointer-arith
 	-Wcast-align -Wsign-compare ;
 HOST_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
 	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
-
-HOST_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes ;
-HOST_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs ;
 
 HOST_WERROR_FLAGS = ;
 
@@ -338,16 +312,11 @@ switch $(HOST_PLATFORM) {
 HOST_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
 HOST_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
 
-HOST_KERNEL_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
-HOST_KERNEL_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
-
 local level ;
 for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 	local flags = $(hostDebugFlags) [ FDefines DEBUG=$(level) ] ;
 	HOST_DEBUG_$(level)_CCFLAGS			= $(flags) ;
 	HOST_DEBUG_$(level)_C++FLAGS		= $(flags) ;
-	HOST_KERNEL_DEBUG_$(level)_CCFLAGS	= $(flags) ;
-	HOST_KERNEL_DEBUG_$(level)_C++FLAGS	= $(flags) ;
 }
 
 # ld flags
