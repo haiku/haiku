@@ -6,12 +6,12 @@
 #define _SYSTEM_FIND_DIRECTORY_PRIVATE_H
 
 
-#include <sys/cdefs.h>
-
 #include <FindDirectory.h>
 
 
-__BEGIN_DECLS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 status_t __find_directory(directory_which which, dev_t device, bool createIt,
@@ -44,7 +44,9 @@ const char* __guess_secondary_architecture_from_path(const char* path,
 	size_t secondaryArchitectureCount);
 
 
-__END_DECLS
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 
 #endif	/* _SYSTEM_FIND_DIRECTORY_PRIVATE_H */
