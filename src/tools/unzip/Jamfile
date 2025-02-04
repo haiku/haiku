@@ -2,8 +2,9 @@ SubDir HAIKU_TOP src tools unzip ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin unzip ] ;
 
+DEFINES += NO_CRYPT HAS_JUNK_EXTRA_FIELD_OPTION=1 ;
 if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
-	DEFINES += HAVE_TERMIOS_H=1 HAS_JUNK_EXTRA_FIELD_OPTION=1 ;
+	DEFINES += HAVE_TERMIOS_H=1 ;
 }
 
 # avoid building host unzip with DEBUG, as that would pollute the build
@@ -16,7 +17,6 @@ BuildPlatformStaticLibrary <build>libunzip.a :
 	crc32.c
 	ttyio.c
 	crctab.c
-	crypt.c
 	envargs.c
 	explode.c
 	extract.c
@@ -37,4 +37,3 @@ BuildPlatformMain <build>unzip :
 	unshrink.c
 	: <build>libunzip.a $(HOST_LIBBE) $(HOST_LIBSUPC++)
 ;
-
