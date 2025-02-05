@@ -455,9 +455,9 @@ BKeymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 */
 status_t
 BKeymap::GetModifiedCharacters(const char* in, int32 inModifiers,
-	int32 outModifiers, BObjectList<const char>* _outList)
+	int32 outModifiers, BStringList& _outList)
 {
-	if (in == NULL || *in == '\0' || _outList == NULL)
+	if (in == NULL || *in == '\0')
 		return B_BAD_VALUE;
 
 	for(uint32 i = 0; i < 128; i++) {
@@ -470,14 +470,8 @@ BKeymap::GetModifiedCharacters(const char* in, int32 inModifiers,
 
 		int32 outOffset = Offset(i, outModifiers);
 		size_t sizeOut = fChars[outOffset++];
-		char* out = (char*)malloc(sizeOut + 1);
-		if (out == NULL)
+		if (!_outList.Add(BString(fChars + outOffset, sizeOut)))
 			return B_NO_MEMORY;
-
-		memcpy(out, fChars + outOffset, sizeOut);
-		out[sizeOut] = '\0';
-
-		_outList->AddItem((const char*)out);
 	}
 
 	return B_OK;

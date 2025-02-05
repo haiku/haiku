@@ -792,12 +792,12 @@ BContainerWindow::Init(const BMessage* message)
 
 	BKeymap keymap;
 	if (keymap.SetToCurrent() == B_OK) {
-		BObjectList<const char> unmodified(3, true);
-		if (keymap.GetModifiedCharacters("+", B_SHIFT_KEY, 0, &unmodified)
+		BStringList unmodified(3);
+		if (keymap.GetModifiedCharacters("+", B_SHIFT_KEY, 0, unmodified)
 				== B_OK) {
-			int32 count = unmodified.CountItems();
+			int32 count = unmodified.CountStrings();
 			for (int32 i = 0; i < count; i++) {
-				uint32 key = BUnicodeChar::FromUTF8(unmodified.ItemAt(i));
+				uint32 key = BUnicodeChar::FromUTF8(unmodified.StringAt(i));
 				if (!HasShortcut(key, 0)) {
 					// Add semantic zoom in shortcut, bug #6692
 					BMessage* increaseSize = new BMessage(kIconMode);

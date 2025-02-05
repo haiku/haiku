@@ -12,7 +12,7 @@
 
 #include <DataIO.h>
 #include <InterfaceDefs.h>
-#include <ObjectList.h>
+#include <StringList.h>
 
 
 class BKeymap {
@@ -41,7 +41,7 @@ public:
 									int32* numBytes) const;
 			status_t			GetModifiedCharacters(const char* in,
 									int32 inModifiers, int32 outModifiers,
-									BObjectList<const char>* _outList);
+									BStringList& _outList);
 
 			const key_map&		Map() const { return fKeys; }
 
