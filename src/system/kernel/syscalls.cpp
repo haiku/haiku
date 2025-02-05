@@ -229,7 +229,7 @@ generic_syscall_init(void)
 		"pre syscall trace entry is encountered, the corresponding post\n"
 		"syscall traced entry is also printed, even if it doesn't match the\n"
 		"given filter.\n", 0);
-#endif	// ENABLE_TRACING
+#endif	// SYSCALL_TRACING
 
 	return B_OK;
 }
