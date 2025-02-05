@@ -34,7 +34,7 @@ private:
 			Variable*			fVar;
 };
 
-typedef BObjectList<Summand> SummandList;
+typedef BObjectList<Summand, true> SummandList;
 
 }	// namespace LinearProgramming
 

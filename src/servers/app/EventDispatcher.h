@@ -51,7 +51,7 @@ class EventTarget {
 	private:
 		bool _RemoveTemporaryListener(event_listener* listener, int32 index);
 
-		BObjectList<event_listener> fListeners;
+		BObjectList<event_listener, true> fListeners;
 		BMessenger	fMessenger;
 };
 

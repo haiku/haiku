@@ -1173,7 +1173,7 @@ OpenWithMenu::StartBuildingItemList()
 		return false;
 	}
 
-	fSupportingAppList = new BObjectList<RelationCachingModelProxy>(20, true);
+	fSupportingAppList = new BObjectList<RelationCachingModelProxy, true>(20);
 
 	//queryRetrieval = new BStopWatch("get next entry on BQuery");
 	return true;

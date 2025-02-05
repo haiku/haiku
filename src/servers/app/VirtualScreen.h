@@ -67,7 +67,7 @@ private:
 	};
 
 			BRect				fFrame;
-			BObjectList<screen_item> fScreenList;
+			BObjectList<screen_item, true> fScreenList;
 			::DrawingEngine*	fDrawingEngine;
 			::HWInterface*		fHWInterface;
 };

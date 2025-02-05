@@ -338,7 +338,7 @@ protected:
 
 	BackgroundImage* fBackgroundImage;
 
-	static LockingList<struct AddOnShortcut>* fAddOnsList;
+	static LockingList<struct AddOnShortcut, true>* fAddOnsList;
 
 private:
 	BRect fSavedZoomRect;
@@ -347,7 +347,7 @@ private:
 	static BRect sNewWindRect;
 
 	BMessage* fDragMessage;
-	BObjectList<BString>* fCachedTypesList;
+	BStringList* fCachedTypesList;
 	bool fWaitingForRefs;
 	bool fSaveStateIsEnabled;
 	bool fIsWatchingPath;

@@ -33,7 +33,7 @@ private:
 
 private:
 	mutable BLocker				fLock;
-	BObjectList<MessageInfo>	fMessages;
+	BObjectList<MessageInfo, true> fMessages;
 };
 
 #endif	// PRIORITY_MESSAGE_QUEUE_H

@@ -60,7 +60,7 @@ private:
 	void UpdateTrashIcons();
 
 	bool fTrashFull;
-	BObjectList<node_ref> fTrashNodeList;
+	BObjectList<node_ref, true> fTrashNodeList;
 
 	typedef BLooper _inherited;
 };

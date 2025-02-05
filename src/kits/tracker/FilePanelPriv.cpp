@@ -598,7 +598,7 @@ TFilePanel::AdjustButton()
 
 	BTextControl* textControl
 		= dynamic_cast<BTextControl*>(FindView("text view"));
-	BObjectList<BPose>* selectionList = fPoseView->SelectionList();
+	PoseList* selectionList = fPoseView->SelectionList();
 	BString buttonText = fButtonText;
 	bool enabled = false;
 
@@ -1415,7 +1415,7 @@ TFilePanel::MessageReceived(BMessage* message)
 void
 TFilePanel::OpenDirectory()
 {
-	BObjectList<BPose>* list = PoseView()->SelectionList();
+	PoseList* list = PoseView()->SelectionList();
 	if (list->CountItems() != 1)
 		return;
 
@@ -1635,7 +1635,7 @@ void
 TFilePanel::HandleOpenButton()
 {
 	PoseView()->CommitActivePose();
-	BObjectList<BPose>* selection = PoseView()->SelectionList();
+	PoseList* selection = PoseView()->SelectionList();
 
 	// if we have only one directory and we're not opening dirs, enter.
 	if ((fNodeFlavors & B_DIRECTORY_NODE) == 0

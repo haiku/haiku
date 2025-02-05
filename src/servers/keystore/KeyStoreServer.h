@@ -15,7 +15,7 @@
 struct app_info;
 class Keyring;
 
-typedef BObjectList<Keyring> KeyringList;
+typedef BObjectList<Keyring, true> KeyringList;
 
 
 class KeyStoreServer : public BApplication {

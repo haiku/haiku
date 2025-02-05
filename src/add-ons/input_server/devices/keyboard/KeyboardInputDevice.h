@@ -98,7 +98,7 @@ private:
 			status_t			_AddDevice(const char* path);
 			status_t			_RemoveDevice(const char* path);
 
-			BObjectList<KeyboardDevice> fDevices;
+			BObjectList<KeyboardDevice, true> fDevices;
 			BLocker				fDeviceListLock;
 			TeamMonitorWindow*	fTeamMonitorWindow;
 };

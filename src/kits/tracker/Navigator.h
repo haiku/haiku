@@ -90,8 +90,8 @@ private:
 	BPath fPath;
 	BTextControl* fLocation;
 
-	BObjectList<BPath> fBackHistory;
-	BObjectList<BPath> fForwHistory;
+	BObjectList<BPath, true> fBackHistory;
+	BObjectList<BPath, true> fForwHistory;
 
 	typedef BView _inherited;
 };

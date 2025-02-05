@@ -29,8 +29,8 @@ class InputManager : public BLocker {
 		void PutStream(EventStream* stream);
 
 	private:
-		BObjectList<EventStream> fFreeStreams;
-		BObjectList<EventStream> fUsedStreams;
+		BObjectList<EventStream, true> fFreeStreams;
+		BObjectList<EventStream, true> fUsedStreams;
 };
 
 extern InputManager* gInputManager;

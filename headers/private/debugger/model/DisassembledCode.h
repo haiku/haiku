@@ -52,7 +52,7 @@ public:
 private:
 			struct Line;
 
-			typedef BObjectList<Line> LineList;
+			typedef BObjectList<Line, true> LineList;
 			typedef BObjectList<ContiguousStatement> StatementList;
 
 private:

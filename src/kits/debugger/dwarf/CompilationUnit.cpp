@@ -35,8 +35,8 @@ CompilationUnit::CompilationUnit(off_t headerOffset, off_t contentOffset,
 		addressSize, isBigEndian, isDwarf64),
 	fUnitEntry(NULL),
 	fAddressRanges(NULL),
-	fDirectories(10, true),
-	fFiles(10, true),
+	fDirectories(10),
+	fFiles(10),
 	fLineNumberProgram(addressSize, isBigEndian)
 {
 }

@@ -33,7 +33,7 @@ struct DisassembledCode::Line {
 DisassembledCode::DisassembledCode(SourceLanguage* language)
 	:
 	fLanguage(language),
-	fLines(20, true)
+	fLines(20)
 {
 	fLanguage->AcquireReference();
 }

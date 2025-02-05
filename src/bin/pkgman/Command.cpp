@@ -116,6 +116,6 @@ CommandManager::GetCommandsForCategory(const char* category,
 
 CommandManager::CommandManager()
 	:
-	fCommands(20, true)
+	fCommands(20)
 {
 }

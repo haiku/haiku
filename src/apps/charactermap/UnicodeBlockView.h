@@ -50,7 +50,7 @@ private:
 			void			_CreateBlocks();
 
 private:
-			BObjectList<BlockListItem> fBlocks;
+			BObjectList<BlockListItem, true> fBlocks;
 			BString			fFilter;
 			bool			fShowPrivateBlocks;
 			bool			fShowContainedBlocksOnly;

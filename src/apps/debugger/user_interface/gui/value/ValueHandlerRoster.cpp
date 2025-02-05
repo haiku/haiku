@@ -25,7 +25,7 @@
 ValueHandlerRoster::ValueHandlerRoster()
 	:
 	fLock("value handler roster"),
-	fValueHandlers(20, false)
+	fValueHandlers(20)
 {
 }
 

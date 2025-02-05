@@ -430,7 +430,7 @@ AttributeStreamFileNode::Next()
 
 AttributeStreamMemoryNode::AttributeStreamMemoryNode()
 	:
-	fAttributes(5, true),
+	fAttributes(5),
 	fCurrentIndex(-1)
 {
 }
@@ -798,7 +798,7 @@ SelectiveAttributeTransformer::SelectiveAttributeTransformer(
 	fAttributeNameToTransform(attributeName),
 	fTransformFunc(transformFunc),
 	fTransformParams(params),
-	fTransformedBuffers(10, false)
+	fTransformedBuffers(10)
 {
 }
 

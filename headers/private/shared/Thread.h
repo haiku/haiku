@@ -81,17 +81,17 @@ private:
 
 class ThreadSequence : private SimpleThread {
 public:
-	static void Launch(BObjectList<FunctionObject>*, bool async = true,
+	static void Launch(BObjectList<FunctionObject, true>*, bool async = true,
 		int32 priority = B_LOW_PRIORITY);
 
 private:
-	ThreadSequence(BObjectList<FunctionObject>*, int32 priority);
+	ThreadSequence(BObjectList<FunctionObject, true>*, int32 priority);
 	~ThreadSequence();
 
 	virtual void Run();
-	static void Run(BObjectList<FunctionObject>*list);
+	static void Run(BObjectList<FunctionObject, true>* list);
 
-	BObjectList<FunctionObject>* fFunctorList;
+	BObjectList<FunctionObject, true>* fFunctorList;
 };
 
 

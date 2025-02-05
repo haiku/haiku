@@ -74,8 +74,8 @@ BackgroundsView::BackgroundsView()
 	fCurrentInfo(NULL),
 	fLastImageIndex(-1),
 	fRecentFoldersLimit(10),
-	fPathList(1, true),
-	fImageList(1, true),
+	fPathList(1),
+	fImageList(1),
 	fFoundPositionSetting(false)
 {
 	SetBorder(B_NO_BORDER);

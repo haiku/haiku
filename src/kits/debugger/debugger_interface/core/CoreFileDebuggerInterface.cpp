@@ -179,7 +179,7 @@ CoreFileDebuggerInterface::GetTeamInfo(TeamInfo& info)
 
 
 status_t
-CoreFileDebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
+CoreFileDebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo, true>& infos)
 {
 	int32 count = fCoreFile->CountThreadInfos();
 	for (int32 i = 0; i < count; i++) {
@@ -198,7 +198,7 @@ CoreFileDebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
 
 
 status_t
-CoreFileDebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
+CoreFileDebuggerInterface::GetImageInfos(BObjectList<ImageInfo, true>& infos)
 {
 	int32 count = fCoreFile->CountImageInfos();
 	for (int32 i = 0; i < count; i++) {
@@ -219,14 +219,14 @@ CoreFileDebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 
 
 status_t
-CoreFileDebuggerInterface::GetAreaInfos(BObjectList<AreaInfo>& infos)
+CoreFileDebuggerInterface::GetAreaInfos(BObjectList<AreaInfo, true>& infos)
 {
 	return B_UNSUPPORTED;
 }
 
 
 status_t
-CoreFileDebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo>& infos)
+CoreFileDebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo, true>& infos)
 {
 	return B_UNSUPPORTED;
 }
@@ -234,7 +234,7 @@ CoreFileDebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo>& infos)
 
 status_t
 CoreFileDebuggerInterface::GetSymbolInfos(team_id team, image_id image,
-	BObjectList<SymbolInfo>& infos)
+	BObjectList<SymbolInfo, true>& infos)
 {
 	// get the image info
 	const CoreFileImageInfo* imageInfo = fCoreFile->ImageInfoForId(image);

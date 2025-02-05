@@ -64,7 +64,7 @@ public:
 			BString				ToString() const;
 
 private:
-			typedef BObjectList<BSolverProblemSolution> SolutionList;
+			typedef BObjectList<BSolverProblemSolution, true> SolutionList;
 
 private:
 			BType				fType;

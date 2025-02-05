@@ -118,7 +118,7 @@ PoseList*
 PoseList::FindAllPoses(const node_ref* node) const
 {
 	int32 count = CountItems();
-	PoseList *result = new PoseList(5, false);
+	PoseList *result = new PoseList(5);
 	for (int32 index = 0; index < count; index++) {
 		BPose *pose = ItemAt(index);
 		Model *model = pose->TargetModel();

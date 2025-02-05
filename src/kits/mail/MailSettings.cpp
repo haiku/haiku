@@ -527,7 +527,7 @@ BMailAddOnSettings::_RelativizePath(const BPath& path) const
 
 BMailProtocolSettings::BMailProtocolSettings()
 	:
-	fFiltersSettings(5, true)
+	fFiltersSettings(5)
 {
 }
 

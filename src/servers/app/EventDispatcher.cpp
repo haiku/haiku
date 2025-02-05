@@ -84,7 +84,7 @@ static const float kListenerImportance = 0.8f;
 
 EventTarget::EventTarget()
 	:
-	fListeners(2, true)
+	fListeners(2)
 {
 }
 

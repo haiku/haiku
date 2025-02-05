@@ -82,7 +82,7 @@ protected:
 	void Build();
 
 private:
-	BObjectList<ShortMimeInfo> fMimeList;
+	BObjectList<ShortMimeInfo, true> fMimeList;
 	BObjectList<ShortMimeInfo> fCommonMimeList;
 	mutable Benaphore fLock;
 };

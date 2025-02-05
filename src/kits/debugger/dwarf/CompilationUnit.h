@@ -56,8 +56,8 @@ public:
 
 private:
 			struct File;
-			typedef BObjectList<BString> DirectoryList;
-			typedef BObjectList<File> FileList;
+			typedef BObjectList<BString, true> DirectoryList;
+			typedef BObjectList<File, true> FileList;
 
 private:
 			DIECompileUnitBase*	fUnitEntry;

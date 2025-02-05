@@ -41,11 +41,11 @@ using namespace BPrivate;
 namespace {
 
 struct Screens {
-	BObjectList<BPrivateScreen>	list;
+	BObjectList<BPrivateScreen, true> list;
 
 	Screens()
 		:
-		list(2, true),
+		list(2),
 		fLock("screen list")
 	{
 	}

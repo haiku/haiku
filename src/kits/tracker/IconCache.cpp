@@ -1390,7 +1390,7 @@ IconCache::IconHitTest(BPoint where, const Model* model, IconDrawMode mode,
 
 
 void
-IconCacheEntry::RetireIcons(BObjectList<BBitmap>* retiredBitmapList)
+IconCacheEntry::RetireIcons(BObjectList<BBitmap, true>* retiredBitmapList)
 {
 	if (fLargeIcon != NULL) {
 		retiredBitmapList->AddItem(fLargeIcon);
@@ -1425,7 +1425,7 @@ SharedIconCache::SharedIconCache()
 	:
 	SimpleIconCache("Tracker shared icon cache"),
 	fHashTable(),
-	fRetiredBitmaps(256, true)
+	fRetiredBitmaps(256)
 {
 	fHashTable.Init(256);
 }

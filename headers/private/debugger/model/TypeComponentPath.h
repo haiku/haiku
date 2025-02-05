@@ -138,7 +138,7 @@ public:
 									{ return !(*this == other); }
 
 private:
-			typedef BObjectList<TypeComponent> ComponentList;
+			typedef BObjectList<TypeComponent, true> ComponentList;
 
 private:
 			ComponentList		fComponents;

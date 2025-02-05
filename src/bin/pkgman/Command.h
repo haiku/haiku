@@ -46,7 +46,7 @@ private:
 };
 
 
-typedef BObjectList<Command> CommandList;
+typedef BObjectList<Command, true> CommandList;
 
 
 class CommandManager {

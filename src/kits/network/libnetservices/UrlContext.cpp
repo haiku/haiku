@@ -26,7 +26,7 @@ BUrlContext::BUrlContext()
 	:
 	fCookieJar(),
 	fAuthenticationMap(NULL),
-	fCertificates(20, true),
+	fCertificates(20),
 	fProxyHost(),
 	fProxyPort(0)
 {

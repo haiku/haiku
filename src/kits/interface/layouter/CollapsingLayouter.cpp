@@ -85,14 +85,14 @@ struct CollapsingLayouter::ElementInfo {
 	float weight;
 	int32 position;
 	bool valid;
-	BObjectList<Constraint> constraints;
+	BObjectList<Constraint, true> constraints;
 
 	ElementInfo()
 		:
 		weight(0),
 		position(-1),
 		valid(false),
-		constraints(5, true)
+		constraints(5)
 	{
 	}
 

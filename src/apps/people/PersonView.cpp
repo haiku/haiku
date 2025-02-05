@@ -47,7 +47,7 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 	BGridView(),
 	fLastModificationTime(0),
 	fGroups(NULL),
-	fControls(20, false),
+	fControls(20),
 	fCategoryAttribute(categoryAttribute),
 	fPictureView(NULL),
 	fSaving(false)

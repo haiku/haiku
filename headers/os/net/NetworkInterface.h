@@ -108,7 +108,7 @@ public:
 									const BNetworkRoute& route);
 			status_t			RemoveDefaultRoute(int family);
 			status_t			GetRoutes(int family,
-									BObjectList<BNetworkRoute>& routes) const;
+									BObjectList<BNetworkRoute, true>& routes) const;
 			status_t			GetDefaultRoute(int family,
 									BNetworkRoute& route) const;
 			status_t			GetDefaultGateway(int family,

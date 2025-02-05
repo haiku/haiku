@@ -224,7 +224,7 @@ TypeHandlerRoster::FindTypeHandlers(ValueNodeChild* nodeChild, Type* type,
 	// find the best-supporting handler
 	AutoLocker<BLocker> locker(fLock);
 
-	TypeHandlerList* handlers = new(std::nothrow) TypeHandlerList(10, false);
+	TypeHandlerList* handlers = new(std::nothrow) TypeHandlerList(10);
 	ObjectDeleter<TypeHandlerList> listDeleter(handlers);
 	if (handlers == NULL)
 		return B_NO_MEMORY;

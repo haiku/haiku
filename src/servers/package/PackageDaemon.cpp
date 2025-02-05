@@ -30,7 +30,7 @@ PackageDaemon::PackageDaemon(status_t* _error)
 	:
 	BServer(B_PACKAGE_DAEMON_APP_SIGNATURE, false, _error),
 	fSystemRoot(NULL),
-	fRoots(10, true),
+	fRoots(10),
 	fVolumeWatcher()
 {
 }

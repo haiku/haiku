@@ -126,7 +126,7 @@ private:
 	BView* fView;
 	BackgroundImageInfo* fShowingBitmap;
 
-	BObjectList<BackgroundImageInfo> fBitmapForWorkspaceList;
+	BObjectList<BackgroundImageInfo, true> fBitmapForWorkspaceList;
 };
 
 } // namespace BPrivate

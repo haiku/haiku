@@ -377,7 +377,7 @@ FindWindow::DeleteQueryOrTemplate(BEntry* entry)
 
 
 static bool
-CheckForDuplicates(BObjectList<entry_ref>* list, entry_ref* ref)
+CheckForDuplicates(BObjectList<entry_ref, true>* list, entry_ref* ref)
 {
 	// Simple Helper Function To Check For Duplicates Within an Entry List of Templates
 	int32 count = list->CountItems();
@@ -395,7 +395,7 @@ FindWindow::PopulateTemplatesMenu()
 {
 	fTemplatesMenu->RemoveItems(0, fTemplatesMenu->CountItems(), true);
 
-	BObjectList<entry_ref> templates(10, true);
+	BObjectList<entry_ref, true> templates(10);
 	BVolumeRoster roster;
 	BVolume volume;
 	while (roster.GetNextVolume(&volume) == B_OK) {
@@ -2549,9 +2549,9 @@ AddOneRecentItem(const entry_ref* ref, void* castToParams)
 	return NULL;
 }
 
-// Helper Function To Catch Entries caused from duplicate files received through BQuery
-bool
-CheckForDuplicates(BObjectList<EntryWithDate>* list, EntryWithDate* entry)
+
+static bool
+CheckForDuplicates(BObjectList<EntryWithDate, true>* list, EntryWithDate* entry)
 {
 	// params checking
 	if (list == NULL || entry == NULL)
@@ -2574,8 +2574,8 @@ void
 FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* target,
 	uint32 what, bool includeTemplates)
 {
-	BObjectList<entry_ref> templates(10, true);
-	BObjectList<EntryWithDate> recentQueries(10, true);
+	BObjectList<entry_ref, true> templates(10);
+	BObjectList<EntryWithDate, true> recentQueries(10);
 
 	// find all the queries on all volumes
 	BVolumeRoster roster;

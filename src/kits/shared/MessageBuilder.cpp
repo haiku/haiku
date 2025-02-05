@@ -17,7 +17,7 @@ namespace BPrivate {
 
 BMessageBuilder::BMessageBuilder(BMessage& message)
 	:
-	fNameStack(20, true),
+	fNameStack(20),
 	fCurrentMessage(&message)
 {
 }

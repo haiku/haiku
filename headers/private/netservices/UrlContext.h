@@ -46,7 +46,7 @@ private:
 private:
 			BNetworkCookieJar	fCookieJar;
 			BHttpAuthenticationMap* fAuthenticationMap;
-			typedef BObjectList<const BCertificate> BCertificateSet;
+			typedef BObjectList<const BCertificate, true> BCertificateSet;
 			BCertificateSet		fCertificates;
 
 			BString				fProxyHost;

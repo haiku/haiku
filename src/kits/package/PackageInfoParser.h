@@ -86,9 +86,9 @@ private:
 									bool convertToLowerCase = false,
 									StringValidator* stringValidator = NULL);
 			void				_ParseResolvableList(
-									BObjectList<BPackageResolvable>* value);
+									BObjectList<BPackageResolvable, true>* value);
 			void				_ParseResolvableExprList(
-									BObjectList<BPackageResolvableExpression>*
+									BObjectList<BPackageResolvableExpression, true>*
 										value,
 									BString* _basePackage = NULL);
 			void				_ParseGlobalWritableFileInfos(

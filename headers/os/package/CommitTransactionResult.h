@@ -150,7 +150,7 @@ public:
 									const BCommitTransactionResult& other);
 
 private:
-			typedef BObjectList<BTransactionIssue> IssueList;
+			typedef BObjectList<BTransactionIssue, true> IssueList;
 
 private:
 			BTransactionError	fError;

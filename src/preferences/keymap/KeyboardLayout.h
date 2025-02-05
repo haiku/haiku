@@ -112,7 +112,7 @@ private:
 			BRect			fBounds;
 			BSize			fDefaultKeySize;
 			int32			fAlternateIndex[3];
-			BObjectList<Indicator> fIndicators;
+			BObjectList<Indicator, true> fIndicators;
 			bool			fIsDefault;
 };
 

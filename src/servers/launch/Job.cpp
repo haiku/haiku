@@ -34,7 +34,7 @@ Job::Job(const char* name)
 	fToken((uint32)B_PREFERRED_TOKEN),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(NULL),
-	fPendingLaunchDataReplies(0, false),
+	fPendingLaunchDataReplies(0),
 	fTeamListener(NULL)
 {
 	mutex_init(&fLaunchStatusLock, "launch status lock");
@@ -54,7 +54,7 @@ Job::Job(const Job& other)
 	fToken((uint32)B_PREFERRED_TOKEN),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(other.Target()),
-	fPendingLaunchDataReplies(0, false)
+	fPendingLaunchDataReplies(0)
 {
 	mutex_init(&fLaunchStatusLock, "launch status lock");
 

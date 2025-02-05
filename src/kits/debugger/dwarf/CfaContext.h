@@ -53,7 +53,7 @@ public:
 			void				RestoreRegisterRule(uint32 reg);
 
 private:
-			typedef BObjectList<CfaRuleSet> RuleSetList;
+			typedef BObjectList<CfaRuleSet, true> RuleSetList;
 
 private:
 			target_addr_t		fTargetLocation;

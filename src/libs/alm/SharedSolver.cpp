@@ -380,7 +380,7 @@ SharedSolver::_InstantiateConstraint(const void* rawData, ssize_t numBytes,
 	int32 summandCount;
 	buffer.Read((void*)&summandCount, sizeof(summandCount));
 
-	SummandList* summandList = new SummandList(20, true);
+	SummandList* summandList = new SummandList(20);
 	ObjectDeleter<SummandList> deleter(summandList);
 	status_t err = B_OK;
 	for (int32 i = 0; i < summandCount; i++) {

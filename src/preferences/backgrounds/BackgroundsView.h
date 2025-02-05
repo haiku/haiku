@@ -163,8 +163,8 @@ protected:
 			int32				fRecentFoldersLimit;
 			BMessage			fSettings;
 
-			BObjectList<BPath>	fPathList;
-			BObjectList<Image>	fImageList;
+			BObjectList<BPath, true> fPathList;
+			BObjectList<Image, true> fImageList;
 
 			FramePart*			fTopLeft;
 			FramePart*			fTop;

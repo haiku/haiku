@@ -177,7 +177,7 @@ public:
 	bool IconHitTest(BPoint, IconDrawMode, BSize) const;
 		// given a point, returns true if a non-transparent pixel was hit
 
-	void RetireIcons(BObjectList<BBitmap>* retiredBitmapList);
+	void RetireIcons(BObjectList<BBitmap, true>* retiredBitmapList);
 		// can't just delete icons, they may be still drawing
 		// async; instead, put them on the retired list and
 		// only delete the list if it grows too much, way after
@@ -289,7 +289,7 @@ private:
 	typedef BOpenHashTable<SelfHashing<SharedCacheEntry> > EntryHashTable;
 	EntryHashTable fHashTable;
 
-	BObjectList<BBitmap> fRetiredBitmaps;
+	BObjectList<BBitmap, true> fRetiredBitmaps;
 		// icons are drawn asynchronously, can't just delete them right away,
 		// instead have to place them onto the retired bitmap list and wait
 		// for the next sync to delete them

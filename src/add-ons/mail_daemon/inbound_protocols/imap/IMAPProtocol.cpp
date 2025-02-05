@@ -20,7 +20,7 @@ IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 	:
 	BInboundMailProtocol("IMAP", settings),
 	fSettings(settings.Name(), settings.InboundSettings()),
-	fWorkers(5, false)
+	fWorkers(5)
 {
 	BPath destination = fSettings.Destination();
 

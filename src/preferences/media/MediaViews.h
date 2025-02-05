@@ -72,7 +72,7 @@ private:
 class SettingsView : public BGroupView
 {
 public:
-	typedef BObjectList<dormant_node_info> NodeList;
+	typedef BObjectList<dormant_node_info, true> NodeList;
 
 								SettingsView();
 			void				AddInputNodes(NodeList& nodes);

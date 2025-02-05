@@ -101,8 +101,8 @@ set_entry(node_ref& nodeRef, const char* name, BEntry& entry)
 //! Does basic set up so that directories can be scanned
 GlobalFontManager::GlobalFontManager()
 	: BLooper("GlobalFontManager"),
-	fDirectories(10, true),
-	fMappings(10, true),
+	fDirectories(10),
+	fMappings(10),
 
 	fDefaultPlainFont(NULL),
 	fDefaultBoldFont(NULL),

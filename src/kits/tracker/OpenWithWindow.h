@@ -325,7 +325,7 @@ private:
 	// menu building state
 	SearchForSignatureEntryList* fIterator;
 	entry_ref fPreferredRef;
-	BObjectList<RelationCachingModelProxy>* fSupportingAppList;
+	BObjectList<RelationCachingModelProxy, true>* fSupportingAppList;
 	bool fHaveCommonPreferredApp;
 	BWindow* fParentWindow;
 

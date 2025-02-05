@@ -46,7 +46,7 @@ public:
 			status_t			Restore(const BMessage& settings);
 
 private:
-	typedef BObjectList<screen_configuration> ConfigurationList;
+	typedef BObjectList<screen_configuration, true> ConfigurationList;
 
 			ConfigurationList	fConfigurations;
 };

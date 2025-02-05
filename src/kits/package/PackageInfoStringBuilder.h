@@ -124,7 +124,7 @@ private:
 	}
 
 	template<typename Value>
-	void _WriteValue(const BObjectList<Value>& value)
+	void _WriteValue(const BObjectList<Value, true>& value)
 	{
 		// Note: The fBasePackage solution is disgusting, but any attempt of
 		// encapsulating the stringification via templates seems to result in

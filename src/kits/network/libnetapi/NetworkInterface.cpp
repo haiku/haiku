@@ -540,7 +540,7 @@ BNetworkInterface::RemoveDefaultRoute(int family)
 
 status_t
 BNetworkInterface::GetRoutes(int family,
-	BObjectList<BNetworkRoute>& routes) const
+	BObjectList<BNetworkRoute, true>& routes) const
 {
 	return BNetworkRoute::GetRoutes(family, Name(), routes);
 }

@@ -421,7 +421,7 @@ BPoseView::DeleteProperty(BMessage* specifier, int32 form,
 		// deleting entries is handled by moving entries to trash
 
 		// build a list of entries, specified by the specifier
-		BObjectList<entry_ref>* entryList = new BObjectList<entry_ref>();
+		BObjectList<entry_ref, true>* entryList = new BObjectList<entry_ref, true>();
 			// list will be deleted for us by the trashing thread
 
 		if (form == (int32)B_ENTRY_SPECIFIER) {

@@ -56,7 +56,7 @@ BSolverProblem::BSolverProblem(BType type, BSolverPackage* sourcePackage,
 	fSourcePackage(sourcePackage),
 	fTargetPackage(targetPackage),
 	fDependency(),
-	fSolutions(10, true)
+	fSolutions(10)
 {
 }
 
@@ -69,7 +69,7 @@ BSolverProblem::BSolverProblem(BType type, BSolverPackage* sourcePackage,
 	fSourcePackage(sourcePackage),
 	fTargetPackage(targetPackage),
 	fDependency(dependency),
-	fSolutions(10, true)
+	fSolutions(10)
 {
 }
 

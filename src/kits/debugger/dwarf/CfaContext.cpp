@@ -18,7 +18,7 @@ CfaContext::CfaContext()
 	fReturnAddressRegister(0),
 	fRuleSet(NULL),
 	fInitialRuleSet(NULL),
-	fRuleSetStack(10, true)
+	fRuleSetStack(10)
 {
 }
 

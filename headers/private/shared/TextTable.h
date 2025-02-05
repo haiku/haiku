@@ -33,8 +33,8 @@ public:
 
 private:
 			struct Column;
-			typedef BObjectList<Column> ColumnList;
-			typedef BObjectList<BStringList> RowList;
+			typedef BObjectList<Column, true> ColumnList;
+			typedef BObjectList<BStringList, true> RowList;
 
 private:
 			ColumnList			fColumns;

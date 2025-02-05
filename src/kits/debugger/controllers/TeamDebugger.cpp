@@ -470,7 +470,7 @@ TeamDebugger::Init(DebuggerInterface* interface, thread_id threadID, int argc,
 
 	ThreadHandler* mainThreadHandler = NULL;
 	{
-		BObjectList<ThreadInfo> threadInfos(20, true);
+		BObjectList<ThreadInfo, true> threadInfos(20);
 		status_t error = fDebuggerInterface->GetThreadInfos(threadInfos);
 		for (int32 i = 0; ThreadInfo* info = threadInfos.ItemAt(i); i++) {
 			::Thread* thread;
@@ -494,7 +494,7 @@ TeamDebugger::Init(DebuggerInterface* interface, thread_id threadID, int argc,
 
 	Image* appImage = NULL;
 	{
-		BObjectList<ImageInfo> imageInfos(20, true);
+		BObjectList<ImageInfo, true> imageInfos(20);
 		status_t error = fDebuggerInterface->GetImageInfos(imageInfos);
 		for (int32 i = 0; ImageInfo* info = imageInfos.ItemAt(i); i++) {
 			Image* image;
@@ -1922,7 +1922,7 @@ TeamDebugger::_PrepareForTeamExec(TeamExecEvent* event)
 		fBreakpointManager->RemoveImageBreakpoints(image);
 	}
 
-	BObjectList<UserBreakpoint> breakpointsToRemove(20, false);
+	BObjectList<UserBreakpoint> breakpointsToRemove(20);
 	const UserBreakpointList& breakpoints = fTeam->UserBreakpoints();
 	for (UserBreakpointList::ConstIterator it = breakpoints.GetIterator();
 			UserBreakpoint* breakpoint = it.Next();) {

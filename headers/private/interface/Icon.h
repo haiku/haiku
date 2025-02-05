@@ -43,7 +43,7 @@ public:
 									uint32 which, uint32 flags, BIcon*& _icon);
 
 private:
-			typedef BObjectList<BBitmap> BitmapList;
+			typedef BObjectList<BBitmap, true> BitmapList;
 
 private:
 	static	BBitmap*			_ConvertToRGB32(const BBitmap* bitmap,

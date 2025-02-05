@@ -54,7 +54,7 @@ public:
 									const BSolverResultElement& element);
 
 private:
-			typedef BObjectList<BSolverResultElement> ElementList;
+			typedef BObjectList<BSolverResultElement, true> ElementList;
 
 private:
 			ElementList			fElements;

@@ -44,7 +44,7 @@ private:
 			status_t		_RemoveDevice(const char* path);
 
 private:
-			BObjectList<MouseDevice> fDevices;
+			BObjectList<MouseDevice, true> fDevices;
 			BLocker			fDeviceListLock;
 };
 

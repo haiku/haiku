@@ -116,10 +116,8 @@ protected:
 									const BPackageVersion& version,
 									BHPKGAttributeID attributeID
 										= kDefaultVersionAttributeID);
-			void				RegisterPackageResolvableExpressionList(
-									PackageAttributeList& attributeList,
-									const BObjectList<
-										BPackageResolvableExpression>& list,
+			void				RegisterPackageResolvableExpressionList(PackageAttributeList& attributeList,
+									const BObjectList<BPackageResolvableExpression, true>& list,
 									uint8 id);
 
 			PackageAttribute*	AddStringAttribute(BHPKGAttributeID id,

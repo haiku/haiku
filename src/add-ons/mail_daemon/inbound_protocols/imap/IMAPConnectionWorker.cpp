@@ -312,7 +312,7 @@ public:
 	CheckMailboxesCommand(IMAPConnectionWorker& worker)
 		:
 		fWorker(worker),
-		fFolders(5, false),
+		fFolders(5),
 		fState(INIT),
 		fFolder(NULL),
 		fMailbox(NULL)

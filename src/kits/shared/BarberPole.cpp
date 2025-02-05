@@ -33,7 +33,7 @@ private:
 private:
 	MachineRoom()
 		:
-		fMessengers(20, true)
+		fMessengers(20)
 	{
 		fSpinLoopLock = create_sem(0, "BarberPole lock");
 		fSpinLoopThread = spawn_thread(&MachineRoom::_StartSpinLoop,
@@ -126,7 +126,7 @@ private:
 	sem_id					fSpinLoopLock;
 
 	BLocker					fLock;
-	BObjectList<BMessenger>	fMessengers;
+	BObjectList<BMessenger, true> fMessengers;
 };
 
 

@@ -102,7 +102,7 @@ BTitleView::BTitleView(BPoseView* view)
 	:
 	BView("TitleView", B_WILL_DRAW),
 	fPoseView(view),
-	fTitleList(10, true),
+	fTitleList(10),
 	fHorizontalResizeCursor(B_CURSOR_ID_RESIZE_EAST_WEST),
 	fPreviouslyClickedColumnTitle(0),
 	fPreviousLeftClickTime(0),

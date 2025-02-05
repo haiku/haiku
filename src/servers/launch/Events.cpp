@@ -32,7 +32,7 @@ protected:
 
 public:
 			void				AddEvent(Event* event);
-			BObjectList<Event>&	Events();
+			BObjectList<Event, true>& Events();
 
 			const BMessenger&	Target() const;
 
@@ -50,7 +50,7 @@ protected:
 protected:
 			BaseJob*			fOwner;
 			BMessenger			fTarget;
-			BObjectList<Event>	fEvents;
+			BObjectList<Event, true> fEvents;
 			bool				fRegistered;
 };
 
@@ -252,7 +252,7 @@ EventContainer::EventContainer(Event* parent, const BMessenger* target,
 	const BMessage& args)
 	:
 	Event(parent),
-	fEvents(5, true),
+	fEvents(5),
 	fRegistered(false)
 {
 	if (target != NULL)
@@ -277,7 +277,7 @@ EventContainer::EventContainer(BaseJob* owner, const BMessenger& target)
 	Event(NULL),
 	fOwner(owner),
 	fTarget(target),
-	fEvents(5, true),
+	fEvents(5),
 	fRegistered(false)
 {
 }
@@ -291,7 +291,7 @@ EventContainer::AddEvent(Event* event)
 }
 
 
-BObjectList<Event>&
+BObjectList<Event, true>&
 EventContainer::Events()
 {
 	return fEvents;

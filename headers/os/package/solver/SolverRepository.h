@@ -71,7 +71,7 @@ public:
 			uint64				ChangeCount() const;
 
 private:
-			typedef BObjectList<BSolverPackage> PackageList;
+			typedef BObjectList<BSolverPackage, true> PackageList;
 
 private:
 			BString				fName;

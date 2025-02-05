@@ -10,7 +10,8 @@
 
 
 RangeList::RangeList()
-	: BObjectList<Range>(20, true)
+	:
+	BObjectList<Range, true>(20)
 {
 }
 

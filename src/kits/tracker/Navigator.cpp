@@ -58,8 +58,8 @@ static const int32 kMaxHistory = 32;
 BNavigator::BNavigator(const Model* model)
 	:
 	BToolBar(),
-	fBackHistory(8, true),
-	fForwHistory(8, true)
+	fBackHistory(8),
+	fForwHistory(8)
 {
 	// Get initial path
 	model->GetPath(&fPath);

@@ -37,7 +37,7 @@ Team::Team()
 	fID(-1),
 	fNubPort(-1),
 	fThreads(),
-	fImages(20, false)
+	fImages(20)
 {
 	fDebugContext.nub_port = -1;
 }

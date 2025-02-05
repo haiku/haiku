@@ -270,7 +270,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 	// dynamic date query during a Refresh call
 	PoseList* oldPoseList = NULL;
 	if (fCreateOldPoseList) {
-		oldPoseList = new PoseList(10, false);
+		oldPoseList = new PoseList(10);
 		oldPoseList->AddList(fPoseList);
 	}
 
@@ -522,7 +522,7 @@ QueryRefFilter::Filter(const entry_ref* ref, BNode* node, stat_beos* st,
 QueryEntryListCollection::QueryEntryListCollection(Model* model,
 	BHandler* target, PoseList* oldPoseList)
 	:
-	fQueryListRep(new QueryListRep(new BObjectList<BQuery>(5, true)))
+	fQueryListRep(new QueryListRep(new BObjectList<BQuery, true>(5)))
 {
 	Rewind();
 	attr_info info;
@@ -650,7 +650,7 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 
 status_t
 QueryEntryListCollection::FetchOneQuery(const BQuery* copyThis,
-	BHandler* target, BObjectList<BQuery>* list, BVolume* volume)
+	BHandler* target, BObjectList<BQuery, true>* list, BVolume* volume)
 {
 	BQuery* query = new (nothrow) BQuery;
 	if (query == NULL)

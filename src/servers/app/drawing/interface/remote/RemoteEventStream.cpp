@@ -18,7 +18,7 @@
 
 RemoteEventStream::RemoteEventStream()
 	:
-	fEventList(10, true),
+	fEventList(10),
 	fEventListLocker("remote event list"),
 	fEventNotification(-1),
 	fWaitingOnEvent(false),

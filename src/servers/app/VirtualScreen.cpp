@@ -17,7 +17,7 @@
 
 VirtualScreen::VirtualScreen()
 	:
-	fScreenList(4, true),
+	fScreenList(4),
 	fDrawingEngine(NULL),
 	fHWInterface(NULL)
 {

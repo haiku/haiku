@@ -526,7 +526,7 @@ LocalDebuggerInterface::GetTeamInfo(TeamInfo& info)
 
 
 status_t
-LocalDebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
+LocalDebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo, true>& infos)
 {
 	thread_info threadInfo;
 	int32 cookie = 0;
@@ -544,7 +544,7 @@ LocalDebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
 
 
 status_t
-LocalDebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
+LocalDebuggerInterface::GetImageInfos(BObjectList<ImageInfo, true>& infos)
 {
 	// get the team's images
 	image_info imageInfo;
@@ -564,7 +564,7 @@ LocalDebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 
 
 status_t
-LocalDebuggerInterface::GetAreaInfos(BObjectList<AreaInfo>& infos)
+LocalDebuggerInterface::GetAreaInfos(BObjectList<AreaInfo, true>& infos)
 {
 	// get the team's areas
 	area_info areaInfo;
@@ -584,7 +584,7 @@ LocalDebuggerInterface::GetAreaInfos(BObjectList<AreaInfo>& infos)
 
 
 status_t
-LocalDebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo>& infos)
+LocalDebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo, true>& infos)
 {
 	// get the team's semaphores
 	sem_info semInfo;
@@ -604,7 +604,7 @@ LocalDebuggerInterface::GetSemaphoreInfos(BObjectList<SemaphoreInfo>& infos)
 
 status_t
 LocalDebuggerInterface::GetSymbolInfos(team_id team, image_id image,
-	BObjectList<SymbolInfo>& infos)
+	BObjectList<SymbolInfo, true>& infos)
 {
 	DebugContextGetter contextGetter(fDebugContextPool);
 

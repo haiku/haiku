@@ -201,9 +201,9 @@ public:
 									ElfSymbolLookup*& _lookup);
 
 private:
-			typedef BObjectList<CoreFileAreaInfo> AreaInfoList;
-			typedef BObjectList<CoreFileImageInfo> ImageInfoList;
-			typedef BObjectList<CoreFileThreadInfo> ThreadInfoList;
+			typedef BObjectList<CoreFileAreaInfo, true> AreaInfoList;
+			typedef BObjectList<CoreFileImageInfo, true> ImageInfoList;
+			typedef BObjectList<CoreFileThreadInfo, true> ThreadInfoList;
 
 private:
 			template<typename ElfClass>

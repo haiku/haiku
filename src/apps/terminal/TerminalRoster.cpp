@@ -93,7 +93,7 @@ TerminalRoster::TerminalRoster()
 	BHandler("terminal roster"),
 	fLock("terminal roster"),
 	fClipboard(TERM_SIGNATURE),
-	fInfos(10, true),
+	fInfos(10),
 	fOurInfo(NULL),
 	fLastCheckedTime(0),
 	fListener(NULL),
@@ -362,7 +362,7 @@ TerminalRoster::_UpdateInfos(bool checkApps)
 		count = 0;
 
 	// create an info list from the message
-	InfoList infos(10, true);
+	InfoList infos(10);
 	for (int32 i = 0; i < count; i++) {
 		// get the team's message
 		BMessage teamData;

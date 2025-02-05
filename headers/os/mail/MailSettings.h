@@ -119,7 +119,7 @@ public:
 	virtual	bool				HasBeenModified() const;
 
 private:
-			BObjectList<BMailAddOnSettings> fFiltersSettings;
+			BObjectList<BMailAddOnSettings, true> fFiltersSettings;
 };
 
 

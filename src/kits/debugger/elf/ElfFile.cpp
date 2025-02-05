@@ -113,7 +113,7 @@ struct ElfFile::SymbolLookupSource : public ElfSymbolLookupSource {
 	SymbolLookupSource(int fd)
 		:
 		fFd(fd),
-		fSegments(8, true)
+		fSegments(8)
 	{
 	}
 
@@ -169,8 +169,8 @@ private:
 	};
 
 private:
-	int						fFd;
-	BObjectList<Segment>	fSegments;
+	int							fFd;
+	BObjectList<Segment, true>	fSegments;
 };
 
 
@@ -185,8 +185,8 @@ ElfFile::ElfFile()
 	fMachine(EM_NONE),
 	f64Bit(false),
 	fSwappedByteOrder(false),
-	fSections(16, true),
-	fSegments(16, true)
+	fSections(16),
+	fSegments(16)
 {
 }
 

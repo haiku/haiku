@@ -34,7 +34,7 @@ public:
 
 private:
 	class LineInfo;
-	typedef BObjectList<LineInfo> LineInfoList;
+	typedef BObjectList<LineInfo, true> LineInfoList;
 	struct SyntaxPair;
 
 private:

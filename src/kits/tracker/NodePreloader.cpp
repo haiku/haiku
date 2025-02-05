@@ -73,7 +73,7 @@ NodePreloader::InstallNodePreloader(const char* name, BLooper* host)
 NodePreloader::NodePreloader(const char* name)
 	:
 	BHandler(name),
-	fModelList(20, true),
+	fModelList(20),
 	fQuitRequested(false)
 {
 }

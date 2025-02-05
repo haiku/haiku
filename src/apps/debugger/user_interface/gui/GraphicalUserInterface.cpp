@@ -131,7 +131,7 @@ GraphicalUserInterface::GraphicalUserInterface()
 	fTeamWindowMessenger(NULL),
 	fFilePanelHandler(NULL),
 	fFilePanel(NULL),
-	fDefaultActions(10, true)
+	fDefaultActions(10)
 {
 }
 

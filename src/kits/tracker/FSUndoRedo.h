@@ -59,7 +59,7 @@ class Undo {
 
 class MoveCopyUndo : public Undo {
 	public:
-		MoveCopyUndo(BObjectList<entry_ref>* sourceList, BDirectory &dest,
+		MoveCopyUndo(BObjectList<entry_ref, true>* sourceList, BDirectory &dest,
 			BList* pointList, uint32 moveMode);
 };
 

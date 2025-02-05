@@ -176,17 +176,17 @@ BPackageInfo::BPackageInfo()
 	fLicenseList(4),
 	fURLList(4),
 	fSourceURLList(4),
-	fGlobalWritableFileInfos(4, true),
-	fUserSettingsFileInfos(4, true),
-	fUsers(4, true),
+	fGlobalWritableFileInfos(4),
+	fUserSettingsFileInfos(4),
+	fUsers(4),
 	fGroups(4),
 	fPostInstallScripts(4),
 	fPreUninstallScripts(4),
-	fProvidesList(20, true),
-	fRequiresList(20, true),
-	fSupplementsList(20, true),
-	fConflictsList(4, true),
-	fFreshensList(4, true),
+	fProvidesList(20),
+	fRequiresList(20),
+	fSupplementsList(20),
+	fConflictsList(4),
+	fFreshensList(4),
 	fReplacesList(4)
 {
 }
@@ -201,17 +201,17 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 	fLicenseList(4),
 	fURLList(4),
 	fSourceURLList(4),
-	fGlobalWritableFileInfos(4, true),
-	fUserSettingsFileInfos(4, true),
-	fUsers(4, true),
+	fGlobalWritableFileInfos(4),
+	fUserSettingsFileInfos(4),
+	fUsers(4),
 	fGroups(4),
 	fPostInstallScripts(4),
 	fPreUninstallScripts(4),
-	fProvidesList(20, true),
-	fRequiresList(20, true),
-	fSupplementsList(20, true),
-	fConflictsList(4, true),
-	fFreshensList(4, true),
+	fProvidesList(20),
+	fRequiresList(20),
+	fSupplementsList(20),
+	fConflictsList(4),
+	fFreshensList(4),
 	fReplacesList(4)
 {
 	status_t error;
@@ -524,21 +524,21 @@ BPackageInfo::SourceURLList() const
 }
 
 
-const BObjectList<BGlobalWritableFileInfo>&
+const BObjectList<BGlobalWritableFileInfo, true>&
 BPackageInfo::GlobalWritableFileInfos() const
 {
 	return fGlobalWritableFileInfos;
 }
 
 
-const BObjectList<BUserSettingsFileInfo>&
+const BObjectList<BUserSettingsFileInfo, true>&
 BPackageInfo::UserSettingsFileInfos() const
 {
 	return fUserSettingsFileInfos;
 }
 
 
-const BObjectList<BUser>&
+const BObjectList<BUser, true>&
 BPackageInfo::Users() const
 {
 	return fUsers;
@@ -566,35 +566,35 @@ BPackageInfo::PreUninstallScripts() const
 }
 
 
-const BObjectList<BPackageResolvable>&
+const BObjectList<BPackageResolvable, true>&
 BPackageInfo::ProvidesList() const
 {
 	return fProvidesList;
 }
 
 
-const BObjectList<BPackageResolvableExpression>&
+const BObjectList<BPackageResolvableExpression, true>&
 BPackageInfo::RequiresList() const
 {
 	return fRequiresList;
 }
 
 
-const BObjectList<BPackageResolvableExpression>&
+const BObjectList<BPackageResolvableExpression, true>&
 BPackageInfo::SupplementsList() const
 {
 	return fSupplementsList;
 }
 
 
-const BObjectList<BPackageResolvableExpression>&
+const BObjectList<BPackageResolvableExpression, true>&
 BPackageInfo::ConflictsList() const
 {
 	return fConflictsList;
 }
 
 
-const BObjectList<BPackageResolvableExpression>&
+const BObjectList<BPackageResolvableExpression, true>&
 BPackageInfo::FreshensList() const
 {
 	return fFreshensList;

@@ -38,7 +38,7 @@ TargetHostInterface::TargetHostInterface()
 	:
 	BLooper(),
 	fListeners(),
-	fTeamDebuggers(20, false)
+	fTeamDebuggers(20)
 {
 }
 

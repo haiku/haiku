@@ -114,7 +114,7 @@ private:
 	};
 
 	Benaphore* fLock;
-	BObjectList<periodic_pose> fPoseList;
+	BObjectList<periodic_pose, true> fPoseList;
 };
 
 extern PeriodicUpdatePoses gPeriodicUpdatePoses;

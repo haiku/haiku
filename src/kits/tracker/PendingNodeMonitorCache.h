@@ -78,7 +78,7 @@ public:
 	void PoseCreatedOrMoved(BPoseView*, const BPose*);
 
 private:
-	BObjectList<PendingNodeMonitorEntry> fList;
+	BObjectList<PendingNodeMonitorEntry, true> fList;
 };
 
 } // namespace BPrivate

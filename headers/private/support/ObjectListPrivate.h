@@ -9,10 +9,10 @@
 #include <ObjectList.h>
 
 
-template<class T>
-class BObjectList<T>::Private {
+template<class T, bool O>
+class BObjectList<T, O>::Private {
 public:
-	Private(BObjectList<T>* objectList)
+	Private(BObjectList<T, O>* objectList)
 		:
 		fObjectList(objectList)
 	{

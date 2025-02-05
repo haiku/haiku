@@ -107,14 +107,14 @@ TypeComponent::operator==(const TypeComponent& other) const
 
 TypeComponentPath::TypeComponentPath()
 	:
-	fComponents(10, true)
+	fComponents(10)
 {
 }
 
 
 TypeComponentPath::TypeComponentPath(const TypeComponentPath& other)
 	:
-	fComponents(10, true)
+	fComponents(10)
 {
 	*this = other;
 }

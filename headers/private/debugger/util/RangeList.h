@@ -30,7 +30,7 @@ struct Range {
 };
 
 
-class RangeList : private BObjectList<Range>
+class RangeList : private BObjectList<Range, true>
 {
 public:
 							RangeList();

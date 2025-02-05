@@ -266,7 +266,7 @@ struct DwarfImageDebugInfo::TypeNameEntry : TypeNameKey {
 	TypeNameEntry(const BString& name)
 		:
 		TypeNameKey(name),
-		types(10, true)
+		types(10)
 	{
 	}
 
@@ -401,7 +401,7 @@ DwarfImageDebugInfo::Init()
 
 
 status_t
-DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
+DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo, true>& symbols,
 	BObjectList<FunctionDebugInfo>& functions)
 {
 	TRACE_IMAGES("DwarfImageDebugInfo::GetFunctions()\n");

@@ -61,7 +61,7 @@ KeyStoreServer::KeyStoreServer()
 	:
 	BApplication(kKeyStoreServerSignature),
 	fMasterKeyring(NULL),
-	fKeyrings(20, true)
+	fKeyrings(20)
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)

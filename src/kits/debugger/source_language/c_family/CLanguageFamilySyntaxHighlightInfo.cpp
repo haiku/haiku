@@ -128,7 +128,7 @@ public:
 	LineInfo(int32 line)
 		:
 		fLine(line),
-		fPairs(5, true)
+		fPairs(5)
 	{
 	}
 
@@ -157,7 +157,7 @@ public:
 	}
 
 private:
-	typedef BObjectList<SyntaxPair> SyntaxPairList;
+	typedef BObjectList<SyntaxPair, true> SyntaxPairList;
 
 private:
 	int32 fLine;
@@ -176,7 +176,7 @@ CLanguageFamilySyntaxHighlightInfo::CLanguageFamilySyntaxHighlightInfo(
 	fHighlightSource(source),
 	fTokenizer(tokenizer),
 	fTypeInfo(typeInfo),
-	fLineInfos(10, true)
+	fLineInfos(10)
 {
 	fHighlightSource->AcquireReference();
 }

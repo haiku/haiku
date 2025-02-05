@@ -471,7 +471,7 @@ PlaylistWindow::_UpdateTotalDuration(bigtime_t duration)
 PlaylistWindow::DurationListener::DurationListener(PlaylistWindow& parent)
 	:
 	PlaylistObserver(this),
-	fKnown(20, true),
+	fKnown(20),
 	fTotalDuration(0),
 	fParent(parent)
 {

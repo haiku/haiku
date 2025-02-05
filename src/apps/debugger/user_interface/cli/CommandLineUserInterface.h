@@ -55,7 +55,7 @@ public:
 
 private:
 			struct CommandEntry;
-			typedef BObjectList<CommandEntry> CommandList;
+			typedef BObjectList<CommandEntry, true> CommandList;
 
 			struct HelpCommand;
 

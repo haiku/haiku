@@ -22,8 +22,8 @@ InputManager* gInputManager;
 
 InputManager::InputManager()
 	: BLocker("input manager"),
-	fFreeStreams(2, true),
-	fUsedStreams(2, true)
+	fFreeStreams(2),
+	fUsedStreams(2)
 {
 }
 
@@ -99,5 +99,3 @@ InputManager::UpdateScreenBounds(BRect bounds)
 		fFreeStreams.ItemAt(i)->UpdateScreenBounds(bounds);
 	}
 }
-
-

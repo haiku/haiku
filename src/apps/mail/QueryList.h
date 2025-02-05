@@ -69,7 +69,7 @@ private:
 			QueryVector			fQueries;
 			QueryVector			fQueryQueue;
 			ThreadVector		fFetchThreads;
-			BObjectList<QueryListener> fListeners;
+			BObjectList<QueryListener, true> fListeners;
 };
 
 

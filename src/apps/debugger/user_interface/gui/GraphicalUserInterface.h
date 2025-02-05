@@ -62,7 +62,7 @@ private:
 				BString fKey;
 				int fDecision;
 			};
-			BObjectList<DefaultAction>	fDefaultActions;
+			BObjectList<DefaultAction, true> fDefaultActions;
 };
 
 

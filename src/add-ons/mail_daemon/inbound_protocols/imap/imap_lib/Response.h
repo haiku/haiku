@@ -35,7 +35,7 @@ private:
 };
 
 
-class ArgumentList : public BObjectList<Argument> {
+class ArgumentList : public BObjectList<Argument, true> {
 public:
 								ArgumentList();
 								~ArgumentList();

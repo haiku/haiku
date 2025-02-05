@@ -714,7 +714,7 @@ CommitTransactionHandler::_PreparePackageToActivate(Package* package)
 		_AddGroup(package, groups.StringAt(i));
 
 	// add users
-	const BObjectList<BUser>& users = package->Info().Users();
+	const BObjectList<BUser, true>& users = package->Info().Users();
 	for (int32 i = 0; const BUser* user = users.ItemAt(i); i++)
 		_AddUser(package, *user);
 
@@ -827,7 +827,7 @@ void
 CommitTransactionHandler::_AddGlobalWritableFiles(Package* package)
 {
 	// get the list of included files
-	const BObjectList<BGlobalWritableFileInfo>& files
+	const BObjectList<BGlobalWritableFileInfo, true>& files
 		= package->Info().GlobalWritableFileInfos();
 	BStringList contentPaths;
 	for (int32 i = 0; const BGlobalWritableFileInfo* file = files.ItemAt(i);

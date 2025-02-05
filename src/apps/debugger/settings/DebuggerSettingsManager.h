@@ -29,7 +29,7 @@ public:
 	virtual	status_t			SaveTeamSettings(const TeamSettings& settings);
 
 private:
-			typedef BObjectList<TeamSettings> TeamSettingsList;
+			typedef BObjectList<TeamSettings, true> TeamSettingsList;
 
 private:
 			void				_Unset();

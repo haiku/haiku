@@ -458,7 +458,7 @@ public:
 			int32				IndexOf(TreeTableNode* child);
 
 private:
-			typedef BObjectList<TreeTableNode> NodeList;
+			typedef BObjectList<TreeTableNode, true> NodeList;
 
 private:
 			TreeTableNode*		fParent;
@@ -532,7 +532,7 @@ bool
 TreeTableNode::AddChild(TreeTableNode* child, int32 index)
 {
 	if (fChildren == NULL) {
-		fChildren = new(std::nothrow) NodeList(10, true);
+		fChildren = new(std::nothrow) NodeList(10);
 		if (fChildren == NULL)
 			return false;
 	}

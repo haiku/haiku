@@ -124,7 +124,7 @@ BSolverProblemSolutionElement::ToString() const
 
 BSolverProblemSolution::BSolverProblemSolution()
 	:
-	fElements(10, true)
+	fElements(10)
 {
 }
 

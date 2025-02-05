@@ -15,7 +15,7 @@
 
 ScreenConfigurations::ScreenConfigurations()
 	:
-	fConfigurations(10, true)
+	fConfigurations(10)
 {
 }
 

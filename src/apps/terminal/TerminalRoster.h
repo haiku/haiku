@@ -76,7 +76,7 @@ private:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			typedef BObjectList<Info> InfoList;
+			typedef BObjectList<Info, true> InfoList;
 
 private:
 			status_t			_UpdateInfos(bool checkApps);

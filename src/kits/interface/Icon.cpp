@@ -24,8 +24,8 @@ namespace BPrivate {
 
 BIcon::BIcon()
 	:
-	fEnabledBitmaps(8, true),
-	fDisabledBitmaps(8, true)
+	fEnabledBitmaps(8),
+	fDisabledBitmaps(8)
 {
 }
 

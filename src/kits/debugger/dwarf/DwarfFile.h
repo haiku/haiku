@@ -113,9 +113,9 @@ private:
 			struct FDELookupInfo;
 
 			typedef DoublyLinkedList<AbbreviationTable> AbbreviationTableList;
-			typedef BObjectList<CompilationUnit> CompilationUnitList;
+			typedef BObjectList<CompilationUnit, true> CompilationUnitList;
 			typedef BOpenHashTable<TypeUnitTableHashDefinition> TypeUnitTable;
-			typedef BObjectList<FDELookupInfo> FDEInfoList;
+			typedef BObjectList<FDELookupInfo, true> FDEInfoList;
 
 private:
 			status_t			_ParseDebugInfoSection(uint8 _addressSize, bool isBigEndian);

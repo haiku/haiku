@@ -44,8 +44,8 @@ public:
 									const void* pointer);
 
 private:
-			BObjectList<BMessage>	fStack;
-			BObjectList<BString>	fNameStack;
+			BObjectList<BMessage> fStack;
+			BObjectList<BString, true> fNameStack;
 			BMessage*			fCurrentMessage;
 };
 

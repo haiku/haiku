@@ -130,7 +130,7 @@ CDDBLookup::Lookup(CDDBServer& server, const dev_t device, bool dumpOnly,
 
 	printf("Looking up CD with CDDB Id %08" B_PRIx32 ".\n", cddbID);
 
-	BObjectList<QueryResponseData> queryResponses(10, true);
+	QueryResponseList queryResponses(10);
 	status_t result = server.Query(cddbID, toc, queryResponses);
 	if (result != B_OK) {
 		fprintf(stderr, "Error when querying CD: %s\n", strerror(result));

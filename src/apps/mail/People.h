@@ -61,7 +61,7 @@ private:
 	typedef std::map<node_ref, Person*> PersonMap;
 
 			QueryList&			fQueryList;
-			BObjectList<Person>	fPersons;
+			BObjectList<Person, true> fPersons;
 			PersonMap			fPersonMap;
 };
 

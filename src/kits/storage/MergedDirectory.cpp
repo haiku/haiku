@@ -30,7 +30,7 @@ struct BMergedDirectory::EntryNameSet : std::set<std::string> {
 BMergedDirectory::BMergedDirectory(BPolicy policy)
 	:
 	BEntryList(),
-	fDirectories(10, true),
+	fDirectories(10),
 	fPolicy(policy),
 	fDirectoryIndex(0),
 	fVisitedEntries(NULL)

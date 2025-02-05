@@ -27,7 +27,7 @@ Protocol::Protocol()
 	:
 	fSocket(NULL),
 	fBufferedSocket(NULL),
-	fHandlerList(5, false),
+	fHandlerList(5),
 	fCommandID(0),
 	fIsConnected(false)
 {

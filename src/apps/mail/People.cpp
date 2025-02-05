@@ -106,7 +106,7 @@ Person::IsInGroup(const char* group) const
 PersonList::PersonList(QueryList& query)
 	:
 	fQueryList(query),
-	fPersons(10, true)
+	fPersons(10)
 {
 	fQueryList.AddListener(this);
 }

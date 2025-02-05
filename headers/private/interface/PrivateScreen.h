@@ -89,7 +89,7 @@ public:
 			uint32				BytesPerRow();
 
 private:
-	friend class BObjectList<BPrivateScreen>;
+	friend class BObjectList<BPrivateScreen, true>;
 
 								BPrivateScreen(int32 id);
 								~BPrivateScreen();

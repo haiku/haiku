@@ -151,7 +151,7 @@ BackgroundImage::BackgroundImage(const BNode* node, bool desktop)
 	fDefinedByNode(*node),
 	fView(NULL),
 	fShowingBitmap(NULL),
-	fBitmapForWorkspaceList(1, true)
+	fBitmapForWorkspaceList(1)
 {
 }
 

@@ -25,7 +25,7 @@ public:
 			status_t			Execute();
 
 private:
-	typedef	BObjectList<DiskDeviceJob> JobList;
+	typedef	BObjectList<DiskDeviceJob, true> JobList;
 
 			JobList				fJobs;
 };

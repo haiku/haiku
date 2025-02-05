@@ -391,8 +391,6 @@ Constraint::~Constraint()
 {
 	Invalidate();
 
-	for (int32 i = 0; i < fLeftSide->CountItems(); i++)
-		delete fLeftSide->ItemAt(i);
 	delete fLeftSide;
 	fLeftSide = NULL;
 }

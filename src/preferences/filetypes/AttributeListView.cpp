@@ -313,7 +313,7 @@ AttributeListView::SetTo(BMimeType* type)
 
 	// Remove the current items but remember them for now. Also remember
 	// the currently selected item.
-	BObjectList<AttributeItem> previousItems(CountItems(), true);
+	BObjectList<AttributeItem, true> previousItems(CountItems());
 	while (AttributeItem* item = (AttributeItem*)RemoveItem((int32)0))
 		previousItems.AddItem(item);
 

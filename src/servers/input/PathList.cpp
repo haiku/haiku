@@ -34,7 +34,7 @@ struct PathList::path_entry {
 
 PathList::PathList()
 	:
-	fPaths(10, true)
+	fPaths(10)
 {
 }
 

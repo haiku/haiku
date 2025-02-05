@@ -27,7 +27,7 @@ public:
 private:
 	struct path_entry;
 
-			BObjectList<path_entry> fPaths;
+			BObjectList<path_entry, true> fPaths;
 };
 
 #endif	// _DEVICE_MANAGER_H

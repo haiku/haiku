@@ -373,7 +373,7 @@ struct BView::LayoutData {
 		fLayoutInvalidationDisabled(0),
 		fLayout(NULL),
 		fLayoutContext(NULL),
-		fLayoutItems(5, false),
+		fLayoutItems(5),
 		fLayoutValid(true),		// TODO: Rethink these initial values!
 		fMinMaxValid(true),		//
 		fLayoutInProgress(false),

@@ -98,10 +98,10 @@ struct HyperTextView::ActionInfo {
 
 
 class HyperTextView::ActionInfoList
-	: public BObjectList<HyperTextView::ActionInfo> {
+	: public BObjectList<HyperTextView::ActionInfo, true> {
 public:
-	ActionInfoList(int32 itemsPerBlock = 20, bool owning = false)
-		: BObjectList<HyperTextView::ActionInfo>(itemsPerBlock, owning)
+	ActionInfoList(int32 itemsPerBlock = 20)
+		: BObjectList<HyperTextView::ActionInfo, true>(itemsPerBlock)
 	{
 	}
 };
@@ -110,7 +110,7 @@ public:
 HyperTextView::HyperTextView(const char* name, uint32 flags)
 	:
 	BTextView(name, flags),
-	fActionInfos(new ActionInfoList(100, true)),
+	fActionInfos(new ActionInfoList(100)),
 	fLastActionInfo(NULL)
 {
 }
@@ -120,7 +120,7 @@ HyperTextView::HyperTextView(BRect frame, const char* name, BRect textRect,
 	uint32 resizeMask, uint32 flags)
 	:
 	BTextView(frame, name, textRect, resizeMask, flags),
-	fActionInfos(new ActionInfoList(100, true)),
+	fActionInfos(new ActionInfoList(100)),
 	fLastActionInfo(NULL)
 {
 }

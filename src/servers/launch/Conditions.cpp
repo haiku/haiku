@@ -33,7 +33,7 @@ protected:
 			void				AddConditionsToString(BString& string) const;
 
 protected:
-			BObjectList<Condition> fConditions;
+			BObjectList<Condition, true> fConditions;
 };
 
 
@@ -179,7 +179,7 @@ Condition::IsConstant(ConditionContext& context) const
 
 ConditionContainer::ConditionContainer(const BMessage& args)
 	:
-	fConditions(10, true)
+	fConditions(10)
 {
 	char* name;
 	type_code type;
@@ -197,7 +197,7 @@ ConditionContainer::ConditionContainer(const BMessage& args)
 
 ConditionContainer::ConditionContainer()
 	:
-	fConditions(10, true)
+	fConditions(10)
 {
 }
 

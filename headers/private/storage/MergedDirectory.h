@@ -55,7 +55,7 @@ protected:
 									// always invoked with index1 < index2
 
 private:
-			typedef BObjectList<BDirectory> DirectoryList;
+			typedef BObjectList<BDirectory, true> DirectoryList;
 			struct EntryNameSet;
 
 private:

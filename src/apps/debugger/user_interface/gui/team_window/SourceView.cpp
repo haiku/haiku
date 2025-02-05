@@ -154,7 +154,7 @@ public:
 
 			template<typename MarkerType> struct MarkerByLinePredicate;
 
-			typedef BObjectList<Marker>	MarkerList;
+			typedef BObjectList<Marker> MarkerList;
 			typedef BObjectList<BreakpointMarker> BreakpointMarkerList;
 
 			void				GetMarkers(uint32 minLine, uint32 maxLine,
@@ -190,8 +190,8 @@ private:
 			SourceCode*			fSourceCode;
 			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
-			MarkerList			fIPMarkers;
-			BreakpointMarkerList fBreakpointMarkers;
+			BObjectList<Marker, true> fIPMarkers;
+			BObjectList<BreakpointMarker, true> fBreakpointMarkers;
 			bool				fIPMarkersValid;
 			bool				fBreakpointMarkersValid;
 
@@ -626,8 +626,8 @@ SourceView::MarkerManager::MarkerManager(SourceView* sourceView, Team* team,
 	fListener(listener),
 	fStackTrace(NULL),
 	fStackFrame(NULL),
-	fIPMarkers(10, true),
-	fBreakpointMarkers(20, true),
+	fIPMarkers(10),
+	fBreakpointMarkers(20),
 	fIPMarkersValid(false),
 	fBreakpointMarkersValid(false)
 {

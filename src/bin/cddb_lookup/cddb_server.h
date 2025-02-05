@@ -40,17 +40,17 @@ struct ReadResponseData {
 	BString artist;
 	BString genre;
 	uint32 year;
-	BObjectList<TrackData> tracks;
+	BObjectList<TrackData, true> tracks;
 
 	ReadResponseData()
 		:
-		tracks(20, true)
+		tracks(20)
 	{
 	}
 };
 
 
-typedef BObjectList<QueryResponseData> QueryResponseList;
+typedef BObjectList<QueryResponseData, true> QueryResponseList;
 
 
 class CDDBServer {

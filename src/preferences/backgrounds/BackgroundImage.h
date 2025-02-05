@@ -149,7 +149,7 @@ private:
 	BackgroundsView* fBackgroundsView;
 	BackgroundImageInfo* fShowingBitmap;
 
-	BObjectList<BackgroundImageInfo> fBitmapForWorkspaceList;
+	BObjectList<BackgroundImageInfo, true> fBitmapForWorkspaceList;
 
 	uint32 fImageSetPeriod;		// period between imagesets, 0 if none
 	uint32 fShowingImageSet;	// current imageset

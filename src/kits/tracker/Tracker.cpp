@@ -688,7 +688,7 @@ TTracker::MoveRefsToTrash(const BMessage* message)
 	if (count <= 0)
 		return;
 
-	BObjectList<entry_ref>* srcList = new BObjectList<entry_ref>(count, true);
+	BObjectList<entry_ref, true>* srcList = new BObjectList<entry_ref, true>(count);
 
 	for (int32 index = 0; index < count; index++) {
 		entry_ref ref;

@@ -24,7 +24,7 @@
 ImageDebugLoadingStateHandlerRoster::ImageDebugLoadingStateHandlerRoster()
 	:
 	fLock("loading state handler roster"),
-	fStateHandlers(20, false)
+	fStateHandlers(20)
 {
 }
 

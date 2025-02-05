@@ -38,7 +38,7 @@ public:
 									ConnectionConfigView*& _view) const;
 
 private:
-			typedef BObjectList<ConnectionConfigHandler> HandlerList;
+			typedef BObjectList<ConnectionConfigHandler, true> HandlerList;
 
 private:
 			bool				_GetHandler(const BString& name,

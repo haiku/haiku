@@ -122,7 +122,7 @@ struct VariablesView::ExpressionInfoEntry : FunctionKey, ExpressionInfoList {
 	ExpressionInfoEntry(FunctionID* function)
 		:
 		FunctionKey(function),
-		ExpressionInfoList(10, false)
+		ExpressionInfoList(10)
 	{
 		function->AcquireReference();
 	}
@@ -1792,7 +1792,7 @@ VariablesView::VariablesView(Listener* listener)
 	fPreviousViewState(NULL),
 	fViewStateHistory(NULL),
 	fExpressions(NULL),
-	fExpressionChildren(10, false),
+	fExpressionChildren(10),
 	fTableCellContextMenuTracker(NULL),
 	fPendingTypecastInfo(NULL),
 	fTemporaryExpression(NULL),

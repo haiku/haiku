@@ -24,7 +24,7 @@ using namespace std;
 */
 BDiskDeviceList::BDiskDeviceList(bool useOwnLocker)
 	: fLocker(NULL),
-	  fDevices(20, true),
+	  fDevices(20),
 	  fSubscribed(false)
 {
 	if (useOwnLocker)

@@ -24,7 +24,7 @@ BlockListItem::BlockListItem(const char* label, uint32 blockIndex)
 
 UnicodeBlockView::UnicodeBlockView(const char* name)
 	: BListView(name),
-	fBlocks(kNumUnicodeBlocks, true),
+	fBlocks(kNumUnicodeBlocks),
 	fShowPrivateBlocks(false),
 	fShowContainedBlocksOnly(false)
 {

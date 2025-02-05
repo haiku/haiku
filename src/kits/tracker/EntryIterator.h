@@ -189,7 +189,7 @@ public:
 	virtual int32 CountEntries();
 
 protected:
-	BObjectList<BEntryList> fList;
+	BObjectList<BEntryList, true> fList;
 	int32 fCurrentIndex;
 };
 

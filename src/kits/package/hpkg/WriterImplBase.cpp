@@ -433,7 +433,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		packageInfo.SourceURLList(), attributeList);
 
 	// provides list
-	const BObjectList<BPackageResolvable>& providesList
+	const BObjectList<BPackageResolvable, true>& providesList
 		= packageInfo.ProvidesList();
 	for (int i = 0; i < providesList.CountItems(); ++i) {
 		BPackageResolvable* resolvable = providesList.ItemAt(i);
@@ -476,7 +476,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		packageInfo.ReplacesList(), attributeList);
 
 	// global writable file info list
-	const BObjectList<BGlobalWritableFileInfo>& globalWritableFileInfos
+	const BObjectList<BGlobalWritableFileInfo, true>& globalWritableFileInfos
 		= packageInfo.GlobalWritableFileInfos();
 	for (int32 i = 0; i < globalWritableFileInfos.CountItems(); ++i) {
 		BGlobalWritableFileInfo* info = globalWritableFileInfos.ItemAt(i);
@@ -504,7 +504,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	}
 
 	// user settings file info list
-	const BObjectList<BUserSettingsFileInfo>& userSettingsFileInfos
+	const BObjectList<BUserSettingsFileInfo, true>& userSettingsFileInfos
 		= packageInfo.UserSettingsFileInfos();
 	for (int32 i = 0; i < userSettingsFileInfos.CountItems(); ++i) {
 		BUserSettingsFileInfo* info = userSettingsFileInfos.ItemAt(i);
@@ -527,7 +527,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	}
 
 	// user list
-	const BObjectList<BUser>& users = packageInfo.Users();
+	const BObjectList<BUser, true>& users = packageInfo.Users();
 	for (int32 i = 0; i < users.CountItems(); ++i) {
 		const BUser* user = users.ItemAt(i);
 		PackageAttribute* attribute = AddStringAttribute(
@@ -603,7 +603,7 @@ WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
 void
 WriterImplBase::RegisterPackageResolvableExpressionList(
 	PackageAttributeList& attributeList,
-	const BObjectList<BPackageResolvableExpression>& expressionList, uint8 id)
+	const BObjectList<BPackageResolvableExpression, true>& expressionList, uint8 id)
 {
 	for (int i = 0; i < expressionList.CountItems(); ++i) {
 		BPackageResolvableExpression* resolvableExpr = expressionList.ItemAt(i);

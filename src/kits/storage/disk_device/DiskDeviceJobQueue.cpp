@@ -20,7 +20,7 @@
 
 // constructor
 DiskDeviceJobQueue::DiskDeviceJobQueue()
-	: fJobs(20, true)
+	: fJobs(20)
 {
 }
 

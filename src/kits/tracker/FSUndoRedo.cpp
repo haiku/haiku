@@ -64,7 +64,7 @@ static BLocker sLock("undo");
 
 class UndoItemCopy : public UndoItem {
 	public:
-		UndoItemCopy(BObjectList<entry_ref>* sourceList, BDirectory &target,
+		UndoItemCopy(BObjectList<entry_ref, true>* sourceList, BDirectory &target,
 			BList* pointList, uint32 moveMode);
 		virtual ~UndoItemCopy();
 
@@ -73,8 +73,8 @@ class UndoItemCopy : public UndoItem {
 		virtual void UpdateEntry(BEntry* entry, const char* name);
 
 	private:
-		BObjectList<entry_ref> fSourceList;
-		BObjectList<entry_ref> fTargetList;
+		BObjectList<entry_ref, true> fSourceList;
+		BObjectList<entry_ref, true> fTargetList;
 		entry_ref	fSourceRef, fTargetRef;
 		uint32		fMoveMode;
 };
@@ -85,7 +85,7 @@ class UndoItemMove : public UndoItem {
 		/** source - list of file(s) that were moved.  Assumes ownership.
 		 *	origfolder - location it was moved from
 		 */
-		UndoItemMove(BObjectList<entry_ref>* sourceList, BDirectory &target,
+		UndoItemMove(BObjectList<entry_ref, true>* sourceList, BDirectory &target,
 			BList* pointList);
 		virtual ~UndoItemMove();
 
@@ -93,7 +93,7 @@ class UndoItemMove : public UndoItem {
 		virtual status_t Redo();
 
 	private:
-		BObjectList<entry_ref> fSourceList;
+		BObjectList<entry_ref, true> fSourceList;
 		entry_ref	fSourceRef, fTargetRef;
 };
 
@@ -150,7 +150,7 @@ class UndoItemRenameVolume : public UndoItem {
 
 
 static status_t
-ChangeListSource(BObjectList<entry_ref> &list, BEntry &entry)
+ChangeListSource(BObjectList<entry_ref, true> &list, BEntry &entry)
 {
 	node_ref source;
 	if (entry.GetNodeRef(&source) != B_OK)
@@ -207,7 +207,7 @@ Undo::Remove()
 }
 
 
-MoveCopyUndo::MoveCopyUndo(BObjectList<entry_ref>* sourceList,
+MoveCopyUndo::MoveCopyUndo(BObjectList<entry_ref, true>* sourceList,
 	BDirectory &dest, BList* pointList, uint32 moveMode)
 {
 	if (moveMode == kMoveSelectionTo)
@@ -238,7 +238,7 @@ RenameVolumeUndo::RenameVolumeUndo(BVolume &volume, const char* newName)
 //	#pragma mark - UndoItemCopy
 
 
-UndoItemCopy::UndoItemCopy(BObjectList<entry_ref>* sourceList,
+UndoItemCopy::UndoItemCopy(BObjectList<entry_ref, true>* sourceList,
 	BDirectory &target, BList* /*pointList*/, uint32 moveMode)
 	:
 	fSourceList(*sourceList),
@@ -266,7 +266,7 @@ UndoItemCopy::~UndoItemCopy()
 status_t
 UndoItemCopy::Undo()
 {
-	FSDeleteRefList(new BObjectList<entry_ref>(fTargetList), true, false);
+	FSDeleteRefList(new BObjectList<entry_ref, true>(fTargetList), true, false);
 	return B_OK;
 }
 
@@ -274,7 +274,7 @@ UndoItemCopy::Undo()
 status_t
 UndoItemCopy::Redo()
 {
-	FSMoveToFolder(new BObjectList<entry_ref>(fSourceList),
+	FSMoveToFolder(new BObjectList<entry_ref, true>(fSourceList),
 		new BEntry(&fTargetRef), FSUndoMoveMode(fMoveMode), NULL);
 
 	return B_OK;
@@ -302,7 +302,7 @@ UndoItemCopy::UpdateEntry(BEntry* entry, const char* name)
 //	#pragma mark - UndoItemMove
 
 
-UndoItemMove::UndoItemMove(BObjectList<entry_ref>* sourceList,
+UndoItemMove::UndoItemMove(BObjectList<entry_ref, true>* sourceList,
 	BDirectory &target, BList* /*pointList*/)
 	:
 	fSourceList(*sourceList)
@@ -326,7 +326,7 @@ UndoItemMove::~UndoItemMove()
 status_t
 UndoItemMove::Undo()
 {
-	BObjectList<entry_ref>* list = new BObjectList<entry_ref>(fSourceList);
+	BObjectList<entry_ref, true>* list = new BObjectList<entry_ref, true>(fSourceList);
 	BEntry entry(&fTargetRef);
 	ChangeListSource(*list, entry);
 
@@ -342,7 +342,7 @@ status_t
 UndoItemMove::Redo()
 {
 	// FSMoveToFolder() owns its arguments
-	FSMoveToFolder(new BObjectList<entry_ref>(fSourceList),
+	FSMoveToFolder(new BObjectList<entry_ref, true>(fSourceList),
 		new BEntry(&fTargetRef), FSUndoMoveMode(kMoveSelectionTo), NULL);
 
 	return B_OK;

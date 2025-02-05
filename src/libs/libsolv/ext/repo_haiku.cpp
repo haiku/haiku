@@ -48,7 +48,7 @@ static void add_dependency(Repo *repo, Offset &dependencies, const char *name,
 }
 
 static void add_resolvables(Repo *repo, Offset &dependencies,
-  const BObjectList<BPackageResolvable> &resolvables)
+  const BObjectList<BPackageResolvable, true> &resolvables)
 {
   for (int32 i = 0; BPackageResolvable *resolvable = resolvables.ItemAt(i); i++)
     {
@@ -59,7 +59,7 @@ static void add_resolvables(Repo *repo, Offset &dependencies,
 }
 
 static void add_resolvable_expressions(Repo *repo, Offset &dependencies,
-  const BObjectList<BPackageResolvableExpression> &expressions)
+  const BObjectList<BPackageResolvableExpression, true> &expressions)
 {
   for (int32 i = 0;
     BPackageResolvableExpression *expression = expressions.ItemAt(i); i++)

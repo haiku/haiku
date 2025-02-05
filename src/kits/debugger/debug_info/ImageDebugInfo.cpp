@@ -46,7 +46,7 @@ ImageDebugInfo::AddSpecificInfo(SpecificImageDebugInfo* info)
 status_t
 ImageDebugInfo::FinishInit(DebuggerInterface* interface)
 {
-	BObjectList<SymbolInfo> symbols(50, true);
+	BObjectList<SymbolInfo, true> symbols(50);
 	status_t error = interface->GetSymbolInfos(fImageInfo.TeamID(),
 		fImageInfo.ImageID(), symbols);
 	if (error != B_OK)

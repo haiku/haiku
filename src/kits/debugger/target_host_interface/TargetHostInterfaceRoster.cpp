@@ -23,8 +23,8 @@ TargetHostInterfaceRoster::TargetHostInterfaceRoster()
 	TargetHostInterface::Listener(),
 	fLock(),
 	fRunningTeamDebuggers(0),
-	fInterfaceInfos(20, false),
-	fActiveInterfaces(20, false),
+	fInterfaceInfos(20),
+	fActiveInterfaces(20),
 	fListener(NULL)
 {
 }

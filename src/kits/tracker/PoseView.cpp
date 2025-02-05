@@ -73,7 +73,6 @@ All rights reserved.
 #include <Volume.h>
 #include <Window.h>
 
-#include <ObjectListPrivate.h>
 #include <PathMonitor.h>
 
 #include "Attributes.h"
@@ -201,7 +200,7 @@ OneMatches(BPose* pose, BPoseView*, void* castToPose)
 
 static void
 CopySelectionListToEntryRefList(const PoseList* original,
-	BObjectList<entry_ref>* copy)
+	BObjectList<entry_ref, true>* copy)
 {
 	int32 count = original->CountItems();
 	for (int32 index = 0; index < count; index++) {
@@ -235,10 +234,9 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fVSPoseList(new PoseList()),
 	fSelectionList(new PoseList()),
 	fMimeTypesInSelectionCache(20),
-	fZombieList(new BObjectList<Model>(10, true)),
-	fColumnList(new BObjectList<BColumn>(4, true)),
-	fMimeTypeList(new BObjectList<BString>(10, true)),
-	fBrokenLinks(new BObjectList<Model>(10, false)),
+	fZombieList(new BObjectList<Model, true>(10)),
+	fColumnList(new BObjectList<BColumn, true>(4)),
+	fBrokenLinks(new BObjectList<Model>(10)),
 	fMimeTypeListIsDirty(false),
 	fCountView(NULL),
 	fListElemHeight(0.0f),
@@ -4658,8 +4656,8 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 			}
 
 			// handle refs by performing a copy
-			BObjectList<entry_ref>* entryList
-				= new BObjectList<entry_ref>(10, true);
+			BObjectList<entry_ref, true>* entryList
+				= new BObjectList<entry_ref, true>(10);
 
 			for (int32 index = 0; ; index++) {
 				// copy all enclosed refs into a list
@@ -5083,8 +5081,8 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			loc, selectionList, srcWindow->PoseView()->ViewMode() == kListMode,
 			dropOnGrid);
 		int32 selectionSize = selectionList->CountItems();
-		BObjectList<entry_ref>* srcList
-			= new BObjectList<entry_ref>(selectionSize, true);
+		BObjectList<entry_ref, true>* srcList
+			= new BObjectList<entry_ref, true>(selectionSize);
 
 		if (srcWindow->TargetModel()->IsVirtualDirectory()) {
 			// resolve symlink and add the resulting entry_ref to the list
@@ -6013,8 +6011,8 @@ BPoseView::DuplicateSelection(BPoint* dropStart, BPoint* dropEnd)
 
 	// create entry_ref list from selection
 	if (!fSelectionList->IsEmpty()) {
-		BObjectList<entry_ref>* srcList
-			= new BObjectList<entry_ref>(CountSelected(), true);
+		BObjectList<entry_ref, true>* srcList
+			= new BObjectList<entry_ref, true>(CountSelected());
 		CopySelectionListToEntryRefList(fSelectionList, srcList);
 
 		BList* dropPoints;
@@ -6041,14 +6039,14 @@ BPoseView::SelectPoseAtLocation(BPoint point)
 
 
 void
-BPoseView::MoveListToTrash(BObjectList<entry_ref>* list, bool selectNext,
+BPoseView::MoveListToTrash(BObjectList<entry_ref, true>* list, bool selectNext,
 	bool deleteDirectly)
 {
 	if (!list->CountItems())
 		return;
 
-	BObjectList<FunctionObject>* taskList =
-		new BObjectList<FunctionObject>(2, true);
+	BObjectList<FunctionObject, true>* taskList =
+		new BObjectList<FunctionObject, true>(2);
 		// new owning list of tasks
 
 	// first move selection to trash,
@@ -6087,8 +6085,8 @@ BPoseView::MoveListToTrash(BObjectList<entry_ref>* list, bool selectNext,
 
 
 inline void
-CopyOneTrashedRefAsEntry(const entry_ref* ref, BObjectList<entry_ref>* trashList,
-	BObjectList<entry_ref>* noTrashList, std::map<int32, bool>* deviceHasTrash)
+CopyOneTrashedRefAsEntry(const entry_ref* ref, BObjectList<entry_ref, true>* trashList,
+	BObjectList<entry_ref, true>* noTrashList, std::map<int32, bool>* deviceHasTrash)
 {
 	std::map<int32, bool> &deviceHasTrashTmp = *deviceHasTrash;
 		// work around stupid binding problems with EachListItem
@@ -6116,8 +6114,8 @@ CopyOneTrashedRefAsEntry(const entry_ref* ref, BObjectList<entry_ref>* trashList
 
 
 static void
-CopyPoseOneAsEntry(BPose* pose, BObjectList<entry_ref>* trashList,
-	BObjectList<entry_ref>* noTrashList, std::map<int32, bool>* deviceHasTrash)
+CopyPoseOneAsEntry(BPose* pose, BObjectList<entry_ref, true>* trashList,
+	BObjectList<entry_ref, true>* noTrashList, std::map<int32, bool>* deviceHasTrash)
 {
 	CopyOneTrashedRefAsEntry(pose->TargetModel()->EntryRef(), trashList,
 		noTrashList, deviceHasTrash);
@@ -6145,10 +6143,10 @@ CheckVolumeReadOnly(const entry_ref* ref)
 void
 BPoseView::MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext)
 {
-	BObjectList<entry_ref>* entriesToTrash = new
-		BObjectList<entry_ref>(CountSelected());
-	BObjectList<entry_ref>* entriesToDeleteOnTheSpot = new
-		BObjectList<entry_ref>(20, true);
+	BObjectList<entry_ref, true>* entriesToTrash = new
+		BObjectList<entry_ref, true>(CountSelected());
+	BObjectList<entry_ref, true>* entriesToDeleteOnTheSpot = new
+		BObjectList<entry_ref, true>(20);
 	std::map<int32, bool> deviceHasTrash;
 
 	if (ref != NULL) {
@@ -6166,7 +6164,7 @@ BPoseView::MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext)
 			delete entriesToDeleteOnTheSpot;
 			return;
 		}
-		EachListItem(fSelectionList, CopyPoseOneAsEntry, entriesToTrash,
+		fSelectionList->EachListItem(CopyPoseOneAsEntry, entriesToTrash,
 			entriesToDeleteOnTheSpot, &deviceHasTrash);
 	}
 
@@ -6224,7 +6222,7 @@ BPoseView::DeleteSelection(bool selectNext, bool confirm)
 	if (!CheckVolumeReadOnly(fSelectionList->ItemAt(0)->TargetModel()->EntryRef()))
 		return;
 
-	BObjectList<entry_ref>* entriesToDelete = new BObjectList<entry_ref>(selectCount, true);
+	BObjectList<entry_ref, true>* entriesToDelete = new BObjectList<entry_ref, true>(selectCount);
 
 	for (int32 index = 0; index < selectCount; index++) {
 		entry_ref* ref = new entry_ref(*fSelectionList->ItemAt(index)->TargetModel()->EntryRef());
@@ -6242,8 +6240,8 @@ BPoseView::RestoreSelectionFromTrash(bool selectNext)
 	if (selectCount <= 0)
 		return;
 
-	BObjectList<entry_ref>* entriesToRestore
-		= new BObjectList<entry_ref>(selectCount, true);
+	BObjectList<entry_ref, true>* entriesToRestore
+		= new BObjectList<entry_ref, true>(selectCount);
 
 	for (int32 index = 0; index < selectCount; index++) {
 		entriesToRestore->AddItem(new entry_ref(
@@ -6257,7 +6255,7 @@ BPoseView::RestoreSelectionFromTrash(bool selectNext)
 void
 BPoseView::Delete(const entry_ref &ref, bool selectNext, bool confirm)
 {
-	BObjectList<entry_ref>* entriesToDelete = new BObjectList<entry_ref>(1, true);
+	BObjectList<entry_ref, true>* entriesToDelete = new BObjectList<entry_ref, true>(1);
 	entriesToDelete->AddItem(new entry_ref(ref));
 
 	Delete(entriesToDelete, selectNext, confirm);
@@ -6265,14 +6263,14 @@ BPoseView::Delete(const entry_ref &ref, bool selectNext, bool confirm)
 
 
 void
-BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool confirm)
+BPoseView::Delete(BObjectList<entry_ref, true>* list, bool selectNext, bool confirm)
 {
 	if (list->CountItems() == 0) {
 		delete list;
 		return;
 	}
 
-	BObjectList<FunctionObject>* taskList = new BObjectList<FunctionObject>(2, true);
+	BObjectList<FunctionObject, true>* taskList = new BObjectList<FunctionObject, true>(2);
 
 	// first move selection to trash,
 	taskList->AddItem(NewFunctionObject(FSDeleteRefList, list, false, confirm));
@@ -6306,14 +6304,14 @@ BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool confirm)
 
 
 void
-BPoseView::RestoreItemsFromTrash(BObjectList<entry_ref>* list, bool selectNext)
+BPoseView::RestoreItemsFromTrash(BObjectList<entry_ref, true>* list, bool selectNext)
 {
 	if (list->CountItems() == 0) {
 		delete list;
 		return;
 	}
 
-	BObjectList<FunctionObject>* taskList = new BObjectList<FunctionObject>(2, true);
+	BObjectList<FunctionObject, true>* taskList = new BObjectList<FunctionObject, true>(2);
 
 	// first restoree selection
 	taskList->AddItem(NewFunctionObject(FSRestoreRefList, list, false));
@@ -7190,7 +7188,7 @@ BPoseView::_EndSelectionRect()
 	fSelectionList->MakeEmpty();
 	fMimeTypesInSelectionCache.MakeEmpty();
 
-	EachListItem(fPoseList, AddIfPoseSelected, fSelectionList);
+	fPoseList->EachListItem(AddIfPoseSelected, fSelectionList);
 
 	// and now make sure that the pivot point is in sync
 	if (fSelectionPivotPose && !fSelectionList->HasItem(fSelectionPivotPose))
@@ -7779,7 +7777,7 @@ BPoseView::SelectPoses(BRect selectionRect, BList** oldList)
 	if (inListMode)
 		listLoc.Set(0, startIndex * fListElemHeight);
 
-	PoseList* poseList = inListMode ? CurrentPoseList() : fVSPoseList;
+	const PoseList* poseList = inListMode ? CurrentPoseList() : fVSPoseList;
 	const int32 poseCount = inListMode ? poseList->CountItems() : fPoseList->CountItems();
 	for (int32 index = startIndex; index < poseCount; index++) {
 		BPose* pose = poseList->ItemAt(index);
@@ -7873,7 +7871,7 @@ BPoseView::AddRemoveSelectionRange(BPoint where, bool extendSelection,
 		}
 
 		if (ViewMode() == kListMode) {
-			PoseList* poseList = CurrentPoseList();
+			const PoseList* poseList = CurrentPoseList();
 			int32 currentSelectedIndex = poseList->IndexOf(pose);
 			int32 lastSelectedIndex = poseList->IndexOf(fSelectionPivotPose);
 
@@ -8657,7 +8655,7 @@ BPoseView::ClearSelection()
 			int32 startIndex = (int32)(bounds.top / fListElemHeight);
 			BPoint loc(0, startIndex * fListElemHeight);
 
-			PoseList* poseList = CurrentPoseList();
+			const PoseList* poseList = CurrentPoseList();
 			int32 poseCount = poseList->CountItems();
 			for (int32 index = startIndex; index < poseCount; index++) {
 				BPose* pose = poseList->ItemAt(index);
@@ -8717,7 +8715,7 @@ BPoseView::ShowSelection(bool show)
 		int32 startIndex = (int32)(bounds.top / fListElemHeight);
 		BPoint loc(0, startIndex * fListElemHeight);
 
-		PoseList* poseList = CurrentPoseList();
+		const PoseList* poseList = CurrentPoseList();
 		int32 poseCount = poseList->CountItems();
 		for (int32 index = startIndex; index < poseCount; index++) {
 			BPose* pose = poseList->ItemAt(index);
@@ -9158,7 +9156,7 @@ void
 BPoseView::DrawViewCommon(const BRect& updateRect)
 {
 	if (ViewMode() == kListMode) {
-		PoseList* poseList = CurrentPoseList();
+		const PoseList* poseList = CurrentPoseList();
 		int32 poseCount = poseList->CountItems();
 		int32 startIndex
 			= (int32)((updateRect.top - fListElemHeight) / fListElemHeight);
@@ -9208,7 +9206,7 @@ BPoseView::ColumnRedraw(BRect updateRect)
 	if (startIndex < 0)
 		startIndex = 0;
 
-	PoseList* poseList = CurrentPoseList();
+	const PoseList* poseList = CurrentPoseList();
 	int32 poseCount = poseList->CountItems();
 	if (poseCount <= 0)
 		return;
@@ -9532,12 +9530,11 @@ BPoseView::SortPoses()
 	PRINT(("===================\n"));
 #endif
 
-	BPose** poses = reinterpret_cast<BPose**>(
-		PoseList::Private(fPoseList).AsBList()->Items());
+	BPose** poses = reinterpret_cast<BPose**>(fPoseList->AsBList()->Items());
 	std::stable_sort(poses, &poses[fPoseList->CountItems()],
 		PoseComparator(this));
 	if (IsFiltering()) {
-		poses = reinterpret_cast<BPose**>(PoseList::Private(fFilteredPoseList).AsBList()->Items());
+		poses = reinterpret_cast<BPose**>(fPoseList->AsBList()->Items());
 		std::stable_sort(poses, &poses[fFilteredPoseList->CountItems()], PoseComparator(this));
 	}
 }

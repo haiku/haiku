@@ -105,7 +105,7 @@ public:
 	ThreadManager(port_id debuggerPort)
 		:
 		fTeams(20),
-		fThreads(20, true),
+		fThreads(20),
 		fKernelTeam(NULL),
 		fDebuggerPort(debuggerPort),
 		fSummaryProfileResult(NULL)
@@ -492,7 +492,7 @@ private:
 
 private:
 	BObjectList<Team>				fTeams;
-	BObjectList<Thread>				fThreads;
+	BObjectList<Thread, true>		fThreads;
 	ImageMap						fImages;
 	Team*							fKernelTeam;
 	port_id							fDebuggerPort;

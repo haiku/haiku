@@ -79,8 +79,8 @@ private:
 			struct Problem;
 			struct Solution;
 
-			typedef BObjectList<RepositoryInfo> RepositoryInfoList;
-			typedef BObjectList<Problem> ProblemList;
+			typedef BObjectList<RepositoryInfo, true> RepositoryInfoList;
+			typedef BObjectList<Problem, true> ProblemList;
 			typedef std::map<Id, BSolverPackage*> SolvableMap;
 			typedef std::map<BSolverPackage*, Id> PackageMap;
 

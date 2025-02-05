@@ -52,7 +52,7 @@ private:
 
 class DNSTools {
 public:
-		static status_t		GetDNSServers(BObjectList<BString>* serverList);
+		static status_t	GetDNSServers(BObjectList<BString, true>* serverList);
 		static BString	ConvertToDNSName(const BString& string);
 		static BString	ConvertFromDNSName(const BString& string);
 };
@@ -100,7 +100,7 @@ public:
 						~DNSQuery();
 		status_t		ReadDNSServer(in_addr* add);
 		status_t		GetMXRecords(const BString& serverName,
-							BObjectList<mx_record>* mxList,
+							BObjectList<mx_record, true>* mxList,
 							bigtime_t timeout = 500000);
 				  
 private:

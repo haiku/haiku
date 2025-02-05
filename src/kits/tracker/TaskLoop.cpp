@@ -325,7 +325,7 @@ RunWhenIdleTask::StillIdle(bigtime_t currentTime)
 
 TaskLoop::TaskLoop(bigtime_t heartBeat)
 	:
-	fTaskList(10, true),
+	fTaskList(10),
 	fHeartBeat(heartBeat)
 {
 }

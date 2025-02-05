@@ -31,7 +31,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			typedef BObjectList<Root> RootList;
+			typedef BObjectList<Root, true> RootList;
 
 private:
 			status_t			_RegisterVolume(dev_t device);

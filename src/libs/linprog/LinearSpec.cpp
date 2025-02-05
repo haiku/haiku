@@ -547,8 +547,6 @@ LinearSpec::_CheckSummandList(SummandList* list)
 	if (ok)
 		return true;
 
-	for (int i = 0; i < list->CountItems(); i++)
-		delete list->ItemAt(i);
 	delete list;
 	return false;
 }

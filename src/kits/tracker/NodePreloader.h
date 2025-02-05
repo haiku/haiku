@@ -71,7 +71,7 @@ private:
 		// for now just preload apps and prefs
 	Model* FindModel(node_ref) const;
 
-	BObjectList<Model> fModelList;
+	BObjectList<Model, true> fModelList;
 	Benaphore fLock;
 	volatile bool fQuitRequested;
 

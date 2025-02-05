@@ -270,7 +270,7 @@ SortByName(const color_scheme *lhs, const color_scheme *rhs)
 void
 PrefHandler::LoadThemes()
 {
-	gColorSchemes = new BObjectList<const color_scheme>(10, true);
+	gColorSchemes = new BObjectList<const color_scheme, true>(10);
 
 	BStringList paths;
 

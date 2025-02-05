@@ -203,7 +203,7 @@ DisallowMetaKeys(BTextView* textView)
 
 PeriodicUpdatePoses::PeriodicUpdatePoses()
 	:
-	fPoseList(20, true)
+	fPoseList(20)
 {
 	fLock = new Benaphore("PeriodicUpdatePoses");
 }

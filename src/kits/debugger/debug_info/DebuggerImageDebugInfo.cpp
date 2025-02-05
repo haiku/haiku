@@ -43,7 +43,7 @@ DebuggerImageDebugInfo::Init()
 
 
 status_t
-DebuggerImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
+DebuggerImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo, true>& symbols,
 	BObjectList<FunctionDebugInfo>& functions)
 {
 	return SpecificImageDebugInfo::GetFunctionsFromSymbols(symbols, functions,

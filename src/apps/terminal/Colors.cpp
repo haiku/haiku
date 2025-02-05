@@ -28,7 +28,7 @@ struct color_scheme gCustomColorScheme = {
 };
 
 
-BObjectList<const color_scheme>* gColorSchemes = NULL;
+BObjectList<const color_scheme, true>* gColorSchemes = NULL;
 
 
 bool

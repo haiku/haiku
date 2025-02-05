@@ -120,17 +120,17 @@ static status_t FSDeleteFolder(BEntry*, CopyLoopControl*, bool updateStatus,
 static status_t MoveEntryToTrash(BEntry*, BPoint*, Undo &undo);
 static void LowLevelCopy(BEntry*, StatStruct*, BDirectory*, char* destName,
 	CopyLoopControl*, BPoint*);
-status_t DuplicateTask(BObjectList<entry_ref>* srcList);
-static status_t MoveTask(BObjectList<entry_ref>*, BEntry*, BList*, uint32);
-static status_t _DeleteTask(BObjectList<entry_ref>*, bool);
-static status_t _RestoreTask(BObjectList<entry_ref>*);
+status_t DuplicateTask(BObjectList<entry_ref, true>* srcList);
+static status_t MoveTask(BObjectList<entry_ref, true>*, BEntry*, BList*, uint32);
+static status_t _DeleteTask(BObjectList<entry_ref, true>*, bool);
+static status_t _RestoreTask(BObjectList<entry_ref, true>*);
 status_t CalcItemsAndSize(CopyLoopControl* loopControl,
-	BObjectList<entry_ref>* refList, ssize_t blockSize, int32* totalCount,
+	BObjectList<entry_ref, true>* refList, ssize_t blockSize, int32* totalCount,
 	off_t* totalSize);
 status_t MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc,
 	uint32 moveMode, const char* newName, Undo &undo,
 	CopyLoopControl* loopControl);
-ConflictCheckResult PreFlightNameCheck(BObjectList<entry_ref>* srcList,
+ConflictCheckResult PreFlightNameCheck(BObjectList<entry_ref, true>* srcList,
 	const BDirectory* destDir, int32* collisionCount, uint32 moveMode);
 status_t CheckName(uint32 moveMode, const BEntry* srcEntry,
 	const BDirectory* destDir, bool multipleCollisions,
@@ -542,7 +542,7 @@ SetupPoseLocation(ino_t sourceParentIno, ino_t destParentIno, const BNode* sourc
 
 
 void
-FSMoveToFolder(BObjectList<entry_ref>* srcList, BEntry* destEntry,
+FSMoveToFolder(BObjectList<entry_ref, true>* srcList, BEntry* destEntry,
 	uint32 moveMode, BList* pointList)
 {
 	if (srcList->IsEmpty()) {
@@ -560,14 +560,14 @@ FSMoveToFolder(BObjectList<entry_ref>* srcList, BEntry* destEntry,
 void
 FSDelete(entry_ref* ref, bool async, bool confirm)
 {
-	BObjectList<entry_ref>* list = new BObjectList<entry_ref>(1, true);
+	BObjectList<entry_ref, true>* list = new BObjectList<entry_ref, true>(1);
 	list->AddItem(ref);
 	FSDeleteRefList(list, async, confirm);
 }
 
 
 void
-FSDeleteRefList(BObjectList<entry_ref>* list, bool async, bool confirm)
+FSDeleteRefList(BObjectList<entry_ref, true>* list, bool async, bool confirm)
 {
 	if (async) {
 		LaunchInNewThread("DeleteTask", B_NORMAL_PRIORITY, _DeleteTask, list,
@@ -578,7 +578,7 @@ FSDeleteRefList(BObjectList<entry_ref>* list, bool async, bool confirm)
 
 
 void
-FSRestoreRefList(BObjectList<entry_ref>* list, bool async)
+FSRestoreRefList(BObjectList<entry_ref, true>* list, bool async)
 {
 	if (async) {
 		LaunchInNewThread("RestoreTask", B_NORMAL_PRIORITY, _RestoreTask,
@@ -589,7 +589,7 @@ FSRestoreRefList(BObjectList<entry_ref>* list, bool async)
 
 
 void
-FSMoveToTrash(BObjectList<entry_ref>* srcList, BList* pointList, bool async)
+FSMoveToTrash(BObjectList<entry_ref, true>* srcList, BList* pointList, bool async)
 {
 	if (srcList->IsEmpty()) {
 		delete srcList;
@@ -876,7 +876,7 @@ ShouldEditRefName(const entry_ref* ref, const char* name, size_t length)
 
 static status_t
 InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
-	BObjectList<entry_ref>* srcList, BVolume* dstVol, BDirectory* destDir,
+	BObjectList<entry_ref, true>* srcList, BVolume* dstVol, BDirectory* destDir,
 	entry_ref* destRef, bool preflightNameCheck, bool needSizeCalculation,
 	int32* collisionCount, ConflictCheckResult* preflightResult)
 {
@@ -997,7 +997,7 @@ delete_point(void* point)
 
 
 static status_t
-MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList, uint32 moveMode)
+MoveTask(BObjectList<entry_ref, true>* srcList, BEntry* destEntry, BList* pointList, uint32 moveMode)
 {
 	ASSERT(!srcList->IsEmpty());
 
@@ -1918,7 +1918,7 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 
 
 void
-FSDuplicate(BObjectList<entry_ref>* srcList, BList* pointList)
+FSDuplicate(BObjectList<entry_ref, true>* srcList, BList* pointList)
 {
 	LaunchInNewThread("DupTask", B_NORMAL_PRIORITY, MoveTask, srcList,
 		(BEntry*)NULL, pointList, kDuplicateSelection);
@@ -2132,7 +2132,7 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 
 
 ConflictCheckResult
-PreFlightNameCheck(BObjectList<entry_ref>* srcList, const BDirectory* destDir,
+PreFlightNameCheck(BObjectList<entry_ref, true>* srcList, const BDirectory* destDir,
 	int32* collisionCount, uint32 moveMode)
 {
 	// count the number of name collisions in dest folder
@@ -2588,7 +2588,7 @@ FSRecursiveCalcSize(BInfoWindow* window, CopyLoopControl* loopControl,
 
 status_t
 CalcItemsAndSize(CopyLoopControl* loopControl,
-	BObjectList<entry_ref>* refList, ssize_t blockSize, int32* totalCount,
+	BObjectList<entry_ref, true>* refList, ssize_t blockSize, int32* totalCount,
 	off_t* totalSize)
 {
 	int32 fileCount = 0;
@@ -2995,7 +2995,7 @@ empty_trash(void*)
 	TrackerCopyLoopControl loopControl(kTrashState);
 
 	// calculate the sum total of all items on all volumes in trash
-	BObjectList<entry_ref> srcList;
+	BObjectList<entry_ref, true> srcList;
 	int32 totalCount = 0;
 	off_t totalSize = 0;
 
@@ -3056,7 +3056,7 @@ empty_trash(void*)
 
 
 status_t
-_DeleteTask(BObjectList<entry_ref>* list, bool confirm)
+_DeleteTask(BObjectList<entry_ref, true>* list, bool confirm)
 {
 	if (confirm) {
 		BAlert* alert = new BAlert("",
@@ -3149,7 +3149,7 @@ FSRecursiveCreateFolder(BPath path)
 }
 
 status_t
-_RestoreTask(BObjectList<entry_ref>* list)
+_RestoreTask(BObjectList<entry_ref, true>* list)
 {
 	TrackerCopyLoopControl loopControl(kRestoreFromTrashState);
 

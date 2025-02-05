@@ -105,8 +105,8 @@ ShortMimeInfo::IsCommonMimeType() const
 
 MimeTypeList::MimeTypeList()
 	:
-	fMimeList(100, true),
-	fCommonMimeList(30, false),
+	fMimeList(100),
+	fCommonMimeList(30),
 	fLock("mimeListLock")
 {
 	fLock.Lock();

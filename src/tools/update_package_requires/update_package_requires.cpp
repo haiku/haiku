@@ -118,7 +118,7 @@ main(int argc, const char* const* argv)
 
 	for (BRepositoryCache::Iterator it = repositoryCache.GetIterator();
 		const BPackageInfo* info = it.Next();) {
-		const BObjectList<BPackageResolvable>& provides = info->ProvidesList();
+		const BObjectList<BPackageResolvable, true>& provides = info->ProvidesList();
 		int32 count = provides.CountItems();
 		for (int32 i = 0; i < count; i++) {
 			BPackageResolvable* resolvable = provides.ItemAt(i);

@@ -67,9 +67,9 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location,
 	fHomeRepository(new (std::nothrow) InstalledRepository("home",
 		B_PACKAGE_INSTALLATION_LOCATION_HOME, -3)),
 	fInstalledRepositories(10),
-	fOtherRepositories(10, true),
+	fOtherRepositories(10),
 	fLocalRepository(new (std::nothrow) MiscLocalRepository),
-	fTransactions(5, true),
+	fTransactions(5),
 	fInstallationInterface(installationInterface),
 	fUserInteractionHandler(userInteractionHandler)
 {
@@ -976,7 +976,7 @@ BPackageManager::InstalledRepository::InstalledRepository(const char* name,
 	BPackageInstallationLocation location, int32 priority)
 	:
 	LocalRepository(),
-	fDisabledPackages(10, true),
+	fDisabledPackages(10),
 	fPackagesToActivate(),
 	fPackagesToDeactivate(),
 	fInitialName(name),

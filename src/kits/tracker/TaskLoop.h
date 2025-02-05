@@ -201,7 +201,7 @@ protected:
 	virtual void StartPulsingIfNeeded() = 0;
 
 	BLocker fLock;
-	BObjectList<DelayedTask> fTaskList;
+	BObjectList<DelayedTask, true> fTaskList;
 	bigtime_t fHeartBeat;
 };
 

@@ -56,7 +56,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-	typedef BObjectList<dormant_node_info> NodeList;
+	typedef BObjectList<dormant_node_info, true> NodeList;
 
 			void				_InitWindow();
 			status_t			_InitMedia(bool first);

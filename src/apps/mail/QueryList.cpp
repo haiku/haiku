@@ -40,7 +40,7 @@ QueryListener::~QueryListener()
 QueryList::QueryList()
 	:
 	fQuit(false),
-	fListeners(5, true)
+	fListeners(5)
 {
 }
 

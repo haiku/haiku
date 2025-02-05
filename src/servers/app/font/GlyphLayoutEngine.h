@@ -204,17 +204,17 @@ public:
 									FontCacheReference* cacheReference = NULL);
 
 	static	void				PopulateFallbacks(
-									BObjectList<FontCacheReference>& fallbacks,
+									BObjectList<FontCacheReference, true>& fallbacks,
 									const ServerFont& font, bool forceVector);
 
 	static FontCacheReference*	GetFallbackReference(
-									BObjectList<FontCacheReference>& fallbacks,
+									BObjectList<FontCacheReference, true>& fallbacks,
 									uint32 charCode);
 
 private:
 	static	const GlyphCache*	_CreateGlyph(
 									FontCacheReference& cacheReference,
-									BObjectList<FontCacheReference>& fallbacks,
+									BObjectList<FontCacheReference, true>& fallbacks,
 									const ServerFont& font, bool needsVector,
 									uint32 glyphCode);
 
@@ -264,7 +264,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	FontCacheEntry* entry = NULL;
 	FontCacheReference* pCacheReference;
 	FontCacheReference cacheReference;
-	BObjectList<FontCacheReference> fallbacksList(21, true);
+	BObjectList<FontCacheReference, true> fallbacksList(21);
 
 	if (_cacheReference != NULL) {
 		pCacheReference = _cacheReference;
@@ -374,7 +374,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 inline const GlyphCache*
 GlyphLayoutEngine::_CreateGlyph(FontCacheReference& cacheReference,
-	BObjectList<FontCacheReference>& fallbacks,
+	BObjectList<FontCacheReference, true>& fallbacks,
 	const ServerFont& font, bool forceVector, uint32 charCode)
 {
 	FontCacheEntry* entry = cacheReference.Entry();
@@ -406,7 +406,7 @@ GlyphLayoutEngine::_CreateGlyph(FontCacheReference& cacheReference,
 
 inline void
 GlyphLayoutEngine::PopulateFallbacks(
-	BObjectList<FontCacheReference>& fallbacksList,
+	BObjectList<FontCacheReference, true>& fallbacksList,
 	const ServerFont& font, bool forceVector)
 {
 	ASSERT(fallbacksList.IsEmpty());
@@ -474,7 +474,7 @@ GlyphLayoutEngine::PopulateFallbacks(
 
 inline FontCacheReference*
 GlyphLayoutEngine::GetFallbackReference(
-	BObjectList<FontCacheReference>& fallbacks, uint32 charCode)
+	BObjectList<FontCacheReference, true>& fallbacks, uint32 charCode)
 {
 	int32 count = fallbacks.CountItems();
 	for (int32 index = 0; index < count; index++) {

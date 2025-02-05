@@ -131,7 +131,7 @@ SharedImage::_Init(debug_symbol_iterator* iterator)
 		return error;
 
 	// iterate through the symbols
-	BObjectList<Symbol>	symbols(512, true);
+	BObjectList<Symbol, true> symbols(512);
 	char symbolName[1024];
 	int32 symbolType;
 	void* symbolLocation;

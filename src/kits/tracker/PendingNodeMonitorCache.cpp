@@ -75,7 +75,7 @@ PendingNodeMonitorEntry::TooOld(bigtime_t now) const
 
 PendingNodeMonitorCache::PendingNodeMonitorCache()
 	:
-	fList(10, true)
+	fList(10)
 {
 }
 

@@ -451,7 +451,7 @@ TabletDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
 
 TabletInputDevice::TabletInputDevice()
 	:
-	fDevices(2, true),
+	fDevices(2),
 	fDeviceListLock("TabletInputDevice list")
 {
 	TID_CALLED();

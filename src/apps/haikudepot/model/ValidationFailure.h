@@ -61,7 +61,7 @@ private:
 			ValidationFailure*	_GetOrCreateFailure(const BString& property);
 
 private:
-			BObjectList<ValidationFailure>
+			BObjectList<ValidationFailure, true>
 								fItems;
 };
 

@@ -174,7 +174,7 @@ ConsoleOutputView::SaveSettings(BMessage& settings)
 void
 ConsoleOutputView::_Init()
 {
-	fPendingOutput = new OutputInfoList(10, true);
+	fPendingOutput = new OutputInfoList(10);
 
 	fWorkToDoSem = create_sem(0, "output_work_available");
 	if (fWorkToDoSem < 0)

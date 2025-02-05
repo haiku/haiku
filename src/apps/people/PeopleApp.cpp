@@ -72,7 +72,7 @@ TPeopleApp::TPeopleApp()
 	:
 	BApplication(APP_SIG),
 	fWindowCount(0),
-	fAttributes(20, true)
+	fAttributes(20)
 {
 	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("People");
 

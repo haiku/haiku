@@ -20,7 +20,7 @@ SpecificImageDebugInfo::~SpecificImageDebugInfo()
 
 /*static*/ status_t
 SpecificImageDebugInfo::GetFunctionsFromSymbols(
-	const BObjectList<SymbolInfo>& symbols,
+	const BObjectList<SymbolInfo, true>& symbols,
 	BObjectList<FunctionDebugInfo>& functions, DebuggerInterface* interface,
 	const ImageInfo& imageInfo, SpecificImageDebugInfo* info)
 {

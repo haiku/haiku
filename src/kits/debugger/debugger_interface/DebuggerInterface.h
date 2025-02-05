@@ -64,18 +64,18 @@ public:
 
 	virtual	status_t			GetSystemInfo(SystemInfo& info) = 0;
 	virtual	status_t			GetTeamInfo(TeamInfo& info) = 0;
-	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos)
+	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo, true>& infos)
 									= 0;
-	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos)
+	virtual	status_t			GetImageInfos(BObjectList<ImageInfo, true>& infos)
 									= 0;
-	virtual status_t			GetAreaInfos(BObjectList<AreaInfo>& infos)
+	virtual status_t			GetAreaInfos(BObjectList<AreaInfo, true>& infos)
 									= 0;
 	virtual status_t			GetSemaphoreInfos(
-									BObjectList<SemaphoreInfo>& infos)
+									BObjectList<SemaphoreInfo, true>& infos)
 									= 0;
 
 	virtual	status_t			GetSymbolInfos(team_id team, image_id image,
-									BObjectList<SymbolInfo>& infos) = 0;
+									BObjectList<SymbolInfo, true>& infos) = 0;
 	virtual	status_t			GetSymbolInfo(team_id team, image_id image,
 									const char* name, int32 symbolType,
 									SymbolInfo& info) = 0;
@@ -104,16 +104,16 @@ public:
 protected:
 			status_t			GetElfSymbols(const char* filePath,
 									int64 textDelta,
-									BObjectList<SymbolInfo>& infos);
+									BObjectList<SymbolInfo, true>& infos);
 			status_t			GetElfSymbols(const void* symbolTable,
 									uint32 symbolCount,
 									uint32 symbolTableEntrySize,
 									const char* stringTable,
 									uint32 stringTableSize, bool is64Bit,
 									bool swappedByteOrder, int64 textDelta,
-									BObjectList<SymbolInfo>& infos);
+									BObjectList<SymbolInfo, true>& infos);
 			status_t			GetElfSymbols(ElfSymbolLookup* symbolLookup,
-									BObjectList<SymbolInfo>& infos);
+									BObjectList<SymbolInfo, true>& infos);
 
 private:
 			struct SymbolTableLookupSource;

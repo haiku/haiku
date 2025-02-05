@@ -42,7 +42,7 @@ public:
 	virtual						~SpecificImageDebugInfo();
 
 	virtual	status_t			GetFunctions(
-									const BObjectList<SymbolInfo>& symbols,
+									const BObjectList<SymbolInfo, true>& symbols,
 									BObjectList<FunctionDebugInfo>& functions)
 										= 0;
 									// returns references
@@ -93,7 +93,7 @@ public:
 
 protected:
 	static	status_t			GetFunctionsFromSymbols(
-									const BObjectList<SymbolInfo>& symbols,
+									const BObjectList<SymbolInfo, true>& symbols,
 									BObjectList<FunctionDebugInfo>& functions,
 									DebuggerInterface* interface,
 									const ImageInfo& imageInfo,

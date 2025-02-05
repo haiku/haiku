@@ -56,7 +56,7 @@ struct FindColorSchemeByName : public UnaryPredicate<const color_scheme> {
 };
 
 extern color_scheme gCustomColorScheme;
-extern BObjectList<const color_scheme> *gColorSchemes;
+extern BObjectList<const color_scheme, true> *gColorSchemes;
 
 const uint kANSIColorCount = 16;
 const uint kTermColorCount = 256;

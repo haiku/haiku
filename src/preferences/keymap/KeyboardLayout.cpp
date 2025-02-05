@@ -31,7 +31,7 @@ KeyboardLayout::KeyboardLayout()
 	fKeys(NULL),
 	fKeyCount(0),
 	fKeyCapacity(0),
-	fIndicators(5, true),
+	fIndicators(5),
 	fIsDefault(true)
 {
 	SetDefault();

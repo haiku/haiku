@@ -154,7 +154,7 @@ filter_required_packages(const BPackageManager& packageManager,
 
 		packagesSet.insert(package);
 
-		BObjectList<BPackageResolvableExpression> requiresList
+		BObjectList<BPackageResolvableExpression, true> requiresList
 			= package->Info().RequiresList();
 		for (int32 j = 0; j < requiresList.CountItems(); j++)
 			requirements.AppendSpecifier(requiresList.ItemAt(j)->ToString());
@@ -172,7 +172,7 @@ filter_required_packages(const BPackageManager& packageManager,
 			std::set<BSolverPackage*>::const_iterator setIterator = packagesSet.begin();
 			for (; setIterator != packagesSet.end(); setIterator++) {
 				BSolverPackage* package = *setIterator;
-				BObjectList<BPackageResolvableExpression> requiresList
+				BObjectList<BPackageResolvableExpression, true> requiresList
 					= package->Info().RequiresList();
 				for (int32 j = 0; j < requiresList.CountItems(); j++) {
 					if (requiresList.ItemAt(j)->ToString() != unmatched->SelectString())

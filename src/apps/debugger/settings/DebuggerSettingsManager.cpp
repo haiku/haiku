@@ -28,7 +28,7 @@ DebuggerSettingsManager::DebuggerSettingsManager()
 	:
 	SettingsManager(),
 	fLock("settings manager"),
-	fRecentTeamSettings(kMaxRecentTeamSettings, true),
+	fRecentTeamSettings(kMaxRecentTeamSettings),
 	fUiSettingsFactory(NULL)
 {
 }

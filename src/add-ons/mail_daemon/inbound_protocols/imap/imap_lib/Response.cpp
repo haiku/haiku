@@ -193,7 +193,7 @@ RFC3501Encoding::_Unshift(BString& buffer, int32& bitsToWrite, int32& sextet,
 
 ArgumentList::ArgumentList()
 	:
-	BObjectList<Argument>(5, true)
+	BObjectList<Argument, true>(5)
 {
 }
 

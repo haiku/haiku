@@ -40,7 +40,7 @@ struct Attachment {
 };
 
 
-typedef BObjectList<Attachment> AttachmentList;
+typedef BObjectList<Attachment, true> AttachmentList;
 
 
 /*!	\class ScheduledMessage
@@ -86,7 +86,7 @@ private:
 			void				_Wakeup(bigtime_t whatTime);
 
 private:
-	typedef BObjectList<ScheduledMessage> ScheduledList;
+	typedef BObjectList<ScheduledMessage, true> ScheduledList;
 
 	mutable	BLocker				fLock;
 			ScheduledList		fMessages;
@@ -109,8 +109,9 @@ DelayedMessageSender gDelayedMessageSender;
 			when needed,
 */
 class DelayedMessageData {
-	typedef BObjectList<port_id> PortList;
+	typedef BObjectList<port_id, true> PortList;
 	typedef void(*FailureCallback)(int32 code, port_id port, void* data);
+
 public:
 								DelayedMessageData(int32 code, bigtime_t delay,
 									bool isSpecificTime);
@@ -302,8 +303,8 @@ DelayedMessageData::DelayedMessageData(int32 code, bigtime_t delay,
 	fScheduledTime(delay + (isSpecificTime ? 0 : system_time())),
 	fValid(false),
 
-	fAttachments(3, true),
-	fTargets(4, true),
+	fAttachments(3),
+	fTargets(4),
 
 	fMergeMode(DM_NO_MERGE),
 	fMergeMask(DM_DATA_DEFAULT),
@@ -663,7 +664,7 @@ CompareMessages(const ScheduledMessage* one, const ScheduledMessage* two)
 DelayedMessageSender::DelayedMessageSender()
 	:
 	fLock("DelayedMessageSender"),
-	fMessages(20, true),
+	fMessages(20),
 	fScheduledWakeup(B_INFINITE_TIMEOUT),
 	fWakeupRetry(0),
 	fThread(spawn_thread(&_thread_func, kName, kPriority, this)),

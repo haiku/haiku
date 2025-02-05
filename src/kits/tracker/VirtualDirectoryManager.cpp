@@ -39,7 +39,7 @@ static const char* const kTemporaryDefinitionFileBaseDirectoryPath
 
 class VirtualDirectoryManager::Info {
 private:
-	typedef BObjectList<Info> InfoList;
+	typedef BObjectList<Info, true> InfoList;
 
 public:
 	Info(RootInfo* root, Info* parent, const BString& path,
@@ -53,7 +53,7 @@ public:
 		fDefinitionFileEntryRef(definitionFileEntryRef),
 		fId(),
 		fChildDefinitionsDirectoryRef(-1, -1),
-		fChildren(10, true)
+		fChildren(10)
 	{
 	}
 

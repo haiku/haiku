@@ -103,7 +103,7 @@ ValidationFailure::Archive(BMessage* into, bool deep) const
 
 ValidationFailures::ValidationFailures(BMessage* from)
 	:
-	fItems(20, true)
+	fItems(20)
 {
 	_AddFromMessage(from);
 }
@@ -111,7 +111,7 @@ ValidationFailures::ValidationFailures(BMessage* from)
 
 ValidationFailures::ValidationFailures()
 	:
-	fItems(20, true)
+	fItems(20)
 {
 }
 

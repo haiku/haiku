@@ -70,7 +70,7 @@ private:
 									int32 index);
 			void				_HandleItemRemoved(int32 index);
 
-			BObjectList<bigtime_t>
+			BObjectList<bigtime_t, true>
 								fKnown;
 			bigtime_t			fTotalDuration;
 			PlaylistWindow&		fParent;

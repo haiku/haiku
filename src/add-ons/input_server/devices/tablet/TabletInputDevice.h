@@ -45,7 +45,7 @@ private:
 			status_t		_RemoveDevice(const char* path);
 
 private:
-			BObjectList<TabletDevice> fDevices;
+			BObjectList<TabletDevice, true> fDevices;
 			BLocker			fDeviceListLock;
 };
 

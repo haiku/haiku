@@ -68,7 +68,7 @@ ScreenChangeListener::ScreenChanged(HWInterface* interface)
 ScreenManager::ScreenManager()
 	:
 	BLooper("screen manager"),
-	fScreenList(4, true)
+	fScreenList(4)
 {
 #ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 #	if defined(USE_DIRECT_WINDOW_TEST_MODE)

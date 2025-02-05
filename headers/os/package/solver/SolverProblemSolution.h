@@ -77,7 +77,7 @@ public:
 			bool				AppendElement(const Element& element);
 
 private:
-			typedef BObjectList<Element> ElementList;
+			typedef BObjectList<Element, true> ElementList;
 
 private:
 			ElementList			fElements;

@@ -85,7 +85,7 @@ private:
 
 private:
 	BLocker						*fLocker;
-	BObjectList<BDiskDevice>	fDevices;
+	BObjectList<BDiskDevice, true> fDevices;
 	bool						fSubscribed;
 };
 

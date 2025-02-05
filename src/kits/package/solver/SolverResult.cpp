@@ -65,7 +65,7 @@ BSolverResultElement::operator=(const BSolverResultElement& other)
 
 BSolverResult::BSolverResult()
 	:
-	fElements(20, true)
+	fElements(20)
 {
 }
 

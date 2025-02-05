@@ -17,8 +17,8 @@
 ValueNodeContainer::ValueNodeContainer()
 	:
 	fLock("value node container"),
-	fChildren(20, false),
-	fListeners(20, false)
+	fChildren(20),
+	fListeners(20)
 {
 }
 

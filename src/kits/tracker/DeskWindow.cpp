@@ -131,7 +131,7 @@ FindElement(struct AddOnShortcut* item, void* castToOther)
 
 static void
 LoadAddOnDir(BDirectory directory, BDeskWindow* window,
-	LockingList<AddOnShortcut>* list)
+	LockingList<AddOnShortcut, true>* list)
 {
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) == B_OK) {
@@ -291,7 +291,7 @@ BDeskWindow::Init(const BMessage*)
 void
 BDeskWindow::InitAddOnsList(bool update)
 {
-	AutoLock<LockingList<AddOnShortcut> > lock(fAddOnsList);
+	AutoLock<LockingList<AddOnShortcut, true> > lock(fAddOnsList);
 	if (!lock.IsLocked())
 		return;
 
@@ -315,7 +315,7 @@ BDeskWindow::InitAddOnsList(bool update)
 void
 BDeskWindow::ApplyShortcutPreferences(bool update)
 {
-	AutoLock<LockingList<AddOnShortcut> > lock(fAddOnsList);
+	AutoLock<LockingList<AddOnShortcut, true> > lock(fAddOnsList);
 	if (!lock.IsLocked())
 		return;
 

@@ -27,7 +27,7 @@ public:
 			status_t			Init();
 
 	virtual	status_t			GetFunctions(
-									const BObjectList<SymbolInfo>& symbols,
+									const BObjectList<SymbolInfo, true>& symbols,
 									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name,

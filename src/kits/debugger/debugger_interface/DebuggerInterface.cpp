@@ -81,7 +81,7 @@ DebuggerInterface::IsPostMortem() const
 
 status_t
 DebuggerInterface::GetElfSymbols(const char* filePath, int64 textDelta,
-	BObjectList<SymbolInfo>& infos)
+	BObjectList<SymbolInfo, true>& infos)
 {
 	// open the ELF file
 	ElfFile elfFile;
@@ -106,7 +106,7 @@ status_t
 DebuggerInterface::GetElfSymbols(const void* symbolTable, uint32 symbolCount,
 	uint32 symbolTableEntrySize, const char* stringTable,
 	uint32 stringTableSize, bool is64Bit, bool swappedByteOrder,
-	int64 textDelta, BObjectList<SymbolInfo>& infos)
+	int64 textDelta, BObjectList<SymbolInfo, true>& infos)
 {
 	size_t symbolTableSize = symbolCount * symbolTableEntrySize;
 	SymbolTableLookupSource* source = new(std::nothrow) SymbolTableLookupSource(
@@ -131,7 +131,7 @@ DebuggerInterface::GetElfSymbols(const void* symbolTable, uint32 symbolCount,
 
 status_t
 DebuggerInterface::GetElfSymbols(ElfSymbolLookup* symbolLookup,
-	BObjectList<SymbolInfo>& infos)
+	BObjectList<SymbolInfo, true>& infos)
 {
 	SymbolInfo symbolInfo;
 	uint32 index = 0;

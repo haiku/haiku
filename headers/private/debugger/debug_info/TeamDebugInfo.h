@@ -96,7 +96,7 @@ private:
 			struct SourceFileEntry;
 			struct SourceFileHashDefinition;
 
-			typedef BObjectList<SpecificTeamDebugInfo> SpecificInfoList;
+			typedef BObjectList<SpecificTeamDebugInfo, true> SpecificInfoList;
 			typedef BObjectList<ImageDebugInfo> ImageList;
 			typedef BOpenHashTable<FunctionHashDefinition> FunctionTable;
 			typedef BOpenHashTable<SourceFileHashDefinition> SourceFileTable;

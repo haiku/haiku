@@ -28,7 +28,7 @@ private:
 // constructor
 PriorityMessageQueue::PriorityMessageQueue()
 	: fLock(),
-	  fMessages(20, true)
+	  fMessages(20)
 {
 }
 

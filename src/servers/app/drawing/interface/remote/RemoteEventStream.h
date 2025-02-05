@@ -31,7 +31,7 @@ virtual	BMessage*				PeekLatestMouseMoved();
 		bool					EventReceived(RemoteMessage& message);
 
 private:
-		BObjectList<BMessage>	fEventList;
+		BObjectList<BMessage, true> fEventList;
 		BLocker					fEventListLocker;
 		sem_id					fEventNotification;
 		bool					fWaitingOnEvent;

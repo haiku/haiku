@@ -178,11 +178,11 @@ LibsolvSolver::LibsolvSolver()
 	fPool(NULL),
 	fSolver(NULL),
 	fJobs(NULL),
-	fRepositoryInfos(10, true),
+	fRepositoryInfos(10),
 	fInstalledRepository(NULL),
 	fSolvablePackages(),
 	fPackageSolvables(),
-	fProblems(10, true),
+	fProblems(10),
 	fDebugLevel(0)
 {
 }

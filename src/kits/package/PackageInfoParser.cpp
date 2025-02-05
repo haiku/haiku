@@ -664,14 +664,14 @@ BPackageInfo::Parser::_ParseFlags()
 
 void
 BPackageInfo::Parser::_ParseResolvableList(
-	BObjectList<BPackageResolvable>* value)
+	BObjectList<BPackageResolvable, true>* value)
 {
 	struct ResolvableParser : public ListElementParser {
 		Parser& parser;
-		BObjectList<BPackageResolvable>* value;
+		BObjectList<BPackageResolvable, true>* value;
 
 		ResolvableParser(Parser& parser_,
-			BObjectList<BPackageResolvable>* value_)
+			BObjectList<BPackageResolvable, true>* value_)
 			:
 			parser(parser_),
 			value(value_)
@@ -692,15 +692,15 @@ BPackageInfo::Parser::_ParseResolvableList(
 
 void
 BPackageInfo::Parser::_ParseResolvableExprList(
-	BObjectList<BPackageResolvableExpression>* value, BString* _basePackage)
+	BObjectList<BPackageResolvableExpression, true>* value, BString* _basePackage)
 {
 	struct ResolvableExpressionParser : public ListElementParser {
 		Parser& parser;
-		BObjectList<BPackageResolvableExpression>* value;
+		BObjectList<BPackageResolvableExpression, true>* value;
 		BString* basePackage;
 
 		ResolvableExpressionParser(Parser& parser,
-			BObjectList<BPackageResolvableExpression>* value,
+			BObjectList<BPackageResolvableExpression, true>* value,
 			BString* basePackage)
 			:
 			parser(parser),

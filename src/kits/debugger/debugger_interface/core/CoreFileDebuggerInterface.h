@@ -49,13 +49,13 @@ public:
 
 	virtual	status_t			GetSystemInfo(SystemInfo& info);
 	virtual	status_t			GetTeamInfo(TeamInfo& info);
-	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos);
-	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);
-	virtual status_t			GetAreaInfos(BObjectList<AreaInfo>& infos);
+	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo, true>& infos);
+	virtual	status_t			GetImageInfos(BObjectList<ImageInfo, true>& infos);
+	virtual status_t			GetAreaInfos(BObjectList<AreaInfo, true>& infos);
 	virtual status_t			GetSemaphoreInfos(
-									BObjectList<SemaphoreInfo>& infos);
+									BObjectList<SemaphoreInfo, true>& infos);
 	virtual	status_t			GetSymbolInfos(team_id team, image_id image,
-									BObjectList<SymbolInfo>& infos);
+									BObjectList<SymbolInfo, true>& infos);
 	virtual	status_t			GetSymbolInfo(team_id team, image_id image,
 									const char* name, int32 symbolType,
 									SymbolInfo& info);

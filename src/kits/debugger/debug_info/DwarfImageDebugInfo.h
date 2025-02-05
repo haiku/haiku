@@ -56,7 +56,7 @@ public:
 									{ return fRelocationDelta; }
 
 	virtual	status_t			GetFunctions(
-									const BObjectList<SymbolInfo>& symbols,
+									const BObjectList<SymbolInfo, true>& symbols,
 									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name,
@@ -105,7 +105,7 @@ private:
 				TypeNameTable;
 
 			struct TypeEntryInfo;
-			typedef BObjectList<TypeEntryInfo> TypeEntryList;
+			typedef BObjectList<TypeEntryInfo, true> TypeEntryList;
 
 private:
 			status_t 			_AddSourceCodeInfo(CompilationUnit* unit,

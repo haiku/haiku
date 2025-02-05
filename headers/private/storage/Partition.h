@@ -19,7 +19,7 @@ class BPartitionParameterEditor;
 class BDiskDeviceVisitor;
 class BDiskSystem;
 class BMutablePartition;
-template <class T> class BObjectList;
+template <class T, bool O> class BObjectList;
 class BPartitioningInfo;
 class BPath;
 class BVolume;
@@ -106,9 +106,9 @@ public:
 			status_t			ValidateResize(off_t* size) const;
 			status_t			Resize(off_t size);
 
-			bool				CanMove(BObjectList<BPartition>*
+			bool				CanMove(BObjectList<BPartition, false>*
 										unmovableDescendants = NULL,
-									BObjectList<BPartition>*
+									BObjectList<BPartition, false>*
 										movableOnlyIfUnmounted = NULL) const;
 			status_t			ValidateMove(off_t* newOffset) const;
 			status_t			Move(off_t newOffset);

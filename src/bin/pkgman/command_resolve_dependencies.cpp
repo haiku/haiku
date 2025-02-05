@@ -174,7 +174,7 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 
 	// add repositories
 	BPackagePathMap packagePaths;
-	BObjectList<BSolverRepository> repositories(10, true);
+	BObjectList<BSolverRepository, true> repositories(10);
 	int32 repositoryIndex = 0;
 	for (int i = 0; i < repositoryDirectoryCount; i++, repositoryIndex++) {
 		const char* directoryPath = repositoryDirectories[i];

@@ -98,7 +98,7 @@ private:
 CommandLineUserInterface::CommandLineUserInterface()
 	:
 	fContext(new CliContext()),
-	fCommands(20, true),
+	fCommands(20),
 	fShowSemaphore(-1),
 	fShown(false),
 	fTerminating(false)

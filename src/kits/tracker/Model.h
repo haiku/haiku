@@ -181,7 +181,7 @@ public:
 		// resolve if document can be opened
 		// if zero, all executables, directories and volumes pass
 		// if traverse, dereference symlinks
-	bool IsDropTargetForList(const BObjectList<BString>* list) const;
+	bool IsDropTargetForList(const BStringList* list) const;
 		// <list> contains mime types of all documents about to be handled
 		// by model
 
@@ -192,7 +192,7 @@ public:
 
 	bool IsSuperHandler() const;
 	int32 SupportsMimeType(const char* type,
-		const BObjectList<BString>* list, bool exactReason = false) const;
+		const BStringList* list, bool exactReason = false) const;
 		// pass in one string in <type> or a bunch in <list>
 		// if <exactReason> false, returns as soon as it figures out that
 		// app supports a given type, if true, returns an exact reason

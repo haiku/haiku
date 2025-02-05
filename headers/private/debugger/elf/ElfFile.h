@@ -164,8 +164,8 @@ public:
 private:
 			struct SymbolLookupSource;
 
-			typedef BObjectList<ElfSection> SectionList;
-			typedef BObjectList<ElfSegment> SegmentList;
+			typedef BObjectList<ElfSection, true> SectionList;
+			typedef BObjectList<ElfSegment, true> SegmentList;
 
 private:
 			template<typename ElfClass>

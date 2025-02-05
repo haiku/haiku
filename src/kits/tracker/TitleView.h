@@ -93,7 +93,7 @@ private:
 
 private:
 	BPoseView* fPoseView;
-	BObjectList<BColumnTitle> fTitleList;
+	BObjectList<BColumnTitle, true> fTitleList;
 	BCursor fHorizontalResizeCursor;
 			float				fPreferredHeight;
 

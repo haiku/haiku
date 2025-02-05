@@ -671,11 +671,11 @@ protected:
 	BList* GetDropPointList(BPoint dropPoint, BPoint startPoint,
 		const PoseList*, bool sourceInListMode, bool dropOnGrid) const;
 	void SendSelectionAsRefs(uint32 what, bool onlyQueries = false);
-	void MoveListToTrash(BObjectList<entry_ref>*, bool selectNext,
+	void MoveListToTrash(BObjectList<entry_ref, true>*, bool selectNext,
 		bool deleteDirectly);
-	void Delete(BObjectList<entry_ref>*, bool selectNext, bool confirm);
-	void Delete(const entry_ref&ref, bool selectNext, bool confirm);
-	void RestoreItemsFromTrash(BObjectList<entry_ref>*, bool selectNext);
+	void Delete(BObjectList<entry_ref, true>*, bool selectNext, bool confirm);
+	void Delete(const entry_ref& ref, bool selectNext, bool confirm);
+	void RestoreItemsFromTrash(BObjectList<entry_ref, true>*, bool selectNext);
 	void DoDelete();
 	void DoMoveToTrash();
 
@@ -748,8 +748,8 @@ private:
 	HashSet<node_ref_key> fInsertedNodes;
 	BStringList fMimeTypesInSelectionCache;
 		// used for mime string based icon highliting during a drag
-	BObjectList<Model>* fZombieList;
-	BObjectList<BColumn>* fColumnList;
+	BObjectList<Model, true>* fZombieList;
+	BObjectList<BColumn, true>* fColumnList;
 	BStringList fMimeTypeList;
 	BObjectList<Model>* fBrokenLinks;
 	bool fMimeTypeListIsDirty;
@@ -811,7 +811,7 @@ private:
 	bool fCursorCheck : 1;
 	bool fTypeAheadFiltering : 1;
 
-	BObjectList<BString> fFilterStrings;
+	BObjectList<BString, true> fFilterStrings;
 	int32 fLastFilterStringCount;
 	int32 fLastFilterStringLength;
 

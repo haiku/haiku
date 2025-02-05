@@ -373,9 +373,9 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 	node_ref* destNodeRef = (node_ref*)model->NodeRef();
 
 	// these will be passed to the asynchronous copy/move process
-	BObjectList<entry_ref>* moveList = new BObjectList<entry_ref>(0, true);
-	BObjectList<entry_ref>* copyList = new BObjectList<entry_ref>(0, true);
-	BObjectList<entry_ref>* duplicateList = new BObjectList<entry_ref>(0, true);
+	BObjectList<entry_ref, true>* moveList = new BObjectList<entry_ref, true>(0);
+	BObjectList<entry_ref, true>* copyList = new BObjectList<entry_ref, true>(0);
+	BObjectList<entry_ref, true>* duplicateList = new BObjectList<entry_ref, true>(0);
 
 	if ((be_clipboard->Lock())) {
 		BMessage* clip = be_clipboard->Data();
@@ -610,7 +610,7 @@ FSClipboardRemove(Model* model)
 
 BClipboardRefsWatcher::BClipboardRefsWatcher()
 	:	BLooper("ClipboardRefsWatcher", B_LOW_PRIORITY, 4096),
-	fNotifyList(10, false)
+	fNotifyList(10)
 {
 	watch_node(NULL, B_WATCH_MOUNT, this);
 	fRefsInClipboard = FSClipboardHasRefs();

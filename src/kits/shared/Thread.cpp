@@ -103,7 +103,7 @@ Thread::Run()
 
 
 void
-ThreadSequence::Launch(BObjectList<FunctionObject>* list, bool async,
+ThreadSequence::Launch(BObjectList<FunctionObject, true>* list, bool async,
 	int32 priority)
 {
 	if (!async) {
@@ -114,7 +114,7 @@ ThreadSequence::Launch(BObjectList<FunctionObject>* list, bool async,
 }
 
 
-ThreadSequence::ThreadSequence(BObjectList<FunctionObject>* list,
+ThreadSequence::ThreadSequence(BObjectList<FunctionObject, true>* list,
 	int32 priority)
 	:	SimpleThread(priority),
 		fFunctorList(list)
@@ -130,7 +130,7 @@ ThreadSequence::~ThreadSequence()
 
 
 void
-ThreadSequence::Run(BObjectList<FunctionObject>* list)
+ThreadSequence::Run(BObjectList<FunctionObject, true>* list)
 {
 	int32 count = list->CountItems();
 	for (int32 index = 0; index < count; index++)

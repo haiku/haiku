@@ -118,7 +118,7 @@ class PeopleChoiceModel : public BAutoCompleter::ChoiceModel {
 public:
 	PeopleChoiceModel()
 		:
-		fChoices(5, true)
+		fChoices(5)
 	{
 	}
 
@@ -174,7 +174,7 @@ public:
 	}
 
 private:
-	BObjectList<BAutoCompleter::Choice> fChoices;
+	BObjectList<BAutoCompleter::Choice, true> fChoices;
 };
 
 

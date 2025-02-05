@@ -31,7 +31,7 @@ AutoConfig::GetInfoFromMailAddress(const char* email, provider_info *info)
 status_t
 AutoConfig::GetMXRecord(const char* provider, provider_info *info)
 {
-	BObjectList<mx_record> mxList(5, true);
+	BObjectList<mx_record, true> mxList(5);
 	DNSQuery dnsQuery;
 	if (dnsQuery.GetMXRecords(provider, &mxList) != B_OK)
 		return B_ERROR;

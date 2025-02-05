@@ -54,12 +54,12 @@ static	status_t				GetDefaultGateway(int family,
 									sockaddr& gateway);
 
 static	status_t				GetRoutes(int family,
-									BObjectList<BNetworkRoute>& routes);
+									BObjectList<BNetworkRoute, true>& routes);
 static	status_t				GetRoutes(int family, const char* interfaceName,
-									BObjectList<BNetworkRoute>& routes);
+									BObjectList<BNetworkRoute, true>& routes);
 static	status_t				GetRoutes(int family, const char* interfaceName,
 									uint32 filterFlags,
-									BObjectList<BNetworkRoute>& routes);
+									BObjectList<BNetworkRoute, true>& routes);
 
 private:
 								BNetworkRoute(const BNetworkRoute& other);

@@ -700,7 +700,7 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars, boo
 
 	FontCacheEntry* entry = NULL;
 	FontCacheReference cacheReference;
-	BObjectList<FontCacheReference> fallbacks(21, true);
+	BObjectList<FontCacheReference, true> fallbacks(21);
 
 	entry = GlyphLayoutEngine::FontCacheEntryFor(*this, false);
 	if (entry == NULL)

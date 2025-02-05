@@ -39,6 +39,7 @@ All rights reserved.
 
 
 #include <ObjectList.h>
+#include <ObjectListPrivate.h>
 
 #include "Pose.h"
 
@@ -51,20 +52,65 @@ namespace BPrivate {
 class Model;
 
 
-class PoseList : public BObjectList<BPose> {
+class PoseList : private BObjectList<BPose> {
+	typedef BObjectList<BPose> _inherited;
+
 public:
 	PoseList(int32 itemsPerBlock = 20, bool owning = false)
 		:
-		BObjectList<BPose>(itemsPerBlock, owning)
+		_inherited(itemsPerBlock),
+		fOwning(owning)
 	{
 	}
 
-	PoseList(const PoseList &list)
+	PoseList(const PoseList& list)
 		:
-		BObjectList<BPose>(list)
+		_inherited(list),
+		fOwning(list.fOwning)
 	{
 	}
 
+	~PoseList()
+	{
+		MakeEmpty();
+	}
+
+	::BList* AsBList() { return _inherited::Private(this).AsBList(); }
+	const BObjectList<BPose>& AsObjectList() const { return *this; }
+
+public:
+	bool IsEmpty() const { return _inherited::IsEmpty(); }
+	int32 CountItems() const { return _inherited::CountItems(); }
+	int32 IndexOf(const BPose* p) const { return _inherited::IndexOf(p); }
+	bool HasItem(const BPose* p) const { return _inherited::HasItem(p); }
+
+	BPose* FirstItem() const { return _inherited::FirstItem(); }
+	BPose* LastItem() const { return _inherited::LastItem(); }
+	BPose* ItemAt(int32 i) const { return _inherited::ItemAt(i); }
+
+	bool AddItem(BPose* p) { return _inherited::AddItem(p); }
+	bool AddItem(BPose* p, int32 i) { return _inherited::AddItem(p, i); }
+	bool AddList(PoseList* list) { return _inherited::AddList(list); }
+
+	bool RemoveItem(BPose* p, bool deleteIfOwning = true);
+	BPose* RemoveItemAt(int32 i) { return _inherited::RemoveItemAt(i); }
+
+	void MakeEmpty(bool deleteIfOwning = true);
+
+public:
+	template<class Item, class Param1>
+	void EachListItem(void (*func)(Item*, Param1), Param1 p1)
+	{
+		::EachListItem(this, func, p1);
+	}
+
+	template<class Item, class Param1, class Param2, class Param3>
+	void EachListItem(void (*func)(Item*, Param1, Param2, Param3), Param1 p1, Param2 p2, Param3 p3)
+	{
+		::EachListItem(this, func, p1, p2, p3);
+	}
+
+public:
 	BPose* FindPose(const node_ref* node, int32* index = NULL) const;
 	BPose* FindPose(const entry_ref* entry, int32* index = NULL) const;
 	BPose* FindPose(const Model* model, int32* index = NULL) const;
@@ -74,7 +120,32 @@ public:
 	PoseList* FindAllPoses(const node_ref* node) const;
 
 	BPose* FindPoseByFileName(const char* name, int32* _index = NULL) const;
+
+private:
+	bool fOwning;
 };
+
+
+inline bool
+PoseList::RemoveItem(BPose* p, bool deleteIfOwning)
+{
+	bool removed = _inherited::RemoveItem(p);
+	if (removed && deleteIfOwning)
+		delete p;
+	return removed;
+}
+
+
+inline void
+PoseList::MakeEmpty(bool deleteIfOwning)
+{
+	if (fOwning && deleteIfOwning) {
+		int32 count = CountItems();
+		for (int32 index = 0; index < count; index++)
+			delete ItemAt(index);
+	}
+	_inherited::MakeEmpty();
+}
 
 
 // iteration glue, add permutations as needed

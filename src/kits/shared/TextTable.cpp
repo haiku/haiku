@@ -155,8 +155,8 @@ private:
 
 TextTable::TextTable()
 	:
-	fColumns(10, true),
-	fRows(100, true)
+	fColumns(10),
+	fRows(100)
 {
 }
 

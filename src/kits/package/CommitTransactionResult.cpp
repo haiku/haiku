@@ -254,7 +254,7 @@ BCommitTransactionResult::BCommitTransactionResult()
 	fString1(),
 	fString2(),
 	fOldStateDirectory(),
-	fIssues(10, true)
+	fIssues(10)
 {
 }
 
@@ -269,7 +269,7 @@ BCommitTransactionResult::BCommitTransactionResult(BTransactionError error)
 	fString1(),
 	fString2(),
 	fOldStateDirectory(),
-	fIssues(10, true)
+	fIssues(10)
 {
 }
 
@@ -285,7 +285,7 @@ BCommitTransactionResult::BCommitTransactionResult(
 	fString1(),
 	fString2(),
 	fOldStateDirectory(),
-	fIssues(10, true)
+	fIssues(10)
 {
 	*this = other;
 }

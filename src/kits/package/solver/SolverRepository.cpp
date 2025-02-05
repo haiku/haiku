@@ -27,7 +27,7 @@ BSolverRepository::BSolverRepository()
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true),
+	fPackages(kInitialPackageListSize),
 	fChangeCount(0)
 {
 }
@@ -38,7 +38,7 @@ BSolverRepository::BSolverRepository(const BString& name)
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true),
+	fPackages(kInitialPackageListSize),
 	fChangeCount(0)
 {
 	SetTo(name);
@@ -50,7 +50,7 @@ BSolverRepository::BSolverRepository(BPackageInstallationLocation location)
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true),
+	fPackages(kInitialPackageListSize),
 	fChangeCount(0)
 {
 	SetTo(location);
@@ -62,7 +62,7 @@ BSolverRepository::BSolverRepository(BAllInstallationLocations)
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true),
+	fPackages(kInitialPackageListSize),
 	fChangeCount(0)
 {
 	SetTo(B_ALL_INSTALLATION_LOCATIONS);
@@ -74,7 +74,7 @@ BSolverRepository::BSolverRepository(const BRepositoryConfig& config)
 	fName(),
 	fPriority(0),
 	fIsInstalled(false),
-	fPackages(kInitialPackageListSize, true),
+	fPackages(kInitialPackageListSize),
 	fChangeCount(0)
 {
 	SetTo(config);

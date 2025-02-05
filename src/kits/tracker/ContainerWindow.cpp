@@ -120,8 +120,8 @@ struct StaggerOneParams {
 BRect BContainerWindow::sNewWindRect;
 static int32 sWindowStaggerBy;
 
-LockingList<AddOnShortcut>* BContainerWindow::fAddOnsList
-	= new LockingList<struct AddOnShortcut>(10, true);
+LockingList<AddOnShortcut, true>* BContainerWindow::fAddOnsList
+	= new LockingList<struct AddOnShortcut, true>(10);
 
 
 namespace BPrivate {
@@ -2688,7 +2688,7 @@ BContainerWindow::EachAddOn(void (*eachAddOn)(const Model*, const char*,
 		BContainerWindow* window, BMenu* menu),
 	void* passThru, BStringList& mimeTypes, BMenu* menu)
 {
-	AutoLock<LockingList<AddOnShortcut> > lock(fAddOnsList);
+	AutoLock<LockingList<AddOnShortcut, true> > lock(fAddOnsList);
 	if (!lock.IsLocked())
 		return;
 
@@ -2998,7 +2998,7 @@ BContainerWindow::AddOnMessage(int32 what)
 	BMessage* message = new BMessage(what);
 
 	// add selected refs to message
-	BObjectList<BPose>* selectionList = PoseView()->SelectionList();
+	PoseList* selectionList = PoseView()->SelectionList();
 
 	int32 index = 0;
 	BPose* pose;

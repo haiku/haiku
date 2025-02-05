@@ -147,7 +147,7 @@ public:
 	// status window, such that the user can drop additional items onto the
 	// progress display of the ongoing copy process to copy these items to
 	// the same target directory.
-			typedef BObjectList<entry_ref> EntryList;
+			typedef BObjectList<entry_ref, true> EntryList;
 
 			void				SetSourceList(EntryList* list);
 
@@ -167,9 +167,9 @@ private:
 #endif
 _IMPEXP_TRACKER status_t FSCopyAttributesAndStats(BNode*, BNode*, bool = true);
 
-_IMPEXP_TRACKER void FSDuplicate(BObjectList<entry_ref>* srcList,
+_IMPEXP_TRACKER void FSDuplicate(BObjectList<entry_ref, true>* srcList,
 	BList* pointList);
-_IMPEXP_TRACKER void FSMoveToFolder(BObjectList<entry_ref>* srcList, BEntry*,
+_IMPEXP_TRACKER void FSMoveToFolder(BObjectList<entry_ref, true>* srcList, BEntry*,
 	uint32 moveMode, BList* pointList = NULL);
 _IMPEXP_TRACKER void FSMakeOriginalName(char* name, BDirectory* destDir,
 	const char* suffix);
@@ -178,13 +178,13 @@ _IMPEXP_TRACKER bool FSIsPrintersDir(const BEntry*);
 _IMPEXP_TRACKER bool FSIsDeskDir(const BEntry*);
 _IMPEXP_TRACKER bool FSIsHomeDir(const BEntry*);
 _IMPEXP_TRACKER bool FSIsRootDir(const BEntry*);
-_IMPEXP_TRACKER void FSMoveToTrash(BObjectList<entry_ref>* srcList,
+_IMPEXP_TRACKER void FSMoveToTrash(BObjectList<entry_ref, true>* srcList,
 	BList* pointList = NULL, bool async = true);
 	// Deprecated
 
-void FSDeleteRefList(BObjectList<entry_ref>*, bool, bool confirm = true);
+void FSDeleteRefList(BObjectList<entry_ref, true>*, bool, bool confirm = true);
 void FSDelete(entry_ref*, bool, bool confirm = true);
-void FSRestoreRefList(BObjectList<entry_ref>* list, bool async);
+void FSRestoreRefList(BObjectList<entry_ref,true >* list, bool async);
 
 _IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref* application,
 	const BMessage* refsReceived, bool async, bool openWithOK);

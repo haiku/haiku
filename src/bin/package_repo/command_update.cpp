@@ -59,9 +59,9 @@ namespace
 typedef std::map<BPackageInfo, bool> PackageInfos;
 
 
-status_t
+static status_t
 parsePackageListFile(const char* packageListFileName,
-	BObjectList<BString>* packageFileNames)
+	BObjectList<BString, true>* packageFileNames)
 {
 	FILE* packageListFile = fopen(packageListFileName, "r");
 	if (packageListFile == NULL) {
@@ -334,7 +334,7 @@ command_update(int argc, const char* const* argv)
 	BEntry tempRepositoryFile(tempRepositoryFileName.String());
 	BPath targetRepositoryFilePath(targetRepositoryFileName);
 
-	BObjectList<BString> packageNames(100, true);
+	BObjectList<BString, true> packageNames(100);
 	if ((result = parsePackageListFile(packageListFileName, &packageNames))
 			!= B_OK) {
 		listener.PrintError(

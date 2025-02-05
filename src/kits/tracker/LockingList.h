@@ -41,10 +41,10 @@ All rights reserved.
 
 namespace BPrivate {
 
-template <class T>
-class LockingList : public BObjectList<T> {
+template <class T, bool Owning = false>
+class LockingList : public BObjectList<T, Owning> {
 public:
-	LockingList(int32 itemsPerBlock = 20, bool owning = false);
+	LockingList(int32 itemsPerBlock = 20);
 	~LockingList()
 	{
 		Lock();
@@ -59,33 +59,33 @@ private:
 };
 
 
-template<class T>
-LockingList<T>::LockingList(int32 itemsPerBlock, bool owning)
+template<class T, bool O>
+LockingList<T, O>::LockingList(int32 itemsPerBlock)
 	:
-	BObjectList<T>(itemsPerBlock, owning)
+	BObjectList<T, O>(itemsPerBlock)
 {
 }
 
 
-template<class T>
+template<class T, bool O>
 bool
-LockingList<T>::Lock()
+LockingList<T, O>::Lock()
 {
 	return lock.Lock();
 }
 
 
-template<class T>
+template<class T, bool O>
 void
-LockingList<T>::Unlock()
+LockingList<T, O>::Unlock()
 {
 	lock.Unlock();
 }
 
 
-template<class T>
+template<class T, bool O>
 bool
-LockingList<T>::IsLocked() const
+LockingList<T, O>::IsLocked() const
 {
 	return lock.IsLocked();
 }

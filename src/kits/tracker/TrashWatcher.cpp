@@ -56,7 +56,7 @@ All rights reserved.
 BTrashWatcher::BTrashWatcher()
 	:
 	BLooper("TrashWatcher", B_LOW_PRIORITY),
-	fTrashNodeList(20, true)
+	fTrashNodeList(20)
 {
 	FSCreateTrashDirs();
 	WatchTrashDirs();

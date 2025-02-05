@@ -233,7 +233,7 @@ protected:
 	int32 Find(const char* name, uint32 type) const;
 
 private:
-	BObjectList<AttrNode> fAttributes;
+	BObjectList<AttrNode, true> fAttributes;
 	int32 fCurrentIndex;
 
 	typedef AttributeStreamNode _inherited;

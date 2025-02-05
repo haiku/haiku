@@ -201,9 +201,9 @@ CoreFile::CoreFile()
 	:
 	fElfFile(),
 	fTeamInfo(),
-	fAreaInfos(32, true),
-	fImageInfos(32, true),
-	fThreadInfos(32, true)
+	fAreaInfos(32),
+	fImageInfos(32),
+	fThreadInfos(32)
 {
 }
 

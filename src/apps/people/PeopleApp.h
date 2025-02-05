@@ -60,7 +60,7 @@ private:
 					BString		name;
 				};
 
-				BObjectList<Attribute> fAttributes;
+				BObjectList<Attribute, true> fAttributes;
 };
 
 #endif // PEOPLE_APP_H

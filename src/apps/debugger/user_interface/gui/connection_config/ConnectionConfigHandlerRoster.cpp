@@ -17,7 +17,7 @@
 ConnectionConfigHandlerRoster::ConnectionConfigHandlerRoster()
 	:
 	fLock("config handler roster lock"),
-	fConfigHandlers(10, true)
+	fConfigHandlers(10)
 {
 }
 

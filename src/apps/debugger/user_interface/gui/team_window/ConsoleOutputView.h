@@ -34,7 +34,7 @@ public:
 
 private:
 			struct OutputInfo;
-			typedef BObjectList<OutputInfo> OutputInfoList;
+			typedef BObjectList<OutputInfo, true> OutputInfoList;
 
 private:
 			void				_Init();

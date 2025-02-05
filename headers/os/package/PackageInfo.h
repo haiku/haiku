@@ -87,25 +87,25 @@ public:
 			const BStringList&	URLList() const;
 			const BStringList&	SourceURLList() const;
 
-			const BObjectList<BGlobalWritableFileInfo>&
+			const BObjectList<BGlobalWritableFileInfo, true>&
 									GlobalWritableFileInfos() const;
-			const BObjectList<BUserSettingsFileInfo>&
+			const BObjectList<BUserSettingsFileInfo, true>&
 									UserSettingsFileInfos() const;
 
-			const BObjectList<BUser>& Users() const;
+			const BObjectList<BUser, true>& Users() const;
 			const BStringList&	Groups() const;
 
 			const BStringList&	PostInstallScripts() const;
 			const BStringList&	PreUninstallScripts() const;
 
-			const BObjectList<BPackageResolvable>&	ProvidesList() const;
-			const BObjectList<BPackageResolvableExpression>&
+			const BObjectList<BPackageResolvable, true>&	ProvidesList() const;
+			const BObjectList<BPackageResolvableExpression, true>&
 								RequiresList() const;
-			const BObjectList<BPackageResolvableExpression>&
+			const BObjectList<BPackageResolvableExpression, true>&
 								SupplementsList() const;
-			const BObjectList<BPackageResolvableExpression>&
+			const BObjectList<BPackageResolvableExpression, true>&
 								ConflictsList() const;
-			const BObjectList<BPackageResolvableExpression>&
+			const BObjectList<BPackageResolvableExpression, true>&
 								FreshensList() const;
 			const BStringList&	ReplacesList() const;
 
@@ -223,16 +223,16 @@ private:
 			struct FieldName;
 			struct PackageFileLocation;
 
-			typedef BObjectList<BPackageResolvable> ResolvableList;
-			typedef BObjectList<BPackageResolvableExpression>
+			typedef BObjectList<BPackageResolvable, true> ResolvableList;
+			typedef BObjectList<BPackageResolvableExpression, true>
 				ResolvableExpressionList;
 
-			typedef BObjectList<BGlobalWritableFileInfo>
+			typedef BObjectList<BGlobalWritableFileInfo, true>
 				GlobalWritableFileInfoList;
-			typedef BObjectList<BUserSettingsFileInfo>
+			typedef BObjectList<BUserSettingsFileInfo, true>
 				UserSettingsFileInfoList;
 
-			typedef BObjectList<BUser> UserList;
+			typedef BObjectList<BUser, true> UserList;
 
 private:
 			status_t			_ReadFromPackageFile(
@@ -298,8 +298,8 @@ private:
 			BStringList			fURLList;
 			BStringList			fSourceURLList;
 
-			BObjectList<BGlobalWritableFileInfo> fGlobalWritableFileInfos;
-			BObjectList<BUserSettingsFileInfo> fUserSettingsFileInfos;
+			GlobalWritableFileInfoList fGlobalWritableFileInfos;
+			UserSettingsFileInfoList fUserSettingsFileInfos;
 
 			UserList			fUsers;
 			BStringList			fGroups;

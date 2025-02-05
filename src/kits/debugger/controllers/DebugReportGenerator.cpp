@@ -367,7 +367,7 @@ DebugReportGenerator::_DumpLoadedImages(BFile& _output)
 status_t
 DebugReportGenerator::_DumpAreas(BFile& _output)
 {
-	BObjectList<AreaInfo> areas(20, true);
+	BObjectList<AreaInfo, true> areas(20);
 	status_t result = fDebuggerInterface->GetAreaInfos(areas);
 	if (result != B_OK)
 		return result;
@@ -413,7 +413,7 @@ DebugReportGenerator::_DumpAreas(BFile& _output)
 status_t
 DebugReportGenerator::_DumpSemaphores(BFile& _output)
 {
-	BObjectList<SemaphoreInfo> semaphores(20, true);
+	BObjectList<SemaphoreInfo, true> semaphores(20);
 	status_t error = fDebuggerInterface->GetSemaphoreInfos(semaphores);
 	if (error != B_OK)
 		return error;

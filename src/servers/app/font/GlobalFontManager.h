@@ -105,8 +105,8 @@ private:
 private:
 			status_t			fInitStatus;
 
-			typedef BObjectList<font_directory>		DirectoryList;
-			typedef BObjectList<font_mapping>		MappingList;
+			typedef BObjectList<font_directory, true>	DirectoryList;
+			typedef BObjectList<font_mapping, true>		MappingList;
 
 			DirectoryList		fDirectories;
 			MappingList			fMappings;
