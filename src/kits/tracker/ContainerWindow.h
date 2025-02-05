@@ -257,6 +257,8 @@ protected:
 	virtual void SetupMountMenu(BMenu*, MenuContext context, const entry_ref* ref);
 	BMenuItem* DetachMountMenu();
 
+	virtual void BuildAddOnMenus(BMenuBar*);
+	virtual void RebuildAddOnMenus(BMenuBar*);
 	virtual void BuildAddOnsMenu(BMenu*);
 	void BuildMimeTypeList(BStringList& mimeTypes);
 
@@ -291,6 +293,7 @@ protected:
 	bool ShouldHaveEditQueryItem(const entry_ref* = NULL);
 	bool ShouldHaveMoveCopyMenus(const entry_ref* = NULL);
 	bool ShouldHaveNewFolderItem();
+	bool ShouldHaveAddOnMenus();
 
 	BGroupLayout* fRootLayout;
 	BGroupView* fMenuContainer;

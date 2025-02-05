@@ -706,7 +706,7 @@ BContainerWindow::RepopulateMenus()
 		if (ShouldAddMenus()) {
 			AddMenus();
 			if (PoseView()->ViewMode() == kListMode)
-				fMenuBar->AddItem(fAttrMenu);
+				fMenuBar->AddItem(fAttrMenu, 2);
 		}
 	}
 
@@ -810,15 +810,20 @@ BContainerWindow::Init(const BMessage* message)
 	else
 		RestoreState();
 
-	if (ShouldAddMenus() && PoseView()->ViewMode() == kListMode) {
+	bool isListMode = PoseView()->ViewMode() == kListMode;
+	if (ShouldAddMenus() && isListMode) {
 		// for now only show attributes in list view
 		// eventually enable attribute menu to allow users to select
 		// using different attributes as titles in icon view modes
 		ShowAttributesMenu();
 	}
+
+	// load Tracker add-on menus into main menu bar
+	if (ShouldAddMenus() && ShouldHaveAddOnMenus())
+		BuildAddOnMenus(fMenuBar);
+
 	CheckScreenIntersect();
 
-	bool isListMode = PoseView()->ViewMode() == kListMode;
 	if (fBackgroundImage != NULL && !PoseView()->IsDesktopView() && !isListMode)
 		fBackgroundImage->Show(PoseView(), current_workspace());
 
@@ -977,6 +982,9 @@ BContainerWindow::SwitchDirectory(const entry_ref* ref)
 	// skip the rest on file panel
 	if (PoseView()->IsFilePanel())
 		return;
+
+	// Tracker add-on menus may have changed
+	RebuildAddOnMenus(fMenuBar);
 
 	TrackerSettings settings;
 	if (settings.ShowNavigator() || settings.ShowFullPathInTitleBar())
@@ -1697,10 +1705,10 @@ BContainerWindow::AddMenus()
 {
 	fFileMenu = new TLiveFileMenu(B_TRANSLATE("File"), this);
 	AddFileMenu(fFileMenu);
-	fMenuBar->AddItem(fFileMenu);
+	fMenuBar->AddItem(fFileMenu, 0);
 
 	fWindowMenu = new TLiveWindowMenu(B_TRANSLATE("Window"), this);
-	fMenuBar->AddItem(fWindowMenu);
+	fMenuBar->AddItem(fWindowMenu, 1);
 	AddWindowMenu(fWindowMenu);
 
 	// create Attributes menu, add it later
@@ -1768,7 +1776,8 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 
 	if (!TargetModel()->IsRoot())
 		menu->AddItem(Shortcuts()->IdentifyItem());
-	menu->AddItem(new BMenuItem(new BMenu(Shortcuts()->AddOnsLabel())));
+	if (ShouldHaveAddOnMenus())
+		menu->AddItem(new BMenuItem(new BMenu(Shortcuts()->AddOnsLabel())));
 }
 
 
@@ -1915,6 +1924,9 @@ BContainerWindow::MenusBeginning()
 
 	if (fWindowMenu != NULL)
 		UpdateMenu(fWindowMenu, kWindowMenuContext);
+
+	// Tracker add-on menus may have changed
+	RebuildAddOnMenus(fMenuBar);
 }
 
 
@@ -2567,7 +2579,7 @@ BContainerWindow::AddPoseContextMenu(BMenu* menu)
 {
 	menu->AddItem(Shortcuts()->OpenItem());
 	// "Edit query" and "Open with..." inserted here,
-	// see UpdateMenus(), SetupEditQueryItem() and SetupOpenWithMenu()
+	// see UpdateMenu(), SetupEditQueryItem() and SetupOpenWithMenu()
 	menu->AddItem(Shortcuts()->GetInfoItem());
 	menu->AddItem(Shortcuts()->EditNameItem());
 
@@ -2592,7 +2604,8 @@ BContainerWindow::AddPoseContextMenu(BMenu* menu)
 	}
 
 	menu->AddItem(Shortcuts()->IdentifyItem());
-	menu->AddItem(new BMenuItem(new BMenu(Shortcuts()->AddOnsLabel())));
+	if (ShouldHaveAddOnMenus())
+		menu->AddItem(new BMenuItem(new BMenu(Shortcuts()->AddOnsLabel())));
 }
 
 
@@ -2607,7 +2620,8 @@ BContainerWindow::AddVolumeContextMenu(BMenu* menu)
 	// "Mount >", "Unmount" and a separator are inserted here,
 	// see UpdateMenu() and SetupMountMenu()
 
-	menu->AddItem(new BMenuItem(new BMenu(Shortcuts()->AddOnsLabel())));
+	if (ShouldHaveAddOnMenus())
+		menu->AddItem(new BMenuItem(new BMenu(Shortcuts()->AddOnsLabel())));
 }
 
 
@@ -2652,7 +2666,8 @@ BContainerWindow::AddWindowContextMenu(BMenu* menu)
 	// "Mount >" menu and "Unmount" are inserted here,
 	// see UpdateMenu() and SetupMountMenu().
 
-	menu->AddItem(new BMenuItem(new BMenu(Shortcuts()->AddOnsLabel())));
+	if (ShouldHaveAddOnMenus())
+		menu->AddItem(new BMenuItem(new BMenu(Shortcuts()->AddOnsLabel())));
 
 #if DEBUG
 	menu->AddSeparatorItem();
@@ -2762,6 +2777,48 @@ BContainerWindow::BuildMimeTypeList(BStringList& mimeTypes)
 			}
 		}
 	}
+}
+
+
+void
+BContainerWindow::BuildAddOnMenus(BMenuBar* parent)
+{
+	BObjectList<BMenuItem> primaryList;
+	BObjectList<BMenuItem> secondaryList;
+	BStringList mimeTypes(10);
+
+	AddOneAddOnParams params;
+	params.primaryList = &primaryList;
+	params.secondaryList = &secondaryList;
+
+	EachAddOn(AddOneAddOn, &params, mimeTypes, parent);
+
+	primaryList.SortItems(CompareLabels);
+	secondaryList.SortItems(CompareLabels);
+
+	int32 parentCount = parent->CountItems();
+	int32 count = primaryList.CountItems();
+	for (int32 index = 0; index < count; index++)
+		parent->AddItem(primaryList.ItemAt(parentCount + index));
+}
+
+
+void
+BContainerWindow::RebuildAddOnMenus(BMenuBar* parent)
+{
+	if (parent == NULL || !ShouldHaveAddOnMenus())
+		return;
+
+	int32 addOnsIndex = (PoseView()->ViewMode() == kListMode) ? 3 : 2;
+	if (parent->CountItems() >= addOnsIndex) {
+		BMenuItem* addOnsItem;
+		while ((addOnsItem = parent->ItemAt(addOnsIndex)) != NULL) {
+			parent->RemoveItem(addOnsItem);
+			delete addOnsItem;
+		}
+	}
+	if (ShouldAddMenus())
+		BuildAddOnMenus(parent);
 }
 
 
@@ -2915,7 +2972,8 @@ BContainerWindow::UpdateFileMenuOrPoseContextMenu(BMenu* menu, MenuContext conte
 	if (ShouldHaveMoveCopyMenus(ref))
 		SetupMoveCopyMenus(menu, ref);
 
-	BuildAddOnsMenu(menu);
+	if (ShouldHaveAddOnMenus())
+		BuildAddOnsMenu(menu);
 }
 
 
@@ -2937,7 +2995,8 @@ BContainerWindow::UpdateWindowContextMenu(BMenu* menu)
 	if (TargetModel()->IsDesktop() || TargetModel()->IsRoot())
 		SetupMountMenu(menu, kWindowPopUpContext);
 
-	BuildAddOnsMenu(menu);
+	if (ShouldHaveAddOnMenus())
+		BuildAddOnsMenu(menu);
 }
 
 
@@ -3108,6 +3167,13 @@ BContainerWindow::ShouldHaveNewFolderItem()
 
 	return !(TargetModel()->IsQuery() || TargetModel()->IsRoot() || TargetModel()->IsTrash()
 		|| TargetModel()->InTrash() || TargetModel()->IsVirtualDirectory());
+}
+
+
+bool
+BContainerWindow::ShouldHaveAddOnMenus()
+{
+	return !PoseView()->IsFilePanel();
 }
 
 
@@ -3311,7 +3377,7 @@ void
 BContainerWindow::ShowAttributesMenu()
 {
 	ASSERT(fAttrMenu != NULL);
-	fMenuBar->AddItem(fAttrMenu);
+	fMenuBar->AddItem(fAttrMenu, 2);
 }
 
 
