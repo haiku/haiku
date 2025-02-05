@@ -134,7 +134,7 @@ SpringLoadedFolderCompareMessages(const BMessage* incoming,
 
 void
 SpringLoadedFolderSetMenuStates(const BMenu* menu,
-	const BObjectList<BString>* typeslist)
+	const BStringList* typeslist)
 {
 	if (menu == NULL || typeslist == NULL || typeslist->IsEmpty())
 		return;
@@ -183,7 +183,7 @@ SpringLoadedFolderSetMenuStates(const BMenu* menu,
 
 void
 SpringLoadedFolderAddUniqueTypeToList(entry_ref* ref,
-	BObjectList<BString>* typeslist)
+	BStringList* typeslist)
 {
 	if (ref == NULL || typeslist == NULL)
 		return;
@@ -212,23 +212,23 @@ SpringLoadedFolderAddUniqueTypeToList(entry_ref* ref,
 		}
 		// scan the current list, don't add dups
 		bool isUnique = true;
-		int32 count = typeslist->CountItems();
+		int32 count = typeslist->CountStrings();
 		for (int32 index = 0 ; index < count ; index++) {
-			if (typeslist->ItemAt(index)->Compare(mimestr) == 0) {
+			if (typeslist->StringAt(index).Compare(mimestr) == 0) {
 				isUnique = false;
 				break;
 			}
 		}
 
 		if (isUnique)
-			typeslist->AddItem(new BString(mimestr));
+			typeslist->Add(mimestr);
 	}
 }
 
 
 void
 SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage** message,
-	BObjectList<BString>** typeslist)
+	BStringList** typeslist)
 {
 	if (incoming == NULL)
 		return;
@@ -237,7 +237,7 @@ SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage** message,
 	delete* typeslist;
 
 	BMessage* localMessage = new BMessage(*incoming);
-	BObjectList<BString>* localTypesList = new BObjectList<BString>(10, true);
+	BStringList* localTypesList = new BStringList(10);
 
 	for (int32 index = 0; incoming->HasRef("refs", index); index++) {
 		entry_ref ref;
@@ -262,7 +262,7 @@ SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage** message,
 
 
 BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
-	BWindow* parentWindow, const BObjectList<BString>* list)
+	BWindow* parentWindow, const BStringList* list)
 	:
 	BSlowMenu(title),
 	fMessage(message),
@@ -272,7 +272,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 	fItemList(NULL),
 	fContainer(NULL),
 	fIteratingDesktop(false),
-	fTypesList(new BObjectList<BString>(10, true))
+	fTypesList(new BStringList(10))
 {
 	if (list != NULL)
 		*fTypesList = *list;
@@ -295,7 +295,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 
 BNavMenu::BNavMenu(const char* title, uint32 message,
 	const BMessenger& messenger, BWindow* parentWindow,
-	const BObjectList<BString>* list)
+	const BStringList* list)
 	:
 	BSlowMenu(title),
 	fMessage(message),
@@ -305,7 +305,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 	fItemList(NULL),
 	fContainer(NULL),
 	fIteratingDesktop(false),
-	fTypesList(new BObjectList<BString>(10, true))
+	fTypesList(new BStringList(10))
 {
 	if (list != NULL)
 		*fTypesList = *list;
@@ -582,7 +582,7 @@ BNavMenu::AddOneItem(Model* model)
 ModelMenuItem*
 BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 	const BMessenger& target, bool suppressFolderHierarchy,
-	BContainerWindow* parentWindow, const BObjectList<BString>* typeslist,
+	BContainerWindow* parentWindow, const BStringList* typeslist,
 	TrackingHookData* hook)
 {
 	if (model->InitCheck() != B_OK)
@@ -844,7 +844,7 @@ BNavMenu::SetShowParent(bool show)
 
 
 void
-BNavMenu::SetTypesList(const BObjectList<BString>* list)
+BNavMenu::SetTypesList(const BStringList* list)
 {
 	if (list != NULL)
 		*fTypesList = *list;
@@ -853,7 +853,7 @@ BNavMenu::SetTypesList(const BObjectList<BString>* list)
 }
 
 
-const BObjectList<BString>*
+const BStringList*
 BNavMenu::TypesList() const
 {
 	return fTypesList;

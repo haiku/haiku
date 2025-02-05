@@ -126,7 +126,7 @@ public:
 			TrackingHookData*	GetTrackingHookData();
 			bool			Dragging() const;
 			const			BMessage* DragMessage() const;
-			BObjectList<BString>*	CachedTypesList() const;
+			BStringList*	CachedTypesList() const;
 			bool			AppCanHandleTypes(const char* signature);
 			void			SetDragOverride(bool);
 			bool			DragOverride();
@@ -209,7 +209,7 @@ private:
 			bigtime_t		fPulseRate;
 			bool			fRefsRcvdOnly;
 			BMessage*		fDragMessage;
-			BObjectList<BString>*	fCachedTypesList;
+			BStringList*	fCachedTypesList;
 			TrackingHookData		fTrackingHookData;
 
 			uint32			fMaxRecentDocs;
@@ -250,7 +250,7 @@ TBarView::DragMessage() const
 }
 
 
-inline BObjectList<BString>*
+inline BStringList*
 TBarView::CachedTypesList() const
 {
 	return fCachedTypesList;

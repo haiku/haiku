@@ -234,7 +234,7 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fFilteredPoseList(new PoseList()),
 	fVSPoseList(new PoseList()),
 	fSelectionList(new PoseList()),
-	fMimeTypesInSelectionCache(20, true),
+	fMimeTypesInSelectionCache(20),
 	fZombieList(new BObjectList<Model>(10, true)),
 	fColumnList(new BObjectList<BColumn>(4, true)),
 	fMimeTypeList(new BObjectList<BString>(10, true)),
@@ -271,7 +271,7 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fHasPosesInClipboard(false),
 	fCursorCheck(false),
 	fTypeAheadFiltering(false),
-	fFilterStrings(4, true),
+	fFilterStrings(4),
 	fLastFilterStringCount(1),
 	fLastFilterStringLength(0),
 	fLastKeyTime(0),
@@ -299,7 +299,6 @@ BPoseView::~BPoseView()
 	delete fVSPoseList;
 	delete fColumnList;
 	delete fSelectionList;
-	delete fMimeTypeList;
 	delete fZombieList;
 	delete fViewState;
 	delete fModel;
@@ -2057,7 +2056,7 @@ BPoseView::MimeTypeAt(int32 index)
 	if (fMimeTypeListIsDirty)
 		RefreshMimeTypeList();
 
-	return fMimeTypeList->ItemAt(index)->String();
+	return fMimeTypeList.StringAt(index).String();
 }
 
 
@@ -2067,27 +2066,27 @@ BPoseView::CountMimeTypes()
 	if (fMimeTypeListIsDirty)
 		RefreshMimeTypeList();
 
-	return fMimeTypeList->CountItems();
+	return fMimeTypeList.CountStrings();
 }
 
 
 void
 BPoseView::AddMimeType(const char* mimeType)
 {
-	int32 count = fMimeTypeList->CountItems();
+	int32 count = fMimeTypeList.CountStrings();
 	for (int32 index = 0; index < count; index++) {
-		if (*fMimeTypeList->ItemAt(index) == mimeType)
+		if (fMimeTypeList.StringAt(index) == mimeType)
 			return;
 	}
 
-	fMimeTypeList->AddItem(new BString(mimeType));
+	fMimeTypeList.Add(mimeType);
 }
 
 
 void
 BPoseView::RefreshMimeTypeList()
 {
-	fMimeTypeList->MakeEmpty();
+	fMimeTypeList.MakeEmpty();
 	fMimeTypeListIsDirty = false;
 
 	for (int32 index = 0;; index++) {
@@ -4116,13 +4115,6 @@ BPoseView::EachItemInDraggedSelection(const BMessage* message,
 }
 
 
-static bool
-ContainsOne(BString* string, const char* matchString)
-{
-	return strcmp(string->String(), matchString) == 0;
-}
-
-
 bool
 BPoseView::FindDragNDropAction(const BMessage* dragMessage, bool &canCopy,
 	bool &canMove, bool &canLink, bool &canErase)
@@ -4250,7 +4242,7 @@ BPoseView::CanHandleDragSelection(const Model* target,
 	if (!lock)
 		return false;
 
-	BObjectList<BString>* mimeTypeList
+	BStringList* mimeTypeList
 		= srcWindow->PoseView()->MimeTypesInSelection();
 	if (mimeTypeList->IsEmpty()) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
@@ -4275,11 +4267,8 @@ BPoseView::CanHandleDragSelection(const Model* target,
 				mime.GetType(mimeType);
 
 				// add unique type string
-				if (!WhileEachListItem(mimeTypeList, ContainsOne,
-						(const char*)mimeType)) {
-					BString* newMimeString = new BString(mimeType);
-					mimeTypeList->AddItem(newMimeString);
-				}
+				if (!mimeTypeList->HasString(mimeType))
+					mimeTypeList->Add(mimeType);
 			}
 		}
 	}
@@ -4340,14 +4329,14 @@ BPoseView::CreateClippingFile(BPoseView* poseView, BFile &result,
 
 static int32
 RunMimeTypeDestinationMenu(const char* actionText,
-	const BObjectList<BString>* types,
-	const BObjectList<BString>* specificItems, BPoint where)
+	const BStringList* types,
+	const BStringList* specificItems, BPoint where)
 {
 	int32 count;
 	if (types != NULL)
-		count = types->CountItems();
+		count = types->CountStrings();
 	else
-		count = specificItems->CountItems();
+		count = specificItems->CountStrings();
 
 	if (count == 0)
 		return 0;
@@ -4357,8 +4346,7 @@ RunMimeTypeDestinationMenu(const char* actionText,
 	for (int32 index = 0; index < count; index++) {
 		const char* embedTypeAs = NULL;
 		char buffer[256];
-		if (types) {
-			types->ItemAt(index)->String();
+		if (types != NULL) {
 			BMimeType mimeType(embedTypeAs);
 
 			if (mimeType.GetShortDescription(buffer) == B_OK)
@@ -4366,8 +4354,8 @@ RunMimeTypeDestinationMenu(const char* actionText,
 		}
 
 		BString description;
-		if (specificItems->ItemAt(index)->Length()) {
-			description << (const BString &)(*specificItems->ItemAt(index));
+		if (specificItems->StringAt(index).Length()) {
+			description << specificItems->StringAt(index);
 
 			if (embedTypeAs)
 				description << " (" << embedTypeAs << ")";
@@ -4504,7 +4492,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 				// handle the promise style drag&drop
 
 				// fish for specification of specialized menu items
-				BObjectList<BString> actionSpecifiers(10, true);
+				BStringList actionSpecifiers(10);
 				for (int32 index = 0; ; index++) {
 					const char* string;
 					if (message->FindString("be:actionspecifier", index,
@@ -4513,12 +4501,12 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 					}
 
 					ASSERT(string != NULL);
-					actionSpecifiers.AddItem(new BString(string));
+					actionSpecifiers.Add(string);
 				}
 
 				// build the list of types the drag originator offers
-				BObjectList<BString> types(10, true);
-				BObjectList<BString> typeNames(10, true);
+				BStringList types(10);
+				BStringList typeNames(10);
 				for (int32 index = 0; ; index++) {
 					const char* string;
 					if (message->FindString("be:filetypes", index, &string)
@@ -4527,12 +4515,12 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 					}
 
 					ASSERT(string != NULL);
-					types.AddItem(new BString(string));
+					types.Add(string);
 
 					const char* typeName = "";
 					message->FindString("be:type_descriptions", index,
 						&typeName);
-					typeNames.AddItem(new BString(typeName));
+					typeNames.Add(typeName);
 				}
 
 				int32 specificTypeIndex = -1;
@@ -4541,14 +4529,14 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 				// if control down, run a popup menu
 				if (canCopy
 					&& SecondaryMouseButtonDown(modifiers(), buttons)) {
-					if (actionSpecifiers.CountItems() > 0) {
+					if (actionSpecifiers.CountStrings() > 0) {
 						specificActionIndex = RunMimeTypeDestinationMenu(NULL,
 							NULL, &actionSpecifiers,
 							view->ConvertToScreen(dropPoint));
 
 						if (specificActionIndex == -1)
 							return false;
-					} else if (types.CountItems() > 0) {
+					} else if (types.CountStrings() > 0) {
 						specificTypeIndex = RunMimeTypeDestinationMenu(
 							B_TRANSLATE("Create %s clipping"),
 							&types, &typeNames,
@@ -4576,18 +4564,18 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 				if (specificTypeIndex != -1) {
 					// we had the user pick a specific type from a menu, use it
 					reply.AddString("be:filetypes",
-						types.ItemAt(specificTypeIndex)->String());
+						types.StringAt(specificTypeIndex).String());
 
-					if (typeNames.ItemAt(specificTypeIndex)->Length()) {
+					if (typeNames.StringAt(specificTypeIndex).Length()) {
 						reply.AddString("be:type_descriptions",
-							typeNames.ItemAt(specificTypeIndex)->String());
+							typeNames.StringAt(specificTypeIndex).String());
 					}
 				}
 
 				if (specificActionIndex != -1) {
 					// we had the user pick a specific type from a menu, use it
 					reply.AddString("be:actionspecifier",
-						actionSpecifiers.ItemAt(specificActionIndex)->String());
+						actionSpecifiers.StringAt(specificActionIndex).String());
 				}
 
 				reply.AddRef("directory", targetModel->EntryRef());

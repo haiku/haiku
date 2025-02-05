@@ -46,6 +46,7 @@ All rights reserved.
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
+#include <StringList.h>
 
 #include "icons.h"
 #include "BarApp.h"
@@ -1019,7 +1020,7 @@ TBarView::AppCanHandleTypes(const char* signature)
 	}
 
 	if (!signature || strlen(signature) == 0
-		|| !fCachedTypesList || fCachedTypesList->CountItems() == 0)
+		|| !fCachedTypesList || fCachedTypesList->CountStrings() == 0)
 		return false;
 
 	if (strcasecmp(signature, kTrackerSignature) == 0) {
@@ -1042,9 +1043,9 @@ TBarView::AppCanHandleTypes(const char* signature)
 	// supports anything in the list
 	// only one item needs to match in the list of refs
 
-	int32 count = fCachedTypesList->CountItems();
+	int32 count = fCachedTypesList->CountStrings();
 	for (int32 i = 0 ; i < count ; i++) {
-		if (fileinfo.IsSupportedType(fCachedTypesList->ItemAt(i)->String()))
+		if (fileinfo.IsSupportedType(fCachedTypesList->StringAt(i).String()))
 			return true;
 	}
 

@@ -124,7 +124,7 @@ private:
 		// Open With window
 
 	CachedEntryIteratorList* fIteratorList;
-	BObjectList<BString> fSignatures;
+	BStringList fSignatures;
 
 	entry_ref fPreferredRef;
 	int32 fPreferredAppCount;

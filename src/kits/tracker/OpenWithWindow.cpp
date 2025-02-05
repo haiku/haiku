@@ -184,20 +184,10 @@ OpenWithContainerWindow::OpenWithSelection()
 }
 
 
-static const BString*
-FindOne(const BString* element, void* castToString)
-{
-	if (strcasecmp(element->String(), (const char*)castToString) == 0)
-		return element;
-
-	return 0;
-}
-
-
 static const entry_ref*
 AddOneUniqueDocumentType(const entry_ref* ref, void* castToList)
 {
-	BObjectList<BString>* list = (BObjectList<BString>*)castToList;
+	BStringList* list = (BStringList*)castToList;
 
 	BEntry entry(ref, true);
 		// traverse symlinks
@@ -212,24 +202,24 @@ AddOneUniqueDocumentType(const entry_ref* ref, void* castToList)
 	if (info.GetType(type) != B_OK)
 		return 0;
 
-	if (list->EachElement(FindOne, &type))
+	if (list->HasString(type, true))
 		// type already in list, bail
 		return 0;
 
 	// add type to list
-	list->AddItem(new BString(type));
+	list->Add(type);
 
 	return 0;
 }
 
 
-static const BString*
-SetDefaultAppForOneType(const BString* element, void* castToEntryRef)
+static bool
+SetDefaultAppForOneType(const BString& element, void* castToEntryRef)
 {
 	const entry_ref* appRef = (const entry_ref*)castToEntryRef;
 
 	// set entry as default handler for one mime string
-	BMimeType mime(element->String());
+	BMimeType mime(element.String());
 	if (!mime.IsInstalled())
 		return 0;
 
@@ -279,12 +269,12 @@ OpenWithContainerWindow::MakeDefaultAndOpen()
 		return;
 
 	// collect all the types of all the opened documents into a list
-	BObjectList<BString> openedFileTypes(10, true);
+	BStringList openedFileTypes(10);
 	EachEntryRef(EntryList(), AddOneUniqueDocumentType, &openedFileTypes, 100);
 
 	// set the default application to be the selected pose for all the
 	// mime types in the list
-	openedFileTypes.EachElement(SetDefaultAppForOneType,
+	openedFileTypes.DoForEach(SetDefaultAppForOneType,
 		(void*)selectedAppPose->TargetModel()->EntryRef());
 
 	// done setting the default application, now launch the app with the
@@ -1371,7 +1361,7 @@ OpenWithMenu::ClearMenuBuildingState()
 SearchForSignatureEntryList::SearchForSignatureEntryList(bool canAddAllApps)
 	:
 	fIteratorList(NULL),
-	fSignatures(20, true),
+	fSignatures(20),
 	fPreferredAppCount(0),
 	fPreferredAppForFileCount(0),
 	fGenericFilesOnly(true),
@@ -1391,10 +1381,10 @@ void
 SearchForSignatureEntryList::PushUniqueSignature(const char* str)
 {
 	// do a unique add
-	if (fSignatures.EachElement(FindOne, (void*)str))
+	if (fSignatures.HasString(str, true))
 		return;
 
-	fSignatures.AddItem(new BString(str));
+	fSignatures.Add(str);
 }
 
 
@@ -1426,17 +1416,17 @@ struct AddOneTermParams {
 };
 
 
-static const BString*
-AddOnePredicateTerm(const BString* item, void* castToParams)
+static bool
+AddOnePredicateTerm(const BString& item, void* castToParams)
 {
 	AddOneTermParams* params = (AddOneTermParams*)castToParams;
 	if (!params->first)
 		(*params->result) << " || ";
-	(*params->result) << kAttrAppSignature << " = " << item->String();
+	(*params->result) << kAttrAppSignature << " = " << item.String();
 
 	params->first = false;
 
-	return 0;
+	return false;
 }
 
 
@@ -1446,7 +1436,7 @@ SearchForSignatureEntryList::Rewind()
 	if (fIteratorList)
 		return fIteratorList->Rewind();
 
-	if (!fSignatures.CountItems())
+	if (!fSignatures.CountStrings())
 		return ENOENT;
 
 	// build up the iterator
@@ -1462,7 +1452,7 @@ SearchForSignatureEntryList::Rewind()
 	params.result = &predicateString;
 	params.first = true;
 
-	fSignatures.EachElement(AddOnePredicateTerm, &params);
+	fSignatures.DoForEach(AddOnePredicateTerm, &params);
 
 	ASSERT(predicateString.Length());
 //	PRINT(("query predicate %s\n", predicateString.String()));

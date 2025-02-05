@@ -314,7 +314,7 @@ public:
 
 	void SetSelectionHandler(BLooper* looper);
 
-	BObjectList<BString>*MimeTypesInSelection();
+	BStringList* MimeTypesInSelection();
 
 	// pose selection
 	void SelectPose(BPose*, int32 index, bool scrollIntoView = true);
@@ -746,11 +746,11 @@ private:
 	PoseList* fVSPoseList;
 	PoseList* fSelectionList;
 	HashSet<node_ref_key> fInsertedNodes;
-	BObjectList<BString> fMimeTypesInSelectionCache;
+	BStringList fMimeTypesInSelectionCache;
 		// used for mime string based icon highliting during a drag
 	BObjectList<Model>* fZombieList;
 	BObjectList<BColumn>* fColumnList;
-	BObjectList<BString>* fMimeTypeList;
+	BStringList fMimeTypeList;
 	BObjectList<Model>* fBrokenLinks;
 	bool fMimeTypeListIsDirty;
 	BCountView* fCountView;
@@ -937,7 +937,7 @@ BPoseView::CountSelected() const
 	return fSelectionList->CountItems();
 }
 
-inline BObjectList<BString>*
+inline BStringList*
 BPoseView::MimeTypesInSelection()
 {
 	return &fMimeTypesInSelectionCache;

@@ -75,9 +75,9 @@ struct TrackingHookData {
 class BNavMenu : public BSlowMenu {
 public:
 	BNavMenu(const char* title, uint32 message, const BHandler*,
-		BWindow* parentWindow = NULL, const BObjectList<BString>* list = NULL);
+		BWindow* parentWindow = NULL, const BStringList* list = NULL);
 	BNavMenu(const char* title, uint32 message, const BMessenger&,
-		BWindow* parentWindow = NULL, const BObjectList<BString>* list = NULL);
+		BWindow* parentWindow = NULL, const BStringList* list = NULL);
 		// parentWindow, if specified, will be closed if nav menu item invoked
 		// with option held down
 
@@ -95,8 +95,8 @@ public:
 	void SetTarget(const BMessenger&);
 	BMessenger Target();
 
-	void SetTypesList(const BObjectList<BString>* list);
-	const BObjectList<BString>* TypesList() const;
+	void SetTypesList(const BStringList* list);
+	const BStringList* TypesList() const;
 
 	void AddNavDir(const Model* model, uint32 what, BHandler* target,
 		bool populateSubmenu);
@@ -113,7 +113,7 @@ public:
 
 	static ModelMenuItem* NewModelItem(Model*, const BMessage*,
 		const BMessenger&, bool suppressFolderHierarchy = false,
-		BContainerWindow* = NULL, const BObjectList<BString>* typeslist = NULL,
+		BContainerWindow* = NULL, const BStringList* typeslist = NULL,
 		TrackingHookData* hook = NULL);
 
 	TrackingHookData* InitTrackingHook(bool (*hookfunction)(BMenu*, void*),
@@ -143,7 +143,7 @@ protected:
 	EntryListBase* fContainer;
 	bool fIteratingDesktop;
 
-	BObjectList<BString>* fTypesList;
+	BStringList* fTypesList;
 
 	TrackingHookData fTrackingHook;
 };
@@ -180,11 +180,11 @@ private:
 _IMPEXP_TRACKER bool SpringLoadedFolderCompareMessages(const BMessage *incoming,
 	const BMessage *dragmessage);
 _IMPEXP_TRACKER void SpringLoadedFolderSetMenuStates(const BMenu *menu,
-	const BObjectList<BString> *typeslist);
+	const BStringList *typeslist);
 _IMPEXP_TRACKER void SpringLoadedFolderAddUniqueTypeToList(entry_ref *ref,
-	BObjectList<BString> *typeslist);
+	BStringList *typeslist);
 _IMPEXP_TRACKER void SpringLoadedFolderCacheDragData(const BMessage *incoming,
-	BMessage **, BObjectList<BString> **typeslist);
+	BMessage **, BStringList **typeslist);
 
 } // namespace BPrivate
 
