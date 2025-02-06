@@ -130,7 +130,7 @@ inline bool
 PoseList::RemoveItem(BPose* p, bool deleteIfOwning)
 {
 	bool removed = _inherited::RemoveItem(p);
-	if (removed && deleteIfOwning)
+	if (removed && fOwning && deleteIfOwning)
 		delete p;
 	return removed;
 }
