@@ -10,12 +10,14 @@
 */
 
 
-#include "acpi.h"
-#include "mmu.h"
-
 #include <string.h>
 
 #include <KernelExport.h>
+
+#include <boot/stage2.h>
+
+#include "acpi.h"
+#include "mmu.h"
 
 
 //#define TRACE_ACPI
@@ -241,7 +243,9 @@ acpi_init()
 			}
 		}
 
-		if (rsdp != NULL && acpi_check_rsdt(rsdp) == B_OK)
+		if (rsdp != NULL && acpi_check_rsdt(rsdp) == B_OK) {
+			gKernelArgs.arch_args.acpi_root = rsdp;
 			break;
+		}
 	}
 }

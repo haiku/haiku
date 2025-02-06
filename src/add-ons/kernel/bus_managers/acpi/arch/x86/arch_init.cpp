@@ -22,18 +22,6 @@ extern "C" {
 #define APIC_MODE 1
 
 
-ACPI_PHYSICAL_ADDRESS
-arch_init_find_root_pointer()
-{
-	ACPI_PHYSICAL_ADDRESS address;
-	ACPI_STATUS status = AcpiFindRootPointer(&address);
-	if (status == AE_OK)
-		return address;
-
-	return 0;
-}
-
-
 void
 arch_init_interrupt_controller()
 {

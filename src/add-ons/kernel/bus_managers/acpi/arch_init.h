@@ -8,13 +8,6 @@
 #define ARCH_INIT_H
 
 
-/** Find the ACPI root pointer using arch or platform-specific code.
- *
- * For example on x86, search for it in the BIOS.
- */
-ACPI_PHYSICAL_ADDRESS arch_init_find_root_pointer();
-
-
 /** Initialize platform specific interrupt controller configuration.
  *
  * For example on x86, enable PIC or APIC depending on boot options.

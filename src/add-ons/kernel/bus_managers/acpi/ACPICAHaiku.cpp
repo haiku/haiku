@@ -240,9 +240,6 @@ AcpiOsGetRootPointer()
 		phys_addr_t* acpiRootPointer = (phys_addr_t*)get_boot_item("ACPI_ROOT_POINTER", NULL);
 		if (acpiRootPointer != NULL)
 			sACPIRoot = *acpiRootPointer;
-
-		if (sACPIRoot == 0)
-			sACPIRoot = arch_init_find_root_pointer();
 	}
 	return sACPIRoot;
 #else
