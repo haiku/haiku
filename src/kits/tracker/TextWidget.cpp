@@ -441,6 +441,10 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	if (!IsEditable() || IsActive())
 		return;
 
+	// do not start edit while dragging
+	if (view->IsDragging())
+		return;
+
 	view->SetActiveTextWidget(this);
 
 	BRect rect(bounds);
