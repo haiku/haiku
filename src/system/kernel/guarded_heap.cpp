@@ -998,6 +998,9 @@ realloc(void* address, size_t newSize)
 }
 
 
+#endif	// USE_GUARDED_HEAP_FOR_MALLOC
+
+
 #if USE_GUARDED_HEAP_FOR_OBJECT_CACHE
 
 
@@ -1011,8 +1014,7 @@ request_memory_manager_maintenance()
 
 
 object_cache*
-create_object_cache(const char*, size_t objectSize, size_t, void*,
-	object_cache_constructor, object_cache_destructor)
+create_object_cache(const char*, size_t objectSize, uint32)
 {
 	return (object_cache*)objectSize;
 }
@@ -1093,6 +1095,3 @@ slab_init_post_thread()
 
 
 #endif	// USE_GUARDED_HEAP_FOR_OBJECT_CACHE
-
-
-#endif	// USE_GUARDED_HEAP_FOR_MALLOC
