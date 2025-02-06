@@ -3015,11 +3015,13 @@ empty_trash(void*)
 		entry_ref ref;
 		entry.GetRef(&ref);
 		srcList.AddItem(&ref);
+
 		status = CalcItemsAndSize(&loopControl, &srcList, volume.BlockSize(),
 			&totalCount, &totalSize);
 		if (status != B_OK)
 			break;
 
+		srcList.RemoveItemAt(0);
 		srcList.MakeEmpty();
 
 		// don't count trash directory itself
