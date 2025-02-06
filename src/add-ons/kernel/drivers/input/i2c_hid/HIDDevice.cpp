@@ -11,6 +11,7 @@
 #include "Driver.h"
 #include "HIDDevice.h"
 #include "HIDReport.h"
+#include "HIDReportItem.h"
 #include "HIDWriter.h"
 #include "ProtocolHandler.h"
 
@@ -21,6 +22,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <new>
+
+
+// As specified in https://learn.microsoft.com/en-us/windows-hardware/design/component-guidelines/touchscreen-required-hid-top-level-collections
+#define HID_USAGE_MICROSOFT_THQA_CERTIFICATE 0xC5
 
 
 HIDDevice::HIDDevice(uint16 descriptorAddress, i2c_device_interface* i2c,
@@ -39,6 +44,8 @@ HIDDevice::HIDDevice(uint16 descriptorAddress, i2c_device_interface* i2c,
 		fI2C(i2c),
 		fI2CCookie(i2cCookie)
 {
+	_Reset();
+
 	// fetch HID descriptor
 	fStatus = _FetchBuffer((uint8*)&fDescriptorAddress,
 		sizeof(fDescriptorAddress), &fDescriptor, sizeof(fDescriptor));
@@ -91,6 +98,7 @@ HIDDevice::HIDDevice(uint16 descriptorAddress, i2c_device_interface* i2c,
 		return;
 	}
 
+// enable for debugging hid reports
 #if 0
 	for (uint32 i = 0; i < fParser.CountReports(HID_REPORT_TYPE_ANY); i++)
 		fParser.ReportAt(HID_REPORT_TYPE_ANY, i)->PrintToStream();
@@ -106,11 +114,74 @@ HIDDevice::HIDDevice(uint16 descriptorAddress, i2c_device_interface* i2c,
 	// (as done in HIDReportItem) without the need for an additional boundary
 	// check. We don't increase the transfer buffer size though as to not expose
 	// this implementation detail onto the device when scheduling transfers.
-	fTransferBuffer = (uint8 *)malloc(fTransferBufferSize + 3);
+	fTransferBuffer = (uint8 *)malloc(fDescriptor.wMaxInputLength + 3);
 	if (fTransferBuffer == NULL) {
 		TRACE_ALWAYS("failed to allocate transfer buffer\n");
 		fStatus = B_NO_MEMORY;
 		return;
+	}
+
+	for (uint32 i = 0; i < fParser.CountReports(HID_REPORT_TYPE_FEATURE); i++) {
+		HIDReport *report = fParser.ReportAt(HID_REPORT_TYPE_FEATURE, i);
+
+		// try to toggle trackpad into a mouse emulated mode
+		// we may remove this once we are capable to handle multitouch events
+		// some trackpads ignore this feature, however
+		HIDReportItem *deviceMode = report->FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+			B_HID_UID_DIG_DEVICE_MODE);
+
+		if (deviceMode) {
+			status_t result = MaybeScheduleTransfer(report);
+
+			if (result != B_OK)
+				continue;
+			TRACE_ALWAYS("Found a trackpad mode configuration\n");
+
+			if (deviceMode->Extract() == B_OK) {
+				uint32 value = deviceMode->Data();
+				TRACE_ALWAYS("Current device mode:%d\n", value);
+				report->DoneProcessing();
+				deviceMode->SetData(0);
+				result = report->SendReport();
+
+				if (result != B_OK)
+					TRACE_ALWAYS("Failed to set trackpad mode\n");
+			}
+		}
+
+		// we do nothing with this value other than debugging
+		// perhaps we can get rid of this in a future patch
+		HIDReportItem *latencyMode = report->FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+			B_HID_UID_DIG_LATENCY_MODE);
+
+		if (latencyMode) {
+			status_t result = MaybeScheduleTransfer(report);
+			if (result != B_OK)
+				continue;
+
+			if (latencyMode->Extract() == B_OK) {
+				uint32 value = latencyMode->Data();
+				TRACE_ALWAYS("Current latency mode:%d\n", value);
+				report->DoneProcessing();
+			}
+		}
+
+		// Some trackpads expects this blob to be fetched before running
+		// https://learn.microsoft.com/en-us/windows-hardware/design/component-guidelines/touchpad-windows-precision-touchpad-collection#device-certification-status-feature-report
+		// https://patchwork.kernel.org/project/linux-input/patch/1457344958-9987-1-git-send-email-benjamin.tissoires@redhat.com/
+		HIDReportItem *win8Blob = report->FindItem(B_HID_USAGE_PAGE_MICROSOFT,
+			HID_USAGE_MICROSOFT_THQA_CERTIFICATE);
+
+		if (win8Blob != NULL) {
+
+			status_t result = MaybeScheduleTransfer(report);
+
+			if (result != B_OK)
+				continue;
+
+			report->DoneProcessing();
+			TRACE_ALWAYS("Fetched a Win8 trackpad blob\n");
+		}
 	}
 
 	ProtocolHandler::AddHandlers(*this, fProtocolHandlerList,
@@ -136,7 +207,15 @@ status_t
 HIDDevice::Open(ProtocolHandler *handler, uint32 flags)
 {
 	atomic_add(&fOpenCount, 1);
+
+#if 0
+	// Supposedly the host should reset the device when connecting
+	// to it, but it seems Open() is already too late for that
+	// (we already fetched the feature report). For now, keep
+	// the device as it was initialized by the BIOS until we
+	// decide of a proper place to do this reset.
 	_Reset();
+#endif
 
 	return B_OK;
 }
@@ -170,20 +249,51 @@ HIDDevice::MaybeScheduleTransfer(HIDReport *report)
 		return B_OK;
 	}
 
-	snooze_until(fTransferLastschedule, B_SYSTEM_TIMEBASE);
-	fTransferLastschedule = system_time() + 10000;
+	status_t status = _FetchBuffer((uint8*)&fDescriptor.wInputRegister,
+		sizeof(fDescriptor.wInputRegister), fTransferBuffer, fDescriptor.wMaxInputLength);
+	if (status != B_OK) {
+		atomic_set(&fTransferScheduled, 0);
+		ERROR("failed to fetch HID report\n");
+		return status;
+	}
 
-	TRACE("scheduling interrupt transfer of %lu bytes\n",
-		report->ReportSize());
-	return _FetchReport(report->Type(), report->ID(), report->ReportSize());
+	uint16 actualLength = fTransferBuffer[0] | (fTransferBuffer[1] << 8);
+
+	if (actualLength <= 2 || actualLength == 0xffff)
+		actualLength = 0;
+	else
+		actualLength -= 2;
+
+	atomic_set(&fTransferScheduled, 0);
+
+	fParser.SetReport(status,
+		(uint8*)((addr_t)fTransferBuffer + 2), actualLength);
+
+	return B_OK;
+
 }
 
 
 status_t
 HIDDevice::SendReport(HIDReport *report)
 {
-	// TODO
-	return B_OK;
+	uint8 reportType = 0;
+
+	switch (report->Type()) {
+		case HID_REPORT_TYPE_INPUT:
+			reportType = 1;
+			break;
+
+		case HID_REPORT_TYPE_OUTPUT:
+			reportType = 2;
+			break;
+
+		case HID_REPORT_TYPE_FEATURE:
+			reportType = 3;
+			break;
+	}
+
+	return _WriteReport(reportType, report->ID(), report->CurrentReport(), report->ReportSize());
 }
 
 
@@ -202,7 +312,9 @@ HIDDevice::ProtocolHandlerAt(uint32 index) const
 	return NULL;
 }
 
-
+// current implementation polls input buffer, maybe in the future
+// we can move to something more asynchronous as we already do in usb hid
+#if 0
 void
 HIDDevice::_UnstallCallback(void *cookie, status_t status, void *data,
 	size_t actualLength)
@@ -226,6 +338,7 @@ HIDDevice::_TransferCallback(void *cookie, status_t status, void *data,
 	atomic_set(&device->fTransferScheduled, 0);
 	device->fParser.SetReport(status, device->fTransferBuffer, actualLength);
 }
+#endif
 
 
 status_t
@@ -236,7 +349,7 @@ HIDDevice::_Reset()
 	if (status != B_OK)
 		return status;
 
-	snooze(1000);
+	snooze(10000);
 
 	uint8 cmd[] = {
 		(uint8)(fDescriptor.wCommandRegister & 0xff),
@@ -251,7 +364,7 @@ HIDDevice::_Reset()
 		return status;
 	}
 
-	snooze(1000);
+	snooze(10000);
 	return B_OK;
 }
 
@@ -268,6 +381,45 @@ HIDDevice::_SetPower(uint8 power)
 	};
 
 	return _ExecCommand(I2C_OP_WRITE_STOP, cmd, sizeof(cmd), NULL, 0);
+}
+
+
+status_t
+HIDDevice::_WriteReport(uint8 type, uint8 id, void *data, size_t reportSize)
+{
+	uint8 reportId = id > 15 ? 15 : id;
+	size_t cmdLength = 6;
+	uint8 cmd[] = {
+		(uint8)(fDescriptor.wCommandRegister & 0xff),
+		(uint8)(fDescriptor.wCommandRegister >> 8),
+		(uint8)(reportId | (type << 4)),
+		I2C_HID_CMD_SET_REPORT,
+		0, 0, 0,
+	};
+
+	int dataOffset = 4;
+	int reportIdLength = 1;
+	if (reportId == 15) {
+		cmd[dataOffset++] = id;
+		cmdLength++;
+		reportIdLength++;
+	}
+
+	cmd[dataOffset++] = fDescriptor.wDataRegister & 0xff;
+	cmd[dataOffset++] = fDescriptor.wDataRegister >> 8;
+
+	size_t bufferLength = reportSize + 1 + 2;
+
+	fTransferBuffer[0] = bufferLength & 0x00ff;
+	fTransferBuffer[1] = (bufferLength & 0xff00) >> 8;
+	fTransferBuffer[2] = id;
+
+	memcpy(fTransferBuffer + 3, data, reportSize);
+
+	status_t status = _ExecCommand(I2C_OP_WRITE_STOP, cmd, cmdLength,
+		fTransferBuffer, bufferLength);
+
+	return status;
 }
 
 
@@ -312,6 +464,7 @@ HIDDevice::_FetchReport(uint8 type, uint8 id, size_t reportSize)
 		actualLength -= 2;
 
 	atomic_set(&fTransferScheduled, 0);
+
 	fParser.SetReport(status,
 		(uint8*)((addr_t)fTransferBuffer + 2), actualLength);
 	return B_OK;
@@ -334,8 +487,7 @@ HIDDevice::_ExecCommand(i2c_op op, uint8* cmd, size_t cmdLength, void* buffer,
 	status_t status = fI2C->acquire_bus(fI2CCookie);
 	if (status != B_OK)
 		return status;
-	status = fI2C->exec_command(fI2CCookie, I2C_OP_READ_STOP, cmd, cmdLength,
-		buffer, bufferLength);
+	status = fI2C->exec_command(fI2CCookie, op, cmd, cmdLength, buffer, bufferLength);
 	fI2C->release_bus(fI2CCookie);
 	return status;
 }
