@@ -24,7 +24,6 @@ resource file_types message {
 	"types" = "application/xhtml+xml",
 	"types" = "application/x-vnd.Be.URL.file",
 	"types" = "application/x-vnd.Be.URL.ftp",
-	"types" = "application/x-vnd.Be.URL.gopher",
 	"types" = "application/x-vnd.Be.URL.http",
 	"types" = "application/x-vnd.Be.URL.https"
 };
