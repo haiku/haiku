@@ -623,14 +623,18 @@ BMenuField::MenuItem() const
 void
 BMenuField::SetLabel(const char* label)
 {
-	if (fLabel) {
-		if (label && strcmp(fLabel, label) == 0)
-			return;
-
-		free(fLabel);
+	if ((fLabel != NULL && label != NULL && strcmp(fLabel, label) == 0)
+		|| (fLabel == NULL && label == NULL)) {
+		// labels are the same, do not set label
+		return;
 	}
 
-	fLabel = strdup(label);
+	if (fLabel != NULL) {
+		free(fLabel);
+		fLabel = NULL;
+	}
+	if (label != NULL)
+		fLabel = strdup(label);
 
 	if (Window())
 		Invalidate();
