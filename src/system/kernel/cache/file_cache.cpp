@@ -750,20 +750,32 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	// satisfied request part
 
 	const uint32 kMaxChunkSize = MAX_IO_VECS * B_PAGE_SIZE;
-	size_t bytesLeft = size, lastLeft = size;
-	int32 lastPageOffset = pageOffset;
-	addr_t lastBuffer = buffer;
-	off_t lastOffset = offset;
-	size_t lastReservedPages = min_c(MAX_IO_VECS, (pageOffset + bytesLeft
-		+ B_PAGE_SIZE - 1) >> PAGE_SHIFT);
-	size_t reservePages = 0;
-	size_t pagesProcessed = 0;
-	cache_func function = NULL;
 
+	size_t lastReservedPages = min_c(MAX_IO_VECS, (pageOffset + size
+		+ B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 	vm_page_reservation reservation;
 	reserve_pages(ref, &reservation, lastReservedPages, doWrite);
 
 	AutoLocker<VMCache> locker(cache);
+
+	// Now that we have the lock, make sure the situation didn't change.
+	if ((pageOffset + offset) >= cache->virtual_end) {
+		locker.Unlock();
+		vm_page_unreserve_pages(&reservation);
+
+		*_size = 0;
+		return B_OK;
+	}
+	if ((off_t)(pageOffset + offset + size) > cache->virtual_end)
+		size = cache->virtual_end - (pageOffset + offset);
+
+	size_t bytesLeft = size, lastLeft = size;
+	int32 lastPageOffset = pageOffset;
+	addr_t lastBuffer = buffer;
+	off_t lastOffset = offset;
+	size_t reservePages = 0;
+	size_t pagesProcessed = 0;
+	cache_func function = NULL;
 
 	while (bytesLeft > 0) {
 		// Periodically reevaluate the low memory situation and select the
