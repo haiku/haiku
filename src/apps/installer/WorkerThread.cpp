@@ -101,6 +101,12 @@ public:
 			fIgnorePaths.insert("system/var/shared_memory");
 			fIgnorePaths.insert("system/var/log/syslog");
 			fIgnorePaths.insert("system/var/log/syslog.old");
+			fIgnorePaths.insert("system/settings/ssh/ssh_host_ecdsa_key");
+			fIgnorePaths.insert("system/settings/ssh/ssh_host_ecdsa_key.pub");
+			fIgnorePaths.insert("system/settings/ssh/ssh_host_ed25519_key");
+			fIgnorePaths.insert("system/settings/ssh/ssh_host_ed25519_key.pub");
+			fIgnorePaths.insert("system/settings/ssh/ssh_host_rsa_key");
+			fIgnorePaths.insert("system/settings/ssh/ssh_host_rsa_key.pub");
 
 			fPackageFSRootPaths.insert("system");
 			fPackageFSRootPaths.insert("home/config");
