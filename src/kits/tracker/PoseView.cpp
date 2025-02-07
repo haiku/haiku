@@ -9499,7 +9499,7 @@ BPoseView::SortPoses()
 	std::stable_sort(poses, &poses[fPoseList->CountItems()],
 		PoseComparator(this));
 	if (IsFiltering()) {
-		poses = reinterpret_cast<BPose**>(fPoseList->AsBList()->Items());
+		poses = reinterpret_cast<BPose**>(fFilteredPoseList->AsBList()->Items());
 		std::stable_sort(poses, &poses[fFilteredPoseList->CountItems()], PoseComparator(this));
 	}
 }
