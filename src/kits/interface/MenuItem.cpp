@@ -275,11 +275,13 @@ BMenuItem::SetShortcut(char shortcut, uint32 modifiers)
 	if (fShortcutChar != 0 && fWindow != NULL)
 		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
 
-	fShortcutChar = shortcut;
-	fModifiers = (fShortcutChar != 0 ? modifiers : 0);
+	uint32 key = (uint32)fShortcutChar;
 
 	if (fShortcutChar != 0 && fWindow != NULL)
-		fWindow->_AddShortcut(fShortcutChar, fModifiers, this);
+		fWindow->_AddShortcut(&key, &modifiers, this);
+
+	fShortcutChar = (char)key;
+	fModifiers = (fShortcutChar != 0 ? modifiers : 0);
 
 	if (fSuper != NULL) {
 		fSuper->InvalidateLayout();
@@ -566,8 +568,14 @@ BMenuItem::Install(BWindow* window)
 
 	fWindow = window;
 
+	uint32 key = (uint32)fShortcutChar;
+	uint32 modifiers = fModifiers;
+
 	if (fShortcutChar != 0 && fWindow != NULL)
-		fWindow->_AddShortcut(fShortcutChar, fModifiers, this);
+		fWindow->_AddShortcut(&key, &modifiers, this);
+
+	fShortcutChar = (char)key;
+	fModifiers = (fShortcutChar != 0 ? modifiers : 0);
 
 	if (!Messenger().IsValid())
 		SetTarget(fWindow);

@@ -99,6 +99,8 @@ public:
 
 			bool			Matches(uint32 key, uint32 modifiers) const;
 
+			uint32			Key() const { return fKey; };
+			uint32			Modifiers() const { return fModifiers; };
 			BMenuItem*		MenuItem() const { return fMenuItem; }
 			BMessage*		Message() const { return fMessage; }
 			BHandler*		Target() const { return fTarget; }
@@ -1684,14 +1686,18 @@ BWindow::PulseRate() const
 
 //! \brief Used by BMenuItem to add its shortcut to the window.
 void
-BWindow::_AddShortcut(uint32 key, uint32 modifiers, BMenuItem* item)
+BWindow::_AddShortcut(uint32* _key, uint32* _modifiers, BMenuItem* item)
 {
-	Shortcut* shortcut = new(std::nothrow) Shortcut(key, modifiers, item);
+	Shortcut* shortcut = new(std::nothrow) Shortcut(*_key, *_modifiers, item);
 	if (shortcut == NULL)
 		return;
 
 	// removes the shortcut if it already exists!
-	RemoveShortcut(key, modifiers);
+	RemoveShortcut(shortcut->Key(), shortcut->Modifiers());
+
+	// pass the prepared key and modifiers back to caller
+	*_key = shortcut->Key();
+	*_modifiers = shortcut->Modifiers();
 
 	fShortcuts.AddItem(shortcut);
 }
@@ -1715,7 +1721,7 @@ BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage* message, BHandler* 
 		return;
 
 	// removes the shortcut if it already exists!
-	RemoveShortcut(key, modifiers);
+	RemoveShortcut(shortcut->Key(), shortcut->Modifiers());
 
 	fShortcuts.AddItem(shortcut);
 }
