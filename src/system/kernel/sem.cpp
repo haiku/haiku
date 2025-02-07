@@ -468,6 +468,8 @@ haiku_sem_init(kernel_args *args)
 sem_id
 create_sem_etc(int32 count, const char* name, team_id owner)
 {
+	if (count < 0)
+		return B_BAD_VALUE;
 	if (!sSemsActive || sUsedSems == sMaxSems)
 		return B_NO_MORE_SEMS;
 
