@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <KernelExport.h>
 #include <fs_cache.h>
 
@@ -755,14 +756,14 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 		+ B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 	vm_page_reservation reservation;
 	reserve_pages(ref, &reservation, lastReservedPages, doWrite);
+	CObjectDeleter<vm_page_reservation, void, vm_page_unreserve_pages>
+		pagesUnreserver(&reservation);
 
 	AutoLocker<VMCache> locker(cache);
 
 	// Now that we have the lock, make sure the situation didn't change.
 	if ((pageOffset + offset) >= cache->virtual_end) {
 		locker.Unlock();
-		vm_page_unreserve_pages(&reservation);
-
 		*_size = 0;
 		return B_OK;
 	}
@@ -874,7 +875,6 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			if (bytesLeft <= bytesInPage) {
 				// we've read the last page, so we're done!
 				locker.Unlock();
-				vm_page_unreserve_pages(&reservation);
 				return B_OK;
 			}
 
