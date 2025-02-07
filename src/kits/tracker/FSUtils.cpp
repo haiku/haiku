@@ -3022,6 +3022,7 @@ empty_trash(void*)
 			break;
 
 		srcList.RemoveItemAt(0);
+			// so that the list doesn't try to free the entry we added above
 		srcList.MakeEmpty();
 
 		// don't count trash directory itself
