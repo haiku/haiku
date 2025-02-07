@@ -2967,22 +2967,8 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	} while (restart);
 
 	// unreserve pages later
-	struct PagesUnreserver {
-		PagesUnreserver(vm_page_reservation* reservation)
-			:
-			fReservation(reservation)
-		{
-		}
-
-		~PagesUnreserver()
-		{
-			if (fReservation != NULL)
-				vm_page_unreserve_pages(fReservation);
-		}
-
-	private:
-		vm_page_reservation*	fReservation;
-	} pagesUnreserver(wiredPages > 0 ? &wiredPagesReservation : NULL);
+	CObjectDeleter<vm_page_reservation, void, vm_page_unreserve_pages>
+		pagesUnreserver(wiredPages > 0 ? &wiredPagesReservation : NULL);
 
 	bool writableCopy
 		= (source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0;
