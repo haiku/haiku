@@ -275,9 +275,9 @@ BMenuItem::SetShortcut(char shortcut, uint32 modifiers)
 	if (fShortcutChar != 0 && fWindow != NULL)
 		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
 
-	uint32 key = (uint32)fShortcutChar;
+	uint32 key = (uint32)shortcut;
 
-	if (fShortcutChar != 0 && fWindow != NULL)
+	if (key != 0 && fWindow != NULL)
 		fWindow->_AddShortcut(&key, &modifiers, this);
 
 	fShortcutChar = (char)key;
