@@ -1,20 +1,22 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2025, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (burton666@libero.it)
+ *		John Scipione (jscipione@gmail.com)
  */
 
+
+#include <PopUpMenu.h>
+
+#include <new>
 
 #include <Application.h>
 #include <Looper.h>
 #include <MenuItem.h>
-#include <PopUpMenu.h>
 #include <Window.h>
-
-#include <new>
 
 #include <binary_compatibility/Interface.h>
 
@@ -345,8 +347,7 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 	}
 
 	// Get a pointer to the window from which Go() was called
-	BWindow* window
-		= dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
+	BWindow* window = dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
 	data->window = window;
 
 	// Asynchronous menu: we set the BWindow menu's semaphore
@@ -366,8 +367,7 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 	data->lock = sem;
 
 	// Spawn the tracking thread
-	fTrackThread = spawn_thread(_thread_entry, "popup", B_DISPLAY_PRIORITY,
-		data);
+	fTrackThread = spawn_thread(_thread_entry, "popup", B_DISPLAY_PRIORITY, data);
 	if (fTrackThread < B_OK) {
 		// Something went wrong. Cleanup and return NULL
 		delete_sem(sem);
