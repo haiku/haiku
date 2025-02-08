@@ -5011,12 +5011,15 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	}
 
 	// make sure source and destination folders are different
-	if (!createLink && !createRelativeLink
-		&& (*srcWindow->PoseView()->TargetModel()->NodeRef()
-			== *destFolder->NodeRef())) {
+	if (*srcWindow->PoseView()->TargetModel()->NodeRef() == *destFolder->NodeRef()) {
 		BPoseView* targetView = srcWindow->PoseView();
 		if (forceCopy) {
 			targetView->DuplicateSelection(&where, &loc);
+			return;
+		}
+
+		if (createLink || createRelativeLink) {
+			// cannot create link or relative link in the same folder
 			return;
 		}
 
