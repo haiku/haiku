@@ -33,6 +33,7 @@ extern const char *kPartitionTypeEXFAT;
 extern const char *kPartitionTypeEXT2;
 extern const char *kPartitionTypeEXT3;
 extern const char *kPartitionTypeFAT12;
+extern const char *kPartitionTypeFAT16;
 extern const char *kPartitionTypeFAT32;
 extern const char *kPartitionTypeHFS;
 extern const char *kPartitionTypeHFSPlus;

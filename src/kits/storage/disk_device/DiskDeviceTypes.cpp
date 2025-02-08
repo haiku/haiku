@@ -40,6 +40,7 @@ const char* kPartitionTypeEXFAT			= EXFAT_FS_NAME;
 const char* kPartitionTypeEXT2			= EXT2_FS_NAME;
 const char* kPartitionTypeEXT3			= EXT3_FS_NAME;
 const char* kPartitionTypeFAT12			= FAT12_FS_NAME;
+const char* kPartitionTypeFAT16			= FAT16_FS_NAME;
 const char* kPartitionTypeFAT32			= FAT32_FS_NAME;
 const char* kPartitionTypeHFS			= HFS_NAME;
 const char* kPartitionTypeHFSPlus		= HFS_PLUS_NAME;

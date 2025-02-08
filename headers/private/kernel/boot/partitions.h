@@ -68,6 +68,7 @@ class Partition : public Node, public partition_data {
 #define kPartitionTypeEXT2		"EXT2 Filesystem"
 #define kPartitionTypeEXT3		"EXT3 Filesystem"
 #define kPartitionTypeFAT12		"FAT12 Filesystem"
+#define kPartitionTypeFAT16		"FAT16 Filesystem"
 #define kPartitionTypeFAT32		"FAT32 Filesystem"
 #define kPartitionTypeHFS		"HFS Filesystem"
 #define kPartitionTypeHFSPlus	"HFS+ Filesystem"

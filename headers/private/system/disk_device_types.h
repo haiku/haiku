@@ -37,6 +37,7 @@
 #define EXT2_FS_NAME					"EXT2 File System"
 #define EXT3_FS_NAME					"EXT3 File System"
 #define FAT12_FS_NAME					"FAT12 File System"
+#define FAT16_FS_NAME					"FAT16 File System"
 #define FAT32_FS_NAME					"FAT32 File System"
 #define HFS_NAME						"HFS File System"
 #define HFS_PLUS_NAME					"HFS+ File System"
