@@ -1,8 +1,7 @@
-1	english (united kingdom)	x-vnd.Haiku-MediaPlayer	765283508
+1	english (united kingdom)	x-vnd.Haiku-MediaPlayer	2106645121
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Remove Entry to Rubbish Bin
 OK	MediaPlayer-RemovePLItemsCmd		Alright
 OK	MediaPlayer-Main		Alright
-Move file to Trash	MediaPlayer-PlaylistWindow		Move file to the Rubbish Bin
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Randomise Entries
 OK	MediaPlayer-SettingsWindow		Alright
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Not all of the files could be moved into the Rubbish Bin.

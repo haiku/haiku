@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-StyledEdit	3760185556
+1	turkish	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Belge istatistikleri
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Geri alınamıyor, dosya bulunamadı: “%s”.
 Cut	Menus		Kes
@@ -34,6 +34,7 @@ Bold	Menus		Kalın
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		“%file%” başka bir uygulama tarafından değiştirilmiş, yeniden yüklensin mi?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		“%file%” başka bir uygulama tarafından kaldırılmış, kurtarılsın mı?
 Lines:	Statistics		Satır:
+Strikeout	Menus		Üzeri çizili
 Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		“%s” içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yok saymak istediğinizden emin misiniz?
 Save	SaveAlert		Kaydet

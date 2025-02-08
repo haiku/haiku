@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	3510322677
+1	turkish	x-vnd.Haiku-libtracker	1571104846
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -276,6 +276,7 @@ Restoring: 	StatusWindow		Eski haline getiriliyor:
 The Tracker must be running to set the default printer.	PoseView		Saptanmış yazıcıyı ayarlamak için İzleyici çalışıyor olmalıdır.
 calculating…	InfoWindow		hesaplanıyor…
 Preferred for file	OpenWithWindow		Dosya için tercih edilen
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# seçili} other{# seçili}}
 OK	AutoMounterSettings		Tamam
 copying	FSUtils		kopyalanıyor
 MIME String	AttributesView		MIME dizisi

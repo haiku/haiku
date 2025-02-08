@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	100393349
+1	indonesian	x-vnd.Haiku-MediaPlayer	1441754962
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Hapus Entri ke Sampah
 Close	MediaPlayer-PlaylistWindow		Tutup
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dari klip latar
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Lanjut:
 Duration	MediaPlayer-InfoWin		Durasi
 Import Entries	MediaPlayer-ImportPLItemsCmd		Impor Entri
 Open network stream	MediaPlayer-Main		Buka aliran-data jaringan
-Move file to Trash	MediaPlayer-PlaylistWindow		Pindahkan berkas ke Sampah
 Open file…	MediaPlayer-Main		Buka berkas…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skalakan kontrol dalam mode layar penuh
 View options	MediaPlayer-SettingsWindow		Opsi tampilan

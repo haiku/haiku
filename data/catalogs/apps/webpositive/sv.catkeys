@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	371749163
+1	swedish	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 Copy	Console Window		Kopiera
@@ -153,6 +153,7 @@ Window	WebPositive Window		Fönster
 Proxy server address:	Settings Window		Proxyserveradress:
 Search page:	Settings Window		Söksida:
 Settings	WebPositive Window		Inställningar
+Show in Tracker	BookmarkBar		Visa i Tracker
 Clear	URL Bar		Rensa
 Loading %url	WebPositive Window		Laddar %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Yxmördaren Julia Blomqvist på fäktning i Schweiz.

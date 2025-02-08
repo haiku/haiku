@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	390961765
+1	english	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		移除条目到垃圾桶
 Close	MediaPlayer-PlaylistWindow		关闭
 Volume of background clips	MediaPlayer-SettingsWindow		背景剪辑音量
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		恢复:
 Duration	MediaPlayer-InfoWin		时长
 Import Entries	MediaPlayer-ImportPLItemsCmd		导入条目
 Open network stream	MediaPlayer-Main		打开网络流
-Move file to Trash	MediaPlayer-PlaylistWindow		移动文件到垃圾桶
 Open file…	MediaPlayer-Main		打开文件…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		全屏模式拉伸控件
 View options	MediaPlayer-SettingsWindow		视图选项

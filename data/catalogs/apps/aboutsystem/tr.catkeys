@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-About	2654448748
+1	turkish	x-vnd.Haiku-About	506608794
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999–2007 Michael C. Ring. Tüm hakları saklıdır.
 \n\nSpecial thanks to:\n	AboutView		\n\nÖzel teşekkürlerimizle:\n
@@ -31,6 +31,7 @@ Time running:	AboutView		Çalışma süresi:
 Visit the Haiku website	AboutView		Haiku web sitesini ziyaret edin
 Version: %s	AboutView	Version: R1 or hrev99999	Sürüm: %s
 Make a donation	AboutView		Projeye bağış yapın
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nnetresolv\nCopyright © 1998-2023 The NetBSD Project, Copyright © 2004-2009 by Internet Systems Consortium, Inc. (\"ISC\"), Copyright © 1996-2003 by Internet Software Consortium. All rights reserved.	AboutView		NetBSD Vakfı ve onun katkıcıları tarafından geliştirilen yazılımları içerir:\nnetresolv\nTelif hakkı ©1998–2023 NetBSD Projesi, Telif hakkı © 2004–2009 Internet Systems Consortium, Inc. (“ISC”), Telif hakkı © 1996–2003 Internet Systems Consortium. Tüm hakları saklıdır.
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB bellek:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Telif hakkı © 1996–2005 Julian R Seward. Tüm hakları saklıdır.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
@@ -78,7 +79,7 @@ Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.	About
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…ve bahsetmeyi unuttuğumuz diğerleri (üzgünüz!)\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Telif hakkı © 2006–2015 Intel Corporation. Tüm hakları saklıdır.
 BSD (2-clause)	AboutWindow		BSD (2 koşullu)
-Website & marketing:\n	AboutView		Web sayfası & pazarlama:\n
+Website & marketing:\n	AboutView		Web sayfası ve pazarlama:\n
 %d MiB used (%s)	AboutView	326 MiB used (16%)	%d MiB kullanılan (%s)
 %.2f GHz	AboutView	3.49 Ghz (CPU clock speed)	%.2f GHz
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001, Generalized Timing Formula temel alınarak Andy Ritger tarafından yazılmıştır.

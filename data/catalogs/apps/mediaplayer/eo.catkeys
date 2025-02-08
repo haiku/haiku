@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-MediaPlayer	100393349
+1	esperanto	x-vnd.Haiku-MediaPlayer	1441754962
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Movi la dosieron al la Rubujo
 Close	MediaPlayer-PlaylistWindow		Fermi
 Volume of background clips	MediaPlayer-SettingsWindow		Laŭteco de fonaj aŭdvidaĵoj
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Daŭrigi:
 Duration	MediaPlayer-InfoWin		Daŭro
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importi anojn
 Open network stream	MediaPlayer-Main		Uzi retan datumfluon
-Move file to Trash	MediaPlayer-PlaylistWindow		Movi dosieron al la Rubujo
 Open file…	MediaPlayer-Main		Uzi dosieron…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skalilo en la plenekrana reĝimo
 View options	MediaPlayer-SettingsWindow		Kontroli agordojn

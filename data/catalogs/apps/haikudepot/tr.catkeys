@@ -4,7 +4,7 @@ Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 An unexpected error has been sent from the server [%li]	ServerHelper		Sunucudan beklenmeyen bir hata alındı [%li]
 Create account	UserLoginWindow		Hesap oluştur
-Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Paket için değişiklik günlüğü getiriliyor
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Paket için olan değişiklik günlüğü getiriliyor…
 Agree	ToLatestUserUsageConditionsWindow		Kabul et
 Install %PackageTitle%	PackageManager		Kur: %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		CAPTCHA yanıtı yanlış.
@@ -47,7 +47,7 @@ Rating not possible	MainWindow		Derecelendirme olanaklı değil
 Package update error	MainWindow		Paket güncelleme hatası
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# süreç}}
 Reboot required	PackageManager		Yeniden başlatma gerekli
-Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Paket için olan kullanıcı derecelendirmeleri getiriliyor
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Paket için olan kullanıcı derecelendirmeleri getiriliyor…
 All packages	PackageListView		Tüm paketler
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
@@ -61,7 +61,7 @@ Repository	PackageListView		Depo
 Close	RatePackageWindow		Kapat
 Close	UserLoginWindow		Kapat
 The email is malformed.	UserLoginWindow		E-posta biçimi hatalı.
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		“%REPO_NAME%” deposunun paket bilgisi eşitleniyor
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		“%REPO_NAME%” deposunun paket bilgisi eşzamanlanıyor…
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Kullanım koşulları kabul edildi
@@ -70,7 +70,7 @@ Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
 All categories	FilterView		Tüm kategoriler
 ignore problem for now	PackageProblem		Sorunu şimdilik yok say
 n/a	PackageInfoView		yok
-Checking user details	UserDetailVerifierProcess		Kullanıcı ayrıntıları denetleniyor
+Checking user details	UserDetailVerifierProcess		Kullanıcı ayrıntıları denetleniyor…
 Cancel	MainWindow		Vazgeç
 Refresh repositories	MainWindow		Depoları yenile
 Continue	App		Sürdür
@@ -84,7 +84,7 @@ Retry	PackageProblem		Yeniden dene
 Update	RatePackageWindow		Güncelle
 Language	UserLoginWindow		Dil
 OK	UserLoginWindow		Tamam
-Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Başvuru bilgisi sunucudan eşitleniyor
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Başvuru bilgisi sunucudan eşzamanlanıyor…
 Stability:	RatePackageWindow		Kararlılık:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Kullanım koşullarını onaylamalı ve kullanıcıyı oluşturan kişinin en az yaş gerekliliğini sağladığını doğrulamalısınız.
 solution %d:	PackageProblem	Don't change the %d variable	%d çözümü:
@@ -121,7 +121,7 @@ User Created	UserLoginWindow		Kullanıcı Oluşturuldu
 Check for updates…	MainWindow		Güncellemeleri denetle…
 Uninstalled	PackageListView		Kaldırıldı
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Kullanım koşullarını kabul ediyorum
-Installing \"%PackageName%\"	InstallPackageProcess		“%PackageName%” kuruluyor
+Installing \"%PackageName%\"	InstallPackageProcess		“%PackageName%” kuruluyor…
 OK	App		Tamam
 HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		Haiku Depo, Haiku Depo Sunucusu adı verilen bir sunucu bileşeni ile iletişim kurar. Bunlar, Haiku Depo Sunucusu servisinin kullanımı ile ilgili güncel kullanım koşullarıdır.
 Fatal error	UninstallPackageAction		Onulmaz hata
@@ -134,7 +134,7 @@ An error has arisen downloading the password requirements required to create a n
 Fetching screenshot	CacheScreenshotProcess		Ekran görüntüsü getiriliyor…
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Sunucu sistemi ile iletişim kurarken bir ağ ulaşım hatası oluştu: %s
 Rating	PackageListView		Derecelendirme
-Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşitleniyor
+Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşzamanlanıyor…
 Show	MainWindow		Göster
 Settings…	MainWindow		Ayarlar…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Bu uygulama çalışabilmek için bilgisayarınızda dosya işlemleri yapmaya gereksinim duyar. Görünüşe göre [%TestFilePath%] konumuna bir sınama dosyası yazımında sorunlar var. Lütfen bu uygulamanın dosya yazmasına engel olabilecek disk veya dosya izinleri sıkıntıları olup olmadığını denetleyin. Bu sorunu göz ardı edip işlemi sürdürebilirsiniz; ancak bazı işlevler devre dışı kalabilir.
@@ -151,7 +151,7 @@ The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUp
 Error	App		Hata
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu’nun Haiku Depo bölümünden erişilebilir.
 There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
-Opening \"%DeskbarLink%\"	OpenPackageProcess		“%DeskbarLink%” açılıyor
+Opening \"%DeskbarLink%\"	OpenPackageProcess		“%DeskbarLink%” açılıyor…
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Derecelendirmeniz başarıyla yüklendi. Haiku Depo sunucusu web sitesinden güncelleyebilir veya silebilirsiniz.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Yeni bir kullanıcı oluşturma için gerekli olan CAPTCHA görseli için sunucu ile iletişim kurulamadı.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		CAPTCHA yanıtı yanlış. Yeni bir CAPTCHA üretilecek; yeniden deneyin.
@@ -172,12 +172,12 @@ Cancel	SettingsWindow		Vazgeç
 Cancel	RatePackageWindow		Vazgeç
 Inactive	PackageListView		Etkin değil
 Nickname:	UserLoginWindow		Takma ad:
-Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Depolar üstbilgisi eşitleniyor
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Depolar üst verisi eşzamanlanıyor…
 OK	MainWindow		Tamam
 Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Kullanıcılar, en az {0, plural, one{# yaşında} other{# yaşında}} olmalıdır.
 Version %Code%	UserUsageConditions		Sürüm %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, other{# öge}}
-Uninstalling \"%PackageName%\"	UninstallPackageAction		“%PackageName%” kaldırılıyor
+Uninstalling \"%PackageName%\"	UninstallPackageAction		“%PackageName%” kaldırılıyor…
 Downloading:	PackageInfoView		İndiriliyor:
 Quit	MainWindow		Çık
 Success	UserLoginWindow		Başarılı
@@ -204,7 +204,7 @@ The password has been incorrectly repeated.	UserLoginWindow		İkinci parola giri
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Önceden [%Nickname%] kullanıcısına ait olan parola şu anda geçerli değil. Uygulamadan çıkış yapılacaktır; güncellenmiş parola ile yeniden giriş yapmanız gerekmektedir.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Kullanım koşullarını görüntüle
 OK	ServerHelper		Tamam
-Reading repository data	LocalPkgDataLoadProcess		Depo bilgisi okunuyor
+Reading repository data	LocalPkgDataLoadProcess		Depo bilgisi okunuyor…
 Fatal error	InstallPackageProcess		Onulmaz hata
 A validation error has occurred	ServerHelper		Bir doğrulama hatası oluştu
 The nickname is required.	UserLoginWindow		Takma ad gerekli.
@@ -212,18 +212,18 @@ The nickname is required.	UserLoginWindow		Takma ad gerekli.
 Apply changes	PackageResult		Değişiklikleri uygula
 Server error	ServerHelper		Sunucu hatası
 Rate package	RatePackageWindow		Paketi derecelendir
-Recording view of \"%PackageName%\"	IncrementViewCounterProcess		“%PackageName%” görüntülemesinin kaydı yazılıyor
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		“%PackageName%” görüntülemesinin kaydı yazılıyor…
 Sending anonymous usage data	MainWindow		Anonim kullanım verisi gönder
 Log in	UserLoginWindow		Giriş yap
 Usage conditions	UserUsageConditions		Kullanım koşulları
-Populating package sizes	PopulatePkgSizesProcess		Paket boyutları dolduruluyor
+Populating package sizes	PopulatePkgSizesProcess		Paket boyutları dolduruluyor…
 HaikuDepot	System name		Haiku Depo
 Screenshot	ScreenshotWindow		Ekran görüntüsü
 Email address:	UserLoginWindow		E-posta adresi:
 View latest usage conditions…	MainWindow		Güncel kullanım koşullarını görüntüle…
 Category:	FilterView		Kategori:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	%s paketini kaldır\n
-Fetching remote repository data	LocalRepositoryUpdateProcess		Uzak depo bilgisi alınıyor
+Fetching remote repository data	LocalRepositoryUpdateProcess		Uzak depo bilgisi alınıyor…
 Description	PackageListView		Tanım
 User creation error	UserLoginWindow		Kullanıcı oluşturma hatası
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.

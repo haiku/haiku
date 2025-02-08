@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Input	130668644
+1	turkish	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Saptanmışlar
 Scrolling	TouchpadPrefView		Kaydırma
 Long	KeyboardView		Uzun
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Çift tıklama hızı
 Typing test area	KeyboardView		Yazma sınama alanı
 Fast	KeyboardView		Hızlı
 Please confirm	TouchpadPrefView		Lütfen onaylayın
+Trackpad speed	TouchpadPrefView		İzleme dörtgeni hızı
 Mouse speed	SettingsView		Fare hızı
+Trackpad acceleration	TouchpadPrefView		İzleme dörtgeni ivmelendirmesi
 Horizontal scrolling	TouchpadPrefView		Yatay sarma
+Reverse scroll direction	TouchpadPrefView		Sarma yönünü tersine çevir
 Keyboard lock delay	TouchpadPrefView		Klavye kilit gecikmesi
 Input	System name		Girdi Aygıtları
 Quick	TouchpadPrefView		Hızlı
@@ -21,6 +24,7 @@ Slow	KeyboardView		Yavaş
 2-Button	SettingsView		2 düğmeli
 Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla
 Vertical	TouchpadPrefView		Dikey
+Low	TouchpadPrefView		Düşük
 Focus follows mouse	SettingsView		Odak fareyi izler
 Double-click test area	SettingsView		Çift tıklama sınama alanı
 Focus mode:	SettingsView		Odak kipi:

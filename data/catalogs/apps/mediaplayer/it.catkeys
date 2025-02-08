@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	390961765
+1	italian	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Riprendi:
 Duration	MediaPlayer-InfoWin		Durata
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importa elementi
 Open network stream	MediaPlayer-Main		Apri stream di rete
-Move file to Trash	MediaPlayer-PlaylistWindow		Sposta file nel Cestino
 Open file…	MediaPlayer-Main		Apri file…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Ridimensiona controlli nella modalità a schermo intero
 View options	MediaPlayer-SettingsWindow		Opzioni di visualizzazione

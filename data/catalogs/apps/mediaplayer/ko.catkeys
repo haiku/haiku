@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-MediaPlayer	390961765
+1	korean	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		항목을 쓰레기통에 버리기
 Close	MediaPlayer-PlaylistWindow		닫기
 Volume of background clips	MediaPlayer-SettingsWindow		백그라운드 클립의 음량
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		이어보기:
 Duration	MediaPlayer-InfoWin		기간
 Import Entries	MediaPlayer-ImportPLItemsCmd		항목 가져오기
 Open network stream	MediaPlayer-Main		네트워크 스트림 열기
-Move file to Trash	MediaPlayer-PlaylistWindow		파일을 쓰레기통으로 이동
 Open file…	MediaPlayer-Main		파일 열기…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		전체화면 모드에서 비율에 따라 컨트롤 크기 조정
 View options	MediaPlayer-SettingsWindow		옵션 보기

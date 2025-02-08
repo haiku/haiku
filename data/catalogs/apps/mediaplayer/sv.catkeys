@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	390961765
+1	swedish	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Återuppta:
 Duration	MediaPlayer-InfoWin		Speltid
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importera poster
 Open network stream	MediaPlayer-Main		Öppna nätverksström
-Move file to Trash	MediaPlayer-PlaylistWindow		Flytta filen till Papperskorgen
 Open file…	MediaPlayer-Main		Öppna fil...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skala kontroller i fullskärmsläge
 View options	MediaPlayer-SettingsWindow		Visningsalternativ

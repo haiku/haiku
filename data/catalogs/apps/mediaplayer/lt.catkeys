@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	2711109766
+1	lithuanian	x-vnd.Haiku-MediaPlayer	4052471379
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Išmesti įrašą Šiukšlinėn
 Close	MediaPlayer-PlaylistWindow		Užverti
 Volume of background clips	MediaPlayer-SettingsWindow		Fone leidžiamų įrašų garsis
@@ -22,7 +22,6 @@ Remove	MediaPlayer-PlaylistWindow		Pašalinti
 <unknown>	MediaPlayer-InfoWin		<nežinomas>
 Duration	MediaPlayer-InfoWin		Trukmė
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importuoti įrašus
-Move file to Trash	MediaPlayer-PlaylistWindow		Išmesti failą Šiukšlinėn
 Open file…	MediaPlayer-Main		Atverti failą…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Padidinti valdiklius pilno ekrano veiksenoje
 View options	MediaPlayer-SettingsWindow		Rodymo parinktys

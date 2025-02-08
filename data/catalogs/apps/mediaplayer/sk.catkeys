@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	1846669086
+1	slovak	x-vnd.Haiku-MediaPlayer	3188030699
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstrániť položku do Koša
 Close	MediaPlayer-PlaylistWindow		Zatvoriť
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitosť klipov na pozadí
@@ -23,7 +23,6 @@ Remove	MediaPlayer-PlaylistWindow		Odstrániť
 Duration	MediaPlayer-InfoWin		Trvanie
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importovať položky
 Open network stream	MediaPlayer-Main		Otvoriť sieťový tok
-Move file to Trash	MediaPlayer-PlaylistWindow		Presunúť súbor do Koša
 Open file…	MediaPlayer-Main		Otvoriť súbor…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Prispôsobiť veľkosť ovládacích prvkov v celoobrazovkovom režime
 View options	MediaPlayer-SettingsWindow		Možnosti zobrazenia

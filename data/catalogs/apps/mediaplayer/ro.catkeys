@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	390961765
+1	romanian	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrarea la gunoi
 Close	MediaPlayer-PlaylistWindow		Închide
 Volume of background clips	MediaPlayer-SettingsWindow		Volumul clipurilor de fundal
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Reluare:
 Duration	MediaPlayer-InfoWin		Durată
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importă intrările
 Open network stream	MediaPlayer-Main		Deschide fluxul de rețea
-Move file to Trash	MediaPlayer-PlaylistWindow		Mută fișierul la gunoi
 Open file…	MediaPlayer-Main		Deschidere fișier…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Scalează controalele în modul ecran complet
 View options	MediaPlayer-SettingsWindow		Opțiuni de vizualizare

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	390961765
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Continuar:
 Duration	MediaPlayer-InfoWin		Duración
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importar entradas
 Open network stream	MediaPlayer-Main		Abrir transmisión de red
-Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
 Open file…	MediaPlayer-Main		Abrir archivo…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escalar controles en modo de pantalla completa
 View options	MediaPlayer-SettingsWindow		Opciones de visualización

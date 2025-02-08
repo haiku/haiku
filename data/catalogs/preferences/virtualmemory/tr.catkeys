@@ -8,7 +8,7 @@ Changes will take effect upon reboot.	SettingsWindow		Değişiklikler yeniden ba
 Revert	SettingsWindow		Eski haline döndür
 Keep enabled	SettingsWindow		Etkin durumda tut
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Ayarlar dosyasında belirtilen ayarlar geçersiz. Saptanmışları yükleyebilir veya uygulamadan çıkabilirsiniz.
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Sanal Bellek\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Sanal Bellek\n\tAxel Dörfler tarafından yazılmıştır.\n\tTelif hakkı © 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Ayarlar dosyasında belirtilen disk bölümü bulunamadı. Önyükleme bölümünü kullanabilir veya uygulamadan çıkabilirsiniz.
 Current Swap:	SettingsWindow		Kullanılan takas:
 Load defaults	SettingsWindow		Saptanmışları yükle

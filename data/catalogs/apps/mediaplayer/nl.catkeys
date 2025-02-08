@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	100393349
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1441754962
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar Trash
 Close	MediaPlayer-PlaylistWindow		Afsluiten
 Volume of background clips	MediaPlayer-SettingsWindow		Volume van achtergrondclips
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Hervatten:
 Duration	MediaPlayer-InfoWin		Duur
 Import Entries	MediaPlayer-ImportPLItemsCmd		Onderdelen importeren
 Open network stream	MediaPlayer-Main		Netwerkstream openen
-Move file to Trash	MediaPlayer-PlaylistWindow		Bestand naar de prullenbak verplaatsen
 Open file…	MediaPlayer-Main		Open bestand...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Besturingselementen schalen in modus volledig scherm
 View options	MediaPlayer-SettingsWindow		Weergave-opties

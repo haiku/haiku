@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	390961765
+1	russian	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Переместить запись в корзину
 Close	MediaPlayer-PlaylistWindow		Закрыть
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Возобновить:
 Duration	MediaPlayer-InfoWin		Длительность
 Import Entries	MediaPlayer-ImportPLItemsCmd		импортирование записей
 Open network stream	MediaPlayer-Main		Открыть сетевой поток
-Move file to Trash	MediaPlayer-PlaylistWindow		Переместить в корзину
 Open file…	MediaPlayer-Main		Открыть файл…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабировать кнопки управления в полноэкранном режиме
 View options	MediaPlayer-SettingsWindow		Настройки вида

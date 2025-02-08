@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	371749163
+1	catalan; valencian	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copia
@@ -153,6 +153,7 @@ Window	WebPositive Window		Finestra
 Proxy server address:	Settings Window		Adreça del servidor intermediari:
 Search page:	Settings Window		Cerca a la pàgina:
 Settings	WebPositive Window		Paràmetres
+Show in Tracker	BookmarkBar		Mostra-ho al Rastrejador
 Clear	URL Bar		Neteja
 Loading %url	WebPositive Window		Es carrega %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Jove xef, sol·licito que porti cafè descafeïnat i whisky amb quinze glaçons d'hidrogen!

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Input	130668644
+1	german	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Standardwerte
 Scrolling	TouchpadPrefView		Scrollen
 Long	KeyboardView		Lang
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Doppelklick-Geschwindigkeit
 Typing test area	KeyboardView		Feld für Testeingaben
 Fast	KeyboardView		Schnell
 Please confirm	TouchpadPrefView		Bitte bestätigen
+Trackpad speed	TouchpadPrefView		Geschwindigkeit
 Mouse speed	SettingsView		Geschwindigkeit
+Trackpad acceleration	TouchpadPrefView		Beschleunigung
 Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
+Reverse scroll direction	TouchpadPrefView		Scroll-Richtung umkehren
 Keyboard lock delay	TouchpadPrefView		Verzögerung der Tastatursperre
 Input	System name		Eingabegeräte
 Quick	TouchpadPrefView		Schnell
@@ -21,6 +24,7 @@ Slow	KeyboardView		Langsam
 2-Button	SettingsView		2-Tasten
 Click to focus and raise	SettingsView		Klicken aktiviert und holt nach vorn
 Vertical	TouchpadPrefView		Vertikal
+Low	TouchpadPrefView		Niedrig
 Focus follows mouse	SettingsView		Ohne Klicken aktivieren
 Double-click test area	SettingsView		Testfeld für Doppelklick
 Focus mode:	SettingsView		Modus:

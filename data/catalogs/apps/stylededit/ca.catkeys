@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-StyledEdit	3760185556
+1	catalan; valencian	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Estadístiques del document
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No es pot revertir: el fitxer no es troba: \"%s\".
 Cut	Menus		Retalla
@@ -34,6 +34,7 @@ Bold	Menus		Negreta
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		El fitxer \"%file%\" ha estat modificat per una altra aplicació. El torno a carregar?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		El fitxer \"%file%\" ha estat suprimit per una altra aplicació. El recupero?
 Lines:	Statistics		Línies:
+Strikeout	Menus		Ratllat
 Replace in all windows	FindandReplaceWindow		Reemplaça-ho a totes les finestres
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" té canvis sense desar.\nVoleu revertir-lo a la darrera versió desada? 
 Save	SaveAlert		Desa

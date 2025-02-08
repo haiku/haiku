@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	390961765
+1	german	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Fortsetzen:
 Duration	MediaPlayer-InfoWin		Spieldauer
 Import Entries	MediaPlayer-ImportPLItemsCmd		Einträge importieren
 Open network stream	MediaPlayer-Main		Netzwerkstream öffnen
-Move file to Trash	MediaPlayer-PlaylistWindow		In Papierkorb verschieben
 Open file…	MediaPlayer-Main		Öffne Datei …
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
 View options	MediaPlayer-SettingsWindow		Darstellung

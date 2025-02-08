@@ -1,17 +1,20 @@
-1	turkish	x-vnd.Haiku-WebPositive	2942427387
+1	turkish	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 Copy	Console Window		Kopyala
 (Finish: %date)	Download Window		(Bitiş: %date)
 Open bookmarks confirmation	WebPositive Window		Yer imi aç onayı
+Delete	BookmarkBar		Sil
 Download folder:	Settings Window		İndirmeler klasörü
 Close window	WebPositive Window		Pencereyi kapat
+Rename	BookmarkBar		Yeniden adlandır
 Find:	WebPositive Window		Bul:
 Script console	WebPositive Window		Betik konsolu
 There was an error setting up the bookmark.	WebPositive Window		Yer imini ayarlarken bir hata oluştu.
 Fonts	Settings Window		Yazıtipleri
 Path	Cookie Manager		Yol
 Bookmarks	WebPositive Window		Yer imleri
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Yer imleri çubuğundan “%leaf%” yer imi kaldırılamadı.
 Use proxy server to connect to the internet	Settings Window		İnternete bağlanmak için vekil sunucu kullan
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url yüklendi
 Auto-hide interface in full screen mode	Settings Window		Tam ekran kipinde arayüzü kendiliğinden gizle
@@ -33,6 +36,7 @@ Browse…	Settings Window		Göz at…
 Resume prior session	Settings Window		Bir önceki oturumu sürdür
 Match case	WebPositive Window		BÜYÜK/küçük harf duyarlı
 Proxy password:	Settings Window		Vekil parolası:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Yer imi silinemedi:\n“%path%”
 Size:	Font Selection view		Boyut:
 Page source	WebPositive Window		Sayfa kaynağı
 Proxy server port:	Settings Window		Vekil sunucu kapısı:
@@ -56,6 +60,7 @@ Cookies for %s	Cookie Manager		%s için çerezler
 Close	Download Window		Kapat
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s — Arama terimi
+Old name: %s	BookmarkBar		Eski adı: %s
 Expiration	Cookie Manager		Son kullanım süresi
 Reload	WebPositive Window		Yeniden yükle
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU’nuz pek eski ve WebPositive’in çalışması için gerekli olan SSE2 uzantılarını desteklemiyor. Yerine NetSurf kurmanızı öneririz.
@@ -95,7 +100,8 @@ Style:	Font Selection view		Biçem:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Yer imi dosyası oluşturulurken bir hata oluştu.\n\nHata: %error
 OK	Download Window		Tamam
 Proxy username:	Settings Window		Vekil kullanıcı adı:
-Manage bookmarks	WebPositive Window		Yer imlerini düzenle
+Rename bookmark	BookmarkBar		Yer imini yeniden adlandır
+Manage bookmarks	WebPositive Window		Yer imlerini yönet
 /s)	Download Window	...as in 'per second'	/sn)
 Restart	Download Window		Yeniden başlat
 Serif font:	Settings Window		Serif yazıtipi:
@@ -106,7 +112,7 @@ Copy	WebPositive Window		Kopyala
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Son satır # kez yinelendi.}other{Son satır # kez yinelendi.}}
 Default standard font size:	Settings Window		Saptanmış standart yazıtipi boyutu:
 Custom	Settings Window		Özel
-Bookmark this page	WebPositive Window		Bu sayfayı yer imlerine ekle
+Bookmark this page	WebPositive Window		Bu sayfaya yer imi koy
 Show tabs if only one page is open	Settings Window		Tek bir sayfa açıksa bile sekmeleri göster
 Remove	Download Window		Kaldır
 Close tab	WebPositive Window		Sekmeyi kapat
@@ -147,12 +153,15 @@ Window	WebPositive Window		Pencere
 Proxy server address:	Settings Window		Vekil sunucu adresi:
 Search page:	Settings Window		Arama sayfası:
 Settings	WebPositive Window		Ayarlar
+Show in Tracker	BookmarkBar		İzleyici’de göster
 Clear	URL Bar		Temizle
 Loading %url	WebPositive Window		%url yükleniyor
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pijamalı hasta, yağız şoföre çabucak güvendi.
+OK	BookmarkBar		Tamam
 Start up:	Settings Window		Başlangıç:
 Confirmation	WebPositive Window		Onaylama
 Session cookie	Cookie Manager		Oturum çerezi
+New name:	BookmarkBar		Yeni adı:
 No SSE2 support	WebPositive		SSE2 desteği yok
 Open all	WebPositive Window		Tümünü aç
 Cut	WebPositive Window		Kes
@@ -162,4 +171,5 @@ Clear history	WebPositive Window		Geçmişi sil
 Cancel	WebPositive Window		Vazgeç
 Script console	Console Window		Betik konsolu
 Copy	URL Bar		Kopyala
+Open in new tab	BookmarkBar		Yeni sekmede aç
 Open start page	Settings Window		Başlangıç sayfasını aç

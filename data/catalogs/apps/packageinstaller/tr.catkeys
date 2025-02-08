@@ -11,7 +11,7 @@ Other…	PackageView		Diğer…
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Verilen yolda “%s” adlı sembolik bağ zaten var.\nBu bağ paketteki ile değiştirilsin mi?
 Stop	PackageStatus		Durdur
 Install to:	PackageView		Kurulum konumu:
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Bu paket hâlihazırda sisteminizde yüklü gibi görünüyor. Kaldırılıp yeniden yüklensin mi?
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Bu paket hâlihazırda sisteminizde kurulu gibi görünüyor. Kaldırılıp yeniden kurulsun mu?
 Skip all	PackageView		Tümünü atla
 The installation of the package has been aborted.	PackageView		Paket kurulumu iptal edildi.
 No installation type selected	PackageView		Hiçbir kurulum türü seçilmedi
@@ -20,7 +20,7 @@ The selected package was not removed from your system. The given installed packa
 Install…	UninstallView		Kuruluyor…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Verilen yolda “%s” adlı öge zaten var.\nBu öge paketteki ile değiştirilsin mi?
 Installing files and folders	PackageInstall		Dosyalar ve klasörler kuruluyor
-Installed packages	UninstallWindow		Yüklü paketler
+Installed packages	UninstallWindow		Kurulu paketler
 Remove	UninstallView		Kaldır
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		İstenilen paket sisteminize kurulamadı. Hedef paket dosyasında bir sorun olabilir. Bu durumu paket dağıtıcısı ile paylaşın.
 OK	UninstallView		Tamam

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MediaPlayer	390961765
+1	turkish	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi çöpe at
 Close	MediaPlayer-PlaylistWindow		Kapat
 Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Oynatmayı sürdür:
 Duration	MediaPlayer-InfoWin		Uzunluk
 Import Entries	MediaPlayer-ImportPLItemsCmd		Girdileri içe aktar
 Open network stream	MediaPlayer-Main		Ağ akışı aç
-Move file to Trash	MediaPlayer-PlaylistWindow		Dosyayı çöpe at
 Open file…	MediaPlayer-Main		Dosya aç…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Tam ekran kipinde denetimleri ölçekle
 View options	MediaPlayer-SettingsWindow		Görüntüleme seçenekleri

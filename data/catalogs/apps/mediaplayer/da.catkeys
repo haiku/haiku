@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-MediaPlayer	100393349
+1	danish	x-vnd.Haiku-MediaPlayer	1441754962
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flyt element til papirkurv
 Close	MediaPlayer-PlaylistWindow		Luk
 Volume of background clips	MediaPlayer-SettingsWindow		Lydstyrke for baggrundsklip
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Genoptag:
 Duration	MediaPlayer-InfoWin		Varighed
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importér elementer
 Open network stream	MediaPlayer-Main		Åbn netværksstrøm
-Move file to Trash	MediaPlayer-PlaylistWindow		Flyt fil til papirkurv
 Open file…	MediaPlayer-Main		Åbn fil…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skalér kontroller i fuldskærmstilstand
 View options	MediaPlayer-SettingsWindow		Visningsvalgmuligheder

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	390961765
+1	czech	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
 Close	MediaPlayer-PlaylistWindow		Zavřít
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Pokračovat:
 Duration	MediaPlayer-InfoWin		Trvání
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importovat položky
 Open network stream	MediaPlayer-Main		Otevřít síťový proud
-Move file to Trash	MediaPlayer-PlaylistWindow		Přesunout soubor do koše
 Open file…	MediaPlayer-Main		Otevřít soubor...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Přizpůsobit velikost ovládacích prvků v režimu celé obrazovky
 View options	MediaPlayer-SettingsWindow		Volby zobrazení

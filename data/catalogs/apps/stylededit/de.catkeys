@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	1577675528
+1	german	x-vnd.Haiku-StyledEdit	3190352697
 Document statistics	Statistics		Dokument-Statistik
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Cut	Menus		Ausschneiden
@@ -34,6 +34,7 @@ Bold	Menus		Fett
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung verändert.\nSoll sie neu geladen werden?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung entfernt. Soll sie wiederhergestellt werden?
 Lines:	Statistics		Zeilen:
+Strikeout	Menus		Durchgestrichen
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" enthält ungespeicherte Änderungen.\nZuletzt gespeicherte Version wiederherstellen?
 Save	SaveAlert		Speichern

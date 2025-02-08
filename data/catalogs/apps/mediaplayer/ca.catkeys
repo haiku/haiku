@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaPlayer	390961765
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
 Close	MediaPlayer-PlaylistWindow		Tanca
 Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Continua:
 Duration	MediaPlayer-InfoWin		Durada
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importa entrades
 Open network stream	MediaPlayer-Main		Obre el flux de xarxa
-Move file to Trash	MediaPlayer-PlaylistWindow		Mou el fitxer a la paperera
 Open file…	MediaPlayer-Main		Obre un fitxer...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escala els controls en mode de pantalla completa.
 View options	MediaPlayer-SettingsWindow		Opcions de visualització

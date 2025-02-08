@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-MediaPlayer	2878408696
+1	croatian	x-vnd.Haiku-MediaPlayer	4219770309
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Ukloni unos u smeće
 Close	MediaPlayer-PlaylistWindow		Zatvori
 Audio	MediaPlayer-InfoWin		Audio
@@ -16,7 +16,6 @@ Remove	MediaPlayer-PlaylistWindow		Ukloni
 Duration	MediaPlayer-InfoWin		Trajanje
 Import Entries	MediaPlayer-ImportPLItemsCmd		Uvezi unose
 Open network stream	MediaPlayer-Main		Otvori mrežno strujanje
-Move file to Trash	MediaPlayer-PlaylistWindow		Premjesti datoteku u smeće
 Open file…	MediaPlayer-Main		Otvori datoteku...
 View options	MediaPlayer-SettingsWindow		Pogledaj opcije
 %d kHz	MediaPlayer-InfoWin		%d kHz

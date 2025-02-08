@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Input	130668644
+1	swedish	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Förvalt
 Scrolling	TouchpadPrefView		Rulla
 Long	KeyboardView		Lång
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Dubbelklicks hastighet
 Typing test area	KeyboardView		Testskrivningsområde
 Fast	KeyboardView		Snabb
 Please confirm	TouchpadPrefView		Var god bekräfta
+Trackpad speed	TouchpadPrefView		Styrplattans hastighet
 Mouse speed	SettingsView		Mushastighet
+Trackpad acceleration	TouchpadPrefView		Styrplattans acceleration
 Horizontal scrolling	TouchpadPrefView		Horisontell rullning
+Reverse scroll direction	TouchpadPrefView		Omvänd rullningsriktning
 Keyboard lock delay	TouchpadPrefView		Tangentbordslåsfördröjning
 Input	System name		Inmatning
 Quick	TouchpadPrefView		Snabbt
@@ -21,6 +24,7 @@ Slow	KeyboardView		Långsam
 2-Button	SettingsView		2-Knappar
 Click to focus and raise	SettingsView		Klicka för att fokusera och höja
 Vertical	TouchpadPrefView		Vertikal
+Low	TouchpadPrefView		Låg
 Focus follows mouse	SettingsView		Fokus följer musen
 Double-click test area	SettingsView		Dubbelklick testområde
 Focus mode:	SettingsView		Fokuserat läge:

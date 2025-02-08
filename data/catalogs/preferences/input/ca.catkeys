@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Input	130668644
+1	catalan; valencian	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Valors predeterminats
 Scrolling	TouchpadPrefView		Desplaçament
 Long	KeyboardView		Llarg
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Velocitat del clic doble
 Typing test area	KeyboardView		Àrea de prova per al tecleig
 Fast	KeyboardView		Ràpid
 Please confirm	TouchpadPrefView		Confirmeu-ho, si us plau
+Trackpad speed	TouchpadPrefView		Velocitat de la tauleta tàctil
 Mouse speed	SettingsView		Velocitat del ratolí
+Trackpad acceleration	TouchpadPrefView		Acceleració de la tauleta tàctil
 Horizontal scrolling	TouchpadPrefView		Desplaçament horitzontal
+Reverse scroll direction	TouchpadPrefView		Direcció de desplaçament inversa
 Keyboard lock delay	TouchpadPrefView		Retard del blocatge del teclat
 Input	System name		Entrada
 Quick	TouchpadPrefView		Ràpid
@@ -21,6 +24,7 @@ Slow	KeyboardView		Lent
 2-Button	SettingsView		2 botons
 Click to focus and raise	SettingsView		Clic per al focus i l'alçament
 Vertical	TouchpadPrefView		Vertical
+Low	TouchpadPrefView		Baixa
 Focus follows mouse	SettingsView		El focus segueix el ratolí
 Double-click test area	SettingsView		Àrea de prova per al clic doble
 Focus mode:	SettingsView		Mode del focus:

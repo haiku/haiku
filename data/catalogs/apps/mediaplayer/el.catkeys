@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	171477831
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	1512839444
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Μετακίνηση Αρχείου στον Κάδο Απορριμάτων
 Close	MediaPlayer-PlaylistWindow		Κλείσιμο
 Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ παρασκηνίου
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Συνέχιση:
 Duration	MediaPlayer-InfoWin		Διάρκεια
 Import Entries	MediaPlayer-ImportPLItemsCmd		Εισαγωγή
 Open network stream	MediaPlayer-Main		Άνοιγμα ροής δικτύου
-Move file to Trash	MediaPlayer-PlaylistWindow		Μετακίνηση αρχείου στον Κάδο Απορριμάτων
 Open file…	MediaPlayer-Main		Άνοιγμα αρχείου…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Να μεταβάλλεται το μέγεθος των κουμπιών ελέγχου σε λειτουργία πλήρης οθόνης 
 View options	MediaPlayer-SettingsWindow		Προβολή ρυθμίσεων

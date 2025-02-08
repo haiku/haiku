@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	371749163
+1	german	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
 Copy	Console Window		Kopieren
@@ -153,6 +153,7 @@ Window	WebPositive Window		Fenster
 Proxy server address:	Settings Window		Proxy-Serveradresse:
 Search page:	Settings Window		Suchmachine:
 Settings	WebPositive Window		Einstellungen
+Show in Tracker	BookmarkBar		In Tracker zeigen
 Clear	URL Bar		Leeren
 Loading %url	WebPositive Window		%url wird geladen
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	100393349
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	1441754962
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Remover Entrada para a Lixeira
 Close	MediaPlayer-PlaylistWindow		Fechar
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dos clipes em segundo plano
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Continuar:
 Duration	MediaPlayer-InfoWin		Duração
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importar Entradas
 Open network stream	MediaPlayer-Main		Abrir stream de rede
-Move file to Trash	MediaPlayer-PlaylistWindow		Mover arquivo para a Lixeira
 Open file…	MediaPlayer-Main		Abrir arquivo…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Controles de escala em modo de tela cheia
 View options	MediaPlayer-SettingsWindow		Opções de visualização

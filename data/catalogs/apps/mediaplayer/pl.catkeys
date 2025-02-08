@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	390961765
+1	polish	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Usunięcie wpisu do Kosza
 Close	MediaPlayer-PlaylistWindow		Zamknij
 Volume of background clips	MediaPlayer-SettingsWindow		Głośność klipów działających w tle
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Wznów:
 Duration	MediaPlayer-InfoWin		Czas trwania
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importowanie wpisów
 Open network stream	MediaPlayer-Main		Otwórz strumień sieciowy
-Move file to Trash	MediaPlayer-PlaylistWindow		Przenieś plik do Kosza
 Open file…	MediaPlayer-Main		Otwórz plik…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaluj kontrolki w trybie pełnoekranowym
 View options	MediaPlayer-SettingsWindow		Opcje widoku

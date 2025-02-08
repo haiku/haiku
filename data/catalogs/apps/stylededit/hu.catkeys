@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	3760185556
+1	hungarian	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Statisztika
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl \"%s\" nem található.
 Cut	Menus		Kivágás
@@ -34,6 +34,7 @@ Bold	Menus		Félkövér
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		A fájlt \"%file%\" egy másik program módosította. Újratöltsem?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		A fájlt \"%file%\" egy másik program törölte. Helyre szeretnéd állítani?
 Lines:	Statistics		Sor:
+Strikeout	Menus		Áthúzás
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		A fájlban \"%s\" történt módosítások még nincsenek mentve.\nVissza szeretnéd állítani a legutóbbi mentett verziót?
 Save	SaveAlert		Mentés

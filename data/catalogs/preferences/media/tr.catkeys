@@ -8,7 +8,7 @@ Video output:	Media views		Video çıkışı:
 Video input:	Media views		Video girişi:
 Audio output:	Media views		Ses çıkışı:
 Please select a SoundFont.	Midi View		Lütfen bir SoundFont seçin.
-There are no SoundFonts installed.	Midi View		Yüklü SoundFont yok.
+There are no SoundFonts installed.	Midi View		Kurulu SoundFont yok.
 Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ortam’dan çıkma ortam servislerinin yeniden başlatılmalarını durduracaktır. Bu işlem ortam işlevlerini sekteye uğratabilir.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Ortam sunucusuna bağlanılamadı.\nŞimdi başlatmak ister misiniz?
 Video settings	Media Window		Video ayarları

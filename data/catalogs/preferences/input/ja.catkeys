@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Input	130668644
+1	japanese	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		デフォルト
 Scrolling	TouchpadPrefView		スクロール
 Long	KeyboardView		長く
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		ダブルクリックの速度
 Typing test area	KeyboardView		タイピングの確認
 Fast	KeyboardView		速く
 Please confirm	TouchpadPrefView		確認してください
+Trackpad speed	TouchpadPrefView		トラックパッドの速度
 Mouse speed	SettingsView		マウスの速度
+Trackpad acceleration	TouchpadPrefView		トラックパッドの加速
 Horizontal scrolling	TouchpadPrefView		水平スクロール
+Reverse scroll direction	TouchpadPrefView		スクロール方向を逆にする
 Keyboard lock delay	TouchpadPrefView		キーボードをロックするまでの時間
 Input	System name		入力機器
 Quick	TouchpadPrefView		素早く
@@ -21,6 +24,7 @@ Slow	KeyboardView		遅く
 2-Button	SettingsView		2 ボタン
 Click to focus and raise	SettingsView		クリックでフォーカスと最前面へ
 Vertical	TouchpadPrefView		垂直方向
+Low	TouchpadPrefView		低い
 Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせる
 Double-click test area	SettingsView		ダブルクリックの確認
 Focus mode:	SettingsView		フォーカスモード:

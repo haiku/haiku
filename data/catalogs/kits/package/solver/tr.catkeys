@@ -5,7 +5,7 @@ unspecified problem	SolverProblem		tanımlanmayan sorun
 package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		%source% paketi %dependency% bağımlılığını gerektiriyor; ancak hiçbir sağlayıcı kurulamıyor
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		%source% paketi %target% tarafından sağlanan %dependency% bağımlılığını gereksiz kılıyor
 nothing provides requested %dependency%	SolverProblem		istenen %dependency% bağımlılığını hiçbir şey sağlamıyor
-do not keep %source% installed	SolverProblemSolution		%source% ögesini yüklü tutma
+do not keep %source% installed	SolverProblemSolution		%source% ögesini kurulu tutma
 do not deinstall \"%selection%\"	SolverProblemSolution		“%selection%” ögesi kurulumunu kaldırma
 install %source% despite its inferior architecture	SolverProblemSolution		%source% ögesini daha eski mimarisine rağmen kur
 conflicting requests	SolverProblem		çakışan istekler
@@ -18,14 +18,14 @@ dependency problem	SolverProblem		bağımlılık sorunu
 %dependency% is provided by the system	SolverProblem		%dependency% sistem tarafından sağlanıyor
 keep %source% despite its inferior architecture	SolverProblemSolution		%source% ögesini daha eski mimarisine rağmen tut
 %source% does not belong to a distupgrade repository	SolverProblem		%source% ögesi bir dağıtım güncelleme deposuna ait değil
-installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		yüklü %source% paketi %target% tarafından sağlanan %dependency% bağımlılığını geçersiz kılıyor
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		kurulu %source% paketi %target% tarafından sağlanan %dependency% bağımlılığını geçersiz kılıyor
 allow name change of %source% to %target%	SolverProblemSolution		%source% ögesinin adının %target% olarak değiştirilmesine izin ver
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		%source% paketi %target% tarafından sağlanan %dependency% ile çakışıyor
 do something	SolverProblemSolution		bir şeyler yap
 install %selection% despite its old version	SolverProblemSolution		%selection% ögesini eski sürüm olmasına rağmen kur
 cannot install both %source% and %target%	SolverProblem		hem %source% hem %target% kurulamaz
 package %source% is not installable	SolverProblem		%source% paketi kurulabilir değil
-problem with installed package %source%	SolverProblem		yüklü %source% paketinde sorun var
+problem with installed package %source%	SolverProblem		kurulu %source% paketinde sorun var
 allow deinstallation of %source%	SolverProblemSolution		%source% paketinin kaldırılabilmesine izin ver
 keep %source% from excluded repository	SolverProblemSolution		dışarıda bırakılan %source% ögesini tut
 keep old %source%	SolverProblemSolution		eski %source% ögesini tut

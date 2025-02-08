@@ -25,14 +25,14 @@ Cancelling updates	SoftwareUpdaterWindow		Güncellemeler durduruluyor
 Cancel	SoftwareUpdaterWindow	Alert button label	Vazgeç
 There were no updates found.	UpdateAction		Güncelleme bulunamadı.
 OK	SoftwareUpdaterWindow		Tamam
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Aşağıdaki güncelleme seçeneklerinden birini seçin:\n\nGüncelle:\n\tYüklü tüm paketleri günceller.\nTam eşitle:\n\tYüklü paketleri depolar ile eşitler.
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Aşağıdaki güncelleme seçeneklerinden birini seçin:\n\nGüncelle:\n\tKurulu tüm paketleri günceller.\nTam eşzamanla:\n\tKurulu paketleri depolar ile eşzamanlar.
 The following changes will be made:	SoftwareUpdaterWindow		Aşağıdaki değişiklikler yapılacak:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Değişkenler artık kabul edilmiyor\n
 Fatal error while checking for updates: %s\n	CheckAction		Güncellemeler denetlenirken onulmaz hata: %s\n
 SoftwareUpdater	System name		Yazılım Güncelleyicisi
 No active network connection was found.\n	CheckManager		Etkin bir ağ bağlantısı bulunamadı.\n
 Applying changes	UpdateManager		Değişiklikler uygulanıyor
-Full sync	SoftwareUpdaterWindow	Alert button label	Tam eşitle
+Full sync	SoftwareUpdaterWindow	Alert button label	Tam eşzamanla
 Quit	SoftwareUpdaterWindow	Button label	Çık
 Updates have been successfully installed.	UpdateManager		Güncellemeler başarıyla kuruldu.
 Exception occurred while updating packages : %s\n	UpdateAction		Paketler güncellenirken kural dışı durum oluştu: %s\n
@@ -59,6 +59,6 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	Kaldırılan sürüm
 %i of %i	UpdateManager	Do not translate %i	%i/%i
 Quit	SoftwareUpdaterWindow		Çık
 No updates available	CheckManager		Güncelleme bulunamadı
-Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Kullanım:  SoftwareUpdater <komut> [ <seçenek> ]\nKurulu paketleri günceller.\n\nKomutlar:\n  update     — Paket güncellemeleri için depoları tarar ve güncellemeleri kurar.\n  check      — Kullanılabilir güncellemeleri denetler; ancak yalnızca sonuçları listeler.\n  full-sync  — Kurulu paketleri depolarla eşitler.\n\nSeçenekler:\n  -h or --help       Bu yardım iletisini gösterir\n  -v or --verbose    Ayrıntılı sözlü çıktıyı gösterir\n
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Kullanım:  SoftwareUpdater <komut> [ <seçenek> ]\nKurulu paketleri günceller.\n\nKomutlar:\n  update     — Paket güncellemeleri için depoları tarar ve güncellemeleri kurar.\n  check      — Kullanılabilir güncellemeleri denetler; ancak yalnızca sonuçları listeler.\n  full-sync  — Kurulu paketleri depolarla eşzamanlar.\n\nSeçenekler:\n  -h or --help       Bu yardım iletisini gösterir\n  -v or --verbose    Ayrıntılı sözlü çıktıyı gösterir\n
 No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Hiçbir uzak depo kullanılabilir değil. Lütfen en azından bazı depoların ulaşılabilir olduğunu depo panellerini veya “pkgman” komutunu kullanarak denetleyin.
 Downloading packages	UpdateManager		Paketler indiriliyor

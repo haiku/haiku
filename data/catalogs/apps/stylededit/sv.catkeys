@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	3760185556
+1	swedish	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Dokumentstatistik
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: \"%s\".
 Cut	Menus		Klipp ut
@@ -34,6 +34,7 @@ Bold	Menus		Fet
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Filen \"%file%\" blev modifierad av ett annat program. Vill du laddaom programmet?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Filen \"%file%\" blev bortplockad av ett annat program. Vill du plocka tillbaka den?
 Lines:	Statistics		Rader:
+Strikeout	Menus		Överstrykning
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" har osparade ändringar.\nVill du ångra och återgå till senast sparade versionen?
 Save	SaveAlert		Spara

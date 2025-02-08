@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	390961765
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
 Close	MediaPlayer-PlaylistWindow		Lukk
 Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
@@ -24,7 +24,6 @@ Resume:	MediaPlayer-SettingsWindow		Fortsett:
 Duration	MediaPlayer-InfoWin		Varighet
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importer Oppføringer
 Open network stream	MediaPlayer-Main		Åpne nettverksstrøm
-Move file to Trash	MediaPlayer-PlaylistWindow		Flytt filen til søppelkurven
 Open file…	MediaPlayer-Main		Åpne fil…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaler kontroller i fullskjerm-modus
 View options	MediaPlayer-SettingsWindow		Visningsalternativer

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	371749163
+1	hungarian	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 Copy	Console Window		Másolás
@@ -153,6 +153,7 @@ Window	WebPositive Window		Ablak
 Proxy server address:	Settings Window		Proxy kiszolgáló címe
 Search page:	Settings Window		Keresőoldal:
 Settings	WebPositive Window		Beállítások
+Show in Tracker	BookmarkBar		Megnyitás a Nyomkövetőben
 Clear	URL Bar		Töröl
 Loading %url	WebPositive Window		%url betöltése
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép

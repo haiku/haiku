@@ -11,12 +11,12 @@ Waiting for answer failed	Time		Yanıt bekleme başarısız
 <Other>	Time		<Diğer>
 Received invalid time	Time		Geçersiz zaman alındı
 Remove	Time		Kaldır
-Synchronize again	Time		Yeniden eşitle
+Synchronize again	Time		Yeniden eşzamanla
 Asia	Time		Asya
 Try all servers	Time		Tüm sunucuları dene
 Time	Time		Tarih ve Zaman
 Current time:	Time		Geçerli zaman:
-The following error occured while synchronizing:\n%s: %s	Time		Eşitleme sırasında aşağıdaki hatalar oluştu:\n%s: %s
+The following error occured while synchronizing:\n%s: %s	Time		Eşzamanlama sırasında aşağıdaki hatalar oluştu:\n%s: %s
 Europe	Time		Avrupa
 Show day of week	Time		Haftanın gününü göster
 Local time (Windows compatible)	Time		Yerel zaman (Windows uyumlu)
@@ -39,10 +39,10 @@ Show clock in Deskbar	Time		Saati Masaüstü Çubuğu’nda göster
 Display time with seconds	Time		Saniyeleri göster
 Time	System name		Tarih ve Zaman
 Show time zone	Time		Zaman dilimini göster
-Synchronize at boot	Time		Önyükleme sırasında eşitle
+Synchronize at boot	Time		Önyükleme sırasında eşzamanla
 Indian	Time		Hint
 Revert	Time		Eski haline döndür
 Date and time	Time		Tarih ve zaman
-The following error occured while synchronizing:\n%s	Time		Eşitleme sırasında aşağıdaki hatalar oluştu:\n%s
-Synchronize	Time		Eşitle
+The following error occured while synchronizing:\n%s	Time		Eşzamanlama sırasında aşağıdaki hatalar oluştu:\n%s
+Synchronize	Time		Eşzamanla
 Add	Time		Ekle

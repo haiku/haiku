@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	3760185556
+1	japanese	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		ドキュメント統計
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		ファイル \"%s\" が存在しないため、元に戻せません。
 Cut	Menus		切り取り
@@ -34,6 +34,7 @@ Bold	Menus		太字
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		ファイル \"%file%\" はほかのアプリケーションにより変更されています。再読み込みしますか?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		ファイル \"%file%\" はほかのアプリケーションにより削除されました。回復しますか?
 Lines:	Statistics		行数:
+Strikeout	Menus		取り消し線
 Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" に保存されていない変更があります。\n保存された版まで戻しますか? 
 Save	SaveAlert		保存

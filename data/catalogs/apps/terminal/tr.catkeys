@@ -130,7 +130,7 @@ Text under cursor	Terminal ThemeView		İmleç altındaki metin
 ANSI bright white color	Terminal ThemeView		ANSI açık beyaz
 Close window	Terminal TermWindow		Pencereyi kapat
 ANSI magenta color	Terminal ThemeView		ANSI mor
-Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Uçbirim\nCopyright 2001–2020 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ve Takaşi Murai.\n\nKullanım: %s [SEÇENEK] [KABUK]\n
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Uçbirim\nTelif hakkı © 2001–2025 Haiku, Inc.\nTelif hakkı ©1999 Kazuho Okui ve Murai Takaşi.\n\nKullanım: %s [SEÇENEK] [KABUK]\n
 cyan	Terminal ThemeView		camgöbeği
 Clear all	Terminal TermWindow		Tümünü temizle
 Cursor	Terminal ThemeView		İmleç

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Input	130668644
+1	hungarian	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Alapértékek
 Scrolling	TouchpadPrefView		Görgetés
 Long	KeyboardView		Hosszú
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Dupla-kattintás sebessége
 Typing test area	KeyboardView		Gépelés próba
 Fast	KeyboardView		Gyors
 Please confirm	TouchpadPrefView		Kérlek erősítsd meg
+Trackpad speed	TouchpadPrefView		Tapipad sebessége
 Mouse speed	SettingsView		Egér sebessége
+Trackpad acceleration	TouchpadPrefView		Tapipad gyorsítása
 Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
+Reverse scroll direction	TouchpadPrefView		Fordított görgetési irány
 Keyboard lock delay	TouchpadPrefView		Billentyűzetzár késleltetése
 Input	System name		Bemenet
 Quick	TouchpadPrefView		Gyors
@@ -21,6 +24,7 @@ Slow	KeyboardView		Lassú
 2-Button	SettingsView		2 gombos
 Click to focus and raise	SettingsView		Fókusz és előtérbe hozás kattintásra
 Vertical	TouchpadPrefView		Függőleges
+Low	TouchpadPrefView		Kicsi
 Focus follows mouse	SettingsView		A fókusz kövesse az egeret
 Double-click test area	SettingsView		Dupla-kattintási terület
 Focus mode:	SettingsView		Fókusz-mód
