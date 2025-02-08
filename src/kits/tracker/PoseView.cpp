@@ -2420,8 +2420,19 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case kMoveSelectionToTrash:
-			DoMoveToTrash();
+		{
+			BView* view = Window()->CurrentFocus();
+			if (dynamic_cast<BTextView*>(view) != NULL) {
+				// send B_DELETE to BTextView
+				char bytes[1];
+				bytes[0] = B_DELETE;
+				view->KeyDown(bytes, 1);
+			} else {
+				// send file to Trash
+				DoMoveToTrash();
+			}
 			break;
+		}
 
 		case kCleanupAll:
 			Cleanup(true);
@@ -6695,12 +6706,6 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 				SelectPose(pose, index);
 			}
 			break;
-
-		case B_DELETE:
-		{
-			DoMoveToTrash();
-			break;
-		}
 
 		case B_BACKSPACE:
 		{
