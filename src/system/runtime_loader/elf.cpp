@@ -1006,16 +1006,7 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 		// calling image. Return the next after the caller symbol.
 
 		// First of all, find the caller image.
-		image_t* callerImage = get_loaded_images().head;
-		for (; callerImage != NULL; callerImage = callerImage->next) {
-			elf_region_t& text = callerImage->regions[0];
-			if ((addr_t)caller >= text.vmstart
-				&& (addr_t)caller < text.vmstart + text.vmsize) {
-				// found the image
-				break;
-			}
-		}
-
+		image_t* callerImage = find_loaded_image_by_address((addr_t)caller);
 		if (callerImage != NULL) {
 			// found the caller -- now search the global scope until we find
 			// the next symbol
