@@ -2438,10 +2438,14 @@ BContainerWindow::ShowDropContextMenu(BPoint where, BPoseView* source)
 		if (item == NULL)
 			break;
 
-		if (item->Command() == kMoveSelectionTo && source != NULL)
-			Shortcuts()->UpdateMoveToItem(item);
-		else
+		if (item->Command() == kMoveSelectionTo && source != NULL) {
+			// check that both source and destination volumes are not read-only
+			item->SetEnabled(PoseView()->TargetVolumeIsReadOnly() == false
+				&& source->SelectedVolumeIsReadOnly() == false);
+		} else {
+			// check that target volume is not read-only
 			item->SetEnabled(PoseView()->TargetVolumeIsReadOnly() == false);
+		}
 	}
 
 	item = fDropContextMenu->Go(global, true, true);
