@@ -22,7 +22,6 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <FindDirectory.h>
-#include <fs_attr.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MediaFiles.h>
@@ -32,10 +31,13 @@
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <Roster.h>
 #include <ScrollView.h>
-#include <StringView.h>
 #include <Sound.h>
+#include <StringView.h>
+
+#include <fs_attr.h>
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -55,11 +57,19 @@ HWindow::HWindow(BRect rect, const char* name)
 {
 	_InitGUI();
 
-	BPath path;
 	// set default path
-	find_directory(B_SYSTEM_SOUNDS_DIRECTORY, &path);
-	get_ref_for_path(path.Path(), &fPathRef);
+	BPathFinder pathFinder;
+	BStringList paths;
+	pathFinder.FindPaths(B_FIND_PATH_SOUNDS_DIRECTORY, paths);
+	for (int i = 0; i < paths.CountStrings(); ++i) {
+		BEntry entry(paths.StringAt(i));
+		if (entry.Exists()) {
+			entry.GetRef(&fPathRef);
+			break;
+		}
+	}
 
+	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(kSettingsFile);
 		BFile file(path.Path(), B_READ_ONLY);
@@ -81,8 +91,10 @@ HWindow::HWindow(BRect rect, const char* name)
 	}
 
 	fFilePanel = new SoundFilePanel(this);
-	fFilePanel->SetPanelDirectory(&fPathRef);
 	fFilePanel->SetTarget(this);
+	BEntry entry(&fPathRef);
+	if (entry.Exists())
+		fFilePanel->SetPanelDirectory(&fPathRef);
 
 	MoveOnScreen();
 }
