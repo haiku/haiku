@@ -551,6 +551,9 @@ TFilePanel::SwitchDirectory(const entry_ref* ref)
 	if (entry.InitCheck() != B_OK)
 		return;
 
+	if (!entry.Exists())
+		return;
+
 	PoseView()->SetIsDesktop(isDesktop);
 	_inherited::SwitchDirectory(&setToRef);
 
