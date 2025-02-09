@@ -184,7 +184,7 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 		rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + ActualFontHeight(view)) / 2);
 		rect.top = rect.bottom - floorf(ActualFontHeight(view));
 	} else {
-		viewWidth = std::min(view->StringWidth("M") * 30, textWidth);
+		viewWidth = ceilf(std::min(view->StringWidth("M") * 30, textWidth));
 		float iconSize = (float)view->IconSizeInt();
 		if (view->ViewMode() == kIconMode) {
 			// icon mode
@@ -197,7 +197,7 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 			rect.bottom = poseLoc.y + roundf((iconSize + ActualFontHeight(view)) / 2);
 			rect.top = poseLoc.y;
 		}
-		rect.right = rect.left + ceilf(viewWidth);
+		rect.right = rect.left + viewWidth;
 	}
 
 	return rect;
