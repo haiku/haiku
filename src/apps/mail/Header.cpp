@@ -154,8 +154,9 @@ LabelView::Draw(BRect updateRect)
 		if (!IsEnabled())
 			flags |= BControlLook::B_DISABLED;
 
+		rgb_color text = ui_color(B_PANEL_TEXT_COLOR);
 		be_control_look->DrawLabel(this, Text(), rect, updateRect,
-			base, flags, BAlignment(Alignment(), B_ALIGN_MIDDLE));
+			base, flags, BAlignment(Alignment(), B_ALIGN_MIDDLE), &text);
 	}
 }
 
@@ -197,6 +198,7 @@ HeaderTextControl::Draw(BRect updateRect)
 	rect.InsetBy(-2, -2);
 
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color text = ui_color(B_PANEL_TEXT_COLOR);
 	uint32 flags = 0;
 	if (!enabled)
 		flags = BControlLook::B_DISABLED;
@@ -219,7 +221,7 @@ HeaderTextControl::Draw(BRect updateRect)
 		GetAlignment(&labelAlignment, NULL);
 
 		be_control_look->DrawLabel(this, Label(), rect, updateRect,
-			base, flags, BAlignment(labelAlignment, B_ALIGN_MIDDLE));
+			base, flags, BAlignment(labelAlignment, B_ALIGN_MIDDLE), &text);
 	}
 }
 

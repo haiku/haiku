@@ -122,8 +122,9 @@ void
 TabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect)
 {
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color text = ui_color(B_PANEL_TEXT_COLOR);
 	be_control_look->DrawLabel(owner, fLabel.String(), frame, updateRect,
-		base, 0, BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
+		base, 0, BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE), &text);
 }
 
 

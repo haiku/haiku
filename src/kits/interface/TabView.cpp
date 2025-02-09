@@ -307,10 +307,12 @@ BTab::DrawLabel(BView* owner, BRect frame)
 	BAffineTransform transform;
 	transform.RotateBy(center, rotation * M_PI / 180.0f);
 	owner->SetTransform(transform);
+
+	rgb_color highColor = ui_color(B_PANEL_TEXT_COLOR);
 	be_control_look->DrawLabel(owner, Label(), frame, frame,
 		ui_color(B_PANEL_BACKGROUND_COLOR),
 		IsEnabled() ? 0 : BControlLook::B_DISABLED,
-		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
+		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER), &highColor);
 	owner->SetTransform(BAffineTransform());
 }
 

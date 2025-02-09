@@ -1512,10 +1512,11 @@ ActivityView::Draw(BRect updateRect)
 			DrawString(label.String(), BPoint(6 + colorBox.right, y));
 			DrawString(text.String(), BPoint(frame.right - width, y));
 		} else {
+			rgb_color parentHigh = Parent()->HighColor();
 			be_control_look->DrawLabel(this, label.String(),
-				Parent()->ViewColor(), 0, BPoint(6 + colorBox.right, y));
+				Parent()->ViewColor(), 0, BPoint(6 + colorBox.right, y), &parentHigh);
 			be_control_look->DrawLabel(this, text.String(),
-				Parent()->ViewColor(), 0, BPoint(frame.right - width, y));
+				Parent()->ViewColor(), 0, BPoint(frame.right - width, y), &parentHigh);
 		}
 	}
 }

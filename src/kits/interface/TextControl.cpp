@@ -361,6 +361,8 @@ BTextControl::Draw(BRect updateRect)
 	rect.InsetBy(-2, -2);
 
 	rgb_color base = ViewColor();
+	rgb_color text = HighColor();
+
 	uint32 flags = fLook;
 	if (!enabled)
 		flags |= BControlLook::B_DISABLED;
@@ -379,7 +381,7 @@ BTextControl::Draw(BRect updateRect)
 		}
 
 		be_control_look->DrawLabel(this, Label(), rect, updateRect,
-			base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE));
+			base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE), &text);
 	}
 }
 
