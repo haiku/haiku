@@ -441,10 +441,12 @@ XHCI::XHCI(pci_info *info, 	pci_device_module_info* pci, pci_device* device, Sta
 	// Assume ownership of the controller from the BIOS.
 	uint32 eec = 0xffffffff;
 	uint32 eecp = HCS0_XECP(cparams) << 2;
-	for (; eecp != 0 && XECP_NEXT(eec); eecp += XECP_NEXT(eec) << 2) {
+	for (; eecp != 0 && XECP_NEXT(eec) != 0; eecp += XECP_NEXT(eec) << 2) {
 		TRACE("eecp register: 0x%08" B_PRIx32 "\n", eecp);
 
 		eec = ReadCapReg32(eecp);
+		if (eec == 0xffffffff)
+			break;
 		if (XECP_ID(eec) != XHCI_LEGSUP_CAPID)
 			continue;
 
