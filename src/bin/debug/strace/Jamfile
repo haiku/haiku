@@ -27,6 +27,7 @@ local straceSources =
 	ioctl.cpp
 	mutex.cpp
 	network.cpp
+	rlimit.cpp
 	signals.cpp
 ;
 

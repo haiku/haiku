@@ -150,6 +150,8 @@ struct pollfd;
 struct object_wait_info;
 struct event_wait_info;
 
+struct rlimit;
+
 DEFINE_FACTORY(flock_ptr, flock *);
 DEFINE_FACTORY(ifconf_ptr, ifconf *);
 DEFINE_FACTORY(ifreq_ptr, ifreq *);
@@ -163,6 +165,9 @@ DEFINE_FACTORY(sockaddr_ptr, const sockaddr *);
 DEFINE_FACTORY(sockaddr_args_ptr, sockaddr_args *);
 DEFINE_FACTORY(socket_args_ptr, socket_args *);
 DEFINE_FACTORY(sockopt_args_ptr, sockopt_args *);
+
+DEFINE_FACTORY(rlimit_ptr, rlimit *);
+DEFINE_FACTORY(rlimit_ptr, const rlimit *);
 
 DEFINE_FACTORY(fdset_ptr, fd_set *);
 DEFINE_FACTORY(pollfd_ptr, pollfd *);
