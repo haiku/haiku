@@ -766,8 +766,10 @@ unload_library(void* handle, image_id imageID, bool addOn)
 			// call_atexit_hooks_for_range() only here, which happens only when
 			// libraries are unloaded dynamically.
 			if (gRuntimeLoader.call_atexit_hooks_for_range != NULL) {
-				gRuntimeLoader.call_atexit_hooks_for_range(
-					image->regions[0].vmstart, image->regions[0].vmsize);
+				for (uint32 i = 0; i < image->num_regions; i++) {
+					gRuntimeLoader.call_atexit_hooks_for_range(
+						image->regions[i].vmstart, image->regions[i].vmsize);
+				}
 			}
 
 			image_event(image, IMAGE_EVENT_UNINITIALIZING);
