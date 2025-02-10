@@ -139,9 +139,9 @@
 #define XHCI_LEGSUP_OSOWNED		(1 << 24)	// OS Owned Semaphore
 #define XHCI_LEGSUP_BIOSOWNED	(1 << 16)	// BIOS Owned Semaphore
 
-#define XHCI_LEGCTLSTS				0x04
-#define XHCI_LEGCTLSTS_DISABLE_SMI	((0x7 << 1) + (0xff << 5) + (0x7 << 17))
-#define XHCI_LEGCTLSTS_EVENTS_SMI	(0x7 << 29)
+#define XHCI_LEGCTLSTS					0x04
+#define XHCI_LEGCTLSTS_RESERVED_BITS	(0xe1fee)
+#define XHCI_LEGCTLSTS_READONLY_BITS	(0x110000)
 
 #define XHCI_SUPPORTED_PROTOCOLS_CAPID		0x02
 #define XHCI_SUPPORTED_PROTOCOLS_0_MINOR(x)	(((x) >> 16) & 0xff)
