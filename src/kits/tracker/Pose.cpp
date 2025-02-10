@@ -505,7 +505,7 @@ BPose::PointInPose(BPoint poseLoc, const BPoseView* poseView, BPoint where,
 		*hitWidget = NULL;
 
 	// check intersection with icon
-	BRect rect = _ListIconRect(poseView, where);
+	BRect rect = _ListIconRect(poseView, poseLoc);
 	if (rect.Contains(where))
 		return true;
 
