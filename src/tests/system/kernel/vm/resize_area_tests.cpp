@@ -57,6 +57,21 @@ reservation_follows_resize_test()
 		return status;
 	}
 
+	// And check that the reservation still extends to where we expect
+	past = (newAreaBase + reserveSize - B_PAGE_SIZE);
+	status = _kern_reserve_address_range(&past, B_EXACT_ADDRESS, B_PAGE_SIZE);
+	if (status == B_OK) {
+		printf("reservation has wrong size!\n");
+		return status;
+	}
+
+	past = (newAreaBase + reserveSize);
+	status = _kern_reserve_address_range(&past, B_EXACT_ADDRESS, B_PAGE_SIZE);
+	if (status != B_OK) {
+		printf("reservation has wrong size!\n");
+		return status;
+	}
+
 	delete_area(area);
 	return _kern_unreserve_address_range(newAreaBase, reserveSize);
 }
