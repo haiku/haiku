@@ -12,6 +12,7 @@ SimpleTest mmap_invalid_tests : mmap_invalid_tests.cpp ;
 SimpleTest mmap_fixed_test : mmap_fixed_test.cpp ;
 
 SimpleTest reserved_areas_test : reserved_areas_test.cpp ;
+SimpleTest resize_area_tests : resize_area_tests.cpp ;
 
 SimpleTest transfer_area_test : transfer_area_test.cpp ;
 

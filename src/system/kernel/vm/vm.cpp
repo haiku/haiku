@@ -794,7 +794,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 	// Cut the end only?
 	if (offset > 0 && size == (area->Size() - offset)) {
-		status_t error = addressSpace->ShrinkAreaTail(area, offset,
+		status_t error = addressSpace->ResizeArea(area, offset,
 			allocationFlags);
 		if (error != B_OK)
 			return error;
@@ -804,7 +804,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 				area->page_protections, area->Size(), allocationFlags);
 
 			if (newProtections == NULL) {
-				addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
+				addressSpace->ResizeArea(area, oldSize, allocationFlags);
 				return B_NO_MEMORY;
 			}
 
@@ -898,7 +898,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	unmap_pages(area, address, area->Size() - firstNewSize);
 
 	// resize the area
-	status_t error = addressSpace->ShrinkAreaTail(area, firstNewSize,
+	status_t error = addressSpace->ResizeArea(area, firstNewSize,
 		allocationFlags);
 	if (error != B_OK)
 		return error;
@@ -915,7 +915,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			allocationFlags);
 
 		if (areaNewProtections == NULL || secondAreaNewProtections == NULL) {
-			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
+			addressSpace->ResizeArea(area, oldSize, allocationFlags);
 			free_etc(areaNewProtections, allocationFlags);
 			free_etc(secondAreaNewProtections, allocationFlags);
 			return B_NO_MEMORY;
@@ -935,7 +935,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			overcommitting, 0, 0,
 			dynamic_cast<VMAnonymousNoSwapCache*>(cache) == NULL, priority);
 		if (error != B_OK) {
-			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
+			addressSpace->ResizeArea(area, oldSize, allocationFlags);
 			free_etc(areaNewProtections, allocationFlags);
 			free_etc(secondAreaNewProtections, allocationFlags);
 			return error;
@@ -993,7 +993,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 			cache->ReleaseRefLocked();
 			secondCache->ReleaseRefLocked();
-			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
+			addressSpace->ResizeArea(area, oldSize, allocationFlags);
 			free_etc(areaNewProtections, allocationFlags);
 			free_etc(secondAreaNewProtections, allocationFlags);
 			return error;
@@ -1007,7 +1007,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			area->protection_max, REGION_NO_PRIVATE_MAP, 0,
 			&addressRestrictions, kernel, &secondArea, NULL);
 		if (error != B_OK) {
-			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
+			addressSpace->ResizeArea(area, oldSize, allocationFlags);
 			free_etc(areaNewProtections, allocationFlags);
 			free_etc(secondAreaNewProtections, allocationFlags);
 			return error;

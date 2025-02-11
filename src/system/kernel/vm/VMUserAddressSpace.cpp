@@ -224,25 +224,27 @@ VMUserAddressSpace::RemoveArea(VMArea* _area, uint32 allocationFlags)
 bool
 VMUserAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 {
-	VMUserArea* next = fAreas.Next(static_cast<VMUserArea*>(area));
-	addr_t newEnd = area->Base() + (newSize - 1);
-
+	const addr_t newEnd = area->Base() + (newSize - 1);
 	if (newEnd < area->Base())
 		return false;
 
-	if (next == NULL)
-		return fEndAddress >= newEnd;
+	VMUserArea* next = fAreas.Next(static_cast<VMUserArea*>(area));
+	while (next != NULL) {
+		if (next->Base() > newEnd)
+			return true;
 
-	if (next->Base() > newEnd)
-		return true;
+		// If the next area is a reservation, then we can resize into it.
+		if (next->id != RESERVED_AREA_ID)
+			return false;
+		if ((next->Base() + (next->Size() - 1)) >= newEnd)
+			return true;
 
-	// If the area was created inside a reserved area, it can
-	// also be resized in that area
-	// TODO: if there is free space after the reserved area, it could
-	// be used as well...
-	return next->id == RESERVED_AREA_ID
-		&& (uint64)next->cache_offset <= (uint64)area->Base()
-		&& next->Base() + (next->Size() - 1) >= newEnd;
+		// This "next" area is a reservation, but it's not large enough.
+		// See if we can resize past it as well.
+		next = fAreas.Next(next);
+	}
+
+	return fEndAddress >= newEnd;
 }
 
 
@@ -252,28 +254,48 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
 {
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
-	addr_t newEnd = area->Base() + (newSize - 1);
-	VMUserArea* next = fAreas.Next(area);
-	if (next != NULL && next->Base() <= newEnd) {
-		if (next->id != RESERVED_AREA_ID
-			|| (uint64)next->cache_offset > (uint64)area->Base()
-			|| next->Base() + (next->Size() - 1) < newEnd) {
-			panic("resize situation for area %p has changed although we "
-				"should have the address space lock", area);
-			return B_ERROR;
-		}
+	const addr_t oldEnd = area->Base() + (area->Size() - 1);
+	const addr_t newEnd = area->Base() + (newSize - 1);
 
-		// resize reserved area
-		addr_t offset = area->Base() + newSize - next->Base();
-		if (next->Size() <= offset) {
-			RemoveArea(next, allocationFlags);
-			next->~VMUserArea();
-			free_etc(next, allocationFlags);
-		} else {
-			status_t error = ShrinkAreaHead(next, next->Size() - offset,
-				allocationFlags);
-			if (error != B_OK)
-				return error;
+	VMUserArea* next = fAreas.Next(area);
+	if (oldEnd < newEnd) {
+		while (next != NULL) {
+			if (next->Base() > newEnd)
+				break;
+
+			if (next->id != RESERVED_AREA_ID && next->Base() < newEnd) {
+				panic("resize situation for area %p has changed although we "
+					"should have the address space lock", area);
+				return B_ERROR;
+			}
+
+			// shrink reserved area
+			addr_t offset = (area->Base() + newSize) - next->Base();
+			if (next->Size() <= offset) {
+				VMUserArea* nextNext = fAreas.Next(next);
+				RemoveArea(next, allocationFlags);
+				next->~VMUserArea();
+				free_etc(next, allocationFlags);
+				next = nextNext;
+			} else {
+				status_t error = ShrinkAreaHead(next, next->Size() - offset,
+					allocationFlags);
+				if (error != B_OK)
+					return error;
+				break;
+			}
+		}
+	} else {
+		if (next != NULL && next->id == RESERVED_AREA_ID
+				&& next->Base() == (oldEnd + 1)) {
+			// expand reserved area (at most to its original size)
+			const addr_t oldNextBase = next->Base();
+			addr_t newNextBase = oldNextBase - (oldEnd - newEnd);
+			if (newNextBase < (addr_t)next->cache_offset)
+				newNextBase = next->cache_offset;
+
+			next->SetBase(newNextBase);
+			next->SetSize(next->Size() + (oldNextBase - newNextBase));
 		}
 	}
 
