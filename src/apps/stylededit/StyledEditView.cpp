@@ -42,6 +42,12 @@ StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds,
 
 	fMessenger = new BMessenger(handler);
 	fSuppressChanges = false;
+
+	// disallow most control characters
+	for (uint32 i = 0; i < B_SPACE; ++i) {
+		if (i != B_TAB && i != B_ENTER)
+			this->DisallowChar(i);
+	}
 }
 
 
