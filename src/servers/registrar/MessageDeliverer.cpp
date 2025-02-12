@@ -10,10 +10,10 @@
 
 #include <AutoDeleter.h>
 #include <Autolock.h>
-#include <DataIO.h>
 #include <MessagePrivate.h>
 #include <MessengerPrivate.h>
 #include <OS.h>
+#include <StackOrHeapArray.h>
 #include <TokenSpace.h>
 #include <util/DoublyLinkedList.h>
 
@@ -603,14 +603,16 @@ MessageDeliverer::DeliverMessage(BMessage *message, MessagingTargetSet &targets,
 	if (message == NULL)
 		return B_BAD_VALUE;
 
-	// flatten the message
-	BMallocIO mallocIO;
-	status_t error = message->Flatten(&mallocIO, NULL);
+	ssize_t size = message->FlattenedSize();
+	BStackOrHeapArray<char, 4096> buffer(size);
+	if (!buffer.IsValid())
+		return B_NO_MEMORY;
+
+	status_t error = message->Flatten(buffer, size);
 	if (error < B_OK)
 		return error;
 
-	return DeliverMessage(mallocIO.Buffer(), mallocIO.BufferLength(), targets,
-		timeout);
+	return DeliverMessage(buffer, size, targets, timeout);
 }
 
 
