@@ -640,19 +640,7 @@ MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
 	if (!messageData || messageSize <= 0)
 		return B_BAD_VALUE;
 
-	// clone the buffer
-	void *data = malloc(messageSize);
-	if (!data)
-		return B_NO_MEMORY;
-	memcpy(data, messageData, messageSize);
-
-	// create a Message
-	Message *message = new(nothrow) Message(data, messageSize, timeout);
-	if (!message) {
-		free(data);
-		return B_NO_MEMORY;
-	}
-	BReference<Message> _(message, true);
+	BReference<Message> messageRef;
 
 	// add the message to the respective target ports
 	BAutolock locker(fLock);
@@ -668,7 +656,8 @@ MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
 
 		// try sending the message, if there are no queued messages yet
 		if (port->IsEmpty()) {
-			status_t error = _SendMessage(message, portID, token);
+			status_t error = BMessage::Private::SendFlattenedMessage((void*)messageData,
+				messageSize, portID, token, 0);
 			// if the message was delivered OK, we're done with the target
 			if (error == B_OK) {
 				_PutTargetPort(port);
@@ -684,8 +673,24 @@ MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
 			}
 		}
 
+		if (!messageRef.IsSet()) {
+			// clone the buffer
+			void *data = malloc(messageSize);
+			if (!data)
+				return B_NO_MEMORY;
+			memcpy(data, messageData, messageSize);
+
+			// create a Message
+			Message *message = new(nothrow) Message(data, messageSize, timeout);
+			if (!message) {
+				free(data);
+				return B_NO_MEMORY;
+			}
+			messageRef.SetTo(message, true);
+		}
+
 		// add the message
-		status_t error = port->PushMessage(message, token);
+		status_t error = port->PushMessage(messageRef, token);
 		_PutTargetPort(port);
 		if (error != B_OK)
 			return error;
