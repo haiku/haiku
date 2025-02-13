@@ -21,6 +21,7 @@ enum {
 	TLS_ON_EXIT_THREAD_SLOT,
 	TLS_USER_THREAD_SLOT,
 	TLS_DYNAMIC_THREAD_VECTOR,
+	TLS_MALLOC_SLOT,
 	TLS_LOCALE_SLOT,
 
 	// Note: these entries can safely be changed between

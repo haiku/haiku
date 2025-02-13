@@ -23,15 +23,17 @@
  * can buy me a beer in return. Poul-Henning Kamp
  */
 
-#ifndef MALLOC_SMALL
+#if !defined(MALLOC_SMALL) && !defined(__HAIKU__)
 #define MALLOC_STATS
 #endif
 
 #include <sys/types.h>
 #include <sys/queue.h>
 #include <sys/mman.h>
+#ifndef __HAIKU__
 #include <sys/sysctl.h>
 #include <uvm/uvmexp.h>
+#endif
 #include <errno.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -46,8 +48,14 @@
 #include <dlfcn.h>
 #endif
 
+#ifdef __HAIKU__
+#include "wrapper.c"
+#endif
+
+#ifndef __HAIKU__
 #include "thread_private.h"
 #include <tib.h>
+#endif
 
 #define MALLOC_PAGESHIFT	_MAX_PAGE_SHIFT
 
@@ -160,6 +168,9 @@ struct dir_info {
 	int malloc_junk;		/* junk fill? */
 	int mmap_flag;			/* extra flag for mmap */
 	int mutex;
+#ifdef __HAIKU__ /* cross-thread free optimization */
+	int last_found_pool;
+#endif
 	int malloc_mt;			/* multi-threaded mode? */
 					/* lists of free chunk info structs */
 	struct chunk_head chunk_info_list[BUCKETS + 1];
@@ -264,6 +275,13 @@ static union {
 		__attribute__((section(".openbsd.mutable")));
 #define mopts	malloc_readonly.mopts
 
+#ifdef __HAIKU__
+static inline u_int mopts_nmutexes()
+{
+	return mopts.malloc_pool[1]->malloc_mt ? mopts.malloc_mutexes : 2;
+}
+#endif
+
 char		*malloc_options;	/* compile-time options */
 
 static __dead void wrterror(struct dir_info *d, char *msg, ...)
@@ -351,7 +369,11 @@ getpool(void)
 	if (mopts.malloc_pool[1] == NULL || !mopts.malloc_pool[1]->malloc_mt)
 		return mopts.malloc_pool[1];
 	else	/* first one reserved for special pool */
+#ifdef __HAIKU__
+		return mopts.malloc_pool[1 + get_thread_malloc_id() %
+#else
 		return mopts.malloc_pool[1 + TIB_GET()->tib_tid %
+#endif
 		    (mopts.malloc_mutexes - 1)];
 }
 
@@ -361,6 +383,15 @@ wrterror(struct dir_info *d, char *msg, ...)
 	int		saved_errno = errno;
 	va_list		ap;
 
+#ifdef __HAIKU__
+	char	msgBuf[1024];
+	va_start(ap, msg);
+	vsnprintf(msgBuf, sizeof(msgBuf), msg, ap);
+	va_end(ap);
+
+	debugger(msgBuf);
+	exit(-1);
+#else
 	dprintf(STDERR_FILENO, "%s(%d) in %s(): ", __progname,
 	    getpid(), (d != NULL && d->func) ? d->func : "unknown");
 	va_start(ap, msg);
@@ -376,6 +407,7 @@ wrterror(struct dir_info *d, char *msg, ...)
 	errno = saved_errno;
 
 	abort();
+#endif
 }
 
 static void
@@ -392,7 +424,11 @@ getrbyte(struct dir_info *d)
 	u_char x;
 
 	if (d->rbytesused >= sizeof(d->rbytes))
+#ifdef __HAIKU__
+		d->rbytesused = 0;
+#else
 		rbytes_init(d);
+#endif
 	x = d->rbytes[d->rbytesused++];
 	return x;
 }
@@ -503,16 +539,25 @@ omalloc_init(void)
 {
 	char *p, *q, b[16];
 	int i, j;
+#ifndef __HAIKU__
 	const int mib[2] = { CTL_VM, VM_MALLOC_CONF };
+#endif
 	size_t sb;
+
+#ifdef __HAIKU__
+	memset(&mopts, 0, sizeof(mopts));
+#endif
 
 	/*
 	 * Default options
 	 */
 	mopts.malloc_mutexes = 8;
+#ifndef __HAIKU__
 	mopts.def_malloc_junk = 1;
+#endif
 	mopts.def_maxcache = MALLOC_DEFAULT_CACHE;
 
+#ifndef __HAIKU__
 	for (i = 0; i < 3; i++) {
 		switch (i) {
 		case 0:
@@ -553,6 +598,7 @@ omalloc_init(void)
 			}
 		}
 	}
+#endif
 
 #ifdef MALLOC_STATS
 	if (DO_STATS && (atexit(malloc_exit) == -1)) {
@@ -614,6 +660,10 @@ omalloc_grow(struct dir_info *d)
 	p = MMAP(newsize, d->mmap_flag);
 	if (p == MAP_FAILED)
 		return 1;
+
+#ifdef __HAIKU__
+	memset(p, 0, newsize);
+#endif
 
 	STATS_ADD(d->malloc_used, newsize);
 	STATS_ZERO(d->inserts);
@@ -961,7 +1011,12 @@ map(struct dir_info *d, size_t sz, int zero_fill)
 					mprotect(p, (cache->max - 1) * sz,
 					    PROT_NONE);
 				p = (char*)p + (cache->max - 1) * sz;
+#ifdef __HAIKU__
+				if (zero_fill)
+					memset(p, 0, sz);
+#else
 				/* zero fill not needed, freshly mmapped */
+#endif
 				return p;
 			}
 		}
@@ -970,7 +1025,12 @@ map(struct dir_info *d, size_t sz, int zero_fill)
 	p = MMAP(sz, d->mmap_flag);
 	if (p != MAP_FAILED)
 		STATS_ADD(d->malloc_used, sz);
+#ifdef __HAIKU__
+	if (zero_fill)
+		memset(p, 0, sz);
+#else
 	/* zero fill not needed */
+#endif
 	return p;
 }
 
@@ -1020,6 +1080,9 @@ alloc_chunk_info(struct dir_info *d, u_int bucket)
 			q = MMAP(MALLOC_PAGESIZE * chunk_pages, d->mmap_flag);
 			if (q == MAP_FAILED)
 				return NULL;
+#ifdef __HAIKU__
+			memset(q, 0, MALLOC_PAGESIZE * chunk_pages);
+#endif
 			d->chunk_pages = q;
 			d->chunk_pages_used = 0;
 			STATS_ADD(d->malloc_used, MALLOC_PAGESIZE *
@@ -1415,6 +1478,9 @@ malloc_recurse(struct dir_info *d)
 	errno = EDEADLK;
 }
 
+#ifdef __HAIKU__
+static
+#endif
 void
 _malloc_init(int from_rthreads)
 {
@@ -1491,6 +1557,9 @@ _malloc_init(int from_rthreads)
 			sz += d->bigcache_size * sizeof(struct bigcache);
 			if (sz > 0) {
 				void *p = MMAP(sz, 0);
+#ifdef __HAIKU__
+				memset(p, 0, sz);
+#endif
 				if (p == MAP_FAILED)
 					wrterror(NULL,
 					    "malloc_init mmap2 failed");
@@ -1506,6 +1575,9 @@ _malloc_init(int from_rthreads)
 			}
 		}
 		d->mutex = i;
+#ifdef __HAIKU__ /* cross-thread free optimization */
+		d->last_found_pool = -1;
+#endif
 	}
 
 	_MALLOC_UNLOCK(1);
@@ -1515,7 +1587,7 @@ DEF_STRONG(_malloc_init);
 #define PROLOGUE(p, fn)			\
 	d = (p); 			\
 	if (d == NULL) { 		\
-		_malloc_init(0);	\
+		/* _malloc_init(0); */	\
 		d = (p);		\
 	}				\
 	_MALLOC_LOCK(d->mutex);		\
@@ -1548,6 +1620,7 @@ malloc(size_t size)
 }
 DEF_STRONG(malloc);
 
+#ifndef __HAIKU__
 void *
 malloc_conceal(size_t size)
 {
@@ -1562,6 +1635,7 @@ malloc_conceal(size_t size)
 	return r;
 }
 DEF_WEAK(malloc_conceal);
+#endif
 
 static struct region_info *
 findpool(void *p, struct dir_info *argpool, struct dir_info **foundpool,
@@ -1572,11 +1646,30 @@ findpool(void *p, struct dir_info *argpool, struct dir_info **foundpool,
 
 	if (r == NULL) {
 		u_int i, nmutexes;
+		int first, skip;
 
 		nmutexes = mopts.malloc_pool[1]->malloc_mt ?
 		    mopts.malloc_mutexes : 2;
+#ifdef __HAIKU__ /* cross-thread free optimization */
+		first = argpool->last_found_pool;
+		skip = -1;
+#endif
 		for (i = 1; i < nmutexes; i++) {
+#ifdef __HAIKU__ /* cross-thread free optimization */
+			u_int j;
+			if (first >= 0) {
+				j = first & (nmutexes - 1);
+				skip = j;
+				first = -1;
+				i--;
+			} else {
+				j = (argpool->mutex + i) & (nmutexes - 1);
+				if (skip >= 0 && j == skip)
+					continue;
+			}
+#else
 			u_int j = (argpool->mutex + i) & (nmutexes - 1);
+#endif
 
 			pool->active--;
 			_MALLOC_UNLOCK(pool->mutex);
@@ -1587,6 +1680,9 @@ findpool(void *p, struct dir_info *argpool, struct dir_info **foundpool,
 			if (r != NULL) {
 				*saved_function = pool->func;
 				pool->func = argpool->func;
+#ifdef __HAIKU__ /* cross-thread free optimization */
+				argpool->last_found_pool = j;
+#endif
 				break;
 			}
 		}
@@ -1758,6 +1854,9 @@ freezero_p(void *ptr, size_t sz)
 	free(ptr);
 }
 
+#ifdef __HAIKU__
+static
+#endif
 void
 freezero(void *ptr, size_t sz)
 {
@@ -1974,6 +2073,42 @@ realloc(void *ptr, size_t size)
 }
 DEF_STRONG(realloc);
 
+#ifdef __HAIKU__
+static size_t
+omalloc_usable_size(struct dir_info **argpool, void *p)
+{
+	struct region_info *r;
+	struct dir_info *pool;
+	const char *saved_function;
+	size_t sz;
+
+	r = findpool(p, *argpool, &pool, &saved_function);
+
+	REALSIZE(sz, r);
+
+	if (*argpool != pool) {
+		pool->func = saved_function;
+		*argpool = pool;
+	}
+	return sz;
+}
+
+size_t
+malloc_usable_size(void *ptr)
+{
+	struct dir_info *d;
+	size_t r;
+	int saved_errno = errno;
+
+	PROLOGUE(getpool(), "malloc_usable_size")
+	SET_CALLER(d, caller(d));
+	r = omalloc_usable_size(&d, ptr);
+	EPILOGUE()
+	return r;
+}
+DEF_STRONG(malloc_usable_size);
+#endif
+
 /*
  * This is sqrt(SIZE_MAX+1), as s1*s2 <= SIZE_MAX
  * if both s1 < MUL_NO_OVERFLOW and s2 < MUL_NO_OVERFLOW
@@ -2006,6 +2141,7 @@ calloc(size_t nmemb, size_t size)
 }
 DEF_STRONG(calloc);
 
+#ifndef __HAIKU__
 void *
 calloc_conceal(size_t nmemb, size_t size)
 {
@@ -2189,6 +2325,7 @@ recallocarray(void *ptr, size_t oldnmemb, size_t newnmemb, size_t size)
 	return r;
 }
 DEF_WEAK(recallocarray);
+#endif
 
 static void *
 mapalign(struct dir_info *d, size_t alignment, size_t sz, int zero_fill)

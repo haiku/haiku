@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src system libroot posix malloc openbsd ;
+
+UsePrivateHeaders kernel libroot shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_malloc.o :
+			PagesAllocator.cpp
+			malloc.c
+			;
+	}
+}
