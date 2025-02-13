@@ -658,6 +658,7 @@ BPose::DrawTextWidget(BRect rect, BRect textRect, float width, BTextWidget* widg
 			drawView->InvertRect(textRect.OffsetByCopy(offset));
 		} else if (!windowActive && showSelectionWhenInactive) {
 			// the selection rect is alpha-blended on top for inactive windows
+			drawView->InvertRect(textRect.OffsetByCopy(offset));
 			drawView->SetDrawingMode(B_OP_BLEND);
 			drawView->SetHighColor(128, 128, 128, 255);
 			drawView->FillRect(textRect.OffsetByCopy(offset));
