@@ -90,12 +90,6 @@ __mutex_unlock(mutex *lock)
 		_kern_mutex_unblock(&lock->lock, 0);
 	}
 
-	if ((oldValue & B_USER_MUTEX_LOCKED) == 0) {
-#if 0
+	if ((oldValue & B_USER_MUTEX_LOCKED) == 0)
 		debugger("mutex was not actually locked!");
-#else
-		// The above happens too often at present (see bug #18451).
-		_kern_debug_output("libroot __mutex_unlock: mutex was not actually locked!\n");
-#endif
-	}
 }
