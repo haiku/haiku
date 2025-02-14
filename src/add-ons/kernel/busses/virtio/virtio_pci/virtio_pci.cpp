@@ -635,7 +635,8 @@ init_bus(device_node* node, void** bus_cookie)
 	pci_info *pciInfo = &bus->info;
 	pci->get_pci_info(device, pciInfo);
 
-	bus->virtio1 = pciInfo->revision == 1;
+	bus->virtio1 = pciInfo->device_id >= VIRTIO_PCI_DEVICEID_MODERN_MIN
+		&& pciInfo->device_id <= VIRTIO_PCI_DEVICEID_MODERN_MAX;
 
 	if (bus->virtio1) {
 		struct virtio_pci_cap common, isr, deviceCap;
@@ -791,12 +792,14 @@ register_child_devices(void* cookie)
 		(void**)&device);
 
 	uint16 pciSubDeviceId = pci->read_pci_config(device, PCI_subsystem_id, 2);
-	uint8 pciRevision = pci->read_pci_config(device, PCI_revision, 1);
 	uint16 pciDeviceId = pci->read_pci_config(device, PCI_device_id, 2);
 
+	uint8 virtioVersion = 0;
 	uint16 virtioDeviceId = pciSubDeviceId;
-	if (pciDeviceId >= VIRTIO_PCI_DEVICEID_MODERN_MIN)
+	if (pciDeviceId >= VIRTIO_PCI_DEVICEID_MODERN_MIN) {
+		virtioVersion = 1;
 		virtioDeviceId = pciDeviceId - VIRTIO_PCI_DEVICEID_MODERN_MIN;
+	}
 
 	char prettyName[25];
 	sprintf(prettyName, "Virtio Device %" B_PRIu16, virtioDeviceId);
@@ -814,7 +817,7 @@ register_child_devices(void* cookie)
 		{ VIRTIO_VRING_ALIGNMENT_ITEM, B_UINT16_TYPE,
 			{ .ui16 = VIRTIO_PCI_VRING_ALIGN }},
 		{ VIRTIO_VERSION_ITEM, B_UINT8_TYPE,
-			{ .ui8 = pciRevision }},
+			{ .ui8 = virtioVersion }},
 		{ NULL }
 	};
 
@@ -881,10 +884,6 @@ supports_device(device_node* parent)
 			&& pciRevision != 0) {
 			return 0.0f;
 		}
-		if (deviceID >= VIRTIO_PCI_DEVICEID_MODERN_MIN
-			&& deviceID <= VIRTIO_PCI_DEVICEID_MODERN_MAX
-			&& pciRevision != 1)
-			return 0.0f;
 
 		TRACE("Virtio device found! vendor 0x%04x, device 0x%04x\n", vendorID,
 			deviceID);
