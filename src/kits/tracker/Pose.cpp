@@ -33,6 +33,8 @@ All rights reserved.
 */
 
 
+#include "Pose.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -45,7 +47,6 @@ All rights reserved.
 #include "Commands.h"
 #include "FSClipboard.h"
 #include "IconCache.h"
-#include "Pose.h"
 #include "PoseView.h"
 
 
@@ -157,8 +158,7 @@ BPose::AddWidget(BPoseView* poseView, BColumn* column)
 
 
 BTextWidget*
-BPose::AddWidget(BPoseView* poseView, BColumn* column,
-	ModelNodeLazyOpener &opener)
+BPose::AddWidget(BPoseView* poseView, BColumn* column, ModelNodeLazyOpener& opener)
 {
 	opener.OpenNode();
 	if (fModel->InitCheck() != B_OK)
@@ -182,8 +182,7 @@ BPose::RemoveWidget(BPoseView*, BColumn* column)
 
 
 void
-BPose::Commit(bool saveChanges, BPoint loc, BPoseView* poseView,
-	int32 poseIndex)
+BPose::Commit(bool saveChanges, BPoint loc, BPoseView* poseView, int32 poseIndex)
 {
 	int32 count = fWidgetList.CountItems();
 	for (int32 index = 0; index < count; index++) {
@@ -343,20 +342,11 @@ BPose::UpdateIcon(BPoint poseLoc, BPoseView* poseView)
 {
 	IconCache::sIconCache->IconChanged(ResolvedModel());
 
-	int32 iconSize = poseView->IconSizeInt();
-
 	BRect rect;
-	if (poseView->ViewMode() == kListMode) {
-		rect = CalcRect(poseLoc, poseView);
-		rect.left += poseView->ListOffset();
-		rect.right = rect.left + iconSize;
-	} else {
-		BPoint location = Location(poseView);
-		rect.left = location.x;
-		rect.top = location.y;
-		rect.right = rect.left + iconSize;
-		rect.bottom = rect.top + iconSize;
-	}
+	if (poseView->ViewMode() == kListMode)
+		rect = _ListIconRect(poseView, poseLoc);
+	else
+		rect = _IconRect(poseView, poseLoc);
 
 	poseView->Invalidate(rect);
 }
@@ -559,7 +549,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 		drawView->SetDrawingMode(B_OP_ALPHA);
 		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 		uint8 alpha = 64; // set the level of opacity by value
-		if (poseView->LowColor().IsLight())
+		if (poseView->HighColor().IsDark())
 			drawView->SetHighColor(0, 0, 0, alpha);
 		else
 			drawView->SetHighColor(255, 255, 255, alpha);
@@ -599,7 +589,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 
 			BTextWidget* widget = WidgetFor(column, poseView, modelOpener);
 			if (widget != NULL && widget->IsVisible()) {
-				BRect columnRect(widget->ColumnRect(rect.LeftTop() + offset, column, poseView));
+				BRect columnRect(widget->ColumnRect(rect.LeftTop(), column, poseView));
 				if (columnRect.Intersects(updateRect)) {
 					BRect widgetRect(widget->CalcRect(rect.LeftTop(), column, poseView));
 
@@ -608,8 +598,8 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 						selected = false;
 
 					// draw text
-					DrawTextWidget(columnRect, widgetRect, column->Width(), widget, poseView,
-						drawView, selected, fClipboardMode, offset);
+					DrawTextWidget(columnRect, widgetRect, widget, poseView, drawView, selected,
+						fClipboardMode, offset);
 				}
 			}
 		}
@@ -631,8 +621,8 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 					selected = false;
 
 				// draw text
-				DrawTextWidget(widgetRect, widgetRect, column->Width(), widget, poseView, drawView,
-					selected, fClipboardMode, offset);
+				DrawTextWidget(widgetRect, widgetRect, widget, poseView, drawView, selected,
+					fClipboardMode, offset);
 			}
 		}
 	}
@@ -643,14 +633,14 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 
 
 void
-BPose::DrawTextWidget(BRect rect, BRect textRect, float width, BTextWidget* widget,
+BPose::DrawTextWidget(BRect rect, BRect textRect, BTextWidget* widget,
 	BPoseView* poseView, BView* drawView, bool selected, uint32 clipboardMode, BPoint offset)
 {
 	bool windowActive = poseView->Window()->IsActive();
 	bool showSelectionWhenInactive = poseView->ShowSelectionWhenInactive();
 	bool isDrawingSelectionRect = poseView->IsDrawingSelectionRect();
 
-	widget->Draw(rect, textRect, width, poseView, drawView, selected, fClipboardMode, offset);
+	widget->Draw(rect, textRect, poseView, drawView, selected, fClipboardMode, offset);
 
 	if (selected) {
 		if (windowActive || isDrawingSelectionRect) {
@@ -903,10 +893,8 @@ BPose::CalcRect(BPoint loc, const BPoseView* poseView, bool minimalRect) const
 
 	if (minimalRect) {
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-		if (widget != NULL) {
-			rect.right = widget->CalcRect(loc, poseView->FirstColumn(),
-				poseView).right;
-		}
+		if (widget != NULL)
+			rect.right = widget->CalcRect(loc, poseView->FirstColumn(), poseView).right;
 	}
 
 	return rect;
@@ -922,27 +910,21 @@ BPose::CalcRect(const BPoseView* poseView) const
 	BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 	BPoint location = Location(poseView);
 	BRect rect(_IconRect(poseView, location));
-	float textWidth = (widget != NULL ? ceilf(widget->TextWidth(poseView)) : 0);
+	float textWidth = (widget != NULL ? widget->TextWidth(poseView) : 0);
 
 	if (poseView->ViewMode() == kIconMode) {
 		// icon mode
-		if (widget != NULL) {
-			if (textWidth > rect.Width()) {
-				rect.left += roundf((rect.Width() - textWidth) / 2);
-				rect.right = rect.left + textWidth;
-			}
+		if (widget != NULL && textWidth > rect.Width()) {
+			rect.left += roundf((rect.Width() - textWidth) / 2.f);
+			rect.right = rect.left + ceilf(textWidth);
 		}
-
-		rect.bottom = rect.top + ceilf(poseView->IconPoseHeight());
 	} else {
 		// mini icon mode
 		if (widget != NULL)
-			rect.right += kMiniIconSeparator + textWidth;
-
-		float iconSize = (float)poseView->IconSizeInt();
-		float fontHeight = ActualFontHeight(poseView);
-		rect.bottom = rect.top + roundf((iconSize + fontHeight) / 2);
+			rect.right += kMiniIconSeparator + ceilf(textWidth);
 	}
+
+	rect.bottom = rect.top + ceilf(poseView->IconPoseHeight());
 
 	return rect;
 }

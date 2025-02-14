@@ -127,7 +127,7 @@ public:
 #endif
 
 private:
-	void DrawTextWidget(BRect rect, BRect textRect, float, BTextWidget*, BPoseView*,
+	void DrawTextWidget(BRect rect, BRect textRect, BTextWidget*, BPoseView* poseView,
 		BView* drawView, bool selected, uint32 clipboardMode, BPoint offset);
 	static bool _PeriodicUpdateCallback(BPose* pose, void* cookie);
 	void EditPreviousNextWidgetCommon(BPoseView* poseView, bool next);

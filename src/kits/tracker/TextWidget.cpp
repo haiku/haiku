@@ -101,8 +101,7 @@ BTextWidget::Compare(const BTextWidget& with, BPoseView* view) const
 const char*
 BTextWidget::Text(const BPoseView* view) const
 {
-	StringAttributeText* textAttribute
-		= dynamic_cast<StringAttributeText*>(fText);
+	StringAttributeText* textAttribute = dynamic_cast<StringAttributeText*>(fText);
 	if (textAttribute == NULL)
 		return NULL;
 
@@ -133,11 +132,12 @@ BTextWidget::ColumnRect(BPoint poseLoc, const BColumn* column,
 		// CalcRect otherwise
 		return CalcRect(poseLoc, column, view);
 	}
+
 	BRect rect;
 	rect.left = column->Offset() + poseLoc.x;
 	rect.right = rect.left + column->Width();
 	rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + ActualFontHeight(view)) / 2.f);
-	rect.top = ceilf(rect.bottom - ActualFontHeight(view));
+	rect.top = rect.bottom - floorf(ActualFontHeight(view));
 
 	return rect;
 }
@@ -148,10 +148,10 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 	const BPoseView* view, float textWidth)
 {
 	BRect rect;
-	float viewWidth = ceilf(textWidth);
+	float viewWidth;
 
 	if (view->ViewMode() == kListMode) {
-		viewWidth = std::min(column->Width(), textWidth);
+		viewWidth = ceilf(std::min(column->Width(), textWidth));
 
 		poseLoc.x += column->Offset();
 
@@ -181,22 +181,27 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 				break;
 		}
 
-		rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + ActualFontHeight(view)) / 2);
+		rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + ActualFontHeight(view)) / 2.f);
 		rect.top = rect.bottom - floorf(ActualFontHeight(view));
 	} else {
-		viewWidth = ceilf(std::min(view->StringWidth("M") * 30, textWidth));
 		float iconSize = (float)view->IconSizeInt();
+
 		if (view->ViewMode() == kIconMode) {
 			// icon mode
+			viewWidth = ceilf(std::min(view->StringWidth("M") * 30, textWidth));
+
 			rect.left = poseLoc.x + roundf((iconSize - viewWidth) / 2.f);
 			rect.bottom = poseLoc.y + ceilf(view->IconPoseHeight());
 			rect.top = rect.bottom - floorf(ActualFontHeight(view));
 		} else {
 			// mini icon mode
+			viewWidth = ceilf(textWidth);
+
 			rect.left = poseLoc.x + iconSize + kMiniIconSeparator;
-			rect.bottom = poseLoc.y + roundf((iconSize + ActualFontHeight(view)) / 2);
+			rect.bottom = poseLoc.y + roundf((iconSize + ActualFontHeight(view)) / 2.f);
 			rect.top = poseLoc.y;
 		}
+
 		rect.right = rect.left + viewWidth;
 	}
 
@@ -604,11 +609,11 @@ BTextWidget::CheckAndUpdate(BPoint loc, const BColumn* column, BPoseView* view, 
 		oldRect = CalcOldRect(loc, column, view);
 
 	if (fText->CheckAttributeChanged() && fText->CheckViewChanged(view) && visible) {
-		BRect invalRect(ColumnRect(loc, column, view));
+		BRect invalidRect(ColumnRect(loc, column, view));
 		if (view->ViewMode() != kListMode)
-			invalRect = invalRect | oldRect;
+			invalidRect = invalidRect | oldRect;
 
-		view->Invalidate(invalRect);
+		view->Invalidate(invalidRect);
 	}
 }
 
@@ -623,7 +628,7 @@ BTextWidget::SelectAll(BPoseView* view)
 
 
 void
-BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView* drawView,
+BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawView,
 	bool selected, uint32 clipboardMode, BPoint offset)
 {
 	ASSERT(view != NULL);
@@ -672,7 +677,14 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 			else
 				drawView->SetHighUIColor(view->HighUIColor());
 		}
-		drawView->SetDrawingMode(B_OP_OVER);
+	} else {
+		drawView->SetDrawingMode(B_OP_ALPHA);
+		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+		uint8 alpha = 128; // set the level of opacity by value
+		if (drawView->LowColor().IsLight())
+			drawView->SetHighColor(0, 0, 0, alpha);
+		else
+			drawView->SetHighColor(255, 255, 255, alpha);
 	}
 
 	float decenderHeight = roundf(view->FontInfo().descent);
@@ -735,10 +747,10 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view, BView
 			drawView->DrawString(fittingText, location + BPoint(1, 1));
 		}
 
-		if (direct && clipboardMode != kMoveSelectionTo) {
+		if (direct && clipboardMode != kMoveSelectionTo)
 			drawView->SetDrawingMode(B_OP_OVER);
-			drawView->SetHighColor(textColor);
-		}
+
+		drawView->SetHighColor(textColor);
 	}
 
 	drawView->DrawString(fittingText, location);

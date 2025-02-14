@@ -213,6 +213,8 @@ public:
 	BSize IconSize() const;
 
 	BRect Extent() const;
+	BRect ListModeExtent() const;
+	BRect IconModeExtent() const;
 	void GetLayoutInfo(uint32 viewMode, BPoint* grid,
 		BPoint* offset) const;
 
@@ -1275,7 +1277,10 @@ BPoseView::SetHasPosesInClipboard(bool hasPoses)
 inline PoseList*
 BPoseView::CurrentPoseList() const
 {
-	return IsFiltering() ? fFilteredPoseList : fPoseList;
+	if (ViewMode() == kListMode)
+		return IsFiltering() ? fFilteredPoseList : fPoseList;
+	else
+		return fVSPoseList;
 }
 
 
