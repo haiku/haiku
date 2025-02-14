@@ -149,7 +149,7 @@ VMUserAddressSpace::FindClosestArea(addr_t address, bool less) const
 {
 	VMUserArea* area = fAreas.FindClosest(address, less);
 	while (area != NULL && area->id == RESERVED_AREA_ID)
-		area = fAreas.Next(area);
+		area = less ? fAreas.Previous(area) : fAreas.Next(area);
 	return area;
 }
 

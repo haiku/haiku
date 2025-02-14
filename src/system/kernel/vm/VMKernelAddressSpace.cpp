@@ -177,7 +177,7 @@ VMKernelAddressSpace::FindClosestArea(addr_t address, bool less) const
 {
 	Range* range = fRangeTree.FindClosest(address, less);
 	while (range != NULL && range->type != Range::RANGE_AREA)
-		range = fRangeTree.Next(range);
+		range = less ? fRangeTree.Previous(range) : fRangeTree.Next(range);
 
 	return range != NULL ? range->area : NULL;
 }
