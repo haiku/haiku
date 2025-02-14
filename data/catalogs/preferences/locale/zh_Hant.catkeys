@@ -1,0 +1,31 @@
+1	english	x-vnd.Haiku-Locale	1312749322
+Medium format:	TimeFormatSettings		中等格式：
+ERROR	TimeFormatSettings		錯誤
+Negative:	TimeFormatSettings		負數
+Language	Locale Preflet Window		語言
+Short format:	TimeFormatSettings		短格式：
+24 hour	TimeFormatSettings		24小時
+Locale	Locale Preflet Window		語言環境
+Time	TimeFormatSettings		時間
+Defaults	Locale Preflet Window		默認值
+Locale	System name		語言環境
+Date	TimeFormatSettings		日期
+OK	Locale Preflet Window		確認
+Long format:	TimeFormatSettings		長格式：
+Numbers	TimeFormatSettings		數字
+Available languages	Locale Preflet Window		可用語言
+Locale	Locale Preflet		語言環境
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		無法找到可用的語言！您不能使用此預置！
+Formatting	Locale Preflet Window		格式化
+Use month/day-names from preferred language	TimeFormatSettings		使用首選語言的月/日名稱
+already chosen	LanguageListView		已經選擇
+Preferred languages	Locale Preflet Window		首選語言
+Full format:	TimeFormatSettings		完整格式：
+Cancel	Locale Preflet Window		取消
+Revert	Locale Preflet Window		恢復
+Translate application and folder names	TimeFormatSettings		翻譯應用程式和資料夾名稱
+12 hour	TimeFormatSettings		12小時
+Positive:	TimeFormatSettings		正數
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		重新啟動后 Deskbar 和 Tracker 才能使此變更生效。您想現在重新啟動它們嗎？
+Restart	Locale Preflet Window		重啓
+Currency	TimeFormatSettings		貨幣

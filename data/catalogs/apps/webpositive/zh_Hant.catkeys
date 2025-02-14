@@ -1,0 +1,92 @@
+1	english	x-vnd.Haiku-WebPositive	1597141675
+Authentication required	Authentication Panel		需要身份驗證
+Copy	Console Window		複製
+Open bookmarks confirmation	WebPositive Window		開啓書籤確認
+Close window	WebPositive Window		關閉視窗
+Rename	BookmarkBar		再命名
+Find:	WebPositive Window		尋找：
+There was an error setting up the bookmark.	WebPositive Window		設定書籤時發生錯誤。
+Fonts	Settings Window		字體
+Path	Cookie Manager		路徑
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 已完成
+Open containing folder	Download Window		開啓包含資料夾
+Find previous	WebPositive Window		尋找上一個
+Copy URL to clipboard	Download Window		將 URL 複製到剪貼簿
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	您想一次開啟 %addedCount 個書籤嗎？
+Cancel	Download Window		取消
+Settings	Settings Window		設定
+Proxy password:	Settings Window		代理密碼：
+Error opening downloads folder	Download Window		開啓下載資料夾時出錯
+Find	WebPositive Window		尋找
+Standard font:	Settings Window		標準字體：
+Open download error	Download Window		開啟下載錯誤
+New tabs:	Settings Window		新標籤頁：
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失敗
+Open downloads folder	Download Window		開啓下載資料夾
+Default fixed font size:	Settings Window		默認固定字體大小：
+The download could not be opened.	Download Window		無法開啟下載的內容。
+Close	Download Window		關閉
+%s - Search term	Settings Window		%s - 搜尋詞
+Username:	Authentication Panel		使用者名稱：
+Hide password text	Authentication Panel		隱藏密碼文字
+OK	Authentication Panel		確認
+Name	Cookie Manager		名稱
+Remove finished	Download Window		消除完成
+Edit	WebPositive Window		編輯
+Back	WebPositive Window		返回
+Yesterday	WebPositive Window		昨日
+Quit	WebPositive		退出
+Number of days to keep links in History menu:	Settings Window		在「歷史記錄」功能表中保留鏈結的天數：
+Password:	Authentication Panel		密碼：
+Cut	URL Bar		剪下
+Paste	URL Bar		貼上
+Find next	WebPositive Window		尋找下一個
+Open search page	Settings Window		開啟搜尋頁面
+New tab	WebPositive Window		新標籤頁
+Open location	WebPositive Window		開啓位置
+New browser window	Download Window		新瀏覽視窗
+Open	Download Window		開啓
+New window	WebPositive Window		新視窗
+New windows:	Settings Window		新視窗：
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	無法開啟下載資料夾。\n\n錯誤：%error
+Cancel	Authentication Panel		取消
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	建立書籤檔案時發生錯誤。\n\n錯誤：%error
+OK	Download Window		確認
+Proxy username:	Settings Window		代理用戶名：
+Rename bookmark	BookmarkBar		再命名書簽
+Apply	Settings Window		套用
+Copy	WebPositive Window		複製
+Default standard font size:	Settings Window		默認標準字體大小：
+Show tabs if only one page is open	Settings Window		如果僅開啟一頁，則顯示選項卡
+Remove	Download Window		消除
+Close tab	WebPositive Window		關閉選項卡
+About	WebPositive Window		關於
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		仍有下載正在進行，您真的要現在退出 WebPositive 嗎？
+Cancel	Settings Window		取消
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	尋找下一個出現的搜尋字詞
+Fixed font:	Settings Window		固定字體：
+Quit	WebPositive Window		退出
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	尋找前一個出現的搜尋字詞
+Remember username and password for this site	Authentication Panel		記住本網站的使用者名稱和密碼
+Show home button	Settings Window		顯示首頁按鍵
+Start new session	Settings Window		開始新會話
+Remove missing	Download Window		消除缺失的
+Paste	WebPositive Window		貼上
+Double-click or middle-click to open new tab.	Tab Manager		雙擊或中鍵點選開啟新分頁。
+Next	WebPositive Window		下一步
+OK	WebPositive Window		確認
+Save page as…	WebPositive Window		將頁面存储為…
+Requesting %url	WebPositive Window		正在請求 %url
+Window	WebPositive Window		視窗
+Search page:	Settings Window		搜尋頁：
+Settings	WebPositive Window		設定
+Loading %url	WebPositive Window		正在加載 %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+New name:	BookmarkBar		新名字：
+Open all	WebPositive Window		開啓全部
+Cut	WebPositive Window		剪下
+Open blank page	Settings Window		開啓空白頁
+Cancel	WebPositive Window		取消
+Copy	URL Bar		複製
+Open in new tab	BookmarkBar		在新選項卡中開啟
+Open start page	Settings Window		開啟起始頁

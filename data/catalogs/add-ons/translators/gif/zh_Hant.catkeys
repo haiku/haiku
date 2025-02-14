@@ -1,0 +1,19 @@
+1	english	x-vnd.Haiku-GIFTranslator	2201651797
+Websafe	GIFView		Websafe
+Write interlaced images	GIFView		寫入隔行圖像
+Optimal	GIFView		最佳化
+Greyscale	GIFView		灰階
+Colors:	GIFView		顏色:
+GIF image translator	GIFTranslator		GIF圖片轉譯器
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be 位圖格式（GIF轉譯器）
+GIF image translator	GIFView		GIF圖片轉譯器
+Palette:	GIFView		調色盤:
+GIF image	GIFTranslator		GIF圖片
+Write transparent images	GIFView		寫入透明圖像
+GIF images	GIFTranslator		GIF圖片
+Version %d.%d.%d, %s	GIFView		版本 %d.%d.%d, %s
+Use RGB color	GIFView		使用RGB
+Use dithering	GIFView		抖動
+GIF Settings	GIFTranslator		GIF設定
+BeOS system	GIFView		BeOS 系統顏色
+Automatic (from alpha channel)	GIFView		自動從Alpha通道設定

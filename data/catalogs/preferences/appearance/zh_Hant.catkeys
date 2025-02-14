@@ -1,0 +1,80 @@
+1	english	x-vnd.Haiku-Appearance	211365410
+Control border	Colors tab		控制邊界
+Control mark	Colors tab		控制標記
+Off	AntialiasingSettingsView		關閉
+Window border	Colors tab		視窗邊框
+Inactive window tab	Colors tab		非活動視窗選項卡
+Defaults	APRWindow		默認
+Shadow	Colors tab		陰影
+Document background	Colors tab		檔案背景
+List background	Colors tab		清單背景
+No effect on running applications	DecorSettingsView		對正在運行的應用程式沒有影響
+Fixed font:	Font view		固定字體：
+Appearance	System name		外觀
+Reduce colored edges filter strength:	AntialiasingSettingsView		降低色彩化邊緣的過濾强度：
+Glyph hinting:	AntialiasingSettingsView		字形提示：
+Default Haiku ControlLook	DecorSettingsView		默認的Haiku控制外觀
+Menu item text	Colors tab		選單項目文字
+About decorator	DecorSettingsView		關於 decorator
+Antialiasing menu	AntialiasingSettingsView		抗鋸齒選單
+Success	Colors tab		成功
+About	DecorSettingsView		關於
+Shine	Colors tab		高亮
+Arrow style	DecorSettingsView		箭頭樣式
+On	AntialiasingSettingsView		開啓
+Decorator:	DecorSettingsView		裝飾：
+Menu background	Colors tab		選單背景
+Revert	APRWindow		恢復
+List item text	Colors tab		列表項文字
+OK	DecorSettingsView		確認
+Control text	Colors tab		控制文字
+Look and feel	APRWindow		外觀和感覺
+Selected menu item background	Colors tab		已選的選單項目背景
+Link active	Colors tab		活躍鏈結
+Antialiasing	APRWindow		抗鋸齒
+Menu font:	Font view		選單字體：
+Bold font:	Font view		粗體：
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n作者:\n\t%decorAuthors\n\nURL: %decorURL\n許可: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		選擇裝飾
+Failure	Colors tab		失敗
+Strong	AntialiasingSettingsView		粗體
+Double:	DecorSettingsView		雙倍：
+Selected menu item text	Colors tab		已選定的選單的項目文字
+Size:	Font Selection view		尺寸：
+Panel background	Colors tab		面板背景
+Plain font:	Font view		一般字體
+Automatically pick secondary colors	Colors tab		自動選取次要顏色
+Window tab text	Colors tab		視窗選項卡文字
+Navigation pulse	Colors tab		導航脈衝
+LCD subpixel	AntialiasingSettingsView		LCD子像素
+Window tab	Colors tab		視窗選項卡
+Link text	Colors tab		鏈結文字
+Tooltip background	Colors tab		工具提示背景
+ControlLook:	DecorSettingsView		控制外觀：
+Scroll bar thumb	Colors tab		滾動條拇指
+Default	DecorSettingsView		默認
+Link visited	Colors tab		已訪問鏈結
+Selected menu item border	Colors tab		已選定的選單項目邊框
+Tooltip text	Colors tab		提示文字
+Control background	Colors tab		控制背景
+Selected list item text	Colors tab		已選定的列表項文字
+Selected list item background	Colors tab		已選定的列表項背景
+Inactive window tab text	Colors tab		非活躍視窗選項卡文字
+Navigation base	Colors tab		導航基礎
+Fonts	APRWindow		字體
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+Grayscale	AntialiasingSettingsView		灰度
+Antialiasing type:	AntialiasingSettingsView		抗鋸齒類型：
+Panel text	Colors tab		面板文字
+Hinting menu	AntialiasingSettingsView		提示選單
+Scroll bar:	DecorSettingsView		滾動條：
+Choose ControlLook	DecorSettingsView		選擇控制外觀
+Monospaced fonts only	AntialiasingSettingsView		僅限單倍體字體
+Document text	Colors tab		檔案文字
+Inactive window border	Colors tab		非活動視窗邊框
+Colors	APRWindow		顏色
+About control look	DecorSettingsView		關於 control look
+Control highlight	Colors tab		控制高亮顯示
+Status bar	Colors tab		狀態列
+Link hover	Colors tab		鏈結懸停
+Single:	DecorSettingsView		單一:

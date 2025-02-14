@@ -1,0 +1,48 @@
+1	english	x-vnd.Haiku-ActivityMonitor	2467534740
+Teams	DataSource		隊列
+Semaphores	DataSource		信號量
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		區塊高速緩衝記憶體
+%lld ms	SettingsWindow		%lld ms
+Media nodes	DataSource		媒體節點
+Text clipboard	DataSource		文字剪貼簿
+Network send	DataSource		網路傳送
+Cache	DataSource		緩存
+Running applications	DataSource		運行應用程式
+CPU usage (combined)	DataSource		CPU 使用率（合併）
+Threads	DataSource		執行緒數
+Receiving	DataSource		接收
+Remove graph	ActivityView		刪除圖表
+Swap space	DataSource		交換空間
+CPU	DataSource		CPU
+ActivityMonitor	System name		活動監視器
+CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		更新時間間隔：
+RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		設定…
+Block cache	DataSource		塊緩存
+Memory	DataSource		記憶體
+CPU usage	DataSource		CPU使用率
+CPU speed	DataSource		中央處理器速度
+Quit	ActivityWindow		退出
+Raw clipboard	DataSource		原始剪貼簿
+Settings	ActivityWindow		設定
+Used memory	DataSource		使用記憶體
+Show legend	ActivityView		顯示圖例
+Cached memory	DataSource		緩存記憶體
+CPU %d usage	DataSource		CPU %d 使用率
+CPU %d speed	DataSource		CPU %d 速度
+File	ActivityWindow		檔案
+Ports	DataSource		端口
+Page faults	DataSource		頁面錯誤
+Additional items	ActivityView		附加項目
+Apps	DataSource		應用程式
+Add graph	ActivityWindow		新增圖表
+Sending	DataSource		傳送
+Always on top	ActivityWindow		始終位於頂部
+Swap	DataSource		交換空間
+%lld sec.	SettingsWindow		%lld 秒
+P-faults	DataSource		P-faults
+Sems	DataSource		Sems
+Network receive	DataSource		網路接收
+%s faults/s	DataSource		%s 故障/秒

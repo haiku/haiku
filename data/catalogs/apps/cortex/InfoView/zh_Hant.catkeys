@@ -1,0 +1,8 @@
+1	english	x-vnd.Cortex.InfoView	391645599
+%title% info	InfoView		%title% 資訊
+File format	AppNodeInfoView		檔案格式
+Live file-interface node	FileNodeInfoView		即時檔案介面節點
+File format	FileNodeInfoView		檔案格式
+(no file)	FileNodeInfoView		（無檔案）
+Version	AppNodeInfoView		版本
+Copyright	FileNodeInfoView		版權

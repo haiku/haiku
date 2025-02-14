@@ -1,0 +1,18 @@
+1	english	x-vnd.Haiku-ProcessController	4055497297
+Error saving file	ProcessController		儲存檔案時發生錯誤
+Your setting file could not be saved!\n(%s)	ProcessController		無法存儲您的設定檔！\n(%s)
+Live in the Deskbar	ProcessController		于Deskbar上實時顯示
+OK	ProcessController		確認
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		您可以在視窗中執行 ProcessController 或將其安裝在Deskbar中。
+Ok!	ProcessController		確認！
+Restart Deskbar	ProcessController		重啟Deskbar
+About ProcessController…	ProcessController		關於ProcessController…
+Usage: %s [-deskbar]\n	ProcessController		用法: %s [-deskbar]\n
+Quit application	ProcessController		退出應用程式
+Quit an application	ProcessController		退出一個應用程式
+Cancel	ProcessController		取消
+Install in Deskbar	ProcessController		安裝在Deskbar中
+Restart Tracker	ProcessController		重啓Tracker
+New Terminal	ProcessController		新創終端
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController 已安裝在Deskbar中。
+Run in window	ProcessController		在視窗中運行

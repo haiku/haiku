@@ -1,0 +1,229 @@
+1	english	x-vnd.Haiku-HaikuDepot	3219032380
+Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用條件下載問題
+Available packages	MainWindow		可用軟體套件
+It was not possible to create the new user.	UserLoginWindow		無法創建新使用者。
+An unexpected error has been sent from the server [%li]	ServerHelper		伺服器  [%li] 發送了意外錯誤
+Create account	UserLoginWindow		創建賬戶
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		取得套件的變更日誌
+Agree	ToLatestUserUsageConditionsWindow		同意
+Install %PackageTitle%	PackageManager		安裝 %PackageTitle%
+The response to the captcha was incorrect.	ServerHelper		對驗證碼的回應不正確。
+Rate package…	PackageInfoView		点评軟體套件…
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		您已成功通過使用者身份驗證 %Nickname%.
+Package problems	PackageProblem	Window title	軟體套件問題
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		無法從伺服器傳回的資料中提取必要的驗證碼資訊。
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		取得套件列表時發生錯誤： %message%
+Update usage conditions	ToLatestUserUsageConditionsWindow		更新使用條件
+No usage conditions	UserUsageConditions		沒有使用條件
+Active	PackageListView		活躍
+Login or Create account	MainWindow		登入或建立帳戶
+Switch account…	MainWindow		切換帳戶…
+Preferred language:	UserLoginWindow		首選語言：
+Name	PackageListView		名稱
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		授權或安全問題。登出並重新登入以檢查您的密碼是否正確，並檢查您是否同意最新的使用條件。
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		Haiku軟體庫 與名為 HaikuDepotServer 的伺服器元件進行通訊。這些是使用者「%Nickname%」在 %AgreedToTimestamp% 同意的與使用 HaikuDepotServer 服務相關的使用條件。
+don't activate package %source%	PackageProblem	don't change '%source%	不啓用套件 %source%
+Rate %Package%	RatePackageWindow		評分 %Package%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		初始化套件管理器時發生錯誤：%message%
+Quit HaikuDepot	App		退出Haiku軟體庫
+Category	FilterView		分類
+A response to the captcha question must be provided.	UserLoginWindow		必須提供對驗證碼問題的答案。
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		意外錯誤 '%Message%' 出現並關聯資產 '%Property%'
+A requested object or an object involved in the request was not found on the server.	ServerHelper		在伺服器上找不到請求的物件或請求中涉及的物件。
+Logout	ToLatestUserUsageConditionsWindow		登出
+Password requirements	UserLoginWindow		密碼要求
+The following additional package changes have to be made:	PackageResult		必須進行以下額外的軟體套件變更：
+No changelog available.	PackageInfoView		沒有可用的變更日誌。
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		目前的使用條件已被同意。
+Cancel	PackageProblem		取消
+Version	PackageListView		版本
+No, quit HaikuDepot	App		否，退出Haiku軟體庫
+Not logged in	MainWindow		未登入
+Featured packages	FeaturedPackagesView		特色套件
+Available	PackageListView		可用的
+Click a package to view information	PackageInfoView		點擊某個套件即可查看訊息
+Cancel	UserLoginWindow		取消
+Rating not possible	MainWindow		無法評分
+Package update error	MainWindow		套件更新錯誤
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
+Reboot required	PackageManager		需要重新啟動
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		獲取套件的用戶評分
+All packages	PackageListView		全部套件
+Send	RatePackageWindow		傳送
+Start package daemon	App		啟動套件守護程式
+There are problems in the supplied data:	UserLoginWindow		提供的數據有問題：
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		使用者 '%Nickname%' 尚未同意任何使用條件。
+Usage conditions download problem	UserLoginWindow		使用條件下載問題
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	從儲存庫 %s 安裝程式包 %s\n
+Package daemon problem	App		套件守護程式問題
+No	MainWindow		否
+Repository	PackageListView		庫
+Close	RatePackageWindow		關閉
+Close	UserLoginWindow		關閉
+The email is malformed.	UserLoginWindow		電子郵件格式錯誤。
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		正在同步儲存庫 '%REPO_NAME%' 的套件數據
+View the usage conditions	UserLoginWindow		檢視使用條件
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		下載創建新使用者所需的使用條件時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		已約定使用條件
+Size	PackageListView		大小
+Your rating was updated.	RatePackageWindow		你的評分已更新。
+All categories	FilterView		所有類別
+ignore problem for now	PackageProblem		暫時忽略問題
+n/a	PackageInfoView		n/a
+Checking user details	UserDetailVerifierProcess		檢查用戶詳細信息
+Cancel	MainWindow		取消
+Refresh repositories	MainWindow		刷新庫
+Continue	App		繼續
+A password is required.	UserLoginWindow		需要密碼。
+Language	RatePackageWindow		語言
+Status	PackageListView		狀態
+Network transport error	ServerHelper		網路傳輸錯誤
+Cancel	PackageResult		取消
+Uninstall %PackageTitle%	PackageManager		解除安裝 %PackageTitle%
+Retry	PackageProblem		重試
+Update	RatePackageWindow		更新
+Language	UserLoginWindow		語言
+OK	UserLoginWindow		確認
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		從伺服器同步參考資料
+Stability:	RatePackageWindow		穩定性：
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		必須同意使用協議，並確認創建用戶的人符合最低年齡要求。
+solution %d:	PackageProblem	Don't change the %d variable	解決方案 %d:
+Source packages	MainWindow		源碼套件
+Problem with working files	App		工作文件有問題
+Try again	App		再試一次
+Unknown	PackageListView		未知
+I agree to the usage conditions	UserLoginWindow		我同意使用條件
+Logged in as %User%	MainWindow		登入身份 %User%
+A reboot is necessary to complete the installation process.	PackageManager		需要重新啟動才能完成安裝程序。
+Yes	MainWindow		是的
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{我至少一歲了}other{我大於 # 歲}}
+Pending…	PackageListView		待辦的…
+Search terms:	FilterView		搜尋字詞：
+Quit	App		退出
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		暱稱格式不正確。暱稱只能包含數字和小寫拉丁字元。暱稱的長度必須在 4 到 16 個字元之間。
+Authentication failed	UserLoginWindow		認證失敗
+Captcha error	UserLoginWindow		驗證碼錯誤
+Manage repositories…	MainWindow		管理庫…
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		暱稱必須是唯一的，但提供的暱稱已被佔用。選擇不同的暱稱。
+OK	UserUsageConditions		確認
+Open %DeskbarLink%	PackageManager		開啟 %DeskbarLink%
+Input validation	UserLoginWindow		輸入驗證
+Log in…	MainWindow		登入…
+Client version too old	ServerHelper		客戶端版本太舊
+Local repository load error	LocalPkgDataLoadProcess		本機儲存庫載入錯誤
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		使用者不存在或提供了錯誤的密碼。檢查您的憑證並重試。
+All repositories	MainWindow		全部庫
+Repository update error	LocalRepositoryUpdateProcess		儲存庫更新錯誤
+Network error	ServerHelper		網路錯誤
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		Haiku軟體庫- %PackageName% %PackageVersion%
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		刷新儲存庫時發生錯誤：%error%
+User Created	UserLoginWindow		用戶已創建
+Check for updates…	MainWindow		檢查更新…
+Uninstalled	PackageListView		已解除安裝
+I agree to the usage conditions	ToLatestUserUsageConditionsWindow		我同意使用條件
+Installing \"%PackageName%\"	InstallPackageProcess		正在安裝 \"%PackageName%\"
+OK	App		確認
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		Haiku軟體庫與名為 HaikuDepotServer 的伺服器元件進行通訊。這些是使用 HaikuDepotServer 服務的最新使用條件。
+Fatal error	UninstallPackageAction		致命錯誤
+Develop packages	MainWindow		開發套件
+Starting the package daemon failed:\n\n%Error%	App		啟動包守護程式失敗：\n\n%Error%
+No user ratings available.	PackageInfoView		沒有可用的用戶評級。
+<no info>	PackageInfoView		<無訊息>
+Usage conditions download problem	UserUsageConditions		使用條件下載問題
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		下載創建新使用者所需的密碼要求時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的HaikuDepot部分。
+Fetching screenshot	CacheScreenshotProcess		正在獲取螢幕截圖
+A network transport error has arisen communicating with the server system: %s	ServerHelper		與伺服器系統通訊時出現網路傳輸錯誤：%s
+Rating	PackageListView		評分
+Synchronizing icons	ServerIconExportUpdateProcess		同步圖示
+Show	MainWindow		展示
+Settings…	MainWindow		設定…
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		該應用程式在您的電腦上寫入和讀取一些工作文件以便正常運行。在 [%TestFilePath%] 處寫入測試檔案似乎出現問題。檢查本機磁碟或權限是否存在可能阻止此應用程式將檔案寫入該目錄位置的問題。您可以選擇承認此問題並繼續，但某些功能可能會被停用。
+<Package contents not available for remote packages>	PackageContentsView		<遠端套件的套件內容不可用>
+Ratings	PackageInfoView		評分
+The following problems have been encountered. Please select a solution for each:	PackageProblem		遇到了以下問題。請為每個問題選擇一個解決方案：
+Local	LocalPkgDataLoadProcess		本地
+Package changes	PackageResult	Window title	套件變動
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		從這台計算機向 HaikuDepotServer 系統發送匿名使用資料是否可以接受？您可以稍後在 \"Settings\" 「設定」視窗中變更您的首選項。
+User rating	RatePackageWindow		用戶評價
+Installed packages	MainWindow		已安裝套件
+Date	PackageListView		日期
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		密碼必須至少為 %MinPasswordLength% 字元。 %MinPasswordUppercaseChar% 字元必須是大寫 以及 %MinPasswordDigitsChar% 字元必須是數字。
+Error	App		錯誤
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		下載使用條件時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
+There was a puzzling response from the web service.	UserLoginWindow		網路服務給了令人費解的回應。
+Opening \"%DeskbarLink%\"	OpenPackageProcess		正開啟 \"%DeskbarLink%\"
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		您的評分已成功上傳。您可以在Haiku軟體庫伺服器網站上更新或刪除它。
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		無法與伺服器通訊以取得創建新使用者所需的驗證碼影像。
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		提供的驗證碼響應不正確。將產生新的驗證碼；再試一次。
+-	no package publish		-
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Haiku軟體庫需要程式套件守護程序才能運行，但它似乎沒有運行。\n您想現在就開始嗎？
+The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		密碼長度必須至少為八個字符，並且至少由兩位數字和一個大寫字符組成。
+Contents	PackageInfoView		內容
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		與 HaikuDepotServer 分享匿名使用數據
+Close	PackageManager		關閉
+Changelog	PackageInfoView		變更日誌
+About	PackageInfoView		關於
+Password requirements download problem	UserLoginWindow		下載需要密碼問題
+Password:	UserLoginWindow		密码：
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		該應用程式太舊，無法與伺服器系統通訊。透過更新您的系統來取得此應用程式的更新版本。此應用程式所需的最低版本是  \"%s\".
+Stability	RatePackageWindow		穩定
+The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		密碼必須重複輸入，以減少密碼輸入錯誤的機會。
+Cancel	SettingsWindow		取消
+Cancel	RatePackageWindow		取消
+Inactive	PackageListView		不活躍
+Nickname:	UserLoginWindow		昵稱：
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		同步儲存庫相關的元數據
+OK	MainWindow		確認
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		使用者必須是{0, plural, one{# 歲} other{# 歲}} 或以上。
+Version %Code%	UserUsageConditions		版本 %Code%
+Uninstalling \"%PackageName%\"	UninstallPackageAction		正在解除安裝 \"%PackageName%\"
+Downloading:	PackageInfoView		下載中：
+Quit	MainWindow		退出
+Success	UserLoginWindow		成功
+(%Votes%)	PackageInfoView		(%Votes%)
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (版本 %hd.version%)
+Settings	SettingsWindow		設定
+Login issue	MainWindow		登入問題
+Your rating:	RatePackageWindow		你的評分：
+HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		Haiku軟體庫正在完成退出前的停止或完成運行中的操作。
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		使用者%Nickname% 已在HaikuDepotServer 系統中成功創建。您可以使用 Web 介面管理您的使用者詳細資訊。您現在已以新使用者身分登入。
+Repositories	MainWindow		庫
+This rating is visible to other users	RatePackageWindow		其他用戶可以看到此評級
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		更新套件資料時出現了一個問題，可能會導致應用程式顯示的資料過時或遺失。可以從應用程式日誌中獲取有關此問題的其他詳細資訊。\n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		下載使用條件時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
+View agreed usage conditions…	MainWindow		查看約定的使用條件…
+The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		使用者 [%Nickname%] 已通過身份驗證，但在繼續之前，您需要同意最新的使用條件。
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		該軟體套件似乎不在 HaikuDepot 伺服器上，因此無法創建新評級或編輯現有評級。
+Apply	SettingsWindow		套用
+View the password requirements	UserLoginWindow		查看密碼要求
+The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		使用者 \"%Nickname%\" 先前已同意使用條件，但此後使用條件已更新。現在需要同意更新的使用條件。
+Log out	MainWindow		退出
+Comment language:	RatePackageWindow		評論語言：
+The password has been incorrectly repeated.	UserLoginWindow		密碼錯誤地重複。
+The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		先前為使用者 [%Nickname%] 提供的密碼目前無效。用戶將從該應用程式註銷，您應該使用更新的密碼再次登入。
+View the usage conditions	ToLatestUserUsageConditionsWindow		檢視使用條件
+OK	ServerHelper		確認
+Reading repository data	LocalPkgDataLoadProcess		正在讀取庫數據
+Fatal error	InstallPackageProcess		致命錯誤
+A validation error has occurred	ServerHelper		發生驗證錯誤
+The nickname is required.	UserLoginWindow		暱稱是必需的。
+Apply changes	PackageResult		套用變更
+Server error	ServerHelper		伺服器錯誤
+Rate package	RatePackageWindow		對套件評分
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		正在錄製視圖 \"%PackageName%\"
+Sending anonymous usage data	MainWindow		發送匿名使用數據
+Log in	UserLoginWindow		登入
+Usage conditions	UserUsageConditions		使用條件
+Populating package sizes	PopulatePkgSizesProcess		正在填充套件大小
+HaikuDepot	System name		Haiku軟體庫
+Screenshot	ScreenshotWindow		螢幕截圖
+Email address:	UserLoginWindow		電子郵件：
+View latest usage conditions…	MainWindow		檢視最新使用條件
+Category:	FilterView		類別：
+uninstall package %s\n	PackageResult	Don't change '%s' variable	解除安裝 package %s\n
+Fetching remote repository data	LocalRepositoryUpdateProcess		取得遠端儲存庫數據
+Description	PackageListView		描述
+User creation error	UserLoginWindow		使用者建立錯誤
+You need to be logged into an account before you can rate packages.	MainWindow		您需要先登入帳戶才能對套件給與評分。
+Cleaning up…	ShuttingDownWindow		清理…
+Repeat password:	UserLoginWindow		重複密碼：

@@ -1,0 +1,54 @@
+1	english	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		賬戶設定
+\t\t· Outgoing	Config Window		\t\t·傳出
+An error occurred while creating the config view: %error.	Config Views		建立配置視圖時發生錯誤：%error。
+E-mail address:	E-Mail		電子郵件：
+Create new account	AutoConfigWindow		創建新賬戶
+While sending and receiving	Config Window		發送和接收時
+Error!	Config Views		錯誤！
+Apply	Config Window		套用
+Incoming mail filters	Config Views		傳入郵件過濾器
+Outgoing mail filters	Config Views		傳出郵件過濾器
+Server name:	E-Mail		伺服器名稱：
+Add	Config Window		添加
+Back	AutoConfigWindow		返回
+Real name:	E-Mail		真實名稱:
+Real name:	Config Views		真實名稱:
+\t\t· E-mail filters	Config Window		\t\t· 電子郵件過濾器
+Outgoing	E-Mail		傳出
+Accounts	Config Window		帳戶
+Outgoing	Config Window		傳出
+Remove	Config Views		消除
+Show notifications:	Config Window		顯示通知：
+Settings	Config Window		設定
+Never	Config Window	show status window	絕不
+Account name:	Config Views		帳戶名稱：
+\t\t· Incoming	Config Window		\t\t· 傳入
+Enter a valid e-mail address.	AutoConfigWindow		輸入有效的電子郵件地址。
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n無法還原常規設定\n\n檢索常規設定時發生錯誤:\n%s\n
+Incoming	E-Mail		傳入
+Choose Protocol	E-Mail		選擇協議
+Return address:	Config Views		回郵地址：
+Password:	E-Mail		密碼：
+Error retrieving general settings: %s\n	Config Window		檢索常規設定時發生錯誤： %s\n
+The filter could not be moved. Deleting filter.	Config Views		過濾器無法移動。正在刪除過濾器。
+OK	Config Views		確認
+Revert	Config Window		恢復
+Incoming	Config Window		傳入
+Finish	AutoConfigWindow		結束
+Add filter	Config Views		新增過濾器
+Account settings	Config Views		帳戶設定
+minutes	Config Window		分鐘
+E-mail	System name		電子郵件
+Check every	Config Window		檢查每個
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		使用「新增」按鈕建立一個新帳戶。\n\n使用所選項目上的「刪除」按鈕刪除帳戶。\n\n選擇清單中的一個項目以變更其設定。
+Account name:	E-Mail		帳戶名稱：
+Edit mailbox menu…	Config Window		編輯郵件選單…
+Server Name:	E-Mail		伺服器名稱：
+Remove	Config Window		消除
+Login name:	E-Mail		登入名稱：
+While sending	Config Window		發送時
+OK	Config Window		確認
+OK	AutoConfigWindow		確認
+Next	AutoConfigWindow		下一步
+Error	Config Window		錯誤

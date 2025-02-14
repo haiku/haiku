@@ -1,0 +1,22 @@
+1	english	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		未壓縮
+Indexed	PSDLoader		已索引
+Grayscale	PSDLoader		灰階
+Photoshop image translator	PSDConfig		Photoshop圖片轉譯器
+Photoshop image translator	PSDTranslator		Photoshop圖片轉譯器
+Version %d.%d.%d, %s	PSDConfig		版本 %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop 檔案（PSD 檔案）
+Photoshop image	PSDTranslator		Photoshop圖片
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop 大型檔案（PSB 檔案）
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Photoshop圖片(%s)
+PSDTranslator Settings	PSDConfig		PSD轉譯器設定
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		點陣圖
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		壓縮：
+Format: 	PSDConfig		格式：
+Multichannel	PSDLoader		多通道
+Duotone	PSDLoader		雙色調

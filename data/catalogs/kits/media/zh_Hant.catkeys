@@ -1,0 +1,12 @@
+1	english	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		正在清理。
+Starting media_services.	MediaDefs		正在啟動media_services。
+Stopping media_addon_server.	MediaDefs		正在關閉media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		等待 media_addon_server 退出。
+Telling media_addon_server to quit.	MediaDefs		正在通知 media_addon_server 退出。
+Ready for use.	MediaDefs		準備好可使用。
+Stopping media server…	MediaDefs		正在停止媒體伺服器…
+Waiting for media_server to quit.	MediaDefs		正在等待 media_server 退出。
+Done shutting down.	MediaDefs		關閉完畢
+Error occurred starting media services.	MediaDefs		啟動媒體服務時發生錯誤。
+Media Service	MediaDefs		媒體服務

@@ -1,0 +1,48 @@
+1	english	x-vnd.Haiku-Time	3691539601
+OK	Time		確認
+Message receiving failed	Time		訊息接收失敗
+Australia	Time		澳洲
+America	Time		美洲
+Reset to default server list	Time		重置為默認伺服器列表
+Could not resolve server address	Time		無法解析伺服器位址
+Time & Date	System name		時間與日期
+Set time zone	Time		設定時區
+Waiting for answer failed	Time		等待迴應失敗
+<Other>	Time		<其他>
+Received invalid time	Time		收到無效時間
+Remove	Time		消除
+Synchronize again	Time		再次同步
+Asia	Time		亞洲
+Try all servers	Time		嘗試所有伺服器
+Time	Time		時間
+Current time:	Time		目前時間：
+The following error occured while synchronizing:\n%s: %s	Time		同步時發生以下錯誤:\n%s: %s
+Europe	Time		歐洲
+Show day of week	Time		顯示星期幾
+Local time (Windows compatible)	Time		當地時間（Windows 相容）
+Hardware clock set to:	Time		硬體時鐘設定為：
+Arctic	Time		北極洲
+Antarctica	Time		南極洲
+GMT (UNIX compatible)	Time		GMT（UNIX 相容）
+Africa	Time		非洲
+Stop	Time		停止
+Time zone	Time		時區
+Clock	Time		時鐘
+Network time	Time		網路時間
+Sending request failed	Time		發送請求失敗
+Preview time:	Time		預覽時間：
+\nNow: 	Time		\n現在：
+Could not create socket	Time		無法建立套接字
+Pacific	Time		太平洋
+Atlantic	Time		大西洋
+Show clock in Deskbar	Time		在Deskbar中顯示時鐘
+Display time with seconds	Time		顯示時間（以秒為單位）
+Time	System name		時間
+Show time zone	Time		顯示時區
+Synchronize at boot	Time		啟動時同步
+Indian	Time		印度洋
+Revert	Time		恢復
+Date and time	Time		日期與時間
+The following error occured while synchronizing:\n%s	Time		同步時發生以下錯誤:\n%s
+Synchronize	Time		同步
+Add	Time		添加

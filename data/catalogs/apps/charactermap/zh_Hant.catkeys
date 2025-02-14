@@ -1,0 +1,8 @@
+1	english	x-vnd.Haiku-CharacterMap	3430592225
+Javanese	UnicodeBlocks		爪哇語
+Hebrew	UnicodeBlocks		希伯來語
+File	CharacterWindow		檔案
+Quit	CharacterWindow		退出
+Copy as escaped byte string	CharacterView		複製為轉義位元組字串
+Copy character	CharacterView		複製字元
+Font	CharacterWindow		字體

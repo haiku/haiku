@@ -1,0 +1,64 @@
+1	english	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		套件描述
+none	PackageView		無
+Continue	PackageInstall		繼續
+Running post-installation scripts	PackageInstall		運行安裝後腳本
+Package installer	PackageView		套件安裝器
+All existing files will be skipped?	PackageView		所有現有檔案將被跳過？
+Replace	PackageView		替換
+All existing files will be replaced?	PackageView		所有現有檔案都會被替換嗎？
+Other…	PackageView		其他…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		給定路徑中已存在名為'%s' 的符號鏈結.\n將連結替換為該套件中的連結還是跳過它?
+Stop	PackageStatus		停止
+Install to:	PackageView		安裝到：
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		給定的軟體套件似乎已經安裝在您的系統上。您想解除安裝現有的並繼續安裝嗎？
+Skip all	PackageView		全部跳過
+The installation of the package has been aborted.	PackageView		該軟體套件的安裝已被中止。
+No installation type selected	PackageView		未選擇安裝類型
+Do you want to remember this decision for the rest of this installation?\n	PackageView		您想在安裝的其餘部分中記住此決定嗎？\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		所選軟體套件未從您的系統中刪除。給定的已安裝軟體套件資訊檔可能已損壞。
+Install…	UninstallView		安裝…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		給定路徑中已存在名為'%s'的項目。\n將此元件替換為該套件中的項目或是跳過它？
+Installing files and folders	PackageInstall		安裝檔案和資料夾
+Installed packages	UninstallWindow		已安裝套件
+Remove	UninstallView		消除
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		請求的軟體套件未能安裝在您的系統上。這可能是目標套件檔案的問題。請向軟體套件發行商諮詢此問題。
+OK	UninstallView		確認
+Accept	PackageTextViewer		接受
+Abort	PackageView		中止
+Disclaimer	PackageTextViewer		免責聲明
+Preparing package	PackageInstall		正在準備套件
+The package you requested has been successfully installed on your system.	PackageView		您要求的軟體套件已成功安裝在您的系統上。
+Installation progress	PackageView		安裝進度
+Decline	PackageTextViewer		拒絕
+Continue	PackageTextViewer		繼續
+Installing package	PackageStatus		正在安裝套件
+Install %name%	PackageView		安裝 %name%
+%index% of %total%	PackageInstall		%index% 之於 %total%
+No package selected.	UninstallView		未有套件被選中
+%name% (%size% free)	PackageView		%name% (%size% 空間)
+Error while installing the package\n	PackageView		安裝套件時發生錯誤\n
+Finishing installation	PackageInstall		正在完成安裝
+No package available.	PackageInfo		沒有可用的套件。
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		給定路徑中已存在名為 '%s' 的腳本。\n將腳本替換為該套件中的腳本或跳過它？
+Installation type:	PackageView		安裝類型：
+The package you selected has been successfully removed from your system.	UninstallView		您選擇的軟體套件已成功從系統中刪除。
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		套件文件中的文件大小似乎不匹配。該包可能已損壞或在創建後已修改。您還想繼續嗎？
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		中止
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		給定路徑中已存在名為'%s'的檔案。\n將檔案替換為該套件中的檔案或跳過它？
+Replace all	PackageView		全部替換
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		套件檔案不可讀。\n出現這種情況的可能原因之一可能是請求的檔案不是有效的 BeOS .pkg 軟體包。
+Continue	PackageInfo		繼續
+No package selected.	PackageInfo		未選擇套件。
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		錯誤! \"%s\" 路徑不正確.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		給定路徑中已存在名為 '%s'的目錄。\n將目錄替換為該套件中的目錄或跳過它？
+LegacyPackageInstaller	System name		舊版套件安裝程序
+Ask again	PackageView		再問一次
+Begin	PackageView		開始
+OK	PackageView		確認
+Abort	PackageInfo		中止
+Done	PackageInstall		完畢
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		錯誤 (%s)! 無法開啓 \"%s\".\n
+Skip	PackageView		跳過
+Image not loaded correctly	PackageImageViewer		圖片未正確載入

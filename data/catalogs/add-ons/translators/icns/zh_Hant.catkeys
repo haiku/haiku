@@ -1,0 +1,7 @@
+1	english	x-vnd.Haiku-ICNSTranslator	660278989
+Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		有效大小: 16, 32, 48, 128, 256, 512, 1024
+Valid colors: RGB32, RGBA32	ICNSConfig		有效顏色: RGB32, RGBA32
+Version %d.%d.%d, %s	ICNSConfig		版本 %d.%d.%d, %s
+Apple icon translator	ICNSConfig		Apple圖示轉譯器
+Apple icons	ICNSTranslator		Apple圖示
+Apple icon translator	ICNSTranslator		Apple圖示轉譯器

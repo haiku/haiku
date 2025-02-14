@@ -1,0 +1,14 @@
+1	english	x-vnd.Haiku-NewMailNotification	2396784785
+Log window	NotifierConfigView		日誌視窗
+none	NotifierConfigView		無
+Alert	NotifierConfigView		警告
+OK	NotifierFilter		確認
+Central alert	NotifierConfigView		警告（所有帳戶）
+Beep	NotifierConfigView		嗶音
+Central beep	NotifierConfigView		嗶音（所有帳戶）
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{有條新訊息} other{# 條新訊息}}
+New mail notification	NotifierFilter		新郵件通知
+New messages	NotifierFilter		新訊息
+Method:	NotifierConfigView		方法:
+Keyboard LEDs	NotifierConfigView		鍵盤LED
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		%account 中有 {0, plural, one{一條新訊息} other{# 條新訊息}} 。

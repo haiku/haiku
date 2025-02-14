@@ -1,0 +1,19 @@
+1	english	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		無新信息
+No new messages	DeskbarView		無新信息
+Shutdown mail services	DeskbarView		關閉郵件服務
+Mail status	MailDaemon		郵件狀態
+Fetching mail for %name	Notifier		正在取得 %name 的郵件
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# 新信息} other{# 新信息}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, other{# 新信息}} for %name\n
+Create new message…	DeskbarView		新創信息...
+Send pending mails	DeskbarView		發送待處理郵件
+Settings…	DeskbarView		設定…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{一條新信息} other{# 條新信息}}
+New Messages	MailDaemon		新信息
+<no accounts>	DeskbarView		<無賬戶>
+Mail status	Notifier		郵件狀態
+Check for mails only	DeskbarView		僅檢查郵件
+Check for mail now	DeskbarView		立即檢查郵件
+Sending mail for %name	Notifier		正在為 %name 發送郵件
+Mail daemon status log	MailDaemon		郵件守護程式狀態日誌

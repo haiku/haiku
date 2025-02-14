@@ -1,0 +1,9 @@
+1	english	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		RAW轉譯器設定
+Version %d.%d.%d, %s	ConfigView		版本 %d.%d.%d, %s
+RAW image translator	RAWTranslator		RAW圖片轉譯器
+RAW Settings	RAWTranslator main		RAW設定
+RAW images	RAWTranslator		RAW圖片
+RAW image translator	ConfigView		RAW圖片轉譯器
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW 圖片
+Based on Dave Coffin's dcraw 8.63	ConfigView		基於 Dave Coffin 的 dcraw 8.63

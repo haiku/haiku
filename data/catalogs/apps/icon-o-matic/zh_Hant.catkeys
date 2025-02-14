@@ -1,0 +1,76 @@
+1	english	x-vnd.haiku-icon_o_matic	2041118686
+None	Icon-O-Matic-Properties		無
+Clean up path	Icon-O-Matic-CleanUpPathCmd		清理路徑
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
+Opening the icon failed!	Icon-O-Matic-Main		開啓圖示失敗！
+Reverse path	Icon-O-Matic-ReversePathCmd		反向路徑
+Add with path	Icon-O-Matic-ShapesList		新增路徑
+Paste properties	Icon-O-Matic-Properties		貼上特性
+Copy	Icon-O-Matic-Properties		複製
+Color	Icon-O-Matic-PropertyNames		顏色
+Color	Icon-O-Matic-StyleTypes		顏色
+Select	Icon-O-Matic-Properties		選擇
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		您嘗試匯入的文字很長，您確定嗎？
+Paste	Icon-O-Matic-Properties		貼上
+Close	Icon-O-Matic-Menu-File		關閉
+Unassign path	Icon-O-Matic-UnassignPathCmd		取消分配路徑
+Remove	Icon-O-Matic-StylesList		消除
+Cancel	Icon-O-Matic-Menu-Settings		取消
+Closed	Icon-O-Matic-PropertyNames		已關閉
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<無可重做內容>
+Height	Icon-O-Matic-PropertyNames		高度
+warning	Icon-O-Matic-SVGExport		警告
+File	Icon-O-Matic-Menus		檔案
+Path	Icon-O-Matic-PropertyNames		路徑
+Path	Icon-O-Matic-Menus		路徑
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	在這裡編輯它的屬性。
+OK	Icon-O-Matic-ColorPicker		確認
+Error: 	Icon-O-Matic-Main		錯誤：
+Opening the document failed!	Icon-O-Matic-Main		開啟文檔失敗！
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		一條或多條路徑的頂點過多。 HVIF 格式支援每條路徑最多 255 個頂點。
+Add with path & style	Icon-O-Matic-ShapesList		新增路徑和样式
+Edit gradient	Icon-O-Matic-SetGradientCmd		編輯漸變
+Redo: %action%	Icon-O-Matic-Main		重做: %action%
+Add	Icon-O-Matic-TransformersList		添加
+Settings	Icon-O-Matic-Menus		設定
+Add	Icon-O-Matic-PathsList		添加
+Remove	Icon-O-Matic-PathManipulator		消除
+Cancel	Icon-O-Matic-ColorPicker		取消
+Save	Icon-O-Matic-Menu-Settings		存儲
+Undo: %action%	Icon-O-Matic-Main		撤銷: %action%
+Don't save	Icon-O-Matic-Menu-Settings		不要存儲
+Add shape with path	Icon-O-Matic-Menu-Shape		新增帶路徑的形狀
+Multi-paste properties	Icon-O-Matic-Properties		多重貼上特性
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		載入 SVG 時，Icon-O-Matic 可能無法解釋 SVG 中的所有資料。透過覆蓋原始文件，該資訊現在將丟失。
+Cancel	Icon-O-Matic-SVGExport		取消
+Open…	Icon-O-Matic-Menu-File		開啓…
+Remove	Icon-O-Matic-ShapesList		消除
+Multi-paste	Icon-O-Matic-Properties		多重貼上
+Bad news	Title of error alert		壞消息
+Save icon	Icon-O-Matic-SavePanel	Dialog title	存儲圖示
+Move	Icon-O-Matic-TransformationBoxStates		移動
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		路徑太多了。 HVIF 格式最多支援 255。
+Name	Icon-O-Matic-PropertyNames		名稱
+Remove	Icon-O-Matic-PathsList		消除
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
+Load error	Icon-O-Matic-SVGImport		載入錯誤
+Quit	Icon-O-Matic-Menu-File		退出
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		一個或多個形狀的路徑太多。 HVIF 格式支援每個形狀最多 255 個路徑。
+Add shape with path & style	Icon-O-Matic-Menu-Shape		新增帶有路徑和样式的形狀
+OK	Icon-O-Matic-SVGImport		確認
+Export icon	Icon-O-Matic-SavePanel	Dialog title	匯出圖示
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		旋轉路徑索引
+Save	Icon-O-Matic-Menu-File		存儲
+Cancel	Icon-O-Matic-StyledTextImport		取消
+Untitled	Icon-O-Matic-Main		無標題
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		關閉前存儲目前圖示的變更嗎？
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		無法將檔案'%s'作為 SVG 文件開啟。\n\n
+Save as…	Icon-O-Matic-Menu-File		存儲為…
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<无可撤销内容>
+Add	Icon-O-Matic-StylesList		添加
+Settings…	Icon-O-Matic-SavePanel		設定…
+Select all	Icon-O-Matic-PathManipulator		選擇全部
+New	Icon-O-Matic-Menu-File		新創
+Add reference image	Icon-O-Matic-ShapesList		新增參考影像
+Edit	Icon-O-Matic-Menus		編輯

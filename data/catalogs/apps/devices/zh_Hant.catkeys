@@ -1,0 +1,22 @@
+1	english	x-vnd.Haiku-Devices	3785804978
+Processor	Device		處理器
+Unknown	DeviceACPI		未知
+Unknown device	DevicesView		未知設備
+Unknown	DevicePCI		未知
+Optical Drive	DeviceSCSI		光碟機
+Name	PropertyList		名稱
+Device name	Device		設備名稱
+Tape Drive	DeviceSCSI		磁帶機
+Device paths	Device		設備路徑
+Unknown device	Device		未知設備
+Device name	DeviceACPI		設備名稱
+Card Reader	DeviceSCSI		讀卡機
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Device name	DevicePCI		設備名稱
+Other	DeviceSCSI		其他
+Order by:	DevicesView		排序以：
+Quit	DevicesView		Quit
+Processor	DeviceSCSI		處理器
+CD-ROM	DeviceSCSI		CD-ROM
+Device name	DeviceSCSI		設備名稱
+unknown	Device		未知

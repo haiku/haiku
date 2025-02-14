@@ -1,0 +1,7 @@
+1	english	x-vnd.Haiku-Pairs	102101508
+Quit	PairsWindow		退出
+New	PairsWindow		新創
+OK	Pairs		確認
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\twritten by Ralf Schülke\n\t版權 2008-2010, Haiku Inc.\n\n
+Quit game	PairsWindow		退出游戲
+New game	PairsWindow		新創遊戲

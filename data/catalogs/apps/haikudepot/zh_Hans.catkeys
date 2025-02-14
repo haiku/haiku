@@ -45,7 +45,7 @@ Click a package to view information	PackageInfoView		点击软件包查看信息
 Cancel	UserLoginWindow		取消
 Rating not possible	MainWindow		无法评价
 Package update error	MainWindow		软件包更新错误
-%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# 个进程} other{# 个进程}}
 Reboot required	PackageManager		需要重启
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		获取软件包的用户评分
 All packages	PackageListView		全部软件包
@@ -69,7 +69,7 @@ Size	PackageListView		大小
 Your rating was updated.	RatePackageWindow		您的评价已被更新。
 All categories	FilterView		所有分类
 ignore problem for now	PackageProblem		暂时忽略问题
-n/a	PackageInfoView		n/a
+n/a	PackageInfoView		不适用
 Checking user details	UserDetailVerifierProcess		检查用户详情中
 Cancel	MainWindow		取消
 Refresh repositories	MainWindow		刷新仓库

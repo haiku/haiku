@@ -1,0 +1,17 @@
+1	english	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		執行以下操作:\n%accessString%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		此應用程式尚不具備所需的權限。
+Keyring:	KeyRequestWindow		密鑰環:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		請求存取密鑰環:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		應用程式密鑰環訪問
+Disallow	AppAccessRequestWindow		不允許
+Allow once	AppAccessRequestWindow		允許一次
+Unlock keyring	KeyRequestWindow		解鎖密鑰環
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		應用程式想要存取下面的密鑰環，但它被密碼鎖定。請輸入密碼以解鎖密鑰環。\n如果您解鎖密鑰環，它將保持解鎖狀態，直到系統關閉或再次手動鎖定密鑰環。\n如果取消此對話框，密鑰環將保持鎖定狀態。
+Password:	KeyRequestWindow		密碼:
+Cancel	KeyRequestWindow		取消
+This application has been updated since it was last granted access.	AppAccessRequestWindow		自上次授予存取權限以來，此應用程式已更新。
+Allow always	AppAccessRequestWindow		始終允許
+Unlock	KeyRequestWindow		解鎖
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		應用程式:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		此應用程式之前未被授予存取權限。

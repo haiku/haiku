@@ -1,0 +1,32 @@
+1	english	x.vnd.OBOS-Inspector	577867100
+\nInput Formats:	ImageView		\n輸入格式：
+Next Page	ImageWindow		下一頁
+Previous Page	ImageWindow		前一頁
+Active Translators	InspectorApp		活躍的翻譯者
+System Translators	ActiveTranslatorsWindow		系統翻譯者
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\n類別: '%1' (%2)\n組: '%3' (%4)\n質量: %5\n容量: %6\nMIME 類型: %7\n名稱: %8\n
+OK	ImageWindow		確認
+View	ImageWindow		視圖
+Open…	ImageWindow		開啓…
+Save feature not implemented yet.	ImageWindow		存储功能尚未實裝。
+Active Translators	ImageWindow		活躍翻譯者
+Info	ImageWindow		信息
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		圖像: %1\n色彩空間: %2 (%3)\n維度: %4 x %5\n每行字節數: %6\n縂字節數: %7\n\n標識資訊:\nID 字符串: %8\nMIME 類型: %9\n類型: '%10' (%11)\n翻譯者 ID: %12\n組: '%13' (%14)\n質量: %15\n容量: %16\n\n擴充資訊:\n
+No image available to save.	ImageWindow		無可供存储的圖像
+OK	ImageView		確認
+Bummer	ImageWindow		Bummer
+\nOutput Formats:	ImageView		\n匯出格式:
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		文檔數量: %1\n\n翻譯者已用:\n名稱: %2\n信息: %3\n版本: %4\n
+User Translators	ActiveTranslatorsWindow		用戶翻譯者
+Last Page	ImageWindow		最後一頁
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n翻譯者已用:\n名稱: %1\n信息: %2\n版本: %3\n
+Unknown	ImageView		未知
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	信息窗口
+Sorry, unable to load the image.	ImageView		抱歉，無法加載此圖像。
+File	ImageWindow		檔案
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		已選文檔: %1\n\n翻譯者已用:\n名稱: %2\n信息: %3\n版本: %4\n
+Quit	ImageWindow		退出
+Sorry, unable to write the image file.	ImageView		抱歉，無法寫入圖像檔案。
+Save…	ImageWindow		存储…
+Window	ImageWindow		視窗
+First Page	ImageWindow		首頁

@@ -1,0 +1,16 @@
+1	english	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		TIFF 函式庫：
+RLE (Packbits)	TIFFView		RLE (Packbits)
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header：無效的文件索引\n
+Use compression:	TIFFView		使用壓縮：
+TIFF image translator	TIFFView		TIFF圖片轉譯器
+TIFF image	TIFFTranslator		TIFF圖片
+TIFF Settings	TIFFMain		TIFF設定
+TIFF image translator	TIFFTranslator		TIFF圖片轉譯器
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header：無法設定目錄\n
+Version %d.%d.%d, %s	TIFFView		版本 %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFF轉譯器設定
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF圖片
+None	TIFFView		無

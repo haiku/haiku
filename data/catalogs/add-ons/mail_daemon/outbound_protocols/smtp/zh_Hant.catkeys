@@ -1,0 +1,14 @@
+1	english	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		POP3認證失敗。伺服器返回:\n
+Destination:	ConfigView		訊息儲存至:
+Error while logging in to %serv	smtp		在登入至 %serv 時發生錯誤
+Connecting to server…	smtp		連線中…
+Unencrypted	ConfigView		未加密
+. The server says:\n	smtp		. 伺服器傳來回覆:\n
+Error while opening connection to %serv	smtp		與 %serv 建立連線時發生錯誤
+. The server said:\n	smtp		. 伺服器回覆:\n
+None	ConfigView		無
+SMTP server:	ConfigView		SMTP伺服器:
+ESMTP	ConfigView		ESMTP
+POP3 before SMTP	ConfigView		POP3 先於 SMTP
+SSL	ConfigView		SSL

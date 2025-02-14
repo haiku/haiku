@@ -1,0 +1,17 @@
+1	english	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		將檔案拖曳到此處。
+Filename: %s	file:ZipOMaticWindow.cpp		檔案名稱：%s
+Do you want to stop them?	file:ZipOMatic.cpp		您想阻止他們嗎？
+Error creating archive	file:ZipOMaticWindow.cpp		建立壓縮檔案時出錯
+Stop them	file:ZipOMatic.cpp		阻止他們
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		您確定要停止建立此壓縮檔嗎？
+Preparing to archive	file:ZipperThread.cpp		正在準備壓縮檔
+Let them continue	file:ZipOMatic.cpp		讓他們繼續
+Continue	file:ZipOMaticWindow.cpp		繼續
+Archive created OK	file:ZipOMaticWindow.cpp		壓縮檔創建成功
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# 個檔案已被追加。} other{# 個檔案已被追加。}}
+Stop	file:ZipOMaticWindow.cpp		停止
+Stopped	file:ZipOMaticWindow.cpp		已停止
+Archive	file:ZipperThread.cpp		壓縮檔
+Creating archive: %s	file:ZipOMaticWindow.cpp		建立壓縮檔： %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		您有 {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} 運行中.\n\n

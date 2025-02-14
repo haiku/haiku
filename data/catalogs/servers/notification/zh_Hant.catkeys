@@ -1,0 +1,5 @@
+1	english	x-vnd.Haiku-notification_server	2022780929
+Warning	NotificationWindow		警告
+Notification	NotificationWindow		通知
+OK	NotificationWindow		確認
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		無法啟動常規設定監視器。\n即時過濾變更已停用。

@@ -1,0 +1,39 @@
+1	english	x-vnd.Haiku.TextSearch	1757850908
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		請選擇您希望在Tracker中為您選擇的檔案。
+%appname% : %path%	GrepWindow		%appname%：%path%
+Failed to start xargs program!	Grepper		無法啟動 xargs 程式！
+Open selection	GrepWindow		開啓選擇
+Actions	GrepWindow		行動
+New window	GrepWindow		新視窗
+Encoding	GrepWindow		編碼
+Set target to parent folder	GrepWindow		將目標設定為父資料夾
+OK	GrepWindow		確認
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		關閉
+Look in sub-folders	GrepWindow		在子資料夾中尋找
+%s: Not enough room to escape the filename.	Grepper		%s：沒有足夠的空間來轉義檔名。
+Follow symbolic links	GrepWindow		遵循符號鏈結
+Regular expression	GrepWindow		正規表示式
+Text files only	GrepWindow		僅文字檔案
+Quit	GrepWindow		退出
+Show files in Tracker	GrepWindow		在Tracker中顯示檔案
+Please select the files you wish to keep searching.	GrepWindow		請選擇您想要繼續搜尋的檔案。
+Trim to selection	GrepWindow		修剪到選區
+Set target…	GrepWindow		設定目標…
+Failed to open input pipe!	Grepper		開啓輸入管道失敗！
+Search	GrepWindow		搜尋
+Copy text to clipboard	GrepWindow		複製文本到剪貼簿
+Show lines	GrepWindow		顯示線
+Failed to open errors pipe!	Grepper		無法開啓錯誤管道！
+The unselected files will be removed from the list.	GrepWindow		未選擇的檔案將從清單中刪除。
+Open files in code editor	GrepWindow		在程式碼編輯器中開啟檔案
+Skip folders starting with a dot	GrepWindow		跳過以點開頭的資料夾
+Failed to open output pipe!	Grepper		無法開啓輸出管道！
+Cancel	GrepWindow		取消
+History	GrepWindow		歷史
+TextSearch	System name		文本搜尋
+File	GrepWindow		檔案
+Case-sensitive	GrepWindow		區分大小寫
+Select all	GrepWindow		選擇全部
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME 無法開啟一個或多個資料夾。
+Settings	GrepWindow		設定

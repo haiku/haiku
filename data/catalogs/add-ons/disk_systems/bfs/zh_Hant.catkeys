@@ -1,0 +1,8 @@
+1	english	x-vnd.Haiku-BFSAddOn	1570987954
+Enable query support	BFS_Initialize_Parameter		啟用查詢支持
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		停用查詢支援可能會加快某些檔案系統操作的速度，\n但應該僅當完全確定不需要查詢時才使用。\n任何用於啟動Haiku的磁碟區都必須啟用查詢支援。
+Name:	BFS_Initialize_Parameter		名稱:
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192（多用於大檔案）
+2048 (Recommended)	BFS_Initialize_Parameter		2048（建議）
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024（多用於小檔案）
+Blocksize:	BFS_Initialize_Parameter		塊大小：

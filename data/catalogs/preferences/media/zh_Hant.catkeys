@@ -1,0 +1,29 @@
+1	english	x-vnd.Haiku-Media	582516163
+Couldn't add volume control in Deskbar: %s\n	Media views		無法在桌面欄中新增音量控制: %s\n
+Restart media services	Media views		重新啟動媒體服務
+Quit	Media Window		退出
+<none>	VideoInputMenu	Used when no video input is available	<無>
+Couldn't remove volume control in Deskbar: %s\n	Media views		無法刪除Deskbar中的音量控制: %s\n
+Video output:	Media views		視訊輸出：
+Video input:	Media views		視訊輸入：
+Audio output:	Media views		音訊輸出：
+Please select a SoundFont.	Midi View		請選擇一個SoundFont。
+There are no SoundFonts installed.	Midi View		沒有安裝 SoundFonts。
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		現在退出媒體將停止重新啟動媒體服務。可能的結果是媒體功能不穩定或不可用。
+Could not connect to the media server.\nWould you like to start it ?	Media Window		無法連線到媒體伺服器。\n您想開始嗎？
+Video settings	Media Window		視頻設定
+Audio mixer	Media Window		音訊混音器
+Show volume control on Deskbar	Media views		在Deskbar上顯示音量控制
+Start media server	Media Window		啟動媒體伺服器
+Audio settings	Media Window		音頻設定
+Quit anyway	Media Window		無論如何都要退出
+Media	System name		媒體
+Warning!	Media Window		警告！
+MIDI Settings	Media Window		MIDI設定
+SoundFonts	Midi View		SoundFonts
+Audio input:	Media views		音訊輸入：
+<none>	Media views		<無>
+Channel:	Media views		通路：
+This hardware has no controls.	Media Window		該硬體沒有控制項。
+Defaults	Media views		默認值
+<none>	VideoOutputMenu	Used when no video output is available	<無>

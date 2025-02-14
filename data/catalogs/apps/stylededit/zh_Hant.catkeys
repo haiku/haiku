@@ -1,0 +1,60 @@
+1	english	x-vnd.Haiku-StyledEdit	1146722246
+Document statistics	Statistics		文件統計
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		無法恢復，未找到檔案：\"%s\"。
+Cut	Menus		剪下
+Center	Menus		中心
+Page setup…	Menus		頁面設定…
+Wrap-around search	FindandReplaceWindow		環繞搜尋
+Untitled 	StyledEditWindow		無標題
+OK	Statistics		確認
+Find	FindandReplaceWindow		尋找
+New	Menus		新創
+Document	Menus		文件
+Search backwards	FindandReplaceWindow		向後搜尋
+Find again	Menus		再次尋找
+Read-only	StatusView		只讀
+Save	Menus		存儲
+Cancel	QuitAlert		取消
+Copy	Menus		複製
+OK	RevertToSavedAlert		確認
+Unlock file	StatusView		解鎖檔案
+Can't undo	Menus		無法撤銷
+Replace…	Menus		替換…
+File	Menus		檔案
+Paste	Menus		貼上
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		檔案 \"%file%\" 已被另一個應用程式修改，是否重新載入？
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		檔案\"%file%\" 已被另一個應用程式刪除，能否恢復？
+Replace in all windows	FindandReplaceWindow		在所有視窗中替換
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" 有未存儲的變更。\n恢復到上次存储的版本嗎？
+Save	SaveAlert		存儲
+Default	Open_and_SaveAsPanel		默認
+Cancel	RevertToSavedAlert		取消
+Cancel	FindandReplaceWindow		取消
+Replace all	FindandReplaceWindow		替換所有
+Close	Menus		關閉
+Default	Menus		默認
+OK	SaveAlert		確認
+Save changes to the document \"%s\"? 	QuitAlert		存储對文檔的更改 \"%s\"?
+StyledEdit	System name		StyledEdit
+Find:	FindandReplaceWindow		尋找：
+Undo typing	QuitAlert		撤銷輸入
+Don't save	SaveAlert		不要存储
+Quit	Menus		退出
+Redo typing	QuitAlert		重做輸入
+Unable to unlock file\n\t%s	QuitAlert		無法解鎖檔案\n\t%s
+OK	LoadAlert		確認
+Save	QuitAlert		存储
+Find selection	Menus		尋找選擇對象
+Find…	Menus		尋找…
+Cancel	SaveAlert		取消
+Replace next	Menus		替換下一個
+OK	QuitAlert		確認
+Edit	Menus		編輯
+Replace with:	FindandReplaceWindow		替換以：
+Open…	Menus		開啓…
+Save as…	Menus		存储为…
+Replace	FindandReplaceWindow		替換
+Don't save	QuitAlert		不存储
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		該檔案被標記為唯讀。存储對檔案 \"%s\"的變更嗎？
+Font	Menus		字體
+Select all	Menus		選擇全部

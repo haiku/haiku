@@ -1,0 +1,88 @@
+1	english	x-vnd.Haiku-Bluetooth	3550394259
+Positioning	DeviceClass		定位
+Controller	DeviceClass		控制器
+Common ISDN access	DeviceClass		通用ISDN接取
+Unknown (reserved) minor device class	DeviceClass		未知（保留）次要設備類別
+Uncategorized	DeviceClass		未分類
+Keyboard	DeviceClass		鍵盤
+Smart phone	DeviceClass		智慧型手機
+VCR	DeviceClass		VCR
+Cellular	DeviceClass		蜂窩網路
+Audio	DeviceClass		音訊
+Audio/Video	DeviceClass		音訊/視訊
+Car audio	DeviceClass		汽車音響
+Major class: 	DeviceClass		主要類別：
+HiFi audio device	DeviceClass		HiFi 高保真音訊設備
+Microphone	DeviceClass		麥克風
+Capturing	DeviceClass		捕捉
+Jacket	DeviceClass		Jacket
+50-67% utilized	DeviceClass		利用率 50-67%
+Headphones	DeviceClass		耳機
+Imaging	DeviceClass		影像
+Device conforms to the headset profile	DeviceClass		設備符合耳機設定檔
+Remote control	DeviceClass		遙控
+Fully available	DeviceClass		完全可用
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#無效名稱
+Server	DeviceClass		伺服器
+No service available	DeviceClass		無可用服務
+Printer	DeviceClass		印表機
+Card reader	DeviceClass		讀卡器
+Wired modem or voice gateway	DeviceClass		有線調變解調器或語音網關
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#無效名稱
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#無效名稱
+Camcorder	DeviceClass		攝影機
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#無效名稱
+17-33% utilized	DeviceClass		17-33% 利用率
+Desktop workstation	DeviceClass		桌面工作站
+Unspecified	DeviceClass		未指定
+Miscellaneous	DeviceClass		各類設定
+Robot	DeviceClass		機器人
+Vehicle	DeviceClass		載具
+LAN access	DeviceClass		區域網路存取
+Glasses	DeviceClass		眼鏡
+Phone	DeviceClass		電話
+Laptop	DeviceClass		筆記型電腦
+67-83% utilized	DeviceClass		利用率 67-83%
+Cordless	DeviceClass		無線
+Invalid device class!\n	DeviceClass		設備類別無效！\n
+Minor class: 	DeviceClass		少數類別：
+Doll/Action figure	DeviceClass		玩偶/可動人偶
+Not implemented	RemoteDevice		未實施
+33-50% utilized	DeviceClass		利用率 33-50%
+Gaming/Toy	DeviceClass		遊戲/玩具
+Video camera	DeviceClass		攝影機
+Handheld	DeviceClass		手持式
+Service classes: 	DeviceClass		服務類別：
+Loudspeaker	DeviceClass		喇叭
+83-99% utilized	DeviceClass		83-99% 利用率
+SIM card reader	DeviceClass		SIM卡讀卡機
+Computer	DeviceClass		電腦
+Scanner	DeviceClass		掃描器
+Wearable	DeviceClass	A wearable computer	穿戴式
+Display	DeviceClass		顯示
+Gamepad	DeviceClass		遊戲手把
+Video monitor	DeviceClass		視訊監控
+Palm	DeviceClass	A palm-held device	Palm
+Joystick	DeviceClass		搖桿
+Networking	DeviceClass		聯網
+Telephony	DeviceClass		電話（固定）
+Game	DeviceClass		遊戲
+Video display and loudspeaker	DeviceClass		視訊顯示器和揚聲器
+Wrist watch	DeviceClass		腕錶
+Sensing device	DeviceClass		感測裝置
+Pointing device	DeviceClass		指點設備
+(reserved)	DeviceClass		(保留)
+Rendering	DeviceClass		渲染
+Information	DeviceClass		資訊
+Helmet	DeviceClass		頭盔
+Pager	DeviceClass	A small radio device to receive short text messages	呼叫器（尋呼機）
+Hands-free	DeviceClass		免持
+Digitizer tablet	DeviceClass		數位化儀平板電腦
+Portable audio	DeviceClass		隨身音響
+Camera	DeviceClass		相機
+1-17% utilized	DeviceClass		利用率 1-17%
+Combo keyboard/pointing device	DeviceClass		組合鍵盤/指點設備
+Video conferencing	DeviceClass		視訊會議
+Peripheral	DeviceClass		週邊
+Object transfer	DeviceClass		對象傳輸
+Set-top box	DeviceClass		機上盒

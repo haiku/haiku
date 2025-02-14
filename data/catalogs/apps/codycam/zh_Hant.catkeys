@@ -1,0 +1,30 @@
+1	english	x-vnd.Haiku-CodyCam	3474920613
+PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (真實密碼已發送)
+JPEG image	CodyCam		JPEG圖片
+image file format expected	CodyCam		預期的圖片檔案格式
+Capturing Image…	VideoConsumer.cpp		正在截取圖像…
+Cannot create a video window	CodyCam		無法建立視訊視窗
+Cannot register the video window	CodyCam		無法註冊視訊視窗
+Quit	CodyCam		退出
+Cannot connect the video source to the video window	CodyCam		無法將視訊來源連接到視訊窗口
+Closing the window	VideoConsumer.cpp		正在關閉視窗
+Never	CodyCam		絕不
+Password:	CodyCam		密码：
+still image filename expected	CodyCam		預期靜止圖片檔名
+File name:	CodyCam		檔案名稱：
+Directory:	CodyCam		目錄：
+Error setting type of output file	VideoConsumer.cpp		輸出文件類型設定錯誤
+Locking the window	VideoConsumer.cpp		正在鎖住視窗
+password expected	CodyCam		需要密碼
+Cannot start the video window	CodyCam		無法啟動視訊視窗
+Cannot set the time source for the video window	CodyCam		無法設定視訊視窗的時間來源
+Image Format Menu	CodyCam		圖片格式菜單
+File upload failed	VideoConsumer.cpp		檔案上傳失敗
+password	CodyCam		密码
+Rename failed	VideoConsumer.cpp		再命名失敗
+Server:	CodyCam		伺服器:
+File	CodyCam		檔案
+Video settings	CodyCam		視頻設定
+Can't find an available connection to the video window	CodyCam		找不到視訊視窗的可用連接
+Error creating output file	VideoConsumer.cpp		建立輸出檔案時出錯
+Error writing output file	VideoConsumer.cpp		寫入輸出檔時出錯

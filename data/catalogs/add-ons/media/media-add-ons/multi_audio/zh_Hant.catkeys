@@ -1,0 +1,34 @@
+1	english	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		主控
+SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		增益
+Output 3D center	MultiAudio		輸出三維中心
+Extended Setup	MultiAudio		高階設定
+CD	MultiAudio		CD
+Tone control	MultiAudio		音調控制
+Phone	MultiAudio		手機
+Aux	MultiAudio		Aux
+Output bass	MultiAudio		輸出低音
+Headphones	MultiAudio		耳機
+Beep	MultiAudio		嗶音
+Output mono mix	MultiAudio		單聲道輸出混音
+Output stereo mix	MultiAudio		雙聲道輸出混音
+Input	MultiAudio		輸入
+Output treble	MultiAudio		輸出高音
+Mono mix	MultiAudio		單聲道混音
+General	MultiAudio		一般
+Input & Output	MultiAudio		輸入輸出
+Enhanced Setup	MultiAudio		高階設定
+Stereo mix	MultiAudio		雙聲道混音
+Output 3D depth	MultiAudio		三維輸出深度
+Volume	MultiAudio		音量
+Output	MultiAudio		輸出
+Video	MultiAudio		視訊
+Line	MultiAudio		線
+Mic	MultiAudio		麥克風
+ frequency:	MultiAudio		 頻率:
+Enable	MultiAudio		啟用
+Mute	MultiAudio		靜音
+Wave	MultiAudio		波形
+Setup	MultiAudio		設定
+Level	MultiAudio		等級

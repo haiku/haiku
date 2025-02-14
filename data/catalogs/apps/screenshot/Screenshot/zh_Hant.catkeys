@@ -1,0 +1,19 @@
+1	english	x-vnd.haiku-screenshot	2229426341
+Include window border	ScreenshotWindow		包括視窗邊框
+Save in:	ScreenshotWindow		存儲于：
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		該檔案已存在。\n您確定要覆蓋它嗎？
+OK	ScreenshotWindow		確認
+The destination path exists but is not a folder.	ScreenshotWindow		目標路徑存在，但不是資料夾.
+Select	ScreenshotWindow		選擇
+Save as:	ScreenshotWindow		存儲為：
+New screenshot	ScreenshotWindow		新創截圖
+Desktop	ScreenshotWindow		桌面
+Translator Settings	ScreenshotWindow		翻譯器設定
+Settings…	ScreenshotWindow		設定…
+Name:	ScreenshotWindow		名稱:
+Failed to save screenshot	ScreenshotWindow		存儲截圖失敗
+Cancel	ScreenshotWindow		取消
+Copy to clipboard	ScreenshotWindow		複製到剪貼簿
+Home folder	ScreenshotWindow		主資料夾
+Save	ScreenshotWindow		存儲
+Capture active window	ScreenshotWindow		捕獲活動視窗

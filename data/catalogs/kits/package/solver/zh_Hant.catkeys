@@ -1,0 +1,38 @@
+1	english	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		允許將 %source% 的架構更改為 %target%
+install %source% from excluded repository	SolverProblemSolution		從排除的儲存庫安裝 %source%
+unspecified problem	SolverProblem		未指定的問題
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		軟體套件 %source% 需要 %dependency%，但無法從任意提供方安裝
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		套件 %source% 隱含地廢棄 %dependency% 來自 %target%
+nothing provides requested %dependency%	SolverProblem		無可提供所請求的%dependency%
+do not keep %source% installed	SolverProblemSolution		不要保留已安裝的%source%
+do not deinstall \"%selection%\"	SolverProblemSolution		不要卸載 \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		儘管架構較差，但還是安裝 %source%
+conflicting requests	SolverProblem		相互衝突的請求
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		不要安裝最新版本的 \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		允許替換 %source% 以 %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		套件 %source% 廢棄了  %dependency% 提供自 %target%
+do not forbid installation of %source%	SolverProblemSolution		不禁止安裝 %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		允許將 %source% 降級到 %target%
+dependency problem	SolverProblem		依賴性問題
+%dependency% is provided by the system	SolverProblem		%dependency%由系統提供
+keep %source% despite its inferior architecture	SolverProblemSolution		保留%source%儘管其架構較差
+%source% does not belong to a distupgrade repository	SolverProblem		%source% 不屬於 distupgrade 儲存庫
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		已安裝的軟體套件 %source% 已過時  %dependency% 提供自 %target%
+allow name change of %source% to %target%	SolverProblemSolution		允許將 %source% 名稱更改為 %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		套件 %source% 與  %dependency% 提供自%target% 衝突 
+do something	SolverProblemSolution		做些事
+install %selection% despite its old version	SolverProblemSolution		安裝 %selection%，儘管它是舊版本
+cannot install both %source% and %target%	SolverProblem		無法同時安裝 %source% 和 %target%
+package %source% is not installable	SolverProblem		軟體套件 %source% 無法安裝
+problem with installed package %source%	SolverProblem		安裝的軟體套件 %source% 有問題
+allow deinstallation of %source%	SolverProblemSolution		允許卸載%source%
+keep %source% from excluded repository	SolverProblemSolution		將 %source% 保留在排除的儲存庫中
+keep old %source%	SolverProblemSolution		保留舊的%source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		套件 %source% 與它自己提供的%dependency%衝突
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		允許供應方從 \"%sourceVendor%\" (%source%) 變更為 \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		不要鎖定 \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		不要安裝 \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		沒有任何內容提供 %dependency% 請求自 %source%
+%source% has inferior architecture	SolverProblem		%source% 的架構較差
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		不要卸載所有可解析的 \"%selection%\"

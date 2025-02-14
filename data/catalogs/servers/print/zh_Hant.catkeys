@@ -1,0 +1,55 @@
+1	english	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		未指定
+Return the number of available transports	PrintServerApp Scripting		傳回可用的傳輸數量
+Return the number of available printers	PrintServerApp Scripting		傳回可用的印表機數量
+Get currently available ports/devices	Transport Scripting		取得目前可用的連接埠/設備
+Retrieve or select the active printer	PrintServerApp Scripting		檢索或選擇活動印表機
+Cancel	PrintServerApp		取消
+Retrieve a specific printer	PrintServerApp Scripting		檢索特定印表機
+Page %1 to %2	ConfigWindow		頁 %1 至 %2
+Get name of the printer add-on used for this printer	Printer Scripting		取得用於此印表機的印表機外掛程式的名稱
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
+OK	ConfigWindow		確認
+Cancel	ConfigWindow		取消
+Printer server	ConfigWindow		印表機伺服器
+Page %1 to %2, %3 copies	ConfigWindow		頁 %1 到 %2, %3 copies
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		同名的印表機已存在，但找不到其驅動程式！要替代它嗎？
+Yes	PrintServerApp		是的
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	分類帳
+Would you like to set one up now?	PrintServerApp		您想現在就設定一個嗎？
+Print job setup:	ConfigWindow		列印作業設定：
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Portrait
+All pages	ConfigWindow		所有頁面
+There is no default printer set up.	PrintServerApp		尚未設定預設印表機。
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+Printer:	ConfigWindow		印表機:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		選擇印表機
+Show configuration window	PrintServerApp Scripting		顯示配置視窗
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		取得此印表機的評論
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		同名的印表機已經存在，但根本無法使用！要替代它嗎？
+No	PrintServerApp		否
+Get the transport configuration for this printer	Printer Scripting		取得此印表機的傳輸配置
+Landscape	ConfigWindow		Landscape
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		沒有設定印表機。
+Get name of the transport add-on used for this printer	Printer Scripting		取得用於該印表機的傳輸插件的名稱
+All pages, %1 copies	ConfigWindow		所有頁，%1 份
+Delete a specific printer	PrintServerApp Scripting		刪除特定印表機
+Create a new printer	PrintServerApp Scripting		創建新印表機
+OK	PrintServerApp		確認
+Print setup	ConfigWindow		列印設定
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		檢索一個特定傳輸
+Get name of printer	Printer Scripting		取得印表機名稱
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		取得傳輸名稱
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		您想將 @ 設定為預設印表機嗎？
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		頁面設定
+Paper setup:	ConfigWindow		紙張設定：

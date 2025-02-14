@@ -1,0 +1,17 @@
+1	english	x-vnd.mmu_man.filepanel	1996091223
+display a load/save file panel\n	FilePanelApp		顯示載入/存储檔案面板\n
+short\tlong\tdescription\n	FilePanelApp		短\t長\t描述\n
+%s not a valid option\n	FilePanelApp		%s 不是有效選項\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\t使用存储FilePanel\n
+%s: this option requires a parameter\n	FilePanelApp		%s: 此選項需要一個參數\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\t展示用法\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\t使用載入 FilePanel（預設）\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\t設定預設保存名稱\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\t可以開啟的條目類型 (flavour):  f, d, s (檔案 (預設), 目錄, 符號鏈結)的任意組合\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		用法: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m]
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		用法: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\t設定FilePanel視窗標題\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t只允許選擇1個文件\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\t使FilePanel成為模式\n
+options:\n	FilePanelApp		選項：\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t開啓於 <folder>\n

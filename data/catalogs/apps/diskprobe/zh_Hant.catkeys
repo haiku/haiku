@@ -1,0 +1,58 @@
+1	english	x-vnd.Haiku-DiskProbe	1515240899
+Raw editor	AttributeWindow		原始編輯器
+Remove	AttributeWindow		消除
+Close	ProbeView		關閉
+File	ProbeView		檔案
+MIME type editor	TypeEditors		MIME 類型編輯器
+File offset: 	ProbeView		檔案偏移量：
+Add	ProbeView		添加
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		您確實要從檔案 \"%s\" 中刪除屬性 \"%s\" 嗎?\n\n您無法撤銷此操作。
+No type editor available	AttributeWindow		沒有可用的類型編輯器
+New…	FileWindow		新創…
+OK	DiskProbe		確認
+Back	ProbeView		返回
+Open file…	FileWindow		開啟檔案…
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		寫入檔案失敗:\n%s\n\n當您退出時，所有變更都會遺失。
+Number editor	TypeEditors		號碼編輯器
+Don't save	ProbeView		不要存儲
+Undo	ProbeView		撤銷
+Cancel	OpenWindow		取消
+Unknown format	TypeEditors		未知格式
+File: 	ProbeView		檔案：
+Stop	ProbeView		停止
+Cancel	ProbeView		取消
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	無法開啓  \"%s\":\n%s
+Font size	ProbeView		字體大小
+Type editor not supported	ProbeView		不支援類型編輯器
+Copy	ProbeView		複製
+Redo	ProbeView		重做
+Cancel	AttributeWindow		取消
+Next	ProbeView		下一步
+Close	FileWindow		關閉
+Unknown type	TypeEditors		未知類型
+Open device	FileWindow		開啓設備
+Quit	FileWindow		退出
+32 bit size or status:	TypeEditors		32 位元大小或狀態：
+Could not open file \"%s\": %s\n	DiskProbe		無法開啟檔案 \"%s\": %s\n
+Probe file…	OpenWindow		探測檔案…
+none	ProbeView	No attributes	無
+Remove from file	AttributeWindow		從檔案中刪除
+Type editor	ProbeView		類型編輯器
+File	FileWindow		檔案
+Close	AttributeWindow		關閉
+Type editor	AttributeWindow		類型編輯器
+Save	ProbeView		存儲
+Select all	ProbeView		選擇全部
+OK	ProbeView		確認
+Selection	ProbeView		選擇
+Find	FindWindow		尋找
+Find again	ProbeView		再次尋找
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	無法讀取圖片
+Image	TypeEditors	This is the type of view	圖片
+Save changes before closing?	ProbeView		關閉前存儲修改？
+Edit	ProbeView		編輯
+String editor	TypeEditors		字串編輯器
+Boolean editor	TypeEditors		布林編輯器
+Find…	ProbeView		尋找…
+Image view	TypeEditors	Image means here a picture file, not a disk image.	查看圖表
+Paste	ProbeView		貼上

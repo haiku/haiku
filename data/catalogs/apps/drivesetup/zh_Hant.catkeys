@@ -1,0 +1,26 @@
+1	english	x-vnd.Haiku-DriveSetup	1179140494
+Could not unmount partition %s.	MainWindow		無法卸載分區 %s。
+Mount all	MainWindow		全部掛載
+Error: 	MainWindow	in any error alert	錯誤：
+Unmount	MainWindow		卸載
+Mounted at	PartitionList		挂載至
+Create…	MainWindow		創建…
+Could not unmount partition	MainWindow		無法卸載分割區
+Create	CreateParametersPanel		創建
+File system	PartitionList		檔案系統
+Unknown (%s)	PartitionList		未知(%s)
+Volume name	PartitionList		卷名
+Partition name:	ChangeParametersPanel		分割區名稱:
+Cancel	AbstractParametersPanel		取消
+OK	MainWindow		確認
+Open with DiskProbe	MainWindow		以DiskProbe開啓
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		是否應強制卸載？\n\n注意：如果應用程式目前正在寫入分割區，現在卸載它可能會導致資料遺失。\n
+Cancel	MainWindow		取消
+Force unmount	MainWindow		强制卸載
+The partition cannot be unmounted.	MainWindow		該分割區無法卸載。
+Could not mount partition %s.	MainWindow		無法安裝分割區 %s。
+The partition %s is already unmounted.	MainWindow		分割區 %s 已卸載。
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		您確定要變更所選分割區的參數嗎?\n\n該分割區可能不再被其他作業系統辨識！
+OK	AbstractParametersPanel		確認
+The partition %s is already mounted.	MainWindow		分割區 %s 已安裝。
+Mount	MainWindow		挂載

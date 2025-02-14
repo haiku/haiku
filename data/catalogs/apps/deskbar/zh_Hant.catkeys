@@ -1,0 +1,41 @@
+1	english	x-vnd.Be-TSKB	1751071781
+Auto-hide	PreferencesWindow		自動隱藏
+Edit in Tracker…	PreferencesWindow		在Tracker中編輯…
+Tracker always first	PreferencesWindow		Tracker永遠優先
+Hide clock	TimeView		隱藏時鐘
+Large	PreferencesWindow		大
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar資料夾為空>
+Recent documents	DeskbarMenu		近期檔案
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		應用程式
+Always on top	PreferencesWindow		始終位於頂部
+Restart system	DeskbarMenu		重啓
+Recent documents:	PreferencesWindow		近期檔案：
+Mount	DeskbarMenu		掛載
+About Haiku	DeskbarMenu		關於Haiku
+Small	PreferencesWindow		小
+Show calendar…	TimeView		顯示日曆...
+Find…	DeskbarMenu		尋找…
+Power off	DeskbarMenu		關機
+Defaults	PreferencesWindow		默認值
+Show replicants	DeskbarMenu		顯示副本
+No windows	WindowMenu		無視窗
+Show clock	Tray		顯示時鐘
+Close all	WindowMenu		關閉全部
+Deskbar preferences	PreferencesWindow		Deskbar偏好
+About this system	DeskbarMenu		關於這個系統
+Quit application	WindowMenu		退出應用程式
+Hide application names	PreferencesWindow		隱藏程式名稱
+Applications	PreferencesWindow		應用程式
+Deskbar preferences…	DeskbarMenu		Deskbar偏好…
+Shutdown…	DeskbarMenu		關機…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		示範
+Expand new applications	PreferencesWindow		展開新的應用程式
+Recent applications:	PreferencesWindow		近期應用程式：
+Recent folders:	PreferencesWindow		近期資料夾：
+Recent folders	DeskbarMenu		近期資料夾
+Recent applications	DeskbarMenu		近期應用程式
+Sort applications by name	PreferencesWindow		按名稱排序應用程式
+Window	PreferencesWindow		視窗
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		偏好
+Time preferences…	TimeView		時間偏好…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		桌面小程式

@@ -1,0 +1,26 @@
+1	english	x-vnd.Haiku-Expander	2143216905
+OK	ExpanderWindow		確認
+The folder was either moved, renamed or not supported.	ExpanderWindow		該資料夾已被移動、再命名或不受支援。
+Close window when done expanding	ExpanderPreferences		展開完成後關閉視窗
+Close	ExpanderMenu		關閉
+Create	ExpanderWindow		創建
+Settings	ExpanderMenu		設定
+Open destination folder after extraction	ExpanderPreferences		解壓縮後開啓目標資料夾
+Same directory as source (archive) file	ExpanderPreferences		與來源（存檔）檔案相同的目錄
+Stop	ExpanderWindow		停止
+Cancel	ExpanderWindow		取消
+Expander settings	ExpanderPreferences		擴展器設定
+Settings…	ExpanderMenu		設定…
+Select current	DirectoryFilePanel		選擇當前
+OK	ExpanderPreferences		確認
+File expanded	ExpanderWindow		已展開檔案
+Automatically expand files	ExpanderPreferences		自動擴充檔案
+Select	DirectoryFilePanel		選擇
+Stop	ExpanderMenu		停止
+Select '%s'…	DirectoryFilePanel		選擇 '%s'…
+Cancel	ExpanderPreferences		取消
+Expander: Open	ExpanderWindow		擴展器：開啓
+Leave destination folder path empty	ExpanderPreferences		留空目標資料夾路徑
+The file doesn't exist	ExpanderWindow		檔案不存在
+Select	ExpanderPreferences		選擇
+File	ExpanderMenu		檔案

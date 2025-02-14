@@ -1,0 +1,23 @@
+1	english	x-vnd.haiku-registrar	2599857937
+Cancel	ShutdownProcess		取消
+OK	ShutdownProcess		確認
+Do you really want to shut down the system?	ShutdownProcess		您真的打算關機嗎？
+Shutdown status	ShutdownProcess		關機狀態
+Shut down	ShutdownProcess		關機
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		應用程式  \"%appName%\" 可能在模式面板上被封鎖。
+System is shut down	ShutdownProcess		系統已關閉
+Restart system	ShutdownProcess		重啓系統
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		應用程式 \"%appName%\" 已中止關閉流程。
+Asking background applications to quit.	ShutdownProcess		正在請求後台應用程式退出。
+Do you really want to restart the system?	ShutdownProcess		您真的打算重啓系統？
+Restart	ShutdownProcess		重啓
+It's now safe to turn off the computer.	ShutdownProcess		現在可以安全關機了。
+Asking other processes to quit.	ShutdownProcess		正在請求其他進程退出。
+Cancel shutdown	ShutdownProcess		取消關機
+Restarting…	ShutdownProcess		重啓中…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		稍微整理一下東西。
+Kill application	ShutdownProcess		殺死應用程式
+Shutdown aborted	ShutdownProcess		關機中斷
+Shutting down…	ShutdownProcess		正在關機…
+Asking \"%appName%\" to quit.	ShutdownProcess		正在請求 \"%appName%\" 退出。

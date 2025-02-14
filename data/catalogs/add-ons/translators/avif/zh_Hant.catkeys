@@ -1,0 +1,23 @@
+1	english	x-vnd.Haiku-AVIFTranslator	2254901146
+1	ConfigView		1
+Faster but worse quality	ConfigView		快速但低質量
+©2021 Emmanuel Gil Peyrot	ConfigView		©2021 Emmanuel Gil Peyrot
+Horizontal tiles:	ConfigView		水平磁塊:
+AVIFTranslator Settings	ConfigView		AVIFTranslator設定
+Pixel format:	ConfigView		點陣格式:
+AVIF images	AVIFTranslator		AVIF圖片
+AVIF image translator	ConfigView		AVIF圖片轉譯器
+Best	ConfigView		最佳的
+Vertical tiles:	ConfigView		垂直磁塊:
+Based on libavif %version%	ConfigView		基於 libavif %version%
+AVIF image translator	AVIFTranslator		AVIF圖片轉譯器
+AVIF image	AVIFTranslator		AVIF圖片
+Slow	ConfigView		慢
+Compression speed:	ConfigView		壓縮速度:
+Pixel format	ConfigView		點陣格式
+Worst	ConfigView		最糟
+©2019 Joe Drago. All rights reserved.	ConfigView		©2019 Joe Drago. 保留一切權利。
+AVIF Settings	main		AVIF設定
+Lossless	ConfigView		無損
+Output quality:	ConfigView		輸出品質:
+2⁶	ConfigView		2⁶

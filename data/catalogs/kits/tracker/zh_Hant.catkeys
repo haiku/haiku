@@ -1,0 +1,490 @@
+1	english	x-vnd.Haiku-libtracker	1487955846
+Created	ContainerWindow		已創建
+Icon	AttributesView		圖標
+Open and make preferred	OpenWithWindow		開啓並設為首選
+Open with…	ContainerWindow		開啓方式…
+Kind	ContainerWindow		種類
+Error moving \"%name\" to Trash. (%error)	FSUtils		移動 \"%name\" 到資源回收筒失敗。 (%error)
+Or	FindPanel		或
+MIME Description	AttributesView		MIME 描述
+Query	FindPanel		詢問
+before	FindPanel		前
+New folder%d	FSUtils		新文件夾 %d
+Volume icons	TrackerSettingsWindow		卷圖示
+Ignore case	SelectionWindow		忽略大寫
+Save as query template:	FindPanel		另存為查詢範本：
+Save query:	FindPanel		存储查詢：
+Current folder	ContainerWindow		目前資料夾
+Finish: %time - Over %finishtime left	StatusWindow		完成：%time - 剩餘 %finishtime
+Mount all disks now	AutoMounterSettings		立即掛載所有磁碟
+Location:	InfoWindow		位置：
+Name	PoseView		名稱
+Kind:	InfoWindow		種類：
+contains	FindPanel		包含
+Open	FilePanelPriv		開啓
+Bitmap icon	AttributesView		點陣圖示
+You can't replace a folder with one of its sub-folders.	FSUtils		您無法用資料夾的子資料夾之一替換資料夾。
+Name	Default Query Columns		名稱
+Unmount	ContainerWindow		卸載
+Eject when unmounting	AutoMounterSettings		卸載時彈出
+Searching for disks to mount…	StatusWindow		搜尋要掛載的磁碟…
+Value	AttributesView		數值
+Information	InfoWindow		資訊
+Error emptying Trash	FSUtils		清空資源回收筒出錯
+Opens with:	InfoWindow		開啓以：
+Size	QueryPoseView		大小
+Disk mount	TrackerSettingsWindow		磁碟掛載
+Type	AttributesView		類型
+Prompt	FSUtils		提示
+Error in regular expression:\n\n'%errstring'	PoseView		正規表示式錯誤：\n\n'%errstring'
+Small bitmap icon	AttributesView		小點陣圖示
+Would you like to find a suitable application to open the file?	FSUtils		您想找到合適的應用程式來開啟該檔案嗎？
+You cannot replace a folder or a symbolic link with a file.	FSUtils		您不能用文件替換資料夾或符號鏈結。
+(unknown)	InfoWindow		（未知）
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# 日>}}
+Trailing \\.	libtracker		跟隨中 \\.
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		At %func \nfind_directory() failed. \nReason: %error
+Handles any file	OpenWithWindow		處理任何檔案
+save text	FilePanelPriv		存储文字
+Raw data	AttributesView		原始數據
+Preparing to move items…	StatusWindow		正在準備移動對象…
+Size	ContainerWindow		大小
+Select…	ContainerWindow		選擇…
+Show shared volumes on Desktop	SettingsView		在桌面上顯示共用磁碟卷
+Size	PoseView		大小
+matches wildcard expression	SelectionWindow		匹配通配符表達式
+Title	Bookmark Query Columns		標題
+Identify	ContainerWindow		判明
+Create link	ContainerWindow		創建鏈結
+starts with	FindPanel		開始於
+Replace	FSUtils		代替
+?+* follows nothing.	libtracker		?+* 什麼都不遵循。
+Include Trash	FindPanel		包含資源回收筒
+Rectangle	AttributesView		長方形
+Move to	ContainerWindow		移至
+Status	Email Query Columns		狀態
+New folder	FSUtils		新文件夾
+New Query	FindPanel		新查詢
+Junk on end.	libtracker		垃圾到頭了。
+system	B_SYSTEM_DIRECTORY		系統
+Preparing to delete items…	StatusWindow		準備刪除項目…
+Open %name with:	OpenWithWindow		開啟 %name 以：
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" 是不受支援的可執行檔。
+You cannot copy or move the root directory.	FSUtils		您無法複製或移動根目錄。
+Plain text	AttributesView		純文字
+Capacity:	InfoWindow		容量：
+File	ContainerWindow		檔案
+Relation	OpenWithWindow		關係
+Moving: 	StatusWindow		正在移動：
+Select	SelectionWindow		選擇
+Select	InfoWindow		選擇
+OK	OpenWithWindow		確認
+Clean up	ContainerWindow		清理
+Modified	FindPanel		已修改的
+ (block size: 	InfoWindow		(塊大小：
+Generate image thumbnails	SettingsView		產生圖片縮圖
+An item named '%filename%' already exists.	FSUtils		一個名為'%filename%'的項目已存在。
+preferences	B_PREFERENCES_DIRECTORY		偏好
+Name	Person Query Columns		名稱
+Skip all	FSUtils		全部跳過
+Atom	AttributesView		Atom
+Corrupted opcode.	libtracker		opcode損壞。
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed 的 %TotalSize, %BytesPerSecond/s
+Preparing to restore items…	StatusWindow		準備恢復項目…
+Mount	ContainerWindow		挂載
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# rectangles>}}
+Desktop	B_DESKTOP_DIRECTORY		桌面
+Corrupted pointers.	libtracker		已損壞指針。
+Link to:	InfoWindow		鏈結至：
+Copy here	ContainerWindow		複製這裡
+Character	AttributesView		特點
+All disks	FindPanel		所有磁碟
+Affine transform	AttributesView		仿射變換
+Window	ContainerWindow		視窗
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+Remove	FindPanel		消除
+Company	Person Query Columns		公司
+Select folders…	FindPanel		選擇資料夾…
+Recent documents	FavoritesMenu		近期檔案
+Edit templates…	TemplatesMenu		編輯模板…
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
+8-bit integer	AttributesView		8 位元整數
+8-bit unsigned integer	AttributesView		8 位元unsigned整數
+%s info	InfoWindow	window title	%s 資訊
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used 已使用 -- %free 空閑)
+Hide dotfiles	SettingsView		不顯示隱藏檔案（前綴帶點）
+Trash	Model		資源回收筒
+copy	FSUtils	filename copy	複製
+Enable type-ahead filtering	SettingsView		啟用預先輸入過濾
+Location	OpenWithWindow		位置
+Find	FSUtils		尋找
+List folders first	SettingsView		優先列出資料夾
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		此資料夾中已存在名為 \"%name\" 的項目。您想用您正在建立的符號鏈結替換它嗎？
+List view	ContainerWindow		清單視圖
+Create relative link	ContainerWindow		建立相對鏈結
+Modified	QueryPoseView		已修改的
+Owner	FilePermissionsView		擁有者
+Cancel	FSClipBoard		取消
+Modified	PoseView		已修改的
+Save as template…	FindPanel		另存為模板…
+Move to Trash	ContainerWindow		移入資源回收筒
+All files and folders	FindPanel		所有檔案和資料夾
+Add-ons	ContainerWindow		附加元件
+Too many parenthesis.	libtracker		括號太多。
+Save query template:	FindPanel		存储查詢範本：
+Increase size	ContainerWindow		增加尺寸
+\nShould this be fixed?	FSUtils		\n這個需要解決嗎？
+URL	Bookmark Query Columns		URL
+Floating point number	AttributesView		浮點數
+Cancel	ContainerWindow		取消
+Attributes	ContainerWindow		屬性
+Error deleting items	FSUtils		刪除項目時發生錯誤
+Cut	ContainerWindow		剪下
+Disks	Model		磁碟
+Create a Query template	FindPanel		建立查詢模板
+Size	FindPanel		大小
+New submenu	ContainerWindow	Folder name of New-template submenu	新子選單
+OK	Email Query Columns		確認
+Location	QueryPoseView		位置
+Edit query	ContainerWindow		編輯查詢
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
+Previously mounted disks	AutoMounterSettings		先前挂載的磁碟
+You cannot replace a file with a folder or a symbolic link.	FSUtils		您不能用資料夾或符號鏈結替換檔案。
+The target disk does not support creating links.	FSUtils		目標磁碟不支援建立鏈結。
+develop	B_SYSTEM_DEVELOP_DIRECTORY		開發
+Cut more	ContainerWindow		剪下更多
+64-bit integer	AttributesView		64 位元整數
+The Tracker must be running to see Info windows.	PoseView		Tracker必須運作才能看到資訊視窗。
+Tracker preferences	TrackerSettingsWindow		Tracker偏好
+Read	FilePermissionsView		讀取
+There was an error writing the attribute.	WidgetAttributeText		寫入屬性時出錯。
+If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		若您重新命名 %target，%osName 可能無法正常運作！\n\n您確定要這樣做嗎？
+Filesystem:	InfoWindow		檔案系統：
+Could not open \"%name\" (%error). 	FSUtils		無法開啟 \"%name\"（%error）。
+Media parameter group	AttributesView		媒體參數組
+%name info	InfoWindow	InfoWindow Title	%name 資訊
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		如果您移動主資料夾，%osName 可能會發生運行故障！\n\n您確定要這樣做嗎？\n\n若無論如何也要移動主資料夾，請按住 Shift 鍵並按一下\"Move\".
+Property info	AttributesView		屬性資訊
+Sorry, you can't create links in the Trash.	PoseView		抱歉，您無法在資源回收筒中建立鏈結。
+From	Email Query Columns		來自
+Open selection with:	OpenWithWindow		開啓選擇以：
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		無法開啟 \"%document\" 因為應用程式 \"%app\" 位於資源回收筒。
+Work Phone	Person Query Columns		工作電話
+Select folders	FindPanel		選擇資料夾
+Close	ContainerWindow		關閉
+Get info	ContainerWindow		獲取資訊
+MIME Type	AttributesView		MIME 類型
+There was an error resolving the link.	Tracker		解析鏈結時發生錯誤。
+Show folder location in title tab	SettingsView		在標題標籤中顯示資料夾位置
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		嘗試存储到您指定的資料夾時出現問題。請嘗試另一種。
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# values>}}
+Desktop	TrackerSettingsWindow		桌面
+Nested *?+.	libtracker		嵌套 *?+.
+Move	FSUtils	button label	移動
+Group	FilePermissionsView		組
+Could not find an application to open \"%name\" (%error). 	FSUtils		找不到開啓 \"%name\" 的應用程式（%error）。
+Internal error.	libtracker		內部錯誤。
+Geometric size	AttributesView		幾何尺寸
+Replace	FilePanelPriv		替換
+contains	SelectionWindow		包含
+is not	FindPanel		並非
+Keywords	Bookmark Query Columns		關鍵字
+Copy more	ContainerWindow		複製更多
+by name	FindPanel		根據名稱
+Media parameter web	AttributesView		媒體參數網
+Sorry, you can't save things at the root of your system.	FilePanelPriv		抱歉，您無法將內容存储在系統根目錄中。
+Restore	ContainerWindow		恢復
+Location	ContainerWindow		位置
+Skip	FSUtils		跳過
+Warning space color	SettingsView		警告空間顔色
+Text list	AttributesView		文字列表
+Used space color	SettingsView		使用的空間色彩
+Cancel	FSUtils		取消
+Original name	ContainerWindow		原名
+Unknown	WidgetAttributeText		未知
+32-bit integer	AttributesView		32 位元整數
+Save as query…	FindPanel		另存為查詢…
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定的名稱已用作資料夾的名稱。請選擇其他名稱。
+Modified	ContainerWindow		已修改的
+Mini icon view	ContainerWindow		迷你圖示視圖
+File	FilePanelPriv		檔案
+Search	FindPanel		搜尋
+Modified:	InfoWindow		已修改的：
+Cancel	FilePanelPriv		取消
+Sorry, you cannot edit that attribute.	WidgetAttributeText		抱歉，您無法編輯該屬性。
+Memory pointer	AttributesView		記憶體指針
+Cancel	OpenWithWindow		取消
+There was an error deleting \"%name\":\n\t%error	FSUtils		刪除 \"%name\" 時出錯:\n\t%error
+Files cannot be moved or deleted from a read-only volume.	PoseView		無法從唯讀卷中移動或刪除檔案。
+Resize to fit	ContainerWindow		調整大小以適合
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	將  \"%name\" 鏈結到：
+Mount server error	AutoMounterSettings		掛載伺服​​器錯誤
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		若您重新命名主資料夾， %osName 可能會發生運行故障！\n\n您確定要這樣做嗎？\n\n若無論如何也要重命名主資料夾，請按住 Shift 鍵並按一下 \"再命名\".
+Boolean	AttributesView		布林值
+Memory size	AttributesView		記憶體大小
+New folder	TemplatesMenu		新創資料夾
+ (broken)	InfoWindow		（損壞）
+Replace all	FSUtils		替換所有
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		應用程式 \"%appname\" 不支援您要開啟的文件類型。\n您確定要繼續嗎？\n\n如果您知道應用程式支援該文件類型，則應聯絡應用程式的發布者並要求他們更新其應用程式以列出支援的文件類型。
+Reverse order	ContainerWindow		顛倒順序
+Copying: 	StatusWindow		正在複製：
+Show navigator	SettingsView		顯示導航器
+Double-precision floating point number	AttributesView		雙精度浮點數
+Decrease size	ContainerWindow		減小尺寸
+Recent queries	FindPanel		最近查詢
+Mount all	MountMenu		全部掛載
+Size	Default Query Columns		大小
+Favorites	FavoritesMenu		收藏夾
+<No recent items>	FavoritesMenu		<沒有最近的項目>
+Formula %formula	FindPanel	FindResultTitle	公式 %formula
+Preparing to create links…	StatusWindow		準備建立鏈結…
+Tracker status	StatusWindow		Tracker狀態
+Handles any %type	OpenWithWindow		處理任何 %type
+The mount server could not be contacted.	AutoMounterSettings		無法聯繫挂載伺服器。
+Query template	FindPanel		查詢模板
+Open	OpenWithWindow		開啓
+ends with	SelectionWindow		結束於
+You must have at least one attribute showing.	PoseView		您必須至少顯示一項屬性。
+Finish: after several years	StatusWindow		完成：幾年後
+Favorites	FilePanelPriv		收藏夾
+You can't move or copy items to read-only volumes.	PoseView		您無法將項目移動或複製到唯讀磁碟卷。
+home	B_USER_DIRECTORY		主資料夾
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker新模板
+Disk mounting during boot	AutoMounterSettings		啟動時挂載磁碟
+Don't automount	AutoMounterSettings		不要自動掛載
+Node ref	AttributesView		節點參考
+Could not find application \"%appname\"	OpenWithWindow		找不到應用程式 \"%appname\"
+Unmatched parenthesis.	libtracker		不符的括號（parenthesis）。
+New folder %d	FSUtils		新創資料夾 %d
+Extended attribute	AttributesView		擴充屬性
+Error %error loading Add-On %name.	ContainerWindow		錯誤 %error 發生於載入附加元件 %name.
+Unmatched brackets.	libtracker		不符的括號（brackets）。
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		您正在嘗試替換該項目:\n\t%name%dest\n從：\n\t%name%src\n\n您想將其替換為您現在的 %movemode 嗎？
+Empty Trash	ContainerWindow		清空資源回收筒
+no supporting apps	OpenWithWindow		無支援的應用程式
+32-bit unsigned integer	AttributesView		32 位元無符號整數
+Preparing to empty Trash…	StatusWindow		正在預備清空資源回收筒…
+Deleting: 	StatusWindow		刪除：
+the MIME settings	FSUtils		MIME設定
+You can't move or copy the trash.	FSUtils		您無法移動或複製資源回收筒
+label too long	PoseView		標籤太長
+Error creating link to \"%name\".	FSUtils		建立鏈結時出錯 \"%name\".
+Unknown	FilePermissionsView		未知
+Paste links	ContainerWindow		貼上鏈結
+Restoring: 	StatusWindow		恢復中：
+The Tracker must be running to set the default printer.	PoseView		Tracker必須運作才能設定預設印表機。
+calculating…	InfoWindow		計算…
+Preferred for file	OpenWithWindow		首選文件
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# 已選擇} other{# 已選擇}}
+OK	AutoMounterSettings		確認
+copying	FSUtils		複製中
+MIME String	AttributesView		MIME 字串
+Delete	ContainerWindow		刪除
+Execute	FilePermissionsView		執行
+Show volumes on Desktop	SettingsView		在桌面上顯示磁碟卷
+Recent folders	ContainerWindow		近期資料夾
+Desktop	Model		桌面
+Select all	ContainerWindow		選擇全部
+apps	B_APPS_DIRECTORY		應用程式
+Error calculating folder size.	InfoWindow		計算資料夾大小時發生錯誤。
+Delete	FSUtils		刪除
+Edit name	ContainerWindow		編輯名稱
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		無法開啓 \"%document\" (缺少符號: %symbol). \n
+ASCII Text	AttributesView		ASCII 文字
+Atom reference	AttributesView		Atom參考
+config	B_USER_CONFIG_DIRECTORY		配置
+Error moving \"%name\".	FSUtils		移動 \"%name\" 時發生錯誤。
+Open	ContainerWindow		開啓
+Settings…	MountMenu		設定…
+You cannot put the selected item(s) into the trash.	FSUtils		您不能將所選項目移入資源回收筒。
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	目標：
+starts with	SelectionWindow		開始於
+Any	AttributesView		任何
+Invert	SelectionWindow		顛倒
+Open…	FindPanel		開啓…
+Would you like to find some other suitable application?	FSUtils		您想找到其他合適的應用程式嗎？
+(unknown)	AttributesView		（未知）
+*+? operand may be empty.	libtracker		*+? 操作數可以為空。
+Recent folders	FavoritesMenu		近期資料夾
+Signed memory size	AttributesView		已標記的記憶體大小
+The specified name is illegal. Please choose another name.	FilePanelPriv		指定的名稱不合法。請選擇其他名稱。
+of %items	StatusWindow		的 %items
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		複製檔案 \"%name\"時發生錯誤:\n\t%error\n\n您想繼續嗎？
+less than	FindPanel		少於
+MIME Path	AttributesView		MIME路徑
+Creating links: 	StatusWindow		正在創建鏈結：
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		無法開啓 \"%document\" 以程式 \"%app\" (%error). 
+Create %s clipping	PoseView		建立 %s 剪輯
+Error moving \"%name\"	FSUtils		移動 \"%name\" 時發生錯誤
+To: %dir	StatusWindow		至：%dir
+Cancel	Tracker		取消
+Paste layout	ContainerWindow		貼上版面
+yes	AttributesView		是的
+Make active printer	ContainerWindow		設定活躍印表機
+Copy to	ContainerWindow		複製到
+Name	SelectionWindow		名稱
+Location	Default Query Columns		位置
+by attribute	FindPanel		根據屬性
+Write	FilePermissionsView		寫
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		如果更改系統資料夾或其內容，您將無法啟動 %osName!\n\n您確定要這樣做嗎？\n\n若要變更系統資料夾或其內容，請按住 Shift 鍵並按一下 \"我悉知我正行此事\".
+Save	FilePanelPriv		存储
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		無法開啓 \"%document\" 以程式 \"%app\" (缺少庫: %library). \n
+Finish: %time	StatusWindow		完成：%time
+after	FindPanel		經過
+Messenger	AttributesView		Messenger
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# data byte>} other{<# bytes of data>}}
+Version	OpenWithWindow		版本
+The entered file name is too long.	FSUtils		輸入的檔名太長。
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些選定的項目無法移至資源回收筒。您想刪除它們嗎？ （此操作無法恢復。）
+Add printer…	ContainerWindow		新增印表機…
+Permissions	ContainerWindow		權限
+Size:	InfoWindow		大小：
+Copy	ContainerWindow		複製
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		某些選定的項目無法移至資源回收筒。您想刪除它們嗎？ （此操作無法恢復。）
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		抱歉，「字元」屬性無法儲存多位元組字形。
+And	FindPanel		以及
+Palette-indexed picture	AttributesView		調色盤索引化的圖片
+Drawing pattern	AttributesView		繪製圖案
+File offset	AttributesView		檔案偏移量
+Name = %name	FindPanel	FindResultTitle	名稱 = %name
+Subject	Email Query Columns		主題
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		複製資料夾時發生錯誤 \"%name\":\n\t%error\n\n您想繼續嗎？
+You cannot create a link to the root directory.	FSUtils		您無法建立到根目錄的鏈結。
+Other	FilePermissionsView		其他
+Automatic disk mounting	AutoMounterSettings		自動磁碟挂載
+parent folder	NavMenu		父資料夾
+Create link here	ContainerWindow		在此建立鏈結
+Force identify	ContainerWindow		強制判明
+no items	CountView		沒有組件
+Time	AttributesView		時間
+Disks	DirMenu		磁碟
+Open parent	ContainerWindow		開啓父目錄
+Find…	ContainerWindow		尋找…
+moving	FSUtils		移動中
+Add	FindPanel		添加
+greater than	FindPanel		大於
+Created:	InfoWindow		已創建：
+Single window navigation	SettingsView		單視窗導航
+Edit Query template	FindPanel		編輯查詢模板
+Save query as template…	FindPanel		將查詢存储為模板…
+All disks	AutoMounterSettings		所有磁碟
+link	FSUtils	filename link	鏈結
+16-bit unsigned integer	AttributesView		16 位元無符號整數
+Proceed	FSUtils		繼續
+Edit favorites…	FilePanelPriv		編輯收藏夾…
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		您無法將資料夾移至其自身或其任何子資料夾中。
+New	ContainerWindow		新創
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		您必須將項目放在 \"Disks\" 視窗的磁碟圖示之一上。
+If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果你改變 %target, %osName 可能運行失常！\n\n您確定要這樣做嗎？
+Sorry, you can't copy items to the Trash.	FSClipBoard		抱歉，您無法將項目複製到資源回收筒。
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		此資料夾中已存在一些與您 %verb 的項目同名的項目。\n\n您想將它們替換為您所使用的 %verb 還是系統會提示您輸入每一項？
+When	Email Query Columns		每當
+Object	AttributesView		對象
+Paste	ContainerWindow		貼上
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		此資料夾中已存在名為 \"%name\" 的項目，並且可能包含\n具有相同名稱的項目。您想將它們替換為您所在資料夾中包含的內容 %verb 嗎？
+Cannot unmount the boot volume \"%name\".	FSUtils		無法卸載啟動磁碟卷 \"%name\"。
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		無法開啓 \"%document\" 以程式 \"%app\" (缺少符號: %symbol). \n
+New folder	ContainerWindow		新創資料夾
+Name	OpenWithWindow		名稱
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	獲取資訊
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		嘗試更換時出現問題 \"%name\". 該項目可能處於開啟狀態或繁忙狀態.
+Windows	TrackerSettingsWindow		視窗
+Show space bars on volumes	SettingsView		在卷上顯示空間表示條
+Could not update permissions of file \"%name\". %error	FSUtils		無法更新檔案 \"%name\"的權限。 %error
+Emptying Trash… 	StatusWindow		正在清空資源回收筒…
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # 檔案} other{for # 檔案}}
+Revert	TrackerSettingsWindow		恢復
+trash	B_TRASH_DIRECTORY		資源回收筒
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		如果移動系統資料夾或其內容，您將無法啟動 %osName ！\n\n您確定要執行此操作嗎？\n\n若要移動系統資料夾或其內容，請按住 Shift 鍵並按一下\"移動\"。
+Open query:	FindPanel		開啟查詢：
+Close all in workspace	ContainerWindow		關閉工作區中的所有內容
+Corrupted expression.	libtracker		expression損壞。
+Network address	AttributesView		網路位址
+Finish: %time - %finishtime left	StatusWindow		完成：%time - %finishtime 剩餘
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		無法開啓 \"%document\" (缺少庫: %library). \n
+Create relative link here	ContainerWindow		在此創建相對鏈結
+All Haiku disks	AutoMounterSettings		所有Haiku磁碟
+Close all	ContainerWindow		關閉所有
+Paused: click to resume or stop	StatusWindow		已暫停：點擊可恢復或停止
+Name	QueryPoseView		名稱
+Error %error loading add-On %name.	ContainerWindow		錯誤 %error 載入附加元件 %name.
+Does not handle file	OpenWithWindow		不處理檔案
+E-mail	Person Query Columns		E-mail
+Templates	FindPanel		模板
+Arrange by	ContainerWindow		排序以
+Attributes	AttributesView		屬性
+Sorry, saving more than one item is not allowed.	FilePanelPriv		抱歉，不允許保存多於一項。
+64-bit unsigned integer	AttributesView		64 位元無符號整數
+Move here	ContainerWindow		移動至此
+the config folder	FSUtils		設定資料夾
+Sorry, could not create a new folder.	FSUtils		抱歉，無法創建新資料夾。
+MIME Signature	AttributesView		MIME 簽名
+Rename	FSUtils	button label	再命名
+Clean up all	ContainerWindow		清理全部
+Add current folder	FilePanelPriv		新增目前資料夾
+Description:	InfoWindow		描述：
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		您確定要刪除所選項目嗎？此操作無法恢復。
+Grayscale picture	AttributesView		灰階圖
+ends with	FindPanel		結束於
+Show Disks icon	SettingsView		顯示磁碟圖示
+Outline selection rectangle only	SettingsView		僅輪廓選擇矩形
+by formula	FindPanel		根據公式
+is	FindPanel		為
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		若您重新命名系統資料夾或其內容，您將無法啟動 %osName！\n\n您確定要執行此操作嗎？\n\n若要重新命名系統資料夾或其內容，請按住 Shift 鍵並按一下\"再命名\"。
+Permissions	FilePermissionsView		權限
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" 是一個遺留的可執行檔。請取得更新版本或重新編譯應用程式。
+Only the boot disk	AutoMounterSettings		僅啟動磁碟
+Message	AttributesView		訊息
+Modified	Default Query Columns		已修改的
+Default application	InfoWindow		默認應用程序
+Untitled bitmap	PoseView		無標題點陣圖
+Invert selection	ContainerWindow		反轉選擇
+matches regular expression	SelectionWindow		匹配正規表示式
+Monochrome picture	AttributesView		單色圖片
+Real name	ContainerWindow		真實名稱
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		無法開啟\"%name\"。該檔案被錯誤地標記為可執行檔。
+Save	FindPanel		存储
+Name	FindPanel		名稱
+Cancel	WidgetAttributeText		取消
+Expression too long.	libtracker		表达式过長。
+Memory corruption.	libtracker		記憶體損壞。
+Color	AttributesView		顏色
+Copy layout	ContainerWindow		複製佈局
+Duplicate	ContainerWindow		複製
+16-bit integer	AttributesView		16 位元整數
+Untitled clipping	PoseView		無標題剪輯
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		檔案 \"%name\" 已存在於指定資料夾中。你想更換它嗎？
+, indexed	InfoWindow		, 已索引的
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		您必須將項目放在\"Disks\" 視窗的磁碟圖示之一上。
+Version:	InfoWindow		版本：
+OK	PoseView		確認
+Add new submenu…	TemplatesMenu		新增子選單…
+Find	FindPanel		尋找
+Empty folder	NavMenu		空資料夾
+Defaults	TrackerSettingsWindow		默認值
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		抱歉，目標磁碟卷上沒有足夠的可用空間來複製所選內容。
+True-color picture	AttributesView		真彩色圖片
+Alignment	AttributesView		校准
+Move to Trash	FSUtils		移入資源回收筒
+Cancel	PoseView		取消
+Options	FindPanel		選項
+Delete	PoseView		刪除
+Media parameter	AttributesView		媒體參數
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		如果您更改主資料夾， %osName 可能會發生運行故障！\n\n您確定要這樣做嗎？\n\n若無論如何也要變更主資料夾，請按住 Shift 鍵並按一下 \"我悉知我正行此事\".
+Sorry, you can't copy items to the Trash.	PoseView		抱歉，您無法將項目複製到資源回收筒。
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# 項目} other{# 項目}}
+Name	AttributesView		名稱
+Invalid bracket range.	libtracker		括號範圍無效。
+the settings folder	FSUtils		設定目錄
+If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果移動 %target，%osName 可能無法正常運作！\n\n您確定要這樣做嗎？
+Create a Query	FindPanel		建立一个查詢
+I know what I'm doing	FSUtils	button label	我悉知我正行此事
+Preparing to copy items…	StatusWindow		準備複製項目…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
+Entry ref	AttributesView		條目參考
+Icon view	ContainerWindow		圖示視圖
+The entered folder name is too long.	FSUtils		輸入的資料夾名稱太長。
+Name	ContainerWindow		名稱
+Preferred for %type	OpenWithWindow		%type 的首選
+Free space color	SettingsView		自由空間顏色
+OK	FSUtils		確認

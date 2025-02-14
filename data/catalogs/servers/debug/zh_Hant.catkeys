@@ -1,0 +1,8 @@
+1	english	x-vnd.Haiku-debug_server	3188340596
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		应用:\n\n%app\n\n遇到错误，导致无法继续。 Haiku将终止应用程序并进行清理。
+Oh yeah!	DebugServer		噢耶！
+Debug	DebugServer		调试
+Terminate	DebugServer		終止
+Save report	DebugServer		存储報告
+Write core file	DebugServer		写入核心檔案
+Oh no!	DebugServer		討厭！

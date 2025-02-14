@@ -1,0 +1,14 @@
+1	english	x-vnd.Haiku-mount_server	599204450
+Mount read-only	AutoMounter		挂載為唯讀
+Error mounting volume:\n\n%s	AutoMounter		錯誤挂載卷:\n\n%s
+Cancel	AutoMounter		取消
+OK	AutoMounter		確認
+Unmount error	AutoMounter		卸載錯誤
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		該卷上的檔案系統不是 Be 檔案系統。建議以唯讀模式掛載，以防止因 Haiku 的錯誤而導致資料意外遺失。
+Mount read/write	AutoMounter		挂載為讀/寫
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		無法卸載盤 \"%s\":\n\t%s
+Mounting volume '%s'\n\n	AutoMounter		正在挂載卷 '%s'\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		無法卸載磁碟 \"%s\":\n\t%s\n\n是否應強制卸載？\n\n注意：如果應用程式目前正在寫入磁碟卷，現在卸載它可能會導致資料遺失。\n
+Force unmount	AutoMounter		强制卸載
+Mount error	AutoMounter		挂載錯誤
+Mount warning	AutoMounter		挂載警告

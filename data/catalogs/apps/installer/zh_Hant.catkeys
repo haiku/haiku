@@ -1,0 +1,87 @@
+1	english	x-vnd.Haiku-Installer	2288760834
+Performing installation.	InstallProgress		正在執行安裝。
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		請先關閉 DriveSetup 視窗，然後再關閉安裝程式視窗。
+No optional packages available.	PackagesView		無可用的可選套件。
+This operating system has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		該作業系統必須安裝在使用Be檔案系統的分割區上，但您的系統上目前沒有可用的此類分割區。
+The mount point could not be retrieved.	InstallProgress		無法檢索裝載點。
+<none>	InstallerWindow	No partition available	<無>
+Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		安裝完成。引導扇區已寫入'%s'。按「重新啟動」重新啟動電腦或選擇新的目標卷以執行另一次安裝。
+Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Haiku 必須安裝在使用Be檔案系統的分區上，但當前您的系統上沒有可用的此類分區。
+Please choose target	InstallerWindow		請選擇目標
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		用於配置Haiku啟動菜單的應用程式BootManager無法啟動。
+Cancel	InstallProgress		取消
+Are you sure you want to to stop the installation?	InstallerWindow		您確定要中止安裝嗎？
+Installer	System name		安裝程式
+Unknown Type	InstallProgress	Partition content type	未知類型
+Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		點擊 '開始' 按鍵以安裝從 '%1s' 到 '%2s'。
+Are you sure you want to stop the installation?	InstallerWindow		您確定要中止安裝嗎？
+README	InstallerApp		README
+Quit	InstallerWindow		退出
+Please close the BootManager window before closing the Installer window.	InstallerWindow		請先關閉BootManager視窗，然後再關閉Installer視窗。
+Write boot sector to '%s'	InstallerWindow		將引導扇區寫入'%s'
+Boot sector not written because of an internal error.	InstallProgress		由於一個内部錯誤，引導扇區未能寫入。
+Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		從彈出菜單中選擇源磁盤和目標磁盤。然後點擊'開始'。
+Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		正在運行 BootManager 以及 DriveSetup ... \n\n結束這兩個程序以繼續安裝。
+Click on 'Set up partitions…' to create one.	InstallerWindow		單擊「設置分區... 」以創建一個。
+Welcome to the Haiku Installer!\n\n	InstallerApp		歡迎使用Haiku安裝程序！ \n\n
+?? of ??	InstallerWindow	Unknown progress	?? 的 ??
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		無法啟動用於配置磁盤分區的應用程式 DriveSetup。
+Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		安裝完成。引導扇區已寫入'%s'。點擊'退出'離開安裝程序或選擇新的目標卷以執行另一次安裝。
+The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		目標卷不為空。如果它已經包含一個Haiku作業系統安裝，它將被覆蓋。這將移除所有已安裝的軟件。\n\n如果您想升级系统而不移除已安装的软件，请参考Haiku用户指南中关于应用程序的主题 \"SoftwareUpdater\" 尋求安裝指引。\n\n您確定要繼續安裝嗎？
+Quit DriveSetup	InstallerWindow		退出DriveSetup
+Write boot sector	InstallerWindow		寫入引導扇區
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld 的 %2ld
+Finishing installation.	InstallProgress		正在完成安裝。
+Install from:	InstallerWindow		安裝自：
+Additional disk space required: 0.0 KiB	InstallerWindow		所需額外磁盤空間: 0.0 KiB
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		這是測試版軟件！這意味著有丟失重要數據的風險。請經常備份！您已被事先警告了。\n\n\n
+???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		无论如何都要安装
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) 如果您要在真實硬件上安裝Haiku（而不是在模擬器內），您可能需要從另一個操作系統準備一個硬盤分區（例如，您可以使用GParted Live-CD，它也可以調整現有分區的大小以騰出空間）。\n您也可以通過從安裝程序啟動DriveSetup來設置分區，但您將無法使用它調整現有分區的大小。盡管多年來DriveSetup已經經過相當徹底的測試，但建議您備份系統上其他分區的最新數據。僅爲以防萬一……
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) 安裝程式將使Haiku分區本身可啟動，但不會采取任何步驟將Haiku集成到現有的啟動菜單中。如果您已經安裝了GRUB，您可以將Haiku添加到其中。\n有關詳細信息，請參考我們網站上關於啟動Haiku的指南 https://www.haiku-os.org/guides/booting.\n或者您可以從安裝器的 \"工具\" 菜單中設置啓動菜單，參見Haiku User Guide裏面 \"BootManager\"的相關主題。\n\n\n
+Hide optional packages	InstallerWindow		隐藏可选套件
+???	InstallerWindow	Unknown partition name	???
+Have fun and thanks for trying out Haiku!	InstallerApp		祝玩得開心，感謝您嘗試Haiku!
+Quit	InstallerApp		退出
+Quit BootManager and DriveSetup	InstallerWindow		退出 BootManager 和 DriveSetup
+Error writing boot sector.	InstallProgress		寫入引導扇區時出錯。
+OK	InstallerWindow		確定
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)當您第一次成功啟動Haiku時，請務必閱讀我們的 \"User Guide\"並進行 \"Quick Tour\"。桌面上和WebPositive瀏覽器的書簽中均有鏈結。 \n\n
+Try installing anyway	InstallProgress		無論如何嘗試安裝
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		安裝HAIKU前的重要資訊\n\n
+Additional disk space required: %s	InstallerWindow		需要額外磁盤空間：%s
+Stop	InstallerWindow	In alert after pressing Stop	終止
+Boot sector successfully written.	InstallProgress		引導扇區寫入成功。
+Failed to launch BootManager	InstallerWindow		無法啟動 BootManager
+Writing bootsector.	InstallProgress		寫入引導扇區。
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		遇到錯誤並且安裝未完成：\n\n錯誤： %s
+Restart	InstallerWindow		重新啟動
+The disk can't be mounted. Please choose a different disk.	InstallProgress		磁盤無法掛載。請選擇不同的磁盤。
+Begin	InstallerWindow		開始
+Collecting copy information.	InstallProgress		正在收集副本信息。
+Set up boot menu…	InstallerWindow		設置啓動菜單…
+Show optional packages	InstallerWindow		顯示可選套件
+No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		未找到適合安裝的分區。請設置分區並使用Be檔案系統格式化至少一個分割區。
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		目標磁盤可能沒有足夠的空間。嘗試選擇不同的磁盤或選擇不安裝可選項目。
+Installation canceled.	InstallProgress		安裝已取消。
+Stop	InstallerWindow		停止
+Cancel	InstallerWindow		取消
+Continue	InstallerWindow	In alert after pressing Stop	繼續
+Scanning for disks…	InstallerWindow		正在掃描磁盤…
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		正在運行DriveSetup…\n\n关闭DriveSetup以继续安装。
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		安裝尚未完成！\n您確定要中止它嗎？
+Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		正在運行BootManager ... \n\n關閉BootManager以繼續安裝。
+The partition can't be mounted. Please choose a different partition.	InstallProgress		分割區無法掛載。請選擇不同的分割區。
+Set up partitions…	InstallerWindow		設置分區…
+Install progress:  	InstallerWindow		安裝進度:
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		您無法將磁盤的內容安裝到其自身上。請選擇不同的磁盤。
+Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		請先關閉 BootManager 和 DriveSetup 視窗，然後再關閉安裝程序視窗。
+Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		從彈出菜單中選擇源磁盤。然後單擊「開始」。
+OK	InstallProgress		確定
+Quit BootManager	InstallerWindow		退出引導管理器
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		您確定要安裝到當前啟動盤上嗎？如果您繼續，安裝程序將必須重新啟動您的電腦。
+Onto:	InstallerWindow		到：
+Tools	InstallerWindow		工具
+scanning…	InstallerWindow		掃描中…
+Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		從彈出菜單中選擇要安裝的磁盤。然後單擊'開始'。
+Continue	InstallerApp		繼續

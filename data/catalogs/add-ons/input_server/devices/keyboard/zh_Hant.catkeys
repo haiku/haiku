@@ -1,0 +1,11 @@
+1	english	x-vnd.Haiku-KeyboardInputServerDevice	131044710
+If the application will not quit you may have to kill it.	Team monitor		如果該軟體沒法被關閉，可能需要強制停止。
+Quit application	Team monitor		退出應用程式
+Open Terminal	Team monitor		開啓終端
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{按住 CONTROL+ALT+DELETE # 秒以重啟。}other{按住 CONTROL+ALT+DELETE # 秒以重啟。}}
+Restart the desktop	Team monitor		重啟桌面環境
+Force reboot	Team monitor		強制重啟
+Team monitor	Team monitor		團隊監視器
+Kill application	Team monitor		強制停止軟體
+Cancel	Team monitor		取消
+(This team is a system component)	Team monitor		(該組別為系統級組件)

@@ -1,0 +1,41 @@
+1	english	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		測試頁
+Remove	PrintersWindow		消除
+Red	TestPageView		紅
+Default Printer	PrinterListView		預設印表機
+<pick one>	AddPrinterDialog		<選擇一個>
+Connected to:	AddPrinterDialog		連接到：
+Make default	PrintersWindow		設為預設值
+Cyan	TestPageView		青
+Completed	JobListView		已完成
+Test page	PrintersWindow		測試頁
+Transport: %transport% %transport_address%	PrinterListView		傳輸：%transport% %transport_address%
+Failed	JobListView		失敗
+Blue	TestPageView		藍
+Waiting	JobListView		等待
+Processing	JobListView		處理中
+Cancel	AddPrinterDialog		取消
+Unknown status	JobListView		未知狀態
+Print jobs for %printer_name%	PrintersWindow		%printer_name% 的列印作業
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? 頁}=1{# 頁}other{# 頁}}
+Add printer	AddPrinterDialog		新增印表機
+Printers	PrintersWindow		印表機
+No printer found!	TransportMenu		找不到印表機！
+Add…	PrintersWindow		添加…
+Magenta	TestPageView		品紅
+Transport: %transport% %transport_address%	TestPageView		傳輸 ： %transport% %transport_address%
+Add	AddPrinterDialog		添加
+Print jobs: No printer selected	PrintersWindow		列印作業：未選擇印表機
+Printer name:	AddPrinterDialog		印表機名稱：
+Yellow	TestPageView		黃
+Black	TestPageView		黑
+Printer type:	AddPrinterDialog		印表機類型：
+Printers	System name		印表機
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{無待處理任務}=1{1 待處理任務}other{# 待處理任務}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		印表機: %printer_name%\n驅動程式: %driver%\n
+Green	TestPageView		綠
+Print test page	PrintersWindow		列印測試頁
+Restart job	PrintersWindow		重新啟動作業
+Driver: %driver%	PrinterListView		驅動程式：%driver%
+Cancel job	PrintersWindow		取消作業
+%.2f KB	JobListView		%.2f KB

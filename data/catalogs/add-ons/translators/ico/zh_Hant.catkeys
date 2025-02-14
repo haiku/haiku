@@ -1,0 +1,14 @@
+1	english	x-vnd.Haiku-ICOTranslator	3916328565
+Cursor	ICOTranslator		滑鼠遊標
+Version %d.%d.%d, %s	ConfigView		版本 %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		視窗 %s %ld bit 圖示
+Valid icon sizes are 16, 32, or 48	ConfigView		有效的圖示大小為16, 32和48
+Windows icons	ICOTranslator		視窗圖示
+Enforce valid icon sizes	ConfigView		強制為有效大小
+ICO Settings	main		ICO設定
+Windows icon translator	ICOTranslator		視窗圖示翻譯器
+pixels in either direction.	ConfigView		任意方向的點陣。
+Write 32 bit images on true color input	ConfigView		將32位元圖示匯出為真彩色輸入
+Icon	ICOTranslator		圖示
+ICOTranslator Settings	ConfigView		ICO轉譯器設定
+Windows icon translator	ConfigView		視窗圖示翻譯器

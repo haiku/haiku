@@ -1,0 +1,7 @@
+1	english	x-vnd.Haiku-SpamFilter	468104950
+or empty e-mail	SpamFilterConfig		或空白郵件
+Genuine below and uncertain above:	SpamFilterConfig		低於以下值的是正常郵件，其他則為不明:
+Spam above:	SpamFilterConfig		以上為垃圾郵件:
+Add spam rating to start of subject	SpamFilterConfig		在題名前追加垃圾郵件評價
+Bayesian Spam Filter	SpamFilter		貝葉斯垃圾郵件過濾器
+Learn from all incoming e-mail	SpamFilterConfig		從所有來信中學習

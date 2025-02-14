@@ -1,0 +1,15 @@
+1	english	x-vnd.Haiku-Sounds	2694258450
+Select	SoundFilePanel		選擇
+Sounds	System name		系統聲音
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n由以下貢獻者提供:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n原始工作由 Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
+No such file or directory	HEventList		沒有這樣的檔案或目錄
+Other…	HWindow		其他…
+OK	SoundsHApp		確認
+Sound file:	HWindow		音訊檔案:
+<none>	HEventList		<無>
+Select a sound file	SoundFilePanel		選擇一個聲音文件
+About Sounds	SoundsHApp		關於系統聲音
+OK	HEventList		確認
+Sound	HEventList		聲音
+Event	HEventList		事件
+<none>	HWindow		<無>

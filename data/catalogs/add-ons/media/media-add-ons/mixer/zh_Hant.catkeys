@@ -1,0 +1,24 @@
+1	english	x-vnd.Haiku-mixer.media_addon	275473112
+Input mapping	AudioMixer		輸入映射
+High quality (linear interpolation)	AudioMixer		高品質（線性補償）
+To output	AudioMixer		至輸出
+Gain	AudioMixer		增益
+To master	AudioMixer		至主混音
+not connected	AudioMixer		未連線
+Master output	AudioMixer		主混音輸出
+dB	AudioMixer		dB
+Gain controls	AudioMixer		增益控制
+Low quality (drop/repeat samples)	AudioMixer		低品質（丟棄/重複樣本）
+Output channel sources	AudioMixer		輸出頻道源
+Allow input channel remapping	AudioMixer		允許輸入通道重映射
+Display balance control for stereo connections	AudioMixer		顯示立體聲連線的平衡控制
+Setup	AudioMixer		設定
+Physical input channels	AudioMixer		物理輸入通道
+Input channel destinations	AudioMixer		輸入通道目的地
+Resampling algorithm:	AudioMixer		重採樣演算法：
+Mute	AudioMixer		靜音
+Output mapping	AudioMixer		輸出映射
+Virtual output channels	AudioMixer		虛擬輸出通道
+Allow output channel remapping	AudioMixer		允許輸出通道再映射
+Input gain controls represent:	AudioMixer		輸入增益控制:
+Attenuate mixer output by 3 dB	AudioMixer		將混頻輸出器衰減3dB

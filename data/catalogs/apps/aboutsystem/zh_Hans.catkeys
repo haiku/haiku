@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	2654448748
+1	english	x-vnd.Haiku-About	506608794
 The Haikuware team and their bounty program\n	AboutView		Haikuware 组织及其捐赠程序\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		版权所有 © 1999-2007 Michael C. Ring，保留所有权利。
 \n\nSpecial thanks to:\n	AboutView		\n\n特别感谢：\n
@@ -13,7 +13,7 @@ Past website & marketing:\n	AboutView		早先网站及市场：\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		版权所有 © 2007 Ralink Technology Corporation。保留所有权利。
 Copyright © 2003 Peter Hanappe and others.	AboutView		版权所有 © 2003 Peter Hanappe 及其他人员。
 Testing and bug triaging:\n	AboutView		测试与错误分析：\n
-{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{代处理器:} other{# 代处理器:}}
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{单线程处理器:} other{# 线程处理器:}}
 Ralink WiFi Firmware	AboutWindow		Ralink WiFi 固件
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku所独有的代码，尤其是内核及与之紧密关联的所有应用程序的代码，它们都在 <MIT 协议> 条款下发布。那些包含第三方代码的系统库则在 <LGPL 协议> 下发布。您可以在下述信息中找到第三方部分代码的版权信息。\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		版权所有 © 1996-1997 Jeff Prosise，保留所有权利。
@@ -31,6 +31,7 @@ Time running:	AboutView		运行时间：
 Visit the Haiku website	AboutView		浏览 Haiku 网站
 Version: %s	AboutView	Version: R1 or hrev99999	版本: %s
 Make a donation	AboutView		捐款
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nnetresolv\nCopyright © 1998-2023 The NetBSD Project, Copyright © 2004-2009 by Internet Systems Consortium, Inc. (\"ISC\"), Copyright © 1996-2003 by Internet Software Consortium. All rights reserved.	AboutView		包含由 NetBSD Foundation, Inc. 及其贡献者开发的软件：\nnetresolv\n版权所有 © 1998-2023 The NetBSD Project， 版权所有 © 2004-2009 by Internet Systems Consortium, Inc. (\"ISC\")， 版权所有 © 1996-2003 by Internet Software Consortium。保留所有权利。
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB 内存：
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		版权所有 © 1996-2005 Julian R Seward，保留所有权利。
 GNU LGPL v2	AboutWindow		GNU LGPL v2

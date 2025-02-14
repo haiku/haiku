@@ -1,0 +1,20 @@
+1	english	x-vnd.Haiku-VirtualMemory	2090796060
+Requested swap file size:	SettingsWindow		請求的交換檔案大小：
+VirtualMemory	System name		虛擬記憶體
+OK	VirtualMemoryApp		確認
+Use volume:	SettingsWindow		使用卷：
+Turn off	SettingsWindow		關閉
+Changes will take effect upon reboot.	SettingsWindow		更改將在重新啟動後生效。
+Revert	SettingsWindow		恢復
+Keep enabled	SettingsWindow		保持啟用狀態
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		設定檔案中指定的設定無效。 您可以加載預設值或退出。
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		虛擬記憶體\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		找不到設定檔中指定的磁碟區.您可以使用啟動磁碟區或退出.
+Current Swap:	SettingsWindow		目前的互換用量：
+Load defaults	SettingsWindow		加載預設值
+Use boot volume	SettingsWindow		使用啟動磁碟卷
+Automatic swap management	SettingsWindow		自動互換管理
+Defaults	SettingsWindow		默認值
+Quit	SettingsWindow		退出
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		一旦記憶體用完，停用虛擬記憶體會對系統穩定性產生不良影響。\n在達到這一點之前，虛擬記憶體不會影響系統效能。\n\n您真的確定要關閉它嗎？
+Enable virtual memory	SettingsWindow		啟用虛擬記憶體

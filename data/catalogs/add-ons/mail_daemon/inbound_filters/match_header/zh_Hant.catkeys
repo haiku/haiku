@@ -1,0 +1,17 @@
+1	english	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		刪除訊息
+Match \"%attribute\" against \"%regex\"	RuleFilter		將 \"%attribute\" 和 \"%regex\" 配對
+Match header	RuleFilter		匹配標題
+Set flags to	ConfigView		將標誌設為
+Header field (e.g. Subject, From, …)	ConfigView		標頭欄位（如：主題，寄信人，…）
+<Choose account>	ConfigView		<選取帳戶>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		通配符值如 \"*spam*\"。\n如要使用正則表達式，請加上前綴 \"REGEX:\"。
+Then	ConfigView		然後
+If	ConfigView		若
+Set as read	ConfigView		標為已讀
+Reply with	ConfigView		回覆
+<Choose action>	ConfigView		<選取動作>
+Move to	ConfigView		移至
+this field is based on the action	ConfigView		這裡的意思會隨著動作而改變
+Account	ConfigView		帳戶
+has	ConfigView		有

@@ -1,0 +1,173 @@
+1	english	x-vnd.Haiku-FileTypes	436017301
+Left	Attribute Window	Attribute column alignment in Tracker	左
+Float	Attribute ListView		浮點數
+Final	Application Types Window		最終
+FileTypes request	FileTypes Window		檔案類型請求
+This file type already exists	New File Type Window		該檔案類型已存在
+Preferred application	FileTypes Window		首選應用程式
+Launch	Application Types Window		啓動
+Removing uninstalled application types	Application Types Window		解除安裝已安裝的應用程式類型
+Width:	Attribute Window	Default column width in Tracker for this attribute.	寬度:
+Same as…	FileType Window	The same TYPE as ...	一致於…
+(from super type)	FileTypes Window		(源於上級類型)
+Select same preferred application as	FileTypes Window		選擇與以下相同的首選應用程式
+Could not change attributes	Attribute Window		無法更改屬性
+Icon	FileTypes Window		圖示
+Add…	Application Type Window		添加…
+Attribute name:	Attribute Window		屬性名稱：
+Long description:	Application Type Window		詳細描述:
+Cancel	Preferred App Menu		取消
+Remove	FileTypes Window		消除
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		應用程式 \"%s\" 不支援此檔案類型。\n您確定要設定它嗎？
+Remove	Application Type Window		消除
+Gamma	Application Type Window		伽瑪
+Cancel	Application Type Window		取消
+Attribute	Attribute Window		屬性
+Multiple launch	Application Type Window		多重啓動
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, other{# 應用程式類型可以被刪除}}
+Edit…	Application Types Window		編輯…
+Could not set preferred application	FileTypes Window		無法設定首選應用程式
+Description	FileTypes Window		描述
+Signature:	Application Types Window		簽名:
+None	FileTypes Window		無
+Exclusive launch	Application Type Window		排他啟動
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		刪除檔案類型無法恢復。\n您確定要刪除它嗎？
+Integer 64 bit	Attribute ListView		整數 64 位元
+Cancel	New File Type Window		取消
+Select same preferred application as	FileType Window		選擇與以下相同的首選應用程式
+Cancel	Type List Window		取消
+Don't save	Application Type Window		不存储
+Center	Attribute Window	Attribute column alignment in Tracker	中心
+Done	Extension Window		完畢
+Development	Application Types Window		開發
+Same as…	FileType Window	The same APPLICATION as ...	等同於…
+Abort	Application Types Window		中止
+Save	Application Type Window		存储
+%1 application type	Application Type Window		%1 應用程式類型
+Icon	Application Type Window		圖示
+Duration	Attribute ListView		週期
+Version:	Application Type Window		版本：
+Default application	FileType Window		默認應用程式
+Internal name:	New File Type Window		內部名稱：
+Integer 8 bit	Attribute ListView		整數8位
+Extension:	Extension Window		擴充名:
+Time	Attribute ListView		時間
+Extensions:	FileTypes Window		擴充名:
+Select preferred application	FileType Window		選擇首選應用程式
+Description:	FileTypes Window		描述
+Multiple files from \"%s\" file type	FileType Window		多個來自 \"%s\" 檔案類型的檔案
+Add new group	New File Type Window		新增群組
+Remove uninstalled	Application Types Window		移除已解除安裝的
+File	Application Type Window		檔案
+Progress	Application Types Window		進度
+Select…	FileType Window		選擇…
+Information	Application Types Window		資訊
+Settings	FileTypes Window		設定
+Done	Attribute Window		完畢
+FileTypes request	FileTypes		檔案類型請求
+Select same type as	FileType Window		選擇相同類型如
+Version:	Application Types Window		版本:
+(from application)	FileTypes Window		(源於應用程式)
+Application types	Application Types Window		應用程式類型
+Description:	Application Types Window		描述:
+Name:	Application Types Window		名稱:
+Rating	Attribute ListView		評分
+duration	Attribute ListView		週期
+File could not be opened	Preferred App Menu		檔案無法開啓
+Args only	Application Type Window		僅參數
+Could not open \"%s\":\n%s	FileTypes		無法開啓 \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	右
+Save changes before closing?	Application Type Window		關閉前存储變更嗎?
+Background app	Application Type Window		後台應用程式
+Recognition rule is not valid:\n\n	FileTypes Window		識別規則無效:\n\n
+Show icons in list	FileTypes Window		在清單中顯示圖標
+Editable	Attribute Window	If Tracker allows to edit this attribute.	可編輯
+New resource file…	FileTypes Window		新資源檔案…
+[Multiple files] file types	FileType Window		[多檔案] 檔案類型
+Application type	Application Type Window		應用程式類型
+Show in Tracker…	Application Types Window		在Tracker中顯示…
+Type name:	FileTypes Window		類型名稱：
+Visible	Attribute Window		可見
+Select preferred application	FileTypes Window		選擇首選應用程式
+Path:	Application Types Window		路徑：
+rating	Attribute ListView		評分
+Could not install file type	New File Type Window		無法安裝檔案類型
+Same as…	FileTypes Window		類同…
+Golden master	Application Type Window		Golden master
+Checkbox	Attribute ListView		複選框
+FileTypes request	Preferred App Menu		檔案類型請求
+no icon	FileTypes Window		沒有圖示
+Single launch	Application Type Window		單運行
+%s file type	FileType Window		%s 檔案類型
+Default	Attribute ListView		默認
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		刪除超級類型的操作無法恢復。\n屬於該超級類型的所有檔案類型都會遺失！\n\n您確定要這樣做嗎？若要刪除整個群組，請按住 Shift 鍵並按下\"Remove\"（消除）。
+String	Attribute ListView		串
+Add type	New File Type Window		新增類型
+Remove icon	Icon View		消除圖示
+Boolean	Attribute ListView		布林值
+Cancel	Extension Window		取消
+Alignment:	Attribute Window		對齊
+Icon	FileType Window		圖示
+Signature:	Application Type Window		簽名:
+Development	Application Type Window		開發
+Golden master	Application Types Window		Golden master
+Add	Extension Window		添加
+Open…	FileTypes Window		開啓…
+checkbox	Attribute ListView		複選框
+Could not change file extensions	Extension Window		無法變更檔案擴充名
+Could not open file	FileType Window		無法開啟檔案
+Choose type	Type List Window		選擇類型
+Select…	FileTypes Window		選擇…
+File recognition	FileTypes Window		檔案識別
+Application types…	FileTypes Window		應用程式類型…
+Add icon…	Icon View		添加圖標…
+Cancel	FileTypes Window		取消
+Save into resource file…	Application Type Window		存储到資源檔案中…
+Special:	Attribute Window		特別:
+Type:	Attribute Window		類型:
+Could not retrieve application signature	Preferred App Menu		無法檢索應用程式簽名
+Beta	Application Types Window		Beta
+Add group	New File Type Window		新增羣組
+Cancel	Attribute Window		取消
+Gamma	Application Types Window		伽瑪
+Supported types	Application Type Window		支援的類型
+Integer 32 bit	Attribute ListView		整數 32 位元
+Beta	Application Type Window		Beta
+Could not retrieve preferred application of this file	Preferred App Menu		無法檢索此檔案的首選應用程式
+Application flags	Application Type Window		應用程式標誌
+OK	FileTypes		確認
+Group name:	New File Type Window		組別名稱：
+Move up	FileTypes Window		向上移動
+File	FileTypes Window		檔案
+Add	Attribute Window		添加
+Open file	FileTypes		開啟檔案
+Version info	Application Type Window		版本資訊
+Final	Application Type Window		最終
+Preferred application	FileType Window		首選應用
+FileTypes	FileTypes		檔案類型
+Set preferred application	Preferred App Menu		設定首選應用程式
+New file type	New File Type Window		新檔案類型
+Short description:	Application Type Window		短描述:
+Save request	Application Type Window		存储請求
+Could not remove file type: %s\n	FileTypes Window		無法刪除檔案類型: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	顯示為:
+Done	Type List Window		完畢
+Extra attributes	FileTypes Window		額外屬性
+Group:	New File Type Window		組:
+Alpha	Application Types Window		Alpha
+Close	Application Type Window		關閉
+Integer 16 bit	Attribute ListView		16位元整數
+Extension	Extension Window		擴充名
+Rule:	FileTypes Window		規則:
+FileTypes	System name		檔案類型
+Version	Application Types Window		版本
+Quit	FileTypes Window		退出
+File type	FileType Window		檔案類型
+Internal name:	FileTypes Window		內部名稱：
+Add…	FileTypes Window		添加…
+Edit icon…	Icon View		編輯圖標…
+Internal name:	Attribute Window		內部名稱：
+Show recognition rule	FileTypes Window		顯示識別規則
+Double	Attribute ListView		Double
+Move down	FileTypes Window		向下移動
+Alpha	Application Type Window		Alpha

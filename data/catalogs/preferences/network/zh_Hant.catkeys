@@ -1,0 +1,55 @@
+1	english	x-vnd.Haiku-Network	543099905
+Ethernet device	InterfaceListItem		乙太網路設備
+Link speed:	IntefaceView		鏈結速度：
+disconnected	IntefaceView		斷開連結
+WPA	WPA protected network		WPA
+Network:	IntefaceView		網路：
+Received:	IntefaceView		已收到：
+New…	NetworkWindow		新創…
+no link	InterfaceListItem		沒有鏈結
+Other	NetworkWindow		其他
+Sent:	IntefaceView		已發送：
+Gateway:	IntefaceAddressView		網關：
+The netmask defines your local network	IntefaceAddressView		網路遮罩定義您的本地網絡
+Your IP address	IntefaceAddressView		您的IP位址
+DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP位址：
+Netmask:	IntefaceAddressView		網路遮罩：
+EAP	EAP protected network		EAP
+Services	NetworkWindow		服務
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		在Deskbar中安裝 NetworkStatus 失敗: %s
+Revert	NetworkWindow		恢復
+off	ServiceListItem		關
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<未找到無線網路>
+Enable	IntefaceView		啓用
+connected	IntefaceView		已連接
+Apply	IntefaceAddressView		套用
+Disable	ServiceView		停用
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		在Deskbar中顯示網路狀態
+Mode:	IntefaceAddressView		模式：
+connected	InterfaceListItem		已連結
+OK	NetworkWindow		確認
+Static	IntefaceAddressView		靜態
+launch error	NetworkWindow		啟動錯誤
+Renegotiate	IntefaceView		重新協商
+MAC address:	IntefaceView		MAC 地址：
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		已停用
+Dial-up connection	InterfaceListItem		撥接連線
+on	ServiceListItem		開
+The method for obtaining an IP address	IntefaceAddressView		取得IP位址的方法
+disconnected	InterfaceListItem		已斷開連結
+Automatic	IntefaceAddressView		自動的
+Choose automatically	IntefaceView		自動選擇
+Status:	IntefaceView		狀態：
+Disable	IntefaceView		停用
+Manage…	NetworkWindow		管理…
+open	Open network		開啓
+Network	System name		網路
+Your gateway to the internet	IntefaceAddressView		您的互聯網網關
+Enable	ServiceView		啓用
+Wireless device	InterfaceListItem		無線裝置
+Disabled	IntefaceAddressView		已停用
+VPN connection	InterfaceListItem		VPN連線

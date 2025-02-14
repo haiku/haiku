@@ -1,0 +1,50 @@
+1	english	x-vnd.Haiku-Input	130668644
+Defaults	InputMouse		默認值
+Scrolling	TouchpadPrefView		滾動
+Long	KeyboardView		長
+Cancel	TouchpadPrefView		取消
+Slow	TouchpadPrefView		慢
+Device List	InputWindow		設備列表
+Double-click speed	SettingsView		按兩下速度
+5-Button	SettingsView		5鍵
+Typing test area	KeyboardView		打字測試區
+Fast	KeyboardView		快
+Please confirm	TouchpadPrefView		請確認
+Mouse speed	SettingsView		滑鼠速度
+Horizontal scrolling	TouchpadPrefView		水平捲動
+Keyboard lock delay	TouchpadPrefView		鍵盤鎖定延遲
+Input	System name		輸入
+Quick	TouchpadPrefView		快
+Short	KeyboardView		短
+Revert	InputMouse		恢復
+Slow	KeyboardView		慢
+2-Button	SettingsView		2鍵
+Click to focus and raise	SettingsView		點擊聚焦並提起
+Vertical	TouchpadPrefView		垂直
+Focus follows mouse	SettingsView		焦點跟隨滑鼠
+Double-click test area	SettingsView		雙擊測試區域
+Focus mode:	SettingsView		對焦模式：
+Revert	TouchpadPrefView		恢復
+4-Button	SettingsView		4鍵
+Tapping sensitivity	TouchpadPrefView		敲擊靈敏度
+Revert	InputKeyboard		恢復
+Mouse type:	SettingsView		滑鼠類型：
+Off	TouchpadPrefView		關
+Never	TouchpadPrefView		絕不
+Fast	TouchpadPrefView		快
+6-Button	SettingsView		6鍵
+Click to focus	SettingsView		點擊對焦
+Acceleration	TouchpadPrefView		加速
+Accept first click	SettingsView		接受第一次點擊
+OK	TouchpadPrefView		確認
+Delay until key repeat	KeyboardView		延遲直至按鍵重複
+Two finger scrolling	TouchpadPrefView		兩指滾動
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新的滾動區域非常大，可能會妨礙滑鼠的正常操作。你真的想改變它嗎？
+Mouse acceleration	SettingsView		滑鼠加速
+High	TouchpadPrefView		高
+Defaults	TouchpadPrefView		默認值
+1-Button	SettingsView		1鍵
+Defaults	InputKeyboard		默認值
+Key repeat rate	KeyboardView		按鍵重複率
+Horizontal	TouchpadPrefView		水平
+3-Button	SettingsView		3鍵

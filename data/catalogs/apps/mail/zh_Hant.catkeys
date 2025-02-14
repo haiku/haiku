@@ -1,0 +1,69 @@
+1	english	x-vnd.Be-MAIL	2822219626
+Set to Saved	Mail		設定為已存儲
+Next message	Mail		下一條信息
+Unread	Mail		未讀
+Copy to new	Mail		複製到新的
+Save as draft	Mail		存儲為草稿
+Default account:	Mail		默認帳戶：
+New	Mail		新創
+Save	Mail		存儲
+Undo	Mail		撤銷
+Save changes to this signature?	Mail		存儲對此簽名的變更嗎？
+Save attachment…	Mail		存儲附件…
+Paste	Mail		貼上
+E-mail draft could not be saved!	Mail		E-mail草稿無法存儲！
+Only files can be added as attachments.	Mail		只能將檔案新增為附件。
+Close	Mail		關閉
+Untitled	Mail		無標題
+Copy link location	Mail		複製鏈結位置
+Next	Mail		下一步
+OK	Mail		確認
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		退出
+Title:	Mail		標題：
+Account from mail	Mail		郵件賬戶
+Cut	Mail		剪下
+\\n - Newline	Mail		\\n - Newline
+Copy	Mail		複製
+Use default account	Mail		使用默認帳戶
+Cancel	Mail		取消
+Find	Mail		尋找
+Date:	Mail		日期：
+Close and 	Mail		關閉並
+Open this link	Mail		開啓此鏈結
+Open draft	Mail		開啓草稿
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Leave as 'New'
+Find again	Mail		再次尋找
+Need Tracker to move items to trash	Mail		需要追蹤器將組件移至資源回收筒
+Font:	Mail		字體：
+Accounts…	Mail		賬戶…
+Include file attributes in attachments	Mail		在附件中包含檔案屬性
+Move to trash	Mail		移到資源回收筒
+Mail settings	Mail		郵件設定
+Status:	Mail		狀態：
+Redo	Mail		重做
+Settings…	Mail		設定…
+Trash	Mail		資源回收筒
+Find…	Mail		尋找…
+Select all	Mail		選擇全部
+Reply account:	Mail		回郵賬戶：
+Open attachment	Mail		開啟附件
+Save this message as a draft before closing?	Mail		在關閉之前將此訊息存儲為草稿嗎？
+None	Mail		無
+No file attributes, just plain data	Mail		沒有檔案屬性，只有純數據
+Add	Mail		地址
+Open	Mail		開啟
+Don't save	Mail		不要存儲
+An error occurred trying to save the attachment.	Mail		嘗試存儲附件時發生錯誤。
+Save address	Mail		存儲地址
+Edit queries…	Mail		編輯查詢…
+There is no installed handler for URL links.	Mail		沒有安裝 URL 鏈結處理程序。
+File	Mail		檔案
+New mail message	Mail		新郵件訊息
+An error occurred trying to open this signature.	Mail		嘗試開啟此簽名時發生錯誤。
+Edit signatures…	Mail		編輯簽名…
+Inconsistency occurred in the undo/redo buffer.	Mail		撤銷/重做緩衝區中出現不一致。
+Edit	Mail		編輯
+An error occurred trying to save this signature.	Mail		嘗試存儲此簽名時發生錯誤。
+Couldn't open this signature. Sorry.	Mail		無法開啓此簽名。對不起。
+Unknown	Mail		未知

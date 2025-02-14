@@ -1,0 +1,30 @@
+1	english	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		無
+PPM Settings	PPMMain		PPM設定
+System palette 8 bits	PPMTranslator		系統8位調色盤
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample code copyright 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		PPM轉譯器出錯了！
+Grayscale 8 bits	PPMTranslator		8位元灰階
+Based on PPMTranslator sample code	PPMTranslator		基於PPM轉譯器的示例碼
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 位元大端
+PPM image translator	PPMTranslator		PPM圖片轉譯器
+Bitmap 1 bit	PPMTranslator		1位元點陣圖
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 位元大端
+PPMTranslator Settings	PPMTranslator		PPM轉譯器設定
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 位元
+OK	PPMMain		確認
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 位元
+PPM image	PPMTranslator		PPM圖片
+Input color space:	PPMTranslator		輸入色彩空間：
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 位元 大端
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 位元 大端
+Write ASCII	PPMTranslator		寫入 ASCII
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 位元
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 位元 大端
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 位元
+Version %d.%d.%d, %s	PPMTranslator		版本 %d.%d.%d, %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 位元
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 位元
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 位元
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 位元
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Be點陣圖格式（PPMTranslator）

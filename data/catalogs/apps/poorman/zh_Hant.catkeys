@@ -1,0 +1,38 @@
+1	english	x-vnd.Haiku-PoorMan	2346049582
+Create Log File	PoorMan		建立日誌檔案
+File logging	PoorMan		檔案記錄
+Log to file	PoorMan		記錄到檔案
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		請選擇要在web上發佈的資料夾。 \n\n您可以讓PoorMan在您的主資料夾中創建默認的\“public_html\”。\n或者，您可以選擇自己的資料夾之一。
+File Name	PoorMan		檔案名稱
+Select	PoorMan		選擇
+Save console as…	PoorMan		將控制台另存為…
+Edit	PoorMan		編輯
+Cancel	PoorMan		取消
+Directory: 	PoorMan		目錄：
+Select all	PoorMan		選擇全部
+Error Server	PoorMan		錯誤伺服器
+Send file listing if there's no start page	PoorMan		如果沒有起始頁則傳送檔案列表
+Done	PoorMan		完畢
+Cannot start the server	PoorMan		無法啓動伺服器
+Create log file	PoorMan		創建日誌文件
+Create public_html	PoorMan		創建public_html
+Status: Stopped	PoorMan		狀態：已停止
+File	PoorMan		檔案
+Settings…	PoorMan		設定…
+Log To File	PoorMan		記錄到檔案
+Copy	PoorMan		複製
+Run server	PoorMan		運行伺服器
+Create	PoorMan		創建
+done.\n	PoorMan		完畢。\n
+PoorMan settings	PoorMan		PoorMan設定
+Clear log file	PoorMan		清除日誌檔案
+Save log console selection	PoorMan		存儲日誌控制台選擇
+File Logging	PoorMan		檔案記錄
+Log file name:	PoorMan		日誌檔名：
+Status: Running	PoorMan		狀態：運行中
+Directory: (none)	PoorMan		目錄：(無)
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		已在\"/boot/home/public_html.\"建立預設 Web 資料夾。\n確保該資料夾中有一個名為 \"index.html\"的 HTML 檔案。
+Save console selections as…	PoorMan		將控制台選擇另存為…
+Quit	PoorMan		退出
+Save log console	PoorMan		儲存日誌控制台
+OK	PoorMan		確認

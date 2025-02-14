@@ -1,0 +1,27 @@
+1	english	x-vnd.Haiku-GLInfo	1282327690
+Maximum clipping planes	Capabilities		最大剪裁平面
+Maximum evaluators equation order	Capabilities		最大求值方程式階數
+Texture stack size	Capabilities		紋理堆疊大小
+GL Info	System name		GL 資訊
+Information	InfoView		資訊
+Attributes stack size	Capabilities		屬性堆疊大小
+Maximum lights	Capabilities		最大光照
+Extensions	Extensions		擴展
+Available extensions	Extensions		可用的擴展
+Maximum recommended vertex elements	Capabilities		最大建議頂點元素數
+Value	Capabilities		數值
+Name stack size	Capabilities		名稱堆疊大小
+Capabilities	Capabilities		能力
+Maximum texture units	Capabilities		最大紋理單元
+Unknown or missing OpenGL renderer.	InfoView		OpenGL 渲染器未知或缺失。
+Capability	Capabilities		能力
+Maximum 2D texture size	Capabilities		最大 2D 紋理尺寸
+Auxiliary buffer(s)	Capabilities		輔助緩衝
+Unknown vendor	InfoView		未知供應商
+Maximum convolution	Capabilities		最大卷積
+Maximum 3D texture size	Capabilities		最大 3D 紋理尺寸
+Maximum recommended index elements	Capabilities		最大推薦索引元素
+Unknown version	InfoView		未知版本
+List stack size	Capabilities		列表堆疊大小
+Model stack size	Capabilities		模型堆疊大小
+Projection stack size	Capabilities		投影堆疊大小

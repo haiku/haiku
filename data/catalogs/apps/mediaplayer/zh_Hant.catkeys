@@ -1,0 +1,76 @@
+1	english	x-vnd.Haiku-MediaPlayer	702918950
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		將條目移動到資源回收筒
+Close	MediaPlayer-PlaylistWindow		關閉
+Volume of background clips	MediaPlayer-SettingsWindow		背景片段的音量
+Subtitle placement:	MediaPlayer-SettingsWindow		字幕位置：
+OK	MediaPlayer-RemovePLItemsCmd		確認
+Open Playlist	MediaPlayer-PlaylistWindow		開啟播放清單
+Subtitles	MediaPlayer-Main		字幕
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app%遇到內部錯誤。該檔案無法開啟。
+File info	MediaPlayer-InfoWin		檔案訊息
+Select all	MediaPlayer-PlaylistWindow		選擇全部
+Move Entries	MediaPlayer-MovePLItemsCmd		移動實體
+OK	MediaPlayer-Main		確認
+Remove	MediaPlayer-PlaylistWindow		消除
+Open network stream	MediaPlayer-Main		開啟網路串流
+Open file…	MediaPlayer-Main		開啟档案…
+Full volume	MediaPlayer-SettingsWindow		全音量
+Start media server	MediaPlayer-Main		開啓媒體伺服器
+Opening '%s'.	MediaPlayer-Main		正在開啓 '%s'.
+Close	MediaPlayer-Main		關閉
+Save error	MediaPlayer-PlaylistWindow		存儲錯誤
+MediaPlayer settings	MediaPlayer-SettingsWindow		媒體播放器設定
+Copyright	MediaPlayer-InfoWin		版權
+Invalid URL inserted!	MediaPlayer-NetworkStream		輸入的URL 無效！
+Error: 	MediaPlayer-Main		錯誤：
+Save	MediaPlayer-PlaylistWindow		存儲
+Cancel	MediaPlayer-NetworkStream		取消
+OK	MediaPlayer-SettingsWindow		確認
+Remove Entries	MediaPlayer-RemovePLItemsCmd		消除條目
+never	MediaPlayer-SettingsWindow		絕不
+Open…	MediaPlayer-PlaylistWindow		開啓…
+Low volume	MediaPlayer-SettingsWindow		低音量
+Quit	MediaPlayer-Main		退出
+Redo	MediaPlayer-PlaylistWindow		重做
+Move Entry	MediaPlayer-MovePLItemsCmd		移動實體
+Cancel	MediaPlayer-SettingsWindow		取消
+unknown format	MediaPlayer-InfoWin		未知格式
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		無法將所有檔案移至資源回收筒。
+Move into trash error	MediaPlayer-RemovePLItemsCmd		移入資源回收筒錯誤
+Drop files to play	MediaPlayer-Main		拖放檔案以播放
+Copy Entry	MediaPlayer-CopyPLItemsCmd		複製實體
+Close window after playing audio	MediaPlayer-SettingsWindow		播放音訊後關閉視窗
+Edit	MediaPlayer-PlaylistWindow		編輯
+Copy Entries	MediaPlayer-CopyPLItemsCmd		複製實體
+Always on top	MediaPlayer-Main		始終位於頂部
+Open	MediaPlayer-PlaylistWindow		開啓
+always	MediaPlayer-SettingsWindow		總是
+Stream URL:	MediaPlayer-NetworkStream		直播URL：
+Stream settings	MediaPlayer-Main		碼流設定
+none	Subtitles menu		無
+Save Playlist	MediaPlayer-PlaylistWindow		存儲播放列表
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		沒有安裝解碼器來處理該檔案格式，或解碼器無法處理該格式的特定版本。
+none	Audio track menu		無
+Open network stream	MediaPlayer-NetworkStream		開啟網路串流
+Undo	MediaPlayer-PlaylistWindow		撤銷
+Settings…	MediaPlayer-Main		設定…
+File info…	MediaPlayer-Main		档案訊息…
+OK	MediaPlayer-NetworkStream		確認
+New player	MediaPlayer-Main		新創播放器
+<nothing to redo>	MediaPlayer-PlaylistWindow		<無可重做內容>
+Bad URL	MediaPlayer-NetworkStream		錯誤的URL
+Save	MediaPlayer-Main		存儲
+Close window after playing video	MediaPlayer-SettingsWindow		播放影片後關閉視窗
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		無法開啟檔案'%filename'。\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		您想要播放的檔案都不是媒體檔案。
+Remove Entry	MediaPlayer-RemovePLItemsCmd		消除條目
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		將條目移動到資源回收筒
+Subtitle size:	MediaPlayer-SettingsWindow		字幕尺寸：
+none	MediaPlayer-Main		無
+Open clips	MediaPlayer-Main		開啓剪輯
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		某些檔案無法移至資源回收筒。
+<nothing to undo>	MediaPlayer-PlaylistWindow		<無可撤銷內容>
+Save as…	MediaPlayer-PlaylistWindow		存儲為…
+Error: 	MediaPlayer-RemovePLItemsCmd		錯誤：
+Open	MediaPlayer-Main		開啓
+OK	MediaPlayer-PlaylistWindow		確認

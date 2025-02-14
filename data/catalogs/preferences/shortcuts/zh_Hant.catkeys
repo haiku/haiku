@@ -1,0 +1,47 @@
+1	english	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MouseUp
+Application	ShortcutsWindow		應用程式
+Option	ShortcutsSpec	Name for modifier on keyboard	選項
+Save changes before closing?	ShortcutsWindow		關閉前存储變更嗎?
+Revert to saved	ShortcutsWindow		恢復到存檔狀態
+Don't save	ShortcutsWindow		不存储
+*MouseDown	ShortcutsWindow		*MouseDown
+*Beep	ShortcutsWindow		*Beep
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		快捷方式無法存储您的keyset。
+Save	ShortcutsWindow		存储
+Either	ShortcutsSpec		同樣
+Oh no	ShortcutsWindow		哦不
+Key	ShortcutsWindow		鍵
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		選擇
+Shortcuts	System name		快捷方式
+Quit	ShortcutsWindow		退出
+(Choose application with file requester)	ShortcutsWindow		(選擇帶有檔案請求方的應用程式)
+Cancel	ShortcutsWindow		取消
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		左
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		快捷方式無法解析您的 KeySet 檔案!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		快捷方式無法存储您的KeySet檔案!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Your Text Here\"
+Remove selected shortcut	ShortcutsWindow		消除選取的捷徑
+Error, NULL state description?	ShortcutsSpec		錯誤，NULL狀態描述？
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		快捷方式無法開啟您的 KeySet 檔案!
+Save & apply	ShortcutsWindow		存储並套用
+Open	ShortcutsWindow		開啓
+Append	ShortcutsWindow		附加
+Both	ShortcutsSpec		一起
+Save KeySet as…	ShortcutsWindow		將KeySet另存為…
+Append KeySet…	ShortcutsWindow		追加KeySet…
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		右
+OK	ShortcutsWindow		確認
+Add new shortcut	ShortcutsWindow		新創快捷方式
+(None)	ShortcutsSpec		(無)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		開啟KeySet…
+File	ShortcutsWindow		檔案
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

@@ -1,0 +1,11 @@
+1	english	x-vnd.haiku.SerialConnect	174292673
+Paste	SerialWindow		貼上
+None	SerialWindow	Flowcontrol	無
+Cancel	Custom baudrate window		取消
+Log to file…	SerialWindow		記錄到檔案...
+File	SerialWindow		檔案
+None	SerialWindow	Parity	無
+file transfer progress	SerialWindow		檔案傳輸進度
+Edit	SerialWindow		編輯
+OK	Custom baudrate window		確認
+Settings	SerialWindow		設定

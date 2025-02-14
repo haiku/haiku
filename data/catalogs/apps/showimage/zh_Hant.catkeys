@@ -1,0 +1,23 @@
+1	english	x-vnd.Haiku-ShowImage	220970460
+Previous file	Menus		上一個檔案
+Copy	Menus		複製
+Next file	Menus		下一個檔案
+OK	Alerts		確認
+File	Menus		檔案
+Close	ClosePrompt		關閉
+Cancel	ClosePrompt		取消
+Close	Menus		關閉
+OK	SaveToFile		確認
+The file '%s' could not be written.	SaveToFile		無法寫入檔案'%s'。
+Quit	Menus		退出
+Close document	ClosePrompt		關閉檔案
+Stretch to window	Menus		拉伸到視窗
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		無法載入圖片！該檔案或它的圖片轉譯器不存在。
+Open with…	Menus		開啓以…
+Fit to window	Menus		適合視窗
+Edit	Menus		編輯
+Move to Trash	Menus		移入資源回收筒
+Open…	Menus		開啓…
+Save as…	Menus		存儲為…
+Next page	Menus		下一頁
+Select all	Menus		選擇全部

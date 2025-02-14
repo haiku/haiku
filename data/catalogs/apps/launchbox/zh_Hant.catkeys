@@ -1,0 +1,11 @@
+1	english	x-vnd.Haiku-LaunchBox	3272055970
+OK	LaunchBox		確認
+Name Panel	LaunchBox		名稱面板
+Show window border	LaunchBox		顯示視窗邊框
+Cancel	LaunchBox		取消
+Settings	LaunchBox		設定
+Close	LaunchBox		關閉
+Remove button	LaunchBox		消除按鍵
+Quit	LaunchBox		退出
+New	LaunchBox		新創
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		無法向 Tracker 發送「開啟資料夾」命令。\n\n錯誤：

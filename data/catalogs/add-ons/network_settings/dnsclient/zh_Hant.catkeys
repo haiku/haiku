@@ -1,0 +1,10 @@
+1	english	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		DNS設定
+Move down	DNSSettingsView		向下移動
+DNS settings	DNSSettingsView		DNS設定
+Remove	DNSSettingsView		消除
+Domain:	DNSSettingsView		域：
+Add	DNSSettingsView		添加
+Server:	DNSSettingsView		伺服器：
+Move up	DNSSettingsView		向上移動
+Apply	DNSSettingsView		套用

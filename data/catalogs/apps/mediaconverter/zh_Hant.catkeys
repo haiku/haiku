@@ -1,0 +1,33 @@
+1	english	x-vnd.Haiku-MediaConverter	2434843593
+Input file not recognized as Audio or Video	MediaConverter		輸入檔無法識別為音頻或視頻
+Source files	MediaConverter		原始檔
+Error converting '%filename'	MediaConverter		轉換'%filename'時發生錯誤
+Selected directory not found. Defaulting to /boot/home	MediaConverter		找不到所選目錄。 默認為/boot/home
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+Cancelling	MediaConverter		正在取消
+None available	Audio codecs		無可用
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		該檔案具有多個音訊或視訊軌道，僅轉換每個音訊或視訊軌道中的第一個。
+No file selected	MediaConverter-FileInfo		未選擇檔案
+File Error	MediaConverter-FileInfo		檔案錯誤
+None available	Video codecs		無可用
+OK	MediaConverter		確認
+Error creating '%filename'	MediaConverter		建立'%filename'時出錯
+Error loading a file	MediaConverter		載入檔案時出錯
+Open…	Menu		開啓…
+Multi-track file detected	MediaConverter		偵測到多軌文件
+Cancelling…	MediaConverter		正在取消…
+Output file '%filename' created	MediaConverter		輸出檔案'%filename'已創建
+Video using parameters form settings	MediaConverter		影片使用參數表單設定
+Select	MediaConverter		選擇
+Conversion cancelled	MediaConverter		轉換已取消
+Error loading files	MediaConverter		載入檔案時出錯
+Cancel	MediaConverter		取消
+OK	MediaConverter-FileInfo		確認
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		讀取檔案資訊時發生錯誤。\n\n錯誤 ：
+Error	MediaConverter		錯誤
+File details	MediaConverter		檔案詳情
+Drop media files onto this window	MediaConverter		將媒體檔案拖曳到此視窗上
+Quit	Menu		退出
+File format:	MediaConverter		檔案格式：
+File	Menu		檔案
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		寫入位置時出錯：%strPath%。 默認位置：/boot/home

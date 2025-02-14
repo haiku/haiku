@@ -1,0 +1,15 @@
+1	english	x-vnd.Haiku-Sudoku	2342585843
+File	SudokuWindow		檔案
+Hard	SudokuWindow		困難
+Start again	SudokuWindow		重新開始
+New	SudokuWindow		新創
+Easy	SudokuWindow		容易
+Undo	SudokuWindow		撤銷
+Export as…	SudokuWindow		匯出...
+Quit	SudokuWindow		退出
+Redo	SudokuWindow		重做
+Could not open \"%s\":\n%s\n	SudokuWindow		無法開啓 \"%s\":\n%s\n
+Copy	SudokuWindow		複製
+OK	SudokuWindow		確認
+Sudoku	System name		數獨
+Open file…	SudokuWindow		開啟檔案…

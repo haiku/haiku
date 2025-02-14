@@ -1,0 +1,25 @@
+1	english	x-vnd.Haiku-Pulse	2650287667
+Quit	DeskbarPulseView		退出
+Error	PulseApp		錯誤
+Bar colors	ConfigView		條顏色
+Defaults	PrefsWindow		默認值
+Fade colors	ConfigView		褪色
+About Pulse…	PulseView		關於Pulse…
+Deskbar mode	NormalPulseView		Deskbar模式
+Pulse settings	PulseApp		Pulse設定
+Remove replicant	CPUButton		消除副本
+Deskbar mode	MiniPulseView		Deskbar模式
+OK	PulseView		確認
+OK	PrefsWindow		確認
+Removing from Deskbar failed.\n%s	DeskbarPulseView		從Deskbar上刪除失敗。\n%s
+OK	PulseApp		確認
+About Pulse…	CPUButton		關於Pulse…
+Deskbar mode	PrefsWindow		Deskbar模式
+OK	CPUButton		確認
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		設定…
+Deskbar menu	CPUButton		Deskbar菜單
+Quit	MiniPulseView		退出
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		用法: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
+OK	DeskbarPulseView		確認
+Installing in Deskbar failed\n%s	PulseApp		在Deskbar中安裝失敗\n%s
