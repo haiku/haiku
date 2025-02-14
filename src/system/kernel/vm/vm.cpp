@@ -1212,10 +1212,11 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 
 	VMArea* area = addressSpace->CreateArea(areaName, wiring, protection,
 		allocationFlags);
-	if (mapping != REGION_PRIVATE_MAP)
-		area->protection_max = protectionMax & B_USER_PROTECTION;
 	if (area == NULL)
 		return B_NO_MEMORY;
+
+	if (mapping != REGION_PRIVATE_MAP)
+		area->protection_max = protectionMax & B_USER_PROTECTION;
 
 	status_t status;
 
