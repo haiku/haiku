@@ -49,8 +49,16 @@ static const enum_info kAddressSpecs[] = {
 };
 
 
+static const enum_info kAreaMappings[] = {
+	ENUM_INFO_ENTRY(REGION_NO_PRIVATE_MAP),
+	ENUM_INFO_ENTRY(REGION_PRIVATE_MAP),
+
+	{ 0, NULL }
+};
+
 static FlagsTypeHandler::FlagsList kAreaProtectionFlags;
 static EnumTypeHandler::EnumMap kAddressSpecsMap;
+static EnumTypeHandler::EnumMap kAreaMappingMap;
 
 
 void
@@ -61,6 +69,9 @@ patch_area()
 	}
 	for (int i = 0; kAddressSpecs[i].name != NULL; i++) {
 		kAddressSpecsMap[kAddressSpecs[i].index] = kAddressSpecs[i].name;
+	}
+	for (int i = 0; kAreaMappings[i].name != NULL; i++) {
+		kAreaMappingMap[kAreaMappings[i].index] = kAreaMappings[i].name;
 	}
 
 	Syscall *create = get_syscall("_kern_create_area");
@@ -97,6 +108,8 @@ patch_area()
 		new EnumTypeHandler(kAddressSpecsMap));
 	map_file->GetParameter("protection")->SetHandler(
 		new FlagsTypeHandler(kAreaProtectionFlags));
+	map_file->GetParameter("mapping")->SetHandler(
+		new EnumTypeHandler(kAreaMappingMap));
 
 	Syscall *set_memory_protection = get_syscall("_kern_set_memory_protection");
 	set_memory_protection->GetParameter("protection")->SetHandler(
