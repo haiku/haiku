@@ -43,19 +43,32 @@
 	\ingroup libbe
 	\brief BControl is the base class for user-event handling objects.
 
+	BControl is a pseudo-abstract class that adds four main attributes
+	to a BView. It adds IsEnabled() and SetEnabled() methods, adds
+	Value() and SetValue(), it is a BInvoker with Invoke() and Message()
+	methods and it adds SetIcon(), SetIconBitmap(), and IconBitmap().
+	A basic implementation is included, you are expected to add to it in
+	your subclass. Call BControl::Invoke() to add default message constants.
+
 	Simple controls such as BCheckBox and BButton deviate only a bit from
 	BControl, whereas more complicated controls such as BColorControl and
-	BSlider re-implement much more functionality. Whether you are building
+	BSlider reimplement much more functionality. Whether you are building
 	a simple control or something more complicated you should inherit from
 	BControl as it provides a common set of methods for intercepting
 	received messages from mouse and keyboard events.
 
 	Controls have state which they keep in their value. The value of a
-	control, stored as an int32, is read and set by the virtual Value() and
+	control, stored as an \c int32, is read and set by the virtual Value() and
 	SetValue() methods. BControl defines \c B_CONTROL_ON and \c B_CONTROL_OFF
 	values that you can use as a convenience if your control has a simple
 	on/off state. If your BControl derived class stores a larger set of
 	states then you should define your own integer values instead.
+
+	You are expected to set colors on your BControl implementation class.
+	Use control colors on the inside of your BControl subclass where
+	appropriate. By default parent colors are used on the outside for
+	example if you include a label next to your control it would typically
+	go on panel colors. Button-like controls should use only control colors.
 
 	\since BeOS R3
 */
