@@ -180,11 +180,9 @@ public:
 		fNode(NULL),
 		fOffset(0),
 		fBlockNumber(0),
+		fBlock(NULL),
 		fWritable(false)
 	{
-#if _BOOT_MODE
-		fBlock = NULL;
-#endif
 	}
 
 	CachedNode(BPlusTree* tree, off_t offset, bool check = true)
@@ -193,11 +191,9 @@ public:
 		fNode(NULL),
 		fOffset(0),
 		fBlockNumber(0),
+		fBlock(NULL),
 		fWritable(false)
 	{
-#if _BOOT_MODE
-		fBlock = NULL;
-#endif
 		SetTo(offset, check);
 	}
 
@@ -241,10 +237,8 @@ protected:
 			bplustree_node*		fNode;
 			off_t				fOffset;
 			off_t				fBlockNumber;
-			bool				fWritable;
-#if _BOOT_MODE
 			uint8*				fBlock;
-#endif
+			bool				fWritable;
 };
 
 
