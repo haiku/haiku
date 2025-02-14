@@ -63,13 +63,21 @@ get_key_value(pthread_thread* thread, uint32 key, int32 sequence)
 void
 __pthread_key_call_destructors(pthread_thread* thread)
 {
-	for (uint32 key = 0; key < PTHREAD_KEYS_MAX; key++) {
-		int32 sequence;
-		pthread_key_destructor destructor = get_key_destructor(key, sequence);
-		void* value = get_key_value(thread, key, sequence);
+	for (uint32 iteration = 0; iteration < PTHREAD_DESTRUCTOR_ITERATIONS; iteration++) {
+		bool onlyNullValues = true;
+		for (uint32 key = 0; key < PTHREAD_KEYS_MAX; key++) {
+			int32 sequence;
+			pthread_key_destructor destructor = get_key_destructor(key, sequence);
+			void* value = get_key_value(thread, key, sequence);
 
-		if (value != NULL && destructor != NULL)
-			destructor(value);
+			if (value != NULL) {
+				onlyNullValues = false;
+				if  (destructor != NULL)
+					destructor(value);
+			}
+		}
+		if (onlyNullValues)
+			break;
 	}
 }
 
