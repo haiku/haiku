@@ -1,21 +1,43 @@
-1	english	x-vnd.Haiku-WebPositive	1597141675
+1	english	x-vnd.Haiku-WebPositive	2091089070
 Authentication required	Authentication Panel		需要身份驗證
+Previous	WebPositive Window		先前
 Copy	Console Window		複製
+(Finish: %date)	Download Window		(完成： %date)
 Open bookmarks confirmation	WebPositive Window		開啓書籤確認
+Delete	BookmarkBar		刪除
+Download folder:	Settings Window		下載資料夾：
 Close window	WebPositive Window		關閉視窗
 Rename	BookmarkBar		再命名
 Find:	WebPositive Window		尋找：
+Script console	WebPositive Window		腳本控制台
 There was an error setting up the bookmark.	WebPositive Window		設定書籤時發生錯誤。
 Fonts	Settings Window		字體
 Path	Cookie Manager		路徑
+Bookmarks	WebPositive Window		書籤
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		無法從書籤欄中刪除書籤 '%leaf%'。
+Use proxy server to connect to the internet	Settings Window		使用代理伺服器連接到互聯網
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 已完成
+Auto-hide interface in full screen mode	Settings Window		全螢幕模式下自動隱藏介面
+Delete	Cookie Manager		刪除
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	檢索書籤資料夾時發生錯誤。\n\n錯誤: %error
+(Finish: %date - Over %duration left)	Download Window		(完成: %date - 剩餘 %duration )
 Open containing folder	Download Window		開啓包含資料夾
 Find previous	WebPositive Window		尋找上一個
+Full screen	WebPositive Window		全螢幕
+Downloads in progress	WebPositive		下載正在進行中
 Copy URL to clipboard	Download Window		將 URL 複製到剪貼簿
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	您想一次開啟 %addedCount 個書籤嗎？
+Clone current page	Settings Window		克隆當前頁面
+Start page:	Settings Window		起始頁：
 Cancel	Download Window		取消
 Settings	Settings Window		設定
+Downloads	WebPositive Window		下載
+Browse…	Settings Window		瀏覽…
+Resume prior session	Settings Window		恢復之前的會話
+Match case	WebPositive Window		匹配大小寫
 Proxy password:	Settings Window		代理密碼：
+Failed to delete bookmark:\n'%path%'	BookmarkBar		刪除書籤失敗：\n'%path%'
+Size:	Font Selection view		尺寸：
 Error opening downloads folder	Download Window		開啓下載資料夾時出錯
 Find	WebPositive Window		尋找
 Standard font:	Settings Window		標準字體：

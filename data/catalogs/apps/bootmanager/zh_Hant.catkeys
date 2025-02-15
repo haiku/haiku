@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-BootManager	847503367
+1	english	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	舊主開機記錄備份失敗
 At least one partition must be selected!	BootManagerController		至少必須選擇一個分區！
 No space available!	DrivesPage	Cannot install	沒有可用空間！
@@ -40,18 +40,30 @@ The Master Boot Record could not be restored!	BootManagerController		主引導�
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		第一個硬碟的分區表與啟動管理器不相容。\n引導管理器僅適用於 IBM PC MBR 分割區。
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		請選擇您想要安裝或解除安裝管理器的磁碟機。
 After four seconds	DefaultPartitionPage		四秒後
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
+First partition starts too early	BootManagerController	Title	第一個分區開始得太早
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		即將將啟動選單寫入磁碟。您確定要繼續嗎？
+Partitions	DefaultPartitionPage	Pop up menu title	分區
 Default Partition:	DefaultPartitionPage	Menu field label	默認分區：
 Next	WizardView	Button	下一步
+Previous	WizardView	Button	以前的
 Uninstallation of boot menu failed	BootManagerController	Title	啟動選單解除安裝失敗
+Incompatible format!	DrivesPage	Cannot install	格式不相容！
 Old Master Boot Record saved	BootManagerController	Title	舊的主引導記錄（MBR）已儲存
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		請指定默認分區和超時時間。\n除非您選擇其他分區，否則啟動選單將在超時後加載默認分區。 您還可以讓啟動選單無限期等待您選擇分區。\n按住“ALT”鍵以禁用啟動時的超時。
+Partitions	PartitionsPage	Title	分區
 Uninstallation of boot menu completed	BootManagerController	Title	啟動選單解除安裝完成
+After two seconds	DefaultPartitionPage		兩秒後
+Partition table not compatible	BootManagerController	Title	分區表不相容
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		引導設備 (%DISK) 的主引導記錄已成功從 %FILE 恢復。
 Done	BootManagerController	Button	完畢
+BootManager	System name		啟動管理器
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		請找到要從中復原的主開機記錄 (MBR) 儲存檔案。這是首次安裝啟動管理員時所建立的檔案。
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		請找到要從中復原的主開機記錄 (MBR) 儲存檔案。這是首次安裝啟動管理員時所建立的檔案。
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	即將恢復主開機記錄 (MBR) 到 %disk 從 %file. 您想繼續嗎？
+Install	DrivesPage	Button	安裝
 File:	FileSelectionPage	Text control label	檔案：
+Error reading partition table	BootManagerController	Title	讀取分割區表時發生錯誤
 Back	BootManagerController	Button	返回
 The boot manager has been successfully installed on your system.	BootManagerController		引導管理器已成功安裝在您的系統上。
 The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		舊的主引導記錄無法儲存到 %s。您可以繼續安裝，但無法解除安裝啟動選單。

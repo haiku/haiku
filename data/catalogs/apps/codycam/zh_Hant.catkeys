@@ -1,8 +1,9 @@
-1	english	x-vnd.Haiku-CodyCam	3474920613
+1	english	x-vnd.Haiku-CodyCam	2134779569
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (真實密碼已發送)
 JPEG image	CodyCam		JPEG圖片
 image file format expected	CodyCam		預期的圖片檔案格式
 Capturing Image…	VideoConsumer.cpp		正在截取圖像…
+Capture Rate Menu	CodyCam		捕獲率選單
 Cannot create a video window	CodyCam		無法建立視訊視窗
 Cannot register the video window	CodyCam		無法註冊視訊視窗
 Quit	CodyCam		退出

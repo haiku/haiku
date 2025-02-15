@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	2822219626
+1	english	x-vnd.Be-MAIL	4186075227
 Set to Saved	Mail		設定為已存儲
 Next message	Mail		下一條信息
 Unread	Mail		未讀
@@ -65,5 +65,6 @@ Edit signatures…	Mail		編輯簽名…
 Inconsistency occurred in the undo/redo buffer.	Mail		撤銷/重做緩衝區中出現不一致。
 Edit	Mail		編輯
 An error occurred trying to save this signature.	Mail		嘗試存儲此簽名時發生錯誤。
+Delete	Mail		刪除
 Couldn't open this signature. Sorry.	Mail		無法開啓此簽名。對不起。
 Unknown	Mail		未知

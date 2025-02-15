@@ -1,8 +1,9 @@
-1	english	x-vnd.Haiku-StyledEdit	1146722246
+1	english	x-vnd.Haiku-StyledEdit	1579554298
 Document statistics	Statistics		文件統計
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		無法恢復，未找到檔案：\"%s\"。
 Cut	Menus		剪下
 Center	Menus		中心
+Increase size	Menus		增大尺寸
 Page setup…	Menus		頁面設定…
 Wrap-around search	FindandReplaceWindow		環繞搜尋
 Untitled 	StyledEditWindow		無標題
@@ -16,12 +17,20 @@ Read-only	StatusView		只讀
 Save	Menus		存儲
 Cancel	QuitAlert		取消
 Copy	Menus		複製
+Reload	NodeMonitorAlerts		重新載入
+line %d, column %d	StatusView		行 %d，列 %d
+Words:	Statistics		字：
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		恢復
+Error saving \"%s\":\n%s	SaveAlert		保存時出錯 \"%s\":\n%s
 OK	RevertToSavedAlert		確認
 Unlock file	StatusView		解鎖檔案
+Italic	Menus		斜體
 Can't undo	Menus		無法撤銷
 Replace…	Menus		替換…
 File	Menus		檔案
 Paste	Menus		貼上
+Bold	Menus		粗體
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		檔案 \"%file%\" 已被另一個應用程式修改，是否重新載入？
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		檔案\"%file%\" 已被另一個應用程式刪除，能否恢復？
 Replace in all windows	FindandReplaceWindow		在所有視窗中替換
@@ -32,6 +41,7 @@ Cancel	RevertToSavedAlert		取消
 Cancel	FindandReplaceWindow		取消
 Replace all	FindandReplaceWindow		替換所有
 Close	Menus		關閉
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		載入錯誤 \"%s\":\n\t不支援的格式
 Default	Menus		默認
 OK	SaveAlert		確認
 Save changes to the document \"%s\"? 	QuitAlert		存储對文檔的更改 \"%s\"?
@@ -39,14 +49,25 @@ StyledEdit	System name		StyledEdit
 Find:	FindandReplaceWindow		尋找：
 Undo typing	QuitAlert		撤銷輸入
 Don't save	SaveAlert		不要存储
+Reload…	Menus		重新載入…
+Print…	Menus		列印…
 Quit	Menus		退出
 Redo typing	QuitAlert		重做輸入
+Ignore	NodeMonitorAlerts		忽略
+Wrap lines	Menus		換行線
+Text encoding	Menus		文字編碼
 Unable to unlock file\n\t%s	QuitAlert		無法解鎖檔案\n\t%s
+Modified	StatusView		修改的
 OK	LoadAlert		確認
 Save	QuitAlert		存储
+Case-sensitive	FindandReplaceWindow		區分大小寫
 Find selection	Menus		尋找選擇對象
 Find…	Menus		尋找…
 Cancel	SaveAlert		取消
+Revert	RevertToSavedAlert		恢復
+Size	Menus		尺寸
+Decrease size	Menus		減小尺寸
+Autodetect	Menus		自動偵測
 Replace next	Menus		替換下一個
 OK	QuitAlert		確認
 Edit	Menus		編輯
@@ -56,5 +77,7 @@ Save as…	Menus		存储为…
 Replace	FindandReplaceWindow		替換
 Don't save	QuitAlert		不存储
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		該檔案被標記為唯讀。存储對檔案 \"%s\"的變更嗎？
+Align	Menus		對齊
 Font	Menus		字體
 Select all	Menus		選擇全部
+Right	Menus		右

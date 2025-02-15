@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Input	130668644
+1	english	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		默認值
 Scrolling	TouchpadPrefView		滾動
 Long	KeyboardView		長
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		按兩下速度
 Typing test area	KeyboardView		打字測試區
 Fast	KeyboardView		快
 Please confirm	TouchpadPrefView		請確認
+Trackpad speed	TouchpadPrefView		觸控板速度
 Mouse speed	SettingsView		滑鼠速度
+Trackpad acceleration	TouchpadPrefView		觸控板加速
 Horizontal scrolling	TouchpadPrefView		水平捲動
+Reverse scroll direction	TouchpadPrefView		反轉滾動方向
 Keyboard lock delay	TouchpadPrefView		鍵盤鎖定延遲
 Input	System name		輸入
 Quick	TouchpadPrefView		快
@@ -21,6 +24,7 @@ Slow	KeyboardView		慢
 2-Button	SettingsView		2鍵
 Click to focus and raise	SettingsView		點擊聚焦並提起
 Vertical	TouchpadPrefView		垂直
+Low	TouchpadPrefView		低
 Focus follows mouse	SettingsView		焦點跟隨滑鼠
 Double-click test area	SettingsView		雙擊測試區域
 Focus mode:	SettingsView		對焦模式：
