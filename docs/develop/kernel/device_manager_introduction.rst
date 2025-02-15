@@ -23,7 +23,8 @@ Structurally, a *device_node* is a set of a module, attributes, and
 resources, as well as a parent and children. At a minimum, a node must
 have a module, all other components are optional.
 
-TODO: picture of the device node tree
+.. image:: device_tree.svg
+   :width: 800
 
 When the system starts, there is only a root node registered. Only
 primary hardware busses register with the root node, such as PCI, and

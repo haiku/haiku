@@ -1,0 +1,121 @@
+<svg id="emhWDRng8ex1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 600 600" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" project-id="19876d740a0247a8b77d7a565e4e4726" export-id="029909313e1c4de5855ddc12ba0afc11" cached="false" style="background-color:#fdfdfd"><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="translate(180.000687 86.330467)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="translate(420.890106 86.330467)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="translate(336.578827 86.330467)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="translate(259.772156 86.330467)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="translate(100.321869 86.330467)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="22.6992" rx="0" ry="0" transform="translate(259.772156 6.651653)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="22.6992" rx="0" ry="0" transform="matrix(1.14448 0 0 1 259.772156 6.651653)" fill="#d2dbed" stroke-width="0"/><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="15" font-weight="400" transform="matrix(1.009413 0 0 1 262.939453 22.150915)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+Device Root
+
+]]></tspan><tspan x="0" y="48" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="15" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+ 
+
+]]></tspan></text><line x1="0" y1="-14.800644" x2="0" y2="14.800645" transform="translate(292.431183 44.524586)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="55.371396" y1="0" x2="-55.371396" y2="0" transform="translate(237.059799 59.325233)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="-42.096261" y1="0" x2="42.096261" y2="0" transform="translate(334.527466 59.325233)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="-21.298488" y1="0" x2="21.298488" y2="0" transform="translate(397.922211 59.325233)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="-15" y1="0" x2="15" y2="0" transform="translate(419.220703 59.325233)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-13.502617" x2="0" y2="13.502618" transform="translate(292.431183 72.82785)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-13.502618" x2="0" y2="13.502618" transform="translate(212.659729 72.82785)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="24.353743" y1="0" x2="-24.353743" y2="0" transform="translate(157.334656 59.325233)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-13.502617" x2="0" y2="13.502618" transform="translate(132.980911 72.82785)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-13.502617" x2="0" y2="13.502617" transform="translate(369.237854 72.82785)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="-9.664238" y1="0" x2="9.664238" y2="0" transform="translate(443.884918 59.325233)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-13.502618" x2="0" y2="13.502618" transform="translate(453.549164 72.82785)" fill="none" stroke="#3f5787" stroke-width="3"/><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(107.218826 108.227997)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+ACPI Root
+
+]]></tspan><tspan x="0" y="33" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+ 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(185.107468 102.727997)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+¹PCI Host 
+
+]]></tspan><tspan x="0" y="11" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+Controller
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(273.756165 108.227997)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+Generic
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(348.769104 108.227997)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+Random
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(443.884918 108.227997)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+ISA
+
+]]></tspan><tspan x="0" y="22" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+ 
+
+]]></tspan></text><line x1="0" y1="-15.10674" x2="0" y2="15.10674" transform="translate(211.964859 137.777786)" fill="none" stroke="#3f5787" stroke-width="3"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="translate(179.305801 152.884521)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="matrix(1.109928 0 0 1 99.626991 245.133698)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="matrix(1.109928 0 0 1 99.626991 312.223999)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="translate(179.305801 375.587067)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="translate(179.305801 312.223999)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="matrix(1.344988 0 0 1 93.836365 470.631653)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="matrix(1.366032 0 0 1 252.929138 470.631653)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="matrix(1.120567 0 0 1 179.305801 245.133698)" fill="#d2dbed" stroke-width="0"/><rect width="65.3181" height="36.3406" rx="0" ry="0" transform="matrix(1.135261 0 0 1 260.374359 245.133698)" fill="#d2dbed" stroke-width="0"/><line x1="0" y1="-15.374861" x2="0" y2="15.374861" transform="translate(211.964859 204.599976)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="39.839407" y1="0" x2="-39.839407" y2="0" transform="translate(172.125443 219.974823)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-12.579431" x2="0" y2="12.579431" transform="translate(132.286041 232.55426)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-12.579431" x2="0" y2="12.579431" transform="translate(211.964859 232.55426)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="-40.534281" y1="0" x2="40.534281" y2="0" transform="translate(252.49913 219.974823)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-12.579431" x2="0" y2="12.579431" transform="translate(293.033417 232.55426)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-15.374862" x2="0" y2="15.374862" transform="translate(132.286041 296.849121)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-15.374862" x2="0" y2="15.374862" transform="translate(211.964859 296.849121)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-15.374862" x2="0" y2="15.374862" transform="translate(211.964859 296.849121)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="39.839408" y1="0" x2="-39.839408" y2="0" transform="translate(172.820328 441.745544)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-14.443051" x2="0" y2="14.443052" transform="translate(132.980911 456.188599)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="-39.885734" y1="0" x2="39.885734" y2="0" transform="translate(252.545456 441.745544)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-12.113527" x2="0" y2="12.113527" transform="translate(292.431183 453.85907)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-5.124954" x2="0" y2="5.124953" transform="translate(292.431183 465.506714)" fill="none" stroke="#3f5787" stroke-width="3"/><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="30" font-weight="400" transform="translate(210.88269 169.394028)" stroke-width="0"><tspan x="0" y="30" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="30" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+ 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(193.109238 174.782059)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+PCI Bus
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(100.321869 267.031219)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+²PCI device 1 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(182.181778 267.031219)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+PCI device 2
+
+]]></tspan><tspan x="0" y="22" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+ 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(261.530487 267.031219)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+PCI device 3 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(102.707344 328.693634)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+³Driver child
+
+]]></tspan><tspan x="0" y="11" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+node 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(188.305984 328.693634)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+UHCI-PCI 
+
+]]></tspan><tspan x="0" y="11" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+Bridge
+
+]]></tspan></text><line x1="-0.347442" y1="-13.511242" x2="0.347442" y2="13.511242" transform="translate(212.312286 362.075806)" fill="none" stroke="#3f5787" stroke-width="3"/><line x1="0" y1="-14.908956" x2="0" y2="14.908956" transform="translate(212.659729 426.836609)" fill="none" stroke="#3f5787" stroke-width="3"/><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(187.50824 392.056702)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+UHCI 
+
+]]></tspan><tspan x="0" y="11" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+Controller
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(101.090492 492.529175)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+UHCI device 1 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(261.069244 492.529175)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+UHCI device 2 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(0 549.497192)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+¹PCI Host controller may be a child of ACPI root if the detection
+
+]]></tspan><tspan x="0" y="11" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+mechanism is ACPI instead of Legacy BIOS. Take a look at "busses/pci" for more details.
+
+]]></tspan><tspan x="0" y="22" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+ 
+
+]]></tspan></text><line x1="-30" y1="0" x2="30" y2="0" transform="translate(1149.621216 286.300262)" fill="none" stroke="#3f5787" stroke-width="3"/><path d="M240.524211,145.667326c11.098321,6.001347,15.740583,20.036796,0,30.21348" transform="translate(-6.271712-22.996279)" fill="none" stroke="#3f5787" stroke-width="1.2"/><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(249.923981 141.577148)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+B_DEVICE_FIXED_CHILD
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(.000006 580.896973)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+²This device is exposed by the PCI bus. 
+
+]]></tspan></text><text dx="0" dy="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" transform="translate(0 596.864136)" stroke-width="0"><tspan y="0" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" font-style="normal" stroke-width="0"><![CDATA[
+
+³Your driver registers this node.
+
+]]></tspan></text></svg>
