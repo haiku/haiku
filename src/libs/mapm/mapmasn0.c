@@ -109,7 +109,7 @@ void	M_arctan_near_0(M_APM rr, int places, M_APM aa)
 {
 M_APM   tmp0, tmp2, tmpR, tmpS, digit, term;
 int	tolerance, dplaces, local_precision;
-long    m1;
+long long    m1;
 
 tmp0  = M_get_stack_var();
 tmp2  = M_get_stack_var();
@@ -126,7 +126,7 @@ m_apm_copy(tmpS, aa);
 m_apm_multiply(tmp0, aa, aa);
 m_apm_round(tmp2, (dplaces + 8), tmp0);
 
-m1 = 1L;
+m1 = 1LL;
 
 while (TRUE)
   {
@@ -148,7 +148,7 @@ while (TRUE)
      local_precision = 20;
 
    m1 += 2;
-   m_apm_set_long(digit, m1);
+   m_apm_set_long_long(digit, m1);
    m_apm_round(term, local_precision, tmp0);
    m_apm_divide(tmp0, local_precision, term, digit);
    m_apm_subtract(tmpR, tmpS, tmp0);
@@ -171,7 +171,7 @@ while (TRUE)
      local_precision = 20;
 
    m1 += 2;
-   m_apm_set_long(digit, m1);
+   m_apm_set_long_long(digit, m1);
    m_apm_round(term, local_precision, tmp0);
    m_apm_divide(tmp0, local_precision, term, digit);
    m_apm_add(tmpS, tmpR, tmp0);

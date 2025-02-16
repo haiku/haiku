@@ -244,17 +244,41 @@ else
 void    M_long_2_ascii(char *output, long input)
 {
 long    t, m;
+char    *p;
+
+m = input;
+p = output;
+t = 2147000000L;          /* something < 2^31 */
+
+if ((m > t) || (m < -t))  /* handle the bigger numbers with 'sprintf'. */
+  {			  /* let them worry about wrap-around problems */
+   sprintf(p, "%ld", m);  /* at 'LONG_MIN', etc. */
+  }
+else
+  {
+   M_long_long_2_ascii(output, ((long long)input));
+  }
+}
+/****************************************************************************/
+/*
+ *
+ *	convert a signed long long to ASCII in base 10
+ *
+ */
+void    M_long_long_2_ascii(char *output, long long input)
+{
+long long t, m;
 int     i, j;
 char    *p, tbuf[64];
 
 m = input;
 p = output;
 i = 0;
-t = 2147000000L;          /* something < 2^31 */
+t = 9223372036854000000LL;  /* something < 2^63 */
 
 if ((m > t) || (m < -t))  /* handle the bigger numbers with 'sprintf'. */
   {			  /* let them worry about wrap-around problems */
-   sprintf(p, "%ld", m);  /* at 'LONG_MIN', etc.                       */
+   sprintf(p, "%lld", m);  /* at 'LLONG_MIN', etc. */
   }
 else
   {

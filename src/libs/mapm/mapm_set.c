@@ -101,6 +101,11 @@ if (M_lbuf != 0)
 /****************************************************************************/
 void	m_apm_set_long(M_APM atmp, long mm)
 {
+  m_apm_set_long_long(atmp, (long long)mm);
+}
+/****************************************************************************/
+void	m_apm_set_long_long(M_APM atmp, long long mm)
+{
 int     len, ii, nbytes;
 char	*p, *buf, ch, buf2[64];
 
@@ -112,7 +117,7 @@ if (mm == 0)
    return;
   }
 
-M_long_2_ascii(buf2, mm);     /* convert long -> ascii in base 10 */
+M_long_long_2_ascii(buf2, mm); /* convert long long int -> ascii in base 10 */
 buf = buf2;
 
 if (mm < 0)

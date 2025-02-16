@@ -54,7 +54,7 @@ void	M_log_near_1(M_APM rr, int places, M_APM xx)
 {
 M_APM   tmp0, tmp1, tmp2, tmpS, term;
 int	tolerance, dplaces, local_precision;
-long    m1;
+long long    m1;
 
 tmp0 = M_get_stack_var();
 tmp1 = M_get_stack_var();
@@ -72,7 +72,7 @@ m_apm_copy(term, tmpS);
 m_apm_multiply(tmp0, tmpS, tmpS);
 m_apm_round(tmp2, (dplaces + 6), tmp0);
 
-m1 = 3L;
+m1 = 3LL;
 
 while (TRUE)
   {
@@ -86,7 +86,7 @@ while (TRUE)
    if (local_precision < 20)
      local_precision = 20;
 
-   m_apm_set_long(tmp1, m1);
+   m_apm_set_long_long(tmp1, m1);
    m_apm_round(term, local_precision, tmp0);
    m_apm_divide(tmp0, local_precision, term, tmp1);
    m_apm_add(tmp1, tmpS, tmp0);

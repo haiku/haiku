@@ -146,7 +146,8 @@ M_restore_stack(2);                    /* restore the 2 locals we used here */
 void	m_apm_log(M_APM r, int places, M_APM a)
 {
 M_APM   tmp0, tmp1, tmp2;
-int	mexp, dplaces;
+long long     mexp;
+int     dplaces;
 
 if (a->m_apm_sign <= 0)
   {
@@ -217,7 +218,7 @@ else
    
    M_log_basic_iteration(tmp0, dplaces, tmp2);
    
-   m_apm_set_long(tmp1, (long)mexp);
+   m_apm_set_long_long(tmp1, mexp);
    m_apm_multiply(tmp2, tmp1, MM_lc_log10);
    m_apm_add(tmp1, tmp2, tmp0);
    

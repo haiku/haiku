@@ -365,7 +365,7 @@ void	M_raw_exp(M_APM rr, int places, M_APM xx)
 {
 M_APM   tmp0, digit, term;
 int	tolerance,  local_precision, prev_exp;
-long    m1;
+long long    m1;
 
 tmp0  = M_get_stack_var();
 term  = M_get_stack_var();
@@ -378,11 +378,11 @@ prev_exp        = 0;
 m_apm_add(rr, MM_One, xx);
 m_apm_copy(term, xx);
 
-m1 = 2L;
+m1 = 2LL;
 
 while (TRUE)
   {
-   m_apm_set_long(digit, m1);
+   m_apm_set_long_long(digit, m1);
    m_apm_multiply(tmp0, term, xx);
    m_apm_divide(term, local_precision, tmp0, digit);
    m_apm_add(tmp0, rr, term);

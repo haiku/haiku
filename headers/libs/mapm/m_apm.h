@@ -225,6 +225,7 @@ extern	char	*m_apm_lib_short_version(char *);
 extern	void	m_apm_set_string(M_APM, char *);
 extern	void	m_apm_set_double(M_APM, double);
 extern	void	m_apm_set_long(M_APM, long);
+extern	void	m_apm_set_long_long(M_APM, long long);
 
 extern	void	m_apm_to_string(char *, int, M_APM);
 extern  void	m_apm_to_fixpt_string(char *, int, M_APM);
@@ -421,6 +422,8 @@ public:
 		{create();m_apm_set_long(val(),l);}
 	MAPM(long l) /* Constructor from long int */
 		{create();m_apm_set_long(val(),l);}
+	MAPM(long long ll) /* Constructor from long long int */
+		{create();m_apm_set_long_long(val(),ll);}
 	/* Destructor */
 	~MAPM() {destroy();}
 	
