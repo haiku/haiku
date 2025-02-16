@@ -179,7 +179,7 @@ public:
 		// Every search term must be found in one of the package texts
 		for (int32 i = fSearchTerms.CountStrings() - 1; i >= 0; i--) {
 			const BString& term = fSearchTerms.StringAt(i);
-			if (!_TextContains(package->Name(), term)
+			if (package->Name().FindFirst(term) < 0
 				&& !_AcceptsPackageFromPublisher(package, term)
 				&& !_AcceptsPackageFromLocalizedText(package, term)) {
 				return false;
@@ -205,8 +205,7 @@ public:
 private:
  	bool _TextContains(BString text, const BString& string) const
  	{
- 		text.ToLower();
- 		int32 index = text.FindFirst(string);
+		int32 index = text.IFindFirst(string);
  		return index >= 0;
  	}
 
