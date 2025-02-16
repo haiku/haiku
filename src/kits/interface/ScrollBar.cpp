@@ -846,10 +846,8 @@ BScrollBar::SetRange(float min, float max)
 
 	if (fValue < fMin || fValue > fMax)
 		SetValue(fValue);
-	else {
+	else
 		_UpdateThumbFrame();
-		Invalidate();
-	}
 }
 
 
@@ -1255,7 +1253,7 @@ BScrollBar::_UpdateThumbFrame()
 		fPrivateData->fThumbFrame.OffsetBy(offset, 0.0);
 	}
 
-	if (Window() != NULL) {
+	if (Window() != NULL && fPrivateData->fThumbFrame != oldFrame) {
 		BRect invalid = oldFrame.IsValid()
 			? oldFrame | fPrivateData->fThumbFrame
 			: fPrivateData->fThumbFrame;
