@@ -801,7 +801,8 @@ public:
 	ItemCountView()
 		:
 		BView("item count view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-		fItemCount(0)
+		fItemCount(0),
+		fInvalidated(false)
 	{
 		BFont font(be_plain_font);
 		font.SetSize(font.Size() * 0.75f);
@@ -834,6 +835,11 @@ public:
 
 	virtual void Draw(BRect updateRect)
 	{
+		if (fInvalidated) {
+			fLabel = _DeriveLabel(fItemCount);
+			fInvalidated = false;
+		}
+
 		FillRect(updateRect, B_SOLID_LOW);
 
 		font_height fontHeight;
@@ -855,19 +861,20 @@ public:
 	{
 		if (count == fItemCount)
 			return;
+
 		fItemCount = count;
-		fLabel = _DeriveLabel(fItemCount);
-		Invalidate();
+		if (!fInvalidated) {
+			Invalidate();
+			fInvalidated = true;
+		}
 	}
 
 private:
-
-/*! This method is hit quite often when the list of packages in the
-    table-view are updated.  Derivation of the plural for some
-    languages such as Russian can be slow so this method should be
-    called sparingly.
-*/
-
+	/*! This method is hit quite often when the list of packages in the
+		table-view are updated.  Derivation of the plural for some
+		languages such as Russian can be slow so this method should be
+		called sparingly.
+	*/
 	BString _DeriveLabel(int32 count) const
 	{
 		static BStringFormat format(B_TRANSLATE("{0, plural, "
@@ -877,9 +884,12 @@ private:
 		return label;
 	}
 
+private:
 	int32		fItemCount;
 	BString		fLabel;
 	BSize		fMinSize;
+
+	bool		fInvalidated;
 };
 
 
