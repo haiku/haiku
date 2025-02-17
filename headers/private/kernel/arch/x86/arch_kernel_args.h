@@ -29,7 +29,7 @@ typedef struct {
 	uint64	virtual_end;
 	uint64	page_hole;
 	// smp stuff
-	uint32	apic_time_cv_factor; // apic ticks per second
+	uint32	_unused; // previously: apic ticks per second
 	uint32	apic_phys;
 	FixedWidthPointer<void> apic;
 	uint32	ioapic_phys;

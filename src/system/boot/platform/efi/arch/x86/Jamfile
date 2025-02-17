@@ -20,7 +20,6 @@ for platform in [ MultiBootSubDirSetup efi ] {
 			crt0-efi-$(TARGET_ARCH).S
 			entry.S
 			smp_trampoline.S
-			support.S
 			relocation_func.cpp
 			arch_mmu.cpp
 			arch_smp.cpp

@@ -44,8 +44,6 @@ static struct scan_spots_struct smp_scan_spots[] = {
 	{ 0, 0, 0 }
 };
 
-extern "C" void execute_n_instructions(int count);
-
 extern "C" void smp_trampoline(void);
 extern "C" void smp_trampoline_end(void);
 
@@ -319,41 +317,6 @@ smp_do_acpi_config(void)
 }
 
 
-static void
-calculate_apic_timer_conversion_factor(void)
-{
-	int64 t1, t2;
-	uint32 config;
-	uint32 count;
-
-	// setup the timer
-	config = apic_read(APIC_LVT_TIMER);
-	config = (config & APIC_LVT_TIMER_MASK) + APIC_LVT_MASKED;
-		// timer masked, vector 0
-	apic_write(APIC_LVT_TIMER, config);
-
-	config = (apic_read(APIC_TIMER_DIVIDE_CONFIG) & ~0x0000000f);
-	apic_write(APIC_TIMER_DIVIDE_CONFIG, config | APIC_TIMER_DIVIDE_CONFIG_1);
-		// divide clock by one
-
-	t1 = system_time();
-	apic_write(APIC_INITIAL_TIMER_COUNT, 0xffffffff); // start the counter
-
-	execute_n_instructions(128 * 20000);
-
-	count = apic_read(APIC_CURRENT_TIMER_COUNT);
-	t2 = system_time();
-
-	count = 0xffffffff - count;
-
-	gKernelArgs.arch_args.apic_time_cv_factor
-		= (uint32)((1000000.0/(t2 - t1)) * count);
-
-	dprintf("APIC ticks/sec = %d\n",
-		gKernelArgs.arch_args.apic_time_cv_factor);
-}
-
-
 //	#pragma mark -
 
 
@@ -402,9 +365,6 @@ smp_init_other_cpus(void)
 		gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
 
 	dprintf("smp: apic (mapped) = %p\n", (void *)gKernelArgs.arch_args.apic);
-
-	// calculate how fast the apic timer is
-	calculate_apic_timer_conversion_factor();
 
 	if (gKernelArgs.num_cpus < 2)
 		return;

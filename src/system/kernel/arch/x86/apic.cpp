@@ -237,6 +237,16 @@ apic_set_lvt_initial_timer_count(uint32 config)
 
 
 uint32
+apic_lvt_current_timer_count()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_CURRENT_TIMER_COUNT);
+	else
+		return apic_read(APIC_CURRENT_TIMER_COUNT);
+}
+
+
+uint32
 apic_lvt_timer_divide_config()
 {
 	if (sX2APIC)

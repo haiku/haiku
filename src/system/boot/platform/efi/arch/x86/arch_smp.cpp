@@ -36,8 +36,6 @@
 #endif
 
 
-extern "C" void execute_n_instructions(int count);
-
 void copy_trampoline_code(uint64 trampolineCode, uint64 trampolineStack);
 void prepare_trampoline_args(uint64 trampolineCode, uint64 trampolineStack,
 	uint32 pagedir, uint64 kernelEntry, addr_t virtKernelArgs,
@@ -125,43 +123,6 @@ acpi_do_smp_config(void)
 }
 
 
-static void
-calculate_apic_timer_conversion_factor(void)
-{
-	int64 t1, t2;
-	uint32 config;
-	uint32 count;
-
-	TRACE("calculating apic timer conversion factor\n");
-
-	// setup the timer
-	config = apic_read(APIC_LVT_TIMER);
-	config = (config & APIC_LVT_TIMER_MASK) + APIC_LVT_MASKED;
-		// timer masked, vector 0
-	apic_write(APIC_LVT_TIMER, config);
-
-	config = (apic_read(APIC_TIMER_DIVIDE_CONFIG) & ~0x0000000f);
-	apic_write(APIC_TIMER_DIVIDE_CONFIG, config | APIC_TIMER_DIVIDE_CONFIG_1);
-		// divide clock by one
-
-	t1 = system_time();
-	apic_write(APIC_INITIAL_TIMER_COUNT, 0xffffffff); // start the counter
-
-	execute_n_instructions(128 * 20000);
-
-	count = apic_read(APIC_CURRENT_TIMER_COUNT);
-	t2 = system_time();
-
-	count = 0xffffffff - count;
-
-	gKernelArgs.arch_args.apic_time_cv_factor
-		= (uint32)((1000000.0/(t2 - t1)) * count);
-
-	TRACE("APIC ticks/sec = %" B_PRId32 "\n",
-		gKernelArgs.arch_args.apic_time_cv_factor);
-}
-
-
 //	#pragma mark -
 
 
@@ -210,9 +171,6 @@ arch_smp_init_other_cpus(void)
 		gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
 
 	TRACE("smp: apic (mapped) = %lx\n", (addr_t)gKernelArgs.arch_args.apic.Pointer());
-
-	// calculate how fast the apic timer is
-	calculate_apic_timer_conversion_factor();
 
 	if (gKernelArgs.num_cpus < 2)
 		return;
