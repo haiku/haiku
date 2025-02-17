@@ -104,6 +104,7 @@ public:
 
 			bigtime_t			TimeDuration();
 			bigtime_t			TimePosition();
+			bigtime_t			TimePositionFor(float value);
 			status_t			SaveState(bool reset = false);
 			void				RestoreState();
 

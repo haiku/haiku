@@ -21,6 +21,8 @@ public:
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 
+			bigtime_t			TimeDuration();
+
 	// DurationView
 			void				Update(bigtime_t position, bigtime_t duration);
 

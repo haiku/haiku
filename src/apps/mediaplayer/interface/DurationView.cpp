@@ -78,6 +78,13 @@ DurationView::MaxSize()
 }
 
 
+bigtime_t
+DurationView::TimeDuration()
+{
+	return fDuration;
+}
+
+
 // #pragma mark -
 
 

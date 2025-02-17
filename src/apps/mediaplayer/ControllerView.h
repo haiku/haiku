@@ -35,6 +35,7 @@ public:
 	virtual	void		VolumeChanged(float value);
 	virtual	void		ToggleMute();
 	virtual	void		PositionChanged(float value);
+	virtual	bigtime_t	TimePositionFor(float value);
 
 private:
 	void				AttachedToWindow();

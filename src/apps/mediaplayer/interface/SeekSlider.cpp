@@ -17,11 +17,12 @@
 static const rgb_color kThumbRed = (rgb_color){ 255, 52, 52, 255 };
 
 
-SeekSlider::SeekSlider(const char* name, BMessage* message, int32 minValue,
-		int32 maxValue)
+SeekSlider::SeekSlider(const char* name, BMessage* message, BMessage* hoverMessage,
+		int32 minValue, int32 maxValue)
 	:
 	BSlider(name, NULL, NULL, minValue, maxValue, B_HORIZONTAL,
 		B_TRIANGLE_THUMB),
+	fHoverMessage(hoverMessage),
 	fTracking(false),
 	fLastTrackTime(0),
 	fDisabledString(""),
@@ -117,6 +118,17 @@ SeekSlider::MouseUp(BPoint where)
 {
 	fTracking = false;
 	BSlider::MouseUp(where);
+}
+
+
+void
+SeekSlider::MouseMoved(BPoint point, uint32 transit, const BMessage* dragMessage)
+{
+	if (!IsTracking()) {
+		fHoverMessage->SetInt32("value", ValueForPoint(point));
+		Invoke(fHoverMessage);
+	}
+	BSlider::MouseMoved(point, transit, dragMessage);
 }
 
 

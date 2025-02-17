@@ -13,7 +13,7 @@
 class SeekSlider : public BSlider {
 public:
 								SeekSlider(const char* name, BMessage* message,
-									int32 minValue, int32 maxValue);
+									BMessage* hoverMessage, int32 minValue, int32 maxValue);
 
 	virtual						~SeekSlider();
 
@@ -24,6 +24,8 @@ public:
 	virtual	void				DrawThumb();
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint point, uint32 transit,
+									const BMessage* dragMessage);
 	virtual	void				GetPreferredSize(float* _width,
 									float* _height);
 	virtual	BSize				MinSize();
@@ -36,6 +38,8 @@ public:
 			void				SetSymbolScale(float scale);
 
 private:
+			BMessage*			fHoverMessage;
+
 			bool				fTracking;
 			bigtime_t			fLastTrackTime;
 
