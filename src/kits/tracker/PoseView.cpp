@@ -9196,7 +9196,10 @@ BPoseView::ColumnRedraw(BRect updateRect)
 	updateRegion.Set(updateRect);
 	ConstrainClippingRegion(&updateRegion);
 	offscreenView->SetDrawingMode(B_OP_COPY);
-	offscreenView->SetLowColor(LowColor());
+	if (!TargetVolumeIsReadOnly())
+		offscreenView->SetLowUIColor(LowUIColor());
+	else
+		offscreenView->SetLowUIColor(LowUIColor(), ReadOnlyTint(LowUIColor()));
 
 	for (int32 index = startIndex; index < poseCount; index++) {
 		BPose* pose = poseList->ItemAt(index);
@@ -9210,6 +9213,11 @@ BPoseView::ColumnRedraw(BRect updateRect)
 
 		offscreenView->Sync();
 		DrawBitmap(sOffscreen->Bitmap(), srcRect, dstRect);
+		if (!TargetVolumeIsReadOnly())
+			offscreenView->SetLowUIColor(LowUIColor());
+		else
+			offscreenView->SetLowUIColor(LowUIColor(), ReadOnlyTint(LowUIColor()));
+
 		location.y += fListElemHeight;
 		if (location.y > updateRect.bottom)
 			break;

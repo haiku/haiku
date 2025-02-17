@@ -78,6 +78,10 @@ _DrawLine(BPoseView* view, BPoint from, BPoint to)
 static void
 _UndrawLine(BPoseView* view, BPoint from, BPoint to)
 {
+	if (!view->TargetVolumeIsReadOnly())
+		view->SetLowUIColor(view->LowUIColor());
+	else
+		view->SetLowUIColor(view->LowUIColor(), ReadOnlyTint(view->LowUIColor()));
 	view->StrokeLine(from, to, B_SOLID_LOW);
 }
 
