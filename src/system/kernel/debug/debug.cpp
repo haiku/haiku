@@ -1220,8 +1220,8 @@ syslog_sender(void* data)
 
 		if (!bufferPending) {
 			// We need to have exclusive access to our syslog buffer
-			cpu_status state = disable_interrupts();
-			acquire_spinlock(&sSpinlock);
+			MutexLocker mutexLocker(sOutputLock);
+			InterruptsSpinLocker spinLocker(sSpinlock);
 
 			length = ring_buffer_readable(sSyslogBuffer)
 				- sSyslogBufferOffset;
@@ -1241,9 +1241,6 @@ syslog_sender(void* data)
 				message, length);
 			sSyslogBufferOffset += length;
 			length += (addr_t)message - (addr_t)sSyslogMessage->message;
-
-			release_spinlock(&sSpinlock);
-			restore_interrupts(state);
 		}
 
 		if (length == 0) {
@@ -1603,6 +1600,10 @@ flush_pending_repeats(bool notifySyslog)
 static void
 check_pending_repeats(void* /*data*/, int /*iteration*/)
 {
+	if (mutex_lock_with_timeout(&sOutputLock, B_RELATIVE_TIMEOUT, 100 * 1000) != B_OK)
+		return;
+	MutexLocker locker(sOutputLock, true);
+
 	if (sMessageRepeatCount > 0
 		&& (system_time() - sMessageRepeatLastTime > 1000000
 			|| system_time() - sMessageRepeatFirstTime > 3000000)) {
