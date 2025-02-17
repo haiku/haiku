@@ -18,7 +18,7 @@ void __pages_allocator_before_fork();
 void __pages_allocator_after_fork(int parent);
 
 
-status_t __allocate_pages(void** address, size_t length, int flags);
+status_t __allocate_pages(void** address, size_t length, int flags, uint8* cleared);
 status_t __free_pages(void* address, size_t length);
 
 

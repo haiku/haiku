@@ -661,10 +661,6 @@ omalloc_grow(struct dir_info *d)
 	if (p == MAP_FAILED)
 		return 1;
 
-#ifdef __HAIKU__
-	memset(p, 0, newsize);
-#endif
-
 	STATS_ADD(d->malloc_used, newsize);
 	STATS_ZERO(d->inserts);
 	STATS_ZERO(d->insert_collisions);
@@ -1011,12 +1007,7 @@ map(struct dir_info *d, size_t sz, int zero_fill)
 					mprotect(p, (cache->max - 1) * sz,
 					    PROT_NONE);
 				p = (char*)p + (cache->max - 1) * sz;
-#ifdef __HAIKU__
-				if (zero_fill)
-					memset(p, 0, sz);
-#else
 				/* zero fill not needed, freshly mmapped */
-#endif
 				return p;
 			}
 		}
@@ -1025,12 +1016,7 @@ map(struct dir_info *d, size_t sz, int zero_fill)
 	p = MMAP(sz, d->mmap_flag);
 	if (p != MAP_FAILED)
 		STATS_ADD(d->malloc_used, sz);
-#ifdef __HAIKU__
-	if (zero_fill)
-		memset(p, 0, sz);
-#else
 	/* zero fill not needed */
-#endif
 	return p;
 }
 
@@ -1080,9 +1066,6 @@ alloc_chunk_info(struct dir_info *d, u_int bucket)
 			q = MMAP(MALLOC_PAGESIZE * chunk_pages, d->mmap_flag);
 			if (q == MAP_FAILED)
 				return NULL;
-#ifdef __HAIKU__
-			memset(q, 0, MALLOC_PAGESIZE * chunk_pages);
-#endif
 			d->chunk_pages = q;
 			d->chunk_pages_used = 0;
 			STATS_ADD(d->malloc_used, MALLOC_PAGESIZE *
@@ -1557,9 +1540,6 @@ _malloc_init(int from_rthreads)
 			sz += d->bigcache_size * sizeof(struct bigcache);
 			if (sz > 0) {
 				void *p = MMAP(sz, 0);
-#ifdef __HAIKU__
-				memset(p, 0, sz);
-#endif
 				if (p == MAP_FAILED)
 					wrterror(NULL,
 					    "malloc_init mmap2 failed");

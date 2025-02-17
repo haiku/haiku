@@ -9,6 +9,7 @@
 #include "PagesAllocator.h"
 
 #include <cstdio>
+#include <cstring>
 #include <errno.h>
 #include <new>
 #include <sys/mman.h>
@@ -69,7 +70,7 @@ public:
 		}
 	}
 
-	status_t AllocatePages(void*& address, size_t allocate)
+	status_t AllocatePages(size_t allocate, void*& address, bool& cleared)
 	{
 		MutexLocker locker(fLock);
 
@@ -82,6 +83,7 @@ public:
 			if (area >= 0) {
 				locker.Lock();
 				fUsed += allocate;
+				cleared = true;
 				return B_OK;
 			}
 			return area;
@@ -92,21 +94,24 @@ public:
 			FreeChunk* chunk = fChunksBySizeTree.FindClosest(allocate, true, true);
 			if (chunk != NULL) {
 				address = _Use(chunk, allocate);
+				cleared = false;
 				return B_OK;
 			}
 		}
 
 		// Not enough memory in the cache. Allocate some more.
 		FreeChunk* chunk;
-		status_t status = _Map(allocate, chunk);
+		bool mostlyClear = false;
+		status_t status = _Map(allocate, chunk, mostlyClear);
 		if (status != B_OK)
 			return status;
 
 		address = _Use(chunk, allocate);
+		cleared = mostlyClear;
 		return B_OK;
 	}
 
-	status_t AllocatePagesAt(void* _address, size_t allocate)
+	status_t AllocatePagesAt(void* _address, size_t allocate, bool& cleared)
 	{
 		const addr_t address = (addr_t)_address;
 		MutexLocker locker(fLock);
@@ -131,6 +136,7 @@ public:
 				// Cut the beginning?
 				if (address == (addr_t)chunk) {
 					_Use(chunk, allocate);
+					cleared = false;
 					return B_OK;
 				}
 
@@ -147,6 +153,7 @@ public:
 			status_t status = _ResizeLastArea(allocate);
 			if (status == B_OK) {
 				fUsed += allocate;
+				cleared = true;
 				return B_OK;
 			}
 			return status;
@@ -175,6 +182,7 @@ public:
 		if (status == B_OK) {
 			locker.Lock();
 			fUsed += allocate;
+			cleared = true;
 			return B_OK;
 		}
 
@@ -257,6 +265,8 @@ private:
 
 		fUsed += amount;
 		fFree -= amount;
+
+		memset(chunk, 0, sizeof(FreeChunk));
 		return (void*)chunk;
 	}
 
@@ -300,13 +310,14 @@ private:
 	}
 
 private:
-	status_t _Map(size_t allocate, FreeChunk*& allocated)
+	status_t _Map(size_t allocate, FreeChunk*& allocated, bool& mostlyClear)
 	{
 		if (fLastArea >= 0) {
 			addr_t oldTop = fLastAreaTop;
 			status_t status = _ResizeLastArea(allocate);
 			if (status == B_OK) {
 				allocated = _Insert((void*)oldTop, allocate);
+				mostlyClear = (allocated == (void*)oldTop);
 				return B_OK;
 			}
 		}
@@ -333,6 +344,7 @@ private:
 		fLastAreaReservedTop = newAreaBase + newReservation;
 
 		allocated = _Insert((void*)newAreaBase, allocate);
+		mostlyClear = (allocated == (void*)newAreaBase);
 		return B_OK;
 	}
 
@@ -527,16 +539,16 @@ __pages_allocator_after_fork(int parent)
 
 
 status_t
-__allocate_pages(void** address, size_t length, int flags)
+__allocate_pages(void** address, size_t length, int flags, uint8* cleared)
 {
 	if ((length % kPageSize) != 0)
 		debugger("PagesAllocator: incorrectly sized allocate");
 
 	if ((flags & MAP_FIXED) != 0)
-		return sPagesAllocator->AllocatePagesAt(*address, length);
+		return sPagesAllocator->AllocatePagesAt(*address, length, *(bool*)cleared);
 
 	//fprintf(stderr, "AllocatePages! 0x%x\n", (int)length);
-	return sPagesAllocator->AllocatePages(*address, length);
+	return sPagesAllocator->AllocatePages(length, *address, *(bool*)cleared);
 }
 
 

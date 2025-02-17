@@ -101,13 +101,18 @@ static void*
 malloc_mmap(void* address, size_t length, int protection, int flags, int fd, off_t offset)
 {
 	status_t status;
+	uint8 cleared;
+
 	length = (length + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);;
 
-	status = __allocate_pages(&address, length, flags);
+	status = __allocate_pages(&address, length, flags, &cleared);
 	if (status != B_OK) {
 		__set_errno(status);
 		return MAP_FAILED;
 	}
+
+	if (!cleared)
+		memset(address, 0, length);
 	return address;
 }
 #define mmap malloc_mmap
