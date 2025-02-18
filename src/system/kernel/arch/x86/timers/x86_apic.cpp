@@ -59,16 +59,16 @@ apic_timer_interrupt(void *data)
 }
 
 
-#define MIN_TIMEOUT 1
-
 static status_t
 apic_timer_set_hardware_timer(bigtime_t relativeTimeout)
 {
-	if (relativeTimeout < MIN_TIMEOUT)
-		relativeTimeout = MIN_TIMEOUT;
+	if (relativeTimeout < 1)
+		relativeTimeout = 1;
 
-	// calculation should be ok, since it's going to be 64-bit
-	uint32 ticks = ((relativeTimeout * sApicTicsPerSec) / 1000000);
+	// calculation should be ok, since it's 64-bit
+	uint64 ticks = ((relativeTimeout * sApicTicsPerSec) / 1000000);
+	if (ticks > UINT32_MAX)
+		ticks = UINT32_MAX;
 
 	cpu_status state = disable_interrupts();
 
@@ -81,7 +81,7 @@ apic_timer_set_hardware_timer(bigtime_t relativeTimeout)
 	apic_set_lvt_timer(config);
 
 	TRACE("arch_smp_set_apic_timer: config 0x%" B_PRIx32 ", timeout %" B_PRIdBIGTIME
-		", tics/sec %" B_PRIu32 ", tics %" B_PRId32 "\n", config, relativeTimeout,
+		", tics/sec %" B_PRIu32 ", tics %" B_PRId64 "\n", config, relativeTimeout,
 		sApicTicsPerSec, ticks);
 
 	apic_set_lvt_initial_timer_count(ticks); // start it up
