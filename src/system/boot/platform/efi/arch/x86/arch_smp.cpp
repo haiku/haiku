@@ -35,12 +35,13 @@
 #	define TRACE(x...) ;
 #endif
 
-
 void copy_trampoline_code(uint64 trampolineCode, uint64 trampolineStack);
 void prepare_trampoline_args(uint64 trampolineCode, uint64 trampolineStack,
 	uint32 pagedir, uint64 kernelEntry, addr_t virtKernelArgs,
 	uint32 currentCpu);
 uint32 get_sentinel(uint64 trampolineStack);
+
+static bool sX2APIC = false;
 
 
 static uint32
@@ -56,11 +57,73 @@ apic_write(uint32 offset, uint32 data)
 	*(volatile uint32 *)((addr_t)gKernelArgs.arch_args.apic_phys + offset) = data;
 }
 
+static uint32
+apic_error_status()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_ERROR_STATUS);
+	else
+		return apic_read(APIC_ERROR_STATUS);
+}
+
+
+static void
+apic_set_error_status(uint32 config)
+{
+	if (sX2APIC)
+		x86_write_msr(IA32_MSR_APIC_ERROR_STATUS, config);
+	else
+		apic_write(APIC_ERROR_STATUS, config);
+}
+
+
+
+static bool
+apic_interrupt_delivered(void)
+{
+	if (sX2APIC)
+		return true;
+	else
+		return (apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) == 0;
+}
+
+
+static void
+apic_set_interrupt_command(uint32 destination, uint32 mode)
+{
+	if (sX2APIC) {
+		uint64 command = 0;
+		command |= (uint64)destination << 32;
+		command |= mode;
+		x86_write_msr(IA32_MSR_APIC_INTR_COMMAND, command);
+	} else {
+		uint32 command2 = 0;
+		command2 |= destination << 24;
+		apic_write(APIC_INTR_COMMAND_2, command2);
+
+		uint32 command1 = mode;
+		apic_write(APIC_INTR_COMMAND_1, command1);
+	}
+}
+
+
+static uint32
+apic_local_id()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_ID);
+	else
+		return (apic_read(APIC_ID) & 0xffffffff) >> 24;
+}
+
 
 static status_t
 acpi_do_smp_config(void)
 {
 	TRACE("smp: using ACPI to detect MP configuration\n");
+
+	sX2APIC = ((x86_read_msr(IA32_MSR_APIC_BASE) & IA32_MSR_APIC_BASE_X2APIC) != 0);
+	TRACE("smp: X2APIC is %s\n", sX2APIC ? "enabled" : "disabled");
 
 	// reset CPU count
 	gKernelArgs.num_cpus = 0;
@@ -132,7 +195,7 @@ arch_smp_get_current_cpu(void)
 	if (gKernelArgs.arch_args.apic == NULL)
 		return 0;
 
-	uint8 apicID = apic_read(APIC_ID) >> 24;
+	uint8 apicID = apic_local_id();
 	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
 		if (gKernelArgs.arch_args.cpu_apic_id[i] == apicID)
 			return i;
@@ -205,8 +268,8 @@ arch_smp_boot_other_cpus(uint32 pagedir, uint64 kernelEntry, addr_t virtKernelAr
 	// boot the cpus
 	TRACE("we have %" B_PRId32 " CPUs to boot...\n", gKernelArgs.num_cpus - 1);
 	for (uint32 i = 1; i < gKernelArgs.num_cpus; i++) {
-		TRACE("trampolining CPU %" B_PRId32 "\n", i);
-		uint32 config;
+		TRACE("trampolining CPU %" B_PRId32 " (apicid=0x%x)\n", i,
+		      gKernelArgs.arch_args.cpu_apic_id[i]);
 		uint64 numStartups;
 		uint32 j;
 
@@ -215,33 +278,27 @@ arch_smp_boot_other_cpus(uint32 pagedir, uint64 kernelEntry, addr_t virtKernelAr
 
 		/* clear apic errors */
 		if (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) {
-			apic_write(APIC_ERROR_STATUS, 0);
-			apic_read(APIC_ERROR_STATUS);
+			apic_set_error_status(0);
+			apic_error_status();
 		}
 
 		/* send (aka assert) INIT IPI */
-		config = (apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK)
-			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
-		apic_write(APIC_INTR_COMMAND_2, config); /* set target pe */
-		config = (apic_read(APIC_INTR_COMMAND_1) & 0xfff00000)
-			| APIC_TRIGGER_MODE_LEVEL | APIC_INTR_COMMAND_1_ASSERT
-			| APIC_DELIVERY_MODE_INIT;
-		apic_write(APIC_INTR_COMMAND_1, config);
+		apic_set_interrupt_command(gKernelArgs.arch_args.cpu_apic_id[i],
+			APIC_TRIGGER_MODE_LEVEL | APIC_INTR_COMMAND_1_ASSERT
+				| APIC_DELIVERY_MODE_INIT);
 
 		// wait for pending to end
-		while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
+		while (!apic_interrupt_delivered())
 			asm volatile ("pause;");
 
+		spin(200);
+
 		/* deassert INIT */
-		config = (apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK)
-			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
-		apic_write(APIC_INTR_COMMAND_2, config);
-		config = (apic_read(APIC_INTR_COMMAND_1) & 0xfff00000)
-			| APIC_TRIGGER_MODE_LEVEL | APIC_DELIVERY_MODE_INIT;
-		apic_write(APIC_INTR_COMMAND_1, config);
+		apic_set_interrupt_command(gKernelArgs.arch_args.cpu_apic_id[i],
+			APIC_TRIGGER_MODE_LEVEL | APIC_DELIVERY_MODE_INIT);
 
 		// wait for pending to end
-		while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
+		while (!apic_interrupt_delivered())
 			asm volatile ("pause;");
 
 		/* wait 10ms */
@@ -251,22 +308,16 @@ arch_smp_boot_other_cpus(uint32 pagedir, uint64 kernelEntry, addr_t virtKernelAr
 			? 2 : 0;
 		for (j = 0; j < numStartups; j++) {
 			/* it's a local apic, so send STARTUP IPIs */
-			apic_write(APIC_ERROR_STATUS, 0);
-
-			/* set target pe */
-			config = (apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK)
-				| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
-			apic_write(APIC_INTR_COMMAND_2, config);
+			apic_set_error_status(0);
 
 			/* send the IPI */
-			config = (apic_read(APIC_INTR_COMMAND_1) & 0xfff0f800)
-				| APIC_DELIVERY_MODE_STARTUP | (trampolineCode >> 12);
-			apic_write(APIC_INTR_COMMAND_1, config);
+			apic_set_interrupt_command(gKernelArgs.arch_args.cpu_apic_id[i],
+				APIC_DELIVERY_MODE_STARTUP | (trampolineCode >> 12));
 
 			/* wait */
 			spin(200);
 
-			while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
+			while (!apic_interrupt_delivered())
 				asm volatile ("pause;");
 		}
 
