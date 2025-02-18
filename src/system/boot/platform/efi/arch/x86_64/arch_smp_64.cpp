@@ -35,6 +35,7 @@ struct gdtr {
     unsigned char null[8];
     unsigned char code[8];
     unsigned char data[8];
+    unsigned char code64[8];
 } __attribute__((packed));
 
 // Arguments passed to the SMP trampoline.
@@ -42,7 +43,8 @@ struct long_trampoline_args {
 	uint32 trampoline;        // Trampoline address
 	uint32 gdt32;             // 32-bit GDTR
 	uint32 pml4;              // 64-bit PML4
-	uint32 gdt64;             // 64-bit GDTR
+	uint32 padding;           // Padding
+	uint64 gdt64;             // 64-bit GDTR
 	uint64 kernel_entry;      // Kernel entry point
 	uint64 kernel_args;       // Kernel arguments
 	uint64 current_cpu;       // CPU number
@@ -73,15 +75,16 @@ prepare_trampoline_args(uint64 trampolineCode, uint64 trampolineStack,
 	args->trampoline = trampolineCode;
 
 	args->gdt32 = (uint64) &args->gdtr;
-	args->gdtr.limit = 23;
+	args->gdtr.limit = 8 * 4 - 1;
 	args->gdtr.base = (uint32)(uint64)args->gdtr.null;
 	#define COPY_ARRAY(A, X0, X1, X2, X3, X4, X5, X6, X7) \
 		{ A[0] = X0; A[1] = X1; A[2] = X2; A[3] = X3; A[4] = X4; A[5] = X5; A[6] = X6; A[7] = X7; }
 	COPY_ARRAY(args->gdtr.null, 0, 0, 0, 0, 0, 0, 0, 0);
 	COPY_ARRAY(args->gdtr.code, 0xff, 0xff, 0, 0, 0, 0x9a, 0xcf, 0);
 	COPY_ARRAY(args->gdtr.data, 0xff, 0xff, 0, 0, 0, 0x92, 0xcf, 0);
+	COPY_ARRAY(args->gdtr.code64, 0xff, 0xff, 0, 0, 0, 0x9a, 0xaf, 0);
 	#undef COPY_ARRAY
-	args->gdt64 = (uint32_t)(uint64_t)&gLongGDTR;
+	args->gdt64 = (uint64_t)&gLongGDTR;
 
 	args->pml4 = pagedir;
 	args->kernel_entry = kernelEntry;
