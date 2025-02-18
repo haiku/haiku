@@ -98,8 +98,10 @@ cond_wait(pthread_cond_t* cond, pthread_mutex_t* mutex, uint32 flags,
 	cond->waiter_count--;
 
 	// If there are no more waiters, we can change mutexes.
-	if (cond->waiter_count == 0)
+	if (cond->waiter_count == 0) {
 		cond->mutex = NULL;
+		cond->lock = 0;
+	}
 
 	return status;
 }
@@ -118,8 +120,8 @@ cond_signal(pthread_cond_t* cond, bool broadcast)
 		flags |= B_USER_MUTEX_SHARED;
 
 	// release the condition lock
-	atomic_and((int32*)&cond->lock, ~(int32)B_USER_MUTEX_LOCKED);
-	_kern_mutex_unblock((int32*)&cond->lock, flags);
+	if ((atomic_and((int32*)&cond->lock, ~(int32)B_USER_MUTEX_LOCKED) & B_USER_MUTEX_WAITING) != 0)
+		_kern_mutex_unblock((int32*)&cond->lock, flags);
 }
 
 
