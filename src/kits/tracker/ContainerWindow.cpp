@@ -413,6 +413,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list, uint32 openFlags,
 	fTaskLoop(NULL),
 	fStateNeedsSaving(false),
 	fBackgroundImage(NULL),
+	fLastMenusBeginningTime(0),
 	fSavedZoomRect(0, 0, -1, -1),
 	fSaveStateIsEnabled(true),
 	fIsWatchingPath(false)
@@ -1925,8 +1926,13 @@ BContainerWindow::MenusBeginning()
 	if (fWindowMenu != NULL)
 		UpdateMenu(fWindowMenu, kWindowMenuContext);
 
-	// Tracker add-on menus may have changed
-	RebuildAddOnMenus(fMenuBar);
+	if (system_time() - fLastMenusBeginningTime > 50000) {
+		// Tracker add-on menus may have changed
+		RebuildAddOnMenus(fMenuBar);
+	}
+
+	// prevent Add-ons from being rebuilt too fast
+	fLastMenusBeginningTime = system_time();
 }
 
 

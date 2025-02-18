@@ -338,6 +338,8 @@ protected:
 	static LockingList<struct AddOnShortcut, true>* fAddOnsList;
 
 private:
+	bigtime_t fLastMenusBeginningTime;
+
 	BRect fSavedZoomRect;
 	BRect fPreviousBounds;
 
