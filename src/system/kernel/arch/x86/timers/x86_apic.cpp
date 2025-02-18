@@ -13,6 +13,7 @@
 
 #include <int.h>
 #include <arch/x86/apic.h>
+#include <arch/x86/arch_system_info.h>
 
 #include <arch/cpu.h>
 
@@ -147,13 +148,33 @@ calculate_apic_timer_conversion_factor()
 }
 
 
+static uint32
+determine_apic_timer_conversion_factor()
+{
+	if (x86_check_feature(IA32_FEATURE_EXT_HYPERVISOR, FEATURE_EXT)) {
+		cpuid_info info;
+		get_current_cpuid(&info, 0x40000000, 0);
+		const uint32 maxVMM = info.regs.eax;
+		if (maxVMM >= 0x40000010) {
+			get_current_cpuid(&info, 0x40000010, 0);
+
+			uint32 freq = info.regs.ebx * 1000;
+			dprintf("APIC timer frequency (from hypervisor CPUID leaf): %d\n", freq);
+			return freq;
+		}
+	}
+
+	return calculate_apic_timer_conversion_factor();
+}
+
+
 static status_t
 apic_timer_init(struct kernel_args *args)
 {
 	if (!apic_available())
 		return B_ERROR;
 
-	sApicTicsPerSec = calculate_apic_timer_conversion_factor();
+	sApicTicsPerSec = determine_apic_timer_conversion_factor();
 
 	reserve_io_interrupt_vectors(1, 0xfb - ARCH_INTERRUPT_BASE,
 		INTERRUPT_TYPE_LOCAL_IRQ);
