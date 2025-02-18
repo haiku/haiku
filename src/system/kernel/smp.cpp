@@ -918,7 +918,7 @@ process_pending_ici(int32 currentCPU)
 	if (msg == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	TRACE("  cpu %ld message = %ld\n", currentCPU, msg->message);
+	TRACE("  cpu %" B_PRId32 " message = %" B_PRId32 "\n", currentCPU, msg->message);
 
 	bool haltCPU = false;
 
@@ -1030,11 +1030,11 @@ call_all_cpus_early(void (*function)(void*, int), void* cookie)
 int
 smp_intercpu_int_handler(int32 cpu)
 {
-	TRACE("smp_intercpu_int_handler: entry on cpu %ld\n", cpu);
+	TRACE("smp_intercpu_int_handler: entry on cpu %" B_PRId32 "\n", cpu);
 
 	process_all_pending_ici(cpu);
 
-	TRACE("smp_intercpu_int_handler: done on cpu %ld\n", cpu);
+	TRACE("smp_intercpu_int_handler: done on cpu %" B_PRId32 "\n", cpu);
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -1046,8 +1046,8 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 {
 	struct smp_msg *msg;
 
-	TRACE("smp_send_ici: target 0x%lx, mess 0x%lx, data 0x%lx, data2 0x%lx, "
-		"data3 0x%lx, ptr %p, flags 0x%lx\n", targetCPU, message, data, data2,
+	TRACE("smp_send_ici: target 0x%" B_PRIx32 ", mess 0x%" B_PRIx32 ", data 0x%lx, data2 0x%lx, "
+		"data3 0x%lx, ptr %p, flags 0x%" B_PRIx32 "\n", targetCPU, message, data, data2,
 		data3, dataPointer, flags);
 
 	if (sICIEnabled) {
@@ -1182,8 +1182,8 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 {
 	struct smp_msg *msg;
 
-	TRACE("smp_send_broadcast_ici: cpu %ld mess 0x%lx, data 0x%lx, data2 "
-		"0x%lx, data3 0x%lx, ptr %p, flags 0x%lx\n", smp_get_current_cpu(),
+	TRACE("smp_send_broadcast_ici: cpu %" B_PRId32 " mess 0x%" B_PRIx32 ", data 0x%lx, data2 "
+		"0x%lx, data3 0x%lx, ptr %p, flags 0x%" B_PRIx32 "\n", smp_get_current_cpu(),
 		message, data, data2, data3, dataPointer, flags);
 
 	if (sICIEnabled) {
@@ -1254,8 +1254,8 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 	if (!sICIEnabled)
 		return;
 
-	TRACE("smp_send_broadcast_ici_interrupts_disabled: cpu %ld mess 0x%lx, "
-		"data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%lx\n",
+	TRACE("smp_send_broadcast_ici_interrupts_disabled: cpu %" B_PRId32 " mess 0x%" B_PRIx32 ", "
+		"data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%" B_PRIx32 "\n",
 		currentCPU, message, data, data2, data3, dataPointer, flags);
 
 	struct smp_msg *msg;
@@ -1272,7 +1272,7 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 	msg->proc_bitmap.ClearBit(currentCPU);
 	msg->done = 0;
 
-	TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: inserting msg %p "
+	TRACE("smp_send_broadcast_ici_interrupts_disabled %" B_PRId32 ": inserting msg %p "
 		"into broadcast mbox\n", currentCPU, msg);
 
 	// stick it in the appropriate cpu's mailbox
@@ -1286,14 +1286,14 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 
 	arch_smp_send_broadcast_ici();
 
-	TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: sent interrupt\n",
+	TRACE("smp_send_broadcast_ici_interrupts_disabled %" B_PRId32 ": sent interrupt\n",
 		currentCPU);
 
 	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
 		// wait for the other cpus to finish processing it
 		// the interrupt handler will ref count it to <0
 		// if the message is sync after it has removed it from the mailbox
-		TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: waiting for "
+		TRACE("smp_send_broadcast_ici_interrupts_disabled %" B_PRId32 ": waiting for "
 			"ack\n", currentCPU);
 
 		while (msg->done == 0) {
@@ -1301,7 +1301,7 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 			cpu_wait(&msg->done, 1);
 		}
 
-		TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: returning "
+		TRACE("smp_send_broadcast_ici_interrupts_disabled %" B_PRId32 ": returning "
 			"message to free list\n", currentCPU);
 
 		// for SYNC messages, it's our responsibility to put it
