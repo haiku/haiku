@@ -256,7 +256,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	} else {
 		info->polling = 0;
 	}
-	info->interrupt.Init(NULL, NULL);
+	info->interrupt.Init(info, "nvme_disk interrupt");
 	install_io_interrupt_handler(irq, nvme_interrupt_handler, (void*)info, B_NO_HANDLED_INFO);
 
 	if (info->ctrlr->feature_supported[NVME_FEAT_INTERRUPT_COALESCING]) {
