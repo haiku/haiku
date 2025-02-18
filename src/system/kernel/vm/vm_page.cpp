@@ -2681,6 +2681,7 @@ free_cached_pages(uint32 pagesToFree, bool dontWait)
 {
 	vm_page marker;
 	init_page_marker(marker);
+	forbid_page_faults();
 
 	uint32 pagesFreed = 0;
 
@@ -2703,6 +2704,7 @@ free_cached_pages(uint32 pagesToFree, bool dontWait)
 	}
 
 	remove_page_marker(marker);
+	permit_page_faults();
 
 	sFreePageCondition.NotifyAll();
 
