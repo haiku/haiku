@@ -671,7 +671,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 			drawView->SetDrawingMode(B_OP_ALPHA);
 			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 			uint8 alpha = 64; // set the level of opacity by value
-			if (view->LowColor().IsLight())
+			if (drawView->LowColor().IsLight())
 				drawView->SetHighColor(0, 0, 0, alpha);
 			else
 				drawView->SetHighColor(255, 255, 255, alpha);
