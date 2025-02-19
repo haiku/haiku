@@ -247,8 +247,7 @@ X86VMTranslationMap32Bit::Unmap(addr_t start, addr_t end)
 			TRACE("unmap_tmap: removing page 0x%lx\n", start);
 
 			page_table_entry oldEntry
-				= X86PagingMethod32Bit::ClearPageTableEntryFlags(&pt[index],
-					X86_PTE_PRESENT);
+				= X86PagingMethod32Bit::ClearPageTableEntry(&pt[index]);
 			fMapCount--;
 
 			if ((oldEntry & X86_PTE_ACCESSED) != 0) {

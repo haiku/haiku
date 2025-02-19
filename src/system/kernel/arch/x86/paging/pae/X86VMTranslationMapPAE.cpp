@@ -480,8 +480,7 @@ X86VMTranslationMapPAE::Unmap(addr_t start, addr_t end)
 				B_PRIxADDR "\n", start);
 
 			pae_page_table_entry oldEntry
-				= X86PagingMethodPAE::ClearTableEntryFlags(
-					&pageTable[index], X86_PAE_PTE_PRESENT);
+				= X86PagingMethodPAE::ClearTableEntry(&pageTable[index]);
 
 			T(Unmap(this, start, oldEntry));
 

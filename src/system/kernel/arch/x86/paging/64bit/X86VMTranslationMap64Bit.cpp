@@ -265,8 +265,8 @@ X86VMTranslationMap64Bit::Unmap(addr_t start, addr_t end)
 				B_PRIxADDR " (%#" B_PRIxPHYSADDR ")\n", start,
 				pageTable[index] & X86_64_PTE_ADDRESS_MASK);
 
-			uint64 oldEntry = X86PagingMethod64Bit::ClearTableEntryFlags(
-				&pageTable[index], X86_64_PTE_PRESENT);
+			uint64 oldEntry = X86PagingMethod64Bit::ClearTableEntry(
+				&pageTable[index]);
 			fMapCount--;
 
 			if ((oldEntry & X86_64_PTE_ACCESSED) != 0) {
