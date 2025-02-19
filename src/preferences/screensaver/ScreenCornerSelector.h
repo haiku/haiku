@@ -22,7 +22,7 @@ public:
 									const char *name, BMessage* message,
 									uint32 resizingMode);
 
-	virtual	void				Draw(BRect updateRect); 
+	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint point);
 	virtual	void				MouseUp(BPoint point);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,

@@ -6,14 +6,14 @@
 
 
 inline BPoint
-scale_direct(float x, float y, BRect area) 
+scale_direct(float x, float y, BRect area)
 {
 	return BPoint(area.Width() * x + area.left, area.Height() * y + area.top);
 }
 
 
 inline BRect
-scale_direct(float x1, float x2, float y1, float y2, BRect area) 
+scale_direct(float x1, float x2, float y1, float y2, BRect area)
 {
 	return BRect(area.Width() * x1 + area.left, area.Height() * y1 + area.top,
 		area.Width()* x2 + area.left, area.Height() * y2 + area.top);

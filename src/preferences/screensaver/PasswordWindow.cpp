@@ -39,7 +39,7 @@ static const uint32 kMsgDone = 'done';
 static const uint32 kMsgPasswordTypeChanged = 'pwtp';
 
 
-PasswordWindow::PasswordWindow(ScreenSaverSettings& settings) 
+PasswordWindow::PasswordWindow(ScreenSaverSettings& settings)
 	:
 	BWindow(BRect(100, 100, 300, 200), B_TRANSLATE("Password Window"),
 		B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE
@@ -51,7 +51,7 @@ PasswordWindow::PasswordWindow(ScreenSaverSettings& settings)
 }
 
 
-void 
+void
 PasswordWindow::_Setup()
 {
 	float spacing = be_control_look->DefaultItemSpacing();
@@ -85,7 +85,7 @@ PasswordWindow::_Setup()
 	passwordTextView->SetExplicitMinSize(BSize(spacing * kPasswordTextWidth,
 		B_SIZE_UNSET));
 
-	fConfirmControl = new BTextControl("confirmTextView", 
+	fConfirmControl = new BTextControl("confirmTextView",
 		B_TRANSLATE("Confirm password:"), B_EMPTY_STRING, NULL);
 	fConfirmControl->SetExplicitMinSize(BSize(spacing * kPasswordTextWidth,
 		B_SIZE_UNSET));
@@ -131,8 +131,8 @@ PasswordWindow::_Setup()
 }
 
 
-void 
-PasswordWindow::Update() 
+void
+PasswordWindow::Update()
 {
 	if (fSettings.UseSystemPassword())
 		fUseSystem->SetValue(B_CONTROL_ON);
@@ -145,7 +145,7 @@ PasswordWindow::Update()
 }
 
 
-void 
+void
 PasswordWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
