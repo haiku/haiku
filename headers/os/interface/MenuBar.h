@@ -106,9 +106,10 @@ private:
 			menu_bar_border		fBorder;
 			thread_id			fTrackingPID;
 			int32				fPrevFocusToken;
+			uint32				_reserved1;
 			BRect*				fLastBounds;
 			uint32				fBorders;
-			uint32				_reserved[2];
+			uint32				_reserved[1];
 
 			bool				fTracking;
 };
