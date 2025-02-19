@@ -6429,8 +6429,16 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			}
 
 			if (commitmentChange != 0) {
-				const off_t newCommitment = topCache->committed_size + commitmentChange;
-				ASSERT(newCommitment <= (topCache->virtual_end - topCache->virtual_base));
+				off_t newCommitment = topCache->committed_size + commitmentChange;
+				if (newCommitment > PAGE_ALIGN(topCache->virtual_end - topCache->virtual_base)) {
+					// This should only happen in the case where this process fork()ed,
+					// duplicating the commitment, and then the child exited, resulting
+					// in the commitments being merged along with the caches.
+					KDEBUG_ONLY(dprintf("set_memory_protection(area %d): new commitment "
+						"greater than cache size, recomputing\n", area->id));
+					newCommitment = (compute_area_page_commitment(area) * B_PAGE_SIZE)
+						+ commitmentChange;
+				}
 				status_t status = topCache->Commit(newCommitment, VM_PRIORITY_USER);
 				if (status != B_OK)
 					return status;
