@@ -60,13 +60,13 @@ PasswordWindow::_Setup()
 	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	topView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
-	BBox* networkBox = new BBox("networkBox");
-	networkBox->SetBorder(B_NO_BORDER);
+	BBox* systemBox = new BBox("systemBox");
+	systemBox->SetBorder(B_NO_BORDER);
 
-	fUseNetwork = new BRadioButton("useNetwork",
-		B_TRANSLATE("Use network password"),
+	fUseSystem = new BRadioButton("useSystem",
+		B_TRANSLATE("Use system password"),
 		new BMessage(kMsgPasswordTypeChanged));
-	networkBox->SetLabel(fUseNetwork);
+	systemBox->SetLabel(fUseSystem);
 
 	BBox* customBox = new BBox("customBox");
 
@@ -114,7 +114,7 @@ PasswordWindow::_Setup()
 
 	BLayoutBuilder::Group<>(topView, B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING)
-		.Add(networkBox)
+		.Add(systemBox)
 		.Add(customBox)
 		.AddStrut(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_HORIZONTAL)
@@ -134,14 +134,14 @@ PasswordWindow::_Setup()
 void 
 PasswordWindow::Update() 
 {
-	if (fSettings.IsNetworkPassword())
-		fUseNetwork->SetValue(B_CONTROL_ON);
+	if (fSettings.UseSystemPassword())
+		fUseSystem->SetValue(B_CONTROL_ON);
 	else
 		fUseCustom->SetValue(B_CONTROL_ON);
 
-	bool useNetPassword = (fUseCustom->Value() > 0);
-	fConfirmControl->SetEnabled(useNetPassword);
-	fPasswordControl->SetEnabled(useNetPassword);
+	bool useSysPassword = (fUseCustom->Value() > 0);
+	fConfirmControl->SetEnabled(useSysPassword);
+	fPasswordControl->SetEnabled(useSysPassword);
 }
 
 
@@ -150,7 +150,7 @@ PasswordWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgDone:
-			fSettings.SetLockMethod(fUseCustom->Value() ? "custom" : "network");
+			fSettings.SetLockMethod(fUseCustom->Value() ? "custom" : "system");
 			if (fUseCustom->Value()) {
 				if (strcmp(fPasswordControl->Text(), fConfirmControl->Text())
 						!= 0) {
@@ -178,7 +178,7 @@ PasswordWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgPasswordTypeChanged:
-			fSettings.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "network");
+			fSettings.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "system");
 			Update();
 			break;
 

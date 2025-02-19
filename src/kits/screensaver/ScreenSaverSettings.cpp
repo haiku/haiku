@@ -14,6 +14,8 @@
 
 #include "ScreenSaverSettings.h"
 
+#include <pwd.h>
+#include <shadow.h>
 #include <string.h>
 
 #include <Debug.h>
@@ -87,8 +89,20 @@ ScreenSaverSettings::Load()
 	if (fSettings.FindString("modulename", &string) == B_OK)
 		fModuleName = string;
 
-	if (IsNetworkPassword()) {
-		// TODO: this does not work yet
+	if (!UseSystemPassword())
+		return true;
+
+	char* username = getlogin();
+	if (username == NULL)
+		return true;
+
+	struct spwd *shadowpwd = getspnam(username);
+	if (shadowpwd != NULL) {
+		fPassword = shadowpwd->sp_pwdp;
+	} else {
+		struct passwd *pwd = getpwnam(username);
+		if (pwd != NULL)
+			fPassword = pwd->pw_passwd;
 	}
 
 	return true;
@@ -160,7 +174,7 @@ ScreenSaverSettings::Message()
 	if (fSettings.ReplaceString("lockmethod", fLockMethod) != B_OK)
 		fSettings.AddString("lockmethod", fLockMethod);
 
-	const char* password = IsNetworkPassword() ? "" : fPassword.String();
+	const char* password = UseSystemPassword() ? "" : fPassword.String();
 	if (fSettings.ReplaceString("lockpassword", password) != B_OK)
 		fSettings.AddString("lockpassword", password);
 

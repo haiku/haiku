@@ -56,9 +56,9 @@ public:
 			bigtime_t		PasswordTime() const { return fPasswordTime; }
 			const char*		Password() { return fPassword.String(); }
 			const char*		LockMethod() { return fLockMethod.String(); }
-			bool			IsNetworkPassword()
-								{ return strcmp(fLockMethod.String(), "custom")
-									!= 0; }
+			bool			UseSystemPassword()
+								{ return strcmp(fLockMethod.String(), "system")
+									== 0; }
 
 			const char*		ModuleName() { return fModuleName.String(); }
 			status_t		GetModuleState(const char* name,
@@ -84,7 +84,7 @@ public:
 								{ fPasswordTime = time; }
 			void			SetPassword(const char* password)
 								{ fPassword = password; }
-								// Cannot set network password from here.
+								// Cannot set system password from here.
 			void			SetLockMethod(const char* method)
 								{ fLockMethod = method; }
 			void			SetModuleName(const char* name)

@@ -31,7 +31,7 @@ private:
 			void				_Setup();
 
 			BRadioButton*		fUseCustom;
-			BRadioButton*		fUseNetwork;
+			BRadioButton*		fUseSystem;
 			BTextControl*		fConfirmControl;
 			BTextControl*		fPasswordControl;
 

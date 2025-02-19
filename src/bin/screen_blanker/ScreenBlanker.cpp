@@ -224,7 +224,9 @@ ScreenBlanker::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgUnlock:
 		{
-			if (strcmp(fSettings.Password(), crypt(fPasswordWindow->Password(),
+			// if the user has no password then just exit on any input
+			if (fSettings.Password()[0] != '\0'
+				&& strcmp(fSettings.Password(), crypt(fPasswordWindow->Password(),
 					fSettings.Password())) != 0) {
 				beep();
 				fPasswordWindow->SetPassword("");
