@@ -4285,13 +4285,10 @@ static status_t
 fault_get_page(PageFaultContext& context)
 {
 	VMCache* cache = context.topCache;
-	VMCache* lastCache = NULL;
 	vm_page* page = NULL;
 
 	while (cache != NULL) {
 		// We already hold the lock of the cache at this point.
-
-		lastCache = cache;
 
 		page = cache->LookupPage(context.cacheOffset);
 		if (page != NULL && page->busy) {
