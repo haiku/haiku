@@ -215,7 +215,7 @@ void
 BStackedMessageEventListener::Complete()
 {
 	// illegal state.
-	HandleError(JSON_EVENT_LISTENER_ANY_LINE, B_NOT_ALLOWED,
+	HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
 		"Complete() called on stacked message listener");
 }
 
