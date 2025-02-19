@@ -32,6 +32,7 @@ public:
 	virtual	void				ReadyToRun();
 
 	virtual	bool				QuitRequested();
+	virtual	void				ArgvReceived(int argc, char** argv);
 	virtual	void				MessageReceived(BMessage* message);
 
 			bool				IsPasswordWindowShown() const;
@@ -51,6 +52,7 @@ private:
 			PasswordWindow*		fPasswordWindow;
 
 			bigtime_t			fBlankTime;
+			bool				fImmediateLock;
 			bool				fTestSaver;
 			BMessageRunner*		fResumeRunner;
 

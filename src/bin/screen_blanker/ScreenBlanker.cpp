@@ -44,6 +44,7 @@ ScreenBlanker::ScreenBlanker()
 	fWindow(NULL),
 	fSaverRunner(NULL),
 	fPasswordWindow(NULL),
+	fImmediateLock(false),
 	fTestSaver(false),
 	fResumeRunner(NULL),
 	fStandByScreenRunner(NULL),
@@ -219,6 +220,14 @@ ScreenBlanker::_QueueTurnOffScreen()
 
 
 void
+ScreenBlanker::ArgvReceived(int argc, char** argv)
+{
+	if (argc > 1 && strcmp("-l", argv[1]) == 0)
+		fImmediateLock = true;
+}
+
+
+void
 ScreenBlanker::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -287,6 +296,8 @@ ScreenBlanker::QuitRequested()
 		bigtime_t minTime = fSettings.PasswordTime() - fSettings.BlankTime();
 		if (minTime == 0)
 			minTime = 5000000;
+		if (fImmediateLock)
+			minTime = -1;
 		if (system_time() - fBlankTime > minTime) {
 			_ShowPasswordWindow();
 			return false;
