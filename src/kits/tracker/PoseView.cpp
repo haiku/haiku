@@ -9151,7 +9151,7 @@ BPoseView::DrawViewCommon(const BRect& updateRect)
 			if (pose == NULL)
 				break;
 
-			poseRect = pose->CalcRect(location, this, true);
+			poseRect = pose->CalcRect(location, this, false);
 			if (updateRect.Intersects(poseRect))
 				pose->Draw(poseRect, updateRect, this, true);
 
