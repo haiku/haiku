@@ -4635,8 +4635,11 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 				if (object_cache_reserve(page_mapping_object_cache_for(
 							context.page->physical_page_number), 1, 0)
 						!= B_OK) {
-					// Apparently the situation is serious. Let's get ourselves
-					// killed.
+					// Apparently the situation is serious. (We ought to have
+					// blocked waiting for pages or failed to reserve memory
+					// before now.)
+					panic("vm_soft_fault: failed to allocate mapping object for page %p",
+						context.page);
 					status = B_NO_MEMORY;
 				} else if (wirePage != NULL) {
 					// The caller expects us to wire the page. Since
