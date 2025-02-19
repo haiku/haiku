@@ -52,7 +52,6 @@ BMenuBar::BMenuBar(BRect frame, const char* name, uint32 resizingMode,
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
 	fPrevFocusToken(-1),
-	fMenuSem(-1),
 	fLastBounds(NULL),
 	fTracking(false)
 {
@@ -68,7 +67,6 @@ BMenuBar::BMenuBar(const char* name, menu_layout layout, uint32 flags)
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
 	fPrevFocusToken(-1),
-	fMenuSem(-1),
 	fLastBounds(NULL),
 	fTracking(false)
 {
@@ -82,7 +80,6 @@ BMenuBar::BMenuBar(BMessage* archive)
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
 	fPrevFocusToken(-1),
-	fMenuSem(-1),
 	fLastBounds(NULL),
 	fTracking(false)
 {
@@ -492,11 +489,9 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
 	// so let's call MenusBeginning() directly
 	window->MenusBeginning();
 
-	fMenuSem = create_sem(0, "window close sem");
-	_set_menu_sem_(window, fMenuSem);
-
-	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking",
-		B_DISPLAY_PRIORITY, NULL);
+	sem_id sem = create_sem(0, "window close sem");
+	_set_menu_sem_(window, sem);
+	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking", B_DISPLAY_PRIORITY, NULL);
 	if (fTrackingPID >= 0) {
 		menubar_data data;
 		data.menuBar = this;
@@ -512,7 +507,6 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
 	} else {
 		fTracking = false;
 		_set_menu_sem_(window, B_NO_MORE_SEMS);
-		delete_sem(fMenuSem);
 	}
 }
 
@@ -540,8 +534,6 @@ BMenuBar::_TrackTask(void* arg)
 	window->PostMessage(_MENUS_DONE_);
 
 	_set_menu_sem_(window, B_BAD_SEM_ID);
-	delete_sem(menuBar->fMenuSem);
-	menuBar->fMenuSem = B_BAD_SEM_ID;
 
 	return 0;
 }

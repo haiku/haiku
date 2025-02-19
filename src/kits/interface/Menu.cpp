@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2018 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -51,9 +51,8 @@
 #include "utf8_functions.h"
 
 
-#define USE_CACHED_MENUWINDOW 1
-
 using BPrivate::gSystemCatalog;
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Menu"
@@ -1392,8 +1391,8 @@ BMenu::Show(bool selectFirst)
 void
 BMenu::Hide()
 {
-	_Hide();
 	_Uninstall();
+	_Hide();
 }
 
 
@@ -1676,11 +1675,9 @@ BMenu::_Hide()
 	window->DetachMenu();
 		// we don't want to be deleted when the window is removed
 
-#if USE_CACHED_MENUWINDOW
 	if (fSuper != NULL)
 		window->Unlock();
 	else
-#endif
 		window->Quit();
 			// it's our window, quit it
 
@@ -2965,13 +2962,12 @@ BMenu::_OverSubmenu(BMenuItem* item, BPoint loc)
 BMenuWindow*
 BMenu::_MenuWindow()
 {
-#if USE_CACHED_MENUWINDOW
 	if (fCachedMenuWindow == NULL) {
 		char windowName[64];
 		snprintf(windowName, 64, "%s cached menu", Name());
 		fCachedMenuWindow = new (nothrow) BMenuWindow(windowName);
 	}
-#endif
+
 	return fCachedMenuWindow;
 }
 
@@ -3060,17 +3056,15 @@ BMenu::_Uninstall()
 
 
 void
-BMenu::_SelectItem(BMenuItem* item, bool showSubmenu, bool selectFirstItem,
-	bool keyDown)
+BMenu::_SelectItem(BMenuItem* item, bool showSubmenu, bool selectFirstItem, bool keyDown)
 {
-	// Avoid deselecting and then reselecting the same item
-	// which would cause flickering
+	// Avoid deselecting and reselecting the same item which would cause flickering.
 	if (item != fSelected) {
 		if (fSelected != NULL) {
 			fSelected->Select(false);
 			BMenu* subMenu = fSelected->Submenu();
 			if (subMenu != NULL && subMenu->Window() != NULL)
-				subMenu->_Hide();
+				subMenu->Hide();
 		}
 
 		fSelected = item;
@@ -3458,7 +3452,7 @@ BMenu::_QuitTracking(bool onlyThis)
 		}
 	}
 
-	_Hide();
+	Hide();
 }
 
 

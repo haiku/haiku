@@ -217,8 +217,23 @@ static value_info sWindowValueInfo[] = {
 void
 _set_menu_sem_(BWindow* window, sem_id sem)
 {
-	if (window != NULL)
-		window->fMenuSem = sem;
+	if (window == NULL)
+		return;
+
+	// delete semaphore when set to invalid
+	switch (sem) {
+		case B_BAD_SEM_ID:
+		case B_NO_MORE_SEMS:
+		case -1:
+			if (window->fMenuSem > 0)
+				delete_sem(window->fMenuSem);
+			break;
+
+		default:
+			break;
+	}
+
+	window->fMenuSem = sem;
 }
 
 
