@@ -945,6 +945,17 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		secondCacheLocker.SetTo(secondCache, true);
 		secondCache->temporary = cache->temporary;
 		secondCache->virtual_base = secondCacheOffset;
+
+		size_t commitmentStolen = 0;
+		if (!overcommitting && resizePriority != -1) {
+			// Steal some of the original cache's commitment.
+			const size_t steal = PAGE_ALIGN(secondSize);
+			if (cache->committed_size > (off_t)steal) {
+				cache->committed_size -= steal;
+				secondCache->committed_size += steal;
+				commitmentStolen = steal;
+			}
+		}
 		error = secondCache->Resize(secondCache->virtual_base + secondSize, resizePriority);
 
 		if (error == B_OK) {
@@ -976,6 +987,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		if (error != B_OK) {
 			// Restore the original cache.
+			secondCache->committed_size -= commitmentStolen;
+			cache->committed_size += commitmentStolen;
 			cache->Resize(cache->virtual_base + oldSize, resizePriority);
 
 			// Move the pages back.
