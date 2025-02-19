@@ -123,6 +123,7 @@ typedef DoublyLinkedList<cached_block,
 	DoublyLinkedListMemberGetLink<cached_block,
 		&cached_block::link> > block_list;
 
+
 struct cache_notification : DoublyLinkedListLinkImpl<cache_notification> {
 	static inline void* operator new(size_t size);
 	static inline void operator delete(void* block);
@@ -137,8 +138,6 @@ struct cache_notification : DoublyLinkedListLinkImpl<cache_notification> {
 
 typedef DoublyLinkedList<cache_notification> NotificationList;
 
-static object_cache* sCacheNotificationCache;
-
 struct cache_listener;
 typedef DoublyLinkedListLink<cache_listener> listener_link;
 
@@ -149,6 +148,8 @@ struct cache_listener : cache_notification {
 typedef DoublyLinkedList<cache_listener,
 	DoublyLinkedListMemberGetLink<cache_listener,
 		&cache_listener::link> > ListenerList;
+
+static object_cache* sCacheNotificationCache;
 
 void*
 cache_notification::operator new(size_t size)
@@ -1681,8 +1682,8 @@ block_cache::Init()
 	condition_variable.Init(this, "cache transaction sync");
 	mutex_init(&lock, "block cache");
 
-	buffer_cache = create_object_cache_etc("block cache buffers", block_size,
-		8, 0, 0, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
+	buffer_cache = create_object_cache("block cache buffers", block_size,
+		CACHE_NO_DEPOT | CACHE_LARGE_SLAB);
 	if (buffer_cache == NULL)
 		return B_NO_MEMORY;
 
