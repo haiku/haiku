@@ -3064,7 +3064,7 @@ BMenu::_SelectItem(BMenuItem* item, bool showSubmenu, bool selectFirstItem, bool
 			fSelected->Select(false);
 			BMenu* subMenu = fSelected->Submenu();
 			if (subMenu != NULL && subMenu->Window() != NULL)
-				subMenu->Hide();
+				subMenu->_Hide();
 		}
 
 		fSelected = item;
@@ -3452,7 +3452,7 @@ BMenu::_QuitTracking(bool onlyThis)
 		}
 	}
 
-	Hide();
+	_Hide();
 }
 
 
