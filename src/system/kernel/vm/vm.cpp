@@ -926,7 +926,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	addressRestrictions.address = (void*)secondBase;
 	addressRestrictions.address_specification = B_EXACT_ADDRESS;
 	VMArea* secondArea;
-	AutoLocker<VMCache> areaCacheLocker, secondCacheLocker;
+	AutoLocker<VMCache> secondCacheLocker;
 
 	if (onlyCacheUser) {
 		// Create a new cache for the second area.
@@ -960,7 +960,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			areaCacheLocker.SetTo(cache, true);
+			cacheChainLocker.SetTo(cache);
 			error = cache->Resize(cache->virtual_base + firstNewSize, resizePriority);
 			ASSERT_ALWAYS(error == B_OK);
 				// Don't unlock the cache yet because we might have to resize it back.
@@ -991,15 +991,12 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 				// retrying.
 			}
 
-			cache->ReleaseRefLocked();
 			secondCache->ReleaseRefLocked();
 			addressSpace->ResizeArea(area, oldSize, allocationFlags);
 			free_etc(areaNewProtections, allocationFlags);
 			free_etc(secondAreaNewProtections, allocationFlags);
 			return error;
 		}
-
-		cache->ReleaseRefLocked();
 	} else {
 		// Reuse the existing cache.
 		error = map_backing_store(addressSpace, cache, secondCacheOffset,
