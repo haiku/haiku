@@ -135,7 +135,8 @@ enum {
 	kInsertAfter
 };
 
-const BPoint kTransparentDragThreshold(256, 192);
+const BPoint kTransparentDragThreshold(be_control_look->ComposeIconSize(256).Width(),
+	be_control_look->ComposeIconSize(192).Width());
 	// maximum size of the transparent drag bitmap, use a drag rect
 	// if larger in any direction
 
@@ -7578,6 +7579,9 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 
 	inner = inner & dragRect;
 
+	float fadeWidth = be_control_look->ComposeIconSize(64).Width();
+		// not an icon but make this bigger based on font-size
+
 	// If the selection is bigger than the specified limit, the
 	// contents will fade out when they come near the borders
 	bool fadeTop = false;
@@ -7586,19 +7590,19 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 	bool fadeRight = false;
 	bool fade = false;
 	if (inner.left > dragRect.left) {
-		inner.left = std::max(inner.left - 32, dragRect.left);
+		inner.left = std::max(inner.left - fadeWidth, dragRect.left);
 		fade = fadeLeft = true;
 	}
 	if (inner.right < dragRect.right) {
-		inner.right = std::min(inner.right + 32, dragRect.right);
+		inner.right = std::min(inner.right + fadeWidth, dragRect.right);
 		fade = fadeRight = true;
 	}
 	if (inner.top > dragRect.top) {
-		inner.top = std::max(inner.top - 32, dragRect.top);
+		inner.top = std::max(inner.top - fadeWidth, dragRect.top);
 		fade = fadeTop = true;
 	}
 	if (inner.bottom < dragRect.bottom) {
-		inner.bottom = std::min(inner.bottom + 32, dragRect.bottom);
+		inner.bottom = std::min(inner.bottom + fadeWidth, dragRect.bottom);
 		fade = fadeBottom = true;
 	}
 
@@ -7665,20 +7669,24 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 		uint32* bits = (uint32*)bitmap->Bits();
 		int32 width = bitmap->BytesPerRow() / 4;
 
-		if (fadeLeft)
-			FadeRGBA32Horizontal(bits, width, int32(rect.bottom), 0, 64);
-
-		if (fadeRight) {
-			FadeRGBA32Horizontal(bits, width, int32(rect.bottom),
-				int32(rect.right), int32(rect.right) - 64);
+		if (fadeLeft) {
+			FadeRGBA32Horizontal(bits, width, int32(rect.bottom), 0,
+				bitmap->Bounds().IntegerWidth());
 		}
 
-		if (fadeTop)
-			FadeRGBA32Vertical(bits, width, int32(rect.bottom), 0, 64);
+		if (fadeRight) {
+			FadeRGBA32Horizontal(bits, width, int32(rect.bottom), int32(rect.right),
+				int32(rect.right) - bitmap->Bounds().IntegerWidth());
+		}
+
+		if (fadeTop) {
+			FadeRGBA32Vertical(bits, width, int32(rect.bottom), 0,
+				bitmap->Bounds().IntegerHeight());
+		}
 
 		if (fadeBottom) {
-			FadeRGBA32Vertical(bits, width, int32(rect.bottom),
-				int32(rect.bottom), int32(rect.bottom) - 64);
+			FadeRGBA32Vertical(bits, width, int32(rect.bottom), int32(rect.bottom),
+				int32(rect.bottom) - bitmap->Bounds().IntegerHeight());
 		}
 	}
 
