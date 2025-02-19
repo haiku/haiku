@@ -7628,7 +7628,7 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 
 	view->SetDrawingMode(B_OP_ALPHA);
 	view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-	uint8 alpha = fade ? 164 : 128; // set the level of opacity by value
+	uint8 alpha = fade ? 164 : 192; // set the level of opacity by value
 	if (HighColor().IsDark())
 		view->SetHighColor(0, 0, 0, alpha);
 	else

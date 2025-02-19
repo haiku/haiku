@@ -670,7 +670,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 		} else if (clipboardMode == kMoveSelectionTo) {
 			drawView->SetDrawingMode(B_OP_ALPHA);
 			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-			uint8 alpha = 64; // set the level of opacity by value
+			uint8 alpha = 128; // set the level of opacity by value
 			if (drawView->LowColor().IsLight())
 				drawView->SetHighColor(0, 0, 0, alpha);
 			else
@@ -685,7 +685,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 	} else {
 		drawView->SetDrawingMode(B_OP_ALPHA);
 		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-		uint8 alpha = 128; // set the level of opacity by value
+		uint8 alpha = 192; // set the level of opacity by value
 		if (drawView->LowColor().IsLight())
 			drawView->SetHighColor(0, 0, 0, alpha);
 		else
