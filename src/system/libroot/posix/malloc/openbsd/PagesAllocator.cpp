@@ -208,7 +208,7 @@ public:
 			// (so they don't get reused for anything but the large allocation.)
 
 			locker.Detach();
-			return _UnmapLocked(chunk);
+			return _RemoveAndUnmapLocked(chunk, false);
 		}
 
 		if (fFree <= _FreeLimit()) {
@@ -220,10 +220,9 @@ public:
 
 		while (fFree > _FreeLimit()) {
 			FreeChunk* chunk = fChunksBySizeTree.FindMax();
-			status_t status = _UnmapLocked(chunk);
+			status_t status = _RemoveAndUnmapLocked(chunk);
 			if (status != B_OK)
 				return status;
-			mutex_lock(&fLock);
 		}
 
 		if (fFree > kLargestUsefulChunk && fFree > (_FreeLimit() / 2)
@@ -234,10 +233,9 @@ public:
 				if (chunk->size != kPageSize)
 					break;
 
-				status_t status = _UnmapLocked(chunk);
+				status_t status = _RemoveAndUnmapLocked(chunk);
 				if (status != B_OK)
 					return status;
-				mutex_lock(&fLock);
 			}
 		}
 
@@ -359,14 +357,34 @@ private:
 		return status;
 	}
 
-	status_t _UnmapLocked(FreeChunk* chunk)
+	status_t _RemoveAndUnmapLocked(FreeChunk* chunk, bool relock = true)
 	{
-		// TODO: We could use an inner lock here to avoid contention.
-		MutexLocker locker(fLock, true);
-
 		fChunksByAddressTree.Remove(chunk);
 		fChunksBySizeTree.Remove(chunk);
 		fFree -= chunk->size;
+
+		status_t status = _UnlockingUnmap(chunk);
+		if (relock)
+			mutex_lock(&fLock);
+		if (status != B_OK) {
+			if (!relock)
+				mutex_lock(&fLock);
+
+			// Unmap failed; reinsert the chunk.
+			fChunksByAddressTree.Insert(chunk);
+			fChunksBySizeTree.Insert(chunk);
+			fFree += chunk->size;
+
+			if (!relock)
+				mutex_unlock(&fLock);
+		}
+		return status;
+	}
+
+	status_t _UnlockingUnmap(FreeChunk* chunk)
+	{
+		// TODO: We could use an inner lock here to avoid contention.
+		MutexLocker locker(fLock, true);
 
 		const size_t size = chunk->size;
 		const addr_t address = (addr_t)chunk;
@@ -559,5 +577,10 @@ __free_pages(void* address, size_t length)
 		debugger("PagesAllocator: incorrectly sized free");
 
 	//fprintf(stderr, "FreePages! %p, 0x%x\n", address, (int)length);
-	return sPagesAllocator->FreePages(address, length);
+	sPagesAllocator->FreePages(address, length);
+
+	// Errors returned from FreePages() indicate problems unmapping memory;
+	// in case of failure the pages will always be added to the free lists.
+	// So we never tell callers about failures here.
+	return B_OK;
 }
