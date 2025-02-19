@@ -296,9 +296,7 @@ ScreenBlanker::QuitRequested()
 		bigtime_t minTime = fSettings.PasswordTime() - fSettings.BlankTime();
 		if (minTime == 0)
 			minTime = 5000000;
-		if (fImmediateLock)
-			minTime = -1;
-		if (system_time() - fBlankTime > minTime) {
+		if (fImmediateLock || system_time() - fBlankTime > minTime) {
 			_ShowPasswordWindow();
 			return false;
 		}
