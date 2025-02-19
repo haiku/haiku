@@ -636,6 +636,7 @@ void
 BPose::DrawTextWidget(BRect rect, BRect textRect, BTextWidget* widget,
 	BPoseView* poseView, BView* drawView, bool selected, uint32 clipboardMode, BPoint offset)
 {
+	bool direct = drawView == poseView;
 	bool windowActive = poseView->Window()->IsActive();
 	bool showSelectionWhenInactive = poseView->ShowSelectionWhenInactive();
 	bool isDrawingSelectionRect = poseView->IsDrawingSelectionRect();
@@ -652,12 +653,18 @@ BPose::DrawTextWidget(BRect rect, BRect textRect, BTextWidget* widget,
 			// invert colors to select label using "reverse video"
 			drawView->InvertRect(invertRect);
 		} else if (!windowActive && showSelectionWhenInactive) {
+			if (direct)
+				drawView->PushState();
+
 			// the selection rect is alpha-blended on top for inactive windows
 			drawView->InvertRect(invertRect);
 			drawView->SetDrawingMode(B_OP_BLEND);
 			drawView->SetHighColor(128, 128, 128, 255);
 			drawView->FillRect(invertRect);
 			drawView->SetDrawingMode(B_OP_OVER);
+
+			if (direct)
+				drawView->PopState();
 		}
 	}
 }
