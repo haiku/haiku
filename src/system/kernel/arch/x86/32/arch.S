@@ -77,22 +77,6 @@ FUNCTION(x86_get_stack_frame):
 	ret
 FUNCTION_END(x86_get_stack_frame)
 
-/* uint64 x86_read_msr(uint32 register); */
-FUNCTION(x86_read_msr):
-	movl	4(%esp), %ecx
-	rdmsr
-	ret
-FUNCTION_END(x86_read_msr)
-
-/* void x86_write_msr(uint32 register, uint64 value); */
-FUNCTION(x86_write_msr):
-	movl	4(%esp), %ecx
-	movl	8(%esp), %eax
-	movl	12(%esp), %edx
-	wrmsr
-	ret
-FUNCTION_END(x86_write_msr)
-
 /* void x86_context_switch(struct arch_thread* oldState,
 	struct arch_thread* newState); */
 FUNCTION(x86_context_switch):

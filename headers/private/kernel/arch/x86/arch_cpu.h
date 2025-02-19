@@ -697,9 +697,6 @@ void x86_page_fault_exception(iframe* iframe);
 
 void x86_swap_pgdir(addr_t newPageDir);
 
-uint64 x86_read_msr(uint32 registerNumber);
-void x86_write_msr(uint32 registerNumber, uint64 value);
-
 void x86_context_switch(struct arch_thread* oldState,
 	struct arch_thread* newState);
 

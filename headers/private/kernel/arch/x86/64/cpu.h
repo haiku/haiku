@@ -13,22 +13,6 @@ extern uint16 gFPUControlDefault;
 extern uint32 gFPUMXCSRDefault;
 
 
-static inline uint64_t
-x86_read_msr(uint32_t msr)
-{
-	uint64_t high, low;
-	asm volatile("rdmsr" : "=a" (low), "=d" (high) : "c" (msr));
-	return (high << 32) | low;
-}
-
-
-static inline void
-x86_write_msr(uint32_t msr, uint64_t value)
-{
-	asm volatile("wrmsr" : : "a" (value) , "d" (value >> 32), "c" (msr));
-}
-
-
 static inline void
 x86_context_switch(arch_thread* oldState, arch_thread* newState)
 {
