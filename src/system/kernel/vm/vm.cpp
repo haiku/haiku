@@ -968,14 +968,10 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		}
 
 		if (error == B_OK) {
-			// Since VMCache::Resize() can temporarily drop the lock, we must
-			// unlock all lower caches to prevent locking order inversion.
+			// We no longer need the lower cache locks (and they can't be held
+			// during the later Resize() anyway, since it could unlock temporarily.)
 			cacheChainLocker.Unlock(cache);
 			cacheChainLocker.SetTo(cache);
-			error = cache->Resize(cache->virtual_base + firstNewSize, resizePriority);
-			ASSERT_ALWAYS(error == B_OK);
-				// Don't unlock the cache yet because we might have to resize it back.
-				// (Or we might have to modify its commitment, if we have page_protections.)
 
 			// Map the second area.
 			error = map_backing_store(addressSpace, secondCache,
@@ -986,10 +982,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		}
 
 		if (error != B_OK) {
-			// Restore the original cache.
 			secondCache->committed_size -= commitmentStolen;
 			cache->committed_size += commitmentStolen;
-			cache->Resize(cache->virtual_base + oldSize, resizePriority);
 
 			// Move the pages back.
 			status_t readoptStatus = cache->Adopt(secondCache,
@@ -1010,6 +1004,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			free_etc(secondAreaNewProtections, allocationFlags);
 			return error;
 		}
+
+		error = cache->Resize(cache->virtual_base + firstNewSize, resizePriority);
+		ASSERT_ALWAYS(error == B_OK);
 	} else {
 		// Reuse the existing cache.
 		error = map_backing_store(addressSpace, cache, secondCacheOffset,
