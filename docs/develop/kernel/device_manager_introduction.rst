@@ -1,5 +1,5 @@
 Device Driver Architecture
-==================================================
+==========================
 
 This document tries to give you a short introduction into the new device
 manager, and how to write drivers for it. Haiku still supports the
@@ -8,8 +8,8 @@ legacy device driver architecture introduced with BeOS.
 The new device driver architecture of Haiku is still a moving target,
 although most of its details are already specificed.
 
-1. The Basics
--------------
+The Basics
+----------
 
 The device manager functionality builds upon *device_node* objects.
 Every driver in the system publishes one or more of such nodes, building
@@ -35,8 +35,8 @@ bus.
 Every driver can also publish a device in */dev* for communication with
 userland applications. All drivers and devices are kernel modules.
 
-2. Exploring the Device Tree
-----------------------------
+Exploring the Device Tree
+-------------------------
 
 So how does it all work? When building the initial device tree, the
 system only explores a minimum of device drivers only, resulting in a
@@ -64,8 +64,8 @@ directories "disk", "ports", and "bus", which will also allow to search
 matching drivers in "busses". While this is relatively limited, it is a
 good way to cut down the number of drivers to be loaded.
 
-3. Writing a Driver
--------------------
+Writing a Driver
+----------------
 
 The device manager assumes the following API from a driver module:
 
@@ -128,8 +128,8 @@ either have dynamic children or fixed children, never both. Also, fixed
 children are registered before **register_child_devices()** is called,
 while dynamic children are registered afterwards.
 
-4. Publishing a Device
-----------------------
+Publishing a Device
+-------------------
 
 To publish a device entry in the device file system under */dev*, all
 your driver has to do is to call the
@@ -176,8 +176,8 @@ A device module must export the following API:
 -  **select()**
 -  **deselect()**
 
-5. Writing a Bus Driver
------------------------
+Writing a Bus Driver
+--------------------
 
 A bus driver is a driver that represents a bus where one or more
 arbitrary devices can be attached to.
@@ -192,8 +192,8 @@ exploration makes use of additional information the bus can provide in
 order to find a responsible device driver faster, and with less
 overhead.
 
-5.1. Writing an Intelligent Bus Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Writing an Intelligent Bus Driver
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If your bus knows what type of device is attached to, and also has
 vendor and device ID information about that device, it is considered to
@@ -253,21 +253,21 @@ drivers that do not relate to a physical device: /dev/null, /dev/zero,
 /dev/random, etc. A "generic" bus has been added, and these drivers can
 attach to it.
 
-6. Open Issues
---------------
+Open Issues
+-----------
 
 While most of the new device manager is fledged out, there are some
 areas that could use improvements or are problematic under certain
 requirements. Also, some parts just haven't been written yet.
 
-6.1. generic/simple busses
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+generic/simple busses
+^^^^^^^^^^^^^^^^^^^^^
 
-6.2. Unpublishing
-^^^^^^^^^^^^^^^^^
+Unpublishing
+^^^^^^^^^^^^
 
-6.4. Versioning
-^^^^^^^^^^^^^^^
+Versioning
+^^^^^^^^^^
 
 The way the device manager works, it makes versioning of modules (which
 are supposed to be one of the strong points of the module system) much
@@ -283,17 +283,17 @@ supports. We would then need a **request_version()** or
 that allows to specify the version of the parent node this device node
 wants to talk to.
 
-6.5. Unregistering Nodes
-^^^^^^^^^^^^^^^^^^^^^^^^
+Unregistering Nodes
+^^^^^^^^^^^^^^^^^^^
 
-6.6. Support for generic drivers is missing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Support for generic drivers is missing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This should probably be done by simply adding a simple bus driver named
 "generic" that generic drivers need to ask for.
 
-6.7. Mappings, And Other Optimizations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mappings, And Other Optimizations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Due to the way the device tree is built, the device manager could
 remember which driver served a given device node. That way, it wouldn't

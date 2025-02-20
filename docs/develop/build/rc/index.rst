@@ -1,5 +1,5 @@
 The rc resource compiler
-====================
+========================
 
 .. toctree::
 
