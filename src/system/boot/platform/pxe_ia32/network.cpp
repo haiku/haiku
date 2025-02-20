@@ -433,7 +433,7 @@ TFTP::ReceiveFile(const char* fileName, uint8** data, size_t* size)
 	// allocate memory for the data
 	uint8* fileData = NULL;
 	if (platform_allocate_region((void**)&fileData, fileSize,
-			B_READ_AREA | B_WRITE_AREA, false) != B_OK) {
+			B_READ_AREA | B_WRITE_AREA) != B_OK) {
 		TRACE(("TFTP: allocating memory for file data failed\n"));
 		return B_NO_MEMORY;
 	}

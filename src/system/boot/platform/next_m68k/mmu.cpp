@@ -136,8 +136,7 @@ mmu_init(void)
 
 
 extern "C" status_t
-platform_allocate_region(void **_address, size_t size, uint8 protection,
-	bool /*exactAddress*/)
+platform_allocate_region(void **_address, size_t size, uint8 protection)
 {
 	return B_UNSUPPORTED;
 }

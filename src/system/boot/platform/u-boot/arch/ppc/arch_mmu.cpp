@@ -350,8 +350,7 @@ mmu_init(void* fdt)
 
 
 extern "C" status_t
-platform_allocate_region(void **_address, size_t size, uint8 protection,
-	bool /*exactAddress*/)
+platform_allocate_region(void **_address, size_t size, uint8 protection)
 {
 	TRACE(("platform_allocate_region(&%p, %zd)\n", *_address, size));
 

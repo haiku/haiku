@@ -297,13 +297,9 @@ GetSatp()
 //	#pragma mark -
 
 extern "C" status_t
-platform_allocate_region(void** address, size_t size, uint8 protection,
-	bool exactAddress)
+platform_allocate_region(void** address, size_t size, uint8 protection)
 {
 	size = ROUNDUP(size, B_PAGE_SIZE);
-
-	if (exactAddress)
-		return B_ERROR;
 
 	ObjectDeleter<MemoryRegion> region(new(std::nothrow) MemoryRegion());
 	if (!region.IsSet())
@@ -417,8 +413,7 @@ mmu_init_for_kernel(addr_t& satp)
 	void* stack_address = NULL;
 	if (platform_allocate_region(&stack_address,
 		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE,
-		B_READ_AREA | B_WRITE_AREA, false)
-		!= B_OK) {
+		B_READ_AREA | B_WRITE_AREA) != B_OK) {
 		panic("Unabled to allocate a stack");
 	}
 	gKernelArgs.cpu_kstack[0].start = fix_address((addr_t)stack_address);

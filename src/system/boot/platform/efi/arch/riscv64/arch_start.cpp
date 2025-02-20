@@ -48,7 +48,7 @@ arch_start_kernel(addr_t kernelEntry)
 	// Allocate virtual memory for kernel args
 	struct kernel_args *kernelArgs = NULL;
 	if (platform_allocate_region((void **)&kernelArgs,
-			sizeof(struct kernel_args), 0, false) != B_OK)
+			sizeof(struct kernel_args), 0) != B_OK)
 		panic("Failed to allocate kernel args.");
 
 	addr_t virtKernelArgs;

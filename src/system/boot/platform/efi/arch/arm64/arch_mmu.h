@@ -240,7 +240,7 @@ public:
 		uint64* page = NULL;
 #if 0
 		// BUG: allocation here overlaps assigned memory ...
-		if (platform_allocate_region((void **)&page, size, 0, false) == B_OK) {
+		if (platform_allocate_region((void **)&page, size, 0) == B_OK) {
 #else
 		// TODO: luckly size == B_PAGE_SIZE == 4KB ...
 		page = reinterpret_cast<uint64*>(mmu_allocate_page());

@@ -27,7 +27,7 @@ platform_allocate_heap_region(size_t size, void **_base)
 
 	*_base = NULL;
 	status_t error = platform_allocate_region(_base, size,
-		B_READ_AREA | B_WRITE_AREA, false);
+		B_READ_AREA | B_WRITE_AREA);
 	if (error != B_OK)
 		return error;
 

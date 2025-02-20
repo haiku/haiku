@@ -87,7 +87,7 @@ allocate_ring_buffer(void)
 	void* buffer = NULL;
 	size_t size = 1024 * 1024;
 
-	if (platform_allocate_region(&buffer, size, 0, false) != B_OK)
+	if (platform_allocate_region(&buffer, size, 0) != B_OK)
 		return;
 
 	sDebugSyslogBuffer = create_ring_buffer_etc(buffer, size, 0);

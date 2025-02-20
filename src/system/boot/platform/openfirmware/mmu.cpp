@@ -12,14 +12,13 @@
 
 
 status_t
-platform_allocate_region(void **_address, size_t size, uint8 protection,
-	bool exactAddress)
+platform_allocate_region(void **_address, size_t size, uint8 protection)
 {
 	if (size == 0)
 		return B_BAD_VALUE;
 
 	void *address = arch_mmu_allocate(*_address, size, protection,
-		exactAddress);
+		false);
 	if (address == NULL)
 		return B_NO_MEMORY;
 

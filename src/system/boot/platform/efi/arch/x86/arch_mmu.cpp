@@ -97,7 +97,7 @@ arch_mmu_init_gdt(gdt_idt_descr &bootGDTDescriptor)
 	segment_descriptor *bootGDT = NULL;
 
 	if (platform_allocate_region((void **)&bootGDT,
-			BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor), 0, false) != B_OK) {
+			BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor), 0) != B_OK) {
 		panic("Failed to allocate GDT.\n");
 	}
 
@@ -224,7 +224,7 @@ static void
 arch_mmu_allocate_page_directory(void)
 {
 	if (platform_allocate_region((void **)&sPageDirectory,
-			B_PAGE_SIZE + ALIGN_PAGEDIR, 0, false) != B_OK)
+			B_PAGE_SIZE + ALIGN_PAGEDIR, 0) != B_OK)
 		panic("Failed to allocate page directory.");
 	sPageDirectory = (uint32_t *)ROUNDUP((uint32_t)sPageDirectory, ALIGN_PAGEDIR);
 	memset(sPageDirectory, 0, B_PAGE_SIZE);

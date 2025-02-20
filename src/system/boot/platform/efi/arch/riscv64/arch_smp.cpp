@@ -189,9 +189,9 @@ arch_smp_init_other_cpus(void)
 		void * stack = NULL;
 		const size_t size = KERNEL_STACK_SIZE
 			+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
-		if (platform_allocate_region(&stack, size, 0, false) != B_OK) {
+		if (platform_allocate_region(&stack, size, 0) != B_OK)
 			panic("Unable to allocate AP stack");
-		}
+
 		memset(stack, 0, size);
 		gKernelArgs.cpu_kstack[i].start = fix_address((uint64_t)stack);
 		gKernelArgs.cpu_kstack[i].size = size;

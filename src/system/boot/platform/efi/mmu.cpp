@@ -42,7 +42,9 @@ struct memory_region {
 };
 
 
-static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + 32 * 1024 * 1024;
+static const size_t kMaxKernelSize = 0x2000000;		// 32 MB
+static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
+
 static memory_region *allocated_regions = NULL;
 
 
@@ -91,24 +93,14 @@ get_current_virtual_address()
 // addresses to kernel addresses.
 
 extern "C" status_t
-platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
-	bool exactAddress)
+platform_allocate_region(void **_address, size_t size, uint8 protection)
 {
 	TRACE("%s: called\n", __func__);
 
-	efi_physical_addr addr;
 	size_t pages = ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE;
-	efi_status status;
-
-	if (exactAddress) {
-		addr = (efi_physical_addr)(addr_t)*_address;
-		status = kBootServices->AllocatePages(AllocateAddress,
-			EfiLoaderData, pages, &addr);
-	} else {
-		addr = 0;
-		status = kBootServices->AllocatePages(AllocateAnyPages,
-			EfiLoaderData, pages, &addr);
-	}
+	efi_physical_addr addr = 0;
+	efi_status status = kBootServices->AllocatePages(AllocateAnyPages,
+		EfiLoaderData, pages, &addr);
 
 	if (status != EFI_SUCCESS)
 		return B_NO_MEMORY;
@@ -121,19 +113,28 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 
 	memory_region *region = new(std::nothrow) memory_region {
 		next: allocated_regions,
-#ifdef __riscv
-		// Disables allocation at fixed virtual address
 		vaddr: 0,
-#else
-		vaddr: *_address == NULL ? 0 : (addr_t)*_address,
-#endif
 		paddr: (phys_addr_t)addr,
-		size: size
+		size: size,
 	};
 
 	if (region == NULL) {
 		kBootServices->FreePages(addr, pages);
 		return B_NO_MEMORY;
+	}
+
+	if (*_address != NULL) {
+		// This is only useful for mapping the kernel itself.
+		// Validate base and size, but don't check for duplicates.
+		addr_t virtualAddress = (addr_t)*_address;
+		if (virtualAddress < KERNEL_LOAD_BASE
+				|| (virtualAddress + size) > (KERNEL_LOAD_BASE + kMaxKernelSize)) {
+			kBootServices->FreePages(addr, pages);
+			delete region;
+			return B_BAD_VALUE;
+		}
+
+		region->vaddr = virtualAddress;
 	}
 
 #ifdef TRACE_MMU
@@ -146,11 +147,11 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 
 
 extern "C" status_t
-platform_allocate_lomem(void **_address, size_t size)
+platform_allocate_region_below(void **_address, size_t size, phys_addr_t maxAddress)
 {
 	TRACE("%s: called\n", __func__);
 
-	efi_physical_addr addr = KERNEL_LOAD_BASE - B_PAGE_SIZE;
+	efi_physical_addr addr = maxAddress;
 	size_t pages = ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE;
 	efi_status status = kBootServices->AllocatePages(AllocateMaxAddress,
 		EfiLoaderData, pages, &addr);
@@ -159,7 +160,7 @@ platform_allocate_lomem(void **_address, size_t size)
 
 	memory_region *region = new(std::nothrow) memory_region {
 		next: allocated_regions,
-		vaddr: (addr_t)addr,
+		vaddr: 0,
 		paddr: (phys_addr_t)addr,
 		size: size
 	};
@@ -235,6 +236,29 @@ convert_physical_ranges()
 
 
 extern "C" status_t
+platform_assign_kernel_address_for_region(void *address, addr_t assign)
+{
+	// Double cast needed to avoid sign extension issues on 32-bit architecture
+	phys_addr_t addr = (phys_addr_t)(addr_t)address;
+
+	for (memory_region *region = allocated_regions; region;
+			region = region->next) {
+		if (region->paddr <= addr && addr < region->paddr + region->size) {
+			if (region->paddr != addr)
+				return EINVAL;
+			if (region->vaddr != 0)
+				return EALREADY;
+
+			region->vaddr = assign;
+			return B_OK;
+		}
+	}
+
+	return B_ERROR;
+}
+
+
+extern "C" status_t
 platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
 {
 	TRACE("%s: called\n", __func__);
@@ -249,9 +273,9 @@ platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
 			region = region->next) {
 		if (region->paddr <= addr && addr < region->paddr + region->size) {
 			// Lazily allocate virtual memory.
-			if (region->vaddr == 0) {
+			if (region->vaddr == 0)
 				region->vaddr = get_next_virtual_address(region->size);
-			}
+
 			*_result = region->vaddr + (addr - region->paddr);
 			//dprintf("Converted bootloader address %p in region %#lx-%#lx to %#lx\n",
 			//	address, region->paddr, region->paddr + region->size, *_result);

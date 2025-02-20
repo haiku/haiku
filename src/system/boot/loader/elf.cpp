@@ -81,7 +81,7 @@ struct ELF32Class {
 		void** _mappedAddress)
 	{
 		status_t status = platform_allocate_region((void**)_address, size,
-			protection, false);
+			protection);
 		if (status != B_OK)
 			return status;
 
@@ -139,8 +139,7 @@ struct ELF64Class {
 		void* address = (void*)*_address;
 #endif
 
-		status_t status = platform_allocate_region(&address, size, protection,
-			false);
+		status_t status = platform_allocate_region(&address, size, protection);
 		if (status != B_OK)
 			return status;
 

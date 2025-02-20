@@ -26,7 +26,7 @@ extern void platform_free_heap_region(void *_base, size_t size);
 
 /* MMU/memory functions */
 extern status_t platform_allocate_region(void **_virtualAddress, size_t size,
-	uint8 protection, bool exactAddress);
+	uint8 protection);
 extern status_t platform_free_region(void *address, size_t size);
 extern status_t platform_bootloader_address_to_kernel_address(void *address, addr_t *_result);
 extern status_t platform_kernel_address_to_bootloader_address(addr_t address, void **_result);

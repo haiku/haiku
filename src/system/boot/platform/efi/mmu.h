@@ -41,13 +41,16 @@ bool mmu_next_region(void** cookie, addr_t* vaddr, phys_addr_t* paddr, size_t* s
 extern addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
 	uint32 flags);
 
+extern status_t platform_assign_kernel_address_for_region(void *address, addr_t assign);
+
 extern status_t platform_kernel_address_to_bootloader_address(addr_t address,
 	void **_result);
 
 extern status_t platform_bootloader_address_to_kernel_address(void *address,
 	addr_t *_result);
 
-extern status_t platform_allocate_lomem(void **_address, size_t size);
+extern status_t platform_allocate_region_below(void **_address,
+	size_t size, phys_addr_t maxAddress);
 
 #ifdef __cplusplus
 }

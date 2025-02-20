@@ -201,7 +201,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 
 	// Allocate the top level PML4.
 	pml4 = NULL;
-	if (platform_allocate_region((void**)&pml4, B_PAGE_SIZE, 0, false) != B_OK)
+	if (platform_allocate_region((void**)&pml4, B_PAGE_SIZE, 0) != B_OK)
 		panic("Failed to allocate PML4.");
 	gKernelArgs.arch_args.phys_pgdir = (uint32_t)(addr_t)pml4;
 	memset(pml4, 0, B_PAGE_SIZE);
