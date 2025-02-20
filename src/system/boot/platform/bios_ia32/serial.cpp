@@ -34,12 +34,19 @@ static const uint32 kSerialBaudRate = 115200;
 static int32 sSerialEnabled = 0;
 static uint16 sSerialBasePort = 0x3f8;
 
+
 static void
 serial_putc(char c)
 {
 	// wait until the transmitter empty bit is set
-	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
-		asm volatile ("pause;");
+	int32 timeout = 256 * 1024;
+	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0) {
+		if (--timeout == 0) {
+			sSerialEnabled = 0;
+			return;
+		}
+		asm volatile ("pause");
+	}
 
 	out8(c, sSerialBasePort + SERIAL_TRANSMIT_BUFFER);
 }

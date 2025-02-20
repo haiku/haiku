@@ -63,11 +63,11 @@ static uint32 sSerialBaudRate = 115200;
 static uint16 sSerialBasePort = 0x3f8;
 	// COM1 is the default debug output port
 
-static bool sKeyboardHandlerInstalled = false;
-
 static spinlock sSerialOutputSpinlock = B_SPINLOCK_INITIALIZER;
-
 static int32 sEarlyBootMessageLock = 0;
+static bool sSerialTimedOut = false;
+
+static bool sKeyboardHandlerInstalled = false;
 
 
 static void
@@ -89,8 +89,14 @@ static void
 put_char(const char c)
 {
 	// wait until the transmitter empty bit is set
-	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
-		asm volatile ("pause;");
+	int32 timeout = 256 * 1024;
+	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0) {
+		if (--timeout == 0) {
+			sSerialTimedOut = true;
+			return;
+		}
+		asm volatile ("pause");
+	}
 
 	out8(c, sSerialBasePort + SERIAL_TRANSMIT_BUFFER);
 }
@@ -375,6 +381,9 @@ _arch_debug_serial_putchar(const char c)
 void
 arch_debug_serial_putchar(const char c)
 {
+	if (sSerialTimedOut)
+		return;
+
 	cpu_status state = 0;
 	if (!debug_debugger_running()) {
 		state = disable_interrupts();
@@ -403,6 +412,9 @@ arch_debug_serial_puts_locked(const char *string)
 void
 arch_debug_serial_puts(const char *s)
 {
+	if (sSerialTimedOut)
+		return;
+
 	cpu_status state = 0;
 	if (!debug_debugger_running()) {
 		state = disable_interrupts();
@@ -421,6 +433,9 @@ arch_debug_serial_puts(const char *s)
 void
 arch_debug_serial_early_boot_message(const char *string)
 {
+	if (sSerialTimedOut)
+		return;
+
 	// this function will only be called in fatal situations
 	// ToDo: also enable output via text console?!
 
@@ -494,6 +509,7 @@ arch_debug_console_init_settings(kernel_args *args)
 		return B_OK;
 
 	init_serial_port(basePort, baudRate);
+	sSerialTimedOut = false;
 
 	return B_OK;
 }

@@ -60,7 +60,8 @@ serial_putc(char ch)
 	// this can happen when serial_io is unavailable, or EFI
 	// is exiting
 	if (gUART != NULL) {
-		gUART->PutChar(ch);
+		if (gUART->PutChar(ch) < 0)
+			gUART = NULL;
 		return;
 	}
 }
