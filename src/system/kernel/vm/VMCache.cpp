@@ -952,7 +952,7 @@ VMCache::WaitForPageEvents(vm_page* page, uint32 events, bool relock)
 }
 
 
-/*!	Makes this case the source of the \a consumer cache,
+/*!	Makes this cache the source of the \a consumer cache,
 	and adds the \a consumer to its list.
 	This also grabs a reference to the source cache.
 	Assumes you have the cache and the consumer's lock held.
