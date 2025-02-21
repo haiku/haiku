@@ -82,3 +82,4 @@
 	a thread to wait for a specific condition, which is notified by another thread. This is
 	similar to the use of semaphores outlined above, but provides an easier way to handle race
 	conditions, spurious wakeups, and so on.
+*/
