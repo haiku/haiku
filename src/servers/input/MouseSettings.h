@@ -68,7 +68,7 @@ class MouseSettings {
 		const mouse_settings* GetSettings() { return &fSettings; }
 
 	private:
-		void _AssureValidMapping();
+		void _EnsureValidMapping();
 
 	private:
 		mouse_settings	fSettings;

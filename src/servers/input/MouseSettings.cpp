@@ -42,7 +42,7 @@ MouseSettings::MouseSettings(const mouse_settings* originalSettings)
 
 		if (MouseType() < 1 || MouseType() > B_MAX_MOUSE_BUTTONS)
 			SetMouseType(kDefaultMouseType);
-		_AssureValidMapping();
+		_EnsureValidMapping();
 	}
 
 #ifdef DEBUG
@@ -185,7 +185,7 @@ MouseSettings::SetMapping(int32 index, uint32 button)
 		return;
 
 	fSettings.map.button[index] = button;
-	_AssureValidMapping();
+	_EnsureValidMapping();
 }
 
 
@@ -193,12 +193,12 @@ void
 MouseSettings::SetMapping(mouse_map &map)
 {
 	fSettings.map = map;
-	_AssureValidMapping();
+	_EnsureValidMapping();
 }
 
 
 void
-MouseSettings::_AssureValidMapping()
+MouseSettings::_EnsureValidMapping()
 {
 	bool hasPrimary = false;
 
