@@ -45,7 +45,7 @@ static const Translation kTranslations[] = {
 		"Paco Rivière\n"
 		"jare\n"
 	},
-	{ "zh",
+	{ "zh_Hans",
 		"Dong Guangyu\n"
 		"Pengfei Han (kurain)\n"
 		"Don Liu\n"
@@ -55,6 +55,10 @@ static const Translation kTranslations[] = {
 		"dgy18787\n"
 		"hlwork\n"
 		"raphino\n"
+	},
+	{ "zh_Hant",
+		"daniel03663\n"
+		"edouardlicn\n"
 	},
 	{ "hr",
 		"Ivica Kolić\n" // Pootle: zvacet
@@ -271,11 +275,10 @@ static const Translation kTranslations[] = {
 		"thebowseat\n"
 		"The JPBE.net user group\n"
 	},
-#if 0
 	{ "ko",
+		"Jinuk Jung\n"
 		"soul.lee\n"
 	},
-#endif
 	{ "lt",
 		"Algirdas Buckus\n"
 		"Simonas Kazlauskas\n" //nagisa
