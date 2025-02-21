@@ -194,14 +194,15 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	uint32_t descriptor_version)
 {
 	// Generate page tables, matching bios_ia32/long.cpp.
-	uint64_t *pml4;
 	uint64_t *pdpt;
 	uint64_t *pageDir;
 	uint64_t *pageTable;
 
 	// Allocate the top level PML4.
-	pml4 = NULL;
-	if (platform_allocate_region((void**)&pml4, B_PAGE_SIZE, 0) != B_OK)
+	// (It needs to be below 4GB, as phys_pgdr is a uint32,
+	// and the SMP trampoline loads it in 32-bit mode.)
+	uint64_t *pml4 = NULL;
+	if (platform_allocate_region_below((void**)&pml4, B_PAGE_SIZE, UINT32_MAX) != B_OK)
 		panic("Failed to allocate PML4.");
 	gKernelArgs.arch_args.phys_pgdir = (uint32_t)(addr_t)pml4;
 	memset(pml4, 0, B_PAGE_SIZE);
