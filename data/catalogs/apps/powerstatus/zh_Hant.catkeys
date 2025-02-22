@@ -1,11 +1,50 @@
-1	english	x-vnd.Haiku-PowerStatus	75311023
+1	english	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		在視窗中運行
+Extended battery info	PowerStatus		擴展電池資訊
 Show status icon	PowerStatus		顯示狀態圖示
+Battery charging	PowerStatus		電池正在充電
 Design capacity low warning: 	PowerStatus		設計容量低警告：
+The battery level is critical, please plug in the device immediately.	PowerStatus		電池電量已處於告急狀態，請立即為設備插上電源。
+non-rechargeable	PowerStatus		不可充電
+Last full charge: 	PowerStatus		上次完全充電時間：
+ mV	PowerStatus		毫伏
+Current rate: 	PowerStatus		當前速率：
+Show text label	PowerStatus		顯示文字標籤
 Quit	PowerStatus		退出
+Battery not charging	PowerStatus		電池未在充電
+Battery low	PowerStatus		電量低
+Model number: 	PowerStatus		型號：
+Battery unused	PowerStatus		電池未使用
+Type: 	PowerStatus		類型：
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		您可以在視窗中執行 PowerStatus 或將其安裝在Deskbar中。
+Damaged or missing battery	PowerStatus		電池損壞或缺失
+ mAh	PowerStatus		毫安時
+Battery discharging	PowerStatus		電池正在放電
+Design voltage: 	PowerStatus		設計電壓：
+discharging	PowerStatus		放電中
+rechargeable	PowerStatus		可充電
+Battery info…	PowerStatus		電池資訊…
+Show time	PowerStatus		顯示時間
+ mA	PowerStatus		毫安
 About…	PowerStatus		關於…
+Serial number: 	PowerStatus		序號：
+Battery critical	PowerStatus		電池電量告急
+Capacity: 	PowerStatus		容量：
+ mW	PowerStatus		毫瓦
 No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		未偵測到支援的電池。 PowerStatus 無法在您的系統上使用。
+Show percent	PowerStatus		顯示百分比
+Capacity granularity 1: 	PowerStatus		容量粒度 1：
+The battery level is getting low, please plug in the device.	PowerStatus		電池電量正在降低，請為設備插上電源。
 Design capacity warning: 	PowerStatus		設計容量警告：
+Capacity granularity 2: 	PowerStatus		容量粒度 2：
+Too bad!	PowerStatus		太糟糕了！
+Technology: 	PowerStatus		技術：
+not charging	PowerStatus		未在充電
+ mWh	PowerStatus		毫瓦時
 PowerStatus	System name		能源狀態
+Design capacity: 	PowerStatus		設計容量：
+OEM info: 	PowerStatus		OEM資訊：
+no battery	PowerStatus		無電池
+Empty battery slot	PowerStatus		電池插槽空閒
 Install in Deskbar	PowerStatus		安裝在Deskbar
+charging	PowerStatus		充電中

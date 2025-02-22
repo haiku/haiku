@@ -1,28 +1,27 @@
-1	slovak	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Nebolo možné načítať šetrič obrazovky
-30 seconds	ScreenSaver		30 sekúnd
-Start screensaver	ScreenSaver		Spustiť šetrič obrazovky
-Password…	ScreenSaver		Heslo…
-Password:	ScreenSaver		Heslo:
-Password lock	ScreenSaver		Zamknutie heslom
-Screensavers	ScreenSaver		Šetriče obrazovky
+1	slovak	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling nie je dostupný
-ScreenSaver	System name		Šetrič obrazovky
-Test	ScreenSaver		Test
-General	ScreenSaver		Všeobecné
+Blackness	ScreenSaver		Čiernota
 Fade now when mouse is here	ScreenSaver		Skryť teraz, keď myš je tu
+Screensavers	ScreenSaver		Šetriče obrazovky
 Enable screensaver	ScreenSaver		Zapnúť šetrič obrazovky
+Passwords don't match. Please try again.	ScreenSaver		Heslá sa nezhodujú. Prosím, skúste to znova.
+30 seconds	ScreenSaver		30 sekúnd
+No options available	ScreenSaver		Žiadne dostupné možnosti
+ScreenSaver	System name		Šetrič obrazovky
 Don't fade when mouse is here	ScreenSaver		Neskrývať, keď myš je tu
 Cancel	ScreenSaver		Zrušiť
-Turn off screen	ScreenSaver		Vypnúť obrazovku
-No options available	ScreenSaver		Žiadne dostupné možnosti
-Password Window	ScreenSaver		Okno s heslom
+Password:	ScreenSaver		Heslo:
 Screensaver settings	ScreenSaver		Nastavenia šetriča obrazovky
-Passwords don't match. Please try again.	ScreenSaver		Heslá sa nezhodujú. Prosím, skúste to znova.
-OK	ScreenSaver		OK
-Blackness	ScreenSaver		Čiernota
+Password Window	ScreenSaver		Okno s heslom
+Test	ScreenSaver		Test
+Could not load screen saver	ScreenSaver		Nebolo možné načítať šetrič obrazovky
 Use custom password	ScreenSaver		Použiť vlastné heslo
-Done	ScreenSaver		Hotovo
+Password…	ScreenSaver		Heslo…
 Confirm password:	ScreenSaver		Potvrďte heslo:
+Turn off screen	ScreenSaver		Vypnúť obrazovku
+Password lock	ScreenSaver		Zamknutie heslom
+OK	ScreenSaver		OK
+Done	ScreenSaver		Hotovo
+Start screensaver	ScreenSaver		Spustiť šetrič obrazovky
 No preview available	PreviewView		Náhľad nie je k dispozícii
-Use network password	ScreenSaver		Použiť sieťové heslo
+General	ScreenSaver		Všeobecné

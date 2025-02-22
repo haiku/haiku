@@ -36,7 +36,7 @@ Drives	DrivesPage	Title	驅動器
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		偵測到以下分區。請選取要包含在啟動選單中的分割區旁邊的方塊。您也可以設定分割區的名稱，因為您希望它們出現在啟動選單中。
 After five seconds	DefaultPartitionPage		五秒後
 Timeout: %s	DefaultPartitionPage		超時：%s
-The Master Boot Record could not be restored!	BootManagerController		主引導記錄無法恢復！
+The Master Boot Record could not be restored!	BootManagerController		主引導記錄無法恢復!
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		第一個硬碟的分區表與啟動管理器不相容。\n引導管理器僅適用於 IBM PC MBR 分割區。
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		請選擇您想要安裝或解除安裝管理器的磁碟機。
 After four seconds	DefaultPartitionPage		四秒後

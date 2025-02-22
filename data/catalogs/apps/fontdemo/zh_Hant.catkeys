@@ -1,4 +1,6 @@
-1	english	x-vnd.Haiku-FontDemo	748721981
+1	english	x-vnd.Haiku-FontDemo	2900237220
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Font:	ControlView		字體：
 Haiku, Inc.	ControlView		Haiku, Inc.
+Text:	ControlView		文字：
+Size: %d	ControlView		大小： %d

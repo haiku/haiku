@@ -1,7 +1,8 @@
-1	english	x-vnd.haiku-screenshot-cli	1581028193
+1	english	x-vnd.haiku-screenshot-cli	3958461128
 Include window border	ScreenshotWindow		包括視窗邊框
 Overwrite	ScreenshotWindow		取代
 Save in:	ScreenshotWindow		存儲到：
+Error saving \"%s\":\n\t%s	ScreenshotWindow		錯誤儲存 \"%s\":\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		該檔案已存在。\n您確定要覆蓋它嗎？
 OK	ScreenshotWindow		確認
 The destination path exists but is not a folder.	ScreenshotWindow		目標路徑存在，但不是資料夾。
@@ -11,6 +12,7 @@ seconds	ScreenshotWindow		秒
 New screenshot	ScreenshotWindow		新截圖
 Screenshot	System name		螢幕截圖
 Desktop	ScreenshotWindow		桌面
+Artwork folder	ScreenshotWindow		美術資料夾
 Translator Settings	ScreenshotWindow		翻譯器設定
 Include mouse pointer	ScreenshotWindow		包含滑鼠指標
 overwrite	ScreenshotWindow		取代

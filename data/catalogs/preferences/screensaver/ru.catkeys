@@ -1,28 +1,27 @@
-1	russian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Не удалось загрузить заставку
-30 seconds	ScreenSaver		30 секунд
-Start screensaver	ScreenSaver		Запускать заставку через
-Password…	ScreenSaver		Пароль…
-Password:	ScreenSaver		Пароль:
-Password lock	ScreenSaver		Требовать пароль через
-Screensavers	ScreenSaver		Заставки
+1	russian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Недоступна DPMS (система сигналов управления энергопотреблением монитора)
-ScreenSaver	System name		Хранитель экрана
-Test	ScreenSaver		Просмотр
-General	ScreenSaver		Общие
+Blackness	ScreenSaver		Пустой экран
 Fade now when mouse is here	ScreenSaver		Включать заставку, когда мышь находится здесь
+Screensavers	ScreenSaver		Заставки
 Enable screensaver	ScreenSaver		Включить заставку
+Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
+30 seconds	ScreenSaver		30 секунд
+No options available	ScreenSaver		Нет доступных настроек
+ScreenSaver	System name		Хранитель экрана
 Don't fade when mouse is here	ScreenSaver		Не включать заставку, когда мышь находится здесь
 Cancel	ScreenSaver		Отмена
-Turn off screen	ScreenSaver		Выключать экран через
-No options available	ScreenSaver		Нет доступных настроек
-Password Window	ScreenSaver		Окно пароля
+Password:	ScreenSaver		Пароль:
 Screensaver settings	ScreenSaver		Настройки заставки
-Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
-OK	ScreenSaver		ОК
-Blackness	ScreenSaver		Пустой экран
+Password Window	ScreenSaver		Окно пароля
+Test	ScreenSaver		Просмотр
+Could not load screen saver	ScreenSaver		Не удалось загрузить заставку
 Use custom password	ScreenSaver		Использовать выбранный пароль
-Done	ScreenSaver		Готово
+Password…	ScreenSaver		Пароль…
 Confirm password:	ScreenSaver		Подтверждение пароля:
+Turn off screen	ScreenSaver		Выключать экран через
+Password lock	ScreenSaver		Требовать пароль через
+OK	ScreenSaver		ОК
+Done	ScreenSaver		Готово
+Start screensaver	ScreenSaver		Запускать заставку через
 No preview available	PreviewView		Предварительный просмотр недоступен
-Use network password	ScreenSaver		Использовать сетевой пароль
+General	ScreenSaver		Общие

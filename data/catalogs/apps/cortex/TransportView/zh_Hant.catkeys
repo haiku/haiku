@@ -1,4 +1,22 @@
-1	english	application/x-vnd.Cortex.TransportView	2491954516
+1	english	application/x-vnd.Cortex.TransportView	3726010288
+Roll	TransportView		捲動
 (none)	TransportView		(無)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# 節點} other{# 節點}}
+Start	TransportView		開始
 No errors.	TransportView		無錯誤。
+to	TransportView		到
+Offline	TransportView		離線
 Stop	TransportView		停止
+(no group)	TransportView		(無群組)
+Drop data	TransportView		捨棄資料
+To:	TransportView		至：
+Recording	TransportView		錄製
+Increase latency	TransportView		增加延遲時間
+Time source:	TransportView		時間來源：
+DAC time source	TransportView		DAC時間來源
+Decrease precision	TransportView		降低精確度
+System clock	TransportView		系統時鐘
+From:	TransportView		從：
+Roll from	TransportView		捲動從
+Preroll	TransportView		預捲
+Run mode:	TransportView		運行模式：

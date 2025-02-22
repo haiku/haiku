@@ -1,28 +1,27 @@
-1	indonesian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Tidak bisa memuat screen saver
-30 seconds	ScreenSaver		30 detik
-Start screensaver	ScreenSaver		Mulai screensaver
-Password…	ScreenSaver		Sandi...
-Password:	ScreenSaver		Sandi:
-Password lock	ScreenSaver		Sandi kunci
-Screensavers	ScreenSaver		Screensaver
+1	indonesian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Tampilan Power Management Signaling tidak tersedia
-ScreenSaver	System name		ScreenSaver
-Test	ScreenSaver		Test
-General	ScreenSaver		Umum
+Blackness	ScreenSaver		Kegelapan
 Fade now when mouse is here	ScreenSaver		Memudar sekarang ketika mouse di sini
+Screensavers	ScreenSaver		Screensaver
 Enable screensaver	ScreenSaver		Memungkinkan screensaver
+Passwords don't match. Please try again.	ScreenSaver		Sandi tidak cocok. Silakan coba lagi.
+30 seconds	ScreenSaver		30 detik
+No options available	ScreenSaver		Tidak ada opsi tersedia
+ScreenSaver	System name		ScreenSaver
 Don't fade when mouse is here	ScreenSaver		Jangan memudar ketika mouse di sini
 Cancel	ScreenSaver		Batal
-Turn off screen	ScreenSaver		Matikan layar
-No options available	ScreenSaver		Tidak ada opsi tersedia
-Password Window	ScreenSaver		Jendela Sandi
+Password:	ScreenSaver		Sandi:
 Screensaver settings	ScreenSaver		Pengaturan screensaver
-Passwords don't match. Please try again.	ScreenSaver		Sandi tidak cocok. Silakan coba lagi.
-OK	ScreenSaver		OKE
-Blackness	ScreenSaver		Kegelapan
+Password Window	ScreenSaver		Jendela Sandi
+Test	ScreenSaver		Test
+Could not load screen saver	ScreenSaver		Tidak bisa memuat screen saver
 Use custom password	ScreenSaver		Gunakan password kustom
-Done	ScreenSaver		Sudah
+Password…	ScreenSaver		Sandi...
 Confirm password:	ScreenSaver		Konfirmasi sandi:
+Turn off screen	ScreenSaver		Matikan layar
+Password lock	ScreenSaver		Sandi kunci
+OK	ScreenSaver		OKE
+Done	ScreenSaver		Sudah
+Start screensaver	ScreenSaver		Mulai screensaver
 No preview available	PreviewView		Tak ada pratilik tersedia
-Use network password	ScreenSaver		Pakai sandi jaringan
+General	ScreenSaver		Umum

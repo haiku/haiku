@@ -1,28 +1,27 @@
-1	spanish; castilian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		No podemos activar salvapantallas
-30 seconds	ScreenSaver		30 segundos
-Start screensaver	ScreenSaver		Iniciar salvapantallas
-Password…	ScreenSaver		Contraseña…
-Password:	ScreenSaver		Contraseña:
-Password lock	ScreenSaver		Bloqueo de contraseña
-Screensavers	ScreenSaver		Salvapantallas
+1	spanish; castilian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		La señal de manejo de la energía del monitor no está disponible
-ScreenSaver	System name		Salvapantallas
-Test	ScreenSaver		Prueba
-General	ScreenSaver		General
+Blackness	ScreenSaver		Oscuridad
 Fade now when mouse is here	ScreenSaver		Atenuar cuando el ratón esté aquí
+Screensavers	ScreenSaver		Salvapantallas
 Enable screensaver	ScreenSaver		Habilitar salvapantallas
+Passwords don't match. Please try again.	ScreenSaver		Las contraseñas no coinciden. Por favor, intente de nuevo.
+30 seconds	ScreenSaver		30 segundos
+No options available	ScreenSaver		No hay opciones disponibles
+ScreenSaver	System name		Salvapantallas
 Don't fade when mouse is here	ScreenSaver		No atenuar cuando el ratón esté aquí
 Cancel	ScreenSaver		Cancelar
-Turn off screen	ScreenSaver		Apagar pantalla
-No options available	ScreenSaver		No hay opciones disponibles
-Password Window	ScreenSaver		Ventana de contraseña
+Password:	ScreenSaver		Contraseña:
 Screensaver settings	ScreenSaver		Configuración de salvapantallas
-Passwords don't match. Please try again.	ScreenSaver		Las contraseñas no coinciden. Por favor, intente de nuevo.
-OK	ScreenSaver		Aceptar
-Blackness	ScreenSaver		Oscuridad
+Password Window	ScreenSaver		Ventana de contraseña
+Test	ScreenSaver		Prueba
+Could not load screen saver	ScreenSaver		No podemos activar salvapantallas
 Use custom password	ScreenSaver		Usar contraseña personalizada
-Done	ScreenSaver		Completa
+Password…	ScreenSaver		Contraseña…
 Confirm password:	ScreenSaver		Confirmar contraseña:
+Turn off screen	ScreenSaver		Apagar pantalla
+Password lock	ScreenSaver		Bloqueo de contraseña
+OK	ScreenSaver		Aceptar
+Done	ScreenSaver		Completa
+Start screensaver	ScreenSaver		Iniciar salvapantallas
 No preview available	PreviewView		Vista previa no disponible
-Use network password	ScreenSaver		Usar contraseña de la red
+General	ScreenSaver		General

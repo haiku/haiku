@@ -1,29 +1,24 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ScreenSaver	215605989
-Could not load screen saver	ScreenSaver		Kunne ikke laste skjermsparer
-30 seconds	ScreenSaver		30 sekunder
-Start screensaver	ScreenSaver		Start skjermsparer
-Password…	ScreenSaver		Passord...
-Password:	ScreenSaver		Passord:
-Password lock	ScreenSaver		Passordlås
-Add…	ScreenSaver		Legg til...
-Screensavers	ScreenSaver		Skjermsparere
-mouse is here	ScreenSaver		mus er her
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ScreenSaver	3028794413
 Display Power Management Signaling not available	ScreenSaver		Signal for strømstyring av skjerm er ikke tilgjengelig
-ScreenSaver	System name		Skjermsparer
-Test	ScreenSaver		Test
-General	ScreenSaver		Generelt
-Enable screensaver	ScreenSaver		Aktiver skjermsparer
-Cancel	ScreenSaver		Avbryt
-Turn off screen	ScreenSaver		Skru av skjerm
-No options available	ScreenSaver		Ingen valg tilgjengelig
-Password Window	ScreenSaver		Passordvindu
-Fade now when	ScreenSaver		Ton ut når
-Screensaver settings	ScreenSaver		Skjermsparer-innstillinger
-Passwords don't match. Please try again.	ScreenSaver		Passordene passer ikke. Prøv igjen.
-OK	ScreenSaver		OK
-Don't fade when	ScreenSaver		Ikke ton ut når
 Blackness	ScreenSaver		Svart skjerm
+Screensavers	ScreenSaver		Skjermsparere
+Enable screensaver	ScreenSaver		Aktiver skjermsparer
+Passwords don't match. Please try again.	ScreenSaver		Passordene passer ikke. Prøv igjen.
+30 seconds	ScreenSaver		30 sekunder
+No options available	ScreenSaver		Ingen valg tilgjengelig
+ScreenSaver	System name		Skjermsparer
+Cancel	ScreenSaver		Avbryt
+Password:	ScreenSaver		Passord:
+Screensaver settings	ScreenSaver		Skjermsparer-innstillinger
+Password Window	ScreenSaver		Passordvindu
+Test	ScreenSaver		Test
+Could not load screen saver	ScreenSaver		Kunne ikke laste skjermsparer
 Use custom password	ScreenSaver		Bruk eget passord
-Done	ScreenSaver		Ferdig
+Password…	ScreenSaver		Passord...
 Confirm password:	ScreenSaver		Bekreft passord:
-Use network password	ScreenSaver		Bruk nettverkspassord
+Turn off screen	ScreenSaver		Skru av skjerm
+Password lock	ScreenSaver		Passordlås
+OK	ScreenSaver		OK
+Done	ScreenSaver		Ferdig
+Start screensaver	ScreenSaver		Start skjermsparer
+General	ScreenSaver		Generelt

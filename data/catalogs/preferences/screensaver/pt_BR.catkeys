@@ -1,28 +1,27 @@
-1	portuguese (brazil)	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Não foi possível carregar o protetor de tela
-30 seconds	ScreenSaver		30 segundos
-Start screensaver	ScreenSaver		Iniciar protetor de tela
-Password…	ScreenSaver		Senha…
-Password:	ScreenSaver		Senha:
-Password lock	ScreenSaver		Senha de bloqueio
-Screensavers	ScreenSaver		Protetores de tela
+1	portuguese (brazil)	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Sinalização do Gerenciador de Energia da Tela não disponível
-ScreenSaver	System name		Protetor de Tela
-Test	ScreenSaver		Teste
-General	ScreenSaver		Geral
+Blackness	ScreenSaver		Negrume
 Fade now when mouse is here	ScreenSaver		Desvanecer agora quando o mouse está aqui
+Screensavers	ScreenSaver		Protetores de tela
 Enable screensaver	ScreenSaver		Habilitar o protetor de tela
+Passwords don't match. Please try again.	ScreenSaver		As senhas não coincidem. Por favor tente novamente.
+30 seconds	ScreenSaver		30 segundos
+No options available	ScreenSaver		Nenhuma opção disponível
+ScreenSaver	System name		Protetor de Tela
 Don't fade when mouse is here	ScreenSaver		Não esvanecer quando o mouse está aqui
 Cancel	ScreenSaver		Cancelar
-Turn off screen	ScreenSaver		Desligar a tela
-No options available	ScreenSaver		Nenhuma opção disponível
-Password Window	ScreenSaver		Janela de Senha
+Password:	ScreenSaver		Senha:
 Screensaver settings	ScreenSaver		Configurações do Protetor de Tela
-Passwords don't match. Please try again.	ScreenSaver		As senhas não coincidem. Por favor tente novamente.
-OK	ScreenSaver		OK
-Blackness	ScreenSaver		Negrume
+Password Window	ScreenSaver		Janela de Senha
+Test	ScreenSaver		Teste
+Could not load screen saver	ScreenSaver		Não foi possível carregar o protetor de tela
 Use custom password	ScreenSaver		Utilize senha personalizada
-Done	ScreenSaver		Concluído
+Password…	ScreenSaver		Senha…
 Confirm password:	ScreenSaver		Confirme a senha:
+Turn off screen	ScreenSaver		Desligar a tela
+Password lock	ScreenSaver		Senha de bloqueio
+OK	ScreenSaver		OK
+Done	ScreenSaver		Concluído
+Start screensaver	ScreenSaver		Iniciar protetor de tela
 No preview available	PreviewView		Nenhuma pré-visualização disponível
-Use network password	ScreenSaver		Utilizar senha de rede
+General	ScreenSaver		Geral

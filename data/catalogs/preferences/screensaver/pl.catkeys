@@ -1,28 +1,27 @@
-1	polish	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Nie można załadować wygaszacza ekranu
-30 seconds	ScreenSaver		30 sekund
-Start screensaver	ScreenSaver		Uruchom wygaszacz ekranu
-Password…	ScreenSaver		Hasło…
-Password:	ScreenSaver		Hasło:
-Password lock	ScreenSaver		Blokada hasła
-Screensavers	ScreenSaver		Wygaszacze ekranu
+1	polish	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		DPMS nie jest dostępne
-ScreenSaver	System name		Wygaszacz ekranu
-Test	ScreenSaver		Test
-General	ScreenSaver		Ogólne
+Blackness	ScreenSaver		Czerń
 Fade now when mouse is here	ScreenSaver		Wygaś gdy mysz jest tutaj
+Screensavers	ScreenSaver		Wygaszacze ekranu
 Enable screensaver	ScreenSaver		Włącz wygaszacz ekranu
+Passwords don't match. Please try again.	ScreenSaver		Hasła nie zgadzają się. Proszę spróbować ponownie.
+30 seconds	ScreenSaver		30 sekund
+No options available	ScreenSaver		Brak dostępnych opcji
+ScreenSaver	System name		Wygaszacz ekranu
 Don't fade when mouse is here	ScreenSaver		Nie wygaszaj gdy mysz jest tutaj
 Cancel	ScreenSaver		Anuluj
-Turn off screen	ScreenSaver		Wyłącz ekran
-No options available	ScreenSaver		Brak dostępnych opcji
-Password Window	ScreenSaver		Okno z hasłem
+Password:	ScreenSaver		Hasło:
 Screensaver settings	ScreenSaver		Ustawienia wygaszacza ekranu
-Passwords don't match. Please try again.	ScreenSaver		Hasła nie zgadzają się. Proszę spróbować ponownie.
-OK	ScreenSaver		OK
-Blackness	ScreenSaver		Czerń
+Password Window	ScreenSaver		Okno z hasłem
+Test	ScreenSaver		Test
+Could not load screen saver	ScreenSaver		Nie można załadować wygaszacza ekranu
 Use custom password	ScreenSaver		Użyj niestandardowego hasła
-Done	ScreenSaver		Zakończono
+Password…	ScreenSaver		Hasło…
 Confirm password:	ScreenSaver		Potwierdź hasło:
+Turn off screen	ScreenSaver		Wyłącz ekran
+Password lock	ScreenSaver		Blokada hasła
+OK	ScreenSaver		OK
+Done	ScreenSaver		Zakończono
+Start screensaver	ScreenSaver		Uruchom wygaszacz ekranu
 No preview available	PreviewView		Podgląd niedostępny
-Use network password	ScreenSaver		Użyj hasła sieciowego
+General	ScreenSaver		Ogólne

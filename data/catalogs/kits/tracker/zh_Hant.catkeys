@@ -9,7 +9,7 @@ Or	FindPanel		或
 MIME Description	AttributesView		MIME 描述
 Query	FindPanel		詢問
 before	FindPanel		前
-New folder%d	FSUtils		新文件夾 %d
+New folder%d	FSUtils		新創資料夾 %d
 Volume icons	TrackerSettingsWindow		卷圖示
 Ignore case	SelectionWindow		忽略大寫
 Save as query template:	FindPanel		另存為查詢範本：
@@ -63,7 +63,7 @@ Include Trash	FindPanel		包含資源回收筒
 Rectangle	AttributesView		長方形
 Move to	ContainerWindow		移至
 Status	Email Query Columns		狀態
-New folder	FSUtils		新文件夾
+New folder	FSUtils		新創資料夾
 New Query	FindPanel		新查詢
 Junk on end.	libtracker		垃圾到頭了。
 system	B_SYSTEM_DIRECTORY		系統
@@ -129,7 +129,7 @@ Modified	PoseView		已修改的
 Save as template…	FindPanel		另存為模板…
 Move to Trash	ContainerWindow		移入資源回收筒
 All files and folders	FindPanel		所有檔案和資料夾
-Add-ons	ContainerWindow		附加元件
+Add-ons	ContainerWindow		外掛組件
 Too many parenthesis.	libtracker		括號太多。
 Save query template:	FindPanel		存储查詢範本：
 Increase size	ContainerWindow		增加尺寸
@@ -257,7 +257,7 @@ Could not find application \"%appname\"	OpenWithWindow		找不到應用程式 \"
 Unmatched parenthesis.	libtracker		不符的括號（parenthesis）。
 New folder %d	FSUtils		新創資料夾 %d
 Extended attribute	AttributesView		擴充屬性
-Error %error loading Add-On %name.	ContainerWindow		錯誤 %error 發生於載入附加元件 %name.
+Error %error loading Add-On %name.	ContainerWindow		錯誤 %error 發生於載入外掛組件 %name.
 Unmatched brackets.	libtracker		不符的括號（brackets）。
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		您正在嘗試替換該項目:\n\t%name%dest\n從：\n\t%name%src\n\n您想將其替換為您現在的 %movemode 嗎？
 Empty Trash	ContainerWindow		清空資源回收筒
@@ -407,7 +407,7 @@ All Haiku disks	AutoMounterSettings		所有Haiku磁碟
 Close all	ContainerWindow		關閉所有
 Paused: click to resume or stop	StatusWindow		已暫停：點擊可恢復或停止
 Name	QueryPoseView		名稱
-Error %error loading add-On %name.	ContainerWindow		錯誤 %error 載入附加元件 %name.
+Error %error loading add-On %name.	ContainerWindow		錯誤 %error 載入外掛組件 %name.
 Does not handle file	OpenWithWindow		不處理檔案
 E-mail	Person Query Columns		E-mail
 Templates	FindPanel		模板

@@ -1,27 +1,70 @@
-1	english	x-vnd.Haiku-DriveSetup	4099698769
+1	english	x-vnd.Haiku-DriveSetup	3462080744
 Could not unmount partition %s.	MainWindow		無法卸載分區 %s。
 Mount all	MainWindow		全部掛載
+Disk	MainWindow		磁碟
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		您確定要立即將變更寫回磁碟嗎?\n\n如果這樣做，所選分區上的所有資料都將無法挽回地丟失！
+Device	PartitionList		裝置
+Initialize	MainWindow		初始化
+Could not change the parameters of the selected partition.	MainWindow		無法變更所選分區的參數。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		您確定要立即將變更寫回磁碟嗎?\n\n如果這樣做，分區 \"%s\" 上的所有資料都將無法挽回地遺失！
+PGP encrypted	Encryption utils		PGP 加密
+Delete partition	MainWindow		刪除分割區
 Error: 	MainWindow	in any error alert	錯誤：
+Removable	PartitionList		可拆卸
+Block size	PartitionList		區塊大小
+The panel experienced a problem!	MainWindow		面板遇到問題！
+Device	DiskView		裝置
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		您確定要格式化 Intel 擴充分割區嗎？如果您繼續，它包含的任何子分割區都將被覆寫。在將變更寫入磁碟之前，系統會再次詢問您。
+Physical block size	PartitionList		物理塊大小
 Unmount	MainWindow		卸載
+Failed to format the partition %s!\n	MainWindow		格式化分割區失敗 %s!\n
+Partition size	CreateParametersPanel		分割區大小
+Validation of the given parameters failed.	MainWindow		給定參數的驗證失敗。
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		您確定要格式化分割區 \"%s\" 嗎？在將變更寫入磁碟之前，系統會再次詢問您。
+DriveSetup	System name		驅動器設定
 Mounted at	PartitionList		挂載至
+Disk system %s not found!	MainWindow		未找到磁碟系統 %s！
 Create…	MainWindow		創建…
+Write changes	MainWindow		寫入更改
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		分區 %s 初始化失敗。 （沒有任何內容寫入磁碟。）
+Validation of the given creation parameters failed.	MainWindow		給定創建參數的驗證失敗。
+Eject	MainWindow		彈出
+Surface test (not implemented)	MainWindow		表面測試（未實施）
+Read only	PartitionList		只讀
+The panel could not return successfully.	MainWindow		面板無法成功返回。
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		更改分區參數失敗。尚未將任何變更寫入磁碟。
+Partition %ld	DiskView		分區 %ld
+There's no space on the partition where a child partition could be created.	MainWindow		分割區上沒有可以建立子分割區的空間。
+No disk devices have been recognized.	DiskView		未識別任何磁碟設備。
+Attributes	PartitionList		屬性
+Failed to delete the partition. No changes have been written to disk.	MainWindow		刪除分割區失敗。尚未將任何變更寫入磁碟。
+Change parameters…	MainWindow		更改參數…
 Could not unmount partition	MainWindow		無法卸載分割區
 Create	CreateParametersPanel		創建
 File system	PartitionList		檔案系統
 Unknown (%s)	PartitionList		未知(%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		創建分割區失敗。尚未將任何變更寫入磁碟。
+BitLocker encrypted	Encryption utils		BitLocker 加密
+Offset: %s	Support		偏移：%s
+SafeBoot encrypted	Encryption utils		SafeBoot 加密
 Volume name	PartitionList		卷名
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您確定要立即將變更寫回磁碟嗎?\n\n如果這樣做，分區上的所有資料都將無法挽回地丟失！
 Partition name:	ChangeParametersPanel		分割區名稱:
+LUKS encrypted	Encryption utils		LUKS 加密
 Cancel	AbstractParametersPanel		取消
 OK	MainWindow		確認
 Open with DiskProbe	MainWindow		以DiskProbe開啓
+The disk has been successfully initialized.\n	MainWindow		磁碟已成功初始化。 \n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		是否應強制卸載？\n\n注意：如果應用程式目前正在寫入分割區，現在卸載它可能會導致資料遺失。\n
 Cancel	MainWindow		取消
 Force unmount	MainWindow		强制卸載
 The partition cannot be unmounted.	MainWindow		該分割區無法卸載。
 Delete	MainWindow		刪除
 Could not mount partition %s.	MainWindow		無法安裝分割區 %s。
+The selected disk is read-only.	MainWindow		所選分區為唯讀。
 The partition %s is already unmounted.	MainWindow		分割區 %s 已卸載。
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		您確定要變更所選分割區的參數嗎?\n\n該分割區可能不再被其他作業系統辨識！
 OK	AbstractParametersPanel		確認
 The partition %s is already mounted.	MainWindow		分割區 %s 已安裝。
+Size	PartitionList		大小
 Mount	MainWindow		挂載

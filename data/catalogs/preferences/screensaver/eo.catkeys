@@ -1,28 +1,27 @@
-1	esperanto	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Neeblis ekruli ekrankurtenon
-30 seconds	ScreenSaver		30 sekundoj
-Start screensaver	ScreenSaver		Ekruli ekrankurtenon
-Password…	ScreenSaver		Pasvorto…
-Password:	ScreenSaver		Pasvorto:
-Password lock	ScreenSaver		Pasvorta ŝloso
-Screensavers	ScreenSaver		Ekrankurtenoj
+1	esperanto	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Ekrana indiko por kontrolilo de povumo ne estas disponebla
-ScreenSaver	System name		Ekrankurteno
-Test	ScreenSaver		Testi
-General	ScreenSaver		Ĝenerala
+Blackness	ScreenSaver		Nigreco
 Fade now when mouse is here	ScreenSaver		Fadi nun kiam la muso estas ĉi tie
+Screensavers	ScreenSaver		Ekrankurtenoj
 Enable screensaver	ScreenSaver		Ebligi ekrankurtenon
+Passwords don't match. Please try again.	ScreenSaver		Pasvortoj ne koincidas. Bonvolu provi denove.
+30 seconds	ScreenSaver		30 sekundoj
+No options available	ScreenSaver		Disponeblaj opcioj forestas
+ScreenSaver	System name		Ekrankurteno
 Don't fade when mouse is here	ScreenSaver		Ne fadi kiam la muso estas ĉi tie
 Cancel	ScreenSaver		Nuligi
-Turn off screen	ScreenSaver		Malŝalti ekranon
-No options available	ScreenSaver		Disponeblaj opcioj forestas
-Password Window	ScreenSaver		Pasvorta Fenestro
+Password:	ScreenSaver		Pasvorto:
 Screensaver settings	ScreenSaver		Ekrankurtena agordo
-Passwords don't match. Please try again.	ScreenSaver		Pasvortoj ne koincidas. Bonvolu provi denove.
-OK	ScreenSaver		Bone
-Blackness	ScreenSaver		Nigreco
+Password Window	ScreenSaver		Pasvorta Fenestro
+Test	ScreenSaver		Testi
+Could not load screen saver	ScreenSaver		Neeblis ekruli ekrankurtenon
 Use custom password	ScreenSaver		Uzi propran pasvorton
-Done	ScreenSaver		Farite
+Password…	ScreenSaver		Pasvorto…
 Confirm password:	ScreenSaver		Konfirmi pasvorton:
+Turn off screen	ScreenSaver		Malŝalti ekranon
+Password lock	ScreenSaver		Pasvorta ŝloso
+OK	ScreenSaver		Bone
+Done	ScreenSaver		Farite
+Start screensaver	ScreenSaver		Ekruli ekrankurtenon
 No preview available	PreviewView		Disponebla antaŭrigardo forestas
-Use network password	ScreenSaver		Uzi retan pasvorton
+General	ScreenSaver		Ĝenerala

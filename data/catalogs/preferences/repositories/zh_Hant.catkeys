@@ -5,7 +5,7 @@ There was an error refreshing the repository cache for %name%	TaskLooper	Error m
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	停用儲存庫 %name% 時出錯
 Unknown	Constants	Unknown repository name	未知
 Remove all	RepositoriesView	Button label	消除全部
-Enable repositories to use with package management:	RepositoriesView	Label text	啟用庫以與套件管理一起使用：
+Enable repositories to use with package management:	RepositoriesView	Label text	啓用庫以用於軟體套件管理：
 Disable	RepositoriesView	Button label	停用
 Cancel task	TaskTimer	Button label	取消任務
 Changes completed	RepositoriesView	Status view text	變更完成

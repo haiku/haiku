@@ -1,5 +1,5 @@
-1	english	x-vnd.haiku-softwareupdater	153492771
-Updating version	SoftwareUpdaterWindow	List item text	正在更新版本
+1	english	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	即將更新版本
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		點此安裝 {0, plural, one{# 已更新套件} other{# updated 已更新套件}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	需要卸載的套件
 No active network connection was found	UpdateManager	Error message	未找到活動的網路連接
@@ -13,8 +13,9 @@ OK	UpdateManager		確認
 Unrecognized argument	SoftwareUpdaterApp	Error message	無法辨識的參數
 There were no updates found.	CheckAction		沒有發現更新。
 No updates available	UpdateAction		無可用更新
-New packages to be installed	SoftwareUpdaterWindow	List super item label	要安裝的新軟體套件
+New packages to be installed	SoftwareUpdaterWindow	List super item label	另需安裝新的軟體包
 Packages to be updated	SoftwareUpdaterWindow	List super item label	待更新的包
+to	SoftwareUpdaterWindow	List item text	至
 Attempting to cancel the updates…	SoftwareUpdaterWindow		正在嘗試取消更新…
 Contacting software repositories to check for package updates.	CheckManager		聯絡軟體儲存庫以檢查軟體套件更新。
 Available updates found	CheckManager		發現可用更新

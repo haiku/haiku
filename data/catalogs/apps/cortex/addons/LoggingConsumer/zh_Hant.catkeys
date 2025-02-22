@@ -1,4 +1,22 @@
-1	english	x-vnd.Be.LoggingConsumerApp	154807172
+1	english	x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp：無法取得節點資訊 (%ld):\n%s\n
+Priority	CortexAddOnsLoggingConsumer		優先級
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp：找不到節點 (%ld):\n%s\n
+Latency	CortexAddOnsLoggingConsumer		延遲時間
+Logged input	CortexAddOnsLoggingConsumer		已記錄的輸入
+CPU spin percentage	CortexAddOnsLoggingConsumer		CPU 自旋百分比
+NodeLogger	CortexAddOnsLoggingConsumers		節點記錄器
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		開始
+Thread priority	CortexAddOnsLoggingConsumer		執行緒優先級
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer 參數
+Latency control	CortexAddOnsLoggingConsumer		延遲控制
+CPU percentage	CortexAddOnsLoggingConsumer		CPU 百分比
+LoggingConsumer	CortexAddOnsLoggingConsumer		記錄使用者
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		停止
-An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		LoggingConsumer node的附加版本。\n請參閱 Be Developer Newsletter III.18: 5 May, 1999\nEric Moon適配 (4 June, 1999)
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		LoggingConsumer node的外掛組件版本。\n請參閱 Be Developer Newsletter III.18: 5 May, 1999\nEric Moon適配 (4 June, 1999)
 OK	CortexAddOnsCommonMediaNodeControlApp		確認
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		控制項
+controls	CortexAddOnsCommonMediaNodeControlApp		控制
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		連接
+percent	CortexAddOnsLoggingConsumer		百分比
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp：無參數賦予節點 node (%ld):\n%s\n

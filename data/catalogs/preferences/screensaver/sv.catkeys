@@ -1,28 +1,27 @@
-1	swedish	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Kunde inte läsa in skärmsläckaren
-30 seconds	ScreenSaver		30 sekunder
-Start screensaver	ScreenSaver		Starta skärmsläckare
-Password…	ScreenSaver		Lösenord...
-Password:	ScreenSaver		Lösenord:
-Password lock	ScreenSaver		Lösenordsskydd
-Screensavers	ScreenSaver		Skrämsläckare
+1	swedish	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Stöd för att sätta skärm i strömsparläge saknas
-ScreenSaver	System name		Skärmsläckare
-Test	ScreenSaver		Testa
-General	ScreenSaver		Allmänt
+Blackness	ScreenSaver		Svärta
 Fade now when mouse is here	ScreenSaver		Avta nu när musen är här
+Screensavers	ScreenSaver		Skrämsläckare
 Enable screensaver	ScreenSaver		Aktivera skärmsläckare
+Passwords don't match. Please try again.	ScreenSaver		Lösenorden stämmer inte överens. Vänligen försök igen.
+30 seconds	ScreenSaver		30 sekunder
+No options available	ScreenSaver		Inga alternativ tillgängliga
+ScreenSaver	System name		Skärmsläckare
 Don't fade when mouse is here	ScreenSaver		Avta inte nu när musen är här
 Cancel	ScreenSaver		Avbryt
-Turn off screen	ScreenSaver		Stäng av skärmen
-No options available	ScreenSaver		Inga alternativ tillgängliga
-Password Window	ScreenSaver		Lösenordsfönster
+Password:	ScreenSaver		Lösenord:
 Screensaver settings	ScreenSaver		Inställningar
-Passwords don't match. Please try again.	ScreenSaver		Lösenorden stämmer inte överens. Vänligen försök igen.
-OK	ScreenSaver		OK
-Blackness	ScreenSaver		Svärta
+Password Window	ScreenSaver		Lösenordsfönster
+Test	ScreenSaver		Testa
+Could not load screen saver	ScreenSaver		Kunde inte läsa in skärmsläckaren
 Use custom password	ScreenSaver		Använd anpassat lösenord
-Done	ScreenSaver		Klar
+Password…	ScreenSaver		Lösenord...
 Confirm password:	ScreenSaver		Bekräfta lösenord:
+Turn off screen	ScreenSaver		Stäng av skärmen
+Password lock	ScreenSaver		Lösenordsskydd
+OK	ScreenSaver		OK
+Done	ScreenSaver		Klar
+Start screensaver	ScreenSaver		Starta skärmsläckare
 No preview available	PreviewView		Ingen förhandsvisning tillgänglig
-Use network password	ScreenSaver		Använd nätverkslösenordet
+General	ScreenSaver		Allmänt

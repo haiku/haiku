@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	3219032380
+1	english	x-vnd.Haiku-HaikuDepot	3355419189
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用條件下載問題
 Available packages	MainWindow		可用軟體套件
 It was not possible to create the new user.	UserLoginWindow		無法創建新使用者。
@@ -54,7 +54,6 @@ Start package daemon	App		啟動套件守護程式
 There are problems in the supplied data:	UserLoginWindow		提供的數據有問題：
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		使用者 '%Nickname%' 尚未同意任何使用條件。
 Usage conditions download problem	UserLoginWindow		使用條件下載問題
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	從儲存庫 %s 安裝程式包 %s\n
 Package daemon problem	App		套件守護程式問題
 No	MainWindow		否
 Repository	PackageListView		庫
@@ -176,6 +175,7 @@ Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		�
 OK	MainWindow		確認
 Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		使用者必須是{0, plural, one{# 歲} other{# 歲}} 或以上。
 Version %Code%	UserUsageConditions		版本 %Code%
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# 項目} other{# 項目}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		正在解除安裝 \"%PackageName%\"
 Downloading:	PackageInfoView		下載中：
 Quit	MainWindow		退出

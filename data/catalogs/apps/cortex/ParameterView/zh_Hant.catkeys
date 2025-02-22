@@ -1,4 +1,8 @@
-1	english	application/x-vnd.Cortex.ParameterView	2640697444
+1	english	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		主題
+Start control panel	ParameterWindow		啟動控制面板
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% 參數
 OK	ParameterWindow		確認
 Window	ParameterWindow		視窗
+Could not start control panel (%error%)	ParameterWindow		無法啟動控制面板 (%error%)
 Close	ParameterWindow		關閉

@@ -1,4 +1,4 @@
-1	english	x-vnd.mmu.AutoRaise	3954724670
+1	english	x-vnd.mmu.AutoRaise	3527604525
 AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		自動前置, (c) 2002, mmu_man\n玩得開心點 :-)
 2 s	AutoRaiseIcon		2 秒
 OK	AutoRaiseIcon		確認
@@ -10,6 +10,7 @@ Delay	AutoRaiseIcon		延遲
 Active	AutoRaiseIcon		啓用
 0.1 s	AutoRaiseIcon		0.1 秒
 Default (all windows)	AutoRaiseIcon		預設值（所有視窗）
+Instant warping (ffm)	AutoRaiseIcon		即時翹曲(ffm)
 About AutoRaise…	AutoRaiseIcon		關於AutoRaise…
 Normal	AutoRaiseIcon		正常
 0.5 s	AutoRaiseIcon		0.5 秒
@@ -17,7 +18,8 @@ Deskbar only (touch)	AutoRaiseIcon		僅Deskbar（觸控）
 4 s	AutoRaiseIcon		4 秒
 Focus follows mouse	AutoRaiseIcon		焦點跟隨滑鼠
 Deskbar only (over its area)	AutoRaiseIcon		僅Deskbar（鼠標在它的區域上）
-Inactive behaviour	AutoRaiseIcon		不活躍的行為
+Inactive behaviour	AutoRaiseIcon		非活躍對象的行為
 Mode	AutoRaiseIcon		模式
+Warping (ffm)	AutoRaiseIcon		翹曲(ffm)
 Remove from tray	AutoRaiseIcon		從托盤中移除
 3 s	AutoRaiseIcon		3 秒

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-StyledEdit	1579554298
+1	english	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		文件統計
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		無法恢復，未找到檔案：\"%s\"。
 Cut	Menus		剪下
@@ -13,13 +13,13 @@ New	Menus		新創
 Document	Menus		文件
 Search backwards	FindandReplaceWindow		向後搜尋
 Find again	Menus		再次尋找
-Read-only	StatusView		只讀
+Read-only	StatusView		唯讀
 Save	Menus		存儲
 Cancel	QuitAlert		取消
 Copy	Menus		複製
 Reload	NodeMonitorAlerts		重新載入
 line %d, column %d	StatusView		行 %d，列 %d
-Words:	Statistics		字：
+Words:	Statistics		單詞：
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		恢復
 Error saving \"%s\":\n%s	SaveAlert		保存時出錯 \"%s\":\n%s
@@ -33,21 +33,29 @@ Paste	Menus		貼上
 Bold	Menus		粗體
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		檔案 \"%file%\" 已被另一個應用程式修改，是否重新載入？
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		檔案\"%file%\" 已被另一個應用程式刪除，能否恢復？
+Lines:	Statistics		行數：
+Strikeout	Menus		刪除線
 Replace in all windows	FindandReplaceWindow		在所有視窗中替換
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" 有未存儲的變更。\n恢復到上次存储的版本嗎？
 Save	SaveAlert		存儲
 Default	Open_and_SaveAsPanel		默認
 Cancel	RevertToSavedAlert		取消
 Cancel	FindandReplaceWindow		取消
+Statistics…	Menus		Statistics…
+Encoding	Open_and_SaveAsPanel		編碼
 Replace all	FindandReplaceWindow		替換所有
 Close	Menus		關閉
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		載入錯誤 \"%s\":\n\t不支援的格式
+Left	Menus		左
 Default	Menus		默認
 OK	SaveAlert		確認
+Color	Menus		顏色
 Save changes to the document \"%s\"? 	QuitAlert		存储對文檔的更改 \"%s\"?
 StyledEdit	System name		StyledEdit
+Underline	Menus		下劃線
 Find:	FindandReplaceWindow		尋找：
 Undo typing	QuitAlert		撤銷輸入
+Error loading \"%s\":\n\t%s	LoadAlert		加載錯誤 \"%s\":\n\t%s
 Don't save	SaveAlert		不要存储
 Reload…	Menus		重新載入…
 Print…	Menus		列印…
@@ -75,6 +83,7 @@ Replace with:	FindandReplaceWindow		替換以：
 Open…	Menus		開啓…
 Save as…	Menus		存储为…
 Replace	FindandReplaceWindow		替換
+Characters:	Statistics		字數：
 Don't save	QuitAlert		不存储
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		該檔案被標記為唯讀。存储對檔案 \"%s\"的變更嗎？
 Align	Menus		對齊

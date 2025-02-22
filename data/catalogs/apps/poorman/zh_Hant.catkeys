@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PoorMan	2280971935
+1	english	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		選擇網路資料夾
 Console logging	PoorMan		控制台日誌記錄
 Create Log File	PoorMan		建立日誌檔案
@@ -18,6 +18,8 @@ Save console as…	PoorMan		將控制台另存為…
 Edit	PoorMan		編輯
 Cancel	PoorMan		取消
 Directory: 	PoorMan		目錄：
+Hits: %lu	PoorMan		點擊數：%lu
+Hits: 0	PoorMan		點擊數：0
 Shutting down.\n	PoorMan		正在關閉。\n
 Select all	PoorMan		選擇全部
 Error Server	PoorMan		錯誤伺服器
@@ -37,8 +39,10 @@ Log To File	PoorMan		記錄到檔案
 Connections	PoorMan		連接
 Controls	PoorMan		控制
 Log to console	PoorMan		登入控制台
+Advanced	PoorMan		高階
 Copy	PoorMan		複製
 Logging	PoorMan		記錄
+PoorMan	System name		PoorMan
 Clear console log	PoorMan		清空控制台日誌
 Run server	PoorMan		運行伺服器
 Create	PoorMan		創建

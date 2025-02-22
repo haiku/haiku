@@ -1,28 +1,27 @@
-1	romanian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Nu s-a putut încărca protectorul de ecran
-30 seconds	ScreenSaver		30 de secunde
-Start screensaver	ScreenSaver		Pornește protectorul de ecran
-Password…	ScreenSaver		Parolă…
-Password:	ScreenSaver		Parolă:
-Password lock	ScreenSaver		Blocare parolă
-Screensavers	ScreenSaver		Protectoare de ecran
+1	romanian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Semnalarea afișajului de administrare a consumului nu este disponibilă
-ScreenSaver	System name		ScreenSaver
-Test	ScreenSaver		Testare
-General	ScreenSaver		Generale
+Blackness	ScreenSaver		Întuneric
 Fade now when mouse is here	ScreenSaver		Estompează acum când mausul este aici
+Screensavers	ScreenSaver		Protectoare de ecran
 Enable screensaver	ScreenSaver		Activează protectorul de ecran
+Passwords don't match. Please try again.	ScreenSaver		Parolele nu se potrivesc. Încercați din nou.
+30 seconds	ScreenSaver		30 de secunde
+No options available	ScreenSaver		Nu sunt opțiuni disponibile
+ScreenSaver	System name		ScreenSaver
 Don't fade when mouse is here	ScreenSaver		Nu estompa când mausul este aici
 Cancel	ScreenSaver		Anulează
-Turn off screen	ScreenSaver		Închide ecranul
-No options available	ScreenSaver		Nu sunt opțiuni disponibile
-Password Window	ScreenSaver		Fereastră de parolă
+Password:	ScreenSaver		Parolă:
 Screensaver settings	ScreenSaver		Configurări protector de ecran
-Passwords don't match. Please try again.	ScreenSaver		Parolele nu se potrivesc. Încercați din nou.
-OK	ScreenSaver		OK
-Blackness	ScreenSaver		Întuneric
+Password Window	ScreenSaver		Fereastră de parolă
+Test	ScreenSaver		Testare
+Could not load screen saver	ScreenSaver		Nu s-a putut încărca protectorul de ecran
 Use custom password	ScreenSaver		Utilizează parolă personalizată
-Done	ScreenSaver		Gata
+Password…	ScreenSaver		Parolă…
 Confirm password:	ScreenSaver		Confirmați parola:
+Turn off screen	ScreenSaver		Închide ecranul
+Password lock	ScreenSaver		Blocare parolă
+OK	ScreenSaver		OK
+Done	ScreenSaver		Gata
+Start screensaver	ScreenSaver		Pornește protectorul de ecran
 No preview available	PreviewView		Nu există previzualizare disponibilă
-Use network password	ScreenSaver		Utilizează parola de rețea
+General	ScreenSaver		Generale

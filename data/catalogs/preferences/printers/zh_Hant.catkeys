@@ -1,11 +1,11 @@
-1	english	x-vnd.Be-PRNT	1465107170
+1	english	x-vnd.Be-PRNT	2300534000
 Test page	TestPageView		測試頁
 Remove	PrintersWindow		消除
 Red	TestPageView		紅
-Default Printer	PrinterListView		預設印表機
+Default Printer	PrinterListView		默認印表機
 <pick one>	AddPrinterDialog		<選擇一個>
 Connected to:	AddPrinterDialog		連接到：
-Make default	PrintersWindow		設為預設值
+Make default	PrintersWindow		設為默認值
 Cyan	TestPageView		青
 Completed	JobListView		已完成
 Test page	PrintersWindow		測試頁
@@ -31,7 +31,6 @@ Yellow	TestPageView		黃
 Black	TestPageView		黑
 Printer type:	AddPrinterDialog		印表機類型：
 Printers	System name		印表機
-{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{無待處理任務}=1{1 待處理任務}other{# 待處理任務}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		印表機: %printer_name%\n驅動程式: %driver%\n
 Green	TestPageView		綠
 Print test page	PrintersWindow		列印測試頁

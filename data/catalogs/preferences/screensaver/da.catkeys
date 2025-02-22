@@ -1,28 +1,27 @@
-1	danish	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Kunne ikke indlæse pauseskærm
-30 seconds	ScreenSaver		30 sekunder
-Start screensaver	ScreenSaver		Start pauseskærm
-Password…	ScreenSaver		Adgangskode…
-Password:	ScreenSaver		Adgangskode:
-Password lock	ScreenSaver		Adgangskodelås
-Screensavers	ScreenSaver		Pauseskærme
+1	danish	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Signalering til skærmens strømstyring er ikke tilgængelig
-ScreenSaver	System name		Pauseskærm
-Test	ScreenSaver		Test
-General	ScreenSaver		Generelt
+Blackness	ScreenSaver		Sorthed
 Fade now when mouse is here	ScreenSaver		Ton ud, når musen er her
+Screensavers	ScreenSaver		Pauseskærme
 Enable screensaver	ScreenSaver		Slå pauseskærm til
+Passwords don't match. Please try again.	ScreenSaver		Adgangskoder er ikke ens. Prøv igen.
+30 seconds	ScreenSaver		30 sekunder
+No options available	ScreenSaver		Ingen valgmuligheder tilgængelige
+ScreenSaver	System name		Pauseskærm
 Don't fade when mouse is here	ScreenSaver		Ton ikke ud, når musen er her
 Cancel	ScreenSaver		Afbryd
-Turn off screen	ScreenSaver		Sluk skærm
-No options available	ScreenSaver		Ingen valgmuligheder tilgængelige
-Password Window	ScreenSaver		Adgangskodevindue
+Password:	ScreenSaver		Adgangskode:
 Screensaver settings	ScreenSaver		Pauseskærmsindstillinger
-Passwords don't match. Please try again.	ScreenSaver		Adgangskoder er ikke ens. Prøv igen.
-OK	ScreenSaver		O.k.
-Blackness	ScreenSaver		Sorthed
+Password Window	ScreenSaver		Adgangskodevindue
+Test	ScreenSaver		Test
+Could not load screen saver	ScreenSaver		Kunne ikke indlæse pauseskærm
 Use custom password	ScreenSaver		Brug brugerdefineret adgangskode
-Done	ScreenSaver		Færdig
+Password…	ScreenSaver		Adgangskode…
 Confirm password:	ScreenSaver		Bekræft adgangskode:
+Turn off screen	ScreenSaver		Sluk skærm
+Password lock	ScreenSaver		Adgangskodelås
+OK	ScreenSaver		O.k.
+Done	ScreenSaver		Færdig
+Start screensaver	ScreenSaver		Start pauseskærm
 No preview available	PreviewView		Ingen forhåndsvisning er tilgængelig
-Use network password	ScreenSaver		Brug netværksadgangskode
+General	ScreenSaver		Generelt

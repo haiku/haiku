@@ -141,7 +141,7 @@ Double-click or middle-click to open new tab.	Tab Manager		双击或者中键点
 Next	WebPositive Window		下一个
 Bookmark error	WebPositive Window		书签错误
 OK	WebPositive Window		确定
-(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% of %expectedSize%, %rate%/s)
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(已下载 %currentSize%, 共 %expectedSize%, 速度 %rate%/s)
 WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		页面保存为…
 Zoom text only	WebPositive Window		仅缩放文本

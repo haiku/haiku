@@ -1,28 +1,27 @@
-1	thai	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		ไม่สามารถโหลดโปรแกรมรักษาหน้าจอ
-30 seconds	ScreenSaver		30 วินาที
-Start screensaver	ScreenSaver		เริ่มโปรแกรมรักษาหน้าจอ
-Password…	ScreenSaver		รหัส
-Password:	ScreenSaver		รหัส:
-Password lock	ScreenSaver		ล็อครหัสผ่าน
-Screensavers	ScreenSaver		รักษาหน้าจอ
+1	thai	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		การแสดงการส่งสัญญาณการจัดการพลังงานไม่พร้อมใช้งาน
-ScreenSaver	System name		รักษาหน้าจอ
-Test	ScreenSaver		ทดสอบ
-General	ScreenSaver		ทั่วไป
+Blackness	ScreenSaver		ความมืด
 Fade now when mouse is here	ScreenSaver		มืดลงเมื่อเมาส์อยู่ที่นี่
+Screensavers	ScreenSaver		รักษาหน้าจอ
 Enable screensaver	ScreenSaver		เปิดใช้งานรักษาหน้าจอ
+Passwords don't match. Please try again.	ScreenSaver		รหัสไม่ถูกต้อง โปรดลองใหม่อีกครั้ง
+30 seconds	ScreenSaver		30 วินาที
+No options available	ScreenSaver		ไม่มีตัวเลือกพร้อมใช้งาน
+ScreenSaver	System name		รักษาหน้าจอ
 Don't fade when mouse is here	ScreenSaver		ไม่มืดลงเมื่อเมาส์อยู่ที่นี่
 Cancel	ScreenSaver		ยกเลิก
-Turn off screen	ScreenSaver		ปิดจอ
-No options available	ScreenSaver		ไม่มีตัวเลือกพร้อมใช้งาน
-Password Window	ScreenSaver		หน้าต่างรหัส
+Password:	ScreenSaver		รหัส:
 Screensaver settings	ScreenSaver		ตั้งค่ารักษาหน้าจอ
-Passwords don't match. Please try again.	ScreenSaver		รหัสไม่ถูกต้อง โปรดลองใหม่อีกครั้ง
-OK	ScreenSaver		ตกลง
-Blackness	ScreenSaver		ความมืด
+Password Window	ScreenSaver		หน้าต่างรหัส
+Test	ScreenSaver		ทดสอบ
+Could not load screen saver	ScreenSaver		ไม่สามารถโหลดโปรแกรมรักษาหน้าจอ
 Use custom password	ScreenSaver		ใช้รหัสผ่านที่กำหนดเอง
-Done	ScreenSaver		เสร็จ
+Password…	ScreenSaver		รหัส
 Confirm password:	ScreenSaver		ยืนยันรหัส
+Turn off screen	ScreenSaver		ปิดจอ
+Password lock	ScreenSaver		ล็อครหัสผ่าน
+OK	ScreenSaver		ตกลง
+Done	ScreenSaver		เสร็จ
+Start screensaver	ScreenSaver		เริ่มโปรแกรมรักษาหน้าจอ
 No preview available	PreviewView		ไม่มีตัวอย่าง
-Use network password	ScreenSaver		ใช้รหัสผ่านเครือข่าย
+General	ScreenSaver		ทั่วไป

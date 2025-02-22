@@ -3,13 +3,13 @@ Teams	DataSource		隊列
 Semaphores	DataSource		信號量
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		區塊高速緩衝記憶體
-%lld ms	SettingsWindow		%lld ms
+%lld ms	SettingsWindow		%lld 毫秒
 Media nodes	DataSource		媒體節點
 Text clipboard	DataSource		文字剪貼簿
 Network send	DataSource		網路傳送
 Cache	DataSource		緩存
 Running applications	DataSource		運行應用程式
-CPU usage (combined)	DataSource		CPU 使用率（合併）
+CPU usage (combined)	DataSource		CPU使用率（合併）
 Threads	DataSource		執行緒數
 Receiving	DataSource		接收
 Remove graph	ActivityView		刪除圖表
@@ -23,7 +23,7 @@ Settings…	ActivityWindow		設定…
 Block cache	DataSource		塊緩存
 Memory	DataSource		記憶體
 CPU usage	DataSource		CPU使用率
-CPU speed	DataSource		中央處理器速度
+CPU speed	DataSource		CPU速度
 Quit	ActivityWindow		退出
 Raw clipboard	DataSource		原始剪貼簿
 Settings	ActivityWindow		設定

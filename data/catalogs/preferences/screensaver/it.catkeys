@@ -1,28 +1,27 @@
-1	italian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Non è stato possibile caricare il salvaschermo
-30 seconds	ScreenSaver		30 secondi
-Start screensaver	ScreenSaver		Avvia dopo
-Password…	ScreenSaver		Password…
-Password:	ScreenSaver		Password:
-Password lock	ScreenSaver		Richiedi password dopo
-Screensavers	ScreenSaver		Salvaschermi
+1	italian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Controlli di risparmio energetico dello schermo non disponibili
-ScreenSaver	System name		Salvaschermo
-Test	ScreenSaver		Test
-General	ScreenSaver		Generale
+Blackness	ScreenSaver		Oscurità
 Fade now when mouse is here	ScreenSaver		Dissolvi quando il puntatore del mouse è in posizione
+Screensavers	ScreenSaver		Salvaschermi
 Enable screensaver	ScreenSaver		Attiva salvaschermo
+Passwords don't match. Please try again.	ScreenSaver		Le password non corrispondono, prova ancora.
+30 seconds	ScreenSaver		30 secondi
+No options available	ScreenSaver		Nessuna opzione disponibile
+ScreenSaver	System name		Salvaschermo
 Don't fade when mouse is here	ScreenSaver		Non dissolvere quando il puntatore del mouse è in posizione
 Cancel	ScreenSaver		Cancella
-Turn off screen	ScreenSaver		Spegni schermo
-No options available	ScreenSaver		Nessuna opzione disponibile
-Password Window	ScreenSaver		Finestra password
+Password:	ScreenSaver		Password:
 Screensaver settings	ScreenSaver		Impostazioni salvaschermo
-Passwords don't match. Please try again.	ScreenSaver		Le password non corrispondono, prova ancora.
-OK	ScreenSaver		OK
-Blackness	ScreenSaver		Oscurità
+Password Window	ScreenSaver		Finestra password
+Test	ScreenSaver		Test
+Could not load screen saver	ScreenSaver		Non è stato possibile caricare il salvaschermo
 Use custom password	ScreenSaver		Usa una password personalizzata
-Done	ScreenSaver		Applica
+Password…	ScreenSaver		Password…
 Confirm password:	ScreenSaver		Conferma password:
+Turn off screen	ScreenSaver		Spegni schermo
+Password lock	ScreenSaver		Richiedi password dopo
+OK	ScreenSaver		OK
+Done	ScreenSaver		Applica
+Start screensaver	ScreenSaver		Avvia dopo
 No preview available	PreviewView		Nessuna anteprima disponibile
-Use network password	ScreenSaver		Usa password di rete
+General	ScreenSaver		Generale

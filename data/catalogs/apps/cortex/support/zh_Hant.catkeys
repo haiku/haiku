@@ -1,12 +1,147 @@
-1	english	x-vnd.Cortex.support	3586899791
+1	english	x-vnd.Cortex.support	761210807
+Header has flags	MediaString		標頭具有旗標
+32 bit HLS	MediaString		32 位元 HLS
+Recording	MediaString		錄製
 (unknown format)	MediaString		（未知格式）
+Clean buffers	MediaString		清除緩衝區
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# 幀向前}other{# 幀向前}}
+Rear-right	MediaString		後右
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# 像素} other{# 像素}}
+Mono	MediaString		單聲道
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		ASF 格式家族
+Encoded video	MediaString		編碼視訊
+YUV444	MediaString		YUV444
+Port	MediaString		埠
+Top-Front-left	MediaString		前左上
+24 bit LAB	MediaString		24 位元 LAB
+16 bit integer	MediaString		16 位元整數
+32 bit HSVA	MediaString		32 位元 HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		離線
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		未知的視訊來源
 QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		32 位元 HLSA
+Top-Front-center	MediaString		前上中
+BeOS format family	MediaString		BeOS 格式家族
+24 bit HSV	MediaString		24 位元 HSV
+Back-center	MediaString		後中
+32 bit CMY	MediaString		32 位元 CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# 位元整數}}
+Ambisonic WXYZ	MediaString		環繞聲 WXYZ
 (unknown video format)	MediaString		（未知影片格式）
+Video data between line %lu and %lu	MediaString		第 %lu 行和第 %lu 行之間的視訊資料
+AVI format family	MediaString		AVI 格式家族
+Homogenous buffers	MediaString		同質緩衝區
+Interlaced 	MediaString		交錯式
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# 頻道}other{# 頻道}}
+15 bit RGBA	MediaString		15 位元 RGBA
+Drop data	MediaString		丟棄資料
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		赫茲
+Right	MediaString		右
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
+32 bit RGB	MediaString		32 位元 RGB
+System mixer	MediaString		系統混音器
+Physical output	MediaString		實體輸出
+Top-Back-center	MediaString		後上中
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		由上到下，由左到右
 (unknown run mode)	MediaString		（未知運轉模式）
+ kb/s	MediaString		kb/s
+24 bit HSI	MediaString		24 位元 HSI
+User-defined media type	MediaString		使用者自訂的媒體類型
+32 bit CMYA	MediaString		32 位元 CMYA
+Rear-left	MediaString		後左
 QuickTime format family	MediaString		QuickTime 格式家族
+Any format family	MediaString		任何格式家族
+Timecode	MediaString		時間碼
+Top-Front-right	MediaString		前右上
+32 bit float	MediaString		32 位元浮點數
+Controllable	MediaString		可控制的
+32 bit integer	MediaString		32 位元整數
+Front-right-center	MediaString		前右中
+Side-right	MediaString		右側
+ kHz	MediaString		千赫茲
+Little endian	MediaString		小端序
 (unknown matrix mask)	MediaString		（未知矩陣遮罩）
+32 bit LAB	MediaString		32 位元 LAB
+Side-left	MediaString		左側
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# 位元每個緩衝區} other{# 位元每個緩衝區}}
+32 bit CMYK	MediaString		32 位元 CMYK
 (unknown multistream format)	MediaString		（未知的多流格式）
+8 bit integer	MediaString		8 位元整數
+8 bit grayscale-index	MediaString		8 位元灰階索引
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		緩衝區產生器
+Buffer consumer	MediaString		緩衝區消耗者
+Increase latency	MediaString		增加延遲
+Front-left-center	MediaString		前左中
+MPEG format family	MediaString		MPEG 格式家族
 (none)	MediaString		(無)
+Center	MediaString		中間
+ kb/s (max)	MediaString		kb/s (max)
+Monochrome	MediaString		單色
+Private Be media type	MediaString		專屬的 Be 媒體類型
+24 bit UVL	MediaString		24 位元 UVL
+32 bit HSV	MediaString		32 位元 HSV
+ID	MediaString		ID
+AIFF format family	MediaString		AIFF 格式家族
+Top-Back-left	MediaString		後左上
+16 bit RGB	MediaString		16 位元 RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		原始音訊
+32 bit LABA	MediaString		32 位元 LABA
+24 bit HLS	MediaString		24 位元 HLS
+Non-interlaced 	MediaString		非交錯式
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# 位元 (平均)}other{# 位元 (平均)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		WAV 格式家族
+ (NTSC)	MediaString		（NTSC）
+Physical input	MediaString		實體輸入
+Big endian	MediaString		大端序
+Sub	MediaString		子
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# 位元 (最大值)}other{# 位元 (最大值)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		多流媒體
+Encoded audio	MediaString		編碼音訊
+Decrease precision	MediaString		降低精確度
 File interface	MediaString		檔案介面
 (unknown byte order)	MediaString		（未知位元組順序）
+32 bit HSI	MediaString		32 位元 HSI
+Typeless media	MediaString		無類型媒體
+ (PAL)	MediaString		（PAL）
+32 bit RGBA	MediaString		32 位元 RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		kb/s (平均值)
+HTML	MediaString		平均值
+Time source	MediaString		時間來源
+15 bit RGB	MediaString		15 位元 RGB
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# 位元每幀}other{# 位元每幀}}
+Parameters	MediaString		參數
+Raw data from VBL area	MediaString		來自 VBL 區域的原始資料
+Top-Back-right	MediaString		來自 VBL 區域的原始資料
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# 位元每行}other{# 位元每行}}
+Left	MediaString		左
+BeOS video	MediaString		BeOS 視訊
+24 bit CMY	MediaString		24 位元 CMY
+32 bit UVLA	MediaString		32 位元 UVLA
+Top-center	MediaString		上中
+Entity interface	MediaString		實體介面
+Stereo	MediaString		立體聲
+8 bit color-index	MediaString		8 位元色彩索引
+Bottom to top, left to right	MediaString		由下到上，由左到右
+32 bit UVL	MediaString		32 位元 UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# 行} other{# 行}}
+Text	MediaString		文字
 Unknown media type	MediaString		未知的媒體類型
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		其他格式家族
+24 bit RGB	MediaString		24 位元 RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# 幀向後}other{# 幀向後}}
+32 bit HSIA	MediaString		32 位元 HSIA
+Raw video	MediaString		原始視訊

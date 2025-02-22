@@ -1,28 +1,27 @@
-1	french	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Impossible de charger l’économiseur d’écran
-30 seconds	ScreenSaver		30 secondes
-Start screensaver	ScreenSaver		Démarrer l’économiseur
-Password…	ScreenSaver		Mot de passe…
-Password:	ScreenSaver		Mot de passe :
-Password lock	ScreenSaver		Verrouillage par mot de passe
-Screensavers	ScreenSaver		Économiseurs
+1	french	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Le système d’économie d’énergie de l’écran (DPMS) n’est pas disponible
-ScreenSaver	System name		Économiseur d’écran
-Test	ScreenSaver		Tester
-General	ScreenSaver		Général
+Blackness	ScreenSaver		Ténèbres
 Fade now when mouse is here	ScreenSaver		Estomper maintenant lorsque la souris est ici
+Screensavers	ScreenSaver		Économiseurs
 Enable screensaver	ScreenSaver		Activer l’économiseur
+Passwords don't match. Please try again.	ScreenSaver		Les mots de passe ne correspondent pas. Veuillez réessayez.
+30 seconds	ScreenSaver		30 secondes
+No options available	ScreenSaver		Aucune option disponible
+ScreenSaver	System name		Économiseur d’écran
 Don't fade when mouse is here	ScreenSaver		Ne pas estomper lorsque la souris est ici
 Cancel	ScreenSaver		Annuler
-Turn off screen	ScreenSaver		Extinction de l’écran
-No options available	ScreenSaver		Aucune option disponible
-Password Window	ScreenSaver		Fenêtre de mot de passe
+Password:	ScreenSaver		Mot de passe :
 Screensaver settings	ScreenSaver		Réglages de l’économiseur
-Passwords don't match. Please try again.	ScreenSaver		Les mots de passe ne correspondent pas. Veuillez réessayez.
-OK	ScreenSaver		OK
-Blackness	ScreenSaver		Ténèbres
+Password Window	ScreenSaver		Fenêtre de mot de passe
+Test	ScreenSaver		Tester
+Could not load screen saver	ScreenSaver		Impossible de charger l’économiseur d’écran
 Use custom password	ScreenSaver		Utiliser un mot de passe personnalisé
-Done	ScreenSaver		Terminé
+Password…	ScreenSaver		Mot de passe…
 Confirm password:	ScreenSaver		Confirmer le mot de passe :
+Turn off screen	ScreenSaver		Extinction de l’écran
+Password lock	ScreenSaver		Verrouillage par mot de passe
+OK	ScreenSaver		OK
+Done	ScreenSaver		Terminé
+Start screensaver	ScreenSaver		Démarrer l’économiseur
 No preview available	PreviewView		Pas d’aperçu disponible
-Use network password	ScreenSaver		Utiliser un mot de passe réseau
+General	ScreenSaver		Général

@@ -1,28 +1,27 @@
-1	lithuanian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Nepavyko įkelti ekrano užsklandos
-30 seconds	ScreenSaver		30 sekundžių
-Start screensaver	ScreenSaver		Paleisti ekrano užsklandą
-Password…	ScreenSaver		Slaptažodis…
-Password:	ScreenSaver		Slaptažodis:
-Password lock	ScreenSaver		Užrakinti slaptažodžiu
-Screensavers	ScreenSaver		Ekrano užsklandos
+1	lithuanian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		DPMS (ekrano maitinimo valdymo sistema) neprieinama
-ScreenSaver	System name		Ekrano užsklanda
-Test	ScreenSaver		Išbandyti
-General	ScreenSaver		Bendrosios
+Blackness	ScreenSaver		Juodas ekranas
 Fade now when mouse is here	ScreenSaver		Paleisti užsklandą, kai pelės žymeklis yra čia
+Screensavers	ScreenSaver		Ekrano užsklandos
 Enable screensaver	ScreenSaver		Įjungti ekrano užsklandą
+Passwords don't match. Please try again.	ScreenSaver		Slaptažodžiai nesutampa. Bandykite dar kartą.
+30 seconds	ScreenSaver		30 sekundžių
+No options available	ScreenSaver		Ši užsklanda nekonfigūruojama
+ScreenSaver	System name		Ekrano užsklanda
 Don't fade when mouse is here	ScreenSaver		Neleisti užsklandos, kai pelės žymeklis yra čia
 Cancel	ScreenSaver		Atsisakyti
-Turn off screen	ScreenSaver		Išjungti ekraną
-No options available	ScreenSaver		Ši užsklanda nekonfigūruojama
-Password Window	ScreenSaver		Slaptažodžio langas
+Password:	ScreenSaver		Slaptažodis:
 Screensaver settings	ScreenSaver		Užsklandos nuostatos
-Passwords don't match. Please try again.	ScreenSaver		Slaptažodžiai nesutampa. Bandykite dar kartą.
-OK	ScreenSaver		Gerai
-Blackness	ScreenSaver		Juodas ekranas
+Password Window	ScreenSaver		Slaptažodžio langas
+Test	ScreenSaver		Išbandyti
+Could not load screen saver	ScreenSaver		Nepavyko įkelti ekrano užsklandos
 Use custom password	ScreenSaver		Naudoti kitą slaptažodį
-Done	ScreenSaver		Atlikta
+Password…	ScreenSaver		Slaptažodis…
 Confirm password:	ScreenSaver		Patvirtinkite slaptažodį:
+Turn off screen	ScreenSaver		Išjungti ekraną
+Password lock	ScreenSaver		Užrakinti slaptažodžiu
+OK	ScreenSaver		Gerai
+Done	ScreenSaver		Atlikta
+Start screensaver	ScreenSaver		Paleisti ekrano užsklandą
 No preview available	PreviewView		Peržiūra negalima
-Use network password	ScreenSaver		Naudoti tinklo slaptažodį
+General	ScreenSaver		Bendrosios

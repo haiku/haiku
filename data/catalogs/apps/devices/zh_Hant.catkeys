@@ -1,22 +1,83 @@
-1	english	x-vnd.Haiku-Devices	3785804978
+1	english	x-vnd.Haiku-Devices	911816421
+ACPI bus	DevicesView		ACPI 匯流排
+Encryption controller	Device		加密控制器
+Devices	System name		裝置
+USB bus	DevicesView		USB 匯流排
+Graphics Peripheral	DeviceSCSI		圖形週邊
 Processor	Device		處理器
+Generate system information	DevicesView		產生系統資訊
 Unknown	DeviceACPI		未知
+Class info	DevicePCI		類型資訊
+USB bus	Device		USB 匯流排
+Computer	DevicesView		電腦
+Communications	DeviceSCSI		通訊
+Mass storage controller	Device		大容量儲存控制器
+Connection	DevicesView		連接
+Printer	DeviceSCSI		印表機
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI 處理器命名空間 '%2'
+Manufacturer	Device		製造商
+Scanner	DeviceSCSI		掃描器
+Memory controller	Device		記憶體控制器
 Unknown device	DevicesView		未知設備
 Unknown	DevicePCI		未知
+ACPI node '%1'	DeviceACPI		ACPI節點 '%1'
 Optical Drive	DeviceSCSI		光碟機
 Name	PropertyList		名稱
+Manufacturer	DeviceSCSI		製造商
 Device name	Device		設備名稱
+Satellite communications controller	Device		衛星通訊控制器
+Device class	DeviceSCSI		設備類別
+Device	Device		設備
+Input device controller	Device		輸入設備控制器
+ACPI System Indicator	DeviceACPI		ACPI 系統指示器
+PCI bus	DevicesView		PCI 匯流排
+ACPI System Bus	DeviceACPI		ACPI系統匯流排
 Tape Drive	DeviceSCSI		磁帶機
+Changer	DeviceSCSI		轉換器
+Serial bus controller	Device		序列匯流排控制器
+Refresh devices	DevicesView		重新整理裝置
+Category	DevicesView		類別
+RBC	DeviceSCSI		RBC
 Device paths	Device		設備路徑
 Unknown device	Device		未知設備
+Wireless controller	Device		無線控制器
+Generic system peripheral	Device		通用系統週邊
+Value	PropertyList		值
+Devices	DevicesView		裝置
 Device name	DeviceACPI		設備名稱
 Card Reader	DeviceSCSI		讀卡機
+Display controller	Device		顯示控制器
+ACPI Button '%1'	DeviceACPI		ACPI 按鈕 '%1'
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		設備名稱
+Disk Drive	DeviceSCSI		磁碟機
+Report compatibility	DevicesView		報告相容性
 Other	DeviceSCSI		其他
+Computer	Device		電腦
+PCI bus	Device		PCI 匯流排
+Enclosure	DeviceSCSI		外殼
+ACPI Thermal Zone	DeviceACPI		ACPI 熱區
 Order by:	DevicesView		排序以：
+Intelligent controller	Device		智慧型控制器
+Multimedia controller	Device		多媒體控制器
 Quit	DevicesView		Quit
+ISA bus	Device		ISA 匯流排
+ISA bus	DevicesView		ISA 匯流排
 Processor	DeviceSCSI		處理器
+Bridge	Device		橋
+Worm	DeviceSCSI		蠕蟲
 CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		製造商
+Bridge	DeviceSCSI		橋
+Signal processing controller	Device		訊號處理控制器
 Device name	DeviceSCSI		設備名稱
+Docking station	Device		擴充座
+Array	DeviceSCSI		陣列
+Unclassified device	Device		未分類設備
+Manufacturer	DeviceACPI		製造商
+ACPI controller	Device		ACPI 控制器
+Network controller	Device		網絡控制器
+Driver used	Device		使用的驅動程式
+Communication controller	Device		通訊控制器
+ACPI bus	Device		ACPI 匯流排
 unknown	Device		未知

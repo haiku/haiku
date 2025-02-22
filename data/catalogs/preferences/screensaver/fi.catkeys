@@ -1,28 +1,27 @@
-1	finnish	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Näytönsäästäjän lataus epäonnistui
-30 seconds	ScreenSaver		30 sekuntia
-Start screensaver	ScreenSaver		Käynnistä näytönsäästäjä
-Password…	ScreenSaver		Salasana...
-Password:	ScreenSaver		Salasana:
-Password lock	ScreenSaver		Salasanalukitus
-Screensavers	ScreenSaver		Näytönsäästäjät
+1	finnish	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Näytön jännitesyötön hallinnan signalointi ei ole käytettävissä
-ScreenSaver	System name		Näytönsäästäjäasetukset
-Test	ScreenSaver		Testaa
-General	ScreenSaver		Yleinen
+Blackness	ScreenSaver		Mustuus
 Fade now when mouse is here	ScreenSaver		Häivytä nyt kun hiiren kohdistin on tässä
+Screensavers	ScreenSaver		Näytönsäästäjät
 Enable screensaver	ScreenSaver		Ota käyttöön näytönsäästäjä
+Passwords don't match. Please try again.	ScreenSaver		Salasanat eivät täsmää. Yritä uudelleen.
+30 seconds	ScreenSaver		30 sekuntia
+No options available	ScreenSaver		Valitsimia ei ole käytettävissä
+ScreenSaver	System name		Näytönsäästäjäasetukset
 Don't fade when mouse is here	ScreenSaver		Älä häivytä, kun hiiren kohdistin on tässä
 Cancel	ScreenSaver		Peru
-Turn off screen	ScreenSaver		Käännä näyttö pois päältä
-No options available	ScreenSaver		Valitsimia ei ole käytettävissä
-Password Window	ScreenSaver		Salasanaikkuna
+Password:	ScreenSaver		Salasana:
 Screensaver settings	ScreenSaver		Näytönsäästäjän asetukset
-Passwords don't match. Please try again.	ScreenSaver		Salasanat eivät täsmää. Yritä uudelleen.
-OK	ScreenSaver		Valmis
-Blackness	ScreenSaver		Mustuus
+Password Window	ScreenSaver		Salasanaikkuna
+Test	ScreenSaver		Testaa
+Could not load screen saver	ScreenSaver		Näytönsäästäjän lataus epäonnistui
 Use custom password	ScreenSaver		Käytä omaa salasanaa
-Done	ScreenSaver		Valmis
+Password…	ScreenSaver		Salasana...
 Confirm password:	ScreenSaver		Vahvista salasana:
+Turn off screen	ScreenSaver		Käännä näyttö pois päältä
+Password lock	ScreenSaver		Salasanalukitus
+OK	ScreenSaver		Valmis
+Done	ScreenSaver		Valmis
+Start screensaver	ScreenSaver		Käynnistä näytönsäästäjä
 No preview available	PreviewView		Ei esikatselua saatavilla
-Use network password	ScreenSaver		Käytä verkkosalasanaa
+General	ScreenSaver		Yleinen

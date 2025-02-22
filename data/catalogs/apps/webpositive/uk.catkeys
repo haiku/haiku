@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	2942427387
+1	ukrainian	x-vnd.Haiku-WebPositive	886016739
 Authentication required	Authentication Panel		Потрібна автентифікація
 Previous	WebPositive Window		Попереднє
 Copy	Console Window		Копіювати
@@ -150,6 +150,7 @@ Settings	WebPositive Window		Налаштування
 Clear	URL Bar		Очистити
 Loading %url	WebPositive Window		Завантаження %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Факт ґринджол: бій псюг вщух, з’їм шче яєць.
+OK	BookmarkBar		OK
 Start up:	Settings Window		При запуску:
 Confirmation	WebPositive Window		Підтвердження
 Session cookie	Cookie Manager		Сесійний файл cookie

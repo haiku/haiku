@@ -1,28 +1,27 @@
-1	hungarian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		A képernyővédő betöltése sikertelen
-30 seconds	ScreenSaver		30 másodperc
-Start screensaver	ScreenSaver		Képernyővédő indítása
-Password…	ScreenSaver		Jelszó…
-Password:	ScreenSaver		Jelszó:
-Password lock	ScreenSaver		Jelszavas zárolás
-Screensavers	ScreenSaver		Képernyővédő
+1	hungarian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		A kijelző energiakezelési jelzései nem elérhetőek
-ScreenSaver	System name		Képernyővédő
-Test	ScreenSaver		Próba
-General	ScreenSaver		Általános
+Blackness	ScreenSaver		Sötétség
 Fade now when mouse is here	ScreenSaver		Bekapcsolás, ha az egér itt van
+Screensavers	ScreenSaver		Képernyővédő
 Enable screensaver	ScreenSaver		Képernyővédő engedélyezése
+Passwords don't match. Please try again.	ScreenSaver		A jelszavak nem egyeznek, próbáld újra.
+30 seconds	ScreenSaver		30 másodperc
+No options available	ScreenSaver		Nincsenek elérhető beállítások
+ScreenSaver	System name		Képernyővédő
 Don't fade when mouse is here	ScreenSaver		Ne kapcsoljon be, ha az egér itt van
 Cancel	ScreenSaver		Mégse
-Turn off screen	ScreenSaver		Képernyő kikapcsolása
-No options available	ScreenSaver		Nincsenek elérhető beállítások
-Password Window	ScreenSaver		Jelszóablak
+Password:	ScreenSaver		Jelszó:
 Screensaver settings	ScreenSaver		Képernyővédő beállításai
-Passwords don't match. Please try again.	ScreenSaver		A jelszavak nem egyeznek, próbáld újra.
-OK	ScreenSaver		Rendben
-Blackness	ScreenSaver		Sötétség
+Password Window	ScreenSaver		Jelszóablak
+Test	ScreenSaver		Próba
+Could not load screen saver	ScreenSaver		A képernyővédő betöltése sikertelen
 Use custom password	ScreenSaver		Egyéni jelszó használata
-Done	ScreenSaver		Kész
+Password…	ScreenSaver		Jelszó…
 Confirm password:	ScreenSaver		Jelszó megerősítése:
+Turn off screen	ScreenSaver		Képernyő kikapcsolása
+Password lock	ScreenSaver		Jelszavas zárolás
+OK	ScreenSaver		Rendben
+Done	ScreenSaver		Kész
+Start screensaver	ScreenSaver		Képernyővédő indítása
 No preview available	PreviewView		Nem áll rendelkezésre előnézet
-Use network password	ScreenSaver		Hálózati jelszó használata
+General	ScreenSaver		Általános

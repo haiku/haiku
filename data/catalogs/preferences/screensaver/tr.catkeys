@@ -1,28 +1,27 @@
-1	turkish	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Ekran koruyucusu yüklenemedi
-30 seconds	ScreenSaver		30 saniye
-Start screensaver	ScreenSaver		Ekran koruyucusunu başlat
-Password…	ScreenSaver		Parola…
-Password:	ScreenSaver		Parola:
-Password lock	ScreenSaver		Parola kilidi
-Screensavers	ScreenSaver		Ekran Koruyucular
+1	turkish	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Ekran Güç Yönetimi Sinyalizasyonu kullanılamıyor
-ScreenSaver	System name		Ekran Koruyucusu
-Test	ScreenSaver		Sına
-General	ScreenSaver		Genel
+Blackness	ScreenSaver		Kara
 Fade now when mouse is here	ScreenSaver		Fare buradayken kapan
+Screensavers	ScreenSaver		Ekran Koruyucular
 Enable screensaver	ScreenSaver		Ekran koruyucusunu etkinleştir
+Passwords don't match. Please try again.	ScreenSaver		Parolalar eşleşmiyor. Lütfen tekrar deneyin.
+30 seconds	ScreenSaver		30 saniye
+No options available	ScreenSaver		Kullanılabilir seçenek yok
+ScreenSaver	System name		Ekran Koruyucusu
 Don't fade when mouse is here	ScreenSaver		Fare buradayken kapanma
 Cancel	ScreenSaver		Vazgeç
-Turn off screen	ScreenSaver		Ekranı kapat
-No options available	ScreenSaver		Kullanılabilir seçenek yok
-Password Window	ScreenSaver		Parola Penceresi
+Password:	ScreenSaver		Parola:
 Screensaver settings	ScreenSaver		Ekran koruyucusu ayarları
-Passwords don't match. Please try again.	ScreenSaver		Parolalar eşleşmiyor. Lütfen tekrar deneyin.
-OK	ScreenSaver		Tamam
-Blackness	ScreenSaver		Kara
+Password Window	ScreenSaver		Parola Penceresi
+Test	ScreenSaver		Sına
+Could not load screen saver	ScreenSaver		Ekran koruyucusu yüklenemedi
 Use custom password	ScreenSaver		Özel bir parola kullanın
-Done	ScreenSaver		Tamam
+Password…	ScreenSaver		Parola…
 Confirm password:	ScreenSaver		Parolayı onaylayın:
+Turn off screen	ScreenSaver		Ekranı kapat
+Password lock	ScreenSaver		Parola kilidi
+OK	ScreenSaver		Tamam
+Done	ScreenSaver		Tamam
+Start screensaver	ScreenSaver		Ekran koruyucusunu başlat
 No preview available	PreviewView		Kullanılabilir önizleme yok
-Use network password	ScreenSaver		Ağ parolasını kullan
+General	ScreenSaver		Genel

@@ -1,28 +1,27 @@
-1	dutch; flemish	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Kon screensaver niet laden
-30 seconds	ScreenSaver		30 seconden
-Start screensaver	ScreenSaver		Start de schermbeveiliging
-Password…	ScreenSaver		Paswoord...
-Password:	ScreenSaver		Paswoord:
-Password lock	ScreenSaver		Paswoordslot
-Screensavers	ScreenSaver		Schermbeveiligingen
+1	dutch; flemish	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Het Energiebeheersignaalvenster is niet beschikbaar
-ScreenSaver	System name		Schermbeveiliging
-Test	ScreenSaver		Test
-General	ScreenSaver		Algemeen
+Blackness	ScreenSaver		Blackness
 Fade now when mouse is here	ScreenSaver		Direct starten wanneer de muisaanwijzer zich hier bevindt
+Screensavers	ScreenSaver		Schermbeveiligingen
 Enable screensaver	ScreenSaver		Schermbeveiliging inschakelen
+Passwords don't match. Please try again.	ScreenSaver		Paswoorden komen niet overeen. Probeer het nogmaals, alstublieft.
+30 seconds	ScreenSaver		30 seconden
+No options available	ScreenSaver		Geen opties aanwezig
+ScreenSaver	System name		Schermbeveiliging
 Don't fade when mouse is here	ScreenSaver		Niet starten wanneer de muisaanwijzer zich hier bevindt
 Cancel	ScreenSaver		Annuleren
-Turn off screen	ScreenSaver		Scherm uit
-No options available	ScreenSaver		Geen opties aanwezig
-Password Window	ScreenSaver		Paspoortvenster
+Password:	ScreenSaver		Paswoord:
 Screensaver settings	ScreenSaver		Schermbeveiliginginstellingen
-Passwords don't match. Please try again.	ScreenSaver		Paswoorden komen niet overeen. Probeer het nogmaals, alstublieft.
-OK	ScreenSaver		Oké
-Blackness	ScreenSaver		Blackness
+Password Window	ScreenSaver		Paspoortvenster
+Test	ScreenSaver		Test
+Could not load screen saver	ScreenSaver		Kon screensaver niet laden
 Use custom password	ScreenSaver		Gebruik gelegenheids-paswoord
-Done	ScreenSaver		Klaar
+Password…	ScreenSaver		Paswoord...
 Confirm password:	ScreenSaver		Bevestig paswoord:
+Turn off screen	ScreenSaver		Scherm uit
+Password lock	ScreenSaver		Paswoordslot
+OK	ScreenSaver		Oké
+Done	ScreenSaver		Klaar
+Start screensaver	ScreenSaver		Start de schermbeveiliging
 No preview available	PreviewView		Geen voorbeeld beschikbaar
-Use network password	ScreenSaver		Gebruik netwerkpaswoord
+General	ScreenSaver		Algemeen

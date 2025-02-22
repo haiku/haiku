@@ -1,10 +1,26 @@
-1	english	x-vnd.Cortex.Route	1495629910
+1	english	x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		節點 '%name%' 已發布
 OK	CortexRouteApp		確認
 About Cortex/Route…	CortexRouteApp		關於Cortex/Route…
 File	CortexRouteApp		檔案
+Connection '%name%' made	CortexRouteApp		連線 '%name%' 已建立
 Save nodes…	CortexRouteApp		存儲節點…
+%producer% and %consumer%	CortexRouteApp		%producer% 與 %consumer%
+Node '%name%' created	CortexRouteApp		節點  '%name%' 已創建
+Negotiated format:	CortexRouteApp		協商格式：
 Window	CortexRouteApp		視窗
+Transport	CortexRouteApp		傳輸
+Connection broken	CortexRouteApp		連線中斷
 Untitled group	CortexRouteApp		無標題組
+Connection failed	CortexRouteApp		連線失敗
+Connection '%name%' broken	CortexRouteApp		連線 '%name%' 中斷
+Between:	CortexRouteApp		介於：
+Cortex	CortexRouteApp		皮質
 Open…	CortexRouteApp		開啓…
+Pull palettes	CortexRouteApp		拉調色盤
+Connection made	CortexRouteApp		已建立連線
+Show transport	CortexRouteApp		顯示傳輸
+Show add-ons	CortexRouteApp		顯示外掛組件
 Quit	CortexRouteApp		退出應用程式
 Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\n版權所有。\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\n感謝:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\n本文所使用的某些圖標的財產\nBe, Inc. 並經許可使用。
+Tried format:	CortexRouteApp		嘗試過的格式：

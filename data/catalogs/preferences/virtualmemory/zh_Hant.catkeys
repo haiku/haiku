@@ -7,11 +7,11 @@ Turn off	SettingsWindow		關閉
 Changes will take effect upon reboot.	SettingsWindow		更改將在重新啟動後生效。
 Revert	SettingsWindow		恢復
 Keep enabled	SettingsWindow		保持啟用狀態
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		設定檔案中指定的設定無效。 您可以加載預設值或退出。
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		設定檔案中指定的設定無效。 您可以加載默認值或退出。
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		虛擬記憶體\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		找不到設定檔中指定的磁碟區.您可以使用啟動磁碟區或退出.
 Current Swap:	SettingsWindow		目前的互換用量：
-Load defaults	SettingsWindow		加載預設值
+Load defaults	SettingsWindow		加載默認值
 Use boot volume	SettingsWindow		使用啟動磁碟卷
 Automatic swap management	SettingsWindow		自動互換管理
 Defaults	SettingsWindow		默認值

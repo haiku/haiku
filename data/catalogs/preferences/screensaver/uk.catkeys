@@ -1,28 +1,27 @@
-1	ukrainian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Не вдалося завантажити заставку
-30 seconds	ScreenSaver		30 секунд
-Start screensaver	ScreenSaver		Запуск заставки
-Password…	ScreenSaver		Пароль…
-Password:	ScreenSaver		Пароль:
-Password lock	ScreenSaver		Блокувати паролем:
-Screensavers	ScreenSaver		Екранні заставки
+1	ukrainian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Система DPMS не підтримується
-ScreenSaver	System name		ScreenSaver
-Test	ScreenSaver		Тест
-General	ScreenSaver		Загальні
+Blackness	ScreenSaver		Чорний екран
 Fade now when mouse is here	ScreenSaver		Заставка, коли курсор знаходиться тут
+Screensavers	ScreenSaver		Екранні заставки
 Enable screensaver	ScreenSaver		Увімкнути заставку
+Passwords don't match. Please try again.	ScreenSaver		Паролі не співпадають. Будь ласка, спробуйте знову.
+30 seconds	ScreenSaver		30 секунд
+No options available	ScreenSaver		Доступні опції відсутні
+ScreenSaver	System name		ScreenSaver
 Don't fade when mouse is here	ScreenSaver		Без заставки, коли курсор знаходиться тут
 Cancel	ScreenSaver		Скасувати
-Turn off screen	ScreenSaver		Вимкнути екран
-No options available	ScreenSaver		Доступні опції відсутні
-Password Window	ScreenSaver		Вікно пароля
+Password:	ScreenSaver		Пароль:
 Screensaver settings	ScreenSaver		Налаштування заставки
-Passwords don't match. Please try again.	ScreenSaver		Паролі не співпадають. Будь ласка, спробуйте знову.
-OK	ScreenSaver		ОК
-Blackness	ScreenSaver		Чорний екран
+Password Window	ScreenSaver		Вікно пароля
+Test	ScreenSaver		Тест
+Could not load screen saver	ScreenSaver		Не вдалося завантажити заставку
 Use custom password	ScreenSaver		Використовувати вибраний пароль
-Done	ScreenSaver		Готово
+Password…	ScreenSaver		Пароль…
 Confirm password:	ScreenSaver		Підтвердіть пароль:
+Turn off screen	ScreenSaver		Вимкнути екран
+Password lock	ScreenSaver		Блокувати паролем:
+OK	ScreenSaver		ОК
+Done	ScreenSaver		Готово
+Start screensaver	ScreenSaver		Запуск заставки
 No preview available	PreviewView		Попередній перегляд недоступний
-Use network password	ScreenSaver		Використовувати мережевий пароль
+General	ScreenSaver		Загальні

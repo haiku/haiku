@@ -1,28 +1,27 @@
-1	english	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		無法載入螢幕保護程式
-30 seconds	ScreenSaver		30秒
-Start screensaver	ScreenSaver		啟動螢幕保護程式
-Password…	ScreenSaver		密碼…
-Password:	ScreenSaver		密碼：
-Password lock	ScreenSaver		密碼鎖
-Screensavers	ScreenSaver		螢幕保護程式
+1	english	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		顯示電源管理訊號不可用
-ScreenSaver	System name		螢幕保護程式
-Test	ScreenSaver		測試
-General	ScreenSaver		一般的
+Blackness	ScreenSaver		黑度
 Fade now when mouse is here	ScreenSaver		當滑鼠位於此處時立即淡出
+Screensavers	ScreenSaver		螢幕保護程式
 Enable screensaver	ScreenSaver		啟用螢幕保護程式
+Passwords don't match. Please try again.	ScreenSaver		密碼不符。請再試一次。
+30 seconds	ScreenSaver		30秒
+No options available	ScreenSaver		無可用選項
+ScreenSaver	System name		螢幕保護程式
 Don't fade when mouse is here	ScreenSaver		滑鼠在此時不褪色
 Cancel	ScreenSaver		取消
-Turn off screen	ScreenSaver		關閉螢幕
-No options available	ScreenSaver		無可用選項
-Password Window	ScreenSaver		密碼視窗
+Password:	ScreenSaver		密碼：
 Screensaver settings	ScreenSaver		螢幕保護程式設定
-Passwords don't match. Please try again.	ScreenSaver		密碼不符。請再試一次。
-OK	ScreenSaver		確認
-Blackness	ScreenSaver		黑度
+Password Window	ScreenSaver		密碼視窗
+Test	ScreenSaver		測試
+Could not load screen saver	ScreenSaver		無法載入螢幕保護程式
 Use custom password	ScreenSaver		使用自訂密碼
-Done	ScreenSaver		完畢
+Password…	ScreenSaver		密碼…
 Confirm password:	ScreenSaver		確認密碼：
+Turn off screen	ScreenSaver		關閉螢幕
+Password lock	ScreenSaver		密碼鎖
+OK	ScreenSaver		確認
+Done	ScreenSaver		完畢
+Start screensaver	ScreenSaver		啟動螢幕保護程式
 No preview available	PreviewView		沒有可用的預覽
-Use network password	ScreenSaver		使用網路密碼
+General	ScreenSaver		一般的

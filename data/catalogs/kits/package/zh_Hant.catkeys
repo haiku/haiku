@@ -1,6 +1,6 @@
 1	english	x-vnd.Haiku-libpackage	134767648
 Fetching repository-cache from %url	RefreshRepositoryRequest		從 %url 取得庫緩存
-Validating checksum for %repositoryName	RefreshRepositoryRequest		正在驗證 checksum 對 %repositoryName
+Validating checksum for %repositoryName	RefreshRepositoryRequest		正在驗證  %repositoryName 的校驗和
 Failed to remove transaction directory	PackageManagerKit		刪除事務目錄失敗
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		無法取得儲存庫 \"%s\" 的配置。跳過。
 Refreshing repository \"%s\" failed	PackageManagerKit		刷新儲存庫 \"%s\" 失敗

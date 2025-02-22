@@ -1,0 +1,7 @@
+1	english	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		系統音訊混音器
+System video output	NodeManager		系統視訊輸出
+System video input	NodeManager		系統視訊輸入
+No name	NodeManager		無名稱
+System audio input	NodeManager		系統音訊輸入
+Time sources	NodeManager		時間源

@@ -1,28 +1,27 @@
-1	friulian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Impussibil cjariâ il salve schermi
-30 seconds	ScreenSaver		30 seconts
-Start screensaver	ScreenSaver		Invie salve schermi
-Password…	ScreenSaver		Peraule di ordin…
-Password:	ScreenSaver		Peraule di ordin:
-Password lock	ScreenSaver		Bloc cun peraule di ordin
-Screensavers	ScreenSaver		Salveschermi
+1	friulian	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Segnâl di gjestion de energjie dal visôr (DPMS) no disponibil
-ScreenSaver	System name		SalveSchermi
-Test	ScreenSaver		Prove
-General	ScreenSaver		Gjenerâl
+Blackness	ScreenSaver		Oscuritât
 Fade now when mouse is here	ScreenSaver		Disfante cumò cuant che il mouse al è chi
+Screensavers	ScreenSaver		Salveschermi
 Enable screensaver	ScreenSaver		Ative salveschermi
+Passwords don't match. Please try again.	ScreenSaver		Lis peraulis di ordin no corispuindin, torne prove.
+30 seconds	ScreenSaver		30 seconts
+No options available	ScreenSaver		Nissune opzion disponibile
+ScreenSaver	System name		SalveSchermi
 Don't fade when mouse is here	ScreenSaver		No sta disfantâ cuant che il mouse al è chi
 Cancel	ScreenSaver		Cancele
-Turn off screen	ScreenSaver		Distude il schermi
-No options available	ScreenSaver		Nissune opzion disponibile
-Password Window	ScreenSaver		Barcon pe peraule di ordin
+Password:	ScreenSaver		Peraule di ordin:
 Screensaver settings	ScreenSaver		Impostazions salveschermi
-Passwords don't match. Please try again.	ScreenSaver		Lis peraulis di ordin no corispuindin, torne prove.
-OK	ScreenSaver		Va ben
-Blackness	ScreenSaver		Oscuritât
+Password Window	ScreenSaver		Barcon pe peraule di ordin
+Test	ScreenSaver		Prove
+Could not load screen saver	ScreenSaver		Impussibil cjariâ il salve schermi
 Use custom password	ScreenSaver		Dopre une peraule di ordin personalizade
-Done	ScreenSaver		Fat
+Password…	ScreenSaver		Peraule di ordin…
 Confirm password:	ScreenSaver		Conferme peraule di ordin:
+Turn off screen	ScreenSaver		Distude il schermi
+Password lock	ScreenSaver		Bloc cun peraule di ordin
+OK	ScreenSaver		Va ben
+Done	ScreenSaver		Fat
+Start screensaver	ScreenSaver		Invie salve schermi
 No preview available	PreviewView		Nissune anteprime disponibile
-Use network password	ScreenSaver		Dopre peraule di ordin di rêt
+General	ScreenSaver		Gjenerâl

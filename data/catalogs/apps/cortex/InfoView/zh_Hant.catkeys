@@ -1,8 +1,58 @@
-1	english	x-vnd.Cortex.InfoView	391645599
+1	english	x-vnd.Cortex.InfoView	2256992135
+Offset	InfoView		偏移
+Description	DormantNodeInfoView		描述
+Byte order	InfoView		Byte order
+Connection	InfoView		連接
+Output formats	DormantNodeInfoView		輸出格式
+History	InfoView		歷史
+Input formats	DormantNodeInfoView		輸入格式
+Signature	AppNodeInfoView		簽名
+Video data between	InfoView		之間的視訊數據
+Any number	DormantNodeInfoView	For 'Max. instances' field	任一號碼
+Flags	InfoView		旗幟
+Media output	InfoView		介質輸出
+Active lines	InfoView		活躍線路
+Buffer size	InfoView		緩衝區大小
+\n- Quality:	FileNodeInfoView		\n- 品質:
+Kinds	LiveNodeInfoView		種類
+Application	AppNodeInfoView		應用
+Flavor flags	DormantNodeInfoView		喜好標誌
+Max. instances	DormantNodeInfoView		最大實例
+\n- Duration:	FileNodeInfoView		\n- 週期：
+Dormant media node	DormantNodeInfoView		休眠媒體節點
+Latency	LiveNodeInfoView		延遲
+Media type	InfoView		介質類型
+Live media node	LiveNodeInfoView		活躍媒體節點
+Kinds	DormantNodeInfoView		種類
 %title% info	InfoView		%title% 資訊
+Node ID	LiveNodeInfoView		節點ID
+Resolution	InfoView		解析度
+Chunk size	InfoView		區塊大小
 File format	AppNodeInfoView		檔案格式
+Matrix mask	InfoView		矩陣遮罩
+Channel mask	InfoView		通道遮罩
+Orientation	InfoView		方向
 Live file-interface node	FileNodeInfoView		即時檔案介面節點
+Channels	InfoView		頻道
+Sample rate	InfoView		取樣率
 File format	FileNodeInfoView		檔案格式
 (no file)	FileNodeInfoView		（無檔案）
+Media input	InfoView		媒體輸入
+Bit rate	InfoView		位元率
+Input format	DormantNodeInfoView		輸入格式
+Format	InfoView		格式
 Version	AppNodeInfoView		版本
+AddOn ID	DormantNodeInfoView		外掛組件ID
+Frame size	InfoView		框架大小
+Flavor ID	DormantNodeInfoView		風格 ID
+Run mode	LiveNodeInfoView		運作模式
+\n- Codec:	FileNodeInfoView		\n- 編解碼器：
+Port	LiveNodeInfoView		埠
+Output format	DormantNodeInfoView		輸出格式
+Aspect ratio	InfoView		長寬比
+Application-owned node	AppNodeInfoView		應用程式私有節點
+Tracks	FileNodeInfoView		軌跡
+Source	InfoView		來源
+Destination	InfoView		目標
 Copyright	FileNodeInfoView		版權
+ID:	FileNodeInfoView		ID:

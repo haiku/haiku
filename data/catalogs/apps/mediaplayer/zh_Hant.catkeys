@@ -13,7 +13,7 @@ Move Entries	MediaPlayer-MovePLItemsCmd		移動實體
 OK	MediaPlayer-Main		確認
 Remove	MediaPlayer-PlaylistWindow		消除
 Open network stream	MediaPlayer-Main		開啟網路串流
-Open file…	MediaPlayer-Main		開啟档案…
+Open file…	MediaPlayer-Main		開啟檔案…
 Full volume	MediaPlayer-SettingsWindow		全音量
 Start media server	MediaPlayer-Main		開啓媒體伺服器
 Opening '%s'.	MediaPlayer-Main		正在開啓 '%s'.

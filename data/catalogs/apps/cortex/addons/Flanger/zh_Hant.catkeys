@@ -1,4 +1,16 @@
-1	english	x-vnd.moon-Flanger.media_addon	2274895116
-An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode的add-on 版本.\nEric Moon 貢獻(16 June, 1999)
+1	english	x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp：無法取得節點資訊 (%ld):\n%s\n
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode的外掛組件版本.\nEric Moon 貢獻(16 June, 1999)
+Delay	CortexAddOnsFlanger		延遲
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp：找不到節點 node (%ld):\n%s\n
+Depth	CortexAddOnsFlanger		深度
 Feedback	CortexAddOnsFlanger		回饋意見
+Sweep rate	CortexAddOnsFlanger		掃頻速率
+Mix ratio	CortexAddOnsFlanger		混合比例
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode 參數
 OK	CortexAddOnsCommonMediaNodeControlApp		確認
+controls	CortexAddOnsCommonMediaNodeControlApp		控制項
+Mix output	CortexAddOnsFlanger		混合輸出
+Flanger	CortexAddOnsFlanger		法蘭格鑲邊
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp：無參數賦予節點 (%ld):\n%s\n
+Audio input	CortexAddOnsFlanger		音訊輸入

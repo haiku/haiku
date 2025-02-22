@@ -1,28 +1,27 @@
-1	german	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen werden.
-30 seconds	ScreenSaver		30 Sekunden
-Start screensaver	ScreenSaver		Bildschirmschoner starten
-Password…	ScreenSaver		Passwort …
-Password:	ScreenSaver		Passwort:
-Password lock	ScreenSaver		Passwortsperre
-Screensavers	ScreenSaver		Bildschirmschoner
+1	german	x-vnd.Haiku-ScreenSaver	2682415627
 Display Power Management Signaling not available	ScreenSaver		Stromsparfunktionen nicht verfügbar
-ScreenSaver	System name		Bildschirmschoner
-Test	ScreenSaver		Test
-General	ScreenSaver		Allgemein
+Blackness	ScreenSaver		Schwarzer Bildschirm
 Fade now when mouse is here	ScreenSaver		Sofort starten, wenn Maus in diesem Eck
+Screensavers	ScreenSaver		Bildschirmschoner
 Enable screensaver	ScreenSaver		Bildschirmschoner aktivieren
+Passwords don't match. Please try again.	ScreenSaver		Die Passwörter stimmen nicht überein. Bitte nochmal versuchen.
+30 seconds	ScreenSaver		30 Sekunden
+No options available	ScreenSaver		Keine Optionen verfügbar
+ScreenSaver	System name		Bildschirmschoner
 Don't fade when mouse is here	ScreenSaver		Nicht starten, wenn Maus in diesem Eck
 Cancel	ScreenSaver		Abbrechen
-Turn off screen	ScreenSaver		Bildschirm ausschalten
-No options available	ScreenSaver		Keine Optionen verfügbar
-Password Window	ScreenSaver		Passwort-Fenster
+Password:	ScreenSaver		Passwort:
 Screensaver settings	ScreenSaver		Bildschirmschoner-Einstellungen
-Passwords don't match. Please try again.	ScreenSaver		Die Passwörter stimmen nicht überein. Bitte nochmal versuchen.
-OK	ScreenSaver		OK
-Blackness	ScreenSaver		Schwarzer Bildschirm
+Password Window	ScreenSaver		Passwort-Fenster
+Test	ScreenSaver		Test
+Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen werden.
 Use custom password	ScreenSaver		Benutzerdefiniertes Passwort
-Done	ScreenSaver		Fertig
+Password…	ScreenSaver		Passwort …
 Confirm password:	ScreenSaver		Passwort bestätigen:
+Turn off screen	ScreenSaver		Bildschirm ausschalten
+Password lock	ScreenSaver		Passwortsperre
+OK	ScreenSaver		OK
+Done	ScreenSaver		Fertig
+Start screensaver	ScreenSaver		Bildschirmschoner starten
 No preview available	PreviewView		Keine Vorschau verfügbar
-Use network password	ScreenSaver		Netzwerkpasswort
+General	ScreenSaver		Allgemein
