@@ -464,8 +464,12 @@ BPopUpMenu::_WaitMenu(void* _data)
 	BWindow* window = data->window;
 	sem_id sem = data->lock;
 	if (window != NULL) {
-		while (acquire_sem_etc(sem, 1, B_TIMEOUT, 50000) != B_BAD_SEM_ID)
-			window->UpdateIfNeeded();
+		status_t err;
+		do {
+			err = acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, 50000);
+		} while (err == B_INTERRUPTED);
+
+		window->UpdateIfNeeded();
 	}
 
  	status_t unused;
