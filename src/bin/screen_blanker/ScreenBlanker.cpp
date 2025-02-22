@@ -251,6 +251,8 @@ ScreenBlanker::MessageReceived(BMessage* message)
 		case kMsgResumeSaver:
 		{
 			if (fWindow->Lock()) {
+				// ensure that our window and application are active before calling HideCursor()
+				fWindow->Activate();
 				HideCursor();
 				fPasswordWindow->SetPassword("");
 				fPasswordWindow->Hide();
