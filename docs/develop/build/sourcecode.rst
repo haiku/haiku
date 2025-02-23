@@ -87,8 +87,11 @@ the MIME database.
 
 * 3rd_party - Developers custom files. Used for various side projects from Haiku developers, useful personal scripts, and integration with other tools and projects such as virtualization software
 
-Managing GCC and binutils updates using vendor branches
--------------------------------------------------------
+Managing 3rd-party code
+-----------------------
+
+GCC and binutils updates using vendor branches
+::::::::::::::::::::::::::::::::::::::::::::::
 
 The buidtools repository uses vendor branches. This concept originates from `the SVN Book <https://svnbook.red-bean.com/en/1.8/svn.advanced.vendorbr.html>`_
 but applies just as well to Git. This organization allows to clearly separate the imported code
@@ -173,3 +176,38 @@ Comparing the two versions is easy because you can refer to them by branch names
 .. code-block:: bash
 
     git diff vendor-binutils master -- binutils
+
+Third party code in Haiku without vendor branches
+:::::::::::::::::::::::::::::::::::::::::::::::::
+
+The Haiku main repository contains third party code that does not use vendor branches. This
+can be for various reasons, such as:
+
+- Imported files are only a very small subset of another project
+- The upstream project is not developped actively anymore
+- The import is not done from a specific release of the upstream project, but done piecewise.
+
+Some examples of this are:
+
+- All the code in src/libs (often not maintained upstream or very simple),
+- The NetBSD DNS resolution code (one version was packaged as a separate "netresolv" package, but
+  that approach was abandoned by NetBSD)
+- Parts of glibc, musl and BSD C library that are reused in libroot (each file imported
+  independently as needed)
+- FreeBSD and OpenBSD network drivers (each driver synchronized as needed)
+
+In this case, since there is no branch to track where the upstream code came from and what changes
+were made, a few specific steps should be taken to avoid confusion and possibly losing some of our
+changes and fixes:
+
+- Mark all changes made on Haiku side with a __HAIKU__ preprocessor guard. This makes them easy to
+  identify, and allows upstream to integrate these changes if they want to
+- When importing newer versions, note in the commit message where you got the files and which
+  version you used (either a release number, or the commit identifier if using files directly from
+  upstream source control)
+- Keep the changes to a minimum to ease future sycnhronizations with upstream. In particular, it
+  is often not possible to build these files with -Werror due to type declaration differences
+
+When importing new version of the files from upstream, make sure to review all the places where
+there are __HAIKU__ guards, and consider wether they still apply in the new version, or if the
+upstream code has been changed so they can be removed.
