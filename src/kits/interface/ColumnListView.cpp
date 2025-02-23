@@ -274,6 +274,7 @@ public:
 			void 				StartSorting();
 			float				GetColumnPreferredWidth(BColumn* column);
 
+			void				AddRows(BList* rows, int32 index, BRow* parentRow);
 			void				AddRow(BRow*, int32 index, BRow* TheRow);
 			BRow*				CurrentSelection(BRow* lastSelected) const;
 			void 				ToggleFocusRowSelection(bool selectRange);
@@ -282,6 +283,7 @@ public:
 									bool addToCurrentSelection);
 			void 				MoveFocusToVisibleRect();
 			void 				ExpandOrCollapse(BRow* parent, bool expand);
+			void				RemoveRows(BList* rows);
 			void 				RemoveRow(BRow*);
 			BRowContainer*		RowList();
 			void				UpdateRow(BRow*);
@@ -324,11 +326,14 @@ private:
 			void				DeepSort();
 			void				SelectRange(BRow* start, BRow* end);
 			int32				CompareRows(BRow* row1, BRow* row2);
-			void				AddSorted(BRowContainer* list, BRow* row);
+			int32				AddRowToParentOnly(BRow* row, int32 index,
+									BRow* parent);
+			int32				AddSorted(BRowContainer* list, BRow* row);
 			void				RecursiveDeleteRows(BRowContainer* list,
 									bool owner);
 			void				InvalidateCachedPositions();
 			bool				FindVisibleRect(BRow* row, BRect* _rect);
+			bool				RemoveRowFromSelectionOnly(BRow* row);
 
 			BList*				fColumns;
 			BList*				fSortColumns;
@@ -1382,10 +1387,39 @@ BColumnListView::AddRow(BRow* row, int32 index, BRow* parentRow)
 
 
 void
+BColumnListView::AddRows(BList* rows, int32 index, BRow* parent)
+{
+	for (int32 i = rows->CountItems() - 1; i >= 0; i--) {
+		BRow* row = static_cast<BRow*>(rows->ItemAt(i));
+		row->fChildList = 0;
+		row->fList = this;
+		row->ValidateFields();
+	}
+
+	fOutlineView->AddRows(rows, index, parent);
+}
+
+
+void
 BColumnListView::RemoveRow(BRow* row)
 {
 	fOutlineView->RemoveRow(row);
 	row->fList = NULL;
+}
+
+
+/*!	This method will allow for multiple rows to be removed at the same time. All
+	of the rows must belong to the same parent row.
+*/
+void
+BColumnListView::RemoveRows(BList* rows)
+{
+	fOutlineView->RemoveRows(rows);
+
+	for (int32 i = rows->CountItems() - 1; i >= 0; i--) {
+		BRow* row = static_cast<BRow*>(rows->ItemAt(i));
+		row->fList = NULL;
+	}
 }
 
 
@@ -1476,7 +1510,9 @@ BColumnListView::InvalidateRow(BRow* row)
 {
 	BRect updateRect;
 	GetRowRect(row, &updateRect);
-	fOutlineView->Invalidate(updateRect);
+
+	if (fOutlineView->VisibleRect().Intersects(updateRect))
+		fOutlineView->Invalidate(updateRect);
 }
 
 
@@ -4351,6 +4387,24 @@ OutlineView::ExpandOrCollapse(BRow* parentRow, bool expand)
 	}
 }
 
+
+/*!	This method will remove the row from the selection if it is in the
+	selection, but does not trigger any UI update.
+*/
+bool
+OutlineView::RemoveRowFromSelectionOnly(BRow* row)
+{
+	if (row->fNextSelected != 0) {
+		row->fNextSelected->fPrevSelected = row->fPrevSelected;
+		row->fPrevSelected->fNextSelected = row->fNextSelected;
+		row->fPrevSelected = 0;
+		row->fNextSelected = 0;
+		return true;
+	}
+	return false;
+}
+
+
 void
 OutlineView::RemoveRow(BRow* row)
 {
@@ -4365,6 +4419,7 @@ OutlineView::RemoveRow(BRow* row)
 
 	// Adjust height for the visible sub-tree that is going to be removed.
 	float subTreeHeight = 0.0f;
+
 	if (parentIsVisible && (parentRow == NULL || parentRow->fIsExpanded)) {
 		// The row itself is visible at least.
 		subTreeHeight = row->Height() + 1;
@@ -4419,13 +4474,152 @@ OutlineView::RemoveRow(BRow* row)
 	}
 
 	// Remove this from the selection if necessary
-	if (row->fNextSelected != 0) {
-		row->fNextSelected->fPrevSelected = row->fPrevSelected;
-		row->fPrevSelected->fNextSelected = row->fNextSelected;
-		row->fPrevSelected = 0;
-		row->fNextSelected = 0;
+	if (RemoveRowFromSelectionOnly(row))
 		fMasterView->SelectionChanged();
+
+	fCurrentColumn = 0;
+	fCurrentRow = 0;
+	fCurrentField = 0;
+}
+
+
+void
+OutlineView::RemoveRows(BList* rows)
+{
+	if (rows->IsEmpty())
+		return;
+
+	// a limitation of the method is that all of the rows must be on the same
+	// parent.
+
+	BRow* parentRow = NULL;
+	int32 countRows = rows->CountItems();
+
+	for (int32 i = 0; i < countRows; i++) {
+		BRow* row = static_cast<BRow*>(rows->ItemAt(i));
+		if (i == 0) {
+			parentRow = row->fParent;
+		} else if (parentRow != row->fParent) {
+			debugger("during bulk removal all rows must be from the same parent");
+			return;
+		}
 	}
+
+	// figure out the size to remove from the parent.
+
+	bool parentIsVisible = parentRow == NULL;
+		// NOTE: This could be a root row without a parent, in which case
+		// it is always visible.
+	BRect parentRowRect;
+
+	if (parentRow)
+		parentIsVisible = FindRect(parentRow, &parentRowRect);
+
+	// Adjust height for the visible sub-tree that is going to be removed.
+	float subTreesHeight = 0.0f;
+	if (parentIsVisible && (parentRow == NULL || parentRow->fIsExpanded)) {
+
+		BRect invalidAll;
+
+		for (int32 i = 0; i < countRows; i++) {
+			BRow* row = static_cast<BRow*>(rows->ItemAt(i));
+
+			// The row itself is visible at least.
+			subTreesHeight += row->Height() + 1;
+
+			if (row->fIsExpanded) {
+				// Adjust for the height of visible sub-items as well.
+				// (By default, the iterator follows open branches only.)
+				for (RecursiveOutlineIterator iterator(row->fChildList);
+					iterator.CurrentRow(); iterator.GoToNext()) {
+					subTreesHeight += iterator.CurrentRow()->Height() + 1;
+				}
+			}
+
+			// Collect a rect of all of the deleted rects then they can be
+			// invalidated at once.
+
+			BRect invalid;
+			if (FindRect(row, &invalid)) {
+				if (!invalidAll.IsValid())
+					invalidAll = invalid;
+				else
+					invalidAll = invalidAll | invalid;
+			}
+		}
+
+		if (invalidAll.IsValid()) {
+			invalidAll.bottom = Bounds().bottom;
+			if (invalidAll.IsValid() && invalidAll.top < fVisibleRect.bottom)
+				Invalidate(invalidAll);
+		}
+	}
+
+	fItemsHeight -= subTreesHeight;
+
+	FixScrollBar(false);
+
+	int32 indent = 0;
+	float top = 0.0;
+	if (FindRow(fVisibleRect.top, &indent, &top) == NULL && ScrollBar(B_VERTICAL) != NULL) {
+		// after removing this row, no rows are actually visible any more,
+		// force a scroll to make them visible again
+		if (fItemsHeight > fVisibleRect.Height())
+			ScrollBy(0.0, fItemsHeight - fVisibleRect.Height() - Bounds().top);
+		else
+			ScrollBy(0.0, -Bounds().top);
+	}
+
+	if (parentRow != NULL) {
+
+		for (int32 i = 0; i < countRows; i++) {
+			BRow* row = static_cast<BRow*>(rows->ItemAt(i));
+			parentRow->fChildList->RemoveItem(row);
+		}
+
+		if (parentRow->fChildList->CountItems() == 0) {
+			delete parentRow->fChildList;
+			parentRow->fChildList = 0;
+			// It was the last child row of the parent, which also means the
+			// latch disappears.
+			BRect parentRowRect;
+			if (parentIsVisible && FindRect(parentRow, &parentRowRect))
+				Invalidate(parentRowRect);
+		}
+	} else {
+		for (int32 i = 0; i < countRows; i++) {
+			BRow* row = static_cast<BRow*>(rows->ItemAt(i));
+			fRows.RemoveItem(row);
+		}
+	}
+
+	if (fFocusRow) {
+		if (fFocusRowRect.top < fVisibleRect.bottom)
+			Invalidate(fFocusRowRect);
+
+		// Adjust focus row if necessary.
+
+		if (fFocusRow && !FindRect(fFocusRow, &fFocusRowRect)) {
+			// focus row is in a subtree that is gone, move it up to the parent.
+			fFocusRow = parentRow;
+
+			if (fFocusRow)
+				FindRect(fFocusRow, &fFocusRowRect);
+
+			if (fFocusRowRect.top < fVisibleRect.bottom)
+				Invalidate(fFocusRowRect);
+		}
+	}
+
+	bool anyRowRemovedFromSelection = false;
+	for (int32 i = 0; i < countRows; i++) {
+		BRow* row = static_cast<BRow*>(rows->ItemAt(i));
+		if (RemoveRowFromSelectionOnly(row))
+			anyRowRemovedFromSelection = true;
+	}
+
+	if (anyRowRemovedFromSelection)
+		fMasterView->SelectionChanged();
 
 	fCurrentColumn = 0;
 	fCurrentRow = 0;
@@ -4478,12 +4672,13 @@ OutlineView::UpdateRow(BRow* row)
 }
 
 
-void
-OutlineView::AddRow(BRow* row, int32 Index, BRow* parentRow)
+/*!	This method will add the row to the supplied parent or to the root parent
+	but will make no adjustments to the UI elements such as the scrollbar.
+	Returns the index of the row at which the row was added.
+*/
+int32
+OutlineView::AddRowToParentOnly(BRow* row, int32 index, BRow* parentRow)
 {
-	if (!row)
-		return;
-
 	row->fParent = parentRow;
 
 	if (fMasterView->SortingEnabled() && !fSortColumns->IsEmpty()) {
@@ -4492,26 +4687,129 @@ OutlineView::AddRow(BRow* row, int32 Index, BRow* parentRow)
 			if (parentRow->fChildList == NULL)
 				parentRow->fChildList = new BRowContainer;
 
-			AddSorted(parentRow->fChildList, row);
-		} else
-			AddSorted(&fRows, row);
-	} else {
-		// Note, a -1 index implies add to end if sorting is not enabled
-		if (parentRow) {
-			if (parentRow->fChildList == 0)
-				parentRow->fChildList = new BRowContainer;
+			return AddSorted(parentRow->fChildList, row);
+		}
+		return AddSorted(&fRows, row);
+	}
 
-			if (Index < 0 || Index > parentRow->fChildList->CountItems())
-				parentRow->fChildList->AddItem(row);
-			else
-				parentRow->fChildList->AddItem(row, Index);
-		} else {
-			if (Index < 0 || Index >= fRows.CountItems())
-				fRows.AddItem(row);
-			else
-				fRows.AddItem(row, Index);
+	// Note, a -1 index implies add to end if sorting is not enabled
+	if (parentRow) {
+		if (parentRow->fChildList == 0)
+			parentRow->fChildList = new BRowContainer;
+
+		int32 parentRowCount = parentRow->fChildList->CountItems();
+
+		if (index < 0 || index > parentRowCount) {
+			parentRow->fChildList->AddItem(row);
+			return parentRowCount;
+		}
+
+		parentRow->fChildList->AddItem(row, index);
+		return index;
+	}
+
+	int32 rowCount = fRows.CountItems();
+
+	if (index < 0 || index >= rowCount) {
+		fRows.AddItem(row);
+		return rowCount;
+	}
+
+	fRows.AddItem(row, index);
+	return index;
+}
+
+
+void
+OutlineView::AddRows(BList* addedRows, int32 index, BRow* parentRow)
+{
+	if (addedRows->IsEmpty())
+		return;
+
+	bool parentRowEmptyOnEntry = true;
+
+	if (parentRow)
+		parentRowEmptyOnEntry = parentRow->fChildList->CountItems() == 0;
+
+	float maxRowHeight = 0.0f;
+	float sumRowHeight = 0.0f;
+	int32 countAddedRows = addedRows->CountItems();
+	int32 firstIndex = -1;
+	BRow* firstRow = NULL;
+
+	for (int32 i = 0; i < countAddedRows; i++) {
+		BRow* row = static_cast<BRow*>(addedRows->ItemAt(i));
+		int insertedIndex = AddRowToParentOnly(row, index, parentRow);
+
+		if (insertedIndex >= 0) {
+			if (firstIndex < 0 || insertedIndex <= firstIndex) {
+				firstIndex = insertedIndex;
+				firstRow = row;
+			}
+
+			float rowHeight = row->Height();
+
+			sumRowHeight += rowHeight;
+
+			if (rowHeight > maxRowHeight)
+				maxRowHeight = rowHeight;
 		}
 	}
+
+#ifdef DOUBLE_BUFFERED_COLUMN_RESIZE
+	ResizeBufferView()->UpdateMaxHeight(maxRowHeight);
+#endif
+
+	// Now that the rows are loaded in, the metrics and other aspects of the
+	// user interface need to be updated.
+
+	if (parentRow == 0 || parentRow->fIsExpanded)
+		fItemsHeight += (sumRowHeight + static_cast<float>(countAddedRows));
+			// the height of the rows plus 1.0 for each row.
+
+	FixScrollBar(false);
+
+	BRect firstAddedRowRect;
+	const bool firstAddedRowIsInOpenBranch = FindRect(firstRow, &firstAddedRowRect);
+
+	// The assumption here is that if the first row is in an open branch then
+	// the rest are as well since they have the same parent. The area that needs
+	// redrawing is everything below this item.
+
+	if (firstAddedRowIsInOpenBranch && firstAddedRowRect.top < fVisibleRect.bottom) {
+		BRect invalidRect = firstAddedRowRect;
+		invalidRect.bottom = fItemsHeight;
+		Invalidate(invalidRect);
+	}
+
+	if (fFocusRow) {
+		if (fFocusRowRect.top < fVisibleRect.bottom)
+			Invalidate(fFocusRowRect);
+
+		FindRect(fFocusRow, &fFocusRowRect);
+
+		if (fFocusRowRect.top < fVisibleRect.bottom)
+			Invalidate(fFocusRowRect);
+	}
+
+	// If the parent was previously childless, it will need to have a latch
+	// drawn.
+
+	if (parentRow && parentRowEmptyOnEntry) {
+		BRect parentRect;
+		if (FindVisibleRect(parentRow, &parentRect))
+			Invalidate(parentRect);
+	}
+}
+
+
+void
+OutlineView::AddRow(BRow* row, int32 Index, BRow* parentRow)
+{
+	if (!row)
+		return;
+
+	AddRowToParentOnly(row, Index, parentRow);
 
 #ifdef DOUBLE_BUFFERED_COLUMN_RESIZE
 	ResizeBufferView()->UpdateMaxHeight(row->Height());
@@ -4618,7 +4916,8 @@ OutlineView::FixScrollBar(bool scrollToFit)
 }
 
 
-void
+/*!	Returns the index at which the row was added. */
+int32
 OutlineView::AddSorted(BRowContainer* list, BRow* row)
 {
 	if (list && row) {
@@ -4641,11 +4940,18 @@ OutlineView::AddSorted(BRowContainer* list, BRow* row)
 			if( CompareRows(row, list->ItemAt(upper)) > 0 ) upper++;
 		}
 
-		if (upper >= list->CountItems())
-			list->AddItem(row);				// Adding to end.
-		else
-			list->AddItem(row, upper);		// Insert
+		if (upper >= list->CountItems()) {
+			list->AddItem(row);
+				// Adding to end.
+			return list->CountItems() - 1;
+		}
+
+		list->AddItem(row, upper);
+			// Insert at specific location
+		return upper;
 	}
+
+	return -1;
 }
 
 
@@ -4730,6 +5036,9 @@ OutlineView::FindVisibleRect(BRow* row, BRect* _rect)
 }
 
 
+/*!	This method will store the visible rectangle of the supplied `row` into
+	`_rect` returning true if the row is currently visible.
+*/
 bool
 OutlineView::FindRect(const BRow* row, BRect* _rect)
 {

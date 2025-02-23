@@ -323,6 +323,8 @@ public:
 			void				AddRow(BRow* row, BRow* parent = NULL);
 			void				AddRow(BRow* row, int32 index,
 									BRow* parent = NULL);
+			void				AddRows(BList* rows, int32 index,
+									BRow* parent = NULL);
 
 			void				ScrollTo(const BRow* Row);
 			void				ScrollTo(BPoint point);
@@ -330,6 +332,7 @@ public:
 	// Does not delete row or children at this time.
 	// todo: Make delete row and children
 			void				RemoveRow(BRow* row);
+			void				RemoveRows(BList* rows);
 			void				UpdateRow(BRow* row);
 			bool				SwapRows(int32 index1, int32 index2, BRow*
 									parentRow1 = NULL, BRow* parentRow2 = NULL);
