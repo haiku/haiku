@@ -11,6 +11,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObject <$(architecture)>posix_musl_string.o :
 			memccpy.c
 			memmem.c
+			memmove.c
 			memrchr.c
 			stpcpy.c
 			stpncpy.c

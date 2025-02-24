@@ -45,20 +45,13 @@ SEARCH_SOURCE += [ FDirName $(posixSources) string ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) sys ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) time ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) unistd ] ;
-SEARCH_SOURCE += [ FDirName $(gnuSources) ] ;
+SEARCH_SOURCE += [ FDirName $(posixSources) musl string ] ;
+#SEARCH_SOURCE += [ FDirName $(gnuSources) ] ;
 
 local muslSources =
 	ffs.c
 	rand.c
 	rand_r.c
-
-	memmem.c
-	stpcpy.c
-	strchrnul.c
-	strcspn.c
-	strpbrk.c
-	strspn.c
-	strstr.c
 	;
 
 SourceHdrs $(muslSources) :
@@ -76,12 +69,14 @@ KernelMergeObject kernel_lib_posix.o :
 	fcntl.cpp
 	poll.cpp
 	utime.c
+
 	# locale
 	ctype_loc.cpp
 	ctype_l.cpp
 	ctype.cpp
 	localeconv.cpp
 	LocaleData.cpp
+
 	# stdlib
 	abs.c
 	atoi.c
@@ -94,6 +89,7 @@ KernelMergeObject kernel_lib_posix.o :
 	strtoll.c
 	strtoul.c
 	strtoull.c
+
 	# sys
 	chmod.c
 	stat.c
@@ -101,13 +97,14 @@ KernelMergeObject kernel_lib_posix.o :
 	select.cpp
 	gettimeofday.c
 	uio.c
+
 	# time
 	time.c
+
 	# unistd
 	access.c
 	chown.c
 	close.c
-	#conf.c
 	directory.c
 	dup.c
 	ioctl.c
@@ -119,16 +116,21 @@ KernelMergeObject kernel_lib_posix.o :
 	truncate.c
 	usergroup.cpp
 	write.c
+
 	# string
 	memchr.c
 	memcmp.c
+	memmem.c
 	memmove.c
+	stpcpy.c
 	strcasecmp.c
 	strcasestr.c
 	strcat.c
 	strchr.c
+	strchrnul.c
 	strcmp.c
 	strcpy.c
+	strcspn.c
 	strdup.cpp
 	strerror.c
 	strlcat.c
@@ -139,7 +141,10 @@ KernelMergeObject kernel_lib_posix.o :
 	strncpy.cpp
 	strndup.cpp
 	strnlen.cpp
+	strpbrk.c
 	strrchr.c
+	strspn.c
+	strstr.c
 	strtok.c
 	strupr.c
 
@@ -149,7 +154,6 @@ KernelMergeObject kernel_lib_posix.o :
 
 SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl misc ] ;
 SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl prng ] ;
-SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl string ] ;
 
 # misc
 
