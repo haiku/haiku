@@ -6,6 +6,7 @@
  *	Ficus Kirkpatrick (ficus@ior.com)
  *	Jérôme Duval
  *	Axel Dörfler, axeld@pinc-software.de
+ *  Stefano Ceccherini
  */
 
 /* A shell utility for somewhat emulating the Tracker's "Find By Formula"
@@ -26,24 +27,56 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "FilteredQuery.h"
 
 extern const char *__progname;
 static const char *kProgramName = __progname;
+
+struct folder_params
+{
+	BPath path;
+	bool includeSubFolders;
+};
+
+
+static bool
+FilterByFolder(const entry_ref *ref, void *arg)
+{
+	folder_params* params = static_cast<folder_params*>(arg);
+	BPath& wantedPath = params->path;
+	bool includeSub = params->includeSubFolders;
+
+	BPath path(ref);
+	if (includeSub) {
+		if (!strncmp(path.Path(), wantedPath.Path(),
+				strlen(wantedPath.Path())))
+			return true;
+	} else {
+		if (path.GetParent(&path) == B_OK &&
+			path == wantedPath)
+			return true;
+	}
+	return false;
+}
+
 
 // Option variables.
 static bool sAllVolumes = false;		// Query all volumes?
 static bool sEscapeMetaChars = true;	// Escape metacharacters?
 static bool sFilesOnly = false;			// Show only files?
 static bool sLocalizedAppNames = false;	// match localized names
+static bool sSubFolders = false;		// Include sub-folders?
 
 
 void
 usage(void)
 {
-	printf("usage: %s [ -ef ] [ -a || -v <path-to-volume> ] expression\n"
+	printf("usage: %s [ -ef ] [ -p <path-to-search> ] [ -s ] [ -a || -v <path-to-volume> ] expression\n"
 		"  -e\t\tdon't escape meta-characters\n"
 		"  -f\t\tshow only files (ie. no directories or symbolic links)\n"
 		"  -l\t\tmatch expression with localized application names\n"
+		"  -p <path>\tsearch only in the given path.\n"
+		"  -s\t\tinclude subfolders (only meaningful when used with \"-p\")\n"
 		"  -a\t\tperform the query on all volumes\n"
 		"  -v <file>\tperform the query on just one volume; <file> can be any\n"
 		"\t\tfile on that volume. Defaults to the current volume.\n"
@@ -54,15 +87,22 @@ usage(void)
 
 
 void
-perform_query(BVolume &volume, const char *predicate)
+perform_query(BVolume &volume, const char *predicate, const char *filterpath)
 {
-	BQuery query;
+	TFilteredQuery query;
 	query.SetVolume(&volume);
 
 	if (sLocalizedAppNames)
 		query.SetPredicate("BEOS:APP_SIG=*");
 	else
 		query.SetPredicate(predicate);
+
+	folder_params options;
+	if (filterpath != NULL && filterpath[0] != '\0') {
+		options.path = filterpath;
+		options.includeSubFolders = sSubFolders;
+		query.AddFilter(FilterByFolder, &options);
+	}
 
 	status_t status = query.Fetch();
 	if (status == B_BAD_VALUE) {
@@ -122,15 +162,21 @@ main(int argc, char **argv)
 	char volumePath[B_FILE_NAME_LENGTH];
 	strcpy(volumePath, ".");
 
+	// We won't filter by dirs unless this gets set by "-p <path>".
+	char directoryPath[B_PATH_NAME_LENGTH] = { '\0' };
+
 	// Parse command-line arguments.
 	int opt;
-	while ((opt = getopt(argc, argv, "efalv:")) != -1) {
+	while ((opt = getopt(argc, argv, "efsalv:p:")) != -1) {
 		switch(opt) {
 			case 'e':
 				sEscapeMetaChars = false;
 				break;
 			case 'f':
 				sFilesOnly = true;
+				break;
+			case 's':
+				sSubFolders = true;
 				break;
 			case 'a':
 				sAllVolumes = true;
@@ -140,6 +186,9 @@ main(int argc, char **argv)
 				break;
 			case 'v':
 				strlcpy(volumePath, optarg, B_FILE_NAME_LENGTH);
+				break;
+			case 'p':
+				strlcpy(directoryPath, optarg, B_PATH_NAME_LENGTH);
 				break;
 
 			default:
@@ -168,7 +217,7 @@ main(int argc, char **argv)
 		if (!volume.KnowsQuery())
 			fprintf(stderr, "%s: volume containing %s is not query-enabled\n", kProgramName, volumePath);
 		else
-			perform_query(volume, argv[optind]);
+			perform_query(volume, argv[optind], directoryPath);
 	} else {
 		// Okay, we want to query all the disks -- so iterate over
 		// them, one by one, running the query.
@@ -177,7 +226,7 @@ main(int argc, char **argv)
 			// We don't print errors here -- this will catch /pipe and
 			// other filesystems we don't care about.
 			if (volume.KnowsQuery())
-				perform_query(volume, argv[optind]);
+				perform_query(volume, argv[optind], directoryPath);
 		}
 	}
 
