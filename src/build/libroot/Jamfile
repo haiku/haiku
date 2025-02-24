@@ -41,10 +41,6 @@ if $(HOST_PLATFORM) != darwin && $(HOST_PLATFORM) != haiku_host {
 	strlSources = strlcpy.c strlcat.c ;
 }
 
-if $(HOST_PLATFORM) = mingw {
-	strlSources += stpcpy.c strcasestr.c ;
-}
-
 local hostPlatformSources ;
 if $(HOST_PLATFORM) = freebsd {
 	hostPlatformSources = fs_freebsd.cpp ;
@@ -72,7 +68,7 @@ local librootSources =
 	driver_settings.cpp
 
 	$(strlSources)
-	strnlen.cpp
+	strnlen.c
 
 	KMessage.cpp
 ;
@@ -108,8 +104,8 @@ BuildPlatformStaticLibraryPIC libroot_build_function_remapper.a :
 
 SEARCH on [ FGristFiles driver_settings.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
-SEARCH on [ FGristFiles $(strlSources) strnlen.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
+SEARCH on [ FGristFiles $(strlSources) strnlen.c ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix musl string ] ;
 SEARCH on [ FGristFiles SHA256.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix crypt ] ;
 SEARCH on [ FGristFiles KMessage.cpp ]

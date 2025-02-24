@@ -318,8 +318,8 @@ for platform in [ MultiBootSubDirSetup ] {
 			memmove.c
 			strdup.cpp
 			strndup.cpp
-			strlen.cpp
-			strnlen.cpp
+			strlen.c
+			strnlen.c
 			strcmp.c
 			strcasecmp.c
 			strncmp.c

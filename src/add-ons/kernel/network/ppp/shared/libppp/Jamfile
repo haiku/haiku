@@ -8,7 +8,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 	libkernelppp headers ] : true ;
 
 StaticLibrary libppp.a :
-	strlcat.c
 	driver_settings.cpp
 	settings_tools.cpp
 	KPPPUtils.cpp
@@ -20,8 +19,6 @@ StaticLibrary libppp.a :
 	: libnetwork.so libbnetapi.so
 ;
 
-SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(HAIKU_TOP) src system
-	libroot posix string ] ;
 SEARCH on [ FGristFiles driver_settings.cpp ] = [ FDirName $(HAIKU_TOP) src
 	system libroot os ] ;
 SEARCH on [ FGristFiles settings_tools.cpp ] = [ FDirName $(HAIKU_TOP) src

@@ -131,9 +131,6 @@ SEARCH on [ FGristFiles list.cpp ring_buffer.cpp ]
 SEARCH on [ FGristFiles KMessage.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
-SEARCH on [ FGristFiles strlcat.c strlcpy.c ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
-
 SEARCH on [ FGristFiles driver_settings.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
