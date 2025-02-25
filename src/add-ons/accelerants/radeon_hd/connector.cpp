@@ -132,7 +132,8 @@ connector_pick_atom_hpdid(uint32 connectorIndex)
 		if (info.dceMajor >= 13) {
 			ERROR("WARNING: CHECK NEW DCE mmDC_GPIO_HPD_A value!\n");
 			targetReg = POL_mmDC_GPIO_HPD_A;
-		} else if (info.dceMajor >= 12)
+		} else if (info.dceMajor >= 12
+			|| (info.dceMajor == 11 && info.dceMinor == 2))
 			targetReg = POL_mmDC_GPIO_HPD_A;
 		else if (info.dceMajor >= 11)
 			targetReg = CAR_mmDC_GPIO_HPD_A;
