@@ -2709,7 +2709,7 @@ void
 BContainerWindow::EachAddOn(void (*eachAddOn)(const Model*, const char*,
 		uint32 shortcut, uint32 modifiers, bool primary, void* context,
 		BContainerWindow* window, BMenu* menu),
-	void* passThru, BStringList& mimeTypes, BMenu* menu)
+	void* passThru, BStringList& mimeTypes, BMenu* parent)
 {
 	AutoLock<LockingList<AddOnShortcut, true> > lock(fAddOnsList);
 	if (!lock.IsLocked())
@@ -2755,7 +2755,7 @@ BContainerWindow::EachAddOn(void (*eachAddOn)(const Model*, const char*,
 			}
 		}
 		((eachAddOn)(item->model, item->model->Name(), item->key,
-			item->modifiers, primary, passThru, this, menu));
+			item->modifiers, primary, passThru, this, parent));
 	}
 }
 
