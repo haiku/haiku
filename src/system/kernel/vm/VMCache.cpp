@@ -1172,6 +1172,17 @@ VMCache::Resize(off_t newSize, int priority)
 		while (_FreePageRange(pages.GetIterator(newPageCount, true, true)))
 			;
 	}
+	if (newSize < virtual_end && newPageCount > 0) {
+		// We may have a partial page at the end of the cache that must be cleared.
+		uint32 partialBytes = newSize % B_PAGE_SIZE;
+		if (partialBytes != 0) {
+			vm_page* page = LookupPage(newSize - partialBytes);
+			if (page != NULL) {
+				vm_memset_physical(page->physical_page_number * B_PAGE_SIZE
+					+ partialBytes, 0, B_PAGE_SIZE - partialBytes);
+			}
+		}
+	}
 
 	if (priority >= 0) {
 		status_t status = Commit(PAGE_ALIGN(newSize - virtual_base), priority);

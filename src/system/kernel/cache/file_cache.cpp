@@ -1276,23 +1276,9 @@ file_cache_set_size(void* _cacheRef, off_t newSize)
 	VMCache* cache = ref->cache;
 	AutoLocker<VMCache> _(cache);
 
-	off_t oldSize = cache->virtual_end;
 	status_t status = cache->Resize(newSize, VM_PRIORITY_USER);
 		// Note, the priority doesn't really matter, since this cache doesn't
 		// reserve any memory.
-	if (status == B_OK && newSize < oldSize) {
-		// We may have a new partial page at the end of the cache that must be
-		// cleared.
-		uint32 partialBytes = newSize % B_PAGE_SIZE;
-		if (partialBytes != 0) {
-			vm_page* page = cache->LookupPage(newSize - partialBytes);
-			if (page != NULL) {
-				vm_memset_physical(page->physical_page_number * B_PAGE_SIZE
-					+ partialBytes, 0, B_PAGE_SIZE - partialBytes);
-			}
-		}
-	}
-
 	return status;
 }
 
