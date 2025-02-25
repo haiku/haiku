@@ -11,6 +11,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		MergeObject <$(architecture)>posix_musl_misc.o :
 			a64l.c
+			basename.c
+			dirname.c
 			ffs.c
 			ftw.c
 			getsubopt.c
