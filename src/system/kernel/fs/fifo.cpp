@@ -1,4 +1,5 @@
 /*
+ * Copyright 2025, Haiku, Inc. All rights reserved.
  * Copyright 2007-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -51,7 +52,6 @@ struct file_cookie;
 class Inode;
 
 static object_cache* sRingBufferCache;
-static const size_t kRingBufferCacheObjectSize = VFS_FIFO_BUFFER_CAPACITY + sizeof(ring_buffer);
 
 
 class RingBuffer {
@@ -63,16 +63,22 @@ public:
 			void				DeleteBuffer();
 
 			ssize_t				Write(const void* buffer, size_t length,
-									bool isUser);
-			ssize_t				Read(void* buffer, size_t length, bool isUser);
-			ssize_t				Peek(size_t offset, void* buffer,
-									size_t length) const;
+									size_t minimum, bool isUser, bool* wasEmpty);
+			ssize_t				Read(void* buffer, size_t length, bool isUser, bool* wasFull);
+			ssize_t				DebugPeek(size_t offset, uint8* out) const;
 
 			size_t				Readable() const;
 			size_t				Writable() const;
 
 private:
-			struct ring_buffer*	fBuffer;
+			uint8*				fBuffer;
+			uint32				fBufferSize;
+
+			mutex				fWriteLock;
+			uint32				fWriteHead;
+
+			uint32				fWriteAvailable;
+			uint32				fReadHead;
 };
 
 
@@ -87,6 +93,12 @@ public:
 		B_INITIALIZE_SPINLOCK(&fLock);
 	}
 
+	bool IsNotified()
+	{
+		InterruptsSpinLocker _(fLock);
+		return fNotified;
+	}
+
 	void SetNotified(bool notified)
 	{
 		InterruptsSpinLocker _(fLock);
@@ -95,12 +107,18 @@ public:
 
 	void Notify(status_t status = B_OK)
 	{
-		InterruptsSpinLocker _(fLock);
+		InterruptsLocker _;
+		SpinLocker spinLocker(fLock);
 		TRACE("ReadRequest %p::Notify(), fNotified %d\n", this, fNotified);
 
 		if (!fNotified) {
-			thread_unblock(fThread, status);
 			fNotified = true;
+
+			// Whoever calls Notify() must hold the requests lock,
+			// so we can be sure this Request won't be deleted.
+			spinLocker.Unlock();
+
+			thread_unblock(fThread, status);
 		}
 	}
 
@@ -118,7 +136,7 @@ private:
 	spinlock		fLock;
 	Thread*			fThread;
 	file_cookie*	fCookie;
-	volatile bool	fNotified;
+	bool			fNotified;
 };
 
 
@@ -167,9 +185,9 @@ public:
 			void				SetModificationTime(timespec modificationTime)
 									{ fModificationTime = modificationTime; }
 
-			mutex*				RequestLock() { return &fRequestLock; }
+			rw_lock*			ChangeLock() { return &fChangeLock; }
 
-			status_t			WriteDataToBuffer(const void* data,
+			status_t			Write(const void* data,
 									size_t* _length, bool nonBlocking,
 									bool isUser);
 			status_t			ReadDataFromBuffer(void* data, size_t* _length,
@@ -184,9 +202,9 @@ public:
 			void				RemoveReadRequest(ReadRequest& request);
 			status_t			WaitForReadRequest(ReadRequest& request);
 
-			void				NotifyBytesRead(size_t bytes);
+			void				NotifyBytesRead(bool wasFull, size_t bytes);
 			void				NotifyReadDone();
-			void				NotifyBytesWritten(size_t bytes);
+			void				NotifyBytesWritten(bool wasEmpty);
 			void				NotifyEndClosed(bool writer);
 
 			status_t			Open(int openMode);
@@ -208,11 +226,12 @@ private:
 
 			RingBuffer			fBuffer;
 
+			spinlock			fReadRequestsLock;
+			spinlock			fWriteRequestsLock;
 			ReadRequestList		fReadRequests;
 			WriteRequestList	fWriteRequests;
 
-			mutex				fRequestLock;
-
+			rw_lock				fChangeLock;
 			ConditionVariable	fActiveCondition;
 
 			int32				fReaderCount;
@@ -242,7 +261,7 @@ private:
 
 struct file_cookie {
 	int	open_mode;
-			// guarded by Inode::fRequestLock
+			// guarded by Inode::fChangeLock
 
 	void SetNonBlocking(bool nonBlocking)
 	{
@@ -261,12 +280,14 @@ RingBuffer::RingBuffer()
 	:
 	fBuffer(NULL)
 {
+	mutex_init(&fWriteLock, "fifo ring write");
 }
 
 
 RingBuffer::~RingBuffer()
 {
 	DeleteBuffer();
+	mutex_destroy(&fWriteLock);
 }
 
 
@@ -276,11 +297,12 @@ RingBuffer::CreateBuffer()
 	if (fBuffer != NULL)
 		return B_OK;
 
-	void* buffer = object_cache_alloc(sRingBufferCache, 0);
-	if (buffer == NULL)
+	fBuffer = (uint8*)object_cache_alloc(sRingBufferCache, 0);
+	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
-	fBuffer = create_ring_buffer_etc(buffer, kRingBufferCacheObjectSize, 0);
+	fWriteAvailable = fBufferSize = VFS_FIFO_BUFFER_CAPACITY;
+	fReadHead = fWriteHead = 0;
 	return B_OK;
 }
 
@@ -296,54 +318,154 @@ RingBuffer::DeleteBuffer()
 
 
 inline ssize_t
-RingBuffer::Write(const void* buffer, size_t length, bool isUser)
+RingBuffer::Write(const void* data, size_t length, size_t minimum, bool isUser, bool* wasEmpty)
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
-	if (isUser && !IS_USER_ADDRESS(buffer))
+	if (isUser && !IS_USER_ADDRESS(data))
 		return B_BAD_ADDRESS;
 
-	return isUser
-		? ring_buffer_user_write(fBuffer, (const uint8*)buffer, length)
-		: ring_buffer_write(fBuffer, (const uint8*)buffer, length);
+	MutexLocker _(fWriteLock);
+	uint32 writeAvailable = atomic_get((int32*)&fWriteAvailable);
+	if (writeAvailable == 0 || writeAvailable < minimum)
+		return 0;
+	if (length > writeAvailable)
+		length = writeAvailable;
+
+	uint32 position = fWriteHead;
+	if ((position + length) <= fBufferSize) {
+		// simple copy
+		if (isUser) {
+			if (user_memcpy(fBuffer + position, data, length) != B_OK)
+				return B_BAD_ADDRESS;
+		} else
+			memcpy(fBuffer + position, data, length);
+	} else {
+		// need to copy both ends
+		uint32 upper = fBufferSize - position;
+		uint32 lower = length - upper;
+
+		if (isUser) {
+			if (user_memcpy(fBuffer + position, data, upper) != B_OK
+					|| user_memcpy(fBuffer, (uint8*)data + upper, lower) != B_OK)
+				return B_BAD_ADDRESS;
+		} else {
+			memcpy(fBuffer + position, data, upper);
+			memcpy(fBuffer, (uint8*)data + upper, lower);
+		}
+	}
+
+	atomic_set((int32*)&fWriteHead, (fWriteHead + length) % fBufferSize);
+	uint32 previouslyAvailable = atomic_add((int32*)&fWriteAvailable, -length);
+
+	if (wasEmpty != NULL)
+		*wasEmpty = (previouslyAvailable == fBufferSize);
+
+	return length;
 }
 
 
 inline ssize_t
-RingBuffer::Read(void* buffer, size_t length, bool isUser)
+RingBuffer::Read(void* data, size_t length, bool isUser, bool* wasFull)
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
-	if (isUser && !IS_USER_ADDRESS(buffer))
+	if (isUser && !IS_USER_ADDRESS(data))
 		return B_BAD_ADDRESS;
 
-	return isUser
-		? ring_buffer_user_read(fBuffer, (uint8*)buffer, length)
-		: ring_buffer_read(fBuffer, (uint8*)buffer, length);
+	uint32 readHead = 0;
+	uint32 readable = 0;
+	for (int retries = 3; retries != 0; retries--) {
+		// atomic ordering shouldn't matter, so long as
+		// the add() at the end comes after the test_and_set()
+		uint32 readEnd = atomic_get((int32*)&fWriteHead);
+		readHead = atomic_get((int32*)&fReadHead);
+		if (readEnd < readHead || (readEnd == readHead && fWriteAvailable == 0))
+			readEnd += fBufferSize;
+
+		readable = readEnd - readHead;
+		if (readable == 0)
+			break;
+		if (readable > length)
+			readable = length;
+
+		// move the read head forwards
+		if ((uint32)atomic_test_and_set((int32*)&fReadHead,
+				(readHead + length) % fBufferSize, readHead) == readHead)
+			break;
+
+		readable = 0;
+	}
+
+	if (readable == 0)
+		return 0;
+	length = readable;
+
+	status_t status = B_OK;
+	if ((readHead + length) <= fBufferSize) {
+		// simple copy
+		if (isUser) {
+			if (user_memcpy(data, fBuffer + readHead, length) != B_OK)
+				status = B_BAD_ADDRESS;
+		} else
+			memcpy(data, fBuffer + readHead, length);
+	} else {
+		// need to copy both ends
+		size_t upper = fBufferSize - readHead;
+		size_t lower = length - upper;
+
+		if (isUser) {
+			if (user_memcpy(data, fBuffer + readHead, upper) != B_OK
+				|| user_memcpy((uint8*)data + upper, fBuffer, lower) != B_OK)
+				status = B_BAD_ADDRESS;
+		} else {
+			memcpy(data, fBuffer + readHead, upper);
+			memcpy((uint8*)data + upper, fBuffer, lower);
+		}
+	}
+
+	// release the buffer space
+	uint32 previouslyAvailable = atomic_add((int32*)&fWriteAvailable, length);
+	if (status != B_OK)
+		return status;
+
+	if (wasFull != NULL)
+		*wasFull = (previouslyAvailable == 0);
+	return length;
 }
 
 
 inline ssize_t
-RingBuffer::Peek(size_t offset, void* buffer, size_t length) const
+RingBuffer::DebugPeek(size_t offset, uint8* out) const
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
-	return ring_buffer_peek(fBuffer, offset, (uint8*)buffer, length);
+	uint32 readEnd = fWriteHead;
+	if (readEnd < fReadHead || (readEnd == fReadHead && fWriteAvailable == 0))
+		readEnd += fBufferSize;
+
+	if ((fReadHead + offset) >= readEnd)
+		return 0;
+
+	*out = fBuffer[(fReadHead + offset) % fBufferSize];
+	return 1;
 }
 
 
 inline size_t
 RingBuffer::Readable() const
 {
-	return fBuffer != NULL ? ring_buffer_readable(fBuffer) : 0;
+	// This is slightly inaccurate, as any currently-in-progress reads
+	// will not be accounted for here.
+	return fBufferSize - atomic_get((int32*)&fWriteAvailable);
 }
 
 
 inline size_t
 RingBuffer::Writable() const
 {
-	return fBuffer != NULL ? ring_buffer_writable(fBuffer) : 0;
+	return atomic_get((int32*)&fWriteAvailable);
 }
 
 
@@ -352,6 +474,8 @@ RingBuffer::Writable() const
 
 Inode::Inode()
 	:
+	fReadRequestsLock(B_SPINLOCK_INITIALIZER),
+	fWriteRequestsLock(B_SPINLOCK_INITIALIZER),
 	fReadRequests(),
 	fWriteRequests(),
 	fReaderCount(0),
@@ -360,8 +484,8 @@ Inode::Inode()
 	fReadSelectSyncPool(NULL),
 	fWriteSelectSyncPool(NULL)
 {
-	fActiveCondition.Publish(this, "pipe");
-	mutex_init(&fRequestLock, "pipe request");
+	rw_lock_init(&fChangeLock, "fifo change");
+	fActiveCondition.Init(this, "fifo");
 
 	bigtime_t time = real_time_clock();
 	fModificationTime.tv_sec = time / 1000000;
@@ -372,8 +496,7 @@ Inode::Inode()
 
 Inode::~Inode()
 {
-	fActiveCondition.Unpublish();
-	mutex_destroy(&fRequestLock);
+	rw_lock_destroy(&fChangeLock);
 }
 
 
@@ -392,7 +515,7 @@ Inode::InitCheck()
 	the returned length is > 0, the returned error code can be ignored.
 */
 status_t
-Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking,
+Inode::Write(const void* _data, size_t* _length, bool nonBlocking,
 	bool isUser)
 {
 	const uint8* data = (const uint8*)_data;
@@ -400,8 +523,10 @@ Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking,
 	size_t& written = *_length;
 	written = 0;
 
-	TRACE("Inode %p::WriteDataToBuffer(data = %p, bytes = %zu)\n", this, data,
+	TRACE("Inode %p::Write(data = %p, bytes = %zu)\n", this, data,
 		dataSize);
+
+	ReadLocker changeLocker(ChangeLock());
 
 	// A request up to VFS_FIFO_ATOMIC_WRITE_SIZE bytes shall not be
 	// interleaved with other writer's data.
@@ -411,22 +536,32 @@ Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking,
 
 	while (dataSize > 0) {
 		// Wait until enough space in the buffer is available.
-		while (!fActive
-				|| (fBuffer.Writable() < minToWrite && fReaderCount > 0)) {
+		while (!fActive || (fBuffer.Writable() < minToWrite && fReaderCount > 0)) {
 			if (nonBlocking)
 				return B_WOULD_BLOCK;
 
 			ConditionVariableEntry entry;
-			entry.Add(this);
+			fActiveCondition.Add(&entry);
 
+			InterruptsSpinLocker writeRequestsLocker(fWriteRequestsLock);
 			WriteRequest request(thread_get_current_thread(), minToWrite);
 			fWriteRequests.Add(&request);
+			writeRequestsLocker.Unlock();
 
-			mutex_unlock(&fRequestLock);
-			status_t status = entry.Wait(B_CAN_INTERRUPT);
-			mutex_lock(&fRequestLock);
+			TRACE("Inode %p::%s(): wait for writable, request %p\n", this, __FUNCTION__,
+				&request);
 
+			status_t status = B_OK;
+			// the situation might have changed, recheck before waiting
+			if (!fActive || (fBuffer.Writable() < minToWrite && fReaderCount > 0)) {
+				changeLocker.Unlock();
+				status = entry.Wait(B_CAN_INTERRUPT);
+				changeLocker.Lock();
+			}
+
+			writeRequestsLocker.Lock();
 			fWriteRequests.Remove(&request);
+			writeRequestsLocker.Unlock();
 
 			if (status != B_OK)
 				return status;
@@ -444,18 +579,21 @@ Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking,
 		size_t toWrite = (fActive ? fBuffer.Writable() : 0);
 		if (toWrite > dataSize)
 			toWrite = dataSize;
+		if (toWrite == 0)
+			continue;
 
-		if (toWrite > 0) {
-			ssize_t bytesWritten = fBuffer.Write(data, toWrite, isUser);
-			if (bytesWritten < 0)
-				return bytesWritten;
-		}
+		bool wasEmpty = false;
+		ssize_t bytesWritten = fBuffer.Write(data, toWrite, minToWrite, isUser, &wasEmpty);
+		if (bytesWritten < 0)
+			return bytesWritten;
+		if (bytesWritten == 0)
+			continue;
 
-		data += toWrite;
-		dataSize -= toWrite;
-		written += toWrite;
+		data += bytesWritten;
+		dataSize -= bytesWritten;
+		written += bytesWritten;
 
-		NotifyBytesWritten(toWrite);
+		NotifyBytesWritten(wasEmpty);
 	}
 
 	return B_OK;
@@ -483,34 +621,47 @@ Inode::ReadDataFromBuffer(void* data, size_t* _length, bool nonBlocking,
 			return error;
 	}
 
-	// wait until data are available
-	while (fBuffer.Readable() == 0) {
-		if (nonBlocking)
-			return B_WOULD_BLOCK;
+	while (dataSize > 0) {
+		// wait until data are available
+		while (fBuffer.Readable() == 0) {
+			if (nonBlocking)
+				return B_WOULD_BLOCK;
 
-		if (fActive && fWriterCount == 0)
-			return B_OK;
+			if (fActive && fWriterCount == 0)
+				return B_OK;
 
-		TRACE("Inode %p::%s(): wait for data, request %p\n", this, __FUNCTION__,
-			&request);
+			TRACE("Inode %p::%s(): wait for data, request %p\n", this, __FUNCTION__,
+				&request);
 
-		error = WaitForReadRequest(request);
-		if (error != B_OK)
-			return error;
+			request.SetNotified(false);
+			// the situation might have changed, recheck before waiting
+			if (fBuffer.Readable() != 0) {
+				request.SetNotified(true);
+				break;
+			}
+
+			error = WaitForReadRequest(request);
+			if (error != B_OK)
+				return error;
+		}
+
+		// read as much as we can
+		size_t toRead = fBuffer.Readable();
+		if (toRead > dataSize)
+			toRead = dataSize;
+
+		bool wasFull = false;
+		ssize_t bytesRead = fBuffer.Read(data, toRead, isUser, &wasFull);
+		if (bytesRead < 0)
+			return bytesRead;
+		if (bytesRead == 0)
+			continue;
+
+		NotifyBytesRead(wasFull, bytesRead);
+
+		*_length = bytesRead;
+		break;
 	}
-
-	// read as much as we can
-	size_t toRead = fBuffer.Readable();
-	if (toRead > dataSize)
-		toRead = dataSize;
-
-	ssize_t bytesRead = fBuffer.Read(data, toRead, isUser);
-	if (bytesRead < 0)
-		return bytesRead;
-
-	NotifyBytesRead(toRead);
-
-	*_length = toRead;
 
 	return B_OK;
 }
@@ -519,6 +670,7 @@ Inode::ReadDataFromBuffer(void* data, size_t* _length, bool nonBlocking,
 void
 Inode::AddReadRequest(ReadRequest& request)
 {
+	InterruptsSpinLocker _(fReadRequestsLock);
 	fReadRequests.Add(&request);
 }
 
@@ -526,6 +678,7 @@ Inode::AddReadRequest(ReadRequest& request)
 void
 Inode::RemoveReadRequest(ReadRequest& request)
 {
+	InterruptsSpinLocker _(fReadRequestsLock);
 	fReadRequests.Remove(&request);
 }
 
@@ -537,37 +690,39 @@ Inode::WaitForReadRequest(ReadRequest& request)
 	thread_prepare_to_block(thread_get_current_thread(), B_CAN_INTERRUPT,
 		THREAD_BLOCK_TYPE_OTHER, "fifo read request");
 
-	request.SetNotified(false);
+	if (request.IsNotified())
+		return B_OK;
 
 	// wait
-	mutex_unlock(&fRequestLock);
+	rw_lock_read_unlock(&fChangeLock);
 	status_t status = thread_block();
 
 	// Before going to lock again, we need to make sure no one tries to
 	// unblock us. Otherwise that would screw with mutex_lock().
 	request.SetNotified(true);
 
-	mutex_lock(&fRequestLock);
+	rw_lock_read_lock(&fChangeLock);
 
 	return status;
 }
 
 
 void
-Inode::NotifyBytesRead(size_t bytes)
+Inode::NotifyBytesRead(bool wasFull, size_t bytes)
 {
 	// notify writer, if something can be written now
 	size_t writable = fBuffer.Writable();
 	if (bytes > 0) {
 		// notify select()ors only, if nothing was writable before
-		if (writable == bytes) {
-			if (fWriteSelectSyncPool)
+		if (wasFull) {
+			if (fWriteSelectSyncPool != NULL)
 				notify_select_event_pool(fWriteSelectSyncPool, B_SELECT_WRITE);
 		}
 
 		// If any of the waiting writers has a minimal write count that has
 		// now become satisfied, we notify all of them (condition variables
 		// don't support doing that selectively).
+		InterruptsSpinLocker _(fWriteRequestsLock);
 		WriteRequest* request;
 		WriteRequestList::Iterator iterator = fWriteRequests.GetIterator();
 		while ((request = iterator.Next()) != NULL) {
@@ -587,6 +742,7 @@ Inode::NotifyReadDone()
 {
 	// notify next reader, if there's still something to be read
 	if (fBuffer.Readable() > 0) {
+		InterruptsSpinLocker _(fReadRequestsLock);
 		if (ReadRequest* request = fReadRequests.First())
 			request->Notify();
 	}
@@ -594,13 +750,14 @@ Inode::NotifyReadDone()
 
 
 void
-Inode::NotifyBytesWritten(size_t bytes)
+Inode::NotifyBytesWritten(bool wasEmpty)
 {
 	// notify reader, if something can be read now
-	if (bytes > 0 && fBuffer.Readable() == bytes) {
-		if (fReadSelectSyncPool)
+	if (wasEmpty && fBuffer.Readable() > 0) {
+		if (fReadSelectSyncPool != NULL)
 			notify_select_event_pool(fReadSelectSyncPool, B_SELECT_READ);
 
+		InterruptsSpinLocker _(fReadRequestsLock);
 		if (ReadRequest* request = fReadRequests.First())
 			request->Notify();
 	}
@@ -618,19 +775,20 @@ Inode::NotifyEndClosed(bool writer)
 		// contains no data, unlock all waiting readers
 		TRACE("  buffer readable: %zu\n", fBuffer.Readable());
 		if (fBuffer.Readable() == 0) {
+			InterruptsSpinLocker readRequestsLocker(fReadRequestsLock);
 			ReadRequestList::Iterator iterator = fReadRequests.GetIterator();
 			while (ReadRequest* request = iterator.Next())
 				request->Notify();
+			readRequestsLocker.Unlock();
 
-			if (fReadSelectSyncPool)
+			if (fReadSelectSyncPool != NULL)
 				notify_select_event_pool(fReadSelectSyncPool, B_SELECT_DISCONNECTED);
-
 		}
 	} else {
 		// Last reader is gone. Wake up all writers.
 		fActiveCondition.NotifyAll();
 
-		if (fWriteSelectSyncPool)
+		if (fWriteSelectSyncPool != NULL)
 			notify_select_event_pool(fWriteSelectSyncPool, B_SELECT_ERROR);
 	}
 }
@@ -639,7 +797,7 @@ Inode::NotifyEndClosed(bool writer)
 status_t
 Inode::Open(int openMode)
 {
-	MutexLocker locker(RequestLock());
+	WriteLocker locker(ChangeLock());
 
 	if ((openMode & O_ACCMODE) == O_WRONLY || (openMode & O_ACCMODE) == O_RDWR)
 		fWriterCount++;
@@ -674,7 +832,7 @@ Inode::Open(int openMode)
 		fActive = true;
 
 		// notify all waiting writers that they can start
-		if (fWriteSelectSyncPool)
+		if (fWriteSelectSyncPool != NULL)
 			notify_select_event_pool(fWriteSelectSyncPool, B_SELECT_WRITE);
 		fActiveCondition.NotifyAll();
 	}
@@ -685,8 +843,7 @@ Inode::Open(int openMode)
 void
 Inode::Close(file_cookie* cookie)
 {
-
-	MutexLocker locker(RequestLock());
+	WriteLocker locker(ChangeLock());
 
 	int openMode = cookie->open_mode;
 	TRACE("Inode %p::Close(openMode = %" B_PRId32 ")\n", this, openMode);
@@ -725,6 +882,8 @@ Inode::Close(file_cookie* cookie)
 status_t
 Inode::Select(uint8 event, selectsync* sync, int openMode)
 {
+	WriteLocker locker(ChangeLock());
+
 	bool writer = true;
 	select_sync_pool** pool;
 	// B_SELECT_READ can happen on write-only opened fds, so restrain B_SELECT_READ to O_RDWR
@@ -760,6 +919,8 @@ Inode::Select(uint8 event, selectsync* sync, int openMode)
 status_t
 Inode::Deselect(uint8 event, selectsync* sync, int openMode)
 {
+	WriteLocker locker(ChangeLock());
+
 	select_sync_pool** pool;
 	if ((event == B_SELECT_READ && (openMode & O_RWMASK) == O_RDWR)
 		|| (openMode & O_RWMASK) == O_RDONLY) {
@@ -820,7 +981,7 @@ Inode::Dump(bool dumpData) const
 			{
 				uint8 byte = '\0';
 				if (fOffset < fBuffer.Readable()) {
-					fBuffer.Peek(fOffset, &byte, 1);
+					fBuffer.DebugPeek(fOffset, &byte);
 					fOffset++;
 				}
 				return byte;
@@ -972,7 +1133,7 @@ fifo_read(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	TRACE("fifo_read(vnode = %p, cookie = %p, length = %lu, mode = %d)\n",
 		inode, cookie, *_length, cookie->open_mode);
 
-	MutexLocker locker(inode->RequestLock());
+	ReadLocker _(inode->ChangeLock());
 
 	if (inode->IsActive() && inode->WriterCount() == 0) {
 		// as long there is no writer, and the pipe is empty,
@@ -1018,14 +1179,12 @@ fifo_write(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	TRACE("fifo_write(vnode = %p, cookie = %p, length = %lu)\n",
 		_node, cookie, *_length);
 
-	MutexLocker locker(inode->RequestLock());
-
 	size_t length = *_length;
 	if (length == 0)
 		return B_OK;
 
 	// copy data into ring buffer
-	status_t status = inode->WriteDataToBuffer(buffer, &length,
+	status_t status = inode->Write(buffer, &length,
 		(cookie->open_mode & O_NONBLOCK) != 0, is_called_via_syscall());
 
 	if (length > 0)
@@ -1050,7 +1209,7 @@ fifo_read_stat(fs_volume* volume, fs_vnode* vnode, struct ::stat* st)
 		return error;
 
 
-	MutexLocker locker(fifo->RequestLock());
+	ReadLocker _(fifo->ChangeLock());
 
 	st->st_size = fifo->BytesAvailable();
 
@@ -1104,9 +1263,7 @@ fifo_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 op,
 			if (buffer == NULL)
 				return B_BAD_VALUE;
 
-			MutexLocker locker(inode->RequestLock());
 			int available = (int)inode->BytesAvailable();
-			locker.Unlock();
 
 			if (is_called_via_syscall()) {
 				if (!IS_USER_ADDRESS(buffer)
@@ -1123,7 +1280,7 @@ fifo_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 op,
 		case B_SET_BLOCKING_IO:
 		case B_SET_NONBLOCKING_IO:
 		{
-			MutexLocker locker(inode->RequestLock());
+			WriteLocker locker(inode->ChangeLock());
 			cookie->SetNonBlocking(op == B_SET_NONBLOCKING_IO);
 			return B_OK;
 		}
@@ -1142,7 +1299,7 @@ fifo_set_flags(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	TRACE("fifo_set_flags(vnode = %p, flags = %x)\n", _node, flags);
 
-	MutexLocker locker(inode->RequestLock());
+	WriteLocker locker(inode->ChangeLock());
 	cookie->open_mode = (cookie->open_mode & ~(O_APPEND | O_NONBLOCK)) | flags;
 	return B_OK;
 }
@@ -1159,7 +1316,6 @@ fifo_select(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	if (!inode)
 		return B_ERROR;
 
-	MutexLocker locker(inode->RequestLock());
 	return inode->Select(event, sync, cookie->open_mode);
 }
 
@@ -1175,7 +1331,6 @@ fifo_deselect(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	if (inode == NULL)
 		return B_ERROR;
 
-	MutexLocker locker(inode->RequestLock());
 	return inode->Deselect(event, sync, cookie->open_mode);
 }
 
@@ -1333,7 +1488,7 @@ void
 fifo_init()
 {
 	sRingBufferCache = create_object_cache("fifo ring buffers",
-		kRingBufferCacheObjectSize, CACHE_NO_DEPOT);
+		VFS_FIFO_BUFFER_CAPACITY, CACHE_NO_DEPOT);
 
 	add_debugger_command_etc("fifo", &Inode::Dump,
 		"Print info about the specified FIFO node",
