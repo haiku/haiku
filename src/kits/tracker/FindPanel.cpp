@@ -1521,7 +1521,7 @@ FindPanel::ShowVolumeMenuLabel()
 }
 
 
-const char*
+BString
 FindPanel::MultipleSelectionsTitle(int32 count)
 {
 	static BStringFormat format(B_TRANSLATE_COMMENT(
