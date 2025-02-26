@@ -26,7 +26,7 @@ static const char *sProgramName = __progname;
 static void
 usage()
 {
-	printf("usage: %s {-o <output-file>} [-[l|r] | -[b|h|c|d <input-file>]]\n"
+	printf("usage: %s {-o <output-file>} [-[l|r] | -[b|H|c|d <input-file>]]\n"
 		"  -o, --output       Change output file to output-file (default: "
 			"keymap.out|h).\n"
 		"  -d, --dump         Decompile key map to standard output (can be "
@@ -39,7 +39,8 @@ usage()
 		"                     input-file is specified.\n"
 		"  -r, --restore      Restore system default key map.\n"
 		"  -c, --compile      Compile source keymap to binary.\n"
-		"  -h, --header       Translate source keymap to C++ header.\n",
+		"  -H, --header       Translate source keymap to C++ header.\n"
+		"  -h, --help         Show this help text and exit.\n",
 		sProgramName);
 }
 
@@ -102,8 +103,8 @@ main(int argc, char** argv)
 		{"load-source", optional_argument, 0, 's'},
 		{"restore", no_argument, 0, 'r'},
 		{"compile", optional_argument, 0, 'c'},
-		{"header", optional_argument, 0, 'h'},
-		{"help", no_argument, 0, 'H'},
+		{"header", optional_argument, 0, 'H'},
+		{"help", no_argument, 0, 'h'},
 		{NULL}
 	};
 
@@ -136,12 +137,12 @@ main(int argc, char** argv)
 				mode = kCompile;
 				input = optarg;
 				break;
-			case 'h':
+			case 'H':
 				mode = kSaveHeader;
 				input = optarg;
 				break;
 
-			case 'H':
+			case 'h':
 			default:
 				mode = kUnspecified;
 				break;
