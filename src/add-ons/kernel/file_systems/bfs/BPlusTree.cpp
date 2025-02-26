@@ -853,6 +853,7 @@ BPlusTree::MakeEmpty()
 {
 	// Put all nodes into the free list in order
 	Transaction transaction(fStream->GetVolume(), fStream->BlockNumber());
+	fStream->WriteLockInTransaction(transaction);
 
 	// Reset the header, and root node
 	CachedNode cached(this);
