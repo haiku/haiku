@@ -61,7 +61,7 @@ static const struct pnp_id kPNPIDs[] = {
 
 
 static combine_mode
-get_combine_mode(display_mode& mode)
+get_combine_mode(const display_mode& mode)
 {
 	if ((mode.flags & B_SCROLL) == 0)
 		return kCombineDisable;
@@ -77,7 +77,7 @@ get_combine_mode(display_mode& mode)
 
 
 static float
-get_refresh_rate(display_mode& mode)
+get_refresh_rate(const display_mode& mode)
 {
 	// we have to be catious as refresh rate cannot be controlled directly,
 	// so it suffers under rounding errors and hardware restrictions
@@ -160,7 +160,7 @@ screen_mode::operator!=(const screen_mode &other) const
 
 
 void
-screen_mode::SetTo(display_mode& mode)
+screen_mode::SetTo(const display_mode& mode)
 {
 	width = mode.virtual_width;
 	height = mode.virtual_height;
@@ -443,13 +443,8 @@ ScreenMode::GetDeviceInfo(accelerant_device_info& info)
 screen_mode
 ScreenMode::ModeAt(int32 index)
 {
-	if (index < 0)
-		index = 0;
-	else if (index >= (int32)fModeCount)
-		index = fModeCount - 1;
-
 	screen_mode mode;
-	mode.SetTo(fModeList[index]);
+	mode.SetTo(DisplayModeAt(index));
 
 	return mode;
 }

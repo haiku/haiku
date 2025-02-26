@@ -28,7 +28,7 @@ struct screen_mode {
 	bool			use_laptop_panel;
 	uint32			tv_standard;
 
-	void SetTo(display_mode& mode);
+	void SetTo(const display_mode& mode);
 	int32 BitsPerPixel() const;
 
 	bool operator==(const screen_mode &otherMode) const;
