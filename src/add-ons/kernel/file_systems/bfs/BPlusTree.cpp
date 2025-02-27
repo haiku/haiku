@@ -899,6 +899,7 @@ BPlusTree::MakeEmpty()
 		if (offset % (1024 * 1024) == 0) {
 			transaction.Done();
 			transaction.Start(fStream->GetVolume(), fStream->BlockNumber());
+			fStream->WriteLockInTransaction(transaction);
 		}
 	}
 
