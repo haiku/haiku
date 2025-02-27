@@ -198,19 +198,19 @@ scsi_init_bus(device_node *node, void **cookie)
 		bus->dma_params.alignment = 0;
 	if (pnp->get_attr_uint32(node, B_DMA_MAX_TRANSFER_BLOCKS,
 			&bus->dma_params.max_blocks, true) != B_OK)
-		bus->dma_params.max_blocks = 0xffffffff;
+		bus->dma_params.max_blocks = UINT32_MAX;
 	if (pnp->get_attr_uint32(node, B_DMA_BOUNDARY,
 			&bus->dma_params.dma_boundary, true) != B_OK)
-		bus->dma_params.dma_boundary = ~0;
+		bus->dma_params.dma_boundary = UINT32_MAX;
 	if (pnp->get_attr_uint32(node, B_DMA_MAX_SEGMENT_BLOCKS,
 			&bus->dma_params.max_sg_block_size, true) != B_OK)
-		bus->dma_params.max_sg_block_size = 0xffffffff;
+		bus->dma_params.max_sg_block_size = UINT32_MAX;
 	if (pnp->get_attr_uint32(node, B_DMA_MAX_SEGMENT_COUNT,
 			&bus->dma_params.max_sg_blocks, true) != B_OK)
-		bus->dma_params.max_sg_blocks = ~0;
+		bus->dma_params.max_sg_blocks = UINT32_MAX;
 	if (pnp->get_attr_uint64(node, B_DMA_HIGH_ADDRESS,
 			&bus->dma_params.high_address, true) != B_OK)
-		bus->dma_params.high_address = ~0;
+		bus->dma_params.high_address = UINT64_MAX;
 
 	// do some sanity check:
 	bus->dma_params.max_sg_block_size &= ~bus->dma_params.alignment;
