@@ -143,18 +143,18 @@ public:
 									int32 maxCount = 5);
 								~MostUsedNames();
 
-			bool				ObtainList(BList* list);
+			bool				ObtainList(BStringList* list);
 			void				ReleaseList();
 
-			void 				AddName(const char*);
+			void 				AddName(const BString&);
 
 protected:
 			struct list_entry {
-				char* name;
+				BString name;
 				int32 count;
 			};
 
-		static int CompareNames(const void* a, const void* b);
+		static int CompareNames(const list_entry* a, const list_entry* b);
 		void LoadList();
 		void UpdateList();
 
@@ -162,7 +162,7 @@ protected:
 		const char*	fDirectory;
 		bool		fLoaded;
 		mutable Benaphore fLock;
-		BList		fList;
+		BObjectList<list_entry> fList;
 		int32		fCount;
 };
 
@@ -2391,11 +2391,11 @@ FindPanel::AddMimeTypesToMenu()
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	ASSERT(tracker != NULL);
 
-	BList list;
+	BStringList list;
 	if (tracker != NULL && gMostUsedMimeTypes.ObtainList(&list)) {
 		int32 count = 0;
-		for (int32 index = 0; index < list.CountItems(); index++) {
-			const char* name = (const char*)list.ItemAt(index);
+		for (int32 index = 0; index < list.CountStrings(); index++) {
+			BString name = list.StringAt(index);
 
 			MimeTypeList* mimeTypes = tracker->MimeTypes();
 			if (mimeTypes != NULL) {
@@ -3839,9 +3839,7 @@ MostUsedNames::~MostUsedNames()
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if (file.InitCheck() == B_OK) {
 		for (int32 i = 0; i < fList.CountItems(); i++) {
-			list_entry* entry = static_cast<list_entry*>(fList.ItemAt(i));
-
-			char line[B_FILE_NAME_LENGTH + 5];
+			list_entry* entry = fList.ItemAt(i);
 
 			// limit upper bound to react more dynamically to changes
 			if (--entry->count > 20)
@@ -3852,8 +3850,9 @@ MostUsedNames::~MostUsedNames()
 			if (entry->count < -10 && i > 0)
 				continue;
 
-			sprintf(line, "%" B_PRId32 " %s\n", entry->count, entry->name);
-			if (file.Write(line, strlen(line)) < B_OK)
+			BString line;
+			line.SetToFormat("%" B_PRId32 " %s\n", entry->count, entry->name.String());
+			if (file.Write(line.String(), line.Length()) < B_OK)
 				break;
 		}
 	}
@@ -3862,15 +3861,14 @@ MostUsedNames::~MostUsedNames()
 	// free data
 
 	for (int32 i = fList.CountItems(); i-- > 0;) {
-		list_entry* entry = static_cast<list_entry*>(fList.ItemAt(i));
-		free(entry->name);
+		list_entry* entry = fList.ItemAt(i);
 		delete entry;
 	}
 }
 
 
 bool
-MostUsedNames::ObtainList(BList* list)
+MostUsedNames::ObtainList(BStringList* list)
 {
 	if (list == NULL)
 		return false;
@@ -3882,11 +3880,11 @@ MostUsedNames::ObtainList(BList* list)
 
 	list->MakeEmpty();
 	for (int32 i = 0; i < fCount; i++) {
-		list_entry* entry = static_cast<list_entry*>(fList.ItemAt(i));
+		list_entry* entry = fList.ItemAt(i);
 		if (entry == NULL)
 			return true;
 
-		list->AddItem(entry->name);
+		list->Add(entry->name);
 	}
 	return true;
 }
@@ -3900,7 +3898,7 @@ MostUsedNames::ReleaseList()
 
 
 void
-MostUsedNames::AddName(const char* name)
+MostUsedNames::AddName(const BString& name)
 {
 	fLock.Lock();
 
@@ -3913,12 +3911,10 @@ MostUsedNames::AddName(const char* name)
 	list_entry* entry = NULL;
 
 	if (fList.CountItems() > fCount * 2) {
-		entry = static_cast<list_entry*>(
-			fList.RemoveItem(fList.CountItems() - 1));
+		entry = fList.RemoveItemAt(fList.CountItems() - 1);
 
 		// is this the name we want to add here?
-		if (strcmp(name, entry->name)) {
-			free(entry->name);
+		if (name == entry->name) {
 			delete entry;
 			entry = NULL;
 		} else
@@ -3926,16 +3922,15 @@ MostUsedNames::AddName(const char* name)
 	}
 
 	if (entry == NULL) {
-		for (int32 i = 0;
-				(entry = static_cast<list_entry*>(fList.ItemAt(i))) != NULL; i++) {
-			if (strcmp(entry->name, name) == 0)
+		for (int32 i = 0; (entry = fList.ItemAt(i)) != NULL; i++) {
+			if (entry->name == name)
 				break;
 		}
 	}
 
 	if (entry == NULL) {
 		entry = new list_entry;
-		entry->name = strdup(name);
+		entry->name = name;
 		entry->count = 1;
 
 		fList.AddItem(entry);
@@ -3950,13 +3945,10 @@ MostUsedNames::AddName(const char* name)
 
 
 int
-MostUsedNames::CompareNames(const void* a,const void* b)
+MostUsedNames::CompareNames(const list_entry* entryA, const list_entry* entryB)
 {
-	list_entry* entryA = *(list_entry**)a;
-	list_entry* entryB = *(list_entry**)b;
-
 	if (entryA->count == entryB->count)
-		return strcasecmp(entryA->name,entryB->name);
+		return entryA->name.ICompare(entryB->name);
 
 	return entryB->count - entryA->count;
 }
@@ -3994,7 +3986,7 @@ MostUsedNames::LoadList()
 			continue;
 
 		list_entry* entry = new list_entry;
-		entry->name = strdup(name);
+		entry->name = name;
 		entry->count = count;
 
 		fList.AddItem(entry);
