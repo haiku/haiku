@@ -4,6 +4,7 @@ The build system
 
 .. toctree::
 
+   /build/configure
    /build/jam
    /build/sourcecode
    /build/compilers

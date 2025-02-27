@@ -51,4 +51,5 @@ Table of contents
    /file_systems/index
    /drivers/index
    /apps/haikudepot/server
+   /debugging/index
 
