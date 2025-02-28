@@ -1,35 +1,21 @@
 /*
  * Copyright (c) 2003 Marcus Overhagen
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * Distributed under the terms of the MIT License.
  */
 
 #include <BlockCache.h>
+
 #include <Debug.h>
 #include <string.h>
 #include <stdlib.h>
 #include <new>
 
 
+extern "C" void heap_debug_get_allocation_info() __attribute__((weak));
+
+
 #define MAGIC1		0x9183f4d9
 #define MAGIC2		0xa6b3c87d
-
 
 struct BBlockCache::_FreeBlock {
 	DEBUG_ONLY(	uint32		magic1;	)
@@ -66,6 +52,10 @@ BBlockCache::BBlockCache(uint32 blockCount, size_t blockSize,
 			fFree = &free;
 			break;
 	}
+
+	// If a debug heap is in use, don't cache anything.
+	if (heap_debug_get_allocation_info != NULL)
+		return;
 
 	// To properly maintain a list of free buffers, a buffer must be
 	// large enough to contain the _FreeBlock struct that is used.
@@ -109,6 +99,9 @@ BBlockCache::~BBlockCache()
 void *
 BBlockCache::Get(size_t blockSize)
 {
+	if (heap_debug_get_allocation_info != NULL)
+		return fAlloc(blockSize);
+
 	if (!fLocker.Lock())
 		return 0;
 	void *pointer;
@@ -134,6 +127,11 @@ BBlockCache::Get(size_t blockSize)
 void
 BBlockCache::Save(void *pointer, size_t blockSize)
 {
+	if (heap_debug_get_allocation_info != NULL) {
+		fFree(pointer);
+		return;
+	}
+
 	if (!fLocker.Lock())
 		return;
 	if (blockSize == fBlockSize && fFreeBlocks < fBlockCount) {
