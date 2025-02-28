@@ -101,7 +101,6 @@ StdBinCommands
 	setversion.cpp
 	trash.cpp
 	version.cpp
-	waitfor.cpp
 	WindowShade.cpp
 	: be : $(haiku-utils_rsrc) ;
 
@@ -142,6 +141,7 @@ StdBinCommands
 # standard commands that need libbe.so, libbnetapi.so, libsupc++.so
 StdBinCommands
 	open.cpp
+	waitfor.cpp
 	: be bnetapi [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # commands that need libbe.so, libsupc++.so and the stub catalog
