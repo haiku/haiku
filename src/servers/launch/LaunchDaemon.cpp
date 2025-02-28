@@ -1734,10 +1734,9 @@ LaunchDaemon::_CanLaunchJob(Job* job, uint32 options, bool testOnly)
 	if (job == NULL || !job->CanBeLaunched())
 		return false;
 
-	return (options & FORCE_NOW) != 0
-		|| (job->EventHasTriggered() && job->CheckCondition(*this)
-			&& ((options & TRIGGER_DEMAND) == 0
-				|| Events::TriggerDemand(job->Event(), testOnly)));
+	if ((options & FORCE_NOW) != 0 || job->EventHasTriggered())
+		return true;
+	return (options & TRIGGER_DEMAND) != 0 && Events::TriggerDemand(job->Event(), testOnly);
 }
 
 
@@ -1751,13 +1750,17 @@ LaunchDaemon::_CanLaunchJobRequirements(Job* job, uint32 options)
 	int32 count = job->Requirements().CountStrings();
 	for (int32 index = 0; index < count; index++) {
 		Job* requirement = FindJob(job->Requirements().StringAt(index));
-		if (requirement != NULL
-			&& !requirement->IsRunning() && !requirement->IsLaunching()
-			&& (!_CanLaunchJob(requirement, options, true)
-				|| _CanLaunchJobRequirements(requirement, options))) {
-			requirement->AddPending(job->Name());
-			return false;
+		// running already?
+		if (requirement == NULL || requirement->IsRunning() || requirement->IsLaunching())
+			continue;
+		// can be launched?
+		if (_CanLaunchJob(requirement, options, true)
+			&& _CanLaunchJobRequirements(requirement, options)) {
+			continue;
 		}
+		// launch again when required job is launched
+		requirement->AddPending(job->Name());
+		return false;
 	}
 
 	return true;
@@ -1791,6 +1794,9 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 	for (int32 index = 0; index < count; index++) {
 		Job* requirement = FindJob(job->Requirements().StringAt(index));
 		if (requirement != NULL) {
+			if (requirement->IsLaunching() || requirement->IsRunning())
+				continue;
+
 			// TODO: For jobs that have their communication channels set up,
 			// we would not need to trigger demand at this point
 			if (!_LaunchJob(requirement, options | TRIGGER_DEMAND)) {
@@ -1805,13 +1811,22 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 	if (job->Event() != NULL)
 		job->Event()->ResetTrigger();
 
-	job->SetLaunching(true);
+	if (!job->IsLaunching() && !job->IsRunning()) {
 
-	status_t status = fJobQueue.AddJob(job);
-	if (status != B_OK) {
-		debug_printf("Adding job %s to queue failed: %s\n", job->Name(),
-			strerror(status));
-		return false;
+		job->SetLaunching(true);
+		if (job->CheckCondition(*this)) {
+			status_t status = fJobQueue.AddJob(job);
+			if (status != B_OK) {
+				debug_printf("Adding job %s to queue failed: %s\n", job->Name(), strerror(status));
+				return false;
+			}
+		} else {
+			fLog.JobSkipped(job);
+
+			// job conditions not present, launch
+			while (BJob* dependantJob = job->DependantJobAt(0))
+				dependantJob->RemoveDependency(job);
+		}
 	}
 
 	// Try to launch pending jobs as well

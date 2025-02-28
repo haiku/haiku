@@ -22,6 +22,7 @@ class Job;
 enum LogItemType {
 	kJobInitialized,
 	kJobIgnored,
+	kJobSkipped,
 	kJobLaunched,
 	kJobTerminated,
 	kJobEnabled,
@@ -73,6 +74,7 @@ public:
 			void				JobInitialized(Job* job);
 			void				JobIgnored(Job* job, status_t status);
 
+			void				JobSkipped(Job* job);
 			void				JobLaunched(Job* job, status_t status);
 			void				JobTerminated(Job* job, status_t status);
 

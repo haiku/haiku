@@ -56,6 +56,22 @@ private:
 };
 
 
+class JobSkippedLogItem : public LogItem {
+public:
+								JobSkippedLogItem(Job* job);
+	virtual						~JobSkippedLogItem();
+
+	virtual	LogItemType			Type() const;
+	virtual status_t			GetMessage(BString& target) const;
+	virtual status_t			GetParameter(BMessage& parameter) const;
+	virtual	bool				Matches(const char* jobName,
+									const char* eventName);
+
+private:
+			BString				fJobName;
+};
+
+
 class JobLaunchedLogItem : public AbstractJobLogItem {
 public:
 								JobLaunchedLogItem(Job* job, status_t status);
@@ -242,6 +258,18 @@ Log::JobIgnored(Job* job, status_t status)
 	else {
 		debug_printf("Ignored job \"%s\": %s\n", job->Name(),
 			strerror(status));
+	}
+}
+
+
+void
+Log::JobSkipped(Job* job)
+{
+	LogItem* item = new(std::nothrow) JobSkippedLogItem(job);
+	if (item != NULL)
+		Add(item);
+	else {
+		debug_printf("Skipped job \"%s\"\n", job->Name());
 	}
 }
 
@@ -449,6 +477,56 @@ JobIgnoredLogItem::GetParameter(BMessage& parameter) const
 
 bool
 JobIgnoredLogItem::Matches(const char* jobName, const char* eventName)
+{
+	if (jobName == NULL && eventName == NULL)
+		return true;
+
+	if (jobName != NULL && fJobName == jobName)
+		return true;
+
+	return false;
+}
+
+
+// #pragma mark - JobSkippedLogItem
+
+
+JobSkippedLogItem::JobSkippedLogItem(Job* job)
+	:
+	fJobName(job->Name())
+{
+}
+
+
+JobSkippedLogItem::~JobSkippedLogItem()
+{
+}
+
+
+LogItemType
+JobSkippedLogItem::Type() const
+{
+	return kJobSkipped;
+}
+
+
+status_t
+JobSkippedLogItem::GetMessage(BString& target) const
+{
+	target.SetToFormat("Skipped job \"%s\"", fJobName.String());
+	return B_OK;
+}
+
+
+status_t
+JobSkippedLogItem::GetParameter(BMessage& parameter) const
+{
+	return parameter.AddString("job", fJobName);
+}
+
+
+bool
+JobSkippedLogItem::Matches(const char* jobName, const char* eventName)
 {
 	if (jobName == NULL && eventName == NULL)
 		return true;
