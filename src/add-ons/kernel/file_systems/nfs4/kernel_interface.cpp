@@ -191,10 +191,9 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 		ERROR("Unable to Acquire RPCServerManager!\n");
 		return result;
 	}
-	
+
 	FileSystem* fs;
-	result = FileSystem::Mount(&fs, server, serverName, path, volume->id,
-		config);
+	result = FileSystem::Mount(&fs, server, serverName, path, volume, config);
 	if (result != B_OK) {
 		ERROR("Error mounting filesystem: %s\n", strerror(result));
 		gRPCServerManager->Release(server);
@@ -347,8 +346,16 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 	TRACE("volume = %p, vnode = %" B_PRIi64 "\n", volume, vti->ID());
 
-	if (fs->Root() == vti->GetPointer())
+	Inode* node = vti->GetPointer();
+
+	if (node == fs->Root())
 		return B_OK;
+
+	if (node != NULL && node->IsStale()) {
+		// in the case of a stale node, VnodeToInode::Unlink was never called by the client,
+		// so the Inode hasn't been deleted yet
+		vti->Clear();
+	}
 
 	ASSERT(vti->GetPointer() == NULL);
 	delete vti;

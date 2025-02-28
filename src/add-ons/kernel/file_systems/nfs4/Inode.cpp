@@ -32,7 +32,8 @@ Inode::Inode()
 	fOpenState(NULL),
 	fWriteDirty(false),
 	fAIOWait(create_sem(1, NULL)),
-	fAIOCount(0)
+	fAIOCount(0),
+	fStale(false)
 {
 	rw_lock_init(&fDelegationLock, NULL);
 	mutex_init(&fStateLock, NULL);
@@ -195,10 +196,39 @@ Inode::LookUp(const char* name, ino_t* id)
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
+	// attempt to get the id from the DirectoryCache
+	fCache->Lock();
+	status_t result = fCache->Revalidate();
+		// At times, this will do a full readdir, in order to sync the DirectoryCache
+		// with server changes.  However, if the directory contents have not changed since
+		// the last readdir, it will either perform no RPC, or an RPC that just checks
+		// FATTR4_CHANGE.
+	if (result == B_OK) {
+		SinglyLinkedList<NameCacheEntry>& entriesList = fCache->EntriesList();
+		NameCacheEntry* entry = entriesList.Head();
+		while (entry != NULL) {
+			if (strcmp(name, entry->fName) == 0)
+				break;
+			entry = entriesList.GetNext(entry);
+		}
+		if (entry != NULL) {
+			// we are skipping ChildAdded(); verify that it is not needed because the InoIdMap
+			// already has this entry
+			FileInfo info;
+			result = fFileSystem->InoIdMap()->GetFileInfo(&info, entry->fNode);
+			ASSERT(result == B_OK);
+
+			*id = entry->fNode;
+			fCache->Unlock();
+			return B_OK;
+		}
+	}
+	fCache->Unlock();
+
 	uint64 change;
 	uint64 fileID;
 	FileHandle handle;
-	status_t result = NFS4Inode::LookUp(name, &change, &fileID, &handle);
+	result = NFS4Inode::LookUp(name, &change, &fileID, &handle);
 	if (result != B_OK)
 		return result;
 
@@ -272,6 +302,7 @@ Inode::Remove(const char* name, FileType type, ino_t* id)
 
 	ChangeInfo changeInfo;
 	uint64 fileID;
+
 	status_t result = NFS4Inode::RemoveObject(name, type, &changeInfo, &fileID);
 	if (result != B_OK)
 		return result;
@@ -417,6 +448,8 @@ Inode::CreateObject(const char* name, const char* path, int mode, FileType type,
 		&changeInfo, &fileID, &handle);
 	if (result != B_OK)
 		return result;
+
+	fFileSystem->EnsureNoCollision(FileIdToInoT(fileID), handle);
 
 	fFileSystem->Root()->MakeInfoInvalid();
 

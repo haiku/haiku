@@ -110,8 +110,6 @@ DirectoryCache::Trash()
 {
 	while (!fNameCache.IsEmpty()) {
 		NameCacheEntry* current = fNameCache.RemoveHead();
-		entry_cache_remove(fInode->GetFileSystem()->DevId(), fInode->ID(),
-			current->fName);
 		delete current;
 	}
 
@@ -147,11 +145,6 @@ DirectoryCache::AddEntry(const char* name, ino_t node, bool created)
 		}
 
 		fDirectoryCache->fEntries.Add(entry);
-	}
-
-	if (!fAttrDir) {
-		return entry_cache_add(fInode->GetFileSystem()->DevId(), fInode->ID(),
-			name, node);
 	}
 
 	return B_OK;
@@ -193,11 +186,6 @@ DirectoryCache::RemoveEntry(const char* name)
 			previous = current;
 			current = iterator.Next();
 		}
-	}
-
-	if (!fAttrDir) {
-		entry_cache_remove(fInode->GetFileSystem()->DevId(), fInode->ID(),
-			name);
 	}
 }
 
