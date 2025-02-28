@@ -259,16 +259,16 @@ AddOneAddOn(const Model* model, const char* name, uint32 shortcut,
 {
 	AddOneAddOnParams* params = (AddOneAddOnParams*)context;
 
-	BMessage* message = new BMessage(kLoadAddOn);
-	message->AddRef("refs", model->EntryRef());
-
 	ModelMenuItem* item;
 	try {
-		item = new ModelMenuItem(model, name, message, (char)shortcut, modifiers);
+		item = new ModelMenuItem(model, name, NULL, (char)shortcut, modifiers);
 	} catch (...) {
-		delete message;
 		return;
 	}
+
+	BMessage* message = new BMessage(kLoadAddOn);
+	message->AddRef("refs", model->EntryRef());
+	item->SetMessage(message);
 
 	const entry_ref* addOnRef = model->EntryRef();
 	AddOnMenuGenerate(addOnRef, menu, window);
