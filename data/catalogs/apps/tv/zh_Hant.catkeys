@@ -1,10 +1,28 @@
-1	english	x-vnd.Haiku.TV	2013113144
+1	english	x-vnd.Haiku.TV	337483365
 No menu	MainWin		沒有菜單
+No border	MainWin		無邊框
+Error, connecting to interface failed:\n\n	MainWin		錯誤，連線介面失敗：\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	強制 720×576，顯示寬高比4:3
+Full screen	MainWin		全螢幕
+Scale to native size	MainWin		縮放至原始大小
 unknown	MainWin		未知
 Next channel	MainWin		下一頻道
+Keep aspect ratio	MainWin		維持縱橫比
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
 Always on top	MainWin		始終位於頂部
+Debug	MainWin		偵錯
+Interface	MainWin		介面
 Quit	MainWin		退出
+Channel	MainWin		頻道
+Previous channel	MainWin		上一個頻道
 OK	MainWin		確認
+TV	MainWin		電視
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	強制544 × 576，顯示寬高比4:3
 Settings	MainWin		設定
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	強制704 × 576，顯示寬高比4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
+TV	System name		電視
 Settings…	MainWin		設定…
 None	MainWin		無
+Error, interface is busy:\n\n	MainWin		錯誤，介面正忙：\n\n
+pixel aspect ratio	MainWin		像素長寬比

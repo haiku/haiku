@@ -84,7 +84,7 @@ Attributes	ProbeView		Öznitelikler
 Message	TypeEditors	This is the type of view	İleti
 Message View	TypeEditors		İleti görünümü
 Offset: 	ProbeView		Ofset: 
-Swapped: 0x%0*Lx	ProbeView		Takas edildi: 0x%0*Lx
+Swapped: 0x%0*Lx	ProbeView		Takas edilen: 0x%0*Lx
 MIME type:	TypeEditors		MIME türü:
 Fit	ProbeView	Size of fonts, fits to available room	Sığdır
 Type editor	ProbeView		Tür düzenleyicisi

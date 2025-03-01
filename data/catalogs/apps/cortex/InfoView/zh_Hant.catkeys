@@ -1,4 +1,4 @@
-1	english	x-vnd.Cortex.InfoView	2256992135
+1	english	x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		偏移
 Description	DormantNodeInfoView		描述
 Byte order	InfoView		Byte order
@@ -23,6 +23,7 @@ Dormant media node	DormantNodeInfoView		休眠媒體節點
 Latency	LiveNodeInfoView		延遲
 Media type	InfoView		介質類型
 Live media node	LiveNodeInfoView		活躍媒體節點
+Field rate	InfoView		場率
 Kinds	DormantNodeInfoView		種類
 %title% info	InfoView		%title% 資訊
 Node ID	LiveNodeInfoView		節點ID

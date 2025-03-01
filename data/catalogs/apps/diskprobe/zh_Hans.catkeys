@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DiskProbe	1019405323
+1	english	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Raw 编辑器
 Remove	AttributeWindow		删除
 Close	ProbeView		关闭
@@ -31,6 +31,7 @@ DiskProbe request	DiskProbe		DiskProbe 要求
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十六进制
 Block %lld (0x%Lx)	ProbeView		区块 %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		写入文件失败：\n%s\n\n退出之后所有的设置将会丢失。
+Native: %lld (0x%0*Lx)	ProbeView		本地: %lld (0x%0*Lx)
 Examine device:	OpenWindow		检测硬件：
 Number editor	TypeEditors		序列号编辑器
 Icon	TypeEditors		图标

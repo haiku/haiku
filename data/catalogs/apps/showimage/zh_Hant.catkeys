@@ -1,24 +1,65 @@
-1	english	x-vnd.Haiku-ShowImage	1231834081
+1	english	x-vnd.Haiku-ShowImage	2453396430
+ShowImage	System name		圖片展示
 Page setup…	Menus		頁面設定…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		檔案 '%s' (頁 %d) 已更改。您要關閉該文件嗎？
 Previous file	Menus		上一個檔案
+View	Menus		查看
+Leave full screen	Menus		保留全螢幕
+Show caption in full screen mode	Menus		以全螢幕模式顯示標題
+Flip left to right	Menus		從左到右翻
+Full screen	Menus		全螢幕
 Copy	Menus		複製
+Height: 	PrintOptionsWindow		高度：
 Next file	Menus		下一個檔案
+Slide show	Menus		幻燈片放映
+Original size	Menus		原始尺寸
+Width:	PrintOptionsWindow		寬度：
+Resize to (in 1/72 inches):	PrintOptionsWindow		調整大小（以 1/72 英吋為單位）：
+Zoom factor in %:	PrintOptionsWindow		縮放係數（%）：
+Zoom out	Menus		縮小
 OK	Alerts		確認
 File	Menus		檔案
 Close	ClosePrompt		關閉
+Image	Menus		影像
+Flip top to bottom	Menus		從上往下翻
+Zoom in	Menus		放大
+Last page	Menus		最後一頁
 Cancel	ClosePrompt		取消
+Attributes	Menus		屬性
+High-quality zooming	Menus		高品質縮放
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		檔案 '%s' 已更改。您要關閉該檔案嗎？
 Close	Menus		關閉
+Selection mode	Menus		選擇方式
+Reset rating	Menus		重置評級
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		使圖像適合頁面
+Show tool bar	Menus		顯示工具列
+First page	Menus		第一頁
 OK	SaveToFile		確認
+Print…	Menus		列印…
 The file '%s' could not be written.	SaveToFile		無法寫入檔案'%s'。
 Quit	Menus		退出
+Get info	Menus		獲取資訊
+Rating	Menus		評分
 Close document	ClosePrompt		關閉檔案
 Stretch to window	Menus		拉伸到視窗
+Job setup	PrintOptionsWindow		工作設定
+Clear selection	Menus		清除選擇
+Rotate clockwise	Menus		順時針旋轉
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		無法載入圖片！該檔案或它的圖片轉譯器不存在。
 Open with…	Menus		開啓以…
+Rotate counterclockwise	Menus		逆時針旋轉
+Previous page	Menus		上一頁
 Fit to window	Menus		適合視窗
+Go to page	Menus		前往頁面
+Browse	Menus		瀏覽
+Progress monitor	ProgressWindow		進度監視器
 Edit	Menus		編輯
 Move to Trash	Menus		移入資源回收筒
+Use as background…	Menus		用作背景…
 Open…	Menus		開啓…
 Save as…	Menus		存儲為…
 Next page	Menus		下一頁
+Print options	PrintOptionsWindow		列印選項
+Slide delay	Menus		幻燈片延遲
 Select all	Menus		選擇全部

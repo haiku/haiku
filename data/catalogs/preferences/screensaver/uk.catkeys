@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ScreenSaver	2682415627
+1	ukrainian	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Система DPMS не підтримується
 Blackness	ScreenSaver		Чорний екран
 Fade now when mouse is here	ScreenSaver		Заставка, коли курсор знаходиться тут
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Скасувати
 Password:	ScreenSaver		Пароль:
 Screensaver settings	ScreenSaver		Налаштування заставки
 Password Window	ScreenSaver		Вікно пароля
+Use system password	ScreenSaver		Використовувати системний пароль
 Test	ScreenSaver		Тест
 Could not load screen saver	ScreenSaver		Не вдалося завантажити заставку
 Use custom password	ScreenSaver		Використовувати вибраний пароль

@@ -5,7 +5,7 @@ That's no Fun!	ProcessController		O da nesi öyle!
 What do you want to do with the team \"%s\"?	ProcessController		“%s” takımı ile ne yapmak istiyorsunuz?
 Your setting file could not be saved!\n(%s)	ProcessController		Ayar dosyanız kaydedilemedi!\n(%s)
 Processor %d	ProcessController		İşlemci %d
-Live in the Deskbar	ProcessController		Canlı yenileme
+Live in the Deskbar	ProcessController		Canlı yenile
 Kill this team!	ProcessController		Sonlandır
 OK	ProcessController		Tamam
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Süreç Denetimcisi’ni bir pencerede çalıştırabilir veya Masaüstü Çubuğu’na kurabilirsiniz.

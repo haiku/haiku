@@ -47,7 +47,7 @@ Bottom of screen	MediaPlayer-SettingsWindow		Ekranın alt kısmı
 MediaPlayer settings	MediaPlayer-SettingsWindow		Ortam Oynatıcısı ayarları
 Copyright	MediaPlayer-InfoWin		Telif hakkı
 Invalid URL inserted!	MediaPlayer-NetworkStream		Geçersiz URL girildi!
-Aspect ratio	MediaPlayer-Main		En boy oranı
+Aspect ratio	MediaPlayer-Main		En–boy oranı
 Eject device	MediaPlayer-Main		Aygıtı çıkar
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Oynatma listesi kaydedilemedi.\n\nHata: 
 <no media>	MediaPlayer-InfoWin		<ortam yok>

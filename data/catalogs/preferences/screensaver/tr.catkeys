@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ScreenSaver	2682415627
+1	turkish	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Ekran Güç Yönetimi Sinyalizasyonu kullanılamıyor
 Blackness	ScreenSaver		Kara
 Fade now when mouse is here	ScreenSaver		Fare buradayken kapan
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Vazgeç
 Password:	ScreenSaver		Parola:
 Screensaver settings	ScreenSaver		Ekran koruyucusu ayarları
 Password Window	ScreenSaver		Parola Penceresi
+Use system password	ScreenSaver		Sistem parolasını kullan
 Test	ScreenSaver		Sına
 Could not load screen saver	ScreenSaver		Ekran koruyucusu yüklenemedi
 Use custom password	ScreenSaver		Özel bir parola kullanın

@@ -1,15 +1,33 @@
-1	english	x-vnd.Haiku-CodyCam	2134779569
+1	english	x-vnd.Haiku-CodyCam	1657004106
+destination directory expected	CodyCam		預期目標目錄
+reply: '%s'\n	SftpClient		回覆：'%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (真實密碼已發送)
 JPEG image	CodyCam		JPEG圖片
+Remote host has closed the connection.\n	FtpClient		遠端主機已關閉連線。\n
 image file format expected	CodyCam		預期的圖片檔案格式
+Every 30 minutes	CodyCam		每30分鐘
 Capturing Image…	VideoConsumer.cpp		正在截取圖像…
-Capture Rate Menu	CodyCam		捕獲率選單
+Cannot start time source!	CodyCam		無法啟動時間來源！
+Waiting…	CodyCam		等待…
+Passive FTP	CodyCam		被動FTP
+Every 10 minutes	CodyCam		每10分鐘
+Every minute	CodyCam		每分鐘
+Capture Rate Menu	CodyCam		熒幕捕獲選單
+Cannot seek time source!	CodyCam		無法尋找時間源！
+Server login failed	VideoConsumer.cpp		伺服器登入失敗
+on or off expected	Settings	Do not translate 'on' and 'off'	預期中的開啟或關閉
+invalid upload client %ld\n	VideoConsumer.cpp		上傳客戶端無效 %ld\n
+Every 30 seconds	CodyCam		每30秒
 Cannot create a video window	CodyCam		無法建立視訊視窗
 Cannot register the video window	CodyCam		無法註冊視訊視窗
+capture rate expected	CodyCam		預期的熒幕捕獲頻次
 Quit	CodyCam		退出
 Cannot connect the video source to the video window	CodyCam		無法將視訊來源連接到視訊窗口
+Every 2 hours	CodyCam		每2小時
+Every 4 hours	CodyCam		每4小時
 Closing the window	VideoConsumer.cpp		正在關閉視窗
 Never	CodyCam		絕不
+Every 8 hours	CodyCam		每8小時
 Password:	CodyCam		密码：
 still image filename expected	CodyCam		預期靜止圖片檔名
 File name:	CodyCam		檔案名稱：
@@ -19,12 +37,18 @@ Locking the window	VideoConsumer.cpp		正在鎖住視窗
 password expected	CodyCam		需要密碼
 Cannot start the video window	CodyCam		無法啟動視訊視窗
 Cannot set the time source for the video window	CodyCam		無法設定視訊視窗的時間來源
+Every 15 minutes	CodyCam		每15分鐘
+Every 24 hours	CodyCam		每24小時
 Image Format Menu	CodyCam		圖片格式菜單
+Every 5 minutes	CodyCam		每5分鐘
 File upload failed	VideoConsumer.cpp		檔案上傳失敗
+Every 15 seconds	CodyCam		每15秒
 password	CodyCam		密码
+Rate:	CodyCam		頻次：
 Rename failed	VideoConsumer.cpp		再命名失敗
 Server:	CodyCam		伺服器:
 File	CodyCam		檔案
+Every hour	CodyCam		每小時
 Video settings	CodyCam		視頻設定
 Can't find an available connection to the video window	CodyCam		找不到視訊視窗的可用連接
 Error creating output file	VideoConsumer.cpp		建立輸出檔案時出錯

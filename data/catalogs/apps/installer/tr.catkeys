@@ -5,7 +5,7 @@ No optional packages available.	PackagesView		İsteğe bağlı paket yok.
 This operating system has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Bu işletim sistemi, Be Dosya Sistemi kullanan bir bölüntüye kurulmalı; ancak sisteminizde böyle bir bölüntü yok.
 The mount point could not be retrieved.	InstallProgress		Bağlama noktası bulunup getirilemedi.
 <none>	InstallerWindow	No partition available	<yok>
-Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme dilimi “%s” konumuna yazıldı. Bilgisayarı yeniden başlatmak için “Yeniden başlat”a tıklayın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
+Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme dilimi “%s” konumuna yazıldı. Bilgisayarı yeniden başlatmak için “Yeniden başlat”a tıklayın veya başka bir kurulum için yeni bir hedef bölüm seçin.
 Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Haiku, Be Dosya Sistemi kullanan bir bölüntüye kurulmalı; ancak sisteminizde böyle bir bölüntü yok.
 Please choose target	InstallerWindow		Lütfen hedef seçin
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Önyükleme Yöneticisi başlatılamadı.
@@ -61,7 +61,7 @@ Begin	InstallerWindow		Başlat
 Collecting copy information.	InstallProgress		Kopya bilgisi toplanıyor…
 Set up boot menu…	InstallerWindow		Önyükleme menüsünü ayarla…
 Show optional packages	InstallerWindow		İsteğe bağlı paketleri göster
-No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Kurulum için uygun bir disk bölümü bulunamadı. Lütfen bölümlerinizi ayarlayın ve en az bir bölümü Be Dosya Sistemi ile biçimleyin.
+No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Kurulum için uygun bir disk bölümü bulunamadı. Lütfen bölümlerinizi ayarlayın ve en az bir bölümü Be Dosya Sistemi ile biçimlendirin.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Hedef diskte yeteri kadar boş alan olmayabilir. Başka bir disk seçin veya isteğe bağlı kurmaları gözden geçirin.
 Installation canceled.	InstallProgress		Kurulum iptal edildi.
 Stop	InstallerWindow		Durdur

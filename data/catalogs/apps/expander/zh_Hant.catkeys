@@ -1,4 +1,7 @@
-1	english	x-vnd.Haiku-Expander	2143216905
+1	english	x-vnd.Haiku-Expander	471851149
+Destination	ExpanderWindow		目標
+Other	ExpanderPreferences		其他
+Automatically show contents listing	ExpanderPreferences		自動顯示內容列表
 OK	ExpanderWindow		確認
 The folder was either moved, renamed or not supported.	ExpanderWindow		該資料夾已被移動、再命名或不受支援。
 Close window when done expanding	ExpanderPreferences		展開完成後關閉視窗

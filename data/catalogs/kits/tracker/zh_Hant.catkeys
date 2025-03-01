@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1487955846
+1	english	x-vnd.Haiku-libtracker	4192200646
 Created	ContainerWindow		已創建
 Icon	AttributesView		圖標
 Open and make preferred	OpenWithWindow		開啓並設為首選
@@ -247,6 +247,7 @@ ends with	SelectionWindow		結束於
 You must have at least one attribute showing.	PoseView		您必須至少顯示一項屬性。
 Finish: after several years	StatusWindow		完成：幾年後
 Favorites	FilePanelPriv		收藏夾
+Point	AttributesView		點
 You can't move or copy items to read-only volumes.	PoseView		您無法將項目移動或複製到唯讀磁碟卷。
 home	B_USER_DIRECTORY		主資料夾
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker新模板
@@ -281,6 +282,7 @@ copying	FSUtils		複製中
 MIME String	AttributesView		MIME 字串
 Delete	ContainerWindow		刪除
 Execute	FilePermissionsView		執行
+no	AttributesView		否
 Show volumes on Desktop	SettingsView		在桌面上顯示磁碟卷
 Recent folders	ContainerWindow		近期資料夾
 Desktop	Model		桌面
@@ -466,6 +468,7 @@ Sorry, there is not enough free space on the destination volume to copy the sele
 True-color picture	AttributesView		真彩色圖片
 Alignment	AttributesView		校准
 Move to Trash	FSUtils		移入資源回收筒
+Handles %type	OpenWithWindow		句柄 %type
 Cancel	PoseView		取消
 Options	FindPanel		選項
 Delete	PoseView		刪除

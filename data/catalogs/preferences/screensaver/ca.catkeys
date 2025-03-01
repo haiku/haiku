@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ScreenSaver	2682415627
+1	catalan; valencian	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		El sistema d'estalvi d'energia de la pantalla (DPMS) no està disponible
 Blackness	ScreenSaver		Foscor
 Fade now when mouse is here	ScreenSaver		Esvaeix ara quan el ratolí és aquí
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Cancel·la
 Password:	ScreenSaver		Contrasenya:
 Screensaver settings	ScreenSaver		Opcions de l'estalvi de pantalla
 Password Window	ScreenSaver		Finestra de la contrasenya
+Use system password	ScreenSaver		Usa la contrasenya del sistema
 Test	ScreenSaver		Prova
 Could not load screen saver	ScreenSaver		No s'ha carregar cap captura de pantalla
 Use custom password	ScreenSaver		Usa una contrasenya personal

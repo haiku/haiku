@@ -1,4 +1,24 @@
-1	english	x-vnd.Haiku-GLTeapot	1379565263
+1	english	x-vnd.Haiku-GLTeapot	1263334963
+Right	TeapotWindow		右
+Backface culling	TeapotWindow		背面剔除
 Add a teapot	TeapotWindow		添加一個茶壺
+Yellow	TeapotWindow		黃色
+Perspective	TeapotWindow		透視
+Off	TeapotWindow		関
 Quit	TeapotWindow		退出
+Green	TeapotWindow		綠色
+Blue	TeapotWindow		藍色
+White	TeapotWindow		白色
+Upper center	TeapotWindow		中上
+Filled polygons	TeapotWindow		填充多邊形
+Lower left	TeapotWindow		左下
+Fog	TeapotWindow		霧
+FPS display	TeapotWindow		FPS顯示
+GLTeapot	System name		GL茶壺
+Limit FPS to refresh rate	TeapotWindow		將 FPS 限制為更新率
 Settings	TeapotWindow		設定
+Gouraud shading	TeapotWindow		高氏著色
+Lighting	TeapotWindow		光照
+Z-buffered	TeapotWindow		Z 緩衝
+Red	TeapotWindow		紅色
+Lights	TeapotWindow		光

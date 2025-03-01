@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ScreenSaver	2682415627
+1	hungarian	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		A kijelző energiakezelési jelzései nem elérhetőek
 Blackness	ScreenSaver		Sötétség
 Fade now when mouse is here	ScreenSaver		Bekapcsolás, ha az egér itt van
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Mégse
 Password:	ScreenSaver		Jelszó:
 Screensaver settings	ScreenSaver		Képernyővédő beállításai
 Password Window	ScreenSaver		Jelszóablak
+Use system password	ScreenSaver		Rendszer jelszó használata
 Test	ScreenSaver		Próba
 Could not load screen saver	ScreenSaver		A képernyővédő betöltése sikertelen
 Use custom password	ScreenSaver		Egyéni jelszó használata

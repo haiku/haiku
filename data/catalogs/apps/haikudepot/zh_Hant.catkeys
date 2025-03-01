@@ -8,7 +8,7 @@ Fetching changelog for package	PopulatePkgChangelogFromServerProcess		取得套�
 Agree	ToLatestUserUsageConditionsWindow		同意
 Install %PackageTitle%	PackageManager		安裝 %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		對驗證碼的回應不正確。
-Rate package…	PackageInfoView		点评軟體套件…
+Rate package…	PackageInfoView		評價軟體套件…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		您已成功通過使用者身份驗證 %Nickname%.
 Package problems	PackageProblem	Window title	軟體套件問題
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		無法從伺服器傳回的資料中提取必要的驗證碼資訊。
@@ -23,7 +23,7 @@ Name	PackageListView		名稱
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		授權或安全問題。登出並重新登入以檢查您的密碼是否正確，並檢查您是否同意最新的使用條件。
 HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		Haiku軟體庫 與名為 HaikuDepotServer 的伺服器元件進行通訊。這些是使用者「%Nickname%」在 %AgreedToTimestamp% 同意的與使用 HaikuDepotServer 服務相關的使用條件。
 don't activate package %source%	PackageProblem	don't change '%source%	不啓用套件 %source%
-Rate %Package%	RatePackageWindow		評分 %Package%
+Rate %Package%	RatePackageWindow		評價 %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		初始化套件管理器時發生錯誤：%message%
 Quit HaikuDepot	App		退出Haiku軟體庫
 Category	FilterView		分類
@@ -209,7 +209,7 @@ A validation error has occurred	ServerHelper		發生驗證錯誤
 The nickname is required.	UserLoginWindow		暱稱是必需的。
 Apply changes	PackageResult		套用變更
 Server error	ServerHelper		伺服器錯誤
-Rate package	RatePackageWindow		對套件評分
+Rate package	RatePackageWindow		評價套件
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		正在錄製視圖 \"%PackageName%\"
 Sending anonymous usage data	MainWindow		發送匿名使用數據
 Log in	UserLoginWindow		登入

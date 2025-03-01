@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	3760185556
+1	ukrainian	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Статистика документу
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо зробити відкат, файл не знайдено: \"%s\".
 Cut	Menus		Вирізати
@@ -34,6 +34,7 @@ Bold	Menus		Жирний
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" був змінений іншою програмою, перезавантажити його?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" був вилучений іншою програмою, відновити його?
 Lines:	Statistics		Рядків:
+Strikeout	Menus		Закреслений
 Replace in all windows	FindandReplaceWindow		Замінити у всіх вікнах
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" має незбережені зміни.\nЗробити відкат до його останньої збереженої версії? 
 Save	SaveAlert		Зберегти

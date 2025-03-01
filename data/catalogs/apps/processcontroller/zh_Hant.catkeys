@@ -1,18 +1,49 @@
-1	english	x-vnd.Haiku-ProcessController	4055497297
+1	english	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		儲存檔案時發生錯誤
+Display priority	ProcessController		顯示優先權
+That's no Fun!	ProcessController		那不好玩！
+What do you want to do with the team \"%s\"?	ProcessController		你想與團隊 \"%s\" 做什麼?
 Your setting file could not be saved!\n(%s)	ProcessController		無法存儲您的設定檔！\n(%s)
+Processor %d	ProcessController		處理器 %d
 Live in the Deskbar	ProcessController		于Deskbar上實時顯示
+Kill this team!	ProcessController		殺掉這個team！
 OK	ProcessController		確認
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		您可以在視窗中執行 ProcessController 或將其安裝在Deskbar中。
+Real-time priority	ProcessController		即時優先權
+Custom priority	ProcessController		自訂優先級
+Debug this thread!	ProcessController		調試這個線程！
+Low priority	ProcessController		低優先級
+Urgent display priority	ProcessController		緊急顯示優先權
+Memory usage	ProcessController		記憶體使用情況
 Ok!	ProcessController		確認！
+Normal priority	ProcessController		普通優先級
 Restart Deskbar	ProcessController		重啟Deskbar
 About ProcessController…	ProcessController		關於ProcessController…
 Usage: %s [-deskbar]\n	ProcessController		用法: %s [-deskbar]\n
+Please confirm	ProcessController		請確認
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
+Urgent priority	ProcessController		緊急優先度
+What do you want to do with the thread \"%s\"?	ProcessController		您想如何處理線程 \"%s\"?
+Idle priority	ProcessController		空閒優先度
+Real-time display priority	ProcessController		實時顯示優先度
+Threads and CPU usage	ProcessController		線程和CPU使用率
 Quit application	ProcessController		退出應用程式
+Info	ProcessController		資訊
+Kill this thread!	ProcessController		殺掉此線程！
+This team is already gone…	ProcessController		此隊列已經故去…
+Gone teams…	ProcessController		故去隊列…
 Quit an application	ProcessController		退出一個應用程式
 Cancel	ProcessController		取消
 Install in Deskbar	ProcessController		安裝在Deskbar中
+Debug this team!	ProcessController		調試此隊列！
+ProcessController	System name		行程控制器
+Lowest active priority	ProcessController		最低活動優先級
 Restart Tracker	ProcessController		重啓Tracker
+System resources & caches…	ProcessController		系統資源和快取…
+Damned!	ProcessController		該死！
 New Terminal	ProcessController		新創終端
+Power saving	ProcessController		節電
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController 已安裝在Deskbar中。
+This is the last active processor…\nYou can't turn it off!	ProcessController		這是最後一個活躍處理器…\n您不能關閉它！
+This thread is already gone…	ProcessController		線程已故…
 Run in window	ProcessController		在視窗中運行

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ScreenSaver	2682415627
+1	japanese	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		DPMS (Display Power Management Signaling) は利用できません
 Blackness	ScreenSaver		Blackness
 Fade now when mouse is here	ScreenSaver		マウスが指定の場所にあるときに画面を消す
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		中止
 Password:	ScreenSaver		パスワード:
 Screensaver settings	ScreenSaver		スクリーンセーバー設定
 Password Window	ScreenSaver		パスワードウィンドウ
+Use system password	ScreenSaver		システムのパスワードを使用
 Test	ScreenSaver		テスト
 Could not load screen saver	ScreenSaver		スクリーンセーバーを実行できません
 Use custom password	ScreenSaver		独自のパスワードを使う

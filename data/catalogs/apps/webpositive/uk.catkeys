@@ -1,11 +1,13 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	886016739
+1	ukrainian	x-vnd.Haiku-WebPositive	107596791
 Authentication required	Authentication Panel		Потрібна автентифікація
 Previous	WebPositive Window		Попереднє
 Copy	Console Window		Копіювати
 (Finish: %date)	Download Window		(Завершення: %date)
 Open bookmarks confirmation	WebPositive Window		Відкрити підтвердження закладок
+Delete	BookmarkBar		Видалити
 Download folder:	Settings Window		Папка завантажень:
 Close window	WebPositive Window		Закрити вікно
+Rename	BookmarkBar		Змінити назву
 Find:	WebPositive Window		Знайти:
 Script console	WebPositive Window		Консоль сценаріїв
 There was an error setting up the bookmark.	WebPositive Window		Під час настройки закладки сталася помилка.
@@ -33,6 +35,7 @@ Browse…	Settings Window		Переглянути…
 Resume prior session	Settings Window		Продовжити попередній сеанс
 Match case	WebPositive Window		Враховувати регістр
 Proxy password:	Settings Window		Пароль проксі:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Помилка видалення вкладки:\n'%path%'
 Size:	Font Selection view		Розмір:
 Page source	WebPositive Window		Код сторінки
 Proxy server port:	Settings Window		Порт проксі-сервера:
@@ -56,6 +59,7 @@ Cookies for %s	Cookie Manager		Cookies для %s
 Close	Download Window		Закрити
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s – Параметри пошуку
+Old name: %s	BookmarkBar		Стара назва: %s
 Expiration	Cookie Manager		Термін дії
 Reload	WebPositive Window		Перезавантажити
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Ваш процесор занадто старий і не підтримує розширення SSE2, без яких WebPositive не може працювати. Натомість ми рекомендуємо встановити NetSurf.
@@ -95,6 +99,7 @@ Style:	Font Selection view		Стиль:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при створенні закладки.\n\nПомилка: %error
 OK	Download Window		ОК
 Proxy username:	Settings Window		Користувач проксі:
+Rename bookmark	BookmarkBar		Зміна назви закладки
 Manage bookmarks	WebPositive Window		Управління закладками
 /s)	Download Window	...as in 'per second'	/с)
 Restart	Download Window		Перезапустити
@@ -147,6 +152,7 @@ Window	WebPositive Window		Вікно
 Proxy server address:	Settings Window		Адреса проксі-сервера:
 Search page:	Settings Window		Сторінка пошуку:
 Settings	WebPositive Window		Налаштування
+Show in Tracker	BookmarkBar		Відкрити у Tracker
 Clear	URL Bar		Очистити
 Loading %url	WebPositive Window		Завантаження %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Факт ґринджол: бій псюг вщух, з’їм шче яєць.
@@ -154,6 +160,7 @@ OK	BookmarkBar		OK
 Start up:	Settings Window		При запуску:
 Confirmation	WebPositive Window		Підтвердження
 Session cookie	Cookie Manager		Сесійний файл cookie
+New name:	BookmarkBar		Нова назва:
 No SSE2 support	WebPositive		SSE2 не підтримується
 Open all	WebPositive Window		Відкрити всі
 Cut	WebPositive Window		Вирізати
@@ -163,4 +170,5 @@ Clear history	WebPositive Window		Очистити історію
 Cancel	WebPositive Window		Скасувати
 Script console	Console Window		Консоль сценаріїв
 Copy	URL Bar		Копіювати
+Open in new tab	BookmarkBar		Відкрити як вкладку
 Open start page	Settings Window		Відкрити стартову сторінку

@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	4044863267
+1	english	x-vnd.haiku-icon_o_matic	376917358
 None	Icon-O-Matic-Properties		无
 Clean up path	Icon-O-Matic-CleanUpPathCmd		清理路径
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -33,6 +33,7 @@ Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Re
 Unassign path	Icon-O-Matic-UnassignPathCmd		取消路径分配
 Remove	Icon-O-Matic-StylesList		删除
 Cancel	Icon-O-Matic-Menu-Settings		取消
+PNG set	Icon-O-Matic-SavePanel		PNG 集
 Transformation	Icon-O-Matic-TransformationBoxStates		转换
 Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		移动 {0, plural, one{条路径} other{条路径}}
 Closed	Icon-O-Matic-PropertyNames		关闭
@@ -50,11 +51,14 @@ edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd 
 Move pivot	Icon-O-Matic-TransformationBoxStates		移动枢轴
 Opacity	Icon-O-Matic-PropertyNames		透明度
 OK	Icon-O-Matic-ColorPicker		确定
+Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	设置多个%property%环境变量
 Error: 	Icon-O-Matic-Main		错误：
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		重置 {0, plural, one{条转换} other{条转换}}
 Assign style	Icon-O-Matic-AssignStyleCmd		指定样式
 Saving your document failed!	Icon-O-Matic-Exporter		文档保存失败！
 Snap to grid	Icon-O-Matic-Menu-Settings		对齐网格
 Opening the document failed!	Icon-O-Matic-Main		打开文档失败！
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		移除 {0, plural, one{个样式} other{个样式}}
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		一条或多条路径的顶点太多。HVIF 格式最多支持每条路径 255 个顶点。
 Add with path & style	Icon-O-Matic-ShapesList		添加路径与样式
 Shape	Icon-O-Matic-Menus		模型
@@ -66,10 +70,12 @@ Add	Icon-O-Matic-TransformersList		添加
 Settings	Icon-O-Matic-Menus		设置
 Scale X	Icon-O-Matic-PropertyNames		比例 X
 Add	Icon-O-Matic-PathsList		添加
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		新增 {0, plural, one{个样式} other{个样式}}
 Remove	Icon-O-Matic-PathManipulator		删除
 Duplicate	Icon-O-Matic-ShapesList		副本
 Alpha	Icon-O-Matic-PropertyNames		Alpha
 Contour	Transformation		轮廓
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		新增 {0, plural, one{条转换} other{条转换}}
 Insert vertex	Icon-O-Matic-InsertPointCmd		插入顶点
 Rounding	Icon-O-Matic-PropertyNames		倒角
 Joins	Icon-O-Matic-PropertyNames		连接
@@ -92,6 +98,7 @@ Rotate indices backwards	Icon-O-Matic-PathsList		逆时针旋转
 Overwrite	Icon-O-Matic-SVGExport		覆盖
 Cancel	Icon-O-Matic-SVGExport		取消
 Open…	Icon-O-Matic-Menu-File		打开...
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		移除 {0, plural, one{条转换} other{条转换}}
 Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	点击上面的一个形状
 Remove	Icon-O-Matic-ShapesList		删除
 Multi-paste	Icon-O-Matic-Properties		批量粘贴
@@ -127,6 +134,7 @@ Import text	Icon-O-Matic-StyledTextImport		导入文本
 Append…	Icon-O-Matic-Menu-File		附加...
 Scale Y	Icon-O-Matic-PropertyNames		比例 Y
 Export icon	Icon-O-Matic-SavePanel	Dialog title	导出图标
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		新增 {0, plural, one{个项目} other{个项目}}
 Rotate indices forwards	Icon-O-Matic-PathsList		顺时针旋转
 Save	Icon-O-Matic-Menu-File		保存
 Cancel	Icon-O-Matic-StyledTextImport		取消
@@ -147,6 +155,7 @@ Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		移除 {
 Add	Icon-O-Matic-StylesList		添加
 Translation Y	Icon-O-Matic-PropertyNames		平移 Y
 Modify vertex	Icon-O-Matic-ChangePointCmd		修改顶点
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		移动 {0, plural, one{个样式} other{个样式}}
 Scale	Icon-O-Matic-TransformationBoxStates		比例
 All	Icon-O-Matic-Properties		全部
 Transformer	Icon-O-Matic-Menus		转换器

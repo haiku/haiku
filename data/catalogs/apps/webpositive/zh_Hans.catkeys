@@ -129,7 +129,7 @@ Fixed font:	Settings Window		固定字体：
 Quit	WebPositive Window		退出
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	查找上一个出现的搜索词
 Remember username and password for this site	Authentication Panel		记住这个网站的用户名和密码
-(Finish: %date - %duration left)	Download Window		(完成还需: %date - %duration)
+(Finish: %date - %duration left)	Download Window		(完成时间: %date - 还需 %duration)
 Cookie manager	Cookie Manager		Cookie 管理器
 Show home button	Settings Window		显示主页按钮
 Start new session	Settings Window		启动新会话

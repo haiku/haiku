@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ScreenSaver	2682415627
+1	german	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Stromsparfunktionen nicht verfügbar
 Blackness	ScreenSaver		Schwarzer Bildschirm
 Fade now when mouse is here	ScreenSaver		Sofort starten, wenn Maus in diesem Eck
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Abbrechen
 Password:	ScreenSaver		Passwort:
 Screensaver settings	ScreenSaver		Bildschirmschoner-Einstellungen
 Password Window	ScreenSaver		Passwort-Fenster
+Use system password	ScreenSaver		System-Passwort
 Test	ScreenSaver		Test
 Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen werden.
 Use custom password	ScreenSaver		Benutzerdefiniertes Passwort

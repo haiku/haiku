@@ -50,7 +50,7 @@ Run mode	LiveNodeInfoView		Çalışma kipi
 \n- Codec:	FileNodeInfoView		\n— Kod çözücü
 Port	LiveNodeInfoView		Kapı
 Output format	DormantNodeInfoView		Çıkış biçimi
-Aspect ratio	InfoView		En boy oranı
+Aspect ratio	InfoView		En–boy oranı
 Application-owned node	AppNodeInfoView		Uygulamanın iyesi olduğu düğüm
 Tracks	FileNodeInfoView		Parçalar
 Source	InfoView		Kaynak

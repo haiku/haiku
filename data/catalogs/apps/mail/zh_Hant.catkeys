@@ -1,9 +1,18 @@
-1	english	x-vnd.Be-MAIL	93276735
+1	english	x-vnd.Be-MAIL	1853872798
 Set to Saved	Mail		設定為已存儲
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		您的正文包含 %ld 個無法編碼的字元。也許不同的字符集會更好？點擊“發送”仍然可以發送（將使用替代字元來代替不可編碼的字元），或者選擇“取消”返回並嘗試修復它。
+Text wrapping:	Mail		文字換行：
+Show icons & labels	Mail		顯示圖示和標籤
+(Date unavailable)	Mail		（日期不詳）
+Reply	Mail		回覆
 Next message	Mail		下一條信息
+Mailing	Mail		郵寄
 Unread	Mail		未讀
+Same sender	Mail		同一寄件人
 Copy to new	Mail		複製到新的
 Save as draft	Mail		存儲為草稿
+Encoding:	Mail		編碼：
+Print	Mail		列印
 Default account:	Mail		默認帳戶：
 New	Mail		新創
 Save	Mail		存儲

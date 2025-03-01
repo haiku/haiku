@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ScreenSaver	2682415627
+1	swedish	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Stöd för att sätta skärm i strömsparläge saknas
 Blackness	ScreenSaver		Svärta
 Fade now when mouse is here	ScreenSaver		Avta nu när musen är här
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Avbryt
 Password:	ScreenSaver		Lösenord:
 Screensaver settings	ScreenSaver		Inställningar
 Password Window	ScreenSaver		Lösenordsfönster
+Use system password	ScreenSaver		Använd systemlösenord
 Test	ScreenSaver		Testa
 Could not load screen saver	ScreenSaver		Kunde inte läsa in skärmsläckaren
 Use custom password	ScreenSaver		Använd anpassat lösenord

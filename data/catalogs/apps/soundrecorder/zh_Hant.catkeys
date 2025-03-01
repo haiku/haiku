@@ -1,7 +1,11 @@
-1	english	x-vnd.Haiku-SoundRecorder	3303114862
+1	english	x-vnd.Haiku-SoundRecorder	1088965115
+Loop	RecorderWindow		循環
 Cannot find default audio hardware	RecorderWindow		找不到默認音訊硬體
 Cannot find the temporary file created to hold the new recording	RecorderWindow		找不到為儲存新錄音而建立的臨時檔案
+Sample size:	RecorderWindow		樣本大小：
+Nothing to play	RecorderWindow		無播放內容
 None of the files appear to be audio files.	RecorderWindow		這些檔案似乎都不是音訊檔案。
+Duration: 	RecorderWindow		週期：
 File info	RecorderWindow		檔案訊息
 Drop files here	SoundListView		將檔案拖放到此處
 Some of the files don't appear to be audio files.	RecorderWindow		有些檔案似乎不是音訊檔案。

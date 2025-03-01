@@ -1,17 +1,17 @@
 1	english	x-vnd.Haiku-DataTranslations	4156631142
 Path:	DataTranslations		路徑:
 Name:	DataTranslations		名稱：
-DataTranslations - Note	DataTranslations		資料翻譯 - 註釋
-The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		項目 '%name' 似乎不是轉換器，因此不會安裝。
+DataTranslations - Note	DataTranslations		數據翻譯 - 註釋
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		項目 '%name' 似乎不是轉譯器，因此不會安裝。
 Could not install %s:\n%s	DataTranslations		無法安裝%s:\n%s
 OK	DataTranslations		確認
 Cancel	DataTranslations		取消
 Info:	DataTranslations		資訊：
-DataTranslations - Error	DataTranslations		數據翻譯 - 錯誤
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		使用此控制台為轉換器設定預設值，以便在應用程式未指定其他設定時使用。
-The new translator has been installed successfully.	DataTranslations		新的翻譯器已成功安裝。
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Translators 資料夾中已存在名為 '%name' 的項目！現有的翻譯器要被覆蓋嗎？
-DataTranslations	System name		數據翻譯
+DataTranslations - Error	DataTranslations		數據轉譯 - 錯誤
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		使用此控制台為轉譯器設定預設值，以便在應用程式未指定其他設定時使用。
+The new translator has been installed successfully.	DataTranslations		新的轉譯器已成功安裝。
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Translators 資料夾中已存在名為 '%name' 的項目！現有的轉譯器要被覆蓋嗎？
+DataTranslations	System name		數據轉譯
 Info	DataTranslations		資訊
 Overwrite	DataTranslations		覆蓋
 Version:	DataTranslations		版本：
