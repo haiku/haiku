@@ -324,14 +324,10 @@ BDeskWindow::InitAddOnsList(bool update)
 	}
 
 	BStringList addOnPaths;
-	BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker",
-		addOnPaths);
+	BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker", addOnPaths);
 	int32 count = addOnPaths.CountStrings();
 	for (int32 i = 0; i < count; i++)
 		LoadAddOnDir(BDirectory(addOnPaths.StringAt(i)), this, fAddOnsList);
-
-	BMessage message(kRebuildAddOnMenus);
-	dynamic_cast<TTracker*>(be_app)->PostMessageToAllContainerWindows(message);
 }
 
 
@@ -379,8 +375,7 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 		bool isInAddOns = false;
 
 		BStringList addOnPaths;
-		BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
-			"Tracker/", addOnPaths);
+		BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker/", addOnPaths);
 		for (int32 i = 0; i < addOnPaths.CountStrings(); i++) {
 			if (command.StartsWith(addOnPaths.StringAt(i))) {
 				isInAddOns = true;
@@ -423,9 +418,6 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 			AddOneShortcut(&model, item->key, item->modifiers, this);
 		}
 	}
-
-	message = BMessage(kRebuildAddOnMenus);
-	dynamic_cast<TTracker*>(be_app)->PostMessageToAllContainerWindows(message);
 }
 
 
@@ -611,10 +603,19 @@ BDeskWindow::MessageReceived(BMessage* message)
 			break;
 		}
 		case B_NODE_MONITOR:
+		{
 			PRINT(("will update addon shortcuts\n"));
 			InitAddOnsList(true);
 			ApplyShortcutPreferences(true);
+
+			// a Tracker add-on may have loaded/unloaded
+			TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+			if (tracker != NULL) {
+				BMessage message(kRebuildAddOnMenus);
+				tracker->PostMessageToAllContainerWindows(message);
+			}
 			break;
+		}
 
 		default:
 			_inherited::MessageReceived(message);
