@@ -21,6 +21,7 @@ KernelAddon ralinkwifi :
 	rt2661.c
 	rt2860.c
 
+	if_mtw.c
 	if_ural.c
 	if_run.c
 	if_rum.c
@@ -31,7 +32,7 @@ KernelAddon ralinkwifi :
 	libfreebsd_network.a
 	;
 
-ObjectHdrs [ FGristFiles if_ural$(SUFOBJ) if_run$(SUFOBJ) if_rum$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles if_mtw$(SUFOBJ) if_ural$(SUFOBJ) if_run$(SUFOBJ) if_rum$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles if_ural.c if_run.c if_rum.c ]
+Includes [ FGristFiles if_mtw.c if_ural.c if_run.c if_rum.c ]
 	: <src!libs!compat!freebsd_network>usbdevs.h ;

@@ -33,13 +33,17 @@ HAIKU_FIRMWARE_NAME_MAP({
 	{"rt2561sfw", "rt2561s.ucode"},
 	{"rt2661fw", "rt2661.ucode"},
 	{"rt2860fw", "rt2860.ucode"},
+
 	{"runfw", "rt2870.ucode"},
+
+	{"/mediatek/mt7601u.bin", "mtw-mt7601u"},
 });
 
 NO_HAIKU_FBSD_MII_DRIVER();
 NO_HAIKU_REENABLE_INTERRUPTS();
 
 extern driver_t* DRIVER_MODULE_NAME(ral, pci);
+extern driver_t* DRIVER_MODULE_NAME(mtw, uhub);
 extern driver_t* DRIVER_MODULE_NAME(ural, uhub);
 extern driver_t* DRIVER_MODULE_NAME(run, uhub);
 extern driver_t* DRIVER_MODULE_NAME(rum, uhub);
@@ -53,6 +57,7 @@ __haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[])
 		NULL
 	};
 	driver_t *usb_drivers[] = {
+		DRIVER_MODULE_NAME(mtw, uhub),
 		DRIVER_MODULE_NAME(ural, uhub),
 		DRIVER_MODULE_NAME(run, uhub),
 		DRIVER_MODULE_NAME(rum, uhub),
