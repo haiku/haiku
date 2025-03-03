@@ -2804,7 +2804,7 @@ common_get_team_usage_info(team_id id, int32 who, team_usage_info* info,
 			for (; child != NULL; child = team->children.GetNext(child)) {
 				TeamLocker childLocker(child);
 
-				Thread* thread = team->thread_list;
+				Thread* thread = child->thread_list;
 
 				for (; thread != NULL; thread = thread->team_next) {
 					InterruptsSpinLocker threadTimeLocker(thread->time_lock);
