@@ -2268,12 +2268,17 @@ thread_exit(void)
 		} else {
 			// The thread is not the main thread. We store a thread death entry
 			// for it, unless someone is already waiting for it.
-			if (threadDeathEntry != NULL && thread->exit.waiters.IsEmpty()) {
-				threadDeathEntry->thread = thread->id;
-				threadDeathEntry->status = thread->exit.status;
+			if (threadDeathEntry != NULL) {
+				if (thread->exit.waiters.IsEmpty()) {
+					threadDeathEntry->thread = thread->id;
+					threadDeathEntry->status = thread->exit.status;
 
-				// add entry to dead thread list
-				team->dead_threads.Add(threadDeathEntry);
+					// add entry to dead thread list
+					team->dead_threads.Add(threadDeathEntry);
+				} else {
+					deferred_free(threadDeathEntry);
+					threadDeathEntry = NULL;
+				}
 			}
 
 			threadCreationLocker.Unlock();
