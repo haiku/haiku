@@ -216,6 +216,216 @@ struct TeamThreadIteratorEntry
 };
 
 
+struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
+	int32			flags;			// summary of events relevant in interrupt
+									// handlers (signals pending, user debugging
+									// enabled, etc.)
+	int64			serial_number;	// immutable after adding thread to hash
+	Thread			*hash_next;		// protected by thread hash lock
+	Thread			*team_next;		// protected by team lock and fLock
+	char			name[B_OS_NAME_LENGTH];	// protected by fLock
+	bool			going_to_suspend;	// protected by scheduler lock
+	int32			priority;		// protected by scheduler lock
+	int32			io_priority;	// protected by fLock
+	int32			state;			// protected by scheduler lock
+	struct cpu_ent	*cpu;			// protected by scheduler lock
+	struct cpu_ent	*previous_cpu;	// protected by scheduler lock
+	CPUSet			cpumask;
+	int32			pinned_to_cpu;	// only accessed by this thread or in the
+									// scheduler, when thread is not running
+	spinlock		scheduler_lock;
+
+	sigset_t		sig_block_mask;	// protected by team->signal_lock,
+									// only modified by the thread itself
+	sigset_t		sigsuspend_original_unblocked_mask;
+		// non-0 after a return from _user_sigsuspend(), containing the inverted
+		// original signal mask, reset in handle_signals(); only accessed by
+		// this thread
+	sigset_t		old_sig_block_mask;
+		// the old sig_block_mask to be restored when returning to userland
+		// when THREAD_FLAGS_OLD_SIGMASK is set
+
+	ucontext_t*		user_signal_context;	// only accessed by this thread
+	addr_t			signal_stack_base;		// only accessed by this thread
+	size_t			signal_stack_size;		// only accessed by this thread
+	bool			signal_stack_enabled;	// only accessed by this thread
+
+	bool			in_kernel;		// protected by time_lock, only written by
+									// this thread
+	bool			has_yielded;	// protected by scheduler lock
+	Scheduler::ThreadData*	scheduler_data; // protected by scheduler lock
+
+	struct user_thread*	user_thread;	// write-protected by fLock, only
+										// modified by the thread itself and
+										// thus freely readable by it
+
+	void			(*cancel_function)(int);
+
+	struct {
+		uint8		parameters[SYSCALL_RESTART_PARAMETER_SIZE];
+	} syscall_restart;
+
+	struct {
+		status_t	status;				// current wait status
+		uint32		flags;				// interrupable flags
+		uint32		type;				// type of the object waited on
+		const void*	object;				// pointer to the object waited on
+		timer		unblock_timer;		// timer for block with timeout
+	} wait;
+
+	struct {
+		sem_id		write_sem;	// acquired by writers before writing
+		sem_id		read_sem;	// release by writers after writing, acquired
+								// by this thread when reading
+		thread_id	sender;
+		int32		code;
+		size_t		size;
+		void*		buffer;
+	} msg;	// write_sem/read_sem are protected by fLock when accessed by
+			// others, the other fields are protected by write_sem/read_sem
+
+	void			(*fault_handler)(void);
+	jmp_buf			fault_handler_state;
+	int32			page_faults_allowed;
+		/* this field may only stay in debug builds in the future */
+
+	BKernel::Team	*team;	// protected by team lock, thread lock, scheduler
+							// lock, team_lock
+	rw_spinlock		team_lock;
+
+	struct {
+		sem_id		sem;		// immutable after thread creation
+		status_t	status;		// accessed only by this thread
+		struct list	waiters;	// protected by fLock
+	} exit;
+
+	struct select_info *select_infos;	// protected by fLock
+
+	struct thread_debug_info debug_info;
+
+	// stack
+	area_id			kernel_stack_area;	// immutable after thread creation
+	addr_t			kernel_stack_base;	// immutable after thread creation
+	addr_t			kernel_stack_top;	// immutable after thread creation
+	area_id			user_stack_area;	// protected by thread lock
+	addr_t			user_stack_base;	// protected by thread lock
+	size_t			user_stack_size;	// protected by thread lock
+
+	addr_t			user_local_storage;
+		// usually allocated at the safe side of the stack
+	int				kernel_errno;
+		// kernel "errno" differs from its userspace alter ego
+
+	// user_time, kernel_time, and last_time are only written by the thread
+	// itself, so they can be read by the thread without lock. Holding the
+	// scheduler lock and checking that the thread does not run also guarantees
+	// that the times will not change.
+	spinlock		time_lock;
+	bigtime_t		user_time;			// protected by time_lock
+	bigtime_t		kernel_time;		// protected by time_lock
+	bigtime_t		last_time;			// protected by time_lock
+	bigtime_t		cpu_clock_offset;	// protected by time_lock
+
+	void			(*post_interrupt_callback)(void*);
+	void*			post_interrupt_data;
+
+#if KDEBUG_RW_LOCK_DEBUG
+	rw_lock*		held_read_locks[64] = {}; // only modified by this thread
+#endif
+
+	// architecture dependent section
+	struct arch_thread arch_info;
+
+public:
+								Thread() {}
+									// dummy for the idle threads
+								Thread(const char *name, thread_id threadID,
+									struct cpu_ent *cpu);
+								~Thread();
+
+	static	status_t			Create(const char* name, Thread*& _thread);
+
+	static	Thread*				Get(thread_id id);
+	static	Thread*				GetAndLock(thread_id id);
+	static	Thread*				GetDebug(thread_id id);
+									// in kernel debugger only
+
+	static	bool				IsAlive(thread_id id);
+
+			void*				operator new(size_t size);
+			void*				operator new(size_t, void* pointer);
+			void				operator delete(void* pointer, size_t size);
+
+			status_t			Init(bool idleThread);
+
+			bool				Lock()
+									{ mutex_lock(&fLock); return true; }
+			bool				TryLock()
+									{ return mutex_trylock(&fLock) == B_OK; }
+			void				Unlock()
+									{ mutex_unlock(&fLock); }
+
+			void				UnlockAndReleaseReference()
+									{ Unlock(); ReleaseReference(); }
+
+			bool				IsAlive() const;
+
+			bool				IsRunning() const
+									{ return cpu != NULL; }
+									// scheduler lock must be held
+
+			sigset_t			ThreadPendingSignals() const
+									{ return fPendingSignals.AllSignals(); }
+	inline	sigset_t			AllPendingSignals() const;
+			void				AddPendingSignal(int signal)
+									{ fPendingSignals.AddSignal(signal); }
+			void				AddPendingSignal(Signal* signal)
+									{ fPendingSignals.AddSignal(signal); }
+			void				RemovePendingSignal(int signal)
+									{ fPendingSignals.RemoveSignal(signal); }
+			void				RemovePendingSignal(Signal* signal)
+									{ fPendingSignals.RemoveSignal(signal); }
+			void				RemovePendingSignals(sigset_t mask)
+									{ fPendingSignals.RemoveSignals(mask); }
+			void				ResetSignalsOnExec();
+
+	inline	int32				HighestPendingSignalPriority(
+									sigset_t nonBlocked) const;
+	inline	Signal*				DequeuePendingSignal(sigset_t nonBlocked,
+									Signal& buffer);
+
+			// user timers -- protected by fLock
+			UserTimer*			UserTimerFor(int32 id) const
+									{ return fUserTimers.TimerFor(id); }
+			status_t			AddUserTimer(UserTimer* timer);
+			void				RemoveUserTimer(UserTimer* timer);
+			void				DeleteUserTimers(bool userDefinedOnly);
+
+			void				UserTimerActivated(ThreadTimeUserTimer* timer)
+									{ fCPUTimeUserTimers.Add(timer); }
+			void				UserTimerDeactivated(ThreadTimeUserTimer* timer)
+									{ fCPUTimeUserTimers.Remove(timer); }
+			void				DeactivateCPUTimeUserTimers();
+			bool				HasActiveCPUTimeUserTimers() const
+									{ return !fCPUTimeUserTimers.IsEmpty(); }
+			ThreadTimeUserTimerList::ConstIterator
+									CPUTimeUserTimerIterator() const
+									{ return fCPUTimeUserTimers.GetIterator(); }
+
+	inline	bigtime_t			CPUTime(bool ignoreCurrentRun) const;
+
+private:
+			mutex				fLock;
+
+			BKernel::PendingSignals	fPendingSignals;
+									// protected by team->signal_lock
+
+			UserTimerList		fUserTimers;			// protected by fLock
+			ThreadTimeUserTimerList fCPUTimeUserTimers;
+									// protected by time_lock
+};
+
+
 struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 		AssociatedDataOwner {
 	DoublyLinkedListLink<Team>	global_list_link;
@@ -431,216 +641,6 @@ private:
 
 			ConditionVariable*	fCoreDumpCondition;
 									// protected by fLock
-};
-
-
-struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
-	int32			flags;			// summary of events relevant in interrupt
-									// handlers (signals pending, user debugging
-									// enabled, etc.)
-	int64			serial_number;	// immutable after adding thread to hash
-	Thread			*hash_next;		// protected by thread hash lock
-	Thread			*team_next;		// protected by team lock and fLock
-	char			name[B_OS_NAME_LENGTH];	// protected by fLock
-	bool			going_to_suspend;	// protected by scheduler lock
-	int32			priority;		// protected by scheduler lock
-	int32			io_priority;	// protected by fLock
-	int32			state;			// protected by scheduler lock
-	struct cpu_ent	*cpu;			// protected by scheduler lock
-	struct cpu_ent	*previous_cpu;	// protected by scheduler lock
-	CPUSet			cpumask;
-	int32			pinned_to_cpu;	// only accessed by this thread or in the
-									// scheduler, when thread is not running
-	spinlock		scheduler_lock;
-
-	sigset_t		sig_block_mask;	// protected by team->signal_lock,
-									// only modified by the thread itself
-	sigset_t		sigsuspend_original_unblocked_mask;
-		// non-0 after a return from _user_sigsuspend(), containing the inverted
-		// original signal mask, reset in handle_signals(); only accessed by
-		// this thread
-	sigset_t		old_sig_block_mask;
-		// the old sig_block_mask to be restored when returning to userland
-		// when THREAD_FLAGS_OLD_SIGMASK is set
-
-	ucontext_t*		user_signal_context;	// only accessed by this thread
-	addr_t			signal_stack_base;		// only accessed by this thread
-	size_t			signal_stack_size;		// only accessed by this thread
-	bool			signal_stack_enabled;	// only accessed by this thread
-
-	bool			in_kernel;		// protected by time_lock, only written by
-									// this thread
-	bool			has_yielded;	// protected by scheduler lock
-	Scheduler::ThreadData*	scheduler_data; // protected by scheduler lock
-
-	struct user_thread*	user_thread;	// write-protected by fLock, only
-										// modified by the thread itself and
-										// thus freely readable by it
-
-	void			(*cancel_function)(int);
-
-	struct {
-		uint8		parameters[SYSCALL_RESTART_PARAMETER_SIZE];
-	} syscall_restart;
-
-	struct {
-		status_t	status;				// current wait status
-		uint32		flags;				// interrupable flags
-		uint32		type;				// type of the object waited on
-		const void*	object;				// pointer to the object waited on
-		timer		unblock_timer;		// timer for block with timeout
-	} wait;
-
-	struct {
-		sem_id		write_sem;	// acquired by writers before writing
-		sem_id		read_sem;	// release by writers after writing, acquired
-								// by this thread when reading
-		thread_id	sender;
-		int32		code;
-		size_t		size;
-		void*		buffer;
-	} msg;	// write_sem/read_sem are protected by fLock when accessed by
-			// others, the other fields are protected by write_sem/read_sem
-
-	void			(*fault_handler)(void);
-	jmp_buf			fault_handler_state;
-	int32			page_faults_allowed;
-		/* this field may only stay in debug builds in the future */
-
-	BKernel::Team	*team;	// protected by team lock, thread lock, scheduler
-							// lock, team_lock
-	rw_spinlock		team_lock;
-
-	struct {
-		sem_id		sem;		// immutable after thread creation
-		status_t	status;		// accessed only by this thread
-		struct list	waiters;	// protected by fLock
-	} exit;
-
-	struct select_info *select_infos;	// protected by fLock
-
-	struct thread_debug_info debug_info;
-
-	// stack
-	area_id			kernel_stack_area;	// immutable after thread creation
-	addr_t			kernel_stack_base;	// immutable after thread creation
-	addr_t			kernel_stack_top;	// immutable after thread creation
-	area_id			user_stack_area;	// protected by thread lock
-	addr_t			user_stack_base;	// protected by thread lock
-	size_t			user_stack_size;	// protected by thread lock
-
-	addr_t			user_local_storage;
-		// usually allocated at the safe side of the stack
-	int				kernel_errno;
-		// kernel "errno" differs from its userspace alter ego
-
-	// user_time, kernel_time, and last_time are only written by the thread
-	// itself, so they can be read by the thread without lock. Holding the
-	// scheduler lock and checking that the thread does not run also guarantees
-	// that the times will not change.
-	spinlock		time_lock;
-	bigtime_t		user_time;			// protected by time_lock
-	bigtime_t		kernel_time;		// protected by time_lock
-	bigtime_t		last_time;			// protected by time_lock
-	bigtime_t		cpu_clock_offset;	// protected by time_lock
-
-	void			(*post_interrupt_callback)(void*);
-	void*			post_interrupt_data;
-
-#if KDEBUG_RW_LOCK_DEBUG
-	rw_lock*		held_read_locks[64] = {}; // only modified by this thread
-#endif
-
-	// architecture dependent section
-	struct arch_thread arch_info;
-
-public:
-								Thread() {}
-									// dummy for the idle threads
-								Thread(const char *name, thread_id threadID,
-									struct cpu_ent *cpu);
-								~Thread();
-
-	static	status_t			Create(const char* name, Thread*& _thread);
-
-	static	Thread*				Get(thread_id id);
-	static	Thread*				GetAndLock(thread_id id);
-	static	Thread*				GetDebug(thread_id id);
-									// in kernel debugger only
-
-	static	bool				IsAlive(thread_id id);
-
-			void*				operator new(size_t size);
-			void*				operator new(size_t, void* pointer);
-			void				operator delete(void* pointer, size_t size);
-
-			status_t			Init(bool idleThread);
-
-			bool				Lock()
-									{ mutex_lock(&fLock); return true; }
-			bool				TryLock()
-									{ return mutex_trylock(&fLock) == B_OK; }
-			void				Unlock()
-									{ mutex_unlock(&fLock); }
-
-			void				UnlockAndReleaseReference()
-									{ Unlock(); ReleaseReference(); }
-
-			bool				IsAlive() const;
-
-			bool				IsRunning() const
-									{ return cpu != NULL; }
-									// scheduler lock must be held
-
-			sigset_t			ThreadPendingSignals() const
-									{ return fPendingSignals.AllSignals(); }
-	inline	sigset_t			AllPendingSignals() const;
-			void				AddPendingSignal(int signal)
-									{ fPendingSignals.AddSignal(signal); }
-			void				AddPendingSignal(Signal* signal)
-									{ fPendingSignals.AddSignal(signal); }
-			void				RemovePendingSignal(int signal)
-									{ fPendingSignals.RemoveSignal(signal); }
-			void				RemovePendingSignal(Signal* signal)
-									{ fPendingSignals.RemoveSignal(signal); }
-			void				RemovePendingSignals(sigset_t mask)
-									{ fPendingSignals.RemoveSignals(mask); }
-			void				ResetSignalsOnExec();
-
-	inline	int32				HighestPendingSignalPriority(
-									sigset_t nonBlocked) const;
-	inline	Signal*				DequeuePendingSignal(sigset_t nonBlocked,
-									Signal& buffer);
-
-			// user timers -- protected by fLock
-			UserTimer*			UserTimerFor(int32 id) const
-									{ return fUserTimers.TimerFor(id); }
-			status_t			AddUserTimer(UserTimer* timer);
-			void				RemoveUserTimer(UserTimer* timer);
-			void				DeleteUserTimers(bool userDefinedOnly);
-
-			void				UserTimerActivated(ThreadTimeUserTimer* timer)
-									{ fCPUTimeUserTimers.Add(timer); }
-			void				UserTimerDeactivated(ThreadTimeUserTimer* timer)
-									{ fCPUTimeUserTimers.Remove(timer); }
-			void				DeactivateCPUTimeUserTimers();
-			bool				HasActiveCPUTimeUserTimers() const
-									{ return !fCPUTimeUserTimers.IsEmpty(); }
-			ThreadTimeUserTimerList::ConstIterator
-									CPUTimeUserTimerIterator() const
-									{ return fCPUTimeUserTimers.GetIterator(); }
-
-	inline	bigtime_t			CPUTime(bool ignoreCurrentRun) const;
-
-private:
-			mutex				fLock;
-
-			BKernel::PendingSignals	fPendingSignals;
-									// protected by team->signal_lock
-
-			UserTimerList		fUserTimers;			// protected by fLock
-			ThreadTimeUserTimerList fCPUTimeUserTimers;
-									// protected by time_lock
 };
 
 
