@@ -147,6 +147,8 @@ ConditionVariableEntry::_RemoveFromVariable()
 		// we do that, we may validly use our cached pointer to the variable.
 		if (try_acquire_spinlock(&variable->fLock))
 			break;
+
+		cpu_pause();
 	}
 
 	// We now hold the variable's lock. Remove ourselves.
