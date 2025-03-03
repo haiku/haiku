@@ -171,14 +171,16 @@ update_threads_breakpoints_flag()
 
 	TeamLocker teamLocker(team);
 
-	Thread* thread = team->thread_list;
-
 	if (arch_has_breakpoints(&team->debug_info.arch_info)) {
-		for (; thread != NULL; thread = thread->team_next)
+		for (Thread* thread = team->thread_list.First(); thread != NULL;
+				thread = team->thread_list.GetNext(thread)) {
 			atomic_or(&thread->flags, THREAD_FLAGS_BREAKPOINTS_DEFINED);
+		}
 	} else {
-		for (; thread != NULL; thread = thread->team_next)
+		for (Thread* thread = team->thread_list.First(); thread != NULL;
+				thread = team->thread_list.GetNext(thread)) {
 			atomic_and(&thread->flags, ~THREAD_FLAGS_BREAKPOINTS_DEFINED);
+		}
 	}
 }
 
@@ -205,14 +207,16 @@ update_thread_debugger_installed_flag(Thread* thread)
 static void
 update_threads_debugger_installed_flag(Team* team)
 {
-	Thread* thread = team->thread_list;
-
 	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
-		for (; thread != NULL; thread = thread->team_next)
+		for (Thread* thread = team->thread_list.First(); thread != NULL;
+				thread = team->thread_list.GetNext(thread)) {
 			atomic_or(&thread->flags, THREAD_FLAGS_DEBUGGER_INSTALLED);
+		}
 	} else {
-		for (; thread != NULL; thread = thread->team_next)
+		for (Thread* thread = team->thread_list.First(); thread != NULL;
+				thread = team->thread_list.GetNext(thread)) {
 			atomic_and(&thread->flags, ~THREAD_FLAGS_DEBUGGER_INSTALLED);
+		}
 	}
 }
 
@@ -2606,8 +2610,8 @@ install_team_debugger_init_debug_infos(Team *team, team_id debuggerTeam,
 	arch_clear_team_debug_info(&team->debug_info.arch_info);
 
 	// set the user debug flags and signal masks of all threads to the default
-	for (Thread *thread = team->thread_list; thread;
-			thread = thread->team_next) {
+	for (Thread *thread = team->thread_list.First(); thread != NULL;
+			thread = team->thread_list.GetNext(thread)) {
 		SpinLocker threadDebugInfoLocker(thread->debug_info.lock);
 
 		if (thread->id == nubThread) {

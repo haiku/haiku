@@ -264,7 +264,6 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	flags(0),
 	serial_number(-1),
 	hash_next(NULL),
-	team_next(NULL),
 	priority(-1),
 	io_priority(-1),
 	cpu(cpu),
@@ -708,8 +707,7 @@ ThreadCreationAttributes::InitFromUserAttributes(
 static void
 insert_thread_into_team(Team *team, Thread *thread)
 {
-	thread->team_next = team->thread_list;
-	team->thread_list = thread;
+	team->thread_list.Add(thread, false);
 	team->num_threads++;
 
 	if (team->num_threads == 1) {
@@ -727,20 +725,8 @@ insert_thread_into_team(Team *team, Thread *thread)
 static void
 remove_thread_from_team(Team *team, Thread *thread)
 {
-	Thread *temp, *last = NULL;
-
-	for (temp = team->thread_list; temp != NULL; temp = temp->team_next) {
-		if (temp == thread) {
-			if (last == NULL)
-				team->thread_list = temp->team_next;
-			else
-				last->team_next = temp->team_next;
-
-			team->num_threads--;
-			break;
-		}
-		last = temp;
-	}
+	team->thread_list.Remove(thread);
+	team->num_threads--;
 }
 
 
@@ -1874,7 +1860,7 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	kprintf("serial_number:      %" B_PRId64 "\n", thread->serial_number);
 	kprintf("name:               \"%s\"\n", thread->name);
 	kprintf("hash_next:          %p\nteam_next:          %p\n",
-		thread->hash_next, thread->team_next);
+		thread->hash_next, thread->team_link.next);
 	kprintf("priority:           %" B_PRId32 " (I/O: %" B_PRId32 ")\n",
 		thread->priority, thread->io_priority);
 	kprintf("state:              %s\n", state_to_text(thread, thread->state));
@@ -3339,8 +3325,8 @@ _get_next_thread_info(team_id teamID, int32 *_cookie, thread_info *info,
 		// don't wrap they are always sorted from highest to lowest).
 		// TODO: That is broken not only when the IDs wrap, but also for the
 		// kernel team, to which threads are added when they are dying.
-		for (Thread* next = team->thread_list; next != NULL;
-				next = next->team_next) {
+		for (Thread* next = team->thread_list.First(); next != NULL;
+				next = team->thread_list.GetNext(next)) {
 			if (next->id <= lastID)
 				break;
 

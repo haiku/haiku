@@ -877,8 +877,8 @@ private:
 	{
 		int32 count = 0;
 
-		for (Thread* thread = fTeam->thread_list; thread != NULL;
-				thread = thread->team_next) {
+		for (Thread* thread = fTeam->thread_list.First(); thread != NULL;
+				thread = fTeam->thread_list.GetNext(thread)) {
 			count++;
 			if (setFlag) {
 				atomic_or(&thread->flags, THREAD_FLAGS_TRAP_FOR_CORE_DUMP);
@@ -907,8 +907,8 @@ private:
 			fThreadCount = 0;
 			int32 missing = 0;
 
-			for (Thread* thread = fTeam->thread_list; thread != NULL;
-					thread = thread->team_next) {
+			for (Thread* thread = fTeam->thread_list.First(); thread != NULL;
+					thread = fTeam->thread_list.GetNext(thread)) {
 				fThreadCount++;
 				ThreadState* state = fPreAllocatedThreadStates.RemoveHead();
 				if (state != NULL) {

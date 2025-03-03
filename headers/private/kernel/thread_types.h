@@ -222,7 +222,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 									// enabled, etc.)
 	int64			serial_number;	// immutable after adding thread to hash
 	Thread			*hash_next;		// protected by thread hash lock
-	Thread			*team_next;		// protected by team lock and fLock
+	DoublyLinkedListLink<Thread> team_link; // protected by team lock and fLock
 	char			name[B_OS_NAME_LENGTH];	// protected by fLock
 	bool			going_to_suspend;	// protected by scheduler lock
 	int32			priority;		// protected by scheduler lock
@@ -467,8 +467,8 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	VMAddressSpace	*address_space;
 	Thread			*main_thread;	// protected by fLock, immutable
 									// after first set
-	Thread			*thread_list;	// protected by fLock, signal_lock and
-									// gThreadCreationLock
+	DoublyLinkedList<Thread, DoublyLinkedListMemberGetLink<Thread, &Thread::team_link> >
+		thread_list;	// protected by fLock, signal_lock and gThreadCreationLock
 	struct team_loading_info *loading_info;	// protected by fLock
 	DoublyLinkedList<image> image_list; // protected by sImageMutex
 	struct list		watcher_list;

@@ -461,7 +461,6 @@ Team::Team(team_id id, bool kernel)
 
 	address_space = NULL;
 	main_thread = NULL;
-	thread_list = NULL;
 	loading_info = NULL;
 
 	list_init(&watcher_list);
@@ -938,8 +937,8 @@ Team::CPUTime(bool ignoreCurrentRun, Thread* lockedThread) const
 	Thread* currentThread = thread_get_current_thread();
 	bigtime_t now = system_time();
 
-	for (Thread* thread = thread_list; thread != NULL;
-			thread = thread->team_next) {
+	for (Thread* thread = thread_list.First(); thread != NULL;
+			thread = thread_list.GetNext(thread)) {
 		bool alreadyLocked = thread == lockedThread;
 		SpinLocker threadTimeLocker(thread->time_lock, alreadyLocked);
 		time += thread->kernel_time + thread->user_time;
@@ -970,8 +969,8 @@ Team::UserCPUTime() const
 
 	bigtime_t now = system_time();
 
-	for (Thread* thread = thread_list; thread != NULL;
-			thread = thread->team_next) {
+	for (Thread* thread = thread_list.First(); thread != NULL;
+			thread = thread_list.GetNext(thread)) {
 		SpinLocker threadTimeLocker(thread->time_lock);
 		time += thread->user_time;
 
@@ -1161,7 +1160,7 @@ _dump_team_info(Team* team)
 		(void*)team->user_data, team->user_data_area);
 	kprintf("free user thread: %p\n", team->free_user_threads);
 	kprintf("main_thread:      %p\n", team->main_thread);
-	kprintf("thread_list:      %p\n", team->thread_list);
+	kprintf("thread_list:      %p\n", team->thread_list.First());
 	kprintf("group_id:         %" B_PRId32 "\n", team->group_id);
 	kprintf("session_id:       %" B_PRId32 "\n", team->session_id);
 }
@@ -1963,8 +1962,8 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 
 	debugInfoLocker.Unlock();
 
-	for (Thread* thread = team->thread_list; thread != NULL;
-			thread = thread->team_next) {
+	for (Thread* thread = team->thread_list.First(); thread != NULL;
+			thread = team->thread_list.GetNext(thread)) {
 		if (thread != team->main_thread && thread->id != nubThreadID)
 			return B_NOT_ALLOWED;
 	}
@@ -2785,9 +2784,8 @@ common_get_team_usage_info(team_id id, int32 who, team_usage_info* info,
 	switch (who) {
 		case B_TEAM_USAGE_SELF:
 		{
-			Thread* thread = team->thread_list;
-
-			for (; thread != NULL; thread = thread->team_next) {
+			for (Thread* thread = team->thread_list.First(); thread != NULL;
+					thread = team->thread_list.GetNext(thread)) {
 				InterruptsSpinLocker threadTimeLocker(thread->time_lock);
 				kernelTime += thread->kernel_time;
 				userTime += thread->user_time;
@@ -2804,9 +2802,8 @@ common_get_team_usage_info(team_id id, int32 who, team_usage_info* info,
 			for (; child != NULL; child = team->children.GetNext(child)) {
 				TeamLocker childLocker(child);
 
-				Thread* thread = child->thread_list;
-
-				for (; thread != NULL; thread = thread->team_next) {
+				for (Thread* thread = child->thread_list.First(); thread != NULL;
+						thread = child->thread_list.GetNext(thread)) {
 					InterruptsSpinLocker threadTimeLocker(thread->time_lock);
 					kernelTime += thread->kernel_time;
 					userTime += thread->user_time;
@@ -3236,15 +3233,13 @@ team_shutdown_team(Team* team)
 		team->death_entry = &deathEntry;
 		deathEntry.remaining_threads = 0;
 
-		Thread* thread = team->thread_list;
-		while (thread != NULL) {
+		for (Thread* thread = team->thread_list.First(); thread != NULL;
+				thread = team->thread_list.GetNext(thread)) {
 			if (thread != team->main_thread) {
 				Signal signal(SIGKILLTHR, SI_USER, B_OK, team->id);
 				send_signal_to_thread(thread, signal, B_DO_NOT_RESCHEDULE);
 				deathEntry.remaining_threads++;
 			}
-
-			thread = thread->team_next;
 		}
 
 		if (deathEntry.remaining_threads == 0)
@@ -3255,9 +3250,7 @@ team_shutdown_team(Team* team)
 		deathEntry.condition.Add(&entry);
 
 		teamLocker.Unlock();
-
 		entry.Wait();
-
 		teamLocker.Lock();
 	}
 
