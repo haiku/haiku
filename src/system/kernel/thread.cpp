@@ -316,8 +316,6 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 
 	exit.status = 0;
 
-	list_init(&exit.waiters);
-
 	exit.sem = -1;
 	msg.write_sem = -1;
 	msg.read_sem = -1;
@@ -1852,8 +1850,6 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 
 	// print the long info
 
-	struct thread_death_entry *death = NULL;
-
 	kprintf("THREAD: %p\n", thread);
 	kprintf("id:                 %" B_PRId32 " (%#" B_PRIx32 ")\n", thread->id,
 		thread->id);
@@ -1936,8 +1932,8 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	kprintf("  exit.status:      %#" B_PRIx32 " (%s)\n", thread->exit.status,
 		strerror(thread->exit.status));
 	kprintf("  exit.waiters:\n");
-	while ((death = (struct thread_death_entry*)list_get_next_item(
-			&thread->exit.waiters, death)) != NULL) {
+	for (thread_death_entry* death = thread->exit.waiters.First(); death != NULL;
+			death = thread->exit.waiters.GetNext(death)) {
 		kprintf("\t%p (thread %" B_PRId32 ")\n", death, death->thread);
 	}
 
@@ -2272,13 +2268,12 @@ thread_exit(void)
 		} else {
 			// The thread is not the main thread. We store a thread death entry
 			// for it, unless someone is already waiting for it.
-			if (threadDeathEntry != NULL
-				&& list_is_empty(&thread->exit.waiters)) {
+			if (threadDeathEntry != NULL && thread->exit.waiters.IsEmpty()) {
 				threadDeathEntry->thread = thread->id;
 				threadDeathEntry->status = thread->exit.status;
 
 				// add entry to dead thread list
-				list_add_item(&team->dead_threads, threadDeathEntry);
+				team->dead_threads.Add(threadDeathEntry);
 			}
 
 			threadCreationLocker.Unlock();
@@ -2371,9 +2366,8 @@ thread_exit(void)
 		thread->exit.sem = -1;
 
 		// fill all death entries
-		thread_death_entry* entry = NULL;
-		while ((entry = (thread_death_entry*)list_get_next_item(
-				&thread->exit.waiters, entry)) != NULL) {
+		for (thread_death_entry* entry = thread->exit.waiters.First(); entry != NULL;
+				entry = thread->exit.waiters.GetNext(entry)) {
 			entry->status = thread->exit.status;
 		}
 
@@ -2611,7 +2605,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 		// remember the semaphore we have to wait on and place our death entry
 		exitSem = thread->exit.sem;
 		if (exitSem >= 0)
-			list_add_link_to_head(&thread->exit.waiters, &death);
+			thread->exit.waiters.Add(&death, false);
 
 		thread->UnlockAndReleaseReference();
 
@@ -2635,10 +2629,10 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 		} else {
 			// check the thread death entries of the team (non-main threads)
 			thread_death_entry* threadDeathEntry = NULL;
-			while ((threadDeathEntry = (thread_death_entry*)list_get_next_item(
-					&team->dead_threads, threadDeathEntry)) != NULL) {
+			for (threadDeathEntry = team->dead_threads.First(); threadDeathEntry != NULL;
+					threadDeathEntry = team->dead_threads.GetNext(threadDeathEntry)) {
 				if (threadDeathEntry->thread == id) {
-					list_remove_item(&team->dead_threads, threadDeathEntry);
+					team->dead_threads.Remove(threadDeathEntry);
 					death.status = threadDeathEntry->status;
 					free(threadDeathEntry);
 					break;
@@ -2674,7 +2668,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 		// remove our death entry now.
 		thread = Thread::GetAndLock(id);
 		if (thread != NULL) {
-			list_remove_link(&death.link);
+			thread->exit.waiters.Remove(&death);
 			thread->UnlockAndReleaseReference();
 		} else {
 			// The thread is already gone, so we need to wait uninterruptibly

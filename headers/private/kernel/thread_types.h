@@ -79,11 +79,12 @@ namespace BKernel {
 }
 
 
-struct thread_death_entry {
-	struct list_link	link;
+struct thread_death_entry : DoublyLinkedListLinkImpl<thread_death_entry> {
 	thread_id			thread;
 	status_t			status;
 };
+
+typedef DoublyLinkedList<thread_death_entry> ThreadDeathEntryList;
 
 struct team_loading_info {
 	ConditionVariable	condition;
@@ -296,7 +297,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 	struct {
 		sem_id		sem;		// immutable after thread creation
 		status_t	status;		// accessed only by this thread
-		struct list	waiters;	// protected by fLock
+		ThreadDeathEntryList waiters; // protected by fLock
 	} exit;
 
 	struct select_info *select_infos;	// protected by fLock
@@ -454,7 +455,7 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	struct realtime_sem_context	*realtime_sem_context;
 	struct xsi_sem_context *xsi_sem_context;
 	struct team_death_entry *death_entry;	// protected by fLock
-	struct list		dead_threads;
+	ThreadDeathEntryList	dead_threads;
 
 	// protected by the team's fLock
 	team_dead_children dead_children;

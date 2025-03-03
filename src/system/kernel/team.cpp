@@ -445,7 +445,6 @@ Team::Team(team_id id, bool kernel)
 	realtime_sem_context = NULL;
 	xsi_sem_context = NULL;
 	death_entry = NULL;
-	list_init(&dead_threads);
 
 	dead_children.condition_variable.Init(&dead_children, "team children");
 	dead_children.count = 0;
@@ -528,10 +527,8 @@ Team::~Team()
 	if (fQueuedSignalsCounter != NULL)
 		fQueuedSignalsCounter->ReleaseReference();
 
-	while (thread_death_entry* threadDeathEntry
-			= (thread_death_entry*)list_remove_head_item(&dead_threads)) {
+	while (thread_death_entry* threadDeathEntry = dead_threads.RemoveHead())
 		free(threadDeathEntry);
-	}
 
 	while (::job_control_entry* entry = dead_children.entries.RemoveHead())
 		delete entry;
