@@ -880,7 +880,7 @@ mutex_destroy(mutex* lock)
 #if KDEBUG
 	if (lock->holder != -1 && thread_get_current_thread_id() != lock->holder) {
 		panic("mutex_destroy(): the lock (%p) is held by %" B_PRId32 ", not "
-			"by the caller", lock, lock->holder);
+			"by the caller @! bt %" B_PRId32, lock, lock->holder, lock->holder);
 		if (_mutex_lock(lock, &locker) != B_OK)
 			return;
 		locker.Lock();
