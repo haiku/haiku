@@ -1,11 +1,15 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems nfs4 ;
 
 UsePrivateKernelHeaders ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders file_systems shared ;
+
+DEFINES += DEBUG_APP="\\\"nfs4\\\"" ;
 
 KernelAddon nfs4 :
 	Cookie.cpp
 	Connection.cpp
+	Debug.cpp
+	DebugSupport.cpp
 	Delegation.cpp
 	DirectoryCache.cpp
 	FileInfo.cpp
@@ -39,6 +43,9 @@ KernelAddon nfs4 :
 	WorkQueue.cpp
 	XDR.cpp
 ;
+
+SEARCH on [ FGristFiles DebugSupport.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems nfs4 idmapper ;
 

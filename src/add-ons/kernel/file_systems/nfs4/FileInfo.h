@@ -16,6 +16,8 @@
 #include <SupportDefs.h>
 #include <util/KernelReferenceable.h>
 
+#include "Debug.h"
+
 
 #define NFS4_FHSIZE	128
 
@@ -32,6 +34,8 @@ struct FileHandle {
 	inline	bool		operator!=(const FileHandle& handle) const;
 	inline	bool		operator>(const FileHandle& handle) const;
 	inline	bool		operator<(const FileHandle& handle) const;
+
+			void		Dump(void (*xprintf)(const char*, ...) = dprintf) const;
 };
 
 struct InodeNames;
@@ -51,6 +55,10 @@ struct InodeNames : public KernelReferenceable {
 	status_t					AddName(InodeNames* parent, const char* name);
 	bool						RemoveName(InodeNames* parent,
 									const char* name);
+
+	void						Dump(void (*xprintf)(const char*, ...) = dprintf);
+
+	void						_DumpLocked(void (*xprintf)(const char*, ...)) const;
 
 	mutex						fLock;
 	SinglyLinkedList<InodeName>	fNames;

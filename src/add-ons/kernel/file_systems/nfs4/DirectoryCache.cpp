@@ -257,6 +257,35 @@ DirectoryCache::Revalidate()
 
 
 void
+DirectoryCache::Dump(void (*xprintf)(const char*, ...))
+{
+	MutexLocker locker;
+	if (xprintf != kprintf)
+		locker.SetTo(fLock, false);
+
+	_DumpLocked(xprintf);
+
+	return;
+}
+
+
+void
+DirectoryCache::_DumpLocked(void (*xprintf)(const char*, ...)) const
+{
+	xprintf("DirectoryCache::fNameCache:\n");
+
+	for (SinglyLinkedList<NameCacheEntry>::ConstIterator it = fNameCache.GetIterator();
+		const NameCacheEntry* entry = it.Next();) {
+		xprintf("\t\tino: %" B_PRIdINO "\t", entry->fNode);
+		if (entry->fName != NULL)
+			xprintf("name: %s\n", entry->fName);
+	}
+
+	return;
+}
+
+
+void
 DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 	DirectoryCacheSnapshot* newSnapshot)
 {

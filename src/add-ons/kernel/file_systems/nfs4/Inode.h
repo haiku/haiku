@@ -121,6 +121,9 @@ public:
 
 	inline			void		SetStale(bool stale = true);
 	inline			bool		IsStale() const;
+
+					void		Dump(void (*xprintf)(const char*, ...) = dprintf) const;
+
 protected:
 								Inode();
 

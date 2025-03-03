@@ -8,6 +8,8 @@ SEARCH_SOURCE += $(nfs4Top) ;
 {
 	local defines =
 		USER=1
+		DEBUG_APP="\\\"userlandfs_server\\\""
+			# with this setting, output of the driver will be integrated with that of the server when DEBUG_PRINT is defined for both
 	;
 
 	defines = [ FDefines $(defines) ] ;
@@ -15,12 +17,14 @@ SEARCH_SOURCE += $(nfs4Top) ;
 }
 
 UsePrivateKernelHeaders ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders file_systems shared ;
 
 Addon <userland>nfs4
 	:
 	Cookie.cpp
 	Connection.cpp
+	Debug.cpp
+	DebugSupport.cpp
 	Delegation.cpp
 	DirectoryCache.cpp
 	FileInfo.cpp
@@ -58,5 +62,8 @@ Addon <userland>nfs4
 	libuserlandfs_haiku_kernel.so
 	[ TargetLibsupc++ ]
 ;
+
+SEARCH on [ FGristFiles DebugSupport.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems nfs4 idmapper ;

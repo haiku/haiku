@@ -17,17 +17,6 @@
 #include "Cookie.h"
 
 
-#define ERROR(x...) dprintf("nfs4: " x)
-
-#ifdef DEBUG
-#define TRACE(x...) dprintf("nfs4: " x)
-#define CALLED() dprintf("nfs4: called %s", __func__)
-#else
-#define TRACE(x...)
-#define CALLED()
-#endif
-
-
 static status_t
 ProcessStream(RPC::Reply* reply, const char* callName)
 {

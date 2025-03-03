@@ -20,17 +20,6 @@
 #include "VnodeToInode.h"
 
 
-#define ERROR(x...) dprintf("nfs4: " x)
-
-#ifdef DEBUG
-#define TRACE(x...) dprintf("nfs4: " x)
-#define CALLED() dprintf("nfs4: called %s", __func__)
-#else
-#define TRACE(x...)
-#define CALLED()
-#endif
-
-
 extern RPC::ServerManager* gRPCServerManager;
 extern RPC::ProgramData* CreateNFS4Server(RPC::Server* serv);
 
@@ -522,6 +511,21 @@ FileSystem::EnsureNoCollision(ino_t newID, const FileHandle& handle)
 }
 
 
+void
+FileSystem::Dump(void (*xprintf)(const char*, ...))
+{
+	MutexLocker locker;
+	if (xprintf != kprintf)
+		locker.SetTo(fOpenLock, false);
+
+	fInoIdMap.Dump(xprintf);
+
+	_DumpLocked(xprintf);
+
+	return;
+}
+
+
 status_t
 FileSystem::_ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 {
@@ -559,5 +563,23 @@ FileSystem::_ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 	free(path);
 
 	return B_OK;
+}
+
+
+void
+FileSystem::_DumpLocked(void (*xprintf)(const char*, ...)) const
+{
+	xprintf("fOpenFiles:\n", fOpenFiles);
+	for (DoublyLinkedList<OpenState>::ConstIterator it = fOpenFiles.GetIterator();
+		const OpenState* state = it.Next();) {
+		xprintf("\tID\t\t%" B_PRIu64 "\n", state->fInfo.fFileId);
+		xprintf("\tFileHandle\t");
+		state->fInfo.fHandle.Dump(xprintf);
+		xprintf("\tInodeNames\t");
+		state->fInfo.fNames->Dump(xprintf);
+		xprintf("\t----------\n");
+	}
+
+	return;
 }
 

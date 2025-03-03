@@ -1023,3 +1023,19 @@ Inode::EndAIOOp()
 		release_sem(fAIOWait);
 }
 
+
+/*! Print the ID, handle, names, and DirectoryCache if applicable.
+	@pre The parent VnodeToInode is locked.
+*/
+void
+Inode::Dump(void (*xprintf)(const char*, ...)) const
+{
+	xprintf("Inode\t%" B_PRIu64 " at %p\n", fInfo.fFileId, this);
+	xprintf("FileHandle\t");
+	fInfo.fHandle.Dump(xprintf);
+	xprintf("InodeNames\t");
+	fInfo.fNames->Dump(xprintf);
+	if (fCache != NULL)
+		fCache->Dump(xprintf);
+}
+

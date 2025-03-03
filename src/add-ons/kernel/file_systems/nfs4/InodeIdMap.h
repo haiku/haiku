@@ -31,6 +31,10 @@ public:
 			status_t						RemoveEntry(ino_t id);
 			status_t						GetFileInfo(FileInfo* fileInfo,
 												ino_t id);
+			void							Dump(void (*xprintf)(const char*, ...) = dprintf);
+
+private:
+			void							_DumpLocked(void (*xprintf)(const char*, ...)) const;
 
 private:
 			AVLTreeMap<ino_t, FileInfo>		fMap;

@@ -11,6 +11,7 @@
 
 #include <fs_interface.h>
 
+#include "Debug.h"
 #include "Delegation.h"
 #include "InodeIdMap.h"
 #include "NFS4Defs.h"
@@ -82,11 +83,16 @@ public:
 	inline	mutex&				CreateFileLock();
 
 			void				EnsureNoCollision(ino_t newID, const FileHandle& handle);
+
+			void				Dump(void (*xprintf)(const char*, ...) = dprintf);
+
 private:
 								FileSystem(const MountConfiguration& config);
 
 	static	status_t			_ParsePath(RequestBuilder& req, uint32& count,
 									const char* _path);
+
+			void 				_DumpLocked(void (*xprintf)(const char*, ...)) const;
 
 			mutex				fCreateFileLock;
 

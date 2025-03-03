@@ -15,6 +15,8 @@
 #include <util/KernelReferenceable.h>
 #include <util/SinglyLinkedList.h>
 
+#include "Debug.h"
+
 
 class Inode;
 
@@ -66,7 +68,10 @@ public:
 
 	inline	Inode*			GetInode();
 
+			void			Dump(void (*xprintf)(const char*, ...) = dprintf);
+
 	const	bigtime_t		fExpirationTime;
+
 protected:
 			void			NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 								DirectoryCacheSnapshot* newSnapshot);
@@ -74,6 +79,8 @@ protected:
 private:
 			void			_SetSnapshot(DirectoryCacheSnapshot* snapshot);
 			status_t		_LoadSnapshot(bool trash);
+
+			void			_DumpLocked(void (*xprintf)(const char*, ...)) const;
 
 			SinglyLinkedList<NameCacheEntry>	fNameCache;
 

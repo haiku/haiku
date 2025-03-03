@@ -14,10 +14,6 @@
 
 #include <SupportDefs.h>
 
-#ifdef USER
-extern "C" void dprintf(const char *format,...);
-#endif
-
 
 enum Procedure {
 	ProcNull		= 0,

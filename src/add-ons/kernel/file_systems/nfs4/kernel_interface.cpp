@@ -25,16 +25,6 @@
 #include "WorkQueue.h"
 
 
-#define ERROR(format, args...) \
-	dprintf("nfs4: %s()" format "\n", __func__ , ##args)
-
-#ifdef DEBUG
-#define TRACE(format, args...) \
-	dprintf("nfs4: %s()" format "\n", __func__ , ##args)
-#else
-#define TRACE(x...)	(void)0
-#endif
-
 extern fs_volume_ops gNFSv4VolumeOps;
 extern fs_vnode_ops gNFSv4VnodeOps;
 
@@ -1403,6 +1393,8 @@ nfs4_release_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 status_t
 nfs4_init()
 {
+	init_debugging();
+
 	gRPCServerManager = new(std::nothrow) RPC::ServerManager;
 	if (gRPCServerManager == NULL)
 		return B_NO_MEMORY;
@@ -1418,6 +1410,11 @@ nfs4_init()
 		return B_NO_MEMORY;
 	}
 
+#ifdef _KERNEL_MODE
+	add_debugger_command("nfs4", kprintf_volume, "dump an nfs4 volume");
+	add_debugger_command("nfs4_inode", kprintf_inode, "dump an nfs4 inode");
+#endif // _KERNEL_MODE
+
 	return B_OK;
 }
 
@@ -1425,6 +1422,8 @@ nfs4_init()
 status_t
 nfs4_uninit()
 {
+	exit_debugging();
+
 	RPC::CallbackServer::ShutdownAll();
 
 	delete gIdMapper;
@@ -1432,6 +1431,11 @@ nfs4_uninit()
 	delete gRPCServerManager;
 
 	mutex_destroy(&gIdMapperLock);
+
+#ifdef _KERNEL_MODE
+	remove_debugger_command("nfs4", kprintf_volume);
+	remove_debugger_command("nfs4_inode", kprintf_inode);
+#endif // _KERNEL_MODE
 
 	return B_OK;
 }

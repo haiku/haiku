@@ -34,6 +34,8 @@ public:
 	inline	ino_t		ID() const;
 
 	inline	bool		IsRoot() const;
+
+			void		Dump(void (*xprintf)(const char*, ...) = dprintf);
 private:
 			ino_t		fID;
 			rw_lock		fLock;

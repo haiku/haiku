@@ -13,6 +13,18 @@
 #include "Request.h"
 
 
+/*! Print the handle.
+	@pre The parent object is locked.
+*/
+void
+FileHandle::Dump(void (*xprintf)(const char*, ...)) const
+{
+	for (int i = 0; i < fSize; ++i)
+		xprintf("%d ", fData[i]);
+	xprintf("\n");
+}
+
+
 InodeName::InodeName(InodeNames* parent, const char* name)
 	:
 	fParent(parent),
@@ -84,6 +96,33 @@ InodeNames::RemoveName(InodeNames* parent, const char* name)
 	}
 
 	return fNames.IsEmpty();
+}
+
+
+void
+InodeNames::Dump(void (*xprintf)(const char*, ...))
+{
+	MutexLocker locker;
+	if (xprintf != kprintf)
+		locker.SetTo(fLock, false);
+
+	_DumpLocked(xprintf);
+
+	return;
+}
+
+
+void
+InodeNames::_DumpLocked(void (*xprintf)(const char*, ...)) const
+{
+	for (SinglyLinkedList<InodeName>::ConstIterator it = fNames.GetIterator();
+		const InodeName* name = it.Next();) {
+		if (name->fName != NULL)
+			xprintf("%s ", name->fName);
+	}
+	xprintf("\n");
+
+	return;
 }
 
 

@@ -51,3 +51,21 @@ VnodeToInode::Unlink(InodeNames* parent, const char* name)
 	return false;
 }
 
+
+void
+VnodeToInode::Dump(void (*xprintf)(const char*, ...))
+{
+	xprintf("VTI\t%" B_PRIdINO " at %p\n", fID);
+
+	ReadLocker locker;
+	if (xprintf != kprintf)
+		locker.SetTo(fLock, false);
+
+	if (fInode != NULL)
+		fInode->Dump(xprintf);
+	else
+		xprintf("NULL Inode");
+
+	return;
+}
+

@@ -79,3 +79,34 @@ InodeIdMap::GetFileInfo(FileInfo* fileInfo, ino_t id)
 	return B_OK;
 }
 
+
+void
+InodeIdMap::Dump(void (*xprintf)(const char*, ...))
+{
+	MutexLocker locker;
+	if (xprintf != kprintf)
+		locker.SetTo(fLock, false);
+
+	_DumpLocked(xprintf);
+
+	return;
+}
+
+
+void
+InodeIdMap::_DumpLocked(void (*xprintf)(const char*, ...)) const
+{
+	xprintf("InodeIdMap at %p\n", this);
+	xprintf("\tino\thandle\n");
+	AVLTreeMap<ino_t, FileInfo>::ConstIterator iterator = fMap.GetIterator();
+	for (iterator.Next(); iterator.HasNext(); iterator.Next()) {
+		ino_t ino = iterator.CurrentKey();
+		xprintf("\t%" B_PRIdINO "\t", ino);
+		const FileInfo* fileInfo = iterator.CurrentValuePointer();
+		if (fileInfo != NULL)
+			fileInfo->fHandle.Dump(xprintf);
+	}
+
+	return;
+}
+
