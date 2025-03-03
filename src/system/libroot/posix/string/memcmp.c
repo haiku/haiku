@@ -14,17 +14,17 @@ memcmp(const void *_a, const void *_b, size_t count)
 	const unsigned char *a = (const unsigned char *)_a;
 	const unsigned char *b = (const unsigned char *)_b;
 
-	if ((((addr_t)a) & 3) == 0 && (((addr_t)b) & 3) == 0) {
-		uint32_t *a32 = (uint32_t *)a;
-		uint32_t *b32 = (uint32_t *)b;
+	if ((((addr_t)a) & (sizeof(size_t) - 1)) == 0 && (((addr_t)b) & (sizeof(size_t) - 1)) == 0) {
+		size_t *asz = (size_t *)a;
+		size_t *bsz = (size_t *)b;
 
-		while (count >= 4 && *a32 == *b32) {
-			a32++;
-			b32++;
-			count -= 4;
+		while (count >= sizeof(size_t) && *asz == *bsz) {
+			asz++;
+			bsz++;
+			count -= sizeof(size_t);
 		}
-		a = (const unsigned char *)a32;
-		b = (const unsigned char *)b32;
+		a = (const unsigned char *)asz;
+		b = (const unsigned char *)bsz;
 	}
 
 	while (count-- > 0) {
