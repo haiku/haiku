@@ -3317,19 +3317,33 @@ _get_next_thread_info(team_id teamID, int32 *_cookie, thread_info *info,
 	Thread* thread = NULL;
 
 	if (lastID == 0) {
-		// We start with the main thread
+		// We start with the main thread.
 		thread = team->main_thread;
 	} else {
-		// Find the one thread with an ID greater than ours (as long as the IDs
-		// don't wrap they are always sorted from highest to lowest).
-		// TODO: That is broken not only when the IDs wrap, but also for the
-		// kernel team, to which threads are added when they are dying.
-		for (Thread* next = team->thread_list.First(); next != NULL;
-				next = team->thread_list.GetNext(next)) {
-			if (next->id <= lastID)
+		// Find the previous thread after the one with the last ID.
+		bool found = false;
+		for (Thread* previous = team->thread_list.Last(); previous != NULL;
+				previous = team->thread_list.GetPrevious(previous)) {
+			if (previous->id == lastID) {
+				found = true;
+				thread = team->thread_list.GetPrevious(previous);
 				break;
+			}
+		}
 
-			thread = next;
+		if (!found) {
+			// Fall back to finding the thread with the next greatest ID (as long
+			// as IDs don't wrap, they are always sorted from highest to lowest).
+			// This won't work properly if IDs wrap, or for the kernel team (to
+			// which threads are added when they are dying), but this is only a
+			// fallback for when the previous thread wasn't found, anyway.
+			for (Thread* next = team->thread_list.First(); next != NULL;
+					next = team->thread_list.GetNext(next)) {
+				if (next->id <= lastID)
+					break;
+
+				thread = next;
+			}
 		}
 	}
 
