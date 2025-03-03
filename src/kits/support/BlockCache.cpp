@@ -11,7 +11,11 @@
 #include <new>
 
 
+#ifdef __HAIKU__
 extern "C" void heap_debug_get_allocation_info() __attribute__((weak));
+#else
+static const void* heap_debug_get_allocation_info = NULL;
+#endif
 
 
 #define MAGIC1		0x9183f4d9
