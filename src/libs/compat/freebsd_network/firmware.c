@@ -46,6 +46,13 @@ getHaikuFirmwareName(const char* fbsdFirmwareName,
 const struct firmware*
 firmware_get(const char* fbsdFirmwareName)
 {
+	return firmware_get_flags(fbsdFirmwareName, 0);
+}
+
+
+const struct firmware*
+firmware_get_flags(const char* fbsdFirmwareName, int flags)
+{
 	char*				fbsdFirmwareNameCopy = NULL;
 	int					fileDescriptor = -1;
 	struct firmware*	firmware = NULL;
