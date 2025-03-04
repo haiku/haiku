@@ -417,7 +417,7 @@ BInfoWindow::MessageReceived(BMessage* message)
 			break;
 
 		case B_NODE_MONITOR:
-			switch (message->FindInt32("opcode")) {
+			switch (message->GetInt32("opcode", 0)) {
 				case B_ENTRY_REMOVED:
 				{
 					node_ref itemNode;

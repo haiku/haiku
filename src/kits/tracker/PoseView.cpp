@@ -5380,7 +5380,7 @@ BPoseView::FSNotification(const BMessage* message)
 	dev_t device;
 	Model* targetModel = TargetModel();
 
-	switch (message->FindInt32("opcode")) {
+	switch (message->GetInt32("opcode", 0)) {
 		case B_ENTRY_CREATED:
 		{
 			ASSERT(targetModel != NULL);

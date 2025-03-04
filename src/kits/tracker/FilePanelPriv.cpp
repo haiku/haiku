@@ -393,7 +393,7 @@ TFilePanel::FSFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 	if (panel == NULL)
 		return B_DISPATCH_MESSAGE;
 
-	switch (message->FindInt32("opcode")) {
+	switch (message->GetInt32("opcode", 0)) {
 		case B_ENTRY_MOVED:
 		{
 			node_ref itemNode;
@@ -1755,7 +1755,7 @@ BFilePanelPoseView::StopWatching()
 bool
 BFilePanelPoseView::FSNotification(const BMessage* message)
 {
-	switch (message->FindInt32("opcode")) {
+	switch (message->GetInt32("opcode", 0)) {
 		case B_DEVICE_MOUNTED:
 		{
 			if (!IsDesktop() && !TargetModel()->IsRoot())

@@ -848,7 +848,7 @@ BClipboardRefsWatcher::MessageReceived(BMessage* message)
 		return;
 	}
 
-	switch (message->FindInt32("opcode")) {
+	switch (message->GetInt32("opcode", 0)) {
 		case B_ENTRY_MOVED:
 		{
 			ino_t toDir;

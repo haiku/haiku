@@ -174,7 +174,7 @@ DesktopPoseView::InitDirentIterator(const entry_ref* ref)
 bool
 DesktopPoseView::FSNotification(const BMessage* message)
 {
-	switch (message->FindInt32("opcode")) {
+	switch (message->GetInt32("opcode", 0)) {
 		case B_DEVICE_MOUNTED:
 		{
 			dev_t device;
