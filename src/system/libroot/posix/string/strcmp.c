@@ -1,4 +1,5 @@
 /*
+ * Copyright 2025, Haiku, Inc. All rights reserved.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT license.
  */
@@ -26,9 +27,10 @@ strcmp(char const *a, char const *b)
 		b = (const char *)b32;
 	}
 
-	while (1) {
-		int cmp = (unsigned char)*a - (unsigned char)*b++;
-		if (cmp != 0 || *a++ == '\0')
-			return cmp;
+	while (*a == *b && *a != 0) {
+		a++;
+		b++;
 	}
+
+	return (unsigned char)*a - (unsigned char)*b;
 }

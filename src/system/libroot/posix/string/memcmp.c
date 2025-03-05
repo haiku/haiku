@@ -1,4 +1,5 @@
 /*
+ * Copyright 2025, Haiku, Inc. All rights reserved.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT license.
  */
@@ -27,11 +28,14 @@ memcmp(const void *_a, const void *_b, size_t count)
 		b = (const unsigned char *)bsz;
 	}
 
-	while (count-- > 0) {
-		int cmp = *a++ - *b++;
-		if (cmp != 0)
-			return cmp;
+	while (count > 0 && *a == *b) {
+		a++;
+		b++;
+		count--;
 	}
 
-	return 0;
+	if (count == 0)
+		return 0;
+
+	return *a - *b;
 }
