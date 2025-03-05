@@ -4,11 +4,6 @@ UsePrivateHeaders [ FDirName kernel arch arm ] ;
 UsePrivateHeaders [ FDirName kernel boot arch arm ] ;
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
 
-local librootGenericSources =
-	memcpy.c
-	memset.c
-;
-
 local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
 ;
@@ -33,7 +28,6 @@ for platform in [ MultiBootSubDirSetup efi ] {
 
 			arch_cpu.cpp
 
-			$(librootGenericSources)
 			$(librootArchSources)
 			:
 			:
@@ -48,9 +42,6 @@ for platform in [ MultiBootSubDirSetup efi ] {
 
 		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
-
-		SEARCH on [ FGristFiles $(librootGenericSources) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
 	}
 }
 

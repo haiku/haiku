@@ -16,11 +16,6 @@ local kernelGenericDriverSources =
 	debug_uart_8250.cpp
 ;
 
-kernelLibGenericSources =
-	memcpy.c
-	memset.c
-;
-
 local kernelLibArchSources = ;
 
 local librootOsArchSources =
@@ -34,7 +29,6 @@ for platform in [ MultiBootSubDirSetup efi ] {
 			$(kernelArchSources)
 			$(kernelArchReusableSources)
 			$(kernelLibArchSources)
-			$(kernelLibGenericSources)
 			$(librootOsArchSources)
 
 			arch_cpu.cpp
@@ -47,8 +41,6 @@ for platform in [ MultiBootSubDirSetup efi ] {
 			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 		SEARCH on [ FGristFiles $(kernelArchReusableSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch arm ] ;
-		SEARCH on [ FGristFiles $(kernelLibGenericSources) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
 		SEARCH on [ FGristFiles $(kernelLibArchSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch arm64 ] ;
 		SEARCH on [ FGristFiles $(librootOsArchSources) ]

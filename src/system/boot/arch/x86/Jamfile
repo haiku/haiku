@@ -32,13 +32,10 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 		;
 
 		local kernelArchSpecificSources ;
-		local kernelLibArchSpecificSources ;
 		if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) = efi {
 			kernelArchSpecificSources = cpuid.cpp ;
-			kernelLibArchSpecificSources = memcpy.cpp memset.cpp ;
 		} else {
 			kernelArchSpecificSources = cpuid.S ;
-			kernelLibArchSpecificSources = arch_string.S ;
 		}
 
 		local librootOsArchSources =
@@ -49,7 +46,6 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 			$(kernelArchSources)
 			$(kernelArchSpecificSources)
 			$(kernelGenericDriverSources)
-			$(kernelLibArchSpecificSources)
 			$(librootOsArchSources)
 			arch_cpu.cpp
 			arch_hpet.cpp
@@ -64,13 +60,9 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 		if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) = efi {
 			SEARCH on [ FGristFiles $(kernelArchSpecificSources) ]
 				= [ FDirName $(HAIKU_TOP) src system kernel arch x86 64 ] ;
-			SEARCH on [ FGristFiles $(kernelLibArchSpecificSources) ]
-				= [ FDirName $(HAIKU_TOP) src system libroot posix string arch x86_64 ] ;
 		} else {
 			SEARCH on [ FGristFiles $(kernelArchSpecificSources) ]
 				= [ FDirName $(HAIKU_TOP) src system kernel arch x86 32 ] ;
-			SEARCH on [ FGristFiles $(kernelLibArchSpecificSources) ]
-				= [ FDirName $(HAIKU_TOP) src system kernel lib arch x86 ] ;
 		}
 		SEARCH on [ FGristFiles $(librootOsArchSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot os arch x86 ] ;

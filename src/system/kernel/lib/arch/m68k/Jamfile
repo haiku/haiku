@@ -30,7 +30,7 @@ KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	kernel_setjmp_save_sigs.c
 
 	memcpy.S
-	memset.c
+	generic_memset.c
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

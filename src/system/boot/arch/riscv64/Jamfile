@@ -9,11 +9,6 @@ local librootArchSources =
 	byteorder.S
 ;
 
-local librootGenericSources =
-	memcpy.c
-	memset.c
-;
-
 local kernelArchDriverSources =
 	arch_elf.cpp
 	arch_uart_sifive.cpp
@@ -33,7 +28,6 @@ for platform in [ MultiBootSubDirSetup efi riscv ] {
 			$(kernelGenericDriverSources)
 
 			$(librootArchSources)
-			$(librootGenericSources)
 
 			arch_cpu.cpp
 			: # additional flags
@@ -43,8 +37,6 @@ for platform in [ MultiBootSubDirSetup efi riscv ] {
 
 		SEARCH on [ FGristFiles $(librootArchSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot os arch riscv64 ] ;
-		SEARCH on [ FGristFiles $(librootGenericSources) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
 
 		SEARCH on [ FGristFiles $(kernelArchDriverSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;

@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src system boot arch ppc ;
 
 local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memcpy.o
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
 local kernelGenericDriverSources =

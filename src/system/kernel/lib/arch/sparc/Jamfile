@@ -32,7 +32,8 @@ KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	fpu_subr.c
 	softfloat.c
 
-	memcpy.c
-	memset.c
+	generic_memcpy.c
+	generic_memset.c
+
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

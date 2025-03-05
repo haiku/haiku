@@ -7,24 +7,13 @@ for platform in [ MultiBootSubDirSetup amiga_m68k atari_m68k next_m68k ] {
 			arch_elf.cpp
 		;
 
-		local librootStringArchSources =
-			memcpy.S
-		;
-
 		local librootOsArchSources =
 			byteorder.S
 		;
 
-		local librootStringGenericSources =
-			#memcpy.c
-			memset.c
-		;
-
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
 			$(kernelArchSources)
-			$(librootStringArchSources)
 			$(librootOsArchSources)
-			$(librootStringGenericSources)
 			:
 		;
 
@@ -45,11 +34,7 @@ for platform in [ MultiBootSubDirSetup amiga_m68k atari_m68k next_m68k ] {
 
 		SEARCH on [ FGristFiles $(kernelArchSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch m68k ] ;
-		SEARCH on [ FGristFiles $(librootStringArchSources) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch m68k ] ;
 		SEARCH on [ FGristFiles $(librootOsArchSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot os arch m68k ] ;
-		SEARCH on [ FGristFiles $(librootStringGenericSources) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
 	}
 }

@@ -300,6 +300,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		}
 
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix musl string ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string arch generic ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix stdlib ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix locale ] ;
@@ -310,6 +311,8 @@ for platform in [ MultiBootSubDirSetup ] {
 			ctype_loc.cpp
 			ctype_l.cpp
 			ctype.cpp
+			generic_memcpy.c
+			generic_memset.c
 			LocaleData.cpp
 			qsort.c
 			kernel_vsprintf.cpp

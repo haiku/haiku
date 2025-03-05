@@ -1,10 +1,5 @@
 SubDir HAIKU_TOP src system boot arch sparc ;
 
-local kernelLibArchObjects =
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memcpy.o
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
-;
-
 local kernelGenericDriverSources =
 	debug_uart.cpp
 	debug_uart_8250.cpp
@@ -19,7 +14,6 @@ for platform in [ MultiBootSubDirSetup openfirmware ] {
 			: # additional flags
 			:
 			$(kernelArchObjects)
-			$(kernelLibArchObjects)
 		;
 
 		SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp ]
