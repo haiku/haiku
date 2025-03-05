@@ -139,13 +139,16 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 		menu->SetHighColor(highColor);
 
 		char infos[128];
-		string_for_size(fCachedMemory * 1024.0, infos, sizeof(infos));
 		BPoint loc(cadre.left, cadre.bottom + 1);
+
+		string_for_size(fCommittedMemory * 1024.0, infos, sizeof(infos));
 		loc.x -= kMargin + gMemoryTextWidth / 2 + menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
-		string_for_size(fCommittedMemory * 1024.0, infos, sizeof(infos));
+
+		string_for_size(fCachedMemory * 1024.0, infos, sizeof(infos));
 		loc.x = cadre.left - kMargin - menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
+
 		fLastSum = sum;
 	}
 }
