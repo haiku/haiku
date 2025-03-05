@@ -16,10 +16,7 @@ for architectureObject in [ MultiArchSubDirSetup riscv64 ] {
 			arch_relocate.cpp
 			:
 			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
-
-			#<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>arch_string.o
-			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memcpy.o
-			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memset.o
+			<$(architecture)>posix_string_arch_$(TARGET_ARCH).o
 			;
 	}
 }

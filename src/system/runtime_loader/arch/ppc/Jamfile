@@ -17,9 +17,7 @@ for architectureObject in [ MultiArchSubDirSetup ppc ] {
 			:
 			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>atomic.o
 			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
-
-			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memcpy.o
-			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memset.o
+			<$(architecture)>posix_string_arch_$(TARGET_ARCH).o
 			;
 	}
 }
