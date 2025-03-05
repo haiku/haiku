@@ -13,7 +13,7 @@ for architectureObject in [ MultiArchSubDirSetup arm ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 		MergeObject <$(architecture)>posix_string_arch_$(TARGET_ARCH).o :
-			arch_string.S
+			memcpy.S
 			memset.c
 			;
 	}

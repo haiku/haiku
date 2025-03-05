@@ -8,7 +8,7 @@ for platform in [ MultiBootSubDirSetup amiga_m68k atari_m68k next_m68k ] {
 		;
 
 		local librootStringArchSources =
-			arch_string.S
+			memcpy.S
 		;
 
 		local librootOsArchSources =
