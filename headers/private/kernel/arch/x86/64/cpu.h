@@ -9,13 +9,13 @@
 #include <arch_thread_types.h>
 
 
-extern uint16 gFPUControlDefault;
-extern uint32 gFPUMXCSRDefault;
-
-
 static inline void
 x86_context_switch(arch_thread* oldState, arch_thread* newState)
 {
+	uint16_t fpuControl;
+	asm volatile("fnstcw %0" : "=m" (fpuControl));
+	uint32_t sseControl;
+	asm volatile("stmxcsr %0" : "=m" (sseControl));
 	asm volatile(
 		"pushq	%%rbp;"
 		"movq	$1f, %c[rip](%0);"
@@ -32,8 +32,11 @@ x86_context_switch(arch_thread* oldState, arch_thread* newState)
 			"r14", "r15", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",
 			"xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13",
 			"xmm14", "xmm15", "memory");
-	asm volatile("ldmxcsr %0" : : "m" (gFPUMXCSRDefault));
-	asm volatile("fldcw %0" : : "m" (gFPUControlDefault));
+	asm volatile("fninit");
+		// The kernel only needs FNCLEX (so that FLDCW won't trigger exceptions)
+		// but we must not leak x87 FPU state between teams, so reset it.
+	asm volatile("ldmxcsr %0" : : "m" (sseControl));
+	asm volatile("fldcw %0" : : "m" (fpuControl));
 }
 
 

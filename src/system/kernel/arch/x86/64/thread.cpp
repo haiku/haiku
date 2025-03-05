@@ -71,8 +71,6 @@ extern "C" void x86_64_thread_entry();
 
 // Initial thread saved state.
 static arch_thread sInitialState _ALIGNED(64);
-uint16 gFPUControlDefault;
-uint32 gFPUMXCSRDefault;
 extern uint64 gFPUSaveLength;
 extern bool gHasXsave;
 extern bool gHasXsavec;
@@ -175,7 +173,6 @@ arch_thread_init(kernel_args* args)
 	// Save one global valid FPU state; it will be copied in the arch dependent
 	// part of each new thread.
 	if (gHasXsave || gHasXsavec) {
-		memset(sInitialState.fpu_state, 0, gFPUSaveLength);
 		if (gHasXsavec) {
 			asm volatile (
 				"clts;"		\
@@ -203,11 +200,15 @@ arch_thread_init(kernel_args* args)
 			"fxsaveq %0"
 			:: "m" (sInitialState.fpu_state));
 	}
-	gFPUControlDefault = ((savefpu*)&sInitialState.fpu_state)->fp_fxsave.control;
-	gFPUMXCSRDefault = ((savefpu*)&sInitialState.fpu_state)->fp_fxsave.mxcsr;
+
+	// FNINIT does not affect MXCSR or data registers, so we reset them in the state.
+	savefpu* initialState = ((savefpu*)&sInitialState.fpu_state);
+	initialState->fp_fxsave.mxcsr = 0x1F80; // __INITIAL_MXCSR__
+	memset(initialState->fp_fxsave.fp, 0, sizeof(initialState->fp_fxsave.fp));
+	memset(initialState->fp_fxsave.xmm, 0, sizeof(initialState->fp_fxsave.xmm));
+	memset(initialState->fp_ymm, 0, sizeof(initialState->fp_ymm));
 
 	register_generic_syscall(THREAD_SYSCALLS, arch_thread_control, 1, 0);
-
 	return B_OK;
 }
 
