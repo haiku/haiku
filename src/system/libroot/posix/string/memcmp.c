@@ -9,13 +9,15 @@
 #include <string.h>
 
 
+#define MISALIGNMENT(PTR, TYPE) ((addr_t)(PTR) & (sizeof(TYPE) - 1))
+
 int
 memcmp(const void *_a, const void *_b, size_t count)
 {
 	const unsigned char *a = (const unsigned char *)_a;
 	const unsigned char *b = (const unsigned char *)_b;
 
-	if ((((addr_t)a) & (sizeof(size_t) - 1)) == 0 && (((addr_t)b) & (sizeof(size_t) - 1)) == 0) {
+	if (MISALIGNMENT(a, size_t) == 0 && MISALIGNMENT(b, size_t) == 0) {
 		size_t *asz = (size_t *)a;
 		size_t *bsz = (size_t *)b;
 
