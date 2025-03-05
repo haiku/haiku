@@ -35,7 +35,7 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 		local kernelLibArchSpecificSources ;
 		if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) = efi {
 			kernelArchSpecificSources = cpuid.cpp ;
-			kernelLibArchSpecificSources = arch_string.cpp ;
+			kernelLibArchSpecificSources = memcpy.cpp memset.cpp ;
 		} else {
 			kernelArchSpecificSources = cpuid.S ;
 			kernelLibArchSpecificSources = arch_string.S ;

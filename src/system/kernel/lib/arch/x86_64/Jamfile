@@ -29,8 +29,8 @@ KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	kernel_longjmp_return.c
 	kernel_setjmp_save_sigs.c
 
-	arch_string.cpp
+	memcpy.cpp
+	memset.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
-

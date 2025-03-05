@@ -14,7 +14,7 @@ for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
 
 		MergeObject <$(architecture)>posix_string_arch_$(TARGET_ARCH).o :
 			[ MultiArchIfPrimary memcpy.c memset.c :
-				arch_string.S : x86_64 ]
+				commpage_string.S : x86_64 ]
 			;
 
 	}
