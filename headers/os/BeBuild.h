@@ -90,9 +90,11 @@
 #if __GNUC__ >= 4
 # define _ALIGNED_BY_ARG(_no_) __attribute__((alloc_align(_no_)))
 # define _EXPORT __attribute__((visibility("default")))
+# define _DEPRECATED __attribute__((__deprecated__))
 #else
 # define _ALIGNED_BY_ARG(_no_)
 # define _EXPORT
+# define _DEPRECATED
 #endif
 #define _IMPORT
 
