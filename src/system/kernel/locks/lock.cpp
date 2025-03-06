@@ -320,6 +320,7 @@ rw_lock_wait(rw_lock* lock, bool writer, InterruptsSpinLocker& locker)
 	status_t result = thread_block();
 
 	locker.Lock();
+	ASSERT(result != B_OK || waiter.thread == NULL);
 	return result;
 }
 
@@ -347,8 +348,8 @@ rw_lock_unblock(rw_lock* lock)
 
 		// unblock thread
 		thread_unblock(waiter->thread, B_OK);
-
 		waiter->thread = NULL;
+
 		return RW_LOCK_WRITER_COUNT_BASE;
 	}
 
@@ -364,7 +365,6 @@ rw_lock_unblock(rw_lock* lock)
 
 		// unblock thread
 		thread_unblock(waiter->thread, B_OK);
-
 		waiter->thread = NULL;
 	} while ((waiter = lock->waiters) != NULL && !waiter->writer);
 
