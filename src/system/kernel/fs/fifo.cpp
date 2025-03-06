@@ -107,17 +107,11 @@ public:
 
 	void Notify(status_t status = B_OK)
 	{
-		InterruptsLocker _;
-		SpinLocker spinLocker(fLock);
+		InterruptsSpinLocker spinLocker(fLock);
 		TRACE("ReadRequest %p::Notify(), fNotified %d\n", this, fNotified);
 
 		if (!fNotified) {
 			fNotified = true;
-
-			// Whoever calls Notify() must hold the requests lock,
-			// so we can be sure this Request won't be deleted.
-			spinLocker.Unlock();
-
 			thread_unblock(fThread, status);
 		}
 	}
@@ -697,9 +691,11 @@ Inode::WaitForReadRequest(ReadRequest& request)
 	rw_lock_read_unlock(&fChangeLock);
 	status_t status = thread_block();
 
-	// Before going to lock again, we need to make sure no one tries to
-	// unblock us. Otherwise that would screw with mutex_lock().
-	request.SetNotified(true);
+	if (status != B_OK) {
+		// Before going to lock again, we need to make sure no one tries to
+		// unblock us. Otherwise that would screw with mutex_lock().
+		request.SetNotified(true);
+	}
 
 	rw_lock_read_lock(&fChangeLock);
 
