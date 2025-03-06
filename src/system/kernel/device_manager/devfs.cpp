@@ -1113,6 +1113,11 @@ devfs_open(fs_volume* _volume, fs_vnode* _vnode, int openMode,
 	struct devfs_cookie* cookie;
 	status_t status = B_OK;
 
+	if (S_ISDIR(vnode->stream.type) && (openMode & O_RWMASK) != O_RDONLY)
+		return B_IS_A_DIRECTORY;
+	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(vnode->stream.type))
+		return B_NOT_A_DIRECTORY;
+
 	cookie = (struct devfs_cookie*)malloc(sizeof(struct devfs_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;
