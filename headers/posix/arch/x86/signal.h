@@ -114,7 +114,7 @@ typedef struct new_extended_regs {
 	unsigned short	fp_ds;
 	unsigned short	_reserved_22_23;
 	unsigned long	mxcsr;
-	unsigned long	_reserved_28_31;
+	unsigned long	mxcsr_mask;
 	union {
 		fp_stack fp;
 		mmx_regs mmx;

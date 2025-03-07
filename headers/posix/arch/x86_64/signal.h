@@ -31,7 +31,7 @@ struct fpu_state {
 	unsigned long		rip;
 	unsigned long		rdp;
 	unsigned int		mxcsr;
-	unsigned int		mscsr_mask;
+	unsigned int		mxcsr_mask;
 
 	union {
 		struct x86_64_fp_register fp[8];
