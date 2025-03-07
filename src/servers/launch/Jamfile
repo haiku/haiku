@@ -12,6 +12,7 @@ Server launch_daemon
 	BaseJob.cpp
 	Conditions.cpp
 	Events.cpp
+	FileWatcher.cpp
 	Job.cpp
 	Log.cpp
 	NetworkWatcher.cpp

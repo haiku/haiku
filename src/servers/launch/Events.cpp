@@ -16,6 +16,7 @@
 #include <StringList.h>
 
 #include "BaseJob.h"
+#include "FileWatcher.h"
 #include "LaunchDaemon.h"
 #include "NetworkWatcher.h"
 #include "Utility.h"
@@ -113,7 +114,7 @@ private:
 };
 
 
-class FileCreatedEvent : public Event {
+class FileCreatedEvent : public Event, FileListener {
 public:
 								FileCreatedEvent(Event* parent,
 									const BMessage& args);
@@ -122,6 +123,8 @@ public:
 	virtual	void				Unregister(EventRegistrator& registrator);
 
 	virtual	BString				ToString() const;
+
+	virtual void				FileCreated(const char* path);
 
 private:
 			BPath				fPath;
@@ -566,14 +569,14 @@ FileCreatedEvent::FileCreatedEvent(Event* parent, const BMessage& args)
 status_t
 FileCreatedEvent::Register(EventRegistrator& registrator)
 {
-	// TODO: implement!
-	return B_ERROR;
+	return FileWatcher::Register(this, fPath);
 }
 
 
 void
 FileCreatedEvent::Unregister(EventRegistrator& registrator)
 {
+	FileWatcher::Unregister(this, fPath);
 }
 
 
@@ -583,6 +586,14 @@ FileCreatedEvent::ToString() const
 	BString string = "file_created ";
 	string << fPath.Path();
 	return string;
+}
+
+
+void
+FileCreatedEvent::FileCreated(const char* path)
+{
+	if (strcmp(fPath.Path(), path) == 0)
+		Trigger(this);
 }
 
 
