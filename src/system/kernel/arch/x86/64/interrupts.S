@@ -207,7 +207,6 @@ STATIC_FUNCTION(int_bottom):
 
 	// Push the rest of the interrupt frame to the stack.
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
-
 	cld
 
 	// Frame pointer is the iframe.
@@ -265,32 +264,23 @@ STATIC_FUNCTION(int_bottom_user):
 
 	// Frame pointer is the iframe.
 	movq	%rsp, %rbp
+	andq	$~15, %rsp
 
-	// xsave needs a 64-byte alignment
-	andq	$~63, %rsp
-	movq	(gFPUSaveLength), %rcx
-	subq	%rcx, %rsp
-	leaq	(%rsp), %rdi
-	shrq	$3, %rcx
-	movq	$0, %rax
-	rep stosq
+	// Get thread pointer.
+	movq	%gs:0, %r12
+
 	movl	(gXsaveMask), %eax
 	movl	(gXsaveMask+4), %edx
-
-	movq	%rsp, %rdi
+	leaq	THREAD_user_fpu_state(%r12), %rdi
 	CODEPATCH_START
 	fxsaveq	(%rdi)
 	CODEPATCH_END(ALTCODEPATCH_TAG_XSAVE)
-
-	movq	%rsp, IFRAME_fpu(%rbp)
+	movq	%rdi, IFRAME_fpu(%rbp)
 
 	// Set the RF (resume flag) in RFLAGS. This prevents an instruction
 	// breakpoint on the instruction we're returning to to trigger a debug
 	// exception.
 	orq		$X86_EFLAGS_RESUME, IFRAME_flags(%rbp)
-
-	// Get thread pointer.
-	movq	%gs:0, %r12
 
 	STOP_USER_DEBUGGING()
 	UPDATE_THREAD_USER_TIME()
@@ -314,7 +304,7 @@ STATIC_FUNCTION(int_bottom_user):
 
 	movl	(gXsaveMask), %eax
 	movl	(gXsaveMask+4), %edx
-	movq	%rsp, %rdi
+	leaq	THREAD_user_fpu_state(%r12), %rdi
 	CODEPATCH_START
 	fxrstorq	(%rdi)
 	CODEPATCH_END(ALTCODEPATCH_TAG_XRSTOR)
@@ -347,7 +337,7 @@ STATIC_FUNCTION(int_bottom_user):
 1:
 	movl	(gXsaveMask), %eax
 	movl	(gXsaveMask+4), %edx
-	movq	%rsp, %rdi
+	leaq	THREAD_user_fpu_state(%r12), %rdi
 	CODEPATCH_START
 	fxrstorq	(%rdi)
 	CODEPATCH_END(ALTCODEPATCH_TAG_XRSTOR)
@@ -392,7 +382,6 @@ FUNCTION(x86_64_syscall_entry):
 	push	$0							// error_code
 	push	$99							// vector
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_SYSCALL)
-
 	cld
 
 	// Frame pointer is the iframe.

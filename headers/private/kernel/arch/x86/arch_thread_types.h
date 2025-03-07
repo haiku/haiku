@@ -63,7 +63,7 @@ struct arch_thread {
 	// have enough space for all the registers, at least 2560 bytes according
 	// to Intel Architecture Instruction Set Extensions Programming Reference,
 	// Section 3.2.4, table 3-8
-	uint8			fpu_state[2560] _ALIGNED(64);
+	uint8			user_fpu_state[2560] _ALIGNED(64);
 #endif
 
 	addr_t			GetFramePointer() const;

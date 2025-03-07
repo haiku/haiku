@@ -49,6 +49,8 @@ dummy()
 	DEFINE_OFFSET_MACRO(THREAD, Thread, fault_handler);
 
 #ifdef __x86_64__
+	DEFINE_MACRO(THREAD_user_fpu_state, offsetof(Thread, arch_info.user_fpu_state));
+
 	// struct arch_thread
 	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, syscall_rsp);
 	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, user_rsp);
