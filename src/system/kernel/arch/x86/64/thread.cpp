@@ -251,6 +251,7 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 
 	*--stackTop = uintptr_t(data);
 	*--stackTop = uintptr_t(function);
+	*--stackTop = uintptr_t(thread);
 
 	// Save the stack position.
 	thread->arch_info.current_stack = stackTop;

@@ -626,8 +626,9 @@ FUNCTION(x86_return_to_userland):
 			, THREAD_flags(%r12)
 	jnz		.Luserland_return_work
 
-	// update the thread's kernel time and return
 	UPDATE_THREAD_KERNEL_TIME()
+
+	CLEAR_FPU_STATE()
 
 	// Restore the frame and return.
 	RESTORE_IFRAME()
@@ -651,10 +652,10 @@ FUNCTION(x86_return_to_userland):
 	movq	%rbp, %rdi
 	call	x86_init_user_debug_at_kernel_exit
 1:
-	// Restore the saved registers.
-	RESTORE_IFRAME()
+	CLEAR_FPU_STATE()
 
-	// Restore the previous GS base and return.
+	// Restore the frame and return.
+	RESTORE_IFRAME()
 	swapgs
 	iretq
 .Luserland_return_handle_signals:

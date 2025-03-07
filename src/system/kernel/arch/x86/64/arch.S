@@ -13,6 +13,8 @@
 
 #include <asm_defs.h>
 
+#include <arch/x86/arch_altcodepatch.h>
+
 #include "asm_offsets.h"
 #include "syscall_numbers.h"
 
@@ -29,6 +31,17 @@ FUNCTION_END(x86_get_stack_frame)
 
 /* void x86_64_thread_entry(); */
 FUNCTION(x86_64_thread_entry):
+	// Get thread pointer.
+	pop		%r12
+
+	// Reset FPU state.
+	movl	(gXsaveMask), %eax
+	movl	(gXsaveMask+4), %edx
+	leaq	THREAD_user_fpu_state(%r12), %rdi
+	CODEPATCH_START
+	fxrstorq	(%rdi)
+	CODEPATCH_END(ALTCODEPATCH_TAG_XRSTOR)
+
 	xorq	%rbp, %rbp
 
 	movq	%rsp, %rax
