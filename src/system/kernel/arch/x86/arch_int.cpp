@@ -28,6 +28,7 @@
 #include <arch/x86/msi.h>
 #include <arch/x86/msi_priv.h>
 
+#include <fenv.h>
 #include <stdio.h>
 
 // interrupt controllers
@@ -157,13 +158,39 @@ x86_unexpected_exception(iframe* frame)
 			break;
 
 		case 16: 	// x87 FPU Floating-Point Error (#MF)
+		case 19: 	// SIMD Floating-Point Exception (#XF)
+		{
 			type = B_FLOATING_POINT_EXCEPTION;
 			signalNumber = SIGFPE;
-			signalCode = FPE_FLTDIV;
-				// TODO: Determine the correct cause via the FPU status
-				// register!
+			signalCode = FPE_FLTINV;
 			signalAddress = frame->ip;
+
+			uint32 status = 0;
+			if (frame->vector == 19) {
+				// MXCSR is only available on SSE, however exception 19 should only
+				// ever occur if the processor has SSE anyway and OSXMMEXCPT is set.
+				__stmxcsr(&status);
+			} else {
+				uint16 fsw = 0;
+				__fnstsw(&fsw);
+				status = fsw;
+			}
+
+			// Determine the real cause of the exception, if possible.
+			if ((status & FE_INVALID) != 0)
+				signalCode = FPE_FLTINV;
+			else if ((status & FE_DENORMAL) != 0)
+				signalCode = FPE_FLTUND;
+			else if ((status & FE_DIVBYZERO) != 0)
+				signalCode = FPE_FLTDIV;
+			else if ((status & FE_OVERFLOW) != 0)
+				signalCode = FPE_FLTOVF;
+			else if ((status & FE_UNDERFLOW) != 0)
+				signalCode = FPE_FLTUND;
+			else if ((status & FE_INEXACT) != 0)
+				signalCode = FPE_FLTRES;
 			break;
+		}
 
 		case 17: 	// Alignment Check Exception (#AC)
 			type = B_ALIGNMENT_EXCEPTION;
@@ -172,14 +199,6 @@ x86_unexpected_exception(iframe* frame)
 			// TODO: Also get the address (from where?). Since we don't enable
 			// alignment checking this exception should never happen, though.
 			signalError = EFAULT;
-			break;
-
-		case 19: 	// SIMD Floating-Point Exception (#XF)
-			type = B_FLOATING_POINT_EXCEPTION;
-			signalNumber = SIGFPE;
-			signalCode = FPE_FLTDIV;
-				// TODO: Determine the correct cause via the MXCSR register!
-			signalAddress = frame->ip;
 			break;
 
 		default:
