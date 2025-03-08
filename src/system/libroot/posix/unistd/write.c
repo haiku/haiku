@@ -21,7 +21,7 @@
 ssize_t
 write(int fd, void const *buffer, size_t bufferSize)
 {
-	int status = _kern_write(fd, -1, buffer, bufferSize);
+	ssize_t status = _kern_write(fd, -1, buffer, bufferSize);
 
 	RETURN_AND_SET_ERRNO_TEST_CANCEL(status);
 }
