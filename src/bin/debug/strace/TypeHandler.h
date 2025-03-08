@@ -108,6 +108,7 @@ struct TypeHandlerFactory {
 extern TypeHandler *create_pointer_type_handler();
 extern TypeHandler *create_string_type_handler();
 extern TypeHandler *create_status_t_type_handler();
+extern TypeHandler *create_ssize_t_type_handler();
 
 // specialization for "const char*"
 template<>
