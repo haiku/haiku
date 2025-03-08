@@ -1,29 +1,52 @@
-1	english	x-vnd.Haiku-Expander	471851149
+1	english	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		目標
 Other	ExpanderPreferences		其他
 Automatically show contents listing	ExpanderPreferences		自動顯示內容列表
+Expander	System name		档案解壓
+Expander: Choose destination	DirectoryFilePanel		档案解壓: 選擇目標位置
+Set source…	ExpanderMenu		設定來源…
 OK	ExpanderWindow		確認
+The destination is not a folder.	ExpanderWindow		目標不是資料夾。
 The folder was either moved, renamed or not supported.	ExpanderWindow		該資料夾已被移動、再命名或不受支援。
 Close window when done expanding	ExpanderPreferences		展開完成後關閉視窗
 Close	ExpanderMenu		關閉
 Create	ExpanderWindow		創建
+Creating listing for '%s'…	ExpanderWindow		正在為 '%s' 創建列表…
+Show contents	ExpanderMenu		顯示內容
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		您確定要停止擴充此存檔嗎？擴展的項目可能不完整。
 Settings	ExpanderMenu		設定
+Expand	ExpanderWindow		解壓
 Open destination folder after extraction	ExpanderPreferences		解壓縮後開啓目標資料夾
 Same directory as source (archive) file	ExpanderPreferences		與來源（存檔）檔案相同的目錄
 Stop	ExpanderWindow		停止
 Cancel	ExpanderWindow		取消
-Expander settings	ExpanderPreferences		擴展器設定
+Expander settings	ExpanderPreferences		解壓設定
+Error when expanding archive	ExpanderWindow		擴充存檔時出錯
+Expand	ExpanderMenu		解壓
+Failed to create the destination folder.	ExpanderWindow		無法建立目標資料夾。
 Settings…	ExpanderMenu		設定…
 Select current	DirectoryFilePanel		選擇當前
+Expanding '%s'…	ExpanderWindow		正在解壓 '%s'…
 OK	ExpanderPreferences		確認
 File expanded	ExpanderWindow		已展開檔案
 Automatically expand files	ExpanderPreferences		自動擴充檔案
 Select	DirectoryFilePanel		選擇
+Show contents	ExpanderWindow		顯示內容
 Stop	ExpanderMenu		停止
 Select '%s'…	DirectoryFilePanel		選擇 '%s'…
+Expansion	ExpanderPreferences		解壓
+Set destination…	ExpanderMenu		設定目標位置…
+Continue	ExpanderWindow		繼續
+ is not supported	ExpanderWindow		不支援
 Cancel	ExpanderPreferences		取消
-Expander: Open	ExpanderWindow		擴展器：開啓
+Use:	ExpanderPreferences		使用：
+Destination folder	ExpanderPreferences		目標資料夾
+Expander: Open	ExpanderWindow		解壓：開啓
 Leave destination folder path empty	ExpanderPreferences		留空目標資料夾路徑
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		目標資料夾不存在。您想創建它嗎？
 The file doesn't exist	ExpanderWindow		檔案不存在
+Hide contents	ExpanderWindow		隱藏內容
+Source	ExpanderWindow		來源
+The destination is read only.	ExpanderWindow		目標是唯讀的。
 Select	ExpanderPreferences		選擇
 File	ExpanderMenu		檔案

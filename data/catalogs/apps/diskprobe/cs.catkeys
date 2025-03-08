@@ -17,15 +17,15 @@ Add	ProbeView		Přidat
 64 bit signed value:	TypeEditors		Hodnota 64 bitového celého čísla:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Určitě chcete odebrat atribut \"%s\" ze souboru \"%s\"?\n\nTuto akci nelze vzít zpět.
 No type editor available	AttributeWindow		Žádný typový editor nenalezen
-Print…	ProbeView		Tisk...
-New…	FileWindow		Nový...
+Print…	ProbeView		Tisk…
+New…	FileWindow		Nový…
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	co: '%.4s'\n\n
 OK	DiskProbe		OK
 DiskProbe	System name		Disková sonda
 Back	ProbeView		Zpět
 Device: 	ProbeView		Zařízení: 
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Číselná soustava
-Open file…	FileWindow		Otevřít soubor...
+Open file…	FileWindow		Otevřít soubor…
 32 bit unsigned pointer:	TypeEditors		32 bitový ukazatel bez znaménka:
 DiskProbe request	DiskProbe		Požadavek diskové sondy
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šestnáctková
@@ -72,7 +72,7 @@ Mode:	FindWindow		Režim:
 of 	ProbeView		z 
 Contents:	TypeEditors		Obsahuje:
 Could not open file \"%s\": %s\n	DiskProbe		Nelze otevřít soubor \"%s\": %s\n
-Probe file…	OpenWindow		Sondovat soubor...
+Probe file…	OpenWindow		Sondovat soubor…
 Block: 	ProbeView		Blok: 
 Bookmarks	ProbeView		Záložky
 Probe device	OpenWindow		Sondovat zařízení
@@ -87,7 +87,7 @@ Offset: 	ProbeView		Ofset:
 Swapped: 0x%0*Lx	ProbeView		Odloženo: 0x%0*Lx
 MIME type:	TypeEditors		MIME typ:
 Fit	ProbeView	Size of fonts, fits to available room	Přizpůsobit velikost
-Type editor	ProbeView		Editor typu:
+Type editor	ProbeView		Editor typu
 File	FileWindow		Soubor
 Grayscale	TypeEditors		Stupně šedi
 32 bit	TypeEditors		32 bitový
@@ -98,7 +98,7 @@ Save	ProbeView		Uložit
 of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	z 0x0
 Attribute type: 	ProbeView		Typ atributu: 
 15 bit	TypeEditors		15 bitový
-Page setup…	ProbeView		Nastavení stránky...
+Page setup…	ProbeView		Nastavení stránky…
 Boolean	TypeEditors	This is the type of editor	Logická hodnota
 Icon view	TypeEditors		Zobrazení ikon
 Select all	ProbeView		Vybrat vše
@@ -126,7 +126,7 @@ Edit	ProbeView		Upravit
 String editor	TypeEditors		Editor řetězce
 Boolean editor	TypeEditors		Editor logických hodnot
 Device offset: 	ProbeView		Ofset zařízení: 
-Find…	ProbeView		Najít...
+Find…	ProbeView		Najít…
 8 bit palette	TypeEditors		8 bitová paleta
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desítková
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Zobrazit obrázek

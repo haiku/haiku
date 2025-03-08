@@ -1,8 +1,23 @@
-1	english	x-vnd.Haiku-Magnify	412607057
+1	english	x-vnd.Haiku-Magnify	3309471563
+  size must be > 4 and a multiple of 4	Console		大小必須 > 4 且是 4 的倍數
+Decrease pixel size	Magnify-Main		減小像素大小
+no clip msg	In console, when clipboard is empty after clicking Copy image		無剪輯訊息
+Increase pixel size	Magnify-Main		增加像素大小
+magnify: size must be a multiple of 4	Console		放大：大小必須是 4 的倍數
+Stick coordinates	Magnify-Main		搖桿座標
 Copy image	Magnify-Main		複製影像
 Decrease window size	Magnify-Main		減小視窗大小
 Remove a crosshair	Magnify-Main		消除十字準線
 Add a crosshair	Magnify-Main		新增十字準線
 Freeze image	Magnify-Main		凍結影像
+%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height @ {0, plural, one{# 像素/像素} other{# 像素/像素}}
+usage: magnify [size] (magnify size * size pixels)	Console		用法： magnify [size] (magnify size * size pixels)
 Increase window size	Magnify-Main		增加視窗大小
 Save image	Magnify-Main		存儲影像
+Show grid	Magnify-Main		顯示網格
+Magnify	System name		放大鏡
+height	Magnify-Main		高度
+width	Magnify-Main		寬度
+Info	Magnify-Main		資訊
+Show info	Magnify-Main		顯示資訊
+Make square	Magnify-Main		形成正方形

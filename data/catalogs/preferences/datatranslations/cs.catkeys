@@ -12,6 +12,6 @@ Use this control panel to set default values for translators, to be used when no
 The new translator has been installed successfully.	DataTranslations		Nový překladač byl úspěšně nainstalován.
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		V adresáři Překladačů již položka se jménem '%name' existuje! Přepsat existující Překladač?
 DataTranslations	System name		Překladače dat
-Info	DataTranslations		informace
+Info	DataTranslations		Informace
 Overwrite	DataTranslations		Přepsat
 Version:	DataTranslations		Verze:

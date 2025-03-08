@@ -1,12 +1,12 @@
-1	czech	x-vnd.Haiku-StyledEdit	3760185556
+1	czech	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Statistika dokumentu
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemohu se vrátit, soubor nenalezen: \"%s\".
 Cut	Menus		Vystřihnout
 Center	Menus		Na střed
 Increase size	Menus		Zvětšit velikost
-Page setup…	Menus		Nastavení stránky...
+Page setup…	Menus		Nastavení stránky…
 Wrap-around search	FindandReplaceWindow		Vyhledávání zalomení
-Untitled 	StyledEditWindow		Neoznačeno
+Untitled 	StyledEditWindow		Neoznačeno 
 OK	Statistics		OK
 Find	FindandReplaceWindow		Najít
 New	Menus		Nový
@@ -27,20 +27,21 @@ OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Odemknout soubor
 Italic	Menus		Kurzíva
 Can't undo	Menus		Nelze vrátit zpět
-Replace…	Menus		Nahradit...
+Replace…	Menus		Nahradit…
 File	Menus		Soubor
 Paste	Menus		Vložit
 Bold	Menus		Tučně
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Soubor \"%file%\" změnila jiná aplikace. Chcete ho znovu načíst?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Soubor \"%file%\" odstranila jiná aplikace. Chcete ho obnovit?
 Lines:	Statistics		Řádky:
+Strikeout	Menus		Přeškrtnutí
 Replace in all windows	FindandReplaceWindow		Nahradit ve všech oknech
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" má neuložené změny.\nChcete vrátit zpět jeho poslední uloženou verzi? 
 Save	SaveAlert		Uložit
 Default	Open_and_SaveAsPanel		Původní
 Cancel	RevertToSavedAlert		Zrušit
 Cancel	FindandReplaceWindow		Zrušit
-Statistics…	Menus		Statistika...
+Statistics…	Menus		Statistika…
 Encoding	Open_and_SaveAsPanel		Kódování
 Replace all	FindandReplaceWindow		Nahradit vše
 Close	Menus		Zavřít
@@ -49,15 +50,15 @@ Left	Menus		Vlevo
 Default	Menus		Původní
 OK	SaveAlert		OK
 Color	Menus		Barva
-Save changes to the document \"%s\"? 	QuitAlert		Uložit změny do dokumentu \"%s\"?
+Save changes to the document \"%s\"? 	QuitAlert		Uložit změny do dokumentu \"%s\"? 
 StyledEdit	System name		Stylizovaný editor
 Underline	Menus		Podtržené
 Find:	FindandReplaceWindow		Najít:
 Undo typing	QuitAlert		Zpět psaní
 Error loading \"%s\":\n\t%s	LoadAlert		Chyba při nahrávání \"%s\":\n\t%s
 Don't save	SaveAlert		Neukládat
-Reload…	Menus		Znovu načíst...
-Print…	Menus		Tisk...
+Reload…	Menus		Znovu načíst…
+Print…	Menus		Tisk…
 Quit	Menus		Ukončit
 Redo typing	QuitAlert		Znovu psaní
 Ignore	NodeMonitorAlerts		Ignorovat
@@ -69,7 +70,7 @@ OK	LoadAlert		OK
 Save	QuitAlert		Uložit
 Case-sensitive	FindandReplaceWindow		Citlivé na velikost písmen
 Find selection	Menus		Najdi výběr
-Find…	Menus		Najít...
+Find…	Menus		Najít…
 Cancel	SaveAlert		Zrušit
 Revert	RevertToSavedAlert		Vrátit zpět
 Size	Menus		Velikost
@@ -79,8 +80,8 @@ Replace next	Menus		Nahradit další
 OK	QuitAlert		OK
 Edit	Menus		Editovat
 Replace with:	FindandReplaceWindow		Nahradit:
-Open…	Menus		Otevřít...
-Save as…	Menus		Uložit jako...
+Open…	Menus		Otevřít…
+Save as…	Menus		Uložit jako…
 Replace	FindandReplaceWindow		Nahradit
 Characters:	Statistics		Znaky:
 Don't save	QuitAlert		Neukládat

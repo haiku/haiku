@@ -1,7 +1,18 @@
-1	english	x-vnd.Haiku-Pairs	102101508
+1	english	x-vnd.Haiku-Pairs	818003250
+Pairs	System name		配對
 Quit	PairsWindow		退出
+Medium	PairsWindow		中等
+Game	PairsWindow		遊戲
+Expert (8x8)	PairsWindow		專家 (8x8)
 New	PairsWindow		新創
 OK	Pairs		確認
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	配對沒有找到足夠的向量圖示以啟動；它至少需要 %zu，已找到 %zu。
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		您在  {0, plural, one{# 次點擊} other{# 次點擊}} 內完成了遊戲。 \n
+Small	PairsWindow		小型
+Size	PairsWindow		尺寸
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\twritten by Ralf Schülke\n\t版權 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		退出游戲
+Large	PairsWindow		大型
+Beginner (4x4)	PairsWindow		新手 (4x4)
+Intermediate (6x6)	PairsWindow		中等 (6x6)
 New game	PairsWindow		新創遊戲

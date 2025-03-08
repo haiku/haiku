@@ -36,7 +36,7 @@ AVI format family	MediaString		Skupina formátů AVI
 Homogenous buffers	MediaString		Homogenní zásobník
 Interlaced 	MediaString		Prokládaný 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# kanál}few{# kanály}other{# kanálů}}
-15 bit RGBA	MediaString		15 bit RGBA
+15 bit RGBA	MediaString		15 bitové RGBA
 Drop data	MediaString		Zahodit data
 AVI	MediaString		AVI
 YUV9	MediaString		YUV9

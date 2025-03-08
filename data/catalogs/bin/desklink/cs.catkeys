@@ -3,7 +3,7 @@ desklink	MediaReplicant	Title of an alert box	odkaz na plochu
 Muted	MediaReplicant		Ztlumeno
 %g dB	MediaReplicant		%g dB
 OK	MediaReplicant		OK
-Sounds preferences…	MediaReplicant		Nastavení zvuku...
+Sounds preferences…	MediaReplicant		Nastavení zvuku…
 Couldn't launch 	MediaReplicant		Nelze spustit 
 Volume	VolumeControl		Hlasitost
 Open MediaPlayer	MediaReplicant		Otevřít Přehrávač multimédií

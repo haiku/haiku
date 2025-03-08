@@ -5,7 +5,7 @@ Unknown	NetworkStatusView		未知
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		啟動網路預置失敗。\n\n錯誤：
 Install in Deskbar	NetworkStatus		安裝至Deskbar
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		網路狀態選項:\n\t--deskbar\t自動將副本新增至Deskbar\n\t--help\t\t列印此訊息並退出
-Open network preferences…	NetworkStatusView		開啟網路偏好設定...
+Open network preferences…	NetworkStatusView		開啟網路偏好...
 NetworkStatus	System name		網路狀態
 Broadcast:	NetworkStatusView		播送：
 OK	NetworkStatusView		確認

@@ -1,25 +1,48 @@
-1	english	x-vnd.Haiku-Pulse	2650287667
+1	english	x-vnd.Haiku-Pulse	559379362
+Normal mode	DeskbarPulseView		普通模式
+Info	CPUButton		資訊
 Quit	DeskbarPulseView		退出
+Info	DeskbarPulseView		資訊
+Normal mode	MiniPulseView		普通模式
+Frame color	ConfigView		框架顏色
 Error	PulseApp		錯誤
 Bar colors	ConfigView		條顏色
+%.2f GHz	NormalPulseView		%.2f GHz
 Defaults	PrefsWindow		默認值
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		迷你模式
+CPU progress bar	NormalPulseView		CPU進度條
 Fade colors	ConfigView		褪色
 About Pulse…	PulseView		關於Pulse…
+Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar模式
 Pulse settings	PulseApp		Pulse設定
 Remove replicant	CPUButton		消除副本
+You can't disable the last active CPU.	PulseView		您無法停用最後一個活動的 CPU。
+Width of icon:	ConfigView		圖示寬度：
 Deskbar mode	MiniPulseView		Deskbar模式
 OK	PulseView		確認
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDavid Ramsey and Arve Hjønnevåg 貢獻\nDaniel Switkin 修訂\n
 OK	PrefsWindow		確認
+Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		從Deskbar上刪除失敗。\n%s
 OK	PulseApp		確認
 About Pulse…	CPUButton		關於Pulse…
 Deskbar mode	PrefsWindow		Deskbar模式
+Mini mode	DeskbarPulseView		迷你模式
+You can't disable the last active CPU.	CPUButton		您無法停用最後一個活動的 CPU。
 OK	CPUButton		確認
 Deskbar	CPUButton		Deskbar
 Settings…	PulseView		設定…
 Deskbar menu	CPUButton		Deskbar菜單
+Mini mode	NormalPulseView		迷你模式
 Quit	MiniPulseView		退出
+Info	PulseView		資訊
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		用法: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		確認
+Info	PulseApp		資訊
+Pulse	System name		Pulse
+Active color	ConfigView		活躍顏色
 Installing in Deskbar failed\n%s	PulseApp		在Deskbar中安裝失敗\n%s
+Idle color	ConfigView		空閒顏色
+Normal mode	PrefsWindow		普通模式

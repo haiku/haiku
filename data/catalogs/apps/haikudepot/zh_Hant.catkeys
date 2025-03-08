@@ -142,7 +142,7 @@ Ratings	PackageInfoView		評分
 The following problems have been encountered. Please select a solution for each:	PackageProblem		遇到了以下問題。請為每個問題選擇一個解決方案：
 Local	LocalPkgDataLoadProcess		本地
 Package changes	PackageResult	Window title	套件變動
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		從這台計算機向 HaikuDepotServer 系統發送匿名使用資料是否可以接受？您可以稍後在 \"Settings\" 「設定」視窗中變更您的首選項。
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		從這台計算機向 HaikuDepotServer 系統發送匿名使用資料是否可以接受？您可以稍後在 \"Settings\" 「設定」視窗中變更您的偏好。
 User rating	RatePackageWindow		用戶評價
 Installed packages	MainWindow		已安裝套件
 Date	PackageListView		日期

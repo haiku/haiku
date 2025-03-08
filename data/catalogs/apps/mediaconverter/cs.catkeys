@@ -24,10 +24,10 @@ OK	MediaConverter		OK
 Error creating '%filename'	MediaConverter		Chyba vytváření '%filename'
 Error loading a file	MediaConverter		CHyba otevírání souboru
 Encoder parameters	MediaConverter-EncoderWindow		Parametry Enkderu
-Open…	Menu		Otevřít...
+Open…	Menu		Otevřít…
 Audio encoding:	MediaConverter		Kódování zvuku:
 Multi-track file detected	MediaConverter		Zjištěn vícestopý soubor
-Cancelling…	MediaConverter		Rušení...
+Cancelling…	MediaConverter		Rušení…
 Output file '%filename' created	MediaConverter		Byl vytvořen výstupní soubor '%filename'
 Output folder	MediaConverter		Výstupní adresář
 Error creating track.	MediaConverter		Chyba při vytváření stopy.
@@ -44,7 +44,7 @@ End   [ms]: 	MediaConverter		Konec [ms]:
 Cancel	MediaConverter		Zrušit
 OK	MediaConverter-FileInfo		OK
 Video encoding:	MediaConverter		Kódování videa:
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla se chyba načítání informací o souboru.\n\nChyba: 
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla se chyba při načítání informací o souboru.\n\nChyba: 
 Error	MediaConverter		Chyba
 File details	MediaConverter		Podrobnosti souboru
 No audio	Audio codecs list		Bez zvuku
@@ -66,7 +66,7 @@ Select this folder	MediaConverter		Zvolit tento adresář
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanál
 Understood	MediaConverter		Rozuměno
 %u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2f snímků/s
-%d bit 	MediaFileInfo		%d bitový
+%d bit 	MediaFileInfo		%d bitový 
 No video	Video codecs list		Bez videa
 Continue	MediaConverter		Pokračovat
 Convert	MediaConverter		Převést

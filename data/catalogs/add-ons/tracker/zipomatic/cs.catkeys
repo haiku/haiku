@@ -9,7 +9,7 @@ Preparing to archive	file:ZipperThread.cpp		Příprava archivace
 Let them continue	file:ZipOMatic.cpp		Nechat běžet
 Continue	file:ZipOMaticWindow.cpp		Pokračovat
 Archive created OK	file:ZipOMaticWindow.cpp		Archiv byl úspěšně vytvořen
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# soubor přidaný} few{# soubory přidány} other{# souborů přidáno}}.
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# soubor přidaný.} few{# soubory přidány.} other{# souborů přidáno.}}
 Stop	file:ZipOMaticWindow.cpp		Zastavit
 Stopped	file:ZipOMaticWindow.cpp		Zastaveno
 Archive	file:ZipperThread.cpp		Archív

@@ -1,17 +1,20 @@
-1	finnish	x-vnd.Haiku-WebPositive	2942427387
+1	finnish	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 Copy	Console Window		Kopioi
 (Finish: %date)	Download Window		(Päättyi: %date)
 Open bookmarks confirmation	WebPositive Window		Avaa kirjanmerkkien vahvistus
+Delete	BookmarkBar		Poista
 Download folder:	Settings Window		Latauskansio:
 Close window	WebPositive Window		Sulje ikkuna
+Rename	BookmarkBar		Nimeä uudelleen
 Find:	WebPositive Window		Etsi:
 Script console	WebPositive Window		Skriptipääteikkuna
 There was an error setting up the bookmark.	WebPositive Window		Kirjanmerkin asettamisessa tapahtui virhe.
 Fonts	Settings Window		Kirjasimet
 Path	Cookie Manager		Polku
 Bookmarks	WebPositive Window		Kirjanmerkit
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Kirjanmerkin '%leaf%' poistaminen kirjanmerkkipalkista epäonnistui.
 Use proxy server to connect to the internet	Settings Window		Käytä välityspalvelinta internet-yhteydellä
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url päättyi
 Auto-hide interface in full screen mode	Settings Window		Piilota käyttöliittymä automaattisesti kokonäyttötilassa
@@ -33,6 +36,7 @@ Browse…	Settings Window		Selaa…
 Resume prior session	Settings Window		Aloita uudelleen varhaisempi istunto
 Match case	WebPositive Window		Täsmää kirjainkoko
 Proxy password:	Settings Window		Välityspalvelimen salasana:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Kirjanmerkin poistaminen epäonnistui:\n'%path%'
 Size:	Font Selection view		Koko:
 Page source	WebPositive Window		Sivulähde
 Proxy server port:	Settings Window		Välityspalvelimen portti:
@@ -56,6 +60,7 @@ Cookies for %s	Cookie Manager		Evästeet kohteelle %s
 Close	Download Window		Sulje
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hakutermi
+Old name: %s	BookmarkBar		Vanha nimi: %s
 Expiration	Cookie Manager		Erääntymisaika
 Reload	WebPositive Window		Lataa uudelleen
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Prosessorisi on liian vanha ja ei tue SSE2-laajennuksia, mitä ilman WebPositive-sovellus ei toimi. Suosittelemme sen sijaan asentamaan NetSurf-sovelluksen.
@@ -95,6 +100,7 @@ Style:	Font Selection view		Tyyli:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Kirjanmerkkitiedoston luominen epäonnistui.\n\nVirhe: %error
 OK	Download Window		Valmis
 Proxy username:	Settings Window		Välityspalvelimen käyttäjätunnus:
+Rename bookmark	BookmarkBar		Nimeä kirjanmerkki uudelleen
 Manage bookmarks	WebPositive Window		Hallinnoi kirjanmerkkejä
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Käynnistä uudelleen
@@ -147,12 +153,15 @@ Window	WebPositive Window		Ikkuna
 Proxy server address:	Settings Window		Välityspalvelimen osoite:
 Search page:	Settings Window		Hakusivu:
 Settings	WebPositive Window		Asetukset
+Show in Tracker	BookmarkBar		Näytä Seuraajassa
 Clear	URL Bar		Tyhjennä
 Loading %url	WebPositive Window		Ladataan verkko-osoite %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
+OK	BookmarkBar		Valmis
 Start up:	Settings Window		Käynnistä:
 Confirmation	WebPositive Window		Vahvistus
 Session cookie	Cookie Manager		Istuntoeväste
+New name:	BookmarkBar		Uusi nimi:
 No SSE2 support	WebPositive		Ei SSE2-tukea
 Open all	WebPositive Window		Avaa kaikki
 Cut	WebPositive Window		Leikkaa
@@ -162,4 +171,5 @@ Clear history	WebPositive Window		Tyhjennä historia
 Cancel	WebPositive Window		Peru
 Script console	Console Window		Skriptipääteikkuna
 Copy	URL Bar		Kopioi
+Open in new tab	BookmarkBar		Avaa uudessa välilehdessä
 Open start page	Settings Window		Avaa avaussivu

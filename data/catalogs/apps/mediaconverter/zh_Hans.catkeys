@@ -64,7 +64,7 @@ File	Menu		文件
 Video quality not supported	MediaConverter		视频质量不支持
 Select this folder	MediaConverter		选中该目录
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld 通道
-Understood	MediaConverter		明了
+Understood	MediaConverter		明白
 %u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		无视频

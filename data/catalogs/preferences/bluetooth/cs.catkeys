@@ -1,11 +1,11 @@
 1	czech	x-vnd.Haiku-BluetoothPrefs	3945807779
-Start bluetooth services…	Window		Zapnout služby bluetooth...
+Start bluetooth services…	Window		Zapnout služby bluetooth…
 From all devices	Settings view		Ze všech zařízení
 Defaults	Window		Původní
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Zkontrolujte zda jsou funkce bluetooth na vašem vzdáleném zařízení aktivovány. Stiskněte 'Průzkum' pro začátek scanování. Čas potřebný pro získání jména není znám, avšak neměl by být delší než 3 sekundy na zařízení. Následně je budete moci přidat do vašeho hlavního seznamu, kde bude možné se s nimi spárovat.
 Laptop	Settings view		Notebook
 Scanning progress	Inquiry panel		Průběh scanování
-Only from trusted devices	Settings view		Jen od důvěryhodných zařízení 
+Only from trusted devices	Settings view		Jen od důvěryhodných zařízení
 Launch now	main		Spustit nyní
 Bluetooth	System name		Bluetooth
 Remove	Remote devices		Odstranit
@@ -16,7 +16,7 @@ Quit	main		Konec
 Help	Window		Nápověda
 With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		S podporou:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nDěkujeme všem, kteří pomohli…\n\nDopravu/darováním hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nFinančně:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nPosláním záplat:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestováním:\n - Petter H. Juliussen\nKdo se podělil o své znalosti:\n - tým yellowTAB
 Manufacturer: 	Device View		Výrobce: 
-Pair…	Remote devices		Spárovat...
+Pair…	Remote devices		Spárovat…
 Desktop	Settings view		Stolní počítač
 Server	Window		Server
 Retrieving name of %1	Inquiry panel		Získávání jména %1
@@ -31,12 +31,12 @@ Add device to list	Inquiry panel		Přidat zařízení do seznamu
 Show name	Extended local device view		Zobrazit jméno
 Settings	Window		Nastavení
 Remaining %1 seconds	Inquiry panel		Zbývá %1 sekund
-Stop bluetooth services…	Window		Zastavit zařízení Bluetooth...
+Stop bluetooth services…	Window		Zastavit zařízení Bluetooth…
 61 secs	Settings view		61 sekund
 Authenticate	Extended local device view		Autentifikovat
 Discoverable	Extended local device view		Zjistitelný
 The Bluetooth services are not currently running on this system.	main		Služby Bluetooth na tomto systému nyní neběží.
-Add…	Remote devices		Přidat...
+Add…	Remote devices		Přidat…
 Scanning completed.	Inquiry panel		Scan dokončen.
 Smart phone	Settings view		Smartphone
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Žádné lokální bluetooth zařízení není v systému registrováno.
@@ -47,5 +47,5 @@ Server	Settings view		Server
  packets: 	Device View		 pakety: 
 Handheld	Settings view		Handheld
 Disconnect	Remote devices		Odpojit
-About Bluetooth…	Window		O bluetooth...
+About Bluetooth…	Window		O bluetooth…
 Starting scan…	Inquiry panel		Začíná vyhledávání…

@@ -8,7 +8,7 @@ Start again	SudokuWindow		Spustit znova
 New	SudokuWindow		Nový
 Easy	SudokuWindow		Snadné
 Undo	SudokuWindow		Zpět
-Export as…	SudokuWindow		Exportovat jako...
+Export as…	SudokuWindow		Exportovat jako…
 Quit	SudokuWindow		Konec
 Redo	SudokuWindow		Znovu
 Could not open \"%s\":\n%s\n	SudokuWindow		Nebylo možno otevřít \"%s\":\n%s\n
@@ -32,4 +32,4 @@ View	SudokuWindow		Pohled
 Snapshot current	SudokuWindow		Aktuální snímek
 Mark valid hints	SudokuWindow		Označit platné úseky
 Sudoku request	SudokuWindow		Sudoku dotaz
-Open file…	SudokuWindow		Otevřít soubor...
+Open file…	SudokuWindow		Otevřít soubor…

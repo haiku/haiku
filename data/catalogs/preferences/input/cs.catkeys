@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Input	130668644
+1	czech	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Výchozí hodnoty
 Scrolling	TouchpadPrefView		Rolování
 Long	KeyboardView		Dlouhá
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Rychlost poklepání
 Typing test area	KeyboardView		Oblast pro zkoušení psaní
 Fast	KeyboardView		Rychlá
 Please confirm	TouchpadPrefView		Prosím potvrďte
+Trackpad speed	TouchpadPrefView		Rychlost trackpadu
 Mouse speed	SettingsView		Rychlost myši
+Trackpad acceleration	TouchpadPrefView		Zrychlení trackpadu
 Horizontal scrolling	TouchpadPrefView		Vodorovné rolování
+Reverse scroll direction	TouchpadPrefView		Rolovat obráceně
 Keyboard lock delay	TouchpadPrefView		Prodleva zamčení klávesnice
 Input	System name		Vstup
 Quick	TouchpadPrefView		Rychlá
@@ -21,6 +24,7 @@ Slow	KeyboardView		Pomalá
 2-Button	SettingsView		2-tlačítková
 Click to focus and raise	SettingsView		Aktivovat a vyzdvihnout klepnutím
 Vertical	TouchpadPrefView		Svislý
+Low	TouchpadPrefView		Málo
 Focus follows mouse	SettingsView		Aktivace najetím myši nad okno
 Double-click test area	SettingsView		Oblast zkoušení poklepání
 Focus mode:	SettingsView		Režim aktivace:

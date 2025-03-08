@@ -13,7 +13,7 @@ Defaults	PrefsWindow		Výchozí
 Mini mode	PrefsWindow		Mini režim
 CPU progress bar	NormalPulseView		Panel využití CPU
 Fade colors	ConfigView		Barvy stínu
-About Pulse…	PulseView		O programu Pulse...
+About Pulse…	PulseView		O programu Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar režim
 Pulse settings	PulseApp		Nastavení Pulsu
@@ -27,13 +27,13 @@ OK	PrefsWindow		OK
 Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstraňování z lišty selhalo.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		O programu Pulse...
+About Pulse…	CPUButton		O programu Pulse…
 Deskbar mode	PrefsWindow		Deskbar režim
 Mini mode	DeskbarPulseView		Mini režim
 You can't disable the last active CPU.	CPUButton		Nelze zakázat poslední aktivní CPU.
 OK	CPUButton		OK
 Deskbar	CPUButton		Deskbar
-Settings…	PulseView		Nastavení...
+Settings…	PulseView		Nastavení…
 Deskbar menu	CPUButton		Nabídka Deskbar
 Mini mode	NormalPulseView		Mini režim
 Quit	MiniPulseView		Ukončit

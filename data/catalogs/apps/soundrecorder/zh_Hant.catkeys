@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-SoundRecorder	1088965115
+1	english	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		循環
 Cannot find default audio hardware	RecorderWindow		找不到默認音訊硬體
 Cannot find the temporary file created to hold the new recording	RecorderWindow		找不到為儲存新錄音而建立的臨時檔案
@@ -8,16 +8,39 @@ None of the files appear to be audio files.	RecorderWindow		這些檔案似乎�
 Duration: 	RecorderWindow		週期：
 File info	RecorderWindow		檔案訊息
 Drop files here	SoundListView		將檔案拖放到此處
+Input	RecorderWindow		輸入
 Some of the files don't appear to be audio files.	RecorderWindow		有些檔案似乎不是音訊檔案。
 Stop	RecorderWindow		停止
+Format:	RecorderWindow		格式：
+Sound List	RecorderWindow		聲音列表
+Compression: 	RecorderWindow		壓縮：
+Rewind	RecorderWindow		倒帶
+Sample rate:	RecorderWindow		取樣率：
 Invalid audio files	RecorderWindow		無效的音訊檔案
+ seconds	RecorderWindow		秒
 OK	RecorderWindow		確認
 Cannot open the temporary file created to hold the new recording	RecorderWindow		無法開啟為儲存新錄音而建立的臨時檔案
+Input:	RecorderWindow		輸入：
+Forward	RecorderWindow		向前
+Play	RecorderWindow		播放
+SoundRecorder	System name		錄音機
+Channels:	RecorderWindow		通路：
+ bits	RecorderWindow		bits
 None	RecorderWindow		無
+Record	RecorderWindow		錄音
+Sample size: 	RecorderWindow		樣本大小：
 Cannot recognize this file as a media file	RecorderWindow		無法將此檔案識別為媒體檔案
+Format: 	RecorderWindow		格式：
 File name: 	RecorderWindow		檔案名稱：
+Cannot connect to the selected sound input	RecorderWindow		無法連接到選定的聲音輸入
 Cannot get the file to play	RecorderWindow		無法播放檔案
+Cannot record a sound that long	RecorderWindow		無法錄製那麼長的聲音
+Duration:	RecorderWindow		週期：
+Compression:	RecorderWindow		壓縮：
 Cannot find an unused name to use for the new recording	RecorderWindow		找不到用於新錄音的未使用的名稱
+Channels: 	RecorderWindow		通路：
 Save	RecorderWindow		存儲
+Sample rate: 	RecorderWindow		採樣率：
+Cannot connect to media server	RecorderWindow		無法連線到媒體伺服器
 The file doesn't appear to be an audio file.	RecorderWindow		該檔案似乎不是音訊檔案。
 File name:	RecorderWindow		檔案名稱：

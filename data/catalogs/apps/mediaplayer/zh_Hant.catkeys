@@ -1,42 +1,90 @@
-1	english	x-vnd.Haiku-MediaPlayer	702918950
+1	english	x-vnd.Haiku-MediaPlayer	3137892470
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		將條目移動到資源回收筒
 Close	MediaPlayer-PlaylistWindow		關閉
 Volume of background clips	MediaPlayer-SettingsWindow		背景片段的音量
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		可以的話使用硬體視訊疊加
+Audio	MediaPlayer-InfoWin		音頻
 Subtitle placement:	MediaPlayer-SettingsWindow		字幕位置：
+MediaPlayer	System name		媒體播放器
+Audio track	MediaPlayer-Main		音軌
+Muted	MediaPlayer-SettingsWindow		靜音
 OK	MediaPlayer-RemovePLItemsCmd		確認
 Open Playlist	MediaPlayer-PlaylistWindow		開啟播放清單
 Subtitles	MediaPlayer-Main		字幕
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app%遇到內部錯誤。該檔案無法開啟。
+DrawBitmap	MediaPlayer-InfoWin		繪製點陣圖
 File info	MediaPlayer-InfoWin		檔案訊息
+raw audio	MediaPlayer-InfoWin		原始音訊
 Select all	MediaPlayer-PlaylistWindow		選擇全部
 Move Entries	MediaPlayer-MovePLItemsCmd		移動實體
 OK	MediaPlayer-Main		確認
 Remove	MediaPlayer-PlaylistWindow		消除
+<unknown>	MediaPlayer-InfoWin		<未知>
+Resume:	MediaPlayer-SettingsWindow		恢復：
+Duration	MediaPlayer-InfoWin		週期
+Import Entries	MediaPlayer-ImportPLItemsCmd		導入條目
 Open network stream	MediaPlayer-Main		開啟網路串流
 Open file…	MediaPlayer-Main		開啟檔案…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		全螢幕模式下的縮放控件
+View options	MediaPlayer-SettingsWindow		查看選項
+%d kHz	MediaPlayer-InfoWin		%d kHz
 Full volume	MediaPlayer-SettingsWindow		全音量
+<untitled>	PlaylistItem-title		<無標題>
 Start media server	MediaPlayer-Main		開啓媒體伺服器
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		媒體伺服似乎沒有運作。\n您想開始嗎？
+Location	MediaPlayer-InfoWin		位置
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		正在開啓 '%s'.
+Medium	MediaPlayer-SettingsWindow		中等
+Play mode	MediaPlayer-SettingsWindow		播放模式
+Playlist	MediaPlayer-PlaylistWindow		播放清單
+%d Bit	MediaPlayer-InfoWin		%d Bit
+Track	Audio Track Menu		音軌
 Close	MediaPlayer-Main		關閉
 Save error	MediaPlayer-PlaylistWindow		存儲錯誤
+Attributes	MediaPlayer-Main		屬性
+Bottom of screen	MediaPlayer-SettingsWindow		螢幕底部
 MediaPlayer settings	MediaPlayer-SettingsWindow		媒體播放器設定
 Copyright	MediaPlayer-InfoWin		版權
 Invalid URL inserted!	MediaPlayer-NetworkStream		輸入的URL 無效！
+Aspect ratio	MediaPlayer-Main		縱橫比
+Eject device	MediaPlayer-Main		彈出裝置
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		儲存播放清單失敗。\n\n錯誤：
+<no media>	MediaPlayer-InfoWin		<無媒體>
+Hide interface	MediaPlayer-Main		隱藏介面
 Error: 	MediaPlayer-Main		錯誤：
+Video track	MediaPlayer-Main		視訊軌道
+Playlist…	MediaPlayer-Main		播放清單…
+<unnamed media>	MediaPlayer-InfoWin		<未命名媒體>
 Save	MediaPlayer-PlaylistWindow		存儲
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		隨機條目
 Cancel	MediaPlayer-NetworkStream		取消
+Nothing to Play	MediaPlayer-Main		無可播放內容
 OK	MediaPlayer-SettingsWindow		確認
 Remove Entries	MediaPlayer-RemovePLItemsCmd		消除條目
 never	MediaPlayer-SettingsWindow		絕不
+Loop audio	MediaPlayer-SettingsWindow		循環播放音訊
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		內部錯誤（格式錯誤的訊息）。儲存播放清單失敗。
 Open…	MediaPlayer-PlaylistWindow		開啓…
+Revert	MediaPlayer-SettingsWindow		恢復
 Low volume	MediaPlayer-SettingsWindow		低音量
+Audio	MediaPlayer-Main		音頻
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{單聲道} =2{立體聲} other{# 聲道}}
 Quit	MediaPlayer-Main		退出
 Redo	MediaPlayer-PlaylistWindow		重做
 Move Entry	MediaPlayer-MovePLItemsCmd		移動實體
+Reset rating	MediaPlayer-Main		重置評分
+<unknown>	PlaylistItem-author		<未知>
 Cancel	MediaPlayer-SettingsWindow		取消
+Large	MediaPlayer-SettingsWindow		大
+Import Entry	MediaPlayer-ImportPLItemsCmd		導入條目
 unknown format	MediaPlayer-InfoWin		未知格式
+Track %d	MediaPlayer-Main		軌道 %d
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		無法將所有檔案移至資源回收筒。
+Total duration: %s	MediaPlayer-PlaylistWindow		總持續時間：%s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		移入資源回收筒錯誤
+50% scale	MediaPlayer-Main		50% 規模
 Drop files to play	MediaPlayer-Main		拖放檔案以播放
 Copy Entry	MediaPlayer-CopyPLItemsCmd		複製實體
 Close window after playing audio	MediaPlayer-SettingsWindow		播放音訊後關閉視窗
@@ -45,32 +93,64 @@ Copy Entries	MediaPlayer-CopyPLItemsCmd		複製實體
 Always on top	MediaPlayer-Main		始終位於頂部
 Open	MediaPlayer-PlaylistWindow		開啓
 always	MediaPlayer-SettingsWindow		總是
+Loop video	MediaPlayer-SettingsWindow		循環視頻
 Stream URL:	MediaPlayer-NetworkStream		直播URL：
+<unknown>	PlaylistItem-album		<未知>
 Stream settings	MediaPlayer-Main		碼流設定
 none	Subtitles menu		無
 Save Playlist	MediaPlayer-PlaylistWindow		存儲播放列表
+Overlay	MediaPlayer-InfoWin		覆蓋
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1（電影院）
+Rating	MediaPlayer-Main		評分
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		內部錯誤（記憶體不足）。儲存播放清單失敗。
+Video	MediaPlayer-Main		影片
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		沒有安裝解碼器來處理該檔案格式，或解碼器無法處理該格式的特定版本。
+Lock Peaks	MediaPlayer-PeakView		鎖住峯值
 none	Audio track menu		無
 Open network stream	MediaPlayer-NetworkStream		開啟網路串流
+Automatically start playing	MediaPlayer-SettingsWindow		自動開始播放
 Undo	MediaPlayer-PlaylistWindow		撤銷
+Display mode	MediaPlayer-InfoWin		顯示方式
+Bottom of video	MediaPlayer-SettingsWindow		影片底部
+Small	MediaPlayer-SettingsWindow		小
 Settings…	MediaPlayer-Main		設定…
+min	MediaPlayer-InfoWin	Minutes	分
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		儲存播放清單失敗：\n\n錯誤：
 File info…	MediaPlayer-Main		档案訊息…
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美國）
+<unnamed>	PlaylistItem-name		<未命名>
+Track	Video Track Menu		軌道
+Full screen	MediaPlayer-Main		全螢幕
 OK	MediaPlayer-NetworkStream		確認
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		內部錯誤（鎖定失敗）。儲存播放清單失敗。
+100% scale	MediaPlayer-Main		100%比例
 New player	MediaPlayer-Main		新創播放器
 <nothing to redo>	MediaPlayer-PlaylistWindow		<無可重做內容>
 Bad URL	MediaPlayer-NetworkStream		錯誤的URL
 Save	MediaPlayer-Main		存儲
 Close window after playing video	MediaPlayer-SettingsWindow		播放影片後關閉視窗
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		平滑縮放影片（非覆蓋模式）
+200% scale	MediaPlayer-Main		200% 比例
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		無法開啟檔案'%filename'。\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		您想要播放的檔案都不是媒體檔案。
 Remove Entry	MediaPlayer-RemovePLItemsCmd		消除條目
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		將條目移動到資源回收筒
 Subtitle size:	MediaPlayer-SettingsWindow		字幕尺寸：
+No aspect correction	MediaPlayer-Main		無縱橫比校正
+raw video	MediaPlayer-InfoWin		原始視頻
+Container	MediaPlayer-InfoWin		容器
 none	MediaPlayer-Main		無
 Open clips	MediaPlayer-Main		開啓剪輯
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		某些檔案無法移至資源回收筒。
 <nothing to undo>	MediaPlayer-PlaylistWindow		<無可撤銷內容>
 Save as…	MediaPlayer-PlaylistWindow		存儲為…
 Error: 	MediaPlayer-RemovePLItemsCmd		錯誤：
+300% scale	MediaPlayer-Main		300% 比例
 Open	MediaPlayer-Main		開啓
+ask every time	MediaPlayer-SettingsWindow		每次都要諮詢
+(not supported)	MediaPlayer-InfoWin		（不支持）
+Randomize	MediaPlayer-PlaylistWindow		隨機化
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+400% scale	MediaPlayer-Main		400% 比例
+h	MediaPlayer-InfoWin	Hours	時
 OK	MediaPlayer-PlaylistWindow		確認

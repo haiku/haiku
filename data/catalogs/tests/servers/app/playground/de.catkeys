@@ -1,21 +1,31 @@
-1	german	x-vnd.Haiku-Playground	4128683144
+1	german	x-vnd.Haiku-Playground	1375574837
 Line	Playground		Linie
 Fill	Playground		Füllen
+Over	Playground		Über
 Quit	Playground		Beenden
 Rect	Playground		Rechteck
+Select	Playground		Auswählen
 Click and drag to draw an object	Playground		Klicken und ziehen, um Objekte zu zeichnen
 Controls	Playground		Steuerung
 Round rect	Playground		Abgerundetes Rechteck
 Alpha:	Playground		Alpha:
 Mode:	Playground		Modus:
 Submenu	Playground		Untermenü
+Copy	Playground		Kopieren
 Cancel	Playground		Abbrechen
 Clear	Playground		Löschen
+Min	Playground		Min
+Blend	Playground		Mischen
+Invert	Playground		Umkehren
 Clear all drawing objects?	Playground		Alle Objekte löschen?
 Width:	Playground		Strichstärke:
+Alpha	Playground		Transparenz
 New object	Playground		Neues Objekt
 Test	Playground		Test
+Max	Playground		Max
+Add	Playground		Addieren
 Playground	System name		Spielwiese
+Erase	Playground		Löschen
 File	Playground		Datei
 Subtract	Playground		Subtrahieren
 <pick>	Playground		<auswählen>

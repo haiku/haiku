@@ -1,12 +1,12 @@
 1	czech	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nepodařilo se připojit k serveru \"%server%\":\n%error%
-Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Aktualizuji odběr složek IMAP, buďte prosím trpělivý...
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Aktualizuji odběr složek IMAP, strpeníčko prosím…
 Failed to fetch available storage.	IMAPFolderConfig		Nepodařilo se zjistit dostupné úložné místo.
 Cancel	IMAPFolderConfig		Zrušit
 OK	IMAPFolderConfig		OK
 Server storage: %s / %s used.	IMAPFolderConfig		Úložiště serveru: %s / %s použito.
 No encryption	imap_config		Bez šifrování
-Fetching IMAP folders, please be patient…	IMAPFolderConfig		Načítám složky IMAP, prosím, buďte trpělivý...
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Načítám složky IMAP, strpeníčko prosím…
 Configure IMAP Folders	imap_config		Nastavení složek IMAP
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Použít

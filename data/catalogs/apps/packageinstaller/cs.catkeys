@@ -7,7 +7,7 @@ Package installer	PackageView		Instalátor balíčků
 All existing files will be skipped?	PackageView		Přeskočit všechny již existující soubory?
 Replace	PackageView		Nahradit
 All existing files will be replaced?	PackageView		Nahradit všechny již existující soubory?
-Other…	PackageView		Ostatní...
+Other…	PackageView		Ostatní…
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolický odkaz pojmenovaný '%s' v zadané cestě již existuje.\nNahradit odkazem z balíčku, nebo přeskočit?
 Stop	PackageStatus		Zastavit
 Install to:	PackageView		Instalovat do:
@@ -17,7 +17,7 @@ The installation of the package has been aborted.	PackageView		Instalace balíč
 No installation type selected	PackageView		Není vybrán žádný typ instalace
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Chcete zapamatovat tuto volbu i pro zbytek této instalace?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Vybraný balíček nebyl z vašeho systému odebrán. Zadaný soubor s informacemi o nainstalovaném balíčku mohl být poškozen.
-Install…	UninstallView		Instalovat...
+Install…	UninstallView		Instalovat…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Položka pojmenovaná '%s' v zadané cestě již existuje.\nPřepsat ji položkou z balíčku, nebo přeskočit?
 Installing files and folders	PackageInstall		Instalace souborů a adresářů
 Installed packages	UninstallWindow		Instalované balíčky

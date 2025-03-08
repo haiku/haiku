@@ -43,7 +43,7 @@ E-mail	System name		E-mail
 Check every	Config Window		Ověřit každých
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Nový účet vytvoříte stisknutím tlačítka Přidat.\n\nÚčet odeberete stisknutím tlačítka Odebrat na vybrané položce.\n\nPro změnu nastavení vyberte položku ze seznamu.
 Account name:	E-Mail		Jméno účtu:
-Edit mailbox menu…	Config Window		Upravit nabídku schránky...
+Edit mailbox menu…	Config Window		Upravit nabídku schránky…
 Server Name:	E-Mail		Jméno serveru:
 Remove	Config Window		Odebrat
 Login name:	E-Mail		Přihlašovací jméno:

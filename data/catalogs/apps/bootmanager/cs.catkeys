@@ -38,7 +38,7 @@ After five seconds	DefaultPartitionPage		Za pět sekund
 Timeout: %s	DefaultPartitionPage		Prodleva %s
 The Master Boot Record could not be restored!	BootManagerController		Tabulka Master Boot Record nemohla být obnovena!
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Tabulka oddílů prvního pevného disku není kompatibilní se správcem spouštění.\nSprávce spouštění funguje pouze s oddíly IBM PC MBR.
-Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Prosím zvolte jednotku, na které chcete provést instalaci nebo odinstalci zavaděče
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Prosím zvolte jednotku, na které chcete provést instalaci nebo odinstalaci zavaděče.
 After four seconds	DefaultPartitionPage		Za čtyři sekundy
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Bezejmena %d
 First partition starts too early	BootManagerController	Title	První disková oblast začíná příliš brzy
@@ -53,17 +53,17 @@ Old Master Boot Record saved	BootManagerController	Title	Úspěšná záloha Mas
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Určete, prosím, výchozí oddíl a odpočet.\nNabídka zavaděče načte výchozí oddíl po odpočtu pokud nevyberete jiný oddíl. Můžete také určit nabídce zavaděče, aby čekala dokud nevyberete oddíl.\nStisknutou klávesou 'ALT' zakážete odpočet při startu.
 Partitions	PartitionsPage	Title	Oddíly
 Uninstallation of boot menu completed	BootManagerController	Title	Úspěšná odinstalace nabídky zavaděče
-After two seconds	DefaultPartitionPage		za dvě sekundy
+After two seconds	DefaultPartitionPage		Za dvě sekundy
 Partition table not compatible	BootManagerController	Title	Nekompatibilita tabulky oddílů
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Master Boot Record spoštěcího disku (%DISK) byl úspěšně obnoven ze souboru %FILE.
 Done	BootManagerController	Button	Hotovo
 BootManager	System name		Správce spouštění
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Lokalizujte prosím soubor, ze kterého má být Master Boot Record (MBR) obnoven. Jedná se o zálohu vytvořenou při první instalaci nabídky zavaděče.
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		K obnovení MBR prosím vyhledejte, soubor s uloženým záznamem Master Boot Record (MBR). Jedná se o soubor vytvořený během první instalace zavaděče.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		K obnovení prosím vyhledejte soubor s uloženým Master Boot Record (MBR) záznamem. Jedná se o soubor vytvořený během první instalace zavaděče.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Obnova Master Boot Record (MBR) disku %disk ze souboru %file připravena. Přejete si pokračovat?
 Install	DrivesPage	Button	Nainstalovat
 File:	FileSelectionPage	Text control label	Soubor:
 Error reading partition table	BootManagerController	Title	Chyba čtení tabulky oddílů
 Back	BootManagerController	Button	Zpět
-The boot manager has been successfully installed on your system.	BootManagerController		Zavaděč byl úspěšně nainstalován do Vašeho systému.
+The boot manager has been successfully installed on your system.	BootManagerController		Zavaděč byl úspěšně nainstalován do vašeho systému.
 The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Původní Master Boot Record nemohl být uložen do %s. Můžete pokračovat v instalaci, ale nebude možné odinstalovat nabídku zavaděče systému.

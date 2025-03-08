@@ -1,13 +1,13 @@
 1	czech	x-vnd.Haiku-SGITranslator	129108011
 SGI images	SGITranslator		Obrázky SGI
 Use compression:	SGIView		Použít kompresi:
-SGI image translator	SGIView		převaděč obrázků SGI
-SGI image	SGITranslator		obrázek SGI
+SGI image translator	SGIView		Převaděč obrázků SGI
+SGI image	SGITranslator		Obrázek SGI
 SGITranslator Settings	SGITranslator		Nastavení Převaděče SGI
 SGI Settings	SGIMain		Nastavení SGI
 SGI image translator	SGITranslator		Převaděč obrázků SGI
-None	SGIView		není
+None	SGIView		Není
 Version %d.%d.%d, %s	SGIView		Verze %d.%d.%d, %s
 \nbased on GIMP SGI plugin v1.5:\n	SGIView		\nzaloženo na zásuvném modulu GIMP SGI v1.5:\n
 RLE	SGIView		RLE
-written by:\n	SGIView		Napsal:\n
+written by:\n	SGIView		napsal:\n

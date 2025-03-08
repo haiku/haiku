@@ -14,7 +14,7 @@ Custom baudrate	Custom baudrate window		自訂波特率
 File	SerialWindow		檔案
 SerialConnect	System name		串口連接
 custom…	SerialWindow	Baudrate	定制…
-Parity	SerialWindow		平價
+Parity	SerialWindow		奇偶
 None	SerialWindow	Parity	無
 Disconnect	SerialWindow		斷開
 Everything sent, waiting for acknowledge	XModemStatus		已發送所有訊息，正在等待確認
@@ -32,7 +32,7 @@ Waiting for receiver…	XModemStatus		等待接收方…
 Clear history	SerialWindow		清除歷史記錄
 Checksum error, re-send block	XModemStatus		校驗和錯誤，重新發送區塊
 Settings	SerialWindow		設定
-Even	SerialWindow	Parity	甚至
+Even	SerialWindow	Parity	Even
 Software	SerialWindow	Flowcontrol	軟體
-Line terminator	SerialWindow		Line terminator
+Line terminator	SerialWindow		行终止符
 Remote cancelled transfer	XModemStatus		遠端取消傳輸

@@ -69,7 +69,7 @@ Size	PackageListView		Velikost
 Your rating was updated.	RatePackageWindow		Vaše hodnocení bylo aktulizováno.
 All categories	FilterView		Všechny kategorie
 ignore problem for now	PackageProblem		teď to neřeš
-n/a	PackageInfoView		N/A
+n/a	PackageInfoView		n/a
 Checking user details	UserDetailVerifierProcess		Šťourání v údajích uživatele
 Cancel	MainWindow		Zrušit
 Refresh repositories	MainWindow		Obnovit repozitáře
@@ -97,13 +97,13 @@ Logged in as %User%	MainWindow		Přihlášen/a jako %User%
 A reboot is necessary to complete the installation process.	PackageManager		K dokonční instalace je třeba restart.
 Yes	MainWindow		Ano
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je mi alespoň jeden rok}few{Je mi alespoň # roky}other{Je mi alespoň # let}}
-Pending…	PackageListView		Pracuji...
+Pending…	PackageListView		Pracuji…
 Search terms:	FilterView		Vyhledat výrazy:
 Quit	App		Ukončit
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Nesprávný formát přezdívky. Přezdívka může obsahovat pouze číslice a malé znaky latinky. Délka musí být 4 až 16 znaků.
 Authentication failed	UserLoginWindow		Ověření se nezdařilo
 Captcha error	UserLoginWindow		Chyba captcha
-Manage repositories…	MainWindow		Spravovat repozitáře...
+Manage repositories…	MainWindow		Spravovat repozitáře…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Přezdívka musí být jedinečná. Vámi zvolená přezdívka je již zabraná, zvolte jinou.
 OK	UserUsageConditions		OK
 Open %DeskbarLink%	PackageManager		Otevřít %DeskbarLink%
@@ -143,11 +143,11 @@ Ratings	PackageInfoView		Hodnocení
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Nestaly následující problémy. Pro každý problém zvolte řešení:
 Local	LocalPkgDataLoadProcess		Místní
 Package changes	PackageResult	Window title	Změny balíčků
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Souhlasíte s odesíláním anonymních dat o používání z tohoto počítače na HaikuDepotServer? Své nastavení můžete později změnit v okně \"Nastavení\".
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Souhlasíte s odesíláním anonymních dat o používání z tohoto počítače na HaikuDepotServer? Svou volbu můžete později změnit v okně \"Nastavení\".
 User rating	RatePackageWindow		Uživatelské hodnocení
 Installed packages	MainWindow		Nainstalované balíčky
 Date	PackageListView		Datum
-The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Heslo musí mít minimálně %MinPasswordLength% znaků.Nejméně %MinPasswordUppercaseChar% velkých písmen a %MinPasswordDigitsChar% číslic.
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Heslo musí mít minimálně %MinPasswordLength% znaků. Nejméně %MinPasswordUppercaseChar% velkých písmen a %MinPasswordDigitsChar% číslic.
 Error	App		Chyba
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Problém se stažením podmínek použití. Zkontrolujte podrobnosti v záznamech a zkuste znovu. \nJak zobrazit záznamy se dočtete v nápovědě v části o HaikuDepot.
 There was a puzzling response from the web service.	UserLoginWindow		Přišla nejasná odpověd z webové služby.

@@ -19,7 +19,7 @@ Quit	GrepWindow		Ukončit
 Show files in Tracker	GrepWindow		Zobrazit soubory v Trackeru
 Please select the files you wish to keep searching.	GrepWindow		Prosím vyberte soubory, které si přejete dále prohledávat.
 Trim to selection	GrepWindow		Upravit do výběru
-Set target…	GrepWindow		Nastavit cíl...
+Set target…	GrepWindow		Nastavit cíl…
 Failed to open input pipe!	Grepper		Chyba otevření vstupní roury!
 Search	GrepWindow		Hledat
 Copy text to clipboard	GrepWindow		Kopírovat text do schránky

@@ -21,10 +21,10 @@ Bcc:	Mail		Skrytá kopie:
 New	Mail		Nová
 Save	Mail		Uložit
 Undo	Mail		Vrátit
-Button bar:	Mail		Lišta tlačítek
+Button bar:	Mail		Lišta tlačítek:
 %e wrote:\\n	Mail		%e napsal/a:\\n
 Save changes to this signature?	Mail		Uložit změny v tomto podpisu?
-Save attachment…	Mail		Uložit přílohu...
+Save attachment…	Mail		Uložit přílohu…
 Paste	Mail		Vložit
 E-mail draft could not be saved!	Mail		Koncept nelze uložit!
 Don't send	Mail		Neodesílat
@@ -75,7 +75,7 @@ View	Mail		Zobrazit
 Signatures	Mail		Podpisy
 On	Mail		Zapnout
 Find	Mail		Najít
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Pardon, nelze nalézt žádnou aplikaci, která by podporovala datový typ 'Person'.
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Pardon, nelze nalézt žádnou aplikaci, která by podporovala datový typ „Osoba“.
 Date:	Mail		Datum:
 Expert	Mail		Expert
 Automatically mark mail as read:	Mail		Automaticky označit e-mail jako přečtený:
@@ -96,11 +96,11 @@ To:	Mail		Komu:
 Need Tracker to move items to trash	Mail		Na přesun položek do koše je potřeba Tracker
 The mail_daemon could not be started:\n\t	Mail		Službu mail_daemon nelze spustit:\n\t
 <no account found>	Mail		<žádný účet nenalezen>
-Mail couldn't find its dictionary.	Mail		Pošta nenašla svůj slovník
+Mail couldn't find its dictionary.	Mail		Pošta nenašla svůj slovník.
 helpful message	Mail		užitečná zpráva
  Read 	Mail		 Číst 
 Font:	Mail		Písmo:
-Accounts…	Mail		Účty...
+Accounts…	Mail		Účty…
 Previous	Mail		Předchozí
 Include file attributes in attachments	Mail		Zahrnout atributy souborů do příloh
 Start now	Mail		Začít teď
@@ -113,15 +113,15 @@ Check spelling	Mail		Zkontrolovat pravopis
 Status:	Mail		Stav:
 Redo	Mail		Znovu
 Leave as '%s'	Mail		Nechat jako '%s'
-Print…	Mail		Tisk...
-Settings…	Mail		Nastavení...
+Print…	Mail		Tisk…
+Settings…	Mail		Nastavení…
 Warn unencodable:	Mail		Varovat pokud nelze zakódovat:
 Trash	Mail		Koš
 Show raw message	Mail		Zobrazit surovou zprávu
-Find…	Mail		Hledat...
+Find…	Mail		Hledat…
 Select all	Mail		Označit vše
 Show header	Mail		Zobrazit záhlaví
-Reply account:	Mail		Účet pro odpověď
+Reply account:	Mail		Účet pro odpověď:
 Sorry	Mail		Pardon
 Forward	Mail		Přeposlat
 Open attachment	Mail		Otevřít přílohu
@@ -143,19 +143,19 @@ Leave same	Mail		Nechat stejné
 An error occurred trying to save the attachment.	Mail		Nastala chyba při pokusu uložit přílohu.
 Save address	Mail		Uložit adresu
 Initial spell check mode:	Mail		Výchozí kontrola pravopisu:
-Edit queries…	Mail		Upravit dotazy...
+Edit queries…	Mail		Upravit dotazy…
 There is no installed handler for URL links.	Mail		Není nainstalována obsluha pro URL odkazy.
 File	Mail		Soubor
 Reply preamble:	Mail		Úvod odpovědi:
 New mail message	Mail		Nový e-mail
 An error occurred trying to open this signature.	Mail		Při pokusu o otevření tohoto podpisu došlo k chybě.
-Edit signatures…	Mail		Upravit podpisy...
+Edit signatures…	Mail		Upravit podpisy…
 User interface	Mail		Uživatelské prostředí
 Inconsistency occurred in the undo/redo buffer.	Mail		Vyskytla se nekonzistence v bufferu zpět/znovu.
 Remove attachment	Mail		Odstranit příponu
 Set to…	Mail		Nastavit na…
 Edit	Mail		Editovat
-Page setup…	Mail		Nastavení stránky...
+Page setup…	Mail		Nastavení stránky…
 An error occurred trying to save this signature.	Mail		Při pokusu o uložení podpisu došlo k chybě.
 Beginner	Mail		Začátečník
 Send message	Mail		Poslat zprávu

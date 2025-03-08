@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Input	130668644
+1	finnish	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Oletukset
 Scrolling	TouchpadPrefView		Vieritettään
 Long	KeyboardView		Pitkä
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Kaksoisnapsautusnopeus
 Typing test area	KeyboardView		Kirjoitustestausalue
 Fast	KeyboardView		Nopea
 Please confirm	TouchpadPrefView		Vahvista
+Trackpad speed	TouchpadPrefView		Tasohiiren nopeus
 Mouse speed	SettingsView		Hiirinopeus
+Trackpad acceleration	TouchpadPrefView		Tasohiiren kiihtyvyys
 Horizontal scrolling	TouchpadPrefView		Vaakasuora vieritys
+Reverse scroll direction	TouchpadPrefView		Käänteinen vierityssuunta
 Keyboard lock delay	TouchpadPrefView		Näppäimistön lukkoviive
 Input	System name		Syöte
 Quick	TouchpadPrefView		Nopea
@@ -21,6 +24,7 @@ Slow	KeyboardView		Hidas
 2-Button	SettingsView		2-painikkeinen
 Click to focus and raise	SettingsView		Kohdista ja nosta napsauttamalla
 Vertical	TouchpadPrefView		Pystysuora
+Low	TouchpadPrefView		Alhainen
 Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
 Double-click test area	SettingsView		Kaksoisnapsautuksen testausalue
 Focus mode:	SettingsView		Kohdistustila:

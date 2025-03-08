@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DriveSetup	1140196651
+1	czech	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Oddíl %s nelze odpojit.
 Mount all	MainWindow		Připojit vše
 Disk	MainWindow		Disk
@@ -6,9 +6,10 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Zařízení
 Initialize	MainWindow		Inicializovat
 Could not change the parameters of the selected partition.	MainWindow		Nelze změnit parametry vybraného oddílu.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Jste si jisti, že chcete zapsat změny zpět na disk?\n\nPokud změnu provedete, všechna data na oddíle \"%s\" budou nenávratně ztracena!
 PGP encrypted	Encryption utils		Zašifrováno PGP
 Delete partition	MainWindow		Odstranit oddíl
-Error: 	MainWindow	in any error alert	Chyba:
+Error: 	MainWindow	in any error alert	Chyba: 
 Removable	PartitionList		Vyměnitelný
 Block size	PartitionList		Velikost bloku
 The panel experienced a problem!	MainWindow		Na panelu došlo k problému!
@@ -22,7 +23,8 @@ Validation of the given parameters failed.	MainWindow		Ověření uvedených par
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Opravdu chcete formátovat oddíl \"%s\"? Budete požádáni znovu, než budou na disk zapsány změny.
 DriveSetup	System name		Nastavení disků
 Mounted at	PartitionList		Připojeno na
-Create…	MainWindow		Vytvořit...
+Disk system %s not found!	MainWindow		Diskový systém %s nenalezen!
+Create…	MainWindow		Vytvořit…
 Write changes	MainWindow		Zapsat změny
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicializace oddílu %s selhala. (Na disk nebylo nic zapsáno.)
 Validation of the given creation parameters failed.	MainWindow		Ověření zadaných vytvářecích parametrů selhalo.
@@ -36,7 +38,7 @@ There's no space on the partition where a child partition could be created.	Main
 No disk devices have been recognized.	DiskView		Žádná disková zařízení nebyla nalezena.
 Attributes	PartitionList		Atributy
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Odstranění oddílu selhalo. Žádné změny nebyly na disk zapsány.
-Change parameters…	MainWindow		Změnit parametry...
+Change parameters…	MainWindow		Změnit parametry…
 Format	InitializeParametersPanel		Formátovat
 Could not unmount partition	MainWindow		Nepodařilo se odpojit svazek
 Create	CreateParametersPanel		Vytvořit
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		Oddíl %s je již odpojen.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Opravdu chcete změnit parametry vybraného oddílu?\n\nOddíl už nemusí být rozpoznán jinými operačními systémy!
 Boot	PartitionList		Zaváděcí
 OK	AbstractParametersPanel		OK
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Jste si jisti, že chcete zapsat změny zpět na disk?\n\nPokud změnu provedete, všechna data na disku \"%s\" budou nenávratně ztracena!
 Virtual	PartitionList		Virtuální
 Virtual	DiskView		Virtuální
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Určitě nyní chcete zapsat změny zpět na disk?\n\nJesliže tak učiníte, všechna data na vybraném disku budou nenávratně ztracena!

@@ -7,17 +7,17 @@ Website options	PoorMan		Volby webové stránky
 Log to file	PoorMan		Uložit záznam do souboru
 Shutting down.	PoorMan		Ukončuji.
 Error Dir	PoorMan		Chybový adresář
-Web folder:	PoorMan		Webová složka
+Web folder:	PoorMan		Webová složka:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vyberte prosím složku, kterou chcete publikovat na webu.\n\nPoorMan může vytvořit implicitní \"public_html\" ve vaší domovské složce.\nNebo místo ní vyberte některou z vašich složek.
 Log To Console	PoorMan		Logovat do Konzole
 File Name	PoorMan		Jméno souboru
-Starting up... 	PoorMan		Spouštím...
+Starting up... 	PoorMan		Spouštím... 
 Select	PoorMan		Vybrat
 Logging view	PoorMan		Zobrazení logování
-Save console as…	PoorMan		Uložit konzoli jako...
+Save console as…	PoorMan		Uložit konzoli jako…
 Edit	PoorMan		Editovat
 Cancel	PoorMan		Zrušit
-Directory: 	PoorMan		Adresář:
+Directory: 	PoorMan		Adresář: 
 Hits: %lu	PoorMan		Přístupy: %lu
 Hits: 0	PoorMan		Přístupy: 0
 Shutting down.\n	PoorMan		Ukončuji.\n
@@ -25,7 +25,7 @@ Select all	PoorMan		Vybrat vše
 Error Server	PoorMan		Chybový server
 Send file listing if there's no start page	PoorMan		Odeslat výpis souborů pokud není úvodní stránka
 Create PoorMan log	PoorMan		Vytvořit log PoorMana
-Max. simultaneous connections:	PoorMan		Max. současných připojení
+Max. simultaneous connections:	PoorMan		Max. současných připojení:
 Done	PoorMan		Hotovo
 Site	PoorMan		Síť
 Cannot start the server	PoorMan		Nemohu spustit server
@@ -34,7 +34,7 @@ Create public_html	PoorMan		Vytvořit public_html
 Clear hit counter	PoorMan		Vymazat počitadlo přístupů
 Status: Stopped	PoorMan		Status: Zastaveno
 File	PoorMan		Soubor
-Settings…	PoorMan		Nastavení...
+Settings…	PoorMan		Nastavení…
 Log To File	PoorMan		Logovat do souboru
 Connections	PoorMan		Spojení
 Controls	PoorMan		Ovládací prvky
@@ -58,9 +58,9 @@ Status: Running	PoorMan		Status: Spuštěn
 Directory: (none)	PoorMan		Adresář: (žádný)
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Implicitní webová složka byla vytvořena v \"/boot/home/public_html.\"\nUjistěte se, že v ní je HTML soubor \"index.html\".
 Dir Created	PoorMan		Adresář vytvořen
-Save console selections as…	PoorMan		Uložit výběry z konzole jako...
+Save console selections as…	PoorMan		Uložit výběry z konzole jako…
 Quit	PoorMan		Ukončit
 Save log console	PoorMan		Uložit konzoli logu
-Start page:	PoorMan		Úvodní stránka
+Start page:	PoorMan		Úvodní stránka:
 OK	PoorMan		OK
 Website location	PoorMan		Umístění webové stránky

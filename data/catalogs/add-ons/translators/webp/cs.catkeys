@@ -17,7 +17,7 @@ Drawing	ConfigView		Kresba
 Output preset:	ConfigView		Výstupní předvolba:
 WebP Settings	main		WebP Nastavení
 Icon	ConfigView		Ikona
-WebP image	WebPTranslator		obrázek WebP
+WebP image	WebPTranslator		Obrázek WebP
 Output quality:	ConfigView		Výstupní kvalita:
 Slower but better	ConfigView		Pomalejší ale lepší
 Based on libwebp %version%	ConfigView		Založeno na libwebp %version%

@@ -8,7 +8,7 @@ Scale to native size	MainWin		Změnit velikost na původní
 unknown	MainWin		neznámý
 Next channel	MainWin		Další kanál
 Keep aspect ratio	MainWin		Ponechat poměr stran
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitální telka
 Always on top	MainWin		Vždy navrchu
 Debug	MainWin		Debugovat
 Interface	MainWin		Rozhraní
@@ -22,7 +22,7 @@ Settings	MainWin		Nastavení
 force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	vynutit 704 × 576, poměr stran 4:3
 %s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
-Settings…	MainWin		Nastavení...
+Settings…	MainWin		Nastavení…
 None	MainWin		Žádný
 Error, interface is busy:\n\n	MainWin		Chyba, rozhraní je zaneprázdněno:\n\n
 pixel aspect ratio	MainWin		poměr aspektu pixelů

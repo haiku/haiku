@@ -15,7 +15,7 @@ Synchronize again	Time		Znovu synchronizovat
 Asia	Time		Asie
 Try all servers	Time		Zkusit všechny servery
 Time	Time		Čas
-Current time:	Time		Aktuální čas
+Current time:	Time		Aktuální čas:
 The following error occured while synchronizing:\n%s: %s	Time		Při synchronizaci došlo k následující chybě:\n%s: %s
 Europe	Time		Evropa
 Show day of week	Time		Zobrazit den v týdnu

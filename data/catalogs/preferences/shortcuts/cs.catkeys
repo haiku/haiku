@@ -32,8 +32,8 @@ Save & apply	ShortcutsWindow		Uložit a použít
 Open	ShortcutsWindow		Otevřít
 Append	ShortcutsWindow		Připojit
 Both	ShortcutsSpec		Obojí
-Save KeySet as…	ShortcutsWindow		Uložit SaduKláves jako...
-Append KeySet…	ShortcutsWindow		Přidat SaduKláves...
+Save KeySet as…	ShortcutsWindow		Uložit SaduKláves jako…
+Append KeySet…	ShortcutsWindow		Přidat SaduKláves…
 *MouseButton 1	ShortcutsWindow		*TlačítkoMyši 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*PřesunoutMyšNa 100% 0\" \"*TlačítkoMyši 1\"
 Right	ShortcutsSpec		Pravý
@@ -41,7 +41,7 @@ OK	ShortcutsWindow		OK
 Add new shortcut	ShortcutsWindow		Přidat novou zkratku
 (None)	ShortcutsSpec		(Žádný)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Open KeySet…	ShortcutsWindow		Otevřít SaduKláves...
+Open KeySet…	ShortcutsWindow		Otevřít SaduKláves…
 File	ShortcutsWindow		Soubor
 *LaunchHandler text/html	ShortcutsWindow		*SpustitObsluhu text/html
 *MoveMouseTo 50% 50%	ShortcutsWindow		*PřesunoutMyšNa 50% 50%

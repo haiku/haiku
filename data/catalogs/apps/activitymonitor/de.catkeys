@@ -15,7 +15,7 @@ Receiving	DataSource		Empfangen
 Remove graph	ActivityView		Graph entfernen
 Swap space	DataSource		Auslagerungsspeicher
 CPU	DataSource		CPU
-ActivityMonitor	System name		Systemaktivität
+ActivityMonitor	System name		Aktivitätsanzeige
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Aktualisierungsintervall:
 RX	DataSource	Shorter version for Receiving.	Empfangen

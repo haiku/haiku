@@ -1,6 +1,6 @@
 1	czech	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Prohlížeč obrázků
-Page setup…	Menus		Nastavení stránky...
+Page setup…	Menus		Nastavení stránky…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stránka %d) byl změněn. Chcete jej zavřít?
 Previous file	Menus		Předchozí soubor
 View	Menus		Zobrazit
@@ -9,7 +9,7 @@ Show caption in full screen mode	Menus		Zobrazit popisek v režimu celé obrazov
 Flip left to right	Menus		Převrátit zleva doprava
 Full screen	Menus		Celá obrazovka
 Copy	Menus		Kopírovat
-Height: 	PrintOptionsWindow		Výška:
+Height: 	PrintOptionsWindow		Výška: 
 Next file	Menus		Další soubor
 Slide show	Menus		Slideshow
 Original size	Menus		Původní velikost
@@ -36,7 +36,7 @@ Fit image to page	PrintOptionsWindow		Přizpůsobit velikost obrázku stránce
 Show tool bar	Menus		Zobrazit panel nástrojů
 First page	Menus		První stránka
 OK	SaveToFile		OK
-Print…	Menus		Tisk...
+Print…	Menus		Tisk…
 The file '%s' could not be written.	SaveToFile		Soubor '%s' nemohl být zapsán.
 Quit	Menus		Ukončit
 Get info	Menus		Informace
@@ -47,7 +47,7 @@ Job setup	PrintOptionsWindow		Nastavení úlohy
 Clear selection	Menus		Zrušit výběr
 Rotate clockwise	Menus		Otočit po směru hodinových ručiček
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nemohu nahrát obrázek! Soubor nebo překladač pro něj neexistuje.
-Open with…	Menus		Otevřít pomocí...
+Open with…	Menus		Otevřít pomocí…
 Rotate counterclockwise	Menus		Otočit proti směru hodinových ručiček
 Previous page	Menus		Předchozí stránka
 Fit to window	Menus		Přizpůsobit oknu
@@ -56,9 +56,9 @@ Browse	Menus		Prohlížet
 Progress monitor	ProgressWindow		Sledování pokroku
 Edit	Menus		Editovat
 Move to Trash	Menus		Přesunout do koše
-Use as background…	Menus		Použít jako pozadí...
-Open…	Menus		Otevřít...
-Save as…	Menus		Uložit jako...
+Use as background…	Menus		Použít jako pozadí…
+Open…	Menus		Otevřít…
+Save as…	Menus		Uložit jako…
 Next page	Menus		Další stránka
 Print options	PrintOptionsWindow		Volby tisku
 Slide delay	Menus		Prodleva mezi snímky

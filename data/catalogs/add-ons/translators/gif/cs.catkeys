@@ -1,19 +1,19 @@
 1	czech	x-vnd.Haiku-GIFTranslator	2201651797
-Websafe	GIFView		Paleta pro Web
+Websafe	GIFView		Paleta pro web
 Write interlaced images	GIFView		Zápis prokládaných obrázků
 Optimal	GIFView		Optimální
 Greyscale	GIFView		Stupně šedi
 Colors:	GIFView		Barvy:
 GIF image translator	GIFTranslator		Překladač obrázků GIF
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Format (GIFTranslator)
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Formát (GIFTranslator)
 GIF image translator	GIFView		Překladač obrázků GIF
 Palette:	GIFView		Paleta:
-GIF image	GIFTranslator		obrázek GIF
+GIF image	GIFTranslator		Obrázek GIF
 Write transparent images	GIFView		Zápis průhledných obrázků
 GIF images	GIFTranslator		Obrázky GIF
 Version %d.%d.%d, %s	GIFView		Verze %d.%d.%d, %s
 Use RGB color	GIFView		Použít RGB obrázky
 Use dithering	GIFView		Použít dithering
-GIF Settings	GIFTranslator		předvolby GIF
+GIF Settings	GIFTranslator		Předvolby GIF
 BeOS system	GIFView		BeOS systém
 Automatic (from alpha channel)	GIFView		Automaticky (z kanálu neprůhlednosti)

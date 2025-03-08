@@ -2,7 +2,7 @@
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Spouštění nastavení typů souborů pro konfiguraci osobních atributů selhalo.\n\nChyba: 
 Mobile phone	People		Mobilní telefon
 Unnamed person	People		Nepojmenovaná osoba
-New person…	People		Nová osoba...
+New person…	People		Nová osoba…
 Address	People		Adresa
 Zip	People		Zip
 Select all	People		Vybrat vše
@@ -27,7 +27,7 @@ URL	People		URL
 %name% picture	People		%name% obrázek
 Home phone	People		Telefon domů
 none	Groups list		žádný
-Save as…	People		Uložit jako...
+Save as…	People		Uložit jako…
 Cut	People		Vyjmout
 Contact information for a person.	Long mimetype description		Kontaktní informace pro osobu.
 Remove image	People		Odstranit obrázek
@@ -47,5 +47,5 @@ Paste	People		Vložit
 E-mail	People		E-mail
 Group	People		Skupina
 Drop an image here,\nor use the contextual menu.	People		Zde přetáhněte obrázek,\nnebo použijte kontextovou nabídku.
-Load image…	People		Nahrát obrázek...
+Load image…	People		Nahrát obrázek…
 Sorry	People		Lituji

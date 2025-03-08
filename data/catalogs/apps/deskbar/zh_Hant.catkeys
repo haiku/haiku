@@ -25,12 +25,12 @@ Show replicants	DeskbarMenu		顯示副本
 No windows	WindowMenu		無視窗
 Show clock	Tray		顯示時鐘
 Close all	WindowMenu		關閉全部
-Deskbar preferences	PreferencesWindow		Deskbar偏好
+Deskbar preferences	PreferencesWindow		Deskbar偏好設定
 About this system	DeskbarMenu		關於這個系統
 Quit application	WindowMenu		退出應用程式
 Hide application names	PreferencesWindow		隱藏程式名稱
 Applications	PreferencesWindow		應用程式
-Show application expander	PreferencesWindow		顯示應用程式擴充器
+Show application expander	PreferencesWindow		顯示應用程式摺疊擴充
 Deskbar preferences…	DeskbarMenu		Deskbar偏好…
 Suspend	DeskbarMenu		暫停
 Shutdown…	DeskbarMenu		關機…
@@ -44,6 +44,6 @@ Hide all	WindowMenu		全部隱藏
 Sort applications by name	PreferencesWindow		按名稱排序應用程式
 Revert	PreferencesWindow		恢復
 Window	PreferencesWindow		視窗
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		偏好
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		偏好設定
 Time preferences…	TimeView		時間偏好…
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		桌面小程式

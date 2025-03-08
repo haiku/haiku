@@ -1,9 +1,10 @@
-1	german	application/x-vnd.Cortex.MediaRoutingView	510650492
+1	german	application/x-vnd.Cortex.MediaRoutingView	3442339205
 Lock group	MediaNodePanel		Gruppe sperren
 %refname% (no file)	MediaNodePanel		%refname% (keine Datei)
 Video output	MediaRoutingView		Videoausgang
 Icon view	MediaRoutingView		Icon-Ansicht
 OK	MediaRoutingView		OK
+Cycle	MediaNodePanel		Schleife
 Advanced	MediaNodePanel		Erweitert
 Audio input	MediaRoutingView		Audioeingang
 Run mode	MediaNodePanel		Laufmodus
@@ -11,7 +12,7 @@ Could not load '%filename%'	MediaRoutingView		'%filename%' konnte nicht geladen 
 Stop time source	MediaNodePanel		Zeitquelle stoppen
 Be Audio Mixer	MediaRoutingView		Be Audiomixer
 Video input	MediaRoutingView		Videoeingang
-Release	MediaNodePanel		Freigeben
+Release	MediaNodePanel		Entfernen
 Disconnect	MediaRoutingView		Trennen
 Could not disconnect	MediaRoutingView		Trennen fehlgeschlagen
 Could not instantiate '%infoname%'	MediaRoutingView		'%infoname%' konnte nicht instanziiert werden

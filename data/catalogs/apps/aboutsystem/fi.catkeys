@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	2654448748
+1	finnish	x-vnd.Haiku-About	506608794
 The Haikuware team and their bounty program\n	AboutView		Haikuware-ryhmä ja heidän bounty-ohjelmansa\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Kaikki oikeudet pidätetty.
 \n\nSpecial thanks to:\n	AboutView		\n\nErityiskiitokset:\n
@@ -31,6 +31,7 @@ Time running:	AboutView		Käynnissäoloaika:
 Visit the Haiku website	AboutView		Vieraile Haikun webbisivulla
 Version: %s	AboutView	Version: R1 or hrev99999	Versio: %s
 Make a donation	AboutView		Tee lahjoitus
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nnetresolv\nCopyright © 1998-2023 The NetBSD Project, Copyright © 2004-2009 by Internet Systems Consortium, Inc. (\"ISC\"), Copyright © 1996-2003 by Internet Software Consortium. All rights reserved.	AboutView		Sisältää NetBSD Foundation, Inc.:n ja sen avustajien kehittämän ohjelman:\nnetresolv\nCopyright © 1998-2023 The NetBSD Project, Copyright © 2004-2009 by Internet Systems Consortium, Inc. (\"ISC\"), Copyright © 1996-2003 by Internet Software Consortium. All rights reserved.
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d Mebitavua muistia:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Kaikki oikeudet pidätetty.
 GNU LGPL v2	AboutWindow		GNU LGPL v2

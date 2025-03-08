@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	3174700455
+1	finnish	x-vnd.haiku-icon_o_matic	1275638063
 None	Icon-O-Matic-Properties		Ei mitään
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -99,6 +99,7 @@ Bummer	Icon-O-Matic-Main	Cancel button - error alert	Kurja juttu
 Translation X	Icon-O-Matic-PropertyNames		Muunnos X
 Multi-paste properties	Icon-O-Matic-Properties		Moniliitettävät ominaisuudet
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Kuvakemaatti ei ehkä tulkitse kaikkia tietoja SVG:stä ohjelmaa ladattaessa. Jos alkuperäinen tiedosto korvataan, nämä tiedot menetetään.
+Remove	Icon-O-Matic-TransformersList		Poista
 Rotate indices backwards	Icon-O-Matic-PathsList		Pyöritä osoittimia taaksepäin
 Overwrite	Icon-O-Matic-SVGExport		Korvaa
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Lisää {0, plural, one{muoto} other{muotoa}}

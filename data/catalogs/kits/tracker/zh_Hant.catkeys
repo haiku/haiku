@@ -84,7 +84,7 @@ Modified	FindPanel		已修改的
  (block size: 	InfoWindow		(塊大小：
 Generate image thumbnails	SettingsView		產生圖片縮圖
 An item named '%filename%' already exists.	FSUtils		一個名為'%filename%'的項目已存在。
-preferences	B_PREFERENCES_DIRECTORY		偏好
+preferences	B_PREFERENCES_DIRECTORY		環境設定
 Name	Person Query Columns		名稱
 Skip all	FSUtils		全部跳過
 Atom	AttributesView		Atom
@@ -155,7 +155,7 @@ develop	B_SYSTEM_DEVELOP_DIRECTORY		開發
 Cut more	ContainerWindow		剪下更多
 64-bit integer	AttributesView		64 位元整數
 The Tracker must be running to see Info windows.	PoseView		Tracker必須運作才能看到資訊視窗。
-Tracker preferences	TrackerSettingsWindow		Tracker偏好
+Tracker preferences	TrackerSettingsWindow		Tracker偏好設定
 Read	FilePermissionsView		讀取
 There was an error writing the attribute.	WidgetAttributeText		寫入屬性時出錯。
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		若您重新命名 %target，%osName 可能無法正常運作！\n\n您確定要這樣做嗎？

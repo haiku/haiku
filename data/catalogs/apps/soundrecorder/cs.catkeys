@@ -28,17 +28,17 @@ Channels:	RecorderWindow		Kanály:
  bits	RecorderWindow		 bitů
 None	RecorderWindow		Žádný
 Record	RecorderWindow		Záznam
-Sample size: 	RecorderWindow		Velikost vzorku:
+Sample size: 	RecorderWindow		Velikost vzorku: 
 Cannot recognize this file as a media file	RecorderWindow		Nemohu rozpoznat tento soubor jako multimediální
-Format: 	RecorderWindow		Formát:
-File name: 	RecorderWindow		Jméno souboru:
+Format: 	RecorderWindow		Formát: 
+File name: 	RecorderWindow		Jméno souboru: 
 Cannot connect to the selected sound input	RecorderWindow		Nemohu se připojit k vybranému zvukovému vstupu
 Cannot get the file to play	RecorderWindow		Nemohu získat soubor k přehrání
 Cannot record a sound that long	RecorderWindow		Takto dlouhý zvuk nelze nahrát
 Duration:	RecorderWindow		Trvání:
 Compression:	RecorderWindow		Komprese:
 Cannot find an unused name to use for the new recording	RecorderWindow		Nemohu najít žádné nepoužité jméno pro novou nahrávku
-Channels: 	RecorderWindow		Kanály:
+Channels: 	RecorderWindow		Kanály: 
 Save	RecorderWindow		Uložit
 Sample rate: 	RecorderWindow		Vzorkovací frekvence: 
 Cannot connect to media server	RecorderWindow		Není možné připojit se k multimediálnímu serveru

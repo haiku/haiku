@@ -11,7 +11,7 @@ Class info	DevicePCI		Informace o třídě
 USB bus	Device		Sběrnice USB
 Computer	DevicesView		Počítač
 Communications	DeviceSCSI		Komunikace
-Mass storage controller	Device		Kontroler Mass storage
+Mass storage controller	Device		Řadič velkokapacitního úložiště
 Connection	DevicesView		Připojení
 Printer	DeviceSCSI		Tiskárna
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Namespace Processoru '%2'
@@ -20,7 +20,7 @@ Scanner	DeviceSCSI		Skener
 Memory controller	Device		Kontroler paměti
 Unknown device	DevicesView		Neznámé zařízení
 Unknown	DevicePCI		Neznámý
-ACPI node '%1'	DeviceACPI		Uzel ACPI "%1"
+ACPI node '%1'	DeviceACPI		Uzel ACPI '%1'
 Optical Drive	DeviceSCSI		Optická mechanika
 Name	PropertyList		Název
 Manufacturer	DeviceSCSI		Výrobce
@@ -65,7 +65,7 @@ ISA bus	Device		Sběrnice ISA
 ISA bus	DevicesView		Sběrnice ISA
 Processor	DeviceSCSI		Procesor
 Bridge	Device		Most
-Worm	DeviceSCSI		Jednou zapisovatelný (Write Once Read Many)
+Worm	DeviceSCSI		Jednou zapisovatelný
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Výrobce
 Bridge	DeviceSCSI		Most
@@ -80,4 +80,4 @@ Network controller	Device		Kontroler sítě
 Driver used	Device		Použitý ovladač
 Communication controller	Device		Kontroler komunikace
 ACPI bus	Device		Sběrnice ACPI
-unknown	Device		Neznámé
+unknown	Device		neznámé

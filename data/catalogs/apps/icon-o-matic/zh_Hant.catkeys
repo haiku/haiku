@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	1890016710
+1	english	x-vnd.haiku-icon_o_matic	3338451224
 None	Icon-O-Matic-Properties		無
 Clean up path	Icon-O-Matic-CleanUpPathCmd		清理路徑
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -81,42 +81,109 @@ Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransforme
 Miter limit	Icon-O-Matic-PropertyNames		斜接限制
 Insert vertex	Icon-O-Matic-InsertPointCmd		插入頂點
 Rounding	Icon-O-Matic-PropertyNames		四捨五入
+Joins	Icon-O-Matic-PropertyNames		接合
 There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		形狀太多了。 HVIF 格式最多支援 255。
 Cancel	Icon-O-Matic-ColorPicker		取消
+Duplicate	Icon-O-Matic-PathsList		複製
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		移動 {0, plural, one{形狀} other{形狀}}
 Save	Icon-O-Matic-Menu-Settings		存儲
+Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	點選其中的一個對象
+Export as…	Icon-O-Matic-Menu-File		導出為…
+Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		凍結 {0, plural, one{形狀} other{形狀}}
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		消除 {0, plural, one{形狀} other{形狀}}
 Undo: %action%	Icon-O-Matic-Main		撤銷: %action%
+Diamond	Icon-O-Matic-StyleTypes		鑽石
 Don't save	Icon-O-Matic-Menu-Settings		不要存儲
 Add shape with path	Icon-O-Matic-Menu-Shape		新增帶路徑的形狀
+Bummer	Icon-O-Matic-Main	Cancel button - error alert	Bummer
 Multi-paste properties	Icon-O-Matic-Properties		多重貼上特性
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		載入 SVG 時，Icon-O-Matic 可能無法解釋 SVG 中的所有資料。透過覆蓋原始文件，該資訊現在將丟失。
+Remove	Icon-O-Matic-TransformersList		消除
+Rotate indices backwards	Icon-O-Matic-PathsList		向後旋轉索引
+Overwrite	Icon-O-Matic-SVGExport		覆蓋
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		添加 {0, plural, one{形狀} other{形狀}}
 Cancel	Icon-O-Matic-SVGExport		取消
 Open…	Icon-O-Matic-Menu-File		開啓…
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		消除 {0, plural, one{變形} other{變形}}
+Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	點擊上面的形狀
 Remove	Icon-O-Matic-ShapesList		消除
 Multi-paste	Icon-O-Matic-Properties		多重貼上
 Bad news	Title of error alert		壞消息
+HVIF source code	Icon-O-Matic-SavePanel		HVIF 源碼
+Drop shapes	Icon-O-Matic-ShapesList		水滴形狀
 Save icon	Icon-O-Matic-SavePanel	Dialog title	存儲圖示
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		分配 {0, plural, one{路徑} other{路徑}}
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		消除 {0, plural, one{組件} other{組件}}
+Linear	Icon-O-Matic-StyleTypes		線性
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		移動 {0, plural, one{組件} other{組件}}
+Add vertex	Icon-O-Matic-AddPointCmd		新增頂點
+Clean up	Icon-O-Matic-PathsList		清理
+Split	Icon-O-Matic-PathManipulator		分裂
 Move	Icon-O-Matic-TransformationBoxStates		移動
 There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		路徑太多了。 HVIF 格式最多支援 255。
+Conic	Icon-O-Matic-StyleTypes		錐
 Name	Icon-O-Matic-PropertyNames		名稱
+Reset transformation	Icon-O-Matic-StylesList		重置變形
+Reverse	Icon-O-Matic-PathsList		反向
 Remove	Icon-O-Matic-PathsList		消除
 64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
 Load error	Icon-O-Matic-SVGImport		載入錯誤
+Style type	Icon-O-Matic-StyleTypes		款式類型
 Quit	Icon-O-Matic-Menu-File		退出
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		一個或多個形狀的變形過多。 HVIF 格式支援每個形狀最多 255 個變形。
+Gradient	Icon-O-Matic-StyleTypes		漸層
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	顏色 (#%02x%02x%02x)
+Detect orient.	Icon-O-Matic-PropertyNames		檢測方向。
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		新增 {0, plural, one{路徑} other{路徑}}
 One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		一個或多個形狀的路徑太多。 HVIF 格式支援每個形狀最多 255 個路徑。
 Add shape with path & style	Icon-O-Matic-Menu-Shape		新增帶有路徑和样式的形狀
+Radial	Icon-O-Matic-StyleTypes		徑向
+Text too long	Icon-O-Matic-StyledTextImport		文字太長
 OK	Icon-O-Matic-SVGImport		確認
+Import text	Icon-O-Matic-StyledTextImport		導入文字
+Append…	Icon-O-Matic-Menu-File		附加…
+Scale Y	Icon-O-Matic-PropertyNames		比例 Y
 Export icon	Icon-O-Matic-SavePanel	Dialog title	匯出圖示
 Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		旋轉路徑索引
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		增加 {0, plural, one{組件} other{組件}}
+Rotate indices forwards	Icon-O-Matic-PathsList		旋轉指數向前
 Save	Icon-O-Matic-Menu-File		存儲
 Cancel	Icon-O-Matic-StyledTextImport		取消
+Add circle	Icon-O-Matic-PathsList		添加圓圈
+Freeze transformation	Icon-O-Matic-ShapesList		凍結變形
+META:ICON attribute	Icon-O-Matic-SavePanel		META：圖示屬性
 Untitled	Icon-O-Matic-Main		無標題
+Max LOD	Icon-O-Matic-PropertyNames		最大LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		關閉前存儲目前圖示的變更嗎？
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		無法將檔案'%s'作為 SVG 文件開啟。\n\n
 Save as…	Icon-O-Matic-Menu-File		存儲為…
+Swatches	Icon-O-Matic-Menus		樣本
+<modify path>	Icon-O-Matic-PathCmd		<修改路徑>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	設定 %property%
+Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<无可撤销内容>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		刪除  {0, plural, one{路徑} other{路徑}}
 Add	Icon-O-Matic-StylesList		添加
+Modify vertex	Icon-O-Matic-ChangePointCmd		修改頂點
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		移動 {0, plural, one{風格} other{風格}}
+Scale	Icon-O-Matic-TransformationBoxStates		延伸
+All	Icon-O-Matic-Properties		全部
+Transformer	Icon-O-Matic-Menus		變形
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		翻動 {0, plural, one{頂點} other{頂點}}
+Invert selection	Icon-O-Matic-Properties		反轉選擇
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	連接變形。
+<unkown property>	Icon-O-Matic-PropertyNames		<未知屬性>
+Pick a color	Icon-O-Matic-ColorPicker		一種顏色
 Settings…	Icon-O-Matic-SavePanel		設定…
 Select all	Icon-O-Matic-PathManipulator		選擇全部
+Add with style	Icon-O-Matic-ShapesList		新增帶樣式
 New	Icon-O-Matic-Menu-File		新創
+Change perspective	Icon-O-Matic-PerspectiveCommand		改變透視
+Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		輕推 {0, plural, one{頂點} other{頂點}}
+Gradient type	Icon-O-Matic-StyleTypes		漸層型
+Perspective	Transformation		透視
+Export	Icon-O-Matic-Menu-File		匯出
+Width	Icon-O-Matic-PropertyNames		寬度
 Add reference image	Icon-O-Matic-ShapesList		新增參考影像
+Style	Icon-O-Matic-Menus		風格
 Edit	Icon-O-Matic-Menus		編輯

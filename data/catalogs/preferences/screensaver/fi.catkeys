@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ScreenSaver	2682415627
+1	finnish	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Näytön jännitesyötön hallinnan signalointi ei ole käytettävissä
 Blackness	ScreenSaver		Mustuus
 Fade now when mouse is here	ScreenSaver		Häivytä nyt kun hiiren kohdistin on tässä
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Peru
 Password:	ScreenSaver		Salasana:
 Screensaver settings	ScreenSaver		Näytönsäästäjän asetukset
 Password Window	ScreenSaver		Salasanaikkuna
+Use system password	ScreenSaver		Käytä järjestelmäsalasanaa
 Test	ScreenSaver		Testaa
 Could not load screen saver	ScreenSaver		Näytönsäästäjän lataus epäonnistui
 Use custom password	ScreenSaver		Käytä omaa salasanaa

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CodyCam	1657004106
+1	english	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		預期目標目錄
 reply: '%s'\n	SftpClient		回覆：'%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (真實密碼已發送)
@@ -23,33 +23,66 @@ Cannot register the video window	CodyCam		無法註冊視訊視窗
 capture rate expected	CodyCam		預期的熒幕捕獲頻次
 Quit	CodyCam		退出
 Cannot connect the video source to the video window	CodyCam		無法將視訊來源連接到視訊窗口
+read: %d\n	SftpClient		讀：%d\n
 Every 2 hours	CodyCam		每2小時
+Cannot get a time source	CodyCam		無法取得時間來源
 Every 4 hours	CodyCam		每4小時
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
 Closing the window	VideoConsumer.cpp		正在關閉視窗
 Never	CodyCam		絕不
 Every 8 hours	CodyCam		每8小時
+Cannot start the video source	CodyCam		無法啟動視訊來源
+Cannot set the time source for the video source	CodyCam		無法為視訊來源設定時間來源
+Renaming…	VideoConsumer.cpp		重新命名…
+Send to…	CodyCam		發送至…
 Password:	CodyCam		密码：
 still image filename expected	CodyCam		預期靜止圖片檔名
 File name:	CodyCam		檔案名稱：
 Directory:	CodyCam		目錄：
 Error setting type of output file	VideoConsumer.cpp		輸出文件類型設定錯誤
 Locking the window	VideoConsumer.cpp		正在鎖住視窗
+Cannot find an available video stream	CodyCam		找不到可用的視訊串流
+Upload…	VideoConsumer.cpp		上傳…
 password expected	CodyCam		需要密碼
+SFTP	CodyCam		SFTP
+Output	CodyCam		輸出
+server address expected	CodyCam		預期伺服器位址
 Cannot start the video window	CodyCam		無法啟動視訊視窗
+reply: %d, %d\n	FtpClient		回覆：%d, %d\n
 Cannot set the time source for the video window	CodyCam		無法設定視訊視窗的時間來源
 Every 15 minutes	CodyCam		每15分鐘
 Every 24 hours	CodyCam		每24小時
 Image Format Menu	CodyCam		圖片格式菜單
 Every 5 minutes	CodyCam		每5分鐘
 File upload failed	VideoConsumer.cpp		檔案上傳失敗
+Format:	CodyCam		格式：
+Start video	CodyCam		開始視頻
+Connected…	VideoConsumer.cpp		已連接…
+upload client name expected	CodyCam		上傳預期的客戶端名稱
 Every 15 seconds	CodyCam		每15秒
+Error getting initial latency for the capture node	CodyCam		取得捕獲節點的初始延遲時出錯
 password	CodyCam		密码
+Local	CodyCam		本地
+Stop video	CodyCam		停止視頻
+Last Capture: 	VideoConsumer.cpp		最後捕獲：
 Rate:	CodyCam		頻次：
+Couldn't find requested directory on server	VideoConsumer.cpp		在伺服器上找不到請求的目錄
+Cannot find the media roster	CodyCam		找不到媒體名單
+Type:	CodyCam		類型：
 Rename failed	VideoConsumer.cpp		再命名失敗
+unrecognized upload client specified	CodyCam		指定的上傳客戶端無法識別
 Server:	CodyCam		伺服器:
+Login:	CodyCam		登入:
 File	CodyCam		檔案
+read: %ld\n	SftpClient		讀取: %ld\n
 Every hour	CodyCam		每小時
+login ID expected	CodyCam		需要登入 ID
 Video settings	CodyCam		視頻設定
 Can't find an available connection to the video window	CodyCam		找不到視訊視窗的可用連接
+FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		建立輸出檔案時出錯
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		找不到視訊來源。\n您需要一個網路攝影機才能使用 CodyCam。
+Logging in…	VideoConsumer.cpp		正在登入…
+CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		寫入輸出檔時出錯
+Capture controls	CodyCam		捕捉控制

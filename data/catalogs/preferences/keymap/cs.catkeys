@@ -65,7 +65,7 @@ Modifier keys	Modifier keys window		Modifikační klávesy
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 mezinárodní
 Kazakh	KeymapNames		Kazašské
 Left Option	Keyboard Layout View		Levý Option
-Save as…	Keymap window		Uložit jako...
+Save as…	Keymap window		Uložit jako…
 Lithuanian (Standard)	KeymapNames		Litevské (standardní)
 Error: duplicate keys	Modifier keys window		Chyba: duplikátní klávesy
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
@@ -140,7 +140,7 @@ Keymap	System name		Rozložení klávesnice
 Slovene	KeymapNames		Slovinské
 Lithuanian	KeymapNames		Litevské
 Left Command	Keyboard Layout View		Levý Cmd
-Set modifier keys…	Keymap window		Nastavit modifikační klávesy...
+Set modifier keys…	Keymap window		Nastavit modifikační klávesy…
 Switch shortcut keys to Haiku mode	Keymap window		Změnit klávesové zkratky do módu Haiku
 Defaults	Keymap window		Nastavit výchozí
 ISO-9995	KeymapNames		ISO-9995
@@ -171,7 +171,7 @@ OPTION	Keyboard Layout View		OPTION
 Dutch	KeymapNames		Holandské
 Diaeresis trigger	Keymap window		Aktivace přehlásky
 Icelandic	KeymapNames		Islandské
-Open…	Keymap window		Otevřít...
+Open…	Keymap window		Otevřít…
 Left Control	Keyboard Layout View		Levý Ctrl
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (USA)
 Num Lock	Keyboard Layout View		Num Lock

@@ -1,17 +1,20 @@
-1	czech	x-vnd.Haiku-WebPositive	2942427387
+1	czech	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
 Copy	Console Window		Kopírovat
 (Finish: %date)	Download Window		(Dokončeno: %date)
 Open bookmarks confirmation	WebPositive Window		Otevřít potvrzení záložek
+Delete	BookmarkBar		Odstranit
 Download folder:	Settings Window		Složka stahování:
 Close window	WebPositive Window		Zavřít okno
+Rename	BookmarkBar		Přejmenovat
 Find:	WebPositive Window		Najít:
 Script console	WebPositive Window		Skriptovací konzole
 There was an error setting up the bookmark.	WebPositive Window		Chyba při nastavení záložky.
 Fonts	Settings Window		Písma
 Path	Cookie Manager		Cesta
 Bookmarks	WebPositive Window		Záložky
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Chyba při mazání záložky '%leaf%' z panelu.
 Use proxy server to connect to the internet	Settings Window		Použít proxy server pro připojení k internetu
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url hotovo
 Auto-hide interface in full screen mode	Settings Window		Automaticky skrývat rozhraní v režimu celé obrazovky
@@ -33,6 +36,7 @@ Browse…	Settings Window		Procházet…
 Resume prior session	Settings Window		Pokračovat v předchozí relaci
 Match case	WebPositive Window		Rozlišovat velikost písmen
 Proxy password:	Settings Window		Heslo proxy:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Chyba mazání záložky:\n'%path%'
 Size:	Font Selection view		Velikost:
 Page source	WebPositive Window		Zdroj stránky
 Proxy server port:	Settings Window		Port proxy serveru:
@@ -56,6 +60,7 @@ Cookies for %s	Cookie Manager		Sušenky pro %s
 Close	Download Window		Zavřít
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hledat výraz
+Old name: %s	BookmarkBar		Původní název: %s
 Expiration	Cookie Manager		Expirace
 Reload	WebPositive Window		Obnovit
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Váš procesor je moc starý a nepodporuje rozšíření SSE2, bez kterého WebPositive nemaká. Doporučujeme raději nainstalovat NetSurf.
@@ -95,6 +100,7 @@ Style:	Font Selection view		Styl:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Při vytváření souboru záložek došlo k chybě.\n\nChyba: %error
 OK	Download Window		OK
 Proxy username:	Settings Window		Uživatelské jméno proxy:
+Rename bookmark	BookmarkBar		Přejmenovat záložku
 Manage bookmarks	WebPositive Window		Spravovat záložky
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Restartovat
@@ -137,7 +143,7 @@ Bookmark error	WebPositive Window		Chyba záložky
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% z %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Save page as…	WebPositive Window		Uložit stránku jako...
+Save page as…	WebPositive Window		Uložit stránku jako…
 Zoom text only	WebPositive Window		Zvětšovat pouze text
 Page source error	WebPositive Window		Chyba zdroje stránky
 Auto-hide mouse pointer	Settings Window		Automaticky skrývat ukazatel myši
@@ -147,12 +153,15 @@ Window	WebPositive Window		Okno
 Proxy server address:	Settings Window		Adresa proxy serveru:
 Search page:	Settings Window		Stránka hledání:
 Settings	WebPositive Window		Nastavení
+Show in Tracker	BookmarkBar		Zobrazit v Trackeru
 Clear	URL Bar		Vyčistit
 Loading %url	WebPositive Window		Načítání %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Příliš žluťoučký kůň úpěl ďábelské ódy.
+OK	BookmarkBar		OK
 Start up:	Settings Window		Spouštění:
 Confirmation	WebPositive Window		Potvrzení
 Session cookie	Cookie Manager		Sušenky relace
+New name:	BookmarkBar		Nový název:
 No SSE2 support	WebPositive		Žádná podpora SSE2
 Open all	WebPositive Window		Otevřít všechny
 Cut	WebPositive Window		Vyjmout
@@ -162,4 +171,5 @@ Clear history	WebPositive Window		Smazat historii
 Cancel	WebPositive Window		Zrušit
 Script console	Console Window		Skriptovací konzole
 Copy	URL Bar		Kopírovat
+Open in new tab	BookmarkBar		Otevřít v nové kartě
 Open start page	Settings Window		Otevřít úvodní stránku

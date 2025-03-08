@@ -1,6 +1,28 @@
-1	english	x-vnd.Haiku-Mandelbrot	3486104401
+1	english	x-vnd.Haiku-Mandelbrot	2302392624
+Grassland	MandelbrotWindow		草原
+Tricorn	MandelbrotWindow		三角獸
+Orbit Trap	MandelbrotWindow		軌道陷阱
+Deepfrost	MandelbrotWindow		深層霜
 1 (none)	MandelbrotWindow		1 (無)
 Quit	MandelbrotWindow		退出
 Save as image…	MandelbrotWindow		存儲為影像…
+Fire	MandelbrotWindow		火
+High contrast	MandelbrotWindow		高對比度
+Full screen	MandelbrotWindow		全螢幕
+Midnight	MandelbrotWindow		午夜
+Burning Ship	MandelbrotWindow		燃燒的船
+Lightning	MandelbrotWindow		閃電
 About	MandelbrotWindow		關於
+Palette	MandelbrotWindow		調色盤
+Set	MandelbrotWindow		組
+Royal	MandelbrotWindow		皇家
+Subsampling	MandelbrotWindow		二次取樣
 File	MandelbrotWindow		檔案
+Julia	MandelbrotWindow		茱莉亞
+Frost	MandelbrotWindow		霜
+View	MandelbrotWindow		視圖
+Mandelbrot	System name		曼得布洛特
+Multibrot	MandelbrotWindow		Multibrot
+Iterations	MandelbrotWindow		迭代
+Spring	MandelbrotWindow		春天
+Mandelbrot	MandelbrotWindow		Mandelbrot

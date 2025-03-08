@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	3760185556
+1	finnish	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Asiakirjan tilastot
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Palauttaminen epäonnistui, tiedostoa ei löytynyt: ”%s”.
 Cut	Menus		Leikkaa
@@ -34,6 +34,7 @@ Bold	Menus		Lihavointi
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Jokin toinen sovellus muokkasi tiedostoa ”%file%”, ladataanko se uudelleen?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Jokin muu sovellus poisti tiedoston ”%file%”, palautetaanko se?
 Lines:	Statistics		Rivejä:
+Strikeout	Menus		Yliviivaa
 Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		tiedostossa ”%s” tallentamattomia muutoksia.\nPalautetaanko se viimeiseen tallennettuun versioon? 
 Save	SaveAlert		Tallenna

@@ -1,4 +1,4 @@
-1	german	application/x-vnd.Cortex.support	3127282947
+1	german	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		Kopfdaten mit Flags
 32 bit HLS	MediaString		HLS 32-bit
 Recording	MediaString		Aufnehmen
@@ -103,6 +103,7 @@ WAV format family	MediaString		WAV Format Familie
  (NTSC)	MediaString		 (NTSC)
 Physical input	MediaString		Physischer Eingang
 Big endian	MediaString		Big endian
+Sub	MediaString		SubWoofer
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# Byte (max)}other{# Bytes (max)}}
 YUV411	MediaString		YUV411
 Multistream media	MediaString		Multistream Media

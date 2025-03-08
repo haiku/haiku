@@ -16,7 +16,7 @@ Revert	PrefletWin		恢復
 Applications	PrefletView		應用程式
 {0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # 秒}other{Timeout: # 秒}}
 Upper right	GeneralView		右上
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		儲存首選項時發生錯誤。\n您的磁碟空間可能已用完
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		儲存偏好設定時發生錯誤。\n您的磁碟空間可能已用完
 Defaults	PrefletWin		默認值
 Upper left	GeneralView		左上
 Window width	GeneralView		視窗寬度

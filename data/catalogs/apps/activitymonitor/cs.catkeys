@@ -19,11 +19,11 @@ ActivityMonitor	System name		Monitor aktivit
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval obnovení:
 RX	DataSource	Shorter version for Receiving.	RX
-Settings…	ActivityWindow		Nastavení...
+Settings…	ActivityWindow		Nastavení…
 Block cache	DataSource		Bloková vyrovnávací paměť
 Memory	DataSource		Paměť
 CPU usage	DataSource		Využití CPU
-CPU speed	DataSource		rychlost CPU
+CPU speed	DataSource		Rychlost CPU
 Quit	ActivityWindow		Ukončit
 Raw clipboard	DataSource		Schránka bez formátu
 Settings	ActivityWindow		Nastavení
@@ -31,7 +31,7 @@ Used memory	DataSource		Využitá paměť
 Show legend	ActivityView		Zobrazit legendu
 Cached memory	DataSource		Vyrovnávací paměť
 CPU %d usage	DataSource		Využití CPU %d
-CPU %d speed	DataSource		rychlost CPU %d
+CPU %d speed	DataSource		Rychlost CPU %d
 File	ActivityWindow		Soubor
 Ports	DataSource		Porty
 Page faults	DataSource		Chyby stránkování

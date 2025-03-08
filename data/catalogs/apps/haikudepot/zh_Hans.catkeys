@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	2400534211
+1	english	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条款下载出错
 Available packages	MainWindow		可用软件包
 It was not possible to create the new user.	UserLoginWindow		无法创建新用户。
@@ -212,6 +212,7 @@ The nickname is required.	UserLoginWindow		请填写昵称。
 Apply changes	PackageResult		应用修改
 Server error	ServerHelper		服务器错误
 Rate package	RatePackageWindow		软件包评分
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		 \"%PackageName%\" 的记录视图
 Sending anonymous usage data	MainWindow		发送匿名使用数据
 Log in	UserLoginWindow		登陆
 Usage conditions	UserUsageConditions		使用条款

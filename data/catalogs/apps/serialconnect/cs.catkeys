@@ -21,7 +21,7 @@ Everything sent, waiting for acknowledge	XModemStatus		Vše odesláno, čekám n
 Odd	SerialWindow	Parity	Lichá
 Flow control	SerialWindow		Řízení toku
 file transfer progress	SerialWindow		postup přenosu souboru
-CRC requested	XModemStatus		vyžádáno CRC
+CRC requested	XModemStatus		Vyžádáno CRC
 Data bits	SerialWindow		Datové bity
 Both	SerialWindow	Flowcontrol	Obojí
 Edit	SerialWindow		Upravit

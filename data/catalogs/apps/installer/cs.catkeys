@@ -35,7 +35,7 @@ Finishing installation.	InstallProgress		Dokončuji instalaci.
 Install from:	InstallerWindow		Instalovat z:
 Additional disk space required: 0.0 KiB	InstallerWindow		Vyžadován další diskový prostor: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Tento software je nedokončený! Znamená to, že můžete přijít o důležitá data. Často zálohujte! Byli jste varováni.\n\n\n
-???	InstallerWindow	Unknown currently copied item	Neznámé
+???	InstallerWindow	Unknown currently copied item	???
 Install anyway	InstallProgress		Přesto nainstalovat
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Pokud instalujete Haiku na skutečný hardware (nikoli v emulátoru), můžete si připravit oddíl disku z jiného OS (můžete například použít GParted Live-CD, který umí také změnit velikost stávajících oddílů, abyste udělali místo pro Haiku).\nNastavení disků z instalátoru umí také spravovat oddíly, ale neumí měnit jejich velikost. Ačkoli byl program pro nastavení disků v průběhu let důkladně testován, je přesto doporučeno udělat aktuální zálohu oddílů. Jen pro případ…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Instalátor nastaví oddíl Haiku jako startovací, ale nezačleňuje Haiku do stávající startovací nabídky. Pokud již používáte GRUB, můžete do něj Haiku přidat.\nVíce podrobností najdete v průvodci o startování Haiku na našem webu at https://www.haiku-os.org/guides/booting.\nNebo můžete nastavit startovací nabídku z nabídky instalátoru \"Nástroje\", podívejte se do sekce o aplikaci \"BootManager\" v Uživatelské příručce Haiku.\n\n\n
@@ -54,7 +54,7 @@ Stop	InstallerWindow	In alert after pressing Stop	Zastavit
 Boot sector successfully written.	InstallProgress		Boot sektor úspěšně zapsán.
 Failed to launch BootManager	InstallerWindow		Chyba spuštění Správce spouštění
 Writing bootsector.	InstallProgress		Zapisuji startovací sektor.
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Došlo k chybě a instalace nebyla dokončena:\n\nChyba: %s
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Došlo k chybě a instalace nebyla dokončena:\n\nChyba:  %s
 Restart	InstallerWindow		Restartovat
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk nemohl být připojen. Zvolte, prosím, jiný disk.
 Begin	InstallerWindow		Začít
@@ -67,13 +67,13 @@ Installation canceled.	InstallProgress		Instalace zrušena.
 Stop	InstallerWindow		Zastavit
 Cancel	InstallerWindow		Zrušit
 Continue	InstallerWindow	In alert after pressing Stop	Pokračovat
-Scanning for disks…	InstallerWindow		Prohledávám disky...
+Scanning for disks…	InstallerWindow		Prohledávám disky…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Spouštění programu pro nastavení disků...\n\nPo ukončení programu pro nastavení disků bude instalace pokračovat.
 The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Instalace ještě není kompletní!\nOpravdu ji chete přerušit?
 Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		Správce spouštění stále běží…\n\nPro pokračování v instalaci aplikaci zavřete.
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Oddíl nemohl být připojen. Zvolte, prosím, jiný oddíl.
-Set up partitions…	InstallerWindow		Nastavení oddílů...
-Install progress:  	InstallerWindow		Průběh instalace:
+Set up partitions…	InstallerWindow		Nastavení oddílů…
+Install progress:  	InstallerWindow		Průběh instalace:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nelze instalovat obsah disk sám na sebe. Zvolte, prosím, jiný disk.
 Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Nejprve zavřete Správce spouštění a Nastavení disků před ukončením instalace.
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Zvolte zdrojový disk z rozbalovací nabídky, a pak stiskněte 'Začít'.
@@ -82,6 +82,6 @@ Quit BootManager	InstallerWindow		Ukončit Správce spouštění
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Určitě si přejete instalovat do současného startovacího disku? Instalátor bude muset restartovat Váš počítač pokud budete pokračovat.
 Onto:	InstallerWindow		Do:
 Tools	InstallerWindow		Nástroje
-scanning…	InstallerWindow		Prohledávání...
+scanning…	InstallerWindow		prohledávání…
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Zvolte cílový disk z rozbalovací nabídky, a pak stiskněte 'Začít'.
 Continue	InstallerApp		Pokračovat

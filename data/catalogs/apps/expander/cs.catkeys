@@ -4,7 +4,7 @@ Other	ExpanderPreferences		Ostatní
 Automatically show contents listing	ExpanderPreferences		Automaticky zobrazit výpis obsahu
 Expander	System name		Rozbalovač
 Expander: Choose destination	DirectoryFilePanel		Rozbalovač: Vybrat cíl
-Set source…	ExpanderMenu		Nastavit zdroj...
+Set source…	ExpanderMenu		Nastavit zdroj…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Cíl není adresář.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Adresář byl přesunut, přejmenován nebo není podporován.
@@ -24,7 +24,7 @@ Expander settings	ExpanderPreferences		Nastavení rozbalovače
 Error when expanding archive	ExpanderWindow		Chyba při rozbalování archivu
 Expand	ExpanderMenu		Rozbalit
 Failed to create the destination folder.	ExpanderWindow		Chyba při vytváření cílového adresáře.
-Settings…	ExpanderMenu		Nastavení...
+Settings…	ExpanderMenu		Nastavení…
 Select current	DirectoryFilePanel		Vybrat aktuální
 Expanding '%s'…	ExpanderWindow		Rozbaluji '%s'…
 OK	ExpanderPreferences		OK
@@ -35,7 +35,7 @@ Show contents	ExpanderWindow		Zobrazit obsah
 Stop	ExpanderMenu		Zastavit
 Select '%s'…	DirectoryFilePanel		Vybráno '%s'…
 Expansion	ExpanderPreferences		Rozbalení
-Set destination…	ExpanderMenu		Nastavit cíl...
+Set destination…	ExpanderMenu		Nastavit cíl…
 Continue	ExpanderWindow		Pokračovat
  is not supported	ExpanderWindow		 není podporováno
 Cancel	ExpanderPreferences		Zrušit

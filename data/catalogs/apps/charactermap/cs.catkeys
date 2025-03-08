@@ -16,7 +16,7 @@ Mro	UnicodeBlocks		Mro
 Mongolian	UnicodeBlocks		Mongolština
 Pau Cin Hau	UnicodeBlocks		Pau Cin Hau
 Yezidi	UnicodeBlocks		Jezídské
-Linear B ideograms	UnicodeBlocks		Ideogramy lineárního písma B 
+Linear B ideograms	UnicodeBlocks		Ideogramy lineárního písma B
 Caucasian Albanian	UnicodeBlocks		Kavkazská Albánština
 CJK unified ideographs extension D	UnicodeBlocks		Rozšíření CJK pro sjednocené ideografické znaky D
 Sharada	UnicodeBlocks		Šarada
@@ -126,7 +126,7 @@ Gothic	UnicodeBlocks		Gothic
 Specials	UnicodeBlocks		Speciální
 Sinhala Archaic numbers	UnicodeBlocks		Sinhálská archaická čísla
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
-Latin-1 supplement	UnicodeBlocks		Doplněk Latin-1
+Latin-1 supplement	UnicodeBlocks		Doplněk latinka-1
 CJK unified ideographs extension A	UnicodeBlocks		CJK unifikované ideogramy, rozšíření A
 Linear B syllabary	UnicodeBlocks		Slabikář lineárního písma B
 Yi syllables	UnicodeBlocks		Yi slabiky
@@ -167,7 +167,7 @@ Box drawing	UnicodeBlocks		Kreslení boxů
 Egyptian hieroglyphs	UnicodeBlocks		Egyptské hieroglyfy
 Vai	UnicodeBlocks		Vai
 Meetei Mayek extensions	UnicodeBlocks		Meetei Mayek rozšíření
-Ethiopic extended	UnicodeBlocks		Rozšířená Etiopština
+Ethiopic extended	UnicodeBlocks		Rozšířená etiopština
 CJK compatibility	UnicodeBlocks		CJK kompatibilita
 Tai Le	UnicodeBlocks		Tai Le
 Old Sogdian	UnicodeBlocks		Starosogdiánsky
@@ -232,7 +232,7 @@ Common Indic number forms	UnicodeBlocks		Indické běžné formy čísel
 Kharoshthi	UnicodeBlocks		Kharoshthi
 Buginese	UnicodeBlocks		Buginese
 Telugu	UnicodeBlocks		Telugština
-Cyrillic supplement	UnicodeBlocks		Doplněk Cyrilice
+Cyrillic supplement	UnicodeBlocks		Doplněk cyrilice
 Grantha	UnicodeBlocks		Grantha
 Yi Radicals	UnicodeBlocks		Yi radikály
 Supplementary private use area A	UnicodeBlocks		Doplňková soukromá oblast A
@@ -263,7 +263,7 @@ Khudawadi	UnicodeBlocks		Khudawadi
 Glagotic	UnicodeBlocks		Hlaholice
 Cyrillic extended B	UnicodeBlocks		Rozšířená Cyrilice B
 Anatolian hieroglyphs	UnicodeBlocks		Anatolské hieroglyfy
-Copy as escaped byte string	CharacterView		Kopírovat jako eskejpovaný bajtový řetězec.
+Copy as escaped byte string	CharacterView		Kopírovat jako eskejpovaný bajtový řetězec
 Tai Xuan Jing symbols	UnicodeBlocks		Symboly Tai Xuan Jing
 Hiragana	UnicodeBlocks		Hiragana
 Tagbanwa	UnicodeBlocks		Tagbanwa

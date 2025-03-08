@@ -1,4 +1,4 @@
-1	german	application/x-vnd.Cortex.Route	51642783
+1	german	application/x-vnd.Cortex.Route	2361015030
 Node '%name%' released	CortexRouteApp		Node '%name%' freigegeben
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		Über Cortex/Route …
@@ -16,6 +16,7 @@ Connection '%name%' broken	CortexRouteApp		Verbindung '%name%' abgebrochen
 Between:	CortexRouteApp		Zwischen:
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Öffnen …
+Pull palettes	CortexRouteApp		Hilfs-Fenster mitbewegen
 Connection made	CortexRouteApp		Verbindung hergestellt
 Show transport	CortexRouteApp		Transport anzeigen
 Show add-ons	CortexRouteApp		Add-ons anzeigen

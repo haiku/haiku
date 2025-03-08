@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1836451181
+1	finnish	x-vnd.Haiku-libtracker	4192200646
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -276,6 +276,7 @@ Restoring: 	StatusWindow		Palautetaan:
 The Tracker must be running to set the default printer.	PoseView		Oletustulostimen asettamiseksi Seuraajan on oltava käynnissä.
 calculating…	InfoWindow		lasketaan...
 Preferred for file	OpenWithWindow		Ensisijainen tiedostolle
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# selected} other{# selected}}
 OK	AutoMounterSettings		Valmis
 copying	FSUtils		kopioidaan
 MIME String	AttributesView		MIME-merkkijono

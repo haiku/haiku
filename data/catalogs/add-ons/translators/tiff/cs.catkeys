@@ -6,7 +6,7 @@ identify_tiff_header: invalid document index\n	TIFFTranslator		identifikace_hlav
 Use compression:	TIFFView		Použít kompresi:
 TIFF image translator	TIFFView		Překladač TIFF obrázků
 TIFF image	TIFFTranslator		TIFF obrázek
-TIFF Settings	TIFFMain		nastavení TIFF
+TIFF Settings	TIFFMain		Nastavení TIFF
 TIFF image translator	TIFFTranslator		Překladač TIFF obrázků
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identifikace_hlavičky_tiff: nelze nastavit adresář\n
 Version %d.%d.%d, %s	TIFFView		Verze %d.%d.%d, %s
