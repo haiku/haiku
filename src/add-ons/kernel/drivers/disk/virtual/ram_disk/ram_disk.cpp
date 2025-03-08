@@ -575,36 +575,23 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			TRACE("ramdisk: trim %" B_PRIu64 " bytes from %" B_PRIu64 "\n",
 				length, offset);
 
-			ASSERT(offset % B_PAGE_SIZE == 0);
-			ASSERT(length % B_PAGE_SIZE == 0);
-
-			BStackOrHeapArray<vm_page*, 16> pages(length / B_PAGE_SIZE);
-			if (!pages.IsValid()) {
-				result = B_NO_MEMORY;
-				break;
-			}
-
-			cache_get_pages(fCache, (off_t)offset, (off_t)length, false, pages);
-
 			AutoLocker<VMCache> locker(fCache);
 			for (uint64 j = 0; j < length / B_PAGE_SIZE; j++) {
-				// If we run out of pages (some may already be trimmed), stop.
-				if (pages[j] == NULL)
-					break;
+				vm_page* page = fCache->LookupPage(offset + j * B_PAGE_SIZE);
+				if (page == NULL || page->busy)
+					continue;
 
 				TRACE("free range %" B_PRIu32 ", page %" B_PRIu64 ", offset %"
 					B_PRIu64 "\n", i, j, offset);
-				DEBUG_PAGE_ACCESS_START(pages[j]);
+				DEBUG_PAGE_ACCESS_START(page);
 
-				if (pages[j]->Cache() != NULL)
-					fCache->RemovePage(pages[j]);
-				vm_page_free(NULL, pages[j]);
+				fCache->RemovePage(page);
+				vm_page_free(NULL, page);
 				trimmedSize += B_PAGE_SIZE;
 			}
 		}
 
 		trimData->trimmed_size = trimmedSize;
-
 		return result;
 	}
 
