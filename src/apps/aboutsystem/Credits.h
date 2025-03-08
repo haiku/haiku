@@ -397,6 +397,7 @@ static const Translation kTranslations[] = {
 		"Yurii Zamotailo\n" // Pootle: IaH
 		"Yury\n"
 		"Алексей Мехоношин\n"
+        "Путий Иван (itvanya)\n"
 		// "taos\n" bugfixes only, no actual translations
 	},
 	{ "sk",
