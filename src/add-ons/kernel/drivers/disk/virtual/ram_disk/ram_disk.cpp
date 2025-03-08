@@ -587,15 +587,16 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			cache_get_pages(fCache, (off_t)offset, (off_t)length, false, pages);
 
 			AutoLocker<VMCache> locker(fCache);
-			uint64 j;
-			for (j = 0; j < length / B_PAGE_SIZE; j++) {
+			for (uint64 j = 0; j < length / B_PAGE_SIZE; j++) {
 				// If we run out of pages (some may already be trimmed), stop.
 				if (pages[j] == NULL)
 					break;
 
 				TRACE("free range %" B_PRIu32 ", page %" B_PRIu64 ", offset %"
 					B_PRIu64 "\n", i, j, offset);
-				if (pages[j]->Cache())
+				DEBUG_PAGE_ACCESS_START(pages[j]);
+
+				if (pages[j]->Cache() != NULL)
 					fCache->RemovePage(pages[j]);
 				vm_page_free(NULL, pages[j]);
 				trimmedSize += B_PAGE_SIZE;
