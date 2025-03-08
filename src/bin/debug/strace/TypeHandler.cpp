@@ -120,7 +120,7 @@ private:
 	string RenderValue(Context &context, uint64 value) const
 	{
 		string rendered = context.FormatUnsigned(value);
-		if (value <= UINT32_MAX && (T)value <= 0) {
+		if ((T)value <= 0) {
 			rendered += " ";
 			rendered += strerror(value);
 		}
