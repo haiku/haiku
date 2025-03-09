@@ -32,7 +32,6 @@ class EventStream;
 class Overlay;
 class RenderingBuffer;
 class ServerBitmap;
-class UpdateQueue;
 
 
 class HWInterfaceListener {
@@ -147,8 +146,7 @@ public:
 	// Invalidate is used for scheduling an area for updating
 	virtual	status_t			InvalidateRegion(const BRegion& region);
 	virtual	status_t			Invalidate(const BRect& frame);
-	// while as CopyBackToFront() actually performs the operation
-	// either directly or asynchronously by the UpdateQueue thread
+	// while CopyBackToFront() actually performs the operation
 	virtual	status_t			CopyBackToFront(const BRect& frame);
 
 protected:

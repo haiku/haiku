@@ -55,7 +55,6 @@ SharedLibrary libhwinterface.so :
 	DWindowBuffer.cpp
 	HWInterface.cpp
 	RGBColor.cpp
-	UpdateQueue.cpp
 
 	NetReceiver.cpp
 	NetSender.cpp

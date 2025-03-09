@@ -16,7 +16,6 @@
 class BBitmap;
 class BBitmapBuffer;
 class CardWindow;
-class UpdateQueue;
 
 
 class ViewHWInterface : public HWInterface {

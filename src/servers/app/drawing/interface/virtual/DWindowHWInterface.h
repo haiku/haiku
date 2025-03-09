@@ -21,7 +21,6 @@
 
 class DWindowBuffer;
 class DWindow;
-class UpdateQueue;
 
 
 class DWindowHWInterface : public HWInterface {
@@ -60,17 +59,6 @@ public:
 	virtual status_t			SetBrightness(float);
 	virtual status_t			GetBrightness(float*);
 
-	// query for available hardware accleration and perform it
-	virtual	uint32				AvailableHWAcceleration() const;
-
-	virtual	void				CopyRegion(const clipping_rect* sortedRectList,
-									uint32 count, int32 xOffset, int32 yOffset);
-	virtual	void				FillRegion(/*const*/ BRegion& region,
-									const rgb_color& color, bool autoSync);
-	virtual	void				InvertRegion(/*const*/ BRegion& region);
-
-	virtual	void				Sync();
-
 	// frame buffer access
 	virtual	RenderingBuffer*	FrontBuffer() const;
 	virtual	RenderingBuffer*	BackBuffer() const;
@@ -97,16 +85,10 @@ private:
 			status_t			_SetupDefaultHooks();
 			status_t			_UpdateFrameBufferConfig();
 
-			void				_RegionToRectParams(/*const*/ BRegion* region,
-									uint32* count) const;
-			uint32				_NativeColor(const rgb_color& color) const;
-
 private:
 			int					fCardFD;
 			image_id			fAccelerantImage;
 			GetAccelerantHook	fAccelerantHook;
-			engine_token*		fEngineToken;
-			sync_token			fSyncToken;
 
 			// required hooks - guaranteed to be valid
 			acquire_engine			fAccAcquireEngine;
@@ -132,11 +114,6 @@ private:
 			frame_buffer_config	fFrameBufferConfig;
 
 			BString				fCardNameInDevFS;
-
-	mutable	fill_rect_params*	fRectParams;
-	mutable	uint32				fRectParamsCount;
-	mutable	blit_params*		fBlitParams;
-	mutable	uint32				fBlitParamsCount;
 };
 
 #endif // D_WINDOW_HW_INTERACE_H

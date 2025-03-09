@@ -47,7 +47,6 @@
 #include "RGBColor.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
-#include "UpdateQueue.h"
 
 
 #ifdef DEBUG_DRIVER_MODULE
@@ -309,8 +308,6 @@ DWindowHWInterface::DWindowHWInterface()
 	fCardFD(-1),
 	fAccelerantImage(-1),
 	fAccelerantHook(NULL),
-	fEngineToken(NULL),
-	fSyncToken(),
 
 	// required hooks
 	fAccAcquireEngine(NULL),
@@ -331,18 +328,11 @@ DWindowHWInterface::DWindowHWInterface()
 	fAccScreenBlit(NULL),
 	fAccSetCursorShape(NULL),
 	fAccMoveCursor(NULL),
-	fAccShowCursor(NULL),
-
-	fRectParams(new (std::nothrow) fill_rect_params[kDefaultParamsCount]),
-	fRectParamsCount(kDefaultParamsCount),
-	fBlitParams(new (std::nothrow) blit_params[kDefaultParamsCount]),
-	fBlitParamsCount(kDefaultParamsCount)
+	fAccShowCursor(NULL)
 {
 	fDisplayMode.virtual_width = 800;
 	fDisplayMode.virtual_height = 600;
 	fDisplayMode.space = B_RGBA32;
-
-	memset(&fSyncToken, 0, sizeof(sync_token));
 }
 
 
@@ -352,9 +342,6 @@ DWindowHWInterface::~DWindowHWInterface()
 		fWindow->Lock();
 		fWindow->Quit();
 	}
-
-	delete[] fRectParams;
-	delete[] fBlitParams;
 
 	be_app->Lock();
 	be_app->Quit();
@@ -366,9 +353,6 @@ status_t
 DWindowHWInterface::Initialize()
 {
 	status_t ret = HWInterface::Initialize();
-
-	if (!fRectParams || !fBlitParams)
-		return B_NO_MEMORY;
 
 	if (ret >= B_OK) {
 		for (int32 i = 1; fCardFD != B_ENTRY_NOT_FOUND; i++) {
@@ -931,144 +915,6 @@ DWindowHWInterface::GetBrightness(float* brightness)
 }
 
 
-uint32
-DWindowHWInterface::AvailableHWAcceleration() const
-{
-	uint32 flags = 0;
-
-	if (!IsDoubleBuffered()) {
-		if (fAccScreenBlit)
-			flags |= HW_ACC_COPY_REGION;
-		if (fAccFillRect)
-			flags |= HW_ACC_FILL_REGION;
-		if (fAccInvertRect)
-			flags |= HW_ACC_INVERT_REGION;
-	}
-
-	return flags;
-}
-
-
-void
-DWindowHWInterface::CopyRegion(const clipping_rect* sortedRectList,
-	uint32 count, int32 xOffset, int32 yOffset)
-{
-	if (fAccScreenBlit && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken,
-				&fEngineToken) >= B_OK) {
-			// make sure the blit_params cache is large enough
-			if (fBlitParamsCount < count) {
-				fBlitParamsCount = (count / kDefaultParamsCount + 1)
-					* kDefaultParamsCount;
-				// NOTE: realloc() could be used instead...
-				blit_params* params
-					= new(std::nothrow) blit_params[fBlitParamsCount];
-				if (params) {
-					delete[] fBlitParams;
-					fBlitParams = params;
-				} else {
-					count = fBlitParamsCount;
-				}
-			}
-			// convert the rects
-			for (uint32 i = 0; i < count; i++) {
-				fBlitParams[i].src_left
-					= (uint16)sortedRectList[i].left + fXOffset;
-				fBlitParams[i].src_top
-					= (uint16)sortedRectList[i].top + fYOffset;
-
-				fBlitParams[i].dest_left
-					= (uint16)sortedRectList[i].left + xOffset + fXOffset;
-				fBlitParams[i].dest_top
-					= (uint16)sortedRectList[i].top + yOffset + fYOffset;
-
-				// NOTE: width and height are expressed as distance, not count!
-				fBlitParams[i].width = (uint16)(sortedRectList[i].right
-					- sortedRectList[i].left);
-				fBlitParams[i].height = (uint16)(sortedRectList[i].bottom
-					- sortedRectList[i].top);
-			}
-
-			// go
-			fAccScreenBlit(fEngineToken, fBlitParams, count);
-
-			// done
-			if (fAccReleaseEngine)
-				fAccReleaseEngine(fEngineToken, &fSyncToken);
-
-			// sync
-			if (fAccSyncToToken)
-				fAccSyncToToken(&fSyncToken);
-		}
-	}
-}
-
-
-void
-DWindowHWInterface::FillRegion(/*const*/ BRegion& region,
-	const rgb_color& color, bool autoSync)
-{
-	if (fAccFillRect && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken,
-				&fEngineToken) >= B_OK) {
-			// convert the region
-			uint32 count;
-			_RegionToRectParams(&region, &count);
-
-			// go
-			fAccFillRect(fEngineToken, _NativeColor(color), fRectParams, count);
-
-			// done
-			if (fAccReleaseEngine)
-				fAccReleaseEngine(fEngineToken, &fSyncToken);
-
-			// sync
-			if (autoSync && fAccSyncToToken)
-				fAccSyncToToken(&fSyncToken);
-		}
-	}
-}
-
-
-void
-DWindowHWInterface::InvertRegion(/*const*/ BRegion& region)
-{
-	if (fAccInvertRect && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken,
-				&fEngineToken) >= B_OK) {
-			// convert the region
-			uint32 count;
-			_RegionToRectParams(&region, &count);
-
-			// go
-			fAccInvertRect(fEngineToken, fRectParams, count);
-
-			// done
-			if (fAccReleaseEngine)
-				fAccReleaseEngine(fEngineToken, &fSyncToken);
-
-			// sync
-			if (fAccSyncToToken)
-				fAccSyncToToken(&fSyncToken);
-
-		} else {
-			fprintf(stderr, "AcquireEngine failed!\n");
-		}
-	} else {
-		fprintf(stderr, "AccelerantHWInterface::InvertRegion() called, but "
-			"hook not available!\n");
-	}
-}
-
-
-void
-DWindowHWInterface::Sync()
-{
-	if (fAccSyncToToken)
-		fAccSyncToToken(&fSyncToken);
-}
-
-
 RenderingBuffer*
 DWindowHWInterface::FrontBuffer() const
 {
@@ -1111,66 +957,4 @@ DWindowHWInterface::SetOffset(int32 left, int32 top)
 	// TODO: someone would have to call DrawingEngine::Update() now!
 
 	WriteUnlock();
-}
-
-
-void
-DWindowHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
-	uint32* count) const
-{
-	*count = region->CountRects();
-	if (fRectParamsCount < *count) {
-		fRectParamsCount = (*count / kDefaultParamsCount + 1)
-			* kDefaultParamsCount;
-		// NOTE: realloc() could be used instead...
-		fill_rect_params* params
-			= new(std::nothrow) fill_rect_params[fRectParamsCount];
-		if (params) {
-			delete[] fRectParams;
-			fRectParams = params;
-		} else {
-			*count = fRectParamsCount;
-		}
-	}
-
-	for (uint32 i = 0; i < *count; i++) {
-		clipping_rect r = region->RectAtInt(i);
-		fRectParams[i].left = (uint16)r.left + fXOffset;
-		fRectParams[i].top = (uint16)r.top + fYOffset;
-		fRectParams[i].right = (uint16)r.right + fXOffset;
-		fRectParams[i].bottom = (uint16)r.bottom + fYOffset;
-	}
-}
-
-
-uint32
-DWindowHWInterface::_NativeColor(const rgb_color& color) const
-{
-	// NOTE: This functions looks somehow suspicios to me.
-	// It assumes that all graphics cards have the same native endianess, no?
-	switch (fDisplayMode.space) {
-		case B_CMAP8:
-		case B_GRAY8:
-			return RGBColor(color).GetColor8();
-
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			return RGBColor(color).GetColor15();
-
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-			return RGBColor(color).GetColor16();
-
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE: {
-			uint32 native = (color.alpha << 24) | (color.red << 16)
-				| (color.green << 8) | (color.blue);
-			return native;
-		}
-	}
-	return 0;
 }

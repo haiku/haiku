@@ -35,7 +35,6 @@
 #include "PortLink.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
-#include "UpdateQueue.h"
 
 
 #ifdef DEBUG_DRIVER_MODULE
@@ -51,8 +50,6 @@ const unsigned char kEmptyCursor[] = { 16, 1, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-static const bool kDefaultDoubleBuffered = true;
 
 enum {
 	MSG_UPDATE = 'updt'
@@ -410,8 +407,6 @@ ViewHWInterface::ViewHWInterface()
 	fFrontBuffer(NULL),
 	fWindow(NULL)
 {
-	SetAsyncDoubleBuffered(kDefaultDoubleBuffered);
-
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
 	fDisplayMode.space = B_RGBA32;
