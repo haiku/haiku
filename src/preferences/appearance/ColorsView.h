@@ -54,7 +54,6 @@ private:
 
 			void				_SetColor(int32 index, rgb_color color);
 			void				_SetColor(color_which which, rgb_color color);
-			void				_SetOneColor(color_which which, rgb_color color);
 			void				_SetCurrentColor(rgb_color color);
 			void				_SetUIColors(const BMessage& colors);
 
