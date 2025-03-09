@@ -525,11 +525,12 @@ put_chars(char **_buffer, size_t *_bufferSize, const char *chars)
 		return true;
 
 	length = strlen(chars);
-	*_bufferSize -= length;
-
-	if (*_bufferSize <= 0)
+	if (*_bufferSize <= length) {
+		*_bufferSize = 0;
 		return false;
+	}
 
+	*_bufferSize -= length;
 	memcpy(buffer, chars, length);
 	buffer += length;
 	buffer[0] = '\0';
@@ -546,11 +547,12 @@ put_char(char **_buffer, size_t *_bufferSize, char c)
 {
 	char *buffer = *_buffer;
 
-	*_bufferSize -= 1;
-
-	if (*_bufferSize <= 0)
+	if (*_bufferSize <= 1) {
+		*_bufferSize = 0;
 		return false;
+	}
 
+	*_bufferSize -= 1;
 	buffer[0] = c;
 	buffer[1] = '\0';
 
@@ -872,8 +874,7 @@ get_driver_settings_string(void *_handle, char *buffer, size_t *_bufferSize,
 			0, flat);
 	}
 
-	*_bufferSize -= bufferSize;
-	return bufferSize >= 0 ? B_OK : B_BUFFER_OVERFLOW;
+	return bufferSize > 0 ? B_OK : B_BUFFER_OVERFLOW;
 }
 
 
