@@ -838,6 +838,11 @@ nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
+	if (inode->Type() == S_IFDIR && (openMode & O_RWMASK) != O_RDONLY)
+		return B_IS_A_DIRECTORY;
+	if ((openMode & O_DIRECTORY) != 0 && inode->Type() != S_IFDIR)
+		return B_NOT_A_DIRECTORY;
+
 	if (inode->Type() == S_IFDIR || inode->Type() == S_IFLNK) {
 		*_cookie = NULL;
 		return B_OK;
