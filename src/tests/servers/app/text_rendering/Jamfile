@@ -9,7 +9,11 @@ SimpleTest TextRendering :
 	main.cpp
 	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] ;
 
+SimpleTest TextRenderer :
+	renderer.cpp
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] ;
+
 if ( $(TARGET_PLATFORM) = libbe_test ) {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : TextRendering
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : TextRendering TextRenderer
 		: tests!apps ;
 }
