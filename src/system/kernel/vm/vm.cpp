@@ -6050,8 +6050,14 @@ _user_get_area_info(area_id area, area_info* userInfo)
 	if (status < B_OK)
 		return status;
 
-	// TODO: do we want to prevent userland from seeing kernel protections?
-	//info.protection &= B_USER_PROTECTION;
+	if (geteuid() != 0) {
+		if (info.team != team_get_current_team_id()) {
+			if (team_geteuid(info.team) != geteuid())
+				return B_NOT_ALLOWED;
+		}
+
+		info.protection &= B_USER_AREA_FLAGS;
+	}
 
 	if (user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)
 		return B_BAD_ADDRESS;
@@ -6076,7 +6082,14 @@ _user_get_next_area_info(team_id team, ssize_t* userCookie, area_info* userInfo)
 	if (status != B_OK)
 		return status;
 
-	//info.protection &= B_USER_PROTECTION;
+	if (geteuid() != 0) {
+		if (info.team != team_get_current_team_id()) {
+			if (team_geteuid(info.team) != geteuid())
+				return B_NOT_ALLOWED;
+		}
+
+		info.protection &= B_USER_AREA_FLAGS;
+	}
 
 	if (user_memcpy(userCookie, &cookie, sizeof(ssize_t)) < B_OK
 		|| user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)
