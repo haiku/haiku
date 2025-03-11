@@ -4084,20 +4084,16 @@ vm_init_post_modules(kernel_args* args)
 
 
 void
-permit_page_faults(void)
+permit_page_faults()
 {
-	Thread* thread = thread_get_current_thread();
-	if (thread != NULL)
-		atomic_add(&thread->page_faults_allowed, 1);
+	thread_get_current_thread()->page_faults_allowed++;
 }
 
 
 void
-forbid_page_faults(void)
+forbid_page_faults()
 {
-	Thread* thread = thread_get_current_thread();
-	if (thread != NULL)
-		atomic_add(&thread->page_faults_allowed, -1);
+	thread_get_current_thread()->page_faults_allowed--;
 }
 
 
@@ -4289,6 +4285,9 @@ fault_get_page(PageFaultContext& context)
 
 		page = cache->LookupPage(context.cacheOffset);
 		if (page != NULL && page->busy) {
+			if (thread_get_current_thread()->page_fault_waits_allowed < 1)
+				return B_BUSY;
+
 			// page must be busy -- wait for it to become unbusy
 			context.UnlockAll(cache);
 			cache->ReleaseRefLocked();

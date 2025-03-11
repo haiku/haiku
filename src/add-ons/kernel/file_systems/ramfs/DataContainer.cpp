@@ -3,14 +3,16 @@
  * Copyright 2019-2024, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
+
 #include "DataContainer.h"
 
 #include <StackOrHeapArray.h>
 #include <util/AutoLock.h>
 #include <util/BitUtils.h>
 #include <slab/Slab.h>
-
+#include <thread.h>
 #include <vfs.h>
+
 #include <vm/VMCache.h>
 #include <vm/vm_page.h>
 #include "VMAnonymousNoSwapCache.h"
@@ -321,8 +323,8 @@ DataContainer::_SwitchToCacheMode()
 
 
 status_t
-DataContainer::_DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,
-	size_t* bytesProcessed, bool isWrite)
+DataContainer::_DoCacheIO(off_t offset, uint8* buffer, ssize_t length,
+	size_t* bytesProcessed, bool isWrite, bool retriesAllowed)
 {
 	const size_t originalLength = length;
 	const bool user = IS_USER_ADDRESS(buffer);
@@ -335,6 +337,7 @@ DataContainer::_DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,
 		return B_NO_MEMORY;
 
 	cache_get_pages(fCache, rounded_offset, rounded_len, isWrite, pages);
+	thread_get_current_thread()->page_fault_waits_allowed--;
 
 	status_t error = B_OK;
 	size_t index = 0;
@@ -358,22 +361,38 @@ DataContainer::_DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,
 			if (page != NULL) {
 				error = vm_memcpy_from_physical(buffer, at, bytes, user);
 			} else {
-				if (user) {
+				if (user)
 					error = user_memset(buffer, 0, bytes);
-				} else {
+				else
 					memset(buffer, 0, bytes);
-				}
 			}
 		}
 		if (error != B_OK)
 			break;
 
+		offset += bytes;
 		buffer += bytes;
 		length -= bytes;
 		index++;
 	}
 
+	thread_get_current_thread()->page_fault_waits_allowed++;
 	cache_put_pages(fCache, rounded_offset, rounded_len, pages, error == B_OK);
+
+	if (error == B_BUSY && retriesAllowed) {
+		// See comment in the file_cache's cache_io() routine.
+		if (user) {
+			error = user_memset(buffer, 0, length);
+		} else {
+			memset(buffer, 0, length);
+			error = B_OK;
+		}
+		if (error == B_OK) {
+			size_t processed;
+			error = _DoCacheIO(offset, buffer, length, &processed, isWrite, false);
+			length -= processed;
+		}
+	}
 
 	if (bytesProcessed != NULL)
 		*bytesProcessed = length > 0 ? originalLength - length : originalLength;

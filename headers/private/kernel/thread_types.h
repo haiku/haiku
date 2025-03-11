@@ -287,8 +287,8 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 
 	void			(*fault_handler)(void);
 	jmp_buf			fault_handler_state;
-	int32			page_faults_allowed;
-		/* this field may only stay in debug builds in the future */
+	int16			page_faults_allowed;
+	int16			page_fault_waits_allowed;
 
 	BKernel::Team	*team;	// protected by team lock, thread lock, scheduler
 							// lock, team_lock

@@ -450,7 +450,6 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
 		DEBUG_PAGE_ACCESS_END(pages[i]);
-
 		cache->MarkPageUnbusy(pages[i]);
 	}
 
@@ -729,7 +728,7 @@ satisfy_cache_io(file_cache_ref* ref, void* cookie, cache_func function,
 
 
 static status_t
-cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
+do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	size_t* _size, bool doWrite)
 {
 	if (_cacheRef == NULL)
@@ -908,6 +907,47 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 	return function(ref, cookie, lastOffset, lastPageOffset, lastBuffer,
 		lastLeft, useBuffer, &reservation, 0);
+}
+
+
+static status_t
+cache_io(void* ref, void* cookie, off_t offset, addr_t buffer,
+	size_t* _size, bool doWrite)
+{
+	size_t originalSize = *_size;
+
+	thread_get_current_thread()->page_fault_waits_allowed--;
+	status_t status = do_cache_io(ref, cookie, offset, buffer, _size, doWrite);
+	thread_get_current_thread()->page_fault_waits_allowed++;
+
+	if (status == B_BUSY) {
+		// This likely means that fault handler would've needed to wait for a page,
+		// but we can't allow that here because it could be one of our pages that
+		// it would've waited on, which would cause a deadlock.
+		// Call memset so that all pages are faulted in, and retry.
+		off_t retryOffset = offset;
+		addr_t retryBuffer = buffer;
+		size_t retrySize = originalSize;
+		if (*_size != originalSize) {
+			retryOffset += *_size;
+			retryBuffer += *_size;
+			retrySize -= *_size;
+		}
+		if (IS_USER_ADDRESS(buffer)) {
+			status = user_memset((void*)retryBuffer, 0, retrySize);
+		} else {
+			memset((void*)retryBuffer, 0, retrySize);
+			status = B_OK;
+		}
+		if (status == B_OK) {
+			thread_get_current_thread()->page_fault_waits_allowed--;
+			status = do_cache_io(ref, cookie, retryOffset, retryBuffer, &retrySize, doWrite);
+			*_size += retrySize;
+			thread_get_current_thread()->page_fault_waits_allowed++;
+		}
+	}
+
+	return status;
 }
 
 

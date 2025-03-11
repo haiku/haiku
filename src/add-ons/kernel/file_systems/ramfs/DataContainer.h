@@ -42,8 +42,8 @@ private:
 	inline bool _RequiresCacheMode(size_t size);
 	inline bool _IsCacheMode() const;
 	status_t _SwitchToCacheMode();
-	status_t _DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,
-		size_t* bytesProcessed, bool isWrite);
+	status_t _DoCacheIO(off_t offset, uint8* buffer, ssize_t length,
+		size_t* bytesProcessed, bool isWrite, bool retriesAllowed = true);
 
 	inline int32 _CountBlocks() const;
 

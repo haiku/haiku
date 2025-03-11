@@ -68,8 +68,8 @@ void slab_init_post_sem();
 void slab_init_post_thread();
 
 // to protect code regions with interrupts turned on
-void permit_page_faults(void);
-void forbid_page_faults(void);
+void permit_page_faults();
+void forbid_page_faults();
 
 // private kernel only extension (should be moved somewhere else):
 area_id create_area_etc(team_id team, const char *name, size_t size,
