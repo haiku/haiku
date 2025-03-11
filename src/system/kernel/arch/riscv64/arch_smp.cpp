@@ -15,7 +15,7 @@
 #include <boot/stage2.h>
 #include <arch/smp.h>
 #include <debug.h>
-#include <int.h>
+#include <interrupts.h>
 
 #include <cpu.h>
 #include <platform/sbi/sbi_syscalls.h>

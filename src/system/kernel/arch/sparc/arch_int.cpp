@@ -7,7 +7,7 @@
  */
 
 
-#include <int.h>
+#include <interrupts.h>
 
 
 status_t

@@ -15,7 +15,7 @@
 #include <boot/stage2.h>
 #include <arch/smp.h>
 #include <debug.h>
-#include <int.h>
+#include <interrupts.h>
 
 
 status_t

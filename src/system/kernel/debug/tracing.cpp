@@ -16,7 +16,7 @@
 #include <debug.h>
 #include <debug_heap.h>
 #include <elf.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <team.h>
 #include <thread.h>

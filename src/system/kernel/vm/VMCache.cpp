@@ -18,7 +18,7 @@
 #include <arch/cpu.h>
 #include <condition_variable.h>
 #include <heap.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <slab/Slab.h>
 #include <smp.h>

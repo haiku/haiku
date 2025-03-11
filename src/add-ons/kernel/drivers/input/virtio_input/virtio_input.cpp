@@ -15,7 +15,6 @@
 
 #include <kernel.h>
 #include <fs/devfs.h>
-#include <int.h>
 
 #include <virtio_input_driver.h>
 

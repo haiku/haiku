@@ -12,7 +12,7 @@
  */
 
 
-#include <int.h>
+#include <interrupts.h>
 
 #include <arch_platform.h>
 #include <arch/smp.h>
@@ -278,11 +278,11 @@ m68k_exception_entry(struct iframe *iframe)
 			M68KPlatform::Default()->AcknowledgeIOInterrupt(vector);
 
 dprintf("handling I/O interrupts...\n");
-			int_io_interrupt_handler(vector, true);
+			io_interrupt_handler(vector, true);
 #if 0
 			while ((irq = sPIC->acknowledge_io_interrupt(sPICCookie)) >= 0) {
 // TODO: correctly pass level-triggered vs. edge-triggered to the handler!
-				int_io_interrupt_handler(irq, true);
+				io_interrupt_handler(irq, true);
 			}
 #endif
 dprintf("handling I/O interrupts done\n");
@@ -295,7 +295,7 @@ dprintf("handling I/O interrupts done\n");
 			// vectors >= 64 are user defined vectors, used for IRQ
 			if (vector >= 64) {
 				if (M68KPlatform::Default()->AcknowledgeIOInterrupt(vector)) {
-					int_io_interrupt_handler(vector, true);
+					io_interrupt_handler(vector, true);
 					break;
 				}
 			}

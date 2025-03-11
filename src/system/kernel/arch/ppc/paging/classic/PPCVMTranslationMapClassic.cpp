@@ -79,7 +79,7 @@
 
 #include <arch/cpu.h>
 #include <arch_mmu.h>
-#include <int.h>
+#include <interrupts.h>
 #include <thread.h>
 #include <slab/Slab.h>
 #include <smp.h>

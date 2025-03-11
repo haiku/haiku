@@ -2,7 +2,7 @@
  * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#include <int.h>
+#include <interrupts.h>
 
 #include <arch/smp.h>
 #include <boot/kernel_args.h>

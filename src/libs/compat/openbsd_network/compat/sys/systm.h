@@ -9,7 +9,7 @@
 #include_next <sys/systm.h>
 #include <sys/kernel.h>
 
-#include <int.h>
+#include <interrupts.h>
 
 
 #define	INFSLP	UINT64_MAX

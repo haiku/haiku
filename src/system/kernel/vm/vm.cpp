@@ -37,7 +37,7 @@
 #include <fs/fd.h>
 #include <heap.h>
 #include <kernel.h>
-#include <int.h>
+#include <interrupts.h>
 #include <lock.h>
 #include <low_resource_manager.h>
 #include <slab/Slab.h>

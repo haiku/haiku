@@ -32,7 +32,7 @@
 #include <boot/kernel_args.h>
 #include <condition_variable.h>
 #include <cpu.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kimage.h>
 #include <kscheduler.h>
 #include <ksignal.h>

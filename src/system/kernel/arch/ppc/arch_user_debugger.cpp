@@ -5,7 +5,7 @@
 
 
 #include <debugger.h>
-#include <int.h>
+#include <interrupts.h>
 #include <thread.h>
 #include <arch/user_debugger.h>
 

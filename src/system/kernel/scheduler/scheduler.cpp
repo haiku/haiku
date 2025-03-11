@@ -19,7 +19,7 @@
 #include <AutoDeleter.h>
 #include <cpu.h>
 #include <debug.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <kscheduler.h>
 #include <listeners.h>

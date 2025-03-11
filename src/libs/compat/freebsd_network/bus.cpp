@@ -12,7 +12,7 @@ extern "C" {
 #include <cstdlib>
 
 #include <arch/cpu.h>
-#include <int.h>
+#include <interrupts.h>
 
 extern "C" {
 #include <compat/dev/pci/pcireg.h>

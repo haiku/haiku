@@ -1,10 +1,6 @@
 /*
  * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
- * Distributed under the terms of the MIT License.
-
  * Copyright 2011, Michael Lotz, mmlr@mlotz.ch.
- * Distributed under the terms of the MIT License.
- *
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -13,7 +9,7 @@
  */
 
 
-#include <int.h>
+#include <interrupts.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -179,16 +175,16 @@ interrupts_enabled(void)
 
 
 status_t
-int_init(kernel_args* args)
+interrupts_init(kernel_args* args)
 {
-	TRACE(("init_int_handlers: entry\n"));
+	TRACE(("interrupts_init: entry\n"));
 
 	return arch_int_init(args);
 }
 
 
 status_t
-int_init_post_vm(kernel_args* args)
+interrupts_init_post_vm(kernel_args* args)
 {
 	int i;
 
@@ -232,14 +228,14 @@ int_init_post_vm(kernel_args* args)
 
 
 status_t
-int_init_io(kernel_args* args)
+interrupts_init_io(kernel_args* args)
 {
 	return arch_int_init_io(args);
 }
 
 
 status_t
-int_init_post_device_manager(kernel_args* args)
+interrupts_init_post_device_manager(kernel_args* args)
 {
 	arch_debug_install_interrupt_handlers();
 
@@ -268,7 +264,7 @@ update_int_load(int i)
 	vector (IRQ).
 */
 int
-int_io_interrupt_handler(int vector, bool levelTriggered)
+io_interrupt_handler(int vector, bool levelTriggered)
 {
 	int status = B_UNHANDLED_INTERRUPT;
 	struct io_handler* io;
@@ -725,7 +721,8 @@ free_io_interrupt_vectors(int32 count, int32 startVector)
 }
 
 
-void assign_io_interrupt_to_cpu(int32 vector, int32 newCPU)
+void
+assign_io_interrupt_to_cpu(int32 vector, int32 newCPU)
 {
 	ASSERT(sVectors[vector].type == INTERRUPT_TYPE_IRQ);
 

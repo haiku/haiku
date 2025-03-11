@@ -10,7 +10,7 @@
 
 #include <debugger.h>
 #include <driver_settings.h>
-#include <int.h>
+#include <interrupts.h>
 #include <team.h>
 #include <thread.h>
 #include <util/AutoLock.h>

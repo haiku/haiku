@@ -11,7 +11,7 @@
 
 #include <algorithm>
 
-#include <int.h>
+#include <interrupts.h>
 #include <slab/Slab.h>
 #include <smp.h>
 #include <util/AutoLock.h>

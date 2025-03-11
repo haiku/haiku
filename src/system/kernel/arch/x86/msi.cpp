@@ -8,7 +8,7 @@
 #include <arch/x86/arch_smp.h>
 
 #include <debug.h>
-#include <int.h>
+#include <interrupts.h>
 #include <lock.h>
 
 

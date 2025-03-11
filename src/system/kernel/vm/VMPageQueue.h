@@ -13,7 +13,7 @@
 #include <util/DoublyLinkedList.h>
 
 #include <lock.h>
-#include <int.h>
+#include <interrupts.h>
 #include <util/AutoLock.h>
 #include <vm/vm_types.h>
 

@@ -12,7 +12,7 @@
 
 
 #include <cpu.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kscheduler.h>
 #include <team.h>
 #include <thread.h>
@@ -254,7 +254,7 @@ x86_hardware_interrupt(struct iframe* frame)
 			apic_end_of_interrupt();
 	}
 
-	int_io_interrupt_handler(vector, levelTriggered);
+	io_interrupt_handler(vector, levelTriggered);
 
 	if (levelTriggered) {
 		if (!sCurrentPIC->end_of_interrupt(vector))

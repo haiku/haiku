@@ -11,7 +11,7 @@
 
 #include "paging/64bit/X86VMTranslationMap64Bit.h"
 
-#include <int.h>
+#include <interrupts.h>
 #include <slab/Slab.h>
 #include <thread.h>
 #include <util/AutoLock.h>

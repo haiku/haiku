@@ -12,7 +12,7 @@
 #include <debug.h>
 #include <elf.h>
 #include <heap.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <lock.h>
 #include <string.h>

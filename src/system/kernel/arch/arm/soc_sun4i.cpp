@@ -56,17 +56,17 @@ Sun4iInterruptController::HandleInterrupt()
 	// FIXME can we use the hardware managed interrupt vector instead?
 	for (int i=0; i < 32; i++) {
 		if (fRegBase[SUN4I_INTC_PEND_REG0] & (1 << i))
-			int_io_interrupt_handler(i, true);
+			io_interrupt_handler(i, true);
 	}
 
 	for (int i=0; i < 32; i++) {
 		if (fRegBase[SUN4I_INTC_PEND_REG1] & (1 << i))
-			int_io_interrupt_handler(i + 32, true);
+			io_interrupt_handler(i + 32, true);
 	}
 
 	for (int i=0; i < 32; i++) {
 		if (fRegBase[SUN4I_INTC_PEND_REG2] & (1 << i))
-			int_io_interrupt_handler(i + 64, true);
+			io_interrupt_handler(i + 64, true);
 	}
 }
 

@@ -6,7 +6,7 @@
 
 #include <util/KernelReferenceable.h>
 
-#include <int.h>
+#include <interrupts.h>
 
 
 void

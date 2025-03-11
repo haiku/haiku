@@ -13,7 +13,7 @@
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
-#include <int.h>
+#include <interrupts.h>
 #include <boot/kernel_args.h>
 #include <arch/vm_translation_map.h>
 #include <arch/cpu.h>

@@ -81,7 +81,7 @@
 #include <arch/cpu.h>
 //#include <arch_mmu.h>
 #include <boot/kernel_args.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <slab/Slab.h>
 #include <vm/vm.h>

@@ -5,7 +5,7 @@
 
 #include <arch/x86/ioapic.h>
 
-#include <int.h>
+#include <interrupts.h>
 #include <vm/vm.h>
 
 #include "acpi_irq_routing_table.h"
@@ -417,7 +417,7 @@ ioapic_source_override_handler(void* data)
 {
 	int32 vector = (addr_t)data;
 	bool levelTriggered = ioapic_is_level_triggered_interrupt(vector);
-	return int_io_interrupt_handler(vector, levelTriggered);
+	return io_interrupt_handler(vector, levelTriggered);
 }
 
 

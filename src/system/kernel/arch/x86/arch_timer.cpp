@@ -16,7 +16,7 @@
 #include <console.h>
 #include <debug.h>
 #include <timer.h>
-#include <int.h>
+#include <interrupts.h>
 #include <safemode.h>
 
 #include <arch/timer.h>

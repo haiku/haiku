@@ -2,7 +2,8 @@
  * Copyright 2021-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#include <int.h>
+
+#include <interrupts.h>
 #include <interrupt_controller.h>
 #include <kernel.h>
 #include <vm/vm.h>
@@ -80,7 +81,7 @@ void GICv2InterruptController::HandleInterrupt()
 	if ((irqnr == 1022) || (irqnr == 1023)) {
 		dprintf("spurious interrupt\n");
 	} else {
-		int_io_interrupt_handler(irqnr, true);
+		io_interrupt_handler(irqnr, true);
 	}
 
 	fGiccRegs[GICC_REG_EOIR] = iar;

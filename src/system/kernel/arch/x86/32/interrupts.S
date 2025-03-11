@@ -180,7 +180,7 @@ FUNCTION(name): \
 	pushl	$vector; \
 	pushl	%edx; \
 	pushl	%eax; \
-	jmp		int_bottom;	\
+	jmp		intr_bottom;	\
 FUNCTION_END(name)
 
 #define TRAP(name, vector) \
@@ -190,7 +190,7 @@ FUNCTION(name): \
 	pushl	$vector; \
 	pushl	%edx; \
 	pushl	%eax; \
-	jmp		int_bottom; \
+	jmp		intr_bottom; \
 FUNCTION_END(name)
 
 TRAP(trap0, 0)
@@ -490,7 +490,7 @@ FUNCTION_END(trap14_double_fault)
 
 
 .align 16
-STATIC_FUNCTION(int_bottom):
+STATIC_FUNCTION(intr_bottom):
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
 
 	movl	$KERNEL_TLS_SELECTOR, %edx
@@ -504,7 +504,7 @@ STATIC_FUNCTION(int_bottom):
 	orl		$0x10000, IFRAME_flags(%ebp);
 
 	cmpw	$USER_CODE_SELECTOR, IFRAME_cs(%ebp)	// user mode
-	je		int_bottom_user
+	je		intr_bottom_user
 
 	// We need to recheck user mode using the thread's in_kernel flag, since
 	// sysexit introduces a raced condition: It doesn't reenable interrupts,
@@ -513,7 +513,7 @@ STATIC_FUNCTION(int_bottom):
 	// up everything for userland already.
 	movl	%gs:0, %edi						// thread pointer
 	cmpb	$0, THREAD_in_kernel(%edi)
-	je		int_bottom_user
+	je		intr_bottom_user
 
 	// disable interrupts -- the handler will enable them, if necessary
 	cli
@@ -523,10 +523,10 @@ STATIC_FUNCTION(int_bottom):
 	call	*gInterruptHandlerTable(, %eax, 4)
 
 	POP_IFRAME_AND_RETURN()
-FUNCTION_END(int_bottom)
+FUNCTION_END(intr_bottom)
 
 
-STATIC_FUNCTION(int_bottom_user):
+STATIC_FUNCTION(intr_bottom_user):
 	movl	$KERNEL_DATA_SELECTOR, %eax
 	cld
 	movl	%eax,%ds
@@ -566,7 +566,7 @@ STATIC_FUNCTION(int_bottom_user):
 	// update the thread's kernel time and return
 	UPDATE_THREAD_KERNEL_TIME()
 	POP_IFRAME_AND_RETURN()
-FUNCTION_END(int_bottom_user)
+FUNCTION_END(intr_bottom_user)
 
 
 // test interrupt handler for performance measurements

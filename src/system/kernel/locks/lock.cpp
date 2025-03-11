@@ -27,7 +27,7 @@ static void _mutex_unlock(struct mutex* lock);
 #include <stdlib.h>
 #include <string.h>
 
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <listeners.h>
 #include <scheduling_analysis.h>

@@ -4,7 +4,7 @@
 class InterruptController;
 
 #include <drivers/bus/FDT.h>
-#include <private/kernel/int.h>
+#include <private/kernel/interrupts.h>
 #include <private/kernel/timer.h>
 
 // ------------------------------------------------------ InterruptController

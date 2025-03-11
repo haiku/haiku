@@ -145,14 +145,14 @@
 	ASM_CLAC							\
 	push	$0;							\
 	push	$nr;						\
-	jmp		int_bottom;
+	jmp		intr_bottom;
 
 // Interrupt with an error code.
 #define DEFINE_ISR_E(nr)				\
 	.align 16;							\
 	ASM_CLAC							\
 	push	$nr;						\
-	jmp		int_bottom;
+	jmp		intr_bottom;
 
 // Array of interrupt service routines.
 .align 16
@@ -200,10 +200,10 @@ SYMBOL(isr_array):
 
 
 // Common interrupt handling code.
-STATIC_FUNCTION(int_bottom):
+STATIC_FUNCTION(intr_bottom):
 	// Coming from user-mode requires special handling.
 	testl	$3, 24(%rsp)
-	jnz		int_bottom_user
+	jnz		intr_bottom_user
 
 	// Push the rest of the interrupt frame to the stack.
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
@@ -249,11 +249,11 @@ STATIC_FUNCTION(int_bottom):
 	RESTORE_IFRAME()
 
 	iretq
-FUNCTION_END(int_bottom)
+FUNCTION_END(intr_bottom)
 
 
 // Handler for an interrupt that occurred in user-mode.
-STATIC_FUNCTION(int_bottom_user):
+STATIC_FUNCTION(intr_bottom_user):
 	// Load the kernel GS segment base.
 	swapgs
 	lfence
@@ -356,7 +356,7 @@ STATIC_FUNCTION(int_bottom_user):
 	sti
 	call	thread_at_kernel_exit
 	jmp		.Lkernel_exit_work_done
-FUNCTION_END(int_bottom_user)
+FUNCTION_END(intr_bottom_user)
 
 
 // SYSCALL entry point.

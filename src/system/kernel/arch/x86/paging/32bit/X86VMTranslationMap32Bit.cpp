@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <int.h>
+#include <interrupts.h>
 #include <thread.h>
 #include <slab/Slab.h>
 #include <smp.h>

@@ -20,7 +20,7 @@
 #include <generic_syscall.h>
 #include <kernel.h>
 #include <ksignal.h>
-#include <int.h>
+#include <interrupts.h>
 #include <team.h>
 #include <thread.h>
 #include <tls.h>

@@ -34,7 +34,7 @@
 #include <find_directory_private.h>
 #include <fs/KPath.h>
 #include <heap.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <kimage.h>
 #include <kscheduler.h>

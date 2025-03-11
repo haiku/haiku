@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 #include <debugger.h>
-#include <int.h>
+#include <interrupts.h>
 #include <thread.h>
 #include <arch/user_debugger.h>
 

@@ -13,7 +13,7 @@
 #include <debug.h>
 #include <kscheduler.h>
 #include <ksignal.h>
-#include <int.h>
+#include <interrupts.h>
 #include <listeners.h>
 #include <scheduling_analysis.h>
 #include <thread.h>

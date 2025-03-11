@@ -5,8 +5,8 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_INT_H
-#define _KERNEL_INT_H
+#ifndef _KERNEL_INTERRUPTS_H
+#define _KERNEL_INTERRUPTS_H
 
 
 #include <KernelExport.h>
@@ -47,11 +47,11 @@ struct irq_assignment {
 extern "C" {
 #endif
 
-status_t int_init(struct kernel_args* args);
-status_t int_init_post_vm(struct kernel_args* args);
-status_t int_init_io(struct kernel_args* args);
-status_t int_init_post_device_manager(struct kernel_args* args);
-int int_io_interrupt_handler(int vector, bool levelTriggered);
+status_t interrupts_init(struct kernel_args* args);
+status_t interrupts_init_post_vm(struct kernel_args* args);
+status_t interrupts_init_io(struct kernel_args* args);
+status_t interrupts_init_post_device_manager(struct kernel_args* args);
+int io_interrupt_handler(int vector, bool levelTriggered);
 
 bool interrupts_enabled(void);
 
@@ -85,4 +85,5 @@ void free_io_interrupt_vectors(int32 count, int32 startVector);
 
 void assign_io_interrupt_to_cpu(int32 vector, int32 cpu);
 
-#endif /* _KERNEL_INT_H */
+
+#endif /* _KERNEL_INTERRUPTS_H */

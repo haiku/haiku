@@ -22,7 +22,7 @@
 #include <boot/kernel_args.h>
 #include <cpu.h>
 #include <debug.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <ksignal.h>
 #include <kscheduler.h>

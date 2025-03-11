@@ -25,7 +25,7 @@
 #include <boot/kernel_args.h>
 #include <cpu.h>
 #include <generic_syscall.h>
-#include <int.h>
+#include <interrupts.h>
 #include <spinlock_contention.h>
 #include <thread.h>
 #include <util/atomic.h>
@@ -949,7 +949,7 @@ process_pending_ici(int32 currentCPU)
 			break;
 
 		default:
-			dprintf("smp_intercpu_int_handler: got unknown message %" B_PRId32 "\n",
+			dprintf("smp_intercpu_interrupt_handler: got unknown message %" B_PRId32 "\n",
 				msg->message);
 			break;
 	}
@@ -1028,13 +1028,13 @@ call_all_cpus_early(void (*function)(void*, int), void* cookie)
 
 
 int
-smp_intercpu_int_handler(int32 cpu)
+smp_intercpu_interrupt_handler(int32 cpu)
 {
-	TRACE("smp_intercpu_int_handler: entry on cpu %" B_PRId32 "\n", cpu);
+	TRACE("smp_intercpu_interrupt_handler: entry on cpu %" B_PRId32 "\n", cpu);
 
 	process_all_pending_ici(cpu);
 
-	TRACE("smp_intercpu_int_handler: done on cpu %" B_PRId32 "\n", cpu);
+	TRACE("smp_intercpu_interrupt_handler: done on cpu %" B_PRId32 "\n", cpu);
 
 	return B_HANDLED_INTERRUPT;
 }

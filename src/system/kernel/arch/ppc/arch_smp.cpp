@@ -6,7 +6,7 @@
 
 #include <KernelExport.h>
 
-#include <int.h>
+#include <interrupts.h>
 
 #include <boot/stage2.h>
 #include <arch/smp.h>

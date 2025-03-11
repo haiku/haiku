@@ -11,7 +11,7 @@
 
 #include <setjmp.h>
 
-#include <int.h>
+#include <interrupts.h>
 #include <smp.h>
 #include <timer.h>
 #include <arch/cpu.h>

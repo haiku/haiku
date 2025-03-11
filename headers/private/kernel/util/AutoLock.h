@@ -12,7 +12,7 @@
 
 #include <shared/AutoLocker.h>
 
-#include <int.h>
+#include <interrupts.h>
 #include <lock.h>
 
 

@@ -11,7 +11,7 @@
 #include <timer.h>
 #include <arch/x86/timer.h>
 
-#include <int.h>
+#include <interrupts.h>
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_system_info.h>
 

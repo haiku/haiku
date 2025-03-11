@@ -9,7 +9,7 @@
 
 
 #include <cpu.h>
-#include <int.h>
+#include <interrupts.h>
 #include <smp.h>
 #include <thread_types.h>
 

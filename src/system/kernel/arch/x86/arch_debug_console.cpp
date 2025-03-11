@@ -12,7 +12,7 @@
 
 #include <KernelExport.h>
 #include <driver_settings.h>
-#include <int.h>
+#include <interrupts.h>
 
 #include <arch/cpu.h>
 #include <arch/debug_console.h>

@@ -13,7 +13,7 @@
 
 #include <arch/x86/arch_int.h>
 
-#include <int.h>
+#include <interrupts.h>
 
 
 //#define TRACE_PIC

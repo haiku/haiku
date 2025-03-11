@@ -32,7 +32,7 @@
 #include <find_directory_private.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kdevice_manager.h>
 #include <kdriver_settings.h>
 #include <kernel_daemon.h>
@@ -143,7 +143,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		cpu_init(&sKernelArgs);
 		cpu_init_percpu(&sKernelArgs, currentCPU);
 		TRACE("init interrupts\n");
-		int_init(&sKernelArgs);
+		interrupts_init(&sKernelArgs);
 
 		TRACE("init VM\n");
 		vm_init(&sKernelArgs);
@@ -170,7 +170,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init semaphores\n");
 		haiku_sem_init(&sKernelArgs);
 		TRACE("init interrupts post vm\n");
-		int_init_post_vm(&sKernelArgs);
+		interrupts_init_post_vm(&sKernelArgs);
 		cpu_init_post_vm(&sKernelArgs);
 		commpage_init();
 #ifdef _COMPAT_MODE
@@ -210,7 +210,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		arch_platform_init_post_thread(&sKernelArgs);
 
 		TRACE("init I/O interrupts\n");
-		int_init_io(&sKernelArgs);
+		interrupts_init_io(&sKernelArgs);
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
 		low_resource_manager_init_post_thread();
@@ -337,7 +337,7 @@ main2(void* /*unused*/)
 	TRACE("Add preloaded old-style drivers\n");
 	legacy_driver_add_preloaded(&sKernelArgs);
 
-	int_init_post_device_manager(&sKernelArgs);
+	interrupts_init_post_device_manager(&sKernelArgs);
 
 	TRACE("Mount boot file system\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_4_MOUNT_BOOT_FS);

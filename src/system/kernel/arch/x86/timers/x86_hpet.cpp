@@ -5,7 +5,7 @@
  */
 
 #include <debug.h>
-#include <int.h>
+#include <interrupts.h>
 #include <smp.h>
 #include <timer.h>
 

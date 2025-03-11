@@ -94,7 +94,7 @@ int32 smp_get_num_cpus(void);
 void smp_set_num_cpus(int32 numCPUs);
 int32 smp_get_current_cpu(void);
 
-int smp_intercpu_int_handler(int32 cpu);
+int smp_intercpu_interrupt_handler(int32 cpu);
 
 void call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie);
 void call_single_cpu_sync(uint32 targetCPU, void (*func)(void*, int),

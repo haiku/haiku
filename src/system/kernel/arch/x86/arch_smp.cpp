@@ -12,7 +12,7 @@
 #include <boot/kernel_args.h>
 #include <vm/vm.h>
 #include <cpu.h>
-#include <int.h>
+#include <interrupts.h>
 #include <smp.h>
 #include <smp_priv.h>
 
@@ -53,7 +53,7 @@ x86_ici_interrupt(void *data)
 	// genuine inter-cpu interrupt
 	int cpu = smp_get_current_cpu();
 	TRACE(("inter-cpu interrupt on cpu %d\n", cpu));
-	return smp_intercpu_int_handler(cpu);
+	return smp_intercpu_interrupt_handler(cpu);
 }
 
 

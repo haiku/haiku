@@ -12,7 +12,7 @@
 
 #include <SupportDefs.h>
 
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 
 

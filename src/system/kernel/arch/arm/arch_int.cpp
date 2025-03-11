@@ -13,7 +13,7 @@
  */
 
 
-#include <int.h>
+#include <interrupts.h>
 
 #include <arch_cpu_defs.h>
 #include <arch/smp.h>

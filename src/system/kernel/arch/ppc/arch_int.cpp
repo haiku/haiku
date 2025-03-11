@@ -11,7 +11,7 @@
  */
 
 
-#include <int.h>
+#include <interrupts.h>
 
 #include <arch/smp.h>
 #include <boot/kernel_args.h>
@@ -189,7 +189,7 @@ dprintf("handling I/O interrupts...\n");
 			int irq;
 			while ((irq = sPIC->acknowledge_io_interrupt(sPICCookie)) >= 0) {
 // TODO: correctly pass level-triggered vs. edge-triggered to the handler!
-				int_io_interrupt_handler(irq, true);
+				io_interrupt_handler(irq, true);
 			}
 dprintf("handling I/O interrupts done\n");
 			break;

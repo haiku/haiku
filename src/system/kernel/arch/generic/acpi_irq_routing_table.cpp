@@ -11,7 +11,7 @@
 
 #include "acpi.h"
 
-#include <int.h>
+#include <interrupts.h>
 
 #include <PCI.h>
 

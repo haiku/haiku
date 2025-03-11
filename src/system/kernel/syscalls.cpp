@@ -28,7 +28,7 @@
 #include <fs/fd.h>
 #include <fs/node_monitor.h>
 #include <generic_syscall.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <kimage.h>
 #include <ksignal.h>

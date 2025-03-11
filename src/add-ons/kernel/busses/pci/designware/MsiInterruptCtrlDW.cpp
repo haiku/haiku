@@ -6,7 +6,7 @@
 
 #include "DWPCIController.h"
 
-#include <int.h>
+#include <interrupts.h>
 
 
 status_t
@@ -104,7 +104,7 @@ MsiInterruptCtrlDW::InterruptReceivedInt()
 	for (int i = 0; i < 32; i++) {
 		if (((1 << i) & status) != 0) {
 //			dprintf("MSI IRQ: %d (%ld)\n", i, fStartMsiIrq + i);
-			int_io_interrupt_handler(fMsiStartIrq + i, false);
+			io_interrupt_handler(fMsiStartIrq + i, false);
 			fDbiRegs->msiIntr[0].status = (1 << i);
 		}
 	}

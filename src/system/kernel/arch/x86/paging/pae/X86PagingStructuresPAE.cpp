@@ -11,7 +11,7 @@
 
 #include <KernelExport.h>
 
-#include <int.h>
+#include <interrupts.h>
 
 #include "paging/pae/X86PagingMethodPAE.h"
 

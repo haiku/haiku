@@ -31,7 +31,7 @@
 #include <debug_paranoia.h>
 #include <driver_settings.h>
 #include <frame_buffer_console.h>
-#include <int.h>
+#include <interrupts.h>
 #include <kernel.h>
 #include <ksystem_info.h>
 #include <safemode.h>
@@ -964,7 +964,7 @@ enter_kernel_debugger(int32 cpu, int32& previousCPU)
 		// us. Process ICIs to ensure we get the halt request. Then we are
 		// blocking there until everyone leaves the debugger and we can
 		// try to enter it again.
-		smp_intercpu_int_handler(cpu);
+		smp_intercpu_interrupt_handler(cpu);
 	}
 
 	arch_debug_save_registers(&sDebugRegisters[cpu]);
@@ -1814,7 +1814,7 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 	InterruptsLocker locker;
 
 	// return, if we've been called recursively (we call
-	// smp_intercpu_int_handler() below)
+	// smp_intercpu_interrupt_handler() below)
 	if (sCPUTrapped[cpu])
 		return;
 
@@ -1832,7 +1832,7 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 			kernel_debugger_internal(NULL, NULL,
 				sCurrentKernelDebuggerMessageArgs, cpu);
 		} else
-			smp_intercpu_int_handler(cpu);
+			smp_intercpu_interrupt_handler(cpu);
 	}
 
 	sCPUTrapped[cpu] = false;

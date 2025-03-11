@@ -10,7 +10,7 @@
 
 #include "paging/pae/X86VMTranslationMapPAE.h"
 
-#include <int.h>
+#include <interrupts.h>
 #include <slab/Slab.h>
 #include <thread.h>
 #include <tracing.h>

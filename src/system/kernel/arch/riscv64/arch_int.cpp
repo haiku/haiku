@@ -7,7 +7,7 @@
  */
 
 
-#include <int.h>
+#include <interrupts.h>
 #include <cpu.h>
 #include <thread.h>
 #include <vm/vm_priv.h>
@@ -258,7 +258,7 @@ STrap(iframe* frame)
 		case causeInterrupt + sSoftInt: {
 			ClearBitsSip(1 << sSoftInt);
 			// dprintf("sSoftInt(%" B_PRId32 ")\n", smp_get_current_cpu());
-			smp_intercpu_int_handler(smp_get_current_cpu());
+			smp_intercpu_interrupt_handler(smp_get_current_cpu());
 			AfterInterrupt();
 			return;
 		}
@@ -271,7 +271,7 @@ STrap(iframe* frame)
 		}
 		case causeInterrupt + sExternInt: {
 			uint64 irq = gPlicRegs->contexts[sPlicContexts[smp_get_current_cpu()]].claimAndComplete;
-			int_io_interrupt_handler(irq, true);
+			io_interrupt_handler(irq, true);
 			gPlicRegs->contexts[sPlicContexts[smp_get_current_cpu()]].claimAndComplete = irq;
 			AfterInterrupt();
 			return;
