@@ -28,7 +28,6 @@ KernelMergeObject kernel_core.o :
 	boot_splash.cpp
 	commpage.cpp
 	condition_variable.cpp
-	convertutf.cpp
 	cpu.cpp
 	DPC.cpp
 	elf.cpp

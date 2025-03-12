@@ -14,7 +14,7 @@
 
 #include <stdlib.h>
 
-#include "convertutf.h"
+#include <util/convertutf.h>
 
 #include "Inode.h"
 
