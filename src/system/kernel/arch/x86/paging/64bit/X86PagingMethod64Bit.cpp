@@ -67,14 +67,19 @@ X86PagingMethod64Bit::Init(kernel_args* args,
 	if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD))
 		call_all_cpus_sync(&_EnableExecutionDisable, NULL);
 
-	// Ensure that the user half of the address space is clear. This removes
-	// the temporary identity mapping made by the boot loader.
-	memset(fKernelVirtualPMLTop, 0, sizeof(uint64) * 256);
-	arch_cpu_global_TLB_invalidate();
-
 	// Create the physical page mapper.
 	mapped_physical_page_ops_init(args, fPhysicalPageMapper,
 		fKernelPhysicalPageMapper);
+
+	// Ensure that the user half of the address space is clear. This removes
+	// the temporary identity mapping made by the boot loader.
+	if (la57) {
+		uint64* virtualPML4 = (uint64*)fKernelPhysicalPageMapper->GetPageTableAt(
+			*fKernelVirtualPMLTop & X86_64_PML5E_ADDRESS_MASK);
+		memset(virtualPML4, 0, sizeof(uint64) * 256);
+	}
+	memset(fKernelVirtualPMLTop, 0, sizeof(uint64) * 256);
+	arch_cpu_global_TLB_invalidate();
 
 	*_physicalPageMapper = fPhysicalPageMapper;
 	return B_ERROR;
