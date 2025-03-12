@@ -51,14 +51,34 @@ X86VMTranslationMap64Bit::~X86VMTranslationMap64Bit()
 	if (fPagingStructures == NULL)
 		return;
 
-	if (fPageMapper != NULL) {
-		vm_page_reservation reservation = {};
-		phys_addr_t address;
-		vm_page* page;
+	if (fPageMapper == NULL) {
+		fPagingStructures->RemoveReference();
+		return;
+	}
 
-		// Free all structures in the bottom half of the PMLTop (user memory).
-		uint64* virtualPML4 = fPagingStructures->VirtualPMLTop();
-		for (uint32 i = 0; i < 256; i++) {
+	vm_page_reservation reservation = {};
+	phys_addr_t address;
+	vm_page* page;
+
+	// Free all structures in the bottom half of the PMLTop (user memory).
+	uint64* virtualPML5 = NULL;
+	if (fLA57)
+		virtualPML5 = fPagingStructures->VirtualPMLTop();
+	for (uint32 p = 0; p < 256; p++) {
+		uint64* virtualPML4 = NULL;
+		uint32 limitPML4 = 256;
+		if (fLA57) {
+			if ((virtualPML5[p] & X86_64_PML5E_PRESENT) == 0)
+				continue;
+
+			virtualPML4 = (uint64*)fPageMapper->GetPageTableAt(
+				virtualPML5[p] & X86_64_PML5E_ADDRESS_MASK);
+			limitPML4 = 512;
+		} else {
+			virtualPML4 = fPagingStructures->VirtualPMLTop();
+		}
+
+		for (uint32 i = 0; i < limitPML4; i++) {
 			if ((virtualPML4[i] & X86_64_PML4E_PRESENT) == 0)
 				continue;
 
@@ -107,10 +127,24 @@ X86VMTranslationMap64Bit::~X86VMTranslationMap64Bit()
 			vm_page_free_etc(NULL, page, &reservation);
 		}
 
-		vm_page_unreserve_pages(&reservation);
+		if (fLA57) {
+			address = virtualPML5[p] & X86_64_PML5E_ADDRESS_MASK;
+			page = vm_lookup_page(address / B_PAGE_SIZE);
+			if (page == NULL) {
+				panic("PML4 %u on invalid page %#" B_PRIxPHYSADDR "\n", p,
+					address);
+			}
 
-		fPageMapper->Delete();
+			DEBUG_PAGE_ACCESS_START(page);
+			vm_page_free_etc(NULL, page, &reservation);
+		} else {
+			break;
+		}
 	}
+
+	vm_page_unreserve_pages(&reservation);
+
+	fPageMapper->Delete();
 
 	fPagingStructures->RemoveReference();
 }
@@ -731,63 +765,82 @@ bool
 X86VMTranslationMap64Bit::DebugGetReverseMappingInfo(phys_addr_t physicalAddress,
 	ReverseMappingInfoCallback& callback)
 {
-	if (fLA57) {
-		kprintf("X86VMTranslationMap64Bit::DebugGetReverseMappingInfo not implemented for LA57\n");
-		return false;
-	}
-
-	const uint64* virtualPML4 = fPagingStructures->VirtualPMLTop();
-	for (uint32 i = 0; i < (fIsKernelMap ? 512 : 256); i++) {
-		if ((virtualPML4[i] & X86_64_PML4E_PRESENT) == 0)
-			continue;
-		const uint64 addressMask = (i >= 256) ? 0xffffff0000000000LL : 0;
-
-		const uint64* virtualPDPT = (uint64*)fPageMapper->GetPageTableAt(
-			virtualPML4[i] & X86_64_PML4E_ADDRESS_MASK);
-		for (uint32 j = 0; j < 512; j++) {
-			if ((virtualPDPT[j] & X86_64_PDPTE_PRESENT) == 0)
+	uint64* virtualPML5 = NULL;
+	if (fLA57)
+		virtualPML5 = fPagingStructures->VirtualPMLTop();
+	for (uint32 p = 0; p < (fIsKernelMap ? 512 : 256); p++) {
+		uint64* virtualPML4 = NULL;
+		uint32 limitPML4 = (fIsKernelMap ? 512 : 256);
+		if (fLA57) {
+			if ((virtualPML5[p] & X86_64_PML5E_PRESENT) == 0)
 				continue;
 
-			const uint64* virtualPageDir = (uint64*)fPageMapper->GetPageTableAt(
-				virtualPDPT[j] & X86_64_PDPTE_ADDRESS_MASK);
-			for (uint32 k = 0; k < 512; k++) {
-				if ((virtualPageDir[k] & X86_64_PDE_PRESENT) == 0)
+			virtualPML4 = (uint64*)fPageMapper->GetPageTableAt(
+				virtualPML5[p] & X86_64_PML5E_ADDRESS_MASK);
+			limitPML4 = 512;
+		} else {
+			virtualPML4 = fPagingStructures->VirtualPMLTop();
+		}
+
+		for (uint32 i = 0; i < limitPML4; i++) {
+			if ((virtualPML4[i] & X86_64_PML4E_PRESENT) == 0)
+				continue;
+			uint64 addressMask = 0;
+			if (i >= 256)
+				addressMask = fLA57 ? 0xff00000000000000LL : 0xfffff00000000000LL;
+
+			const uint64* virtualPDPT = (uint64*)fPageMapper->GetPageTableAt(
+				virtualPML4[i] & X86_64_PML4E_ADDRESS_MASK);
+			for (uint32 j = 0; j < 512; j++) {
+				if ((virtualPDPT[j] & X86_64_PDPTE_PRESENT) == 0)
 					continue;
 
-				if ((virtualPageDir[k] & X86_64_PDE_LARGE_PAGE) != 0) {
-					phys_addr_t largeAddress = virtualPageDir[k] & X86_64_PDE_ADDRESS_MASK;
-					if (physicalAddress >= largeAddress
-							&& physicalAddress < (largeAddress + k64BitPageTableRange)) {
-						off_t offset = physicalAddress - largeAddress;
-						addr_t virtualAddress = i * k64BitPDPTRange
-							+ j * k64BitPageDirectoryRange
-							+ k * k64BitPageTableRange
-							+ offset;
-						virtualAddress |= addressMask;
-						if (callback.HandleVirtualAddress(virtualAddress))
-							return true;
-					}
-					continue;
-				}
-
-				const uint64* virtualPageTable = (uint64*)fPageMapper->GetPageTableAt(
-					virtualPageDir[k] & X86_64_PDE_ADDRESS_MASK);
-				for (uint32 l = 0; l < 512; l++) {
-					if ((virtualPageTable[l] & X86_64_PTE_PRESENT) == 0)
+				const uint64* virtualPageDir = (uint64*)fPageMapper->GetPageTableAt(
+					virtualPDPT[j] & X86_64_PDPTE_ADDRESS_MASK);
+				for (uint32 k = 0; k < 512; k++) {
+					if ((virtualPageDir[k] & X86_64_PDE_PRESENT) == 0)
 						continue;
 
-					if ((virtualPageTable[l] & X86_64_PTE_ADDRESS_MASK) == physicalAddress) {
-						addr_t virtualAddress = i * k64BitPDPTRange
-							+ j * k64BitPageDirectoryRange
-							+ k * k64BitPageTableRange
-							+ l * B_PAGE_SIZE;
-						virtualAddress |= addressMask;
-						if (callback.HandleVirtualAddress(virtualAddress))
-							return true;
+					if ((virtualPageDir[k] & X86_64_PDE_LARGE_PAGE) != 0) {
+						phys_addr_t largeAddress = virtualPageDir[k] & X86_64_PDE_ADDRESS_MASK;
+						if (physicalAddress >= largeAddress
+								&& physicalAddress < (largeAddress + k64BitPageTableRange)) {
+							off_t offset = physicalAddress - largeAddress;
+							addr_t virtualAddress = p * k64BitPML4TRange
+								+ i * k64BitPDPTRange
+								+ j * k64BitPageDirectoryRange
+								+ k * k64BitPageTableRange
+								+ offset;
+							virtualAddress |= addressMask;
+							if (callback.HandleVirtualAddress(virtualAddress))
+								return true;
+						}
+						continue;
+					}
+
+					const uint64* virtualPageTable = (uint64*)fPageMapper->GetPageTableAt(
+						virtualPageDir[k] & X86_64_PDE_ADDRESS_MASK);
+					for (uint32 l = 0; l < 512; l++) {
+						if ((virtualPageTable[l] & X86_64_PTE_PRESENT) == 0)
+							continue;
+
+						if ((virtualPageTable[l] & X86_64_PTE_ADDRESS_MASK) == physicalAddress) {
+							addr_t virtualAddress = p * k64BitPML4TRange
+								+ i * k64BitPDPTRange
+								+ j * k64BitPageDirectoryRange
+								+ k * k64BitPageTableRange
+								+ l * B_PAGE_SIZE;
+							virtualAddress |= addressMask;
+							if (callback.HandleVirtualAddress(virtualAddress))
+								return true;
+						}
 					}
 				}
 			}
 		}
+
+		if (!fLA57)
+			break;
 	}
 
 	return false;
