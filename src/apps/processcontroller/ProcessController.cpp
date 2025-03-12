@@ -287,7 +287,8 @@ ProcessController::MessageReceived(BMessage *message)
 	team_id team;
 	thread_id thread;
 	BAlert *alert;
-	char	question[1000];
+	BString question;
+
 	switch (message->what) {
 		case 'Puls':
 			Update ();
@@ -307,13 +308,13 @@ ProcessController::MessageReceived(BMessage *message)
 				info_pack infos;
 				if (get_team_info(team, &infos.team_info) == B_OK) {
 					get_team_name_and_icon(infos);
-					snprintf(question, sizeof(question),
-					B_TRANSLATE("What do you want to do with the team \"%s\"?"),
-					infos.team_name);
+					question.SetToFormat(
+						B_TRANSLATE("What do you want to do with the team \"%s\"?"),
+						infos.team_name);
 					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
-					B_TRANSLATE("Cancel"), B_TRANSLATE("Debug this team!"),
-					B_TRANSLATE("Kill this team!"), B_WIDTH_AS_USUAL,
-					B_STOP_ALERT);
+						B_TRANSLATE("Cancel"), B_TRANSLATE("Debug this team!"),
+						B_TRANSLATE("Kill this team!"), B_WIDTH_AS_USUAL,
+						B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
 					int result = alert->Go();
 					switch (result) {
@@ -342,8 +343,7 @@ ProcessController::MessageReceived(BMessage *message)
 				thread_info	thinfo;
 				if (get_thread_info(thread, &thinfo) == B_OK) {
 					#if DEBUG_THREADS
-					snprintf(question, sizeof(question),
-						B_TRANSLATE("What do you want to do "
+					question.SetToFormat(B_TRANSLATE("What do you want to do "
 						"with the thread \"%s\"?"), thinfo.name);
 					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
 						B_TRANSLATE("Cancel"), B_TRANSLATE("Debug this thread!"),
@@ -353,7 +353,7 @@ ProcessController::MessageReceived(BMessage *message)
 
 					#define KILL 2
 					#else
-					snprintf(question, sizeof(question),
+					question.SetToFormat(
 						B_TRANSLATE("Are you sure you want "
 						"to kill the thread \"%s\"?"), thinfo.name);
 					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
@@ -828,17 +828,17 @@ thread_popup(void *arg)
 	// CPU on/off section
 	if (gCPUcount > 1) {
 		for (unsigned int i = 0; i < gCPUcount; i++) {
-			char item_name[32];
-			sprintf (item_name, B_TRANSLATE("Processor %d"), i + 1);
-			BMessage* m = new BMessage ('CPU ');
-			m->AddInt32 ("cpu", i);
-			item = new IconMenuItem (gPCView->fProcessorIcon, item_name, m);
+			BString itemName;
+			itemName.SetToFormat(B_TRANSLATE("Processor %d"), i + 1);
+			BMessage* m = new BMessage('CPU ');
+			m->AddInt32("cpu", i);
+			item = new IconMenuItem (gPCView->fProcessorIcon, itemName, m);
 			if (_kern_cpu_enabled(i))
-				item->SetMarked (true);
+				item->SetMarked(true);
 			item->SetTarget(gPCView);
 			addtopbottom(item);
 		}
-		addtopbottom (new BSeparatorItem ());
+		addtopbottom(new BSeparatorItem());
 	}
 
 	// Scheduler modes
