@@ -86,7 +86,7 @@ MemoryBarMenu::Pulse()
 	MemoryBarMenuItem* item;
 	int	total = 0;
 	for (k = 1; (item = (MemoryBarMenuItem*)ItemAt(k)) != NULL; k++) {
-		int m = item->UpdateSituation(committedMemory);
+		int64 m = item->UpdateSituation(committedMemory);
 		if (m < 0) {
 			if (lastRecycle == fRecycleCount) {
 				fRecycleCount += EXTRA;

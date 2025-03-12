@@ -200,7 +200,7 @@ MemoryBarMenuItem::GetContentSize(float* _width, float* _height)
 }
 
 
-int
+int64
 MemoryBarMenuItem::UpdateSituation(int64 committedMemory)
 {
 	fCommittedMemory = committedMemory;

@@ -19,7 +19,7 @@ class MemoryBarMenuItem : public IconMenuItem {
 		virtual	void	GetContentSize(float* _width, float* _height);
 
 		void			DrawBar(bool force);
-		int				UpdateSituation(int64 committedMemory);
+		int64			UpdateSituation(int64 committedMemory);
 		void			BarUpdate();
 		void			Init();
 		void			Reset(char* name, team_id team, BBitmap* icon, bool deleteIcon);
