@@ -1335,6 +1335,7 @@ MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 			(addr_t)area, (addr_t)areaBase + SLAB_AREA_SIZE - 1);
 
 		vmArea = VMAreas::Lookup(areaID);
+		vmArea->protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 		status_t error = _MapChunk(vmArea, (addr_t)area, kAreaAdminSize,
 			pagesNeededToMap, flags);
 		if (error != B_OK) {
