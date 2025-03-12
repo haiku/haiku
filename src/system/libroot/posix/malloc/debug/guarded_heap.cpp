@@ -714,6 +714,15 @@ guarded_heap_area_allocation_for(void* address, area_id& allocationArea)
 	if (get_area_info(allocationArea, &areaInfo) != B_OK)
 		return NULL;
 
+	if ((areaInfo.protection & B_STACK_AREA) != 0) {
+		panic("tried to free %p which is in a stack area (%d)",
+			address, allocationArea);
+		return NULL;
+	}
+
+	if (strncmp(areaInfo.name, "guarded_heap", strlen("guarded_heap")) != 0)
+		return NULL;
+
 	guarded_heap_page* page = (guarded_heap_page*)areaInfo.address;
 	if (page->flags != (GUARDED_HEAP_PAGE_FLAG_USED
 			| GUARDED_HEAP_PAGE_FLAG_FIRST | GUARDED_HEAP_PAGE_FLAG_AREA)) {
