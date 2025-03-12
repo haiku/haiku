@@ -786,8 +786,13 @@ X86VMTranslationMap64Bit::DebugGetReverseMappingInfo(phys_addr_t physicalAddress
 			if ((virtualPML4[i] & X86_64_PML4E_PRESENT) == 0)
 				continue;
 			uint64 addressMask = 0;
-			if (i >= 256)
-				addressMask = fLA57 ? 0xff00000000000000LL : 0xfffff00000000000LL;
+			if (fLA57) {
+				if (p >= 256)
+					addressMask = 0xff00000000000000LL;
+			} else {
+				if (i >= 256)
+					addressMask = 0xfffff00000000000LL;
+			}
 
 			const uint64* virtualPDPT = (uint64*)fPageMapper->GetPageTableAt(
 				virtualPML4[i] & X86_64_PML4E_ADDRESS_MASK);
