@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system libroot posix stdlib ;
 
 UsePrivateHeaders drivers libroot runtime_loader shared ;
+UsePrivateHeaders kernel ;	# for <util/*>
+
 SubDirCcFlags -D_DEFAULT_SOURCE ;
 
 local architectureObject ;
