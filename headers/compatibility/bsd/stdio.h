@@ -19,7 +19,7 @@ extern "C" {
 
 char *fgetln(FILE *stream, size_t *_length);
 
-int asprintf(char **ret, char const *format, ...) __PRINTFLIKE(2,3);
+int asprintf(char **ret, char const *format, ...) _PRINTFLIKE(2,3);
 int vasprintf(char **ret, char const *format, va_list ap);
 
 

@@ -10,7 +10,6 @@
 
 
 #include <module.h>
-#include <stdio.h>
 
 struct kernel_args;
 
@@ -32,8 +31,8 @@ extern "C" {
 #endif
 
 int con_init(struct kernel_args *args);
-void kprintf(const char *fmt, ...) __PRINTFLIKE(1,2);
-void kprintf_xy(int x, int y, const char *fmt, ...) __PRINTFLIKE(3,4);
+void kprintf(const char *fmt, ...) _PRINTFLIKE(1,2);
+void kprintf_xy(int x, int y, const char *fmt, ...) _PRINTFLIKE(3,4);
 
 #ifdef __cplusplus
 }

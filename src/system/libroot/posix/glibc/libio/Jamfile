@@ -26,6 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		MergeObject <$(architecture)>posix_gnu_libio.o :
 			__fpurge.c
+			__freading.c
 			__fsetlocking.c
 			clearerr.c
 			clearerr_u.c
