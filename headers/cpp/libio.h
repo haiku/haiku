@@ -181,25 +181,11 @@ extern int __uflow(_IO_FILE *stream);
 extern int __overflow(_IO_FILE *stream, int c);
 
 extern int _IO_peekc_locked(_IO_FILE *stream);
-
-/* This one is for Emacs. */
-#define _IO_PENDING_OUTPUT_COUNT(_fp)	\
-	((_fp)->_IO_write_ptr - (_fp)->_IO_write_base)
+#define _IO_peekc(_fp) _IO_peekc_locked (_fp)
 
 extern void _IO_flockfile(_IO_FILE *);
 extern void _IO_funlockfile(_IO_FILE *);
 extern int _IO_ftrylockfile(_IO_FILE *);
-
-#ifdef _IO_MTSAFE_IO
-#	define _IO_peekc(_fp) _IO_peekc_locked (_fp)
-#else
-#	define _IO_peekc(_fp) _IO_peekc_unlocked (_fp)
-#	define _IO_flockfile(_fp) /**/
-#	define _IO_funlockfile(_fp) /**/
-#	define _IO_ftrylockfile(_fp) /**/
-#	define _IO_cleanup_region_start(_fct, _fp) /**/
-#	define _IO_cleanup_region_end(_Doit) /**/
-#endif /* !_IO_MTSAFE_IO */
 
 extern int _IO_vfscanf(_IO_FILE *, const char *, va_list, int *);
 extern int _IO_vfprintf(_IO_FILE *, const char *, va_list);
