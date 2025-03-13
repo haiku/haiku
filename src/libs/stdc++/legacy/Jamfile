@@ -144,12 +144,11 @@ for architectureObject in [ MultiArchSubDirSetup x86_gcc2 ] {
 				strstream.cc ;
 
 		# stuff imported from libiberty:
-		GenerateStdC++Object
-			: basename.c getpagesize.c insque.c sigsetmask.c strerror.c
-				vfork.c ;
+		GenerateStdC++Object :
+			sigsetmask.c
+			;
 
 		SharedLibraryFromObjects libstdc++.r4.so :
-			basename.o
 			builtinbuf.o
 			cmathi.o
 			cstdlibi.o
@@ -163,9 +162,7 @@ for architectureObject in [ MultiArchSubDirSetup x86_gcc2 ] {
 			fcomplex.o
 			filebuf.o
 			fstream.o
-			getpagesize.o
 			indstream.o
-			insque.o
 			ioassign.o
 			ioextend.o
 			iomanip.o
@@ -192,8 +189,7 @@ for architectureObject in [ MultiArchSubDirSetup x86_gcc2 ] {
 			stlinst.o
 			stream.o
 			streambuf.o
-			strerror.o
 			strstream.o
-			vfork.o ;
+			;
 	}
 }
