@@ -288,7 +288,6 @@ struct streambuf : public _IO_FILE { // protected??
     const void *&_vtable() { return *(const void**)((_IO_FILE*)this + 1); }
   protected:
     static streambuf* _list_all; /* List of open streambufs. */
-    _IO_FILE*& xchain() { return _chain; }
     void _un_link();
     void _link_in();
     char* gptr() const
@@ -302,13 +301,8 @@ struct streambuf : public _IO_FILE { // protected??
       { return _IO_file_flags & _IO_IN_BACKUP ? _IO_save_base : _IO_read_base;}
     char* base() const { return _IO_buf_base; }
     char* ebuf() const { return _IO_buf_end; }
-    int blen() const { return _IO_buf_end - _IO_buf_base; }
-    void xput_char(char c) { *_IO_write_ptr++ = c; }
     int xflags() { return _IO_file_flags; }
     int xflags(int f) {int fl = _IO_file_flags; _IO_file_flags = f; return fl;}
-    void xsetflags(int f) { _IO_file_flags |= f; }
-    void xsetflags(int f, int mask)
-      { _IO_file_flags = (_IO_file_flags & ~mask) | (f & mask); }
     void gbump(int n)
       { _IO_file_flags & _IO_IN_BACKUP ? (_IO_save_base+=n):(_IO_read_ptr+=n);}
     void pbump(int n) { _IO_write_ptr += n; }
@@ -318,26 +312,6 @@ struct streambuf : public _IO_FILE { // protected??
     void setg(char* eb, char* g, char *eg) {
       if (_IO_file_flags & _IO_IN_BACKUP) _IO_free_backup_area(this);
       _IO_read_base = eb; _IO_read_ptr = g; _IO_read_end = eg; }
-    char *shortbuf() { return _shortbuf; }
-
-    int in_backup() { return _flags & _IO_IN_BACKUP; }
-    // The start of the main get area:  FIXME:  wrong for write-mode filebuf?
-    char *Gbase() { return in_backup() ? _IO_save_base : _IO_read_base; }
-    // The end of the main get area:
-    char *eGptr() { return in_backup() ? _IO_save_end : _IO_read_end; }
-    // The start of the backup area:
-    char *Bbase() { return in_backup() ? _IO_read_base : _IO_save_base; }
-    char *Bptr() { return _IO_backup_base; }
-    // The end of the backup area:
-    char *eBptr() { return in_backup() ? _IO_read_end : _IO_save_end; }
-    char *Nbase() { return _IO_save_base; }
-    char *eNptr() { return _IO_save_end; }
-    int have_backup() { return _IO_save_base != NULL; }
-    int have_markers() { return _markers != NULL; }
-    void free_backup_area();
-    void unsave_markers(); // Make all streammarkers !saving().
-    int put_mode() { return _flags & _IO_CURRENTLY_PUTTING; }
-    int switch_to_get_mode();
 
     streambuf(int flags=0);
   public:
@@ -446,10 +420,6 @@ class filebuf : public streambuf {
     virtual int sync();
   protected: // See documentation in filebuf.C.
 //    virtual int pbackfail(int c);
-    int is_reading() { return eback() != egptr(); }
-    char* cur_ptr() { return is_reading() ?  gptr() : pptr(); }
-    /* System's idea of pointer */
-    char* file_ptr() { return eGptr(); }
     // Low-level operations (Usually invoke system calls.)
     virtual streamsize sys_read(char* buf, streamsize size);
     virtual streampos sys_seek(streamoff, _seek_dir);

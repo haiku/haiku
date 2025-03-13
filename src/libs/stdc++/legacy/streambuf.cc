@@ -40,12 +40,6 @@ void streambuf::_un_link() { _IO_un_link(reinterpret_cast<_IO_FILE_plus*>(this))
 
 void streambuf::_link_in() { _IO_link_in(reinterpret_cast<_IO_FILE_plus*>(this)); }
 
-int streambuf::switch_to_get_mode()
-{ return _IO_switch_to_get_mode(this); }
-
-void streambuf::free_backup_area()
-{ _IO_free_backup_area(this); }
-
 #if 0
 int streambuf::switch_to_put_mode()
 { return _IO_:switch_to_put_mode(this); }
@@ -337,11 +331,6 @@ int streammarker::delta()
 int streambuf::seekmark(streammarker& mark, int delta /* = 0 */)
 {
   return _IO_seekmark(this, &mark, delta);
-}
-
-void streambuf::unsave_markers()
-{
-  _IO_unsave_markers(this);
 }
 
 int ios::readable() { return !(rdbuf()->_flags & _IO_NO_READS); }
