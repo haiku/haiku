@@ -199,14 +199,15 @@ public:
 		// it is therefor yet "untransformed" in case there is an
 		// embedded transformation.
 		const agg::rect_i& r = glyph->bounds;
+		if (!r.is_valid())
+			return true;
 		IntRect glyphBounds(int32(r.x1 + x), int32(r.y1 + y - 1),
 			int32(r.x2 + x + 1), int32(r.y2 + y + 1));
 			// NOTE: "-1"/"+1" converts the glyph bounding box from pixel
 			// indices to pixel area coordinates
 
 		// track bounding box
-		if (glyphBounds.IsValid())
-			fBounds = fBounds | glyphBounds;
+		fBounds = fBounds | glyphBounds;
 
 		// render the glyph if this is not a dry run
 		if (!fDryRun) {
