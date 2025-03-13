@@ -3,7 +3,6 @@
 
 #ifndef __CMATH__
 #define __CMATH__
-#include <_G_config.h>
 #include <math.h>
 
 #ifdef __GNUG__

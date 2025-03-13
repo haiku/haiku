@@ -161,7 +161,6 @@
 # endif
 
 # ifdef __GNUC__
-#   include <_G_config.h>
 #   define __STL_HAS_WCHAR_T
 #   if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
 #     define __STL_STATIC_TEMPLATE_MEMBER_BUG

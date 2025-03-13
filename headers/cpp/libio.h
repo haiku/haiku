@@ -81,6 +81,7 @@
 #define _IO_IS_APPENDING 0x1000
 #define _IO_IS_FILEBUF 0x2000
 #define _IO_BAD_SEEN 0x4000
+#define _G_IO_IO_FILE_VERSION 0x20001
 
 /* These are "formatting flags" matching the iostream fmtflags enum values. */
 #define _IO_SKIPWS 01

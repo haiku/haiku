@@ -55,11 +55,7 @@ extern "C" {
 #endif
 
 #ifndef _IO_wchar_t
-#if _G_IO_IO_FILE_VERSION == 0x20001
-#define _IO_wchar_t _G_wchar_t
-#else
 #define _IO_wchar_t wchar_t
-#endif
 #endif
 
 extern "C++" {
