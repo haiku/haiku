@@ -120,19 +120,25 @@ extern void		lcong48(unsigned short int param[7]);
 
 /* search and sort functions */
 typedef int (*_compare_function)(const void *, const void *);
+typedef int (*_compare_function_qsort_r)(const void*, const void*, void*);
 
 extern void		*bsearch(const void *key, const void *base, size_t numElements,
 					size_t sizeOfElement, _compare_function);
+extern void		qsort(void *base, size_t numElements, size_t sizeOfElement,
+					_compare_function);
+extern void		qsort_r(void* base, size_t numElements, size_t sizeOfElement,
+					_compare_function_qsort_r, void* cookie);
+
+#ifdef _DEFAULT_SOURCE
 extern int		heapsort(void *base, size_t numElements, size_t sizeOfElement,
 					_compare_function);
 extern int		mergesort(void *base, size_t numElements, size_t sizeOfElement,
-					_compare_function);
-extern void		qsort(void *base, size_t numElements, size_t sizeOfElement,
 					_compare_function);
 extern int		radixsort(u_char const **base, int numElements,
 					u_char const *table, u_int endByte);
 extern int		sradixsort(u_char const **base, int numElements,
 					u_char const *table, u_int endByte);
+#endif
 
 /* misc math functions */
 extern int		abs(int number);

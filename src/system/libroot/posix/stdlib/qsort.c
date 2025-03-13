@@ -29,16 +29,22 @@
  * SUCH DAMAGE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)qsort.c	8.1 (Berkeley) 6/4/93";
-#endif /* LIBC_SCCS and not lint */
-
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
+#define __unused
+
+#if defined(I_AM_QSORT_R)
+typedef int		 cmp_t(const void *, const void *, void *);
+#elif defined(I_AM_QSORT_R_COMPAT)
+typedef int		 cmp_t(void *, const void *, const void *);
+#elif defined(I_AM_QSORT_S)
+typedef int		 cmp_t(const void *, const void *, void *);
+#else
 typedef int		 cmp_t(const void *, const void *);
+#endif
 static inline char	*med3(char *, char *, char *, cmp_t *, void *);
 
 #define	MIN(a, b)	((a) < (b) ? a : b)
@@ -62,20 +68,39 @@ swapfunc(char *a, char *b, size_t es)
 #define	vecswap(a, b, n)				\
 	if ((n) > 0) swapfunc(a, b, n)
 
+#if defined(I_AM_QSORT_R)
+#define	CMP(t, x, y) (cmp((x), (y), (t)))
+#elif defined(I_AM_QSORT_R_COMPAT)
+#define	CMP(t, x, y) (cmp((t), (x), (y)))
+#elif defined(I_AM_QSORT_S)
+#define	CMP(t, x, y) (cmp((x), (y), (t)))
+#else
 #define	CMP(t, x, y) (cmp((x), (y)))
+#endif
 
 static inline char *
-med3(char *a, char *b, char *c, cmp_t *cmp, void *thunk)
+med3(char *a, char *b, char *c, cmp_t *cmp, void *thunk
+#if !defined(I_AM_QSORT_R) && !defined(I_AM_QSORT_R_COMPAT) && !defined(I_AM_QSORT_S)
+__unused
+#endif
+)
 {
 	return CMP(thunk, a, b) < 0 ?
-		   (CMP(thunk, b, c) < 0 ? b : (CMP(thunk, a, c) < 0 ? c : a ))
-		  :(CMP(thunk, b, c) > 0 ? b : (CMP(thunk, a, c) < 0 ? a : c ));
+	       (CMP(thunk, b, c) < 0 ? b : (CMP(thunk, a, c) < 0 ? c : a ))
+	      :(CMP(thunk, b, c) > 0 ? b : (CMP(thunk, a, c) < 0 ? a : c ));
 }
 
 /*
  * The actual qsort() implementation is static to avoid preemptible calls when
  * recursing. Also give them different names for improved debugging.
  */
+#if defined(I_AM_QSORT_R)
+#define local_qsort local_qsort_r
+#elif defined(I_AM_QSORT_R_COMPAT)
+#define local_qsort local_qsort_r_compat
+#elif defined(I_AM_QSORT_S)
+#define local_qsort local_qsort_s
+#endif
 static void
 local_qsort(void *a, size_t n, size_t es, cmp_t *cmp, void *thunk)
 {
@@ -92,8 +117,8 @@ loop:
 	if (n < 7) {
 		for (pm = (char *)a + es; pm < (char *)a + n * es; pm += es)
 			for (pl = pm;
-				 pl > (char *)a && CMP(thunk, pl - es, pl) > 0;
-				 pl -= es)
+			     pl > (char *)a && CMP(thunk, pl - es, pl) > 0;
+			     pl -= es)
 				swapfunc(pl, pl - es, es);
 		return;
 	}
@@ -141,8 +166,8 @@ loop:
 	if (swap_cnt == 0) {  /* Switch to insertion sort */
 		for (pm = (char *)a + es; pm < (char *)a + n * es; pm += es)
 			for (pl = pm;
-				 pl > (char *)a && CMP(thunk, pl - es, pl) > 0;
-				 pl -= es)
+			     pl > (char *)a && CMP(thunk, pl - es, pl) > 0;
+			     pl -= es)
 				swapfunc(pl, pl - es, es);
 		return;
 	}
@@ -186,8 +211,52 @@ loop:
 	}
 }
 
+#if defined(I_AM_QSORT_R)
+void
+(qsort_r)(void *a, size_t n, size_t es, cmp_t *cmp, void *thunk)
+{
+	local_qsort_r(a, n, es, cmp, thunk);
+}
+#elif defined(I_AM_QSORT_R_COMPAT)
+void
+__qsort_r_compat(void *a, size_t n, size_t es, void *thunk, cmp_t *cmp)
+{
+	local_qsort_r_compat(a, n, es, cmp, thunk);
+}
+#elif defined(I_AM_QSORT_S)
+errno_t
+qsort_s(void *a, rsize_t n, rsize_t es, cmp_t *cmp, void *thunk)
+{
+	if (n > RSIZE_MAX) {
+		__throw_constraint_handler_s("qsort_s : n > RSIZE_MAX", EINVAL);
+		return (EINVAL);
+	} else if (es > RSIZE_MAX) {
+		__throw_constraint_handler_s("qsort_s : es > RSIZE_MAX",
+		    EINVAL);
+		return (EINVAL);
+	} else if (n != 0) {
+		if (a == NULL) {
+			__throw_constraint_handler_s("qsort_s : a == NULL",
+			    EINVAL);
+			return (EINVAL);
+		} else if (cmp == NULL) {
+			__throw_constraint_handler_s("qsort_s : cmp == NULL",
+			    EINVAL);
+			return (EINVAL);
+		} else if (es <= 0) {
+			__throw_constraint_handler_s("qsort_s : es <= 0",
+			    EINVAL);
+			return (EINVAL);
+		}
+	}
+
+	local_qsort_s(a, n, es, cmp, thunk);
+	return (0);
+}
+#else
 void
 qsort(void *a, size_t n, size_t es, cmp_t *cmp)
 {
 	local_qsort(a, n, es, cmp, NULL);
 }
+#endif
