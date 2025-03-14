@@ -35,8 +35,6 @@
 /* This has to be changed whenever a new locale is defined.  */
 #define __LC_LAST	7
 
-#include <intl/loadinfo.h>	/* For loaded_l10nfile definition.  */
-
 /* Magic number at the beginning of a locale data file for CATEGORY.  */
 #define	LIMAGIC(category)	((unsigned int) (0x20000828 ^ (category)))
 

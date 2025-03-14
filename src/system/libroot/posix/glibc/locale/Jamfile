@@ -26,11 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			C_name.c
 			coll-lookup.c
 			global-locale.c
-			lc-collate.c
 			lc-ctype.c
-			lc-messages.c
-			lc-monetary.c
-			lc-numeric.c
 			xlocale.c
 			;
 	}
