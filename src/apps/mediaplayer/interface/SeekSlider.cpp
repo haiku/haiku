@@ -124,9 +124,9 @@ SeekSlider::MouseUp(BPoint where)
 void
 SeekSlider::MouseMoved(BPoint point, uint32 transit, const BMessage* dragMessage)
 {
-	if (!IsTracking()) {
+	if (fHoverMessage != NULL) {
 		fHoverMessage->SetInt32("value", ValueForPoint(point));
-		Invoke(fHoverMessage);
+		BControl::Invoke(fHoverMessage);
 	}
 	BSlider::MouseMoved(point, transit, dragMessage);
 }

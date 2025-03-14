@@ -88,6 +88,8 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	fSeekLayout->AddView(fSeekSlider);
 
 	fPositionToolTip = new PositionToolTip();
+	fPositionToolTip->SetAlignment(BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
+	fPositionToolTip->SetMouseRelativeLocation(BPoint(0, 0));
 	fSeekSlider->SetToolTip(fPositionToolTip);
 
 	// Duration view
@@ -278,10 +280,11 @@ TransportControlGroup::MessageReceived(BMessage* message)
 
 		case MSG_DURATION_TOOLTIP:
 		{
-			BToolTipManager* manager = BToolTipManager::Manager();
 			BPoint tipPoint;
-			GetMouse(&tipPoint, NULL, false);
-			manager->ShowTip(fPositionToolTip, tipPoint, this);
+			fSeekSlider->GetMouse(&tipPoint, NULL, false);
+			tipPoint.y = 0;
+			fSeekSlider->ConvertToScreen(&tipPoint);
+			BToolTipManager::Manager()->ShowTip(fPositionToolTip, tipPoint, this);
 			break;
 		}
 
@@ -291,6 +294,7 @@ TransportControlGroup::MessageReceived(BMessage* message)
 			if (message->FindInt32("value", &value) == B_OK) {
 				bigtime_t position = TimePositionFor(value / (float)kPositionFactor);
 				fPositionToolTip->Update(position, fDurationView->TimeDuration());
+				Looper()->PostMessage(MSG_DURATION_TOOLTIP, this);
 			}
 			break;
 		}
@@ -505,11 +509,8 @@ TransportControlGroup::SetPosition(float value, bigtime_t position,
 {
 	fDurationView->Update(position, duration);
 
-	if (fSeekSlider->IsTracking()) {
-		fPositionToolTip->Update(position, duration);
+	if (fSeekSlider->IsTracking())
 		return;
-	}
-
 	fSeekSlider->SetPosition(value);
 }
 

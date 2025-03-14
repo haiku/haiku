@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <Autolock.h>
 #include <StringView.h>
 
 #include "DurationToString.h"
@@ -36,16 +37,15 @@ public:
 
 	void Update(bigtime_t position, bigtime_t duration)
 	{
-		if (!LockLooper())
+		BAutolock locker(Looper());
+		if (Looper() != NULL && !locker.IsLocked())
 			return;
 
 		if (position != -1) {
 			position /= 1000000L;
 			duration /= 1000000L;
-			if (position == fPosition && duration == fDuration) {
-				UnlockLooper();
+			if (position == fPosition && duration == fDuration)
 				return;
-			}
 
 			fPosition = position;
 			fDuration = duration;
@@ -60,8 +60,6 @@ public:
 		char text[66];
 		snprintf(text, sizeof(text), "%s / %s", positionText, durationText);
 		SetText(text);
-
-		UnlockLooper();
 	}
 
 private:
