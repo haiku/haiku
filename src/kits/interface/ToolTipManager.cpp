@@ -350,8 +350,13 @@ ToolTipWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgShowToolTip:
+		{
+			BPoint where;
+			if (message->FindPoint("where", &where) == B_OK)
+				view->ResetWindowFrame(where);
 			view->ShowTip();
 			break;
+		}
 
 		case kMsgCloseToolTip:
 			if (view->IsTipHidden())
@@ -399,7 +404,9 @@ BToolTipManager::ShowTip(BToolTip* tip, BPoint where, void* owner)
 		current->ReleaseReference();
 
 	if (current == tip || currentOwner == owner) {
-		fWindow.SendMessage(kMsgShowToolTip);
+		BMessage message(kMsgShowToolTip);
+		message.AddPoint("where", where);
+		fWindow.SendMessage(&message);
 		return;
 	}
 
