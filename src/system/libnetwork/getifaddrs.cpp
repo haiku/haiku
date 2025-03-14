@@ -175,9 +175,9 @@ freeifaddrs(struct ifaddrs* ifa)
 {
 	while (ifa != NULL) {
 		free((void*)ifa->ifa_name);
-		delete ifa->ifa_addr;
-		delete ifa->ifa_netmask;
-		delete ifa->ifa_dstaddr;
+		delete (sockaddr_storage*)ifa->ifa_addr;
+		delete (sockaddr_storage*)ifa->ifa_netmask;
+		delete (sockaddr_storage*)ifa->ifa_dstaddr;
 
 		struct ifaddrs* next = ifa->ifa_next;
 		delete ifa;
