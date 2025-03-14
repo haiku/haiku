@@ -81,7 +81,6 @@ KernelMergeObject kernel_lib_posix.o :
 	abs.c
 	atoi.c
 	bsearch.c
-	merge.c
 	qsort.c
 	random.c
 	strtod.c
