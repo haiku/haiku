@@ -5707,6 +5707,10 @@ BView::ShowToolTip(BToolTip* tip)
 void
 BView::HideToolTip()
 {
+	if (fToolTip == NULL)
+		return;
+
+	// TODO: Only hide if ours is the tooltip that's showing!
 	BToolTipManager::Manager()->HideTip();
 }
 
