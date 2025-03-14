@@ -55,6 +55,7 @@ public:
 
 private:
 			BToolTip*			fToolTip;
+			BPoint				fWhere;
 			bool				fHidden;
 };
 
@@ -159,10 +160,7 @@ ToolTipView::ShowTip()
 void
 ToolTipView::ResetWindowFrame()
 {
-	BPoint where;
-	GetMouse(&where, NULL, false);
-
-	ResetWindowFrame(ConvertToScreen(where));
+	ResetWindowFrame(fWhere);
 }
 
 
@@ -174,6 +172,8 @@ ToolTipView::ResetWindowFrame()
 void
 ToolTipView::ResetWindowFrame(BPoint where)
 {
+	fWhere = where;
+
 	if (Window() == NULL)
 		return;
 
@@ -322,7 +322,6 @@ ToolTipWindow::ToolTipWindow(BToolTip* tip, BPoint where, void* owner)
 	manager->Unlock();
 
 	// figure out size and location
-
 	view->ResetWindowFrame(where);
 }
 
