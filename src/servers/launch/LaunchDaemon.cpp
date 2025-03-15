@@ -1866,7 +1866,7 @@ LaunchDaemon::_StopJob(Job* job, bool force)
 	}
 	// TODO: allow custom shutdown
 
-	send_signal(-job->Team(), SIGINT);
+	send_signal(job->Team(), SIGTERM);
 	// TODO: this would be the next step, again, after a delay
 	//send_signal(job->Team(), SIGKILL);
 }

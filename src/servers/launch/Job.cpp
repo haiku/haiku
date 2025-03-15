@@ -475,7 +475,17 @@ Job::GetMessenger(BMessenger& messenger)
 	if (fDefaultPort < 0)
 		return B_NAME_NOT_FOUND;
 
-	BMessenger::Private(messenger).SetTo(fTeam, fDefaultPort, fToken);
+	app_info info;
+	status_t status = be_roster->GetRunningAppInfo(fTeam, &info);
+	if (status != B_OK)
+		return B_NAME_NOT_FOUND;
+
+	bool preRegistered = false;
+	status = BRoster::Private().IsAppRegistered(&info.ref, info.team, fToken, &preRegistered, NULL);
+	if (status != B_OK || preRegistered)
+		return B_NAME_NOT_FOUND;
+
+	BMessenger::Private(messenger).SetTo(fTeam, info.port, fToken);
 	return B_OK;
 }
 
