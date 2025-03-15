@@ -1858,6 +1858,10 @@ BRoster::_UpdateActiveApp(team_id team) const
 	       the team ID of the launched application.
 	\param appThread Pointer to a pre-allocated thread_id variable to
 		   be set to the thread ID of the launched main thread.
+	\param _appPort Pointer to a pre-allocated port_id variable to
+		   be set to the port ID of the launched application.
+	\param _appToken Pointer to a pre-allocated uint32 variable to
+		   be set to the token of the launched application.
 	\param launchSuspended Indicates whether to keep the app thread in the
 		   suspended state or resume it.
 
