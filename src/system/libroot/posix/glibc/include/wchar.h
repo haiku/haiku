@@ -1,6 +1,8 @@
 #ifndef _WCHAR_H
 #include <wcsmbs/wchar.h>
 
+typedef unsigned long int wctype_t;
+
 # ifdef _WCHAR_H
 /* Now define the internal interfaces.  */
 extern int __wcscasecmp (__const wchar_t *__s1, __const wchar_t *__s2)
