@@ -20,7 +20,7 @@ TV	MainWin		TV
 force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	544 × 576, ekran en–boy oranı 4:3 zorla
 Settings	MainWin		Ayarlar
 force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	704 × 576, ekran en–boy oranı 4:3 zorla
-%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s — %d × %d, %.3f:%.3f ≧ %.0f × %.0f
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s — %d × %d, %.3f:%.3f ⇒ %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Ayarlar…
 None	MainWin		Yok

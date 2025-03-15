@@ -163,7 +163,7 @@ Close	PackageManager		關閉
 Changelog	PackageInfoView		變更日誌
 About	PackageInfoView		關於
 Password requirements download problem	UserLoginWindow		下載需要密碼問題
-Password:	UserLoginWindow		密码：
+Password:	UserLoginWindow		密碼：
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		該應用程式太舊，無法與伺服器系統通訊。透過更新您的系統來取得此應用程式的更新版本。此應用程式所需的最低版本是  \"%s\".
 Stability	RatePackageWindow		穩定
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		密碼必須重複輸入，以減少密碼輸入錯誤的機會。

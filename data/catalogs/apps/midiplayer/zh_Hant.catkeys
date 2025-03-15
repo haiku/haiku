@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MidiPlayer	2554156329
+1	english	x-vnd.Haiku-MidiPlayer	1046133011
 This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	這個小程式\n曉得播放數千首\n俗氣的歌曲
 Dungeon	Main Window		地下城
 Could not load song	Main Window		無法載入歌曲
@@ -7,6 +7,7 @@ Off	Main Window		關閉
 Loading instruments…	Scope View		加載樂器…
 Volume:	Main Window		音量：
 Closet	Main Window		衣櫥
+Scope	Main Window		Scope
 Drop MIDI file here	Scope View		將MIDI檔案拖曳到此處
 None	Main Window		無
 Reverb:	Main Window		混響：

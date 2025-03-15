@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	3137892470
+1	english	x-vnd.Haiku-MediaPlayer	1732323378
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		將條目移動到資源回收筒
 Close	MediaPlayer-PlaylistWindow		關閉
 Volume of background clips	MediaPlayer-SettingsWindow		背景片段的音量
@@ -116,6 +116,7 @@ Small	MediaPlayer-SettingsWindow		小
 Settings…	MediaPlayer-Main		設定…
 min	MediaPlayer-InfoWin	Minutes	分
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		儲存播放清單失敗：\n\n錯誤：
+Video	MediaPlayer-InfoWin		視頻
 File info…	MediaPlayer-Main		档案訊息…
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美國）
 <unnamed>	PlaylistItem-name		<未命名>
@@ -151,6 +152,7 @@ ask every time	MediaPlayer-SettingsWindow		每次都要諮詢
 (not supported)	MediaPlayer-InfoWin		（不支持）
 Randomize	MediaPlayer-PlaylistWindow		隨機化
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		關
 400% scale	MediaPlayer-Main		400% 比例
 h	MediaPlayer-InfoWin	Hours	時
 OK	MediaPlayer-PlaylistWindow		確認

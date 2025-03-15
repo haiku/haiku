@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-LaunchBox	4251358078
+1	english	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		設定說明…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		真的關閉這個pad嗎？\n（該pad將不會被記住。）
 OK	LaunchBox		確認
@@ -20,6 +20,7 @@ Add button here	LaunchBox		在此新增按鈕
 Cancel	LaunchBox		取消
 launch popup	LaunchBox		啟動彈出
 Clear button	LaunchBox		清除按鈕
+Bummer	LaunchBox		失敗
 last chance	LaunchBox		最後機會
 You can drag an icon here.	LaunchBox		您可以將圖示拖到此處。
 Pad 1	LaunchBox		Pad 1

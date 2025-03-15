@@ -40,7 +40,7 @@ Add filter	Config Views		新增過濾器
 Account settings	Config Views		帳戶設定
 minutes	Config Window		分鐘
 E-mail	System name		電子郵件
-Check every	Config Window		檢查每個
+Check every	Config Window		檢查每隔
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		使用「新增」按鈕建立一個新帳戶。\n\n使用所選項目上的「刪除」按鈕刪除帳戶。\n\n選擇清單中的一個項目以變更其設定。
 Account name:	E-Mail		帳戶名稱：
 Edit mailbox menu…	Config Window		編輯郵件選單…

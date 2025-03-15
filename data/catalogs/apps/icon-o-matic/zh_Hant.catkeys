@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	3338451224
+1	english	x-vnd.haiku-icon_o_matic	1275638063
 None	Icon-O-Matic-Properties		無
 Clean up path	Icon-O-Matic-CleanUpPathCmd		清理路徑
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -88,7 +88,7 @@ Duplicate	Icon-O-Matic-PathsList		複製
 Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		移動 {0, plural, one{形狀} other{形狀}}
 Save	Icon-O-Matic-Menu-Settings		存儲
 Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	點選其中的一個對象
-Export as…	Icon-O-Matic-Menu-File		導出為…
+Export as…	Icon-O-Matic-Menu-File		匯出為…
 Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		凍結 {0, plural, one{形狀} other{形狀}}
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		消除 {0, plural, one{形狀} other{形狀}}
 Undo: %action%	Icon-O-Matic-Main		撤銷: %action%
@@ -96,6 +96,7 @@ Diamond	Icon-O-Matic-StyleTypes		鑽石
 Don't save	Icon-O-Matic-Menu-Settings		不要存儲
 Add shape with path	Icon-O-Matic-Menu-Shape		新增帶路徑的形狀
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Bummer
+Translation X	Icon-O-Matic-PropertyNames		移動X軸
 Multi-paste properties	Icon-O-Matic-Properties		多重貼上特性
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		載入 SVG 時，Icon-O-Matic 可能無法解釋 SVG 中的所有資料。透過覆蓋原始文件，該資訊現在將丟失。
 Remove	Icon-O-Matic-TransformersList		消除
@@ -139,6 +140,7 @@ One or more of the shapes has too many paths. The HVIF format supports a maximum
 Add shape with path & style	Icon-O-Matic-Menu-Shape		新增帶有路徑和样式的形狀
 Radial	Icon-O-Matic-StyleTypes		徑向
 Text too long	Icon-O-Matic-StyledTextImport		文字太長
+Caps	Icon-O-Matic-PropertyNames		大寫
 OK	Icon-O-Matic-SVGImport		確認
 Import text	Icon-O-Matic-StyledTextImport		導入文字
 Append…	Icon-O-Matic-Menu-File		附加…
@@ -164,6 +166,7 @@ Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<无可撤销内容>
 Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		刪除  {0, plural, one{路徑} other{路徑}}
 Add	Icon-O-Matic-StylesList		添加
+Translation Y	Icon-O-Matic-PropertyNames		移動Y軸
 Modify vertex	Icon-O-Matic-ChangePointCmd		修改頂點
 Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		移動 {0, plural, one{風格} other{風格}}
 Scale	Icon-O-Matic-TransformationBoxStates		延伸
@@ -186,4 +189,5 @@ Export	Icon-O-Matic-Menu-File		匯出
 Width	Icon-O-Matic-PropertyNames		寬度
 Add reference image	Icon-O-Matic-ShapesList		新增參考影像
 Style	Icon-O-Matic-Menus		風格
+Off	Icon-O-Matic-Menu-Settings		關
 Edit	Icon-O-Matic-Menus		編輯

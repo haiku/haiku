@@ -2,7 +2,7 @@
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		啟動檔案類型preflet以設定人員屬性已失敗。\n\n錯誤：
 Mobile phone	People		移動電話
 Unnamed person	People		未命名人員
-New person…	People		新人員…
+New person…	People		新的聯絡人…
 Address	People		地址
 Zip	People		郵編
 Select all	People		選擇全部
@@ -19,8 +19,8 @@ People	System name		人員
 Error	People		錯誤
 Revert	People		恢復
 Country	People		國家
-Person	Short mimetype description		人員
-New person	People		新人員
+Person	Short mimetype description		聯絡人
+New person	People		新的聯絡人
 Save	People		存儲
 Fax	People		傳真
 URL	People		URL

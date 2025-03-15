@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	1838011023
+1	english	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		設定為已存儲
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		您的正文包含 %ld 個無法編碼的字元。也許不同的字符集會更好？點擊“發送”仍然可以發送（將使用替代字元來代替不可編碼的字元），或者選擇“取消”返回並嘗試修復它。
 Text wrapping:	Mail		文字換行：
@@ -13,7 +13,7 @@ Copy to new	Mail		複製到新的
 Save as draft	Mail		存儲為草稿
 Encoding:	Mail		編碼：
 Print	Mail		列印
-Decrease quote level	Mail		降低quote水平
+Decrease quote level	Mail		降低引用等級
 Encoding	Mail		編碼
 Default account:	Mail		默認帳戶：
 Message	Mail		訊息
@@ -66,11 +66,14 @@ Really delete this signature? This cannot be undone.	Mail		真的刪除這個簽
 spam	B_USER_DIRECTORY/mail/spam		垃圾郵件
 Reply to all	Mail		回覆全部
 Cancel	Mail		取消
+Off	Mail		關
 Set to %s	Mail		設定為 %s
 Signature:	Mail		簽名：
 Forward without attachments	Mail		無附件轉發
 queries	B_USER_DIRECTORY/mail/queries		查詢
+View	Mail		查看
 Signatures	Mail		簽名
+On	Mail		開
 Find	Mail		尋找
 Sorry, could not find an application that supports the 'Person' data type.	Mail		抱歉，找不到支援“Person”資料類型的應用程式。
 Date:	Mail		日期：
@@ -95,6 +98,7 @@ The mail_daemon could not be started:\n\t	Mail		mail_daemon無法啓動：\n\t
 <no account found>	Mail		<沒有找到帳戶>
 Mail couldn't find its dictionary.	Mail		Mail找不到它的字典。
 helpful message	Mail		有用的信息
+ Read 	Mail		閱讀
 Font:	Mail		字體：
 Accounts…	Mail		賬戶…
 Previous	Mail		上一個
@@ -130,7 +134,9 @@ Hide	Mail		隱藏
 From:	Mail		從：
 No file attributes, just plain data	Mail		沒有檔案屬性，只有純數據
 Add	Mail		地址
+out	B_USER_DIRECTORY/mail/out		發送
 Send this message before closing?	Mail		在關閉之前發送此訊息？
+in	B_USER_DIRECTORY/mail/in		接收
 Open	Mail		開啟
 Don't save	Mail		不要存儲
 Leave same	Mail		留下同樣的
@@ -159,3 +165,4 @@ Spam	Mail		垃圾郵件
 Couldn't open this signature. Sorry.	Mail		無法開啓此簽名。對不起。
 Revert	Mail		上一個
 Unknown	Mail		未知
+Increase quote level	Mail		提升引用等級

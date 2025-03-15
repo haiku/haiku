@@ -35,7 +35,7 @@ Cannot start the video source	CodyCam		無法啟動視訊來源
 Cannot set the time source for the video source	CodyCam		無法為視訊來源設定時間來源
 Renaming…	VideoConsumer.cpp		重新命名…
 Send to…	CodyCam		發送至…
-Password:	CodyCam		密码：
+Password:	CodyCam		密碼：
 still image filename expected	CodyCam		預期靜止圖片檔名
 File name:	CodyCam		檔案名稱：
 Directory:	CodyCam		目錄：
@@ -61,7 +61,7 @@ Connected…	VideoConsumer.cpp		已連接…
 upload client name expected	CodyCam		上傳預期的客戶端名稱
 Every 15 seconds	CodyCam		每15秒
 Error getting initial latency for the capture node	CodyCam		取得捕獲節點的初始延遲時出錯
-password	CodyCam		密码
+password	CodyCam		密碼
 Local	CodyCam		本地
 Stop video	CodyCam		停止視頻
 Last Capture: 	VideoConsumer.cpp		最後捕獲：
