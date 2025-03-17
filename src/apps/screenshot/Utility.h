@@ -15,6 +15,17 @@
 
 // Command constant for sending utility data to the GUI app
 const int32 SS_UTILITY_DATA = 'SSUD';
+// Command constant for retrieving selected area frame from select view
+const int32 SS_SELECT_AREA_FRAME = 'SAF';
+// Command constant for launching area selector
+const int32 SS_LAUNCH_AREA_SELECTOR = 'LAS';
+
+
+enum ShotType {
+	kActiveWindow = 'aw',
+	kWholeScreen = 'ws',
+	kShowSelectedArea = 'sa'
+};
 
 
 class Utility {
@@ -25,8 +36,8 @@ public:
 			void		CopyToClipboard(const BBitmap& screenshot) const;
 			status_t	Save(BBitmap* screenshot, const char* fileName,
 							uint32 imageType) const;
-			BBitmap*	MakeScreenshot(bool includeCursor, bool activeWindow,
-							bool includeBorder) const;
+			BBitmap*	MakeScreenshot(bool includeCursor, bool includeBorder,
+							ShotType type, BRect selectedArea = BRect(0, 0, -1, -1)) const;
 			BString		FileNameExtension(uint32 imageType) const;
 			status_t	FindTranslator(uint32 imageType, translator_id& id,
 							BString* _mimeType = NULL) const;

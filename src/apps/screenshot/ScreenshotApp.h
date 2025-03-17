@@ -13,8 +13,8 @@
 #include <Catalog.h>
 
 
+class ScreenshotWindow;
 class Utility;
-
 
 class ScreenshotApp : public BApplication {
 public:
@@ -26,9 +26,12 @@ public:
 			void		ReadyToRun();
 
 private:
+			ScreenshotWindow*
+						fScreenshotWindow;
 			Utility*	fUtility;
 			bool		fSilent;
 			bool		fClipboard;
+			bool		fLaunchWithAreaSelect;
 };
 
 

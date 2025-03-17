@@ -7,6 +7,7 @@ UsePrivateHeaders interface shared ;
 Application Screenshot :
 	ScreenshotApp.cpp
 	ScreenshotWindow.cpp
+	SelectAreaView.cpp
 	Utility.cpp
 	: be localestub tracker translation [ TargetLibsupc++ ]
 	: ScreenshotApp.rdef

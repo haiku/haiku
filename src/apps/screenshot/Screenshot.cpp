@@ -98,6 +98,9 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 		} else if (strcmp(argv[i], "-c") == 0
 			|| strcmp(argv[i], "--clipboard") == 0)
 			copyToClipboard = true;
+		else if (strcmp(argv[i], "-a") == 0
+			|| strcmp(argv[i], "--area") == 0)
+			fSelectArea = true;
 		else if (i == argc - 1)
 			outputFilename = argv[i];
 	}
@@ -107,8 +110,8 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 	if (copyToClipboard || saveScreenshotSilent) {
 		fLaunchGui = false;
 
-		BBitmap* screenshot = fUtility->MakeScreenshot(includeCursor,
-			grabActiveWindow, includeBorder);
+		BBitmap* screenshot = fUtility->MakeScreenshot(includeCursor, includeBorder,
+			grabActiveWindow ? kActiveWindow : kWholeScreen);
 
 		if (screenshot == NULL)
 			return;
@@ -153,6 +156,8 @@ Screenshot::ReadyToRun()
 		message.AddRect("tabFrame", fUtility->tabFrame);
 		message.AddFloat("borderSize", fUtility->borderSize);
 
+		message.AddBool("selectArea", fSelectArea);
+
 		be_roster->Launch("application/x-vnd.haiku-screenshot",	&message);
 	}
 
@@ -185,9 +190,10 @@ Screenshot::_ShowHelp()
 	printf("  -c, --clipboard       Copies the screenshot to the system "
 		"clipboard without\n                        showing the application "
 		"window\n");
-	printf("\n");
-	printf("Note: OPTION -b, --border takes only effect when used with -w, "
-		"--window\n");
+	printf("  -a, --area            Select an area of the screen to capture \n");
+	printf("Note:\nOption -b, --border only takes effect when used with -w, "
+		"--window\nOption -a, --area does not take effect with -s, "
+		"--silent or -c, --clipboard\n");
 
 	fLaunchGui = false;
 }

@@ -12,6 +12,9 @@
 #define SCREENSHOT_WINDOW_H
 
 
+#include "Rect.h"
+#include "Utility.h"
+#include <RadioButton.h>
 #include <String.h>
 #include <TranslationDefs.h>
 #include <TranslatorFormats.h>
@@ -26,22 +29,22 @@ class BPath;
 class BTextControl;
 class BTextView;
 
-class Utility;
-
 
 class ScreenshotWindow : public BWindow {
 public:
-							ScreenshotWindow(const Utility& utility,
-								bool silent, bool clipboard);
+							ScreenshotWindow(const Utility& utility, bool silent,
+								bool clipboard);
 							~ScreenshotWindow();
 
 			void			MessageReceived(BMessage* message);
 			void			Quit();
+			void			SetSelectedArea(BRect frame);
 
 private:
 			void			_NewScreenshot(bool silent = false,
 								bool clipboard = false,
-								bool ignoreDelay = false);
+								bool ignoreDelay = false,
+								bool selectArea = false);
 			void			_UpdatePreviewPanel();
 			void			_DisallowChar(BTextView* textView);
 			void			_SetupOutputPathMenu(const BMessage& settings);
@@ -61,7 +64,9 @@ private:
 	const	Utility&		fUtility;
 
 			BView*			fPreview;
-			BCheckBox*		fActiveWindow;
+			BRadioButton*	fActiveWindow;
+			BRadioButton*	fAreaSelect;
+			BRadioButton*   fWholeScreen;
 			BTextControl*	fDelayControl;
 			BCheckBox*		fWindowBorder;
 			BCheckBox*		fShowCursor;
@@ -72,14 +77,16 @@ private:
 			BFilePanel*		fOutputPathPanel;
 			BMenuItem*		fLastSelectedPath;
 			BWindow*		fSettingsWindow;
+			BWindow* 		fSelectAreaWindow;
 
 			bigtime_t		fDelay;
 			bool			fIncludeBorder;
 			bool			fIncludeCursor;
-			bool			fGrabActiveWindow;
+			ShotType		fShotType;
 			BString			fOutputFilename;
 			BString			fExtension;
 			int32			fImageFileType;
+			BRect			fSelectedArea;
 };
 
 

@@ -133,8 +133,8 @@ Utility::Save(BBitmap* screenshot, const char* fileName, uint32 imageType)
 
 
 BBitmap*
-Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
-	bool includeBorder) const
+Utility::MakeScreenshot(bool includeMouse, bool includeBorder, ShotType type,
+	BRect selectedArea) const
 {
 	if (wholeScreen == NULL)
 		return NULL;
@@ -151,7 +151,19 @@ Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
 
 	BBitmap* screenshot = NULL;
 
-	if (activeWindow && activeWindowFrame.IsValid()) {
+	if (type == kShowSelectedArea && selectedArea.IsValid()) {
+		BBitmap* cropShot = new BBitmap(selectedArea.OffsetToCopy(B_ORIGIN),
+			wholeScreen->ColorSpace(), true);
+		BView* cropView = new BView(cropShot->Bounds(), "", B_FOLLOW_NONE, 0);
+		cropShot->AddChild(cropView);
+		cropShot->Lock();
+		cropView->DrawBitmap(wholeScreen, selectedArea, cropView->Bounds());
+		cropView->Sync();
+		screenshot = new BBitmap(cropShot);
+		cropShot->RemoveChild(cropView);
+		delete cropView;
+		delete cropShot;
+	} else if (type == kActiveWindow && activeWindowFrame.IsValid()) {
 		BRect frame(activeWindowFrame);
 		if (includeBorder) {
 			frame.InsetBy(-borderSize, -borderSize);

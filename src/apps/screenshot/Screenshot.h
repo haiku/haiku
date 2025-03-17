@@ -31,6 +31,7 @@ private:
 private:
 			Utility*	fUtility;
 			bool		fLaunchGui;
+			bool		fSelectArea;
 };
 
 

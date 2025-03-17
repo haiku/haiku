@@ -9,6 +9,7 @@
  *		Fredrik Modéen
  *		Christophe Huriaux
  *		Wim van der Meer
+ *		Pawan Yerramilli
  */
 
 
@@ -34,6 +35,7 @@
 #include <MenuItem.h>
 #include <MessageFilter.h>
 #include <Path.h>
+#include <RadioButton.h>
 #include <Roster.h>
 #include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
@@ -43,6 +45,7 @@
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
 
+#include "Control.h"
 #include "Utility.h"
 
 
@@ -51,7 +54,6 @@
 
 
 enum {
-	kActiveWindow,
 	kIncludeBorder,
 	kIncludeCursor,
 	kNewScreenshot,
@@ -60,7 +62,8 @@ enum {
 	kChooseLocation,
 	kSaveScreenshot,
 	kSettings,
-	kCloseTranslatorSettings
+	kCloseTranslatorSettings,
+	kSelectArea
 };
 
 
@@ -123,7 +126,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	fDelay(0),
 	fIncludeBorder(false),
 	fIncludeCursor(false),
-	fGrabActiveWindow(false),
+	fShotType(kWholeScreen),
 	fOutputFilename(NULL),
 	fExtension(""),
 	fImageFileType(B_PNG_FORMAT)
@@ -144,20 +147,32 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 		return;
 	}
 
-	fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fGrabActiveWindow,
-		fIncludeBorder);
+	fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fIncludeBorder, fShotType);
 
-	fActiveWindow = new BCheckBox(B_TRANSLATE("Capture active window"),
+	fWholeScreen = new BRadioButton(B_TRANSLATE("Whole screen"),
+		new BMessage(kWholeScreen));
+
+	fActiveWindow = new BRadioButton(B_TRANSLATE("Active window"),
 		new BMessage(kActiveWindow));
-	if (fGrabActiveWindow)
+
+	fAreaSelect = new BRadioButton(B_TRANSLATE("Selected area"),
+		new BMessage(kShowSelectedArea));
+	fAreaSelect->SetEnabled(false);
+	fActiveWindow->SetEnabled(fUtility.activeWindowFrame.IsValid());
+
+	if (fShotType == kShowSelectedArea && fAreaSelect->IsEnabled())
+		fAreaSelect->SetValue(B_CONTROL_ON);
+	else if (fShotType == kActiveWindow && fUtility.activeWindowFrame.IsValid())
 		fActiveWindow->SetValue(B_CONTROL_ON);
+	else
+		fWholeScreen->SetValue(B_CONTROL_ON);
 
 	fWindowBorder = new BCheckBox(B_TRANSLATE("Include window border"),
 		new BMessage(kIncludeBorder));
-	if (fIncludeBorder)
-		fWindowBorder->SetValue(B_CONTROL_ON);
-	if (!fGrabActiveWindow)
+	if (fShotType != kActiveWindow || !fUtility.activeWindowFrame.IsValid())
 		fWindowBorder->SetEnabled(false);
+	if (fIncludeBorder && fUtility.activeWindowFrame.IsValid())
+		fWindowBorder->SetValue(B_CONTROL_ON);
 
 	fShowCursor = new BCheckBox(B_TRANSLATE("Include mouse pointer"),
 		new BMessage(kIncludeCursor));
@@ -206,7 +221,10 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 			.Add(previewBox)
 			.AddGroup(B_VERTICAL, 0)
+				.Add(fWholeScreen)
 				.Add(fActiveWindow)
+				.Add(fAreaSelect)
+				.AddStrut(kSpacing)
 				.Add(fWindowBorder)
 				.Add(fShowCursor)
 				.AddStrut(kSpacing)
@@ -236,6 +254,8 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 				new BMessage(B_COPY)))
 			.Add(new BButton("", B_TRANSLATE("New screenshot"),
 				new BMessage(kNewScreenshot)))
+			.Add(new BButton("", B_TRANSLATE("Select area"),
+				new BMessage(kSelectArea)))
 			.AddGlue()
 			.Add(saveScreenshot);
 
@@ -264,31 +284,45 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kActiveWindow:
-			fGrabActiveWindow = false;
-			if (fActiveWindow->Value() == B_CONTROL_ON)
-				fGrabActiveWindow = true;
-
-			fWindowBorder->SetEnabled(fGrabActiveWindow);
+			fShotType = kActiveWindow;
+			fWindowBorder->SetEnabled(true);
 
 			delete fScreenshot;
-			fScreenshot = fUtility.MakeScreenshot(fIncludeCursor,
-				fGrabActiveWindow, fIncludeBorder);
+			fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fIncludeBorder, fShotType);
+			_UpdatePreviewPanel();
+			break;
+
+		case kWholeScreen:
+			fShotType = kWholeScreen;
+			fWindowBorder->SetEnabled(false);
+
+			delete fScreenshot;
+			fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fIncludeBorder, fShotType);
+			_UpdatePreviewPanel();
+			break;
+
+		case kShowSelectedArea:
+			fShotType = kShowSelectedArea;
+			fWindowBorder->SetEnabled(false);
+
+			delete fScreenshot;
+			fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fIncludeBorder, fShotType,
+				fSelectedArea);
 			_UpdatePreviewPanel();
 			break;
 
 		case kIncludeBorder:
 			fIncludeBorder = (fWindowBorder->Value() == B_CONTROL_ON);
 			delete fScreenshot;
-			fScreenshot = fUtility.MakeScreenshot(fIncludeCursor,
-				fGrabActiveWindow, fIncludeBorder);
+			fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fIncludeBorder, fShotType);
 			_UpdatePreviewPanel();
 			break;
 
 		case kIncludeCursor:
 			fIncludeCursor = (fShowCursor->Value() == B_CONTROL_ON);
 			delete fScreenshot;
-			fScreenshot = fUtility.MakeScreenshot(fIncludeCursor,
-				fGrabActiveWindow, fIncludeBorder);
+			fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fIncludeBorder, fShotType,
+				fSelectedArea);
 			_UpdatePreviewPanel();
 			break;
 
@@ -374,6 +408,10 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			fSettingsWindow = NULL;
 			break;
 
+		case kSelectArea:
+			be_app->PostMessage(new BMessage(SS_LAUNCH_AREA_SELECTOR));
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -391,7 +429,21 @@ ScreenshotWindow::Quit()
 
 
 void
-ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard, bool ignoreDelay)
+ScreenshotWindow::SetSelectedArea(BRect frame)
+{
+	if (frame.IsValid()) {
+		Lock();
+		fSelectedArea = frame;
+		fAreaSelect->SetEnabled(true);
+		fAreaSelect->SetValue(B_CONTROL_ON);
+		PostMessage(new BMessage(kShowSelectedArea));
+		Unlock();
+	}
+}
+
+
+void
+ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard, bool ignoreDelay, bool selectArea)
 {
 	BMessage message(B_ARGV_RECEIVED);
 	int32 argc = 1;
@@ -403,6 +455,11 @@ ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard, bool ignoreDelay)
 		delay << fDelay / 1000000;
 		message.AddString("argv", "--delay");
 		message.AddString("argv", delay);
+	}
+
+	if (selectArea) {
+		argc++;
+		message.AddString("argv", "--select");
 	}
 
 	if (silent || clipboard) {
@@ -422,7 +479,7 @@ ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard, bool ignoreDelay)
 			argc++;
 			message.AddString("argv", "--mouse-pointer");
 		}
-		if (fGrabActiveWindow) {
+		if (fShotType == kActiveWindow) {
 			argc++;
 			message.AddString("argv", "--window");
 		}
@@ -805,11 +862,14 @@ ScreenshotWindow::_ReadSettings()
 
 	if (settings.FindInt32("type", &fImageFileType) != B_OK)
 		fImageFileType = B_PNG_FORMAT;
+	bool activeWindow = false;
 	settings.FindBool("includeBorder", &fIncludeBorder);
 	settings.FindBool("includeCursor", &fIncludeCursor);
-	settings.FindBool("grabActiveWindow", &fGrabActiveWindow);
+	settings.FindBool("grabActiveWindow", &activeWindow);
 	settings.FindInt64("delay", &fDelay);
 	settings.FindString("outputFilename", &fOutputFilename);
+	if (activeWindow)
+		fShotType = kActiveWindow;
 
 	_SetupOutputPathMenu(settings);
 }
@@ -826,7 +886,7 @@ ScreenshotWindow::_WriteSettings()
 	settings.AddInt32("type", fImageFileType);
 	settings.AddBool("includeBorder", fIncludeBorder);
 	settings.AddBool("includeCursor", fIncludeCursor);
-	settings.AddBool("grabActiveWindow", fGrabActiveWindow);
+	settings.AddBool("grabActiveWindow", fShotType == kActiveWindow);
 	settings.AddInt64("delay", fDelay);
 	settings.AddString("outputFilename", fOutputFilename);
 

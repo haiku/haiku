@@ -15,17 +15,22 @@
 #include <Catalog.h>
 #include <Locale.h>
 #include <Roster.h>
+#include <Screen.h>
+#include <WindowPrivate.h>
 
 #include "ScreenshotWindow.h"
+#include "SelectAreaView.h"
 #include "Utility.h"
 
 
 ScreenshotApp::ScreenshotApp()
 	:
 	BApplication("application/x-vnd.haiku-screenshot"),
+	fScreenshotWindow(NULL),
 	fUtility(new Utility),
 	fSilent(false),
-	fClipboard(false)
+	fClipboard(false),
+	fLaunchWithAreaSelect(false)
 {
 }
 
@@ -80,6 +85,39 @@ ScreenshotApp::MessageReceived(BMessage* message)
 			if (status != B_OK)
 				break;
 
+			status = message->FindBool("selectArea", &fLaunchWithAreaSelect);
+			if (status != B_OK)
+				break;
+
+			break;
+		}
+
+		case SS_SELECT_AREA_FRAME:
+		{
+			BRect frame;
+			status_t status = message->FindRect("selectAreaFrame", &frame);
+			if (status != B_OK)
+				break;
+
+			if (!frame.IsValid() && fLaunchWithAreaSelect)
+				be_app->PostMessage(B_QUIT_REQUESTED);
+			else if (fScreenshotWindow == NULL) {
+				fScreenshotWindow = new ScreenshotWindow(*fUtility, fSilent, fClipboard);
+				fLaunchWithAreaSelect = false;
+			}
+
+			fScreenshotWindow->SetSelectedArea(frame);
+			break;
+		}
+
+		case SS_LAUNCH_AREA_SELECTOR:
+		{
+			BWindow* selectAreaWindow = new BWindow(BScreen().Frame(),
+				"Area Window", kWindowScreenWindow,
+				B_ASYNCHRONOUS_CONTROLS|B_NOT_RESIZABLE|B_NOT_CLOSABLE|B_NOT_ZOOMABLE);
+
+			selectAreaWindow->AddChild(new SelectAreaView(fUtility->wholeScreen));
+			selectAreaWindow->Show();
 			break;
 		}
 
@@ -110,7 +148,10 @@ ScreenshotApp::ArgvReceived(int32 argc, char** argv)
 void
 ScreenshotApp::ReadyToRun()
 {
-	new ScreenshotWindow(*fUtility, fSilent, fClipboard);
+	if (fLaunchWithAreaSelect)
+		be_app->PostMessage(new BMessage(SS_LAUNCH_AREA_SELECTOR));
+	else
+		fScreenshotWindow = new ScreenshotWindow(*fUtility, fSilent, fClipboard);
 }
 
 

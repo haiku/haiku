@@ -3694,6 +3694,16 @@ BWindow::_HandleKeyDown(BMessage* event)
 			return true;
 		}
 
+		// If option is held, then launch the area selector via CLI
+		if ((modifiers & B_OPTION_KEY) != 0) {
+			BMessage message(B_ARGV_RECEIVED);
+			message.AddString("argv", "screenshot");
+			message.AddString("argv", "--area");
+			message.AddInt32("argc", 2);
+			be_roster->Launch("application/x-vnd.haiku-screenshot-cli", &message);
+			return true;
+		}
+
 		// Prepare a message based on the modifier keys pressed and launch the
 		// screenshot GUI
 		BMessage message(B_ARGV_RECEIVED);
