@@ -71,7 +71,6 @@ private:
 	FontCacheEntry::GlyphGray8Scanline	fGray8Scanline;
 	FontCacheEntry::GlyphMonoAdapter	fMonoAdaptor;
 	FontCacheEntry::GlyphMonoScanline	fMonoScanline;
-	FontCacheEntry::SubpixAdapter		fSubpixAdaptor;
 
 	FontCacheEntry::CurveConverter		fCurves;
 	FontCacheEntry::ContourConverter	fContour;

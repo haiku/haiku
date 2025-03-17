@@ -40,7 +40,6 @@ AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 	fGray8Scanline(),
 	fMonoAdaptor(),
 	fMonoScanline(),
-	fSubpixAdaptor(),
 
 	fCurves(fPathAdaptor),
 	fContour(fCurves),
@@ -144,7 +143,8 @@ public:
 
 	bool NeedsVector()
 	{
-		return !fTransform.IsTranslationOnly();
+		return !fTransform.IsTranslationOnly()
+			|| (fSubpixelAntiAliased && fRenderer.fMaskedScanline != NULL);
 	}
 
 	void Start()
@@ -269,6 +269,7 @@ public:
 
 					case glyph_data_subpix:
 						// TODO: Handle alpha mask (fRenderer.fMaskedScanline)
+						//       and remove the grayscale workaround for that.
 						agg::render_scanlines(fRenderer.fGray8Adaptor,
 							fRenderer.fGray8Scanline,
 							fRenderer.fSubpixRenderer);
@@ -276,7 +277,7 @@ public:
 
 					case glyph_data_outline: {
 						fVector = true;
-						if (fSubpixelAntiAliased) {
+						if (fSubpixelAntiAliased && fRenderer.fMaskedScanline == NULL) {
 							if (fRenderer.fContour.width() == 0.0) {
 								fRenderer.fSubpixRasterizer.add_path(
 									fTransformedGlyph);
@@ -302,11 +303,10 @@ public:
 	p.close_polygon();
 	agg::conv_stroke<agg::path_storage> ps(p);
 	ps.width(1.0);
-	if (fSubpixelAntiAliased) {
+	if (fSubpixelAntiAliased && fRenderer.fMaskedScanline != NULL)
 		fRenderer.fSubpixRasterizer.add_path(ps);
-	} else {
+	else
 		fRenderer.fRasterizer.add_path(ps);
-	}
 #endif
 
 						break;
