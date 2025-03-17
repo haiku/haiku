@@ -329,11 +329,12 @@ private:
 	{
 		agg::path_storage path;
 		IntRect bounds = fBounds;
-		bounds.bottom = (int)y;
-		bounds.OffsetBy(fTransformOffset);
-		path.move_to(bounds.left + 0.5, bounds.bottom + 0.5);
-		path.line_to(bounds.right + 0.5, bounds.bottom + 0.5);
-		path.close_polygon();
+		BPoint left(bounds.left, y);
+		BPoint right(bounds.right, y);
+		fTransform.Transform(&left);
+		fTransform.Transform(&right);
+		path.move_to(left.x + 0.5, left.y + 0.5);
+		path.line_to(right.x + 0.5, right.y + 0.5);
 		agg::conv_stroke<agg::path_storage> pathStorage(path);
 		pathStorage.width(fRenderer.fFont.Size() / 12.0f);
 		if (fRenderer.fMaskedScanline != NULL) {
