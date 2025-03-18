@@ -521,7 +521,7 @@ find_undefined_symbol_add_on(image_t* rootImage, image_t* image,
 			&& (otherImage->flags
 				& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0) {
 			if (elf_sym* symbol = find_symbol(otherImage, lookupInfo)) {
-				if (symbol->Bind() != STB_WEAK) {
+				if (symbol->Bind() != STB_WEAK || image->abi >= B_HAIKU_ABI_GCC_4) {
 					*_foundInImage = otherImage;
 					return symbol;
 				}
