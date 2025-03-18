@@ -44,11 +44,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			snprintf.c
 			sprintf.c
 			sscanf.c
-			tempnam.c
-			tempname.c
-			tmpfile.c
-			tmpnam.c
-			tmpnam_r.c
 			vfprintf.c
 #			vfprintf_stub.c
 #			vfscanf_stub.c
