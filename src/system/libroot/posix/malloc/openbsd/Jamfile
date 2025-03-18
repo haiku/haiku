@@ -13,6 +13,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObject <$(architecture)>posix_malloc.o :
 			PagesAllocator.cpp
 			malloc.c
+			r5_compatibility.c
 			;
 	}
 }
