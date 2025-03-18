@@ -6,11 +6,11 @@
 #define _BSD_STDIO_H_
 
 
-#include_next <stdio.h>
 #include <features.h>
+#include_next <stdio.h>
 
 
-#if defined(_DEFAULT_SOURCE) || defined(_GNU_SOURCE)
+#ifdef _DEFAULT_SOURCE
 
 
 #ifdef __cplusplus
@@ -18,10 +18,6 @@ extern "C" {
 #endif
 
 char *fgetln(FILE *stream, size_t *_length);
-
-int asprintf(char **ret, char const *format, ...) _PRINTFLIKE(2,3);
-int vasprintf(char **ret, char const *format, va_list ap);
-
 
 #ifdef __cplusplus
 }
