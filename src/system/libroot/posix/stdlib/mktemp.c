@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1987, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -10,11 +12,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -31,7 +29,7 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
+#include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <fcntl.h>
@@ -41,96 +39,80 @@
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <stdint.h>
 
-#include <errno_private.h>
+char *_mktemp(char *);
 
+static int _gettemp(int, char *, int *, int, int, int);
 
-static int _gettemp(char *, int *, int, int, int);
-
-static const char padchar[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-
-int
-mkstemps(char *path, int slen)
-{
-	int fd;
-	return _gettemp(path, &fd, 0, slen, 0) ? fd : -1;
-}
-
-
-int
-mkstemp(char *path)
-{
-	int fd;
-	if (_gettemp(path, &fd, 0, 0, 0))
-		return fd;
-
-	return -1;
-}
-
+static const unsigned char padchar[] =
+"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 int
 mkostemp(char *path, int oflags)
 {
 	int fd;
-	if (_gettemp(path, &fd, 0, 0, oflags))
-		return fd;
 
-	return -1;
+	return (_gettemp(AT_FDCWD, path, &fd, 0, 0, oflags) ? fd : -1);
 }
 
+int
+mkstemp(char *path)
+{
+	int fd;
+
+	return (_gettemp(AT_FDCWD, path, &fd, 0, 0, 0) ? fd : -1);
+}
 
 char *
-mkdtemp(path)
-	char *path;
+mkdtemp(char *path)
 {
-	return (_gettemp(path, (int *)NULL, 1, 0, 0) ? path : (char *)NULL);
+	return (_gettemp(AT_FDCWD, path, (int *)NULL, 1, 0, 0) ? path : (char *)NULL);
 }
-
 
 char *
 mktemp(char *path)
 {
-	if (_gettemp(path, (int *)NULL, 0, 0, 0))
-		return path;
-
-	return NULL;
+	return (_gettemp(AT_FDCWD, path, (int *)NULL, 0, 0, 0) ? path : (char *)NULL);
 }
 
-
 static int
-_gettemp(char *path, int *doopen, int domkdir, int slen, int oflags)
+_gettemp(int dfd, char *path, int *doopen, int domkdir, int slen, int oflags)
 {
-	char *start, *trv, *suffp;
+	char *start, *trv, *suffp, *carryp;
 	char *pad;
 	struct stat sbuf;
-	int rval;
 	static unsigned int seed = 0;
+	char carrybuf[MAXPATHLEN];
+	int saved;
 
-	if (doopen != NULL && domkdir) {
-		__set_errno(EINVAL);
-		return 0;
+	if ((doopen != NULL && domkdir) || slen < 0 ||
+	    (oflags & ~(O_APPEND | O_DIRECT | O_SYNC | O_CLOEXEC)) != 0) {
+		errno = EINVAL;
+		return (0);
 	}
 
-	for (trv = path; *trv != '\0'; ++trv)
-		;
-
+	trv = path + strlen(path);
+	if (trv - path >= MAXPATHLEN) {
+		errno = ENAMETOOLONG;
+		return (0);
+	}
 	trv -= slen;
 	suffp = trv;
 	--trv;
-	if (trv < path) {
-		__set_errno(EINVAL);
-		return 0;
+	if (trv < path || NULL != strchr(suffp, '/')) {
+		errno = EINVAL;
+		return (0);
 	}
 
 	/* Fill space with random characters */
 	if (seed == 0) {
 		/* Select a pseudo-random seed on first call to avoid
 		to generate the same sequence of pattern */
-		struct timeval tv;
-		gettimeofday(&tv, 0);
-		seed = (getpid() << 16) ^ getuid() ^ tv.tv_sec ^ tv.tv_usec;
+		if (getentropy(&seed, sizeof(seed)) != 0) {
+			struct timeval tv;
+			gettimeofday(&tv, 0);
+			seed = (getpid() << 16) ^ getuid() ^ tv.tv_sec ^ tv.tv_usec;
+		}
 	}
 	while (trv >= path && *trv == 'X') {
 		uint32_t value = rand_r(&seed) % (sizeof(padchar) - 1);
@@ -138,53 +120,52 @@ _gettemp(char *path, int *doopen, int domkdir, int slen, int oflags)
 	}
 	start = trv + 1;
 
-	/*
-	 * check the target directory.
-	 */
-	if (doopen != NULL || domkdir) {
-		for (; trv > path; --trv) {
-			if (*trv == '/') {
-				*trv = '\0';
-				rval = stat(path, &sbuf);
-				*trv = '/';
-				if (rval != 0)
-					return 0;
-				if (!S_ISDIR(sbuf.st_mode)) {
-					__set_errno(ENOTDIR);
-					return 0;
-				}
-				break;
-			}
-		}
-	}
-
+	saved = 0;
+	oflags |= O_CREAT | O_EXCL | O_RDWR;
 	for (;;) {
 		if (doopen) {
-			if ((*doopen = open(path, O_CREAT | O_EXCL | O_RDWR | oflags, 0600)) >= 0)
-				return 1;
+			*doopen = openat(dfd, path, oflags, 0600);
+			if (*doopen >= 0)
+				return (1);
 			if (errno != EEXIST)
-				return 0;
+				return (0);
 		} else if (domkdir) {
 			if (mkdir(path, 0700) == 0)
-				return 1;
+				return (1);
 			if (errno != EEXIST)
-				return 0;
+				return (0);
 		} else if (lstat(path, &sbuf))
-			return errno == ENOENT;
+			return (errno == ENOENT);
+
+		/* save first combination of random characters */
+		if (!saved) {
+			memcpy(carrybuf, start, suffp - start);
+			saved = 1;
+		}
 
 		/* If we have a collision, cycle through the space of filenames */
-		for (trv = start;;) {
-			if (*trv == '\0' || trv == suffp)
-				return 0;
+		for (trv = start, carryp = carrybuf;;) {
+			/* have we tried all possible permutations? */
+			if (trv == suffp)
+				return (0); /* yes - exit with EEXIST */
 			pad = strchr(padchar, *trv);
-			if (pad == NULL || *++pad == '\0')
-				*trv++ = padchar[0];
-			else {
-				*trv++ = *pad;
+			if (pad == NULL) {
+				/* this should never happen */
+				errno = EIO;
+				return (0);
+			}
+			/* increment character */
+			*trv = (*++pad == '\0') ? padchar[0] : *pad;
+			/* carry to next position? */
+			if (*trv == *carryp) {
+				/* increment position and loop */
+				++trv;
+				++carryp;
+			} else {
+				/* try with new name */
 				break;
 			}
 		}
 	}
-
-	/* not reached */
+	/*NOTREACHED*/
 }
