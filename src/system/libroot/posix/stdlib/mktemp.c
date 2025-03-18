@@ -48,6 +48,14 @@ static const unsigned char padchar[] =
 "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 int
+mkstemps(char *path, int slen)
+{
+	int fd;
+
+	return (_gettemp(AT_FDCWD, path, &fd, 0, slen, 0) ? fd : -1);
+}
+
+int
 mkostemp(char *path, int oflags)
 {
 	int fd;
