@@ -1791,29 +1791,34 @@ MainWin::_CreateMenu()
 	fVideoMenu->AddItem(fSubTitleTrackMenu);
 	fVideoMenu->AddSeparatorItem();
 	BMessage* resizeMessage = new BMessage(M_VIEW_SIZE);
+	resizeMessage->AddInt32("size", 25);
+	fVideoMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("25% scale"), resizeMessage, '0'));
+
+	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 50);
 	fVideoMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("50% scale"), resizeMessage, '0'));
+		B_TRANSLATE("50% scale"), resizeMessage, '1'));
 
 	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 100);
 	fVideoMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("100% scale"), resizeMessage, '1'));
+		B_TRANSLATE("100% scale"), resizeMessage, '2'));
 
 	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 200);
 	fVideoMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("200% scale"), resizeMessage, '2'));
+		B_TRANSLATE("200% scale"), resizeMessage, '3'));
 
 	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 300);
 	fVideoMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("300% scale"), resizeMessage, '3'));
+		B_TRANSLATE("300% scale"), resizeMessage, '4'));
 
 	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 400);
 	fVideoMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("400% scale"), resizeMessage, '4'));
+		B_TRANSLATE("400% scale"), resizeMessage, '5'));
 
 	fVideoMenu->AddSeparatorItem();
 
