@@ -280,9 +280,9 @@ static inline u_int mopts_nmutexes()
 {
 	return mopts.malloc_pool[1]->malloc_mt ? mopts.malloc_mutexes : 2;
 }
-#endif
-
+#else
 char		*malloc_options;	/* compile-time options */
+#endif
 
 static __dead void wrterror(struct dir_info *d, char *msg, ...)
     __attribute__((__format__ (printf, 2, 3)));
