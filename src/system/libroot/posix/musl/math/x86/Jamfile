@@ -59,7 +59,7 @@ for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
 		UseHeaders [ FDirName $(SUBDIR) .. .. arch $(architecture) ] ;
 
 		if $(architecture) = x86_gcc2 {
-			# GCC 2 miscompiles some of the files in here, so we use GCC 8.
+			# GCC 2 miscompiles some of the files in here, so use the newer GCC.
 			original_TARGET_CC_x86_gcc2 = $(TARGET_CC_x86_gcc2) ;
 			TARGET_CC_x86_gcc2 = $(TARGET_CC_x86) -Wa,-mrelax-relocations=no -Wno-unused-but-set-variable ;
 		}
@@ -91,7 +91,6 @@ for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
 		if $(architecture) = x86_gcc2 {
 			TARGET_CC_x86_gcc2 = $(original_TARGET_CC_x86_gcc2) ;
 		}
-
 
 		SEARCH on [ FGristFiles $(generics) ] = [ FDirName $(SUBDIR) .. ] ;
 	}

@@ -16,7 +16,7 @@
 #ifndef	_MATH_H
 #define	_MATH_H	1
 
-#include_next <math.h>
+#include <posix/math.h>
 
 #include <features.h>
 

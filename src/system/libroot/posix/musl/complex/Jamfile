@@ -1,0 +1,44 @@
+SubDir HAIKU_TOP src system libroot posix musl complex ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) .. include ] ;
+UseHeaders [ FDirName $(SUBDIR) .. internal ] ;
+UseHeaders [ FDirName $(SUBDIR) .. arch $(TARGET_ARCH) ] ;
+UseHeaders [ FDirName $(SUBDIR) .. arch generic ] ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		if $(architecture) = x86_gcc2 {
+			# GCC 2 can't compile some of the files in here, so use the newer GCC.
+			original_TARGET_CC_x86_gcc2 = $(TARGET_CC_x86_gcc2) ;
+			TARGET_CC_x86_gcc2 = $(TARGET_CC_x86) -Wa,-mrelax-relocations=no -Wno-unused-but-set-variable ;
+		}
+
+		MergeObject <$(architecture)>posix_musl_complex.o :
+			__cexp.c __cexpf.c
+			cabs.c cabsf.c cabsl.c
+			cacosh.c cacoshf.c
+			carg.c cargf.c cargl.c
+			catan.c catanf.c catanl.c
+			catanh.c catanhf.c catanhl.c
+			ccos.c ccosf.c ccosl.c
+			ccosh.c ccoshf.c
+			cexp.c cexpf.c
+			cimag.c cimagf.c cimagl.c
+			conj.c conjf.c conjl.c
+			cproj.c cprojf.c cprojl.c
+			creal.c crealf.c creall.c
+			csin.c csinf.c csinl.c
+			csinh.c csinhf.c
+			csqrt.c csqrtf.c
+			ctan.c ctanf.c ctanl.c
+			ctanh.c ctanhf.c
+			;
+
+		if $(architecture) = x86_gcc2 {
+			TARGET_CC_x86_gcc2 = $(original_TARGET_CC_x86_gcc2) ;
+		}
+	}
+}

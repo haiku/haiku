@@ -8,6 +8,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObjectFromObjects <$(architecture)>posix_musl.o :
 			:
 			<$(architecture)>posix_musl_crypt.o
+			<$(architecture)>posix_musl_complex.o
 			<$(architecture)>posix_musl_dirent.o
 			<$(architecture)>posix_musl_math.o
 			<$(architecture)>posix_musl_misc.o
@@ -27,6 +28,7 @@ for arch in $(TARGET_ARCHS) {
 }
 
 HaikuSubInclude crypt ;
+HaikuSubInclude complex ;
 HaikuSubInclude dirent ;
 HaikuSubInclude misc ;
 HaikuSubInclude prng ;
