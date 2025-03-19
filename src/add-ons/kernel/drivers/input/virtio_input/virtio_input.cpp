@@ -383,7 +383,8 @@ virtio_input_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			if (buffer == NULL || length < sizeof(VirtioInputPacket))
 				return B_BAD_VALUE;
 
-			status_t res = acquire_sem(info->sem_cb.Get());
+			status_t res = acquire_sem_etc(info->sem_cb.Get(), 1, B_CAN_INTERRUPT,
+				B_INFINITE_TIMEOUT);
 			if (res < B_OK)
 				return res;
 
