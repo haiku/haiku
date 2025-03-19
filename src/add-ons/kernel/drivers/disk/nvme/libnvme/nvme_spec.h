@@ -860,7 +860,7 @@ struct nvme_power_state {
 	/*
 	 * bit 24: max power scale.
 	 */
-	uint8_t mps		: 1;
+	uint8_t mxps		: 1;
 
 	/*
 	 * bit 25: non-operational state.
@@ -902,8 +902,37 @@ struct nvme_power_state {
 	uint8_t rwl		: 5;
 	uint8_t reserved6	: 3;
 
-	uint8_t reserved7[16];
+	/*
+	 * bits 143:128: idle power.
+	 */
+	uint16_t idlp;
 
+	uint8_t reserved7	: 6;
+	/*
+	 * bits 151:150: idle power scale.
+	 */
+	uint8_t ips		: 2;
+
+	uint8_t reserved8;
+
+	/*
+	 * bits 175:160: active power.
+	 */
+	uint16_t actp;
+
+	/*
+	 * bits 178:176: active power workload.
+	 */
+	uint8_t apw	: 3;
+
+	uint8_t reserved9	: 3;
+
+	/*
+	 * bits 183:182: active power scale.
+	 */
+	uint8_t aps	: 2;
+
+	uint8_t reserved10[9];
 };
 nvme_static_assert(sizeof(struct nvme_power_state) == 32, "Incorrect size");
 

@@ -265,6 +265,26 @@ nvme_disk_init_device(void* _info, void** _cookie)
 			((microseconds / 100) << 8) | threshold, 0, NULL);
 	}
 
+	if (info->ctrlr->feature_supported[NVME_FEAT_AUTONOMOUS_POWER_STATE_TRANSITION]) {
+		// dump power states
+		struct nvme_ctrlr_data cdata;
+		struct nvme_register_data rdata;
+		if (nvme_ctrlr_data(info->ctrlr, &cdata, &rdata) == 0
+			&& cdata.npss > 0 && cdata.npss < 31) {
+			TRACE_ALWAYS("\tpower states: %u\n", cdata.npss);
+			for (uint8 i = 0; i <= cdata.npss; i++) {
+				struct nvme_power_state	*psd = &cdata.psd[i];
+				TRACE_ALWAYS("\tps %u: mp:%fW %soperational enlat:%u exlat:%u rrt:%u rrl:%u\n",
+					i, psd->mp / (psd->mxps == 0 ? 100.0 : 10000.0),
+					psd->nops ? "non-" : "", psd->enlat, psd->exlat, psd->rrt, psd->rrl);
+				TRACE_ALWAYS("\trwt:%u rwl:%u idlp:%fW actp:%fW apw:%u\n", psd->rwt, psd->rwl,
+					psd->idlp / (psd->ips == 2 ? 100.0 : (psd->ips == 1 ? 10000.0 : 1.0)),
+					psd->actp / (psd->aps == 2 ? 100.0 : (psd->aps == 1 ? 10000.0 : 1.0)),
+					psd->apw);
+			}
+		}
+	}
+
 	// allocate qpairs
 	uint32 try_qpairs = cstat.io_qpairs;
 	try_qpairs = min_c(try_qpairs, NVME_MAX_QPAIRS);
@@ -496,7 +516,7 @@ ior_next_sge(nvme_io_request* request, uint64_t* address, uint32_t* length)
 	*address = request->iovecs[index].address + request->iovec_offset;
 	*length = request->iovecs[index].size - request->iovec_offset;
 
-	TRACE("IOV %d (+ " B_PRIu32 "): 0x%" B_PRIx64 ", %" B_PRIu32 "\n",
+	TRACE("IOV %d (+ %" B_PRIu32 "): 0x%" B_PRIx64 ", %" B_PRIu32 "\n",
 		request->iovec_i, request->iovec_offset, *address, *length);
 
 	request->iovec_i++;
