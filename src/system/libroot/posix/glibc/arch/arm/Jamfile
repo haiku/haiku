@@ -29,6 +29,7 @@ local genericSources =
 	lshift.c rshift.c
 	sub_n.c submul_1.c
 
+	s_cacos.c s_cacosf.c #s_cacosl.c
 	#s_cacoshl.c
 	s_casin.c s_casinf.c #s_casinl.c
 	s_casinh.c s_casinhf.c #s_casinhl.c
