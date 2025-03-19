@@ -502,7 +502,7 @@ static int nvme_ctrlr_set_num_qpairs(struct nvme_ctrlr *ctrlr)
 	 * of queues requested (see specifications).
 	 */
 	ret = nvme_admin_set_feature(ctrlr, false, NVME_FEAT_NUMBER_OF_QUEUES,
-				     num_queues, 0, &cdw0);
+				     num_queues, 0, NULL, 0, &cdw0);
 	if (ret != 0) {
 		nvme_notice("Set feature NVME_FEAT_NUMBER_OF_QUEUES failed\n");
 		return ret;
@@ -656,7 +656,7 @@ static int nvme_ctrlr_configure_aer(struct nvme_ctrlr *ctrlr)
 
 	ret =  nvme_admin_set_feature(ctrlr, false,
 				      NVME_FEAT_ASYNC_EVENT_CONFIGURATION,
-				      state.raw, 0, NULL);
+				      state.raw, 0, NULL, 0, NULL);
 	if (ret != 0) {
 		nvme_notice("Set feature ASYNC_EVENT_CONFIGURATION failed\n");
 		return ret;
@@ -1193,6 +1193,7 @@ int nvme_ctrlr_get_feature(struct nvme_ctrlr *ctrlr,
 int nvme_ctrlr_set_feature(struct nvme_ctrlr *ctrlr,
 			   bool save, enum nvme_feat feature,
 			   uint32_t cdw11, uint32_t cdw12,
+			   void *buf, size_t len,
 			   uint32_t *attributes)
 {
 	int ret;
@@ -1200,7 +1201,7 @@ int nvme_ctrlr_set_feature(struct nvme_ctrlr *ctrlr,
 	pthread_mutex_lock(&ctrlr->lock);
 
 	ret = nvme_admin_set_feature(ctrlr, save, feature,
-				     cdw11, cdw12, attributes);
+				     cdw11, cdw12, NULL, 0, attributes);
 	if (ret != 0)
 		nvme_notice("Set feature 0x%08x failed\n",
 			    (unsigned int) feature);

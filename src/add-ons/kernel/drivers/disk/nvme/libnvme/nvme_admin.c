@@ -159,6 +159,7 @@ int nvme_admin_set_feature(struct nvme_ctrlr *ctrlr,
 			   enum nvme_feat feature,
 			   uint32_t cdw11,
 			   uint32_t cdw12,
+			   void *buf, uint32_t len,
 			   uint32_t *attributes)
 {
 	struct nvme_completion_poll_status status;
@@ -176,7 +177,7 @@ int nvme_admin_set_feature(struct nvme_ctrlr *ctrlr,
 
 	/* Submit the command */
 	status.done = false;
-	ret = nvme_admin_submit_cmd(ctrlr, &cmd, NULL, 0,
+	ret = nvme_admin_submit_cmd(ctrlr, &cmd, buf, len,
 				    nvme_request_completion_poll_cb,
 				    &status);
 	if (ret == 0) {

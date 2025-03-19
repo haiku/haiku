@@ -623,6 +623,7 @@ extern int nvme_ctrlr_get_feature(struct nvme_ctrlr *ctrlr,
 extern int nvme_ctrlr_set_feature(struct nvme_ctrlr *ctrlr,
 				  bool save, enum nvme_feat feature,
 				  uint32_t cdw11, uint32_t cdw12,
+				  void *buf, size_t len,
 				  uint32_t *attributes);
 
 /**
