@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2025, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STDIO_EXT_H_
@@ -16,18 +16,20 @@ extern "C" {
 #define FSETLOCKING_INTERNAL	1
 #define FSETLOCKING_BYCALLER	2
 
-/* The following stdio extensions are not implemented yet */
-/* extern size_t	__fufsize(FILE* stream); */
-extern int		__freading(FILE* stream);
-/* extern int		__fwriting(FILE* stream); */
-/* extern int		__freadable(FILE* stream); */
-/* extern int		__fwritable(FILE* stream); */
-/* extern int		__flbf(FILE* stream); */
-extern void		__fpurge(FILE* stream);
-/* extern size_t	__fpending(FILE* stream); */
-
 extern void		_flushlbf(void);
 extern int		__fsetlocking(FILE* stream, int type);
+
+extern int		__freading(FILE* stream);
+extern int		__fwriting(FILE* stream);
+extern int		__freadable(FILE* stream);
+extern int		__fwritable(FILE* stream);
+extern size_t	__freadahead(FILE* stream);
+extern const char* __freadptr(FILE* stream, size_t* size);
+extern void		__freadptrinc(FILE* stream, size_t inc);
+extern int		__flbf(FILE* stream);
+extern size_t	__fbufsize(FILE* stream);
+extern size_t	__fpending(FILE* stream);
+extern void		__fpurge(FILE* stream);
 
 #ifdef __cplusplus
 }

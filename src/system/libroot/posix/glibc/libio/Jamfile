@@ -25,9 +25,19 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UsePrivateHeaders libroot ;
 
 		MergeObject <$(architecture)>posix_gnu_libio.o :
+			__fbufsize.c
+			__flbf.c
+			__fpending.c
 			__fpurge.c
+			__freadable.c
+			__freadahead.c
 			__freading.c
+			__freadptr.c
+			__freadptrinc.c
+			__fseterr.c
 			__fsetlocking.c
+			__fwritable.c
+			__fwriting.c
 			clearerr.c
 			clearerr_u.c
 			fcloseall.c
