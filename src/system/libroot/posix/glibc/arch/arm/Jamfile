@@ -29,10 +29,6 @@ local genericSources =
 	lshift.c rshift.c
 	sub_n.c submul_1.c
 
-	s_isnan.c s_isnanf.c
-	s_finite.c s_finitef.c
-	s_isinf.c s_isinff.c
-
 	s_clog.c s_clogf.c
 	s_csqrt.c s_csqrtf.c
 	s_cacos.c s_cacosf.c

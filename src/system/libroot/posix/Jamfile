@@ -36,6 +36,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			fcntl.cpp
 			glob.c
 			inttypes.c
+			math.c
 			poll.cpp
 			$(PWD_BACKEND)
 			scheduler.cpp
