@@ -233,7 +233,7 @@ floating(Buffer& outBuffer, double value, int fieldWidth, int flags)
 
 	if (fraction != 0) {
 		bool first = true;
-		while (fraction != 0) {
+		for (int zeroes = 0; zeroes < 3; zeroes++) {
 			int digit = do_div(&fraction, 10);
 			if (!first || digit > 0) {
 				buffer[length++] = '0' + digit;
