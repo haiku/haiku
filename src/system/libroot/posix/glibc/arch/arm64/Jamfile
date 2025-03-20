@@ -38,6 +38,7 @@ local genericSources =
 	s_clog.c s_clogf.c s_clogl.c
 	s_clog10.c s_clog10f.c s_clog10l.c
 	s_cpow.c s_cpowf.c s_cpowl.c
+	s_csinhl.c
 	s_csqrtl.c
 	s_ctanhl.c
 	;

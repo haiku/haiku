@@ -35,6 +35,7 @@ local generics =
 	fmaxl.c
 	fminl.c
 	fmod.c fmodf.c fmodl.c
+	__fpclassify.c __fpclassifyf.c __fpclassifyl.c
 	frexp.c frexpf.c frexpl.c
 	hypot.c hypotf.c hypotl.c
 	ilogb.c ilogbf.c ilogbl.c
