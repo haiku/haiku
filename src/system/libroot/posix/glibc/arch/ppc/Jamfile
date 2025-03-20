@@ -24,6 +24,7 @@ local genericSources =
 	mpn2dbl.c mpn2flt.c mpn2ldbl.c
 	mul.c mul_n.c
 
+	s_cacos.c s_cacosf.c #s_cacosl.c
 	#s_cacoshl.c
 	s_casin.c s_casinf.c #s_casinl.c
 	s_casinh.c s_casinhf.c #s_casinhl.c
