@@ -4,6 +4,9 @@
 #include_next <stdlib.h>
 #include <stdint.h>
 
+#include <sys/cdefs.h>
+
+
 /* Now define the internal interfaces.  */
 extern long int __random (void);
 extern void __srandom (unsigned int __seed);
