@@ -27,14 +27,6 @@ namespace BPrivate {
 namespace Libroot {
 
 
-extern "C" GlibcLocaleStruct* _nl_current_locale();
-extern "C" GlibcLocaleStruct _nl_global_locale;
-#define _NL_CURRENT_DATA(category) \
-	((locale_data*&)(_nl_current_locale()->__locales[category]))
-#define _NL_GLOBAL_DATA(category) \
-	((locale_data*&)(_nl_global_locale.__locales[category]))
-
-
 LocaleCtypeDataBridge::LocaleCtypeDataBridge(bool isGlobal)
 	:
 	localClassInfoTable(__ctype_b),
@@ -89,34 +81,13 @@ LocaleMonetaryDataBridge::LocaleMonetaryDataBridge()
 LocaleNumericDataBridge::LocaleNumericDataBridge(bool isGlobal)
 	:
 	posixLocaleConv(&gPosixLocaleConv),
-	glibcNumericLocale(&glibcNumericLocaleData),
 	isGlobal(isGlobal)
 {
-
-	memcpy(glibcNumericLocale, _NL_GLOBAL_DATA(GLIBC_LC_NUMERIC),
-		sizeof(GlibcNumericLocale));
-
-	if (isGlobal) {
-		originalGlibcLocale = _NL_GLOBAL_DATA(GLIBC_LC_NUMERIC);
-		_NL_GLOBAL_DATA(GLIBC_LC_NUMERIC) = (locale_data*)glibcNumericLocale;
-	}
 }
 
 
 LocaleNumericDataBridge::~LocaleNumericDataBridge()
 {
-	if (isGlobal) {
-		_NL_GLOBAL_DATA(GLIBC_LC_NUMERIC) = originalGlibcLocale;
-	} else if (_NL_CURRENT_DATA(GLIBC_LC_NUMERIC) == (locale_data*)glibcNumericLocale) {
-		_NL_CURRENT_DATA(GLIBC_LC_NUMERIC) = _NL_GLOBAL_DATA(GLIBC_LC_NUMERIC);
-	}
-}
-
-
-void
-LocaleNumericDataBridge::ApplyToCurrentThread()
-{
-	_NL_CURRENT_DATA(GLIBC_LC_NUMERIC) = (locale_data*)glibcNumericLocale;
 }
 
 
@@ -164,7 +135,6 @@ void
 LocaleDataBridge::ApplyToCurrentThread()
 {
 	ctypeDataBridge.ApplyToCurrentThread();
-	numericDataBridge.ApplyToCurrentThread();
 	// While timeConverstionDataBridge stores read-write variables,
 	// these variables are global (by POSIX definition). Furthermore,
 	// none of the backends seem to access these variables

@@ -14,7 +14,6 @@
 
 
 struct lc_time_t;
-struct locale_data;		// glibc
 
 
 namespace BPrivate {
@@ -60,37 +59,12 @@ struct LocaleMonetaryDataBridge {
 
 
 struct LocaleNumericDataBridge {
-private:
-	// struct used by glibc to store numeric locale data
-	struct GlibcNumericLocale {
-		const char* name;
-		const char* filedata;
-		off_t filesize;
-		int mmaped;
-		unsigned int usage_count;
-		int use_translit;
-		const char *options;
-		unsigned int nstrings;
-		union locale_data_value
-		{
-			const uint32_t* wstr;
-			const char* string;
-			unsigned int word;
-		}
-		values[6];
-	};
-	locale_data* originalGlibcLocale;
-	GlibcNumericLocale  		glibcNumericLocaleData;
-
 public:
 	const struct lconv* const 	posixLocaleConv;
-	GlibcNumericLocale*  		glibcNumericLocale;
 	bool						isGlobal;
 
 	LocaleNumericDataBridge(bool isGlobal);
 	~LocaleNumericDataBridge();
-
-	void ApplyToCurrentThread();
 };
 
 

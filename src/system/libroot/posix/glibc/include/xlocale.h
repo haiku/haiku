@@ -1,1 +1,1 @@
-#include <locale/xlocale.h>
+/* Nothing here. */

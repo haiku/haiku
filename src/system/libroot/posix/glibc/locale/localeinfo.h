@@ -1,109 +1,149 @@
-/* Declarations for internal libc locale interfaces
-   Copyright (C) 1995, 96, 97, 98, 99,2000,2001 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
-
+/*
+ * Copyright 2025, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _LOCALEINFO_H
-#define _LOCALEINFO_H 1
+#define _LOCALEINFO_H
 
-#include <stddef.h>
-#include <langinfo.h>
-#include <limits.h>
-#include <time.h>
-#include <stdint.h>
-#include <sys/types.h>
 
-// __locale_struct
-#include <xlocale.h>
-// LC_* values
+#include <stdlib.h>
 #include <locale.h>
+#include <wchar.h>
 
-/* This has to be changed whenever a new locale is defined.  */
-#define __LC_LAST	7
 
-/* We use a special value for the usage counter in `locale_data' to
-   signal that this data must never be removed anymore.  */
-#define MAX_USAGE_COUNT (UINT_MAX - 1)
-#define UNDELETABLE	UINT_MAX
+enum {
+	LC_CTYPE__NL_CTYPE_OUTDIGITS_MB_LEN = 0,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT0_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT1_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT2_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT3_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT4_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT5_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT6_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT7_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT8_MB,
+	LC_CTYPE__NL_CTYPE_OUTDIGIT9_MB,
+	LC_CTYPE__NL_CTYPE_MB_CUR_MAX,
 
-/* Structure describing locale data in core for a category.  */
-struct locale_data
-{
-  const char *name;
-  const char *filedata;		/* Region mapping the file data.  */
-  off_t filesize;		/* Size of the file (and the region).  */
-  int mmaped;			/* If nonzero the data is mmaped.  */
+#define LC_CTYPE__NL_CTYPE_INDIGITS_MB_LEN LC_CTYPE__NL_CTYPE_OUTDIGITS_MB_LEN
+#define LC_CTYPE__NL_CTYPE_INDIGITS0_MB LC_CTYPE__NL_CTYPE_OUTDIGIT0_MB
 
-  unsigned int usage_count;	/* Counter for users.  */
+#define LC_CTYPE__NL_CTYPE_OUTDIGITS_WC_LEN LC_CTYPE__NL_CTYPE_OUTDIGITS_MB_LEN
+#define LC_CTYPE__NL_CTYPE_OUTDIGIT0_WC LC_CTYPE__NL_CTYPE_OUTDIGIT0_MB
+#define LC_CTYPE__NL_CTYPE_INDIGITS_WC_LEN LC_CTYPE__NL_CTYPE_INDIGITS_MB_LEN
+#define LC_CTYPE__NL_CTYPE_INDIGITS0_WC LC_CTYPE__NL_CTYPE_INDIGITS0_MB
 
-  int use_translit;		/* Nonzero if the mb*towv*() and wc*tomb()
-				   functions should use transliteration.  */
-  const char *options;		/* Extra options from the locale name,
-				   not used in the path to the locale data.  */
+	LC_MONETARY_MON_DECIMAL_POINT,
+	LC_MONETARY_MON_THOUSANDS_SEP,
+	LC_MONETARY_MON_GROUPING,
 
-  unsigned int nstrings;	/* Number of strings below.  */
-  union locale_data_value
-  {
-    const uint32_t *wstr;
-    const char *string;
-    unsigned int word;
-  }
-  values __flexarr;	/* Items, usually pointers into `filedata'.  */
+#define LC_MONETARY__NL_MONETARY_DECIMAL_POINT_WC LC_MONETARY_MON_DECIMAL_POINT
+#define LC_MONETARY__NL_MONETARY_THOUSANDS_SEP_WC LC_MONETARY_MON_THOUSANDS_SEP
+
+	LC_NUMERIC_DECIMAL_POINT,
+	LC_NUMERIC_THOUSANDS_SEP,
+	LC_NUMERIC_GROUPING,
+
+#define LC_NUMERIC__NL_NUMERIC_DECIMAL_POINT_WC LC_NUMERIC_DECIMAL_POINT
+#define LC_NUMERIC__NL_NUMERIC_THOUSANDS_SEP_WC LC_NUMERIC_THOUSANDS_SEP
 };
 
+static inline const char*
+_nl_current(int value)
+{
+	struct lconv* lconv = localeconv();
+	switch (value) {
+		// TODO: Not correct for non-ASCII/UTF-8 multibyte locales!
+		// (perhaps via alloca+wcrtomb? or do we need new localeinfo?)
+#define DIGIT(D) case LC_CTYPE__NL_CTYPE_OUTDIGIT##D##_MB: return #D
+		DIGIT(0);
+		DIGIT(1);
+		DIGIT(2);
+		DIGIT(3);
+		DIGIT(4);
+		DIGIT(5);
+		DIGIT(6);
+		DIGIT(7);
+		DIGIT(8);
+		DIGIT(9);
+#undef DIGIT
 
-/* Name of the standard locales.  */
-extern const char _nl_C_name[];
-extern const char _nl_POSIX_name[];
+		case LC_MONETARY_MON_DECIMAL_POINT:
+			return lconv->mon_decimal_point;
+		case LC_MONETARY_MON_THOUSANDS_SEP:
+			return lconv->mon_thousands_sep;
+		case LC_MONETARY_MON_GROUPING:
+			return lconv->mon_grouping;
 
-/* The standard codeset.  */
-extern const char _nl_C_codeset[];
+		case LC_NUMERIC_DECIMAL_POINT:
+			return lconv->decimal_point;
+		case LC_NUMERIC_THOUSANDS_SEP:
+			return lconv->thousands_sep;
+		case LC_NUMERIC_GROUPING:
+			return lconv->grouping;
+	}
+	return NULL;
+}
 
-/* This is the internal locale_t object that holds the global locale
-   controlled by calls to setlocale.  A thread's TSD locale pointer
-   points to this when `uselocale (LC_GLOBAL_LOCALE)' is in effect.  */
-extern struct __locale_struct _nl_global_locale;
+static inline const wchar_t
+_nl_current_word(int value)
+{
+	struct lconv* lconv = NULL;
+	mbstate_t temp;
+	const char* str = NULL;
+	wchar_t out = 0;
 
-extern struct __locale_struct* _nl_current_locale();
-#define _NL_CURRENT_LOCALE        (_nl_current_locale())
+	switch (value) {
+		case LC_CTYPE__NL_CTYPE_OUTDIGITS_WC_LEN:
+			return 1;
 
-/* Return a pointer to the current `struct __locale_data' for CATEGORY.  */
-#define _NL_CURRENT_DATA(category) \
-  (_NL_CURRENT_LOCALE->__locales[category])
+		/* We always use UTF-32 in wchar_t. */
+#define DIGIT(D) case LC_CTYPE__NL_CTYPE_OUTDIGIT##D##_MB: return 0x0030 + D
+		DIGIT(0);
+		DIGIT(1);
+		DIGIT(2);
+		DIGIT(3);
+		DIGIT(4);
+		DIGIT(5);
+		DIGIT(6);
+		DIGIT(7);
+		DIGIT(8);
+		DIGIT(9);
+#undef DIGIT
 
-/* Extract the current CATEGORY locale's string for ITEM.  */
+		case LC_CTYPE__NL_CTYPE_MB_CUR_MAX:
+			return __ctype_get_mb_cur_max();
+
+		case LC_MONETARY_MON_DECIMAL_POINT:
+			lconv = localeconv();
+			str = lconv->mon_decimal_point;
+			break;
+		case LC_MONETARY_MON_THOUSANDS_SEP:
+			lconv = localeconv();
+			str = lconv->mon_thousands_sep;
+			break;
+
+		case LC_NUMERIC_DECIMAL_POINT:
+			lconv = localeconv();
+			str = lconv->decimal_point;
+			break;
+		case LC_NUMERIC_THOUSANDS_SEP:
+			lconv = localeconv();
+			str = lconv->thousands_sep;
+			break;
+	}
+	if (str == NULL)
+		return out;
+
+	mbrtowc(&out, str, 1, &temp);
+	return out;
+}
+
+
 #define _NL_CURRENT(category, item) \
-  (_NL_CURRENT_DATA (category)->values[_NL_ITEM_INDEX (item)].string)
-
-/* Extract the current CATEGORY locale's string for ITEM.  */
-#define _NL_CURRENT_WSTR(category, item) \
-  ((wchar_t *) _NL_CURRENT_DATA (category)->values[_NL_ITEM_INDEX (item)].wstr)
-
-/* Extract the current CATEGORY locale's word for ITEM.  */
+	_nl_current(category##_##item)
 #define _NL_CURRENT_WORD(category, item) \
-  ((uint32_t) _NL_CURRENT_DATA (category)->values[_NL_ITEM_INDEX (item)].word)
-
-/* This is used in lc-CATEGORY.c to define _nl_current_CATEGORY.  */
-#define _NL_CURRENT_DEFINE(category) \
-  /* No per-category variable here. */
-
-/* Postload processing.  */
-extern void _nl_postload_ctype (void);
-extern void _nl_postload_time (void);
+	_nl_current_word(category##_##item)
 
 
-#endif	/* localeinfo.h */
+#endif	/* _LOCALEINFO_H */
