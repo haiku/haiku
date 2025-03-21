@@ -201,7 +201,7 @@ private:
 
 			char*				fMinLimitLabel;
 			char*				fMaxLimitLabel;
-			const char*			fUpdateText;
+			char*				fUpdateText;
 
 			int32 				fMinValue;
 			int32 				fMaxValue;

@@ -208,6 +208,7 @@ BSlider::~BSlider()
 #endif
 
 	delete fModificationMessage;
+	free(fUpdateText);
 	free(fMinLimitLabel);
 	free(fMaxLimitLabel);
 }
@@ -1054,7 +1055,9 @@ BSlider::UpdateTextChanged()
 		oldWidth = StringWidth(fUpdateText);
 
 	const char* oldUpdateText = fUpdateText;
-	fUpdateText = UpdateText();
+	free(fUpdateText);
+
+	fUpdateText = strdup(UpdateText());
 	bool updateTextOnOff = (fUpdateText == NULL && oldUpdateText != NULL)
 		|| (fUpdateText != NULL && oldUpdateText == NULL);
 
