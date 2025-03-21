@@ -89,7 +89,7 @@ static inline const wchar_t
 _nl_current_word(int value)
 {
 	struct lconv* lconv = NULL;
-	mbstate_t temp;
+	mbstate_t temp = {};
 	const char* str = NULL;
 	wchar_t out = 0;
 
