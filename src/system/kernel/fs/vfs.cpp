@@ -2157,7 +2157,7 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 	int count, struct io_context* ioContext, VnodePutter& _vnode,
 	ino_t* _parentID, char* leafName)
 {
-	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
+	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", start, path));
 	ASSERT(!_vnode.IsSet());
 
 	VnodePutter vnode(start);
@@ -5915,6 +5915,24 @@ file_deselect(struct file_descriptor* descriptor, uint8 event,
 
 
 static status_t
+dir_create_vnode(struct vnode* vnode, const char* name, int perms)
+{
+	status_t status;
+	if (HAS_FS_CALL(vnode, create_dir)) {
+		status = FS_CALL(vnode, create_dir, name, perms);
+	} else {
+		struct vnode* entry = NULL;
+		if (lookup_dir_entry(vnode, name, &entry) == B_OK) {
+			status = B_FILE_EXISTS;
+			put_vnode(entry);
+		} else
+			status = B_READ_ONLY_DEVICE;
+	}
+	return status;
+}
+
+
+static status_t
 dir_create_entry_ref(dev_t mountID, ino_t parentID, const char* name, int perms,
 	bool kernel)
 {
@@ -5931,10 +5949,7 @@ dir_create_entry_ref(dev_t mountID, ino_t parentID, const char* name, int perms,
 	if (status != B_OK)
 		return status;
 
-	if (HAS_FS_CALL(vnode, create_dir))
-		status = FS_CALL(vnode, create_dir, name, perms);
-	else
-		status = B_READ_ONLY_DEVICE;
+	status = dir_create_vnode(vnode, name, perms);
 
 	put_vnode(vnode);
 	return status;
@@ -5955,12 +5970,7 @@ dir_create(int fd, char* path, int perms, bool kernel)
 	if (status < 0)
 		return status;
 
-	if (HAS_FS_CALL(vnode, create_dir)) {
-		status = FS_CALL(vnode.Get(), create_dir, filename, perms);
-	} else
-		status = B_READ_ONLY_DEVICE;
-
-	return status;
+	return dir_create_vnode(vnode.Get(), filename, perms);
 }
 
 
