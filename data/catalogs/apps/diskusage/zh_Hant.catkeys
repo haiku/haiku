@@ -13,8 +13,8 @@ Rescan	Status View		重新掃描
 file unavailable	Status View		檔案不可用
 Get info	Pie View		獲取資訊
 DiskUsage	System name		磁碟使用情況
-Created	Info Window		已創建
-Modified	Info Window		已修改的
+Created	Info Window		創建
+Modified	Info Window		修改
 Abort	Status View		中止
 Open with	Pie View		開啓以
 Open	Pie View		開啓

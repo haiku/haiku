@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ScreenSaver	2682415627
+1	english	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		顯示電源管理訊號不可用
 Blackness	ScreenSaver		黑度
 Fade now when mouse is here	ScreenSaver		當滑鼠位於此處時立即淡出
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		取消
 Password:	ScreenSaver		密碼：
 Screensaver settings	ScreenSaver		螢幕保護程式設定
 Password Window	ScreenSaver		密碼視窗
+Use system password	ScreenSaver		使用系統密碼
 Test	ScreenSaver		測試
 Could not load screen saver	ScreenSaver		無法載入螢幕保護程式
 Use custom password	ScreenSaver		使用自訂密碼

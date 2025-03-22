@@ -37,7 +37,7 @@ Homogenous buffers	MediaString		Homogene Puffer
 Interlaced 	MediaString		Interlaced 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# Kanal}other{# Kanäle}}
 15 bit RGBA	MediaString		RGBA 15-bit
-Drop data	MediaString		Daten verwefen
+Drop data	MediaString		Daten verwerfen
 AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz

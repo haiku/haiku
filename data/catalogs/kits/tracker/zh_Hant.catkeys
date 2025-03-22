@@ -1,5 +1,5 @@
 1	english	x-vnd.Haiku-libtracker	4192200646
-Created	ContainerWindow		已創建
+Created	ContainerWindow		創建
 Icon	AttributesView		圖標
 Open and make preferred	OpenWithWindow		開啓並設為首選
 Open with…	ContainerWindow		開啓方式…
@@ -80,7 +80,7 @@ Select	SelectionWindow		選擇
 Select	InfoWindow		選擇
 OK	OpenWithWindow		確認
 Clean up	ContainerWindow		清理
-Modified	FindPanel		已修改的
+Modified	FindPanel		修改
  (block size: 	InfoWindow		(塊大小：
 Generate image thumbnails	SettingsView		產生圖片縮圖
 An item named '%filename%' already exists.	FSUtils		一個名為'%filename%'的項目已存在。
@@ -122,10 +122,10 @@ List folders first	SettingsView		優先列出資料夾
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		此資料夾中已存在名為 \"%name\" 的項目。您想用您正在建立的符號鏈結替換它嗎？
 List view	ContainerWindow		清單視圖
 Create relative link	ContainerWindow		建立相對鏈結
-Modified	QueryPoseView		已修改的
+Modified	QueryPoseView		修改
 Owner	FilePermissionsView		擁有者
 Cancel	FSClipBoard		取消
-Modified	PoseView		已修改的
+Modified	PoseView		修改
 Save as template…	FindPanel		另存為模板…
 Move to Trash	ContainerWindow		移入資源回收筒
 All files and folders	FindPanel		所有檔案和資料夾
@@ -205,11 +205,11 @@ Unknown	WidgetAttributeText		未知
 32-bit integer	AttributesView		32 位元整數
 Save as query…	FindPanel		另存為查詢…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定的名稱已用作資料夾的名稱。請選擇其他名稱。
-Modified	ContainerWindow		已修改的
+Modified	ContainerWindow		修改
 Mini icon view	ContainerWindow		迷你圖示視圖
 File	FilePanelPriv		檔案
 Search	FindPanel		搜尋
-Modified:	InfoWindow		已修改的：
+Modified:	InfoWindow		修改：
 Cancel	FilePanelPriv		取消
 Sorry, you cannot edit that attribute.	WidgetAttributeText		抱歉，您無法編輯該屬性。
 Memory pointer	AttributesView		記憶體指針
@@ -365,7 +365,7 @@ Find…	ContainerWindow		尋找…
 moving	FSUtils		移動中
 Add	FindPanel		添加
 greater than	FindPanel		大於
-Created:	InfoWindow		已創建：
+Created:	InfoWindow		創建：
 Single window navigation	SettingsView		單視窗導航
 Edit Query template	FindPanel		編輯查詢模板
 Save query as template…	FindPanel		將查詢存储為模板…
@@ -437,7 +437,7 @@ Permissions	FilePermissionsView		權限
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" 是一個遺留的可執行檔。請取得更新版本或重新編譯應用程式。
 Only the boot disk	AutoMounterSettings		僅啟動磁碟
 Message	AttributesView		訊息
-Modified	Default Query Columns		已修改的
+Modified	Default Query Columns		修改
 Default application	InfoWindow		默認應用程序
 Untitled bitmap	PoseView		無標題點陣圖
 Invert selection	ContainerWindow		反轉選擇

@@ -8,7 +8,7 @@ Offline	TransportView		Offline
 (???)	TransportView		(???)
 Stop	TransportView		Stopp
 (no group)	TransportView		(keine Gruppe)
-Drop data	TransportView		Daten verwefen
+Drop data	TransportView		Daten verwerfen
 To:	TransportView		Zu:
 Recording	TransportView		Aufnahme
 Increase latency	TransportView		Latenz erhöhen
