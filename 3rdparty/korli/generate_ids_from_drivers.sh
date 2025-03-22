@@ -10,7 +10,7 @@
 # marvell_yukon
 # nforce
 # pcnet
-# rtl8139 rtl81xx
+# rtl8139 rtl81xx rtl8125
 # sis19x sis900 syskonnect
 # via_rhine vt612x
 
@@ -22,7 +22,7 @@ driverPath=src/add-ons/kernel/drivers/network/ether/$1
 bsdname=$2
 headername=$3
 table=$4
-sed -e 's/#include.*//g' $TOPDIR/$driverPath/dev/$bsdname/if_${bsdname}.c | awk '/VENDORID_.*,$/  { printf("%s\t", $0); next } 1' | gcc -E -include $TOPDIR/$driverPath/dev/$headername/if_${headername}${5}.h - | sed -E -n "/${bsdname}_${table}\[/,/^$/p" | sed -r -e 's/.*0x([^ ,]+), 0x([^ ,]+).*/\1\t\2/' -e '/^[[:alnum:]]/!d' | awk -F'\t' -v driverPath=$driverPath 'NF > 1 { printf "pci %s %s .... .... ...... : CONFIG__UNKNOWN__ : %s\n", $1, $2, driverPath }' | uniq
+sed -e 's/#include.*//g' $TOPDIR/$driverPath/dev/$bsdname/if_${bsdname}.c | awk '/VENDORID_.*,$/  { printf("%s\t", $0); next } 1' | gcc -E -include $TOPDIR/$driverPath/dev/$headername/if_${headername}${5}.h - | sed -E -n "/${bsdname}_${table}\[/,/^$/p" | sed -r -e 's/.*0x([^ ,]+), 0x([^ ,]+).*/\1\t\2/' -e '/^[[:alnum:]]/!d' | awk -F'\t' -v driverPath=$driverPath 'NF > 1 { printf "pci %04x %04x .... .... ...... : CONFIG__UNKNOWN__ : %s\n", strtonum("0x"$1), strtonum("0x"$2), driverPath }' | uniq
 
 }
 
@@ -35,6 +35,17 @@ table=$4
 headersuffix=$5
 sourcesuffix=$6
 sed -e 's/#include.*//g' $TOPDIR/$driverPath/dev/$bsdname/if_${bsdname}${sourcesuffix}.c | awk '/VENDORID_.*,$/  { printf("%s\t", $0); next } 1' | gcc -E -include $TOPDIR/$driverPath/dev/$headername/if_${headername}${headersuffix}.h - | sed -E -n "/${bsdname}_${table}\[/,/^\};$/p" | sed -e 's/0X/0x/g' | sed -r -e 's/[^0x]*0x([^ ,]+), 0x([^ ,]+).*/\1\t\2/' -e '/^[[:alnum:]]/!d' | awk -F'\t' -v driverPath=$driverPath 'NF > 1 { printf "pci %s %s .... .... ...... : CONFIG__UNKNOWN__ : %s\n", $1, $2, driverPath }' | sort | uniq
+
+}
+
+
+usbRalinkBsdDriver()
+{
+driverPath=src/add-ons/kernel/drivers/network/wlan/$1
+bsdname=$2
+table=$3
+sourcesuffix=$4
+sed -e 's/#include.*//g' $TOPDIR/$driverPath/dev/usb/wlan/if_${bsdname}${sourcesuffix}.c | awk '/VENDORID_.*,$/  { printf("%s\t", $0); next } 1' | gcc -E -include objects/common/libs/compat/freebsd_network/usbdevs.h - | sed -E -n "/${bsdname}_${table}\[/,/^\};$/p" | sed -e 's/0X/0x/g' | sed -r -e 's/[^0x]*0x([^ ,]+), 0x([^ ,\)]+).*/\1\t\2/' -e '/^[[:alnum:]]/!d' | awk -F'\t' -v driverPath=$driverPath 'NF > 1 { printf "usb %s %s .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : %s\n", $1, $2, driverPath }' | sort | uniq
 
 }
 
@@ -83,6 +94,16 @@ pciBsdEtherDriver  marvell_yukon msk msk products reg
 pciBsdEtherDriver  nforce nfe nfe devs reg
 pciBsdEtherDriver  pcnet pcn pcn devs reg
 pciBsdEtherDriver  rtl81xx re rl devs reg
+
+#rtl8125
+driverPath=src/add-ons/kernel/drivers/network/ether/rtl8125
+bsdname=rge
+headername=rge
+table=devices
+headersuffix=reg
+sourcesuffix=
+sed -e 's/#include.*//g' $TOPDIR/$driverPath/dev/pci/if_${bsdname}${sourcesuffix}.c | awk '/VENDORID_.*,$/  { printf("%s\t", $0); next } 1' | gcc -E -D__FreeBSD_version -include $TOPDIR/$driverPath/dev/pci/if_${headername}${headersuffix}.h - | sed -E -n "/${bsdname}_${table}\[/,/^rge_probe/{p;/^rge_probe/q}" | sed -e 's/0X/0x/g' | sed -r -e 's/[^0x]*0x([^ ,]+), 0x([^ \},]+).*/\1\t\2/' -e '/^[[:alnum:]]/!d' | awk -F'\t' -v driverPath=$driverPath 'NF > 1 { printf "pci %s %s .... .... ...... : CONFIG__UNKNOWN__ : %s\n", $1, $2, driverPath }' | sort | uniq
+
 pciBsdEtherDriver  rtl8139 rl rl devs reg
 pciBsdEtherDriver  sis19x sge sge devs reg
 pciBsdEtherDriver  sis900 sis sis devs reg
@@ -163,10 +184,11 @@ bsdname=ral
 table=pci_ids
 sourcesuffix=_pci
 sed -e 's/#include.*//g' $TOPDIR/$driverPath/dev/$bsdname/if_${bsdname}${sourcesuffix}.c | awk '/VENDORID_.*,$/  { printf("%s\t", $0); next } 1' | gcc -E - | sed -E -n "/${bsdname}_${table}\[/,/^\};$/p" | sed -e 's/0X/0x/g' | sed -r -e 's/[^0x]*0x([^ ,]+), 0x([^ ,]+).*/\1\t\2/' -e '/^[[:alnum:]]/!d' | awk -F'\t' -v driverPath=$driverPath 'NF > 1 { printf "pci %s %s .... .... ...... : CONFIG__UNKNOWN__ : %s\n", $1, $2, driverPath }' | sort | uniq
-bsdname=ural
-table=devs
-sourcesuffix=
-sed -e 's/#include.*//g' $TOPDIR/$driverPath/dev/usb/wlan/if_${bsdname}${sourcesuffix}.c | awk '/VENDORID_.*,$/  { printf("%s\t", $0); next } 1' | gcc -E -include objects/common/libs/compat/freebsd_network/usbdevs.h - | sed -E -n "/${bsdname}_${table}\[/,/^\};$/p" | sed -e 's/0X/0x/g' | sed -r -e 's/[^0x]*0x([^ ,]+), 0x([^ \)]+).*/\1\t\2/' -e '/^[[:alnum:]]/!d' | awk -F'\t' -v driverPath=$driverPath 'NF > 1 { printf "usb %s %s .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : %s\n", $1, $2, driverPath }' | sort | uniq
+
+usbRalinkBsdDriver	ralinkwifi ural devs
+usbRalinkBsdDriver	ralinkwifi run devs
+usbRalinkBsdDriver	ralinkwifi rum devs
+usbRalinkBsdDriver	ralinkwifi mtw devs
 
 
 #realtekwifi

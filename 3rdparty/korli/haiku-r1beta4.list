@@ -85,8 +85,7 @@ pci 8086 15F8 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/
 pci 8086 15F7 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
 pci 8086 3101 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
 pci 8086 5502 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
-pci 8086 3102 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
-pci 8086 5503 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
+pci 8086 5504 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
 pci 8086 0D9F .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
 pci 8086 125B .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
 pci 8086 125C .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/intel22x
@@ -272,22 +271,6 @@ pci 8086 550A .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/
 pci 8086 550B .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
 pci 8086 550C .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
 pci 8086 550D .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 550E .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 550F .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 5510 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 5511 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 0DC7 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 0DC8 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 0DC5 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 0DC6 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 57A0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 57A1 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 57B3 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 57B4 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 57B5 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 57B6 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 57B7 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
-pci 8086 57B8 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
 pci 8086 10A7 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
 pci 8086 10A9 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
 pci 8086 10D6 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/ipro1000
@@ -403,12 +386,10 @@ pci 10de 0ab0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/
 pci 10de 0ab1 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/nforce
 pci 10de 0ab2 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/nforce
 pci 10de 0ab3 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/nforce
-pci 10de 0d7d .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/nforce
 pci 1022 2000 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/pcnet
 pci 1022 2001 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/pcnet
 pci 1186 4300 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
 pci 1186 4302 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
-pci 10ec 2600 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
 pci 10ec 8139 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
 pci 10ec 8136 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
 pci 10ec 8168 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
@@ -419,8 +400,6 @@ pci 10ec 8167 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/
 pci 1259 c107 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
 pci 1737 1032 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
 pci 16ec 0116 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl81xx
-pci 10ec 3000 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl8125
-pci 10ec 8125 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl8125
 pci 10ec 8129 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl8139
 pci 10ec 8139 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl8139
 pci 10ec 8039 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/ether/rtl8139
@@ -611,11 +590,9 @@ pci 8086 3df0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/
 pci 8086 43f0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 4df0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 51f0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
-pci 8086 51f1 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 54f0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 7a70 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 7af0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
-pci 8086 7e40 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 7f70 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 a0f0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 08b1 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/idualwifi7260
@@ -1033,9 +1010,6 @@ usb 2019 ab01 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kern
 usb 2019 ab50 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
 usb 2019 ed02 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
 usb 7392 7318 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
-usb 148f 7601 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
-usb 2717 4106 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
-usb 7392 7710 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
 pci 10ec 8176 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 pci 10ec 8178 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 pci 10ec 8179 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
@@ -1126,7 +1100,6 @@ usb 2019 ed17 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kern
 usb 20f4 624d .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 20f4 648b .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 20f4 805b .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
-usb 2357 0100 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 2357 0101 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 2357 0103 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 2357 0107 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi

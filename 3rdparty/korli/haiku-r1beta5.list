@@ -615,7 +615,6 @@ pci 8086 51f1 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/
 pci 8086 54f0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 7a70 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 7af0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
-pci 8086 7e40 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 7f70 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 a0f0 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/iaxwifi200
 pci 8086 08b1 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/idualwifi7260
@@ -1033,9 +1032,6 @@ usb 2019 ab01 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kern
 usb 2019 ab50 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
 usb 2019 ed02 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
 usb 7392 7318 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
-usb 148f 7601 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
-usb 2717 4106 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
-usb 7392 7710 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/ralinkwifi
 pci 10ec 8176 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 pci 10ec 8178 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 pci 10ec 8179 .... .... ...... : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
@@ -1126,7 +1122,6 @@ usb 2019 ed17 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kern
 usb 20f4 624d .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 20f4 648b .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 20f4 805b .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
-usb 2357 0100 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 2357 0101 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 2357 0103 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
 usb 2357 0107 .. .. .. .. .. .. 0000 ffff : CONFIG__UNKNOWN__ : src/add-ons/kernel/drivers/network/wlan/realtekwifi
