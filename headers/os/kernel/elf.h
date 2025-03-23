@@ -33,10 +33,12 @@ typedef Elf64_Half Elf64_Versym;
 	#define Elf_Addr Elf32_Addr
 	#define Elf_Phdr Elf32_Phdr
 	#define Elf_Half Elf32_Half
+	#define ElfW(x) Elf32_ ## x
 #elif B_HAIKU_64_BIT
 	#define Elf_Addr Elf64_Addr
 	#define Elf_Phdr Elf64_Phdr
 	#define Elf_Half Elf64_Half
+	#define ElfW(x) Elf64_ ## x
 #endif
 
 
@@ -707,6 +709,8 @@ typedef struct {
 #define NT_IMAGES			0x696d6167 	/* images */
 #define NT_THREADS			0x74687264 	/* threads */
 #define NT_SYMBOLS			0x73796d73 	/* symbols */
+
+#define NT_GNU_BUILD_ID		3
 
 /* NT_TEAM: uint32 entrySize; Elf32_Note_Team; char[] args */
 typedef struct {
