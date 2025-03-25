@@ -267,7 +267,12 @@ FileSystem::GetInode(ino_t id, Inode** _inode)
 
 	FileInfo fi;
 	status_t result = fInoIdMap.GetFileInfo(&fi, id);
-	ASSERT(result != B_ENTRY_NOT_FOUND);
+	if (result == B_ENTRY_NOT_FOUND) {
+		bool removed = false;
+		status_t getRemovedResult = get_vnode_removed(fFsVolume, id, &removed);
+		ASSERT(getRemovedResult == B_OK);
+		ASSERT(removed == true);
+	}
 
 	if (result != B_OK)
 		return result;
