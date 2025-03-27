@@ -15,7 +15,6 @@
 #include <Shape.h>
 #include <Window.h>
 
-
 const char* kMimeTypePlainText = "text/plain";
 
 

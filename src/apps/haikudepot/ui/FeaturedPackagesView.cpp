@@ -1,7 +1,8 @@
 /*
- * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2025, Pawan Yerramilli <me@pawanyerramilli.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -21,11 +22,12 @@
 #include <StringView.h>
 
 #include "BitmapView.h"
+#include "Cursor.h"
 #include "HaikuDepotConstants.h"
+#include "InterfaceDefs.h"
 #include "LocaleUtils.h"
 #include "Logger.h"
 #include "MainWindow.h"
-#include "MarkupTextView.h"
 #include "PackageUtils.h"
 #include "RatingUtils.h"
 #include "RatingView.h"
@@ -50,6 +52,11 @@
 // The faction of an M-space that is left between the title and the first trailing icon.
 #define TITLE_RIGHT_TRAILING_ICON_PADDING_M_FACTOR 0.1
 
+enum {
+	PACKAGE_BULDING_CARD = 0,
+	PACKAGE_LIST_CARD = 1,
+	NO_RESULTS_CARD = 2
+};
 
 // #pragma mark - PackageView
 
@@ -966,19 +973,59 @@ private:
 FeaturedPackagesView::FeaturedPackagesView(Model& model)
 	:
 	BView(B_TRANSLATE("Featured packages"), 0),
-	fModel(model)
+	fModel(model),
+	fIsLoadingAndNoData(false)
 {
 	fPackagesView = new StackedFeaturedPackagesView(fModel);
 
 	fScrollView = new BScrollView("featured packages scroll view", fPackagesView, 0, false, true,
 		B_FANCY_BORDER);
 
-	BLayoutBuilder::Group<>(this).Add(fScrollView, 1.0f);
-}
+	_BuildNoResultsView();
 
+	BStringView* pleaseWaitText = new BStringView(
+		"please wait text", B_TRANSLATE("Creating package list" B_UTF8_ELLIPSIS));
+
+	pleaseWaitText->SetExplicitAlignment(
+		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
+
+	fFeaturedCardLayout = new BCardLayout();
+	SetLayout(fFeaturedCardLayout);
+
+	BGroupView* pleaseWaitGroup = new BGroupView("please wait");
+	pleaseWaitGroup->SetViewColor(ui_color(B_LIST_BACKGROUND_COLOR));
+	AddChild(pleaseWaitGroup);
+
+	BGroupView* foundResultsGroup = new BGroupView("search results");
+	AddChild(foundResultsGroup);
+
+	BGroupView* noResultsGroup = new BGroupView("no search results");
+	noResultsGroup->SetViewColor(ui_color(B_LIST_BACKGROUND_COLOR));
+	AddChild(noResultsGroup);
+
+	BLayoutBuilder::Group<>(pleaseWaitGroup)
+		.Add(pleaseWaitText)
+		.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+	BLayoutBuilder::Group<>(foundResultsGroup).Add(fScrollView, 1.0f);
+	BLayoutBuilder::Group<>(noResultsGroup)
+		.AddGroup(B_VERTICAL)
+				.AddGlue()
+				.Add(fNoResultsView)
+				.AddGlue()
+		.End()
+		.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+	_AdjustViews();
+}
 
 FeaturedPackagesView::~FeaturedPackagesView()
 {
+}
+
+
+void
+FeaturedPackagesView::AttachedToWindow()
+{
+	fNoResultsView->SetTarget(Window());
 }
 
 
@@ -994,6 +1041,9 @@ void
 FeaturedPackagesView::AddRemovePackages(const std::vector<PackageInfoRef>& addedPackages,
 	const std::vector<PackageInfoRef>& removedPackages)
 {
+	if (!addedPackages.empty())
+		fIsLoadingAndNoData = false;
+
 	if (!addedPackages.empty() || !removedPackages.empty()) {
 		fPackagesView->AddRemovePackages(addedPackages, removedPackages);
 		_AdjustViews();
@@ -1046,7 +1096,58 @@ FeaturedPackagesView::HandlePackagesChanged(const PackageInfoEvents& events)
 
 
 void
+FeaturedPackagesView::SetLoading(bool isLoading)
+{
+	if ((isLoading && fPackagesView->IsEmpty()) != fIsLoadingAndNoData) {
+		fIsLoadingAndNoData = !fIsLoadingAndNoData;
+		_AdjustViews();
+	}
+}
+
+
+void
+FeaturedPackagesView::_BuildNoResultsView()
+{
+	fNoResultsView = new TextDocumentView();
+	TextDocumentRef noResultsTextDocument = new TextDocument();
+	ParagraphStyle paragraphStyle;
+	paragraphStyle.SetAlignment(ALIGN_CENTER);
+	Paragraph paragraph(paragraphStyle);
+
+	TextSpan prefix;
+	prefix.SetText(B_TRANSLATE("No results? "));
+
+	CharacterStyle linkStyle;
+	linkStyle.SetForegroundColor(ui_color(B_LINK_TEXT_COLOR));
+	TextSpan link(B_TRANSLATE_COMMENT(
+		"Click here", "Appears in the sentence 'Click here to search all packages.'"), linkStyle);
+	link.SetClickMessage(new BMessage(MSG_SHOW_ALL_PACKAGES_TAB));
+	BCursor cursor(B_CURSOR_ID_SYSTEM_DEFAULT);
+	link.SetCursor(cursor);
+
+	TextSpan suffix;
+	suffix.SetText(B_TRANSLATE_COMMENT(" to search all packages.",
+		"Appears in the sentence 'Click here to search all packages.'"));
+
+	paragraph.Append(prefix);
+	paragraph.Append(link);
+	paragraph.Append(suffix);
+	noResultsTextDocument->Append(paragraph);
+	fNoResultsView->SetTextDocument(noResultsTextDocument);
+	fNoResultsView->SetSelectionEnabled(false);
+	fNoResultsView->SetViewUIColor(B_LIST_BACKGROUND_COLOR);
+}
+
+
+void
 FeaturedPackagesView::_AdjustViews()
 {
+	if (fIsLoadingAndNoData)
+		fFeaturedCardLayout->SetVisibleItem(PACKAGE_BULDING_CARD);
+	else if (fPackagesView->IsEmpty())
+		fFeaturedCardLayout->SetVisibleItem(NO_RESULTS_CARD);
+	else
+		fFeaturedCardLayout->SetVisibleItem(PACKAGE_LIST_CARD);
+
 	fScrollView->FrameResized(fScrollView->Frame().Width(), fScrollView->Frame().Height());
 }

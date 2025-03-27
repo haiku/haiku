@@ -45,7 +45,7 @@ public:
 									{ return fCursor; }
 			void				SetClickMessage(BMessage* message);
 	inline	const BMessage*		ClickMessage() const
-									{ return fClickMessage.IsEmpty() ? NULL : &fClickMessage; }
+									{ return &fClickMessage; }
 private:
 			void				_TruncateInsert(int32& start) const;
 			void				_TruncateRemove(int32& start,

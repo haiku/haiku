@@ -28,7 +28,8 @@ enum {
 	MSG_LOG_OUT								= 'lgot',
 	MSG_PKG_INSTALL							= 'pkgi',
 	MSG_PKG_UNINSTALL						= 'pkgu',
-	MSG_PKG_OPEN							= 'pkgo'
+	MSG_PKG_OPEN							= 'pkgo',
+	MSG_SHOW_ALL_PACKAGES_TAB				= 'sapt'
 };
 
 enum BitmapSize {
