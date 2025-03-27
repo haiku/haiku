@@ -353,6 +353,8 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 	bool eof = false;
 	if ((cookie->fMode & O_NOCACHE) != 0)
 		return ReadDirect(cookie, pos, buffer, _length, &eof);
+
+	MutexLocker _(fFileCacheLock);
 	return file_cache_read(fFileCache, cookie, pos, buffer, _length);
 }
 

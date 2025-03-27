@@ -182,7 +182,7 @@ Inode::RevalidateFileCache()
 		fMaxFileSize = st.st_size;
 	fFileCache = file_cache_create(fFileSystem->DevId(), ID(), fMaxFileSize);
 
-	change = fChange;
+	fChange = change;
 	return B_OK;
 }
 
