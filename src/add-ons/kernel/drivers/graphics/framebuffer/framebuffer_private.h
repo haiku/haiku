@@ -24,9 +24,6 @@ struct framebuffer_info {
 	area_id			shared_area;
 
 	addr_t			frame_buffer;
-	addr_t			physical_frame_buffer;
-	size_t			physical_frame_buffer_size;
-	bool			complete_frame_buffer_mapped;
 };
 
 extern status_t framebuffer_init(framebuffer_info& info);
