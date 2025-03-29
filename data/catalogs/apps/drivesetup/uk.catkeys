@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	1140196651
+1	ukrainian	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Пристрій
 Initialize	MainWindow		Ініціалізація
 Could not change the parameters of the selected partition.	MainWindow		Неможливо змінити параметри вибраного розділу.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що саме зараз потрібно записати зміни на диск?\n\nЯкщо це зробити, всі дані на розділі \«%s\» будуть безповоротно втрачені!
 PGP encrypted	Encryption utils		PGP-шифрування
 Delete partition	MainWindow		Видалити розділ
 Error: 	MainWindow	in any error alert	Помилка: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		Збій при пере�
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \«%s\»? Повторний запит буде видано безпосередньо перед записом змін на диск.
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		Підключено як
+Disk system %s not found!	MainWindow		Дискова система %s не знайдена!
 Create…	MainWindow		Створити…
 Write changes	MainWindow		Записати зміни
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Збій ініціалізації розділу %s. (На диск нічого не було записано.)
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		Розділ %s вже від
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ви впевнені, що бажаєте змінити параметри вибраного розділу?\n\nРозділ може більше не розпізнаватись іншими операційними системами!
 Boot	PartitionList		Завантажувальний
 OK	AbstractParametersPanel		ОК
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що саме зараз потрібно записати зміни на диск?\n\nЯкщо це зробити, всі дані на диску \«%s\» будуть безповоротно втрачені!
 Virtual	PartitionList		Віртуальний
 Virtual	DiskView		Віртуальний
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на вибранному диску будуть безповоротно втрачені, якщо Ви продовжите!

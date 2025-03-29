@@ -1,17 +1,20 @@
-1	russian	x-vnd.Haiku-WebPositive	2942427387
+1	russian	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Требуется авторизация
 Previous	WebPositive Window		Ранее
 Copy	Console Window		Копировать
 (Finish: %date)	Download Window		(Завершение: %date)
 Open bookmarks confirmation	WebPositive Window		Подтверждение открытия закладок
+Delete	BookmarkBar		Удалить
 Download folder:	Settings Window		Папка для загрузок:
 Close window	WebPositive Window		Закрыть окно
+Rename	BookmarkBar		Переименовать
 Find:	WebPositive Window		Найти:
 Script console	WebPositive Window		Консоль сценариев
 There was an error setting up the bookmark.	WebPositive Window		При настройке закладки произошла ошибка.
 Fonts	Settings Window		Шрифты
 Path	Cookie Manager		Путь
 Bookmarks	WebPositive Window		Закладки
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Не удалось убрать закладку «%leaf%» из панели закладок.
 Use proxy server to connect to the internet	Settings Window		Использовать прокси-сервер для соединения с интернетом
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен
 Auto-hide interface in full screen mode	Settings Window		Автоматически скрывать интерфейс в полноэкранном режиме
@@ -33,6 +36,7 @@ Browse…	Settings Window		Выбрать…
 Resume prior session	Settings Window		Восстановить предыдущую сессию
 Match case	WebPositive Window		Учитывать регистр
 Proxy password:	Settings Window		Пароль прокси:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Не удалось удалить закладку:«%path%»
 Size:	Font Selection view		Размер:
 Page source	WebPositive Window		Код страницы
 Proxy server port:	Settings Window		Порт прокси-сервера:
@@ -56,6 +60,7 @@ Cookies for %s	Cookie Manager		Куки для %s
 Close	Download Window		Закрыть
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Условия поиска
+Old name: %s	BookmarkBar		Старое название: %s
 Expiration	Cookie Manager		Срок действия
 Reload	WebPositive Window		Обновить
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Ваш процессор слишком старый и не поддерживает расширения SSE2, без которых WebPositive не может работать. Рекомендуем установить NetSurf.
@@ -95,6 +100,7 @@ Style:	Font Selection view		Стиль:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при создании закладки.\n\nОшибка: %error
 OK	Download Window		OK
 Proxy username:	Settings Window		Имя пользователя прокси:
+Rename bookmark	BookmarkBar		Переименовать закладку
 Manage bookmarks	WebPositive Window		Изменить закладки…
 /s)	Download Window	...as in 'per second'	/с)
 Restart	Download Window		Перезапустить
@@ -147,12 +153,15 @@ Window	WebPositive Window		Окно
 Proxy server address:	Settings Window		Адрес прокси-сервера:
 Search page:	Settings Window		Страница поиска:
 Settings	WebPositive Window		Настройки
+Show in Tracker	BookmarkBar		Показать в Tracker
 Clear	URL Bar		Очистить
 Loading %url	WebPositive Window		Загрузка %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
+OK	BookmarkBar		OK
 Start up:	Settings Window		При запуске:
 Confirmation	WebPositive Window		Подтверждение
 Session cookie	Cookie Manager		Куки сессии
+New name:	BookmarkBar		Новое название:
 No SSE2 support	WebPositive		Без поддержки SSE2
 Open all	WebPositive Window		Открыть все
 Cut	WebPositive Window		Вырезать
@@ -162,4 +171,5 @@ Clear history	WebPositive Window		Очистить историю
 Cancel	WebPositive Window		Отмена
 Script console	Console Window		Консоль сценариев
 Copy	URL Bar		Копировать
+Open in new tab	BookmarkBar		Открыть в новой вкладке
 Open start page	Settings Window		Открыть стартовую страницу

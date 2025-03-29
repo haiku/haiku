@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	1732323378
+1	swedish	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Videospår
 Playlist…	MediaPlayer-Main		Spellista...
 <unnamed media>	MediaPlayer-InfoWin		<inget namn media>
 Save	MediaPlayer-PlaylistWindow		Spara
+25% scale	MediaPlayer-Main		25% skala
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Slumpa poster
 Cancel	MediaPlayer-NetworkStream		Avbryt
 Nothing to Play	MediaPlayer-Main		Inget att spela upp

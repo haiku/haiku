@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	107596791
+1	ukrainian	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Потрібна автентифікація
 Previous	WebPositive Window		Попереднє
 Copy	Console Window		Копіювати
@@ -14,6 +14,7 @@ There was an error setting up the bookmark.	WebPositive Window		Під час н
 Fonts	Settings Window		Шрифти
 Path	Cookie Manager		Шлях
 Bookmarks	WebPositive Window		Закладки
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Не вдалося прибрати закладку «%leaf%» з панелі закладок.
 Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для підключення до Інтернет
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url завантажився
 Auto-hide interface in full screen mode	Settings Window		Автоматично приховувати інтерфейс у повноекранному режимі

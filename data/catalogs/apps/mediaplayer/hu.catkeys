@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	1732323378
+1	hungarian	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Bejegyzés Szemetesbe helyezése
 Close	MediaPlayer-PlaylistWindow		Bezárás
 Volume of background clips	MediaPlayer-SettingsWindow		Háttérbeli klippek hangereje
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Videósáv
 Playlist…	MediaPlayer-Main		Lejátszási lista…
 <unnamed media>	MediaPlayer-InfoWin		<névtelen>
 Save	MediaPlayer-PlaylistWindow		Mentés
+25% scale	MediaPlayer-Main		25% méret
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Bejegyzések véletlenszerűsítése
 Cancel	MediaPlayer-NetworkStream		Mégse
 Nothing to Play	MediaPlayer-Main		Nincs mit lejátszani

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Input	130668644
+1	ukrainian	x-vnd.Haiku-Input	2383795148
 Defaults	InputMouse		Типові настройки
 Scrolling	TouchpadPrefView		Прокрутка
 Long	KeyboardView		Більше
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Швидкість подвійного нат�
 Typing test area	KeyboardView		Поле для перевірки набору тексту
 Fast	KeyboardView		Більше
 Please confirm	TouchpadPrefView		Будь ласка підтвердіть
+Trackpad speed	TouchpadPrefView		Швидкість Trackpad
 Mouse speed	SettingsView		Швидкість миші
+Trackpad acceleration	TouchpadPrefView		Прискорення Trackpad
 Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
+Reverse scroll direction	TouchpadPrefView		Зворотний напрямок прокрутки
 Keyboard lock delay	TouchpadPrefView		Затримка блокування клавіатури
 Input	System name		Input
 Quick	TouchpadPrefView		Швидко

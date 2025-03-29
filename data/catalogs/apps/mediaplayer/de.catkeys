@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	1732323378
+1	german	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Videospur
 Playlist…	MediaPlayer-Main		Playliste …
 <unnamed media>	MediaPlayer-InfoWin		<Dateiname nicht verfügbar>
 Save	MediaPlayer-PlaylistWindow		Speichern
+25% scale	MediaPlayer-Main		25% Zoom
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Einträge zufällig anordnen
 Cancel	MediaPlayer-NetworkStream		Abbrechen
 Nothing to Play	MediaPlayer-Main		Nichts abzuspielen

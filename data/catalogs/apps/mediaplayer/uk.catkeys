@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	1732323378
+1	ukrainian	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до смітника
 Close	MediaPlayer-PlaylistWindow		Закрити
 Volume of background clips	MediaPlayer-SettingsWindow		Гучність фонових кліпів
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Відеодоріжка
 Playlist…	MediaPlayer-Main		Список відтворення…
 <unnamed media>	MediaPlayer-InfoWin		<неназване медіа>
 Save	MediaPlayer-PlaylistWindow		Зберегти
+25% scale	MediaPlayer-Main		Масштаб 25%
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Випадкові записи
 Cancel	MediaPlayer-NetworkStream		Скасувати
 Nothing to Play	MediaPlayer-Main		Нічого відтворювати

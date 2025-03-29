@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ScreenSaver	2682415627
+1	russian	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Недоступна DPMS (система сигналов управления энергопотреблением монитора)
 Blackness	ScreenSaver		Пустой экран
 Fade now when mouse is here	ScreenSaver		Включать заставку, когда мышь находится здесь
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Отмена
 Password:	ScreenSaver		Пароль:
 Screensaver settings	ScreenSaver		Настройки заставки
 Password Window	ScreenSaver		Окно пароля
+Use system password	ScreenSaver		Использовать системный пароль
 Test	ScreenSaver		Просмотр
 Could not load screen saver	ScreenSaver		Не удалось загрузить заставку
 Use custom password	ScreenSaver		Использовать выбранный пароль

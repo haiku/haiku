@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaPlayer	1732323378
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
 Close	MediaPlayer-PlaylistWindow		Tanca
 Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Pista de vídeo
 Playlist…	MediaPlayer-Main		Llista de reproducció...
 <unnamed media>	MediaPlayer-InfoWin		<mitjans sense nom>
 Save	MediaPlayer-PlaylistWindow		Desa
+25% scale	MediaPlayer-Main		Escala del 25 %
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Entrades aleatòries
 Cancel	MediaPlayer-NetworkStream		Cancel·la
 Nothing to Play	MediaPlayer-Main		Res per reproduir
@@ -84,7 +85,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No s'han 
 Total duration: %s	MediaPlayer-PlaylistWindow		Durada total: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Error de moviment a la paperera
-50% scale	MediaPlayer-Main		Escala de 50 %
+50% scale	MediaPlayer-Main		Escala del 50 %
 Drop files to play	MediaPlayer-Main		Deixeu anar els fitxers per reproduir.
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copia l'entrada
 Close window after playing audio	MediaPlayer-SettingsWindow		Tanca la finestra després de reproduir l'àudio.
@@ -124,14 +125,14 @@ Track	Video Track Menu		Pista
 Full screen	MediaPlayer-Main		Pantalla completa
 OK	MediaPlayer-NetworkStream		D'acord
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error intern (fallada de blocatge). Ha fallat desar la llista de reproducció.
-100% scale	MediaPlayer-Main		Escala de 100 %
+100% scale	MediaPlayer-Main		Escala del 100 %
 New player	MediaPlayer-Main		Reproductor nou
 <nothing to redo>	MediaPlayer-PlaylistWindow		<res per refer>
 Bad URL	MediaPlayer-NetworkStream		URL incorrecte
 Save	MediaPlayer-Main		Desa
 Close window after playing video	MediaPlayer-SettingsWindow		Tanca la finestra després de reproduir el vídeo.
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Escala pel·lícules sense problemes (mode sense superposició)
-200% scale	MediaPlayer-Main		Escala de 200 %
+200% scale	MediaPlayer-Main		Escala del 200 %
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		No s'ha pogut obrir el fitxer %filename.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Cap dels fitxers que voleu reproduir sembla un fitxer multimèdia.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Suprimeix l'entrada
@@ -146,13 +147,13 @@ Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alguns f
 <nothing to undo>	MediaPlayer-PlaylistWindow		<res per desfer>
 Save as…	MediaPlayer-PlaylistWindow		Desa com a...
 Error: 	MediaPlayer-RemovePLItemsCmd		Error: 
-300% scale	MediaPlayer-Main		Escala de 300 %
+300% scale	MediaPlayer-Main		Escala del 300 %
 Open	MediaPlayer-Main		Obre
 ask every time	MediaPlayer-SettingsWindow		pregunta-ho cada cop
 (not supported)	MediaPlayer-InfoWin		(no s'admet)
 Randomize	MediaPlayer-PlaylistWindow		Aleatori
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Off	Subtitles menu		Desactivat
-400% scale	MediaPlayer-Main		Escala de 400 %
+400% scale	MediaPlayer-Main		Escala del 400 %
 h	MediaPlayer-InfoWin	Hours	h
 OK	MediaPlayer-PlaylistWindow		D'acord

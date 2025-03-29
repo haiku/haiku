@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1732323378
+1	russian	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Переместить запись в корзину
 Close	MediaPlayer-PlaylistWindow		Закрыть
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Видео дорожка
 Playlist…	MediaPlayer-Main		Плейлист…
 <unnamed media>	MediaPlayer-InfoWin		<безымянное медиа>
 Save	MediaPlayer-PlaylistWindow		Сохранить
+25% scale	MediaPlayer-Main		Масштаб 25%
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Перемешать записи
 Cancel	MediaPlayer-NetworkStream		Отмена
 Nothing to Play	MediaPlayer-Main		Нечего проигрывать

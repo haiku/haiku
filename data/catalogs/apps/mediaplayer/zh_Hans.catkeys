@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	1732323378
+1	english	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		移除条目到垃圾桶
 Close	MediaPlayer-PlaylistWindow		关闭
 Volume of background clips	MediaPlayer-SettingsWindow		背景剪辑音量
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		视频轨
 Playlist…	MediaPlayer-Main		播放列表…
 <unnamed media>	MediaPlayer-InfoWin		<未命名媒体>
 Save	MediaPlayer-PlaylistWindow		保存
+25% scale	MediaPlayer-Main		25% 缩放
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		随机化条目
 Cancel	MediaPlayer-NetworkStream		取消
 Nothing to Play	MediaPlayer-Main		无播放项

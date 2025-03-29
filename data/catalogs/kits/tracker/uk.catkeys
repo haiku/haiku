@@ -165,7 +165,7 @@ Media parameter group	AttributesView		Група параметрів медіа
 %name info	InfoWindow	InfoWindow Title	Зведення про «%name»
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Якщо перемістити каталог home, %osName може працювати неналежним чином!\n\nВи дійсно бажаєте цього?\n\nДля переміщення home, затисніть кнопку Shift та натисніть \«Перемістити\».
 Property info	AttributesView		Інфо про властивості
-Sorry, you can't create links in the Trash.	PoseView		Вибачте, Ви не можете створювати посилання в смітнику.
+Sorry, you can't create links in the Trash.	PoseView		Вибачте, Ви не можете створювати посилання у смітнику.
 From	Email Query Columns		Від
 Open selection with:	OpenWithWindow		Відкрити вибране у:
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Неможливо відкрити \«%document\» бо програма \«%app\» у смітнику. 
@@ -192,7 +192,7 @@ Keywords	Bookmark Query Columns		Ключові слова
 Copy more	ContainerWindow		Копіювати ще
 by name	FindPanel		за ім'ям/назвою
 Media parameter web	AttributesView		Медіа параметри веб
-Sorry, you can't save things at the root of your system.	FilePanelPriv		Прикро, Ви не можете зберігати в кореневому каталозі системи.
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Дійсно, Ви не можете зберігати у кореневому каталозі системи.
 Restore	ContainerWindow		Відновити
 Location	ContainerWindow		Розташування
 Skip	FSUtils		Пропустити
@@ -463,7 +463,7 @@ Add new submenu…	TemplatesMenu		Додати нове підменю…
 Find	FindPanel		Знайти
 Empty folder	NavMenu		Порожня папка
 Defaults	TrackerSettingsWindow		Типові настройки
-Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Вибачте, недостатньо вільного місця в томі призначення, щоб скопіювати виділене.
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Вибачте, недостатньо вільного місця на томі призначення, щоб скопіювати виділене.
 True-color picture	AttributesView		TrueColor зображення
 Alignment	AttributesView		Вирівнювання
 Move to Trash	FSUtils		До смітника
