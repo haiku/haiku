@@ -30,6 +30,8 @@ int			mkstemps(char *templat, int slen);
 long long	strtonum(const char *numstr, long long minval,
 				long long maxval, const char **errstrp);
 
+int			getloadavg(double array[], int size);
+
 #ifdef __cplusplus
 }
 #endif

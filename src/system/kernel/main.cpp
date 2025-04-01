@@ -313,6 +313,8 @@ main2(void* /*unused*/)
 	TRACE("init system notifications\n");
 	system_notifications_init();
 
+	scheduler_loadavg_init();
+
 	TRACE("Init modules\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);
 	module_init_post_threads();

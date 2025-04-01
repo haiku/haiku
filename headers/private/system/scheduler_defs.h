@@ -62,4 +62,10 @@ struct scheduling_analysis {
 };
 
 
+struct loadavg {
+	uint32	ldavg[3];
+	long 	fscale;
+};
+
+
 #endif	/* _SYSTEM_SCHEDULER_DEFS_H */

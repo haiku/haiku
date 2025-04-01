@@ -19,6 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			explicit_bzero.c
 			fgetln.c
 			fts.c
+			getloadavg.cpp
 			getpass.c
 			issetugid.c
 			kqueue.cpp

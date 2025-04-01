@@ -28,6 +28,7 @@ struct fd_info;
 struct fd_set;
 struct fs_info;
 struct iovec;
+struct loadavg;
 struct msqid_ds;
 struct net_stat;
 struct pollfd;
@@ -212,6 +213,7 @@ extern bigtime_t	_kern_estimate_max_scheduling_latency(thread_id thread);
 
 extern status_t		_kern_set_scheduler_mode(int32 mode);
 extern int32		_kern_get_scheduler_mode(void);
+extern status_t		_kern_get_loadavg(struct loadavg* info, size_t size);
 
 // user/group functions
 extern gid_t		_kern_getgid(bool effective);

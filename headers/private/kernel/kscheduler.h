@@ -85,6 +85,7 @@ void scheduler_add_listener(struct SchedulerListener* listener);
 void scheduler_remove_listener(struct SchedulerListener* listener);
 
 void scheduler_init(void);
+status_t scheduler_loadavg_init();
 void scheduler_enable_scheduling(void);
 void scheduler_update_policy(void);
 
@@ -94,6 +95,9 @@ status_t _user_analyze_scheduling(bigtime_t from, bigtime_t until, void* buffer,
 
 status_t _user_set_scheduler_mode(int32 mode);
 int32 _user_get_scheduler_mode(void);
+
+status_t _user_get_loadavg(struct loadavg* info, size_t size);
+
 
 #ifdef __cplusplus
 }

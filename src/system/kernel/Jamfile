@@ -70,6 +70,7 @@ KernelMergeObject kernel_core.o :
 	power_saving.cpp
 	scheduler.cpp
 	scheduler_cpu.cpp
+	scheduler_load.cpp
 	scheduler_profiler.cpp
 	scheduler_thread.cpp
 	scheduler_tracing.cpp
