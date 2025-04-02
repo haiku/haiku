@@ -310,11 +310,11 @@ atexit(void (*func)(void))
 void
 exit(int status)
 {
-	// BeOS on exit notification for the main thread
-	_thread_do_exit_work();
-
 	// unwind the exit stack, calling the registered functions
 	__cxa_finalize(NULL);
+
+	// BeOS on exit notification for the main thread
+	_thread_do_exit_work();
 
 	// close all open files
 	_IO_cleanup();
