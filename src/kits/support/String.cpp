@@ -2278,6 +2278,9 @@ BString::BString(char* privateData, PrivateDataTag tag)
 status_t
 BString::_MakeWritable()
 {
+	if (fPrivateData == NULL)
+		return B_NO_INIT;
+
 	if (atomic_get(&_ReferenceCount()) > 1) {
 		// It might be shared, and this requires special treatment
 		char* newData = _Clone(fPrivateData, Length());
@@ -2303,7 +2306,7 @@ BString::_MakeWritable(int32 length, bool copy)
 {
 	char* newData = NULL;
 
-	if (atomic_get(&_ReferenceCount()) > 1) {
+	if (fPrivateData != NULL && atomic_get(&_ReferenceCount()) > 1) {
 		// we might share our data with someone else
 		if (copy)
 			newData = _Clone(fPrivateData, length);
