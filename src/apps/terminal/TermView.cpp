@@ -18,15 +18,12 @@
 
 #include "TermView.h"
 
-#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
 
 #include <algorithm>
 #include <new>
-#include <vector>
-
 #include <Alert.h>
 #include <Application.h>
 #include <Beep.h>
@@ -87,7 +84,11 @@ static property_info sPropList[] = {
 	{B_GET_PROPERTY, 0},
 	{B_DIRECT_SPECIFIER, 0},
 	"get tty name."},
-	{ 0  }
+	{ "command",
+	{B_EXECUTE_PROPERTY, 0},
+	{B_DIRECT_SPECIFIER, 0},
+	"execute command"},
+	{ 0  },
 };
 
 
@@ -245,13 +246,8 @@ TermView::TermView(BMessage* archive)
 		fRows = ROWS_DEFAULT;
 
 	int32 argc = 0;
-	if (archive->HasInt32("argc"))
-		archive->FindInt32("argc", &argc);
-
-	const char **argv = new const char*[argc];
-	for (int32 i = 0; i < argc; i++) {
-		archive->FindString("argv", i, (const char**)&argv[i]);
-	}
+	const char** argv = NULL;
+	_GetArgumentsFromMessage(archive, argv, argc);
 
 	// TODO: Retrieve colors, history size, etc. from archive
 	status_t status = _InitObject(ShellParameters(argc, argv));
@@ -365,12 +361,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	ShellParameters modifiedShellParameters(shellParameters);
 	modifiedShellParameters.SetEncoding(fEncoding);
 
-	error = fShell->Open(fRows, fColumns, modifiedShellParameters);
-
-	if (error < B_OK)
-		return error;
-
-	error = _AttachShell(fShell);
+	error = _AttachShell(fShell, modifiedShellParameters);
 	if (error < B_OK)
 		return error;
 
@@ -992,11 +983,29 @@ TermView::_InvalidateTextRange(TermPos start, TermPos end)
 }
 
 
+void
+TermView::_GetArgumentsFromMessage(const BMessage* message, const char**& argv, int32& argc)
+{
+	type_code type;
+	if (message->GetInfo("argv", &type, &argc) == B_OK) {
+		argv = new const char*[argc + 1];
+		int32 i = 0;
+		while (message->FindString("argv", i, &argv[i]) == B_OK)
+			i++;
+		argv[i] = NULL;
+	}
+}
+
+
 status_t
-TermView::_AttachShell(Shell *shell)
+TermView::_AttachShell(Shell *shell, const ShellParameters& shellParameters)
 {
 	if (shell == NULL)
 		return B_BAD_VALUE;
+
+	status_t status = shell->Open(fRows, fColumns, shellParameters);
+	if (status != B_OK)
+		return status;
 
 	fShell = shell;
 
@@ -1742,6 +1751,37 @@ TermView::MessageReceived(BMessage *message)
 					BView::MessageReceived(message);
 			} else
 				BView::MessageReceived(message);
+			break;
+		}
+
+		case B_EXECUTE_PROPERTY:
+		{
+			int32 i;
+			BMessage specifier;
+			if (message->GetCurrentSpecifier(&i, &specifier) == B_OK
+				&& strcmp("command",
+					specifier.FindString("property", i)) == 0) {
+
+				Shell* shell = _DetachShell();
+				shell->Close();
+
+				int32 argc = 0;
+				const char** argv = NULL;
+				_GetArgumentsFromMessage(message, argv, argc);
+
+				if (message->GetBool("clear", false))
+					Clear();
+
+				ShellParameters shellParameters(argc, argv);
+				shellParameters.SetEncoding(fEncoding);
+				_AttachShell(shell, shellParameters);
+
+				delete[] argv;
+
+				message->SendReply(B_REPLY);
+			} else {
+				BView::MessageReceived(message);
+			}
 			break;
 		}
 

@@ -312,8 +312,10 @@ Shell::AttachBuffer(TerminalBuffer *buffer)
 void
 Shell::DetachBuffer()
 {
-	if (fAttached)
+	if (fAttached) {
 		fTermParse->StopThreads();
+		fAttached = false;
+	}
 }
 
 
