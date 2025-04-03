@@ -18,6 +18,7 @@
 #define PROT_NONE		0x00
 
 /* mmap() flags */
+#define MAP_FILE		0x00			/* map a file to memory (this is the default behavior) */
 #define MAP_SHARED		0x01			/* changes are seen by others */
 #define MAP_PRIVATE		0x02			/* changes are only seen by caller */
 #define MAP_FIXED		0x04			/* require mapping to specified addr */
