@@ -270,6 +270,9 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 		case 0x037b: // One by Wacom CTL-672
 			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO_PT);
 			break;
+		case 0x0304: // Wacom Cintiq 13HD
+			SetDevice(29376.0, 16524.0, DEVICE_CINTIQ);
+			break;
 		default:
 			status = B_BAD_VALUE;
 			break;
@@ -888,6 +891,9 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 			break;
 		case 0x037b:
 			*name = "One by Wacom (CTL-672)";
+			break;
+		case 0x0304:
+			*name = "Wacom Cintiq 13HD";
 			break;
 
 		default:
