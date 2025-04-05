@@ -1,17 +1,20 @@
-1	italian	x-vnd.Haiku-WebPositive	2942427387
+1	italian	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Richiesta autenticazione
 Previous	WebPositive Window		Precedente
 Copy	Console Window		Copia
 (Finish: %date)	Download Window		(Terminato: %date)
 Open bookmarks confirmation	WebPositive Window		Conferma apertura segnalibri
+Delete	BookmarkBar		Elimina
 Download folder:	Settings Window		Cartella dei file scaricati:
 Close window	WebPositive Window		Chiudi finestra
+Rename	BookmarkBar		Rinomina
 Find:	WebPositive Window		Trova:
 Script console	WebPositive Window		Console
 There was an error setting up the bookmark.	WebPositive Window		Si è verificato un errore durante l'impostazione del segnalibro.
 Fonts	Settings Window		Tipi di caratteri
 Path	Cookie Manager		Percorso:
 Bookmarks	WebPositive Window		Segnalibri
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Impossibile rimuovere '%leaf%' dalla barra dei segnalibri.
 Use proxy server to connect to the internet	Settings Window		Utilizza un server proxy per la connessione a Internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url completato
 Auto-hide interface in full screen mode	Settings Window		Nasconti automaticamente l'interfaccia in modalità a schermo intero
@@ -33,6 +36,7 @@ Browse…	Settings Window		Sfoglia…
 Resume prior session	Settings Window		Continua sessione precedente
 Match case	WebPositive Window		Distingui maiuscole/minuscole
 Proxy password:	Settings Window		Password server proxy:
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Impossibile rimuovere il segnalibro:\n'%path%'
 Size:	Font Selection view		Dimensione:
 Page source	WebPositive Window		Sorgente della pagina
 Proxy server port:	Settings Window		Porta del server proxy:
@@ -56,6 +60,7 @@ Cookies for %s	Cookie Manager		Cookie per %s
 Close	Download Window		Chiudi
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Termine di ricerca
+Old name: %s	BookmarkBar		Vecchio nome: %s
 Expiration	Cookie Manager		Scadenza
 Reload	WebPositive Window		Ricarica
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La tua CPU è troppo vecchia e non supporta le estensioni SSE2, senza le quali WebPositive non può funzionare. Ti consigliamo, invece, di installare NetSurf.
@@ -95,6 +100,7 @@ Style:	Font Selection view		Stile:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nella creazione del file del segnalibro.\n\nErrore: %error
 OK	Download Window		OK
 Proxy username:	Settings Window		Nome utente server proxy:
+Rename bookmark	BookmarkBar		Rinomina segnalibro
 Manage bookmarks	WebPositive Window		Gestisci segnalibri
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Riavvia
@@ -147,12 +153,15 @@ Window	WebPositive Window		Finestra
 Proxy server address:	Settings Window		Indirizzo del server proxy:
 Search page:	Settings Window		Cerca nella pagina:
 Settings	WebPositive Window		Impostazioni
+Show in Tracker	BookmarkBar		Mostra nel Tracker
 Clear	URL Bar		Cancella
 Loading %url	WebPositive Window		Caricamento %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	La vispa Teresa avea tra l’erbetta a volo sorpresa gentil farfalletta.
+OK	BookmarkBar		OK
 Start up:	Settings Window		Avvio:
 Confirmation	WebPositive Window		Conferma
 Session cookie	Cookie Manager		Cookie di sessione
+New name:	BookmarkBar		Nuovo nome:
 No SSE2 support	WebPositive		Nessun supporto SSE2
 Open all	WebPositive Window		Apri tutti
 Cut	WebPositive Window		Taglia
@@ -162,4 +171,5 @@ Clear history	WebPositive Window		Cancella cronologia
 Cancel	WebPositive Window		Annulla
 Script console	Console Window		Console
 Copy	URL Bar		Copia
+Open in new tab	BookmarkBar		Apri in una nuova tab
 Open start page	Settings Window		Apri pagina iniziale

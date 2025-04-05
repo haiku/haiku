@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	1732323378
+1	italian	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Traccia video
 Playlist…	MediaPlayer-Main		Elenco di riproduzione…
 <unnamed media>	MediaPlayer-InfoWin		<media senza nome>
 Save	MediaPlayer-PlaylistWindow		Salva
+25% scale	MediaPlayer-Main		Scala 25%
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Rendi casuali gli elementi
 Cancel	MediaPlayer-NetworkStream		Annulla
 Nothing to Play	MediaPlayer-Main		Nulla da riprodurre

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	2029495331
+1	italian	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema di download delle condizioni di utilizzo
 Available packages	MainWindow		Pacchetti disponibili
 It was not possible to create the new user.	UserLoginWindow		Non è stato possble creare il nuovo utente.
@@ -47,6 +47,7 @@ Rating not possible	MainWindow		Valutazione non possibile
 Package update error	MainWindow		Errore nell'aggiornamento del pacchetto
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# processo} other{# processi}}
 Reboot required	PackageManager		È richiesto il riavvio
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Recupero le valutazioni degli utenti per il pacchetto
 All packages	PackageListView		Tutti i pacchetti
 Send	RatePackageWindow		Invia
 Start package daemon	App		Avvia server dei pacchetti

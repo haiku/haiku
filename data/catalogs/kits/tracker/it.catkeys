@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	841482309
+1	italian	x-vnd.Haiku-libtracker	4192200646
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -59,6 +59,7 @@ Create link	ContainerWindow		Crea collegamento
 starts with	FindPanel		comincia con
 Replace	FSUtils		Sostituisci
 ?+* follows nothing.	libtracker		?+* non seguito da espressione.
+Include Trash	FindPanel		Includi il cestino
 Rectangle	AttributesView		Rettangolo
 Move to	ContainerWindow		Sposta in
 Status	Email Query Columns		Stato
@@ -103,6 +104,7 @@ Window	ContainerWindow		Finestra
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Rimuovi
 Company	Person Query Columns		Organizzazione
+Select folders…	FindPanel		Seleziona cartelle…
 Recent documents	FavoritesMenu		Documenti recenti
 Edit templates…	TemplatesMenu		Modifica modelli…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# byte}}
@@ -124,6 +126,7 @@ Modified	QueryPoseView		Modificato
 Owner	FilePermissionsView		Proprietario
 Cancel	FSClipBoard		Annulla
 Modified	PoseView		Modificato
+Save as template…	FindPanel		Salva come modello…
 Move to Trash	ContainerWindow		Sposta nel Cestino
 All files and folders	FindPanel		Tutti i file e cartelle
 Add-ons	ContainerWindow		Componenti Aggiuntivi
@@ -140,6 +143,7 @@ Cut	ContainerWindow		Taglia
 Disks	Model		Dischi
 Create a Query template	FindPanel		Crea un modello di interrogazione
 Size	FindPanel		Dimensione
+New submenu	ContainerWindow	Folder name of New-template submenu	Nuovo sottomenu
 OK	Email Query Columns		OK
 Location	QueryPoseView		Posizione
 Edit query	ContainerWindow		Modifica interrogazione
@@ -166,6 +170,7 @@ From	Email Query Columns		Da
 Open selection with:	OpenWithWindow		Apri selezione con:
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Non è stato possibile aprire \"%document\" perché l'applicazione \"%app\" è nel Cestino. 
 Work Phone	Person Query Columns		Telefono di lavoro
+Select folders	FindPanel		Seleziona cartelle
 Close	ContainerWindow		Chiudi
 Get info	ContainerWindow		Ottieni informazioni
 MIME Type	AttributesView		Tipo MIME
@@ -271,6 +276,7 @@ Restoring: 	StatusWindow		Ripristino:
 The Tracker must be running to set the default printer.	PoseView		Il Tracker deve essere in esecuzione per impostare la stampante predefinita.
 calculating…	InfoWindow		calcolo in corso...
 Preferred for file	OpenWithWindow		Preferito per file
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# selezionato} other{# selezionati}}
 OK	AutoMounterSettings		OK
 copying	FSUtils		in copia
 MIME String	AttributesView		Stringa MIME
@@ -293,9 +299,11 @@ Error moving \"%name\".	FSUtils		Errore durante lo spostamento di \"%name\".
 Open	ContainerWindow		Apri
 Settings…	MountMenu		Impostazioni…
 You cannot put the selected item(s) into the trash.	FSUtils		Non puoi spostare l'oggetto (o gli oggetti) selezionato nel cestino.
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Destinazione:
 starts with	SelectionWindow		incomincia con
 Any	AttributesView		Qualsiasi
 Invert	SelectionWindow		Inverti
+Open…	FindPanel		Apri…
 Would you like to find some other suitable application?	FSUtils		Vuoi cercare un'applicazione adatta?
 (unknown)	AttributesView		(sconosciuto)
 *+? operand may be empty.	libtracker		operando *+? potrebbe essere vuoto.
@@ -404,6 +412,7 @@ Name	QueryPoseView		Nome
 Error %error loading add-On %name.	ContainerWindow		Il caricamento del componente aggiuntivo %name ha generato il seguente errore: %error.
 Does not handle file	OpenWithWindow		Non gestisce file
 E-mail	Person Query Columns		E-mail
+Templates	FindPanel		Modelli
 Arrange by	ContainerWindow		Ordina per
 Attributes	AttributesView		Attributi
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Spiacenti, salvare più di un elemento non è permesso.
@@ -451,6 +460,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Devi trascinare e lasciare gli elementi su una delle icone del disco nella finestra \"Disks\".
 Version:	InfoWindow		Versione:
 OK	PoseView		OK
+Add new submenu…	TemplatesMenu		Aggiungi nuovo sottomenu…
 Find	FindPanel		Trova
 Empty folder	NavMenu		Cartella vuota
 Defaults	TrackerSettingsWindow		Predefiniti
@@ -460,6 +470,7 @@ Alignment	AttributesView		Allineamento
 Move to Trash	FSUtils		Sposta nel Cestino
 Handles %type	OpenWithWindow		Gestisce %type
 Cancel	PoseView		Annulla
+Options	FindPanel		Opzioni
 Delete	PoseView		Elimina
 Media parameter	AttributesView		Parametro media
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se modifichi la tua cartella personale, %osName potrebbe non funzionare correttamente!\n\nSei sicuro di voler procedere?\n\nPer modificare la cartella home, tieni premuto il tasto Maiusc e clicca su \"So quello che faccio\".

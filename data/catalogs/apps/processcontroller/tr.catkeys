@@ -21,7 +21,7 @@ Restart Deskbar	ProcessController		Masaüstü Çubuğu’nu yeniden başlat
 About ProcessController…	ProcessController		Süreç Denetimcisi hakkında…
 Usage: %s [-deskbar]\n	ProcessController		Kullanım: %s [-deskbar]\n
 Please confirm	ProcessController		Lütfen onaylayın
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996–2001 Georges–Edouard Berenger, berenger@francenet.fr
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		© 1996–2001 Georges–Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		İvedi öncelik
 What do you want to do with the thread \"%s\"?	ProcessController		“%s” iş parçacığı ile ne yapmak istiyorsunuz?
 Idle priority	ProcessController		Boştaki öncelik

@@ -276,7 +276,7 @@ Restoring: 	StatusWindow		Återställer:
 The Tracker must be running to set the default printer.	PoseView		Tracker måste ha startats för att kunna sätta förvald printer.
 calculating…	InfoWindow		beräknar...
 Preferred for file	OpenWithWindow		Föredras för fil
-{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# vald} other {# valda}}
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# vald} other{# valda}}
 OK	AutoMounterSettings		OK
 copying	FSUtils		kopierar
 MIME String	AttributesView		MIME-sträng

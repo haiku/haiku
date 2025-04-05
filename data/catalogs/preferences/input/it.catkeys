@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Input	130668644
+1	italian	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Predefiniti
 Scrolling	TouchpadPrefView		Scorrimento
 Long	KeyboardView		Lungo
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Velocità doppio click
 Typing test area	KeyboardView		Area di test battitura
 Fast	KeyboardView		Veloce
 Please confirm	TouchpadPrefView		Per favore conferma
+Trackpad speed	TouchpadPrefView		Velocità del trackpad
 Mouse speed	SettingsView		Velocità del mouse
+Trackpad acceleration	TouchpadPrefView		Accelerazione del trackpad
 Horizontal scrolling	TouchpadPrefView		Scrolling orizzontale
+Reverse scroll direction	TouchpadPrefView		Inverti la direzione dello scroll
 Keyboard lock delay	TouchpadPrefView		Ritardo blocco tastiera
 Input	System name		Periferiche di Input
 Quick	TouchpadPrefView		Veloce
@@ -21,6 +24,7 @@ Slow	KeyboardView		Lenta
 2-Button	SettingsView		2 Pulsanti
 Click to focus and raise	SettingsView		Click da il focus e ripristina
 Vertical	TouchpadPrefView		Verticale
+Low	TouchpadPrefView		Basso
 Focus follows mouse	SettingsView		Il focus segue il mouse
 Double-click test area	SettingsView		Area di test doppo click
 Focus mode:	SettingsView		Modalità focus:

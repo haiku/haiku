@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ScreenSaver	2682415627
+1	italian	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Controlli di risparmio energetico dello schermo non disponibili
 Blackness	ScreenSaver		Oscurità
 Fade now when mouse is here	ScreenSaver		Dissolvi quando il puntatore del mouse è in posizione
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Cancella
 Password:	ScreenSaver		Password:
 Screensaver settings	ScreenSaver		Impostazioni salvaschermo
 Password Window	ScreenSaver		Finestra password
+Use system password	ScreenSaver		Usa la password di sistema
 Test	ScreenSaver		Test
 Could not load screen saver	ScreenSaver		Non è stato possibile caricare il salvaschermo
 Use custom password	ScreenSaver		Usa una password personalizzata

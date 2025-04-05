@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MediaPlayer	1732323378
+1	turkish	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi çöpe at
 Close	MediaPlayer-PlaylistWindow		Kapat
 Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Video parçası
 Playlist…	MediaPlayer-Main		Oynatma listesi…
 <unnamed media>	MediaPlayer-InfoWin		<adsız ortam>
 Save	MediaPlayer-PlaylistWindow		Kaydet
+25% scale	MediaPlayer-Main		%25 ölçek
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Girdileri rastgele dağıt
 Cancel	MediaPlayer-NetworkStream		Vazgeç
 Nothing to Play	MediaPlayer-Main		Oynatacak bir şey yok

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-DriveSetup	1140196651
+1	italian	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Impossibile smontare la partizione %s.
 Mount all	MainWindow		Monta tutto
 Disk	MainWindow		Disco
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispositivo
 Initialize	MainWindow		Inizializza
 Could not change the parameters of the selected partition.	MainWindow		Impossibile modificare i parametri della partizione selezionata.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler applicare le modifiche su disco adesso?\n\nTutti i dati contenuti nella partizione \"%s\" saranno irrimediabilmente persi se procedi!
 PGP encrypted	Encryption utils		Crittografia PGP
 Delete partition	MainWindow		Elimina partizione
 Error: 	MainWindow	in any error alert	Errore: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		Validazione dei parametri
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare la partizione \"%s\"? Ti sarà nuovamente chiesta conferma prima di salvare i cambiamenti sul disco.
 DriveSetup	System name		Gestione Disco
 Mounted at	PartitionList		Montato su
+Disk system %s not found!	MainWindow		Il disco di sistema %s non è stato trovato!
 Create…	MainWindow		Crea…
 Write changes	MainWindow		Salva modifiche
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		L'inizializzazione della partizione %s è fallita. (Nessuna modifica è stata scritta sul disco.)
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		La partizione %s è stata gi�
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sei sicuro di voler modificare i parametri della partizione selezionata?\n\nLa partizione potrebbe non essere più riconosciuta da altri sistemi operativi!
 Boot	PartitionList		Avvio
 OK	AbstractParametersPanel		OK
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler applicare le modifiche su disco adesso?\n\ntutti i dati contenuti nel disco \"%s\" saranno irrimediabilmente persi se procedi!
 Virtual	PartitionList		Virtuale
 Virtual	DiskView		Virtuale
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler salvare le modifiche sul disco?\n\nProcedendo tutti i dati del disco selezionato saranno irrimediabilmente perduti!
