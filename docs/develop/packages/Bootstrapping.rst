@@ -4,7 +4,7 @@ Bootstrapping Haiku
 
 Even a very basic Haiku requires a set of third-party packages (ICU, zlib,...),
 a Haiku sufficiently complete to build software even more
-(binutils, gcc, make,...). So whenever something fundamental in Haiku
+(binutils, gcc, make,...). So, whenever something fundamental in Haiku
 (the architecture ABI, the ABI of libroot) changes in a binary incompatible way,
 or when Haiku is ported to a new architecture, it is necessary to bootstrap
 Haiku and a basic set of required third-party packages. This document describes
@@ -31,6 +31,13 @@ Prerequisites
 
 - All the usual prerequisites for building Haiku.
 
+The process is not extremely well tested, and may fail in unexpected ways due
+to minor differences in the host machine configuration. Until all these issues
+are discovered and resolved, here is a list of systems where the bootstrapping
+is known to mostly work:
+
+- x86_64, Debian 12 host.
+
 Configuring and Building
 ========================
 
@@ -45,7 +52,7 @@ Configuring and Building
    fail!
 #. Build a bootstrap Haiku image::
 
-     jam -q @bootstrap-raw
+     jam -q -sHAIKU_PORTER_CONCURRENT_JOBS=4 @bootstrap-raw
 
 #. Boot the bootstrap Haiku (e.g. in a virtual machine), edit the file
    "/boot/home/haikuports/haikuports.config" -- entering your email address in
@@ -63,12 +70,21 @@ packages the Haiku build system put in your generated directory under
 repository can be built and in turn a regular Haiku can be built using it.
 Further packages can then be built on the regular Haiku.
 
+Known problems:
+
+- Running the configure script inside of the Haiku source directory is not
+  supported for bootstrap builds. Use an out-of tree generated directory instead.
+- When running jam for bootstrap, the -j option is broken. It will result in
+  starting multiple instances of Haikuporter that will all try to generate the
+  package infos files from the repository at the same file, and will confuse
+  each other. You can either run a single-process build, or re-run jam if there
+  is a build failure to see if it will go further.
+- Using mksh as your shell will not work when doing a bootstrap build. The most
+  well tested shell is bash, other shells may or may not work.
+
 Further hints:
 
-- Of course, as usual, "-j<number>" can be passed to the jam building the
-  bootstrap Haiku. Building the bootstrap third-party packages, which is part of
-  this process, will take quite some time anyway. Since those packages are built
-  sequentially, the jam variable "HAIKU_PORTER_CONCURRENT_JOBS" can be defined
+- The jam variable "HAIKU_PORTER_CONCURRENT_JOBS" can be defined
   to the number of jobs that shall be used to build a package.
 - Instead of "bootstrap-raw" the build profile "bootstrap-vmware" can be used as
   well. You can also define your own build profile, e.g. for building to a
@@ -165,3 +181,30 @@ following things need to be considered:
 
 If the Haiku architecture port doesn't support a working userland yet, the
 process obviously cannot go further than building the bootstrap Haiku image.
+In this case, it is possible to use the "unbootstrap" script to convert the
+bootstrap packages into regular ones, to generate a first version of the binary
+package repository. This allows to work on the bringup of the new architecture
+using non-bootstrap builds, which are better documented and tested. Once the
+architecture is in a bootable state, bootstrapping can be completed fully, and
+the properly built packages will then replace the initial set.
+
+Rules for updating haikuports.cross
+===================================
+
+The bootstrapping process being complex and having a lot of moving parts, it's
+easy to accidentally break one architecture while working on another. If you
+need to make changes to haikuports.cross, for example to update one package,
+be sure to only do so for the architectures you are testing with (that is,
+avoid using the "all" architecture or adding architectures to your new recipe
+that you have not actually tested).
+
+Once your new recipe is merged, other architectures can be added to it as they
+are tested.
+
+Try to keep changes to a minimum: it's not really needed to use the very latest
+version of everything. Having something that is tested and working is more
+important. Once you have the bootstrap image booting, you will be able to use it
+to build more up to date versions of packages. If you want to make updates to
+haikuports.cross to run newer versions of software, try to do it so that all
+architectures are following each other, to avoid having to maintain a different
+version of each recipe for each architecture.
