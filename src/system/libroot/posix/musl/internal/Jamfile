@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src system libroot posix musl stdlib ;
+SubDir HAIKU_TOP src system libroot posix musl internal ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) .. include ] ;
 UseHeaders [ FDirName $(SUBDIR) .. internal ] ;
@@ -8,15 +8,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-		MergeObject <$(architecture)>posix_musl_stdlib.o :
-			ecvt.c
-			fcvt.c
-			gcvt.c
-
-			strtod.c
-			strtol.c
-			wcstod.c
-			wcstol.c
+		MergeObject <$(architecture)>posix_musl_internal.o :
+			floatscan.c
+			intscan.c
+			shgetc.c
 			;
 	}
 }

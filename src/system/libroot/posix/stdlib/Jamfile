@@ -34,10 +34,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			reallocarray.cpp
 			realpath.cpp
 			strfmon.c
-			strtol.c
-			strtoll.c
-			strtoul.c
-			strtoull.c
 			;
 	}
 }

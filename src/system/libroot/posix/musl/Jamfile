@@ -10,6 +10,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			<$(architecture)>posix_musl_crypt.o
 			<$(architecture)>posix_musl_complex.o
 			<$(architecture)>posix_musl_dirent.o
+			<$(architecture)>posix_musl_internal.o
 			<$(architecture)>posix_musl_math.o
 			<$(architecture)>posix_musl_misc.o
 			<$(architecture)>posix_musl_prng.o
@@ -30,6 +31,7 @@ for arch in $(TARGET_ARCHS) {
 HaikuSubInclude crypt ;
 HaikuSubInclude complex ;
 HaikuSubInclude dirent ;
+HaikuSubInclude internal ;
 HaikuSubInclude misc ;
 HaikuSubInclude prng ;
 HaikuSubInclude regex ;
