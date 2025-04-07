@@ -28,7 +28,7 @@ BootstrapPackageRepository HaikuPortsCross
 	icu_bootstrap-67.1-2
 	icu_bootstrap_devel-67.1-2
 	less_bootstrap-451-1
-	m4_bootstrap-1.4.16-1
+	m4_bootstrap-1.4.19-1
 	make_bootstrap-4.3-1
 	ncurses6_bootstrap-6.2-1
 	ncurses6_bootstrap_devel-6.2-1
