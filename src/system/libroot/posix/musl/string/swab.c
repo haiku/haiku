@@ -1,8 +1,5 @@
 #include <unistd.h>
-
-#if __GNUC__ < 4
-#define restrict
-#endif
+#include "features.h"
 
 void swab(const void *restrict _src, void *restrict _dest, ssize_t n)
 {

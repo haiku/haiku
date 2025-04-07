@@ -1,10 +1,6 @@
 #include <time.h>
 #include <features.h>
 
-#if __GNUC__ < 4
-#define restrict
-#endif
-
 hidden int __month_to_secs(int, int);
 hidden long long __year_to_secs(long long, int *);
 hidden long long __tm_to_secs(const struct tm *);

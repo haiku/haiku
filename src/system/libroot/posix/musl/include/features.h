@@ -6,4 +6,8 @@
 #define weak_alias(old, new) \
 	extern __typeof(old) new __attribute__((__weak__, __alias__(#old)))
 
+#if __GNUC__ < 4
+#define restrict
+#endif
+
 #endif
