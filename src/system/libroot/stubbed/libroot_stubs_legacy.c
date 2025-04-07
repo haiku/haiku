@@ -10,8 +10,6 @@ int _IO_str_jumps;
 int _IO_wfile_jumps;
 int _IO_wstr_jumps;
 int __bb;
-int __ctype32_wctrans;
-int __ctype32_wctype;
 int __ctype_b;
 int __ctype_mb_cur_max;
 int __ctype_tolower;
@@ -76,14 +74,6 @@ int _data_offset_main_;
 int _exit_dummy_decl;
 int _gSharedObjectHaikuABI;
 int _gSharedObjectHaikuVersion;
-int _nl_C_LC_COLLATE;
-int _nl_C_LC_CTYPE;
-int _nl_C_LC_MESSAGES;
-int _nl_C_LC_MONETARY;
-int _nl_C_LC_NUMERIC;
-int _nl_C_LC_TIME;
-int _nl_C_locobj;
-int _nl_global_locale;
 int _obstack;
 int _rtDebugFlag;
 int _single_threaded;
@@ -114,7 +104,6 @@ void AdoptUnit__14parsed_elementRC16known_identifier() {}
 void Adopt__14parsed_elementRC16known_identifier() {}
 void ApplyToCurrentThread__Q38BPrivate7Libroot16LocaleDataBridge() {}
 void ApplyToCurrentThread__Q38BPrivate7Libroot21LocaleCtypeDataBridge() {}
-void ApplyToCurrentThread__Q38BPrivate7Libroot23LocaleNumericDataBridge() {}
 void BufferCapacity__CQ28BPrivate8KMessage() {}
 void Buffer__CQ28BPrivate8KMessage() {}
 void ContentSize__CQ28BPrivate8KMessage() {}
@@ -430,43 +419,21 @@ void __builtin_new() {}
 void __builtin_saveregs() {}
 void __builtin_vec_delete() {}
 void __builtin_vec_new() {}
-void __cabs() {}
-void __cabsf() {}
-void __cabsl() {}
 void __cacos() {}
 void __cacosf() {}
-void __cacosh() {}
-void __cacoshf() {}
 void __cacoshl() {}
 void __cacosl() {}
-void __carg() {}
-void __cargf() {}
-void __cargl() {}
 void __casin() {}
 void __casinf() {}
 void __casinh() {}
 void __casinhf() {}
 void __casinhl() {}
 void __casinl() {}
-void __catan() {}
-void __catanf() {}
-void __catanh() {}
-void __catanhf() {}
-void __catanhl() {}
-void __catanl() {}
-void __ccos() {}
-void __ccosf() {}
-void __ccosh() {}
-void __ccoshf() {}
 void __ccoshl() {}
-void __ccosl() {}
 void __cexp() {}
 void __cexpf() {}
 void __cexpl() {}
 void __check_eh_spec() {}
-void __cimag() {}
-void __cimagf() {}
-void __cimagl() {}
 void __clear_cache() {}
 void __clock() {}
 void __clock_beos() {}
@@ -477,11 +444,6 @@ void __clog10l() {}
 void __clogf() {}
 void __clogl() {}
 void __cmpdi2() {}
-void __collidx_table_lookup() {}
-void __collseq_table_lookup() {}
-void __conj() {}
-void __conjf() {}
-void __conjl() {}
 void __cp_eh_info() {}
 void __cp_exception_info() {}
 void __cp_pop_exception() {}
@@ -490,28 +452,12 @@ void __cplus_type_matcher() {}
 void __cpow() {}
 void __cpowf() {}
 void __cpowl() {}
-void __cproj() {}
-void __cprojf() {}
-void __cprojl() {}
-void __creal() {}
-void __crealf() {}
-void __creall() {}
 void __create_dir_struct() {}
-void __csin() {}
-void __csinf() {}
-void __csinh() {}
-void __csinhf() {}
 void __csinhl() {}
-void __csinl() {}
 void __csqrt() {}
 void __csqrtf() {}
 void __csqrtl() {}
-void __ctan() {}
-void __ctanf() {}
-void __ctanh() {}
-void __ctanhf() {}
 void __ctanhl() {}
-void __ctanl() {}
 void __ctype_b_loc() {}
 void __ctype_get_mb_cur_max() {}
 void __ctype_tolower_loc() {}
@@ -537,6 +483,7 @@ void __empty() {}
 void __eprintf() {}
 void __eq__C9type_infoRC9type_info() {}
 void __erand48_r() {}
+void __fbufsize() {}
 void __fcloseall() {}
 void __fe_dfl_env() {}
 void __fedisableexcept() {}
@@ -564,20 +511,30 @@ void __fixunsxfdi() {}
 void __fixunsxfsi() {}
 void __fixxfdi() {}
 void __flatten_process_args() {}
+void __flbf() {}
 void __floatdidf() {}
 void __floatdisf() {}
 void __floatdixf() {}
+void __floatscan() {}
 void __fopen_internal() {}
 void __fopen_maybe_mmap() {}
 void __fpclassify() {}
 void __fpclassifyf() {}
 void __fpclassifyl() {}
+void __fpending() {}
 void __fpurge() {}
 void __frame_state_for() {}
+void __freadable() {}
+void __freadahead() {}
 void __freading() {}
+void __freadptr() {}
+void __freadptrinc() {}
 void __free_pages() {}
+void __fseterr() {}
 void __fsetlocking() {}
 void __fwprintf() {}
+void __fwritable() {}
+void __fwriting() {}
 void __gcc_bcmp() {}
 void __gconv_get_builtin_trans() {}
 void __gconv_transform_ascii_internal() {}
@@ -627,6 +584,7 @@ void __init_time() {}
 void __initstate_r() {}
 void __insertion_sort__H1ZPQ217EnvironmentFilter5Entry_X01X01_v() {}
 void __introsort_loop__H3ZPQ217EnvironmentFilter5EntryZQ217EnvironmentFilter5EntryZl_X01X01PX11X21_v() {}
+void __intscan() {}
 void __ioctl() {}
 void __is_pointer__FPv() {}
 void __isinf() {}
@@ -636,16 +594,12 @@ void __isnan() {}
 void __isnanf() {}
 void __isnanl() {}
 void __jrand48_r() {}
-void __kernel_casinh() {}
-void __kernel_casinhf() {}
-void __kernel_casinhl() {}
 void __lcong48_r() {}
 void __lexicographical_compare_3way__H2ZPCScZPCSc_X01X01X11X11_i() {}
 void __lgammal_r() {}
 void __libc_dlclose() {}
 void __libc_dlopen() {}
 void __libc_dlsym() {}
-void __libc_use_alloca() {}
 void __load_image_at_path() {}
 void __longjmp_return() {}
 void __look_up_in_path() {}
@@ -766,6 +720,8 @@ void __set_scheduler_mode() {}
 void __set_stack_protection() {}
 void __setjmp_save_sigs() {}
 void __setstate_r() {}
+void __shgetc() {}
+void __shlim() {}
 void __sigaction() {}
 void __sigaction_beos() {}
 void __sigaddset() {}
@@ -1302,30 +1258,6 @@ void _kunlock_node_() {}
 void _longjmp() {}
 void _lstat_beos() {}
 void _lstat_current() {}
-void _nl_C_LC_CTYPE_class() {}
-void _nl_C_LC_CTYPE_class32() {}
-void _nl_C_LC_CTYPE_class_alnum() {}
-void _nl_C_LC_CTYPE_class_alpha() {}
-void _nl_C_LC_CTYPE_class_blank() {}
-void _nl_C_LC_CTYPE_class_cntrl() {}
-void _nl_C_LC_CTYPE_class_digit() {}
-void _nl_C_LC_CTYPE_class_graph() {}
-void _nl_C_LC_CTYPE_class_lower() {}
-void _nl_C_LC_CTYPE_class_print() {}
-void _nl_C_LC_CTYPE_class_punct() {}
-void _nl_C_LC_CTYPE_class_space() {}
-void _nl_C_LC_CTYPE_class_upper() {}
-void _nl_C_LC_CTYPE_class_xdigit() {}
-void _nl_C_LC_CTYPE_map_tolower() {}
-void _nl_C_LC_CTYPE_map_toupper() {}
-void _nl_C_LC_CTYPE_tolower() {}
-void _nl_C_LC_CTYPE_toupper() {}
-void _nl_C_LC_CTYPE_width() {}
-void _nl_C_codeset() {}
-void _nl_C_name() {}
-void _nl_POSIX_name() {}
-void _nl_current_locale() {}
-void _nl_postload_ctype() {}
 void _obstack_allocated_p() {}
 void _obstack_begin() {}
 void _obstack_begin_1() {}
@@ -2671,15 +2603,15 @@ void wcsspn() {}
 void wcsstr() {}
 void wcstod() {}
 void wcstof() {}
+void wcstoimax() {}
 void wcstok() {}
 void wcstol() {}
 void wcstold() {}
 void wcstoll() {}
 void wcstombs() {}
-void wcstoq() {}
 void wcstoul() {}
 void wcstoull() {}
-void wcstouq() {}
+void wcstoumax() {}
 void wcswcs() {}
 void wcswidth() {}
 void wcsxfrm() {}
