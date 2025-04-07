@@ -1,7 +1,7 @@
 /*-
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright (c) 1992, 1993
+ * Copyright (c) 1990, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
  * Copyright (c) 2011 The FreeBSD Foundation
@@ -36,27 +36,28 @@
 
 
 #include <limits.h>
-#include <errno.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>
 
 /*
- * Convert a string to an unsigned long long integer.
+ * Convert a string to an unsigned long integer.
  *
  * Assumes that the upper and lower case
  * alphabets and digits are each contiguous.
  */
-unsigned long long
-strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
+
+unsigned long
+strtoul(const char * __restrict nptr, char ** __restrict endptr, int base)
 {
 	const char *s;
-	unsigned long long acc;
+	unsigned long acc;
 	char c;
-	unsigned long long cutoff;
+	unsigned long cutoff;
 	int neg, any, cutlim;
 
 	/*
-	 * See strtoq for comments as to the logic used.
+	 * See strtol for comments as to the logic used.
 	 */
 	s = nptr;
 	do {
@@ -71,17 +72,17 @@ strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
 			c = *s++;
 	}
 	if ((base == 0 || base == 16) &&
-	    c == '0' && (*s == 'x' || *s == 'X') &&
-	    ((s[1] >= '0' && s[1] <= '9') ||
-	    (s[1] >= 'A' && s[1] <= 'F') ||
-	    (s[1] >= 'a' && s[1] <= 'f'))) {
+		c == '0' && (*s == 'x' || *s == 'X') &&
+		((s[1] >= '0' && s[1] <= '9') ||
+		(s[1] >= 'A' && s[1] <= 'F') ||
+		(s[1] >= 'a' && s[1] <= 'f'))) {
 		c = s[1];
 		s += 2;
 		base = 16;
 	}
 	if ((base == 0 || base == 2) &&
-	    c == '0' && (*s == 'b' || *s == 'B') &&
-	    (s[1] >= '0' && s[1] <= '1')) {
+		c == '0' && (*s == 'b' || *s == 'B') &&
+		(s[1] >= '0' && s[1] <= '1')) {
 		c = s[1];
 		s += 2;
 		base = 2;
@@ -92,8 +93,8 @@ strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
 	if (base < 2 || base > 36)
 		goto noconv;
 
-	cutoff = ULLONG_MAX / base;
-	cutlim = ULLONG_MAX % base;
+	cutoff = ULONG_MAX / base;
+	cutlim = ULONG_MAX % base;
 	for ( ; ; c = *s++) {
 		if (c >= '0' && c <= '9')
 			c -= '0';
@@ -114,7 +115,7 @@ strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
 		}
 	}
 	if (any < 0) {
-		acc = ULLONG_MAX;
+		acc = ULONG_MAX;
 		errno = ERANGE;
 	} else if (!any) {
 noconv:
@@ -125,17 +126,3 @@ noconv:
 		*endptr = (char *)(any ? s - 1 : nptr);
 	return (acc);
 }
-
-
-#ifdef __HAIKU__
-unsigned long long __strtoull_internal(const char *number, char **_end, int base, int group);
-
-unsigned long long
-__strtoull_internal(const char *number, char **_end, int base, int group)
-{
-	// ToDo: group is currently not supported!
-	(void)group;
-
-	return strtoull(number, _end, base);
-}
-#endif
