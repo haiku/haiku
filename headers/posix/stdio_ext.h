@@ -18,6 +18,7 @@ extern "C" {
 
 extern void		_flushlbf(void);
 extern int		__fsetlocking(FILE* stream, int type);
+extern void		__fseterr(FILE* stream);
 
 extern int		__freading(FILE* stream);
 extern int		__fwriting(FILE* stream);
