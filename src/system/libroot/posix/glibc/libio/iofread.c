@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,1995,1997,1998,1999,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -39,14 +38,12 @@ _IO_fread (buf, size, count, fp)
   CHECK_FILE (fp, 0);
   if (bytes_requested == 0)
     return 0;
-  _IO_cleanup_region_start ((void (*) __P ((void *))) _IO_funlockfile, fp);
-  _IO_flockfile (fp);
-  bytes_read = INTUSE(_IO_sgetn) (fp, (char *) buf, bytes_requested);
-  _IO_funlockfile (fp);
-  _IO_cleanup_region_end (0);
+  _IO_acquire_lock (fp);
+  bytes_read = _IO_sgetn (fp, (char *) buf, bytes_requested);
+  _IO_release_lock (fp);
   return bytes_requested == bytes_read ? count : bytes_read / size;
 }
-INTDEF(_IO_fread)
+libc_hidden_def (_IO_fread)
 
 #ifdef weak_alias
 weak_alias (_IO_fread, fread)

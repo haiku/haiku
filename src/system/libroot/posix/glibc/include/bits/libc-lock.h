@@ -24,12 +24,14 @@
 #include <stddef.h>
 
 #define __libc_maybe_call(func, args, else) func args
+#define __sched_yield sched_yield
 #define __pthread_mutex_init pthread_mutex_init
 #define __pthread_mutex_destroy pthread_mutex_destroy
 #define __pthread_mutexattr_init pthread_mutexattr_init
 #define __pthread_mutexattr_destroy pthread_mutexattr_destroy
 #define __pthread_mutexattr_settype pthread_mutexattr_settype
 #define __pthread_mutex_lock pthread_mutex_lock
+#define __pthread_mutex_trylock pthread_mutex_trylock
 #define __pthread_mutex_unlock pthread_mutex_unlock
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP	PTHREAD_RECURSIVE_MUTEX_INITIALIZER
 #define PTHREAD_MUTEX_RECURSIVE_NP	PTHREAD_MUTEX_RECURSIVE

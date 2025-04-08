@@ -1,4 +1,4 @@
-/* Copyright (C) 1994,1997,1999,2000,2001,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1994-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -29,16 +28,7 @@
 #include "strfile.h"
 
 
-typedef struct
-{
-  _IO_strfile f;
-  /* This is used for the characters which do not fit in the buffer
-     provided by the user.  */
-  wchar_t overflow_buf[64];
-} _IO_strnfile;
-
-
-static wint_t _IO_wstrn_overflow __P ((_IO_FILE *fp, wint_t c));
+static wint_t _IO_wstrn_overflow (_IO_FILE *fp, wint_t c) __THROW;
 
 static wint_t
 _IO_wstrn_overflow (fp, c)
@@ -49,14 +39,14 @@ _IO_wstrn_overflow (fp, c)
      filled.  But since we must return the number of characters which
      would have been written in total we must provide a buffer for
      further use.  We can do this by writing on and on in the overflow
-     buffer in the _IO_strnfile structure.  */
-  _IO_strnfile *snf = (_IO_strnfile *) fp;
+     buffer in the _IO_wstrnfile structure.  */
+  _IO_wstrnfile *snf = (_IO_wstrnfile *) fp;
 
   if (fp->_wide_data->_IO_buf_base != snf->overflow_buf)
     {
-      INTUSE(_IO_wsetb) (fp, snf->overflow_buf,
-			 snf->overflow_buf + (sizeof (snf->overflow_buf)
-					      / sizeof (wchar_t)), 0);
+      _IO_wsetb (fp, snf->overflow_buf,
+		 snf->overflow_buf + (sizeof (snf->overflow_buf)
+				      / sizeof (wchar_t)), 0);
 
       fp->_wide_data->_IO_write_base = snf->overflow_buf;
       fp->_wide_data->_IO_read_base = snf->overflow_buf;
@@ -75,21 +65,21 @@ _IO_wstrn_overflow (fp, c)
 }
 
 
-static struct _IO_jump_t _IO_wstrn_jumps =
+const struct _IO_jump_t _IO_wstrn_jumps attribute_hidden =
 {
   JUMP_INIT_DUMMY,
   JUMP_INIT(finish, _IO_wstr_finish),
   JUMP_INIT(overflow, (_IO_overflow_t) _IO_wstrn_overflow),
   JUMP_INIT(underflow, (_IO_underflow_t) _IO_wstr_underflow),
-  JUMP_INIT(uflow, (_IO_underflow_t) INTUSE(_IO_wdefault_uflow)),
+  JUMP_INIT(uflow, (_IO_underflow_t) _IO_wdefault_uflow),
   JUMP_INIT(pbackfail, (_IO_pbackfail_t) _IO_wstr_pbackfail),
-  JUMP_INIT(xsputn, INTUSE(_IO_wdefault_xsputn)),
-  JUMP_INIT(xsgetn, INTUSE(_IO_wdefault_xsgetn)),
+  JUMP_INIT(xsputn, _IO_wdefault_xsputn),
+  JUMP_INIT(xsgetn, _IO_wdefault_xsgetn),
   JUMP_INIT(seekoff, _IO_wstr_seekoff),
   JUMP_INIT(seekpos, _IO_default_seekpos),
   JUMP_INIT(setbuf, _IO_default_setbuf),
   JUMP_INIT(sync, _IO_default_sync),
-  JUMP_INIT(doallocate, INTUSE(_IO_wdefault_doallocate)),
+  JUMP_INIT(doallocate, _IO_wdefault_doallocate),
   JUMP_INIT(read, _IO_default_read),
   JUMP_INIT(write, _IO_default_write),
   JUMP_INIT(seek, _IO_default_seek),
@@ -107,7 +97,7 @@ _IO_vswprintf (string, maxlen, format, args)
      const wchar_t *format;
      _IO_va_list args;
 {
-  _IO_strnfile sf;
+  _IO_wstrnfile sf;
   int ret;
   struct _IO_wide_data wd;
 #ifdef _IO_MTSAFE_IO
@@ -127,7 +117,7 @@ _IO_vswprintf (string, maxlen, format, args)
 
   if (sf.f._sbf._f._wide_data->_IO_buf_base == sf.overflow_buf)
     /* ISO C99 requires swprintf/vswprintf to return an error if the
-       output does not fit int he provided buffer.  */
+       output does not fit in the provided buffer.  */
     return -1;
 
   /* Terminate the string.  */
@@ -135,8 +125,5 @@ _IO_vswprintf (string, maxlen, format, args)
 
   return ret;
 }
-
-#ifdef weak_alias
 weak_alias (_IO_vswprintf, __vswprintf)
 weak_alias (_IO_vswprintf, vswprintf)
-#endif

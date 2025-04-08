@@ -1,6 +1,7 @@
 #ifndef _LIBC_STRING_H
 #define _LIBC_STRING_H
 
+#define _DEFAULT_SOURCE
 #include_next <string.h>
 
 /* map the internal glibc interface to the public one */

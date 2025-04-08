@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,1997,1998,1999,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -26,10 +25,9 @@
    in files containing the exception.  */
 
 #include "libioP.h"
-#ifdef __STDC__
+#include <fcntl.h>
 #include <stdlib.h>
 #include <stddef.h>
-#endif
 #ifdef _LIBC
 # include <shlib-compat.h>
 #else
@@ -80,20 +78,19 @@ __fopen_internal (filename, mode, is32)
   new_f->fp.file._lock = &new_f->lock;
 #endif
 #if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
-  _IO_no_init (&new_f->fp.file, 0, 0, &new_f->wd, &INTUSE(_IO_wfile_jumps));
+  _IO_no_init (&new_f->fp.file, 0, 0, &new_f->wd, &_IO_wfile_jumps);
 #else
   _IO_no_init (&new_f->fp.file, 1, 0, NULL, NULL);
 #endif
-  _IO_JUMPS (&new_f->fp) = &INTUSE(_IO_file_jumps);
-  INTUSE(_IO_file_init) (&new_f->fp);
+  _IO_JUMPS (&new_f->fp) = &_IO_file_jumps;
+  _IO_file_init (&new_f->fp);
 #if  !_IO_UNIFIED_JUMPTABLES
   new_f->fp.vtable = NULL;
 #endif
-  if (INTUSE(_IO_file_fopen) ((_IO_FILE *) new_f, filename, mode, is32)
-      != NULL)
+  if (_IO_file_fopen ((_IO_FILE *) new_f, filename, mode, is32) != NULL)
     return __fopen_maybe_mmap (&new_f->fp.file);
 
-  INTUSE(_IO_un_link) (&new_f->fp);
+  _IO_un_link (&new_f->fp);
   free (new_f);
   return NULL;
 }
@@ -110,4 +107,9 @@ _IO_new_fopen (filename, mode)
 strong_alias (_IO_new_fopen, __new_fopen)
 versioned_symbol (libc, _IO_new_fopen, _IO_fopen, GLIBC_2_1);
 versioned_symbol (libc, __new_fopen, fopen, GLIBC_2_1);
+
+# if !defined O_LARGEFILE || O_LARGEFILE == 0
+weak_alias (_IO_new_fopen, _IO_fopen64)
+weak_alias (_IO_new_fopen, fopen64)
+# endif
 #endif

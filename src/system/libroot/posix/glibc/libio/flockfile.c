@@ -1,8 +1,19 @@
-/* 
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
- */
+/* Copyright (C) 1996-2014 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
 
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include "libioP.h"
 
@@ -14,23 +25,19 @@
 void
 _IO_flockfile(_IO_FILE *stream)
 {
-	__libc_lock_lock_recursive(*stream->_lock);
+	_IO_lock_lock (*stream->_lock);
 }
-
 
 void
 _IO_funlockfile(_IO_FILE *stream)
 {
-	__libc_lock_unlock_recursive(*stream->_lock);
+	_IO_lock_unlock (*stream->_lock);
 }
-
 
 int
 _IO_ftrylockfile(_IO_FILE *stream)
 {
-	// ToDo: that code has probably never been tested!
-	//return __libc_lock_trylock_recursive(*stream->_lock);
-	return 1;
+	return _IO_lock_trylock (*stream->_lock);
 }
 
 weak_alias (_IO_flockfile, flockfile);

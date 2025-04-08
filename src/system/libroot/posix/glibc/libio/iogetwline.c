@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,1997,1998,1999,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -32,8 +31,6 @@
 #ifdef _LIBC
 # define wmemcpy __wmemcpy
 #endif
-
-#if defined _LIBC || !_G_HAVE_IO_GETLINE_INFO
 
 _IO_size_t
 _IO_getwline (fp, buf, n, delim, extract_delim)
@@ -86,10 +83,10 @@ _IO_getwline_info (fp, buf, n, delim, extract_delim, eof)
  	      if (extract_delim > 0)
 		*ptr++ = wc;
 	      else if (extract_delim < 0)
-		INTUSE(_IO_sputbackc) (fp, wc);
-	      return ptr - buf;
+		_IO_sputbackc (fp, wc);
 	      if (extract_delim > 0)
 		++len;
+	      return ptr - buf;
 	    }
 	  *ptr++ = wc;
 	  n--;
@@ -123,5 +120,3 @@ _IO_getwline_info (fp, buf, n, delim, extract_delim, eof)
     }
   return ptr - buf;
 }
-
-#endif /* Defined _LIBC || !_G_HAVE_IO_GETLINE_INFO */

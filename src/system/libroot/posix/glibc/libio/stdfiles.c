@@ -1,4 +1,4 @@
-/* Copyright (C) 1993-1997,1999,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -39,30 +38,30 @@
 #  define DEF_STDFILE(NAME, FD, CHAIN, FLAGS) \
   static _IO_lock_t _IO_stdfile_##FD##_lock = _IO_lock_initializer; \
   static struct _IO_wide_data _IO_wide_data_##FD \
-    = { ._wide_vtable = &INTUSE(_IO_wfile_jumps) }; \
+    = { ._wide_vtable = &_IO_wfile_jumps }; \
   struct _IO_FILE_plus NAME \
     = {FILEBUF_LITERAL(CHAIN, FLAGS, FD, &_IO_wide_data_##FD), \
-       &INTUSE(_IO_file_jumps)};
+       &_IO_file_jumps};
 # else
 #  define DEF_STDFILE(NAME, FD, CHAIN, FLAGS) \
   static _IO_lock_t _IO_stdfile_##FD##_lock = _IO_lock_initializer; \
   struct _IO_FILE_plus NAME \
     = {FILEBUF_LITERAL(CHAIN, FLAGS, FD, NULL), \
-       &INTUSE(_IO_file_jumps)};
+       &_IO_file_jumps};
 # endif
 #else
 # if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
 #  define DEF_STDFILE(NAME, FD, CHAIN, FLAGS) \
   static struct _IO_wide_data _IO_wide_data_##FD \
-    = { ._wide_vtable = &INTUSE(_IO_wfile_jumps) }; \
+    = { ._wide_vtable = &_IO_wfile_jumps }; \
   struct _IO_FILE_plus NAME \
     = {FILEBUF_LITERAL(CHAIN, FLAGS, FD, &_IO_wide_data_##FD), \
-       &INTUSE(_IO_file_jumps)};
+       &_IO_file_jumps};
 # else
 #  define DEF_STDFILE(NAME, FD, CHAIN, FLAGS) \
   struct _IO_FILE_plus NAME \
     = {FILEBUF_LITERAL(CHAIN, FLAGS, FD, NULL), \
-       &INTUSE(_IO_file_jumps)};
+       &_IO_file_jumps};
 # endif
 #endif
 
@@ -71,4 +70,4 @@ DEF_STDFILE(_IO_2_1_stdout_, 1, &_IO_2_1_stdin_, _IO_NO_READS);
 DEF_STDFILE(_IO_2_1_stderr_, 2, &_IO_2_1_stdout_, _IO_NO_READS+_IO_UNBUFFERED);
 
 struct _IO_FILE_plus *_IO_list_all = &_IO_2_1_stderr_;
-INTVARDEF(_IO_list_all)
+libc_hidden_data_def (_IO_list_all)

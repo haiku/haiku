@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1995-2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -36,16 +35,14 @@ _IO_ftell (fp)
 {
   _IO_off64_t pos;
   CHECK_FILE (fp, -1L);
-  _IO_cleanup_region_start ((void (*) __P ((void *))) _IO_funlockfile, fp);
-  _IO_flockfile (fp);
+  _IO_acquire_lock (fp);
   pos = _IO_seekoff_unlocked (fp, 0, _IO_seek_cur, 0);
-  if (_IO_in_backup (fp))
+  if (_IO_in_backup (fp) && pos != _IO_pos_BAD)
     {
-      if (fp->_vtable_offset != 0 || fp->_mode <= 0)
+      if (_IO_vtable_offset (fp) != 0 || fp->_mode <= 0)
 	pos -= fp->_IO_save_end - fp->_IO_save_base;
     }
-  _IO_funlockfile (fp);
-  _IO_cleanup_region_end (0);
+  _IO_release_lock (fp);
   if (pos == _IO_pos_BAD)
     {
 #ifdef EIO
@@ -54,7 +51,7 @@ _IO_ftell (fp)
 #endif
       return -1L;
     }
-  if ((_IO_off64_t) (off_t) pos != pos)
+  if ((_IO_off64_t) (long int) pos != pos)
     {
 #ifdef EOVERFLOW
       __set_errno (EOVERFLOW);
@@ -63,7 +60,7 @@ _IO_ftell (fp)
     }
   return pos;
 }
-INTDEF(_IO_ftell)
+libc_hidden_def (_IO_ftell)
 
 #ifdef weak_alias
 weak_alias (_IO_ftell, ftell)

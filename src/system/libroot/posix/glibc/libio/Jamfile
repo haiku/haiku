@@ -94,7 +94,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			iovsprintf.c
 			iovsscanf.c
 			memstream.c
-#			obprintf.c
 			pclose.c
 			peekc.c
 			putc.c
@@ -112,7 +111,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			vsnprintf.c
 
 			# wide character
-
 			fputwc.c
 			fputwc_u.c
 			fwprintf.c

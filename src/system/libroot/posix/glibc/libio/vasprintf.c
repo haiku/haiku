@@ -1,4 +1,4 @@
-/* Copyright (C) 1995,1997,1999,2000,2001,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -46,29 +45,31 @@ _IO_vasprintf (result_ptr, format, args)
   int ret;
   _IO_size_t needed;
   _IO_size_t allocated;
+  /* No need to clear the memory here (unlike for open_memstream) since
+     we know we will never seek on the stream.  */
   string = (char *) malloc (init_string_size);
   if (string == NULL)
     return -1;
 #ifdef _IO_MTSAFE_IO
   sf._sbf._f._lock = NULL;
 #endif
-  _IO_no_init ((_IO_FILE *) &sf._sbf, _IO_USER_LOCK, -1, NULL, NULL);
-  _IO_JUMPS ((struct _IO_FILE_plus *) &sf._sbf) = &_IO_str_jumps;
-  INTUSE(_IO_str_init_static) (&sf, string, init_string_size, string);
+  _IO_no_init (&sf._sbf._f, _IO_USER_LOCK, -1, NULL, NULL);
+  _IO_JUMPS (&sf._sbf) = &_IO_str_jumps;
+  _IO_str_init_static_internal (&sf, string, init_string_size, string);
   sf._sbf._f._flags &= ~_IO_USER_BUF;
   sf._s._allocate_buffer = (_IO_alloc_type) malloc;
   sf._s._free_buffer = (_IO_free_type) free;
-  ret = INTUSE(_IO_vfprintf) (&sf._sbf._f, format, args);
+  ret = _IO_vfprintf (&sf._sbf._f, format, args);
   if (ret < 0)
     {
       free (sf._sbf._f._IO_buf_base);
       return ret;
     }
-  /* Only use realloc if the size we need is of the same order of
-     magnitude then the memory we allocated.  */
+  /* Only use realloc if the size we need is of the same (binary)
+     order of magnitude then the memory we allocated.  */
   needed = sf._sbf._f._IO_write_ptr - sf._sbf._f._IO_write_base + 1;
   allocated = sf._sbf._f._IO_write_end - sf._sbf._f._IO_write_base;
-  if ((allocated << 1) <= needed)
+  if ((allocated >> 1) <= needed)
     *result_ptr = (char *) realloc (sf._sbf._f._IO_buf_base, needed);
   else
     {
@@ -87,7 +88,4 @@ _IO_vasprintf (result_ptr, format, args)
   (*result_ptr)[needed - 1] = '\0';
   return ret;
 }
-
-#ifdef weak_alias
 weak_alias (_IO_vasprintf, vasprintf)
-#endif

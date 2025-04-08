@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,1996,1997,1998,1999,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -35,15 +34,12 @@ _IO_fputs (str, fp)
 {
   _IO_size_t len = strlen (str);
   int result = EOF;
-
   CHECK_FILE (fp, EOF);
-  _IO_cleanup_region_start ((void (*) __P ((void *))) _IO_funlockfile, fp);
-  _IO_flockfile (fp);
-  if ((fp->_vtable_offset != 0 || _IO_fwide (fp, -1) == -1)
+  _IO_acquire_lock (fp);
+  if ((_IO_vtable_offset (fp) != 0 || _IO_fwide (fp, -1) == -1)
       && _IO_sputn (fp, str, len) == len)
     result = 1;
-  _IO_funlockfile (fp);
-  _IO_cleanup_region_end (0);
+  _IO_release_lock (fp);
   return result;
 }
 libc_hidden_def (_IO_fputs)

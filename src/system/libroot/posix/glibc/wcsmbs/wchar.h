@@ -287,7 +287,7 @@ extern unsigned long long int __wcstoull_internal (__const wchar_t *
 #endif
 
 
-#if defined __OPTIMIZE__ && __GNUC__ >= 2
+#if defined(__USE_EXTERN_INLINES) && !defined(__HAIKU__)
 /* Define inline functions which call the internal entry points.  */
 
 __extern_inline double wcstod (__const wchar_t *__restrict __nptr,

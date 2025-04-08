@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,1995,1996,1997,1998,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -40,16 +39,24 @@ fgets_unlocked (buf, n, fp)
   CHECK_FILE (fp, NULL);
   if (n <= 0)
     return NULL;
+  if (__glibc_unlikely (n == 1))
+    {
+      /* Another irregular case: since we have to store a NUL byte and
+	 there is only room for exactly one byte, we don't have to
+	 read anything.  */
+      buf[0] = '\0';
+      return buf;
+    }
   /* This is very tricky since a file descriptor may be in the
      non-blocking mode. The error flag doesn't mean much in this
      case. We return an error only when there is a new error. */
   old_error = fp->_IO_file_flags & _IO_ERR_SEEN;
   fp->_IO_file_flags &= ~_IO_ERR_SEEN;
-  count = INTUSE(_IO_getline) (fp, buf, n - 1, '\n', 1);
+  count = _IO_getline (fp, buf, n - 1, '\n', 1);
   /* If we read in some bytes and errno is EAGAIN, that error will
      be reported for next read. */
   if (count == 0 || ((fp->_IO_file_flags & _IO_ERR_SEEN)
-  		     && errno != EAGAIN))
+		     && errno != EAGAIN))
     result = NULL;
   else
     {

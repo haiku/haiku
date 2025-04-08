@@ -1,5 +1,5 @@
 /* Thread package specific definitions of stream lock type.  Generic version.
-   Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2000-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _BITS_STDIO_LOCK_H
 #define _BITS_STDIO_LOCK_H 1
@@ -27,7 +26,7 @@ __libc_lock_define_recursive (typedef, _IO_lock_t)
 /* We need recursive (counting) mutexes.  */
 #ifdef _LIBC_LOCK_RECURSIVE_INITIALIZER
 # define _IO_lock_initializer _LIBC_LOCK_RECURSIVE_INITIALIZER
-#elif defined _IO_MTSAFE_IO
+#elif _IO_MTSAFE_IO
  #error libio needs recursive mutexes for _IO_MTSAFE_IO
 #endif
 
@@ -45,5 +44,14 @@ __libc_lock_define_recursive (typedef, _IO_lock_t)
 #define _IO_cleanup_region_end(_doit) \
   __libc_cleanup_region_end (_doit)
 
+#if defined _LIBC && !defined NOT_IN_libc
+# define _IO_acquire_lock(_fp) \
+  _IO_cleanup_region_start ((void (*) (void *)) _IO_funlockfile, (_fp));      \
+  _IO_flockfile (_fp)
+
+# define _IO_release_lock(_fp) \
+  _IO_funlockfile (_fp);						      \
+  _IO_cleanup_region_end (0)
+#endif
 
 #endif /* bits/stdio-lock.h */

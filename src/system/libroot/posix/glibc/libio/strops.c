@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1997-2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -25,42 +24,48 @@
    This exception applies to code released by its copyright holders
    in files containing the exception.  */
 
-#include "libioP.h"
+#include <assert.h>
 #include "strfile.h"
+#include "libioP.h"
 #include <string.h>
 #include <stdio_ext.h>
 
-#if 0
-/* The following definitions are for exposition only.
-   They map the terminology used in the ANSI/ISO C++ draft standard
-   to the implementation. */
+void
+_IO_str_init_static_internal (sf, ptr, size, pstart)
+     _IO_strfile *sf;
+     char *ptr;
+     _IO_size_t size;
+     char *pstart;
+{
+  _IO_FILE *fp = &sf->_sbf._f;
+  char *end;
 
-/* allocated:  set  when a dynamic array object has been allocated, and
-   hence should be freed by the destructor for the strstreambuf object. */
-#define ALLOCATED(FP) ((FP)->_f._IO_buf_base && DYNAMIC(FP))
+  if (size == 0)
+    end = ptr + strlen (ptr);
+  else if ((_IO_size_t) ptr + size > (_IO_size_t) ptr)
+    end = ptr + size;
+  else
+    end = (char *) -1;
+  _IO_setb (fp, ptr, end, 0);
 
-/* constant:  set when the array object has const elements,
-   so the output sequence cannot be written. */
-#define CONSTANT(FP) ((FP)->_f._IO_file_flags & _IO_NO_WRITES)
-
-/* alsize:  the suggested minimum size for a dynamic array object. */
-#define ALSIZE(FP) ??? /* not stored */
-
-/* palloc: points to the function to call to allocate a dynamic array object.*/
-#define PALLOC(FP) \
-  ((FP)->_s._allocate_buffer == default_alloc ? 0 : (FP)->_s._allocate_buffer)
-
-/* pfree: points  to  the  function  to call to free a dynamic array object. */
-#define PFREE(FP) \
-  ((FP)->_s._free_buffer == default_free ? 0 : (FP)->_s._free_buffer)
-
-#endif
-
-#ifdef TODO
-/* An "unbounded buffer" is when a buffer is supplied, but with no
-   specified length.  An example is the buffer argument to sprintf.
-   */
-#endif
+  fp->_IO_write_base = ptr;
+  fp->_IO_read_base = ptr;
+  fp->_IO_read_ptr = ptr;
+  if (pstart)
+    {
+      fp->_IO_write_ptr = pstart;
+      fp->_IO_write_end = end;
+      fp->_IO_read_end = pstart;
+    }
+  else
+    {
+      fp->_IO_write_ptr = ptr;
+      fp->_IO_write_end = ptr;
+      fp->_IO_read_end = end;
+    }
+  /* A null _allocate_buffer function flags the strfile as being static. */
+  sf->_s._allocate_buffer = (_IO_alloc_type) 0;
+}
 
 void
 _IO_str_init_static (sf, ptr, size, pstart)
@@ -69,47 +74,8 @@ _IO_str_init_static (sf, ptr, size, pstart)
      int size;
      char *pstart;
 {
-  _IO_FILE *fp = &sf->_sbf._f;
-
-  if (size == 0)
-    size = strlen (ptr);
-  else if (size < 0)
-    {
-      /* If size is negative 'the characters are assumed to
-	 continue indefinitely.'  This is kind of messy ... */
-      int s;
-      size = 512;
-      /* Try increasing powers of 2, as long as we don't wrap around. */
-      for (; s = 2*size, s > 0 && ptr + s > ptr && s < 0x4000000L; )
-	size = s;
-      /* Try increasing size as much as we can without wrapping around. */
-      for (s = size >> 1; s > 0; s >>= 1)
-	{
-	  if (ptr + size + s > ptr)
-	    size += s;
-	}
-    }
-  INTUSE(_IO_setb) (fp, ptr, ptr + size, 0);
-
-  fp->_IO_write_base = ptr;
-  fp->_IO_read_base = ptr;
-  fp->_IO_read_ptr = ptr;
-  if (pstart)
-    {
-      fp->_IO_write_ptr = pstart;
-      fp->_IO_write_end = ptr + size;
-      fp->_IO_read_end = pstart;
-    }
-  else
-    {
-      fp->_IO_write_ptr = ptr;
-      fp->_IO_write_end = ptr;
-      fp->_IO_read_end = ptr+size;
-    }
-  /* A null _allocate_buffer function flags the strfile as being static. */
-  sf->_s._allocate_buffer = (_IO_alloc_type) 0;
+  return _IO_str_init_static_internal (sf, ptr, size < 0 ? -1 : size, pstart);
 }
-INTDEF(_IO_str_init_static)
 
 void
 _IO_str_init_readonly (sf, ptr, size)
@@ -117,7 +83,7 @@ _IO_str_init_readonly (sf, ptr, size)
      const char *ptr;
      int size;
 {
-  INTUSE(_IO_str_init_static) (sf, (char *) ptr, size, NULL);
+  _IO_str_init_static_internal (sf, (char *) ptr, size < 0 ? -1 : size, NULL);
   sf->_sbf._f._IO_file_flags |= _IO_NO_WRITES;
 }
 
@@ -136,7 +102,7 @@ _IO_str_overflow (fp, c)
       fp->_IO_write_ptr = fp->_IO_read_ptr;
       fp->_IO_read_ptr = fp->_IO_read_end;
     }
-  pos =  fp->_IO_write_ptr - fp->_IO_write_base;
+  pos = fp->_IO_write_ptr - fp->_IO_write_base;
   if (pos >= (_IO_size_t) (_IO_blen (fp) + flush_only))
     {
       if (fp->_flags & _IO_USER_BUF) /* not allowed to enlarge */
@@ -145,7 +111,10 @@ _IO_str_overflow (fp, c)
 	{
 	  char *new_buf;
 	  char *old_buf = fp->_IO_buf_base;
-	  _IO_size_t new_size = 2 * _IO_blen (fp) + 100;
+	  size_t old_blen = _IO_blen (fp);
+	  _IO_size_t new_size = 2 * old_blen + 100;
+	  if (new_size < old_blen)
+	    return EOF;
 	  new_buf
 	    = (char *) (*((_IO_strfile *) fp)->_s._allocate_buffer) (new_size);
 	  if (new_buf == NULL)
@@ -155,16 +124,14 @@ _IO_str_overflow (fp, c)
 	    }
 	  if (old_buf)
 	    {
-	      memcpy (new_buf, old_buf, _IO_blen (fp));
+	      memcpy (new_buf, old_buf, old_blen);
 	      (*((_IO_strfile *) fp)->_s._free_buffer) (old_buf);
 	      /* Make sure _IO_setb won't try to delete _IO_buf_base. */
 	      fp->_IO_buf_base = NULL;
 	    }
-#if 0
-	  if (lenp == &LEN(fp)) /* use '\0'-filling */
-	      memset (new_buf + pos, 0, blen() - pos);
-#endif
-	  INTUSE(_IO_setb) (fp, new_buf, new_buf + new_size, 1);
+	  memset (new_buf + old_blen, '\0', new_size - old_blen);
+
+	  _IO_setb (fp, new_buf, new_buf + new_size, 1);
 	  fp->_IO_read_base = new_buf + (fp->_IO_read_base - old_buf);
 	  fp->_IO_read_ptr = new_buf + (fp->_IO_read_ptr - old_buf);
 	  fp->_IO_read_end = new_buf + (fp->_IO_read_end - old_buf);
@@ -181,7 +148,7 @@ _IO_str_overflow (fp, c)
     fp->_IO_read_end = fp->_IO_write_ptr;
   return c;
 }
-INTDEF(_IO_str_overflow)
+libc_hidden_def (_IO_str_overflow)
 
 int
 _IO_str_underflow (fp)
@@ -200,7 +167,7 @@ _IO_str_underflow (fp)
   else
     return EOF;
 }
-INTDEF(_IO_str_underflow)
+libc_hidden_def (_IO_str_underflow)
 
 /* The size of the valid part of the buffer.  */
 
@@ -212,6 +179,73 @@ _IO_str_count (fp)
 	   ? fp->_IO_write_ptr : fp->_IO_read_end)
 	  - fp->_IO_read_base);
 }
+
+
+static int
+enlarge_userbuf (_IO_FILE *fp, _IO_off64_t offset, int reading)
+{
+  _IO_ssize_t oldend, newsize;
+  char *oldbuf, *newbuf;
+  if ((_IO_ssize_t) offset <= _IO_blen (fp))
+    return 0;
+
+  oldend = fp->_IO_write_end - fp->_IO_write_base;
+
+  /* Try to enlarge the buffer.  */
+  if (fp->_flags & _IO_USER_BUF)
+    /* User-provided buffer.  */
+    return 1;
+
+  newsize = offset + 100;
+  oldbuf = fp->_IO_buf_base;
+  newbuf
+    = (char *) (*((_IO_strfile *) fp)->_s._allocate_buffer) (newsize);
+  if (newbuf == NULL)
+    return 1;
+
+  if (oldbuf != NULL)
+    {
+      memcpy (newbuf, oldbuf, _IO_blen (fp));
+      (*((_IO_strfile *) fp)->_s._free_buffer) (oldbuf);
+      /* Make sure _IO_setb won't try to delete
+	 _IO_buf_base. */
+      fp->_IO_buf_base = NULL;
+    }
+
+  _IO_setb (fp, newbuf, newbuf + newsize, 1);
+
+  if (reading)
+    {
+      fp->_IO_write_base = newbuf + (fp->_IO_write_base - oldbuf);
+      fp->_IO_write_ptr = newbuf + (fp->_IO_write_ptr - oldbuf);
+      fp->_IO_write_end = newbuf + (fp->_IO_write_end - oldbuf);
+      fp->_IO_read_ptr = newbuf + (fp->_IO_read_ptr - oldbuf);
+
+      fp->_IO_read_base = newbuf;
+      fp->_IO_read_end = fp->_IO_buf_end;
+    }
+  else
+    {
+      fp->_IO_read_base = newbuf + (fp->_IO_read_base - oldbuf);
+      fp->_IO_read_ptr = newbuf + (fp->_IO_read_ptr - oldbuf);
+      fp->_IO_read_end = newbuf + (fp->_IO_read_end - oldbuf);
+      fp->_IO_write_ptr = newbuf + (fp->_IO_write_ptr - oldbuf);
+
+      fp->_IO_write_base = newbuf;
+      fp->_IO_write_end = fp->_IO_buf_end;
+    }
+
+  /* Clear the area between the last write position and th
+     new position.  */
+  assert (offset >= oldend);
+  if (reading)
+    memset (fp->_IO_read_base + oldend, '\0', offset - oldend);
+  else
+    memset (fp->_IO_write_base + oldend, '\0', offset - oldend);
+
+  return 0;
+}
+
 
 _IO_off64_t
 _IO_str_seekoff (fp, offset, dir, mode)
@@ -253,7 +287,10 @@ _IO_str_seekoff (fp, offset, dir, mode)
 	    default: /* case _IO_seek_set: */
 	      break;
 	    }
-	  if (offset < 0 || (_IO_ssize_t) offset > cur_size)
+	  if (offset < 0)
+	    return EOF;
+	  if ((_IO_ssize_t) offset > cur_size
+	      && enlarge_userbuf (fp, offset, 1) != 0)
 	    return EOF;
 	  fp->_IO_read_ptr = fp->_IO_read_base + offset;
 	  fp->_IO_read_end = fp->_IO_read_base + cur_size;
@@ -274,7 +311,10 @@ _IO_str_seekoff (fp, offset, dir, mode)
 	    default: /* case _IO_seek_set: */
 	      break;
 	    }
-	  if (offset < 0 || (_IO_ssize_t) offset > cur_size)
+	  if (offset < 0)
+	    return EOF;
+	  if ((_IO_ssize_t) offset > cur_size
+	      && enlarge_userbuf (fp, offset, 0) != 0)
 	    return EOF;
 	  fp->_IO_write_ptr = fp->_IO_write_base + offset;
 	  new_pos = offset;
@@ -282,7 +322,7 @@ _IO_str_seekoff (fp, offset, dir, mode)
     }
   return new_pos;
 }
-INTDEF(_IO_str_seekoff)
+libc_hidden_def (_IO_str_seekoff)
 
 int
 _IO_str_pbackfail (fp, c)
@@ -291,9 +331,9 @@ _IO_str_pbackfail (fp, c)
 {
   if ((fp->_flags & _IO_NO_WRITES) && c != EOF)
     return EOF;
-  return INTUSE(_IO_default_pbackfail) (fp, c);
+  return _IO_default_pbackfail (fp, c);
 }
-INTDEF(_IO_str_pbackfail)
+libc_hidden_def (_IO_str_pbackfail)
 
 void
 _IO_str_finish (fp, dummy)
@@ -304,24 +344,24 @@ _IO_str_finish (fp, dummy)
     (((_IO_strfile *) fp)->_s._free_buffer) (fp->_IO_buf_base);
   fp->_IO_buf_base = NULL;
 
-  INTUSE(_IO_default_finish) (fp, 0);
+  _IO_default_finish (fp, 0);
 }
 
-struct _IO_jump_t _IO_str_jumps =
+const struct _IO_jump_t _IO_str_jumps =
 {
   JUMP_INIT_DUMMY,
   JUMP_INIT(finish, _IO_str_finish),
-  JUMP_INIT(overflow, INTUSE(_IO_str_overflow)),
-  JUMP_INIT(underflow, INTUSE(_IO_str_underflow)),
-  JUMP_INIT(uflow, INTUSE(_IO_default_uflow)),
-  JUMP_INIT(pbackfail, INTUSE(_IO_str_pbackfail)),
-  JUMP_INIT(xsputn, INTUSE(_IO_default_xsputn)),
-  JUMP_INIT(xsgetn, INTUSE(_IO_default_xsgetn)),
-  JUMP_INIT(seekoff, INTUSE(_IO_str_seekoff)),
+  JUMP_INIT(overflow, _IO_str_overflow),
+  JUMP_INIT(underflow, _IO_str_underflow),
+  JUMP_INIT(uflow, _IO_default_uflow),
+  JUMP_INIT(pbackfail, _IO_str_pbackfail),
+  JUMP_INIT(xsputn, _IO_default_xsputn),
+  JUMP_INIT(xsgetn, _IO_default_xsgetn),
+  JUMP_INIT(seekoff, _IO_str_seekoff),
   JUMP_INIT(seekpos, _IO_default_seekpos),
   JUMP_INIT(setbuf, _IO_default_setbuf),
   JUMP_INIT(sync, _IO_default_sync),
-  JUMP_INIT(doallocate, INTUSE(_IO_default_doallocate)),
+  JUMP_INIT(doallocate, _IO_default_doallocate),
   JUMP_INIT(read, _IO_default_read),
   JUMP_INIT(write, _IO_default_write),
   JUMP_INIT(seek, _IO_default_seek),

@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1996, 1997, 1998, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -36,9 +35,7 @@ _IO_gets (buf)
   int ch;
   char *retval;
 
-  _IO_cleanup_region_start ((void (*) __P ((void *))) _IO_funlockfile,
-			    _IO_stdin);
-  _IO_flockfile (_IO_stdin);
+  _IO_acquire_lock (_IO_stdin);
   ch = _IO_getc_unlocked (_IO_stdin);
   if (ch == EOF)
     {
@@ -55,7 +52,7 @@ _IO_gets (buf)
       int old_error = _IO_stdin->_IO_file_flags & _IO_ERR_SEEN;
       _IO_stdin->_IO_file_flags &= ~_IO_ERR_SEEN;
       buf[0] = (char) ch;
-      count = INTUSE(_IO_getline) (_IO_stdin, buf + 1, INT_MAX, '\n', 0) + 1;
+      count = _IO_getline (_IO_stdin, buf + 1, INT_MAX, '\n', 0) + 1;
       if (_IO_stdin->_IO_file_flags & _IO_ERR_SEEN)
 	{
 	  retval = NULL;
@@ -67,8 +64,7 @@ _IO_gets (buf)
   buf[count] = 0;
   retval = buf;
 unlock_return:
-  _IO_funlockfile (_IO_stdin);
-  _IO_cleanup_region_end (0);
+  _IO_release_lock (_IO_stdin);
   return retval;
 }
 
@@ -77,5 +73,5 @@ weak_alias (_IO_gets, gets)
 #endif
 
 #ifdef _LIBC
-//link_warning (gets, "the `gets' function is dangerous and should not be used.")
+link_warning (gets, "the `gets' function is dangerous and should not be used.")
 #endif

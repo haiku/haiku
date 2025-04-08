@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1996-1999, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -33,16 +32,14 @@ ungetwc (c, fp)
      wint_t c;
      _IO_FILE *fp;
 {
-  int result;
+  wint_t result;
   CHECK_FILE (fp, WEOF);
-  _IO_cleanup_region_start ((void (*) __P ((void *))) _IO_funlockfile, fp);
-  _IO_flockfile (fp);
+  _IO_acquire_lock (fp);
   _IO_fwide (fp, 1);
   if (c == WEOF)
     result = WEOF;
   else
-    result = INTUSE(_IO_sputbackwc) (fp, c);
-  _IO_funlockfile (fp);
-  _IO_cleanup_region_end (0);
+    result = _IO_sputbackwc (fp, c);
+  _IO_release_lock (fp);
   return result;
 }

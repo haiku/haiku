@@ -55,8 +55,6 @@ typedef struct
 #endif
 #undef __need_mbstate_t
 
-typedef size_t _G_size_t;
-
 
 #if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
 typedef struct
@@ -75,14 +73,7 @@ typedef off_t _G_fpos_t;
 typedef off_t _G_fpos64_t;
 #endif
 #define __off_t		off_t
-#define _G_ssize_t	ssize_t
-#define _G_off_t	off_t
-#define _G_off64_t	off_t
-#define	_G_pid_t	pid_t
-#define	_G_uid_t	uid_t
-#define _G_wchar_t	wchar_t
-#define _G_wint_t	wint_t
-#define _G_stat64	stat
+#define stat64		stat
 
 #include <iconv/gconv.h>
 typedef union
@@ -118,10 +109,6 @@ typedef unsigned int _G_uint32_t __attribute__ ((__mode__ (__SI__)));
 #define _G_HAVE_IO_GETLINE_INFO 1
 
 #define _G_IO_IO_FILE_VERSION 0x20001
-
-//#define _G_OPEN64	__open64
-//#define _G_LSEEK64	__lseek64
-//#define _G_FSTAT64(fd,buf) __fxstat64 (_STAT_VER, fd, buf)
 
 /* This is defined by <bits/stat.h> if `st_blksize' exists.  */
 /*#define _G_HAVE_ST_BLKSIZE defined (_STATBUF_ST_BLKSIZE)*/

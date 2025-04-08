@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,95,96,97,98,99,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -34,19 +33,17 @@ _IO_setbuffer (fp, buf, size)
      _IO_size_t size;
 {
   CHECK_FILE (fp, );
-  _IO_cleanup_region_start ((void (*) (void *)) _IO_funlockfile, fp);
-  _IO_flockfile (fp);
+  _IO_acquire_lock (fp);
   fp->_flags &= ~_IO_LINE_BUF;
   if (!buf)
     size = 0;
   (void) _IO_SETBUF (fp, buf, size);
-  if (fp->_vtable_offset == 0 && fp->_mode == 0 && _IO_CHECK_WIDE (fp))
+  if (_IO_vtable_offset (fp) == 0 && fp->_mode == 0 && _IO_CHECK_WIDE (fp))
     /* We also have to set the buffer using the wide char function.  */
     (void) _IO_WSETBUF (fp, buf, size);
-  _IO_funlockfile (fp);
-  _IO_cleanup_region_end (0);
+  _IO_release_lock (fp);
 }
-INTDEF(_IO_setbuffer)
+libc_hidden_def (_IO_setbuffer)
 
 #ifdef weak_alias
 weak_alias (_IO_setbuffer, setbuffer)

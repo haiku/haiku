@@ -3,6 +3,9 @@
 #include_next <fcntl.h>
 #include <features.h>
 
+#define O_LARGEFILE 0
+#define __ASSUME_O_CLOEXEC
+
 /* Now define the internal interfaces.  */
 extern int __open64 (__const char *__file, int __oflag, ...);
 libc_hidden_proto (__open64)

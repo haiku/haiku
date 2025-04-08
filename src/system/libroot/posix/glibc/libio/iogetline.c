@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,1997,1998,2000,2001,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -28,8 +27,6 @@
 #include "libioP.h"
 #include <string.h>
 
-#if defined _LIBC || !_G_HAVE_IO_GETLINE_INFO
-
 _IO_size_t
 _IO_getline (fp, buf, n, delim, extract_delim)
      _IO_FILE *fp;
@@ -38,10 +35,9 @@ _IO_getline (fp, buf, n, delim, extract_delim)
      int delim;
      int extract_delim;
 {
-  return INTUSE(_IO_getline_info) (fp, buf, n, delim, extract_delim,
-				   (int *) 0);
+  return _IO_getline_info (fp, buf, n, delim, extract_delim, (int *) 0);
 }
-INTDEF(_IO_getline)
+libc_hidden_def (_IO_getline)
 
 /* Algorithm based on that used by Berkeley pre-4.4 fgets implementation.
 
@@ -73,7 +69,8 @@ _IO_getline_info (fp, buf, n, delim, extract_delim, eof)
 	  int c = __uflow (fp);
 	  if (c == EOF)
 	    {
-	      if (eof) *eof = c;
+	      if (eof)
+		*eof = c;
 	      break;
 	    }
 	  if (c == delim)
@@ -81,7 +78,7 @@ _IO_getline_info (fp, buf, n, delim, extract_delim, eof)
  	      if (extract_delim > 0)
 		*ptr++ = c;
 	      else if (extract_delim < 0)
-		INTUSE(_IO_sputbackc) (fp, c);
+		_IO_sputbackc (fp, c);
 	      if (extract_delim > 0)
 		++len;
 	      return ptr - buf;
@@ -89,34 +86,32 @@ _IO_getline_info (fp, buf, n, delim, extract_delim, eof)
 	  *ptr++ = c;
 	  n--;
 	}
-	else
-	  {
-	    char *t;
-	    if ((_IO_size_t) len >= n)
-	      len = n;
-	    t = (char *) memchr ((void *) fp->_IO_read_ptr, delim, len);
-	    if (t != NULL)
-	      {
-		_IO_size_t old_len = ptr-buf;
-		len = t - fp->_IO_read_ptr;
-		if (extract_delim >= 0)
-		  {
-		    ++t;
-		    if (extract_delim > 0)
-		      ++len;
-		  }
-		memcpy ((void *) ptr, (void *) fp->_IO_read_ptr, len);
-		fp->_IO_read_ptr = t;
-		return old_len + len;
-	      }
-	    memcpy ((void *) ptr, (void *) fp->_IO_read_ptr, len);
-	    fp->_IO_read_ptr += len;
-	    ptr += len;
-	    n -= len;
-	  }
+      else
+	{
+	  char *t;
+	  if ((_IO_size_t) len >= n)
+	    len = n;
+	  t = (char *) memchr ((void *) fp->_IO_read_ptr, delim, len);
+	  if (t != NULL)
+	    {
+	      _IO_size_t old_len = ptr-buf;
+	      len = t - fp->_IO_read_ptr;
+	      if (extract_delim >= 0)
+		{
+		  ++t;
+		  if (extract_delim > 0)
+		    ++len;
+		}
+	      memcpy ((void *) ptr, (void *) fp->_IO_read_ptr, len);
+	      fp->_IO_read_ptr = t;
+	      return old_len + len;
+	    }
+	  memcpy ((void *) ptr, (void *) fp->_IO_read_ptr, len);
+	  fp->_IO_read_ptr += len;
+	  ptr += len;
+	  n -= len;
+	}
     }
   return ptr - buf;
 }
-INTDEF(_IO_getline_info)
-
-#endif /* Defined _LIBC || !_G_HAVE_IO_GETLINE_INFO */
+libc_hidden_def (_IO_getline_info)

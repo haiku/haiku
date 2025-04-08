@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -23,34 +22,31 @@
    however invalidate any other reasons why the executable file
    might be covered by the GNU Lesser General Public License.
    This exception applies to code released by its copyright holders
-   in files containing the exception.
-*/
-
+   in files containing the exception.  */
 
 #include "libioP.h"
 #include <string.h>
-
+#include <limits.h>
+#include <sys/param.h>
 
 int
-_IO_puts(const char *str)
+_IO_puts (str)
+     const char *str;
 {
-	int result = EOF;
-	_IO_size_t len = strlen(str);
+  int result = EOF;
+  _IO_size_t len = strlen (str);
+  _IO_acquire_lock (_IO_stdout);
 
-	_IO_cleanup_region_start((void (*) __P ((void *))) _IO_funlockfile, _IO_stdout);
-	_IO_flockfile(_IO_stdout);
+  if ((_IO_vtable_offset (_IO_stdout) != 0
+       || _IO_fwide (_IO_stdout, -1) == -1)
+      && _IO_sputn (_IO_stdout, str, len) == len
+      && _IO_putc_unlocked ('\n', _IO_stdout) != EOF)
+    result = MIN (INT_MAX, len + 1);
 
-	if ((_IO_stdout->_vtable_offset != 0 || _IO_fwide(_IO_stdout, -1) == -1)
-		&& _IO_sputn(_IO_stdout, str, len) == len
-		&& _IO_putc_unlocked('\n', _IO_stdout) != EOF)
-		result = len + 1;
-
-	_IO_funlockfile(_IO_stdout);
-	_IO_cleanup_region_end(0);
-
-	return result;
+  _IO_release_lock (_IO_stdout);
+  return result;
 }
 
 #ifdef weak_alias
-weak_alias(_IO_puts, puts)
+weak_alias (_IO_puts, puts)
 #endif

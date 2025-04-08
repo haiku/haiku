@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1997, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -41,7 +40,7 @@
    4. Neither the name of the University nor the names of its contributors
       may be used to endorse or promote products derived from this software
       without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -62,10 +61,8 @@
 #include "libioP.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef __STDC__
 #include <stdlib.h>
 #include <unistd.h>
-#endif
 
 #ifdef _LIBC
 # undef isatty
@@ -73,6 +70,17 @@
 
 # include <device-nrs.h>
 #endif
+
+
+static int
+local_isatty (int fd)
+{
+  int save_errno = errno;
+  int res = isatty (fd);
+  __set_errno (save_errno);
+  return res;
+}
+
 
 /*
  * Allocate a file buffer, or switch to unbuffered I/O.
@@ -88,14 +96,14 @@ _IO_file_doallocate (fp)
 {
   _IO_size_t size;
   char *p;
-  struct _G_stat64 st;
+  struct stat64 st;
 
 #ifndef _LIBC
   /* If _IO_cleanup_registration_needed is non-zero, we should call the
      function it points to.  This is to make sure _IO_cleanup gets called
      on exit.  We call it from _IO_file_doallocate, since that is likely
      to get called by any program that does buffered I/O. */
-  if (__builtin_expect (_IO_cleanup_registration_needed != NULL, 0))
+  if (__glibc_unlikely (_IO_cleanup_registration_needed != NULL))
     (*_IO_cleanup_registration_needed) ();
 #endif
 
@@ -109,7 +117,7 @@ _IO_file_doallocate (fp)
 #ifdef DEV_TTY_P
 	      DEV_TTY_P (&st) ||
 #endif
-	      isatty (fp->_fileno))
+	      local_isatty (fp->_fileno))
 	    fp->_flags |= _IO_LINE_BUF;
 	}
 #if _IO_HAVE_ST_BLKSIZE
@@ -118,7 +126,7 @@ _IO_file_doallocate (fp)
 #endif
     }
   ALLOC_BUF (p, size, EOF);
-  INTUSE(_IO_setb) (fp, p, p + size, 1);
+  _IO_setb (fp, p, p + size, 1);
   return 1;
 }
-INTDEF(_IO_file_doallocate)
+libc_hidden_def (_IO_file_doallocate)

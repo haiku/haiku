@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1997-2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -40,13 +39,10 @@ _IO_vsscanf (string, format, args)
   sf._sbf._f._lock = NULL;
 #endif
   _IO_no_init (&sf._sbf._f, _IO_USER_LOCK, -1, NULL, NULL);
-  _IO_JUMPS ((struct _IO_FILE_plus *) &sf._sbf) = &_IO_str_jumps;
-  INTUSE(_IO_str_init_static) (&sf, (char*)string, 0, NULL);
-  ret = INTUSE(_IO_vfscanf) ((_IO_FILE *) &sf._sbf, format, args, NULL);
+  _IO_JUMPS (&sf._sbf) = &_IO_str_jumps;
+  _IO_str_init_static_internal (&sf, (char*)string, 0, NULL);
+  ret = _IO_vfscanf (&sf._sbf._f, format, args, NULL);
   return ret;
 }
-
-#ifdef weak_alias
 weak_alias (_IO_vsscanf, __vsscanf)
 weak_alias (_IO_vsscanf, vsscanf)
-#endif

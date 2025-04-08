@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,96,97,98,99,2000,2001,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -40,12 +39,11 @@ _IO_setvbuf (fp, buf, mode, size)
 {
   int result;
   CHECK_FILE (fp, EOF);
-  _IO_cleanup_region_start ((void (*) (void *)) _IO_funlockfile, fp);
-  _IO_flockfile (fp);
+  _IO_acquire_lock (fp);
   switch (mode)
     {
     case _IOFBF:
-      fp->_IO_file_flags &= ~_IO_LINE_BUF|_IO_UNBUFFERED;
+      fp->_IO_file_flags &= ~(_IO_LINE_BUF|_IO_UNBUFFERED);
       if (buf == NULL)
 	{
 	  if (fp->_IO_buf_base == NULL)
@@ -96,11 +94,10 @@ _IO_setvbuf (fp, buf, mode, size)
   result = _IO_SETBUF (fp, buf, size) == NULL ? EOF : 0;
 
 unlock_return:
-  _IO_funlockfile (fp);
-  _IO_cleanup_region_end (0);
+  _IO_release_lock (fp);
   return result;
 }
-INTDEF(_IO_setvbuf)
+libc_hidden_def (_IO_setvbuf)
 
 #ifdef weak_alias
 weak_alias (_IO_setvbuf, setvbuf)

@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef	_SYS_CDEFS_H
 #define	_SYS_CDEFS_H	1
@@ -37,32 +36,51 @@
 
 #ifdef __GNUC__
 
+/* All functions, except those with callbacks or those that
+   synchronize memory, are leaf functions.  */
+# if __GNUC_PREREQ (4, 6) && !defined _LIBC
+#  define __LEAF , __leaf__
+#  define __LEAF_ATTR __attribute__ ((__leaf__))
+# else
+#  define __LEAF
+#  define __LEAF_ATTR
+# endif
+
 /* GCC can always grok prototypes.  For C++ programs we add throw()
    to help it optimize the function calls.  But this works only with
-   gcc 2.8.x and egcs.  */
-# if defined __cplusplus && __GNUC_PREREQ (2,8)
-#  define __THROW	throw ()
+   gcc 2.8.x and egcs.  For gcc 3.2 and up we even mark C functions
+   as non-throwing using a function attribute since programs can use
+   the -fexceptions options for C code as well.  */
+# if !defined __cplusplus && __GNUC_PREREQ (3, 3)
+#  define __THROW	__attribute__ ((__nothrow__ __LEAF))
+#  define __THROWNL	__attribute__ ((__nothrow__))
+#  define __NTH(fct)	__attribute__ ((__nothrow__ __LEAF)) fct
 # else
-#  define __THROW
+#  if defined __cplusplus && __GNUC_PREREQ (2,8)
+#   define __THROW	throw ()
+#   define __THROWNL	throw ()
+#   define __NTH(fct)	__LEAF_ATTR fct throw ()
+#  else
+#   define __THROW
+#   define __THROWNL
+#   define __NTH(fct)	fct
+#  endif
 # endif
-# define __P(args)	args __THROW
-/* This macro will be used for functions which might take C++ callback
-   functions.  */
-# define __PMT(args)	args
 
 #else	/* Not GCC.  */
 
 # define __inline		/* No inline functions.  */
 
 # define __THROW
-# define __P(args)	args
-# define __PMT(args)	args
-
-# define __const	const
-# define __signed	signed
-# define __volatile	volatile
+# define __THROWNL
+# define __NTH(fct)	fct
 
 #endif	/* GCC.  */
+
+/* These two macros are not used in glibc anymore.  They are kept here
+   only because some other projects expect the macros to be defined.  */
+#define __P(args)	args
+#define __PMT(args)	args
 
 /* For these things, GCC behaves the ANSI way normally,
    and the non-ANSI way under -traditional.  */
@@ -118,6 +136,23 @@
 #endif
 
 
+/* Fortify support.  */
+#define __bos(ptr) __builtin_object_size (ptr, __USE_FORTIFY_LEVEL > 1)
+#define __bos0(ptr) __builtin_object_size (ptr, 0)
+#define __fortify_function __extern_always_inline __attribute_artificial__
+
+#if __GNUC_PREREQ (4,3)
+# define __warndecl(name, msg) \
+  extern void name (void) __attribute__((__warning__ (msg)))
+# define __warnattr(msg) __attribute__((__warning__ (msg)))
+# define __errordecl(name, msg) \
+  extern void name (void) __attribute__((__error__ (msg)))
+#else
+# define __warndecl(name, msg) extern void name (void)
+# define __warnattr(msg)
+# define __errordecl(name, msg) extern void name (void)
+#endif
+
 /* Support for flexible arrays.  */
 #if __GNUC_PREREQ (2,97)
 /* GCC 2.97 supports C99 flexible array members.  */
@@ -149,6 +184,17 @@
 #if defined __GNUC__ && __GNUC__ >= 2
 
 # define __REDIRECT(name, proto, alias) name proto __asm__ (__ASMNAME (#alias))
+# ifdef __cplusplus
+#  define __REDIRECT_NTH(name, proto, alias) \
+     name proto __THROW __asm__ (__ASMNAME (#alias))
+#  define __REDIRECT_NTHNL(name, proto, alias) \
+     name proto __THROWNL __asm__ (__ASMNAME (#alias))
+# else
+#  define __REDIRECT_NTH(name, proto, alias) \
+     name proto __asm__ (__ASMNAME (#alias)) __THROW
+#  define __REDIRECT_NTHNL(name, proto, alias) \
+     name proto __asm__ (__ASMNAME (#alias)) __THROWNL
+# endif
 # define __ASMNAME(cname)  __ASMNAME2 (__USER_LABEL_PREFIX__, cname)
 # define __ASMNAME2(prefix, cname) __STRING (prefix) cname
 
@@ -176,6 +222,15 @@
 # define __attribute_malloc__ /* Ignore */
 #endif
 
+/* Tell the compiler which arguments to an allocation function
+   indicate the size of the allocation.  */
+#if __GNUC_PREREQ (4, 3)
+# define __attribute_alloc_size__(params) \
+  __attribute__ ((__alloc_size__ params))
+#else
+# define __attribute_alloc_size__(params) /* Ignore.  */
+#endif
+
 /* At some point during the gcc 2.96 development the `pure' attribute
    for functions was introduced.  We don't want to use it unconditionally
    (although this would be possible) since it generates warnings.  */
@@ -183,6 +238,13 @@
 # define __attribute_pure__ __attribute__ ((__pure__))
 #else
 # define __attribute_pure__ /* Ignore */
+#endif
+
+/* This declaration tells the compiler that the value is constant.  */
+#if __GNUC_PREREQ (2,5)
+# define __attribute_const__ __attribute__ ((__const__))
+#else
+# define __attribute_const__ /* Ignore */
 #endif
 
 /* At some point during the gcc 3.1 development the `used' attribute
@@ -226,6 +288,28 @@
 # define __attribute_format_strfmon__(a,b) /* Ignore */
 #endif
 
+/* The nonull function attribute allows to mark pointer parameters which
+   must not be NULL.  */
+#if __GNUC_PREREQ (3,3)
+# define __nonnull(params) __attribute__ ((__nonnull__ params))
+#else
+# define __nonnull(params)
+#endif
+
+/* If fortification mode, we warn about unused results of certain
+   function calls which can lead to problems.  */
+#if __GNUC_PREREQ (3,4)
+# define __attribute_warn_unused_result__ \
+   __attribute__ ((__warn_unused_result__))
+# if __USE_FORTIFY_LEVEL > 0
+#  define __wur __attribute_warn_unused_result__
+# endif
+#else
+# define __attribute_warn_unused_result__ /* empty */
+#endif
+#ifndef __wur
+# define __wur /* Ignore */
+#endif
 
 /* Forces a function to be always inlined.  */
 #if __GNUC_PREREQ (3,2)
@@ -242,10 +326,12 @@
 # define __attribute_artificial__ /* Ignore */
 #endif
 
-/* GCC 4.3 and above with -std=c99 or -std=gnu99 implements ISO C99
-   inline semantics, unless -fgnu89-inline is used.  */
-#if !defined __cplusplus || __GNUC_PREREQ (4,3)
-# if defined __GNUC_STDC_INLINE__ || defined __cplusplus
+#ifdef __GNUC__
+/* One of these will be defined if the __gnu_inline__ attribute is
+   available.  In C++, __GNUC_GNU_INLINE__ will be defined even though
+   __inline does not use the GNU inlining rules.  If neither macro is
+   defined, this version of GCC only supports GNU inline semantics. */
+# if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
 #  define __extern_inline extern __inline __attribute__ ((__gnu_inline__))
 #  define __extern_always_inline \
   extern __always_inline __attribute__ ((__gnu_inline__))
@@ -253,10 +339,17 @@
 #  define __extern_inline extern __inline
 #  define __extern_always_inline extern __always_inline
 # endif
-#else
-#  define __extern_inline extern __inline
+#else /* Not GCC.  */
+# define __extern_inline  /* Ignore */
+# define __extern_always_inline /* Ignore */
 #endif
 
+/* GCC 4.3 and above allow passing all anonymous arguments of an
+   __extern_always_inline function to some other vararg function.  */
+#if __GNUC_PREREQ (4,3)
+# define __va_arg_pack() __builtin_va_arg_pack ()
+# define __va_arg_pack_len() __builtin_va_arg_pack_len ()
+#endif
 
 /* It is possible to compile containing GCC extensions even if GCC is
    run in pedantic mode if the uses are carefully marked using the
@@ -286,6 +379,58 @@
 /* Some other non-C99 compiler.  */
 #   define __restrict_arr	/* Not supported.  */
 #  endif
+# endif
+#endif
+
+#if __GNUC__ >= 3
+# define __glibc_unlikely(cond)	__builtin_expect ((cond), 0)
+# define __glibc_likely(cond)	__builtin_expect ((cond), 1)
+#else
+# define __glibc_unlikely(cond)	(cond)
+# define __glibc_likely(cond)	(cond)
+#endif
+
+#if (!defined _Noreturn \
+     && (defined __STDC_VERSION__ ? __STDC_VERSION__ : 0) < 201112 \
+     &&  !__GNUC_PREREQ (4,7))
+# if __GNUC_PREREQ (2,8)
+#  define _Noreturn __attribute__ ((__noreturn__))
+# else
+#  define _Noreturn
+# endif
+#endif
+
+#include <bits/wordsize.h>
+
+#if defined __LONG_DOUBLE_MATH_OPTIONAL && defined __NO_LONG_DOUBLE_MATH
+# define __LDBL_COMPAT 1
+# ifdef __REDIRECT
+#  define __LDBL_REDIR1(name, proto, alias) __REDIRECT (name, proto, alias)
+#  define __LDBL_REDIR(name, proto) \
+  __LDBL_REDIR1 (name, proto, __nldbl_##name)
+#  define __LDBL_REDIR1_NTH(name, proto, alias) __REDIRECT_NTH (name, proto, alias)
+#  define __LDBL_REDIR_NTH(name, proto) \
+  __LDBL_REDIR1_NTH (name, proto, __nldbl_##name)
+#  define __LDBL_REDIR1_DECL(name, alias) \
+  extern __typeof (name) name __asm (__ASMNAME (#alias));
+#  define __LDBL_REDIR_DECL(name) \
+  extern __typeof (name) name __asm (__ASMNAME ("__nldbl_" #name));
+#  define __REDIRECT_LDBL(name, proto, alias) \
+  __LDBL_REDIR1 (name, proto, __nldbl_##alias)
+#  define __REDIRECT_NTH_LDBL(name, proto, alias) \
+  __LDBL_REDIR1_NTH (name, proto, __nldbl_##alias)
+# endif
+#endif
+#if !defined __LDBL_COMPAT || !defined __REDIRECT
+# define __LDBL_REDIR1(name, proto, alias) name proto
+# define __LDBL_REDIR(name, proto) name proto
+# define __LDBL_REDIR1_NTH(name, proto, alias) name proto __THROW
+# define __LDBL_REDIR_NTH(name, proto) name proto __THROW
+# define __LDBL_REDIR_DECL(name)
+# ifdef __REDIRECT
+#  define __REDIRECT_LDBL(name, proto, alias) __REDIRECT (name, proto, alias)
+#  define __REDIRECT_NTH_LDBL(name, proto, alias) \
+  __REDIRECT_NTH (name, proto, alias)
 # endif
 #endif
 

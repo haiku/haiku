@@ -1,5 +1,5 @@
 /* Optimizing macros and inline functions for stdio functions.
-   Copyright (C) 1998, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,15 +13,14 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _STDIO_H
 # error "Never include <bits/stdio.h> directly; use <stdio.h> instead."
 #endif
 
-#ifdef __cplusplus
+#ifndef __extern_inline
 # define __STDIO_INLINE inline
 #else
 # define __STDIO_INLINE __extern_inline
@@ -29,41 +28,55 @@
 
 
 #ifdef __USE_EXTERN_INLINES
+/* For -D_FORTIFY_SOURCE{,=2} bits/stdio2.h will define a different
+   inline.  */
+# if !(__USE_FORTIFY_LEVEL > 0 && defined __fortify_function)
 /* Write formatted output to stdout from argument list ARG.  */
 __STDIO_INLINE int
-vprintf (__const char *__restrict __fmt, _G_va_list __arg) __THROW
+vprintf (const char *__restrict __fmt, _G_va_list __arg)
 {
   return vfprintf (stdout, __fmt, __arg);
 }
+# endif
 
 /* Read a character from stdin.  */
 __STDIO_INLINE int
-getchar (void) __THROW
+getchar (void)
 {
   return _IO_getc (stdin);
 }
 
 
-# if defined __USE_POSIX || defined __USE_MISC
+# ifdef __USE_MISC
+/* Faster version when locking is not necessary.  */
+__STDIO_INLINE int
+fgetc_unlocked (FILE *__fp)
+{
+  return _IO_getc_unlocked (__fp);
+}
+# endif /* misc */
+
+
+# ifdef __USE_POSIX
 /* This is defined in POSIX.1:1996.  */
 __STDIO_INLINE int
-getc_unlocked (FILE *__fp) __THROW
+getc_unlocked (FILE *__fp)
 {
   return _IO_getc_unlocked (__fp);
 }
 
 /* This is defined in POSIX.1:1996.  */
 __STDIO_INLINE int
-getchar_unlocked (void) __THROW
+getchar_unlocked (void)
 {
   return _IO_getc_unlocked (stdin);
 }
-# endif	/* POSIX || misc */
+# endif	/* POSIX */
 
 
 /* Write a character to stdout.  */
 __STDIO_INLINE int
-putchar (int __c) __THROW
+putchar (int __c)
 {
   return _IO_putc (__c, stdout);
 }
@@ -72,34 +85,34 @@ putchar (int __c) __THROW
 # ifdef __USE_MISC
 /* Faster version when locking is not necessary.  */
 __STDIO_INLINE int
-fputc_unlocked (int __c, FILE *__stream) __THROW
+fputc_unlocked (int __c, FILE *__stream)
 {
   return _IO_putc_unlocked (__c, __stream);
 }
 # endif /* misc */
 
 
-# if defined __USE_POSIX || defined __USE_MISC
+# ifdef __USE_POSIX
 /* This is defined in POSIX.1:1996.  */
 __STDIO_INLINE int
-putc_unlocked (int __c, FILE *__stream) __THROW
+putc_unlocked (int __c, FILE *__stream)
 {
   return _IO_putc_unlocked (__c, __stream);
 }
 
 /* This is defined in POSIX.1:1996.  */
 __STDIO_INLINE int
-putchar_unlocked (int __c) __THROW
+putchar_unlocked (int __c)
 {
   return _IO_putc_unlocked (__c, stdout);
 }
-# endif	/* POSIX || misc */
+# endif	/* POSIX */
 
 
-# ifdef	__USE_GNU
+# if defined(__USE_GNU) && !defined(__HAIKU__)
 /* Like `getdelim', but reads up to a newline.  */
 __STDIO_INLINE _IO_ssize_t
-getline (char **__lineptr, size_t *__n, FILE *__stream) __THROW
+getline (char **__lineptr, size_t *__n, FILE *__stream)
 {
   return __getdelim (__lineptr, __n, '\n', __stream);
 }
@@ -109,14 +122,14 @@ getline (char **__lineptr, size_t *__n, FILE *__stream) __THROW
 # ifdef __USE_MISC
 /* Faster versions when locking is not required.  */
 __STDIO_INLINE int
-feof_unlocked (FILE *__stream) __THROW
+__NTH (feof_unlocked (FILE *__stream))
 {
   return _IO_feof_unlocked (__stream);
 }
 
 /* Faster versions when locking is not required.  */
 __STDIO_INLINE int
-ferror_unlocked (FILE *__stream) __THROW
+__NTH (ferror_unlocked (FILE *__stream))
 {
   return _IO_ferror_unlocked (__stream);
 }
@@ -125,43 +138,51 @@ ferror_unlocked (FILE *__stream) __THROW
 #endif /* Use extern inlines.  */
 
 
-#if defined __USE_MISC && defined __GNUC__ && defined __OPTIMIZE__
+#if defined __USE_MISC && defined __GNUC__ && defined __OPTIMIZE__ \
+    && !defined __cplusplus
 /* Perform some simple optimizations.  */
 # define fread_unlocked(ptr, size, n, stream) \
   (__extension__ ((__builtin_constant_p (size) && __builtin_constant_p (n)    \
-		   && (size_t) ((size) * (n)) <= 8 && (size) != 0)	      \
+		   && (size_t) (size) * (size_t) (n) <= 8		      \
+		   && (size_t) (size) != 0)				      \
 		  ? ({ char *__ptr = (char *) (ptr);			      \
 		       FILE *__stream = (stream);			      \
 		       size_t __cnt;					      \
-		       for (__cnt = (size) * (n); __cnt > 0; --__cnt)	      \
+		       for (__cnt = (size_t) (size) * (size_t) (n);	      \
+			    __cnt > 0; --__cnt)				      \
 			 {						      \
 			   int __c = _IO_getc_unlocked (__stream);	      \
 			   if (__c == EOF)				      \
 			     break;					      \
 			   *__ptr++ = __c;				      \
 			 }						      \
-		       ((size_t) ((size) * (n)) - __cnt) / (size); })	      \
-		  : (((__builtin_constant_p (size) && (size) == 0)	      \
-		      || (__builtin_constant_p (n) && (n) == 0))	      \
+		       ((size_t) (size) * (size_t) (n) - __cnt)		      \
+			/ (size_t) (size); })				      \
+		  : (((__builtin_constant_p (size) && (size_t) (size) == 0)   \
+		      || (__builtin_constant_p (n) && (size_t) (n) == 0))     \
 			/* Evaluate all parameters once.  */		      \
 		     ? ((void) (ptr), (void) (stream), (void) (size),	      \
-			(void) (n), 0)					      \
+			(void) (n), (size_t) 0)				      \
 		     : fread_unlocked (ptr, size, n, stream))))
 
 # define fwrite_unlocked(ptr, size, n, stream) \
   (__extension__ ((__builtin_constant_p (size) && __builtin_constant_p (n)    \
-		   && (size_t) ((size) * (n)) <= 8 && (size) != 0)	      \
+		   && (size_t) (size) * (size_t) (n) <= 8		      \
+		   && (size_t) (size) != 0)				      \
 		  ? ({ const char *__ptr = (const char *) (ptr);	      \
 		       FILE *__stream = (stream);			      \
 		       size_t __cnt;					      \
-		       for (__cnt = (size) * (n); __cnt > 0; --__cnt)	      \
+		       for (__cnt = (size_t) (size) * (size_t) (n);	      \
+			    __cnt > 0; --__cnt)				      \
 			 if (_IO_putc_unlocked (*__ptr++, __stream) == EOF)   \
 			   break;					      \
-		       ((size_t) ((size) * (n)) - __cnt) / (size); })	      \
-		  : (((__builtin_constant_p (size) && (size) == 0)	      \
-		      || (__builtin_constant_p (n) && (n) == 0))	      \
+		       ((size_t) (size) * (size_t) (n) - __cnt)		      \
+			/ (size_t) (size); })				      \
+		  : (((__builtin_constant_p (size) && (size_t) (size) == 0)   \
+		      || (__builtin_constant_p (n) && (size_t) (n) == 0))     \
 			/* Evaluate all parameters once.  */		      \
-		     ? ((void) (ptr), (void) (stream), (void) (size), n)      \
+		     ? ((void) (ptr), (void) (stream), (void) (size),	      \
+			(void) (n), (size_t) 0)				      \
 		     : fwrite_unlocked (ptr, size, n, stream))))
 #endif
 

@@ -1,7 +1,7 @@
 /* Fmemopen implementation.
-   Copyright (C) 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2000-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by  Hanno Mueller, kontakt@hanno.de, 2000.
+   Contributed by Hanno Mueller, kontakt@hanno.de, 2000.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -14,9 +14,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 /*
  * fmemopen() - "my" version of a string stream
@@ -26,8 +25,6 @@
  * I needed fmemopen() for an application that I currently work on,
  * but couldn't find it in libio. The following snippet of code is an
  * attempt to implement what glibc's documentation describes.
- *
- * No, it isn't really tested yet. :-)
  *
  *
  *
@@ -73,6 +70,7 @@
 #include <libio.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <sys/types.h>
 #include "libioP.h"
@@ -83,6 +81,7 @@ struct fmemopen_cookie_struct
 {
   char *buffer;
   int mybuffer;
+  int binmode;
   size_t size;
   _IO_off64_t pos;
   size_t maxpos;
@@ -121,14 +120,14 @@ fmemopen_write (void *cookie, const char *b, size_t s)
 
   c = (fmemopen_cookie_t *) cookie;
 
-  addnullc = s == 0 || b[s - 1] != '\0';
+  addnullc = c->binmode == 0 && (s == 0 || b[s - 1] != '\0');
 
   if (c->pos + s + addnullc > c->size)
     {
       if ((size_t) (c->pos + addnullc) == c->size)
 	{
 	  __set_errno (ENOSPC);
-	  return -1;
+	  return 0;
 	}
       s = c->size - c->pos - addnullc;
     }
@@ -166,7 +165,7 @@ fmemopen_seek (void *cookie, _IO_off64_t *p, int w)
       break;
 
     case SEEK_END:
-      np = c->size - *p;
+      np = (c->binmode ? c->size : c->maxpos) - *p;
       break;
 
     default:
@@ -176,9 +175,9 @@ fmemopen_seek (void *cookie, _IO_off64_t *p, int w)
   if (np < 0 || (size_t) np > c->size)
     return -1;
 
-  c->pos = np;
+  *p = c->pos = np;
 
-  return np;
+  return 0;
 }
 
 
@@ -203,6 +202,13 @@ fmemopen (void *buf, size_t len, const char *mode)
   cookie_io_functions_t iof;
   fmemopen_cookie_t *c;
 
+  if (__glibc_unlikely (len == 0))
+    {
+    einval:
+      __set_errno (EINVAL);
+      return NULL;
+    }
+
   c = (fmemopen_cookie_t *) malloc (sizeof (fmemopen_cookie_t));
   if (c == NULL)
     return NULL;
@@ -218,21 +224,32 @@ fmemopen (void *buf, size_t len, const char *mode)
 	  return NULL;
 	}
       c->buffer[0] = '\0';
+      c->maxpos = 0;
     }
   else
-    c->buffer = buf;
+    {
+      if (__glibc_unlikely ((uintptr_t) len > -(uintptr_t) buf))
+	{
+	  free (c);
+	  goto einval;
+	}
+
+      c->buffer = buf;
+
+      if (mode[0] == 'w')
+	c->buffer[0] = '\0';
+
+      c->maxpos = strnlen (c->buffer, len);
+    }
 
   c->size = len;
-
-  if (mode[0] == 'w')
-    c->buffer[0] = '\0';
-
-  c->maxpos = strlen (c->buffer);
 
   if (mode[0] == 'a')
     c->pos = c->maxpos;
   else
     c->pos = 0;
+
+  c->binmode = mode[0] != '\0' && mode[1] == 'b';
 
   iof.read = fmemopen_read;
   iof.write = fmemopen_write;
@@ -241,3 +258,4 @@ fmemopen (void *buf, size_t len, const char *mode)
 
   return _IO_fopencookie (c, mode, iof);
 }
+libc_hidden_def (fmemopen)

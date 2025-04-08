@@ -31,61 +31,34 @@
 
 #include <_G_config.h>
 /* ALL of these should be defined in _G_config.h */
-#define _IO_pos_t _G_fpos_t /* obsolete */
 #define _IO_fpos_t _G_fpos_t
 #define _IO_fpos64_t _G_fpos64_t
-#define _IO_size_t _G_size_t
-#define _IO_ssize_t _G_ssize_t
-#define _IO_off_t _G_off_t
-#define _IO_off64_t _G_off64_t
-#define _IO_pid_t _G_pid_t
-#define _IO_uid_t _G_uid_t
+#define _IO_size_t size_t
+#define _IO_ssize_t __ssize_t
+#define _IO_off_t __off_t
+#define _IO_off64_t __off64_t
+#define _IO_pid_t pid_t
+#define _IO_uid_t __uid_t
 #define _IO_iconv_t _G_iconv_t
-#define _IO_HAVE_SYS_WAIT _G_HAVE_SYS_WAIT
 #define _IO_HAVE_ST_BLKSIZE _G_HAVE_ST_BLKSIZE
 #define _IO_BUFSIZ _G_BUFSIZ
 #define _IO_va_list _G_va_list
-#define _IO_wint_t _G_wint_t
+#define _IO_wint_t wint_t
 #define __mbstate_t __c_mbstate_t
 
-#ifdef _G_NEED_STDARG_H
 /* This define avoids name pollution if we're using GNU stdarg.h */
-# define __need___va_list
-# include <stdarg.h>
-# ifdef __GNUC_VA_LIST
-#  undef _IO_va_list
-#  define _IO_va_list __gnuc_va_list
-# endif /* __GNUC_VA_LIST */
-#endif
+#define __need___va_list
+#include <stdarg.h>
+#ifdef __GNUC_VA_LIST
+# undef _IO_va_list
+# define _IO_va_list __gnuc_va_list
+#endif /* __GNUC_VA_LIST */
 
 #ifndef __P
-# if _G_HAVE_SYS_CDEFS
-#  include <sys/cdefs.h>
-# else
-#  ifdef __STDC__
-#   define __P(p) p
-#   define __PMT(p) p
-#  else
-#   define __P(p) ()
-#   define __PMT(p) ()
-#  endif
-# endif
+# include <sys/cdefs.h>
 #endif /*!__P*/
 
-/* For backward compatibility */
-#ifndef _PARAMS
-# define _PARAMS(protos) __P(protos)
-#endif /*!_PARAMS*/
-
-#ifndef __STDC__
-# ifndef const
-#  define const
-# endif
-#endif
 #define _IO_UNIFIED_JUMPTABLES 1
-#ifndef _G_HAVE_PRINTF_FP
-# define _IO_USE_DTOA 1
-#endif
 
 #ifndef EOF
 # define EOF (-1)
@@ -139,7 +112,16 @@
 #define _IO_USER_LOCK 0x8000
 
 #define _IO_FLAGS2_MMAP 1
+#define _IO_FLAGS2_NOTCANCEL 2
+#ifdef _LIBC
+# define _IO_FLAGS2_FORTIFY 4
+#endif
 #define _IO_FLAGS2_USER_WBUF 8
+#ifdef _LIBC
+# define _IO_FLAGS2_SCANF_STD 16
+# define _IO_FLAGS2_NOCLOSE 32
+# define _IO_FLAGS2_CLOEXEC 64
+#endif
 
 /* These are "formatting flags" matching the iostream fmtflags enum values. */
 #define _IO_SKIPWS 01
@@ -258,7 +240,7 @@ struct _IO_wide_data
 
   wchar_t _shortbuf[1];
 
-  struct _IO_jump_t *_wide_vtable;
+  const struct _IO_jump_t *_wide_vtable;
 };
 #endif
 
@@ -406,42 +388,56 @@ extern void _IO_cookie_init (struct _IO_cookie_file *__cfile, int __read_write,
 extern "C" {
 #endif
 
-extern int __underflow (_IO_FILE *) __THROW;
-extern int __uflow (_IO_FILE *) __THROW;
-extern int __overflow (_IO_FILE *, int) __THROW;
-extern _IO_wint_t __wunderflow (_IO_FILE *) __THROW;
-extern _IO_wint_t __wuflow (_IO_FILE *) __THROW;
-extern _IO_wint_t __woverflow (_IO_FILE *, _IO_wint_t) __THROW;
+extern int __underflow (_IO_FILE *);
+extern int __uflow (_IO_FILE *);
+extern int __overflow (_IO_FILE *, int);
+#if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
+extern _IO_wint_t __wunderflow (_IO_FILE *);
+extern _IO_wint_t __wuflow (_IO_FILE *);
+extern _IO_wint_t __woverflow (_IO_FILE *, _IO_wint_t);
+#endif
+
+#if  __GNUC__ >= 3
+# define _IO_BE(expr, res) __builtin_expect ((expr), res)
+#else
+# define _IO_BE(expr, res) (expr)
+#endif
 
 #define _IO_getc_unlocked(_fp) \
-       ((_fp)->_IO_read_ptr >= (_fp)->_IO_read_end ? __uflow (_fp) \
-	: *(unsigned char *) (_fp)->_IO_read_ptr++)
+       (_IO_BE ((_fp)->_IO_read_ptr >= (_fp)->_IO_read_end, 0) \
+	? __uflow (_fp) : *(unsigned char *) (_fp)->_IO_read_ptr++)
 #define _IO_peekc_unlocked(_fp) \
-       ((_fp)->_IO_read_ptr >= (_fp)->_IO_read_end \
+       (_IO_BE ((_fp)->_IO_read_ptr >= (_fp)->_IO_read_end, 0) \
 	  && __underflow (_fp) == EOF ? EOF \
 	: *(unsigned char *) (_fp)->_IO_read_ptr)
 #define _IO_putc_unlocked(_ch, _fp) \
-   (((_fp)->_IO_write_ptr >= (_fp)->_IO_write_end) \
+   (_IO_BE ((_fp)->_IO_write_ptr >= (_fp)->_IO_write_end, 0) \
     ? __overflow (_fp, (unsigned char) (_ch)) \
     : (unsigned char) (*(_fp)->_IO_write_ptr++ = (_ch)))
 
-#define _IO_getwc_unlocked(_fp) \
-  ((_fp)->_wide_data->_IO_read_ptr >= (_fp)->_wide_data->_IO_read_end \
+#if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
+# define _IO_getwc_unlocked(_fp) \
+  (_IO_BE ((_fp)->_wide_data == NULL					\
+	   || ((_fp)->_wide_data->_IO_read_ptr				\
+	       >= (_fp)->_wide_data->_IO_read_end), 0)			\
    ? __wuflow (_fp) : (_IO_wint_t) *(_fp)->_wide_data->_IO_read_ptr++)
-#define _IO_putwc_unlocked(_wch, _fp) \
-  ((_fp)->_wide_data->_IO_write_ptr >= (_fp)->_wide_data->_IO_write_end \
-   ? __woverflow (_fp, _wch) \
+# define _IO_putwc_unlocked(_wch, _fp) \
+  (_IO_BE ((_fp)->_wide_data == NULL					\
+	   || ((_fp)->_wide_data->_IO_write_ptr				\
+	       >= (_fp)->_wide_data->_IO_write_end), 0)			\
+   ? __woverflow (_fp, _wch)						\
    : (_IO_wint_t) (*(_fp)->_wide_data->_IO_write_ptr++ = (_wch)))
+#endif
 
 #define _IO_feof_unlocked(__fp) (((__fp)->_flags & _IO_EOF_SEEN) != 0)
 #define _IO_ferror_unlocked(__fp) (((__fp)->_flags & _IO_ERR_SEEN) != 0)
 
-extern int _IO_getc (_IO_FILE *__fp) __THROW;
-extern int _IO_putc (int __c, _IO_FILE *__fp) __THROW;
+extern int _IO_getc (_IO_FILE *__fp);
+extern int _IO_putc (int __c, _IO_FILE *__fp);
 extern int _IO_feof (_IO_FILE *__fp) __THROW;
 extern int _IO_ferror (_IO_FILE *__fp) __THROW;
 
-extern int _IO_peekc_locked (_IO_FILE *__fp) __THROW;
+extern int _IO_peekc_locked (_IO_FILE *__fp);
 
 /* This one is for Emacs. */
 #define _IO_PENDING_OUTPUT_COUNT(_fp)	\
@@ -467,20 +463,20 @@ extern int _IO_ftrylockfile (_IO_FILE *) __THROW;
 #endif /* !_IO_MTSAFE_IO */
 
 extern int _IO_vfscanf (_IO_FILE * __restrict, const char * __restrict,
-			_IO_va_list, int *__restrict) __THROW;
+			_IO_va_list, int *__restrict);
 extern int _IO_vfprintf (_IO_FILE *__restrict, const char *__restrict,
-			 _IO_va_list) __THROW;
-extern _IO_ssize_t _IO_padn (_IO_FILE *, int, _IO_ssize_t) __THROW;
-extern _IO_size_t _IO_sgetn (_IO_FILE *, void *, _IO_size_t) __THROW;
+			 _IO_va_list);
+extern _IO_ssize_t _IO_padn (_IO_FILE *, int, _IO_ssize_t);
+extern _IO_size_t _IO_sgetn (_IO_FILE *, void *, _IO_size_t);
 
-extern _IO_off64_t _IO_seekoff (_IO_FILE *, _IO_off64_t, int, int) __THROW;
-extern _IO_off64_t _IO_seekpos (_IO_FILE *, _IO_off64_t, int) __THROW;
+extern _IO_off64_t _IO_seekoff (_IO_FILE *, _IO_off64_t, int, int);
+extern _IO_off64_t _IO_seekpos (_IO_FILE *, _IO_off64_t, int);
 
 extern void _IO_free_backup_area (_IO_FILE *) __THROW;
 
 #if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
-extern _IO_wint_t _IO_getwc (_IO_FILE *__fp) __THROW;
-extern _IO_wint_t _IO_putwc (wchar_t __wc, _IO_FILE *__fp) __THROW;
+extern _IO_wint_t _IO_getwc (_IO_FILE *__fp);
+extern _IO_wint_t _IO_putwc (wchar_t __wc, _IO_FILE *__fp);
 extern int _IO_fwide (_IO_FILE *__fp, int __mode) __THROW;
 # if __GNUC__ >= 2
 /* While compiling glibc we have to handle compatibility with very old
@@ -509,17 +505,17 @@ weak_extern (_IO_stdin_used);
 	 __result = (__fp)->_mode;					      \
        }								      \
      else if (__builtin_constant_p (__mode) && (__mode) == 0)		      \
-       __result = (__fp)->_mode;					      \
+       __result = _IO_fwide_maybe_incompatible ? -1 : (__fp)->_mode;	      \
      else								      \
        __result = _IO_fwide (__fp, __result);				      \
      __result; })
 # endif
 
 extern int _IO_vfwscanf (_IO_FILE * __restrict, const wchar_t * __restrict,
-			 _IO_va_list, int *__restrict) __THROW;
+			 _IO_va_list, int *__restrict);
 extern int _IO_vfwprintf (_IO_FILE *__restrict, const wchar_t *__restrict,
-			  _IO_va_list) __THROW;
-extern _IO_ssize_t _IO_wpadn (_IO_FILE *, wint_t, _IO_ssize_t) __THROW;
+			  _IO_va_list);
+extern _IO_ssize_t _IO_wpadn (_IO_FILE *, wint_t, _IO_ssize_t);
 extern void _IO_free_wbackup_area (_IO_FILE *) __THROW;
 #endif
 

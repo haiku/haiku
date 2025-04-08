@@ -1,4 +1,4 @@
-/* Copyright (C) 1993,95,97,99,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -31,11 +30,13 @@
 #include <shlib-compat.h>
 
 /* Prototyped for local functions.  */
-static _IO_ssize_t _IO_cookie_read (register _IO_FILE* fp, void* buf,
+static _IO_ssize_t _IO_cookie_read (_IO_FILE* fp, void* buf,
 				    _IO_ssize_t size);
-static _IO_ssize_t _IO_cookie_write (register _IO_FILE* fp,
+static _IO_ssize_t _IO_cookie_write (_IO_FILE* fp,
 				     const void* buf, _IO_ssize_t size);
 static _IO_off64_t _IO_cookie_seek (_IO_FILE *fp, _IO_off64_t offset, int dir);
+static _IO_off64_t _IO_cookie_seekoff (_IO_FILE *fp, _IO_off64_t offset,
+				       int dir, int mode);
 static int _IO_cookie_close (_IO_FILE* fp);
 
 static _IO_ssize_t
@@ -59,11 +60,19 @@ _IO_cookie_write (fp, buf, size)
      _IO_ssize_t size;
 {
   struct _IO_cookie_file *cfile = (struct _IO_cookie_file *) fp;
+  _IO_ssize_t n;
 
   if (cfile->__io_functions.write == NULL)
-    return -1;
+    {
+      fp->_flags |= _IO_ERR_SEEN;
+      return 0;
+    }
 
-  return cfile->__io_functions.write (cfile->__cookie, buf, size);
+  n = cfile->__io_functions.write (cfile->__cookie, buf, size);
+  if (n < size)
+    fp->_flags |= _IO_ERR_SEEN;
+
+  return n;
 }
 
 static _IO_off64_t
@@ -94,20 +103,34 @@ _IO_cookie_close (fp)
 }
 
 
-static struct _IO_jump_t _IO_cookie_jumps = {
+static _IO_off64_t
+_IO_cookie_seekoff (fp, offset, dir, mode)
+     _IO_FILE *fp;
+     _IO_off64_t offset;
+     int dir;
+     int mode;
+{
+  /* We must force the fileops code to always use seek to determine
+     the position.  */
+  fp->_offset = _IO_pos_BAD;
+  return _IO_file_seekoff (fp, offset, dir, mode);
+}
+
+
+static const struct _IO_jump_t _IO_cookie_jumps = {
   JUMP_INIT_DUMMY,
-  JUMP_INIT(finish, INTUSE(_IO_file_finish)),
-  JUMP_INIT(overflow, INTUSE(_IO_file_overflow)),
-  JUMP_INIT(underflow, INTUSE(_IO_file_underflow)),
-  JUMP_INIT(uflow, INTUSE(_IO_default_uflow)),
-  JUMP_INIT(pbackfail, INTUSE(_IO_default_pbackfail)),
-  JUMP_INIT(xsputn, INTUSE(_IO_file_xsputn)),
-  JUMP_INIT(xsgetn, INTUSE(_IO_default_xsgetn)),
-  JUMP_INIT(seekoff, INTUSE(_IO_file_seekoff)),
+  JUMP_INIT(finish, _IO_file_finish),
+  JUMP_INIT(overflow, _IO_file_overflow),
+  JUMP_INIT(underflow, _IO_file_underflow),
+  JUMP_INIT(uflow, _IO_default_uflow),
+  JUMP_INIT(pbackfail, _IO_default_pbackfail),
+  JUMP_INIT(xsputn, _IO_file_xsputn),
+  JUMP_INIT(xsgetn, _IO_default_xsgetn),
+  JUMP_INIT(seekoff, _IO_cookie_seekoff),
   JUMP_INIT(seekpos, _IO_default_seekpos),
-  JUMP_INIT(setbuf, INTUSE(_IO_file_setbuf)),
-  JUMP_INIT(sync, INTUSE(_IO_file_sync)),
-  JUMP_INIT(doallocate, INTUSE(_IO_file_doallocate)),
+  JUMP_INIT(setbuf, _IO_file_setbuf),
+  JUMP_INIT(sync, _IO_file_sync),
+  JUMP_INIT(doallocate, _IO_file_doallocate),
   JUMP_INIT(read, _IO_cookie_read),
   JUMP_INIT(write, _IO_cookie_write),
   JUMP_INIT(seek, _IO_cookie_seek),
@@ -122,17 +145,16 @@ void
 _IO_cookie_init (struct _IO_cookie_file *cfile, int read_write,
 		 void *cookie, _IO_cookie_io_functions_t io_functions)
 {
-  INTUSE(_IO_init) (&cfile->__fp.file, 0);
+  _IO_init (&cfile->__fp.file, 0);
   _IO_JUMPS (&cfile->__fp) = &_IO_cookie_jumps;
 
   cfile->__cookie = cookie;
   cfile->__io_functions = io_functions;
 
-  INTUSE(_IO_file_init) (&cfile->__fp);
+  _IO_file_init (&cfile->__fp);
 
-  cfile->__fp.file._IO_file_flags =
-    _IO_mask_flags (&cfile->__fp.file, read_write,
-		    _IO_NO_READS+_IO_NO_WRITES+_IO_IS_APPENDING);
+  _IO_mask_flags (&cfile->__fp.file, read_write,
+		  _IO_NO_READS+_IO_NO_WRITES+_IO_IS_APPENDING);
 
   /* We use a negative number different from -1 for _fileno to mark that
      this special stream is not associated with a real file, but still has
@@ -195,6 +217,7 @@ _IO_FILE * _IO_old_fopencookie (void *cookie, const char *mode,
 				_IO_cookie_io_functions_t io_functions);
 
 static _IO_off64_t
+attribute_compat_text_section
 _IO_old_cookie_seek (fp, offset, dir)
      _IO_FILE *fp;
      _IO_off64_t offset;
@@ -213,20 +236,20 @@ _IO_old_cookie_seek (fp, offset, dir)
   return (ret == -1) ? _IO_pos_BAD : ret;
 }
 
-static struct _IO_jump_t _IO_old_cookie_jumps = {
+static const struct _IO_jump_t _IO_old_cookie_jumps = {
   JUMP_INIT_DUMMY,
-  JUMP_INIT(finish, INTUSE(_IO_file_finish)),
-  JUMP_INIT(overflow, INTUSE(_IO_file_overflow)),
-  JUMP_INIT(underflow, INTUSE(_IO_file_underflow)),
-  JUMP_INIT(uflow, INTUSE(_IO_default_uflow)),
-  JUMP_INIT(pbackfail, INTUSE(_IO_default_pbackfail)),
-  JUMP_INIT(xsputn, INTUSE(_IO_file_xsputn)),
-  JUMP_INIT(xsgetn, INTUSE(_IO_default_xsgetn)),
-  JUMP_INIT(seekoff, INTUSE(_IO_file_seekoff)),
+  JUMP_INIT(finish, _IO_file_finish),
+  JUMP_INIT(overflow, _IO_file_overflow),
+  JUMP_INIT(underflow, _IO_file_underflow),
+  JUMP_INIT(uflow, _IO_default_uflow),
+  JUMP_INIT(pbackfail, _IO_default_pbackfail),
+  JUMP_INIT(xsputn, _IO_file_xsputn),
+  JUMP_INIT(xsgetn, _IO_default_xsgetn),
+  JUMP_INIT(seekoff, _IO_cookie_seekoff),
   JUMP_INIT(seekpos, _IO_default_seekpos),
-  JUMP_INIT(setbuf, INTUSE(_IO_file_setbuf)),
-  JUMP_INIT(sync, INTUSE(_IO_file_sync)),
-  JUMP_INIT(doallocate, INTUSE(_IO_file_doallocate)),
+  JUMP_INIT(setbuf, _IO_file_setbuf),
+  JUMP_INIT(sync, _IO_file_sync),
+  JUMP_INIT(doallocate, _IO_file_doallocate),
   JUMP_INIT(read, _IO_cookie_read),
   JUMP_INIT(write, _IO_cookie_write),
   JUMP_INIT(seek, _IO_old_cookie_seek),
@@ -237,6 +260,7 @@ static struct _IO_jump_t _IO_old_cookie_jumps = {
 };
 
 _IO_FILE *
+attribute_compat_text_section
 _IO_old_fopencookie (cookie, mode, io_functions)
      void *cookie;
      const char *mode;

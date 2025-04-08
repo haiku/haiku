@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1997, 1998, 1999 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -47,7 +46,7 @@ struct _IO_str_fields
 struct _IO_streambuf
 {
   struct _IO_FILE _f;
-  const void *_vtable;
+  const struct _IO_jump_t *vtable;
 };
 
 typedef struct _IO_strfile_
@@ -63,3 +62,24 @@ typedef struct _IO_strfile_
 /* frozen: set when the program has requested that the array object not
    be altered, reallocated, or freed. */
 #define _IO_STR_FROZEN(FP) ((FP)->_f._IO_file_flags & _IO_USER_BUF)
+
+typedef struct
+{
+  _IO_strfile f;
+  /* This is used for the characters which do not fit in the buffer
+     provided by the user.  */
+  char overflow_buf[64];
+} _IO_strnfile;
+
+extern const struct _IO_jump_t _IO_strn_jumps attribute_hidden;
+
+
+typedef struct
+{
+  _IO_strfile f;
+  /* This is used for the characters which do not fit in the buffer
+     provided by the user.  */
+  wchar_t overflow_buf[64];
+} _IO_wstrnfile;
+
+extern const struct _IO_jump_t _IO_wstrn_jumps attribute_hidden;

@@ -1,4 +1,4 @@
-/* Copyright (C) 1995, 1997-2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
 
    As a special exception, if you link the code in this file with
    files compiled with a GNU compiler to produce an executable,
@@ -25,7 +24,7 @@
    This exception applies to code released by its copyright holders
    in files containing the exception.  */
 
-#include "libioP.h"
+#include <libioP.h>
 #include <stdio_ext.h>
 
 int
@@ -41,29 +40,29 @@ _IO_vdprintf (d, format, arg)
 #ifdef _IO_MTSAFE_IO
   tmpfil.file._lock = NULL;
 #endif
-  _IO_no_init (&tmpfil.file, _IO_USER_LOCK, 0, &wd, &INTUSE(_IO_wfile_jumps));
-  _IO_JUMPS (&tmpfil) = &INTUSE(_IO_file_jumps);
-  INTUSE(_IO_file_init) (&tmpfil);
+  _IO_no_init (&tmpfil.file, _IO_USER_LOCK, 0, &wd, &_IO_wfile_jumps);
+  _IO_JUMPS (&tmpfil) = &_IO_file_jumps;
+  _IO_file_init (&tmpfil);
 #if  !_IO_UNIFIED_JUMPTABLES
   tmpfil.vtable = NULL;
 #endif
-  if (INTUSE(_IO_file_attach) (&tmpfil.file, d) == NULL)
+  if (_IO_file_attach (&tmpfil.file, d) == NULL)
     {
-      INTUSE(_IO_un_link) (&tmpfil);
+      _IO_un_link (&tmpfil);
       return EOF;
     }
-  tmpfil.file._IO_file_flags =
-    (_IO_mask_flags (&tmpfil.file, _IO_NO_READS,
-		     _IO_NO_READS+_IO_NO_WRITES+_IO_IS_APPENDING)
-     | _IO_DELETE_DONT_CLOSE);
+  tmpfil.file._flags |= _IO_DELETE_DONT_CLOSE;
 
-  done = INTUSE(_IO_vfprintf) (&tmpfil.file, format, arg);
+  _IO_mask_flags (&tmpfil.file, _IO_NO_READS,
+		  _IO_NO_READS+_IO_NO_WRITES+_IO_IS_APPENDING);
+
+  done = _IO_vfprintf (&tmpfil.file, format, arg);
+
+  if (done != EOF && _IO_do_flush (&tmpfil.file) == EOF)
+    done = EOF;
 
   _IO_FINISH (&tmpfil.file);
 
   return done;
 }
-
-#ifdef weak_alias
 weak_alias (_IO_vdprintf, vdprintf)
-#endif
