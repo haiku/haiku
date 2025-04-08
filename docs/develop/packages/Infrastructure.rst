@@ -5,7 +5,7 @@ This pages gives an overview of what components belong to Haiku's package
 management infrastructure and how they work and interact.
 
 - **package** and **package_repo** are command line tools for building package
-  and package repository files. They are discussed in `Building Packages`_.
+  and package repository files. They are discussed in :ref:`building_packages`.
 - **packagefs** is the file system that virtually extracts activated packages.
 - The **package kit** is an API for package management related programming.
 - The **dependency solver** is a part of the package kit. It solves dependencies
@@ -20,8 +20,6 @@ management infrastructure and how they work and interact.
 - The **package manager** provides the user interface for software installation,
   update, and removal. There are actually two programs, ``pkgman``, a command
   line tool, and, ``HaikuDepot``, a GUI application.
-
-.. _Building Packages: BuildingPackages.rst
 
 .. image:: package-management-infrastructure.png
    :align: center
@@ -202,13 +200,11 @@ internet. Haiku's package management solution allows to refer to any number of
 software repositories from which packages can be downloaded and installed. The
 structure of the respository is very simple. It's just a set of files which can
 be downloaded via a common protocol (HTTP or FTP). One file is the repository
-index file in `HPKR format`_. It lists all packages that are available in the
+index file in :ref:`hpkr_file_format`. It lists all packages that are available in the
 repository together with their descriptions and dependency information. It is
 downloaded and cached, allowing user interfaces to show the information and the
 dependency solver to do the computation locally. The other files are the
 individual package files.
-
-.. _HPKR format: FileFormat.rst#haiku-package-repository-format
 
 Standard Repositories
 ---------------------

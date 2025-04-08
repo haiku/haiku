@@ -1,3 +1,5 @@
+.. _building_packages:
+
 =================
 Building Packages
 =================
@@ -8,11 +10,9 @@ second section refers to building packages with the ``haikuporter`` tool.
 
 Building a Package with the "package" Command
 =============================================
-The package file format is specified in detail in a `separate document`_. This
+The package file format is specified in detail in :ref:`hpkg_file_format`. This
 section presents information from the perspective of how to build a package file
 with the ``package`` command.
-
-.. _separate document: FileFormat.rst
 
 An hpkg file is an archive file (just like tar or zip files) that additionally
 contains package meta information in a separate section of the file. When

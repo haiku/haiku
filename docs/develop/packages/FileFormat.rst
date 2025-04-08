@@ -1,3 +1,5 @@
+.. _hpkg_file_format:
+
 =========================
 Haiku Package File Format
 =========================
@@ -928,6 +930,8 @@ B_HPKG_ATTRIBUTE_ID_PACKAGE_PRE_UNINSTALL_SCRIPT ("package:pre-uninstall-script"
     the package.  For consistency, it is recommended to start with
     "boot/pre-uninstall/".
   :Child Attributes: none
+
+.. _hpkr_file_format:
 
 Haiku Package Repository Format
 ===============================
