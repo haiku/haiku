@@ -1,4 +1,4 @@
-:: _directory_structure:
+.. _directory_structure:
 
 ===============================
 Boot Volume Directory Structure

@@ -15,7 +15,7 @@ Changes for Users
   installed manually by moving (not copying) them to the respective "packages"
   subdirectory in "/boot/system" or "/boot/home/config".
 - The directory layout has changed and many directories have become read-only.
-  Cf. :ref:`_directory_structure` for details.
+  Cf. :ref:`directory_structure` for details.
 
 - The Deskbar menu works differently. It uses a new virtual directory
   Tracker/Deskbar feature to generate its content. Any package can contribute
@@ -70,7 +70,7 @@ Changes for Application Developers
   ``PATH``. The commands of the secondary tool chain are also available in the
   standard path with a name suffixed with "-<arch>" (e.g. "gcc-x86" for the
   gcc 4 executable on a gcc2/gcc4 hybrid).
-- Software can be packaged using the ``package`` tool. Cf. :ref:`building_package`
+- Software can be packaged using the ``package`` tool. Cf. :ref:`building_packages`
   for more information.
 
 - The ``find_directory()`` API has been partially deprecated. While there are
