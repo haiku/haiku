@@ -563,6 +563,11 @@ public:
 		return fTree.IsEmpty();
 	}
 
+	Node* PreviousDontSplay(const Key& key)
+	{
+		return fTree.PreviousDontSplay(key);
+	}
+
 	Node* FindClosest(const Key& key, bool greater, bool orEqual)
 	{
 		return fTree.FindClosest(key, greater, orEqual);
