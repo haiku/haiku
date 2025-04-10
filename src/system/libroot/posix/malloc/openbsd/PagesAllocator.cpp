@@ -35,6 +35,9 @@ static const size_t kFreePercentage = 25;
 /*! Always allow this much free memory, even if it's above kFreePercentage. */
 static const size_t kFreeMinimum = 128 * kPageSize;
 
+/*! When a free chunk encompasses a whole area and is smaller than this, unmap it. */
+static const size_t kMinimumFreeAreaSize = 16 * kPageSize;
+
 
 namespace {
 
@@ -199,7 +202,7 @@ public:
 			debugger("PagesAllocator: request to free more than allocated");
 		fUsed -= size;
 
-		FreeChunk* chunk = _Insert(_address, size);
+		FreeChunk* freedChunk = _Insert(_address, size);
 
 		if (size > kLargestUsefulChunk) {
 			// TODO: This doesn't deal with a free of a smaller number of pages
@@ -208,7 +211,21 @@ public:
 			// (so they don't get reused for anything but the large allocation.)
 
 			locker.Detach();
-			return _RemoveAndUnmapLocked(chunk, false);
+			return _UnlockingRemoveAndUnmap(freedChunk, false);
+		}
+
+		if (!_InLastArea(freedChunk) && freedChunk->size < kMinimumFreeAreaSize) {
+			// If this chunk covers a whole area, or is at the head or tail of one
+			// that's smaller than kMinimumFreeAreaSize, we unmap it immediately.
+			// TODO: Find a way to avoid invoking syscalls here, at least in some cases?
+			area_info info = {};
+			get_area_info(area_for(freedChunk), &info);
+			if (info.size == size || (info.size < kMinimumFreeAreaSize
+					&& (info.address == freedChunk
+						|| ((addr_t)info.address + info.size) == freedChunk->NextAddress()))) {
+				locker.Detach();
+				return _UnlockingRemoveAndUnmap(freedChunk, false);
+			}
 		}
 
 		if (fFree <= _FreeLimit()) {
@@ -220,23 +237,24 @@ public:
 
 		while (fFree > _FreeLimit()) {
 			FreeChunk* chunk = fChunksBySizeTree.FindMax();
-			status_t status = _RemoveAndUnmapLocked(chunk);
-			if (status != B_OK)
-				return status;
-		}
 
-		if (fFree > kLargestUsefulChunk && fFree > (_FreeLimit() / 2)
-				&& fChunksBySizeTree.FindMax()->size == kPageSize) {
-			// All the free chunks are single pages, and there's more of them
-			// than a "largest useful" chunk. Just evict them all at this point.
-			while (FreeChunk* chunk = fChunksBySizeTree.FindMin()) {
-				if (chunk->size != kPageSize)
+			// Try to avoid unmapping the just-freed chunk, or any in the last area
+			// besides the topmost.
+			while (chunk == freedChunk || _InLastArea(chunk)) {
+				if (chunk->NextAddress() == fLastAreaTop)
 					break;
 
-				status_t status = _RemoveAndUnmapLocked(chunk);
-				if (status != B_OK)
-					return status;
+				FreeChunk* previousChunk = fChunksBySizeTree.PreviousDontSplay(chunk);
+				if (previousChunk == NULL) {
+					// Just free the maximum-size chunk, whatever it was.
+					chunk = fChunksBySizeTree.FindMax();
+					break;
+				}
+				chunk = previousChunk;
 			}
+			status_t status = _UnlockingRemoveAndUnmap(chunk);
+			if (status != B_OK)
+				return status;
 		}
 
 		return B_OK;
@@ -346,6 +364,12 @@ private:
 		return B_OK;
 	}
 
+	bool _InLastArea(const FreeChunk* chunk) const
+	{
+		return ((addr_t)chunk < fLastAreaTop
+			&& (addr_t)chunk >= (fLastAreaTop - fLastAreaSize));
+	}
+
 	status_t _ResizeLastArea(size_t amount)
 	{
 		// TODO: We could use an inner lock here to avoid contention.
@@ -357,7 +381,7 @@ private:
 		return status;
 	}
 
-	status_t _RemoveAndUnmapLocked(FreeChunk* chunk, bool relock = true)
+	status_t _UnlockingRemoveAndUnmap(FreeChunk* chunk, bool relock = true)
 	{
 		fChunksByAddressTree.Remove(chunk);
 		fChunksBySizeTree.Remove(chunk);
