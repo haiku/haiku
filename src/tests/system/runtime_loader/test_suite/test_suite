@@ -7,6 +7,7 @@ for test in \
 	load_resolve_order2		\
 	load_resolve_order3		\
 	load_resolve_order4		\
+	dlopen_noload1			\
 	dlopen_resolve_basic1	\
 	dlopen_resolve_basic2	\
 	dlopen_resolve_basic3	\

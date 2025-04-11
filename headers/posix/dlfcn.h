@@ -13,6 +13,7 @@
 #define RTLD_NOW	1	/* the file gets relocated at load time */
 #define RTLD_LOCAL	0	/* symbols are not available for relocating any other object */
 #define RTLD_GLOBAL	2	/* all symbols are available */
+#define RTLD_NOLOAD	4	/* do not load any new object */
 
 /* not-yet-POSIX extensions (dlsym() handles) */
 #define RTLD_DEFAULT	((void*)0)

@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# program
+#
+# dlopen():
+# liba.so (no load)
+# liba.so
+# liba.so (no load)
+#
+# Expected: First attempt fails, next two attemps succeed,
+# returning the same handles.
+
+
+. ./test_setup
+
+
+# create liba.so
+cat > liba.c << EOI
+int a() { return 42; }
+EOI
+
+# build
+compile_lib -o liba.so liba.c
+
+
+# create program
+cat > program.c << EOI
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+int
+main()
+{
+	void* liba_fail;
+	void* liba_1;
+	void* liba_2;
+	int (*a)();
+
+	liba_fail = dlopen("liba.so", RTLD_LOCAL | RTLD_LAZY | RTLD_NOLOAD);
+	if (liba_fail != NULL) {
+		fprintf(stderr, "dlopen() succeeded unexpectedly for non-loaded object");
+		exit(117);
+	}
+
+	liba_1 = dlopen("liba.so", RTLD_LOCAL | RTLD_LAZY);
+	if (liba_1 == NULL) {
+		fprintf(stderr, "Error opening liba.so: %s\n", dlerror());
+		exit(116);
+	}
+
+	liba_2 = dlopen("liba.so", RTLD_GLOBAL | RTLD_LAZY | RTLD_NOLOAD);
+	if (liba_2 == NULL) {
+		fprintf(stderr, "Error opening liba.so: %s\n", dlerror());
+		exit(115);
+	}
+
+	if (liba_1 != liba_2) {
+		fprintf(stderr, "dlopen() returned different handles for the same object");
+		exit(114);
+	}
+
+	a = (int (*)())dlsym(liba_2, "a");
+	if (a == NULL) {
+		fprintf(stderr, "Error getting symbol a: %s\n", dlerror());
+		exit(113);
+	}
+
+	return a();
+}
+EOI
+
+# build
+compile_program_dl -o program program.c
+
+# run
+test_run_ok ./program 42
