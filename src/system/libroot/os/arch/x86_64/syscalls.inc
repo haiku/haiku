@@ -16,18 +16,22 @@
 #define _SYSCALL_NO_RCX(name, n)	\
 	.align 8;						\
 	FUNCTION(name):					\
+		.cfi_startproc;				\
 		movq	$n, %rax;			\
 		syscall;					\
 		ret;						\
+		.cfi_endproc;				\
 	FUNCTION_END(name)
 
 #define _SYSCALL_RCX(name, n)		\
 	.align 8;						\
 	FUNCTION(name):					\
+		.cfi_startproc;				\
 		movq	%rcx, %r10;			\
 		movq	$n, %rax;			\
 		syscall;					\
 		ret;						\
+		.cfi_endproc;				\
 	FUNCTION_END(name)
 
 
