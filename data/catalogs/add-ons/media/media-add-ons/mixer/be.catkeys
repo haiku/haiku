@@ -1,5 +1,6 @@
-1	belarusian	x-vnd.Haiku-mixer.media_addon	3463574286
+1	belarusian	x-vnd.Haiku-mixer.media_addon	2428480097
 Input mapping	AudioMixer		Перапрызначенне ўваходаў
+High quality (linear interpolation)	AudioMixer		Высокая якасць (лінейная інтэрпаляцыя)
 To output	AudioMixer		Выводзіць
 Gain	AudioMixer		Узмацненне
 To master	AudioMixer		Да асноўнага
@@ -7,6 +8,7 @@ not connected	AudioMixer		ня злучана
 Master output	AudioMixer		Асноўны выхад
 dB	AudioMixer		дБ
 Gain controls	AudioMixer		Рэгулятары ўзмацнення
+Low quality (drop/repeat samples)	AudioMixer		Нізкая якасць (прапушчаныя/паўторныя сэмплы)
 Output channel sources	AudioMixer		Крыніцы выхаднога каналу
 Allow input channel remapping	AudioMixer		Дазволiць перапрызначэнне ўваходнага канала
 Display balance control for stereo connections	AudioMixer		Паказаць рэгулятар балансу для стэрэа злучэнняў

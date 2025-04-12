@@ -1,31 +1,48 @@
-1	belarusian	x-vnd.Haiku-Installer	3125198243
+1	belarusian	x-vnd.Haiku-Installer	92411837
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
 No optional packages available.	PackagesView		Дадатковыя пакункі недаступныя.
+This operating system has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Гэтая аперацыйная сістэма мае быць інсталяванай на раздзел фармату Be File System, але ў Вашай сістэме  адпаведны раздзел адсутнічае.
 The mount point could not be retrieved.	InstallProgress		Не ўдалося атрымаць пункт мантавання.
 <none>	InstallerWindow	No partition available	<няма>
-Please choose target	InstallerWindow		Калі ласка, выберыце дыск прызначэння
+Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершаная. Загрузачны сэктар быў запісаны на '%s'. Перазапусціце кампутар альбо абярыце наступны падзел для яшчэ адной усталёўкі.
+Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Haiku мае быць інсталяванай на раздзел фармату Be File System, але ў Вашай сістэме адпаведны раздзел адсутнічае. 
+Please choose target	InstallerWindow		Калі ласка, выберыце раздзел
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Не ўдалося запусціць BootManager, прыладу для наладкі загрузачнага меню Haiku.
 Cancel	InstallProgress		Адмена
-Are you sure you want to to stop the installation?	InstallerWindow		Сапраўды астанавіць усталёўку?
+Are you sure you want to to stop the installation?	InstallerWindow		Сапраўды жадаеце спыніць усталёўку?
 Installer	System name		Усталёўшчык
 Unknown Type	InstallProgress	Partition content type	Невядомы тып
-README	InstallerApp		README
+Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Распачніце ўсталёўку з '%1s' на '%2s'.
+Are you sure you want to stop the installation?	InstallerWindow		Сапраўды жадаеце спыніць усталёўку?
+README	InstallerApp		Інструкцыя
 Quit	InstallerWindow		Выйсці
+Please close the BootManager window before closing the Installer window.	InstallerWindow		Калі ласка скончыце працу ў BootManager перш чым пакінуць Усталёўшчык.
 Write boot sector to '%s'	InstallerWindow		Запісаць загрузачны сектар на '%s'
 Boot sector not written because of an internal error.	InstallProgress		Загрузачны сектар не запісаны з-за ўнутранай памылкі.
+Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		Абярыце зыходны і мэтавы падзелы ў меню. Пасля націсніце 'Усталяваць'.
+Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		BootManager і DriveSetup актыўныя…\n\nКалі ласка завяршыце іх працу перш чым працягнуць усталёўку.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Прывітанне! Гэта ўсталёўшчык Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, праграма для праўкі дыскавых падзелаў, не запусцілася.
+Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершаная. Загрузачны сэктар быў запісаны на '%s'. Націсніце 'Выйсці' каб завяршыць працу Усталёўшчыка альбо абярыце наступны падзел для яшчэ адной усталёўкі.
 Quit DriveSetup	InstallerWindow		Выйсці з DriveSetup
 Write boot sector	InstallerWindow		Запісаць загрузачны сектар
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
+Finishing installation.	InstallProgress		Завяршэнне усталёўкі.
 Install from:	InstallerWindow		Усталяваць з:
 Additional disk space required: 0.0 KiB	InstallerWindow		Патрэбна яшчэ 0.0 KiB месца на дыску
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Мы ўвесь час удасканальваем для Вас гэтыя праграмы. Але, на жаль, пакуль існуе рызыка страты дадзеных. Таму, калі ласка, перыядычна захоўвайце рэзэрвовыя копіі вашых дадзеных. Мусілі Вас папярэдзіць.\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Hide optional packages	InstallerWindow		Схаваць дадатковыя пакункі
+Install anyway	InstallProgress		Усталяваць безумоўна
+Hide optional packages	InstallerWindow		Прыхаваць дадатковыя пакункі
 ???	InstallerWindow	Unknown partition name	???
+Have fun and thanks for trying out Haiku!	InstallerApp		Зычым Вам прыемный працы і дзякуем за жаданне пазнаёміцца з Haiku!
 Quit	InstallerApp		Выйсці
+Quit BootManager and DriveSetup	InstallerWindow		Спыніць працу BootManager і DriveSetup
+Error writing boot sector.	InstallProgress		Памылка запісу загрузачнага сэктара.
 OK	InstallerWindow		ОК
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Першасную інфармацыю пра Haiku, пасля усталёўкі можна будзе знайсці ў файлах \"User Guide\" і \"Quick Tour\" па спасылках на Вашым працоўным стале і ў закладках WebPositive.\n\n
 Try installing anyway	InstallProgress		Ўсё роўна паспрабаваць усталёўку
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖНАЯ ІНФАРМАЦЫЯ НАКОНТ УСТАЛЁЎКІ\n\n
 Additional disk space required: %s	InstallerWindow		Патрэбна месца дадаткова: %s

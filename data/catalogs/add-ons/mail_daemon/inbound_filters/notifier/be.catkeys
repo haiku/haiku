@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-NewMailNotification	2957041017
+1	belarusian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Акно гісторыі
 none	NotifierConfigView		не
 Alert	NotifierConfigView		Паведамленне
@@ -6,7 +6,8 @@ OK	NotifierFilter		Добра
 Central alert	NotifierConfigView		Цэнтральнае паведамленне
 Beep	NotifierConfigView		Гукавы сігнал
 Central beep	NotifierConfigView		Цэнтральны гукавы сігнал
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Адно новае паведамленне} few{# новых паведамленняў} other{# новых паведамленняў}}
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Адно новае паведамленне} few{# новых паведамленні} other{# новых паведамленняў}}
 New messages	NotifierFilter		Новыя паведамленні
 Method:	NotifierConfigView		Метад:
 Keyboard LEDs	NotifierConfigView		Клавіатурныя светадыёды
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Вы атрымалі {0, plural, one{адно новае паведамленне} few{# новых паведамленні} other{# новых паведамленняў}} для %account.

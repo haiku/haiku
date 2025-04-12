@@ -1,5 +1,5 @@
 1	english	x-vnd.Haiku-LaunchBox	1878360293
-Set description…	LaunchBox		設定說明…
+Set description…	LaunchBox		補充描述設定…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		真的關閉這個pad嗎？\n（該pad將不會被記住。）
 OK	LaunchBox		確認
 Ignore double-click	LaunchBox		忽略雙擊
@@ -7,7 +7,7 @@ Show on all workspaces	LaunchBox		在所有工作區上顯示
 Name Panel	LaunchBox		名稱面板
 Autostart	LaunchBox		自動啟動
 Clone	LaunchBox		克隆
-Description for '%3'	LaunchBox		說明 '%3'
+Description for '%3'	LaunchBox		描述 '%3'
 Show window border	LaunchBox		顯示視窗邊框
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\n無法啟動帶有簽名的應用程式 '%2'.\n\n錯誤：
 Failed to launch 'something', error in Pad data.	LaunchBox		無法啟動“某物”，Pad資料錯誤。
@@ -15,11 +15,11 @@ LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		自動升起
 %ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		圖示大小
-Open containing folder	LaunchBox		打開包含的資料夾
-Add button here	LaunchBox		在此新增按鈕
+Open containing folder	LaunchBox		打開所在資料夾
+Add button here	LaunchBox		在此新增按鍵
 Cancel	LaunchBox		取消
 launch popup	LaunchBox		啟動彈出
-Clear button	LaunchBox		清除按鈕
+Clear button	LaunchBox		清除按鍵
 Bummer	LaunchBox		失敗
 last chance	LaunchBox		最後機會
 You can drag an icon here.	LaunchBox		您可以將圖示拖到此處。
@@ -29,7 +29,7 @@ Settings	LaunchBox		設定
 Vertical layout	LaunchBox		垂直佈局
 Pad	LaunchBox		Pad
 Close	LaunchBox		關閉
-Remove button	LaunchBox		消除按鍵
+Remove button	LaunchBox		徹底移除按鍵
 Quit	LaunchBox		退出
 Horizontal layout	LaunchBox		橫向佈局
 New	LaunchBox		新創

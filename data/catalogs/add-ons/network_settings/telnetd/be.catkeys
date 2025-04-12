@@ -1,2 +1,3 @@
-1	belarusian	x-vnd.Haiku-TelnetService	1580090553
+1	belarusian	x-vnd.Haiku-TelnetService	1209067113
+The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Telnet сервер дазваляе атрымаць доступ да вашага кампутара дыстанцыйна, з дапамогай пратакола telnet.\n\nМайце, калі ласка, на ўвазе, што гэта незашыфраванае і небяспечнае далучэнне.
 Telnet server	TelnetServiceAddOn		Сервер Telnet
