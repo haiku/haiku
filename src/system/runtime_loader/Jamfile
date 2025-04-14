@@ -87,6 +87,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		local sources =
 			add_ons.cpp
+			commpage.cpp
 			elf.cpp
 			elf_haiku_version.cpp
 			elf_load_image.cpp
