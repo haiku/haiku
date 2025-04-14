@@ -25,7 +25,7 @@
 void
 DumpDescriptorData(const usb_generic_descriptor* descriptor)
 {
-	printf("                    Length............ 0x%02x\n",
+	printf("                    Length ........... 0x%02x\n",
 		descriptor->length);
 	printf("                    Type ............. 0x%02x\n",
 		descriptor->descriptor_type);
@@ -210,8 +210,8 @@ DumpInfo(BUSBDevice& device, bool verbose)
 	size_t size = device.GetDescriptor(USB_DESCRIPTOR_HUB, 0, 0,
 		(void*)&hubDescriptor, sizeof(usb_hub_descriptor));
 	if (size == sizeof(usb_hub_descriptor)) {
-		printf("    Hub ports count......... %d\n", hubDescriptor.num_ports);
-		printf("    Hub Controller Current.. %dmA\n", hubDescriptor.max_power);
+		printf("    Hub ports count ........ %d\n", hubDescriptor.num_ports);
+		printf("    Hub Controller Current . %dmA\n", hubDescriptor.max_power);
 
 		for (int index = 1; index <= hubDescriptor.num_ports; index++) {
 			usb_port_status portStatus;
@@ -220,8 +220,15 @@ DumpInfo(BUSBDevice& device, bool verbose)
 				index, sizeof(portStatus), (void*)&portStatus);
 			if (actualLength != sizeof(portStatus))
 				continue;
-			printf("      Port %d status....... %04x.%04x%s%s%s%s%s%s%s%s\n",
-				index, portStatus.status, portStatus.change,
+			const char* padding;
+			if (index >= 100)
+				padding = "....";
+			else if (index >= 10)
+				padding = ".....";
+			else
+				padding = "......";
+			printf("      Port %d status %s %04x.%04x%s%s%s%s%s%s%s%s\n",
+				index, padding, portStatus.status, portStatus.change,
 				portStatus.status & PORT_STATUS_CONNECTION ? " Connect": "",
 				portStatus.status & PORT_STATUS_ENABLE ? " Enable": "",
 				portStatus.status & PORT_STATUS_SUSPEND ? " Suspend": "",
