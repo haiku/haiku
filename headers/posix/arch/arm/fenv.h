@@ -179,7 +179,7 @@ feupdateenv(const fenv_t *__envp)
 	return (0);
 }
 
-#if __BSD_VISIBLE
+#ifdef _DEFAULT_SOURCE
 
 static __inline int
 feenableexcept(int __mask)
@@ -212,7 +212,7 @@ fegetexcept(void)
 	return ((__fpsr & _ENABLE_MASK) >> _FPUSW_SHIFT);
 }
 
-#endif /* __BSD_VISIBLE */
+#endif /* _DEFAULT_SOURCE */
 
 __END_DECLS
 

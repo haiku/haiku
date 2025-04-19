@@ -218,7 +218,7 @@ feupdateenv(const fenv_t *__envp)
 }
 #endif /* !__riscv_float_abi_soft */
 
-#if __BSD_VISIBLE
+#ifdef _DEFAULT_SOURCE
 
 /* We currently provide no external definitions of the functions below. */
 
@@ -255,7 +255,7 @@ fegetexcept(void)
 }
 #endif /* !__riscv_float_abi_soft */
 
-#endif /* __BSD_VISIBLE */
+#endif /* _DEFAULT_SOURCE */
 
 __END_DECLS
 

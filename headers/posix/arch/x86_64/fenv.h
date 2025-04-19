@@ -193,7 +193,7 @@ fesetenv(const fenv_t *__envp)
 
 int feupdateenv(const fenv_t *__envp);
 
-#if __BSD_VISIBLE
+#ifdef _DEFAULT_SOURCE
 
 int feenableexcept(int __mask);
 int fedisableexcept(int __mask);
@@ -211,7 +211,7 @@ fegetexcept(void)
 	return (~__control & FE_ALL_EXCEPT);
 }
 
-#endif /* __BSD_VISIBLE */
+#endif /* _DEFAULT_SOURCE */
 
 __END_DECLS
 
