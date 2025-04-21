@@ -139,8 +139,7 @@ MainWindow::MessageReceived(BMessage* message)
 						} else
 							launchedByRef = true;
 					} else
-						errorMessage = ("Failed to open folder - is Tracker "
-							"running?");
+						errorMessage = B_TRANSLATE("Failed to open folder - is Tracker running?");
 				} else {
 					status_t ret = be_roster->Launch(button->Ref());
 					if (ret < B_OK && ret != B_ALREADY_RUNNING) {
