@@ -304,19 +304,25 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 	if (gInvokeCommandDirectly)
 		return command->func(argc, argv);
 
-	sInCommand = true;
+	if (sInvokeCommandLevel >= kMaxInvokeCommandDepth) {
+		kprintf_unfiltered("\n[*** MAX COMMAND DEPTH HIT ***]\n");
+		return B_KDEBUG_ERROR;
+	}
 
 	invoke_command_parameters parameters;
 	parameters.command = command;
 	parameters.argc = argc;
 	parameters.argv = argv;
 
-	switch (debug_call_with_fault_handler(
-			sInvokeCommandEnv[sInvokeCommandLevel++],
-			&invoke_command_trampoline, &parameters)) {
+	sInCommand = true;
+	int result = debug_call_with_fault_handler(
+		sInvokeCommandEnv[sInvokeCommandLevel++],
+		&invoke_command_trampoline, &parameters);
+	sInvokeCommandLevel--;
+	sInCommand = false;
+
+	switch (result) {
 		case 0:
-			sInvokeCommandLevel--;
-			sInCommand = false;
 			return parameters.result;
 
 		case INVOKE_COMMAND_FAULT:
@@ -338,7 +344,6 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 			break;
 	}
 
-	sInCommand = false;
 	return B_KDEBUG_ERROR;
 }
 
@@ -351,7 +356,7 @@ void
 abort_debugger_command()
 {
 	if (!gInvokeCommandDirectly && sInvokeCommandLevel > 0) {
-		longjmp(sInvokeCommandEnv[--sInvokeCommandLevel],
+		longjmp(sInvokeCommandEnv[sInvokeCommandLevel - 1],
 			INVOKE_COMMAND_ERROR);
 	}
 }
