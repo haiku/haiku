@@ -15,7 +15,9 @@ extern console_module_info gFrameBufferConsoleModule;
 
 class VideoTextConsole : public ConsoleNode {
 	public:
-		VideoTextConsole(addr_t framebuffer);
+		VideoTextConsole();
+
+		void Init(addr_t framebuffer);
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
 			size_t bufferSize);
@@ -36,12 +38,21 @@ class VideoTextConsole : public ConsoleNode {
 		int32 fScreenWidth, fScreenHeight;
 };
 
+static VideoTextConsole sVideoTextConsole;
+static bool sVideoTextConsoleInitialized;
+
 
 //	#pragma mark -
 
 
-VideoTextConsole::VideoTextConsole(addr_t framebuffer)
+VideoTextConsole::VideoTextConsole()
 	: ConsoleNode()
+{
+}
+
+
+void
+VideoTextConsole::Init(addr_t framebuffer)
 {
 	frame_buffer_update(framebuffer, gKernelArgs.frame_buffer.width,
 		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth,
@@ -49,6 +60,7 @@ VideoTextConsole::VideoTextConsole(addr_t framebuffer)
 	gFrameBufferConsoleModule.get_size(&fScreenWidth, &fScreenHeight);
 
 	SetCursorVisible(false);
+	SetCursor(0, 0);
 	ClearScreen();
 }
 
@@ -147,5 +159,11 @@ VideoTextConsole::SetColors(int32 foreground, int32 background)
 ConsoleNode*
 video_text_console_init(addr_t frameBuffer)
 {
-	return new VideoTextConsole(frameBuffer);
+	if (!sVideoTextConsoleInitialized) {
+		new(&sVideoTextConsole) VideoTextConsole;
+		sVideoTextConsoleInitialized = true;
+	}
+
+	sVideoTextConsole.Init(frameBuffer);
+	return &sVideoTextConsole;
 }
