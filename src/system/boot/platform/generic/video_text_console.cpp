@@ -32,7 +32,7 @@ class VideoTextConsole : public ConsoleNode {
 		virtual void	SetColors(int32 foreground, int32 background);
 
 	private:
-		uint16 fColor = 0x0f00;
+		uint16 fColor;
 		bool fShowCursor;
 		int32 fCursorX, fCursorY;
 		int32 fScreenWidth, fScreenHeight;
@@ -61,6 +61,7 @@ VideoTextConsole::Init(addr_t framebuffer)
 
 	SetCursorVisible(false);
 	SetCursor(0, 0);
+	SetColors(15, 0);
 	ClearScreen();
 }
 
