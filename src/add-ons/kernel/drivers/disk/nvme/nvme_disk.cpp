@@ -286,7 +286,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 					psd.apw);
 			}
 
-			size_t tableSize = 32 * sizeof(uint64);
+			uint32_t tableSize = 32 * sizeof(uint64);
 			uint64* table = (uint64*)malloc(tableSize);
 			memset(table, 0, tableSize);
 

@@ -1193,7 +1193,7 @@ int nvme_ctrlr_get_feature(struct nvme_ctrlr *ctrlr,
 int nvme_ctrlr_set_feature(struct nvme_ctrlr *ctrlr,
 			   bool save, enum nvme_feat feature,
 			   uint32_t cdw11, uint32_t cdw12,
-			   void *buf, size_t len,
+			   void *buf, uint32_t len,
 			   uint32_t *attributes)
 {
 	int ret;
@@ -1201,7 +1201,7 @@ int nvme_ctrlr_set_feature(struct nvme_ctrlr *ctrlr,
 	pthread_mutex_lock(&ctrlr->lock);
 
 	ret = nvme_admin_set_feature(ctrlr, save, feature,
-				     cdw11, cdw12, NULL, 0, attributes);
+				     cdw11, cdw12, buf, len, attributes);
 	if (ret != 0)
 		nvme_notice("Set feature 0x%08x failed\n",
 			    (unsigned int) feature);
