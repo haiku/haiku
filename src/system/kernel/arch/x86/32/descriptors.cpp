@@ -144,6 +144,11 @@ void
 x86_double_fault_exception(struct iframe* frame)
 {
 	int cpu = x86_double_fault_get_cpu();
+	if (cpu < 0) {
+		kprintf("Double fault handler invoked, but can't determine CPU! "
+			"Entering infinite loop...\n");
+		while (true);
+	}
 
 	// The double fault iframe contains no useful information (as
 	// per Intel's architecture spec). Thus we simply save the
@@ -183,13 +188,18 @@ x86_page_fault_exception_double_fault(struct iframe* frame)
 	addr_t cr2 = x86_read_cr2();
 
 	// Only if this CPU has a fault handler, we're allowed to be here.
-	cpu_ent& cpu = gCPU[x86_double_fault_get_cpu()];
-	addr_t faultHandler = cpu.fault_handler;
+	addr_t faultHandler = 0, faultHandlerStack;
+	int32 currentCPU = x86_double_fault_get_cpu();
+	if (currentCPU >= 0) {
+		cpu_ent& cpu = gCPU[currentCPU];
+		faultHandler = cpu.fault_handler;
+		faultHandlerStack = cpu.fault_handler_stack_pointer;
+	}
 	if (faultHandler != 0) {
 		debug_set_page_fault_info(cr2, frame->ip,
 			(frame->error_code & 0x2) != 0 ? DEBUG_PAGE_FAULT_WRITE : 0);
 		frame->ip = faultHandler;
-		frame->bp = cpu.fault_handler_stack_pointer;
+		frame->bp = faultHandlerStack;
 		return;
 	}
 
