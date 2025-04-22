@@ -374,6 +374,20 @@ x86_64_stack_fault_exception(iframe* frame)
 }
 
 
+static void
+x86_double_fault_exception(iframe* frame)
+{
+	int cpu = x86_double_fault_get_cpu();
+	if (cpu < 0) {
+		kprintf("Double fault handler invoked, but can't determine CPU! "
+			"Entering infinite loop...\n");
+		while (true);
+	}
+
+	debug_double_fault(cpu);
+}
+
+
 // #pragma mark -
 
 
@@ -428,7 +442,7 @@ x86_descriptors_init(kernel_args* args)
 	table[5]  = x86_unexpected_exception;	// BOUND Range Exceeded Exception (#BR)
 	table[6]  = x86_unexpected_exception;	// Invalid Opcode Exception (#UD)
 	table[7]  = x86_fatal_exception;		// Device Not Available Exception (#NM)
-	table[8]  = x86_fatal_exception;		// Double Fault Exception (#DF)
+	table[8]  = x86_double_fault_exception;		// Double Fault Exception (#DF)
 	table[9]  = x86_fatal_exception;		// Coprocessor Segment Overrun
 	table[10] = x86_fatal_exception;		// Invalid TSS Exception (#TS)
 	table[11] = x86_fatal_exception;		// Segment Not Present (#NP)
