@@ -191,20 +191,24 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		return B_ERROR;
 	}
 
-	struct nvme_ctrlr_stat cstat;
-	int err = nvme_ctrlr_stat(info->ctrlr, &cstat);
+	struct nvme_ctrlr_stat* cstat = (struct nvme_ctrlr_stat*)malloc(sizeof(struct nvme_ctrlr_stat));
+	if (cstat == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter cstatDeleter(cstat);
+
+	int err = nvme_ctrlr_stat(info->ctrlr, cstat);
 	if (err != 0) {
 		TRACE_ERROR("failed to get controller information!\n");
 		nvme_ctrlr_close(info->ctrlr);
 		return err;
 	}
 
-	TRACE_ALWAYS("attached to NVMe device \"%s (%s)\"\n", cstat.mn, cstat.sn);
-	TRACE_ALWAYS("\tmaximum transfer size: %" B_PRIuSIZE "\n", cstat.max_xfer_size);
-	TRACE_ALWAYS("\tqpair count: %d\n", cstat.io_qpairs);
+	TRACE_ALWAYS("attached to NVMe device \"%s (%s)\"\n", cstat->mn, cstat->sn);
+	TRACE_ALWAYS("\tmaximum transfer size: %" B_PRIuSIZE "\n", cstat->max_xfer_size);
+	TRACE_ALWAYS("\tqpair count: %d\n", cstat->io_qpairs);
 
 	// TODO: export more than just the first namespace!
-	info->ns = nvme_ns_open(info->ctrlr, cstat.ns_ids[0]);
+	info->ns = nvme_ns_open(info->ctrlr, cstat->ns_ids[0]);
 	if (info->ns == NULL) {
 		TRACE_ERROR("failed to open namespace!\n");
 		nvme_ctrlr_close(info->ctrlr);
@@ -267,10 +271,8 @@ nvme_disk_init_device(void* _info, void** _cookie)
 
 	if (info->ctrlr->feature_supported[NVME_FEAT_AUTONOMOUS_POWER_STATE_TRANSITION]) {
 		// dump power states
-		struct nvme_ctrlr_data cdata;
-		struct nvme_register_data rdata;
-		if (nvme_ctrlr_data(info->ctrlr, &cdata, &rdata) == 0
-			&& cdata.npss > 0 && cdata.npss < 31) {
+		struct nvme_ctrlr_data& cdata = info->ctrlr->cdata;
+		if (cdata.npss > 0 && cdata.npss < 31) {
 			TRACE_ALWAYS("\tpower states: %u\n", cdata.npss);
 			for (uint8 i = 0; i <= cdata.npss; i++) {
 				struct nvme_power_state	psd;
@@ -337,7 +339,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	}
 
 	// allocate qpairs
-	uint32 try_qpairs = cstat.io_qpairs;
+	uint32 try_qpairs = cstat->io_qpairs;
 	try_qpairs = min_c(try_qpairs, NVME_MAX_QPAIRS);
 	if (try_qpairs >= (uint32)smp_get_num_cpus()) {
 		try_qpairs = smp_get_num_cpus();
@@ -373,8 +375,8 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		// only on 32-bits, and the rest only need to have sizes that are a multiple
 		// of the block size.
 	restrictions.max_segment_count = (NVME_MAX_SGL_DESCRIPTORS / 2);
-	restrictions.max_transfer_size = cstat.max_xfer_size;
-	info->max_io_blocks = cstat.max_xfer_size / nsstat.sector_size;
+	restrictions.max_transfer_size = cstat->max_xfer_size;
+	info->max_io_blocks = cstat->max_xfer_size / nsstat.sector_size;
 
 	err = info->dma_resource.Init(restrictions, B_PAGE_SIZE, buffers, buffers);
 	if (err != 0) {
