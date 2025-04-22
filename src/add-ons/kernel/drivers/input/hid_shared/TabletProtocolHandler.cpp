@@ -242,7 +242,7 @@ TabletProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 			return B_DEV_NOT_READY;
 		}
 
-		if ((*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
+		if (result == B_CANCELED || (*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
 			return B_CANCELED;
 
 		if (result != B_INTERRUPTED) {

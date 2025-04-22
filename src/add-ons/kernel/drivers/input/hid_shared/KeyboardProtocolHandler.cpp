@@ -514,7 +514,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 			return B_ERROR;
 		}
 
-		if ((*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
+		if (result == B_CANCELED || (*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
 			return B_CANCELED;
 
 		if (result != B_TIMED_OUT && result != B_INTERRUPTED) {
