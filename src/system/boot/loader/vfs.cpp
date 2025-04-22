@@ -1027,13 +1027,16 @@ writev(int fd, const struct iovec* vecs, int count)
 int
 open(const char *name, int mode, ...)
 {
+	if (gRoot == NULL)
+		RETURN_AND_SET_ERRNO(B_NO_INIT);
+
 	mode_t permissions = 0;
 	if ((mode & O_CREAT) != 0) {
-        va_list args;
-        va_start(args, mode);
-        permissions = va_arg(args, int) /*& ~__gUmask*/;
-            // adapt the permissions as required by POSIX
-        va_end(args);
+		va_list args;
+		va_start(args, mode);
+		permissions = va_arg(args, int) /*& ~__gUmask*/;
+			// adapt the permissions as required by POSIX
+		va_end(args);
 	}
 
 	// we always start at the top (there is no notion of a current directory (yet?))
