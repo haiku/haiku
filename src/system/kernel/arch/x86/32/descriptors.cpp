@@ -224,7 +224,7 @@ init_double_fault(int cpuNum)
 	tss->esp = tss->sp0;
 	tss->ds = KERNEL_DATA_SELECTOR;
 	tss->fs = KERNEL_DATA_SELECTOR;
-	tss->gs = KERNEL_DATA_SELECTOR;
+	tss->gs = (KERNEL_TLS_SEGMENT << 3);
 	tss->ldt_seg_selector = 0;
 	tss->io_map_base = sizeof(struct tss);
 
