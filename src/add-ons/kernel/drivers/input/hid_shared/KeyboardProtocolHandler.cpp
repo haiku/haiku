@@ -514,13 +514,14 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 			return B_ERROR;
 		}
 
-		if (result == B_CANCELED || (*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
-			return B_CANCELED;
+		if (result == B_INTERRUPTED)
+			return result;
+		if ((*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
+			return B_FILE_ERROR;
 
-		if (result != B_TIMED_OUT && result != B_INTERRUPTED) {
+		if (result != B_TIMED_OUT && result != B_BUSY) {
 			// we expect timeouts as we do repeat key handling this way,
-			// interrupts happen when other reports come in on the same
-			// endpoint
+			// "busy" happens when other reports come in on the same endpoint
 			TRACE_ALWAYS("error waiting for report: %s\n", strerror(result));
 		}
 

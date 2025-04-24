@@ -147,6 +147,8 @@ MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 				mouse_movement movement;
 				status_t result = _ReadReport(&movement, cookie);
 				if (result == B_INTERRUPTED)
+					return result;
+				if (result == B_BUSY)
 					continue;
 
 				if (!IS_USER_ADDRESS(buffer)
@@ -192,17 +194,18 @@ MouseProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 			return B_DEV_NOT_READY;
 		}
 
-		if (result == B_CANCELED || (*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
-			return B_CANCELED;
+		if (result == B_INTERRUPTED)
+			return result;
+		if ((*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
+			return B_FILE_ERROR;
 
-		if (result != B_INTERRUPTED) {
-			// interrupts happen when other reports come in on the same
-			// input as ours
+		if (result != B_BUSY) {
+			// "busy" happens when other reports come in on the same input as ours
 			TRACE_ALWAYS("error waiting for report: %s\n", strerror(result));
 		}
 
 		// signal that we simply want to try again
-		return B_INTERRUPTED;
+		return B_BUSY;
 	}
 
 	uint32 axisRelativeData[2];

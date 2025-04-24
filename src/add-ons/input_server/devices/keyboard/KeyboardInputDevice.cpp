@@ -297,12 +297,18 @@ KeyboardDevice::_ControlThread()
 
 	while (fActive) {
 		status_t status = ioctl(fFD, KB_READ, &keyInfo, sizeof(keyInfo));
+		if (status < 0)
+			status = errno;
+
+		if (status == B_INTERRUPTED)
+			continue;
 		if (status == B_BUSY) {
 			// probably the debugger is listening to key events, wait and try
 			// again
 			snooze(100000);
 			continue;
-		} else if (status != B_OK) {
+		}
+		if (status != B_OK) {
 			_ControlThreadCleanup();
 			// TOAST!
 			return 0;

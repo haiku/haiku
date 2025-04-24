@@ -489,7 +489,7 @@ HIDParser::SetReport(status_t status, uint8 *report, size_t length)
 		if (fReports[i]->ID() == targetID)
 			fReports[i]->SetReport(status, report, length);
 		else
-			fReports[i]->SetReport(B_INTERRUPTED, NULL, 0);
+			fReports[i]->SetReport(B_BUSY, NULL, 0);
 	}
 }
 

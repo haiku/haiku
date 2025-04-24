@@ -200,6 +200,8 @@ ELANDevice::Control(uint32 op, void *buffer,
 					&read.u.touchpad, read.timeout,
 					zero_report_count);
 				if (result == B_INTERRUPTED)
+					return result;
+				if (result == B_BUSY)
 					continue;
 
 				if (!IS_USER_ADDRESS(buffer)
@@ -268,23 +270,24 @@ ELANDevice::_ReadAndParseReport(touchpad_movement *info, bigtime_t timeout, int 
 			return B_DEV_NOT_READY;
 		}
 
-		if (result != B_INTERRUPTED) {
-			// interrupts happen when other reports come in on the same
-			// input as ours
+		if (result == B_INTERRUPTED)
+			return result;
+
+		if (result != B_BUSY) {
+			// "busy" happens when other reports come in on the same input as ours
 			TRACE_ALWAYS("error waiting for report: %s\n", strerror(result));
 		}
 
-		if (result == B_TIMED_OUT) {
+		if (result == B_TIMED_OUT)
 			return result;
-		}
 
 		// signal that we simply want to try again
-		return B_INTERRUPTED;
+		return B_BUSY;
 	}
 
 	if (fCurrentReportLength == 0 && ++zero_report_count < 3) {
 		atomic_add(&fBusyCount, -1);
-		return B_INTERRUPTED;
+		return B_BUSY;
 	}
 
 	uint8 report_copy[TRANSFER_BUFFER_SIZE];
@@ -507,7 +510,7 @@ ELANDevice::_SetReport(status_t status, uint8 *report, size_t length)
 	if (status == B_OK && length != 0 && report[0] != fReportID) {
 		report = NULL;
 		length = 0;
-		status = B_INTERRUPTED;
+		status = B_BUSY;
 	}
 
 	if (report && length) {

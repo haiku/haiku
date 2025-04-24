@@ -356,12 +356,11 @@ JoystickProtocolHandler::_Update()
 			return B_DEV_NOT_READY;
 		}
 
-		if (result == B_CANCELED)
-			return B_CANCELED;
+		if (result == B_INTERRUPTED)
+			return result;
 
-		if (result != B_INTERRUPTED) {
-			// interrupts happen when other reports come in on the same
-			// input as ours
+		if (result != B_BUSY) {
+			// "busy" happens when other reports come in on the same input as ours
 			TRACE_ALWAYS("error waiting for report: %s\n", strerror(result));
 		}
 

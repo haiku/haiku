@@ -240,8 +240,6 @@ HIDReport::WaitForReport(bigtime_t timeout)
 
 	result = conditionVariableEntry.Wait(B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 	TRACE("waiting for report returned with result: %s\n", strerror(result));
-	if (result == B_INTERRUPTED)
-		return B_CANCELED;
 	if (result != B_OK)
 		return result;
 
