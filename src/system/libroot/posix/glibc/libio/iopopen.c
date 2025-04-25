@@ -43,7 +43,10 @@
 #ifndef __HAIKU__
 #include <kernel-features.h>
 #else
+#include <fcntl.h>
 #define __ASSUME_PIPE2
+#define __pipe2 pipe2
+#define __fcntl fcntl
 #endif
 
 #ifndef _IO_fork
