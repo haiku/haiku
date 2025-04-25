@@ -1085,8 +1085,9 @@
 	\brief Hook method that gets called just before a menu owned by the window is
 	       shown.
 
-	\note This method is not invoked by a message, there is no
-	      \c B_MENUS_BEGINNING flag.
+	It will also be invoked while dispatching shortcuts.
+
+	\note This method is not invoked by a message.
 
 	\since BeOS R3
 */
@@ -1097,8 +1098,9 @@
 	\brief Hook method that gets called just before a menu owned by the window is
 	       hidden.
 
-	\note This method is not invoked by a message, there is no
-	      \c B_MENUS_ENDED flag.
+	It will also be invoked after dispatching shortcuts.
+
+	\note This method is not invoked by a message.
 
 	\since BeOS R3
 */
