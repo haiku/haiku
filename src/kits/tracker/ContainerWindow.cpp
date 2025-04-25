@@ -2132,8 +2132,9 @@ BContainerWindow::SetupNewTemplatesMenu(BMenu* parent, MenuContext context)
 	TemplatesMenu* newTemplatesMenu = (TemplatesMenu*)fNewTemplatesItem->Submenu();
 	ASSERT(newTemplatesMenu != NULL);
 
-	// update templates menu state
-	newTemplatesMenu->UpdateMenuState();
+	// if no known templates, scan for some now
+	if (newTemplatesMenu->CountTemplates() == 0)
+		newTemplatesMenu->UpdateMenuState();
 
 	// no templates found, update "New folder" instead, bail
 	if (newTemplatesMenu->CountTemplates() == 0)
