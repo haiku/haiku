@@ -258,25 +258,26 @@ AddOneAddOn(const Model* model, const char* name, uint32 shortcut,
 	BContainerWindow* window, BMenu* menu)
 {
 	AddOneAddOnParams* params = (AddOneAddOnParams*)context;
+	BObjectList<BMenuItem>* list = primary ? params->primaryList : params->secondaryList;
+	if (list != NULL) {
+		ModelMenuItem* item;
+		try {
+			item = new ModelMenuItem(model, name, NULL, (char)shortcut, modifiers);
+		} catch (...) {
+			return;
+		}
 
-	ModelMenuItem* item;
-	try {
-		item = new ModelMenuItem(model, name, NULL, (char)shortcut, modifiers);
-	} catch (...) {
-		return;
+		BMessage* message = new BMessage(kLoadAddOn);
+		message->AddRef("refs", model->EntryRef());
+		item->SetMessage(message);
+
+		list->AddItem(item);
 	}
 
-	BMessage* message = new BMessage(kLoadAddOn);
-	message->AddRef("refs", model->EntryRef());
-	item->SetMessage(message);
-
-	const entry_ref* addOnRef = model->EntryRef();
-	AddOnMenuGenerate(addOnRef, menu, window);
-
-	if (primary)
-		params->primaryList->AddItem(item);
-	else
-		params->secondaryList->AddItem(item);
+	if (menu != NULL) {
+		const entry_ref* addOnRef = model->EntryRef();
+		AddOnMenuGenerate(addOnRef, menu, window);
+	}
 }
 
 
@@ -2789,23 +2790,13 @@ BContainerWindow::BuildMimeTypeList(BStringList& mimeTypes)
 void
 BContainerWindow::BuildAddOnMenus(BMenuBar* parent)
 {
-	BObjectList<BMenuItem> primaryList;
-	BObjectList<BMenuItem> secondaryList;
-	BStringList mimeTypes(10);
-
 	AddOneAddOnParams params;
-	params.primaryList = &primaryList;
-	params.secondaryList = &secondaryList;
+	params.primaryList = NULL;
+	params.secondaryList = NULL;
+
+	BStringList mimeTypes;
 
 	EachAddOn(AddOneAddOn, &params, mimeTypes, parent);
-
-	primaryList.SortItems(CompareLabels);
-	secondaryList.SortItems(CompareLabels);
-
-	int32 parentCount = parent->CountItems();
-	int32 count = primaryList.CountItems();
-	for (int32 index = 0; index < count; index++)
-		parent->AddItem(primaryList.ItemAt(parentCount + index));
 }
 
 
