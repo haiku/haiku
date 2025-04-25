@@ -162,26 +162,33 @@ ActivateWindowFilter(BMessage*, BHandler** target, BMessageFilter*)
 
 
 static int32
-AddOnMenuGenerate(const entry_ref* addOnRef, BMenu* menu, BContainerWindow* window)
+AddOnMenuGenerate(const struct AddOnInfo* info, BMenu* menu, BContainerWindow* window)
 {
+	if (info->has_populate_menu != B_NO_INIT && info->has_populate_menu != B_OK)
+		return info->has_populate_menu;
+
+	const entry_ref* addOnRef = info->model->EntryRef();
 	BEntry entry(addOnRef);
-	BPath path;
 	status_t result = entry.InitCheck();
 	if (result != B_OK)
 		return result;
 
+	BPath path;
 	result = entry.GetPath(&path);
 	if (result != B_OK)
 		return result;
 
 	image_id addOnImage = load_add_on(path.Path());
-	if (addOnImage < 0)
+	if (addOnImage < 0) {
+		info->has_populate_menu = addOnImage;
 		return addOnImage;
+	}
 
 	void (*populateMenu)(BMessage*, BMenu*, BHandler*);
 	result = get_image_symbol(addOnImage, "populate_menu", 2, (void**)&populateMenu);
 	if (result < 0) {
-		PRINT(("Couldn't find populate_menu\n"));
+		PRINT(("Couldn't find populate_menu in %s\n", info->model->Name()));
+		info->has_populate_menu = result;
 		unload_add_on(addOnImage);
 		return result;
 	}
@@ -193,6 +200,7 @@ AddOnMenuGenerate(const entry_ref* addOnRef, BMenu* menu, BContainerWindow* wind
 	(*populateMenu)(message, menu, window->PoseView());
 
 	unload_add_on(addOnImage);
+	info->has_populate_menu = B_OK;
 	return B_OK;
 }
 
@@ -252,31 +260,29 @@ end:
 
 
 static void
-AddOneAddOn(const Model* model, const char* name, uint32 shortcut,
-	uint32 modifiers, bool primary, void* context,
-	BContainerWindow* window, BMenu* menu)
+AddOneAddOn(void* context, const struct AddOnInfo* info,
+	bool primary, BContainerWindow* window, BMenu* menu)
 {
 	AddOneAddOnParams* params = (AddOneAddOnParams*)context;
 	BObjectList<BMenuItem>* list = primary ? params->primaryList : params->secondaryList;
 	if (list != NULL) {
 		ModelMenuItem* item;
 		try {
-			item = new ModelMenuItem(model, name, NULL, (char)shortcut, modifiers);
+			item = new ModelMenuItem(info->model, info->model->Name(), NULL,
+				info->key, info->modifiers);
 		} catch (...) {
 			return;
 		}
 
 		BMessage* message = new BMessage(kLoadAddOn);
-		message->AddRef("refs", model->EntryRef());
+		message->AddRef("refs", info->model->EntryRef());
 		item->SetMessage(message);
 
 		list->AddItem(item);
 	}
 
-	if (menu != NULL) {
-		const entry_ref* addOnRef = model->EntryRef();
-		AddOnMenuGenerate(addOnRef, menu, window);
-	}
+	if (menu != NULL)
+		AddOnMenuGenerate(info, menu, window);
 }
 
 
@@ -2699,9 +2705,8 @@ BContainerWindow::AddTrashContextMenu(BMenu* menu)
 
 
 void
-BContainerWindow::EachAddOn(void (*eachAddOn)(const Model*, const char*,
-		uint32 shortcut, uint32 modifiers, bool primary, void* context,
-		BContainerWindow* window, BMenu* menu),
+BContainerWindow::EachAddOn(void (*eachAddOn)(void* context,
+		const struct AddOnInfo*, bool primary, BContainerWindow* window, BMenu* menu),
 	void* passThru, BStringList& mimeTypes, BMenu* parent)
 {
 	AutoLock<LockingList<AddOnInfo, true> > lock(fAddOnsList);
@@ -2729,8 +2734,7 @@ BContainerWindow::EachAddOn(void (*eachAddOn)(const Model*, const char*,
 			if (!secondary && !primary)
 				continue;
 		}
-		((eachAddOn)(item->model, item->model->Name(), item->key,
-			item->modifiers, primary, passThru, this, parent));
+		((eachAddOn)(passThru, item, primary, this, parent));
 	}
 }
 

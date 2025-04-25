@@ -86,9 +86,13 @@ struct AddOnInfo {
 	Model*	model;
 	BStringList supportedTypes;
 
+	// shortcut
 	char	key;
 	char	defaultKey;
 	uint32	modifiers;
+
+	// hooks
+	mutable status_t has_populate_menu;
 };
 
 
@@ -281,8 +285,8 @@ protected:
 		const char*);
 
 	void LoadAddOn(BMessage*);
-	void EachAddOn(void (*)(const Model*, const char*, uint32 shortcut,
-			uint32 modifiers, bool primary, void*, BContainerWindow*, BMenu*),
+	void EachAddOn(void (*)(void* context, const struct AddOnInfo*,
+			bool primary, BContainerWindow*, BMenu*),
 		void*, BStringList&, BMenu*);
 
 protected:

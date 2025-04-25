@@ -156,6 +156,8 @@ LoadAddOnDir(BDirectory directory, BDeskWindow* window,
 			struct AddOnInfo* item = new struct AddOnInfo;
 			item->model = model;
 
+			item->has_populate_menu = B_NO_INIT;
+
 			BResources resources(model->ResolveIfLink()->EntryRef());
 			size_t size;
 			char* shortcut = (char*)resources.LoadResource(B_STRING_TYPE,
