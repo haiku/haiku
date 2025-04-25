@@ -36,7 +36,6 @@ All rights reserved.
 #include "ContainerWindow.h"
 
 #include <Alert.h>
-#include <AppFileInfo.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -120,8 +119,8 @@ struct StaggerOneParams {
 BRect BContainerWindow::sNewWindRect;
 static int32 sWindowStaggerBy;
 
-LockingList<AddOnShortcut, true>* BContainerWindow::fAddOnsList
-	= new LockingList<struct AddOnShortcut, true>(10);
+LockingList<AddOnInfo, true>* BContainerWindow::fAddOnsList
+	= new LockingList<struct AddOnInfo, true>(10);
 
 
 namespace BPrivate {
@@ -2705,48 +2704,30 @@ BContainerWindow::EachAddOn(void (*eachAddOn)(const Model*, const char*,
 		BContainerWindow* window, BMenu* menu),
 	void* passThru, BStringList& mimeTypes, BMenu* parent)
 {
-	AutoLock<LockingList<AddOnShortcut, true> > lock(fAddOnsList);
+	AutoLock<LockingList<AddOnInfo, true> > lock(fAddOnsList);
 	if (!lock.IsLocked())
 		return;
 
 	for (int i = fAddOnsList->CountItems() - 1; i >= 0; i--) {
-		struct AddOnShortcut* item = fAddOnsList->ItemAt(i);
+		struct AddOnInfo* item = fAddOnsList->ItemAt(i);
 		bool primary = false;
 
-		if (mimeTypes.CountStrings() > 0) {
-			BFile file(item->model->EntryRef(), B_READ_ONLY);
-			if (file.InitCheck() == B_OK) {
-				BAppFileInfo info(&file);
-				if (info.InitCheck() == B_OK) {
-					bool secondary = true;
-
-					// does this add-on has types set at all?
-					BMessage message;
-					if (info.GetSupportedTypes(&message) == B_OK) {
-						type_code typeCode;
-						int32 count;
-						if (message.GetInfo("types", &typeCode, &count) == B_OK)
-							secondary = false;
-					}
-
-					// check all supported types if it has some set
-					if (!secondary) {
-						for (int32 i = mimeTypes.CountStrings(); !primary && i-- > 0;) {
-							BString type = mimeTypes.StringAt(i);
-							if (info.IsSupportedType(type.String())) {
-								BMimeType mimeType(type.String());
-								if (info.Supports(&mimeType))
-									primary = true;
-								else
-									secondary = true;
-							}
-						}
-					}
-
-					if (!secondary && !primary)
-						continue;
+		if (mimeTypes.CountStrings() > 0 && !item->supportedTypes.IsEmpty()) {
+			// check all supported types if it has some set
+			bool secondary = false;
+			for (int32 i = mimeTypes.CountStrings(); !primary && i-- > 0;) {
+				BMimeType mimeType(mimeTypes.StringAt(i));
+				for (int32 j = 0; j < item->supportedTypes.CountStrings(); j++) {
+					BString supportedType = item->supportedTypes.StringAt(j);
+					if (BMimeType(supportedType).Contains(&mimeType))
+						primary = true;
+					else if (supportedType == B_FILE_MIME_TYPE)
+						secondary = true;
 				}
 			}
+
+			if (!secondary && !primary)
+				continue;
 		}
 		((eachAddOn)(item->model, item->model->Name(), item->key,
 			item->modifiers, primary, passThru, this, parent));

@@ -82,8 +82,10 @@ enum {
 };
 
 
-struct AddOnShortcut {
+struct AddOnInfo {
 	Model*	model;
+	BStringList supportedTypes;
+
 	char	key;
 	char	defaultKey;
 	uint32	modifiers;
@@ -335,7 +337,7 @@ protected:
 
 	BackgroundImage* fBackgroundImage;
 
-	static LockingList<struct AddOnShortcut, true>* fAddOnsList;
+	static LockingList<struct AddOnInfo, true>* fAddOnsList;
 
 private:
 	BRect fSavedZoomRect;

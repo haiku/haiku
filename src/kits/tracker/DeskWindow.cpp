@@ -35,6 +35,7 @@ All rights reserved.
 
 #include "DeskWindow.h"
 
+#include <AppFileInfo.h>
 #include <Catalog.h>
 #include <Debug.h>
 #include <FindDirectory.h>
@@ -77,8 +78,8 @@ const char* kDefaultShortcut = "BEOS:default_shortcut";
 const uint32 kDefaultModifiers = B_OPTION_KEY | B_COMMAND_KEY;
 
 
-static struct AddOnShortcut*
-MatchOne(struct AddOnShortcut* item, void* castToName)
+static struct AddOnInfo*
+MatchOne(struct AddOnInfo* item, void* castToName)
 {
 	if (strcmp(item->model->Name(), (const char*)castToName) == 0) {
 		// found match, bail out
@@ -101,8 +102,8 @@ AddOneShortcut(Model* model, char key, uint32 modifiers, BDeskWindow* window)
 }
 
 
-static struct AddOnShortcut*
-RevertToDefault(struct AddOnShortcut* item, void* castToWindow)
+static struct AddOnInfo*
+RevertToDefault(struct AddOnInfo* item, void* castToWindow)
 {
 	if (item->key != item->defaultKey || item->modifiers != kDefaultModifiers) {
 		BDeskWindow* window = static_cast<BDeskWindow*>(castToWindow);
@@ -118,8 +119,8 @@ RevertToDefault(struct AddOnShortcut* item, void* castToWindow)
 }
 
 
-static struct AddOnShortcut*
-FindElement(struct AddOnShortcut* item, void* castToOther)
+static struct AddOnInfo*
+FindElement(struct AddOnInfo* item, void* castToOther)
 {
 	Model* other = static_cast<Model*>(castToOther);
 	if (*item->model->EntryRef() == *other->EntryRef())
@@ -131,7 +132,7 @@ FindElement(struct AddOnShortcut* item, void* castToOther)
 
 static void
 LoadAddOnDir(BDirectory directory, BDeskWindow* window,
-	LockingList<AddOnShortcut, true>* list)
+	LockingList<AddOnInfo, true>* list)
 {
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) == B_OK) {
@@ -152,7 +153,7 @@ LoadAddOnDir(BDirectory directory, BDeskWindow* window,
 
 		char* name = strdup(model->Name());
 		if (!list->EachElement(MatchOne, name)) {
-			struct AddOnShortcut* item = new struct AddOnShortcut;
+			struct AddOnInfo* item = new struct AddOnInfo;
 			item->model = model;
 
 			BResources resources(model->ResolveIfLink()->EntryRef());
@@ -167,6 +168,23 @@ LoadAddOnDir(BDirectory directory, BDeskWindow* window,
 			item->defaultKey = item->key;
 			item->modifiers = kDefaultModifiers;
 			list->AddItem(item);
+
+			// load supported types (if any)
+			BFile file(item->model->EntryRef(), B_READ_ONLY);
+			if (file.InitCheck() == B_OK) {
+				BAppFileInfo info(&file);
+				if (info.InitCheck() == B_OK) {
+					BMessage types;
+					if (info.GetSupportedTypes(&types) == B_OK) {
+						int32 i = 0;
+						BString supportedType;
+						while (types.FindString("types", i, &supportedType) == B_OK) {
+							item->supportedTypes.Add(supportedType);
+							i++;
+						}
+					}
+				}
+			}
 		}
 		free(name);
 	}
@@ -291,13 +309,13 @@ BDeskWindow::Init(const BMessage*)
 void
 BDeskWindow::InitAddOnsList(bool update)
 {
-	AutoLock<LockingList<AddOnShortcut, true> > lock(fAddOnsList);
+	AutoLock<LockingList<AddOnInfo, true> > lock(fAddOnsList);
 	if (!lock.IsLocked())
 		return;
 
 	if (update) {
 		for (int i = fAddOnsList->CountItems() - 1; i >= 0; i--) {
-			AddOnShortcut* item = fAddOnsList->ItemAt(i);
+			AddOnInfo* item = fAddOnsList->ItemAt(i);
 			RemoveShortcut(item->key, B_OPTION_KEY | B_COMMAND_KEY);
 		}
 		fAddOnsList->MakeEmpty(true);
@@ -318,7 +336,7 @@ BDeskWindow::InitAddOnsList(bool update)
 void
 BDeskWindow::ApplyShortcutPreferences(bool update)
 {
-	AutoLock<LockingList<AddOnShortcut, true> > lock(fAddOnsList);
+	AutoLock<LockingList<AddOnInfo, true> > lock(fAddOnsList);
 	if (!lock.IsLocked())
 		return;
 
@@ -393,7 +411,7 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 			modifiers |= (value != 0 ? B_OPTION_KEY : 0);
 
 		Model model(&entry);
-		AddOnShortcut* item = fAddOnsList->EachElement(FindElement, &model);
+		AddOnInfo* item = fAddOnsList->EachElement(FindElement, &model);
 		if (item != NULL) {
 			if (item->key != '\0')
 				RemoveShortcut(item->key, item->modifiers);
