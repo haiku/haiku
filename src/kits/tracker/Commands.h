@@ -80,6 +80,7 @@ const uint32 kCreateRelativeLink = 'Trln';
 const uint32 kDuplicateSelection = 'Tdsl';
 const uint32 kMoveSelectionToTrash = kMoveToTrash;
 const uint32 kLoadAddOn = 'Tlda';
+const uint32 kRebuildAddOnMenus = 'Trba';
 const uint32 kEmptyTrash = 'Tetr';
 const uint32 kAddPrinter = 'Tadp';
 const uint32 kMakeActivePrinter = 'Tmap';

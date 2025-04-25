@@ -309,6 +309,9 @@ BDeskWindow::InitAddOnsList(bool update)
 	int32 count = addOnPaths.CountStrings();
 	for (int32 i = 0; i < count; i++)
 		LoadAddOnDir(BDirectory(addOnPaths.StringAt(i)), this, fAddOnsList);
+
+	BMessage message(kRebuildAddOnMenus);
+	dynamic_cast<TTracker*>(be_app)->PostMessageToAllContainerWindows(message);
 }
 
 
@@ -400,6 +403,9 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 			AddOneShortcut(&model, item->key, item->modifiers, this);
 		}
 	}
+
+	message = BMessage(kRebuildAddOnMenus);
+	dynamic_cast<TTracker*>(be_app)->PostMessageToAllContainerWindows(message);
 }
 
 

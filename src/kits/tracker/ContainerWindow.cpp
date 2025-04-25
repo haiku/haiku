@@ -414,7 +414,6 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list, uint32 openFlags,
 	fTaskLoop(NULL),
 	fStateNeedsSaving(false),
 	fBackgroundImage(NULL),
-	fLastMenusBeginningTime(0),
 	fSavedZoomRect(0, 0, -1, -1),
 	fSaveStateIsEnabled(true),
 	fIsWatchingPath(false)
@@ -981,11 +980,9 @@ BContainerWindow::SwitchDirectory(const entry_ref* ref)
 		RepopulateMenus();
 	}
 
-	// skip the rest on file panel
 	if (PoseView()->IsFilePanel())
 		return;
 
-	// Tracker add-on menus may have changed
 	RebuildAddOnMenus(fMenuBar);
 
 	TrackerSettings settings;
@@ -1014,7 +1011,6 @@ BContainerWindow::SwitchDirectory(const entry_ref* ref)
 		}
 	}
 
-	// Update window title
 	UpdateTitle();
 }
 
@@ -1437,6 +1433,10 @@ BContainerWindow::MessageReceived(BMessage* message)
 
 		case kLoadAddOn:
 			LoadAddOn(message);
+			break;
+
+		case kRebuildAddOnMenus:
+			RebuildAddOnMenus(fMenuBar);
 			break;
 
 		case kCopySelectionTo:
@@ -1926,14 +1926,6 @@ BContainerWindow::MenusBeginning()
 
 	if (fWindowMenu != NULL)
 		UpdateMenu(fWindowMenu, kWindowMenuContext);
-
-	if (system_time() - fLastMenusBeginningTime > 50000) {
-		// Tracker add-on menus may have changed
-		RebuildAddOnMenus(fMenuBar);
-	}
-
-	// prevent Add-ons from being rebuilt too fast
-	fLastMenusBeginningTime = system_time();
 }
 
 

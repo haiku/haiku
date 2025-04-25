@@ -139,6 +139,7 @@ public:
 
 	void ShowSettingsWindow();
 
+	void PostMessageToAllContainerWindows(BMessage& message) const;
 	BContainerWindow* FindContainerWindow(const node_ref*,
 		int32 number = 0) const;
 	BContainerWindow* FindContainerWindow(const entry_ref*,
