@@ -43,7 +43,7 @@ Format	InitializeParametersPanel		Alusta
 Could not unmount partition	MainWindow		Osion irrottaminen epäonnistui
 Create	CreateParametersPanel		Luo
 File system	PartitionList		Tiedostojärjestelmä
-Unknown (%s)	PartitionList		Tuntomaton (%s)
+Unknown (%s)	PartitionList		Tuntematon (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Valittu osio ei sisällä osiointijärjestelmää.
 End: %s	Support		Loppu: %s
 Partition type	PartitionList		Osiotyyppi

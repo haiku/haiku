@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	1732323378
+1	english	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		將條目移動到資源回收筒
 Close	MediaPlayer-PlaylistWindow		關閉
 Volume of background clips	MediaPlayer-SettingsWindow		背景片段的音量
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		視訊軌道
 Playlist…	MediaPlayer-Main		播放清單…
 <unnamed media>	MediaPlayer-InfoWin		<未命名媒體>
 Save	MediaPlayer-PlaylistWindow		存儲
+25% scale	MediaPlayer-Main		25%尺寸
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		隨機條目
 Cancel	MediaPlayer-NetworkStream		取消
 Nothing to Play	MediaPlayer-Main		無可播放內容
@@ -84,7 +85,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		無法將
 Total duration: %s	MediaPlayer-PlaylistWindow		總持續時間：%s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		移入資源回收筒錯誤
-50% scale	MediaPlayer-Main		50% 規模
+50% scale	MediaPlayer-Main		50%尺寸
 Drop files to play	MediaPlayer-Main		拖放檔案以播放
 Copy Entry	MediaPlayer-CopyPLItemsCmd		複製實體
 Close window after playing audio	MediaPlayer-SettingsWindow		播放音訊後關閉視窗
@@ -124,14 +125,14 @@ Track	Video Track Menu		軌道
 Full screen	MediaPlayer-Main		全螢幕
 OK	MediaPlayer-NetworkStream		確認
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		內部錯誤（鎖定失敗）。儲存播放清單失敗。
-100% scale	MediaPlayer-Main		100%比例
+100% scale	MediaPlayer-Main		100%尺寸
 New player	MediaPlayer-Main		新創播放器
 <nothing to redo>	MediaPlayer-PlaylistWindow		<無可重做內容>
 Bad URL	MediaPlayer-NetworkStream		錯誤的URL
 Save	MediaPlayer-Main		存儲
 Close window after playing video	MediaPlayer-SettingsWindow		播放影片後關閉視窗
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		平滑縮放影片（非覆蓋模式）
-200% scale	MediaPlayer-Main		200% 比例
+200% scale	MediaPlayer-Main		200%尺寸
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		無法開啟檔案'%filename'。\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		您想要播放的檔案都不是媒體檔案。
 Remove Entry	MediaPlayer-RemovePLItemsCmd		消除條目
@@ -146,13 +147,13 @@ Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		某些�
 <nothing to undo>	MediaPlayer-PlaylistWindow		<無可撤銷內容>
 Save as…	MediaPlayer-PlaylistWindow		存儲為…
 Error: 	MediaPlayer-RemovePLItemsCmd		錯誤：
-300% scale	MediaPlayer-Main		300% 比例
+300% scale	MediaPlayer-Main		300%尺寸
 Open	MediaPlayer-Main		開啓
 ask every time	MediaPlayer-SettingsWindow		每次都要諮詢
 (not supported)	MediaPlayer-InfoWin		（不支持）
 Randomize	MediaPlayer-PlaylistWindow		隨機化
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Off	Subtitles menu		關
-400% scale	MediaPlayer-Main		400% 比例
+400% scale	MediaPlayer-Main		400%尺寸
 h	MediaPlayer-InfoWin	Hours	時
 OK	MediaPlayer-PlaylistWindow		確認

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1732323378
+1	finnish	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
 Close	MediaPlayer-PlaylistWindow		Sulje
 Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Videokappale
 Playlist…	MediaPlayer-Main		Soittoluettelo...
 <unnamed media>	MediaPlayer-InfoWin		<nimeämätön media>
 Save	MediaPlayer-PlaylistWindow		Tallenna
+25% scale	MediaPlayer-Main		25% skaala
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Satunnaista kappaleita
 Cancel	MediaPlayer-NetworkStream		Peru
 Nothing to Play	MediaPlayer-Main		Ei mitään soitettavaa
