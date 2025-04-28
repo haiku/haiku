@@ -153,7 +153,12 @@ ReadBatteryInfo(battery_driver_cookie* cookie,
 			goto exit;
 	}
 
+	if (buffer.pointer == NULL) {
+		status = B_ERROR;
+		goto exit;
+	}
 	object = (acpi_object_type*)buffer.pointer;
+
 	TRACE("ReadBatteryInfo %d %u\n", object->object_type,
 		object->package.count);
 	if (object->object_type != ACPI_TYPE_PACKAGE
