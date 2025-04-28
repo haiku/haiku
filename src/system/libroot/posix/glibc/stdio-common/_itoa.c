@@ -1,6 +1,5 @@
 /* Internal function for converting integers to ASCII.
-   Copyright (C) 1994, 1995, 1996, 1999, 2000, 2002, 2003, 2007
-   Free Software Foundation, Inc.
+   Copyright (C) 1994-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Torbjorn Granlund <tege@matematik.su.se>
    and Ulrich Drepper <drepper@gnu.org>.
@@ -16,16 +15,16 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <gmp-mparam.h>
 #include <gmp.h>
+#include <limits.h>
 #include <stdlib/gmp-impl.h>
 #include <stdlib/longlong.h>
 
-#include "_itoa.h"
+#include <_itoa.h>
 
 
 /* Canonize environment.  For some architectures not all values might
@@ -78,10 +77,12 @@ struct base_table_t
 #endif
 
 
+/* We do not compile _itoa if we always can use _itoa_word.  */
+#if _ITOA_NEEDED
 /* Local variables.  */
 const struct base_table_t _itoa_base_table[] attribute_hidden =
 {
-#if BITS_PER_MP_LIMB == 64
+# if BITS_PER_MP_LIMB == 64
   /*  2 */ {SEL1(0ull) 1, 1},
   /*  3 */ {SEL1(0xaaaaaaaaaaaaaaabull) 0, 1},
   /*  4 */ {SEL1(0ull) 1, 2},
@@ -117,8 +118,8 @@ const struct base_table_t _itoa_base_table[] attribute_hidden =
   /* 34 */ {SEL1(0xf0f0f0f0f0f0f0f1ull) 0, 5},
   /* 35 */ {SEL1(0xea0ea0ea0ea0ea0full) 0, 5},
   /* 36 */ {SEL1(0xe38e38e38e38e38full) 0, 5}
-#endif
-#if BITS_PER_MP_LIMB == 32
+# endif
+# if BITS_PER_MP_LIMB == 32
   /*  2 */ {SEL1(0ul) 1, 1, {0, 31, 0x80000000ul SEL2(0xfffffffful)}},
   /*  3 */ {SEL1(0xaaaaaaabul) 0, 1, {0, 20, 0xcfd41b91ul SEL2(0x3b563c24ul)}},
   /*  4 */ {SEL1(0ul) 1, 2, {1, 15, 0x40000000ul SEL2(0xfffffffful)}},
@@ -154,17 +155,41 @@ const struct base_table_t _itoa_base_table[] attribute_hidden =
   /* 34 */ {SEL1(0xf0f0f0f1ul) 0, 5, {1, 6, 0x5c13d840ul SEL2(0x63dfc229ul)}},
   /* 35 */ {SEL1(0xd41d41d5ul) 1, 6, {1, 6, 0x6d91b519ul SEL2(0x2b0fee30ul)}},
   /* 36 */ {SEL1(0x38e38e39ul) 0, 3, {0, 6, 0x81bf1000ul SEL2(0xf91bd1b6ul)}}
-#endif
+# endif
 };
+#endif
 
-/* Lower-case digits.  */
-extern const char _itoa_lower_digits[];
-extern const char _itoa_lower_digits_internal[] attribute_hidden;
-/* Upper-case digits.  */
-extern const char _itoa_upper_digits[];
-extern const char _itoa_upper_digits_internal[] attribute_hidden;
+char *
+_itoa_word (_ITOA_WORD_TYPE value, char *buflim,
+	    unsigned int base, int upper_case)
+{
+  const char *digits = (upper_case
+			? _itoa_upper_digits
+			: _itoa_lower_digits);
+
+  switch (base)
+    {
+#define SPECIAL(Base)							      \
+    case Base:								      \
+      do								      \
+	*--buflim = digits[value % Base];				      \
+      while ((value /= Base) != 0);					      \
+      break
+
+      SPECIAL (10);
+      SPECIAL (16);
+      SPECIAL (8);
+    default:
+      do
+	*--buflim = digits[value % base];
+      while ((value /= base) != 0);
+    }
+  return buflim;
+}
+#undef SPECIAL
 
 
+#if _ITOA_NEEDED
 char *
 _itoa (value, buflim, base, upper_case)
      unsigned long long int value;
@@ -173,15 +198,15 @@ _itoa (value, buflim, base, upper_case)
      int upper_case;
 {
   const char *digits = (upper_case
-			? INTUSE(_itoa_upper_digits)
-			: INTUSE(_itoa_lower_digits));
+			? _itoa_upper_digits
+			: _itoa_lower_digits);
   const struct base_table_t *brec = &_itoa_base_table[base - 2];
 
   switch (base)
     {
-#define RUN_2N(BITS) \
+# define RUN_2N(BITS) \
       do								      \
-        {								      \
+	{								      \
 	  /* `unsigned long long int' always has 64 bits.  */		      \
 	  mp_limb_t work_hi = value >> (64 - BITS_PER_MP_LIMB);		      \
 									      \
@@ -234,12 +259,13 @@ _itoa (value, buflim, base, upper_case)
     default:
       {
 	char *bufend = buflim;
-#if BITS_PER_MP_LIMB == 64
+# if BITS_PER_MP_LIMB == 64
 	mp_limb_t base_multiplier = brec->base_multiplier;
 	if (brec->flag)
 	  while (value != 0)
 	    {
-	      mp_limb_t quo, rem, x, dummy;
+	      mp_limb_t quo, rem, x;
+	      mp_limb_t dummy __attribute__ ((unused));
 
 	      umul_ppmm (x, dummy, value, base_multiplier);
 	      quo = (x + ((value - x) >> 1)) >> (brec->post_shift - 1);
@@ -250,7 +276,8 @@ _itoa (value, buflim, base, upper_case)
 	else
 	  while (value != 0)
 	    {
-	      mp_limb_t quo, rem, x, dummy;
+	      mp_limb_t quo, rem, x;
+	      mp_limb_t dummy __attribute__ ((unused));
 
 	      umul_ppmm (x, dummy, value, base_multiplier);
 	      quo = x >> brec->post_shift;
@@ -258,8 +285,8 @@ _itoa (value, buflim, base, upper_case)
 	      *--buflim = digits[rem];
 	      value = quo;
 	    }
-#endif
-#if BITS_PER_MP_LIMB == 32
+# endif
+# if BITS_PER_MP_LIMB == 32
 	mp_limb_t t[3];
 	int n;
 
@@ -267,11 +294,11 @@ _itoa (value, buflim, base, upper_case)
 	   Optimize for frequent cases of 32 bit numbers.  */
 	if ((mp_limb_t) (value >> 32) >= 1)
 	  {
-#if UDIV_TIME > 2 * UMUL_TIME || UDIV_NEEDS_NORMALIZATION
+#  if UDIV_TIME > 2 * UMUL_TIME || UDIV_NEEDS_NORMALIZATION
 	    int big_normalization_steps = brec->big.normalization_steps;
 	    mp_limb_t big_base_norm
 	      = brec->big.base << big_normalization_steps;
-#endif
+#  endif
 	    if ((mp_limb_t) (value >> 32) >= brec->big.base)
 	      {
 		mp_limb_t x1hi, x1lo, r;
@@ -280,7 +307,7 @@ _itoa (value, buflim, base, upper_case)
 		   always be very small.  It might be faster just to
 		   subtract in a tight loop.  */
 
-#if UDIV_TIME > 2 * UMUL_TIME
+#  if UDIV_TIME > 2 * UMUL_TIME
 		mp_limb_t x, xh, xl;
 
 		if (big_normalization_steps == 0)
@@ -305,7 +332,7 @@ _itoa (value, buflim, base, upper_case)
 		udiv_qrnnd_preinv (t[0], x, xh, xl, big_base_norm,
 				   brec->big.base_ninv);
 		t[1] = x >> big_normalization_steps;
-#elif UDIV_NEEDS_NORMALIZATION
+#  elif UDIV_NEEDS_NORMALIZATION
 		mp_limb_t x, xh, xl;
 
 		if (big_normalization_steps == 0)
@@ -327,17 +354,17 @@ _itoa (value, buflim, base, upper_case)
 		xl = x1lo << big_normalization_steps;
 		udiv_qrnnd (t[0], x, xh, xl, big_base_norm);
 		t[1] = x >> big_normalization_steps;
-#else
+#  else
 		udiv_qrnnd (x1hi, r, 0, (mp_limb_t) (value >> 32),
 			    brec->big.base);
 		udiv_qrnnd (x1lo, t[2], r, (mp_limb_t) value, brec->big.base);
 		udiv_qrnnd (t[0], t[1], x1hi, x1lo, brec->big.base);
-#endif
+#  endif
 		n = 3;
 	      }
 	    else
 	      {
-#if (UDIV_TIME > 2 * UMUL_TIME)
+#  if UDIV_TIME > 2 * UMUL_TIME
 		mp_limb_t x;
 
 		value <<= brec->big.normalization_steps;
@@ -345,17 +372,17 @@ _itoa (value, buflim, base, upper_case)
 				   (mp_limb_t) value, big_base_norm,
 				   brec->big.base_ninv);
 		t[1] = x >> brec->big.normalization_steps;
-#elif UDIV_NEEDS_NORMALIZATION
+#  elif UDIV_NEEDS_NORMALIZATION
 		mp_limb_t x;
 
 		value <<= big_normalization_steps;
 		udiv_qrnnd (t[0], x, (mp_limb_t) (value >> 32),
 			    (mp_limb_t) value, big_base_norm);
 		t[1] = x >> big_normalization_steps;
-#else
+#  else
 		udiv_qrnnd (t[0], t[1], (mp_limb_t) (value >> 32),
 			    (mp_limb_t) value, brec->big.base);
-#endif
+#  endif
 		n = 2;
 	      }
 	  }
@@ -371,12 +398,13 @@ _itoa (value, buflim, base, upper_case)
 	    mp_limb_t ti = t[--n];
 	    int ndig_for_this_limb = 0;
 
-#if UDIV_TIME > 2 * UMUL_TIME
+#  if UDIV_TIME > 2 * UMUL_TIME
 	    mp_limb_t base_multiplier = brec->base_multiplier;
 	    if (brec->flag)
 	      while (ti != 0)
 		{
-		  mp_limb_t quo, rem, x, dummy;
+		  mp_limb_t quo, rem, x;
+		  mp_limb_t dummy __attribute__ ((unused));
 
 		  umul_ppmm (x, dummy, ti, base_multiplier);
 		  quo = (x + ((ti - x) >> 1)) >> (brec->post_shift - 1);
@@ -388,7 +416,8 @@ _itoa (value, buflim, base, upper_case)
 	    else
 	      while (ti != 0)
 		{
-		  mp_limb_t quo, rem, x, dummy;
+		  mp_limb_t quo, rem, x;
+		  mp_limb_t dummy __attribute__ ((unused));
 
 		  umul_ppmm (x, dummy, ti, base_multiplier);
 		  quo = x >> brec->post_shift;
@@ -397,7 +426,7 @@ _itoa (value, buflim, base, upper_case)
 		  ti = quo;
 		  ++ndig_for_this_limb;
 		}
-#else
+#  else
 	    while (ti != 0)
 	      {
 		mp_limb_t quo, rem;
@@ -408,7 +437,7 @@ _itoa (value, buflim, base, upper_case)
 		ti = quo;
 		++ndig_for_this_limb;
 	      }
-#endif
+#  endif
 	    /* If this wasn't the most significant word, pad with zeros.  */
 	    if (n != 0)
 	      while (ndig_for_this_limb < brec->big.ndigits)
@@ -418,7 +447,7 @@ _itoa (value, buflim, base, upper_case)
 		}
 	  }
 	while (n != 0);
-#endif
+# endif
 	if (buflim == bufend)
 	  *--buflim = '0';
       }
@@ -427,3 +456,27 @@ _itoa (value, buflim, base, upper_case)
 
   return buflim;
 }
+#endif
+
+char *
+_fitoa_word (_ITOA_WORD_TYPE value, char *buf, unsigned int base,
+	     int upper_case)
+{
+  char tmpbuf[sizeof (value) * 4];	      /* Worst case length: base 2.  */
+  char *cp = _itoa_word (value, tmpbuf + sizeof (value) * 4, base, upper_case);
+  while (cp < tmpbuf + sizeof (value) * 4)
+    *buf++ = *cp++;
+  return buf;
+}
+
+#if _ITOA_NEEDED
+char *
+_fitoa (unsigned long long value, char *buf, unsigned int base, int upper_case)
+{
+  char tmpbuf[sizeof (value) * 4];	      /* Worst case length: base 2.  */
+  char *cp = _itoa (value, tmpbuf + sizeof (value) * 4, base, upper_case);
+  while (cp < tmpbuf + sizeof (value) * 4)
+    *buf++ = *cp++;
+  return buf;
+}
+#endif

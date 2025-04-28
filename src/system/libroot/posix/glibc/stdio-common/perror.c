@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-1993,1997,1998,2000-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,40 +12,73 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
-*/
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
-
+#include <stdio_private.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <wchar.h>
+#include "libioP.h"
 
-
-/**	Print a line on stderr consisting of the text in \a s, a colon,
- *	a space, a message describing the meaning of the contents of
- *	`errno' and a newline.
- *	If \a s is NULL or "", the colon and space are omitted.
- */
-
-void
-perror(const char *s)
+static void
+perror_internal (FILE *fp, const char *s, int errnum)
 {
-	const char *colon;
-	char buffer[1024];
+  char buf[1024];
+  const char *colon;
+  const char *errstring;
 
-	// ToDo: we should not change the orientation of the stream
-	// (wide char support is currently disabled, so this doesn't matter yet)
+  if (s == NULL || *s == '\0')
+    s = colon = "";
+  else
+    colon = ": ";
 
-	if (s == NULL || *s == '\0')
-		s = colon = "";
-	else
-		colon = ": ";
+  errstring = __strerror_r (errnum, buf, sizeof buf);
 
-	if (strerror_r(errno, buffer, sizeof(buffer)) != 0)
-		snprintf(buffer, sizeof(buffer), "Unknown error %d", errno);
-
-	fprintf(stderr, "%s%s%s\n", s, colon, buffer);
+  (void) __fxprintf (fp, "%s%s%s\n", s, colon, errstring);
 }
 
+
+/* Print a line on stderr consisting of the text in S, a colon, a space,
+   a message describing the meaning of the contents of `errno' and a newline.
+   If S is NULL or "", the colon and space are omitted.  */
+void
+perror (const char *s)
+{
+  int errnum = errno;
+  FILE *fp;
+  int fd = -1;
+
+
+  /* The standard says that 'perror' must not change the orientation
+     of the stream.  What is supposed to happen when the stream isn't
+     oriented yet?  In this case we'll create a new stream which is
+     using the same underlying file descriptor.  */
+  if (__builtin_expect (_IO_fwide (stderr, 0) != 0, 1)
+      || (fd = fileno (stderr)) == -1
+      || (fd = dup (fd)) == -1
+      || (fp = fdopen (fd, "w+")) == NULL)
+    {
+      if (__glibc_unlikely (fd != -1))
+	__close (fd);
+
+      /* Use standard error as is.  */
+      perror_internal (stderr, s, errnum);
+    }
+  else
+    {
+      /* We don't have to do any special hacks regarding the file
+	 position.  Since the stderr stream wasn't used so far we just
+	 write to the descriptor.  */
+      perror_internal (fp, s, errnum);
+
+      if (_IO_ferror_unlocked (fp))
+	stderr->_flags |= _IO_ERR_SEEN;
+
+      /* Close the stream.  */
+      fclose (fp);
+    }
+}
+libc_hidden_def (perror)

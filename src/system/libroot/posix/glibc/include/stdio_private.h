@@ -6,6 +6,8 @@
 
 /* Now define the internal interfaces.  */
 extern int __fcloseall (void);
+extern int __fxprintf (FILE *__fp, const char *__fmt, ...)
+     __attribute__ ((__format__ (__printf__, 2, 3)));
 extern int __snprintf (char *__restrict __s, size_t __maxlen,
 		       __const char *__restrict __format, ...)
      __attribute__ ((__format__ (__printf__, 3, 4)));
@@ -34,29 +36,19 @@ extern int __printf_fphex (FILE *fp,
 	const struct printf_info *info,
 	const void *const *args);
 
-/* Prototypes for compatibility functions.  */
-extern FILE *__new_tmpfile (void);
-extern FILE *__old_tmpfile (void);
-
-
-
-#  define __need_size_t
-#  include <stddef.h>
-/* Generate a unique file name (and possibly open it).  */
-extern int __path_search (char *__tmpl, size_t __tmpl_len,
-			  __const char *__dir, __const char *__pfx,
-			  int __try_tempdir);
-
-extern int __gen_tempname (char *__tmpl, int __kind);
-/* The __kind argument to __gen_tempname may be one of: */
-#  define __GT_FILE	0	/* create a file */
-#  define __GT_BIGFILE	1	/* create a file, using open64 */
-#  define __GT_DIR	2	/* create a directory */
-#  define __GT_NOCREATE	3	/* just find a name not currently in use */
-
 /* Print out MESSAGE on the error output and abort.  */
-extern void __libc_fatal (__const char *__message)
-     __attribute__ ((__noreturn__));
+static __inline void
+__libc_fatal (__const char *__message)
+{
+	debugger(__message);
+	abort();
+}
+
+static __inline int
+__readonly_area (const void *ptr, size_t size)
+{
+	return 0;
+}
 
 /* Acquire ownership of STREAM.  */
 extern void __flockfile (FILE *__stream);

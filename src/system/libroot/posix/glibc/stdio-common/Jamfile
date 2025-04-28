@@ -26,6 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			asprintf.c
 			dprintf.c
 			fprintf.c
+			fxprintf.c
 			fscanf.c
 			getline.c
 			getw.c
@@ -34,6 +35,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			itowa-digits.c
 			perror.c
 			printf-prs.c
+			printf-parsemb.c
+			printf-parsewc.c
 			printf.c
 			printf_fp.c
 			printf_fphex.c

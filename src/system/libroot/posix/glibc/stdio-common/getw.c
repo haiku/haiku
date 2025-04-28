@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1997, 1998, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,22 +12,22 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <stdio.h>
 
+#include <libio/iolibio.h>
+#define fread(p, m, n, s) _IO_fread (p, m, n, s)
 
-/** Read a word (int) from STREAM. */
-
+/* Read a word (int) from STREAM.  */
 int
-getw(FILE *stream)
+getw (FILE *stream)
 {
-	int w;
+  int w;
 
-	if (fread((void *)&w, sizeof(w), 1, stream) != 1)
-		return EOF;
-
-	return w;
+  /* Is there a better way?  */
+  if (fread ((void *) &w, sizeof (w), 1, stream) != 1)
+    return EOF;
+  return w;
 }

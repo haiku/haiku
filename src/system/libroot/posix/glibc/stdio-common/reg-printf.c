@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1996, 1997, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,27 +12,76 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
-*/
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
-
-#include <stdio_private.h>
 #include <errno.h>
 #include <limits.h>
 #include <printf.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <bits/libc-lock.h>
+
+#ifdef __HAIKU__
+#define __libc_lock_define_initialized __libc_lock_define_initialized_recursive
+#define __libc_lock_lock __libc_lock_lock_recursive
+#define __libc_lock_unlock __libc_lock_unlock_recursive
+#endif
 
 
 /* Array of functions indexed by format character.  */
-libc_freeres_ptr (printf_arginfo_function **__printf_arginfo_table)
+libc_freeres_ptr (printf_arginfo_size_function **__printf_arginfo_table)
   attribute_hidden;
 printf_function **__printf_function_table attribute_hidden;
 
-int __register_printf_function __P ((int, printf_function,
-                                     printf_arginfo_function));
+__libc_lock_define_initialized (static, lock)
+
+int __register_printf_specifier (int, printf_function,
+				 printf_arginfo_size_function);
+int __register_printf_function (int, printf_function,
+				printf_arginfo_function);
+
+
+/* Register FUNC to be called to format SPEC specifiers.  */
+int
+__register_printf_specifier (spec, converter, arginfo)
+     int spec;
+     printf_function converter;
+     printf_arginfo_size_function arginfo;
+{
+  int result = 0;
+  if (spec < 0 || spec > (int) UCHAR_MAX)
+    {
+      __set_errno (EINVAL);
+      return -1;
+    }
+
+  __libc_lock_lock (lock);
+
+  if (__printf_function_table == NULL)
+    {
+      __printf_arginfo_table = (printf_arginfo_size_function **)
+	calloc (UCHAR_MAX + 1, sizeof (void *) * 2);
+      if (__printf_arginfo_table == NULL)
+	{
+	  result = -1;
+	  goto out;
+	}
+
+      __printf_function_table = (printf_function **)
+	(__printf_arginfo_table + UCHAR_MAX + 1);
+    }
+
+  __printf_function_table[spec] = converter;
+  __printf_arginfo_table[spec] = arginfo;
+
+ out:
+  __libc_lock_unlock (lock);
+
+  return result;
+}
+weak_alias (__register_printf_specifier, register_printf_specifier)
+
 
 /* Register FUNC to be called to format SPEC specifiers.  */
 int
@@ -41,25 +90,7 @@ __register_printf_function (spec, converter, arginfo)
      printf_function converter;
      printf_arginfo_function arginfo;
 {
-  if (spec < 0 || spec > (int) UCHAR_MAX)
-    {
-      __set_errno (EINVAL);
-      return -1;
-    }
-
-  if (__printf_function_table == NULL)
-    {
-      __printf_arginfo_table = (printf_arginfo_function **)
-	malloc ((UCHAR_MAX + 1) * sizeof (void *) * 2);
-      if (__printf_arginfo_table == NULL)
-	return -1;
-      __printf_function_table = (printf_function **)
-	(__printf_arginfo_table + UCHAR_MAX + 1);
-    }
-
-  __printf_function_table[spec] = converter;
-  __printf_arginfo_table[spec] = arginfo;
-
-  return 0;
+  return __register_printf_specifier (spec, converter,
+				      (printf_arginfo_size_function*) arginfo);
 }
 weak_alias (__register_printf_function, register_printf_function)

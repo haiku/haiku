@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1995, 1997, 1998 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,19 +12,13 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <stdarg.h>
 #include <stdio.h>
-
-#ifdef USE_IN_LIBIO
-# include <libio/libioP.h>
-# define __vsnprintf(s, l, f, a) _IO_vsnprintf (s, l, f, a)
-#endif
-
-int __snprintf(char *s, size_t maxlen, const char *format, ...);
+#include <libioP.h>
+#define __vsnprintf(s, l, f, a) _IO_vsnprintf (s, l, f, a)
 
 /* Write formatted output into S, according to the format
    string FORMAT, writing no more than MAXLEN characters.  */

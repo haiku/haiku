@@ -1,4 +1,4 @@
-/* Copyright (C) 1991,1995,1996,1998,2002,2003 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,17 +12,13 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <stdarg.h>
 #include <stdio.h>
-
-#ifdef USE_IN_LIBIO
-# include <libio/iolibio.h>
-# define __vsscanf(s, f, a) _IO_vsscanf (s, f, a)
-#endif
+#include <libioP.h>
+#define __vsscanf(s, f, a) _IO_vsscanf (s, f, a)
 
 /* Read formatted input from S, according to the format string FORMAT.  */
 /* VARARGS2 */
@@ -38,10 +34,6 @@ sscanf (const char *s, const char *format, ...)
 
   return done;
 }
-libc_hidden_def (sscanf)
-
-#ifdef USE_IN_LIBIO
-# undef _IO_sscanf
+#undef _IO_sscanf
 /* This is for libg++.  */
 strong_alias (sscanf, _IO_sscanf)
-#endif

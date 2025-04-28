@@ -1,5 +1,6 @@
 /* Floating point output for `printf'.
-   Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
+
    This file is part of the GNU C Library.
    Written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
 
@@ -14,23 +15,19 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 /* The gmp headers need some configuration frobs.  */
 #define HAVE_ALLOCA 1
 
-#ifdef USE_IN_LIBIO
-#  include <libioP.h>
-#else
-#  include <stdio.h>
-#endif
+#include <libioP.h>
 #include <alloca.h>
 #include <ctype.h>
 #include <float.h>
 #include <gmp-mparam.h>
 #include <gmp.h>
+#include <ieee754.h>
 #include <stdlib/gmp-impl.h>
 #include <stdlib/longlong.h>
 #include <stdlib/fpioconst.h>
@@ -42,6 +39,16 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <stdbool.h>
+#include <rounding-mode.h>
+
+#ifdef COMPILE_WPRINTF
+# define CHAR_T        wchar_t
+#else
+# define CHAR_T        char
+#endif
+
+#include "_i18n_number.h"
 
 #ifndef NDEBUG
 # define NDEBUG			/* Undefine this for debugging assertions.  */
@@ -50,41 +57,43 @@
 
 /* This defines make it possible to use the same code for GNU C library and
    the GNU I/O library.	 */
-#ifdef USE_IN_LIBIO
-# define PUT(f, s, n) _IO_sputn (f, s, n)
-# define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : _IO_padn (f, c, n))
+#define PUT(f, s, n) _IO_sputn (f, s, n)
+#define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : _IO_padn (f, c, n))
 /* We use this file GNU C library and GNU I/O library.	So make
    names equal.	 */
-# undef putc
-# define putc(c, f) (wide \
-		      ? (int)_IO_putwc_unlocked (c, f) : _IO_putc_unlocked (c, f))
-# define size_t     _IO_size_t
-# define FILE	     _IO_FILE
-#else	/* ! USE_IN_LIBIO */
-# define PUT(f, s, n) fwrite (s, 1, n, f)
-# define PAD(f, c, n) __printf_pad (f, c, n)
-ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
-#endif	/* USE_IN_LIBIO */
-
+#undef putc
+#define putc(c, f) (wide \
+		    ? (int)_IO_putwc_unlocked (c, f) : _IO_putc_unlocked (c, f))
+#define size_t     _IO_size_t
+#define FILE	     _IO_FILE
+
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
   do									      \
     {									      \
-      register const int outc = (ch);					      \
+      const int outc = (ch);						      \
       if (putc (outc, fp) == EOF)					      \
-	return -1;							      \
+	{								      \
+	  if (buffer_malloced)						      \
+	    free (wbuffer);						      \
+	  return -1;							      \
+	}								      \
       ++done;								      \
     } while (0)
 
 #define PRINT(ptr, wptr, len)						      \
   do									      \
     {									      \
-      register size_t outlen = (len);					      \
+      size_t outlen = (len);						      \
       if (len > 20)							      \
 	{								      \
 	  if (PUT (fp, wide ? (const char *) wptr : ptr, outlen) != outlen)   \
-	    return -1;							      \
+	    {								      \
+	      if (buffer_malloced)					      \
+		free (wbuffer);						      \
+	      return -1;						      \
+	    }								      \
 	  ptr += outlen;						      \
 	  done += outlen;						      \
 	}								      \
@@ -103,11 +112,15 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
   do									      \
     {									      \
       if (PAD (fp, ch, len) != len)					      \
-	return -1;							      \
+	{								      \
+	  if (buffer_malloced)						      \
+	    free (wbuffer);						      \
+	  return -1;							      \
+	}								      \
       done += len;							      \
     }									      \
   while (0)
-
+
 /* We use the GNU MP library to handle large numbers.
 
    An MP variable occupies a varying number of entries in its array.  We keep
@@ -138,8 +151,8 @@ static wchar_t *group_number (wchar_t *buf, wchar_t *bufend,
 
 int
 __printf_fp (FILE *fp,
-	     const struct printf_info *info,
-	     const void *const *args)
+	      const struct printf_info *info,
+	      const void *const *args)
 {
   /* The floating-point value to output.  */
   union
@@ -183,10 +196,7 @@ __printf_fp (FILE *fp,
   /* Temporary bignum value.  */
   MPN_VAR(tmp);
 
-  /* Digit which is result of last hack_digit() call.  */
-  wchar_t digit;
-
-  /* The type of output format that will be used: 'e'/'E' or 'f'/'F'.  */
+  /* The type of output format that will be used: 'e'/'E' or 'f'.  */
   int type;
 
   /* Counter for number of written characters.	*/
@@ -198,21 +208,23 @@ __printf_fp (FILE *fp,
   /* Nonzero if this is output on a wide character stream.  */
   int wide = info->wide;
 
-  wchar_t hack_digit_ret;
-  int hack_digit_callee;
+  /* Buffer in which we produce the output.  */
+  wchar_t *wbuffer = NULL;
+  /* Flag whether wbuffer is malloc'ed or not.  */
+  int buffer_malloced = 0;
 
-  while (0)
+  auto wchar_t hack_digit (void);
+
+  wchar_t hack_digit (void)
     {
       mp_limb_t hi;
 
-hack_digit:
-      if (expsign != 0 && _tolower (type) == 'f' && exponent-- > 0)
+      if (expsign != 0 && type == 'f' && exponent-- > 0)
 	hi = 0;
       else if (scalesize == 0)
 	{
 	  hi = frac[fracsize - 1];
-	  cy = __mpn_mul_1 (frac, frac, fracsize - 1, 10);
-	  frac[fracsize - 1] = cy;
+	  frac[fracsize - 1] = __mpn_mul_1 (frac, frac, fracsize - 1, 10);
 	}
       else
 	{
@@ -232,25 +244,18 @@ hack_digit:
 		  /* We're not prepared for an mpn variable with zero
 		     limbs.  */
 		  fracsize = 1;
-		  hack_digit_ret = L'0' + hi;
-		  goto hack_digit_end;
+		  return L'0' + hi;
 		}
 	    }
 
-	  cy = __mpn_mul_1 (frac, frac, fracsize, 10);
-	  if (cy != 0)
-	    frac[fracsize++] = cy;
+	  {
+	  mp_limb_t _cy = __mpn_mul_1 (frac, frac, fracsize, 10);
+	  if (_cy != 0)
+	    frac[fracsize++] = _cy;
+	  }
 	}
 
-      hack_digit_ret = L'0' + hi;
-hack_digit_end:
-      switch (hack_digit_callee)
-        {
-	  case 1: goto hack_digit_callee1;
-	  case 2: goto hack_digit_callee2;
-	  case 3: goto hack_digit_callee3;
-	  default: abort();
-	}
+      return L'0' + hi;
     }
 
 
@@ -323,11 +328,13 @@ hack_digit_end:
 #ifndef __NO_LONG_DOUBLE_MATH
   if (info->is_long_double && sizeof (long double) > sizeof (double))
     {
+      int res;
       fpnum.ldbl = *(const long double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
       if (isnan (fpnum.ldbl))
 	{
+	  is_neg = signbit (fpnum.ldbl);
 	  if (isupper (info->spec))
 	    {
 	      special = "NAN";
@@ -338,10 +345,10 @@ hack_digit_end:
 		special = "nan";
 		wspecial = L"nan";
 	      }
-	  is_neg = 0;
 	}
-      else if (isinf (fpnum.ldbl))
+      else if ((res = isinf (fpnum.ldbl)))
 	{
+	  is_neg = res < 0;
 	  if (isupper (info->spec))
 	    {
 	      special = "INF";
@@ -352,7 +359,6 @@ hack_digit_end:
 	      special = "inf";
 	      wspecial = L"inf";
 	    }
-	  is_neg = fpnum.ldbl < 0;
 	}
       else
 	{
@@ -367,11 +373,14 @@ hack_digit_end:
   else
 #endif	/* no long double */
     {
+      int res;
       fpnum.dbl = *(const double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
       if (isnan (fpnum.dbl))
 	{
+	  union ieee754_double u = { .d = fpnum.dbl };
+	  is_neg = u.ieee.negative != 0;
 	  if (isupper (info->spec))
 	    {
 	      special = "NAN";
@@ -382,10 +391,10 @@ hack_digit_end:
 	      special = "nan";
 	      wspecial = L"nan";
 	    }
-	  is_neg = 0;
 	}
-      else if (isinf (fpnum.dbl))
+      else if ((res = isinf (fpnum.dbl)))
 	{
+	  is_neg = res < 0;
 	  if (isupper (info->spec))
 	    {
 	      special = "INF";
@@ -396,7 +405,6 @@ hack_digit_end:
 	      special = "inf";
 	      wspecial = L"inf";
 	    }
-	  is_neg = fpnum.dbl < 0;
 	}
       else
 	{
@@ -441,7 +449,9 @@ hack_digit_end:
      would be really big it could lead to memory problems.  */
   {
     mp_size_t bignum_size = ((ABS (exponent) + BITS_PER_MP_LIMB - 1)
-			     / BITS_PER_MP_LIMB + 4) * sizeof (mp_limb_t);
+			     / BITS_PER_MP_LIMB
+			     + (LDBL_MANT_DIG / BITS_PER_MP_LIMB > 2 ? 8 : 4))
+			    * sizeof (mp_limb_t);
     frac = (mp_limb_t *) alloca (bignum_size);
     tmp = (mp_limb_t *) alloca (bignum_size);
     scale = (mp_limb_t *) alloca (bignum_size);
@@ -502,6 +512,9 @@ hack_digit_end:
 			      &__tens[powers->arrayoff],
 			      tmpsize * sizeof (mp_limb_t));
 		      MPN_ZERO (tmp, _FPIO_CONST_SHIFT);
+		      /* Adjust exponent, as scaleexpo will be this much
+			 bigger too.  */
+		      exponent += _FPIO_CONST_SHIFT * BITS_PER_MP_LIMB;
 		    }
 		  else
 #endif
@@ -625,7 +638,6 @@ hack_digit_end:
       int exp10 = 0;
       int explog = LDBL_MAX_10_EXP_LOG;
       const struct mp_power *powers = &_fpioconst_pow10[explog + 1];
-      mp_size_t used_limbs = fracsize - 1;
 
       /* Now shift the input value to its right place.	*/
       cy = __mpn_lshift (frac, fp_input, fracsize, to_shift);
@@ -747,7 +759,6 @@ hack_digit_end:
 			  fracsize = tmpsize - (i - 1);
 			}
 		    }
-		  used_limbs = fracsize - 1;
 		}
 	    }
 	  --explog;
@@ -781,7 +792,7 @@ hack_digit_end:
   else
     {
       /* This is a special case.  We don't need a factor because the
-	 numbers are in the range of 0.0 <= fp < 8.0.  We simply
+	 numbers are in the range of 1.0 <= |fp| < 8.0.  We simply
 	 shift it to the right place and divide it by 1.0 to get the
 	 leading digit.	 (Of course this division is not really made.)	*/
       assert (0 <= exponent && exponent < 3 &&
@@ -795,43 +806,45 @@ hack_digit_end:
 
   {
     int width = info->width;
-    wchar_t *wbuffer, *wstartp, *wcp;
-    int buffer_malloced;
-    int chars_needed;
+    wchar_t *wstartp, *wcp;
+    size_t chars_needed;
     int expscale;
     int intdig_max, intdig_no = 0;
-    int fracdig_min, fracdig_max, fracdig_no = 0;
+    int fracdig_min;
+    int fracdig_max;
     int dig_max;
     int significant;
     int ngroups = 0;
+    char spec = _tolower (info->spec);
+	size_t wbuffer_to_alloc;
 
-    if (_tolower (info->spec) == 'e')
+    if (spec == 'e')
       {
 	type = info->spec;
 	intdig_max = 1;
 	fracdig_min = fracdig_max = info->prec < 0 ? 6 : info->prec;
-	chars_needed = 1 + 1 + fracdig_max + 1 + 1 + 4;
+	chars_needed = 1 + 1 + (size_t) fracdig_max + 1 + 1 + 4;
 	/*	       d   .	 ddd	     e	 +-  ddd  */
 	dig_max = INT_MAX;		/* Unlimited.  */
 	significant = 1;		/* Does not matter here.  */
       }
-    else if (_tolower (info->spec) == 'f')
+    else if (spec == 'f')
       {
-	type = info->spec;
+	type = 'f';
 	fracdig_min = fracdig_max = info->prec < 0 ? 6 : info->prec;
+	dig_max = INT_MAX;		/* Unlimited.  */
+	significant = 1;		/* Does not matter here.  */
 	if (expsign == 0)
 	  {
 	    intdig_max = exponent + 1;
 	    /* This can be really big!	*/  /* XXX Maybe malloc if too big? */
-	    chars_needed = exponent + 1 + 1 + fracdig_max;
+	    chars_needed = (size_t) exponent + 1 + 1 + (size_t) fracdig_max;
 	  }
 	else
 	  {
 	    intdig_max = 1;
-	    chars_needed = 1 + 1 + fracdig_max;
+	    chars_needed = 1 + 1 + (size_t) fracdig_max;
 	  }
-	dig_max = INT_MAX;		/* Unlimited.  */
-	significant = 1;		/* Does not matter here.  */
       }
     else
       {
@@ -845,7 +858,7 @@ hack_digit_end:
 	      type = isupper (info->spec) ? 'E' : 'e';
 	    fracdig_max = dig_max - 1;
 	    intdig_max = 1;
-	    chars_needed = 1 + 1 + fracdig_max + 1 + 1 + 4;
+	    chars_needed = 1 + 1 + (size_t) fracdig_max + 1 + 1 + 4;
 	  }
 	else
 	  {
@@ -857,7 +870,7 @@ hack_digit_end:
 	       zeros can be as many as would be required for
 	       exponential notation with a negative two-digit
 	       exponent, which is 4.  */
-	    chars_needed = dig_max + 1 + 4;
+	    chars_needed = (size_t) dig_max + 1 + 4;
 	  }
 	fracdig_min = info->alt ? fracdig_max : 0;
 	significant = 0;		/* We count significant digits.	 */
@@ -868,36 +881,43 @@ hack_digit_end:
 	/* Guess the number of groups we will make, and thus how
 	   many spaces we need for separator characters.  */
 	ngroups = __guess_grouping (intdig_max, grouping);
-	chars_needed += ngroups;
+	/* Allocate one more character in case rounding increases the
+	   number of groups.  */
+	chars_needed += ngroups + 1;
       }
 
     /* Allocate buffer for output.  We need two more because while rounding
        it is possible that we need two more characters in front of all the
        other output.  If the amount of memory we have to allocate is too
        large use `malloc' instead of `alloca'.  */
-    buffer_malloced = chars_needed > 5000;
-    if (buffer_malloced)
+    if (__builtin_expect (chars_needed >= (size_t) -1 / sizeof (wchar_t) - 2
+			  || chars_needed < fracdig_max, 0))
       {
-	wbuffer = (wchar_t *) malloc ((2 + chars_needed) * sizeof (wchar_t));
+	/* Some overflow occurred.  */
+	__set_errno (ERANGE);
+	return -1;
+      }
+    wbuffer_to_alloc = (2 + chars_needed) * sizeof (wchar_t);
+    buffer_malloced = ! __libc_use_alloca (wbuffer_to_alloc);
+    if (__builtin_expect (buffer_malloced, 0))
+      {
+	wbuffer = (wchar_t *) malloc (wbuffer_to_alloc);
 	if (wbuffer == NULL)
 	  /* Signal an error to the caller.  */
 	  return -1;
       }
     else
-      wbuffer = (wchar_t *) alloca ((2 + chars_needed) * sizeof (wchar_t));
+      wbuffer = (wchar_t *) alloca (wbuffer_to_alloc);
     wcp = wstartp = wbuffer + 2;	/* Let room for rounding.  */
 
     /* Do the real work: put digits in allocated buffer.  */
-    if (expsign == 0 || _tolower (type) != 'f')
+    if (expsign == 0 || type != 'f')
       {
 	assert (expsign == 0 || intdig_max == 1);
 	while (intdig_no < intdig_max)
 	  {
 	    ++intdig_no;
-	    hack_digit_callee = 1;
-	    goto hack_digit;
-hack_digit_callee1:
-	    *wcp++ = hack_digit_ret;
+	    *wcp++ = hack_digit ();
 	  }
 	significant = 1;
 	if (info->alt
@@ -913,68 +933,81 @@ hack_digit_callee1:
 	--exponent;
 	*wcp++ = decimalwc;
       }
-
+	  
+	{
+	wchar_t last_digit, next_digit;
+	bool more_bits;
+	size_t lcnt;
+	int rounding_mode;
+	wchar_t *wtp;
+	
     /* Generate the needed number of fractional digits.	 */
-    while (fracdig_no < fracdig_min
+    int fracdig_no = 0;
+    int added_zeros = 0;
+    while (fracdig_no < fracdig_min + added_zeros
 	   || (fracdig_no < fracdig_max && (fracsize > 1 || frac[0] != 0)))
       {
 	++fracdig_no;
-	hack_digit_callee = 2;
-	goto hack_digit;
-hack_digit_callee2:
-	*wcp = hack_digit_ret;
-	if (*wcp != L'0')
+	*wcp = hack_digit ();
+	if (*wcp++ != L'0')
 	  significant = 1;
 	else if (significant == 0)
 	  {
 	    ++fracdig_max;
 	    if (fracdig_min > 0)
-	      ++fracdig_min;
+	      ++added_zeros;
 	  }
-	++wcp;
       }
 
     /* Do rounding.  */
-    hack_digit_callee = 3;
-    goto hack_digit;
-hack_digit_callee3:
-    digit = hack_digit_ret;
-    if (digit > L'4')
+    last_digit = wcp[-1] != decimalwc ? wcp[-1] : wcp[-2];
+    next_digit = hack_digit ();
+    more_bits;
+    if (next_digit != L'0' && next_digit != L'5')
+      more_bits = true;
+    else if (fracsize == 1 && frac[0] == 0)
+      /* Rest of the number is zero.  */
+      more_bits = false;
+    else if (scalesize == 0)
       {
-	wchar_t *wtp = wcp;
-
-	if (digit == L'5'
-	    && ((*(wcp - 1) != decimalwc && (*(wcp - 1) & 1) == 0)
-		|| ((*(wcp - 1) == decimalwc && (*(wcp - 2) & 1) == 0))))
-	  {
-	    /* This is the critical case.	 */
-	    if (fracsize == 1 && frac[0] == 0)
-	      /* Rest of the number is zero -> round to even.
-		 (IEEE 754-1985 4.1 says this is the default rounding.)  */
-	      goto do_expo;
-	    else if (scalesize == 0)
-	      {
-		/* Here we have to see whether all limbs are zero since no
-		   normalization happened.  */
-		size_t lcnt = fracsize;
-		while (lcnt >= 1 && frac[lcnt - 1] == 0)
-		  --lcnt;
-		if (lcnt == 0)
-		  /* Rest of the number is zero -> round to even.
-		     (IEEE 754-1985 4.1 says this is the default rounding.)  */
-		  goto do_expo;
-	      }
-	  }
+	/* Here we have to see whether all limbs are zero since no
+	   normalization happened.  */
+	lcnt = fracsize;
+	while (lcnt >= 1 && frac[lcnt - 1] == 0)
+	  --lcnt;
+	more_bits = lcnt > 0;
+      }
+    else
+      more_bits = true;
+    rounding_mode = get_rounding_mode ();
+    if (round_away (is_neg, (last_digit - L'0') & 1, next_digit >= L'5',
+		    more_bits, rounding_mode))
+      {
+	wtp = wcp;
 
 	if (fracdig_no > 0)
 	  {
 	    /* Process fractional digits.  Terminate if not rounded or
 	       radix character is reached.  */
+	    int removed = 0;
 	    while (*--wtp != decimalwc && *wtp == L'9')
-	      *wtp = '0';
+	      {
+		*wtp = L'0';
+		++removed;
+	      }
+	    if (removed == fracdig_min && added_zeros > 0)
+	      --added_zeros;
 	    if (*wtp != decimalwc)
 	      /* Round up.  */
 	      (*wtp)++;
+	    else if (__builtin_expect (spec == 'g' && type == 'f' && info->alt
+				       && wtp == wstartp + 1
+				       && wstartp[0] == L'0',
+				       0))
+	      /* This is a special case: the rounded number is 1.0,
+		 the format is 'g' or 'G', and the alternative format
+		 is selected.  This means the result must be "1.".  */
+	      --added_zeros;
 	  }
 
 	if (fracdig_no == 0 || *wtp == decimalwc)
@@ -992,10 +1025,16 @@ hack_digit_callee3:
 	    else
 	      /* It is more critical.  All digits were 9's.  */
 	      {
-		if (_tolower (type) != 'f')
+		if (type != 'f')
 		  {
 		    *wstartp = '1';
 		    exponent += expsign == 0 ? 1 : -1;
+
+		    /* The above exponent adjustment could lead to 1.0e-00,
+		       e.g. for 0.999999999.  Make sure exponent 0 always
+		       uses + sign.  */
+		    if (exponent == 0)
+		      expsign = 0;
 		  }
 		else if (intdig_no == dig_max)
 		  {
@@ -1039,9 +1078,8 @@ hack_digit_callee3:
 	  }
       }
 
-  do_expo:
     /* Now remove unnecessary '0' at the end of the string.  */
-    while (fracdig_no > fracdig_min && *(wcp - 1) == L'0')
+    while (fracdig_no > fracdig_min + added_zeros && *(wcp - 1) == L'0')
       {
 	--wcp;
 	--fracdig_no;
@@ -1052,33 +1090,60 @@ hack_digit_callee3:
       --wcp;
 
     if (grouping)
-      /* Add in separator characters, overwriting the same buffer.  */
-      wcp = group_number (wstartp, wcp, intdig_no, grouping, thousands_sepwc,
-			  ngroups);
+      {
+	/* Rounding might have changed the number of groups.  We allocated
+	   enough memory but we need here the correct number of groups.  */
+	if (intdig_no != intdig_max)
+	  ngroups = __guess_grouping (intdig_no, grouping);
+
+	/* Add in separator characters, overwriting the same buffer.  */
+	wcp = group_number (wstartp, wcp, intdig_no, grouping, thousands_sepwc,
+			    ngroups);
+      }
 
     /* Write the exponent if it is needed.  */
-    if (_tolower (type) != 'f')
+    if (type != 'f')
       {
-	*wcp++ = (wchar_t) type;
-	*wcp++ = expsign ? L'-' : L'+';
-
-	/* Find the magnitude of the exponent.	*/
-	expscale = 10;
-	while (expscale <= exponent)
-	  expscale *= 10;
-
-	if (exponent < 10)
-	  /* Exponent always has at least two digits.  */
-	  *wcp++ = L'0';
+	if (__glibc_unlikely (expsign != 0 && exponent == 4 && spec == 'g'))
+	  {
+	    /* This is another special case.  The exponent of the number is
+	       really smaller than -4, which requires the 'e'/'E' format.
+	       But after rounding the number has an exponent of -4.  */
+	    assert (wcp >= wstartp + 1);
+	    assert (wstartp[0] == L'1');
+	    __wmemcpy (wstartp, L"0.0001", 6);
+	    wstartp[1] = decimalwc;
+	    if (wcp >= wstartp + 2)
+	      {
+		wmemset (wstartp + 6, L'0', wcp - (wstartp + 2));
+		wcp += 4;
+	      }
+	    else
+	      wcp += 5;
+	  }
 	else
-	  do
-	    {
-	      expscale /= 10;
-	      *wcp++ = L'0' + (exponent / expscale);
-	      exponent %= expscale;
-	    }
-	  while (expscale > 10);
-	*wcp++ = L'0' + exponent;
+	  {
+	    *wcp++ = (wchar_t) type;
+	    *wcp++ = expsign ? L'-' : L'+';
+
+	    /* Find the magnitude of the exponent.	*/
+	    expscale = 10;
+	    while (expscale <= exponent)
+	      expscale *= 10;
+
+	    if (exponent < 10)
+	      /* Exponent always has at least two digits.  */
+	      *wcp++ = L'0';
+	    else
+	      do
+		{
+		  expscale /= 10;
+		  *wcp++ = L'0' + (exponent / expscale);
+		  exponent %= expscale;
+		}
+	      while (expscale > 10);
+	    *wcp++ = L'0' + exponent;
+	  }
       }
 
     /* Compute number of characters which must be filled with the padding
@@ -1102,6 +1167,7 @@ hack_digit_callee3:
 
     {
       char *buffer = NULL;
+      char *buffer_end = NULL;
       char *cp = NULL;
       char *tmpptr;
 
@@ -1110,7 +1176,11 @@ hack_digit_callee3:
 	  /* Create the single byte string.  */
 	  size_t decimal_len;
 	  size_t thousands_sep_len;
+	  size_t nbuffer;
 	  wchar_t *copywc;
+	  size_t factor = (info->i18n
+			   ? _NL_CURRENT_WORD (LC_CTYPE, _NL_CTYPE_MB_CUR_MAX)
+			   : 1);
 
 	  decimal_len = strlen (decimal);
 
@@ -1119,17 +1189,21 @@ hack_digit_callee3:
 	  else
 	    thousands_sep_len = strlen (thousands_sep);
 
-	  if (buffer_malloced)
+	  nbuffer = (2 + chars_needed * factor + decimal_len
+			    + ngroups * thousands_sep_len);
+	  if (__glibc_unlikely (buffer_malloced))
 	    {
-	      buffer = (char *) malloc (2 + chars_needed + decimal_len
-					+ ngroups * thousands_sep_len);
+	      buffer = (char *) malloc (nbuffer);
 	      if (buffer == NULL)
-		/* Signal an error to the caller.  */
-		return -1;
+		{
+		  /* Signal an error to the caller.  */
+		  free (wbuffer);
+		  return -1;
+		}
 	    }
 	  else
-	    buffer = (char *) alloca (2 + chars_needed + decimal_len
-				      + ngroups * thousands_sep_len);
+	    buffer = (char *) alloca (nbuffer);
+	  buffer_end = buffer + nbuffer;
 
 	  /* Now copy the wide character string.  Since the character
 	     (except for the decimal point and thousands separator) must
@@ -1145,10 +1219,27 @@ hack_digit_callee3:
 	}
 
       tmpptr = buffer;
+      if (__glibc_unlikely (info->i18n))
+	{
+#ifdef COMPILE_WPRINTF
+	  wstartp = _i18n_number_rewrite (wstartp, wcp,
+					  wbuffer + wbuffer_to_alloc);
+	  wcp = wbuffer + wbuffer_to_alloc;
+	  assert ((uintptr_t) wbuffer <= (uintptr_t) wstartp);
+	  assert ((uintptr_t) wstartp
+		  < (uintptr_t) wbuffer + wbuffer_to_alloc);
+#else
+	  tmpptr = _i18n_number_rewrite (tmpptr, cp, buffer_end);
+	  cp = buffer_end;
+	  assert ((uintptr_t) buffer <= (uintptr_t) tmpptr);
+	  assert ((uintptr_t) tmpptr < (uintptr_t) buffer_end);
+#endif
+	}
+
       PRINT (tmpptr, wstartp, wide ? wcp - wstartp : cp - tmpptr);
 
       /* Free the memory if necessary.  */
-      if (buffer_malloced)
+      if (__glibc_unlikely (buffer_malloced))
 	{
 	  free (buffer);
 	  free (wbuffer);
@@ -1157,6 +1248,7 @@ hack_digit_callee3:
 
     if (info->left && width > 0)
       PADN (info->pad, width);
+	}
   }
   return done;
 }

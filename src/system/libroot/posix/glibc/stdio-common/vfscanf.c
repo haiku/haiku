@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-1999, 2000, 2001 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,15 +12,15 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -29,6 +29,15 @@
 #include <wctype.h>
 #include <bits/libc-lock.h>
 #include <locale/localeinfo.h>
+
+#ifdef __HAIKU__
+#include <stdio_private.h>
+#include <alloca.h>
+#define __ldbl_is_dbl 0
+
+locale_t __current_locale_t();
+#define _NL_CURRENT_LOCALE (__current_locale_t())
+#endif
 
 #ifdef	__GNUC__
 # define HAVE_LONGLONG
@@ -48,110 +57,121 @@
 #if INT_MAX == LONG_MAX
 # define need_long	0
 #else
-# define need_long 	1
+# define need_long	1
 #endif
 
 /* Those are flags in the conversion format. */
-#define LONG		0x001	/* l: long or double */
-#define LONGDBL		0x002	/* L: long long or long double */
-#define SHORT		0x004	/* h: short */
-#define SUPPRESS	0x008	/* *: suppress assignment */
-#define POINTER		0x010	/* weird %p pointer (`fake hex') */
-#define NOSKIP		0x020	/* do not skip blanks */
-#define WIDTH		0x040	/* width was given */
-#define GROUP		0x080	/* ': group numbers */
-#define MALLOC		0x100	/* a: malloc strings */
-#define CHAR		0x200	/* hh: char */
-#define I18N		0x400	/* I: use locale's digits */
+#define LONG		0x0001	/* l: long or double */
+#define LONGDBL		0x0002	/* L: long long or long double */
+#define SHORT		0x0004	/* h: short */
+#define SUPPRESS	0x0008	/* *: suppress assignment */
+#define POINTER		0x0010	/* weird %p pointer (`fake hex') */
+#define NOSKIP		0x0020	/* do not skip blanks */
+#define NUMBER_SIGNED	0x0040	/* signed integer */
+#define GROUP		0x0080	/* ': group numbers */
+#define GNU_MALLOC	0x0100	/* a: malloc strings */
+#define CHAR		0x0200	/* hh: char */
+#define I18N		0x0400	/* I: use locale's digits */
+#define HEXA_FLOAT	0x0800	/* hexadecimal float */
+#define READ_POINTER	0x1000	/* this is a pointer value */
+#define POSIX_MALLOC	0x2000	/* m: malloc strings */
+#define MALLOC		(GNU_MALLOC | POSIX_MALLOC)
 
+#include <locale/localeinfo.h>
+#include <libioP.h>
+#include <libio.h>
 
-#ifdef USE_IN_LIBIO
-# include <libioP.h>
-# include <libio.h>
+#undef va_list
+#define va_list	_IO_va_list
 
-# undef va_list
-# define va_list	_IO_va_list
-
-# ifdef COMPILE_WSCANF
-#  define ungetc(c, s)	((void) (c == WEOF				      \
+#ifdef COMPILE_WSCANF
+# define ungetc(c, s)	((void) (c == WEOF				      \
 				 || (--read_in,				      \
 				     _IO_sputbackwc (s, c))))
-#  define ungetc_not_eof(c, s)	((void) (--read_in,			      \
+# define ungetc_not_eof(c, s)	((void) (--read_in,			      \
 					 _IO_sputbackwc (s, c)))
-#  define inchar()	(c == WEOF ? WEOF				      \
+# define inchar()	(c == WEOF ? ((errno = inchar_errno), WEOF)	      \
 			 : ((c = _IO_getwc_unlocked (s)),		      \
-			    (void) (c != WEOF && ++read_in), c))
+			    (void) (c != WEOF				      \
+				    ? ++read_in				      \
+				    : (size_t) (inchar_errno = errno)), c))
 
-#  define MEMCPY(d, s, n) __wmemcpy (d, s, n)
-#  define ISSPACE(Ch)	  iswspace (Ch)
-#  define ISDIGIT(Ch)	  iswdigit (Ch)
-#  define ISXDIGIT(Ch)	  iswxdigit (Ch)
-#  define TOLOWER(Ch)	  towlower (Ch)
-#  define ORIENT	  if (_IO_fwide (s, 1) != 1) return WEOF
-#  define __strtoll_internal	__wcstoll_internal
-#  define __strtoull_internal	__wcstoull_internal
-#  define __strtol_internal	__wcstol_internal
-#  define __strtoul_internal	__wcstoul_internal
-#  define __strtold_internal	__wcstold_internal
-#  define __strtod_internal	__wcstod_internal
-#  define __strtof_internal	__wcstof_internal
+# define MEMCPY(d, s, n) __wmemcpy (d, s, n)
+# define ISSPACE(Ch)	  iswspace (Ch)
+# define ISDIGIT(Ch)	  iswdigit (Ch)
+# define ISXDIGIT(Ch)	  iswxdigit (Ch)
+# define TOLOWER(Ch)	  towlower (Ch)
+# define ORIENT	  if (_IO_fwide (s, 1) != 1) return WEOF
+# define __strtoll_internal	__wcstoll_internal
+# define __strtoull_internal	__wcstoull_internal
+# define __strtol_internal	__wcstol_internal
+# define __strtoul_internal	__wcstoul_internal
+# define __strtold_internal	__wcstold_internal
+# define __strtod_internal	__wcstod_internal
+# define __strtof_internal	__wcstof_internal
 
-#  define L_(Str)	  L##Str
-#  define CHAR_T	  wchar_t
-#  define UCHAR_T	  unsigned int
-#  define WINT_T	  wint_t
-#  undef EOF
-#  define EOF		  WEOF
-# else
-#  define ungetc(c, s)	((void) ((int) c == EOF				      \
+# define L_(Str)	L##Str
+# define CHAR_T		wchar_t
+# define UCHAR_T	unsigned int
+# define WINT_T		wint_t
+# undef EOF
+# define EOF		WEOF
+#else
+# define ungetc(c, s)	((void) ((int) c == EOF				      \
 				 || (--read_in,				      \
 				     _IO_sputbackc (s, (unsigned char) c))))
-#  define ungetc_not_eof(c, s)	((void) (--read_in,			      \
+# define ungetc_not_eof(c, s)	((void) (--read_in,			      \
 					 _IO_sputbackc (s, (unsigned char) c)))
-#  define inchar()	(c == EOF ? EOF					      \
+# define inchar()	(c == EOF ? ((errno = inchar_errno), EOF)	      \
 			 : ((c = _IO_getc_unlocked (s)),		      \
-			    (void) (c != EOF && ++read_in), c))
-#  define MEMCPY(d, s, n) memcpy (d, s, n)
-#  define ISSPACE(Ch)	  isspace (Ch)
-#  define ISDIGIT(Ch)	  isdigit (Ch)
-#  define ISXDIGIT(Ch)	  isxdigit (Ch)
-#  define TOLOWER(Ch)	  tolower (Ch)
-#  define ORIENT	  if (s->_vtable_offset == 0			      \
+			    (void) (c != EOF				      \
+				    ? ++read_in				      \
+				    : (size_t) (inchar_errno = errno)), c))
+# define MEMCPY(d, s, n) memcpy (d, s, n)
+# define ISSPACE(Ch)	  isspace_l (Ch, loc)
+# define ISDIGIT(Ch)	  isdigit_l (Ch, loc)
+# define ISXDIGIT(Ch)	  isxdigit_l (Ch, loc)
+# define TOLOWER(Ch)	  tolower_l ((unsigned char) (Ch), loc)
+# define ORIENT	  if (_IO_vtable_offset (s) == 0			      \
 			      && _IO_fwide (s, -1) != -1)		      \
 			    return EOF
 
-#  define L_(Str)	  Str
-#  define CHAR_T	  char
-#  define UCHAR_T	  unsigned char
-#  define WINT_T	  int
-# endif
+# define L_(Str)	Str
+# define CHAR_T		char
+# define UCHAR_T	unsigned char
+# define WINT_T		int
+#endif
 
-# define encode_error() do {						      \
-			  if (errp != NULL) *errp |= 4;			      \
-			  _IO_funlockfile (s);				      \
-			  __libc_cleanup_end (0);			      \
+#define encode_error() do {						      \
+			  errval = 4;					      \
 			  __set_errno (EILSEQ);				      \
-			  return done;					      \
+			  goto errout;					      \
 			} while (0)
-# define conv_error()	do {						      \
-			  if (errp != NULL) *errp |= 2;			      \
-			  _IO_funlockfile (s);				      \
-			  __libc_cleanup_end (0);			      \
-			  return done;					      \
+#define conv_error()	do {						      \
+			  errval = 2;					      \
+			  goto errout;					      \
 			} while (0)
-# define input_error()	do {						      \
-			  _IO_funlockfile (s);				      \
-			  if (errp != NULL) *errp |= 1;			      \
-			  __libc_cleanup_end (0);			      \
-			  return done ?: EOF;				      \
+#define input_error()	do {						      \
+			  errval = 1;					      \
+			  if (done == 0) done = EOF;			      \
+			  goto errout;					      \
 			} while (0)
-# define memory_error() do {						      \
-			  _IO_funlockfile (s);				      \
-			  __set_errno (ENOMEM);				      \
-			  __libc_cleanup_end (0);			      \
-			  return EOF;					      \
-			} while (0)
-# define ARGCHECK(s, format)						      \
+#define add_ptr_to_free(ptr)						      \
+  do									      \
+    {									      \
+      if (ptrs_to_free == NULL						      \
+	  || ptrs_to_free->count == (sizeof (ptrs_to_free->ptrs)	      \
+				     / sizeof (ptrs_to_free->ptrs[0])))	      \
+	{								      \
+	  struct ptrs_to_free *new_ptrs = alloca (sizeof (*ptrs_to_free));    \
+	  new_ptrs->count = 0;						      \
+	  new_ptrs->next = ptrs_to_free;				      \
+	  ptrs_to_free = new_ptrs;					      \
+	}								      \
+      ptrs_to_free->ptrs[ptrs_to_free->count++] = (ptr);		      \
+    }									      \
+  while (0)
+#define ARGCHECK(s, format)						      \
   do									      \
     {									      \
       /* Check file argument for consistence.  */			      \
@@ -167,133 +187,71 @@
 	  return EOF;							      \
 	}								      \
     } while (0)
-# define LOCK_STREAM(S)							      \
+#define LOCK_STREAM(S)							      \
   __libc_cleanup_region_start (1, (void (*) (void *)) &_IO_funlockfile, (S)); \
   _IO_flockfile (S)
-# define UNLOCK_STREAM(S)						      \
+#define UNLOCK_STREAM(S)						      \
   _IO_funlockfile (S);							      \
   __libc_cleanup_region_end (0)
-#else
-# define ungetc(c, s)	((void) (c != EOF && --read_in), ungetc (c, s))
-# define ungetc_not_eof(c, s)	(--read_in, (ungetc) (c, s))
-# define inchar()	(c == EOF ? EOF					      \
-			 : ((c = getc (s)), (void) (c != EOF && ++read_in), c))
-# define MEMCPY(d, s, n)  memcpy (d, s, n)
-# define ISSPACE(Ch)      isspace (Ch)
-# define ISDIGIT(Ch)      isdigit (Ch)
-# define ISXDIGIT(Ch)     isxdigit (Ch)
-# define TOLOWER(Ch)      tolower (Ch)
 
-# define L_(Str)          Str
-# define CHAR_T           char
-# define UCHAR_T          unsigned char
-# define WINT_T           int
-
-# define encode_error()	do {						      \
-			  funlockfile (s);				      \
-			  __set_errno (EILSEQ);				      \
-			  return done;					      \
-			} while (0)
-# define conv_error()	do {						      \
-			  funlockfile (s);				      \
-			  return done;					      \
-			} while (0)
-# define input_error()	do {						      \
-			  funlockfile (s);				      \
-			  return done ?: EOF;				      \
-			} while (0)
-# define memory_error()	do {						      \
-			  funlockfile (s);				      \
-			  __set_errno (ENOMEM);				      \
-			  return EOF;					      \
-			} while (0)
-# define ARGCHECK(s, format)						      \
-  do									      \
-    {									      \
-      /* Check file argument for consistence.  */			      \
-      if (!__validfp (s) || !s->__mode.__read)				      \
-	{								      \
-	  __set_errno (EBADF);						      \
-	  return EOF;							      \
-	}								      \
-      else if (format == NULL)						      \
-	{								      \
-	  __set_errno (EINVAL);						      \
-	  return EOF;							      \
-	}								      \
-    } while (0)
-#if 1
-      /* XXX For now !!! */
-# define flockfile(S) /* nothing */
-# define funlockfile(S) /* nothing */
-# define LOCK_STREAM(S)
-# define UNLOCK_STREAM(S)
-#else
-# define LOCK_STREAM(S)							      \
-  __libc_cleanup_region_start (&__funlockfile, (S));			      \
-  __flockfile (S)
-# define UNLOCK_STREAM(S)						      \
-  __funlockfile (S);							      \
-  __libc_cleanup_region_end (0)
-#endif
-#endif
-
+struct ptrs_to_free
+{
+  size_t count;
+  struct ptrs_to_free *next;
+  char **ptrs[32];
+};
 
 /* Read formatted input from S according to the format string
    FORMAT, using the argument list in ARG.
    Return the number of assignments made, or -1 for an input error.  */
-#ifdef USE_IN_LIBIO
-# ifdef COMPILE_WSCANF
+#ifdef COMPILE_WSCANF
 int
-_IO_vfwscanf (s, format, argptr, errp)
-     _IO_FILE *s;
-     const wchar_t *format;
-     _IO_va_list argptr;
-     int *errp;
-# else
-int
-_IO_vfscanf (s, format, argptr, errp)
-     _IO_FILE *s;
-     const char *format;
-     _IO_va_list argptr;
-     int *errp;
-# endif
+_IO_vfwscanf (_IO_FILE *s, const wchar_t *format, _IO_va_list argptr,
+	      int *errp)
 #else
 int
-__vfscanf (FILE *s, const char *format, va_list argptr)
+_IO_vfscanf_internal (_IO_FILE *s, const char *format, _IO_va_list argptr,
+		      int *errp)
 #endif
 {
   va_list arg;
-  register const CHAR_T *f = format;
-  register UCHAR_T fc;	/* Current character of the format.  */
-  register WINT_T done = 0;	/* Assignments done.  */
-  register size_t read_in = 0;	/* Chars read in.  */
-  register WINT_T c = 0;	/* Last char read.  */
-  register int width;		/* Maximum field width.  */
-  register int flags;		/* Modifiers for current format element.  */
+  const CHAR_T *f = format;
+  UCHAR_T fc;	/* Current character of the format.  */
+  WINT_T done = 0;	/* Assignments done.  */
+  size_t read_in = 0;	/* Chars read in.  */
+  WINT_T c = 0;	/* Last char read.  */
+  int width;		/* Maximum field width.  */
+  int flags;		/* Modifiers for current format element.  */
+  int errval = 0;
+#ifndef COMPILE_WSCANF
+  locale_t loc = _NL_CURRENT_LOCALE;
+#ifndef __HAIKU__
+  struct __locale_data *const curctype = loc->__locales[LC_CTYPE];
+#endif
+#endif
 
+  /* Errno of last failed inchar call.  */
+  int inchar_errno = 0;
   /* Status for reading F-P nums.  */
-  char got_dot, got_e, negative;
+  char got_digit, got_dot, got_e, negative;
   /* If a [...] is a [^...].  */
   CHAR_T not_in;
 #define exp_char not_in
   /* Base for integral numbers.  */
   int base;
-  /* Signedness for integral numbers.  */
-  int number_signed;
-#define is_hexa number_signed
   /* Decimal point character.  */
 #ifdef COMPILE_WSCANF
-  wchar_t decimal;
+  wint_t decimal;
 #else
   const char *decimal;
 #endif
   /* The thousands character of the current locale.  */
 #ifdef COMPILE_WSCANF
-  wchar_t thousands;
+  wint_t thousands;
 #else
   const char *thousands;
 #endif
+  struct ptrs_to_free *ptrs_to_free = NULL;
   /* State for the conversions.  */
   mbstate_t state;
   /* Integral holding variables.  */
@@ -313,23 +271,44 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
      possibly be matched even if in the input stream no character is
      available anymore.  */
   int skip_space = 0;
-  /* Nonzero if we are reading a pointer.  */
-  int read_pointer;
   /* Workspace.  */
   CHAR_T *tw;			/* Temporary pointer.  */
   CHAR_T *wp = NULL;		/* Workspace.  */
   size_t wpmax = 0;		/* Maximal size of workspace.  */
   size_t wpsize;		/* Currently used bytes in workspace.  */
+  bool use_malloc = false;
 #define ADDW(Ch)							    \
   do									    \
     {									    \
-      if (wpsize == wpmax)						    \
+      if (__glibc_unlikely (wpsize == wpmax))				      \
 	{								    \
 	  CHAR_T *old = wp;						    \
-	  wpmax = (UCHAR_MAX + 1 > 2 * wpmax ? UCHAR_MAX + 1 : 2 * wpmax);  \
-	  wp = (CHAR_T *) alloca (wpmax * sizeof (wchar_t));		    \
-	  if (old != NULL)						    \
-	    MEMCPY (wp, old, wpsize);					    \
+	  size_t newsize = (UCHAR_MAX + 1 > 2 * wpmax			    \
+			    ? UCHAR_MAX + 1 : 2 * wpmax);		    \
+	  if (use_malloc || !__libc_use_alloca (newsize))		    \
+	    {								    \
+	      wp = realloc (use_malloc ? wp : NULL, newsize);		    \
+	      if (wp == NULL)						    \
+		{							    \
+		  if (use_malloc)					    \
+		    free (old);						    \
+		  done = EOF;						    \
+		  goto errout;						    \
+		}							    \
+	      if (! use_malloc)						    \
+		MEMCPY (wp, old, wpsize);				    \
+	      wpmax = newsize;						    \
+	      use_malloc = true;					    \
+	    }								    \
+	  else								    \
+	    {								    \
+	      size_t s = wpmax * sizeof (CHAR_T);			    \
+	      wp = (CHAR_T *) extend_alloca (wp, s,			    \
+					     newsize * sizeof (CHAR_T));    \
+	      wpmax = s / sizeof (CHAR_T);				    \
+	      if (old != NULL)						    \
+		MEMCPY (wp, old, wpsize);				    \
+	    }								    \
 	}								    \
       wp[wpsize++] = (Ch);						    \
     }									    \
@@ -347,20 +326,20 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
   ARGCHECK (s, format);
 
-  /* Figure out the decimal point character.  */
+ {
+   /* Figure out the decimal point character.  */
 #ifdef COMPILE_WSCANF
-  decimal = _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_DECIMAL_POINT_WC);
+   decimal = _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_DECIMAL_POINT_WC);
 #else
-  decimal = _NL_CURRENT (LC_NUMERIC, DECIMAL_POINT);
+   decimal = _NL_CURRENT (LC_NUMERIC, DECIMAL_POINT);
 #endif
-  /* Figure out the thousands separator character.  */
+   /* Figure out the thousands separator character.  */
 #ifdef COMPILE_WSCANF
-  thousands = _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_THOUSANDS_SEP_WC);
+   thousands = _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_THOUSANDS_SEP_WC);
 #else
-  thousands = _NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP);
-  if (*thousands == '\0')
-    thousands = NULL;
+   thousands = _NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP);
 #endif
+ }
 
   /* Lock the stream.  */
   LOCK_STREAM (s);
@@ -418,7 +397,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	      do
 		{
 		  c = inchar ();
-		  if (c == EOF)
+		  if (__glibc_unlikely (c == EOF))
 		    input_error ();
 		  else if (c != (unsigned char) *f++)
 		    {
@@ -446,7 +425,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	  c = inchar ();
 
 	  /* Characters other than format specs must just match.  */
-	  if (c == EOF)
+	  if (__glibc_unlikely (c == EOF))
 	    input_error ();
 
 	  /* We saw white space char as the last character in the format
@@ -454,12 +433,12 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	  if (skip_space)
 	    {
 	      while (ISSPACE (c))
-		if (inchar () == EOF && errno == EINTR)
-		  conv_error ();
+		if (__glibc_unlikely (inchar () == EOF))
+		  input_error ();
 	      skip_space = 0;
 	    }
 
-	  if (c != fc)
+	  if (__glibc_unlikely (c != fc))
 	    {
 	      ungetc (c, s);
 	      conv_error ();
@@ -470,9 +449,6 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
       /* This is the start of the conversion string. */
       flags = 0;
-
-      /* Not yet decided whether we read a pointer or not.  */
-      read_pointer = 0;
 
       /* Initialize state of modifiers.  */
       argpos = 0;
@@ -492,7 +468,6 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	    {
 	      /* Oops; that was actually the field width.  */
 	      width = argpos;
-	      flags |= WIDTH;
 	      argpos = 0;
 	      goto got_width;
 	    }
@@ -507,16 +482,17 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	    flags |= SUPPRESS;
 	    break;
 	  case L_('\''):
-	    flags |= GROUP;
+#ifdef COMPILE_WSCANF
+	    if (thousands != L'\0')
+#else
+	    if (thousands != NULL)
+#endif
+	      flags |= GROUP;
 	    break;
 	  case L_('I'):
 	    flags |= I18N;
 	    break;
 	  }
-
-      /* We have seen width. */
-      if (ISDIGIT ((UCHAR_T) *f))
-	flags |= WIDTH;
 
       /* Find the maximum field width.  */
       width = 0;
@@ -566,9 +542,24 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	      --f;
 	      break;
 	    }
+	  /* In __isoc99_*scanf %as, %aS and %a[ extension is not
+	     supported at all.  */
+	  if (s->_flags2 & _IO_FLAGS2_SCANF_STD)
+	    {
+	      --f;
+	      break;
+	    }
 	  /* String conversions (%s, %[) take a `char **'
 	     arg and fill it in with a malloc'd pointer.  */
-	  flags |= MALLOC;
+	  flags |= GNU_MALLOC;
+	  break;
+	case L_('m'):
+	  flags |= POSIX_MALLOC;
+	  if (*f == L_('l'))
+	    {
+	      ++f;
+	      flags |= LONG;
+	    }
 	  break;
 	case L_('z'):
 	  if (need_longlong && sizeof (size_t) > sizeof (unsigned long int))
@@ -595,7 +586,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	}
 
       /* End of the format string?  */
-      if (*f == L_('\0'))
+      if (__glibc_unlikely (*f == L_('\0')))
 	conv_error ();
 
       /* Find the conversion specifier.  */
@@ -605,12 +596,17 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	{
 	  /* Eat whitespace.  */
 	  int save_errno = errno;
-	  __set_errno(0);
+	  __set_errno (0);
 	  do
-	    if (inchar () == EOF && errno == EINTR)
+	    /* We add the additional test for EOF here since otherwise
+	       inchar will restore the old errno value which might be
+	       EINTR but does not indicate an interrupt since nothing
+	       was read at this time.  */
+	    if (__builtin_expect ((c == EOF || inchar () == EOF)
+				  && errno == EINTR, 0))
 	      input_error ();
 	  while (ISSPACE (c));
-	  __set_errno(save_errno);
+	  __set_errno (save_errno);
 	  ungetc (c, s);
 	  skip_space = 0;
 	}
@@ -619,9 +615,9 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	{
 	case L_('%'):	/* Must match a literal '%'.  */
 	  c = inchar ();
-	  if (c == EOF)
+	  if (__glibc_unlikely (c == EOF))
 	    input_error ();
-	  if (c != fc)
+	  if (__glibc_unlikely (c != fc))
 	    {
 	      ungetc_not_eof (c, s);
 	      conv_error ();
@@ -679,19 +675,48 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	case L_('c'):	/* Match characters.  */
 	  if ((flags & LONG) == 0)
 	    {
-	      if (!(flags & SUPPRESS))
-		{
-		  str = ARG (char *);
-		  if (str == NULL)
-		    conv_error ();
-		}
-
-	      c = inchar ();
-	      if (c == EOF)
-		input_error ();
-
 	      if (width == -1)
 		width = 1;
+
+#define STRING_ARG(Str, Type, Width)					      \
+	      do if (!(flags & SUPPRESS))				      \
+		{							      \
+		  if (flags & MALLOC)					      \
+		    {							      \
+		      /* The string is to be stored in a malloc'd buffer.  */ \
+		      /* For %mS using char ** is actually wrong, but	      \
+			 shouldn't make a difference on any arch glibc	      \
+			 supports and would unnecessarily complicate	      \
+			 things. */					      \
+		      strptr = ARG (char **);				      \
+		      if (strptr == NULL)				      \
+			conv_error ();					      \
+		      /* Allocate an initial buffer.  */		      \
+		      strsize = Width;					      \
+		      *strptr = (char *) malloc (strsize * sizeof (Type));    \
+		      Str = (Type *) *strptr;				      \
+		      if (Str != NULL)					      \
+			add_ptr_to_free (strptr);			      \
+		      else if (flags & POSIX_MALLOC)			      \
+			{						      \
+			  done = EOF;					      \
+			  goto errout;					      \
+			}						      \
+		    }							      \
+		  else							      \
+		    Str = ARG (Type *);					      \
+		  if (Str == NULL)					      \
+		    conv_error ();					      \
+		} while (0)
+#ifdef COMPILE_WSCANF
+	      STRING_ARG (str, char, 100);
+#else
+	      STRING_ARG (str, char, (width > 1024 ? 1024 : width));
+#endif
+
+	      c = inchar ();
+	      if (__glibc_unlikely (c == EOF))
+		input_error ();
 
 #ifdef COMPILE_WSCANF
 	      /* We have to convert the wide character(s) into multibyte
@@ -702,8 +727,43 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		{
 		  size_t n;
 
+		  if (!(flags & SUPPRESS) && (flags & POSIX_MALLOC)
+		      && str + MB_CUR_MAX >= *strptr + strsize)
+		    {
+		      /* We have to enlarge the buffer if the `m' flag
+			 was given.  */
+		      size_t strleng = str - *strptr;
+		      char *newstr;
+
+		      newstr = (char *) realloc (*strptr, strsize * 2);
+		      if (newstr == NULL)
+			{
+			  /* Can't allocate that much.  Last-ditch effort.  */
+			  newstr = (char *) realloc (*strptr,
+						     strleng + MB_CUR_MAX);
+			  if (newstr == NULL)
+			    {
+			      /* c can't have `a' flag, only `m'.  */
+			      done = EOF;
+			      goto errout;
+			    }
+			  else
+			    {
+			      *strptr = newstr;
+			      str = newstr + strleng;
+			      strsize = strleng + MB_CUR_MAX;
+			    }
+			}
+		      else
+			{
+			  *strptr = newstr;
+			  str = newstr + strleng;
+			  strsize *= 2;
+			}
+		    }
+
 		  n = __wcrtomb (!(flags & SUPPRESS) ? str : NULL, c, &state);
-		  if (n == (size_t) -1)
+		  if (__glibc_unlikely (n == (size_t) -1))
 		    /* No valid wide character.  */
 		    input_error ();
 
@@ -716,7 +776,43 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	      if (!(flags & SUPPRESS))
 		{
 		  do
-		    *str++ = c;
+		    {
+		      if ((flags & MALLOC)
+			  && (char *) str == *strptr + strsize)
+			{
+			  /* Enlarge the buffer.  */
+			  size_t newsize
+			    = strsize
+			      + (strsize >= width ? width - 1 : strsize);
+
+			  str = (char *) realloc (*strptr, newsize);
+			  if (str == NULL)
+			    {
+			      /* Can't allocate that much.  Last-ditch
+				 effort.  */
+			      str = (char *) realloc (*strptr, strsize + 1);
+			      if (str == NULL)
+				{
+				  /* c can't have `a' flag, only `m'.  */
+				  done = EOF;
+				  goto errout;
+				}
+			      else
+				{
+				  *strptr = (char *) str;
+				  str += strsize;
+				  ++strsize;
+				}
+			    }
+			  else
+			    {
+			      *strptr = (char *) str;
+			      str += strsize;
+			      strsize = newsize;
+			    }
+			}
+		      *str++ = c;
+		    }
 		  while (--width > 0 && inchar () != EOF);
 		}
 	      else
@@ -724,21 +820,28 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 #endif
 
 	      if (!(flags & SUPPRESS))
-		++done;
+		{
+		  if ((flags & MALLOC) && str - *strptr != strsize)
+		    {
+		      char *cp = (char *) realloc (*strptr, str - *strptr);
+		      if (cp != NULL)
+			*strptr = cp;
+		    }
+		  strptr = NULL;
+		  ++done;
+		}
 
 	      break;
 	    }
 	  /* FALLTHROUGH */
 	case L_('C'):
-	  if (!(flags & SUPPRESS))
-	    {
-	      wstr = ARG (wchar_t *);
-	      if (wstr == NULL)
-		conv_error ();
-	    }
+	  if (width == -1)
+	    width = 1;
+
+	  STRING_ARG (wstr, wchar_t, (width > 1024 ? 1024 : width));
 
 	  c = inchar ();
-	  if (c == EOF)
+	  if (__glibc_unlikely (c == EOF))
 	    input_error ();
 
 #ifdef COMPILE_WSCANF
@@ -746,7 +849,44 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	  if (!(flags & SUPPRESS))
 	    {
 	      do
-		*wstr++ = c;
+		{
+		  if ((flags & MALLOC)
+		      && wstr == (wchar_t *) *strptr + strsize)
+		    {
+		      size_t newsize
+			= strsize + (strsize > width ? width - 1 : strsize);
+		      /* Enlarge the buffer.  */
+		      wstr = (wchar_t *) realloc (*strptr,
+						  newsize * sizeof (wchar_t));
+		      if (wstr == NULL)
+			{
+			  /* Can't allocate that much.  Last-ditch effort.  */
+			  wstr = (wchar_t *) realloc (*strptr,
+						      (strsize + 1)
+						      * sizeof (wchar_t));
+			  if (wstr == NULL)
+			    {
+			      /* C or lc can't have `a' flag, only `m'
+				 flag.  */
+			      done = EOF;
+			      goto errout;
+			    }
+			  else
+			    {
+			      *strptr = (char *) wstr;
+			      wstr += strsize;
+			      ++strsize;
+			    }
+			}
+		      else
+			{
+			  *strptr = (char *) wstr;
+			  wstr += strsize;
+			  strsize = newsize;
+			}
+		    }
+		  *wstr++ = c;
+		}
 	      while (--width > 0 && inchar () != EOF);
 	    }
 	  else
@@ -765,6 +905,41 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		/* This is what we present the mbrtowc function first.  */
 		buf[0] = c;
 
+		if (!(flags & SUPPRESS) && (flags & MALLOC)
+		    && wstr == (wchar_t *) *strptr + strsize)
+		  {
+		    size_t newsize
+		      = strsize + (strsize > width ? width - 1 : strsize);
+		    /* Enlarge the buffer.  */
+		    wstr = (wchar_t *) realloc (*strptr,
+						newsize * sizeof (wchar_t));
+		    if (wstr == NULL)
+		      {
+			/* Can't allocate that much.  Last-ditch effort.  */
+			wstr = (wchar_t *) realloc (*strptr,
+						    ((strsize + 1)
+						     * sizeof (wchar_t)));
+			if (wstr == NULL)
+			  {
+			    /* C or lc can't have `a' flag, only `m' flag.  */
+			    done = EOF;
+			    goto errout;
+			  }
+			else
+			  {
+			    *strptr = (char *) wstr;
+			    wstr += strsize;
+			    ++strsize;
+			  }
+		      }
+		    else
+		      {
+			*strptr = (char *) wstr;
+			wstr += strsize;
+			strsize = newsize;
+		      }
+		  }
+
 		while (1)
 		  {
 		    size_t n;
@@ -776,14 +951,14 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      {
 			/* Possibly correct character, just not enough
 			   input.  */
-			if (inchar () == EOF)
+			if (__glibc_unlikely (inchar () == EOF))
 			  encode_error ();
 
 			buf[0] = c;
 			continue;
 		      }
 
-		    if (n != 1)
+		    if (__glibc_unlikely (n != 1))
 		      encode_error ();
 
 		    /* We have a match.  */
@@ -798,36 +973,30 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 #endif
 
 	  if (!(flags & SUPPRESS))
-	    ++done;
+	    {
+	      if ((flags & MALLOC) && wstr - (wchar_t *) *strptr != strsize)
+		{
+		  wchar_t *cp = (wchar_t *) realloc (*strptr,
+						     ((wstr
+						       - (wchar_t *) *strptr)
+						      * sizeof (wchar_t)));
+		  if (cp != NULL)
+		    *strptr = (char *) cp;
+		}
+	      strptr = NULL;
+
+	      ++done;
+	    }
 
 	  break;
 
 	case L_('s'):		/* Read a string.  */
 	  if (!(flags & LONG))
 	    {
-#define STRING_ARG(Str, Type)						      \
-	      do if (!(flags & SUPPRESS))				      \
-		{							      \
-		  if (flags & MALLOC)					      \
-		    {							      \
-		      /* The string is to be stored in a malloc'd buffer.  */ \
-		      strptr = ARG (char **);				      \
-		      if (strptr == NULL)				      \
-			conv_error ();					      \
-		      /* Allocate an initial buffer.  */		      \
-		      strsize = 100;					      \
-		      *strptr = (char *) malloc (strsize * sizeof (Type));    \
-		      Str = (Type *) *strptr;				      \
-		    }							      \
-		  else							      \
-		    Str = ARG (Type *);					      \
-		  if (Str == NULL)					      \
-		    conv_error ();					      \
-		} while (0)
-	      STRING_ARG (str, char);
+	      STRING_ARG (str, char, 100);
 
 	      c = inchar ();
-	      if (c == EOF)
+	      if (__glibc_unlikely (c == EOF))
 		input_error ();
 
 #ifdef COMPILE_WSCANF
@@ -852,8 +1021,8 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		    if (!(flags & SUPPRESS) && (flags & MALLOC)
 			&& str + MB_CUR_MAX >= *strptr + strsize)
 		      {
-			/* We have to enlarge the buffer if the `a' flag
-			   was given.  */
+			/* We have to enlarge the buffer if the `a' or `m'
+			   flag was given.  */
 			size_t strleng = str - *strptr;
 			char *newstr;
 
@@ -866,10 +1035,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 						       strleng + MB_CUR_MAX);
 			    if (newstr == NULL)
 			      {
+				if (flags & POSIX_MALLOC)
+				  {
+				    done = EOF;
+				    goto errout;
+				  }
 				/* We lose.  Oh well.  Terminate the
 				   string and stop converting,
 				   so at least we don't skip any input.  */
 				((char *) (*strptr))[strleng] = '\0';
+				strptr = NULL;
 				++done;
 				conv_error ();
 			      }
@@ -890,7 +1065,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
 		    n = __wcrtomb (!(flags & SUPPRESS) ? str : NULL, c,
 				   &state);
-		    if (n == (size_t) -1)
+		    if (__glibc_unlikely (n == (size_t) -1))
 		      encode_error ();
 
 		    assert (n <= MB_CUR_MAX);
@@ -913,10 +1088,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			      str = (char *) realloc (*strptr, strsize + 1);
 			      if (str == NULL)
 				{
+				  if (flags & POSIX_MALLOC)
+				    {
+				      done = EOF;
+				      goto errout;
+				    }
 				  /* We lose.  Oh well.  Terminate the
 				     string and stop converting,
 				     so at least we don't skip any input.  */
 				  ((char *) (*strptr))[strsize - 1] = '\0';
+				  strptr = NULL;
 				  ++done;
 				  conv_error ();
 				}
@@ -956,10 +1137,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      newstr = (char *) realloc (*strptr, strleng + n + 1);
 		      if (newstr == NULL)
 			{
+			  if (flags & POSIX_MALLOC)
+			    {
+			      done = EOF;
+			      goto errout;
+			    }
 			  /* We lose.  Oh well.  Terminate the string
 			     and stop converting, so at least we don't
 			     skip any input.  */
 			  ((char *) (*strptr))[strleng] = '\0';
+			  strptr = NULL;
 			  ++done;
 			  conv_error ();
 			}
@@ -981,6 +1168,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      if (cp != NULL)
 			*strptr = cp;
 		    }
+		  strptr = NULL;
 
 		  ++done;
 		}
@@ -995,10 +1183,10 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 #endif
 
 	    /* Wide character string.  */
-	    STRING_ARG (wstr, wchar_t);
+	    STRING_ARG (wstr, wchar_t, 100);
 
 	    c = inchar ();
-	    if (c == EOF)
+	    if (__builtin_expect (c == EOF,  0))
 	      input_error ();
 
 #ifndef COMPILE_WSCANF
@@ -1028,16 +1216,22 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			if (wstr == NULL)
 			  {
 			    /* Can't allocate that much.  Last-ditch
-                               effort.  */
+			       effort.  */
 			    wstr = (wchar_t *) realloc (*strptr,
 							(strsize + 1)
 							* sizeof (wchar_t));
 			    if (wstr == NULL)
 			      {
+				if (flags & POSIX_MALLOC)
+				  {
+				    done = EOF;
+				    goto errout;
+				  }
 				/* We lose.  Oh well.  Terminate the string
 				   and stop converting, so at least we don't
 				   skip any input.  */
 				((wchar_t *) (*strptr))[strsize - 1] = L'\0';
+				strptr = NULL;
 				++done;
 				conv_error ();
 			      }
@@ -1073,14 +1267,14 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			{
 			  /* Possibly correct character, just not enough
 			     input.  */
-			  if (inchar () == EOF)
+			  if (__glibc_unlikely (inchar () == EOF))
 			    encode_error ();
 
 			  buf[0] = c;
 			  continue;
 			}
 
-		      if (n != 1)
+		      if (__glibc_unlikely (n != 1))
 			encode_error ();
 
 		      /* We have a match.  */
@@ -1103,10 +1297,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 						       * sizeof (wchar_t)));
 			  if (wstr == NULL)
 			    {
+			      if (flags & POSIX_MALLOC)
+				{
+				  done = EOF;
+				  goto errout;
+				}
 			      /* We lose.  Oh well.  Terminate the
 				 string and stop converting, so at
 				 least we don't skip any input.  */
 			      ((wchar_t *) (*strptr))[strsize - 1] = L'\0';
+			      strptr = NULL;
 			      ++done;
 			      conv_error ();
 			    }
@@ -1142,6 +1342,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		    if (cp != NULL)
 		      *strptr = (char *) cp;
 		  }
+		strptr = NULL;
 
 		++done;
 	      }
@@ -1151,31 +1352,28 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	case L_('x'):	/* Hexadecimal integer.  */
 	case L_('X'):	/* Ditto.  */
 	  base = 16;
-	  number_signed = 0;
 	  goto number;
 
 	case L_('o'):	/* Octal integer.  */
 	  base = 8;
-	  number_signed = 0;
 	  goto number;
 
 	case L_('u'):	/* Unsigned decimal integer.  */
 	  base = 10;
-	  number_signed = 0;
 	  goto number;
 
 	case L_('d'):	/* Signed decimal integer.  */
 	  base = 10;
-	  number_signed = 1;
+	  flags |= NUMBER_SIGNED;
 	  goto number;
 
 	case L_('i'):	/* Generic number.  */
 	  base = 0;
-	  number_signed = 1;
+	  flags |= NUMBER_SIGNED;
 
 	number:
 	  c = inchar ();
-	  if (c == EOF)
+	  if (__glibc_unlikely (c == EOF))
 	    input_error ();
 
 	  /* Check for a sign.  */
@@ -1214,41 +1412,121 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	  if (base == 0)
 	    base = 10;
 
-	  if (base == 10 && (flags & I18N) != 0)
+	  if (base == 10 && __builtin_expect ((flags & I18N) != 0, 0))
 	    {
 	      int from_level;
 	      int to_level;
 	      int level;
 #ifdef COMPILE_WSCANF
 	      const wchar_t *wcdigits[10];
+	      const wchar_t *wcdigits_extended[10];
 #else
 	      const char *mbdigits[10];
+	      const char *mbdigits_extended[10];
 #endif
+#ifdef __HAIKU__
+	      void* map = NULL;
+#else
+	      /*  "to_inpunct" is a map from ASCII digits to their
+		  equivalent in locale. This is defined for locales
+		  which use an extra digits set.  */
+	      wctrans_t map = __wctrans ("to_inpunct");
 	      int n;
+#endif
 
 	      from_level = 0;
 #ifdef COMPILE_WSCANF
 	      to_level = _NL_CURRENT_WORD (LC_CTYPE,
 					   _NL_CTYPE_INDIGITS_WC_LEN) - 1;
 #else
+#ifdef __HAIKU__
 	      to_level = _NL_CURRENT_WORD (LC_CTYPE,
 					   _NL_CTYPE_INDIGITS_MB_LEN) - 1;
+#else
+	      to_level = (uint32_t) curctype->values[_NL_ITEM_INDEX (_NL_CTYPE_INDIGITS_MB_LEN)].word - 1;
+#endif
+#endif
+
+#ifndef __HAIKU__
+	      /* Get the alternative digit forms if there are any.  */
+	      if (__glibc_unlikely (map != NULL))
+		{
+		  /*  Adding new level for extra digits set in locale file.  */
+		  ++to_level;
+
+		  for (n = 0; n < 10; ++n)
+		    {
+#ifdef COMPILE_WSCANF
+		      wcdigits[n] = (const wchar_t *)
+			_NL_CURRENT (LC_CTYPE, _NL_CTYPE_INDIGITS0_WC + n);
+
+		      wchar_t *wc_extended = (wchar_t *)
+			alloca ((to_level + 2) * sizeof (wchar_t));
+		      __wmemcpy (wc_extended, wcdigits[n], to_level);
+		      wc_extended[to_level] = __towctrans (L'0' + n, map);
+		      wc_extended[to_level + 1] = '\0';
+		      wcdigits_extended[n] = wc_extended;
+#else
+			mbdigits[n]
+			  = curctype->values[_NL_CTYPE_INDIGITS0_MB + n].string;
+
+		      /*  Get the equivalent wide char in map.  */
+		      wint_t extra_wcdigit = __towctrans (L'0' + n, map);
+
+		      /*  Convert it to multibyte representation.  */
+		      mbstate_t state;
+		      memset (&state, '\0', sizeof (state));
+
+		      char extra_mbdigit[MB_LEN_MAX];
+		      size_t mblen
+			= __wcrtomb (extra_mbdigit, extra_wcdigit, &state);
+
+		      if (mblen == (size_t) -1)
+			{
+			  /*  Ignore this new level.  */
+			  map = NULL;
+			  break;
+			}
+
+		      /*  Calculate the length of mbdigits[n].  */
+		      const char *last_char = mbdigits[n];
+		      for (level = 0; level < to_level; ++level)
+			last_char = strchr (last_char, '\0') + 1;
+
+		      size_t mbdigits_len = last_char - mbdigits[n];
+
+		      /*  Allocate memory for extended multibyte digit.  */
+		      char *mb_extended;
+		      mb_extended = (char *) alloca (mbdigits_len + mblen + 1);
+
+		      /*  And get the mbdigits + extra_digit string.  */
+		      *(char *) __mempcpy (__mempcpy (mb_extended, mbdigits[n],
+						      mbdigits_len),
+					   extra_mbdigit, mblen) = '\0';
+		      mbdigits_extended[n] = mb_extended;
+#endif
+		    }
+		}
 #endif
 
 	      /* Read the number into workspace.  */
 	      while (c != EOF && width != 0)
 		{
+		  int n;
 		  /* In this round we get the pointer to the digit strings
 		     and also perform the first round of comparisons.  */
 		  for (n = 0; n < 10; ++n)
 		    {
 		      /* Get the string for the digits with value N.  */
 #ifdef COMPILE_WSCANF
-		      wcdigits[n] = (const wchar_t *)
-			_NL_CURRENT (LC_CTYPE, _NL_CTYPE_INDIGITS0_WC + n);
+		      if (__glibc_unlikely (map != NULL))
+			wcdigits[n] = wcdigits_extended[n];
+		      else
+			wcdigits[n] = (const wchar_t *)
+			  _NL_CURRENT (LC_CTYPE, _NL_CTYPE_INDIGITS0_WC + n);
 		      wcdigits[n] += from_level;
 
-		      if (c == *wcdigits[n])
+		      if (c == (wint_t) *wcdigits[n])
 			{
 			  to_level = from_level;
 			  break;
@@ -1260,20 +1538,28 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      const char *cmpp;
 		      int avail = width > 0 ? width : INT_MAX;
 
-		      mbdigits[n] = _NL_CURRENT (LC_CTYPE,
-						 _NL_CTYPE_INDIGITS0_MB + n);
+		      if (__glibc_unlikely (map != NULL))
+			mbdigits[n] = mbdigits_extended[n];
+		      else
+#ifdef __HAIKU__
+			mbdigits[n] = _NL_CURRENT (LC_CTYPE,
+			  _NL_CTYPE_INDIGITS0_MB + n);
+#else
+			mbdigits[n]
+			  = curctype->values[_NL_CTYPE_INDIGITS0_MB + n].string;
+#endif
 
 		      for (level = 0; level < from_level; level++)
 			mbdigits[n] = strchr (mbdigits[n], '\0') + 1;
 
 		      cmpp = mbdigits[n];
-		      while ((unsigned char) *cmpp == c && avail > 0)
+		      while ((unsigned char) *cmpp == c && avail >= 0)
 			{
 			  if (*++cmpp == '\0')
 			    break;
 			  else
 			    {
-			      if ((c = inchar ()) == EOF)
+			      if (avail == 0 || inchar () == EOF)
 				break;
 			      --avail;
 			    }
@@ -1310,7 +1596,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			  for (n = 0; n < 10; ++n)
 			    {
 #ifdef COMPILE_WSCANF
-			      if (c == *wcdigits[n])
+			      if (c == (wint_t) *wcdigits[n])
 				break;
 
 			      /* Advance the pointer to the next string.  */
@@ -1320,13 +1606,13 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			      int avail = width > 0 ? width : INT_MAX;
 
 			      cmpp = mbdigits[n];
-			      while ((unsigned char) *cmpp == c && avail > 0)
+			      while ((unsigned char) *cmpp == c && avail >= 0)
 				{
 				  if (*++cmpp == '\0')
 				    break;
 				  else
 				    {
-				      if ((c = inchar ()) == EOF)
+				      if (avail == 0 || inchar () == EOF)
 					break;
 				      --avail;
 				    }
@@ -1365,13 +1651,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
 		  if (n < 10)
 		    c = L_('0') + n;
-		  else if ((flags & GROUP)
-#ifdef COMPILE_WSCANF
-			   && thousands != L'\0'
-#else
-			   && thousands != NULL
-#endif
-			   )
+		  else if (flags & GROUP)
 		    {
 		      /* Try matching against the thousands separator.  */
 #ifdef COMPILE_WSCANF
@@ -1381,14 +1661,14 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      const char *cmpp = thousands;
 		      int avail = width > 0 ? width : INT_MAX;
 
-		      while ((unsigned char) *cmpp == c && avail > 0)
+		      while ((unsigned char) *cmpp == c && avail >= 0)
 			{
 			  ADDW (c);
 			  if (*++cmpp == '\0')
 			    break;
 			  else
 			    {
-			      if ((c = inchar ()) == EOF)
+			      if (avail == 0 || inchar () == EOF)
 				break;
 			      --avail;
 			    }
@@ -1435,15 +1715,9 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		    if (!ISXDIGIT (c))
 		      break;
 		  }
-		else if (!ISDIGIT (c) || c - L_('0') >= base)
+		else if (!ISDIGIT (c) || (int) (c - L_('0')) >= base)
 		  {
-		    if (base == 10 && (flags & GROUP)
-#ifdef COMPILE_WSCANF
-			&& thousands != L'\0'
-#else
-			&& thousands != NULL
-#endif
-			)
+		    if (base == 10 && (flags & GROUP))
 		      {
 			/* Try matching against the thousands separator.  */
 #ifdef COMPILE_WSCANF
@@ -1453,14 +1727,14 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			const char *cmpp = thousands;
 			int avail = width > 0 ? width : INT_MAX;
 
-			while ((unsigned char) *cmpp == c && avail > 0)
+			while ((unsigned char) *cmpp == c && avail >= 0)
 			  {
 			    ADDW (c);
 			    if (*++cmpp == '\0')
 			      break;
 			    else
 			      {
-				if ((c = inchar ()) == EOF)
+				if (avail == 0 || inchar () == EOF)
 				  break;
 				--avail;
 			      }
@@ -1503,12 +1777,14 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	    {
 	      /* There was no number.  If we are supposed to read a pointer
 		 we must recognize "(nil)" as well.  */
-	      if (wpsize == 0 && read_pointer && (width < 0 || width >= 0)
-		  && c == '('
-		  && TOLOWER (inchar ()) == L_('n')
-		  && TOLOWER (inchar ()) == L_('i')
-		  && TOLOWER (inchar ()) == L_('l')
-		  && inchar () == L_(')'))
+	      if (__builtin_expect (wpsize == 0
+				    && (flags & READ_POINTER)
+				    && (width < 0 || width >= 5)
+				    && c == '('
+				    && TOLOWER (inchar ()) == L_('n')
+				    && TOLOWER (inchar ()) == L_('i')
+				    && TOLOWER (inchar ()) == L_('l')
+				    && inchar () == L_(')'), 1))
 		/* We must produce the value of a NULL pointer.  A single
 		   '0' digit is enough.  */
 		ADDW (L_('0'));
@@ -1529,24 +1805,37 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	  ADDW (L_('\0'));
 	  if (need_longlong && (flags & LONGDBL))
 	    {
-	      if (number_signed)
+	      if (flags & NUMBER_SIGNED)
 		num.q = __strtoll_internal (wp, &tw, base, flags & GROUP);
 	      else
 		num.uq = __strtoull_internal (wp, &tw, base, flags & GROUP);
 	    }
 	  else
 	    {
-	      if (number_signed)
+	      if (flags & NUMBER_SIGNED)
 		num.l = __strtol_internal (wp, &tw, base, flags & GROUP);
 	      else
 		num.ul = __strtoul_internal (wp, &tw, base, flags & GROUP);
 	    }
-	  if (wp == tw)
+	  if (__glibc_unlikely (wp == tw))
 	    conv_error ();
 
 	  if (!(flags & SUPPRESS))
 	    {
-	      if (! number_signed)
+	      if (flags & NUMBER_SIGNED)
+		{
+		  if (need_longlong && (flags & LONGDBL))
+		    *ARG (LONGLONG int *) = num.q;
+		  else if (need_long && (flags & LONG))
+		    *ARG (long int *) = num.l;
+		  else if (flags & SHORT)
+		    *ARG (short int *) = (short int) num.l;
+		  else if (!(flags & CHAR))
+		    *ARG (int *) = (int) num.l;
+		  else
+		    *ARG (signed char *) = (signed char) num.ul;
+		}
+	      else
 		{
 		  if (need_longlong && (flags & LONGDBL))
 		    *ARG (unsigned LONGLONG int *) = num.uq;
@@ -1559,19 +1848,6 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		    *ARG (unsigned int *) = (unsigned int) num.ul;
 		  else
 		    *ARG (unsigned char *) = (unsigned char) num.ul;
-		}
-	      else
-		{
-		  if (need_longlong && (flags & LONGDBL))
-		    *ARG (LONGLONG int *) = num.q;
-		  else if (need_long && (flags & LONG))
-		    *ARG (long int *) = num.l;
-		  else if (flags & SHORT)
-		    *ARG (short int *) = (short int) num.l;
-		  else if (!(flags & CHAR))
-		    *ARG (int *) = (int) num.l;
-		  else
-		    *ARG (signed char *) = (signed char) num.ul;
 		}
 	      ++done;
 	    }
@@ -1586,63 +1862,20 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	case L_('a'):
 	case L_('A'):
 	  c = inchar ();
-	  if (c == EOF)
+	  if (width > 0)
+	    --width;
+	  if (__glibc_unlikely (c == EOF))
 	    input_error ();
+
+	  got_digit = got_dot = got_e = 0;
 
 	  /* Check for a sign.  */
 	  if (c == L_('-') || c == L_('+'))
 	    {
 	      negative = c == L_('-');
-	      if (width == 0 || inchar () == EOF)
+	      if (__glibc_unlikely (width == 0 || inchar () == EOF))
 		/* EOF is only an input error before we read any chars.  */
 		conv_error ();
-	      if (! ISDIGIT (c) && TOLOWER (c) != L_('i')
-		  && TOLOWER (c) != L_('n'))
-		{
-#ifdef COMPILE_WSCANF
-		  if (c != decimal)
-		    {
-		      /* This is no valid number.  */
-		      ungetc (c, s);
-		      conv_error ();
-		    }
-#else
-		  /* Match against the decimal point.  At this point
-                     we are taking advantage of the fact that we can
-                     push more than one character back.  This is
-                     (almost) never necessary since the decimal point
-                     string hopefully never contains more than one
-                     byte.  */
-		  const char *cmpp = decimal;
-		  int avail = width > 0 ? width : INT_MAX;
-
-		  while ((unsigned char) *cmpp == c && avail > 0)
-		    if (*++cmpp == '\0')
-		      break;
-		    else
-		      {
-			if (inchar () == EOF)
-			  break;
-			--avail;
-		      }
-
-		  if (*cmpp != '\0')
-		    {
-		      /* This is no valid number.  */
-		      while (1)
-			{
-			  ungetc (c, s);
-			  if (cmpp == decimal)
-			    break;
-			  c = (unsigned char) *--cmpp;
-			}
-
-		      conv_error ();
-		    }
-		  if (width > 0)
-		    width = avail;
-#endif
-		}
 	      if (width > 0)
 		--width;
 	    }
@@ -1654,12 +1887,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	    {
 	      /* Maybe "nan".  */
 	      ADDW (c);
-	      if (width == 0 || inchar () == EOF || TOLOWER (c) != L_('a'))
+	      if (__builtin_expect (width == 0
+				    || inchar () == EOF
+				    || TOLOWER (c) != L_('a'), 0))
 		conv_error ();
 	      if (width > 0)
 		--width;
 	      ADDW (c);
-	      if (width == 0 || inchar () == EOF || TOLOWER (c) != L_('n'))
+	      if (__builtin_expect (width == 0
+				    || inchar () == EOF
+				    || TOLOWER (c) != L_('n'), 0))
 		conv_error ();
 	      if (width > 0)
 		--width;
@@ -1671,12 +1908,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	    {
 	      /* Maybe "inf" or "infinity".  */
 	      ADDW (c);
-	      if (width == 0 || inchar () == EOF || TOLOWER (c) != L_('n'))
+	      if (__builtin_expect (width == 0
+				    || inchar () == EOF
+				    || TOLOWER (c) != L_('n'), 0))
 		conv_error ();
 	      if (width > 0)
 		--width;
 	      ADDW (c);
-	      if (width == 0 || inchar () == EOF || TOLOWER (c) != L_('f'))
+	      if (__builtin_expect (width == 0
+				    || inchar () == EOF
+				    || TOLOWER (c) != L_('f'), 0))
 		conv_error ();
 	      if (width > 0)
 		--width;
@@ -1690,26 +1931,30 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			--width;
 		      /* Now we have to read the rest as well.  */
 		      ADDW (c);
-		      if (width == 0 || inchar () == EOF
-			  || TOLOWER (c) != L_('n'))
+		      if (__builtin_expect (width == 0
+					    || inchar () == EOF
+					    || TOLOWER (c) != L_('n'), 0))
 			conv_error ();
 		      if (width > 0)
 			--width;
 		      ADDW (c);
-		      if (width == 0 || inchar () == EOF
-			  || TOLOWER (c) != L_('i'))
+		      if (__builtin_expect (width == 0
+					    || inchar () == EOF
+					    || TOLOWER (c) != L_('i'), 0))
 			conv_error ();
 		      if (width > 0)
 			--width;
 		      ADDW (c);
-		      if (width == 0 || inchar () == EOF
-			  || TOLOWER (c) != L_('t'))
+		      if (__builtin_expect (width == 0
+					    || inchar () == EOF
+					    || TOLOWER (c) != L_('t'), 0))
 			conv_error ();
 		      if (width > 0)
 			--width;
 		      ADDW (c);
-		      if (width == 0 || inchar () == EOF
-			  || TOLOWER (c) != L_('y'))
+		      if (__builtin_expect (width == 0
+					    || inchar () == EOF
+					    || TOLOWER (c) != L_('y'), 0))
 			conv_error ();
 		      if (width > 0)
 			--width;
@@ -1722,7 +1967,6 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	      goto scan_float;
 	    }
 
-	  is_hexa = 0;
 	  exp_char = L_('e');
 	  if (width != 0 && c == L_('0'))
 	    {
@@ -1735,7 +1979,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		  /* It is a number in hexadecimal format.  */
 		  ADDW (c);
 
-		  is_hexa = 1;
+		  flags |= HEXA_FLOAT;
 		  exp_char = L_('p');
 
 		  /* Grouping is not allowed.  */
@@ -1744,19 +1988,27 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		  if (width > 0)
 		    --width;
 		}
+	      else
+		got_digit = 1;
 	    }
 
-	  got_dot = got_e = 0;
-	  do
+	  while (1)
 	    {
 	      if (ISDIGIT (c))
-		ADDW (c);
-	      else if (!got_e && is_hexa && ISXDIGIT (c))
-		ADDW (c);
+		{
+		  ADDW (c);
+		  got_digit = 1;
+		}
+	      else if (!got_e && (flags & HEXA_FLOAT) && ISXDIGIT (c))
+		{
+		  ADDW (c);
+		  got_digit = 1;
+		}
 	      else if (got_e && wp[wpsize - 1] == exp_char
 		       && (c == L_('-') || c == L_('+')))
 		ADDW (c);
-	      else if (wpsize > 0 && !got_e && TOLOWER (c) == exp_char)
+	      else if (got_digit && !got_e
+		       && (CHAR_T) TOLOWER (c) == exp_char)
 		{
 		  ADDW (exp_char);
 		  got_e = got_dot = 1;
@@ -1769,7 +2021,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      ADDW (c);
 		      got_dot = 1;
 		    }
-		  else if (thousands != L'\0' && ! got_dot && c == thousands)
+		  else if ((flags & GROUP) != 0 && ! got_dot && c == thousands)
 		    ADDW (c);
 		  else
 		    {
@@ -1784,12 +2036,12 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
 		  if (! got_dot)
 		    {
-		      while ((unsigned char) *cmpp == c && avail > 0)
+		      while ((unsigned char) *cmpp == c && avail >= 0)
 			if (*++cmpp == '\0')
 			  break;
 			else
 			  {
-			    if (inchar () == EOF)
+			    if (avail == 0 || inchar () == EOF)
 			      break;
 			    --avail;
 			  }
@@ -1813,19 +2065,19 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			 we can compare against it.  */
 		      const char *cmp2p = thousands;
 
-		      if (thousands != NULL && ! got_dot)
+		      if ((flags & GROUP) != 0 && ! got_dot)
 			{
-			  while (cmp2p < cmpp
+			  while (cmp2p - thousands < cmpp - decimal
 				 && *cmp2p == decimal[cmp2p - thousands])
 			    ++cmp2p;
-			  if (cmp2p == cmpp)
+			  if (cmp2p - thousands == cmpp - decimal)
 			    {
-			      while ((unsigned char) *cmp2p == c && avail > 0)
+			      while ((unsigned char) *cmp2p == c && avail >= 0)
 				if (*++cmp2p == '\0')
 				  break;
 				else
 				  {
-				    if (inchar () == EOF)
+				    if (avail == 0 || inchar () == EOF)
 				      break;
 				    --avail;
 				  }
@@ -1850,27 +2102,250 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		    }
 #endif
 		}
+
+	      if (width == 0 || inchar () == EOF)
+		break;
+
 	      if (width > 0)
 		--width;
 	    }
-	  while (width != 0 && inchar () != EOF);
+
+#ifndef __HAIKU__
+	  wctrans_t map;
+	  if (__builtin_expect ((flags & I18N) != 0, 0)
+	      /* Hexadecimal floats make no sense, fixing localized
+		 digits with ASCII letters.  */
+	      && !(flags & HEXA_FLOAT)
+	      /* Minimum requirement.  */
+	      && (wpsize == 0 || got_dot)
+	      && (map = __wctrans ("to_inpunct")) != NULL)
+	    {
+	      /* Reget the first character.  */
+	      inchar ();
+
+	      /* Localized digits, decimal points, and thousands
+		 separator.  */
+	      wint_t wcdigits[12];
+
+	      /* First get decimal equivalent to check if we read it
+		 or not.  */
+	      wcdigits[11] = __towctrans (L'.', map);
+
+	      /* If we have not read any character or have just read
+		 locale decimal point which matches the decimal point
+		 for localized FP numbers, then we may have localized
+		 digits.  Note, we test GOT_DOT above.  */
+#ifdef COMPILE_WSCANF
+	      if (wpsize == 0 || (wpsize == 1 && wcdigits[11] == decimal))
+#else
+	      char mbdigits[12][MB_LEN_MAX + 1];
+
+	      mbstate_t state;
+	      memset (&state, '\0', sizeof (state));
+
+	      bool match_so_far = wpsize == 0;
+	      size_t mblen = __wcrtomb (mbdigits[11], wcdigits[11], &state);
+	      if (mblen != (size_t) -1)
+		{
+		  mbdigits[11][mblen] = '\0';
+		  match_so_far |= (wpsize == strlen (decimal)
+				   && strcmp (decimal, mbdigits[11]) == 0);
+		}
+	      else
+		{
+		  size_t decimal_len = strlen (decimal);
+		  /* This should always be the case but the data comes
+		     from a file.  */
+		  if (decimal_len <= MB_LEN_MAX)
+		    {
+		      match_so_far |= wpsize == decimal_len;
+		      memcpy (mbdigits[11], decimal, decimal_len + 1);
+		    }
+		  else
+		    match_so_far = false;
+		}
+
+	      if (match_so_far)
+#endif
+		{
+		  bool have_locthousands = (flags & GROUP) != 0;
+
+		  /* Now get the digits and the thousands-sep equivalents.  */
+		  for (int n = 0; n < 11; ++n)
+		    {
+		      if (n < 10)
+			wcdigits[n] = __towctrans (L'0' + n, map);
+		      else if (n == 10)
+			{
+			  wcdigits[10] = __towctrans (L',', map);
+			  have_locthousands &= wcdigits[10] != L'\0';
+			}
+
+#ifndef COMPILE_WSCANF
+		      memset (&state, '\0', sizeof (state));
+
+		      size_t mblen = __wcrtomb (mbdigits[n], wcdigits[n],
+						&state);
+		      if (mblen == (size_t) -1)
+			{
+			  if (n == 10)
+			    {
+			      if (have_locthousands)
+				{
+				  size_t thousands_len = strlen (thousands);
+				  if (thousands_len <= MB_LEN_MAX)
+				    memcpy (mbdigits[10], thousands,
+					    thousands_len + 1);
+				  else
+				    have_locthousands = false;
+				}
+			    }
+			  else
+			    /* Ignore checking against localized digits.  */
+			    goto no_i18nflt;
+			}
+		      else
+			mbdigits[n][mblen] = '\0';
+#endif
+		    }
+
+		  /* Start checking against localized digits, if
+		     conversion is done correctly. */
+		  while (1)
+		    {
+		      if (got_e && wp[wpsize - 1] == exp_char
+			  && (c == L_('-') || c == L_('+')))
+			ADDW (c);
+		      else if (wpsize > 0 && !got_e
+			       && (CHAR_T) TOLOWER (c) == exp_char)
+			{
+			  ADDW (exp_char);
+			  got_e = got_dot = 1;
+			}
+		      else
+			{
+			  /* Check against localized digits, decimal point,
+			     and thousands separator.  */
+			  int n;
+			  for (n = 0; n < 12; ++n)
+			    {
+#ifdef COMPILE_WSCANF
+			      if (c == wcdigits[n])
+				{
+				  if (n < 10)
+				    ADDW (L_('0') + n);
+				  else if (n == 11 && !got_dot)
+				    {
+				      ADDW (decimal);
+				      got_dot = 1;
+				    }
+				  else if (n == 10 && have_locthousands
+					   && ! got_dot)
+				    ADDW (thousands);
+				  else
+				    /* The last read character is not part
+				       of the number anymore.  */
+				    n = 12;
+
+				  break;
+				}
+#else
+			      const char *cmpp = mbdigits[n];
+			      int avail = width > 0 ? width : INT_MAX;
+
+			      while ((unsigned char) *cmpp == c && avail >= 0)
+				if (*++cmpp == '\0')
+				  break;
+				else
+				  {
+				    if (avail == 0 || inchar () == EOF)
+				      break;
+				    --avail;
+				  }
+			      if (*cmpp == '\0')
+				{
+				  if (width > 0)
+				    width = avail;
+
+				  if (n < 10)
+				    ADDW (L_('0') + n);
+				  else if (n == 11 && !got_dot)
+				    {
+				      /* Add all the characters.  */
+				      for (cmpp = decimal; *cmpp != '\0';
+					   ++cmpp)
+					ADDW ((unsigned char) *cmpp);
+
+				      got_dot = 1;
+				    }
+				  else if (n == 10 && (flags & GROUP) != 0
+					   && ! got_dot)
+				    {
+				      /* Add all the characters.  */
+				      for (cmpp = thousands; *cmpp != '\0';
+					   ++cmpp)
+					ADDW ((unsigned char) *cmpp);
+				    }
+				  else
+				    /* The last read character is not part
+				       of the number anymore.  */
+				      n = 12;
+
+				  break;
+				}
+
+			      /* We are pushing all read characters back.  */
+			      if (cmpp > mbdigits[n])
+				{
+				  ungetc (c, s);
+				  while (--cmpp > mbdigits[n])
+				    ungetc_not_eof ((unsigned char) *cmpp, s);
+				  c = (unsigned char) *cmpp;
+				}
+#endif
+			    }
+
+			  if (n >= 12)
+			    {
+			      /* The last read character is not part
+				 of the number anymore.  */
+			      ungetc (c, s);
+			      break;
+			    }
+			}
+
+		      if (width == 0 || inchar () == EOF)
+			break;
+
+		      if (width > 0)
+			--width;
+		    }
+		}
+
+#ifndef COMPILE_WSCANF
+	    no_i18nflt:
+	      ;
+#endif
+	    }
+#endif
 
 	  /* Have we read any character?  If we try to read a number
 	     in hexadecimal notation and we have read only the `0x'
-	     prefix or no exponent this is an error.  */
-	  if (wpsize == 0 || (is_hexa && (wpsize == 2 || ! got_e)))
+	     prefix this is an error.  */
+	  if (__builtin_expect (wpsize == 0
+				|| ((flags & HEXA_FLOAT) && wpsize == 2), 0))
 	    conv_error ();
 
 	scan_float:
 	  /* Convert the number.  */
 	  ADDW (L_('\0'));
-	  if (flags & LONGDBL)
+	  if ((flags & LONGDBL) && !__ldbl_is_dbl)
 	    {
 	      long double d = __strtold_internal (wp, &tw, flags & GROUP);
 	      if (!(flags & SUPPRESS) && tw != wp)
 		*ARG (long double *) = negative ? -d : d;
 	    }
-	  else if (flags & LONG)
+	  else if (flags & (LONG | LONGDBL))
 	    {
 	      double d = __strtod_internal (wp, &tw, flags & GROUP);
 	      if (!(flags & SUPPRESS) && tw != wp)
@@ -1883,7 +2358,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		*ARG (float *) = negative ? -d : d;
 	    }
 
-	  if (tw == wp)
+	  if (__glibc_unlikely (tw == wp))
 	    conv_error ();
 
 	  if (!(flags & SUPPRESS))
@@ -1891,10 +2366,12 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	  break;
 
 	case L_('['):	/* Character class.  */
+	{
+	  wchar_t *twend;
 	  if (flags & LONG)
-	    STRING_ARG (wstr, wchar_t);
+	    STRING_ARG (wstr, wchar_t, 100);
 	  else
-	    STRING_ARG (str, char);
+	    STRING_ARG (str, char, 100);
 
 	  if (*f == L_('^'))
 	    {
@@ -1909,7 +2386,6 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	       number of characters we read.  Therefore we set width to
 	       a very high value to make the algorithm easier.  */
 	    width = INT_MAX;
-
 #ifdef COMPILE_WSCANF
 	  /* Find the beginning and the end of the scanlist.  We are not
 	     creating a lookup table since it would have to be too large.
@@ -1923,9 +2399,9 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
 	  while ((fc = *f++) != L'\0' && fc != L']');
 
-	  if (fc == L'\0')
+	  if (__glibc_unlikely (fc == L'\0'))
 	    conv_error ();
-	  wp = (wchar_t *) f - 1;
+	  twend = (wchar_t *) f - 1;
 #else
 	  /* Fill WP with byte flags indexed by character.
 	     We will use this flag map for matching input characters.  */
@@ -1959,7 +2435,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	      /* Add the character to the flag map.  */
 	      wp[fc] = 1;
 
-	  if (fc == '\0')
+	  if (__glibc_unlikely (fc == '\0'))
 	    conv_error();
 #endif
 
@@ -1967,7 +2443,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	    {
 	      size_t now = read_in;
 #ifdef COMPILE_WSCANF
-	      if (inchar () == WEOF)
+	      if (__glibc_unlikely (inchar () == WEOF))
 		input_error ();
 
 	      do
@@ -1976,9 +2452,10 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
 		  /* Test whether it's in the scanlist.  */
 		  runp = tw;
-		  while (runp < wp)
+		  while (runp < twend)
 		    {
-		      if (runp[0] == L'-' && runp[1] != '\0' && runp + 1 != wp
+		      if (runp[0] == L'-' && runp[1] != '\0'
+			  && runp + 1 != twend
 			  && runp != tw
 			  && (unsigned int) runp[-1] <= (unsigned int) runp[1])
 			{
@@ -1987,7 +2464,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			  wchar_t wc;
 
 			  for (wc = runp[-1] + 1; wc <= runp[1]; ++wc)
-			    if (wc == c)
+			    if ((wint_t) wc == c)
 			      break;
 
 			  if (wc <= runp[1] && !not_in)
@@ -1995,7 +2472,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			  if (wc <= runp[1] && not_in)
 			    {
 			      /* The current character is not in the
-                                 scanset.  */
+				 scanset.  */
 			      ungetc (c, s);
 			      goto out;
 			    }
@@ -2004,11 +2481,11 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			}
 		      else
 			{
-			  if (*runp == c && !not_in)
+			  if ((wint_t) *runp == c && !not_in)
 			    break;
-			  if (*runp == c && not_in)
+			  if ((wint_t) *runp == c && not_in)
 			    {
-				  ungetc (c, s);
+			      ungetc (c, s);
 			      goto out;
 			    }
 
@@ -2016,7 +2493,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			}
 		    }
 
-		  if (runp == wp && !not_in)
+		  if (runp == twend && !not_in)
 		    {
 		      ungetc (c, s);
 		      goto out;
@@ -2042,10 +2519,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 						  * sizeof (wchar_t));
 			      if (wstr == NULL)
 				{
+				  if (flags & POSIX_MALLOC)
+				    {
+				      done = EOF;
+				      goto errout;
+				    }
 				  /* We lose.  Oh well.  Terminate the string
 				     and stop converting, so at least we don't
 				     skip any input.  */
 				  ((wchar_t *) (*strptr))[strsize - 1] = L'\0';
+				  strptr = NULL;
 				  ++done;
 				  conv_error ();
 				}
@@ -2072,7 +2555,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	      size_t cnt = 0;
 	      mbstate_t cstate;
 
-	      if (inchar () == EOF)
+	      if (__glibc_unlikely (inchar () == EOF))
 		input_error ();
 
 	      memset (&cstate, '\0', sizeof (cstate));
@@ -2102,6 +2585,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			  assert (cnt < MB_CUR_MAX);
 			  continue;
 			}
+		      cnt = 0;
 
 		      ++wstr;
 		      if ((flags & MALLOC)
@@ -2120,10 +2604,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 						   * sizeof (wchar_t)));
 			      if (wstr == NULL)
 				{
+				  if (flags & POSIX_MALLOC)
+				    {
+				      done = EOF;
+				      goto errout;
+				    }
 				  /* We lose.  Oh well.  Terminate the
 				     string and stop converting,
 				     so at least we don't skip any input.  */
 				  ((wchar_t *) (*strptr))[strsize - 1] = L'\0';
+				  strptr = NULL;
 				  ++done;
 				  conv_error ();
 				}
@@ -2148,13 +2638,13 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		}
 	      while (inchar () != EOF);
 
-	      if (cnt != 0)
+	      if (__glibc_unlikely (cnt != 0))
 		/* We stopped in the middle of recognizing another
 		   character.  That's a problem.  */
 		encode_error ();
 #endif
 
-	      if (now == read_in)
+	      if (__glibc_unlikely (now == read_in))
 		/* We haven't succesfully read any character.  */
 		conv_error ();
 
@@ -2171,6 +2661,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      if (cp != NULL)
 			*strptr = (char *) cp;
 		    }
+		  strptr = NULL;
 
 		  ++done;
 		}
@@ -2179,7 +2670,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	    {
 	      size_t now = read_in;
 
-	      if (inchar () == EOF)
+	      if (__glibc_unlikely (inchar () == EOF))
 		input_error ();
 
 #ifdef COMPILE_WSCANF
@@ -2193,9 +2684,10 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
 		  /* Test whether it's in the scanlist.  */
 		  runp = tw;
-		  while (runp < wp)
+		  while (runp < twend)
 		    {
-		      if (runp[0] == L'-' && runp[1] != '\0' && runp + 1 != wp
+		      if (runp[0] == L'-' && runp[1] != '\0'
+			  && runp + 1 != twend
 			  && runp != tw
 			  && (unsigned int) runp[-1] <= (unsigned int) runp[1])
 			{
@@ -2204,7 +2696,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			  wchar_t wc;
 
 			  for (wc = runp[-1] + 1; wc <= runp[1]; ++wc)
-			    if (wc == c)
+			    if ((wint_t) wc == c)
 			      break;
 
 			  if (wc <= runp[1] && !not_in)
@@ -2212,7 +2704,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			  if (wc <= runp[1] && not_in)
 			    {
 			      /* The current character is not in the
-                                 scanset.  */
+				 scanset.  */
 			      ungetc (c, s);
 			      goto out2;
 			    }
@@ -2221,9 +2713,9 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			}
 		      else
 			{
-			  if (*runp == c && !not_in)
+			  if ((wint_t) *runp == c && !not_in)
 			    break;
-			  if (*runp == c && not_in)
+			  if ((wint_t) *runp == c && not_in)
 			    {
 			      ungetc (c, s);
 			      goto out2;
@@ -2233,7 +2725,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			}
 		    }
 
-		  if (runp == wp && !not_in)
+		  if (runp == twend && !not_in)
 		    {
 		      ungetc (c, s);
 		      goto out2;
@@ -2257,10 +2749,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 							 strleng + MB_CUR_MAX);
 			      if (newstr == NULL)
 				{
+				  if (flags & POSIX_MALLOC)
+				    {
+				      done = EOF;
+				      goto errout;
+				    }
 				  /* We lose.  Oh well.  Terminate the string
 				     and stop converting, so at least we don't
 				     skip any input.  */
 				  ((char *) (*strptr))[strleng] = '\0';
+				  strptr = NULL;
 				  ++done;
 				  conv_error ();
 				}
@@ -2281,7 +2779,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		    }
 
 		  n = __wcrtomb (!(flags & SUPPRESS) ? str : NULL, c, &state);
-		  if (n == (size_t) -1)
+		  if (__glibc_unlikely (n == (size_t) -1))
 		    encode_error ();
 
 		  assert (n <= MB_CUR_MAX);
@@ -2306,33 +2804,37 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			  && (char *) str == *strptr + strsize)
 			{
 			  /* Enlarge the buffer.  */
-			  str = (char *) realloc (*strptr, 2 * strsize);
+			  size_t newsize = 2 * strsize;
+
+			allocagain:
+			  str = (char *) realloc (*strptr, newsize);
 			  if (str == NULL)
 			    {
 			      /* Can't allocate that much.  Last-ditch
 				 effort.  */
-			      str = (char *) realloc (*strptr, strsize + 1);
-			      if (str == NULL)
+			      if (newsize > strsize + 1)
 				{
-				  /* We lose.  Oh well.  Terminate the
-				     string and stop converting,
-				     so at least we don't skip any input.  */
-				  ((char *) (*strptr))[strsize - 1] = '\0';
-				  ++done;
-				  conv_error ();
+				  newsize = strsize + 1;
+				  goto allocagain;
 				}
-			      else
+			      if (flags & POSIX_MALLOC)
 				{
-				  *strptr = (char *) str;
-				  str += strsize;
-				  ++strsize;
+				  done = EOF;
+				  goto errout;
 				}
+			      /* We lose.  Oh well.  Terminate the
+				 string and stop converting,
+				 so at least we don't skip any input.  */
+			      ((char *) (*strptr))[strsize - 1] = '\0';
+			      strptr = NULL;
+			      ++done;
+			      conv_error ();
 			    }
 			  else
 			    {
 			      *strptr = (char *) str;
 			      str += strsize;
-			      strsize *= 2;
+			      strsize = newsize;
 			    }
 			}
 		    }
@@ -2340,7 +2842,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	      while (--width > 0 && inchar () != EOF);
 #endif
 
-	      if (now == read_in)
+	      if (__glibc_unlikely (now == read_in))
 		/* We haven't succesfully read any character.  */
 		conv_error ();
 
@@ -2361,10 +2863,16 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      newstr = (char *) realloc (*strptr, strleng + n + 1);
 		      if (newstr == NULL)
 			{
+			  if (flags & POSIX_MALLOC)
+			    {
+			      done = EOF;
+			      goto errout;
+			    }
 			  /* We lose.  Oh well.  Terminate the string
 			     and stop converting, so at least we don't
 			     skip any input.  */
 			  ((char *) (*strptr))[strleng] = '\0';
+			  strptr = NULL;
 			  ++done;
 			  conv_error ();
 			}
@@ -2386,11 +2894,13 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 		      if (cp != NULL)
 			*strptr = cp;
 		    }
+		  strptr = NULL;
 
 		  ++done;
 		}
 	    }
 	  break;
+	}
 
 	case L_('p'):	/* Generic pointer.  */
 	  base = 16;
@@ -2398,8 +2908,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	  flags &= ~(SHORT|LONGDBL);
 	  if (need_long)
 	    flags |= LONG;
-	  number_signed = 0;
-	  read_pointer = 1;
+	  flags |= READ_POINTER;
 	  goto number;
 
 	default:
@@ -2418,30 +2927,56 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
       ungetc (c, s);
     }
 
+ errout:
   /* Unlock stream.  */
   UNLOCK_STREAM (s);
 
+  if (use_malloc)
+    free (wp);
+
+  if (errp != NULL)
+    *errp |= errval;
+
+  if (__glibc_unlikely (done == EOF))
+    {
+      if (__glibc_unlikely (ptrs_to_free != NULL))
+	{
+	  struct ptrs_to_free *p = ptrs_to_free;
+	  while (p != NULL)
+	    {
+		size_t cnt;
+	      for (cnt = 0; cnt < p->count; ++cnt)
+		{
+		  free (*p->ptrs[cnt]);
+		  *p->ptrs[cnt] = NULL;
+		}
+	      p = p->next;
+	      ptrs_to_free = p;
+	    }
+	}
+    }
+  else if (__glibc_unlikely (strptr != NULL))
+    {
+      free (*strptr);
+      *strptr = NULL;
+    }
   return done;
 }
 
-#ifdef USE_IN_LIBIO
-# ifdef COMPILE_WSCANF
+#ifdef COMPILE_WSCANF
 int
 __vfwscanf (FILE *s, const wchar_t *format, va_list argptr)
 {
   return _IO_vfwscanf (s, format, argptr, NULL);
 }
-# else
-int
-__vfscanf (FILE *s, const char *format, va_list argptr)
-{
-  return _IO_vfscanf (s, format, argptr, NULL);
-}
-# endif
-#endif
-
-#ifdef COMPILE_WSCANF
 weak_alias (__vfwscanf, vfwscanf)
 #else
-weak_alias (__vfscanf, vfscanf)
+int
+___vfscanf (FILE *s, const char *format, va_list argptr)
+{
+  return _IO_vfscanf_internal (s, format, argptr, NULL);
+}
+strong_alias (_IO_vfscanf_internal, _IO_vfscanf)
+strong_alias (___vfscanf, __vfscanf)
+weak_alias (___vfscanf, vfscanf)
 #endif

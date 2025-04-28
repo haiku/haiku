@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-1993,1995-1999,2000,2001 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -12,9 +12,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef	_PRINTF_H
 
@@ -28,6 +27,7 @@ __BEGIN_DECLS
 #define	__need_size_t
 #define __need_wchar_t
 #include <stddef.h>
+#include <stdarg.h>
 
 
 struct printf_info
@@ -47,6 +47,10 @@ struct printf_info
   unsigned int is_char:1;	/* hh flag.  */
   unsigned int wide:1;		/* Nonzero for wide character streams.  */
   unsigned int i18n:1;		/* I flag.  */
+#ifndef __HAIKU__
+  unsigned int __pad:4;		/* Unused so far.  */
+  unsigned short int user;	/* Bits for user-installed modifiers.  */
+#endif
   wchar_t pad;			/* Padding character.  */
 };
 
@@ -62,23 +66,60 @@ struct printf_info
    or -1 for errors.  */
 
 typedef int printf_function (FILE *__stream,
-			     __const struct printf_info *__info,
-			     __const void *__const *__args);
+			     const struct printf_info *__info,
+			     const void *const *__args);
 
 /* Type of a printf specifier-arginfo function.
    INFO gives information about the format specification.
-   N, ARGTYPES, and return value are as for parse_printf_format.  */
+   N, ARGTYPES, *SIZE has to contain the size of the parameter for
+   user-defined types, and return value are as for parse_printf_format
+   except that -1 should be returned if the handler cannot handle
+   this case.  This allows to partially overwrite the functionality
+   of existing format specifiers.  */
 
-typedef int printf_arginfo_function (__const struct printf_info *__info,
+typedef int printf_arginfo_size_function (const struct printf_info *__info,
+					  size_t __n, int *__argtypes,
+					  int *__size);
+
+/* Old version of 'printf_arginfo_function' without a SIZE parameter.  */
+
+typedef int printf_arginfo_function (const struct printf_info *__info,
 				     size_t __n, int *__argtypes);
+
+/* Type of a function to get a value of a user-defined from the
+   variable argument list.  */
+typedef void printf_va_arg_function (void *__mem, va_list *__ap);
 
 
 /* Register FUNC to be called to format SPEC specifiers; ARGINFO must be
    specified to determine how many arguments a SPEC conversion requires and
    what their types are.  */
 
+extern int register_printf_specifier (int __spec, printf_function __func,
+				      printf_arginfo_size_function __arginfo)
+  __THROW;
+
+
+/* Obsolete interface similar to register_printf_specifier.  It can only
+   handle basic data types because the ARGINFO callback does not return
+   information on the size of the user-defined type.  */
+
 extern int register_printf_function (int __spec, printf_function __func,
-				     printf_arginfo_function __arginfo);
+				     printf_arginfo_function __arginfo)
+  __THROW __attribute_deprecated__;
+
+
+/* Register a new modifier character sequence.  If the call succeeds
+   it returns a positive value representing the bit set in the USER
+   field in 'struct printf_info'.  */
+
+extern int register_printf_modifier (const wchar_t *__str) __wur __THROW;
+
+
+/* Register variable argument handler for user type.  The return value
+   is to be used in ARGINFO functions to signal the use of the
+   type.  */
+extern int register_printf_type (printf_va_arg_function __fct) __wur __THROW;
 
 
 /* Parse FMT, and fill in N elements of ARGTYPES with the
@@ -92,14 +133,15 @@ extern int register_printf_function (int __spec, printf_function __func,
    array it is passed with the types of the arguments it wants, and return
    the number of arguments it wants.  */
 
-extern size_t parse_printf_format (__const char *__restrict __fmt, size_t __n,
+extern size_t parse_printf_format (const char *__restrict __fmt, size_t __n,
 				   int *__restrict __argtypes) __THROW;
 
 
 /* Codes returned by `parse_printf_format' for basic types.
 
    These values cover all the standard format specifications.
-   Users can add new values after PA_LAST for their own types.  */
+   Users can reserve new values after PA_LAST for their own types
+   using 'register_printf_type'.  */
 
 enum
 {				/* C type: */
@@ -131,14 +173,17 @@ enum
    the format specifier is a uppercase character powers of 1000 are
    used.  Otherwise powers of 1024.  */
 extern int printf_size (FILE *__restrict __fp,
-			__const struct printf_info *__info,
-			__const void *__const *__restrict __args) __THROW;
+			const struct printf_info *__info,
+			const void *const *__restrict __args) __THROW;
 
 /* This is the appropriate argument information function for `printf_size'.  */
-extern int printf_size_info (__const struct printf_info *__restrict
+extern int printf_size_info (const struct printf_info *__restrict
 			     __info, size_t __n, int *__restrict __argtypes)
      __THROW;
 
+#ifdef __LDBL_COMPAT
+# include <bits/printf-ldbl.h>
+#endif
 
 __END_DECLS
 

@@ -1,5 +1,5 @@
 /* Print size value using units for orders of magnitude.
-   Copyright (C) 1997,1998,1999,2000,2001,2002 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
    Based on a proposal by Larry McVoy <lm@sgi.com>.
@@ -15,43 +15,34 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
-#include <libioP.h>
-
-#include <stdio_private.h>
 #include <ctype.h>
 #include <ieee754.h>
 #include <math.h>
 #include <printf.h>
+#include <libioP.h>
 
 
 /* This defines make it possible to use the same code for GNU C library and
    the GNU I/O library.	 */
-#ifdef USE_IN_LIBIO
-# define PUT(f, s, n) _IO_sputn (f, s, n)
-# define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : INTUSE(_IO_padn) (f, c, n))
+#define PUT(f, s, n) _IO_sputn (f, s, n)
+#define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : _IO_padn (f, c, n))
 /* We use this file GNU C library and GNU I/O library.	So make
    names equal.	 */
-# undef putc
-# define putc(c, f) (wide \
-		     ? (int)_IO_putwc_unlocked (c, f) : _IO_putc_unlocked (c, f))
-# define size_t	_IO_size_t
-# define FILE	_IO_FILE
-#else	/* ! USE_IN_LIBIO */
-# define PUT(f, s, n) fwrite (s, 1, n, f)
-# define PAD(f, c, n) __printf_pad (f, c, n)
-ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
-#endif	/* USE_IN_LIBIO */
+#undef putc
+#define putc(c, f) (wide \
+		    ? (int)_IO_putwc_unlocked (c, f) : _IO_putc_unlocked (c, f))
+#define size_t	_IO_size_t
+#define FILE	_IO_FILE
 
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
   do									      \
     {									      \
-      register const int outc = (ch);					      \
+      const int outc = (ch);						      \
       if (putc (outc, fp) == EOF)					      \
 	return -1;							      \
       ++done;								      \
@@ -60,7 +51,7 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 #define PRINT(ptr, wptr, len)						      \
   do									      \
     {									      \
-      register size_t outlen = (len);					      \
+      size_t outlen = (len);						      \
       if (len > 20)							      \
 	{								      \
 	  if (PUT (fp, wide ? (const char *) wptr : ptr, outlen) != outlen)   \
@@ -88,9 +79,14 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
     }									      \
   while (0)
 
+/* Prototype for helper functions.  */
+extern int __printf_fp (FILE *fp, const struct printf_info *info,
+			const void *const *args);
+
 
 int
-printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
+__printf_size (FILE *fp, const struct printf_info *info,
+	       const void *const *args)
 {
   /* Units for the both formats.  */
 #define BINARY_UNITS	" kmgtpezy"
@@ -107,12 +103,12 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
   union
     {
       union ieee754_double dbl;
-      union ieee854_long_double ldbl;
+      long double ldbl;
     }
   fpnum;
   const void *ptr = &fpnum;
 
-  int negative = 0;
+  int fpnum_sign = 0;
 
   /* "NaN" or "Inf" for the special cases.  */
   const char *special = NULL;
@@ -121,32 +117,31 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
   struct printf_info fp_info;
   int done = 0;
   int wide = info->wide;
-
+  int res;
 
   /* Fetch the argument value.	*/
 #ifndef __NO_LONG_DOUBLE_MATH
   if (info->is_long_double && sizeof (long double) > sizeof (double))
     {
-      fpnum.ldbl.d = *(const long double *) args[0];
+      fpnum.ldbl = *(const long double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
-      if (isnan (fpnum.ldbl.d))
+      if (isnan (fpnum.ldbl))
 	{
 	  special = "nan";
 	  wspecial = L"nan";
-	  negative = 0;
+	  // fpnum_sign = 0;	Already zero
 	}
-      else if (isinf (fpnum.ldbl.d))
+      else if ((res = isinf (fpnum.ldbl)))
 	{
+	  fpnum_sign = res;
 	  special = "inf";
 	  wspecial = L"inf";
-
-	  negative = fpnum.ldbl.d < 0;
 	}
       else
-	while (fpnum.ldbl.d >= divisor && tag[1] != '\0')
+	while (fpnum.ldbl >= divisor && tag[1] != '\0')
 	  {
-	    fpnum.ldbl.d /= divisor;
+	    fpnum.ldbl /= divisor;
 	    ++tag;
 	  }
     }
@@ -160,14 +155,13 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
 	{
 	  special = "nan";
 	  wspecial = L"nan";
-	  negative = 0;
+	  // fpnum_sign = 0;	Already zero
 	}
-      else if (isinf (fpnum.dbl.d))
+      else if ((res = isinf (fpnum.dbl.d)))
 	{
+	  fpnum_sign = res;
 	  special = "inf";
 	  wspecial = L"inf";
-
-	  negative = fpnum.dbl.d < 0;
 	}
       else
 	while (fpnum.dbl.d >= divisor && tag[1] != '\0')
@@ -181,14 +175,14 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
     {
       int width = info->prec > info->width ? info->prec : info->width;
 
-      if (negative || info->showsign || info->space)
+      if (fpnum_sign < 0 || info->showsign || info->space)
 	--width;
       width -= 3;
 
       if (!info->left && width > 0)
 	PADN (' ', width);
 
-      if (negative)
+      if (fpnum_sign < 0)
 	outchar ('-');
       else if (info->showsign)
 	outchar ('+');
@@ -205,18 +199,9 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
 
   /* Prepare to print the number.  We want to use `__printf_fp' so we
      have to prepare a `printf_info' structure.  */
+  fp_info = *info;
   fp_info.spec = 'f';
   fp_info.prec = info->prec < 0 ? 3 : info->prec;
-  fp_info.is_long_double = info->is_long_double;
-  fp_info.is_short = info->is_short;
-  fp_info.is_long = info->is_long;
-  fp_info.alt = info->alt;
-  fp_info.space = info->space;
-  fp_info.left = info->left;
-  fp_info.showsign = info->showsign;
-  fp_info.group = info->group;
-  fp_info.extra = info->extra;
-  fp_info.pad = info->pad;
   fp_info.wide = wide;
 
   if (fp_info.left && fp_info.pad == L' ')
@@ -246,6 +231,7 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
 
   return done;
 }
+strong_alias (__printf_size, printf_size);
 
 /* This is the function used by `vfprintf' to determine number and
    type of the arguments.  */

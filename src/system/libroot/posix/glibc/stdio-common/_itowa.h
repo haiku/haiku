@@ -1,5 +1,5 @@
 /* Internal function for converting integers to ASCII.
-   Copyright (C) 1994, 95, 96, 97, 98, 99, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1994-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,14 +13,14 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _ITOWA_H
 #define _ITOWA_H	1
 #include <features.h>
 #include <wchar.h>
+#include <_itoa.h>
 
 /* Convert VALUE into ASCII in base BASE (2..36).
    Write backwards starting the character just before BUFLIM.
@@ -31,8 +31,8 @@ extern wchar_t *_itowa (unsigned long long int value, wchar_t *buflim,
 			unsigned int base, int upper_case);
 
 static inline wchar_t *
-__attribute__ ((unused))
-_itowa_word (unsigned long value, wchar_t *buflim,
+__attribute__ ((unused, always_inline))
+_itowa_word (_ITOA_WORD_TYPE value, wchar_t *buflim,
 	     unsigned int base, int upper_case)
 {
   extern const wchar_t _itowa_upper_digits[] attribute_hidden;
@@ -61,5 +61,11 @@ _itowa_word (unsigned long value, wchar_t *buflim,
   return bp;
 }
 #undef SPECIAL
+
+#if !_ITOA_NEEDED
+/* No need for special long long versions.  */
+# define _itowa(value, buf, base, upper_case) \
+  _itowa_word (value, buf, base, upper_case)
+#endif
 
 #endif	/* itowa.h */

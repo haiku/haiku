@@ -1,4 +1,4 @@
-/* Copyright (C) 2000 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 2000.
 
@@ -13,23 +13,80 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+
+#include <stdbool.h>
+#include <wchar.h>
+#include <wctype.h>
 
 #include "../locale/outdigits.h"
 #include "../locale/outdigitswc.h"
 
 static CHAR_T *
-_i18n_number_rewrite (CHAR_T *w, CHAR_T *rear_ptr)
+_i18n_number_rewrite (CHAR_T *w, CHAR_T *rear_ptr, CHAR_T *end)
 {
-  CHAR_T *src, *s;
+#ifdef COMPILE_WPRINTF
+# define decimal NULL
+# define thousands NULL
+#else
+  char decimal[MB_LEN_MAX + 1];
+  char thousands[MB_LEN_MAX + 1];
+#endif
+
+#ifdef __HAIKU__
+  wint_t wdecimal = L'.';
+  wint_t wthousands = L',';
+  void* map = NULL;
+#else
+  /* "to_outpunct" is a map from ASCII decimal point and thousands-sep
+     to their equivalent in locale. This is defined for locales which
+     use extra decimal point and thousands-sep.  */
+  wctrans_t map = __wctrans ("to_outpunct");
+  wint_t wdecimal = __towctrans (L'.', map);
+  wint_t wthousands = __towctrans (L',', map);
+
+#ifndef COMPILE_WPRINTF
+  if (__glibc_unlikely (map != NULL))
+    {
+      mbstate_t state;
+      memset (&state, '\0', sizeof (state));
+
+      size_t n = __wcrtomb (decimal, wdecimal, &state);
+      if (n == (size_t) -1)
+	memcpy (decimal, ".", 2);
+      else
+	decimal[n] = '\0';
+
+      memset (&state, '\0', sizeof (state));
+
+      n = __wcrtomb (thousands, wthousands, &state);
+      if (n == (size_t) -1)
+	memcpy (thousands, ",", 2);
+      else
+	thousands[n] = '\0';
+    }
+#endif
+#endif
 
   /* Copy existing string so that nothing gets overwritten.  */
-  src = (CHAR_T *) alloca ((rear_ptr - w) * sizeof (CHAR_T));
+  CHAR_T *src, *s;
+  bool use_alloca = __libc_use_alloca ((rear_ptr - w) * sizeof (CHAR_T));
+  if (__builtin_expect (use_alloca, true))
+    src = (CHAR_T *) alloca ((rear_ptr - w) * sizeof (CHAR_T));
+  else
+    {
+      src = (CHAR_T *) malloc ((rear_ptr - w) * sizeof (CHAR_T));
+      if (src == NULL)
+	/* If we cannot allocate the memory don't rewrite the string.
+	   It is better than nothing.  */
+	return w;
+    }
+
   s = (CHAR_T *) __mempcpy (src, w,
-			    (rear_ptr - w) * sizeof (CHAR_T));
-  w = rear_ptr;
+				    (rear_ptr - w) * sizeof (CHAR_T));
+
+  w = end;
 
   /* Process all characters in the string.  */
   while (--s >= src)
@@ -41,9 +98,26 @@ _i18n_number_rewrite (CHAR_T *w, CHAR_T *rear_ptr)
 	  else
 	    *--w = (CHAR_T) outdigitwc_value (*s - '0');
 	}
-      else
+      else if (__builtin_expect (map == NULL, 1) || (*s != '.' && *s != ','))
 	*--w = *s;
+      else
+	{
+	  if (sizeof (CHAR_T) == 1)
+	    {
+	      const char *outpunct = *s == '.' ? decimal : thousands;
+	      size_t dlen = strlen (outpunct);
+
+	      w -= dlen;
+	      while (dlen-- > 0)
+		w[dlen] = outpunct[dlen];
+	    }
+	  else
+	    *--w = *s == '.' ? (CHAR_T) wdecimal : (CHAR_T) wthousands;
+	}
     }
+
+  if (! use_alloca)
+    free (src);
 
   return w;
 }

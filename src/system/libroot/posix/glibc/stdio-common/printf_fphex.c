@@ -1,5 +1,5 @@
 /* Print floating point number in hexadecimal notation according to ISO C99.
-   Copyright (C) 1997-2002,2004,2006 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
 
@@ -14,9 +14,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include <ctype.h>
 #include <ieee754.h>
@@ -26,41 +25,34 @@
 #include <stdio.h>
 #include <string.h>
 #include <wchar.h>
-#include "_itoa.h"
-#include "_itowa.h"
+#include <_itoa.h>
+#include <_itowa.h>
 #include <locale/localeinfo.h>
+#include <stdbool.h>
+#include <rounding-mode.h>
 
 /* #define NDEBUG 1*/		/* Undefine this for debugging assertions.  */
 #include <assert.h>
 
-int __printf_fphex (FILE *fp, const struct printf_info *info,
-		const void *const *args);
-
 /* This defines make it possible to use the same code for GNU C library and
    the GNU I/O library.	 */
-#ifdef USE_IN_LIBIO
-# include <libioP.h>
-# define PUT(f, s, n) _IO_sputn (f, s, n)
-# define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : _IO_padn (f, c, n))
+#include <libioP.h>
+#define PUT(f, s, n) _IO_sputn (f, s, n)
+#define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : _IO_padn (f, c, n))
 /* We use this file GNU C library and GNU I/O library.	So make
    names equal.	 */
-# undef putc
-# define putc(c, f) (wide \
+#undef putc
+#define putc(c, f) (wide \
 		     ? (int)_IO_putwc_unlocked (c, f) : _IO_putc_unlocked (c, f))
-# define size_t     _IO_size_t
-# define FILE	     _IO_FILE
-#else	/* ! USE_IN_LIBIO */
-# define PUT(f, s, n) fwrite (s, 1, n, f)
-# define PAD(f, c, n) __printf_pad (f, c, n)
-ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
-#endif	/* USE_IN_LIBIO */
-
+#define size_t     _IO_size_t
+#define FILE	     _IO_FILE
+
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
   do									      \
     {									      \
-      register const int outc = (ch);					      \
+      const int outc = (ch);						      \
       if (putc (outc, fp) == EOF)					      \
 	return -1;							      \
       ++done;								      \
@@ -69,7 +61,7 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 #define PRINT(ptr, wptr, len)						      \
   do									      \
     {									      \
-      register size_t outlen = (len);					      \
+      size_t outlen = (len);						      \
       if (wide)								      \
 	while (outlen-- > 0)						      \
 	  outchar (*wptr++);						      \
@@ -90,88 +82,7 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 #ifndef MIN
 # define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
-
-
-
-#if defined(__x86_64__) || defined(__i386__)
-
-/* sysdeps/x86_64/fpu/printf_fphex.c */
-
-#ifndef LONG_DOUBLE_DENORM_BIAS
-# define LONG_DOUBLE_DENORM_BIAS (IEEE854_LONG_DOUBLE_BIAS - 1)
-#endif
-
-#define PRINT_FPHEX_LONG_DOUBLE \
-do {									      \
-      /* The "strange" 80 bit format on ix86 and m68k has an explicit	      \
-	 leading digit in the 64 bit mantissa.  */			      \
-      unsigned long long int num;					      \
-									      \
-									      \
-      num = (((unsigned long long int) fpnum.ldbl.ieee.mantissa0) << 32	      \
-	     | fpnum.ldbl.ieee.mantissa1);				      \
-									      \
-      zero_mantissa = num == 0;						      \
-									      \
-      if (sizeof (unsigned long int) > 6)				      \
-	{								      \
-	  numstr = _itoa_word (num, numbuf + sizeof numbuf, 16,		      \
-			       info->spec == 'A');			      \
-	  wnumstr = _itowa_word (num,					      \
-				 wnumbuf + sizeof (wnumbuf) / sizeof (wchar_t),\
-				 16, info->spec == 'A');		      \
-	}								      \
-      else								      \
-	{								      \
-	  numstr = _itoa (num, numbuf + sizeof numbuf, 16, info->spec == 'A');\
-	  wnumstr = _itowa (num,					      \
-			    wnumbuf + sizeof (wnumbuf) / sizeof (wchar_t),    \
-			    16, info->spec == 'A');			      \
-	}								      \
-									      \
-      /* Fill with zeroes.  */						      \
-      while (numstr > numbuf + (sizeof numbuf - 64 / 4))		      \
-	{								      \
-	  *--numstr = '0';						      \
-	  *--wnumstr = L'0';						      \
-	}								      \
-									      \
-      /* We use a full nibble for the leading digit.  */		      \
-      leading = *numstr++;						      \
-      wnumstr++;							      \
-									      \
-      /* We have 3 bits from the mantissa in the leading nibble.	      \
-	 Therefore we are here using `IEEE854_LONG_DOUBLE_BIAS + 3'.  */      \
-      exponent = fpnum.ldbl.ieee.exponent;				      \
-									      \
-      if (exponent == 0)						      \
-	{								      \
-	  if (zero_mantissa)						      \
-	    expnegative = 0;						      \
-	  else								      \
-	    {								      \
-	      /* This is a denormalized number.  */			      \
-	      expnegative = 1;						      \
-	      /* This is a hook for the m68k long double format, where the    \
-		 exponent bias is the same for normalized and denormalized    \
-		 numbers.  */						      \
-	      exponent = LONG_DOUBLE_DENORM_BIAS + 3;			      \
-	    }								      \
-	}								      \
-      else if (exponent >= IEEE854_LONG_DOUBLE_BIAS + 3)		      \
-	{								      \
-	  expnegative = 0;						      \
-	  exponent -= IEEE854_LONG_DOUBLE_BIAS + 3;			      \
-	}								      \
-      else								      \
-	{								      \
-	  expnegative = 1;						      \
-	  exponent = -(exponent - (IEEE854_LONG_DOUBLE_BIAS + 3));	      \
-	}								      \
-} while (0)
-
-#endif	/* __x86_64__ || __i386__ */
-
+
 
 int
 __printf_fphex (FILE *fp,
@@ -182,7 +93,7 @@ __printf_fphex (FILE *fp,
   union
     {
       union ieee754_double dbl;
-      union ieee854_long_double ldbl;
+      long double ldbl;
     }
   fpnum;
 
@@ -197,10 +108,10 @@ __printf_fphex (FILE *fp,
   /* Buffer for the generated number string for the mantissa.  The
      maximal size for the mantissa is 128 bits.  */
   char numbuf[32];
-  char *numstr="";
+  char *numstr;
   char *numend;
   wchar_t wnumbuf[32];
-  wchar_t *wnumstr=L"";
+  wchar_t *wnumstr;
   wchar_t *wnumend;
   int negative;
 
@@ -209,14 +120,14 @@ __printf_fphex (FILE *fp,
   char *expstr;
   wchar_t wexpbuf[5];
   wchar_t *wexpstr;
-  int expnegative = 0;
-  int exponent = 0;
+  int expnegative;
+  int exponent;
 
   /* Non-zero is mantissa is zero.  */
-  int zero_mantissa = 1;
+  int zero_mantissa;
 
   /* The leading digit before the decimal point.  */
-  char leading = '0';
+  char leading;
 
   /* Precision.  */
   int precision = info->prec;
@@ -229,6 +140,8 @@ __printf_fphex (FILE *fp,
 
   /* Nonzero if this is output on a wide character stream.  */
   int wide = info->wide;
+  
+  bool do_round_away;
 
 
   /* Figure out the decimal point character.  */
@@ -251,10 +164,10 @@ __printf_fphex (FILE *fp,
 #ifndef __NO_LONG_DOUBLE_MATH
   if (info->is_long_double && sizeof (long double) > sizeof (double))
     {
-      fpnum.ldbl.d = *(const long double *) args[0];
+      fpnum.ldbl = *(const long double *) args[0];
 
       /* Check for special values: not a number or infinity.  */
-      if (isnan (fpnum.ldbl.d))
+      if (isnan (fpnum.ldbl))
 	{
 	  if (isupper (info->spec))
 	    {
@@ -266,11 +179,10 @@ __printf_fphex (FILE *fp,
 	      special = "nan";
 	      wspecial = L"nan";
 	    }
-	  negative = 0;
 	}
       else
 	{
-	  if (isinf (fpnum.ldbl.d))
+	  if (isinf (fpnum.ldbl))
 	    {
 	      if (isupper (info->spec))
 		{
@@ -283,9 +195,8 @@ __printf_fphex (FILE *fp,
 		  wspecial = L"inf";
 		}
 	    }
-
-	  negative = signbit (fpnum.ldbl.d);
 	}
+      negative = signbit (fpnum.ldbl);
     }
   else
 #endif	/* no long double */
@@ -295,6 +206,7 @@ __printf_fphex (FILE *fp,
       /* Check for special values: not a number or infinity.  */
       if (isnan (fpnum.dbl.d))
 	{
+	  negative = fpnum.dbl.ieee.negative != 0;
 	  if (isupper (info->spec))
 	    {
 	      special = "NAN";
@@ -305,11 +217,11 @@ __printf_fphex (FILE *fp,
 	      special = "nan";
 	      wspecial = L"nan";
 	    }
-	  negative = 0;
 	}
       else
 	{
-	  if (isinf (fpnum.dbl.d))
+	  int res = isinf (fpnum.dbl.d);
+	  if (res)
 	    {
 	      if (isupper (info->spec))
 		{
@@ -321,9 +233,10 @@ __printf_fphex (FILE *fp,
 		  special = "inf";
 		  wspecial = L"inf";
 		}
+	      negative = res < 0;
 	    }
-
-	  negative = signbit (fpnum.dbl.d);
+	  else
+	    negative = signbit (fpnum.dbl.d);
 	}
     }
 
@@ -430,21 +343,33 @@ __printf_fphex (FILE *fp,
 	  --numend;
 	}
 
+      do_round_away = false;
+
+      if (precision != -1 && precision < numend - numstr)
+	{
+	  char last_digit = precision > 0 ? numstr[precision - 1] : leading;
+	  char next_digit = numstr[precision];
+	  int last_digit_value = (last_digit >= 'A' && last_digit <= 'F'
+				  ? last_digit - 'A' + 10
+				  : (last_digit >= 'a' && last_digit <= 'f'
+				     ? last_digit - 'a' + 10
+				     : last_digit - '0'));
+	  int next_digit_value = (next_digit >= 'A' && next_digit <= 'F'
+				  ? next_digit - 'A' + 10
+				  : (next_digit >= 'a' && next_digit <= 'f'
+				     ? next_digit - 'a' + 10
+				     : next_digit - '0'));
+	  bool more_bits = ((next_digit_value & 7) != 0
+			    || precision + 1 < numend - numstr);
+	  int rounding_mode = get_rounding_mode ();
+	  do_round_away = round_away (negative, last_digit_value & 1,
+				      next_digit_value >= 8, more_bits,
+				      rounding_mode);
+	}
+
       if (precision == -1)
 	precision = numend - numstr;
-      else if (precision < numend - numstr
-	       && (numstr[precision] > '8'
-		   || (('A' < '0' || 'a' < '0')
-		       && numstr[precision] < '0')
-		   || (numstr[precision] == '8'
-		       && (precision + 1 < numend - numstr
-			   /* Round to even.  */
-			   || (precision > 0
-			       && ((numstr[precision - 1] & 1)
-				   ^ (isdigit (numstr[precision - 1]) == 0)))
-			   || (precision == 0
-			       && ((leading & 1)
-				   ^ (isdigit (leading) == 0)))))))
+      else if (do_round_away)
 	{
 	  /* Round up.  */
 	  int cnt = precision;
@@ -457,7 +382,7 @@ __printf_fphex (FILE *fp,
 		{
 		  wnumstr[cnt] = (wchar_t) info->spec;
 		  numstr[cnt] = info->spec;	/* This is tricky,
-		  				   think about it!  */
+						   think about it!  */
 		  break;
 		}
 	      else if (tolower (ch) < 'f')
