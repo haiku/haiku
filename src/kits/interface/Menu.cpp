@@ -1648,6 +1648,9 @@ BMenu::_Show(bool selectFirstItem, bool keyDown)
 			return false;
 		}
 
+		if (ourWindow)
+			_Install(window);
+
 		_UpdateWindowViewSize(true);
 		window->Show();
 
