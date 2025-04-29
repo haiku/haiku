@@ -488,9 +488,6 @@ protected:
 	virtual void CreatePoses(Model**models, PoseInfo* poseInfoArray, int32 count,
 		BPose** resultingPoses, bool insertionSort = true, int32* lastPoseIndexPointer = 0,
 		BRect* boundsPointer = 0, bool forceDraw = false);
-	virtual bool ShouldShowPose(const Model*, const PoseInfo*);
-		// filter, subclasses override to control which poses show up
-		// subclasses should always call inherited
 	void CreateVolumePose(BVolume*, bool watchIndividually);
 
 	void CreateTrashPose();
