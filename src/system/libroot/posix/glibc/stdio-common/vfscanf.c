@@ -338,6 +338,10 @@ _IO_vfscanf_internal (_IO_FILE *s, const char *format, _IO_va_list argptr,
    thousands = _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_THOUSANDS_SEP_WC);
 #else
    thousands = _NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP);
+#ifdef __HAIKU__
+   if (thousands != NULL && *thousands == '\0')
+     thousands = NULL;
+#endif
 #endif
  }
 
