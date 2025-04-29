@@ -127,8 +127,8 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView* nodeMonitoringTarget,
 
 	result->AddItem(perDesktopIterator);
 	if (nodeMonitoringTarget != NULL) {
-		TTracker::WatchNode(sourceModel.NodeRef(),
-			B_WATCH_DIRECTORY | B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR,
+		TTracker::WatchNode(sourceModel.NodeRef(), B_WATCH_DIRECTORY | B_WATCH_CHILDREN
+				| B_WATCH_NAME | B_WATCH_STAT | B_WATCH_INTERIM_STAT | B_WATCH_ATTR,
 			nodeMonitoringTarget);
 	}
 

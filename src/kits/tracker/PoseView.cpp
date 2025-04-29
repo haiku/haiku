@@ -1216,8 +1216,8 @@ BPoseView::InitDirentIterator(const entry_ref* ref)
 		return NULL;
 	}
 
-	TTracker::WatchNode(sourceModel.NodeRef(), B_WATCH_DIRECTORY
-		| B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR, this);
+	TTracker::WatchNode(sourceModel.NodeRef(), B_WATCH_DIRECTORY | B_WATCH_CHILDREN
+		| B_WATCH_NAME | B_WATCH_STAT | B_WATCH_INTERIM_STAT | B_WATCH_ATTR, this);
 
 	return entryList;
 }
@@ -1233,7 +1233,8 @@ BPoseView::ReturnDirentIterator(EntryListBase* iterator)
 uint32
 BPoseView::WatchNewNodeMask()
 {
-	return B_WATCH_STAT | B_WATCH_INTERIM_STAT | B_WATCH_ATTR;
+	// For regular directories, B_WATCH_CHILDREN suffices.
+	return 0;
 }
 
 
@@ -1247,6 +1248,9 @@ BPoseView::WatchNewNode(const node_ref* item)
 status_t
 BPoseView::WatchNewNode(const node_ref* item, uint32 mask, BMessenger messenger)
 {
+	if (mask == 0)
+		return B_OK;
+
 	status_t result = TTracker::WatchNode(item, mask, messenger);
 
 #if DEBUG

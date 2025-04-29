@@ -54,6 +54,7 @@ All rights reserved.
 #include <Locale.h>
 #include <Mime.h>
 #include <NodeInfo.h>
+#include <NodeMonitor.h>
 #include <Path.h>
 #include <Roster.h>
 #include <SpaceLayoutItem.h>
@@ -687,6 +688,13 @@ void
 OpenWithPoseView::ReturnDirentIterator(EntryListBase* iterator)
 {
 	// Do nothing. We keep our fIterator around as it is used by fRefFilter.
+}
+
+
+uint32
+OpenWithPoseView::WatchNewNodeMask()
+{
+	return B_WATCH_STAT | B_WATCH_INTERIM_STAT | B_WATCH_ATTR;
 }
 
 

@@ -143,7 +143,8 @@ VirtualDirectoryPoseView::StartWatching()
 	int32 count = fDirectoryPaths.CountStrings();
 	for (int32 i = 0; i < count; i++) {
 		BString path = fDirectoryPaths.StringAt(i);
-		BPathMonitor::StartWatching(path, B_WATCH_DIRECTORY, this);
+		BPathMonitor::StartWatching(path, B_WATCH_DIRECTORY | B_WATCH_CHILDREN
+			| B_WATCH_NAME | B_WATCH_STAT | B_WATCH_INTERIM_STAT | B_WATCH_ATTR, this);
 	}
 
 	// watch the definition file

@@ -227,6 +227,7 @@ protected:
 
 	virtual EntryListBase* InitDirentIterator(const entry_ref* ref);
 	virtual void ReturnDirentIterator(EntryListBase* iterator);
+	virtual uint32 WatchNewNodeMask();
 
 	virtual void SetupDefaultColumnsIfNeeded();
 		// show launch window specific columns
