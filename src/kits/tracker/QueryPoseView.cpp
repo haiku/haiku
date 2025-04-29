@@ -94,7 +94,7 @@ BQueryPoseView::~BQueryPoseView()
 }
 
 
-bool
+static bool
 FolderFilterFunction(const entry_ref* directory, const entry_ref* model)
 {
 	if (directory == NULL || model == NULL)
@@ -106,10 +106,13 @@ FolderFilterFunction(const entry_ref* directory, const entry_ref* model)
 	if (directoryPath.InitCheck() != B_OK || modelPath.InitCheck() != B_OK)
 		return false;
 
-	char* requiredDirectoryPath = const_cast<char*>(directoryPath.Path());
-	strcat(requiredDirectoryPath, "/");
-	// only supports searching completely in the directories as well as subdirectories for now.
-	return strncmp(requiredDirectoryPath, modelPath.Path(), strlen(requiredDirectoryPath)) == 0;
+	const char* dirPathStr = directoryPath.Path(),
+		*modelPathStr = modelPath.Path();
+	size_t dirPathLen = strlen(dirPathStr);
+
+	if (strncmp(dirPathStr, modelPathStr, dirPathLen) != 0)
+		return false;
+	return modelPathStr[dirPathLen] == '/';
 }
 
 
