@@ -328,14 +328,16 @@ BPoseView::Init(const BMessage &message)
 void
 BPoseView::InitCommon()
 {
-	// Create the TitleView and CountView
-	fTitleView = new BTitleView(this);
-	if (ViewMode() != kListMode)
-		fTitleView->Hide();
-	if (fHScrollBar != NULL)
-		fHScrollBar->SetTitleView(fTitleView);
+	if (!IsDesktopView()) {
+		// Create the TitleView and CountView
+		fTitleView = new BTitleView(this);
+		if (ViewMode() != kListMode)
+			fTitleView->Hide();
+		if (fHScrollBar != NULL)
+			fHScrollBar->SetTitleView(fTitleView);
 
-	fCountView = new BCountView(this);
+		fCountView = new BCountView(this);
+	}
 
 	BPoint origin;
 	if (ViewMode() == kListMode)
