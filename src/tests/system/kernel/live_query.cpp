@@ -53,7 +53,7 @@ private:
 									const char* predicate);
 			void				_PerformQuery(BQuery& query);
 
-			BObjectList<BQuery>	fQueries;
+			BObjectList<BQuery, true> fQueries;
 			bool				fArgsReceived;
 };
 
@@ -61,7 +61,7 @@ private:
 LiveQuery::LiveQuery()
 	:
 	BApplication("application/x-vnd.test-live-query"),
-	fQueries(10, true),
+	fQueries(10),
 	fArgsReceived(false)
 {
 }

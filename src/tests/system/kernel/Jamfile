@@ -18,7 +18,7 @@ CCFLAGS on $(avxObject) = -mavx ;
 
 SimpleTest live_query :
 	live_query.cpp
-	: be
+	: be [ TargetLibsupc++ ]
 ;
 
 SimpleTest lock_node_test :
