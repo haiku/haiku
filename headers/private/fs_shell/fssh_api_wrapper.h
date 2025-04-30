@@ -964,8 +964,9 @@
 #define notify_attribute_changed	fssh_notify_attribute_changed
 
 #define notify_query_entry_created	fssh_notify_query_entry_created
+#define notify_query_entry_moved	fssh_notify_query_entry_moved
 #define notify_query_entry_removed	fssh_notify_query_entry_removed
-#define notify_query_attr_changed	fssh_notify_query_attr_changed
+#define notify_query_attribute_changed	fssh_notify_query_attribute_changed
 
 
 ////////////////////////////////////////////////////////////////////////////////

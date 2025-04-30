@@ -366,12 +366,16 @@ extern status_t notify_attribute_changed(dev_t device, ino_t directory,
 extern status_t notify_query_entry_created(port_id port, int32 token,
 					dev_t device, ino_t directory, const char* name,
 					ino_t node);
+extern status_t notify_query_entry_moved(port_id port, int32 token,
+					dev_t device, ino_t fromDirectory,
+					const char* fromName, ino_t toDirectory,
+					const char* toName, ino_t node);
 extern status_t notify_query_entry_removed(port_id port, int32 token,
 					dev_t device, ino_t directory, const char* name,
 					ino_t node);
-extern status_t notify_query_attr_changed(port_id port, int32 token,
-					dev_t device, ino_t directory, const char* name,
-					ino_t node);
+extern status_t notify_query_attribute_changed(port_id port, int32 token,
+					dev_t device, ino_t directory, ino_t node,
+					const char* attribute, int32 cause);
 
 #ifdef __cplusplus
 }

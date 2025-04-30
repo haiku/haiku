@@ -221,46 +221,6 @@ class NodeMonitorService : public NotificationService {
 static NodeMonitorService sNodeMonitorService;
 
 
-/*!	\brief Notifies the listener of a live query that an entry has been added
-  		   to or removed from or updated and still in the query (for whatever
-  		   reason).
-  	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED or \c B_ATTR_CHANGED.
-  	\param port The target port of the listener.
-  	\param token The BHandler token of the listener.
-  	\param device The ID of the mounted FS, the entry lives in.
-  	\param directory The entry's parent directory ID.
-  	\param name The entry's name.
-  	\param node The ID of the node the entry refers to.
-  	\return
-  	- \c B_OK, if everything went fine,
-  	- another error code otherwise.
-*/
-static status_t
-notify_query_entry_event(int32 opcode, port_id port, int32 token,
-	dev_t device, ino_t directory, const char *name, ino_t node)
-{
-	if (!name)
-		return B_BAD_VALUE;
-
-	// construct the message
-	char messageBuffer[1024];
-	KMessage message;
-	message.SetTo(messageBuffer, sizeof(messageBuffer), B_QUERY_UPDATE);
-	message.AddInt32("opcode", opcode);
-	message.AddInt32("device", device);
-	message.AddInt64("directory", directory);
-	message.AddInt64("node", node);
-	message.AddString("name", name);
-
-	// send the message
-	messaging_target target;
-	target.port = port;
-	target.token = token;
-
-	return send_message(&message, &target, 1);
-}
-
-
 //	#pragma mark - NodeMonitorService
 
 
@@ -1083,6 +1043,88 @@ NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
 }
 
 
+static status_t
+notify_query_entry_created_or_removed(int32 opcode, port_id port, int32 token,
+	dev_t device, ino_t directory, const char *name, ino_t node)
+{
+	if (!name)
+		return B_BAD_VALUE;
+
+	// construct the message
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_QUERY_UPDATE);
+	message.AddInt32("opcode", opcode);
+	message.AddInt32("device", device);
+	message.AddInt64("directory", directory);
+	message.AddInt64("node", node);
+	message.AddString("name", name);
+
+	// send the message
+	messaging_target target;
+	target.port = port;
+	target.token = token;
+
+	return send_message(&message, &target, 1);
+}
+
+
+static status_t
+notify_query_attr_changed(port_id port, int32 token,
+	dev_t device, ino_t directory, ino_t node, const char *attr, int32 cause)
+{
+	if (!attr)
+		return B_BAD_VALUE;
+
+	// construct the message
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_QUERY_UPDATE);
+	message.AddInt32("opcode", B_ATTR_CHANGED);
+	message.AddInt32("device", device);
+	message.AddInt64("directory", directory);
+	message.AddInt64("node", node);
+	message.AddString("attr", attr);
+	message.AddInt32("cause", cause);
+
+	// send the message
+	messaging_target target;
+	target.port = port;
+	target.token = token;
+
+	return send_message(&message, &target, 1);
+}
+
+
+static status_t
+notify_query_entry_moved(int32 opcode, port_id port, int32 token,
+	dev_t device, ino_t fromDirectory, const char *fromName,
+	ino_t toDirectory, const char* toName, ino_t node)
+{
+	if (!fromName || !toName)
+		return B_BAD_VALUE;
+
+	// construct the message
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_QUERY_UPDATE);
+	message.AddInt32("opcode", opcode);
+	message.AddInt32("device", device);
+	message.AddInt64("from directory", fromDirectory);
+	message.AddInt64("to directory", toDirectory);
+	message.AddInt64("node", node);
+	message.AddString("from name", fromName);		// Haiku only
+	message.AddString("name", toName);
+
+	// send the message
+	messaging_target target;
+	target.port = port;
+	target.token = token;
+
+	return send_message(&message, &target, 1);
+}
+
+
 //	#pragma mark - private kernel API
 
 
@@ -1253,7 +1295,7 @@ status_t
 notify_query_entry_created(port_id port, int32 token, dev_t device,
 	ino_t directory, const char *name, ino_t node)
 {
-	return notify_query_entry_event(B_ENTRY_CREATED, port, token,
+	return notify_query_entry_created_or_removed(B_ENTRY_CREATED, port, token,
 		device, directory, name, node);
 }
 
@@ -1274,29 +1316,52 @@ status_t
 notify_query_entry_removed(port_id port, int32 token, dev_t device,
 	ino_t directory, const char *name, ino_t node)
 {
-	return notify_query_entry_event(B_ENTRY_REMOVED, port, token,
+	return notify_query_entry_created_or_removed(B_ENTRY_REMOVED, port, token,
 		device, directory, name, node);
 }
 
 
-/*!	\brief Notifies the listener of a live query that an entry has been changed
-  		   and is still in the query (for whatever reason).
+/*!	\brief Notifies the listener of a live query that an entry has been moved.
   	\param port The target port of the listener.
   	\param token The BHandler token of the listener.
   	\param device The ID of the mounted FS, the entry lives in.
-  	\param directory The entry's parent directory ID.
-  	\param name The entry's name.
+	\param fromDirectory The old parent directory ID.
+	\param toDirectory The new parent directory ID.
+	\param fromName The entry's old name.
+	\param toName The entry's new name.
   	\param node The ID of the node the entry refers to.
   	\return
   	- \c B_OK, if everything went fine,
   	- another error code otherwise.
 */
 status_t
-notify_query_attr_changed(port_id port, int32 token, dev_t device,
-	ino_t directory, const char* name, ino_t node)
+notify_query_entry_moved(port_id port, int32 token, dev_t device, ino_t fromDirectory,
+	const char *fromName, ino_t toDirectory, const char *toName,
+	ino_t node)
 {
-	return notify_query_entry_event(B_ATTR_CHANGED, port, token,
-		device, directory, name, node);
+	return notify_query_entry_moved(B_ENTRY_MOVED, port, token,
+		device, fromDirectory, fromName, toDirectory, toName, node);
+}
+
+
+/*!	\brief Notifies the listener of a live query that an entry has been changed
+		and is still in the query (for whatever reason).
+	\param port The target port of the listener.
+	\param token The BHandler token of the listener.
+	\param device The ID of the mounted FS, the entry lives in.
+	\param directory The entry's parent directory ID.
+	\param name The entry's name.
+	\param node The ID of the node the entry refers to.
+	\return
+	- \c B_OK, if everything went fine,
+	- another error code otherwise.
+*/
+status_t
+notify_query_attribute_changed(port_id port, int32 token, dev_t device,
+	ino_t directory, ino_t node, const char* attribute, int32 cause)
+{
+	return notify_query_attr_changed(port, token,
+		device, directory, node, attribute, cause);
 }
 
 

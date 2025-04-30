@@ -34,6 +34,7 @@
 
 #	include <fs_interface.h>
 #	include <fs_query.h>
+#	include <NodeMonitor.h>
 #	include <TypeConstants.h>
 
 #	include <util/SinglyLinkedList.h>
@@ -147,9 +148,13 @@ public:
 
 private:
 			status_t		_GetNextEntry(struct dirent* dirent, size_t size);
+			void			_EvaluateLiveUpdate(Entry* entry, Node* node,
+								const char* attribute, int32 type,
+								const uint8* oldKey, size_t oldLength,
+								const uint8* newKey, size_t newLength,
+								int32& opcode);
 			void			_SendEntryNotification(Entry* entry,
-								status_t (*notify)(port_id, int32, dev_t, ino_t,
-									const char*, ino_t));
+								int32 opcode, const char* attribute, int32 cause);
 
 private:
 			Context*		fContext;
@@ -1542,14 +1547,12 @@ Query<QueryPolicy>::LiveUpdate(Entry* entry, Node* node, const char* attribute,
 	if (fPort < 0 || fExpression == NULL || attribute == NULL)
 		return;
 
-	// TODO: check if the attribute is part of the query at all...
-
 	// If no entry has been supplied, but the we need one for the evaluation
 	// (i.e. the "name" attribute is used), we invoke ourselves for all entries
 	// referring to the given node.
 	if (entry == NULL && fNeedsEntry) {
 		entry = QueryPolicy::NodeGetFirstReferrer(node);
-		while (entry) {
+		while (entry != NULL) {
 			LiveUpdate(entry, node, attribute, type, oldKey, oldLength, newKey,
 				newLength);
 			entry = QueryPolicy::NodeGetNextReferrer(node, entry);
@@ -1557,45 +1560,27 @@ Query<QueryPolicy>::LiveUpdate(Entry* entry, Node* node, const char* attribute,
 		return;
 	}
 
-	status_t oldStatus = fExpression->Root()->Match(entry, node, attribute,
-		type, oldKey, oldLength);
-	status_t newStatus = fExpression->Root()->Match(entry, node, attribute,
-		type, newKey, newLength);
+	int32 opcode = -1;
+	_EvaluateLiveUpdate(entry, node, attribute, type, oldKey, oldLength,
+		newKey, newLength, opcode);
 
-	bool entryCreated = false;
-	bool stillInQuery = false;
-
-	if (oldStatus != MATCH_OK) {
-		if (newStatus != MATCH_OK) {
-			// nothing has changed
-			return;
-		}
-		entryCreated = true;
-	} else if (newStatus != MATCH_OK) {
-		// entry got removed
-		entryCreated = false;
-	} else if ((fFlags & B_ATTR_CHANGE_NOTIFICATION) != 0) {
-		// The entry stays in the query
-		stillInQuery = true;
-	} else
+	if (opcode <= 0)
 		return;
 
-	// notify query listeners
-	status_t (*notify)(port_id, int32, dev_t, ino_t, const char*, ino_t);
-
-	if (stillInQuery)
-		notify = notify_query_attr_changed;
-	else if (entryCreated)
-		notify = notify_query_entry_created;
-	else
-		notify = notify_query_entry_removed;
+	int32 cause = B_ATTR_CHANGED;
+	if (opcode == B_ATTR_CHANGED) {
+		if (oldKey == NULL && newKey != NULL)
+			cause = B_ATTR_CREATED;
+		else if (oldKey != NULL && newKey == NULL)
+			cause = B_ATTR_REMOVED;
+	}
 
 	if (entry != NULL) {
-		_SendEntryNotification(entry, notify);
+		_SendEntryNotification(entry, opcode, attribute, cause);
 	} else {
 		entry = QueryPolicy::NodeGetFirstReferrer(node);
-		while (entry) {
-			_SendEntryNotification(entry, notify);
+		while (entry != NULL) {
+			_SendEntryNotification(entry, opcode, attribute, cause);
 			entry = QueryPolicy::NodeGetNextReferrer(node, entry);
 		}
 	}
@@ -1611,31 +1596,66 @@ Query<QueryPolicy>::LiveUpdateRenameMove(Entry* entry, Node* node,
 	if (fPort < 0 || fExpression == NULL)
 		return;
 
-	// TODO: check if the attribute is part of the query at all...
+	int32 opcode = -1;
+	_EvaluateLiveUpdate(entry, node, "name", B_STRING_TYPE,
+		(const uint8*)oldName, oldLength, (const uint8*)newName, newLength,
+		opcode);
 
-	status_t oldStatus = fExpression->Root()->Match(entry, node, "name",
-		B_STRING_TYPE, (const uint8*)oldName, oldLength);
-	status_t newStatus = fExpression->Root()->Match(entry, node, "name",
-		B_STRING_TYPE, (const uint8*)newName, newLength);
-
-	if (oldStatus != MATCH_OK || oldStatus != newStatus)
+	if (opcode < 0)
 		return;
 
-	// The entry stays in the query, notify query listeners about the rename
-	// or move
-
-	// We send a notification for the given entry, if any, or otherwise for
-	// all entries referring to the node;
-	if (entry != NULL) {
-		_SendEntryNotification(entry, notify_query_entry_removed);
-		_SendEntryNotification(entry, notify_query_entry_created);
-	} else {
-		entry = QueryPolicy::NodeGetFirstReferrer(node);
-		while (entry) {
-			_SendEntryNotification(entry, notify_query_entry_removed);
-			_SendEntryNotification(entry, notify_query_entry_created);
-			entry = QueryPolicy::NodeGetNextReferrer(node, entry);
+	if (opcode == 0 || opcode == B_ATTR_CHANGED) {
+		if ((fFlags & B_QUERY_WATCH_ALL) != 0) {
+			// In this case, we can send B_ENTRY_MOVED.
+			notify_query_entry_moved(fPort, fToken, QueryPolicy::ContextGetVolumeID(fContext),
+				oldDirectoryID, oldName, newDirectoryID, newName,
+				QueryPolicy::EntryGetNodeID(entry));
+		} else {
+			// Just like BeOS, send B_ENTRY_REMOVED and then B_ENTRY_CREATED.
+			notify_query_entry_removed(fPort, fToken, QueryPolicy::ContextGetVolumeID(fContext),
+				oldDirectoryID, oldName, QueryPolicy::EntryGetNodeID(entry));
+			notify_query_entry_created(fPort, fToken, QueryPolicy::ContextGetVolumeID(fContext),
+				newDirectoryID, newName, QueryPolicy::EntryGetNodeID(entry));
 		}
+		return;
+	}
+
+	_SendEntryNotification(entry, opcode, NULL, B_ATTR_CHANGED);
+}
+
+
+template<typename QueryPolicy>
+void
+Query<QueryPolicy>::_EvaluateLiveUpdate(Entry* entry, Node* node, const char* attribute,
+	int32 type, const uint8* oldKey, size_t oldLength, const uint8* newKey,
+	size_t newLength, int32& opcode)
+{
+	if (fPort < 0 || fExpression == NULL)
+		return;
+
+	// TODO: check if the attribute is part of the query at all...
+
+	status_t oldStatus = fExpression->Root()->Match(entry, node, attribute,
+		type, oldKey, oldLength);
+	status_t newStatus = fExpression->Root()->Match(entry, node, attribute,
+		type, newKey, newLength);
+
+	if (oldStatus != MATCH_OK) {
+		if (newStatus != MATCH_OK) {
+			// wasn't in query, and still isn't
+			return;
+		}
+		// entry was added
+		opcode = B_ENTRY_CREATED;
+	} else if (newStatus != MATCH_OK) {
+		// entry was removed
+		opcode = B_ENTRY_REMOVED;
+	} else if ((fFlags & B_QUERY_WATCH_ALL) != 0) {
+		// still in query, all attribute changes watched
+		opcode = B_ATTR_CHANGED;
+	} else {
+		// still in query, no change to notify
+		opcode = 0;
 	}
 }
 
@@ -1681,15 +1701,30 @@ Query<QueryPolicy>::_GetNextEntry(struct dirent* dirent, size_t size)
 
 template<typename QueryPolicy>
 void
-Query<QueryPolicy>::_SendEntryNotification(Entry* entry,
-	status_t (*notify)(port_id, int32, dev_t, ino_t, const char*, ino_t))
+Query<QueryPolicy>::_SendEntryNotification(Entry* entry, int32 opcode,
+	const char* attribute, int32 cause)
 {
-	NodeHolder nodeHolder;
-	const char* name = QueryPolicy::EntryGetNameNoCopy(nodeHolder, entry);
-	if (name != NULL) {
-		notify(fPort, fToken, QueryPolicy::ContextGetVolumeID(fContext),
-			QueryPolicy::EntryGetParentID(entry), name,
-			QueryPolicy::EntryGetNodeID(entry));
+	switch (opcode) {
+		case B_ENTRY_CREATED:
+		case B_ENTRY_REMOVED:
+		{
+			NodeHolder nodeHolder;
+			const char* name = QueryPolicy::EntryGetNameNoCopy(nodeHolder, entry);
+			if (name != NULL) {
+				((opcode == B_ENTRY_CREATED) ?
+						notify_query_entry_created : notify_query_entry_removed)
+					(fPort, fToken, QueryPolicy::ContextGetVolumeID(fContext),
+						QueryPolicy::EntryGetParentID(entry), name,
+						QueryPolicy::EntryGetNodeID(entry));
+			}
+			break;
+		}
+
+		case B_ATTR_CHANGED:
+			notify_query_attribute_changed(fPort, fToken, QueryPolicy::ContextGetVolumeID(fContext),
+				QueryPolicy::EntryGetParentID(entry), QueryPolicy::EntryGetNodeID(entry),
+				attribute, cause);
+			break;
 	}
 }
 
