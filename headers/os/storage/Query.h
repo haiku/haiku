@@ -63,6 +63,7 @@ public:
 			status_t		SetVolume(const BVolume* volume);
 			status_t		SetPredicate(const char* expression);
 			status_t		SetTarget(BMessenger messenger);
+			void			SetFlags(uint32 flags);
 
 			bool			IsLive() const;
 
@@ -102,7 +103,7 @@ private:
 			BPrivate::Storage::QueryStack* fStack;
 			char*			fPredicate;
 			dev_t			fDevice;
-			bool			fLive;
+			uint32			fFlags;
 			port_id			fPort;
 			long			fToken;
 			int				fQueryFd;

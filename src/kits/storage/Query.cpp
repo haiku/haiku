@@ -39,7 +39,7 @@ BQuery::BQuery()
 	fStack(NULL),
 	fPredicate(NULL),
 	fDevice((dev_t)B_ERROR),
-	fLive(false),
+	fFlags(0),
 	fPort(B_ERROR),
 	fToken(0),
 	fQueryFd(-1)
@@ -71,7 +71,7 @@ BQuery::Clear()
 	fPredicate = NULL;
 	// reset the other parameters
 	fDevice = (dev_t)B_ERROR;
-	fLive = false;
+	fFlags = 0;
 	fPort = B_ERROR;
 	fToken = 0;
 	return error;
@@ -226,9 +226,15 @@ BQuery::SetTarget(BMessenger messenger)
 		fPort = messengerPrivate.Port();
 		fToken = (messengerPrivate.IsPreferredTarget()
 			? -1 : messengerPrivate.Token());
-		fLive = true;
 	}
 	return error;
+}
+
+
+void
+BQuery::SetFlags(uint32 flags)
+{
+	fFlags = flags;
 }
 
 
@@ -236,7 +242,7 @@ BQuery::SetTarget(BMessenger messenger)
 bool
 BQuery::IsLive() const
 {
-	return fLive;
+	return fPort >= 0;
 }
 
 
@@ -310,14 +316,14 @@ BQuery::Fetch()
 	BString parsedPredicate;
 	_ParseDates(parsedPredicate);
 
-	fQueryFd = _kern_open_query(fDevice, parsedPredicate.String(),
-		parsedPredicate.Length(), fLive ? B_LIVE_QUERY : 0, fPort, fToken);
+	fQueryFd = _kern_open_query(fDevice,
+		parsedPredicate.String(), parsedPredicate.Length(),
+		fFlags | ((fPort >= 0) ? B_LIVE_QUERY : 0),
+		fPort, fToken);
 	if (fQueryFd < 0)
 		return fQueryFd;
 
-	// set close on exec flag
 	fcntl(fQueryFd, F_SETFD, FD_CLOEXEC);
-
 	return B_OK;
 }
 
