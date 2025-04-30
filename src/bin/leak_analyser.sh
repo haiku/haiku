@@ -99,6 +99,7 @@ then
 		"<libroot.so> BPrivate::Libroot::LocaleBackend::LoadBackend" \
 		"<libbe.so> initialize_before " \
 		"<libbe.so> initialize_after " \
+		"<libbe.so> __initialize_locale_kit" \
 		"<libbe.so> _control_input_server_" \
 		"<libbe.so> BApplication::_InitGUIContext" \
 		"<libbe.so> BApplication::_InitAppResources" \
