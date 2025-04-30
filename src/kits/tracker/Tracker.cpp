@@ -306,6 +306,8 @@ TTracker::~TTracker()
 
 	BPathMonitor::SetWatchingInterface(NULL);
 	delete fWatchingInterface;
+
+	delete fMimeTypeList;
 }
 
 
