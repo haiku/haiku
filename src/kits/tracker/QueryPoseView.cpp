@@ -582,10 +582,8 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 		}
 
 		int32 count;
-		if ((result = message.GetInfo("refs", NULL, &count)) != B_OK) {
-			fStatus = result;
-			return;
-		}
+		if ((result = message.GetInfo("refs", NULL, &count)) != B_OK)
+			count = 0;
 
 		for (int32 i = 0; i < count; i++) {
 			entry_ref ref;

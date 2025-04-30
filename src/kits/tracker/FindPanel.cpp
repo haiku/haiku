@@ -1294,10 +1294,15 @@ FindPanel::SaveDirectoryFiltersToFile(BNode* node)
 	if (node->InitCheck() != B_OK)
 		return B_NO_INIT;
 
+	int32 count = fDirectoryFilters.CountItems();
+	if (count == 0) {
+		node->RemoveAttr("_trk/directories");
+		return B_OK;
+	}
+
 	// Store the entry_refs of the fDirectoryFilters to a BMessage
 	// So that it can be serialized.
 	BMessage message;
-	int32 count = fDirectoryFilters.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		entry_ref* ref = fDirectoryFilters.ItemAt(i);
 		if (message.AddRef("refs", ref) != B_OK)
