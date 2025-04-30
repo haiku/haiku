@@ -57,6 +57,7 @@ All rights reserved.
 #include "Tracker.h"
 
 #include <fs_attr.h>
+#include <query_private.h>
 
 
 using std::nothrow;
@@ -357,7 +358,8 @@ BQueryPoseView::ReturnDirentIterator(EntryListBase* iterator)
 uint32
 BQueryPoseView::WatchNewNodeMask()
 {
-	return B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR;
+	// B_QUERY_WATCH_ALL suffices.
+	return 0;
 }
 
 
@@ -627,8 +629,9 @@ QueryEntryListCollection::FetchOneQuery(const BQuery* copyThis,
 	const_cast<BQuery*>(copyThis)->GetPredicate(&buffer);
 	query->SetPredicate(buffer.String());
 
-	query->SetTarget(BMessenger(target));
 	query->SetVolume(volume);
+	query->SetTarget(BMessenger(target));
+	query->SetFlags(B_QUERY_WATCH_ALL);
 
 	status_t result = query->Fetch();
 	if (result != B_OK) {
