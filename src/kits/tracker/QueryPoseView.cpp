@@ -80,59 +80,18 @@ using std::nothrow;
 BQueryPoseView::BQueryPoseView(Model* model)
 	:
 	BPoseView(model, kListMode),
-	fRefFilter(NULL),
-	fQueryList(NULL),
+	fRefFilter(new QueryRefFilter),
 	fQueryListContainer(NULL),
 	fCreateOldPoseList(false)
 {
+	SetRefFilter(fRefFilter);
 }
 
 
 BQueryPoseView::~BQueryPoseView()
 {
+	delete fRefFilter;
 	delete fQueryListContainer;
-}
-
-
-static bool
-FolderFilterFunction(const entry_ref* directory, const entry_ref* model)
-{
-	if (directory == NULL || model == NULL)
-		return false;
-
-	BPath directoryPath(directory);
-	BPath modelPath(model);
-
-	if (directoryPath.InitCheck() != B_OK || modelPath.InitCheck() != B_OK)
-		return false;
-
-	const char* dirPathStr = directoryPath.Path(),
-		*modelPathStr = modelPath.Path();
-	size_t dirPathLen = strlen(dirPathStr);
-
-	if (strncmp(dirPathStr, modelPathStr, dirPathLen) != 0)
-		return false;
-	return modelPathStr[dirPathLen] == '/';
-}
-
-
-bool
-QueryRefFilter::PassThroughDirectoryFilters(const entry_ref* ref) const
-{
-	int32 count = fDirectoryFilters.CountItems();
-	bool passed = count == 0;
-		// in this context, even if the model passes through a single filter, it is considered
-		// as the folder selections are combined with OR! and not AND!
-
-	for (int32 i = 0; i < count; i++) {
-		entry_ref* filterDirectory = fDirectoryFilters.ItemAt(i);
-		if (FolderFilterFunction(filterDirectory, ref)) {
-			passed = true;
-			break;
-		}
-	}
-
-	return passed;
 }
 
 
@@ -245,6 +204,7 @@ BQueryPoseView::Refresh()
 	fAddPosesThreads.clear();
 	delete fQueryListContainer;
 	fQueryListContainer = NULL;
+	fRefFilter->SetQueryListContainer(NULL);
 
 	fCreateOldPoseList = true;
 	AddPoses(TargetModel());
@@ -300,18 +260,16 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 
 	fQueryListContainer = new QueryEntryListCollection(&sourceModel, this,
 		oldPoseList);
-	fCreateOldPoseList = false;
-
 	if (fQueryListContainer->InitCheck() != B_OK) {
 		delete fQueryListContainer;
 		fQueryListContainer = NULL;
 		return NULL;
 	}
+	fCreateOldPoseList = false;
+	fRefFilter->SetQueryListContainer(fQueryListContainer);
 
 	TTracker::WatchNode(sourceModel.NodeRef(), B_WATCH_NAME | B_WATCH_STAT
 		| B_WATCH_ATTR, this);
-
-	fQueryList = fQueryListContainer->QueryList();
 
 	if (fQueryListContainer->DynamicDateQuery()) {
 		// calculate the time to trigger the query refresh - next midnight
@@ -385,13 +343,14 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 			delta);
 	}
 
-	QueryRefFilter* filter = new QueryRefFilter(fQueryListContainer->ShowResultsFromTrash());
-	TargetModel()->OpenNode();
-	filter->LoadDirectoryFiltersFromFile(TargetModel()->Node());
-	TargetModel()->CloseNode();
-	SetRefFilter(filter);
+	return fQueryListContainer;
+}
 
-	return fQueryListContainer->Clone();
+
+void
+BQueryPoseView::ReturnDirentIterator(EntryListBase* iterator)
+{
+	// Do nothing. We keep our fIterator around.
 }
 
 
@@ -438,9 +397,9 @@ BQueryPoseView::SearchForType() const
 bool
 BQueryPoseView::ActiveOnDevice(dev_t device) const
 {
-	int32 count = fQueryList->CountItems();
+	int32 count = fQueryListContainer->QueryList()->CountItems();
 	for (int32 index = 0; index < count; index++) {
-		if (fQueryList->ItemAt(index)->TargetDevice() == device)
+		if (fQueryListContainer->QueryList()->ItemAt(index)->TargetDevice() == device)
 			return true;
 	}
 
@@ -451,82 +410,13 @@ BQueryPoseView::ActiveOnDevice(dev_t device) const
 //	#pragma mark - QueryRefFilter
 
 
-QueryRefFilter::QueryRefFilter(bool showResultsFromTrash)
-	:
-	fShowResultsFromTrash(showResultsFromTrash)
+QueryRefFilter::QueryRefFilter()
 {
 }
 
 
 QueryRefFilter::~QueryRefFilter()
 {
-	int32 count = fDirectoryFilters.CountItems();
-	for (int32 i = 0; i < count; i++)
-		delete fDirectoryFilters.RemoveItemAt(0);
-}
-
-
-status_t
-QueryRefFilter::LoadDirectoryFiltersFromFile(const BNode* node)
-{
-	// params checking
-	if (node == NULL || node->InitCheck() != B_OK)
-		return B_BAD_VALUE;
-
-	struct attr_info info;
-	status_t error = node->GetAttrInfo("_trk/directories", &info);
-	if (error != B_OK)
-		return error;
-
-	BString bufferString;
-	char* buffer = bufferString.LockBuffer(info.size);
-	if (node->ReadAttr("_trk/directories", B_MESSAGE_TYPE, 0, buffer, info.size) != info.size)
-		return B_ERROR;
-
-	BMessage message;
-	error = message.Unflatten(buffer);
-	if (error != B_OK)
-		return error;
-
-	int32 count;
-	if ((error = message.GetInfo("refs", NULL, &count)) != B_OK)
-		return error;
-
-	for (int32 i = 0; i < count; i++) {
-		entry_ref ref;
-		if ((error = message.FindRef("refs", i, &ref)) != B_OK)
-			continue;
-
-		AddDirectoryFilter(&ref);
-	}
-
-	return B_OK;
-}
-
-
-status_t
-QueryRefFilter::AddDirectoryFilter(const entry_ref* ref)
-{
-	if (ref == NULL)
-		return B_BAD_VALUE;
-
-	// checking for duplicates
-	int32 count = fDirectoryFilters.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		entry_ref* item = fDirectoryFilters.ItemAt(i);
-		if (ref != NULL && item != NULL && *item == *ref)
-			return B_CANCELED;
-	}
-
-	BEntry entry(ref, true);
-	if (entry.InitCheck() != B_OK || !entry.Exists() || !entry.IsDirectory())
-		return B_ERROR;
-
-	entry_ref symlinkTraversedRef;
-	entry.GetRef(&symlinkTraversedRef);
-
-	fDirectoryFilters.AddItem(new entry_ref(symlinkTraversedRef));
-	return B_OK;
 }
 
 
@@ -534,9 +424,16 @@ bool
 QueryRefFilter::Filter(const entry_ref* ref, BNode* node, stat_beos* st,
 	const char* filetype)
 {
+	if (fQueryListContainer == NULL)
+		return true;
+
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	return !(!fShowResultsFromTrash && tracker != NULL && tracker->InTrashNode(ref))
-		&& PassThroughDirectoryFilters(ref);
+	if (!fQueryListContainer->ShowResultsFromTrash()
+			&& tracker != NULL && tracker->InTrashNode(ref))
+		return false;
+	if (!fQueryListContainer->PathFilter(ref))
+		return false;
+	return true;
 }
 
 
@@ -546,7 +443,8 @@ QueryRefFilter::Filter(const entry_ref* ref, BNode* node, stat_beos* st,
 QueryEntryListCollection::QueryEntryListCollection(Model* model,
 	BHandler* target, PoseList* oldPoseList)
 	:
-	fQueryListRep(new QueryListRep(new BObjectList<BQuery, true>(5)))
+	fQueryListRep(new QueryListRep),
+	fOldPoseList(oldPoseList)
 {
 	Rewind();
 	attr_info info;
@@ -584,7 +482,6 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 
 	fStatus = query.SetPredicate(buffer.String());
 
-	fQueryListRep->fOldPoseList = oldPoseList;
 	fQueryListRep->fDynamicDateQuery = false;
 
 	fQueryListRep->fRefreshEveryHour = false;
@@ -633,7 +530,7 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 					if (result == B_OK) {
 						// start the query on this volume
 						result = FetchOneQuery(&query, target,
-							fQueryListRep->fQueryList, &volume);
+							&fQueryListRep->fQueryList, &volume);
 						if (result != B_OK)
 							continue;
 
@@ -660,15 +557,59 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 		while (roster.GetNextVolume(&volume) == B_OK)
 			if (volume.IsPersistent() && volume.KnowsQuery()) {
 				result = FetchOneQuery(&query, target,
-					fQueryListRep->fQueryList, &volume);
+					&fQueryListRep->fQueryList, &volume);
 				if (result != B_OK)
 					continue;
 			}
 	}
 
-	fStatus = B_OK;
+	if (modelNode->GetAttrInfo("_trk/directories", &info) == B_OK) {
+		BString bufferString;
+		char* buffer = bufferString.LockBuffer(info.size);
+		if (modelNode->ReadAttr("_trk/directories", B_MESSAGE_TYPE, 0,
+				buffer, info.size) != info.size) {
+			fStatus = B_ERROR;
+			return;
+		}
 
-	return;
+		BMessage message;
+		result = message.Unflatten(buffer);
+		if (result != B_OK) {
+			fStatus = result;
+			return;
+		}
+
+		int32 count;
+		if ((result = message.GetInfo("refs", NULL, &count)) != B_OK) {
+			fStatus = result;
+			return;
+		}
+
+		for (int32 i = 0; i < count; i++) {
+			entry_ref ref;
+			if ((result = message.FindRef("refs", i, &ref)) != B_OK)
+				continue;
+
+			BEntry entry(&ref, true);
+			if (entry.InitCheck() != B_OK || !entry.Exists() || !entry.IsDirectory())
+				continue;
+
+			BPath path;
+			if ((result = entry.GetPath(&path)) != B_OK)
+				continue;
+
+			BString pathString = path.Path();
+			pathString.Append("/");
+
+			// check for duplicates
+			if (fQueryListRep->fPathFilters.IndexOf(pathString) >= 0)
+				continue;
+
+			fQueryListRep->fPathFilters.Add(pathString);
+		}
+	}
+
+	fStatus = B_OK;
 }
 
 
@@ -697,44 +638,25 @@ QueryEntryListCollection::FetchOneQuery(const BQuery* copyThis,
 	}
 
 	list->AddItem(query);
-
 	return B_OK;
 }
 
 
 QueryEntryListCollection::~QueryEntryListCollection()
 {
-	if (fQueryListRep->CloseQueryList())
-		delete fQueryListRep;
-}
-
-
-QueryEntryListCollection*
-QueryEntryListCollection::Clone()
-{
-	fQueryListRep->OpenQueryList();
-	return new QueryEntryListCollection(*this);
+	delete fQueryListRep;
+	delete fOldPoseList;
 }
 
 
 //	#pragma mark - QueryEntryListCollection
 
 
-QueryEntryListCollection::QueryEntryListCollection(
-	const QueryEntryListCollection &cloneThis)
-	:
-	EntryListBase(),
-	fQueryListRep(cloneThis.fQueryListRep)
-{
-	// only to be used by the Clone routine
-}
-
-
 void
 QueryEntryListCollection::ClearOldPoseList()
 {
-	delete fQueryListRep->fOldPoseList;
-	fQueryListRep->fOldPoseList = NULL;
+	delete fOldPoseList;
+	fOldPoseList = NULL;
 }
 
 
@@ -743,14 +665,26 @@ QueryEntryListCollection::GetNextEntry(BEntry* entry, bool traverse)
 {
 	status_t result = B_ERROR;
 
-	for (int32 count = fQueryListRep->fQueryList->CountItems();
-		fQueryListRep->fQueryListIndex < count;
-		fQueryListRep->fQueryListIndex++) {
-		result = fQueryListRep->fQueryList->
-			ItemAt(fQueryListRep->fQueryListIndex)->
-				GetNextEntry(entry, traverse);
-		if (result == B_OK)
-			break;
+	for (int32 count = fQueryListRep->fQueryList.CountItems();
+			fQueryListRep->fQueryListIndex < count;
+			fQueryListRep->fQueryListIndex++) {
+		for (;;) {
+			result = fQueryListRep->fQueryList.
+				ItemAt(fQueryListRep->fQueryListIndex)->
+					GetNextEntry(entry, traverse);
+			if (result != B_OK)
+				break;
+			if (!fQueryListRep->fPathFilters.IsEmpty()) {
+				entry_ref ref;
+				if ((result = entry->GetRef(&ref)) != B_OK)
+					continue;
+				if (!PathFilter(&ref)) {
+					result = B_ERROR;
+					continue;
+				}
+			}
+			return result;
+		}
 	}
 
 	return result;
@@ -761,16 +695,30 @@ int32
 QueryEntryListCollection::GetNextDirents(struct dirent* buffer, size_t length,
 	int32 count)
 {
+	// If path-filtering, we only read one dirent at a time.
+	if (!fQueryListRep->fPathFilters.IsEmpty())
+		count = 1;
+
 	int32 result = 0;
 
-	for (int32 queryCount = fQueryListRep->fQueryList->CountItems();
+	for (int32 queryCount = fQueryListRep->fQueryList.CountItems();
 			fQueryListRep->fQueryListIndex < queryCount;
 			fQueryListRep->fQueryListIndex++) {
-		result = fQueryListRep->fQueryList->
-			ItemAt(fQueryListRep->fQueryListIndex)->
-				GetNextDirents(buffer, length, count);
-		if (result > 0)
-			break;
+		for (;;) {
+			result = fQueryListRep->fQueryList.
+				ItemAt(fQueryListRep->fQueryListIndex)->
+					GetNextDirents(buffer, length, count);
+			if (result <= 0)
+				break;
+			if (!fQueryListRep->fPathFilters.IsEmpty()) {
+				entry_ref ref(buffer->d_pdev, buffer->d_pino, buffer->d_name);
+				if (!PathFilter(&ref)) {
+					result = 0;
+					continue;
+				}
+			}
+			return result;
+		}
 	}
 
 	return result;
@@ -782,17 +730,51 @@ QueryEntryListCollection::GetNextRef(entry_ref* ref)
 {
 	status_t result = B_ERROR;
 
-	for (int32 count = fQueryListRep->fQueryList->CountItems();
-		fQueryListRep->fQueryListIndex < count;
-		fQueryListRep->fQueryListIndex++) {
-
-		result = fQueryListRep->fQueryList->
-			ItemAt(fQueryListRep->fQueryListIndex)->GetNextRef(ref);
-		if (result == B_OK)
-			break;
+	for (int32 count = fQueryListRep->fQueryList.CountItems();
+			fQueryListRep->fQueryListIndex < count;
+			fQueryListRep->fQueryListIndex++) {
+		for (;;) {
+			result = fQueryListRep->fQueryList.
+				ItemAt(fQueryListRep->fQueryListIndex)->GetNextRef(ref);
+			if (result != B_OK)
+				break;
+			if (!fQueryListRep->fPathFilters.IsEmpty()) {
+				if (!PathFilter(ref)) {
+					result = B_ERROR;
+					continue;
+				}
+			}
+			return result;
+		}
 	}
 
 	return result;
+}
+
+
+bool
+QueryEntryListCollection::PathFilter(const entry_ref* ref) const
+{
+	// We perform path filtering here so that PoseView doesn't create Poses
+	// to track the state of nodes removed by the path filters. (We still
+	// must perform filtering in the RefFilter too, however, so that live
+	// queries are filtered properly.)
+
+	if (fQueryListRep->fPathFilters.IsEmpty())
+		return true;
+
+	BPath path(ref);
+	if (path.InitCheck() != B_OK)
+		return false;
+	const char* pathStr = path.Path();
+
+	for (int32 i = 0; i < fQueryListRep->fPathFilters.CountStrings(); i++) {
+		BString filterPath = fQueryListRep->fPathFilters.StringAt(i);
+		if (strncmp(filterPath.String(), pathStr, filterPath.Length()) == 0)
+			return true;
+	}
+
+	return false;
 }
 
 
@@ -800,6 +782,8 @@ status_t
 QueryEntryListCollection::Rewind()
 {
 	fQueryListRep->fQueryListIndex = 0;
+	for (int32 i = 0; i < fQueryListRep->fQueryList.CountItems(); i++)
+		fQueryListRep->fQueryList.ItemAt(i)->Rewind();
 
 	return B_OK;
 }
