@@ -32,7 +32,8 @@ public:
 			status_t		Update(Transaction& transaction, const char* name,
 								int32 type, const uint8* oldKey,
 								uint16 oldLength, const uint8* newKey,
-								uint16 newLength, Inode* inode);
+								uint16 newLength, Inode* inode,
+								bool updateLiveQueries = true);
 
 			status_t		InsertName(Transaction& transaction,
 								const char* name, Inode* inode);
@@ -40,7 +41,7 @@ public:
 								const char* name, Inode* inode);
 			status_t		UpdateName(Transaction& transaction,
 								const char* oldName, const char* newName,
-								Inode* inode);
+								Inode* inode, bool updateLiveQueries = true);
 
 			status_t		InsertSize(Transaction& transaction, Inode* inode);
 			status_t		RemoveSize(Transaction& transaction, Inode* inode);

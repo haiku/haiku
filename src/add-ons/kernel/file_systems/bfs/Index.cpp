@@ -219,7 +219,7 @@ Index::Create(Transaction& transaction, const char* name, uint32 type)
 status_t
 Index::Update(Transaction& transaction, const char* name, int32 type,
 	const uint8* oldKey, uint16 oldLength, const uint8* newKey,
-	uint16 newLength, Inode* inode)
+	uint16 newLength, Inode* inode, bool updateLiveQueries)
 {
 	if (name == NULL
 		|| (oldKey == NULL && newKey == NULL)
@@ -242,9 +242,11 @@ Index::Update(Transaction& transaction, const char* name, int32 type,
 		return B_OK;
 	}
 
-	// update all live queries about the change, if they have an index or not
-	fVolume->UpdateLiveQueries(inode, name, type, oldKey, oldLength,
-		newKey, newLength);
+	if (updateLiveQueries) {
+		// update all live queries about the change, if they have an index or not
+		fVolume->UpdateLiveQueries(inode, name, type, oldKey, oldLength,
+			newKey, newLength);
+	}
 
 	if (((name != fName || strcmp(name, fName)) && SetTo(name) != B_OK)
 		|| fNode == NULL)
@@ -297,14 +299,14 @@ Index::RemoveName(Transaction& transaction, const char* name, Inode* inode)
 
 status_t
 Index::UpdateName(Transaction& transaction, const char* oldName,
-	const char* newName, Inode* inode)
+	const char* newName, Inode* inode, bool updateLiveQueries)
 {
 	ASSERT(inode->IsRegularNode());
 
 	uint16 oldLength = oldName != NULL ? strlen(oldName) : 0;
 	uint16 newLength = newName != NULL ? strlen(newName) : 0;
 	return Update(transaction, "name", B_STRING_TYPE, (uint8*)oldName,
-		oldLength, (uint8*)newName, newLength, inode);
+		oldLength, (uint8*)newName, newLength, inode, updateLiveQueries);
 }
 
 
