@@ -972,7 +972,7 @@ enter_kernel_debugger(int32 cpu, int32& previousCPU)
 
 	if (!gKernelStartup && sDebuggerOnCPU != cpu && smp_get_num_cpus() > 1) {
 		// First entry on a MP system, send a halt request to all of the other
-		// CPUs. Should they try to enter the debugger they will be cought in
+		// CPUs. Should they try to enter the debugger they will be caught in
 		// the loop above.
 		smp_send_broadcast_ici_interrupts_disabled(cpu, SMP_MSG_CPU_HALT, 0, 0,
 			0, NULL, SMP_MSG_FLAG_SYNC);
@@ -1669,6 +1669,7 @@ debug_debugger_running(void)
 void
 debug_puts(const char* string, int32 length)
 {
+	MutexLocker mutexLocker(sOutputLock);
 	InterruptsSpinLocker _(sSpinlock);
 	debug_output(string, length, true);
 }
