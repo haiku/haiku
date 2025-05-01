@@ -21,6 +21,10 @@ struct bios_regs {
 	uint32	edi;
 	uint16	es;
 	uint16	flags;
+
+#ifdef __cplusplus
+	bios_regs() : eax(0), ebx(0), ecx(0), edx(0), esi(0), edi(0), es(0), flags(0) {}
+#endif
 };
 
 #define CARRY_FLAG	0x01

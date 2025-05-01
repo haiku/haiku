@@ -296,10 +296,13 @@ static uint32
 get_memory_map(extended_memory **_extendedMemory)
 {
 	extended_memory *block = (extended_memory *)kExtraSegmentScratch;
-	bios_regs regs = {0, 0, sizeof(extended_memory), 0, 0, (uint32)block, 0, 0};
+	bios_regs regs;
 	uint32 count = 0;
 
 	TRACE("get_memory_map()\n");
+
+	regs.ecx = sizeof(extended_memory);
+	regs.edi = (uint32)block;
 
 	do {
 		regs.eax = 0xe820;
