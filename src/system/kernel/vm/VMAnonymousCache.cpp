@@ -723,7 +723,8 @@ VMAnonymousCache::Commit(off_t size, int priority)
 	TRACE("%p->VMAnonymousCache::Commit(%" B_PRIdOFF ")\n", this, size);
 
 	AssertLocked();
-	ASSERT(size >= (page_count * B_PAGE_SIZE));
+	ASSERT_PRINT(size >= (page_count * B_PAGE_SIZE),
+		"cache %p @! cache %p", this, this);
 
 	// If we can overcommit, we don't commit here, but in Fault(). We always
 	// unreserve memory, if we're asked to shrink our commitment, though.
