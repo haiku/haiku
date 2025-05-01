@@ -287,7 +287,7 @@ void HttpURLConnection::getResponse()
 				{
 					const char *p = getHeaderField("Location");
 					if (p) {
-						BUrl trueUrl(p);
+						BUrl trueUrl(p, true);
 						url = trueUrl;
 						delete __response;
 						__response = NULL;

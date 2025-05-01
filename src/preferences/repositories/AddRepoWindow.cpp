@@ -82,7 +82,7 @@ AddRepoWindow::MessageReceived(BMessage* message)
 			BString url(fText->Text());
 			if (url != "") {
 				// URL must have a protocol
-				BUrl newRepoUrl(url);
+				BUrl newRepoUrl(url, true);
 				if (!newRepoUrl.IsValid()) {
 					BAlert* alert = new BAlert("error",
 						B_TRANSLATE_COMMENT("This is not a valid URL.",
@@ -129,7 +129,7 @@ AddRepoWindow::_GetClipboardData()
 
 		// The string must be a valid url
 		BString clipString(string, stringLen);
-		BUrl testUrl(clipString.String());
+		BUrl testUrl(clipString.String(), true);
 		if (!testUrl.IsValid())
 			return B_ERROR;
 		else

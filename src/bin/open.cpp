@@ -96,7 +96,7 @@ main(int argc, char** argv)
 				result = B_OK;
 		} else if (strchr(*argv, ':')) {
 			// try to open it as an URI
-			BUrl url(*argv);
+			BUrl url(*argv, true);
 			result = url.OpenWithPreferredApplication();
 			if (result == B_OK || result == B_ALREADY_RUNNING)
 				continue;

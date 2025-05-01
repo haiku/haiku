@@ -62,7 +62,7 @@ NetworkStreamWin::MessageReceived(BMessage* message)
 	switch(message->what) {
 		case M_OPEN_URL:
 		{
-			BUrl url(fTextControl->Text());
+			BUrl url(fTextControl->Text(), true);
 			if (!url.IsValid()) {
 				BAlert* alert = new BAlert(B_TRANSLATE("Bad URL"),
 					B_TRANSLATE("Invalid URL inserted!"),
@@ -137,7 +137,7 @@ NetworkStreamWin::_LookIntoClipboardForUrl()
 
 			// Before to set the text let's see if it's really
 			// a valid URL.
-			BUrl url(text);
+			BUrl url(text, true);
 			if (url.IsValid())
 				fTextControl->SetText(text);
 		}

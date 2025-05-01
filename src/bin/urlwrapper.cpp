@@ -117,7 +117,7 @@ UrlWrapper::RefsReceived(BMessage* msg)
 					}
 				}
 				if (url.Length()) {
-					BUrl u(url.String());
+					BUrl u(url.String(), true);
 					args[1] = (char*)u.UrlString().String();
 					mimetype = kURLHandlerSigBase;
 					mimetype += u.Protocol();
@@ -196,7 +196,7 @@ UrlWrapper::RefsReceived(BMessage* msg)
 					}
 				}
 				if (url.Length()) {
-					BUrl u(url.String());
+					BUrl u(url.String(), true);
 					args[1] = (char*)u.UrlString().String();
 					mimetype = kURLHandlerSigBase;
 					mimetype += u.Protocol();
@@ -210,7 +210,7 @@ UrlWrapper::RefsReceived(BMessage* msg)
 			// NetPositive Bookmark or any file with a META:url attribute
 			if (f.ReadAttr("META:url", B_STRING_TYPE, 0LL, buff,
 				B_PATH_NAME_LENGTH) > 0) {
-				BUrl u(buff);
+				BUrl u(buff, true);
 				args[1] = (char*)u.UrlString().String();
 				mimetype = kURLHandlerSigBase;
 				mimetype += u.Protocol();
@@ -235,7 +235,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	char* args[] = { (char *)"/bin/sh", (char *)"-c", NULL, NULL};
 	status_t err;
 
-	BUrl url(argv[1]);
+	BUrl url(argv[1], true);
 
 	BString full = BUrl(url).SetProtocol(BString()).UrlString();
 	BString proto = url.Protocol();
@@ -520,7 +520,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		BString mimetype;
 
 		url << full;
-		BUrl u(url.String());
+		BUrl u(url.String(), true);
 		args[0] = const_cast<char*>("urlwrapper"); //XXX
 		args[1] = (char*)u.UrlString().String();
 		args[2] = NULL;

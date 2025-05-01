@@ -30,7 +30,7 @@ UrlPlaylistItem::UrlPlaylistItem(const BMessage* archive)
 {
 	const char* url = NULL;
 	if (archive->FindString("mediaplayer:url", &url) == B_OK)
-		fUrl = BUrl(url);
+		fUrl = BUrl(url, true);
 }
 
 

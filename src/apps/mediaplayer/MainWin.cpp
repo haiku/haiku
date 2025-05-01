@@ -654,7 +654,7 @@ MainWin::MessageReceived(BMessage* msg)
 						BString urlString;
 						entry_ref fileRef;
 						for (int32 j = 0; msg->FindString("data", j, &urlString) == B_OK; j++) {
-							BUrl url(urlString);
+							BUrl url(urlString, true);
 							if (url.IsValid() && url.Protocol() != "file") {
 								UrlPlaylistItem* item = new UrlPlaylistItem(url);
 								if (!fPlaylist->AddItem(item, i + j)) {

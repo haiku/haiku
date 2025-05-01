@@ -89,7 +89,7 @@ AddRepoCommand::Execute(int argc, const char* const* argv)
 	status_t result;
 	for (int i = 0; i < urlCount; ++i) {
 		// Test if a valid URL has been supplied before attempting to add
-		BUrl repoURL(repoURLs[i]);
+		BUrl repoURL(repoURLs[i], true);
 		if (!repoURL.IsValid()) {
 			result = B_BAD_VALUE;
 			DIE(result, "request for adding repository \"%s\" failed",

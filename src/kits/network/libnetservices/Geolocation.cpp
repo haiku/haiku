@@ -51,8 +51,8 @@ class GeolocationListener: public BUrlProtocolListener
 
 
 BGeolocation::BGeolocation()
-	: fGeolocationService(kDefaultGeolocationService),
-	fGeocodingService(kDefaultGeocodingService)
+	: fGeolocationService(kDefaultGeolocationService, true),
+	fGeocodingService(kDefaultGeocodingService, true)
 {
 }
 
@@ -63,9 +63,9 @@ BGeolocation::BGeolocation(const BUrl& geolocationService,
 	fGeocodingService(geocodingService)
 {
 	if (!fGeolocationService.IsValid())
-		fGeolocationService.SetUrlString(kDefaultGeolocationService);
+		fGeolocationService.SetUrlString(kDefaultGeolocationService, true);
 	if (!fGeocodingService.IsValid())
-		fGeocodingService.SetUrlString(kDefaultGeocodingService);
+		fGeocodingService.SetUrlString(kDefaultGeocodingService, true);
 }
 
 

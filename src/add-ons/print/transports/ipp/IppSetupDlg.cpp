@@ -114,7 +114,7 @@ bool IppSetupView::UpdateViewData()
 		request->setURI("printer-uri", url->Text());
 		request->setDelimiter(IPP_END_OF_ATTRIBUTES_TAG);
 
-		IppURLConnection conn(BUrl(url->Text()));
+		IppURLConnection conn(BUrl(url->Text(), true));
 		conn.setIppRequest(request);
 		conn.setRequestProperty("Connection", "close");
 

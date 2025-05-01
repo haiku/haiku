@@ -52,7 +52,7 @@ PlaylistFileReader::_AppendItemToPlaylist(const BString& entry, Playlist* playli
 	if (err == B_OK)
 		item = new (nothrow) FilePlaylistItem(refPath);
 	else {
-		BUrl url(entry);
+		BUrl url(entry, true);
 		if (url.IsValid())
 			item = new (nothrow) UrlPlaylistItem(url);
 		else {

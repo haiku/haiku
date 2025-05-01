@@ -97,7 +97,7 @@ IppTransport::~IppTransport()
 		__fs.seekg(0, ios::beg);
 		request->setRawData(__fs, fssize);
 
-		BUrl url(__url);
+		BUrl url(__url, true);
 		IppURLConnection conn(url);
 		conn.setIppRequest(request);
 		conn.setRequestProperty("Connection", "close");

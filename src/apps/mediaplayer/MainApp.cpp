@@ -218,7 +218,7 @@ MainApp::ArgvReceived(int32 argc, char** argv)
 	getcwd(cwd, sizeof(cwd));
 
 	for (int i = 1; i < argc; i++) {
-		BUrl url(argv[i]);
+		BUrl url(argv[i], true);
 		if (url.IsValid()) {
 			BMessage archivedUrl;
 			url.Archive(&archivedUrl);

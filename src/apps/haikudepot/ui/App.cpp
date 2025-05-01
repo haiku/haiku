@@ -277,7 +277,7 @@ App::ArgvReceived(int32 argc, char* argv[])
 				break;
 
 			case WEB_APP_BASE_URL_SWITCH:
-				if (ServerSettings::SetBaseUrl(BUrl(argv[i + 1])) != B_OK) {
+				if (ServerSettings::SetBaseUrl(BUrl(argv[i + 1], true)) != B_OK) {
 					HDERROR("malformed web app base url; %s", argv[i + 1]);
 					Quit();
 				} else {

@@ -58,7 +58,7 @@ int media_play(const char* uri)
 	BMediaFile* playFile;
 
 	if (get_ref_for_path(uri, &ref) != B_OK) {
-		url.SetUrlString(uri);
+		url.SetUrlString(uri, true);
 		if (url.IsValid()) {
 			playFile = new BMediaFile(url);
 		} else

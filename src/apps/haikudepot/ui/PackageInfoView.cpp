@@ -777,7 +777,7 @@ public:
 
 			case MSG_VISIT_PUBLISHER_WEBSITE:
 			{
-				BUrl url(fWebsiteLinkView->Text());
+				BUrl url(fWebsiteLinkView->Text(), true);
 				url.OpenWithPreferredApplication();
 				break;
 			}
