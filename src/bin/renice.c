@@ -87,7 +87,6 @@ int main(int argc, char **argv)
 	bool use_be_prio = false;
 	bool next_is_prio = true;
 	bool next_is_increment = false;
-	bool use_increment = false;
 	bool find_by_name = false;
 	int i = 0;
 	int32 teamcookie = 0;
@@ -106,7 +105,6 @@ int main(int argc, char **argv)
 		} else if (!strcmp(argv[i], "-n")) {
 			next_is_prio = false;
 			next_is_increment = true;
-			use_increment = true;
 		} else if (!strcmp(argv[i], "-b")) {
 			use_be_prio = true;
 		} else if (!strcmp(argv[i], "-f")) {
