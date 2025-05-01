@@ -63,7 +63,7 @@ public:
 			status_t		SetVolume(const BVolume* volume);
 			status_t		SetPredicate(const char* expression);
 			status_t		SetTarget(BMessenger messenger);
-			void			SetFlags(uint32 flags);
+			status_t		SetFlags(uint32 flags);
 
 			bool			IsLive() const;
 

@@ -231,10 +231,14 @@ BQuery::SetTarget(BMessenger messenger)
 }
 
 
-void
+status_t
 BQuery::SetFlags(uint32 flags)
 {
-	fFlags = flags;
+	if (_HasFetched())
+		return B_NOT_ALLOWED;
+
+	fFlags = (flags & ~B_LIVE_QUERY);
+	return B_OK;
 }
 
 

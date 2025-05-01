@@ -330,6 +330,27 @@
 */
 
 
+/*!
+	\fn status_t BQuery::SetFlags(uint32 flags)
+	\brief Sets the flags the query will be opened with.
+
+	The possible flags to set are defined in \file fs_query.h.
+
+	This methods fails if called after Fetch(). To reuse the BQuery object it
+	must first be reset via Clear().
+
+	\note The \c B_LIVE_QUERY flag will be ignored; BQuery always sets it automatically if necessary.
+
+	\param flags The flags to set.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NOT_ALLOWED SetFlags() was called after Fetch().
+
+	\since Haiku R1
+*/
+
+
 //! @}
 
 
