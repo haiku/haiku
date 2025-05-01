@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Name: actbl2.h - ACPI Table Definitions (tables not in ACPI spec)
+ * Name: actbl2.h - ACPI Table Definitions
  *
  *****************************************************************************/
 
@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2024, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2025, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -173,6 +173,7 @@
 #define ACPI_SIG_BDAT           "BDAT"      /* BIOS Data ACPI Table */
 #define ACPI_SIG_CCEL           "CCEL"      /* CC Event Log Table */
 #define ACPI_SIG_CDAT           "CDAT"      /* Coherent Device Attribute Table */
+#define ACPI_SIG_ERDT           "ERDT"      /* Enhanced Resource Director Technology */
 #define ACPI_SIG_IORT           "IORT"      /* IO Remapping Table */
 #define ACPI_SIG_IVRS           "IVRS"      /* I/O Virtualization Reporting Structure */
 #define ACPI_SIG_LPIT           "LPIT"      /* Low Power Idle Table */
@@ -181,6 +182,7 @@
 #define ACPI_SIG_MCHI           "MCHI"      /* Management Controller Host Interface table */
 #define ACPI_SIG_MPAM           "MPAM"      /* Memory System Resource Partitioning and Monitoring Table */
 #define ACPI_SIG_MPST           "MPST"      /* Memory Power State Table */
+#define ACPI_SIG_MRRM           "MRRM"      /* Memory Range and Region Mapping table */
 #define ACPI_SIG_MSDM           "MSDM"      /* Microsoft Data Management Table */
 #define ACPI_SIG_NFIT           "NFIT"      /* NVDIMM Firmware Interface Table */
 #define ACPI_SIG_NHLT           "NHLT"      /* Non HD Audio Link Table */
@@ -194,6 +196,7 @@
 #define ACPI_SIG_RAS2           "RAS2"      /* RAS2 Feature table */
 #define ACPI_SIG_RGRT           "RGRT"      /* Regulatory Graphics Resource Table */
 #define ACPI_SIG_RHCT           "RHCT"      /* RISC-V Hart Capabilities Table */
+#define ACPI_SIG_RIMT           "RIMT"      /* RISC-V IO Mapping Table */
 #define ACPI_SIG_SBST           "SBST"      /* Smart Battery Specification Table */
 #define ACPI_SIG_SDEI           "SDEI"      /* Software Delegated Exception Interface Table */
 #define ACPI_SIG_SDEV           "SDEV"      /* Secure Devices table */
@@ -259,7 +262,9 @@ typedef struct acpi_aest_hdr
 #define ACPI_AEST_SMMU_ERROR_NODE           2
 #define ACPI_AEST_VENDOR_ERROR_NODE         3
 #define ACPI_AEST_GIC_ERROR_NODE            4
-#define ACPI_AEST_NODE_TYPE_RESERVED        5 /* 5 and above are reserved */
+#define ACPI_AEST_PCIE_ERROR_NODE           5
+#define ACPI_AEST_PROXY_ERROR_NODE          6
+#define ACPI_AEST_NODE_TYPE_RESERVED        7 /* 7 and above are reserved */
 
 
 /*
@@ -346,6 +351,16 @@ typedef struct acpi_aest_vendor
 
 } ACPI_AEST_VENDOR;
 
+/* 3: Vendor Defined V2 */
+
+typedef struct acpi_aest_vendor_v2
+{
+    UINT64                  AcpiHid;
+    UINT32                  AcpiUid;
+    UINT8                   VendorSpecificData[16];
+
+} ACPI_AEST_VENDOR_V2;
+
 /* 4: Gic Error */
 
 typedef struct acpi_aest_gic
@@ -363,6 +378,22 @@ typedef struct acpi_aest_gic
 #define ACPI_AEST_GIC_ITS                   3
 #define ACPI_AEST_GIC_RESERVED              4   /* 4 and above are reserved */
 
+/* 5: PCIe Error */
+
+typedef struct acpi_aest_pcie
+{
+    UINT32                  IortNodeReference;
+
+} ACPI_AEST_PCIE;
+
+
+/* 6: Proxy Error */
+
+typedef struct acpi_aest_proxy
+{
+    UINT64                  NodeAddress;
+
+} ACPI_AEST_PROXY;
 
 /* Node Interface Structure */
 
@@ -380,11 +411,67 @@ typedef struct acpi_aest_node_interface
 
 } ACPI_AEST_NODE_INTERFACE;
 
+/* Node Interface Structure V2*/
+
+typedef struct acpi_aest_node_interface_header
+{
+    UINT8                   Type;
+    UINT8                   GroupFormat;
+    UINT8                   Reserved[2];
+    UINT32                  Flags;
+    UINT64                  Address;
+    UINT32                  ErrorRecordIndex;
+    UINT32                  ErrorRecordCount;
+
+} ACPI_AEST_NODE_INTERFACE_HEADER;
+
+#define ACPI_AEST_NODE_GROUP_FORMAT_4K             0
+#define ACPI_AEST_NODE_GROUP_FORMAT_16K            1
+#define ACPI_AEST_NODE_GROUP_FORMAT_64K            2
+
+typedef struct acpi_aest_node_interface_common
+{
+    UINT32                             ErrorNodeDevice;
+    UINT32                             ProcessorAffinity;
+    UINT64                             ErrorGroupRegisterBase;
+    UINT64                             FaultInjectRegisterBase;
+    UINT64                             InterruptConfigRegisterBase;
+
+} ACPI_AEST_NODE_INTERFACE_COMMON;
+
+typedef struct acpi_aest_node_interface_4k
+{
+    UINT64                             ErrorRecordImplemented;
+    UINT64                             ErrorStatusReporting;
+    UINT64                             AddressingMode;
+    ACPI_AEST_NODE_INTERFACE_COMMON    Common;
+
+} ACPI_AEST_NODE_INTERFACE_4K;
+
+typedef struct acpi_aest_node_interface_16k
+{
+    UINT64                             ErrorRecordImplemented[4];
+    UINT64                             ErrorStatusReporting[4];
+    UINT64                             AddressingMode[4];
+    ACPI_AEST_NODE_INTERFACE_COMMON    Common;
+
+} ACPI_AEST_NODE_INTERFACE_16K;
+
+typedef struct acpi_aest_node_interface_64k
+{
+    INT64                              ErrorRecordImplemented[14];
+    UINT64                             ErrorStatusReporting[14];
+    UINT64                             AddressingMode[14];
+    ACPI_AEST_NODE_INTERFACE_COMMON    Common;
+
+} ACPI_AEST_NODE_INTERFACE_64K;
+
 /* Values for Type field above */
 
-#define ACPI_AEST_NODE_SYSTEM_REGISTER      0
-#define ACPI_AEST_NODE_MEMORY_MAPPED        1
-#define ACPI_AEST_XFACE_RESERVED            2   /* 2 and above are reserved */
+#define ACPI_AEST_NODE_SYSTEM_REGISTER                    0
+#define ACPI_AEST_NODE_MEMORY_MAPPED                      1
+#define ACPI_AEST_NODE_SINGLE_RECORD_MEMORY_MAPPED        2
+#define ACPI_AEST_XFACE_RESERVED                          3   /* 2 and above are reserved */
 
 /* Node Interrupt Structure */
 
@@ -398,6 +485,18 @@ typedef struct acpi_aest_node_interrupt
     UINT8                   Reserved1[3];
 
 } ACPI_AEST_NODE_INTERRUPT;
+
+/* Node Interrupt Structure V2 */
+
+typedef struct acpi_aest_node_interrupt_v2
+{
+    UINT8                   Type;
+    UINT8                   Reserved[2];
+    UINT8                   Flags;
+    UINT32                  Gsiv;
+    UINT8                   Reserved1[4];
+
+} ACPI_AEST_NODE_INTERRUPT_V2;
 
 /* Values for Type field above */
 
@@ -545,10 +644,239 @@ typedef struct acpi_table_ccel
 
 /*******************************************************************************
  *
+ * ERDT - Enhanced Resource Director Technology (ERDT) table
+ *
+ * Conforms to "Intel Resource Director Technology Architecture Specification"
+ * Version 1.1, January 2025
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_erdt
+{
+    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
+    UINT32                  MaxClos;            /* Maximum classes of service */
+    UINT8                   Reserved[24];
+    UINT8                   Erdt_Substructures[];
+
+} ACPI_TABLE_ERDT;
+
+
+/* Values for subtable type in ACPI_SUBTBL_HDR_16 */
+
+enum AcpiErdtType
+{
+    ACPI_ERDT_TYPE_RMDD                 = 0,
+    ACPI_ERDT_TYPE_CACD                 = 1,
+    ACPI_ERDT_TYPE_DACD                 = 2,
+    ACPI_ERDT_TYPE_CMRC                 = 3,
+    ACPI_ERDT_TYPE_MMRC                 = 4,
+    ACPI_ERDT_TYPE_MARC                 = 5,
+    ACPI_ERDT_TYPE_CARC                 = 6,
+    ACPI_ERDT_TYPE_CMRD                 = 7,
+    ACPI_ERDT_TYPE_IBRD                 = 8,
+    ACPI_ERDT_TYPE_IBAD                 = 9,
+    ACPI_ERDT_TYPE_CARD                 = 10,
+    ACPI_ERDT_TYPE_RESERVED             = 11    /* 11 and above are reserved */
+
+};
+
+/*
+ * ERDT Subtables, correspond to Type in ACPI_SUBTBL_HDR_16
+ */
+
+/* 0: RMDD - Resource Management Domain Description */
+
+typedef struct acpi_erdt_rmdd
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT16                  Flags;
+    UINT16                  IO_l3_Slices;       /* Number of slices in IO cache */
+    UINT8                   IO_l3_Sets;         /* Number of sets in IO cache */
+    UINT8                   IO_l3_Ways;         /* Number of ways in IO cache */
+    UINT64                  Reserved;
+    UINT16                  DomainId;           /* Unique domain ID */
+    UINT32                  MaxRmid;            /* Maximun RMID supported */
+    UINT64                  CregBase;           /* Control Register Base Address */
+    UINT16                  CregSize;           /* Control Register Size (4K pages) */
+    UINT8                   RmddStructs[];
+
+} ACPI_ERDT_RMDD;
+
+
+/* 1: CACD - CPU Agent Collection Description */
+
+typedef struct acpi_erdt_cacd
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT16                  Reserved;
+    UINT16                  DomainId;           /* Unique domain ID */
+    UINT32                  X2APICIDS[];
+
+} ACPI_ERDT_CACD;
+
+
+/* 2: DACD - Device Agent Collection Description */
+
+typedef struct acpi_erdt_dacd
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT16                  Reserved;
+    UINT16                  DomainId;           /* Unique domain ID */
+    UINT8                   DevPaths[];
+
+} ACPI_ERDT_DACD;
+
+typedef struct acpi_erdt_dacd_dev_paths
+{
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT16                  Segment;
+    UINT8                   Reserved;
+    UINT8                   StartBus;
+    UINT8                   Path[];
+
+} ACPI_ERDT_DACD_PATHS;
+
+
+/* 3: CMRC - Cache Monitoring Registers for CPU Agents */
+
+typedef struct acpi_erdt_cmrc
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT32                  Reserved1;
+    UINT32                  Flags;
+    UINT8                   IndexFn;
+    UINT8                   Reserved2[11];
+    UINT64                  CmtRegBase;
+    UINT32                  CmtRegSize;
+    UINT16                  ClumpSize;
+    UINT16                  ClumpStride;
+    UINT64                  UpScale;
+
+} ACPI_ERDT_CMRC;
+
+
+/* 4: MMRC - Memory-bandwidth Monitoring Registers for CPU Agents */
+
+typedef struct acpi_erdt_mmrc
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT32                  Reserved1;
+    UINT32                  Flags;
+    UINT8                   IndexFn;
+    UINT8                   Reserved2[11];
+    UINT64                  RegBase;
+    UINT32                  RegSize;
+    UINT8                   CounterWidth;
+    UINT64                  UpScale;
+    UINT8                   Reserved3[7];
+    UINT32                  CorrFactorListLen;
+    UINT32                  CorrFactorList[];
+
+} ACPI_ERDT_MMRC;
+
+
+/* 5: MARC - Memory-bandwidth Allocation Registers for CPU Agents */
+
+typedef struct acpi_erdt_marc
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT16                  Reserved1;
+    UINT16                  Flags;
+    UINT8                   IndexFn;
+    UINT8                   Reserved2[7];
+    UINT64                  RegBaseOpt;
+    UINT64                  RegBaseMin;
+    UINT64                  RegBaseMax;
+    UINT32                  MbaRegSize;
+    UINT32                  MbaCtrlRange;
+
+} ACPI_ERDT_MARC;
+
+
+/* 6: CARC - Cache Allocation Registers for CPU Agents */
+
+typedef struct acpi_erdt_carc
+{
+    ACPI_SUBTBL_HDR_16      Header;
+
+} ACPI_ERDT_CARC;
+
+
+/* 7: CMRD - Cache Monitoring Registers for Device Agents */
+
+typedef struct acpi_erdt_cmrd
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT32                  Reserved1;
+    UINT32                  Flags;
+    UINT8                   IndexFn;
+    UINT8                   Reserved2[11];
+    UINT64                  RegBase;
+    UINT32                  RegSize;
+    UINT16                  CmtRegOff;
+    UINT16                  CmtClumpSize;
+    UINT64                  UpScale;
+
+} ACPI_ERDT_CMRD;
+
+
+/* 8: IBRD - Cache Monitoring Registers for Device Agents */
+
+typedef struct acpi_erdt_ibrd
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT32                  Reserved1;
+    UINT32                  Flags;
+    UINT8                   IndexFn;
+    UINT8                   Reserved2[11];
+    UINT64                  RegBase;
+    UINT32                  RegSize;
+    UINT16                  TotalBwOffset;
+    UINT16                  IOMissBwOffset;
+    UINT16                  TotalBwClump;
+    UINT16                  IOMissBwClump;
+    UINT8                   Reserved3[7];
+    UINT8                   CounterWidth;
+    UINT64                  UpScale;
+    UINT32                  CorrFactorListLen;
+    UINT32                  CorrFactorList[];
+
+} ACPI_ERDT_IBRD;
+
+
+/* 9: IBAD - IO bandwidth Allocation Registers for device agents */
+
+typedef struct acpi_erdt_ibad
+{
+    ACPI_SUBTBL_HDR_16      Header;
+
+} ACPI_ERDT_IBAD;
+
+
+/* 10: CARD - IO bandwidth Allocation Registers for Device Agents */
+
+typedef struct acpi_erdt_card
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT32                  Reserved1;
+    UINT32                  Flags;
+    UINT32                  ContentionMask;
+    UINT8                   IndexFn;
+    UINT8                   Reserved2[7];
+    UINT64                  RegBase;
+    UINT32                  RegSize;
+    UINT16                  CatRegOffset;
+    UINT16                  CatRegBlockSize;
+
+} ACPI_ERDT_CARD;
+
+
+/*******************************************************************************
+ *
  * IORT - IO Remapping Table
  *
  * Conforms to "IO Remapping Table System Software on ARM Platforms",
- * Document number: ARM DEN 0049E.e, Sep 2022
+ * Document number: ARM DEN 0049E.f, Apr 2024
  *
  ******************************************************************************/
 
@@ -631,6 +959,7 @@ typedef struct acpi_iort_memory_access
 
 #define ACPI_IORT_MF_COHERENCY          (1)
 #define ACPI_IORT_MF_ATTRIBUTES         (1<<1)
+#define ACPI_IORT_MF_CANWBS             (1<<2)
 
 
 /*
@@ -1835,7 +2164,7 @@ typedef struct acpi_mpam_msc_node
     UINT32                     MaxNrdyUsec;
     UINT64                     HardwareIdLinkedDevice;
     UINT32                     InstanceIdLinkedDevice;
-    UINT32                     NumResouceNodes;
+    UINT32                     NumResourceNodes;
 } ACPI_MPAM_MSC_NODE;
 
 typedef struct acpi_table_mpam
@@ -1991,6 +2320,52 @@ typedef struct acpi_msct_proximity
     UINT64                  MemoryCapacity;     /* In bytes */
 
 } ACPI_MSCT_PROXIMITY;
+
+
+/*******************************************************************************
+ *
+ * MRRM - Memory Range and Region Mapping (MRRM) table
+ * Conforms to "Intel Resource Director Technology Architecture Specification"
+ * Version 1.1, January 2025
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_mrrm
+{
+    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
+    UINT8                   MaxMemRegion;       /* Max Memory Regions supported */
+    UINT8                   Flags;              /* Region assignment type */
+    UINT8                   Reserved[26];
+    UINT8                   Memory_Range_Entry[];
+
+} ACPI_TABLE_MRRM;
+
+/* Flags */
+#define ACPI_MRRM_FLAGS_REGION_ASSIGNMENT_OS    (1<<0)
+
+/*******************************************************************************
+    *
+    * Memory Range entry - Memory Range entry in MRRM table
+    *
+    ******************************************************************************/
+
+typedef struct acpi_mrrm_mem_range_entry
+{
+    ACPI_SUBTBL_HDR_16      Header;
+    UINT32                  Reserved0;          /* Reserved */
+    UINT64                  AddrBase;           /* Base addr of the mem range */
+    UINT64                  AddrLen;            /* Length of the mem range */
+    UINT16                  RegionIdFlags;      /* Valid local or remote Region-ID */
+    UINT8                   LocalRegionId;      /* Platform-assigned static local Region-ID */
+    UINT8                   RemoteRegionId;     /* Platform-assigned static remote Region-ID */
+    UINT32                  Reserved1;          /* Reserved */
+    /* Region-ID Programming Registers[] */
+
+} ACPI_MRRM_MEM_RANGE_ENTRY;
+
+/* Values for RegionIdFlags above */
+#define ACPI_MRRM_VALID_REGION_ID_FLAGS_LOCAL   (1<<0)
+#define ACPI_MRRM_VALID_REGION_ID_FLAGS_REMOTE  (1<<1)
 
 
 /*******************************************************************************
@@ -3221,17 +3596,17 @@ typedef struct acpi_ras2_pcc_desc {
 
 /* RAS2 Platform Communication Channel Shared Memory Region */
 
-typedef struct acpi_ras2_shared_memory {
+typedef struct acpi_ras2_shmem {
     UINT32                  Signature;
     UINT16                  Command;
     UINT16                  Status;
     UINT16                  Version;
     UINT8                   Features[16];
-    UINT8                   SetCapabilities[16];
-    UINT16                  NumParameterBlocks;
-    UINT32                  SetCapabilitiesStatus;
+    UINT8                   SetCaps[16];
+    UINT16                  NumParamBlks;
+    UINT32                  SetCapsStatus;
 
-} ACPI_RAS2_SHARED_MEMORY;
+} ACPI_RAS2_SHMEM;
 
 /* RAS2 Parameter Block Structure for PATROL_SCRUB */
 
@@ -3245,16 +3620,16 @@ typedef struct acpi_ras2_parameter_block
 
 /* RAS2 Parameter Block Structure for PATROL_SCRUB */
 
-typedef struct acpi_ras2_patrol_scrub_parameter {
+typedef struct acpi_ras2_patrol_scrub_param {
     ACPI_RAS2_PARAMETER_BLOCK   Header;
-    UINT16                      PatrolScrubCommand;
-    UINT64                      RequestedAddressRange[2];
-    UINT64                      ActualAddressRange[2];
+    UINT16                      Command;
+    UINT64                      ReqAddrRange[2];
+    UINT64                      ActlAddrRange[2];
     UINT32                      Flags;
     UINT32                      ScrubParamsOut;
     UINT32                      ScrubParamsIn;
 
-} ACPI_RAS2_PATROL_SCRUB_PARAMETER;
+} ACPI_RAS2_PATROL_SCRUB_PARAM;
 
 /* Masks for Flags field above */
 
@@ -3436,6 +3811,89 @@ typedef struct acpi_rhct_hart_info {
     UINT16                  NumOffsets;
     UINT32                  Uid;                /* ACPI processor UID */
 } ACPI_RHCT_HART_INFO;
+
+/*******************************************************************************
+ *
+ * RIMT - RISC-V IO Remapping Table
+ *
+ * https://github.com/riscv-non-isa/riscv-acpi-rimt
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_rimt {
+    ACPI_TABLE_HEADER Header;              /* Common ACPI table header */
+    UINT32            NumNodes;            /* Number of RIMT Nodes */
+    UINT32            NodeOffset;          /* Offset to RIMT Node Array */
+    UINT32            Reserved;
+} ACPI_TABLE_RIMT;
+
+typedef struct acpi_rimt_node {
+    UINT8             Type;
+    UINT8             Revision;
+    UINT16            Length;
+    UINT16            Reserved;
+    UINT16            Id;
+    char              NodeData[];
+} ACPI_RIMT_NODE;
+
+enum acpi_rimt_node_type {
+    ACPI_RIMT_NODE_TYPE_IOMMU             = 0x0,
+    ACPI_RIMT_NODE_TYPE_PCIE_ROOT_COMPLEX = 0x1,
+    ACPI_RIMT_NODE_TYPE_PLAT_DEVICE       = 0x2,
+};
+
+typedef struct acpi_rimt_iommu {
+    UINT8             HardwareId[8];       /* Hardware ID */
+    UINT64            BaseAddress;         /* Base Address */
+    UINT32            Flags;               /* Flags */
+    UINT32            ProximityDomain;     /* Proximity Domain */
+    UINT16            PcieSegmentNumber;   /* PCIe Segment number */
+    UINT16            PcieBdf;             /* PCIe B/D/F */
+    UINT16            NumInterruptWires;   /* Number of interrupt wires */
+    UINT16            InterruptWireOffset; /* Interrupt wire array offset */
+    UINT64            InterruptWire[];     /* Interrupt wire array */
+} ACPI_RIMT_IOMMU;
+
+/* IOMMU Node Flags */
+#define ACPI_RIMT_IOMMU_FLAGS_PCIE      (1)
+#define ACPI_RIMT_IOMMU_FLAGS_PXM_VALID (1 << 1)
+
+/* Interrupt Wire Structure */
+typedef struct acpi_rimt_iommu_wire_gsi {
+    UINT32             IrqNum;             /* Interrupt Number */
+    UINT32             Flags;              /* Flags */
+} ACPI_RIMT_IOMMU_WIRE_GSI;
+
+/* Interrupt Wire Flags */
+#define ACPI_RIMT_GSI_LEVEL_TRIGGERRED  (1)
+#define ACPI_RIMT_GSI_ACTIVE_HIGH       (1 << 1)
+
+typedef struct acpi_rimt_id_mapping {
+    UINT32              SourceIdBase;      /* Source ID Base */
+    UINT32              NumIds;            /* Number of IDs */
+    UINT32              DestIdBase;        /* Destination Device ID Base */
+    UINT32              DestOffset;        /* Destination IOMMU Offset */
+    UINT32              Flags;             /* Flags */
+} ACPI_RIMT_ID_MAPPING;
+
+typedef struct acpi_rimt_pcie_rc {
+    UINT32              Flags;             /* Flags */
+    UINT16              Reserved;          /* Reserved */
+    UINT16              PcieSegmentNumber; /* PCIe Segment number */
+    UINT16              IdMappingOffset;   /* ID mapping array offset */
+    UINT16              NumIdMappings;     /* Number of ID mappings */
+} ACPI_RIMT_PCIE_RC;
+
+/* PCIe Root Complex Node Flags */
+#define ACPI_RIMT_PCIE_ATS_SUPPORTED   (1)
+#define ACPI_RIMT_PCIE_PRI_SUPPORTED   (1 << 1)
+
+typedef struct acpi_rimt_platform_device {
+    UINT16              IdMappingOffset;   /* ID Mapping array offset */
+    UINT16              NumIdMappings;     /* Number of ID mappings */
+    char                DeviceName[];      /* Device Object Name */
+} ACPI_RIMT_PLATFORM_DEVICE;
+
 
 /*******************************************************************************
  *
