@@ -25,7 +25,7 @@ Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute icu : headers ] ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
-Preference Time
+Application Time
 	: $(sources)
 	: be bnetapi network shared [ TargetLibstdc++ ] localestub
 	: Time.rdef

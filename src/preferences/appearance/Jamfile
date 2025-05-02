@@ -4,7 +4,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders shared app interface [ FDirName servers app ] ;
 
-Preference Appearance :
+Application Appearance :
 	AntialiasingSettingsView.cpp
 	Appearance.cpp
 	AppearanceWindow.cpp

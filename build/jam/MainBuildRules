@@ -41,9 +41,9 @@ rule AddSharedObjectGlueCode
 	}
 }
 
-rule Executable
+rule Application
 {
-	# Executable <name> : <sources> : <libraries> : <res> ;
+	# Application <name> : <sources> : <libraries> : <res> ;
 	#
 	if ! [ IsPlatformSupportedForTarget $(1) ] {
 		return ;
@@ -60,18 +60,6 @@ rule Executable
 	AddSharedObjectGlueCode $(1) : true ;
 }
 
-rule Application
-{
-	# Application <name> : <sources> : <libraries> : <res> ;
-	Executable $(1) : $(2) : $(3) : $(4) ;
-}
-
-rule BinCommand
-{
-	# BinCommand <name> : <sources> : <libraries> : <res> ;
-	Executable $(1) : $(2) : $(3) : $(4) ;
-}
-
 rule StdBinCommands
 {
 	# StdBinCommands <sources> : <libs> : <res> ;
@@ -82,21 +70,8 @@ rule StdBinCommands
 	{
 		local target = $(source:S=) ;
 
-		BinCommand $(target) : $(source) : $(libs) : $(ress) ;
+		Application $(target) : $(source) : $(libs) : $(ress) ;
 	}
-}
-
-rule Preference
-{
-	# Preference <name> : <sources> : <libraries> : <res> ;
-	Executable $(1) : $(2) : $(3) : $(4) ;
-}
-
-rule Server
-{
-	# Server <name> : <sources> : <libraries> : <res> ;
-
-	Executable $(1) : $(2) : $(3) : $(4) ;
 }
 
 rule Addon target : sources : libraries : isExecutable

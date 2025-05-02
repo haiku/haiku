@@ -19,7 +19,7 @@ local sources =
 
 AddResources E-mail : e-mail.rdef ;
 
-Preference E-mail
+Application E-mail
 	:
 	$(sources)
 	:

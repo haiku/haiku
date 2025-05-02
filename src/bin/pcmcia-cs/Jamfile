@@ -13,7 +13,7 @@ StdBinCommands
 	dump_cisreg.c
 	: root ;
 
-BinCommand pack_cis :
+Application pack_cis :
 	pack_cis.c
 	lex_cis.l
 	yacc_cis.y

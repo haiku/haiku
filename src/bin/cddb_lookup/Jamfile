@@ -4,7 +4,7 @@ UsePrivateHeaders drivers ;
 
 AddResources cddb_lookup : cddb_lookup.rdef ;
 
-BinCommand cddb_lookup :
+Application cddb_lookup :
 	cddb_lookup.cpp
 	cddb_server.cpp
 	: be bnetapi [ TargetLibsupc++ ]

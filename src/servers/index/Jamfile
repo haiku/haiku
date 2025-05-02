@@ -5,7 +5,7 @@ AddResources index_server : index_server.rdef ;
 UsePrivateHeaders index_server shared storage kernel app ;
 UsePrivateSystemHeaders ;
 
-Server index_server :
+Application index_server :
 	CatchUpManager.cpp
 	main.cpp
 	IndexServer.cpp

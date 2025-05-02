@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src tests system kernel device_manager ;
 
-BinCommand <test>listdev :
+Application <test>listdev :
 	dm_wrapper.c
 	listdev.c
 ;

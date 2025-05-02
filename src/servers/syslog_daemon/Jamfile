@@ -5,7 +5,7 @@ UsePrivateSystemHeaders ;
 
 AddResources syslog_daemon : SyslogDaemon.rdef ;
 
-Server syslog_daemon :
+Application syslog_daemon :
 	SyslogDaemon.cpp
 	syslog_output.cpp
 	listener_output.cpp

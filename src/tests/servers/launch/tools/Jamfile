@@ -36,7 +36,7 @@ Server test_launch_daemon :
 	LaunchDaemon.rdef
 ;
 
-BinCommand test_launch_roster :
+Application test_launch_roster :
 	LaunchRoster.cpp
 	launch_roster.cpp
 	:

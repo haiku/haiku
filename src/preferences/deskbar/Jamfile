@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences deskbar ;
 
 SubDirSysHdrs $(HAIKU_TOP) src apps deskbar ;
 
-Preference <preference>Deskbar
+Application <preference>Deskbar
 	:
 	DeskbarPreferences.cpp
 	:

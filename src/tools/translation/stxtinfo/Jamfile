@@ -1,4 +1,4 @@
 SubDir HAIKU_TOP src tools translation stxtinfo ;
 
-BinCommand stxtinfo : stxtinfo.cpp : be [ TargetLibsupc++ ] ;
+Application stxtinfo : stxtinfo.cpp : be [ TargetLibsupc++ ] ;
 

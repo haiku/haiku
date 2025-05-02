@@ -7,7 +7,7 @@ AddResources print_server :
 	print_server.rdef
 ;
 
-Server print_server :
+Application print_server :
 	PrintServerApp.cpp
 	PrintServerApp.R5.cpp
 	PrintServerApp.Scripting.cpp

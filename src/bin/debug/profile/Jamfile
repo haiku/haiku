@@ -8,7 +8,7 @@ UsePrivateSystemHeaders ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-BinCommand profile
+Application profile
 	:
 	BasicProfileResult.cpp
 	CallgrindProfileResult.cpp

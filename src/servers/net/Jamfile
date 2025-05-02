@@ -16,7 +16,7 @@ SubDirC++Flags $(defines) ;
 
 AddResources net_server : net_server.rdef ;
 
-Server net_server :
+Application net_server :
 	NetServer.cpp
 	AutoconfigClient.cpp
 	AutoconfigLooper.cpp

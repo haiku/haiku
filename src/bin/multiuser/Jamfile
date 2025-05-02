@@ -10,21 +10,21 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 StaticLibrary libmultiuser_utils.a : multiuser_utils.cpp ;
 
-BinCommand login : login.cpp : libmultiuser_utils.a libbsd.so ;
+Application login : login.cpp : libmultiuser_utils.a libbsd.so ;
 
-BinCommand su : su.cpp : libmultiuser_utils.a libbsd.so ;
+Application su : su.cpp : libmultiuser_utils.a libbsd.so ;
 
-BinCommand passwd : passwd.cpp : libmultiuser_utils.a libbsd.so ;
+Application passwd : passwd.cpp : libmultiuser_utils.a libbsd.so ;
 
-BinCommand useradd : useradd.cpp ;
+Application useradd : useradd.cpp ;
 
-BinCommand userdel : userdel.cpp ;
+Application userdel : userdel.cpp ;
 
-BinCommand groupadd : groupadd.cpp ;
+Application groupadd : groupadd.cpp ;
 
-BinCommand groupdel : groupdel.cpp ;
+Application groupdel : groupdel.cpp ;
 
-BinCommand groupmod : groupmod.cpp : [ TargetLibstdc++ ] ;
+Application groupmod : groupmod.cpp : [ TargetLibstdc++ ] ;
 
 # set set-uid bit on passwd, su
 MODE on passwd = 04755 ;

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src servers midi ;
 
 UsePrivateHeaders app interface locale midi shared storage ;
 
-Server midi_server :
+Application midi_server :
 	MidiServerApp.cpp
 	DeviceWatcher.cpp
 	PortDrivers.cpp

@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src servers mount ;
 UsePrivateHeaders app mount shared storage ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
-Server mount_server
+Application mount_server
 	:
 	AutoMounter.cpp
 	:

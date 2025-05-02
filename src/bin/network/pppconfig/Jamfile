@@ -7,7 +7,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 	libkernelppp headers ] : true ;
 
-BinCommand pppconfig :
+Application pppconfig :
 	pppconfig.cpp
 	:
 	be libppp.a [ TargetLibsupc++ ] libbsd.so $(TARGET_NETWORK_LIBS)

@@ -55,7 +55,7 @@ if [ FIsBuildFeatureEnabled fontconfig ] {
 	: [ BuildFeatureAttribute freetype : headers ] ;
 }
 
-Server app_server :
+Application app_server :
 	Angle.cpp
 	AppServer.cpp
 	#BitfieldRegion.cpp

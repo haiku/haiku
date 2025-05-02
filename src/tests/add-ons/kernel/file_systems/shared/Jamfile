@@ -10,7 +10,7 @@ SimpleTest random_read
 	: be
 ;
 
-BinCommand fragmenter :
+Application fragmenter :
 	fragmenter.cpp
 ;
 

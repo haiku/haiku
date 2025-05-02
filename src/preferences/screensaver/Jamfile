@@ -6,7 +6,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons screen_saver ] : true ;
 UsePrivateHeaders screen_saver ;
 SubDirSysHdrs $(SUBDIR) ;
 
-Preference ScreenSaver :
+Application ScreenSaver :
 	ScreenSaverApp.cpp
 	ScreenSaverWindow.cpp
 	PasswordWindow.cpp

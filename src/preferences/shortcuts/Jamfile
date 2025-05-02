@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src preferences shortcuts ;
 UsePrivateHeaders interface ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons input_server filters shortcut_catcher ] ;
 
-Preference Shortcuts :
+Application Shortcuts :
 	main.cpp
 	MetaKeyStateMap.cpp
 	ShortcutsApp.cpp

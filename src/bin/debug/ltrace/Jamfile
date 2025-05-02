@@ -6,7 +6,7 @@ UsePrivateHeaders runtime_loader ;
 UsePrivateHeaders shared ;
 UsePrivateSystemHeaders ;
 
-BinCommand ltrace
+Application ltrace
 	:
 	ltrace.cpp
 ;

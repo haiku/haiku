@@ -5,7 +5,7 @@ UsePrivateSystemHeaders ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-BinCommand scheduling_recorder
+Application scheduling_recorder
 	:
 	scheduling_recorder.cpp
 	:

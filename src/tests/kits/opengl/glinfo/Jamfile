@@ -22,7 +22,7 @@ Includes [ FGristFiles $(sources) ] :
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
-Preference GLInfo :
+Application GLInfo :
 	$(sources)
 	:
 	be libglut.so

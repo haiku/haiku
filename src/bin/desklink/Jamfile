@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src bin desklink ;
 
 UsePrivateHeaders app interface shared ;
 
-BinCommand desklink :
+Application desklink :
 	desklink.cpp
 	DeskButton.cpp
 	MediaReplicant.cpp

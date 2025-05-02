@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src bin network arp ;
 UsePrivateHeaders net ;
 UsePrivateSystemHeaders ;
 
-BinCommand arp :
+Application arp :
 	arp.cpp
 	: $(TARGET_NETWORK_LIBS) $(TARGET_SELECT_UNAME_ETC_LIB) ;
 

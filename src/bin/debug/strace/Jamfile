@@ -57,7 +57,7 @@ for i in $(straceSyscallsIndices) {
 		: GET_SYSCALLS=get_syscalls$(i) SYSCALLS_CHUNK_$(i) ;
 }
 
-BinCommand strace : $(straceSources)
+Application strace : $(straceSources)
 	:
 	$(straceSyscallsObjects)
 	<bin>debug_utils.a

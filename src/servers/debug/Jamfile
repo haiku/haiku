@@ -8,7 +8,7 @@ UsePrivateHeaders storage ;
 
 AddResources debug_server : debug_server.rdef ;
 
-Server debug_server
+Application debug_server
  	:
  	DebugServer.cpp
 	DebugWindow.cpp

@@ -1,10 +1,10 @@
 SubDir HAIKU_TOP src tests system network multicast ;
 
-BinCommand multicast :
+Application multicast :
 	multicast.cpp
 	: libnetwork.so
 ;
 
 
-BinCommand multicat : multicat.c : libnetwork.so ;
-BinCommand multisend : multisend.c : libnetwork.so ;
+Application multicat : multicat.c : libnetwork.so ;
+Application multisend : multisend.c : libnetwork.so ;

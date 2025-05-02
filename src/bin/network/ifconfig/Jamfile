@@ -5,7 +5,7 @@ UsePrivateHeaders net ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 
-BinCommand ifconfig :
+Application ifconfig :
 	ifconfig.cpp
 	MediaTypes.cpp
 	: be network bnetapi [ TargetLibstdc++ ]

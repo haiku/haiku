@@ -5,7 +5,7 @@ UsePrivateSystemHeaders ;
 
 AddResources media_server : media_server.rdef ;
 
-Server media_server :
+Application media_server :
 	media_server.cpp
 	AppManager.cpp
 	BufferManager.cpp

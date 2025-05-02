@@ -6,7 +6,7 @@ UsePrivateHeaders [ FDirName graphics radeon ] ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src preferences screen ] ;
 
-BinCommand screenmode :
+Application screenmode :
 	screenmode.cpp
 
 	# from Screen preferences

@@ -10,7 +10,7 @@ Includes [ FGristFiles KeymapWindow.cpp ] : <keymap-locale>KeymapNames.h ;
 Includes [ FGristFiles KeymapWindow.cpp ]
 	: <keyboard-layout-locale>KeyboardLayoutNames.h ;
 
-Preference Keymap :
+Application Keymap :
 	KeyboardLayout.cpp
 	KeyboardLayoutView.cpp
 	Keymap.cpp

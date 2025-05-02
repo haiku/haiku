@@ -7,7 +7,7 @@ SubDirC++Flags -Wno-sign-compare -Wno-unused ;
 StaticLibrary librdef.a :
 	compile.cpp decompile.cpp lexer.l parser.y rdef.cpp ;
 
-BinCommand rc :
+Application rc :
 	rc.cpp
 	: librdef.a [ TargetLibstdc++ ] be
 ;

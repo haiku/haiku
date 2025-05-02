@@ -5,7 +5,7 @@ UsePrivateSystemHeaders ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
 
-Server launch_daemon
+Application launch_daemon
 	:
 	LaunchDaemon.cpp
 

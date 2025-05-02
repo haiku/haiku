@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences virtualmemory ;
 
 UsePrivateHeaders shared system ;
 
-Preference VirtualMemory :
+Application VirtualMemory :
 	VirtualMemory.cpp
 	SettingsWindow.cpp
 	Settings.cpp

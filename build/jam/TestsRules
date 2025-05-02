@@ -98,7 +98,7 @@ rule SimpleTest
 		DEBUG on $(1) [ FGristFiles $(2:S=$(SUFOBJ)) ] ?= 1 ;
 	}
 
-	Executable $(1) : $(2) : $(3) : $(4) ;
+	Application $(1) : $(2) : $(3) : $(4) ;
 }
 
 

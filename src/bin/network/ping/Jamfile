@@ -4,7 +4,7 @@ SubDirSysHdrs $(HAIKU_TOP) headers compatibility bsd ;
 
 DEFINES += INET INET6 ;
 
-BinCommand ping :
+Application ping :
 	main.c
 	ping.c
 	ping6.c

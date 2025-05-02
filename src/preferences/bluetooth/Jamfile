@@ -5,7 +5,7 @@ UsePrivateHeaders shared ;
 
 AddResources Bluetooth : Bluetooth.rdef ;
 
-Preference Bluetooth :
+Application Bluetooth :
 	BluetoothDeviceView.cpp
 	BluetoothMain.cpp
 	BluetoothSettings.cpp

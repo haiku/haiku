@@ -10,7 +10,7 @@ SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 AddResources mail_daemon : mail_daemon.rdef DeskbarViewIcons.rdef ;
 
-Server mail_daemon :
+Application mail_daemon :
 	DeskbarView.cpp
 	ErrorLogWindow.cpp
 	LEDAnimation.cpp

@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src preferences joysticks ;
 
-Preference Joysticks :
+Application Joysticks :
 	CalibWin.cpp
 	JoyWin.cpp
 	Joysticks.cpp

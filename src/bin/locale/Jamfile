@@ -5,11 +5,11 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 UsePublicHeaders locale ;
 UsePrivateHeaders locale shared ;
 
-BinCommand collectcatkeys : collectcatkeys.cpp RegExp.cpp 
+Application collectcatkeys : collectcatkeys.cpp RegExp.cpp 
 	: be localestub [ TargetLibsupc++ ] ;
 
-BinCommand linkcatkeys : linkcatkeys.cpp : be  [ TargetLibstdc++ ] ;
+Application linkcatkeys : linkcatkeys.cpp : be  [ TargetLibstdc++ ] ;
 
-BinCommand dumpcatalog : dumpcatalog.cpp : be  [ TargetLibsupc++ ] ;
+Application dumpcatalog : dumpcatalog.cpp : be  [ TargetLibsupc++ ] ;
 
-BinCommand locale : locale.cpp : be [ TargetLibsupc++ ] ;
+Application locale : locale.cpp : be [ TargetLibsupc++ ] ;

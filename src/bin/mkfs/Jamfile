@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src bin mkfs ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
-BinCommand mkfs :
+Application mkfs :
 	   main.cpp
 	   FsCreator.cpp
 	   : be [ TargetLibstdc++ ] ;

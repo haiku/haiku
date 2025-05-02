@@ -5,7 +5,7 @@ UseHeaders [ FDirName headers os add-ons screen_saver ] ;
 
 UsePrivateHeaders interface screen_saver ;
 
-BinCommand screen_blanker :
+Application screen_blanker :
 	ScreenBlanker.cpp
 	ScreenSaverWindow.cpp
 	PasswordWindow.cpp

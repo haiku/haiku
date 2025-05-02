@@ -6,7 +6,7 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders interface preferences ;
 
-Preference Screen :
+Application Screen :
 	AlertWindow.cpp
 	MonitorView.cpp
 	multimon.cpp

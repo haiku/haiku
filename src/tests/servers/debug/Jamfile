@@ -5,7 +5,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers debug ] ;
 UsePrivateHeaders shared ;
 
-BinCommand crashing_app : crashing_app.cpp ;
+Application crashing_app : crashing_app.cpp ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers debug ] ;
 SimpleTest DebugWindow :

@@ -6,7 +6,7 @@ UsePrivateHeaders net shared storage ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps networkstatus ]
 	[ FDirName $(HAIKU_TOP) src bin network ifconfig ] ;
 
-Preference Network :
+Application Network :
 	Network.cpp
 	NetworkWindow.cpp
 	NetworkProfile.cpp

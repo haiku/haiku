@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences backgrounds ;
 
 UsePrivateHeaders preferences shared ;
 
-Preference Backgrounds :
+Application Backgrounds :
 	BackgroundImage.cpp
 	Backgrounds.cpp
 	BackgroundsView.cpp

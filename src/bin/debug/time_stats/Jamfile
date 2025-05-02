@@ -7,7 +7,7 @@ UsePrivateSystemHeaders ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-BinCommand time_stats
+Application time_stats
 	:
 	scheduling_analysis.cpp
 	time_stats.cpp

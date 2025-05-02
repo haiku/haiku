@@ -2,6 +2,6 @@ SubDir HAIKU_TOP src bin i2c ;
 
 UsePrivateHeaders i2c shared ;
 
-BinCommand <bin>i2c :
+Application <bin>i2c :
 	i2c.cpp
 ;

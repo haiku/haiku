@@ -39,7 +39,7 @@ if $(TARGET_PLATFORM) != haiku {
 	APPSERVER_TEST_MODE = 0 ;
 }
 
-Server input_server :
+Application input_server :
 	InputServer.cpp
 	InputServerDevice.cpp
 	InputServerFilter.cpp

@@ -11,7 +11,7 @@ UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 
-Server registrar
+Application registrar
  	:
 	AppInfoList.cpp
 	AppInfoListMessagingTargetSet.cpp

@@ -5,7 +5,7 @@ UsePrivateSystemHeaders ;
 
 AddResources media_addon_server : media_addon_server.rdef ;
 
-Server media_addon_server :
+Application media_addon_server :
 	MediaAddonServer.cpp
 	MediaFilePlayer.cpp
 	SystemTimeSource.cpp

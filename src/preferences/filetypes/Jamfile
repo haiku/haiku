@@ -6,7 +6,7 @@ UseLibraryHeaders icon ;
 UsePrivateHeaders shared tracker ;
 SubDirSysHdrs $(HAIKU_TOP) src kits tracker ;
 
-Preference FileTypes :
+Application FileTypes :
 	FileTypes.cpp
 	FileTypesWindow.cpp
 	ApplicationTypesWindow.cpp

@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin query ;
 
-BinCommand query :
+Application query :
 	query.cpp FilteredQuery.cpp
 	: be [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
 

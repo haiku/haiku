@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src bin listdev ;
 UsePrivateHeaders shared ;
 UsePrivateSystemHeaders ;
 
-BinCommand listdev :
+Application listdev :
 	dm_wrapper.c
 	listdev.cpp
 ;

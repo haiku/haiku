@@ -9,7 +9,7 @@ SubDirC++Flags $(defines) ;
 UsePrivateHeaders drivers ;
 UseHeaders $(driverDir) ;
 
-BinCommand hid_decode :
+Application hid_decode :
 	HIDCollection.cpp
 	HIDParser.cpp
 	HIDReport.cpp

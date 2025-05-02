@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences input ;
 
 UsePrivateHeaders input ;
 
-Preference Input :
+Application Input :
 	Input.cpp
 	InputDeviceView.cpp
 	InputIcons.cpp

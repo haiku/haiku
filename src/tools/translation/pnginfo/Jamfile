@@ -9,7 +9,7 @@ Includes [ FGristFiles pnginfo.cpp ]
 	[ BuildFeatureAttribute zlib : headers ]
 	;
 
-BinCommand pnginfo : pnginfo.cpp : be
+Application pnginfo : pnginfo.cpp : be
 	[ BuildFeatureAttribute libpng : library ]
 	[ BuildFeatureAttribute zlib : library ]
 	[ TargetLibsupc++ ] ;

@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 #AddResources mount_nfs : mount_nfs.rdef ;
 
-BinCommand mount_nfs :
+Application mount_nfs :
 	mount_nfs.cpp
 	: libnetwork.so [ TargetLibsupc++ ]
 ;

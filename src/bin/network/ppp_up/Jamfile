@@ -11,7 +11,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 
 AddResources ppp_up : ppp_up.rdef ;
 
-BinCommand ppp_up :
+Application ppp_up :
 	ConnectionView.cpp
 	ConnectionWindow.cpp
 	PPPDeskbarReplicant.cpp

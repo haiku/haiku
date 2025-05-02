@@ -23,7 +23,7 @@ Includes [ FGristFiles $(sources) ]
 	: [ BuildFeatureAttribute ncurses : headers ] ;
 
 
-BinCommand telnetd :
+Application telnetd :
 	$(sources)
 	: [ BuildFeatureAttribute ncurses : library ] libtelnet.a libutil.a
 	libbsd.so $(TARGET_NETWORK_LIBS)

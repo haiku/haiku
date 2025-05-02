@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin addattr ;
 
-BinCommand addattr :
+Application addattr :
 	main.cpp
 	addAttr.cpp
 	: be

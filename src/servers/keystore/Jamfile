@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src servers keystore ;
 UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 
-Server keystore_server :
+Application keystore_server :
 	AppAccessRequestWindow.cpp
 	KeyRequestWindow.cpp
 	Keyring.cpp

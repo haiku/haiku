@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src bin network traceroute ;
 
 SubDirSysHdrs $(HAIKU_TOP) headers compatibility bsd ;
 
-BinCommand traceroute :
+Application traceroute :
 	as.c
 	findsaddr-haiku.c
 	ifaddrlist.c
