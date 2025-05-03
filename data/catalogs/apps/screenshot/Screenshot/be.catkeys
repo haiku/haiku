@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-screenshot	363809141
+1	belarusian	x-vnd.haiku-screenshot	982199096
 Include window border	ScreenshotWindow		Уключыць мяжу вакна
 Overwrite	ScreenshotWindow		Перазапiсаць
 Save in:	ScreenshotWindow		Захаваць у:
@@ -23,4 +23,3 @@ Copy to clipboard	ScreenshotWindow		Капіяваць у буфер
 screenshot	Screenshot	Base filename of screenshot files	здымак
 Home folder	ScreenshotWindow		Хатні каталог
 Save	ScreenshotWindow		Захаваць
-Capture active window	ScreenshotWindow		Захваціць актыўнае вакно

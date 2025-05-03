@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-screenshot	3958461128
+1	slovak	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Vrátane okraja okna
 Overwrite	ScreenshotWindow		Prepísať
 Save in:	ScreenshotWindow		Uložiť do:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Skopírovať do schránky
 screenshot	Screenshot	Base filename of screenshot files	snímka obrazovky
 Home folder	ScreenshotWindow		Domovský priečinok
 Save	ScreenshotWindow		Uložiť
-Capture active window	ScreenshotWindow		Zachytiť aktívne okno

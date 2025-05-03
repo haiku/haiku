@@ -64,8 +64,8 @@ View the usage conditions	UserLoginWindow		Vis brugsvilkår
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		En fejl er opstået ved hentning af de brugsvilkår, som kræves for at oprette en ny bruger. Se efter i loggen for detaljer, og prøv igen. \nOplysninger om, hvordan loggene fremvises, er tilgængelige i HaikuDepot-afsnittet i Haikus brugervejledning.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Brugsvilkår godkendt
 Size	PackageListView		Størrelse
-Your rating was updated.	RatePackageWindow		Din bedømmelse blev opdateret.
 All categories	FilterView		Alle kategorier
+Your rating was updated.	RatePackageWindow		Din bedømmelse blev opdateret.
 ignore problem for now	PackageProblem		ignorér problemet denne gang
 n/a	PackageInfoView		-
 Checking user details	UserDetailVerifierProcess		Undersøger brugeroplysninger
@@ -132,8 +132,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Bedømmelse
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner
 Show	MainWindow		Vis
-Settings…	MainWindow		Indstillinger…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Programmet skriver og læser nogle arbejdsfiler på din computer for at kunne fungere. Det ser ud til, at der ved problemer med at skrive en testfil i [%TestFilePath%]. Undersøg, at der ikke er nogen problemer med din lokale disk eller tilladelser, som kan forhindre programmer i at skrive filerne i mappens placering. Du kan vælge at være bekendt med problemet og fortsætte, men nogle funktioner kan være slået fra.
+Settings…	MainWindow		Indstillinger…
 <Package contents not available for remote packages>	PackageContentsView		<pakkens indhold er ikke tilgængeligt for fjernpakker>
 Ratings	PackageInfoView		Bedømmelser
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Følgende problemer er blevet truffet. Vælg en løsning for hvert:

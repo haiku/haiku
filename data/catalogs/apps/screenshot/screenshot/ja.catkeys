@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-screenshot-cli	3958461128
+1	japanese	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		ウィンドウの枠を含める
 Overwrite	ScreenshotWindow		上書き
 Save in:	ScreenshotWindow		次へ保存:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		クリップボードへコピー
 screenshot	Screenshot	Base filename of screenshot files	スクリーンショット
 Home folder	ScreenshotWindow		ホームフォルダー
 Save	ScreenshotWindow		保存
-Capture active window	ScreenshotWindow		アクティブウィンドウのみ

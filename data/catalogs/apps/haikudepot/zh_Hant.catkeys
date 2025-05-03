@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		取消
 Rating not possible	MainWindow		無法評分
 Package update error	MainWindow		套件更新錯誤
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
-Reboot required	PackageManager		需要重新啟動
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		獲取套件的用戶評分
+Reboot required	PackageManager		需要重新啟動
 All packages	PackageListView		全部套件
 Send	RatePackageWindow		傳送
 Start package daemon	App		啟動套件守護程式
@@ -65,8 +65,8 @@ View the usage conditions	UserLoginWindow		檢視使用條件
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		下載創建新使用者所需的使用條件時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		已約定使用條件
 Size	PackageListView		大小
-Your rating was updated.	RatePackageWindow		你的評分已更新。
 All categories	FilterView		所有類別
+Your rating was updated.	RatePackageWindow		你的評分已更新。
 ignore problem for now	PackageProblem		暫時忽略問題
 n/a	PackageInfoView		n/a
 Checking user details	UserDetailVerifierProcess		檢查用戶詳細信息
@@ -135,8 +135,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		評分
 Synchronizing icons	ServerIconExportUpdateProcess		同步圖示
 Show	MainWindow		展示
-Settings…	MainWindow		設定…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		該應用程式在您的電腦上寫入和讀取一些工作文件以便正常運行。在 [%TestFilePath%] 處寫入測試檔案似乎出現問題。檢查本機磁碟或權限是否存在可能阻止此應用程式將檔案寫入該目錄位置的問題。您可以選擇承認此問題並繼續，但某些功能可能會被停用。
+Settings…	MainWindow		設定…
 <Package contents not available for remote packages>	PackageContentsView		<遠端套件的套件內容不可用>
 Ratings	PackageInfoView		評分
 The following problems have been encountered. Please select a solution for each:	PackageProblem		遇到了以下問題。請為每個問題選擇一個解決方案：

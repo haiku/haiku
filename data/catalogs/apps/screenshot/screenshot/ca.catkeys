@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-screenshot-cli	3958461128
+1	catalan; valencian	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Inclou la vora de la finestra
 Overwrite	ScreenshotWindow		Sobreescriu
 Save in:	ScreenshotWindow		Desa a:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Copia-ho al porta-retalls
 screenshot	Screenshot	Base filename of screenshot files	captura de pantalla
 Home folder	ScreenshotWindow		Carpeta personal
 Save	ScreenshotWindow		Desa
-Capture active window	ScreenshotWindow		Captura la finestra activa

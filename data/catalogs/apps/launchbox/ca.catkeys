@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-LaunchBox	1878360293
+1	catalan; valencian	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Estableix la descripció...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Segur que voleu tancar aquesta barra?\n(No es recordarà.)
 OK	LaunchBox		D'acord
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Inici automàtic
 Clone	LaunchBox		Clona
 Description for '%3'	LaunchBox		Descripció per a %3
 Show window border	LaunchBox		Mostra la vora de la finestra
+Failed to open folder - is Tracker running?	LaunchBox		Ha fallat obrir la carpeta: s'executa el Rastrejador?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nHa fallat iniciar l'aplicació amb la signatura "%2".\n\nError:
 Failed to launch 'something', error in Pad data.	LaunchBox		Ha fallat executar alguna cosa, hi ha hagut un error a les dades de la barra.
 LaunchBox	System name		Executa

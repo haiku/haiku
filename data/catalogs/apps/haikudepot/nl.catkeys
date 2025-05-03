@@ -63,8 +63,8 @@ View the usage conditions	UserLoginWindow		Bekijk de gebruiksvoorwaarden
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Er is een fout opgetreden bij het ophalen van de gebruiksvoorwaarden voor het maken van een nieuwe gebruikersaccount. Controleer de log voor details en probeer het later nog eens. \nInformatie over hoe u de logs kunt bekijken is te vinden in het HaikuDepot-onderdeel van de Haiku User Guide.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Gebruikersvoorwaarden aanvaard
 Size	PackageListView		Grootte
-Your rating was updated.	RatePackageWindow		Uw beoordeling is bijgewerkt.
 All categories	FilterView		Alle categorieën
+Your rating was updated.	RatePackageWindow		Uw beoordeling is bijgewerkt.
 ignore problem for now	PackageProblem		probleem voorlopig negeren
 n/a	PackageInfoView		n.v.t.
 Checking user details	UserDetailVerifierProcess		Controleer gebruiker details
@@ -130,8 +130,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Beoordeling
 Synchronizing icons	ServerIconExportUpdateProcess		Iconen synchroniseren
 Show	MainWindow		Toon
-Settings…	MainWindow		Instellingen…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Deze applicatie leest en schrijft wat werkbestanden op uw computer om te functioneren. Het lijkt erop dat er problemen zijn met het schrijven van een testbestand op [%TestFilePath%]. Controleer dat er geen problemen zijn met uw lokale schijf of met de rechten van mappen en bestanden, die er voor zouden kunnen zorgen dat deze toepassing geen bestanden in die map kan schrijven. U kan ervoor kiezen om het probleem te erkennen en door te gaan, maar dan wordt sommige functionaliteit uitgeschakeld.
+Settings…	MainWindow		Instellingen…
 <Package contents not available for remote packages>	PackageContentsView		<Pakketinhoud niet beschikbaar voor pakketten op afstand>
 Ratings	PackageInfoView		Beoordelingen
 The following problems have been encountered. Please select a solution for each:	PackageProblem		De volgende problemen zijn voorgevallen. Selecteer een oplossing voor elk:

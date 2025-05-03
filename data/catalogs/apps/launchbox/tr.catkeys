@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-LaunchBox	1878360293
+1	turkish	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Açıklama koy…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Bu rampa kaldırılsın mı?\n(Rampa hatırlanmayacaktır.)
 OK	LaunchBox		Tamam
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Sistem açılırken başlat
 Clone	LaunchBox		Aynısından ekle
 Description for '%3'	LaunchBox		“%3” için açıklama
 Show window border	LaunchBox		Pencere kenarlığını göster
+Failed to open folder - is Tracker running?	LaunchBox		Klasör açılamadı — İzleyici çalışıyor mu?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nUygulama, “%2” imzası ile başlatılamadı.\n\nHata:
 Failed to launch 'something', error in Pad data.	LaunchBox		“Bir şey” başlatılamadı, Rampa verisinde hata.
 LaunchBox	System name		Başlatma Rampası

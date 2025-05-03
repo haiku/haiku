@@ -63,8 +63,8 @@ View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Une erreur s’est produite lors du téléchargement des conditions d’utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Conditions d'utilisation acceptées
 Size	PackageListView		Taille
-Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jour.
 All categories	FilterView		Toutes les catégories
+Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jour.
 ignore problem for now	PackageProblem		ignorer le problème pour l'instant
 n/a	PackageInfoView		n/a
 Checking user details	UserDetailVerifierProcess		Vérification des caractéristiques de l'utilisateur
@@ -129,8 +129,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Évaluation
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Show	MainWindow		Afficher
-Settings…	MainWindow		Réglages…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cette application lit et écrit certains fichiers de travail sur votre ordinateur afin de fonctionner. Il semble qu’il y ait des problèmes pour écrire un fichier test dans [%TestFilePath%]. Vérifiez qu’il n’y a pas de problèmes avec votre disque local ou avec les autorisations qui pourraient empêcher cette application d’écrire des fichiers dans ce répertoire. Vous pouvez choisir d’assumer ce problème et de continuer, mais certaines fonctionnalités peuvent être désactivées.
+Settings…	MainWindow		Réglages…
 <Package contents not available for remote packages>	PackageContentsView		<Contenu du paquet indisponible pour les paquets distants>
 Ratings	PackageInfoView		Évaluations
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Les problèmes suivants ont été rencontrés. Veuillez sélectionner une solution pour chacun d'eux :

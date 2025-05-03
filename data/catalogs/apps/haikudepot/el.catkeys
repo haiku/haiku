@@ -64,8 +64,8 @@ View the usage conditions	UserLoginWindow		Προβολή όρων χρήσης
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Σφάλμα κατά τη λήψη των όρων χρήσης για την εγγραφή νέου χρήστη. Παρακαλώ ελέγξτε το αρχείο καταγραφών και ξαναδοκιμάστε.\nΠληροφορίες για το αρχείο καταγραφών υπάρχουν στο λήμμα του Οδηγού Χρήστη του Haiku για την εφαρμογή HaikuDepot.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Συμφωνήσατε στους όρους χρήσης
 Size	PackageListView		Μέγεθος
-Your rating was updated.	RatePackageWindow		Η αξιολόγησή σας ενημερώθηκε.
 All categories	FilterView		Όλες οι κατηγορίες
+Your rating was updated.	RatePackageWindow		Η αξιολόγησή σας ενημερώθηκε.
 ignore problem for now	PackageProblem		αγνόησε το πρόβλημα προς το παρόν
 n/a	PackageInfoView		δ/υ
 Checking user details	UserDetailVerifierProcess		Έλεγχος στοιχείων χρήστη
@@ -133,8 +133,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Αξιολόγηση
 Synchronizing icons	ServerIconExportUpdateProcess		Γίνεται συγχρονισμός εικονιδίων
 Show	MainWindow		Εμφάνιση
-Settings…	MainWindow		Ρυθμίσεις...
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Η εφαρμογή θα αναγνώσει και θα δημιουργήσει κάποια αρχεία στον υπολογιστή σας, έτσι ώστε να λειτουργήσει σωστά. Φαίνεται πως προέκυψαν προβλήματα κατά την εγγραφή ενός δοκιμαστικού αρχείου στην διαδρομή [%TestFilePath%]. Ελέγξτε ότι δεν υπάρχουν προβλήματα με τον δίσκο σας ή με τις άδειες, τα οποία θα μπορούσαν να αποτρέψουν την εφαρμογή από το να εγγράψει αρχεία σε αυτήν την τοποθεσία. Μπορείτε να συνεχίσετε, εφόσον έχετε ενημερωθεί για το πρόβλημα αυτό, αλλά ορισμένες λειτουργίες ενδεχομένως να είναι απενεργοποιημένες.
+Settings…	MainWindow		Ρυθμίσεις...
 <Package contents not available for remote packages>	PackageContentsView		<Τα περιεχόμενα ενός πακέτου δεν είναι διαθέσιμα για μη-εγκατεστημένα πακέτα>
 Ratings	PackageInfoView		Αξιολογήσεις
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Τα παρακάτω προβλήματα έχουν εντοπιστεί. Παρακαλώ επιλέξτε τον τρόπο επίλυσης του καθενός:

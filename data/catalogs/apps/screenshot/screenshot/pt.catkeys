@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.haiku-screenshot-cli	3958461128
+1	portuguese	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Incluir o limite da janela
 Overwrite	ScreenshotWindow		Sobrescrever
 Save in:	ScreenshotWindow		Guardar em:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Copiar para a área de transferência
 screenshot	Screenshot	Base filename of screenshot files	captura
 Home folder	ScreenshotWindow		Pasta pessoal
 Save	ScreenshotWindow		Guardar
-Capture active window	ScreenshotWindow		Capturar a janela ativa

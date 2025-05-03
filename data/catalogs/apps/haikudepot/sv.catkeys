@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Avbryt
 Rating not possible	MainWindow		Betyg ej möjligt
 Package update error	MainWindow		Paketuppdateringsfel
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processer}}
-Reboot required	PackageManager		Omstart krävs
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Hämta användarbetyg för paket
+Reboot required	PackageManager		Omstart krävs
 All packages	PackageListView		Alla paket
 Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Visa användarvillkor
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av de användningsvillkor som krävs för att skapa en ny användare. Kontrollera loggen för mer information och försök igen. \nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Användningsvillkor överenskomna
 Size	PackageListView		Storlek
-Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 All categories	FilterView		Alla kategorier
+Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 ignore problem for now	PackageProblem		ignorera problemet för tillfället
 n/a	PackageInfoView		oviktigt
 Checking user details	UserDetailVerifierProcess		Kontrollerar användarinformation
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Betyg
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
 Show	MainWindow		Visa
-Settings…	MainWindow		Inställningar...
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Denna applikation skriver och läser några arbetsfiler på din dator för att fungera. Det verkar som om det finns problem med att skriva en testfil på [%TestFilePath%]. Kontrollera att det inte finns några problem med din hårdisk eller behörigheter som kan förhindra programmet från att skriva filer till katalogplatsen. Du kan välja att bara notera detta problem och fortsätta, men vissa funktioner kan vara inaktiverade.
+Settings…	MainWindow		Inställningar...
 <Package contents not available for remote packages>	PackageContentsView		<Paketinehållet är inte tillgängligt för externa paket>
 Ratings	PackageInfoView		Betyg
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Följande problem har uppstått. Välj en lösning för varje:

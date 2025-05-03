@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-screenshot-cli	3958461128
+1	polish	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Dołącz obramowanie okna
 Overwrite	ScreenshotWindow		Nadpisz
 Save in:	ScreenshotWindow		Zapisz w:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Kopiuj do schowka
 screenshot	Screenshot	Base filename of screenshot files	zrzut_ekranu
 Home folder	ScreenshotWindow		Katalog domowy
 Save	ScreenshotWindow		Zapisz
-Capture active window	ScreenshotWindow		Przechwyć aktywne okno

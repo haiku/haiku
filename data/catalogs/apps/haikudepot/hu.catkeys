@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Mégse
 Rating not possible	MainWindow		Nem értékelhető
 Package update error	MainWindow		Csomag frissítési hiba
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# folyamat} other{# folyamat}}
-Reboot required	PackageManager		Újraindítás szükséges
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Felhasználói értékelések lekérése a csomaghoz
+Reboot required	PackageManager		Újraindítás szükséges
 All packages	PackageListView		Minden csomag
 Send	RatePackageWindow		Küldés
 Start package daemon	App		Csomag démon indítása
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Felhasználási feltételek
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hiba történt az új felhasználó létrehozásához szükséges használati feltételek letöltésével. Ellenőrizd a naplót a részletekért, és próbáld újra.\nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot szakaszában találhatók.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Felhasználási feltételek elfogadva
 Size	PackageListView		Méret
-Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 All categories	FilterView		Minden kategória
+Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 ignore problem for now	PackageProblem		most hagyja figyelmen kívül
 n/a	PackageInfoView		nincs értékelve
 Checking user details	UserDetailVerifierProcess		Felhasználó ellenőrzése
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
 Show	MainWindow		Megjelenítés
-Settings…	MainWindow		Beállítások…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ezen alkalmazás működéséhez a számítógépen szükséges néhány fájt írása/olvasása. Úgy tűnik, hogy problémák vannak egy tesztfájl írásával [%TestFilePath%] útvonalon. Ellenőrizd, hogy a helyi lemezzel vagy az engedélyekkel kapcsolatban nincsenek-e olyan problémák, amelyek megakadályozhatják, hogy az alkalmazás fájlokat írjon az adott mappába. Tudomásul veheted ezt a problémát és folytathatod, de egyes funkciók nem lesznek elérhetők.
+Settings…	MainWindow		Beállítások…
 <Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>
 Ratings	PackageInfoView		Értékelés
 The following problems have been encountered. Please select a solution for each:	PackageProblem		A következő problémák merültek fel. Kérlek, válassz megoldást mindegyikhez:

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-screenshot	3958461128
+1	hungarian	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Az ablak keretének belefoglalása a képbe
 Overwrite	ScreenshotWindow		Felülírás
 Save in:	ScreenshotWindow		Mentés ide:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
 screenshot	Screenshot	Base filename of screenshot files	képernyőkép
 Home folder	ScreenshotWindow		Saját mappa
 Save	ScreenshotWindow		Mentés
-Capture active window	ScreenshotWindow		Kép az aktív ablakról

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-LaunchBox	1878360293
+1	hungarian	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Leírás…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Biztos bezárod ezt a tálcát?\n(A tálca nem lesz rögzítve sehol.)
 OK	LaunchBox		Rendben
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Automatikus indítás
 Clone	LaunchBox		Klónozás
 Description for '%3'	LaunchBox		%3 leírása
 Show window border	LaunchBox		Ablak keretének mutatása
+Failed to open folder - is Tracker running?	LaunchBox		Nem sikerült megnyitni a mappát - fut a Nyomkövető?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNem sikerült a programot elindítani ezzel az aláírással: %2.\n\nHiba:
 Failed to launch 'something', error in Pad data.	LaunchBox		Nem sikerült elindítani valamit, hiba van a tálca adataiban.
 LaunchBox	System name		Indítósáv

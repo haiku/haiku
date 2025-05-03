@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Отмена
 Rating not possible	MainWindow		Оценка невозможна
 Package update error	MainWindow		Ошибка обновления пакета
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# процесс} few{# процесса} other{# процессов}}
-Reboot required	PackageManager		Требуется перезагрузка
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Получение оценок пользователей для пакета (рейтинга)
+Reboot required	PackageManager		Требуется перезагрузка
 All packages	PackageListView		Все пакеты
 Send	RatePackageWindow		Отправить
 Start package daemon	App		Запустить пакетный демон
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Показать условия ис�
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Произошла ошибка при скачивании условий использования необходимых для создания нового пользователя. \nДля получения более подробных сведений об ошибке можно запустить приложение из Терминала.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Принимаю Условия использования
 Size	PackageListView		Размер
-Your rating was updated.	RatePackageWindow		Ваш рейтинг был обновлен.
 All categories	FilterView		Все категории
+Your rating was updated.	RatePackageWindow		Ваш рейтинг был обновлен.
 ignore problem for now	PackageProblem		временно игнорировать проблему
 n/a	PackageInfoView		н/д
 Checking user details	UserDetailVerifierProcess		Проверка данных пользователя
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Оценка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронизация значков
 Show	MainWindow		Показывать
-Settings…	MainWindow		Настройки…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Во время работы это приложение записывает и читает некоторые рабочие файлы на вашем компьютере. Похоже есть проблема с записью тестового файла в папку [%TestFilePath%]. Проверьте нет ли каких-то проблем с локальным диском или правами доступа к этой папке. Вы можете продолжить пользоваться этим приложением, но часть функционала будет отключена.
+Settings…	MainWindow		Настройки…
 <Package contents not available for remote packages>	PackageContentsView		<Содержимое пакетов недоступно для нелокальных пакетов>
 Ratings	PackageInfoView		Оценки
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Возникли следующие проблемы. Пожалуйста, выберите решение для каждой из них:

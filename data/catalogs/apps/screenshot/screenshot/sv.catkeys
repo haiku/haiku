@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-screenshot-cli	3958461128
+1	swedish	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Inkludera fönsterkanten
 Overwrite	ScreenshotWindow		Skriva över
 Save in:	ScreenshotWindow		Spara i:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Kopiera till urklipp
 screenshot	Screenshot	Base filename of screenshot files	skärmdump
 Home folder	ScreenshotWindow		Hemmapp
 Save	ScreenshotWindow		Spara
-Capture active window	ScreenshotWindow		Fånga aktivt fönster

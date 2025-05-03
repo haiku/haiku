@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Anulează
 Rating not possible	MainWindow		Evaluarea nu este posibilă
 Package update error	MainWindow		Eroare de actualizare a pachetului
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
-Reboot required	PackageManager		Repornire necesară
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Se aduc evaluările utilizatorilor pentru pachet
+Reboot required	PackageManager		Repornire necesară
 All packages	PackageListView		Toate pachetele
 Send	RatePackageWindow		Trimite
 Start package daemon	App		Pornește serviciul de pachete
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare la descărcarea condițiilor de utilizare necesare pentru a crea unui nou utilizator. Verificați istoricul pentru detalii și încercați din nou. \nInformații despre modul de vizualizare a istoricului sunt disponibile în secțiunea HaikuDepot a Ghidului utilizatorului Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Condiții de utilizare agreate
 Size	PackageListView		Dimensiune
-Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 All categories	FilterView		Toate categoriile
+Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 ignore problem for now	PackageProblem		ignoră problema pentru moment
 n/a	PackageInfoView		n/a
 Checking user details	UserDetailVerifierProcess		Se verifică detaliile utilizatorului
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează pictogramele
 Show	MainWindow		Arată
-Settings…	MainWindow		Configurări…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Această aplicație scrie și citește câteva fișiere de lucru de pe calculator pentru a funcționa. Se pare că există probleme la scrierea unui fișier test la [%TestFilePath%]. Verificați dacă nu există probleme cu discul local sau cu permisiunile care ar putea împiedica această aplicație să scrie fișiere în locația respectivă a directorului. Puteți alege să recunoașteți această problemă și să continuați, dar unele funcționalități pot fi dezactivate.
+Settings…	MainWindow		Configurări…
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
 Ratings	PackageInfoView		Evaluări
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Au apărut următoarele probleme. Selectați o soluție pentru fiecare:

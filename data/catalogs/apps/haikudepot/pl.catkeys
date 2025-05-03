@@ -65,8 +65,8 @@ View the usage conditions	UserLoginWindow		Zobacz warunki korzystania
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Wystąpił błąd podczas pobierania warunków korzystania wymaganych do stworzenia nowego użytkownika. Sprawdź szczegóły w dzienniku i spróbuj ponownie.\nInformacje o tym jak dostać się do dziennika znajdują się w rozdziale HaikuDepot Podręcznika użytkownika Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Warunki korzystania zaakceptowane
 Size	PackageListView		Rozmiar
-Your rating was updated.	RatePackageWindow		Zaktualizowano twoją ocenę.
 All categories	FilterView		Wszystkie kategorie
+Your rating was updated.	RatePackageWindow		Zaktualizowano twoją ocenę.
 ignore problem for now	PackageProblem		zignoruj problem na teraz
 n/a	PackageInfoView		Nie dotyczy
 Checking user details	UserDetailVerifierProcess		Sprawdzanie danych użytkownika
@@ -135,8 +135,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Ocena
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizowanie ikon
 Show	MainWindow		Pokaż
-Settings…	MainWindow		Ustawienia…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ta aplikacja zapisuje i odczytuje niektóre pliki robocze na twoim komputerze w celu funkcjonowania. Wygląda na to, że są problemy z zapisaniem testowego pliku w [%TestFilePath%]. Sprawdź czy nie ma problemów z dyskiem lub uprawnieniami, które mogą uniemożliwiać tej aplikacji zapisywanie plików w tym katalogu. Możesz zaakceptować ten problem i kontynuować, ale część funkcjonalności może być wyłączona.
+Settings…	MainWindow		Ustawienia…
 <Package contents not available for remote packages>	PackageContentsView		<Podgląd zawartości nie jest dostępny dla zdalnych pakietów>
 Ratings	PackageInfoView		Oceny
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Wystąpiły następujące problemy. Wybierz rozwiązanie dla każdego z nich:

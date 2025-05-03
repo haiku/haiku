@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Cancelar
 Rating not possible	MainWindow		No ha sido posible calificar
 Package update error	MainWindow		Error de actualización del paquete
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
-Reboot required	PackageManager		Reinicio requerido
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Obteniendo calificaciones de usuarios para el paquete
+Reboot required	PackageManager		Reinicio requerido
 All packages	PackageListView		Todos los paquetes
 Send	RatePackageWindow		Enviar
 Start package daemon	App		Arrancar demonio de paquetes
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Ver las condiciones de uso
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ha ocurrido un error al descargar las condiciones de uso requeridas para crear un nuevo usuario. Revise los archivos de registro para obtener el detalle del error e intente de nuevo. \nLa información sobre como acceder a los archivos de registro está disponible en la sección HaikuDepot de la Guía de Usuario de Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Condiciones de uso aceptadas
 Size	PackageListView		Tamaño
-Your rating was updated.	RatePackageWindow		Su calificación ha sido actualizada.
 All categories	FilterView		Todas las categorías
+Your rating was updated.	RatePackageWindow		Su calificación ha sido actualizada.
 ignore problem for now	PackageProblem		ignorar el problema por ahora
 n/a	PackageInfoView		n/d
 Checking user details	UserDetailVerifierProcess		Comprobando detalles de usuario
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Calificación
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizando iconos
 Show	MainWindow		Mostrar
-Settings…	MainWindow		Configuración…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Para poder funcionar, esta aplicación escribe y lee algunos archivos de trabajo en su ordenador. Parece que hay problemas al escribir un archivo de prueba en [%TestFilePath%]. Compruebe que no hayan problemas en su disco duro o con los permisos que impidan a esta aplicación escribir archivos en esa ubicación de carpeta. Usted puede informarse de este problema y continuar, pero algunas funciones podrían quedar deshabilitadas.
+Settings…	MainWindow		Configuración…
 <Package contents not available for remote packages>	PackageContentsView		<El contenido del paquete no está disponible para paquetes remotos>
 Ratings	PackageInfoView		Calificaciones
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Se han encontrado los siguientes problemas. Por favor, elija una solución para cada uno:

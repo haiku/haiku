@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-LaunchBox	1878360293
+1	japanese	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		説明の作成...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		このパッドを閉じてよろしいですか?\n(パッドは記憶されません。)
 OK	LaunchBox		OK
@@ -9,6 +9,7 @@ Autostart	LaunchBox		自動的に起動
 Clone	LaunchBox		複製
 Description for '%3'	LaunchBox		'%3' の説明
 Show window border	LaunchBox		ウィンドウ枠の表示
+Failed to open folder - is Tracker running?	LaunchBox		フォルダーを開くのに失敗しました - Tracker は動いていますか?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nアプリケーション (シグネチャ '%2') の起動に失敗しました。\n\nエラー:
 Failed to launch 'something', error in Pad data.	LaunchBox		'something' の起動に失敗しました。パッドデータにエラーがあります。
 LaunchBox	System name		ランチャー

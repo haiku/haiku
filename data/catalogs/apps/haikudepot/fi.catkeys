@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Peru
 Rating not possible	MainWindow		Arvosanojen antaminen ei ole mahdollista
 Package update error	MainWindow		Pakkauksen päivitysvirhe
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# prosessi} other{# prosessia}}
-Reboot required	PackageManager		Tarvitaan uudelleenkäynnistys
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Noudetaan pakkauksen käyttäjäarvosanoja
+Reboot required	PackageManager		Tarvitaan uudelleenkäynnistys
 All packages	PackageListView		Kaikki pakkaukset
 Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Katso käyttöehtoja
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ilmeni virhe ladattaessa käyttöehtoja, jotka vaaditaan uuden käyttäjän luomiseksi. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTieto siitä, kuinka lokitiedostoa katsotaan, on saatavilla Haiku-käyttöohjeen HaikuVarasto-osasta.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Käyttöehdot hyväksytty
 Size	PackageListView		Koko
-Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
 All categories	FilterView		Kaikki luokat
+Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
 ignore problem for now	PackageProblem		ohita pulma toistaiseksi
 n/a	PackageInfoView		–
 Checking user details	UserDetailVerifierProcess		Tarkistetaan käyttäjätietojen yksityiskohdat
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Arvosana
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
 Show	MainWindow		Näytä
-Settings…	MainWindow		Asetukset…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Tämä sovellus kirjoittaa ja lukee joitakin työtiedostoja tietokoneellasi toiminnan tarkistamiseksi. Näyttää, että testaustiedoston kirjoittamisessa  osoitteeseen [%TestFilePath%] on pulmia. Tarkista, että paikallisella levyasemallasi ei ole pulmia tai että käyttöoikeudet eivät estä tätä sovellusta kirjoittamasta tuohon hakemistosijaintiin. Voit kuitata tämän pulman ja jatkaa, mutta joku toiminnallisuus on poissa käytöstä.
+Settings…	MainWindow		Asetukset…
 <Package contents not available for remote packages>	PackageContentsView		<Etäpakkausten sisältö ei ole saatavilla>
 Ratings	PackageInfoView		Arvosanat
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Kohdattiin seuraavat pulmat. Valitse ratkaisu jokaiselle:

@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Avbryt
 Rating not possible	MainWindow		Vurdering er ikke mulig
 Package update error	MainWindow		Feil ved oppdatering av pakke
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# prosess} other{# prosesser}}
-Reboot required	PackageManager		Omstart påkrevet
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Henter brukervurderinger for pakken
+Reboot required	PackageManager		Omstart påkrevet
 All packages	PackageListView		Alle pakker
 Send	RatePackageWindow		Send
 Start package daemon	App		Start pakke-daemon
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Se bruksbetingelsene
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Det har oppstått en feil ved nedlasting av bruksbetingelsene som kreves for å opprette en ny bruker. Sjekk loggen for detaljer og prøv igjen. \nInformasjon om hvordan du viser loggene er tilgjengelig i HaikuDepot-delen av Haiku-brukerveiledningen.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Bruksbetingelser godtatt
 Size	PackageListView		Størrelse
-Your rating was updated.	RatePackageWindow		Din vurdering ble oppdatert.
 All categories	FilterView		Alle kategorier
+Your rating was updated.	RatePackageWindow		Din vurdering ble oppdatert.
 ignore problem for now	PackageProblem		ignorer problemet foreløpig
 n/a	PackageInfoView		n/a
 Checking user details	UserDetailVerifierProcess		Kontrollerer brukerdetaljer
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Vurdering
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner
 Show	MainWindow		Vis
-Settings…	MainWindow		Innstillinger…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Denne applikasjonen skriver og leser noen arbeidsfiler på datamaskinen din for å fungere. Det ser ut til at det er problemer med å skrive en testfil til [%TestFilePath%]. Sjekk at det ikke er noen problemer med din lokale disk eller tillatelser som kan hindre denne applikasjonen fra å skrive filer til den mappen. Du kan velge å godkjenne dette problemet og fortsette, men noen funksjoner kan bli deaktivert.
+Settings…	MainWindow		Innstillinger…
 <Package contents not available for remote packages>	PackageContentsView		<Pakkeinnholdet er ikke tilgjengelig for eksterne pakker>
 Ratings	PackageInfoView		Vurderinger
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Følgende problemer har oppstått. Velg en løsning for hvert:

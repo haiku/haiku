@@ -1,4 +1,4 @@
-1	friulian	x-vnd.haiku-screenshot-cli	3958461128
+1	friulian	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Inclût i ôrs dal barcon
 Overwrite	ScreenshotWindow		Sorescrîf
 Save in:	ScreenshotWindow		Salve in:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Copie intes notis
 screenshot	Screenshot	Base filename of screenshot files	cature di schermi
 Home folder	ScreenshotWindow		Cartele home
 Save	ScreenshotWindow		Salve
-Capture active window	ScreenshotWindow		Cature il barcon atîf

@@ -64,8 +64,8 @@ View the usage conditions	UserLoginWindow		Ver as condições de utilização
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ocorreu um erro ao transferir as condições de utilização necessárias para criar um novo utilizador. Verifique o registo para obter detalhes e tente de novo. \nInformação sobre como visualizar os registos (logs) está disponível na secção HaikuDepot do Guia do Utilizador do Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Condições de utilização acordadas
 Size	PackageListView		Tamanho
-Your rating was updated.	RatePackageWindow		A sua avaliação foi atualizada.
 All categories	FilterView		Todas as categorias
+Your rating was updated.	RatePackageWindow		A sua avaliação foi atualizada.
 ignore problem for now	PackageProblem		ignorar o problema por agora
 n/a	PackageInfoView		n/d
 Checking user details	UserDetailVerifierProcess		A verificar detalhes do utilizador
@@ -133,8 +133,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Avaliação
 Synchronizing icons	ServerIconExportUpdateProcess		A sincronizar ícones
 Show	MainWindow		Mostrar
-Settings…	MainWindow		Definições…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Esta aplicação escreve e lê alguns ficheiros de trabalho no seu computador para poder funcionar. Parece que há problemas ao escrever um ficheiro de teste em [%TestFilePath%]. Por favor, verifique a possível existência de problemas com o seu disco local ou com as permissões que possam impedir esta aplicação de escrever ficheiros nessa pasta. Pode optar por aceitar este problema e continuar, mas algumas funcionalidades poderão ficar inativas.
+Settings…	MainWindow		Definições…
 <Package contents not available for remote packages>	PackageContentsView		<Conteúdos do pacote não disponíveis para pacotes remotos>
 Ratings	PackageInfoView		Avaliações
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Foram encontrados os seguintes problemas. Por favor, selecione uma solução para cada:

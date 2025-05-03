@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-screenshot-cli	3958461128
+1	german	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Inklusive Fensterrahmen
 Overwrite	ScreenshotWindow		Überschreiben
 Save in:	ScreenshotWindow		Speichern in:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		In Ablage kopieren
 screenshot	Screenshot	Base filename of screenshot files	screenshot
 Home folder	ScreenshotWindow		Home-Ordner
 Save	ScreenshotWindow		Speichern
-Capture active window	ScreenshotWindow		Nur aktives Fenster

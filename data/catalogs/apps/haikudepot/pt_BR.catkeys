@@ -47,8 +47,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 View the usage conditions	UserLoginWindow		Veja as condições de uso
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ocorreu um erro ao baixar as condições de uso necessárias para criar um novo usuário. Verifique o log para obter detalhes e tente novamente. \nAs informações sobre como visualizar os logs estão disponíveis na seção HaikuDepot do Guia do usuário do Haiku.
 Size	PackageListView		Tamanho
-Your rating was updated.	RatePackageWindow		Sua avaliação foi atualizada.
 All categories	FilterView		Todas as categorias
+Your rating was updated.	RatePackageWindow		Sua avaliação foi atualizada.
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Cancelar
 Refresh repositories	MainWindow		Atualizar repositórios
@@ -102,8 +102,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Avaliação
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizando ícones
 Show	MainWindow		Exibir
-Settings…	MainWindow		Configurações…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Este aplicativo grava e lê alguns arquivos de trabalho em seu computador para funcionar. Parece que há problemas ao gravar um arquivo de teste em [%TestFilePath%]. Verifique se não há problemas com seu disco local ou permissões que possam impedir este aplicativo de gravar arquivos nesse local de diretório. Você pode escolher reconhecer este problema e continuar, mas algumas funcionalidades podem estar desativadas.
+Settings…	MainWindow		Configurações…
 <Package contents not available for remote packages>	PackageContentsView		<Conteúdos de pacote não disponíveis para pacotes remotos>
 Ratings	PackageInfoView		Classificações
 Local	LocalPkgDataLoadProcess		Local

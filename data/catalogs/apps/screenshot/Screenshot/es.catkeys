@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-screenshot	3958461128
+1	spanish; castilian	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Incuir el borde de la ventana
 Overwrite	ScreenshotWindow		Sobrescribir
 Save in:	ScreenshotWindow		Guardar en:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Copiar al portapapeles
 screenshot	Screenshot	Base filename of screenshot files	Captura
 Home folder	ScreenshotWindow		Carpeta home
 Save	ScreenshotWindow		Guardar
-Capture active window	ScreenshotWindow		Capturar la ventana actual

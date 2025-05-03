@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-screenshot	3958461128
+1	dutch; flemish	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Vensterrand insluiten
 Overwrite	ScreenshotWindow		Overschrijven
 Save in:	ScreenshotWindow		Opslaan in:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Kopieer naar het klembord
 screenshot	Screenshot	Base filename of screenshot files	schermafbeelding
 Home folder	ScreenshotWindow		Home-map
 Save	ScreenshotWindow		Opslaan
-Capture active window	ScreenshotWindow		Leg het actieve venster vast

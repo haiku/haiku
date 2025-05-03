@@ -1,4 +1,4 @@
-1	croatian	x-vnd.haiku-screenshot	3385109649
+1	croatian	x-vnd.haiku-screenshot	4003499604
 Include window border	ScreenshotWindow		Uključi rub prozora
 Overwrite	ScreenshotWindow		Prebriši
 Save in:	ScreenshotWindow		Spremi u:
@@ -27,4 +27,3 @@ Delay:	ScreenshotWindow		Odgoda:
 screenshot	Screenshot	Base filename of screenshot files	slika zaslona
 Home folder	ScreenshotWindow		Osobna mapa
 Save	ScreenshotWindow		Spremi
-Capture active window	ScreenshotWindow		Uhvati aktivni prozor

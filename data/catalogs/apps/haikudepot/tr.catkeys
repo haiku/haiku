@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Vazgeç
 Rating not possible	MainWindow		Derecelendirme olanaklı değil
 Package update error	MainWindow		Paket güncelleme hatası
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# süreç}}
-Reboot required	PackageManager		Yeniden başlatma gerekli
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Paket için olan kullanıcı derecelendirmeleri getiriliyor…
+Reboot required	PackageManager		Yeniden başlatma gerekli
 All packages	PackageListView		Tüm paketler
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Kullanım koşulları kabul edildi
 Size	PackageListView		Boyut
-Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
 All categories	FilterView		Tüm kategoriler
+Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
 ignore problem for now	PackageProblem		Sorunu şimdilik yok say
 n/a	PackageInfoView		yok
 Checking user details	UserDetailVerifierProcess		Kullanıcı ayrıntıları denetleniyor…
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşzamanlanıyor…
 Show	MainWindow		Göster
-Settings…	MainWindow		Ayarlar…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Bu uygulama çalışabilmek için bilgisayarınızda dosya işlemleri yapmaya gereksinim duyar. Görünüşe göre [%TestFilePath%] konumuna bir sınama dosyası yazımında sorunlar var. Lütfen bu uygulamanın dosya yazmasına engel olabilecek disk veya dosya izinleri sıkıntıları olup olmadığını denetleyin. Bu sorunu göz ardı edip işlemi sürdürebilirsiniz; ancak bazı işlevler devre dışı kalabilir.
+Settings…	MainWindow		Ayarlar…
 <Package contents not available for remote packages>	PackageContentsView		<Uzak konum paketleri için paket içeriği kullanılamıyor>
 Ratings	PackageInfoView		Derecelendirmeler
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Aşağıdaki sorunlara denk gelindi. Lütfen, her birisi için bir çözüm seçin:

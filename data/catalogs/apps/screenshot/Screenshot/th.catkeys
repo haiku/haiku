@@ -1,4 +1,4 @@
-1	thai	x-vnd.haiku-screenshot	3958461128
+1	thai	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		รวมเส้นขอบหน้าต่าง
 Overwrite	ScreenshotWindow		เขียนทับ
 Save in:	ScreenshotWindow		บันทึกเป็น:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		คัดลอกไปที่คลิ�
 screenshot	Screenshot	Base filename of screenshot files	บันทึกหน้าจอ
 Home folder	ScreenshotWindow		โฮมโฟลเดอร์
 Save	ScreenshotWindow		บันทึก
-Capture active window	ScreenshotWindow		จับภาพหน้าต่างที่ใช้งานอยู่

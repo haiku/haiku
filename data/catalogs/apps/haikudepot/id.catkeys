@@ -45,8 +45,8 @@ The email is malformed.	UserLoginWindow		Email salah.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Menyinkronkan data paket untuk repositori '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Lihat kondisi penggunaan
 Size	PackageListView		Ukuran
-Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
 All categories	FilterView		Semua kategori
+Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Batal
 Refresh repositories	MainWindow		Muat-ulang repositori
@@ -101,8 +101,8 @@ No user ratings available.	PackageInfoView		Tak tersedia penilaian pengguna.
 Rating	PackageListView		Penilaian
 Synchronizing icons	ServerIconExportUpdateProcess		Ikon sinkronisasi
 Show	MainWindow		Menunjukkan
-Settings…	MainWindow		Pengaturan…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aplikasi ini menulis dan membaca beberapa file yang berfungsi di komputer Anda agar berfungsi. Tampaknya ada masalah saat menulis file uji di [%TestFilePath%].Periksa bahwa tidak ada masalah dengan disk lokal Anda atau izin yang dapat mencegah aplikasi ini dari menulis file ke lokasi direktori itu. Anda dapat memilih untuk mengakui masalah ini dan melanjutkan, tetapi beberapa fungsi mungkin dinonaktifkan.
+Settings…	MainWindow		Pengaturan…
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
 Ratings	PackageInfoView		Peringkat
 Local	LocalPkgDataLoadProcess		Lokal

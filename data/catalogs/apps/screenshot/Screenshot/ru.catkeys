@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-screenshot	3958461128
+1	russian	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Включая заголовок окна
 Overwrite	ScreenshotWindow		Перезаписать
 Save in:	ScreenshotWindow		Сохранить в:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Скопировать в буфер
 screenshot	Screenshot	Base filename of screenshot files	screenshot
 Home folder	ScreenshotWindow		Домашнюю папку
 Save	ScreenshotWindow		Сохранить
-Capture active window	ScreenshotWindow		Захватить активное окно

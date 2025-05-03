@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-screenshot	3958461128
+1	ukrainian	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Включаючи рамку вікна
 Overwrite	ScreenshotWindow		Переписати
 Save in:	ScreenshotWindow		Зберегти в:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Копіювати до буфера обм�
 screenshot	Screenshot	Base filename of screenshot files	знімок екрана
 Home folder	ScreenshotWindow		Папка Home
 Save	ScreenshotWindow		Зберегти
-Capture active window	ScreenshotWindow		Захопити активне вікно

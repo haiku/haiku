@@ -45,8 +45,8 @@ The email is malformed.	UserLoginWindow		อีเมลผิดรูปแบ
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		การซิงโครไนซ์ข้อมูลแพ็คเกจสำหรับที่เก็บ '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		ดูเงื่อนไขการใช้งาน
 Size	PackageListView		ขนาด
-Your rating was updated.	RatePackageWindow		คะแนนของคุณได้รับการอัพเดท
 All categories	FilterView		ทุกประเภท
+Your rating was updated.	RatePackageWindow		คะแนนของคุณได้รับการอัพเดท
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		ยกเลิก
 Refresh repositories	MainWindow		รีเฟรชการจัดเก็บ

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-LaunchBox	1878360293
+1	german	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Beschreibung ändern …
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Wirklich diesen Block schließen?\n(Der Block wird nicht gespeichert.)
 OK	LaunchBox		OK
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Autostart
 Clone	LaunchBox		Duplizieren
 Description for '%3'	LaunchBox		Beschreibung für '%3'
 Show window border	LaunchBox		Fensterrahmen anzeigen
+Failed to open folder - is Tracker running?	LaunchBox		Ordner konnte nicht geöffnet werden - läuft Tracker?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nDie Anwendung mit der Signatur "%2" konnte nicht gestartet werden.\n\nFehler:
 Failed to launch 'something', error in Pad data.	LaunchBox		Start von 'irgendwas' fehlgeschlagen, Fehler in den Daten des Blocks.
 LaunchBox	System name		LaunchBox

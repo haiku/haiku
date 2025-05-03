@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-screenshot	3958461128
+1	turkish	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Pencere kenarlığını içer
 Overwrite	ScreenshotWindow		Üzerine yaz
 Save in:	ScreenshotWindow		Şuraya kaydet:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Panoya kopyala
 screenshot	Screenshot	Base filename of screenshot files	ekran görüntüsü
 Home folder	ScreenshotWindow		Ana klasör
 Save	ScreenshotWindow		Kaydet
-Capture active window	ScreenshotWindow		Etkin pencereyi yakala

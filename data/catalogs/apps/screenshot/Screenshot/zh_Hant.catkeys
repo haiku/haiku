@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-screenshot	3958461128
+1	english	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		包括視窗邊框
 Overwrite	ScreenshotWindow		覆蓋
 Save in:	ScreenshotWindow		存儲于：
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		複製到剪貼簿
 screenshot	Screenshot	Base filename of screenshot files	螢幕截圖
 Home folder	ScreenshotWindow		主資料夾
 Save	ScreenshotWindow		存儲
-Capture active window	ScreenshotWindow		捕獲活動視窗

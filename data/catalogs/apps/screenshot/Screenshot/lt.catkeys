@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-screenshot	363809141
+1	lithuanian	x-vnd.haiku-screenshot	982199096
 Include window border	ScreenshotWindow		Įtraukti lango rėmelį
 Overwrite	ScreenshotWindow		Perrašyti
 Save in:	ScreenshotWindow		Įrašyti į:
@@ -23,4 +23,3 @@ Copy to clipboard	ScreenshotWindow		Kopijuoti į iškarpinę
 screenshot	Screenshot	Base filename of screenshot files	nuotrauka
 Home folder	ScreenshotWindow		Namų aplankas
 Save	ScreenshotWindow		Įrašyti
-Capture active window	ScreenshotWindow		Fotografuoti tik aktyvų langą

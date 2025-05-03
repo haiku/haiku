@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-screenshot-cli	3958461128
+1	czech	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Zahrnout okraj okna
 Overwrite	ScreenshotWindow		Přepsat
 Save in:	ScreenshotWindow		Uložit do:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Zkopírovat do schránky
 screenshot	Screenshot	Base filename of screenshot files	snímek obrazovky
 Home folder	ScreenshotWindow		Domovské složce
 Save	ScreenshotWindow		Uložit
-Capture active window	ScreenshotWindow		Zachytit aktivní okno

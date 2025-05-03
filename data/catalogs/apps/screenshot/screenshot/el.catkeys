@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-screenshot-cli	3958461128
+1	greek, modern (1453-)	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Περίληψη περιγράμματος παραθύρου
 Overwrite	ScreenshotWindow		Αντικατάσταση
 Save in:	ScreenshotWindow		Αποθήκευση σε:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Αντιγραφή στο πρόχειρο
 screenshot	Screenshot	Base filename of screenshot files	στιγμιότυπο
 Home folder	ScreenshotWindow		Αρχικός φάκελος
 Save	ScreenshotWindow		Αποθήκευση
-Capture active window	ScreenshotWindow		Στιγμιότυπο ενεργού παραθύρου

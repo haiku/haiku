@@ -1,4 +1,4 @@
-1	danish	x-vnd.haiku-screenshot-cli	3958461128
+1	danish	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Medtag vindueskant
 Overwrite	ScreenshotWindow		Overskriv
 Save in:	ScreenshotWindow		Gem i:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Kopiér til udklipsholder
 screenshot	Screenshot	Base filename of screenshot files	skærmbillede
 Home folder	ScreenshotWindow		Hjemmemappe
 Save	ScreenshotWindow		Gem
-Capture active window	ScreenshotWindow		Optag aktivt vindue

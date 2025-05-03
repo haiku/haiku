@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.haiku-screenshot	3958461128
+1	esperanto	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Inkludante fenestran borderon
 Overwrite	ScreenshotWindow		Anstataŭigi
 Save in:	ScreenshotWindow		Konservi en:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Kopii en tondujon
 screenshot	Screenshot	Base filename of screenshot files	ekrankopio
 Home folder	ScreenshotWindow		Hejma dosierujo
 Save	ScreenshotWindow		Konservi
-Capture active window	ScreenshotWindow		Kopii aktualan fenestron

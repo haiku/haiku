@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-screenshot	3958461128
+1	finnish	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Sisällytä ikkunaraja
 Overwrite	ScreenshotWindow		Korvaa
 Save in:	ScreenshotWindow		Tallenna kohteeseen:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Kopioi leikepöydälle
 screenshot	Screenshot	Base filename of screenshot files	näytönkaappaus
 Home folder	ScreenshotWindow		Kotikansio
 Save	ScreenshotWindow		Tallenna
-Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna

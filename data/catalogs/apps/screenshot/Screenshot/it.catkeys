@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku-screenshot	3958461128
+1	italian	x-vnd.haiku-screenshot	281883787
 Include window border	ScreenshotWindow		Includi i bordi della finestra
 Overwrite	ScreenshotWindow		Sovrascrivi
 Save in:	ScreenshotWindow		Salva in:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Copia negli appunti
 screenshot	Screenshot	Base filename of screenshot files	istantanea
 Home folder	ScreenshotWindow		Cartella Home
 Save	ScreenshotWindow		Salva
-Capture active window	ScreenshotWindow		Cattura la finestra attiva

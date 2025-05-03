@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Anule
 Rating not possible	MainWindow		Valutazion dineade
 Package update error	MainWindow		Erôr di inzornament dal pachet
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procès} other{# procès}}
-Reboot required	PackageManager		Tornâ a inviâ necessari
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Daûr a recuperâ lis valutazions dai utents pal pachet
+Reboot required	PackageManager		Tornâ a inviâ necessari
 All packages	PackageListView		Ducj i pachets
 Send	RatePackageWindow		Invie
 Start package daemon	App		Invie demoni dai pachets
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Viôt lis cundizions di ûs
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjariant lis cundizions di ûs necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su ce mût viodi i regjistris a son disponibilis inte sezion di HaikuDepot  de Vuide utent di Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Cundizions di utilizazion acetadis
 Size	PackageListView		Dimension
-Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis
+Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 ignore problem for now	PackageProblem		ignore il probleme pal moment
 n/a	PackageInfoView		n/d
 Checking user details	UserDetailVerifierProcess		Verifiche dai detais utent
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
 Show	MainWindow		Mostre
-Settings…	MainWindow		Impostazions…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cheste aplicazion, par funzionâ ben, e scrîf e e lei cualchi file di lavôr tal to computer. Al somee che a sedin problemis tal scrivi un file di prove su [%TestFilePath%]. Controle di no vê fastidis cul to disc locâl o cun permès che a impedissin a cheste aplicazion di scrivi files in chê posizion. Tu puedis sielzi di no risolvi il probleme e di continuâ, ma al è pussibil che cualchi funzionalitât e vegni disabilitade.
+Settings…	MainWindow		Impostazions…
 <Package contents not available for remote packages>	PackageContentsView		<Contignûts dal pachet no disponibii pai pachets esternis>
 Ratings	PackageInfoView		Valutazions
 The following problems have been encountered. Please select a solution for each:	PackageProblem		A son vignûts fûr chescj problemis. Par plasê selezione une soluzion par ognun di lôr:

@@ -46,8 +46,8 @@ The email is malformed.	UserLoginWindow		La retpoŝtadreso estas misformita.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sinkronigado de pakaĵa datumo por la deponejo '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Vidi la kondiĉojn de uzado
 Size	PackageListView		Grandeco
-Your rating was updated.	RatePackageWindow		Via takso estis ĝisdatigita
 All categories	FilterView		Ĉiaj kategorioj
+Your rating was updated.	RatePackageWindow		Via takso estis ĝisdatigita
 n/a	PackageInfoView		Neaplikebla
 Cancel	MainWindow		Nuligi
 Refresh repositories	MainWindow		Aktualigi deponejojn
@@ -101,8 +101,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Takso
 Synchronizing icons	ServerIconExportUpdateProcess		Sinkronigas piktogramojn
 Show	MainWindow		Montri
-Settings…	MainWindow		Agordo…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ĉi tiu programo konservas kaj prenas laborajn dosierojn je via komputilo por funkcii. Ŝajnas, ke okazis problemoj skribante provizoran dosieron en [%TestFilePath%]-on. Kontrolu, ke forestas problemoj de via disko aŭ permesoj, kiuj povus malhelpi al ĉi programo skribi en tiu loko. Vi rajtas malatenti ĉi problemon kaj malgraŭe daŭri, sed iuj kapabloj povas malŝaltiĝi.
+Settings…	MainWindow		Agordo…
 <Package contents not available for remote packages>	PackageContentsView		<Pakaĵa enhavo ne estas disponebla por foraj pakaĵoj>
 Ratings	PackageInfoView		Taksoj
 Local	LocalPkgDataLoadProcess		Loka

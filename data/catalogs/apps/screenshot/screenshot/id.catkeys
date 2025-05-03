@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.haiku-screenshot-cli	1618937837
+1	indonesian	x-vnd.haiku-screenshot-cli	2237327792
 Include window border	ScreenshotWindow		Sertakan batas jendela
 Overwrite	ScreenshotWindow		Timpa
 Save in:	ScreenshotWindow		Simpan di:
@@ -27,4 +27,3 @@ Copy to clipboard	ScreenshotWindow		Salin ke clipboard
 screenshot	Screenshot	Base filename of screenshot files	Cuplikan
 Home folder	ScreenshotWindow		Folder rumah
 Save	ScreenshotWindow		Simpan
-Capture active window	ScreenshotWindow		Tangkap jendela aktif

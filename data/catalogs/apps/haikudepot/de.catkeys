@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Abbrechen
 Rating not possible	MainWindow		Bewertung nicht möglich
 Package update error	MainWindow		Fehler bei Paketaktualisierung
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# Prozess} other{# Prozesse}}
-Reboot required	PackageManager		Neustart erforderlich
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Bewertungen des Pakets werden geladen
+Reboot required	PackageManager		Neustart erforderlich
 All packages	PackageListView		Alle Pakete
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen für die Erstellung eines neuen Benutzerkontos ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logs angezeigt werden können, steht im Kapitel 'HaikuDepot' des Haiku User Guide.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Nutzungsbedingungen zugestimmt
 Size	PackageListView		Größe
-Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
 All categories	FilterView		Alle Kategorien
+Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
 ignore problem for now	PackageProblem		Problem erstmal ignorieren
 n/a	PackageInfoView		n.v.
 Checking user details	UserDetailVerifierProcess		Prüfe Benutzerdaten
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisiere Icons
 Show	MainWindow		Anzeigen
-Settings…	MainWindow		Einstellungen …
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Diese Anwendung schreibt und liest einige Arbeitsdateien auf diesem Computer, um richtig zu funktionieren. Eine Testdatei konnte jedoch nicht nach [%TestFilePath%] geschrieben werden. Bitte prüfen, ob es Probleme mit der lokalen Festplatte gibt oder ob für diesen Ordner nötige Schreibrechte fehlen. Dieses Problem kann zwar ignoriert werden, allerdings wird die Anwendung dann nur eingeschränkt funktionieren.
+Settings…	MainWindow		Einstellungen …
 <Package contents not available for remote packages>	PackageContentsView		<Der Inhalt kann nur für bereits heruntergeladene Pakete angezeigt werden>
 Ratings	PackageInfoView		Bewertungen
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Es gibt Probleme. Bitte für jedes Problem eine Lösung wählen:

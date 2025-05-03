@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Cancel·la
 Rating not possible	MainWindow		La puntuació no és possible.
 Package update error	MainWindow		Error d'actualització de paquet
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procés} other{# processos}}
-Reboot required	PackageManager		Cal reiniciar
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		S'obtenen les valoracions dels usuaris per al paquet.
+Reboot required	PackageManager		Cal reiniciar
 All packages	PackageListView		Tots els paquets
 Send	RatePackageWindow		Envia
 Start package daemon	App		Inicia el dimoni de paquets
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Mostra'n les condicions d'ús
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		S'ha produït un error en baixar les condicions d'ús necessàries per crear un usuari nou. Consulteu el registre per obtenir-ne més informació i torneu-ho a provar. \nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Condicions d'ús acordades
 Size	PackageListView		Mida
-Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
 All categories	FilterView		Totes les categories
+Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
 ignore problem for now	PackageProblem		Ignora el problema per ara.
 n/a	PackageInfoView		n/d
 Checking user details	UserDetailVerifierProcess		Comprovació de les dades de l'usuari
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 Show	MainWindow		Mostra...
-Settings…	MainWindow		Paràmetres...
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aquesta aplicació escriu i llegeix alguns fitxers de treball de l'ordinador per tal de funcionar. Sembla que hi ha problemes per escriure un fitxer de prova a [%TestFilePath%]. Comproveu que no hi ha cap problema amb el disc local o els permisos que pugui evitar que aquesta aplicació escrigui fitxers a la ubicació del directori. Podeu optar per reconèixer aquest problema i continuar, però és possible que alguna funcionalitat estigui inhabilitada.
+Settings…	MainWindow		Paràmetres...
 <Package contents not available for remote packages>	PackageContentsView		<El contingut del paquet no està disponible per als paquets remots>
 Ratings	PackageInfoView		Puntuacions
 The following problems have been encountered. Please select a solution for each:	PackageProblem		S'han trobat els problemes següents. Seleccioneu una solució per a cadascun:

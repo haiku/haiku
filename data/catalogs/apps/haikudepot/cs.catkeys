@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		Zrušit
 Rating not possible	MainWindow		Hodnocení není možné
 Package update error	MainWindow		Chyba aktualizace balíčku
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} few{# procesy} other{# procesů}}
-Reboot required	PackageManager		Restart vyžadován
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Stahování uživatelských hodnocení
+Reboot required	PackageManager		Restart vyžadován
 All packages	PackageListView		Všechny balíčky
 Send	RatePackageWindow		Poslat
 Start package daemon	App		Spustit službu balíčků
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		Zobrazit podmínky užívání
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Nastala chyba při stahování podmínek použití potřebných pro vytvoření nového uživatele. Zkontrolujte log pro více informací a zkuste to znovu. \nV HaikuDepot sekci uživatelské příručky Haiku se dočtete jak zobrazit logy.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Podmínky použití dohodnuté
 Size	PackageListView		Velikost
-Your rating was updated.	RatePackageWindow		Vaše hodnocení bylo aktulizováno.
 All categories	FilterView		Všechny kategorie
+Your rating was updated.	RatePackageWindow		Vaše hodnocení bylo aktulizováno.
 ignore problem for now	PackageProblem		teď to neřeš
 n/a	PackageInfoView		n/a
 Checking user details	UserDetailVerifierProcess		Šťourání v údajích uživatele
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Hodnocení
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizuji ikony
 Show	MainWindow		Ukázat
-Settings…	MainWindow		Nastavení…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aby tato apliakce fungovala, zapisuje a čte některé pracovní soubory na váš počítač. Je problém se zápisem testovacího souboru na [%TestFilePath%]. Zkontrolujte, že nejsou problémy s vaším diskem nebo s oprávněním k zápisu v daném adresáři. Můžete zvolit pokračovat, ale některé funkce budou zakázány.
+Settings…	MainWindow		Nastavení…
 <Package contents not available for remote packages>	PackageContentsView		<Obsah balíčku není dostupný pro vzdálené balíčky>
 Ratings	PackageInfoView		Hodnocení
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Nestaly následující problémy. Pro každý problém zvolte řešení:

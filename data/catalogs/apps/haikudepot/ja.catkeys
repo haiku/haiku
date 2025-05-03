@@ -65,8 +65,8 @@ View the usage conditions	UserLoginWindow		使用条件を見る
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新しいユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		利用条件が同意されました
 Size	PackageListView		サイズ
-Your rating was updated.	RatePackageWindow		評価が更新されました。
 All categories	FilterView		すべての分類
+Your rating was updated.	RatePackageWindow		評価が更新されました。
 ignore problem for now	PackageProblem		今は問題を無視する
 n/a	PackageInfoView		評価待ち
 Checking user details	UserDetailVerifierProcess		ユーザーの詳細を確認中
@@ -135,8 +135,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 Show	MainWindow		表示
-Settings…	MainWindow		設定...
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		このアプリケーションは動作するためにあなたのコンピューター上のいくつかの作業ファイルを読み書きします。テストファイルの [%TestFilePath%] への書き込みに問題があるようです。ローカルディスクに問題がないことや、そのディレクトリにアプリケーションが書込みできない権限になっているかをチェックしてください。この問題を認識して続行することもできますが、いくつかの機能が無効となるかもしれません。
+Settings…	MainWindow		設定...
 <Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
 Ratings	PackageInfoView		評価
 The following problems have been encountered. Please select a solution for each:	PackageProblem		以下の問題があります。それぞれについて解決策を選択してください:

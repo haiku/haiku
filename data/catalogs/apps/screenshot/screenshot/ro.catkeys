@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-screenshot-cli	3958461128
+1	romanian	x-vnd.haiku-screenshot-cli	281883787
 Include window border	ScreenshotWindow		Include marginea ferestrei
 Overwrite	ScreenshotWindow		Suprascrie
 Save in:	ScreenshotWindow		Salvează în:
@@ -28,4 +28,3 @@ Copy to clipboard	ScreenshotWindow		Copiază la clipboard
 screenshot	Screenshot	Base filename of screenshot files	captură de ecran
 Home folder	ScreenshotWindow		Dosarul home
 Save	ScreenshotWindow		Salvează
-Capture active window	ScreenshotWindow		Capturează fereastra activă

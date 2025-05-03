@@ -46,8 +46,8 @@ Cancel	UserLoginWindow		취소
 Rating not possible	MainWindow		평가 불가능
 Package update error	MainWindow		패키지 업데이트 오류
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# 프로세스} other{# 프로세스}}
-Reboot required	PackageManager		재부팅 필요
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		패키지 사용자 평가 가져오는 중
+Reboot required	PackageManager		재부팅 필요
 All packages	PackageListView		모든 패키지
 Send	RatePackageWindow		보내기
 Start package daemon	App		패키지 데몬 시작
@@ -66,8 +66,8 @@ View the usage conditions	UserLoginWindow		사용자 약관 보기
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		새 사용자를 생성하는데 필요한 사용자 약관을 받아오는 데 오류가 발생했습니다. 로그를 통해 상세 사항을 확인하고 다시 시도하십시오.\n로그를 보는 방법에 대한 정보는 Haiku 사용자 설명서의 HaikuDepot 항목에서 볼 수 있습니다.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		사용자 약관 동의함
 Size	PackageListView		크기
-Your rating was updated.	RatePackageWindow		평가가 업데이트 되었습니다.
 All categories	FilterView		모든 카테고리
+Your rating was updated.	RatePackageWindow		평가가 업데이트 되었습니다.
 ignore problem for now	PackageProblem		지금은 문제 무시
 n/a	PackageInfoView		사용불가
 Checking user details	UserDetailVerifierProcess		사용자 상세 정보 확인 중
@@ -136,8 +136,8 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		평가
 Synchronizing icons	ServerIconExportUpdateProcess		아이콘 동기화 중
 Show	MainWindow		보기
-Settings…	MainWindow		설정…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		이 프로그램은 작동을 위하여 컴퓨터에 파일을 읽고 쓰는 동작을 필요로 합니다. 현재 [%TestFilePath%]에 테스트용 파일을 쓰는데 문제가 있는 것으로 보입니다. 로컬 디스크에 문제가 없는지 확인하거나 해당 디렉터리 경로에 이 프로그램이 파일을 기록하는 것을 막고 있는 권한설정이 있는지 확인이 필요합니다. 지금 이 문제를 무시하고 진행할 수도 있지만, 대신 일부 기능이 비활성화 될 수 있습니다.
+Settings…	MainWindow		설정…
 <Package contents not available for remote packages>	PackageContentsView		<원격 패키지를 위한 패키지 내용을 사용할 수 없습니다>
 Ratings	PackageInfoView		평가
 The following problems have been encountered. Please select a solution for each:	PackageProblem		다음과 같은 문제들이 발생하였습니다. 각각에 대한 해결 방안을 선택하십시오:
