@@ -90,12 +90,10 @@ main(int argc, char *argv[])
 		}
 
 		if (strcmp(argv[i], "-s") == 0) {
-			if (argc <= i + 1 || sscanf(argv[i + 1], "%" B_SCNu16, &sshPort) != 1) {
-				print_usage(argv[0]);
-				return 2;
+			if((i + 1 < argc) && sscanf(argv[i + 1], "%" B_SCNu16, &sshPort) == 1) {
+				i++;
 			}
 
-			i++;
 			useSSH = true;
 			continue;
 		}
