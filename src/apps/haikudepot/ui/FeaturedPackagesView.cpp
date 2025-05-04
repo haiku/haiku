@@ -1109,7 +1109,7 @@ void
 FeaturedPackagesView::_BuildNoResultsView()
 {
 	fNoResultsView = new TextDocumentView();
-	TextDocumentRef noResultsTextDocument = new TextDocument();
+	TextDocumentRef noResultsTextDocument(new(std::nothrow) TextDocument(), true);
 	ParagraphStyle paragraphStyle;
 	paragraphStyle.SetAlignment(ALIGN_CENTER);
 	Paragraph paragraph(paragraphStyle);
