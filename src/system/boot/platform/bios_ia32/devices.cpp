@@ -207,7 +207,7 @@ are_extensions_available(uint8 drive)
 	regs.edx = drive;
 	call_bios(0x13, &regs);
 
-	TRACE(("checking extensions: carry: %u; ebx: 0x%08lx; ecx: 0x%08lx\n",
+	TRACE(("checking extensions: carry: %u; ebx: 0x%08" B_PRIx32 "; ecx: 0x%08" B_PRIx32 "\n",
 		regs.flags & CARRY_FLAG, regs.ebx, regs.ecx));
 	return (regs.flags & CARRY_FLAG) == 0 && regs.ebx == 0xaa55
 		&& (regs.ecx & 0x01 /* supports device access using packet */) != 0;
@@ -502,7 +502,7 @@ find_unique_check_sums(NodeList *devices)
 			disk.device.unknown.check_sums[i].offset = offset;
 			disk.device.unknown.check_sums[i].sum = compute_check_sum(drive, offset);
 
-			TRACE(("disk %x, offset %lld, sum %lu\n", drive->DriveID(), offset,
+			TRACE(("disk %x, offset %lld, sum %" B_PRIu32 "\n", drive->DriveID(), offset,
 				disk.device.unknown.check_sums[i].sum));
 		}
 
@@ -584,7 +584,8 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 			return;
 		}
 
-		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+		TRACE(("  cylinders: %" B_PRIu32 ", heads: %" B_PRIu32 ", sectors: %" B_PRIu32
+			", bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
 		TRACE(("  total sectors: %lld\n", fParameters.sectors));
@@ -598,7 +599,8 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 		TRACE(("drive_path_signature: %x\n", fParameters.device_path_signature));
 		TRACE(("host bus: \"%s\", interface: \"%s\"\n", fParameters.host_bus,
 			fParameters.interface_type));
-		TRACE(("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+		TRACE(("cylinders: %" B_PRIu32 ", heads: %" B_PRIu32 ", sectors: %" B_PRIu32
+			", bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
 		TRACE(("total sectors: %lld\n", fParameters.sectors));
@@ -675,7 +677,7 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 			head %= fParameters.heads;
 
 			if (cylinder >= fParameters.cylinders) {
-				TRACE(("cylinder value %lu bigger than available %lu\n",
+				TRACE(("cylinder value %" B_PRIu32 " bigger than available %" PRIu32 "\n",
 					cylinder, fParameters.cylinders));
 				return B_BAD_VALUE;
 			}
