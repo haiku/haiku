@@ -149,6 +149,9 @@ const struct supported_device {
 	{0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
 	{0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
 
+	{0x5a84, INTEL_MODEL_KBYM, "Apollo Lake GT1.5"},
+	{0x5a85, INTEL_MODEL_KBYM, "Apollo Lake GT1"},
+
 	{0x5906, INTEL_MODEL_KBY,  "Kabylake ULT GT1"},
 	{0x5902, INTEL_MODEL_KBY,  "Kabylake DT GT1"},
 	{0x5916, INTEL_MODEL_KBYM, "Kabylake ULT GT2"},
@@ -301,6 +304,9 @@ detect_intel_pch()
 			case INTEL_PCH_CNP_DEVICE_ID:
 			case INTEL_PCH_CNP_LP_DEVICE_ID:
 				ERROR("%s: Found Cannon Lake PCH\n", __func__);
+				return INTEL_PCH_CNP;
+			case INTEL_PCH_APL_LP_DEVICE_ID:
+				ERROR("%s: Found Apollo Lake PCH\n", __func__);
 				return INTEL_PCH_CNP;
 			case INTEL_PCH_CMP_DEVICE_ID:
 			case INTEL_PCH_CMP2_DEVICE_ID:

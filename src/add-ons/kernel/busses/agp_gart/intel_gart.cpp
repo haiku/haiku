@@ -163,6 +163,9 @@ const struct supported_device {
 	{0x1904, 0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
 	{0x1904, 0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
 
+	{0x5af0, 0x5a84, INTEL_MODEL_KBYM, "Apollo Lake GT1.5"},
+	{0x5af0, 0x5a85, INTEL_MODEL_KBYM, "Apollo Lake GT1"},
+
 	{0x5904, 0x5906, INTEL_MODEL_KBY,  "Kabylake ULT GT1"},
 	{0x590f, 0x5902, INTEL_MODEL_KBY,  "Kabylake DT GT1"},
 	{0x5904, 0x5916, INTEL_MODEL_KBYM, "Kabylake ULT GT2"},
