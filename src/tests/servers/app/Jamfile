@@ -214,7 +214,7 @@ Includes [ FGristFiles AppServer.cpp BitmapManager.cpp Canvas.cpp
 
 AddResources test_app_server : test_app_server.rdef ;
 
-Server test_app_server :
+Application test_app_server :
 
 	# drawing
 	drawing_support.cpp

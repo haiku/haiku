@@ -16,7 +16,7 @@ local defines = [ FDefines TEST_MODE=1 ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 
-Server test_launch_daemon :
+Application test_launch_daemon :
 	LaunchDaemon.cpp
 
 	BaseJob.cpp

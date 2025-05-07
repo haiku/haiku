@@ -10,7 +10,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseBuildFeatureHeaders freetype ;
 
-Server fake_app_server :
+Application fake_app_server :
 	AppServer.cpp
 	ServerApp.cpp
 	: be [ TargetLibsupc++ ]
