@@ -112,6 +112,7 @@ Window::Window(const BRect& frame, const char *name,
 	fFeel(feel),
 	fWorkspaces(workspaces),
 	fCurrentWorkspace(-1),
+	fPriorWorkspace(-1),
 
 	fMinWidth(1),
 	fMaxWidth(32768),

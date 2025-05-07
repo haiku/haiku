@@ -530,9 +530,10 @@ WindowArea::_MoveToSAT(SATWindow* triggerWindow)
 	float deltaByY = round(frameSAT.bottom - frame.bottom);
 
 	int32 workspace = triggerWindow->GetWindow()->CurrentWorkspace();
+	if (workspace < 0)
+		workspace = triggerWindow->GetWindow()->PriorWorkspace();
 	Desktop* desktop = triggerWindow->GetWindow()->Desktop();
-	desktop->MoveWindowBy(topWindow->GetWindow(), deltaToX, deltaToY,
-		workspace);
+	desktop->MoveWindowBy(topWindow->GetWindow(), deltaToX, deltaToY, workspace);
 	// Update frame to the new position
 	desktop->ResizeWindowBy(topWindow->GetWindow(), deltaByX, deltaByY);
 

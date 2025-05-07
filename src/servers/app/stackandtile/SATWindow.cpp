@@ -389,9 +389,14 @@ BRect
 SATWindow::CompleteWindowFrame()
 {
 	BRect frame = fWindow->Frame();
-	if (fDesktop
+	if (fDesktop && fWindow->IsVisible()
 		&& fDesktop->CurrentWorkspace() != fWindow->CurrentWorkspace()) {
 		window_anchor& anchor = fWindow->Anchor(fWindow->CurrentWorkspace());
+		if (anchor.position != kInvalidWindowPosition)
+			frame.OffsetTo(anchor.position);
+	} else if (fDesktop && !fWindow->IsVisible() && fWindow->PriorWorkspace() >= 0
+		&& fDesktop->CurrentWorkspace() != fWindow->PriorWorkspace()) {
+		window_anchor& anchor = fWindow->Anchor(fWindow->PriorWorkspace());
 		if (anchor.position != kInvalidWindowPosition)
 			frame.OffsetTo(anchor.position);
 	}
