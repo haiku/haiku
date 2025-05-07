@@ -116,6 +116,20 @@ extern "C" {
 # define _IO_vtable_offset(THIS) 0
 #endif
 #define _IO_WIDE_JUMPS_FUNC(THIS) _IO_WIDE_JUMPS(THIS)
+#if __GNUC__ == 2
+# define JUMP_FIELD(TYPE, NAME) struct { short delta1, delta2; TYPE pfn; } NAME
+# define JUMP0(FUNC, THIS) _IO_JUMPS_FUNC(THIS)->FUNC.pfn (THIS)
+# define JUMP1(FUNC, THIS, X1) _IO_JUMPS_FUNC(THIS)->FUNC.pfn (THIS, X1)
+# define JUMP2(FUNC, THIS, X1, X2) _IO_JUMPS_FUNC(THIS)->FUNC.pfn (THIS, X1, X2)
+# define JUMP3(FUNC, THIS, X1,X2,X3) _IO_JUMPS_FUNC(THIS)->FUNC.pfn (THIS, X1,X2,X3)
+# define JUMP_INIT(NAME, VALUE) {0, 0, VALUE}
+# define JUMP_INIT_DUMMY JUMP_INIT(dummy, 0)
+
+# define WJUMP0(FUNC, THIS) _IO_WIDE_JUMPS_FUNC(THIS)->FUNC.pfn (THIS)
+# define WJUMP1(FUNC, THIS, X1) _IO_WIDE_JUMPS_FUNC(THIS)->FUNC.pfn (THIS, X1)
+# define WJUMP2(FUNC, THIS, X1, X2) _IO_WIDE_JUMPS_FUNC(THIS)->FUNC.pfn (THIS, X1, X2)
+# define WJUMP3(FUNC, THIS, X1,X2,X3) _IO_WIDE_JUMPS_FUNC(THIS)->FUNC.pfn (THIS, X1,X2,X3)
+#else
 #define JUMP_FIELD(TYPE, NAME) TYPE NAME
 #define JUMP0(FUNC, THIS) (_IO_JUMPS_FUNC(THIS)->FUNC) (THIS)
 #define JUMP1(FUNC, THIS, X1) (_IO_JUMPS_FUNC(THIS)->FUNC) (THIS, X1)
@@ -128,6 +142,7 @@ extern "C" {
 #define WJUMP1(FUNC, THIS, X1) (_IO_WIDE_JUMPS_FUNC(THIS)->FUNC) (THIS, X1)
 #define WJUMP2(FUNC, THIS, X1, X2) (_IO_WIDE_JUMPS_FUNC(THIS)->FUNC) (THIS, X1, X2)
 #define WJUMP3(FUNC, THIS, X1,X2,X3) (_IO_WIDE_JUMPS_FUNC(THIS)->FUNC) (THIS, X1,X2, X3)
+#endif
 
 /* The 'finish' function does any final cleaning up of an _IO_FILE object.
    It does not delete (free) it, but does everything else to finalize it.
@@ -290,7 +305,9 @@ typedef void (*_IO_imbue_t) (_IO_FILE *, void *);
 struct _IO_jump_t
 {
     JUMP_FIELD(size_t, __dummy);
+#if __GNUC__ != 2
     JUMP_FIELD(size_t, __dummy2);
+#endif
     JUMP_FIELD(_IO_finish_t, __finish);
     JUMP_FIELD(_IO_overflow_t, __overflow);
     JUMP_FIELD(_IO_underflow_t, __underflow);
