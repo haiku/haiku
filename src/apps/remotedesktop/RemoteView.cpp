@@ -94,6 +94,7 @@ RemoteView::RemoteView(BRect frame, const char *remoteHost, uint16 remotePort)
 		return;
 
 	fEndpoint = new(std::nothrow) BNetEndpoint();
+	fEndpoint->SetReuseAddr();
 	if (fEndpoint == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		TRACE_ERROR("no memory available\n");
