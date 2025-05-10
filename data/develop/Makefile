@@ -117,6 +117,16 @@ LINKER_FLAGS =
 #	This may also be specified in a resource.
 APP_VERSION :=
 
+#	Specify the desired install location for "make install". Only used when "TYPE" is not "DRIVER".
+#	Example:
+#		INSTALL_DIR = $(shell finddir B_USER_NONPACKAGED_ADDONS_DIRECTORY)/input_server/filters
+INSTALL_DIR =
+
+#	Specify where to place the resulting binary (instead of leaving it under the "objects.* dir).
+#	Example:
+#		TARGET_DIR = .
+TARGET_DIR =
+
 #	(Only used when "TYPE" is "DRIVER"). Specify the desired driver install
 #	location in the /dev hierarchy. Example:
 #		DRIVER_PATH = video/usb
