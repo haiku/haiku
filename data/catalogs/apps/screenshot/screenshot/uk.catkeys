@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-screenshot-cli	281883787
+1	ukrainian	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		Включаючи рамку вікна
 Overwrite	ScreenshotWindow		Перезаписати
 Save in:	ScreenshotWindow		Зберегти в:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Робочий стіл
 Artwork folder	ScreenshotWindow		Папка Artwork
 Translator Settings	ScreenshotWindow		Налаштування транслятора
 Include mouse pointer	ScreenshotWindow		Включаючи курсор
+Selected area	ScreenshotWindow		Вибрана область
 overwrite	ScreenshotWindow		перезаписати
 Settings…	ScreenshotWindow		Налаштування…
+Select area	ScreenshotWindow		Вибрати область
 Choose folder	ScreenshotWindow		Вибрати папку
 Name:	ScreenshotWindow		Ім'я:
+Active window	ScreenshotWindow		Активне вікно
 Choose folder…	ScreenshotWindow		Виберіть папку…
 Please select	ScreenshotWindow		Будь ласка виберіть
 Failed to save screenshot	ScreenshotWindow		Не вдалося зберегти знімок екрана
 Cancel	ScreenshotWindow		Скасувати
+Whole screen	ScreenshotWindow		Весь екран
 Delay:	ScreenshotWindow		Затримка:
 Copy to clipboard	ScreenshotWindow		Копіювати до буфера обміну
 screenshot	Screenshot	Base filename of screenshot files	знімок екрана

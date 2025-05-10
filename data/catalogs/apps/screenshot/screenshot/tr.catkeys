@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-screenshot-cli	281883787
+1	turkish	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		Pencere kenarlığını içer
 Overwrite	ScreenshotWindow		Üzerine yaz
 Save in:	ScreenshotWindow		Kaydetme yeri:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Masaüstü
 Artwork folder	ScreenshotWindow		Resimler klasörü
 Translator Settings	ScreenshotWindow		Çevirmen Ayarları
 Include mouse pointer	ScreenshotWindow		Fare imlecini içer
+Selected area	ScreenshotWindow		Seçili alan
 overwrite	ScreenshotWindow		üzerine yaz
 Settings…	ScreenshotWindow		Ayarlar…
+Select area	ScreenshotWindow		Alan seç
 Choose folder	ScreenshotWindow		Klasör seç
 Name:	ScreenshotWindow		Ad:
+Active window	ScreenshotWindow		Etkin pencere
 Choose folder…	ScreenshotWindow		Klasör seç…
 Please select	ScreenshotWindow		Lütfen seçin
 Failed to save screenshot	ScreenshotWindow		Ekran görüntüsü kaydedilemedi
 Cancel	ScreenshotWindow		Vazgeç
+Whole screen	ScreenshotWindow		Tüm ekran
 Delay:	ScreenshotWindow		Gecikme:
 Copy to clipboard	ScreenshotWindow		Panoya kopyala
 screenshot	Screenshot	Base filename of screenshot files	ekran görüntüsü

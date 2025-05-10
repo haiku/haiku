@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-screenshot-cli	281883787
+1	catalan; valencian	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		Inclou la vora de la finestra
 Overwrite	ScreenshotWindow		Sobreescriu
 Save in:	ScreenshotWindow		Desa a:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Escriptori
 Artwork folder	ScreenshotWindow		Carpeta d’obres d’art
 Translator Settings	ScreenshotWindow		Paràmetres del Traductor
 Include mouse pointer	ScreenshotWindow		Inclou el punter del ratolí
+Selected area	ScreenshotWindow		Àrea seleccionada
 overwrite	ScreenshotWindow		sobreescriu
 Settings…	ScreenshotWindow		Paràmetres...
+Select area	ScreenshotWindow		Seleccioneu l'àrea
 Choose folder	ScreenshotWindow		Trieu la carpeta
 Name:	ScreenshotWindow		Nom:
+Active window	ScreenshotWindow		Finestra activa
 Choose folder…	ScreenshotWindow		Trieu la carpeta...
 Please select	ScreenshotWindow		Si us plau, seccioneu...
 Failed to save screenshot	ScreenshotWindow		Ha fallat desar la captura de pantalla.
 Cancel	ScreenshotWindow		Cancel·la
+Whole screen	ScreenshotWindow		Tota la pantalla
 Delay:	ScreenshotWindow		Retard:
 Copy to clipboard	ScreenshotWindow		Copia-ho al porta-retalls
 screenshot	Screenshot	Base filename of screenshot files	captura de pantalla

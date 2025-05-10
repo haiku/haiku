@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2555742361
+1	swedish	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Klicka på ett paket för a
 Cancel	UserLoginWindow		Avbryt
 Rating not possible	MainWindow		Betyg ej möjligt
 Package update error	MainWindow		Paketuppdateringsfel
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Klicka här
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processer}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Hämta användarbetyg för paket
 Reboot required	PackageManager		Omstart krävs
 All packages	PackageListView		Alla paket
 Send	RatePackageWindow		Skicka
+Creating package list…	FeaturedPackagesView		Skapar paketlista...
 Start package daemon	App		Starta paket-servicen
 There are problems in the supplied data:	UserLoginWindow		Det finns problem med de angivna uppgifterna:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Användaren '%Nickname%' har inte samtyckt till några användningsvillkor.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Innehåll
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Dela anonym användningsinformation med HaikuDepotServer
 Close	PackageManager		Stäng
 Changelog	PackageInfoView		Ändringslogg
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 för att söka i alla paket.
 About	PackageInfoView		Om
 Password requirements download problem	UserLoginWindow		Lösenordskrav nedladdningsproblem
 Password:	UserLoginWindow		Lösenord:
@@ -225,6 +228,7 @@ Category:	FilterView		Kategori:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	avinstallera paketet %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Hämtar fjärrdata från repositorie
 Description	PackageListView		Beskrivning
+No results? 	FeaturedPackagesView		Inga resultat? 
 User creation error	UserLoginWindow		Användarskapande-fel
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 Cleaning up…	ShuttingDownWindow		Städar upp…

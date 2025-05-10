@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2555742361
+1	german	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 Available packages	MainWindow		Verfügbare Pakete
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Paket anklicken, um Infos a
 Cancel	UserLoginWindow		Abbrechen
 Rating not possible	MainWindow		Bewertung nicht möglich
 Package update error	MainWindow		Fehler bei Paketaktualisierung
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Hier klicken
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# Prozess} other{# Prozesse}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Bewertungen des Pakets werden geladen
 Reboot required	PackageManager		Neustart erforderlich
 All packages	PackageListView		Alle Pakete
 Send	RatePackageWindow		Senden
+Creating package list…	FeaturedPackagesView		Erzeuge Paketliste…
 Start package daemon	App		Paket-Daemon starten
 There are problems in the supplied data:	UserLoginWindow		Es gibt Probleme mit den eingegebenen Daten:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		'%Nickname%' hat keinen Nutzungsbedingungen zugestimmt.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Inhalt
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Anonymisierte Nutzungsdaten an den HaikuDepotServer senden
 Close	PackageManager		Schließen
 Changelog	PackageInfoView		Änderungsprotokoll
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	, um alle Pakete zu durchsuchen.
 About	PackageInfoView		Über
 Password requirements download problem	UserLoginWindow		Problem beim Herunterladen der Kennwortvorgaben
 Password:	UserLoginWindow		Kennwort:
@@ -225,6 +228,7 @@ Category:	FilterView		Kategorie:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	Paket %s deinstallieren\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Paketquellendaten werden geladen
 Description	PackageListView		Beschreibung
+No results? 	FeaturedPackagesView		Keine Ergebnisse? 
 User creation error	UserLoginWindow		Fehler beim Erstellen des Benutzerkontos
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
 Cleaning up…	ShuttingDownWindow		Aufräumarbeiten…

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Input	2383795148
+1	ukrainian	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Типові настройки
 Scrolling	TouchpadPrefView		Прокрутка
 Long	KeyboardView		Більше
@@ -24,6 +24,7 @@ Slow	KeyboardView		Меньше
 2-Button	SettingsView		2 кнопки
 Click to focus and raise	SettingsView		Натиснути для фокусу та підняти
 Vertical	TouchpadPrefView		Вертикальна
+Low	TouchpadPrefView		Низький
 Focus follows mouse	SettingsView		Фокус слідує за мишею
 Double-click test area	SettingsView		Тестова зона подвійного натискання
 Focus mode:	SettingsView		Режим фокусу:

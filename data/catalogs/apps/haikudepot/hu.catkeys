@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2555742361
+1	hungarian	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Válassz egy csomagot az in
 Cancel	UserLoginWindow		Mégse
 Rating not possible	MainWindow		Nem értékelhető
 Package update error	MainWindow		Csomag frissítési hiba
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Kattints ide
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# folyamat} other{# folyamat}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Felhasználói értékelések lekérése a csomaghoz
 Reboot required	PackageManager		Újraindítás szükséges
 All packages	PackageListView		Minden csomag
 Send	RatePackageWindow		Küldés
+Creating package list…	FeaturedPackagesView		Csomaglista készítése…
 Start package daemon	App		Csomag démon indítása
 There are problems in the supplied data:	UserLoginWindow		Hibás adatok lettek megadva:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		A felhasználó (%Nickname%) nem fogadta el a felhasználási feltételeket.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Tartalom
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Névtelen felhasználási adatok megosztása a HaikuDepot kiszolgálóval
 Close	PackageManager		Bezárás
 Changelog	PackageInfoView		Változásnapló
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	az összes csomag kereséséhez.
 About	PackageInfoView		Névjegy
 Password requirements download problem	UserLoginWindow		A jelszókövetelményeket nem sikerült letölteni
 Password:	UserLoginWindow		Jelszó:
@@ -225,6 +228,7 @@ Category:	FilterView		Kategória:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	%s csomag eltávolítása\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Tároló adatainak letöltése
 Description	PackageListView		Leírás
+No results? 	FeaturedPackagesView		Nincs találat?
 User creation error	UserLoginWindow		Felhasználó létrehozási hiba
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
 Cleaning up…	ShuttingDownWindow		Rendrakás…

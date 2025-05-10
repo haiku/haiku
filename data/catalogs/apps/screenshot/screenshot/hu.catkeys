@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-screenshot-cli	281883787
+1	hungarian	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		Az ablak keretét is
 Overwrite	ScreenshotWindow		Írja felül
 Save in:	ScreenshotWindow		Mentés ide:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Asztal
 Artwork folder	ScreenshotWindow		Művész-mappa
 Translator Settings	ScreenshotWindow		Értelmező beállításai
 Include mouse pointer	ScreenshotWindow		Az egér kurzort is
+Selected area	ScreenshotWindow		Kijelölt terület
 overwrite	ScreenshotWindow		felülír
 Settings…	ScreenshotWindow		Beállítások…
+Select area	ScreenshotWindow		Terület kijelölése
 Choose folder	ScreenshotWindow		Mappa választása
 Name:	ScreenshotWindow		Név:
+Active window	ScreenshotWindow		Aktív ablak
 Choose folder…	ScreenshotWindow		Mappa választása…
 Please select	ScreenshotWindow		Kérlek válassz
 Failed to save screenshot	ScreenshotWindow		Nem sikerült a képernyőkép mentése
 Cancel	ScreenshotWindow		Mégse
+Whole screen	ScreenshotWindow		Teljes képernyő
 Delay:	ScreenshotWindow		Késleltetés:
 Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
 screenshot	Screenshot	Base filename of screenshot files	képernyőkép

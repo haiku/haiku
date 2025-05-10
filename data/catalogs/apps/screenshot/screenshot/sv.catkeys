@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-screenshot-cli	281883787
+1	swedish	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		Inkludera fönsterkanten
 Overwrite	ScreenshotWindow		Skriva över
 Save in:	ScreenshotWindow		Spara i:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Desktop
 Artwork folder	ScreenshotWindow		Mapp för konstverk
 Translator Settings	ScreenshotWindow		Översättningsinställningar
 Include mouse pointer	ScreenshotWindow		Inkludera muspekaren
+Selected area	ScreenshotWindow		Valt område
 overwrite	ScreenshotWindow		Skriva över
 Settings…	ScreenshotWindow		Inställningar...
+Select area	ScreenshotWindow		Välj område
 Choose folder	ScreenshotWindow		Välj mapp
 Name:	ScreenshotWindow		Namn:
+Active window	ScreenshotWindow		Aktivt fönster
 Choose folder…	ScreenshotWindow		Välj mapp...
 Please select	ScreenshotWindow		Vänligen välj
 Failed to save screenshot	ScreenshotWindow		Det gick inte att spara skärmdump
 Cancel	ScreenshotWindow		Avbryt
+Whole screen	ScreenshotWindow		Hela skärmen
 Delay:	ScreenshotWindow		Dröjsmål:
 Copy to clipboard	ScreenshotWindow		Kopiera till urklipp
 screenshot	Screenshot	Base filename of screenshot files	skärmdump

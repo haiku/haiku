@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2555742361
+1	turkish	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Paket bilgisini görmek iç
 Cancel	UserLoginWindow		Vazgeç
 Rating not possible	MainWindow		Derecelendirme olanaklı değil
 Package update error	MainWindow		Paket güncelleme hatası
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Tüm paketlerde arama yapmak için
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# süreç}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Paket için olan kullanıcı derecelendirmeleri getiriliyor…
 Reboot required	PackageManager		Yeniden başlatma gerekli
 All packages	PackageListView		Tüm paketler
 Send	RatePackageWindow		Gönder
+Creating package list…	FeaturedPackagesView		Paket listesi oluşturuluyor…
 Start package daemon	App		Paket hizmetini başlat
 There are problems in the supplied data:	UserLoginWindow		Girilen veride sorunlar var:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		“%Nickname%” kullanıcısı herhangi bir kullanım koşulunu kabul etmedi.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		İçerik
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Anonim veri kullanımını Haiku Depo sunucusu ile paylaş
 Close	PackageManager		Kapat
 Changelog	PackageInfoView		Değişiklik günlüğü
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 buraya tıklayın.
 About	PackageInfoView		Hakkında
 Password requirements download problem	UserLoginWindow		Parola gereklilikleri indirme sorunu
 Password:	UserLoginWindow		Parola:
@@ -225,6 +228,7 @@ Category:	FilterView		Kategori:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	%s paketini kaldır\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Uzak depo bilgisi alınıyor…
 Description	PackageListView		Tanım
+No results? 	FeaturedPackagesView		Aradığınızı bulamadınız mı? 
 User creation error	UserLoginWindow		Kullanıcı oluşturma hatası
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.
 Cleaning up…	ShuttingDownWindow		Toparlanıyor…
