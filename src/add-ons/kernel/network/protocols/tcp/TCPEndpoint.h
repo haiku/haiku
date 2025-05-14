@@ -178,6 +178,7 @@ private:
 	uint32			fSendTime;
 	tcp_sequence	fRoundTripStartSequence;
 	bigtime_t		fRetransmitTimeout;
+	uint32			fRetransmitInitialCount;
 
 	uint32			fReceivedTimestamp;
 

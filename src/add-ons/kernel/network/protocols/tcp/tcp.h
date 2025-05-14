@@ -187,14 +187,12 @@ operator==(tcp_sequence a, tcp_sequence b)
 #define TCP_MAX_SEGMENT_LIFETIME		60000000	// 60 secs
 #define TCP_PERSIST_TIMEOUT				1000000		// 1 sec
 
-// Initial estimate for packet round trip time (RTT)
-#define TCP_INITIAL_RTT					2000000		// 2 secs
 // Minimum retransmit timeout (consider delayed ack)
 #define TCP_MIN_RETRANSMIT_TIMEOUT		200000		// 200 msecs
 // Maximum retransmit timeout (per RFC6298)
 #define TCP_MAX_RETRANSMIT_TIMEOUT		60000000	// 60 secs
 // New value for timeout in case of lost SYN (RFC 6298)
-#define TCP_SYN_RETRANSMIT_TIMEOUT 		3000000		// 3 secs
+#define TCP_SYN_RETRANSMIT_TIMEOUT 		1000000		// 1 sec
 
 struct tcp_sack {
 	uint32 left_edge;
