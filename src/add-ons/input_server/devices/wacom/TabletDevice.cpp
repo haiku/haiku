@@ -228,6 +228,15 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 		case 0xB7:  // Wacom PTZ-431W Intuos3 4x6
 			SetDevice(31496.0, 19685.0, DEVICE_INTUOS3);
 			break;
+		case 0xB8: // Wacom Intuos4S PTK-440 (S)
+			SetDevice(31496.0, 19685.0, DEVICE_INTUOS4);
+			break;
+		case 0xB9: // Wacom Intuos4 PTK-640 (M)
+			SetDevice(44704.0, 27940.0, DEVICE_INTUOS4);
+			break;
+		case 0xBA: // Wacom Intuos4L PTK-840 (L)
+			SetDevice(63000.0, 39400.0, DEVICE_INTUOS4);
+			break;
 		case 0xD0:	// Wacom Bamboo 2FG (from Linux Wacom Project)
 			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
 			break;
@@ -373,9 +382,10 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 		}
 		case DEVICE_INTUOS:
 		case DEVICE_INTUOS3:
+		case DEVICE_INTUOS4:
 		case DEVICE_CINTIQ:
 			if ((data[0] == 0x02) && !(((data[1] >> 5) & 0x03) == 0x02)) {
-				if (fDeviceMode == DEVICE_INTUOS3) {
+				if (fDeviceMode == DEVICE_INTUOS3 || fDeviceMode == DEVICE_INTUOS4) {
 					xPos = (data[2] << 9) | (data[3] << 1)
 						| ((data[9] >> 1) & 1);
 					yPos = (data[4] << 9) | (data[5] << 1) | (data[9] & 1);
@@ -719,6 +729,7 @@ TabletDevice::_DeviceSupportsTilt() const
 	switch (fDeviceMode) {
 		case DEVICE_INTUOS:
 		case DEVICE_INTUOS3:
+		case DEVICE_INTUOS4:
 		case DEVICE_CINTIQ:
 			tilt = true;
 			break;
@@ -848,6 +859,16 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 			break;
 		case 0xB2:
 			*name = "Wacom Intuos3 9x12 USB";
+			break;
+
+		case 0xB8:
+			*name = "Wacom Intuos4 Small 4x6 (PTK-440)";
+			break;
+		case 0xB9:
+			*name = "Wacom Intuos4 Medium 6x9 (PTK-640)";
+			break;
+		case 0xBA:
+			*name = "Wacom Intuos4 Large 8x13 (PTK-840)";
 			break;
 
 		case 0xD0:
