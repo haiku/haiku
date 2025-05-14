@@ -39,13 +39,8 @@ VnodeToInode::Unlink(InodeNames* parent, const char* name)
 {
 	WriteLocker _(fLock);
 	if (fInode != NULL && !IsRoot()) {
-		bool removed = fInode->GetFileSystem()->InoIdMap()->RemoveName(fID,
-			parent, name);
-		if (removed) {
-			delete fInode;
-			fInode = NULL;
-		}
-		return removed;
+		return fInode->GetFileSystem()->InoIdMap()->RemoveName(fID, parent,
+			name);
 	}
 
 	return false;

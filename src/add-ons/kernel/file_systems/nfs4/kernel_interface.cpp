@@ -341,13 +341,10 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 	if (node == fs->Root())
 		return B_OK;
 
-	if (node != NULL && node->IsStale()) {
-		// in the case of a stale node, VnodeToInode::Unlink was never called by the client,
-		// so the Inode hasn't been deleted yet
-		vti->Clear();
-	}
+	// Verify that all known names have been unlinked.
+	FileInfo fileInfo;
+	ASSERT(fs->InoIdMap()->GetFileInfo(&fileInfo, vti->ID()) == B_ENTRY_NOT_FOUND);
 
-	ASSERT(vti->GetPointer() == NULL);
 	delete vti;
 
 	return B_OK;
