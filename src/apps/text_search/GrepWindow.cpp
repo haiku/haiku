@@ -109,6 +109,7 @@ GrepWindow::GrepWindow(BMessage* message)
 
 	fGrepper(NULL),
 	fOldPattern(""),
+	fIncludeFilesGlob(""),
 	fModel(new (nothrow) Model()),
 	fLastNodeMonitorEvent(system_time()),
 	fChangesIterator(NULL),
@@ -233,6 +234,10 @@ void GrepWindow::MessageReceived(BMessage* message)
 
 		case MSG_SEARCH_TEXT:
 			_OnSearchText();
+			break;
+
+		case MSG_SEARCH_GLOB_FILTER:
+			_OnGlobFilterChange();
 			break;
 
 		case MSG_SELECT_HISTORY:
@@ -547,6 +552,14 @@ GrepWindow::_CreateViews()
 	fSearchText->TextView()->SetMaxBytes(1000);
 	fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
 
+	fGlobText = new BTextControl(
+		"GlobText", B_TRANSLATE("File filter:"), NULL, NULL,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
+
+	fGlobText->TextView()->SetMaxBytes(20);
+	fGlobText->SetModificationMessage(new BMessage(MSG_SEARCH_GLOB_FILTER));
+	fGlobText->SetToolTip(B_TRANSLATE("Only search files matching the given pattern, e.g. \"*.h\"."));
+
 	fButton = new BButton(
 		"Button", B_TRANSLATE("Search"),
 		new BMessage(MSG_START_CANCEL));
@@ -573,13 +586,16 @@ GrepWindow::_LayoutViews()
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0, 0, -1, -1)
 		.Add(fMenuBar)
-		.AddGrid(B_USE_HALF_ITEM_INSETS)
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
 			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
-			.Add(fSearchText, 0, 0, 3)
-			.Add(fShowLinesCheckbox, 0, 1)
-			.Add(BSpaceLayoutItem::CreateGlue(), 1, 1)
-			.Add(fButton, 2, 1)
+			.Add(fSearchText)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+				.Add(fGlobText, 1.0)
+				.Add(fShowLinesCheckbox)
+				.AddGlue(0.5)
+				.Add(fButton)
+			.End()
 		.End()
 		.AddGroup(B_VERTICAL, 0)
 			.SetInsets(-2, 0, -1, -1)
@@ -737,6 +753,7 @@ GrepWindow::_OnStartCancel()
 		// displaying the names of the files we are grepping.
 
 		fSearchText->SetModificationMessage(NULL);
+		fGlobText->SetModificationMessage(NULL);
 
 		fFileMenu->SetEnabled(false);
 		fActionMenu->SetEnabled(false);
@@ -745,6 +762,7 @@ GrepWindow::_OnStartCancel()
 		fEncodingMenu->SetEnabled(false);
 
 		fSearchText->SetEnabled(false);
+		fGlobText->SetEnabled(false);
 
 		fButton->MakeFocus(true);
 		fButton->SetLabel(B_TRANSLATE("Cancel"));
@@ -762,7 +780,7 @@ GrepWindow::_OnStartCancel()
 		_SetWindowTitle();
 
 		FileIterator* iterator = new (nothrow) InitialIterator(fModel);
-		fGrepper = new (nothrow) Grepper(fOldPattern.String(), fModel,
+		fGrepper = new (nothrow) Grepper(fOldPattern.String(), fIncludeFilesGlob.String(), fModel,
 			this, iterator);
 		if (fGrepper != NULL && fGrepper->IsValid())
 			fGrepper->Start();
@@ -810,6 +828,8 @@ GrepWindow::_OnSearchFinished()
 	fSearchText->SetText(fOldPattern.String());
 	fSearchText->TextView()->SelectAll();
 	fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
+	fGlobText->SetEnabled(true);
+	fGlobText->SetModificationMessage(new BMessage(MSG_SEARCH_GLOB_FILTER));
 
 	PostMessage(MSG_START_NODE_MONITORING);
 }
@@ -968,7 +988,7 @@ GrepWindow::_OnNodeMonitorPulse()
 	fChangesIterator->PrintToStream();
 #endif
 
-	fGrepper = new (nothrow) Grepper(fOldPattern.String(), fModel,
+	fGrepper = new (nothrow) Grepper(fOldPattern.String(), fIncludeFilesGlob.String(), fModel,
 		this, fChangesIterator);
 	if (fGrepper != NULL && fGrepper->IsValid()) {
 		fGrepper->Start();
@@ -1555,6 +1575,15 @@ GrepWindow::_OnSetTargetToParent()
 		parentRefs.AddRef("dir_ref", &parent_ref);
 		_OnFileDrop(&parentRefs);
 	}
+}
+
+
+void
+GrepWindow::_OnGlobFilterChange()
+{
+	CALLED();
+	fIncludeFilesGlob = fGlobText->Text();
+	_StopNodeMonitoring();
 }
 
 

@@ -74,6 +74,7 @@ private:
 			void				_OnSelectAll(BMessage* message);
 			void				_OnNewWindow();
 			void				_OnSetTargetToParent();
+			void				_OnGlobFilterChange();
 
 			void				_ModelChanged();
 			bool				_OpenInEditor(const entry_ref& ref, int32 lineNum);
@@ -85,6 +86,7 @@ private:
 
 private:
 			BTextControl*		fSearchText;
+			BTextControl*		fGlobText;
 			GrepListView*		fSearchResults;
 
 			BMenuBar*			fMenuBar;
@@ -121,6 +123,7 @@ private:
 
 			Grepper*			fGrepper;
 			BString				fOldPattern;
+			BString				fIncludeFilesGlob;
 			Model*				fModel;
 			bigtime_t			fLastNodeMonitorEvent;
 			ChangesIterator*	fChangesIterator;

@@ -13,7 +13,7 @@ class Model;
 // Executes "grep" in a background thread.
 class Grepper {
 public:
-								Grepper(const char* pattern, const Model* model,
+								Grepper(const char* pattern, const char* glob, const Model* model,
 									const BHandler* target,
 									FileIterator* iterator);
 	virtual						~Grepper();
@@ -43,6 +43,7 @@ private:
 	private:
 	// The (escaped) search pattern.
 			char*				fPattern;
+			char*				fGlob;
 
 	// The settings from the model.
 			BMessenger			fTarget;

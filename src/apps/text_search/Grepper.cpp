@@ -88,7 +88,7 @@ strdup_from_utf8(uint32 encode, const char* src, int32 length)
 }
 
 
-Grepper::Grepper(const char* pattern, const Model* model,
+Grepper::Grepper(const char* pattern, const char* glob, const Model* model,
 		const BHandler* target, FileIterator* iterator)
 	: fPattern(NULL),
 	  fTarget(target),
@@ -107,6 +107,8 @@ Grepper::Grepper(const char* pattern, const Model* model,
 		free(src);
 	} else
 		_SetPattern(pattern);
+
+	fGlob = strdup(glob);
 }
 
 
@@ -114,6 +116,7 @@ Grepper::~Grepper()
 {
 	Cancel();
 	free(fPattern);
+	free(fGlob);
 	delete fIterator;
 }
 
@@ -271,6 +274,13 @@ Grepper::_RunnerThread()
 		argv[argc++] = "-i";
 	if (! fRegularExpression)
 		argv[argc++] = "-F";	 // no a regexp: force fixed string,
+
+	// Limit included files to fGlob pattern, if one was given.
+	if (strlen(fGlob) > 0) {
+		argv[argc++] = "--include";
+		argv[argc++] = fGlob;
+	}
+
 	// Add double dash argument to tell grep
 	// it's the end of commands options
 	argv[argc++] = "--";
