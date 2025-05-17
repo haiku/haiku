@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2555742361
+1	finnish	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen
 Cancel	UserLoginWindow		Peru
 Rating not possible	MainWindow		Arvosanojen antaminen ei ole mahdollista
 Package update error	MainWindow		Pakkauksen päivitysvirhe
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Napsauta tähän
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# prosessi} other{# prosessia}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Noudetaan pakkauksen käyttäjäarvosanoja
 Reboot required	PackageManager		Tarvitaan uudelleenkäynnistys
 All packages	PackageListView		Kaikki pakkaukset
 Send	RatePackageWindow		Lähetä
+Creating package list…	FeaturedPackagesView		Luodaan pakkausluettelo…
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
 There are problems in the supplied data:	UserLoginWindow		Toimitetuissa tiedoissa on pulmia:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Käyttäjä '%Nickname%' ei ole hyväksynyt yhtään käyttöehtoa.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Sisällöt
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Jaa anonyymit käyttäjätiedot HaikuVarasto-palvelimelle
 Close	PackageManager		Sulje
 Changelog	PackageInfoView		Muutosloki
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 kaikkien pakkausten noutamiseksi.
 About	PackageInfoView		Ohjelmasta
 Password requirements download problem	UserLoginWindow		Salasanavaatimusten latauspulma
 Password:	UserLoginWindow		Salasana:
@@ -225,6 +228,7 @@ Category:	FilterView		Luokka:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	poista pakkauksen %s asennus\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Noudetaan etätietovaraston tietoja
 Description	PackageListView		Kuvaus
+No results? 	FeaturedPackagesView		Ei tulosta? 
 User creation error	UserLoginWindow		Käyttäjän luomisen virhe
 You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
 Cleaning up…	ShuttingDownWindow		Siistitään…
