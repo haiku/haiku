@@ -1007,8 +1007,6 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_COLOR_SCHEME_CHANGED:
-		case BColorListView::B_MESSAGE_SET_CURRENT_COLOR:
-		case BColorListView::B_MESSAGE_SET_COLOR:
 		case MSG_UPDATE_COLOR:
 			_SetTermColors();
 			break;

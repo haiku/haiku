@@ -63,7 +63,7 @@ private:
 			void				_ChangeColorScheme(color_scheme* scheme);
 			void				_SetCurrentColorScheme();
 			void				_SetCurrentColor(rgb_color color);
-			void				_SetColor(const char* name, rgb_color color);
+			void				_SetColor(int32 index, rgb_color color);
 
 			void				_MakeColorSchemeMenu();
 			void				_MakeColorSchemeMenuItem(const color_scheme *item);

@@ -34,7 +34,7 @@
 #define B_TRANSLATION_CONTEXT "Terminal ThemeView"
 
 
-#define COLOR_DROPPED 'cldp'
+#define MSG_COLOR_DROPPED 'cldp'
 #define DECORATOR_CHANGED 'dcch'
 
 
@@ -94,7 +94,7 @@ ThemeView::ThemeView(const char* name, const BMessenger& messenger)
 	fColorSchemeMenu = new BPopUpMenu("");
 	fColorSchemeField = new BMenuField(B_TRANSLATE("Color scheme:"), fColorSchemeMenu);
 
-	fColorPreview = new BColorPreview("color preview", "", new BMessage(COLOR_DROPPED));
+	fColorPreview = new BColorPreview("color preview", "", new BMessage(MSG_COLOR_DROPPED));
 
 	fPicker = new BColorControl(B_ORIGIN, B_CELLS_32x8, 8.0,
 		"picker", new BMessage(MSG_UPDATE_COLOR));
@@ -292,8 +292,23 @@ ThemeView::MessageReceived(BMessage* message)
 		ssize_t size;
 		if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type) == B_OK
 			&& message->FindData(name, type, (const void**)&color, &size) == B_OK) {
-			_SetCurrentColor(*color);
-			modified = true;
+			BPoint dropLoc = message->DropPoint();
+			if (fAttrList->Bounds().Contains(fAttrList->ConvertFromScreen(dropLoc))) {
+				// dropped on color list view
+				int32 index = fAttrList->IndexOf(fAttrList->ConvertFromScreen(dropLoc));
+				bool selected = index == fAttrList->CurrentSelection();
+				if (index < 0 || index >= fAttrList->CountItems() || selected)
+					_SetCurrentColor(*color);
+				else
+					_SetColor(index, *color);
+
+				modified = true;
+			} else if (fColorPreview->Bounds().Contains(fColorPreview->ConvertFromScreen(dropLoc))
+				|| fPicker->Bounds().Contains(fPicker->ConvertFromScreen(dropLoc))) {
+				// dropped on color preview or color control
+				_SetCurrentColor(*color);
+				modified = true;
+			}
 		}
 	}
 
@@ -303,26 +318,6 @@ ThemeView::MessageReceived(BMessage* message)
 			color_scheme* newScheme = NULL;
 			if (message->FindPointer("color_scheme", (void**)&newScheme) == B_OK) {
 				_ChangeColorScheme(newScheme);
-				modified = true;
-			}
-			break;
-		}
-
-		case BColorListView::B_MESSAGE_SET_CURRENT_COLOR:
-		case BColorListView::B_MESSAGE_SET_COLOR:
-		{
-			// Received from color list view when color changes
-			char* name;
-			type_code type;
-			rgb_color* color;
-			ssize_t size;
-			if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type) == B_OK
-				&& message->FindData(name, type, (const void**)&color, &size) == B_OK) {
-				bool current = message->GetBool("current", false);
-				if (current)
-					_SetCurrentColor(*color);
-				else
-					_SetColor(name, *color);
 				modified = true;
 			}
 			break;
@@ -341,11 +336,12 @@ ThemeView::MessageReceived(BMessage* message)
 		case MSG_COLOR_ATTRIBUTE_CHOSEN:
 		{
 			// Received when the user chooses a GUI fAttribute from the list
-			const int32 currentIndex = fAttrList->CurrentSelection();
-			if (currentIndex < 0)
+
+			const int32 index = fAttrList->CurrentSelection();
+			if (index < 0 || index >= fAttrList->CountItems())
 				break;
 
-			rgb_color color = PrefHandler::Default()->getRGB(kColorTable[currentIndex]);
+			rgb_color color = PrefHandler::Default()->getRGB(kColorTable[index]);
 			_SetCurrentColor(color);
 			break;
 		}
@@ -382,8 +378,8 @@ ThemeView::SetDefaults()
 		fAttrList->InvalidateItem(index);
 	}
 
-	int32 currentIndex = fAttrList->CurrentSelection();
-	BColorItem* item = static_cast<BColorItem*>(fAttrList->ItemAt(currentIndex));
+	int32 index = fAttrList->CurrentSelection();
+	BColorItem* item = static_cast<BColorItem*>(fAttrList->ItemAt(index));
 	if (item != NULL) {
 		rgb_color color = item->Color();
 		fPicker->SetValue(color);
@@ -532,24 +528,19 @@ ThemeView::_MakeColorSchemeMenu()
 void
 ThemeView::_SetCurrentColor(rgb_color color)
 {
-	int32 currentIndex = fAttrList->CurrentSelection();
-	BColorItem* item = static_cast<BColorItem*>(fAttrList->ItemAt(currentIndex));
-	if (item != NULL) {
-		item->SetColor(color);
-		fAttrList->InvalidateItem(currentIndex);
-
-		PrefHandler::Default()->setRGB(kColorTable[currentIndex], color);
-	}
-
+	_SetColor(fAttrList->CurrentSelection(), color);
 	fPicker->SetValue(color);
 	fColorPreview->SetColor(color);
 }
 
 
 void
-ThemeView::_SetColor(const char* name, rgb_color color)
+ThemeView::_SetColor(int32 index, rgb_color color)
 {
-	PrefHandler::Default()->setRGB(name, color);
-
-	_UpdateStyle();
+	BColorItem* item = dynamic_cast<BColorItem*>(fAttrList->ItemAt(index));
+	if (item != NULL) {
+		item->SetColor(color);
+		fAttrList->InvalidateItem(index);
+		PrefHandler::Default()->setRGB(kColorTable[index], color);
+	}
 }
