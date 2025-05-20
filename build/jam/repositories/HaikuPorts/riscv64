@@ -124,8 +124,8 @@ RemotePackageRepository HaikuPorts
 	zip-3.0-4
 	zlib_devel-1.2.11-1
 	zlib-1.2.11-1
-	zstd_devel-1.5.0-2
-	zstd-1.5.0-2
+	zstd_devel-1.5.7-1
+	zstd-1.5.7-1
 	:
 	# source packages
 	libsolv
