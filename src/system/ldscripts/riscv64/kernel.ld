@@ -9,7 +9,8 @@ OUTPUT_ARCH(riscv)
 ENTRY(_start)
 SECTIONS
 {
-  . = 0x80000000 + SIZEOF_HEADERS;
+  /* riscv64 kernel is PIC */
+  . = 0x0 + SIZEOF_HEADERS;
 
   .interp         : { *(.interp) }
   .note.gnu.build-id : { *(.note.gnu.build-id) }
