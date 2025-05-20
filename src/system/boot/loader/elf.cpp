@@ -313,6 +313,8 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 		if (Class::AllocateRegion(&address, totalSize,
 				B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA, &mappedRegion)
 				!= B_OK) {
+			dprintf("%s: AllocateRegion failed for address 0x%" B_PRIx64 " (size %" B_PRIx64 ")\n",
+				__func__, (int64)address, totalSize);
 			status = B_NO_MEMORY;
 			goto error1;
 		}
