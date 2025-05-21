@@ -225,6 +225,23 @@ Model::FillHistoryMenu(BMenu* menu) const
 }
 
 
+BString
+Model::GetHistoryItem(int32 index)
+{
+	BList items;
+	if (!_LoadHistory(items))
+		return NULL;
+
+	int32 itemCount = items.CountItems() - 1;
+	if (index > itemCount)
+		return NULL;
+
+	// latest entry is at the end of the BList
+	BString* itemtext = static_cast<BString*>(items.ItemAt(itemCount - index));
+
+	return itemtext->String();
+}
+
 // #pragma mark - private
 
 

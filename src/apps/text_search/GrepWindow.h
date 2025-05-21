@@ -129,7 +129,7 @@ private:
 			ChangesIterator*	fChangesIterator;
 			BMessageRunner*		fChangesPulse;
 
-
+			int32				fCurrentHistoryIndex;
 			BFilePanel*			fFilePanel;
 };
 

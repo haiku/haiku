@@ -17,6 +17,7 @@
 #include <Alert.h>
 #include <Clipboard.h>
 #include <LayoutBuilder.h>
+#include <MessageFilter.h>
 #include <MessageRunner.h>
 #include <MimeType.h>
 #include <Path.h>
@@ -71,6 +72,48 @@ static const bigtime_t kChangesPulseInterval = 150000;
 #endif // TRACE_FUNCTIONS
 
 
+class HistoryInputFilter : public BMessageFilter {
+public:
+	HistoryInputFilter(BHandler* target)
+		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN),
+		fTarget(target)
+	{
+	}
+
+	virtual filter_result Filter(BMessage* message, BHandler** _target)
+	{
+		const char* bytes;
+		int32 modifiers;
+		if (message->FindString("bytes", &bytes) != B_OK)
+			return B_DISPATCH_MESSAGE;
+
+		message->FindInt32("modifiers", &modifiers);
+		if (modifiers & (B_SHIFT_KEY | B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
+			return B_DISPATCH_MESSAGE;
+
+		switch (bytes[0]) {
+			case B_UP_ARROW:
+			{
+				fTarget.SendMessage(new BMessage(MSG_PREV_HISTORY));
+				return B_SKIP_MESSAGE;
+			} break;
+
+			case B_DOWN_ARROW:
+			{
+				fTarget.SendMessage(new BMessage(MSG_NEXT_HISTORY));
+				return B_SKIP_MESSAGE;
+			} break;
+
+			default:
+				return B_DISPATCH_MESSAGE;
+		}
+	}
+
+	private:
+		BMessenger	fTarget;
+};
+
+
 GrepWindow::GrepWindow(BMessage* message)
 	: BWindow(BRect(0, 0, 525, 430), NULL, B_DOCUMENT_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS),
@@ -115,6 +158,7 @@ GrepWindow::GrepWindow(BMessage* message)
 	fChangesIterator(NULL),
 	fChangesPulse(NULL),
 
+	fCurrentHistoryIndex(-1),
 	fFilePanel(NULL)
 {
 	if (fModel == NULL)
@@ -233,6 +277,7 @@ void GrepWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_SEARCH_TEXT:
+			fCurrentHistoryIndex = -1;	// reset on user input
 			_OnSearchText();
 			break;
 
@@ -244,6 +289,46 @@ void GrepWindow::MessageReceived(BMessage* message)
 			_OnHistoryItem(message);
 			break;
 
+		case MSG_PREV_HISTORY:
+		{
+			if (fCurrentHistoryIndex == HISTORY_LIMIT - 1)
+				break;
+
+			fCurrentHistoryIndex++;
+			BString text = fModel->GetHistoryItem(fCurrentHistoryIndex);
+			if (text != NULL) {
+				fSearchText->SetModificationMessage(NULL);
+				fSearchText->SetText(text);
+				fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
+			} else
+				fCurrentHistoryIndex--;
+
+			_OnSearchText();
+			break;
+		}
+		case MSG_NEXT_HISTORY:
+		{
+			if (fCurrentHistoryIndex <= 0) {
+				fCurrentHistoryIndex = -1;
+				fSearchText->SetText("");
+				_OnSearchText();
+				break;
+			}
+
+			fCurrentHistoryIndex--;
+			BString text = fModel->GetHistoryItem(fCurrentHistoryIndex);
+			if (text != NULL) {
+				fSearchText->SetModificationMessage(NULL);
+				fSearchText->SetText(text);
+				fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
+			} else {
+				fCurrentHistoryIndex--;
+				fSearchText->SetText("");
+			}
+
+			_OnSearchText();
+			break;
+		}
 		case MSG_START_CANCEL:
 			_OnStartCancel();
 			break;
@@ -549,6 +634,7 @@ GrepWindow::_CreateViews()
 		"SearchText", NULL, NULL, NULL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
 
+	fSearchText->TextView()->AddFilter(new HistoryInputFilter(this));
 	fSearchText->TextView()->SetMaxBytes(1000);
 	fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
 
@@ -754,6 +840,7 @@ GrepWindow::_OnStartCancel()
 
 		fSearchText->SetModificationMessage(NULL);
 		fGlobText->SetModificationMessage(NULL);
+		fCurrentHistoryIndex = -1;
 
 		fFileMenu->SetEnabled(false);
 		fActionMenu->SetEnabled(false);
