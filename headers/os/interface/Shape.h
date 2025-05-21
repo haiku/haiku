@@ -13,11 +13,6 @@ class BPoint;
 class BRect;
 class BShape;
 
-namespace BPrivate {
-	class ServerLink;
-	class PicturePlayer;
-};
-
 
 class BShapeIterator {
 public:
