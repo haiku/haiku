@@ -55,7 +55,7 @@
 
 #if __GNUC__ == 2
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_2_HAIKU
-#elif (__GNUC__ >= 4 && __GNUC__ <= 14) || defined(__TINYC__)
+#elif (__GNUC__ >= 4 && __GNUC__ <= 15) || defined(__TINYC__)
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_4
 #else
 #	error Unsupported compiler!
