@@ -134,7 +134,6 @@ static const char* kSpamMenuItemTextArray[] = {
 	"Mark as genuine"						// M_TRAIN_GENUINE
 };
 
-static const uint32 kMsgQuitAndKeepAllStatus = 'Casm';
 
 static const char* kQueriesDirectory = "mail/queries";
 static const char* kAttrQueryInitialMode = "_trk/qryinitmode";
@@ -212,7 +211,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	fDownloading(false)
 {
-	fKeepStatusOnQuit = false;
+	fKeepStatusOnClose = false;
 
 	if (messenger != NULL)
 		fTrackerMessenger = *messenger;
@@ -273,7 +272,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			subMenu->AddItem(new BMenuItem(
 				B_TRANSLATE_COMMENT("Leave as 'New'",
 				"Do not translate New - this is non-localizable e-mail status"),
-				new BMessage(kMsgQuitAndKeepAllStatus), 'W', B_SHIFT_KEY));
+				new BMessage(kMsgCloseAndKeepAllStatus), 'W', B_SHIFT_KEY));
 		} else {
 			BString status;
 			file.ReadAttrString(B_MAIL_ATTR_STATUS, &status);
@@ -288,7 +287,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			subMenu->AddItem(new BMenuItem(label.String(),
 							new BMessage(B_QUIT_REQUESTED), 'W'));
 			AddShortcut('W', B_COMMAND_KEY | B_SHIFT_KEY,
-				new BMessage(kMsgQuitAndKeepAllStatus));
+				new BMessage(kMsgCloseAndKeepAllStatus));
 		}
 
 		subMenu->AddItem(new BMenuItem(B_TRANSLATE("Move to trash"),
@@ -1025,7 +1024,7 @@ TMailWindow::MenusBeginning()
 
 		BMenuItem* LeaveStatus = fLeaveStatusMenu->FindItem(B_QUIT_REQUESTED);
 		if (LeaveStatus == NULL)
-			LeaveStatus = fLeaveStatusMenu->FindItem(kMsgQuitAndKeepAllStatus);
+			LeaveStatus = fLeaveStatusMenu->FindItem(kMsgCloseAndKeepAllStatus);
 
 		if (LeaveStatus != NULL && status.Length() > 0) {
 			BString label;
@@ -1314,14 +1313,19 @@ TMailWindow::MessageReceived(BMessage* msg)
 		}
 		case M_CLOSE_SAVED:
 		{
-			BMessage message(B_QUIT_REQUESTED);
+			BMessage message(B_CLOSE_REQUESTED);
 			message.AddString("status", "Saved");
 			PostMessage(&message);
 			break;
 		}
 		case kMsgQuitAndKeepAllStatus:
-			fKeepStatusOnQuit = true;
-			be_app->PostMessage(B_QUIT_REQUESTED);
+		{
+			be_app->PostMessage(msg);
+			break;
+		}
+		case kMsgCloseAndKeepAllStatus:
+			fKeepStatusOnClose = true;
+			PostMessage(B_CLOSE_REQUESTED);
 			break;
 		case M_CLOSE_CUSTOM:
 			if (msg->HasString("status")) {
@@ -1860,7 +1864,7 @@ TMailWindow::QuitRequested()
 				}
 			}
 		}
-	} else if (fRef != NULL && !fKeepStatusOnQuit) {
+	} else if (fRef != NULL && !fKeepStatusOnClose) {
 		// ...Otherwise just set the message read
 		if (fAutoMarkRead == true)
 			MarkMessageRead(fRef, B_READ);

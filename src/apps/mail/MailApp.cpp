@@ -413,6 +413,14 @@ TMailApp::MessageReceived(BMessage *msg)
 				be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
 
+		case kMsgQuitAndKeepAllStatus:
+		{
+			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+				TMailWindow* window = (TMailWindow*)fWindowList.ItemAt(i);
+				window->PostMessage(new BMessage(kMsgCloseAndKeepAllStatus));
+			}
+			break;
+		}
 		case B_REFS_RECEIVED:
 			RefsReceived(msg);
 			break;
