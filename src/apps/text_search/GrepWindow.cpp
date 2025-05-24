@@ -208,6 +208,13 @@ void GrepWindow::FrameMoved(BPoint origin)
 void GrepWindow::MenusBeginning()
 {
 	fModel->FillHistoryMenu(fHistoryMenu);
+
+	if (fHistoryMenu->CountItems() > 0) {
+		fHistoryMenu->AddSeparatorItem();
+		BMessage* message = new BMessage(MSG_CLEAR_HISTORY);
+		fHistoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Clear history"), message));
+	}
+
 	BWindow::MenusBeginning();
 }
 
@@ -329,6 +336,11 @@ void GrepWindow::MessageReceived(BMessage* message)
 			_OnSearchText();
 			break;
 		}
+
+		case MSG_CLEAR_HISTORY:
+			fModel->ClearHistory();
+			break;
+
 		case MSG_START_CANCEL:
 			_OnStartCancel();
 			break;

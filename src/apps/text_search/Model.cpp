@@ -208,6 +208,20 @@ Model::AddToHistory(const char* text)
 
 
 void
+Model::ClearHistory()
+{
+	BList items;
+	if (!_LoadHistory(items))
+		return;
+
+	items.RemoveItems(0, items.CountItems());
+
+	_SaveHistory(items);
+	_FreeHistory(items);
+}
+
+
+void
 Model::FillHistoryMenu(BMenu* menu) const
 {
 	BList items;

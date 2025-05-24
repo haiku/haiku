@@ -33,6 +33,7 @@ enum {
 	MSG_SELECT_HISTORY,
 	MSG_PREV_HISTORY,
 	MSG_NEXT_HISTORY,
+	MSG_CLEAR_HISTORY,
 	MSG_NODE_MONITOR_PULSE,
 	MSG_START_NODE_MONITORING,
 
@@ -70,6 +71,7 @@ public:
 			status_t			SavePrefs();
 
 			void				AddToHistory(const char* text);
+			void				ClearHistory();
 			void				FillHistoryMenu(BMenu* menu) const;
 			BString				GetHistoryItem(int32 index);
 
