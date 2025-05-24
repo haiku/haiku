@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-screenshot-cli	281883787
+1	japanese	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		ウィンドウの枠を含める
 Overwrite	ScreenshotWindow		上書き
 Save in:	ScreenshotWindow		次へ保存:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		デスクトップ
 Artwork folder	ScreenshotWindow		Artwork フォルダー
 Translator Settings	ScreenshotWindow		トランスレーター設定
 Include mouse pointer	ScreenshotWindow		マウスポインターを含める
+Selected area	ScreenshotWindow		選択範囲
 overwrite	ScreenshotWindow		上書き
 Settings…	ScreenshotWindow		設定...
+Select area	ScreenshotWindow		範囲を選択
 Choose folder	ScreenshotWindow		フォルダーの選択
 Name:	ScreenshotWindow		ファイル名:
+Active window	ScreenshotWindow		アクティブウィンドウ
 Choose folder…	ScreenshotWindow		フォルダーの選択...
 Please select	ScreenshotWindow		選択してください
 Failed to save screenshot	ScreenshotWindow		スクリーンショットの保存に失敗しました
 Cancel	ScreenshotWindow		キャンセル
+Whole screen	ScreenshotWindow		画面全体
 Delay:	ScreenshotWindow		取得までの時間:
 Copy to clipboard	ScreenshotWindow		クリップボードへコピー
 screenshot	Screenshot	Base filename of screenshot files	スクリーンショット

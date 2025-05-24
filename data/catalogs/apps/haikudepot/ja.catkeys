@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2029495331
+1	japanese	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
@@ -45,10 +45,13 @@ Click a package to view information	PackageInfoView		パッケージをクリッ
 Cancel	UserLoginWindow		中止
 Rating not possible	MainWindow		評価不能
 Package update error	MainWindow		パッケージアップデートエラー
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	ここをクリック
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# プロセス} other{# プロセス}}
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		パッケージのユーザー評価を取得中
 Reboot required	PackageManager		再起動が必要です
 All packages	PackageListView		すべてのパッケージ
 Send	RatePackageWindow		送信する
+Creating package list…	FeaturedPackagesView		パッケージリストを作成中…
 Start package daemon	App		パッケージデーモンの起動
 There are problems in the supplied data:	UserLoginWindow		入力されたデータに問題があります:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		ユーザー '%Nickname%' は利用条件に同意していません。
@@ -161,6 +164,7 @@ Contents	PackageInfoView		内容
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		匿名の使用データーを HaikuDepotServer とシェアする
 Close	PackageManager		閉じる
 Changelog	PackageInfoView		変更履歴
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	してすべてのパッケージを探す。
 About	PackageInfoView		パッケージについて
 Password requirements download problem	UserLoginWindow		パスワード要件ダウンロード不具合
 Password:	UserLoginWindow		パスワード:
@@ -224,6 +228,7 @@ Category:	FilterView		分類:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	パッケージ %s をアンインストール\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		リモートリポジトリデータの取得中
 Description	PackageListView		説明
+No results? 	FeaturedPackagesView		見つかりませんか? 
 User creation error	UserLoginWindow		ユーザー作成エラー
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージの評価前にアカウントにログインする必要があります。
 Cleaning up…	ShuttingDownWindow		クリーンアップしています…
