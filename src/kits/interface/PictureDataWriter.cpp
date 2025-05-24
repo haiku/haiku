@@ -496,12 +496,10 @@ PictureDataWriter::WriteDrawString(const BPoint& where, const char* string,
 		EndOp();
 
 		BeginOp(B_PIC_DRAW_STRING);
+		Write<int32>(length);
+		WriteData(string, length);
 		Write<float>(escapement.space);
 		Write<float>(escapement.nonspace);
-		//WriteData(string, length + 1);
-			// TODO: is string 0 terminated? why is length given?
-		WriteData(string, length);
-		Write<uint8>(0);
 		EndOp();
 	} catch (status_t& status) {
 		return status;
@@ -521,8 +519,8 @@ PictureDataWriter::WriteDrawString(const char* string,
 		for (int32 i = 0; i < locationCount; i++) {
 			Write<BPoint>(locations[i]);
 		}
+		Write<int32>(length);
 		WriteData(string, length);
-		Write<uint8>(0);
 		EndOp();
 	} catch (status_t& status) {
 		return status;
@@ -734,8 +732,10 @@ PictureDataWriter::WriteSetFontFamily(const font_family family)
 {
 	try {
 		BeginOp(B_PIC_SET_FONT_FAMILY);
-		WriteData(family, strlen(family));
-		Write<uint8>(0);
+		// BeOS writes string size including terminating null character for some reason.
+		uint32 length = strlen(family) + 1;
+		Write<uint32>(length);
+		WriteData(family, length);
 		EndOp();
 	} catch (status_t& status) {
 		return status;
@@ -750,8 +750,10 @@ PictureDataWriter::WriteSetFontStyle(const font_style style)
 {
 	try {
 		BeginOp(B_PIC_SET_FONT_STYLE);
-		WriteData(style, strlen(style));
-		Write<uint8>(0);
+		// BeOS writes string size including terminating null character for some reason.
+		uint32 length = strlen(style) + 1;
+		Write<uint32>(length);
+		WriteData(style, length);
 		EndOp();
 	} catch (status_t& status) {
 		return status;

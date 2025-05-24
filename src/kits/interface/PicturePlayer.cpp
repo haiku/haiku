@@ -1202,18 +1202,19 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 			case B_PIC_DRAW_STRING:
 			{
+				const int32* length;
+				const char* string;
 				const float* escapementSpace;
 				const float* escapementNonSpace;
-				const char* string;
-				size_t length;
 				if (callbacks.draw_string == NULL
+					|| !reader.Get(length)
+					|| !reader.Get(string, *length)
 					|| !reader.Get(escapementSpace)
-					|| !reader.Get(escapementNonSpace)
-					|| !reader.GetRemaining(string, length)) {
+					|| !reader.Get(escapementNonSpace)) {
 					break;
 				}
 
-				callbacks.draw_string(userData, string, length,
+				callbacks.draw_string(userData, string, *length,
 					*escapementSpace, *escapementNonSpace);
 				break;
 			}
@@ -1222,16 +1223,17 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const uint32* pointCount;
 				const BPoint* pointList;
+				const int32* length;
 				const char* string;
-				size_t length;
 				if (callbacks.draw_string_locations == NULL
 					|| !reader.Get(pointCount)
 					|| !reader.Get(pointList, *pointCount)
-					|| !reader.GetRemaining(string, length)) {
+					|| !reader.Get(length)
+					|| !reader.Get(string, *length)) {
 					break;
 				}
 
-				callbacks.draw_string_locations(userData, string, length,
+				callbacks.draw_string_locations(userData, string, *length,
 					pointList, *pointCount);
 				break;
 			}
@@ -1454,27 +1456,29 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 			case B_PIC_SET_FONT_FAMILY:
 			{
+				const int32* length;
 				const char* family;
-				size_t length;
 				if (callbacks.set_font_family == NULL
-					|| !reader.GetRemaining(family, length)) {
+					|| !reader.Get(length)
+					|| !reader.Get(family, *length)) {
 					break;
 				}
 
-				callbacks.set_font_family(userData, family, length);
+				callbacks.set_font_family(userData, family, *length);
 				break;
 			}
 
 			case B_PIC_SET_FONT_STYLE:
 			{
+				const int32* length;
 				const char* style;
-				size_t length;
 				if (callbacks.set_font_style == NULL
-					|| !reader.GetRemaining(style, length)) {
+					|| !reader.Get(length)
+					|| !reader.Get(style, *length)) {
 					break;
 				}
 
-				callbacks.set_font_style(userData, style, length);
+				callbacks.set_font_style(userData, style, *length);
 				break;
 			}
 
