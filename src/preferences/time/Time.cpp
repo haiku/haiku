@@ -102,6 +102,7 @@ main(int argc, char** argv)
 	if (argc > 1) {
 		if (strcmp(argv[1], "--update") != 0) {
 			fprintf(stderr, "Usage: %s [--update]\n", argv[0]);
+			fprintf(stderr, "    --update    Optionally force an NTP clock sync and exit\n\n");
 			return 0;
 		}
 
