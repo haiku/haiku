@@ -212,15 +212,15 @@ Inode::LookUp(const char* name, ino_t* id)
 			entry = entriesList.GetNext(entry);
 		}
 		if (entry != NULL) {
-			// we are skipping ChildAdded(); verify that it is not needed because the InoIdMap
-			// already has this entry
+			// Verify that the InoIdMap already has an entry for this inode.
+			// If not, we need to get the file handle from the server and call ChildAdded().
 			FileInfo info;
 			result = fFileSystem->InoIdMap()->GetFileInfo(&info, entry->fNode);
-			ASSERT(result == B_OK);
-
-			*id = entry->fNode;
-			fCache->Unlock();
-			return B_OK;
+			if (result == B_OK) {
+				*id = entry->fNode;
+				fCache->Unlock();
+				return B_OK;
+			}
 		}
 	}
 	fCache->Unlock();
@@ -265,6 +265,7 @@ Inode::Link(Inode* dir, const char* name)
 
 	fFileSystem->Root()->MakeInfoInvalid();
 	fInfo.fNames->AddName(dir->fInfo.fNames, name);
+	fMetaCache.InvalidateStat();
 
 	dir->fCache->Lock();
 	if (dir->fCache->Valid()) {
@@ -385,7 +386,24 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 	if (oldID != NULL)
 		*oldID = FileIdToInoT(oldFileID);
 
-	DirectoryCache* cache = attribute ? from->fAttrCache : from->fCache;
+	DirectoryCache* cache = NULL;
+	if (*oldID != 0) {
+		// If we overwrote an existing file, remove the DirectoryCache entry of
+		// the overwritten file, which now contains an incorrect inode value.
+		cache = attribute ? to->fAttrCache : to->fCache;
+		cache->Lock();
+		if (cache->Valid()) {
+			if (toChange.fAtomic
+				&& (cache->ChangeInfo() == toChange.fBefore)) {
+				cache->RemoveEntry(toName);
+			} else {
+				cache->Trash();
+			}
+		}
+		cache->Unlock();
+	}
+
+	cache = attribute ? from->fAttrCache : from->fCache;
 	cache->Lock();
 	if (cache->Valid()) {
 		if (fromChange.fAtomic && cache->ChangeInfo() == fromChange.fBefore) {

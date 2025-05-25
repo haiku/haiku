@@ -341,9 +341,12 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 	if (node == fs->Root())
 		return B_OK;
 
-	// Verify that all known names have been unlinked.
-	FileInfo fileInfo;
-	ASSERT(fs->InoIdMap()->GetFileInfo(&fileInfo, vti->ID()) == B_ENTRY_NOT_FOUND);
+	// Unless the file was deleted by someone else, verify that all known names have been
+	// unlinked.
+	if (node->IsStale() == false) {
+		FileInfo fileInfo;
+		ASSERT(fs->InoIdMap()->GetFileInfo(&fileInfo, vti->ID()) == B_ENTRY_NOT_FOUND);
+	}
 
 	delete vti;
 
