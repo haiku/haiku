@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2023, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2025, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -1695,7 +1695,7 @@ TermView::MessageReceived(BMessage *message)
 			// This message originates from the system clipboard. Overwrite
 			// the contents of the mouse clipboard with the ones from the
 			// system clipboard, in case it contains text data.
-			if (be_clipboard->Lock()) {
+			if (be_clipboard != fMouseClipboard && be_clipboard->Lock()) {
 				if (fMouseClipboard->Lock()) {
 					BMessage* clipMsgA = be_clipboard->Data();
 					const char* text;
