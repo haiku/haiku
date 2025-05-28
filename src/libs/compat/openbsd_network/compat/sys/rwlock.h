@@ -58,9 +58,18 @@ rw_enter_write(struct rwlock* rwl)
 }
 
 static inline void
-rw_exit(struct rwlock* rwl)
+rw_exit_write(struct rwlock* rwl)
 {
 	rw_lock_write_unlock(&rwl->lock);
+}
+
+static inline void
+rw_exit(struct rwlock* rwl)
+{
+	if (rwl->lock.holder == find_thread(NULL))
+		rw_lock_write_unlock(&rwl->lock);
+	else
+		rw_lock_read_unlock(&rwl->lock);
 }
 
 static inline void
