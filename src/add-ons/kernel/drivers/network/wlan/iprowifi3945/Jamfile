@@ -1,24 +1,22 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan iprowifi3945 ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
-	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat openbsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat openbsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ]
-	-Wno-format
-	-Wno-unused
-	-Wno-uninitialized ;
+SubDirCcFlags [ FDefines _KERNEL=1 _XOPEN_SOURCE ]
+	-Wno-unused -Wno-sign-compare ;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) dev wpi ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev pci ] ;
 
 KernelAddon iprowifi3945 :
 	if_wpi.c
 	glue.c
 	:
-	freebsd_wlan.a
+	openbsd_wlan.a
 	libfreebsd_network.a
 	;
