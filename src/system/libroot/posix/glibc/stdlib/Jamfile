@@ -34,6 +34,13 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			random_r.c
 			seed48.c
 			srand48.c
+			strtod.c
+			strtold.c
+			strtof.c
+			strtol.c
+			strtoll.c
+			strtoul.c
+			strtoull.c
 
 			# These are nonstandard but were declared in BeOS's headers.
 			erand48_r.c

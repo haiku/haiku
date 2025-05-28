@@ -12,11 +12,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ecvt.c
 			fcvt.c
 			gcvt.c
-
-			strtod.c
-			strtol.c
-			wcstod.c
-			wcstol.c
 			;
 	}
 }
