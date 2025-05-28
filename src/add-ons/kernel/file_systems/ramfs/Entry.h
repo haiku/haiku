@@ -29,15 +29,12 @@ public:
 	inline void SetParent(Directory *parent)	{ fParent = parent; }
 	Directory *GetParent() const				{ return fParent; }
 
-//	inline void SetNode(Node *node)				{ fNode = node; }
 	status_t Link(Node *node);
 	status_t Unlink();
 	Node *GetNode() const						{ return fNode; }
 
 	status_t SetName(const char *newName);
 	inline const char *GetName() const			{ return fName.GetString(); }
-
-//	inline Volume *GetVolume() const			{ return fVolume; }
 
 	inline DoublyLinkedListLink<Entry> *GetReferrerLink()
 		{ return &fReferrerLink; }
@@ -57,6 +54,7 @@ private:
 	Node					*fNode;
 	String					fName;
 	DoublyLinkedListLink<Entry>		fReferrerLink;
+
 	// iterator management
 	DoublyLinkedList<EntryIterator>	fIterators;
 };

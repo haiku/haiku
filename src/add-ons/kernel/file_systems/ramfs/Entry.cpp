@@ -36,7 +36,7 @@ Entry::InitCheck() const
 	return (fName.GetString() ? B_OK : B_NO_INIT);
 }
 
-// Link
+
 status_t
 Entry::Link(Node *node)
 {
@@ -45,25 +45,28 @@ Entry::Link(Node *node)
 	if (node == fNode)
 		return B_OK;
 
-	// We first link to the new node and then unlink the old one.
-	Node *oldNode = fNode;
-	status_t error = node->Link(this);
-	if (error == B_OK) {
+	// We can only be linked to one Node at a time, so force callers
+	// to decide what to do when we're already linked to a Node.
+	if (fNode != NULL)
+		return B_BAD_VALUE;
+
+	status_t status = node->Link(this);
+	if (status == B_OK)
 		fNode = node;
-		if (oldNode)
-			oldNode->Unlink(this);
-	}
-	return error;
+	return status;
 }
 
-// Unlink
+
 status_t
 Entry::Unlink()
 {
-	status_t error = (fNode ? B_OK : B_BAD_VALUE);
-	if (error == B_OK && (error = fNode->Unlink(this)) == B_OK)
+	if (fNode == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = fNode->Unlink(this);
+	if (status == B_OK)
 		fNode = NULL;
-	return error;
+	return status;
 }
 
 // SetName

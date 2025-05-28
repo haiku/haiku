@@ -622,9 +622,10 @@ ramfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char *oldName,
 				error = oldDir->DeleteEntry(entry);
 				if (error == B_OK) {
 					// create the new one/relink the target entry
-					if (clobberEntry)
+					if (clobberEntry != NULL) {
+						clobberEntry->Unlink();
 						error = clobberEntry->Link(node);
-					else
+					} else
 						error = newDir->CreateEntry(node, newName);
 
 					if (error == B_OK) {
