@@ -151,7 +151,9 @@ DataContainer::Resize(off_t newSize)
 				return error;
 
 			AutoLocker<VMCache> _(fCache);
-			fCache->Resize(newSize, VM_PRIORITY_USER);
+			error = fCache->Resize(newSize, VM_PRIORITY_USER);
+			if (error != B_OK)
+				return error;
 
 			// pages will be added as they are written to; so nothing else
 			// needs to be done here.
