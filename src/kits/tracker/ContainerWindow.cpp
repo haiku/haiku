@@ -1809,7 +1809,8 @@ BContainerWindow::AddWindowMenu(BMenu* menu)
 	menu->AddItem(Shortcuts()->CloseAllInWorkspaceItem());
 	menu->AddSeparatorItem();
 
-	item = new BMenuItem("Preferences" B_UTF8_ELLIPSIS, new BMessage(kShowSettingsWindow), ',');
+	item = new BMenuItem(B_TRANSLATE("Preferences" B_UTF8_ELLIPSIS),
+		new BMessage(kShowSettingsWindow), ',');
 	item->SetTarget(be_app);
 	menu->AddItem(item);
 }
