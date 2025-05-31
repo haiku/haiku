@@ -677,7 +677,7 @@ TShortcuts::ReverseOrderLabel()
 BMenuItem*
 TShortcuts::SelectItem()
 {
-	return new BMenuItem(SelectLabel(), new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY);
+	return new BMenuItem(SelectLabel(), new BMessage(kShowSelectionWindow), 'A');
 }
 
 

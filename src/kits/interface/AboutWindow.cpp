@@ -527,7 +527,7 @@ BAboutWindow::AddSpecialThanks(const char** thanks)
 	if (thanks == NULL)
 		return;
 
-	const char* specialThanks = B_TRANSLATE_MARK("Special Thanks:");
+	const char* specialThanks = B_TRANSLATE_MARK("Special thanks:");
 	specialThanks = gSystemCatalog.GetString(specialThanks, "AboutWindow");
 
 	AddText(specialThanks, thanks);
