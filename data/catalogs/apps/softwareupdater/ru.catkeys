@@ -19,7 +19,7 @@ to	SoftwareUpdaterWindow	List item text	до
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Попытка отменить обновления…
 Contacting software repositories to check for package updates.	CheckManager		Устанавливаем связь с репозиториями для проверки обновлений.
 Available updates found	CheckManager		Найдены доступные обновления
-from repository	SoftwareUpdaterWindow	List item text	из репозитория
+from repository	SoftwareUpdaterWindow	List item text	из репозитария
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Проверка репозиториев на наличие обновлений.
 Cancelling updates	SoftwareUpdaterWindow		Отмена обновлений
 Cancel	SoftwareUpdaterWindow	Alert button label	Отмена

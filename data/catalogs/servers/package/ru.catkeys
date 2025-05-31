@@ -6,7 +6,7 @@ solution %d:	PackageProblem	Don't change the %d variable	решение %d:
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Были обнаружены следующие проблемы. Пожалуйста выберите решение для каждой:
 Apply changes	PackageResult		Применить изменения
 Package daemon	PackageManager		Пакетный демон
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	установить пакет %s из репозитория %s\n
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	установить пакет %s из репозитария %s\n
 The following additional package changes have to be made:	PackageResult		Следующие изменения должны быть сделаны:
 Warning	PackageManager		Предупреждение
 Cancel	PackageProblem		Отмена

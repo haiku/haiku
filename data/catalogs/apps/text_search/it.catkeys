@@ -12,9 +12,9 @@ OK	GrepWindow		OK
 Close	GrepWindow		Chiudi
 Look in sub-folders	GrepWindow		Cerca nelle sotto-cartelle
 %s: Not enough room to escape the filename.	Grepper		%s: Non c'è abbastanza spazio per ripulire il nome del file.
+Text files only	GrepWindow		Solo file di testo
 Follow symbolic links	GrepWindow		Segui collegamenti simbolici
 Regular expression	GrepWindow		Espressione regolare
-Text files only	GrepWindow		Solo file di testo
 Quit	GrepWindow		Esci
 Show files in Tracker	GrepWindow		Mostra i file nel Tracker
 Please select the files you wish to keep searching.	GrepWindow		Seleziona i file sui quali desideri continuare la ricerca.

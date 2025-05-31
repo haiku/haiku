@@ -10,8 +10,8 @@ OK	GrepWindow		ОК
 Close	GrepWindow		Закрыць
 Look in sub-folders	GrepWindow		Глядзець у даччыных каталогах
 %s: Not enough room to escape the filename.	Grepper		%s: Не хапае месца для перадання імя файла.
-Follow symbolic links	GrepWindow		Прытрымлівацца сімвалічных спасылак
 Text files only	GrepWindow		Толькі тэкставыя файлы
+Follow symbolic links	GrepWindow		Прытрымлівацца сімвалічных спасылак
 Quit	GrepWindow		Выйсці
 Show files in Tracker	GrepWindow		Паказаць файлы ў Трэкеры
 Please select the files you wish to keep searching.	GrepWindow		Калі ласка, выберыце файлы, якія жадаеце шукаць далей.

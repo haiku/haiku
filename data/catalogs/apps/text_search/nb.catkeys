@@ -12,9 +12,9 @@ OK	GrepWindow		OK
 Close	GrepWindow		Lukk
 Look in sub-folders	GrepWindow		Se i undermapper
 %s: Not enough room to escape the filename.	Grepper		%s: Ikke nok rom til å avslutte filenavnet.
+Text files only	GrepWindow		Kun tekstfiler
 Follow symbolic links	GrepWindow		Følg symbolske lenker
 Regular expression	GrepWindow		Regulært uttrykk
-Text files only	GrepWindow		Kun tekstfiler
 Quit	GrepWindow		Avslutt
 Show files in Tracker	GrepWindow		Vis filer i Tracker
 Please select the files you wish to keep searching.	GrepWindow		Vennligst velg filene du ønsker å fortsette å søke gjennom.

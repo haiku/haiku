@@ -12,9 +12,9 @@ OK	GrepWindow		Bone
 Close	GrepWindow		Fermi
 Look in sub-folders	GrepWindow		Serĉi en subdosierujojn
 %s: Not enough room to escape the filename.	Grepper		%s: Spaco ne sufiĉas por eskapi la dosiernomon.
+Text files only	GrepWindow		Nur tekstaj dosieroj
 Follow symbolic links	GrepWindow		Sekvi simbolajn ligilojn
 Regular expression	GrepWindow		Regula esprimo
-Text files only	GrepWindow		Nur tekstaj dosieroj
 Quit	GrepWindow		Ĉesi
 Show files in Tracker	GrepWindow		Montri dosierojn en Spurilo
 Please select the files you wish to keep searching.	GrepWindow		Bonvolu elekti la dosierojn, por kiuj vi volus daŭrigi serĉadon.

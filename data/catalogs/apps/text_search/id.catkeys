@@ -12,9 +12,9 @@ OK	GrepWindow		Oke
 Close	GrepWindow		Tutup
 Look in sub-folders	GrepWindow		Lihat di sub-folder
 %s: Not enough room to escape the filename.	Grepper		%s: Tidak cukup ruang untuk lepas dari nama file.
+Text files only	GrepWindow		Hanya file teks
 Follow symbolic links	GrepWindow		Ikuti tautan simbolik
 Regular expression	GrepWindow		Regular expression
-Text files only	GrepWindow		Hanya file teks
 Quit	GrepWindow		Berhenti
 Show files in Tracker	GrepWindow		Tampilkan file di Tracker
 Please select the files you wish to keep searching.	GrepWindow		Silakan pilih file yang ingin Anda cari.

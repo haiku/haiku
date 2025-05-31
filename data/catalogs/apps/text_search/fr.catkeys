@@ -12,9 +12,9 @@ OK	GrepWindow		OK
 Close	GrepWindow		Fermer
 Look in sub-folders	GrepWindow		Regarder dans les sous-dossiers
 %s: Not enough room to escape the filename.	Grepper		%s: Pas assez de place pour coder le nom du fichier.
+Text files only	GrepWindow		Seulement les fichiers texte
 Follow symbolic links	GrepWindow		Suivre les liens symboliques
 Regular expression	GrepWindow		Expression régulière
-Text files only	GrepWindow		Seulement les fichiers texte
 Quit	GrepWindow		Quitter
 Show files in Tracker	GrepWindow		Montrer les fichiers dans le Tracker
 Please select the files you wish to keep searching.	GrepWindow		Veuillez sélectionnez les fichiers dans lesquels vous souhaitez continuer à scruter.

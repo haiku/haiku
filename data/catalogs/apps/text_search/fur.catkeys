@@ -12,9 +12,9 @@ OK	GrepWindow		Va ben
 Close	GrepWindow		Siere
 Look in sub-folders	GrepWindow		Cîr tes sot-cartelis
 %s: Not enough room to escape the filename.	Grepper		%s: No'nd è vonde spazi par evitâ il non dal file.
+Text files only	GrepWindow		Dome files di test
 Follow symbolic links	GrepWindow		Seguìs i colegaments simbolics
 Regular expression	GrepWindow		Espression regolâr
-Text files only	GrepWindow		Dome files di test
 Quit	GrepWindow		Jes
 Show files in Tracker	GrepWindow		Mostre i files tal Tracker
 Please select the files you wish to keep searching.	GrepWindow		Selezione i files là che tu desideris continuâ la ricercje. 

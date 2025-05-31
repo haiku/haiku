@@ -12,9 +12,9 @@ OK	GrepWindow		OK
 Close	GrepWindow		Fechar
 Look in sub-folders	GrepWindow		Procurar nas subpastas
 %s: Not enough room to escape the filename.	Grepper		%s: Espaço insuficiente para codificar o nome do ficheiro.
+Text files only	GrepWindow		Apenas ficheiros de texto
 Follow symbolic links	GrepWindow		Seguir ligações simbólicas
 Regular expression	GrepWindow		Expressão regular
-Text files only	GrepWindow		Apenas ficheiros de texto
 Quit	GrepWindow		Sair
 Show files in Tracker	GrepWindow		Mostrar ficheiros no Tracker
 Please select the files you wish to keep searching.	GrepWindow		Por favor selecione os ficheiros nos quais pretende continuar a procurar.

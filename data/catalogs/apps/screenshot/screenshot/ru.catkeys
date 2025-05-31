@@ -1,8 +1,8 @@
-1	russian	x-vnd.haiku-screenshot-cli	281883787
+1	russian	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		Включая заголовок окна
 Overwrite	ScreenshotWindow		Перезаписать
 Save in:	ScreenshotWindow		Сохранить в:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Ошибка при сохранении \"%s\":\n\t%s
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Ошибка при сохранении \«%s\»:\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Этот файл уже существует.\nВы уверены, что хотите перезаписать его?
 OK	ScreenshotWindow		ОК
 The destination path exists but is not a folder.	ScreenshotWindow		Путь назначения существует, но не является папкой.
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Рабочий стол
 Artwork folder	ScreenshotWindow		Папку artwork
 Translator Settings	ScreenshotWindow		Настройки транслятора
 Include mouse pointer	ScreenshotWindow		Включая курсор
+Selected area	ScreenshotWindow		Область экрана
 overwrite	ScreenshotWindow		перезаписать
 Settings…	ScreenshotWindow		Настройки…
+Select area	ScreenshotWindow		Выделить область
 Choose folder	ScreenshotWindow		Выбрать папку
 Name:	ScreenshotWindow		Имя:
+Active window	ScreenshotWindow		Активное окно
 Choose folder…	ScreenshotWindow		Выбрать папку…
 Please select	ScreenshotWindow		Пожалуйста выберите
 Failed to save screenshot	ScreenshotWindow		Не удалось сохранить снимок экрана
-Cancel	ScreenshotWindow		Отмена
+Cancel	ScreenshotWindow		Отменить
+Whole screen	ScreenshotWindow		Весь экран
 Delay:	ScreenshotWindow		Задержка:
 Copy to clipboard	ScreenshotWindow		Скопировать в буфер
 screenshot	Screenshot	Base filename of screenshot files	снимок экрана

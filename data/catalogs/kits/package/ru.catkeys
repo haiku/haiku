@@ -1,10 +1,10 @@
 1	russian	x-vnd.Haiku-libpackage	134767648
-Fetching repository-cache from %url	RefreshRepositoryRequest		Загрузка кеша репозитория из %url
-Validating checksum for %repositoryName	RefreshRepositoryRequest		Проверка контрольной суммы репозитория %repositoryName
+Fetching repository-cache from %url	RefreshRepositoryRequest		Загрузка кеша репозитария из %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Проверка контрольной суммы репозитария %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Не удалось удалить папку с транзакциями
-Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Не удалось получить конфигурацию для репозитория \"%s\". Пропускаем.
-Refreshing repository \"%s\" failed	PackageManagerKit		Не удалось обновить репозиторий \"%s\"
-Fetching repository checksum from %url	RefreshRepositoryRequest		Загрузка контрольной суммы репозитория из %url
-Failed to get repository names	PackageManagerKit		Не удалось получить имена репозиториев
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Не удалось получить кэш для репозитория \"%s\". Пропускаем.
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Не удалось получить конфигурацию для репозитария \«%s\». Пропускаем.
+Refreshing repository \"%s\" failed	PackageManagerKit		Не удалось обновить репозитарий \«%s\»
+Fetching repository checksum from %url	RefreshRepositoryRequest		Загрузка контрольной суммы репозитария из %url
+Failed to get repository names	PackageManagerKit		Не удалось получить названия репозитариев
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Не удалось получить кэш для репозитария \«%s\». Пропускаем.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Пакет %s-%s не имеет совпадающих требований для своего базового пакета \"%s\"

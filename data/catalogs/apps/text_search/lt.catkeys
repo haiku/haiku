@@ -10,8 +10,8 @@ OK	GrepWindow		Gerai
 Close	GrepWindow		Užverti
 Look in sub-folders	GrepWindow		Ieškoti poaplankiuose
 %s: Not enough room to escape the filename.	Grepper		%s: Trūksta vietos kaitos ženklams failo varde.
-Follow symbolic links	GrepWindow		Sekti simbolinėmis nuorodomis
 Text files only	GrepWindow		Ieškoti tik tekstiniuose failuose
+Follow symbolic links	GrepWindow		Sekti simbolinėmis nuorodomis
 Quit	GrepWindow		Baigti darbą
 Show files in Tracker	GrepWindow		Parodyti failus Pėdsekyje
 Please select the files you wish to keep searching.	GrepWindow		Pažymėkite failus, kuriuose norite tęsti paiešką.

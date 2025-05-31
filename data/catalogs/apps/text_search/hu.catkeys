@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku.TextSearch	1757850908
+1	hungarian	x-vnd.Haiku.TextSearch	3471063634
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Válassza ki azokat a fájlokat a Nyomkövetőben, melyek kijelölésre kerüljenek.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Az xargs indítása sikertelen!
@@ -11,13 +11,15 @@ OK	GrepWindow		Rendben
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Bezárás
 Look in sub-folders	GrepWindow		Keresés almappákban is
+File filter:	GrepWindow		Fájl szűrő:
 %s: Not enough room to escape the filename.	Grepper		%s: Nincs elég hely kihagyni a fájlnevet.
+Text files only	GrepWindow		Csak szövegfájlokban
 Follow symbolic links	GrepWindow		Szimbolikus linkek követése
 Regular expression	GrepWindow		Reguláris kifejezés
-Text files only	GrepWindow		Csak szövegfájlokban
 Quit	GrepWindow		Kilépés
 Show files in Tracker	GrepWindow		Fájlok megjelenítése a Nyomkövetőben
 Please select the files you wish to keep searching.	GrepWindow		Kérlek válaszd ki azokat a fájlokat amelyekben folytatni kívánod a keresést.
+Only search files matching the given pattern, e.g. \"*.h\".	GrepWindow		Csak az adott mintára történő szűrés, pl. \"*.h\".
 Trim to selection	GrepWindow		Kijelölés kivágása
 Set target…	GrepWindow		Cél megadása…
 Failed to open input pipe!	Grepper		Nem sikerült megnyitni a bementi eszközt

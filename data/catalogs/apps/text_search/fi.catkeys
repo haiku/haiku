@@ -12,9 +12,9 @@ OK	GrepWindow		Valmis
 Close	GrepWindow		Sulje
 Look in sub-folders	GrepWindow		Etsi alikansioista
 %s: Not enough room to escape the filename.	Grepper		%s: Ei kylliksi tilaa tiedostonimen ohittamiseen.
+Text files only	GrepWindow		Vain tekstitiedostot
 Follow symbolic links	GrepWindow		Seuraa symbolisia linkkejä
 Regular expression	GrepWindow		Säännöllinen lauseke
-Text files only	GrepWindow		Vain tekstitiedostot
 Quit	GrepWindow		Poistu
 Show files in Tracker	GrepWindow		Näytä tiedostot Seuraajassa
 Please select the files you wish to keep searching.	GrepWindow		Valitse tiedostot, jotka haluat pitää etsinnässä.

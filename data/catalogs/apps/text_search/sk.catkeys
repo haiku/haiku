@@ -10,8 +10,8 @@ OK	GrepWindow		OK
 Close	GrepWindow		Zatvoriť
 Look in sub-folders	GrepWindow		Hľadať v podpriečinkoch
 %s: Not enough room to escape the filename.	Grepper		%s: nedostatok miesta na vloženie únikových klauzúl do názvu súboru.
-Follow symbolic links	GrepWindow		Nasledovať symbolické odkazy
 Text files only	GrepWindow		Iba textové súbory
+Follow symbolic links	GrepWindow		Nasledovať symbolické odkazy
 Quit	GrepWindow		Ukončiť
 Show files in Tracker	GrepWindow		Zobraziť súbory v Trackeri
 Please select the files you wish to keep searching.	GrepWindow		Prosím, vyberte súbory, v ktorých chcete ďalej hľadať.

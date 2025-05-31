@@ -12,9 +12,9 @@ OK	GrepWindow		確認
 Close	GrepWindow		關閉
 Look in sub-folders	GrepWindow		在子資料夾中尋找
 %s: Not enough room to escape the filename.	Grepper		%s：沒有足夠的空間來轉義檔名。
+Text files only	GrepWindow		僅文字檔案
 Follow symbolic links	GrepWindow		遵循符號鏈結
 Regular expression	GrepWindow		正規表示式
-Text files only	GrepWindow		僅文字檔案
 Quit	GrepWindow		退出
 Show files in Tracker	GrepWindow		在Tracker中顯示檔案
 Please select the files you wish to keep searching.	GrepWindow		請選擇您想要繼續搜尋的檔案。

@@ -1,6 +1,6 @@
 1	russian	x-vnd.Haiku-libsolvsolver	3404387783
 allow architecture change of %source% to %target%	SolverProblemSolution		разрешить изменение архитектуры пакета с %source% на %target%
-install %source% from excluded repository	SolverProblemSolution		установить пакет %source% из исключённого репозитория
+install %source% from excluded repository	SolverProblemSolution		установить пакет %source% из исключённого репозитария
 unspecified problem	SolverProblem		неопределенная проблема
 package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		пакету %source%, требуется %dependency%, но ни один из его поставщиков не может быть установлен
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		пакет %source% имеет устаревшую зависимость %dependency% предоставленную пакетом %target%
@@ -17,7 +17,7 @@ allow downgrade of %source% to %target%	SolverProblemSolution		позволит�
 dependency problem	SolverProblem		проблема с зависимостью
 %dependency% is provided by the system	SolverProblem		%dependency% предоставляется системой
 keep %source% despite its inferior architecture	SolverProblemSolution		оставить %source% не смотря на его архитектуру
-%source% does not belong to a distupgrade repository	SolverProblem		пакет %source% не принадлежит к репозиторию обновления дистрибутива
+%source% does not belong to a distupgrade repository	SolverProblem		пакет %source% не принадлежит к репозитарию обновления дистрибутива
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		установленный пакет %source% делает %dependency% устаревшим предоставленную %target%
 allow name change of %source% to %target%	SolverProblemSolution		разрешить изменение имени пакета с %source% на %target%
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		пакет %source% конфликтует с %dependency% предоставляемым %target%
@@ -27,7 +27,7 @@ cannot install both %source% and %target%	SolverProblem		невозможно у
 package %source% is not installable	SolverProblem		пакет %source% невозможно установить
 problem with installed package %source%	SolverProblem		проблема с установленным пакетом %source%
 allow deinstallation of %source%	SolverProblemSolution		разрешить удаление пакета %source%
-keep %source% from excluded repository	SolverProblemSolution		оставить пакет %source% из исключенного репозитория
+keep %source% from excluded repository	SolverProblemSolution		оставить пакет %source% из исключенного репозитария
 keep old %source%	SolverProblemSolution		оставить старый пакет %source%
 package %source% conflicts with %dependency% provided by itself	SolverProblem		пакет %source% конфликтует с %dependency% предоставленным самим собой
 allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		разрешить смену поставщика с \"%sourceVendor%\" (%source%) на \"%targetVendor%\" (%target%)

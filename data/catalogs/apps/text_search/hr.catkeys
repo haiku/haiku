@@ -9,8 +9,8 @@ OK	GrepWindow		Uredu
 Close	GrepWindow		Zatvori
 Look in sub-folders	GrepWindow		Pogledaj u podmape
 %s: Not enough room to escape the filename.	Grepper		%s: Nedovoljno prostora za izbjegavanje imena datoteke.
-Follow symbolic links	GrepWindow		Slijedi simboličke poveznice
 Text files only	GrepWindow		Samo tekstualne datoteke
+Follow symbolic links	GrepWindow		Slijedi simboličke poveznice
 Quit	GrepWindow		Isključi
 Show files in Tracker	GrepWindow		Prikaži datoteke u Tracker-u
 Please select the files you wish to keep searching.	GrepWindow		Odaberite datoteke koje želite nastaviti tražiti.

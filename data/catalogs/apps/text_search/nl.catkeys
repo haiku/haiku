@@ -12,9 +12,9 @@ OK	GrepWindow		Oké
 Close	GrepWindow		Sluiten
 Look in sub-folders	GrepWindow		In submappen zoeken
 %s: Not enough room to escape the filename.	Grepper		%s: Niet genoeg ruimte om de bestandsnaam om te vormen.
+Text files only	GrepWindow		Alleen tekstbestanden
 Follow symbolic links	GrepWindow		Symbolische koppelingen volgen
 Regular expression	GrepWindow		Reguliere expressie
-Text files only	GrepWindow		Alleen tekstbestanden
 Quit	GrepWindow		Afsluiten
 Show files in Tracker	GrepWindow		Toon bestanden in Tracker
 Please select the files you wish to keep searching.	GrepWindow		Selecteer alstublieft de bestanden waarin u wilt blijven zoeken. 

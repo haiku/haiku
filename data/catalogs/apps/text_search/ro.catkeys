@@ -12,9 +12,9 @@ OK	GrepWindow		OK
 Close	GrepWindow		Închide
 Look in sub-folders	GrepWindow		Caută în sub-dosare
 %s: Not enough room to escape the filename.	Grepper		%s: Nu este suficient spațiu pentru a escapa numele de fișier.
+Text files only	GrepWindow		Doar fișiere text
 Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
 Regular expression	GrepWindow		Expresie regulată
-Text files only	GrepWindow		Doar fișiere text
 Quit	GrepWindow		Ieșire
 Show files in Tracker	GrepWindow		Arată fișierele în Tracker
 Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.

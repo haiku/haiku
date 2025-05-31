@@ -12,9 +12,9 @@ OK	GrepWindow		确定
 Close	GrepWindow		关闭
 Look in sub-folders	GrepWindow		在子目录中搜索
 %s: Not enough room to escape the filename.	Grepper		%s：没有足够的空间以消除文件名。
+Text files only	GrepWindow		仅文本文件
 Follow symbolic links	GrepWindow		对符号链接有效
 Regular expression	GrepWindow		正则表达式
-Text files only	GrepWindow		仅文本文件
 Quit	GrepWindow		退出
 Show files in Tracker	GrepWindow		在文件浏览器中显示文件
 Please select the files you wish to keep searching.	GrepWindow		请您选择需要进一步搜索的文件。

@@ -1,13 +1,13 @@
 1	ukrainian	x-vnd.Haiku-Sounds	2694258450
 Select	SoundFilePanel		Вибрати
 Sounds	System name		Sounds
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n  Brought to you by:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
-No such file or directory	HEventList		Немає такого файлу або папки
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n  Підтримання і супровід:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Оригінальна розробка Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
+No such file or directory	HEventList		Такого файлу або каталогу не існує
 Other…	HWindow		Інший…
 OK	SoundsHApp		ОК
 Sound file:	HWindow		Звуковий файл:
 <none>	HEventList		<пусто>
-Select a sound file	SoundFilePanel		Вибір файлу звукового супроводу
+Select a sound file	SoundFilePanel		Вибір звукового файлу
 About Sounds	SoundsHApp		Про Sounds
 OK	HEventList		ОК
 Sound	HEventList		Звук

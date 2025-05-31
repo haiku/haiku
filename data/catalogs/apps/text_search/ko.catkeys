@@ -12,9 +12,9 @@ OK	GrepWindow		확인
 Close	GrepWindow		닫기
 Look in sub-folders	GrepWindow		하위 폴더 검색
 %s: Not enough room to escape the filename.	Grepper		%s: 파일이름을 변경할 충분한 공간이 없습니다.
+Text files only	GrepWindow		텍스트 파일만
 Follow symbolic links	GrepWindow		심볼릭 링크 따라가기
 Regular expression	GrepWindow		정규표현식
-Text files only	GrepWindow		텍스트 파일만
 Quit	GrepWindow		종료
 Show files in Tracker	GrepWindow		Tracker에서 파일 보기
 Please select the files you wish to keep searching.	GrepWindow		검색을 계속 진행하고자 하는 파일을 선택하십시오.

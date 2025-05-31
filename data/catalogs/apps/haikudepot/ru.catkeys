@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2555742361
+1	russian	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблемы при загрузке Условий использования
 Available packages	MainWindow		Доступные пакеты
 It was not possible to create the new user.	UserLoginWindow		Не удалось создать нового пользователя.
@@ -45,23 +45,25 @@ Click a package to view information	PackageInfoView		Нажмите на пак�
 Cancel	UserLoginWindow		Отмена
 Rating not possible	MainWindow		Оценка невозможна
 Package update error	MainWindow		Ошибка обновления пакета
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Нажмите здесь
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# процесс} few{# процесса} other{# процессов}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Получение оценок пользователей для пакета (рейтинга)
 Reboot required	PackageManager		Требуется перезагрузка
 All packages	PackageListView		Все пакеты
 Send	RatePackageWindow		Отправить
+Creating package list…	FeaturedPackagesView		Создание списка пакетов…
 Start package daemon	App		Запустить пакетный демон
 There are problems in the supplied data:	UserLoginWindow		Есть проблемы в предоставленных данных:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Пользователь «%Nickname%» не принял Условия использования.
 Usage conditions download problem	UserLoginWindow		Проблема загрузки условий использования
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	установить пакет %s из репозитория %s\n
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	установить пакет %s из репозитария %s\n
 Package daemon problem	App		Проблема с пакетным демоном
 No	MainWindow		Нет
-Repository	PackageListView		Репозиторий
+Repository	PackageListView		Репозитарий
 Close	RatePackageWindow		Закрыть
 Close	UserLoginWindow		Закрыть
 The email is malformed.	UserLoginWindow		Неверный формат адреса электронной почты.
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронизация данных пакетов репозитория «%REPO_NAME%»
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронизация данных пакетов репозитария «%REPO_NAME%»
 View the usage conditions	UserLoginWindow		Показать условия использования
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Произошла ошибка при скачивании условий использования необходимых для создания нового пользователя. \nДля получения более подробных сведений об ошибке можно запустить приложение из Терминала.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Принимаю Условия использования
@@ -110,13 +112,13 @@ Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
 Input validation	UserLoginWindow		Проверка ввода
 Log in…	MainWindow		Войти…
 Client version too old	ServerHelper		Слишком старая версия клиента
-Local repository load error	LocalPkgDataLoadProcess		Ошибка загрузки локального репозитория
+Local repository load error	LocalPkgDataLoadProcess		Ошибка загрузки локального репозитария
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Пользователь не существует или введён неверный пароль. Проверьте свои учётные данные и попробуйте снова.
 All repositories	MainWindow		Все репозитории
-Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
+Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитария
 Network error	ServerHelper		Ошибка сети
 HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
-An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитария: %error%
 User Created	UserLoginWindow		Пользователь создан
 Check for updates…	MainWindow		Проверить обновления…
 Uninstalled	PackageListView		Деинсталлированные
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Содержимое
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Отправлять анонимную статистику на сервер HaikuDepot?
 Close	PackageManager		Закрыть
 Changelog	PackageInfoView		История изменений
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 для поиска среди всех пакетов.
 About	PackageInfoView		О программе
 Password requirements download problem	UserLoginWindow		Проблема с загрузкой требований к паролю
 Password:	UserLoginWindow		Пароль:
@@ -204,7 +207,7 @@ The password has been incorrectly repeated.	UserLoginWindow		Пароль был
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Пароль, ранее предоставленный для пользователя [%Nickname%], в настоящее время недействителен. Будет произведён выход из этого приложения, и Вы должны войти снова с вашим обновлённым паролем.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Ознакомиться с Условиями использования
 OK	ServerHelper		OK
-Reading repository data	LocalPkgDataLoadProcess		Чтение данных репозитория
+Reading repository data	LocalPkgDataLoadProcess		Чтение данных репозитария
 Fatal error	InstallPackageProcess		Критическая ошибка
 A validation error has occurred	ServerHelper		Произошла ошибка валидации
 The nickname is required.	UserLoginWindow		Имя пользователя обязательно.
@@ -223,8 +226,9 @@ Email address:	UserLoginWindow		Email адрес:
 View latest usage conditions…	MainWindow		Показать последние условия использования…
 Category:	FilterView		Категория:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	удалить пакет %s\n
-Fetching remote repository data	LocalRepositoryUpdateProcess		Получение данных удалённого репозитория
+Fetching remote repository data	LocalRepositoryUpdateProcess		Получение данных удалённого репозитария
 Description	PackageListView		Описание
+No results? 	FeaturedPackagesView		Нет результатов? 
 User creation error	UserLoginWindow		Ошибка создания пользователя
 You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.
 Cleaning up…	ShuttingDownWindow		Наводим чистоту…

@@ -12,9 +12,9 @@ OK	GrepWindow		Εντάξει
 Close	GrepWindow		Κλείσιμο
 Look in sub-folders	GrepWindow		Ψάξε στους υποφακέλους
 %s: Not enough room to escape the filename.	Grepper		%s: Δεν υπάρχει αρκετός χώρος για την αποφυγή του ονόματος αρχείου.
+Text files only	GrepWindow		Μόνο αρχεία κειμένου
 Follow symbolic links	GrepWindow		Ακολούθησε τους συμβολικούς δεσμούς
 Regular expression	GrepWindow		Κανονική έκφραση
-Text files only	GrepWindow		Μόνο αρχεία κειμένου
 Quit	GrepWindow		Έξοδος
 Show files in Tracker	GrepWindow		Εμφάνιση των αρχείων στον Ιχνηλάτη
 Please select the files you wish to keep searching.	GrepWindow		Παρακαλώ επιλέξτε τα αρχεία που επιθυμείτε να συνεχίσετε την αναζήτηση.

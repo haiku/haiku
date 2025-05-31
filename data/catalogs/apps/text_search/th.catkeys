@@ -11,9 +11,9 @@ OK	GrepWindow		ตกลง
 Close	GrepWindow		ปิด
 Look in sub-folders	GrepWindow		ดูในโฟลเดอร์ย่อย
 %s: Not enough room to escape the filename.	Grepper		%s: มีพื้นที่ไม่เพียงพอที่จะเปลี่ยนรูปแบบชื่อไฟล์
+Text files only	GrepWindow		ไฟล์ข้อความเท่านั้น
 Follow symbolic links	GrepWindow		ติดตามลิงก์สัญลักษณ์
 Regular expression	GrepWindow		การแสดงออกปกติ
-Text files only	GrepWindow		ไฟล์ข้อความเท่านั้น
 Quit	GrepWindow		ออก
 Show files in Tracker	GrepWindow		แสดงไฟล์ในตัวติดตาม
 Please select the files you wish to keep searching.	GrepWindow		โปรดเลือกไฟล์ที่คุณต้องการค้นหาต่อไป

@@ -12,9 +12,9 @@ OK	GrepWindow		OK
 Close	GrepWindow		Zavřít
 Look in sub-folders	GrepWindow		Dívat se do podsložek
 %s: Not enough room to escape the filename.	Grepper		%s: Málo prostoru pro GREP vypíchnutí jména souboru.
+Text files only	GrepWindow		Pouze textové soubory
 Follow symbolic links	GrepWindow		Následovat symbolické linky
 Regular expression	GrepWindow		Regulární výraz
-Text files only	GrepWindow		Pouze textové soubory
 Quit	GrepWindow		Ukončit
 Show files in Tracker	GrepWindow		Zobrazit soubory v Trackeru
 Please select the files you wish to keep searching.	GrepWindow		Prosím vyberte soubory, které si přejete dále prohledávat.

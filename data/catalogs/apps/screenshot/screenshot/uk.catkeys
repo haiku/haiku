@@ -2,23 +2,23 @@
 Include window border	ScreenshotWindow		Включаючи рамку вікна
 Overwrite	ScreenshotWindow		Перезаписати
 Save in:	ScreenshotWindow		Зберегти в:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Помилка при збереженні \"%s\":\n\t%s
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Помилка при збереженні \«%s\»:\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\n Ви впевнені, що хочете його перезаписати?
 OK	ScreenshotWindow		ОК
 The destination path exists but is not a folder.	ScreenshotWindow		Кінцевий шлях призначення існує, але це не папка.
 Select	ScreenshotWindow		Вибрати
 Save as:	ScreenshotWindow		Зберегти як:
 seconds	ScreenshotWindow		секунд
-New screenshot	ScreenshotWindow		Новий знімок екрана
+New screenshot	ScreenshotWindow		Новий знімок
 Screenshot	System name		Screenshot
 Desktop	ScreenshotWindow		Робочий стіл
 Artwork folder	ScreenshotWindow		Папка Artwork
 Translator Settings	ScreenshotWindow		Налаштування транслятора
 Include mouse pointer	ScreenshotWindow		Включаючи курсор
-Selected area	ScreenshotWindow		Вибрана область
+Selected area	ScreenshotWindow		Область екрана
 overwrite	ScreenshotWindow		перезаписати
 Settings…	ScreenshotWindow		Налаштування…
-Select area	ScreenshotWindow		Вибрати область
+Select area	ScreenshotWindow		Виділити область
 Choose folder	ScreenshotWindow		Вибрати папку
 Name:	ScreenshotWindow		Ім'я:
 Active window	ScreenshotWindow		Активне вікно

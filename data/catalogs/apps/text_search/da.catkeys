@@ -12,9 +12,9 @@ OK	GrepWindow		O.k.
 Close	GrepWindow		Luk
 Look in sub-folders	GrepWindow		Kig i undermapper
 %s: Not enough room to escape the filename.	Grepper		%s: Ikke nok plads til at omkode filnavnet.
+Text files only	GrepWindow		Kun tekstfiler
 Follow symbolic links	GrepWindow		Følg symbolske lænker
 Regular expression	GrepWindow		Regulært udtryk
-Text files only	GrepWindow		Kun tekstfiler
 Quit	GrepWindow		Afslut
 Show files in Tracker	GrepWindow		Vis filer i Tracker
 Please select the files you wish to keep searching.	GrepWindow		Vælg de filer, du vil fortsat søge efter.

@@ -232,4 +232,4 @@ No results? 	FeaturedPackagesView		Безрезультатно
 User creation error	UserLoginWindow		Помилка створення користувача
 You need to be logged into an account before you can rate packages.	MainWindow		Для оцінки пакетів спочатку необхідно авторизуватись.
 Cleaning up…	ShuttingDownWindow		Очищення…
-Repeat password:	UserLoginWindow		Повторіть гасло:
+Repeat password:	UserLoginWindow		Повторіть пароль:

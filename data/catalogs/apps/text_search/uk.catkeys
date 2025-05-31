@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	1757850908
+1	ukrainian	x-vnd.Haiku.TextSearch	3471063634
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Не вдалося запустити програму xargs!
@@ -11,13 +11,15 @@ OK	GrepWindow		ОК
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Закрити
 Look in sub-folders	GrepWindow		Дивитися в підпапках
+File filter:	GrepWindow		Фільтр файлів:
 %s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця щоб екранувати ім'я файлу.
+Text files only	GrepWindow		Тільки текстові файли
 Follow symbolic links	GrepWindow		Переходити за символьними посиланнями
 Regular expression	GrepWindow		Регулярний вираз
-Text files only	GrepWindow		Тільки текстові файли
 Quit	GrepWindow		Вийти
 Show files in Tracker	GrepWindow		Показати файли у Tracker
 Please select the files you wish to keep searching.	GrepWindow		Виберіть файли в яких Ви хочете продовжити пошук.
+Only search files matching the given pattern, e.g. \"*.h\".	GrepWindow		Шукати у файлах відібраних за заданим шаблоном, наприклад, \«*.h\».
 Trim to selection	GrepWindow		Обмежитись вибраним
 Set target…	GrepWindow		Вибрати цільовий об'єкт…
 Failed to open input pipe!	Grepper		Збій при відкритті вхідного каналу!

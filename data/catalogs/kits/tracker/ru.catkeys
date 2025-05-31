@@ -4,8 +4,8 @@ Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
 Open with…	ContainerWindow		Открыть в…
 Kind	ContainerWindow		Тип
-Error moving \"%name\" to Trash. (%error)	FSUtils		Ошибка при перемещении \"%name\" в корзину. (%error)
-Or	FindPanel		или
+Error moving \"%name\" to Trash. (%error)	FSUtils		Ошибка при перемещении \«%name\» в корзину. (%error)
+Or	FindPanel		ИЛИ
 MIME Description	AttributesView		MIME Описание
 Query	FindPanel		Запрос
 before	FindPanel		до
@@ -36,7 +36,7 @@ Size	QueryPoseView		Размер
 Disk mount	TrackerSettingsWindow		Монтирование дисков
 Type	AttributesView		Тип
 Prompt	FSUtils		Спрашивать
-Error in regular expression:\n\n'%errstring'	PoseView		Ошибка в регулярном выражении:\n\n'%errstring'
+Error in regular expression:\n\n'%errstring'	PoseView		Ошибка в регулярном выражении:\n\n«%errstring»
 Small bitmap icon	AttributesView		Малый растровый значок
 Would you like to find a suitable application to open the file?	FSUtils		Хотите найти подходящее приложение для открытия файла?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Невозможно заменить папку или символическую ссылку файлом.
@@ -69,7 +69,7 @@ Junk on end.	libtracker		Нежелательные данные в конце.
 system	B_SYSTEM_DIRECTORY		Система
 Preparing to delete items…	StatusWindow		Подготовка к удалению файлов…
 Open %name with:	OpenWithWindow		Открыть %name с помощью:
-\"%name\" is an unsupported executable.	FSUtils		\"%name\" неподдерживаемый исполняемый файл.
+\"%name\" is an unsupported executable.	FSUtils		\«%name\» неподдерживаемый исполняемый файл.
 You cannot copy or move the root directory.	FSUtils		Вы не можете копировать или перемещать корневую папку.
 Plain text	AttributesView		Простой текст
 Capacity:	InfoWindow		Объём:
@@ -83,7 +83,7 @@ Clean up	ContainerWindow		Выстроить
 Modified	FindPanel		Изменён
  (block size: 	InfoWindow		 (размер блока: 
 Generate image thumbnails	SettingsView		Генерировать миниатюры
-An item named '%filename%' already exists.	FSUtils		Файл '%filename%' уже существует.
+An item named '%filename%' already exists.	FSUtils		Файл «%filename%» уже существует.
 preferences	B_PREFERENCES_DIRECTORY		Настройки
 Name	Person Query Columns		Имя
 Skip all	FSUtils		Пропустить все
@@ -119,7 +119,7 @@ Enable type-ahead filtering	SettingsView		Включить фильтрацию 
 Location	OpenWithWindow		Путь
 Find	FSUtils		Найти
 List folders first	SettingsView		Отображать папки в начале списка
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Объект с именем \"%name\" уже существует в этой папке. Заменить его ссылкой, которую вы создаёте?
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Объект с названием \«%name\» уже существует в этой папке. Заменить его ссылкой, которую Вы создаёте?
 List view	ContainerWindow		Список
 Create relative link	ContainerWindow		Создать относительную ссылку в
 Modified	QueryPoseView		Изменён
@@ -160,15 +160,15 @@ Read	FilePermissionsView		Чтение
 There was an error writing the attribute.	WidgetAttributeText		Произошла ошибка при записи атрибута.
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы переименуете %target, то это может привести\n к неправильной работоспособности %osName!\nВы действительно хотите сделать это?
 Filesystem:	InfoWindow		Файловая система:
-Could not open \"%name\" (%error). 	FSUtils		Невозможно открыть \"%name\" (%error). 
+Could not open \"%name\" (%error). 	FSUtils		Невозможно открыть \«%name\» (%error). 
 Media parameter group	AttributesView		Группа параметров медиа
 %name info	InfoWindow	InfoWindow Title	Сведения о «%name»
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите home, %osName может начать работать неверно!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку home или её содержимое, зажмите клавишу Shift и нажмите \"Переместить\".
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите home, %osName может начать работать неверно!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку home или её содержимое, зажмите клавишу Shift и нажмите \«Переместить\».
 Property info	AttributesView		Информация о свойствах
 Sorry, you can't create links in the Trash.	PoseView		Извините, но вы не можете создавать ссылки в корзине.
 From	Email Query Columns		От
 Open selection with:	OpenWithWindow		Открыть выбранное с помощью:
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Невозможно открыть \"%document\" поскольку программа \"%app\" находится в корзине. 
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Невозможно открыть \«%document\» поскольку программа \«%app\» находится в корзине. 
 Work Phone	Person Query Columns		Рабочий телефон
 Select folders	FindPanel		Выбор папок…
 Close	ContainerWindow		Закрыть
@@ -182,7 +182,7 @@ Desktop	TrackerSettingsWindow		Рабочий стол
 Nested *?+.	libtracker		Вложенные *?+.
 Move	FSUtils	button label	Переместить
 Group	FilePermissionsView		Группа
-Could not find an application to open \"%name\" (%error). 	FSUtils		Невозможно найти программу для открытия \"%name\" (%error). 
+Could not find an application to open \"%name\" (%error). 	FSUtils		Невозможно найти программу, чтобы открыть \«%name\» (%error). 
 Internal error.	libtracker		Внутренняя ошибка.
 Geometric size	AttributesView		Геометрический размер
 Replace	FilePanelPriv		Заменить
@@ -214,18 +214,18 @@ Cancel	FilePanelPriv		Отмена
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Извините, но вы не можете изменить этот атрибут.
 Memory pointer	AttributesView		Указатель памяти
 Cancel	OpenWithWindow		Отмена
-There was an error deleting \"%name\":\n\t%error	FSUtils		Ошибка при удалении \"%name\":\n\t%error
+There was an error deleting \"%name\":\n\t%error	FSUtils		Ошибка при удалении \«%name\»:\n\t%error
 Files cannot be moved or deleted from a read-only volume.	PoseView		Невозможно перемещать с раздела в режиме только для чтения.
 Resize to fit	ContainerWindow		Подогнать размер окна
-Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Ссылка \"%name\" на:
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Ссылка \«%name\» на:
 Mount server error	AutoMounterSettings		Ошибка сервера подключения дисков
-If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Если вы переименуете папку home, %osName может начать работать неверно!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переименовать папку system или её содержимое, зажмите клавишу Shift и нажмите \"Переименовать\".
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Если вы переименуете папку home, %osName может начать работать неверно!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переименовать папку system или её содержимое, зажмите клавишу Shift и нажмите \«Переименовать\».
 Boolean	AttributesView		Булево
 Memory size	AttributesView		Размер памяти
 New folder	TemplatesMenu		Новую папку
  (broken)	InfoWindow		 (сломан)
 Replace all	FSUtils		Заменить все
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Программа \"%appname\" не поддерживает открытие документов данного типа.\nВы действительно хотите открыть документ в ней?\n\nЕсли вы знаете, что программа поддерживает этот тип документов, то рекомендуется связаться с разработчиками программы и попросить их обновить список типов, поддерживаемых программой.
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Программа \«%appname\» не поддерживает открытие документов данного типа.\nВы действительно хотите открыть документ в ней?\n\nЕсли Вы знаете, что программа поддерживает этот тип документов, то рекомендуется связаться с разработчиками программы и попросить их обновить список типов, поддерживаемых программой.
 Reverse order	ContainerWindow		В обратном порядке
 Copying: 	StatusWindow		Копирование: 
 Show navigator	SettingsView		Показывать панель навигации
@@ -254,7 +254,7 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		�
 Disk mounting during boot	AutoMounterSettings		Подключение дисков при загрузке
 Don't automount	AutoMounterSettings		Не подключать автоматически
 Node ref	AttributesView		Ссылка на узел
-Could not find application \"%appname\"	OpenWithWindow		Невозможно найти приложение \"%appname\"
+Could not find application \"%appname\"	OpenWithWindow		Не удалось найти приложение \«%appname\»
 Unmatched parenthesis.	libtracker		Непарные скобки
 New folder %d	FSUtils		Новая папка %d
 Extended attribute	AttributesView		Расширенные атрибуты
@@ -269,7 +269,7 @@ Deleting: 	StatusWindow		Удаление:
 the MIME settings	FSUtils		настройки MIME
 You can't move or copy the trash.	FSUtils		Вы не можете перемещать или копировать корзину.
 label too long	PoseView		слишком длинное имя
-Error creating link to \"%name\".	FSUtils		Ошибка при создании ссылки к \"%name\".
+Error creating link to \"%name\".	FSUtils		Ошибка при создании ссылки к \«%name\».
 Unknown	FilePermissionsView		Неизвестно
 Paste links	ContainerWindow		Вставить ссылки
 Restoring: 	StatusWindow		Восстановление: 
@@ -290,11 +290,11 @@ apps	B_APPS_DIRECTORY		Приложения
 Error calculating folder size.	InfoWindow		Ошибка при подсчете размера папки.
 Delete	FSUtils		Удалить
 Edit name	ContainerWindow		Переименовать
-Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" (Отсутствует символ: %symbol). \n
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \«%document\» (Отсутствует символ: %symbol). \n
 ASCII Text	AttributesView		Текст ASCII
 Atom reference	AttributesView		ссылочный Atom
 config	B_USER_CONFIG_DIRECTORY		Конфигурация
-Error moving \"%name\".	FSUtils		Ошибка при перемещении \"%name\".
+Error moving \"%name\".	FSUtils		Ошибка при перемещении \«%name\».
 Open	ContainerWindow		Открыть
 Settings…	MountMenu		Настройки…
 You cannot put the selected item(s) into the trash.	FSUtils		Вы не можете переместить выбранные объекты в корзину.
@@ -310,13 +310,13 @@ Recent folders	FavoritesMenu		Недавние папки
 Signed memory size	AttributesView		Установленный размер памяти
 The specified name is illegal. Please choose another name.	FilePanelPriv		Введённое имя недопустимо. Введите какое-нибудь другое.
 of %items	StatusWindow		из %items
-Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании файла \"%name\":\n\t%error\n\nВы хотите продолжить?
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании файла \«%name\»:\n\t%error\n\nВы хотите продолжить?
 less than	FindPanel		меньше чем
 MIME Path	AttributesView		MIME Путь
 Creating links: 	StatusWindow		Создание ссылок: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (%error). 
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \«%document\» приложением \«%app\» (%error). 
 Create %s clipping	PoseView		Сохранить как %s
-Error moving \"%name\"	FSUtils		Ошибка при перемещении \"%name\"
+Error moving \"%name\"	FSUtils		Ошибка при перемещении \«%name\»
 To: %dir	StatusWindow		В: %dir
 Cancel	Tracker		Отмена
 Paste layout	ContainerWindow		Вставить вид папки
@@ -327,9 +327,9 @@ Name	SelectionWindow		Имя
 Location	Default Query Columns		Путь
 by attribute	FindPanel		по атрибуту
 Write	FilePermissionsView		Запись
-If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что изменить ее?\n\nЧтобы изменить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Я знаю, что я делаю\".
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если Вы измените папку system или её содержимое, то не сможете больше загрузить %osName!\n\nВы уверены, что изменить ее?\n\nЧтобы изменить папку system или её содержимое, зажмите клавишу Shift и нажмите \«Я знаю, что я делаю\».
 Save	FilePanelPriv		Сохранить
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствуют библиотеки: %library). \n
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Невозможно открыть \«%document\» приложением \«%app\» (Отсутствуют библиотеки: %library). \n
 Finish: %time	StatusWindow		Окончание: %time
 after	FindPanel		после
 Messenger	AttributesView		Мессенджер
@@ -342,14 +342,14 @@ Permissions	ContainerWindow		Права
 Size:	InfoWindow		Размер:
 Copy	ContainerWindow		Копировать
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбранный объект не может быть перемещён в корзину. Хотите ли вы вместо этого удалить его? (Эту операцию будет невозможно отменить)
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Извините, но атрибут 'Character' не может хранить многобайтовый глиф.
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Извините, но атрибут «Character» не может хранить многобайтовый глиф.
 And	FindPanel		и
 Palette-indexed picture	AttributesView		Индексированная картинка
 Drawing pattern	AttributesView		Отрисовка шаблона
 File offset	AttributesView		Смещение файла
 Name = %name	FindPanel	FindResultTitle	Имя = %name
 Subject	Email Query Columns		Тема
-Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании папки \"%name\":\n\t%error\n\nВы хотите продолжить?
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании папки \«%name\»:\n\t%error\n\nВы хотите продолжить?
 You cannot create a link to the root directory.	FSUtils		Невозможно создать ссылку на корневую папку.
 Other	FilePermissionsView		Другие
 Automatic disk mounting	AutoMounterSettings		Автоматическое подключение
@@ -375,34 +375,34 @@ Proceed	FSUtils		Исправить
 Edit favorites…	FilePanelPriv		Изменить закладки…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Невозможно переместить папку в саму себя или в собственную подпапку.
 New	ContainerWindow		Создать
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Вам нужно перетащить объект(ы) на один из значков диска в окне \"Диски\".
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Вам нужно перетащить объект(ы) на один из значков диска в окне \«Диски\».
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если изменить %target, %osName может вести себя непредсказуемо!\n\nВы уверены, что это хотите это сделать?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Извините, но вы не можете копировать объекты в корзину.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некоторые объекты с такими же именами, которые вы %verb, уже существуют в этой папке.\n \nЗаменить их теми, которые вы %verb или спрашивать для каждого объекта?
 When	Email Query Columns		Когда
 Object	AttributesView		Объект
 Paste	ContainerWindow		Вставить
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Папка \"%name\" уже существует.\nЗаменить существующие файлы при совпадении имён?
-Cannot unmount the boot volume \"%name\".	FSUtils		Невозможно отключить загрузочный раздел \"%name\".
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствует символ: %symbol). \n
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Папка \«%name\» уже существует.\nЗаменить существующие файлы при совпадении имён?
+Cannot unmount the boot volume \"%name\".	FSUtils		Невозможно отключить загрузочный раздел \«%name\».
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \«%document\» приложением \«%app\» (Отсутствует символ: %symbol). \n
 New folder	ContainerWindow		Новая папка
 Name	OpenWithWindow		Имя
 Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Сведения
-There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ошибка при замене \"%name\". Возможно файл открыт или занят.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ошибка при замене \«%name\». Возможно файл открыт или занят.
 Windows	TrackerSettingsWindow		Окна
 Show space bars on volumes	SettingsView		Показывать индикаторы занятого места
-Could not update permissions of file \"%name\". %error	FSUtils		Невозможно обновить права файла \"%name\". %error
+Could not update permissions of file \"%name\". %error	FSUtils		Невозможно обновить права файла \«%name\». %error
 Emptying Trash… 	StatusWindow		Очищение корзины… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# файл} few{# файла} other{# файлов}}
 Revert	TrackerSettingsWindow		Вернуть
 trash	B_TRASH_DIRECTORY		Корзина
-If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Переместить\".
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Если Вы переместите папку system или её содержимое, то не сможете больше загрузить %osName!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку system или её содержимое, зажмите клавишу Shift и нажмите \«Переместить\».
 Open query:	FindPanel		Открыть запрос:
 Close all in workspace	ContainerWindow		Закрыть все на этом столе
 Corrupted expression.	libtracker		Поврежденное выражение.
 Network address	AttributesView		Сетевой адрес
 Finish: %time - %finishtime left	StatusWindow		Окончание: %time - осталось %finishtime
-Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Невозможно открыть \"%document\" (Отсутствуют библиотеки: %library). \n
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Невозможно открыть \«%document\» (Отсутствуют библиотеки: %library). \n
 Create relative link here	ContainerWindow		Создать относительную ссылку здесь
 All Haiku disks	AutoMounterSettings		Все диски Haiku
 Close all	ContainerWindow		Закрыть все
@@ -431,9 +431,9 @@ Show Disks icon	SettingsView		Показывать значок дисков
 Outline selection rectangle only	SettingsView		Не использовать прозрачное выделение
 by formula	FindPanel		по формуле
 is	FindPanel		равен
-If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Если вы переименуете системную папку или её содержимое, вы не сможете загрузить %osName!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переименовать системную папку или её содержимое, зажмите клавишу "Shift" и нажмите \"Переименовать\".
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Если Вы переименуете системную папку или её содержимое, то не сможете загрузить %osName!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переименовать системную папку или её содержимое, зажмите клавишу «Shift» и нажмите \«Переименовать\».
 Permissions	FilePermissionsView		Права
-\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" программа устаревшего типа. Пожалуйста получите обновленную версию.
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\«%name\» программа устаревшего типа. Пожалуйста получите обновленную версию.
 Only the boot disk	AutoMounterSettings		Только загрузочный диск
 Message	AttributesView		Сообщение
 Modified	Default Query Columns		Изменён
@@ -443,10 +443,10 @@ Invert selection	ContainerWindow		Инвертировать
 matches regular expression	SelectionWindow		совпадает с регулярным выражением
 Monochrome picture	AttributesView		Монохромная картинка
 Real name	ContainerWindow		Реальное имя
-Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Невозможно открыть \"%name\". Файл ошибочно помечен как исполняемый. 
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Невозможно открыть \«%name\». Файл ошибочно помечен как исполняемый. 
 Save	FindPanel		Сохранить
 Name	FindPanel		Имя
-Cancel	WidgetAttributeText		Отмена
+Cancel	WidgetAttributeText		Отменить
 Expression too long.	libtracker		Выражение слишком длинное.
 Memory corruption.	libtracker		Повреждение памяти.
 Color	AttributesView		Цвет
@@ -454,9 +454,9 @@ Copy layout	ContainerWindow		Копировать вид папки
 Duplicate	ContainerWindow		Дублировать
 16-bit integer	AttributesView		16-битное целое
 Untitled clipping	PoseView		Безымянная выборка
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" уже существует в указанной папке. Вы хотите заменить его?
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \«%name\» уже существует в указанной папке. Вы хотите заменить его?
 , indexed	InfoWindow		, индексировано
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Вам нужно перетащить объект(ы) на один из значков диска в окне \"Диски\".
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Вам нужно перетащить объект(ы) на один из значков диска в окне \«Диски\».
 Version:	InfoWindow		Версия:
 OK	PoseView		ОК
 Add new submenu…	TemplatesMenu		Добавить новое подменю…
@@ -472,7 +472,7 @@ Cancel	PoseView		Отмена
 Options	FindPanel		Опции
 Delete	PoseView		Удалить
 Media parameter	AttributesView		Параметры медиа
-If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените домашнюю папку, %osName может вести себя непредсказуемо!\n\nВы уверены, что это нужно сделать?\n\nЧтобы изменить домашнюю папку, зажмите клавишу "Shift" и нажмите \"Я знаю, что я делаю\".
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если Вы измените домашнюю папку, %osName может вести себя непредсказуемо!\n\nВы уверены, что это нужно сделать?\n\nЧтобы изменить домашнюю папку, зажмите клавишу «Shift» и нажмите \«Я знаю, что я делаю\».
 Sorry, you can't copy items to the Trash.	PoseView		Извините, но вы не можете копировать объекты в корзину.
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# объект} few{# объекта} other{# объектов}}
 Name	AttributesView		Имя
