@@ -31,7 +31,7 @@ VIEW='View licenses'
 ABORT='Abort installation'
 OK='I agree to the licenses. Install firmwares.'
 
-baseURL='https://raw.githubusercontent.com/haiku/firmware/master/wifi/'
+baseURL='https://github.com/haiku/firmware/raw/refs/heads/master/wifi'
 firmwareDir=`finddir B_SYSTEM_DATA_DIRECTORY`/firmware
 tempDir=`finddir B_SYSTEM_TEMP_DIRECTORY`/wifi-firmwares
 driversDir=`finddir B_SYSTEM_ADDONS_DIRECTORY`/kernel/drivers
