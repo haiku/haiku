@@ -347,14 +347,11 @@ protected:
 									float rightBottomRadius,
 									const rgb_color& base,
 									const rgb_color& background,
-									float contrast, float brightness = 1.0,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
 			void				_DrawOuterResessedFrame(BView* view,
 									BRect& rect, const rgb_color& base,
-									float contrast = 1.0f,
-									float brightness = 1.0f,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
@@ -529,13 +526,8 @@ protected:
 									orientation orientation);
 
 	// Border color methods
-			rgb_color			_EdgeLightColor(const rgb_color& base,
-									float contrast, float brightness,
-									uint32 flags);
-
-			rgb_color			_EdgeShadowColor(const rgb_color& base,
-									float contrast, float brightness,
-									uint32 flags);
+			rgb_color			_EdgeColor(const rgb_color& base,
+									bool shadow, uint32 flags);
 
 			rgb_color			_FrameLightColor(const rgb_color& base,
 									uint32 flags);

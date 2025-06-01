@@ -110,7 +110,7 @@ HaikuControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateR
 	uint32 borders)
 {
 	_DrawButtonFrame(view, rect, updateRect, 0.0f, 0.0f, 0.0f, 0.0f, base,
-		background, 1.0, 1.0, flags, borders);
+		background, flags, borders);
 }
 
 
@@ -120,7 +120,7 @@ HaikuControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateR
 	uint32 borders)
 {
 	_DrawButtonFrame(view, rect, updateRect, radius, radius, radius, radius,
-		base, background, 1.0, 1.0, flags, borders);
+		base, background, flags, borders);
 }
 
 
@@ -133,7 +133,7 @@ HaikuControlLook::DrawButtonFrame(BView* view, BRect& rect,
 {
 	_DrawButtonFrame(view, rect, updateRect, leftTopRadius, rightTopRadius,
 		leftBottomRadius, rightBottomRadius, base, background,
-		1.0, 1.0, flags, borders);
+		flags, borders);
 }
 
 
@@ -221,7 +221,7 @@ HaikuControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
 	const rgb_color& background, uint32 flags, uint32 borders)
 {
 	_DrawButtonFrame(view, rect, updateRect, 0.0f, 0.0f, 0.0f, 0.0f, base,
-		background, 0.6, 1.0, flags, borders);
+		background, flags, borders);
 }
 
 
@@ -231,7 +231,7 @@ HaikuControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
 	const rgb_color& background, uint32 flags, uint32 borders)
 {
 	_DrawButtonFrame(view, rect, updateRect, radius, radius, radius, radius,
-		base, background, 0.6, 1.0, flags, borders);
+		base, background, flags, borders);
 }
 
 
@@ -243,7 +243,7 @@ HaikuControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
 	const rgb_color& background, uint32 flags, uint32 borders)
 {
 	_DrawButtonFrame(view, rect, updateRect, leftTopRadius, rightTopRadius,
-		leftBottomRadius, rightBottomRadius, base, background, 0.6, 1.0,
+		leftBottomRadius, rightBottomRadius, base, background,
 		flags, borders);
 }
 
@@ -427,7 +427,7 @@ HaikuControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	if ((flags & B_DISABLED) != 0) {
-		_DrawOuterResessedFrame(view, rect, base, 0.0, 1.0, flags);
+		_DrawOuterResessedFrame(view, rect, base, flags);
 
 		dark1BorderColor = tint_color(base, 1.15);
 		dark2BorderColor = tint_color(base, 1.15);
@@ -441,7 +441,7 @@ HaikuControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect
 
 		dark2BorderColor = dark1BorderColor;
 	} else {
-		_DrawOuterResessedFrame(view, rect, base, 0.6, 1.0, flags);
+		_DrawOuterResessedFrame(view, rect, base, flags);
 
 		dark1BorderColor = tint_color(base, 1.40);
 		dark2BorderColor = tint_color(base, 1.38);
@@ -973,7 +973,7 @@ HaikuControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 	rgb_color scrollbarFrameColor = tint_color(base, B_DARKEN_2_TINT);
 
 	if (borderStyle == B_FANCY_BORDER)
-		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
+		_DrawOuterResessedFrame(view, rect, base, flags, borders);
 
 	if ((flags & B_FOCUSED) != 0) {
 		rgb_color focusColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
@@ -991,7 +991,7 @@ HaikuControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		borders = _borders;
 		borders &= ~B_TOP_BORDER;
 		_DrawOuterResessedFrame(view, horizontalScrollBarFrame, base,
-			1.0, 1.0, flags, borders);
+			flags, borders);
 		_DrawFrame(view, horizontalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
@@ -1002,7 +1002,7 @@ HaikuControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		borders = _borders;
 		borders &= ~B_LEFT_BORDER;
 		_DrawOuterResessedFrame(view, verticalScrollBarFrame, base,
-			1.0, 1.0, flags, borders);
+			flags, borders);
 		_DrawFrame(view, verticalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
@@ -2052,7 +2052,7 @@ HaikuControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 		scrollbarFrameColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	if (borderStyle == B_FANCY_BORDER)
-		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
+		_DrawOuterResessedFrame(view, rect, base, flags, borders);
 
 	_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
 		scrollbarFrameColor, scrollbarFrameColor, borders);
@@ -2094,7 +2094,7 @@ HaikuControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	rgb_color invalidColor = ui_color(B_FAILURE_COLOR);
 
 	if ((flags & B_DISABLED) != 0) {
-		_DrawOuterResessedFrame(view, rect, base, 0.0, 1.0, flags, borders);
+		_DrawOuterResessedFrame(view, rect, base, flags, borders);
 
 		if ((flags & B_BLEND_FRAME) != 0)
 			dark1BorderColor = (rgb_color){ 0, 0, 0, 40 };
@@ -2112,7 +2112,7 @@ HaikuControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 
 		dark2BorderColor = dark1BorderColor;
 	} else {
-		_DrawOuterResessedFrame(view, rect, base, 0.6, 1.0, flags, borders);
+		_DrawOuterResessedFrame(view, rect, base, flags, borders);
 
 		if ((flags & B_BLEND_FRAME) != 0) {
 			dark1BorderColor = (rgb_color){ 0, 0, 0, 102 };
@@ -2494,8 +2494,7 @@ void
 HaikuControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
-	const rgb_color& background, float contrast, float brightness,
-	uint32 flags, uint32 borders)
+	const rgb_color& background, uint32 flags, uint32 borders)
 {
 	if (!rect.IsValid())
 		return;
@@ -2537,12 +2536,8 @@ HaikuControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 
 	if ((flags & B_DEFAULT_BUTTON) != 0) {
 		cornerBgColor = defaultIndicatorColor;
-		edgeLightColor = _EdgeLightColor(defaultIndicatorColor,
-			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
-			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9), flags);
-		edgeShadowColor = _EdgeShadowColor(defaultIndicatorColor,
-			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
-			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9), flags);
+		edgeLightColor = _EdgeColor(defaultIndicatorColor, false, flags);
+		edgeShadowColor = _EdgeColor(defaultIndicatorColor, true, flags);
 
 		// draw default button indicator
 		// Allow a 1-pixel border of the background to come through.
@@ -2563,12 +2558,8 @@ HaikuControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			view->SetDrawingMode(B_OP_ALPHA);
 		}
 
-		edgeLightColor = _EdgeLightColor(background,
-			contrast * ((flags & B_DISABLED) != 0 ? 0.0 : 1.0),
-			brightness * 1.0, flags);
-		edgeShadowColor = _EdgeShadowColor(background,
-			contrast * (flags & B_DISABLED) != 0 ? 0.0 : 1.0,
-			brightness * 1.0, flags);
+		edgeLightColor = _EdgeColor(background, false, flags);
+		edgeShadowColor = _EdgeColor(background, true, flags);
 	}
 
 	// frame colors
@@ -2630,13 +2621,10 @@ HaikuControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	// draw outer edge
 	if ((flags & B_DEFAULT_BUTTON) != 0) {
 		_DrawOuterResessedFrame(view, rect, defaultIndicatorColor,
-			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
-			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9),
 			flags, borders);
 	} else {
 		_DrawOuterResessedFrame(view, rect, background,
-			contrast * ((flags & B_DISABLED) != 0 ? 0.0 : 1.0),
-			brightness * 1.0, flags, borders);
+			flags, borders);
 	}
 
 	view->SetDrawingMode(oldMode);
@@ -2662,13 +2650,10 @@ HaikuControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 
 void
 HaikuControlLook::_DrawOuterResessedFrame(BView* view, BRect& rect,
-	const rgb_color& base, float contrast, float brightness, uint32 flags,
-	uint32 borders)
+	const rgb_color& base, uint32 flags, uint32 borders)
 {
-	rgb_color edgeLightColor = _EdgeLightColor(base, contrast,
-		brightness, flags);
-	rgb_color edgeShadowColor = _EdgeShadowColor(base, contrast,
-		brightness, flags);
+	rgb_color edgeLightColor = _EdgeColor(base, false, flags);
+	rgb_color edgeShadowColor = _EdgeColor(base, true, flags);
 
 	if ((flags & B_BLEND_FRAME) != 0) {
 		// assumes the background has already been painted
@@ -2963,10 +2948,10 @@ HaikuControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 		if ((flags & B_ACTIVATED) != 0)
 			separatorBaseColor = tint_color(base, B_DARKEN_1_TINT);
 
-		rgb_color separatorLightColor = _EdgeLightColor(separatorBaseColor,
-			(flags & B_DISABLED) != 0 ? 0.7 : 1.0, 1.0, flags);
-		rgb_color separatorShadowColor = _EdgeShadowColor(separatorBaseColor,
-			(flags & B_DISABLED) != 0 ? 0.7 : 1.0, 1.0, flags);
+		rgb_color separatorLightColor = _EdgeColor(separatorBaseColor,
+			true, flags);
+		rgb_color separatorShadowColor = _EdgeColor(separatorBaseColor,
+			false, flags);
 
 		view->BeginLineArray(2);
 
@@ -3674,65 +3659,41 @@ HaikuControlLook::_DrawRoundBarCorner(BView* view, BRect& rect,
 
 
 rgb_color
-HaikuControlLook::_EdgeLightColor(const rgb_color& base, float contrast,
-	float brightness, uint32 flags)
+HaikuControlLook::_EdgeColor(const rgb_color& base, bool shadow, uint32 flags)
 {
-	rgb_color edgeLightColor;
+	rgb_color edgeColor;
 
 	if ((flags & B_BLEND_FRAME) != 0) {
-		uint8 alpha = uint8(20 * contrast);
-		uint8 white = uint8(255 * brightness);
-
-		edgeLightColor = (rgb_color){ white, white, white, alpha };
-	} else {
-		// colors
-		float tintLight = kEdgeBevelLightTint;
-
-		if (contrast == 0.0)
-			tintLight = B_NO_TINT;
-		else if (contrast != 1.0)
-			tintLight = B_NO_TINT + (tintLight - B_NO_TINT) * contrast;
-
-		edgeLightColor = tint_color(base, tintLight);
-
-		if (brightness < 1.0) {
-			edgeLightColor.red = uint8(edgeLightColor.red * brightness);
-			edgeLightColor.green = uint8(edgeLightColor.green * brightness);
-			edgeLightColor.blue = uint8(edgeLightColor.blue * brightness);
+		uint8 alpha = 20;
+		uint8 value = shadow ? 0 : 255;
+		if ((flags & B_DEFAULT_BUTTON) != 0) {
+			if ((flags & B_DISABLED) != 0) {
+				alpha = (uint8)(alpha * 0.3);
+				value = (uint8)(value * 0.9);
+			} else
+				alpha = (uint8)(alpha * 0.8);
+		} else {
+			if ((flags & B_DISABLED) != 0)
+				alpha = 0;
 		}
+
+		edgeColor = (rgb_color){ value, value, value, alpha };
+	} else {
+		float tint = shadow ? kEdgeBevelShadowTint : kEdgeBevelLightTint;
+		if ((flags & B_DEFAULT_BUTTON) != 0) {
+			if ((flags & B_DISABLED) != 0)
+				tint = B_NO_TINT + (tint - B_NO_TINT) * 0.3;
+			else
+				tint = (tint + 1.245f /* darken "< 2" */) / 2;
+		} else {
+			if ((flags & B_DISABLED) != 0)
+				tint = B_NO_TINT;
+		}
+
+		edgeColor = tint_color(base, tint);
 	}
 
-	return edgeLightColor;
-}
-
-
-rgb_color
-HaikuControlLook::_EdgeShadowColor(const rgb_color& base, float contrast,
-	float brightness, uint32 flags)
-{
-	rgb_color edgeShadowColor;
-
-	if ((flags & B_BLEND_FRAME) != 0) {
-		uint8 alpha = uint8(20 * contrast);
-		edgeShadowColor = (rgb_color){ 0, 0, 0, alpha };
-	} else {
-		float tintShadow = kEdgeBevelShadowTint;
-
-		if (contrast == 0.0)
-			tintShadow = B_NO_TINT;
-		else if (contrast != 1.0)
-			tintShadow = B_NO_TINT + (tintShadow - B_NO_TINT) * contrast;
-
-		edgeShadowColor = tint_color(base, tintShadow);
-
-		if (brightness < 1.0) {
-			edgeShadowColor.red = uint8(edgeShadowColor.red * brightness);
-			edgeShadowColor.green = uint8(edgeShadowColor.green * brightness);
-			edgeShadowColor.blue = uint8(edgeShadowColor.blue * brightness);
-		}
-	}
-
-	return edgeShadowColor;
+	return edgeColor;
 }
 
 
