@@ -678,12 +678,12 @@ FUNCTION_END(handle_syscall)
 	movl	IFRAME_ax(%ebp), %eax
 	push	%edx
 	push	%eax
-	lea		16(%esp), %eax			// syscall parameters
+	lea		8(%esp), %eax			// syscall parameters
 	push	%eax
 	movl	IFRAME_orig_eax(%ebp), %eax		// syscall number
 	push	%eax
 	call	user_debug_post_syscall
-	addl	$24, %esp
+	addl	$16, %esp
 
   2:
 	// clear the 64 bit return value and syscall restarted bits
