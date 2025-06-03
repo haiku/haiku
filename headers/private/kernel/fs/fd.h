@@ -94,6 +94,9 @@ extern bool fd_is_file(struct file_descriptor* descriptor);
 extern bool fd_close_on_exec(const struct io_context *context, int fd);
 extern void fd_set_close_on_exec(struct io_context *context, int fd,
 	bool closeFD);
+extern bool fd_close_on_fork(const struct io_context *context, int fd);
+extern void fd_set_close_on_fork(struct io_context *context, int fd,
+	bool closeFD);
 
 static struct io_context *get_current_io_context(bool kernel);
 

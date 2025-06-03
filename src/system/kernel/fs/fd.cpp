@@ -109,6 +109,23 @@ fd_set_close_on_exec(struct io_context* context, int fd, bool closeFD)
 }
 
 
+bool
+fd_close_on_fork(const struct io_context* context, int fd)
+{
+	return CHECK_BIT(context->fds_close_on_fork[fd / 8], fd & 7) ? true : false;
+}
+
+
+void
+fd_set_close_on_fork(struct io_context* context, int fd, bool closeFD)
+{
+	if (closeFD)
+		context->fds_close_on_fork[fd / 8] |= (1 << (fd & 7));
+	else
+		context->fds_close_on_fork[fd / 8] &= ~(1 << (fd & 7));
+}
+
+
 /*!	Searches a free slot in the FD table of the provided I/O context, and
 	inserts the specified descriptor into it.
 */
@@ -315,6 +332,7 @@ remove_fd(struct io_context* context, int fd)
 
 		context->fds[fd] = NULL;
 		fd_set_close_on_exec(context, fd, false);
+		fd_set_close_on_fork(context, fd, false);
 		context->num_used_fds--;
 
 		selectInfos = context->select_infos[fd];
@@ -351,6 +369,7 @@ dup_fd(int fd, bool kernel)
 	} else {
 		WriteLocker locker(context->lock);
 		fd_set_close_on_exec(context, status, false);
+		fd_set_close_on_fork(context, status, false);
 	}
 
 	return status;
@@ -374,7 +393,7 @@ dup2_fd(int oldfd, int newfd, int flags, bool kernel)
 	// quick check
 	if (oldfd < 0 || newfd < 0)
 		return B_FILE_ERROR;
-	if ((flags & ~O_CLOEXEC) != 0)
+	if ((flags & ~(O_CLOEXEC | O_CLOFORK)) != 0)
 		return B_BAD_VALUE;
 
 	// Get current I/O context and lock it
@@ -411,6 +430,7 @@ dup2_fd(int oldfd, int newfd, int flags, bool kernel)
 	}
 
 	fd_set_close_on_exec(context, newfd, (flags & O_CLOEXEC) != 0);
+	fd_set_close_on_fork(context, newfd, (flags & O_CLOFORK) != 0);
 
 	locker.Unlock();
 

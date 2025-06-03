@@ -371,6 +371,8 @@ create_socket_fd(net_socket* socket, int flags, bool kernel)
 	int oflags = 0;
 	if ((flags & SOCK_CLOEXEC) != 0)
 		oflags |= O_CLOEXEC;
+	if ((flags & SOCK_CLOFORK) != 0)
+		oflags |= O_CLOFORK;
 	if ((flags & SOCK_NONBLOCK) != 0 || nonBlock)
 		oflags |= O_NONBLOCK;
 
@@ -394,6 +396,7 @@ create_socket_fd(net_socket* socket, int flags, bool kernel)
 
 	rw_lock_write_lock(&context->lock);
 	fd_set_close_on_exec(context, fd, (oflags & O_CLOEXEC) != 0);
+	fd_set_close_on_fork(context, fd, (oflags & O_CLOFORK) != 0);
 	rw_lock_write_unlock(&context->lock);
 
 	return fd;
@@ -409,8 +412,8 @@ common_socket(int family, int type, int protocol, bool kernel)
 	if (!get_stack_interface_module())
 		return B_UNSUPPORTED;
 
-	int sflags = type & (SOCK_CLOEXEC | SOCK_NONBLOCK);
-	type &= ~(SOCK_CLOEXEC | SOCK_NONBLOCK);
+	int sflags = type & (SOCK_CLOEXEC | SOCK_NONBLOCK | SOCK_CLOFORK);
+	type &= ~(SOCK_CLOEXEC | SOCK_NONBLOCK | SOCK_CLOFORK);
 
 	// create the socket
 	net_socket* socket;
@@ -487,7 +490,7 @@ common_accept(int fd, struct sockaddr *address, socklen_t *_addressLength, int f
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	if ((flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK)) != 0)
+	if ((flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK | SOCK_CLOFORK)) != 0)
 		RETURN_AND_SET_ERRNO(B_BAD_VALUE);
 
 	net_socket* acceptedSocket;
@@ -649,8 +652,8 @@ common_socketpair(int family, int type, int protocol, int fds[2], bool kernel)
 	if (!get_stack_interface_module())
 		return B_UNSUPPORTED;
 
-	int sflags = type & (SOCK_CLOEXEC | SOCK_NONBLOCK);
-	type &= ~(SOCK_CLOEXEC | SOCK_NONBLOCK);
+	int sflags = type & (SOCK_CLOEXEC | SOCK_NONBLOCK | SOCK_CLOFORK);
+	type &= ~(SOCK_CLOEXEC | SOCK_NONBLOCK | SOCK_CLOFORK);
 
 	net_socket* sockets[2];
 	status_t error = sStackInterface->socketpair(family, type, protocol,

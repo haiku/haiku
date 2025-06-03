@@ -82,6 +82,7 @@ static const enum_info kShutdownHow[] = {
 static const FlagsTypeHandler::FlagInfo kSocketFlagInfos[] = {
 	FLAG_INFO_ENTRY(SOCK_NONBLOCK),
 	FLAG_INFO_ENTRY(SOCK_CLOEXEC),
+	FLAG_INFO_ENTRY(SOCK_CLOFORK),
 
 	{ 0, NULL }
 };

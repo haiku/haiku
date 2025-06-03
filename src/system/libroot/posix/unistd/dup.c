@@ -31,5 +31,7 @@ dup3(int oldFD, int newFD, int flags)
 {
 	if (oldFD == newFD)
 		RETURN_AND_SET_ERRNO(EINVAL);
+	if ((flags & ~(O_CLOEXEC | O_CLOFORK)) != 0)
+		RETURN_AND_SET_ERRNO(EINVAL);
 	RETURN_AND_SET_ERRNO(_kern_dup2(oldFD, newFD, flags));
 }

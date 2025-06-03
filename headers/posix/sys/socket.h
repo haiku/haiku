@@ -49,6 +49,7 @@ typedef uint8_t sa_family_t;
 
 #define SOCK_NONBLOCK 	0x00040000
 #define SOCK_CLOEXEC 	0x00080000
+#define SOCK_CLOFORK 	0x00100000
 
 /* Socket options for SOL_SOCKET level */
 #define	SOL_SOCKET		-1

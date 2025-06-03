@@ -21,6 +21,7 @@
 #define F_SETLK         0x0080		/* set locking information */
 #define F_SETLKW        0x0100		/* as above, but waits if blocked */
 #define F_DUPFD_CLOEXEC 0x0200		/* duplicate fd with close on exec set */
+#define F_DUPFD_CLOFORK 0x0400		/* duplicate fd with close on fork set */
 
 /* advisory locking types */
 #define F_RDLCK         0x0040		/* read or shared lock */
@@ -29,6 +30,7 @@
 
 /* file descriptor flags for fcntl() */
 #define FD_CLOEXEC		1			/* close on exec */
+#define FD_CLOFORK		2			/* close on fork */
 
 /* file access modes for open() */
 #define O_RDONLY		0x0000		/* read only */
@@ -57,6 +59,7 @@
 									/* possible */
 #define O_NOCACHE		O_DIRECT
 #define O_DIRECTORY		0x00200000	/* fail if not a directory */
+#define O_CLOFORK		0x00400000	/* close on fork */
 
 /* flags for the *at() functions */
 #define AT_FDCWD		(-100)		/* CWD FD for the *at() functions */

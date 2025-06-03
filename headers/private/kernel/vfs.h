@@ -56,6 +56,7 @@ typedef struct io_context {
 	struct file_descriptor **fds;
 	struct select_info **select_infos;
 	uint8		*fds_close_on_exec;
+	uint8		*fds_close_on_fork;
 	struct list node_monitors;
 	uint32		num_monitors;
 	uint32		max_monitors;

@@ -38,6 +38,8 @@ static const FlagsTypeHandler::FlagInfo kOpenFlagInfos[] = {
 
 	FLAG_INFO_ENTRY(O_DIRECTORY),
 
+	FLAG_INFO_ENTRY(O_CLOFORK),
+
 	{ 0, NULL }
 };
 
