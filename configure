@@ -265,9 +265,9 @@ standard_gcc_settings()
 {
 	local gcc="$1"
 
-	if which greadlink > /dev/null 2>&1; then
+	if command -v greadlink > /dev/null 2>&1; then
 		readlink="greadlink -e"
-	elif which realpath > /dev/null 2>&1; then
+	elif command -v realpath > /dev/null 2>&1; then
 		readlink=realpath
 	elif readlink -e / > /dev/null 2>&1; then
 		readlink="readlink -e"
@@ -422,7 +422,7 @@ get_build_tool_path()
 		path="`pwd`/`basename "$path"`"
 		cd $oldPwd
 	else
-		which "$path" > /dev/null 2>&1 || {
+		command -v "$path" > /dev/null 2>&1 || {
 			echo "Build tool \"$path\" not found (maybe specify it in $var?)" >&2
 			exit 1
 		}
