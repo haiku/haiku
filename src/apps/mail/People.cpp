@@ -36,7 +36,7 @@ AddPersonAddresses(BNode& node, BStringList& addresses)
 		char attr[32];
 		snprintf(attr, sizeof(attr), "META:email%d", i);
 
-		if (node.ReadAttrString(attr, &email) != B_OK)
+		if (node.ReadAttrString(attr, &email) != B_OK || email.IsEmpty())
 			break;
 
 		addresses.Add(email);
