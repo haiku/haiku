@@ -37,7 +37,7 @@ AddPersonAddresses(BNode& node, BStringList& addresses)
 		snprintf(attr, sizeof(attr), "META:email%d", i);
 
 		if (node.ReadAttrString(attr, &email) != B_OK || email.IsEmpty())
-			break;
+			continue;
 
 		addresses.Add(email);
 	}
@@ -124,6 +124,29 @@ PersonList::EntryCreated(QueryList& source, const entry_ref& ref, ino_t node)
 	BAutolock locker(this);
 
 	Person* person = new Person(ref);
+	const BString& name = person->Name();
+	bool isUnique = true;
+
+	for (int32 index = 0; index < fPersons.CountItems(); index++) {
+		const Person* item = (Person*)fPersons.ItemAt(index);
+		const BString& itemName = item->Name();
+		if (itemName != name)
+			continue;
+
+		isUnique = false;
+		for (int32 addressIndex = 0; addressIndex < person->CountAddresses(); addressIndex++) {
+			const BString& address = person->AddressAt(addressIndex);
+			const BString& itemAddress = item->AddressAt(addressIndex);
+			if (itemAddress != address) {
+				isUnique = true;
+				break;
+			}
+		}
+	}
+
+	if (!isUnique)
+		return;
+
 	fPersons.AddItem(person);
 	fPersonMap.insert(std::make_pair(node_ref(ref.device, node), person));
 }
