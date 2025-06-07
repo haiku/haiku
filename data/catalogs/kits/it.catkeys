@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libbe	1445751563
+1	italian	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Tutti i diritti riservati.
 gold master	AboutWindow		gold master
 Undo	TextView		Annulla
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Errore
 Paste	TextView		Incolla
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Ringraziamenti speciali:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Decoratore di finestre predefinito di Haiku. 
 %s GiB	StringForSize	size unit	%s GiB

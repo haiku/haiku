@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libbe	1445751563
+1	german	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Alle Rechte vorbehalten.
 gold master	AboutWindow		Golden Master
 Undo	TextView		Rückgängig
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Fehler
 Paste	TextView		Einfügen
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Besonderen Dank an:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Standard-Dekorator aller Fenster
 %s GiB	StringForSize	size unit	%s GiB
@@ -42,7 +41,7 @@ About %app…	Dragger		Über %app ...
 About %app%	AboutWindow		Über %app%
 {0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s Byte} other{%s Bytes}}
 %s GiB/s	StringForRate	units per second	%s GiB/s
-Version history:	AboutWindow		Historie:
+Version history:	AboutWindow		Versionsgeschichte:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Blau:

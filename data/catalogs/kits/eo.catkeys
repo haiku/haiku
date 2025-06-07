@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libbe	1337497439
+1	esperanto	x-vnd.Haiku-libbe	2491350405
 All Rights Reserved.	AboutWindow		Ĉiuj rajtoj estas rezervitaj.
 gold master	AboutWindow		ora mastro
 Undo	TextView		Malfari
@@ -20,7 +20,6 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		Eraro
 Paste	TextView		Alglui
 OK	AboutWindow		Bone
-Special Thanks:	AboutWindow		Apartaj dankoj al:
 Default Haiku window decorator.	Default decorator about box		Defaŭlta dekoraciilo por fenestroj de la Hajko
 Remove replicant	Dragger		Forigi replikilon
 Version	AboutWindow		Versio

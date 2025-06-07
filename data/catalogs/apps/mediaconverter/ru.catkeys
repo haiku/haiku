@@ -4,7 +4,7 @@ Source files	MediaConverter		Исходные файлы
 Error writing video frame %lld	MediaConverter		Ошибка записи видеокадра %lld
 Audio quality: %s	MediaConverter		Качество аудио: %s
 Error converting '%filename'	MediaConverter		Ошибка конвертации '%filename'
-Selected directory not found. Defaulting to /boot/home	MediaConverter		Выбранная папка не найдена. Выбираем по умолчанию /boot/home
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Выбранный каталог не найден. Выбираем по умолчанию /boot/home
 Conversion completed	MediaConverter		Конвертация завершена
 Audio:	MediaConverter-FileInfo		Аудио:
 MediaConverter+:SaveDirectory	MediaConverter		Медиаконвертер: выбор папки сохранения

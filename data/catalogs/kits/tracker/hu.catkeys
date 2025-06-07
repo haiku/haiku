@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	4192200646
+1	hungarian	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -168,6 +168,7 @@ Property info	AttributesView		Tulajdonság infó
 Sorry, you can't create links in the Trash.	PoseView		Sajnálom, de nem lehet hivatkozást létrehozni a Szemetesbe.
 From	Email Query Columns		Feladó
 Open selection with:	OpenWithWindow		Kijelölés megnyitása ezzel:
+Preferences…	ContainerWindow		Beállítások…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nem sikerült megnyitni a dokumentumot (\"%document\"), mert a program (\"%app\") a Szemetesben van.
 Work Phone	Person Query Columns		Munkahelyi telefonszám
 Select folders	FindPanel		Mappák megadása

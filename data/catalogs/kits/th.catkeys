@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libbe	1136819888
+1	thai	x-vnd.Haiku-libbe	2290672854
 All Rights Reserved.	AboutWindow		สงวนลิขสิทธิ์
 gold master	AboutWindow		gold master
 Undo	TextView		เลิกทำ
@@ -19,7 +19,6 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		ผิดพลาด
 Paste	TextView		วาง
 OK	AboutWindow		ตกลง
-Special Thanks:	AboutWindow		ขอขอบคุณเป็นพิเศษ:
 Remove replicant	Dragger		ลบ replicant
 Version	AboutWindow		เวอร์ชั่น
 Red:	ColorControl		แดง:

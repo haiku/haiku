@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libbe	1136819888
+1	slovak	x-vnd.Haiku-libbe	2290672854
 All Rights Reserved.	AboutWindow		Všetky práva vyhradené.
 gold master	AboutWindow		gold master
 Undo	TextView		Späť
@@ -19,7 +19,6 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		Chyba
 Paste	TextView		Vložiť
 OK	AboutWindow		OK
-Special Thanks:	AboutWindow		Zvláštne poďakovanie:
 Remove replicant	Dragger		Odstrániť replikanta
 Version	AboutWindow		Verzia
 Red:	ColorControl		Červená:

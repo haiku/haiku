@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-libbe	1445751563
+1	korean	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		골드 마스터
 Undo	TextView		실행취소
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		오류
 Paste	TextView		붙여넣기
 OK	AboutWindow		확인
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Special Thanks:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		기본 Haiku 윈도우 테마.
 %s GiB	StringForSize	size unit	%s GiB

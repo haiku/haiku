@@ -4,7 +4,7 @@ Description	DormantNodeInfoView		Beschreibung
 Byte order	InfoView		Byte-Reihenfolge
 Connection	InfoView		Verbindung
 Output formats	DormantNodeInfoView		Ausgangeformate
-History	InfoView		Historie
+History	InfoView		Verlauf
 Input formats	DormantNodeInfoView		Eingangsformate
 Signature	AppNodeInfoView		Signatur
 Video data between	InfoView		Videodaten zwischen

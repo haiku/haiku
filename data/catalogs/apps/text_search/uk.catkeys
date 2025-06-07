@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	3471063634
+1	ukrainian	x-vnd.Haiku.TextSearch	1461663588
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Не вдалося запустити програму xargs!
@@ -7,6 +7,7 @@ Actions	GrepWindow		Дії
 New window	GrepWindow		Нове вікно
 Encoding	GrepWindow		Кодування
 Set target to parent folder	GrepWindow		Зробити батьківський каталог цільовим
+Clear history	GrepWindow		Очистити історію
 OK	GrepWindow		ОК
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Закрити
@@ -28,7 +29,7 @@ Copy text to clipboard	GrepWindow		Копіювати текст до буфер
 Show lines	GrepWindow		Показати рядки
 Failed to open errors pipe!	Grepper		Збій при відкритті каналу помилок!
 The unselected files will be removed from the list.	GrepWindow		Файли, які не вибрані, будуть вилучені зі списку.
-Open files in code editor	GrepWindow		Відкрвати файли в редакторі коду
+Open files in code editor	GrepWindow		Відкривати файли у редакторі коду
 Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з крапки
 Failed to open output pipe!	Grepper		Збій при відкритті вихідного каналу! 
 Cancel	GrepWindow		Скасувати

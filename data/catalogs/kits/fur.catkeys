@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libbe	1445751563
+1	friulian	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Ducj i dirits riservâts.
 gold master	AboutWindow		gold master
 Undo	TextView		Disfe
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Erôr
 Paste	TextView		Tache
 OK	AboutWindow		Va ben
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Ringraciaments speciâi:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Decoradôr di barcons predefinît di Haiku.
 %s GiB	StringForSize	size unit	%s GiB

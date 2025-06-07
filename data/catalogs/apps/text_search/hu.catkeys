@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku.TextSearch	3471063634
+1	hungarian	x-vnd.Haiku.TextSearch	1461663588
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Válassza ki azokat a fájlokat a Nyomkövetőben, melyek kijelölésre kerüljenek.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Az xargs indítása sikertelen!
@@ -7,6 +7,7 @@ Actions	GrepWindow		Műveletek
 New window	GrepWindow		Új ablak
 Encoding	GrepWindow		Kódolás
 Set target to parent folder	GrepWindow		A cél a szülő mappa legyen
+Clear history	GrepWindow		Előzmények törlése
 OK	GrepWindow		Rendben
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Bezárás

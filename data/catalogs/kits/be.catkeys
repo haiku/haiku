@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libbe	4009575035
+1	belarusian	x-vnd.Haiku-libbe	868460705
 All Rights Reserved.	AboutWindow		Усе правы захаваныя.
 gold master	AboutWindow		залатая
 Undo	TextView		Адвярнуць
@@ -18,7 +18,6 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		Памылка
 Paste	TextView		Уставіць
 OK	AboutWindow		ОК
-Special Thanks:	AboutWindow		Адмысловыя падзякі:
 Remove replicant	Dragger		Выдаліць рэпліканта
 Version	AboutWindow		Версія
 Red:	ColorControl		Чырвоны:

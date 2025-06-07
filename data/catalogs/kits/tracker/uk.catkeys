@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	4192200646
+1	ukrainian	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -168,6 +168,7 @@ Property info	AttributesView		Інфо про властивості
 Sorry, you can't create links in the Trash.	PoseView		Вибачте, Ви не можете створювати посилання у смітнику.
 From	Email Query Columns		Від
 Open selection with:	OpenWithWindow		Відкрити вибране у:
+Preferences…	ContainerWindow		Налаштування…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Неможливо відкрити \«%document\» бо програма \«%app\» у смітнику. 
 Work Phone	Person Query Columns		Робочий телефон
 Select folders	FindPanel		Вибір папок

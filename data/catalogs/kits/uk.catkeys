@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libbe	1445751563
+1	ukrainian	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Всі права захищені.
 gold master	AboutWindow		золотий майстер
 Undo	TextView		Відмінити
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Помилка
 Paste	TextView		Вставити
 OK	AboutWindow		ОК
 %s MiB/s	StringForRate	units per second	%s MБ/с
-Special Thanks:	AboutWindow		Особлива подяка:
 %s TiB	StringForSize	size unit	%s TБ
 Default Haiku window decorator.	Default decorator about box		Декоратор вікон Haiku за замовчуванням.
 %s GiB	StringForSize	size unit	%s ГБ

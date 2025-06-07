@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1516006117
+1	japanese	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -38,7 +38,7 @@ Type	AttributesView		型
 Prompt	FSUtils		プロンプト
 Error in regular expression:\n\n'%errstring'	PoseView		正規表現にエラーがあります:\n\n'%errstring'
 Small bitmap icon	AttributesView		小ビットマップアイコン
-Would you like to find a suitable application to open the file?	FSUtils		このファイルを開くことのできるアプリケーションを検索しますか?
+Would you like to find a suitable application to open the file?	FSUtils		このファイルを開らけるアプリケーションを検索しますか?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
 (unknown)	InfoWindow		(不明)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# 日>}}
@@ -168,6 +168,7 @@ Property info	AttributesView		プロパティ情報
 Sorry, you can't create links in the Trash.	PoseView		ごみ箱にリンクを作成できません。
 From	Email Query Columns		差出人
 Open selection with:	OpenWithWindow		選択ファイルをアプリケーションで開く:
+Preferences…	ContainerWindow		設定…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%app\" はごみ箱にあるため、\"%document\" を開けません。
 Work Phone	Person Query Columns		勤務先の電話番号
 Select folders	FindPanel		フォルダーの選択
@@ -276,6 +277,7 @@ Restoring: 	StatusWindow		元に戻しています:
 The Tracker must be running to set the default printer.	PoseView		デフォルトプリンターを設定するにはTrackerが動作している必要があります。
 calculating…	InfoWindow		計算中...
 Preferred for file	OpenWithWindow		関連付けの第一優先
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# 個選択済} other{# 個選択済}}
 OK	AutoMounterSettings		OK
 copying	FSUtils		コピー中
 MIME String	AttributesView		MIME文字列
@@ -298,6 +300,7 @@ Error moving \"%name\".	FSUtils		\"%name\" の移動中にエラーが発生し
 Open	ContainerWindow		開く
 Settings…	MountMenu		設定...
 You cannot put the selected item(s) into the trash.	FSUtils		選択した項目をごみ箱に移動できません
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	検索対象:
 starts with	SelectionWindow		指定文字列で始まる
 Any	AttributesView		任意の
 Invert	SelectionWindow		反転

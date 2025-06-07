@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1836451181
+1	russian	x-vnd.Haiku-libtracker	2786291405
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -168,6 +168,7 @@ Property info	AttributesView		Информация о свойствах
 Sorry, you can't create links in the Trash.	PoseView		Извините, но вы не можете создавать ссылки в корзине.
 From	Email Query Columns		От
 Open selection with:	OpenWithWindow		Открыть выбранное с помощью:
+Preferences…	ContainerWindow		Настройки…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Невозможно открыть \«%document\» поскольку программа \«%app\» находится в корзине. 
 Work Phone	Person Query Columns		Рабочий телефон
 Select folders	FindPanel		Выбор папок…

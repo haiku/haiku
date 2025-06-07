@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libbe	1445751563
+1	spanish; castilian	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Todos los derechos reservados.
 gold master	AboutWindow		maestro dorado
 Undo	TextView		Deshacer
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Error
 Paste	TextView		Pegar
 OK	AboutWindow		Aceptar
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Agradecimientos especiales:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Decorador de ventana predeterminado de Haiku.
 %s GiB	StringForSize	size unit	%s GiB

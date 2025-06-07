@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libbe	1445751563
+1	czech	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Všechna práva vyhrazena.
 gold master	AboutWindow		zlatý mistr
 Undo	TextView		Zpět
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Chyba
 Paste	TextView		Vložit
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Zvláštní poděkování:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Výchozí dekoratér oken Haiku.
 %s GiB	StringForSize	size unit	%s GiB

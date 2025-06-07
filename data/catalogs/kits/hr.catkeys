@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libbe	2262853297
+1	croatian	x-vnd.Haiku-libbe	3416706263
 All Rights Reserved.	AboutWindow		Sva prava pridržana.
 Undo	TextView		Poništi
 OK	PrintJob		U redu
@@ -15,7 +15,6 @@ Cut	TextView		Izreži
 Error	ZombieReplicantView		Greška
 Paste	TextView		Zalijepi
 OK	AboutWindow		U redu
-Special Thanks:	AboutWindow		Posebna zahvala:
 Version	AboutWindow		Verzija
 Red:	ColorControl		Crveno:
 <empty>	Menu		<empty>

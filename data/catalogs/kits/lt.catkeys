@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libbe	4009575035
+1	lithuanian	x-vnd.Haiku-libbe	868460705
 All Rights Reserved.	AboutWindow		Visos teisės saugomos.
 gold master	AboutWindow		galutinė
 Undo	TextView		Atšaukti
@@ -18,7 +18,6 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		Klaida
 Paste	TextView		Įdėti
 OK	AboutWindow		Gerai
-Special Thanks:	AboutWindow		Ypatingos padėkos:
 Remove replicant	Dragger		Pašalinti replikantą
 Version	AboutWindow		Versija
 Red:	ColorControl		Raudona:

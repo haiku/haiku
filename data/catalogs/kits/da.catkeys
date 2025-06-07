@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libbe	1337497439
+1	danish	x-vnd.Haiku-libbe	2491350405
 All Rights Reserved.	AboutWindow		Alle rettigheder forbeholdes.
 gold master	AboutWindow		guldmaster
 Undo	TextView		Fortryd
@@ -20,7 +20,6 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		Fejl
 Paste	TextView		Indsæt
 OK	AboutWindow		O.k.
-Special Thanks:	AboutWindow		Særlig tak til:
 Default Haiku window decorator.	Default decorator about box		Standard Haiku-vinduesdekoratør.
 Remove replicant	Dragger		Fjern replikant
 Version	AboutWindow		Version

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	4192200646
+1	german	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -168,6 +168,7 @@ Property info	AttributesView		Property-Info
 Sorry, you can't create links in the Trash.	PoseView		Im Papierkorb können keine Verknüpfungen erstellt werden.
 From	Email Query Columns		Von
 Open selection with:	OpenWithWindow		Auswahl öffnen mit:
+Preferences…	ContainerWindow		Einstellungen…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Die Datei \"%document\" kann nicht geöffnet werden, weil sich das zugehörige Programm \"%app\" im Papierkorb befindet.
 Work Phone	Person Query Columns		Telefon (geschäftlich)
 Select folders	FindPanel		Ordner wählen

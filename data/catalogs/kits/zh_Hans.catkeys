@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	1445751563
+1	english	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		保留所有权利
 gold master	AboutWindow		最终测试版
 Undo	TextView		撤销
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		错误
 Paste	TextView		粘贴
 OK	AboutWindow		确定
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		特别感谢：
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		默认 Haiku 窗口主题。
 %s GiB	StringForSize	size unit	%s GiB

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libbe	1445751563
+1	french	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Tous droits réservés.
 gold master	AboutWindow		finale
 Undo	TextView		Annuler
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Erreur
 Paste	TextView		Coller
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s Mio/s
-Special Thanks:	AboutWindow		Remerciements particuliers :
 %s TiB	StringForSize	size unit	%s Tio
 Default Haiku window decorator.	Default decorator about box		Décorateur de fenêtre Haiku par défaut.
 %s GiB	StringForSize	size unit	%s Gio

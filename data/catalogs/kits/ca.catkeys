@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libbe	1445751563
+1	catalan; valencian	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Tots els drets reservats.
 gold master	AboutWindow		candidat
 Undo	TextView		Desfés
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Error
 Paste	TextView		Enganxa
 OK	AboutWindow		D'acord
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Agraïments especials:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Decorador de finestres per defecte del Haiku
 %s GiB	StringForSize	size unit	%s GiB

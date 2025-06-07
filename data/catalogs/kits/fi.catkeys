@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	1445751563
+1	finnish	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		gold master
 Undo	TextView		Peru
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Virhe
 Paste	TextView		Liitä
 OK	AboutWindow		Valmis
 %s MiB/s	StringForRate	units per second	%s Mebitavua/s
-Special Thanks:	AboutWindow		Erityiskiitokset:
 %s TiB	StringForSize	size unit	%s Tebitavua
 Default Haiku window decorator.	Default decorator about box		Oletus Haiku-ikkunakoristemaalari.
 %s GiB	StringForSize	size unit	%s Gibitavua

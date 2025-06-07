@@ -29,7 +29,7 @@ XModem send…	SerialWindow		XModem senden …
 Baudrate:	Custom baudrate window		Baudrate:
 OK	Custom baudrate window		OK
 Waiting for receiver…	XModemStatus		Warte auf Empfänger …
-Clear history	SerialWindow		Historie leeren
+Clear history	SerialWindow		Verlauf leeren
 Checksum error, re-send block	XModemStatus		Checksummenfehler, Block nochmal senden
 Settings	SerialWindow		Einstellungen
 Even	SerialWindow	Parity	Gerade

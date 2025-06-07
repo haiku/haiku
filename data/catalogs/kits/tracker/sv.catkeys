@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	4192200646
+1	swedish	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -168,6 +168,7 @@ Property info	AttributesView		Egenskapsinfo
 Sorry, you can't create links in the Trash.	PoseView		Du kan inte skapa länkar i Papperskorgen.
 From	Email Query Columns		Från
 Open selection with:	OpenWithWindow		Öppna markering med:
+Preferences…	ContainerWindow		Inställningar...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Kunde inte öppna \"%document\" för att programmet \"%app\" ligger i Papperskorgen. 
 Work Phone	Person Query Columns		Jobbtelefon
 Select folders	FindPanel		Välj mappar

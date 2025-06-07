@@ -24,7 +24,7 @@ Unknown	ImageView		Неизвестно
 Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Окно сведений
 Sorry, unable to load the image.	ImageView		К сожалению, не удалось загрузить изображение.
 File	ImageWindow		Файл
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбранный документ: %1\n\nИспользованный транслятор:\nИмя: %2\nСведения: %3\nВерсия: %4\n
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Выбранный документ: %1\n\nИспользованный транслятор:\nНазвание: %2\nСведения: %3\nВерсия: %4\n
 Quit	ImageWindow		Выйти
 Sorry, unable to write the image file.	ImageView		К сожалению, не удалось записать файл изображения.
 Save…	ImageWindow		Сохранить…

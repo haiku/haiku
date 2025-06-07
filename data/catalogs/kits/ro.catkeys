@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libbe	1445751563
+1	romanian	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
 gold master	AboutWindow		versiune finală
 Undo	TextView		Refă
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Eroare
 Paste	TextView		Lipește
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiO/s
-Special Thanks:	AboutWindow		Mulţumiri speciale:
 %s TiB	StringForSize	size unit	%s TiO
 Default Haiku window decorator.	Default decorator about box		Decorator de fereastră Haiku implicit.
 %s GiB	StringForSize	size unit	%s GiO

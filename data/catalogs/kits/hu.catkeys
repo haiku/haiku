@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	1445751563
+1	hungarian	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
 gold master	AboutWindow		arany fokozatú
 Undo	TextView		Visszavonás
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Hiba
 Paste	TextView		Beillesztés
 OK	AboutWindow		Rendben
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Külön köszönet:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Alapértelmezett Haiku ablak-dekoráció
 %s GiB	StringForSize	size unit	%s GiB

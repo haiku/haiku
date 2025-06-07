@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libbe	1445751563
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Alle rettigheter forbeholdt.
 gold master	AboutWindow		gold master
 Undo	TextView		Tilbakestill
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Feil
 Paste	TextView		Lim inn
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Spesiell takk:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Standard Haiku vindusdekorator.
 %s GiB	StringForSize	size unit	%s GiB

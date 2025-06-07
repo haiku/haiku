@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libbe	1445751563
+1	swedish	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
 gold master	AboutWindow		guld mästare
 Undo	TextView		Ångra
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Fel
 Paste	TextView		Klistra in
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiB/s
-Special Thanks:	AboutWindow		Särskilt tack till:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Standard Haiku window decorator.
 %s GiB	StringForSize	size unit	%s GiB

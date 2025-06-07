@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libbe	1445751563
+1	indonesian	x-vnd.Haiku-libbe	2599604529
 All Rights Reserved.	AboutWindow		Hak Cipta dilindungi undang-undang.
 gold master	AboutWindow		master emas
 Undo	TextView		Batal
@@ -24,7 +24,6 @@ Error	ZombieReplicantView		Galat
 Paste	TextView		Tempel
 OK	AboutWindow		OKE
 %s MiB/s	StringForRate	units per second	%s MiB/d
-Special Thanks:	AboutWindow		Terima kasih terkhusus:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Dekorator window bawaan Haiku.
 %s GiB	StringForSize	size unit	%s GiB

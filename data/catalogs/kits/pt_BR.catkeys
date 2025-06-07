@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libbe	1337497439
+1	portuguese (brazil)	x-vnd.Haiku-libbe	2491350405
 All Rights Reserved.	AboutWindow		Todos os direitos reservados.
 gold master	AboutWindow		cópia mestra
 Undo	TextView		Desfazer
@@ -20,7 +20,6 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		Erro
 Paste	TextView		Colar
 OK	AboutWindow		OK
-Special Thanks:	AboutWindow		Agradecimentos Especiais
 Default Haiku window decorator.	Default decorator about box		Decorador de janela padrão do Haiku.
 Remove replicant	Dragger		Remover replicante
 Version	AboutWindow		Versão

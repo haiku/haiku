@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	4192200646
+1	catalan; valencian	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -168,6 +168,7 @@ Property info	AttributesView		Informació de propietat
 Sorry, you can't create links in the Trash.	PoseView		Disculpeu, no podeu fer enllaços amb la paperera.
 From	Email Query Columns		De
 Open selection with:	OpenWithWindow		Obre la selecció amb:
+Preferences…	ContainerWindow		Preferències…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		No s'ha pogut obrir \"%document\" ja que l'aplicació \"%app\" és a la paperera. 
 Work Phone	Person Query Columns		Telèfon de la feina
 Select folders	FindPanel		Selecció de carpetes

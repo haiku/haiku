@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libbe	1337497439
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	2491350405
 All Rights Reserved.	AboutWindow		Με επιφύλαξη παντός δικαιώματος.
 gold master	AboutWindow		gold master
 Undo	TextView		Αναίρεση
@@ -20,7 +20,6 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		Σφάλμα
 Paste	TextView		Επικόλληση
 OK	AboutWindow		Εντάξει
-Special Thanks:	AboutWindow		Ευχαριστούμε ιδιαίτερα τους/τις:
 Default Haiku window decorator.	Default decorator about box		Προεπιλεγμένη διακόσμηση παραθύρων Haiku.
 Remove replicant	Dragger		Αφαίρεση ρεπλίκας
 Version	AboutWindow		Έκδοση

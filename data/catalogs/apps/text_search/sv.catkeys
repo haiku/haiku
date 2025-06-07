@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku.TextSearch	3471063634
+1	swedish	x-vnd.Haiku.TextSearch	1461663588
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Markera de filer du vill ska markeras i Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Misslyckades med att starta xargs-program!
@@ -7,6 +7,7 @@ Actions	GrepWindow		Kommandon
 New window	GrepWindow		Nytt fönster
 Encoding	GrepWindow		Teckenuppsättning
 Set target to parent folder	GrepWindow		Ställ in mål till överordnad mapp
+Clear history	GrepWindow		Rensa historik
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Stäng
