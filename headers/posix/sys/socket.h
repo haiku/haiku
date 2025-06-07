@@ -126,6 +126,8 @@ struct msghdr {
 #define MSG_MCAST		0x0200	/* this message rec'd as multicast */
 #define	MSG_EOF			0x0400	/* data completes connection */
 #define MSG_NOSIGNAL	0x0800	/* don't raise SIGPIPE if socket is closed */
+#define MSG_CMSG_CLOEXEC	0x1000	/* set FD_CLOEXEC flag on FDs created via SCM_RIGHTS */
+#define MSG_CMSG_CLOFORK	0x2000	/* set FD_CLOFORK flag on FDs created via SCM_RIGHTS */
 
 struct cmsghdr {
 	socklen_t	cmsg_len;

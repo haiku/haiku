@@ -233,7 +233,7 @@ add_ancillary_data(net_socket* socket, ancillary_data_container* container,
 
 static status_t
 process_ancillary_data(net_socket* socket, ancillary_data_container* container,
-	msghdr* messageHeader)
+	msghdr* messageHeader, int flags)
 {
 	uint8* dataBuffer = (uint8*)messageHeader->msg_control;
 	int dataBufferLen = messageHeader->msg_controllen;
@@ -247,7 +247,7 @@ process_ancillary_data(net_socket* socket, ancillary_data_container* container,
 		return B_NOT_SUPPORTED;
 
 	ssize_t bytesWritten = socket->first_info->process_ancillary_data(
-		socket->first_protocol, container, dataBuffer, dataBufferLen);
+		socket->first_protocol, container, dataBuffer, dataBufferLen, flags);
 	if (bytesWritten < 0)
 		return bytesWritten;
 
@@ -258,7 +258,7 @@ process_ancillary_data(net_socket* socket, ancillary_data_container* container,
 
 static status_t
 process_ancillary_data(net_socket* socket,
-	net_buffer* buffer, msghdr* messageHeader)
+	net_buffer* buffer, msghdr* messageHeader, int flags)
 {
 	void *dataBuffer = messageHeader->msg_control;
 	ssize_t bytesWritten;
@@ -295,7 +295,7 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 	ancillary_data_container* ancillaryData = NULL;
 	ssize_t bytesRead = socket->first_info->read_data_no_buffer(
 		socket->first_protocol, vecs, vecCount, &ancillaryData, address,
-		addressLen, flags);
+		addressLen, flags & ~(MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK));
 	if (bytesRead < 0)
 		return bytesRead;
 
@@ -305,7 +305,8 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 
 	// process ancillary data
 	if (header != NULL) {
-		status_t status = process_ancillary_data(socket, ancillaryData, header);
+		status_t status = process_ancillary_data(socket, ancillaryData, header,
+			flags & (MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK));
 		if (status != B_OK)
 			return status;
 
@@ -1165,9 +1166,9 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 			ancillary_data_container* container
 				= gNetBufferModule.get_ancillary_data(buffer);
 			if (container != NULL)
-				status = process_ancillary_data(socket, container, header);
+				status = process_ancillary_data(socket, container, header, flags);
 			else
-				status = process_ancillary_data(socket, buffer, header);
+				status = process_ancillary_data(socket, buffer, header, flags);
 			if (status != B_OK) {
 				gNetBufferModule.free(buffer);
 				return status;

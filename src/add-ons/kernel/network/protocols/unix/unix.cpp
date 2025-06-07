@@ -354,7 +354,7 @@ unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 ssize_t
 unix_process_ancillary_data(net_protocol *self,
 	const ancillary_data_container *container, void *buffer,
-	size_t bufferSize)
+	size_t bufferSize, int flags)
 {
 	TRACE("[%" B_PRId32 "] unix_process_ancillary_data(%p, %p, %p, %p, %lu)\n",
 		find_thread(NULL), self, container, buffer, bufferSize);
@@ -409,6 +409,12 @@ unix_process_ancillary_data(net_protocol *self,
 					close_fd_index(ioContext, fds[j]);
 				break;
 			}
+
+			WriteLocker locker(ioContext->lock);
+			if ((flags & MSG_CMSG_CLOEXEC) != 0)
+				fd_set_close_on_exec(ioContext, fds[i], true);
+			if ((flags & MSG_CMSG_CLOFORK) != 0)
+				fd_set_close_on_fork(ioContext, fds[i], true);
 		}
 		if (error != B_OK)
 			break;
