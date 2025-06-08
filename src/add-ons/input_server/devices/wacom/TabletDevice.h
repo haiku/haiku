@@ -41,6 +41,7 @@ class TabletDevice : public PointingDevice {
 									int32& eraser,
 									float& wheelX,
 									float& wheelY,
+									float& lastWheelY,
 									float& tiltX,
 									float& tiltY) const;
 

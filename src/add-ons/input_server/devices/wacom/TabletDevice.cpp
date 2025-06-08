@@ -304,7 +304,7 @@ TabletDevice::SetDevice(float maxX, float maxY, uint32 mode)
 void
 TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 	uint32& mode, uint32& buttons, float& x, float& y, float& pressure,
-	int32& clicks, int32& eraser, float& wheelX, float& wheelY,
+	int32& clicks, int32& eraser, float& wheelX, float& wheelY, float& lastWheelY,
 	float& tiltX, float& tiltY) const
 {
 	hasContact = false;
@@ -384,6 +384,7 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 		case DEVICE_INTUOS3:
 		case DEVICE_INTUOS4:
 		case DEVICE_CINTIQ:
+		{
 			if ((data[0] == 0x02) && !(((data[1] >> 5) & 0x03) == 0x02)) {
 				if (fDeviceMode == DEVICE_INTUOS3 || fDeviceMode == DEVICE_INTUOS4) {
 					xPos = (data[2] << 9) | (data[3] << 1)
@@ -445,8 +446,33 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 					tiltX = (float)(tiltDataX - 64) / 64.0;
 					tiltY = (float)(tiltDataY - 64) / 64.0;
 				}
+			} else if (data[0] == 0x0c) { // Wheel pad
+
+				// Touch Ring rotation (delta)
+				uint8 wheelDelta = data[1];
+				uint8 ringValue = wheelDelta & 0x7f;
+				bool ringProximity = (wheelDelta & 0x80) != 0;
+				float localWheelY = ringValue / 30.0f; // sensibility of 30.0
+				wheelY = localWheelY;
+
+			    if (localWheelY > lastWheelY) {
+					lastWheelY = wheelY;
+			    } else {
+					wheelY = -wheelY;
+				    lastWheelY = -wheelY; // use absolute value for lastWheelY
+			    }
+
+				buttons = 0;
+				x = fPosX * fMaxX;
+				y = fPosY * fMaxY;
+				hasContact = ringProximity;
+				mode = MODE_MOUSE;
+				pressure = 0.0;
+				eraser = 0;
+				tiltX = tiltY = 0.0;
 			}
 			break;
+		}
 		case DEVICE_PL500: {
 			hasContact = ( data[1] & 0x20);
 			xPos = data[2] << 8 | data[3];
@@ -672,6 +698,7 @@ TabletDevice::poll_usb_device(void* arg)
 
 	uchar data[max_c(12, dataBytes)];
 
+	float lastWheelY = 0.0;
 	while (tabletDevice->IsActive()) {
 
 		status_t ret = reader->ReadData(data, dataBytes);
@@ -688,12 +715,13 @@ TabletDevice::poll_usb_device(void* arg)
 			int32 eraser = 0;
 			float wheelX = 0.0;
 			float wheelY = 0.0;
+
 			float tiltX = 0.0;
 			float tiltY = 0.0;
 			// let the device extract all information from the data
 			tabletDevice->ReadData(data, dataBytes, hasContact, mode, buttons,
 								   x, y, pressure, clicks, eraser,
-								   wheelX, wheelY, tiltX, tiltY);
+								   wheelX, wheelY, lastWheelY, tiltX, tiltY);
 			if (hasContact) {
 				// apply the changes to the device
 				tabletDevice->SetStatus(mode, buttons, x, y, pressure,
