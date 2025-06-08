@@ -13,6 +13,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SharedLibrary [ MultiArchDefaultGristFiles libbsd.so ] :
 			arc4random.c
 			arc4random_uniform.c
+			closefrom.cpp
 			daemon.c
 			dl_iterate_phdr.c
 			err.c

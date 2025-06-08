@@ -857,6 +857,27 @@ common_close(int fd, bool kernel)
 }
 
 
+static status_t
+common_close_range(u_int minFd, u_int maxFd, int flags, bool kernel)
+{
+	if (maxFd < minFd)
+		return B_BAD_VALUE;
+	struct io_context* context = get_current_io_context(kernel);
+	maxFd = min_c(maxFd, context->table_size - 1);
+	if ((flags & CLOSE_RANGE_CLOEXEC) == 0) {
+		for (u_int fd = minFd; fd <= maxFd; fd++)
+			close_fd_index(context, fd);
+	} else {
+		WriteLocker locker(context->lock);
+		for (u_int fd = minFd; fd <= maxFd; fd++) {
+			if (context->fds[fd] != NULL)
+				fd_set_close_on_exec(context, fd, true);
+		}
+	}
+	return B_OK;
+}
+
+
 status_t
 user_fd_kernel_ioctl(int fd, uint32 op, void* buffer, size_t length)
 {
@@ -1015,6 +1036,15 @@ status_t
 _user_close(int fd)
 {
 	return common_close(fd, false);
+}
+
+
+status_t
+_user_close_range(u_int minFd, u_int maxFd, int flags)
+{
+	if ((flags & ~(CLOSE_RANGE_CLOEXEC)) != 0)
+		return B_BAD_VALUE;
+	return common_close_range(minFd, maxFd, flags, false);
 }
 
 
@@ -1207,6 +1237,13 @@ status_t
 _kern_close(int fd)
 {
 	return common_close(fd, true);
+}
+
+
+status_t
+_kern_close_range(u_int minFd, u_int maxFd, int flags)
+{
+	return common_close_range(minFd, maxFd, flags, true);
 }
 
 

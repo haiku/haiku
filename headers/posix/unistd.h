@@ -327,6 +327,8 @@
 #	define SEEK_HOLE 4
 #endif
 
+#define CLOSE_RANGE_CLOEXEC	0x4
+
 
 #ifdef __cplusplus
 extern "C" {

@@ -28,6 +28,9 @@ char	*getusershell(void);
 int		issetugid(void);
 void	setusershell(void);
 
+int		closefrom(int lowFd);
+int		close_range(u_int minFd, u_int maxFd, int flags);
+
 #ifdef __cplusplus
 }
 #endif
