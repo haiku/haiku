@@ -2303,6 +2303,10 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 			lastParentID = vnode->id;
 		}
 
+		// if next path component is empty, check next vnode is actually a directory
+		if (directoryFound && *nextPath == '\0' && !S_ISDIR(nextVnode->Type()))
+			return B_NOT_A_DIRECTORY;
+
 		// decrease the ref count on the old dir we just looked up into
 		vnode.Unset();
 
