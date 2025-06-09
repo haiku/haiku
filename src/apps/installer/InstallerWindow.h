@@ -82,6 +82,7 @@ private:
 			BButton*			fLaunchDriveSetupButton;
 			BMenuItem*			fLaunchBootManagerItem;
 			BMenuItem*			fMakeBootableItem;
+			BMenu*				fEFILoaderMenu;
 
 			bool				fEncouragedToSetupPartitions;
 

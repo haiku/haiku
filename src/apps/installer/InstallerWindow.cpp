@@ -264,10 +264,14 @@ InstallerWindow::InstallerWindow()
 	fMakeBootableItem = new BMenuItem(B_TRANSLATE("Write boot sector"),
 		new BMessage(MSG_WRITE_BOOT_SECTOR));
 	fMakeBootableItem->SetEnabled(false);
+
+	fEFILoaderMenu = new BMenu(B_TRANSLATE("Install EFI loader"));
+
 	BMenuBar* mainMenu = new BMenuBar("main menu");
 	BMenu* toolsMenu = new BMenu(B_TRANSLATE("Tools"));
 	toolsMenu->AddItem(fLaunchBootManagerItem);
 	toolsMenu->AddItem(fMakeBootableItem);
+	toolsMenu->AddItem(fEFILoaderMenu);
 	mainMenu->AddItem(toolsMenu);
 
 	BGroupView* packagesGroup = new BGroupView(B_VERTICAL, B_USE_ITEM_SPACING);
@@ -425,6 +429,13 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case TARGET_PARTITION:
 			_UpdateControls();
 			break;
+		case EFI_PARTITION:
+		{
+			partition_id id;
+			msg->FindInt32("id", &id);
+			fWorkerThread->InstallEFILoader(id, false);
+			break;
+		}
 		case LAUNCH_DRIVE_SETUP:
 			_LaunchDriveSetup();
 			break;
@@ -740,11 +751,20 @@ InstallerWindow::_ScanPartitions()
 		delete item;
 	while ((item = fDestMenu->RemoveItem((int32)0)))
 		delete item;
+	while ((item = fEFILoaderMenu->RemoveItem((int32)0)))
+		delete item;
 
-	fWorkerThread->ScanDisksPartitions(fSrcMenu, fDestMenu);
+	fWorkerThread->ScanDisksPartitions(fSrcMenu, fDestMenu, fEFILoaderMenu);
 
 	if (fSrcMenu->ItemAt(0) != NULL)
 		_PublishPackages();
+
+	if (fEFILoaderMenu->ItemAt(0) == NULL) {
+		BMenuItem* noPart = new BMenuItem(B_TRANSLATE("No valid EFI system data partitions found"),
+			NULL);
+		noPart->SetEnabled(false);
+		fEFILoaderMenu->AddItem(noPart);
+	}
 
 	// If the install is already finished, keep the button as is.
 	if (fInstallStatus != kFinished)

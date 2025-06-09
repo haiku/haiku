@@ -23,8 +23,10 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 
+			void 				InstallEFILoader(partition_id id, bool rename);
+
 			void				ScanDisksPartitions(BMenu* srcMenu,
-									BMenu* dstMenu);
+									BMenu* dstMenu, BMenu* EFIMenu);
 
 			void				SetPackagesList(BList* list);
 			void				SetSpaceRequired(off_t bytes)

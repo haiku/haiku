@@ -370,7 +370,7 @@ BDiskDeviceRoster::FindPartitionByMountPoint(const char* mountPoint,
 {
 	BVolume volume(dev_for_path(mountPoint));
 	if (volume.InitCheck() == B_OK
-		&& FindPartitionByVolume(volume, device, _partition))
+		&& FindPartitionByVolume(volume, device, _partition) == B_OK)
 		return B_OK;
 
 	return B_ENTRY_NOT_FOUND;
