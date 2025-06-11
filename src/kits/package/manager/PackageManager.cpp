@@ -157,19 +157,22 @@ BPackageManager::SetDebugLevel(int32 level)
 
 
 void
-BPackageManager::Install(const char* const* packages, int packageCount)
+BPackageManager::Install(const char* const* packages, int packageCount, bool refresh)
 {
 	BSolverPackageSpecifierList packagesToInstall;
 	_AddPackageSpecifiers(packages, packageCount, packagesToInstall);
-	Install(packagesToInstall);
+	Install(packagesToInstall, refresh);
 }
 
 
 void
-BPackageManager::Install(const BSolverPackageSpecifierList& packages)
+BPackageManager::Install(const BSolverPackageSpecifierList& packages, bool refresh)
 {
-	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES
-		| B_REFRESH_REPOSITORIES);
+	uint32 flags = B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES;
+	if (refresh)
+		flags |= B_REFRESH_REPOSITORIES;
+
+	Init(flags);
 
 	// solve
 	const BSolverPackageSpecifier* unmatchedSpecifier;

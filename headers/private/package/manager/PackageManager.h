@@ -91,9 +91,9 @@ public:
 									{ return fOtherRepositories; }
 
 			void				Install(const char* const* packages,
-									int packageCount);
+									int packageCount, bool refresh = true);
 			void				Install(const BSolverPackageSpecifierList&
-									packages);
+									packages, bool refresh = true);
 			void				Uninstall(const char* const* packages,
 									int packageCount);
 			void				Uninstall(const BSolverPackageSpecifierList&
