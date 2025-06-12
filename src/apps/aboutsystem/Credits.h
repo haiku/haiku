@@ -292,11 +292,12 @@ static const Translation kTranslations[] = {
 	{ "mi",
 		"Rob Judd\n"
 	},
+#endif
 	{ "nb",
+		"Johan Wagenheim\n"
 		"Klapaucius\n"
 		"petterhj\n"
 	},
-#endif
 	{ "pl",
 		"arckat\n"
 		"Artur Wyszyński\n"
