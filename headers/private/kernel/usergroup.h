@@ -31,10 +31,10 @@ extern "C" {
 
 // syscalls
 
-gid_t		_user_getgid(bool effective);
-uid_t		_user_getuid(bool effective);
-status_t	_user_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged);
-status_t	_user_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged);
+status_t	_user_getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+status_t	_user_getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+status_t	_user_setresgid(gid_t rgid, gid_t egid, gid_t sgid, bool setAllIfPrivileged);
+status_t	_user_setresuid(uid_t ruid, uid_t euid, uid_t suid, bool setAllIfPrivileged);
 ssize_t		_user_getgroups(int groupCount, gid_t* groupList);
 ssize_t		_user_setgroups(int groupCount, const gid_t* groupList);
 

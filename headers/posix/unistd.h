@@ -467,6 +467,8 @@ extern gid_t	getegid(void);
 extern uid_t	geteuid(void);
 extern gid_t	getgid(void);
 extern uid_t	getuid(void);
+extern int		getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+extern int		getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
 
 extern int		setgid(gid_t gid);
 extern int		setuid(uid_t uid);
@@ -474,6 +476,8 @@ extern int		setegid(gid_t gid);
 extern int		seteuid(uid_t uid);
 extern int		setregid(gid_t rgid, gid_t egid);
 extern int		setreuid(uid_t ruid, uid_t euid);
+extern int		setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+extern int		setresuid(uid_t ruid, uid_t euid, uid_t suid);
 
 extern int		getgrouplist(const char* user, gid_t baseGroup,
 					gid_t* groupList, int* groupCount);

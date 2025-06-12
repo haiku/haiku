@@ -39,70 +39,106 @@ set_errno_if_necessary(const T& result)
 gid_t
 getegid(void)
 {
-	return _kern_getgid(true);
+	gid_t egid = 0;
+	_kern_getresgid(NULL, &egid, NULL);
+	return egid;
 }
 
 
 uid_t
 geteuid(void)
 {
-	return _kern_getuid(true);
+	uid_t euid = 0;
+	_kern_getresuid(NULL, &euid, NULL);
+	return euid;
 }
 
 
 gid_t
 getgid(void)
 {
-	return _kern_getgid(false);
+	gid_t rgid = 0;
+	_kern_getresgid(&rgid, NULL, NULL);
+	return rgid;
 }
 
 
 uid_t
 getuid(void)
 {
-	return _kern_getuid(false);
+	uid_t ruid = 0;
+	_kern_getresuid(&ruid, NULL, NULL);
+	return ruid;
+}
+
+
+int
+getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid)
+{
+	return set_errno_if_necessary(_kern_getresgid(rgid, egid, sgid));
+}
+
+
+int
+getresuid(uid_t *ruid, uid_t *euid, uid_t *suid)
+{
+	return set_errno_if_necessary(_kern_getresuid(ruid, euid, suid));
 }
 
 
 int
 setgid(gid_t gid)
 {
-	return set_errno_if_necessary(_kern_setregid(gid, (gid_t)-1, true));
+	return set_errno_if_necessary(_kern_setresgid(gid, (gid_t)-1, (gid_t)-1, true));
 }
 
 
 int
 setuid(uid_t uid)
 {
-	return set_errno_if_necessary(_kern_setreuid(uid, (uid_t)-1, true));
+	return set_errno_if_necessary(_kern_setresuid(uid, (uid_t)-1, (uid_t)-1, true));
 }
 
 
 int
 setegid(gid_t gid)
 {
-	return set_errno_if_necessary(_kern_setregid((gid_t)-1, gid, false));
+	return set_errno_if_necessary(_kern_setresgid((gid_t)-1, gid, (gid_t)-1, false));
 }
 
 
 int
 seteuid(uid_t uid)
 {
-	return set_errno_if_necessary(_kern_setreuid((uid_t)-1, uid, false));
+	return set_errno_if_necessary(_kern_setresuid((uid_t)-1, uid, (uid_t)-1, false));
 }
 
 
 int
 setregid(gid_t rgid, gid_t egid)
 {
-	return set_errno_if_necessary(_kern_setregid(rgid, egid, false));
+	return set_errno_if_necessary(_kern_setresgid(rgid, egid, (gid_t)-1, false));
 }
 
 
 int
 setreuid(uid_t ruid, uid_t euid)
 {
-	return set_errno_if_necessary(_kern_setreuid(ruid, euid, false));
+	return set_errno_if_necessary(_kern_setresuid(ruid, euid, (uid_t)-1, false));
+}
+
+
+int
+setresgid(gid_t rgid, gid_t egid, gid_t sgid)
+{
+	return set_errno_if_necessary(_kern_setresgid(rgid, egid, sgid, false));
+}
+
+
+int
+setresuid(uid_t ruid, uid_t euid, uid_t suid)
+{
+	return set_errno_if_necessary(_kern_setresuid(ruid, euid, suid, false));
 }
 
 

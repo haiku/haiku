@@ -37,7 +37,7 @@ is_privileged(Team* team)
 
 
 static status_t
-common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
+common_setresgid(gid_t rgid, gid_t egid, gid_t ssgid, bool setAllIfPrivileged, bool kernel)
 {
 	Team* team = thread_get_current_thread()->team;
 
@@ -45,7 +45,8 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 
 	bool privileged = kernel || is_privileged(team);
 
-	gid_t ssgid = team->saved_set_gid;
+	if (ssgid == (gid_t)-1 || !privileged)
+		ssgid = team->saved_set_gid;
 
 	// real gid
 	if (rgid == (gid_t)-1) {
@@ -100,7 +101,7 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 
 
 static status_t
-common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
+common_setresuid(uid_t ruid, uid_t euid, uid_t ssuid, bool setAllIfPrivileged, bool kernel)
 {
 	Team* team = thread_get_current_thread()->team;
 
@@ -108,7 +109,14 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 
 	bool privileged = kernel || is_privileged(team);
 
-	uid_t ssuid = team->saved_set_uid;
+	if (ssuid == (uid_t)-1)
+		ssuid = team->saved_set_uid;
+	else {
+		if (!privileged && ssuid != team->effective_uid
+			&& ssuid != team->real_uid && ssuid != team->saved_set_uid) {
+			return EPERM;
+		}
+	}
 
 	// real uid
 	if (ruid == (uid_t)-1) {
@@ -308,35 +316,45 @@ is_in_group(Team* team, gid_t gid)
 }
 
 
-gid_t
-_kern_getgid(bool effective)
+status_t
+_kern_setresgid(gid_t rgid, gid_t egid, gid_t ssgid, bool setAllIfPrivileged)
 {
-	Team* team = thread_get_current_thread()->team;
-
-	return effective ? team->effective_gid : team->real_gid;
-}
-
-
-uid_t
-_kern_getuid(bool effective)
-{
-	Team* team = thread_get_current_thread()->team;
-
-	return effective ? team->effective_uid : team->real_uid;
+	return common_setresgid(rgid, egid, ssgid, setAllIfPrivileged, true);
 }
 
 
 status_t
-_kern_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged)
+_kern_setresuid(uid_t ruid, uid_t euid, uid_t ssuid, bool setAllIfPrivileged)
 {
-	return common_setregid(rgid, egid, setAllIfPrivileged, true);
+	return common_setresuid(ruid, euid, ssuid, setAllIfPrivileged, true);
 }
 
 
 status_t
-_kern_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged)
+_kern_getresgid(gid_t *rgid, gid_t *egid, gid_t *ssgid)
 {
-	return common_setreuid(ruid, euid, setAllIfPrivileged, true);
+	Team* team = thread_get_current_thread()->team;
+	if (rgid != NULL)
+		*rgid = team->real_gid;
+	if (egid != NULL)
+		*egid = team->effective_gid;
+	if (ssgid != NULL)
+		*ssgid = team->saved_set_gid;
+	return B_OK;
+}
+
+
+status_t
+_kern_getresuid(uid_t *ruid, uid_t *euid, gid_t *ssuid)
+{
+	Team* team = thread_get_current_thread()->team;
+	if (ruid != NULL)
+		*ruid = team->real_uid;
+	if (euid != NULL)
+		*euid = team->effective_uid;
+	if (ssuid != NULL)
+		*ssuid = team->saved_set_uid;
+	return B_OK;
 }
 
 
@@ -357,35 +375,69 @@ _kern_setgroups(int groupCount, const gid_t* groupList)
 // #pragma mark - Syscalls
 
 
-gid_t
-_user_getgid(bool effective)
+status_t
+_user_setresgid(gid_t rgid, gid_t egid, gid_t ssgid, bool setAllIfPrivileged)
 {
-	Team* team = thread_get_current_thread()->team;
-
-	return effective ? team->effective_gid : team->real_gid;
-}
-
-
-uid_t
-_user_getuid(bool effective)
-{
-	Team* team = thread_get_current_thread()->team;
-
-	return effective ? team->effective_uid : team->real_uid;
+	return common_setresgid(rgid, egid, ssgid, setAllIfPrivileged, false);
 }
 
 
 status_t
-_user_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged)
+_user_setresuid(uid_t ruid, uid_t euid, uid_t ssuid, bool setAllIfPrivileged)
 {
-	return common_setregid(rgid, egid, setAllIfPrivileged, false);
+	return common_setresuid(ruid, euid, ssuid, setAllIfPrivileged, false);
 }
 
 
 status_t
-_user_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged)
+_user_getresgid(gid_t *rgid, gid_t *egid, gid_t *ssgid)
 {
-	return common_setreuid(ruid, euid, setAllIfPrivileged, false);
+	Team* team = thread_get_current_thread()->team;
+	if (rgid != NULL) {
+		if (!IS_USER_ADDRESS(rgid)
+			|| user_memcpy(rgid, &team->real_gid, sizeof(uid_t)) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+	if (egid != NULL) {
+		if (!IS_USER_ADDRESS(egid)
+			|| user_memcpy(egid, &team->effective_gid, sizeof(uid_t)) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+	if (ssgid != NULL) {
+		if (!IS_USER_ADDRESS(ssgid)
+			|| user_memcpy(ssgid, &team->saved_set_gid, sizeof(uid_t)) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+	return B_OK;
+}
+
+
+status_t
+_user_getresuid(uid_t *ruid, uid_t *euid, gid_t *ssuid)
+{
+	Team* team = thread_get_current_thread()->team;
+	if (ruid != NULL) {
+		if (!IS_USER_ADDRESS(ruid)
+			|| user_memcpy(ruid, &team->real_uid, sizeof(uid_t)) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+	if (euid != NULL) {
+		if (!IS_USER_ADDRESS(euid)
+			|| user_memcpy(euid, &team->effective_uid, sizeof(uid_t)) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+	if (ssuid != NULL) {
+		if (!IS_USER_ADDRESS(ssuid)
+			|| user_memcpy(ssuid, &team->saved_set_uid, sizeof(uid_t)) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+	return B_OK;
 }
 
 

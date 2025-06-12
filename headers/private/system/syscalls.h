@@ -216,11 +216,11 @@ extern int32		_kern_get_scheduler_mode(void);
 extern status_t		_kern_get_loadavg(struct loadavg* info, size_t size);
 
 // user/group functions
-extern gid_t		_kern_getgid(bool effective);
-extern uid_t		_kern_getuid(bool effective);
-extern status_t		_kern_setregid(gid_t rgid, gid_t egid,
+extern status_t		_kern_getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+extern status_t		_kern_getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+extern status_t		_kern_setresgid(gid_t rgid, gid_t egid, gid_t sgid,
 						bool setAllIfPrivileged);
-extern status_t		_kern_setreuid(uid_t ruid, uid_t euid,
+extern status_t		_kern_setresuid(uid_t ruid, uid_t euid, uid_t suid,
 						bool setAllIfPrivileged);
 extern ssize_t		_kern_getgroups(int groupCount, gid_t* groupList);
 extern status_t		_kern_setgroups(int groupCount, const gid_t* groupList);
