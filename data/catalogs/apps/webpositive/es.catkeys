@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	3076065254
+1	spanish; castilian	x-vnd.Haiku-WebPositive	634582724
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiar
@@ -149,6 +149,7 @@ Window	WebPositive Window		Ventana
 Proxy server address:	Settings Window		Dirección del servidor proxy:
 Search page:	Settings Window		Página de búsqueda:
 Settings	WebPositive Window		Configuración
+Show in Tracker	BookmarkBar		Mostrar en Tracker
 Clear	URL Bar		Limpiar
 Loading %url	WebPositive Window		Cargando %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	El pingüino Wenceslao hizo kilómetros bajo exhaustiva lluvia y frío, añoraba a su querido cachorro.

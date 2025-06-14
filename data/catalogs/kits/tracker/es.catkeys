@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	4192200646
+1	spanish; castilian	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -168,6 +168,7 @@ Property info	AttributesView		Información de propiedad
 Sorry, you can't create links in the Trash.	PoseView		No es posible crear enlaces en la papelera.
 From	Email Query Columns		Desde
 Open selection with:	OpenWithWindow		Abrir selección con:
+Preferences…	ContainerWindow		Ajustes…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		No se pudo abrir \"%documento\" porque la aplicación \"%app\" está en la Basura. 
 Work Phone	Person Query Columns		Teléfono Laboral
 Select folders	FindPanel		Seleccionar carpetas

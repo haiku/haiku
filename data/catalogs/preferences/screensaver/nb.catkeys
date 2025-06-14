@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ScreenSaver	3028794413
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ScreenSaver	3775157518
 Display Power Management Signaling not available	ScreenSaver		Signal for strømstyring av skjerm er ikke tilgjengelig
 Blackness	ScreenSaver		Svart skjerm
 Screensavers	ScreenSaver		Skjermsparere
@@ -11,6 +11,7 @@ Cancel	ScreenSaver		Avbryt
 Password:	ScreenSaver		Passord:
 Screensaver settings	ScreenSaver		Skjermsparer-innstillinger
 Password Window	ScreenSaver		Passordvindu
+Use system password	ScreenSaver		Bruk systempassord
 Test	ScreenSaver		Test
 Could not load screen saver	ScreenSaver		Kunne ikke laste skjermsparer
 Use custom password	ScreenSaver		Bruk eget passord
@@ -21,4 +22,5 @@ Password lock	ScreenSaver		Passordlås
 OK	ScreenSaver		OK
 Done	ScreenSaver		Ferdig
 Start screensaver	ScreenSaver		Start skjermsparer
+No preview available	PreviewView		Ingen forhåndsvisning tilgjengelig
 General	ScreenSaver		Generelt

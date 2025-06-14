@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	2599604529
+1	hungarian	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
 gold master	AboutWindow		arany fokozatú
 Undo	TextView		Visszavonás
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Előző verziók:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a replikánshoz tartozó program. Nincs megadva programaláírás.\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Kék
+Special thanks:	AboutWindow		Külön köszönet:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehet replikánst létrehozni ehhez: \"%description\".\n%error
 Written by:	AboutWindow		Írta:

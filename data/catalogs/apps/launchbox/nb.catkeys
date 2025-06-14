@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-LaunchBox	1878360293
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Sett beskrivelse
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vil du virkelig lukke denne padden?\n
 OK	LaunchBox		OK
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Autostart
 Clone	LaunchBox		Klon
 Description for '%3'	LaunchBox		Beskrivelse for '%3'
 Show window border	LaunchBox		Vis vinduskant
+Failed to open folder - is Tracker running?	LaunchBox		Kunne ikke åpne mappen - kjører Tracker?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nKunne ikke starte applikasjonen med signatur '%2'.\n\nFeil:
 Failed to launch 'something', error in Pad data.	LaunchBox		Kunne ikke starte "noe", feil i Pad-data.
 LaunchBox	System name		LaunchBox

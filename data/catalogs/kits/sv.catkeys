@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libbe	2599604529
+1	swedish	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
 gold master	AboutWindow		guld mästare
 Undo	TextView		Ångra
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Versionshistorik:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan inte hitta programmet för replikanten. Ingen programsignatur är angiven.\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Blå:
+Special thanks:	AboutWindow		Speciellt tack:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kan inte skapa replikanten för \"%description\".\n%error
 Written by:	AboutWindow		Skrivet av:

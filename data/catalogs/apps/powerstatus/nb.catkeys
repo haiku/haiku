@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PowerStatus	1876447050
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		Kjør i vindu
 Extended battery info	PowerStatus		Utvidet batteriinformasjon
 Show status icon	PowerStatus		Vis statusikon
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		Modellnummer:
 Battery unused	PowerStatus		Batteri ikke i bruk
 Type: 	PowerStatus		Type: 
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan kjøre Strøm i et vindu eller installere det i Deskbar
+Damaged or missing battery	PowerStatus		Skadet eller manglende batteri
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Batteri utlader
 Design voltage: 	PowerStatus		Designspenning: 

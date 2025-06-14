@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2786291405
+1	russian	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -52,9 +52,9 @@ Size	ContainerWindow		Размер
 Select…	ContainerWindow		Выделить…
 Show shared volumes on Desktop	SettingsView		Показывать значки общих дисков
 Size	PoseView		Размер
-matches wildcard expression	SelectionWindow		совпадает с шаблонным выражением
+matches wildcard expression	SelectionWindow		совпадает с шаблоном
 Title	Bookmark Query Columns		Заголовок
-Identify	ContainerWindow		Опознать
+Identify	ContainerWindow		Распознать
 Create link	ContainerWindow		Создать ссылку в
 starts with	FindPanel		начинается на
 Replace	FSUtils		Заменить
@@ -277,6 +277,7 @@ Restoring: 	StatusWindow		Восстановление:
 The Tracker must be running to set the default printer.	PoseView		Чтобы установить принтер по умолчанию Tracker должен быть запущен.
 calculating…	InfoWindow		подсчёт…
 Preferred for file	OpenWithWindow		Предпочтительно для файлов
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# выделенный} other{# выделенных}}
 OK	AutoMounterSettings		ОК
 copying	FSUtils		копируемый
 MIME String	AttributesView		Строка MIME
@@ -356,7 +357,7 @@ Other	FilePermissionsView		Другие
 Automatic disk mounting	AutoMounterSettings		Автоматическое подключение
 parent folder	NavMenu		родительский каталог
 Create link here	ContainerWindow		Создать ссылку здесь
-Force identify	ContainerWindow		Опознать принудительно
+Force identify	ContainerWindow		Распознать принудительно
 no items	CountView		нет объектов
 Time	AttributesView		Время
 Disks	DirMenu		Диски

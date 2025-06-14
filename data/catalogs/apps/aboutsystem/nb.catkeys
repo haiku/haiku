@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-About	2654448748
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-About	506608794
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet og deres dusørprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Opphavsrett © 1999-2007 Michael C. Ring. Alle rettigheter forbeholdt.
 \n\nSpecial thanks to:\n	AboutView		\n\nEn spesiell takk til:\n
@@ -31,6 +31,7 @@ Time running:	AboutView		Oppetid:
 Visit the Haiku website	AboutView		Besøk Haiku-nettstedet
 Version: %s	AboutView	Version: R1 or hrev99999	Versjon: %s
 Make a donation	AboutView		Gi en donasjon
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nnetresolv\nCopyright © 1998-2023 The NetBSD Project, Copyright © 2004-2009 by Internet Systems Consortium, Inc. (\"ISC\"), Copyright © 1996-2003 by Internet Software Consortium. All rights reserved.	AboutView		Inneholder programvare utviklet av NetBSD Foundation, Inc. og dets bidragsytere:\nnetResolv\nCopyright © 1998-2023 The NetBSD Project, Copyright © 2004-2009 av Internet Systems Consortium, Inc. (\"ISC\"), Copyright © 1996-2003 av Internet Software Consortium. Alle rettigheter forbeholdt.
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB minne:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Opphavsrett © 1996-2005 Julian R Seward. Alle rettigheter forbeholdt.
 GNU LGPL v2	AboutWindow		GNU LGPL v2

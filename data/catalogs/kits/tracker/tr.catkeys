@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	1571104846
+1	turkish	x-vnd.Haiku-libtracker	2520945070
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -168,6 +168,7 @@ Property info	AttributesView		Özellik bilgisi
 Sorry, you can't create links in the Trash.	PoseView		Üzgünüm, çöp içinde bağlantılar oluşturamazsınız.
 From	Email Query Columns		Şuradan
 Open selection with:	OpenWithWindow		Seçimi şununla aç:
+Preferences…	ContainerWindow		Tercihler…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		“%document” açılamadı; çünkü “%app” uygulaması çöpte. 
 Work Phone	Person Query Columns		İş telefonu
 Select folders	FindPanel		Klasörler seç

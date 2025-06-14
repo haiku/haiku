@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	1140196651
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Enhet
 Initialize	MainWindow		Initialiser
 Could not change the parameters of the selected partition.	MainWindow		Kunne ikke endre parametrene for den valgte partisjonen.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen \"%s\" vil bli uopprettelig tapt hvis du gjør det!
 PGP encrypted	Encryption utils		PGP-kryptert
 Delete partition	MainWindow		Slett partisjon
 Error: 	MainWindow	in any error alert	Feil: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		Validering av parameterne
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du ønsker å formatere partisjonen \"%s\"? Du vil bli spurt igjen før  endringer blir skrevet til disken.
 DriveSetup	System name		Diskoppsett
 Mounted at	PartitionList		Monteringspunkt
+Disk system %s not found!	MainWindow		Disksystem %s ble ikke funnet!
 Create…	MainWindow		Opprett…
 Write changes	MainWindow		Skriv endringer
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisering av partisjonen %s var mislykket. (ingenting ble skrevet til disken.)
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		Partisjonen %s er allerede av
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Er du sikker på at du vil endre parametere for den valgte partisjonen?\n\nPartisjonen vil kanskje ikke lenger gjenkjennes av andre operativsystemer!
 Boot	PartitionList		Boot
 OK	AbstractParametersPanel		OK
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på disken \"%s\" vil bli uopprettelig tapt hvis du gjør det!
 Virtual	PartitionList		Virtuell
 Virtual	DiskView		Virtuell
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte disken vil gå tapt for godt hvis du gjør det!

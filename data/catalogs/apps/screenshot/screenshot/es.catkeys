@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-screenshot-cli	281883787
+1	spanish; castilian	x-vnd.haiku-screenshot-cli	2839190358
 Include window border	ScreenshotWindow		Incluir el borde de la ventana
 Overwrite	ScreenshotWindow		Sobrescribir
 Save in:	ScreenshotWindow		Guardar en:
@@ -17,12 +17,15 @@ Translator Settings	ScreenshotWindow		Configuración del Intérprete
 Include mouse pointer	ScreenshotWindow		Incluir puntero del ratón
 overwrite	ScreenshotWindow		sobrescribir
 Settings…	ScreenshotWindow		Configuración…
+Select area	ScreenshotWindow		Seleccionar área
 Choose folder	ScreenshotWindow		Elija una carpeta
 Name:	ScreenshotWindow		Nombre:
+Active window	ScreenshotWindow		Ventana activa
 Choose folder…	ScreenshotWindow		Elegir carpeta…
 Please select	ScreenshotWindow		Seleccione
 Failed to save screenshot	ScreenshotWindow		No se pudo guardar la captura de pantalla
 Cancel	ScreenshotWindow		Cancelar
+Whole screen	ScreenshotWindow		Toda la pantalla
 Delay:	ScreenshotWindow		Demora:
 Copy to clipboard	ScreenshotWindow		Copiar en el portapapeles
 screenshot	Screenshot	Base filename of screenshot files	Capturas

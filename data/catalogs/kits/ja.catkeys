@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	2599604529
+1	japanese	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		ゴールデンマスター
 Undo	TextView		元に戻す
@@ -45,5 +45,6 @@ Version history:	AboutWindow		改訂履歴:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		青:
+Special thanks:	AboutWindow		Special thanks:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\" 用のレプリカントを作成できません。\n%error
 Written by:	AboutWindow		作者:

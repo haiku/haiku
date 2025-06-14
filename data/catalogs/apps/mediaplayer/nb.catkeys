@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	1732323378
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
 Close	MediaPlayer-PlaylistWindow		Lukk
 Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Videospor
 Playlist…	MediaPlayer-Main		Spilleliste…
 <unnamed media>	MediaPlayer-InfoWin		<medie uten navn>
 Save	MediaPlayer-PlaylistWindow		Lagre
+25% scale	MediaPlayer-Main		25% skala
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Randomiser oppføringer
 Cancel	MediaPlayer-NetworkStream		Avbryt
 Nothing to Play	MediaPlayer-Main		Ingenting å spille

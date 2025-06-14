@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Input	130668644
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Standarder
 Scrolling	TouchpadPrefView		Rulling
 Long	KeyboardView		Lang
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Hastighet på dobbelt-klikk
 Typing test area	KeyboardView		Felt for skrivetesting
 Fast	KeyboardView		Rask
 Please confirm	TouchpadPrefView		Vennligst bekreft
+Trackpad speed	TouchpadPrefView		Styreflate-hastighet
 Mouse speed	SettingsView		Musens hastighet
+Trackpad acceleration	TouchpadPrefView		Styreflate-akselerasjon
 Horizontal scrolling	TouchpadPrefView		Horisontal rulling
+Reverse scroll direction	TouchpadPrefView		Omvendt rulleretning
 Keyboard lock delay	TouchpadPrefView		Tastaturlåsforsinkelse
 Input	System name		Inndata
 Quick	TouchpadPrefView		Rask
@@ -21,6 +24,7 @@ Slow	KeyboardView		Treg
 2-Button	SettingsView		2-knapper
 Click to focus and raise	SettingsView		Klikk for å fokusere og heve
 Vertical	TouchpadPrefView		Vertikal
+Low	TouchpadPrefView		Lav
 Focus follows mouse	SettingsView		Fokus følger mus
 Double-click test area	SettingsView		Testområde for dobbeltklikk
 Focus mode:	SettingsView		Fokus-modus:

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1836451181
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -168,6 +168,7 @@ Property info	AttributesView		Eiendomsinformasjon
 Sorry, you can't create links in the Trash.	PoseView		Beklager, du kan ikke opprette lenker i søppelkurven.
 From	Email Query Columns		Fra
 Open selection with:	OpenWithWindow		Åpne valgte med:
+Preferences…	ContainerWindow		Innstillinger…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Kunne ikke åpne \"%document\" fordi programmet \"%app\" befinner seg i søppelkurven. 
 Work Phone	Person Query Columns		Jobbtelefon
 Select folders	FindPanel		Velg mapper
@@ -276,6 +277,7 @@ Restoring: 	StatusWindow		Gjenoppretter:
 The Tracker must be running to set the default printer.	PoseView		Trackeren må kjøre for å angi standardskriver.
 calculating…	InfoWindow		kalkulerer...
 Preferred for file	OpenWithWindow		Foretrukket for fil
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# valgt} other{# valgt}}
 OK	AutoMounterSettings		OK
 copying	FSUtils		kopierer
 MIME String	AttributesView		MIME-string

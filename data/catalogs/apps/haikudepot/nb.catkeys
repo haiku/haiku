@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HaikuDepot	2555742361
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem med nedlasting av bruksbetingelser
 Available packages	MainWindow		Tilgjengelige pakker
 It was not possible to create the new user.	UserLoginWindow		Det var ikke mulig å opprette brukeren.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Klikk på en pakke for å s
 Cancel	UserLoginWindow		Avbryt
 Rating not possible	MainWindow		Vurdering er ikke mulig
 Package update error	MainWindow		Feil ved oppdatering av pakke
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Klikk her
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# prosess} other{# prosesser}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Henter brukervurderinger for pakken
 Reboot required	PackageManager		Omstart påkrevet
 All packages	PackageListView		Alle pakker
 Send	RatePackageWindow		Send
+Creating package list…	FeaturedPackagesView		Oppretter pakkeliste…
 Start package daemon	App		Start pakke-daemon
 There are problems in the supplied data:	UserLoginWindow		Det er problemer med de oppgitte dataene:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Brukeren '%Nickname%' har ikke godtatt noen bruksbetingelser.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Innhold
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Del anonyme bruksdata med HaikuDepotServer
 Close	PackageManager		Lukk
 Changelog	PackageInfoView		Endringslogg
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 for å søke i alle pakkene.
 About	PackageInfoView		Om
 Password requirements download problem	UserLoginWindow		Problem med nedlasting av passordkrav
 Password:	UserLoginWindow		Passord:
@@ -225,6 +228,7 @@ Category:	FilterView		Kategori:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	avinstaller pakken %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Henter eksterne programarkiv-data
 Description	PackageListView		Beskrivelse
+No results? 	FeaturedPackagesView		Ingen resultater? 
 User creation error	UserLoginWindow		Feil ved opprettelse av bruker
 You need to be logged into an account before you can rate packages.	MainWindow		Du må være logget inn før du kan vurdere pakker.
 Cleaning up…	ShuttingDownWindow		Rydder opp…

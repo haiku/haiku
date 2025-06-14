@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libbe	2599604529
+1	russian	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Все права защищены.
 gold master	AboutWindow		золотая
 Undo	TextView		Отменить
@@ -45,5 +45,6 @@ Version history:	AboutWindow		История версий:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
 %s KiB/s	StringForRate	units per second	%s Кбайт/с
 Blue:	ColorControl		Синий:
+Special thanks:	AboutWindow		Особая благодарность:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
 Written by:	AboutWindow		Разработан:

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libbe	2599604529
+1	turkish	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Tüm hakları saklıdır.
 gold master	AboutWindow		altın kopya
 Undo	TextView		Geri al
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Sürüm geçmişi:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Yinelenen uygulaması konumu bulunamıyor. Hiçbir uygulama imzası sağlanmamış.\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/sn
 Blue:	ColorControl		Mavi:
+Special thanks:	AboutWindow		Özel teşekkürlerimizle:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		“%description” için yinelenen oluşturulamıyor.\n%error
 Written by:	AboutWindow		Yazan:

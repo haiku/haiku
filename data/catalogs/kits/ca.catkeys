@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libbe	2599604529
+1	catalan; valencian	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Tots els drets reservats.
 gold master	AboutWindow		candidat
 Undo	TextView		Desfés
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Historial de versions:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No es pot trobar l'aplicació del replicant. No s'ha proporcionat cap signatura de l'aplicació.\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Blau:
+Special thanks:	AboutWindow		Agraïment especial:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No es pot crear el replicant per a \"%description\".\n%error
 Written by:	AboutWindow		Escrit per:

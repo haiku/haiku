@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	3174700455
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	1275638063
 None	Icon-O-Matic-Properties		Ingen
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Rydd opp sti
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -99,6 +99,7 @@ Bummer	Icon-O-Matic-Main	Cancel button - error alert	Synd
 Translation X	Icon-O-Matic-PropertyNames		Flytting X
 Multi-paste properties	Icon-O-Matic-Properties		Lim inn flere egenskaper
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Det kan være Icon-O-Matic ikke fikk tolket alle data fra SVG når den ble lastet. Ved å overskrive den orginale filen, vil denne informasjonen bli tapt.
+Remove	Icon-O-Matic-TransformersList		Fjern
 Rotate indices backwards	Icon-O-Matic-PathsList		Roter indeksene bakover
 Overwrite	Icon-O-Matic-SVGExport		Overskriv
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Legg til {0, plural, one{form} other{former}}

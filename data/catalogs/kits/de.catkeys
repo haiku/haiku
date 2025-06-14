@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libbe	2599604529
+1	german	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Alle Rechte vorbehalten.
 gold master	AboutWindow		Golden Master
 Undo	TextView		Rückgängig
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Versionsgeschichte:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Blau:
+Special thanks:	AboutWindow		Besonderer Dank an:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Replikant für \"%description\" konnte nicht erstellt werden.\n%error
 Written by:	AboutWindow		Von:
