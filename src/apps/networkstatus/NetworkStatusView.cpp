@@ -61,7 +61,7 @@ static const char *kStatusDescriptions[] = {
 	B_TRANSLATE("No link"),
 	B_TRANSLATE("No stateful configuration"),
 	B_TRANSLATE("Configuring"),
-	B_TRANSLATE("Ready")
+	B_TRANSLATE("Connected")
 };
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(float maxWidth, float maxHeight);

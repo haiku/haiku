@@ -194,10 +194,18 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 	bool isWireless = device.IsWireless();
 	bool disabled = (fInterface.Flags() & IFF_UP) == 0;
 
-	if (fInterface.HasLink())
+	uint32 flags = fInterface.Flags();
+
+	if ((flags & IFF_LINK) == 0)
+		fStatusField->SetText(B_TRANSLATE("no link"));
+	else if ((flags & (IFF_UP | IFF_CONFIGURING)) == 0)
+		fStatusField->SetText(B_TRANSLATE("no stateful configuration"));
+	else if ((flags & IFF_CONFIGURING) == IFF_CONFIGURING)
+		fStatusField->SetText(B_TRANSLATE("configuring"));
+	else if ((flags & IFF_UP) == IFF_UP)
 		fStatusField->SetText(B_TRANSLATE("connected"));
 	else
-		fStatusField->SetText(B_TRANSLATE("disconnected"));
+		fStatusField->SetText(B_TRANSLATE("unknown"));
 
 	BNetworkAddress hardwareAddress;
 	if (device.GetHardwareAddress(hardwareAddress) == B_OK)
