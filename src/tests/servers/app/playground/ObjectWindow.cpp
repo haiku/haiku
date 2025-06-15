@@ -11,6 +11,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ColorControl.h>
+#include <ControlLook.h>
 #include <ListItem.h>
 #include <ListView.h>
 #include <Menu.h>
@@ -151,8 +152,8 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	// object view occupies the right side of the window
 	b.left = b.right + 1.0;
-	b.right = Bounds().right - B_V_SCROLL_BAR_WIDTH;
-	b.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	b.right = Bounds().right - be_control_look->GetScrollBarWidth(B_VERTICAL);
+	b.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 	fObjectView = new ObjectView(b, "object view", B_FOLLOW_ALL,
 								 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	// wrap a scroll view around the object view
@@ -326,7 +327,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.top += controlGroup->InnerFrame().top;
 	b.InsetBy(10.0, 10.0);
 	b.left = b.left + b.Width() / 2.0 + 6.0;
-	b.right -= B_V_SCROLL_BAR_WIDTH;
+	b.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
     b.bottom = fDrawingModeMF->Frame().top - 10.0;
 
 	fObjectLV = new ObjectListView(b, "object list", B_SINGLE_SELECTION_LIST);
