@@ -12,6 +12,7 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <IconUtils.h>
 #include <Locale.h>
@@ -267,19 +268,15 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node,
 	fNode(node),
 	fLayoutData(layoutData)
 {
-	BRect rect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
+	BRect rect(BPoint(0, 0), be_control_look->ComposeIconSize(B_LARGE_ICON));
 	if (sIcon == NULL) {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		sIcon = new BBitmap(rect, B_RGBA32);
-#else
-		sIcon = new BBitmap(rect, B_CMAP8);
-#endif
 		BMimeType type(PSRV_PRINTER_FILETYPE);
-		type.GetIcon(sIcon, B_LARGE_ICON);
+		type.GetIcon(sIcon, (icon_size)(rect.IntegerHeight() + 1));
 	}
 
 	if (sIcon && sIcon->IsValid() && sSelectedIcon == NULL) {
-		const float checkMarkIconSize = 20.0;
+		const float checkMarkIconSize = be_control_look->ComposeIconSize(20).Height();
 		BBitmap *checkMark = _LoadVectorIcon("check_mark_icon",
 			checkMarkIconSize);
 		if (checkMark && checkMark->IsValid()) {
@@ -405,6 +402,8 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	owner->SetHighColor(oldHighColor);
 
 	float iconColumnWidth = B_LARGE_ICON + 8.0;
+	if (sIcon)
+		iconColumnWidth = sIcon->Bounds().Height() + 8.0;
 	float x = iconColumnWidth;
 	BPoint iconPt(bounds.LeftTop() + BPoint(2.0, 2.0));
 	BPoint namePt(iconPt + BPoint(x, fntheight));

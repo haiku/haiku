@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Locale.h>
 #include <MimeType.h>
 #include <Roster.h>
@@ -182,19 +183,10 @@ JobItem::Update()
 
 	entry_ref ref;
 	if (fIcon == NULL && be_roster->FindApp(mimeType.String(), &ref) == B_OK) {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		font_height fontHeight;
-		be_plain_font->GetHeight(&fontHeight);
-		float height = (fontHeight.ascent + fontHeight.descent
-			+ fontHeight.leading) * 2.0;
-		BRect rect(0, 0, height, height);
+		BRect rect(BPoint(0, 0), be_control_look->ComposeIconSize(B_LARGE_ICON));
 		fIcon = new BBitmap(rect, B_RGBA32);
-#else
-		BRect rect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1);
-		fIcon = new BBitmap(rect, B_CMAP8);
-#endif
 		BMimeType type(mimeType.String());
-		if (type.GetIcon(fIcon, B_MINI_ICON) != B_OK) {
+		if (type.GetIcon(fIcon, (icon_size)(rect.IntegerHeight() + 1)) != B_OK) {
 			delete fIcon;
 			fIcon = NULL;
 		}
