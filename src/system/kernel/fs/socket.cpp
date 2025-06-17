@@ -454,6 +454,9 @@ common_shutdown(int fd, int how, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
+	if (how < SHUT_RD || how > SHUT_RDWR)
+		return B_BAD_VALUE;
+
 	return sStackInterface->shutdown(FD_SOCKET(descriptor), how);
 }
 
