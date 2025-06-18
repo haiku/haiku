@@ -143,7 +143,7 @@ LegendChartAxis::LegendChartAxis(ChartAxisLegendSource* legendSource,
 	fLocation(CHART_AXIS_BOTTOM),
 	fRange(),
 	fFrame(),
-	fLegends(20, true),
+	fLegends(20),
 	fHorizontalSpacing(20),
 	fVerticalSpacing(10),
 	fLayoutValid(false)

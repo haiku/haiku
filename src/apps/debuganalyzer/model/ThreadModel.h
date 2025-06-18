@@ -40,7 +40,7 @@ public:
 			int32				FindSchedulingEvent(nanotime_t time);
 
 private:
-			typedef BObjectList<WaitObjectGroup> WaitObjectGroupList;
+			typedef BObjectList<WaitObjectGroup, true> WaitObjectGroupList;
 			typedef BObjectList<const system_profiler_event_header> EventList;
 
 private:

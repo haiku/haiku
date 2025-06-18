@@ -40,7 +40,7 @@ ThreadModel::ThreadModel(Model* model, Model::Thread* thread)
 	:
 	fModel(model),
 	fThread(thread),
-	fWaitObjectGroups(10, true)
+	fWaitObjectGroups(10)
 {
 }
 

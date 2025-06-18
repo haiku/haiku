@@ -719,7 +719,7 @@ HeaderView::HeaderView()
  	:
  	BView("header view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
  	fModel(NULL),
- 	fHeaderEntries(10, true),
+	fHeaderEntries(10),
  	fLayoutValid(false),
  	fDefaultState(new DefaultState(this)),
  	fState(fDefaultState)

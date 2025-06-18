@@ -30,7 +30,7 @@ public:
 
 private:
 			struct LegendInfo;
-			typedef BObjectList<LegendInfo> LegendList;
+			typedef BObjectList<LegendInfo, true> LegendList;
 private:
 			void				_InvalidateLayout();
 			bool				_ValidateLayout(BView* view);

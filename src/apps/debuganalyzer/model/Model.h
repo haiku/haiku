@@ -135,11 +135,11 @@ public:
 									// returns the closest previous state
 
 private:
-			typedef BObjectList<CPU> CPUList;
-			typedef BObjectList<Team> TeamList;
-			typedef BObjectList<Thread> ThreadList;
-			typedef BObjectList<WaitObjectGroup> WaitObjectGroupList;
-			typedef BObjectList<IOScheduler> IOSchedulerList;
+			typedef BObjectList<CPU, true> CPUList;
+			typedef BObjectList<Team, true> TeamList;
+			typedef BObjectList<Thread, true> ThreadList;
+			typedef BObjectList<WaitObjectGroup, true> WaitObjectGroupList;
+			typedef BObjectList<IOScheduler, true> IOSchedulerList;
 			typedef BObjectList<CompactSchedulingState> SchedulingStateList;
 
 private:
@@ -505,7 +505,7 @@ public:
 									const Thread* thread);
 
 private:
-			typedef BObjectList<ThreadWaitObjectGroup>
+			typedef BObjectList<ThreadWaitObjectGroup, true>
 				ThreadWaitObjectGroupList;
 
 private:

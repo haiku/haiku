@@ -278,15 +278,16 @@ private:
 	struct NodeContainerNode : Node {
 		NodeContainerNode()
 			:
-			fChildren(20, true)
+			fChildren(20)
 		{
 		}
 
 		NodeContainerNode(BObjectList<Node>& nodes)
 			:
-			fChildren(20, true)
+			fChildren(20)
 		{
-			fChildren.AddList(&nodes);
+			for (int32 index = 0; index < nodes.CountItems(); index++)
+				fChildren.AddItem(nodes.ItemAt(index));
 
 			// compute total waits and total wait time
 			fWaits = 0;
@@ -341,7 +342,7 @@ private:
 		}
 
 	protected:
-		BObjectList<Node>	fChildren;
+		BObjectList<Node, true> fChildren;
 		int64				fWaits;
 		nanotime_t			fTotalWaitTime;
 	};
@@ -354,8 +355,8 @@ private:
 			model(model)
 		{
 			// create nodes for the wait object groups
-			BObjectList<Node> tempChildren;
-			BObjectList<Node>& children
+			BObjectList<Node, true> tempChildren;
+			BObjectList<Node, true>& children
 				= groupByName ? tempChildren : NodeContainerNode::fChildren;
 			int32 count = model->CountWaitObjectGroups();
 			for (int32 i = 0; i < count; i++) {
@@ -368,6 +369,7 @@ private:
 			if (groupByName) {
 				if (children.CountItems() < 2) {
 					NodeContainerNode::fChildren.AddList(&children);
+					children.MakeEmpty(false);
 					return;
 				}
 
@@ -400,6 +402,8 @@ private:
 					previousNode = node;
 				}
 			}
+
+			tempChildren.MakeEmpty(false);
 		}
 
 	private:

@@ -320,7 +320,7 @@ Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
 	fIOTime(0),
 	fPreemptions(0),
 	fIndex(-1),
-	fWaitObjectGroups(20, true)
+	fWaitObjectGroups(20)
 {
 }
 
@@ -631,11 +631,11 @@ Model::Model(const char* dataSourceName, void* eventData, size_t eventDataSize,
 	fBaseTime(0),
 	fLastEventTime(0),
 	fIdleTime(0),
-	fCPUs(20, true),
-	fTeams(20, true),
-	fThreads(20, true),
-	fWaitObjectGroups(20, true),
-	fIOSchedulers(10, true),
+	fCPUs(20),
+	fTeams(20),
+	fThreads(20),
+	fWaitObjectGroups(20),
+	fIOSchedulers(10),
 	fSchedulingStates(100)
 {
 }
