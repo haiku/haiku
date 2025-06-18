@@ -107,9 +107,11 @@ prepare_userland_address_result(struct sockaddr* userAddress,
 	if (userAddress == NULL) {
 		if (addressRequired)
 			return B_BAD_VALUE;
-	} else if (!IS_USER_ADDRESS(userAddress)
-			|| !IS_USER_ADDRESS(_addressLength)) {
-		return B_BAD_ADDRESS;
+	} else {
+		if (!IS_USER_ADDRESS(_addressLength))
+			return B_BAD_ADDRESS;
+		if (!IS_USER_ADDRESS(userAddress) && addressRequired)
+			return B_BAD_ADDRESS;
 	}
 
 	// copy the buffer size from userland
@@ -136,8 +138,8 @@ copy_address_to_userland(const void* address, socklen_t addressLength,
 	if (user_memcpy(userAddressLength, &addressLength,
 			sizeof(socklen_t)) != B_OK
 		|| (userAddress != NULL
-			&& user_memcpy(userAddress, address,
-				min_c(addressLength, userAddressBufferSize)) != B_OK)) {
+			&& (!IS_USER_ADDRESS(userAddress) || user_memcpy(userAddress, address,
+				min_c(addressLength, userAddressBufferSize)) != B_OK))) {
 		return B_BAD_ADDRESS;
 	}
 
