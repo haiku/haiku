@@ -430,6 +430,14 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 		status_t result = file_cache_set_size(fFileCache, fileSize);
 		if (result != B_OK)
 			return result;
+		if (static_cast<uint64>(pos) > ROUNDUP(fMaxFileSize, B_PAGE_SIZE)
+			&& (cookie->fMode & O_NOCACHE) == 0) {
+			// Zero out the start of the file cache page where the write begins.
+			// We will let the server zero out the rest of the hole.
+			fMaxFileSize = pos;
+			size_t pageOffset = pos % B_PAGE_SIZE;
+			file_cache_write(fFileCache, cookie, pos - pageOffset, NULL, &pageOffset);
+		}
 		fMaxFileSize = fileSize;
 		fMetaCache.GrowFile(fMaxFileSize);
 	}
