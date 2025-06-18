@@ -162,15 +162,7 @@ _BMCMenuBar_::AttachedToWindow()
 	if (fFixedSize && (Flags() & B_SUPPORTS_LAYOUT) == 0)
 		SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
-	if (Parent() != NULL) {
-		color_which which = Parent()->LowUIColor();
-		if (which == B_NO_COLOR)
-			SetLowColor(Parent()->LowColor());
-		else
-			SetLowUIColor(which);
-
-	} else
-		SetLowUIColor(B_MENU_BACKGROUND_COLOR);
+	SetLowUIColor(B_CONTROL_BACKGROUND_COLOR);
 
 	fPreviousWidth = Bounds().Width();
 }
@@ -198,7 +190,6 @@ _BMCMenuBar_::Draw(BRect updateRect)
 	}
 
 	BRect rect(Bounds());
-	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 	uint32 flags = 0;
 	if (!IsEnabled())
 		flags |= BControlLook::B_DISABLED;
@@ -206,7 +197,7 @@ _BMCMenuBar_::Draw(BRect updateRect)
 		flags |= BControlLook::B_FOCUSED;
 
 	be_control_look->DrawMenuFieldBackground(this, rect,
-		updateRect, base, fShowPopUpMarker, flags);
+		updateRect, LowColor(), fShowPopUpMarker, flags);
 
 	DrawItems(updateRect);
 }

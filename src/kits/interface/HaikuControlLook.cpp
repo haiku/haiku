@@ -28,8 +28,6 @@
 
 namespace BPrivate {
 
-static const float kEdgeBevelLightTint = 0.59;
-static const float kEdgeBevelShadowTint = 1.0735;
 static const float kHoverTintFactor = 0.85;
 
 static const int32 kButtonPopUpIndicatorWidth = B_USE_ITEM_SPACING;
@@ -2779,7 +2777,10 @@ HaikuControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 		&& (flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED)) == 0
 		&& ((flags & (B_HOVER | B_FOCUSED)) == 0
 			|| (flags & B_DISABLED) != 0)) {
-		_DrawFlatButtonBackground(view, rect, updateRect, base, popupIndicator,
+		rgb_color flatBase = base;
+		if (view->Parent() != NULL)
+			flatBase = view->Parent()->LowColor();
+		_DrawFlatButtonBackground(view, rect, updateRect, flatBase, popupIndicator,
 			flags, borders, orientation);
 	} else {
 		BRegion clipping(rect);
@@ -2829,12 +2830,12 @@ HaikuControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 	rgb_color bevelLightColor  = _BevelLightColor(base, flags);
 	rgb_color bevelShadowColor = _BevelShadowColor(base, flags);
 
-	// button background color
-	rgb_color buttonBgColor;
+	// button corners color
+	rgb_color buttonCornerColor;
 	if ((flags & B_DISABLED) != 0)
-		buttonBgColor = tint_color(base, 0.7);
+		buttonCornerColor = tint_color(base, 0.84 /* lighten "< 1" */);
 	else
-		buttonBgColor = tint_color(base, B_LIGHTEN_1_TINT);
+		buttonCornerColor = tint_color(base, 0.7 /* lighten "< 1" */);
 
 	// surface top gradient
 	BGradientLinear fillGradient;
@@ -2929,7 +2930,7 @@ HaikuControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 		_DrawFrame(view, rect,
 			bevelLightColor, bevelLightColor,
 			bevelShadowColor, bevelShadowColor,
-			buttonBgColor, buttonBgColor, borders);
+			buttonCornerColor, buttonCornerColor, borders);
 	}
 
 	if (popupIndicator) {
@@ -3679,7 +3680,7 @@ HaikuControlLook::_EdgeColor(const rgb_color& base, bool shadow, uint32 flags)
 
 		edgeColor = (rgb_color){ value, value, value, alpha };
 	} else {
-		float tint = shadow ? kEdgeBevelShadowTint : kEdgeBevelLightTint;
+		float tint = shadow ? 1.0735 : 0.59;
 		if ((flags & B_DEFAULT_BUTTON) != 0) {
 			if ((flags & B_DISABLED) != 0)
 				tint = B_NO_TINT + (tint - B_NO_TINT) * 0.3;
@@ -3718,7 +3719,7 @@ HaikuControlLook::_FrameLightColor(const rgb_color& base, uint32 flags)
 		if ((flags & B_BLEND_FRAME) != 0)
 			frameLightColor = (rgb_color){ 0, 0, 0, 75 };
 		else
-			frameLightColor = tint_color(base, 1.33);
+			frameLightColor = tint_color(base, 1.35);
 
 		if ((flags & B_DEFAULT_BUTTON) != 0)
 			frameLightColor = tint_color(frameLightColor, 1.35);
@@ -3741,7 +3742,7 @@ HaikuControlLook::_FrameShadowColor(const rgb_color& base, uint32 flags)
 
 	if ((flags & B_DISABLED) != 0) {
 		// TODO: B_BLEND_FRAME
-		frameShadowColor = tint_color(base, 1.24);
+		frameShadowColor = tint_color(base, 1.26);
 
 		if ((flags & B_DEFAULT_BUTTON) != 0) {
 			frameShadowColor = tint_color(base, 1.145);
@@ -3759,7 +3760,7 @@ HaikuControlLook::_FrameShadowColor(const rgb_color& base, uint32 flags)
 			if ((flags & B_BLEND_FRAME) != 0)
 				frameShadowColor = (rgb_color){ 0, 0, 0, 95 };
 			else
-				frameShadowColor = tint_color(base, 1.47);
+				frameShadowColor = tint_color(base, 1.485);
 		}
 	}
 
@@ -3770,13 +3771,14 @@ HaikuControlLook::_FrameShadowColor(const rgb_color& base, uint32 flags)
 rgb_color
 HaikuControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
 {
-	rgb_color bevelLightColor = tint_color(base, 0.2);
-
-	if ((flags & B_DISABLED) != 0)
-		bevelLightColor = tint_color(base, B_LIGHTEN_1_TINT);
+	rgb_color bevelLightColor;
 
 	if ((flags & B_ACTIVATED) != 0)
-		bevelLightColor = tint_color(base, B_DARKEN_1_TINT);
+		bevelLightColor = tint_color(base, 1.17);
+	else if ((flags & B_DISABLED) != 0)
+		bevelLightColor = tint_color(base, B_LIGHTEN_1_TINT);
+	else
+		bevelLightColor = tint_color(base, 0.2);
 
 	return bevelLightColor;
 }
@@ -3785,13 +3787,14 @@ HaikuControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
 rgb_color
 HaikuControlLook::_BevelShadowColor(const rgb_color& base, uint32 flags)
 {
-	rgb_color bevelShadowColor = tint_color(base, 1.08);
-
-	if ((flags & B_DISABLED) != 0)
-		bevelShadowColor = base;
+	rgb_color bevelShadowColor;
 
 	if ((flags & B_ACTIVATED) != 0)
-		bevelShadowColor = tint_color(base, B_DARKEN_1_TINT);
+		bevelShadowColor = tint_color(base, 1.17);
+	else if ((flags & B_DISABLED) != 0)
+		bevelShadowColor = base;
+	else
+		bevelShadowColor = tint_color(base, 1.105);
 
 	return bevelShadowColor;
 }
@@ -3857,14 +3860,14 @@ void
 HaikuControlLook::_MakeButtonGradient(BGradientLinear& gradient, BRect& rect,
 	const rgb_color& base, uint32 flags, orientation orientation) const
 {
-	float topTint = 0.49;
-	float middleTint1 = 0.62;
-	float middleTint2 = 0.76;
-	float bottomTint = 0.90;
+	float topTint = 0.6;
+	float middleTint1 = 0.75;
+	float middleTint2 = 0.9;
+	float bottomTint = 1.01;
 
 	if ((flags & B_ACTIVATED) != 0) {
-		topTint = 1.11;
-		bottomTint = 1.08;
+		topTint = 1.135;
+		bottomTint = 1.105;
 	}
 
 	if ((flags & B_DISABLED) != 0) {

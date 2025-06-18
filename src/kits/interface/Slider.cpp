@@ -1593,7 +1593,7 @@ BSlider::_DrawBlockThumb()
 	BRect frame = ThumbFrame();
 	BView* view = OffscreenView();
 
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	uint32 flags = be_control_look->Flags(this);
 	be_control_look->DrawSliderThumb(view, frame, frame, base, flags,
 		fOrientation);
@@ -1605,7 +1605,7 @@ BSlider::_DrawTriangleThumb()
 {
 	BRect frame = ThumbFrame();
 	BView* view = OffscreenView();
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	uint32 flags = be_control_look->Flags(this);
 	be_control_look->DrawSliderTriangle(view, frame, frame, base, flags,
 		fOrientation);

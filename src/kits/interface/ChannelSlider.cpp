@@ -611,7 +611,7 @@ BChannelSlider::DrawThumb(BView* into, int32 channel, BPoint where,
 	rect.top = floorf(rect.top);
 	rect.right = ceilf(rect.right + 0.5);
 	rect.bottom = ceilf(rect.bottom + 0.5);
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	uint32 flags = 0;
 	be_control_look->DrawSliderThumb(into, rect, rect, base,
 		flags, Orientation());

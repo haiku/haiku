@@ -547,6 +547,17 @@ Desktop::Init()
 		const_cast<menu_info&>(fSettings->MenuInfo()).font_size = fontSize;
 	}
 
+#if 1
+	// Migrate old default UI control color to the new one.
+	// TODO: Drop this after R1/beta6 is released!
+	if (fSettings->UIColor(B_CONTROL_BACKGROUND_COLOR) == make_color(245, 245, 245)
+			&& fSettings->ControlLook().IsEmpty()) {
+		rgb_color newControlBackground = make_color(222, 222, 222);
+		fSettings->SetUIColor(B_CONTROL_BACKGROUND_COLOR, newControlBackground);
+		fSettings->SetUIColor(B_SCROLL_BAR_THUMB_COLOR, newControlBackground);
+	}
+#endif
+
 	HWInterface()->SetDPMSMode(B_DPMS_ON);
 
 	float brightness = fWorkspaces[0].StoredScreenConfiguration().Brightness(0);

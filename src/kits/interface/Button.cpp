@@ -134,6 +134,7 @@ BButton::Draw(BRect updateRect)
 	BRect rect(Bounds());
 	rgb_color background = ViewColor();
 	rgb_color base = LowColor();
+	rgb_color text = HighColor();
 
 	uint32 flags = be_control_look->Flags(this);
 	if (_Flag(FLAG_DEFAULT))
@@ -156,7 +157,7 @@ BButton::Draw(BRect updateRect)
 			| (IsEnabled() ? 0 : B_DISABLED_ICON_BITMAP));
 
 	be_control_look->DrawLabel(this, Label(), icon, rect, updateRect, base, flags,
-		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE), &text);
 }
 
 
@@ -221,12 +222,7 @@ void
 BButton::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
-
-	// tint low color to match background
-	if (ViewColor().IsLight())
-		SetLowUIColor(B_CONTROL_BACKGROUND_COLOR, 1.115);
-	else
-		SetLowUIColor(B_CONTROL_BACKGROUND_COLOR, 0.885);
+	SetLowUIColor(B_CONTROL_BACKGROUND_COLOR);
 	SetHighUIColor(B_CONTROL_TEXT_COLOR);
 
 	if (IsDefault())
