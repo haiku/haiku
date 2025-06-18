@@ -625,6 +625,7 @@ _user_event_queue_create(int openFlags)
 
 	rw_lock_write_lock(&context->lock);
 	fd_set_close_on_exec(context, fd, (openFlags & O_CLOEXEC) != 0);
+	fd_set_close_on_fork(context, fd, (openFlags & O_CLOFORK) != 0);
 	rw_lock_write_unlock(&context->lock);
 
 	deleter.Detach();
@@ -692,6 +693,9 @@ _user_event_queue_wait(int queue, event_wait_info* userInfos, int numInfos,
 		return B_BAD_VALUE;
 	if (numInfos > 0 && (userInfos == NULL || !IS_USER_ADDRESS(userInfos)))
 		return B_BAD_ADDRESS;
+
+	if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) == 0)
+		timeout = B_INFINITE_TIMEOUT;
 
 	BStackOrHeapArray<event_wait_info, 16> infos(numInfos);
 	if (!infos.IsValid())

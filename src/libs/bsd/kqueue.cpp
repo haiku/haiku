@@ -15,7 +15,7 @@
 extern "C" int
 kqueue()
 {
-	int fd = _kern_event_queue_create(0);
+	int fd = _kern_event_queue_create(O_CLOFORK);
 	if (fd < 0) {
 		__set_errno(fd);
 		return -1;
