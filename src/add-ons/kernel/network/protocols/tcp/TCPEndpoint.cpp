@@ -323,6 +323,7 @@ enum {
 	FLAG_RECOVERY				= 0x40,
 	FLAG_OPTION_SACK_PERMITTED	= 0x80,
 	FLAG_AUTO_RECEIVE_BUFFER_SIZE = 0x100,
+	FLAG_CAN_NOTIFY 			= 0x200
 };
 
 
@@ -650,6 +651,7 @@ TCPEndpoint::Connect(const sockaddr* address)
 
 	TRACE("  Connect(): starting 3-way handshake...");
 
+	fFlags |= FLAG_CAN_NOTIFY;
 	fState = SYNCHRONIZE_SENT;
 	T(State(this));
 
@@ -783,6 +785,7 @@ TCPEndpoint::Listen(int count)
 
 	gSocketModule->set_max_backlog(socket, count);
 
+	fFlags |= FLAG_CAN_NOTIFY;
 	fState = LISTEN;
 	T(State(this));
 	return B_OK;
@@ -908,13 +911,13 @@ TCPEndpoint::SendAvailable()
 {
 	MutexLocker locker(fLock);
 
-	ssize_t available;
+	ssize_t available = 0;
 
 	if (is_writable(fState))
 		available = fSendQueue.Free();
 	else if (is_establishing(fState))
 		available = 0;
-	else
+	else if ((fFlags & FLAG_CAN_NOTIFY) != 0)
 		available = EPIPE;
 
 	TRACE("SendAvailable(): %" B_PRIdSSIZE, available);
@@ -1434,7 +1437,7 @@ TCPEndpoint::_AvailableData() const
 
 	ssize_t availableData = fReceiveQueue.Available();
 
-	if (availableData == 0 && !_ShouldReceive())
+	if (availableData == 0 && !_ShouldReceive() && (fFlags & FLAG_CAN_NOTIFY) != 0)
 		return ENOTCONN;
 	if (availableData == 0 && (fState == FINISH_RECEIVED || fState == WAIT_FOR_FINISH_ACKNOWLEDGE))
 		return ESHUTDOWN;
