@@ -16,6 +16,8 @@ local avxSource = [ FGristFiles hello_avx.c ] ;
 local avxObject = $(avxSource:S=$(SUFOBJ)) ;
 CCFLAGS on $(avxObject) = -mavx ;
 
+SimpleTest fp_excepts_test : fp_excepts.c ;
+
 SimpleTest live_query :
 	live_query.cpp
 	: be [ TargetLibsupc++ ]
