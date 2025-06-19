@@ -3,8 +3,8 @@
 
 // ##### Include headers for your tests here #####
 #include "AppFileInfoTest.h"
-#include "DirectoryTest.h"
 #include "DataIOTest.h"
+#include "DirectoryTest.h"
 #include "EntryTest.h"
 #include "FileTest.h"
 #include "FindDirectoryTest.h"
@@ -24,8 +24,8 @@ BTestSuite* getTestSuite() {
 
 	// ##### Add test suites here #####
 	suite->addTest("BAppFileInfo", AppFileInfoTest::Suite());
-	suite->addTest("BDirectory", DirectoryTest::Suite());
 	suite->addTest("BDataIO", DataIOTest::Suite());
+	suite->addTest("BDirectory", DirectoryTest::Suite());
 	suite->addTest("BEntry", EntryTest::Suite());
 	suite->addTest("BFile", FileTest::Suite());
 #if 0
