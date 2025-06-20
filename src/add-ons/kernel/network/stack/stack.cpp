@@ -435,18 +435,16 @@ get_domain_protocols(net_socket* socket)
 		chain = chain::Lookup(sProtocolChains, socket->family, socket->type,
 			socket->type == SOCK_RAW ? 0 : socket->protocol);
 			// in SOCK_RAW mode, we ignore the protocol information
-		if (chain == NULL) {
-			// TODO: if we want to be POSIX compatible, we should also support
-			//	the error codes EPROTONOSUPPORT and EPROTOTYPE.
-			return EAFNOSUPPORT;
-		}
 	}
 
 	// create net_protocol objects for the protocols in the chain
-
-	status_t status = chain->Acquire();
-	if (status != B_OK)
-		return status;
+	if (chain == NULL || chain->Acquire() != B_OK) {
+		if (::family::Lookup(socket->family) == NULL)
+			return EAFNOSUPPORT;
+		if (socket->type != 0 && socket->protocol == 0)
+			return EPROTOTYPE;
+		return EPROTONOSUPPORT;
+	}
 
 	net_protocol* last = NULL;
 
