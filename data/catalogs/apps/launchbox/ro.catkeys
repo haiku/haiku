@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-LaunchBox	1878360293
+1	romanian	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Stabilire descriere…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sigur închideți acest bloc?\n(Blocul nu va fi reținut.)
 OK	LaunchBox		OK
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Pornire automată
 Clone	LaunchBox		Clonează
 Description for '%3'	LaunchBox		Descriere pentru „%3”
 Show window border	LaunchBox		Arată marginea ferestrei
+Failed to open folder - is Tracker running?	LaunchBox		Nu s-a putut deschide dosarul - rulează Tracker?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNu s-a putut lansa aplicația cu semnătura „%2”.\n\nEroare:
 Failed to launch 'something', error in Pad data.	LaunchBox		Nu s-a putut lansa „ceva”, eroare în datele blocului.
 LaunchBox	System name		LaunchBox

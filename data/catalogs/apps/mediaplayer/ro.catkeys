@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	1732323378
+1	romanian	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrarea la gunoi
 Close	MediaPlayer-PlaylistWindow		Închide
 Volume of background clips	MediaPlayer-SettingsWindow		Volumul clipurilor de fundal
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Pistă video
 Playlist…	MediaPlayer-Main		Listă de redare…
 <unnamed media>	MediaPlayer-InfoWin		<unnamed media>
 Save	MediaPlayer-PlaylistWindow		Salvează
+25% scale	MediaPlayer-Main		Scală 25%
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Randomizează intrările
 Cancel	MediaPlayer-NetworkStream		Anulează
 Nothing to Play	MediaPlayer-Main		Nimic de redat

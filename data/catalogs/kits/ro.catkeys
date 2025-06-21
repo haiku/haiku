@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libbe	2599604529
+1	romanian	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
 gold master	AboutWindow		versiune finală
 Undo	TextView		Refă
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Istoricul versiunii:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate localiza aplicația pentru replicant. Nu a fost furnizată nicio semnătură de aplicație.\n%error
 %s KiB/s	StringForRate	units per second	%s KiO/s
 Blue:	ColorControl		Albastru:
+Special thanks:	AboutWindow		Mulțumiri speciale:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea replicantul pentru \„%description\”.\n%error
 Written by:	AboutWindow		Scris de:

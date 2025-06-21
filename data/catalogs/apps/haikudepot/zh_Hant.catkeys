@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	3355419189
+1	english	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用條件下載問題
 Available packages	MainWindow		可用軟體套件
 It was not possible to create the new user.	UserLoginWindow		無法創建新使用者。
@@ -45,15 +45,18 @@ Click a package to view information	PackageInfoView		點擊某個套件即可查
 Cancel	UserLoginWindow		取消
 Rating not possible	MainWindow		無法評分
 Package update error	MainWindow		套件更新錯誤
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	點這裡
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		獲取套件的用戶評分
 Reboot required	PackageManager		需要重新啟動
 All packages	PackageListView		全部套件
 Send	RatePackageWindow		傳送
+Creating package list…	FeaturedPackagesView		建立包列表…
 Start package daemon	App		啟動套件守護程式
 There are problems in the supplied data:	UserLoginWindow		提供的數據有問題：
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		使用者 '%Nickname%' 尚未同意任何使用條件。
 Usage conditions download problem	UserLoginWindow		使用條件下載問題
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	從庫 %s 安裝軟體包 %s \n
 Package daemon problem	App		套件守護程式問題
 No	MainWindow		否
 Repository	PackageListView		庫
@@ -161,6 +164,7 @@ Contents	PackageInfoView		內容
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		與 HaikuDepotServer 分享匿名使用數據
 Close	PackageManager		關閉
 Changelog	PackageInfoView		變更日誌
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	搜尋所有包。
 About	PackageInfoView		關於
 Password requirements download problem	UserLoginWindow		下載需要密碼問題
 Password:	UserLoginWindow		密碼：
@@ -207,6 +211,7 @@ Reading repository data	LocalPkgDataLoadProcess		正在讀取庫數據
 Fatal error	InstallPackageProcess		致命錯誤
 A validation error has occurred	ServerHelper		發生驗證錯誤
 The nickname is required.	UserLoginWindow		暱稱是必需的。
+-	no package size		-
 Apply changes	PackageResult		套用變更
 Server error	ServerHelper		伺服器錯誤
 Rate package	RatePackageWindow		評價套件
@@ -223,6 +228,7 @@ Category:	FilterView		類別：
 uninstall package %s\n	PackageResult	Don't change '%s' variable	解除安裝 package %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		取得遠端儲存庫數據
 Description	PackageListView		描述
+No results? 	FeaturedPackagesView		沒有結果？
 User creation error	UserLoginWindow		使用者建立錯誤
 You need to be logged into an account before you can rate packages.	MainWindow		您需要先登入帳戶才能對套件給與評分。
 Cleaning up…	ShuttingDownWindow		清理…

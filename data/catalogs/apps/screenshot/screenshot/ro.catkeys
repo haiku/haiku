@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-screenshot-cli	281883787
+1	romanian	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		Include marginea ferestrei
 Overwrite	ScreenshotWindow		Suprascrie
 Save in:	ScreenshotWindow		Salvează în:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Desktop
 Artwork folder	ScreenshotWindow		Dosar de lucrări de artă
 Translator Settings	ScreenshotWindow		Configurări traducător
 Include mouse pointer	ScreenshotWindow		Include indicatorul mausului
+Selected area	ScreenshotWindow		Zonă selectată
 overwrite	ScreenshotWindow		suprascrie
 Settings…	ScreenshotWindow		Configurări…
+Select area	ScreenshotWindow		Selectează zona
 Choose folder	ScreenshotWindow		Alege dosarul
 Name:	ScreenshotWindow		Nume:
+Active window	ScreenshotWindow		Fereastră activă
 Choose folder…	ScreenshotWindow		Alege dosarul…
 Please select	ScreenshotWindow		Selectați
 Failed to save screenshot	ScreenshotWindow		Nu s-a putut salva captura de ecran
 Cancel	ScreenshotWindow		Anulează
+Whole screen	ScreenshotWindow		Ecran întreg
 Delay:	ScreenshotWindow		Întârziere:
 Copy to clipboard	ScreenshotWindow		Copiază la clipboard
 screenshot	Screenshot	Base filename of screenshot files	captură de ecran

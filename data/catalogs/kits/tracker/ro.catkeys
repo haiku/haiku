@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	4192200646
+1	romanian	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -168,6 +168,7 @@ Property info	AttributesView		Informații de proprietate
 Sorry, you can't create links in the Trash.	PoseView		Nu puteți crea legături în gunoi.
 From	Email Query Columns		De la
 Open selection with:	OpenWithWindow		Deschide selecția cu:
+Preferences…	ContainerWindow		Preferințe…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nu s-a putut deschide \„%document\” pentru că aplicația \„%app\” este la gunoi. 
 Work Phone	Person Query Columns		Telefon de serviciu
 Select folders	FindPanel		Selectează dosarele

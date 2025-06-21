@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	371749163
+1	romanian	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiază
@@ -153,6 +153,7 @@ Window	WebPositive Window		Fereastră
 Proxy server address:	Settings Window		Adresă de server proxy:
 Search page:	Settings Window		Caută în pagină:
 Settings	WebPositive Window		Configurări
+Show in Tracker	BookmarkBar		Arată în Tracker
 Clear	URL Bar		Eliberează
 Loading %url	WebPositive Window		Se încarcă %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Vând muzică de jazz și haine de bun-gust în New-York și Quebec, la preț fix.

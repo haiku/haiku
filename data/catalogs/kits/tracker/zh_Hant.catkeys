@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	4192200646
+1	english	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		創建
 Icon	AttributesView		圖標
 Open and make preferred	OpenWithWindow		開啓並設為首選
@@ -168,6 +168,7 @@ Property info	AttributesView		屬性資訊
 Sorry, you can't create links in the Trash.	PoseView		抱歉，您無法在資源回收筒中建立鏈結。
 From	Email Query Columns		來自
 Open selection with:	OpenWithWindow		開啓選擇以：
+Preferences…	ContainerWindow		偏好…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		無法開啟 \"%document\" 因為應用程式 \"%app\" 位於資源回收筒。
 Work Phone	Person Query Columns		工作電話
 Select folders	FindPanel		選擇資料夾

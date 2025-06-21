@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-LaunchBox	1878360293
+1	english	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		補充描述設定…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		真的關閉這個pad嗎？\n（該pad將不會被記住。）
 OK	LaunchBox		確認
@@ -9,6 +9,7 @@ Autostart	LaunchBox		自動啟動
 Clone	LaunchBox		克隆
 Description for '%3'	LaunchBox		描述 '%3'
 Show window border	LaunchBox		顯示視窗邊框
+Failed to open folder - is Tracker running?	LaunchBox		無法開啟資料夾 - Tracker 正在運行嗎？
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\n無法啟動帶有簽名的應用程式 '%2'.\n\n錯誤：
 Failed to launch 'something', error in Pad data.	LaunchBox		無法啟動'某物'，Pad資料錯誤。
 LaunchBox	System name		LaunchBox

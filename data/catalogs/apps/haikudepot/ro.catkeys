@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2555742361
+1	romanian	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Clic pe un pachet pentru a 
 Cancel	UserLoginWindow		Anulează
 Rating not possible	MainWindow		Evaluarea nu este posibilă
 Package update error	MainWindow		Eroare de actualizare a pachetului
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Clic aici
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Se aduc evaluările utilizatorilor pentru pachet
 Reboot required	PackageManager		Repornire necesară
 All packages	PackageListView		Toate pachetele
 Send	RatePackageWindow		Trimite
+Creating package list…	FeaturedPackagesView		Se creează lista de pachete…
 Start package daemon	App		Pornește serviciul de pachete
 There are problems in the supplied data:	UserLoginWindow		Există probleme în datele furnizate:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Utilizatorul „%Nickname%” nu a fost de acord cu nicio condiție de utilizare.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Conținut
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Partajați date de utilizare anonime cu HaikuDepotServer
 Close	PackageManager		Închide
 Changelog	PackageInfoView		Istoric de modificări
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 pentru a căuta toate pachetele.
 About	PackageInfoView		Despre
 Password requirements download problem	UserLoginWindow		Problemă la descărcarea cerințelor de parolă
 Password:	UserLoginWindow		Parolă:
@@ -225,6 +228,7 @@ Category:	FilterView		Categorie:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	dezinstalează pachetul %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Se aduc datele depozitului de la distanță
 Description	PackageListView		Descriere
+No results? 	FeaturedPackagesView		Fără rezultate? 
 User creation error	UserLoginWindow		Eroare la crearea utilizatorului
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să vă autentificați la un cont înainte de a putea evalua pachete.
 Cleaning up…	ShuttingDownWindow		Curățare…

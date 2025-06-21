@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-screenshot-cli	2032391935
+1	english	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		包括視窗邊框
 Overwrite	ScreenshotWindow		取代
 Save in:	ScreenshotWindow		存儲到：
@@ -15,10 +15,13 @@ Desktop	ScreenshotWindow		桌面
 Artwork folder	ScreenshotWindow		美術資料夾
 Translator Settings	ScreenshotWindow		翻譯器設定
 Include mouse pointer	ScreenshotWindow		包含滑鼠指標
+Selected area	ScreenshotWindow		選定區域
 overwrite	ScreenshotWindow		取代
 Settings…	ScreenshotWindow		設定…
+Select area	ScreenshotWindow		選擇區域
 Choose folder	ScreenshotWindow		選擇資料夾
 Name:	ScreenshotWindow		名稱：
+Active window	ScreenshotWindow		活動視窗
 Choose folder…	ScreenshotWindow		選擇資料夾...
 Please select	ScreenshotWindow		請選擇
 Failed to save screenshot	ScreenshotWindow		存儲螢幕截圖失敗

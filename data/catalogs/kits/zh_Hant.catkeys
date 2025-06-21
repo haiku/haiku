@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	2599604529
+1	english	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		版權所有。
 gold master	AboutWindow		gold master
 Undo	TextView		撤銷
@@ -45,5 +45,6 @@ Version history:	AboutWindow		版本歷史：
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		無法找到副本的應用程式。未提供應用程式簽名。\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		藍：
+Special thanks:	AboutWindow		特別鳴謝：
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		無法建立副本 \"%description\".\n%error
 Written by:	AboutWindow		撰寫者：

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-StyledEdit	3760185556
+1	romanian	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Statisticile documentului
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, fișierul nu a fost găsit: \„%s\”.
 Cut	Menus		Taie
@@ -34,6 +34,7 @@ Bold	Menus		Aldin
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Fișierul \„%file%\” a fost modificat de o altă aplicație, îl reîncărcați?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Fișierul \„%file%\” a fost eliminat de o altă aplicație, îl recuperați?
 Lines:	Statistics		Linii:
+Strikeout	Menus		Tăiat
 Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\„%s\” are modificări nesalvate.\nReveniți la ultima versiune salvată? 
 Save	SaveAlert		Salvează

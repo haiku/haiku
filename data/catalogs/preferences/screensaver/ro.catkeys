@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ScreenSaver	2682415627
+1	romanian	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Semnalarea afișajului de administrare a consumului nu este disponibilă
 Blackness	ScreenSaver		Întuneric
 Fade now when mouse is here	ScreenSaver		Estompează acum când mausul este aici
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Anulează
 Password:	ScreenSaver		Parolă:
 Screensaver settings	ScreenSaver		Configurări protector de ecran
 Password Window	ScreenSaver		Fereastră de parolă
+Use system password	ScreenSaver		Utilizează parola sistemului
 Test	ScreenSaver		Testare
 Could not load screen saver	ScreenSaver		Nu s-a putut încărca protectorul de ecran
 Use custom password	ScreenSaver		Utilizează parolă personalizată
