@@ -161,9 +161,10 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fStatusView->SetExplicitMinSize(BSize(50.0f, B_SIZE_UNSET));
 	fStatusView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	ResizeTo(Bounds().Width(), fSizeLimit);
-	SetSizeLimits(size.Width(), 32767.0f, fSizeLimit, fSizeLimit);
-	SetZoomLimits(Bounds().Width(), fSizeLimit);
+	ResizeToPreferred();
+	SetSizeLimits(Size().Width(), 32767.0f, fSizeLimit, fSizeLimit);
+	SetZoomLimits(Size().Width(), fSizeLimit);
+	ResizeBy(be_plain_font->StringWidth("M") * 15, 0);
 	fPreviousHeight = -1;
 
 	fScrollView->Hide();
