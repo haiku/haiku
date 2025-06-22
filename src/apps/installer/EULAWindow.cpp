@@ -27,9 +27,8 @@ static const uint32 kMsgNext = 'next';
 
 EULAWindow::EULAWindow()
 	:
-	BWindow(BRect(0, 0, 600, 450), B_TRANSLATE("README"),
-		B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE
-		| B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(), B_TRANSLATE("README"), B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	BString infoText;
 	infoText << B_TRANSLATE(
@@ -96,6 +95,10 @@ EULAWindow::EULAWindow()
 			.Add(cancelButton)
 			.Add(continueButton);
 
+	font_height fontHeight;
+	be_plain_font->GetHeight(&fontHeight);
+	const float lineHeight = fontHeight.ascent + fontHeight.descent;
+	GetLayout()->SetExplicitSize(BSize(be_plain_font->StringWidth("M") * 60, lineHeight * 30));
 	CenterOnScreen();
 	Show();
 }
