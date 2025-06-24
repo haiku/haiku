@@ -15,7 +15,7 @@ namespace BPrivate {
 
 
 
-// Button to adopt backgrond color of toolbar
+//! Button to adopt background color of BToolBar
 class ToolBarButton : public BButton {
 public:
 			ToolBarButton(const char* name, const char* label,
@@ -29,23 +29,23 @@ ToolBarButton::ToolBarButton(const char* name, const char* label,
 				BMessage* message)
 	:
 	BButton(name, label, message)
-	{}
+{
+}
 
 
 void
 ToolBarButton::AttachedToWindow()
 {
 	BButton::AttachedToWindow();
-	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-		// have to remove the darkening caused by BButton's drawing
+
+	// TODO: Should we force Control, Menu, or parent colors here?
 }
 
 
-//# pragma mark -
+// # pragma mark -
 
 
-class LockableButton: public ToolBarButton {
+class LockableButton : public ToolBarButton {
 public:
 			LockableButton(const char* name, const char* label,
 				BMessage* message);
@@ -220,6 +220,7 @@ BToolBar::FindButton(uint32 command) const
 
 // #pragma mark - Private methods
 
+
 void
 BToolBar::Pulse()
 {
@@ -247,6 +248,9 @@ BToolBar::_Init()
 	GroupLayout()->SetSpacing(1);
 
 	SetFlags(Flags() | B_FRAME_EVENTS | B_PULSE_NEEDED);
+
+	SetLowUIColor(B_MENU_BACKGROUND_COLOR);
+	SetViewUIColor(B_MENU_BACKGROUND_COLOR);
 }
 
 

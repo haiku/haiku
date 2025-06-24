@@ -73,7 +73,6 @@ BNavigator::BNavigator(const Model* model)
 
 	// Needed to draw the bottom border
 	SetFlags(Flags() | B_WILL_DRAW);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
@@ -85,6 +84,8 @@ BNavigator::~BNavigator()
 void
 BNavigator::AttachedToWindow()
 {
+	BToolBar::AttachedToWindow();
+
 	const BRect iconRect(BPoint(0, 0),
 		be_control_look->ComposeIconSize(20));
 
