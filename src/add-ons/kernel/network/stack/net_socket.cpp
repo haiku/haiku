@@ -886,6 +886,8 @@ int
 socket_accept(net_socket* socket, struct sockaddr* address,
 	socklen_t* _addressLength, net_socket** _acceptedSocket)
 {
+	if (socket->type != SOCK_STREAM)
+		return B_NOT_SUPPORTED;
 	if ((socket->options & SO_ACCEPTCONN) == 0)
 		return B_BAD_VALUE;
 
