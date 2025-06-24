@@ -10,6 +10,7 @@
 #include <InterfaceDefs.h>
 #include <Rect.h>
 
+
 class BView;
 class BWindow;
 namespace BPrivate {

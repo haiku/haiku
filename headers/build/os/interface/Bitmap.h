@@ -1,20 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Distributed under the terms of the MIT license.
-//
-//	File Name:		Bitmap.h
-//	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	BBitmap objects represent off-screen windows that
-//					contain bitmap data.
-//------------------------------------------------------------------------------
-
+/*
+ * Copyright 2001-2007, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef	_BITMAP_H
 #define	_BITMAP_H
+
 
 #include <Archivable.h>
 #include <InterfaceDefs.h>
 #include <Rect.h>
+
 
 enum {
 	B_BITMAP_CLEAR_TO_WHITE				= 0x00000001,
@@ -23,90 +18,119 @@ enum {
 	B_BITMAP_IS_LOCKED					= 0x00000008 | B_BITMAP_IS_AREA,
 	B_BITMAP_IS_CONTIGUOUS				= 0x00000010 | B_BITMAP_IS_LOCKED,
 	B_BITMAP_IS_OFFSCREEN				= 0x00000020,
+		// Offscreen but non-overlay bitmaps are not supported on Haiku,
+		// but appearantly never were on BeOS either! The accelerant API
+		// would need to be extended to so that the app_server can ask
+		// the graphics driver to reserve memory for a bitmap and for this
+		// to make any sense, an accelerated blit from this memory into
+		// the framebuffer needs to be added to the API as well.
 	B_BITMAP_WILL_OVERLAY				= 0x00000040 | B_BITMAP_IS_OFFSCREEN,
 	B_BITMAP_RESERVE_OVERLAY_CHANNEL	= 0x00000080,
-	B_BITMAP_NO_SERVER_LINK				= 0x00000100
+
+	// Haiku extensions:
+	B_BITMAP_NO_SERVER_LINK				= 0x00000100,
+		// Cheap to create, object will manage memory itself,
+		// no BApplication needs to run, but one can't draw such
+		// a BBitmap.
 };
 
 #define B_ANY_BYTES_PER_ROW	-1
 
-//----------------------------------------------------------------//
-//----- BBitmap class --------------------------------------------//
 
 class BBitmap : public BArchivable {
 public:
-	BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
-			int32 bytesPerRow = B_ANY_BYTES_PER_ROW,
-			screen_id screenID = B_MAIN_SCREEN_ID);
-	BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews = false,
-			bool needsContiguous = false);
-	BBitmap(const BBitmap *source, bool acceptsViews = false,
-			bool needsContiguous = false);
-	virtual ~BBitmap();
+								BBitmap(BRect bounds, uint32 flags,
+									color_space colorSpace,
+									int32 bytesPerRow = B_ANY_BYTES_PER_ROW,
+									screen_id screenID = B_MAIN_SCREEN_ID);
+								BBitmap(BRect bounds, color_space colorSpace,
+									bool acceptsViews = false,
+									bool needsContiguous = false);
+								BBitmap(const BBitmap& source, uint32 flags);
+								BBitmap(const BBitmap& source);
+								BBitmap(const BBitmap* source,
+									bool acceptsViews = false,
+									bool needsContiguous = false);
+	virtual						~BBitmap();
 
 	// Archiving
-	BBitmap(BMessage *data);
-	static BArchivable *Instantiate(BMessage *data);
-	virtual status_t Archive(BMessage *data, bool deep = true) const;
+								BBitmap(BMessage* data);
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 
-	status_t InitCheck() const;
-	bool IsValid() const;
+			status_t			InitCheck() const;
+			bool				IsValid() const;
 
-	status_t LockBits(uint32 *state = NULL);
-	void UnlockBits();
+			status_t			LockBits(uint32* state = NULL);
+			void				UnlockBits();
 
-	area_id Area() const;
-	void *Bits() const;
-	int32 BitsLength() const;
-	int32 BytesPerRow() const;
-	color_space ColorSpace() const;
-	BRect Bounds() const;
+			void*				Bits() const;
+			int32				BitsLength() const;
+			int32				BytesPerRow() const;
+			color_space			ColorSpace() const;
+			BRect				Bounds() const;
 
-	void SetBits(const void *data, int32 length, int32 offset,
-				 color_space colorSpace);
+			status_t			SetDrawingFlags(uint32 flags);
+			uint32				Flags() const;
 
-	// not part of the R5 API
-	status_t ImportBits(const void *data, int32 length, int32 bpr,
-						int32 offset, color_space colorSpace);
-	status_t ImportBits(const BBitmap *bitmap);
+			status_t			ImportBits(const void* data, int32 length,
+									int32 bpr, int32 offset,
+									color_space colorSpace);
+			status_t			ImportBits(const void* data, int32 length,
+									int32 bpr, color_space colorSpace,
+									BPoint from, BPoint to, BSize size);
+			status_t			ImportBits(const BBitmap* bitmap);
+			status_t			ImportBits(const BBitmap* bitmap, BPoint from,
+									BPoint to, BSize size);
 
-	status_t GetOverlayRestrictions(overlay_restrictions *restrictions) const;
+			status_t			GetOverlayRestrictions(
+									overlay_restrictions* restrictions) const;
 
-//----- Private or reserved -----------------------------------------//
-	
-	virtual status_t Perform(perform_code d, void *arg);
+			bool				Lock();
+			void				Unlock();
+			bool				IsLocked() const;
+
+			BBitmap&			operator=(const BBitmap& source);
+
+	class Private;
+
+public:
+	// deprecated
+			void				SetBits(const void* data, int32 length,
+									int32 offset, color_space colorSpace);
 
 private:
-	virtual void _ReservedBitmap1();
-	virtual void _ReservedBitmap2();
-	virtual void _ReservedBitmap3();
+			status_t			ImportBits(const void* data, int32 length,
+									int32 bpr, color_space colorSpace,
+									BPoint from, BPoint to, int32 width, int32 height);
+			status_t			ImportBits(const BBitmap* bitmap, BPoint from,
+									BPoint to, int32 width, int32 height);
 
-	BBitmap(const BBitmap &);
-	BBitmap &operator=(const BBitmap &);
+private:
+	friend class Private;
 
-	char *get_shared_pointer() const;
-	int32 get_server_token() const;
-	void InitObject(BRect bounds, color_space colorSpace, uint32 flags,
-					int32 bytesPerRow, screen_id screenID);
-	void CleanUp();
+	virtual	status_t			Perform(perform_code d, void* arg);
+	virtual	void				_ReservedBitmap1();
+	virtual	void				_ReservedBitmap2();
+	virtual	void				_ReservedBitmap3();
 
-	void AssertPtr();
+			int32				_ServerToken() const;
+			void				_InitObject(BRect bounds,
+									color_space colorSpace, uint32 flags,
+									int32 bytesPerRow, screen_id screenID);
+			void				_CleanUp();
+			void				_AssertPointer();
 
-	void		*fBasePtr;
-	int32		fSize;
-	color_space	fColorSpace;
-	BRect		fBounds;
-	int32		fBytesPerRow;
-	int32		fServerToken;
-	int32		fToken;
-	uint8		unused;
-	area_id		fArea;
-	area_id		fOrigArea;
-	uint32		fFlags;
-	status_t	fInitError;
+private:
+			uint8*				fBasePointer;
+			int32				fSize;
+			color_space			fColorSpace;
+			BRect				fBounds;
+			int32				fBytesPerRow;
+			int32				fServerToken;
+			uint8				unused;
+			uint32				fFlags;
+			status_t			fInitError;
 };
-
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
 
 #endif	// _BITMAP_H
