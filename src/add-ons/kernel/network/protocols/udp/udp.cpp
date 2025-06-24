@@ -450,6 +450,12 @@ UdpDomainSupport::_Bind(UdpEndpoint *endpoint, const sockaddr *address)
 			ntohs(otherEndpoint->LocalAddress().Port()));
 
 		if (otherEndpoint->LocalAddress().EqualPorts(address)) {
+			// check for broadcast address (apply to IPv4 only)
+			if ((fDomain->address_module->flags & NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS) != 0
+				&& ((const sockaddr_in *)address)->sin_addr.s_addr == htonl(INADDR_BROADCAST)) {
+					return EADDRNOTAVAIL;
+			}
+
 			// port is already bound, SO_REUSEADDR or SO_REUSEPORT is required:
 			if ((otherEndpoint->Socket()->options
 					& (SO_REUSEADDR | SO_REUSEPORT)) == 0
