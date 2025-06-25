@@ -769,7 +769,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 status_t
 UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 {
-	TRACE_EPM("ReceiveError(code %" B_PRId32 " %p [%" B_PRIu32 " bytes])",
+	TRACE_EPM("ReceiveError(code %" B_PRIx32 " %p [%" B_PRIu32 " bytes])",
 		error, buffer, buffer->size);
 
 	// We only really need the port information
@@ -1056,6 +1056,10 @@ UdpEndpoint::SendRoutedData(net_buffer *buffer, net_route *route)
 		return EMSGSIZE;
 	if ((fFlags & FLAG_NO_SEND) != 0)
 		return EPIPE;
+	status_t status = fSocket->error;
+	fSocket->error = 0;
+	if (status != B_OK)
+		return status;
 
 	buffer->protocol = IPPROTO_UDP;
 
@@ -1091,6 +1095,10 @@ UdpEndpoint::SendData(net_buffer *buffer)
 
 	if ((fFlags & FLAG_NO_SEND) != 0)
 		return EPIPE;
+	status_t status = fSocket->error;
+	fSocket->error = 0;
+	if (status != B_OK)
+		return status;
 
 	return gDatalinkModule->send_data(this, NULL, buffer);
 }
@@ -1371,11 +1379,22 @@ udp_error_received(net_error error, net_buffer* buffer)
 			notifyError = ENETUNREACH;
 			break;
 		case B_NET_ERROR_UNREACH_HOST:
+		case B_NET_ERROR_UNREACH_SOURCE_FAIL:
+		case B_NET_ERROR_UNREACH_NET_UNKNOWN:
+		case B_NET_ERROR_UNREACH_HOST_UNKNOWN:
+		case B_NET_ERROR_UNREACH_ISOLATED:
+		case B_NET_ERROR_UNREACH_NET_TOS:
+		case B_NET_ERROR_UNREACH_HOST_TOS:
+		case B_NET_ERROR_UNREACH_HOST_PRECEDENCE:
+		case B_NET_ERROR_UNREACH_PRECEDENCE_CUTOFF:
 		case B_NET_ERROR_TRANSIT_TIME_EXCEEDED:
 			notifyError = EHOSTUNREACH;
 			break;
 		case B_NET_ERROR_UNREACH_PROTOCOL:
 		case B_NET_ERROR_UNREACH_PORT:
+		case B_NET_ERROR_UNREACH_NET_PROHIBITED:
+		case B_NET_ERROR_UNREACH_HOST_PROHIBITED:
+		case B_NET_ERROR_UNREACH_FILTER_PROHIBITED:
 			notifyError = ECONNREFUSED;
 			break;
 		case B_NET_ERROR_MESSAGE_SIZE:
