@@ -402,7 +402,7 @@ ipv4_set_to_empty_address(sockaddr *address)
 		return B_BAD_VALUE;
 
 	memset(address, 0, sizeof(sockaddr_in));
-	address->sa_len = sizeof(sockaddr_in);
+	address->sa_len = 0;
 	address->sa_family = AF_INET;
 	return B_OK;
 }
