@@ -1089,7 +1089,7 @@ _user_sendto(int socket, const void *data, size_t length, int flags,
 	if (data == NULL || !is_user_address_range(data, length))
 		return B_BAD_ADDRESS;
 
-	if (addressLength <= 0
+	if (addressLength < 0
 			|| addressLength > MAX_SOCKET_ADDRESS_LENGTH) {
 		return B_BAD_VALUE;
 	}
