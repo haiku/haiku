@@ -47,13 +47,13 @@
 // to compile with gcc 2.95
 #	define TRACE_EP(format, args...)	dprintf("UDP [%" B_PRIu64 ",%" \
 		B_PRIu32 "] %p " format "\n", system_time(), \
-		thread_get_current_thread_id(), this , ##args)
+		find_thread(NULL), this , ##args)
 #	define TRACE_EPM(format, args...)	dprintf("UDP [%" B_PRIu64 ",%" \
 		B_PRIu32 "] " format "\n", system_time() , \
-		thread_get_current_thread_id() , ##args)
+		find_thread(NULL) , ##args)
 #	define TRACE_DOMAIN(format, args...)	dprintf("UDP [%" B_PRIu64 ",%" \
 		B_PRIu32 "] (%d) " format "\n", system_time(), \
-		thread_get_current_thread_id(), Domain()->family , ##args)
+		find_thread(NULL), Domain()->family , ##args)
 #else
 #	define TRACE_BLOCK(x)
 #	define TRACE_EP(args...)	do { } while (0)
@@ -75,6 +75,13 @@ typedef NetBufferField<uint16, offsetof(udp_header, udp_checksum)>
 
 class UdpDomainSupport;
 
+// constants for the fFlags field
+enum {
+	FLAG_NO_RECEIVE				= 0x01,
+	FLAG_NO_SEND				= 0x02,
+};
+
+
 class UdpEndpoint : public net_protocol, public DatagramSocket<> {
 public:
 								UdpEndpoint(net_socket* socket);
@@ -82,6 +89,7 @@ public:
 			status_t			Bind(const sockaddr* newAddr);
 			status_t			Unbind(sockaddr* newAddr);
 			status_t			Connect(const sockaddr* newAddr);
+			status_t			Shutdown(int direction);
 
 			status_t			Open();
 			status_t			Close();
@@ -90,6 +98,7 @@ public:
 			status_t			SendRoutedData(net_buffer* buffer,
 									net_route* route);
 			status_t			SendData(net_buffer* buffer);
+			ssize_t				SendAvailable();
 
 			ssize_t				BytesAvailable();
 			status_t			FetchData(size_t numBytes, uint32 flags,
@@ -115,6 +124,7 @@ private:
 									// optionally connected)
 
 			UdpEndpoint*		fLink;
+			uint32				fFlags;
 };
 
 
@@ -945,7 +955,8 @@ UdpEndpointManager::_GetDomainSupport(net_buffer* buffer)
 UdpEndpoint::UdpEndpoint(net_socket *socket)
 	:
 	DatagramSocket<>("udp endpoint", socket),
-	fActive(false)
+	fActive(false),
+	fFlags(0)
 {
 }
 
@@ -974,6 +985,23 @@ UdpEndpoint::Connect(const sockaddr *address)
 {
 	TRACE_EP("Connect(%s)", AddressString(Domain(), address, true).Data());
 	return fManager->ConnectEndpoint(this, address);
+}
+
+
+status_t
+UdpEndpoint::Shutdown(int direction)
+{
+	TRACE_EP("Shutdown()");
+	AutoLocker _(fLock);
+
+	if (!IsActive())
+		return ENOTCONN;
+
+	if (direction == SHUT_RD || direction == SHUT_RDWR)
+		fFlags |= FLAG_NO_RECEIVE;
+	if (direction == SHUT_WR || direction == SHUT_RDWR)
+		fFlags |= FLAG_NO_SEND;
+	return B_OK;
 }
 
 
@@ -1026,6 +1054,8 @@ UdpEndpoint::SendRoutedData(net_buffer *buffer, net_route *route)
 
 	if (buffer->size > (0xffff - sizeof(udp_header)))
 		return EMSGSIZE;
+	if ((fFlags & FLAG_NO_SEND) != 0)
+		return EPIPE;
 
 	buffer->protocol = IPPROTO_UDP;
 
@@ -1059,7 +1089,20 @@ UdpEndpoint::SendData(net_buffer *buffer)
 {
 	TRACE_EP("SendData(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
 
+	if ((fFlags & FLAG_NO_SEND) != 0)
+		return EPIPE;
+
 	return gDatalinkModule->send_data(this, NULL, buffer);
+}
+
+
+ssize_t
+UdpEndpoint::SendAvailable()
+{
+	ssize_t bytes = fSocket->send.buffer_size;
+	if ((fFlags & FLAG_NO_SEND) != 0)
+		bytes = EPIPE;
+	return bytes;
 }
 
 
@@ -1069,8 +1112,10 @@ UdpEndpoint::SendData(net_buffer *buffer)
 ssize_t
 UdpEndpoint::BytesAvailable()
 {
-	size_t bytes = AvailableData();
-	TRACE_EP("BytesAvailable(): %lu", bytes);
+	ssize_t bytes = AvailableData();
+	if ((fFlags & FLAG_NO_RECEIVE) != 0)
+		bytes = ESHUTDOWN;
+	TRACE_EP("BytesAvailable(): %ld", bytes);
 	return bytes;
 }
 
@@ -1079,6 +1124,10 @@ status_t
 UdpEndpoint::FetchData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 {
 	TRACE_EP("FetchData(%" B_PRIuSIZE ", 0x%" B_PRIx32 ")", numBytes, flags);
+	if ((fFlags & FLAG_NO_RECEIVE) != 0) {
+		*_buffer = NULL;
+		return B_OK;
+	}
 
 	status_t status = Dequeue(flags, _buffer);
 	TRACE_EP("  FetchData(): returned from fifo status: %s", strerror(status));
@@ -1243,7 +1292,7 @@ udp_listen(net_protocol *protocol, int count)
 status_t
 udp_shutdown(net_protocol *protocol, int direction)
 {
-	return B_NOT_SUPPORTED;
+	return ((UdpEndpoint *)protocol)->Shutdown(direction);
 }
 
 
@@ -1265,7 +1314,7 @@ udp_send_data(net_protocol *protocol, net_buffer *buffer)
 ssize_t
 udp_send_avail(net_protocol *protocol)
 {
-	return protocol->socket->send.buffer_size;
+	return ((UdpEndpoint *)protocol)->SendAvailable();
 }
 
 
