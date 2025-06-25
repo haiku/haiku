@@ -246,7 +246,11 @@ init_va_filerev(void)
 static inline void
 vput(struct vnode* vp)
 {
-	put_vnode(vp->v_mount->mnt_fsvolume, VTODE(vp)->de_inode);
+	// The driver might call vput to balance a getnewvnode() call. The getnewvnode stand-in
+	// written for the Haiku port, which leaves the node in VSTATE_UNINITIALIZED, doesn't get a
+	// ref to the node though.
+	if (vp->v_state != VSTATE_UNINITIALIZED)
+		put_vnode(vp->v_mount->mnt_fsvolume, VTODE(vp)->de_inode);
 
 	rw_lock_write_unlock(&vp->v_vnlock->haikuRW);
 }

@@ -95,6 +95,8 @@ bread(struct vnode* vp, daddr_t blkno, int size, struct ucred* cred, struct buf*
 
 	if (error == 0)
 		*bpp = buf;
+	else
+		*bpp = NULL;
 
 	return error;
 }
@@ -198,12 +200,15 @@ bawrite(struct buf* bp)
 }
 
 
-/*! Each bread call must be balanced with either a b(d/a)write (to write changes) or a brelse.
-
+/*! Each successful bread call must be balanced with either a b(d/a)write (to write changes) or a
+	brelse.
 */
 void
 brelse(struct buf* bp)
 {
+	if (bp == NULL)
+		return;
+
 	if (bp->b_vreg != NULL) {
 		put_buf(bp);
 		return;
@@ -262,6 +267,7 @@ getblk(struct vnode* vp, daddr_t blkno, int size, int slpflag, int slptimeo, int
 	@param splflag Ignored in the port.
 	@param slptimeo Ignored in the port.
 	@param flags Ignored in the port.
+	@param bpp If no error is returned, *bpp contains the address of the requested buf.
 */
 int
 getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, int slptimeo,
@@ -363,10 +369,11 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 		off_t fileOffset;
 		size_t bytesRead;
 
-		newBuf->b_owned = true;
 		status = allocate_data(newBuf, size);
-		if (status != B_OK)
+		if (status != B_OK) {
+			put_buf(newBuf);
 			return B_TO_POSIX_ERROR(status);
+		}
 
 		// Don't use the file cache while resizing; wait until node lock is released to avoid
 		// deadlocks.
@@ -374,7 +381,7 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 			(*bpp) = newBuf;
 				// we need to return a buffer with b_data allocated even in this case,
 				// because detrunc may zero out the unused space at the end of the last cluster
-			return B_TO_POSIX_ERROR(status);
+			return 0;
 		}
 
 		fileOffset = de_cn2off(fatVolume, blkno);
@@ -402,10 +409,11 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 		newBuf->b_bufsize = CACHED_BLOCK_SIZE;
 	} else {
 		// need to get more than one cached block and copy them to make a continuous buffer
-		newBuf->b_owned = true;
 		status = allocate_data(newBuf, size);
-		if (status != 0)
+		if (status != 0) {
+			put_buf(newBuf);
 			return B_TO_POSIX_ERROR(status);
+		}
 
 #ifdef _KERNEL_MODE
 		// for high block counts, try to get all blocks in one disk read
@@ -415,7 +423,7 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 		}
 #endif // _KERNEL_MODE
 
-		for (i = 0; i < cBlockCount && status == B_OK; i++) {
+		for (i = 0; i < cBlockCount; i++) {
 			if (readOnly == true)
 				newBuf->b_bcpointers[i] = (void*)block_cache_get(blockCache, dblkno + i);
 			else
@@ -438,7 +446,7 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 
 	*bpp = newBuf;
 
-	return B_TO_POSIX_ERROR(status);
+	return 0;
 }
 
 
@@ -503,7 +511,8 @@ bwrite(struct buf* bp)
 
 
 /*! Added for the Haiku port. Ensure that buf->b_data points to 'size' bytes of zero'd memory.
-
+	@post If no error is returned, buf->b_owned is set to true. If an error is returned,
+	no memory is allocated for buf->b_data.
 */
 static status_t
 allocate_data(struct buf* buf, int size)
@@ -527,6 +536,8 @@ allocate_data(struct buf* buf, int size)
 			buf->b_bufsize = size;
 		}
 	}
+
+	buf->b_owned = true;
 
 	return B_OK;
 }
