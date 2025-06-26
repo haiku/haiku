@@ -1546,8 +1546,9 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 			header->source = source.sin_addr.s_addr;
 			header->checksum = 0;
 			header.Sync();
-		} else
+		} else if (header->checksum != 0) {
 			checksumNeeded = false;
+		}
 
 		TRACE("  Header was already supplied:");
 		TRACE_ONLY(dump_ipv4_header(*header));
