@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2025, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NETINET_IN_H_
@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-/* RFC 2553 states that these must be available through <netinet/in.h> */
 #include <netinet6/in6.h>
 
 
@@ -19,11 +18,11 @@
 extern "C" {
 #endif
 
+
 typedef uint16_t in_port_t;
 typedef uint32_t in_addr_t;
 
-/* We can't include <ByteOrder.h> since we are a POSIX file,
- * and we are not allowed to import all the BeOS types here. */
+
 #if __GNUC__ >= 4
 #	define __net_swap_int32(arg)	(uint32_t)__builtin_bswap32(arg)
 #	define __net_swap_int16(arg)	(uint16_t)__builtin_bswap16(arg)
@@ -76,10 +75,7 @@ typedef uint32_t in_addr_t;
 
 #define IPPORT_RESERVED			1024
 	/* < IPPORT_RESERVED are privileged and should be accessible only by root */
-#define IPPORT_USERRESERVED		49151
-	/* > IPPORT_USERRESERVED are reserved for servers, though not requiring
-	 * privileged status
-	 */
+
 
 /* IP Version 4 address */
 struct in_addr {
@@ -120,27 +116,25 @@ struct group_source_req {
 	struct sockaddr_storage gsr_source;    /* source address */
 };
 
-/*
- * Options for use with [gs]etsockopt at the IP level.
- * First word of comment is data type; bool is stored in int.
- */
+
+/* [gs]etsockopt options for IPv4/IPv6 */
+
 #define IP_OPTIONS					1	/* buf/ip_opts; set/get IP options */
 #define IP_HDRINCL					2	/* int; header is included with data */
-#define IP_TOS						3
-	/* int; IP type of service and preced. */
+#define IP_TOS						3	/* int; IP type of service and preced. */
 #define IP_TTL						4	/* int; IP time to live */
+
 #define IP_RECVOPTS					5	/* bool; receive all IP opts w/dgram */
 #define IP_RECVRETOPTS				6	/* bool; receive IP opts for response */
 #define IP_RECVDSTADDR				7	/* bool; receive IP dst addr w/dgram */
 #define IP_RETOPTS					8	/* ip_opts; set/get IP options */
 #define IP_MULTICAST_IF				9	/* in_addr; set/get IP multicast i/f  */
 #define IP_MULTICAST_TTL			10	/* u_char; set/get IP multicast ttl */
-#define IP_MULTICAST_LOOP			11
-	/* u_char; set/get IP multicast loopback */
-#define IP_ADD_MEMBERSHIP			12
-	/* ip_mreq; add an IP group membership */
-#define IP_DROP_MEMBERSHIP			13
-	/* ip_mreq; drop an IP group membership */
+#define IP_MULTICAST_LOOP			11	/* u_char; set/get IP multicast loopback */
+
+/* RFC 3678 - Socket Interface Extensions for Multicast Source Filters */
+#define IP_ADD_MEMBERSHIP			12	/* ip_mreq; add an IP group membership */
+#define IP_DROP_MEMBERSHIP			13	/* ip_mreq; drop an IP group membership */
 #define IP_BLOCK_SOURCE				14	/* ip_mreq_source */
 #define IP_UNBLOCK_SOURCE			15	/* ip_mreq_source */
 #define IP_ADD_SOURCE_MEMBERSHIP	16	/* ip_mreq_source */
@@ -152,24 +146,24 @@ struct group_source_req {
 #define MCAST_JOIN_SOURCE_GROUP		22	/* group_source_req */
 #define MCAST_LEAVE_SOURCE_GROUP	23	/* group_source_req */
 
-/* IPPROTO_IPV6 options */
+/* RFC 3493 - Basic Socket Interface Extensions for IPv6 */
 #define IPV6_MULTICAST_IF			24	/* int */
 #define IPV6_MULTICAST_HOPS			25	/* int */
 #define IPV6_MULTICAST_LOOP			26	/* int */
-
 #define IPV6_UNICAST_HOPS			27	/* int */
 #define IPV6_JOIN_GROUP				28	/* struct ipv6_mreq */
 #define IPV6_LEAVE_GROUP			29	/* struct ipv6_mreq */
 #define IPV6_V6ONLY					30	/* int */
 
+/* RFC 3542 - Advanced Sockets API for IPv6 */
 #define IPV6_PKTINFO				31	/* struct ipv6_pktinfo */
 #define IPV6_RECVPKTINFO			32	/* struct ipv6_pktinfo */
 #define IPV6_HOPLIMIT				33	/* int */
 #define IPV6_RECVHOPLIMIT			34	/* int */
-
 #define IPV6_HOPOPTS				35  /* struct ip6_hbh */
 #define IPV6_DSTOPTS				36  /* struct ip6_dest */
 #define IPV6_RTHDR					37  /* struct ip6_rthdr */
+
 
 #define INADDR_ANY					((in_addr_t)0x00000000)
 #define INADDR_LOOPBACK				((in_addr_t)0x7f000001)
@@ -217,11 +211,6 @@ struct group_source_req {
 /* maximal length of the string representation of an IPv4 address */
 #define INET_ADDRSTRLEN				16
 
-/* some helpful macro's :) */
-#define in_hosteq(s, t)				((s).s_addr == (t).s_addr)
-#define in_nullhost(x)				((x).s_addr == INADDR_ANY)
-#define satosin(sa)					((struct sockaddr_in *)(sa))
-#define sintosa(sin)				((struct sockaddr *)(sin))
 
 #ifdef __cplusplus
 }
