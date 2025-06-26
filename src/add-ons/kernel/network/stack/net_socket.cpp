@@ -965,8 +965,10 @@ socket_getpeername(net_socket* _socket, struct sockaddr* address,
 	net_socket_private* socket = (net_socket_private*)_socket;
 	BReference<net_socket_private> parent = socket->parent.GetReference();
 
-	if ((!parent.IsSet() && !socket->is_connected) || socket->peer.ss_len == 0)
+	if ((!parent.IsSet() && !socket->is_connected) || socket->peer.ss_len == 0
+		|| socket->peer.ss_family == AF_UNSPEC) {
 		return ENOTCONN;
+	}
 
 	memcpy(address, &socket->peer, min_c(*_addressLength, socket->peer.ss_len));
 	*_addressLength = socket->peer.ss_len;

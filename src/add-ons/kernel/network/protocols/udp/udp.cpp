@@ -362,6 +362,7 @@ UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 		// [Stevens-UNP1, p226]: specifying AF_UNSPEC requests a "disconnect",
 		// so we reset the peer address:
 		endpoint->PeerAddress().SetToEmpty();
+		(*endpoint->PeerAddress())->sa_family = AF_UNSPEC;
 	} else {
 		if (!AddressModule()->is_same_family(address))
 			return EAFNOSUPPORT;
