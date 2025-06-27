@@ -296,7 +296,7 @@ l2cap_receive_data(net_buffer* buffer)
 
 
 status_t
-l2cap_error_received(net_error error, net_buffer* data)
+l2cap_error_received(net_error error, net_error_data* errorData, net_buffer* data)
 {
 	CALLED();
 

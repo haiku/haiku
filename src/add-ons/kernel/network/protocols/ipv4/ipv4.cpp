@@ -1878,7 +1878,7 @@ ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 
 
 status_t
-ipv4_error_received(net_error error, net_buffer* buffer)
+ipv4_error_received(net_error error, net_error_data* errorData, net_buffer* buffer)
 {
 	TRACE("  ipv4_error_received(error %d, buffer %p [%" B_PRIu32 " bytes])",
 		(int)error, buffer, buffer->size);
@@ -1929,7 +1929,7 @@ ipv4_error_received(net_error error, net_buffer* buffer)
 		return B_ERROR;
 
 	// propagate error
-	return protocol->error_received(error, buffer);
+	return protocol->error_received(error, errorData, buffer);
 }
 
 

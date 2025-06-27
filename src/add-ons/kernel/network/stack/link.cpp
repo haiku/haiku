@@ -629,7 +629,7 @@ link_receive_data(net_buffer* buffer)
 
 
 static status_t
-link_error_received(net_error error, net_buffer* data)
+link_error_received(net_error error, net_error_data* errorData, net_buffer* data)
 {
 	// We don't do any error processing
 	return B_ERROR;

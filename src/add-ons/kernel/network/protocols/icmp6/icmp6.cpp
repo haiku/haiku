@@ -299,7 +299,7 @@ icmp6_deliver_data(net_protocol *protocol, net_buffer *buffer)
 
 
 status_t
-icmp6_error_received(net_error code, net_buffer* data)
+icmp6_error_received(net_error code, net_error_data* errorData, net_buffer* data)
 {
  	return B_ERROR;
 }

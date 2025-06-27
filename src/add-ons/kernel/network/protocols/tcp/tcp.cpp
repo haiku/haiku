@@ -757,7 +757,7 @@ tcp_receive_data(net_buffer* buffer)
 
 
 status_t
-tcp_error_received(net_error error, net_buffer* data)
+tcp_error_received(net_error error, net_error_data* errorData, net_buffer* data)
 {
 	return B_ERROR;
 }

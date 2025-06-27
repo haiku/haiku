@@ -105,7 +105,7 @@ struct net_protocol_module_info {
 	status_t	(*receive_data)(net_buffer* data);
 	status_t	(*deliver_data)(net_protocol* self, net_buffer* data);
 
-	status_t	(*error_received)(net_error error, net_buffer* data);
+	status_t	(*error_received)(net_error error, net_error_data* errorData, net_buffer* data);
 	status_t	(*error_reply)(net_protocol* self, net_buffer* cause,
 					net_error error, net_error_data* errorData);
 

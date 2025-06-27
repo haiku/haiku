@@ -275,7 +275,7 @@ unix_deliver_data(net_protocol *_protocol, net_buffer *buffer)
 
 
 status_t
-unix_error_received(net_error error, net_buffer *data)
+unix_error_received(net_error error, net_error_data* errorData, net_buffer *data)
 {
 	return B_ERROR;
 }

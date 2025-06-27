@@ -1572,7 +1572,7 @@ ipv6_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 
 
 status_t
-ipv6_error_received(net_error error, net_buffer* data)
+ipv6_error_received(net_error error, net_error_data* errorData, net_buffer* data)
 {
 	return B_ERROR;
 }

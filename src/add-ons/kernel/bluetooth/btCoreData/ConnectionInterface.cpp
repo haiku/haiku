@@ -50,7 +50,7 @@ HciConnection::~HciConnection()
 	if (L2cap != NULL) {
 		net_buffer* error = gBufferModule->create(128);
 		error->interface_address = &interface_address;
-		if (L2cap->error_received(B_NET_ERROR_UNREACH_HOST, error) != B_OK) {
+		if (L2cap->error_received(B_NET_ERROR_UNREACH_HOST, NULL, error) != B_OK) {
 			error->interface_address = NULL;
 			gBufferModule->free(error);
 		}

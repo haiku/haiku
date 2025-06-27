@@ -554,7 +554,7 @@ icmp_receive_data(net_buffer* buffer)
 			net_error error = icmp_to_net_error(header.type, header.code);
 			if (error != 0) {
 				bufferHeader.Remove();
-				return domain->module->error_received(error, buffer);
+				return domain->module->error_received(error, NULL, buffer);
 			}
 			break;
 		}
@@ -579,7 +579,7 @@ icmp_receive_data(net_buffer* buffer)
 
 
 status_t
-icmp_error_received(net_error code, net_buffer* data)
+icmp_error_received(net_error code, net_error_data* errorData, net_buffer* data)
 {
 	return B_ERROR;
 }

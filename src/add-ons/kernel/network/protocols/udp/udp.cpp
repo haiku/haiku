@@ -1371,7 +1371,7 @@ udp_deliver_data(net_protocol *protocol, net_buffer *buffer)
 
 
 status_t
-udp_error_received(net_error error, net_buffer* buffer)
+udp_error_received(net_error error, net_error_data* errorData, net_buffer* buffer)
 {
 	status_t notifyError = B_OK;
 
