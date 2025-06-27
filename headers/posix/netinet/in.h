@@ -164,6 +164,8 @@ struct group_source_req {
 #define IPV6_DSTOPTS				36  /* struct ip6_dest */
 #define IPV6_RTHDR					37  /* struct ip6_rthdr */
 
+#define IP_DONTFRAG					38  /* bool; don't fragment */
+
 
 #define INADDR_ANY					((in_addr_t)0x00000000)
 #define INADDR_LOOPBACK				((in_addr_t)0x7f000001)
