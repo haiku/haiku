@@ -1920,6 +1920,10 @@ ipv4_error_received(net_error error, net_error_data* errorData, net_buffer* buff
 		return B_ERROR;
 	}
 
+	if (error == B_NET_ERROR_REDIRECT_HOST) {
+		// TODO: Update the routing table!
+	}
+
 	buffer->protocol = header.protocol;
 
 	bufferHeader.Remove(headerLength);

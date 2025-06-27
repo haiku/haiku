@@ -544,23 +544,40 @@ icmp_receive_data(net_buffer* buffer)
 		case ICMP_TYPE_SOURCE_QUENCH:
 		case ICMP_TYPE_PARAMETER_PROBLEM:
 		case ICMP_TYPE_TIME_EXCEEDED:
+		case ICMP_TYPE_REDIRECT:
 		{
 			net_domain* domain = get_domain(buffer);
 			if (domain == NULL)
 				break;
 
+			net_error error = icmp_to_net_error(header.type, header.code);
+			if (error == 0)
+				break;
+
+			net_error_data dataStorage = {};
+			net_error_data* data = NULL;
+			if (error == B_NET_ERROR_MESSAGE_SIZE) {
+				data = &dataStorage;
+				data->mtu = ntohs(header.path_mtu.next_mtu);
+
+				// IPv4 minimum fragment size is 68 bytes, so if the "next MTU" is
+				// smaller than that, we can be sure it's invalid.
+				if (data->mtu < 68)
+					data = NULL;
+			} else if (error == B_NET_ERROR_REDIRECT_HOST) {
+				data = &dataStorage;
+				sockaddr_in& gateway = (sockaddr_in&)data->gateway;
+				gateway.sin_len = sizeof(sockaddr_in);
+				gateway.sin_family = AF_INET;
+				gateway.sin_addr.s_addr = header.redirect.gateway;
+			}
+
 			// Deliver the error to the domain protocol which will
 			// propagate the error to the upper protocols
-			net_error error = icmp_to_net_error(header.type, header.code);
-			if (error != 0) {
-				bufferHeader.Remove();
-				return domain->module->error_received(error, NULL, buffer);
-			}
-			break;
+			bufferHeader.Remove();
+			return domain->module->error_received(error, data, buffer);
 		}
 
-		case ICMP_TYPE_REDIRECT:
-			// TODO: Update the routing table
 		case ICMP_TYPE_TIMESTAMP_REQUEST:
 		case ICMP_TYPE_TIMESTAMP_REPLY:
 		case ICMP_TYPE_INFO_REQUEST:
@@ -662,7 +679,7 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 				icmpHeader->parameter_problem.pointer = errorData->error_offset;
 				break;
 			case B_NET_ERROR_MESSAGE_SIZE:
-				icmpHeader->path_mtu.next_mtu = errorData->mtu;
+				icmpHeader->path_mtu.next_mtu = htons(errorData->mtu);
 				break;
 
 			default:
