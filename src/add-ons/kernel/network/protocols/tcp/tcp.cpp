@@ -759,7 +759,45 @@ tcp_receive_data(net_buffer* buffer)
 status_t
 tcp_error_received(net_error error, net_error_data* errorData, net_buffer* data)
 {
-	return B_ERROR;
+	TRACE(("TCP: Received error %d\n", error));
+
+	if (data->interface_address == NULL
+		|| data->interface_address->domain == NULL)
+		return B_ERROR;
+
+	net_domain* domain = data->interface_address->domain;
+	net_address_module_info* addressModule = domain->address_module;
+
+	NetBufferHeaderReader<tcp_header> bufferHeader(data);
+	if (bufferHeader.Status() < B_OK)
+		return bufferHeader.Status();
+
+	tcp_header& header = bufferHeader.Data();
+
+	uint16 headerLength = header.HeaderLength();
+	if (headerLength < sizeof(tcp_header))
+		return B_BAD_DATA;
+
+	EndpointManager* endpointManager = endpoint_manager_for(domain);
+	if (endpointManager == NULL)
+		return B_ERROR;
+
+	addressModule->set_port(data->source, header.source_port);
+	addressModule->set_port(data->destination, header.destination_port);
+
+	TCPEndpoint* endpoint = endpointManager->FindConnection(
+		data->source, data->destination);
+	if (endpoint == NULL) {
+		TRACE(("  Endpoint not found for: peer %s, local %s\n",
+			AddressString(domain, data->destination, true).Data(),
+			AddressString(domain, data->source, true).Data()));
+		return B_ERROR;
+	}
+
+	status_t status = endpoint->ErrorReceived(error, errorData, data);
+
+	gSocketModule->release_socket(endpoint->socket);
+	return status;
 }
 
 

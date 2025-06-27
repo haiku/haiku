@@ -1945,7 +1945,10 @@ ipv4_error_received(net_error error, net_error_data* errorData, net_buffer* buff
 		return B_ERROR;
 	}
 
-	if (error == B_NET_ERROR_REDIRECT_HOST) {
+	if (error == B_NET_ERROR_MESSAGE_SIZE) {
+		if (errorData != NULL)
+			errorData->mtu -= sizeof(ipv4_header);
+	} else if (error == B_NET_ERROR_REDIRECT_HOST) {
 		// TODO: Update the routing table!
 	}
 

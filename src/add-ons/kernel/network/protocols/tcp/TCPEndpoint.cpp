@@ -2034,6 +2034,25 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 }
 
 
+status_t
+TCPEndpoint::ErrorReceived(net_error error, net_error_data* errorData,
+	net_buffer* data)
+{
+	MutexLocker locker(fLock);
+
+	if (error == B_NET_ERROR_MESSAGE_SIZE && errorData != NULL) {
+		uint32 newMaxSegmentSize = errorData->mtu - sizeof(tcp_header);
+		if (fSendMaxSegmentSize > newMaxSegmentSize) {
+			fSendMaxSegmentSize = newMaxSegmentSize;
+			gStackModule->set_timer(&fRetransmitTimer, 0);
+		}
+		return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
 //	#pragma mark - send
 
 
@@ -2415,6 +2434,9 @@ TCPEndpoint::_PrepareSendPath(const sockaddr* peer)
 	fSendQueue.SetInitialSequence(fSendNext + 1);
 
 	fReceiveMaxSegmentSize = _MaxSegmentSize(peer);
+
+	int yes = 1;
+	next->module->setsockopt(next, IPPROTO_IP, IP_DONTFRAG, &yes, sizeof(yes));
 
 	// Compute the window shift we advertise to our peer - if it doesn't support
 	// this option, this will be reset to 0 (when its SYN is received)

@@ -64,6 +64,8 @@ public:
 
 			int32		SegmentReceived(tcp_segment_header& segment,
 							net_buffer* buffer);
+			status_t	ErrorReceived(net_error error, net_error_data* errorData,
+							net_buffer* data);
 
 			void		Dump() const;
 
