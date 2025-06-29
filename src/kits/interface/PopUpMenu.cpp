@@ -370,6 +370,7 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 	fTrackThread = spawn_thread(_thread_entry, "popup", B_DISPLAY_PRIORITY, data);
 	if (fTrackThread < B_OK) {
 		// Something went wrong. Cleanup and return NULL
+		delete_sem(sem);
 		if (async && window != NULL)
 			_set_menu_sem_(window, B_BAD_SEM_ID);
 		delete data;
@@ -402,6 +403,8 @@ BPopUpMenu::_thread_entry(void* menuData)
 	// Reset the window menu semaphore
 	if (data->async && data->window)
 		_set_menu_sem_(data->window, B_BAD_SEM_ID);
+
+	delete_sem(data->lock);
 
 	// Commit suicide if needed
 	if (data->async && menu->fAutoDestruct) {
@@ -459,12 +462,8 @@ BPopUpMenu::_WaitMenu(void* _data)
 	BWindow* window = data->window;
 	sem_id sem = data->lock;
 	if (window != NULL) {
-		status_t err;
-		do {
-			err = acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, 50000);
-		} while (err == B_INTERRUPTED);
-
-		window->UpdateIfNeeded();
+		while (acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, 50000) != B_BAD_SEM_ID)
+			window->UpdateIfNeeded();
 	}
 
  	status_t unused;
