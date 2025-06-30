@@ -180,13 +180,18 @@ HashedObjectCache::_ResizeHashTableIfNeeded(uint32 flags)
 
 		if (buffer != NULL) {
 			if (hash_table.ResizeNeeded() == hashSize) {
-				void* oldHash;
+				void* oldHash = NULL;
 				hash_table.Resize(buffer, hashSize, true, &oldHash);
 				if (oldHash != NULL) {
 					Unlock();
 					slab_internal_free(oldHash, flags);
 					Lock();
 				}
+			} else {
+				// Condition changed, our allocated buffer is not suitable.
+				Unlock();
+				slab_internal_free(buffer, flags);
+				Lock();
 			}
 		}
 	}
