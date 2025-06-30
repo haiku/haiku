@@ -138,7 +138,7 @@ PrecacheIO::~PrecacheIO()
 	delete[] fPages;
 	delete[] fVecs;
 	fCache->ReleaseStoreRef();
-	fCache->ReleaseRefLocked();
+	fCache->ReleaseRef();
 }
 
 
@@ -191,7 +191,7 @@ void
 PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 	generic_size_t bytesTransferred)
 {
-	AutoLocker<VMCache> locker(fCache);
+	fCache->Lock();
 
 	// Make successfully loaded pages accessible again (partially
 	// transferred pages are considered failed)
@@ -227,6 +227,7 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 		vm_page_free(fCache, fPages[i]);
 	}
 
+	fCache->Unlock();
 	delete this;
 }
 
@@ -1064,7 +1065,9 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 			PrecacheIO* io = new(std::nothrow) PrecacheIO(ref, lastOffset,
 				bytesToRead);
 			if (io == NULL || io->Prepare(&reservation) != B_OK) {
+				cache->Unlock();
 				delete io;
+				cache->Lock();
 				break;
 			}
 
