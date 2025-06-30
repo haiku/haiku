@@ -37,6 +37,7 @@ struct DMABounceBuffer : public DoublyLinkedListLinkImpl<DMABounceBuffer> {
 	void*		address;
 	phys_addr_t	physical_address;
 	phys_size_t	size;
+	area_id		area;
 };
 
 typedef DoublyLinkedList<DMABounceBuffer> DMABounceBufferList;
