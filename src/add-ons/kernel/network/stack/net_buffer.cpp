@@ -866,44 +866,44 @@ alloc_data_header_space(data_header* header, size_t size)
 		size = sizeof(free_data);
 	size = _ALIGN(size);
 
-	if (header->first_free != NULL && header->first_free->size >= size) {
-		// the first entry of the header space matches the allocation's needs
+	// Define minimum size for a remainder to be useful (must hold free_data header)
+	const size_t MIN_USABLE_REMAINDER_SIZE = _ALIGN(sizeof(free_data));
 
-		// TODO: If the free space is greater than what shall be allocated, we
-		// leak the remainder of the space. We should only allocate multiples of
-		// _ALIGN(sizeof(free_data)) and split free space in this case. It's not
-		// that pressing, since the only thing allocated ATM are data_nodes, and
-		// thus the free space entries will always have the right size.
-		uint8* data = (uint8*)header->first_free;
-		header->first_free = header->first_free->next;
+	free_data** _link = &header->first_free;
+	free_data* current = header->first_free;
+
+	while (current != NULL) {
+		if (current->size >= size) {
+			// Found a suitable block
+			if (current->size >= size + MIN_USABLE_REMAINDER_SIZE) {
+				// Split the block
+				uint8* allocatedBlock = (uint8*)current;
+
+				free_data* remainder = (free_data*)((uint8*)current + size);
+				remainder->size = current->size - size;
+				remainder->next = current->next;
+
+				*_link = remainder; // Previous item now points to the remainder
+				return allocatedBlock;
+			} else {
+				// Use the whole block (it's a good enough fit, or remainder too small)
+				*_link = current->next; // Unlink current
+				return (uint8*)current;
+			}
+		}
+		_link = &current->next;
+		current = current->next;
+	}
+
+	// If no suitable block in free list, try carving from header->data_end
+	if (header->space.free >= size) {
+		uint8* data = header->data_end;
+		header->data_end += size;
+		header->space.free -= size;
 		return data;
 	}
 
-	if (header->space.free < size) {
-		// there is no free space left, search free list
-		free_data* freeData = header->first_free;
-		free_data* last = NULL;
-		while (freeData != NULL) {
-			if (last != NULL && freeData->size >= size) {
-				// take this one
-				last->next = freeData->next;
-				return (uint8*)freeData;
-			}
-
-			last = freeData;
-			freeData = freeData->next;
-		}
-
-		return NULL;
-	}
-
-	// allocate new space
-
-	uint8* data = header->data_end;
-	header->data_end += size;
-	header->space.free -= size;
-
-	return data;
+	return NULL;
 }
 
 
