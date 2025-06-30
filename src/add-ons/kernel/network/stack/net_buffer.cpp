@@ -9,17 +9,20 @@
 
 
 #include "utility.h"
+#include <util/DoublyLinkedList.h> // For DoublyLinkedList (used conceptually for preallocatedNodes)
+#include <StackOrHeapArray.h> // For BStackOrHeapArray
 
 #include <net_buffer.h>
 #include <slab/Slab.h>
 #include <tracing.h>
-#include <util/list.h>
+#include <util/list.h> // For list_link and list_* functions
+#include <util/DoublyLinkedList.h> // For DoublyLinkedList (used conceptually for preallocatedNodes)
+#include <StackOrHeapArray.h> // For BStackOrHeapArray
 
 #include <ByteOrder.h>
 #include <debug.h>
 #include <kernel.h>
 #include <KernelExport.h>
-#include <util/DoublyLinkedList.h>
 
 #include <algorithm>
 #include <stdlib.h>
@@ -28,7 +31,7 @@
 #include <sys/uio.h>
 
 #include "ancillary_data.h"
-#include "interfaces.h"
+#include "interfaces.h" // For InterfaceAddress
 
 #include "paranoia_config.h"
 
@@ -73,13 +76,15 @@ struct data_header {
 };
 
 struct data_node {
-	struct list_link link;
+	struct list_link link; // For use with util/list.h functions
 	struct data_header* header;
 	struct data_header* located;
 	size_t			offset;		// the net_buffer-wide offset of this node
 	uint8*			start;		// points to the start of the data
 	uint16			flags;
 	uint16			used;		// defines how much memory is used by this node
+
+	// DoublyLinkedListLink<data_node> temporary_prealloc_link; // Conceptual, if DoublyLinkedList is used directly
 
 	uint16 HeaderSpace() const
 	{
@@ -133,7 +138,7 @@ struct data_node {
 // data itself via associated data or something like this. Or this
 // structure as a whole, too...
 struct net_buffer_private : net_buffer {
-	struct list					buffers;
+	struct list					buffers; // Uses list_link in data_node
 	data_header*				allocation_header;
 		// the current place where we allocate header space (nodes, ...)
 	ancillary_data_container*	ancillary_data;
@@ -176,11 +181,8 @@ static int32 sMaxAllocatedNetBufferCount = 0;
 
 
 #if NET_BUFFER_TRACING
-
-
 namespace NetBufferTracing {
-
-
+// ... (Tracing classes as before, unchanged) ...
 class NetBufferTraceEntry : public AbstractTraceEntry {
 public:
 	NetBufferTraceEntry(net_buffer* buffer)
@@ -633,7 +635,7 @@ dump_buffer(net_buffer* _buffer)
 }
 
 #if ENABLE_DEBUGGER_COMMANDS
-
+// ... (debugger commands as before) ...
 static int
 dump_net_buffer(int argc, char** argv)
 {
@@ -645,11 +647,10 @@ dump_net_buffer(int argc, char** argv)
 	dump_buffer((net_buffer*)parse_expression(argv[1]));
 	return 0;
 }
-
 #endif	// ENABLE_DEBUGGER_COMMANDS
 
 #if ENABLE_STATS
-
+// ... (stats command as before) ...
 static int
 dump_net_buffer_stats(int argc, char** argv)
 {
@@ -661,11 +662,10 @@ dump_net_buffer_stats(int argc, char** argv)
 		sMaxAllocatedNetBufferCount);
 	return 0;
 }
-
 #endif	// ENABLE_STATS
 
 #if PARANOID_BUFFER_CHECK
-
+// ... (check_buffer and related as before) ...
 static void
 check_buffer(net_buffer* _buffer)
 {
@@ -691,61 +691,12 @@ check_buffer(net_buffer* _buffer)
 		return;
 	}
 }
-
-
-#if 0
-static void
-check_buffer_contents(net_buffer* buffer, size_t offset, const void* data,
-	size_t size)
-{
-	void* bufferData = malloc(size);
-	if (bufferData == NULL)
-		return;
-
-	if (read_data(buffer, offset, bufferData, size) == B_OK) {
-		if (memcmp(bufferData, data, size) != 0) {
-			int32 index = 0;
-			while (((uint8*)data)[index] == ((uint8*)bufferData)[index])
-				index++;
-			panic("check_buffer_contents(): contents check failed at index "
-				"%ld, buffer: %p, offset: %lu, size: %lu", index, buffer,
-				offset, size);
-		}
-	} else {
-		panic("failed to read from buffer %p, offset: %lu, size: %lu",
-			buffer, offset, size);
-	}
-
-	free(bufferData);
-}
-
-
-static void
-check_buffer_contents(net_buffer* buffer, size_t offset, net_buffer* source,
-	size_t sourceOffset, size_t size)
-{
-	void* bufferData = malloc(size);
-	if (bufferData == NULL)
-		return;
-
-	if (read_data(source, sourceOffset, bufferData, size) == B_OK) {
-		check_buffer_contents(buffer, offset, bufferData, size);
-	} else {
-		panic("failed to read from source buffer %p, offset: %lu, size: %lu",
-			source, sourceOffset, size);
-	}
-
-	free(bufferData);
-}
-#endif
-
-
 # 	define CHECK_BUFFER(buffer)	check_buffer(buffer)
 #else
 # 	define CHECK_BUFFER(buffer)	do {} while (false)
 #endif	// !PARANOID_BUFFER_CHECK
 
-
+// ... (allocate/free/create/release_data_header as before) ...
 static inline data_header*
 allocate_data_header()
 {
@@ -842,7 +793,7 @@ acquire_data_header(data_header* header)
 	T2(AcquireDataHeader(header, refCount + 1));
 }
 
-
+// ... (free_data_header_space with coalescing as modified before) ...
 static void
 free_data_header_space(data_header* header, uint8* data, size_t size)
 {
@@ -903,9 +854,7 @@ free_data_header_space(data_header* header, uint8* data, size_t size)
 	// newFreeBlock (which is prev) is already correctly linked and sized.
 }
 
-
-/*!	Tries to allocate \a size bytes from the free space in the header.
-*/
+// ... (alloc_data_header_space with splitting as modified before) ...
 static uint8*
 alloc_data_header_space(data_header* header, size_t size)
 {
@@ -1030,7 +979,8 @@ add_data_node(net_buffer_private* buffer, data_header* header)
 	node->flags = 0;
 	return node;
 }
-
+// ... (remove_data_node, get_node_at_offset, append_data_from_buffer, copy_metadata as before) ...
+// ... (create_buffer, free_buffer, duplicate_buffer, clone_buffer, split_buffer as before) ...
 
 void
 remove_data_node(data_node* node)
@@ -1160,6 +1110,12 @@ create_buffer(size_t headerSpace)
 	buffer->allocation_header = header;
 
 	data_node* node = add_first_data_node(header);
+	if (node == NULL) { // Check if add_first_data_node failed
+		release_data_header(header); // Clean up created header
+		free_net_buffer(buffer);
+		return NULL;
+	}
+
 
 	list_init(&buffer->buffers);
 	list_add_item(&buffer->buffers, node);
@@ -1296,7 +1252,7 @@ clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 
 	return clone;
 
-#if 0
+#if 0 // Original more complex clone logic, now simplified by append_cloned_data
 	ParanoiaChecker _(buffer);
 
 	TRACE(("%d: clone_buffer(buffer %p)\n", find_thread(NULL), buffer));
@@ -1305,7 +1261,7 @@ clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 	if (clone == NULL)
 		return NULL;
 
-	TRACE(("%d:   clone: %p\n", find_thread(NULL), buffer));
+	TRACE(("%d:   clone: %p)\n", find_thread(NULL), buffer));
 
 	data_node* sourceNode = (data_node*)list_get_first_item(&buffer->buffers);
 	if (sourceNode == NULL) {
@@ -1321,10 +1277,13 @@ clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 	// grab reference to this buffer - all additional nodes will get
 	// theirs in add_data_node()
 	acquire_data_header(sourceNode->header);
-	data_node* node = &clone->first_node;
+	data_node* node = &clone->first_node; // This was problematic: first_node is not part of net_buffer_private
+	                                      // This part of the #if 0 block would need significant rework
+										  // to align with current data_node allocation.
+										  // The active code path using append_cloned_data is safer.
 	node->header = sourceNode->header;
 	node->located = NULL;
-	node->used_header_space = &node->own_header_space;
+	// node->used_header_space = &node->own_header_space; // own_header_space doesn't exist
 
 	while (sourceNode != NULL) {
 		node->start = sourceNode->start;
@@ -1334,12 +1293,12 @@ clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 		if (shareFreeSpace) {
 			// both buffers could claim the free space - note that this option
 			// has to be used carefully
-			node->used_header_space = &sourceNode->header->space;
+			// node->used_header_space = &sourceNode->header->space; // own_header_space doesn't exist
 			node->tail_space = sourceNode->tail_space;
 		} else {
 			// the free space stays with the original buffer
-			node->used_header_space->size = 0;
-			node->used_header_space->free = 0;
+			// node->used_header_space->size = 0; // own_header_space doesn't exist
+			// node->used_header_space->free = 0;
 			node->tail_space = 0;
 		}
 
@@ -1351,12 +1310,12 @@ clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 		if (sourceNode == NULL)
 			break;
 
-		node = add_data_node(sourceNode->header);
+		node = add_data_node(clone, sourceNode->header); // Pass clone, not sourceNode->header
 		if (node == NULL) {
 			// There was not enough space left for another node in this buffer
 			// TODO: handle this case!
 			panic("clone buffer hits size limit... (fix me)");
-			free_net_buffer(clone);
+			free_net_buffer(clone); // This would leak previously acquired data_headers for nodes.
 			return NULL;
 		}
 	}
@@ -1426,70 +1385,72 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 	TRACE(("%d: merge buffer %p with %p (%s)\n", find_thread(NULL), buffer,
 		with, after ? "after" : "before"));
 	T(Merge(buffer, with, after));
-	//dump_buffer(buffer);
-	//dprintf("with:\n");
-	//dump_buffer(with);
 
 	ParanoiaChecker _(buffer);
 	CHECK_BUFFER(buffer);
 	CHECK_BUFFER(with);
 
-	// TODO: this is currently very simplistic, I really need to finish the
-	//	harder part of this implementation (data_node management per header)
-
-	// Temporary list for pre-allocated data_node structs
-	DoublyLinkedList<data_node> preallocatedNodes;
-
-	// Pre-allocation phase
-	data_node* node_in_with = NULL;
-	while ((node_in_with = (data_node*)list_get_next_item(&with->buffers,
-			node_in_with)) != NULL) {
-		// Condition to check if a new data_node struct needs to be allocated
-		// (i.e., it's not considered "local" to its current data_header's metadata area)
-		bool needsNewNodeStruct = !((uint8*)node_in_with > (uint8*)node_in_with->header
-			&& (uint8*)node_in_with < (uint8*)node_in_with->header + BUFFER_SIZE);
-
-		if (needsNewNodeStruct) {
-			data_node* newNode = add_data_node(buffer, node_in_with->header);
-			if (newNode == NULL) {
-				// Pre-allocation failed. Clean up already pre-allocated nodes.
-				while (data_node* prealloc = preallocatedNodes.RemoveHead()) {
-					// remove_data_node expects the node to be part of a buffer's list
-					// to correctly handle located vs header. Since these are fresh from
-					// add_data_node for 'buffer', their 'located' is buffer's
-					// allocation_header.
-					remove_data_node(prealloc);
-				}
-				return ENOBUFS;
-			}
-			// Use a temporary link field if data_node doesn't have one for generic lists.
-			// For this draft, assuming data_node can be added to DoublyLinkedList.
-			// If not, a wrapper struct or a simple array of pointers would be needed.
-			// Let's assume data_node has a fTemporaryPreallocLink for this.
-			// For now, we'll just add to a conceptual list and iterate it later.
-			// This requires adding a temporary link member to data_node or using a wrapper.
-			// For simplicity of diff, this detail is omitted but crucial.
-			// We'll use a conceptual list and retrieve them in order.
-			preallocatedNodes.Add(newNode);
-		}
+	if (with->size == 0) {
+		// Nothing to merge from 'with' buffer
+		free_buffer(with);
+		return B_OK;
 	}
 
-	// Main merge phase
-	data_node* original_buffer_first_node = NULL;
-	size_t prepend_offset_tracker = 0;
+	// Pre-allocation phase
+	// Count nodes in 'with' to size the preallocatedNodePtrs array
+	uint32 nodesToPotentiallyReallocate = 0;
+	data_node* counter_node = NULL;
+	while ((counter_node = (data_node*)list_get_next_item(&with->buffers,
+			counter_node)) != NULL) {
+		bool needsNewNodeStruct = !((uint8*)counter_node > (uint8*)counter_node->header
+			&& (uint8*)counter_node < (uint8*)counter_node->header + BUFFER_SIZE);
+		if (needsNewNodeStruct)
+			nodesToPotentiallyReallocate++;
+	}
 
-	if (!after) {
-		// Adjust offsets of existing nodes in the target buffer
+	BStackOrHeapArray<data_node*> preallocatedNodePtrs(nodesToPotentiallyReallocate);
+	if (nodesToPotentiallyReallocate > 0 && !preallocatedNodePtrs.IsValid()) {
+		return B_NO_MEMORY;
+	}
+
+	uint32 preallocatedCount = 0;
+	data_node* node_in_with_prealloc = NULL;
+	while ((node_in_with_prealloc = (data_node*)list_get_next_item(&with->buffers,
+			node_in_with_prealloc)) != NULL) {
+		bool needsNewNodeStruct = !((uint8*)node_in_with_prealloc > (uint8*)node_in_with_prealloc->header
+			&& (uint8*)node_in_with_prealloc < (uint8*)node_in_with_prealloc->header + BUFFER_SIZE);
+
+		if (needsNewNodeStruct) {
+			data_node* newNode = add_data_node(buffer, node_in_with_prealloc->header);
+			if (newNode == NULL) {
+				// Pre-allocation failed. Clean up already pre-allocated nodes.
+				for (uint32 i = 0; i < preallocatedCount; i++) {
+					remove_data_node(preallocatedNodePtrs[i]);
+				}
+				return ENOBUFS; // 'buffer' and 'with' are in their original state
+			}
+			preallocatedNodePtrs[preallocatedCount++] = newNode;
+		}
+	}
+	// Reset preallocatedCount to be used as an index in the main loop
+	preallocatedCount = 0;
+
+
+	// Main Merge Phase
+	data_node* original_buffer_first_node = NULL; // Used as insertion point if prepending
+	size_t prepend_offset_tracker = 0;          // Tracks offset for newly prepended nodes
+
+	if (!after) { // Prepending
 		original_buffer_first_node = (data_node*)list_get_first_item(&buffer->buffers);
 		data_node* node_in_target = NULL;
 		while ((node_in_target = (data_node*)list_get_next_item(
 				&buffer->buffers, node_in_target)) != NULL) {
-			node_in_target->offset += with->size;
+			node_in_target->offset += with->size; // Correctly update existing nodes' offsets
 		}
 	}
 
 	data_node* last_processed_node_from_with = NULL;
-	data_node* current_preallocated_node = preallocatedNodes.Head();
+	data_node* node_in_with = NULL;
 
 	while ((node_in_with = (data_node*)list_get_next_item(&with->buffers,
 			last_processed_node_from_with)) != NULL) {
@@ -1499,51 +1460,43 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 			&& (uint8*)node_in_with < (uint8*)node_in_with->header + BUFFER_SIZE);
 
 		if (needsNewNodeStruct) {
-			// Use a pre-allocated node
-			ASSERT(current_preallocated_node != NULL);
-			node_to_add = current_preallocated_node;
-			preallocatedNodes.Remove(node_to_add); // Conceptually remove from head
-			current_preallocated_node = preallocatedNodes.Head(); // Next preallocated
+			// Use a pre-allocated node struct
+			ASSERT(preallocatedCount < nodesToPotentiallyReallocate || (nodesToPotentiallyReallocate == 0 && preallocatedCount == 0));
+			node_to_add = preallocatedNodePtrs[preallocatedCount++];
 
-			// Copy necessary fields from node_in_with to node_to_add
-			// node_to_add->header is already set by add_data_node correctly.
-			// node_to_add->located is also set by add_data_node.
 			node_to_add->start = node_in_with->start;
 			node_to_add->used = node_in_with->used;
 			node_to_add->flags = node_in_with->flags;
-			// Ensure DATA_NODE_READ_ONLY is preserved if it was set due to cloning.
-			// If node_in_with itself was a clone, its data_header was shared.
-			// add_data_node already acquired a reference to node_in_with->header.
+			// Original node_in_with remains in with->buffers to be cleaned by free_buffer(with)
 		} else {
 			// Re-link the existing node_in_with
 			list_remove_item(&with->buffers, node_in_with);
-			with->size -= node_in_with->used;
-			node_to_add = node_in_with;
+			with->size -= node_in_with->used;          // Adjust 'with' size
+			node_to_add = node_in_with;                // This node itself will be added
 		}
 
 		if (after) { // Append
-			node_to_add->offset = buffer->size;
+			node_to_add->offset = buffer->size; // Offset is current end of 'buffer'
 			list_add_item(&buffer->buffers, node_to_add);
 		} else { // Prepend
 			node_to_add->offset = prepend_offset_tracker;
-			prepend_offset_tracker += node_to_add->used;
 			list_insert_item_before(&buffer->buffers, original_buffer_first_node,
 				node_to_add);
+			// original_buffer_first_node remains the correct insertion point for subsequent prepends
 		}
-		buffer->size += node_to_add->used;
-		last_processed_node_from_with = node_in_with; // Advance original iterator
+		buffer->size += node_to_add->used; // Update 'buffer' size
+		if (!after)
+			prepend_offset_tracker += node_to_add->used;
+
+		last_processed_node_from_with = node_in_with;
 	}
 
-	// Ensure any remaining preallocatedNodes (should be none if logic is perfect) are cleaned.
-	// This path should ideally not be hit if preallocation count matched needed count.
-	while (data_node* prealloc = preallocatedNodes.RemoveHead()) {
-		remove_data_node(prealloc); // Frees the node struct and releases header refs
-	}
+	ASSERT(preallocatedCount == nodesToPotentiallyReallocate);
 
 	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
 		sizeof(buffer->size));
 
-	free_buffer(with); // Frees the 'with' net_buffer_private and its *remaining* original data_nodes
+	free_buffer(with);
 
 	CHECK_BUFFER(buffer);
 
@@ -1551,10 +1504,12 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 }
 
 
-/*!	Writes into existing allocated memory.
-	\return B_BAD_VALUE if you write outside of the buffers current
-		bounds.
-*/
+// ... (rest of the file: write_data, read_data, prepend_size, prepend_data, etc. as before) ...
+// ... (append_size, append_data, remove_header, remove_trailer, trim_data as before) ...
+// ... (append_cloned_data, ancillary_data functions, header store/restore functions as before) ...
+// ... (direct_access, checksum_data, get_iovecs, count_iovecs, swap_addresses as before) ...
+// ... (std_ops and gNetBufferModule definition as before) ...
+
 static status_t
 write_data(net_buffer* _buffer, size_t offset, const void* data, size_t size)
 {
@@ -1656,7 +1611,7 @@ prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
 	if (node == NULL) {
 		node = add_first_data_node(buffer->allocation_header);
-		if (node == NULL)
+		if (node == NULL) // Check return of add_first_data_node
 			return B_NO_MEMORY;
 	}
 
@@ -1692,6 +1647,12 @@ prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 				data_node* previous = node;
 
 				node = (data_node*)add_first_data_node(header);
+				if (node == NULL) { // Check return of add_first_data_node
+					release_data_header(header);
+					remove_header(buffer, sizePrepended);
+					return B_NO_MEMORY;
+				}
+
 
 				list_insert_item_before(&buffer->buffers, previous, node);
 
@@ -1780,7 +1741,7 @@ append_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 	data_node* node = (data_node*)list_get_last_item(&buffer->buffers);
 	if (node == NULL) {
 		node = add_first_data_node(buffer->allocation_header);
-		if (node == NULL)
+		if (node == NULL) // Check return of add_first_data_node
 			return B_NO_MEMORY;
 	}
 
@@ -1821,8 +1782,9 @@ append_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 			}
 
 			node = add_first_data_node(header);
-			if (node == NULL) {
+			if (node == NULL) { // Check return of add_first_data_node
 				release_data_header(header);
+				remove_trailer(buffer, sizeAdded); // Clean up partially added data
 				return B_NO_MEMORY;
 			}
 
@@ -1997,10 +1959,36 @@ trim_data(net_buffer* _buffer, size_t newSize)
 		return B_OK;
 
 	data_node* node = get_node_at_offset(buffer, newSize);
-	if (node == NULL) {
-		// trim size greater than buffer size
+	if (node == NULL && newSize != 0) { // Allow trimming to zero
+		// This case should ideally not be hit if newSize < buffer->size
+		// and buffer->size > 0, unless get_node_at_offset has an issue
+		// or newSize is 0 and buffer was already empty.
+		// If newSize is 0, all nodes should be removed.
+		if (newSize == 0) {
+			while ((node = (data_node*)list_remove_head_item(&buffer->buffers)) != NULL) {
+				remove_data_node(node);
+			}
+			buffer->size = 0;
+			SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+				sizeof(buffer->size));
+			CHECK_BUFFER(buffer);
+			return B_OK;
+		}
 		return B_BAD_VALUE;
+	} else if (node == NULL && newSize == 0) {
+		// Buffer is already empty or will become empty
+		if (buffer->size > 0) { // Only if it's not already empty
+			while ((node = (data_node*)list_remove_head_item(&buffer->buffers)) != NULL) {
+				remove_data_node(node);
+			}
+		}
+		buffer->size = 0;
+		SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+			sizeof(buffer->size));
+		CHECK_BUFFER(buffer);
+		return B_OK;
 	}
+
 
 	int32 diff = node->used + node->offset - newSize;
 	node->SetTailSpace(node->TailSpace() + diff);
@@ -2008,6 +1996,13 @@ trim_data(net_buffer* _buffer, size_t newSize)
 
 	if (node->used > 0)
 		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+	else { // Node became empty, remove it.
+		data_node* toRemove = node;
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		list_remove_item(&buffer->buffers, toRemove);
+		remove_data_node(toRemove);
+	}
+
 
 	while (node != NULL) {
 		data_node* next = (data_node*)list_get_next_item(&buffer->buffers, node);
@@ -2028,7 +2023,7 @@ trim_data(net_buffer* _buffer, size_t newSize)
 	return B_OK;
 }
 
-
+// ... (The rest of the file from append_cloned_data onwards is identical to the previous version)
 /*!	Appends data coming from buffer \a source to the buffer \a buffer. It only
 	clones the data, though, that is the data is not copied, just referenced.
 */
@@ -2498,4 +2493,3 @@ net_buffer_module_info gNetBufferModule = {
 
 	dump_buffer,	// dump
 };
-
