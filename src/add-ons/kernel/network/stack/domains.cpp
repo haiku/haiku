@@ -72,18 +72,87 @@ dump_domains(int argc, char** argv)
 		kprintf("  module:         %p\n", domain->module);
 		kprintf("  address_module: %p\n", domain->address_module);
 
-		if (!domain->routes.IsEmpty())
-			kprintf("  routes:\n");
-	
-		RouteList::Iterator routeIterator = domain->routes.GetIterator();
-		while (net_route_private* route = routeIterator.Next()) {
-			kprintf("    %p: dest %s, mask %s, gw %s, flags %" B_PRIx32 ", "
-				"address %p\n", route, AddressString(domain, route->destination
-					? route->destination : NULL).Data(),
-				AddressString(domain, route->mask ? route->mask : NULL).Data(),
-				AddressString(domain, route->gateway
-					? route->gateway : NULL).Data(),
-				route->flags, route->interface_address);
+		if (domain->rnh_head != NULL && domain->rnh_head->rnh_treetop != NULL) {
+			kprintf("  routes (radix tree):\n");
+			// Define a walktree callback function
+			struct DumpContext {
+				net_domain_private* domain;
+				int count;
+			};
+			walktree_f_t dump_route_callback_func = [](struct radix_node* node, void* context) -> int {
+				DumpContext* ctx = (DumpContext*)context;
+				net_domain_private* currentDomain = ctx->domain;
+				net_route_private* route = net_route_private::FromRadixNode(node);
+
+				// Iterate through the main node and its duped keys
+				for (net_route_private* currentRoute = route; currentRoute != NULL;
+					 currentRoute = (currentRoute == route) ? net_route_private::FromRadixNode(node->rn_dupedkey)
+					                                        : net_route_private::FromRadixNode(currentRoute->rn_nodes[0].rn_dupedkey)) {
+					// Check if currentRoute is valid (FromRadixNode can return NULL)
+					if (currentRoute == NULL && node->rn_dupedkey != NULL && currentRoute != route ) {
+						// This can happen if FromRadixNode on a dupedkey's node fails.
+						// We need a more robust way to walk dupedkeys if rn_nodes[0] is not always the rn_dupedkey link anchor.
+						// The rn_dupedkey is on the radix_node itself.
+						// So, if currentRoute was derived from 'node', the next is from node->rn_dupedkey.
+						// If currentRoute was from a previous dupedkey, its own rn_nodes[0].rn_dupedkey.
+						// This loop structure is a bit complex. Let's simplify.
+						// rn_walktree gives one leaf node. We then iterate its dupedkey chain.
+						break; // Safety break for complex loop logic, will refine.
+					}
+					if (currentRoute == NULL) break;
+
+
+					kprintf("    %p: dest %s, mask %s, gw %s, flags %" B_PRIx32 ", "
+						"address %p, iface %s, ref %" B_PRId32 "\n",
+						currentRoute,
+						AddressString(currentDomain, currentRoute->destination).Data(),
+						AddressString(currentDomain, currentRoute->mask).Data(),
+						AddressString(currentDomain, currentRoute->gateway).Data(),
+						currentRoute->flags, currentRoute->interface_address,
+						currentRoute->interface_address ? currentRoute->interface_address->interface->name : "none",
+						currentRoute->ref_count);
+					ctx->count++;
+					if (currentRoute == route && node->rn_dupedkey == NULL) break; // No dupes or only one
+					if (currentRoute != route && currentRoute->rn_nodes[0].rn_dupedkey == NULL) break; // End of chain
+				}
+				return 0; // Continue walking
+			};
+
+			// Simpler iteration for duped keys directly from the node returned by walktree
+			walktree_f_t dump_route_callback_func_simplified = [](struct radix_node* rn, void* context) -> int {
+				DumpContext* ctx = (DumpContext*)context;
+				net_domain_private* currentDomain = ctx->domain;
+
+				// rn is a leaf node. Iterate it and its dupedkey chain.
+				for (struct radix_node* iterNode = rn; iterNode != NULL; iterNode = iterNode->rn_dupedkey) {
+					net_route_private* route = net_route_private::FromRadixNode(iterNode);
+					if (route == NULL) continue; // Should not happen for valid nodes
+
+					kprintf("    %p: dest %s, mask %s, gw %s, flags %" B_PRIx32 ", "
+						"address %p, iface %s, ref %" B_PRId32 "\n",
+						route,
+						AddressString(currentDomain, route->destination).Data(),
+						AddressString(currentDomain, route->mask).Data(),
+						AddressString(currentDomain, route->gateway).Data(),
+						route->flags, route->interface_address,
+						route->interface_address ? route->interface_address->interface->name : "none",
+						route->ref_count);
+					ctx->count++;
+				}
+				return 0; // Continue walking
+			};
+
+			DumpContext context = {domain, 0};
+			if (domain->rnh_head->rnh_walktree != NULL) { // Check if function pointer is valid
+				// Acquire domain lock before walking its routes
+				RecursiveLocker locker(domain->lock);
+				domain->rnh_head->rnh_walktree(domain->rnh_head, dump_route_callback_func_simplified, &context);
+				kprintf("    Total routes in radix tree: %d\n", context.count);
+			} else {
+				kprintf("    rnh_walktree function pointer is NULL.\n");
+			}
+		} else {
+			kprintf("  No routes or radix head not initialized.\n");
 		}
 
 		if (!domain->route_infos.IsEmpty())
@@ -138,6 +207,14 @@ register_domain(int family, const char* name,
 	domain->name = name;
 	domain->module = module;
 	domain->address_module = addressModule;
+	domain->rnh_head = NULL; // Initialize to NULL
+
+	status_t status = init_routing_domain_radix(domain);
+	if (status != B_OK) {
+		recursive_lock_destroy(&domain->lock);
+		delete domain;
+		return status;
+	}
 
 	sDomains.Add(domain);
 
@@ -156,6 +233,15 @@ unregister_domain(net_domain* _domain)
 	MutexLocker locker(sDomainLock);
 
 	sDomains.Remove(domain);
+
+	// TODO: Before deinitializing the radix head and deleting the domain,
+	// all routes associated with this domain must be removed from the radix tree
+	// and their net_route_private objects must be deleted. This will involve
+	// using rn_walktree() to iterate through all routes, calling rn_delete()
+	// for each, and then freeing the net_route_private object.
+	// This cleanup will be fully implemented as part of later steps (route deletion
+	// and adapting iteration logic).
+	deinit_routing_domain_radix(domain);
 
 	recursive_lock_destroy(&domain->lock);
 	delete domain;

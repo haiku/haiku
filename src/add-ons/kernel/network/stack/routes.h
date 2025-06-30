@@ -12,24 +12,44 @@
 #include <net_datalink.h>
 #include <net_stack.h>
 
-#include <util/DoublyLinkedList.h>
-
+// #include <util/DoublyLinkedList.h> // No longer using DoublyLinkedList for routes
+#include <stddef.h> // For offsetof
+#include "radix.h" // For struct radix_node
 
 struct InterfaceAddress;
 
 
-struct net_route_private
-	: net_route, DoublyLinkedListLinkImpl<net_route_private> {
+struct net_route_private : net_route {
 	int32	ref_count;
+	struct radix_node rn_nodes[2]; // For radix tree integration
 
 	net_route_private();
 	~net_route_private();
+
+	// Helper to get the containing net_route_private from its leaf radix_node
+	// The leaf node is typically rn_nodes[0] as returned by rn_addroute/rn_match.
+	static net_route_private* FromRadixNode(struct radix_node* node) {
+		if (node == NULL || (node->rn_flags & RNF_ROOT) != 0)
+			return NULL;
+		// Check if the node pointer is within a valid range of a potential rn_nodes array.
+		// This is a basic sanity check, not foolproof.
+		// A more robust way might involve a magic number if we were really paranoid.
+		// For now, rely on the fact that 'node' is expected to be rn_nodes[0].
+		return reinterpret_cast<net_route_private*>(
+			reinterpret_cast<char*>(node) - offsetof(net_route_private, rn_nodes[0]));
+	}
 };
 
-typedef DoublyLinkedList<net_route_private> RouteList;
+// typedef DoublyLinkedList<net_route_private> RouteList; // No longer used
 typedef DoublyLinkedList<net_route_info,
 	DoublyLinkedListCLink<net_route_info> > RouteInfoList;
 
+
+// Forward declaration for functions below
+struct net_domain_private;
+
+status_t init_routing_domain_radix(struct net_domain_private* domain);
+void deinit_routing_domain_radix(struct net_domain_private* domain);
 
 uint32 route_table_size(struct net_domain_private* domain);
 status_t list_routes(struct net_domain_private* domain, void* buffer,
