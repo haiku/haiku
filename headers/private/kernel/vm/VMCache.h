@@ -203,6 +203,10 @@ public:
 			VMArea::CacheList	areas;
 			ConsumerList		consumers;
 				// list of caches that use this cache as a source
+			// SIEVE specific: Doubly linked list for FIFO order of pages
+			vm_page*			sieve_page_list_head;   /** Head of the SIEVE FIFO page list (newest page). */
+			vm_page*			sieve_page_list_tail;   /** Tail of the SIEVE FIFO page list (oldest page). */
+			vm_page*			sieve_hand;             /** Hand pointer for SIEVE eviction algorithm, scans from tail towards head. */
 			VMCachePagesTree	pages;
 			VMCache*			source;
 			off_t				virtual_base;
@@ -226,6 +230,14 @@ private:
 			void				_NotifyPageEvents(vm_page* page, uint32 events);
 
 	inline	bool				_IsMergeable() const;
+
+			// SIEVE specific helper methods
+			void				_SieveAddPageToHead(vm_page* page);
+									/** Adds page to the head of the SIEVE list. */
+			void				_SieveRemovePage(vm_page* page);
+									/** Removes page from the SIEVE list, adjusts hand. */
+			vm_page*			_SieveFindVictimPage();
+									/** Finds a victim page using SIEVE algorithm. */
 
 			void				_MergeWithOnlyConsumer();
 			void				_RemoveConsumer(VMCache* consumer);

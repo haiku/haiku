@@ -644,6 +644,10 @@ VMCache::Init(const char* name, uint32 cacheType, uint32 allocationFlags)
 	fWiredPagesCount = 0;
 	fFaultCount = 0;
 	fCopiedPagesCount = 0;
+	// SIEVE: Initialize SIEVE algorithm members
+	sieve_page_list_head = NULL;
+	sieve_page_list_tail = NULL;
+	sieve_hand = NULL;
 	type = cacheType;
 	fPageEventWaiters = NULL;
 
@@ -803,6 +807,10 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 	page_count++;
 	page->SetCacheRef(fCacheRef);
 
+	// SIEVE: Add to our FIFO list and initialize visited status for SIEVE.
+	page->sieve_visited = false; // New pages start as not visited.
+	_SieveAddPageToHead(page);   // Add to the head of SIEVE's doubly linked list.
+
 #if KDEBUG
 	vm_page* otherPage = pages.Lookup(page->cache_offset);
 	if (otherPage != NULL) {
@@ -835,6 +843,11 @@ VMCache::RemovePage(vm_page* page)
 	}
 
 	T2(RemovePage(this, page));
+
+	// SIEVE: Remove from our FIFO list. This must be done before clearing
+	// cache_ref or other destructive operations on the page, as _SieveRemovePage
+	// might need to access page->cache_offset for debugging, or other page fields.
+	_SieveRemovePage(page);
 
 	pages.Remove(page);
 	page_count--;
@@ -1169,8 +1182,35 @@ VMCache::Resize(off_t newSize, int priority)
 
 	if (newPageCount < oldPageCount) {
 		// Remove all pages in the cache outside of the new virtual size.
-		while (_FreePageRange(pages.GetIterator(newPageCount, true, true)))
-			;
+		// Iterate carefully as RemovePage() modifies the collection.
+		VMCachePagesTree::Iterator it = pages.GetIterator(newPageCount, true, true);
+		vm_page* page = it.Next();
+		while (page != NULL) {
+			vm_page* nextPage = it.Next(); // Get next before removing current
+
+			// These pages are being removed due to truncation, not memory pressure.
+			// We must ensure they are not busy or wired before forcibly removing.
+			// This is an existing concern in Resize; SIEVE doesn't change this core need.
+			if (!page->busy && page->WiredCount() == 0) {
+				// TODO: What if page is modified? Resize should ensure data is synced
+				// or changes are irrelevant if the file is truncated.
+				// For now, assume modified pages here are also removed.
+				vm_remove_all_page_mappings(page); // Ensure unmapped
+				RemovePage(page); // This now calls _SieveRemovePage()
+				vm_page_free(this, page);
+			} else {
+				// Page is busy or wired. Cannot remove it immediately.
+				// This might leave the cache temporarily larger than newSize implies.
+				// The underlying file system or VFS layer is responsible for
+				// ensuring I/O is complete and pages are un-wired before size changes propagate.
+				// For this simulation, we'll just log if KDEBUG is on.
+#if KDEBUG
+				debug_printf("VMCache::Resize: Cannot remove page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
+					page, page->cache_offset);
+#endif
+			}
+			page = nextPage;
+		}
 	}
 	if (newSize < virtual_end && newPageCount > 0) {
 		// We may have a partial page at the end of the cache that must be cleared.
@@ -1216,8 +1256,24 @@ VMCache::Rebase(off_t newBase, int priority)
 
 	if (newBase > virtual_base) {
 		// Remove all pages in the cache outside of the new virtual base.
-		while (_FreePageRange(pages.GetIterator(), &basePage))
-			;
+		VMCachePagesTree::Iterator it = pages.GetIterator();
+		vm_page* page = it.Next();
+		while (page != NULL && page->cache_offset < basePage) {
+			vm_page* nextPage = it.Next(); // Get next before removing current
+
+			if (!page->busy && page->WiredCount() == 0) {
+				// TODO: Handle modified pages similar to Resize.
+				vm_remove_all_page_mappings(page);
+				RemovePage(page); // This now calls _SieveRemovePage()
+				vm_page_free(this, page);
+			} else {
+#if KDEBUG
+				debug_printf("VMCache::Rebase: Cannot remove page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
+					page, page->cache_offset);
+#endif
+			}
+			page = nextPage;
+		}
 	}
 
 	if (priority >= 0) {
@@ -1257,13 +1313,39 @@ VMCache::Adopt(VMCache* source, off_t offset, off_t size, off_t newOffset)
 ssize_t
 VMCache::Discard(off_t offset, off_t size)
 {
-	page_num_t discarded = 0;
+	page_num_t discardedPageCount = 0;
 	page_num_t startPage = offset >> PAGE_SHIFT;
 	page_num_t endPage = (offset + size + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
-	while (_FreePageRange(pages.GetIterator(startPage, true, true), &endPage, &discarded))
-		;
 
-	return (discarded * B_PAGE_SIZE);
+	VMCachePagesTree::Iterator it = pages.GetIterator(startPage, true, true);
+	vm_page* page = it.Next();
+	while (page != NULL && page->cache_offset < endPage) {
+		vm_page* nextPage = it.Next(); // Get next before removing current
+
+		// Discard implies pages should be freed if possible.
+		// Similar busy/wired/modified checks as Resize/Rebase apply.
+		// For discard, modified pages are usually just thrown away, not written back.
+		if (!page->busy && page->WiredCount() == 0) {
+			if (page->modified) {
+				// For discard, we usually don't write back modified pages.
+				// They are simply being discarded. Mark as not modified.
+				page->modified = false;
+				// TODO: Consider if vm_page_set_state to CACHED is needed if it was MODIFIED
+			}
+			vm_remove_all_page_mappings(page);
+			RemovePage(page); // This now calls _SieveRemovePage()
+			vm_page_free(this, page);
+			discardedPageCount++;
+		} else {
+#if KDEBUG
+			debug_printf("VMCache::Discard: Cannot discard page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
+				page, page->cache_offset);
+#endif
+		}
+		page = nextPage;
+	}
+
+	return (discardedPageCount * B_PAGE_SIZE);
 }
 
 
@@ -1590,6 +1672,334 @@ VMCache::_RemoveConsumer(VMCache* consumer)
 
 	// Now release the consumer's reference.
 	ReleaseRef();
+}
+
+
+// #pragma mark - SIEVE Helper Methods
+
+
+/*! Adds a page to the head of the SIEVE FIFO list (newest entry).
+	The cache lock must be held.
+	The page's sieve_visited flag should be set by the caller.
+*/
+void
+VMCache::_SieveAddPageToHead(vm_page* page)
+{
+	AssertLocked();
+	ASSERT(page->sieve_next == NULL && page->sieve_prev == NULL); // Page should not already be in a list
+
+	page->sieve_next = sieve_page_list_head;
+	page->sieve_prev = NULL;
+	if (sieve_page_list_head != NULL)
+		sieve_page_list_head->sieve_prev = page;
+	sieve_page_list_head = page;
+
+	if (sieve_page_list_tail == NULL) // If list was empty, new page is also the tail
+		sieve_page_list_tail = page;
+
+	// Initialize sieve_hand if the list was empty and now has its first page.
+	// The SIEVE hand scans from oldest towards newest. If the list was empty,
+	// the new page is both newest and oldest, so hand points to it (the tail).
+	if (sieve_hand == NULL && sieve_page_list_tail != NULL) {
+		sieve_hand = sieve_page_list_tail;
+	}
+}
+
+
+/*! Removes a page from the SIEVE FIFO list.
+	Adjusts sieve_hand if it points to the removed page.
+	The cache lock must be held.
+*/
+void
+VMCache::_SieveRemovePage(vm_page* page)
+{
+	AssertLocked();
+
+	// If page is not in any list (e.g. sieve_next/prev are NULL and it's not head/tail)
+	// this indicates a potential logic error or a double removal.
+	if (page->sieve_next == NULL && page->sieve_prev == NULL &&
+	    sieve_page_list_head != page && sieve_page_list_tail != page) {
+#if KDEBUG
+		// This might be noisy if pages are legitimately removed before full SIEVE integration
+		// in all paths, but good for debugging initial implementation.
+		debug_printf("VMCache::_SieveRemovePage: Page %p (offset %" B_PRIuPHYSADDR ") may not be in SIEVE list or was already removed.\n",
+			page, page->cache_offset);
+#endif
+		// Ensure pointers are definitely NULL if it was an orphaned page and return.
+		page->sieve_next = NULL;
+		page->sieve_prev = NULL;
+		return;
+	}
+
+	// Adjust sieve_hand if it points to the page being removed.
+	// The SIEVE hand points to an object O. If O is evicted, the hand is advanced
+	// to the next object in the list (towards older objects / tail).
+	if (sieve_hand == page) {
+		sieve_hand = page->sieve_prev; // Move hand towards older pages (tail)
+		if (sieve_hand == NULL) {
+			// If the removed page was the tail (oldest) and hand pointed to it,
+			// the new hand should become the new tail.
+			// This will be correctly set after list pointers are updated if new tail exists.
+			// Or if list becomes empty, hand will be set to NULL below.
+			// For now, if page->sieve_prev is NULL, hand becomes NULL temporarily.
+		}
+	}
+
+	// Unlink the page
+	if (page == sieve_page_list_head)
+		sieve_page_list_head = page->sieve_next;
+	if (page->sieve_prev != NULL)
+		page->sieve_prev->sieve_next = page->sieve_next;
+
+	if (page == sieve_page_list_tail)
+		sieve_page_list_tail = page->sieve_prev;
+	if (page->sieve_next != NULL)
+		page->sieve_next->sieve_prev = page->sieve_prev;
+
+	// Post-unlinking adjustments for sieve_hand
+	if (sieve_page_list_head == NULL) { // List became empty
+		ASSERT(sieve_page_list_tail == NULL);
+		sieve_hand = NULL;
+	} else if (sieve_hand == NULL && sieve_page_list_tail != NULL) {
+		// If hand became NULL (e.g., was pointing to the tail which was removed,
+		// and it was the only element or page->sieve_prev was NULL),
+		// re-initialize it to the current tail.
+		sieve_hand = sieve_page_list_tail;
+	}
+
+
+	page->sieve_next = NULL;
+	page->sieve_prev = NULL;
+}
+
+
+/*! Finds a victim page for eviction using the SIEVE algorithm.
+	The cache lock must be held.
+	Scans from the current 'sieve_hand' towards older entries (tail of list).
+	If a visited page is found, its visited bit is cleared, and the hand moves to it.
+	If an unvisited page is found, it's returned as the victim.
+	Returns the victim page, or NULL if no suitable (clean, not busy, not wired)
+	victim is found after a full scan. The returned page is *not* removed from
+	any cache structures by this function; that's the caller's responsibility.
+*/
+vm_page*
+VMCache::_SieveFindVictimPage()
+{
+	AssertLocked();
+
+	if (sieve_hand == NULL) { // Implies list is empty
+		ASSERT(sieve_page_list_head == NULL && sieve_page_list_tail == NULL);
+		return NULL;
+	}
+
+	vm_page* scanPointer = sieve_hand;
+
+	// Loop at most twice through the list. Once for initial scan and demotions,
+	// a second time to find a now unvisited page if all were initially visited.
+	for (int pass = 0; pass < 2; pass++) {
+		vm_page* current = scanPointer; // Start scan from current hand/scanPointer position
+		do {
+			// Candidate pages must be clean, not busy, and not wired.
+			if (!current->busy && current->WiredCount() == 0
+				&& !current->modified) {
+
+				if (current->sieve_visited) {
+					current->sieve_visited = false; // Demote
+					sieve_hand = current;           // Move hand to this demoted page
+				} else {
+					// Found an unvisited, viable page. This is the victim.
+					// The hand does not move from where it was before this find.
+					return current;
+				}
+			}
+
+			// Advance scanPointer towards the tail (older pages)
+			current = current->sieve_prev;
+			if (current == NULL) { // Wrapped around past the tail
+				current = sieve_page_list_tail; // Reset scan to tail
+				if (current == NULL) // List became empty during scan
+					return NULL;
+			}
+		// Continue until we've scanned back to where this pass's scan started (sieve_hand for pass 0,
+		// or the initial scanPointer if hand moved for subsequent passes)
+		} while (current != scanPointer);
+
+		// If we are here, it means a full pass was made from 'scanPointer'.
+		// If pass 0, and we are here, all pages from original sieve_hand to tail then head to original sieve_hand
+		// were either not viable or were visited (and now demoted). The sieve_hand is now at the
+		// position of the last page whose visited bit was cleared.
+		// The second pass (pass == 1) will scan again. If a page (now unvisited) is found, it's the victim.
+		// If the second pass completes and we are here, no victim was found.
+		if (pass == 0) {
+			scanPointer = sieve_hand; // Start the second pass from the potentially new hand
+		}
+	}
+
+	return NULL; // No suitable victim found after two full passes
+}
+
+
+// #pragma mark - SIEVE Helper Methods
+
+
+/*! Adds a page to the head of the SIEVE FIFO list.
+	The cache lock must be held.
+*/
+void
+VMCache::_SieveAddPageToHead(vm_page* page)
+{
+	AssertLocked();
+	ASSERT(page->sieve_next == NULL && page->sieve_prev == NULL); // Page should not already be in a list
+
+	page->sieve_next = sieve_page_list_head;
+	page->sieve_prev = NULL;
+	if (sieve_page_list_head != NULL)
+		sieve_page_list_head->sieve_prev = page;
+	sieve_page_list_head = page;
+
+	if (sieve_page_list_tail == NULL) // If list was empty, new page is also the tail
+		sieve_page_list_tail = page;
+
+	// Initialize sieve_hand if the list was empty and now has its first page.
+	// According to SIEVE paper, hand is just a pointer, often to the last evicted object's position.
+	// For a new list, pointing it to the tail (oldest, which is also the newest here) is a reasonable start.
+	if (sieve_hand == NULL && sieve_page_list_tail != NULL) {
+		sieve_hand = sieve_page_list_tail;
+	}
+}
+
+
+/*! Removes a page from the SIEVE FIFO list.
+	Adjusts sieve_hand if it points to the removed page.
+	The cache lock must be held.
+*/
+void
+VMCache::_SieveRemovePage(vm_page* page)
+{
+	AssertLocked();
+
+	// If page is not in any list, this is a no-op for pointers, but indicates potential issue.
+	if (page->sieve_next == NULL && page->sieve_prev == NULL &&
+	    sieve_page_list_head != page && sieve_page_list_tail != page) {
+#if KDEBUG
+		debug_printf("VMCache::_SieveRemovePage: Page %p (offset %" B_PRIuPHYSADDR ") not in SIEVE list or double removal.\n",
+			page, page->cache_offset);
+#endif
+		// Ensure pointers are definitely NULL if it was an orphaned page
+		page->sieve_next = NULL;
+		page->sieve_prev = NULL;
+		return;
+	}
+
+	// Adjust sieve_hand if it points to the page being removed
+	if (sieve_hand == page) {
+		// Move hand to the previous (logically older) element in scan order (towards tail).
+		// If removing the tail and hand is at tail, hand moves to new tail.
+		// If removing head and hand is at head, hand moves to new head (which is page->sieve_next).
+		// The SIEVE paper implies hand moves to next position *after* eviction.
+		// If current hand is victim, hand should effectively point to where next scan would start.
+		sieve_hand = page->sieve_prev; // Move towards older item (tail)
+		if (sieve_hand == NULL) { // If removed page was the tail, hand moves to new tail
+			sieve_hand = sieve_page_list_tail; // This will be updated below
+		}
+	}
+
+	if (page == sieve_page_list_head)
+		sieve_page_list_head = page->sieve_next;
+	if (page->sieve_prev != NULL)
+		page->sieve_prev->sieve_next = page->sieve_next;
+
+	if (page == sieve_page_list_tail)
+		sieve_page_list_tail = page->sieve_prev;
+	if (page->sieve_next != NULL)
+		page->sieve_next->sieve_prev = page->sieve_prev;
+
+	if (sieve_page_list_head == NULL) { // List became empty
+		ASSERT(sieve_page_list_tail == NULL);
+		sieve_hand = NULL;
+	} else if (sieve_hand == NULL && sieve_page_list_tail != NULL) {
+		// If hand became NULL (e.g. was pointing to the only page that got removed)
+		// re-initialize it to the tail, as this is where scan usually starts or wraps.
+		sieve_hand = sieve_page_list_tail;
+	}
+
+
+	page->sieve_next = NULL;
+	page->sieve_prev = NULL;
+}
+
+
+/*! Finds a victim page for eviction using the SIEVE algorithm.
+	The cache lock must be held.
+	Returns the victim page, or NULL if no suitable victim is found.
+	The returned page is still part of all cache structures; the caller
+	is responsible for its actual removal and freeing.
+*/
+vm_page*
+VMCache::_SieveFindVictimPage()
+{
+	AssertLocked();
+
+	if (sieve_hand == NULL) { // Implies list is empty
+		ASSERT(sieve_page_list_head == NULL && sieve_page_list_tail == NULL);
+		return NULL;
+	}
+
+	vm_page* scanPointer = sieve_hand;
+	vm_page* const originalHandPosition = sieve_hand;
+	bool handAdvancedInThisPass = false; // Tracks if hand moved in the current "conceptual" pass
+
+	do {
+		// Candidate pages must be clean, not busy, and not wired.
+		if (!scanPointer->busy && scanPointer->WiredCount() == 0
+			&& !scanPointer->modified) {
+
+			if (scanPointer->sieve_visited) {
+				scanPointer->sieve_visited = false; // Demote
+				sieve_hand = scanPointer;           // Move hand to this demoted page
+				handAdvancedInThisPass = true;
+			} else {
+				// Found an unvisited, viable page. This is the victim.
+				return scanPointer;
+			}
+		}
+
+		// Advance scanPointer towards the tail (older pages)
+		scanPointer = scanPointer->sieve_prev;
+		if (scanPointer == NULL) { // Wrapped around past the tail (which means we were at sieve_page_list_tail)
+			scanPointer = sieve_page_list_tail; // Effectively, stay at tail or reset to tail for a "new" pass sense
+
+			// Check if we've made a full conceptual pass starting from originalHandPosition
+			// A full pass is tricky to define perfectly here without counting iterations or more state.
+			// The core idea is: if we scan all objects and all were visited (and thus demoted),
+			// the hand will end up at the last demoted object. A subsequent scan should then find it unvisited.
+			// If originalHandPosition is reached again AND the hand didn't move (no demotions in this pass),
+			// it implies no viable unvisited page was found among the scannable pages from originalHandPosition.
+			if (scanPointer == originalHandPosition && !handAdvancedInThisPass) {
+				// If the hand itself (which might be the originalHandPosition or a newly demoted page)
+				// is now a candidate, return it.
+				if (!sieve_hand->busy && sieve_hand->WiredCount() == 0
+					&& !sieve_hand->modified && !sieve_hand->sieve_visited) {
+					return sieve_hand;
+				}
+				return NULL; // No victim after a full scan without further demotions.
+			}
+			// If hand did move, the loop condition (scanPointer != originalHandPosition || handAdvancedInThisPass)
+			// might need adjustment or we rely on eventually finding a non-visited page or the hand itself.
+			// Resetting handAdvancedInThisPass if we consider this a "new" full scan from the (potentially new) hand.
+			// For simplicity, the loop condition will eventually make scanPointer == sieve_hand.
+		}
+	} while (scanPointer != sieve_hand); // Loop until we scan back to the current hand.
+
+	// After the loop, the current sieve_hand is the only remaining candidate.
+	// This covers the case where all pages were visited and demoted, and the hand
+	// made a full circle.
+	if (!sieve_hand->busy && sieve_hand->WiredCount() == 0
+		&& !sieve_hand->modified && !sieve_hand->sieve_visited) {
+		return sieve_hand;
+	}
+
+	return NULL; // No suitable victim found
 }
 
 

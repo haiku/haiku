@@ -849,6 +849,10 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				locker.Lock();
 
 				if (doWrite) {
+					// Mark page as visited on write hit as well, as it's an access
+					// and SIEVE benefits from knowing about recent use.
+					page->sieve_visited = true; // SIEVE: Mark page as visited on write cache hit.
+
 					DEBUG_PAGE_ACCESS_START(page);
 
 					page->modified = true;
@@ -857,6 +861,8 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 						vm_page_set_state(page, PAGE_STATE_MODIFIED);
 
 					DEBUG_PAGE_ACCESS_END(page);
+				} else { // This is a read hit
+					page->sieve_visited = true; // SIEVE: Mark page as visited on read cache hit.
 				}
 
 				cache->MarkPageUnbusy(page);
