@@ -12,6 +12,7 @@
 #include <lock.h>
 #include <util/list.h>
 #include <util/DoublyLinkedList.h>
+#include "radix.h" // For struct radix_node_head
 
 #include "routes.h"
 
@@ -23,7 +24,8 @@ struct net_domain_private : net_domain,
 		DoublyLinkedListLinkImpl<net_domain_private> {
 	recursive_lock		lock;
 
-	RouteList			routes;
+	// RouteList			routes; // Replaced by radix tree
+	struct radix_node_head* rnh_head; // Radix tree head for this domain's routes
 	RouteInfoList		route_infos;
 };
 
