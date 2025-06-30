@@ -1732,17 +1732,19 @@ VMCache::_SieveRemovePage(vm_page* page)
 	}
 
 	// Adjust sieve_hand if it points to the page being removed.
-	// The SIEVE hand points to an object O. If O is evicted, the hand is advanced
-	// to the next object in the list (towards older objects / tail).
+	// The SIEVE paper states: "When an object O is evicted, the hand is set to
+	// the position of O (i.e. O is the new hand)." Since we are _removing_ O,
+	// the hand should effectively point to the object that *was previously
+	// pointed to by O->sieve_prev* (the next object in the scan order, which
+	// goes from current hand towards tail).
 	if (sieve_hand == page) {
-		sieve_hand = page->sieve_prev; // Move hand towards older pages (tail)
-		if (sieve_hand == NULL) {
-			// If the removed page was the tail (oldest) and hand pointed to it,
-			// the new hand should become the new tail.
-			// This will be correctly set after list pointers are updated if new tail exists.
-			// Or if list becomes empty, hand will be set to NULL below.
-			// For now, if page->sieve_prev is NULL, hand becomes NULL temporarily.
-		}
+		sieve_hand = page->sieve_prev;
+		// If page was the tail (sieve_page_list_tail), then page->sieve_prev
+		// would become the new tail. If sieve_hand becomes NULL here (meaning
+		// page was the tail and the only element, or page was tail and
+		// page->sieve_prev was NULL which shouldn't happen in a valid list
+		// unless it's the only element), the post-unlinking adjustment
+		// will handle setting it to the new tail or NULL if list is empty.
 	}
 
 	// Unlink the page
@@ -1756,17 +1758,23 @@ VMCache::_SieveRemovePage(vm_page* page)
 	if (page->sieve_next != NULL)
 		page->sieve_next->sieve_prev = page->sieve_prev;
 
-	// Post-unlinking adjustments for sieve_hand
-	if (sieve_page_list_head == NULL) { // List became empty
+	// Post-unlinking adjustments for sieve_hand:
+	// If the list became empty, head, tail, and hand must all be NULL.
+	if (sieve_page_list_head == NULL) {
 		ASSERT(sieve_page_list_tail == NULL);
 		sieve_hand = NULL;
-	} else if (sieve_hand == NULL && sieve_page_list_tail != NULL) {
-		// If hand became NULL (e.g., was pointing to the tail which was removed,
-		// and it was the only element or page->sieve_prev was NULL),
-		// re-initialize it to the current tail.
+	} else if (sieve_hand == NULL) {
+		// If sieve_hand became NULL (e.g., because the removed page was the
+		// tail and the only item, or it was the tail and its sieve_prev was
+		// also NULL which is an inconsistent state for a multi-item list but
+		// could happen if it was the only item), and the list is *not* empty,
+		// then the hand should point to the new tail of the list. This ensures
+		// the scan can continue or restart from a valid position.
 		sieve_hand = sieve_page_list_tail;
 	}
-
+	// If sieve_hand is not NULL here, it correctly points to the element
+	// that was sieve_prev of the removed page, or it was not pointing to the
+	// removed page at all and remains valid.
 
 	page->sieve_next = NULL;
 	page->sieve_prev = NULL;

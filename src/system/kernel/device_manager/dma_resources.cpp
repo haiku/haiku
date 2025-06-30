@@ -103,10 +103,24 @@ DMAResource::DMAResource()
 DMAResource::~DMAResource()
 {
 	mutex_lock(&fLock);
+
+	// free DMABuffers
+	DMABuffer* dmaBuffer = fDMABuffers.RemoveHead();
+	while (dmaBuffer != NULL) {
+		free(dmaBuffer);
+		dmaBuffer = fDMABuffers.RemoveHead();
+	}
+
+	// free DMABounceBuffers and their areas
+	DMABounceBuffer* bounceBuffer = fBounceBuffers.RemoveHead();
+	while (bounceBuffer != NULL) {
+		delete_area(bounceBuffer->area);
+		delete bounceBuffer;
+		bounceBuffer = fBounceBuffers.RemoveHead();
+	}
+
 	mutex_destroy(&fLock);
 	free(fScratchVecs);
-
-// TODO: Delete DMABuffers and BounceBuffers!
 }
 
 
@@ -278,6 +292,7 @@ DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 	buffer->address = bounceBuffer;
 	buffer->physical_address = physicalBase;
 	buffer->size = size;
+	buffer->area = area;
 
 	*_buffer = buffer;
 	return B_OK;
