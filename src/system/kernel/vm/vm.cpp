@@ -1831,29 +1831,69 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		case B_FULL_LOCK:
 		{
 			// Allocate and map all pages for this area
-
+			status_t wiringStatus = B_OK;
 			off_t offset = 0;
-			for (addr_t address = area->Base();
-					address < area->Base() + (area->Size() - 1);
-					address += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
+			addr_t currentAddress = area->Base();
+			for (; currentAddress < area->Base() + area->Size();
+					currentAddress += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
 #ifdef DEBUG_KERNEL_STACKS
 #	ifdef STACK_GROWS_DOWNWARDS
-				if (isStack && address < area->Base()
+				if (isStack && currentAddress < area->Base()
 						+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
 #	else
-				if (isStack && address >= area->Base() + area->Size()
+				if (isStack && currentAddress >= area->Base() + area->Size()
 						- KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
 #	endif
 					continue;
 #endif
-				vm_page* page = vm_page_allocate_page(&reservation,
+				vm_page* pageToWire = vm_page_allocate_page(&reservation,
 					PAGE_STATE_WIRED | pageAllocFlags);
-				cache->InsertPage(page, offset);
-				map_page(area, page, address, protection, &reservation);
-
-				DEBUG_PAGE_ACCESS_END(page);
+				if (pageToWire == NULL) {
+					// This shouldn't happen if reservation was adequate
+					wiringStatus = B_NO_MEMORY;
+					break;
+				}
+				cache->InsertPage(pageToWire, offset);
+				wiringStatus = map_page(area, pageToWire, currentAddress,
+					protection, &reservation);
+				if (wiringStatus != B_OK) {
+					// Failed to map, remove from cache and free
+					cache->RemovePage(pageToWire);
+					vm_page_free(cache, pageToWire);
+					break;
+				}
+				DEBUG_PAGE_ACCESS_END(pageToWire);
 			}
 
+			if (wiringStatus != B_OK) {
+				// Rollback pages already wired in this loop for this area
+				addr_t rollbackAddress = area->Base();
+				for (; rollbackAddress < currentAddress;
+						rollbackAddress += B_PAGE_SIZE) {
+					unmap_page(area, rollbackAddress);
+					// vm_page was allocated from reservation and inserted into cache
+					// We need to find it, remove from cache, and return to reservation implicitly by freeing
+					// or explicitly if vm_page_free doesn't do that for reserved pages.
+					// Given vm_page_allocate_page comes from reservation, vm_page_free should handle it.
+					// The cache still holds the page struct, so we need to remove it.
+					off_t pageCacheOffset = (rollbackAddress - area->Base()) + area->cache_offset;
+					vm_page* pageToFree = cache->LookupPage(pageCacheOffset);
+					if (pageToFree != NULL && pageToFree->Cache() == cache) {
+						// Ensure it's the page we just added, not a pre-existing one
+						// (though for anonymous, newly created cache, this is guaranteed)
+						cache->RemovePage(pageToFree);
+						vm_page_free(cache, pageToFree);
+					}
+				}
+				// Now delete the area itself as it's inconsistently wired
+				cache->Unlock();
+				locker.Unlock(); // AddressSpaceReadLocker
+				vm_delete_area(team, area->id, kernel);
+				// vm_page_unreserve_pages(&reservation) will be called at err1/err0
+				// reservedMemory is handled by cache deletion path
+				status = wiringStatus;
+				goto err1; // Jump to existing cleanup for reservations.
+			}
 			break;
 		}
 
