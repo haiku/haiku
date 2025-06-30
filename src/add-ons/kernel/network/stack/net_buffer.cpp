@@ -846,14 +846,61 @@ acquire_data_header(data_header* header)
 static void
 free_data_header_space(data_header* header, uint8* data, size_t size)
 {
-	if (size < sizeof(free_data))
-		size = sizeof(free_data);
+	// Ensure the block can hold free_data structure and is aligned.
+	// The size passed should be the actual aligned block size being freed.
+	// alloc_data_header_space already ensures allocations are _ALIGN'd
+	// and at least sizeof(free_data).
+	ASSERT(size >= sizeof(free_data));
+	ASSERT(((addr_t)data & (sizeof(void*) - 1)) == 0);
+	ASSERT((size & (sizeof(void*) - 1)) == 0);
 
-	free_data* freeData = (free_data*)data;
-	freeData->next = header->first_free;
-	freeData->size = size;
+	free_data* newFreeBlock = (free_data*)data;
+	newFreeBlock->size = size;
+	newFreeBlock->next = NULL; // Initialize next pointer
 
-	header->first_free = freeData;
+	// Iterate to find insertion point and coalesce
+	free_data** link = &header->first_free;
+	free_data* current = header->first_free;
+	free_data* prev = NULL;
+
+	while (current != NULL && (uint8*)current < (uint8*)newFreeBlock) {
+		prev = current;
+		link = &current->next;
+		current = current->next;
+	}
+
+	// 'newFreeBlock' should be inserted before 'current' (or at the end if current is NULL)
+	// 'prev' is the block before newFreeBlock in the address-ordered list.
+	// 'link' points to where newFreeBlock should be linked (either header->first_free or prev->next)
+
+	bool mergedWithPrev = false;
+	if (prev != NULL && ((uint8*)prev + prev->size == (uint8*)newFreeBlock)) {
+		// Coalesce with previous block
+		prev->size += newFreeBlock->size;
+		newFreeBlock = prev; // The block to check against 'current' is now the extended 'prev'
+		mergedWithPrev = true;
+	}
+
+	// Now, 'newFreeBlock' is either the original block or the extended 'prev' block.
+	// 'current' is still the block that should come *after* 'newFreeBlock' in address order.
+	if (current != NULL && ((uint8*)newFreeBlock + newFreeBlock->size == (uint8*)current)) {
+		// Coalesce with next block ('current')
+		newFreeBlock->size += current->size;
+		newFreeBlock->next = current->next; // newFreeBlock (or extended prev) now points past current
+		// 'current' is now absorbed and effectively gone.
+		// If newFreeBlock was *not* mergedWithPrev, we still need to link it into the list.
+		if (!mergedWithPrev) {
+			*link = newFreeBlock;
+		}
+		// If it *was* mergedWithPrev, 'prev' (which is newFreeBlock) is already correctly linked.
+	} else if (!mergedWithPrev) {
+		// No coalesce with next, and no coalesce with prev that wasn't handled by extending prev.
+		// Insert newFreeBlock into the list.
+		newFreeBlock->next = current;
+		*link = newFreeBlock;
+	}
+	// If mergedWithPrev was true, and no merge with current occurred,
+	// newFreeBlock (which is prev) is already correctly linked and sized.
 }
 
 
