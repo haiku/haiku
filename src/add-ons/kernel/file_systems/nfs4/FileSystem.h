@@ -22,6 +22,8 @@ class Inode;
 class RootInode;
 
 struct MountConfiguration {
+	bool		fReadOnly;
+
 	bool		fHard;
 	int			fRetryLimit;
 	bigtime_t	fRequestTimeout;

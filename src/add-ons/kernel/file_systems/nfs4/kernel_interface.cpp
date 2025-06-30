@@ -10,6 +10,7 @@
 #include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <fs_interface.h>
+#include <fs_volume.h>
 
 #include "Connection.h"
 #include "FileSystem.h"
@@ -138,7 +139,7 @@ ParseArguments(const char* _args, AddressResolver** address, char** _server,
 
 static status_t
 nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
-			const char* args, ino_t* _rootVnodeID)
+	const char* args, ino_t* _rootVnodeID)
 {
 	TRACE("volume = %p, device = %s, flags = %" B_PRIu32 ", args = %s\n",
 		volume, device, flags, args);
@@ -161,8 +162,10 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	}
 	locker.Unlock();
 
-	AddressResolver* resolver;
 	MountConfiguration config;
+	config.fReadOnly = (flags & B_MOUNT_READ_ONLY) != 0;
+
+	AddressResolver* resolver;
 	char* path;
 	char* serverName;
 	result = ParseArguments(args, &resolver, &serverName, &path, &config);
@@ -527,6 +530,10 @@ nfs4_create_symlink(fs_volume* volume, fs_vnode* dir, const char* name,
 	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s, path = %s, mode = %d\n",
 		volume, vti->ID(), name, path, mode);
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
+
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
 	if (inode == NULL)
@@ -556,11 +563,14 @@ nfs4_link(fs_volume* volume, fs_vnode* dir, const char* name, fs_vnode* vnode)
 	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s, vnode = %" B_PRIi64
 		"\n", volume, dirVti->ID(), name, vti->ID());
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
+
 	VnodeToInodeLocker _dir(dirVti);
 	Inode* dirInode = dirVti->Get();
 	if (dirInode == NULL)
 		return B_ENTRY_NOT_FOUND;
-
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -576,13 +586,17 @@ nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(dir->private_node);
 
+	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s\n", volume, vti->ID(),
+		name);
+
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
+
 	VnodeToInodeLocker locker(vti);
 	Inode* inode = vti->Get();
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
-
-	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s\n", volume, vti->ID(),
-		name);
 
 	ino_t id;
 	status_t result = inode->Remove(name, NF4REG, &id);
@@ -617,11 +631,14 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 		" fromName = %s, toName = %s\n", volume, fromVti->ID(), toVti->ID(),
 		fromName, toName);
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
+
 	VnodeToInodeLocker _from(fromVti);
 	Inode* fromInode = fromVti->Get();
 	if (fromInode == NULL)
 		return B_ENTRY_NOT_FOUND;
-
 
 	VnodeToInodeLocker _to(toVti);
 	Inode* toInode = toVti->Get();
@@ -711,6 +728,10 @@ nfs4_write_stat(fs_volume* volume, fs_vnode* vnode, const struct stat* stat,
 	TRACE("volume = %p, vnode = %" B_PRIi64 ", statMask = %" B_PRIu32 "\n",
 		volume,	vti->ID(), statMask);
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
+
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
 	if (inode == NULL)
@@ -767,6 +788,9 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(dir->private_node);
 	TRACE("volume = %p, dir = %" B_PRIi64 ", name = %s, openMode = %d,"	\
 		" perms = %d\n", volume, vti->ID(), name, openMode, perms);
+
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -828,6 +852,10 @@ nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly && (openMode & O_RWMASK) != O_RDONLY)
+		return B_READ_ONLY_DEVICE;
+
 	if (inode->Type() == S_IFDIR && (openMode & O_RWMASK) != O_RDONLY)
 		return B_IS_A_DIRECTORY;
 	if ((openMode & O_DIRECTORY) != 0 && inode->Type() != S_IFDIR)
@@ -838,7 +866,6 @@ nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 		return B_OK;
 	}
 
-	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 	OpenFileCookie* cookie = new OpenFileCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
@@ -866,7 +893,6 @@ nfs4_close(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 	Inode* inode = vti->Get();
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
-
 
 	if (inode->Type() == S_IFDIR || inode->Type() == S_IFLNK)
 		return B_OK;
@@ -959,6 +985,10 @@ nfs4_create_dir(fs_volume* volume, fs_vnode* parent, const char* name,
 	TRACE("volume = %p, parent = %" B_PRIi64 ", mode = %d\n", volume, vti->ID(),
 		mode);
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
+
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
 	if (inode == NULL)
@@ -986,6 +1016,10 @@ nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(parent->private_node);
 	TRACE("volume = %p, parent = %" B_PRIi64 ", name = %s\n", volume, vti->ID(),
 		name);
+
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -1064,7 +1098,7 @@ nfs4_free_dir_cookie(fs_volume* volume, fs_vnode* vnode, void* cookie)
 
 static status_t
 nfs4_read_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie,
-				struct dirent* buffer, size_t bufferSize, uint32* _num)
+	struct dirent* buffer, size_t bufferSize, uint32* _num)
 {
 	OpenDirCookie* cookie = reinterpret_cast<OpenDirCookie*>(_cookie);
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
@@ -1158,12 +1192,15 @@ nfs4_create_attr(fs_volume* volume, fs_vnode* vnode, const char* name,
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
+
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 	OpenAttrCookie* cookie = new OpenAttrCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
@@ -1189,6 +1226,9 @@ nfs4_open_attr(fs_volume* volume, fs_vnode* vnode, const char* name,
 		return B_ENTRY_NOT_FOUND;
 
 	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly && (openMode & O_RWMASK) != O_RDONLY)
+		return B_READ_ONLY_DEVICE;
+
 	OpenAttrCookie* cookie = new OpenAttrCookie(fs);
 	if (cookie == NULL)
 		return B_NO_MEMORY;
@@ -1298,6 +1338,11 @@ nfs4_rename_attr(fs_volume* volume, fs_vnode* fromVnode, const char* fromName,
 	fs_vnode* toVnode, const char* toName)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(toVnode->private_node);
+
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
+
 	VnodeToInodeLocker to(vti);
 	Inode* toInode = vti->Get();
 	if (toInode == NULL)
@@ -1317,6 +1362,10 @@ static status_t
 nfs4_remove_attr(fs_volume* volume, fs_vnode* vnode, const char* name)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
+
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -1354,6 +1403,9 @@ nfs4_acquire_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, lock = %p\n",
 		volume, vti->ID(), _cookie, lock);
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
@@ -1367,11 +1419,15 @@ nfs4_acquire_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 
 static status_t
 nfs4_release_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
-			const struct flock* lock)
+	const struct flock* lock)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, lock = %p\n",
 		volume, vti->ID(), _cookie, lock);
+
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	if (fs->GetConfiguration().fReadOnly)
+		return B_READ_ONLY_DEVICE;
 
 	VnodeToInodeLocker _(vti);
 	Inode* inode = vti->Get();
