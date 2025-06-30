@@ -672,25 +672,48 @@ publish_device(device_node *node, const char *path, const char *moduleName)
 	node->AddDevice(device);
 
 	device_attr_private* attr;
+	char name_buffer[256];
 
+	// Attribute for device path
 	attr = new(std::nothrow) device_attr_private();
 	if (attr != NULL) {
-		char buf[256];
-		sprintf(buf, "dev/%" B_PRIdINO "/path", device->ID());
-		attr->name = strdup(buf);
-		attr->type = B_STRING_TYPE;
-		attr->value.string = strdup(path);
-		node->Attributes().Add(attr);
+		sprintf(name_buffer, "dev/%" B_PRIdINO "/path", device->ID());
+		attr->name = strdup(name_buffer);
+		if (attr->name != NULL) {
+			attr->type = B_STRING_TYPE;
+			attr->value.string = strdup(path);
+			if (attr->value.string != NULL) {
+				node->Attributes().Add(attr);
+			} else {
+				free((void*)attr->name);
+				delete attr;
+				// Attribute not added, but publish_device overall can still succeed
+			}
+		} else {
+			delete attr;
+			// Attribute not added
+		}
 	}
 
+	// Attribute for device driver
 	attr = new(std::nothrow) device_attr_private();
 	if (attr != NULL) {
-		char buf[256];
-		sprintf(buf, "dev/%" B_PRIdINO "/driver", device->ID());
-		attr->name = strdup(buf);
-		attr->type = B_STRING_TYPE;
-		attr->value.string = strdup(moduleName);
-		node->Attributes().Add(attr);
+		sprintf(name_buffer, "dev/%" B_PRIdINO "/driver", device->ID());
+		attr->name = strdup(name_buffer);
+		if (attr->name != NULL) {
+			attr->type = B_STRING_TYPE;
+			attr->value.string = strdup(moduleName);
+			if (attr->value.string != NULL) {
+				node->Attributes().Add(attr);
+			} else {
+				free((void*)attr->name);
+				delete attr;
+				// Attribute not added
+			}
+		} else {
+			delete attr;
+			// Attribute not added
+		}
 	}
 
 	return B_OK;
@@ -1224,9 +1247,18 @@ device_node::device_node(const char* moduleName, const device_attr* attrs)
 	device_attr_private* attr = new(std::nothrow) device_attr_private();
 	if (attr != NULL) {
 		attr->name = strdup("device/driver");
-		attr->type = B_STRING_TYPE;
-		attr->value.string = strdup(fModuleName);
-		fAttributes.Add(attr);
+		if (attr->name != NULL) {
+			attr->type = B_STRING_TYPE;
+			attr->value.string = strdup(fModuleName);
+			if (attr->value.string != NULL) {
+				fAttributes.Add(attr);
+			} else {
+				free((void*)attr->name);
+				delete attr;
+			}
+		} else {
+			delete attr;
+		}
 	}
 
 	get_attr_uint32(this, B_DEVICE_FLAGS, &fFlags, false);
@@ -1677,11 +1709,13 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 							|| !strcmp(sGenericContextPath, "bus"))) {
 						_AddPath(*stack, "busses");
 					}
-					const char* bus;
-					if (get_attr_string(this, B_DEVICE_BUS, &bus, false) == B_OK) {
-						if (strcmp(bus, "virtio") == 0)
+
+				const char* busType = NULL;
+				if (get_attr_string(this, B_DEVICE_BUS, &busType, false) == B_OK) {
+					if (strcmp(busType, "virtio") == 0)
 							_AddPath(*stack, "busses/scsi");
 					}
+
 					_AddPath(*stack, "drivers", sGenericContextPath);
 					_AddPath(*stack, "busses/i2c");
 					_AddPath(*stack, "busses/random");
