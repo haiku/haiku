@@ -173,22 +173,26 @@ void
 HashedObjectCache::_ResizeHashTableIfNeeded(uint32 flags)
 {
 	size_t hashSize = hash_table.ResizeNeeded();
-	if (hashSize != 0) {
-		Unlock();
-		void* buffer = slab_internal_alloc(hashSize, flags);
-		Lock();
+	if (hashSize == 0)
+		return;
 
-		if (buffer != NULL) {
-			if (hash_table.ResizeNeeded() == hashSize) {
-				void* oldHash;
-				hash_table.Resize(buffer, hashSize, true, &oldHash);
-				if (oldHash != NULL) {
-					Unlock();
-					slab_internal_free(oldHash, flags);
-					Lock();
-				}
-			}
-		}
+	Unlock();
+	void* buffer = slab_internal_alloc(hashSize, flags);
+	Lock();
+
+	if (buffer == NULL)
+		return;
+
+	if (hash_table.ResizeNeeded() == hashSize) {
+		void* oldHash = NULL;
+		hash_table.Resize(buffer, hashSize, true, &oldHash);
+		buffer = oldHash;
+	}
+
+	if (buffer != NULL) {
+		Unlock();
+		slab_internal_free(buffer, flags);
+		Lock();
 	}
 }
 
