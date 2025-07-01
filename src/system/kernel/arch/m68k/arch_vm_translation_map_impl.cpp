@@ -95,7 +95,7 @@ static addr_t sQueryPage = NULL;
 // MUST be aligned
 static page_table_entry sQueryDesc __attribute__ (( aligned (4) ));
 
-static vm_translation_map *tmap_list;
+static VMTranslationMap *tmap_list;
 static spinlock tmap_list_lock;
 
 static addr_t sIOSpaceBase;
@@ -122,12 +122,12 @@ static status_t early_query(addr_t va, addr_t *out_physical);
 static status_t get_physical_page_tmap_internal(addr_t pa, addr_t *va, uint32 flags);
 static status_t put_physical_page_tmap_internal(addr_t va);
 
-static void flush_tmap(vm_translation_map *map);
+static void flush_tmap(VMTranslationMap *map);
 
 
 #warning M68K: RENAME
 static void *
-_m68k_translation_map_get_pgdir(vm_translation_map *map)
+_m68k_translation_map_get_pgdir(VMTranslationMap *map)
 {
 	return map->arch_data->rtdir_phys;
 }
@@ -201,7 +201,7 @@ update_page_indirect_entry(page_indirect_entry *entry, page_indirect_entry *with
 static void
 _update_all_pgdirs(int index, page_root_entry e)
 {
-	vm_translation_map *entry;
+	VMTranslationMap *entry;
 	unsigned int state = disable_interrupts();
 
 	acquire_spinlock(&tmap_list_lock);
@@ -271,7 +271,7 @@ early_query(addr_t va, addr_t *_physicalAddress)
 	in case it's the first locking recursion.
 */
 static status_t
-lock_tmap(vm_translation_map *map)
+lock_tmap(VMTranslationMap *map)
 {
 	TRACE(("lock_tmap: map %p\n", map));
 
@@ -291,7 +291,7 @@ lock_tmap(vm_translation_map *map)
 	needed).
 */
 static status_t
-unlock_tmap(vm_translation_map *map)
+unlock_tmap(VMTranslationMap *map)
 {
 	TRACE(("unlock_tmap: map %p\n", map));
 
@@ -306,11 +306,11 @@ unlock_tmap(vm_translation_map *map)
 
 
 static void
-destroy_tmap(vm_translation_map *map)
+destroy_tmap(VMTranslationMap *map)
 {
 	int state;
-	vm_translation_map *entry;
-	vm_translation_map *last = NULL;
+	VMTranslationMap *entry;
+	VMTranslationMap *last = NULL;
 	unsigned int i, j;
 
 	if (map == NULL)
@@ -488,7 +488,7 @@ put_page_indirect_entry_in_pgtable(page_indirect_entry *entry,
 
 
 static size_t
-map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
+map_max_pages_need(VMTranslationMap */*map*/, addr_t start, addr_t end)
 {
 	size_t need;
 	size_t pgdirs;
@@ -517,7 +517,7 @@ map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
 
 
 static status_t
-map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
+map_tmap(VMTranslationMap *map, addr_t va, addr_t pa, uint32 attributes)
 {
 	page_root_entry *pr;
 	page_directory_entry *pd;
@@ -646,7 +646,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 
 
 static status_t
-unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
+unmap_tmap(VMTranslationMap *map, addr_t start, addr_t end)
 {
 	page_table_entry *pt;
 	page_directory_entry *pd;
@@ -722,7 +722,7 @@ restart:
 
 // XXX: 040 should be able to do that with PTEST (but not 030 or 060)
 static status_t
-query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
+query_tmap_interrupt(VMTranslationMap *map, addr_t va, addr_t *_physical,
 	uint32 *_flags)
 {
 	page_root_entry *pr = map->arch_data->rtdir_virt;
@@ -778,7 +778,7 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
 
 
 static status_t
-query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags)
+query_tmap(VMTranslationMap *map, addr_t va, addr_t *_physical, uint32 *_flags)
 {
 	page_table_entry *pt;
 	page_indirect_entry *pi;
@@ -861,14 +861,14 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 
 
 static addr_t
-get_mapped_size_tmap(vm_translation_map *map)
+get_mapped_size_tmap(VMTranslationMap *map)
 {
 	return map->map_count;
 }
 
 
 static status_t
-protect_tmap(vm_translation_map *map, addr_t start, addr_t end, uint32 attributes)
+protect_tmap(VMTranslationMap *map, addr_t start, addr_t end, uint32 attributes)
 {
 	page_table_entry *pt;
 	page_directory_entry *pd;
@@ -948,7 +948,7 @@ restart:
 
 
 static status_t
-clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
+clear_flags_tmap(VMTranslationMap *map, addr_t va, uint32 flags)
 {
 	page_table_entry *pt;
 	page_indirect_entry *pi;
@@ -1031,7 +1031,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 
 
 static void
-flush_tmap(vm_translation_map *map)
+flush_tmap(VMTranslationMap *map)
 {
 	cpu_status state;
 
@@ -1163,7 +1163,7 @@ static vm_translation_map_ops tmap_ops = {
 
 
 static status_t
-m68k_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
+m68k_vm_translation_map_init_map(VMTranslationMap *map, bool kernel)
 {
 	if (map == NULL)
 		return B_BAD_VALUE;
@@ -1229,7 +1229,7 @@ m68k_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 
 
 static status_t
-m68k_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
+m68k_vm_translation_map_init_kernel_map_post_sem(VMTranslationMap *map)
 {
 	return B_OK;
 }

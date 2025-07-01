@@ -129,7 +129,7 @@ M68KPagingStructures040::UpdateAllPageDirs(int index,
 #warning M68K:FIXME
 	InterruptsSpinLocker locker(sPagingStructuresListLock);
 
-	PagingStructuresList::Iterator it = sPagingStructuresList.GetIterator();
+	PagingStructuresList::ConstIterator it = sPagingStructuresList.GetIterator();
 	while (M68KPagingStructures040* info = it.Next())
 		info->pgroot_virt[index] = entry;
 }
