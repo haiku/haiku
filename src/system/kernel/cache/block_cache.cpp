@@ -1,10 +1,11 @@
 /*
- * Copyright 2004-2020, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2023, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2023, Your Name, your.email@example.com.
  * Distributed under the terms of the MIT License.
  */
 
-
-#include <block_cache.h>
+#include "block_cache_private.h"
+#include "unified_cache.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,10 +25,10 @@
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
 #include <StackOrHeapArray.h>
-#include <vm/vm_page.h>
+#include <vm/vm_page.h> // For read_pos, writev_pos if used directly
 
 #ifndef BUILDING_USERLAND_FS_SERVER
-#include "IORequest.h"
+// #include "IORequest.h" // This might be replaced or adapted depending on how I/O is handled
 #endif // !BUILDING_USERLAND_FS_SERVER
 #include "kernel_debug_config.h"
 
@@ -59,71 +60,53 @@
 static const bigtime_t kTransactionIdleTime = 2000000LL;
 	// a transaction is considered idle after 2 seconds of inactivity
 
+// Global unified cache for all block devices.
+// This should be initialized in block_cache_init().
+// A more sophisticated system might use a cache manager or allow multiple
+// named unified_cache instances. For now, a single one simplifies things.
+static unified_cache* gBlockUnifiedCache = NULL;
 
+// Object cache for transaction structures if they are kept similar
+static object_cache* sTransactionObjectCache = NULL;
+static object_cache* sCacheNotificationCache = NULL; // Keep for notifications if used
+
+
+// The old cached_block and block_cache structs are removed or significantly changed.
+// The new block_cache_instance_data (from block_cache_private.h) will hold
+// instance-specific data (fd, block_size, etc.) and a pointer to gBlockUnifiedCache.
+
+// Forward declarations for static functions that might be kept or adapted
+// For example, transaction helper functions.
+// Many of the old static functions related to direct cache management (hashing, LRU)
+// will be removed.
+
+// The old BlockHash, TransactionHash, block_list, etc., are removed as
+// the unified cache handles its own hashing and eviction lists.
+
+// The old 'namespace {' anonymous namespace might still be used for static helpers.
 namespace {
 
-struct cache_transaction;
-struct cached_block;
-struct block_cache;
-typedef DoublyLinkedListLink<cached_block> block_link;
+// Adapted cache_transaction might still be needed if transaction logic is complex
+// and not fully embedded in unified_cache_entry.
+// The definition from block_cache_private.h will be used.
 
-struct cached_block {
-	cached_block*	next;			// next in hash
-	cached_block*	transaction_next;
-	block_link		link;
-	off_t			block_number;
-	void*			current_data;
-		// The data that is seen by everyone using the API; this one is always
-		// present.
-	void*			original_data;
-		// When in a transaction, this contains the original data from before
-		// the transaction.
-	void*			parent_data;
-		// This is a lazily alloced buffer that represents the contents of the
-		// block in the parent transaction. It may point to current_data if the
-		// contents have been changed only in the parent transaction, or, if the
-		// block has been changed in the current sub transaction already, to a
-		// new block containing the contents changed in the parent transaction.
-		// If this is NULL, the block has not been changed in the parent
-		// transaction at all.
-#if BLOCK_CACHE_DEBUG_CHANGED
-	void*			compare;
-#endif
-	int32			ref_count;
-	int32			last_accessed;
-	bool			busy_reading : 1;
-	bool			busy_writing : 1;
-	bool			is_writing : 1;
-		// Block has been checked out for writing without transactions, and
-		// cannot be written back if set
-	bool			is_dirty : 1;
-	bool			unused : 1;
-	bool			discard : 1;
-	bool			busy_reading_waiters : 1;
-	bool			busy_writing_waiters : 1;
-	cache_transaction* transaction;
-		// This is the current active transaction, if any, the block is
-		// currently in (meaning was changed as a part of it).
-	cache_transaction* previous_transaction;
-		// This is set to the last transaction that was ended containing this
-		// block. In this case, the block has not yet written back yet, and
-		// the changed data is either in current_data, or original_data -- the
-		// latter if the block is already being part of another transaction.
-		// There can only be one previous transaction, so when the active
-		// transaction ends, the changes of the previous transaction have to
-		// be written back before that transaction becomes the next previous
-		// transaction.
+// ListenerList and related notification structures might be kept if the
+// transaction notification API is preserved.
+typedef DoublyLinkedList<cache_notification> NotificationList;
 
-	bool CanBeWritten() const;
-	int32 LastAccess() const
-		{ return system_time() / 1000000L - last_accessed; }
+struct cache_listener;
+typedef DoublyLinkedListLink<cache_listener> listener_link;
+
+struct cache_listener : cache_notification { // cache_notification from fs_cache.h? No, local.
+	listener_link	link;
 };
+typedef DoublyLinkedList<cache_listener,
+	DoublyLinkedListMemberGetLink<cache_listener,
+		&cache_listener::link> > ListenerList;
 
-typedef DoublyLinkedList<cached_block,
-	DoublyLinkedListMemberGetLink<cached_block,
-		&cached_block::link> > block_list;
 
-
+// TODO: Review if cache_notification needs to be redefined or if fs_cache.h version is enough
+// For now, assume the local definition from old block_cache.cpp is what's used for listeners.
 struct cache_notification : DoublyLinkedListLinkImpl<cache_notification> {
 	static inline void* operator new(size_t size);
 	static inline void operator delete(void* block);
@@ -131,34 +114,14 @@ struct cache_notification : DoublyLinkedListLinkImpl<cache_notification> {
 	int32			transaction_id;
 	int32			events_pending;
 	int32			events;
-	transaction_notification_hook hook;
+	transaction_notification_hook hook; // From fs_cache.h
 	void*			data;
 	bool			delete_after_event;
 };
 
-typedef DoublyLinkedList<cache_notification> NotificationList;
-
-struct cache_listener;
-typedef DoublyLinkedListLink<cache_listener> listener_link;
-
-struct cache_listener : cache_notification {
-	listener_link	link;
-};
-
-typedef DoublyLinkedList<cache_listener,
-	DoublyLinkedListMemberGetLink<cache_listener,
-		&cache_listener::link> > ListenerList;
-
-static object_cache* sCacheNotificationCache;
-
 void*
 cache_notification::operator new(size_t size)
 {
-	// We can't really know whether something is a cache_notification or a
-	// cache_listener at runtime, so we just use one object_cache for both
-	// with the size set to that of the (slightly larger) cache_listener.
-	// In practice, the vast majority of cache_notifications are really
-	// cache_listeners, so this is a more than acceptable trade-off.
 	ASSERT(size <= sizeof(cache_listener));
 	return object_cache_alloc(sCacheNotificationCache, 0);
 }
@@ -170,229 +133,99 @@ cache_notification::operator delete(void* block)
 }
 
 
-struct BlockHash {
-	typedef off_t			KeyType;
-	typedef	cached_block	ValueType;
-
-	size_t HashKey(KeyType key) const
-	{
-		return key;
-	}
-
-	size_t Hash(ValueType* block) const
-	{
-		return block->block_number;
-	}
-
-	bool Compare(KeyType key, ValueType* block) const
-	{
-		return block->block_number == key;
-	}
-
-	ValueType*& GetLink(ValueType* value) const
-	{
-		return value->next;
-	}
-};
-
-typedef BOpenHashTable<BlockHash> BlockTable;
-
-
-struct TransactionHash {
-	typedef int32				KeyType;
-	typedef	cache_transaction	ValueType;
-
-	size_t HashKey(KeyType key) const
-	{
-		return key;
-	}
-
-	size_t Hash(ValueType* transaction) const;
-	bool Compare(KeyType key, ValueType* transaction) const;
-	ValueType*& GetLink(ValueType* value) const;
-};
-
-typedef BOpenHashTable<TransactionHash> TransactionTable;
-
-
-struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
-	BlockTable*		hash;
-	mutex			lock;
-	const int		fd;
-	off_t			max_blocks;
-	const size_t	block_size;
-	int32			next_transaction_id;
-	cache_transaction* last_transaction;
-	TransactionTable* transaction_hash;
-
-	object_cache*	buffer_cache;
-	block_list		unused_blocks;
-	uint32			unused_block_count;
-
-	ConditionVariable busy_reading_condition;
-	uint32			busy_reading_count;
-	bool			busy_reading_waiters;
-
-	ConditionVariable busy_writing_condition;
-	uint32			busy_writing_count;
-	bool			busy_writing_waiters;
-
-	bigtime_t		last_block_write;
-	bigtime_t		last_block_write_duration;
-
-	uint32			num_dirty_blocks;
-	const bool		read_only;
-
-	NotificationList pending_notifications;
-	ConditionVariable condition_variable;
-
-					block_cache(int fd, off_t numBlocks, size_t blockSize,
-						bool readOnly);
-					~block_cache();
-
-	status_t		Init();
-
-	void			Free(void* buffer);
-	void*			Allocate();
-	void			FreeBlock(cached_block* block);
-	cached_block*	NewBlock(off_t blockNumber);
-	void			FreeBlockParentData(cached_block* block);
-
-	void			RemoveUnusedBlocks(int32 count, int32 minSecondsOld = 0);
-	void			RemoveBlock(cached_block* block);
-	void			DiscardBlock(cached_block* block);
-
-private:
-	static void		_LowMemoryHandler(void* data, uint32 resources,
-						int32 level);
-	cached_block*	_GetUnusedBlock();
-};
-
-struct cache_transaction {
-	cache_transaction();
-
-	cache_transaction* next;
-	int32			id;
-	int32			num_blocks;
-	int32			main_num_blocks;
-	int32			sub_num_blocks;
-	cached_block*	first_block;
-	block_list		blocks;
-	ListenerList	listeners;
-	bool			open;
-	bool			has_sub_transaction;
-	bigtime_t		last_used;
-	int32			busy_writing_count;
-};
-
-
+// BlockWriter might be simplified or adapted. It primarily writes data to disk.
+// It will now get data from unified_cache_entry.
 class BlockWriter {
 public:
-								BlockWriter(block_cache* cache,
+								BlockWriter(block_cache_instance_data* cacheInstance,
 									size_t max = SIZE_MAX);
 								~BlockWriter();
 
-			bool				Add(cached_block* block,
+			bool				Add(unified_cache_entry* entry,
 									cache_transaction* transaction = NULL);
-			bool				Add(cache_transaction* transaction,
-									bool& hasLeftOvers);
+			// bool				Add(cache_transaction* transaction,
+			// 						bool& hasLeftOvers); // This needs redesign for transactions
 
-			status_t			Write(cache_transaction* transaction = NULL,
-									bool canUnlock = true);
+			status_t			Write(/*cache_transaction* transaction = NULL,*/
+									bool canUnlock = true); // transaction might not be needed if BlockWriter just writes entries
 
-			bool				DeletedTransaction() const
-									{ return fDeletedTransaction; }
+			// bool				DeletedTransaction() const
+			// 						{ return fDeletedTransaction; } // If transactions are managed differently
 
-	static	status_t			WriteBlock(block_cache* cache,
-									cached_block* block);
-
-private:
-			void*				_Data(cached_block* block) const;
-			status_t			_WriteBlocks(cached_block** blocks, uint32 count);
-			void				_BlockDone(cached_block* block,
-									cache_transaction* transaction);
-			void				_UnmarkWriting(cached_block* block);
-
-	static	int					_CompareBlocks(const void* _blockA,
-									const void* _blockB);
+	// static	status_t			WriteBlock(block_cache_instance_data* cacheInstance,
+	// 								unified_cache_entry* entry); // Static helper
 
 private:
-	static	const size_t		kBufferSize = 64;
+			// void*				_Data(unified_cache_entry* entry) const; // Gets data from entry
+			status_t			_WriteBlocks(unified_cache_entry** entries, uint32 count, size_t blockSize, int fd);
+			// void				_BlockDone(unified_cache_entry* entry,
+			// 						cache_transaction* transaction);
+			// void				_UnmarkWriting(unified_cache_entry* entry);
 
-			block_cache*		fCache;
-			cached_block*		fBuffer[kBufferSize];
-			cached_block**		fBlocks;
+	static	int					_CompareBlocks(const void* _entryA,
+									const void* _entryB); // Compares based on entry->id (block_number)
+
+private:
+	static	const size_t		kBufferSize = 64; // Max entries to write in one go
+
+			block_cache_instance_data*		fCacheInstance;
+			unified_cache_entry*		fBuffer[kBufferSize];
+			unified_cache_entry**		fEntries; // Points to fBuffer or allocated array
 			size_t				fCount;
-			size_t				fTotal;
+			size_t				fTotal; // Total entries added for writing in this batch
 			size_t				fCapacity;
-			size_t				fMax;
+			size_t				fMax; // Max entries to write in this BlockWriter lifetime
 			status_t			fStatus;
-			bool				fDeletedTransaction;
+			// bool				fDeletedTransaction;
 };
 
 
+// BlockPrefetcher will also need to be adapted to use unified_cache
 #ifndef BUILDING_USERLAND_FS_SERVER
 class BlockPrefetcher {
 public:
-								BlockPrefetcher(block_cache* cache, off_t fBlockNumber,
-									size_t numBlocks);
+								BlockPrefetcher(block_cache_instance_data* cacheInstance,
+									off_t blockNumber, size_t numBlocks);
 								~BlockPrefetcher();
 
-			status_t			Allocate();
-			status_t			ReadAsync(MutexLocker& cacheLocker);
-
-			size_t				NumAllocated() { return fNumAllocated; }
+			status_t			AllocateAndFetch(); // Simplified
 
 private:
-	static	void			_IOFinishedCallback(void* cookie, io_request* request,
-									status_t status, bool partialTransfer,
-									generic_size_t bytesTransferred);
-			void			_IOFinished(status_t status, generic_size_t bytesTransferred);
-
-			void				_RemoveAllocated(size_t unbusyCount, size_t removeCount);
+	// static	void			_IOFinishedCallback(void* cookie, io_request* request,
+	// 								status_t status, bool partialTransfer,
+	// 								generic_size_t bytesTransferred);
+	//		void			_IOFinished(status_t status, generic_size_t bytesTransferred);
+	//		void				_RemoveAllocated(size_t unbusyCount, size_t removeCount);
 
 private:
-			block_cache* 		fCache;
-			off_t				fBlockNumber;
-			size_t				fNumRequested;
-			size_t				fNumAllocated;
-			cached_block** 		fBlocks;
-			generic_io_vec* 	fDestVecs;
+			block_cache_instance_data* 	fCacheInstance;
+			off_t				fStartBlockNumber;
+			size_t				fNumBlocksRequested;
+			// unified_cache_entry** 		fEntries; // Store entries if needed during async op
+			// generic_io_vec* 	fDestVecs;
 };
 #endif // !BUILDING_USERLAND_FS_SERVER
 
 
-class TransactionLocking {
+// TransactionLocking might not be needed if unified_cache handles its own locking.
+// Or it might be for the transaction_lock in block_cache_instance_data.
+// For now, let's assume it's for the instance's transaction_lock.
+class TransactionInstanceLocking {
 public:
-	inline bool Lock(block_cache* cache)
+	inline bool Lock(block_cache_instance_data* cacheInstance)
 	{
-		mutex_lock(&cache->lock);
-
-		while (cache->busy_writing_count != 0) {
-			// wait for all blocks to be written
-			ConditionVariableEntry entry;
-			cache->busy_writing_condition.Add(&entry);
-			cache->busy_writing_waiters = true;
-
-			mutex_unlock(&cache->lock);
-
-			entry.Wait();
-
-			mutex_lock(&cache->lock);
-		}
-
-		return true;
+		return mutex_lock(&cacheInstance->transaction_lock) == B_OK;
 	}
 
-	inline void Unlock(block_cache* cache)
+	inline void Unlock(block_cache_instance_data* cacheInstance)
 	{
-		mutex_unlock(&cache->lock);
+		mutex_unlock(&cacheInstance->transaction_lock);
 	}
 };
 
-typedef AutoLocker<block_cache, TransactionLocking> TransactionLocker;
+typedef AutoLocker<block_cache_instance_data, TransactionInstanceLocking> TransactionInstanceLocker;
 
-} // namespace
+} // unnamed namespace
 
 
 #if BLOCK_CACHE_BLOCK_TRACING && !defined(BUILDING_USERLAND_FS_SERVER)
@@ -797,23 +630,58 @@ private:
 #	define T(x) ;
 #endif
 
+// TODO: sCaches list might be re-introduced if block_cache_instance_data needs global tracking.
+// static DoublyLinkedList<block_cache_instance_data> sBlockCacheInstances;
+// static mutex sBlockCacheInstancesLock = MUTEX_INITIALIZER("block cache instances");
 
-static DoublyLinkedList<block_cache> sCaches;
-static mutex sCachesLock = MUTEX_INITIALIZER("block caches");
-static mutex sCachesMemoryUseLock
-	= MUTEX_INITIALIZER("block caches memory use");
-static size_t sUsedMemory;
-static sem_id sEventSemaphore;
-static mutex sNotificationsLock
-	= MUTEX_INITIALIZER("block cache notifications");
-static thread_id sNotifierWriterThread;
-static DoublyLinkedListLink<block_cache> sMarkCache;
-	// TODO: this only works if the link is the first entry of block_cache
-static object_cache* sBlockCache;
+static mutex sBlockCacheMemoryUseLock = MUTEX_INITIALIZER("block cache memory use");
+static size_t sCurrentBlockDataMemoryUsed = 0; // Approximate memory used by block data in unified cache
+
+// The event semaphore and notifier thread for transactions might still be needed.
+static sem_id sTransactionEventSemaphore;
+static mutex sTransactionNotificationsLock = MUTEX_INITIALIZER("block cache transaction notifications");
+static thread_id sTransactionNotifierWriterThread;
+// static DoublyLinkedListLink<block_cache_instance_data> sMarkInstance; // If iterating instances
 
 
-static void mark_block_busy_reading(block_cache* cache, cached_block* block);
-static void mark_block_unbusy_reading(block_cache* cache, cached_block* block);
+// These static functions operated on the old 'cached_block' and 'block_cache' structs.
+// They will either be removed or heavily adapted.
+// static void mark_block_busy_reading(block_cache* cache, cached_block* block);
+// static void mark_block_unbusy_reading(block_cache* cache, cached_block* block);
+
+// TODO: Placeholder for reading a block from disk into a provided buffer.
+// This will be used when unified_cache_get_entry results in a miss.
+static status_t
+_read_block_from_disk(block_cache_instance_data* instance, off_t blockNumber, void* buffer)
+{
+    TRACE("_read_block_from_disk: instance %p, block %lld, buffer %p\n", instance, blockNumber, buffer);
+    ssize_t bytesRead = read_pos(instance->fd, blockNumber * instance->block_size,
+        buffer, instance->block_size);
+
+    if (bytesRead < 0)
+        return errno;
+    if ((size_t)bytesRead != instance->block_size)
+        return B_IO_ERROR; // Partial read
+
+    return B_OK;
+}
+
+// TODO: Placeholder for writing a block from a buffer to disk.
+// This will be used for dirty blocks during sync or eviction.
+static status_t
+_write_block_to_disk(block_cache_instance_data* instance, off_t blockNumber, const void* buffer)
+{
+    TRACE("_write_block_to_disk: instance %p, block %lld, buffer %p\n", instance, blockNumber, buffer);
+    ssize_t bytesWritten = write_pos(instance->fd, blockNumber * instance->block_size,
+        buffer, instance->block_size);
+
+    if (bytesWritten < 0)
+        return errno;
+    if ((size_t)bytesWritten != instance->block_size)
+        return B_IO_ERROR; // Partial write
+
+    return B_OK;
+}
 
 
 //	#pragma mark - notifications/listener
@@ -3826,98 +3694,212 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 status_t
 block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
 {
-	block_cache* cache = (block_cache*)_cache;
-	MutexLocker locker(&cache->lock);
+	block_cache_instance_data* instance = (block_cache_instance_data*)_cache;
+	// TransactionLocker locker(instance); // Uses instance->transaction_lock
 
-	if (cache->read_only) {
+	if (instance->read_only) {
 		panic("tried to make block writable on a read-only cache!");
 		return B_ERROR;
 	}
 
-	// TODO: this can be done better!
-	void* block;
-	status_t status = get_writable_cached_block(cache, blockNumber,
-		transaction, false, &block);
-	if (status == B_OK) {
-		put_cached_block((block_cache*)_cache, blockNumber);
-		return B_OK;
+	unified_cache_entry* entry = unified_cache_get_entry(instance->master_cache,
+		blockNumber, BLOCK_DATA);
+
+	if (entry == NULL) {
+		// Block not in cache, try to read it first
+		void* dataBuffer = malloc(instance->block_size);
+		if (dataBuffer == NULL)
+			return B_NO_MEMORY;
+
+		status_t status = _read_block_from_disk(instance, blockNumber, dataBuffer);
+		if (status != B_OK) {
+			free(dataBuffer);
+			return status;
+		}
+		// Now put it into the cache (not dirty yet, just read)
+		status = unified_cache_put_entry(instance->master_cache, blockNumber, BLOCK_DATA,
+			dataBuffer, instance->block_size, false, &entry);
+		if (status != B_OK) {
+			free(dataBuffer); // unified_cache_put_entry failed, free buffer
+			return status;
+		}
+		// unified_cache_put_entry returns a referenced entry
 	}
 
+	// Mark as writable (and dirty by default)
+	status_t status = unified_cache_make_writable(instance->master_cache, entry, true);
+	// TODO: Transaction logic would go here.
+	// If in a transaction, original data might need to be saved if not already.
+	// The 'transaction' parameter is currently unused in this simplified version.
+
+	unified_cache_release_entry(instance->master_cache, entry);
+		// release the reference from get_entry/put_entry
 	return status;
 }
 
 
 status_t
 block_cache_get_writable_etc(void* _cache, off_t blockNumber,
-	int32 transaction, void** _block)
+	int32 transactionId, void** _block)
 {
-	block_cache* cache = (block_cache*)_cache;
-	MutexLocker locker(&cache->lock);
+	block_cache_instance_data* instance = (block_cache_instance_data*)_cache;
+	if (instance->read_only) {
+		TRACE_ALWAYS("block_cache_get_writable_etc: Attempt to get writable block on read-only cache instance %p\n", instance);
+		return B_PERMISSION_DENIED;
+	}
 
-	TRACE(("block_cache_get_writable_etc(block = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
-		blockNumber, transaction));
-	if (cache->read_only)
-		panic("tried to get writable block on a read-only cache!");
+	TRACE("block_cache_get_writable_etc: block %lld, transaction %d\n", blockNumber, transactionId);
 
-	return get_writable_cached_block(cache, blockNumber,
-		transaction, false, _block);
+	unified_cache_entry* entry = unified_cache_get_entry(instance->master_cache,
+		blockNumber, BLOCK_DATA);
+
+	if (entry == NULL) {
+		// Block not in cache, read it from disk
+		void* dataBuffer = malloc(instance->block_size);
+		if (dataBuffer == NULL) {
+			TRACE_ALWAYS("block_cache_get_writable_etc: No memory for dataBuffer for block %lld\n", blockNumber);
+			return B_NO_MEMORY;
+		}
+		status_t status = _read_block_from_disk(instance, blockNumber, dataBuffer);
+		if (status != B_OK) {
+			TRACE_ALWAYS("block_cache_get_writable_etc: Failed to read block %lld from disk: %s\n", blockNumber, strerror(status));
+			free(dataBuffer);
+			return status;
+		}
+		// Put into cache, not dirty yet. The subsequent make_writable will mark it.
+		status = unified_cache_put_entry(instance->master_cache, blockNumber, BLOCK_DATA,
+			dataBuffer, instance->block_size, false, &entry);
+		if (status != B_OK) {
+			TRACE_ALWAYS("block_cache_get_writable_etc: Failed to put block %lld into cache: %s\n", blockNumber, strerror(status));
+			free(dataBuffer); // unified_cache takes ownership on success
+			return status;
+		}
+		// entry is now referenced
+	}
+
+	// Mark the block as writable. This also handles the dirty flag.
+	status_t status = unified_cache_make_writable(instance->master_cache, entry, true);
+	if (status != B_OK) {
+		TRACE_ALWAYS("block_cache_get_writable_etc: Failed to make block %lld writable: %s\n", blockNumber, strerror(status));
+		unified_cache_release_entry(instance->master_cache, entry); // Release ref from get/put
+		return status;
+	}
+
+	// TODO: Transaction logic.
+	// The old code had complex handling for original_data, parent_data here.
+	// This needs to be reimplemented, possibly by storing transaction-specific copies
+	// outside the unified_cache_entry, or by extending unified_cache_entry.
+	// For now, we just return the current data pointer.
+
+	*_block = entry->data;
+	// The entry remains referenced. Caller must call block_cache_put().
+	return B_OK;
 }
 
 
 void*
-block_cache_get_writable(void* _cache, off_t blockNumber, int32 transaction)
+block_cache_get_writable(void* _cache, off_t blockNumber, int32 transactionId)
 {
-	void* block;
-	if (block_cache_get_writable_etc(_cache, blockNumber,
-			transaction, &block) == B_OK)
-		return block;
+	void* blockData;
+	status_t status = block_cache_get_writable_etc(_cache, blockNumber, transactionId, &blockData);
+	if (status == B_OK)
+		return blockData;
 
+	TRACE_ALWAYS("block_cache_get_writable: Failed for block %lld, transaction %d: %s\n", blockNumber, transactionId, strerror(status));
 	return NULL;
 }
 
 
 void*
-block_cache_get_empty(void* _cache, off_t blockNumber, int32 transaction)
+block_cache_get_empty(void* _cache, off_t blockNumber, int32 transactionId)
 {
-	block_cache* cache = (block_cache*)_cache;
-	MutexLocker locker(&cache->lock);
+	block_cache_instance_data* instance = (block_cache_instance_data*)_cache;
+	if (instance->read_only) {
+		TRACE_ALWAYS("block_cache_get_empty: Attempt on read-only cache instance %p\n", instance);
+		return NULL;
+	}
 
-	TRACE(("block_cache_get_empty(block = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
-		blockNumber, transaction));
-	if (cache->read_only)
-		panic("tried to get empty writable block on a read-only cache!");
+	TRACE("block_cache_get_empty: block %lld, transaction %d\n", blockNumber, transactionId);
 
-	void* block;
-	if (get_writable_cached_block((block_cache*)_cache, blockNumber,
-			transaction, true, &block) == B_OK)
-		return block;
+	unified_cache_entry* entry = unified_cache_get_entry(instance->master_cache,
+		blockNumber, BLOCK_DATA);
+	status_t status;
 
-	return NULL;
+	if (entry == NULL) {
+		// Block not in cache, create a new zeroed buffer for it
+		void* dataBuffer = malloc(instance->block_size);
+		if (dataBuffer == NULL) {
+			TRACE_ALWAYS("block_cache_get_empty: No memory for dataBuffer for block %lld\n", blockNumber);
+			return NULL;
+		}
+		memset(dataBuffer, 0, instance->block_size);
+
+		// Put into cache, mark as dirty since it's new and "empty" (zeroed) content.
+		status = unified_cache_put_entry(instance->master_cache, blockNumber, BLOCK_DATA,
+			dataBuffer, instance->block_size, true, &entry);
+		if (status != B_OK) {
+			TRACE_ALWAYS("block_cache_get_empty: Failed to put new empty block %lld into cache: %s\n", blockNumber, strerror(status));
+			free(dataBuffer);
+			return NULL;
+		}
+		// entry is now referenced
+	} else {
+		// Entry exists, mark it writable and zero its contents.
+		status = unified_cache_make_writable(instance->master_cache, entry, true);
+		if (status != B_OK) {
+			TRACE_ALWAYS("block_cache_get_empty: Failed to make block %lld writable: %s\n", blockNumber, strerror(status));
+			unified_cache_release_entry(instance->master_cache, entry); // Release ref from get
+			return NULL;
+		}
+		// Zero the existing buffer
+		memset(entry->data, 0, instance->block_size);
+	}
+
+	// TODO: Transaction logic (as in get_writable_etc)
+
+	// Caller must call block_cache_put().
+	return entry->data;
 }
 
 
 status_t
 block_cache_get_etc(void* _cache, off_t blockNumber, const void** _block)
 {
-	block_cache* cache = (block_cache*)_cache;
-	MutexLocker locker(&cache->lock);
-	bool allocated;
+	block_cache_instance_data* instance = (block_cache_instance_data*)_cache;
+	TRACE("block_cache_get_etc: block %lld\n", blockNumber);
 
-	cached_block* block;
-	status_t status = get_cached_block(cache, blockNumber, &allocated, true,
-		&block);
-	if (status != B_OK)
-		return status;
+	unified_cache_entry* entry = unified_cache_get_entry(instance->master_cache,
+		blockNumber, BLOCK_DATA);
 
-#if BLOCK_CACHE_DEBUG_CHANGED
-	if (block->compare == NULL)
-		block->compare = cache->Allocate();
-	if (block->compare != NULL)
-		memcpy(block->compare, block->current_data, cache->block_size);
-#endif
-	TB(Get(cache, block));
+	if (entry == NULL) {
+		// Block not in cache, read from disk
+		TRACE("block_cache_get_etc: Miss for block %lld. Reading from disk.\n", blockNumber);
+		void* dataBuffer = malloc(instance->block_size);
+		if (dataBuffer == NULL) {
+			TRACE_ALWAYS("block_cache_get_etc: No memory for dataBuffer for block %lld\n", blockNumber);
+			return B_NO_MEMORY;
+		}
 
-	*_block = block->current_data;
+		status_t status = _read_block_from_disk(instance, blockNumber, dataBuffer);
+		if (status != B_OK) {
+			TRACE_ALWAYS("block_cache_get_etc: Failed to read block %lld from disk: %s\n", blockNumber, strerror(status));
+			free(dataBuffer);
+			return status;
+		}
+
+		// Put into cache (not dirty)
+		status = unified_cache_put_entry(instance->master_cache, blockNumber, BLOCK_DATA,
+			dataBuffer, instance->block_size, false, &entry);
+		if (status != B_OK) {
+			TRACE_ALWAYS("block_cache_get_etc: Failed to put block %lld into cache: %s\n", blockNumber, strerror(status));
+			free(dataBuffer); // unified_cache takes ownership on success
+			return status;
+		}
+		// entry is now referenced
+	}
+
+	*_block = entry->data;
+	// The entry remains referenced. Caller must call block_cache_put().
 	return B_OK;
 }
 
@@ -3925,10 +3907,12 @@ block_cache_get_etc(void* _cache, off_t blockNumber, const void** _block)
 const void*
 block_cache_get(void* _cache, off_t blockNumber)
 {
-	const void* block;
-	if (block_cache_get_etc(_cache, blockNumber, &block) == B_OK)
-		return block;
+	const void* blockData;
+	status_t status = block_cache_get_etc(_cache, blockNumber, &blockData);
+	if (status == B_OK)
+		return blockData;
 
+	TRACE_ALWAYS("block_cache_get: Failed for block %lld: %s\n", blockNumber, strerror(status));
 	return NULL;
 }
 
@@ -3941,35 +3925,75 @@ block_cache_get(void* _cache, off_t blockNumber)
 	writable!
 */
 status_t
-block_cache_set_dirty(void* _cache, off_t blockNumber, bool dirty,
-	int32 transaction)
+block_cache_set_dirty(void* _cache, off_t blockNumber, bool isDirty,
+	int32 transactionId)
 {
-	block_cache* cache = (block_cache*)_cache;
-	MutexLocker locker(&cache->lock);
+	block_cache_instance_data* instance = (block_cache_instance_data*)_cache;
+	TRACE("block_cache_set_dirty: block %lld, dirty %d, transaction %d\n", blockNumber, isDirty, transactionId);
 
-	cached_block* block = cache->hash->Lookup(blockNumber);
-	if (block == NULL)
-		return B_BAD_VALUE;
-	if (block->is_dirty == dirty) {
-		// there is nothing to do for us
-		return B_OK;
+	// We need a reference to the entry to modify it.
+	// Since this function doesn't return the block, we get and release here.
+	unified_cache_entry* entry = unified_cache_get_entry(instance->master_cache,
+		blockNumber, BLOCK_DATA);
+
+	if (entry == NULL) {
+		// This is problematic. If the block isn't in cache, what does setting dirty mean?
+		// The old cache would likely have it already if it was made writable.
+		// For now, assume it must be in cache (e.g., after a get_writable).
+		TRACE_ALWAYS("block_cache_set_dirty: Block %lld not found in cache.\n", blockNumber);
+		return B_ENTRY_NOT_FOUND;
 	}
 
-	// TODO: not yet implemented
-	if (dirty)
-		panic("block_cache_set_dirty(): not yet implemented that way!\n");
+	// TODO: Transaction logic. If part of a transaction, this interacts with it.
 
-	return B_OK;
+	status_t status = unified_cache_make_writable(instance->master_cache, entry, isDirty);
+	unified_cache_release_entry(instance->master_cache, entry);
+
+	if (status != B_OK) {
+		TRACE_ALWAYS("block_cache_set_dirty: Failed to set dirty status for block %lld: %s\n", blockNumber, strerror(status));
+	}
+	return status;
 }
 
 
 void
 block_cache_put(void* _cache, off_t blockNumber)
 {
-	block_cache* cache = (block_cache*)_cache;
-	MutexLocker locker(&cache->lock);
+	block_cache_instance_data* instance = (block_cache_instance_data*)_cache;
+	TRACE("block_cache_put: block %lld\n", blockNumber);
 
-	put_cached_block(cache, blockNumber);
+	// This function releases a reference to a block previously obtained via get.
+	// The unified_cache_entry pointer itself is not passed here, only the blockNumber.
+	// This requires looking up the entry again just to release it, which is inefficient.
+	// A better API would pass the entry pointer.
+	// For now, we have to do this:
+	// NOTE: This is a temporary, potentially problematic implementation.
+	// The caller of block_cache_put expects to release one reference.
+	// If the block is not in cache (e.g. get failed, but put is still called),
+	// get_entry here will return NULL.
+	// A robust solution would involve the get functions returning an opaque cookie
+	// or the unified_cache_entry* itself, which is then passed to put.
+	// For now, assume the block *should* be in cache if put is called.
+
+	MutexLocker locker(instance->master_cache->lock); // Need to lock for direct lookup and ref_count change
+	unified_cache_entry* entry = instance->master_cache->LookupEntry(blockNumber);
+	if (entry != NULL && entry->data_type == BLOCK_DATA) {
+		// Manually decrease ref count. This is simplified.
+		// Proper release should go through unified_cache_release_entry.
+		// This is a placeholder for a more robust ref_counting release mechanism.
+		// For now, directly calling unified_cache_release_entry without getting a new ref.
+		// This assumes the caller of block_cache_put() is releasing a ref they hold.
+		// The entry *must* have been previously acquired.
+		// unified_cache_release_entry already handles the locking.
+		locker.Unlock(); // unified_cache_release_entry will relock
+		unified_cache_release_entry(instance->master_cache, entry);
+
+	} else {
+		// This case should ideally not happen if get/put are paired correctly.
+		// Or it means the block was evicted between get and put, which is also a problem
+		// if the caller still holds a pointer to the data.
+		TRACE_ALWAYS("block_cache_put: Block %lld not found or type mismatch during put. This might indicate an issue.\n", blockNumber);
+	}
 }
 
 
@@ -3981,36 +4005,76 @@ block_cache_put(void* _cache, off_t blockNumber)
 	block that is already cached.
 */
 status_t
-block_cache_prefetch(void* _cache, off_t blockNumber, size_t* _numBlocks)
+block_cache_prefetch(void* _cache, off_t startBlockNumber, size_t* _numBlocks)
 {
 #ifndef BUILDING_USERLAND_FS_SERVER
-	TRACE(("block_cache_prefetch: fetching %" B_PRIuSIZE " blocks starting with %" B_PRIdOFF "\n",
-		*_numBlocks, blockNumber));
+	block_cache_instance_data* instance = (block_cache_instance_data*)_cache;
+	size_t requestedBlocks = *_numBlocks;
+	size_t actualBlocks = 0;
 
-	block_cache* cache = reinterpret_cast<block_cache*>(_cache);
-	MutexLocker locker(&cache->lock);
+	TRACE("block_cache_prefetch: instance %p, start %lld, count %lu\n", instance, startBlockNumber, requestedBlocks);
 
-	size_t numBlocks = *_numBlocks;
-	*_numBlocks = 0;
-
-	BlockPrefetcher* blockPrefetcher = new BlockPrefetcher(cache, blockNumber, numBlocks);
-
-	status_t status = blockPrefetcher->Allocate();
-	if (status != B_OK || blockPrefetcher->NumAllocated() == 0) {
-		TRACE(("block_cache_prefetch returning early (%s): allocated %" B_PRIuSIZE "\n",
-			strerror(status), blockPrefetcher->NumAllocated()));
-		delete blockPrefetcher;
-		return status;
+	if (requestedBlocks == 0) {
+		*_numBlocks = 0;
+		return B_OK;
 	}
 
-	numBlocks = blockPrefetcher->NumAllocated();
+	// The BlockPrefetcher class needs significant rework.
+	// For now, a simplified synchronous prefetch loop.
+	// A true prefetcher would be asynchronous.
+	for (size_t i = 0; i < requestedBlocks; ++i) {
+		off_t currentBlockNumber = startBlockNumber + i;
+		if (currentBlockNumber >= instance->num_blocks)
+			break; // Past end of device
 
-	status = blockPrefetcher->ReadAsync(locker);
+		// Check if already in cache; if so, prefetching this one is redundant
+		// but SIEVE might benefit from the access.
+		// For true prefetch, we'd only load if not present.
+		unified_cache_entry* entry = unified_cache_get_entry(instance->master_cache,
+			currentBlockNumber, BLOCK_DATA);
 
-	if (status == B_OK)
-		*_numBlocks = numBlocks;
+		if (entry != NULL) {
+			// Already cached. Release our reference.
+			unified_cache_release_entry(instance->master_cache, entry);
+			// Some prefetch strategies might stop if a block is found.
+			// For simplicity, we'll continue for now, but this could be changed.
+			// actualBlocks++;
+			// continue;
+            // Let's follow the original comment: "stop short if the requested range includes a block that is already cached."
+            TRACE("block_cache_prefetch: Block %lld already in cache. Stopping prefetch at this point.\n", currentBlockNumber);
+            break;
+		}
 
-	return status;
+		// Not in cache, load it
+		void* dataBuffer = malloc(instance->block_size);
+		if (dataBuffer == NULL) {
+			// Ran out of memory during prefetch
+			TRACE_ALWAYS("block_cache_prefetch: Out of memory for block %lld\n", currentBlockNumber);
+			break;
+		}
+
+		status_t readStatus = _read_block_from_disk(instance, currentBlockNumber, dataBuffer);
+		if (readStatus != B_OK) {
+			TRACE_ALWAYS("block_cache_prefetch: Failed to read block %lld: %s\n", currentBlockNumber, strerror(readStatus));
+			free(dataBuffer);
+			break; // Stop prefetching on I/O error
+		}
+
+		// Put into cache (not dirty, no specific entry pointer needed back)
+		status_t putStatus = unified_cache_put_entry(instance->master_cache, currentBlockNumber,
+			BLOCK_DATA, dataBuffer, instance->block_size, false, NULL);
+		if (putStatus != B_OK) {
+			TRACE_ALWAYS("block_cache_prefetch: Failed to put prefetched block %lld into cache: %s\n", currentBlockNumber, strerror(putStatus));
+			free(dataBuffer); // Unified cache did not take ownership
+			break; // Stop if cache insertion fails
+		}
+		// unified_cache_put_entry takes ownership of dataBuffer on success
+		actualBlocks++;
+	}
+
+	*_numBlocks = actualBlocks;
+	return B_OK;
+
 #else // BUILDING_USERLAND_FS_SERVER
 	*_numBlocks = 0;
 	return B_UNSUPPORTED;

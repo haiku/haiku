@@ -149,13 +149,16 @@ public:
 	bool					busy_writing : 1;
 	bool					accessed : 1;
 	bool					modified : 1;
-	uint8					_unused : 1; //SIEVE: make this 2 bits if space needed, one for visited
+	// uint8					_unused : 1; // This bit will be used by sieve_visited_count
 
-	// SIEVE cache related fields
-	bool					sieve_visited : 1;  /** True if page has been accessed (visited)
-										 * since the SIEVE hand last passed over or demoted it.
-										 * Reset by the SIEVE eviction algorithm.
+	// SIEVE-2 cache related fields
+	uint8					sieve_visited_count : 2; /** SIEVE-2 visited counter.
+										 * 0: Candidate for eviction.
+										 * 1: Visited once (one chance).
+										 * 2: Visited multiple times (hot).
+										 * (Using 2 bits allows for values 0-3)
 										 */
+	// bool					sieve_visited : 1;  // Replaced by sieve_visited_count
 	struct vm_page*			sieve_next;         /** Next page in the VMCache's internal SIEVE FIFO list
 										 * (points towards newer pages / list head).
 										 */
@@ -164,6 +167,7 @@ public:
 										 */
 
 	uint8					usage_count;
+	uint8					_unused_bits : 5; // Remaining unused bits from the original _unused and sieve_visited
 
 	inline void Init(page_num_t pageNumber);
 
@@ -221,11 +225,12 @@ vm_page::Init(page_num_t pageNumber)
 	InitState(PAGE_STATE_FREE);
 	busy = busy_writing = false;
 	accessed = modified = false;
-	_unused = 0;
-	sieve_visited = false;
+	// _unused = 0; // covered by _unused_bits
+	sieve_visited_count = 0; // Initialize SIEVE-2 counter
 	sieve_next = NULL;
 	sieve_prev = NULL;
 	usage_count = 0;
+	_unused_bits = 0;
 
 	fWiredCount = 0;
 
