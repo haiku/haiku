@@ -15,7 +15,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			continue ;
 		}
 
-		SubDirC++Flags -std=gnu++17 ;
+		if $(architecture) = sparc {
+			SubDirC++Flags -std=gnu++14 ;
+		} else {
+			SubDirC++Flags -std=gnu++17 ;
+		}
 
 		StaticLibrary <$(architecture)>libnetservices2.a :
 			ErrorsExt.cpp
