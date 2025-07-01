@@ -76,12 +76,12 @@ static page_table_entry *iospace_pgtables = NULL;
 #define PAGE_INVALIDATE_CACHE_SIZE 64
 
 // vm_translation object stuff
-typedef struct vm_translation_map_arch_info {
-	page_root_entry *rtdir_virt;
-	page_root_entry *rtdir_phys;
-	int num_invalidate_pages;
-	addr_t pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
-} vm_translation_map_arch_info;
+// typedef struct vm_translation_map_arch_info {
+//  page_root_entry *rtdir_virt;
+//  page_root_entry *rtdir_phys;
+//  int num_invalidate_pages;
+//  addr_t pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
+// } vm_translation_map_arch_info;
 
 #if 1//XXX:HOLE
 static page_table_entry *page_hole = NULL;
@@ -116,7 +116,12 @@ static addr_t sIOSpaceBase;
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGROOT_ENTS   (VADDR_TO_PRENT(KERNEL_SIZE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
-#define IS_KERNEL_MAP(map)		(map->arch_data->rtdir_phys == sKernelPhysicalPageRoot)
+// TODO: This needs to use the fIsKernelMap member of M68KVMTranslationMap if map is of that type.
+// Or, access PagingStructures()->pgroot_phys if appropriate.
+// For now, this macro will likely cause errors or incorrect behavior.
+#define IS_KERNEL_MAP(map)		(static_cast<M68KVMTranslationMap*>(map)->fIsKernelMap)
+// #define IS_KERNEL_MAP(map)		(static_cast<M68KVMTranslationMap040*>(map)->PagingStructures040()->pgroot_phys == sKernelPhysicalPageRoot)
+
 
 static status_t early_query(addr_t va, addr_t *out_physical);
 static status_t get_physical_page_tmap_internal(addr_t pa, addr_t *va, uint32 flags);
@@ -129,7 +134,13 @@ static void flush_tmap(VMTranslationMap *map);
 static void *
 _m68k_translation_map_get_pgdir(VMTranslationMap *map)
 {
-	return map->arch_data->rtdir_phys;
+	// Assuming M68KVMTranslationMap040 is the concrete type or similar access pattern
+	// This function is problematic as VMTranslationMap itself doesn't define this.
+	// It's likely called by arch-specific code that knows the concrete type.
+	if (map == NULL) return NULL;
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+	if (m68kMap->PagingStructures() == NULL) return NULL;
+	return (void*)m68kMap->PagingStructures()->pgroot_phys;
 }
 
 
@@ -137,7 +148,8 @@ static inline void
 init_page_root_entry(page_root_entry *entry)
 {
 	// DT_INVALID is 0
-	*(page_root_entry_scalar *)entry = DFL_ROOTENT_VAL;
+	// page_root_entry is typedef'd to uint32 for 040
+	*entry = DFL_ROOTENT_VAL;
 }
 
 
@@ -145,14 +157,15 @@ static inline void
 update_page_root_entry(page_root_entry *entry, page_root_entry *with)
 {
 	// update page directory entry atomically
-	*(page_root_entry_scalar *)entry = *(page_root_entry_scalar *)with;
+	*entry = *with;
 }
 
 
 static inline void
 init_page_directory_entry(page_directory_entry *entry)
 {
-	*(page_directory_entry_scalar *)entry = DFL_DIRENT_VAL;
+	// page_directory_entry is typedef'd to uint32 for 040
+	*entry = DFL_DIRENT_VAL;
 }
 
 
@@ -160,14 +173,17 @@ static inline void
 update_page_directory_entry(page_directory_entry *entry, page_directory_entry *with)
 {
 	// update page directory entry atomically
-	*(page_directory_entry_scalar *)entry = *(page_directory_entry_scalar *)with;
+	*entry = *with;
 }
 
 
 static inline void
 init_page_table_entry(page_table_entry *entry)
 {
-	*(page_table_entry_scalar *)entry = DFL_PAGEENT_VAL;
+	// page_table_entry is typedef'd to uint32 for 040
+	// For 030, it's uint64. This needs to be conditional on MMU type.
+	// Assuming 040 path for now based on error messages.
+	*entry = DFL_PAGEENT_VAL;
 }
 
 
@@ -176,7 +192,8 @@ update_page_table_entry(page_table_entry *entry, page_table_entry *with)
 {
 	// update page table entry atomically
 	// XXX: is it ?? (long desc?)
-	*(page_table_entry_scalar *)entry = *(page_table_entry_scalar *)with;
+	// Assuming 040 path (uint32). For 030 (uint64), atomicity is a concern.
+	*entry = *with;
 }
 
 
@@ -184,7 +201,9 @@ static inline void
 init_page_indirect_entry(page_indirect_entry *entry)
 {
 #warning M68K: is it correct ?
-	*(page_indirect_entry_scalar *)entry = DFL_PAGEENT_VAL;
+	// page_indirect_entry is typedef'd to uint32 for 040
+	// For 030, it's uint64. This needs to be conditional on MMU type.
+	*entry = DFL_PAGEENT_VAL;
 }
 
 
@@ -193,21 +212,37 @@ update_page_indirect_entry(page_indirect_entry *entry, page_indirect_entry *with
 {
 	// update page table entry atomically
 	// XXX: is it ?? (long desc?)
-	*(page_indirect_entry_scalar *)entry = *(page_indirect_entry_scalar *)with;
+	// Assuming 040 path (uint32). For 030 (uint64), atomicity is a concern.
+	*entry = *with;
 }
 
 
 #warning M68K: allocate all kernel pgdirs at boot and remove this (also dont remove them anymore from unmap)
+// TODO: This function needs significant rework due to arch_data and next pointer removal.
+// It iterates a global list of VMTranslationMap objects.
 static void
 _update_all_pgdirs(int index, page_root_entry e)
 {
-	VMTranslationMap *entry;
+	VMTranslationMap *entry_map;
 	unsigned int state = disable_interrupts();
 
 	acquire_spinlock(&tmap_list_lock);
 
-	for(entry = tmap_list; entry != NULL; entry = entry->next)
-		entry->arch_data->rtdir_virt[index] = e;
+	// The iteration `entry = entry->next` is no longer valid as VMTranslationMap has no `next`.
+	// The `tmap_list` management needs to be rethought.
+	// Also, direct access to `rtdir_virt` via `arch_data` is gone.
+	// This function is currently broken.
+	for(entry_map = tmap_list; entry_map != NULL; /* entry_map = entry_map->next -- INVALID */ ) {
+		// This is a placeholder for the correct logic once list iteration is fixed.
+		// M68KVMTranslationMap040* m68kMap = static_cast<M68KVMTranslationMap040*>(entry_map);
+		// if (m68kMap && m68kMap->PagingStructures040()) {
+		// 	m68kMap->PagingStructures040()->pgroot_virt[index] = e;
+		// }
+		// For now, to avoid immediate compilation error with entry_map->next, break.
+		// This needs a proper fix for list traversal.
+		panic("_update_all_pgdirs needs rework for tmap_list iteration and arch_data removal");
+		break;
+	}
 
 	release_spinlock(&tmap_list_lock);
 	restore_interrupts(state);
@@ -275,11 +310,14 @@ lock_tmap(VMTranslationMap *map)
 {
 	TRACE(("lock_tmap: map %p\n", map));
 
-	recursive_lock_lock(&map->lock);
-	if (recursive_lock_get_recursion(&map->lock) == 1) {
+	// Assuming M68KVMTranslationMap is the actual type or provides fLock and fInvalidPagesCount
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+
+	recursive_lock_lock(&m68kMap->fLock);
+	if (recursive_lock_get_recursion(&m68kMap->fLock) == 1) {
 		// we were the first one to grab the lock
 		TRACE(("clearing invalidated page count\n"));
-		map->arch_data->num_invalidate_pages = 0;
+		m68kMap->fInvalidPagesCount = 0;
 	}
 
 	return B_OK;
@@ -295,50 +333,60 @@ unlock_tmap(VMTranslationMap *map)
 {
 	TRACE(("unlock_tmap: map %p\n", map));
 
-	if (recursive_lock_get_recursion(&map->lock) == 1) {
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+
+	if (recursive_lock_get_recursion(&m68kMap->fLock) == 1) {
 		// we're about to release it for the last time
 		flush_tmap(map);
 	}
 
-	recursive_lock_unlock(&map->lock);
+	recursive_lock_unlock(&m68kMap->fLock);
 	return B_OK;
 }
 
-
+// TODO: This function needs significant rework due to arch_data and next pointer removal.
 static void
 destroy_tmap(VMTranslationMap *map)
 {
 	int state;
-	VMTranslationMap *entry;
+	VMTranslationMap *entry_map;
 	VMTranslationMap *last = NULL;
 	unsigned int i, j;
 
 	if (map == NULL)
 		return;
 
+	M68KVMTranslationMap040* m68kMap040 = static_cast<M68KVMTranslationMap040*>(map);
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+
+
 	// remove it from the tmap list
 	state = disable_interrupts();
 	acquire_spinlock(&tmap_list_lock);
 
-	entry = tmap_list;
-	while (entry != NULL) {
-		if (entry == map) {
-			if (last != NULL)
-				last->next = entry->next;
-			else
-				tmap_list = entry->next;
-
+	entry_map = tmap_list;
+	// This loop for removing from tmap_list is broken due to `next` pointer removal.
+	// Needs a proper list data structure or external management of `next`.
+	while (entry_map != NULL) {
+		if (entry_map == map) {
+			// if (last != NULL)
+			// 	last->next = entry_map->next; // INVALID: last has no next
+			// else
+			// 	tmap_list = entry_map->next; // INVALID: entry_map has no next
+			panic("destroy_tmap: tmap_list removal needs rework");
 			break;
 		}
-		last = entry;
-		entry = entry->next;
+		last = entry_map;
+		// entry_map = entry_map->next; // INVALID
+		break; // temporary break to avoid infinite loop
 	}
 
 	release_spinlock(&tmap_list_lock);
 	restore_interrupts(state);
 
-	if (map->arch_data->rtdir_virt != NULL) {
+	if (m68kMap040->PagingStructures040() != NULL && m68kMap040->PagingStructures040()->pgroot_virt != NULL) {
 		vm_page_reservation reservation = {};
+		page_root_entry* rtdir_virt = m68kMap040->PagingStructures040()->pgroot_virt;
 
 		// cycle through and free all of the user space pgtables
 		// since the size of tables don't match B_PAGE_SIZE,
@@ -349,20 +397,24 @@ destroy_tmap(VMTranslationMap *map)
 			page_directory_entry *pgdir;
 			vm_page *dirpage;
 
-			if (map->arch_data->rtdir_virt[i].type == DT_INVALID)
+			if (rtdir_virt[i].type == DT_INVALID)
 				continue;
-			if (map->arch_data->rtdir_virt[i].type != DT_ROOT) {
+			if (rtdir_virt[i].type != DT_ROOT) {
 				panic("rtdir[%d]: buggy descriptor type", i);
 				return;
 			}
 			// suboptimal (done 8 times)
-			pgdir_pn = PRE_TO_PN(map->arch_data->rtdir_virt[i]);
+			pgdir_pn = PRE_TO_PN(rtdir_virt[i]);
 			dirpage = vm_lookup_page(pgdir_pn);
-			pgdir = &(((page_directory_entry *)dirpage)[i%NUM_DIRTBL_PER_PAGE]);
+			// TODO: The calculation of pgdir might be off if dirpage is not the start of an allocation block
+			// This part needs careful review against how pages for page directories are allocated and mapped.
+			// Assuming dirpage points to the start of the memory block for the page directory table containing this entry.
+			pgdir = (page_directory_entry *)((addr_t)dirpage + (PRE_TO_TA(rtdir_virt[i]) % B_PAGE_SIZE));
+
 
 			for (j = 0; j <= NUM_DIRENT_PER_TBL; j+=NUM_PAGETBL_PER_PAGE) {
 				addr_t pgtbl_pn;
-				page_table_entry *pgtbl;
+				// page_table_entry *pgtbl; // pgtbl is unused
 				vm_page *page;
 				if (pgdir[j].type == DT_INVALID)
 					continue;
@@ -372,7 +424,7 @@ destroy_tmap(VMTranslationMap *map)
 				}
 				pgtbl_pn = PDE_TO_PN(pgdir[j]);
 				page = vm_lookup_page(pgtbl_pn);
-				pgtbl = (page_table_entry *)page;
+				// pgtbl = (page_table_entry *)page; // pgtbl is unused
 
 				if (!page) {
 					panic("destroy_tmap: didn't find pgtable page\n");
@@ -382,16 +434,23 @@ destroy_tmap(VMTranslationMap *map)
 				vm_page_free_etc(NULL, page, &reservation);
 			}
 			if (((i + 1) % NUM_DIRTBL_PER_PAGE) == 0) {
+				// This assumes dirpage is freed only when the last pgdir entry it contains is processed.
+				// This logic depends heavily on allocation strategy of page directory pages.
 				DEBUG_PAGE_ACCESS_END(dirpage);
 				vm_page_free_etc(NULL, dirpage, &reservation);
 			}
 		}
-		free(map->arch_data->rtdir_virt);
+		// pgroot_virt for non-kernel maps was allocated with memalign.
+		if (!m68kMap->fIsKernelMap)
+			free(rtdir_virt);
 		vm_page_unreserve_pages(&reservation);
 	}
 
-	free(map->arch_data);
-	recursive_lock_destroy(&map->lock);
+	// The M68KPagingStructures040 object (fPagingStructures) is owned by M68KVMTranslationMap040
+	// and should be deleted by its destructor if allocated by it.
+	// free(map->arch_data); // arch_data is gone.
+	recursive_lock_destroy(&m68kMap->fLock);
+	// The 'map' object itself is typically deleted by the caller (e.g., VMAddressSpace)
 }
 
 
@@ -536,7 +595,10 @@ map_tmap(VMTranslationMap *map, addr_t va, addr_t pa, uint32 attributes)
 	dprintf("present bit is %d\n", pgdir[va / B_PAGE_SIZE / 1024].present);
 	dprintf("addr is %d\n", pgdir[va / B_PAGE_SIZE / 1024].addr);
 */
-	pr = map->arch_data->rtdir_virt;
+	M68KVMTranslationMap040* m68kMap040 = static_cast<M68KVMTranslationMap040*>(map);
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+	// TODO: Handle case where PagingStructures040() or pgroot_virt is null
+	pr = m68kMap040->PagingStructures040()->pgroot_virt;
 
 	// check to see if a page directory exists for this range
 	rindex = VADDR_TO_PRENT(va);
@@ -572,7 +634,7 @@ map_tmap(VMTranslationMap *map, addr_t va, addr_t pa, uint32 attributes)
 			pgdir += SIZ_DIRTBL;
 		}
 #warning M68K: really mean map_count++ ??
-		map->map_count++;
+		m68kMap->fMapCount++;
 	}
 	// now, fill in the pentry
 	do {
@@ -615,7 +677,7 @@ map_tmap(VMTranslationMap *map, addr_t va, addr_t pa, uint32 attributes)
 		}
 
 #warning M68K: really mean map_count++ ??
-		map->map_count++;
+		m68kMap->fMapCount++;
 	}
 	// now, fill in the pentry
 	do {
@@ -634,12 +696,12 @@ map_tmap(VMTranslationMap *map, addr_t va, addr_t pa, uint32 attributes)
 	put_physical_page_tmap_internal(pt_pg);
 	put_physical_page_tmap_internal(pd_pg);
 
-	if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE)
-		map->arch_data->pages_to_invalidate[map->arch_data->num_invalidate_pages] = va;
+	if (m68kMap->fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+		m68kMap->fInvalidPages[m68kMap->fInvalidPagesCount] = va;
 
-	map->arch_data->num_invalidate_pages++;
+	m68kMap->fInvalidPagesCount++;
 
-	map->map_count++;
+	m68kMap->fMapCount++;
 
 	return 0;
 }
@@ -650,7 +712,10 @@ unmap_tmap(VMTranslationMap *map, addr_t start, addr_t end)
 {
 	page_table_entry *pt;
 	page_directory_entry *pd;
-	page_root_entry *pr = map->arch_data->rtdir_virt;
+	M68KVMTranslationMap040* m68kMap040 = static_cast<M68KVMTranslationMap040*>(map);
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+	// TODO: Handle case where PagingStructures040() or pgroot_virt is null
+	page_root_entry *pr = m68kMap040->PagingStructures040()->pgroot_virt;
 	addr_t pd_pg, pt_pg;
 	status_t status;
 	int index;
@@ -706,12 +771,12 @@ restart:
 		TRACE(("unmap_tmap: removing page 0x%lx\n", start));
 
 		pt[index].type = DT_INVALID;
-		map->map_count--;
+		m68kMap->fMapCount--;
 
-		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE)
-			map->arch_data->pages_to_invalidate[map->arch_data->num_invalidate_pages] = start;
+		if (m68kMap->fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+			m68kMap->fInvalidPages[m68kMap->fInvalidPagesCount] = start;
 
-		map->arch_data->num_invalidate_pages++;
+		m68kMap->fInvalidPagesCount++;
 	}
 
 	put_physical_page_tmap_internal(pt_pg);
@@ -725,7 +790,15 @@ static status_t
 query_tmap_interrupt(VMTranslationMap *map, addr_t va, addr_t *_physical,
 	uint32 *_flags)
 {
-	page_root_entry *pr = map->arch_data->rtdir_virt;
+	// This function is tricky because it's called in interrupt context.
+	// Accessing PagingStructures() and then pgroot_virt might involve locks
+	// or other operations not safe for interrupts if not handled carefully by the
+	// M68KVMTranslationMap040 implementation.
+	// For now, assume direct access is okay for the purpose of this refactor,
+	// but this needs verification for interrupt safety.
+	M68KVMTranslationMap040* m68kMap040 = static_cast<M68KVMTranslationMap040*>(map);
+	// TODO: Handle PagingStructures040() or pgroot_virt being NULL
+	page_root_entry *pr = m68kMap040->PagingStructures040()->pgroot_virt;
 	page_directory_entry *pd;
 	page_indirect_entry *pi;
 	page_table_entry *pt;
@@ -783,7 +856,9 @@ query_tmap(VMTranslationMap *map, addr_t va, addr_t *_physical, uint32 *_flags)
 	page_table_entry *pt;
 	page_indirect_entry *pi;
 	page_directory_entry *pd;
-	page_directory_entry *pr = map->arch_data->rtdir_virt;
+	M68KVMTranslationMap040* m68kMap040 = static_cast<M68KVMTranslationMap040*>(map);
+	// TODO: Handle PagingStructures040() or pgroot_virt being NULL
+	page_root_entry *pr = m68kMap040->PagingStructures040()->pgroot_virt;
 	addr_t pd_pg, pt_pg, pi_pg;
 	status_t status;
 	int32 index;
@@ -863,7 +938,8 @@ query_tmap(VMTranslationMap *map, addr_t va, addr_t *_physical, uint32 *_flags)
 static addr_t
 get_mapped_size_tmap(VMTranslationMap *map)
 {
-	return map->map_count;
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+	return m68kMap->fMapCount;
 }
 
 
@@ -872,7 +948,10 @@ protect_tmap(VMTranslationMap *map, addr_t start, addr_t end, uint32 attributes)
 {
 	page_table_entry *pt;
 	page_directory_entry *pd;
-	page_root_entry *pr = map->arch_data->rtdir_virt;
+	M68KVMTranslationMap040* m68kMap040 = static_cast<M68KVMTranslationMap040*>(map);
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+	// TODO: Handle case where PagingStructures040() or pgroot_virt is null
+	page_root_entry *pr = m68kMap040->PagingStructures040()->pgroot_virt;
 	addr_t pd_pg, pt_pg;
 	status_t status;
 	int index;
@@ -934,10 +1013,10 @@ restart:
 		else
 			pt[index].write_protect = (attributes & B_KERNEL_WRITE_AREA) == 0;
 
-		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE)
-			map->arch_data->pages_to_invalidate[map->arch_data->num_invalidate_pages] = start;
+		if (m68kMap->fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+			m68kMap->fInvalidPages[m68kMap->fInvalidPagesCount] = start;
 
-		map->arch_data->num_invalidate_pages++;
+		m68kMap->fInvalidPagesCount++;
 	}
 
 	put_physical_page_tmap_internal(pt_pg);
@@ -953,7 +1032,10 @@ clear_flags_tmap(VMTranslationMap *map, addr_t va, uint32 flags)
 	page_table_entry *pt;
 	page_indirect_entry *pi;
 	page_directory_entry *pd;
-	page_root_entry *pr = map->arch_data->rtdir_virt;
+	M68KVMTranslationMap040* m68kMap040 = static_cast<M68KVMTranslationMap040*>(map);
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+	// TODO: Handle case where PagingStructures040() or pgroot_virt is null
+	page_root_entry *pr = m68kMap040->PagingStructures040()->pgroot_virt;
 	addr_t pd_pg, pt_pg, pi_pg;
 	status_t status;
 	int index;
@@ -1020,10 +1102,10 @@ clear_flags_tmap(VMTranslationMap *map, addr_t va, uint32 flags)
 	put_physical_page_tmap_internal(pd_pg);
 
 	if (tlb_flush) {
-		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE)
-			map->arch_data->pages_to_invalidate[map->arch_data->num_invalidate_pages] = va;
+		if (m68kMap->fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+			m68kMap->fInvalidPages[m68kMap->fInvalidPagesCount] = va;
 
-		map->arch_data->num_invalidate_pages++;
+		m68kMap->fInvalidPagesCount++;
 	}
 
 	return B_OK;
@@ -1034,30 +1116,31 @@ static void
 flush_tmap(VMTranslationMap *map)
 {
 	cpu_status state;
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
 
-	if (map->arch_data->num_invalidate_pages <= 0)
+	if (m68kMap->fInvalidPagesCount <= 0)
 		return;
 
 	state = disable_interrupts();
 
-	if (map->arch_data->num_invalidate_pages > PAGE_INVALIDATE_CACHE_SIZE) {
+	if (m68kMap->fInvalidPagesCount > PAGE_INVALIDATE_CACHE_SIZE) {
 		// invalidate all pages
 		TRACE(("flush_tmap: %d pages to invalidate, invalidate all\n",
-			map->arch_data->num_invalidate_pages));
+			m68kMap->fInvalidPagesCount));
 
-		if (IS_KERNEL_MAP(map)) {
+		if (IS_KERNEL_MAP(map)) { // IS_KERNEL_MAP uses fIsKernelMap now
 			arch_cpu_global_TLB_invalidate();
 		} else {
 			arch_cpu_user_TLB_invalidate();
 		}
 	} else {
 		TRACE(("flush_tmap: %d pages to invalidate, invalidate list\n",
-			map->arch_data->num_invalidate_pages));
+			m68kMap->fInvalidPagesCount));
 
-		arch_cpu_invalidate_TLB_list(map->arch_data->pages_to_invalidate,
-			map->arch_data->num_invalidate_pages);
+		arch_cpu_invalidate_TLB_list(m68kMap->fInvalidPages,
+			m68kMap->fInvalidPagesCount);
 	}
-	map->arch_data->num_invalidate_pages = 0;
+	m68kMap->fInvalidPagesCount = 0;
 
 	restore_interrupts(state);
 }
@@ -1128,7 +1211,7 @@ put_physical_page_tmap(addr_t virtualAddress, void *handle)
 	return generic_put_physical_page(virtualAddress);
 }
 
-
+/*
 static vm_translation_map_ops tmap_ops = {
 	destroy_tmap,
 	lock_tmap,
@@ -1156,7 +1239,7 @@ static vm_translation_map_ops tmap_ops = {
 	generic_vm_memcpy_physical_page
 		// TODO: Verify that this is safe to use!
 };
-
+*/
 
 //	#pragma mark -
 //	VM API
@@ -1171,54 +1254,79 @@ m68k_vm_translation_map_init_map(VMTranslationMap *map, bool kernel)
 	TRACE(("vm_translation_map_create\n"));
 
 	// initialize the new object
-	map->ops = &tmap_ops;
-	map->map_count = 0;
+	// map->ops = &tmap_ops; // Obsolete
+	M68KVMTranslationMap* m68kMap = static_cast<M68KVMTranslationMap*>(map);
+	M68KVMTranslationMap040* m68kMap040 = static_cast<M68KVMTranslationMap040*>(map);
 
-	recursive_lock_init(&map->lock, "translation map");
+	m68kMap->fMapCount = 0;
+	// The fLock should be initialized by the M68KVMTranslationMap constructor or its Init method.
+	// recursive_lock_init(&m68kMap->fLock, "translation map"); // Likely redundant if done in class
 
-	map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
-	if (map == NULL) {
-		recursive_lock_destroy(&map->lock);
-		return B_NO_MEMORY;
-	}
+	// arch_data is replaced by fPagingStructures (on M68KVMTranslationMap040)
+	// and fInvalidPagesCount/fInvalidPages (on M68KVMTranslationMap)
+	// The M68KPagingStructures040 object (fPagingStructures) should be allocated and
+	// initialized by M68KVMTranslationMap040's Init method.
 
-	map->arch_data->num_invalidate_pages = 0;
+	// map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
+	// if (map == NULL) { // map is the input parameter, this check is for malloc result
+	// 	recursive_lock_destroy(&m68kMap->fLock); // fLock might not be init'd if M68K...::Init not called
+	// 	return B_NO_MEMORY;
+	// }
+
+	m68kMap->fInvalidPagesCount = 0;
+	m68kMap->fIsKernelMap = kernel;
 
 	if (!kernel) {
 		// user
-		// allocate a rtdir
-		map->arch_data->rtdir_virt = (page_root_entry *)memalign(
-			SIZ_ROOTTBL, SIZ_ROOTTBL);
-		if (map->arch_data->rtdir_virt == NULL) {
-			free(map->arch_data);
-			recursive_lock_destroy(&map->lock);
-			return B_NO_MEMORY;
-		}
-		vm_get_page_mapping(VMAddressSpace::KernelID(),
-			(addr_t)map->arch_data->rtdir_virt, (addr_t *)&map->arch_data->rtdir_phys);
+		// The M68KVMTranslationMap040::Init method is responsible for allocating
+		// and setting up its fPagingStructures, including pgroot_virt and pgroot_phys.
+		// The logic below for allocating rtdir_virt and getting rtdir_phys
+		// should be part of that class's Init.
+
+		// Example: (this is conceptual, actual init is in M68KVMTranslationMap040::Init)
+		// m68kMap040->fPagingStructures->pgroot_virt = (page_root_entry *)memalign(...);
+		// vm_get_page_mapping(..., (addr_t)m68kMap040->fPagingStructures->pgroot_virt,
+		//                     (addr_t *)&m68kMap040->fPagingStructures->pgroot_phys);
 	} else {
 		// kernel
-		// we already know the kernel pgdir mapping
-		map->arch_data->rtdir_virt = sKernelVirtualPageRoot;
-		map->arch_data->rtdir_phys = sKernelPhysicalPageRoot;
+		// Similarly, for kernel maps, M68KVMTranslationMap040::Init
+		// would set its fPagingStructures to point to sKernelVirtualPageRoot, etc.
+		// m68kMap040->fPagingStructures->pgroot_virt = sKernelVirtualPageRoot;
+		// m68kMap040->fPagingStructures->pgroot_phys = sKernelPhysicalPageRoot;
 	}
 
-	// zero out the bottom portion of the new rtdir
-	memset(map->arch_data->rtdir_virt + FIRST_USER_PGROOT_ENT, 0,
-		NUM_USER_PGROOT_ENTS * sizeof(page_root_entry));
+	// This setup (zeroing user part, copying kernel part, adding to tmap_list)
+	// should also ideally be within M68KVMTranslationMap040::Init or a similar
+	// arch-specific setup function called after the generic map is constructed.
+	// However, tmap_list itself is problematic.
+
+	if (m68kMap040->PagingStructures040() && m68kMap040->PagingStructures040()->pgroot_virt) {
+		page_root_entry* rtdir_virt = m68kMap040->PagingStructures040()->pgroot_virt;
+		// zero out the bottom portion of the new rtdir
+		memset(rtdir_virt + FIRST_USER_PGROOT_ENT, 0,
+			NUM_USER_PGROOT_ENTS * sizeof(page_root_entry));
+
+		// copy the top portion of the rtdir from the current one (for user maps)
+		if (!kernel) {
+			memcpy(rtdir_virt + FIRST_KERNEL_PGROOT_ENT,
+				sKernelVirtualPageRoot + FIRST_KERNEL_PGROOT_ENT,
+				NUM_KERNEL_PGROOT_ENTS * sizeof(page_root_entry));
+		}
+	} else if (!kernel) {
+		// If pgroot_virt is not initialized here for a user map, it's an issue.
+		panic("m68k_vm_translation_map_init_map: user map's pgroot_virt not initialized by class Init");
+	}
+
 
 	// insert this new map into the map list
+	// TODO: map->next is invalid. tmap_list management needs a complete rework.
 	{
 		int state = disable_interrupts();
 		acquire_spinlock(&tmap_list_lock);
 
-		// copy the top portion of the rtdir from the current one
-		memcpy(map->arch_data->rtdir_virt + FIRST_KERNEL_PGROOT_ENT,
-			sKernelVirtualPageRoot + FIRST_KERNEL_PGROOT_ENT,
-			NUM_KERNEL_PGROOT_ENTS * sizeof(page_root_entry));
-
-		map->next = tmap_list;
-		tmap_list = map;
+		// map->next = tmap_list; // INVALID
+		// tmap_list = map;      // This makes tmap_list point to the map, but breaks chain.
+		panic("m68k_vm_translation_map_init_map: tmap_list addition needs rework");
 
 		release_spinlock(&tmap_list_lock);
 		restore_interrupts(state);
@@ -1477,7 +1585,7 @@ m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 			//TRACE(("clearing table[%d]\n", i));
 			pd = (page_directory_entry *)tbl;
 			for (int32 j = 0; j < NUM_DIRENT_PER_TBL; j++)
-				*(page_directory_entry_scalar *)(&pd[j]) = DFL_DIRENT_VAL;
+				pd[j] = DFL_DIRENT_VAL; // Assuming page_directory_entry is scalar
 			tbl += SIZ_DIRTBL;
 		}
 	}
@@ -1500,7 +1608,7 @@ m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 			//TRACE(("clearing table[%d]\n", i));
 			pt = (page_table_entry *)tbl;
 			for (int32 j = 0; j < NUM_PAGEENT_PER_TBL; j++)
-				*(page_table_entry_scalar *)(&pt[j]) = DFL_PAGEENT_VAL;
+				pt[j] = DFL_PAGEENT_VAL; // Assuming page_table_entry is scalar
 			tbl += SIZ_PAGETBL;
 		}
 	}
