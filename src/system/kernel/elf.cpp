@@ -20,6 +20,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <sys/stat.h>
+
 
 #include <algorithm>
 
@@ -46,8 +48,19 @@
 
 #include <arch/cpu.h>
 #include <arch/elf.h>
-#include <elf_priv.h>
+#include <elf_priv.h> // For elf_image_info struct
 #include <boot/elf.h>
+
+// Define conceptual constants for ELF validation (can be tuned)
+#define ELF_MAX_PROGRAM_HEADERS   256
+#define ELF_MAX_PHENTSIZE_FACTOR  4
+#define ELF_MAX_TOTAL_PH_SIZE     (64 * 1024) // 64KB
+#define ELF_MAX_SEGMENT_MEMSZ     (256 * 1024 * 1024) // 256MB
+#define MAX_DYN_SECTION_MEMSZ     (1 * 1024 * 1024)   // 1MB for dynamic section itself
+#define ELF_MAX_DT_STRSZ          (16 * 1024 * 1024)  // 16MB for DT_STRSZ
+#define ELF_MAX_REL_TABLE_SIZE    (32 * 1024 * 1024)  // 32MB for relocation tables
+#define ELF_MAX_VER_COUNT         1024                // Max version definitions/needed
+
 
 //#define TRACE_ELF
 #ifdef TRACE_ELF
@@ -274,6 +287,8 @@ create_image_struct()
 
 	image->text_region.id = -1;
 	image->data_region.id = -1;
+	image->dynamic_section_memsz = 0;
+	image->string_table_size = 0;
 	image->ref_count = 1;
 
 	return image;
@@ -1954,26 +1969,70 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 	image->elf_header = &elfHeader;
 
 	// read program header
+	// Validate ELF program header count and entry size before allocation
+	if (elfHeader.e_phnum > 256) { // ELF_MAX_PROGRAM_HEADERS
+		TRACE(("%s: ELF has too many program headers (%" B_PRIu16 ").\n", baseName, elfHeader.e_phnum));
+		return B_BAD_DATA;
+	}
+	// verify_eheader ensures e_phentsize >= sizeof(elf_phdr).
+	if (elfHeader.e_phnum > 0 && elfHeader.e_phentsize > (sizeof(elf_phdr) * 4)) { // ELF_MAX_PHENTSIZE_FACTOR
+		TRACE(("%s: ELF program header entry size (e_phentsize %" B_PRIu16 ") is unusually large.\n", baseName, elfHeader.e_phentsize));
+		return B_BAD_DATA;
+	}
 
-	elf_phdr *programHeaders = (elf_phdr *)malloc(
-		elfHeader.e_phnum * elfHeader.e_phentsize);
+	size_t programHeadersSize = 0;
+	if (elfHeader.e_phnum > 0) {
+		if (elfHeader.e_phentsize > SIZE_MAX / elfHeader.e_phnum) {
+			TRACE(("%s: ELF program headers size calculation would overflow (e_phnum %" B_PRIu16 ", e_phentsize %" B_PRIu16 ").\n",
+				baseName, elfHeader.e_phnum, elfHeader.e_phentsize));
+			return B_BAD_DATA;
+		}
+		programHeadersSize = (size_t)elfHeader.e_phnum * elfHeader.e_phentsize;
+
+		if (programHeadersSize == 0) { // Should not happen if e_phnum > 0
+			TRACE(("%s: Calculated programHeadersSize is 0 with e_phnum > 0.\n", baseName));
+			return B_BAD_DATA;
+		}
+		if (programHeadersSize > (64 * 1024)) { // ELF_MAX_TOTAL_PH_SIZE
+			TRACE(("%s: ELF program headers total size (%" B_PRIuSIZE ") is too large.\n", baseName, programHeadersSize));
+			return B_BAD_DATA;
+		}
+	}
+
+	elf_phdr *programHeaders = (elf_phdr *)malloc(programHeadersSize);
 	if (programHeaders == NULL) {
-		dprintf("error allocating space for program headers\n");
+		dprintf("%s: error allocating space for program headers (size %" B_PRIuSIZE ")\n", baseName, programHeadersSize);
 		return B_NO_MEMORY;
 	}
 	MemoryDeleter headersDeleter(programHeaders);
 
-	TRACE(("reading in program headers at 0x%lx, length 0x%x\n",
-		elfHeader.e_phoff, elfHeader.e_phnum * elfHeader.e_phentsize));
-	length = _kern_read(fd, elfHeader.e_phoff, programHeaders,
-		elfHeader.e_phnum * elfHeader.e_phentsize);
-	if (length < B_OK) {
-		dprintf("error reading in program headers\n");
-		return length;
-	}
-	if (length != elfHeader.e_phnum * elfHeader.e_phentsize) {
-		dprintf("short read while reading in program headers\n");
-		return B_ERROR;
+	if (elfHeader.e_phnum > 0) {
+		if (elfHeader.e_phoff < 0) {
+			TRACE(("%s: ELF program header offset (e_phoff %" B_PRIdOFF ") is negative.\n", baseName, elfHeader.e_phoff));
+			return B_BAD_DATA;
+		}
+		if ((unsigned long long)elfHeader.e_phoff + programHeadersSize > (unsigned long long)st.st_size) {
+			TRACE(("%s: ELF program headers (offset %" B_PRIdOFF ", size %" B_PRIuSIZE ") exceed file size (%" B_PRIdOFF ").\n",
+				baseName, elfHeader.e_phoff, programHeadersSize, st.st_size));
+			return B_BAD_DATA;
+		}
+		if (programHeadersSize > SSIZE_MAX) {
+			TRACE(("%s: ELF program headers size (%" B_PRIuSIZE ") exceeds SSIZE_MAX for read.\n", baseName, programHeadersSize));
+			return B_BAD_DATA;
+		}
+
+		TRACE(("reading in program headers at offset %" B_PRIdOFF ", size %" B_PRIuSIZE "\n",
+			elfHeader.e_phoff, programHeadersSize));
+		length = _kern_read(fd, elfHeader.e_phoff, programHeaders, programHeadersSize);
+		if (length < B_OK) {
+			dprintf("error reading in program headers: %s\n", strerror(length));
+			return length;
+		}
+		if ((size_t)length != programHeadersSize) {
+			dprintf("short read while reading in program headers (read %" B_PRIdSSIZE ", expected %" B_PRIuSIZE ").\n",
+				length, programHeadersSize);
+			return B_ERROR;
+		}
 	}
 
 	// construct a nice name for the region we have to create below
@@ -2006,6 +2065,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 	addr_t delta = 0;
 	uint32 addressSpec = B_RANDOMIZED_BASE_ADDRESS;
 	for (int i = 0; i < elfHeader.e_phnum; i++) {
+		elf_phdr* phdr = &programHeaders[i];
 		char regionName[B_OS_NAME_LENGTH];
 		char *regionAddress;
 		char *originalRegionAddress;
@@ -2013,95 +2073,167 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 
 		mappedAreas[i] = -1;
 
-		if (programHeaders[i].p_type == PT_DYNAMIC) {
-			image->dynamic_section = programHeaders[i].p_vaddr;
+		if (phdr->p_type == PT_DYNAMIC) {
+			image->dynamic_section = phdr->p_vaddr;
+			// Store dynamic section size for later parsing validation
+			image->dynamic_section_memsz = phdr->p_memsz;
 			continue;
 		}
 
-		if (programHeaders[i].p_type != PT_LOAD)
+		if (phdr->p_type != PT_LOAD)
 			continue;
 
-		regionAddress = (char *)(ROUNDDOWN(programHeaders[i].p_vaddr,
-			B_PAGE_SIZE) + delta);
+		// II.1: p_filesz vs p_memsz
+		if (phdr->p_filesz > phdr->p_memsz) {
+			TRACE(("%s: Segment %d p_filesz (%" B_PRIuELFADDR ") > p_memsz (%" B_PRIuELFADDR ").\n",
+				baseName, i, phdr->p_filesz, phdr->p_memsz));
+			return B_BAD_DATA;
+		}
+
+		// II.2: Region Size Calculation (common for text/data logic below)
+		elf_xword memsz = phdr->p_memsz;
+		elf_xword vaddr_page_offset = phdr->p_vaddr % B_PAGE_SIZE;
+		elf_xword required_raw_size;
+		size_t segmentSize; // Rounded final size for memory mapping/area
+
+		// const elf_xword MAX_REASONABLE_SEGMENT_MEMSZ_USER = (1024UL * 1024 * 1024 * 2); // 2GB Example
+		// if (memsz > MAX_REASONABLE_SEGMENT_MEMSZ_USER) {
+		// 	TRACE(("%s: Segment %d p_memsz (%" B_PRIuELFXWORD ") too large.\n", baseName, i, memsz));
+		// 	return B_BAD_DATA;
+		// }
+		if (memsz > (elf_xword)-1 - vaddr_page_offset) {
+			TRACE(("%s: Segment %d: p_memsz + (p_vaddr %% PAGE_SIZE) overflows.\n", baseName, i));
+			return B_BAD_DATA;
+		}
+		required_raw_size = memsz + vaddr_page_offset;
+
+		if (required_raw_size == 0 && memsz > 0) {
+			TRACE(("%s: Segment %d: required_raw_size is 0 but memsz > 0.\n", baseName, i));
+			return B_BAD_DATA;
+		}
+		if (required_raw_size > (elf_xword)-1 - (B_PAGE_SIZE - 1)) {
+			 TRACE(("%s: Segment %d: ROUNDUP calculation for segment size would overflow.\n", baseName, i));
+			 return B_BAD_DATA;
+		}
+		segmentSize = ROUNDUP(required_raw_size, B_PAGE_SIZE);
+		if (segmentSize == 0 && required_raw_size > 0) {
+			 TRACE(("%s: Segment %d: segmentSize rounded to 0 incorrectly.\n", baseName, i));
+			 return B_BAD_DATA;
+		}
+
+		// II.3: File Read Boundaries (common check before mapping)
+		if (phdr->p_filesz > 0) {
+			if (phdr->p_offset < 0) {
+				TRACE(("%s: Segment %d p_offset (%" B_PRIuELFADDR ") is negative.\n", baseName, i, phdr->p_offset));
+				return B_BAD_DATA;
+			}
+			if ((unsigned long long)phdr->p_offset + phdr->p_filesz > (unsigned long long)st.st_size) {
+				TRACE(("%s: Segment %d file region (offset %" B_PRIuELFADDR ", filesz %" B_PRIuELFADDR ") exceeds file size (%" B_PRIdOFF ").\n",
+					baseName, i, phdr->p_offset, phdr->p_filesz, st.st_size));
+				return B_BAD_DATA;
+			}
+		}
+
+		regionAddress = (char *)(ROUNDDOWN(phdr->p_vaddr, B_PAGE_SIZE) + delta);
 		originalRegionAddress = regionAddress;
 
-		if (programHeaders[i].p_flags & PF_WRITE) {
-			// rw/data segment
-			size_t memUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
-				+ programHeaders[i].p_memsz;
-			size_t fileUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
-				+ programHeaders[i].p_filesz;
+		// II.4: Virtual Address Sanity (check before vm_map_file or create_area)
+		// Note: For user images, regionAddress can be large. The OS manages user VAS.
+		// The primary check is that regionAddress + segmentSize doesn't wrap addr_t.
+		if ((addr_t)regionAddress > (addr_t)-1 - segmentSize) {
+			TRACE(("%s: Segment %d: target virtual address range would wrap (addr %p, size %#" B_PRIxSIZE ").\n",
+				baseName, i, regionAddress, segmentSize));
+			return B_BAD_DATA;
+		}
 
-			memUpperBound = ROUNDUP(memUpperBound, B_PAGE_SIZE);
-			fileUpperBound = ROUNDUP(fileUpperBound, B_PAGE_SIZE);
+
+		if (phdr->p_flags & PF_WRITE) {
+			// rw/data segment
+			size_t file_map_size = ROUNDUP((phdr->p_vaddr % B_PAGE_SIZE) + phdr->p_filesz, B_PAGE_SIZE);
+			// file_map_size calculation also needs overflow checks if done from scratch:
+			// elf_xword file_raw_size;
+			// if (phdr->p_filesz > (elf_xword)-1 - vaddr_page_offset) { /* overflow */ return B_BAD_DATA; }
+			// file_raw_size = phdr->p_filesz + vaddr_page_offset;
+			// if (file_raw_size > (elf_xword)-1 - (B_PAGE_SIZE-1)) { /* overflow for roundup */ return B_BAD_DATA; }
+			// file_map_size = ROUNDUP(file_raw_size, B_PAGE_SIZE);
+			// if (file_map_size == 0 && file_raw_size > 0) return B_BAD_DATA;
+			// Ensure file_map_size <= segmentSize (as p_filesz <= p_memsz)
+			if (file_map_size > segmentSize) { // Should be guaranteed by p_filesz <= p_memsz
+				TRACE(("%s: Segment %d data: file_map_size %#" B_PRIxSIZE " > segmentSize %#" B_PRIxSIZE ".\n",
+					baseName, i, file_map_size, segmentSize));
+				return B_BAD_DATA; // Should not happen if p_filesz <= p_memsz
+			}
+
 
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%drw", baseName, i);
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
-				addressSpec, fileUpperBound,
+				addressSpec, file_map_size, // Map only up to file content size initially
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 				REGION_PRIVATE_MAP, false, fd,
-				ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
+				ROUNDDOWN(phdr->p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
-				dprintf("error mapping file data: %s!\n", strerror(id));
-				return B_NOT_AN_EXECUTABLE;
+				dprintf("%s: error mapping file data for \"%s\": %s!\n", baseName, regionName, strerror(id));
+				return B_NOT_AN_EXECUTABLE; // Or id
 			}
 			mappedAreas[i] = id;
 
 			imageInfo.basic_info.data = regionAddress;
-			imageInfo.basic_info.data_size = memUpperBound;
+			imageInfo.basic_info.data_size = segmentSize; // Full mem size
 
 			image->data_region.start = (addr_t)regionAddress;
-			image->data_region.size = memUpperBound;
+			image->data_region.size = segmentSize; // Full mem size
 
-			// clean garbage brought by mmap (the region behind the file,
-			// at least parts of it are the bss and have to be zeroed)
-			addr_t start = (addr_t)regionAddress
-				+ (programHeaders[i].p_vaddr % B_PAGE_SIZE)
-				+ programHeaders[i].p_filesz;
-			size_t amount = fileUpperBound
-				- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
-				- (programHeaders[i].p_filesz);
-			memset((void *)start, 0, amount);
+			// clean garbage brought by mmap for the part of last page not in file
+			// This is only for the mapped file part. BSS is handled next.
+			if (phdr->p_filesz > 0 && file_map_size > 0) { // Only if there's file content mapped
+				addr_t start_zero = (addr_t)regionAddress + vaddr_page_offset + phdr->p_filesz;
+				addr_t end_mapped_file_page = (addr_t)regionAddress + file_map_size;
+				if (start_zero < end_mapped_file_page) {
+					size_t amount_to_zero = end_mapped_file_page - start_zero;
+					memset((void *)start_zero, 0, amount_to_zero);
+				}
+			}
 
-			// Check if we need extra storage for the bss - we have to do this if
-			// the above region doesn't already comprise the memory size, too.
 
-			if (memUpperBound != fileUpperBound) {
-				size_t bssSize = memUpperBound - fileUpperBound;
+			if (segmentSize > file_map_size) { // If BSS part exists
+				size_t bssSize = segmentSize - file_map_size;
+				char* bssRegionAddress = regionAddress + file_map_size;
 
 				snprintf(regionName, B_OS_NAME_LENGTH, "%s_bss%d", baseName, i);
 
-				regionAddress += fileUpperBound;
 				virtual_address_restrictions virtualRestrictions = {};
-				virtualRestrictions.address = regionAddress;
+				virtualRestrictions.address = bssRegionAddress;
 				virtualRestrictions.address_specification = B_EXACT_ADDRESS;
 				physical_address_restrictions physicalRestrictions = {};
 				id = create_area_etc(team->id, regionName, bssSize, B_NO_LOCK,
 					B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, 0, &virtualRestrictions,
-					&physicalRestrictions, (void**)&regionAddress);
+					&physicalRestrictions, (void**)&bssRegionAddress); // Re-assigns bssRegionAddress
 				if (id < B_OK) {
-					dprintf("error allocating bss area: %s!\n", strerror(id));
-					return B_NOT_AN_EXECUTABLE;
+					dprintf("%s: error allocating bss area for \"%s\": %s!\n", baseName, regionName, strerror(id));
+					// mappedAreas[i] is already set, need to clean up if this fails.
+					// This function doesn't have goto error paths for cleanup. Consider adding.
+					return B_NOT_AN_EXECUTABLE; // Or id
 				}
+				// mappedAreas needs to track this BSS area too if it needs separate cleanup.
+				// Current mappedAreas only tracks one ID per phdr.
 			}
-		} else {
-			// assume ro/text segment
+		} else { // Text segment (PF_EXECUTE and !PF_WRITE, or PF_EXECUTE and only one exec header)
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%drx", baseName, i);
 
-			size_t segmentSize = ROUNDUP(programHeaders[i].p_memsz
-				+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+			// segmentSize is already calculated and validated.
+			// p_offset and p_filesz are already validated against st.st_size.
+			// Here, vm_map_file maps the whole segmentSize, and OS handles zeroing parts not in file.
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
-				addressSpec, segmentSize,
-				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+				addressSpec, segmentSize, // Map entire segmentSize
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, // Initially writable for relocations
 				REGION_PRIVATE_MAP, false, fd,
-				ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
+				ROUNDDOWN(phdr->p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
-				dprintf("error mapping file text: %s!\n", strerror(id));
-				return B_NOT_AN_EXECUTABLE;
+				dprintf("%s: error mapping file text for \"%s\": %s!\n", baseName, regionName, strerror(id));
+				return B_NOT_AN_EXECUTABLE; // Or id
 			}
-
 			mappedAreas[i] = id;
 
 			imageInfo.basic_info.text = regionAddress;
@@ -2195,12 +2327,17 @@ load_kernel_add_on(const char *path)
 	ssize_t length;
 	bool textSectionWritable = false;
 	int executableHeaderCount = 0;
+	struct stat st;
 
 	TRACE(("elf_load_kspace: entry path '%s'\n", path));
 
 	int fd = _kern_open(-1, path, O_RDONLY, 0);
 	if (fd < 0)
 		return fd;
+
+	status = _kern_read_stat(fd, NULL, false, &st, sizeof(st));
+	if (status != B_OK)
+		goto error0;
 
 	struct vnode *vnode;
 	status = vfs_get_vnode_from_fd(fd, true, &vnode);
@@ -2254,48 +2391,161 @@ load_kernel_add_on(const char *path)
 	image->name = strdup(path);
 	vnode = NULL;
 
-	programHeaders = (elf_phdr *)malloc(elfHeader->e_phnum
-		* elfHeader->e_phentsize);
+	// Validate ELF program header count and entry size before allocation
+	if (elfHeader->e_phnum > 256) { // ELF_MAX_PROGRAM_HEADERS
+		TRACE(("%s: ELF has too many program headers (%" B_PRIu16 ").\n", fileName, elfHeader->e_phnum));
+		status = B_BAD_DATA;
+		goto error2;
+	}
+	// verify_eheader ensures e_phentsize >= sizeof(elf_phdr).
+	// Check for excessively large e_phentsize.
+	if (elfHeader->e_phnum > 0 && elfHeader->e_phentsize > (sizeof(elf_phdr) * 4)) { // ELF_MAX_PHENTSIZE_FACTOR
+		TRACE(("%s: ELF program header entry size (e_phentsize %" B_PRIu16 ") is unusually large.\n", fileName, elfHeader->e_phentsize));
+		status = B_BAD_DATA;
+		goto error2;
+	}
+
+	size_t programHeadersSize = 0;
+	if (elfHeader->e_phnum > 0) {
+		if (elfHeader->e_phentsize > SIZE_MAX / elfHeader->e_phnum) {
+			TRACE(("%s: ELF program headers size calculation would overflow (e_phnum %" B_PRIu16 ", e_phentsize %" B_PRIu16 ").\n",
+				fileName, elfHeader->e_phnum, elfHeader->e_phentsize));
+			status = B_BAD_DATA;
+			goto error2;
+		}
+		programHeadersSize = (size_t)elfHeader->e_phnum * elfHeader->e_phentsize;
+
+		if (programHeadersSize == 0) { // Should not happen if e_phnum > 0 and e_phentsize is validated
+			TRACE(("%s: Calculated programHeadersSize is 0 with e_phnum > 0.\n", fileName));
+			status = B_BAD_DATA;
+			goto error2;
+		}
+		if (programHeadersSize > (64 * 1024)) { // ELF_MAX_TOTAL_PH_SIZE
+			TRACE(("%s: ELF program headers total size (%" B_PRIuSIZE ") is too large.\n", fileName, programHeadersSize));
+			status = B_BAD_DATA;
+			goto error2;
+		}
+	}
+
+	programHeaders = (elf_phdr *)malloc(programHeadersSize);
 	if (programHeaders == NULL) {
-		dprintf("%s: error allocating space for program headers\n", fileName);
+		dprintf("%s: error allocating space for program headers (size %" B_PRIuSIZE ")\n", fileName, programHeadersSize);
 		status = B_NO_MEMORY;
 		goto error2;
 	}
 
-	TRACE(("reading in program headers at 0x%lx, length 0x%x\n",
-		elfHeader->e_phoff, elfHeader->e_phnum * elfHeader->e_phentsize));
+	if (elfHeader->e_phnum > 0) {
+		// Validate read offset and size against file size and SSIZE_MAX
+		if (elfHeader->e_phoff < 0) { // elf_off is off_t, can be negative
+			TRACE(("%s: ELF program header offset (e_phoff %" B_PRIdOFF ") is negative.\n", fileName, elfHeader->e_phoff));
+			status = B_BAD_DATA;
+			goto error3;
+		}
+		if ((unsigned long long)elfHeader->e_phoff + programHeadersSize > (unsigned long long)st.st_size) {
+			TRACE(("%s: ELF program headers (offset %" B_PRIdOFF ", size %" B_PRIuSIZE ") exceed file size (%" B_PRIdOFF ").\n",
+				fileName, elfHeader->e_phoff, programHeadersSize, st.st_size));
+			status = B_BAD_DATA;
+			goto error3;
+		}
+		if (programHeadersSize > SSIZE_MAX) {
+			TRACE(("%s: ELF program headers size (%" B_PRIuSIZE ") exceeds SSIZE_MAX for read.\n", fileName, programHeadersSize));
+			status = B_BAD_DATA;
+			goto error3;
+		}
 
-	length = _kern_read(fd, elfHeader->e_phoff, programHeaders,
-		elfHeader->e_phnum * elfHeader->e_phentsize);
-	if (length < B_OK) {
-		status = length;
-		TRACE(("%s: error reading in program headers\n", fileName));
-		goto error3;
-	}
-	if (length != elfHeader->e_phnum * elfHeader->e_phentsize) {
-		TRACE(("%s: short read while reading in program headers\n", fileName));
-		status = B_ERROR;
-		goto error3;
+		TRACE(("reading in program headers at offset %" B_PRIdOFF ", size %" B_PRIuSIZE "\n",
+			elfHeader->e_phoff, programHeadersSize));
+
+		length = _kern_read(fd, elfHeader->e_phoff, programHeaders, programHeadersSize);
+		if (length < B_OK) {
+			status = length;
+			TRACE(("%s: error reading in program headers: %s\n", fileName, strerror(status)));
+			goto error3;
+		}
+		if ((size_t)length != programHeadersSize) {
+			TRACE(("%s: short read while reading in program headers (read %" B_PRIdSSIZE ", expected %" B_PRIuSIZE ").\n",
+				fileName, length, programHeadersSize));
+			status = B_ERROR;
+			goto error3;
+		}
 	}
 
 	// determine how much space we need for all loaded segments
 
 	reservedSize = 0;
-	length = 0;
+	// 'length' here is actually accumulating total rounded segment sizes, perhaps rename for clarity later.
+	size_t totalSegmentsMappedSize = 0;
+
 
 	for (int32 i = 0; i < elfHeader->e_phnum; i++) {
-		size_t end;
+		elf_phdr* phdr = &programHeaders[i];
+		size_t currentSegmentRoundedSize;
+		size_t segmentVirtualEndRounded;
 
-		if (programHeaders[i].p_type != PT_LOAD)
+		if (phdr->p_type != PT_LOAD)
 			continue;
 
-		length += ROUNDUP(programHeaders[i].p_memsz
-			+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+		// Validate p_filesz vs p_memsz (as per Part II.1)
+		if (phdr->p_filesz > phdr->p_memsz) {
+			TRACE(("%s: Segment %" B_PRId32 " p_filesz (%" B_PRIuELFADDR ") > p_memsz (%" B_PRIuELFADDR ").\n",
+				fileName, i, phdr->p_filesz, phdr->p_memsz));
+			status = B_BAD_DATA;
+			goto error3; // Ensure programHeaders is freed
+		}
 
-		end = ROUNDUP(programHeaders[i].p_memsz + programHeaders[i].p_vaddr,
-			B_PAGE_SIZE);
-		if (end > reservedSize)
-			reservedSize = end;
+		// Validate for 'totalSegmentsMappedSize' accumulation (as per Part II.2)
+		elf_xword current_memsz = phdr->p_memsz;
+		elf_xword current_vaddr_offset = phdr->p_vaddr % B_PAGE_SIZE;
+		elf_xword current_required_raw_size;
+
+		if (current_memsz > (elf_xword)-1 - current_vaddr_offset) { // Using (elf_xword)-1 as MAX_elf_xword
+			TRACE(("%s: Segment %" B_PRId32 " p_memsz + (p_vaddr %% PAGE_SIZE) overflows for mapped size calc.\n", fileName, i));
+			status = B_BAD_DATA;
+			goto error3;
+		}
+		current_required_raw_size = current_memsz + current_vaddr_offset;
+
+		if (current_required_raw_size > (elf_xword)-1 - (B_PAGE_SIZE - 1)) {
+			 TRACE(("%s: Segment %" B_PRId32 " ROUNDUP calculation for mapped size would overflow.\n", fileName, i));
+			 status = B_BAD_DATA;
+			 goto error3;
+		}
+		currentSegmentRoundedSize = ROUNDUP(current_required_raw_size, B_PAGE_SIZE);
+		if (currentSegmentRoundedSize == 0 && current_required_raw_size > 0) {
+			 TRACE(("%s: Segment %" B_PRId32 " mapped size rounded to 0 incorrectly.\n", fileName, i));
+			 status = B_BAD_DATA;
+			 goto error3;
+		}
+		if (currentSegmentRoundedSize > (elf_xword)-1 - totalSegmentsMappedSize) { // Check before adding to total
+			TRACE(("%s: Accumulating segment mapped sizes would overflow.\n", fileName));
+			status = B_BAD_DATA;
+			goto error3;
+		}
+		totalSegmentsMappedSize += currentSegmentRoundedSize;
+
+
+		// Validate for 'reservedSize' (highest extent) calculation (Part II.5)
+		if (phdr->p_vaddr > (elf_addr)-1 - phdr->p_memsz) {
+			TRACE(("%s: Segment %" B_PRId32 " p_vaddr + p_memsz overflows for reservedSize calc.\n", fileName, i));
+			status = B_BAD_DATA;
+			goto error3;
+		}
+		elf_addr segmentActualEnd = phdr->p_vaddr + phdr->p_memsz;
+
+		if (segmentActualEnd > (elf_addr)-1 - (B_PAGE_SIZE - 1) && segmentActualEnd !=0) {
+			TRACE(("%s: Segment %" B_PRId32 " ROUNDUP for segmentActualEnd would overflow (reservedSize calc).\n", fileName, i));
+			status = B_BAD_DATA;
+			goto error3;
+		}
+		segmentVirtualEndRounded = ROUNDUP(segmentActualEnd, B_PAGE_SIZE);
+		if (segmentVirtualEndRounded == 0 && segmentActualEnd > 0) {
+			TRACE(("%s: Segment %" B_PRId32 " segment end rounded to 0 incorrectly (reservedSize calc).\n", fileName, i));
+			status = B_BAD_DATA;
+			goto error3;
+		}
+
+		if (segmentVirtualEndRounded > reservedSize)
+			reservedSize = segmentVirtualEndRounded;
 
 		if (programHeaders[i].IsExecutable())
 			executableHeaderCount++;
@@ -2329,6 +2579,7 @@ load_kernel_add_on(const char *path)
 				break;
 			case PT_DYNAMIC:
 				image->dynamic_section = programHeaders[i].p_vaddr;
+				image->dynamic_section_memsz = programHeaders[i].p_memsz; // Store memsz
 				continue;
 			case PT_INTERP:
 				// should check here for appropriate interpreter
@@ -2352,6 +2603,44 @@ load_kernel_add_on(const char *path)
 		}
 
 		// we're here, so it must be a PT_LOAD segment
+		elf_phdr* phdr = &programHeaders[i];
+
+		// II.2 Region Size Calculation
+		elf_xword memsz = phdr->p_memsz;
+		elf_xword vaddr_page_offset = phdr->p_vaddr % B_PAGE_SIZE;
+		elf_xword required_raw_size;
+
+		// const elf_xword MAX_REASONABLE_SEGMENT_MEMSZ_KADDON = (256 * 1024 * 1024); // Example
+		// if (memsz > MAX_REASONABLE_SEGMENT_MEMSZ_KADDON) {
+		// TRACE(("%s: Segment %" B_PRId32 " p_memsz (%" B_PRIuELFXWORD ") too large for kernel add-on.\n", fileName, i, memsz));
+		// status = B_BAD_DATA;
+		// goto error4;
+		// }
+
+		if (memsz > (elf_xword)-1 - vaddr_page_offset) {
+			TRACE(("%s: Segment %" B_PRId32 " p_memsz + (p_vaddr %% PAGE_SIZE) overflows.\n", fileName, i));
+			status = B_BAD_DATA;
+			goto error4;
+		}
+		required_raw_size = memsz + vaddr_page_offset;
+
+		if (required_raw_size == 0 && memsz > 0) {
+			TRACE(("%s: Segment %" B_PRId32 " required_raw_size is 0 but memsz > 0.\n", fileName, i));
+			status = B_BAD_DATA;
+			goto error4;
+		}
+		if (required_raw_size > (elf_xword)-1 - (B_PAGE_SIZE - 1)) {
+			 TRACE(("%s: Segment %" B_PRId32 " ROUNDUP calculation for segment size would overflow.\n", fileName, i));
+			 status = B_BAD_DATA;
+			 goto error4;
+		}
+		size_t segmentSize = ROUNDUP(required_raw_size, B_PAGE_SIZE);
+		if (segmentSize == 0 && required_raw_size > 0) {
+			 TRACE(("%s: Segment %" B_PRId32 " segmentSize rounded to 0 incorrectly.\n", fileName, i));
+			 status = B_BAD_DATA;
+			 goto error4;
+		}
+
 
 		// Usually add-ons have two PT_LOAD headers: one for .data one or .text.
 		// x86 and PPC may differ in permission bits for .data's PT_LOAD header
@@ -2359,8 +2648,8 @@ load_kernel_add_on(const char *path)
 
 		// Some add-ons may have .text and .data concatenated in a single
 		// PT_LOAD RWE header and we must map that to .text.
-		if (programHeaders[i].IsReadWrite()
-			&& (!programHeaders[i].IsExecutable()
+		if (phdr->IsReadWrite()
+			&& (!phdr->IsExecutable()
 				|| executableHeaderCount > 1)) {
 			// this is the writable segment
 			if (image->data_region.size != 0) {
@@ -2368,52 +2657,82 @@ load_kernel_add_on(const char *path)
 				continue;
 			}
 			region = &image->data_region;
-
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_data", fileName);
-		} else if (programHeaders[i].IsExecutable()) {
+		} else if (phdr->IsExecutable()) {
 			// this is the non-writable segment
 			if (image->text_region.size != 0) {
 				// we've already created this segment
 				continue;
 			}
 			region = &image->text_region;
-
-			// some programs may have .text and .data concatenated in a
-			// single PT_LOAD section which is readable/writable/executable
-			textSectionWritable = programHeaders[i].IsReadWrite();
+			textSectionWritable = phdr->IsReadWrite();
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", fileName);
 		} else {
 			dprintf("%s: weird program header flags %#" B_PRIx32 "\n", fileName,
-				programHeaders[i].p_flags);
+				phdr->p_flags);
 			continue;
 		}
 
-		region->start = (addr_t)reservedAddress + ROUNDDOWN(
-			programHeaders[i].p_vaddr, B_PAGE_SIZE);
-		region->size = ROUNDUP(programHeaders[i].p_memsz
-			+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+		region->start = (addr_t)reservedAddress + ROUNDDOWN(phdr->p_vaddr, B_PAGE_SIZE);
+		region->size = segmentSize; // Use validated segmentSize
+
+		// II.4 Virtual Address Sanity
+		if (region->start > (addr_t)-1 - region->size) { // Check before create_area uses start+size
+			TRACE(("%s: Segment %" B_PRId32 " virtual address range (start %#" B_PRIxADDR ", size %#" B_PRIxSIZE ") would wrap for area creation.\n",
+				fileName, i, region->start, region->size));
+			status = B_BAD_DATA;
+			goto error4;
+		}
+
 		region->id = create_area(regionName, (void **)&region->start,
 			B_EXACT_ADDRESS, region->size, B_FULL_LOCK,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region->id < B_OK) {
-			dprintf("%s: error allocating area: %s\n", fileName,
+			dprintf("%s: error allocating area \"%s\": %s\n", fileName, regionName,
 				strerror(region->id));
-			status = B_NOT_AN_EXECUTABLE;
+			status = region->id; // Propagate actual error
 			goto error4;
 		}
-		region->delta = -ROUNDDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
+		region->delta = -ROUNDDOWN(phdr->p_vaddr, B_PAGE_SIZE);
 
-		TRACE(("elf_load_kspace: created area \"%s\" at %p\n",
-			regionName, (void *)region->start));
+		TRACE(("elf_load_kspace: created area \"%s\" (id %" B_PRId32 ") at %p, size %#" B_PRIxSIZE "\n",
+			regionName, region->id, (void *)region->start, region->size));
 
-		length = _kern_read(fd, programHeaders[i].p_offset,
-			(void *)(region->start + (programHeaders[i].p_vaddr % B_PAGE_SIZE)),
-			programHeaders[i].p_filesz);
-		if (length < B_OK) {
-			status = length;
-			dprintf("%s: error reading in segment %" B_PRId32 "\n", fileName,
-				i);
-			goto error5;
+		// II.3 File Read Boundaries
+		if (phdr->p_filesz > 0) {
+			if (phdr->p_offset < 0) {
+				TRACE(("%s: Segment %" B_PRId32 " p_offset (%" B_PRIuELFADDR ") is negative.\n", fileName, i, phdr->p_offset));
+				status = B_BAD_DATA;
+				goto error5; // Error after area creation needs to clean up area via error5
+			}
+			if ((unsigned long long)phdr->p_offset + phdr->p_filesz > (unsigned long long)st.st_size) {
+				TRACE(("%s: Segment %" B_PRId32 " file region (offset %" B_PRIuELFADDR ", filesz %" B_PRIuELFADDR ") exceeds file size (%" B_PRIdOFF ").\n",
+					fileName, i, phdr->p_offset, phdr->p_filesz, st.st_size));
+				status = B_BAD_DATA;
+				goto error5;
+			}
+			// Ensure read does not exceed allocated region size (vaddr_page_offset + p_filesz vs region->size)
+			if (vaddr_page_offset + phdr->p_filesz > region->size) {
+				TRACE(("%s: Segment %" B_PRId32 " file content (vaddr_offset %" B_PRIuELFXWORD " + filesz %" B_PRIuELFADDR ") exceeds allocated region size (%" B_PRIuSIZE ").\n",
+					fileName, i, vaddr_page_offset, phdr->p_filesz, region->size));
+				status = B_BAD_DATA;
+				goto error5;
+			}
+
+
+			length = _kern_read(fd, phdr->p_offset,
+				(void *)(region->start + vaddr_page_offset), phdr->p_filesz);
+			if (length < B_OK) {
+				status = length;
+				dprintf("%s: error reading in segment %" B_PRId32 " of \"%s\": %s\n", fileName, i, regionName, strerror(status));
+				goto error5;
+			}
+			if ((elf_xword)length != phdr->p_filesz) {
+				dprintf("%s: short read for segment %" B_PRId32 " of \"%s\" (read %" B_PRIdSSIZE ", expected %" B_PRIuELFADDR ").\n",
+					fileName, i, regionName, length, phdr->p_filesz);
+				status = B_ERROR;
+				goto error5;
+			}
 		}
 	}
 
@@ -2849,3 +3168,4 @@ _user_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
 
 #endif // ELF32_COMPAT
 
+[end of src/system/kernel/elf.cpp]
