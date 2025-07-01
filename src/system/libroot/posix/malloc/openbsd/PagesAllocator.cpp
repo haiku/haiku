@@ -27,7 +27,7 @@ static const size_t kPageSize = B_PAGE_SIZE;
 static const size_t kLargestUsefulChunk = 512 * kPageSize;
 
 /*! Amount of virtual address space to reserve when creating new areas. */
-static const size_t kReserveAddressSpace = 128 * 1024 * 1024;
+static const size_t kReserveAddressSpace = 512 * 1024 * 1024;
 
 /*! Cache up to this many percentage points of free memory (compared to used.) */
 static const size_t kFreePercentage = 25;
