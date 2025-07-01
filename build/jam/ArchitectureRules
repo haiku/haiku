@@ -60,12 +60,28 @@ rule ArchitectureSetup architecture
 	HAIKU_LINK_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 
 	HAIKU_CCFLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
-	HAIKU_C++FLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
+
+	# Start with base flags for C++
+	local currentCxxFlags = $(ccBaseFlags) -nostdinc ;
+
+	# Append any pre-existing HAIKU_C++FLAGS_$(architecture) that are NOT -std= flags
+	local existingArchFlags = $(HAIKU_C++FLAGS_$(architecture)) ;
+	local flag ;
+	for flag in $(existingArchFlags) {
+		if ! [ Match "-std=*" : $(flag) ] {
+			# Avoid duplicating ccBaseFlags or -nostdinc if they were already in existingArchFlags
+			if ! ( $(flag) in $(currentCxxFlags) ) {
+				currentCxxFlags += $(flag) ;
+			}
+		}
+	}
+
 	if $(architecture) in sparc m68k ppc {
 		# GCC 8.3.0 has issues with C++17 unique_ptr for these targets
-		HAIKU_C++FLAGS_$(architecture) += -std=gnu++14 ;
+		HAIKU_C++FLAGS_$(architecture) = $(currentCxxFlags) -std=gnu++14 ;
 	} else {
-		HAIKU_C++FLAGS_$(architecture) += -std=gnu++17 ;
+		# Default to C++17 for other architectures
+		HAIKU_C++FLAGS_$(architecture) = $(currentCxxFlags) -std=gnu++17 ;
 	}
 	HAIKU_LINKFLAGS_$(architecture) += $(ccBaseFlags) ;
 	HAIKU_ASFLAGS_$(architecture) += $(archFlags) -nostdinc ;
