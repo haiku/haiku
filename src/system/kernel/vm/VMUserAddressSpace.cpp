@@ -218,6 +218,9 @@ VMUserAddressSpace::RemoveArea(VMArea* _area, uint32 allocationFlags)
 		IncrementChangeCount();
 		fFreeSpace += area->Size();
 	}
+
+	if ((area->Base() + area->Size()) == fNextInsertHint)
+		fNextInsertHint -= area->Size();
 }
 
 
