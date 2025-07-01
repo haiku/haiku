@@ -1268,7 +1268,7 @@ struct TextFont {
 extern struct GfxBase *GRAPHICS_BASE_NAME;
 
 #define Amiga_ClearScreen(last) \
-	LP1NR(0x30, ClearScreen, struct RastPort *, last, a1, \
+	LP1NR(0x30, AmigaClearScreen_Internal, struct RastPort *, last, a1, \
 	, GRAPHICS_BASE_NAME)
 
 #define Text(par1, par2, last) \
