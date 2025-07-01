@@ -1209,7 +1209,7 @@ VMCache::Resize(off_t newSize, int priority)
 				// ensuring I/O is complete and pages are un-wired before size changes propagate.
 				// For this simulation, we'll just log if KDEBUG is on.
 #if KDEBUG
-				debug_printf("VMCache::Resize: Cannot remove page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
+				dprintf("VMCache::Resize: Cannot remove page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
 					page, page->cache_offset);
 #endif
 			}
@@ -1272,7 +1272,7 @@ VMCache::Rebase(off_t newBase, int priority)
 				vm_page_free(this, page);
 			} else {
 #if KDEBUG
-				debug_printf("VMCache::Rebase: Cannot remove page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
+				dprintf("VMCache::Rebase: Cannot remove page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
 					page, page->cache_offset);
 #endif
 			}
@@ -1342,7 +1342,7 @@ VMCache::Discard(off_t offset, off_t size)
 			discardedPageCount++;
 		} else {
 #if KDEBUG
-			debug_printf("VMCache::Discard: Cannot discard page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
+			dprintf("VMCache::Discard: Cannot discard page %p (offset %" B_PRIuPHYSADDR ") due to busy/wired state.\n",
 				page, page->cache_offset);
 #endif
 		}
@@ -1726,7 +1726,7 @@ VMCache::_SieveRemovePage(vm_page* page)
 #if KDEBUG
 		// This might be noisy if pages are legitimately removed before full SIEVE integration
 		// in all paths, but good for debugging initial implementation.
-		debug_printf("VMCache::_SieveRemovePage: Page %p (offset %" B_PRIuPHYSADDR ") may not be in SIEVE list or was already removed.\n",
+		dprintf("VMCache::_SieveRemovePage: Page %p (offset %" B_PRIuPHYSADDR ") may not be in SIEVE list or was already removed.\n",
 			page, page->cache_offset);
 #endif
 		// Ensure pointers are definitely NULL if it was an orphaned page and return.
