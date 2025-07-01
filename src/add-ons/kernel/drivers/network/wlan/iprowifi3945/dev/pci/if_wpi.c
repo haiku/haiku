@@ -271,7 +271,7 @@ wpi_attach(struct device *parent, struct device *self, void *aux)
 	    PCI_CAP_PCIEXPRESS, &sc->sc_cap_off, NULL);
 	if (error == 0) {
 		printf(": PCIe capability structure not found!\n");
-		return -1;
+		goto fail;
 	}
 
 	/* Clear device-specific "PCI retry timeout" register (41h). */
@@ -284,13 +284,13 @@ wpi_attach(struct device *parent, struct device *self, void *aux)
 	    &sc->sc_sh, NULL, &sc->sc_sz, 0);
 	if (error != 0) {
 		printf(": can't map mem space\n");
-		return -1;
+		goto fail;
 	}
 
 	/* Install interrupt handler. */
 	if (pci_intr_map_msi(pa, &ih) != 0 && pci_intr_map(pa, &ih) != 0) {
 		printf(": can't map interrupt\n");
-		return -1;
+		goto fail;
 	}
 	intrstr = pci_intr_string(sc->sc_pct, ih);
 	sc->sc_ih = pci_intr_establish(sc->sc_pct, ih, IPL_NET, wpi_intr, sc,
@@ -300,26 +300,26 @@ wpi_attach(struct device *parent, struct device *self, void *aux)
 		if (intrstr != NULL)
 			printf(" at %s", intrstr);
 		printf("\n");
-		return -1;
+		goto fail;
 	}
 	printf(": %s", intrstr);
 
 	/* Power ON adapter. */
 	if ((error = wpi_apm_init(sc)) != 0) {
 		printf(": could not power ON adapter\n");
-		return -1;
+		goto fail;
 	}
 
 	/* Read MAC address, channels, etc from EEPROM. */
 	if ((error = wpi_read_eeprom(sc)) != 0) {
 		printf(": could not read EEPROM\n");
-		return -1;
+		goto fail;
 	}
 
 	/* Allocate DMA memory for firmware transfers. */
 	if ((error = wpi_alloc_fwmem(sc)) != 0) {
 		printf(": could not allocate memory for firmware\n");
-		return -1;
+		goto fail;
 	}
 
 	/* Allocate shared area. */
@@ -409,6 +409,10 @@ fail2:	while (--i >= 0)
 		wpi_free_tx_ring(sc, &sc->txq[i]);
 	wpi_free_shared(sc);
 fail1:	wpi_free_fwmem(sc);
+#ifdef __HAIKU__
+fail:
+	if_free_inplace(ifp);
+#endif
 	return -1;
 }
 
