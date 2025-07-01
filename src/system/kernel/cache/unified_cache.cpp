@@ -69,7 +69,7 @@ unified_cache::Destroy()
         // In a real scenario, check ref_count, dirty status, etc.
         // object_cache_free(sEntryCache, entry->data); // If data is from slab
         free(entry->data); // If data is from malloc
-        object_cache_free(sEntryCache, entry);
+        object_cache_free(sEntryCache, entry, 0);
     }
 
     if (hash_table) {
@@ -148,7 +148,7 @@ unified_cache::RemoveEntry(unified_cache_entry* entry)
     if (entry->ref_count == 0) {
         // object_cache_free(sEntryCache, entry->data); // if data from slab
         free(entry->data); // if data from malloc
-        object_cache_free(sEntryCache, entry);
+        object_cache_free(sEntryCache, entry, 0);
     }
 }
 
@@ -226,7 +226,7 @@ unified_cache::EvictEntrySieve2()
             // For this simplified version, we assume it's freed.
             // object_cache_free(sEntryCache, candidate->data); // if data from slab
             free(candidate->data); // if data from malloc
-            object_cache_free(sEntryCache, candidate);
+            object_cache_free(sEntryCache, candidate, 0);
 
             return candidate; // Technically returning a pointer to freed memory, should return id or status.
                               // Let's change to return NULL after freeing, or the entry before freeing if caller manages it.
@@ -273,7 +273,7 @@ unified_cache_init(const char* name, size_t max_size_bytes, unified_cache** _cac
 {
     if (sEntryCache == NULL) {
         sEntryCache = create_object_cache("unified_cache_entries", sizeof(unified_cache_entry),
-                                          0, NULL, NULL, NULL);
+                                          0);
         if (sEntryCache == NULL)
             return B_NO_MEMORY;
     }
@@ -378,7 +378,7 @@ unified_cache_put_entry(unified_cache* cache, uint64 id, unified_data_type type,
 
     status_t status = cache->InsertEntry(entry);
     if (status != B_OK) {
-        object_cache_free(sEntryCache, entry); // Don't free entry->data, it's owned by caller
+        object_cache_free(sEntryCache, entry, 0); // Don't free entry->data, it's owned by caller
         return status;
     }
 
@@ -394,12 +394,12 @@ unified_cache_release_entry(unified_cache* cache, unified_cache_entry* entry)
 
     MutexLocker locker(cache->lock);
 
-    int32 old_ref_count = atomic_add(&entry->ref_count, -1);
-    TRACE("unified_cache_release_entry: Released entry %llu, old ref_count %ld, new %ld\n",
-        entry->id, old_ref_count, entry->ref_count);
+    atomic_add(&entry->ref_count, -1);
+    TRACE("unified_cache_release_entry: Released entry %" B_PRIu64 ", new ref_count %ld\n",
+        entry->id, entry->ref_count); // old_ref_count is no longer available directly here
 
     if (entry->ref_count < 0) {
-        panic("unified_cache_release_entry: Negative ref_count for entry %llu!", entry->id);
+        panic("unified_cache_release_entry: Negative ref_count for entry %" B_PRIu64 "!", entry->id);
     }
 
     if (entry->ref_count == 0) {
