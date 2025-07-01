@@ -156,14 +156,11 @@ StdBinCommands
 	: be : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libstdc++.so
-local savedCxxFlags = $(CXXFLAGS) ;
-CXXFLAGS += -std=c++11 ;
 StdBinCommands
 	copyattr.cpp
 	setmime.cpp
 	xres.cpp
 	: be [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
-CXXFLAGS = $(savedCxxFlags) ;
 
 # Haiku-specific apps which need libbe.so, libstdc++.so
 StdBinCommands
