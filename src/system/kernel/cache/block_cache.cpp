@@ -204,6 +204,7 @@ flush_pending_notifications_for_cache(block_cache* cache)
 //	}
 // }
 
+/*
 static void
 delete_notification(cache_notification* notification)
 {
@@ -213,6 +214,7 @@ delete_notification(cache_notification* notification)
 	else
 		delete notification;
 }
+*/
 
 /*
 static void
@@ -398,6 +400,7 @@ void* BlockWriter::_Data(cached_block* block) const
 		? block->original_data : block->data;
 }
 
+/*
 status_t BlockWriter::_WriteBlocks(cached_block** blocks, uint32 count)
 {
 	const size_t blockSize = fCache->block_size;
@@ -423,10 +426,11 @@ status_t BlockWriter::_WriteBlocks(cached_block** blocks, uint32 count)
 	}
 	return B_OK;
 }
+*/
 
-void BlockWriter::_BlockDone(cached_block* block, cache_transaction* /*transactionContext*/) { /* ... (implementation as before, ensure members exist) ... */ }
-void BlockWriter::_UnmarkWriting(cached_block* block) { /* ... (implementation as before, ensure members exist) ... */ }
-/*static*/ int BlockWriter::_CompareBlocks(const void* _blockA, const void* _blockB) { /* ... */ return 0; }
+/*void BlockWriter::_BlockDone(cached_block* block, cache_transaction* /-*transactionContext*-/) { /-* ... (implementation as before, ensure members exist) ... *-/ } */
+/*void BlockWriter::_UnmarkWriting(cached_block* block) { /-* ... (implementation as before, ensure members exist) ... *-/ } */
+/*static*//* int BlockWriter::_CompareBlocks(const void* _blockA, const void* _blockB) { /-* ... *-/ return 0; }*/
 
 #ifndef BUILDING_USERLAND_FS_SERVER
 // BlockPrefetcher methods commented out as unused
