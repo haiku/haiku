@@ -15,11 +15,21 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			continue ;
 		}
 
+		local currentCxxFlags = $(C++FLAGS) ;
+		# Remove any existing -std= flags
+		local cleanCxxFlags ;
+		local flag ;
+		for flag in $(currentCxxFlags) {
+			if ! [ Match "-std=*" : $(flag) ] {
+				cleanCxxFlags += $(flag) ;
+			}
+		}
+
 		# Explicitly set C++ standard per architecture for this kit
 		if $(architecture) = sparc || $(architecture) = m68k || $(architecture) = ppc {
-			SubDirC++Flags -std=gnu++14 ;
+			C++FLAGS on *.cpp = $(cleanCxxFlags) -std=gnu++14 ;
 		} else {
-			SubDirC++Flags -std=gnu++17 ;
+			C++FLAGS on *.cpp = $(cleanCxxFlags) -std=gnu++17 ;
 		}
 
 		StaticLibrary <$(architecture)>libnetservices2.a :
