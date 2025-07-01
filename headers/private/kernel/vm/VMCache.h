@@ -238,6 +238,8 @@ private:
 									/** Removes page from the SIEVE list, adjusts hand. */
 			vm_page*			_SieveFindVictimPage();
 									/** Finds a victim page using SIEVE algorithm. */
+			void				_SieveTouchPage(vm_page* page);
+									/** Updates page status on access for SIEVE. */
 
 			void				_MergeWithOnlyConsumer();
 			void				_RemoveConsumer(VMCache* consumer);
