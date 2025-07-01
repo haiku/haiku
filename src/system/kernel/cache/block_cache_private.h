@@ -23,11 +23,11 @@
 struct cached_block;
 struct cache_transaction;
 struct block_cache;
-extern object_cache* sCacheNotificationCache; // Used by cache_notification::new/delete
+extern object_cache* sCacheNotificationCache;
 
-// cache_notification and cache_listener definitions
+
 struct cache_notification {
-	DoublyLinkedListLink<cache_notification> link; // Link for pending_notifications list
+	DoublyLinkedListLink<cache_notification> link; // For pending_notifications list
 
 	int32			transaction_id;
 	int32			events_pending;
@@ -36,8 +36,33 @@ struct cache_notification {
 	void*			data;
 	bool			delete_after_event;
 
-	inline void* operator new(size_t size); // Defined in .cpp
-	inline void operator delete(void* block); // Defined in .cpp
+	// Inline new/delete to ensure definition is available and to handle -Werror=return-type
+	static inline void* operator new(size_t size) {
+		if (sCacheNotificationCache == NULL)
+			panic("cache_notification::new: sCacheNotificationCache is not initialized!");
+		void* block = object_cache_alloc(sCacheNotificationCache, 0);
+		if (block == NULL)
+			panic("cache_notification::new: object_cache_alloc failed!");
+		return block;
+	}
+
+	static inline void operator delete(void* block) {
+		if (sCacheNotificationCache == NULL) {
+			// This might happen during shutdown if caches are cleaned up late.
+			// It's not ideal to panic here if sCacheNotificationCache is gone.
+			// Consider how critical this is or if a TRACE_ALWAYS is better.
+			// For now, to avoid panic during potential shutdown races:
+			if (block != NULL) {
+				// Can't free via object_cache, potential leak or use after free if called late.
+				// This indicates a system design issue if sCacheNotificationCache is gone before all instances.
+				// panic("cache_notification::delete: sCacheNotificationCache is NULL but block is not!");
+				TRACE_ALWAYS("cache_notification::delete: sCacheNotificationCache is NULL! Potential leak for block %p\n", block);
+			}
+			return;
+		}
+		if (block != NULL)
+			object_cache_free(sCacheNotificationCache, block, 0);
+	}
 
 	cache_notification()
 		: transaction_id(0), events_pending(0), events(0), hook(NULL), data(NULL),
@@ -48,16 +73,13 @@ struct cache_notification {
 
 struct cache_listener : public cache_notification {
 	DoublyLinkedListLink<cache_listener> listener_list_link;
-		// Specific link for ListenerList
 };
 
-// Define ListenerList using the specific link member in cache_listener
 typedef DoublyLinkedList<cache_listener,
 	DoublyLinkedListMemberGetLink<cache_listener,
 		&cache_listener::listener_list_link> > ListenerList;
 
 
-// Hash table definition for cached_block
 struct BlockHashDefinition {
 	typedef off_t			KeyType;
 	typedef	cached_block	ValueType;
@@ -71,7 +93,6 @@ struct BlockHashDefinition {
 typedef BOpenHashTable<BlockHashDefinition> BlockTable;
 
 
-// Hash table definition for cache_transaction
 struct TransactionHashDefinition {
 	typedef int32			KeyType;
 	typedef cache_transaction ValueType;
@@ -85,9 +106,8 @@ struct TransactionHashDefinition {
 typedef BOpenHashTable<TransactionHashDefinition> TransactionTable;
 
 
-// cached_block structure
 struct cached_block {
-	DoublyLinkedListLink<cached_block> link; // For block_list
+	DoublyLinkedListLink<cached_block> link;
 
 	off_t				block_number;
 	void*				data;
@@ -128,9 +148,8 @@ typedef DoublyLinkedList<cached_block,
 		&cached_block::link> > block_list;
 
 
-// cache_transaction structure
 struct cache_transaction {
-	DoublyLinkedListLink<cache_transaction> link; // For potential global list of transactions
+	DoublyLinkedListLink<cache_transaction> link;
 
 	int32				id;
 	uint32				num_blocks;
@@ -162,9 +181,8 @@ struct cache_transaction {
 };
 
 
-// block_cache structure
 struct block_cache {
-	DoublyLinkedListLink<block_cache> link; // For sCaches list
+	DoublyLinkedListLink<block_cache> link;
 
 	mutex				lock;
 	int					fd;
@@ -222,7 +240,7 @@ extern mutex sCachesLock;
 extern mutex sNotificationsLock;
 extern mutex sCachesMemoryUseLock;
 extern object_cache* sBlockCache;
-// sCacheNotificationCache is now forward declared at the top, defined in .cpp
+// sCacheNotificationCache is forward declared at the top, defined in .cpp
 extern object_cache* sTransactionObjectCache;
 extern sem_id sEventSemaphore;
 extern thread_id sNotifierWriterThread;
