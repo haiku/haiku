@@ -245,9 +245,11 @@ add_to_iovec(generic_io_vec* vecs, uint32 &index, uint32 max,
 	}
 
 	if (index == max) {
-		ASSERT_PRINT("add_to_iovec: no more space for iovecs! index: %" B_PRIu32 ", max: %" B_PRIu32, index, max);
+		ASSERT_PRINT(false, "add_to_iovec: no more space for iovecs! index: %" B_PRIu32 ", max: %" B_PRIu32, index, max);
 		// This should not be reached if MAX_IO_VECS and chunking logic are correct.
 		// Return an error rather than panicking in a release build.
+		// The ASSERT_PRINT above will panic in KDEBUG builds.
+		// The dprintf below is for non-KDEBUG builds or for additional logging.
 		dprintf("add_to_iovec: Error - no more space for iovecs! index: %" B_PRIu32 ", max: %" B_PRIu32 "\n", index, max);
 		// How to return an error? This function doesn't return status.
 		// The callers would need to check vecCount against their expectation.
