@@ -62,8 +62,8 @@ thread_id sNotifierWriterThread = -1;
 
 size_t sUsedMemory = 0;
 
-static status_t block_notifier_and_writer(void* data);
-static block_cache* get_next_locked_block_cache(block_cache* last);
+// static status_t block_notifier_and_writer(void* data);
+// static block_cache* get_next_locked_block_cache(block_cache* last);
 
 block_cache sMarkCache(0, 0, 0, false);
 
@@ -147,7 +147,7 @@ cache_transaction*& TransactionHashDefinition::GetLink(cache_transaction* value)
 	return value->hash_link;
 }
 
-
+/*
 static bool
 get_next_pending_event(cache_notification* notification, int32* _event)
 {
@@ -161,6 +161,7 @@ get_next_pending_event(cache_notification* notification, int32* _event)
 	}
 	return false;
 }
+*/
 
 /*
 static void
@@ -213,6 +214,7 @@ delete_notification(cache_notification* notification)
 		delete notification;
 }
 
+/*
 static void
 add_notification(block_cache* cache, cache_notification* notification,
 	int32 event, bool deleteNotification)
@@ -233,6 +235,7 @@ add_notification(block_cache* cache, cache_notification* notification,
 	if (sEventSemaphore >= B_OK)
 		release_sem_etc(sEventSemaphore, 1, B_DO_NOT_RESCHEDULE);
 }
+*/
 
 /*
 static void
@@ -257,6 +260,7 @@ notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 }
 */
 
+/*
 static void
 remove_transaction_listeners(block_cache* cache, cache_transaction* transaction)
 {
@@ -266,6 +270,7 @@ remove_transaction_listeners(block_cache* cache, cache_transaction* transaction)
 		delete_notification(listener);
 	}
 }
+*/
 
 /*
 static void
@@ -341,6 +346,7 @@ BlockWriter::Add(cached_block* block, cache_transaction* /-*transaction*-/)
 
 // bool BlockWriter::Add(cache_transaction* transaction, bool& hasLeftOvers) { /* ... */ } // Commented out - unused
 
+/*
 status_t
 BlockWriter::Write(cache_transaction* currentTransactionContext, bool canUnlock)
 {
@@ -382,6 +388,7 @@ BlockWriter::Write(cache_transaction* currentTransactionContext, bool canUnlock)
 	fCount = 0;
 	return fStatus;
 }
+*/
 
 // status_t BlockWriter::WriteBlock(cached_block* block) { /* ... */ } // Commented out - unused
 
