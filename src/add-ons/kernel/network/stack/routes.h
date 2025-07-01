@@ -35,8 +35,15 @@ struct net_route_private : net_route {
 		// This is a basic sanity check, not foolproof.
 		// A more robust way might involve a magic number if we were really paranoid.
 		// For now, rely on the fact that 'node' is expected to be rn_nodes[0].
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif
 		return reinterpret_cast<net_route_private*>(
 			reinterpret_cast<char*>(node) - offsetof(net_route_private, rn_nodes[0]));
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 	}
 };
 
