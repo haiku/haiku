@@ -1,0 +1,8 @@
+# This Jamfile is intentionally left empty.
+# It is created to prevent the parent Jamfile's MultiArchSubDirSetup
+# from attempting to apply default rules or globs to an empty or
+# non-source-containing x86_64 specific directory for the 'complex'
+# musl component, which was causing an "Unknown suffix" error.
+# All sources for posix_musl_complex.o are common and defined in
+# src/system/libroot/posix/musl/complex/Jamfile.
+SubDir HAIKU_TOP src system libroot posix musl complex x86_64 ;
