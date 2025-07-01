@@ -1163,80 +1163,166 @@ load_elf_symbol_table(int fd, struct elf_image_info *image)
 	elf_sym *symbolTable = NULL;
 	elf_shdr *stringHeader = NULL;
 	uint32 numSymbols = 0;
-	char *stringTable;
-	status_t status;
+	char *stringTable = NULL; // Initialize to NULL
+	status_t status = B_OK;   // Initialize status
 	ssize_t length;
 	int32 i;
+	elf_shdr *sectionHeaders = NULL; // Initialize to NULL
 
 	// get section headers
+	uint64 calculated_sh_size = (uint64)elfHeader->e_shnum * elfHeader->e_shentsize;
+	const uint64 practical_max_sh_size = (uint64)0xffff * 256; // Max sections * generous entry size
 
-	ssize_t size = elfHeader->e_shnum * elfHeader->e_shentsize;
-	elf_shdr *sectionHeaders = (elf_shdr *)malloc(size);
-	if (sectionHeaders == NULL) {
-		dprintf("error allocating space for section headers\n");
-		return B_NO_MEMORY;
+	if (elfHeader->e_shnum > 0 && elfHeader->e_shentsize == 0) {
+		TRACE(("ELF: e_shentsize is 0 with e_shnum > 0.\n"));
+		status = B_BAD_DATA;
+		goto error0; // No allocations yet to free for this function's scope
+	}
+	if (calculated_sh_size > practical_max_sh_size || calculated_sh_size > SSIZE_MAX) {
+		TRACE(("ELF: Section headers table size (%" B_PRIu64 ") is too large.\n", calculated_sh_size));
+		status = B_BAD_DATA; // Or B_NO_MEMORY
+		goto error0;
 	}
 
-	length = read_pos(fd, elfHeader->e_shoff, sectionHeaders, size);
-	if (length < size) {
-		TRACE(("error reading in program headers\n"));
-		status = B_ERROR;
-		goto error1;
+	size_t section_headers_alloc_size = (size_t)calculated_sh_size;
+	if (section_headers_alloc_size > 0) {
+		sectionHeaders = (elf_shdr *)malloc(section_headers_alloc_size);
+		if (sectionHeaders == NULL) {
+			dprintf("error allocating space for section headers\n");
+			status = B_NO_MEMORY;
+			goto error0;
+		}
+	} else {
+		sectionHeaders = NULL; // Explicitly NULL if size is 0
+	}
+
+	if (section_headers_alloc_size > 0) {
+		length = read_pos(fd, elfHeader->e_shoff, sectionHeaders, section_headers_alloc_size);
+		if (length < 0) { // read_pos returns ssize_t, error is < 0
+			TRACE(("error reading in section headers: %s\n", strerror(length)));
+			status = length; // actual error code
+			goto error1;
+		}
+		if ((size_t)length < section_headers_alloc_size) {
+			TRACE(("short read while reading in section headers\n"));
+			status = B_ERROR; // Or B_IO_ERROR
+			goto error1;
+		}
 	}
 
 	// find symbol table in section headers
-
-	for (i = 0; i < elfHeader->e_shnum; i++) {
+	for (i = 0; i < elfHeader->e_shnum; i++) { // This loop won't run if e_shnum is 0
 		if (sectionHeaders[i].sh_type == SHT_SYMTAB) {
+			// Validate sh_link before using it as an index
+			if (sectionHeaders[i].sh_link >= elfHeader->e_shnum) {
+				TRACE(("ELF: Invalid sh_link in SYMTAB section header.\n"));
+				status = B_BAD_DATA;
+				goto error1;
+			}
 			stringHeader = &sectionHeaders[sectionHeaders[i].sh_link];
 
 			if (stringHeader->sh_type != SHT_STRTAB) {
-				TRACE(("doesn't link to string table\n"));
+				TRACE(("SHT_SYMTAB section does not link to a SHT_STRTAB section.\n"));
 				status = B_BAD_DATA;
 				goto error1;
 			}
 
 			// read in symbol table
-			size = sectionHeaders[i].sh_size;
-			symbolTable = (elf_sym *)malloc(size);
+			size_t symtab_size = sectionHeaders[i].sh_size;
+			if (symtab_size == 0) { // Empty symbol table is valid
+				numSymbols = 0;
+				symbolTable = NULL; // Ensure it's NULL if size is 0
+				break;
+			}
+			if (symtab_size > practical_max_sh_size) { // Reuse practical_max_sh_size as a general sanity limit
+				TRACE(("ELF: Symbol table size (%" B_PRIuSIZE ") is too large.\n", symtab_size));
+				status = B_BAD_DATA;
+				goto error1;
+			}
+			if (symtab_size % sizeof(elf_sym) != 0) {
+				TRACE(("ELF: Symbol table size is not a multiple of elf_sym size.\n"));
+				status = B_BAD_DATA;
+				goto error1;
+			}
+
+			symbolTable = (elf_sym *)malloc(symtab_size);
 			if (symbolTable == NULL) {
 				status = B_NO_MEMORY;
 				goto error1;
 			}
 
-			length
-				= read_pos(fd, sectionHeaders[i].sh_offset, symbolTable, size);
-			if (length < size) {
-				TRACE(("error reading in symbol table\n"));
+			length = read_pos(fd, sectionHeaders[i].sh_offset, symbolTable, symtab_size);
+			if (length < 0) {
+				TRACE(("error reading in symbol table: %s\n", strerror(length)));
+				status = length;
+				goto error2;
+			}
+			if ((size_t)length < symtab_size) {
+				TRACE(("short read while reading in symbol table\n"));
 				status = B_ERROR;
 				goto error2;
 			}
 
-			numSymbols = size / sizeof(elf_sym);
+			numSymbols = symtab_size / sizeof(elf_sym);
 			break;
 		}
 	}
 
-	if (symbolTable == NULL) {
-		TRACE(("no symbol table\n"));
+	if (symbolTable == NULL && elfHeader->e_shnum > 0 && i == elfHeader->e_shnum) {
+		TRACE(("no symbol table (SHT_SYMTAB) found\n"));
 		status = B_BAD_VALUE;
 		goto error1;
 	}
-
-	// read in string table
-
-	stringTable = (char *)malloc(size = stringHeader->sh_size);
-	if (stringTable == NULL) {
-		status = B_NO_MEMORY;
-		goto error2;
+	if (symbolTable == NULL && numSymbols == 0) {
+		goto success_no_symbols;
 	}
 
-	length = read_pos(fd, stringHeader->sh_offset, stringTable, size);
-	if (length < size) {
-		TRACE(("error reading in string table\n"));
-		status = B_ERROR;
-		goto error3;
+
+	// read in string table (only if stringHeader was found and validated)
+	if (stringHeader == NULL) {
+		TRACE(("ELF: stringHeader is NULL, implies no valid SHT_SYMTAB or SHT_STRTAB found.\n"));
+		if (symbolTable != NULL) {
+			status = B_BAD_DATA;
+			goto error2;
+		}
+		goto success_no_symbols;
 	}
+
+
+	size_t strtab_size = stringHeader->sh_size;
+	if (strtab_size == 0) {
+		stringTable = (char*)malloc(1);
+		if (stringTable == NULL) {
+			status = B_NO_MEMORY;
+			goto error2;
+		}
+		stringTable[0] = '\0';
+	} else {
+		if (strtab_size > practical_max_sh_size) {
+			TRACE(("ELF: String table size (%" B_PRIuSIZE ") is too large.\n", strtab_size));
+			status = B_BAD_DATA;
+			goto error2;
+		}
+		stringTable = (char *)malloc(strtab_size);
+		if (stringTable == NULL) {
+			status = B_NO_MEMORY;
+			goto error2;
+		}
+
+		length = read_pos(fd, stringHeader->sh_offset, stringTable, strtab_size);
+		if (length < 0) {
+			TRACE(("error reading in string table: %s\n", strerror(length)));
+			status = length;
+			goto error3;
+		}
+		if ((size_t)length < strtab_size) {
+			TRACE(("short read while reading in string table\n"));
+			status = B_ERROR;
+			goto error3;
+		}
+	}
+
+success_no_symbols:
 
 	TRACE(("loaded %" B_PRId32 " debug symbols\n", numSymbols));
 
