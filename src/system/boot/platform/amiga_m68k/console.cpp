@@ -298,12 +298,12 @@ ConsoleDevice::WaitForKey()
 {
 	char ascii;
 	
-	if (ReadAt(NULL, 0, &ascii, 1) < 1)
+	if (this->ReadAt(NULL, 0, &ascii, 1) < 1)
 		return TEXT_CONSOLE_NO_KEY;
 	//dprintf("ascii %d %c\n", ascii, ascii);
 
 	if (ascii == (char)0x9b) {
-		if (ReadAt(NULL, 0, &ascii, 1) < 1)
+		if (this->ReadAt(NULL, 0, &ascii, 1) < 1)
 			return TEXT_CONSOLE_NO_KEY;
 		//dprintf(">ascii %d %c\n", ascii, ascii);
 		switch (ascii) {
@@ -317,16 +317,16 @@ ConsoleDevice::WaitForKey()
 				return TEXT_CONSOLE_KEY_RIGHT;
 			case '4':
 			{
-				if (ReadAt(NULL, 0, &ascii, 1) < 1)
+				if (this->ReadAt(NULL, 0, &ascii, 1) < 1)
 					return TEXT_CONSOLE_NO_KEY;
 				if (ascii == '~')
 					return TEXT_CONSOLE_NO_KEY;
 				switch (ascii) {
 					case '1':
-						ReadAt(NULL, 0, &ascii, 1); // ~
+						this->ReadAt(NULL, 0, &ascii, 1); // ~
 						return TEXT_CONSOLE_KEY_PAGE_UP;
 					case '2':
-						ReadAt(NULL, 0, &ascii, 1); // ~
+						this->ReadAt(NULL, 0, &ascii, 1); // ~
 						return TEXT_CONSOLE_KEY_PAGE_UP;
 					default:
 						return TEXT_CONSOLE_NO_KEY;
