@@ -421,7 +421,7 @@ rule KernelArchitectureSetup architecture
 			# Unfortunately it's not easy to make the kernel be
 			# position-independant, on sparc, that requires relocation support
 			# in the ELF loader to fill in the plt section.
-			HAIKU_KERNEL_PIC_CCFLAGS = -fPIE ;
+			HAIKU_KERNEL_PIC_CCFLAGS = -fPIE -fPIC ;
 			HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
 
 		case x86 :

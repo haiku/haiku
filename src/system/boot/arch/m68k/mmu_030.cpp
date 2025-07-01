@@ -131,7 +131,13 @@ static status_t
 enable_paging(void)
 {
 	TRACE(("mmu_030:enable_paging\n"));
-	return B_NO_INIT;
+	uint16 tc = 0x8000; // Enable, 4K page size (ignored by 030)
+	asm volatile( \
+		".chip 68030\n\t" \
+		"pmove (%0),%%tc\n\t" \
+		".chip 68k\n\t" \
+		: : "a"(&tc));
+	return B_OK;
 }
 
 
