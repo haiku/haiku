@@ -578,15 +578,16 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	start = align_address(start, alignment);
 
-	bool useHint
-		= addressSpec != B_EXACT_ADDRESS && !is_base_address_spec(addressSpec);
+	bool useHint = addressSpec != B_EXACT_ADDRESS
+		&& !is_base_address_spec(addressSpec)
+		&& fFreeSpace > (Size() / 2);
 
 	addr_t originalStart = 0;
 	if (fRandomizingEnabled && addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
 		originalStart = start;
 		start = _RandomizeAddress(start, end - size + 1, alignment, true);
 	} else if (useHint
-		&& start <= fNextInsertHint && fNextInsertHint <= end - size + 1) {
+			&& start <= fNextInsertHint && fNextInsertHint <= (end - size + 1)) {
 		originalStart = start;
 		start = fNextInsertHint;
 	}
@@ -595,7 +596,7 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 second_chance:
 	VMUserArea* next = fAreas.FindClosest(start + size, false);
 	VMUserArea* last = next != NULL
-			? fAreas.Previous(next) : fAreas.FindClosest(start + size, true);
+		? fAreas.Previous(next) : fAreas.FindClosest(start + size, true);
 
 	// find the right spot depending on the address specification - the area
 	// will be inserted directly after "last" ("next" is not referenced anymore)
