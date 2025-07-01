@@ -24,10 +24,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 local arch ;
 for arch in $(TARGET_ARCHS) {
-	# Explicitly tell Jam not to try to build anything from complex/<arch>/* using default rules,
-	# as these directories are expected to be empty or managed by complex/Jamfile itself.
-	local complexArchDir = [ FDirName complex $(arch) ] ;
-	NoUserObject $(complexArchDir)/* ;
 	HaikuSubInclude math $(arch) ;
 }
 
