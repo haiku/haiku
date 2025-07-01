@@ -1937,7 +1937,6 @@ VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
 	return B_OK;
 }
 
-
 /*static*/ status_t
 VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode)
 {
@@ -2012,3 +2011,5 @@ VMCacheFactory::CreateNullCache(int priority, VMCache*& _cache)
 	_cache = cache;
 	return B_OK;
 }
+
+[end of src/system/kernel/vm/VMCache.cpp]
