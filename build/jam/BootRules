@@ -138,11 +138,15 @@ rule BootLd
 	# For PPC, also try linking against the general libgcc, as it might contain
 	# ABI helpers not present in libgcc-kernel.a for the bootloader.
 	if $(TARGET_KERNEL_ARCH) = ppc {
-		# Assuming libgcc.a is found via -lgcc by the linker in the toolchain's lib path
-		libs += -lgcc ;
+		# Provide full path to libgcc.a from the toolchain
+		libs += [ FJoin $(HAIKU_GCC_LIB_DIR_$(TARGET_KERNEL_ARCH)) libgcc.a ] ;
 	}
 	LINKLIBS on $(1) = $(libs) ;
 	Depends $(1) : [ TargetBootLibgcc $(TARGET_KERNEL_ARCH) ] ;
+	# Ensure dependency on the explicitly added libgcc.a if it's PPC
+	if $(TARGET_KERNEL_ARCH) = ppc {
+		Depends $(1) : [ FJoin $(HAIKU_GCC_LIB_DIR_$(TARGET_KERNEL_ARCH)) libgcc.a ] ;
+	}
 
 	# TODO: Do we really want to invoke SetupBoot here? The objects should
 	# have been compiled with BootObjects anyway, so we're doing that twice.
