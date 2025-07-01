@@ -5,6 +5,11 @@ UseHeaders [ FDirName $(SUBDIR) .. internal ] ;
 UseHeaders [ FDirName $(SUBDIR) .. arch $(TARGET_ARCH) ] ;
 UseHeaders [ FDirName $(SUBDIR) .. arch generic ] ;
 
+# If the arch-specific complex directory (e.g., complex/ppc) is empty,
+# a wildcard glob like complex/ppc/* might cause "Unknown suffix" errors.
+# Explicitly tell Jam not to try to build anything from such paths using default rules.
+NoUserObject $(SUBDIR)/$(TARGET_ARCH)/* ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
