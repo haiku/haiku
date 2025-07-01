@@ -12,7 +12,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 040 ] ;
 # cpu-specific stuff
 KernelMergeObject arch_m68k_030.o :
 	arch_030_cpu.cpp
-	#arch_030_mmu.cpp
+	arch_030_mmu.cpp
 	arch_030_asm.S
 
 	# paging/030
@@ -25,7 +25,7 @@ KernelMergeObject arch_m68k_030.o :
 
 KernelMergeObject arch_m68k_040.o :
 	arch_040_cpu.cpp
-	#arch_040_mmu.cpp
+	arch_040_mmu.cpp
 	arch_040_asm.S
 
 	# paging/040
