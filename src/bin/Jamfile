@@ -156,6 +156,7 @@ StdBinCommands
 	: be : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libstdc++.so
+Object src/bin/setmime.cpp : <cxxflags>-std=c++11 ;
 StdBinCommands
 	copyattr.cpp
 	setmime.cpp
