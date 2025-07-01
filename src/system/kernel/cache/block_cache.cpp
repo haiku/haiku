@@ -394,12 +394,6 @@ BlockWriter::Write(cache_transaction* currentTransactionContext, bool canUnlock)
 
 // status_t BlockWriter::WriteBlock(cached_block* block) { /* ... */ } // Commented out - unused
 
-void* BlockWriter::_Data(cached_block* block) const
-{
-	return (block->previous_transaction != NULL && block->original_data != NULL)
-		? block->original_data : block->data;
-}
-
 /*
 status_t BlockWriter::_WriteBlocks(cached_block** blocks, uint32 count)
 {
