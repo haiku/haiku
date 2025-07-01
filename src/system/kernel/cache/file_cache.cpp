@@ -623,7 +623,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		status = vfs_read_pages(ref->vnode, cookie, offset, &readVec, 1,
 			B_PHYSICAL_IO_REQUEST, &bytesRead);
 		if (status < B_OK) {
-			dprintf("file_cache: write_to_cache: failed to read first partial page for offset %lld: %s\n", offset, strerror(status));
+			dprintf("file_cache: write_to_cache: failed to read first partial page for offset %ld: %s\n", offset, strerror(status));
 			// Pages are marked busy, need to unbusy them before returning.
 			// The lock is not held here.
 			ref->cache->Lock();
@@ -658,7 +658,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 				PAGE_ALIGN(offset + pageOffset + bufferSize) - B_PAGE_SIZE,
 				&readVec, 1, B_PHYSICAL_IO_REQUEST, &bytesRead);
 			if (status < B_OK) {
-				dprintf("file_cache: write_to_cache: failed to read last partial page for offset %lld: %s\n",
+				dprintf("file_cache: write_to_cache: failed to read last partial page for offset %lu: %s\n",
 					PAGE_ALIGN(offset + pageOffset + bufferSize) - B_PAGE_SIZE, strerror(status));
 				// Pages are marked busy, need to unbusy them before returning.
 				// The lock is not held here.
@@ -705,7 +705,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		status_t writeStatus = vfs_write_pages(ref->vnode, cookie, offset, vecs,
 			vecCount, B_PHYSICAL_IO_REQUEST, &numBytes);
 		if (writeStatus < B_OK) {
-			dprintf("file_cache: write_to_cache: vfs_write_pages failed for offset %lld: %s\n", offset, strerror(writeStatus));
+			dprintf("file_cache: write_to_cache: vfs_write_pages failed for offset %ld: %s\n", offset, strerror(writeStatus));
 			// Even if write fails, the data is in the cache (and marked modified by default earlier).
 			// The pages are busy. We need to unbusy them.
 			// The original 'status' (which is B_OK at this point if we reached here)
