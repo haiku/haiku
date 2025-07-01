@@ -8,6 +8,7 @@
 #include <slab/Slab.h>
 #include <util/AutoLock.h>
 #include <kernel.h> // For dprintf, new_lock etc.
+#include <inttypes.h> // For B_PRIu64 if not implicitly included
 
 // Define to enable debug output
 //#define TRACE_UNIFIED_CACHE
@@ -67,7 +68,7 @@ unified_cache::Destroy()
     unified_cache_entry* entry = NULL;
     while ((entry = sieve_list.RemoveHead()) != NULL) {
         // In a real scenario, check ref_count, dirty status, etc.
-        // object_cache_free(sEntryCache, entry->data); // If data is from slab
+        // object_cache_free(sEntryCache, entry->data, 0); // If data is from slab
         free(entry->data); // If data is from malloc
         object_cache_free(sEntryCache, entry, 0);
     }
@@ -96,7 +97,7 @@ unified_cache::InsertEntry(unified_cache_entry* entry)
     if (current_size_bytes + entry->size > max_size_bytes && sieve_list.Count() > 0) {
         unified_cache_entry* victim = EvictEntrySieve2();
         if (victim) {
-            TRACE("InsertEntry: Evicted entry %llu to make space.\n", victim->id);
+            TRACE("InsertEntry: Evicted entry %\" B_PRIu64 \" to make space.\n", victim->id);
             // Data and entry itself are freed by EvictEntrySieve2 if no refs
         } else if (current_size_bytes + entry->size > max_size_bytes) {
             // Still no space, eviction failed (e.g. all pages pinned)
@@ -115,7 +116,7 @@ unified_cache::InsertEntry(unified_cache_entry* entry)
         sieve_hand = sieve_list.Head();
     }
 
-    TRACE("InsertEntry: Inserted entry %llu, current size %lu bytes, %lu entries.\n",
+    TRACE("InsertEntry: Inserted entry %\" B_PRIu64 \", current size %lu bytes, %lu entries.\n",
         entry->id, current_size_bytes, current_entries);
     return B_OK;
 }
@@ -125,7 +126,7 @@ unified_cache::RemoveEntry(unified_cache_entry* entry)
 {
     // Assumes lock is held and entry is no longer referenced externally for cache purposes
     // (ref_count might be >0 if someone holds a direct pointer, but cache considers it removable)
-    TRACE("RemoveEntry: Removing entry %llu.\n", entry->id);
+    TRACE("RemoveEntry: Removing entry %\" B_PRIu64 \".\n", entry->id);
 
     // If the hand points to the entry being removed, advance the hand.
     // This is crucial for SIEVE's clock behavior.
@@ -146,7 +147,7 @@ unified_cache::RemoveEntry(unified_cache_entry* entry)
     // For simplicity here, assume it's freed immediately if no outstanding refs.
     // This part needs to align with unified_cache_release_entry.
     if (entry->ref_count == 0) {
-        // object_cache_free(sEntryCache, entry->data); // if data from slab
+        // object_cache_free(sEntryCache, entry->data, 0); // if data from slab
         free(entry->data); // if data from malloc
         object_cache_free(sEntryCache, entry, 0);
     }
@@ -184,7 +185,7 @@ unified_cache::EvictEntrySieve2()
             // Let's assume for now it stays in place, and hand moves.
         } else {
             // Found victim
-            TRACE("EvictEntrySieve2: Victim found %llu (visited_count: %u, ref_count: %ld).\n",
+            TRACE("EvictEntrySieve2: Victim found %\" B_PRIu64 \" (visited_count: %u, ref_count: %ld).\n",
                 candidate->id, candidate->sieve_visited_count, candidate->ref_count);
 
             // Before removing from hash and list, advance the hand
@@ -203,7 +204,7 @@ unified_cache::EvictEntrySieve2()
             // This is a simplified eviction. A real one would queue dirty blocks
             // for write-back and might not evict immediately.
             if (candidate->is_dirty) {
-                TRACE("EvictEntrySieve2: Victim %llu is dirty. Needs writeback (not implemented here).\n", candidate->id);
+                TRACE("EvictEntrySieve2: Victim %\" B_PRIu64 \" is dirty. Needs writeback (not implemented here).\n", candidate->id);
                 // For now, we'll pretend it's written back or handle it as an error for eviction
                 // A robust cache would have a mechanism to flush dirty pages.
                 // For now, let's just mark it as not evictable if dirty and unreferenced.
@@ -224,7 +225,7 @@ unified_cache::EvictEntrySieve2()
             // The caller is responsible for freeing the victim's data and the entry struct itself
             // if ref_count is indeed 0.
             // For this simplified version, we assume it's freed.
-            // object_cache_free(sEntryCache, candidate->data); // if data from slab
+            // object_cache_free(sEntryCache, candidate->data, 0); // if data from slab
             free(candidate->data); // if data from malloc
             object_cache_free(sEntryCache, candidate, 0);
 
@@ -263,7 +264,7 @@ unified_cache::AccessEntrySieve2(unified_cache_entry* entry)
     // And for SIEVE-2, the count matters. Let's use 1 as the "recently visited" state.
     entry->sieve_visited_count = 1; // Set to 1 (or highest value for SIEVE-N)
 
-    TRACE("AccessEntrySieve2: Accessed entry %llu, new visited_count %u.\n", entry->id, entry->sieve_visited_count);
+    TRACE("AccessEntrySieve2: Accessed entry %\" B_PRIu64 \", new visited_count %u.\n", entry->id, entry->sieve_visited_count);
 }
 
 // #pragma mark - Public API functions
@@ -323,12 +324,12 @@ unified_cache_get_entry(unified_cache* cache, uint64 id, unified_data_type type)
         atomic_add(&entry->ref_count, 1);
         cache->AccessEntrySieve2(entry);
         cache->hits++;
-        TRACE("unified_cache_get_entry: Hit for ID %llu, ref_count %ld\n", id, entry->ref_count);
+        TRACE("unified_cache_get_entry: Hit for ID %\" B_PRIu64 \", ref_count %ld\n", id, entry->ref_count);
         return entry;
     }
 
     cache->misses++;
-    TRACE("unified_cache_get_entry: Miss for ID %llu\n", id);
+    TRACE("unified_cache_get_entry: Miss for ID %\" B_PRIu64 \".\n", id);
 
     // TODO: Entry not found, need to load it.
     // This requires interaction with block_device or file_system logic.
@@ -353,7 +354,7 @@ unified_cache_put_entry(unified_cache* cache, uint64 id, unified_data_type type,
         // If size changes, or data pointer changes, needs careful handling.
         // For simplicity, assume put is for new entries or overwriting with same size.
         // A real cache might free old data, update new data, mark dirty.
-        TRACE("unified_cache_put_entry: Entry %llu exists. Updating (simplified).\n", id);
+        TRACE("unified_cache_put_entry: Entry %\" B_PRIu64 \" exists. Updating (simplified).\n", id);
         // free(entry->data); // Free old data if necessary
         entry->data = data; // This assumes caller manages old data if replaced
         entry->size = size; // Size could change
@@ -394,12 +395,12 @@ unified_cache_release_entry(unified_cache* cache, unified_cache_entry* entry)
 
     MutexLocker locker(cache->lock);
 
-    atomic_add(&entry->ref_count, -1);
-    TRACE("unified_cache_release_entry: Released entry %" B_PRIu64 ", new ref_count %ld\n",
-        entry->id, entry->ref_count); // old_ref_count is no longer available directly here
+    atomic_add(&entry->ref_count, -1); // Removed storing old_ref_count
+    TRACE("unified_cache_release_entry: Released entry %\" B_PRIu64 \", new ref_count %ld\n",
+        entry->id, entry->ref_count);
 
     if (entry->ref_count < 0) {
-        panic("unified_cache_release_entry: Negative ref_count for entry %" B_PRIu64 "!", entry->id);
+        panic("unified_cache_release_entry: Negative ref_count for entry %\" B_PRIu64 \"!", entry->id);
     }
 
     if (entry->ref_count == 0) {
@@ -408,7 +409,7 @@ unified_cache_release_entry(unified_cache* cache, unified_cache_entry* entry)
         // This logic is tricky: an entry with ref_count 0 is a candidate for eviction.
         // If it's *also* not in the hash/sieve list (e.g. due to discard), then it can be freed.
         // For now, do nothing more; eviction or discard handles actual freeing.
-        TRACE("unified_cache_release_entry: Entry %llu ref_count is 0. Candidate for eviction.\n", entry->id);
+        TRACE("unified_cache_release_entry: Entry %\" B_PRIu64 \" ref_count is 0. Candidate for eviction.\n", entry->id);
     }
 }
 
@@ -426,7 +427,7 @@ unified_cache_make_writable(unified_cache* cache, unified_cache_entry* entry, bo
     }
     // Accessing it for write implies it's recently used.
     cache->AccessEntrySieve2(entry);
-    TRACE("unified_cache_make_writable: Entry %llu marked %s.\n", entry->id, markDirty ? "dirty" : "writable (not dirty)");
+    TRACE("unified_cache_make_writable: Entry %\" B_PRIu64 \" marked %s.\n", entry->id, markDirty ? "dirty" : "writable (not dirty)");
     return B_OK;
 }
 
@@ -450,7 +451,7 @@ unified_cache_discard(unified_cache* cache, uint64 id, unified_data_type type)
     if (entry->ref_count > 0) {
         // Cannot discard a referenced entry. Or, it means "mark for discard when refs drop to 0".
         // For now, let's be strict.
-        TRACE("unified_cache_discard: Entry %llu is referenced (ref_count %ld), cannot discard directly.\n",
+        TRACE("unified_cache_discard: Entry %\" B_PRIu64 \" is referenced (ref_count %ld), cannot discard directly.\n",
             id, entry->ref_count);
         return B_BUSY;
     }
@@ -458,11 +459,11 @@ unified_cache_discard(unified_cache* cache, uint64 id, unified_data_type type)
     // TODO: If dirty, should it be written back first or discarded forcefully?
     // Typically, discard implies data is no longer valid or needed.
     if (entry->is_dirty) {
-        TRACE("unified_cache_discard: Discarding dirty entry %llu without writeback.\n", id);
+        TRACE("unified_cache_discard: Discarding dirty entry %\" B_PRIu64 \" without writeback.\n", id);
     }
 
     cache->RemoveEntry(entry); // This will also free the entry and its data if ref_count is 0
-    TRACE("unified_cache_discard: Discarded entry %llu.\n", id);
+    TRACE("unified_cache_discard: Discarded entry %\" B_PRIu64 \".\n", id);
     return B_OK;
 }
 

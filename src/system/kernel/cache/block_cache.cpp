@@ -76,7 +76,7 @@ static mutex sBlockCacheInstancesLock = MUTEX_INITIALIZER("block_cache_instances
 
 // For transaction event notifications
 static sem_id sTransactionEventSemaphore;
-// sTransactionNotificationsLock is already defined below if needed, or should be here. Let's assume it's correct.
+static mutex sTransactionNotificationsLock = MUTEX_INITIALIZER("block_cache_transaction_notifications_lock");
 static thread_id sTransactionNotifierWriterThread;
 
 // If sMarkInstance is used for safe iteration over sBlockCacheInstances
@@ -645,25 +645,6 @@ private:
 #	define T(x) ;
 #endif
 
-// TODO: sCaches list might be re-introduced if block_cache_instance_data needs global tracking.
-// static DoublyLinkedList<block_cache_instance_data> sBlockCacheInstances;
-// static mutex sBlockCacheInstancesLock = MUTEX_INITIALIZER("block cache instances");
-
-static mutex sBlockCacheMemoryUseLock = MUTEX_INITIALIZER("block cache memory use");
-static size_t sCurrentBlockDataMemoryUsed = 0; // Approximate memory used by block data in unified cache
-
-// The event semaphore and notifier thread for transactions might still be needed.
-static sem_id sTransactionEventSemaphore;
-static mutex sTransactionNotificationsLock = MUTEX_INITIALIZER("block cache transaction notifications");
-static thread_id sTransactionNotifierWriterThread;
-// static DoublyLinkedListLink<block_cache_instance_data> sMarkInstance; // If iterating instances
-
-
-// These static functions operated on the old 'cached_block' and 'block_cache' structs.
-// They will either be removed or heavily adapted.
-// static void mark_block_busy_reading(block_cache* cache, cached_block* block);
-// static void mark_block_unbusy_reading(block_cache* cache, cached_block* block);
-
 // TODO: Placeholder for reading a block from disk into a provided buffer.
 // This will be used when unified_cache_get_entry results in a miss.
 static status_t
@@ -850,7 +831,7 @@ add_notification(block_cache* cache, cache_notification* notification,
 		delete_notification(notification);
 	}
 
-	release_sem_etc(sEventSemaphore, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(sTransactionEventSemaphore, 1, B_DO_NOT_RESCHEDULE);
 		// We're probably still holding some locks that makes rescheduling
 		// not a good idea at this point.
 }
@@ -2692,7 +2673,7 @@ block_notifier_and_writer(void* /*data*/)
 	while (true) {
 		bigtime_t start = system_time();
 
-		status_t status = acquire_sem_etc(sEventSemaphore, 1,
+		status_t status = acquire_sem_etc(sTransactionEventSemaphore, 1,
 			B_RELATIVE_TIMEOUT, timeout);
 		if (status == B_OK) {
 			flush_pending_notifications();
@@ -3535,9 +3516,9 @@ block_cache_delete(void* _cache, bool allowWrites)
 	if (allowWrites)
 		block_cache_sync(cache);
 
-	mutex_lock(&sCachesLock);
-	sCaches.Remove(cache);
-	mutex_unlock(&sCachesLock);
+	mutex_lock(&sBlockCacheInstancesLock);
+	sBlockCacheInstances.Remove(cache);
+	mutex_unlock(&sBlockCacheInstancesLock);
 
 	mutex_lock(&cache->lock);
 
@@ -3580,8 +3561,8 @@ block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 		return NULL;
 	}
 
-	MutexLocker _(sCachesLock);
-	sCaches.Add(cache);
+	MutexLocker _(sBlockCacheInstancesLock);
+	sBlockCacheInstances.Add(cache);
 
 	return cache;
 }
@@ -4095,3 +4076,5 @@ block_cache_prefetch(void* _cache, off_t startBlockNumber, size_t* _numBlocks)
 	return B_UNSUPPORTED;
 #endif // !BUILDING_USERLAND_FS_SERVER
 }
+
+[end of src/system/kernel/cache/block_cache.cpp]
