@@ -12,75 +12,127 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h> // For TransactionTable if transactions remain similar
 
-// Forward declarations from the old block_cache.cpp (if parts of transaction logic are kept)
-// These are illustrative and will be refined.
-struct cache_transaction_block_data; // If we keep transaction logic separate
+// Forward declarations
+struct cache_listener;
+struct cache_transaction;
+struct unified_cache_entry; // From unified_cache.h, but good to forward declare
+
+typedef DoublyLinkedList<cache_listener> ListenerList;
 
 // This structure will hold the per-instance data for a "block cache"
-// which now primarily acts as a frontend to the unified_cache for block data,
-// and manages block-specific logic like transactions if they aren't fully
-// pushed into the unified_cache.
 struct block_cache_instance_data {
-    unified_cache*  master_cache;       // Pointer to the global unified cache instance
-    int             fd;                 // File descriptor for the block device
-    off_t           num_blocks;         // Total number of blocks on the device
-    size_t          block_size;         // Size of each block
-    bool            read_only;          // Is the cache read-only?
+	unified_cache*  master_cache;
+	int             fd;
+	off_t           num_blocks;
+	size_t          block_size;
+	bool            read_only;
 
-    // Transaction-related fields (if kept separate from unified_cache_entry)
-    // This part needs significant redesign. For now, let's assume transactions
-    // are still managed here, operating on data obtained from the unified cache.
-    mutex                   transaction_lock; // Separate lock for transaction metadata
-    int32                   next_transaction_id;
-    struct cache_transaction* last_transaction; // old struct cache_transaction might be reused/adapted
+	mutex           transaction_lock;
+	int32           next_transaction_id;
+	cache_transaction* last_transaction;
 
-    // We might need a way to map transaction IDs to transaction metadata.
-    // The old TransactionTable might be adapted.
-    // TransactionTable*       transaction_hash;
+	struct TransactionHashDefinition {
+		typedef int32               KeyType;
+		typedef cache_transaction   ValueType;
 
+		size_t HashKey(KeyType key) const { return key; }
+		size_t Hash(ValueType* value) const; // Implemented in .cpp
+		bool Compare(KeyType key, ValueType* value) const; // Implemented in .cpp
+		ValueType*& GetLink(ValueType* value) const; // Implemented in .cpp
+	};
+	typedef BOpenHashTable<TransactionHashDefinition> TransactionTable;
+	TransactionTable*       transaction_hash;
 
-    // List of active transactions specific to this block device instance.
-    // This is highly dependent on how transaction logic is refactored.
-    // For now, keeping it conceptual.
-    // DoublyLinkedList<adapted_cache_transaction> active_transactions;
+	// For managing pending notifications (if this logic is kept)
+	mutex			notifications_lock; // Separate from main cache lock
+	DoublyLinkedList<cache_listener> pending_notifications; // Listeners waiting for events
 
-    // TODO: Other fields needed to maintain the block cache API,
-    // especially for transaction management.
-    // The original `block_cache` struct had listener lists, notification lists, etc.
-    // These will need to be re-evaluated.
+	// Condition variables from old block_cache, now per instance
+	ConditionVariable busy_reading_condition;
+	ConditionVariable busy_writing_condition;
+	ConditionVariable transaction_sync_condition; // For cache_sync_transaction waits
 
-    block_cache_instance_data(int _fd, off_t _num_blocks, size_t _block_size, bool _read_only)
-        : master_cache(NULL), fd(_fd), num_blocks(_num_blocks), block_size(_block_size),
-          read_only(_read_only), next_transaction_id(1), last_transaction(NULL)
-          /* transaction_hash(NULL) */ {
-        mutex_init(&transaction_lock, "block cache transaction lock");
-    }
+	uint32			busy_reading_count;
+	bool			busy_reading_waiters;
+	uint32			busy_writing_count;
+	bool			busy_writing_waiters; // If specific waiters on block, else use CV broadcast
 
-    ~block_cache_instance_data() {
-        mutex_destroy(&transaction_lock);
-        // unified_cache_destroy(master_cache); // This should be managed globally or by who created it
-        // delete transaction_hash;
-    }
+	// Stats from old block_cache
+	bigtime_t		last_block_write;
+	bigtime_t		last_block_write_duration;
+	uint32			num_dirty_blocks; // If tracking dirty blocks outside unified_cache for this instance
+
+	block_cache_instance_data(int _fd, off_t _num_blocks, size_t _block_size, bool _read_only);
+	~block_cache_instance_data();
+	status_t Init(); // To initialize hash table, CVs etc.
 };
 
-// If transaction logic is heavily refactored, the old cache_transaction might look different.
-// For now, let's assume we might need a similar structure.
+// Represents a transaction
 struct cache_transaction {
-    cache_transaction* next_hash_link; // For a potential hash table of transactions
-    int32			id;
-    // bool			open;
-    // bigtime_t		last_used;
-    // ListenerList	listeners; // From old block_cache.cpp
+	cache_transaction* next_hash_link; // For TransactionTable
+	int32			id;
+	bool			open;
+	bigtime_t		last_used;
+	ListenerList	listeners; 		// List of listeners for this transaction
 
-    // Which blocks are part of this transaction?
-    // This needs a new way to be tracked, as 'cached_block' is gone.
-    // Perhaps a list of block numbers or unified_cache_entry pointers (referenced).
-    // DoublyLinkedList<uint64> dirty_block_ids_in_transaction;
+	// How to track blocks in a transaction without cached_block?
+	// Option 1: List of referenced unified_cache_entry pointers.
+	// Option 2: List of block_ids (uint64).
+	// Let's try with unified_cache_entry pointers for now, means they must be kept referenced.
+	DoublyLinkedList<unified_cache_entry,
+		DoublyLinkedListMemberGetLink<unified_cache_entry,
+			&unified_cache_entry::sieve_link> > blocks_in_transaction;
+			// Reusing sieve_link for transaction list might be problematic if an entry
+			// is in multiple lists. Better to have a dedicated transaction_link in unified_cache_entry
+			// or manage this list by other means (e.g. separate link struct or list of IDs).
+			// For now, this is a placeholder showing the need.
 
-    // Minimal for now, to be expanded
-    cache_transaction(int32 _id) : id(_id) {}
+	// Let's use a simpler list of block IDs for now, assuming original_data is handled
+	// by copying to a temporary buffer if a transaction modifies a block.
+	struct TransactionBlockEntry : DoublyLinkedListLinkImpl<TransactionBlockEntry> {
+		uint64 block_id;
+		void* original_data; // if needed for rollback for this transaction
+		void* parent_data;   // if part of a sub-transaction
+		bool  discard_in_transaction;
+		// Other transaction-specific flags for this block
+		TransactionBlockEntry(uint64 id) : block_id(id), original_data(NULL), parent_data(NULL), discard_in_transaction(false) {}
+	};
+	typedef DoublyLinkedList<TransactionBlockEntry> TransactionBlockList;
+	TransactionBlockList	blocks; // Blocks modified by this transaction specifically
+
+	unified_cache_entry* first_block; // This was used for iteration, needs rethink.
+
+	int32			num_blocks;
+	int32			main_num_blocks; // For sub-transactions
+	int32			sub_num_blocks;  // For sub-transactions
+	bool			has_sub_transaction;
+	int32			busy_writing_count; // Count of blocks from this transaction currently being written
+
+	cache_transaction(int32 _id);
+	// No default constructor if ID is mandatory
 };
 
-// TODO: Define TransactionHash if needed for a hash table of cache_transactions.
+// cache_notification and cache_listener from block_cache.cpp anonymous namespace,
+// possibly moved here or to a shared internal header if ListenerList is in cache_transaction.
+struct cache_notification_data : DoublyLinkedListLinkImpl<cache_notification_data> {
+	int32			transaction_id;
+	int32			events_pending;
+	int32			events;
+	transaction_notification_hook hook;
+	void*			data;
+	bool			delete_after_event;
+};
+
+// This was cache_listener in the anonymous namespace
+struct block_cache_listener : cache_notification_data {
+	DoublyLinkedListLink<block_cache_listener> link; // For ListenerList
+};
+
+// Re-declare ListenerList using the correct type
+typedef DoublyLinkedList<block_cache_listener,
+	DoublyLinkedListMemberGetLink<block_cache_listener,
+		&block_cache_listener::link> > ActualListenerList;
+// And cache_transaction should use ActualListenerList listeners;
+
 
 #endif // _KERNEL_BLOCK_CACHE_PRIVATE_H
