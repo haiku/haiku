@@ -247,22 +247,11 @@ void
 unified_cache::AccessEntrySieve2(unified_cache_entry* entry)
 {
     // Assumes lock is held
-    // For SIEVE-2, set visited count to a higher value (e.g., 2) on access.
-    // The paper suggests setting the visited bit. For a counter based SIEVE-2:
-    if (entry->sieve_visited_count < 2) { // Cap at 2 for simplicity
-        entry->sieve_visited_count = 2;
-    }
-    // Some SIEVE variants might also move the accessed item to the MRU end of the list.
-    // For a simple clock-based SIEVE, just updating visited status is enough.
-    // The original SIEVE paper: "SIEVE keeps all objects in a FIFO list residing in a circular buffer.
-    // Insertion happens at the head of the list. Eviction happens at the tail after scanning using a hand pointer."
-    // On a hit, set its visited flag.
-    // Eviction: iterate from hand. If visited, clear flag and hand moves. If not visited, evict.
-    // This means our current `sieve_list` is more like the clock. `AccessEntry` marks visited.
-    // `EvictEntry` clears visited or evicts.
-    // Let's assume `sieve_visited_count = 0` means "not visited", `>0` means "visited".
-    // And for SIEVE-2, the count matters. Let's use 1 as the "recently visited" state.
-    entry->sieve_visited_count = 1; // Set to 1 (or highest value for SIEVE-N)
+    // For SIEVE-2, on access, set visited count to the "hot" value (e.g., 2).
+    // This indicates it has been recently accessed.
+    // New entries start at 0 (evictable).
+    // During eviction scan, count is decremented if > 0. Evicted when 0.
+    entry->sieve_visited_count = 2;
 
     TRACE("AccessEntrySieve2: Accessed entry %\" B_PRIu64 \", new visited_count %u.\n", entry->id, entry->sieve_visited_count);
 }
