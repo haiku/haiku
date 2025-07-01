@@ -2011,5 +2011,3 @@ VMCacheFactory::CreateNullCache(int priority, VMCache*& _cache)
 	_cache = cache;
 	return B_OK;
 }
-
-[end of src/system/kernel/vm/VMCache.cpp]
