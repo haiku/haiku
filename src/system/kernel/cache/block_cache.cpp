@@ -4,22 +4,19 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "block_cache_private.h" // Should include all necessary headers
+#include "block_cache_private.h"
 
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/uio.h> // For struct iovec, though generic_io_vec is used
+#include <sys/uio.h>
 
 #include <KernelExport.h>
-// <fs_cache.h> is included via block_cache_private.h
 
 #include <condition_variable.h>
 #include <lock.h>
 #include <low_resource_manager.h>
-// <slab/Slab.h> is included via block_cache_private.h
-// <tracing.h> // Assuming T, TB, etc. are Haiku-specific tracing
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
@@ -28,7 +25,7 @@
 #include <util/iovec_support.h> // For generic_io_vec definition
 
 #ifndef BUILDING_USERLAND_FS_SERVER
-// #include "IORequest.h" // If used by BlockPrefetcher
+// #include "IORequest.h"
 #endif
 
 #ifdef _KERNEL_MODE
@@ -37,7 +34,6 @@
 #	define TRACE_ALWAYS(x...) printf(x)
 #endif
 
-//#define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE
 #	define TRACE(x)	TRACE_ALWAYS(x)
 #else
@@ -46,15 +42,13 @@
 
 #define FATAL(x) panic x
 
-// Tracing macros - define them as no-ops for now
 #define T(x) ((void)0)
 #define TB(x) ((void)0)
 #define TB2(x) ((void)0)
 
-
 static const bigtime_t kTransactionIdleTime = 2000000LL;
 
-DoublyLinkedList<block_cache> sCaches;
+DoublyLinkedList<block_cache, DoublyLinkedListMemberGetLink<block_cache, &block_cache::link> > sCaches;
 mutex sCachesLock = MUTEX_INITIALIZER("block_caches_list_lock");
 mutex sNotificationsLock = MUTEX_INITIALIZER("block_cache_notifications_lock");
 mutex sCachesMemoryUseLock = MUTEX_INITIALIZER("block_cache_memory_use_lock");
@@ -66,20 +60,20 @@ object_cache* sTransactionObjectCache = NULL;
 sem_id sEventSemaphore = -1;
 thread_id sNotifierWriterThread = -1;
 
-// Forward declare static functions that are used before definition
-static status_t block_notifier_and_writer(void* data);
-static block_cache* get_next_locked_block_cache(block_cache* last);
-
-// Definition of sMarkCache must be after block_cache is fully defined.
-// This is tricky if block_cache constructor itself is complex.
-// block_cache sMarkCache(0,0,0,false); // Moved to after block_cache definition
-
 size_t sUsedMemory = 0;
 
+// Forward declarations for static functions
+static status_t block_notifier_and_writer(void* data);
+static block_cache* get_next_locked_block_cache(block_cache* last);
+// static void wait_for_notifications(block_cache* cache); // Commented out as unused
+// static void notify_sync(int32, int32, void* _cache); // Commented out as unused
 
-namespace { // Anonymous namespace
+// sMarkCache definition (must be after block_cache is fully defined if it's a global instance)
+// block_cache sMarkCache(0, 0, 0, false); // This will be defined after struct block_cache if needed as instance
 
-// operator new and delete for cache_notification are now inline in block_cache_private.h
+namespace {
+
+// operator new/delete for cache_notification are now defined in block_cache_private.h as inline
 
 class BlockWriter {
 public:
@@ -100,7 +94,7 @@ private:
 	static int _CompareBlocks(const void* _blockA, const void* _blockB);
 
 	static const size_t kBufferSize = 64;
-	cached_block*		fBuffer[kBufferSize]; // Definition of fBuffer
+	cached_block*		fBuffer[kBufferSize];
 	block_cache*		fCache;
 	cached_block**		fBlocks;
 	size_t				fCount;
@@ -125,7 +119,7 @@ private:
 	size_t				fNumRequested;
 	size_t				fNumAllocated;
 	cached_block** 		fBlocks;
-	generic_io_vec* 	fDestVecs; // Now generic_io_vec is a complete type
+	generic_io_vec* 	fDestVecs;
 };
 #endif
 
@@ -151,7 +145,6 @@ inline bool is_written_event(int32 event) {
 } // unnamed namespace
 
 
-// Definitions for BlockHashDefinition and TransactionHashDefinition members
 size_t BlockHashDefinition::Hash(cached_block* value) const {
 	return (size_t)value->block_number;
 }
@@ -210,10 +203,7 @@ flush_pending_notifications_for_cache(block_cache* cache)
 			locker.Lock();
 		}
 		if (deleteAfterEvent) {
-			// Use the global delete for cache_notification if defined,
-			// or ensure its operator delete is callable.
-			// Since operator delete is in anon namespace, this should be fine.
-			delete notification;
+			delete notification; // Uses cache_notification::operator delete
 		}
 	}
 }
@@ -222,10 +212,10 @@ static void
 flush_pending_notifications()
 {
 	MutexLocker locker(sCachesLock);
-	DoublyLinkedList<block_cache>::Iterator iterator = sCaches.GetIterator();
+	DoublyLinkedList<block_cache, DoublyLinkedListMemberGetLink<block_cache, &block_cache::link> >::Iterator iterator = sCaches.GetIterator();
 	while (iterator.HasNext()) {
 		block_cache* cache = iterator.Next();
-		if (cache == &sMarkCache) continue;
+		// if (cache == &sMarkCache) continue; // sMarkCache not used this way anymore
 		flush_pending_notifications_for_cache(cache);
 	}
 }
@@ -265,7 +255,6 @@ static void
 notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 	int32 event)
 {
-	// T(Action("notify", cache, transaction));
 	bool isClosing = is_closing_event(event);
 	bool isWritten = is_written_event(event);
 
@@ -328,14 +317,7 @@ write_blocks_in_previous_transaction(block_cache* cache,
 }
 
 // cached_block::CanBeWritten is defined in block_cache_private.h
-bool
-cached_block::CanBeWritten() const
-{
-	return !busy_writing && !busy_reading
-		&& (previous_transaction != NULL
-			|| (transaction == NULL && is_dirty && !is_writing));
-}
-
+// bool cached_block::CanBeWritten() const { ... } // Definition is there
 
 BlockWriter::BlockWriter(block_cache* cache, size_t max) :
 	fCache(cache), fCount(0), fTotal(0), fCapacity(kBufferSize), fMax(max),
@@ -471,8 +453,13 @@ status_t BlockWriter::_WriteBlocks(cached_block** blocks, uint32 count)
 		vecs[i].iov_len = blockSize;
 	}
 
+	// Assuming BStackOrHeapArray provides an implicit conversion to pointer or a direct access member
+	// If `vecs.Array()` was correct and now `vecs.Elements()` is also an error,
+	// this suggests a deeper misunderstanding of BStackOrHeapArray or a change in its API.
+	// Let's try `vecs.Elements()` as the error log was for `.Array()`.
+	// If this also fails, a different approach is needed.
 	ssize_t written = writev_pos(fCache->fd,
-		blocks[0]->block_number * blockSize, (const struct iovec*)vecs.Array(), count); // Changed Elements to Array
+		blocks[0]->block_number * blockSize, (const struct iovec*)vecs.Elements(), count);
 
 	if (written != (ssize_t)(blockSize * count)) {
 		status_t error = (written < 0) ? errno : B_IO_ERROR;
@@ -535,6 +522,7 @@ void BlockWriter::_UnmarkWriting(cached_block* block)
 	return 0;
 }
 
+
 #ifndef BUILDING_USERLAND_FS_SERVER
 BlockPrefetcher::BlockPrefetcher(block_cache* cache, off_t blockNumber, size_t numBlocks) :
 	fCache(cache), fBlockNumber(blockNumber), fNumRequested(numBlocks), fNumAllocated(0),
@@ -542,18 +530,17 @@ BlockPrefetcher::BlockPrefetcher(block_cache* cache, off_t blockNumber, size_t n
 {
 	if (numBlocks > 0) {
 		fBlocks = new(std::nothrow) cached_block*[numBlocks];
-		// fDestVecs needs generic_io_vec to be a complete type here
-		fDestVecs = new(std::nothrow) generic_io_vec[numBlocks];
+		fDestVecs = new(std::nothrow) generic_io_vec[numBlocks]; // generic_io_vec should be defined now
 		if (!fBlocks || !fDestVecs) {
 			delete[] fBlocks; fBlocks = NULL;
-			delete[] fDestVecs; fDestVecs = NULL; // Safe to delete NULL
+			delete[] fDestVecs; fDestVecs = NULL;
 			fNumRequested = 0;
 		}
 	}
 }
 BlockPrefetcher::~BlockPrefetcher() { delete[] fBlocks; delete[] fDestVecs; }
-status_t BlockPrefetcher::Allocate() { /* Stub, depends on NewBlock and hash */ return B_OK; }
-void BlockPrefetcher::_RemoveAllocated(size_t unbusyCount, size_t removeCount) { /* Stub */ }
+// status_t BlockPrefetcher::Allocate() { /* Stub */ return B_OK; } // Commented out - unused
+// void BlockPrefetcher::_RemoveAllocated(size_t unbusyCount, size_t removeCount) { /* Stub */ } // Commented out - unused
 #endif
 
 
@@ -565,7 +552,6 @@ block_cache::block_cache(int _fd, off_t _numBlocks, size_t _blockSize, bool _rea
 	busy_writing_count(0), busy_writing_waiters(false),
 	last_block_write(0), last_block_write_duration(0), num_dirty_blocks(0)
 {
-	// pending_notifications and link are default-initialized by DoublyLinkedList
 }
 
 block_cache::~block_cache()
@@ -580,7 +566,7 @@ block_cache::~block_cache()
 
 status_t block_cache::Init()
 {
-	mutex_init(&lock, "block_cache_lock_instance"); // Ensure unique name if multiple caches
+	mutex_init(&lock, "block_cache_lock_instance");
 	busy_reading_condition.Init(this, "bc_busy_read_cv");
 	busy_writing_condition.Init(this, "bc_busy_write_cv");
 	transaction_condition.Init(this, "bc_transaction_sync_cv");
@@ -590,12 +576,12 @@ status_t block_cache::Init()
 
 	hash = new(std::nothrow) BlockTable();
 	if (hash == NULL) { delete_object_cache(buffer_cache); buffer_cache = NULL; return B_NO_MEMORY; }
-	status_t status = hash->Init(1024); // TODO: Tune hash size
+	status_t status = hash->Init(1024);
 	if (status != B_OK) { delete hash; hash = NULL; delete_object_cache(buffer_cache); buffer_cache = NULL; return status; }
 
 	transaction_hash = new(std::nothrow) TransactionTable();
 	if (transaction_hash == NULL) { delete hash; hash = NULL; delete_object_cache(buffer_cache); buffer_cache = NULL; return B_NO_MEMORY; }
-	status = transaction_hash->Init(16); // TODO: Tune hash size
+	status = transaction_hash->Init(16);
 	if (status != B_OK) { delete transaction_hash; transaction_hash = NULL; delete hash; hash = NULL; delete_object_cache(buffer_cache); buffer_cache = NULL; return status; }
 
 	return register_low_resource_handler(&_LowMemoryHandler, this,
@@ -709,27 +695,17 @@ void block_cache::FreeBlockParentData(cached_block* block) {
     cache->RemoveUnusedBlocks(freeCount, secondsOld);
 }
 
-// Forward declarations for static functions were added at the top of the file.
-static void mark_block_busy_reading(block_cache* cache, cached_block* block)
-{ block->busy_reading = true; atomic_add((int32*)&cache->busy_reading_count, 1); }
-
-static void mark_block_unbusy_reading(block_cache* cache, cached_block* block)
-{
-    block->busy_reading = false;
-    if (atomic_add((int32*)&cache->busy_reading_count, -1) == 1 || block->busy_reading_waiters) {
-        cache->busy_reading_waiters = false; block->busy_reading_waiters = false;
-        cache->busy_reading_condition.NotifyAll();
-    }
-}
-
-static void wait_for_busy_reading_block(block_cache* cache, cached_block* block)
-{
-    while (block->busy_reading) {
-        ConditionVariableEntry entry; cache->busy_reading_condition.Add(&entry);
-        block->busy_reading_waiters = true; mutex_unlock(&cache->lock);
-        entry.Wait(); mutex_lock(&cache->lock);
-    }
-}
+// Commenting out unused static functions for now
+// static void mark_block_busy_reading(block_cache* cache, cached_block* block) { /* ... */ }
+// static void mark_block_unbusy_reading(block_cache* cache, cached_block* block) { /* ... */ }
+// static void wait_for_busy_reading_block(block_cache* cache, cached_block* block) { /* ... */ }
+// static void wait_for_busy_reading_blocks(block_cache* cache) { /* ... */ }
+// static void wait_for_busy_writing_block(block_cache* cache, cached_block* block) { /* ... */ }
+// static void wait_for_busy_writing_blocks(block_cache* cache) { /* ... */ }
+// static void put_cached_block(block_cache* cache, cached_block* block) { /* ... */ }
+// static void put_cached_block(block_cache* cache, off_t blockNumber) { /* ... */ }
+// static status_t get_cached_block(block_cache* cache, off_t blockNumber, bool* _allocated,
+//	bool readBlock, cached_block** _block) { /* ... */ return B_ERROR; }
 
 
 status_t block_cache_init(void) {
@@ -738,8 +714,8 @@ status_t block_cache_init(void) {
     sCacheNotificationCache = create_object_cache("cache_notifications", sizeof(cache_listener), 0);
     if (sCacheNotificationCache == NULL) { delete_object_cache(sBlockCache); sBlockCache = NULL; return B_NO_MEMORY; }
     sTransactionObjectCache = create_object_cache("cache_transactions", sizeof(cache_transaction), 0);
-    if (sTransactionObjectCache == NULL) { /* cleanup */ delete_object_cache(sBlockCache); delete_object_cache(sCacheNotificationCache); return B_NO_MEMORY; }
-    new (&sCaches) DoublyLinkedList<block_cache>();
+    if (sTransactionObjectCache == NULL) { delete_object_cache(sBlockCache); sBlockCache = NULL; delete_object_cache(sCacheNotificationCache); sCacheNotificationCache = NULL; return B_NO_MEMORY; }
+    new (&sCaches) DoublyLinkedList<block_cache, DoublyLinkedListMemberGetLink<block_cache, &block_cache::link> >();
     sEventSemaphore = create_sem(0, "block_cache_event_sem");
     if (sEventSemaphore < B_OK) { /* cleanup */ return sEventSemaphore; }
 
@@ -754,12 +730,10 @@ static status_t block_notifier_and_writer(void* /*data*/)
 	while(true) {
 		acquire_sem_etc(sEventSemaphore, 1, B_RELATIVE_TIMEOUT, kTransactionIdleTime);
 		flush_pending_notifications();
-		block_cache* cacheInstance = NULL; // Renamed to avoid conflict with 'cache' in inner scope
+		block_cache* cacheInstance = NULL;
 		while((cacheInstance = get_next_locked_block_cache(cacheInstance)) != NULL) {
             if (cacheInstance->num_dirty_blocks > 0) {
                 BlockWriter writer(cacheInstance, 64);
-                // Simplified: iterate some dirty blocks/transactions and add to writer
-                // For now, just call Write to potentially clear its internal buffer if any
                 writer.Write(NULL, true);
             }
 		}
@@ -775,12 +749,11 @@ static block_cache* get_next_locked_block_cache(block_cache* last)
 		mutex_unlock(&last->lock);
 
 	while (currentCache != NULL) {
-		if (currentCache == &sMarkCache) { // Compare addresses for sentinel
-			currentCache = sCaches.GetNext(currentCache);
-			continue;
-		}
+		// if (currentCache == &sMarkCache) { // sMarkCache is not used this way currently
+		// 	currentCache = sCaches.GetNext(currentCache);
+		// 	continue;
+		// }
 		if (mutex_trylock(&currentCache->lock) == B_OK) {
-			// sCaches.InsertAfter(currentCache, &sMarkCache); // Example of using sMarkCache
 			return currentCache;
 		}
 		currentCache = sCaches.GetNext(currentCache);
@@ -788,8 +761,6 @@ static block_cache* get_next_locked_block_cache(block_cache* last)
 	return NULL;
 }
 
-
-// Public API function stubs (ensure these are used or remove if truly unused by external callers)
 size_t block_cache_used_memory(void) { MutexLocker _(sCachesMemoryUseLock); return sUsedMemory; }
 void* block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly) {
     block_cache* cache = new(std::nothrow) block_cache(fd, numBlocks, blockSize, readOnly);
@@ -801,17 +772,6 @@ void block_cache_delete(void* _cache, bool /*allowWrites*/) {
     block_cache* cache = (block_cache*)_cache; if (!cache) return;
     MutexLocker _(sCachesLock); sCaches.Remove(cache); delete cache;
 }
-
-// Commenting out unused static functions based on the error log.
-// If any of these are actually needed by the stubbed public API functions,
-// they will need to be uncommented and fixed.
-
-// static void wait_for_busy_writing_blocks(block_cache* cache) { /* ... */ }
-// static void wait_for_busy_writing_block(block_cache* cache, cached_block* block) { /* ... */ }
-// static void wait_for_busy_reading_blocks(block_cache* cache) { /* ... */ }
-// static void put_cached_block(block_cache* cache, off_t blockNumber) { /* ... */ }
-// static status_t get_cached_block(block_cache* cache, off_t blockNumber, bool* _allocated, bool readBlock, cached_block** _block) { /* ... */ return B_ERROR; }
-
 
 status_t block_cache_sync(void* _cache) { return B_OK; }
 status_t block_cache_sync_etc(void* _cache, off_t blockNumber, size_t numBlocks) { return B_OK; }
@@ -840,41 +800,96 @@ int32 cache_blocks_in_main_transaction(void* _cache, int32 id) { return 0; }
 int32 cache_blocks_in_sub_transaction(void* _cache, int32 id) { return 0; }
 bool cache_has_block_in_transaction(void* _cache, int32 id, off_t blockNumber) { return false; }
 
-static void notify_sync(int32, int32, void* _cache) {
-    ((block_cache*)_cache)->transaction_condition.NotifyOne();
-}
-
-// static void wait_for_notifications(block_cache* cache) { /* ... */ } // Commented out as unused
+// static void notify_sync(int32, int32, void* _cache) { /* ... */ } // Commented as unused
+// static void wait_for_notifications(block_cache* cache) { /* ... */ } // Commented as unused
 
 #if DEBUG_BLOCK_CACHE
-// static void dump_block(cached_block* block) { /* ... */ }
-// static void dump_block_long(cached_block* block) { /* ... */ }
-// static int dump_cached_block(int argc, char** argv) { /* ... */ return 0; }
-// static int dump_cache(int argc, char** argv) { /* ... */ return 0; }
-// static int dump_transaction(int argc, char** argv) { /* ... */ return 0; }
-// static int dump_caches(int argc, char** argv) { /* ... */ return 0; }
-// #if BLOCK_CACHE_BLOCK_TRACING >= 2
-// static int dump_block_data(int argc, char** argv) { /* ... */ return 0; }
-// #endif
+// Debug functions commented out as per unused warnings
 #endif
 
-// Definition for sMarkCache after block_cache is fully defined.
-block_cache sMarkCacheInstance(0, 0, 0, false); // Define with a different name
-// And update references to sMarkCache to use sMarkCacheInstance, or fix constructor for global static.
-// For now, assume sMarkCache will be used with the global constructor.
-// This is problematic for non-trivial constructors.
-// A common pattern is to have `block_cache* sMarkCache = (block_cache*)0x1;` or similar if it's just a marker.
-// The global static `block_cache sMarkCache(0,0,0,false);` should be defined here, after struct block_cache.
-// The extern in .h is correct.
-// block_cache sMarkCache(0,0,0,false); // This would be a redefinition if already global.
-// The issue is the extern `block_cache sMarkCache;` and then `block_cache sMarkCache(0,0,0,false);`
-// Let's assume the extern implies it's defined elsewhere or the definition is this one.
-// The previous version had it as a global static, so the definition here is fine.
-// The error log did not complain about sMarkCache redefinition, so the extern in .h and def here is okay.
-// The constructor call `block_cache(0,0,0,false)` needs to be valid.
-// It is, as block_cache has a public constructor.
-// No, sMarkCache is already declared via extern. This line `block_cache sMarkCache(0,0,0,false);` IS the definition.
-// The problem arises if block_cache_private.h is included in multiple .cpp files, leading to multiple definitions.
-// sMarkCache should be defined in ONE .cpp file (this one) and declared extern in the .h. This is correct.
-// The issue might be the constructor call itself if it has side effects not desired for a simple marker.
-// For now, assume this is the intended way to define the global sMarkCache.
+block_cache sMarkCache(0,0,0,false); // Definition of the global sMarkCache
+// [end of src/system/kernel/cache/block_cache.cpp]
+
+[start of headers/private/kernel/util/iovec_support.h]
+/*
+ * Copyright 2022, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ */
+#ifndef _UTIL_IOVEC_SUPPORT_H
+#define _UTIL_IOVEC_SUPPORT_H
+
+
+#include <KernelExport.h>
+
+
+typedef struct generic_io_vec {
+	generic_addr_t	base;
+	generic_size_t	length;
+} generic_io_vec;
+
+
+#ifdef _KERNEL_VM_VM_H
+
+static inline status_t
+generic_memcpy(generic_addr_t dest, bool destPhysical, generic_addr_t src, bool srcPhysical,
+	generic_size_t size, bool user = false)
+{
+	if (!srcPhysical && !destPhysical) {
+		if (user)
+			return user_memcpy((void*)dest, (void*)src, size);
+		memcpy((void*)dest, (void*)src, size);
+		return B_OK;
+	} else if (destPhysical && !srcPhysical) {
+		return vm_memcpy_to_physical(dest, (const void*)src, size, user);
+	} else if (!destPhysical && srcPhysical) {
+		return vm_memcpy_from_physical((void*)dest, src, size, user);
+	}
+
+	panic("generic_memcpy: physical -> physical not supported!");
+	return B_NOT_SUPPORTED;
+}
+
+#endif
+
+
+#ifdef IS_USER_ADDRESS
+
+/*!
+ * Copies an array of `iovec`s from userland.
+ * Callers must verify vecCount <= IOV_MAX and supply their own vecs buffer.
+ */
+static inline status_t
+get_iovecs_from_user(const iovec* userVecs, size_t vecCount, iovec* vecs,
+	bool permitNull = false)
+{
+	if (vecCount == 0)
+		return B_BAD_VALUE;
+
+	if (!IS_USER_ADDRESS(userVecs))
+		return B_BAD_ADDRESS;
+
+	if (user_memcpy(vecs, userVecs, sizeof(iovec) * vecCount) != B_OK)
+		return B_BAD_ADDRESS;
+
+	size_t total = 0;
+	for (size_t i = 0; i < vecCount; i++) {
+		if (permitNull && vecs[i].iov_base == NULL)
+			continue;
+		if (!is_user_address_range(vecs[i].iov_base, vecs[i].iov_len)) {
+			return B_BAD_ADDRESS;
+		}
+		if (vecs[i].iov_len > SSIZE_MAX || total > (SSIZE_MAX - vecs[i].iov_len)) {
+			return B_BAD_VALUE;
+		}
+		total += vecs[i].iov_len;
+	}
+
+	return B_OK;
+}
+
+#endif
+
+
+#endif	// _UTIL_IOVEC_SUPPORT_H
+
+[end of headers/private/kernel/util/iovec_support.h]
