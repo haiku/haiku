@@ -14,7 +14,7 @@
 
 #include <block_cache.h> // Public API
 #include <condition_variable.h>
-#include <kernel.h>
+#include <kernel.h> // For basic types, panic, dprintf/TRACE_ALWAYS
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
@@ -23,11 +23,20 @@
 struct cached_block;
 struct cache_transaction;
 struct block_cache;
-extern object_cache* sCacheNotificationCache;
+extern object_cache* sCacheNotificationCache; // Defined in block_cache.cpp
+
+// Define TRACE_ALWAYS if not already defined (e.g. by kernel.h or other common header)
+#ifndef TRACE_ALWAYS
+#	ifdef _KERNEL_MODE
+#		define TRACE_ALWAYS(x...) dprintf(x)
+#	else
+#		define TRACE_ALWAYS(x...) printf(x)
+#	endif
+#endif
 
 
 struct cache_notification {
-	DoublyLinkedListLink<cache_notification> link; // For pending_notifications list
+	DoublyLinkedListLink<cache_notification> link;
 
 	int32			transaction_id;
 	int32			events_pending;
@@ -36,8 +45,8 @@ struct cache_notification {
 	void*			data;
 	bool			delete_after_event;
 
-	// Inline new/delete to ensure definition is available and to handle -Werror=return-type
-	static inline void* operator new(size_t size) {
+	static inline void* operator new(size_t /*size*/) {
+		// It's crucial that sCacheNotificationCache is initialized before this is ever used.
 		if (sCacheNotificationCache == NULL)
 			panic("cache_notification::new: sCacheNotificationCache is not initialized!");
 		void* block = object_cache_alloc(sCacheNotificationCache, 0);
@@ -49,13 +58,8 @@ struct cache_notification {
 	static inline void operator delete(void* block) {
 		if (sCacheNotificationCache == NULL) {
 			// This might happen during shutdown if caches are cleaned up late.
-			// It's not ideal to panic here if sCacheNotificationCache is gone.
-			// Consider how critical this is or if a TRACE_ALWAYS is better.
-			// For now, to avoid panic during potential shutdown races:
+			// Avoid panic if sCacheNotificationCache is already gone.
 			if (block != NULL) {
-				// Can't free via object_cache, potential leak or use after free if called late.
-				// This indicates a system design issue if sCacheNotificationCache is gone before all instances.
-				// panic("cache_notification::delete: sCacheNotificationCache is NULL but block is not!");
 				TRACE_ALWAYS("cache_notification::delete: sCacheNotificationCache is NULL! Potential leak for block %p\n", block);
 			}
 			return;
@@ -240,7 +244,6 @@ extern mutex sCachesLock;
 extern mutex sNotificationsLock;
 extern mutex sCachesMemoryUseLock;
 extern object_cache* sBlockCache;
-// sCacheNotificationCache is forward declared at the top, defined in .cpp
 extern object_cache* sTransactionObjectCache;
 extern sem_id sEventSemaphore;
 extern thread_id sNotifierWriterThread;
