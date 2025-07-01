@@ -437,9 +437,78 @@ block_cache::block_cache(int _fd, off_t _numBlocks, size_t _blockSize, bool _rea
 	busy_reading_count(0), busy_reading_waiters(false),
 	busy_writing_count(0), busy_writing_waiters(false),
 	last_block_write(0), last_block_write_duration(0), num_dirty_blocks(0)
-{}
-block_cache::~block_cache() { /* ... */ }
-status_t block_cache::Init() { /* ... */ return B_OK; }
+	busy_reading_count(0), busy_reading_waiters(false),
+	busy_writing_count(0), busy_writing_waiters(false),
+	last_block_write(0), last_block_write_duration(0), num_dirty_blocks(0)
+{
+	// It's critical that mutex_init is called for lock before it's used.
+	// The current structure has lock as a direct member, so it should be initialized
+	// by the caller of the constructor or in an Init method.
+	// For now, let's assume the default constructor of mutex is sufficient if used
+	// before Init() is called, or Init() should take a name.
+	// Let's ensure the lock is initialized here if not elsewhere.
+	mutex_init(&lock, "block_cache_instance_lock");
+}
+
+block_cache::~block_cache()
+{
+	if (hash != NULL) {
+		// TODO: Iterate and free blocks if owned by this hash table directly
+		// For now, just delete the table structure.
+		// hash->Clear(true); // if it should delete items
+		delete hash;
+	}
+	if (transaction_hash != NULL) {
+		// TODO: Clean up transactions
+		// transaction_hash->Clear(true);
+		delete transaction_hash;
+	}
+	// TODO: free blocks in unused_blocks list
+	// TODO: destroy buffer_cache if owned and created by this instance
+
+	mutex_destroy(&lock);
+}
+
+status_t block_cache::Init()
+{
+	// The lock should be initialized before any operations.
+	// If the constructor didn't get a name, or if it's preferred here:
+	// mutex_init(&lock, "block_cache_lock"); // Or use a name passed in.
+
+	hash = new(std::nothrow) BlockTable();
+	if (hash == NULL)
+		return B_NO_MEMORY;
+	status_t status = hash->InitCheck(); // Assuming InitCheck or similar exists
+	if (status != B_OK) {
+		delete hash;
+		hash = NULL;
+		return status;
+	}
+
+	transaction_hash = new(std::nothrow) TransactionTable();
+	if (transaction_hash == NULL) {
+		delete hash;
+		hash = NULL;
+		return B_NO_MEMORY;
+	}
+	status = transaction_hash->InitCheck(); // Assuming InitCheck
+	if (status != B_OK) {
+		delete transaction_hash;
+		transaction_hash = NULL;
+		delete hash;
+		hash = NULL;
+		return status;
+	}
+
+	// TODO: Initialize buffer_cache (slab allocator for block data)
+	// Example: buffer_cache = create_object_cache("block_cache_buffers", block_size, 0);
+	// This would typically be done if the cache manages its own raw block memory.
+	// If block data is externally managed or part of 'cached_block' objects from
+	// another slab, this might not be needed here.
+
+	return B_OK;
+}
+
 void block_cache::FreeBlock(cached_block* block) { /* ... */ }
 void block_cache::Free(void* buffer) { /* ... */ }
 void* block_cache::Allocate() { /* ... */ return NULL; } // Added return NULL

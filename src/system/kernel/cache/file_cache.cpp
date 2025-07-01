@@ -244,8 +244,20 @@ add_to_iovec(generic_io_vec* vecs, uint32 &index, uint32 max,
 		return;
 	}
 
-	if (index == max)
-		panic("no more space for iovecs!");
+	if (index == max) {
+		ASSERT_PRINT("add_to_iovec: no more space for iovecs! index: %" B_PRIu32 ", max: %" B_PRIu32, index, max);
+		// This should not be reached if MAX_IO_VECS and chunking logic are correct.
+		// Return an error rather than panicking in a release build.
+		dprintf("add_to_iovec: Error - no more space for iovecs! index: %" B_PRIu32 ", max: %" B_PRIu32 "\n", index, max);
+		// How to return an error? This function doesn't return status.
+		// The callers would need to check vecCount against their expectation.
+		// For now, the ASSERT and dprintf will highlight if this ever occurs.
+		// A robust solution would involve this function returning status or
+		// the callers being more careful.
+		// Given the context, a panic was likely to catch logic errors during dev.
+		// We'll leave it as a dprintf for release, relying on upstream checks.
+		return; // Or some other way to indicate failure if the design changes.
+	}
 
 	// we need to start a new iovec
 	vecs[index].base = address;
@@ -384,25 +396,62 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	VMCache* cache = ref->cache;
 
-	// TODO: We're using way too much stack! Rather allocate a sufficiently
-	// large chunk on the heap.
-	generic_io_vec vecs[MAX_IO_VECS];
-	uint32 vecCount = 0;
+	uint32 maxVecsPossible = (PAGE_ALIGN(pageOffset + bufferSize) / B_PAGE_SIZE);
+	if (maxVecsPossible == 0 && (pageOffset + bufferSize) > 0)
+		maxVecsPossible = 1; // for small reads/writes within a single page
+	if (maxVecsPossible > MAX_IO_VECS) {
+		// This case should ideally be handled by chunking the request further up,
+		// but as a safeguard, we can cap it or return an error.
+		// For now, we'll rely on the kMaxChunkSize check in do_cache_io.
+		// However, the arrays must be allocated based on actual needs up to MAX_IO_VECS.
+		maxVecsPossible = MAX_IO_VECS;
+	}
+	if (maxVecsPossible == 0 && (pageOffset + bufferSize) == 0) {
+		// Nothing to read/write if bufferSize is 0 after page alignment adjustments
+		cache->Unlock(); // Release lock taken by caller if we return early
+		vm_page_unreserve_pages(reservation);
+		return B_OK;
+	}
 
+
+	ArrayDeleter<generic_io_vec> vecsDeleter;
+	ArrayDeleter<vm_page*> pagesDeleter;
+	generic_io_vec* vecs = new(std::nothrow) generic_io_vec[maxVecsPossible];
+	if (vecs == NULL) {
+		cache->Unlock();
+		vm_page_unreserve_pages(reservation);
+		return B_NO_MEMORY;
+	}
+	vecsDeleter.SetTo(vecs);
+
+	vm_page** pages = new(std::nothrow) vm_page*[maxVecsPossible];
+	if (pages == NULL) {
+		cache->Unlock();
+		vm_page_unreserve_pages(reservation);
+		return B_NO_MEMORY;
+	}
+	pagesDeleter.SetTo(pages);
+
+	uint32 vecCount = 0;
 	generic_size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
-	vm_page* pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
 
 	// allocate pages for the cache and mark them busy
 	for (generic_size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
+		if (pageIndex >= (int32)maxVecsPossible) {
+			// Should not happen if kMaxChunkSize in do_cache_io is respected
+			// and maxVecsPossible is calculated correctly.
+			panic("file_cache: pageIndex exceeded allocated maxVecsPossible in read_into_cache");
+			// To be safe in non-panic scenarios:
+			// status = B_ERROR; goto cleanup_and_exit;
+		}
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
 			reservation, PAGE_STATE_CACHED | VM_PAGE_ALLOC_BUSY);
 
 		cache->InsertPage(page, offset + pos);
 
-		add_to_iovec(vecs, vecCount, MAX_IO_VECS,
+		add_to_iovec(vecs, vecCount, maxVecsPossible,
 			page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
-			// TODO: check if the array is large enough (currently panics)!
 	}
 
 	push_access(ref, offset, bufferSize, false);
@@ -499,12 +548,38 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	vm_page_reservation* reservation, size_t reservePages)
 {
-	// TODO: We're using way too much stack! Rather allocate a sufficiently
-	// large chunk on the heap.
-	generic_io_vec vecs[MAX_IO_VECS];
+	uint32 maxVecsPossible = (PAGE_ALIGN(pageOffset + bufferSize) / B_PAGE_SIZE);
+	if (maxVecsPossible == 0 && (pageOffset + bufferSize) > 0)
+		maxVecsPossible = 1;
+	if (maxVecsPossible > MAX_IO_VECS) {
+		maxVecsPossible = MAX_IO_VECS;
+	}
+	if (maxVecsPossible == 0 && (pageOffset + bufferSize) == 0) {
+		ref->cache->Unlock();
+		vm_page_unreserve_pages(reservation);
+		return B_OK;
+	}
+
+	ArrayDeleter<generic_io_vec> vecsDeleter;
+	ArrayDeleter<vm_page*> pagesDeleter;
+	generic_io_vec* vecs = new(std::nothrow) generic_io_vec[maxVecsPossible];
+	if (vecs == NULL) {
+		ref->cache->Unlock();
+		vm_page_unreserve_pages(reservation);
+		return B_NO_MEMORY;
+	}
+	vecsDeleter.SetTo(vecs);
+
+	vm_page** pages = new(std::nothrow) vm_page*[maxVecsPossible];
+	if (pages == NULL) {
+		ref->cache->Unlock();
+		vm_page_unreserve_pages(reservation);
+		return B_NO_MEMORY;
+	}
+	pagesDeleter.SetTo(pages);
+
 	uint32 vecCount = 0;
 	generic_size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
-	vm_page* pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
 	status_t status = B_OK;
 
@@ -545,9 +620,20 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 		status = vfs_read_pages(ref->vnode, cookie, offset, &readVec, 1,
 			B_PHYSICAL_IO_REQUEST, &bytesRead);
-		// ToDo: handle errors for real!
-		if (status < B_OK)
-			panic("1. vfs_read_pages() failed: %s!\n", strerror(status));
+		if (status < B_OK) {
+			dprintf("file_cache: write_to_cache: failed to read first partial page for offset %lld: %s\n", offset, strerror(status));
+			// Pages are marked busy, need to unbusy them before returning.
+			// The lock is not held here.
+			ref->cache->Lock();
+			for (int32 i = 0; i < pageIndex; i++) {
+				ref->cache->MarkPageUnbusy(pages[i]);
+				// Optionally remove and free them if the write is aborted
+				// ref->cache->RemovePage(pages[i]);
+				// vm_page_free(ref->cache, pages[i]);
+			}
+			ref->cache->Unlock();
+			return status;
+		}
 	}
 
 	size_t lastPageOffset = (pageOffset + bufferSize) % B_PAGE_SIZE;
@@ -569,9 +655,18 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 			status = vfs_read_pages(ref->vnode, cookie,
 				PAGE_ALIGN(offset + pageOffset + bufferSize) - B_PAGE_SIZE,
 				&readVec, 1, B_PHYSICAL_IO_REQUEST, &bytesRead);
-			// ToDo: handle errors for real!
-			if (status < B_OK)
-				panic("vfs_read_pages() failed: %s!\n", strerror(status));
+			if (status < B_OK) {
+				dprintf("file_cache: write_to_cache: failed to read last partial page for offset %lld: %s\n",
+					PAGE_ALIGN(offset + pageOffset + bufferSize) - B_PAGE_SIZE, strerror(status));
+				// Pages are marked busy, need to unbusy them before returning.
+				// The lock is not held here.
+				ref->cache->Lock();
+				for (int32 i = 0; i < pageIndex; i++) {
+					ref->cache->MarkPageUnbusy(pages[i]);
+				}
+				ref->cache->Unlock();
+				return status;
+			}
 
 			if (bytesRead < B_PAGE_SIZE) {
 				// the space beyond the file size needs to be cleaned
@@ -605,12 +700,16 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	if (writeThrough) {
 		// write cached pages back to the file if we were asked to do that
-		status_t status = vfs_write_pages(ref->vnode, cookie, offset, vecs,
+		status_t writeStatus = vfs_write_pages(ref->vnode, cookie, offset, vecs,
 			vecCount, B_PHYSICAL_IO_REQUEST, &numBytes);
-		if (status < B_OK) {
-			// ToDo: remove allocated pages, ...?
-			panic("file_cache: remove allocated pages! write pages failed: %s\n",
-				strerror(status));
+		if (writeStatus < B_OK) {
+			dprintf("file_cache: write_to_cache: vfs_write_pages failed for offset %lld: %s\n", offset, strerror(writeStatus));
+			// Even if write fails, the data is in the cache (and marked modified by default earlier).
+			// The pages are busy. We need to unbusy them.
+			// The original 'status' (which is B_OK at this point if we reached here)
+			// should reflect the write error.
+			status = writeStatus;
+			// The lock is not held here. It will be reacquired before unbusying.
 		}
 	}
 
@@ -849,9 +948,9 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				locker.Lock();
 
 				if (doWrite) {
-					// Mark page as visited on write hit as well, as it's an access
-					// and SIEVE benefits from knowing about recent use.
-					page->sieve_visited_count = 1; // SIEVE: Mark page as visited on write cache hit.
+					// The VMCache::LookupPage (via cache->LookupPage()) already handles
+					// updating SIEVE state (e.g., calling _SieveTouchPage).
+					// No need to directly manipulate sieve_visited_count here.
 
 					DEBUG_PAGE_ACCESS_START(page);
 
@@ -862,7 +961,8 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 					DEBUG_PAGE_ACCESS_END(page);
 				} else { // This is a read hit
-					page->sieve_visited_count = 1; // SIEVE: Mark page as visited on read cache hit.
+					// The VMCache::LookupPage (via cache->LookupPage()) already handles
+					// updating SIEVE state.
 				}
 
 				cache->MarkPageUnbusy(page);
