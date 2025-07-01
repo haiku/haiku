@@ -26,6 +26,10 @@ local sources =
 	wait_for_objects.cpp
 	;
 
+if $(TARGET_SYMBOLS_LEVEL) >= 2 {
+	sources += debug.c ;
+}
+
 SourceHdrs $(sources) : $(librootOSSources) ;
 
 KernelMergeObject kernel_os_main.o : $(sources)
