@@ -5,11 +5,6 @@ UseHeaders [ FDirName $(SUBDIR) .. internal ] ;
 UseHeaders [ FDirName $(SUBDIR) .. arch $(TARGET_ARCH) ] ;
 UseHeaders [ FDirName $(SUBDIR) .. arch generic ] ;
 
-# If the arch-specific complex directory (e.g., complex/ppc) is empty,
-# a wildcard glob like complex/ppc/* might cause "Unknown suffix" errors.
-# Explicitly tell Jam not to try to build anything from such paths using default rules.
-NoUserObject $(SUBDIR)/$(TARGET_ARCH)/* ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -24,23 +19,22 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObject <$(architecture)>posix_musl_complex.o :
 			__cexp.c __cexpf.c
 			cabs.c cabsf.c cabsl.c
-			cacos.c cacosf.c /* Added */
-			cacosh.c cacoshf.c cacoshl.c /* Added cacoshl.c */
+			cacosh.c cacoshf.c
 			carg.c cargf.c cargl.c
 			catan.c catanf.c catanl.c
-			catanh.c atanhf.c catanhl.c
+			catanh.c catanhf.c catanhl.c
 			ccos.c ccosf.c ccosl.c
-			ccosh.c ccoshf.c ccoshl.c /* Added ccoshl.c */
+			ccosh.c ccoshf.c
 			cexp.c cexpf.c
 			cimag.c cimagf.c cimagl.c
 			conj.c conjf.c conjl.c
 			cproj.c cprojf.c cprojl.c
 			creal.c crealf.c creall.c
 			csin.c csinf.c csinl.c
-			csinh.c csinhf.c csinhl.c /* Added csinhl.c */
+			csinh.c csinhf.c
 			csqrt.c csqrtf.c
 			ctan.c ctanf.c ctanl.c
-			ctanh.c ctanhf.c ctanhl.c /* Added ctanhl.c */
+			ctanh.c ctanhf.c
 			;
 
 		if $(architecture) = x86_gcc2 {
