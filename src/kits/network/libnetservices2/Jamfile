@@ -15,7 +15,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			continue ;
 		}
 
-		if $(architecture) = sparc {
+		if $(architecture) = sparc || $(architecture) = m68k {
 			SubDirC++Flags -std=gnu++14 ;
 		} else {
 			SubDirC++Flags -std=gnu++17 ;

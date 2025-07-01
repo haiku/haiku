@@ -82,6 +82,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ TargetStaticLibsupc++ ]
 			[ TargetLibgcc ]
 			;
+		if $(architecture) = m68k {
+			LINKLIBS on $(libroot) += m ;
+		}
 
 		# Use the standard libroot.so soname, so when the debug version is
 		# pre-loaded it prevents the standard version to be loaded as well.
@@ -96,6 +99,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ TargetStaticLibsupc++ ]
 			[ TargetLibgcc ]
 			;
+		if $(architecture) = m68k {
+			LINKLIBS on $(librootDebug) += m ;
+		}
 
 		# These are defined in POSIX for c99 support, so fake'em
 		StaticLibrary [ MultiArchDefaultGristFiles libc.a ] : empty.c ;
