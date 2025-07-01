@@ -106,7 +106,7 @@ struct unified_cache {
     unified_cache_entry*    LookupEntry(uint64 id);
     status_t                InsertEntry(unified_cache_entry* entry);
     void                    RemoveEntry(unified_cache_entry* entry);
-    unified_cache_entry*    EvictEntrySieve2(); // Core SIEVE-2 eviction
+    status_t                EvictEntrySieve2(); // Core SIEVE-2 eviction
     void                    AccessEntrySieve2(unified_cache_entry* entry); // Update on hit
 
     // TODO: Low memory handling
