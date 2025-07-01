@@ -173,7 +173,7 @@ void
 ConsoleHandle::Clear()
 {
 	Move(&gScreen->RastPort, 0, sScreenTopOffset);
-	ClearScreen(&gScreen->RastPort);
+	Amiga_ClearScreen(&gScreen->RastPort);
 }
 
 
