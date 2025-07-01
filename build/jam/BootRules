@@ -134,7 +134,14 @@ rule BootLd
 		libs += [ TargetBootLibsupc++ true ] ;
 		Depends $(1) : [ TargetBootLibsupc++ ] ;
 	}
-	LINKLIBS on $(1) = $(libs) [ TargetBootLibgcc $(TARGET_KERNEL_ARCH) : true ] ;
+	libs += [ TargetBootLibgcc $(TARGET_KERNEL_ARCH) : true ] ;
+	# For PPC, also try linking against the general libgcc, as it might contain
+	# ABI helpers not present in libgcc-kernel.a for the bootloader.
+	if $(TARGET_KERNEL_ARCH) = ppc {
+		# Assuming libgcc.a is found via -lgcc by the linker in the toolchain's lib path
+		libs += -lgcc ;
+	}
+	LINKLIBS on $(1) = $(libs) ;
 	Depends $(1) : [ TargetBootLibgcc $(TARGET_KERNEL_ARCH) ] ;
 
 	# TODO: Do we really want to invoke SetupBoot here? The objects should
