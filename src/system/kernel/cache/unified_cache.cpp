@@ -400,7 +400,7 @@ unified_cache_release_entry(unified_cache* cache, unified_cache_entry* entry)
         entry->id, entry->ref_count);
 
     if (entry->ref_count < 0) {
-        panic("unified_cache_release_entry: Negative ref_count for entry %\" B_PRIu64 \"!", entry->id);
+        panic("unified_cache_release_entry: Negative ref_count for entry %" B_PRIu64 "!", entry->id);
     }
 
     if (entry->ref_count == 0) {
