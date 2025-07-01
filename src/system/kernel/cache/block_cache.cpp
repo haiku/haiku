@@ -437,9 +437,6 @@ block_cache::block_cache(int _fd, off_t _numBlocks, size_t _blockSize, bool _rea
 	busy_reading_count(0), busy_reading_waiters(false),
 	busy_writing_count(0), busy_writing_waiters(false),
 	last_block_write(0), last_block_write_duration(0), num_dirty_blocks(0)
-	busy_reading_count(0), busy_reading_waiters(false),
-	busy_writing_count(0), busy_writing_waiters(false),
-	last_block_write(0), last_block_write_duration(0), num_dirty_blocks(0)
 {
 	// It's critical that mutex_init is called for lock before it's used.
 	// The current structure has lock as a direct member, so it should be initialized
@@ -478,7 +475,7 @@ status_t block_cache::Init()
 	hash = new(std::nothrow) BlockTable();
 	if (hash == NULL)
 		return B_NO_MEMORY;
-	status_t status = hash->InitCheck(); // Assuming InitCheck or similar exists
+	status_t status = hash->Init();
 	if (status != B_OK) {
 		delete hash;
 		hash = NULL;
@@ -491,7 +488,7 @@ status_t block_cache::Init()
 		hash = NULL;
 		return B_NO_MEMORY;
 	}
-	status = transaction_hash->InitCheck(); // Assuming InitCheck
+	status = transaction_hash->Init();
 	if (status != B_OK) {
 		delete transaction_hash;
 		transaction_hash = NULL;
