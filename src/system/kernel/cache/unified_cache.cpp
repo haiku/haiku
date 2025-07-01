@@ -68,8 +68,10 @@ unified_cache::Destroy()
     unified_cache_entry* entry = NULL;
     while ((entry = sieve_list.RemoveHead()) != NULL) {
         // In a real scenario, check ref_count, dirty status, etc.
-        // object_cache_free(sEntryCache, entry->data, 0); // If data is from slab
-        free(entry->data); // If data is from malloc
+        // This simplified Destroy assumes entries are no longer referenced and can be freed.
+        // Data is assumed to be malloc'd.
+        if (entry->data != NULL)
+            free(entry->data);
         object_cache_free(sEntryCache, entry, 0);
     }
 
@@ -94,16 +96,30 @@ status_t
 unified_cache::InsertEntry(unified_cache_entry* entry)
 {
     // Assumes lock is held
-    if (current_size_bytes + entry->size > max_size_bytes && sieve_list.Count() > 0) {
-        unified_cache_entry* victim = EvictEntrySieve2();
-        if (victim) {
-            TRACE("InsertEntry: Evicted entry %\" B_PRIu64 \" to make space.\n", victim->id);
-            // Data and entry itself are freed by EvictEntrySieve2 if no refs
-        } else if (current_size_bytes + entry->size > max_size_bytes) {
-            // Still no space, eviction failed (e.g. all pages pinned)
-            return B_NO_MEMORY; // Or some other error indicating cache full
+    while (current_size_bytes + entry->size > max_size_bytes && !sieve_list.IsEmpty()) {
+        status_t evictStatus = EvictEntrySieve2();
+        if (evictStatus == B_OK) {
+            TRACE("InsertEntry: Evicted an entry to make space.\n");
+            // Loop again to check size or if list became empty
+        } else if (evictStatus == B_ENTRY_NOT_FOUND || evictStatus == B_BUSY) {
+            // No suitable victim found (all pinned, or all visited and got a second chance)
+            // or all remaining are dirty and writeback isn't implemented/immediate.
+            TRACE("InsertEntry: Eviction failed (no suitable victim or all dirty/pinned), current size %lu, entry size %lu, max %lu\n",
+                current_size_bytes, entry->size, max_size_bytes);
+            if (current_size_bytes + entry->size > max_size_bytes)
+                return B_NO_MEMORY; // Still no space
+            break; // Exit loop if no victim found, proceed to insert if space allows
+        } else {
+            // Some other error during eviction
+             TRACE("InsertEntry: Eviction failed with error %s.\n", strerror(evictStatus));
+            return evictStatus;
         }
     }
+    if (current_size_bytes + entry->size > max_size_bytes) {
+        // Final check if list became empty or eviction wasn't enough/possible
+        return B_NO_MEMORY;
+    }
+
 
     hash_table->Insert(entry);
     sieve_list.Add(entry); // Add to the tail (MRU position for new items)
@@ -147,32 +163,39 @@ unified_cache::RemoveEntry(unified_cache_entry* entry)
     // For simplicity here, assume it's freed immediately if no outstanding refs.
     // This part needs to align with unified_cache_release_entry.
     if (entry->ref_count == 0) {
-        // object_cache_free(sEntryCache, entry->data, 0); // if data from slab
-        free(entry->data); // if data from malloc
+        // If ref_count is 0, this entry is not externally referenced and can be freed.
+        // Data is assumed to be malloc'd.
+        if (entry->data != NULL)
+            free(entry->data);
         object_cache_free(sEntryCache, entry, 0);
     }
 }
 
-unified_cache_entry*
+status_t
 unified_cache::EvictEntrySieve2()
 {
     // Assumes lock is held
     if (sieve_list.IsEmpty())
-        return NULL;
+        return B_ENTRY_NOT_FOUND; // Or B_OK if "nothing to evict" is not an error
 
     unified_cache_entry* candidate = sieve_hand;
+    unified_cache_entry* originalHand = sieve_hand;
+    bool loopedOnce = false;
+
     while (candidate != NULL) {
         // If the entry is referenced, we cannot evict it. Skip.
         // In SIEVE, objects with ref_count > 0 are considered "pinned".
         if (candidate->ref_count > 0) {
             sieve_hand = sieve_list.GetNext(candidate);
             if (sieve_hand == NULL) sieve_hand = sieve_list.Head(); // Wrap around
-            if (sieve_hand == candidate && candidate->ref_count > 0) {
-                // All pages pinned or only one pinned page left
-                TRACE("EvictEntrySieve2: All remaining pages are pinned or only one pinned page.\n");
-                return NULL;
+            if (sieve_hand == originalHand && loopedOnce && candidate->ref_count > 0) {
+                // Made a full loop and the original hand (which is current candidate) is still pinned
+                TRACE("EvictEntrySieve2: Full loop, all remaining pages are pinned or only one pinned page.\n");
+                return B_ENTRY_NOT_FOUND; // Or B_BUSY if more appropriate
             }
             candidate = sieve_hand;
+            if (candidate == originalHand)
+                loopedOnce = true;
             continue;
         }
 
@@ -180,67 +203,95 @@ unified_cache::EvictEntrySieve2()
             candidate->sieve_visited_count--; // "Second chance"
             sieve_hand = sieve_list.GetNext(candidate);
             if (sieve_hand == NULL) sieve_hand = sieve_list.Head(); // Wrap around
-            // Move candidate to MRU end of list if that's part of the specific SIEVE-2 variant
-            // For basic SIEVE, just clearing visited is enough, hand moves on.
-            // Let's assume for now it stays in place, and hand moves.
         } else {
             // Found victim
             TRACE("EvictEntrySieve2: Victim found %\" B_PRIu64 \" (visited_count: %u, ref_count: %ld).\n",
                 candidate->id, candidate->sieve_visited_count, candidate->ref_count);
 
-            // Before removing from hash and list, advance the hand
-            sieve_hand = sieve_list.GetNext(candidate);
-            if (sieve_hand == NULL) {
-                sieve_hand = sieve_list.Head();
-            }
-            // If sieve_hand becomes the candidate again after wrapping, and it was the only item,
-            // and it's being evicted, sieve_hand should become NULL if list is now empty.
-            if (sieve_hand == candidate) { // Only element was the candidate
-                 sieve_hand = NULL; // List will be empty after removal
-            }
-
-
             // TODO: Handle dirty victim: write back before evicting.
-            // This is a simplified eviction. A real one would queue dirty blocks
-            // for write-back and might not evict immediately.
             if (candidate->is_dirty) {
-                TRACE("EvictEntrySieve2: Victim %\" B_PRIu64 \" is dirty. Needs writeback (not implemented here).\n", candidate->id);
-                // For now, we'll pretend it's written back or handle it as an error for eviction
-                // A robust cache would have a mechanism to flush dirty pages.
-                // For now, let's just mark it as not evictable if dirty and unreferenced.
-                // This is a placeholder for more complex dirty page handling.
-                sieve_hand = sieve_list.GetNext(candidate); // try next
+                TRACE("EvictEntrySieve2: Victim %\" B_PRIu64 \" is dirty. Skipping for now (needs writeback).\n", candidate->id);
+                sieve_hand = sieve_list.GetNext(candidate);
                 if (sieve_hand == NULL) sieve_hand = sieve_list.Head();
-                if (sieve_hand == candidate) return NULL; // all dirty or pinned
+                if (sieve_hand == originalHand && loopedOnce) {
+                     TRACE("EvictEntrySieve2: Full loop, all remaining unpinned pages are dirty.\n");
+                     return B_IO_ERROR; // Indicate dirty pages blocking eviction
+                }
                 candidate = sieve_hand;
-                continue;
+                if (candidate == originalHand)
+                    loopedOnce = true;
+                continue; // Try next
             }
+
+            // Advance the hand *before* removing the candidate
+            unified_cache_entry* nextHand = sieve_list.GetNext(candidate);
+            if (nextHand == NULL) {
+                nextHand = sieve_list.Head();
+            }
+             // If candidate is the only item, nextHand might become candidate itself.
+            // After removing candidate, if list becomes empty, hand should be NULL.
+            // If list not empty but nextHand was candidate (only item), hand should point to new head.
 
             hash_table->Remove(candidate);
-            sieve_list.Remove(candidate);
+            sieve_list.Remove(candidate); // This will adjust head/tail of sieve_list
+
+            if (sieve_list.IsEmpty()) {
+                sieve_hand = NULL;
+            } else if (sieve_hand == candidate) {
+                // If the hand was pointing to the victim, and it was the only item,
+                // sieve_list.GetNext(candidate) would be NULL, then sieve_list.Head()
+                // would be NULL after removal.
+                // If it was not the only item, nextHand is valid.
+                sieve_hand = nextHand;
+                 // If nextHand was candidate (single item list), and now it's removed,
+                 // sieve_list.Head() is the correct new hand (or NULL if empty).
+                if (sieve_hand == candidate) sieve_hand = sieve_list.Head();
+
+            }
+            // If sieve_hand was not the candidate, it remains valid unless candidate was its prev/next.
+            // The DoublyLinkedList handles this internally. We just need to ensure sieve_hand is valid.
+            // The most robust is to set it relative to the list state after removal.
+            // This simplified hand update should be:
+            // if (sieve_hand == candidate) {
+            //     sieve_hand = nextHandIfAnyOrListHead;
+            // } // else hand is fine
+            // The current sieve_hand = nextHand (calculated before removal) is mostly okay,
+            // but if candidate was the tail, nextHand became Head. If Head was candidate, it's tricky.
+            // Let's reset based on list state:
+            if (!sieve_list.IsEmpty() && (sieve_hand == candidate || !sieve_list.Contains(sieve_hand))) {
+                 sieve_hand = sieve_list.Head(); // Default to head if hand is invalid or was victim
+            } else if (sieve_list.IsEmpty()) {
+                 sieve_hand = NULL;
+            }
+
+
             current_size_bytes -= candidate->size;
             current_entries--;
             evictions++;
 
-            // The caller is responsible for freeing the victim's data and the entry struct itself
-            // if ref_count is indeed 0.
-            // For this simplified version, we assume it's freed.
-            // object_cache_free(sEntryCache, candidate->data, 0); // if data from slab
-            free(candidate->data); // if data from malloc
+            if (candidate->data != NULL)
+                free(candidate->data);
             object_cache_free(sEntryCache, candidate, 0);
 
-            return candidate; // Technically returning a pointer to freed memory, should return id or status.
-                              // Let's change to return NULL after freeing, or the entry before freeing if caller manages it.
-                              // For now, this indicates success. The entry is gone.
+            return B_OK;
         }
         candidate = sieve_hand;
-        if (candidate == NULL && !sieve_list.IsEmpty()) { // Should not happen if list not empty
-             sieve_hand = sieve_list.Head(); // Reset hand if it became NULL unexpectedly
+        if (candidate == originalHand) {
+            if (loopedOnce) {
+                // Made a full circle, and all pages were either pinned or got a second chance (their count > 0 initially)
+                TRACE("EvictEntrySieve2: Full scan, no immediately evictable entry found this pass.\n");
+                return B_ENTRY_NOT_FOUND; // Or B_WOULD_BLOCK if we expect counts to drop
+            }
+            loopedOnce = true;
+        }
+        if (candidate == NULL && !sieve_list.IsEmpty()) {
+             sieve_hand = sieve_list.Head();
              candidate = sieve_hand;
+             if(candidate == originalHand) loopedOnce = true; // Avoid infinite loop on single item list
         }
     }
-    TRACE("EvictEntrySieve2: No evictable entry found (all pinned or dirty and unhandled).\n");
-    return NULL; // No evictable page found
+    TRACE("EvictEntrySieve2: No evictable entry found (e.g. list became empty during scan, or logic error).\n");
+    return B_ENTRY_NOT_FOUND;
 }
 
 void
@@ -341,14 +392,22 @@ unified_cache_put_entry(unified_cache* cache, uint64 id, unified_data_type type,
     if (entry != NULL) {
         // Entry exists. Update it. This is a complex case.
         // If size changes, or data pointer changes, needs careful handling.
-        // For simplicity, assume put is for new entries or overwriting with same size.
-        // A real cache might free old data, update new data, mark dirty.
-        TRACE("unified_cache_put_entry: Entry %\" B_PRIu64 \" exists. Updating (simplified).\n", id);
-        // free(entry->data); // Free old data if necessary
-        entry->data = data; // This assumes caller manages old data if replaced
-        entry->size = size; // Size could change
+        TRACE("unified_cache_put_entry: Entry %\" B_PRIu64 \" exists. Updating.\n", id);
+        if (entry->data != data) { // Only free if new data pointer is different
+            if (entry->data != NULL)
+                free(entry->data); // Free old data; assumes cache owned it.
+            entry->data = data;
+        }
+        // Update size and dirty status
+        cache->current_size_bytes -= entry->size;
+        cache->current_size_bytes += size;
+        entry->size = size;
         entry->is_dirty = is_dirty;
-        entry->data_type = type; // Should match
+        // entry->data_type should match, assert or check if necessary
+        if (entry->data_type != type) {
+            panic("unified_cache_put_entry: ID collision with different data type on update!");
+            // Or return B_BAD_TYPE;
+        }
         atomic_add(&entry->ref_count, 1);
         cache->AccessEntrySieve2(entry); // Treat as access
         if (_entry) *_entry = entry;

@@ -117,7 +117,18 @@ VMVnodeCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 	if (!StoreHasPage(offset))
 		return B_BAD_ADDRESS;
 
-	// vm_soft_fault() reads the page in.
+	// According to the comment, vm_soft_fault() is expected to read the page.
+	// If VMCache::Fault() is reached, it implies vm_soft_fault() might have
+	// already tried to look up the page and found it missing, and is now
+	// calling this as a fallback or for a specific reason.
+	// Returning B_BAD_HANDLER tells the VM layer that this cache doesn't
+	// handle the fault directly in this path.
+	// A more explicit approach might involve this function triggering the read
+	// if the page isn't present, as sketched in review comments.
+	// For now, keeping B_BAD_HANDLER as per existing logic flow implication,
+	// but noting this is a critical point for mmap functionality.
+	// If vm_soft_fault itself is supposed to call VMCache::Read, then
+	// this function might only be called in unexpected scenarios.
 	return B_BAD_HANDLER;
 }
 
