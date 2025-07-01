@@ -565,5 +565,44 @@ bool cache_has_block_in_transaction(void* _cache, int32 id, off_t blockNumber) {
 #if DEBUG_BLOCK_CACHE
 // Debug functions commented out
 #endif
+
+
+// #pragma mark - Public API
+
+
+extern "C" void
+block_cache_put(void* _cache, off_t blockNumber)
+{
+	block_cache* cache = (block_cache*)_cache;
+	if (cache == NULL) {
+		TRACE_ALWAYS("block_cache_put: NULL cache provided for block %" B_PRIdOFF "\\n", blockNumber);
+		return;
+	}
+
+	// TODO: This is a placeholder implementation for block_cache_put.
+	// The actual logic for finding the cached_block, decrementing its
+	// reference count, and managing its state (e.g., moving to LRU,
+	// freeing if ref_count is zero and not dirty) needs to be implemented here,
+	// similar to how block_cache_get manages block acquisition and ref counting.
+	//
+	// A typical sequence would involve:
+	// 1. Lock the cache.
+	// 2. Find the cached_block for blockNumber.
+	// 3. If found:
+	//    a. Decrement block->ref_count.
+	//    b. If block->ref_count == 0:
+	//       i. Potentially add to an LRU/unused list.
+	//       ii. Consider if the block's buffer needs special handling.
+	// 4. Unlock the cache.
+	// 5. If not found, it might be an error or a no-op depending on cache design.
+
+	TRACE(("block_cache_put(cache %p, block %" B_PRIdOFF ") - STUBBED\n", cache, blockNumber));
+
+	// For now, this stub does nothing with the block itself to avoid incorrect cache behavior.
+	// The primary goal of this stub is to allow dependent modules (like BFS) to link.
+	// A proper implementation is required for correct cache operation.
+}
+
+
 // [end of src/system/kernel/cache/block_cache.cpp]
 // [end of src/system/kernel/cache/block_cache.cpp] // Removed this marker line
