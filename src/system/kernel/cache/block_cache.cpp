@@ -499,4 +499,5 @@ bool cache_has_block_in_transaction(void* _cache, int32 id, off_t blockNumber) {
 #if DEBUG_BLOCK_CACHE
 // Debug functions commented out
 #endif
+// [end of src/system/kernel/cache/block_cache.cpp]
 // [end of src/system/kernel/cache/block_cache.cpp] // Removed this marker line
