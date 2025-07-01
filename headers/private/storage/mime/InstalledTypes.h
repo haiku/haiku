@@ -42,8 +42,7 @@ class InstalledTypes {
 		status_t RemoveType(const char *type);
 
 	private:
-		status_t _AddSupertype(const char *super,
-					std::map<std::string, Supertype>::iterator &i);
+		status_t _AddSupertype(const char* super);
 		status_t _AddSubtype(const char *super, const char *sub);		
 		status_t _AddSubtype(Supertype &super, const char *sub);
 
