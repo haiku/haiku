@@ -784,6 +784,10 @@ VMCache::LookupPage(off_t offset)
 		panic("page %p not in cache %p\n", page, this);
 #endif
 
+	if (page != NULL) { // Page found - this is a cache hit
+		_SieveTouchPage(page); // Update SIEVE-2 status
+	}
+
 	return page;
 }
 
@@ -807,9 +811,9 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 	page_count++;
 	page->SetCacheRef(fCacheRef);
 
-	// SIEVE: Add to our FIFO list and initialize visited status for SIEVE.
-	page->sieve_visited = false; // New pages start as not visited.
-	_SieveAddPageToHead(page);   // Add to the head of SIEVE's doubly linked list.
+	// SIEVE-2: Add to our FIFO list and initialize visited count for SIEVE-2.
+	page->sieve_visited_count = 0; // New pages start with count 0 (candidate for eviction).
+	_SieveAddPageToHead(page);     // Add to the head of SIEVE's doubly linked list.
 
 #if KDEBUG
 	vm_page* otherPage = pages.Lookup(page->cache_offset);
@@ -1800,54 +1804,86 @@ VMCache::_SieveFindVictimPage()
 		return NULL;
 	}
 
-	vm_page* scanPointer = sieve_hand;
+	vm_page* const originalHandPosition = sieve_hand;
+	vm_page* currentVictimCandidate = NULL;
 
-	// Loop at most twice through the list. Once for initial scan and demotions,
-	// a second time to find a now unvisited page if all were initially visited.
-	for (int pass = 0; pass < 2; pass++) {
-		vm_page* current = scanPointer; // Start scan from current hand/scanPointer position
-		do {
-			// Candidate pages must be clean, not busy, and not wired.
-			if (!current->busy && current->WiredCount() == 0
-				&& !current->modified) {
+	// The SIEVE-2 logic:
+	// Scan with the hand. If a page has visited_count > 0, decrement count and
+	// move the hand to this page (it becomes the "newest-oldest" accessed page).
+	// If visited_count == 0, it's a candidate for eviction.
+	// The original SIEVE paper scans until an unvisited page is found or a full circle.
+	// For SIEVE-2, we might iterate, decrementing counts. If we make a full circle
+	// and all pages had their counts decremented (none were 0 initially), a second
+	// pass might be needed, or the current hand (which would be the last one
+	// decremented) becomes the victim if its count is now 0.
 
-				if (current->sieve_visited) {
-					current->sieve_visited = false; // Demote
-					sieve_hand = current;           // Move hand to this demoted page
-				} else {
-					// Found an unvisited, viable page. This is the victim.
-					// The hand does not move from where it was before this find.
-					return current;
-				}
+	vm_page* scan = sieve_hand;
+	do {
+		vm_page* nextScan = scan->sieve_prev; // Scan towards older pages (tail)
+		if (nextScan == NULL) // Wrapped around
+			nextScan = sieve_page_list_tail;
+
+		if (!scan->busy && scan->WiredCount() == 0 && !scan->modified) {
+			if (scan->sieve_visited_count > 0) {
+				scan->sieve_visited_count--;
+				sieve_hand = scan; // Hand moves to the page that got a "chance"
+				currentVictimCandidate = NULL; // Reset candidate if hand moved
+			} else {
+				// This page has sieve_visited_count == 0. It's our victim.
+				// The hand does not necessarily move to it *before* eviction.
+				// The paper says "the position of O [the victim] (i.e. O is the new hand)".
+				// So, after identifying O, sieve_hand points to O's position.
+				sieve_hand = scan;
+				currentVictimCandidate = scan;
+				goto found_victim; // Exit loop and return victim
 			}
-
-			// Advance scanPointer towards the tail (older pages)
-			current = current->sieve_prev;
-			if (current == NULL) { // Wrapped around past the tail
-				current = sieve_page_list_tail; // Reset scan to tail
-				if (current == NULL) // List became empty during scan
-					return NULL;
-			}
-		// Continue until we've scanned back to where this pass's scan started (sieve_hand for pass 0,
-		// or the initial scanPointer if hand moved for subsequent passes)
-		} while (current != scanPointer);
-
-		// If we are here, it means a full pass was made from 'scanPointer'.
-		// If pass 0, and we are here, all pages from original sieve_hand to tail then head to original sieve_hand
-		// were either not viable or were visited (and now demoted). The sieve_hand is now at the
-		// position of the last page whose visited bit was cleared.
-		// The second pass (pass == 1) will scan again. If a page (now unvisited) is found, it's the victim.
-		// If the second pass completes and we are here, no victim was found.
-		if (pass == 0) {
-			scanPointer = sieve_hand; // Start the second pass from the potentially new hand
 		}
+
+		scan = nextScan;
+		if (scan == NULL) { // Should not happen if list is not empty
+			if (sieve_page_list_tail != NULL) scan = sieve_page_list_tail;
+			else return NULL; // List became empty
+		}
+
+	} while (scan != sieve_hand && scan != originalHandPosition);
+	// Loop termination:
+	// 1. scan == sieve_hand: We made a full circle and the hand is where it started
+	//    (or where it last moved to after decrementing a counter).
+	// 2. scan == originalHandPosition: We made a full circle relative to the initial hand.
+
+	// If we are here, we made a full circle. The current sieve_hand page is the
+	// best candidate if its count is 0.
+	if (sieve_hand != NULL && !sieve_hand->busy && sieve_hand->WiredCount() == 0
+		&& !sieve_hand->modified && sieve_hand->sieve_visited_count == 0) {
+		currentVictimCandidate = sieve_hand;
 	}
 
-	return NULL; // No suitable victim found after two full passes
+found_victim:
+	// If a victim was found, sieve_hand is already pointing to it.
+	// The caller will remove it, and then the sieve_hand should be
+	// advanced to the *next* position for the subsequent scan.
+	// This detail is handled by _SieveRemovePage.
+	return currentVictimCandidate;
 }
 
 
-// #pragma mark - SIEVE Helper Methods
+// Method to be called when a page is "hit" or accessed in the cache
+void
+VMCache::_SieveTouchPage(vm_page* page)
+{
+	AssertLocked();
+	// Set to max value for SIEVE-2 like behavior (e.g., 2 for 3 levels: 0,1,2)
+	// Using 2 bits, max value is 3. Let's use 2 as "hot".
+	if (page->sieve_visited_count < 2)
+		page->sieve_visited_count = 2;
+
+	// Original SIEVE does not move pages on hit, just sets visited.
+	// More LRU-like SIEVE variants might move to MRU on hit.
+	// For now, just update count.
+}
+
+
+// #pragma mark - VMCache
 
 
 /*! Adds a page to the head of the SIEVE FIFO list.
