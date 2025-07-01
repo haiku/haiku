@@ -173,8 +173,7 @@ InstalledTypes::AddType(const char *type)
 	}
 	if (i == len) {
 		// Supertype only
-		std::map<std::string, Supertype>::iterator i;
-		return _AddSupertype(type, i);
+		return _AddSupertype(type);
 	}
 
 	// Copy the supertype
@@ -235,16 +234,14 @@ InstalledTypes::RemoveType(const char *type)
 	- "error code": failure
 */
 status_t
-InstalledTypes::_AddSupertype(const char *super,
-	std::map<std::string, Supertype>::iterator &i)
+InstalledTypes::_AddSupertype(const char* super)
 {
 	if (super == NULL)
 		return B_BAD_VALUE;
 
 	status_t err = B_OK;
 
-	i = fSupertypes.find(super);
-	if (i == fSupertypes.end()) {
+	if (fSupertypes.find(super) == fSupertypes.end()) {
 		Supertype &supertype = fSupertypes[super];
 		supertype.SetName(super);
 		if (fCachedMessage)
@@ -274,10 +271,9 @@ InstalledTypes::_AddSubtype(const char *super, const char *sub)
 	if (super == NULL || sub == NULL)
 		return B_BAD_VALUE;
 
-	std::map<std::string, Supertype>::iterator i;
-	status_t err = _AddSupertype(super, i);
+	status_t err = _AddSupertype(super);
 	if (!err)
-		err = _AddSubtype(i->second, sub);
+		err = _AddSubtype(fSupertypes[super], sub);
 
 	return err;
 }
@@ -408,8 +404,7 @@ InstalledTypes::_BuildInstalledTypesList()
 					BPrivate::Storage::to_lower(supertype);
 
 					// Add this supertype
-					std::map<std::string, Supertype>::iterator i;
-					if (_AddSupertype(supertype, i) != B_OK)
+					if (_AddSupertype(supertype) != B_OK)
 						DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList()"
 							" -- Error adding supertype '%s': 0x%" B_PRIx32 "\n",
 							supertype, err));
