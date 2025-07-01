@@ -162,6 +162,7 @@ get_next_pending_event(cache_notification* notification, int32* _event)
 	return false;
 }
 
+/*
 static void
 flush_pending_notifications_for_cache(block_cache* cache)
 {
@@ -189,6 +190,7 @@ flush_pending_notifications_for_cache(block_cache* cache)
 		}
 	}
 }
+*/
 
 // static void // Commented out - unused
 // flush_pending_notifications()
@@ -232,6 +234,7 @@ add_notification(block_cache* cache, cache_notification* notification,
 		release_sem_etc(sEventSemaphore, 1, B_DO_NOT_RESCHEDULE);
 }
 
+/*
 static void
 notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 	int32 event)
@@ -252,6 +255,7 @@ notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 			delete_notification(listener);
 	}
 }
+*/
 
 static void
 remove_transaction_listeners(block_cache* cache, cache_transaction* transaction)
@@ -263,6 +267,7 @@ remove_transaction_listeners(block_cache* cache, cache_transaction* transaction)
 	}
 }
 
+/*
 static void
 delete_transaction(block_cache* cache, cache_transaction* transaction)
 {
@@ -274,6 +279,7 @@ delete_transaction(block_cache* cache, cache_transaction* transaction)
 	else
 		delete transaction;
 }
+*/
 
 // static cache_transaction* lookup_transaction(block_cache* cache, int32 id) { /* ... */ } // Commented out - unused
 // static status_t write_blocks_in_previous_transaction(block_cache* cache, cache_transaction* transaction) { /* ... */ } // Commented out - unused
@@ -287,6 +293,7 @@ cached_block::CanBeWritten() const
 			|| (transaction == NULL && is_dirty && !is_writing));
 }
 
+/*
 BlockWriter::BlockWriter(block_cache* cache, size_t max) :
 	fCache(cache), fCount(0), fTotal(0), fCapacity(kBufferSize), fMax(max),
 	fStatus(B_OK), fDeletedTransaction(false)
@@ -301,7 +308,7 @@ BlockWriter::~BlockWriter()
 }
 
 bool
-BlockWriter::Add(cached_block* block, cache_transaction* /*transaction*/)
+BlockWriter::Add(cached_block* block, cache_transaction* /-*transaction*-/)
 {
 	if (!block->CanBeWritten()) return false;
 	if (fTotal >= fMax) return false;
@@ -330,6 +337,7 @@ BlockWriter::Add(cached_block* block, cache_transaction* /*transaction*/)
 		atomic_add(&block->previous_transaction->busy_writing_count, 1);
 	return true;
 }
+*/
 
 // bool BlockWriter::Add(cache_transaction* transaction, bool& hasLeftOvers) { /* ... */ } // Commented out - unused
 
@@ -439,8 +447,10 @@ void block_cache::FreeBlockParentData(cached_block* block) { /* ... */ }
 /*static*/ void block_cache::_LowMemoryHandler(void* data, uint32, int32 level) { /* ... */ }
 
 status_t block_cache_init(void) { /* ... */ return B_OK; }
-static status_t block_notifier_and_writer(void* /*data*/) { /* ... */ return B_OK;}
-static block_cache* get_next_locked_block_cache(block_cache* last) { /* ... */ return NULL;}
+/*
+static status_t block_notifier_and_writer(void* /-*data*-/) { /-* ... *-/ return B_OK;}
+static block_cache* get_next_locked_block_cache(block_cache* last) { /-* ... *-/ return NULL;}
+*/
 
 size_t block_cache_used_memory(void) { MutexLocker _(sCachesMemoryUseLock); return sUsedMemory; }
 void* block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly) { /* ... */ return NULL; }
@@ -484,6 +494,4 @@ bool cache_has_block_in_transaction(void* _cache, int32 id, off_t blockNumber) {
 #if DEBUG_BLOCK_CACHE
 // Debug functions commented out
 #endif
-
-block_cache sMarkCache(0,0,0,false);
 // [end of src/system/kernel/cache/block_cache.cpp] // Removed this marker line
