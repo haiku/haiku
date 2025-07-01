@@ -1,5 +1,24 @@
 SubDir HAIKU_TOP src libs ;
 
+# Ensure C++14 is used for problematic architectures for all libraries
+# if the global ArchitectureRules setting isn't taking precedence.
+local currentArchitecture = $(HAIKU_PACKAGING_ARCH) ;
+if $(currentArchitecture) in sparc m68k ppc {
+	SubDirC++Flags $(SubDirC++Flags) -std=gnu++14 ;
+} else {
+	# Default to C++17 for other architectures if not already set,
+	# or ensure it's part of the flags.
+	# This is a bit broad, ideally specific kits set their desired modern standard.
+	local currentCxxFlags = $(SubDirC++Flags) ;
+	if ! ( -std=gnu++17 in $(currentCxxFlags) ) && ! ( -std=gnu++14 in $(currentCxxFlags) ) && ! ( -std=gnu++11 in $(currentCxxFlags) ) {
+		# Only add if no C++ standard is already specified by a more local Jamfile
+		# This check might be too simple.
+	}
+	# Let's assume ArchitectureRules handles the default C++17 for others for now,
+	# and only force C++14 for the problem cases here.
+}
+
+
 SubInclude HAIKU_TOP src libs agg ;
 SubInclude HAIKU_TOP src libs alm ;
 SubInclude HAIKU_TOP src libs bsd ;

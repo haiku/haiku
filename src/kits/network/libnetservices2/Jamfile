@@ -15,12 +15,12 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			continue ;
 		}
 
-		# The C++ standard is now set globally in ArchitectureRules
-		# if $(architecture) = sparc || $(architecture) = m68k || $(architecture) = ppc {
-		# 	SubDirC++Flags -std=gnu++14 ;
-		# } else {
-		# 	SubDirC++Flags -std=gnu++17 ;
-		# }
+		# Explicitly set C++ standard per architecture for this kit
+		if $(architecture) = sparc || $(architecture) = m68k || $(architecture) = ppc {
+			SubDirC++Flags -std=gnu++14 ;
+		} else {
+			SubDirC++Flags -std=gnu++17 ;
+		}
 
 		StaticLibrary <$(architecture)>libnetservices2.a :
 			ErrorsExt.cpp

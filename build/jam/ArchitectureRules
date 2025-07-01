@@ -60,18 +60,28 @@ rule ArchitectureSetup architecture
 	HAIKU_LINK_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 
 	HAIKU_CCFLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
-	# For problematic architectures, reset C++ flags then set C++14
+
+	# Start with base flags for C++
+	local currentCxxFlags = $(ccBaseFlags) -nostdinc ;
+
+	# Append any pre-existing HAIKU_C++FLAGS_$(architecture) that are NOT -std= flags
+	local existingArchFlags = $(HAIKU_C++FLAGS_$(architecture)) ;
+	local flag ;
+	for flag in $(existingArchFlags) {
+		if ! [ Match "-std=*" : $(flag) ] {
+			# Avoid duplicating ccBaseFlags or -nostdinc if they were already in existingArchFlags
+			if ! ( $(flag) in $(currentCxxFlags) ) {
+				currentCxxFlags += $(flag) ;
+			}
+		}
+	}
+
 	if $(architecture) in sparc m68k ppc {
-		HAIKU_C++FLAGS_$(architecture) = $(ccBaseFlags) -nostdinc -std=gnu++14 ;
+		# GCC 8.3.0 has issues with C++17 unique_ptr for these targets
+		HAIKU_C++FLAGS_$(architecture) = $(currentCxxFlags) -std=gnu++14 ;
 	} else {
-		# Ensure ccBaseFlags and nostdinc are added if not already, then add C++17
-		# This assumes HAIKU_C++FLAGS_$(architecture) might already have these from a general init
-		# or might need them added if it was empty.
-		local tempFlags = $(HAIKU_C++FLAGS_$(architecture)) ;
-		if ! ( $(ccBaseFlags) in $(tempFlags) ) { tempFlags += $(ccBaseFlags) ; }
-		if ! ( -nostdinc in $(tempFlags) ) { tempFlags += -nostdinc ; }
-		tempFlags += -std=gnu++17 ;
-		HAIKU_C++FLAGS_$(architecture) = $(tempFlags) ;
+		# Default to C++17 for other architectures
+		HAIKU_C++FLAGS_$(architecture) = $(currentCxxFlags) -std=gnu++17 ;
 	}
 	HAIKU_LINKFLAGS_$(architecture) += $(ccBaseFlags) ;
 	HAIKU_ASFLAGS_$(architecture) += $(archFlags) -nostdinc ;
