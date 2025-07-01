@@ -1265,7 +1265,7 @@ insert_preloaded_image(preloaded_elf_image *preloadedImage, bool kernel)
 	status_t status;
 
 	// Copy the header to an aligned local variable to avoid unaligned access.
-	elf_ehdr header_copy = preloadedImage->elf_header;
+	Elf64_Ehdr header_copy = preloadedImage->elf_header;
 	status = verify_eheader(&header_copy);
 	if (status != B_OK)
 		return status;

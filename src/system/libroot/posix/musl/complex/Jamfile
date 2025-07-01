@@ -16,7 +16,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			TARGET_CC_x86_gcc2 = $(TARGET_CC_x86) -Wa,-mrelax-relocations=no -Wno-unused-but-set-variable ;
 		}
 
-		MergeObject <$(architecture)>posix_musl_complex.o :
+		local complexSources =
 			__cexp.c __cexpf.c
 			cabs.c cabsf.c cabsl.c
 			cacosh.c cacoshf.c
@@ -35,7 +35,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			csqrt.c csqrtf.c
 			ctan.c ctanf.c ctanl.c
 			ctanh.c ctanhf.c
-			;
+		;
+		MergeObject <$(architecture)>posix_musl_complex.o : $(complexSources:G=<$(SUBDIR)>) ;
 
 		if $(architecture) = x86_gcc2 {
 			TARGET_CC_x86_gcc2 = $(original_TARGET_CC_x86_gcc2) ;

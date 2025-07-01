@@ -126,7 +126,7 @@ struct radix_node_head {
 
 
 #ifdef __cplusplus
-extern "{"
+extern "C" {
 #endif
 
 void	rn_init(void);
