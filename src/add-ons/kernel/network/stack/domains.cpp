@@ -79,7 +79,8 @@ dump_domains(int argc, char** argv)
 				net_domain_private* domain;
 				int count;
 			};
-			walktree_f_t dump_route_callback_func = [](struct radix_node* node, void* context) -> int {
+			// Use auto for the lambda, it will decay to a function pointer when passed.
+			auto dump_route_callback_func = [](struct radix_node* node, void* context) -> int {
 				DumpContext* ctx = (DumpContext*)context;
 				net_domain_private* currentDomain = ctx->domain;
 				net_route_private* route = net_route_private::FromRadixNode(node);
@@ -119,7 +120,7 @@ dump_domains(int argc, char** argv)
 			};
 
 			// Simpler iteration for duped keys directly from the node returned by walktree
-			walktree_f_t dump_route_callback_func_simplified = [](struct radix_node* rn, void* context) -> int {
+			auto dump_route_callback_func_simplified = [](struct radix_node* rn, void* context) -> int {
 				DumpContext* ctx = (DumpContext*)context;
 				net_domain_private* currentDomain = ctx->domain;
 

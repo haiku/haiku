@@ -1408,7 +1408,7 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 			nodesToPotentiallyReallocate++;
 	}
 
-	BStackOrHeapArray<data_node*> preallocatedNodePtrs(nodesToPotentiallyReallocate);
+	BStackOrHeapArray<data_node*, 16> preallocatedNodePtrs(nodesToPotentiallyReallocate);
 	if (nodesToPotentiallyReallocate > 0 && !preallocatedNodePtrs.IsValid()) {
 		return B_NO_MEMORY;
 	}
