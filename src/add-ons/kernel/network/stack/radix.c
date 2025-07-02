@@ -177,12 +177,12 @@ rn_new_radix_mask(register struct radix_node *tt, register struct radix_mask *ne
 	Search a node in the tree matching the key.
 */
 static struct radix_node *
-rn_search(void *v_arg, struct radix_node *head)
+rn_search(const void *v_arg, struct radix_node *head)
 {
 	register struct radix_node *x;
-	register caddr_t v;
+	register const uint8 *v = (const uint8*)v_arg;
 
-	for (x = head, v = v_arg; x->rn_bit >= 0;) {
+	for (x = head; x->rn_bit >= 0;) {
 		if (x->rn_bmask & v[x->rn_offset])
 			x = x->rn_right;
 		else
@@ -197,10 +197,11 @@ rn_search(void *v_arg, struct radix_node *head)
 	XXX note this function is used only once.
 */
 static struct radix_node *
-rn_search_m(void *v_arg, struct radix_node *head, void *m_arg)
+rn_search_m(const void *v_arg, struct radix_node *head, const void *m_arg)
 {
 	register struct radix_node *x;
-	register caddr_t v = v_arg, m = m_arg;
+	register const uint8 *v = (const uint8*)v_arg;
+	register const uint8 *m = (const uint8*)m_arg;
 
 	for (x = head; x->rn_bit >= 0;) {
 		if ((x->rn_bmask & m[x->rn_offset])
@@ -214,14 +215,16 @@ rn_search_m(void *v_arg, struct radix_node *head, void *m_arg)
 
 
 static int
-rn_satisfies_leaf(char *trial, register struct radix_node *leaf, int skip)
+rn_satisfies_leaf(const uint8 *trial, register struct radix_node *leaf, int skip)
 {
-	register char *cp = trial, *cp2 = leaf->rn_key, *cp3 = leaf->rn_mask;
-	char *cplim;
+	register const uint8 *cp = trial;
+	register const uint8 *cp2 = leaf->rn_key;
+	register const uint8 *cp3 = leaf->rn_mask;
+	const uint8 *cplim;
 	int length = min(LEN(cp), LEN(cp2));
 
 	if (cp3 == 0)
-		cp3 = rn_ones;
+		cp3 = rn_ones; /* rn_ones is uint8* */
 	else
 		length = min(length, *(u_char *)cp3);
 	cplim = cp + length; cp3 += skip; cp2 += skip;
@@ -260,7 +263,7 @@ rn_newpair(void *v, int b, struct radix_node nodes[2])
 	tt->rn_bmask = 0;
 #endif
 	tt->rn_bit = -1;
-	tt->rn_key = (caddr_t)v;
+	tt->rn_key = (uint8*)v;
 	tt->rn_parent = t;
 	tt->rn_flags = t->rn_flags = RNF_ACTIVE;
 	tt->rn_mklist = t->rn_mklist = 0;
@@ -309,8 +312,15 @@ rn_insert(void *v_arg, struct radix_node_head *head, int *dupentry,
 				x = x->rn_right;
 			else
 				x = x->rn_left;
-		} while (b > (unsigned) x->rn_bit);
-					/* x->rn_bit < b && x->rn_bit >= 0 */
+		} while (x->rn_bit >= 0 && b > x->rn_bit);
+					/* After loop: x is child of p.
+					 * If x is leaf (x->rn_bit < 0), loop terminates.
+					 * If x is internal node, loop continues if b is a 'deeper' bit.
+					 * This matches comment: /* x->rn_bit < b && x->rn_bit >= 0 */
+					 * which should hold for p (the parent of new node t) relative to b,
+					 * or rather, x (child of p) should have x->rn_bit < b if x is internal,
+					 * or x is a leaf.
+					 */
 		t = rn_newpair(v_arg, b, nodes); 
 		tt = t->rn_left;
 		if ((cp[p->rn_offset] & p->rn_bmask) == 0)
@@ -507,12 +517,12 @@ rn_lookup(void *v_arg, void *m_arg, struct radix_node_head *head)
 struct radix_node *
 rn_match(void *v_arg, struct radix_node_head *head)
 {
-	caddr_t v = v_arg;
+	const uint8 *v = (const uint8*)v_arg;
 	register struct radix_node *t = head->rnh_treetop, *x;
-	register caddr_t cp = v, cp2;
-	caddr_t cplim;
+	register const uint8 *cp = v, *cp2;
+	const uint8 *cplim;
 	struct radix_node *saved_t, *top = t;
-	int off = t->rn_offset, vlen = LEN(cp), matched_off;
+	int off = t->rn_offset, vlen = LEN(v), matched_off;
 	register int test, b, rn_bit;
 
 	/*
@@ -613,15 +623,16 @@ on1:
 struct radix_node *
 rn_addmask(void *n_arg, int search, int skip)
 {
-	uint8 *netmask = (uint8 *)n_arg;
+	uint8 *input_mask = (uint8 *)n_arg;
 	register struct radix_node *x;
 	register uint8 *cp, *cplim;
 	register int b = 0, mlen, j;
 	int maskduplicated, m0, isnormal;
 	struct radix_node *saved_x;
+	uint8 *stored_mask_key; // For the key stored in the node
 	static int last_zeroed = 0;
 
-	if ((mlen = LEN(netmask)) > max_keylen)
+	if ((mlen = LEN(input_mask)) > max_keylen)
 		mlen = max_keylen;
 	if (skip == 0)
 		skip = 1;
@@ -630,7 +641,7 @@ rn_addmask(void *n_arg, int search, int skip)
 	if (skip > 1)
 		memcpy(addmask_key + 1, rn_ones + 1, skip - 1);
 	if ((m0 = mlen) > skip)
-		memcpy(addmask_key + skip, netmask + skip, mlen - skip);
+		memcpy(addmask_key + skip, input_mask + skip, mlen - skip);
 	/*
 	 * Trim trailing zeroes.
 	 */
@@ -646,16 +657,18 @@ rn_addmask(void *n_arg, int search, int skip)
 		memset(addmask_key + m0, 0, last_zeroed - m0);
 	*addmask_key = last_zeroed = mlen;
 	x = rn_search(addmask_key, rn_masktop);
-	if (memcmp(addmask_key, x->rn_key, mlen) != 0)
+	if (x && memcmp(addmask_key, x->rn_key, mlen) != 0) // x can be null from rn_search if not found
 		x = 0;
 	if (x || search)
 		return x;
 	x = (struct radix_node *)calloc(1, max_keylen + 2 * sizeof(*x));
 	if ((saved_x = x) == 0)
 		return 0;
-	netmask = cp = (caddr_t)(x + 2);
+	stored_mask_key = cp = (uint8*)(x + 2);
 	memcpy(cp, addmask_key, mlen);
-	x = rn_insert(cp, mask_rnhead, &maskduplicated, x);
+	// The first argument to rn_insert is the key to be inserted.
+	// rn_insert will set x->rn_left->rn_key = stored_mask_key (where x->rn_left is nodes[0])
+	x = rn_insert(stored_mask_key, mask_rnhead, &maskduplicated, x);
 	if (maskduplicated) {
 		dprintf("rn_addmask: mask impossibly already in tree\n");
 		free(saved_x);
@@ -668,13 +681,13 @@ rn_addmask(void *n_arg, int search, int skip)
 	 * the pattern must be one of those in normal_chars[], or we have
 	 * a non-contiguous mask.
 	 */
-	cplim = netmask + mlen;
+	cplim = stored_mask_key + mlen; // Use stored_mask_key here
 	isnormal = 1;
-	for (cp = netmask + skip; (cp < cplim) && *(u_char *)cp == 0xff;) {
+	for (cp = stored_mask_key + skip; (cp < cplim) && *cp == 0xff;) { // Cast to u_char for *cp was not strictly needed
 		cp++;
 	}
 	if (cp != cplim) {
-		static char normal_chars[] = {
+		static char normal_chars[] = { // This is char, comparison with *cp (uint8) is fine
 			0, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff};
 
 		for (j = 0x80; (j & *cp) != 0; j >>= 1)
@@ -682,7 +695,7 @@ rn_addmask(void *n_arg, int search, int skip)
 		if (*cp != normal_chars[b] || cp != (cplim - 1))
 			isnormal = 0;
 	}
-	b += (cp - netmask) << 3;
+	b += (cp - stored_mask_key) << 3; // Use stored_mask_key here
 	x->rn_bit = -1 - b;
 	if (isnormal)
 		x->rn_flags |= RNF_NORMAL;
@@ -763,7 +776,7 @@ rn_addroute(void *v_arg, void *n_arg, struct radix_node_head *head,
 			if (tt->rn_dupedkey)			/* parent */
 				tt->rn_dupedkey->rn_parent = tt; /* parent */
 		}
-		tt->rn_key = (caddr_t) v;
+		tt->rn_key = (uint8*)v;
 		tt->rn_bit = -1;
 		tt->rn_flags = RNF_ACTIVE;
 	}
@@ -1086,7 +1099,7 @@ rn_inithead(void **head, int off)
 void
 rn_init()
 {
-	char *cp, *cplim;
+	uint8 *cp, *cplim;
 #ifdef _KERNEL
 	struct domain *dom;
 
@@ -1098,14 +1111,14 @@ rn_init()
 		dprintf("rn_init: radix functions require max_keylen be set\n");
 		return;
 	}
-	rn_zeros = (char *)malloc(3 * max_keylen);
+	rn_zeros = (uint8 *)malloc(3 * max_keylen);
 	if (rn_zeros == NULL)
 		panic("rn_init");
 	memset(rn_zeros, 0, 3 * max_keylen);
 	rn_ones = cp = rn_zeros + max_keylen;
 	addmask_key = cplim = rn_ones + max_keylen;
 	while (cp < cplim)
-		*cp++ = -1;
+		*cp++ = 0xff; // Use 0xff for uint8* to set all bits
 	if (rn_inithead((void **)(void *)&mask_rnhead, 0) == 0)
 		panic("rn_init 2");
 }
