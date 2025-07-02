@@ -18,6 +18,7 @@ KernelAddon stack :
 	stack.cpp
 	stack_interface.cpp
 	utility.cpp
+	$(HAIKU_TOP)/src/system/kernel/util/list.cpp
 
 	# for test purposes
 	#simple_net_buffer.cpp
