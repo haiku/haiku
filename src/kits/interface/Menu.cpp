@@ -415,6 +415,9 @@ BMenu::AttachedToWindow()
 	_GetOptionKey(sOptionKey);
 	_GetMenuKey(sMenuKey);
 
+	if (Superitem() == NULL)
+		_Install(Window());
+
 	// The menu should be added to the menu hierarchy and made visible if:
 	// * the mouse is over the menu,
 	// * the user has requested the menu via the keyboard.
@@ -436,6 +439,9 @@ void
 BMenu::DetachedFromWindow()
 {
 	BView::DetachedFromWindow();
+
+	if (Superitem() == NULL)
+		_Uninstall();
 }
 
 
@@ -1383,7 +1389,6 @@ BMenu::Show()
 void
 BMenu::Show(bool selectFirst)
 {
-	_Install(NULL);
 	_Show(selectFirst);
 }
 
@@ -1391,7 +1396,6 @@ BMenu::Show(bool selectFirst)
 void
 BMenu::Hide()
 {
-	_Uninstall();
 	_Hide();
 }
 
@@ -1647,9 +1651,6 @@ BMenu::_Show(bool selectFirstItem, bool keyDown)
 				window->Unlock();
 			return false;
 		}
-
-		if (ourWindow)
-			_Install(window);
 
 		_UpdateWindowViewSize(true);
 		window->Show();

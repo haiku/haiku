@@ -140,7 +140,6 @@ BMenuBar::Archive(BMessage* data, bool deep) const
 void
 BMenuBar::AttachedToWindow()
 {
-	_Install(Window());
 	Window()->SetKeyMenuBar(this);
 
 	BMenu::AttachedToWindow();
