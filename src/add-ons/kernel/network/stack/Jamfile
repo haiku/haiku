@@ -13,7 +13,7 @@ KernelAddon stack :
 	net_socket.cpp
 	notifications.cpp
 	link.cpp
-	#radix.c
+	radix.c
 	routes.cpp
 	stack.cpp
 	stack_interface.cpp
