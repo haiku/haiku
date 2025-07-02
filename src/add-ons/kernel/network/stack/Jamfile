@@ -4,6 +4,7 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 UsePrivateHeaders net shared ;
 
 KernelAddon stack :
+	$(HAIKU_TOP)/src/system/kernel/util/kernel_util.o
 	ancillary_data.cpp
 	datalink.cpp
 	device_interfaces.cpp
@@ -18,7 +19,6 @@ KernelAddon stack :
 	stack.cpp
 	stack_interface.cpp
 	utility.cpp
-	$(HAIKU_TOP)/src/system/kernel/util/list.cpp
 
 	# for test purposes
 	#simple_net_buffer.cpp
