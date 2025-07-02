@@ -28,6 +28,7 @@
 
 #include <net/if_dl.h>
 #include <net/route.h>
+#include <util/ObjectList.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
@@ -472,8 +473,6 @@ list_routes(net_domain_private* domain, void* userBuffer, size_t totalSize)
 				// More accurate base size for ifreq, though only ifr_route part is used from it.
 				// The original code used IF_NAMESIZE + sizeof(route_entry).
 				// Let's stick to kBaseSize being the fixed part of the ifreq data related to route.
-			const size_t kBaseRouteEntryStructSize = sizeof(route_entry);
-			const size_t kIfNameSize = IF_NAMESIZE;
 			// The actual fixed part written is ifreq.ifr_name and ifreq.ifr_route (which is route_entry)
 			// but they are not contiguous in ifreq.
 			// The old code copied kBaseSize = IF_NAMESIZE + sizeof(route_entry) as one block.
@@ -880,15 +879,19 @@ get_route_information(struct net_domain* _domain, void* value, size_t length)
 
 	RecursiveLocker locker(domain->lock);
 
-	net_route_private* route = find_route(domain, (sockaddr*)&destination);
+	net_route_private* route = (net_route_private*)get_route_internal(domain, (sockaddr*)&destination);
 	if (route == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	status = fill_route_entry(&entry, value, length, route);
-	if (status != B_OK)
+	if (status != B_OK) {
+		put_route_internal(domain, route); // Release reference on error after filling
 		return status;
+	}
 
-	return user_memcpy(value, &entry, sizeof(route_entry));
+	status = user_memcpy(value, &entry, sizeof(route_entry));
+	put_route_internal(domain, route); // Release reference after successful use
+	return status;
 }
 
 
@@ -898,15 +901,54 @@ invalidate_routes(net_domain* _domain, net_interface* interface)
 	net_domain_private* domain = (net_domain_private*)_domain;
 	RecursiveLocker locker(domain->lock);
 
-	TRACE("invalidate_routes(%i, %s)\n", domain->family, interface->name);
+	TRACE("invalidate_routes(domain family %d, interface %s)\n", domain->family, interface->name);
 
-	RouteList::Iterator iterator = domain->routes.GetIterator();
-	while (iterator.HasNext()) {
-		net_route* route = iterator.Next();
+	if (domain->rnh_head == NULL || domain->rnh_head->rnh_walktree == NULL)
+		return;
 
-		if (route->interface_address->interface == interface)
-			remove_route(domain, route);
+	struct InvalidateRoutesContext {
+		net_domain_private* domain;
+		net_interface* interfaceToInvalidate;
+		BObjectList<net_route_private> routes_to_delete;
+
+		InvalidateRoutesContext(net_domain_private* d, net_interface* i)
+			: domain(d), interfaceToInvalidate(i), routes_to_delete(20, false) {}
+			// 20 initial items, false means it does not own the items.
+
+		static int callback(struct radix_node* rn, void* context)
+		{
+			InvalidateRoutesContext* ctx = (InvalidateRoutesContext*)context;
+			for (struct radix_node* iterNode = rn; iterNode != NULL; iterNode = iterNode->rn_dupedkey) {
+				net_route_private* route = net_route_private::FromRadixNode(iterNode);
+				if (route != NULL && route->interface_address != NULL
+					&& route->interface_address->interface == ctx->interfaceToInvalidate) {
+					// Add to list for later deletion. Increment ref count while in list.
+					atomic_add(&route->ref_count, 1);
+					if (!ctx->routes_to_delete.AddItem(route)) {
+						// Failed to add (e.g. no memory), release ref count and log error
+						atomic_add(&route->ref_count, -1);
+						dprintf("Failed to add route to deletion list in invalidate_routes by interface\n");
+					}
+				}
+			}
+			return 0; // Continue walking
+		}
+	};
+
+	InvalidateRoutesContext context = {domain, interface};
+	domain->rnh_head->rnh_walktree(domain->rnh_head, InvalidateRoutesContext::callback, &context);
+
+	// Now delete the collected routes
+	for (int32 i = 0; i < context.routes_to_delete.CountItems(); i++) {
+		net_route_private* route_to_remove = context.routes_to_delete.ItemAt(i);
+		// ItemAt does not remove, BObjectList still holds pointer.
+		if (route_to_remove) {
+			remove_route(domain, route_to_remove); // remove_route handles internal locking
+			// This put balances the atomic_add when adding to routes_to_delete list
+			put_route_internal(domain, route_to_remove);
+		}
 	}
+	context.routes_to_delete.MakeEmpty(false); // Clear the list of pointers, false = don't delete items
 }
 
 
@@ -915,18 +957,52 @@ invalidate_routes(InterfaceAddress* address)
 {
 	net_domain_private* domain = (net_domain_private*)address->domain;
 
-	TRACE("invalidate_routes(%s)\n",
+	TRACE("invalidate_routes(interface address %s)\n",
 		AddressString(domain, address->local).Data());
 
 	RecursiveLocker locker(domain->lock);
 
-	RouteList::Iterator iterator = domain->routes.GetIterator();
-	while (iterator.HasNext()) {
-		net_route* route = iterator.Next();
+	if (domain->rnh_head == NULL || domain->rnh_head->rnh_walktree == NULL)
+		return;
 
-		if (route->interface_address == address)
-			remove_route(domain, route);
+	struct InvalidateRoutesForAddressContext {
+		net_domain_private* domain;
+		InterfaceAddress* interfaceAddressToInvalidate;
+		BObjectList<net_route_private> routes_to_delete;
+
+		InvalidateRoutesForAddressContext(net_domain_private* d, InterfaceAddress* ia)
+			: domain(d), interfaceAddressToInvalidate(ia), routes_to_delete(20, false) {}
+			// 20 initial items, false means it does not own the items.
+
+		static int callback(struct radix_node* rn, void* context)
+		{
+			InvalidateRoutesForAddressContext* ctx = (InvalidateRoutesForAddressContext*)context;
+			for (struct radix_node* iterNode = rn; iterNode != NULL; iterNode = iterNode->rn_dupedkey) {
+				net_route_private* route = net_route_private::FromRadixNode(iterNode);
+				if (route != NULL && route->interface_address == ctx->interfaceAddressToInvalidate) {
+					atomic_add(&route->ref_count, 1);
+					if (!ctx->routes_to_delete.AddItem(route)) {
+						atomic_add(&route->ref_count, -1);
+						dprintf("Failed to add route to deletion list in invalidate_routes by address\n");
+					}
+				}
+			}
+			return 0; // Continue walking
+		}
+	};
+
+	InvalidateRoutesForAddressContext context = {domain, address};
+	domain->rnh_head->rnh_walktree(domain->rnh_head, InvalidateRoutesForAddressContext::callback, &context);
+
+	for (int32 i = 0; i < context.routes_to_delete.CountItems(); i++) {
+		net_route_private* route_to_remove = context.routes_to_delete.ItemAt(i);
+		if (route_to_remove) {
+			remove_route(domain, route_to_remove);
+			// This put balances the atomic_add when adding to routes_to_delete list
+			put_route_internal(domain, route_to_remove);
+		}
 	}
+	context.routes_to_delete.MakeEmpty(false); // Clear the list of pointers, false = don't delete items
 }
 
 
