@@ -26,7 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		}
 
 		# Explicitly set C++ standard per architecture for this kit
-		if $(architecture) = sparc || $(architecture) = m68k || $(architecture) = ppc {
+		if $(architecture) = sparc || $(architecture) = m68k {
 			C++FLAGS on *.cpp = $(cleanCxxFlags) -std=gnu++14 ;
 		} else {
 			C++FLAGS on *.cpp = $(cleanCxxFlags) -std=gnu++17 ;
