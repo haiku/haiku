@@ -598,7 +598,7 @@
 	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
 	         a menu in \c B_ITEMS_IN_MATRIX layout.
 
-	\return The index of the menu \a item or \c B_ERROR of not found.
+	\return The index of the menu \a item or \c B_ERROR if not found.
 
 	\since BeOS R3
 */
@@ -615,7 +615,7 @@
 	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
 	         a menu in \c B_ITEMS_IN_MATRIX layout.
 
-	\return The index of the \a submenu or \c B_ERROR of not found.
+	\return The index of the \a submenu or \c B_ERROR if not found.
 
 	\since BeOS R3
 */
