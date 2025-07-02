@@ -909,11 +909,11 @@ invalidate_routes(net_domain* _domain, net_interface* interface)
 	struct InvalidateRoutesContext {
 		net_domain_private* domain;
 		net_interface* interfaceToInvalidate;
-		BObjectList<net_route_private> routes_to_delete;
+		BObjectList<net_route_private, false> routes_to_delete;
 
 		InvalidateRoutesContext(net_domain_private* d, net_interface* i)
-			: domain(d), interfaceToInvalidate(i), routes_to_delete(20, false) {}
-			// 20 initial items, false means it does not own the items.
+			: domain(d), interfaceToInvalidate(i), routes_to_delete(20) {}
+			// 20 initial items per block. 'false' (not owning) is a template parameter.
 
 		static int callback(struct radix_node* rn, void* context)
 		{
@@ -968,11 +968,11 @@ invalidate_routes(InterfaceAddress* address)
 	struct InvalidateRoutesForAddressContext {
 		net_domain_private* domain;
 		InterfaceAddress* interfaceAddressToInvalidate;
-		BObjectList<net_route_private> routes_to_delete;
+		BObjectList<net_route_private, false> routes_to_delete;
 
 		InvalidateRoutesForAddressContext(net_domain_private* d, InterfaceAddress* ia)
-			: domain(d), interfaceAddressToInvalidate(ia), routes_to_delete(20, false) {}
-			// 20 initial items, false means it does not own the items.
+			: domain(d), interfaceAddressToInvalidate(ia), routes_to_delete(20) {}
+			// 20 initial items per block. 'false' (not owning) is a template parameter.
 
 		static int callback(struct radix_node* rn, void* context)
 		{
