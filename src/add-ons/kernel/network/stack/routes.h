@@ -12,7 +12,7 @@
 #include <net_datalink.h>
 #include <net_stack.h>
 
-// #include <util/DoublyLinkedList.h> // No longer using DoublyLinkedList for routes
+#include <util/DoublyLinkedList.h>
 #include <stddef.h> // For offsetof
 #include "radix.h" // For struct radix_node
 
