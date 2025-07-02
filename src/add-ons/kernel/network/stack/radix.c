@@ -50,8 +50,8 @@ static int rn_walktree(struct radix_node_head *, walktree_f_t *, void *);
 static struct radix_node *rn_insert(void *, struct radix_node_head *, int *,
 	     		struct radix_node [2]);
 static struct radix_node *rn_newpair(void *, int, struct radix_node[2]);
-static struct radix_node *rn_search(void *, struct radix_node *);
-static struct radix_node *rn_search_m(void *, struct radix_node *, void *);
+static struct radix_node *rn_search(const void *, struct radix_node *);
+static struct radix_node *rn_search_m(const void *, struct radix_node *, const void *);
 
 static int	max_keylen;
 static struct radix_mask *rn_mkfreelist;
@@ -69,7 +69,7 @@ static uint8 *rn_zeros, *rn_ones, *addmask_key;
 static int	rn_lexobetter(void *m_arg, void *n_arg);
 static struct radix_mask *rn_new_radix_mask(struct radix_node *tt,
 					struct radix_mask *next);
-static int	rn_satisfies_leaf(char *trial, struct radix_node *leaf,
+static int	rn_satisfies_leaf(const uint8 *trial, struct radix_node *leaf,
 					int skip);
 
 /*
@@ -316,10 +316,9 @@ rn_insert(void *v_arg, struct radix_node_head *head, int *dupentry,
 					/* After loop: x is child of p.
 					 * If x is leaf (x->rn_bit < 0), loop terminates.
 					 * If x is internal node, loop continues if b is a 'deeper' bit.
-					 * This matches comment: /* x->rn_bit < b && x->rn_bit >= 0 */
-					 * which should hold for p (the parent of new node t) relative to b,
-					 * or rather, x (child of p) should have x->rn_bit < b if x is internal,
-					 * or x is a leaf.
+					 * This matches the original comment's logic: (x->rn_bit < b && x->rn_bit >= 0)
+					 * which described the state of 'x' relative to 'b' for the parent 'p'
+					 * after the loop.
 					 */
 		t = rn_newpair(v_arg, b, nodes); 
 		tt = t->rn_left;
