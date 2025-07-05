@@ -84,6 +84,7 @@ public:
 
 	inline	mutex&				CreateFileLock();
 
+			status_t			TrashStaleNode(ino_t ino);
 			void				EnsureNoCollision(ino_t newID, const FileHandle& handle);
 
 			void				Dump(void (*xprintf)(const char*, ...) = dprintf);

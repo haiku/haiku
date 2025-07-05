@@ -206,9 +206,6 @@ DirectoryCache::_LoadSnapshot(bool trash)
 	if (oldSnapshot != NULL)
 		oldSnapshot->AcquireReference();
 
-	if (trash)
-		Trash();
-
 	DirectoryCacheSnapshot* newSnapshot;
 	status_t result = fInode->GetDirSnapshot(&newSnapshot, NULL, &fChange,
 		fAttrDir);
@@ -221,6 +218,31 @@ DirectoryCache::_LoadSnapshot(bool trash)
 
 	_SetSnapshot(newSnapshot);
 	fExpireTime = system_time() + fExpirationTime;
+
+	if (trash) {
+		// Clear fNameCache, while checking for mismatches between its entries and the newly
+		// obtained snapshot that might indicate stale nodes.
+		while (!fNameCache.IsEmpty()) {
+			NameCacheEntry* current = fNameCache.RemoveHead();
+			bool nodeFound = false;
+			for (SinglyLinkedList<NameCacheEntry>::ConstIterator it
+					= newSnapshot->fEntries.GetIterator();
+				NameCacheEntry* snapshotEntry = it.Next();) {
+				if (current->fNode == snapshotEntry->fNode
+					&& strcmp(current->fName, snapshotEntry->fName) == 0) {
+					nodeFound = true;
+					break;
+				}
+			}
+			if (!nodeFound) {
+				// The inode-name association that was cached in 'current' is no longer valid.
+				result = fInode->GetFileSystem()->TrashStaleNode(current->fNode);
+				if (result != B_OK)
+					INFORM("_LoadSnapshot: Couldn't free stale node.\n");
+			}
+			delete current;
+		}
+	}
 
 	fTrashed = false;
 

@@ -469,6 +469,41 @@ FileSystem::GetDelegation(const FileHandle& handle)
 	return it.Current();
 }
 
+/*! If a node object with this inode number exists, free it at the FS and VFS levels to
+	ensure that no operation will try to use it.
+
+*/
+status_t
+FileSystem::TrashStaleNode(ino_t ino)
+{
+	status_t result = B_OK;
+	if (acquire_vnode(fFsVolume, ino) == B_OK) {
+		// we still have a vnode for the stale file present in memory
+
+		// mark it as stale
+		VnodeToInode* vti;
+		result = get_vnode(fFsVolume, ino, reinterpret_cast<void**>(&vti));
+		ASSERT(result == B_OK);
+		Inode* inode = vti->GetPointer();
+		if (inode != NULL)
+			inode->SetStale();
+		put_vnode(fFsVolume, ino);
+
+		// delete it
+		result = remove_vnode(fFsVolume, ino);
+		ASSERT(result == B_OK);
+		put_vnode(fFsVolume, ino);
+
+		// verify it is gone
+		if (acquire_vnode(fFsVolume, ino) == B_OK)
+			result = B_ERROR;
+		else
+			result = B_OK;
+	}
+
+	return result;
+}
+
 
 /*! Used when creating a file to check for a stale node with the same ino. If it exists,
 	the stale node is deleted.
@@ -488,28 +523,8 @@ FileSystem::EnsureNoCollision(ino_t newID, const FileHandle& handle)
 		// We are already using this file ID for a previously existing file.  If the server has
 		// assigned that ID to the file that we are now creating, it means someone else must have
 		// deleted the other file from the server, and the server is recycling the file ID.
-		result = acquire_vnode(fFsVolume, newID);
-		if (result == B_OK) {
-			// we still have a vnode for the stale file present in memory
-
-			// mark it as stale
-			VnodeToInode* vti;
-			result = get_vnode(fFsVolume, newID, reinterpret_cast<void**>(&vti));
-			ASSERT(result == B_OK);
-			Inode* inode = vti->GetPointer();
-			if (inode != NULL)
-				inode->SetStale();
-			put_vnode(fFsVolume, newID);
-
-			// delete it
-			result = remove_vnode(fFsVolume, newID);
-			ASSERT(result == B_OK);
-			put_vnode(fFsVolume, newID);
-
-			// verify it is gone
-			result = acquire_vnode(fFsVolume, newID);
-			ASSERT(result != B_OK);
-		}
+		result = TrashStaleNode(newID);
+		ASSERT(result == B_OK);
 	}
 
 	return;
