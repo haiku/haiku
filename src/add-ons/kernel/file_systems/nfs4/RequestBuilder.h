@@ -25,10 +25,11 @@ struct LockOwner;
 
 class RequestBuilder {
 public:
-									RequestBuilder(Procedure p = ProcCompound);
+									RequestBuilder(uid_t uid, gid_t gid,
+										Procedure p = ProcCompound);
 									~RequestBuilder();
 
-	inline	void					Reset(Procedure proc = ProcCompound);
+	inline	void					Reset(uid_t uid, gid_t gid, Procedure proc = ProcCompound);
 
 			status_t				Access();
 			status_t				Close(uint32 seq, const uint32* id,
@@ -84,7 +85,7 @@ public:
 			RPC::Call*				Request();
 
 private:
-			void					_InitHeader();
+			void					_InitHeader(uid_t uid, gid_t gid);
 
 			void					_GenerateLockOwner(XDR::WriteStream& stream,
 										OpenState* state, LockOwner* owner);
@@ -106,14 +107,14 @@ private:
 
 
 inline void
-RequestBuilder::Reset(Procedure proc)
+RequestBuilder::Reset(uid_t uid, gid_t gid, Procedure proc)
 {
 	fRequest->Stream().Clear();
 	fOpCount = 0;
 	fProcedure = proc;
 	delete fRequest;
 
-	_InitHeader();
+	_InitHeader(uid, gid);
 }
 
 

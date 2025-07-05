@@ -19,7 +19,7 @@ public:
 	inline	const XDR::WriteStream&		Stream() const;
 
 	static	const Auth*					CreateNone();
-	static	const Auth*					CreateSys();
+	static	const Auth*					CreateSys(uid_t uid, gid_t gid);
 
 private:
 										Auth();

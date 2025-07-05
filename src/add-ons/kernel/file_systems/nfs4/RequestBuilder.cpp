@@ -20,13 +20,13 @@
 #include "RPCCallbackServer.h"
 
 
-RequestBuilder::RequestBuilder(Procedure proc)
+RequestBuilder::RequestBuilder(uid_t uid, gid_t gid, Procedure proc)
 	:
 	fOpCount(0),
 	fProcedure(proc),
 	fRequest(NULL)
 {
-	_InitHeader();
+	_InitHeader(uid, gid);
 }
 
 
@@ -37,9 +37,9 @@ RequestBuilder::~RequestBuilder()
 
 
 void
-RequestBuilder::_InitHeader()
+RequestBuilder::_InitHeader(uid_t uid, gid_t gid)
 {
-	fRequest = RPC::Call::Create(fProcedure, RPC::Auth::CreateSys(),
+	fRequest = RPC::Call::Create(fProcedure, RPC::Auth::CreateSys(uid, gid),
 		RPC::Auth::CreateNone());
 
 	if (fRequest == NULL)

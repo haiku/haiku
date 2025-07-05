@@ -20,13 +20,14 @@ class FileSystem;
 class Request {
 public:
 	inline						Request(RPC::Server* server,
-									FileSystem* fileSystem);
+									FileSystem* fileSystem,
+									uid_t uid, gid_t gid);
 
 	inline	RequestBuilder&		Builder();
 	inline	ReplyInterpreter&	Reply();
 
 			status_t			Send(Cookie* cookie = NULL);
-			void				Reset();
+			void				Reset(uid_t uid, gid_t gid);
 
 private:
 			status_t			_SendUDP(Cookie* cookie);
@@ -41,10 +42,11 @@ private:
 
 
 inline
-Request::Request(RPC::Server* server, FileSystem* fileSystem)
+Request::Request(RPC::Server* server, FileSystem* fileSystem, uid_t uid, gid_t gid)
 	:
 	fServer(server),
-	fFileSystem(fileSystem)
+	fFileSystem(fileSystem),
+	fBuilder(uid, gid)
 {
 	ASSERT(server != NULL);
 }

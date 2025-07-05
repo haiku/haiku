@@ -39,6 +39,9 @@ struct OpenState : public NFS4Object, public KernelReferenceable,
 			LockOwner*		fLockOwners;
 			mutex			fOwnerLock;
 
+			uid_t			fUid;
+			gid_t			fGid;
+
 			LockOwner*		GetLockOwner(uint32 owner);
 
 			void			AddLock(LockInfo* lock);

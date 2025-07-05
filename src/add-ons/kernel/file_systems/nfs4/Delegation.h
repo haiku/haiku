@@ -37,6 +37,8 @@ private:
 	OpenDelegationData	fData;
 	Inode*				fInode;
 	bool				fAttribute;
+	uid_t				fUid;
+	gid_t				fGid;
 };
 
 

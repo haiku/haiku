@@ -47,7 +47,7 @@ Auth::CreateNone()
 
 
 const Auth*
-Auth::CreateSys()
+Auth::CreateSys(uid_t uid, gid_t gid)
 {
 	Auth* auth = new(std::nothrow) Auth;
 	if (auth == NULL)
@@ -62,8 +62,8 @@ Auth::CreateSys()
 		strcpy(hostname, "unknown");
 	xdr.AddString(hostname, 255);
 
-	xdr.AddUInt(getuid());
-	xdr.AddUInt(getgid());
+	xdr.AddUInt(uid);
+	xdr.AddUInt(gid);
 
 	int count = getgroups(0, NULL);
 	if (count < B_OK)

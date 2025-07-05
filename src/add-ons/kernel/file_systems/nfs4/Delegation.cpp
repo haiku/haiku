@@ -19,7 +19,9 @@ Delegation::Delegation(const OpenDelegationData& data, Inode* inode,
 	fClientID(clientID),
 	fData(data),
 	fInode(inode),
-	fAttribute(attribute)
+	fAttribute(attribute),
+	fUid(geteuid()),
+	fGid(getegid())
 {
 	ASSERT(inode != NULL);
 }
@@ -43,7 +45,7 @@ Delegation::ReturnDelegation()
 	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv, fFileSystem);
+		Request request(serv, fFileSystem, fUid, fGid);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);

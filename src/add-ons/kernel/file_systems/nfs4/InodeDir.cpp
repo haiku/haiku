@@ -147,7 +147,7 @@ Inode::ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv, fFileSystem);
+		Request request(serv, fFileSystem, geteuid(), getegid());
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);

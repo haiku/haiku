@@ -173,7 +173,7 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 {
 	ASSERT(fs != NULL);
 
-	Request request(fs->Server(), fs);
+	Request request(fs->Server(), fs, geteuid(), getegid());
 	RequestBuilder& req = request.Builder();
 
 	req.PutRootFH();

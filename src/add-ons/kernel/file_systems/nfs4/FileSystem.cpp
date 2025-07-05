@@ -146,7 +146,7 @@ FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* serverName, c
 		return B_NO_MEMORY;
 	ObjectDeleter<FileSystem> fsDeleter(fs);
 
-	Request request(serv, fs);
+	Request request(serv, fs, geteuid(), getegid());
 	RequestBuilder& req = request.Builder();
 
 	req.PutRootFH();

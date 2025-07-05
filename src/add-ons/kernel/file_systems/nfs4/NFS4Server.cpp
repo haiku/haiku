@@ -111,7 +111,7 @@ NFS4Server::ClientId(uint64 prevId, bool forceNew)
 	if ((fUseCount == 0 && fClientIdLastUse + (time_t)LeaseTime() < time(NULL))
 		|| (forceNew && fClientId == prevId)) {
 
-		Request request(fServer, NULL);
+		Request request(fServer, NULL, geteuid(), getegid());
 		request.Builder().SetClientID(fServer);
 
 		status_t result = request.Send();
@@ -123,7 +123,7 @@ NFS4Server::ClientId(uint64 prevId, bool forceNew)
 		if (result != B_OK)
 			return fClientId;
 
-		request.Reset();
+		request.Reset(geteuid(), getegid());
 		request.Builder().SetClientIDConfirm(fClientId, ver);
 
 		result = request.Send();
@@ -158,7 +158,7 @@ NFS4Server::FileSystemMigrated()
 status_t
 NFS4Server::_GetLeaseTime()
 {
-	Request request(fServer, NULL);
+	Request request(fServer, NULL, geteuid(), getegid());
 	request.Builder().PutRootFH();
 	Attribute attr[] = { FATTR4_LEASE_TIME };
 	request.Builder().GetAttr(attr, sizeof(attr) / sizeof(Attribute));
@@ -244,7 +244,7 @@ NFS4Server::_Renewal()
 			}
 		}
 
-		Request request(fServer, NULL);
+		Request request(fServer, NULL, geteuid(), getegid());
 		request.Builder().Renew(clientId);
 		result = request.Send();
 		if (result != B_OK)

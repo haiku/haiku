@@ -151,9 +151,9 @@ Request::_SendTCP(Cookie* cookie)
 
 
 void
-Request::Reset()
+Request::Reset(uid_t uid, gid_t gid)
 {
-	fBuilder.Reset();
+	fBuilder.Reset(uid, gid);
 	fReply.Reset();
 }
 

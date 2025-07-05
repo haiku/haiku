@@ -61,7 +61,7 @@ RootInode::_UpdateInfo(bool force)
 	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
-		Request request(server, fFileSystem);
+		Request request(server, fFileSystem, geteuid(), getegid());
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -152,7 +152,7 @@ RootInode::ProbeMigration()
 	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
-		Request request(server, fFileSystem);
+		Request request(server, fFileSystem, geteuid(), getegid());
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -183,7 +183,7 @@ RootInode::GetLocations(AttrValue** attrv)
 	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
-		Request request(server, fFileSystem);
+		Request request(server, fFileSystem, geteuid(), getegid());
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);

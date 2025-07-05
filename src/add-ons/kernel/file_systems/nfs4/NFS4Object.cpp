@@ -200,7 +200,7 @@ NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state,
 	uint32 attempt = 0;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv, fFileSystem);
+		Request request(serv, fFileSystem, geteuid(), getegid());
 
 		RequestBuilder& req = request.Builder();
 

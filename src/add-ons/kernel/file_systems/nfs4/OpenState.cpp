@@ -21,7 +21,9 @@ OpenState::OpenState()
 	fOpened(false),
 	fDelegation(NULL),
 	fLocks(NULL),
-	fLockOwners(NULL)
+	fLockOwners(NULL),
+	fUid(geteuid()),
+	fGid(getegid())
 {
 	mutex_init(&fLock, NULL);
 
@@ -117,7 +119,7 @@ OpenState::_ReleaseLockOwner(LockOwner* owner)
 	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
-		Request request(server, fFileSystem);
+		Request request(server, fFileSystem, fUid, fGid);
 		RequestBuilder& req = request.Builder();
 
 		req.ReleaseLockOwner(this, owner);
@@ -170,7 +172,7 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 	uint32 attempt = 0;
 	do {
 		RPC::Server* server = fFileSystem->Server();
-		Request request(server, fFileSystem);
+		Request request(server, fFileSystem, fUid, fGid);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -240,7 +242,7 @@ OpenState::_ReclaimLocks(uint64 newClientID)
 		uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 		do {
 			RPC::Server* server = fFileSystem->Server();
-			Request request(server, fFileSystem);
+			Request request(server, fFileSystem, fUid, fGid);
 			RequestBuilder& req = request.Builder();
 
 			req.PutFH(fInfo.fHandle);
@@ -292,7 +294,7 @@ OpenState::Close()
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv, fFileSystem);
+		Request request(serv, fFileSystem, fUid, fGid);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
