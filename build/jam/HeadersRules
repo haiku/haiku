@@ -438,7 +438,7 @@ rule FStandardOSHeaders
 					   add-ons/screen_saver
 					   add-ons/tracker app device drivers game interface
 					   kernel locale media mail midi midi2 net storage
-					   support translation ;
+					   support translation aio ;
 
 	return [ FDirName $(HAIKU_TOP) headers os ]
 		[ PublicHeaders $(osIncludes) ] ;

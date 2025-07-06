@@ -731,6 +731,20 @@ IOOperation::Dump() const
 
 IORequest::IORequest()
 	:
+	fBuffer(NULL), // Initialize fBuffer
+	fOwner(NULL),  // Initialize fOwner
+	fParent(NULL), // Initialize fParent
+	fOffset(0),
+	fLength(0),
+	fTransferSize(0),
+	fRelativeParentOffset(0),
+	fPendingChildren(0),
+	fFlags(0),
+	fTeam(-1),     // Initialize fTeam
+	fThread(-1),   // Initialize fThread
+	fIsWrite(false),
+	fPartialTransfer(false),
+	fSuppressChildNotifications(false),
 	fIsNotified(false),
 	fFinishedCallback(NULL),
 	fFinishedCookie(NULL),
@@ -739,6 +753,7 @@ IORequest::IORequest()
 {
 	mutex_init(&fLock, "I/O request lock");
 	fFinishedCondition.Init(this, "I/O request finished");
+	ResetStatus();
 }
 
 
@@ -770,14 +785,16 @@ IORequest::Init(off_t offset, generic_addr_t buffer, generic_size_t length,
 	generic_io_vec vec;
 	vec.base = buffer;
 	vec.length = length;
-	return Init(offset, &vec, 1, length, write, flags);
+	// Pass current team as default, can be overridden by SetTeamID before Init
+	return Init(offset, 0, length, &vec, 1, length, write, flags,
+		fTeam != -1 ? fTeam : team_get_current_team_id());
 }
 
 
 status_t
 IORequest::Init(off_t offset, generic_size_t firstVecOffset,
 	generic_size_t lastVecSize, const generic_io_vec* vecs, size_t count,
-	generic_size_t length, bool write, uint32 flags)
+	generic_size_t length, bool write, uint32 flags, team_id teamID)
 {
 	ASSERT(offset >= 0);
 
@@ -793,9 +810,8 @@ IORequest::Init(off_t offset, generic_size_t firstVecOffset,
 	fRelativeParentOffset = 0;
 	fTransferSize = 0;
 	fFlags = flags;
-	Thread* thread = thread_get_current_thread();
-	fTeam = thread->team->id;
-	fThread = thread->id;
+	fTeam = teamID; // Use provided teamID
+	fThread = find_thread(NULL); // find_thread(NULL) gets current thread
 	fIsWrite = write;
 	fPartialTransfer = false;
 	fSuppressChildNotifications = false;
@@ -807,7 +823,8 @@ IORequest::Init(off_t offset, generic_size_t firstVecOffset,
 
 	fPendingChildren = 0;
 
-	fStatus = 1;
+	// fStatus is reset by the constructor and when reused
+	// fStatus = 1;
 
 	return B_OK;
 }
