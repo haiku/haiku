@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src system kernel io_sched ;
+
+KernelMergeObject kernel_io_sched.o :
+	BFQInspiredIOScheduler.cpp
+	:
+	$(TARGET_KERNEL_PIC_CCFLAGS)
+;
+
+AddKernelPublicHeaders [ FDirName $(SUBDIR) ] : BFQInspiredIOScheduler.h ;

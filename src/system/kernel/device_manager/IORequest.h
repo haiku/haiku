@@ -276,6 +276,7 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			bool				IsWrite() const	{ return fIsWrite; }
 			bool				IsRead() const	{ return !fIsWrite; }
 			team_id				TeamID() const		{ return fTeam; }
+			void				SetTeamID(team_id team) { fTeam = team; }
 			thread_id			ThreadID() const	{ return fThread; }
 			uint32				Flags() const	{ return fFlags; }
 

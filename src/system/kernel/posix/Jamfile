@@ -6,6 +6,7 @@ KernelMergeObject kernel_posix.o :
 	realtime_sem.cpp
 	xsi_message_queue.cpp
 	xsi_semaphore.cpp
+	aio.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

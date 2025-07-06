@@ -438,7 +438,8 @@ vfs_asynchronous_read_pages(struct vnode* vnode, void* cookie, off_t pos,
 	}
 
 	status_t status = request->Init(pos, vecs, count, numBytes, false,
-		flags | B_DELETE_IO_REQUEST);
+		flags | B_DELETE_IO_REQUEST, team_get_kernel_team_id());
+		// Assuming kernel context for these internal VFS async calls
 	if (status != B_OK) {
 		delete request;
 		callback->IOFinished(status, true, 0);
@@ -464,7 +465,8 @@ vfs_asynchronous_write_pages(struct vnode* vnode, void* cookie, off_t pos,
 	}
 
 	status_t status = request->Init(pos, vecs, count, numBytes, true,
-		flags | B_DELETE_IO_REQUEST);
+		flags | B_DELETE_IO_REQUEST, team_get_kernel_team_id());
+		// Assuming kernel context for these internal VFS async calls
 	if (status != B_OK) {
 		delete request;
 		callback->IOFinished(status, true, 0);
