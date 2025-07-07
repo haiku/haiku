@@ -723,13 +723,16 @@ ramfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat *st,
 	if (!locker.IsLocked())
 		RETURN_ERROR(B_ERROR);
 
-	status_t error = B_OK;
+	if (check_write_stat_permissions(node->GetGID(), node->GetUID(), node->GetMode(),
+			mask, st) != B_OK)
+		RETURN_ERROR(B_NOT_ALLOWED);
+
 	NodeMTimeUpdater mTimeUpdater(node);
-	// check permissions
-	error = node->CheckPermissions(W_OK);
-	// size
-	if (error == B_OK && (mask & B_STAT_SIZE))
+	status_t error = B_OK;
+
+	if ((mask & B_STAT_SIZE) != 0)
 		error = node->SetSize(st->st_size);
+
 	if (error == B_OK) {
 		// permissions
 		if (mask & B_STAT_MODE) {
