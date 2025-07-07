@@ -1,87 +1,141 @@
+# Set the current subdirectory for the Jam build system.
+# This indicates that the Jamfile is located in 'src/system/boot/libs'
+# relative to the top-level Haiku source directory (HAIKU_TOP).
 SubDir HAIKU_TOP src system boot libs ;
 
+# --- zlib Library Configuration ---
+# Get the source directory path for the 'zlib' build feature.
+# Build features are a way in Haiku's build system to manage external dependencies
+# or reusable components.
 local zlibSourceDirectory = [ BuildFeatureAttribute zlib : sources : path ] ;
+# Add the zlib source directory to the list of paths where header files are searched.
 UseHeaders $(zlibSourceDirectory) ;
+# Add the zlib source directory again, but this time indicating it's a "system" header path.
+# This might affect how compilers treat includes (e.g., -I vs -isystem).
 UseHeaders $(zlibSourceDirectory) : true ;
 
+# Define a list of source files that belong to the zlib library.
+# These are the specific C files that will be compiled for zlib.
 local zlibSources =
-	adler32.c
-	crc32.c
-	inffast.c
-	inflate.c
-	inftrees.c
-	uncompr.c
-	zutil.c
-	;
+    adler32.c
+    crc32.c
+    inffast.c
+    inflate.c
+    inftrees.c
+    uncompr.c
+    zutil.c
+    ;
 
+# --- zstd Library Configuration ---
+# Get the source directory path for the 'zstd' build feature.
 local zstdSourceDirectory = [ BuildFeatureAttribute zstd : sources : path ] ;
+# Add the 'lib' subdirectory of zstd sources to the header search paths.
 UseHeaders [ FDirName $(zstdSourceDirectory) lib ] ;
+# Add the 'lib/common' subdirectory of zstd sources to the header search paths.
 UseHeaders [ FDirName $(zstdSourceDirectory) lib common ] ;
 
+# Define a list of common source files for the zstd library.
 local zstdCommonSources =
-	error_private.c
-	entropy_common.c fse_decompress.c zstd_common.c
-	xxhash.c
-	;
+    error_private.c
+    entropy_common.c fse_decompress.c zstd_common.c
+    xxhash.c
+    ;
+# Define a list of decompression-specific source files for the zstd library.
 local zstdDecSources =
-	huf_decompress.c zstd_ddict.c zstd_decompress.c zstd_decompress_block.c
-	;
+    huf_decompress.c zstd_ddict.c zstd_decompress.c zstd_decompress_block.c
+    ;
 
+# --- libfdt (Flattened Device Tree) Library Configuration ---
+# Define the source directory for the libfdt library, relative to HAIKU_TOP.
 local libFDTSourceDirectory = [ FDirName $(HAIKU_TOP) src libs libfdt ] ;
 
+# Define a list of source files for the libfdt library.
 local libFDTSources =
-	fdt.c
-	fdt_ro.c
-	fdt_rw.c
-	fdt_strerror.c
-	fdt_sw.c
-	fdt_wip.c
-	fdt_addresses.c
-	fdt_check.c
-	fdt_empty_tree.c
-	fdt_overlay.c
-	;
+    fdt.c
+    fdt_ro.c
+    fdt_rw.c
+    fdt_strerror.c
+    fdt_sw.c
+    fdt_wip.c
+    fdt_addresses.c
+    fdt_check.c
+    fdt_empty_tree.c
+    fdt_overlay.c
+    ;
 
+# --- Global Compiler Flags for this Subdirectory ---
+# Set C and C++ compiler flags for this subdirectory.
+# These flags disable specific warnings that are treated as errors by default
+# but might be acceptable for these particular boot libraries.
+# -Wno-error=missing-prototypes: Ignores errors for missing function prototypes.
+# -Wno-error=sign-compare: Ignores errors for signed/unsigned comparison mismatches.
+# -Wno-error=missing-braces: Ignores errors for missing braces in initializers.
 SubDirCcFlags -Wno-error=missing-prototypes -Wno-error=sign-compare -Wno-error=missing-braces ;
 
+# --- Build Loop for Multiple Boot Platforms ---
+# Iterate through each defined boot platform.
+# MultiBootSubDirSetup likely sets up variables like TARGET_BOOT_PLATFORM
+# for each platform (e.g., 'x86_64', 'arm').
 local platform ;
 for platform in [ MultiBootSubDirSetup ] {
-	on $(platform) {
-		# zlib
-		UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+    # 'on $(platform)' ensures that the following rules apply specifically
+    # to the current boot platform being processed in the loop.
+    on $(platform) {
+        # --- zlib specific rules for the current platform ---
+        # Add private headers from the kernel's boot platform directory.
+        # This is crucial for zlib to access platform-specific definitions
+        # needed during the boot process.
+        UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
-		LOCATE on [ FGristFiles $(zlibSources) ] = $(zlibSourceDirectory) ;
+        # Specify the exact location of the zlib source files for the build system.
+        # This is important if the sources are not in the current directory.
+        LOCATE on [ FGristFiles $(zlibSources) ] = $(zlibSourceDirectory) ;
 
-		Depends [ FGristFiles $(zlibSources) ]
-			: [ BuildFeatureAttribute zlib : sources ] ;
+        # Declare that the compilation of zlib sources depends on the zlib feature's
+        # source attribute. This ensures that zlib sources are available before compilation.
+        Depends [ FGristFiles $(zlibSources) ]
+            : [ BuildFeatureAttribute zlib : sources ] ;
 
-		BootStaticLibrary [ MultiBootGristFiles boot_zlib ] :
-			$(zlibSources)
-			;
+        # Compile the zlib source files into a static library specifically for the bootloader.
+        # MultiBootGristFiles ensures the library name is unique per platform (e.g., 'boot_zlib_x86_64').
+        BootStaticLibrary [ MultiBootGristFiles boot_zlib ] :
+            $(zlibSources)
+            ;
 
-		# zstd
-		LOCATE on [ FGristFiles $(zstdCommonSources) ] =
-			[ FDirName $(zstdSourceDirectory) lib common ] ;
-		LOCATE on [ FGristFiles $(zstdDecSources) ] =
-			[ FDirName $(zstdSourceDirectory) lib decompress ] ;
+        # --- zstd specific rules for the current platform ---
+        # Specify the location for zstd common source files.
+        LOCATE on [ FGristFiles $(zstdCommonSources) ] =
+            [ FDirName $(zstdSourceDirectory) lib common ] ;
+        # Specify the location for zstd decompression source files.
+        LOCATE on [ FGristFiles $(zstdDecSources) ] =
+            [ FDirName $(zstdSourceDirectory) lib decompress ] ;
 
-		# tune build for smaller size
-		DEFINES += HUF_FORCE_DECOMPRESS_X1 ZSTD_FORCE_DECOMPRESS_SEQUENCES_SHORT ;
-		# prevent weak symbols
-		DEFINES += ZSTD_HAVE_WEAK_SYMBOLS=0 ;
+        # Add preprocessor definitions to tune the zstd build for smaller size.
+        # HUF_FORCE_DECOMPRESS_X1 and ZSTD_FORCE_DECOMPRESS_SEQUENCES_SHORT
+        # likely enable optimizations for bootloader environments where size is critical.
+        DEFINES += HUF_FORCE_DECOMPRESS_X1 ZSTD_FORCE_DECOMPRESS_SEQUENCES_SHORT ;
+        # Prevent the use of weak symbols, which can be problematic in early boot environments.
+        DEFINES += ZSTD_HAVE_WEAK_SYMBOLS=0 ;
 
-		BootStaticLibrary [ MultiBootGristFiles boot_zstd ] :
-			$(zstdCommonSources) $(zstdDecSources)
-			;
-		Depends [ FGristFiles $(zstdCommonSources) $(zstdDecSources) ]
-			: [ BuildFeatureAttribute zstd : sources ] ;
+        # Compile the zstd source files (common and decompression) into a static library
+        # for the bootloader, unique per platform.
+        BootStaticLibrary [ MultiBootGristFiles boot_zstd ] :
+            $(zstdCommonSources) $(zstdDecSources)
+            ;
+        # Declare dependencies for zstd sources on the zstd feature's source attribute.
+        Depends [ FGristFiles $(zstdCommonSources) $(zstdDecSources) ]
+            : [ BuildFeatureAttribute zstd : sources ] ;
 
-		# fdt
-		UseLibraryHeaders [ FDirName libfdt ] ;
+        # --- libfdt specific rules for the current platform ---
+        # Add the libfdt header directory to the search paths.
+        UseLibraryHeaders [ FDirName libfdt ] ;
 
-		BootStaticLibrary [ MultiBootGristFiles boot_fdt ] :
-			$(libFDTSources) ;
+        # Compile the libfdt source files into a static library for the bootloader,
+        # unique per platform.
+        BootStaticLibrary [ MultiBootGristFiles boot_fdt ] :
+            $(libFDTSources) ;
 
-		LOCATE on [ FGristFiles $(libFDTSources) ] = $(libFDTSourceDirectory) ;
-	}
+        # Specify the location for libfdt source files.
+        LOCATE on [ FGristFiles $(libFDTSources) ] = $(libFDTSourceDirectory) ;
+    }
 }
