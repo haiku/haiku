@@ -1,194 +1,197 @@
+# Set the subdirectory for the build system to the Haiku boot loader source directory
 SubDir HAIKU_TOP src system boot loader ;
 
+# Include headers from various partitioning systems for different architectures
+# These headers are necessary for handling different disk partitioning schemes
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems common ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ;
+
+# Use private kernel headers to access internal kernel APIs
 UsePrivateKernelHeaders ;
+
+# Include private headers for specific kernel components
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
 
+# Store the current defines to extend them later
 local defines = $(DEFINES) ;
 
+# Variable to iterate over different platforms
 local platform ;
+
+# Loop over each platform setup to configure build settings
 for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {
 		{
+			# Reset DEFINES to the stored value
 			DEFINES = $(defines) ;
 
+			# Add common definitions for all platforms
 			DEFINES +=
-				BOOT_ARCH=\\\"$(TARGET_KERNEL_ARCH_DIR)\\\"
-				KMESSAGE_CONTAINER_ONLY
-
-				BOOT_SUPPORT_PARTITION_INTEL
-
-				BOOT_SUPPORT_FILE_SYSTEM_BFS
-				BOOT_SUPPORT_FILE_SYSTEM_TARFS
-				#BOOT_SUPPORT_FILE_MAP_DISK
-				BOOT_SUPPORT_FILE_SYSTEM_FAT
+				BOOT_ARCH=\\\"$(TARGET_KERNEL_ARCH_DIR)\\\" # Define the target architecture for the boot loader
+				KMESSAGE_CONTAINER_ONLY # Only include container-related parts of KMessage
+				BOOT_SUPPORT_PARTITION_INTEL # Support for Intel partition maps
+				BOOT_SUPPORT_FILE_SYSTEM_BFS # Support for BFS file system
+				BOOT_SUPPORT_FILE_SYSTEM_TARFS # Support for TARFS file system
+				#BOOT_SUPPORT_FILE_MAP_DISK # Support for file map disk (commented out)
+				BOOT_SUPPORT_FILE_SYSTEM_FAT # Support for FAT file system
 			;
 
+			# Add platform-specific definitions for EFI
 			if $(TARGET_BOOT_PLATFORM) = efi {
 				DEFINES +=
-					_BOOT_PLATFORM_EFI
-					BOOT_SUPPORT_PARTITION_EFI
+					_BOOT_PLATFORM_EFI # Define that the platform is EFI
+					BOOT_SUPPORT_PARTITION_EFI # Support for EFI partition maps
 				;
 			}
 
-			# Add architecture specific partition/file system modules
-
+			# Add architecture-specific partition/file system modules
 			switch $(TARGET_KERNEL_ARCH_DIR) {
 				case "ppc" :
 				{
+					# Definitions specific to PowerPC architecture
 					DEFINES +=
-						BOOT_SUPPORT_ELF32 #How to deal with PPC970 ?
-						BOOT_SUPPORT_PARTITION_AMIGA
-						BOOT_SUPPORT_PARTITION_APPLE
-
-						BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
+						BOOT_SUPPORT_ELF32 # Support for 32-bit ELF binaries
+						BOOT_SUPPORT_PARTITION_AMIGA # Support for Amiga partition maps
+						BOOT_SUPPORT_PARTITION_APPLE # Support for Apple partition maps
+						BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS # Support for Amiga Fast File System
 					;
 				}
 				case "x86" :
 				{
+					# Definitions specific to x86 architecture
 					DEFINES +=
-						ALTERNATE_BOOT_ARCH=\\\"x86_64\\\"
-						BOOT_SUPPORT_PARTITION_EFI
-
-						#BOOT_SUPPORT_FILE_SYSTEM_FAT
+						ALTERNATE_BOOT_ARCH=\\\"x86_64\\\" # Alternate architecture for booting
+						BOOT_SUPPORT_PARTITION_EFI # Support for EFI partition maps
+						#BOOT_SUPPORT_FILE_SYSTEM_FAT # Support for FAT file system (commented out)
 					;
 
+					# Additional definitions for non-EFI x86 platforms
 					if $(TARGET_BOOT_PLATFORM) != efi {
 						DEFINES +=
-							_BOOT_PLATFORM_BIOS
-							BOOT_SUPPORT_ELF32
-							BOOT_SUPPORT_ELF64
+							_BOOT_PLATFORM_BIOS # Define that the platform is BIOS
+							BOOT_SUPPORT_ELF32 # Support for 32-bit ELF binaries
+							BOOT_SUPPORT_ELF64 # Support for 64-bit ELF binaries
 						;
 					} else {
+						# Specific ELF support based on architecture
 						if $(TARGET_ARCH) = x86_64 {
-							DEFINES += BOOT_SUPPORT_ELF64 ;
+							DEFINES += BOOT_SUPPORT_ELF64 ; # Support for 64-bit ELF binaries
 						} else {
-							DEFINES += BOOT_SUPPORT_ELF32 ;
+							DEFINES += BOOT_SUPPORT_ELF32 ; # Support for 32-bit ELF binaries
 						}
 					}
 				}
 				case "sparc" :
 				{
-					DEFINES += BOOT_SUPPORT_ELF64 ;
+					# Definitions specific to SPARC architecture
+					DEFINES += BOOT_SUPPORT_ELF64 ; # Support for 64-bit ELF binaries
 				}
 				case "riscv64" :
 				{
-					DEFINES += BOOT_SUPPORT_ELF64 ;
+					# Definitions specific to RISC-V 64-bit architecture
+					DEFINES += BOOT_SUPPORT_ELF64 ; # Support for 64-bit ELF binaries
 				}
 				case "m68k" :
 				{
-					DEFINES += BOOT_SUPPORT_ELF32 ;
+					# Definitions specific to Motorola 68k architecture
+					DEFINES += BOOT_SUPPORT_ELF32 ; # Support for 32-bit ELF binaries
 				}
 				case "arm" :
 				{
-					DEFINES += BOOT_SUPPORT_ELF32 ;
+					# Definitions specific to ARM architecture
+					DEFINES += BOOT_SUPPORT_ELF32 ; # Support for 32-bit ELF binaries
 				}
 				case "arm64" :
 				{
-					DEFINES += BOOT_SUPPORT_ELF64 ;
+					# Definitions specific to ARM 64-bit architecture
+					DEFINES += BOOT_SUPPORT_ELF64 ; # Support for 64-bit ELF binaries
 				}
 			}
 
-			local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
-				kernel_cpp.h ] ;
+			# Define the path to the kernel C++ header file
+			local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util kernel_cpp.h ] ;
 
+			# Set C++ flags for the boot loader, including disabling RTTI and including a specific header
 			SubDirC++Flags -fno-rtti -include $(kernelC++Header) ;
 		}
 
-
+		# Define the static library for the boot loader
 		BootStaticLibrary [ MultiBootGristFiles boot_loader ] :
-			PathBlocklist.cpp
-			elf.cpp
-			heap.cpp
-			kernel_args.cpp
-			load_driver_settings.cpp
-			loader.cpp
-			main.cpp
-			menu.cpp
-			package_support.cpp
-			pager.cpp
-			partitions.cpp
-			RootFileSystem.cpp
-			stdio.cpp
-			system_revision.c
-			vfs.cpp
-			misc.cpp
-
+			PathBlocklist.cpp # Source file for path blocklist functionality
+			elf.cpp # Source file for ELF binary handling
+			heap.cpp # Source file for heap management
+			kernel_args.cpp # Source file for kernel arguments handling
+			load_driver_settings.cpp # Source file for loading driver settings
+			loader.cpp # Main source file for the boot loader
+			main.cpp # Main entry point for the boot loader
+			menu.cpp # Source file for menu handling
+			package_support.cpp # Source file for package support
+			pager.cpp # Source file for pager functionality
+			partitions.cpp # Source file for partition handling
+			RootFileSystem.cpp # Source file for root file system handling
+			stdio.cpp # Source file for standard I/O handling
+			system_revision.c # Source file for system revision handling
+			vfs.cpp # Source file for virtual file system handling
+			misc.cpp # Miscellaneous source file
 			# libroot
-			driver_settings.cpp
-
+			driver_settings.cpp # Source file for driver settings
 			# utils
-			kernel_cpp.cpp
-			KMessage.cpp
-			list.cpp
-			ring_buffer.cpp
-			safemode_settings.cpp
-			StringHash.cpp
-
-			DataIO.cpp
-			Referenceable.cpp
+			kernel_cpp.cpp # Source file for kernel C++ utilities
+			KMessage.cpp # Source file for kernel messaging
+			list.cpp # Source file for list handling
+			ring_buffer.cpp # Source file for ring buffer handling
+			safemode_settings.cpp # Source file for safe mode settings
+			StringHash.cpp # Source file for string hashing
+			DataIO.cpp # Source file for data I/O handling
+			Referenceable.cpp # Source file for referenceable objects
 			;
 
-		# The partition support is built in an extra static library
-		# so that only the ones that are used will be included.
-
+		# Define the static library for partition support
 		BootStaticLibrary [ MultiBootGristFiles boot_partitions ] :
-			FileMapDisk.cpp
-			amiga_rdb.cpp
-			apple.cpp
-
-			gpt.cpp
-			Header.cpp
-			crc32.cpp
-			utility.cpp
-
-			intel.cpp
-			PartitionMapParser.cpp
-
-			PartitionMap.cpp
+			FileMapDisk.cpp # Source file for file map disk handling
+			amiga_rdb.cpp # Source file for Amiga RDB partition handling
+			apple.cpp # Source file for Apple partition handling
+			gpt.cpp # Source file for GPT partition handling
+			Header.cpp # Source file for header handling
+			crc32.cpp # Source file for CRC32 checksum handling
+			utility.cpp # Utility source file
+			intel.cpp # Source file for Intel partition handling
+			PartitionMapParser.cpp # Source file for partition map parsing
+			PartitionMap.cpp # Source file for partition map handling
 			;
 
-		# Tell Jam where to find the utility sources
+		# Specify search paths for various source files
 		SEARCH on [ FGristFiles kernel_cpp.cpp list.cpp ring_buffer.cpp StringHash.cpp ]
 			= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
 		SEARCH on [ FGristFiles KMessage.cpp ]
 			= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
-
 		SEARCH on [ FGristFiles safemode_settings.cpp ]
 			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
-
 		SEARCH on [ FGristFiles driver_settings.cpp system_revision.c ]
 			= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
-
 		SEARCH on [ FGristFiles amiga_rdb.cpp ]
 			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ] ;
-
 		SEARCH on [ FGristFiles apple.cpp ]
 			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ] ;
-
 		SEARCH on [ FGristFiles gpt.cpp Header.cpp crc32.cpp utility.cpp ]
 			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ] ;
-
 		SEARCH on [ FGristFiles intel.cpp PartitionMapParser.cpp ]
 			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
-
 		SEARCH on [ FGristFiles PartitionMap.cpp ]
 			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems common ] ;
-
 		SEARCH on [ FGristFiles stage2_crt0.S ]
 			= [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH_DIR) ] ;
-
 		SEARCH on [ FGristFiles DataIO.cpp Referenceable.cpp ]
 			= [ FDirName $(HAIKU_TOP) src kits support ] ;
 	}
 }
 
+# Include additional Jamfiles for file systems and network support
 SubInclude HAIKU_TOP src system boot loader file_systems ;
 SubInclude HAIKU_TOP src system boot loader net ;
+
