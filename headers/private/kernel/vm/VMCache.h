@@ -25,7 +25,7 @@ struct ObjectCache;
 
 
 enum {
-	CACHE_TYPE_RAM = 0,
+	CACHE_TYPE_RAM = 1,
 	CACHE_TYPE_VNODE,
 	CACHE_TYPE_DEVICE,
 	CACHE_TYPE_NULL
