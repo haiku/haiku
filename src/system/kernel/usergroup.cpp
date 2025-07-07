@@ -162,7 +162,7 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 }
 
 
-ssize_t
+static ssize_t
 common_getgroups(int groupCount, gid_t* groupList, bool kernel)
 {
 	Team* team = thread_get_current_thread()->team;
@@ -285,6 +285,26 @@ update_set_id_user_and_group(Team* team, const char* file)
 	}
 
 	return B_OK;
+}
+
+
+bool
+is_in_group(Team* team, gid_t gid)
+{
+	TeamLocker teamLocker(team);
+
+	if (team->effective_gid == gid)
+		return true;
+
+	if (team->supplementary_groups == NULL)
+		return false;
+
+	for (int i = 0; i < team->supplementary_groups->count; i++) {
+		if (gid == team->supplementary_groups->groups[i])
+			return true;
+	}
+
+	return false;
 }
 
 

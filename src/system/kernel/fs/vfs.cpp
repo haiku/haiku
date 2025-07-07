@@ -51,6 +51,7 @@
 #include <syscalls.h>
 #include <syscall_restart.h>
 #include <tracing.h>
+#include <usergroup.h>
 #include <util/atomic.h>
 #include <util/AutoLock.h>
 #include <util/ThreadAutoLock.h>
@@ -3622,23 +3623,6 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 }
 
 
-static bool
-is_user_in_group(gid_t gid)
-{
-	if (gid == getegid())
-		return true;
-
-	gid_t groups[NGROUPS_MAX];
-	int groupCount = getgroups(NGROUPS_MAX, groups);
-	for (int i = 0; i < groupCount; i++) {
-		if (gid == groups[i])
-			return true;
-	}
-
-	return false;
-}
-
-
 static status_t
 free_io_context(io_context* context)
 {
@@ -4011,7 +3995,7 @@ check_access_permissions(int accessMode, mode_t mode, gid_t nodeGroupID,
 	} else if (uid == nodeUserID) {
 		// user is node owner
 		permissions = userPermissions;
-	} else if (is_user_in_group(nodeGroupID)) {
+	} else if (is_in_group(thread_get_current_thread()->team, nodeGroupID)) {
 		// user is in owning group
 		permissions = groupPermissions;
 	} else {

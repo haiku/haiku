@@ -18,14 +18,16 @@ namespace BKernel {
 using BKernel::Team;
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // kernel private functions
 
 void		inherit_parent_user_and_group(Team* team, Team* parent);
 status_t	update_set_id_user_and_group(Team* team, const char* file);
+bool		is_in_group(Team* team, gid_t gid);
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // syscalls
 
