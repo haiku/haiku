@@ -626,6 +626,16 @@ compute_area_page_commitment(VMArea* area)
 }
 
 
+static bool
+is_area_only_cache_user(VMArea* area)
+{
+	return area->cache->type == CACHE_TYPE_RAM
+		&& area->cache->areas.First() == area
+		&& area->cache->areas.GetNext(area) == NULL
+		&& area->cache->consumers.IsEmpty();
+}
+
+
 /*!	The caller must have reserved enough pages the translation map
 	implementation might need to map this page.
 	The page's cache must be locked.
@@ -773,22 +783,21 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		allocationFlags = 0;
 	}
 
-	int resizePriority = priority;
-	const bool overcommitting = (area->protection & B_OVERCOMMITTING_AREA) != 0,
-		writable = (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
-	if ((area->page_protections != NULL || !writable) && !overcommitting) {
-		// We'll adjust commitments directly, rather than letting VMCache do it.
-		resizePriority = -1;
-	}
-
 	VMCache* cache = vm_area_get_locked_cache(area);
 	VMCacheChainLocker cacheChainLocker(cache);
 	cacheChainLocker.LockAllSourceCaches();
 
 	// If no one else uses the area's cache and it's an anonymous cache, we can
 	// resize or split it, too.
-	bool onlyCacheUser = cache->areas.First() == area && cache->areas.GetNext(area) == NULL
-		&& cache->consumers.IsEmpty() && cache->type == CACHE_TYPE_RAM;
+	const bool onlyCacheUser = is_area_only_cache_user(area);
+
+	int resizePriority = priority;
+	const bool overcommitting = (area->protection & B_OVERCOMMITTING_AREA) != 0,
+		writable = (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
+	if (onlyCacheUser && !overcommitting && (area->page_protections != NULL || !writable)) {
+		// We'll adjust commitments directly, rather than letting VMCache do it.
+		resizePriority = -1;
+	}
 
 	const addr_t oldSize = area->Size();
 
@@ -1007,6 +1016,19 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		error = cache->Resize(cache->virtual_base + firstNewSize, resizePriority);
 		ASSERT_ALWAYS(error == B_OK);
+
+		if (resizePriority == -1) {
+			// Adjust commitments.
+			const off_t areaCommit = compute_area_page_commitment(area) * B_PAGE_SIZE;
+			if (areaCommit < area->cache->committed_size) {
+				secondArea->cache->committed_size += area->cache->committed_size - areaCommit;
+				area->cache->committed_size = areaCommit;
+			}
+			area->cache->Commit(areaCommit, priority);
+
+			const off_t secondCommit = compute_area_page_commitment(secondArea) * B_PAGE_SIZE;
+			secondArea->cache->Commit(secondCommit, priority);
+		}
 	} else {
 		// Reuse the existing cache.
 		error = map_backing_store(addressSpace, cache, secondCacheOffset,
@@ -1045,19 +1067,6 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// We don't need this anymore.
 		free_etc(areaOldProtections, allocationFlags);
-	}
-
-	if (resizePriority == -1) {
-		// Adjust commitments.
-		const off_t areaCommit = compute_area_page_commitment(area) * B_PAGE_SIZE;
-		if (areaCommit < area->cache->committed_size) {
-			secondArea->cache->committed_size += area->cache->committed_size - areaCommit;
-			area->cache->committed_size = areaCommit;
-		}
-		area->cache->Commit(areaCommit, priority);
-
-		const off_t secondCommit = compute_area_page_commitment(secondArea) * B_PAGE_SIZE;
-		secondArea->cache->Commit(secondCommit, priority);
 	}
 
 	if (_secondArea != NULL)
@@ -6420,7 +6429,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		cacheChainLocker.LockAllSourceCaches();
 
 		// Adjust the committed size, if necessary.
-		if (topCache->temporary && !topCache->CanOvercommit()) {
+		if (is_area_only_cache_user(area) && !topCache->CanOvercommit()) {
 			const bool becomesWritable = (protection & B_WRITE_AREA) != 0;
 			ssize_t commitmentChange = 0;
 			const off_t areaCacheBase = area->Base() - area->cache_offset;
@@ -6442,7 +6451,8 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 
 			if (commitmentChange != 0) {
 				off_t newCommitment = topCache->committed_size + commitmentChange;
-				if (newCommitment > PAGE_ALIGN(topCache->virtual_end - topCache->virtual_base)) {
+				const ssize_t topCacheSize = topCache->virtual_end - topCache->virtual_base;
+				if (newCommitment > topCacheSize) {
 					// This should only happen in the case where this process fork()ed,
 					// duplicating the commitment, and then the child exited, resulting
 					// in the commitments being merged along with the caches.
