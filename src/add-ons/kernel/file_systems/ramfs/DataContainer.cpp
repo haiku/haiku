@@ -307,6 +307,7 @@ DataContainer::_SwitchToCacheMode()
 
 	fCache = cache;
 	fCache->temporary = 1;
+	fCache->type = 0;
 	fCache->virtual_end = fSize;
 
 	error = fCache->Commit(fSize, VM_PRIORITY_USER);
