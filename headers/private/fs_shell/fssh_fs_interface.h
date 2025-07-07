@@ -364,6 +364,9 @@ extern fssh_fs_volume* fssh_volume_for_vnode(fssh_fs_vnode *vnode);
 extern fssh_status_t fssh_check_access_permissions(int accessMode,
 				fssh_mode_t mode, fssh_gid_t nodeGroupID,
 				fssh_uid_t nodeUserID);
+extern fssh_status_t fssh_check_write_stat_permissions(fssh_gid_t nodeGroupID,
+				fssh_uid_t nodeUserID, fssh_mode_t nodeMode, uint32_t mask,
+				const struct fssh_stat* stat);
 
 extern fssh_status_t fssh_read_pages(int fd, fssh_off_t pos,
 				const struct fssh_iovec *vecs, fssh_size_t count,

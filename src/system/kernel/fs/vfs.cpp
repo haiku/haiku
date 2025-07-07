@@ -4007,6 +4007,53 @@ check_access_permissions(int accessMode, mode_t mode, gid_t nodeGroupID,
 }
 
 
+extern "C" status_t
+check_write_stat_permissions(gid_t nodeGroupID, uid_t nodeUserID, mode_t nodeMode,
+	uint32 mask, const struct stat* stat)
+{
+	uid_t uid = geteuid();
+
+	// root has all permissions
+	if (uid == 0)
+		return B_OK;
+
+	const bool hasWriteAccess = check_access_permissions(W_OK,
+		nodeMode, nodeGroupID, nodeUserID) == B_OK;
+
+	if ((mask & B_STAT_SIZE) != 0) {
+		if (!hasWriteAccess)
+			return B_NOT_ALLOWED;
+	}
+
+	if ((mask & B_STAT_UID) != 0) {
+		if (nodeUserID == uid && stat->st_uid == uid) {
+			// No change.
+		} else
+			return B_NOT_ALLOWED;
+	}
+
+	if ((mask & B_STAT_GID) != 0) {
+		if (nodeUserID != uid)
+			return B_NOT_ALLOWED;
+
+		if (!is_in_group(thread_get_current_thread()->team, stat->st_gid))
+			return B_NOT_ALLOWED;
+	}
+
+	if ((mask & B_STAT_MODE) != 0) {
+		if (nodeUserID != uid)
+			return B_NOT_ALLOWED;
+	}
+
+	if ((mask & (B_STAT_CREATION_TIME | B_STAT_MODIFICATION_TIME | B_STAT_CHANGE_TIME)) != 0) {
+		if (!hasWriteAccess && nodeUserID != uid)
+			return B_NOT_ALLOWED;
+	}
+
+	return B_OK;
+}
+
+
 #if 0
 extern "C" status_t
 read_pages(int fd, off_t pos, const iovec* vecs, size_t count,

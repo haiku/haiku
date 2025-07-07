@@ -24,6 +24,7 @@
 #include "fssh_fs_volume.h"
 #include "fssh_kernel_export.h"
 #include "fssh_module.h"
+#include "fssh_node_monitor.h"
 #include "fssh_stat.h"
 #include "fssh_stdio.h"
 #include "fssh_string.h"
@@ -2164,6 +2165,54 @@ fssh_check_access_permissions(int accessMode, fssh_mode_t mode,
 	}
 
 	return (accessMode & ~permissions) == 0 ? FSSH_B_OK : FSSH_B_NOT_ALLOWED;
+}
+
+
+extern "C" fssh_status_t
+fssh_check_write_stat_permissions(fssh_gid_t nodeGroupID, fssh_uid_t nodeUserID,
+	fssh_mode_t nodeMode, uint32_t mask, const struct fssh_stat* stat)
+{
+	uid_t uid = fssh_geteuid();
+
+	// root has all permissions
+	if (uid == 0)
+		return FSSH_B_OK;
+
+	const bool hasWriteAccess = fssh_check_access_permissions(FSSH_W_OK,
+		nodeMode, nodeGroupID, nodeUserID) == FSSH_B_OK;
+
+	if ((mask & FSSH_B_STAT_SIZE) != 0) {
+		if (!hasWriteAccess)
+			return FSSH_B_NOT_ALLOWED;
+	}
+
+	if ((mask & FSSH_B_STAT_UID) != 0) {
+		if (nodeUserID == uid && stat->fssh_st_uid == uid) {
+			// No change.
+		} else
+			return FSSH_B_NOT_ALLOWED;
+	}
+
+	if ((mask & FSSH_B_STAT_GID) != 0) {
+		if (nodeUserID != uid)
+			return FSSH_B_NOT_ALLOWED;
+
+		if (fssh_getegid() != stat->fssh_st_gid)
+			return FSSH_B_NOT_ALLOWED;
+	}
+
+	if ((mask & FSSH_B_STAT_MODE) != 0) {
+		if (nodeUserID != uid)
+			return FSSH_B_NOT_ALLOWED;
+	}
+
+	if ((mask & (FSSH_B_STAT_CREATION_TIME | FSSH_B_STAT_MODIFICATION_TIME
+			| FSSH_B_STAT_CHANGE_TIME)) != 0) {
+		if (!hasWriteAccess && nodeUserID != uid)
+			return FSSH_B_NOT_ALLOWED;
+	}
+
+	return FSSH_B_OK;
 }
 
 

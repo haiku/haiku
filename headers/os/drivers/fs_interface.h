@@ -331,8 +331,11 @@ extern status_t unremove_vnode(fs_volume* volume, ino_t vnodeID);
 extern status_t get_vnode_removed(fs_volume* volume, ino_t vnodeID,
 					bool* _removed);
 extern fs_volume* volume_for_vnode(fs_vnode* vnode);
+
 extern status_t check_access_permissions(int accessMode, mode_t mode,
 					gid_t nodeGroupID, uid_t nodeUserID);
+extern status_t check_write_stat_permissions(gid_t nodeGroupID, uid_t nodeUserID,
+					mode_t nodeMode, uint32 mask, const struct stat* stat);
 
 extern status_t read_pages(int fd, off_t pos, const struct iovec* vecs,
 					size_t count, size_t* _numBytes);
