@@ -886,13 +886,13 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 
 	bfs_inode& node = inode->Node();
 	bool updateTime = false;
-	uid_t uid = geteuid();
-
-	bool isOwnerOrRoot = uid == 0 || uid == (uid_t)node.UserID();
-	bool hasWriteAccess = inode->CheckPermissions(W_OK) == B_OK;
 
 	Transaction transaction(volume, inode->BlockNumber());
 	inode->WriteLockInTransaction(transaction);
+
+	if (check_write_stat_permissions(node.GroupID(), node.UserID(), node.Mode(),
+			mask, stat) != B_OK)
+		RETURN_ERROR(B_NOT_ALLOWED);
 
 	if ((mask & B_STAT_SIZE) != 0 && inode->Size() != stat->st_size) {
 		// Since B_STAT_SIZE is the only thing that can fail directly, we
@@ -902,8 +902,6 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 			return B_IS_A_DIRECTORY;
 		if (!inode->IsFile())
 			return B_BAD_VALUE;
-		if (!hasWriteAccess)
-			RETURN_ERROR(B_NOT_ALLOWED);
 
 		off_t oldSize = inode->Size();
 
@@ -929,25 +927,16 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 	}
 
 	if ((mask & B_STAT_UID) != 0) {
-		// only root should be allowed
-		if (uid != 0)
-			RETURN_ERROR(B_NOT_ALLOWED);
 		node.uid = HOST_ENDIAN_TO_BFS_INT32(stat->st_uid);
 		updateTime = true;
 	}
 
 	if ((mask & B_STAT_GID) != 0) {
-		// only the user or root can do that
-		if (!isOwnerOrRoot)
-			RETURN_ERROR(B_NOT_ALLOWED);
 		node.gid = HOST_ENDIAN_TO_BFS_INT32(stat->st_gid);
 		updateTime = true;
 	}
 
 	if ((mask & B_STAT_MODE) != 0) {
-		// only the user or root can do that
-		if (!isOwnerOrRoot)
-			RETURN_ERROR(B_NOT_ALLOWED);
 		PRINT(("original mode = %u, stat->st_mode = %u\n",
 			(unsigned int)node.Mode(), (unsigned int)stat->st_mode));
 		node.mode = HOST_ENDIAN_TO_BFS_INT32((node.Mode() & ~S_IUMSK)
@@ -956,17 +945,11 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 	}
 
 	if ((mask & B_STAT_CREATION_TIME) != 0) {
-		// the user or root can do that or any user with write access
-		if (!isOwnerOrRoot && !hasWriteAccess)
-			RETURN_ERROR(B_NOT_ALLOWED);
 		node.create_time
 			= HOST_ENDIAN_TO_BFS_INT64(bfs_inode::ToInode(stat->st_crtim));
 	}
 
 	if ((mask & B_STAT_MODIFICATION_TIME) != 0) {
-		// the user or root can do that or any user with write access
-		if (!isOwnerOrRoot && !hasWriteAccess)
-			RETURN_ERROR(B_NOT_ALLOWED);
 		if (!inode->InLastModifiedIndex()) {
 			// directory modification times are not part of the index
 			node.last_modified_time
@@ -980,9 +963,6 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 	}
 
 	if ((mask & B_STAT_CHANGE_TIME) != 0 || updateTime) {
-		// the user or root can do that or any user with write access
-		if (!isOwnerOrRoot && !hasWriteAccess)
-			RETURN_ERROR(B_NOT_ALLOWED);
 		bigtime_t newTime;
 		if ((mask & B_STAT_CHANGE_TIME) == 0)
 			newTime = bfs_inode::ToInode(real_time_clock_usecs());
