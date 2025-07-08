@@ -173,14 +173,19 @@ Inode::RevalidateFileCache()
 		return B_OK;
 	SyncAndCommit(true);
 
-	file_cache_delete(fFileCache);
+	result = file_cache_disable(fFileCache);
+	if (result != B_OK) {
+		INFORM("RevalidateFileCache: failed to disable cache\n");
+		return result;
+	}
 
 	struct stat st;
 	fMetaCache.InvalidateStat();
 	result = Stat(&st);
 	if (result == B_OK)
 		fMaxFileSize = st.st_size;
-	fFileCache = file_cache_create(fFileSystem->DevId(), ID(), fMaxFileSize);
+	file_cache_set_size(fFileCache, fMaxFileSize);
+	file_cache_enable(fFileCache);
 
 	fChange = change;
 	return B_OK;
