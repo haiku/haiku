@@ -1002,7 +1002,9 @@ Inode::SetDirEntryChecksum(uint8* block, uint32 id, uint32 gen)
 {
 	if (fVolume->HasMetaGroupChecksumFeature()) {
 		ext2_dir_entry_tail* tail = _DirEntryTail(block);
+		tail->zero1 = 0;
 		tail->twelve = 12;
+		tail->zero2 = 0;
 		tail->hexade = 0xde;
 		tail->checksum = _DirEntryChecksum(block, id, gen);
 	}

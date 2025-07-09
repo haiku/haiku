@@ -609,13 +609,16 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 		root = (HTreeRoot*)secondBlock;
 
 		HTreeFakeDirEntry* dotdot = &root->dotdot;
-		dotdot->SetEntryLength(maxSize - (sizeof(HTreeFakeDirEntry) + 4));
+		dotdot->SetEntryLength(fBlockSize - (sizeof(HTreeFakeDirEntry) + 4));
 
 		root->hash_version = fVolume->DefaultHashVersion();
 		root->root_info_length = 8;
 		root->indirection_levels = 0;
+		uint32 rootMaxSize = fBlockSize;
+		if (fVolume->HasMetaGroupChecksumFeature())
+			rootMaxSize -= sizeof(ext2_htree_tail);
 
-		root->count_limit->SetLimit((maxSize
+		root->count_limit->SetLimit((rootMaxSize
 			- ((uint8*)root->count_limit - secondBlock)) / sizeof(HTreeEntry));
 		root->count_limit->SetCount(2);
 	}
@@ -846,7 +849,9 @@ DirectoryIterator::_CheckDirEntry(const ext2_dir_entry* dirEntry, const uint8* b
 		errmsg = "Length is too big for the blocksize";
 	}
 
-	TRACE("DirectoryIterator::_CheckDirEntry() %s\n", errmsg != NULL ? errmsg : "null");
+	if (errmsg != NULL) {
+		TRACE("DirectoryIterator::_CheckDirEntry() %s\n", errmsg);
+	}
 	return errmsg == NULL;
 }
 
@@ -899,8 +904,7 @@ DirectoryIterator::_HTreeRootChecksum(uint8* block, uint16 offset, uint16 count)
 		offset + count * sizeof(HTreeEntry));
 	TRACE("DirectoryIterator::_HTreeRootChecksum() size %" B_PRIu64 "\n",
 		offset + count * sizeof(HTreeEntry));
-	ext2_htree_tail dummy;
-	dummy.reserved = 0;
+	ext2_htree_tail dummy = {};
 	checksum = calculate_crc32c(checksum, (uint8*)&dummy, sizeof(dummy));
 	return checksum;
 }

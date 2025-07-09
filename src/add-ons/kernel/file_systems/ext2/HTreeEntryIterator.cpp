@@ -40,7 +40,7 @@ HTreeEntryIterator::HTreeEntryIterator(off_t offset, Inode* directory)
 	fInitStatus = fDirectory->FindBlock(offset, fBlockNum);
 	
 	if (fInitStatus == B_OK) {
-		fFirstEntry = offset % fBlockSize / sizeof(HTreeEntry);
+		fFirstEntry = offset / sizeof(HTreeEntry);
 		fCurrentEntry = fFirstEntry;
 	}
 
@@ -372,13 +372,17 @@ HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
 			(count + fFirstEntry - fCurrentEntry - 1) * sizeof(HTreeEntry));
 	}
 
-	uint32 oldHash = entries[fCurrentEntry].Hash();
-	entries[fCurrentEntry].SetHash(hasCollision ? oldHash | 1 : oldHash & ~1);
-	entries[fCurrentEntry + 1].SetHash((oldHash & 1) == 0 ? hash & ~1
-		: hash | 1);
+	if (fCurrentEntry == fFirstEntry) {
+		entries[fCurrentEntry + 1].SetHash(hash);
+	} else {
+		uint32 oldHash = entries[fCurrentEntry].Hash();
+		entries[fCurrentEntry].SetHash(hasCollision ? oldHash | 1 : oldHash & ~1);
+		entries[fCurrentEntry + 1].SetHash((oldHash & 1) == 0 ? hash & ~1
+			: hash | 1);
+	}
 	entries[fCurrentEntry + 1].SetBlock(blockNum);
-
-	countLimit->SetCount(count + 1);
+	fCount = count + 1;
+	countLimit->SetCount(fCount);
 
 	_SetHTreeEntryChecksum(blockData);
 
@@ -406,7 +410,7 @@ HTreeEntryIterator::_Checksum(uint8* block) const
 	checksum = calculate_crc32c(checksum, (uint8*)&gen, sizeof(gen));
 	checksum = calculate_crc32c(checksum, block,
 		(fFirstEntry + fCount) * sizeof(HTreeEntry));
-	ext2_htree_tail dummy;
+	ext2_htree_tail dummy = {};
 	checksum = calculate_crc32c(checksum, (uint8*)&dummy, sizeof(dummy));
 	return checksum;
 }
@@ -417,7 +421,7 @@ HTreeEntryIterator::_SetHTreeEntryChecksum(uint8* block)
 {
 	if (fVolume->HasMetaGroupChecksumFeature()) {
 		ext2_htree_tail* tail = _HTreeEntryTail(block);
-		tail->reserved = 0xde00000c;
+		tail->reserved = 0;
 		tail->checksum = _Checksum(block);
 	}
 }
