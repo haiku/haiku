@@ -677,6 +677,8 @@ load_library(char const *path, uint32 flags, bool addOn, void* caller,
 	if (image->find_undefined_symbol == NULL) {
 		if (addOn)
 			image->find_undefined_symbol = find_undefined_symbol_add_on;
+		else if (flags & RTLD_GROUP)
+			image->find_undefined_symbol = find_undefined_symbol_dependencies_only;
 		else
 			image->find_undefined_symbol = find_undefined_symbol_global;
 	}

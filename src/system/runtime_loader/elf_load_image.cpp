@@ -657,7 +657,7 @@ load_image(char const* name, image_type type, const char* rpath, const char* run
 	// init gcc version dependent image flags
 	// symbol resolution strategy
 	if (image->abi == B_HAIKU_ABI_GCC_2_ANCIENT)
-		image->find_undefined_symbol = find_undefined_symbol_beos;
+		image->find_undefined_symbol = find_undefined_symbol_dependencies_only;
 
 	// init version infos
 	status = init_image_version_infos(image);

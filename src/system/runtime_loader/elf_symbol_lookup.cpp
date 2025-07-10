@@ -379,12 +379,18 @@ find_symbol_breadth_first(image_t* image, const SymbolLookupInfo& lookupInfo,
 
 
 elf_sym*
-find_undefined_symbol_beos(image_t* rootImage, image_t* image,
+find_undefined_symbol_dependencies_only(image_t* rootImage, image_t* image,
 	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
 {
 	// BeOS style symbol resolution: It is sufficient to check the image itself
 	// and its direct dependencies. The linker would have complained, if the
-	// symbol wasn't there. First we check whether the requesting symbol is
+	// symbol wasn't there.
+	//
+	// Also used for the RTLD_GROUP option in dlopen, which works similarly.
+	// Symbols must be defined by direct dependencies and existing symbols from
+	// the executable or previously loaded libraries cannot interfere.
+	//
+	// First we check whether the requesting symbol is
 	// defined already -- then we can simply return it, since, due to symbolic
 	// linking, that's the one we'd find anyway.
 	if (elf_sym* symbol = lookupInfo.requestingSymbol) {

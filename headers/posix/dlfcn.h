@@ -14,6 +14,7 @@
 #define RTLD_LOCAL	0	/* symbols are not available for relocating any other object */
 #define RTLD_GLOBAL	2	/* all symbols are available */
 #define RTLD_NOLOAD	4	/* do not load any new object */
+#define RTLD_GROUP	8	/* do not lookup symbols in the global symbol table */
 
 /* not-yet-POSIX extensions (dlsym() handles) */
 #define RTLD_DEFAULT	((void*)0)
