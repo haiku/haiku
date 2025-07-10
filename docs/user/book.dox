@@ -561,12 +561,12 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 		formats.
 
 
-	\defgroup libtranslation (libtranslation.so)
+	\defgroup libtranslation Translation Kit libary (libtranslation.so)
 
-	\defgroup libbe (libbe.so)
+	\defgroup libbe Main C++ library (libbe.so)
 
 
-	\defgroup libroot (libroot.so)
+	\defgroup libroot C and POSIX standard functions and extensions (libroot.so)
 	\brief Implements the C and POSIX standard libraries.
 */
 
