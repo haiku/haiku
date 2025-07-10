@@ -1,0 +1,57 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/posix/dlfcn/h	hrev58958
+ */
+
+/*!
+	\file dlfcn.h
+	\ingroup libroot
+	\brief Dynamic shared library loading
+*/
+
+/*!
+	\fn void* dlopen(const char* file, int flags)
+	\brief Open a shared library symbol table handle.
+
+	Refer to the POSIX specification for the full specification. This page only documents Haiku
+	specific behavior.
+
+	The following are left implementation defined by POSIX:
+
+	- If the "file" argument does not contain a slash character, it will be handled as a file name
+	  to be searched in a list of directories set by the LIBRARY_PATH environment variable. That
+	  variable is a list of path separated by colon characters. If one of the paths contains the
+	  sequence %A, that is replaced with the directory where the currently running executable is
+	  stored.
+	- If neither RTLD_LOCAL or RTLD_GLOBAL is defined, RTLD_LOCAL is the default.
+
+	In addition to the POSIX standard flags, dlopen supports the following extended flags:
+
+	- RTLD_NOLOAD: do not load the shared object if it is not already loaded in the current program
+	  address space. Only return a valid handle if the library is already loaded by other means
+	  such as a previous call to dlopen or the runtime_loader symbol resolution at program startup.
+	- RTLD_GROUP: do not use existing symbols from already loaded libraries to resolve dependencies
+	  from the loaded library. The library must explicitly link to all other libraries it needs.
+	  These may provide symbols with the same name as other symbols from already loaded libraries
+	  without interfering.
+*/
+
+/*!
+	\fn void* dlsym(void* image, const char* symbolName)
+	\brief get the address of a symbol from a shared library.
+
+	Refer to the POSIX specification for the full specification. This page only documents Haiku
+	specific behavior.
+
+	The following values are accepted for the image parameter in addition to handles obtained
+	through calls to dlopen (these are currently "reserved for future use" in POSIX):
+
+	- RTLD_DEFAULT: find the symbol in the global scope
+	- RTLD_NEXT: find the next definition of the symbol
+*/
