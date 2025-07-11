@@ -215,7 +215,6 @@ private:
 	status_t OpenNodeCommon(bool writable);
 	void SetupBaseType();
 	void FinishSettingUpType();
-	bool ShouldUseWellKnownIcon() const;
 	bool CheckAppIconHint() const;
 	void DeletePreferredAppVolumeNameLinkTo();
 	void CacheLocalizedName();

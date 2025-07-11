@@ -154,25 +154,28 @@ BTrashWatcher::MessageReceived(BMessage* message)
 void
 BTrashWatcher::UpdateTrashIcons()
 {
-	BVolumeRoster roster;
-	BVolume volume;
-	roster.Rewind();
-
+	// only update Trash icon attributes on boot volume
+	BVolume boot;
 	BDirectory trashDir;
-	while (roster.GetNextVolume(&volume) == B_OK) {
-		if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
-			// pull out the icons for the current trash state from resources
-			// and apply them onto the trash directory node
-			size_t vectorSize = 0;
-			const void* vectorData = GetTrackerResources()->LoadResource(
-				B_VECTOR_ICON_TYPE,
-				fTrashFull ? R_TrashFullIcon : R_TrashIcon, &vectorSize);
+	if (BVolumeRoster().GetBootVolume(&boot) == B_OK
+		&& FSGetTrashDir(&trashDir, boot.Device()) == B_OK) {
+		// pull out the icons for the current trash state from resources
+		// and apply them onto the trash directory node
+		int32 id = fTrashFull ? R_TrashFullIcon : R_TrashIcon;
+		size_t size = 0;
+		const void* data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE, id, &size);
+		if (data != NULL && size > 0) {
+			// write vector icon attribute
+			trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
+		} else {
+			// write large and mini icon attributes
+			data = GetTrackerResources()->LoadResource('ICON', id, &size);
+			if (data != NULL && size > 0)
+				trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
 
-			if (vectorData) {
-				trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
-					vectorData, vectorSize);
-			} else
-				TRESPASS();
+			data = GetTrackerResources()->LoadResource('MICN', id, &size);
+			if (data != NULL && size > 0)
+				trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
 		}
 	}
 }
@@ -206,7 +209,7 @@ BTrashWatcher::CheckTrashDirs()
 	volRoster.Rewind();
 	BVolume	volume;
 	while (volRoster.GetNextVolume(&volume) == B_OK) {
-		if (volume.IsReadOnly() || !volume.IsPersistent())
+		if (volume.IsReadOnly() || !volume.IsPersistent() || volume.Capacity() == 0)
 			continue;
 
 		BDirectory trashDir;

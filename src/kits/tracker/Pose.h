@@ -95,9 +95,8 @@ public:
 	BRect CalcRect(BPoint loc, const BPoseView*, bool minimal_rect = false) const;
 	BRect CalcRect(const BPoseView*) const;
 	void UpdateAllWidgets(int32 poseIndex, BPoint poseLoc, BPoseView*);
-	void UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
-			uint32 attrType, int32 poseIndex, BPoint poseLoc,
-			BPoseView* view, bool visible);
+	void UpdateWidgetAndModel(const char* attrName, uint32 attrType, int32 poseIndex,
+		BPoint poseLoc, BPoseView* view, bool visible);
 	bool UpdateVolumeSpaceBar(BVolume* volume);
 	void UpdateIcon(BPoint poseLoc, BPoseView*);
 

@@ -728,16 +728,6 @@ Model::FinishSettingUpType()
 
 
 bool
-Model::ShouldUseWellKnownIcon() const
-{
-	if (fBaseType == kDirectoryNode || fBaseType == kVolumeNode
-		|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
-		return !CheckAppIconHint();
-	return false;
-}
-
-
-bool
 Model::CheckAppIconHint() const
 {
 	attr_info info;
@@ -770,7 +760,14 @@ Model::ResetIconFrom()
 	if (InitCheck() != B_OK)
 		return;
 
-	if (ShouldUseWellKnownIcon()) {
+	bool hasAttrIcon = CheckAppIconHint();
+
+	if (hasAttrIcon && (fBaseType == kDesktopNode || fBaseType == kTrashNode)) {
+		// Desktop or Trash with an icon attribute
+		fIconFrom = kNode;
+		return;
+	} else if (!hasAttrIcon && (fBaseType == kDirectoryNode || fBaseType == kVolumeNode)) {
+		// No icon attribute override, check if well-known or root directory
 		BDirectory* directory = dynamic_cast<BDirectory*>(fNode);
 		if (WellKnowEntryList::Match(NodeRef()) > (directory_which)-1) {
 			fIconFrom = kTrackerSupplied;
@@ -780,6 +777,7 @@ Model::ResetIconFrom()
 			return;
 		}
 	}
+
 	fIconFrom = kUnknownSource;
 }
 
@@ -966,6 +964,9 @@ Model::AttrChanged(const char* attrName)
 bool
 Model::StatChanged()
 {
+	if (fNode == NULL)
+		return false;
+
 	ASSERT(IsNodeOpen());
 	mode_t oldMode = fStatBuf.st_mode;
 	fStatus = fNode->GetStat(&fStatBuf);

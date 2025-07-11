@@ -2679,32 +2679,10 @@ FSGetTrashDir(BDirectory* trashDir, dev_t dev)
 		PoseInfo poseInfo;
 		poseInfo.fInvisible = true;
 		poseInfo.fInitedDirectory = sbuf.st_ino;
-		trashDir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
-			sizeof(PoseInfo));
+		trashDir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo, sizeof(PoseInfo));
 	}
 
-	// set Trash icons (if they haven't already been set)
-	attr_info attrInfo;
-	size_t size;
-	const void* data;
-	if (trashDir->GetAttrInfo(kAttrLargeIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
-		data = GetTrackerResources()->LoadResource('ICON', R_TrashIcon, &size);
-		if (data != NULL)
-			trashDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
-	}
-
-	if (trashDir->GetAttrInfo(kAttrMiniIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
-		data = GetTrackerResources()->LoadResource('MICN', R_TrashIcon, &size);
-		if (data != NULL)
-			trashDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
-	}
-
-	if (trashDir->GetAttrInfo(kAttrIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
-		data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE,
-			R_TrashIcon, &size);
-		if (data != NULL)
-			trashDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
-	}
+	// icon attributes set by TrashWatcher
 
 	return B_OK;
 }
@@ -3233,7 +3211,7 @@ FSCreateTrashDirs()
 
 	roster.Rewind();
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		if (volume.IsReadOnly() || !volume.IsPersistent())
+		if (volume.IsReadOnly() || !volume.IsPersistent() || volume.Capacity() == 0)
 			continue;
 
 		BDirectory trashDir;

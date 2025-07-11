@@ -241,18 +241,18 @@ BPose::UpdateAllWidgets(int32, BPoint poseLoc, BPoseView* poseView)
 
 
 void
-BPose::UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
-	uint32 attrType, int32, BPoint poseLoc, BPoseView* poseView, bool visible)
+BPose::UpdateWidgetAndModel(const char* attrName, uint32 attrType, int32, BPoint poseLoc,
+	BPoseView* poseView, bool visible)
 {
-	if (poseView->ViewMode() != kListMode)
-		poseLoc = Location(poseView);
-
+	Model* resolvedModel = ResolvedModel();
 	ASSERT(resolvedModel == NULL || resolvedModel->IsNodeOpen());
 
 	if (attrName != NULL) {
 		// pick up new attributes and find out if icon needs updating
-		if (resolvedModel->AttrChanged(attrName) && visible)
+		if (visible && resolvedModel != NULL && resolvedModel->InitCheck() == B_OK
+			&& resolvedModel->AttrChanged(attrName)) {
 			UpdateIcon(poseLoc, poseView);
+		}
 
 		// ToDo: the following code is wrong, because this sort of hashing
 		// may overlap and we get aliasing
@@ -280,12 +280,9 @@ BPose::UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
 		// no attr name means check all widgets for stat info changes
 
 		// pick up stat changes
-		if (resolvedModel && resolvedModel->StatChanged()) {
-			if (resolvedModel->InitCheck() != B_OK)
-				return;
-
-			if (visible)
-				UpdateIcon(poseLoc, poseView);
+		if (visible && resolvedModel != NULL && resolvedModel->InitCheck() == B_OK
+			&& resolvedModel->StatChanged()) {
+			UpdateIcon(poseLoc, poseView);
 		}
 
 		// distribute stat changes

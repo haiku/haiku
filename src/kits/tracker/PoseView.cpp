@@ -1797,15 +1797,16 @@ BPoseView::RemoveRootPose()
 void
 BPoseView::CreateTrashPose()
 {
-	BVolume volume;
-	if (BVolumeRoster().GetBootVolume(&volume) == B_OK) {
+	BVolume boot;
+	if (BVolumeRoster().GetBootVolume(&boot) == B_OK) {
 		BDirectory trash;
 		BEntry entry;
-		node_ref ref;
-		if (FSGetTrashDir(&trash, volume.Device()) == B_OK
+		node_ref nref;
+		if (FSGetTrashDir(&trash, boot.Device()) == B_OK
 			&& trash.GetEntry(&entry) == B_OK
-			&& entry.GetNodeRef(&ref) == B_OK) {
-			WatchNewNode(&ref);
+			&& entry.GetNodeRef(&nref) == B_OK) {
+			WatchNewNode(&nref, B_WATCH_ATTR, BMessenger(this));
+				// redraw Trash icon when attribute changes
 			Model* model = new Model(&entry);
 			PoseInfo info;
 			ReadPoseInfo(model, &info);
@@ -5873,8 +5874,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 			if (result == B_OK || result != B_BUSY)
 				break;
 
-			PRINT(("poseModel %s busy, retrying in a bit\n",
-				poseModel->Name()));
+			PRINT(("poseModel %s busy, retrying in a bit\n", poseModel->Name()));
 			snooze(10000);
 		}
 		if (result != B_OK) {
@@ -5888,18 +5888,50 @@ BPoseView::AttributeChanged(const BMessage* message)
 		if (IsFiltering())
 			visible = fFilteredPoseList->FindPose(poseModel->NodeRef(), &index) != NULL;
 
-		BPoint loc(0, index * fListElemHeight);
-		if (attrName != NULL && poseModel->Node() != NULL) {
+		status_t infoStatus = B_ERROR;
+		if (attrName != NULL) {
 			memset(&info, 0, sizeof(attr_info));
-			// the call below might fail if the attribute has been removed
-			poseModel->Node()->GetAttrInfo(attrName, &info);
-			pose->UpdateWidgetAndModel(poseModel, attrName, info.type, index, loc, this, visible);
+			if (strcmp(attrName, kAttrIcon) == 0
+				|| strcmp(attrName, kAttrLargeIcon) == 0
+				|| strcmp(attrName, kAttrMiniIcon) == 0
+				|| strcmp(attrName, kAttrThumbnail) == 0) {
+				// set icon type manually in case attribute was removed
+				if (strcmp(attrName, kAttrIcon) == 0)
+					info.type = B_VECTOR_ICON_TYPE;
+				else if (strcmp(attrName, kAttrLargeIcon) == 0)
+					info.type = 'ICON';
+				else if (strcmp(attrName, kAttrMiniIcon) == 0)
+					info.type = 'MICN';
+				else if (strcmp(attrName, kAttrThumbnail) == 0)
+					info.type = B_RAW_TYPE;
+
+				info.size = 0;
+					// old size not needed, writing new attr
+				infoStatus = B_OK;
+			} else if (poseModel->Node() != NULL) {
+				// the call below might fail if the attribute has been removed
+				infoStatus = poseModel->Node()->GetAttrInfo(attrName, &info);
+			}
+		}
+
+		BPoint poseLoc;
+		if (ViewMode() == kListMode)
+			poseLoc.Set(0, index * fListElemHeight);
+		else
+			poseLoc = pose->Location(this);
+
+		if (attrName != NULL) {
+			// update attr
+			pose->UpdateWidgetAndModel(attrName, infoStatus == B_OK ? info.type : 0,
+				index, poseLoc, this, visible);
 			if (strcmp(attrName, kAttrMIMEType) == 0)
 				RefreshMimeTypeList();
 		} else {
-			pose->UpdateWidgetAndModel(poseModel, 0, 0, index, loc, this, visible);
+			// update stat
+			pose->UpdateWidgetAndModel(0, 0, index, poseLoc, this, visible);
 		}
 		poseModel->CloseNode();
+
 		if (IsFiltering()) {
 			if (!visible && FilterPose(pose)) {
 				visible = true;
