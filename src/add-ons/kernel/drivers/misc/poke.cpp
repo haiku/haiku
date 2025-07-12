@@ -140,6 +140,9 @@ poke_free(void* cookie)
 status_t
 poke_control(void* cookie, uint32 op, void* arg, size_t length)
 {
+	if (!IS_USER_ADDRESS(arg))
+		return B_BAD_ADDRESS;
+
 	switch (op) {
 		case POKE_PORT_READ:
 		{
@@ -259,6 +262,8 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 				return B_BAD_ADDRESS;
 			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
+			if (!IS_USER_ADDRESS(ioctl.info))
+				return B_BAD_ADDRESS;
 
 			pci_info info;
 			ioctl.status = pci->get_nth_pci_info(ioctl.index, &info);
