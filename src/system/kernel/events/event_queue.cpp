@@ -674,7 +674,7 @@ _user_event_queue_select(int queue, event_wait_info* userInfos, int numInfos)
 		}
 
 		if (error != B_OK) {
-			user_memcpy(&userInfos[i].events, &error, sizeof(&userInfos[i].events));
+			user_memcpy(&userInfos[i].events, &error, sizeof(userInfos[i].events));
 			result = B_ERROR;
 		}
 	}
