@@ -594,11 +594,15 @@ get_area_page_protection(VMArea* area, addr_t pageAddress)
 /*! Computes the committed size an area's cache ought to have,
 	based on the area's page_protections and any pages already present.
 */
-static inline uint32
+static inline size_t
 compute_area_page_commitment(VMArea* area)
 {
+	uint32 commitProtection = B_WRITE_AREA | B_KERNEL_WRITE_AREA;
+	if (area->cache->source == NULL)
+		commitProtection |= B_READ_AREA | B_KERNEL_READ_AREA;
+
 	if (area->page_protections == NULL) {
-		if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0)
+		if ((area->protection & commitProtection) != 0)
 			return area->Size();
 		return area->cache->page_count * B_PAGE_SIZE;
 	}
@@ -612,7 +616,7 @@ compute_area_page_commitment(VMArea* area)
 		if (area->cache->LookupPage(pageOffset) != NULL)
 			pages++;
 		else
-			pages += ((protection & (B_WRITE_AREA << 0)) != 0) ? 1 : 0;
+			pages += ((protection & (commitProtection << 0)) != 0) ? 1 : 0;
 
 		if (i == (bytes - 1) && oddPageCount)
 			break;
@@ -620,7 +624,7 @@ compute_area_page_commitment(VMArea* area)
 		if (area->cache->LookupPage(pageOffset + B_PAGE_SIZE) != NULL)
 			pages++;
 		else
-			pages += ((protection & (B_WRITE_AREA << 4)) != 0) ? 1 : 0;
+			pages += ((protection & (commitProtection << 4)) != 0) ? 1 : 0;
 	}
 	return pages;
 }
@@ -1260,8 +1264,16 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 		cache = newCache;
 	}
 
+	// attach the cache to the area
+	area->cache = cache;
+	area->cache_offset = offset;
+
+	// point the cache back to the area
+	cache->InsertAreaLocked(area);
+
 	if ((flags & CREATE_AREA_DONT_COMMIT_MEMORY) == 0) {
-		status = cache->SetMinimalCommitment(size, priority);
+		const size_t commitmentPages = compute_area_page_commitment(area);
+		status = cache->SetMinimalCommitment(commitmentPages * B_PAGE_SIZE, priority);
 		if (status != B_OK)
 			goto err2;
 	}
@@ -1298,12 +1310,6 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	if (status != B_OK)
 		goto err2;
 
-	// attach the cache to the area
-	area->cache = cache;
-	area->cache_offset = offset;
-
-	// point the cache back to the area
-	cache->InsertAreaLocked(area);
 	if (mapping == REGION_PRIVATE_MAP)
 		cache->Unlock();
 
@@ -1323,9 +1329,13 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 
 err3:
 	cache->Lock();
-	cache->RemoveArea(area);
-	area->cache = NULL;
+	addressSpace->RemoveArea(area, allocationFlags);
 err2:
+	cache->Unlock();
+	cache->RemoveArea(area);
+	cache->Lock();
+	area->cache = NULL;
+
 	if (mapping == REGION_PRIVATE_MAP) {
 		// We created this cache, so we must delete it again. Note, that we
 		// need to temporarily unlock the source cache or we'll otherwise
@@ -2313,12 +2323,6 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	uint32 mappingFlags = 0;
 	if (unmapAddressRange)
 		mappingFlags |= CREATE_AREA_UNMAP_ADDRESS_RANGE;
-	if (mapping == REGION_PRIVATE_MAP) {
-		// For privately mapped read-only regions, skip committing memory.
-		// (If protections are changed later on, memory will be committed then.)
-		if ((protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0)
-			mappingFlags |= CREATE_AREA_DONT_COMMIT_MEMORY;
-	}
 
 	if (fd < 0) {
 		virtual_address_restrictions virtualRestrictions = {};
@@ -6430,7 +6434,11 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 
 		// Adjust the committed size, if necessary.
 		if (is_area_only_cache_user(area) && !topCache->CanOvercommit()) {
-			const bool becomesWritable = (protection & B_WRITE_AREA) != 0;
+			uint8 commitProtection = B_WRITE_AREA;
+			if (topCache->source == NULL)
+				commitProtection |= B_READ_AREA;
+			const bool newNeedsCommitment = (protection & commitProtection) != 0;
+
 			ssize_t commitmentChange = 0;
 			const off_t areaCacheBase = area->Base() - area->cache_offset;
 			for (addr_t pageAddress = area->Base() + offset;
@@ -6440,12 +6448,12 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 					continue;
 				}
 
-				const bool isWritable
-					= (get_area_page_protection(area, pageAddress) & B_WRITE_AREA) != 0;
+				const bool nowNeedsCommitment
+					= (get_area_page_protection(area, pageAddress) & commitProtection) != 0;
 
-				if (becomesWritable && !isWritable)
+				if (newNeedsCommitment && !nowNeedsCommitment)
 					commitmentChange += B_PAGE_SIZE;
-				else if (!becomesWritable && isWritable)
+				else if (!newNeedsCommitment && nowNeedsCommitment)
 					commitmentChange -= B_PAGE_SIZE;
 			}
 
