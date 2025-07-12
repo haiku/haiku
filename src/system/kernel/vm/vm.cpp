@@ -1264,18 +1264,16 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 		cache = newCache;
 	}
 
-	// attach the cache to the area
-	area->cache = cache;
-	area->cache_offset = offset;
-
-	// point the cache back to the area
-	cache->InsertAreaLocked(area);
-
 	if ((flags & CREATE_AREA_DONT_COMMIT_MEMORY) == 0) {
-		const size_t commitmentPages = compute_area_page_commitment(area);
-		status = cache->SetMinimalCommitment(commitmentPages * B_PAGE_SIZE, priority);
-		if (status != B_OK)
-			goto err2;
+		uint32 commitProtection = B_WRITE_AREA | B_KERNEL_WRITE_AREA;
+		if (cache->source == NULL)
+			commitProtection |= B_READ_AREA | B_KERNEL_READ_AREA;
+
+		if ((protection & commitProtection) != 0) {
+			status = cache->SetMinimalCommitment(size, priority);
+			if (status != B_OK)
+				goto err2;
+		}
 	}
 
 	// check to see if this address space has entered DELETE state
@@ -1310,6 +1308,12 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	if (status != B_OK)
 		goto err2;
 
+	// attach the cache to the area
+	area->cache = cache;
+	area->cache_offset = offset;
+
+	// point the cache back to the area
+	cache->InsertAreaLocked(area);
 	if (mapping == REGION_PRIVATE_MAP)
 		cache->Unlock();
 
@@ -1328,21 +1332,24 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	return B_OK;
 
 err3:
-	cache->Lock();
+	if (mapping != REGION_PRIVATE_MAP)
+		cache->Unlock();
+	cache->RemoveArea(area);
+	area->cache = NULL;
+	if (mapping != REGION_PRIVATE_MAP)
+		cache->Lock();
+
 	addressSpace->RemoveArea(area, allocationFlags);
 err2:
-	cache->Unlock();
-	cache->RemoveArea(area);
-	cache->Lock();
-	area->cache = NULL;
-
 	if (mapping == REGION_PRIVATE_MAP) {
 		// We created this cache, so we must delete it again. Note, that we
 		// need to temporarily unlock the source cache or we'll otherwise
 		// deadlock, since VMCache::_RemoveConsumer() will try to lock it, too.
-		sourceCache->Unlock();
-		cache->ReleaseRefAndUnlock();
-		sourceCache->Lock();
+		if (sourceCache != cache)
+			sourceCache->Unlock();
+		cache->ReleaseRef();
+		if (sourceCache != cache)
+			sourceCache->Lock();
 	}
 err1:
 	addressSpace->DeleteArea(area, allocationFlags);
