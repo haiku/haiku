@@ -3950,9 +3950,9 @@ vm_init(kernel_args* args)
 	slab_init(args);
 
 #if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
-	off_t heapSize = INITIAL_HEAP_SIZE;
+	size_t heapSize = INITIAL_HEAP_SIZE;
 	// try to accomodate low memory systems
-	while (heapSize > sAvailableMemory / 8)
+	while (heapSize > (vm_page_num_pages() * B_PAGE_SIZE) / 8)
 		heapSize /= 2;
 	if (heapSize < 1024 * 1024)
 		panic("vm_init: go buy some RAM please.");
