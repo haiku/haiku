@@ -16,7 +16,6 @@ struct x86_64_fp_register {
 	unsigned char reserved[6];
 };
 
-
 struct x86_64_xmm_register {
 	unsigned char value[16];
 };
@@ -39,7 +38,19 @@ struct fpu_state {
 	};
 
 	struct x86_64_xmm_register		xmm[16];
-	unsigned char		_reserved_416_511[96];
+	unsigned char		_reserved_416_463[48];
+
+	// This area is explicitly not read and written by the XSAVE and FXSAVE instructions
+	// according to Intel documentation. Which is good news, because we have a few more things
+	// of our own to store...
+
+	unsigned long		fault_address;
+	unsigned long		error_code;
+	unsigned short		cs;
+	unsigned short		ss;
+	unsigned char		trap_number;
+
+	unsigned char		_available_485_511[27];
 };
 
 
@@ -50,7 +61,7 @@ struct xstate_hdr {
 };
 
 
-// The layout of this struct matches the one used by the FXSAVE instruction on
+// The layout of this struct matches the one used by the XSAVE instruction on
 // an AVX CPU
 struct savefpu {
 	struct fpu_state			fp_fxsave;

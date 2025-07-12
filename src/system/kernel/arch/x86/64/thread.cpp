@@ -378,6 +378,12 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 			sInitialState.user_fpu_state, gFPUSaveLength);
 	}
 
+	signalFrameData->context.uc_mcontext.fpu.fp_fxsave.fault_address = x86_read_cr2();
+	signalFrameData->context.uc_mcontext.fpu.fp_fxsave.error_code = frame->error_code;
+	signalFrameData->context.uc_mcontext.fpu.fp_fxsave.cs = frame->cs;
+	signalFrameData->context.uc_mcontext.fpu.fp_fxsave.ss = frame->ss;
+	signalFrameData->context.uc_mcontext.fpu.fp_fxsave.trap_number = frame->vector;
+
 	// Fill in signalFrameData->context.uc_stack.
 	signal_get_user_stack(frame->user_sp, &signalFrameData->context.uc_stack);
 
@@ -444,6 +450,13 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 	frame->ip = signalFrameData->context.uc_mcontext.rip;
 	frame->flags = (frame->flags & ~(uint64)X86_EFLAGS_USER_FLAGS)
 		| (signalFrameData->context.uc_mcontext.rflags & X86_EFLAGS_USER_FLAGS);
+
+	// Note: the error_code and vector fields are not restored. These are provided to the signal
+	// handler for information purposes only, and are not used after the signal handling is
+	// complete.
+	
+	frame->cs = signalFrameData->context.uc_mcontext.fpu.fp_fxsave.cs;
+	frame->ss = signalFrameData->context.uc_mcontext.fpu.fp_fxsave.ss;
 
 	Thread* thread = thread_get_current_thread();
 

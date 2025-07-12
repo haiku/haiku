@@ -34,6 +34,8 @@ typedef struct packed_mmx_regs {
 	unsigned char	mm7[10];
 } packed_mmx_regs;
 
+// The layout of this structure matches the one used by the FSAVE/FNSAVE instruction, so the
+// context can be loaded directly in the FPU if that instruction is available.
 typedef struct old_extended_regs {
 	unsigned short	fp_control;
 	unsigned short	_reserved1;
@@ -102,6 +104,8 @@ typedef struct xmmx_regs {
 	unsigned char	xmm7[16];
 } xmmx_regs;
 
+// The layout matches the one used by the FXSAVE instruction, so that the context can be loaded
+// quickly into the FPU using that.
 typedef struct new_extended_regs {
 	unsigned short	fp_control;
 	unsigned short	fp_status;
@@ -120,7 +124,23 @@ typedef struct new_extended_regs {
 		mmx_regs mmx;
 	} fp_mmx;
 	xmmx_regs xmmx;
-	unsigned char	_reserved_288_511[224];
+	unsigned char	_reserved_288_463[176];
+
+	// This area is explicitly not read and written by the XSAVE and FXSAVE instructions
+	// according to Intel documentation. Which is good news, because we have a few more things
+	// of our own to store...
+
+	unsigned long		fault_address;
+	unsigned long		error_code;
+	unsigned short		cs;
+	unsigned short		ds;
+	unsigned short		es;
+	unsigned short		fs;
+	unsigned short		gs;
+	unsigned short		ss;
+	unsigned char		trap_number;
+
+	unsigned char	_available_485_511[27];
 } new_extended_regs;
 
 typedef struct extended_regs {

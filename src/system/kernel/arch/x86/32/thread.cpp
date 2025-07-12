@@ -322,6 +322,16 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	// Fill in signalFrameData->context.uc_stack
 	signal_get_user_stack(frame->user_sp, &signalFrameData->context.uc_stack);
 
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.fault_address = x86_read_cr2();
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.error_code = frame->error_code;
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.cs = frame->cs;
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.ds = frame->ds;
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.es = frame->es;
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.fs = frame->fs;
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.gs = frame->gs;
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.ss = frame->user_ss;
+	signalFrameData->context.uc_mcontext.xregs.state.new_format.trap_number = frame->vector;
+
 	// store orig_eax/orig_edx in syscall_restart_return_value
 	signalFrameData->syscall_restart_return_value
 		= (uint64)frame->orig_edx << 32 | frame->orig_eax;
@@ -387,6 +397,17 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 	frame->di = signalFrameData->context.uc_mcontext.edi;
 	frame->si = signalFrameData->context.uc_mcontext.esi;
 	frame->bx = signalFrameData->context.uc_mcontext.ebx;
+
+	// Note: the error_code and vector fields are not restored. These are provided to the signal
+	// handler for information purposes only, and are not used after the signal handling is
+	// complete.
+
+	frame->cs = signalFrameData->context.uc_mcontext.xregs.state.new_format.cs;
+	frame->ds = signalFrameData->context.uc_mcontext.xregs.state.new_format.ds;
+	frame->es = signalFrameData->context.uc_mcontext.xregs.state.new_format.es;
+	frame->fs = signalFrameData->context.uc_mcontext.xregs.state.new_format.fs;
+	frame->gs = signalFrameData->context.uc_mcontext.xregs.state.new_format.gs;
+	frame->user_ss = signalFrameData->context.uc_mcontext.xregs.state.new_format.ss;
 
 	x86_frstor((void*)(&signalFrameData->context.uc_mcontext.xregs));
 
