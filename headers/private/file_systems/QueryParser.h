@@ -373,6 +373,7 @@ Equation<QueryPolicy>::Equation(const char** expr)
 	fAttribute(NULL),
 	fString(NULL),
 	fType(0),
+	fSize(0),
 	fIsPattern(false),
 	fScore(INT32_MAX)
 {
@@ -766,7 +767,13 @@ Equation<QueryPolicy>::CalculateScore(Index &index)
 	// And the code could also need some real world testing :-)
 
 	// do we have to operate on a "foreign" index?
-	if (QueryPolicy::IndexSetTo(index, fAttribute) < B_OK) {
+	if (QueryPolicy::IndexSetTo(index, fAttribute) != B_OK) {
+		fScore = INT32_MAX;
+		return;
+	}
+
+	if (ConvertValue(QueryPolicy::IndexGetType(index),
+			QueryPolicy::IndexGetKeySize(index)) != B_OK) {
 		fScore = INT32_MAX;
 		return;
 	}
@@ -787,7 +794,9 @@ Equation<QueryPolicy>::CalculateScore(Index &index)
 		fScore /= divisor;
 	} else {
 		// Score by operator
-		if (Term<QueryPolicy>::fOp == OP_EQUAL) {
+		if (Term<QueryPolicy>::fOp == OP_EQUAL
+				|| Term<QueryPolicy>::fOp == OP_GREATER_THAN
+				|| Term<QueryPolicy>::fOp == OP_GREATER_THAN_OR_EQUAL) {
 			// higher than most patterns
 			fScore /= (fSize > 8) ? 8 : fSize;
 		} else {
