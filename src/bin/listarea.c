@@ -53,14 +53,14 @@ list_areas_for_id(team_id id)
 		strcpy(teamInfo.args, "KERNEL SPACE");
 
 	printf("\n%s (team %" B_PRId32 ")\n", teamInfo.args, id);
-	printf("   ID                             name   address     size   alloc."
-		" #-cow  #-in #-out\n");
+	printf("%5s %32s %16s %8s %8s %5s %5s %5s %4s %4s\n", "ID", "name", "address", "size",
+		"alloc.", "#-cow", "#-in", "#-out", "lock", "prot");
 	printf("------------------------------------------------------------------"
-		"------------------\n");
+		"-----------------------------------\n");
 
 	while (get_next_area_info(id, &cookie, &areaInfo) == B_OK) {
-		printf("%5" B_PRId32 " %32s  %p %8" B_PRIxSIZE " %8" B_PRIx32 " %5"
-			B_PRId32 " %5" B_PRId32 " %5" B_PRId32 "\n",
+		printf("%5" B_PRId32 " %32s  %14p %8" B_PRIxSIZE " %8" B_PRIx32 " %5"
+			B_PRId32 " %5" B_PRId32 " %5" B_PRId32 " %4" B_PRIx32 " %4" B_PRIx32 "\n",
 			areaInfo.area,
 			areaInfo.name,
 			areaInfo.address,
@@ -68,7 +68,9 @@ list_areas_for_id(team_id id)
 			areaInfo.ram_size,
 			areaInfo.copy_count,
 			areaInfo.in_count,
-			areaInfo.out_count);
+			areaInfo.out_count,
+			areaInfo.lock,
+			areaInfo.protection);
 	}
 }
 
