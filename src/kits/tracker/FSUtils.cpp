@@ -2726,27 +2726,38 @@ FSGetDeskDir(BDirectory* deskDir)
 		return result;
 
 	// set Desktop icons (if they haven't already been set)
+	bool gotIcon = true;
 	attr_info attrInfo;
 	size_t size;
 	const void* data;
-	if (deskDir->GetAttrInfo(kAttrLargeIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
-		data = GetTrackerResources()->LoadResource('ICON', R_DeskIcon, &size);
-		if (data != NULL)
-			deskDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
-	}
-
-	if (deskDir->GetAttrInfo(kAttrMiniIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
-		data = GetTrackerResources()->LoadResource('MICN', R_DeskIcon, &size);
-		if (data != NULL)
-			deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
+	if (deskDir->GetAttrInfo(kAttrIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+		// write vector icon attribute
+		data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE, R_DeskIcon, &size);
+		if (data != NULL && size > 0)
+			deskDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
 	}
 
 	if (deskDir->GetAttrInfo(kAttrIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
-		data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE,
-			R_DeskIcon, &size);
-		if (data != NULL)
-			deskDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
+		// write large and mini icon attributes
+		if (deskDir->GetAttrInfo(kAttrLargeIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+			data = GetTrackerResources()->LoadResource('ICON', R_DeskIcon, &size);
+			if (data != NULL && size > 0)
+				deskDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
+			else
+				gotIcon = false;
+		}
+
+		if (deskDir->GetAttrInfo(kAttrMiniIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+			data = GetTrackerResources()->LoadResource('MICN', R_DeskIcon, &size);
+			if (data != NULL && size > 0)
+				deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
+			else
+				gotIcon = false;
+		}
 	}
+
+	if (!gotIcon)
+		TRESPASS();
 
 	return B_OK;
 }
