@@ -5979,6 +5979,8 @@ BPoseView::UpdateIcon(BPose* pose)
 
 		if (!found)
 			return;
+	} else {
+		location = pose->Location(this);
 	}
 
 	pose->UpdateIcon(location, this);
