@@ -185,6 +185,8 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 		rect.top = rect.bottom - floorf(ActualFontHeight(view));
 	} else {
 		float iconSize = (float)view->IconSizeInt();
+		textWidth = floorf(textWidth);
+			// prevent drawing artifacts from selection rect drawing an extra pixel
 
 		if (view->ViewMode() == kIconMode) {
 			// icon mode
