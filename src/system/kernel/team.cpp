@@ -4456,6 +4456,15 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 		return B_BAD_ADDRESS;
 	}
 
+	Team* team = Team::Get(teamID);
+	if (team == NULL)
+		return B_BAD_TEAM_ID;
+	BReference<Team> teamReference(team, true);
+
+	uid_t uid = geteuid();
+	if (uid != 0 && uid != team->effective_uid)
+		return B_NOT_ALLOWED;
+
 	KMessage info;
 
 	if ((flags & B_TEAM_INFO_BASIC) != 0) {
@@ -4473,12 +4482,7 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 
 		io_context* ioContext;
 		{
-			// get the team structure
-			Team* team = Team::GetAndLock(teamID);
-			if (team == NULL)
-				return B_BAD_TEAM_ID;
-			BReference<Team> teamReference(team, true);
-			TeamLocker teamLocker(team, true);
+			TeamLocker teamLocker(team);
 
 			// copy the data
 			teamClone.id = team->id;
