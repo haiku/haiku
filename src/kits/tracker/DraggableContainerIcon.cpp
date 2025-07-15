@@ -71,8 +71,7 @@ DraggableContainerIcon::MouseDown(BPoint where)
 	if (window == NULL)
 		return;
 
-	// we don't like the Trash icon (because it cannot be moved)
-	if (window->TargetModel()->IsTrash() || window->TargetModel()->IsPrintersDir())
+	if (!window->ShouldHaveDraggableFolderIcon())
 		return;
 
 	if (window->CurrentMessage() == NULL)

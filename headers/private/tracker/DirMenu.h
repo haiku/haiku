@@ -49,11 +49,11 @@ public:
 		const char* entryName = 0);
 	virtual ~BDirMenu();
 
-	void Populate(const BEntry* startDir, BWindow* originatingWindow,
+	void Populate(const BEntry* startDir, BWindow* source,
 		bool includeStartDir = false, bool select = false,
 		bool reverse = false, bool addShortcuts = false,
 		bool navMenuEntries = false);
-	void AddItemToDirMenu(const BEntry*, BWindow* originatingWindow,
+	void AddItemToDirMenu(const BEntry*, BWindow* source,
 		bool atEnd, bool addShortcuts, bool navMenuEntries = false);
 	void AddDisksIconToMenu(bool reverse = false);
 

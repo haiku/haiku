@@ -152,6 +152,8 @@ public:
 	void SetCanSetAppAsDefault(bool);
 	void SetCanOpen(bool);
 
+	virtual bool ShouldHaveDraggableFolderIcon() { return false; };
+
 	OpenWithPoseView* PoseView() const;
 
 protected:

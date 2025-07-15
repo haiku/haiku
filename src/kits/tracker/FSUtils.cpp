@@ -624,7 +624,7 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry, DestructiveAction action,
 	if (confirmedAlready && *confirmedAlready == kConfirmedAll)
 		return true;
 
-	if (FSIsDeskDir(entry) || FSIsTrashDir(entry) || FSIsRootDir(entry))
+	if (FSIsDeskDir(entry) || FSIsPrintersDir(entry) || FSIsRootDir(entry) || FSIsTrashDir(entry))
 		return false;
 
 	if ((!DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)
@@ -891,26 +891,44 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 		BEntry entry((entry_ref*)srcList->ItemAt(index));
 		if (FSIsRootDir(&entry)) {
 			BString errorStr;
-			if (moveMode == kCreateLink) {
-				errorStr.SetTo(
-					B_TRANSLATE("You cannot create a link to the root "
-					"directory."));
-			} else {
-				errorStr.SetTo(
-					B_TRANSLATE("You cannot copy or move the root "
-					"directory."));
-			}
+			if (moveMode == kCreateLink || moveMode == kCreateRelativeLink)
+				errorStr.SetTo(B_TRANSLATE("You cannot create a link to the root directory."));
+			else
+				errorStr.SetTo(B_TRANSLATE("You cannot copy or move the root directory."));
 
-			BAlert* alert = new BAlert("", errorStr.String(),
-				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT);
+			BAlert* alert = new BAlert("", errorStr.String(), B_TRANSLATE("Cancel"), 0, 0,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
+
+			return B_ERROR;
+		} else if (FSIsTrashDir(&entry)) {
+			BString errorStr;
+			if (moveMode == kCreateLink || moveMode == kCreateRelativeLink)
+				errorStr.SetTo(B_TRANSLATE("You cannot create a link to the Trash directory."));
+			else
+				errorStr.SetTo(B_TRANSLATE("You cannot copy or move the Trash directory."));
+
+			BAlert* alert = new BAlert("", errorStr.String(), B_TRANSLATE("Cancel"), 0, 0,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+
+			return B_ERROR;
+		} else if (FSIsPrintersDir(&entry)
+			&& (moveMode == kCopySelectionTo || moveMode == kMoveSelectionTo)) {
+			BString errorStr(B_TRANSLATE("You cannot copy or move the Printers directory."));
+
+			BAlert* alert = new BAlert("", errorStr.String(), B_TRANSLATE("Cancel"), 0, 0,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+
 			return B_ERROR;
 		}
+
 		if (moveMode == kMoveSelectionTo
-			&& !ConfirmChangeIfWellKnownDirectory(&entry, kMove,
-				false, &askOnceOnly)) {
+			&& !ConfirmChangeIfWellKnownDirectory(&entry, kMove, false, &askOnceOnly)) {
 			return B_ERROR;
 		}
 	}

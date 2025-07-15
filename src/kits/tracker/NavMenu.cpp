@@ -280,11 +280,10 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 
 	// add the parent window to the invocation message so that it
 	// can be closed if option modifier held down during invocation
-	BContainerWindow* originatingWindow =
-		dynamic_cast<BContainerWindow*>(fParentWindow);
-	if (originatingWindow != NULL) {
+	BContainerWindow* source = dynamic_cast<BContainerWindow*>(fParentWindow);
+	if (source != NULL) {
 		fMessage.AddData("nodeRefsToClose", B_RAW_TYPE,
-			originatingWindow->TargetModel()->NodeRef(), sizeof(node_ref));
+			source->TargetModel()->NodeRef(), sizeof(node_ref));
 	}
 
 	// too long to have triggers
@@ -313,11 +312,10 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 
 	// add the parent window to the invocation message so that it
 	// can be closed if option modifier held down during invocation
-	BContainerWindow* originatingWindow =
-		dynamic_cast<BContainerWindow*>(fParentWindow);
-	if (originatingWindow != NULL) {
+	BContainerWindow* source = dynamic_cast<BContainerWindow*>(fParentWindow);
+	if (source != NULL) {
 		fMessage.AddData("nodeRefsToClose", B_RAW_TYPE,
-			originatingWindow->TargetModel()->NodeRef(), sizeof (node_ref));
+			source->TargetModel()->NodeRef(), sizeof(node_ref));
 	}
 
 	// too long to have triggers
@@ -417,9 +415,8 @@ BNavMenu::StartBuildingItemList()
 	status_t status = entry.GetParent(&parent);
 
 	// if ref is the root item then build list of volume root dirs
-	fFlags = uint8((fFlags & ~kVolumesOnly)
-		| (status == B_ENTRY_NOT_FOUND ? kVolumesOnly : 0));
-	if (fFlags & kVolumesOnly)
+	fFlags = uint8((fFlags & ~kVolumesOnly) | (status == B_ENTRY_NOT_FOUND ? kVolumesOnly : 0));
+	if ((fFlags & kVolumesOnly) != 0)
 		return true;
 
 	Model startModel(&entry, true);
@@ -432,9 +429,9 @@ BNavMenu::StartBuildingItemList()
 		fContainer = new VirtualDirectoryEntryList(&startModel);
 	} else if (startModel.IsDesktop()) {
 		fIteratingDesktop = true;
-		fContainer = DesktopPoseView::InitDesktopDirentIterator(0,
-			startModel.EntryRef());
-		AddRootItemsIfNeeded();
+		fContainer = DesktopPoseView::InitDesktopDirentIterator(0, startModel.EntryRef());
+		if (TrackerSettings().MountVolumesOntoDesktop())
+			AddRootItemsIfNeeded();
 		AddTrashItem();
 	} else if (startModel.IsTrash()) {
 		// the trash window needs to display a union of all the
@@ -445,26 +442,20 @@ BNavMenu::StartBuildingItemList()
 		fContainer = new EntryIteratorList();
 
 		while (volRoster.GetNextVolume(&volume) == B_OK) {
-			if (volume.IsReadOnly() || !volume.IsPersistent())
+			if (volume.IsReadOnly() || !volume.IsPersistent() || volume.Capacity() == 0)
 				continue;
 
 			BDirectory trashDir;
-
 			if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
-				EntryIteratorList* iteratorList
-					= dynamic_cast<EntryIteratorList*>(fContainer);
-
+				EntryIteratorList* iteratorList = dynamic_cast<EntryIteratorList*>(fContainer);
 				ASSERT(iteratorList != NULL);
-
 				if (iteratorList != NULL)
 					iteratorList->AddItem(new DirectoryEntryList(trashDir));
 			}
 		}
 	} else {
 		BDirectory* directory = dynamic_cast<BDirectory*>(startModel.Node());
-
 		ASSERT(directory != NULL);
-
 		if (directory != NULL)
 			fContainer = new DirectoryEntryList(*directory);
 	}
@@ -483,17 +474,19 @@ BNavMenu::AddRootItemsIfNeeded()
 {
 	BVolumeRoster roster;
 	roster.Rewind();
+
 	BVolume volume;
+	BDirectory root;
+	BEntry entry;
+	Model model;
+
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		BDirectory root;
-		BEntry entry;
-		if (!volume.IsPersistent()
-			|| volume.GetRootDirectory(&root) != B_OK
-			|| root.GetEntry(&entry) != B_OK) {
+		if (volume.InitCheck() != B_OK || !volume.IsPersistent() || volume.Capacity() == 0
+			|| volume.GetRootDirectory(&root) != B_OK || root.GetEntry(&entry) != B_OK) {
 			continue;
 		}
 
-		Model model(&entry);
+		model.SetTo(&entry);
 		AddOneItem(&model);
 	}
 }
@@ -537,8 +530,11 @@ BNavMenu::AddNextItem()
 		return true;
 	}
 
-	QueryEntryListCollection* queryContainer
-		= dynamic_cast<QueryEntryListCollection*>(fContainer);
+	// skip Trash
+	if (model.IsTrash())
+		return true;
+
+	QueryEntryListCollection* queryContainer = dynamic_cast<QueryEntryListCollection*>(fContainer);
 	if (queryContainer != NULL && !queryContainer->ShowResultsFromTrash()
 		&& FSInTrashDir(model.EntryRef())) {
 		// query entry is in trash and shall not be shown
@@ -547,18 +543,14 @@ BNavMenu::AddNextItem()
 
 	ssize_t size = -1;
 	PoseInfo poseInfo;
-	if (model.Node() != NULL) {
-		size = model.Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
-			&poseInfo, sizeof(poseInfo));
-	}
+	if (model.Node() != NULL)
+		size = model.Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo));
 
 	model.CloseNode();
 
 	// item might be in invisible
-	if (size == sizeof(poseInfo)
-			&& !BPoseView::PoseVisible(&model, &poseInfo)) {
+	if (size == sizeof(poseInfo) && !BPoseView::PoseVisible(&model, &poseInfo))
 		return true;
-	}
 
 	AddOneItem(&model);
 
@@ -676,16 +668,17 @@ void
 BNavMenu::BuildVolumeMenu()
 {
 	BVolumeRoster roster;
-	BVolume volume;
-
 	roster.Rewind();
+
+	BVolume volume;
+	BDirectory startDir;
+	BEntry entry;
+
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		if (!volume.IsPersistent())
+		if (volume.InitCheck() != B_OK || !volume.IsPersistent() || volume.Capacity() == 0)
 			continue;
 
-		BDirectory startDir;
 		if (volume.GetRootDirectory(&startDir) == B_OK) {
-			BEntry entry;
 			startDir.GetEntry(&entry);
 
 			Model* model = new Model(&entry);
@@ -755,12 +748,10 @@ BNavMenu::DoneBuildingItemList()
 	if ((fFlags & kShowParent) != 0) {
 		BDirectory directory(&fNavDir);
 		BEntry entry(&fNavDir);
-		if (!directory.IsRootDirectory()
-			&& entry.GetParent(&entry) == B_OK) {
+		if (!directory.IsRootDirectory() && entry.GetParent(&entry) == B_OK) {
 			Model model(&entry, true);
 			BLooper* looper;
-			AddNavParentDir(&model, fMessage.what,
-				fMessenger.Target(&looper));
+			AddNavParentDir(&model, fMessage.what, fMessenger.Target(&looper));
 		}
 	}
 

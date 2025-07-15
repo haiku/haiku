@@ -83,7 +83,7 @@ BDirMenu::~BDirMenu()
 
 
 void
-BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
+BDirMenu::Populate(const BEntry* startEntry, BWindow* source,
 	bool includeStartEntry, bool select, bool reverse, bool addShortcuts,
 	bool navMenuEntries)
 {
@@ -96,7 +96,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 
 		ModelMenuItem* menu = NULL;
 
-		if (fMenuBar) {
+		if (fMenuBar != NULL) {
 			menu = new ModelMenuItem(&model, this, true, true);
 			fMenuBar->AddItem(menu);
 		}
@@ -115,8 +115,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 			BDirectory parent;
 			BDirectory dir(&entry);
 
-			if (!showDesktop && dir.InitCheck() == B_OK
-				&& dir.IsRootDirectory()) {
+			if (!showDesktop && dir.InitCheck() == B_OK && dir.IsRootDirectory()) {
 				// if we're at the root directory skip "mnt" and
 				// go straight to "/"
 				parent.SetTo("/");
@@ -143,8 +142,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 			bool hitRoot = false;
 
 			BDirectory dir(&entry);
-			if (!showDesktop && dir.InitCheck() == B_OK
-				&& dir.IsRootDirectory()) {
+			if (!showDesktop && dir.InitCheck() == B_OK && dir.IsRootDirectory()) {
 				// if we're at the root directory skip "mnt" and
 				// go straight to "/"
 				hitRoot = true;
@@ -167,8 +165,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 
 			if (result == kReadAttrFailed || !info.fInvisible
 				|| (showDesktop && desktopEntry == entry)) {
-				AddItemToDirMenu(&entry, originatingWindow, reverse,
-					addShortcuts, navMenuEntries);
+				AddItemToDirMenu(&entry, source, reverse, addShortcuts, navMenuEntries);
 			}
 
 			if (hitRoot) {
@@ -186,8 +183,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 		if (!select)
 			return;
 
-		ModelMenuItem* item
-			= dynamic_cast<ModelMenuItem*>(ItemAt(CountItems() - 1));
+		ModelMenuItem* item = dynamic_cast<ModelMenuItem*>(ItemAt(CountItems() - 1));
 		if (item != NULL) {
 			item->SetMarked(true);
 			if (menu) {
@@ -207,7 +203,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 
 
 void
-BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* originatingWindow,
+BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* source,
 	bool atEnd, bool addShortcuts, bool navMenuEntries)
 {
 	Model model(entry);
@@ -219,16 +215,14 @@ BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* originatingWindow,
 
 	// add reference to the container windows model so that we can
 	// close the window if
-	BContainerWindow* window = originatingWindow ?
-		dynamic_cast<BContainerWindow*>(originatingWindow) : 0;
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(source);
 	if (window != NULL) {
 		message->AddData("nodeRefsToClose", B_RAW_TYPE,
-			window->TargetModel()->NodeRef(), sizeof (node_ref));
+			window->TargetModel()->NodeRef(), sizeof(node_ref));
 	}
 	ModelMenuItem* item;
 	if (navMenuEntries) {
-		BNavMenu* subMenu = new BNavMenu(model.Name(), B_REFS_RECEIVED,
-			fTarget, window);
+		BNavMenu* subMenu = new BNavMenu(model.Name(), fCommand, fTarget, source);
 		entry_ref ref;
 		entry->GetRef(&ref);
 		subMenu->SetNavDir(&ref);
@@ -254,8 +248,7 @@ BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* originatingWindow,
 	item->SetTarget(fTarget);
 
 	if (fMenuBar != NULL) {
-		ModelMenuItem* menu
-			= dynamic_cast<ModelMenuItem*>(fMenuBar->ItemAt(0));
+		ModelMenuItem* menu = dynamic_cast<ModelMenuItem*>(fMenuBar->ItemAt(0));
 		if (menu != NULL) {
 			ThrowOnError(menu->SetEntry(entry));
 			item->SetMarked(true);
@@ -272,13 +265,21 @@ BDirMenu::AddDisksIconToMenu(bool atEnd)
 	if (model.InitCheck() != B_OK)
 		return;
 
+	entry_ref ref;
+	entry.GetRef(&ref);
 	BMessage* message = new BMessage(fCommand);
-	message->AddRef(fEntryName.String(), model.EntryRef());
+	message->AddRef(fEntryName.String(), &ref);
 
-	ModelMenuItem* item = new ModelMenuItem(&model,
-		B_TRANSLATE(B_DISKS_DIR_NAME), message);
+	BNavMenu* subMenu = new BNavMenu(model.Name(), fCommand, fTarget);
+	subMenu->SetNavDir(&ref);
+	ModelMenuItem* item = new ModelMenuItem(&model, subMenu);
+	item->SetLabel(model.Name());
+	item->SetMessage(message);
+
 	if (atEnd)
 		AddItem(item);
 	else
 		AddItem(item, 0);
+
+	item->SetTarget(fTarget);
 }

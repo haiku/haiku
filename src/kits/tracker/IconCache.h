@@ -446,6 +446,11 @@ private:
 		AutoLock<SimpleIconCache>** resultingLockedCache,
 		Model*, IconSource&, IconDrawMode mode,
 		BSize size, LazyBitmapAllocator*);
+	IconCacheEntry* GetPrinterIcon(AutoLock<SimpleIconCache>* nodeCache,
+		AutoLock<SimpleIconCache>* sharedCache,
+		AutoLock<SimpleIconCache>** resultingLockedCache,
+		Model*, IconSource&, IconDrawMode mode,
+		BSize size, LazyBitmapAllocator*);
 	IconCacheEntry* GetWellKnownIcon(AutoLock<SimpleIconCache> *nodeCache,
 		AutoLock<SimpleIconCache>* sharedCache,
 		AutoLock<SimpleIconCache>** resultingLockedCache,

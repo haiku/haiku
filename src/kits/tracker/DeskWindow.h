@@ -70,6 +70,8 @@ public:
 
 	void SaveDesktopPoseLocations();
 
+	virtual bool ShouldHaveDraggableFolderIcon() { return false; };
+
 protected:
 	virtual BPoseView* NewPoseView(Model*, uint32);
 

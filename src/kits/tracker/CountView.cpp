@@ -74,8 +74,13 @@ BCountView::BCountView(BPoseView* view)
 	fTypeAheadString(""),
 	fFilterString("")
 {
-	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE,
-		R_BarberPoleBitmap, &fBarberPoleMap);
+	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, R_BarberPoleBitmap, &fBarberPoleMap);
+
+	SetFont(be_plain_font);
+	SetFontSize(std::max(kMinFontSize, ceilf(be_plain_font->Size() * 0.75f)));
+
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 }
 
 
@@ -291,35 +296,28 @@ BCountView::MouseDown(BPoint)
 	if (fPoseView->IsFilePanel() || fPoseView->TargetModel() == NULL)
 		return;
 
-	if (!window->TargetModel()->IsRoot()) {
-		BDirMenu* menu = new BDirMenu(NULL, be_app, B_REFS_RECEIVED);
-		BEntry entry;
-		if (entry.SetTo(window->TargetModel()->EntryRef()) == B_OK)
-			menu->Populate(&entry, Window(), false, false, true, false, true);
-		else
-			menu->Populate(NULL, Window(), false, false, true, false, true);
+	if (window->TargetModel()->IsRoot())
+		return;
 
-		BPoint point = Bounds().LeftBottom();
-		point.y += 3;
-		ConvertToScreen(&point);
-		BRect clickToOpenRect(Bounds());
-		ConvertToScreen(&clickToOpenRect);
-		menu->Go(point, true, true, clickToOpenRect);
-		delete menu;
-	}
+	BDirMenu menu(NULL, be_app, B_REFS_RECEIVED);
+	BEntry entry;
+	if (entry.SetTo(window->TargetModel()->EntryRef()) == B_OK)
+		menu.Populate(&entry, Window(), false, false, true, false, true);
+	else
+		menu.Populate(NULL, Window(), false, false, true, false, true);
+
+	BPoint point = Bounds().LeftBottom();
+	point.y += 3;
+	ConvertToScreen(&point);
+	BRect clickToOpenRect(Bounds());
+	ConvertToScreen(&clickToOpenRect);
+	menu.Go(point, true, true, clickToOpenRect);
 }
 
 
 void
 BCountView::AttachedToWindow()
 {
-	SetFont(be_plain_font);
-	SetFontSize(std::max(kMinFontSize,
-		ceilf(be_plain_font->Size() * 0.75f)));
-
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	SetLowUIColor(ViewUIColor());
-
 	CheckCount();
 }
 

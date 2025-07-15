@@ -104,6 +104,8 @@ public:
 	// a default state file the last time it ran.
 	bool DefaultStateRestored() const { return fDefaultStateRestored; }
 
+	virtual bool ShouldHaveDraggableFolderIcon() { return false; };
+
 protected:
 	BPoseView* NewPoseView(Model* model, uint32);
 	virtual void Init(const BMessage* message = NULL);

@@ -5838,14 +5838,14 @@ BPoseView::AttributeChanged(const BMessage* message)
 		attrName = NULL;
 
 	Model* targetModel = TargetModel();
-	if (targetModel != NULL && *targetModel->NodeRef() == itemNode
-		&& targetModel->IsNodeOpen()
+	if (ContainerWindow()->ShouldHaveDraggableFolderIcon() && targetModel != NULL
+		&& *targetModel->NodeRef() == itemNode && targetModel->IsNodeOpen()
 		&& targetModel->AttrChanged(attrName)) {
 		// the icon of our target has changed, update drag icon
 		// TODO: make this simpler (i.e. store the icon with the window)
 		BView* view = Window()->FindView("MenuBar");
 		if (view != NULL) {
-			view = view->FindView("ThisContainer");
+			view = view->FindView("DraggableContainerIcon");
 			if (view != NULL) {
 				IconCache::sIconCache->IconChanged(targetModel);
 				view->Invalidate();

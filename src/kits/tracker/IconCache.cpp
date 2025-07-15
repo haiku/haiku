@@ -668,6 +668,22 @@ IconCache::GetRootIcon(AutoLock<SimpleIconCache>*,
 
 
 IconCacheEntry*
+IconCache::GetPrinterIcon(AutoLock<SimpleIconCache>*,
+	AutoLock<SimpleIconCache>* sharedCacheLocker,
+	AutoLock<SimpleIconCache>** resultingOpenCache,
+	Model*, IconSource &source, IconDrawMode mode,
+	BSize size, LazyBitmapAllocator* lazyBitmap)
+{
+	*resultingOpenCache = sharedCacheLocker;
+	(*resultingOpenCache)->Lock();
+
+	source = kTrackerSupplied;
+
+	return GetIconFromMetaMime(B_PRINTER_MIMETYPE, mode, size, lazyBitmap, 0);
+}
+
+
+IconCacheEntry*
 IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache>*,
 	AutoLock<SimpleIconCache>* sharedCacheLocker,
 	AutoLock<SimpleIconCache>** resultingOpenCache,
@@ -945,6 +961,10 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 						&resultingOpenCache, model, source, mode,
 						size, &lazyBitmap);
 				}
+			} else if (model->IsPrintersDir()) {
+				entry = GetPrinterIcon(nodeCacheLocker, sharedCacheLocker,
+					&resultingOpenCache, model, source, mode, size, &lazyBitmap);
+				ASSERT(entry != NULL);
 			} else {
 				if (source == kUnknownSource) {
 					// look for node icons first
@@ -998,6 +1018,11 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 				case kTrackerSupplied:
 					if (model->IsRoot()) {
 						entry = GetRootIcon(nodeCacheLocker, sharedCacheLocker,
+							&resultingOpenCache, model, source, mode, size,
+							&lazyBitmap);
+						break;
+					} else if (model->IsPrintersDir()) {
+						entry = GetPrinterIcon(nodeCacheLocker, sharedCacheLocker,
 							&resultingOpenCache, model, source, mode, size,
 							&lazyBitmap);
 						break;

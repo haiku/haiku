@@ -301,6 +301,10 @@ protected:
 	bool ShouldHaveNewFolderItem();
 	bool ShouldHaveAddOnMenus();
 
+public:
+	virtual bool ShouldHaveDraggableFolderIcon();
+
+protected:
 	BGroupLayout* fRootLayout;
 	BGroupView* fMenuContainer;
 	BGridView* fPoseContainer;
