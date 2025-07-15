@@ -324,7 +324,6 @@ remove_fd(struct io_context* context, int fd)
 		descriptor = context->fds[fd];
 
 	select_info* selectInfos = NULL;
-	bool disconnected = false;
 
 	if (descriptor != NULL)	{
 		// fd is valid
@@ -337,14 +336,12 @@ remove_fd(struct io_context* context, int fd)
 
 		selectInfos = context->select_infos[fd];
 		context->select_infos[fd] = NULL;
-
-		disconnected = (descriptor->open_mode & O_DISCONNECTED);
 	}
 
 	if (selectInfos != NULL)
 		deselect_select_infos(descriptor, selectInfos, true);
 
-	return disconnected ? NULL : descriptor;
+	return descriptor;
 }
 
 
