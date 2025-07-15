@@ -58,8 +58,7 @@ class TermWindow : public BWindow, private SmartTabView::Listener,
 	private TermView::Listener, private SetTitleDialog::Listener,
 	private TerminalRoster::Listener {
 public:
-								TermWindow(const BString& title,
-									Arguments* args);
+								TermWindow(const Arguments& args);
 	virtual						~TermWindow();
 
 			void				SessionChanged();
@@ -154,7 +153,7 @@ private:
 			void				_DoPrint();
 
 			void				_NewTab();
-			void				_AddTab(Arguments* args,
+			void				_AddTab(const Arguments* args,
 									const BString& currentDirectory
 										= BString());
 			void				_RemoveTab(int32 index);

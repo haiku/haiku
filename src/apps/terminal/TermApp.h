@@ -55,9 +55,6 @@ private:
 private:
 			thread_id			fChildCleanupThread;
 			bool				fTerminating;
-			bool				fStartFullscreen;
-			BString				fWindowTitle;
-			BString				fWorkingDirectory;
 
 			BWindow*			fTermWindow;
 			Arguments*			fArgs;

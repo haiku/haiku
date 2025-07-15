@@ -62,7 +62,6 @@ TermApp::TermApp()
 	BApplication(TERM_SIGNATURE),
 	fChildCleanupThread(-1),
 	fTerminating(false),
-	fStartFullscreen(false),
 	fTermWindow(NULL),
 	fArgs(NULL)
 {
@@ -137,7 +136,7 @@ TermApp::ReadyToRun()
 	}
 
 	// using BScreen::Frame isn't enough
-	if (fStartFullscreen)
+	if (fArgs->FullScreen())
 		BMessenger(fTermWindow).SendMessage(FULLSCREEN);
 }
 
@@ -205,16 +204,6 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		PostMessage(B_QUIT_REQUESTED);
 		return;
 	}
-
-	if (fArgs->Title() != NULL)
-		fWindowTitle = fArgs->Title();
-
-	if (fArgs->WorkingDir() != NULL) {
-		fWorkingDirectory = fArgs->WorkingDir();
-		chdir(fWorkingDirectory);
-	}
-
-	fStartFullscreen = fArgs->FullScreen();
 }
 
 
@@ -239,7 +228,6 @@ TermApp::RefsReceived(BMessage* message)
 
 	// if App opened by Pref file
 	if (strcmp(mimetype, PREFFILE_MIMETYPE) == 0) {
-
 		BEntry ent(&ref);
 		BPath path(&ent);
 		PrefHandler::Default()->OpenText(path.Path());
@@ -259,7 +247,7 @@ status_t
 TermApp::_MakeTermWindow()
 {
 	try {
-		fTermWindow = new TermWindow(fWindowTitle, fArgs);
+		fTermWindow = new TermWindow(*fArgs);
 	} catch (int error) {
 		return (status_t)error;
 	} catch (...) {

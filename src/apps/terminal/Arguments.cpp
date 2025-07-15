@@ -47,8 +47,7 @@ Arguments::~Arguments()
 void
 Arguments::Parse(int argc, const char* const* argv)
 {
-	int argi;
-	for (argi = 1; argi < argc; argi ++) {
+	for (int argi = 1; argi < argc; argi++) {
 		const char* arg = argv[argi];
 
 		if (*arg == '-') {
@@ -56,13 +55,13 @@ Arguments::Parse(int argc, const char* const* argv)
 				fUsageRequested = true;
 			else if (strcmp(arg, "-t") == 0 || strcmp(arg, "--title") == 0) {
 				// title
-				if (argi >= argc)
+				if ((argi + 1) >= argc)
 					fUsageRequested = true;
 				else
 					fTitle = argv[++argi];
 			} else if (strcmp(arg, "-w") == 0
 					|| strcmp(arg, "--working-directory") == 0) {
-				if (argi >= argc)
+				if ((argi + 1) >= argc)
 					fUsageRequested = true;
 				else
 					fWorkingDirectory = argv[++argi];

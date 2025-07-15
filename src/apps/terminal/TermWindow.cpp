@@ -181,9 +181,9 @@ struct TermWindow::Session {
 // #pragma mark - TermWindow
 
 
-TermWindow::TermWindow(const BString& title, Arguments* args)
+TermWindow::TermWindow(const Arguments& args)
 	:
-	BWindow(BRect(0, 0, 0, 0), title, B_DOCUMENT_WINDOW,
+	BWindow(BRect(0, 0, 0, 0), args.Title(), B_DOCUMENT_WINDOW,
 		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE),
 	fTitleUpdateRunner(this, BMessage(kUpdateTitles), 1000000),
 	fNextSessionID(0),
@@ -216,7 +216,7 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 	get_key_map(&fKeymap, &fKeymapChars);
 
 	// apply the title settings
-	fTitle.pattern = title;
+	fTitle.pattern = args.Title();
 	if (fTitle.pattern.Length() == 0) {
 		fTitle.pattern = B_TRANSLATE_SYSTEM_NAME("Terminal");
 
@@ -228,7 +228,7 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 		fTitle.patternUserDefined = true;
 
 	fTitle.title = fTitle.pattern;
-	fTitle.pattern = title;
+	fTitle.pattern = args.Title();
 
 	_TitleSettingsChanged();
 
@@ -259,7 +259,7 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 
 	// init the GUI and add a tab
 	_InitWindow();
-	_AddTab(args);
+	_AddTab(&args, args.WorkingDir());
 
 	// Announce our window as no longer minimized. That's not true, since it's
 	// still hidden at this point, but it will be shown very soon.
@@ -749,19 +749,22 @@ TermWindow::MessageReceived(BMessage *message)
 		{
 			// Set our current working directory to that of the active tab, so
 			// that the new terminal and its shell inherit it.
-			// Note: That's a bit lame. We should rather fork() and change the
-			// CWD in the child, but since ATM there aren't any side effects of
-			// changing our CWD, we save ourselves the trouble.
+			const char* argv[] = {NULL, NULL, NULL};
+			int32 argc = 0;
+
 			ActiveProcessInfo activeProcessInfo;
-			if (_ActiveTermView()->GetActiveProcessInfo(activeProcessInfo))
-				chdir(activeProcessInfo.CurrentDirectory());
+			if (_ActiveTermView()->GetActiveProcessInfo(activeProcessInfo)) {
+				argv[0] = "-w";
+				argv[1] = activeProcessInfo.CurrentDirectory();
+				argc = 2;
+			}
 
 			app_info info;
 			be_app->GetAppInfo(&info);
 
 			// try launching two different ways to work around possible problems
-			if (be_roster->Launch(&info.ref) != B_OK)
-				be_roster->Launch(TERM_SIGNATURE);
+			if (be_roster->Launch(&info.ref, argc, argv) != B_OK)
+				be_roster->Launch(TERM_SIGNATURE, argc, argv);
 			break;
 		}
 
@@ -1341,7 +1344,7 @@ TermWindow::_NewTab()
 
 
 void
-TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
+TermWindow::_AddTab(const Arguments* args, const BString& currentDirectory)
 {
 	int argc = 0;
 	const char* const* argv = NULL;
