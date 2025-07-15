@@ -10,8 +10,11 @@
 #include <OS.h>
 #include <fs_info.h>
 
+#include <extended_system_info.h>
+#include <extended_system_info_defs.h>
 #include <syscalls.h>
 #include <vfs_defs.h>
+#include <util/KMessage.h>
 
 #include <ctype.h>
 #include <errno.h>
@@ -29,7 +32,7 @@ enum info_mode {
 extern const char *__progname;
 
 
-const char *
+static const char *
 open_mode_to_string(int openMode)
 {
 	switch (openMode & O_RWMASK) {
@@ -43,15 +46,45 @@ open_mode_to_string(int openMode)
 }
 
 
+static status_t
+get_next_fd_info(team_id teamID, int32* cookie, fd_info* info)
+{
+	while (*cookie < 0) {
+		*cookie = 0;
+
+		// Fetch CWD before regular FDs.
+		KMessage teamInfo;
+		status_t error = get_extended_team_info(teamID, B_TEAM_INFO_BASIC, teamInfo);
+		if (error != B_OK)
+			break;
+
+		int32 cwdDevice = 0;
+		int64 cwdDirectory = 0;
+		if (teamInfo.FindInt32("cwd device", &cwdDevice) != B_OK
+			|| teamInfo.FindInt64("cwd directory", &cwdDirectory) != B_OK) {
+			break;
+		}
+
+		info->number = AT_FDCWD;
+		info->device = cwdDevice;
+		info->node = cwdDirectory;
+		info->open_mode = 0;
+		return B_OK;
+	}
+
+	return _kern_get_next_fd_info(teamID, (uint32*)cookie, info, sizeof(fd_info));
+}
+
+
 void
 print_fds(team_info &teamInfo)
 {
 	printf("Team: (%" B_PRId32 ") %s\n", teamInfo.team, teamInfo.args);
 
-	uint32 cookie = 0;
+	int32 cookie = -1;
 	fd_info info;
 
-	while (_kern_get_next_fd_info(teamInfo.team, &cookie, &info, sizeof(fd_info)) == B_OK) {
+	while (get_next_fd_info(teamInfo.team, &cookie, &info) == B_OK) {
 		printf("%5d  %s %" B_PRIdDEV ":%" B_PRIdINO "\n", info.number,
 			open_mode_to_string(info.open_mode), info.device, info.node);
 	}
@@ -61,10 +94,10 @@ print_fds(team_info &teamInfo)
 void
 filter_device(team_info &teamInfo, dev_t device, bool brief)
 {
-	uint32 cookie = 0;
+	int32 cookie = -1;
 	fd_info info;
 
-	while (_kern_get_next_fd_info(teamInfo.team, &cookie, &info, sizeof(fd_info)) == B_OK) {
+	while (get_next_fd_info(teamInfo.team, &cookie, &info) == B_OK) {
 		if (info.device != device)
 			continue;
 
@@ -73,7 +106,7 @@ filter_device(team_info &teamInfo, dev_t device, bool brief)
 			break;
 		}
 
-		printf("%5" B_PRId32 " %3d  %3s  %" B_PRIdDEV ":%" B_PRIdINO " %s\n",
+		printf("%5" B_PRId32 " %4d  %3s  %" B_PRIdDEV ":%" B_PRIdINO " %s\n",
 			teamInfo.team, info.number, open_mode_to_string(info.open_mode),
 				info.device, info.node, teamInfo.args);
 	}
@@ -83,10 +116,10 @@ filter_device(team_info &teamInfo, dev_t device, bool brief)
 void
 filter_file(team_info &teamInfo, dev_t device, ino_t node, bool brief)
 {
-	uint32 cookie = 0;
+	int32 cookie = -1;
 	fd_info info;
 
-	while (_kern_get_next_fd_info(teamInfo.team, &cookie, &info, sizeof(fd_info)) == B_OK) {
+	while (get_next_fd_info(teamInfo.team, &cookie, &info) == B_OK) {
 		if (info.device != device || info.node != node)
 			continue;
 
@@ -95,7 +128,7 @@ filter_file(team_info &teamInfo, dev_t device, ino_t node, bool brief)
 			break;
 		}
 
-		printf("%5" B_PRId32 " %3d  %3s  %s\n", teamInfo.team, info.number,
+		printf("%5" B_PRId32 " %4d  %3s  %s\n", teamInfo.team, info.number,
 			open_mode_to_string(info.open_mode), teamInfo.args);
 	}
 }
@@ -190,4 +223,3 @@ main(int argc, char **argv)
 
 	return 0;
 }
-
