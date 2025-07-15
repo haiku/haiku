@@ -6029,13 +6029,13 @@ dir_open_entry_ref(dev_t mountID, ino_t parentID, const char* name, bool kernel)
 {
 	FUNCTION(("dir_open_entry_ref()\n"));
 
-	if (name && name[0] == '\0')
+	if (name != NULL && name[0] == '\0')
 		return B_BAD_VALUE;
 
 	// get the vnode matching the entry_ref/node_ref
 	VnodePutter vnode;
 	status_t status;
-	if (name) {
+	if (name != NULL) {
 		status = entry_ref_to_vnode(mountID, parentID, name, true, kernel,
 			vnode);
 	} else {
@@ -7482,7 +7482,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	KPath normalizedDevice;
 	bool newlyCreatedFileDevice = false;
 
-	if (!(flags & B_MOUNT_VIRTUAL_DEVICE) && device != NULL) {
+	if ((flags & B_MOUNT_VIRTUAL_DEVICE) == 0 && device != NULL) {
 		// normalize the device path
 		status = normalizedDevice.SetTo(device, true);
 		if (status != B_OK)
