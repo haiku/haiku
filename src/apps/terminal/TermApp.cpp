@@ -272,29 +272,6 @@ TermApp::_MakeTermWindow()
 }
 
 
-//#ifndef B_NETPOSITIVE_APP_SIGNATURE
-//#define B_NETPOSITIVE_APP_SIGNATURE "application/x-vnd.Be-NPOS"
-//#endif
-//
-//void
-//TermApp::ShowHTML(BMessage *msg)
-//{
-//  const char *url;
-//  msg->FindString("Url", &url);
-//  BMessage message;
-//
-//  message.what = B_NETPOSITIVE_OPEN_URL;
-//  message.AddString("be:url", url);
-
-//  be_roster->Launch(B_NETPOSITIVE_APP_SIGNATURE, &message);
-//  while(!(be_roster->IsRunning(B_NETPOSITIVE_APP_SIGNATURE)))
-//    snooze(10000);
-//
-//  // Activate net+
-//  be_roster->ActivateApp(be_roster->TeamFor(B_NETPOSITIVE_APP_SIGNATURE));
-//}
-
-
 /*static*/ void
 TermApp::_SigChildHandler(int signal, void* data)
 {
