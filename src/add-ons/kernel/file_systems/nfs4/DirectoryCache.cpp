@@ -224,21 +224,24 @@ DirectoryCache::_LoadSnapshot(bool trash)
 		// obtained snapshot that might indicate stale nodes.
 		while (!fNameCache.IsEmpty()) {
 			NameCacheEntry* current = fNameCache.RemoveHead();
-			bool nodeFound = false;
-			for (SinglyLinkedList<NameCacheEntry>::ConstIterator it
-					= newSnapshot->fEntries.GetIterator();
-				NameCacheEntry* snapshotEntry = it.Next();) {
-				if (current->fNode == snapshotEntry->fNode
-					&& strcmp(current->fName, snapshotEntry->fName) == 0) {
-					nodeFound = true;
-					break;
+			if (strcmp(current->fName, "..") != 0) {
+				bool nodeFound = false;
+				for (SinglyLinkedList<NameCacheEntry>::ConstIterator it
+						= newSnapshot->fEntries.GetIterator();
+					NameCacheEntry* snapshotEntry = it.Next();) {
+					if (current->fNode == snapshotEntry->fNode
+						&& strcmp(current->fName, snapshotEntry->fName) == 0) {
+						nodeFound = true;
+						break;
+					}
 				}
-			}
-			if (!nodeFound) {
-				// The inode-name association that was cached in 'current' is no longer valid.
-				result = fInode->GetFileSystem()->TrashStaleNode(current->fNode);
-				if (result != B_OK)
-					INFORM("_LoadSnapshot: Couldn't free stale node.\n");
+				if (!nodeFound) {
+					// The inode-name association that was cached in 'current' is no longer valid.
+					result = fInode->GetFileSystem()->TrashStaleNode(current->fNode);
+					if (result != B_OK)
+						INFORM("_LoadSnapshot: Couldn't free stale node %" B_PRIdINO "\n",
+							current->fNode);
+				}
 			}
 			delete current;
 		}
