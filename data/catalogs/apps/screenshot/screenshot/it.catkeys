@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku-screenshot-cli	281883787
+1	italian	x-vnd.haiku-screenshot-cli	3900035709
 Include window border	ScreenshotWindow		Includi i bordi della finestra
 Overwrite	ScreenshotWindow		Sovrascrivi
 Save in:	ScreenshotWindow		Salva in:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Scrivania
 Artwork folder	ScreenshotWindow		Cartella immagini
 Translator Settings	ScreenshotWindow		Impostazioni traduttore dati
 Include mouse pointer	ScreenshotWindow		Include puntatore del mouse
+Selected area	ScreenshotWindow		Area selezionata
 overwrite	ScreenshotWindow		sovrascrivi
 Settings…	ScreenshotWindow		Impostazioni…
+Select area	ScreenshotWindow		Seleziona area
 Choose folder	ScreenshotWindow		Seleziona cartella
 Name:	ScreenshotWindow		Nome:
+Active window	ScreenshotWindow		Finestra attiva
 Choose folder…	ScreenshotWindow		Seleziona cartella…
 Please select	ScreenshotWindow		Per favore, seleziona la cartella
 Failed to save screenshot	ScreenshotWindow		Errore durante il salvataggio
 Cancel	ScreenshotWindow		Annulla
+Whole screen	ScreenshotWindow		Intero schermo
 Delay:	ScreenshotWindow		Ritardo:
 Copy to clipboard	ScreenshotWindow		Copia negli appunti
 screenshot	Screenshot	Base filename of screenshot files	istantanea

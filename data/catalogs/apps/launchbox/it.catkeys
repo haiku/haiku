@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-LaunchBox	1878360293
+1	italian	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Imposta descrizione…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sei certo di voler chiudere questo pad?\n(Il pad non sarà conservato.)
 OK	LaunchBox		OK
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Avvio automatico
 Clone	LaunchBox		Clona
 Description for '%3'	LaunchBox		Descrizione per '%3'
 Show window border	LaunchBox		Mostra il bordo della finestra
+Failed to open folder - is Tracker running?	LaunchBox		Impossibile aprire la cartella - Tracker è in esecuzione?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nEsecuzione dell'applicazione con sigla '%2' fallita.\n\nErrore:
 Failed to launch 'something', error in Pad data.	LaunchBox		Esecuzione di '????' fallita, errore nei dati del Pad.
 LaunchBox	System name		Launchbox

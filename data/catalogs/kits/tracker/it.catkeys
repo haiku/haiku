@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	4192200646
+1	italian	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -168,6 +168,7 @@ Property info	AttributesView		Dettagli proprietà
 Sorry, you can't create links in the Trash.	PoseView		Non è possibile creare collegamenti nel Cestino.
 From	Email Query Columns		Da
 Open selection with:	OpenWithWindow		Apri selezione con:
+Preferences…	ContainerWindow		Impostazioni…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Non è stato possibile aprire \"%document\" perché l'applicazione \"%app\" è nel Cestino. 
 Work Phone	Person Query Columns		Telefono di lavoro
 Select folders	FindPanel		Seleziona cartelle

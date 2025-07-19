@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	2555742361
+1	italian	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema di download delle condizioni di utilizzo
 Available packages	MainWindow		Pacchetti disponibili
 It was not possible to create the new user.	UserLoginWindow		Non è stato possble creare il nuovo utente.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Clicca su un pacchetto per 
 Cancel	UserLoginWindow		Annulla
 Rating not possible	MainWindow		Valutazione non possibile
 Package update error	MainWindow		Errore nell'aggiornamento del pacchetto
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Clicca qui
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# processo} other{# processi}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Recupero le valutazioni degli utenti per il pacchetto
 Reboot required	PackageManager		È richiesto il riavvio
 All packages	PackageListView		Tutti i pacchetti
 Send	RatePackageWindow		Invia
+Creating package list…	FeaturedPackagesView		Creazione della lista dei pacchetti…
 Start package daemon	App		Avvia server dei pacchetti
 There are problems in the supplied data:	UserLoginWindow		Sono stati riscontrati dei problemi nei dati inseriti:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		L'utente '%Nickname%' non ha accettato alcuna condizione di utilizzo.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Contenuto
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Condividi con HaikuDepotServer dati anonimi sull'utilizzo
 Close	PackageManager		Chiudi
 Changelog	PackageInfoView		Registro modifiche
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 per cercare tra tutti i pacchetti.
 About	PackageInfoView		Informazioni su…
 Password requirements download problem	UserLoginWindow		Problema di download dei requisiti della password
 Password:	UserLoginWindow		Password:
@@ -225,6 +228,7 @@ Category:	FilterView		Categoria:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	disinstallare il pacchetto %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Recupero dei dati del repository remoto
 Description	PackageListView		Descrizione
+No results? 	FeaturedPackagesView		Nessun risultato? 
 User creation error	UserLoginWindow		Creazione utente non riuscita
 You need to be logged into an account before you can rate packages.	MainWindow		Per poter valutare i pacchetti è necessario accedere con un account.
 Cleaning up…	ShuttingDownWindow		Pulizia…
