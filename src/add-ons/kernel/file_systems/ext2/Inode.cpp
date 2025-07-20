@@ -836,7 +836,7 @@ Inode::_EnlargeDataStream(Transaction& transaction, off_t size)
 	fNode.SetSize(size);
 	TRACE("Inode::_EnlargeDataStream(): Setting allocated block count to %"
 		B_PRIdOFF "\n", end);
-	return _SetNumBlocks(NumBlocks() + end * (fVolume->BlockSize() / 512));
+	return _SetNumBlocks(end * (fVolume->BlockSize() / 512));
 }
 
 
@@ -855,8 +855,8 @@ Inode::_ShrinkDataStream(Transaction& transaction, off_t size)
 		// Minimum size that doesn't require freeing blocks
 
 	if (size > minSize) {
-		// No need to allocate more blocks
-		TRACE("Inode::_ShrinkDataStream(): No need to allocate more blocks\n");
+		// No need to free more blocks
+		TRACE("Inode::_ShrinkDataStream(): No need to free more blocks\n");
 		TRACE("Inode::_ShrinkDataStream(): Setting size to %" B_PRIdOFF "\n",
 			size);
 		fNode.SetSize(size);
@@ -874,7 +874,9 @@ Inode::_ShrinkDataStream(Transaction& transaction, off_t size)
 	}
 
 	fNode.SetSize(size);
-	return _SetNumBlocks(NumBlocks() - end * (fVolume->BlockSize() / 512));
+	TRACE("Inode::_ShrinkDataStream(): Setting allocated block count to %"
+		B_PRIdOFF "\n", end);
+	return _SetNumBlocks(end * (fVolume->BlockSize() / 512));
 }
 
 
