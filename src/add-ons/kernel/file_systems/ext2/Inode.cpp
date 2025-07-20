@@ -456,29 +456,9 @@ Inode::Unlink(Transaction& transaction)
 	if ((IsDirectory() && numLinks == 2) || (numLinks == 1))  {
 		fUnlinked = true;
 
-		TRACE("Inode::Unlink(): Putting inode in orphan list\n");
-		ino_t firstOrphanID;
-		status_t status = fVolume->SaveOrphan(transaction, fID, firstOrphanID);
-		if (status != B_OK)
-			return status;
-
-		if (firstOrphanID != 0) {
-			Vnode firstOrphan(fVolume, firstOrphanID);
-			Inode* nextOrphan;
-
-			status = firstOrphan.Get(&nextOrphan);
-			if (status != B_OK)
-				return status;
-
-			fNode.SetNextOrphan(nextOrphan->ID());
-		} else {
-			// Next orphan link is stored in deletion time
-			fNode.deletion_time = 0;
-		}
-
 		fNode.num_links = 0;
 
-		status = remove_vnode(fVolume->FSVolume(), fID);
+		status_t status = remove_vnode(fVolume->FSVolume(), fID);
 		if (status != B_OK)
 			return status;
 	} else if (!IsDirectory() || numLinks > 2)

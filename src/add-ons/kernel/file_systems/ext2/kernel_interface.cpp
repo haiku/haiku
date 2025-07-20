@@ -257,15 +257,10 @@ ext2_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 			return status;
 	}
 
-	TRACE("ext2_remove_vnode(): Removing from orphan list\n");
-	status_t status = volume->RemoveOrphan(transaction, inode->ID());
-	if (status != B_OK)
-		return status;
-
 	TRACE("ext2_remove_vnode(): Setting deletion time\n");
 	inode->Node().SetDeletionTime(real_time_clock());
 
-	status = inode->WriteBack(transaction);
+	status_t status = inode->WriteBack(transaction);
 	if (status != B_OK)
 		return status;
 
