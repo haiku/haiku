@@ -354,8 +354,6 @@ Volume::Unmount()
 	delete fJournal;
 	delete fJournalInode;
 
-	TRACE("Volume::Unmount(): Putting root node\n");
-	put_vnode(fFSVolume, RootNode()->ID());
 	TRACE("Volume::Unmount(): Deleting the block cache\n");
 	block_cache_delete(fBlockCache, !IsReadOnly());
 	TRACE("Volume::Unmount(): Closing device\n");
