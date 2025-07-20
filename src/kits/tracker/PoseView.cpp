@@ -1280,15 +1280,13 @@ BPoseView::AddPoses(Model* model)
 {
 	// if model is zero, PoseView has other means of iterating through all
 	// the entries that it adds
-	if (model != NULL) {
-		TrackerSettings settings;
-		if (model->IsRoot()) {
-			AddRootPoses(true, settings.MountSharedVolumesOntoDesktop());
-			return;
-		} else if (IsDesktopView()
-			&& (settings.MountVolumesOntoDesktop() || settings.ShowDisksIcon()
-				|| (IsFilePanel() && settings.DesktopFilePanelRoot())))
-			AddRootPoses(true, settings.MountSharedVolumesOntoDesktop());
+
+	// Desktop poses are added either in FilePanelPriv or DesktopPoseView
+
+	// adding volumes is all there is to do for root directory
+	if (TargetModel()->IsRoot()) {
+		AddVolumePoses();
+		return;
 	}
 
 	ShowBarberPole();
@@ -1587,8 +1585,11 @@ BPoseView::AddPosesTask(void* castToParams)
 
 
 void
-BPoseView::AddRootPoses(bool watchIndividually, bool mountShared)
+BPoseView::AddVolumePoses()
 {
+	if (Window() == NULL)
+		return;
+
 	BVolumeRoster roster;
 	roster.Rewind();
 	BVolume volume;
@@ -1606,18 +1607,18 @@ BPoseView::AddRootPoses(bool watchIndividually, bool mountShared)
 			monitorMsg.AddInt64("node", model.NodeRef()->node);
 			monitorMsg.AddInt64("directory", model.EntryRef()->directory);
 			monitorMsg.AddString("name", model.EntryRef()->name);
-			if (Window())
-				Window()->PostMessage(&monitorMsg, this);
+
+			Window()->PostMessage(&monitorMsg, this);
 		}
 	} else {
 		while (roster.GetNextVolume(&volume) == B_OK) {
 			if (!volume.IsPersistent())
 				continue;
 
-	 		if (volume.IsShared() && !mountShared)
+			if (volume.IsShared() && !TrackerSettings().MountSharedVolumesOntoDesktop())
 				continue;
 
-			CreateVolumePose(&volume, watchIndividually);
+			CreateVolumePose(&volume);
 		}
 	}
 
@@ -1628,7 +1629,7 @@ BPoseView::AddRootPoses(bool watchIndividually, bool mountShared)
 
 
 void
-BPoseView::RemoveRootPoses()
+BPoseView::RemoveVolumePoses()
 {
 	int32 index;
 	int32 poseCount = fPoseList->CountItems();
@@ -1649,6 +1650,25 @@ BPoseView::RemoveRootPoses()
 	SortPoses();
 	UpdateCount();
 	Invalidate();
+}
+
+
+void
+BPoseView::ToggleDisksVolumes()
+{
+	if (IsVolumesRoot() && LockLooper()) {
+		SavePoseLocations();
+
+		if (TrackerSettings().MountVolumesOntoDesktop()) {
+			RemoveRootPose();
+			AddVolumePoses();
+		} else {
+			RemoveVolumePoses();
+			CreateRootPose();
+		}
+
+		UnlockLooper();
+	}
 }
 
 
@@ -1703,7 +1723,7 @@ BPoseView::AddPosesCompleted()
 
 
 void
-BPoseView::CreateVolumePose(BVolume* volume, bool watchIndividually)
+BPoseView::CreateVolumePose(BVolume* volume)
 {
 	if (volume->InitCheck() != B_OK || !volume->IsPersistent()) {
 		// We never want to create poses for those volumes; the file
@@ -1735,12 +1755,42 @@ BPoseView::CreateVolumePose(BVolume* volume, bool watchIndividually)
 	dirNode.node = ref.directory;
 
 	BPose* pose = EntryCreated(&dirNode, &itemNode, ref.name, 0);
-	if (pose != NULL && watchIndividually) {
-		// make sure volume names still get watched, even though
-		// they are on the desktop which is not their physical parent
+	if (pose != NULL && !TargetModel()->IsRoot()) {
+		// When placing a volume pose onto the Desktop where unlike in the
+		// Root window it will not be watched by the folder.
 		pose->TargetModel()->WatchVolumeAndMountPoint(B_WATCH_NAME
 			| B_WATCH_STAT | B_WATCH_ATTR, this);
 	}
+}
+
+
+void
+BPoseView::CreateRootPose()
+{
+	BEntry entry("/");
+	Model* model = new Model(&entry);
+	if (model == NULL || model->InitCheck() != B_OK) {
+		delete model;
+		return;
+	}
+
+	PoseInfo info;
+	ReadPoseInfo(model, &info);
+	CreatePose(model, &info, true, NULL, NULL, true);
+}
+
+
+void
+BPoseView::RemoveRootPose()
+{
+	BEntry entry("/");
+	node_ref nref;
+	if (entry.GetNodeRef(&nref) != B_OK)
+		return;
+
+	DeletePose(&nref);
+
+	Invalidate();
 }
 
 
@@ -5351,9 +5401,10 @@ BPoseView::FSNotification(const BMessage* message)
 				&& !targetModel->IsQuery()
 				&& !targetModel->IsVirtualDirectory()
 				&& !targetModel->IsRoot()
-				&& (!settings.ShowDisksIcon() || !IsDesktopView())) {
+				&& (!settings.ShowDisksIcon() || !IsVolumesRoot())) {
 				if (count == 0)
 					break;
+
 				createPose = false;
 			}
 
@@ -5386,8 +5437,8 @@ BPoseView::FSNotification(const BMessage* message)
 							createdPath.Length()) == 0) {
 							if (pathStr[createdPath.Length()] != '/')
 								break;
-							StopWatchingParentsOf(fBrokenLinks->ItemAt(i)
-								->EntryRef());
+
+							StopWatchingParentsOf(fBrokenLinks->ItemAt(i)->EntryRef());
 							watch_node(&itemNode, B_WATCH_DIRECTORY, this);
 							break;
 						}
@@ -5463,7 +5514,7 @@ BPoseView::FSNotification(const BMessage* message)
 			if (targetModel != NULL && targetModel->IsRoot()) {
 				BVolume volume(device);
 				if (volume.InitCheck() == B_OK)
-					CreateVolumePose(&volume, false);
+					CreateVolumePose(&volume);
 			} else if (TargetModel()->IsTrash()) {
 				// add trash items from newly mounted volume
 
@@ -8390,6 +8441,7 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 		AddTrashPoses();
 	else
 		AddPoses(TargetModel());
+
 	TargetModel()->CloseNode();
 
 	AdoptSystemColors();

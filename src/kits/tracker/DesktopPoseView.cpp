@@ -51,6 +51,7 @@ All rights reserved.
 #include "FSUtils.h"
 #include "PoseList.h"
 #include "Tracker.h"
+#include "TrackerDefaults.h"
 #include "TrackerSettings.h"
 #include "TrackerString.h"
 
@@ -95,7 +96,7 @@ DesktopPoseView::MessageReceived(BMessage* message)
 			break;
 
 		default:
-			BPoseView::MessageReceived(message);
+			_inherited::MessageReceived(message);
 			break;
 	}
 }
@@ -188,10 +189,9 @@ DesktopPoseView::FSNotification(const BMessage* message)
 				break;
 
 			if (settings.MountVolumesOntoDesktop()
-				&& (!volume.IsShared()
-					|| settings.MountSharedVolumesOntoDesktop())) {
+				&& (!volume.IsShared() || settings.MountSharedVolumesOntoDesktop())) {
 				// place an icon for the volume onto the desktop
-				CreateVolumePose(&volume, true);
+				CreateVolumePose(&volume);
 			}
 		}
 		break;
@@ -212,7 +212,18 @@ void
 DesktopPoseView::AddPosesCompleted()
 {
 	_inherited::AddPosesCompleted();
+
 	CreateTrashPose();
+	CheckAutoPlacedPoses();
+}
+
+
+void
+DesktopPoseView::AddPoses(Model* model)
+{
+	AddVolumePoses();
+
+	_inherited::AddPoses(model);
 }
 
 
@@ -233,21 +244,6 @@ DesktopPoseView::Represents(const entry_ref* ref) const
 	node_ref nref;
 	entry.GetNodeRef(&nref);
 	return Represents(&nref);
-}
-
-
-void
-DesktopPoseView::ShowVolumes(bool visible, bool showShared)
-{
-	if (LockLooper()) {
-		SavePoseLocations();
-		if (!visible)
-			RemoveRootPoses();
-		else
-			AddRootPoses(true, showShared);
-
-		UnlockLooper();
-	}
 }
 
 
@@ -278,17 +274,14 @@ DesktopPoseView::StopSettingsWatch()
 void
 DesktopPoseView::AdaptToVolumeChange(BMessage* message)
 {
+	if (Window() == NULL)
+		return;
+
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	ThrowOnAssert(tracker != NULL);
 
-	bool showDisksIcon = false;
-	bool mountVolumesOnDesktop = true;
-	bool mountSharedVolumesOntoDesktop = false;
-
+	bool showDisksIcon = kDefaultShowDisksIcon;
 	message->FindBool("ShowDisksIcon", &showDisksIcon);
-	message->FindBool("MountVolumesOntoDesktop", &mountVolumesOnDesktop);
-	message->FindBool("MountSharedVolumesOntoDesktop",
-		&mountSharedVolumesOntoDesktop);
 
 	BEntry entry("/");
 	Model model(&entry);
@@ -302,40 +295,30 @@ DesktopPoseView::AdaptToVolumeChange(BMessage* message)
 			entryMessage.AddInt32("opcode", B_ENTRY_REMOVED);
 			entry_ref ref;
 			if (entry.GetRef(&ref) == B_OK) {
-				BContainerWindow* disksWindow
-					= tracker->FindContainerWindow(&ref);
+				BContainerWindow* disksWindow = tracker->FindContainerWindow(&ref);
 				if (disksWindow != NULL) {
 					disksWindow->Lock();
 					disksWindow->Close();
 				}
 			}
 		}
+
 		entryMessage.AddInt32("device", model.NodeRef()->device);
 		entryMessage.AddInt64("node", model.NodeRef()->node);
 		entryMessage.AddInt64("directory", model.EntryRef()->directory);
 		entryMessage.AddString("name", model.EntryRef()->name);
-		BContainerWindow* deskWindow
-			= dynamic_cast<BContainerWindow*>(Window());
-		if (deskWindow != NULL)
-			deskWindow->PostMessage(&entryMessage, deskWindow->PoseView());
+
+		Window()->PostMessage(&entryMessage, this);
 	}
 
-	ShowVolumes(mountVolumesOnDesktop, mountSharedVolumesOntoDesktop);
+	ToggleDisksVolumes();
 }
 
 
 void
 DesktopPoseView::AdaptToDesktopIntegrationChange(BMessage* message)
 {
-	bool mountVolumesOnDesktop = true;
-	bool mountSharedVolumesOntoDesktop = true;
-
-	message->FindBool("MountVolumesOntoDesktop", &mountVolumesOnDesktop);
-	message->FindBool("MountSharedVolumesOntoDesktop",
-		&mountSharedVolumesOntoDesktop);
-
-	ShowVolumes(false, mountSharedVolumesOntoDesktop);
-	ShowVolumes(mountVolumesOnDesktop, mountSharedVolumesOntoDesktop);
+	ToggleDisksVolumes();
 }
 
 

@@ -57,17 +57,16 @@ public:
 
 	static EntryListBase* InitDesktopDirentIterator(BPoseView*, const entry_ref*);
 
-	void ShowVolumes(bool visible, bool showShared);
-
 	void StartSettingsWatch();
 	void StopSettingsWatch();
-
-	virtual bool AddPosesThreadValid(const entry_ref*) const;
-	virtual void AddPosesCompleted();
 
 protected:
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 	virtual bool FSNotification(const BMessage*);
+
+	virtual bool AddPosesThreadValid(const entry_ref*) const;
+	virtual void AddPosesCompleted();
+	virtual void AddPoses(Model* model = NULL);
 
 	virtual bool IsDesktopView() const;
 

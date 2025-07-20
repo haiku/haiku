@@ -488,7 +488,10 @@ protected:
 	virtual void CreatePoses(Model**models, PoseInfo* poseInfoArray, int32 count,
 		BPose** resultingPoses, bool insertionSort = true, int32* lastPoseIndexPointer = 0,
 		BRect* boundsPointer = 0, bool forceDraw = false);
-	void CreateVolumePose(BVolume*, bool watchIndividually);
+	void CreateVolumePose(BVolume*);
+
+	virtual void CreateRootPose();
+	virtual void RemoveRootPose();
 
 	void CreateTrashPose();
 
@@ -502,12 +505,11 @@ protected:
 		// if <model> is zero, PoseView has other means of iterating
 		// through all the entries thaat it adds
 
-	virtual void AddRootPoses(bool watchIndividually, bool mountShared);
-		// watchIndividually is used when placing a volume pose onto
-		// the Desktop where unlike in the Root window it will not be
-		// watched by the folder representing root. If set, each volume
-		// will therefore be watched individually
-	virtual void RemoveRootPoses();
+	virtual void AddVolumePoses();
+	virtual void RemoveVolumePoses();
+	virtual void ToggleDisksVolumes();
+	virtual bool IsVolumesRoot() const { return IsDesktopView(); };
+
 	virtual void AddTrashPoses();
 
 	virtual bool DeletePose(const node_ref*, BPose* pose = NULL, int32 index = 0);

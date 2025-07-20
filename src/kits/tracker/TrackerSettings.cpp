@@ -290,6 +290,7 @@ void
 TrackerSettings::SetShowDisksIcon(bool enabled)
 {
 	gTrackerState.fShowDisksIcon->SetValue(enabled);
+	gTrackerState.fMountVolumesOntoDesktop->SetValue(!enabled);
 }
 
 
@@ -317,6 +318,7 @@ TrackerSettings::MountVolumesOntoDesktop()
 void
 TrackerSettings::SetMountVolumesOntoDesktop(bool enabled)
 {
+	gTrackerState.fShowDisksIcon->SetValue(!enabled);
 	gTrackerState.fMountVolumesOntoDesktop->SetValue(enabled);
 }
 

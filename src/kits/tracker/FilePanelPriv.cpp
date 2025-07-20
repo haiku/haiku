@@ -80,6 +80,7 @@ All rights reserved.
 #include "NavMenu.h"
 #include "Shortcuts.h"
 #include "Tracker.h"
+#include "TrackerDefaults.h"
 #include "Utilities.h"
 
 #include "tracker_private.h"
@@ -557,6 +558,10 @@ TFilePanel::SwitchDirectory(const entry_ref* ref)
 	PoseView()->SetIsDesktop(isDesktop);
 	_inherited::SwitchDirectory(&setToRef);
 
+	if (PoseView()->IsDesktop())
+		PoseView()->AddVolumePoses();
+
+	AddShortcut('D', B_COMMAND_KEY, new BMessage(kSwitchToDesktop));
 	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
 		// our shortcut got possibly removed because the home
 		// menu item got removed - we shouldn't really have to do
@@ -804,6 +809,7 @@ TFilePanel::Init(const BMessage*)
 	fShortcuts = new TShortcuts(this);
 
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(kCancelButton));
+	AddShortcut('D', B_COMMAND_KEY, new BMessage(kSwitchToDesktop));
 	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
 	AddShortcut('A', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kShowSelectionWindow));
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), this);
@@ -823,6 +829,7 @@ TFilePanel::Init(const BMessage*)
 
 	if (ShouldAddMenus())
 		AddMenus();
+
 	AddContextMenus();
 
 	PoseView()->ScrollTo(B_ORIGIN);
@@ -967,8 +974,7 @@ TFilePanel::RestoreWindowState(AttributeStreamNode* node)
 
 	const char* rectAttributeName = kAttrWindowFrame;
 	BRect frame(Frame());
-	if (node->Read(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame)
-		== sizeof(BRect)) {
+	if (node->Read(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame) == sizeof(BRect)) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	}
@@ -1291,6 +1297,27 @@ TFilePanel::MessageReceived(BMessage* message)
 			entry_ref ref;
 			if (message->FindRef("refs", &ref) != B_OK)
 				break;
+
+			SwitchDirectory(&ref);
+			break;
+		}
+
+		case kSwitchToDesktop:
+		{
+			if (PoseView() != NULL && PoseView()->IsFocus()
+				&& PoseView()->CanMoveToTrashOrDuplicate()) {
+				// duplicate selection instead
+				message->what = kDuplicateSelection;
+				PostMessage(message, PoseView());
+				break;
+			}
+
+			BPath path;
+			entry_ref ref;
+			if (find_directory(B_DESKTOP_DIRECTORY, &path) != B_OK
+				|| get_ref_for_path(path.Path(), &ref) != B_OK) {
+				break;
+			}
 
 			SwitchDirectory(&ref);
 			break;
@@ -1698,7 +1725,7 @@ TFilePanel::WindowActivated(bool active)
 BFilePanelPoseView::BFilePanelPoseView(Model* model)
 	:
 	BPoseView(model, kListMode),
-	fIsDesktop(model->IsDesktop())
+	fIsDesktop(model != NULL && model->IsDesktop())
 {
 }
 
@@ -1731,26 +1758,25 @@ BFilePanelPoseView::FSNotification(const BMessage* message)
 	switch (message->FindInt32("opcode")) {
 		case B_DEVICE_MOUNTED:
 		{
-			if (IsDesktop()) {
-				// Pretty much copied straight from DesktopPoseView.
-				// Would be better if the code could be shared somehow.
-				dev_t device;
-				if (message->FindInt32("new device", &device) != B_OK)
-					break;
+			if (!IsDesktop() && !TargetModel()->IsRoot())
+				break;
 
-				ASSERT(TargetModel() != NULL);
-				TrackerSettings settings;
+			dev_t device;
+			if (message->FindInt32("new device", &device) != B_OK)
+				break;
 
-				BVolume volume(device);
-				if (volume.InitCheck() != B_OK)
-					break;
+			ASSERT(TargetModel() != NULL);
+			TrackerSettings settings;
 
-				if (settings.MountVolumesOntoDesktop()
-					&& (!volume.IsShared()
-						|| settings.MountSharedVolumesOntoDesktop())) {
-					// place an icon for the volume onto the desktop
-					CreateVolumePose(&volume, true);
-				}
+			BVolume volume(device);
+			if (volume.InitCheck() != B_OK)
+				break;
+
+			// place volume icon onto Desktop or Root
+			if ((!volume.IsShared() || settings.MountSharedVolumesOntoDesktop())
+				&& ((IsVolumesRoot() && settings.MountVolumesOntoDesktop())
+					|| TargetModel()->IsRoot())) {
+				CreateVolumePose(&volume);
 			}
 			break;
 		}
@@ -1759,8 +1785,7 @@ BFilePanelPoseView::FSNotification(const BMessage* message)
 		{
 			dev_t device;
 			if (message->FindInt32("device", &device) == B_OK) {
-				if (TargetModel() != NULL
-					&& TargetModel()->NodeRef()->device == device) {
+				if (TargetModel() != NULL && TargetModel()->NodeRef()->device == device) {
 					// Volume currently shown in this file panel
 					// disappeared, reset location to home directory
 					BMessage message(kSwitchToHome);
@@ -1809,37 +1834,36 @@ void
 BFilePanelPoseView::AddPosesCompleted()
 {
 	_inherited::AddPosesCompleted();
+
 	if (IsDesktop())
 		CreateTrashPose();
+
+	// the menu that adds these shortcuts may not exist initially
+	Window()->AddShortcut('D', B_COMMAND_KEY, new BMessage(kSwitchToDesktop));
+	Window()->AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
+
+	UpdateScrollRange();
 }
 
 
 void
-BFilePanelPoseView::ShowVolumes(bool visible, bool showShared)
+BFilePanelPoseView::AddPoses(Model* model)
 {
-	if (IsDesktop()) {
-		if (!visible)
-			RemoveRootPoses();
-		else
-			AddRootPoses(true, showShared);
-	}
+	if (IsDesktop())
+		AddVolumePoses();
 
-	TFilePanel* panel = dynamic_cast<TFilePanel*>(Window());
-	if (panel != NULL && TargetModel() != NULL)
-		panel->SwitchDirectory(TargetModel()->EntryRef());
+	_inherited::AddPoses(model);
 }
 
 
 void
 BFilePanelPoseView::AdaptToVolumeChange(BMessage* message)
 {
-	bool showDisksIcon;
-	bool mountVolumesOnDesktop;
-	bool mountSharedVolumesOntoDesktop;
+	if (Window() == NULL)
+		return;
 
+	bool showDisksIcon = kDefaultShowDisksIcon;
 	message->FindBool("ShowDisksIcon", &showDisksIcon);
-	message->FindBool("MountVolumesOntoDesktop", &mountVolumesOnDesktop);
-	message->FindBool("MountSharedVolumesOntoDesktop", &mountSharedVolumesOntoDesktop);
 
 	BEntry entry("/");
 	Model model(&entry);
@@ -1856,23 +1880,18 @@ BFilePanelPoseView::AdaptToVolumeChange(BMessage* message)
 		monitorMsg.AddInt64("node", model.NodeRef()->node);
 		monitorMsg.AddInt64("directory", model.EntryRef()->directory);
 		monitorMsg.AddString("name", model.EntryRef()->name);
+
 		TrackerSettings().SetShowDisksIcon(showDisksIcon);
+
 		Window()->PostMessage(&monitorMsg, this);
 	}
 
-	ShowVolumes(mountVolumesOnDesktop, mountSharedVolumesOntoDesktop);
+	ToggleDisksVolumes();
 }
 
 
 void
 BFilePanelPoseView::AdaptToDesktopIntegrationChange(BMessage* message)
 {
-	bool mountVolumesOnDesktop = true;
-	bool mountSharedVolumesOntoDesktop = true;
-
-	message->FindBool("MountVolumesOntoDesktop", &mountVolumesOnDesktop);
-	message->FindBool("MountSharedVolumesOntoDesktop", &mountSharedVolumesOntoDesktop);
-
-	ShowVolumes(false, mountSharedVolumesOntoDesktop);
-	ShowVolumes(mountVolumesOnDesktop, mountSharedVolumesOntoDesktop);
+	ToggleDisksVolumes();
 }

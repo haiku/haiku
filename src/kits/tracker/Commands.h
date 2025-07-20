@@ -114,6 +114,7 @@ const uint32 kEditFavorites = 'Tedf';
 const uint32 kSwitchDirectory = 'Tswd';
 const uint32 kQuitTracker = 'Tqit';
 
+const uint32 kSwitchToDesktop = 'TswD';
 const uint32 kSwitchToHome = 'Tswh';
 
 const uint32 kTestIconCache = 'TicC';
