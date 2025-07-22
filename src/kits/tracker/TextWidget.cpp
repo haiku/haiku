@@ -639,6 +639,9 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 
 	textRect.OffsetBy(offset);
 
+	BRegion textRegion(textRect);
+	drawView->ConstrainClippingRegion(&textRegion);
+
 	// We are only concerned with setting the correct text color.
 
 	// For active views the selection is drawn as inverse text
@@ -784,4 +787,6 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 		if (direct && clipboardMode != kMoveSelectionTo)
 			drawView->SetDrawingMode(B_OP_OVER);
 	}
+
+	drawView->ConstrainClippingRegion(NULL);
 }
