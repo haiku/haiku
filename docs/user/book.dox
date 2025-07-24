@@ -561,7 +561,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 		formats.
 
 
-	\defgroup libtranslation Translation Kit libary (libtranslation.so)
+	\defgroup libtranslation Translation Kit library (libtranslation.so)
 
 	\defgroup libbe Main C++ library (libbe.so)
 
