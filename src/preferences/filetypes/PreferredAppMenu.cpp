@@ -5,6 +5,7 @@
 
 
 #include "FileTypes.h"
+#include "IconMenuItem.h"
 #include "PreferredAppMenu.h"
 
 #include <Alert.h>
@@ -63,7 +64,7 @@ add_signature(BMenuItem* item, const char* signature)
 }
 
 
-static BMenuItem*
+static IconMenuItem*
 create_application_item(const char* signature, uint32 what)
 {
 	char name[B_FILE_NAME_LENGTH];
@@ -73,9 +74,9 @@ create_application_item(const char* signature, uint32 what)
 
 	BMimeType applicationType(signature);
 	if (applicationType.GetShortDescription(name) == B_OK)
-		return new BMenuItem(name, message);
+		return new IconMenuItem(name, message, signature);
 
-	return new BMenuItem(signature, message);
+	return new IconMenuItem(signature, message, signature);
 }
 
 
