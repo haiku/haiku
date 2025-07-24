@@ -32,6 +32,8 @@
 		- The \ref app is the starting point for developing applications
 			and includes classes for messaging and for interacting with
 			the rest of the system.
+		- The \ref device offers software interfaces
+			that allow applications to access and interact with connected hardware.
 		- The \ref game provides classes for producing game sounds and
 			working with full screen apps.
 		- The \ref interface is used to create responsive and attractive
@@ -116,6 +118,9 @@
 		- BKey
 		- BKeyStore
 
+	\defgroup device Device Kit
+	\brief The Device Kit offers software interfaces
+	that allow applications to access and interact with connected hardware.
 
 	\defgroup device Device Kit
 	\brief The Device Kit provides access to devices such as joysticks and serial ports.
@@ -123,7 +128,6 @@
 	\defgroup game Game Kit
 	\brief The Game Kit provides classes for producing game sounds and
 		working with full screen apps.
-
 
 	\defgroup interface Interface Kit
 	\brief API for displaying a graphical user interface.
