@@ -7758,7 +7758,7 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 
 			if (poseRect.Intersects(inner)) {
 				offsetBy = BPoint(-inner.LeftTop().x, -inner.LeftTop().y);
-				pose->Draw(poseRect, poseRect, this, view, true, offsetBy, false);
+				pose->Draw(poseRect, poseRect, this, view, true, offsetBy, true);
 			}
 		}
 

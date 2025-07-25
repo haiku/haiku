@@ -651,50 +651,34 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 	// BPose::Draw before and after calling this function.
 
 	bool direct = drawView == view;
-	bool dragging = false;
-	if (view->Window()->CurrentMessage() != NULL)
-		dragging = view->Window()->CurrentMessage()->what == kMsgMouseDragged;
 
-	if (!dragging) {
-		if (selected) {
-			if (direct) {
-				// erase selection rect background
-				drawView->SetDrawingMode(B_OP_COPY);
-				BRect invertRect(textRect);
-				invertRect.left = ceilf(invertRect.left);
-				invertRect.top = ceilf(invertRect.top);
-				invertRect.right = floorf(invertRect.right);
-				invertRect.bottom = floorf(invertRect.bottom);
-				drawView->FillRect(invertRect, B_SOLID_LOW);
-			}
-			drawView->SetDrawingMode(B_OP_OVER);
+	if (selected) {
+		// erase selection rect background
+		drawView->SetDrawingMode(B_OP_COPY);
+		BRect invertRect(textRect);
+		invertRect.left = ceilf(invertRect.left);
+		invertRect.top = ceilf(invertRect.top);
+		invertRect.right = floorf(invertRect.right);
+		invertRect.bottom = floorf(invertRect.bottom);
+		drawView->FillRect(invertRect, B_SOLID_LOW);
 
-			// High color is set to inverted low, then the whole thing is
-			// inverted again so that the background color "shines through".
-			drawView->SetHighColor(InvertColorSmart(drawView->LowColor()));
-		} else if (clipboardMode == kMoveSelectionTo) {
-			drawView->SetDrawingMode(B_OP_ALPHA);
-			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-			uint8 alpha = 128; // set the level of opacity by value
-			if (drawView->LowColor().IsLight())
-				drawView->SetHighColor(0, 0, 0, alpha);
-			else
-				drawView->SetHighColor(255, 255, 255, alpha);
-		} else {
-			drawView->SetDrawingMode(B_OP_OVER);
-			if (view->IsDesktopView())
-				drawView->SetHighColor(view->HighColor());
-			else
-				drawView->SetHighUIColor(view->HighUIColor());
-		}
-	} else {
+		// High color is set to inverted low, then the whole thing is
+		// inverted again so that the background color "shines through".
+		drawView->SetHighColor(InvertColorSmart(drawView->LowColor()));
+	} else if (clipboardMode == kMoveSelectionTo) {
 		drawView->SetDrawingMode(B_OP_ALPHA);
 		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-		uint8 alpha = 192; // set the level of opacity by value
+		uint8 alpha = 128; // set the level of opacity by value
 		if (drawView->LowColor().IsLight())
 			drawView->SetHighColor(0, 0, 0, alpha);
 		else
 			drawView->SetHighColor(255, 255, 255, alpha);
+	} else {
+		drawView->SetDrawingMode(B_OP_OVER);
+		if (view->IsDesktopView())
+			drawView->SetHighColor(view->HighColor());
+		else
+			drawView->SetHighUIColor(view->HighUIColor());
 	}
 
 	float decenderHeight = roundf(view->FontInfo().descent);
@@ -704,7 +688,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 
 	// Draw text outline unless selected or column resizing.
 	// The direct parameter is false when dragging or column resizing.
-	if (!selected && (direct || dragging) && view->WidgetTextOutline()) {
+	if (!selected && direct && view->WidgetTextOutline()) {
 		// draw a halo around the text by using the "false bold"
 		// feature for text rendering. Either black or white is used for
 		// the glow (whatever acts as contrast) with a some alpha value,
