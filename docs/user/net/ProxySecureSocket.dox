@@ -1,0 +1,85 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/ProxySecureSocket.h	hrev58979
+ *		src/kits/network/libnetapi/ProxySecureSocket.cpp	hrev58979
+ */
+
+
+/*!
+	\file ProxySecureSocket.h
+	\ingroup network
+	\brief Provides the BProxySecureSocket class.
+*/
+
+
+/*!
+	\class BProxySecureSocket
+	\ingroup network
+	\brief BProxySecureSocket is a class that extends BSecureSocket to
+		have an encrypted connection via an HTTP proxy server.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BProxySecureSocket::BProxySecureSocket(const BNetworkAddress& proxy)
+	\brief Creates an uninitialized socket in disconnected and unbound state.
+
+	\a proxy is set as the proxy server through where the encrypted
+	communications are channelled.
+
+	\param[in] proxy The proxy network address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BProxySecureSocket::BProxySecureSocket(const BNetworkAddress& proxy, const BNetworkAddress& peer, bigtime_t timeout = B_INFINITE_TIMEOUT)
+	\brief Creates a socket to \a peer and tries to connect to that endpoint
+		via \a proxy until \a timeout is reached.
+
+	It initializes an SSL session by which the connection should be channeled.
+
+	\param[in] proxy The proxy's network address.
+	\param[in] peer The peer's network address.
+	\param[in] timeout The timeout in microseconds or \c B_INFINITE_TIMEOUT.
+		This is used for subsequent reads and writes as well.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BProxySecureSocket::BProxySecureSocket(const BProxySecureSocket& other)
+	\brief Copy constructor.
+
+	The copied object accesses the same underlying socket.
+
+	\param[in] other The other BProxySecureSocket object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BProxySecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout = B_INFINITE_TIMEOUT)
+	\brief Connect the socket to the given \a peer.
+
+	It also creates an SSL session for encrypted communication.
+
+	The socket is disconnected from any previous connections.
+
+	\returns \c B_OK if the connection was performed successfully or an error
+		code otherwise.
+
+	\since Haiku R1
+*/
+

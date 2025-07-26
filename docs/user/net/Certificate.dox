@@ -1,0 +1,148 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/Certificate.h	hrev58979
+ *		src/kits/network/libnetapi/Certificate.cpp	hrev58979
+ */
+
+
+/*!
+	\file Certificate.h
+	\ingroup network
+	\brief Provides the BCertificate class.
+*/
+
+
+/*!
+	\class BCertificate
+	\ingroup network
+	\brief BCertificate is a class that represents a digital certificate used in
+		encrypted network connections, such as X.509 certificates.
+
+	It is aimed to retrieve information from a certificate, including the
+	date of validity and of expiration, the issuer, subject and the
+	signature algorithm. It also checks if the certificate is a Certificate
+	Authority (CA) certificate as well as if the certificate is self-signed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BCertificate::BCertificate(const BCertificate& other)
+	\brief Copy constructor.
+
+	It creates a deep copy of the certificate data.
+
+	\param[in] other The other BCertificate object from where to initialize this
+		BCertificate instance.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int BCertificate::Version() const
+	\brief Returns the numerical value of the certificate's version field.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn time_t BCertificate::StartDate() const
+	\brief Returns the certificate's \c notBefore field timestamp.
+
+	This is the date when the certificate starts to be valid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn time_t BCertificate::ExpirationDate() const
+	\brief Returns the certificate's \c notAfter field timestamp.
+
+	This is the date when the certificate is no longer valid, that is, its
+	expiration date.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BCertificate::IsValidAuthority() const
+	\brief Checks if the certificate is a Certificate Authority certificate.
+
+	CA certificates are those that can be used to sign other certificates.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BCertificate::IsSelfSigned() const
+	\brief Checks if the certificate was self-signed.
+
+	A self-signed certificate is one where the CA certificate is the same as
+	the certificated subject.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BCertificate::Issuer() const
+	\brief Returns the name of the Certificate Authority that issued the
+		certificate.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BCertificate::Subject() const
+	\brief Returns the certificate's subject name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BCertificate::SignatureAlgorithm() const
+	\brief Returns the name of the certificate's signature algorithm.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BCertificate::String() const
+	\brief Returns the information contained in the certificate in a
+		human-readable form.
+
+	This includes the certificate's version, the name of the signature
+	algorithm, the issuer name, the validity period, the subject name, the
+	public key and its algorithm, hexadecimal dump of any unique identifier of
+	the issuer or the subject, any signature algorithm extensions, the signature
+	dump and any non-standard data fields.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BCertificate::operator==(const BCertificate& other) const
+	\brief Compares if this certificate is the same as \a other certificate.
+
+	\retval true Both BCertificate objects refer to the same certificate.
+	\retval false The certificates are different.
+
+	\since Haiku R1
+*/
+

@@ -23,7 +23,7 @@
 
 	BAbstractSocket provides a common interface for all socket-based
 	communication streams. These include BDatagramSocket, BSocket,
-	BSecureSocket and BServerSocket.
+	BSecureSocket and BProxySecureSocket.
 
 	BAbstractSocket implements common behavior between these different socket
 	types. This includes management of a BSD socket integer handle, knowledge

@@ -1,0 +1,150 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/Socket.h	hrev58979
+ *		src/kits/network/libnetapi/Socket.cpp	hrev58979
+ */
+
+
+/*!
+	\file Socket.h
+	\ingroup network
+	\brief Provides the BSocket class.
+*/
+
+
+/*!
+	\class BSocket
+	\ingroup network
+	\brief BSocket is a class used to perform stream-based socket connections.
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSocket::BSocket()
+	\brief Creates an uninitialized socket in disconnected and unbound state.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSocket::BSocket(const BNetworkAddress& peer, bigtime_t timeout = B_INFINITE_TIMEOUT)
+	\brief Creates a socket to \a peer and tries to connect to that endpoint
+		until \a timeout is reached.
+
+	\param[in] peer A network address.
+	\param[in] timeout The timeout in microseconds or \c B_INFINITE_TIMEOUT.
+		This is used for subsequent reads and writes as well.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSocket::BSocket(const BSocket& other)
+	\brief Copy constructor.
+
+	The copied object accesses the same underlying socket.
+
+	\param[in] other The other BSocket object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BSocket::~BSocket()
+	\brief Destructor.
+
+	Disconnects the socket.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSocket::Bind(const BNetworkAddress& peer, bool reuseAddr = true)
+	\brief Assigns a local address \a peer to this socket.
+
+	If \a reuseAddr is \c true, it should allow the reuse of the local address.
+
+	If the binding is successful, the object is left in a bound state.
+
+	\param[in] peer The local address to be bound to this socket object.
+	\param[in] reuseAddr Whether the reuse of local addresses should be allowed in non-zero requests.
+
+	\retval B_OK Binding was successful.
+	\retval EADDRINUSE The specified address is already in use and \a reuseAddr is false.
+	\retval EADDRNOTAVAIL The specified address is not available from the local machine.
+	\retval EAFNOSUPPORT The specified address is not of a family address accepted by the socket.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSocket::Accept(BAbstractSocket*& _socket)
+	\brief Accepts an incoming connection to this socket and initializes
+		\a _socket to that remote endpoint.
+
+	This method extracts the first connection from the pending incoming
+	connections' queue and fills \a _socket with the peer's information.
+
+	\retval B_OK The connection was accepted and the other object was
+		initialized with the peer's information.
+	\retval B_NO_MEMORY Not enough memory to allocate for the other socket object.
+	\retval -1 Failure to accept the incoming connection.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout = B_INFINITE_TIMEOUT)
+	\brief Connects the socket to the given \a peer.
+
+	The socket is disconnected from any previous connections.
+
+	\param[in] peer The peer's address to connect to.
+	\param[in] timeout The timeout in microseconds or \c B_INFINITE_TIMEOUT.
+		This is used for subsequent reads and writes as well.
+
+	\returns B_OK if the connection was performed successfully or an error
+		code otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual ssize_t BSocket::Read(void* buffer, size_t size)
+	\brief Receives from the socket's peer and stores it in \a buffer.
+
+	\param[out] buffer A buffer where the data should be stored.
+	\param[in] size The length in bytes of the buffer.
+
+	\returns The length of bytes received, or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual ssize_t BSocket::Write(const void* buffer, size_t size)
+	\brief Sends data from the socket to its peer.
+
+	\param[in] buffer The data to be sent.
+	\param[in] size The length in bytes of the data.
+
+	\returns The length of bytes sent, or an error code.
+
+	\since Haiku R1
+*/
+

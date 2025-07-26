@@ -1,0 +1,130 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/SecureSocket.h	hrev58979
+ *		src/kits/network/libnetapi/SecureSocket.cpp	hrev58979
+ */
+
+
+/*!
+	\file SecureSocket.h
+	\ingroup network
+	\brief Provides the BSecureSocket class.
+*/
+
+
+/*!
+	\class BSecureSocket
+	\ingroup network
+	\brief BSecureSocket is a class that extends BSocket to provide
+		encrypted connection using the TLS or SSL protocols.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSecureSocket::BSecureSocket()
+	\brief Creates an uninitialized socket in disconnected and unbound state.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSecureSocket::BSecureSocket(const BNetworkAddress& peer, bigtime_t timeout = B_INFINITE_TIMEOUT)
+	\brief Creates a socket to \a peer and tries to connect to that endpoint
+		until \a timeout is reached.
+
+	It initializes an SSL session by which the connection should be channeled.
+
+	\param[in] peer The peer's network address.
+	\param[in] timeout The timeout in microseconds or \c B_INFINITE_TIMEOUT.
+		This is used for subsequent reads and writes as well.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSecureSocket::BSecureSocket(const BSecureSocket& other)
+	\brief Copy constructor.
+
+	The copied object accesses the same underlying socket.
+
+	\param[in] other The other BSecureSocket object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BSecureSocket::~BSecureSocket()
+	\brief Destructor.
+
+	Disconnects the socket and releases any SSL resources.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual bool BSecureSocket::CertificateVerificationFailed(BCertificate& certificate, const char* message)
+	\brief Callback method triggered when a certificate verification fails.
+
+	The default implementation returns \c false.
+	This will cancel the connection. Applications could subclass BSecureSocket
+	to allow the user to check the certificate manually, or validate it on
+	their own, before letting the connection continue anyways.
+
+	\param[out] certificate The certificate in the certificate chain that
+		could not be validated.
+	\param message The error message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BSecureSocket::InitCheck()
+	\brief Returns the initialization status.
+
+	\returns \c B_OK if the object was properly initialized or an error code
+		otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout = B_INFINITE_TIMEOUT)
+	\brief Connect the socket to the given \a peer.
+
+	It also creates an SSL session for encrypted communication.
+
+	The socket is disconnected from any previous connections.
+
+	\returns \c B_OK if the connection was performed successfully or an error
+		code otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BSecureSocket::Disconnect()
+	\brief Close the connection.
+
+	It also closes the current SSL session.
+
+	The socket becomes disconnected and unbound. You can Connect or Bind it
+	again, either to the same or another peer.
+
+	\since Haiku R1
+*/
+
