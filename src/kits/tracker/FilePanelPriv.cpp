@@ -1163,44 +1163,43 @@ TFilePanel::SetButtonLabel(file_panel_button selector, const char* text)
 {
 	switch (selector) {
 		case B_CANCEL_BUTTON:
-			{
-				BButton* button
-					= dynamic_cast<BButton*>(FindView("cancel button"));
-				if (button == NULL)
-					break;
+		{
+			BButton* button = dynamic_cast<BButton*>(FindView("cancel button"));
+			if (button == NULL)
+				break;
 
+			float old_width = button->StringWidth(button->Label());
+			button->SetLabel(text);
+			float delta = old_width - button->StringWidth(text);
+			if (delta) {
+				button->MoveBy(delta, 0);
+				button->ResizeBy(-delta, 0);
+			}
+			break;
+		}
+
+		case B_DEFAULT_BUTTON:
+		{
+			fButtonText = text;
+			float delta = 0;
+			BButton* button = dynamic_cast<BButton*>(FindView("default button"));
+			if (button != NULL) {
 				float old_width = button->StringWidth(button->Label());
 				button->SetLabel(text);
-				float delta = old_width - button->StringWidth(text);
+				delta = old_width - button->StringWidth(text);
 				if (delta) {
 					button->MoveBy(delta, 0);
 					button->ResizeBy(-delta, 0);
 				}
 			}
-			break;
 
-		case B_DEFAULT_BUTTON:
-			{
-				fButtonText = text;
-				float delta = 0;
-				BButton* button
-					= dynamic_cast<BButton*>(FindView("default button"));
-				if (button != NULL) {
-					float old_width = button->StringWidth(button->Label());
-					button->SetLabel(text);
-					delta = old_width - button->StringWidth(text);
-					if (delta) {
-						button->MoveBy(delta, 0);
-						button->ResizeBy(-delta, 0);
-					}
-				}
+			// now must move cancel button
+			button = dynamic_cast<BButton*>(FindView("cancel button"));
+			if (button != NULL)
+				button->MoveBy(delta, 0);
 
-				// now must move cancel button
-				button = dynamic_cast<BButton*>(FindView("cancel button"));
-				if (button != NULL)
-					button->MoveBy(delta, 0);
-			}
 			break;
+		}
 	}
 }
 
@@ -1211,8 +1210,7 @@ TFilePanel::SetSaveText(const char* text)
 	if (text == NULL)
 		return;
 
-	BTextControl* textControl
-		= dynamic_cast<BTextControl*>(FindView("text view"));
+	BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("text view"));
 	if (textControl != NULL) {
 		textControl->SetText(text);
 		if (textControl->TextView() != NULL)
@@ -1410,6 +1408,7 @@ TFilePanel::MessageReceived(BMessage* message)
 				HandleSaveButton();
 			} else
 				HandleOpenButton();
+
 			break;
 
 		case B_OBSERVER_NOTICE_CHANGE:
