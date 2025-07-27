@@ -322,8 +322,9 @@ OpenWithContainerWindow::KeyDownFilter(BMessage* message, BHandler**,
 	if (message->FindInt8("byte", (int8*)&key) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
-	int32 modifiers = 0;
-	message->FindInt32("modifiers", &modifiers);
+	int32 modifiers = message->GetInt32("modifiers", 0);
+	modifiers &= B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_CONTROL_KEY | B_MENU_KEY;
+
 	if (modifiers == 0 && key == B_ESCAPE) {
 		filter->Looper()->PostMessage(kCancelButton);
 		return B_SKIP_MESSAGE;
