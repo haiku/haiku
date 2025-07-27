@@ -130,6 +130,7 @@ key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 		return B_DISPATCH_MESSAGE;
 
 	int32 modifiers = message->GetInt32("modifiers", 0);
+	modifiers &= B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_CONTROL_KEY | B_MENU_KEY;
 
 	if ((modifiers & B_COMMAND_KEY) != 0) {
 		switch (key) {
@@ -150,7 +151,7 @@ key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 		if (view->ActivePose() != NULL)
 			view->CommitActivePose(false);
 		else if (view->IsTypeAheadFiltering())
-			BMessenger(panel).SendMessage(B_CANCEL, *handler);
+			BMessenger(panel->PoseView()).SendMessage(B_CANCEL, *handler);
 		else
 			BMessenger(panel).SendMessage(kCancelButton);
 
