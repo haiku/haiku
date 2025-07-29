@@ -106,6 +106,7 @@ KernelMergeObject kernel_lib_posix.o :
 	close.c
 	directory.c
 	dup.c
+	hostname.cpp
 	ioctl.c
 	link.c
 	lseek.c

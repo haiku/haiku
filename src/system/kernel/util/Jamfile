@@ -6,7 +6,6 @@ KernelMergeObject kernel_util.o :
 	AVLTreeBase.cpp
 	Bitmap.cpp
 	convertutf.cpp
-	hostname.cpp
 	inet_addr.c
 	inet_ntop.c
 	kernel_cpp.cpp
