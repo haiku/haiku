@@ -216,14 +216,14 @@ typedef BOpenHashTable<TransactionHash> TransactionTable;
 
 
 struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
-	BlockTable*		hash;
 	mutex			lock;
+	BlockTable		hash;
 	const int		fd;
 	off_t			max_blocks;
 	const size_t	block_size;
 	int32			next_transaction_id;
 	cache_transaction* last_transaction;
-	TransactionTable* transaction_hash;
+	TransactionTable transaction_hash;
 
 	object_cache*	buffer_cache;
 	block_list		unused_blocks;
@@ -1075,7 +1075,7 @@ delete_transaction(block_cache* cache, cache_transaction* transaction)
 static cache_transaction*
 lookup_transaction(block_cache* cache, int32 id)
 {
-	return cache->transaction_hash->Lookup(id);
+	return cache->transaction_hash.Lookup(id);
 }
 
 
@@ -1399,9 +1399,9 @@ BlockWriter::_BlockDone(cached_block* block,
 				// use RemoveUnchecked so the iterator is still valid. A regular
 				// Remove can trigger a resize of the hash table which would
 				// result in the linked items in the table changing order.
-				fCache->transaction_hash->RemoveUnchecked(transaction);
+				fCache->transaction_hash.RemoveUnchecked(transaction);
 			} else
-				fCache->transaction_hash->Remove(previous);
+				fCache->transaction_hash.Remove(previous);
 
 			delete_transaction(fCache, previous);
 			fDeletedTransaction = true;
@@ -1496,7 +1496,7 @@ BlockPrefetcher::Allocate()
 				B_PRIdOFF ")", blockNumIter, fCache->max_blocks - 1);
 			return B_BAD_VALUE;
 		}
-		cached_block* block = fCache->hash->Lookup(blockNumIter);
+		cached_block* block = fCache->hash.Lookup(blockNumIter);
 		if (block != NULL) {
 			// truncate the request
 			TRACE(("BlockPrefetcher::Allocate: found an existing block (%" B_PRIdOFF ")\n",
@@ -1514,7 +1514,7 @@ BlockPrefetcher::Allocate()
 			_RemoveAllocated(0, i);
 			return B_NO_MEMORY;
 		}
-		fCache->hash->Insert(block);
+		fCache->hash.Insert(block);
 
 		block->unused = true;
 		fCache->unused_blocks.Add(block);
@@ -1639,13 +1639,11 @@ BlockPrefetcher::_RemoveAllocated(size_t unbusyCount, size_t removeCount)
 block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 		bool readOnly)
 	:
-	hash(NULL),
 	fd(_fd),
 	max_blocks(numBlocks),
 	block_size(blockSize),
 	next_transaction_id(1),
 	last_transaction(NULL),
-	transaction_hash(NULL),
 	buffer_cache(NULL),
 	unused_block_count(0),
 	busy_reading_count(0),
@@ -1665,9 +1663,6 @@ block_cache::~block_cache()
 {
 	unregister_low_resource_handler(&_LowMemoryHandler, this);
 
-	delete transaction_hash;
-	delete hash;
-
 	delete_object_cache(buffer_cache);
 
 	mutex_destroy(&lock);
@@ -1677,22 +1672,21 @@ block_cache::~block_cache()
 status_t
 block_cache::Init()
 {
+	mutex_init(&lock, "block cache");
+
 	busy_reading_condition.Init(this, "cache block busy_reading");
 	busy_writing_condition.Init(this, "cache block busy writing");
 	condition_variable.Init(this, "cache transaction sync");
-	mutex_init(&lock, "block cache");
 
 	buffer_cache = create_object_cache("block cache buffers", block_size,
 		CACHE_NO_DEPOT | CACHE_LARGE_SLAB);
 	if (buffer_cache == NULL)
 		return B_NO_MEMORY;
 
-	hash = new BlockTable();
-	if (hash == NULL || hash->Init(1024) != B_OK)
+	if (hash.Init(1024) != B_OK)
 		return B_NO_MEMORY;
 
-	transaction_hash = new(std::nothrow) TransactionTable();
-	if (transaction_hash == NULL || transaction_hash->Init(16) != B_OK)
+	if (transaction_hash.Init(16) != B_OK)
 		return B_NO_MEMORY;
 
 	return register_low_resource_handler(&_LowMemoryHandler, this,
@@ -1848,7 +1842,7 @@ block_cache::RemoveUnusedBlocks(int32 count, int32 minSecondsOld)
 void
 block_cache::RemoveBlock(cached_block* block)
 {
-	hash->Remove(block);
+	hash.Remove(block);
 	FreeBlock(block);
 }
 
@@ -1940,7 +1934,7 @@ block_cache::_GetUnusedBlock()
 		// remove block from lists
 		iterator.Remove();
 		unused_block_count--;
-		hash->Remove(block);
+		hash.Remove(block);
 
 		ASSERT(block->original_data == NULL && block->parent_data == NULL);
 		block->unused = false;
@@ -2116,7 +2110,7 @@ put_cached_block(block_cache* cache, off_t blockNumber)
 			blockNumber, cache->max_blocks - 1);
 	}
 
-	cached_block* block = cache->hash->Lookup(blockNumber);
+	cached_block* block = cache->hash.Lookup(blockNumber);
 	if (block != NULL)
 		put_cached_block(cache, block);
 	else {
@@ -2149,7 +2143,7 @@ get_cached_block(block_cache* cache, off_t blockNumber, bool* _allocated,
 	}
 
 retry:
-	cached_block* block = cache->hash->Lookup(blockNumber);
+	cached_block* block = cache->hash.Lookup(blockNumber);
 	*_allocated = false;
 
 	if (block == NULL) {
@@ -2158,7 +2152,7 @@ retry:
 		if (block == NULL)
 			return B_NO_MEMORY;
 
-		cache->hash->Insert(block);
+		cache->hash.Insert(block);
 		*_allocated = true;
 	} else if (block->busy_reading) {
 		// The block is currently busy_reading - wait and try again later
@@ -2483,7 +2477,7 @@ dump_cache(int argc, char** argv)
 	off_t blockNumber = -1;
 	if (i + 1 < argc) {
 		blockNumber = parse_expression(argv[i + 1]);
-		cached_block* block = cache->hash->Lookup(blockNumber);
+		cached_block* block = cache->hash.Lookup(blockNumber);
 		if (block != NULL)
 			dump_block_long(block);
 		else
@@ -2521,7 +2515,7 @@ dump_cache(int argc, char** argv)
 		kprintf(" transactions:\n");
 		kprintf("address       id state  blocks  main   sub\n");
 
-		TransactionTable::Iterator iterator(cache->transaction_hash);
+		TransactionTable::Iterator iterator(&cache->transaction_hash);
 
 		while (iterator.HasNext()) {
 			cache_transaction* transaction = iterator.Next();
@@ -2543,7 +2537,7 @@ dump_cache(int argc, char** argv)
 	uint32 count = 0;
 	uint32 dirty = 0;
 	uint32 discarded = 0;
-	BlockTable::Iterator iterator(cache->hash);
+	BlockTable::Iterator iterator(&cache->hash);
 	while (iterator.HasNext()) {
 		cached_block* block = iterator.Next();
 		if (showBlocks)
@@ -2851,7 +2845,7 @@ block_notifier_and_writer(void* /*data*/)
 			if (cache->num_dirty_blocks) {
 				// This cache is not using transactions, we'll scan the blocks
 				// directly
-				BlockTable::Iterator iterator(cache->hash);
+				BlockTable::Iterator iterator(&cache->hash);
 
 				while (iterator.HasNext()) {
 					cached_block* block = iterator.Next();
@@ -2861,7 +2855,7 @@ block_notifier_and_writer(void* /*data*/)
 					}
 				}
 			} else {
-				TransactionTable::Iterator iterator(cache->transaction_hash);
+				TransactionTable::Iterator iterator(&cache->transaction_hash);
 
 				while (iterator.HasNext()) {
 					cache_transaction* transaction = iterator.Next();
@@ -3059,7 +3053,7 @@ cache_start_transaction(void* _cache)
 	TRACE(("cache_start_transaction(): id %" B_PRId32 " started\n", transaction->id));
 	T(Action("start", cache, transaction));
 
-	cache->transaction_hash->Insert(transaction);
+	cache->transaction_hash.Insert(transaction);
 
 	return transaction->id;
 }
@@ -3078,7 +3072,7 @@ cache_sync_transaction(void* _cache, int32 id)
 		hadBusy = false;
 
 		BlockWriter writer(cache);
-		TransactionTable::Iterator iterator(cache->transaction_hash);
+		TransactionTable::Iterator iterator(&cache->transaction_hash);
 
 		while (iterator.HasNext()) {
 			// close all earlier transactions which haven't been closed yet
@@ -3224,7 +3218,7 @@ cache_abort_transaction(void* _cache, int32 id)
 			block->is_dirty = false;
 	}
 
-	cache->transaction_hash->Remove(transaction);
+	cache->transaction_hash.Remove(transaction);
 	delete_transaction(cache, transaction);
 	return B_OK;
 }
@@ -3331,7 +3325,7 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 	transaction->num_blocks = transaction->main_num_blocks;
 	transaction->sub_num_blocks = 0;
 
-	cache->transaction_hash->Insert(newTransaction);
+	cache->transaction_hash.Insert(newTransaction);
 	cache->last_transaction = newTransaction;
 
 	return newTransaction->id;
@@ -3634,7 +3628,7 @@ cache_has_block_in_transaction(void* _cache, int32 id, off_t blockNumber)
 	block_cache* cache = (block_cache*)_cache;
 	TransactionLocker locker(cache);
 
-	cached_block* block = cache->hash->Lookup(blockNumber);
+	cached_block* block = cache->hash.Lookup(blockNumber);
 
 	return (block != NULL && block->transaction != NULL
 		&& block->transaction->id == id);
@@ -3664,7 +3658,7 @@ block_cache_delete(void* _cache, bool allowWrites)
 
 	// free all blocks
 
-	cached_block* block = cache->hash->Clear(true);
+	cached_block* block = cache->hash.Clear(true);
 	while (block != NULL) {
 		cached_block* next = block->next;
 		cache->FreeBlock(block);
@@ -3673,7 +3667,7 @@ block_cache_delete(void* _cache, bool allowWrites)
 
 	// free all transactions (they will all be aborted)
 
-	cache_transaction* transaction = cache->transaction_hash->Clear(true);
+	cache_transaction* transaction = cache->transaction_hash.Clear(true);
 	while (transaction != NULL) {
 		cache_transaction* next = transaction->next;
 		delete transaction;
@@ -3715,7 +3709,7 @@ block_cache_sync(void* _cache)
 	MutexLocker locker(&cache->lock);
 
 	BlockWriter writer(cache);
-	BlockTable::Iterator iterator(cache->hash);
+	BlockTable::Iterator iterator(&cache->hash);
 
 	while (iterator.HasNext()) {
 		cached_block* block = iterator.Next();
@@ -3753,7 +3747,7 @@ block_cache_sync_etc(void* _cache, off_t blockNumber, size_t numBlocks)
 	BlockWriter writer(cache);
 
 	for (; numBlocks > 0; numBlocks--, blockNumber++) {
-		cached_block* block = cache->hash->Lookup(blockNumber);
+		cached_block* block = cache->hash.Lookup(blockNumber);
 		if (block == NULL)
 			continue;
 
@@ -3787,7 +3781,7 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 	BlockWriter writer(cache);
 
 	for (size_t i = 0; i < numBlocks; i++, blockNumber++) {
-		cached_block* block = cache->hash->Lookup(blockNumber);
+		cached_block* block = cache->hash.Lookup(blockNumber);
 		if (block != NULL && block->previous_transaction != NULL)
 			writer.Add(block);
 	}
@@ -3799,7 +3793,7 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 		// reset blockNumber to its original value
 
 	for (size_t i = 0; i < numBlocks; i++, blockNumber++) {
-		cached_block* block = cache->hash->Lookup(blockNumber);
+		cached_block* block = cache->hash.Lookup(blockNumber);
 		if (block == NULL)
 			continue;
 
@@ -3947,7 +3941,7 @@ block_cache_set_dirty(void* _cache, off_t blockNumber, bool dirty,
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
-	cached_block* block = cache->hash->Lookup(blockNumber);
+	cached_block* block = cache->hash.Lookup(blockNumber);
 	if (block == NULL)
 		return B_BAD_VALUE;
 	if (block->is_dirty == dirty) {
