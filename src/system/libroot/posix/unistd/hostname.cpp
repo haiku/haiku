@@ -35,6 +35,11 @@ get_path(char *path, bool create)
 extern "C" int
 sethostname(const char *hostName, size_t nameSize)
 {
+	if (nameSize > MAXHOSTNAMELEN) {
+		__set_errno(EINVAL);
+		return -1;
+	}
+
 	char path[B_PATH_NAME_LENGTH];
 	if (get_path(path, false) != B_OK) {
 		__set_errno(B_ERROR);
@@ -45,7 +50,6 @@ sethostname(const char *hostName, size_t nameSize)
 	if (file < 0)
 		return -1;
 
-	nameSize = min_c(nameSize, MAXHOSTNAMELEN);
 	ftruncate(file, nameSize + 1);
 
 	if (write(file, hostName, nameSize) != (ssize_t)nameSize
