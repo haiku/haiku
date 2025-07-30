@@ -226,6 +226,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	TransactionTable transaction_hash;
 
 	object_cache*	buffer_cache;
+	spinlock		unused_blocks_lock;
 	block_list		unused_blocks;
 	uint32			unused_block_count;
 
@@ -1673,6 +1674,7 @@ status_t
 block_cache::Init()
 {
 	rw_lock_init(&lock, "block cache");
+	B_INITIALIZE_SPINLOCK(&unused_blocks_lock);
 
 	busy_reading_condition.Init(this, "cache block busy_reading");
 	busy_writing_condition.Init(this, "cache block busy writing");
@@ -1927,6 +1929,7 @@ block_cache::_GetUnusedBlock()
 	for (block_list::Iterator iterator = unused_blocks.GetIterator();
 			cached_block* block = iterator.Next();) {
 		TB(Flush(this, block, true));
+
 		// this can only happen if no transactions are used
 		if (block->is_dirty && !block->busy_writing && !block->discard)
 			BlockWriter::WriteBlock(this, block);
@@ -2059,11 +2062,16 @@ wait_for_busy_writing_blocks(block_cache* cache)
 	but not necessarily the \a block it just released.
 */
 static void
-put_cached_block(block_cache* cache, cached_block* block)
+put_cached_block(block_cache* cache, cached_block* block, WriteLocker* writeLocker = NULL)
 {
 #if BLOCK_CACHE_DEBUG_CHANGED
-	if (!block->is_dirty && block->compare != NULL
-		&& memcmp(block->current_data, block->compare, cache->block_size)) {
+	if (block->compare != NULL
+			&& memcmp(block->current_data, block->compare, cache->block_size) != 0) {
+		if (writeLocker != NULL && !writeLocker->IsLocked()) {
+			rw_lock_read_unlock(&cache->lock);
+			writeLocker->Lock();
+		}
+
 		TRACE_ALWAYS("new block:\n");
 		dump_block((const char*)block->current_data, 256, "  ");
 		TRACE_ALWAYS("unchanged block:\n");
@@ -2077,13 +2085,36 @@ put_cached_block(block_cache* cache, cached_block* block)
 #endif
 	TB(Put(cache, block));
 
+	if (writeLocker != NULL && !writeLocker->IsLocked()) {
+#ifdef _KERNEL_MODE
+		// We must hold a read-lock only. Try the quick way out.
+		if (!block->discard && !block->is_writing
+				&& block->transaction == NULL
+				&& block->previous_transaction == NULL) {
+			if (atomic_add(&block->ref_count, -1) == 1) {
+				InterruptsSpinLocker unusedLocker(cache->unused_blocks_lock);
+				if (atomic_get(&block->ref_count) == 0 && !block->unused) {
+					cache->unused_blocks.Add(block);
+					cache->unused_block_count++;
+					block->unused = true;
+				}
+			}
+			return;
+		}
+#endif
+
+		rw_lock_read_unlock(&cache->lock);
+		writeLocker->Lock();
+	}
+
 	if (block->ref_count < 1) {
 		panic("Invalid ref_count for block %p, cache %p\n", block, cache);
 		return;
 	}
 
 	if (--block->ref_count == 0
-		&& block->transaction == NULL && block->previous_transaction == NULL) {
+			&& block->transaction == NULL
+			&& block->previous_transaction == NULL) {
 		// This block is not used anymore, and not part of any transaction
 		block->is_writing = false;
 
@@ -2103,7 +2134,7 @@ put_cached_block(block_cache* cache, cached_block* block)
 
 
 static void
-put_cached_block(block_cache* cache, off_t blockNumber)
+put_cached_block(block_cache* cache, off_t blockNumber, WriteLocker* writeLocker = NULL)
 {
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
 		panic("put_cached_block: invalid block number %" B_PRIdOFF " (max %" B_PRIdOFF ")",
@@ -2111,9 +2142,9 @@ put_cached_block(block_cache* cache, off_t blockNumber)
 	}
 
 	cached_block* block = cache->hash.Lookup(blockNumber);
-	if (block != NULL)
-		put_cached_block(cache, block);
-	else {
+	if (block != NULL) {
+		put_cached_block(cache, block, writeLocker);
+	} else {
 		TB(Error(cache, blockNumber, "put unknown"));
 	}
 }
@@ -2255,6 +2286,13 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber,
 			cache->num_dirty_blocks++;
 			block->is_dirty = true;
 				// mark the block as dirty
+
+#if BLOCK_CACHE_DEBUG_CHANGED
+			if (block->compare != NULL) {
+				cache->Free(block->compare);
+				block->compare = NULL;
+			}
+#endif
 		}
 
 		TB(Get(cache, block));
@@ -2354,6 +2392,13 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber,
 	}
 
 	block->is_dirty = true;
+
+#if BLOCK_CACHE_DEBUG_CHANGED
+	if (block->compare != NULL) {
+		cache->Free(block->compare);
+		block->compare = NULL;
+	}
+#endif
 	TB(Get(cache, block));
 	TB2(BlockData(cache, block, "get writable"));
 
@@ -3894,20 +3939,50 @@ status_t
 block_cache_get_etc(void* _cache, off_t blockNumber, const void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
-	WriteLocker locker(&cache->lock);
-	bool allocated;
 
+	WriteLocker writeLocker(&cache->lock, false, false);
+
+#ifndef _KERNEL_MODE
 	cached_block* block;
-	status_t status = get_cached_block(cache, blockNumber, &allocated, true,
-		&block);
-	if (status != B_OK)
-		return status;
+	{
+#else
+	rw_lock_read_lock(&cache->lock);
+	cached_block* block = cache->hash.Lookup(blockNumber);
+	if (block != NULL && !block->busy_reading) {
+		// Block exists and is read in: quick way out.
+		if (atomic_add(&block->ref_count, 1) == 0) {
+			InterruptsSpinLocker unusedLocker(cache->unused_blocks_lock);
+			if (block->unused) {
+				cache->unused_blocks.Remove(block);
+				cache->unused_block_count--;
+				block->unused = false;
+			}
+		}
+		atomic_set(&block->last_accessed, system_time() / 1000000L);
+		rw_lock_read_unlock(&cache->lock);
+	} else {
+		rw_lock_read_unlock(&cache->lock);
+#endif
+		writeLocker.Lock();
+
+		bool allocated;
+		status_t status = get_cached_block(cache, blockNumber, &allocated, true,
+			&block);
+		if (status != B_OK)
+			return status;
+	}
 
 #if BLOCK_CACHE_DEBUG_CHANGED
-	if (block->compare == NULL)
-		block->compare = cache->Allocate();
-	if (block->compare != NULL)
-		memcpy(block->compare, block->current_data, cache->block_size);
+	if (block->compare == NULL) {
+		if (!writeLocker.IsLocked())
+			writeLocker.Lock();
+
+		if (block->compare == NULL && !block->is_dirty) {
+			block->compare = cache->Allocate();
+			if (block->compare != NULL)
+				memcpy(block->compare, block->current_data, cache->block_size);
+		}
+	}
 #endif
 	TB(Get(cache, block));
 
@@ -3961,9 +4036,13 @@ void
 block_cache_put(void* _cache, off_t blockNumber)
 {
 	block_cache* cache = (block_cache*)_cache;
-	WriteLocker locker(&cache->lock);
+	WriteLocker locker(&cache->lock, false, false);
+	rw_lock_read_lock(&cache->lock);
 
-	put_cached_block(cache, blockNumber);
+	put_cached_block(cache, blockNumber, &locker);
+
+	if (!locker.IsLocked())
+		rw_lock_read_unlock(&cache->lock);
 }
 
 
