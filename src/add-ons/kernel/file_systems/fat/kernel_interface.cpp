@@ -575,13 +575,14 @@ dosfs_write_fs_stat(fs_volume* volume, const struct fs_info* info, uint32 mask)
 	// update the label file if there is one
 	if (bsdVolume->mnt_volentry >= 0) {
 		uint8* rootDirBuffer;
-		daddr_t rootDirBlock = fatVolume->pm_rootdirblk;
+		daddr_t rootDirSector = fatVolume->pm_rootdirblk;
 		if (FAT32(fatVolume) == true)
-			rootDirBlock = cntobn(fatVolume, fatVolume->pm_rootdirblk);
+			rootDirSector = cntobn(fatVolume, fatVolume->pm_rootdirblk);
+		rootDirSector = BLOCK_TO_SECTOR(fatVolume, rootDirSector);
 		daddr_t dirOffset = bsdVolume->mnt_volentry * sizeof(direntry);
-		rootDirBlock += dirOffset / DEV_BSIZE;
+		rootDirSector += dirOffset / fatVolume->pm_BytesPerSec;
 
-		status = block_cache_get_writable_etc(blockCache, rootDirBlock, -1,
+		status = block_cache_get_writable_etc(blockCache, rootDirSector, -1,
 			reinterpret_cast<void**>(&rootDirBuffer));
 		if (status == B_OK) {
 			direntry* label_direntry = reinterpret_cast<direntry*>(rootDirBuffer + dirOffset);
@@ -593,10 +594,10 @@ dosfs_write_fs_stat(fs_volume* volume, const struct fs_info* info, uint32 mask)
 				memcpy(label_direntry->deName, name, LABEL_LENGTH);
 			} else {
 				INFORM("wfsstat: root directory position check failed\n");
-				block_cache_set_dirty(blockCache, rootDirBlock, false, -1);
+				block_cache_set_dirty(blockCache, rootDirSector, false, -1);
 				status = B_ERROR;
 			}
-			block_cache_put(blockCache, rootDirBlock);
+			block_cache_put(blockCache, rootDirSector);
 		}
 	} else {
 		// A future enhancement could be to create a label direntry if none exists already.
@@ -1213,9 +1214,11 @@ _dosfs_fsync(struct vnode* bsdNode)
 		if (externStatus != B_OK)
 			REPORT_ERROR(externStatus);
 	} else {
-		size_t fatBlocks = (fatVolume->pm_fatsize * fatVolume->pm_FATs) / DEV_BSIZE;
+		off_t fatFirstSector = fatVolume->pm_fatblk / fatVolume->pm_BytesPerSec;
+		size_t fatSectors = (fatVolume->pm_fatsize * fatVolume->pm_FATs)
+			/ fatVolume->pm_BytesPerSec;
 		status_t fatStatus
-			= block_cache_sync_etc(bsdVolume->mnt_cache, fatVolume->pm_fatblk, fatBlocks);
+			= block_cache_sync_etc(bsdVolume->mnt_cache, fatFirstSector, fatSectors);
 		if (fatStatus != B_OK) {
 			externStatus = fatStatus;
 			REPORT_ERROR(fatStatus);
@@ -3309,14 +3312,6 @@ bsd_device_init(mount* bsdVolume, const dev_t devID, const char* deviceFile, cde
 		*_readOnly = true;
 	}
 
-	if (geometry->bytes_per_sector != 0x200) {
-		// FAT is compatible with 0x400, 0x800, and 0x1000 as well, but this driver has not
-		// been tested with those values
-		INFORM("The FAT driver does not currently support write access to volumes with > 1 block "
-			"per sector\n");
-		*_readOnly = true;
-	}
-
 	if (*_readOnly == false) {
 		// reopen it with read/write permissions
 		close(device->si_fd);
@@ -3652,6 +3647,7 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 		fatVolume->pm_fatblocksize = 3 * 512;
 	else
 		fatVolume->pm_fatblocksize = DEV_BSIZE;
+	fatVolume->pm_fatblocksize = roundup(fatVolume->pm_fatblocksize, fatVolume->pm_BytesPerSec);
 	fatVolume->pm_fatblocksec = fatVolume->pm_fatblocksize / DEV_BSIZE;
 	fatVolume->pm_bnshift = ffs(DEV_BSIZE) - 1;
 
@@ -3679,9 +3675,17 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 		INFORM("si_geometry not initialized\n");
 		return B_ERROR;
 	}
+
+	// mkfs.fat sets the BytesPerSec value in the BPB based on the -S command line parameter,
+	// not on the properties of the underlying device.
+	if (dev->si_geometry->bytes_per_sector > fatVolume->pm_BytesPerSec) {
+		INFORM("Volume was formatted with %u-byte sectors, but device can support %" B_PRIu32
+			"-byte sectors.\n", fatVolume->pm_BytesPerSec, dev->si_geometry->bytes_per_sector);
+	}
+
 	uint32 fsSectors = fatVolume->pm_HugeSectors / fatVolume->pm_BlkPerSec;
 		// convert back from 512-byte blocks to sectors
-	if (fsSectors > dev->si_mediasize / dev->si_geometry->bytes_per_sector) {
+	if (fsSectors > dev->si_mediasize / fatVolume->pm_BytesPerSec) {
 		INFORM("dosfs: volume extends past end of partition, mounting read-only\n");
 		readOnly = true;
 	}
@@ -3691,9 +3695,10 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 		// given the size of the FAT table, how many sectors do we expect to have in the volume?
 		uint32 fatSectors = fatVolume->pm_FATsecs / fatVolume->pm_BlkPerSec;
 			// convert back from 512-byte blocks to sectors
-		uint32 minUsedFatSectors = fatSectors - 8 - (SECTORS_PER_CLUSTER(fatVolume) - 1);
+		uint32 minUsedFatSectors = fatSectors - (fatSectors / 64)
+			- (SECTORS_PER_CLUSTER(fatVolume) - 1);
 			// The math recommended by Microsoft to estimate required FAT sectors at initialization
-			// may overestimate by up to 8 sectors; fsck.fat also aligns the FAT to cluster size
+			// may overestimate the requirement; mkfs.fat also aligns the FAT to cluster size
 		uint32 fatEntriesPerSector = fatVolume->pm_BytesPerSec / 4;
 		uint32 minFatEntries = minUsedFatSectors * fatEntriesPerSector - (fatEntriesPerSector - 1);
 			// the last utilized sector of a FAT contains at least one entry
@@ -3712,13 +3717,9 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 	if (status != B_OK)
 		RETURN_ERROR(status);
 
-	// Set up the block cache.
-	// If the cached block size is ever changed, functions that work with the block cache
-	// will need to be re-examined because they assume a size of 512 bytes
-	// (e.g. dosfs_fsync, read_fsinfo, write_fsinfo, sync_clusters, discard_clusters,
-	// dosfs_write_fs_stat, and the functions defined in vfs_bio.c).
+	// set up the block cache to use sector-size blocks
 	bsdVolume->mnt_cache
-		= block_cache_create(dev->si_fd, fatVolume->pm_HugeSectors, CACHED_BLOCK_SIZE, readOnly);
+		= block_cache_create(dev->si_fd, fsSectors, fatVolume->pm_BytesPerSec, readOnly);
 	if (bsdVolume->mnt_cache == NULL)
 		return B_ERROR;
 

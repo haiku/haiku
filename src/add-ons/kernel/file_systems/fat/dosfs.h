@@ -14,7 +14,6 @@
 #endif
 
 
-#define CACHED_BLOCK_SIZE 512
 #define BUF_CACHE_SIZE 20
 
 // notify every second if the file size has changed
@@ -33,6 +32,9 @@
 #define SECTORS_PER_CLUSTER(fat_volume) \
 	((fat_volume->pm_bpcluster) / (fat_volume->pm_BlkPerSec * DEV_BSIZE))
 #define BLOCKS_PER_CLUSTER(fatVolume) (fatVolume->pm_bpcluster / DEV_BSIZE)
+
+// convert a block number from DEV_BSIZE units to volume-specific sector units
+#define BLOCK_TO_SECTOR(fat_volume, block) ((block * DEV_BSIZE) / fat_volume->pm_BytesPerSec)
 
 #define vIS_DATA_CLUSTER(fatVolume, cluster) \
 	(((cluster) >= 2) && ((uint32)(cluster) <= fatVolume->pm_maxcluster))

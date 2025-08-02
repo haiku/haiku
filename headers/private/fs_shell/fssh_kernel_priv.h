@@ -46,6 +46,7 @@
 
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 #define ROUNDDOWN(a, b) (((a) / (b)) * (b))
+#define HOWMANY(a, b)	(((a) + ((b) - 1)) / (b))
 
 
 #define CHECK_BIT(a, b) ((a) & (1 << (b)))

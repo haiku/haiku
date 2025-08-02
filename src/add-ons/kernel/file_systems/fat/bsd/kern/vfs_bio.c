@@ -138,15 +138,16 @@ _bwrite(struct buf* buf)
 			return EIO;
 	} else if (buf->b_owned == false) {
 		// put the single block cache block that was modified
-		block_cache_put(blockCache, buf->b_blkno);
+		block_cache_put(blockCache, BLOCK_TO_SECTOR(fatVolume, buf->b_blkno));
 	} else {
+		size_t cBlockSize = fatVolume->pm_BytesPerSec;
+		off_t cachedBlock = BLOCK_TO_SECTOR(fatVolume, buf->b_blkno);
 		// copy b_data into mutiple block cache blocks and put them
-		uint32 cBlockCount = buf->b_bufsize / CACHED_BLOCK_SIZE;
+		uint32 cBlockCount = buf->b_bufsize / cBlockSize;
 		uint32 i;
 		for (i = 0; i < cBlockCount && buf->b_bcpointers[i] != NULL; ++i) {
-			memcpy((caddr_t)buf->b_bcpointers[i], buf->b_data + (i * CACHED_BLOCK_SIZE),
-				CACHED_BLOCK_SIZE);
-			block_cache_put(blockCache, buf->b_blkno + i);
+			memcpy((caddr_t)buf->b_bcpointers[i], buf->b_data + (i * cBlockSize), cBlockSize);
+			block_cache_put(blockCache, cachedBlock + i);
 			buf->b_bcpointers[i] = NULL;
 		}
 	}
@@ -184,13 +185,16 @@ bawrite(struct buf* bp)
 		if (bp->b_vreg->v_resizing == false)
 			file_cache_sync(bp->b_vreg->v_cache);
 	} else {
-		void* blockCache = bp->b_vp->v_rdev->si_mountpt->mnt_cache;
+		struct mount* bsdVolume = bp->b_vp->v_rdev->si_mountpt;
+		struct msdosfsmount* fatVolume = (struct msdosfsmount*)bsdVolume->mnt_data;
+		void* blockCache = bsdVolume->mnt_cache;
+		off_t cachedBlock = BLOCK_TO_SECTOR(fatVolume, bp->b_blkno);
 
 		if (bp->b_owned == false) {
-			block_cache_sync_etc(blockCache, bp->b_blkno, 1);
+			block_cache_sync_etc(blockCache, cachedBlock, 1);
 		} else {
-			block_cache_sync_etc(blockCache, bp->b_blkno,
-				howmany(bp->b_bufsize, CACHED_BLOCK_SIZE));
+			block_cache_sync_etc(blockCache, cachedBlock,
+				howmany(bp->b_bufsize, fatVolume->pm_BytesPerSec));
 		}
 	}
 
@@ -215,21 +219,23 @@ brelse(struct buf* bp)
 	}
 
 	struct mount* bsdVolume = bp->b_vp->v_rdev->si_mountpt;
+	struct msdosfsmount* fatVolume = (struct msdosfsmount*)bsdVolume->mnt_data;
 	void* blockCache = bsdVolume->mnt_cache;
+	off_t cachedBlock = BLOCK_TO_SECTOR(fatVolume, bp->b_blkno);
 	bool readOnly = MOUNTED_READ_ONLY(VFSTOMSDOSFS(bsdVolume));
 
 	if (bp->b_owned == false) {
 		if (readOnly == true)
-			block_cache_set_dirty(blockCache, bp->b_blkno, false, -1);
-		block_cache_put(blockCache, bp->b_blkno);
+			block_cache_set_dirty(blockCache, cachedBlock, false, -1);
+		block_cache_put(blockCache, cachedBlock);
 		put_buf(bp);
 	} else {
-		uint32 cBlockCount = bp->b_bufsize / CACHED_BLOCK_SIZE;
+		uint32 cBlockCount = bp->b_bufsize / fatVolume->pm_BytesPerSec;
 		uint32 i;
 		for (i = 0; i < cBlockCount && bp->b_bcpointers[i] != NULL; ++i) {
 			if (readOnly == true)
-				block_cache_set_dirty(blockCache, bp->b_blkno + i, false, -1);
-			block_cache_put(blockCache, bp->b_blkno + i);
+				block_cache_set_dirty(blockCache, cachedBlock + i, false, -1);
+			block_cache_put(blockCache, cachedBlock + i);
 			bp->b_bcpointers[i] = NULL;
 		}
 
@@ -282,6 +288,7 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 
 	uint32 i;
 	void* blockCache = NULL;
+	size_t cBlockSize = 0;
 	uint32 cBlockCount;
 		// the number of block cache blocks spanned by the client's request
 	struct buf* newBuf = NULL;
@@ -304,11 +311,12 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 	} else {
 		return ENOTSUP;
 	}
+	cBlockSize = fatVolume->pm_BytesPerSec;
 
 	// Before allocating memory for a new struct buf, try to reuse an existing one
 	// in the device vnode's lists.
 	rw_lock_write_lock(&deviceNode->v_bufobj.bo_lock.haikuRW);
-	if (size == CACHED_BLOCK_SIZE && vp->v_type != VREG
+	if ((size_t)size == cBlockSize && vp->v_type != VREG
 		&& SLIST_EMPTY(&deviceNode->v_bufobj.bo_emptybufs) == false) {
 		// Get a buf with no data space. It will just point to a block cache block.
 		newBuf = SLIST_FIRST(&deviceNode->v_bufobj.bo_emptybufs);
@@ -324,8 +332,7 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 		foundExisting = true;
 	} else if (size == (int)fatVolume->pm_fatblocksize
 		&& SLIST_EMPTY(&deviceNode->v_bufobj.bo_fatbufs) == false) {
-		// This branch will never be reached in FAT16 or FAT32 so long as pm_fatblocksize and
-		// CACHED_BLOCK_SIZE are both 512.
+		// This branch is only relevant for FAT12 volumes with 512-byte sectors.
 		newBuf = SLIST_FIRST(&deviceNode->v_bufobj.bo_fatbufs);
 		SLIST_REMOVE_HEAD(&deviceNode->v_bufobj.bo_fatbufs, link);
 		--deviceNode->v_bufobj.bo_fatblocks;
@@ -355,7 +362,7 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 	newBuf->b_vreg = vp->v_type == VREG ? vp : NULL;
 
 	ASSERT(size == newBuf->b_resid);
-	cBlockCount = howmany(size, CACHED_BLOCK_SIZE);
+	cBlockCount = howmany(size, cBlockSize);
 
 	// Three branches:
 	// For regular files, copy from file cache into b_data.
@@ -397,18 +404,20 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 			put_buf(newBuf);
 			return EIO;
 		}
-	} else if (size == CACHED_BLOCK_SIZE && vp->v_type != VREG) {
+	} else if ((size_t)size == cBlockSize && vp->v_type != VREG) {
+		off_t cachedBlock = BLOCK_TO_SECTOR(fatVolume, dblkno);
 		if (readOnly == true)
-			newBuf->b_data = (void*)block_cache_get(blockCache, dblkno);
+			newBuf->b_data = (void*)block_cache_get(blockCache, cachedBlock);
 		else
-			newBuf->b_data = block_cache_get_writable(blockCache, dblkno, -1);
+			newBuf->b_data = block_cache_get_writable(blockCache, cachedBlock, -1);
 		if (newBuf->b_data == NULL) {
 			put_buf(newBuf);
 			return EIO;
 		}
-		newBuf->b_bufsize = CACHED_BLOCK_SIZE;
+		newBuf->b_bufsize = cBlockSize;
 	} else {
 		// need to get more than one cached block and copy them to make a continuous buffer
+		off_t cachedBlock = BLOCK_TO_SECTOR(fatVolume, dblkno);
 		status = allocate_data(newBuf, size);
 		if (status != 0) {
 			put_buf(newBuf);
@@ -419,25 +428,26 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 		// for high block counts, try to get all blocks in one disk read
 		if (cBlockCount > 4) {
 			size_t prefetchBlocks = cBlockCount;
-			block_cache_prefetch(blockCache, dblkno, &prefetchBlocks);
+			block_cache_prefetch(blockCache, cachedBlock, &prefetchBlocks);
 		}
 #endif // _KERNEL_MODE
 
 		for (i = 0; i < cBlockCount; i++) {
 			if (readOnly == true)
-				newBuf->b_bcpointers[i] = (void*)block_cache_get(blockCache, dblkno + i);
+				newBuf->b_bcpointers[i] = (void*)block_cache_get(blockCache, cachedBlock + i);
 			else
-				newBuf->b_bcpointers[i] = block_cache_get_writable(blockCache, dblkno + i, -1);
+				newBuf->b_bcpointers[i] = block_cache_get_writable(blockCache, cachedBlock + i,
+					-1);
 			if (newBuf->b_bcpointers[i] == NULL) {
 				put_buf(newBuf);
 				return EIO;
 			}
 		}
 
-		ASSERT(cBlockCount * CACHED_BLOCK_SIZE == (u_long)newBuf->b_bufsize);
+		ASSERT(cBlockCount * cBlockSize == (u_long)newBuf->b_bufsize);
 		for (i = 0; i < cBlockCount; i++) {
-			memcpy(newBuf->b_data + (i * CACHED_BLOCK_SIZE), (caddr_t)newBuf->b_bcpointers[i],
-				CACHED_BLOCK_SIZE);
+			memcpy(newBuf->b_data + (i * cBlockSize), (caddr_t)newBuf->b_bcpointers[i],
+				cBlockSize);
 		}
 	}
 
@@ -492,15 +502,19 @@ bwrite(struct buf* bp)
 		}
 	} else {
 		// block cache
-		void* blockCache = bp->b_vp->v_rdev->si_mountpt->mnt_cache;
+		struct mount* bsdVolume = bp->b_vp->v_rdev->si_mountpt;
+		struct msdosfsmount* fatVolume = (struct msdosfsmount*)bsdVolume->mnt_data;
+
+		void* blockCache = bsdVolume->mnt_cache;
+		off_t cachedBlock = BLOCK_TO_SECTOR(fatVolume, bp->b_blkno);
 
 		if (bp->b_owned == false) {
 			// single block
-			status = block_cache_sync_etc(blockCache, bp->b_blkno, 1);
+			status = block_cache_sync_etc(blockCache, cachedBlock, 1);
 		} else {
 			// multiple blocks
-			status = block_cache_sync_etc(blockCache, bp->b_blkno,
-				howmany(bp->b_bufsize, CACHED_BLOCK_SIZE));
+			status = block_cache_sync_etc(blockCache, cachedBlock,
+				howmany(bp->b_bufsize, fatVolume->pm_BytesPerSec));
 		}
 	}
 
