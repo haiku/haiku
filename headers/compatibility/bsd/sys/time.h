@@ -39,6 +39,14 @@
 #define	timespecvalid_interval(a)	((a)->tv_sec >= 0	\
 	&& (a)->tv_nsec >= 0 && (&)->tv_nsec < 1000000000L)
 
+#define	TIMEVAL_TO_TIMESPEC(tv, ts) do {				\
+	(ts)->tv_sec = (tv)->tv_sec;					\
+	(ts)->tv_nsec = (tv)->tv_usec * 1000;				\
+} while (0)
+#define	TIMESPEC_TO_TIMEVAL(tv, ts) do {				\
+	(tv)->tv_sec = (ts)->tv_sec;					\
+	(tv)->tv_usec = (ts)->tv_nsec / 1000;				\
+} while (0)
 
 #ifdef __cplusplus
 extern "C" {
