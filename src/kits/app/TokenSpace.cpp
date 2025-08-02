@@ -20,10 +20,20 @@ BTokenSpace gDefaultTokens;
 	// the default token space - all handlers will go into that one
 
 
+static int32
+get_next_token(int32 token)
+{
+	if (token == INT32_MAX)
+		return 1;
+	else
+		return token + 1;
+}
+
+
 BTokenSpace::BTokenSpace()
 	:
 	BLocker("token space"),
-	fTokenCount(1)
+	fNextToken(1)
 {
 }
 
@@ -39,17 +49,24 @@ BTokenSpace::NewToken(int16 type, void* object)
 	BAutolock locker(this);
 
 	token_info tokenInfo = { type, object, NULL };
-	int32 token = fTokenCount;
+
+	int32 wraparoundToken = fNextToken;
 
 	try {
-		fTokenMap[token] = tokenInfo;
+		for (;;) {
+			int32 token = fNextToken;
+			bool done = fTokenMap.insert(std::pair(token, tokenInfo)).second;
+			fNextToken = get_next_token(token);
+
+			if (done)
+				return token;
+
+			if (fNextToken == wraparoundToken)
+				return -1;
+		}
 	} catch (std::bad_alloc& exception) {
 		return -1;
 	}
-
-	fTokenCount++;
-
-	return token;
 }
 
 
@@ -73,8 +90,8 @@ BTokenSpace::SetToken(int32 token, int16 type, void* object)
 	}
 
 	// this makes sure SetToken() plays more or less nice with NewToken()
-	if (token >= fTokenCount)
-		fTokenCount = token + 1;
+	if (token >= fNextToken)
+		fNextToken = get_next_token(token);
 
 	return true;
 }

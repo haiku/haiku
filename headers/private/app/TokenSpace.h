@@ -62,7 +62,7 @@ private:
 	typedef std::map<int32, token_info> TokenMap;
 
 			TokenMap			fTokenMap;
-			int32				fTokenCount;
+			int32				fNextToken;
 };
 
 
