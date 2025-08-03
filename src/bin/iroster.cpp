@@ -80,6 +80,16 @@ static void stop_device(const char *name)
 		delete device;
 }
 
+void usage()
+{
+	printf("iroster\t- lists/starts/stops input devices\n");
+	printf("\nUsage:\n");
+	printf("    iroster                       \t- lists currently active input devices.\n");
+	printf("    iroster [+|-]input_device_name\t- starts/stops the given input device name.\n");
+	printf("\nExample:\n");
+	printf("    iroster -\"Extended PS/2 Mouse 1\"\n");
+}
+
 int main(int argc, char *argv[])
 {
 	int i;
@@ -90,6 +100,11 @@ int main(int argc, char *argv[])
 	}
 	else {
 		for (i = 1; i < argc; i++) {
+			if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
+				usage();
+				return 0;
+			}
+
 			name = argv[i];
 			if (name[0] == '+') {
 				start_device(name + 1);
@@ -98,10 +113,9 @@ int main(int argc, char *argv[])
 				stop_device(name + 1);
 			}
 			else {
-				printf("USAGE: %s [+|-]input_device_name\n", argv[0]);
+				usage();
 			}
 		}
 	}
 	return 0;
 }
-
