@@ -1106,7 +1106,9 @@ TShortcuts::UpdateEmptyTrashItem(BMenuItem* item)
 		return;
 
 	if (fInWindow) {
-		item->SetEnabled(static_cast<TTracker*>(be_app)->TrashFull());
+		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+		if (tracker != NULL)
+			item->SetEnabled(tracker->TrashFull());
 		item->SetTarget(PoseView());
 	}
 }
