@@ -4379,10 +4379,8 @@ OutlineView::ExpandOrCollapse(BRow* parentRow, bool expand)
 			FindRect(fFocusRow, &fFocusRowRect);
 		}
 
-		if (parentRect.top < fVisibleRect.bottom) {
-			Invalidate(BRect(0, parentRect.top, fVisibleRect.right,
-				fVisibleRect.bottom));
-		}
+		Invalidate(BRect(0, parentRect.top, fVisibleRect.right,
+			fVisibleRect.bottom));
 		FixScrollBar(false);
 	}
 }
