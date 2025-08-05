@@ -4485,6 +4485,9 @@ BView::Invalidate(BRect invalRect)
 	if (!invalRect.IsValid())
 		return;
 
+	if (!fBounds.Intersects(invalRect))
+		return;
+
 	_CheckLockAndSwitchCurrent();
 
 	fOwner->fLink->StartMessage(AS_VIEW_INVALIDATE_RECT);
@@ -4506,6 +4509,9 @@ void
 BView::Invalidate(const BRegion* region)
 {
 	if (region == NULL || fOwner == NULL)
+		return;
+
+	if (!fBounds.Intersects(region->Frame()))
 		return;
 
 	_CheckLockAndSwitchCurrent();
