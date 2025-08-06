@@ -55,7 +55,7 @@ BTokenSpace::NewToken(int16 type, void* object)
 	try {
 		for (;;) {
 			int32 token = fNextToken;
-			bool done = fTokenMap.insert(std::pair(token, tokenInfo)).second;
+			bool done = fTokenMap.insert(std::make_pair(token, tokenInfo)).second;
 			fNextToken = get_next_token(token);
 
 			if (done)
