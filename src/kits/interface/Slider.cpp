@@ -972,8 +972,8 @@ BSlider::DrawText()
 	BRect bounds(Bounds());
 	BView* view = OffscreenView();
 
-	rgb_color base = ViewColor();
-	rgb_color text = HighColor();
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color text = ui_color(B_PANEL_TEXT_COLOR);
 	uint32 flags = be_control_look->Flags(this);
 
 	font_height fontHeight;
