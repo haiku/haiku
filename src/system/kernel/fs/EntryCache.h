@@ -9,20 +9,23 @@
 #include <stdlib.h>
 
 #include <util/AutoLock.h>
+#include <util/AtomicsHashTable.h>
 #include <util/DoublyLinkedList.h>
-#include <util/OpenHashTable.h>
 #include <util/StringHash.h>
 
 
 struct EntryCacheKey {
-	EntryCacheKey(ino_t dirID, const char* name)
+	EntryCacheKey(ino_t dirID, const char* name, const uint32* _hash = NULL)
 		:
 		dir_id(dirID),
 		name(name)
 	{
-		hash = Hash(dirID, name);
-			// We cache the hash value, so we can easily compute it before
-			// holding any locks.
+		if (_hash == NULL) {
+			// We cache the hash value, so we compute it before holding any locks.
+			hash = Hash(dirID, name);
+		} else {
+			hash = *_hash;
+		}
 	}
 
 	static uint32 Hash(ino_t dirID, const char* name)
@@ -74,6 +77,11 @@ struct EntryCacheHashDefinition {
 		return value->hash;
 	}
 
+	EntryCacheKey Key(const EntryCacheEntry* value) const
+	{
+		return EntryCacheKey(value->dir_id, value->name, &value->hash);
+	}
+
 	bool Compare(const EntryCacheKey& key, const EntryCacheEntry* value) const
 	{
 		if (key.hash != value->hash)
@@ -107,12 +115,12 @@ public:
 			const char*			DebugReverseLookup(ino_t nodeID, ino_t& _dirID);
 
 private:
-			typedef BOpenHashTable<EntryCacheHashDefinition> EntryTable;
+			typedef AtomicsHashTable<EntryCacheHashDefinition> EntryTable;
 			typedef DoublyLinkedList<EntryCacheEntry> EntryList;
 
 private:
-			void				_AddEntryToCurrentGeneration(
-									EntryCacheEntry* entry);
+			bool				_AddEntryToCurrentGeneration(
+									EntryCacheEntry* entry, bool move);
 
 private:
 			rw_lock				fLock;
