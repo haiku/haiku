@@ -34,6 +34,7 @@ Inode::Inode()
 	fWriteDirty(false),
 	fAIOWait(create_sem(1, NULL)),
 	fAIOCount(0),
+	fOpenStateReleasesPending(0),
 	fStale(false)
 {
 	rw_lock_init(&fDelegationLock, "nfs4 Inode::fDelegationLock");
@@ -704,12 +705,15 @@ Inode::WriteStat(const struct stat* st, uint32 mask, OpenAttrCookie* cookie)
 		i++;
 	}
 
+	ReadLocker delegationLocker(fDelegationLock);
 	if (cookie == NULL) {
 		MutexLocker stateLocker(fStateLock);
 		ASSERT(fOpenState != NULL || !(mask & B_STAT_SIZE));
-		result = NFS4Inode::WriteStat(fOpenState, attr, i);
-	} else
-		result = NFS4Inode::WriteStat(cookie->fOpenState, attr, i);
+		result = NFS4Inode::WriteStat(fOpenState, fDelegation, attr, i);
+	} else {
+		ASSERT(cookie->fOpenState->fDelegation == fDelegation);
+		result = NFS4Inode::WriteStat(cookie->fOpenState, NULL, attr, i);
+	}
 
 	fMetaCache.InvalidateStat();
 
@@ -974,6 +978,52 @@ Inode::RecallDelegation(bool truncate)
 }
 
 
+/*! Flush write data to the server if needed before returning the delegation.
+	@post If data needs to be flushed, an IO job is enqueued but may not be complete.
+*/
+void
+Inode::PrepareDelegationRecall(bool truncate)
+{
+	rw_lock_write_lock(&fDelegationLock);
+	fDelegation->MarkRecalled();
+	rw_lock_write_unlock(&fDelegationLock);
+
+	ReadLocker _(fDelegationLock);
+	if (fDelegation == NULL)
+		return;
+
+	fDelegation->PrepareGiveUp(truncate);
+
+	return;
+}
+
+
+/*! Return the delegation after data has been flushed to the server.
+	@pre RecallDelegationAsyncPrep has been called.
+*/
+void
+Inode::RecallDelegationAsync(bool truncate)
+{
+	WriteLocker _(fDelegationLock);
+	if (fDelegation == NULL)
+		return;
+
+	fDelegation->DoGiveUp(truncate, false);
+
+	fMetaCache.UnlockValid();
+	fFileSystem->RemoveDelegation(fDelegation);
+
+	MutexLocker stateLocker(fStateLock);
+	fOpenState->fDelegation = NULL;
+	ReleaseOpenState();
+
+	delete fDelegation;
+	fDelegation = NULL;
+
+	return;
+}
+
+
 void
 Inode::RecallReadDelegation()
 {
@@ -1003,27 +1053,90 @@ Inode::ReturnDelegation(bool truncate)
 }
 
 
+/*! Temporarily unlock the locks that need to be acquired by the WorkQueue when a delegation
+	is recalled.
+	@pre fStateLock is locked and fDelegation lock is read-locked.
+*/
+void
+Inode::UnlockAndRelockStateLocks()
+{
+	rw_lock_read_unlock(&fDelegationLock);
+	mutex_unlock(&fStateLock);
+	rw_lock_read_lock(&fDelegationLock);
+	mutex_lock(&fStateLock);
+}
+
+
+/*! Temporarily unlock fWriteLock.  Useful for allowing an IO job to complete.
+	@pre fWriteLock is write-locked and fDelegationLock is read-locked.
+*/
+void
+Inode::UnlockAndRelockWriteLock()
+{
+	rw_lock_write_unlock(&fWriteLock);
+	rw_lock_write_lock(&fWriteLock);
+}
+
+
+/*! Release a reference to fOpenState or set up later release if IO is not complete.
+	@pre fStateLock is locked.
+*/
 void
 Inode::ReleaseOpenState()
 {
 	ASSERT(fOpenState != NULL);
 
-	if (fOpenState->ReleaseReference() == 1) {
-		ASSERT(fAIOCount == 0);
-		fOpenState = NULL;
+	// If IO is pending, wait until it is finished to release the (possibly last) reference.
+	// It would be simpler to call WaitAIOComplete here, but that won't work if this
+	// is the WorkQueue thread.
+	MutexLocker _(fAIOLock);
+	if (fAIOCount > 0) {
+		++fOpenStateReleasesPending;
+	} else {
+		if (fOpenState->ReleaseReference() == 1)
+			fOpenState = NULL;
 	}
+
+	return;
+}
+
+
+/*! Sync file cache data to server.
+	@param wait If true, the function returns only after the sync is finished.
+*/
+status_t
+Inode::Sync(bool force, bool wait)
+{
+	ReadLocker locker(fDelegationLock);
+	if (!force && fDelegation != NULL && fDelegation->Type() == OPEN_DELEGATE_WRITE
+		&& !fDelegation->RecallInitiated()) {
+		locker.Unlock();
+		if (wait == true) {
+			// Wait for any IO jobs that may already be enqueued.
+			WaitAIOComplete();
+		}
+		return B_OK;
+	}
+	locker.Unlock();
+
+	status_t status = file_cache_sync(fFileCache);
+	if (wait == true)
+		WaitAIOComplete();
+
+	return status;
 }
 
 
 status_t
-Inode::SyncAndCommit(bool force)
+Inode::SyncAndCommit(bool force, OpenStateCookie* cookie)
 {
-	if (!force && fDelegation != NULL)
-		return B_OK;
+	Sync(force, true);
 
-	file_cache_sync(fFileCache);
-	WaitAIOComplete();
-	return Commit();
+	// The server is liable to deny a commit request that does not come from a user who
+	// opened the file.
+	uid_t uid = cookie != NULL ? cookie->fUid : geteuid();
+	gid_t gid = cookie != NULL ? cookie->fGid : getegid();
+	return Commit(uid, gid);
 }
 
 
@@ -1040,11 +1153,33 @@ Inode::BeginAIOOp()
 void
 Inode::EndAIOOp()
 {
-	MutexLocker _(fAIOLock);
+	MutexLocker AIOLocker(fAIOLock);
 	ASSERT(fAIOCount > 0);
 	fAIOCount--;
 	if (fAIOCount == 0)
 		release_sem(fAIOWait);
+
+	if (fOpenStateReleasesPending > 0) {
+		MutexLocker stateLocker(fStateLock);
+		--fOpenStateReleasesPending;
+		if (fOpenState->ReleaseReference() == 1) {
+			ASSERT(fAIOCount == 0);
+			ASSERT(fOpenStateReleasesPending == 0);
+			fOpenState = NULL;
+		}
+	}
+}
+
+
+bool
+Inode::AIOIncomplete()
+{
+	MutexLocker _(fAIOLock);
+
+	if (fAIOCount > 0)
+		return true;
+
+	return false;
 }
 
 

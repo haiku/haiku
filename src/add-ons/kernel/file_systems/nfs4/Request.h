@@ -21,7 +21,7 @@ class Request {
 public:
 	inline						Request(RPC::Server* server,
 									FileSystem* fileSystem,
-									uid_t uid, gid_t gid);
+									uid_t uid, gid_t gid, bool singleAttempt = false);
 
 	inline	RequestBuilder&		Builder();
 	inline	ReplyInterpreter&	Reply();
@@ -38,15 +38,19 @@ private:
 
 			RequestBuilder		fBuilder;
 			ReplyInterpreter	fReply;
+
+			bool				fSingleAttempt;
 };
 
 
 inline
-Request::Request(RPC::Server* server, FileSystem* fileSystem, uid_t uid, gid_t gid)
+Request::Request(RPC::Server* server, FileSystem* fileSystem, uid_t uid, gid_t gid,
+	bool singleAttempt)
 	:
 	fServer(server),
 	fFileSystem(fileSystem),
-	fBuilder(uid, gid)
+	fBuilder(uid, gid),
+	fSingleAttempt(singleAttempt)
 {
 	ASSERT(server != NULL);
 }

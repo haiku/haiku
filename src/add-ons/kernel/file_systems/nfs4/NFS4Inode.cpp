@@ -61,20 +61,38 @@ NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 
 
 status_t
-NFS4Inode::CommitWrites()
+NFS4Inode::CommitWrites(bool unlockBetweenAttempts, uid_t uid, gid_t gid)
 {
 	uint32 attempt = 0;
+	uint32 retryLimit = 0;
+	bool hard = true;
+	if (fFileSystem != NULL) {
+		retryLimit = fFileSystem->GetConfiguration().fRetryLimit;
+		hard = fFileSystem->GetConfiguration().fHard;
+	}
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv, fFileSystem, geteuid(), getegid());
+		Request request(serv, fFileSystem, uid, gid, unlockBetweenAttempts);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
 		req.Commit(0, 0);
 
 		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
+		if (result != B_OK) {
+			if (unlockBetweenAttempts && (hard || attempt < retryLimit)) {
+				// The server won't reply to a commit request while a delegation recall is in
+				// progress. To avoid a deadlock, we respond to a failure to reply by releasing
+				// fWriteLock, allowing the CallbackServer thread to proceed with CallbackRecall()
+				// if it is blocked, and trying the commit request again.
+				static_cast<Inode*>(this)->UnlockAndRelockWriteLock();
+				++attempt;
+				continue;
+			} else {
+				return result;
+			}
+		}
 
 		ReplyInterpreter& reply = request.Reply();
 
@@ -318,22 +336,40 @@ NFS4Inode::GetStat(AttrValue** values, uint32* count, OpenAttrCookie* cookie)
 
 
 status_t
-NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
+NFS4Inode::WriteStat(OpenState* state, Delegation* delegation, AttrValue* attrs, uint32 attrCount)
 {
 	ASSERT(attrs != NULL);
 
 	uint32 attempt = 0;
+	Inode* inode = delegation != NULL ? delegation->GetInode() : NULL;
+
+	bool useDelegationStateID = true;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem, geteuid(), getegid());
 		RequestBuilder& req = request.Builder();
 
+		uint32 stateID[3];
+		memset(stateID, 0, sizeof(stateID));
+		uint32 stateSeq = 0;
+
 		if (state != NULL) {
+			if (state->fDelegation != NULL && useDelegationStateID) {
+				delegation = state->fDelegation;
+				delegation->GetStateIDandSeq(stateID, stateSeq);
+			} else {
+				memcpy(stateID, state->fStateID, sizeof(stateID));
+				stateSeq = state->fStateSeq;
+			}
 			req.PutFH(state->fInfo.fHandle);
-			req.SetAttr(state->fStateID, state->fStateSeq, attrs, attrCount);
+			req.SetAttr(stateID, stateSeq, attrs, attrCount);
 		} else {
+			if (delegation != NULL && useDelegationStateID) {
+				// We might have a delegation regardless of whether the file is open.
+				delegation->GetStateIDandSeq(stateID, stateSeq);
+			}
 			req.PutFH(fInfo.fHandle);
-			req.SetAttr(NULL, 0, attrs, attrCount);
+			req.SetAttr(stateID, stateSeq, attrs, attrCount);
 		}
 
 		status_t result = request.Send();
@@ -342,8 +378,19 @@ NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(attempt, reply.NFS4Error(), serv))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, NULL, state)) {
+			if (reply.NFS4Error() == NFS4ERR_DELAY && delegation != NULL) {
+				delegation->GetInode()->UnlockAndRelockStateLocks();
+				if (inode != NULL) {
+					// The OpenState and Delegation pointers might be invalid now.
+					state = inode->GetOpenState();
+					delegation = inode->GetDelegation();
+				}
+			} else if (reply.NFS4Error() == NFS4ERR_OPENMODE && state->fDelegation != NULL) {
+				useDelegationStateID = false;
+			}
 			continue;
+		}
 
 		reply.PutFH();
 		result = reply.SetAttr();
@@ -726,13 +773,24 @@ NFS4Inode::ReadFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 	ASSERT(eof != NULL);
 
 	uint32 attempt = 0;
+	bool useDelegationStateID = true;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem, geteuid(), getegid());
 		RequestBuilder& req = request.Builder();
 
+		uint32 stateID[3];
+		memset(stateID, 0, sizeof(stateID));
+		uint32 stateSeq = 0;
+		if (state->fDelegation != NULL && useDelegationStateID) {
+			state->fDelegation->GetStateIDandSeq(stateID, stateSeq);
+		} else {
+			memcpy(stateID, state->fStateID, sizeof(stateID));
+			stateSeq = state->fStateSeq;
+		}
+
 		req.PutFH(state->fInfo.fHandle);
-		req.Read(state->fStateID, state->fStateSeq, position, *length);
+		req.Read(stateID, stateSeq, position, *length);
 
 		status_t result = request.Send(cookie);
 		if (result != B_OK)
@@ -740,8 +798,13 @@ NFS4Inode::ReadFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie, state))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie, state)) {
+			if (reply.NFS4Error() == NFS4ERR_DELAY && state->fDelegation != NULL)
+				state->fDelegation->GetInode()->UnlockAndRelockStateLocks();
+			else if (reply.NFS4Error() == NFS4ERR_OPENMODE && state->fDelegation != NULL)
+				useDelegationStateID = false;
 			continue;
+		}
 
 		reply.PutFH();
 		result = reply.Read(buffer, length, eof);
@@ -762,14 +825,25 @@ NFS4Inode::WriteFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 	ASSERT(buffer != NULL);
 
 	uint32 attempt = 0;
+	bool useDelegationStateID = true;
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem, state->fUid, state->fGid);
 		RequestBuilder& req = request.Builder();
 
+		uint32 stateID[3];
+		memset(stateID, 0, sizeof(stateID));
+		uint32 stateSeq = 0;
+		if (state->fDelegation != NULL && useDelegationStateID) {
+			state->fDelegation->GetStateIDandSeq(stateID, stateSeq);
+		} else {
+			memcpy(stateID, state->fStateID, sizeof(stateID));
+			stateSeq = state->fStateSeq;
+		}
+
 		req.PutFH(state->fInfo.fHandle);
 
-		req.Write(state->fStateID, state->fStateSeq, buffer, position, *length,
+		req.Write(stateID, stateSeq, buffer, position, *length,
 			commit);
 
 		status_t result = request.Send(cookie);
@@ -778,8 +852,13 @@ NFS4Inode::WriteFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie, state))
+		if (HandleErrors(attempt, reply.NFS4Error(), serv, cookie, state)) {
+			if (reply.NFS4Error() == NFS4ERR_DELAY && state->fDelegation != NULL)
+				state->fDelegation->GetInode()->UnlockAndRelockStateLocks();
+			else if (reply.NFS4Error() == NFS4ERR_OPENMODE && state->fDelegation != NULL)
+				useDelegationStateID = false;
 			continue;
+		}
 
 		reply.PutFH();
 

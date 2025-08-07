@@ -78,6 +78,9 @@ struct OpenStateCookie : public Cookie {
 			OpenState*		fOpenState;
 			uint32			fMode;
 
+			uid_t			fUid;
+			gid_t			fGid;
+
 							OpenStateCookie(FileSystem* fileSystem);
 };
 

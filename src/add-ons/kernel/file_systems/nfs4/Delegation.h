@@ -24,10 +24,15 @@ public:
 							uint64 clientID, bool attr = false);
 
 	status_t			GiveUp(bool truncate = false);
+			status_t	PrepareGiveUp(bool truncate);
+			status_t	DoGiveUp(bool truncate, bool wait = true);
 
 	inline	void		SetData(const OpenDelegationData& data);
 	inline	Inode*		GetInode() const;
+			void		GetStateIDandSeq(uint32* stateID, uint32& stateSeq) const;
 	inline	OpenDelegation Type();
+	inline	void		MarkRecalled();
+	inline	bool		RecallInitiated() const;
 
 	void				Dump(void (*xprintf)(const char*, ...) = dprintf) const;
 
@@ -39,8 +44,11 @@ private:
 	OpenDelegationData	fData;
 	Inode*				fInode;
 	bool				fAttribute;
+	uint32				fStateID[3];
+	uint32				fStateSeq;
 	uid_t				fUid;
 	gid_t				fGid;
+	bool				fRecalled;
 };
 
 
@@ -62,6 +70,20 @@ inline OpenDelegation
 Delegation::Type()
 {
 	return fData.fType;
+}
+
+
+inline void
+Delegation::MarkRecalled()
+{
+	fRecalled = true;
+}
+
+
+inline bool
+Delegation::RecallInitiated() const
+{
+	return fRecalled;
 }
 
 

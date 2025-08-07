@@ -20,22 +20,55 @@ Delegation::Delegation(const OpenDelegationData& data, Inode* inode,
 	fData(data),
 	fInode(inode),
 	fAttribute(attribute),
+	fStateSeq(data.fStateSeq),
 	fUid(geteuid()),
-	fGid(getegid())
+	fGid(getegid()),
+	fRecalled(false)
 {
 	ASSERT(inode != NULL);
+	memcpy(fStateID, data.fStateID, sizeof(fStateID));
 }
 
 
 status_t
 Delegation::GiveUp(bool truncate)
 {
+	PrepareGiveUp(truncate);
+
+	return DoGiveUp(truncate);
+}
+
+
+status_t
+Delegation::PrepareGiveUp(bool truncate)
+{
+	status_t status = B_OK;
 	if (!fAttribute && !truncate)
-		fInode->SyncAndCommit(true);
+		status = fInode->Sync(true, false);
 
-	ReturnDelegation();
+	return status;
+}
 
-	return B_OK;
+
+status_t
+Delegation::DoGiveUp(bool truncate, bool wait)
+{
+	if (!fAttribute && !truncate && wait)
+		fInode->WaitAIOComplete();
+
+	status_t status = ReturnDelegation();
+
+	fInode->Commit(fUid, fGid);
+
+	return status;
+}
+
+
+void
+Delegation::GetStateIDandSeq(uint32* stateID, uint32& stateSeq) const
+{
+	memcpy(stateID, fStateID, sizeof(uint32) * 3);
+	stateSeq = fStateSeq;
 }
 
 

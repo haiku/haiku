@@ -349,7 +349,7 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 
 	// Unless the file was deleted by someone else, verify that all known names have been
 	// unlinked.
-	if (node->IsStale() == false) {
+	if (node != NULL && node->IsStale() == false) {
 		FileInfo fileInfo;
 		ASSERT(fs->InoIdMap()->GetFileInfo(&fileInfo, vti->ID()) == B_ENTRY_NOT_FOUND);
 	}

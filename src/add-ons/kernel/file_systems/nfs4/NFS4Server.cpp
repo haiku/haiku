@@ -348,6 +348,11 @@ NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 	DelegationRecallArgs* args = new(std::nothrow) DelegationRecallArgs;
 	args->fDelegation = delegation;
 	args->fTruncate = truncate;
+
+	// If an IORequest job is needed, we should enqueue it before enqueueing
+	// the DelegationRecall job.
+	delegation->GetInode()->PrepareDelegationRecall(truncate);
+
 	gWorkQueue->EnqueueJob(DelegationRecall, args);
 
 	reply->Recall(B_OK);

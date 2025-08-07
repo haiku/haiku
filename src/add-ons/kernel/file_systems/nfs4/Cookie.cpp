@@ -147,7 +147,9 @@ Cookie::CancelAll()
 
 OpenStateCookie::OpenStateCookie(FileSystem* fileSystem)
 	:
-	Cookie(fileSystem)
+	Cookie(fileSystem),
+	fUid(geteuid()),
+	fGid(getegid())
 {
 }
 

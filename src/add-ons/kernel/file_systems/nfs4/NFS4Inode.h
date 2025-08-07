@@ -28,7 +28,7 @@ public:
 protected:
 			status_t	Access(uint32* allowed);
 
-			status_t	CommitWrites();
+			status_t	CommitWrites(bool unlockBetweenAttempts, uid_t uid, gid_t gid);
 
 			status_t	LookUp(const char* name, uint64* change, uint64* fileID,
 							FileHandle* handle, bool parent = false);
@@ -43,8 +43,8 @@ protected:
 
 			status_t	GetStat(AttrValue** values, uint32* count,
 							OpenAttrCookie* attr = NULL);
-			status_t	WriteStat(OpenState* state, AttrValue* attrs,
-							uint32 attrCount);
+			status_t	WriteStat(OpenState* state, Delegation* delegation,
+							AttrValue* attrs, uint32 attrCount);
 
 			status_t	CreateFile(const char* name, int mode, int perms,
 							OpenState* state, ChangeInfo* changeInfo,

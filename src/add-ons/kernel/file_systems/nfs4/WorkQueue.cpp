@@ -186,7 +186,24 @@ void
 WorkQueue::JobRecall(DelegationRecallArgs* args)
 {
 	ASSERT(args != NULL);
-	args->fDelegation->GetInode()->RecallDelegation(args->fTruncate);
+
+	Inode* inode = args->fDelegation->GetInode();
+	if (inode->AIOIncomplete()) {
+		// Re-queue and try again later.
+		WorkQueueEntry* entry = new(std::nothrow) WorkQueueEntry;
+		if (entry == NULL)
+			return;
+
+		entry->fType = DelegationRecall;
+		entry->fArguments = args;
+
+		// The queue is already locked.
+		fQueue.InsertAfter(fQueue.Tail(), entry);
+	} else {
+		args->fDelegation->GetInode()->RecallDelegationAsync(args->fTruncate);
+	}
+
+	return;
 }
 
 

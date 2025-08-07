@@ -184,6 +184,12 @@ NFS4Object::HandleErrors(uint32& attempt, uint32 nfs4Error, RPC::Server* server,
 			}
 			return false;
 
+		// delegation might have just been recalled, or is about to be recalled
+		case NFS4ERR_OPENMODE:
+			if (state->fDelegation != NULL)
+				return true;
+			return false;
+
 		default:
 			return false;
 	}

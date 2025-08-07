@@ -40,16 +40,22 @@ public:
 
 	inline			OpenState*	GetOpenState();
 
+	inline			Delegation*	GetDelegation() const;
 					void		SetDelegation(Delegation* delegation);
 					void		RecallDelegation(bool truncate = false);
+					void		PrepareDelegationRecall(bool truncate = false);
+					void		RecallDelegationAsync(bool truncate = false);
 					void		RecallReadDelegation();
+					void		UnlockAndRelockStateLocks();
+					void		UnlockAndRelockWriteLock();
 
 					status_t	LookUp(const char* name, ino_t* id);
 
 					status_t	Access(int mode);
 
-					status_t	Commit();
-					status_t	SyncAndCommit(bool force = false);
+					status_t	Sync(bool force = false, bool wait = true);
+					status_t	Commit(uid_t uid, gid_t gid);
+					status_t	SyncAndCommit(bool force = false, OpenStateCookie* cookie = NULL);
 
 					status_t	CreateObject(const char* name, const char* path,
 									int mode, FileType type, ino_t* id);
@@ -117,6 +123,7 @@ public:
 
 					void		BeginAIOOp();
 					void		EndAIOOp();
+					bool		AIOIncomplete();
 	inline			void		WaitAIOComplete();
 
 	inline			void		SetStale(bool stale = true);
@@ -177,6 +184,7 @@ private:
 					sem_id		fAIOWait;
 					uint32		fAIOCount;
 					mutex		fAIOLock;
+					uint32		fOpenStateReleasesPending;
 
 					bool		fStale;
 };
@@ -263,6 +271,13 @@ inline OpenState*
 Inode::GetOpenState()
 {
 	return fOpenState;
+}
+
+
+inline Delegation*
+Inode::GetDelegation() const
+{
+	return fDelegation;
 }
 
 
