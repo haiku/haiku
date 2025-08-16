@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2555742361
+1	friulian	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis cundizions di utilizazion
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Fâs clic suntun pachet par
 Cancel	UserLoginWindow		Anule
 Rating not possible	MainWindow		Valutazion dineade
 Package update error	MainWindow		Erôr di inzornament dal pachet
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Fâs clic achì
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procès} other{# procès}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Daûr a recuperâ lis valutazions dai utents pal pachet
 Reboot required	PackageManager		Tornâ a inviâ necessari
 All packages	PackageListView		Ducj i pachets
 Send	RatePackageWindow		Invie
+Creating package list…	FeaturedPackagesView		Daûr a creâ la liste dai pachets…
 Start package daemon	App		Invie demoni dai pachets
 There are problems in the supplied data:	UserLoginWindow		Si à problemis tai dâts furnîts:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		L'utent '%Nickname%' nol à acetât nissune cundizion di utilizazion.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Contignût
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Condivît dâts anonims sul ûs cun HaikuDepotServer
 Close	PackageManager		Siere
 Changelog	PackageInfoView		Regjistri modifichis
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	  par cirî ducj i pachets.
 About	PackageInfoView		Informazions su
 Password requirements download problem	UserLoginWindow		Probleme tal tirâ jù i recuisîts de password
 Password:	UserLoginWindow		Peraule d'ordin:
@@ -225,6 +228,7 @@ Category:	FilterView		Categorie:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	disinstale pachet %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Daûr a recuperâ i dâts dal dipuesit lontan
 Description	PackageListView		Descrizion
+No results? 	FeaturedPackagesView		Nissun risultât? 
 User creation error	UserLoginWindow		Erôr di creazion dal utent
 You need to be logged into an account before you can rate packages.	MainWindow		Tu âs di acedi a un account prime di podê valutâ i pachets.
 Cleaning up…	ShuttingDownWindow		Netisie…

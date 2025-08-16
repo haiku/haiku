@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	4192200646
+1	friulian	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -168,6 +168,7 @@ Property info	AttributesView		Informazions de proprietât
 Sorry, you can't create links in the Trash.	PoseView		No tu puedis creâ un colegament te Scovacere.
 From	Email Query Columns		Di
 Open selection with:	OpenWithWindow		Vierç selezion cun:
+Preferences…	ContainerWindow		Preferencis…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nol è stât pussibil vierzi \"%document\" parcè che la aplicazion \"%app\" e je te Scovacere. 
 Work Phone	Person Query Columns		Telefon di vore
 Select folders	FindPanel		Selezione cartelis

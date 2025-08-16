@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-StyledEdit	3760185556
+1	friulian	x-vnd.Haiku-StyledEdit	1077895429
 Document statistics	Statistics		Statistichis sul document
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impussibil ripristinâ, file no cjatât: \"%s\".
 Cut	Menus		Taie
@@ -34,6 +34,7 @@ Bold	Menus		Neret
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Il file \"%file%\" al è stât modificât di une altre aplicazion, tornâ a cjariâlu?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Il file \"%file%\" al è stât gjavât di une altre aplicazion, recuperâlu?
 Lines:	Statistics		Riis:
+Strikeout	Menus		Tressât
 Replace in all windows	FindandReplaceWindow		Sostituìs in ducj i barcons
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" al à modifichis che no son stadis salvadis.\nTornâ ae ultime version salvade?
 Save	SaveAlert		Salve

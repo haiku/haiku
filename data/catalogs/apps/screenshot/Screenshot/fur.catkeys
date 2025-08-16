@@ -1,4 +1,4 @@
-1	friulian	x-vnd.haiku-screenshot	281883787
+1	friulian	x-vnd.haiku-screenshot	3900035709
 Include window border	ScreenshotWindow		Inclût ôrs dal barcon
 Overwrite	ScreenshotWindow		Sorescrîf
 Save in:	ScreenshotWindow		Salve in:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Scritori
 Artwork folder	ScreenshotWindow		Cartele Artwork
 Translator Settings	ScreenshotWindow		Impostazions tradutôr
 Include mouse pointer	ScreenshotWindow		Inclût il pontadôr dal mouse
+Selected area	ScreenshotWindow		Aree selezionade
 overwrite	ScreenshotWindow		sorescrîf
 Settings…	ScreenshotWindow		Impostazions…
+Select area	ScreenshotWindow		Selezione la aree
 Choose folder	ScreenshotWindow		Sielç cartele
 Name:	ScreenshotWindow		Non:
+Active window	ScreenshotWindow		Barcon afîf
 Choose folder…	ScreenshotWindow		Sielç une cartele…
 Please select	ScreenshotWindow		Par plasê selezione
 Failed to save screenshot	ScreenshotWindow		No si è rivâts a salvâ la cature di schermi
 Cancel	ScreenshotWindow		Cancele
+Whole screen	ScreenshotWindow		Schermi intîr
 Delay:	ScreenshotWindow		Ritart:
 Copy to clipboard	ScreenshotWindow		Copie intes notis
 screenshot	Screenshot	Base filename of screenshot files	cature di schermi

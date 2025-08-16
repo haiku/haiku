@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-LaunchBox	1878360293
+1	friulian	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Stabilìs descrizion…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sierâ pardabon chest pad?\n(Il pad nol vignarà ricuardât.)
 OK	LaunchBox		Va ben
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Auto-Invie
 Clone	LaunchBox		Clone
 Description for '%3'	LaunchBox		Descrizion par '%3'
 Show window border	LaunchBox		Mostre l'ôr dal barcon
+Failed to open folder - is Tracker running?	LaunchBox		Impussibil vierzi la cartele - Tracker isal in esecuzion?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNo si è rivâts a inviâ la aplicazion cun firme '%2'.\n\nErôr:
 Failed to launch 'something', error in Pad data.	LaunchBox		Esecuzion di 'alc' falide, erôr tai dâts dal Pad.
 LaunchBox	System name		LaunchBox

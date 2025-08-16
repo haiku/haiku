@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Input	130668644
+1	friulian	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Predefinîts
 Scrolling	TouchpadPrefView		Scoriment
 Long	KeyboardView		Lunc
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Velocitât dopli-clic
 Typing test area	KeyboardView		Aree di prove batidure
 Fast	KeyboardView		Svelte
 Please confirm	TouchpadPrefView		Par plasê conferme
+Trackpad speed	TouchpadPrefView		Velocitât trackpad
 Mouse speed	SettingsView		Velocitât dal mouse
+Trackpad acceleration	TouchpadPrefView		Acelerazion trackpad
 Horizontal scrolling	TouchpadPrefView		Scoriment orizontâl
+Reverse scroll direction	TouchpadPrefView		Direzion scoriment invertide
 Keyboard lock delay	TouchpadPrefView		Ritart dal bloc de tastiere
 Input	System name		Input
 Quick	TouchpadPrefView		Veloç
@@ -21,6 +24,7 @@ Slow	KeyboardView		Lente
 2-Button	SettingsView		2-Botons
 Click to focus and raise	SettingsView		Clic par meti a fûc e parâ denant
 Vertical	TouchpadPrefView		Verticâl
+Low	TouchpadPrefView		Basse
 Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
 Double-click test area	SettingsView		Aree di prove dopli-clic
 Focus mode:	SettingsView		Mût par meti a fûc:

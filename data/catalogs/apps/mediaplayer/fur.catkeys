@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-MediaPlayer	1732323378
+1	friulian	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposte element te Scovacere
 Close	MediaPlayer-PlaylistWindow		Siere
 Volume of background clips	MediaPlayer-SettingsWindow		Volum des riproduzions di sotfont
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Linie video
 Playlist…	MediaPlayer-Main		Liste di riproduzion…
 <unnamed media>	MediaPlayer-InfoWin		<media cence non>
 Save	MediaPlayer-PlaylistWindow		Salve
+25% scale	MediaPlayer-Main		Scjale al 25%
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Rint casuâls lis vôs
 Cancel	MediaPlayer-NetworkStream		Anule
 Nothing to Play	MediaPlayer-Main		Nuie di riprodusi

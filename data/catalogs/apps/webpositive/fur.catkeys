@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	371749163
+1	friulian	x-vnd.Haiku-WebPositive	2225233929
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 Copy	Console Window		Copie
@@ -153,6 +153,7 @@ Window	WebPositive Window		Barcon
 Proxy server address:	Settings Window		Direzion servidôr proxy:
 Search page:	Settings Window		Pagjine di ricercje:
 Settings	WebPositive Window		Impostazions
+Show in Tracker	BookmarkBar		Mostre tal Tracker
 Clear	URL Bar		Nete
 Loading %url	WebPositive Window		Daûr a cjariâ %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ogni mês si fâs la lune, ogni dì si impare une.
