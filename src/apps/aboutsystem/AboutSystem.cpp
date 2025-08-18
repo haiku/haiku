@@ -735,9 +735,9 @@ SysInfoView::CacheInitialSize()
 	// increase min width based on some potentially wide string views
 	fCachedMinWidth = ceilf(std::max(fCachedBaseWidth,
 		fVersionLabelView->StringWidth(fVersionLabelView->Text()) + insets));
-	fCachedMinWidth = ceilf(std::max(fCachedBaseWidth,
+	fCachedMinWidth = ceilf(std::max(fCachedMinWidth,
 		fCPUInfoView->StringWidth(fCPUInfoView->Text()) + insets));
-	fCachedMinWidth = ceilf(std::max(fCachedBaseWidth,
+	fCachedMinWidth = ceilf(std::max(fCachedMinWidth,
 		fMemSizeView->StringWidth(fMemSizeView->Text()) + insets));
 
 	// width is fixed, height can grow in Pulse()
