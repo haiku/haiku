@@ -297,9 +297,9 @@ CDDBServer::_ParseAddress(const BString& cddbServer)
 	int32 pos = cddbServer.FindFirst(":");
 	if (pos == B_ERROR) {
 		// It seems we do not have the address:port format. Use hostname as-is.
-		fServerAddress.SetTo(cddbServer.String(), kDefaultPortNumber);
-		if (fServerAddress.InitCheck() == B_OK)
-			return B_OK;
+		fServerHostname.SetTo(cddbServer);
+		fServerPort = kDefaultPortNumber;
+		return B_OK;
 	} else {
 		// Parse address:port format.
 		int32 port;
@@ -320,9 +320,9 @@ CDDBServer::_ParseAddress(const BString& cddbServer)
 			}
 
 			newCddbServer.RemoveAll(":");
-			fServerAddress.SetTo(newCddbServer.String(), port);
-			if (fServerAddress.InitCheck() == B_OK)
-				return B_OK;
+			fServerHostname.SetTo(newCddbServer);
+			fServerPort = port;
+			return B_OK;
 		}
 	}
 
@@ -338,6 +338,12 @@ CDDBServer::_OpenConnection()
 
 	if (fConnected)
 		return B_OK;
+
+	if (fServerAddress.InitCheck() != B_OK) {
+		// This performs a DNS lookup, hence why we don't do it earlier.
+		if (fServerAddress.SetTo(fServerHostname, fServerPort) != B_OK)
+			return B_ERROR;
+	}
 
 	if (fConnection.Connect(fServerAddress) == B_OK) {
 		fConnected = true;

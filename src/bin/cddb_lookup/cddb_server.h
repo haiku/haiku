@@ -83,6 +83,8 @@ private:
 private:
 			BString				fLocalHostName;
 			BString				fLocalUserName;
+			BString				fServerHostname;
+			int32				fServerPort;
 			BNetAddress			fServerAddress;
 			BNetEndpoint		fConnection;
 			bool				fInitialized;
