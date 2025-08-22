@@ -265,8 +265,9 @@
 #define IA32_FEATURE_EXT_HYPERVISOR	(1 << 31) // Running on a hypervisor
 
 // x86 features from cpuid eax 0x80000001, ecx register (AMD)
-#define IA32_FEATURE_AMD_EXT_CMPLEGACY	(1 << 1) // Core MP legacy mode
-#define IA32_FEATURE_AMD_EXT_TOPOLOGY	(1 << 22) // Topology extensions
+#define IA32_FEATURE_AMD_EXT_CMPLEGACY	(1 << 1)	// Core MP legacy mode
+#define IA32_FEATURE_AMD_EXT_TOPOLOGY	(1 << 22)	// Topology extensions
+#define IA32_FEATURE_AMD_EXT_MWAITX		(1 << 29)	// MWAITX, MONITORX instructions
 
 // x86 features from cpuid eax 0x80000001, edx register (AMD)
 // only care about the ones that are unique to this register
@@ -354,6 +355,7 @@
 #define IA32_FEATURE_UMIP			(1 << 2) // User-mode Instruction Prevention
 #define IA32_FEATURE_PKU			(1 << 3) // Memory Protection Keys for User-mode pages
 #define IA32_FEATURE_OSPKE			(1 << 4) // PKU enabled by OS
+#define IA32_FEATURE_WAITPKG		(1 << 5) // TPAUSE, UMONITOR, UMWAIT instructions
 #define IA32_FEATURE_AVX512VMBI2	(1 << 6) // AVX-512 Vector Bit Manipulation Instructions 2
 #define IA32_FEATURE_GFNI			(1 << 8) // Galois Field instructions
 #define IA32_FEATURE_VAES			(1 << 9) // AES instruction set (VEX-256/EVEX)

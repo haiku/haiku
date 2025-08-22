@@ -11,6 +11,7 @@
 
 #include <arch/debug.h>
 
+#include <x86intrin.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1357,9 +1358,52 @@ arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 }
 
 
+static void (*sDebugSnooze)(bigtime_t) = NULL;
+static uint64 sDebugSnoozeConversionFactor = 0;
+
+
+static void
+debug_snooze_mwaitx(bigtime_t duration)
+{
+	uint32 delay = (duration * sDebugSnoozeConversionFactor) / 1000;
+	if (delay == 0)
+		delay = 1;
+
+	// monitorx (r/eax = pointer, ecx = extensions, edx = hints)
+	asm volatile(".byte 0x0f, 0x01, 0xfa;"
+		:: "a" (sDebugSnooze), "c" (0), "d" (0));
+
+	// mwaitx (eax = hints, ecx = extensions, ebx = timeout)
+	asm volatile(".byte 0x0f, 0x01, 0xfb;"
+		:: "a" (0xf0 /* disable C-states */), "c" (0x2 /* enable timer */), "b" (delay));
+}
+
+
+static void
+debug_snooze_tpause(bigtime_t duration)
+{
+	uint32 delay = (duration * sDebugSnoozeConversionFactor) / 1000;
+	if (delay == 0)
+		delay = 1;
+
+	memory_read_barrier();
+	uint64 target = __rdtsc() + delay;
+
+	// tpause (ecx = options, eax = target [low 32], edx = target [high 32])
+	uint32 low = target, high = target >> 32;
+	asm volatile(".byte 0x66, 0x0f, 0xae, 0xf1;"
+		:: "c" (0x0), "a" (low), "d" (high));
+}
+
+
 void
 arch_debug_snooze(bigtime_t duration)
 {
+	if (sDebugSnooze != NULL) {
+		sDebugSnooze(duration);
+		return;
+	}
+
 	spin(duration);
 }
 
@@ -1367,7 +1411,18 @@ arch_debug_snooze(bigtime_t duration)
 status_t
 arch_debug_init(kernel_args* args)
 {
-	// at this stage, the debugger command system is alive
+	bool haveMWAITX = x86_check_feature(IA32_FEATURE_AMD_EXT_MWAITX, FEATURE_EXT_AMD_ECX),
+		haveTPAUSE = x86_check_feature(IA32_FEATURE_WAITPKG, FEATURE_7_ECX);
+	if (haveMWAITX || haveTPAUSE) {
+		// Store the TSC frequency in kHz.
+		sDebugSnoozeConversionFactor =
+			(uint64(1000) << 32) / args->arch_args.system_time_cv_factor;
+
+		if (haveMWAITX)
+			sDebugSnooze = debug_snooze_mwaitx;
+		else if (haveTPAUSE)
+			sDebugSnooze = debug_snooze_tpause;
+	}
 
 	add_debugger_command("where", &stack_trace, "Same as \"sc\"");
 	add_debugger_command("bt", &stack_trace, "Same as \"sc\" (as in gdb)");

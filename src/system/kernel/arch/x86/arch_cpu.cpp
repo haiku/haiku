@@ -500,6 +500,8 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "rdrnd ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_HYPERVISOR)
 		strlcat(features, "hypervisor ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_AMD_ECX] & IA32_FEATURE_AMD_EXT_MWAITX)
+		strlcat(features, "mwaitx ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_SYSCALL)
 		strlcat(features, "syscall ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_NX)
@@ -624,6 +626,8 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "pku ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_OSPKE)
 		strlcat(features, "ospke ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_WAITPKG)
+		strlcat(features, "waitpkg ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512VMBI2)
 		strlcat(features, "avx512vmbi2 ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_GFNI)
