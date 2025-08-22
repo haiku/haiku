@@ -117,6 +117,7 @@ PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 		B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
 	fTotalDuration->SetAlignment(B_ALIGN_RIGHT);
 	fTotalDuration->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fTotalDuration->SetHighUIColor(B_PANEL_TEXT_COLOR);
 	AddChild(fTotalDuration);
 
 	_UpdateTotalDuration(0);
