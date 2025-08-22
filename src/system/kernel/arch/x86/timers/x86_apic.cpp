@@ -77,7 +77,7 @@ apic_timer_set_hardware_timer(bigtime_t relativeTimeout)
 
 	apic_set_lvt_initial_timer_count(0); // zero out the timer
 
-	config = apic_lvt_timer() & ~APIC_LVT_MASKED; // unmask the timer
+	config &= ~APIC_LVT_MASKED; // unmask the timer
 	apic_set_lvt_timer(config);
 
 	TRACE("arch_smp_set_apic_timer: config 0x%" B_PRIx32 ", timeout %" B_PRIdBIGTIME
