@@ -4,7 +4,6 @@ SubDir HAIKU_TOP src add-ons kernel drivers network ether ;
 HaikuSubInclude etherpci ;
 HaikuSubInclude pegasus ;
 HaikuSubInclude virtio ;
-HaikuSubInclude usb_asix ;
 HaikuSubInclude usb_davicom ;
 HaikuSubInclude usb_ecm ;
 HaikuSubInclude usb_rndis ;
@@ -12,6 +11,7 @@ HaikuSubInclude wb840 ;
 
 # FreeBSD drivers
 HaikuSubInclude 3com ;
+HaikuSubInclude asix88xxx ;
 HaikuSubInclude atheros81xx ;
 HaikuSubInclude atheros813x ;
 HaikuSubInclude attansic_l1 ;

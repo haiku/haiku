@@ -312,6 +312,7 @@ SYSTEM_ADD_ONS_DRIVERS_MIDI = ;
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	x86,x86_64,riscv64 @{
 		3com
+		asix88xxx
 		atheros813x
 		atheros81xx
 		attansic_l1
@@ -339,7 +340,6 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 
 	etherpci
 	pegasus
-	usb_asix
 	usb_davicom
 	usb_rndis
 	wb840

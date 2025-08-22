@@ -1,0 +1,32 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether asix88xxx ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev usb net ] ;
+
+KernelAddon asix88xxx :
+	glue.c
+	axphy.c
+	if_axe.c
+	if_axge.c
+	:
+	freebsd_mii.a
+	freebsd_usb.a
+	libfreebsd_network.a
+	;
+
+ObjectHdrs [ FGristFiles if_axe$(SUFOBJ) if_axge$(SUFOBJ) ]
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles if_axe.c if_axge.c ] : <src!libs!compat!freebsd_network>usbdevs.h ;
+
+ObjectHdrs [ FGristFiles axphy$(SUFOBJ) ]
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles axphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
