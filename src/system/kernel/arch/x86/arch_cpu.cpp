@@ -1605,12 +1605,21 @@ detect_amdc1e_noarat()
 	if (cpu->arch.vendor != VENDOR_AMD)
 		return false;
 
-	// Family 0x12 and higher processors support ARAT
-	// Family lower than 0xf processors doesn't support C1E
-	// Family 0xf with model <= 0x40 procssors doesn't support C1E
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_ARAT)
+		return false;
+
 	uint32 family = cpu->arch.family + cpu->arch.extended_family;
 	uint32 model = (cpu->arch.extended_model << 4) | cpu->arch.model;
-	return (family < 0x12 && family > 0xf) || (family == 0xf && model > 0x40);
+	if (family >= 0x12) {
+		// Family 0x12 and higher processors support ARAT correctly,
+		// but they don't declare it in the CPUID until 0x17 (Zen).
+		cpu->arch.feature[FEATURE_6_EAX] |= IA32_FEATURE_ARAT;
+		return false;
+	}
+
+	// Family lower than 0xf processors doesn't support C1E
+	// Family 0xf with model <= 0x40 processors doesn't support C1E
+	return (family > 0xf) || (family == 0xf && model > 0x40);
 }
 
 
@@ -1732,10 +1741,9 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 	load_microcode(cpu);
 	detect_cpu(cpu);
 
-	if (cpu == 0)
+	if (cpu == 0) {
 		init_tsc(args);
 
-	if (!gCpuIdleFunc) {
 		if (detect_amdc1e_noarat())
 			gCpuIdleFunc = amdc1e_noarat_idle;
 		else
