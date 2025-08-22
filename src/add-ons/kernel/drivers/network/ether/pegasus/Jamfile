@@ -1,16 +1,31 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ether pegasus ;
 
-SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
 
-# For ether_driver.h
-UsePrivateHeaders net ;
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev usb net ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
 
 KernelAddon pegasus :
-	driver.c
-	devlist.c
+	glue.c
 	if_aue.c
+	acphy.c
+	:
+	freebsd_usb.a
+	freebsd_mii.a
+	libfreebsd_network.a
 	;
 
-ObjectHdrs [ FGristFiles driver$(SUFOBJ) if_aue$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles if_aue$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles driver.c if_aue.c ] : <src!libs!compat!freebsd_network>usbdevs.h ;
+Includes [ FGristFiles if_aue.c ] : <src!libs!compat!freebsd_network>usbdevs.h ;
+
+ObjectHdrs [ FGristFiles acphy$(SUFOBJ) ]
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles acphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

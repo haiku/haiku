@@ -327,6 +327,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		marvell_yukon
 		nforce
 		pcnet
+		pegasus
 		rtl8125
 		rtl8139
 		rtl81xx
@@ -339,7 +340,6 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	}@ # x86,x86_64,riscv64
 
 	etherpci
-	pegasus
 	usb_davicom
 	usb_rndis
 	wb840
