@@ -32,6 +32,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	eventhandler.c
 	firmware.c
 	if.c
+	kthread.cpp
 	libkern.cpp
 	malloc.cpp
 	mbuf.c
@@ -53,6 +54,8 @@ KernelStaticLibrary freebsd_usb.a :
 	fbsd_usb_error.c
 	fbsd_usb_util.c
 	fbsd_usb_lookup.c
+	usb_process.c
+	usb_ethernet.c
 	usb.cpp
 	usb_util.c
 	;

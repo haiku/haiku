@@ -69,6 +69,8 @@
 
 #define	USB_MAX_AUTO_QUIRK	8	/* maximum number of dynamic quirks */
 
+#define USB_IN_POLLING_MODE_FUNC() 0
+
 typedef uint32_t usb_timeout_t;		/* milliseconds */
 typedef uint32_t usb_frlength_t;	/* bytes */
 typedef uint32_t usb_frcount_t;		/* units */

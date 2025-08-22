@@ -311,6 +311,39 @@ struct usb_attach_arg {
 };
 
 /*
+ * General purpose locking wrappers to ease supporting
+ * USB polled mode:
+ */
+#ifdef INVARIANTS
+#define USB_MTX_ASSERT(_m, _t) do {     \
+	if (!USB_IN_POLLING_MODE_FUNC())    \
+		mtx_assert(_m, _t);     \
+} while (0)
+#else
+#define USB_MTX_ASSERT(_m, _t) do { } while (0)
+#endif
+
+#define USB_MTX_LOCK(_m) do {           \
+	if (!USB_IN_POLLING_MODE_FUNC())    \
+		mtx_lock(_m);           \
+} while (0)
+
+#define USB_MTX_UNLOCK(_m) do {         \
+	if (!USB_IN_POLLING_MODE_FUNC())    \
+		mtx_unlock(_m);         \
+} while (0)
+
+#define USB_MTX_LOCK_SPIN(_m) do {      \
+	if (!USB_IN_POLLING_MODE_FUNC())    \
+		mtx_lock_spin(_m);      \
+} while (0)
+
+#define USB_MTX_UNLOCK_SPIN(_m) do {        \
+	if (!USB_IN_POLLING_MODE_FUNC())    \
+		mtx_unlock_spin(_m);        \
+} while (0)
+
+/*
  * The following is a wrapper for the callout structure to ease
  * porting the code to other platforms.
  */

@@ -25,7 +25,7 @@ cv_init(struct cv* variable, const char* description)
 void
 cv_destroy(struct cv* variable)
 {
-	__cv_ConditionVariable(variable)->NotifyAll();
+	cv_broadcast(variable);
 
 	// Nothing else to do.
 }
@@ -38,19 +38,23 @@ cv_signal(struct cv* variable)
 }
 
 
-int
-cv_timedwait(struct cv* variable, struct mtx* mutex, int timeout)
+void
+cv_broadcast(struct cv* variable)
+{
+	__cv_ConditionVariable(variable)->NotifyAll();
+}
+
+
+static int
+cv_wait_etc(struct cv* variable, struct mtx* mutex, uint32 flags, bigtime_t timeout)
 {
 	ConditionVariable* condition = __cv_ConditionVariable(variable);
 
-	const uint32 flags = timeout ? B_RELATIVE_TIMEOUT : 0;
-	const bigtime_t bigtimeout = TICKS_2_USEC(timeout);
 	int status;
-
 	if (mutex->type == MTX_RECURSE) {
 		// Special case: let the ConditionVariable handle switching recursive locks.
 		status = condition->Wait(&mutex->u.recursive,
-			flags, bigtimeout);
+			flags, timeout);
 		return status;
 	}
 
@@ -59,15 +63,31 @@ cv_timedwait(struct cv* variable, struct mtx* mutex, int timeout)
 
 	mtx_unlock(mutex);
 
-	status = entry.Wait(flags, bigtimeout);
+	status = entry.Wait(flags, timeout);
 
 	mtx_lock(mutex);
 	return status;
 }
 
 
+int
+cv_timedwait(struct cv* variable, struct mtx* mutex, int timeout)
+{
+	const uint32 flags = timeout ? B_RELATIVE_TIMEOUT : 0;
+	const bigtime_t bigtimeout = TICKS_2_USEC(timeout);
+	return cv_wait_etc(variable, mutex, flags, bigtimeout);
+}
+
+
 void
 cv_wait(struct cv* variable, struct mtx* mutex)
 {
-	cv_timedwait(variable, mutex, 0);
+	cv_wait_etc(variable, mutex, 0, 0);
+}
+
+
+int
+cv_wait_sig(struct cv* variable, struct mtx* mutex)
+{
+	return cv_wait_etc(variable, mutex, B_CAN_INTERRUPT, 0);
 }

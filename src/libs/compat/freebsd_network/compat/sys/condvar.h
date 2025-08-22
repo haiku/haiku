@@ -25,9 +25,12 @@ struct cv {
 
 void cv_init(struct cv*, const char*);
 void cv_destroy(struct cv*);
+
 void cv_wait(struct cv*, struct mtx*);
 int cv_timedwait(struct cv*, struct mtx*, int);
+int cv_wait_sig(struct cv*, struct mtx*);
 void cv_signal(struct cv*);
+void cv_broadcast(struct cv*);
 
 
 __END_DECLS
