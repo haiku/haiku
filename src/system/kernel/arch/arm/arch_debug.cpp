@@ -502,6 +502,13 @@ arch_get_debug_variable(const char* variableName, uint64* value)
 }
 
 
+void
+arch_debug_snooze(bigtime_t duration)
+{
+	spin(duration);
+}
+
+
 status_t
 arch_debug_init(kernel_args *args)
 {

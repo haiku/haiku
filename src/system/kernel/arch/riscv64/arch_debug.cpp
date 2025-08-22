@@ -1136,11 +1136,16 @@ arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 }
 
 
+void
+arch_debug_snooze(bigtime_t duration)
+{
+	spin(duration);
+}
+
+
 status_t
 arch_debug_init(kernel_args* args)
 {
-	// at this stage, the debugger command system is alive
-
 	add_debugger_command("where", &stack_trace, "Same as \"sc\"");
 	add_debugger_command("bt", &stack_trace, "Same as \"sc\" (as in gdb)");
 	add_debugger_command("sc", &stack_trace,

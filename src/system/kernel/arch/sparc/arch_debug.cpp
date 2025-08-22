@@ -92,6 +92,13 @@ arch_debug_get_interrupt_pc(bool* _isSyscall)
 }
 
 
+void
+arch_debug_snooze(bigtime_t duration)
+{
+	spin(duration);
+}
+
+
 status_t
 arch_debug_init(kernel_args *args)
 {

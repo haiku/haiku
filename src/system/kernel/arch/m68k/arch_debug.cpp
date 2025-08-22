@@ -393,6 +393,13 @@ arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 }
 
 
+void
+arch_debug_snooze(bigtime_t duration)
+{
+	spin(duration);
+}
+
+
 status_t
 arch_debug_init(kernel_args *args)
 {
