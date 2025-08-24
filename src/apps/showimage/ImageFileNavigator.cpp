@@ -192,17 +192,37 @@ TrackerNavigator::FindNextImage(const entry_ref& currentRef, entry_ref& ref,
 		BMessage request(B_GET_PROPERTY);
 		BMessage specifier;
 		if (rewind)
-			specifier.what = B_DIRECT_SPECIFIER;
+			specifier.what = B_INDEX_SPECIFIER;
 		else if (next)
 			specifier.what = 'snxt';
 		else
 			specifier.what = 'sprv';
 		specifier.AddString("property", "Entry");
-		if (rewind) {
-			// if rewinding, ask for the ref to the
-			// first item in the directory
-			specifier.AddInt32("data", 0);
-		} else
+
+		// if rewinding, ask for the ref to the first or last item in the directory
+		if (rewind && next) {
+			// we first need to know the amount of files, then start iterating from the last.
+			BMessage countRequest(B_COUNT_PROPERTIES);
+			BMessage countSpecifier;
+			countSpecifier.what = B_DIRECT_SPECIFIER;
+			countSpecifier.AddString("property", "Entry");
+			countRequest.AddSpecifier(&countSpecifier);
+
+			BMessage countReply;
+			int32 count;
+			if (fTrackerMessenger.SendMessage(&countRequest, &countReply) != B_OK)
+				return false;
+			if (countReply.FindInt32("result", &count) != B_OK)
+				return false;
+
+			specifier.AddInt32("index", count-1);
+			// Iterate backwards from here.
+			next = !next;
+		} else if (rewind) {
+			specifier.AddInt32("index", 0);
+			next = !next;
+		}
+		else
 			specifier.AddRef("data", &nextRef);
 		request.AddSpecifier(&specifier);
 
@@ -215,8 +235,7 @@ TrackerNavigator::FindNextImage(const entry_ref& currentRef, entry_ref& ref,
 		if (IsImage(nextRef))
 			foundRef = true;
 
-		rewind = false;
-			// stop asking for the first ref in the directory
+		rewind = false; // stop asking for the first ref in the directory
 	}
 
 	ref = nextRef;
@@ -279,7 +298,7 @@ FolderNavigator::FindNextImage(const entry_ref& currentRef, entry_ref& nextRef,
 {
 	int32 index;
 	if (rewind) {
-		index = next ? fEntries.CountItems() : 0;
+		index = next ? fEntries.CountItems() - 1 : 0;
 		next = !next;
 	} else {
 		index = fEntries.BinarySearchIndex(currentRef,
@@ -533,6 +552,20 @@ ImageFileNavigator::FirstFile()
 {
 	entry_ref ref;
 	if (fNavigator->FindNextImage(fCurrentRef, ref, false, true)) {
+		SetTo(ref, 1, 1);
+		fNavigator->UpdateSelection(fCurrentRef);
+		return true;
+	}
+
+	return false;
+}
+
+
+bool
+ImageFileNavigator::LastFile()
+{
+	entry_ref ref;
+	if (fNavigator->FindNextImage(fCurrentRef, ref, true, true)) {
 		SetTo(ref, 1, 1);
 		fNavigator->UpdateSelection(fCurrentRef);
 		return true;

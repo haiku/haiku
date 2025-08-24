@@ -751,8 +751,11 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			_EnableMenuItem(fBar, MSG_PAGE_PREV, fNavigator.HasPreviousPage());
 			fGoToPageMenu->SetEnabled(pages > 1);
 
-			_EnableMenuItem(fBar, MSG_FILE_NEXT, fNavigator.HasNextFile());
-			_EnableMenuItem(fBar, MSG_FILE_PREV, fNavigator.HasPreviousFile());
+			// Disable next/previous if this is the only image in the folder.
+			if (!fNavigator.HasNextFile() && !fNavigator.HasPreviousFile()) {
+				_EnableMenuItem(fBar, MSG_FILE_NEXT, false);
+				_EnableMenuItem(fBar, MSG_FILE_PREV, false);
+			}
 
 			if (fGoToPageMenu->CountItems() != pages) {
 				// Only rebuild the submenu if the number of
@@ -902,8 +905,13 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_FILE_PREV:
-			if (_ClosePrompt() && fNavigator.PreviousFile())
-				_LoadImage(false);
+			if (_ClosePrompt()) {
+				if (!fNavigator.PreviousFile()) {
+					// Wrap to last file
+					fNavigator.LastFile();
+				}
+				_LoadImage();
+			}
 			break;
 
 		case MSG_FILE_NEXT:

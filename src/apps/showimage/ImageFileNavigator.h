@@ -48,6 +48,7 @@ public:
 			bool				GoToPage(int32 page);
 
 			bool				FirstFile();
+			bool				LastFile();
 			bool				NextFile();
 			bool				PreviousFile();
 			bool				HasNextFile();
