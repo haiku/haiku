@@ -186,6 +186,8 @@ TransformerListView::SelectionChanged()
 			Invoke(&message);
 		}
 	}
+
+	_UpdateMenu();
 }
 
 
@@ -560,4 +562,7 @@ TransformerListView::_UpdateMenu()
 	bool isReferenceImage = dynamic_cast<ReferenceImage*>(fShape) != NULL;
 	fContourItem->SetEnabled(!isReferenceImage);
 	fStrokeItem->SetEnabled(!isReferenceImage);
+
+	bool hasSelection = CurrentSelection(0) >= 0;
+	fRemoveItem->SetEnabled(hasSelection);
 }
