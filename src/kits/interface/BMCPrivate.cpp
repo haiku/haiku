@@ -99,7 +99,8 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
 		!fixedSize),
 	fMenuField(menuField),
 	fFixedSize(fixedSize),
-	fShowPopUpMarker(true)
+	fShowPopUpMarker(true),
+	fIsInside(false)
 {
 	_Init();
 }
@@ -110,7 +111,8 @@ _BMCMenuBar_::_BMCMenuBar_(BMenuField* menuField)
 	BMenuBar("_mc_mb_", B_ITEMS_IN_ROW),
 	fMenuField(menuField),
 	fFixedSize(true),
-	fShowPopUpMarker(true)
+	fShowPopUpMarker(true),
+	fIsInside(false)
 {
 	_Init();
 }
@@ -121,7 +123,8 @@ _BMCMenuBar_::_BMCMenuBar_(BMessage* data)
 	BMenuBar(data),
 	fMenuField(NULL),
 	fFixedSize(true),
-	fShowPopUpMarker(true)
+	fShowPopUpMarker(true),
+	fIsInside(false)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 
@@ -195,11 +198,24 @@ _BMCMenuBar_::Draw(BRect updateRect)
 		flags |= BControlLook::B_DISABLED;
 	if (IsFocus())
 		flags |= BControlLook::B_FOCUSED;
+	if (fIsInside)
+		flags |= BControlLook::B_HOVER;
 
 	be_control_look->DrawMenuFieldBackground(this, rect,
 		updateRect, LowColor(), fShowPopUpMarker, flags);
 
 	DrawItems(updateRect);
+}
+
+
+void
+_BMCMenuBar_::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
+{
+	bool inside = (code != B_EXITED_VIEW) && Bounds().Contains(where);
+	if (inside != fIsInside) {
+		fIsInside = inside;
+		Invalidate();
+	}
 }
 
 

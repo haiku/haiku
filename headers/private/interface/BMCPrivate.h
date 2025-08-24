@@ -45,6 +45,7 @@ public:
 
 	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
+	virtual void				MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage);
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				MakeFocus(bool focused = true);
 	virtual	void				MessageReceived(BMessage* message);
@@ -65,8 +66,9 @@ private:
 			void				_Init();
 
 			BMenuField*			fMenuField;
-			bool				fFixedSize;	
+			bool				fFixedSize;
 			bool				fShowPopUpMarker;
+			bool				fIsInside;
 			float				fPreviousWidth;
 };
 
