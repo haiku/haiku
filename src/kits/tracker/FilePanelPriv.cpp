@@ -812,6 +812,9 @@ TFilePanel::Init(const BMessage*)
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(kCancelButton));
 	AddShortcut('D', B_COMMAND_KEY, new BMessage(kSwitchToDesktop));
 	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
+	AddShortcut(B_DELETE, B_NO_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDeleteSelection),
+		PoseView());
+	AddShortcut(B_DELETE, B_NO_COMMAND_KEY, new BMessage(kMoveSelectionToTrash), PoseView());
 	AddShortcut('A', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kShowSelectionWindow));
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), this);
 	AddShortcut('S', B_COMMAND_KEY, new BMessage(kInvertSelection), PoseView());
