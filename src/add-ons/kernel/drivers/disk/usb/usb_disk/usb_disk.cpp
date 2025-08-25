@@ -1817,18 +1817,11 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 static status_t
 usb_disk_bounced_io(device_lun *lun, io_request *request)
 {
+	ASSERT(request->Buffer()->IsPhysical() || request->Buffer()->IsMemoryLocked());
+
 	DMAResource* dmaResource = get_dma_resource(lun->device, lun->block_size);
 	if (dmaResource == NULL)
 		return B_NO_INIT;
-
-	if (!request->Buffer()->IsPhysical()) {
-		status_t status = request->Buffer()->LockMemory(request->TeamID(), request->IsWrite());
-		if (status != B_OK) {
-			TRACE_ALWAYS("failed to lock memory: %s\n", strerror(status));
-			return status;
-		}
-		// SetStatusAndNotify() takes care of unlocking memory if necessary.
-	}
 
 	status_t status = B_OK;
 	while (request->RemainingBytes() > 0) {
@@ -1919,6 +1912,17 @@ usb_disk_io(void *cookie, io_request *request)
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
 
+	const bool needsBounce = usb_disk_needs_bounce(lun, request);
+
+	if (needsBounce && !request->Buffer()->IsPhysical()) {
+		status_t status = request->Buffer()->LockMemory(request->TeamID(), request->IsWrite());
+		if (status != B_OK) {
+			TRACE_ALWAYS("failed to lock memory: %s\n", strerror(status));
+			return status;
+		}
+		// SetStatusAndNotify() takes care of unlocking memory if necessary.
+	}
+
 	RecursiveLocker ioLocker(device->io_lock);
 	MutexLocker deviceLocker(device->lock);
 
@@ -1926,7 +1930,7 @@ usb_disk_io(void *cookie, io_request *request)
 		return B_DEV_NOT_READY;
 
 	status_t status;
-	if (!usb_disk_needs_bounce(lun, request)) {
+	if (!needsBounce) {
 		status = usb_disk_direct_io(lun, request);
 	} else {
 		status = usb_disk_bounced_io(lun, request);
