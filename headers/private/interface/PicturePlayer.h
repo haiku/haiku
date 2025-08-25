@@ -18,6 +18,7 @@
 #include <InterfaceDefs.h>
 #include <Point.h>
 #include <Rect.h>
+#include <Region.h>
 
 
 class BAffineTransform;
@@ -52,7 +53,7 @@ struct picture_player_callbacks {
 		const void* data, size_t length);
 	void (*draw_picture)(void* userData, const BPoint& where, int32 token);
 	void (*set_clipping_rects)(void* userData, size_t numRects,
-		const BRect rects[]);
+		const clipping_rect rects[]);
 	void (*clip_to_picture)(void* userData, int32 token,
 		const BPoint& where, bool clipToInverse);
 	void (*push_state)(void* userData);

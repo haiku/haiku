@@ -186,7 +186,7 @@ draw_picture(void* _context, const BPoint& where, int32 token)
 
 
 static void
-set_clipping_rects(void* _context, size_t numRects, const BRect _rects[])
+set_clipping_rects(void* _context, size_t numRects, const clipping_rect _rects[])
 {
 	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 
@@ -195,7 +195,10 @@ set_clipping_rects(void* _context, size_t numRects, const BRect _rects[])
 	if (!rects.IsValid())
 		return;
 
-	memcpy((void*)rects, _rects, numRects * sizeof(BRect));
+	for (size_t i = 0; i < numRects; i++) {
+		clipping_rect srcRect = _rects[i];
+		rects[i] = BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom);
+	}
 
 	((void (*)(void*, BRect*, uint32))context->function_table[20])(
 		context->user_data, rects, numRects);
@@ -1278,14 +1281,20 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 			case B_PIC_SET_CLIPPING_RECTS:
 			{
-				const uint32* numRects;
-				const BRect* rects;
-				if (callbacks.set_clipping_rects == NULL
-					|| !reader.Get(numRects) || !reader.Get(rects, *numRects)) {
+				if (callbacks.set_clipping_rects == NULL)
 					break;
-				}
 
-				callbacks.set_clipping_rects(userData, *numRects, rects);
+				const clipping_rect* frame;
+				if (!reader.Get(frame))
+					break;
+
+				uint32 numRects = reader.Remaining() / sizeof(clipping_rect);
+
+				const clipping_rect* rects;
+				if (!reader.Get(rects, numRects))
+					break;
+
+				callbacks.set_clipping_rects(userData, numRects, rects);
 				break;
 			}
 

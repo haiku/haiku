@@ -599,7 +599,7 @@ draw_picture(void* _canvas, const BPoint& where, int32 token)
 
 
 static void
-set_clipping_rects(void* _canvas, size_t numRects, const BRect rects[])
+set_clipping_rects(void* _canvas, size_t numRects, const clipping_rect rects[])
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 

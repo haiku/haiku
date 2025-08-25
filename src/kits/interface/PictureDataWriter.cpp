@@ -301,18 +301,14 @@ PictureDataWriter::WriteClipToPicture(int32 pictureToken,
 status_t
 PictureDataWriter::WriteSetClipping(const BRegion& region)
 {
-	// TODO: I don't know if it's compatible with R5's BPicture version
 	try {
+		BeginOp(B_PIC_SET_CLIPPING_RECTS);
+		Write<clipping_rect>(region.FrameInt());
 		const int32 numRects = region.CountRects();
-		if (numRects > 0 && region.Frame().IsValid()) {
-			BeginOp(B_PIC_SET_CLIPPING_RECTS);
-			Write<uint32>(numRects);
-			for (int32 i = 0; i < numRects; i++)
-				Write<BRect>(region.RectAt(i));
+		for (int32 i = 0; i < numRects; i++)
+			Write<clipping_rect>(region.RectAtInt(i));
 
-			EndOp();
-		} else
-			WriteClearClipping();
+		EndOp();
 	} catch (status_t& status) {
 		return status;
 	}
