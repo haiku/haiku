@@ -956,6 +956,7 @@ usb_disk_update_capacity(device_lun *lun)
 
 	if (lun->io_scheduler == NULL) {
 		dma_restrictions restrictions = {};
+		restrictions.high_address = UINT32_MAX;
 		restrictions.max_transfer_size = (lun->block_size * MAX_IO_BLOCKS);
 
 		DMAResource* dmaResource = new DMAResource;
