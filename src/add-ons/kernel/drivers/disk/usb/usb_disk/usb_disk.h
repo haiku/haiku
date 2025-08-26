@@ -9,7 +9,6 @@
 #define _USB_DISK_H_
 
 
-#include <util/Vector.h>
 #include <util/DoublyLinkedList.h>
 
 #include <lock.h>
@@ -26,7 +25,6 @@
 #define SYNC_SUPPORT_RELOAD			5
 
 struct IOScheduler;
-struct DMAResource;
 typedef struct device_lun_s device_lun;
 
 // holds common information about an attached device (pointed to by luns)
@@ -42,9 +40,6 @@ typedef struct disk_device_s {
 	uint32		open_count;
 	recursive_lock io_lock;
 	mutex		lock;
-
-	// IO operations
-	Vector<DMAResource*>	dma_resources;
 
 	// device state
 	usb_pipe	bulk_in;
@@ -77,6 +72,8 @@ struct device_lun_s {
 	disk_device *device;
 	char		name[32];
 	uint8		logical_unit_number;
+
+	IOScheduler *io_scheduler;
 	bool		should_sync;
 
 	// device information through read capacity/inquiry

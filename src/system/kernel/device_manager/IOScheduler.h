@@ -42,6 +42,8 @@ public:
 			const char*			Name() const	{ return fName; }
 			int32				ID() const		{ return fID; }
 
+			const DMAResource*	GetDMAResource() const { return fDMAResource; }
+
 	virtual	void				SetCallback(IOCallback& callback);
 	virtual	void				SetCallback(io_callback callback, void* data);
 

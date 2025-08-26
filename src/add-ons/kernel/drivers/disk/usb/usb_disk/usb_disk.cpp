@@ -24,14 +24,14 @@
 #include <syscall_restart.h>
 #include <util/AutoLock.h>
 
-#include "IORequest.h"
+#include "IOSchedulerSimple.h"
 
 #include "scsi_sense.h"
 #include "usb_disk_scsi.h"
 #include "icons.h"
 
 
-#define MAX_IO_BLOCKS					(128)
+#define MAX_IO_BLOCKS					(256)
 
 #define USB_DISK_DEVICE_MODULE_NAME		"drivers/disk/usb_disk/device_v1"
 #define USB_DISK_DRIVER_MODULE_NAME		"drivers/disk/usb_disk/driver_v1"
@@ -86,6 +86,7 @@ struct {
 
 static void	usb_disk_callback(void *cookie, status_t status, void *data,
 				size_t actualLength);
+static status_t usb_disk_do_io(void* cookie, IOOperation* operation);
 
 uint8		usb_disk_get_max_lun(disk_device *device);
 void		usb_disk_reset_recovery(disk_device *device);
@@ -127,27 +128,15 @@ disk_device_s::~disk_device_s()
 }
 
 
-static DMAResource*
-get_dma_resource(disk_device *device, uint32 blockSize)
-{
-	for (int32 i = 0; i < device->dma_resources.Count(); i++) {
-		DMAResource* r = device->dma_resources[i];
-		if (r->BlockSize() == blockSize)
-			return r;
-	}
-	return NULL;
-}
-
-
 void
 usb_disk_free_device_and_luns(disk_device *device)
 {
 	ASSERT_LOCKED_MUTEX(&device->lock);
 
-	for (int32 i = 0; i < device->dma_resources.Count(); i++)
-		delete device->dma_resources[i];
-	for (uint8 i = 0; i < device->lun_count; i++)
+	for (uint8 i = 0; i < device->lun_count; i++) {
+		delete device->luns[i]->io_scheduler;
 		free(device->luns[i]);
+	}
 	free(device->luns);
 	delete device;
 }
@@ -949,8 +938,23 @@ usb_disk_update_capacity(device_lun *lun)
 			return result;
 	}
 
-	// ensure we have a DMAResource for this block_size
-	if (get_dma_resource(lun->device, lun->block_size) == NULL) {
+	if (lun->io_scheduler != NULL
+			&& lun->io_scheduler->GetDMAResource()->BlockSize() != lun->block_size) {
+		// We need to replace the IOScheduler.
+		IOScheduler* oldScheduler = lun->io_scheduler;
+		lun->io_scheduler = NULL;
+
+		// Release the locks so any pending operations can finish cleanly.
+		mutex_unlock(&lun->device->lock);
+		recursive_lock_unlock(&lun->device->io_lock);
+
+		delete oldScheduler;
+
+		recursive_lock_lock(&lun->device->io_lock);
+		mutex_lock(&lun->device->lock);
+	}
+
+	if (lun->io_scheduler == NULL) {
 		dma_restrictions restrictions = {};
 		restrictions.max_transfer_size = (lun->block_size * MAX_IO_BLOCKS);
 
@@ -959,7 +963,12 @@ usb_disk_update_capacity(device_lun *lun)
 		if (result != B_OK)
 			return result;
 
-		lun->device->dma_resources.Add(dmaResource);
+		lun->io_scheduler = new IOSchedulerSimple(dmaResource);
+		result = lun->io_scheduler->Init("usb_disk");
+		if (result != B_OK)
+			panic("initializing IOScheduler failed: %s", strerror(result));
+
+		lun->io_scheduler->SetCallback(usb_disk_do_io, lun);
 	}
 
 	return B_OK;
@@ -1163,6 +1172,7 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 		lun->should_sync = false;
 		lun->media_present = true;
 		lun->media_changed = true;
+		lun->io_scheduler = NULL;
 
 		memset(lun->vendor_name, 0, sizeof(lun->vendor_name));
 		memset(lun->product_name, 0, sizeof(lun->product_name));
@@ -1258,21 +1268,6 @@ usb_disk_device_removed(void *cookie)
 		usb_disk_free_device_and_luns(device);
 	else
 		mutex_unlock(&device->lock);
-}
-
-
-static bool
-usb_disk_needs_bounce(device_lun *lun, io_request *request)
-{
-	if (!request->Buffer()->IsVirtual())
-		return true;
-	if ((request->Offset() % lun->block_size) != 0)
-		return true;
-	if ((request->Length() % lun->block_size) != 0)
-		return true;
-	if (request->Length() > (lun->block_size * MAX_IO_BLOCKS))
-		return true;
-	return false;
 }
 
 
@@ -1815,91 +1810,36 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 
 static status_t
-usb_disk_bounced_io(device_lun *lun, io_request *request)
+usb_disk_do_io(void* cookie, IOOperation* operation)
 {
-	ASSERT(request->Buffer()->IsPhysical() || request->Buffer()->IsMemoryLocked());
+	device_lun *lun = (device_lun *)cookie;
 
-	DMAResource* dmaResource = get_dma_resource(lun->device, lun->block_size);
-	if (dmaResource == NULL)
-		return B_NO_INIT;
+	RecursiveLocker ioLocker(lun->device->io_lock);
+	MutexLocker deviceLocker(lun->device->lock);
 
-	status_t status = B_OK;
-	while (request->RemainingBytes() > 0) {
-		IOOperation operation;
-		status = dmaResource->TranslateNext(request, &operation, 0);
-		if (status != B_OK)
-			break;
+	TRACE("%p: IOO offset: %" B_PRIdOFF ", length: %" B_PRIuGENADDR
+		", write: %s\n", operation->Parent(), operation->Offset(),
+		operation->Length(), operation->IsWrite() ? "yes" : "no");
 
-		do {
-			TRACE("%p: IOO offset: %" B_PRIdOFF ", length: %" B_PRIuGENADDR
-				", write: %s\n", request, operation.Offset(),
-				operation.Length(), operation.IsWrite() ? "yes" : "no");
-
-			struct transfer_data data;
-			data.physical = true;
-			data.phys_vecs = (physical_entry*)operation.Vecs();
-			data.vec_count = operation.VecCount();
-
-			size_t length = operation.Length();
-			const uint64 blockPosition = operation.Offset() / lun->block_size;
-			const size_t blockCount = length / lun->block_size;
-			if (operation.IsWrite()) {
-				status = usb_disk_block_write(lun,
-					blockPosition, blockCount, data, &length);
-			} else {
-				status = usb_disk_block_read(lun,
-					blockPosition, blockCount, data, &length);
-			}
-
-			operation.SetStatus(status, length);
-		} while (status == B_OK && !operation.Finish());
-
-		if (status == B_OK && operation.Status() != B_OK) {
-			TRACE_ALWAYS("I/O succeeded but IOOperation failed!\n");
-			status = operation.Status();
-		}
-
-		request->OperationFinished(&operation);
-		dmaResource->RecycleBuffer(operation.Buffer());
-
-		TRACE("%p: status %s, remaining bytes %" B_PRIuGENADDR "\n", request,
-			strerror(status), request->RemainingBytes());
-		if (status != B_OK)
-			break;
-	}
-
-	return status;
-}
-
-
-static status_t
-usb_disk_direct_io(device_lun *lun, io_request *request)
-{
-	generic_io_vec* genericVecs = request->Buffer()->Vecs();
-	const uint32 count = request->Buffer()->VecCount();
-	BStackOrHeapArray<iovec, 16> vecs(count);
-	for (uint32 i = 0; i < count; i++) {
-		vecs[i].iov_base = (void*)genericVecs[i].base;
-		vecs[i].iov_len = genericVecs[i].length;
-	}
 	struct transfer_data data;
-	data.vecs = vecs;
-	data.vec_count = count;
+	data.physical = true;
+	data.phys_vecs = (physical_entry*)operation->Vecs();
+	data.vec_count = operation->VecCount();
 
-	size_t length = request->Length();
-	const uint64 blockPosition = request->Offset() / lun->block_size;
+	size_t length = operation->Length();
+	const uint64 blockPosition = operation->Offset() / lun->block_size;
 	const size_t blockCount = length / lun->block_size;
 
 	status_t status;
-	if (request->IsWrite()) {
-		 status = usb_disk_block_write(lun,
+	if (operation->IsWrite()) {
+		status = usb_disk_block_write(lun,
 			blockPosition, blockCount, data, &length);
 	} else {
 		status = usb_disk_block_read(lun,
 			blockPosition, blockCount, data, &length);
 	}
 
-	request->SetTransferredBytes(length != request->Length(), length);
+	lun->io_scheduler->OperationCompleted(operation, status, length);
 	return status;
 }
 
@@ -1908,42 +1848,21 @@ static status_t
 usb_disk_io(void *cookie, io_request *request)
 {
 	TRACE("io(%p)\n", request);
-
 	device_lun *lun = (device_lun *)cookie;
-	disk_device *device = lun->device;
 
-	const bool needsBounce = usb_disk_needs_bounce(lun, request);
+	MutexLocker deviceLocker(lun->device->lock);
 
-	if (needsBounce && !request->Buffer()->IsPhysical()) {
-		status_t status = request->Buffer()->LockMemory(request->TeamID(), request->IsWrite());
-		if (status != B_OK) {
-			TRACE_ALWAYS("failed to lock memory: %s\n", strerror(status));
-			return status;
-		}
-		// SetStatusAndNotify() takes care of unlocking memory if necessary.
-	}
-
-	RecursiveLocker ioLocker(device->io_lock);
-	MutexLocker deviceLocker(device->lock);
-
-	if (device->removed)
+	if (lun->device->removed)
 		return B_DEV_NOT_READY;
+	if (!lun->media_present)
+		return B_DEV_NO_MEDIA;
 
-	status_t status;
-	if (!needsBounce) {
-		status = usb_disk_direct_io(lun, request);
-	} else {
-		status = usb_disk_bounced_io(lun, request);
+	if (lun->io_scheduler == NULL) {
+		// We must be in the middle of a media change.
+		return B_BUSY;
 	}
 
-	deviceLocker.Unlock();
-	ioLocker.Unlock();
-
-	if (request->Status() > 0)
-		request->SetStatusAndNotify(status);
-	else
-		request->NotifyFinished();
-	return status;
+	return lun->io_scheduler->ScheduleRequest(request);
 }
 
 
