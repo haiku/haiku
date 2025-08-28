@@ -7,7 +7,6 @@
 #include "Attribute.h"
 #include "Misc.h"
 #include "Node.h"
-#include "ramfs.h"
 #include "Volume.h"
 
 // constructor
@@ -102,7 +101,7 @@ Attribute::_Changed(uint8* oldKey, size_t oldLength, off_t changeOffset, ssize_t
 
 	// update live queries
 	uint8 newKey[kMaxIndexKeyLength];
-	size_t newLength = kMaxIndexKeyLength;
+	size_t newLength;
 	GetKey(newKey, &newLength);
 	GetVolume()->UpdateLiveQueries(NULL, fNode, GetName(), fType, oldKey,
 		oldLength, newKey, newLength);
@@ -125,10 +124,9 @@ Attribute::SetIndex(AttributeIndex *index, bool inIndex)
 
 // GetKey
 void
-Attribute::GetKey(uint8 *key, size_t *length)
+Attribute::GetKey(uint8 key[kMaxIndexKeyLength], size_t *length)
 {
-	*length = min(*length, kMaxIndexKeyLength);
-	ReadAt(0, key, *length, length);
+	ReadAt(0, key, kMaxIndexKeyLength, length);
 }
 
 // AttachAttributeIterator
