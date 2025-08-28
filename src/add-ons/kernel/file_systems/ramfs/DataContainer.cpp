@@ -134,17 +134,17 @@ DataContainer::Resize(off_t newSize)
 {
 //	PRINT("DataContainer::Resize(%lld), fSize: %lld\n", newSize, fSize);
 
-	status_t error = B_OK;
 	if (_RequiresCacheMode(newSize)) {
 		if (newSize < fSize) {
 			// shrink
 			// resize the VMCache, which will automatically free pages
 			AutoLocker<VMCache> _(fCache);
-			error = fCache->Resize(newSize, VM_PRIORITY_USER);
+			status_t error = fCache->Resize(newSize, VM_PRIORITY_USER);
 			if (error != B_OK)
 				return error;
 		} else {
 			// grow
+			status_t error = B_OK;
 			if (!_IsCacheMode())
 				error = _SwitchToCacheMode();
 			if (error != B_OK)
@@ -171,9 +171,7 @@ DataContainer::Resize(off_t newSize)
 	}
 
 	fSize = newSize;
-
-//	PRINT("DataContainer::Resize() done: %lx, fSize: %lld\n", error, fSize);
-	return error;
+	return B_OK;
 }
 
 
