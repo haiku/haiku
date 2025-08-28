@@ -3864,10 +3864,17 @@ acquire_vnode(fs_volume* volume, ino_t vnodeID)
 	ReadLocker nodeLocker(sVnodeLock);
 
 	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
-	if (vnode == NULL)
+	if (vnode == NULL) {
+		KDEBUG_ONLY(panic("acquire_vnode(%p, %" B_PRIdINO "): not found!", volume, vnodeID));
 		return B_BAD_VALUE;
+	}
 
-	inc_vnode_ref_count(vnode);
+	if (inc_vnode_ref_count(vnode) == 0) {
+		// It isn't valid to acquire another reference to a vnode that
+		// you don't already have a reference to, so this should never happen.
+		panic("acquire_vnode(%p, %" B_PRIdINO "): node wasn't used!", volume, vnodeID);
+	}
+
 	return B_OK;
 }
 
@@ -3881,8 +3888,10 @@ put_vnode(fs_volume* volume, ino_t vnodeID)
 	vnode = lookup_vnode(volume->id, vnodeID);
 	rw_lock_read_unlock(&sVnodeLock);
 
-	if (vnode == NULL)
+	if (vnode == NULL) {
+		KDEBUG_ONLY(panic("put_vnode(%p, %" B_PRIdINO "): not found!", volume, vnodeID));
 		return B_BAD_VALUE;
+	}
 
 	dec_vnode_ref_count(vnode, false, true);
 	return B_OK;
