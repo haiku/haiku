@@ -8,6 +8,7 @@
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 int
@@ -19,8 +20,12 @@ main(int argc, char** argv)
 		printf("with affinity on CPU 1\n");
 		pthread_t thread = pthread_self();
 		cpuset_t cpuset;
-		CPUSET_ZERO(&cpuset);
-		CPUSET_SET(1, &cpuset);
+		CPU_ZERO(&cpuset);
+		CPU_SET(1, &cpuset);
+		if (CPU_COUNT(&cpuset) != 1) {
+			fprintf(stderr, "CPU_COUNT failed\n");
+			exit(1);
+		}
 		if (pthread_setaffinity_np(thread, sizeof(cpuset_t), &cpuset) != 0) {
 			fprintf(stderr, "pthread_setaffinity_np failed\n");
 			exit(1);
@@ -29,7 +34,7 @@ main(int argc, char** argv)
 			fprintf(stderr, "pthread_getaffinity_np failed\n");
 			exit(1);
 		}
-		if (!CPUSET_ISSET(1, &cpuset))
+		if (!CPU_ISSET(1, &cpuset))
 			fprintf(stderr, "affinity not on CPU 1\n");
 		if (sched_getcpu() != 1)
 			fprintf(stderr, "not running on CPU 1\n");

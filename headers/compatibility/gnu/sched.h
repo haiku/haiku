@@ -32,6 +32,7 @@ typedef __haiku_uint32 cpuset_mask;
 typedef struct _cpuset {
 	cpuset_mask bits[_howmany(CPU_SETSIZE, NCPUSETBITS)];
 } cpuset_t;
+typedef cpuset_t cpu_set_t;
 
 
 #define _CPUSET_BITSINDEX(cpu) ((cpu) / NCPUSETBITS)
@@ -40,12 +41,32 @@ typedef struct _cpuset {
 /* FD_ZERO uses memset */
 #include <string.h>
 
-#define CPUSET_ZERO(set) memset((set), 0, sizeof(cpuset_t))
-#define CPUSET_SET(cpu, set) ((set)->bits[_CPUSET_BITSINDEX(cpu)] |= _CPUSET_BIT(cpu))
-#define CPUSET_CLR(cpu, set) ((set)->bits[_CPUSET_BITSINDEX(cpu)] &= ~_CPUSET_BIT(cpu))
-#define CPUSET_ISSET(cpu, set) ((set)->bits[_CPUSET_BITSINDEX(cpu)] & _CPUSET_BIT(cpu))
-#define CPUSET_COPY(source, target) (*(target) = *(source))
 
+static inline unsigned int
+__cpu_count(cpuset_t *set)
+{
+	unsigned int count = 0;
+	for (unsigned int i = 0; i < _howmany(CPU_SETSIZE, NCPUSETBITS); i++) {
+		cpuset_mask mask = set->bits[i];
+#if __GNUC__ > 2
+		count += __builtin_popcount(mask);
+#else
+		while (mask > 0) {
+			if ((mask & 1) == 1)
+				count++;
+			mask >>= 1;
+		}
+#endif
+	}
+	return count;
+}
+
+#define CPU_ZERO(set) memset((set), 0, sizeof(cpuset_t))
+#define CPU_SET(cpu, set) ((set)->bits[_CPUSET_BITSINDEX(cpu)] |= _CPUSET_BIT(cpu))
+#define CPU_CLR(cpu, set) ((set)->bits[_CPUSET_BITSINDEX(cpu)] &= ~_CPUSET_BIT(cpu))
+#define CPU_ISSET(cpu, set) ((set)->bits[_CPUSET_BITSINDEX(cpu)] & _CPUSET_BIT(cpu))
+#define CPU_COPY(source, target) (*(target) = *(source))
+#define CPU_COUNT(set)	__cpu_count(set)
 
 #ifdef __cplusplus
 extern "C" {
