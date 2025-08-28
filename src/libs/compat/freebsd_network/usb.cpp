@@ -420,7 +420,7 @@ extern "C" void
 usbd_xfer_set_frame_len(struct usb_xfer* xfer,
 	usb_frcount_t frindex, usb_frlength_t len)
 {
-	KASSERT(frindex < uint32_t(xfer->nframes), ("frame index overflow"));
+	KASSERT(frindex < uint32_t(xfer->max_frame_count), ("frame index overflow"));
 	KASSERT(len <= uint32_t(xfer->max_data_length), ("length overflow"));
 
 	// Trigger buffer allocation if necessary.
