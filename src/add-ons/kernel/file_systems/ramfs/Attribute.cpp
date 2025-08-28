@@ -26,6 +26,7 @@ Attribute::Attribute(Volume *volume, Node *node, const char *name,
 // destructor
 Attribute::~Attribute()
 {
+	ASSERT(fIndex == NULL);
 }
 
 // InitCheck
@@ -101,6 +102,9 @@ Attribute::WriteAt(off_t offset, const void *buffer, size_t size,
 void
 Attribute::SetIndex(AttributeIndex *index, bool inIndex)
 {
+	ASSERT(fIndex == NULL || index == NULL || fIndex == index);
+	ASSERT(!fInIndex || fInIndex != inIndex);
+
 	fIndex = index;
 	fInIndex = inIndex;
 }
