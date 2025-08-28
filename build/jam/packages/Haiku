@@ -161,7 +161,6 @@ AddDriversToPackage :
 	null
 	<driver>tty
 	usb_modeswitch
-	zero
 	;
 AddDriversToPackage audio hmulti :
 	$(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;

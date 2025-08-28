@@ -106,7 +106,6 @@ AddDriversToPackage :
 	null
 	random
 	<driver>tty
-	zero
 	;
 AddDriversToPackage audio hmulti
 	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;

@@ -8,10 +8,13 @@
 
 
 #include <Drivers.h>
+#include <KernelExport.h>
 #include <string.h>
 
 
-#define DEVICE_NAME "null"
+#define DEVICE_NAME_FULL "full"
+#define DEVICE_NAME_NULL "null"
+#define DEVICE_NAME_ZERO "zero"
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -54,9 +57,26 @@ null_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 
 
 static status_t
+zero_read(void *cookie, off_t pos, void *buffer, size_t *_length)
+{
+	if (user_memset(buffer, 0, *_length) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return B_OK;
+}
+
+
+static status_t
 null_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	return B_OK;
+}
+
+
+static status_t
+full_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
+{
+	return B_DEVICE_FULL;
 }
 
 
@@ -74,7 +94,9 @@ const char **
 publish_devices(void)
 {
 	static const char *devices[] = {
-		DEVICE_NAME, 
+		DEVICE_NAME_FULL,
+		DEVICE_NAME_NULL,
+		DEVICE_NAME_ZERO,
 		NULL
 	};
 
@@ -85,24 +107,40 @@ publish_devices(void)
 device_hooks *
 find_device(const char *name)
 {
-	static device_hooks hooks = {
+	static device_hooks fullHooks = {
+		&null_open,
+		&null_close,
+		&null_freecookie,
+		&null_ioctl,
+		&null_read,
+		&full_write,
+	};
+
+	static device_hooks nullHooks = {
 		&null_open,
 		&null_close,
 		&null_freecookie,
 		&null_ioctl,
 		&null_read,
 		&null_write,
-		/* Leave select/deselect/readv/writev undefined. The kernel will
-		 * use its own default implementation. The basic hooks above this
-		 * line MUST be defined, however. */
-		NULL,
-		NULL,
-		NULL,
-		NULL
 	};
 
-	if (!strcmp(name, DEVICE_NAME))
-		return &hooks;
+	static device_hooks zeroHooks = {
+		&null_open,
+		&null_close,
+		&null_freecookie,
+		&null_ioctl,
+		&zero_read,
+		&null_write,
+	};
+
+
+	if (strcmp(name, DEVICE_NAME_FULL) == 0)
+		return &fullHooks;
+	if (strcmp(name, DEVICE_NAME_NULL) == 0)
+		return &nullHooks;
+	if (strcmp(name, DEVICE_NAME_ZERO) == 0)
+		return &zeroHooks;
 
 	return NULL;
 }
