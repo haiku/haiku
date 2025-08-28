@@ -481,7 +481,7 @@ Inode::WriteLockInTransaction(Transaction& transaction)
 	if ((Flags() & INODE_DELETED) != 0)
 		fVolume->RemovedInodes().Remove(this);
 
-	if (!fVolume->IsInitializing())
+	if (!fVolume->IsInitializing() && this != fVolume->IndicesNode())
 		acquire_vnode(fVolume->FSVolume(), ID());
 
 	rw_lock_write_lock(&Lock());
@@ -2509,7 +2509,7 @@ Inode::RemovedFromTransaction()
 
 	rw_lock_write_unlock(&Lock());
 
-	if (!fVolume->IsInitializing())
+	if (!fVolume->IsInitializing() && this != fVolume->IndicesNode())
 		put_vnode(fVolume->FSVolume(), ID());
 }
 
