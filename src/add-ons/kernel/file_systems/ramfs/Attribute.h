@@ -54,6 +54,10 @@ public:
 	void GetAllocationInfo(AllocationInfo &info);
 
 private:
+	void _Changed(uint8* oldKey, size_t oldLength,
+		off_t changeOffset, ssize_t changeSize);
+
+private:
 	Node						*fNode;
 	String						fName;
 	uint32						fType;
