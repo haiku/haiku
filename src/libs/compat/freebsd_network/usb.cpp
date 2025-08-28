@@ -316,6 +316,8 @@ usbd_transfer_setup(struct freebsd_usb_device* udev,
 				continue;
 
 			xfer->pipe = iface->endpoint[i].handle;
+			if (xfer->max_data_length == 0)
+				xfer->max_data_length = iface->endpoint[i].descr->max_packet_size;
 			break;
 		}
 		if (xfer->pipe == -1)
