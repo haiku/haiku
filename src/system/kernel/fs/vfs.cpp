@@ -144,6 +144,8 @@ struct fs_mount {
 
 	~fs_mount()
 	{
+		ASSERT(vnodes.IsEmpty());
+
 		mutex_destroy(&lock);
 		free(device_name);
 
@@ -1069,6 +1071,9 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 	if (vnode->IsBusy())
 		panic("dec_vnode_ref_count: called on busy vnode %p\n", vnode);
 
+	if (vnode->mount->unmounting)
+		alwaysFree = true;
+
 	bool freeNode = false;
 	bool freeUnusedNodes = false;
 
@@ -1359,7 +1364,7 @@ free_unused_vnodes(int32 level)
 		if (vnode != sUnusedVnodeList.First())
 			continue;
 
-		ASSERT(!vnode->IsBusy());
+		ASSERT(!vnode->IsBusy() && vnode->ref_count == 0);
 
 		// grab a reference
 		inc_vnode_ref_count(vnode);
@@ -7732,6 +7737,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 		coveredNode->covered_by = mount->root_vnode;
 		coveredNode->SetCovered(true);
+		inc_vnode_ref_count(mount->root_vnode);
 	}
 	rw_lock_write_unlock(&sVnodeLock);
 
@@ -7864,6 +7870,8 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 				refCount--;
 			if (vnode->covered_by != NULL)
 				refCount--;
+			if (vnode == mount->root_vnode)
+				refCount--;
 
 			if (refCount != 0) {
 				dprintf("fs_unmount(): inode %" B_PRIdINO " is still referenced\n", vnode->id);
@@ -7955,6 +7963,9 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 			}
 		}
 
+		if (vnode == mount->root_vnode)
+			continue;
+
 		vnode->SetBusy(true);
 		vnode_to_be_freed(vnode);
 	}
@@ -7962,8 +7973,6 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	vnodesWriteLocker.Unlock();
 
 	// Free all vnodes associated with this mount.
-	// They will be removed from the mount list by free_vnode(), so
-	// we don't have to do this.
 	while (struct vnode* vnode = mount->vnodes.Head()) {
 		// Put the references to external covered/covering vnodes we kept above.
 		if (Vnode* coveredNode = vnode->covers)
@@ -7971,8 +7980,17 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		if (Vnode* coveringNode = vnode->covered_by)
 			put_vnode(coveringNode);
 
-		free_vnode(vnode, false);
+		// free_vnode() removes nodes from the mount list. However, the root
+		// will still be referenced by the FS, so we can't free it yet.
+		if (vnode == mount->root_vnode)
+			remove_vnode_from_mount_list(vnode, mount);
+		else
+			free_vnode(vnode, false);
 	}
+
+	// Re-add the root to the mount list, so it can be freed.
+	add_vnode_to_mount_list(mount->root_vnode, mount);
+	mount->root_vnode = NULL;
 
 	// remove the mount structure from the hash table
 	rw_lock_write_lock(&sMountLock);
