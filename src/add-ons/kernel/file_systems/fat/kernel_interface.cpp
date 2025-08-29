@@ -459,6 +459,8 @@ dosfs_unmount(fs_volume* volume)
 	status_t status = B_OK;
 	status_t returnStatus = B_OK;
 
+	put_vnode(volume, root_inode(fatVolume));
+
 	MutexLocker locker(bsdVolume->mnt_mtx.haikuMutex);
 
 	status = fat_volume_uninit(fatVolume);
