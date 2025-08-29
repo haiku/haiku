@@ -261,6 +261,8 @@ fs_unmount(fs_volume* _volume)
 	if (ntfs_umount(volume->ntfs, false) < 0)
 		return errno;
 
+	put_vnode(_volume, FILE_root);
+
 	delete volume;
 	_volume->private_volume = NULL;
 
