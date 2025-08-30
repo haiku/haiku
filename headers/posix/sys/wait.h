@@ -6,6 +6,7 @@
 #define _SYS_WAIT_H
 
 
+#include <features.h>
 #include <sys/types.h>
 #include <signal.h>
 
@@ -25,8 +26,13 @@
 #define WTERMSIG(value)		(((value) >> 8) & 0xff)
 #define WIFSTOPPED(value)	((((value) >> 16) & 0xff) != 0)
 #define WSTOPSIG(value)		(((value) >> 16) & 0xff)
-#define WIFCORED(value)		((value) & 0x10000)
+#define WCOREDUMP(value)	((value) & 0x10000)
 #define WIFCONTINUED(value)	((value) & 0x20000)
+
+#ifdef _DEFAULT_SOURCE
+/* non-standard macro for backwards compatibility */
+#define WIFCORED(value)		WCOREDUMP(value)
+#endif
 
 /* ID types for waitid() */
 typedef enum {

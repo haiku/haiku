@@ -54,7 +54,7 @@ _waitpid(pid_t pid, int* _status, int options, team_usage_info *usage_info)
 			case CLD_DUMPED:
 				// fill in signal for WIFSIGNALED() and WTERMSIG()
 				status = (info.si_status << 8) & 0xff00;
-				// if core dumped, set flag for WIFCORED()
+				// if core dumped, set flag for WCOREDUMP()
 				if (info.si_code == CLD_DUMPED)
 					status |= 0x10000;
 				break;
