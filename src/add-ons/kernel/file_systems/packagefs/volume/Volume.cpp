@@ -450,6 +450,7 @@ Volume::Mount(const char* parameterString)
 void
 Volume::Unmount()
 {
+	PutVNode(fRootDirectory->ID());
 }
 
 
