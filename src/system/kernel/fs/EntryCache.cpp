@@ -243,6 +243,10 @@ EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry, bool move)
 	readLocker.Unlock();
 	WriteLocker writeLocker(fLock);
 
+	// Resize the table if needed, no matter what. (The only other place it can
+	// be resized is Remove(), so this is important.)
+	fEntries.ResizeIfNeeded();
+
 	if (entry->index == kEntryRemoved) {
 		// the entry has been removed in the meantime
 		writeLocker.Unlock();
@@ -256,8 +260,6 @@ EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry, bool move)
 		fGenerations[fCurrentGeneration].entries[index] = entry;
 		entry->generation = fCurrentGeneration;
 		entry->index = index;
-
-		fEntries.ResizeIfNeeded();
 		return true;
 	}
 
