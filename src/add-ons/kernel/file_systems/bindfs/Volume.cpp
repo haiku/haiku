@@ -98,6 +98,7 @@ Volume::Mount(const char* parameterString)
 void
 Volume::Unmount()
 {
+	put_vnode(fFSVolume, fRootNode->ID());
 }
 
 
