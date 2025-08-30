@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	2599604529
+1	finnish	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		gold master
 Undo	TextView		Peru
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Versiohistoria:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kopion sovelluksen paikantaminen epäonnistui. Sovellusallekirjoitusta ei ole tarjottu.\n%error
 %s KiB/s	StringForRate	units per second	%s Kibitavua/s
 Blue:	ColorControl		Sininen:
+Special thanks:	AboutWindow		Lisäkiitokset:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kohteen ”%description” kopion luominen epäonnistui.\n%error
 Written by:	AboutWindow		Tekijä:

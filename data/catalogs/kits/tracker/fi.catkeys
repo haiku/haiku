@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	4192200646
+1	finnish	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -168,6 +168,7 @@ Property info	AttributesView		Ominaisuustiedot
 Sorry, you can't create links in the Trash.	PoseView		Et voi luoda linkkejä roskakorissa.
 From	Email Query Columns		Lähettäjä
 Open selection with:	OpenWithWindow		Avaa valinta sovelluksella:
+Preferences…	ContainerWindow		Asetukset…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Asiakirjan ”%document” avaus epäonnistui, koska sovellus ”%app” on roskakorissa. 
 Work Phone	Person Query Columns		Työpuhelin
 Select folders	FindPanel		Valitse kansiot

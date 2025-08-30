@@ -7,7 +7,7 @@ short\tlong\tdescription\n	FilePanelApp		lyhyt\tpitkä\tkuvaus\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tnäytä käyttö\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tkäytä ladattua tiedostopaneelia (oletus)\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\taseta tallennusten oletusnimi\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\t minkä kaltaisia kohteita ei voida avata (tyyppi): kaikki f, d, s -yhdistelmät  (tiedosto (oletus), hakemisto, symbolinen linkki)\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tsavattava(tyyppise)t: kaikki f, d, s -yhdistelmät  (tiedosto (oletus), hakemisto, symbolinen linkki)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		käyttö: %s [-h]     [-d kansio]              [-l|-s]     [-t ttl]      [-1]       [-m]
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		käyttö: %s [--help] [--directory kansio] [--load|--save] [--title ttl] [--single] [--modal]\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\taseta tiedostopaneelin ikkunaotsikko\n
