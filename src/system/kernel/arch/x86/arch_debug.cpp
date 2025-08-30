@@ -1358,17 +1358,13 @@ arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 }
 
 
-static void (*sDebugSnooze)(bigtime_t) = NULL;
+static void (*sDebugSnooze)(uint32) = NULL;
 static uint64 sDebugSnoozeConversionFactor = 0;
 
 
 static void
-debug_snooze_mwaitx(bigtime_t duration)
+debug_snooze_mwaitx(uint32 delay)
 {
-	uint32 delay = (duration * sDebugSnoozeConversionFactor) / 1000;
-	if (delay == 0)
-		delay = 1;
-
 	// monitorx (r/eax = pointer, ecx = extensions, edx = hints)
 	asm volatile(".byte 0x0f, 0x01, 0xfa;"
 		:: "a" (sDebugSnooze), "c" (0), "d" (0));
@@ -1380,12 +1376,8 @@ debug_snooze_mwaitx(bigtime_t duration)
 
 
 static void
-debug_snooze_tpause(bigtime_t duration)
+debug_snooze_tpause(uint32 delay)
 {
-	uint32 delay = (duration * sDebugSnoozeConversionFactor) / 1000;
-	if (delay == 0)
-		delay = 1;
-
 	memory_read_barrier();
 	uint64 target = __rdtsc() + delay;
 
@@ -1399,30 +1391,33 @@ debug_snooze_tpause(bigtime_t duration)
 void
 arch_debug_snooze(bigtime_t duration)
 {
+	uint32 delay = (duration * sDebugSnoozeConversionFactor) / 1000;
+	if (delay == 0)
+		delay = 1;
+
 	if (sDebugSnooze != NULL) {
-		sDebugSnooze(duration);
+		sDebugSnooze(delay);
 		return;
 	}
 
-	spin(duration);
+	memory_read_barrier();
+	uint64 target = __rdtsc() + delay;
+
+	while (__rdtsc() < target)
+		arch_cpu_pause();
 }
 
 
 status_t
 arch_debug_init(kernel_args* args)
 {
-	bool haveMWAITX = x86_check_feature(IA32_FEATURE_AMD_EXT_MWAITX, FEATURE_EXT_AMD_ECX),
-		haveTPAUSE = x86_check_feature(IA32_FEATURE_WAITPKG, FEATURE_7_ECX);
-	if (haveMWAITX || haveTPAUSE) {
-		// Store the TSC frequency in kHz.
-		sDebugSnoozeConversionFactor =
-			(uint64(1000) << 32) / args->arch_args.system_time_cv_factor;
-
-		if (haveMWAITX)
-			sDebugSnooze = debug_snooze_mwaitx;
-		else if (haveTPAUSE)
-			sDebugSnooze = debug_snooze_tpause;
-	}
+	// Store the TSC frequency in kHz.
+	sDebugSnoozeConversionFactor =
+		(uint64(1000) << 32) / args->arch_args.system_time_cv_factor;
+	if (x86_check_feature(IA32_FEATURE_AMD_EXT_MWAITX, FEATURE_EXT_AMD_ECX))
+		sDebugSnooze = debug_snooze_mwaitx;
+	if (x86_check_feature(IA32_FEATURE_WAITPKG, FEATURE_7_ECX))
+		sDebugSnooze = debug_snooze_tpause;
 
 	add_debugger_command("where", &stack_trace, "Same as \"sc\"");
 	add_debugger_command("bt", &stack_trace, "Same as \"sc\" (as in gdb)");
