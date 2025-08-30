@@ -446,8 +446,8 @@ cancel_timer(timer* event)
 void
 spin(bigtime_t microseconds)
 {
-	bigtime_t time = system_time();
+	bigtime_t target = system_time() + microseconds;
 
-	while ((system_time() - time) < microseconds)
+	while (system_time() < target)
 		cpu_pause();
 }
