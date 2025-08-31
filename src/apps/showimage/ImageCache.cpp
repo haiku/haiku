@@ -228,7 +228,7 @@ ImageCache::_RetrieveImage(QueueEntry* queueEntry, CacheEntry** _entry)
 
 	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	if (roster == NULL)
-		return B_ERROR;
+		return B_TRANSLATION_BASE_ERROR;
 
 	BFile file;
 	status_t status = file.SetTo(&queueEntry->ref, B_READ_ONLY);

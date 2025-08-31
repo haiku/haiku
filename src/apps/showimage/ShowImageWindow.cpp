@@ -51,6 +51,8 @@
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
 
+#include <posix/locale.h>
+
 #include "ImageCache.h"
 #include "ProgressWindow.h"
 #include "ShowImageApp.h"
@@ -270,8 +272,9 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		fBar->MinSize().height + gridLayout->MinSize().height, 100000);
 
 	// finish creating the window
-	if (_LoadImage() != B_OK) {
-		_LoadError(ref);
+	status_t status = _LoadImage();
+	if (status != B_OK) {
+		_LoadError(ref, status);
 		Quit();
 		return;
 	}
@@ -679,7 +682,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				if (bitmapOwner != NULL)
 					bitmapOwner->ReleaseReference();
 
-				_LoadError(ref);
+				_LoadError(ref, status);
 
 				// quit if file could not be opened
 				if (first)
@@ -1177,13 +1180,12 @@ ShowImageWindow::_UpdateStatusText(const BMessage* message)
 
 
 void
-ShowImageWindow::_LoadError(const entry_ref& ref)
+ShowImageWindow::_LoadError(const entry_ref& ref, status_t status)
 {
-	// TODO: give a better error message!
-	BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("ShowImage"),
-		B_TRANSLATE_CONTEXT("Could not load image! Either the "
-			"file or an image translator for it does not exist.",
-			"LoadAlerts"),
+	locale_t locale = newlocale(LC_ALL_MASK, "", 0);
+	const char* errorMessage = strerror_l(status, locale);
+	freelocale(locale);
+	BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("ShowImage"), errorMessage,
 		B_TRANSLATE_CONTEXT("OK", "Alerts"), NULL, NULL,
 		B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

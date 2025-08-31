@@ -351,6 +351,10 @@ ShowImageView::_DeleteSelectionBitmap()
 status_t
 ShowImageView::SetImage(const BMessage* message)
 {
+	status_t status;
+	if (message->FindInt32("error", &status) == B_OK && status != B_OK)
+		return status;
+
 	BBitmap* bitmap;
 	entry_ref ref;
 	if (message->FindPointer("bitmap", (void**)&bitmap) != B_OK
@@ -360,7 +364,7 @@ ShowImageView::SetImage(const BMessage* message)
 	BitmapOwner* bitmapOwner;
 	message->FindPointer("bitmapOwner", (void**)&bitmapOwner);
 
-	status_t status = SetImage(&ref, bitmap, bitmapOwner);
+	status = SetImage(&ref, bitmap, bitmapOwner);
 	if (status == B_OK) {
 		fFormatDescription = message->FindString("type");
 		fMimeType = message->FindString("mime");

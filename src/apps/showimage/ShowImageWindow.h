@@ -88,7 +88,7 @@ private:
 			void				_MarkSlideShowDelay(bigtime_t delay);
 
 			void				_UpdateStatusText(const BMessage* message);
-			void				_LoadError(const entry_ref& ref);
+			void				_LoadError(const entry_ref& ref, status_t status);
 			void				_SaveAs(BMessage* message);
 									// Handle Save As submenu choice
 			void				_SaveToFile(BMessage* message);
