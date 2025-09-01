@@ -66,7 +66,7 @@ public:
 									ino_t* oldID = NULL);
 
 					status_t	Stat(struct stat* st,
-									OpenAttrCookie* attr = NULL);
+									OpenAttrCookie* attr = NULL, bool revalidate = false);
 					status_t	WriteStat(const struct stat* st, uint32 mask,
 									OpenAttrCookie* attr = NULL);
 

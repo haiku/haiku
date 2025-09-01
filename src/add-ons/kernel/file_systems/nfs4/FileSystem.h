@@ -84,8 +84,11 @@ public:
 
 	inline	mutex&				CreateFileLock();
 
-			status_t			TrashStaleNode(ino_t ino);
-			void				EnsureNoCollision(ino_t newID, const FileHandle& handle);
+			status_t			TrashStaleNode(Inode* inode);
+			status_t			TrashIfStale(Inode* inode);
+			void				EnsureNoCollision(ino_t newId, const FileHandle& handle);
+			void				ServerUnlinkCleanup(ino_t id, Inode* parent,
+									const char* missingName);
 
 			void				Dump(void (*xprintf)(const char*, ...) = dprintf);
 

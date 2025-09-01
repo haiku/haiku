@@ -533,7 +533,7 @@ Inode::Access(int mode)
 
 
 status_t
-Inode::Stat(struct stat* st, OpenAttrCookie* attr)
+Inode::Stat(struct stat* st, OpenAttrCookie* attr, bool revalidate)
 {
 	ASSERT(st != NULL);
 
@@ -541,7 +541,7 @@ Inode::Stat(struct stat* st, OpenAttrCookie* attr)
 		return GetStat(st, attr);
 
 	bool cache = fFileSystem->GetConfiguration().fCacheMetadata;
-	if (!cache)
+	if (!cache || revalidate)
 		return GetStat(st, NULL);
 
 	status_t result = fMetaCache.GetStat(st);

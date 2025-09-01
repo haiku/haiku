@@ -259,8 +259,11 @@ static status_t
 nfs4_unmount(fs_volume* volume)
 {
 	TRACE("volume = %p\n", volume);
+
 	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 	RPC::Server* server = fs->Server();
+
+	put_vnode(volume, fs->Root()->ID());
 
 	delete fs;
 	gRPCServerManager->Release(server);
@@ -599,24 +602,24 @@ nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 		return B_ENTRY_NOT_FOUND;
 
 	ino_t id;
-	status_t result = inode->Remove(name, NF4REG, &id);
-	if (result != B_OK)
-		return result;
-	locker.Unlock();
-
-	result = acquire_vnode(volume, id);
+	inode->LookUp(name, &id);
+	VnodeToInode* childVti = NULL;
+	status_t result = get_vnode(volume, id, reinterpret_cast<void**>(&childVti));
 	if (result == B_OK) {
-		result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
-		ASSERT(result == B_OK);
-		
+		ino_t removedId;
+		status_t result = inode->Remove(name, NF4REG, &removedId);
+		if (result != B_OK)
+			return result;
+		ASSERT(removedId == id);
+		locker.Unlock();
+
 		if (vti->Unlink(inode->fInfo.fNames, name))
 			remove_vnode(volume, id);
 
 		put_vnode(volume, id);
-		put_vnode(volume, id);
 	}
 
-	return B_OK;
+	return result;
 }
 
 
@@ -656,14 +659,10 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 
 	if (oldID != 0) {
 		// we have overriden an inode
-		result = acquire_vnode(volume, oldID);
+		result = get_vnode(volume, oldID, reinterpret_cast<void**>(&vti));
 		if (result == B_OK) {
-			result = get_vnode(volume, oldID, reinterpret_cast<void**>(&vti));
-			ASSERT(result == B_OK);
 			if (vti->Unlink(toInode->fInfo.fNames, toName))
 				remove_vnode(volume, oldID);
-
-			put_vnode(volume, oldID);
 			put_vnode(volume, oldID);
 		}
 	}
@@ -742,39 +741,6 @@ nfs4_write_stat(fs_volume* volume, fs_vnode* vnode, const struct stat* stat,
 
 
 static status_t
-get_new_vnode(fs_volume* volume, ino_t id, VnodeToInode** _vti)
-{
-	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
-	Inode* inode;
-	VnodeToInode* vti;
-
-	status_t result = acquire_vnode(volume, id);
-	if (result == B_OK) {
-		ASSERT(get_vnode(volume, id, reinterpret_cast<void**>(_vti)) == B_OK);
-		unremove_vnode(volume, id);
-
-		// Release after acquire
-		put_vnode(volume, id);
-
-		vti = *_vti;
-
-		if (vti->Get() == NULL) {
-			result = fs->GetInode(id, &inode);
-			if (result != B_OK) {
-				put_vnode(volume, id);
-				return result;
-			}
-
-			vti->Replace(inode);
-		}
-		return B_OK;
-	}
-
-	return get_vnode(volume, id, reinterpret_cast<void**>(_vti));
-}
-
-
-static status_t
 nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	int perms, void** _cookie, ino_t* _newVnodeID)
 {
@@ -807,7 +773,7 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 		return result;
 	}
 
-	result = get_new_vnode(volume, *_newVnodeID, &vti);
+	result = get_vnode(volume, *_newVnodeID, reinterpret_cast<void**>(&vti));
 	if (result != B_OK) {
 		delete cookie;
 		return result;
@@ -1031,15 +997,10 @@ nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 	if (result != B_OK)
 		return result;
 
-	result = acquire_vnode(volume, id);
+	result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
 	if (result == B_OK) {
-		result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
-		ASSERT(result == B_OK);
-
 		if (vti->Unlink(inode->fInfo.fNames, name))
 			remove_vnode(volume, id);
-
-		put_vnode(volume, id);
 		put_vnode(volume, id);
 	}
 

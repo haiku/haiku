@@ -237,10 +237,8 @@ DirectoryCache::_LoadSnapshot(bool trash)
 				}
 				if (!nodeFound) {
 					// The inode-name association that was cached in 'current' is no longer valid.
-					result = fInode->GetFileSystem()->TrashStaleNode(current->fNode);
-					if (result != B_OK)
-						INFORM("_LoadSnapshot: Couldn't free stale node %" B_PRIdINO "\n",
-							current->fNode);
+					fInode->GetFileSystem()->ServerUnlinkCleanup(current->fNode, fInode,
+						current->fName);
 				}
 			}
 			delete current;
