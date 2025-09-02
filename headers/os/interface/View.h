@@ -346,6 +346,10 @@ public:
 									::pattern pattern = B_SOLID_HIGH);
 			void				StrokeLine(BPoint start, BPoint end,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeLine(BPoint toPoint,
+									const BGradient& gradient);
+			void				StrokeLine(BPoint start, BPoint end,
+									const BGradient& gradient);
 			void				BeginLineArray(int32 count);
 			void				AddLine(BPoint start, BPoint end,
 									rgb_color color);
@@ -361,6 +365,16 @@ public:
 									int32 numPoints, BRect bounds,
 									bool closed = true,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokePolygon(const BPolygon* polygon,
+									bool closed,
+									const BGradient& gradient);
+			void				StrokePolygon(const BPoint* pointArray,
+									int32 numPoints, bool closed,
+									const BGradient& gradient);
+			void				StrokePolygon(const BPoint* pointArray,
+									int32 numPoints, BRect bounds,
+									bool closed,
+									const BGradient& gradient);
 			void				FillPolygon(const BPolygon* polygon,
 									::pattern pattern = B_SOLID_HIGH);
 			void				FillPolygon(const BPoint* pointArray,
@@ -383,6 +397,11 @@ public:
 			void				StrokeTriangle(BPoint point1, BPoint point2,
 									BPoint point3,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeTriangle(BPoint point1, BPoint point2,
+									BPoint point3, BRect bounds,
+									const BGradient& gradient);
+			void				StrokeTriangle(BPoint point1, BPoint point2,
+									BPoint point3, const BGradient& gradient);
 			void				FillTriangle(BPoint point1, BPoint point2,
 									BPoint point3,
 									::pattern pattern = B_SOLID_HIGH);
@@ -397,6 +416,8 @@ public:
 
 			void				StrokeRect(BRect rect,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeRect(BRect rect,
+									const BGradient& gradient);
 			void				FillRect(BRect rect,
 									::pattern pattern = B_SOLID_HIGH);
 			void				FillRect(BRect rect, const BGradient& gradient);
@@ -409,6 +430,9 @@ public:
 			void				StrokeRoundRect(BRect rect, float xRadius,
 									float yRadius,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeRoundRect(BRect rect, float xRadius,
+									float yRadius,
+									const BGradient& gradient);
 			void				FillRoundRect(BRect rect, float xRadius,
 									float yRadius,
 									::pattern pattern = B_SOLID_HIGH);
@@ -420,6 +444,11 @@ public:
 									::pattern pattern = B_SOLID_HIGH);
 			void				StrokeEllipse(BRect rect,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeEllipse(BPoint center, float xRadius,
+									float yRadius,
+									const BGradient& gradient);
+			void				StrokeEllipse(BRect rect,
+									const BGradient& gradient);
 			void				FillEllipse(BPoint center, float xRadius,
 									float yRadius,
 									::pattern pattern = B_SOLID_HIGH);
@@ -437,6 +466,13 @@ public:
 			void				StrokeArc(BRect rect, float startAngle,
 									float arcAngle,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeArc(BPoint center, float xRadius,
+									float yRadius, float startAngle,
+									float arcAngle,
+									const BGradient& gradient);
+			void				StrokeArc(BRect rect, float startAngle,
+									float arcAngle,
+									const BGradient& gradient);
 			void				FillArc(BPoint center, float xRadius,
 									float yRadius, float startAngle,
 									float arcAngle,
@@ -452,6 +488,8 @@ public:
 
 			void				StrokeBezier(BPoint* controlPoints,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeBezier(BPoint* controlPoints,
+									const BGradient& gradient);
 			void				FillBezier(BPoint* controlPoints,
 									::pattern pattern = B_SOLID_HIGH);
 			void				FillBezier(BPoint* controlPoints,
@@ -459,6 +497,8 @@ public:
 
 			void				StrokeShape(BShape* shape,
 									::pattern pattern = B_SOLID_HIGH);
+			void				StrokeShape(BShape* shape,
+									const BGradient& gradient);
 			void				FillShape(BShape* shape,
 									::pattern pattern = B_SOLID_HIGH);
 			void				FillShape(BShape* shape,

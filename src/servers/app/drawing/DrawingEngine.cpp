@@ -670,8 +670,8 @@ DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
 
 
 void
-DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
-	const BGradient& gradient)
+DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
+	bool filled, const BGradient& gradient)
 {
 	ASSERT_PARALLEL_LOCKED();
 
@@ -686,7 +686,10 @@ DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
 	BPoint center(r.left + xRadius,
 				  r.top + yRadius);
 
-	fPainter->FillArc(center, xRadius, yRadius, angle, span, gradient);
+	if (filled)
+		fPainter->FillArc(center, xRadius, yRadius, angle, span, gradient);
+	else
+		fPainter->StrokeArc(center, xRadius, yRadius, angle, span, gradient);
 }
 
 
@@ -703,14 +706,14 @@ DrawingEngine::DrawBezier(BPoint* pts, bool filled)
 
 
 void
-DrawingEngine::FillBezier(BPoint* pts, const BGradient& gradient)
+DrawingEngine::DrawBezier(BPoint* pts, bool filled, const BGradient& gradient)
 {
 	ASSERT_PARALLEL_LOCKED();
 
 	// TODO: figure out bounds and hide cursor depending on that
 	DrawTransaction transaction(this);
 
-	transaction.SetDirty(fPainter->FillBezier(pts, gradient));
+	transaction.SetDirty(fPainter->DrawBezier(pts, filled, gradient));
 }
 
 
@@ -740,13 +743,16 @@ DrawingEngine::DrawEllipse(BRect r, bool filled)
 
 
 void
-DrawingEngine::FillEllipse(BRect r, const BGradient& gradient)
+DrawingEngine::DrawEllipse(BRect r, bool filled, const BGradient& gradient)
 {
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	BRect clipped = r;
-	fPainter->AlignEllipseRect(&clipped, true);
+	fPainter->AlignEllipseRect(&clipped, filled);
+
+	if (!filled)
+		extend_by_stroke_width(clipped, fPainter->PenSize());
 
 	clipped.left = floorf(clipped.left);
 	clipped.top = floorf(clipped.top);
@@ -757,7 +763,7 @@ DrawingEngine::FillEllipse(BRect r, const BGradient& gradient)
 	if (!transaction.IsDirty())
 		return;
 
-	fPainter->FillEllipse(r, gradient);
+	fPainter->DrawEllipse(r, filled, gradient);
 }
 
 
@@ -779,17 +785,19 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 
 
 void
-DrawingEngine::FillPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
-	const BGradient& gradient, bool closed)
+DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
+	bool filled, bool closed, const BGradient& gradient)
 {
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(bounds);
+	if (!filled)
+		extend_by_stroke_width(bounds, fPainter->PenSize());
 	DrawTransaction transaction(this, fPainter->TransformAndClipRect(bounds));
 	if (!transaction.IsDirty())
 		return;
 
-	fPainter->FillPolygon(ptlist, numpts, gradient, closed);
+	fPainter->DrawPolygon(ptlist, numpts, filled, closed, gradient);
 }
 
 
@@ -929,6 +937,23 @@ DrawingEngine::FillRect(BRect r)
 
 
 void
+DrawingEngine::StrokeRect(BRect r, const BGradient& gradient)
+{
+	ASSERT_PARALLEL_LOCKED();
+
+	// support invalid rects
+	make_rect_valid(r);
+	BRect clipped(r);
+	extend_by_stroke_width(clipped, fPainter->PenSize());
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(clipped));
+	if (!transaction.IsDirty())
+		return;
+
+	fPainter->StrokeRect(r, gradient);
+}
+
+
+void
 DrawingEngine::FillRect(BRect r, const BGradient& gradient)
 {
 	ASSERT_PARALLEL_LOCKED();
@@ -1003,12 +1028,14 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 
 
 void
-DrawingEngine::FillRoundRect(BRect r, float xrad, float yrad,
-	const BGradient& gradient)
+DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
+	bool filled, const BGradient& gradient)
 {
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
+	if (!filled)
+		extend_by_stroke_width(r, fPainter->PenSize());
 	BRect clipped = fPainter->TransformAndClipRect(r);
 
 	clipped.left = floorf(clipped.left);
@@ -1020,7 +1047,10 @@ DrawingEngine::FillRoundRect(BRect r, float xrad, float yrad,
 	if (!transaction.IsDirty())
 		return;
 
-	fPainter->FillRoundRect(r, xrad, yrad, gradient);
+	if (filled)
+		fPainter->FillRoundRect(r, xrad, yrad, gradient);
+	else
+		fPainter->StrokeRoundRect(r, xrad, yrad, gradient);
 }
 
 
@@ -1053,9 +1083,9 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 
 
 void
-DrawingEngine::FillShape(const BRect& bounds, int32 opCount,
+DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 ptCount, const BPoint* ptList,
-	const BGradient& gradient, const BPoint& viewToScreenOffset,
+	bool filled, const BGradient& gradient, const BPoint& viewToScreenOffset,
 	float viewScale)
 {
 	ASSERT_PARALLEL_LOCKED();
@@ -1073,8 +1103,8 @@ DrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 //		return;
 	DrawTransaction transaction(this);
 
-	transaction.SetDirty(fPainter->FillShape(opCount, opList, ptCount, ptList,
-		gradient, viewToScreenOffset, viewScale));
+	transaction.SetDirty(fPainter->DrawShape(opCount, opList, ptCount, ptList,
+		filled, gradient, viewToScreenOffset, viewScale));
 }
 
 
@@ -1098,16 +1128,22 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 
 
 void
-DrawingEngine::FillTriangle(BPoint* pts, const BRect& bounds,
-	const BGradient& gradient)
+DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
+	bool filled, const BGradient& gradient)
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	DrawTransaction transaction(this, fPainter->TransformAndClipRect(bounds));
+	BRect clipped(bounds);
+	if (!filled)
+		extend_by_stroke_width(clipped, fPainter->PenSize());
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(clipped));
 	if (!transaction.IsDirty())
 		return;
 
-	fPainter->FillTriangle(pts[0], pts[1], pts[2], gradient);
+	if (filled)
+		fPainter->FillTriangle(pts[0], pts[1], pts[2], gradient);
+	else
+		fPainter->StrokeTriangle(pts[0], pts[1], pts[2], gradient);
 }
 
 
@@ -1124,6 +1160,22 @@ DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end)
 		return;
 
 	fPainter->StrokeLine(start, end);
+}
+
+
+void
+DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end, const BGradient& gradient)
+{
+	ASSERT_PARALLEL_LOCKED();
+
+	BRect touched(start, end);
+	make_rect_valid(touched);
+	extend_by_stroke_width(touched, fPainter->PenSize());
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(touched));
+	if (!transaction.IsDirty())
+		return;
+
+	fPainter->StrokeLine(start, end, gradient);
 }
 
 

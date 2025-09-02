@@ -70,23 +70,20 @@ public:
 	// drawing primitives
 	virtual	void				DrawArc(BRect rect, const float& angle,
 									const float& span, bool filled);
-	virtual	void				FillArc(BRect rect, const float& angle,
-									const float& span,
-									const BGradient& gradient);
+	virtual	void				DrawArc(BRect rect, const float& angle,
+									const float& span, bool filled, const BGradient& gradient);
 
 	virtual	void				DrawBezier(BPoint* points, bool filled);
-	virtual	void				FillBezier(BPoint* points,
-									const BGradient& gradient);
+	virtual	void				DrawBezier(BPoint* points, bool filled, const BGradient& gradient);
 
 	virtual	void				DrawEllipse(BRect rect, bool filled);
-	virtual	void				FillEllipse(BRect rect,
-									const BGradient& gradient);
+	virtual	void				DrawEllipse(BRect rect, bool filled, const BGradient& gradient);
 
 	virtual	void				DrawPolygon(BPoint* pointList, int32 numPoints,
 									BRect bounds, bool filled, bool closed);
-	virtual	void				FillPolygon(BPoint* pointList, int32 numPoints,
-									BRect bounds, const BGradient& gradient,
-									bool closed);
+	virtual	void				DrawPolygon(BPoint* pointList, int32 numPoints,
+									BRect bounds, bool filled, bool closed,
+									const BGradient& gradient);
 
 	// these rgb_color versions are used internally by the server
 	virtual	void				StrokePoint(const BPoint& point,
@@ -97,6 +94,7 @@ public:
 									const rgb_color& color);
 
 	virtual	void				StrokeRect(BRect rect);
+	virtual	void				StrokeRect(BRect rect, const BGradient& gradient);
 	virtual	void				FillRect(BRect rect);
 	virtual	void				FillRect(BRect rect, const BGradient& gradient);
 
@@ -106,8 +104,8 @@ public:
 
 	virtual	void				DrawRoundRect(BRect rect, float xRadius,
 									float yRadius, bool filled);
-	virtual	void				FillRoundRect(BRect rect, float xRadius,
-									float yRadius, const BGradient& gradient);
+	virtual	void				DrawRoundRect(BRect rect, float xRadius,
+									float yRadius, bool filled, const BGradient& gradient);
 
 	virtual	void				DrawShape(const BRect& bounds,
 									int32 opCount, const uint32* opList,
@@ -115,24 +113,25 @@ public:
 									bool filled,
 									const BPoint& viewToScreenOffset,
 									float viewScale);
-	virtual	void				FillShape(const BRect& bounds,
+	virtual	void				DrawShape(const BRect& bounds,
 									int32 opCount, const uint32* opList,
 									int32 pointCount, const BPoint* pointList,
-									const BGradient& gradient,
+									bool filled, const BGradient& gradient,
 									const BPoint& viewToScreenOffset,
 									float viewScale);
 
 	virtual	void				DrawTriangle(BPoint* points,
 									const BRect& bounds, bool filled);
-	virtual	void				FillTriangle(BPoint* points,
-									const BRect& bounds,
-									const BGradient& gradient);
+	virtual	void				DrawTriangle(BPoint* points, const BRect& bounds,
+									bool filled, const BGradient& gradient);
 
 	// these versions are used by the Decorator
 	virtual	void				StrokeLine(const BPoint& start,
 									const BPoint& end, const rgb_color& color);
 	virtual	void				StrokeLine(const BPoint& start,
 									const BPoint& end);
+	virtual	void				StrokeLine(const BPoint& start,
+									const BPoint& end, const BGradient& gradient);
 	virtual	void				StrokeLineArray(int32 numlines,
 									const ViewLineArrayInfo* data);
 

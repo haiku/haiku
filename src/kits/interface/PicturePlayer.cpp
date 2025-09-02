@@ -614,6 +614,14 @@ set_fill_rule(void* _context, int32 fillRule)
 }
 
 
+static void
+stroke_line_gradient(void* _context, const BPoint& start, const BPoint& end, const BGradient& gradient)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, BPoint, BPoint, const BGradient&))context->function_table[71])(
+		context->user_data, start, end, gradient);
+}
+
 
 #if DEBUG > 1
 static const char *
@@ -656,6 +664,7 @@ PictureOpToString(int op)
 		RETURN_STRING(B_PIC_FILL_ARC_GRADIENT);
 		RETURN_STRING(B_PIC_STROKE_ELLIPSE_GRADIENT);
 		RETURN_STRING(B_PIC_FILL_ELLIPSE_GRADIENT);
+		RETURN_STRING(B_PIC_STROKE_LINE_GRADIENT);
 
 		RETURN_STRING(B_PIC_ENTER_STATE_CHANGE);
 		RETURN_STRING(B_PIC_SET_CLIPPING_RECTS);
@@ -774,7 +783,8 @@ PicturePlayer::Play(void** callBackTable, int32 tableEntries, void* userData)
 		draw_ellipse_gradient,
 		draw_polygon_gradient,
 		draw_shape_gradient,
-		set_fill_rule
+		set_fill_rule,
+		stroke_line_gradient
 	};
 
 	// We don't check if the functions in the table are NULL, but we
@@ -1200,6 +1210,20 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 				callbacks.draw_ellipse_gradient(userData, *rect, *gradient,
 					header->op == B_PIC_FILL_ELLIPSE_GRADIENT);
+				break;
+			}
+
+			case B_PIC_STROKE_LINE_GRADIENT:
+			{
+				const BPoint* start;
+				const BPoint* end;
+				BGradient* gradient;
+				if (callbacks.stroke_line_gradient == NULL || !reader.Get(start)
+					|| !reader.Get(end) || !reader.GetGradient(gradient)) {
+					break;
+				}
+
+				callbacks.stroke_line_gradient(userData, *start, *end, *gradient);
 				break;
 			}
 

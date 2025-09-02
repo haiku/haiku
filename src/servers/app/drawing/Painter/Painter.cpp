@@ -566,6 +566,48 @@ Painter::StrokeLine(BPoint a, BPoint b)
 }
 
 
+// StrokeLine
+void
+Painter::StrokeLine(BPoint a, BPoint b, const BGradient& gradient)
+{
+	CHECK_CLIPPING_NO_RETURN
+
+	// "false" means not to do the pixel center offset,
+	// because it would mess up our optimized versions
+	_Align(&a, false);
+	_Align(&b, false);
+
+	fPath.remove_all();
+
+	if (a == b) {
+		// special case dots
+		fPath.move_to(a.x, a.y);
+		fPath.line_to(a.x + 1, a.y);
+		fPath.line_to(a.x + 1, a.y + 1);
+		fPath.line_to(a.x, a.y + 1);
+
+		_FillPath(fPath, gradient);
+	} else {
+		// Do the pixel center offset here
+		if (!fSubpixelPrecise && fmodf(fPenSize, 2.0) != 0.0) {
+			_Align(&a, true);
+			_Align(&b, true);
+		}
+
+		fPath.move_to(a.x, a.y);
+		fPath.line_to(b.x, b.y);
+
+		if (!fSubpixelPrecise && fPenSize == 1.0f) {
+			// Tweak ends to "include" the pixel at the index,
+			// we need to do this in order to produce results like R5,
+			// where coordinates were inclusive
+			_StrokePath(fPath, B_SQUARE_CAP, gradient);
+		} else
+			_StrokePath(fPath, gradient);
+	}
+}
+
+
 // StraightLine
 bool
 Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
@@ -649,6 +691,14 @@ Painter::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 }
 
 
+// StrokeTriangle
+BRect
+Painter::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3, const BGradient& gradient)
+{
+	return _DrawTriangle(pt1, pt2, pt3, false, gradient);
+}
+
+
 // FillTriangle
 BRect
 Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
@@ -662,21 +712,7 @@ BRect
 Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	const BGradient& gradient)
 {
-	CHECK_CLIPPING
-
-	_Align(&pt1);
-	_Align(&pt2);
-	_Align(&pt3);
-
-	fPath.remove_all();
-
-	fPath.move_to(pt1.x, pt1.y);
-	fPath.line_to(pt2.x, pt2.y);
-	fPath.line_to(pt3.x, pt3.y);
-
-	fPath.close_polygon();
-
-	return _FillPath(fPath, gradient);
+	return _DrawTriangle(pt1, pt2, pt3, true, gradient);
 }
 
 
@@ -715,29 +751,34 @@ Painter::DrawPolygon(BPoint* p, int32 numPts, bool filled, bool closed) const
 
 // FillPolygon
 BRect
-Painter::FillPolygon(BPoint* p, int32 numPts, const BGradient& gradient,
-	bool closed)
+Painter::DrawPolygon(BPoint* p, int32 numPts, bool filled, bool closed, const BGradient& gradient)
 {
 	CHECK_CLIPPING
 
-	if (numPts > 0) {
-		fPath.remove_all();
+	if (numPts == 0)
+		return BRect(0.0, 0.0, -1.0, -1.0);
 
-		_Align(p);
-		fPath.move_to(p->x, p->y);
+	bool centerOffset = !filled && fIdentityTransform
+		&& fmodf(fPenSize, 2.0) != 0.0;
 
-		for (int32 i = 1; i < numPts; i++) {
-			p++;
-			_Align(p);
-			fPath.line_to(p->x, p->y);
-		}
+	fPath.remove_all();
 
-		if (closed)
-			fPath.close_polygon();
+	_Align(p, centerOffset);
+	fPath.move_to(p->x, p->y);
 
-		return _FillPath(fPath, gradient);
+	for (int32 i = 1; i < numPts; i++) {
+		p++;
+		_Align(p, centerOffset);
+		fPath.line_to(p->x, p->y);
 	}
-	return BRect(0.0, 0.0, -1.0, -1.0);
+
+	if (closed)
+		fPath.close_polygon();
+
+	if (filled)
+		return _FillPath(fPath, gradient);
+
+	return _StrokePath(fPath, gradient);
 }
 
 
@@ -768,7 +809,7 @@ Painter::DrawBezier(BPoint* p, bool filled) const
 
 // FillBezier
 BRect
-Painter::FillBezier(BPoint* p, const BGradient& gradient)
+Painter::DrawBezier(BPoint* p, bool filled, const BGradient& gradient)
 {
 	CHECK_CLIPPING
 
@@ -782,8 +823,12 @@ Painter::FillBezier(BPoint* p, const BGradient& gradient)
 	fPath.move_to(p[0].x, p[0].y);
 	fPath.curve4(p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
 
-	fPath.close_polygon();
-	return _FillPath(fCurve, gradient);
+	if (filled) {
+		fPath.close_polygon();
+		return _FillPath(fCurve, gradient);
+	}
+
+	return _StrokePath(fCurve, gradient);
 }
 
 
@@ -807,8 +852,8 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 
 // FillShape
 BRect
-Painter::FillShape(const int32& opCount, const uint32* opList,
-	const int32& ptCount, const BPoint* points, const BGradient& gradient,
+Painter::DrawShape(const int32& opCount, const uint32* opList,
+	const int32& ptCount, const BPoint* points, bool filled, const BGradient& gradient,
 	const BPoint& viewToScreenOffset, float viewScale)
 {
 	CHECK_CLIPPING
@@ -816,7 +861,10 @@ Painter::FillShape(const int32& opCount, const uint32* opList,
 	_IterateShapeData(opCount, opList, ptCount, points, viewToScreenOffset,
 		viewScale);
 
-	return _FillPath(fCurve, gradient);
+	if (filled)
+		return _FillPath(fCurve, gradient);
+
+	return _StrokePath(fCurve, gradient);
 }
 
 
@@ -868,6 +916,41 @@ Painter::StrokeRect(const BRect& r) const
 	fPath.close_polygon();
 
 	return _StrokePath(fPath);
+}
+
+
+// StrokeRect
+BRect
+Painter::StrokeRect(const BRect& r, const BGradient& gradient)
+{
+	CHECK_CLIPPING
+
+	BPoint a(r.left, r.top);
+	BPoint b(r.right, r.bottom);
+	_Align(&a, false);
+	_Align(&b, false);
+
+	if (fIdentityTransform && fmodf(fPenSize, 2.0) != 0.0) {
+		// shift coords to center of pixels
+		a.x += 0.5;
+		a.y += 0.5;
+		b.x += 0.5;
+		b.y += 0.5;
+	}
+
+	fPath.remove_all();
+	fPath.move_to(a.x, a.y);
+	if (a.x == b.x || a.y == b.y) {
+		// special case rects with one pixel height or width
+		fPath.line_to(b.x, b.y);
+	} else {
+		fPath.line_to(b.x, a.y);
+		fPath.line_to(b.x, b.y);
+		fPath.line_to(a.x, b.y);
+	}
+	fPath.close_polygon();
+
+	return _StrokePath(fPath, gradient);
 }
 
 
@@ -1129,6 +1212,27 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 }
 
 
+// StrokeRoundRect
+BRect
+Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius,
+	const BGradient& gradient)
+{
+	CHECK_CLIPPING
+
+	BPoint lt(r.left, r.top);
+	BPoint rb(r.right, r.bottom);
+	bool centerOffset = fmodf(fPenSize, 2.0) != 0.0;
+	_Align(&lt, centerOffset);
+	_Align(&rb, centerOffset);
+
+	agg::rounded_rect rect;
+	rect.rect(lt.x, lt.y, rb.x, rb.y);
+	rect.radius(xRadius, yRadius);
+
+	return _StrokePath(rect, gradient);
+}
+
+
 // FillRoundRect
 BRect
 Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
@@ -1227,11 +1331,11 @@ Painter::DrawEllipse(BRect r, bool fill) const
 
 // FillEllipse
 BRect
-Painter::FillEllipse(BRect r, const BGradient& gradient)
+Painter::DrawEllipse(BRect r, bool fill, const BGradient& gradient)
 {
 	CHECK_CLIPPING
 
-	AlignEllipseRect(&r, true);
+	AlignEllipseRect(&r, fill);
 
 	float xRadius = r.Width() / 2.0;
 	float yRadius = r.Height() / 2.0;
@@ -1245,7 +1349,10 @@ Painter::FillEllipse(BRect r, const BGradient& gradient)
 
 	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 
-	return _FillPath(path, gradient);
+	if (fill)
+		return _FillPath(path, gradient);
+	else
+		return _StrokePath(path, gradient);
 }
 
 
@@ -1267,6 +1374,27 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius, float angle,
 	path.approximation_scale(2.0);
 
 	return _StrokePath(path);
+}
+
+
+// StrokeArc
+BRect
+Painter::StrokeArc(BPoint center, float xRadius, float yRadius, float angle,
+	float span, const BGradient& gradient)
+{
+	CHECK_CLIPPING
+
+	_Align(&center);
+
+	double angleRad = (angle * M_PI) / 180.0;
+	double spanRad = (span * M_PI) / 180.0;
+	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius, -angleRad,
+		-spanRad);
+
+	agg::conv_curve<agg::bezier_arc> path(arc);
+	path.approximation_scale(2.0);
+
+	return _StrokePath(path, gradient);
 }
 
 
@@ -1630,6 +1758,30 @@ Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 }
 
 
+inline BRect
+Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill, const BGradient& gradient)
+{
+	CHECK_CLIPPING
+
+	_Align(&pt1);
+	_Align(&pt2);
+	_Align(&pt3);
+
+	fPath.remove_all();
+
+	fPath.move_to(pt1.x, pt1.y);
+	fPath.line_to(pt2.x, pt2.y);
+	fPath.line_to(pt3.x, pt3.y);
+
+	fPath.close_polygon();
+
+	if (fill)
+		return _FillPath(fPath, gradient);
+
+	return _StrokePath(fPath, gradient);
+}
+
+
 void
 Painter::_IterateShapeData(const int32& opCount, const uint32* opList,
 	const int32& ptCount, const BPoint* points,
@@ -1829,6 +1981,36 @@ Painter::_StrokePath(VertexSource& path, cap_mode capMode) const
 	agg::conv_transform<agg::conv_stroke<VertexSource> > transformedStroke(
 		stroke, fTransform);
 	return _RasterizePath(transformedStroke);
+}
+
+
+template<class VertexSource>
+BRect
+Painter::_StrokePath(VertexSource& path, const BGradient& gradient)
+{
+	return _StrokePath(path, fLineCapMode, gradient);
+}
+
+
+template<class VertexSource>
+BRect
+Painter::_StrokePath(VertexSource& path, cap_mode capMode, const BGradient& gradient)
+{
+	agg::conv_stroke<VertexSource> stroke(path);
+	stroke.width(fPenSize);
+
+	stroke.line_cap(agg_line_cap_mode_for(capMode));
+	stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
+	stroke.miter_limit(fMiterLimit);
+
+	if (fIdentityTransform)
+		return _RasterizePath(stroke, gradient);
+
+	stroke.approximation_scale(fTransform.scale());
+
+	agg::conv_transform<agg::conv_stroke<VertexSource> > transformedStroke(
+		stroke, fTransform);
+	return _RasterizePath(transformedStroke, gradient);
 }
 
 

@@ -113,6 +113,8 @@ public:
 			status_t			WriteDrawShapeGradient(const int32& opCount,
 									const void* opList, const int32& ptCount,
 									const void* ptList, const BGradient& gradient, const bool& fill);
+			status_t			WriteStrokeLineGradient(const BPoint& start, const BPoint& end,
+									const BGradient& gradient);
 			status_t			WriteDrawBitmap(const BRect& srcRect,
 									const BRect& dstRect, const int32& width,
 									const int32& height,

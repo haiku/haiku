@@ -3334,6 +3334,31 @@ BView::StrokeEllipse(BRect rect, ::pattern pattern)
 
 
 void
+BView::StrokeEllipse(BPoint center, float xRadius, float yRadius,
+	const BGradient& gradient)
+{
+	StrokeEllipse(BRect(center.x - xRadius, center.y - yRadius,
+		center.x + xRadius, center.y + yRadius), gradient);
+}
+
+
+void
+BView::StrokeEllipse(BRect rect, const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_STROKE_ELLIPSE_GRADIENT);
+	fOwner->fLink->Attach<BRect>(rect);
+	fOwner->fLink->AttachGradient(gradient);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
 BView::FillEllipse(BPoint center, float xRadius, float yRadius,
 	::pattern pattern)
 {
@@ -3412,6 +3437,34 @@ BView::StrokeArc(BRect rect, float startAngle, float arcAngle,
 
 
 void
+BView::StrokeArc(BPoint center, float xRadius, float yRadius, float startAngle,
+	float arcAngle, const BGradient& gradient)
+{
+	StrokeArc(BRect(center.x - xRadius, center.y - yRadius, center.x + xRadius,
+		center.y + yRadius), startAngle, arcAngle, gradient);
+}
+
+
+void
+BView::StrokeArc(BRect rect, float startAngle, float arcAngle,
+	const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_STROKE_ARC_GRADIENT);
+	fOwner->fLink->Attach<BRect>(rect);
+	fOwner->fLink->Attach<float>(startAngle);
+	fOwner->fLink->Attach<float>(arcAngle);
+	fOwner->fLink->AttachGradient(gradient);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
 BView::FillArc(BPoint center,float xRadius, float yRadius, float startAngle,
 	float arcAngle, ::pattern pattern)
 {
@@ -3481,6 +3534,25 @@ BView::StrokeBezier(BPoint* controlPoints, ::pattern pattern)
 	fOwner->fLink->Attach<BPoint>(controlPoints[1]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[2]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[3]);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::StrokeBezier(BPoint* controlPoints, const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_STROKE_BEZIER_GRADIENT);
+	fOwner->fLink->Attach<BPoint>(controlPoints[0]);
+	fOwner->fLink->Attach<BPoint>(controlPoints[1]);
+	fOwner->fLink->Attach<BPoint>(controlPoints[2]);
+	fOwner->fLink->Attach<BPoint>(controlPoints[3]);
+	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
 }
@@ -3568,6 +3640,58 @@ BView::StrokePolygon(const BPoint* pointArray, int32 numPoints, BRect bounds,
 		fOwner->fLink->Attach<bool>(closed);
 		fOwner->fLink->Attach<int32>(polygon.fCount);
 		fOwner->fLink->Attach(polygon.fPoints, polygon.fCount * sizeof(BPoint));
+
+		_FlushIfNotInTransaction();
+	} else {
+		fprintf(stderr, "ERROR: Can't send polygon to app_server!\n");
+	}
+}
+
+
+void
+BView::StrokePolygon(const BPolygon* polygon, bool closed, const BGradient& gradient)
+{
+	if (polygon == NULL)
+		return;
+
+	StrokePolygon(polygon->fPoints, polygon->fCount, polygon->Frame(), closed,
+		gradient);
+}
+
+
+void
+BView::StrokePolygon(const BPoint* pointArray, int32 numPoints, bool closed,
+	const BGradient& gradient)
+{
+	BPolygon polygon(pointArray, numPoints);
+
+	StrokePolygon(polygon.fPoints, polygon.fCount, polygon.Frame(), closed,
+		gradient);
+}
+
+
+void
+BView::StrokePolygon(const BPoint* pointArray, int32 numPoints, BRect bounds,
+	bool closed, const BGradient& gradient)
+{
+	if (pointArray == NULL
+		|| numPoints <= 1
+		|| fOwner == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	BPolygon polygon(pointArray, numPoints);
+	polygon.MapTo(polygon.Frame(), bounds);
+
+	if (fOwner->fLink->StartMessage(AS_STROKE_POLYGON_GRADIENT,
+			polygon.fCount * sizeof(BPoint) + sizeof(BRect) + sizeof(bool)
+				+ sizeof(int32)) == B_OK) {
+		fOwner->fLink->Attach<BRect>(polygon.Frame());
+		fOwner->fLink->Attach<bool>(closed);
+		fOwner->fLink->Attach<int32>(polygon.fCount);
+		fOwner->fLink->Attach(polygon.fPoints, polygon.fCount * sizeof(BPoint));
+		fOwner->fLink->AttachGradient(gradient);
 
 		_FlushIfNotInTransaction();
 	} else {
@@ -3696,6 +3820,22 @@ BView::StrokeRect(BRect rect, ::pattern pattern)
 
 
 void
+BView::StrokeRect(BRect rect, const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_STROKE_RECT_GRADIENT);
+	fOwner->fLink->Attach<BRect>(rect);
+	fOwner->fLink->AttachGradient(gradient);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
 BView::FillRect(BRect rect, ::pattern pattern)
 {
 	if (fOwner == NULL)
@@ -3751,6 +3891,25 @@ BView::StrokeRoundRect(BRect rect, float xRadius, float yRadius,
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(xRadius);
 	fOwner->fLink->Attach<float>(yRadius);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::StrokeRoundRect(BRect rect, float xRadius, float yRadius,
+	const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_STROKE_ROUNDRECT_GRADIENT);
+	fOwner->fLink->Attach<BRect>(rect);
+	fOwner->fLink->Attach<float>(xRadius);
+	fOwner->fLink->Attach<float>(yRadius);
+	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
 }
@@ -3885,6 +4044,66 @@ BView::StrokeTriangle(BPoint point1, BPoint point2, BPoint point3,
 			bounds.bottom = point3.y;
 
 		StrokeTriangle(point1, point2, point3, bounds, pattern);
+	}
+}
+
+
+void
+BView::StrokeTriangle(BPoint point1, BPoint point2, BPoint point3, BRect bounds,
+	const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_STROKE_TRIANGLE_GRADIENT);
+	fOwner->fLink->Attach<BPoint>(point1);
+	fOwner->fLink->Attach<BPoint>(point2);
+	fOwner->fLink->Attach<BPoint>(point3);
+	fOwner->fLink->Attach<BRect>(bounds);
+	fOwner->fLink->AttachGradient(gradient);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::StrokeTriangle(BPoint point1, BPoint point2, BPoint point3,
+	const BGradient& gradient)
+{
+	if (fOwner) {
+		// we construct the smallest rectangle that contains the 3 points
+		// for the 1st point
+		BRect bounds(point1, point1);
+
+		// for the 2nd point
+		if (point2.x < bounds.left)
+			bounds.left = point2.x;
+
+		if (point2.y < bounds.top)
+			bounds.top = point2.y;
+
+		if (point2.x > bounds.right)
+			bounds.right = point2.x;
+
+		if (point2.y > bounds.bottom)
+			bounds.bottom = point2.y;
+
+		// for the 3rd point
+		if (point3.x < bounds.left)
+			bounds.left = point3.x;
+
+		if (point3.y < bounds.top)
+			bounds.top = point3.y;
+
+		if (point3.x > bounds.right)
+			bounds.right = point3.x;
+
+		if (point3.y > bounds.bottom)
+			bounds.bottom = point3.y;
+
+		StrokeTriangle(point1, point2, point3, bounds, gradient);
 	}
 }
 
@@ -4039,6 +4258,36 @@ BView::StrokeLine(BPoint start, BPoint end, ::pattern pattern)
 
 
 void
+BView::StrokeLine(BPoint toPoint, const BGradient& gradient)
+{
+	StrokeLine(PenLocation(), toPoint, gradient);
+}
+
+
+void
+BView::StrokeLine(BPoint start, BPoint end, const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	ViewStrokeLineInfo info;
+	info.startPoint = start;
+	info.endPoint = end;
+
+	fOwner->fLink->StartMessage(AS_STROKE_LINE_GRADIENT);
+	fOwner->fLink->Attach<ViewStrokeLineInfo>(info);
+	fOwner->fLink->AttachGradient(gradient);
+
+	_FlushIfNotInTransaction();
+
+	// this modifies our pen location, so we invalidate the flag.
+	fState->valid_flags &= ~B_VIEW_PEN_LOCATION_BIT;
+}
+
+
+void
 BView::StrokeShape(BShape* shape, ::pattern pattern)
 {
 	if (shape == NULL || fOwner == NULL)
@@ -4054,6 +4303,27 @@ BView::StrokeShape(BShape* shape, ::pattern pattern)
 	fOwner->fLink->StartMessage(AS_STROKE_SHAPE);
 	fOwner->fLink->Attach<BRect>(shape->Bounds());
 	fOwner->fLink->AttachShape(*shape);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::StrokeShape(BShape* shape, const BGradient& gradient)
+{
+	if (shape == NULL || fOwner == NULL)
+		return;
+
+	shape_data* sd = BShape::Private(*shape).PrivateData();
+	if (sd->opCount == 0 || sd->ptCount == 0)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_STROKE_SHAPE_GRADIENT);
+	fOwner->fLink->Attach<BRect>(shape->Bounds());
+	fOwner->fLink->AttachShape(*shape);
+	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
 }

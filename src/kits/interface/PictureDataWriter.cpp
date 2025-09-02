@@ -677,6 +677,24 @@ PictureDataWriter::WriteDrawShapeGradient(const int32& opCount, const void* opLi
 
 
 status_t
+PictureDataWriter::WriteStrokeLineGradient(const BPoint& start, const BPoint& end,
+	const BGradient& gradient)
+{
+	try {
+		BeginOp(B_PIC_STROKE_LINE_GRADIENT);
+		Write<BPoint>(start);
+		Write<BPoint>(end);
+		gradient.Flatten(fData);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 PictureDataWriter::WriteDrawBitmap(const BRect& srcRect, const BRect& dstRect,
 	const int32& width, const int32& height, const int32& bytesPerRow,
 	const int32& colorSpace, const int32& flags, const void* data,

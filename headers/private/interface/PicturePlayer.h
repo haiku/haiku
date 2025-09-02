@@ -103,6 +103,7 @@ struct picture_player_callbacks {
 	void (*draw_polygon_gradient)(void* userData, size_t numPoints, const BPoint points[], bool isClosed, BGradient& gradient, bool fill);
 	void (*draw_shape_gradient)(void* userData, const BShape& shape, BGradient& gradient, bool fill);
 	void (*set_fill_rule)(void* userData, int32 fillRule);
+	void (*stroke_line_gradient)(void* userData, const BPoint& start, const BPoint& end, const BGradient& gradient);
 };
 
 

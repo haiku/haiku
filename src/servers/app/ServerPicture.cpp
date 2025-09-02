@@ -220,9 +220,9 @@ ShapePainter::Draw(BRect frame, bool filled)
 		transform.Apply(&frame);
 
 		/* stroked gradients are not yet supported */
-		if (fGradient != NULL && filled) {
-			fCanvas->GetDrawingEngine()->FillShape(frame, opCount, opList,
-				ptCount, ptList, *fGradient, screenOffset, fCanvas->Scale());
+		if (fGradient != NULL) {
+			fCanvas->GetDrawingEngine()->DrawShape(frame, opCount, opList,
+				ptCount, ptList, filled, *fGradient, screenOffset, fCanvas->Scale());
 		} else {
 			fCanvas->GetDrawingEngine()->DrawShape(frame, opCount, opList,
 				ptCount, ptList, filled, screenOffset, fCanvas->Scale());
@@ -420,8 +420,8 @@ draw_round_rect_gradient(void* _canvas, const BRect& _rect, const BPoint& radii,
 	transform.Apply(&rect);
 	transform.Apply(&gradient);
 	float scale = canvas->CurrentState()->CombinedScale();
-	canvas->GetDrawingEngine()->FillRoundRect(rect, radii.x * scale,
-		radii.y * scale, gradient);
+	canvas->GetDrawingEngine()->DrawRoundRect(rect, radii.x * scale,
+		radii.y * scale, fill, gradient);
 }
 
 
@@ -437,7 +437,7 @@ draw_bezier_gradient(void* _canvas, const BPoint viewPoints[4], BGradient& gradi
 		canvas->PenToScreenTransform();
 	transform.Apply(points, viewPoints, kNumPoints);
 	transform.Apply(&gradient);
-	canvas->GetDrawingEngine()->FillBezier(points, gradient);
+	canvas->GetDrawingEngine()->DrawBezier(points, fill, gradient);
 }
 
 
@@ -453,7 +453,7 @@ draw_arc_gradient(void* _canvas, const BPoint& center, const BPoint& radii,
 		canvas->PenToScreenTransform();
 	transform.Apply(&rect);
 	transform.Apply(&gradient);
-	canvas->GetDrawingEngine()->FillArc(rect, startTheta, arcTheta, gradient);
+	canvas->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, fill, gradient);
 }
 
 
@@ -467,7 +467,7 @@ draw_ellipse_gradient(void* _canvas, const BRect& _rect, BGradient& gradient, bo
 		canvas->PenToScreenTransform();
 	transform.Apply(&rect);
 	transform.Apply(&gradient);
-	canvas->GetDrawingEngine()->FillEllipse(rect, gradient);
+	canvas->GetDrawingEngine()->DrawEllipse(rect, fill, gradient);
 }
 
 
@@ -492,8 +492,8 @@ draw_polygon_gradient(void* _canvas, size_t numPoints, const BPoint viewPoints[]
 	BRect polyFrame;
 	get_polygon_frame(points, numPoints, &polyFrame);
 
-	canvas->GetDrawingEngine()->FillPolygon(points, numPoints, polyFrame,
-		gradient, isClosed && numPoints > 2);
+	canvas->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
+		isClosed && numPoints > 2, fill, gradient);
 }
 
 
@@ -505,6 +505,26 @@ draw_shape_gradient(void* _canvas, const BShape& shape, BGradient& gradient, boo
 
 	drawShape.Iterate(&shape);
 	drawShape.Draw(shape.Bounds(), fill);
+}
+
+
+static void
+stroke_line_gradient(void* _canvas, const BPoint& _start, const BPoint& _end,
+	const BGradient& gradient)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	BPoint start = _start;
+	BPoint end = _end;
+
+	const SimpleTransform transform = canvas->PenToScreenTransform();
+	transform.Apply(&start);
+	transform.Apply(&end);
+	canvas->GetDrawingEngine()->StrokeLine(start, end, gradient);
+
+	canvas->CurrentState()->SetPenLocation(_end);
+	// the DrawingEngine/Painter does not need to be updated, since this
+	// effects only the view->screen coord conversion, which is handled
+	// by the view only
 }
 
 
@@ -1065,7 +1085,8 @@ static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
 	draw_ellipse_gradient,
 	draw_polygon_gradient,
 	draw_shape_gradient,
-	set_fill_rule
+	set_fill_rule,
+	stroke_line_gradient
 };
 
 

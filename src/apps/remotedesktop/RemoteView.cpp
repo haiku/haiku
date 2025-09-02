@@ -805,29 +805,38 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_ARC:
+			case RP_STROKE_ARC_GRADIENT:
 			case RP_FILL_ARC:
 			case RP_FILL_ARC_GRADIENT:
 			{
 				BRect rect;
 				float angle, span;
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
 
 				message.Read(rect);
 				message.Read(angle);
 				if (message.Read(span) != B_OK)
 					continue;
 
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_ARC_GRADIENT || code == RP_FILL_ARC_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
+
 				if (code == RP_STROKE_ARC) {
 					offscreen->StrokeArc(rect, angle, span, pattern);
+					rect.InsetBy(-penSize, -penSize);
+				} else if (code == RP_STROKE_ARC_GRADIENT) {
+					offscreen->StrokeArc(rect, angle, span, *gradient);
 					rect.InsetBy(-penSize, -penSize);
 				} else if (code == RP_FILL_ARC)
 					offscreen->FillArc(rect, angle, span, pattern);
 				else {
-					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK)
-						continue;
-
 					offscreen->FillArc(rect, angle, span, *gradient);
-					delete gradient;
 				}
 
 				invalidRegion.Include(rect);
@@ -835,26 +844,36 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_BEZIER:
+			case RP_STROKE_BEZIER_GRADIENT:
 			case RP_FILL_BEZIER:
 			case RP_FILL_BEZIER_GRADIENT:
 			{
 				BPoint points[4];
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
+
 				if (message.ReadList(points, 4) != B_OK)
 					continue;
+
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_BEZIER_GRADIENT || code == RP_FILL_BEZIER_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
 
 				BRect bounds = _BuildInvalidateRect(points, 4);
 				if (code == RP_STROKE_BEZIER) {
 					offscreen->StrokeBezier(points, pattern);
 					bounds.InsetBy(-penSize, -penSize);
+				} else if (code == RP_STROKE_BEZIER_GRADIENT) {
+					offscreen->StrokeBezier(points, *gradient);
+					bounds.InsetBy(-penSize, -penSize);
 				} else if (code == RP_FILL_BEZIER)
 					offscreen->FillBezier(points, pattern);
 				else {
-					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK)
-						continue;
-
 					offscreen->FillBezier(points, *gradient);
-					delete gradient;
 				}
 
 				invalidRegion.Include(bounds);
@@ -862,25 +881,34 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_ELLIPSE:
+			case RP_STROKE_ELLIPSE_GRADIENT:
 			case RP_FILL_ELLIPSE:
 			case RP_FILL_ELLIPSE_GRADIENT:
 			{
 				BRect rect;
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
 				if (message.Read(rect) != B_OK)
 					continue;
+
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_ELLIPSE_GRADIENT || code == RP_FILL_ELLIPSE_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
 
 				if (code == RP_STROKE_ELLIPSE) {
 					offscreen->StrokeEllipse(rect, pattern);
 					rect.InsetBy(-penSize, -penSize);
+				} else if (code == RP_STROKE_ELLIPSE_GRADIENT) {
+					offscreen->StrokeEllipse(rect, *gradient);
+					rect.InsetBy(-penSize, -penSize);
 				} else if (code == RP_FILL_ELLIPSE)
 					offscreen->FillEllipse(rect, pattern);
 				else {
-					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK)
-						continue;
-
 					offscreen->FillEllipse(rect, *gradient);
-					delete gradient;
 				}
 
 				invalidRegion.Include(rect);
@@ -888,12 +916,15 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_POLYGON:
+			case RP_STROKE_POLYGON_GRADIENT:
 			case RP_FILL_POLYGON:
 			case RP_FILL_POLYGON_GRADIENT:
 			{
 				BRect bounds;
 				bool closed;
 				int32 numPoints;
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
 
 				message.Read(bounds);
 				message.Read(closed);
@@ -904,20 +935,24 @@ RemoteView::_DrawThread()
 				for (int32 i = 0; i < numPoints; i++)
 					message.Read(points[i]);
 
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_POLYGON_GRADIENT || code == RP_FILL_POLYGON_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
+
 				if (code == RP_STROKE_POLYGON) {
-					offscreen->StrokePolygon(points, numPoints, bounds, closed,
-						pattern);
+					offscreen->StrokePolygon(points, numPoints, bounds, closed, pattern);
+					bounds.InsetBy(-penSize, -penSize);
+				} else if (code == RP_STROKE_POLYGON_GRADIENT) {
+					offscreen->StrokePolygon(points, numPoints, bounds, closed, *gradient);
 					bounds.InsetBy(-penSize, -penSize);
 				} else if (code == RP_FILL_POLYGON)
 					offscreen->FillPolygon(points, numPoints, bounds, pattern);
 				else {
-					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK)
-						continue;
-
-					offscreen->FillPolygon(points, numPoints, bounds,
-						*gradient);
-					delete gradient;
+					offscreen->FillPolygon(points, numPoints, bounds, *gradient);
 				}
 
 				invalidRegion.Include(bounds);
@@ -925,25 +960,35 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_RECT:
+			case RP_STROKE_RECT_GRADIENT:
 			case RP_FILL_RECT:
 			case RP_FILL_RECT_GRADIENT:
 			{
 				BRect rect;
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
+
 				if (message.Read(rect) != B_OK)
 					continue;
+
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_ARC_GRADIENT || code == RP_FILL_ARC_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
 
 				if (code == RP_STROKE_RECT) {
 					offscreen->StrokeRect(rect, pattern);
 					rect.InsetBy(-penSize, -penSize);
+				} else if (code == RP_STROKE_RECT_GRADIENT) {
+					offscreen->StrokeRect(rect, *gradient);
+					rect.InsetBy(-penSize, -penSize);
 				} else if (code == RP_FILL_RECT)
 					offscreen->FillRect(rect, pattern);
 				else {
-					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK)
-						continue;
-
 					offscreen->FillRect(rect, *gradient);
-					delete gradient;
 				}
 
 				invalidRegion.Include(rect);
@@ -951,31 +996,38 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_ROUND_RECT:
+			case RP_STROKE_ROUND_RECT_GRADIENT:
 			case RP_FILL_ROUND_RECT:
 			case RP_FILL_ROUND_RECT_GRADIENT:
 			{
 				BRect rect;
 				float xRadius, yRadius;
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
 
 				message.Read(rect);
 				message.Read(xRadius);
 				if (message.Read(yRadius) != B_OK)
 					continue;
 
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_ARC_GRADIENT || code == RP_FILL_ARC_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
+
 				if (code == RP_STROKE_ROUND_RECT) {
-					offscreen->StrokeRoundRect(rect, xRadius, yRadius,
-						pattern);
+					offscreen->StrokeRoundRect(rect, xRadius, yRadius, pattern);
+					rect.InsetBy(-penSize, -penSize);
+				} else if (code == RP_STROKE_ROUND_RECT_GRADIENT) {
+					offscreen->StrokeRoundRect(rect, xRadius, yRadius, *gradient);
 					rect.InsetBy(-penSize, -penSize);
 				} else if (code == RP_FILL_ROUND_RECT)
 					offscreen->FillRoundRect(rect, xRadius, yRadius, pattern);
 				else {
-					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK)
-						continue;
-
-					offscreen->FillRoundRect(rect, xRadius, yRadius,
-						*gradient);
-					delete gradient;
+					offscreen->FillRoundRect(rect, xRadius, yRadius, *gradient);
 				}
 
 				invalidRegion.Include(rect);
@@ -983,6 +1035,7 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_SHAPE:
+			case RP_STROKE_SHAPE_GRADIENT:
 			case RP_FILL_SHAPE:
 			case RP_FILL_SHAPE_GRADIENT:
 			{
@@ -1016,6 +1069,17 @@ RemoteView::_DrawThread()
 				if (message.Read(scale) != B_OK)
 					continue;
 
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
+
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_SHAPE_GRADIENT || code == RP_FILL_SHAPE_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
+
 				offscreen->PushState();
 				offscreen->MovePenTo(offset);
 				offscreen->SetScale(scale);
@@ -1024,17 +1088,13 @@ RemoteView::_DrawThread()
 				if (code == RP_STROKE_SHAPE) {
 					offscreen->StrokeShape(&shape, pattern);
 					bounds.InsetBy(-penSize, -penSize);
+				} else if (code == RP_STROKE_SHAPE_GRADIENT) {
+					offscreen->StrokeShape(&shape, *gradient);
+					bounds.InsetBy(-penSize, -penSize);
 				} else if (code == RP_FILL_SHAPE)
 					offscreen->FillShape(&shape, pattern);
 				else {
-					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK) {
-						offscreen->PopState();
-						continue;
-					}
-
 					offscreen->FillShape(&shape, *gradient);
-					delete gradient;
 				}
 
 				offscreen->PopState();
@@ -1043,31 +1103,41 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_TRIANGLE:
+			case RP_STROKE_TRIANGLE_GRADIENT:
 			case RP_FILL_TRIANGLE:
 			case RP_FILL_TRIANGLE_GRADIENT:
 			{
 				BRect bounds;
 				BPoint points[3];
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
 
 				message.ReadList(points, 3);
 				if (message.Read(bounds) != B_OK)
 					continue;
 
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_TRIANGLE_GRADIENT || code == RP_FILL_TRIANGLE_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
+
 				if (code == RP_STROKE_TRIANGLE) {
 					offscreen->StrokeTriangle(points[0], points[1], points[2],
 						bounds, pattern);
+					bounds.InsetBy(-penSize, -penSize);
+				} else if (code == RP_STROKE_TRIANGLE_GRADIENT) {
+					offscreen->StrokeTriangle(points[0], points[1], points[2],
+						bounds, *gradient);
 					bounds.InsetBy(-penSize, -penSize);
 				} else if (code == RP_FILL_TRIANGLE) {
 					offscreen->FillTriangle(points[0], points[1], points[2],
 						bounds, pattern);
 				} else {
-					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK)
-						continue;
-
 					offscreen->FillTriangle(points[0], points[1], points[2],
 						bounds, *gradient);
-					delete gradient;
 				}
 
 				invalidRegion.Include(bounds);
@@ -1075,12 +1145,27 @@ RemoteView::_DrawThread()
 			}
 
 			case RP_STROKE_LINE:
+			case RP_STROKE_LINE_GRADIENT:
 			{
 				BPoint points[2];
+				BGradient *gradient = NULL;
+				ObjectDeleter<BGradient> gradientDeleter;
+
 				if (message.ReadList(points, 2) != B_OK)
 					continue;
 
-				offscreen->StrokeLine(points[0], points[1], pattern);
+				message.ReadGradient(&gradient);
+				if (code == RP_STROKE_LINE_GRADIENT) {
+					if (message.ReadGradient(&gradient) != B_OK)
+						continue;
+
+					gradientDeleter.SetTo(gradient);
+				}
+
+				if (code == RP_STROKE_LINE)
+					offscreen->StrokeLine(points[0], points[1], pattern);
+				else
+					offscreen->StrokeLine(points[0], points[1], *gradient);
 
 				BRect bounds = _BuildInvalidateRect(points, 2);
 				invalidRegion.Include(bounds.InsetBySelf(-penSize, -penSize));

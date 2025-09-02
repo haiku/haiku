@@ -37,6 +37,7 @@ enum {
 	B_PIC_FILL_ARC_GRADIENT		= 0x0123,
 	B_PIC_STROKE_ELLIPSE_GRADIENT = 0x0124,
 	B_PIC_FILL_ELLIPSE_GRADIENT	= 0x0125,
+	B_PIC_STROKE_LINE_GRADIENT	= 0x0126,
 
 	B_PIC_ENTER_STATE_CHANGE	= 0x0200,
 	B_PIC_SET_CLIPPING_RECTS	= 0x0201,
@@ -77,7 +78,7 @@ enum {
 };
 
 
-const static uint32 kOpsTableSize = 71;
+const static uint32 kOpsTableSize = 72;
 
 
 #endif
