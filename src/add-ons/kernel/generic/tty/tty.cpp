@@ -1528,11 +1528,8 @@ tty_close_cookie(tty_cookie* cookie)
 
 		requestLocker.Unlock();
 
-		// notify a select read and write event on the other tty, if we've closed this tty
-		if (cookie->other_tty->open_count > 0) {
-			tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
-			tty_notify_select_event(cookie->other_tty, B_SELECT_READ);
-		}
+		// notify a select event on the other tty, if we've closed this tty
+		tty_notify_select_event(cookie->other_tty, B_SELECT_DISCONNECTED);
 
 		cookie->tty->is_exclusive = false;
 	}
@@ -1998,7 +1995,7 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 		"%p)\n", cookie, event, ref, sync));
 
 	// we don't support all kinds of events
-	if (event < B_SELECT_READ || event > B_SELECT_ERROR)
+	if (event < B_SELECT_READ || (event > B_SELECT_ERROR && event != B_SELECT_DISCONNECTED))
 		return B_BAD_VALUE;
 
 	// if the TTY is already closed, we notify immediately
@@ -2006,7 +2003,8 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 	if (!ttyReference.IsLocked()) {
 		TRACE(("tty_select() done: cookie %p already closed\n", cookie));
 
-		notify_select_event(sync, event);
+		if (event == B_SELECT_DISCONNECTED)
+			notify_select_event(sync, event);
 		return B_OK;
 	}
 
@@ -2042,10 +2040,8 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 		case B_SELECT_WRITE:
 		{
 			// writes go to the other TTY
-			if (!otherTTY) {
-				notify_select_event(sync, event);
+			if (otherTTY == NULL)
 				break;
-			}
 
 			// In case input is echoed, we have to check, whether we can
 			// currently can write to our TTY as well.
@@ -2062,6 +2058,11 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 			}
 			break;
 		}
+
+		case B_SELECT_DISCONNECTED:
+			if (otherTTY == NULL)
+				notify_select_event(sync, event);
+			break;
 
 		case B_SELECT_ERROR:
 		default:
@@ -2081,7 +2082,7 @@ tty_deselect(tty_cookie* cookie, uint8 event, selectsync* sync)
 		sync));
 
 	// we don't support all kinds of events
-	if (event < B_SELECT_READ || event > B_SELECT_ERROR)
+	if (event < B_SELECT_READ || (event > B_SELECT_ERROR && event != B_SELECT_DISCONNECTED))
 		return B_BAD_VALUE;
 
 	// lock the TTY (guards the select sync pool, among other things)
