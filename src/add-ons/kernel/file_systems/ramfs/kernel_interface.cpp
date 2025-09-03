@@ -1036,7 +1036,6 @@ ramfs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 //	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
 	Node* node = (Node*)_node->private_node;
-	FileCookie *cookie = (FileCookie*)_cookie;
 
 //	FUNCTION(("((%lu, %lu), %lld, %p, %lu)\n", node->GetDirID(),
 //			  node->GetObjectID(), pos, buffer, *bufferSize));
@@ -1049,11 +1048,6 @@ ramfs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 	// don't read anything but files
 	if (!node->IsFile())
 		SET_ERROR(error, B_BAD_VALUE);
-
-	// check, if reading is allowed
-	int rwMode = cookie->GetOpenMode() & O_RWMASK;
-	if (error == B_OK && rwMode != O_RDONLY && rwMode != O_RDWR)
-		SET_ERROR(error, B_FILE_ERROR);
 
 	// read
 	if (error == B_OK) {
@@ -1091,23 +1085,17 @@ ramfs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 	if (!node->IsFile())
 		SET_ERROR(error, B_BAD_VALUE);
 	if (error == B_OK) {
-		// check, if reading is allowed
-		int rwMode = cookie->GetOpenMode() & O_RWMASK;
-		if (error == B_OK && rwMode != O_WRONLY && rwMode != O_RDWR)
-			SET_ERROR(error, B_FILE_ERROR);
-		if (error == B_OK) {
-			// reset the position, if opened in append mode
-			if (cookie->GetOpenMode() & O_APPEND)
-				pos = node->GetSize();
-			// write
-			if (File *file = dynamic_cast<File*>(node)) {
-				error = file->WriteAt(pos, buffer, *bufferSize,
-					bufferSize);
-			} else {
-				FATAL("Node %" B_PRIdINO " pretends to be a File, but isn't!\n",
-					node->GetID());
-				error = B_BAD_VALUE;
-			}
+		// reset the position, if opened in append mode
+		if (cookie->GetOpenMode() & O_APPEND)
+			pos = node->GetSize();
+		// write
+		if (File *file = dynamic_cast<File*>(node)) {
+			error = file->WriteAt(pos, buffer, *bufferSize,
+				bufferSize);
+		} else {
+			FATAL("Node %" B_PRIdINO " pretends to be a File, but isn't!\n",
+				node->GetID());
+			error = B_BAD_VALUE;
 		}
 	}
 	// notify listeners
