@@ -422,6 +422,28 @@ private:
 #endif	// SLAB_MEMORY_MANAGER_TRACING
 
 
+// #pragma mark - utility methods
+
+
+template<typename Type>
+static inline Type*
+_pop(Type*& head)
+{
+	Type* oldHead = head;
+	head = head->next;
+	return oldHead;
+}
+
+
+template<typename Type>
+static inline void
+_push(Type*& head, Type* object)
+{
+	object->next = head;
+	head = object;
+}
+
+
 // #pragma mark - MemoryManager
 
 
@@ -1438,6 +1460,25 @@ MemoryManager::_FreeArea(Area* area, bool areaRemoved, uint32 flags)
 	vm_unreserve_memory(memoryToUnreserve);
 
 	mutex_lock(&sLock);
+}
+
+
+/*static*/ inline void
+MemoryManager::_PushFreeArea(Area* area)
+{
+	_push(sFreeAreas, area);
+	sFreeAreaCount++;
+}
+
+
+/*static*/ inline MemoryManager::Area*
+MemoryManager::_PopFreeArea()
+{
+	if (sFreeAreaCount == 0)
+		return NULL;
+
+	sFreeAreaCount--;
+	return _pop(sFreeAreas);
 }
 
 

@@ -24,25 +24,6 @@ void		block_allocator_init_boot();
 void		block_allocator_init_rest();
 
 
-template<typename Type>
-static inline Type*
-_pop(Type*& head)
-{
-	Type* oldHead = head;
-	head = head->next;
-	return oldHead;
-}
-
-
-template<typename Type>
-static inline void
-_push(Type*& head, Type* object)
-{
-	object->next = head;
-	head = object;
-}
-
-
 static inline void*
 slab_internal_alloc(size_t size, uint32 flags)
 {

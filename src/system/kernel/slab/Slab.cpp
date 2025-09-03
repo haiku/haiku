@@ -20,7 +20,6 @@
 #include <elf.h>
 #include <kernel.h>
 #include <low_resource_manager.h>
-#include <slab/ObjectDepot.h>
 #include <smp.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
@@ -28,11 +27,12 @@
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
 
+#include "SmallObjectCache.h"
 #include "HashedObjectCache.h"
+#include "ObjectDepot.h"
 #include "MemoryManager.h"
 #include "slab_debug.h"
 #include "slab_private.h"
-#include "SmallObjectCache.h"
 
 
 #if !USE_GUARDED_HEAP_FOR_OBJECT_CACHE
@@ -251,7 +251,7 @@ static void
 dump_slab(::slab* slab)
 {
 	kprintf("  %p  %p  %6" B_PRIuSIZE " %6" B_PRIuSIZE " %6" B_PRIuSIZE "  %p\n",
-		slab, slab->pages, slab->size, slab->count, slab->offset, slab->free);
+		slab, slab->pages, slab->size, slab->count, slab->offset, slab->free.head);
 }
 
 
@@ -1273,7 +1273,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 
 	ParanoiaChecker _2(source);
 
-	object_link* link = _pop(source->free);
+	slab_queue_link* link = source->free.Pop();
 	source->count--;
 	cache->used_count++;
 

@@ -10,9 +10,11 @@
 
 #include <condition_variable.h>
 #include <lock.h>
-#include <slab/ObjectDepot.h>
 #include <slab/Slab.h>
 #include <util/DoublyLinkedList.h>
+
+#include "ObjectDepot.h"
+#include "slab_queue.h"
 
 #include "kernel_debug_config.h"
 #include "slab_debug.h"
@@ -21,16 +23,12 @@
 struct ResizeRequest;
 
 
-struct object_link {
-	struct object_link* next;
-};
-
 struct slab : DoublyLinkedListLinkImpl<slab> {
 	void*			pages;
 	size_t			size;		// total number of objects
 	size_t			count;		// free objects
 	size_t			offset;
-	object_link*	free;
+	slab_queue		free;
 #if SLAB_OBJECT_CACHE_ALLOCATION_TRACKING
 	AllocationTrackingInfo*	tracking;
 #endif
@@ -131,17 +129,17 @@ public:
 
 
 static inline void*
-link_to_object(object_link* link, size_t objectSize)
+link_to_object(slab_queue_link* link, size_t objectSize)
 {
-	return ((uint8*)link) - (objectSize - sizeof(object_link));
+	return ((uint8*)link) - (objectSize - sizeof(slab_queue_link));
 }
 
 
-static inline object_link*
+static inline slab_queue_link*
 object_to_link(void* object, size_t objectSize)
 {
-	return (object_link*)(((uint8*)object)
-		+ (objectSize - sizeof(object_link)));
+	return (slab_queue_link*)(((uint8*)object)
+		+ (objectSize - sizeof(slab_queue_link)));
 }
 
 

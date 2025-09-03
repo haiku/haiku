@@ -51,8 +51,8 @@ ObjectCache::Init(const char* name, size_t objectSize, size_t alignment,
 
 	mutex_init(&lock, this->name);
 
-	if (objectSize < sizeof(object_link))
-		objectSize = sizeof(object_link);
+	if (objectSize < sizeof(slab_queue_link))
+		objectSize = sizeof(slab_queue_link);
 
 	if (alignment < kMinObjectAlignment)
 		alignment = kMinObjectAlignment;
@@ -125,7 +125,7 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 
 	slab->pages = pages;
 	slab->count = slab->size = byteCount / object_size;
-	slab->free = NULL;
+	slab->free.Init();
 
 	size_t spareBytes = byteCount - (slab->size * object_size);
 
@@ -142,7 +142,6 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 
 	CREATE_PARANOIA_CHECK_SET(slab, "slab");
 
-
 	for (size_t i = 0; i < slab->size; i++) {
 		status_t status = B_OK;
 		if (constructor)
@@ -157,11 +156,10 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 			}
 
 			DELETE_PARANOIA_CHECK_SET(slab);
-
 			return NULL;
 		}
 
-		_push(slab->free, object_to_link(data, object_size));
+		slab->free.Push(object_to_link(data, object_size));
 
 		ADD_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, slab,
 			&object_to_link(data, object_size)->next, sizeof(void*));
@@ -216,13 +214,13 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 	}
 #endif // KDEBUG
 
-	object_link* link = object_to_link(object, object_size);
+	slab_queue_link* link = object_to_link(object, object_size);
 
 	TRACE_CACHE(this, "returning %p (%p) to %p, %lu used (%lu empty slabs).",
 		object, link, source, source->size - source->count,
 		empty_count);
 
-	_push(source->free, link);
+	source->free.Push(link);
 	source->count++;
 	used_count--;
 
@@ -267,8 +265,8 @@ ObjectCache::AssertObjectNotFreed(void* object)
 		return false;
 	}
 
-	object_link* link = object_to_link(object, object_size);
-	for (object_link* freeLink = source->free; freeLink != NULL;
+	slab_queue_link* link = object_to_link(object, object_size);
+	for (slab_queue_link* freeLink = source->free.head; freeLink != NULL;
 			freeLink = freeLink->next) {
 		if (freeLink == link) {
 			panic("object_cache: double free of %p (slab %p, cache %p)",

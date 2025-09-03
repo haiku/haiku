@@ -7,7 +7,7 @@
  */
 
 
-#include <slab/ObjectDepot.h>
+#include "ObjectDepot.h"
 
 #include <algorithm>
 
@@ -18,10 +18,10 @@
 
 #include "slab_debug.h"
 #include "slab_private.h"
+#include "slab_queue.h"
 
 
-struct DepotMagazine {
-			DepotMagazine*		next;
+struct DepotMagazine : public slab_queue_link {
 			uint16				current_round;
 			uint16				round_count;
 			void*				rounds[0];
@@ -138,14 +138,14 @@ exchange_with_full(object_depot* depot, DepotMagazine*& magazine)
 
 	SpinLocker _(depot->inner_lock);
 
-	if (depot->full == NULL)
+	if (depot->full.head == NULL)
 		return false;
 
 	depot->full_count--;
 	depot->empty_count++;
 
-	_push(depot->empty, magazine);
-	magazine = _pop(depot->full);
+	depot->empty.Push(magazine);
+	magazine = (DepotMagazine*)depot->full.Pop();
 	return true;
 }
 
@@ -158,21 +158,21 @@ exchange_with_empty(object_depot* depot, DepotMagazine*& magazine,
 
 	SpinLocker _(depot->inner_lock);
 
-	if (depot->empty == NULL)
+	if (depot->empty.head == NULL)
 		return false;
 
 	depot->empty_count--;
 
 	if (magazine != NULL) {
 		if (depot->full_count < depot->max_count) {
-			_push(depot->full, magazine);
+			depot->full.Push(magazine);
 			depot->full_count++;
 			freeMagazine = NULL;
 		} else
 			freeMagazine = magazine;
 	}
 
-	magazine = _pop(depot->empty);
+	magazine = (DepotMagazine*)depot->empty.Pop();
 	return true;
 }
 
@@ -182,7 +182,7 @@ push_empty_magazine(object_depot* depot, DepotMagazine* magazine)
 {
 	SpinLocker _(depot->inner_lock);
 
-	_push(depot->empty, magazine);
+	depot->empty.Push(magazine);
 	depot->empty_count++;
 }
 
@@ -202,8 +202,8 @@ object_depot_init(object_depot* depot, size_t capacity, size_t maxCount,
 	uint32 flags, void* cookie, void (*return_object)(object_depot* depot,
 		void* cookie, void* object, uint32 flags))
 {
-	depot->full = NULL;
-	depot->empty = NULL;
+	depot->full.Init();
+	depot->empty.Init();
 	depot->full_count = depot->empty_count = 0;
 	depot->max_count = maxCount;
 	depot->magazine_capacity = capacity;
@@ -336,43 +336,44 @@ object_depot_make_empty(object_depot* depot, uint32 flags)
 
 	// collect the store magazines
 
-	DepotMagazine* storeMagazines = NULL;
+	slab_queue storeMagazines;
+	storeMagazines.Init();
 
 	int cpuCount = smp_get_num_cpus();
 	for (int i = 0; i < cpuCount; i++) {
 		depot_cpu_store& store = depot->stores[i];
 
-		if (store.loaded) {
-			_push(storeMagazines, store.loaded);
+		if (store.loaded != NULL) {
+			storeMagazines.Push(store.loaded);
 			store.loaded = NULL;
 		}
 
-		if (store.previous) {
-			_push(storeMagazines, store.previous);
+		if (store.previous != NULL) {
+			storeMagazines.Push(store.previous);
 			store.previous = NULL;
 		}
 	}
 
 	// detach the depot's full and empty magazines
 
-	DepotMagazine* fullMagazines = depot->full;
-	depot->full = NULL;
+	slab_queue fullMagazines = depot->full;
+	depot->full.head = depot->full.tail = NULL;
 
-	DepotMagazine* emptyMagazines = depot->empty;
-	depot->empty = NULL;
+	slab_queue emptyMagazines = depot->empty;
+	depot->empty.head = depot->empty.tail = NULL;
 
 	writeLocker.Unlock();
 
 	// free all magazines
 
-	while (storeMagazines != NULL)
-		empty_magazine(depot, _pop(storeMagazines), flags);
+	while (storeMagazines.head != NULL)
+		empty_magazine(depot, (DepotMagazine*)storeMagazines.Pop(), flags);
 
-	while (fullMagazines != NULL)
-		empty_magazine(depot, _pop(fullMagazines), flags);
+	while (fullMagazines.head != NULL)
+		empty_magazine(depot, (DepotMagazine*)fullMagazines.Pop(), flags);
 
-	while (emptyMagazines)
-		free_magazine(_pop(emptyMagazines), flags);
+	while (emptyMagazines.head != NULL)
+		free_magazine((DepotMagazine*)emptyMagazines.Pop(), flags);
 }
 
 
@@ -398,8 +399,8 @@ object_depot_contains_object(object_depot* depot, void* object)
 		}
 	}
 
-	for (DepotMagazine* magazine = depot->full; magazine != NULL;
-			magazine = magazine->next) {
+	for (DepotMagazine* magazine = (DepotMagazine*)depot->full.head; magazine != NULL;
+			magazine = (DepotMagazine*)magazine->next) {
 		if (magazine->ContainsObject(object))
 			return true;
 	}
@@ -416,8 +417,8 @@ object_depot_contains_object(object_depot* depot, void* object)
 void
 dump_object_depot(object_depot* depot)
 {
-	kprintf("  full:     %p, count %lu\n", depot->full, depot->full_count);
-	kprintf("  empty:    %p, count %lu\n", depot->empty, depot->empty_count);
+	kprintf("  full:     %p, count %lu\n", depot->full.head, depot->full_count);
+	kprintf("  empty:    %p, count %lu\n", depot->empty.head, depot->empty_count);
 	kprintf("  max full: %lu\n", depot->max_count);
 	kprintf("  capacity: %lu\n", depot->magazine_capacity);
 	kprintf("  stores:\n");

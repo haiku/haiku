@@ -10,14 +10,16 @@
 #include <lock.h>
 #include <KernelExport.h>
 
+#include "slab_queue.h"
+
 
 struct DepotMagazine;
 
 typedef struct object_depot {
 	rw_lock					outer_lock;
 	spinlock				inner_lock;
-	DepotMagazine*			full;
-	DepotMagazine*			empty;
+	slab_queue				full;
+	slab_queue				empty;
 	size_t					full_count;
 	size_t					empty_count;
 	size_t					max_count;

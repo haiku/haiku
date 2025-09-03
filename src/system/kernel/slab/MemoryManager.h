@@ -239,25 +239,6 @@ MemoryManager::MaintenanceNeeded()
 }
 
 
-/*static*/ inline void
-MemoryManager::_PushFreeArea(Area* area)
-{
-	_push(sFreeAreas, area);
-	sFreeAreaCount++;
-}
-
-
-/*static*/ inline MemoryManager::Area*
-MemoryManager::_PopFreeArea()
-{
-	if (sFreeAreaCount == 0)
-		return NULL;
-
-	sFreeAreaCount--;
-	return _pop(sFreeAreas);
-}
-
-
 /*static*/ inline addr_t
 MemoryManager::_AreaBaseAddressForAddress(addr_t address)
 {
