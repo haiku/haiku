@@ -2557,6 +2557,9 @@ static status_t
 overlay_mount(fs_volume *volume, const char *device, uint32 flags,
 	const char *args, ino_t *rootID)
 {
+	if (volume->super_volume == NULL)
+		return B_UNSUPPORTED;
+
 	TRACE_VOLUME("mounting write overlay\n");
 	volume->private_volume = new(std::nothrow) OverlayVolume(volume);
 	if (volume->private_volume == NULL)
