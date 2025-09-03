@@ -284,7 +284,7 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar* buffer,
 				DBG(dump_full_table_of_contents(buffer, buffer_length));
 				return B_OK;
 			} else {
-				error = B_FILE_ERROR;
+				error = B_IO_ERROR;
 				TRACE(("%s: scsi ioctl succeeded, but scsi command failed\n",
 					kModuleDebugName));
 			}

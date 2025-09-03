@@ -792,8 +792,8 @@ status_t MediaReader::FillFileBuffer(
 	off_t position = GetCurrentFile()->Position();
 	ssize_t bytesRead = GetCurrentFile()->Read(buffer->Data(),buffer->SizeAvailable());
 	if (bytesRead < 0) {
-		PRINT("\t<- B_FILE_ERROR\n");
-		return B_FILE_ERROR; // some sort of file related error
+		PRINT("\t<- B_IO_ERROR\n");
+		return B_IO_ERROR; // some sort of I/O related error
 	}
 	PRINT("\t%ld file bytes read at position %ld.\n",
 			bytesRead, position);

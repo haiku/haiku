@@ -200,7 +200,7 @@ Server::WakeCall(Request* request)
 	if (req == NULL)
 		return B_OK;
 
-	request->fError = B_FILE_ERROR;
+	request->fError = B_IO_ERROR;
 	*request->fReply = NULL;
 	request->fDone = true;
 	request->fEvent.NotifyAll();

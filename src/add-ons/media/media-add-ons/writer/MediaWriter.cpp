@@ -546,8 +546,8 @@ status_t MediaWriter::WriteFileBuffer(
 			buffer->SizeUsed(),GetCurrentFile()->Position());
 	ssize_t bytesWriten = GetCurrentFile()->Write(buffer->Data(),buffer->SizeUsed());
 	if (bytesWriten < 0) {
-		fprintf(stderr,"<- B_FILE_ERROR\n");
-		return B_FILE_ERROR; // some sort of file related error
+		fprintf(stderr,"<- B_IO_ERROR\n");
+		return B_IO_ERROR; // some sort of I/O related error
 	}
 	// nothing more to say?
 	return B_OK;
