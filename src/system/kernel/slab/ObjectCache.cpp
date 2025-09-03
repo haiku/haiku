@@ -159,6 +159,7 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 			return NULL;
 		}
 
+		fill_freed_block(data, object_size);
 		slab->free.Push(object_to_link(data, object_size));
 
 		ADD_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, slab,

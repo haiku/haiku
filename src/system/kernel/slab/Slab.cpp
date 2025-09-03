@@ -1240,59 +1240,63 @@ object_cache_set_minimum_reserve(object_cache* cache, size_t objectCount)
 void*
 object_cache_alloc(object_cache* cache, uint32 flags)
 {
-	if (!(cache->flags & CACHE_NO_DEPOT)) {
-		void* object = object_depot_obtain(&cache->depot);
-		if (object) {
-			add_alloc_tracing_entry(cache, flags, object);
-			return fill_allocated_block(object, cache->object_size);
+	void* object = NULL;
+	if ((cache->flags & CACHE_NO_DEPOT) == 0)
+		object = object_depot_obtain(&cache->depot);
+
+	if (object == NULL) {
+		MutexLocker locker(cache->lock);
+		slab* source = NULL;
+
+		while (true) {
+			source = cache->partial.Head();
+			if (source != NULL)
+				break;
+
+			source = cache->empty.RemoveHead();
+			if (source != NULL) {
+				cache->empty_count--;
+				cache->partial.Add(source);
+				break;
+			}
+
+			if (object_cache_reserve_internal(cache, 1, flags) != B_OK) {
+				T(Alloc(cache, flags, NULL));
+				return NULL;
+			}
+
+			cache->pressure++;
 		}
+
+		ParanoiaChecker _2(source);
+
+		slab_queue_link* link = source->free.Pop();
+		source->count--;
+		cache->used_count++;
+
+		if (cache->total_objects - cache->used_count < cache->min_object_reserve)
+			increase_object_reserve(cache);
+
+		REMOVE_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, source, &link->next,
+			sizeof(void*));
+
+		TRACE_CACHE(cache, "allocate %p (%p) from %p, %lu remaining.",
+			link_to_object(link, cache->object_size), link, source, source->count);
+
+		if (source->count == 0) {
+			cache->partial.Remove(source);
+			cache->full.Add(source);
+		}
+
+		object = link_to_object(link, cache->object_size);
+		locker.Unlock();
 	}
 
-	MutexLocker locker(cache->lock);
-	slab* source = NULL;
-
-	while (true) {
-		source = cache->partial.Head();
-		if (source != NULL)
-			break;
-
-		source = cache->empty.RemoveHead();
-		if (source != NULL) {
-			cache->empty_count--;
-			cache->partial.Add(source);
-			break;
-		}
-
-		if (object_cache_reserve_internal(cache, 1, flags) != B_OK) {
-			T(Alloc(cache, flags, NULL));
-			return NULL;
-		}
-
-		cache->pressure++;
+#if PARANOID_KERNEL_FREE
+	if (cache->object_size >= (sizeof(void*) * 2)) {
+		ASSERT_ALWAYS(*(uint32*)object == 0xdeadbeef);
 	}
-
-	ParanoiaChecker _2(source);
-
-	slab_queue_link* link = source->free.Pop();
-	source->count--;
-	cache->used_count++;
-
-	if (cache->total_objects - cache->used_count < cache->min_object_reserve)
-		increase_object_reserve(cache);
-
-	REMOVE_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, source, &link->next,
-		sizeof(void*));
-
-	TRACE_CACHE(cache, "allocate %p (%p) from %p, %lu remaining.",
-		link_to_object(link, cache->object_size), link, source, source->count);
-
-	if (source->count == 0) {
-		cache->partial.Remove(source);
-		cache->full.Add(source);
-	}
-
-	void* object = link_to_object(link, cache->object_size);
-	locker.Unlock();
+#endif
 
 	add_alloc_tracing_entry(cache, flags, object);
 	return fill_allocated_block(object, cache->object_size);
