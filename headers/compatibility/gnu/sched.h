@@ -46,7 +46,8 @@ static inline unsigned int
 __cpu_count(cpuset_t *set)
 {
 	unsigned int count = 0;
-	for (unsigned int i = 0; i < _howmany(CPU_SETSIZE, NCPUSETBITS); i++) {
+	unsigned int i;
+	for (i = 0; i < _howmany(CPU_SETSIZE, NCPUSETBITS); i++) {
 		cpuset_mask mask = set->bits[i];
 #if __GNUC__ > 2
 		count += __builtin_popcount(mask);
