@@ -119,11 +119,17 @@ public:
 		vec.iov_base = buffer;
 		vec.iov_len = *length;
 
+		// We need to use write_pages (if it exists) to bypass caches.
+
 		if (fWrite) {
+			if (!HAS_FS_CALL(fVnode, write_pages))
+				return FS_CALL(fVnode, write, fCookie, offset, buffer, length);
 			return FS_CALL(fVnode, write_pages, fCookie, offset, &vec, 1,
 				length);
 		}
 
+		if (!HAS_FS_CALL(fVnode, read_pages))
+			return FS_CALL(fVnode, read, fCookie, offset, buffer, length);
 		return FS_CALL(fVnode, read_pages, fCookie, offset, &vec, 1, length);
 	}
 
