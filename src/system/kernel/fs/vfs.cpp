@@ -4117,6 +4117,8 @@ read_file_io_vec_pages(int fd, const file_io_vec* fileVecs, size_t fileVecCount,
 	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, true));
 	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY)
+		return B_FILE_ERROR;
 
 	status_t status = common_file_io_vec_pages(vnode, descriptor->cookie,
 		fileVecs, fileVecCount, vecs, vecCount, _vecIndex, _vecOffset, _bytes,
@@ -4134,6 +4136,8 @@ write_file_io_vec_pages(int fd, const file_io_vec* fileVecs, size_t fileVecCount
 	struct vnode* vnode;
 	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, true));
 	if (!descriptor.IsSet())
+		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY)
 		return B_FILE_ERROR;
 
 	status_t status = common_file_io_vec_pages(vnode, descriptor->cookie,

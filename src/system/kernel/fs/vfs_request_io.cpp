@@ -504,14 +504,19 @@ do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 
 	struct vnode* vnode;
 	file_descriptor* descriptor = get_fd_and_vnode(fd, &vnode, true);
+	FileDescriptorPutter descriptorPutter(descriptor);
+	if (descriptor != NULL && (request->IsWrite()
+			? (descriptor->open_mode & O_RWMASK) == O_RDONLY
+			: (descriptor->open_mode & O_RWMASK) == O_WRONLY)) {
+		descriptor = NULL;
+	}
+
 	if (descriptor == NULL) {
 		if (finished != NULL)
 			finished(cookie, request, B_FILE_ERROR, true, 0);
 		request->SetStatusAndNotify(B_FILE_ERROR);
 		return B_FILE_ERROR;
 	}
-
-	FileDescriptorPutter descriptorPutter(descriptor);
 
 	if (!HAS_FS_CALL(vnode, io)) {
 		// no io() call -- fall back to synchronous I/O
