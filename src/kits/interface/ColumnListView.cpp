@@ -4555,7 +4555,7 @@ OutlineView::RemoveRows(BList* rows)
 
 	fItemsHeight -= subTreesHeight;
 
-	FixScrollBar(false);
+	FixScrollBar(true);
 
 	int32 indent = 0;
 	float top = 0.0;
