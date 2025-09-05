@@ -39,6 +39,22 @@ Delegation::GiveUp(bool truncate)
 }
 
 
+void
+Delegation::Dump(void (*xprintf)(const char*, ...)) const
+{
+	xprintf("Delegation at %p for Inode at %p (ino %" B_PRIdINO ")\n", this, fInode, fInode->ID());
+	if (fData.fType == OPEN_DELEGATE_READ)
+		xprintf("\ttype OPEN_DELEGATE_READ, ");
+	else if (fData.fType == OPEN_DELEGATE_WRITE)
+		xprintf("\ttype OPEN_DELEGATE_WRITE, ");
+	xprintf("attribute %d, uid %" B_PRIu32 ", gid %" B_PRIu32 "\n", fAttribute, fUid, fGid);
+	xprintf("\tstate id and sequence %" B_PRIu32 " %" B_PRIu32 " %" B_PRIu32 " %" B_PRIu32 "\n",
+		fData.fStateID[0], fData.fStateID[1], fData.fStateID[2], fData.fStateSeq);
+
+	return;
+}
+
+
 status_t
 Delegation::ReturnDelegation()
 {

@@ -98,7 +98,8 @@ private:
 	static	status_t			_ParsePath(RequestBuilder& req, uint32& count,
 									const char* _path);
 
-			void 				_DumpLocked(void (*xprintf)(const char*, ...)) const;
+			void 				_DumpLocked(void (*xprintf)(const char*, ...),
+									bool dumpDelegations, bool dumpOpenFiles) const;
 
 			mutex				fCreateFileLock;
 

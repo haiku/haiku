@@ -15,6 +15,7 @@
 #include <util/AutoLock.h>
 #include <util/AVLTreeMap.h>
 
+#include "Debug.h"
 
 class Inode;
 
@@ -45,11 +46,16 @@ public:
 
 	inline			void		Invalidate();
 
+					void		Dump(void (*xprintf)(const char*, ...) = dprintf);
+
 	static const	time_t		kExpirationTime	= 60;
 
 protected:
 					void		NotifyChanges(const struct stat* oldStat,
 									const struct stat* newStat);
+
+private:
+					void		_DumpLocked(void (*xprintf)(const char*, ...)) const;
 
 private:
 					struct stat	fStatCache;

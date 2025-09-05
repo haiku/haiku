@@ -18,6 +18,7 @@
 #include "Request.h"
 #include "RootInode.h"
 #include "VnodeToInode.h"
+#include "WorkQueue.h"
 
 
 extern RPC::ServerManager* gRPCServerManager;
@@ -37,10 +38,10 @@ FileSystem::FileSystem(const MountConfiguration& configuration)
 {
 	fOpenOwner = get_random<uint64>();
 
-	mutex_init(&fOpenOwnerLock, NULL);
-	mutex_init(&fOpenLock, NULL);
-	mutex_init(&fDelegationLock, NULL);
-	mutex_init(&fCreateFileLock, NULL);
+	mutex_init(&fOpenOwnerLock, "nfs4 FileSystem::fOpenOwnerLock");
+	mutex_init(&fOpenLock, "nfs4 FileSystem::fOpenLock");
+	mutex_init(&fDelegationLock, "nfs4 FileSystem::fDelegationLock");
+	mutex_init(&fCreateFileLock, "nfs4 FileSystem::fCreateFileLock");
 }
 
 
@@ -554,13 +555,32 @@ FileSystem::ServerUnlinkCleanup(ino_t id, Inode* parent, const char* missingName
 void
 FileSystem::Dump(void (*xprintf)(const char*, ...))
 {
-	MutexLocker locker;
-	if (xprintf != kprintf)
-		locker.SetTo(fOpenLock, false);
+	xprintf("FileSystem at %p\n", this);
+	bool dumpDelegations = true;
+	bool dumpOpenFiles = true;
+	if (xprintf != kprintf) {
+		status_t status = mutex_trylock(&fDelegationLock);
+		if (status != B_OK)
+			dumpDelegations = false;
+		status = mutex_trylock(&fOpenLock);
+		if (status != B_OK)
+			dumpOpenFiles = false;
+	}
 
+	_DumpLocked(xprintf, dumpDelegations, dumpOpenFiles);
+
+	if (xprintf != kprintf) {
+		if (dumpDelegations)
+			mutex_unlock(&fDelegationLock);
+		if (dumpOpenFiles)
+			mutex_unlock(&fOpenLock);
+	}
+
+	xprintf("\n");
 	fInoIdMap.Dump(xprintf);
 
-	_DumpLocked(xprintf);
+	xprintf("\n");
+	gWorkQueue->Dump(xprintf);
 
 	return;
 }
@@ -607,17 +627,36 @@ FileSystem::_ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 
 
 void
-FileSystem::_DumpLocked(void (*xprintf)(const char*, ...)) const
+FileSystem::_DumpLocked(void (*xprintf)(const char*, ...), bool dumpDelegations,
+	bool dumpOpenFiles) const
 {
-	xprintf("fOpenFiles:\n", fOpenFiles);
-	for (DoublyLinkedList<OpenState>::ConstIterator it = fOpenFiles.GetIterator();
-		const OpenState* state = it.Next();) {
-		xprintf("\tID\t\t%" B_PRIu64 "\n", state->fInfo.fFileId);
-		xprintf("\tFileHandle\t");
-		state->fInfo.fHandle.Dump(xprintf);
-		xprintf("\tInodeNames\t");
-		state->fInfo.fNames->Dump(xprintf);
-		xprintf("\t----------\n");
+	xprintf("\tRootInode at %p\n", fRoot);
+
+	xprintf("\tfOpenFiles\n", fOpenFiles);
+	if (dumpOpenFiles) {
+		uint64 entries = 0;
+		for (DoublyLinkedList<OpenState>::ConstIterator it = fOpenFiles.GetIterator();
+			const OpenState* state = it.Next(); ++entries) {
+			xprintf("\t\tOpenState at %p for ino %" B_PRIdINO "\n", state, state->fInfo.fFileId);
+		}
+		if (entries == 0)
+			xprintf("\t\tNone\n");
+	} else {
+		xprintf("\tfOpenLock is locked\n");
+	}
+
+	xprintf("\tDelegations\n");
+	if (dumpDelegations) {
+		uint64 entries = 0;
+		for (DoublyLinkedList<Delegation>::ConstIterator it = fDelegationList.GetIterator();
+			const Delegation* del = it.Next(); ++entries) {
+			xprintf("\t\tDelegation at %p for Inode at %p (ino %" B_PRIdINO ")\n", del,
+				del->GetInode(), del->GetInode()->ID());
+		}
+		if (entries == 0)
+			xprintf("\t\tNone");
+	} else {
+		xprintf("\tfDelegationLock is locked\n");
 	}
 
 	return;

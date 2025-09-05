@@ -52,10 +52,14 @@ struct OpenState : public NFS4Object, public KernelReferenceable,
 
 			status_t		Close();
 
+			void			Dump(void (*xprintf)(const char*, ...) = dprintf);
+
 private:
 			status_t		_ReclaimOpen(uint64 newClientID);
 			status_t		_ReclaimLocks(uint64 newClientID);
 			status_t		_ReleaseLockOwner(LockOwner* owner);
+
+			void			_DumpLocked(void (*xprintf)(const char*, ...)) const;
 };
 
 

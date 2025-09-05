@@ -115,6 +115,7 @@ InodeNames::Dump(void (*xprintf)(const char*, ...))
 void
 InodeNames::_DumpLocked(void (*xprintf)(const char*, ...)) const
 {
+	xprintf("InodeNames ");
 	for (SinglyLinkedList<InodeName>::ConstIterator it = fNames.GetIterator();
 		const InodeName* name = it.Next();) {
 		if (name->fName != NULL)

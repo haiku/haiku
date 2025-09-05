@@ -26,8 +26,10 @@ public:
 	status_t			GiveUp(bool truncate = false);
 
 	inline	void		SetData(const OpenDelegationData& data);
-	inline	Inode*		GetInode();
+	inline	Inode*		GetInode() const;
 	inline	OpenDelegation Type();
+
+	void				Dump(void (*xprintf)(const char*, ...) = dprintf) const;
 
 protected:
 	status_t			ReturnDelegation();
@@ -50,7 +52,7 @@ Delegation::SetData(const OpenDelegationData& data)
 
 
 inline Inode*
-Delegation::GetInode()
+Delegation::GetInode() const
 {
 	return fInode;
 }

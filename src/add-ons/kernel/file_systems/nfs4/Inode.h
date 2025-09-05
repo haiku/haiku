@@ -122,7 +122,7 @@ public:
 	inline			void		SetStale(bool stale = true);
 	inline			bool		IsStale() const;
 
-					void		Dump(void (*xprintf)(const char*, ...) = dprintf) const;
+					void		Dump(void (*xprintf)(const char*, ...) = dprintf);
 
 protected:
 								Inode();
@@ -150,6 +150,9 @@ protected:
 
 	static inline	status_t	CheckLockType(short ltype, uint32 mode);
 
+private:
+					void		_DumpLocked(void (*xprintf)(const char*, ...), bool dumpDelegation,
+									bool dumpAIO) const;
 private:
 					uint32		fType;
 

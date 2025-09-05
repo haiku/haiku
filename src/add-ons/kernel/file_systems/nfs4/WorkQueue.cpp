@@ -17,6 +17,28 @@
 WorkQueue*		gWorkQueue		= NULL;
 
 
+void
+WorkQueueEntry::Dump(void (*xprintf)(const char*, ...)) const
+{
+	if (fType == DelegationRecall) {
+		xprintf("\tType: DelegationRecall\n");
+		DelegationRecallArgs* args = reinterpret_cast<DelegationRecallArgs*>(fArguments);
+		xprintf("\t\tDelegation at %p for Inode at %p (ino %" B_PRIdINO "), truncate %d\n",
+			args->fDelegation, args->fDelegation->GetInode(), args->fDelegation->GetInode()->ID(),
+			args->fTruncate);
+	} else if (fType == IORequest) {
+		xprintf("\tType: IORequest\n");
+		IORequestArgs* args = reinterpret_cast<IORequestArgs*>(fArguments);
+		xprintf("\t\tFor Inode at %p (ino %" B_PRIdINO ")\n", args->fInode, args->fInode->ID());
+		xprintf("\t\twrite %d, offset %" B_PRIdOFF ", length %" B_PRIdOFF "\n",
+			io_request_is_write(args->fRequest), io_request_offset(args->fRequest),
+			io_request_length(args->fRequest));
+	}
+
+	return;
+}
+
+
 WorkQueue::WorkQueue()
 	:
 	fQueueSemaphore(create_sem(0, NULL)),
@@ -73,6 +95,28 @@ WorkQueue::EnqueueJob(JobType type, void* args)
 
 	release_sem(fQueueSemaphore);
 	return B_OK;
+}
+
+
+void
+WorkQueue::Dump(void (*xprintf)(const char*, ...))
+{
+	xprintf("WorkQueue\n");
+
+	if (xprintf != kprintf) {
+		status_t status = mutex_trylock(&fQueueLock);
+		if (status != B_OK) {
+			xprintf("\t Locked\n");
+			return;
+		}
+	}
+
+	_DumpLocked(xprintf);
+
+	if (xprintf != kprintf)
+		mutex_unlock(&fQueueLock);
+
+	return;
 }
 
 
@@ -214,5 +258,21 @@ WorkQueue::JobIO(IORequestArgs* args)
 
 	notify_io_request(args->fRequest, result);
 	args->fInode->EndAIOOp();
+}
+
+
+void
+WorkQueue::_DumpLocked(void (*xprintf)(const char*, ...)) const
+{
+	uint64 entries = 0;
+	for (DoublyLinkedList<WorkQueueEntry>::ConstIterator it = fQueue.GetIterator();
+		const WorkQueueEntry* entry = it.Next(); ++entries) {
+		entry->Dump(xprintf);
+	}
+
+	if (entries == 0)
+		xprintf("\tEmpty\n");
+
+	return;
 }
 

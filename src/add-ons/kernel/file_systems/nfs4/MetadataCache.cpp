@@ -22,7 +22,7 @@ MetadataCache::MetadataCache(Inode* inode)
 	fInited(false)
 {
 	ASSERT(inode != NULL);
-	mutex_init(&fLock, NULL);
+	mutex_init(&fLock, "nfs4 MetadataCache");
 }
 
 
@@ -149,6 +149,26 @@ MetadataCache::UnlockValid()
 
 
 void
+MetadataCache::Dump(void (*xprintf)(const char*, ...))
+{
+	if (xprintf != kprintf) {
+		status_t status = mutex_trylock(&fLock);
+		if (status != B_OK) {
+			xprintf("MetadataCache at %p locked\n", this);
+			return;
+		}
+	}
+
+	_DumpLocked(xprintf);
+
+	if (xprintf != kprintf)
+		mutex_unlock(&fLock);
+
+	return;
+}
+
+
+void
 MetadataCache::NotifyChanges(const struct stat* oldStat,
 	const struct stat* newStat)
 {
@@ -183,5 +203,25 @@ MetadataCache::NotifyChanges(const struct stat* oldStat,
 
 	notify_stat_changed(fInode->GetFileSystem()->DevId(), -1, fInode->ID(),
 		flags);
+}
+
+
+void
+MetadataCache::_DumpLocked(void (*xprintf)(const char*, ...)) const
+{
+	xprintf("MetadataCache at %p for Inode at %p\n", this, fInode);
+	xprintf("\tfInited %d, fForceValid %d\n", fInited, fForceValid);
+	if (time(NULL) < fExpire)
+		xprintf("\tExpires at %" B_PRIdTIME "\n", fExpire);
+	else
+		xprintf("\tExpired\n");
+
+	xprintf("\tst_mode %" B_PRIo32 "\n", fStatCache.st_mode);
+	xprintf("\tst_nlink %" B_PRId32 "\n", fStatCache.st_nlink);
+	xprintf("\tst_uid %" B_PRIu32 "\n", fStatCache.st_uid);
+	xprintf("\tst_gid %" B_PRIu32 "\n", fStatCache.st_gid);
+	xprintf("\tst_size %" B_PRIdOFF "\n", fStatCache.st_size);
+
+	return;
 }
 

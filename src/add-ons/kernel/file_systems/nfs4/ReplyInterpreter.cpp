@@ -899,7 +899,13 @@ ReplyInterpreter::_OperationError(Opcode op)
 
 	status_t result = _NFS4ErrorToHaiku(fReply->Stream().GetUInt());
 	if (result != B_OK) {
+#if DEBUG
 		ERROR("NFS Error: %s\n", strerror(result));
+#else
+		// Lookup failures are routine. Reporting them could obscure more important error messages.
+		if (op != OpLookUp || result != B_ENTRY_NOT_FOUND)
+			ERROR("NFS Error: %s\n", strerror(result));
+#endif
 		fDecodeError = true;
 	}
 	return result;

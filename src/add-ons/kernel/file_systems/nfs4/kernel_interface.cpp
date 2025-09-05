@@ -602,10 +602,15 @@ nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 		return B_ENTRY_NOT_FOUND;
 
 	ino_t id;
-	inode->LookUp(name, &id);
+	status_t result = inode->LookUp(name, &id);
+	if (result != B_OK)
+		return B_ENTRY_NOT_FOUND;
+
 	VnodeToInode* childVti = NULL;
-	status_t result = get_vnode(volume, id, reinterpret_cast<void**>(&childVti));
+	result = get_vnode(volume, id, reinterpret_cast<void**>(&childVti));
 	if (result == B_OK) {
+		childVti->Get();
+			// Needed to ensure childVti::fInode is non-NULL prior to VnodeToInode::Unlink.
 		ino_t removedId;
 		status_t result = inode->Remove(name, NF4REG, &removedId);
 		if (result != B_OK)
@@ -613,7 +618,7 @@ nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 		ASSERT(removedId == id);
 		locker.Unlock();
 
-		if (vti->Unlink(inode->fInfo.fNames, name))
+		if (childVti->Unlink(inode->fInfo.fNames, name))
 			remove_vnode(volume, id);
 
 		put_vnode(volume, id);

@@ -19,6 +19,7 @@
 #include "IdMap.h"
 #include "Request.h"
 #include "RootInode.h"
+#include "WorkQueue.h"
 
 
 Inode::Inode()
@@ -35,11 +36,11 @@ Inode::Inode()
 	fAIOCount(0),
 	fStale(false)
 {
-	rw_lock_init(&fDelegationLock, NULL);
-	mutex_init(&fStateLock, NULL);
-	mutex_init(&fFileCacheLock, NULL);
-	rw_lock_init(&fWriteLock, NULL);
-	mutex_init(&fAIOLock, NULL);
+	rw_lock_init(&fDelegationLock, "nfs4 Inode::fDelegationLock");
+	mutex_init(&fStateLock, "nfs4 Inode::fStateLock");
+	mutex_init(&fFileCacheLock, "nfs4 Inode::fFileCacheLock");
+	rw_lock_init(&fWriteLock, "nfs4 Inode::fWriteLock");
+	mutex_init(&fAIOLock, "nfs4 Inode::fAIOLock");
 }
 
 
@@ -1051,14 +1052,81 @@ Inode::EndAIOOp()
 	@pre The parent VnodeToInode is locked.
 */
 void
-Inode::Dump(void (*xprintf)(const char*, ...)) const
+Inode::Dump(void (*xprintf)(const char*, ...))
 {
-	xprintf("Inode\t%" B_PRIu64 " at %p\n", fInfo.fFileId, this);
-	xprintf("FileHandle\t");
-	fInfo.fHandle.Dump(xprintf);
-	xprintf("InodeNames\t");
-	fInfo.fNames->Dump(xprintf);
+	bool dumpDelegation = true;
+	bool dumpAIO = true;
+	if (xprintf != kprintf) {
+		status_t status = rw_lock_read_lock_with_timeout(&fDelegationLock, B_RELATIVE_TIMEOUT, 0);
+		if (status != B_OK)
+			dumpDelegation = false;
+		status = mutex_trylock(&fAIOLock);
+		if (status != B_OK)
+			dumpAIO = false;
+	}
+
+	_DumpLocked(xprintf, dumpDelegation, dumpAIO);
+
+	if (xprintf != kprintf) {
+		if (dumpDelegation)
+			rw_lock_read_unlock(&fDelegationLock);
+		if (dumpAIO)
+			mutex_unlock(&fAIOLock);
+	}
+
+	if (GetFileSystem()->Root() != this)
+		fInfo.fNames->Dump(xprintf);
+
 	if (fCache != NULL)
 		fCache->Dump(xprintf);
+
+	fMetaCache.Dump(xprintf);
+
+	if (fOpenState == NULL) {
+		xprintf("No OpenState\n");
+	} else {
+		status_t status = mutex_trylock(&fStateLock);
+		if (status == B_OK) {
+			fOpenState->Dump(xprintf);
+			mutex_unlock(&fStateLock);
+		} else {
+			xprintf("fStateLock locked\n");
+		}
+	}
+
+	gWorkQueue->Dump(xprintf);
+
+	return;
+}
+
+/*!	Dump members that have const Dump methods or are dumped manually.
+
+*/
+void
+Inode::_DumpLocked(void (*xprintf)(const char*, ...), bool dumpDelegation, bool dumpAIO) const
+{
+	if (GetFileSystem()->Root() == this)
+		xprintf("Root inode\t%" B_PRIu64 " at %p\n", fInfo.fFileId, this);
+	else
+		xprintf("Inode\t%" B_PRIu64 " at %p\n", fInfo.fFileId, this);
+
+	xprintf("FileHandle ");
+	fInfo.fHandle.Dump(xprintf);
+
+	xprintf("\tfType %" B_PRIu32 ", fChange %" B_PRIu64 ", fStale %d\n", fType, fChange, fStale);
+
+	if (dumpAIO)
+		xprintf("\tfAIOCount %" B_PRIu32 "\n", fAIOCount);
+	else
+		xprintf("\tAIO locked\n");
+
+	if (fDelegation == NULL)
+		xprintf("\tNo Delegation\n");
+	else if (dumpDelegation)
+		fDelegation->Dump();
+	else
+		xprintf("Delegation locked\n");
+
+	return;
 }
 

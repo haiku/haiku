@@ -36,6 +36,8 @@ struct IORequestArgs {
 struct WorkQueueEntry : public DoublyLinkedListLinkImpl<WorkQueueEntry> {
 	JobType			fType;
 	void*			fArguments;
+
+	void			Dump(void (*xprintf)(const char*, ...)) const;
 };
 
 class WorkQueue {
@@ -47,6 +49,8 @@ public:
 
 			status_t	EnqueueJob(JobType type, void* args);
 
+			void		Dump(void (*xprintf)(const char*, ...) = dprintf);
+
 protected:
 	static	status_t	LaunchWorkingThread(void* object);
 			status_t	WorkingThread();
@@ -55,6 +59,9 @@ protected:
 
 			void		JobRecall(DelegationRecallArgs* args);
 			void		JobIO(IORequestArgs* args);
+
+private:
+			void		_DumpLocked(void (*xprintf)(const char*, ...)) const;
 
 private:
 			status_t	fInitError;

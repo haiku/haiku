@@ -31,20 +31,38 @@ int
 kprintf_inode(int argc, char** argv)
 {
 	if ((argc == 1) || strcmp(argv[1], "--help") == 0) {
-		kprintf("usage: nfs4_inode <address(es) ...>\n"
-			"  address(es):  address of one or more nfs4 private nodes (VnodeToInode), "
+		kprintf("usage: nfs4_inode [-i] <address(es) ...>\n"
+			"  -i specifies that the address is that of an Inode (rather than a VnodeToInode)\n"
+			"  address(es):  address of one or more objects of the same type, "
 			"separated by spaces\n"
-			"  Addresses can be found with the 'vnodes' command.\n");
+			"  VnodeToInode addresses can be found with the 'vnodes' command.\n"
+			"  Output of the 'nfs4' command refers to nodes by their Inode address.\n");
 		return 0;
 	}
 
-	for (int i = 1; i < argc; i++) {
-		VnodeToInode* node = reinterpret_cast<VnodeToInode*>(strtoul(argv[1], NULL, 0));
-		if (node == NULL)
-			continue;
-		node->Dump(kprintf);
-		kprintf("----------\n");
+	int argIndex = 1;
+	bool dumpVti = true;
+
+	if (strcmp(argv[argIndex], "-i") == 0) {
+		dumpVti = false;
+		++argIndex;
+	}
+
+	for (; argIndex < argc; ++argIndex) {
+		if (dumpVti) {
+			VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(strtoul(argv[argIndex], NULL, 0));
+			if (vti == NULL)
+				continue;
+			vti->Dump(kprintf);
+		} else {
+			Inode* inode = reinterpret_cast<Inode*>(strtoul(argv[argIndex], NULL, 0));
+			if (inode == NULL)
+				continue;
+			inode->Dump(kprintf);
+		}
+		kprintf("\n");
 	}
 
 	return 0;
 }
+

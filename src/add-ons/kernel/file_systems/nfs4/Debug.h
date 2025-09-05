@@ -16,13 +16,20 @@
 #include <DebugSupport.h>
 
 
-#ifdef DEBUG
 #define TRACE(x...) FUNCTION(x)
 #define CALLED() FUNCTION_START()
+
+#if KDEBUG
+#	define ASSERT_WITH_DUMP(expr,obj) \
+		do { \
+			if (!(expr)) { \
+				obj->Dump(); \
+				panic("ASSERT FAILED (%s:%d): %s", __FILE__, __LINE__, #expr); \
+			} \
+		} while (0)
 #else
-#define TRACE(x...)
-#define CALLED()
-#endif
+#	define ASSERT_WITH_DUMP(expr,obj) do { } while(0)
+#endif	// KDEBUG
 
 #if USER
 extern "C" void dprintf(const char *format, ...);

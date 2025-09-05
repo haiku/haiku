@@ -25,10 +25,10 @@ OpenState::OpenState()
 	fUid(geteuid()),
 	fGid(getegid())
 {
-	mutex_init(&fLock, NULL);
+	mutex_init(&fLock, "nfs4 OpenState::fLock");
 
-	mutex_init(&fLocksLock, NULL);
-	mutex_init(&fOwnerLock, NULL);
+	mutex_init(&fLocksLock, "nfs4 OpenState::fLocksLock");
+	mutex_init(&fOwnerLock, "nfs4 OpenState::fOwnerLock");
 }
 
 
@@ -328,5 +328,47 @@ OpenState::Close()
 
 		return reply.Close();
 	} while (true);
+}
+
+
+void
+OpenState::Dump(void (*xprintf)(const char*, ...))
+{
+	status_t status = B_OK;
+	if (xprintf != kprintf)
+		status = mutex_trylock(&fLock);
+
+	if (status == B_OK)
+		_DumpLocked(xprintf);
+	else
+		xprintf("OpenState at %p locked\n", this);
+
+	if (xprintf != kprintf && status == B_OK)
+		mutex_unlock(&fLock);
+
+	return;
+}
+
+
+void
+OpenState::_DumpLocked(void (*xprintf)(const char*, ...)) const
+{
+	xprintf("OpenState at %p for ino %" B_PRIdINO "\n", this, Inode::FileIdToInoT(fInfo.fFileId));
+
+	xprintf("\tFileHandle ");
+	fInfo.fHandle.Dump(xprintf);
+
+	xprintf("\t");
+	fInfo.fNames->Dump(xprintf);
+
+	xprintf("\tmode %x, opened %d, delegation %p, refs %" B_PRIu32 "\n",
+		static_cast<unsigned int>(fMode), fOpened, fDelegation, CountReferences());
+
+	xprintf("\tuid %" B_PRIu32 ", gid %" B_PRIu32 "\n", fUid, fGid);
+
+	xprintf("\tstate id and sequence %" B_PRIu32 " %" B_PRIu32 " %" B_PRIu32 " %" B_PRIu32 "\n",
+		fStateID[0], fStateID[1], fStateID[2], fStateSeq);
+
+	return;
 }
 

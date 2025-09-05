@@ -86,7 +86,7 @@ DirectoryCache::DirectoryCache(Inode* inode, bool attr)
 {
 	ASSERT(inode != NULL);
 
-	mutex_init(&fLock, NULL);
+	mutex_init(&fLock, "nfs4 DirectoryCache");
 }
 
 
@@ -299,7 +299,7 @@ DirectoryCache::_DumpLocked(void (*xprintf)(const char*, ...)) const
 
 	for (SinglyLinkedList<NameCacheEntry>::ConstIterator it = fNameCache.GetIterator();
 		const NameCacheEntry* entry = it.Next();) {
-		xprintf("\t\tino: %" B_PRIdINO "\t", entry->fNode);
+		xprintf("\tino: %" B_PRIdINO "\t", entry->fNode);
 		if (entry->fName != NULL)
 			xprintf("name: %s\n", entry->fName);
 	}
