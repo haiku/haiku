@@ -257,17 +257,9 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 	link.Attach<double[6]>(_transform);
 
 	// we send the 'local' clipping region... if we have one...
-	// TODO: Could be optimized, but is low prio, since most views won't
-	// have a custom clipping region.
-	if (clipping_region_used) {
-		int32 count = clipping_region.CountRects();
-		link.Attach<int32>(count);
-		for (int32 i = 0; i < count; i++)
-			link.Attach<BRect>(clipping_region.RectAt(i));
-	} else {
-		// no clipping region
-		link.Attach<int32>(-1);
-	}
+	link.Attach<bool>(clipping_region_used);
+	if (clipping_region_used)
+		link.AttachRegion(clipping_region);
 
 	// Although we might have a 'local' clipping region, when we call
 	// BView::GetClippingRegion() we ask for the 'global' one and it
@@ -330,19 +322,11 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	// read the user clipping
 	// (that's NOT the current View visible clipping but the additional
 	// user specified clipping!)
-	int32 clippingRectCount;
-	link.Read<int32>(&clippingRectCount);
-	if (clippingRectCount >= 0) {
+	link.Read<bool>(&clipping_region_used);
+	if (clipping_region_used)
+		link.ReadRegion(&clipping_region);
+	else
 		clipping_region.MakeEmpty();
-		for (int32 i = 0; i < clippingRectCount; i++) {
-			BRect rect;
-			link.Read<BRect>(&rect);
-			clipping_region.Include(rect);
-		}
-	} else {
-		// no user clipping used
-		clipping_region_used = false;
-	}
 
 	valid_flags = ~(B_VIEW_CLIP_REGION_BIT | B_VIEW_PARENT_COMPOSITE_BIT)
 		| (valid_flags & B_VIEW_PARENT_COMPOSITE_BIT);
@@ -3027,16 +3011,9 @@ BView::ConstrainClippingRegion(BRegion* region)
 	if (_CheckOwnerLockAndSwitchCurrent()) {
 		fOwner->fLink->StartMessage(AS_VIEW_SET_CLIP_REGION);
 
-		if (region) {
-			int32 count = region->CountRects();
-			fOwner->fLink->Attach<int32>(count);
-			if (count > 0)
-				fOwner->fLink->AttachRegion(*region);
-		} else {
-			fOwner->fLink->Attach<int32>(-1);
-			// '-1' means that in the app_server, there won't be any 'local'
-			// clipping region (it will be NULL)
-		}
+		fOwner->fLink->Attach<bool>(region != NULL);
+		if (region != NULL)
+			fOwner->fLink->AttachRegion(*region);
 
 		_FlushIfNotInTransaction();
 

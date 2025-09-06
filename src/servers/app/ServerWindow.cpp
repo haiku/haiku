@@ -2142,20 +2142,16 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_CLIP_REGION:
 		{
-			int32 rectCount;
-			status_t status = link.Read<int32>(&rectCount);
-				// a negative count means no
-				// region for the current draw state,
-				// but an *empty* region is actually valid!
-				// even if it means no drawing is allowed
+			bool hasClipRegion;
+			status_t status = link.Read<bool>(&hasClipRegion);
 
 			if (status < B_OK)
 				break;
 
-			if (rectCount >= 0) {
+			if (hasClipRegion) {
 				// we are supposed to set the clipping region
 				BRegion region;
-				if (rectCount > 0 && link.ReadRegion(&region) < B_OK)
+				if (link.ReadRegion(&region) < B_OK)
 					break;
 
 				DTRACE(("ServerWindow %s: Message AS_VIEW_SET_CLIP_REGION: "

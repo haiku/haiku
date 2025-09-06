@@ -257,18 +257,12 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 
 
 	// read clipping
-	// TODO: This could be optimized, but the user clipping regions are rarely
-	// used, so it's low priority...
-	int32 clipRectCount;
-	link.Read<int32>(&clipRectCount);
+	bool hasClippingRegion;
+	link.Read<bool>(&hasClippingRegion);
 
-	if (clipRectCount >= 0) {
+	if (hasClippingRegion) {
 		BRegion region;
-		BRect rect;
-		for (int32 i = 0; i < clipRectCount; i++) {
-			link.Read<BRect>(&rect);
-			region.Include(rect);
-		}
+		link.ReadRegion(&region);
 		SetClippingRegion(&region);
 	} else {
 		// No user clipping used
@@ -322,17 +316,9 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 		return;
 	link.Attach<double[6]>(transform);
 
-	// TODO: Could be optimized, but is low prio, since most views do not
-	// use a custom clipping region...
-	if (fClippingRegion.IsSet()) {
-		int32 clippingRectCount = fClippingRegion->CountRects();
-		link.Attach<int32>(clippingRectCount);
-		for (int i = 0; i < clippingRectCount; i++)
-			link.Attach<BRect>(fClippingRegion->RectAt(i));
-	} else {
-		// no client clipping
-		link.Attach<int32>(-1);
-	}
+	link.Attach<bool>(fClippingRegion.IsSet());
+	if (fClippingRegion.IsSet())
+		link.AttachRegion(*fClippingRegion.Get());
 }
 
 
