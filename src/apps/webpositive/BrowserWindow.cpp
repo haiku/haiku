@@ -1799,7 +1799,9 @@ BrowserWindow::UpdateGlobalHistory(const BString& url)
 {
 	BrowsingHistory::DefaultInstance()->AddItem(BrowsingHistoryItem(url));
 
-	fURLInputGroup->SetText(CurrentWebView()->MainFrameURL());
+	BWebView* webView = CurrentWebView();
+	if (webView != NULL)
+		fURLInputGroup->SetText(webView->MainFrameURL());
 }
 
 
