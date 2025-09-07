@@ -27,6 +27,10 @@
 #include <GradientRadialFocus.h>
 #include <GradientDiamond.h>
 #include <GradientConic.h>
+#include <Shape.h>
+#include <ShapePrivate.h>
+
+#include <StackOrHeapArray.h>
 
 #include "link_message.h"
 
@@ -440,6 +444,7 @@ err:
 	return status;
 }
 
+
 status_t
 LinkReceiver::ReadRegion(BRegion* region)
 {
@@ -457,6 +462,26 @@ LinkReceiver::ReadRegion(BRegion* region)
 			region->MakeEmpty();
 	}
 	return status;
+}
+
+
+status_t
+LinkReceiver::ReadShape(BShape* shape)
+{
+	int32 opCount, ptCount;
+	Read(&opCount, sizeof(int32));
+	Read(&ptCount, sizeof(int32));
+
+	BStackOrHeapArray<uint32, 64> opList(opCount);
+	if (opCount > 0)
+		Read(opList, opCount * sizeof(uint32));
+
+	BStackOrHeapArray<BPoint, 64> ptList(ptCount);
+	if (ptCount > 0)
+		Read(ptList, ptCount * sizeof(BPoint));
+
+	BShape::Private(*shape).SetData(opCount, ptCount, opList, ptList);
+	return B_OK;
 }
 
 

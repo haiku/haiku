@@ -79,7 +79,7 @@ public:
 			status_t			ReadRegion(BRegion* region);
 			status_t			ReadShape(BShape* shape);
 			status_t			ReadGradient(BGradient** _gradient);
-			
+
 			template <class Type>
 			status_t			Read(Type* data);
 
@@ -168,6 +168,27 @@ ServerLink::AttachString(const char* string, int32 length)
 }
 
 
+inline status_t
+ServerLink::AttachRegion(const BRegion& region)
+{
+	return fSender->AttachRegion(region);
+}
+
+
+inline status_t
+ServerLink::AttachShape(BShape& shape)
+{
+	return fSender->AttachShape(shape);
+}
+
+
+inline status_t
+ServerLink::AttachGradient(const BGradient& gradient)
+{
+	return fSender->AttachGradient(gradient);
+}
+
+
 template<class Type> status_t
 ServerLink::Attach(const Type& data)
 {
@@ -231,6 +252,27 @@ inline status_t
 ServerLink::ReadString(char** _string, size_t* _length)
 {
 	return fReceiver->ReadString(_string, _length);
+}
+
+
+inline status_t
+ServerLink::ReadRegion(BRegion* region)
+{
+	return fReceiver->ReadRegion(region);
+}
+
+
+inline status_t
+ServerLink::ReadShape(BShape* shape)
+{
+	return fReceiver->ReadShape(shape);
+}
+
+
+inline status_t
+ServerLink::ReadGradient(BGradient** _gradient)
+{
+	return fReceiver->ReadGradient(_gradient);
 }
 
 

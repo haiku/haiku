@@ -10,8 +10,8 @@
 
 
 namespace BPrivate {
-	class ServerLink;
 	class LinkReceiver;
+	class LinkSender;
 };
 
 /* Integer rect used to define a clipping rectangle. All bounds are inclusive. */
@@ -85,8 +85,8 @@ public:
 
 private:
 	friend class BDirectWindow;
-	friend class BPrivate::ServerLink;
 	friend class BPrivate::LinkReceiver;
+	friend class BPrivate::LinkSender;
 
 	class Support;
 	friend class Support;

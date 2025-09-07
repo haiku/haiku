@@ -14,6 +14,16 @@
 #include <string.h>
 #include <new>
 
+#include <Gradient.h>
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
+#include <GradientDiamond.h>
+#include <GradientConic.h>
+#include <Region.h>
+#include <Shape.h>
+#include <ShapePrivate.h>
+
 #include <ServerProtocol.h>
 #include <LinkSender.h>
 
@@ -26,6 +36,14 @@
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
+#endif
+
+//#define TRACE_SERVER_LINK_GRADIENTS
+#ifdef TRACE_SERVER_LINK_GRADIENTS
+#	include <OS.h>
+#	define GTRACE(x) debug_printf x
+#else
+#	define GTRACE(x) ;
 #endif
 
 static const size_t kMaxStringSize = 4096;
@@ -176,14 +194,14 @@ LinkSender::Attach(const void *passedData, size_t passedSize)
 
 		if (senderArea < B_OK)
 			return senderArea;
-			
+
 		data = &senderArea;
 		memcpy(address, passedData, passedSize);
 
 		area_id areaID = senderArea;
 		senderArea = _kern_transfer_area(senderArea, &address,
 			B_ANY_ADDRESS, fTargetTeam);
-		
+
 		if (senderArea < B_OK) {
 			delete_area(areaID);
 			return senderArea;
@@ -224,6 +242,116 @@ LinkSender::AttachString(const char *string, int32 length)
 	}
 
 	return status;
+}
+
+
+status_t
+LinkSender::AttachRegion(const BRegion& region)
+{
+	Attach(&region.fCount, sizeof(int32));
+	if (region.fCount > 0) {
+		Attach(&region.fBounds, sizeof(clipping_rect));
+		return Attach(region.fData,
+			region.fCount * sizeof(clipping_rect));
+	}
+
+	return Attach(&region.fBounds, sizeof(clipping_rect));
+}
+
+
+status_t
+LinkSender::AttachShape(BShape& shape)
+{
+	int32 opCount, ptCount;
+	uint32* opList;
+	BPoint* ptList;
+
+	BShape::Private(shape).GetData(&opCount, &ptCount, &opList, &ptList);
+
+	Attach(&opCount, sizeof(int32));
+	Attach(&ptCount, sizeof(int32));
+	if (opCount > 0)
+		Attach(opList, opCount * sizeof(uint32));
+	if (ptCount > 0)
+		Attach(ptList, ptCount * sizeof(BPoint));
+	return B_OK;
+}
+
+
+status_t
+LinkSender::AttachGradient(const BGradient& gradient)
+{
+	GTRACE(("ServerLink::AttachGradient\n"));
+	BGradient::Type gradientType = gradient.GetType();
+	int32 stopCount = gradient.CountColorStops();
+	GTRACE(("ServerLink::AttachGradient> color stop count == %d\n",
+		(int)stopCount));
+	Attach(&gradientType, sizeof(BGradient::Type));
+	Attach(&stopCount, sizeof(int32));
+	if (stopCount > 0) {
+		for (int i = 0; i < stopCount; i++) {
+			Attach(gradient.ColorStopAtFast(i),
+				sizeof(BGradient::ColorStop));
+		}
+	}
+
+	switch (gradientType) {
+		case BGradient::TYPE_LINEAR:
+		{
+			GTRACE(("ServerLink::AttachGradient> type == TYPE_LINEAR\n"));
+			const BGradientLinear* linear = (BGradientLinear*)&gradient;
+			Attach(linear->Start());
+			Attach(linear->End());
+			break;
+		}
+		case BGradient::TYPE_RADIAL:
+		{
+			GTRACE(("ServerLink::AttachGradient> type == TYPE_RADIAL\n"));
+			const BGradientRadial* radial = (BGradientRadial*)&gradient;
+			BPoint center = radial->Center();
+			float radius = radial->Radius();
+			Attach(&center, sizeof(BPoint));
+			Attach(&radius, sizeof(float));
+			break;
+		}
+		case BGradient::TYPE_RADIAL_FOCUS:
+		{
+			GTRACE(("ServerLink::AttachGradient> type == TYPE_RADIAL_FOCUS\n"));
+			const BGradientRadialFocus* radialFocus
+				= (BGradientRadialFocus*)&gradient;
+			BPoint center = radialFocus->Center();
+			BPoint focal = radialFocus->Focal();
+			float radius = radialFocus->Radius();
+			Attach(&center, sizeof(BPoint));
+			Attach(&focal, sizeof(BPoint));
+			Attach(&radius, sizeof(float));
+			break;
+		}
+		case BGradient::TYPE_DIAMOND:
+		{
+			GTRACE(("ServerLink::AttachGradient> type == TYPE_DIAMOND\n"));
+			const BGradientDiamond* diamond = (BGradientDiamond*)&gradient;
+			BPoint center = diamond->Center();
+			Attach(&center, sizeof(BPoint));
+			break;
+		}
+		case BGradient::TYPE_CONIC:
+		{
+			GTRACE(("ServerLink::AttachGradient> type == TYPE_CONIC\n"));
+			const BGradientConic* conic = (BGradientConic*)&gradient;
+			BPoint center = conic->Center();
+			float angle = conic->Angle();
+			Attach(&center, sizeof(BPoint));
+			Attach(&angle, sizeof(float));
+			break;
+		}
+		case BGradient::TYPE_NONE:
+		{
+			GTRACE(("ServerLink::AttachGradient> type == TYPE_NONE\n"));
+			break;
+		}
+	}
+	return B_OK;
 }
 
 
