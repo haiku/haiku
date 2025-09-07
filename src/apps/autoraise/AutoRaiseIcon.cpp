@@ -14,10 +14,10 @@
 #define B_TRANSLATION_CONTEXT "AutoRaiseIcon"
 
 
-extern "C" _EXPORT BView *instantiate_deskbar_item(void)
+extern "C" _EXPORT BView *instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
 	puts("Instanciating AutoRaise TrayView...");
-	return (new TrayView);
+	return new TrayView(BRect(0, 0, maxHeight - 1, maxHeight - 1));
 }
 
 
@@ -197,20 +197,14 @@ ConfigMenu::~ConfigMenu() {}
 
 //************************************************
 
-TrayView::TrayView()
-	:BView(BRect(0, 0, B_MINI_ICON, B_MINI_ICON -1), "AutoRaise", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW){
+TrayView::TrayView(BRect frame)
+	:BView(frame, "AutoRaise", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW){
 	_init(); 	//Initialization common to both constructors
 }
 
 //Rehydratable constructor
 TrayView::TrayView(BMessage *mdArchive):BView(mdArchive){
 	_init();		//As above
-}
-
-void TrayView::GetPreferredSize(float *w, float *h)
-{
-	*w = B_MINI_ICON;
-	*h = B_MINI_ICON - 1;
 }
 
 void TrayView::_init()
@@ -347,11 +341,11 @@ void TrayView::Draw(BRect updaterect) {
 
 	if (_settings->Active())
 	{
-		if (_activeIcon) DrawBitmap(_activeIcon);
+		if (_activeIcon) DrawBitmap(_activeIcon, updaterect);
 	}
 	else
 	{
-		if (_inactiveIcon) DrawBitmap(_inactiveIcon);
+		if (_inactiveIcon) DrawBitmap(_inactiveIcon, updaterect);
 	}
 }
 

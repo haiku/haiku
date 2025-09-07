@@ -12,7 +12,7 @@
 #include <Roster.h>
 
 //exported instantiator function
-extern "C" _EXPORT BView* instantiate_deskbar_item();
+extern "C" _EXPORT BView* instantiate_deskbar_item(float maxWidth, float maxHeight);
 
 
 //since we can't remove the view from the deskbar from within the same thread
@@ -52,7 +52,7 @@ class TrayView:public BView{
 		sem_id fPollerSem;
 		thread_id poller_thread;
 
-		TrayView();
+		TrayView(BRect frame);
 		TrayView(BMessage *mdArchive);
 		virtual ~TrayView();
 
@@ -63,7 +63,6 @@ class TrayView:public BView{
 		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
 		virtual void MessageReceived(BMessage* message);
-		virtual void GetPreferredSize(float *w, float *h);
 
 		AutoRaiseSettings *Settings() const;
 		void SetActive(bool);

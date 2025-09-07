@@ -60,7 +60,7 @@ void AutoRaiseApp::PutInTray(bool persist)
 	BDeskbar db;
 
 	if (!persist)
-		db.AddItem(new TrayView);
+		db.AddItem(new TrayView(BRect(0, 0, db.MaxItemHeight() - 1, db.MaxItemHeight() - 1)));
 	else {
 		BRoster roster;
 		entry_ref ref;
