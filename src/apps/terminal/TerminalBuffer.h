@@ -38,9 +38,8 @@ public:
 			void				ResetColors(uint8* indexes,
 									int32 count = 1, bool dynamic = false);
 			void				GetColor(uint8 index);
-			void				SetCursorStyle(int32 style, bool blinking);
-			void				SetCursorBlinking(bool blinking);
-			void				SetCursorHidden(bool hidden);
+			void				SetCursorStyle(int32 style);
+			int32				CursorStyle() const { return fCursorStyle; };
 			void				SetPaletteColor(uint8 index, rgb_color color);
 			inline const rgb_color*
 								Palette() const { return fColorsPalette; }
@@ -54,15 +53,9 @@ public:
 			void				UseAlternateScreenBuffer(bool clear);
 			void				UseNormalScreenBuffer();
 
-			void				EnableInterpretMetaKey(bool enable);
-			void				EnableMetaKeySendsEscape(bool enable);
-			void				EnableBracketedPasteMode(bool enable);
-
-			void				ReportX10MouseEvent(bool report);
-			void				ReportNormalMouseEvent(bool report);
-			void				ReportButtonMouseEvent(bool report);
-			void				ReportAnyMouseEvent(bool report);
-			void				EnableExtendedMouseCoordinates(bool enable);
+			bool				IsMode(uint32 mode) const;
+			void				SetMode(uint32 mode);
+			void				ResetMode(uint32 mode);
 
 protected:
 	virtual	void				NotifyListener();
@@ -82,6 +75,9 @@ private:
 			// listener/dirty region management
 			BMessenger			fListener;
 			bool				fListenerValid;
+
+			uint32				fMode;
+			int					fCursorStyle;
 };
 
 

@@ -61,8 +61,10 @@ private:
 	void _DecReqTermParms(int value);
 	void _DecPrivateModeSet(int value);
 	void _DecPrivateModeReset(int value);
+	void _DecPrivateModeRequest(int value);
 	int* _GuessGroundTable(int encoding);
 	void _ProcessOperatingSystemControls(uchar* params);
+	void _WriteReply(BString &reply);
 
 	int fFd;
 

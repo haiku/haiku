@@ -155,12 +155,15 @@ TermView::StandardBaseState::StandardBaseState(TermView* view)
 bool
 TermView::StandardBaseState::_StandardMouseMoved(BPoint where, int32 modifiers)
 {
-	if (!fView->fReportAnyMouseEvent && !fView->fReportButtonMouseEvent)
+	bool reportButtonMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_BUTTON_MOUSE_EVENT);
+	bool reportAnyMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_ANY_MOUSE_EVENT);
+	if (!reportButtonMouseEvent && !reportAnyMouseEvent)
 		return false;
 
 	TermPos clickPos = fView->_ConvertToTerminal(where);
 
-	if (fView->fReportButtonMouseEvent || fView->fEnableExtendedMouseCoordinates) {
+	if (reportButtonMouseEvent
+		|| fView->TextBuffer()->IsMode(MODE_EXTENDED_MOUSE_COORDINATES)) {
 		if (fView->fPrevPos.x != clickPos.x
 			|| fView->fPrevPos.y != clickPos.y) {
 			fView->_SendMouseEvent(fView->fMouseButtons, modifiers,
@@ -210,8 +213,10 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 	fView->_ActivateCursor(true);
 
 	// Handle the Option key when used as Meta
+	bool interpretMetaKey = fView->TextBuffer()->IsMode(MODE_INTERPRET_META_KEY);
+	bool metaKeySendsEscape = fView->TextBuffer()->IsMode(MODE_META_KEY_SENDS_ESCAPE);
 	if ((mod & B_LEFT_OPTION_KEY) != 0 && fView->fUseOptionAsMetaKey
-		&& (fView->fInterpretMetaKey || fView->fMetaKeySendsEscape)) {
+		&& (interpretMetaKey || metaKeySendsEscape)) {
 		const char* bytes;
 		int8 numBytes;
 
@@ -237,7 +242,7 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 		char outputBuffer[2];
 		const char* toWrite = bytes;
 
-		if (fView->fMetaKeySendsEscape) {
+		if (metaKeySendsEscape) {
 			fView->fShell->Write("\e", 1);
 		} else if (numBytes == 1) {
 			char byte = *bytes | 0x80;
@@ -420,8 +425,13 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 void
 TermView::DefaultState::MouseDown(BPoint where, int32 buttons, int32 modifiers)
 {
-	if (fView->fReportAnyMouseEvent || fView->fReportButtonMouseEvent
-		|| fView->fReportNormalMouseEvent || fView->fReportX10MouseEvent) {
+	bool reportButtonMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_BUTTON_MOUSE_EVENT);
+	bool reportAnyMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_ANY_MOUSE_EVENT);
+	bool reportNormalMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_NORMAL_MOUSE_EVENT);
+	bool reportX10MouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_X10_MOUSE_EVENT);
+
+	if (reportAnyMouseEvent || reportButtonMouseEvent || reportNormalMouseEvent
+		|| reportX10MouseEvent) {
 		TermPos clickPos = fView->_ConvertToTerminal(where);
 		fView->_SendMouseEvent(buttons, modifiers, clickPos.x, clickPos.y,
 			false, false);
@@ -456,8 +466,13 @@ TermView::DefaultState::MouseMoved(BPoint where, uint32 transit,
 void
 TermView::DefaultState::MouseUp(BPoint where, int32 buttons)
 {
-	if (fView->fReportAnyMouseEvent || fView->fReportButtonMouseEvent
-		|| fView->fReportNormalMouseEvent || fView->fReportX10MouseEvent) {
+	bool reportButtonMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_BUTTON_MOUSE_EVENT);
+	bool reportAnyMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_ANY_MOUSE_EVENT);
+	bool reportNormalMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_NORMAL_MOUSE_EVENT);
+	bool reportX10MouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_X10_MOUSE_EVENT);
+
+	if (reportAnyMouseEvent || reportButtonMouseEvent
+		|| reportNormalMouseEvent || reportX10MouseEvent) {
 		TermPos clickPos = fView->_ConvertToTerminal(where);
 		fView->_SendMouseEvent(buttons, 0, clickPos.x, clickPos.y,
 			false, true);
@@ -666,8 +681,11 @@ TermView::SelectState::MouseUp(BPoint where, int32 buttons)
 	// When releasing the first mouse button, we copy the selected text to the
 	// clipboard.
 
-	if (fView->fReportAnyMouseEvent || fView->fReportButtonMouseEvent
-		|| fView->fReportNormalMouseEvent) {
+	bool reportButtonMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_BUTTON_MOUSE_EVENT);
+	bool reportAnyMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_ANY_MOUSE_EVENT);
+	bool reportNormalMouseEvent = fView->TextBuffer()->IsMode(MODE_REPORT_NORMAL_MOUSE_EVENT);
+
+	if (reportAnyMouseEvent || reportButtonMouseEvent || reportNormalMouseEvent) {
 		TermPos clickPos = fView->_ConvertToTerminal(where);
 		fView->_SendMouseEvent(0, 0, clickPos.x, clickPos.y, false);
 	} else if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0

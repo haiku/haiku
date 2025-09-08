@@ -646,6 +646,12 @@ TermParse::EscParse()
 						param[nparam++] = ' ';
 					break;
 
+				case CASE_DEC_DOL: // ESC [? N p
+					// part of change cursor style DECRQM
+					if (nparam < NPARAM)
+						param[nparam++] = '$';
+					break;
+
 				case CASE_DEC_STATE:
 					/* enter dec mode */
 					parsestate = gDecTable;
@@ -1009,8 +1015,13 @@ TermParse::EscParse()
 								break;
 						}
 
-						if (style != -1)
-							fBuffer->SetCursorStyle(style, blinking);
+						if (style != -1) {
+							fBuffer->SetCursorStyle(style);
+							if (blinking)
+								fBuffer->SetMode(MODE_CURSOR_BLINKING);
+							else
+								fBuffer->ResetMode(MODE_CURSOR_BLINKING);
+						}
 					}
 					parsestate = groundtable;
 					break;
@@ -1269,6 +1280,14 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 				}
+
+				case CASE_DECRQM:	// DECRQM - request mode to terminal
+					if (nparam == 2 && param[1] == '$') {
+						_DecPrivateModeRequest(param[0]);
+					}
+					parsestate = groundtable;
+					break;
+
 				default:
 					break;
 			}
@@ -1424,15 +1443,15 @@ TermParse::_DecPrivateModeSet(int value)
 			break;
 		case 9:
 			// Set Mouse X and Y on button press.
-			fBuffer->ReportX10MouseEvent(true);
+			fBuffer->SetMode(MODE_REPORT_X10_MOUSE_EVENT);
 			break;
 		case 12:
 			// Start Blinking Cursor.
-			fBuffer->SetCursorBlinking(true);
+			fBuffer->SetMode(MODE_CURSOR_BLINKING);
 			break;
 		case 25:
 			// Show Cursor.
-			fBuffer->SetCursorHidden(false);
+			fBuffer->ResetMode(MODE_CURSOR_HIDDEN);
 			break;
 		case 47:
 			// Use Alternate Screen Buffer.
@@ -1440,28 +1459,28 @@ TermParse::_DecPrivateModeSet(int value)
 			break;
 		case 1000:
 			// Send Mouse X & Y on button press and release.
-			fBuffer->ReportNormalMouseEvent(true);
+			fBuffer->SetMode(MODE_REPORT_NORMAL_MOUSE_EVENT);
 			break;
 		case 1002:
 			// Send Mouse X and Y on button press and release, and on motion
 			// when the mouse enter a new cell
-			fBuffer->ReportButtonMouseEvent(true);
+			fBuffer->SetMode(MODE_REPORT_BUTTON_MOUSE_EVENT);
 			break;
 		case 1003:
 			// Use All Motion Mouse Tracking
-			fBuffer->ReportAnyMouseEvent(true);
+			fBuffer->SetMode(MODE_REPORT_ANY_MOUSE_EVENT);
 			break;
 		case 1006:
 			// Enable extended mouse coordinates with SGR scheme
-			fBuffer->EnableExtendedMouseCoordinates(true);
+			fBuffer->SetMode(MODE_EXTENDED_MOUSE_COORDINATES);
 			break;
 		case 1034:
 			// Interpret "meta" key, sets eighth bit.
-			fBuffer->EnableInterpretMetaKey(true);
+			fBuffer->SetMode(MODE_INTERPRET_META_KEY);
 			break;
 		case 1036:
 			// Send ESC when Meta modifies a key
-			fBuffer->EnableMetaKeySendsEscape(true);
+			fBuffer->SetMode(MODE_META_KEY_SENDS_ESCAPE);
 			break;
 		case 1039:
 			// TODO: Send ESC when Alt modifies a key
@@ -1475,7 +1494,7 @@ TermParse::_DecPrivateModeSet(int value)
 			break;
 		case 2004:
 			// Enable bracketed paste mode
-			fBuffer->EnableBracketedPasteMode(true);
+			fBuffer->SetMode(MODE_BRACKETED_PASTE);
 			break;
 	}
 }
@@ -1507,15 +1526,15 @@ TermParse::_DecPrivateModeReset(int value)
 			break;
 		case 9:
 			// Disable Mouse X and Y on button press.
-			fBuffer->ReportX10MouseEvent(false);
+			fBuffer->ResetMode(MODE_REPORT_X10_MOUSE_EVENT);
 			break;
 		case 12:
 			// Stop Blinking Cursor.
-			fBuffer->SetCursorBlinking(false);
+			fBuffer->ResetMode(MODE_CURSOR_BLINKING);
 			break;
 		case 25:
 			// Hide Cursor
-			fBuffer->SetCursorHidden(true);
+			fBuffer->SetMode(MODE_CURSOR_HIDDEN);
 			break;
 		case 47:
 			// Use Normal Screen Buffer.
@@ -1523,28 +1542,28 @@ TermParse::_DecPrivateModeReset(int value)
 			break;
 		case 1000:
 			// Don't send Mouse X & Y on button press and release.
-			fBuffer->ReportNormalMouseEvent(false);
+			fBuffer->ResetMode(MODE_REPORT_NORMAL_MOUSE_EVENT);
 			break;
 		case 1002:
 			// Don't send Mouse X and Y on button press and release, and on motion
 			// when the mouse enter a new cell
-			fBuffer->ReportButtonMouseEvent(false);
+			fBuffer->ResetMode(MODE_REPORT_BUTTON_MOUSE_EVENT);
 			break;
 		case 1003:
 			// Disable All Motion Mouse Tracking.
-			fBuffer->ReportAnyMouseEvent(false);
+			fBuffer->ResetMode(MODE_REPORT_ANY_MOUSE_EVENT);
 			break;
 		case 1006:
 			// Disable extended mouse coordinates with SGR scheme
-			fBuffer->EnableExtendedMouseCoordinates(false);
+			fBuffer->ResetMode(MODE_EXTENDED_MOUSE_COORDINATES);
 			break;
 		case 1034:
 			// Don't interpret "meta" key.
-			fBuffer->EnableInterpretMetaKey(false);
+			fBuffer->ResetMode(MODE_INTERPRET_META_KEY);
 			break;
 		case 1036:
 			// Don't send ESC when Meta modifies a key
-			fBuffer->EnableMetaKeySendsEscape(false);
+			fBuffer->ResetMode(MODE_META_KEY_SENDS_ESCAPE);
 			break;
 		case 1039:
 			// TODO: Don't send ESC when Alt modifies a key
@@ -1557,9 +1576,36 @@ TermParse::_DecPrivateModeReset(int value)
 			break;
 		case 2004:
 			// Disable bracketed paste mode
-			fBuffer->EnableBracketedPasteMode(false);
+			fBuffer->ResetMode(MODE_BRACKETED_PASTE);
 			break;
 	}
+}
+
+
+void
+TermParse::_DecPrivateModeRequest(int value)
+{
+	BString reply;
+	switch (value) {
+		case 12:
+			// Request cursor blinking mode
+			reply.SetToFormat("\033[?12;%u$y\033\\",
+				fBuffer->IsMode(MODE_CURSOR_BLINKING) ? 1 : 2);
+			break;
+		case 1006:
+			// Request extended mouse coordinates with SGR scheme
+			reply.SetToFormat("\033[?1006;%u$y\033\\",
+				fBuffer->IsMode(MODE_EXTENDED_MOUSE_COORDINATES) ? 1 : 2);
+			break;
+		case 2004:
+			// Request bracketed paste mode
+			reply.SetToFormat("\033[?2004;%u$y\033\\",
+				fBuffer->IsMode(MODE_BRACKETED_PASTE) ? 1 : 2);
+			break;
+		default:
+			return;
+	}
+	_WriteReply(reply);
 }
 
 
@@ -1658,4 +1704,11 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 		//	printf("%d -> %s\n", mode, params);
 			break;
 	}
+}
+
+
+void
+TermParse::_WriteReply(BString &reply)
+{
+	write(fFd, reply.String(), reply.Length());
 }

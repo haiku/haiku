@@ -102,3 +102,6 @@
 #define CASE_INDEX 99
 #define CASE_NEXT_LINE 100
 #define CASE_REP 101
+#define CASE_DEC_DOL 102
+#define CASE_DECRQM 103
+

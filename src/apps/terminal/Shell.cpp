@@ -77,43 +77,6 @@ const char *kDefaultShell = "/bin/sh";
 const char *kColorTerminalType = "truecolor";
 const char *kTerminalType = "xterm-256color";
 
-/*
- * Set environment variable.
- */
-#if defined(HAIKU_TARGET_PLATFORM_BEOS) || \
-	defined(HAIKU_TARGET_PLATFORM_BONE) || \
-	defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-
-extern char **environ;
-
-static int setenv(const char *var, const char *value, bool overwrite);
-
-static int
-setenv(const char *var, const char *value, bool overwrite)
-{
-	int envindex = 0;
-	const int len = strlen(var);
-	const int val_len = strlen (value);
-
-	while (environ[envindex] != NULL) {
-		if (!strncmp(environ[envindex], var, len)) {
-			/* found it */
-			if (overwrite) {
-				environ[envindex] = (char *)malloc((unsigned)len + val_len + 2);
-				sprintf(environ[envindex], "%s=%s", var, value);
-			}
-			return 0;
-		}
-		envindex++;
-	}
-
-	environ[envindex] = (char *)malloc((unsigned)len + val_len + 2);
-	sprintf(environ[envindex], "%s=%s", var, value);
-	environ[++envindex] = NULL;
-	return 0;
-}
-#endif
-
 
 /* handshake interface */
 typedef struct
