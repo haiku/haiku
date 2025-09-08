@@ -29,13 +29,20 @@ ifq_enqueue(struct ifaltq *ifq, struct mbuf *m)
 	return 0;
 }
 
+
 static struct mbuf*
-ifq_dequeue(struct ifaltq *ifq)
+ifq_dequeue_openbsd(if_t ifp, struct ifaltq *ifq)
 {
 	struct mbuf* m = NULL;
 	IF_DEQUEUE(ifq, m);
+	if (m != NULL && ifq == &ifp->if_snd) {
+		// OpenBSD drivers don't increment the OPACKETS counter directly,
+		// so we do it here.
+		if_inc_counter(ifp, IFCOUNTER_OPACKETS, 1);
+	}
 	return m;
 }
+#define ifq_dequeue(IFQ) ifq_dequeue_openbsd(ifp, IFQ)
 
 
 #ifndef __cplusplus
