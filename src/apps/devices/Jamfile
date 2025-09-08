@@ -19,7 +19,7 @@ rule ISAPnPHeaderGen
 
 actions ISAPnPHeaderGen1
 {
-	grep '^PNP[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]] '  $(2[1]) \
+	grep '^PNP[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]]'  $(2[1]) \
 | awk -f $(2[2]) > $(1) ;
 }
 
@@ -116,7 +116,7 @@ DoCatalogs Devices :
 	Device.cpp
 ;
 
-Includes [ FGristFiles DeviceACPI.cpp ] : [ FGristFiles acpipnpids.h ] ;
+Includes [ FGristFiles DeviceACPI.cpp ] : [ FGristFiles acpipnpids.h isapnpids.h ] ;
 Includes [ FGristFiles DevicePCI.cpp ] : [ FGristFiles pcihdr.h ] ;
 Includes [ FGristFiles DeviceUSB.cpp ] : [ FGristFiles usbhdr.h ] ;
 

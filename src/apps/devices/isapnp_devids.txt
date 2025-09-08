@@ -77,9 +77,9 @@ compatibility devices. The IDs are defined in the following tables.
 DEVICE ID RANGES
 
 ID range	Category
---------        -------------
+--------  -------------
 PNP0xxx 	System devices
-PNP8xxx	        Network adapters 
+PNP8xxx	Network adapters 
 PNPAxxx 	SCSI, proprietary CD adapters 
 PNPBxxx 	Sound, video capture, multimedia
 PNPCxxx - Dxxx	Modems
@@ -88,11 +88,11 @@ The following device ID is provided only for compatibility
 with earlier device ID lists:
 
 Device ID	Description
---------        -------------
-PNP0802	        Microsoft Sound System-compatible device
-                (obsolete; use PNPB0xx instead)
+--------  -------------
+PNP0802	Microsoft Sound System-compatible device
+          (obsolete; use PNPB0xx instead)
 
----------------------------------------------------------------------------
+--------------------------------------------------------------------------
 Device ID       Description
 --------        -------------
 ***** System Devices - PNP0xxx **************************
@@ -107,6 +107,7 @@ PNP0004         Cyrix SLiC MP interrupt controller
 PNP0100         AT Timer
 PNP0101         EISA Timer
 PNP0102         MCA Timer
+PNP0103	        HPET
 
 --DMA--
 PNP0200         AT DMA Controller
@@ -160,7 +161,7 @@ PNP0701         Standard floppy controller supporting MS Device Bay Spec
 
 --Compatibility with early device ID list--
 PNP0802         Microsoft Sound System compatible device (obsolete, use
-		PNPB0xx instead)
+	   		 PNPB0xx instead)
 --Display Adapters--
 PNP0900         VGA Compatible
 PNP0901         Video Seven VRAM/VRAM II/1024i 
@@ -201,15 +202,20 @@ PNP0A01         EISA Bus
 PNP0A02         MCA Bus
 PNP0A03         PCI Bus
 PNP0A04         VESA/VL Bus
-PNP0A05         ACPI Bus
+PNP0A05         Generic ACPI Bus
+PNP0A06         Generic ACPI Extended-IO Bus (EIO bus)
+
 
 -- Real Time Clock, BIOS, System board devices--
 PNP0800         AT-style speaker sound
 PNP0B00         AT Real-Time Clock
+PNP0B01		Intel PIIX4-compatible RTC/CMOS Devices
+PNP0B02		Dallas Semiconductor-compatible RTC/CMOS Devices
+
+
 PNP0C00         Plug and Play BIOS (only created by the root enumerator)
 PNP0C01         System Board
-PNP0C02         General ID for reserving resources required by Plug and Play
-		motherboard registers. (Not specific to a particular device.)
+PNP0C02         General ID for reserving resources required by Plug and Play motherboard registers. (Not specific to a particular device.)
 PNP0C03         Plug and Play BIOS Event Notification Interrupt
 PNP0C04         Math Coprocessor
 PNP0C05         APM BIOS (Version independent)
@@ -217,6 +223,51 @@ PNP0C06         Reserved for identification of early Plug and Play
                 BIOS implementation.
 PNP0C07         Reserved for identification of early Plug and Play 
                 BIOS implementation.
+PNP0C08         ACPI system board hardware
+PNP0C09         ACPI Embedded Controller
+PNP0C0A         ACPI Control Method Battery
+PNP0C0B         ACPI Fan
+PNP0C0C         ACPI power button device
+PNP0C0D         ACPI lid device
+PNP0C0E         ACPI sleep button device
+PNP0C0F         PCI interrupt link device
+PNP0C10		ACPI system indicator device
+PNP0C11         ACPI thermal zone
+PNP0C12         Device Bay Controller
+PNP0C80		Memory device
+PNP0C20 	SMI_CMD
+PNP0C21		PM1a_EVT_BLK / X_ PM1a_EVT_BLK
+PNP0C22  	PM1b_EVT_BLK / X_PM1b_EVT_BLK
+PNP0C23		PM1a_CNT_BLK / X_PM1a_CNT_BLK
+PNP0C24		PM1b_CNT_BLK / X_ PM1b_CNT_BLK
+PNP0C25		PM2_CNT_BLK / X_ PM2_CNT_BLK
+PNP0C26		PM_TMR_BLK / X_ PM_TMR_BLK
+PNP0C27		GPE0_BLK / X_GPE0_BLK
+PNP0C28		GPE1_BLK / X_ GPE1_BLK
+PNP0C30		TMKBC
+PNP0C31		TPM
+PNP0C32		HIDACPI Button Device
+PNP0C33		Microsoft-compatible H/W Error Device
+PNP0C34		Metering Device
+PNP0C34		Microsoft Virtual S3 Generic VGA Device
+PNP0C40		Windows-compatible Button Array
+PNP0C50		HID over I2C Compliant device
+PNP0C60		Convertible Laptop display sensor device
+PNP0C70		Dock sensor device
+
+--Multifunction Controllers--
+PNP0D00		A multifunction 3.0 PC Card
+
+--Communication Bus Host Controllers --
+PNP0D10		XHCI-compliant USB Controller without Std. Debug support
+PNP0D15		XHCI-compliant USB Controller with Std. Debug support
+PNP0D20		EHCI-compliant USB Controller without Std. Debug support
+PNP0D25		EHCI-compliant USB Controller with Std. Debug support
+PNP0D40		SDA Standard Compliant SD Host Controller
+
+--System Power Management Controllers--
+PNP0D80		Windows-compatible System Power Management Controller
+
 
 --PCMCIA Controller Chipsets--
 PNP0E00         Intel 82365-Compatible PCMCIA Controller
@@ -261,7 +312,8 @@ PNP0F20         Reserved by Microsoft Input Device Group
 PNP0F21         Reserved by Microsoft Input Device Group
 PNP0F22         Reserved by Microsoft Input Device Group
 PNP0F23         Reserved by Microsoft Input Device Group
-PNP0FFF         Reserved by Microsoft Systems
+PNP0FFC		Reserved (temporarily) by Microsoft Kernel team
+PNP0FFF         Reserved by Microsoft Systems (SDA Standard Compliant SD Host Controller Vendor)
 
 ***** Network Adapters - PNP8xxx ***********************
 PNP8001         Novell/Anthem NE3200
@@ -386,6 +438,7 @@ PNP8327         IBM Token Ring (All Types)
 PNP8385         Remote Network Access Driver
 PNP8387         RNA Point-to-point Protocol Driver
 PNP8388         Reserved for Microsoft Networking components
+PNP8389		Peer IrLAN infrared driver (Microsoft-supplied)
 
 ***** SCSI, Proprietary CD Adapters - PNPAxxx **********
 PNPA002         Future Domain 16-700 compatible controller

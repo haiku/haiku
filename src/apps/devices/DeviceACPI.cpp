@@ -17,6 +17,7 @@
 
 extern "C" {
 #include "acpipnpids.h"
+#include "isapnpids.h"
 }
 
 #undef B_TRANSLATION_CONTEXT
@@ -33,6 +34,19 @@ acpi_get_vendor_info(const char* vendorID, const char **vendorName)
 		}
 	}
 	*vendorName = NULL;
+}
+
+
+void
+isapnp_get_device_info(const char* deviceId, const char **deviceName)
+{
+	for (size_t i = 0; i < ISA_DEVTABLE_LEN; i++) {
+		if (strncmp(isapnp_devids[i].id, deviceId, strlen(isapnp_devids[i].id)) == 0) {
+			*deviceName = isapnp_devids[i].devname;
+			return;
+		}
+	}
+	*deviceName = NULL;
 }
 
 
@@ -54,10 +68,14 @@ DeviceACPI::InitFromAttributes()
 	BString nodeACPIPath;
 	BString rootACPIPath;
 	BString nodeACPIHid;
+	BString nodeACPICid;
 	BString deviceName;
+	const char* hidDevName = NULL;
+	const char* cidDevName = NULL;
 
 	rootACPIPath = nodeACPIPath = GetAttribute("acpi/path").fValue;
 	nodeACPIHid = GetAttribute("acpi/hid").fValue;
+	nodeACPICid = GetAttribute("acpi/cid").fValue;
 
 	// Grab just the root node info
 	// We grab 6 characters to not identify sub nodes of root node
@@ -66,6 +84,9 @@ DeviceACPI::InitFromAttributes()
 	nodeACPIPath.Remove(0, nodeACPIPath.FindLast(".") + 1);
 
 	fCategory = (Category)CAT_ACPI;
+
+	isapnp_get_device_info(nodeACPIHid.String(), &hidDevName);
+	isapnp_get_device_info(nodeACPICid.String(), &cidDevName);
 
 	// Identify Predefined root namespaces (ACPI Spec 4.0a, p162)
 	if (rootACPIPath == "\\_SB_") {
@@ -80,6 +101,10 @@ DeviceACPI::InitFromAttributes()
 		deviceName << string.String();
 	} else if (rootACPIPath == "\\_SI_") {
 		deviceName = B_TRANSLATE("ACPI System Indicator");
+	} else if (hidDevName != NULL) {
+		deviceName << hidDevName;
+	} else if (cidDevName != NULL) {
+		deviceName << cidDevName;
 	} else if (nodeACPIPath != "") {
 		// This allows to localize apostrophes, too
 		BString string(B_TRANSLATE("ACPI node '%1'"));

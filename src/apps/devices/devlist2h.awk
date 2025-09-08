@@ -15,7 +15,7 @@
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 BEGIN {
-	FS="         "
+	FS="[ \t][ \t]+"
 }
 NR == 1 {
 	printf("/*\tHaiku" "$\t*/\n\n")
@@ -34,8 +34,8 @@ NF > 0 {
 
 END {
 	printf("\n")
-	printf("typedef struct { char* id; char* devname; } idTable;\n")
-	printf("idTable isapnp_devids [] = {\n")
+	printf("typedef struct { const char* const id; const char* const devname; } isaIdTable;\n")
+	printf("const isaIdTable isapnp_devids [] = {\n")
 	for (i = 1; i <= n; i++) {
 		printf("\t{\n")
 		printf("\t\t\"%s\", \"%s\"\n", ids[i,1], ids[i,2])
