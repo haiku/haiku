@@ -357,10 +357,10 @@ object_depot_make_empty(object_depot* depot, uint32 flags)
 	// detach the depot's full and empty magazines
 
 	slab_queue fullMagazines = depot->full;
-	depot->full.head = depot->full.tail = NULL;
+	depot->full.Init();
 
 	slab_queue emptyMagazines = depot->empty;
-	depot->empty.head = depot->empty.tail = NULL;
+	depot->empty.Init();
 
 	writeLocker.Unlock();
 
