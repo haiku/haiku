@@ -39,10 +39,17 @@ public:
 };
 
 
+#if PARANOID_KERNEL_FREE
+struct depot_cpu_store {
+	DepotMagazine*	obtain;
+	DepotMagazine*	store;
+};
+#else
 struct depot_cpu_store {
 	DepotMagazine*	loaded;
 	DepotMagazine*	previous;
 };
+#endif
 
 
 RANGE_MARKER_FUNCTION_BEGIN(SlabObjectDepot)
@@ -134,18 +141,20 @@ empty_magazine(object_depot* depot, DepotMagazine* magazine, uint32 flags)
 static bool
 exchange_with_full(object_depot* depot, DepotMagazine*& magazine)
 {
-	ASSERT(magazine->IsEmpty());
+	ASSERT(magazine == NULL || magazine->IsEmpty());
 
 	SpinLocker _(depot->inner_lock);
 
 	if (depot->full.head == NULL)
 		return false;
 
-	depot->full_count--;
-	depot->empty_count++;
+	if (magazine != NULL) {
+		depot->empty.Push(magazine);
+		depot->empty_count++;
+	}
 
-	depot->empty.Push(magazine);
 	magazine = (DepotMagazine*)depot->full.Pop();
+	depot->full_count--;
 	return true;
 }
 
@@ -156,12 +165,18 @@ exchange_with_empty(object_depot* depot, DepotMagazine*& magazine,
 {
 	ASSERT(magazine == NULL || magazine->IsFull());
 
+#if PARANOID_KERNEL_FREE
+	if (magazine != NULL) {
+		// Reverse the rounds in the magazine so we get FIFO, not LIFO.
+		for (int i = 0; i < magazine->current_round / 2; i++)
+			std::swap(magazine->rounds[i], magazine->rounds[magazine->current_round - i - 1]);
+	}
+#endif
+
 	SpinLocker _(depot->inner_lock);
 
 	if (depot->empty.head == NULL)
 		return false;
-
-	depot->empty_count--;
 
 	if (magazine != NULL) {
 		if (depot->full_count < depot->max_count) {
@@ -173,6 +188,7 @@ exchange_with_empty(object_depot* depot, DepotMagazine*& magazine,
 	}
 
 	magazine = (DepotMagazine*)depot->empty.Pop();
+	depot->empty_count--;
 	return true;
 }
 
@@ -220,8 +236,13 @@ object_depot_init(object_depot* depot, size_t capacity, size_t maxCount,
 	}
 
 	for (int i = 0; i < cpuCount; i++) {
+#if PARANOID_KERNEL_FREE
+		depot->stores[i].obtain = NULL;
+		depot->stores[i].store = NULL;
+#else
 		depot->stores[i].loaded = NULL;
 		depot->stores[i].previous = NULL;
+#endif
 	}
 
 	depot->cookie = cookie;
@@ -250,6 +271,18 @@ object_depot_obtain(object_depot* depot)
 
 	depot_cpu_store* store = object_depot_cpu(depot);
 
+#if PARANOID_KERNEL_FREE
+	// When paranoid free is enabled, we want to defer object reuse,
+	// instead of reusing as rapidly as possible. Thus we always exchange
+	// full and empty magazines with the depot.
+
+	if (store->obtain == NULL || store->obtain->IsEmpty()) {
+		if (!exchange_with_full(depot, store->obtain))
+			return NULL;
+	}
+
+	return store->obtain->Pop();
+#else
 	// To better understand both the Alloc() and Free() logic refer to
 	// Bonwick's ``Magazines and Vmem'' [in 2001 USENIX proceedings]
 
@@ -264,13 +297,14 @@ object_depot_obtain(object_depot* depot)
 		if (!store->loaded->IsEmpty())
 			return store->loaded->Pop();
 
-		if (store->previous
+		if (store->previous != NULL
 			&& (store->previous->IsFull()
 				|| exchange_with_full(depot, store->previous))) {
 			std::swap(store->previous, store->loaded);
 		} else
 			return NULL;
 	}
+#endif
 }
 
 
@@ -282,12 +316,19 @@ object_depot_store(object_depot* depot, void* object, uint32 flags)
 
 	depot_cpu_store* store = object_depot_cpu(depot);
 
-	// We try to add the object to the loaded magazine if we have one
-	// and it's not full, or to the previous one if it is empty. If
-	// the magazine depot doesn't provide us with a new empty magazine
-	// we return the object directly to the slab.
-
 	while (true) {
+#if PARANOID_KERNEL_FREE
+		if (store->store != NULL && store->store->Push(object))
+			return;
+
+		DepotMagazine* freeMagazine = NULL;
+		if (exchange_with_empty(depot, store->store, freeMagazine)) {
+#else
+		// We try to add the object to the loaded magazine if we have one
+		// and it's not full, or to the previous one if it is empty. If
+		// the magazine depot doesn't provide us with a new empty magazine
+		// we return the object directly to the slab.
+
 		if (store->loaded != NULL && store->loaded->Push(object))
 			return;
 
@@ -295,7 +336,7 @@ object_depot_store(object_depot* depot, void* object, uint32 flags)
 		if ((store->previous != NULL && store->previous->IsEmpty())
 			|| exchange_with_empty(depot, store->previous, freeMagazine)) {
 			std::swap(store->loaded, store->previous);
-
+#endif
 			if (freeMagazine != NULL) {
 				// Free the magazine that didn't have space in the list
 				interruptsLocker.Unlock();
@@ -343,6 +384,17 @@ object_depot_make_empty(object_depot* depot, uint32 flags)
 	for (int i = 0; i < cpuCount; i++) {
 		depot_cpu_store& store = depot->stores[i];
 
+#if PARANOID_KERNEL_FREE
+		if (store.obtain != NULL) {
+			storeMagazines.Push(store.obtain);
+			store.obtain = NULL;
+		}
+
+		if (store.store != NULL) {
+			storeMagazines.Push(store.store);
+			store.store = NULL;
+		}
+#else
 		if (store.loaded != NULL) {
 			storeMagazines.Push(store.loaded);
 			store.loaded = NULL;
@@ -352,6 +404,7 @@ object_depot_make_empty(object_depot* depot, uint32 flags)
 			storeMagazines.Push(store.previous);
 			store.previous = NULL;
 		}
+#endif
 	}
 
 	// detach the depot's full and empty magazines
@@ -388,13 +441,13 @@ object_depot_contains_object(object_depot* depot, void* object)
 	for (int i = 0; i < cpuCount; i++) {
 		depot_cpu_store& store = depot->stores[i];
 
-		if (store.loaded != NULL && !store.loaded->IsEmpty()) {
-			if (store.loaded->ContainsObject(object))
+		if (store.obtain != NULL && !store.obtain->IsEmpty()) {
+			if (store.obtain->ContainsObject(object))
 				return true;
 		}
 
-		if (store.previous != NULL && !store.previous->IsEmpty()) {
-			if (store.previous->ContainsObject(object))
+		if (store.store != NULL && !store.store->IsEmpty()) {
+			if (store.store->ContainsObject(object))
 				return true;
 		}
 	}
@@ -425,10 +478,17 @@ dump_object_depot(object_depot* depot)
 
 	int cpuCount = smp_get_num_cpus();
 
+#if PARANOID_KERNEL_FREE
+	for (int i = 0; i < cpuCount; i++) {
+		kprintf("  [%d] obtain:   %p\n", i, depot->stores[i].obtain);
+		kprintf("      store:    %p\n", depot->stores[i].store);
+	}
+#else
 	for (int i = 0; i < cpuCount; i++) {
 		kprintf("  [%d] loaded:   %p\n", i, depot->stores[i].loaded);
 		kprintf("      previous: %p\n", depot->stores[i].previous);
 	}
+#endif
 }
 
 
