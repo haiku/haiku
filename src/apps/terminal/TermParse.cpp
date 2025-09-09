@@ -1246,7 +1246,7 @@ TermParse::EscParse()
 					break;
 
 				case CASE_CFT:	// cursor forward tab
-					if ((column= param[0]) < 1)
+					if ((column = param[0]) < 1)
 						column = 1;
 					for (int32 i = 0; i < column; ++i)
 						fBuffer->InsertTab();
@@ -1254,7 +1254,7 @@ TermParse::EscParse()
 					break;
 
 				case CASE_CNL:	// cursor next line
-					if ((row= param[0]) < 1)
+					if ((row = param[0]) < 1)
 						row = 1;
 					fBuffer->SetCursorX(0);
 					fBuffer->MoveCursorDown(row);
@@ -1262,7 +1262,7 @@ TermParse::EscParse()
 					break;
 
 				case CASE_CPL:	// cursor previous line
-					if ((row= param[0]) < 1)
+					if ((row = param[0]) < 1)
 						row = 1;
 					fBuffer->SetCursorX(0);
 					fBuffer->MoveCursorUp(row);
@@ -1272,6 +1272,8 @@ TermParse::EscParse()
 				case CASE_REP:		// ESC [...b repeat last graphic char
 				{
 					int repetitions = param[0];
+					if (repetitions < 1)
+						repetitions = 1;
 					int maxRepetitions = fBuffer->Width() * fBuffer->Height();
 					if (repetitions > maxRepetitions)
 						repetitions = maxRepetitions;
