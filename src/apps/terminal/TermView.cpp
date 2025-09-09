@@ -1051,6 +1051,7 @@ TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 	rgb_color rgb_fore = fTextForeColor;
 	rgb_color rgb_back = fTextBackColor;
 	rgb_color rgb_under = fTextForeColor;
+	rgb_color rgb_over = fTextForeColor;
 
 	// color attribute
 	if (attr.IsForeSet())
@@ -1131,6 +1132,12 @@ TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 		}
 	}
 
+	// overline attribute
+	if (attr.IsOver()) {
+		inView->SetHighColor(rgb_over);
+		inView->MovePenTo(x1, y1);
+		inView->StrokeLine(BPoint(x1 , y1), BPoint(x2 , y1));
+	}
 
 	inView->SetHighColor(rgb_fore);
 

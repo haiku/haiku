@@ -40,6 +40,7 @@ struct Attributes {
 	inline bool IsBold() const { return (state & BOLD) == BOLD; }
 	inline bool IsUnder() const { return (state & UNDERLINE) == UNDERLINE; }
 	inline bool IsInverse() const { return (state & INVERSE) == INVERSE; }
+	inline bool IsOver() const { return (state & OVERLINE) == OVERLINE; }
 	inline bool IsMouse() const { return (state & MOUSE) == MOUSE; }
 	inline bool IsForeSet() const { return (state & FORESET) == FORESET; }
 	inline bool IsBackSet() const { return (state & BACKSET) == BACKSET; }

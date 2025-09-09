@@ -219,9 +219,10 @@ enum {
 #define RESERVE			0x0080
 #define DUMPCR			0x0040
 #define UNDERSET		0x0020
+#define OVERLINE		0x0010
 #define FORECOLOR		0xFF0000
 #define BACKCOLOR		0xFF000000
-#define CHAR_ATTRIBUTES	0xFFFF7720
+#define CHAR_ATTRIBUTES	0xFFFF7730
 
 #define FORECOLORED(x) ((x) << 16)
 #define BACKCOLORED(x) ((x) << 24)

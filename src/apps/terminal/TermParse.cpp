@@ -854,6 +854,14 @@ TermParse::EscParse()
 								attributes &= ~INVERSE;
 								break;
 
+							case 53:	/* Overline	*/
+								attributes |= OVERLINE;
+								break;
+
+							case 55:	/* Not Overline	*/
+								attributes &= ~OVERLINE;
+								break;
+
 							case 90:
 							case 91:
 							case 92:
