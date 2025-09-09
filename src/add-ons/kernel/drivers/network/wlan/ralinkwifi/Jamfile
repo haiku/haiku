@@ -29,6 +29,7 @@ KernelAddon ralinkwifi :
 	glue.c
 	:
 	freebsd_wlan.a
+	freebsd_usb.a
 	libfreebsd_network.a
 	;
 

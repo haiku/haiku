@@ -153,6 +153,7 @@ KernelAddon realtekwifi :
 	r21au_init.c
 	:
 	freebsd_wlan.a
+	freebsd_usb.a
 	libfreebsd_network.a
 	;
 

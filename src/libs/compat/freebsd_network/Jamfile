@@ -20,9 +20,6 @@ KernelStaticLibrary libfreebsd_network.a :
 	fbsd_subr_sbuf.c
 	fbsd_time.c
 	fbsd_timingsafe.c
-	fbsd_usb_error.c
-	fbsd_usb_util.c
-	fbsd_usb_lookup.c
 
 	bus.cpp
 	bus_dma.cpp
@@ -48,6 +45,14 @@ KernelStaticLibrary libfreebsd_network.a :
 	sysinit.c
 	taskqueue.c
 	unit.cpp
+	;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev usb ] ;
+
+KernelStaticLibrary freebsd_usb.a :
+	fbsd_usb_error.c
+	fbsd_usb_util.c
+	fbsd_usb_lookup.c
 	usb.cpp
 	usb_util.c
 	;

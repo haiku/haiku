@@ -12,6 +12,4 @@ struct usb_device {
 	uint32 haiku_usb_device;
 };
 
-void usb_cleanup_device(struct usb_device* udev);
-
 #endif // _FBSD_COMPAT_USB_DEVICE_H_

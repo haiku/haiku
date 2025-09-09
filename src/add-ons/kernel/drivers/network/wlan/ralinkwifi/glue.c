@@ -49,8 +49,8 @@ extern driver_t* DRIVER_MODULE_NAME(run, uhub);
 extern driver_t* DRIVER_MODULE_NAME(rum, uhub);
 
 
-status_t
-__haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[]))
+void
+__haiku_init_hardware()
 {
 	driver_t *pci_drivers[] = {
 		DRIVER_MODULE_NAME(ral, pci),
@@ -63,7 +63,8 @@ __haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[])
 		DRIVER_MODULE_NAME(rum, uhub),
 		NULL
 	};
-	return (*handler)(pci_drivers, usb_drivers);
+	_fbsd_init_hardware_pci(pci_drivers);
+	_fbsd_init_hardware_uhub(usb_drivers);
 }
 
 

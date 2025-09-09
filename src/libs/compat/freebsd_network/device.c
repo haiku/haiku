@@ -506,8 +506,11 @@ bus_generic_attach(device_t dev)
 				} else {
 					device_printf(dev, "failed to find driver for child device\n");
 				}
-			} else
+			} else {
+				device_printf(dev, "found device driver: %s\n",
+					driver->name);
 				device_set_driver(child, driver);
+			}
 		} else
 			child->methods.device_probe(child);
 
@@ -543,30 +546,31 @@ bus_generic_detach(device_t device)
 
 
 driver_t *
-__haiku_probe_drivers(device_t dev, driver_t *drivers[])
+__haiku_probe_drivers(device_t device, driver_t *drivers[])
 {
 	driver_t *selected = NULL;
-	int i, selectedResult = 0;
+	int best = 0;
 
 	if (drivers == NULL)
 		return NULL;
 
-	for (i = 0; drivers[i]; i++) {
-		device_probe_t *probe = (device_probe_t *)
-			resolve_device_method(drivers[i], ID_device_probe);
-		if (probe == NULL)
-			continue;
+	for (int i = 0; drivers[i]; i++) {
+		// Skip allocating the device softc and just call probe() directly.
+		// (Any drivers which don't support this should be patched.)
+		device->methods.device_register
+			= resolve_device_method(drivers[i], ID_device_register);
+		device->methods.device_probe
+			= resolve_device_method(drivers[i], ID_device_probe);
 
-		int result = probe(dev);
-		if (result >= 0) {
-			if (selected == NULL || result < selectedResult) {
-				selected = drivers[i];
-				selectedResult = result;
-				device_printf(dev, "found %s device driver: %s\n",
-					dev->parent->description, selected->name);
-			}
+		int result = device->methods.device_probe(device);
+		if (result >= 0 && (selected == NULL || result > best)) {
+			selected = drivers[i];
+			best = result;
 		}
 	}
+
+	device->methods.device_register = NULL;
+	device->methods.device_probe = NULL;
 
 	return selected;
 }

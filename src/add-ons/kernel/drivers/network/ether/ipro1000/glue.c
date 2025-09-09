@@ -17,13 +17,13 @@ NO_HAIKU_CHECK_DISABLE_INTERRUPTS();
 NO_HAIKU_REENABLE_INTERRUPTS();
 
 
-status_t
-__haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[]))
+void
+__haiku_init_hardware()
 {
 	driver_t *drivers[] = {
 		DRIVER_MODULE_NAME(em, pci),
 		DRIVER_MODULE_NAME(igb, pci),
 		NULL
 	};
-	return (*handler)(drivers, NULL);
+	_fbsd_init_hardware_pci(drivers);
 }

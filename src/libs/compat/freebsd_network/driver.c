@@ -37,8 +37,10 @@ static struct {
 	driver_t* driver;
 	int bus;
 	struct pci_info pci_info;
-	struct freebsd_usb_device usb_dev;
-	struct usb_attach_arg uaa;
+
+	void* compat_device;
+	void (*prepare_attach)(void*, device_t);
+	void (*free_compat_device)(void*);
 } sProbedDevices[MAX_DEVICES];
 
 const char* gDeviceNameList[MAX_DEVICES + 1];
@@ -46,7 +48,7 @@ struct ifnet* gDevices[MAX_DEVICES];
 int32 gDeviceCount;
 
 
-static status_t
+status_t
 init_root_device(device_t *_root, int bus_type)
 {
 	static driver_t sRootDriverPCI = {
@@ -115,18 +117,41 @@ uninit_probed_devices()
 			gPci->unreserve_device(sProbedDevices[p].pci_info.bus,
 				sProbedDevices[p].pci_info.device, sProbedDevices[p].pci_info.function,
 				gDriverName, NULL);
-		} else if (sProbedDevices->bus == BUS_uhub) {
-			usb_cleanup_device(&sProbedDevices[p].usb_dev);
+		} else {
+			sProbedDevices[p].free_compat_device(sProbedDevices[p].compat_device);
 		}
 	}
+}
+
+
+void
+report_probed_device(int bus, void* compat_device, driver_t* driver,
+	void (*prepare_attach)(void*, device_t), void (*free_compat_device)(void*))
+{
+	int p = 0;
+	while (sProbedDevices[p].bus != BUS_INVALID && p < MAX_DEVICES)
+		p++;
+	if (p == MAX_DEVICES) {
+		free_compat_device(compat_device);
+		return;
+	}
+
+	sProbedDevices[p].bus = bus;
+	sProbedDevices[p].driver = driver;
+	sProbedDevices[p].compat_device = compat_device;
+	sProbedDevices[p].prepare_attach = prepare_attach;
+	sProbedDevices[p].free_compat_device = free_compat_device;
+
+	if ((p + 1) < MAX_DEVICES)
+		sProbedDevices[p + 1].bus = BUS_INVALID;
 }
 
 
 //	#pragma mark - Haiku Driver API
 
 
-static status_t
-init_hardware_pci(driver_t* drivers[])
+status_t
+_fbsd_init_hardware_pci(driver_t* drivers[])
 {
 	status_t status;
 	int i = 0;
@@ -154,23 +179,7 @@ init_hardware_pci(driver_t* drivers[])
 		device.parent = root;
 		device.root = root;
 
-		for (int index = 0; drivers[index] != NULL; index++) {
-			// Skip allocating the device softc and just call probe() directly.
-			// (Any drivers which don't support this should be patched.)
-			device.methods.device_register
-				= resolve_device_method(drivers[index], ID_device_register);
-			device.methods.device_probe
-				= resolve_device_method(drivers[index], ID_device_probe);
-
-			int result = device.methods.device_probe(&device);
-			if (result >= 0 && (driver == NULL || result > best)) {
-				TRACE(("%s, found %s at %d (%d)\n", gDriverName,
-					device_get_desc(device), i, result));
-				driver = drivers[index];
-				best = result;
-			}
-		}
-
+		driver = __haiku_probe_drivers(&device, drivers);
 		if (driver == NULL)
 			continue;
 
@@ -199,94 +208,12 @@ init_hardware_pci(driver_t* drivers[])
 }
 
 
-static status_t
-init_hardware_uhub(driver_t* drivers[])
-{
-	status_t status;
-	device_t root;
-
-	int p = 0;
-	while (sProbedDevices[p].bus != BUS_INVALID)
-		p++;
-
-	status = init_usb();
-	if (status != B_OK)
-		return status;
-
-	status = init_root_device(&root, BUS_uhub);
-	if (status != B_OK)
-		return status;
-
-	bool found = false;
-	uint32 cookie = 0;
-	struct freebsd_usb_device udev = {};
-	while ((status = get_next_usb_device(&cookie, &udev)) == B_OK) {
-		int best = 0;
-		driver_t* driver = NULL;
-
-		struct usb_attach_arg uaa;
-		status = get_usb_device_attach_arg(&udev, &uaa);
-		if (status != B_OK)
-			continue;
-
-		struct device device = {};
-		device.parent = root;
-		device.root = root;
-		device_set_ivars(&device, &uaa);
-
-		for (int index = 0; drivers[index] != NULL; index++) {
-			device.methods.device_register
-				= resolve_device_method(drivers[index], ID_device_register);
-			device.methods.device_probe
-				= resolve_device_method(drivers[index], ID_device_probe);
-
-			int result = device.methods.device_probe(&device);
-			if (result >= 0 && (driver == NULL || result > best)) {
-				TRACE(("%s, found %s at %d (%d)\n", gDriverName,
-					device_get_desc(device), i, result));
-				driver = drivers[index];
-				best = result;
-			}
-		}
-
-		if (driver == NULL)
-			continue;
-
-		sProbedDevices[p].bus = BUS_uhub;
-		sProbedDevices[p].driver = driver;
-		sProbedDevices[p].usb_dev = udev;
-		sProbedDevices[p].uaa = uaa;
-		sProbedDevices[p].uaa.device = &sProbedDevices[p].usb_dev;
-
-		// We just "transferred ownership" of usb_dev to sProbedDevices.
-		memset(&udev, 0, sizeof(udev));
-
-		found = true;
-		p++;
-	}
-	sProbedDevices[p].bus = BUS_INVALID;
-
-	device_delete_child(NULL, root);
-	usb_cleanup_device(&udev);
-
-	if (found)
-		return B_OK;
-
-	uninit_usb();
-	return B_NOT_SUPPORTED;
-}
-
-
 status_t
-_fbsd_init_hardware(driver_t* pci_drivers[], driver_t* uhub_drivers[])
+_fbsd_init_hardware()
 {
 	sProbedDevices[0].bus = BUS_INVALID;
 
-	if (pci_drivers != NULL)
-		init_hardware_pci(pci_drivers);
-
-	if (uhub_drivers != NULL)
-		init_hardware_uhub(uhub_drivers);
+	__haiku_init_hardware();
 
 	return (sProbedDevices[0].bus != BUS_INVALID) ? B_OK : B_NOT_SUPPORTED;
 }
@@ -328,20 +255,16 @@ _fbsd_init_drivers()
 		if (status != B_OK)
 			break;
 
-		if (sProbedDevices[p].bus == BUS_pci) {
-			pci_info* info = get_device_pci_info(root);
-			*info = sProbedDevices[p].pci_info;
-		} else if (sProbedDevices[p].bus == BUS_uhub) {
-			struct root_device_softc* root_softc = (struct root_device_softc*)root->softc;
-			root_softc->usb_dev = &sProbedDevices[p].usb_dev;
-		}
-
 		status = add_child_device(sProbedDevices[p].driver, root, &device);
 		if (status != B_OK)
 			break;
 
-		if (sProbedDevices[p].bus == BUS_uhub)
-			device_set_ivars(device, &sProbedDevices[p].uaa);
+		if (sProbedDevices[p].bus == BUS_pci) {
+			pci_info* info = get_device_pci_info(root);
+			*info = sProbedDevices[p].pci_info;
+		} else {
+			sProbedDevices[p].prepare_attach(sProbedDevices[p].compat_device, device);
+		}
 
 		// some drivers expect probe() to be called before attach()
 		// (i.e. they set driver softc in probe(), etc.)
@@ -376,7 +299,8 @@ err3:
 err2:
 	uninit_probed_devices();
 
-	uninit_usb();
+	if (uninit_usb != NULL)
+		uninit_usb();
 	uninit_pci();
 
 	return status;
@@ -399,7 +323,8 @@ _fbsd_uninit_drivers()
 
 	uninit_probed_devices();
 
-	uninit_usb();
+	if (uninit_usb != NULL)
+		uninit_usb();
 	uninit_pci();
 
 	return B_OK;

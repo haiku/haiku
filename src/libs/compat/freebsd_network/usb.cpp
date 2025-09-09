@@ -63,7 +63,7 @@ uninit_usb()
 }
 
 
-status_t
+static status_t
 get_next_usb_device(uint32* cookie, freebsd_usb_device* result)
 {
 	// We cheat here: since USB IDs are sequential, instead of doing a
@@ -114,7 +114,7 @@ get_next_usb_device(uint32* cookie, freebsd_usb_device* result)
 }
 
 
-status_t
+static status_t
 get_usb_device_attach_arg(struct freebsd_usb_device* device, struct usb_attach_arg* uaa)
 {
 	memset(uaa, 0, sizeof(struct usb_attach_arg));
@@ -158,13 +158,100 @@ get_usb_device_attach_arg(struct freebsd_usb_device* device, struct usb_attach_a
 }
 
 
-void
+static void
 usb_cleanup_device(freebsd_usb_device* udev)
 {
 	for (int i = 0; i < USB_MAX_EP_UNITS; i++) {
 		delete udev->endpoints[i].edesc;
 		udev->endpoints[i].edesc = NULL;
 	}
+}
+
+
+struct compat_usb_device {
+	freebsd_usb_device udev;
+	struct usb_attach_arg uaa;
+};
+
+
+static void
+free_compat_usb_device(void* cookie)
+{
+	compat_usb_device* compat_device = (compat_usb_device*)cookie;
+	usb_cleanup_device(&compat_device->udev);
+	free(compat_device);
+}
+
+
+static void
+prepare_usb_attach(void* cookie, device_t device)
+{
+	compat_usb_device* compat_device = (compat_usb_device*)cookie;
+
+	struct root_device_softc* root_softc
+		= (struct root_device_softc*)device->parent->softc;
+	root_softc->usb_dev = &compat_device->udev;
+	device_set_ivars(device, &compat_device->uaa);
+}
+
+
+status_t
+_fbsd_init_hardware_uhub(driver_t* drivers[])
+{
+	status_t status;
+	device_t root;
+	const int BUS_uhub = root_device_softc::BUS_uhub;
+
+	status = init_usb();
+	if (status != B_OK)
+		return status;
+
+	status = init_root_device(&root, BUS_uhub);
+	if (status != B_OK)
+		return status;
+
+	bool found = false;
+	uint32 cookie = 0;
+	struct freebsd_usb_device udev = {};
+	while ((status = get_next_usb_device(&cookie, &udev)) == B_OK) {
+		int best = 0;
+		driver_t* driver = NULL;
+
+		struct usb_attach_arg uaa;
+		status = get_usb_device_attach_arg(&udev, &uaa);
+		if (status != B_OK)
+			continue;
+
+		struct device device = {};
+		device.parent = root;
+		device.root = root;
+		device_set_ivars(&device, &uaa);
+
+		driver = __haiku_probe_drivers(&device, drivers);
+		if (driver == NULL)
+			continue;
+
+		compat_usb_device* compat_device = (compat_usb_device*)malloc(sizeof(compat_usb_device));
+		compat_device->udev = udev;
+		compat_device->uaa = uaa;
+		compat_device->uaa.device = &compat_device->udev;
+
+		// We just "transferred ownership" of usb_dev to sProbedDevices.
+		memset(&udev, 0, sizeof(udev));
+
+		report_probed_device(BUS_uhub, compat_device, driver,
+			prepare_usb_attach, free_compat_usb_device);
+		found = true;
+	}
+
+	device_delete_child(NULL, root);
+	usb_cleanup_device(&udev);
+
+	if (found)
+		return B_OK;
+
+	uninit_usb();
+	return B_NOT_SUPPORTED;
 }
 
 

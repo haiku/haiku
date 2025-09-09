@@ -45,15 +45,15 @@ extern driver_t *DRIVER_MODULE_NAME(le, pci);
 extern driver_t *DRIVER_MODULE_NAME(pcn, pci);
 
 
-status_t
-__haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[]))
+void
+__haiku_init_hardware()
 {
 	driver_t *drivers[] = {
 		DRIVER_MODULE_NAME(le, pci),
 		DRIVER_MODULE_NAME(pcn, pci),
 		NULL
 	};
-	return (*handler)(drivers, NULL);
+	_fbsd_init_hardware_pci(drivers);
 }
 
 

@@ -43,8 +43,8 @@ NO_HAIKU_FBSD_MII_DRIVER();
 NO_HAIKU_REENABLE_INTERRUPTS();
 
 
-status_t
-__haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[]))
+void
+__haiku_init_hardware()
 {
 	driver_t *pci_drivers[] = {
 		DRIVER_MODULE_NAME(rtwn_pci, pci),
@@ -54,7 +54,8 @@ __haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[])
 		DRIVER_MODULE_NAME(rtwn_usb, uhub),
 		NULL
 	};
-	return (*handler)(pci_drivers, usb_drivers);
+	_fbsd_init_hardware_pci(pci_drivers);
+	_fbsd_init_hardware_uhub(usb_drivers);
 }
 
 

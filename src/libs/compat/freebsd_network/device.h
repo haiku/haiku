@@ -82,13 +82,12 @@ void uninit_callout(void);
 status_t init_pci();
 void uninit_pci();
 
-status_t init_usb();
-void uninit_usb();
+void uninit_usb() __attribute__((weak));
 
-status_t get_next_usb_device(uint32* cookie, struct freebsd_usb_device* result);
-status_t get_usb_device_attach_arg(struct freebsd_usb_device* device, struct usb_attach_arg* uaa);
-
-device_t find_root_device(int);
+void report_probed_device(int bus, void* compat_device, driver_t* driver,
+	void (*prepare_attach)(void*, device_t), void (*free_compat_device)(void*));
+status_t init_root_device(device_t *_root, int bus_type);
+device_t find_root_device(int unit);
 pci_info* get_device_pci_info(device_t dev);
 
 device_method_signature_t resolve_device_method(driver_t *driver, int id);
