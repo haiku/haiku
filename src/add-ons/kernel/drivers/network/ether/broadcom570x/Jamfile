@@ -16,12 +16,10 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev bge ] ;
 KernelAddon broadcom570x :
 	glue.c
 	brgphy.c
-	ukphy.c
-	ukphy_subr.c
 	if_bge.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
-ObjectHdrs [ FGristFiles brgphy$(SUFOBJ) ukphy$(SUFOBJ) if_bge$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles brgphy$(SUFOBJ) if_bge$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles brgphy.c ukphy.c if_bge.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
+Includes [ FGristFiles brgphy.c if_bge.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

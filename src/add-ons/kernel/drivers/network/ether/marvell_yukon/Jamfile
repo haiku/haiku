@@ -14,13 +14,11 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev msk ] ;
 
 KernelAddon marvell_yukon :
 	glue.c
-	ukphy.c
-	ukphy_subr.c
 	e1000phy.c
 	if_msk.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
-ObjectHdrs [ FGristFiles ukphy$(SUFOBJ) e1000phy$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles e1000phy$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles ukphy.c e1000phy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
+Includes [ FGristFiles e1000phy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

@@ -17,7 +17,7 @@ KernelAddon rtl81xx :
 	rgephy.c
 	rlphy.c
 	if_re.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
 ObjectHdrs [ FGristFiles rgephy$(SUFOBJ) rlphy$(SUFOBJ) ]

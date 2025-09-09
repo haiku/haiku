@@ -39,7 +39,7 @@ __haiku_select_miibus_driver(device_t dev)
 		NULL
 	};
 
-	return __haiku_probe_miibus(dev, drivers);
+	return __haiku_probe_drivers(dev, drivers);
 }
 
 

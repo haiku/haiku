@@ -23,13 +23,11 @@ KernelAddon dec21xxx :
 	if_de.c
 	acphy.c
 	amphy.c
-	ukphy.c
-	ukphy_subr.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
 ObjectHdrs [ FGristFiles dcphy$(SUFOBJ)	pnphy$(SUFOBJ) if_de$(SUFOBJ)
-		acphy$(SUFOBJ) amphy$(SUFOBJ) ukphy$(SUFOBJ) ]
+		acphy$(SUFOBJ) amphy$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
 Includes [ FGristFiles dcphy.c pnphy.c acphy.c amphy.c ]
 	: <src!libs!compat!freebsd_network>miidevs.h ;

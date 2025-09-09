@@ -15,6 +15,11 @@
 #include <compat/dev/mii/miivar.h>
 
 
+// This symbol needs to be visible so that device_add_child can find it.
+__attribute__ ((visibility ("default")))
+driver_t *DRIVER_MODULE_NAME(miibus, driver) = &miibus_driver;
+
+
 int
 __haiku_miibus_readreg(device_t device, int phy, int reg)
 {

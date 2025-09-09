@@ -92,8 +92,12 @@ init_root_device(device_t *_root, int bus_type)
 static status_t
 add_child_device(driver_t* driver, device_t root, device_t* _child)
 {
-	device_t child = device_add_child_driver(root, driver->name, driver, 0);
+	device_t child = device_add_child(root, NULL, 0);
 	if (child == NULL)
+		return B_ERROR;
+
+	strlcpy(child->device_name, driver->name, sizeof(child->device_name));
+	if (device_set_driver(child, driver) != 0)
 		return B_ERROR;
 
 	if (_child != NULL)

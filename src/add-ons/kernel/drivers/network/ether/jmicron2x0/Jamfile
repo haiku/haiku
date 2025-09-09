@@ -16,7 +16,7 @@ KernelAddon jmicron2x0 :
 	glue.c
 	if_jme.c
 	jmphy.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
 ObjectHdrs [ FGristFiles jmphy$(SUFOBJ) ]

@@ -16,12 +16,10 @@ KernelAddon sis900 :
 	glue.c
 	icsphy.c
 	nsphyter.c
-	ukphy.c
-	ukphy_subr.c
 	if_sis.c
-	: libfreebsd_network.a
+	: freebsd_mii.a libfreebsd_network.a
 	;
 
-ObjectHdrs [ FGristFiles icsphy$(SUFOBJ) nsphyter$(SUFOBJ) ukphy$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles icsphy$(SUFOBJ) nsphyter$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles icsphy.c nsphyter.c ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
+Includes [ FGristFiles icsphy.c nsphyter.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

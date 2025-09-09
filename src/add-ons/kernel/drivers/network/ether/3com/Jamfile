@@ -17,12 +17,10 @@ KernelAddon 3com :
 	if_xl.c
 	xlphy.c
 	bmtphy.c
-	ukphy.c
-	ukphy_subr.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
-ObjectHdrs [ FGristFiles bmtphy$(SUFOBJ) ukphy$(SUFOBJ) xlphy$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles bmtphy$(SUFOBJ) xlphy$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles bmtphy.c ukphy.c xlphy.c ]
+Includes [ FGristFiles bmtphy.c xlphy.c ]
 	: <src!libs!compat!freebsd_network>miidevs.h ;

@@ -84,7 +84,7 @@ status_t _fbsd_uninit_drivers();
 
 extern const char *gDriverName;
 driver_t *__haiku_select_miibus_driver(device_t dev);
-driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[]);
+driver_t *__haiku_probe_drivers(device_t dev, driver_t *drivers[]);
 status_t __haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[]));
 
 status_t init_wlan_stack(void);
@@ -161,12 +161,6 @@ status_t wlan_close(void*);
 	}																	\
 	HAIKU_FBSD_WLAN_DRIVERS_GLUE(publicname);
 
-#define HAIKU_FBSD_RETURN_MII_DRIVER(drivers)					\
-	driver_t *__haiku_select_miibus_driver(device_t dev)		\
-	{															\
-		return __haiku_probe_miibus(dev, drivers);				\
-	}
-
 #define HAIKU_FBSD_MII_DRIVER(name)								\
 	extern driver_t *DRIVER_MODULE_NAME(name, miibus);			\
 	driver_t *__haiku_select_miibus_driver(device_t dev)		\
@@ -175,11 +169,14 @@ status_t wlan_close(void*);
 			DRIVER_MODULE_NAME(name, miibus),					\
 			NULL												\
 		};														\
-		return __haiku_probe_miibus(dev, drivers);				\
+		return __haiku_probe_drivers(dev, drivers);				\
 	}
 
 #define NO_HAIKU_FBSD_MII_DRIVER()								\
-	HAIKU_FBSD_RETURN_MII_DRIVER(NULL)
+	driver_t *__haiku_select_miibus_driver(device_t dev)		\
+	{															\
+		return NULL;											\
+	}
 
 extern spinlock __haiku_intr_spinlock;
 extern int __haiku_disable_interrupts(device_t dev);

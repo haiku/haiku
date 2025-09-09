@@ -115,8 +115,6 @@ void device_set_ivars(device_t dev, void *);
 void *device_get_ivars(device_t dev);
 
 device_t device_add_child(device_t dev, const char* name, int unit);
-device_t device_add_child_driver(device_t dev, const char* name, driver_t* driver,
-	int unit);
 int device_delete_child(device_t dev, device_t child);
 int device_is_attached(device_t dev);
 int device_attach(device_t dev);

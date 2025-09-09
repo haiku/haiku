@@ -15,7 +15,7 @@ KernelAddon ipro100 :
 	if_fxp.c
 	glue.c
 	inphy.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
 ObjectHdrs [ FGristFiles inphy$(SUFOBJ) ]

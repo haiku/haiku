@@ -14,13 +14,11 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev vge ] ;
 
 KernelAddon vt612x :
 	glue.c
-	ukphy.c
-	ukphy_subr.c
 	ciphy.c
 	if_vge.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
-ObjectHdrs [ FGristFiles ukphy$(SUFOBJ) ciphy$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles ciphy$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles ukphy.c ciphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
+Includes [ FGristFiles ciphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

@@ -9,17 +9,10 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev sge ] ;
 
 KernelAddon sis19x :
 	glue.c
-	ukphy.c
-	ukphy_subr.c
 	if_sge.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
-
-ObjectHdrs [ FGristFiles icsphy$(SUFOBJ) nsphyter$(SUFOBJ) ukphy$(SUFOBJ) ]
-	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles icsphy.c nsphyter.c ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

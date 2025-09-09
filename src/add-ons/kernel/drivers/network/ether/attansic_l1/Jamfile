@@ -16,7 +16,7 @@ KernelAddon attansic_l1 :
 	glue.c
 	atphy.c
 	if_age.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
 ObjectHdrs [ FGristFiles atphy$(SUFOBJ) ]

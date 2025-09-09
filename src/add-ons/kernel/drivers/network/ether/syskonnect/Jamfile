@@ -16,12 +16,10 @@ KernelAddon syskonnect :
 	glue.c
 	e1000phy.c
 	xmphy.c
-	ukphy.c
-	ukphy_subr.c
 	if_sk.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
-ObjectHdrs [ FGristFiles e1000phy$(SUFOBJ) xmphy$(SUFOBJ) ukphy$(SUFOBJ) ]
+ObjectHdrs [ FGristFiles e1000phy$(SUFOBJ) xmphy$(SUFOBJ) ]
 	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles e1000phy.c xmphy.c ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
+Includes [ FGristFiles e1000phy.c xmphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

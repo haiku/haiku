@@ -16,7 +16,7 @@ KernelAddon broadcom440x :
 	glue.c
 	bmtphy.c
 	if_bfe.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
 ObjectHdrs [ FGristFiles bmtphy$(SUFOBJ) ]

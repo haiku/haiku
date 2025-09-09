@@ -16,9 +16,6 @@ KernelStaticLibrary libfreebsd_network.a :
 	fbsd_kern_mbuf.c
 	fbsd_uipc_mbuf.c
 	fbsd_uipc_mbuf2.c
-	fbsd_mii.c
-	fbsd_mii_bitbang.c
-	fbsd_mii_physubr.c
 	fbsd_subr_bufring.c
 	fbsd_subr_sbuf.c
 	fbsd_time.c
@@ -41,7 +38,6 @@ KernelStaticLibrary libfreebsd_network.a :
 	libkern.cpp
 	malloc.cpp
 	mbuf.c
-	mii.c
 	mutex.c
 	pci.cpp
 	priv.cpp
@@ -55,6 +51,19 @@ KernelStaticLibrary libfreebsd_network.a :
 	usb.cpp
 	usb_util.c
 	;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+
+KernelStaticLibrary freebsd_mii.a :
+	mii.c
+	mii_bitbang.c
+	mii_physubr.c
+	miibus.c
+	ukphy.c
+	ukphy_subr.c
+	;
+
+Includes [ FGristFiles ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
 
 rule MIIHeaderGen
 {

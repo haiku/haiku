@@ -16,7 +16,7 @@ KernelAddon rtl8139 :
 	glue.c
 	rlphy.c
 	if_rl.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
 ObjectHdrs [ FGristFiles rlphy$(SUFOBJ) ]

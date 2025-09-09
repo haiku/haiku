@@ -16,7 +16,7 @@ KernelAddon rdc :
 	glue.c
 	rdcphy.c
 	if_vte.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a freebsd_mii.a
 	;
 
 ObjectHdrs [ FGristFiles rdcphy$(SUFOBJ) ]
