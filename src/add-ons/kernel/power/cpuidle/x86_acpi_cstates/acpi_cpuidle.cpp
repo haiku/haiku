@@ -1,6 +1,5 @@
 /*
- * Copyright 2012, Haiku, Inc. All Rights Reserved.
- *
+ * Copyright 2012-2025, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,8 +20,9 @@
 #include <cpu.h>
 #include <cpuidle.h>
 #include <smp.h>
+#include <thread.h>
 
-#include "x86_cpuidle.h"
+#include "x86_mwait.h"
 
 
 #define ACPI_PDC_REVID		0x1
@@ -65,7 +65,7 @@
 #define ACPI_C_STATE_COUNT              4
 
 
-#define ACPI_CPUIDLE_MODULE_NAME "drivers/power/x86_cpuidle/acpi/driver_v1"
+#define ACPI_CPUIDLE_MODULE_NAME CPUIDLE_MODULES_PREFIX "/x86_acpi_cstates/v1"
 
 
 struct acpicpu_reg {
@@ -78,28 +78,33 @@ struct acpicpu_reg {
 	uint64	reg_addr;
 } __attribute__((packed));
 
-struct acpi_cpuidle_driver_info {
-	device_node *node;
-	acpi_device_module_info *acpi;
-	acpi_device acpi_cookie;
-	uint32 flags;
-	int32 cpuIndex;
-};
-
 struct acpi_cstate_info {
+	char name[B_OS_NAME_LENGTH];
+	uint32 latency;
+
 	uint32 address;
 	uint8 skip_bm_sts;
 	uint8 method;
 	uint8 type;
 };
 
+struct acpi_cpuidle_driver_info {
+	device_node *processor;
+	acpi_device_module_info *acpi;
+	acpi_device acpi_cookie;
+	uint32 flags;
+
+#define MAX_CSTATES 8
+	int32 state_count;
+	acpi_cstate_info states[MAX_CSTATES];
+};
+
 
 static acpi_cpuidle_driver_info *sAcpiProcessor[SMP_MAX_CPUS];
-static CpuidleDevice sAcpiDevice;
 static device_manager_info *sDeviceManager;
 static acpi_module_info *sAcpi;
 
-CpuidleModuleInfo *gIdle;
+static int32 sStateIndex = -1;
 
 
 static status_t
@@ -119,8 +124,8 @@ acpi_eval_pdc(acpi_cpuidle_driver_info *device)
 	cap[2] |= ACPI_PDC_SMP_T_SW | ACPI_PDC_P_FFH | ACPI_PDC_P_HWCOORD
 		| ACPI_PDC_T_FFH;
 	obj.object_type = ACPI_TYPE_BUFFER;
-	obj.data.buffer.length = sizeof(cap);
-	obj.data.buffer.buffer = cap;
+	obj.buffer.length = sizeof(cap);
+	obj.buffer.buffer = cap;
 	status_t status = device->acpi->evaluate_method(device->acpi_cookie, "_PDC",
 		&arg, NULL);
 	return status;
@@ -151,15 +156,15 @@ acpi_eval_osc(acpi_cpuidle_driver_info *device)
 	arg.pointer = obj;
 
 	obj[0].object_type = ACPI_TYPE_BUFFER;
-	obj[0].data.buffer.length = sizeof(uuid);
-	obj[0].data.buffer.buffer = uuid;
+	obj[0].buffer.length = sizeof(uuid);
+	obj[0].buffer.buffer = uuid;
 	obj[1].object_type = ACPI_TYPE_INTEGER;
-	obj[1].data.integer = ACPI_PDC_REVID;
+	obj[1].integer.integer = ACPI_PDC_REVID;
 	obj[2].object_type = ACPI_TYPE_INTEGER;
-	obj[2].data.integer = sizeof(cap)/sizeof(cap[0]);
+	obj[2].integer.integer = sizeof(cap)/sizeof(cap[0]);
 	obj[3].object_type = ACPI_TYPE_BUFFER;
-	obj[3].data.buffer.length = sizeof(cap);
-	obj[3].data.buffer.buffer = (void *)cap;
+	obj[3].buffer.length = sizeof(cap);
+	obj[3].buffer.buffer = (void *)cap;
 
 	acpi_data buf;
 	buf.pointer = NULL;
@@ -171,7 +176,7 @@ acpi_eval_osc(acpi_cpuidle_driver_info *device)
 	acpi_object_type *osc = (acpi_object_type *)buf.pointer;
 	if (osc->object_type != ACPI_TYPE_BUFFER)
 		return B_BAD_TYPE;
-	if (osc->data.buffer.length != sizeof(cap))
+	if (osc->buffer.length != sizeof(cap))
 		return B_BUFFER_OVERFLOW;
 	return status;
 }
@@ -191,34 +196,27 @@ acpi_cstate_bm_check(void)
 
 
 static inline void
-acpi_cstate_ffh_enter(CpuidleCstate *cState)
+acpi_cstate_ffh_enter(acpi_cstate_info *ci)
 {
-	cpu_ent *cpu = get_cpu_struct();
-	if (cpu->invoke_scheduler)
-		return;
-
-	x86_monitor((void *)&cpu->invoke_scheduler, 0, 0);
-	if (!cpu->invoke_scheduler)
-		x86_mwait((unsigned long)cState->pData, 1);
+	int dummy;
+	x86_monitor(&dummy, 0, 0);
+	x86_mwait((ci->type << 4), MWAIT_INTERRUPTS_BREAK);
 }
 
 
 static inline void
 acpi_cstate_halt(void)
 {
-	cpu_ent *cpu = get_cpu_struct();
-	if (cpu->invoke_scheduler)
-		return;
-	asm("hlt");
+	// The idle routine may perform extra steps before HLT depending on CPU.
+	gCpuIdleFunc();
 }
 
 
 static void
-acpi_cstate_enter(CpuidleCstate *cState)
+acpi_cstate_enter(acpi_cstate_info *ci)
 {
-	acpi_cstate_info *ci = (acpi_cstate_info *)cState->pData;
 	if (ci->method == ACPI_CSTATE_FFH)
-		acpi_cstate_ffh_enter(cState);
+		acpi_cstate_ffh_enter(ci);
 	else if (ci->method == ACPI_CSTATE_SYSIO)
 		in8(ci->address);
 	else
@@ -226,23 +224,96 @@ acpi_cstate_enter(CpuidleCstate *cState)
 }
 
 
-static int32
-acpi_cstate_idle(int32 state, CpuidleDevice *device)
+static void
+acpi_cstate_set_scheduler_mode(scheduler_mode mode)
 {
-	CpuidleCstate *cState = &device->cStates[state];
-	acpi_cstate_info *ci = (acpi_cstate_info *)cState->pData;
+	int maxState;
+	if (mode == SCHEDULER_MODE_POWER_SAVING)
+		maxState = ACPI_STATE_C3;
+	else
+		maxState = ACPI_STATE_C1;
+
+	acpi_cpuidle_driver_info *pi = sAcpiProcessor[0];
+	int32 index = -1;
+	for (int i = 0; i < pi->state_count; i++) {
+		if (pi->states[i].type > maxState)
+			break;
+
+		index = i;
+	}
+
+	sStateIndex = index;
+}
+
+
+static void
+acpi_cstate_idle()
+{
+	Thread* thread = thread_get_current_thread();
+	if (thread->pinned_to_cpu <= 0 || thread->post_interrupt_callback != NULL)
+		panic("invalid thread state");
+
+	acpi_cpuidle_driver_info *pi = sAcpiProcessor[smp_get_current_cpu()];
+	acpi_cstate_info *ci = NULL;
+	int32 stateIndex = -1;
+
+	// If any interrupts occur, we have to back out and start over.
+	struct IdlingState {
+		jmp_buf reset_jump;
+		int32 preparing;
+	} idlingState;
+
+	idlingState.preparing = 1;
+	int result = setjmp(idlingState.reset_jump);
+	if (result != 0) {
+		enable_interrupts();
+		if (ci->type == ACPI_STATE_C3)
+			goto C3_out;
+
+		thread->post_interrupt_callback = NULL;
+		return;
+	}
+
+	thread->post_interrupt_data = &idlingState;
+	thread->post_interrupt_callback = [](void* state) {
+		thread_get_current_thread()->post_interrupt_callback = NULL;
+
+		IdlingState* idlingState = (IdlingState*)state;
+		if (idlingState->preparing == 1) {
+			// No need to longjmp, just unset this value.
+			// (We may be in the middle of calling ACPI or other routines,
+			// so using longjmp may not be safe here anyway.)
+			idlingState->preparing = 0;
+			return;
+		}
+
+		longjmp(idlingState->reset_jump, EINTR);
+	};
+
+	if ((stateIndex = sStateIndex) < 0) {
+		// No C-state currently set.
+		thread->post_interrupt_callback = NULL;
+		acpi_cstate_halt();
+		return;
+	}
+
+	ci = &pi->states[stateIndex];
 	if (!ci->skip_bm_sts) {
 		// we fall back to C1 if there's bus master activity
 		if (acpi_cstate_bm_check())
-			state = 1;
+			ci = &pi->states[0];
 	}
-	if (ci->type != ACPI_STATE_C3)
-		acpi_cstate_enter(cState);
+	if (ci->type != ACPI_STATE_C3) {
+		if (atomic_test_and_set(&idlingState.preparing, 0, 1) == 1)
+			acpi_cstate_enter(ci);
+
+		thread->post_interrupt_callback = NULL;
+		return;
+	}
 
 	// set BM_RLD for Bus Master to activity to wake the system from C3
 	// With Newer chipsets BM_RLD is a NOP Since DMA is automatically handled
 	// during C3 State
-	acpi_cpuidle_driver_info *pi = sAcpiProcessor[smp_get_current_cpu()];
 	if (pi->flags & ACPI_FLAG_C_BM)
 		sAcpi->write_bit_register(ACPI_BITREG_BUS_MASTER_RLD, 1);
 
@@ -250,7 +321,11 @@ acpi_cstate_idle(int32 state, CpuidleDevice *device)
 	if (pi->flags & ACPI_FLAG_C_ARB)
 		sAcpi->write_bit_register(ACPI_BITREG_ARB_DISABLE, 1);
 
-	acpi_cstate_enter(cState);
+	if (atomic_test_and_set(&idlingState.preparing, 0, 1) == 1)
+		acpi_cstate_enter(ci);
+
+C3_out:
+	thread->post_interrupt_callback = NULL;
 
 	// clear BM_RLD and re-enable the arbiter
 	if (pi->flags & ACPI_FLAG_C_BM)
@@ -258,84 +333,85 @@ acpi_cstate_idle(int32 state, CpuidleDevice *device)
 
 	if (pi->flags & ACPI_FLAG_C_ARB)
 		sAcpi->write_bit_register(ACPI_BITREG_ARB_DISABLE, 0);
+}
 
-	return state;
+
+static void
+acpi_cstate_wait(int32* variable, int32 test)
+{
+	arch_cpu_pause();
 }
 
 
 static status_t
-acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
+acpi_cstate_add(acpi_object_type *object, acpi_cstate_info *ci)
 {
-	acpi_cstate_info *ci = (acpi_cstate_info *)malloc(sizeof(acpi_cstate_info));
-	if (!ci)
-		return B_NO_MEMORY;
-
 	if (object->object_type != ACPI_TYPE_PACKAGE) {
 		dprintf("invalid _CST object\n");
-		goto error;
+		return B_ERROR;
 	}
 
-	if (object->data.package.count != 4) {
+	if (object->package.count != 4) {
 		dprintf("invalid _CST number\n");
-		goto error;
+		return B_ERROR;
 	}
 
 	// type
-	acpi_object_type * pointer = &object->data.package.objects[1];
+	acpi_object_type * pointer = &object->package.objects[1];
 	if (pointer->object_type != ACPI_TYPE_INTEGER) {
 		dprintf("invalid _CST elem type\n");
-		goto error;
+		return B_ERROR;
 	}
-	uint32 n = pointer->data.integer;
+	uint32 n = pointer->integer.integer;
 	if (n < 1 || n > 3) {
 		dprintf("invalid _CST elem value\n");
-		goto error;
+		return B_ERROR;
 	}
 	ci->type = n;
-	dprintf("C%" B_PRId32 "\n", n);
-	snprintf(cState->name, sizeof(cState->name), "C%" B_PRId32, n);
+	dprintf("C%" B_PRId32 " ", n);
+	snprintf(ci->name, sizeof(ci->name), "C%" B_PRId32, n);
 
 	// Latency
-	pointer = &object->data.package.objects[2];
+	pointer = &object->package.objects[2];
 	if (pointer->object_type != ACPI_TYPE_INTEGER) {
 		dprintf("invalid _CST elem type\n");
-		goto error;
+		return B_ERROR;
 	}
-	n = pointer->data.integer;
-	cState->latency = n;
-	dprintf("Latency: %" B_PRId32 "\n", n);
+	n = pointer->integer.integer;
+	ci->latency = n;
+	dprintf("latency: %" B_PRId32 ", ", n);
 
 	// power
-	pointer = &object->data.package.objects[3];
+	pointer = &object->package.objects[3];
 	if (pointer->object_type != ACPI_TYPE_INTEGER) {
 		dprintf("invalid _CST elem type\n");
-		goto error;
+		return B_ERROR;
 	}
-	n = pointer->data.integer;
-	dprintf("power: %" B_PRId32 "\n", n);
+	n = pointer->integer.integer;
+	dprintf("power: %" B_PRId32 ", ", n);
 
 	// register
-	pointer = &object->data.package.objects[0];
+	pointer = &object->package.objects[0];
 	if (pointer->object_type != ACPI_TYPE_BUFFER) {
 		dprintf("invalid _CST elem type\n");
-		goto error;
+		return B_ERROR;
 	}
-	if (pointer->data.buffer.length < 15) {
+	if (pointer->buffer.length < 15) {
 		dprintf("invalid _CST elem length\n");
-		goto error;
+		return B_ERROR;
 	}
 
-	struct acpicpu_reg *reg = (struct acpicpu_reg *)pointer->data.buffer.buffer;
+	struct acpicpu_reg *reg = (struct acpicpu_reg *)pointer->buffer.buffer;
 	switch (reg->reg_spaceid) {
 		case ACPI_ADR_SPACE_SYSTEM_IO:
 			dprintf("IO method\n");
 			if (reg->reg_addr == 0) {
 				dprintf("illegal address\n");
-				goto error;
+				return B_ERROR;
 			}
 			if (reg->reg_bitwidth != 8) {
 				dprintf("invalid source length\n");
-				goto error;
+				return B_ERROR;
 			}
 			ci->address = reg->reg_addr;
 			ci->method = ACPI_CSTATE_SYSIO;
@@ -348,8 +424,8 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 
 			// skip checking BM_STS if ACPI_PDC_GAS_BM is cleared
 			cpu_ent *cpu = get_cpu_struct();
-			if ((cpu->arch.vendor == VENDOR_INTEL) &&
-				!(reg->reg_accesssize & ACPI_PDC_GAS_BM))
+			if (cpu->arch.vendor == VENDOR_INTEL &&
+					(reg->reg_accesssize & ACPI_PDC_GAS_BM) == 0)
 				ci->skip_bm_sts = 1;
 			break;
 		}
@@ -357,13 +433,8 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 			dprintf("invalid spaceid %" B_PRId8 "\n", reg->reg_spaceid);
 			break;
 	}
-	cState->pData = ci;
-	cState->EnterIdle = acpi_cstate_idle;
 
 	return B_OK;
-error:
-	free(ci);
-	return B_ERROR;
 }
 
 
@@ -410,25 +481,27 @@ acpi_cpuidle_setup(acpi_cpuidle_driver_info *device)
 	acpi_object_type *object = (acpi_object_type *)buffer.pointer;
 	if (object->object_type != ACPI_TYPE_PACKAGE)
 		dprintf("invalid _CST type\n");
-	if (object->data.package.count < 2)
+	if (object->package.count < 2)
 		dprintf("invalid _CST count\n");
 
-	acpi_object_type *pointer = object->data.package.objects;
+	acpi_object_type *pointer = object->package.objects;
 	if (pointer[0].object_type != ACPI_TYPE_INTEGER)
 		dprintf("invalid _CST type 2\n");
-	uint32 n = pointer[0].data.integer;
-	if (n != object->data.package.count - 1)
+	uint32 n = pointer[0].integer.integer;
+	if (n != object->package.count - 1)
 		dprintf("invalid _CST count 2\n");
-	if (n > 8)
+	if (n > MAX_CSTATES) {
 		dprintf("_CST has too many states\n");
+		n = MAX_CSTATES;
+	}
 	dprintf("cpuidle found %" B_PRId32 " cstates\n", n);
-	uint32 count = 1;
+	uint32 count = 0;
 	for (uint32 i = 1; i <= n; i++) {
-		pointer = &object->data.package.objects[i];
-		if (acpi_cstate_add(pointer, &sAcpiDevice.cStates[count]) == B_OK)
+		pointer = &object->package.objects[i];
+		if (acpi_cstate_add(pointer, &device->states[count]) == B_OK)
 			++count;
 	}
-	sAcpiDevice.cStateCount = count;
+	device->state_count = count;
 	free(buffer.pointer);
 
 	// TODO we assume BM is a must and ARB_DIS is always available
@@ -441,27 +514,9 @@ acpi_cpuidle_setup(acpi_cpuidle_driver_info *device)
 
 
 static status_t
-acpi_cpuidle_init(void)
-{
-	dprintf("acpi_cpuidle_init\n");
-
-	for (int32 i = 0; i < smp_get_num_cpus(); i++)
-		if (acpi_cpuidle_setup(sAcpiProcessor[i]) != B_OK)
-			return B_ERROR;
-
-	status_t status = gIdle->AddDevice(&sAcpiDevice);
-	if (status == B_OK)
-		dprintf("using acpi idle\n");
-	return status;
-}
-
-
-static status_t
 acpi_processor_init(acpi_cpuidle_driver_info *device)
 {
 	// get the CPU index
-	dprintf("get acpi processor @%p\n", device->acpi_cookie);
-
 	acpi_data buffer;
 	buffer.pointer = NULL;
 	buffer.length = ACPI_ALLOCATE_BUFFER;
@@ -472,143 +527,157 @@ acpi_processor_init(acpi_cpuidle_driver_info *device)
 		return status;
 	}
 
-	acpi_object_type *object = (acpi_object_type *)buffer.pointer;
-	dprintf("acpi cpu%" B_PRId32 ": P_BLK at %#x/%lu\n",
-		object->data.processor.cpu_id,
-		object->data.processor.pblk_address,
-		object->data.processor.pblk_length);
-
-	int32 cpuIndex = object->data.processor.cpu_id;
+	acpi_object_type *tmpObject = (acpi_object_type *)buffer.pointer;
+	const uint32 processor_cpu_id = tmpObject->processor.cpu_id;
 	free(buffer.pointer);
 
-	if (cpuIndex < 0 || cpuIndex >= smp_get_num_cpus())
-		return B_ERROR;
-
-	device->cpuIndex = cpuIndex;
-	sAcpiProcessor[cpuIndex] = device;
-
-	// If nodes for all processors have been registered, init the idle callback.
-	for (int32 i = smp_get_num_cpus() - 1; i >= 0; i--) {
-		if (sAcpiProcessor[i] == NULL)
-			return B_OK;
+	// Find this processor's CPU index.
+	int32 cpuIndex = -1;
+	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
+		cpu_ent* cpu = &gCPU[i];
+		if ((uint32)cpu->arch.acpi_processor_id == processor_cpu_id) {
+			cpuIndex = i;
+			break;
+		}
 	}
 
-	if (intel_cpuidle_init() == B_OK)
-		return B_OK;
+	if (cpuIndex < 0) {
+		dprintf("can't find matching cpu_ent for acpi cpu %" B_PRId32 "\n",
+			processor_cpu_id);
+		return B_ERROR;
+	}
 
-	status = acpi_cpuidle_init();
+	dprintf("acpi cpu %" B_PRId32 " maps to cpu %" B_PRId32 "\n",
+		processor_cpu_id, cpuIndex);
+
+	sAcpiProcessor[cpuIndex] = device;
+	return status;
+}
+
+
+static void
+acpi_cpuidle_uninit()
+{
+	for (size_t i = 0; i < B_COUNT_OF(sAcpiProcessor); i++) {
+		if (sAcpiProcessor[i] == NULL)
+			continue;
+
+		sDeviceManager->put_node(sAcpiProcessor[i]->processor);
+		free(sAcpiProcessor[i]);
+		sAcpiProcessor[i] = NULL;
+	}
+}
+
+
+static status_t
+acpi_cpuidle_init()
+{
+	if (x86_check_feature(IA32_FEATURE_EXT_HYPERVISOR, FEATURE_EXT))
+		return B_ERROR;
+
+	device_node* root = sDeviceManager->get_root_node();
+
+	status_t status = B_OK;
+	int32 processors = 0;
+	device_node* processor = NULL;
+	while (true) {
+		device_attr acpiAttrs[] = {
+			{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "acpi" }},
+			{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { .ui32 = ACPI_TYPE_PROCESSOR }},
+			{ NULL }
+		};
+
+		if (sDeviceManager->find_child_node(root, acpiAttrs, &processor) != B_OK)
+			break;
+
+		acpi_cpuidle_driver_info *device;
+		device = (acpi_cpuidle_driver_info *)calloc(1, sizeof(*device));
+		if (device == NULL) {
+			sDeviceManager->put_node(processor);
+			status = B_NO_MEMORY;
+			break;
+		}
+
+		device->processor = processor;
+		sDeviceManager->get_driver(processor, (driver_module_info **)&device->acpi,
+			(void **)&device->acpi_cookie);
+
+		status = acpi_processor_init(device);
+		if (status != B_OK) {
+			sDeviceManager->put_node(processor);
+			free(device);
+
+			// Ignore the error and continue: there are sometimes processor
+			// objects that don't map to cpu_ents, apparently.
+			status = B_OK;
+			continue;
+		}
+
+		processors++;
+	}
+
+	sDeviceManager->put_node(root);
+	if (status == B_OK && processors != smp_get_num_cpus()) {
+		dprintf("can't use x86 ACPI idle: missing %" B_PRId32 " processor objects\n",
+			smp_get_num_cpus() - processors);
+		status = B_NOT_SUPPORTED;
+	}
+
+	for (int32 i = 0; status == B_OK && i < smp_get_num_cpus(); i++)
+		status = acpi_cpuidle_setup(sAcpiProcessor[i]);
+
+	if (status == B_OK) {
+		acpi_cstate_set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
+		dprintf("using x86 ACPI idle\n");
+	}
+
 	if (status != B_OK)
-		sAcpiProcessor[cpuIndex] = NULL;
+		acpi_cpuidle_uninit();
 
 	return status;
 }
 
 
-static float
-acpi_cpuidle_support(device_node *parent)
+static status_t
+std_ops(int32 op, ...)
 {
-	const char *bus;
-	uint32 device_type;
+	switch (op) {
+		case B_MODULE_INIT:
+			return acpi_cpuidle_init();
 
-	dprintf("acpi_cpuidle_support\n");
-	// make sure parent is really the ACPI bus manager
-	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
-		return -1;
-
-	if (strcmp(bus, "acpi") != 0)
-		return 0.0;
-
-	// check whether it's really a cpu Device
-	if (sDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM,
-			&device_type, false) != B_OK
-		|| device_type != ACPI_TYPE_PROCESSOR) {
-		return 0.0;
+		case B_MODULE_UNINIT:
+			acpi_cpuidle_uninit();
+			return B_OK;
 	}
 
-	return 0.6;
+	return B_ERROR;
 }
 
 
-static status_t
-acpi_cpuidle_register_device(device_node *node)
-{
-	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "ACPI CPU IDLE" }},
-		{ NULL }
-	};
-
-	dprintf("acpi_cpuidle_register_device\n");
-	return sDeviceManager->register_node(node, ACPI_CPUIDLE_MODULE_NAME, attrs,
-		NULL, NULL);
-}
-
-
-static status_t
-acpi_cpuidle_init_driver(device_node *node, void **driverCookie)
-{
-	dprintf("acpi_cpuidle_init_driver\n");
-	acpi_cpuidle_driver_info *device;
-	device = (acpi_cpuidle_driver_info *)calloc(1, sizeof(*device));
-	if (device == NULL)
-		return B_NO_MEMORY;
-
-	device->node = node;
-
-	device_node *parent;
-	parent = sDeviceManager->get_parent_node(node);
-	sDeviceManager->get_driver(parent, (driver_module_info **)&device->acpi,
-		(void **)&device->acpi_cookie);
-	sDeviceManager->put_node(parent);
-
-	status_t status = acpi_processor_init(device);
-	if (status != B_OK) {
-		free(device);
-		return status;
-	}
-
-	*driverCookie = device;
-	return B_OK;
-}
-
-
-static void
-acpi_cpuidle_uninit_driver(void *driverCookie)
-{
-	dprintf("acpi_cpuidle_uninit_driver");
-	acpi_cpuidle_driver_info *device = (acpi_cpuidle_driver_info *)driverCookie;
-	// TODO: When the first device to be unregistered, we'd need to balance the
-	// gIdle->AddDevice() call, but ATM isn't any API for that.
-	sAcpiProcessor[device->cpuIndex] = NULL;
-	free(device);
-}
-
-
-module_dependency module_dependencies[] = {
-	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager },
-	{ B_ACPI_MODULE_NAME, (module_info **)&sAcpi},
-	{ B_CPUIDLE_MODULE_NAME, (module_info **)&gIdle },
-	{}
-};
-
-
-static driver_module_info sAcpiidleModule = {
+static cpuidle_module_info sAcpiidleModule = {
 	{
 		ACPI_CPUIDLE_MODULE_NAME,
 		0,
-		NULL
+		std_ops,
 	},
 
-	acpi_cpuidle_support,
-	acpi_cpuidle_register_device,
-	acpi_cpuidle_init_driver,
-	acpi_cpuidle_uninit_driver,
-	NULL,
-	NULL,	// rescan
-	NULL,	// removed
+	0.2f,
+
+	acpi_cstate_set_scheduler_mode,
+
+	acpi_cstate_idle,
+	acpi_cstate_wait
 };
 
 
 module_info *modules[] = {
 	(module_info *)&sAcpiidleModule,
 	NULL
+};
+
+
+module_dependency module_dependencies[] = {
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager },
+	{ B_ACPI_MODULE_NAME, (module_info **)&sAcpi },
+	{}
 };

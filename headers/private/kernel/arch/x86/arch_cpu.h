@@ -563,6 +563,7 @@ typedef struct arch_cpu_info {
 	uint8				hybrid_type;
 
 	uint32				logical_apic_id;
+	int16				acpi_processor_id;
 
 	uint64				mperf_prev;
 	uint64				aperf_prev;

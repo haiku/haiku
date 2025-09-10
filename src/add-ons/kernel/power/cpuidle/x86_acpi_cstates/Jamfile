@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel power cpuidle x86_acpi_cstates ;
+
+UsePrivateKernelHeaders ;
+
+KernelAddon x86_acpi_cstates :
+	acpi_cpuidle.cpp
+	;

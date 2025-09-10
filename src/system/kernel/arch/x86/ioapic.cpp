@@ -592,17 +592,23 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				break;
 			}
 
-#ifdef TRACE_IOAPIC
 			case ACPI_MADT_TYPE_LOCAL_APIC:
 			{
 				// purely informational
 				acpi_madt_local_apic* info = (acpi_madt_local_apic*)apicEntry;
-				dprintf("found local apic with id %u, processor id %u, "
+				TRACE("found local apic with id %u, processor id %u, "
 					"flags 0x%08" B_PRIx32 "\n", info->Id, info->ProcessorId,
 					(uint32)info->LapicFlags);
+				for (int32 i = 0; i < smp_get_num_cpus(); i++) {
+					if (x86_get_cpu_apic_id(i) == info->Id) {
+						gCPU[i].arch.acpi_processor_id = info->ProcessorId;
+						break;
+					}
+				}
 				break;
 			}
 
+#ifdef TRACE_IOAPIC
 			case ACPI_MADT_TYPE_LOCAL_APIC_NMI:
 			{
 				// TODO: take these into account, but at apic.cpp
