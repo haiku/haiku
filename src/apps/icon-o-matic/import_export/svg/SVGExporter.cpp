@@ -49,6 +49,7 @@ write_line(BPositionIO* stream, BString& string)
 // constructor
 SVGExporter::SVGExporter()
 	: Exporter(),
+	  fShownUnsupportedGradientWarning(false),
 	  fGradientCount(0),
 	  fOriginalEntry(NULL)
 {
@@ -155,6 +156,27 @@ SVGExporter::_DisplayWarning() const
 	alert->SetShortcut(0, B_ESCAPE);
 	return alert->Go() == 1;
 }
+
+// _DisplayUnsupportedGradientWarning
+void
+SVGExporter::_DisplayUnsupportedGradientWarning() const
+{
+	if (fShownUnsupportedGradientWarning)
+		return;
+
+	BAlert* alert = new BAlert(
+		B_TRANSLATE("SVG export"),
+		B_TRANSLATE("SVG does not support some gradient types "
+		            "(conic, diamond, xy, sqrt_xy).\n\n"
+		            "They will be exported as linear approximations and "
+		            "may look different in other viewers."),
+		B_TRANSLATE("OK")
+	);
+
+	alert->Go();
+	fShownUnsupportedGradientWarning = true;
+}
+
 
 // #pragma mark -
 
@@ -367,6 +389,13 @@ status_t
 SVGExporter::_ExportGradient(const Gradient* gradient, BPositionIO* stream)
 {
 	BString helper;
+
+	// display a warning if the gradient is unsupported
+	if (gradient->Type() == GRADIENT_CONIC
+		|| gradient->Type() == GRADIENT_DIAMOND
+		|| gradient->Type() == GRADIENT_XY
+		|| gradient->Type() == GRADIENT_SQRT_XY)
+		_DisplayUnsupportedGradientWarning();
 
 	// start new gradient tag
 	if (gradient->Type() == GRADIENT_CIRCULAR) {

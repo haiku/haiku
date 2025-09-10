@@ -40,6 +40,7 @@ class SVGExporter : public Exporter {
 
  private:
 			bool				_DisplayWarning() const;
+			void				_DisplayUnsupportedGradientWarning() const;
 
 			status_t			_ExportShape(const Shape* shape,
 											 BPositionIO* stream);
@@ -52,6 +53,7 @@ class SVGExporter : public Exporter {
 										 char* string,
 										 BPositionIO* stream);
 
+			mutable bool		fShownUnsupportedGradientWarning;
  			int32				fGradientCount;
 			entry_ref*			fOriginalEntry;
 };
