@@ -29,11 +29,84 @@
 
 
 using BPrivate::PicturePlayer;
+using BPrivate::PicturePlayerCallbacks;
+using BPrivate::picture_player_callbacks_compat;
 
 
-struct adapter_context {
-	void* user_data;
-	void** function_table;
+class CallbackAdapterPlayer : public PicturePlayerCallbacks {
+public:
+	CallbackAdapterPlayer(void* userData, void** functionTable);
+
+	virtual void MovePenBy(const BPoint& where);
+	virtual void StrokeLine(const BPoint& start, const BPoint& end);
+	virtual void DrawRect(const BRect& rect, bool fill);
+	virtual void DrawRoundRect(const BRect& rect, const BPoint& radii, bool fill);
+	virtual void DrawBezier(const BPoint controlPoints[4], bool fill);
+	virtual void DrawArc(const BPoint& center, const BPoint& radii, float startTheta,
+		float arcTheta, bool fill);
+	virtual void DrawEllipse(const BRect& rect, bool fill);
+	virtual void DrawPolygon(size_t numPoints, const BPoint points[], bool isClosed, bool fill);
+	virtual void DrawShape(const BShape& shape, bool fill);
+	virtual void DrawString(const char* string, size_t length, float spaceEscapement,
+		float nonSpaceEscapement);
+	virtual void DrawPixels(const BRect& source, const BRect& destination, uint32 width,
+		uint32 height, size_t bytesPerRow, color_space pixelFormat, uint32 flags, const void* data,
+		size_t length);
+	virtual void DrawPicture(const BPoint& where, int32 token);
+	virtual void SetClippingRects(size_t numRects, const clipping_rect rects[]);
+	virtual void ClipToPicture(int32 token, const BPoint& where, bool clipToInverse);
+	virtual void PushState();
+	virtual void PopState();
+	virtual void EnterStateChange();
+	virtual void ExitStateChange();
+	virtual void EnterFontState();
+	virtual void ExitFontState();
+	virtual void SetOrigin(const BPoint& origin);
+	virtual void SetPenLocation(const BPoint& location);
+	virtual void SetDrawingMode(drawing_mode mode);
+	virtual void SetLineMode(cap_mode capMode, join_mode joinMode, float miterLimit);
+	virtual void SetPenSize(float size);
+	virtual void SetForeColor(const rgb_color& color);
+	virtual void SetBackColor(const rgb_color& color);
+	virtual void SetStipplePattern(const pattern& patter);
+	virtual void SetScale(float scale);
+	virtual void SetFontFamily(const char* familyName, size_t length);
+	virtual void SetFontStyle(const char* styleName, size_t length);
+	virtual void SetFontSpacing(uint8 spacing);
+	virtual void SetFontSize(float size);
+	virtual void SetFontRotation(float rotation);
+	virtual void SetFontEncoding(uint8 encoding);
+	virtual void SetFontFlags(uint32 flags);
+	virtual void SetFontShear(float shear);
+	virtual void SetFontFace(uint16 face);
+	virtual void SetBlendingMode(source_alpha alphaSourceMode, alpha_function alphaFunctionMode);
+	virtual void SetTransform(const BAffineTransform& transform);
+	virtual void TranslateBy(double x, double y);
+	virtual void ScaleBy(double x, double y);
+	virtual void RotateBy(double angleRadians);
+	virtual void BlendLayer(Layer* layer);
+	virtual void ClipToRect(const BRect& rect, bool inverse);
+	virtual void ClipToShape(int32 opCount, const uint32 opList[], int32 ptCount,
+		const BPoint ptList[], bool inverse);
+	virtual void DrawStringLocations(const char* string, size_t length, const BPoint locations[],
+		size_t locationCount);
+	virtual void DrawRectGradient(const BRect& rect, BGradient& gradient, bool fill);
+	virtual void DrawRoundRectGradient(const BRect& rect, const BPoint& radii, BGradient& gradient,
+		bool fill);
+	virtual void DrawBezierGradient(const BPoint controlPoints[4], BGradient& gradient, bool fill);
+	virtual void DrawArcGradient(const BPoint& center, const BPoint& radii, float startTheta,
+		float arcTheta, BGradient& gradient, bool fill);
+	virtual void DrawEllipseGradient(const BRect& rect, BGradient& gradient, bool fill);
+	virtual void DrawPolygonGradient(size_t numPoints, const BPoint points[], bool isClosed,
+		BGradient& gradient, bool fill);
+	virtual void DrawShapeGradient(const BShape& shape, BGradient& gradient, bool fill);
+	virtual void SetFillRule(int32 fillRule);
+	virtual void StrokeLineGradient(const BPoint& start, const BPoint& end,
+		const BGradient& gradient);
+
+private:
+	void* fUserData;
+	picture_player_callbacks_compat* fCallbacks;
 };
 
 
@@ -43,82 +116,89 @@ nop()
 }
 
 
-static void
-move_pen_by(void* _context, const BPoint& delta)
+CallbackAdapterPlayer::CallbackAdapterPlayer(void* userData, void** functionTable)
+	:
+	fUserData(userData),
+	fCallbacks((picture_player_callbacks_compat*)functionTable)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BPoint))context->function_table[1])(context->user_data,
-		delta);
 }
 
 
-static void
-stroke_line(void* _context, const BPoint& start, const BPoint& end)
+void
+CallbackAdapterPlayer::MovePenBy(const BPoint& delta)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BPoint, BPoint))context->function_table[2])(
-		context->user_data, start, end);
+	fCallbacks->move_pen_by(fUserData, delta);
 }
 
 
-static void
-draw_rect(void* _context, const BRect& rect, bool fill)
+void
+CallbackAdapterPlayer::StrokeLine(const BPoint& start, const BPoint& end)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BRect))context->function_table[fill ? 4 : 3])(
-		context->user_data, rect);
+	fCallbacks->stroke_line(fUserData, start, end);
 }
 
 
-static void
-draw_round_rect(void* _context, const BRect& rect, const BPoint& radii,
+void
+CallbackAdapterPlayer::DrawRect(const BRect& rect, bool fill)
+{
+	if (fill)
+		fCallbacks->fill_rect(fUserData, rect);
+	else
+		fCallbacks->stroke_rect(fUserData, rect);
+}
+
+
+void
+CallbackAdapterPlayer::DrawRoundRect(const BRect& rect, const BPoint& radii,
 	bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BRect, BPoint))context->function_table[fill ? 6 : 5])(
-		context->user_data, rect, radii);
+	if (fill)
+		fCallbacks->fill_round_rect(fUserData, rect, radii);
+	else
+		fCallbacks->stroke_round_rect(fUserData, rect, radii);
 }
 
 
-static void
-draw_bezier(void* _context, const BPoint _points[4], bool fill)
+void
+CallbackAdapterPlayer::DrawBezier(const BPoint _points[4], bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-
 	BPoint points[4] = { _points[0], _points[1], _points[2], _points[3] };
-	((void (*)(void*, BPoint*))context->function_table[fill ? 8 : 7])(
-		context->user_data, points);
+
+	if (fill)
+		fCallbacks->fill_bezier(fUserData, points);
+	else
+		fCallbacks->stroke_bezier(fUserData, points);
 }
 
 
-static void
-draw_arc(void* _context, const BPoint& center, const BPoint& radii,
+void
+CallbackAdapterPlayer::DrawArc(const BPoint& center, const BPoint& radii,
 	float startTheta, float arcTheta, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BPoint, BPoint, float, float))
-		context->function_table[fill ? 10 : 9])(context->user_data, center,
-			radii, startTheta, arcTheta);
+	if (fill)
+		fCallbacks->fill_arc(fUserData, center, radii, startTheta, arcTheta);
+	else
+		fCallbacks->stroke_arc(fUserData, center, radii, startTheta, arcTheta);
 }
 
 
-static void
-draw_ellipse(void* _context, const BRect& rect, bool fill)
+void
+CallbackAdapterPlayer::DrawEllipse(const BRect& rect, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 	BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
 	BPoint center = rect.LeftTop() + radii;
-	((void (*)(void*, BPoint, BPoint))
-		context->function_table[fill ? 12 : 11])(context->user_data, center,
-			radii);
+
+	if (fill)
+		fCallbacks->fill_ellipse(fUserData, center, radii);
+	else
+		fCallbacks->stroke_ellipse(fUserData, center, radii);
 }
 
 
-static void
-draw_polygon(void* _context, size_t numPoints, const BPoint _points[],
+void
+CallbackAdapterPlayer::DrawPolygon(size_t numPoints, const BPoint _points[],
 	bool isClosed, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 
 	BStackOrHeapArray<BPoint, 200> points(numPoints);
 	if (!points.IsValid())
@@ -126,70 +206,63 @@ draw_polygon(void* _context, size_t numPoints, const BPoint _points[],
 
 	memcpy((void*)points, _points, numPoints * sizeof(BPoint));
 
-	((void (*)(void*, int32, BPoint*, bool))
-		context->function_table[fill ? 14 : 13])(context->user_data, numPoints,
-			points, isClosed);
+	if (fill)
+		fCallbacks->fill_polygon(fUserData, numPoints, points, isClosed);
+	else
+		fCallbacks->stroke_polygon(fUserData, numPoints, points, isClosed);
 }
 
 
-static void
-draw_shape(void* _context, const BShape& shape, bool fill)
+void
+CallbackAdapterPlayer::DrawShape(const BShape& shape, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BShape))context->function_table[fill ? 16 : 15])(
-		context->user_data, shape);
+	if (fill)
+		fCallbacks->fill_shape(fUserData, &shape);
+	else
+		fCallbacks->stroke_shape(fUserData, &shape);
 }
 
 
-static void
-draw_string(void* _context, const char* _string, size_t length,
+void
+CallbackAdapterPlayer::DrawString(const char* _string, size_t length,
 	float deltaSpace, float deltaNonSpace)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 	char* string = strndup(_string, length);
 
-	((void (*)(void*, char*, float, float))
-		context->function_table[17])(context->user_data, string, deltaSpace,
-			deltaNonSpace);
+	fCallbacks->draw_string(fUserData, string, deltaSpace, deltaNonSpace);
 
 	free(string);
 }
 
 
-static void
-draw_pixels(void* _context, const BRect& src, const BRect& dest, uint32 width,
+void
+CallbackAdapterPlayer::DrawPixels(const BRect& src, const BRect& dest, uint32 width,
 	uint32 height, size_t bytesPerRow, color_space pixelFormat, uint32 options,
 	const void* _data, size_t length)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 	void* data = malloc(length);
 	if (data == NULL)
 		return;
 
 	memcpy(data, _data, length);
 
-	((void (*)(void*, BRect, BRect, int32, int32, int32, int32, int32, void*))
-		context->function_table[18])(context->user_data, src, dest, width,
+	fCallbacks->draw_pixels(fUserData, src, dest, width,
 			height, bytesPerRow, pixelFormat, options, data);
 
 	free(data);
 }
 
 
-static void
-draw_picture(void* _context, const BPoint& where, int32 token)
+void
+CallbackAdapterPlayer::DrawPicture(const BPoint& where, int32 token)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BPoint, int32))context->function_table[19])(
-		context->user_data, where, token);
+	fCallbacks->draw_picture(fUserData, where, token);
 }
 
 
-static void
-set_clipping_rects(void* _context, size_t numRects, const clipping_rect _rects[])
+void
+CallbackAdapterPlayer::SetClippingRects(size_t numRects, const clipping_rect _rects[])
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-
 	// This is rather ugly but works for such a trivial class.
 	BStackOrHeapArray<BRect, 100> rects(numRects);
 	if (!rects.IsValid())
@@ -200,426 +273,362 @@ set_clipping_rects(void* _context, size_t numRects, const clipping_rect _rects[]
 		rects[i] = BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom);
 	}
 
-	((void (*)(void*, BRect*, uint32))context->function_table[20])(
-		context->user_data, rects, numRects);
+	fCallbacks->set_clipping_rects(fUserData, rects, numRects);
 }
 
 
-static void
-clip_to_picture(void* _context, int32 token, const BPoint& origin,
+void
+CallbackAdapterPlayer::ClipToPicture(int32 token, const BPoint& origin,
 	bool clipToInverse)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, int32, BPoint, bool))context->function_table[21])(
-			context->user_data, token, origin, clipToInverse);
+	fCallbacks->clip_to_picture(fUserData, token, origin, clipToInverse);
 }
 
 
-static void
-push_state(void* _context)
+void
+CallbackAdapterPlayer::PushState()
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*))context->function_table[22])(context->user_data);
+	fCallbacks->push_state(fUserData);
 }
 
 
-static void
-pop_state(void* _context)
+void
+CallbackAdapterPlayer::PopState()
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*))context->function_table[23])(context->user_data);
+	fCallbacks->pop_state(fUserData);
 }
 
 
-static void
-enter_state_change(void* _context)
+void
+CallbackAdapterPlayer::EnterStateChange()
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*))context->function_table[24])(context->user_data);
+	fCallbacks->enter_state_change(fUserData);
 }
 
 
-static void
-exit_state_change(void* _context)
+void
+CallbackAdapterPlayer::ExitStateChange()
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*))context->function_table[25])(context->user_data);
+	fCallbacks->exit_state_change(fUserData);
 }
 
 
-static void
-enter_font_state(void* _context)
+void
+CallbackAdapterPlayer::EnterFontState()
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*))context->function_table[26])(context->user_data);
+	fCallbacks->enter_font_state(fUserData);
 }
 
 
-static void
-exit_font_state(void* _context)
+void
+CallbackAdapterPlayer::ExitFontState()
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*))context->function_table[27])(context->user_data);
+	fCallbacks->exit_font_state(fUserData);
 }
 
 
-static void
-set_origin(void* _context, const BPoint& origin)
+void
+CallbackAdapterPlayer::SetOrigin(const BPoint& origin)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BPoint))context->function_table[28])(context->user_data,
-		origin);
+	fCallbacks->set_origin(fUserData, origin);
 }
 
 
-static void
-set_pen_location(void* _context, const BPoint& penLocation)
+void
+CallbackAdapterPlayer::SetPenLocation(const BPoint& penLocation)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BPoint))context->function_table[29])(context->user_data,
-		penLocation);
+	fCallbacks->set_pen_location(fUserData, penLocation);
 }
 
 
-static void
-set_drawing_mode(void* _context, drawing_mode mode)
+void
+CallbackAdapterPlayer::SetDrawingMode(drawing_mode mode)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, drawing_mode))context->function_table[30])(
-		context->user_data, mode);
+	fCallbacks->set_drawing_mode(fUserData, mode);
 }
 
 
-static void
-set_line_mode(void* _context, cap_mode capMode, join_mode joinMode,
+void
+CallbackAdapterPlayer::SetLineMode(cap_mode capMode, join_mode joinMode,
 	float miterLimit)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, cap_mode, join_mode, float))context->function_table[31])(
-		context->user_data, capMode, joinMode, miterLimit);
+	fCallbacks->set_line_mode(fUserData, capMode, joinMode, miterLimit);
 }
 
 
-static void
-set_pen_size(void* _context, float size)
+void
+CallbackAdapterPlayer::SetPenSize(float size)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, float))context->function_table[32])(context->user_data,
-		size);
+	fCallbacks->set_pen_size(fUserData, size);
 }
 
 
-static void
-set_fore_color(void* _context, const rgb_color& color)
+void
+CallbackAdapterPlayer::SetForeColor(const rgb_color& color)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, rgb_color))context->function_table[33])(
-		context->user_data, color);
+	fCallbacks->set_fore_color(fUserData, color);
 }
 
 
-static void
-set_back_color(void* _context, const rgb_color& color)
+void
+CallbackAdapterPlayer::SetBackColor(const rgb_color& color)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, rgb_color))context->function_table[34])(
-		context->user_data, color);
+	fCallbacks->set_back_color(fUserData, color);
 }
 
 
-static void
-set_stipple_pattern(void* _context, const pattern& stipplePattern)
+void
+CallbackAdapterPlayer::SetStipplePattern(const pattern& stipplePattern)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, pattern))context->function_table[35])(context->user_data,
-		stipplePattern);
+	fCallbacks->set_stipple_pattern(fUserData, stipplePattern);
 }
 
 
-static void
-set_scale(void* _context, float scale)
+void
+CallbackAdapterPlayer::SetScale(float scale)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, float))context->function_table[36])(context->user_data,
-		scale);
+	fCallbacks->set_scale(fUserData, scale);
 }
 
 
-static void
-set_font_family(void* _context, const char* _family, size_t length)
+void
+CallbackAdapterPlayer::SetFontFamily(const char* _family, size_t length)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 	char* family = strndup(_family, length);
 
-	((void (*)(void*, char*))context->function_table[37])(context->user_data,
-		family);
+	fCallbacks->set_font_family(fUserData, family);
 
 	free(family);
 }
 
 
-static void
-set_font_style(void* _context, const char* _style, size_t length)
+void
+CallbackAdapterPlayer::SetFontStyle(const char* _style, size_t length)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 	char* style = strndup(_style, length);
 
-	((void (*)(void*, char*))context->function_table[38])(context->user_data,
-		style);
+	fCallbacks->set_font_style(fUserData, style);
 
 	free(style);
 }
 
 
-static void
-set_font_spacing(void* _context, uint8 spacing)
+void
+CallbackAdapterPlayer::SetFontSpacing(uint8 spacing)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, int32))context->function_table[39])(context->user_data,
-		spacing);
+	fCallbacks->set_font_spacing(fUserData, spacing);
 }
 
 
-static void
-set_font_size(void* _context, float size)
+void
+CallbackAdapterPlayer::SetFontSize(float size)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, float))context->function_table[40])(context->user_data,
-		size);
+	fCallbacks->set_font_size(fUserData, size);
 }
 
 
-static void
-set_font_rotation(void* _context, float rotation)
+void
+CallbackAdapterPlayer::SetFontRotation(float rotation)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, float))context->function_table[41])(context->user_data,
-		rotation);
+	fCallbacks->set_font_rotate(fUserData, rotation);
 }
 
 
-static void
-set_font_encoding(void* _context, uint8 encoding)
+void
+CallbackAdapterPlayer::SetFontEncoding(uint8 encoding)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, int32))context->function_table[42])(context->user_data,
-		encoding);
+	fCallbacks->set_font_encoding(fUserData, encoding);
 }
 
 
-static void
-set_font_flags(void* _context, uint32 flags)
+void
+CallbackAdapterPlayer::SetFontFlags(uint32 flags)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, int32))context->function_table[43])(context->user_data,
-		flags);
+	fCallbacks->set_font_flags(fUserData, flags);
 }
 
 
-static void
-set_font_shear(void* _context, float shear)
+void
+CallbackAdapterPlayer::SetFontShear(float shear)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, float))context->function_table[44])(context->user_data,
-		shear);
+	fCallbacks->set_font_shear(fUserData, shear);
 }
 
 
-static void
-set_font_face(void* _context, uint16 face)
+void
+CallbackAdapterPlayer::SetFontFace(uint16 face)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, int32))context->function_table[46])(context->user_data,
-		face);
+	fCallbacks->set_font_face(fUserData, face);
 }
 
 
-static void
-set_blending_mode(void* _context, source_alpha alphaSrcMode,
+void
+CallbackAdapterPlayer::SetBlendingMode(source_alpha alphaSrcMode,
 	alpha_function alphaFncMode)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, source_alpha, alpha_function))
-		context->function_table[47])(context->user_data, alphaSrcMode,
-			alphaFncMode);
+	fCallbacks->set_blending_mode(fUserData, alphaSrcMode, alphaFncMode);
 }
 
 
-static void
-set_transform(void* _context, const BAffineTransform& transform)
+void
+CallbackAdapterPlayer::SetTransform(const BAffineTransform& transform)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, const BAffineTransform&))
-		context->function_table[48])(context->user_data, transform);
+	fCallbacks->set_transform(fUserData, transform);
 }
 
 
-static void
-translate_by(void* _context, double x, double y)
+void
+CallbackAdapterPlayer::TranslateBy(double x, double y)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, double, double))
-		context->function_table[49])(context->user_data, x, y);
+	fCallbacks->translate_by(fUserData, x, y);
 }
 
 
-static void
-scale_by(void* _context, double x, double y)
+void
+CallbackAdapterPlayer::ScaleBy(double x, double y)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, double, double))
-		context->function_table[50])(context->user_data, x, y);
+	fCallbacks->scale_by(fUserData, x, y);
 }
 
 
-static void
-rotate_by(void* _context, double angleRadians)
+void
+CallbackAdapterPlayer::RotateBy(double angleRadians)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, double))
-		context->function_table[51])(context->user_data, angleRadians);
+	fCallbacks->rotate_by(fUserData, angleRadians);
 }
 
 
-static void
-blend_layer(void* _context, Layer* layer)
+void
+CallbackAdapterPlayer::BlendLayer(Layer* layer)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, Layer*))
-		context->function_table[52])(context->user_data, layer);
+	fCallbacks->blend_layer(fUserData, layer);
 }
 
 
-static void
-clip_to_rect(void* _context, const BRect& rect, bool inverse)
+void
+CallbackAdapterPlayer::ClipToRect(const BRect& rect, bool inverse)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, const BRect&, bool))
-		context->function_table[53])(context->user_data, rect, inverse);
+	fCallbacks->clip_to_rect(fUserData, rect, inverse);
 }
 
 
-static void
-clip_to_shape(void* _context, int32 opCount, const uint32 opList[],
+void
+CallbackAdapterPlayer::ClipToShape(int32 opCount, const uint32 opList[],
 	int32 ptCount, const BPoint ptList[], bool inverse)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, int32, const uint32*, int32, const BPoint*, bool))
-		context->function_table[54])(context->user_data, opCount, opList,
+	fCallbacks->clip_to_shape(fUserData, opCount, opList,
 			ptCount, ptList, inverse);
 }
 
 
-static void
-draw_string_locations(void* _context, const char* _string, size_t length,
+void
+CallbackAdapterPlayer::DrawStringLocations(const char* _string, size_t length,
 	const BPoint* locations, size_t locationCount)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 	char* string = strndup(_string, length);
 
-	((void (*)(void*, char*, const BPoint*, size_t))
-		context->function_table[55])(context->user_data, string, locations,
+	fCallbacks->draw_string_locations(fUserData, string, locations,
 			locationCount);
 
 	free(string);
 }
 
 
-static void
-draw_rect_gradient(void* _context, const BRect& rect, BGradient& gradient, bool fill)
+void
+CallbackAdapterPlayer::DrawRectGradient(const BRect& rect, BGradient& gradient, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BRect, BGradient&))context->function_table[fill ? 56 : 57])(
-		context->user_data, rect, gradient);
+	if (fill)
+		fCallbacks->fill_rect_gradient(fUserData, rect, gradient);
+	else
+		fCallbacks->stroke_rect_gradient(fUserData, rect, gradient);
 }
 
 
-static void
-draw_round_rect_gradient(void* _context, const BRect& rect, const BPoint& radii, BGradient& gradient,
+void
+CallbackAdapterPlayer::DrawRoundRectGradient(const BRect& rect, const BPoint& radii, BGradient& gradient,
 	bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BRect, BPoint, BGradient&))context->function_table[fill ? 58 : 59])(
-		context->user_data, rect, radii, gradient);
+	if (fill)
+		fCallbacks->fill_round_rect_gradient(fUserData, rect, radii, gradient);
+	else
+		fCallbacks->stroke_round_rect_gradient(fUserData, rect, radii, gradient);
 }
 
 
-static void
-draw_bezier_gradient(void* _context, const BPoint _points[4], BGradient& gradient, bool fill)
+void
+CallbackAdapterPlayer::DrawBezierGradient(const BPoint _points[4], BGradient& gradient, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-
 	BPoint points[4] = { _points[0], _points[1], _points[2], _points[3] };
-	((void (*)(void*, BPoint*, BGradient&))context->function_table[fill ? 60 : 61])(
-		context->user_data, points, gradient);
+
+	if (fill)
+		fCallbacks->fill_bezier_gradient(fUserData, points, gradient);
+	else
+		fCallbacks->stroke_bezier_gradient(fUserData, points, gradient);
 }
 
 
-static void
-draw_arc_gradient(void* _context, const BPoint& center, const BPoint& radii,
+void
+CallbackAdapterPlayer::DrawArcGradient(const BPoint& center, const BPoint& radii,
 	float startTheta, float arcTheta, BGradient& gradient, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BPoint, BPoint, float, float, BGradient&))
-		context->function_table[fill ? 62 : 63])(context->user_data, center,
-			radii, startTheta, arcTheta, gradient);
+	if (fill)
+		fCallbacks->fill_arc_gradient(fUserData, center, radii, startTheta, arcTheta, gradient);
+	else
+		fCallbacks->stroke_arc_gradient(fUserData, center, radii, startTheta, arcTheta, gradient);
 }
 
 
-static void
-draw_ellipse_gradient(void* _context, const BRect& rect, BGradient& gradient, bool fill)
+void
+CallbackAdapterPlayer::DrawEllipseGradient(const BRect& rect, BGradient& gradient, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 	BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
 	BPoint center = rect.LeftTop() + radii;
-	((void (*)(void*, BPoint, BPoint, BGradient&))
-		context->function_table[fill ? 64 : 65])(context->user_data, center,
-			radii, gradient);
+
+	if (fill)
+		fCallbacks->fill_ellipse_gradient(fUserData, center, radii, gradient);
+	else
+		fCallbacks->stroke_ellipse_gradient(fUserData, center, radii, gradient);
 }
 
 
-static void
-draw_polygon_gradient(void* _context, size_t numPoints, const BPoint _points[],
+void
+CallbackAdapterPlayer::DrawPolygonGradient(size_t numPoints, const BPoint _points[],
 	bool isClosed, BGradient& gradient, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-
 	BStackOrHeapArray<BPoint, 200> points(numPoints);
 	if (!points.IsValid())
 		return;
 
 	memcpy((void*)points, _points, numPoints * sizeof(BPoint));
 
-	((void (*)(void*, int32, BPoint*, bool, BGradient&))
-		context->function_table[fill ? 66 : 67])(context->user_data, numPoints,
-			points, isClosed, gradient);
+	if (fill)
+		fCallbacks->fill_polygon_gradient(fUserData, numPoints, points, isClosed, gradient);
+	else
+		fCallbacks->stroke_polygon_gradient(fUserData, numPoints, points, isClosed, gradient);
 }
 
 
-static void
-draw_shape_gradient(void* _context, const BShape& shape, BGradient& gradient, bool fill)
+void
+CallbackAdapterPlayer::DrawShapeGradient(const BShape& shape, BGradient& gradient, bool fill)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BShape, BGradient&))context->function_table[fill ? 68 : 69])(
-		context->user_data, shape, gradient);
+	if (fill)
+		fCallbacks->fill_shape_gradient(fUserData, shape, gradient);
+	else
+		fCallbacks->stroke_shape_gradient(fUserData, shape, gradient);
 }
 
 
-static void
-set_fill_rule(void* _context, int32 fillRule)
+void
+CallbackAdapterPlayer::SetFillRule(int32 fillRule)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, int32))context->function_table[70])(
-		context->user_data, fillRule);
+	fCallbacks->set_fill_rule(fUserData, fillRule);
 }
 
 
-static void
-stroke_line_gradient(void* _context, const BPoint& start, const BPoint& end, const BGradient& gradient)
+void
+CallbackAdapterPlayer::StrokeLineGradient(const BPoint& start, const BPoint& end, const BGradient& gradient)
 {
-	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	((void (*)(void*, BPoint, BPoint, const BGradient&))context->function_table[71])(
-		context->user_data, start, end, gradient);
+	fCallbacks->stroke_line_gradient(fUserData, start, end, gradient);
 }
 
 
@@ -728,65 +737,6 @@ PicturePlayer::~PicturePlayer()
 status_t
 PicturePlayer::Play(void** callBackTable, int32 tableEntries, void* userData)
 {
-	const BPrivate::picture_player_callbacks kAdapterCallbacks = {
-		move_pen_by,
-		stroke_line,
-		draw_rect,
-		draw_round_rect,
-		draw_bezier,
-		draw_arc,
-		draw_ellipse,
-		draw_polygon,
-		draw_shape,
-		draw_string,
-		draw_pixels,
-		draw_picture,
-		set_clipping_rects,
-		clip_to_picture,
-		push_state,
-		pop_state,
-		enter_state_change,
-		exit_state_change,
-		enter_font_state,
-		exit_font_state,
-		set_origin,
-		set_pen_location,
-		set_drawing_mode,
-		set_line_mode,
-		set_pen_size,
-		set_fore_color,
-		set_back_color,
-		set_stipple_pattern,
-		set_scale,
-		set_font_family,
-		set_font_style,
-		set_font_spacing,
-		set_font_size,
-		set_font_rotation,
-		set_font_encoding,
-		set_font_flags,
-		set_font_shear,
-		set_font_face,
-		set_blending_mode,
-		set_transform,
-		translate_by,
-		scale_by,
-		rotate_by,
-		blend_layer,
-		clip_to_rect,
-		clip_to_shape,
-		draw_string_locations,
-		draw_rect_gradient,
-		draw_round_rect_gradient,
-		draw_bezier_gradient,
-		draw_arc_gradient,
-		draw_ellipse_gradient,
-		draw_polygon_gradient,
-		draw_shape_gradient,
-		set_fill_rule,
-		stroke_line_gradient
-	};
-
 	// We don't check if the functions in the table are NULL, but we
 	// check the tableEntries to see if the table is big enough.
 	// If an application supplies the wrong size or an invalid pointer,
@@ -796,27 +746,23 @@ PicturePlayer::Play(void** callBackTable, int32 tableEntries, void* userData)
 	// we use our dummy table, and copy the supported ops from the supplied one.
 	void *dummyTable[kOpsTableSize];
 
-	adapter_context adapterContext;
-	adapterContext.user_data = userData;
-	adapterContext.function_table = callBackTable;
-
 	if ((size_t)tableEntries < kOpsTableSize) {
 		memcpy(dummyTable, callBackTable, tableEntries * sizeof(void*));
 		for (size_t i = (size_t)tableEntries; i < kOpsTableSize; i++)
 			dummyTable[i] = (void*)nop;
 
-		adapterContext.function_table = dummyTable;
+		callBackTable = dummyTable;
 	}
 
-	return _Play(kAdapterCallbacks, &adapterContext, fData, fSize, 0);
+	CallbackAdapterPlayer callbackAdapterPlayer(userData, callBackTable);
+	return _Play(callbackAdapterPlayer, fData, fSize, 0);
 }
 
 
 status_t
-PicturePlayer::Play(const picture_player_callbacks& callbacks,
-	size_t callbacksSize, void* userData)
+PicturePlayer::Play(PicturePlayerCallbacks& callbacks)
 {
-	return _Play(callbacks, userData, fData, fSize, 0);
+	return _Play(callbacks, fData, fSize, 0);
 }
 
 
@@ -888,7 +834,7 @@ struct picture_data_entry_header {
 
 
 status_t
-PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
+PicturePlayer::_Play(PicturePlayerCallbacks& callbacks,
 	const void* buffer, size_t length, uint16 parentOp)
 {
 #if DEBUG
@@ -941,10 +887,10 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			case B_PIC_MOVE_PEN_BY:
 			{
 				const BPoint* where;
-				if (callbacks.move_pen_by == NULL || !reader.Get(where))
+				if (!reader.Get(where))
 					break;
 
-				callbacks.move_pen_by(userData, *where);
+				callbacks.MovePenBy(*where);
 				break;
 			}
 
@@ -952,12 +898,10 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const BPoint* start;
 				const BPoint* end;
-				if (callbacks.stroke_line == NULL || !reader.Get(start)
-					|| !reader.Get(end)) {
+				if (!reader.Get(start) || !reader.Get(end))
 					break;
-				}
 
-				callbacks.stroke_line(userData, *start, *end);
+				callbacks.StrokeLine(*start, *end);
 				break;
 			}
 
@@ -965,11 +909,10 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			case B_PIC_FILL_RECT:
 			{
 				const BRect* rect;
-				if (callbacks.draw_rect == NULL || !reader.Get(rect))
+				if (!reader.Get(rect))
 					break;
 
-				callbacks.draw_rect(userData, *rect,
-					header->op == B_PIC_FILL_RECT);
+				callbacks.DrawRect(*rect, header->op == B_PIC_FILL_RECT);
 				break;
 			}
 
@@ -978,12 +921,10 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const BRect* rect;
 				const BPoint* radii;
-				if (callbacks.draw_round_rect == NULL || !reader.Get(rect)
-					|| !reader.Get(radii)) {
+				if (!reader.Get(rect) || !reader.Get(radii))
 					break;
-				}
 
-				callbacks.draw_round_rect(userData, *rect, *radii,
+				callbacks.DrawRoundRect(*rect, *radii,
 					header->op == B_PIC_FILL_ROUND_RECT);
 				break;
 			}
@@ -993,12 +934,10 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const size_t kNumControlPoints = 4;
 				const BPoint* controlPoints;
-				if (callbacks.draw_bezier == NULL
-					|| !reader.Get(controlPoints, kNumControlPoints)) {
+				if (!reader.Get(controlPoints, kNumControlPoints))
 					break;
-				}
 
-				callbacks.draw_bezier(userData, controlPoints, header->op == B_PIC_FILL_BEZIER);
+				callbacks.DrawBezier(controlPoints, header->op == B_PIC_FILL_BEZIER);
 				break;
 			}
 
@@ -1009,13 +948,13 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const BPoint* radii;
 				const float* startTheta;
 				const float* arcTheta;
-				if (callbacks.draw_arc == NULL || !reader.Get(center)
+				if (!reader.Get(center)
 					|| !reader.Get(radii) || !reader.Get(startTheta)
 					|| !reader.Get(arcTheta)) {
 					break;
 				}
 
-				callbacks.draw_arc(userData, *center, *radii, *startTheta,
+				callbacks.DrawArc(*center, *radii, *startTheta,
 					*arcTheta, header->op == B_PIC_FILL_ARC);
 				break;
 			}
@@ -1024,10 +963,10 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			case B_PIC_FILL_ELLIPSE:
 			{
 				const BRect* rect;
-				if (callbacks.draw_ellipse == NULL || !reader.Get(rect))
+				if (!reader.Get(rect))
 					break;
 
-				callbacks.draw_ellipse(userData, *rect,
+				callbacks.DrawEllipse(*rect,
 					header->op == B_PIC_FILL_ELLIPSE);
 				break;
 			}
@@ -1037,10 +976,8 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const uint32* numPoints;
 				const BPoint* points;
-				if (callbacks.draw_polygon == NULL || !reader.Get(numPoints)
-					|| !reader.Get(points, *numPoints)) {
+				if (!reader.Get(numPoints) || !reader.Get(points, *numPoints))
 					break;
-				}
 
 				bool isClosed = true;
 				const bool* closedPointer;
@@ -1051,7 +988,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 					isClosed = *closedPointer;
 				}
 
-				callbacks.draw_polygon(userData, *numPoints, points, isClosed,
+				callbacks.DrawPolygon(*numPoints, points, isClosed,
 					header->op == B_PIC_FILL_POLYGON);
 				break;
 			}
@@ -1063,7 +1000,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const uint32* pointCount;
 				const uint32* opList;
 				const BPoint* pointList;
-				if (callbacks.draw_shape == NULL || !reader.Get(opCount)
+				if (!reader.Get(opCount)
 					|| !reader.Get(pointCount) || !reader.Get(opList, *opCount)
 					|| !reader.Get(pointList, *pointCount)) {
 					break;
@@ -1073,8 +1010,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				BShape shape;
 				BShape::Private(shape).SetData(*opCount, *pointCount, opList, pointList);
 
-				callbacks.draw_shape(userData, shape,
-					header->op == B_PIC_FILL_SHAPE);
+				callbacks.DrawShape(shape, header->op == B_PIC_FILL_SHAPE);
 				break;
 			}
 
@@ -1083,11 +1019,11 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const BRect* rect;
 				BGradient* gradient;
-				if (callbacks.draw_rect_gradient == NULL || !reader.Get(rect) || !reader.GetGradient(gradient))
+				if (!reader.Get(rect) || !reader.GetGradient(gradient))
 					break;
 				ObjectDeleter<BGradient> gradientDeleter(gradient);
 
-				callbacks.draw_rect_gradient(userData, *rect, *gradient,
+				callbacks.DrawRectGradient(*rect, *gradient,
 					header->op == B_PIC_FILL_RECT_GRADIENT);
 				break;
 			}
@@ -1098,13 +1034,13 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const BRect* rect;
 				const BPoint* radii;
 				BGradient* gradient;
-				if (callbacks.draw_round_rect_gradient == NULL || !reader.Get(rect)
+				if (!reader.Get(rect)
 					|| !reader.Get(radii) || !reader.GetGradient(gradient)) {
 					break;
 				}
 				ObjectDeleter<BGradient> gradientDeleter(gradient);
 
-				callbacks.draw_round_rect_gradient(userData, *rect, *radii, *gradient,
+				callbacks.DrawRoundRectGradient(*rect, *radii, *gradient,
 					header->op == B_PIC_FILL_ROUND_RECT_GRADIENT);
 				break;
 			}
@@ -1115,13 +1051,11 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const size_t kNumControlPoints = 4;
 				const BPoint* controlPoints;
 				BGradient* gradient;
-				if (callbacks.draw_bezier_gradient == NULL
-					|| !reader.Get(controlPoints, kNumControlPoints) || !reader.GetGradient(gradient)) {
+				if (!reader.Get(controlPoints, kNumControlPoints) || !reader.GetGradient(gradient))
 					break;
-				}
 				ObjectDeleter<BGradient> gradientDeleter(gradient);
 
-				callbacks.draw_bezier_gradient(userData, controlPoints, *gradient,
+				callbacks.DrawBezierGradient(controlPoints, *gradient,
 					header->op == B_PIC_FILL_BEZIER_GRADIENT);
 				break;
 			}
@@ -1132,10 +1066,8 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const uint32* numPoints;
 				const BPoint* points;
 				BGradient* gradient;
-				if (callbacks.draw_polygon_gradient == NULL || !reader.Get(numPoints)
-					|| !reader.Get(points, *numPoints)) {
+				if (!reader.Get(numPoints) || !reader.Get(points, *numPoints))
 					break;
-				}
 
 				bool isClosed = true;
 				const bool* closedPointer;
@@ -1150,7 +1082,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 					break;
 				ObjectDeleter<BGradient> gradientDeleter(gradient);
 
-				callbacks.draw_polygon_gradient(userData, *numPoints, points, isClosed, *gradient,
+				callbacks.DrawPolygonGradient(*numPoints, points, isClosed, *gradient,
 					header->op == B_PIC_FILL_POLYGON_GRADIENT);
 				break;
 			}
@@ -1163,7 +1095,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const uint32* opList;
 				const BPoint* pointList;
 				BGradient* gradient;
-				if (callbacks.draw_shape_gradient == NULL || !reader.Get(opCount)
+				if (!reader.Get(opCount)
 					|| !reader.Get(pointCount) || !reader.Get(opList, *opCount)
 					|| !reader.Get(pointList, *pointCount) || !reader.GetGradient(gradient)) {
 					break;
@@ -1174,7 +1106,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				BShape shape;
 				BShape::Private(shape).SetData(*opCount, *pointCount, opList, pointList);
 
-				callbacks.draw_shape_gradient(userData, shape, *gradient,
+				callbacks.DrawShapeGradient(shape, *gradient,
 					header->op == B_PIC_FILL_SHAPE_GRADIENT);
 				break;
 			}
@@ -1187,14 +1119,14 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const float* startTheta;
 				const float* arcTheta;
 				BGradient* gradient;
-				if (callbacks.draw_arc_gradient == NULL || !reader.Get(center)
+				if (!reader.Get(center)
 					|| !reader.Get(radii) || !reader.Get(startTheta)
 					|| !reader.Get(arcTheta) || !reader.GetGradient(gradient)) {
 					break;
 				}
 				ObjectDeleter<BGradient> gradientDeleter(gradient);
 
-				callbacks.draw_arc_gradient(userData, *center, *radii, *startTheta,
+				callbacks.DrawArcGradient(*center, *radii, *startTheta,
 					*arcTheta, *gradient, header->op == B_PIC_FILL_ARC_GRADIENT);
 				break;
 			}
@@ -1204,11 +1136,11 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const BRect* rect;
 				BGradient* gradient;
-				if (callbacks.draw_ellipse_gradient == NULL || !reader.Get(rect) || !reader.GetGradient(gradient))
+				if (!reader.Get(rect) || !reader.GetGradient(gradient))
 					break;
 				ObjectDeleter<BGradient> gradientDeleter(gradient);
 
-				callbacks.draw_ellipse_gradient(userData, *rect, *gradient,
+				callbacks.DrawEllipseGradient(*rect, *gradient,
 					header->op == B_PIC_FILL_ELLIPSE_GRADIENT);
 				break;
 			}
@@ -1218,12 +1150,12 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const BPoint* start;
 				const BPoint* end;
 				BGradient* gradient;
-				if (callbacks.stroke_line_gradient == NULL || !reader.Get(start)
+				if (!reader.Get(start)
 					|| !reader.Get(end) || !reader.GetGradient(gradient)) {
 					break;
 				}
 
-				callbacks.stroke_line_gradient(userData, *start, *end, *gradient);
+				callbacks.StrokeLineGradient(*start, *end, *gradient);
 				break;
 			}
 
@@ -1233,15 +1165,14 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const char* string;
 				const float* escapementSpace;
 				const float* escapementNonSpace;
-				if (callbacks.draw_string == NULL
-					|| !reader.Get(length)
+				if (!reader.Get(length)
 					|| !reader.Get(string, *length)
 					|| !reader.Get(escapementSpace)
 					|| !reader.Get(escapementNonSpace)) {
 					break;
 				}
 
-				callbacks.draw_string(userData, string, *length,
+				callbacks.DrawString(string, *length,
 					*escapementSpace, *escapementNonSpace);
 				break;
 			}
@@ -1252,15 +1183,14 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const BPoint* pointList;
 				const int32* length;
 				const char* string;
-				if (callbacks.draw_string_locations == NULL
-					|| !reader.Get(pointCount)
+				if (!reader.Get(pointCount)
 					|| !reader.Get(pointList, *pointCount)
 					|| !reader.Get(length)
 					|| !reader.Get(string, *length)) {
 					break;
 				}
 
-				callbacks.draw_string_locations(userData, string, *length,
+				callbacks.DrawStringLocations(string, *length,
 					pointList, *pointCount);
 				break;
 			}
@@ -1276,7 +1206,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const uint32* flags;
 				const void* data;
 				size_t length;
-				if (callbacks.draw_pixels == NULL || !reader.Get(sourceRect)
+				if (!reader.Get(sourceRect)
 					|| !reader.Get(destinationRect) || !reader.Get(width)
 					|| !reader.Get(height) || !reader.Get(bytesPerRow)
 					|| !reader.Get(colorSpace) || !reader.Get(flags)
@@ -1284,7 +1214,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 					break;
 				}
 
-				callbacks.draw_pixels(userData, *sourceRect, *destinationRect,
+				callbacks.DrawPixels(*sourceRect, *destinationRect,
 					*width, *height, *bytesPerRow, (color_space)*colorSpace,
 					*flags, data, length);
 				break;
@@ -1294,20 +1224,15 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const BPoint* where;
 				const int32* token;
-				if (callbacks.draw_picture == NULL || !reader.Get(where)
-					|| !reader.Get(token)) {
+				if (!reader.Get(where) || !reader.Get(token))
 					break;
-				}
 
-				callbacks.draw_picture(userData, *where, *token);
+				callbacks.DrawPicture(*where, *token);
 				break;
 			}
 
 			case B_PIC_SET_CLIPPING_RECTS:
 			{
-				if (callbacks.set_clipping_rects == NULL)
-					break;
-
 				const clipping_rect* frame;
 				if (!reader.Get(frame))
 					break;
@@ -1318,16 +1243,13 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				if (!reader.Get(rects, numRects))
 					break;
 
-				callbacks.set_clipping_rects(userData, numRects, rects);
+				callbacks.SetClippingRects(numRects, rects);
 				break;
 			}
 
 			case B_PIC_CLEAR_CLIPPING_RECTS:
 			{
-				if (callbacks.set_clipping_rects == NULL)
-					break;
-
-				callbacks.set_clipping_rects(userData, 0, NULL);
+				callbacks.SetClippingRects(0, NULL);
 				break;
 			}
 
@@ -1336,29 +1258,23 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const int32* token;
 				const BPoint* where;
 				const bool* inverse;
-				if (callbacks.clip_to_picture == NULL || !reader.Get(token)
+				if (!reader.Get(token)
 					|| !reader.Get(where) || !reader.Get(inverse))
 					break;
 
-				callbacks.clip_to_picture(userData, *token, *where, *inverse);
+				callbacks.ClipToPicture(*token, *where, *inverse);
 				break;
 			}
 
 			case B_PIC_PUSH_STATE:
 			{
-				if (callbacks.push_state == NULL)
-					break;
-
-				callbacks.push_state(userData);
+				callbacks.PushState();
 				break;
 			}
 
 			case B_PIC_POP_STATE:
 			{
-				if (callbacks.pop_state == NULL)
-					break;
-
-				callbacks.pop_state(userData);
+				callbacks.PopState();
 				break;
 			}
 
@@ -1370,22 +1286,20 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				if (!reader.GetRemaining(data, length))
 					break;
 
-				if (header->op == B_PIC_ENTER_STATE_CHANGE) {
-					if (callbacks.enter_state_change != NULL)
-						callbacks.enter_state_change(userData);
-				} else if (callbacks.enter_font_state != NULL)
-					callbacks.enter_font_state(userData);
+				if (header->op == B_PIC_ENTER_STATE_CHANGE)
+					callbacks.EnterStateChange();
+				else
+					callbacks.EnterFontState();
 
-				status_t result = _Play(callbacks, userData, data, length,
+				status_t result = _Play(callbacks, data, length,
 					header->op);
 				if (result != B_OK)
 					return result;
 
-				if (header->op == B_PIC_ENTER_STATE_CHANGE) {
-					if (callbacks.exit_state_change != NULL)
-						callbacks.exit_state_change(userData);
-				} else if (callbacks.exit_font_state != NULL)
-					callbacks.exit_font_state(userData);
+				if (header->op == B_PIC_ENTER_STATE_CHANGE)
+					callbacks.ExitStateChange();
+				else
+					callbacks.ExitFontState();
 
 				break;
 			}
@@ -1393,30 +1307,30 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			case B_PIC_SET_ORIGIN:
 			{
 				const BPoint* origin;
-				if (callbacks.set_origin == NULL || !reader.Get(origin))
+				if (!reader.Get(origin))
 					break;
 
-				callbacks.set_origin(userData, *origin);
+				callbacks.SetOrigin(*origin);
 				break;
 			}
 
 			case B_PIC_SET_PEN_LOCATION:
 			{
 				const BPoint* location;
-				if (callbacks.set_pen_location == NULL || !reader.Get(location))
+				if (!reader.Get(location))
 					break;
 
-				callbacks.set_pen_location(userData, *location);
+				callbacks.SetPenLocation(*location);
 				break;
 			}
 
 			case B_PIC_SET_DRAWING_MODE:
 			{
 				const uint16* mode;
-				if (callbacks.set_drawing_mode == NULL || !reader.Get(mode))
+				if (!reader.Get(mode))
 					break;
 
-				callbacks.set_drawing_mode(userData, (drawing_mode)*mode);
+				callbacks.SetDrawingMode((drawing_mode)*mode);
 				break;
 			}
 
@@ -1425,12 +1339,12 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const uint16* capMode;
 				const uint16* joinMode;
 				const float* miterLimit;
-				if (callbacks.set_line_mode == NULL || !reader.Get(capMode)
+				if (!reader.Get(capMode)
 					|| !reader.Get(joinMode) || !reader.Get(miterLimit)) {
 					break;
 				}
 
-				callbacks.set_line_mode(userData, (cap_mode)*capMode,
+				callbacks.SetLineMode((cap_mode)*capMode,
 					(join_mode)*joinMode, *miterLimit);
 				break;
 			}
@@ -1438,52 +1352,51 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			case B_PIC_SET_PEN_SIZE:
 			{
 				const float* penSize;
-				if (callbacks.set_pen_size == NULL || !reader.Get(penSize))
+				if (!reader.Get(penSize))
 					break;
 
-				callbacks.set_pen_size(userData, *penSize);
+				callbacks.SetPenSize(*penSize);
 				break;
 			}
 
 			case B_PIC_SET_FORE_COLOR:
 			{
 				const rgb_color* color;
-				if (callbacks.set_fore_color == NULL || !reader.Get(color))
+				if (!reader.Get(color))
 					break;
 
-				callbacks.set_fore_color(userData, *color);
+				callbacks.SetForeColor(*color);
 				break;
 			}
 
 			case B_PIC_SET_BACK_COLOR:
 			{
 				const rgb_color* color;
-				if (callbacks.set_back_color == NULL || !reader.Get(color))
+				if (!reader.Get(color))
 					break;
 
-				callbacks.set_back_color(userData, *color);
+				callbacks.SetBackColor(*color);
 				break;
 			}
 
 			case B_PIC_SET_STIPLE_PATTERN:
 			{
 				const pattern* stipplePattern;
-				if (callbacks.set_stipple_pattern == NULL
-					|| !reader.Get(stipplePattern)) {
+				if (!reader.Get(stipplePattern)) {
 					break;
 				}
 
-				callbacks.set_stipple_pattern(userData, *stipplePattern);
+				callbacks.SetStipplePattern(*stipplePattern);
 				break;
 			}
 
 			case B_PIC_SET_SCALE:
 			{
 				const float* scale;
-				if (callbacks.set_scale == NULL || !reader.Get(scale))
+				if (!reader.Get(scale))
 					break;
 
-				callbacks.set_scale(userData, *scale);
+				callbacks.SetScale(*scale);
 				break;
 			}
 
@@ -1491,13 +1404,12 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const int32* length;
 				const char* family;
-				if (callbacks.set_font_family == NULL
-					|| !reader.Get(length)
+				if (!reader.Get(length)
 					|| !reader.Get(family, *length)) {
 					break;
 				}
 
-				callbacks.set_font_family(userData, family, *length);
+				callbacks.SetFontFamily(family, *length);
 				break;
 			}
 
@@ -1505,87 +1417,82 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const int32* length;
 				const char* style;
-				if (callbacks.set_font_style == NULL
-					|| !reader.Get(length)
+				if (!reader.Get(length)
 					|| !reader.Get(style, *length)) {
 					break;
 				}
 
-				callbacks.set_font_style(userData, style, *length);
+				callbacks.SetFontStyle(style, *length);
 				break;
 			}
 
 			case B_PIC_SET_FONT_SPACING:
 			{
 				const uint32* spacing;
-				if (callbacks.set_font_spacing == NULL || !reader.Get(spacing))
+				if (!reader.Get(spacing))
 					break;
 
-				callbacks.set_font_spacing(userData, *spacing);
+				callbacks.SetFontSpacing(*spacing);
 				break;
 			}
 
 			case B_PIC_SET_FONT_SIZE:
 			{
 				const float* size;
-				if (callbacks.set_font_size == NULL || !reader.Get(size))
+				if (!reader.Get(size))
 					break;
 
-				callbacks.set_font_size(userData, *size);
+				callbacks.SetFontSize(*size);
 				break;
 			}
 
 			case B_PIC_SET_FONT_ROTATE:
 			{
 				const float* rotation;
-				if (callbacks.set_font_rotation == NULL
-					|| !reader.Get(rotation)) {
+				if (!reader.Get(rotation))
 					break;
-				}
 
-				callbacks.set_font_rotation(userData, *rotation);
+				callbacks.SetFontRotation(*rotation);
 				break;
 			}
 
 			case B_PIC_SET_FONT_ENCODING:
 			{
 				const uint32* encoding;
-				if (callbacks.set_font_encoding == NULL
-					|| !reader.Get(encoding)) {
+				if (!reader.Get(encoding))
 					break;
-				}
 
-				callbacks.set_font_encoding(userData, *encoding);
+				callbacks.SetFontEncoding(*encoding);
 				break;
 			}
 
 			case B_PIC_SET_FONT_FLAGS:
 			{
 				const uint32* flags;
-				if (callbacks.set_font_flags == NULL || !reader.Get(flags))
+				if (!reader.Get(flags))
 					break;
 
-				callbacks.set_font_flags(userData, *flags);
+				callbacks.SetFontFlags(*flags);
 				break;
 			}
 
 			case B_PIC_SET_FONT_SHEAR:
 			{
 				const float* shear;
-				if (callbacks.set_font_shear == NULL || !reader.Get(shear))
+				if (!reader.Get(shear))
 					break;
 
-				callbacks.set_font_shear(userData, *shear);
+				callbacks.SetFontShear(*shear);
 				break;
 			}
 
 			case B_PIC_SET_FONT_FACE:
 			{
 				const uint32* face;
-				if (callbacks.set_font_face == NULL || !reader.Get(face))
+				if (!reader.Get(face))
 					break;
 
-				callbacks.set_font_face(userData, *face);
+				callbacks.SetFontFace(*face);
 				break;
 			}
 
@@ -1593,13 +1500,12 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const uint16* alphaSourceMode;
 				const uint16* alphaFunctionMode;
-				if (callbacks.set_blending_mode == NULL
-					|| !reader.Get(alphaSourceMode)
+				if (!reader.Get(alphaSourceMode)
 					|| !reader.Get(alphaFunctionMode)) {
 					break;
 				}
 
-				callbacks.set_blending_mode(userData,
+				callbacks.SetBlendingMode(
 					(source_alpha)*alphaSourceMode,
 					(alpha_function)*alphaFunctionMode);
 				break;
@@ -1608,22 +1514,20 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			case B_PIC_SET_FILL_RULE:
 			{
 				const uint32* fillRule;
-				if (callbacks.set_fill_rule == NULL
-					|| !reader.Get(fillRule)) {
+				if (!reader.Get(fillRule))
 					break;
-				}
 
-				callbacks.set_fill_rule(userData, *fillRule);
+				callbacks.SetFillRule(*fillRule);
 				break;
 			}
 
 			case B_PIC_SET_TRANSFORM:
 			{
 				const BAffineTransform* transform;
-				if (callbacks.set_transform == NULL || !reader.Get(transform))
+				if (!reader.Get(transform))
 					break;
 
-				callbacks.set_transform(userData, *transform);
+				callbacks.SetTransform(*transform);
 				break;
 			}
 
@@ -1631,12 +1535,10 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const double* x;
 				const double* y;
-				if (callbacks.translate_by == NULL || !reader.Get(x)
-					|| !reader.Get(y)) {
+				if (!reader.Get(x) || !reader.Get(y))
 					break;
-				}
 
-				callbacks.translate_by(userData, *x, *y);
+				callbacks.TranslateBy(*x, *y);
 				break;
 			}
 
@@ -1644,32 +1546,30 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 			{
 				const double* x;
 				const double* y;
-				if (callbacks.scale_by == NULL || !reader.Get(x)
-					|| !reader.Get(y)) {
+				if (!reader.Get(x) || !reader.Get(y))
 					break;
-				}
 
-				callbacks.scale_by(userData, *x, *y);
+				callbacks.ScaleBy(*x, *y);
 				break;
 			}
 
 			case B_PIC_AFFINE_ROTATE:
 			{
 				const double* angleRadians;
-				if (callbacks.rotate_by == NULL || !reader.Get(angleRadians))
+				if (!reader.Get(angleRadians))
 					break;
 
-				callbacks.rotate_by(userData, *angleRadians);
+				callbacks.RotateBy(*angleRadians);
 				break;
 			}
 
 			case B_PIC_BLEND_LAYER:
 			{
 				Layer* const* layer;
-				if (callbacks.blend_layer == NULL || !reader.Get<Layer*>(layer))
+				if (!reader.Get<Layer*>(layer))
 					break;
 
-				callbacks.blend_layer(userData, *layer);
+				callbacks.BlendLayer(*layer);
 				break;
 			}
 
@@ -1678,12 +1578,10 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const bool* inverse;
 				const BRect* rect;
 
-				if (callbacks.clip_to_rect == NULL || !reader.Get(inverse)
-					|| !reader.Get(rect)) {
+				if (!reader.Get(inverse) || !reader.Get(rect))
 					break;
-				}
 
-				callbacks.clip_to_rect(userData, *rect, *inverse);
+				callbacks.ClipToRect(*rect, *inverse);
 				break;
 			}
 
@@ -1694,14 +1592,14 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				const uint32* pointCount;
 				const uint32* opList;
 				const BPoint* pointList;
-				if (callbacks.clip_to_shape == NULL || !reader.Get(inverse)
+				if (!reader.Get(inverse)
 					|| !reader.Get(opCount) || !reader.Get(pointCount)
 					|| !reader.Get(opList, *opCount)
 					|| !reader.Get(pointList, *pointCount)) {
 					break;
 				}
 
-				callbacks.clip_to_shape(userData, *opCount, opList,
+				callbacks.ClipToShape(*opCount, opList,
 					*pointCount, pointList, *inverse);
 				break;
 			}

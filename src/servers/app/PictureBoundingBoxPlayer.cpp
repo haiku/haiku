@@ -142,6 +142,71 @@ private:
 // #pragma mark - Picture playback hooks
 
 
+class BoundingBoxCallbacks: public BPrivate::PicturePlayerCallbacks {
+public:
+	BoundingBoxCallbacks(BoundingBoxState* const state);
+
+	virtual void MovePenBy(const BPoint& where);
+	virtual void StrokeLine(const BPoint& start, const BPoint& end);
+	virtual void DrawRect(const BRect& rect, bool fill);
+	virtual void DrawRoundRect(const BRect& rect, const BPoint& radii, bool fill);
+	virtual void DrawBezier(const BPoint controlPoints[4], bool fill);
+	virtual void DrawArc(const BPoint& center, const BPoint& radii, float startTheta,
+		float arcTheta, bool fill);
+	virtual void DrawEllipse(const BRect& rect, bool fill);
+	virtual void DrawPolygon(size_t numPoints, const BPoint points[], bool isClosed, bool fill);
+	virtual void DrawShape(const BShape& shape, bool fill);
+	virtual void DrawString(const char* string, size_t length, float spaceEscapement,
+		float nonSpaceEscapement);
+	virtual void DrawPixels(const BRect& source, const BRect& destination, uint32 width,
+		uint32 height, size_t bytesPerRow, color_space pixelFormat, uint32 flags, const void* data,
+		size_t length);
+	virtual void DrawPicture(const BPoint& where, int32 token);
+	virtual void SetClippingRects(size_t numRects, const clipping_rect rects[]);
+	virtual void ClipToPicture(int32 token, const BPoint& where, bool clipToInverse);
+	virtual void PushState();
+	virtual void PopState();
+	virtual void EnterStateChange();
+	virtual void ExitStateChange();
+	virtual void EnterFontState();
+	virtual void ExitFontState();
+	virtual void SetOrigin(const BPoint& origin);
+	virtual void SetPenLocation(const BPoint& location);
+	virtual void SetDrawingMode(drawing_mode mode);
+	virtual void SetLineMode(cap_mode capMode, join_mode joinMode, float miterLimit);
+	virtual void SetPenSize(float size);
+	virtual void SetForeColor(const rgb_color& color);
+	virtual void SetBackColor(const rgb_color& color);
+	virtual void SetStipplePattern(const pattern& patter);
+	virtual void SetScale(float scale);
+	virtual void SetFontFamily(const char* familyName, size_t length);
+	virtual void SetFontStyle(const char* styleName, size_t length);
+	virtual void SetFontSpacing(uint8 spacing);
+	virtual void SetFontSize(float size);
+	virtual void SetFontRotation(float rotation);
+	virtual void SetFontEncoding(uint8 encoding);
+	virtual void SetFontFlags(uint32 flags);
+	virtual void SetFontShear(float shear);
+	virtual void SetFontFace(uint16 face);
+	virtual void SetBlendingMode(source_alpha alphaSourceMode, alpha_function alphaFunctionMode);
+	virtual void SetTransform(const BAffineTransform& transform);
+	virtual void TranslateBy(double x, double y);
+	virtual void ScaleBy(double x, double y);
+	virtual void RotateBy(double angleRadians);
+	virtual void BlendLayer(Layer* layer);
+
+private:
+	BoundingBoxState* const fState;
+};
+
+
+BoundingBoxCallbacks::BoundingBoxCallbacks(BoundingBoxState* const state)
+	:
+	fState(state)
+{
+}
+
+
 static void
 get_polygon_frame(const BPoint* points, int32 numPoints, BRect* frame)
 {
@@ -180,31 +245,27 @@ expand_rect_for_pen_size(BoundingBoxState* state, RectType& rect)
 }
 
 
-static void
-move_pen_by(void* _state, const BPoint& delta)
+void
+BoundingBoxCallbacks::MovePenBy(const BPoint& delta)
 {
 	TRACE_BB("%p move pen by %.2f %.2f\n", _state, delta.x, delta.y);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
 
-	state->GetDrawState()->SetPenLocation(
-		state->GetDrawState()->PenLocation() + delta);
+	fState->GetDrawState()->SetPenLocation(
+		fState->GetDrawState()->PenLocation() + delta);
 }
 
 
-static void
-determine_bounds_stroke_line(void* _state, const BPoint& _start,
+void
+BoundingBoxCallbacks::StrokeLine(const BPoint& _start,
 	const BPoint& _end)
 {
 	TRACE_BB("%p stroke line %.2f %.2f -> %.2f %.2f\n", _state,
 		_start.x, _start.y, _end.x, _end.y);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
 
 	BPoint start = _start;
 	BPoint end = _end;
 
-	const SimpleTransform transform = state->PenToLocalTransform();
+	const SimpleTransform transform = fState->PenToLocalTransform();
 	transform.Apply(&start);
 	transform.Apply(&end);
 
@@ -224,34 +285,32 @@ determine_bounds_stroke_line(void* _state, const BPoint& _start,
 		rect.bottom = start.y;
 	}
 
-	expand_rect_for_pen_size(state, rect);
-	state->IncludeRect(rect);
+	expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
 
-	state->GetDrawState()->SetPenLocation(_end);
+	fState->GetDrawState()->SetPenLocation(_end);
 }
 
 
-static void
-determine_bounds_draw_rect(void* _state, const BRect& _rect, bool fill)
+void
+BoundingBoxCallbacks::DrawRect(const BRect& _rect, bool fill)
 {
 	TRACE_BB("%p draw rect fill=%d %.2f %.2f %.2f %.2f\n", _state, fill,
 		_rect.left, _rect.top, _rect.right, _rect.bottom);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
 
 	BRect rect = _rect;
-	state->PenToLocalTransform().Apply(&rect);
+	fState->PenToLocalTransform().Apply(&rect);
 	if (!fill)
-		expand_rect_for_pen_size(state, rect);
-	state->IncludeRect(rect);
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
 }
 
 
-static void
-determine_bounds_draw_round_rect(void* _state, const BRect& _rect,
+void
+BoundingBoxCallbacks::DrawRoundRect(const BRect& _rect,
 	const BPoint&, bool fill)
 {
-	determine_bounds_draw_rect(_state, _rect, fill);
+	DrawRect(_rect, fill);
 }
 
 
@@ -280,9 +339,8 @@ determine_bounds_bezier(BoundingBoxState* state, const BPoint viewPoints[4],
 }
 
 
-static void
-determine_bounds_draw_bezier(void* _state,
-	const BPoint viewPoints[4], bool fill)
+void
+BoundingBoxCallbacks::DrawBezier(const BPoint viewPoints[4], bool fill)
 {
 	TRACE_BB("%p draw bezier fill=%d (%.2f %.2f) (%.2f %.2f) "
 		"(%.2f %.2f) (%.2f %.2f)\n",
@@ -292,40 +350,36 @@ determine_bounds_draw_bezier(void* _state,
 		viewPoints[1].x, viewPoints[1].y,
 		viewPoints[2].x, viewPoints[2].y,
 		viewPoints[3].x, viewPoints[3].y);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
 
 	BRect rect;
-	determine_bounds_bezier(state, viewPoints, rect);
+	determine_bounds_bezier(fState, viewPoints, rect);
 	if (!fill)
-		expand_rect_for_pen_size(state, rect);
-	state->IncludeRect(rect);
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
 }
 
 
-static void
-determine_bounds_draw_ellipse(void* _state, const BRect& _rect, bool fill)
+void
+BoundingBoxCallbacks::DrawEllipse(const BRect& _rect, bool fill)
 {
 	TRACE_BB("%p draw ellipse fill=%d (%.2f %.2f) (%.2f %.2f)\n", _state, fill,
 		_rect.left, _rect.top, _rect.right, _rect.bottom);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
 
 	BRect rect = _rect;
-	state->PenToLocalTransform().Apply(&rect);
+	fState->PenToLocalTransform().Apply(&rect);
 	if (!fill)
-		expand_rect_for_pen_size(state, rect);
-	state->IncludeRect(rect);
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
 }
 
 
-static void
-determine_bounds_draw_arc(void* _state, const BPoint& center,
+void
+BoundingBoxCallbacks::DrawArc(const BPoint& center,
 	const BPoint& radii, float, float, bool fill)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
-	determine_bounds_draw_ellipse(_state, rect, fill);
+	DrawEllipse(rect, fill);
 }
 
 
@@ -361,479 +415,358 @@ determine_bounds_polygon(BoundingBoxState* state, int32 numPoints,
 
 
 void
-determine_bounds_draw_polygon(void* _state, size_t numPoints,
+BoundingBoxCallbacks::DrawPolygon(size_t numPoints,
 	const BPoint viewPoints[], bool, bool fill)
 {
-	TRACE_BB("%p draw polygon fill=%d (%ld points)\n", _state, fill, numPoints);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
+	TRACE_BB("%p draw polygon fill=%d (%ld points)\n", fState, fill, numPoints);
 
 	BRect rect;
-	determine_bounds_polygon(state, numPoints, viewPoints, rect);
+	determine_bounds_polygon(fState, numPoints, viewPoints, rect);
 	if (!fill)
-		expand_rect_for_pen_size(state, rect);
-	state->IncludeRect(rect);
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
 }
 
 
-static void
-determine_bounds_draw_shape(void* _state, const BShape& shape, bool fill)
+void
+BoundingBoxCallbacks::DrawShape(const BShape& shape, bool fill)
 {
 	BRect rect = shape.Bounds();
 
-	TRACE_BB("%p stroke shape (bounds %.2f %.2f %.2f %.2f)\n", _state,
+	TRACE_BB("%p stroke shape (bounds %.2f %.2f %.2f %.2f)\n", fState,
 		rect.left, rect.top, rect.right, rect.bottom);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
 
-	state->PenToLocalTransform().Apply(&rect);
+	fState->PenToLocalTransform().Apply(&rect);
 	if (!fill)
-		expand_rect_for_pen_size(state, rect);
-	state->IncludeRect(rect);
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
 }
 
 
-static void
-determine_bounds_draw_string(void* _state, const char* string, size_t length,
+void
+BoundingBoxCallbacks::DrawString(const char* string, size_t length,
 	float deltaSpace, float deltaNonSpace)
 {
-	TRACE_BB("%p string '%s'\n", _state, string);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
+	TRACE_BB("%p string '%s'\n", fState, string);
 
-	ServerFont font = state->GetDrawState()->Font();
+	ServerFont font = fState->GetDrawState()->Font();
 
 	escapement_delta delta = { deltaSpace, deltaNonSpace };
 	BRect rect;
 	font.GetBoundingBoxesForStrings((char**)&string, &length, 1, &rect,
 		B_SCREEN_METRIC, &delta);
 
-	BPoint location = state->GetDrawState()->PenLocation();
+	BPoint location = fState->GetDrawState()->PenLocation();
 
-	state->PenToLocalTransform().Apply(&location);
+	fState->PenToLocalTransform().Apply(&location);
 	rect.OffsetBy(location);
-	state->IncludeRect(rect);
+	fState->IncludeRect(rect);
 
-	state->PenToLocalTransform().Apply(&location);
-	state->GetDrawState()->SetPenLocation(location);
+	fState->PenToLocalTransform().Apply(&location);
+	fState->GetDrawState()->SetPenLocation(location);
 }
 
 
-static void
-determine_bounds_draw_pixels(void* _state, const BRect&, const BRect& _dest,
+void
+BoundingBoxCallbacks::DrawPixels(const BRect&, const BRect& _dest,
 	uint32, uint32, size_t, color_space, uint32, const void*, size_t)
 {
-	TRACE_BB("%p pixels (dest %.2f %.2f %.2f %.2f)\n", _state,
+	TRACE_BB("%p pixels (dest %.2f %.2f %.2f %.2f)\n", fState,
 		_dest.left, _dest.top, _dest.right, _dest.bottom);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
 
 	BRect dest = _dest;
-	state->PenToLocalTransform().Apply(&dest);
-	state->IncludeRect(dest);
+	fState->PenToLocalTransform().Apply(&dest);
+	fState->IncludeRect(dest);
 }
 
 
-static void
-draw_picture(void* _state, const BPoint& where, int32 token)
+void
+BoundingBoxCallbacks::DrawPicture(const BPoint& where, int32 token)
 {
-	TRACE_BB("%p picture (unimplemented)\n", _state);
+	TRACE_BB("%p picture (unimplemented)\n", fState);
 
 	// TODO
-	(void)_state;
 	(void)where;
 	(void)token;
 }
 
 
-static void
-set_clipping_rects(void* _state, size_t numRects, const clipping_rect rects[])
+void
+BoundingBoxCallbacks::SetClippingRects(size_t numRects, const clipping_rect rects[])
 {
-	TRACE_BB("%p cliping rects (%ld rects)\n", _state, numRects);
+	TRACE_BB("%p cliping rects (%ld rects)\n", fState, numRects);
 
 	// TODO
-	(void)_state;
 	(void)rects;
 	(void)numRects;
 }
 
 
-static void
-clip_to_picture(void* _state, int32 pictureToken, const BPoint& where,
+void
+BoundingBoxCallbacks::ClipToPicture(int32 pictureToken, const BPoint& where,
 	bool clipToInverse)
 {
-	TRACE_BB("%p clip to picture (unimplemented)\n", _state);
+	TRACE_BB("%p clip to picture (unimplemented)\n", fState);
 
 	// TODO
 }
 
 
-static void
-push_state(void* _state)
+void
+BoundingBoxCallbacks::PushState()
 {
-	TRACE_BB("%p push state\n", _state);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
+	TRACE_BB("%p push state\n", fState);
 
-	state->PushDrawState();
+	fState->PushDrawState();
 }
 
 
-static void
-pop_state(void* _state)
+void
+BoundingBoxCallbacks::PopState()
 {
-	TRACE_BB("%p pop state\n", _state);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
+	TRACE_BB("%p pop state\n", fState);
 
-	state->PopDrawState();
+	fState->PopDrawState();
 }
 
 
-static void
-enter_state_change(void*)
+void
+BoundingBoxCallbacks::EnterStateChange()
 {
 }
 
 
-static void
-exit_state_change(void*)
+void
+BoundingBoxCallbacks::ExitStateChange()
 {
 }
 
 
-static void
-enter_font_state(void*)
+void
+BoundingBoxCallbacks::EnterFontState()
 {
 }
 
 
-static void
-exit_font_state(void*)
+void
+BoundingBoxCallbacks::ExitFontState()
 {
 }
 
 
-static void
-set_origin(void* _state, const BPoint& pt)
+void
+BoundingBoxCallbacks::SetOrigin(const BPoint& pt)
 {
-	TRACE_BB("%p set origin %.2f %.2f\n", _state, pt.x, pt.y);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-	state->GetDrawState()->SetOrigin(pt);
+	TRACE_BB("%p set origin %.2f %.2f\n", , pt.x, pt.y);
+	fState->GetDrawState()->SetOrigin(pt);
 }
 
 
-static void
-set_pen_location(void* _state, const BPoint& pt)
+void
+BoundingBoxCallbacks::SetPenLocation(const BPoint& pt)
 {
-	TRACE_BB("%p set pen location %.2f %.2f\n", _state, pt.x, pt.y);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-	state->GetDrawState()->SetPenLocation(pt);
+	TRACE_BB("%p set pen location %.2f %.2f\n", fState, pt.x, pt.y);
+	fState->GetDrawState()->SetPenLocation(pt);
 }
 
 
-static void
-set_drawing_mode(void*, drawing_mode)
+void
+BoundingBoxCallbacks::SetDrawingMode(drawing_mode)
 {
 }
 
 
-static void
-set_line_mode(void* _state, cap_mode capMode, join_mode joinMode,
+void
+BoundingBoxCallbacks::SetLineMode(cap_mode capMode, join_mode joinMode,
 	float miterLimit)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
-	DrawState* drawState = state->GetDrawState();
+	DrawState* drawState = fState->GetDrawState();
 	drawState->SetLineCapMode(capMode);
 	drawState->SetLineJoinMode(joinMode);
 	drawState->SetMiterLimit(miterLimit);
 }
 
 
-static void
-set_pen_size(void* _state, float size)
+void
+BoundingBoxCallbacks::SetPenSize(float size)
 {
-	TRACE_BB("%p set pen size %.2f\n", _state, size);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
+	TRACE_BB("%p set pen size %.2f\n", fState, size);
 
-	state->GetDrawState()->SetPenSize(size);
+	fState->GetDrawState()->SetPenSize(size);
 }
 
 
-static void
-set_fore_color(void* _state, const rgb_color& color)
+void
+BoundingBoxCallbacks::SetForeColor(const rgb_color& color)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
-	state->GetDrawState()->SetHighColor(color);
+	fState->GetDrawState()->SetHighColor(color);
 }
 
 
-static void
-set_back_color(void* _state, const rgb_color& color)
+void
+BoundingBoxCallbacks::SetBackColor(const rgb_color& color)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
-	state->GetDrawState()->SetLowColor(color);
+	fState->GetDrawState()->SetLowColor(color);
 }
 
 
-static void
-set_stipple_pattern(void* _state, const pattern& _pattern)
+void
+BoundingBoxCallbacks::SetStipplePattern(const pattern& _pattern)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
-	state->GetDrawState()->SetPattern(Pattern(_pattern));
+	fState->GetDrawState()->SetPattern(Pattern(_pattern));
 }
 
 
-static void
-set_scale(void* _state, float scale)
+void
+BoundingBoxCallbacks::SetScale(float scale)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
-	state->GetDrawState()->SetScale(scale);
+	fState->GetDrawState()->SetScale(scale);
 }
 
 
-static void
-set_font_family(void* _state, const char* _family, size_t length)
+void
+BoundingBoxCallbacks::SetFontFamily(const char* _family, size_t length)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	BString family(_family, length);
 	gFontManager->Lock();
 	FontStyle* fontStyle = gFontManager->GetStyleByIndex(family, 0);
 	ServerFont font;
 	font.SetStyle(fontStyle);
 	gFontManager->Unlock();
-	state->GetDrawState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
+	fState->GetDrawState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
 
 
-static void
-set_font_style(void* _state, const char* _style, size_t length)
+void
+BoundingBoxCallbacks::SetFontStyle(const char* _style, size_t length)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	BString style(_style, length);
-	ServerFont font(state->GetDrawState()->Font());
+	ServerFont font(fState->GetDrawState()->Font());
 	gFontManager->Lock();
 	FontStyle* fontStyle = gFontManager->GetStyle(font.Family(), style);
 	font.SetStyle(fontStyle);
 	gFontManager->Unlock();
-	state->GetDrawState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
+	fState->GetDrawState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
 
 
-static void
-set_font_spacing(void* _state, uint8 spacing)
+void
+BoundingBoxCallbacks::SetFontSpacing(uint8 spacing)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	ServerFont font;
 	font.SetSpacing(spacing);
-	state->GetDrawState()->SetFont(font, B_FONT_SPACING);
+	fState->GetDrawState()->SetFont(font, B_FONT_SPACING);
 }
 
 
-static void
-set_font_size(void* _state, float size)
+void
+BoundingBoxCallbacks::SetFontSize(float size)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	ServerFont font;
 	font.SetSize(size);
-	state->GetDrawState()->SetFont(font, B_FONT_SIZE);
+	fState->GetDrawState()->SetFont(font, B_FONT_SIZE);
 }
 
 
-static void
-set_font_rotate(void* _state, float rotation)
+void
+BoundingBoxCallbacks::SetFontRotation(float rotation)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	ServerFont font;
 	font.SetRotation(rotation);
-	state->GetDrawState()->SetFont(font, B_FONT_ROTATION);
+	fState->GetDrawState()->SetFont(font, B_FONT_ROTATION);
 }
 
 
-static void
-set_font_encoding(void* _state, uint8 encoding)
+void
+BoundingBoxCallbacks::SetFontEncoding(uint8 encoding)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	ServerFont font;
 	font.SetEncoding(encoding);
-	state->GetDrawState()->SetFont(font, B_FONT_ENCODING);
+	fState->GetDrawState()->SetFont(font, B_FONT_ENCODING);
 }
 
 
-static void
-set_font_flags(void* _state, uint32 flags)
+void
+BoundingBoxCallbacks::SetFontFlags(uint32 flags)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	ServerFont font;
 	font.SetFlags(flags);
-	state->GetDrawState()->SetFont(font, B_FONT_FLAGS);
+	fState->GetDrawState()->SetFont(font, B_FONT_FLAGS);
 }
 
 
-static void
-set_font_shear(void* _state, float shear)
+void
+BoundingBoxCallbacks::SetFontShear(float shear)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	ServerFont font;
 	font.SetShear(shear);
-	state->GetDrawState()->SetFont(font, B_FONT_SHEAR);
+	fState->GetDrawState()->SetFont(font, B_FONT_SHEAR);
 }
 
 
-static void
-set_font_face(void* _state, uint16 face)
+void
+BoundingBoxCallbacks::SetFontFace(uint16 face)
 {
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-
 	ServerFont font;
 	font.SetFace(face);
-	state->GetDrawState()->SetFont(font, B_FONT_FACE);
+	fState->GetDrawState()->SetFont(font, B_FONT_FACE);
 }
 
 
-static void
-set_blending_mode(void*, source_alpha, alpha_function)
+void
+BoundingBoxCallbacks::SetBlendingMode(source_alpha, alpha_function)
 {
 }
 
 
-static void
-set_transform(void* _state, const BAffineTransform& transform)
+void
+BoundingBoxCallbacks::SetTransform(const BAffineTransform& transform)
 {
-	TRACE_BB("%p transform\n", _state);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-	state->GetDrawState()->SetTransform(transform);
+	TRACE_BB("%p transform\n", fState);
+	fState->GetDrawState()->SetTransform(transform);
 }
 
 
-static void
-translate_by(void* _state, double x, double y)
+void
+BoundingBoxCallbacks::TranslateBy(double x, double y)
 {
-	TRACE_BB("%p translate\n", _state);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-	BAffineTransform transform = state->GetDrawState()->Transform();
+	TRACE_BB("%p translate\n", fState);
+	BAffineTransform transform = fState->GetDrawState()->Transform();
 	transform.PreTranslateBy(x, y);
-	state->GetDrawState()->SetTransform(transform);
+	fState->GetDrawState()->SetTransform(transform);
 }
 
 
-static void
-scale_by(void* _state, double x, double y)
+void
+BoundingBoxCallbacks::ScaleBy(double x, double y)
 {
-	TRACE_BB("%p scale\n", _state);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-	BAffineTransform transform = state->GetDrawState()->Transform();
+	TRACE_BB("%p scale\n", fState);
+	BAffineTransform transform = fState->GetDrawState()->Transform();
 	transform.PreScaleBy(x, y);
-	state->GetDrawState()->SetTransform(transform);
+	fState->GetDrawState()->SetTransform(transform);
 }
 
 
-static void
-rotate_by(void* _state, double angleRadians)
+void
+BoundingBoxCallbacks::RotateBy(double angleRadians)
 {
-	TRACE_BB("%p rotate\n", _state);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
-	BAffineTransform transform = state->GetDrawState()->Transform();
+	TRACE_BB("%p rotate\n", fState);
+	BAffineTransform transform = fState->GetDrawState()->Transform();
 	transform.PreRotateBy(angleRadians);
-	state->GetDrawState()->SetTransform(transform);
+	fState->GetDrawState()->SetTransform(transform);
 }
 
 
-static void
-determine_bounds_nested_layer(void* _state, Layer* layer)
+void
+BoundingBoxCallbacks::BlendLayer(Layer* layer)
 {
-	TRACE_BB("%p nested layer\n", _state);
-	BoundingBoxState* const state =
-		reinterpret_cast<BoundingBoxState*>(_state);
+	TRACE_BB("%p nested layer\n", fState);
 
 	BRect boundingBox;
-	PictureBoundingBoxPlayer::Play(layer, state->GetDrawState(), &boundingBox);
+	PictureBoundingBoxPlayer::Play(layer, fState->GetDrawState(), &boundingBox);
 	if (boundingBox.IsValid())
-		state->IncludeRect(boundingBox);
+		fState->IncludeRect(boundingBox);
 }
-
-
-static const BPrivate::picture_player_callbacks
-	kPictureBoundingBoxPlayerCallbacks = {
-	move_pen_by,
-	determine_bounds_stroke_line,
-	determine_bounds_draw_rect,
-	determine_bounds_draw_round_rect,
-	determine_bounds_draw_bezier,
-	determine_bounds_draw_arc,
-	determine_bounds_draw_ellipse,
-	determine_bounds_draw_polygon,
-	determine_bounds_draw_shape,
-	determine_bounds_draw_string,
-	determine_bounds_draw_pixels,
-	draw_picture,
-	set_clipping_rects,
-	clip_to_picture,
-	push_state,
-	pop_state,
-	enter_state_change,
-	exit_state_change,
-	enter_font_state,
-	exit_font_state,
-	set_origin,
-	set_pen_location,
-	set_drawing_mode,
-	set_line_mode,
-	set_pen_size,
-	set_fore_color,
-	set_back_color,
-	set_stipple_pattern,
-	set_scale,
-	set_font_family,
-	set_font_style,
-	set_font_spacing,
-	set_font_size,
-	set_font_rotate,
-	set_font_encoding,
-	set_font_flags,
-	set_font_shear,
-	set_font_face,
-	set_blending_mode,
-	set_transform,
-	translate_by,
-	scale_by,
-	rotate_by,
-	determine_bounds_nested_layer
-};
 
 
 // #pragma mark - PictureBoundingBoxPlayer
@@ -849,9 +782,10 @@ PictureBoundingBoxPlayer::Play(ServerPicture* picture,
 	if (mallocIO == NULL)
 		return;
 
+	BoundingBoxCallbacks callbacks(&state);
+
 	BPrivate::PicturePlayer player(mallocIO->Buffer(),
 		mallocIO->BufferLength(), ServerPicture::PictureList::Private(
 			picture->fPictures.Get()).AsBList());
-	player.Play(kPictureBoundingBoxPlayerCallbacks,
-		sizeof(kPictureBoundingBoxPlayerCallbacks), &state);
+	player.Play(callbacks);
 }

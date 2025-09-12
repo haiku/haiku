@@ -237,6 +237,89 @@ ShapePainter::Draw(BRect frame, bool filled)
 // #pragma mark - drawing functions
 
 
+class CanvasCallbacks: public BPrivate::PicturePlayerCallbacks {
+public:
+	CanvasCallbacks(Canvas* const canvas);
+
+	virtual void MovePenBy(const BPoint& where);
+	virtual void StrokeLine(const BPoint& start, const BPoint& end);
+	virtual void DrawRect(const BRect& rect, bool fill);
+	virtual void DrawRoundRect(const BRect& rect, const BPoint& radii, bool fill);
+	virtual void DrawBezier(const BPoint controlPoints[4], bool fill);
+	virtual void DrawArc(const BPoint& center, const BPoint& radii, float startTheta,
+		float arcTheta, bool fill);
+	virtual void DrawEllipse(const BRect& rect, bool fill);
+	virtual void DrawPolygon(size_t numPoints, const BPoint points[], bool isClosed, bool fill);
+	virtual void DrawShape(const BShape& shape, bool fill);
+	virtual void DrawString(const char* string, size_t length, float spaceEscapement,
+		float nonSpaceEscapement);
+	virtual void DrawPixels(const BRect& source, const BRect& destination, uint32 width,
+		uint32 height, size_t bytesPerRow, color_space pixelFormat, uint32 flags, const void* data,
+		size_t length);
+	virtual void DrawPicture(const BPoint& where, int32 token);
+	virtual void SetClippingRects(size_t numRects, const clipping_rect rects[]);
+	virtual void ClipToPicture(int32 token, const BPoint& where, bool clipToInverse);
+	virtual void PushState();
+	virtual void PopState();
+	virtual void EnterStateChange();
+	virtual void ExitStateChange();
+	virtual void EnterFontState();
+	virtual void ExitFontState();
+	virtual void SetOrigin(const BPoint& origin);
+	virtual void SetPenLocation(const BPoint& location);
+	virtual void SetDrawingMode(drawing_mode mode);
+	virtual void SetLineMode(cap_mode capMode, join_mode joinMode, float miterLimit);
+	virtual void SetPenSize(float size);
+	virtual void SetForeColor(const rgb_color& color);
+	virtual void SetBackColor(const rgb_color& color);
+	virtual void SetStipplePattern(const pattern& patter);
+	virtual void SetScale(float scale);
+	virtual void SetFontFamily(const char* familyName, size_t length);
+	virtual void SetFontStyle(const char* styleName, size_t length);
+	virtual void SetFontSpacing(uint8 spacing);
+	virtual void SetFontSize(float size);
+	virtual void SetFontRotation(float rotation);
+	virtual void SetFontEncoding(uint8 encoding);
+	virtual void SetFontFlags(uint32 flags);
+	virtual void SetFontShear(float shear);
+	virtual void SetFontFace(uint16 face);
+	virtual void SetBlendingMode(source_alpha alphaSourceMode, alpha_function alphaFunctionMode);
+	virtual void SetTransform(const BAffineTransform& transform);
+	virtual void TranslateBy(double x, double y);
+	virtual void ScaleBy(double x, double y);
+	virtual void RotateBy(double angleRadians);
+	virtual void BlendLayer(Layer* layer);
+	virtual void ClipToRect(const BRect& rect, bool inverse);
+	virtual void ClipToShape(int32 opCount, const uint32 opList[], int32 ptCount,
+		const BPoint ptList[], bool inverse);
+	virtual void DrawStringLocations(const char* string, size_t length, const BPoint locations[],
+		size_t locationCount);
+	virtual void DrawRectGradient(const BRect& rect, BGradient& gradient, bool fill);
+	virtual void DrawRoundRectGradient(const BRect& rect, const BPoint& radii, BGradient& gradient,
+		bool fill);
+	virtual void DrawBezierGradient(const BPoint controlPoints[4], BGradient& gradient, bool fill);
+	virtual void DrawArcGradient(const BPoint& center, const BPoint& radii, float startTheta,
+		float arcTheta, BGradient& gradient, bool fill);
+	virtual void DrawEllipseGradient(const BRect& rect, BGradient& gradient, bool fill);
+	virtual void DrawPolygonGradient(size_t numPoints, const BPoint points[], bool isClosed,
+		BGradient& gradient, bool fill);
+	virtual void DrawShapeGradient(const BShape& shape, BGradient& gradient, bool fill);
+	virtual void SetFillRule(int32 fillRule);
+	virtual void StrokeLineGradient(const BPoint& start, const BPoint& end,
+		const BGradient& gradient);
+
+private:
+	Canvas* const fCanvas;
+};
+
+
+CanvasCallbacks::CanvasCallbacks(Canvas* const canvas)
+	:
+	fCanvas(canvas)
+{
+}
+
+
 static void
 get_polygon_frame(const BPoint* points, uint32 numPoints, BRect* _frame)
 {
@@ -266,105 +349,93 @@ get_polygon_frame(const BPoint* points, uint32 numPoints, BRect* _frame)
 }
 
 
-static void
-move_pen_by(void* _canvas, const BPoint& delta)
+void
+CanvasCallbacks::MovePenBy(const BPoint& delta)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetPenLocation(
-		canvas->CurrentState()->PenLocation() + delta);
+	fCanvas->CurrentState()->SetPenLocation(
+		fCanvas->CurrentState()->PenLocation() + delta);
 }
 
 
-static void
-stroke_line(void* _canvas, const BPoint& _start, const BPoint& _end)
+void
+CanvasCallbacks::StrokeLine(const BPoint& _start, const BPoint& _end)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BPoint start = _start;
 	BPoint end = _end;
 
-	const SimpleTransform transform = canvas->PenToScreenTransform();
+	const SimpleTransform transform = fCanvas->PenToScreenTransform();
 	transform.Apply(&start);
 	transform.Apply(&end);
-	canvas->GetDrawingEngine()->StrokeLine(start, end);
+	fCanvas->GetDrawingEngine()->StrokeLine(start, end);
 
-	canvas->CurrentState()->SetPenLocation(_end);
+	fCanvas->CurrentState()->SetPenLocation(_end);
 	// the DrawingEngine/Painter does not need to be updated, since this
 	// effects only the view->screen coord conversion, which is handled
 	// by the view only
 }
 
 
-static void
-draw_rect(void* _canvas, const BRect& _rect, bool fill)
+void
+CanvasCallbacks::DrawRect(const BRect& _rect, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BRect rect = _rect;
 
-	canvas->PenToScreenTransform().Apply(&rect);
+	fCanvas->PenToScreenTransform().Apply(&rect);
 	if (fill)
-		canvas->GetDrawingEngine()->FillRect(rect);
+		fCanvas->GetDrawingEngine()->FillRect(rect);
 	else
-		canvas->GetDrawingEngine()->StrokeRect(rect);
+		fCanvas->GetDrawingEngine()->StrokeRect(rect);
 }
 
 
-static void
-draw_round_rect(void* _canvas, const BRect& _rect, const BPoint& radii,
+void
+CanvasCallbacks::DrawRoundRect(const BRect& _rect, const BPoint& radii,
 	bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BRect rect = _rect;
 
-	canvas->PenToScreenTransform().Apply(&rect);
-	float scale = canvas->CurrentState()->CombinedScale();
-	canvas->GetDrawingEngine()->DrawRoundRect(rect, radii.x * scale,
+	fCanvas->PenToScreenTransform().Apply(&rect);
+	float scale = fCanvas->CurrentState()->CombinedScale();
+	fCanvas->GetDrawingEngine()->DrawRoundRect(rect, radii.x * scale,
 		radii.y * scale, fill);
 }
 
 
-static void
-draw_bezier(void* _canvas, const BPoint viewPoints[4], bool fill)
+void
+CanvasCallbacks::DrawBezier(const BPoint viewPoints[4], bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	const size_t kNumPoints = 4;
 
 	BPoint points[kNumPoints];
-	canvas->PenToScreenTransform().Apply(points, viewPoints, kNumPoints);
-	canvas->GetDrawingEngine()->DrawBezier(points, fill);
+	fCanvas->PenToScreenTransform().Apply(points, viewPoints, kNumPoints);
+	fCanvas->GetDrawingEngine()->DrawBezier(points, fill);
 }
 
 
-static void
-draw_arc(void* _canvas, const BPoint& center, const BPoint& radii,
+void
+CanvasCallbacks::DrawArc(const BPoint& center, const BPoint& radii,
 	float startTheta, float arcTheta, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
-	canvas->PenToScreenTransform().Apply(&rect);
-	canvas->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, fill);
+	fCanvas->PenToScreenTransform().Apply(&rect);
+	fCanvas->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, fill);
 }
 
 
-static void
-draw_ellipse(void* _canvas, const BRect& _rect, bool fill)
+void
+CanvasCallbacks::DrawEllipse(const BRect& _rect, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	BRect rect = _rect;
-	canvas->PenToScreenTransform().Apply(&rect);
-	canvas->GetDrawingEngine()->DrawEllipse(rect, fill);
+	fCanvas->PenToScreenTransform().Apply(&rect);
+	fCanvas->GetDrawingEngine()->DrawEllipse(rect, fill);
 }
 
 
-static void
-draw_polygon(void* _canvas, size_t numPoints, const BPoint viewPoints[],
+void
+CanvasCallbacks::DrawPolygon(size_t numPoints, const BPoint viewPoints[],
 	bool isClosed, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	if (numPoints == 0)
 		return;
 
@@ -372,111 +443,101 @@ draw_polygon(void* _canvas, size_t numPoints, const BPoint viewPoints[],
 	if (!points.IsValid())
 		return;
 
-	canvas->PenToScreenTransform().Apply(points, viewPoints, numPoints);
+	fCanvas->PenToScreenTransform().Apply(points, viewPoints, numPoints);
 
 	BRect polyFrame;
 	get_polygon_frame(points, numPoints, &polyFrame);
 
-	canvas->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
+	fCanvas->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
 		fill, isClosed && numPoints > 2);
 }
 
 
-static void
-draw_shape(void* _canvas, const BShape& shape, bool fill)
+void
+CanvasCallbacks::DrawShape(const BShape& shape, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	ShapePainter drawShape(canvas, NULL);
+	ShapePainter drawShape(fCanvas, NULL);
 
 	drawShape.Iterate(&shape);
 	drawShape.Draw(shape.Bounds(), fill);
 }
 
 
-static void
-draw_rect_gradient(void* _canvas, const BRect& _rect, BGradient& gradient, bool fill)
+void
+CanvasCallbacks::DrawRectGradient(const BRect& _rect, BGradient& gradient, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BRect rect = _rect;
 
 	const SimpleTransform transform =
-		canvas->PenToScreenTransform();
+		fCanvas->PenToScreenTransform();
 	transform.Apply(&rect);
 	transform.Apply(&gradient);
 
-	canvas->GetDrawingEngine()->FillRect(rect, gradient);
+	fCanvas->GetDrawingEngine()->FillRect(rect, gradient);
 }
 
 
-static void
-draw_round_rect_gradient(void* _canvas, const BRect& _rect, const BPoint& radii, BGradient& gradient,
+void
+CanvasCallbacks::DrawRoundRectGradient(const BRect& _rect, const BPoint& radii, BGradient& gradient,
 	bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BRect rect = _rect;
 
 	const SimpleTransform transform =
-		canvas->PenToScreenTransform();
+		fCanvas->PenToScreenTransform();
 	transform.Apply(&rect);
 	transform.Apply(&gradient);
-	float scale = canvas->CurrentState()->CombinedScale();
-	canvas->GetDrawingEngine()->DrawRoundRect(rect, radii.x * scale,
+	float scale = fCanvas->CurrentState()->CombinedScale();
+	fCanvas->GetDrawingEngine()->DrawRoundRect(rect, radii.x * scale,
 		radii.y * scale, fill, gradient);
 }
 
 
-static void
-draw_bezier_gradient(void* _canvas, const BPoint viewPoints[4], BGradient& gradient, bool fill)
+void
+CanvasCallbacks::DrawBezierGradient(const BPoint viewPoints[4], BGradient& gradient, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	const size_t kNumPoints = 4;
 
 	BPoint points[kNumPoints];
 	const SimpleTransform transform =
-		canvas->PenToScreenTransform();
+		fCanvas->PenToScreenTransform();
 	transform.Apply(points, viewPoints, kNumPoints);
 	transform.Apply(&gradient);
-	canvas->GetDrawingEngine()->DrawBezier(points, fill, gradient);
+	fCanvas->GetDrawingEngine()->DrawBezier(points, fill, gradient);
 }
 
 
-static void
-draw_arc_gradient(void* _canvas, const BPoint& center, const BPoint& radii,
+void
+CanvasCallbacks::DrawArcGradient(const BPoint& center, const BPoint& radii,
 	float startTheta, float arcTheta, BGradient& gradient, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
 	const SimpleTransform transform =
-		canvas->PenToScreenTransform();
+		fCanvas->PenToScreenTransform();
 	transform.Apply(&rect);
 	transform.Apply(&gradient);
-	canvas->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, fill, gradient);
+	fCanvas->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, fill, gradient);
 }
 
 
-static void
-draw_ellipse_gradient(void* _canvas, const BRect& _rect, BGradient& gradient, bool fill)
+void
+CanvasCallbacks::DrawEllipseGradient(const BRect& _rect, BGradient& gradient, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BRect rect = _rect;
 
 	const SimpleTransform transform =
-		canvas->PenToScreenTransform();
+		fCanvas->PenToScreenTransform();
 	transform.Apply(&rect);
 	transform.Apply(&gradient);
-	canvas->GetDrawingEngine()->DrawEllipse(rect, fill, gradient);
+	fCanvas->GetDrawingEngine()->DrawEllipse(rect, fill, gradient);
 }
 
 
-static void
-draw_polygon_gradient(void* _canvas, size_t numPoints, const BPoint viewPoints[],
+void
+CanvasCallbacks::DrawPolygonGradient(size_t numPoints, const BPoint viewPoints[],
 	bool isClosed, BGradient& gradient, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	if (numPoints == 0)
 		return;
 
@@ -485,106 +546,99 @@ draw_polygon_gradient(void* _canvas, size_t numPoints, const BPoint viewPoints[]
 		return;
 
 	const SimpleTransform transform =
-		canvas->PenToScreenTransform();
+		fCanvas->PenToScreenTransform();
 	transform.Apply(points, viewPoints, numPoints);
 	transform.Apply(&gradient);
 
 	BRect polyFrame;
 	get_polygon_frame(points, numPoints, &polyFrame);
 
-	canvas->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
+	fCanvas->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
 		isClosed && numPoints > 2, fill, gradient);
 }
 
 
-static void
-draw_shape_gradient(void* _canvas, const BShape& shape, BGradient& gradient, bool fill)
+void
+CanvasCallbacks::DrawShapeGradient(const BShape& shape, BGradient& gradient, bool fill)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	ShapePainter drawShape(canvas, &gradient);
+	ShapePainter drawShape(fCanvas, &gradient);
 
 	drawShape.Iterate(&shape);
 	drawShape.Draw(shape.Bounds(), fill);
 }
 
 
-static void
-stroke_line_gradient(void* _canvas, const BPoint& _start, const BPoint& _end,
+void
+CanvasCallbacks::StrokeLineGradient(const BPoint& _start, const BPoint& _end,
 	const BGradient& gradient)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BPoint start = _start;
 	BPoint end = _end;
 
-	const SimpleTransform transform = canvas->PenToScreenTransform();
+	const SimpleTransform transform = fCanvas->PenToScreenTransform();
 	transform.Apply(&start);
 	transform.Apply(&end);
-	canvas->GetDrawingEngine()->StrokeLine(start, end, gradient);
+	fCanvas->GetDrawingEngine()->StrokeLine(start, end, gradient);
 
-	canvas->CurrentState()->SetPenLocation(_end);
+	fCanvas->CurrentState()->SetPenLocation(_end);
 	// the DrawingEngine/Painter does not need to be updated, since this
 	// effects only the view->screen coord conversion, which is handled
 	// by the view only
 }
 
 
-static void
-draw_string(void* _canvas, const char* string, size_t length, float deltaSpace,
+void
+CanvasCallbacks::DrawString(const char* string, size_t length, float deltaSpace,
 	float deltaNonSpace)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	// NOTE: the picture data was recorded with a "set pen location"
 	// command inserted before the "draw string" command, so we can
 	// use PenLocation()
-	BPoint location = canvas->CurrentState()->PenLocation();
+	BPoint location = fCanvas->CurrentState()->PenLocation();
 
 	escapement_delta delta = { deltaSpace, deltaNonSpace };
-	canvas->PenToScreenTransform().Apply(&location);
-	location = canvas->GetDrawingEngine()->DrawString(string, length,
+	fCanvas->PenToScreenTransform().Apply(&location);
+	location = fCanvas->GetDrawingEngine()->DrawString(string, length,
 		location, &delta);
 
-	canvas->PenToScreenTransform().Apply(&location);
-	canvas->CurrentState()->SetPenLocation(location);
+	fCanvas->PenToScreenTransform().Apply(&location);
+	fCanvas->CurrentState()->SetPenLocation(location);
 	// the DrawingEngine/Painter does not need to be updated, since this
 	// effects only the view->screen coord conversion, which is handled
 	// by the view only
 }
 
 
-static void
-draw_string_locations(void* _canvas, const char* string, size_t length,
+void
+CanvasCallbacks::DrawStringLocations(const char* string, size_t length,
 	const BPoint* _locations, size_t locationsCount)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BStackOrHeapArray<BPoint, 200> locations(locationsCount);
 	if (!locations.IsValid())
 		return;
 
-	const SimpleTransform transform = canvas->PenToScreenTransform();
+	const SimpleTransform transform = fCanvas->PenToScreenTransform();
 	for (size_t i = 0; i < locationsCount; i++) {
 		locations[i] = _locations[i];
 		transform.Apply(&locations[i]);
 	}
 
-	BPoint location = canvas->GetDrawingEngine()->DrawString(string, length,
+	BPoint location = fCanvas->GetDrawingEngine()->DrawString(string, length,
 		locations);
 
-	canvas->PenToScreenTransform().Apply(&location);
-	canvas->CurrentState()->SetPenLocation(location);
+	fCanvas->PenToScreenTransform().Apply(&location);
+	fCanvas->CurrentState()->SetPenLocation(location);
 	// the DrawingEngine/Painter does not need to be updated, since this
 	// effects only the view->screen coord conversion, which is handled
 	// by the view only
 }
 
 
-static void
-draw_pixels(void* _canvas, const BRect& src, const BRect& _dest, uint32 width,
+void
+CanvasCallbacks::DrawPixels(const BRect& src, const BRect& _dest, uint32 width,
 	uint32 height, size_t bytesPerRow, color_space pixelFormat, uint32 options,
 	const void* data, size_t length)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1),
 		(color_space)pixelFormat, 0, bytesPerRow);
 
@@ -594,214 +648,194 @@ draw_pixels(void* _canvas, const BRect& src, const BRect& _dest, uint32 width,
 	memcpy(bitmap.Bits(), data, std::min(height * bytesPerRow, length));
 
 	BRect dest = _dest;
-	canvas->PenToScreenTransform().Apply(&dest);
-	canvas->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest, options);
+	fCanvas->PenToScreenTransform().Apply(&dest);
+	fCanvas->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest, options);
 }
 
 
-static void
-draw_picture(void* _canvas, const BPoint& where, int32 token)
+void
+CanvasCallbacks::DrawPicture(const BPoint& where, int32 token)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
-	BReference<ServerPicture> picture(canvas->GetPicture(token), true);
+	BReference<ServerPicture> picture(fCanvas->GetPicture(token), true);
 	if (picture != NULL) {
-		canvas->PushState();
-		canvas->SetDrawingOrigin(where);
+		fCanvas->PushState();
+		fCanvas->SetDrawingOrigin(where);
 
-		canvas->PushState();
-		picture->Play(canvas);
-		canvas->PopState();
+		fCanvas->PushState();
+		picture->Play(fCanvas);
+		fCanvas->PopState();
 
-		canvas->PopState();
+		fCanvas->PopState();
 	}
 }
 
 
-static void
-set_clipping_rects(void* _canvas, size_t numRects, const clipping_rect rects[])
+void
+CanvasCallbacks::SetClippingRects(size_t numRects, const clipping_rect rects[])
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	if (numRects == 0)
-		canvas->SetUserClipping(NULL);
+		fCanvas->SetUserClipping(NULL);
 	else {
 		// TODO: This might be too slow, we should copy the rects
 		// directly to BRegion's internal data
 		BRegion region;
 		for (uint32 c = 0; c < numRects; c++)
 			region.Include(rects[c]);
-		canvas->SetUserClipping(&region);
+		fCanvas->SetUserClipping(&region);
 	}
-	canvas->UpdateCurrentDrawingRegion();
+	fCanvas->UpdateCurrentDrawingRegion();
 }
 
 
-static void
-clip_to_picture(void* _canvas, int32 pictureToken, const BPoint& where,
+void
+CanvasCallbacks::ClipToPicture(int32 pictureToken, const BPoint& where,
 	bool clipToInverse)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
-	BReference<ServerPicture> picture(canvas->GetPicture(pictureToken), true);
+	BReference<ServerPicture> picture(fCanvas->GetPicture(pictureToken), true);
 	if (picture == NULL)
 		return;
-	BReference<AlphaMask> mask(new(std::nothrow) PictureAlphaMask(canvas->GetAlphaMask(),
-		picture, *canvas->CurrentState(), where, clipToInverse), true);
-	canvas->SetAlphaMask(mask);
-	canvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
-		canvas->Bounds());
-	canvas->ResyncDrawState();
+	BReference<AlphaMask> mask(new(std::nothrow) PictureAlphaMask(fCanvas->GetAlphaMask(),
+		picture, *fCanvas->CurrentState(), where, clipToInverse), true);
+	fCanvas->SetAlphaMask(mask);
+	fCanvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
+		fCanvas->Bounds());
+	fCanvas->ResyncDrawState();
 }
 
 
-static void
-push_state(void* _canvas)
+void
+CanvasCallbacks::PushState()
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->PushState();
+	fCanvas->PushState();
 }
 
 
-static void
-pop_state(void* _canvas)
+void
+CanvasCallbacks::PopState()
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->PopState();
+	fCanvas->PopState();
 
 	BPoint p(0, 0);
-	canvas->PenToScreenTransform().Apply(&p);
-	canvas->GetDrawingEngine()->SetDrawState(canvas->CurrentState(),
+	fCanvas->PenToScreenTransform().Apply(&p);
+	fCanvas->GetDrawingEngine()->SetDrawState(fCanvas->CurrentState(),
 		(int32)p.x, (int32)p.y);
 }
 
 
 // TODO: Be smart and actually take advantage of these methods:
 // only apply state changes when they are called
-static void
-enter_state_change(void* _canvas)
+void
+CanvasCallbacks::EnterStateChange()
 {
 }
 
 
-static void
-exit_state_change(void* _canvas)
+void
+CanvasCallbacks::ExitStateChange()
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->ResyncDrawState();
+	fCanvas->ResyncDrawState();
 }
 
 
-static void
-enter_font_state(void* _canvas)
+void
+CanvasCallbacks::EnterFontState()
 {
 }
 
 
-static void
-exit_font_state(void* _canvas)
+void
+CanvasCallbacks::ExitFontState()
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->GetDrawingEngine()->SetFont(canvas->CurrentState()->Font());
+	fCanvas->GetDrawingEngine()->SetFont(fCanvas->CurrentState()->Font());
 }
 
 
-static void
-set_origin(void* _canvas, const BPoint& pt)
+void
+CanvasCallbacks::SetOrigin(const BPoint& pt)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetOrigin(pt);
+	fCanvas->CurrentState()->SetOrigin(pt);
 }
 
 
-static void
-set_pen_location(void* _canvas, const BPoint& pt)
+void
+CanvasCallbacks::SetPenLocation(const BPoint& pt)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetPenLocation(pt);
+	fCanvas->CurrentState()->SetPenLocation(pt);
 	// the DrawingEngine/Painter does not need to be updated, since this
 	// effects only the view->screen coord conversion, which is handled
 	// by the view only
 }
 
 
-static void
-set_drawing_mode(void* _canvas, drawing_mode mode)
+void
+CanvasCallbacks::SetDrawingMode(drawing_mode mode)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	if (canvas->CurrentState()->SetDrawingMode(mode))
-		canvas->GetDrawingEngine()->SetDrawingMode(mode);
+	if (fCanvas->CurrentState()->SetDrawingMode(mode))
+		fCanvas->GetDrawingEngine()->SetDrawingMode(mode);
 }
 
 
-static void
-set_line_mode(void* _canvas, cap_mode capMode, join_mode joinMode,
+void
+CanvasCallbacks::SetLineMode(cap_mode capMode, join_mode joinMode,
 	float miterLimit)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	DrawState* state = canvas->CurrentState();
+	DrawState* state = fCanvas->CurrentState();
 	state->SetLineCapMode(capMode);
 	state->SetLineJoinMode(joinMode);
 	state->SetMiterLimit(miterLimit);
-	canvas->GetDrawingEngine()->SetStrokeMode(capMode, joinMode, miterLimit);
+	fCanvas->GetDrawingEngine()->SetStrokeMode(capMode, joinMode, miterLimit);
 }
 
 
-static void
-set_pen_size(void* _canvas, float size)
+void
+CanvasCallbacks::SetPenSize(float size)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetPenSize(size);
-	canvas->GetDrawingEngine()->SetPenSize(
-		canvas->CurrentState()->PenSize());
+	fCanvas->CurrentState()->SetPenSize(size);
+	fCanvas->GetDrawingEngine()->SetPenSize(
+		fCanvas->CurrentState()->PenSize());
 		// DrawState::PenSize() returns the scaled pen size, so we
 		// need to use that value to set the drawing engine pen size.
 }
 
 
-static void
-set_fore_color(void* _canvas, const rgb_color& color)
+void
+CanvasCallbacks::SetForeColor(const rgb_color& color)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetHighColor(color);
-	canvas->GetDrawingEngine()->SetHighColor(color);
+	fCanvas->CurrentState()->SetHighColor(color);
+	fCanvas->GetDrawingEngine()->SetHighColor(color);
 }
 
 
-static void
-set_back_color(void* _canvas, const rgb_color& color)
+void
+CanvasCallbacks::SetBackColor(const rgb_color& color)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetLowColor(color);
-	canvas->GetDrawingEngine()->SetLowColor(color);
+	fCanvas->CurrentState()->SetLowColor(color);
+	fCanvas->GetDrawingEngine()->SetLowColor(color);
 }
 
 
-static void
-set_stipple_pattern(void* _canvas, const pattern& pattern)
+void
+CanvasCallbacks::SetStipplePattern(const pattern& pattern)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetPattern(Pattern(pattern));
-	canvas->GetDrawingEngine()->SetPattern(pattern);
+	fCanvas->CurrentState()->SetPattern(Pattern(pattern));
+	fCanvas->GetDrawingEngine()->SetPattern(pattern);
 }
 
 
-static void
-set_scale(void* _canvas, float scale)
+void
+CanvasCallbacks::SetScale(float scale)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetScale(scale);
-	canvas->ResyncDrawState();
+	fCanvas->CurrentState()->SetScale(scale);
+	fCanvas->ResyncDrawState();
 
 	// Update the drawing engine draw state, since some stuff
 	// (for example the pen size) needs to be recalculated.
 }
 
 
-static void
-set_font_family(void* _canvas, const char* _family, size_t length)
+void
+CanvasCallbacks::SetFontFamily(const char* _family, size_t length)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BString family(_family, length);
 
 	gFontManager->Lock();
@@ -809,204 +843,183 @@ set_font_family(void* _canvas, const char* _family, size_t length)
 	ServerFont font;
 	font.SetStyle(fontStyle);
 	gFontManager->Unlock();
-	canvas->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
 
 
-static void
-set_font_style(void* _canvas, const char* _style, size_t length)
+void
+CanvasCallbacks::SetFontStyle(const char* _style, size_t length)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	BString style(_style, length);
 
-	ServerFont font(canvas->CurrentState()->Font());
+	ServerFont font(fCanvas->CurrentState()->Font());
 
 	gFontManager->Lock();
 	FontStyle* fontStyle = gFontManager->GetStyle(font.Family(), style);
 
 	font.SetStyle(fontStyle);
 	gFontManager->Unlock();
-	canvas->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
 
 
-static void
-set_font_spacing(void* _canvas, uint8 spacing)
+void
+CanvasCallbacks::SetFontSpacing(uint8 spacing)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	ServerFont font;
 	font.SetSpacing(spacing);
-	canvas->CurrentState()->SetFont(font, B_FONT_SPACING);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_SPACING);
 }
 
 
-static void
-set_font_size(void* _canvas, float size)
+void
+CanvasCallbacks::SetFontSize(float size)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	ServerFont font;
 	font.SetSize(size);
-	canvas->CurrentState()->SetFont(font, B_FONT_SIZE);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_SIZE);
 }
 
 
-static void
-set_font_rotation(void* _canvas, float rotation)
+void
+CanvasCallbacks::SetFontRotation(float rotation)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	ServerFont font;
 	font.SetRotation(rotation);
-	canvas->CurrentState()->SetFont(font, B_FONT_ROTATION);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_ROTATION);
 }
 
 
-static void
-set_font_encoding(void* _canvas, uint8 encoding)
+void
+CanvasCallbacks::SetFontEncoding(uint8 encoding)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	ServerFont font;
 	font.SetEncoding(encoding);
-	canvas->CurrentState()->SetFont(font, B_FONT_ENCODING);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_ENCODING);
 }
 
 
-static void
-set_font_flags(void* _canvas, uint32 flags)
+void
+CanvasCallbacks::SetFontFlags(uint32 flags)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	ServerFont font;
 	font.SetFlags(flags);
-	canvas->CurrentState()->SetFont(font, B_FONT_FLAGS);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_FLAGS);
 }
 
 
-static void
-set_font_shear(void* _canvas, float shear)
+void
+CanvasCallbacks::SetFontShear(float shear)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	ServerFont font;
 	font.SetShear(shear);
-	canvas->CurrentState()->SetFont(font, B_FONT_SHEAR);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_SHEAR);
 }
 
 
-static void
-set_font_face(void* _canvas, uint16 face)
+void
+CanvasCallbacks::SetFontFace(uint16 face)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	ServerFont font;
 	font.SetFace(face);
-	canvas->CurrentState()->SetFont(font, B_FONT_FACE);
+	fCanvas->CurrentState()->SetFont(font, B_FONT_FACE);
 }
 
 
-static void
-set_blending_mode(void* _canvas, source_alpha alphaSrcMode,
+void
+CanvasCallbacks::SetBlendingMode(source_alpha alphaSrcMode,
 	alpha_function alphaFncMode)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetBlendingMode(alphaSrcMode, alphaFncMode);
+	fCanvas->CurrentState()->SetBlendingMode(alphaSrcMode, alphaFncMode);
 }
 
 
-static void
-set_fill_rule(void* _canvas, int32 fillRule)
+void
+CanvasCallbacks::SetFillRule(int32 fillRule)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->CurrentState()->SetFillRule(fillRule);
-	canvas->GetDrawingEngine()->SetFillRule(fillRule);
+	fCanvas->CurrentState()->SetFillRule(fillRule);
+	fCanvas->GetDrawingEngine()->SetFillRule(fillRule);
 }
 
 
-static void
-set_transform(void* _canvas, const BAffineTransform& transform)
+void
+CanvasCallbacks::SetTransform(const BAffineTransform& transform)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	BPoint leftTop(0, 0);
-	canvas->PenToScreenTransform().Apply(&leftTop);
+	fCanvas->PenToScreenTransform().Apply(&leftTop);
 
-	canvas->CurrentState()->SetTransform(transform);
-	canvas->GetDrawingEngine()->SetTransform(
-		canvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
+	fCanvas->CurrentState()->SetTransform(transform);
+	fCanvas->GetDrawingEngine()->SetTransform(
+		fCanvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
 }
 
 
-static void
-translate_by(void* _canvas, double x, double y)
+void
+CanvasCallbacks::TranslateBy(double x, double y)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	BPoint leftTop(0, 0);
-	canvas->PenToScreenTransform().Apply(&leftTop);
+	fCanvas->PenToScreenTransform().Apply(&leftTop);
 
-	BAffineTransform transform = canvas->CurrentState()->Transform();
+	BAffineTransform transform = fCanvas->CurrentState()->Transform();
 	transform.PreTranslateBy(x, y);
-	canvas->CurrentState()->SetTransform(transform);
-	canvas->GetDrawingEngine()->SetTransform(
-		canvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
+	fCanvas->CurrentState()->SetTransform(transform);
+	fCanvas->GetDrawingEngine()->SetTransform(
+		fCanvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
 }
 
 
-static void
-scale_by(void* _canvas, double x, double y)
+void
+CanvasCallbacks::ScaleBy(double x, double y)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	BPoint leftTop(0, 0);
-	canvas->PenToScreenTransform().Apply(&leftTop);
+	fCanvas->PenToScreenTransform().Apply(&leftTop);
 
-	BAffineTransform transform = canvas->CurrentState()->Transform();
+	BAffineTransform transform = fCanvas->CurrentState()->Transform();
 	transform.PreScaleBy(x, y);
-	canvas->CurrentState()->SetTransform(transform);
-	canvas->GetDrawingEngine()->SetTransform(
-		canvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
+	fCanvas->CurrentState()->SetTransform(transform);
+	fCanvas->GetDrawingEngine()->SetTransform(
+		fCanvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
 }
 
 
-static void
-rotate_by(void* _canvas, double angleRadians)
+void
+CanvasCallbacks::RotateBy(double angleRadians)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
 	BPoint leftTop(0, 0);
-	canvas->PenToScreenTransform().Apply(&leftTop);
+	fCanvas->PenToScreenTransform().Apply(&leftTop);
 
-	BAffineTransform transform = canvas->CurrentState()->Transform();
+	BAffineTransform transform = fCanvas->CurrentState()->Transform();
 	transform.PreRotateBy(angleRadians);
-	canvas->CurrentState()->SetTransform(transform);
-	canvas->GetDrawingEngine()->SetTransform(
-		canvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
+	fCanvas->CurrentState()->SetTransform(transform);
+	fCanvas->GetDrawingEngine()->SetTransform(
+		fCanvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
 }
 
 
-static void
-blend_layer(void* _canvas, Layer* layer)
+void
+CanvasCallbacks::BlendLayer(Layer* layer)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	canvas->BlendLayer(layer);
+	fCanvas->BlendLayer(layer);
 }
 
 
-static void
-clip_to_rect(void* _canvas, const BRect& rect, bool inverse)
+void
+CanvasCallbacks::ClipToRect(const BRect& rect, bool inverse)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	bool needDrawStateUpdate = canvas->ClipToRect(rect, inverse);
+	bool needDrawStateUpdate = fCanvas->ClipToRect(rect, inverse);
 	if (needDrawStateUpdate) {
-		canvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
-			canvas->Bounds());
-		canvas->ResyncDrawState();
+		fCanvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
+			fCanvas->Bounds());
+		fCanvas->ResyncDrawState();
 	}
-	canvas->UpdateCurrentDrawingRegion();
+	fCanvas->UpdateCurrentDrawingRegion();
 }
 
 
-static void
-clip_to_shape(void* _canvas, int32 opCount, const uint32 opList[],
+void
+CanvasCallbacks::ClipToShape(int32 opCount, const uint32 opList[],
 	int32 ptCount, const BPoint ptList[], bool inverse)
 {
-	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	shape_data shapeData;
 
 	// TODO: avoid copies
@@ -1020,74 +1033,14 @@ clip_to_shape(void* _canvas, int32 opCount, const uint32 opList[],
 	shapeData.ptCount = ptCount;
 	shapeData.ptSize = ptCount * sizeof(BPoint);
 
-	canvas->ClipToShape(&shapeData, inverse);
-	canvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
-		canvas->Bounds());
-	canvas->ResyncDrawState();
+	fCanvas->ClipToShape(&shapeData, inverse);
+	fCanvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
+		fCanvas->Bounds());
+	fCanvas->ResyncDrawState();
 
 	free(shapeData.opList);
 	free(shapeData.ptList);
 }
-
-
-static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
-	move_pen_by,
-	stroke_line,
-	draw_rect,
-	draw_round_rect,
-	draw_bezier,
-	draw_arc,
-	draw_ellipse,
-	draw_polygon,
-	draw_shape,
-	draw_string,
-	draw_pixels,
-	draw_picture,
-	set_clipping_rects,
-	clip_to_picture,
-	push_state,
-	pop_state,
-	enter_state_change,
-	exit_state_change,
-	enter_font_state,
-	exit_font_state,
-	set_origin,
-	set_pen_location,
-	set_drawing_mode,
-	set_line_mode,
-	set_pen_size,
-	set_fore_color,
-	set_back_color,
-	set_stipple_pattern,
-	set_scale,
-	set_font_family,
-	set_font_style,
-	set_font_spacing,
-	set_font_size,
-	set_font_rotation,
-	set_font_encoding,
-	set_font_flags,
-	set_font_shear,
-	set_font_face,
-	set_blending_mode,
-	set_transform,
-	translate_by,
-	scale_by,
-	rotate_by,
-	blend_layer,
-	clip_to_rect,
-	clip_to_shape,
-	draw_string_locations,
-	draw_rect_gradient,
-	draw_round_rect_gradient,
-	draw_bezier_gradient,
-	draw_arc_gradient,
-	draw_ellipse_gradient,
-	draw_polygon_gradient,
-	draw_shape_gradient,
-	set_fill_rule,
-	stroke_line_gradient
-};
 
 
 // #pragma mark - ServerPicture
@@ -1294,10 +1247,11 @@ ServerPicture::Play(Canvas* target)
 	if (mallocIO == NULL)
 		return;
 
+	CanvasCallbacks callbacks(target);
+
 	BPrivate::PicturePlayer player(mallocIO->Buffer(),
 		mallocIO->BufferLength(), PictureList::Private(fPictures.Get()).AsBList());
-	player.Play(kPicturePlayerCallbacks, sizeof(kPicturePlayerCallbacks),
-		target);
+	player.Play(callbacks);
 }
 
 
