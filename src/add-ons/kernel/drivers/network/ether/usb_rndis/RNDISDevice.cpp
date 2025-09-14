@@ -251,6 +251,7 @@ status_t
 RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 {
 	if (fRemoved) {
+		TRACE("Reading, but device is removed\n");
 		*numBytes = 0;
 		return B_DEVICE_NOT_FOUND;
 	}
@@ -260,21 +261,28 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 	// buffer for each Read() call before scheduling a new USB transfer. This would be more
 	// efficient if the network stack had a way to read multiple frames at once.
 	if (fReadHeader == NULL) {
+		TRACE("Reading next packet batch\n");
 		status_t result = gUSBModule->queue_bulk(fReadEndpoint, fReadBuffer, sizeof(fReadBuffer),
 			_ReadCallback, this);
 		if (result != B_OK) {
+			TRACE_ALWAYS("failed to schedule read transfer: %s\n", strerror(result));
+			fReadHeader = NULL;
 			*numBytes = 0;
 			return result;
 		}
 
 		result = acquire_sem_etc(fNotifyReadSem, 1, B_CAN_INTERRUPT, 0);
 		if (result < B_OK) {
+			TRACE_ALWAYS("error while waiting for frame: %s\n", strerror(result));
+			fReadHeader = NULL;
 			*numBytes = 0;
 			return result;
 		}
 
 		if (fStatusRead == B_CANCELED) {
+			TRACE_ALWAYS("request was cancelled: %s\n", strerror(result));
 			// The transfer was canceled, so no data was actually received.
+			fReadHeader = NULL;
 			*numBytes = 0;
 			return fStatusRead;
 		}
@@ -282,18 +290,21 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 		if ((fStatusRead != B_OK) && !fRemoved) {
 			// In other error cases (triggered by the device), we need to clear the "halt" feature
 			// so that the next transfers will work.
-			TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusRead);
+			TRACE_ALWAYS("device read status error: %s\n", strerror(fStatusRead));
 
 			gUSBModule->cancel_queued_transfers(fReadEndpoint);
 
 			result = gUSBModule->clear_feature(fReadEndpoint, USB_FEATURE_ENDPOINT_HALT);
 			if (result != B_OK) {
 				TRACE_ALWAYS("failed to clear halt state on read\n");
-				*numBytes = 0;
-				return result;
 			}
+			fReadHeader = NULL;
+			*numBytes = 0;
+			return fStatusRead;
 		}
 		fReadHeader = (uint32*)fReadBuffer;
+	} else {
+		TRACE("Returning buffered packet\n");
 	}
 
 	if (fReadHeader[0] != REMOTE_NDIS_PACKET_MSG) {
@@ -418,7 +429,7 @@ RNDISDevice::Write(const uint8 *buffer, size_t *numBytes)
 	}
 
 	if ((fStatusWrite != B_OK) && !fRemoved) {
-		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusWrite);
+		TRACE_ALWAYS("device write status error 0x%08" B_PRIx32 "\n", fStatusWrite);
 
 		gUSBModule->cancel_queued_transfers(fReadEndpoint);
 
@@ -466,6 +477,11 @@ RNDISDevice::Control(uint32 op, void *buffer, size_t length)
 			state->speed = fDownstreamSpeed * 100;
 			return B_OK;
 		}
+
+		case ETHER_SEND_NET_BUFFER:
+		case ETHER_RECEIVE_NET_BUFFER:
+			// Ignored for now, we use the old read/write interface instead
+			return B_DEV_INVALID_IOCTL;
 
 		default:
 			TRACE_ALWAYS("unsupported ioctl %" B_PRIu32 "\n", op);
@@ -843,7 +859,7 @@ RNDISDevice::_NotifyCallback(void *cookie, int32 status, void *_data,
 	}
 
 	if (status != B_OK) {
-		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", status);
+		TRACE_ALWAYS("device notify status error 0x%08" B_PRIx32 "\n", status);
 
 		if (gUSBModule->clear_feature(device->fNotifyEndpoint,
 			USB_FEATURE_ENDPOINT_HALT) != B_OK)
