@@ -8,6 +8,7 @@
 #include <Entry.h>
 #include <ListItem.h>
 #include <OutlineListView.h>
+#include <PopUpMenu.h>
 
 
 class ResultItem : public BStringItem {
@@ -22,11 +23,19 @@ class GrepListView : public BOutlineListView {
 public:
 								GrepListView();
 
+	virtual void				AttachedToWindow();
+	virtual	void				MouseDown(BPoint where);
+
 			ResultItem*			FindItem(const entry_ref& ref,
 									int32* _index) const;
 
 			ResultItem*			RemoveResults(const entry_ref& ref,
 									bool completeItem);
+
+private:
+			void				_CreatePopUpMenu();
+			BPopUpMenu*			fContextMenu;
 };
+
 
 #endif // GREP_LIST_VIEW_H
