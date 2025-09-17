@@ -1151,7 +1151,8 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 
 	size_t totalLength = length;
 	if (header != NULL) {
-		ASSERT(data == header->msg_iov[0].iov_base);
+		ASSERT((header->msg_iovlen == 0 && data == NULL)
+			|| data == header->msg_iov[0].iov_base);
 
 		// calculate the length considering all of the extra buffers
 		for (int i = 1; i < header->msg_iovlen; i++)
