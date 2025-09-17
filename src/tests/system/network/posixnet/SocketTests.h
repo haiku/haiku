@@ -7,6 +7,7 @@
 class SocketTests : public BTestCase {
  public:
 			void	ClientSocketReuseTest();
+			void	TcpRecvmsgTest();
 
 	static	void	AddTests(BTestSuite& suite);
 };

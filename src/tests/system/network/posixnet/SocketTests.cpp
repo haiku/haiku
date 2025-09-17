@@ -14,7 +14,8 @@
 // This test reproduces a KDL from issue #13927 where a socket is created
 // and an attempt is made to connect to an address, which fails. The socket
 // is closed and then reused to connect to a *different* address.
-void SocketTests::ClientSocketReuseTest()
+void
+SocketTests::ClientSocketReuseTest()
 {
 	// TODO: Try to find unused ports instead of using these hard-coded ones.
 	const uint16_t kFirstPort = 14025;
@@ -49,12 +50,34 @@ void SocketTests::ClientSocketReuseTest()
 }
 
 
-void SocketTests::AddTests(BTestSuite &parent) {
+// This test reproduces a KDL from issue #19755.
+void
+SocketTests::TcpRecvmsgTest()
+{
+	// create a client socket
+	int fd = socket(AF_INET, SOCK_STREAM, 0);
+	CPPUNIT_ASSERT(fd >= 0);
+
+	struct msghdr msg;
+	memset(&msg, 0, sizeof(msg));
+	ssize_t r = recvmsg(fd, &msg, 0);
+	CPPUNIT_ASSERT(r == -1);
+
+	close(fd);
+}
+
+
+void
+SocketTests::AddTests(BTestSuite &parent)
+{
 	CppUnit::TestSuite &suite = *new CppUnit::TestSuite("SocketTests");
 
 	suite.addTest(new CppUnit::TestCaller<SocketTests>(
 		"SocketTests::ClientSocketReuseTest",
 		&SocketTests::ClientSocketReuseTest));
+	suite.addTest(new CppUnit::TestCaller<SocketTests>(
+		"SocketTests::TcpRecvmsgTest",
+		&SocketTests::TcpRecvmsgTest));
 
 	parent.addTest("SocketTests", &suite);
 }
