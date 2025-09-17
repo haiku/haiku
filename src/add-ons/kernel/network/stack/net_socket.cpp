@@ -268,8 +268,10 @@ process_ancillary_data(net_socket* socket,
 		return B_OK;
 	}
 
-	if (socket->first_info->process_ancillary_data_no_container == NULL)
-		return B_NOT_SUPPORTED;
+	if (socket->first_info->process_ancillary_data_no_container == NULL) {
+		messageHeader->msg_controllen = 0;
+		return B_OK;
+	}
 
 	bytesWritten = socket->first_info->process_ancillary_data_no_container(
 		socket->first_protocol, buffer, dataBuffer,
