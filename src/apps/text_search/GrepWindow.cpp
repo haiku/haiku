@@ -1390,7 +1390,14 @@ GrepWindow::_OnTrimSelection()
 		if (item == NULL)
 			break;
 
-		if (!item->IsSelected() || item->OutlineLevel() != 0)
+		// only open selected items
+		if (!item->IsSelected())
+			continue;
+
+		// get top level (file) item
+		if (item->OutlineLevel() != 0)
+			item = dynamic_cast<BStringItem*>(fSearchResults->Superitem(item));
+		if (item == NULL)
 			continue;
 
 		if (path == item->Text())
@@ -1486,8 +1493,14 @@ GrepWindow::_OnSelectInTracker()
 		if (item == NULL)
 			break;
 
-		// only open selected and top level (file) items
-		if (!item->IsSelected() || item->OutlineLevel() > 0)
+		// only open selected items
+		if (!item->IsSelected())
+			continue;
+
+		// get top level (file) item
+		if (item->OutlineLevel() != 0)
+			item = dynamic_cast<BStringItem*>(fSearchResults->Superitem(item));
+		if (item == NULL)
 			continue;
 
 		// check if this was previously opened
