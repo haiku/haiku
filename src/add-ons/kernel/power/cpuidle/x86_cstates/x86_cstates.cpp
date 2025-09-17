@@ -139,25 +139,34 @@ init_cstates()
 	cpuid_info cpuid;
 	get_current_cpuid(&cpuid, 0, 0);
 	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;
-	if (maxBasicLeaf < IA32_CPUID_LEAF_MWAIT)
+	if (maxBasicLeaf < IA32_CPUID_LEAF_MWAIT) {
+		dprintf("can't use x86 C-States: no CPUID leaf for MWAIT\n");
 		return B_ERROR;
+	}
 
 	get_current_cpuid(&cpuid, IA32_CPUID_LEAF_MWAIT, 0);
 	uint32 minMonitorLineSize = cpuid.regs.eax & 0xffff;
 	//uint32 maxMonitorLineSize = cpuid.regs.ebx & 0xffff;
-	uint32 mwaitSubStates  = cpuid.regs.edx;
-	if (minMonitorLineSize < sizeof(int32))
+	uint32 mwaitSubStates = cpuid.regs.edx;
+	if (minMonitorLineSize < sizeof(int32)) {
+		dprintf("can't use x86 C-States: line size too small\n");
 		return B_ERROR;
-	if (mwaitSubStates == 0)
+	}
+	if (mwaitSubStates == 0) {
+		dprintf("can't use x86 C-States: no MWAIT sub-states\n");
 		return B_ERROR;
+	}
+
 	// check Enumeration of Monitor-Mwait extensions is supported
 	// and check treating interrupts as break-events even when interrupts disabled is supported
-	if ((cpuid.regs.ecx & CPUID_MWAIT_ECX_SUPPORT) != CPUID_MWAIT_ECX_SUPPORT)
+	if ((cpuid.regs.ecx & CPUID_MWAIT_ECX_SUPPORT) != CPUID_MWAIT_ECX_SUPPORT) {
+		dprintf("can't use x86 C-States: extensions missing\n");
 		return B_ERROR;
+	}
 
 	cpu_ent* cpu = &gCPU[0];
 	uint8 model = cpu->arch.model + (cpu->arch.extended_model << 4);
-	if (cpu->arch.family == 6) {
+	if (cpu->arch.vendor == VENDOR_INTEL && cpu->arch.family == 6) {
 		// disable C5 and C6 states on Skylake (same as Linux)
 		if (model == 0x5e && (mwaitSubStates & (0xf << 28)) != 0)
 			mwaitSubStates &= 0xf00fffff;
@@ -181,8 +190,10 @@ init_cstates()
 		sCStateCount++;
 	}
 
-	if (sCStateCount == 0)
+	if (sCStateCount == 0) {
+		dprintf("can't use x86 C-States: none found\n");
 		return B_ERROR;
+	}
 
 	sIdleTime = new(std::nothrow) bigtime_t[smp_get_num_cpus()];
 	if (sIdleTime == NULL)
@@ -191,7 +202,7 @@ init_cstates()
 
 	cstates_set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
 
-	dprintf("using Intel C-States: C0%s\n", cStates);
+	dprintf("using x86 C-States: C0%s\n", cStates);
 	return B_OK;
 }
 
@@ -240,4 +251,3 @@ module_info* modules[] = {
 	(module_info*)&sX86CStates,
 	NULL
 };
-
