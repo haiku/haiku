@@ -250,7 +250,7 @@ send_test()
 		return 1;
 	}
 
-	status = sendto(sock2, "test3", 5, 0, (struct sockaddr*)&addr1, sizeof(addr1));
+	status = sendto(sock2, "test3", 5, MSG_NOSIGNAL, (struct sockaddr*)&addr1, sizeof(addr1));
 	if (status != -1) {
 		REPORT_ERROR("sendto() succeeded unexpectedly\n");
 		return 1;
@@ -446,7 +446,7 @@ shutdown_test()
 		return 1;
 	}
 
-	status = sendto(sock, "test", 4, 0, (struct sockaddr*)&addr1, sizeof(addr1));
+	status = sendto(sock, "test", 4, MSG_NOSIGNAL, (struct sockaddr*)&addr1, sizeof(addr1));
 	if (status != -1) {
 		REPORT_ERROR("send() succeeded unexpectedly\n");
 		return 1;
@@ -468,7 +468,7 @@ shutdown_test()
 		return 1;
 	}
 
-	status = sendto(sock1, "test", 4, 0, (struct sockaddr*)&addr, sizeof(addr));
+	status = sendto(sock1, "test", 4, MSG_NOSIGNAL, (struct sockaddr*)&addr, sizeof(addr));
 	if (status != -1) {
 		REPORT_ERROR("send() succeeded unexpectedly\n");
 		return 1;
