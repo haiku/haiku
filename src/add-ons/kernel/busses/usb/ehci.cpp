@@ -2006,7 +2006,8 @@ EHCI::FinishTransfers()
 
 				if (callbackStatus == B_OK) {
 					bool nextDataToggle = false;
-					if (transfer->data_descriptor && transfer->incoming) {
+					if (transfer->data_descriptor && transfer->incoming
+							&& transfer->data_descriptor->buffer_log != NULL) {
 						// data to read out
 						generic_io_vec *vector = transfer->transfer->Vector();
 						size_t vectorCount = transfer->transfer->VectorCount();
@@ -2017,7 +2018,7 @@ EHCI::FinishTransfers()
 								vector, vectorCount, transfer->transfer->IsPhysical(),
 								&nextDataToggle);
 						}
-					} else if (transfer->data_descriptor) {
+					} else if (transfer->data_descriptor != NULL) {
 						// calculate transfered length
 						actualLength = ReadActualLength(
 							transfer->data_descriptor, &nextDataToggle);
@@ -2461,8 +2462,9 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 	if (transfer->VectorCount() > 0) {
 		ehci_qtd *lastDescriptor = NULL;
 		status_t result = CreateDescriptorChain(pipe, &dataDescriptor,
-			&lastDescriptor, statusDescriptor, transfer->FragmentLength(),
-			directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT);
+			&lastDescriptor, statusDescriptor,
+			directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT,
+			transfer->FragmentLength());
 
 		if (result != B_OK) {
 			FreeDescriptor(setupDescriptor);
@@ -2504,6 +2506,14 @@ status_t
 EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
 	ehci_qtd **_dataDescriptor, bool *_directionIn, bool prepareKernelAccess)
 {
+	if (transfer->IsPhysical()) {
+		// Try to use the physical buffer directly, first.
+		status_t result = _FillQueueWithPhysicalData(transfer, queueHead,
+			_dataDescriptor, _directionIn);
+		if (result != B_NOT_SUPPORTED)
+			return result;
+	}
+
 	Pipe *pipe = transfer->TransferPipe();
 	bool directionIn = (pipe->Direction() == Pipe::In);
 
@@ -2511,13 +2521,13 @@ EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
 	ehci_qtd *lastDescriptor = NULL;
 	ehci_qtd *strayDescriptor = queueHead->stray_log;
 	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
-		&lastDescriptor, strayDescriptor, transfer->FragmentLength(),
-		directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT);
+		&lastDescriptor, strayDescriptor,
+		directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT,
+		transfer->FragmentLength());
 
 	if (result != B_OK)
 		return result;
 
-	lastDescriptor->token |= EHCI_QTD_IOC;
 	if (!directionIn) {
 		if (prepareKernelAccess) {
 			result = transfer->PrepareKernelAccess();
@@ -2533,6 +2543,96 @@ EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
 	queueHead->element_log = firstDescriptor;
 	queueHead->overlay.next_phy = firstDescriptor->this_phy;
 	queueHead->overlay.alt_next_phy = EHCI_ITEM_TERMINATE;
+	lastDescriptor->token |= EHCI_QTD_IOC;
+
+	*_dataDescriptor = firstDescriptor;
+	if (_directionIn)
+		*_directionIn = directionIn;
+	return B_OK;
+}
+
+
+status_t
+EHCI::_FillQueueWithPhysicalData(Transfer *transfer, ehci_qh *queueHead,
+	ehci_qtd **_dataDescriptor, bool *_directionIn)
+{
+	generic_io_vec* transferVec = transfer->Vector();
+	size_t vecI;
+	int32 pagesCount = 0;
+	bool canUseBuffer = true;
+
+	for (vecI = 0; vecI < transfer->VectorCount(); vecI++) {
+		canUseBuffer = canUseBuffer
+			&& (transferVec[vecI].base + transferVec[vecI].length) < UINT32_MAX;
+		pagesCount += (transferVec[vecI].length + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+	}
+
+	if (transfer->VectorCount() > 1) {
+		canUseBuffer = canUseBuffer
+			&& ((transferVec[0].base + transferVec[0].length) % B_PAGE_SIZE) == 0;
+	}
+	for (vecI = 1; vecI < (transfer->VectorCount() - 1); vecI++) {
+		canUseBuffer = canUseBuffer
+			&& (transferVec[vecI].base % B_PAGE_SIZE) == 0
+			&& (transferVec[vecI].length % B_PAGE_SIZE) == 0;
+	}
+	if (vecI != 1) {
+		canUseBuffer = canUseBuffer
+			&& ((transferVec[vecI - 1].base) % B_PAGE_SIZE) == 0;
+	}
+
+	if (!canUseBuffer)
+		return B_NOT_SUPPORTED;
+
+	Pipe *pipe = transfer->TransferPipe();
+	bool directionIn = (pipe->Direction() == Pipe::In);
+
+	ehci_qtd *firstDescriptor = NULL;
+	ehci_qtd *lastDescriptor = NULL;
+	ehci_qtd *strayDescriptor = queueHead->stray_log;
+	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
+		&lastDescriptor, strayDescriptor,
+		directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT,
+		0, (pagesCount + 5 - 1) / 5);
+
+	if (result != B_OK)
+		return result;
+
+	ehci_qtd *current = firstDescriptor;
+	uint32 transferVecOffset = 0;
+	size_t remaining = transfer->FragmentLength();
+	while (remaining != 0) {
+		uint32 qtdLength = 0;
+		for (int i = 0; i < 5; i++) {
+			current->buffer_phy[i] = (uint32)transferVec->base + transferVecOffset;
+
+			// Special cases for the first and last buffers.
+			uint32 bufferLength = B_PAGE_SIZE;
+			if ((current->buffer_phy[i] % B_PAGE_SIZE) != 0)
+				bufferLength -= (current->buffer_phy[i] % B_PAGE_SIZE);
+			if (bufferLength > remaining)
+				bufferLength = remaining;
+
+			qtdLength += bufferLength;
+			transferVecOffset += bufferLength;
+			remaining -= bufferLength;
+			if (transferVec->length == transferVecOffset) {
+				transferVec++;
+				transferVecOffset = 0;
+			}
+			if (remaining == 0)
+				break;
+		}
+		current->buffer_size = qtdLength;
+		current->token |= qtdLength << EHCI_QTD_BYTES_SHIFT;
+
+		current = current->next_log;
+	}
+
+	queueHead->element_log = firstDescriptor;
+	queueHead->overlay.next_phy = firstDescriptor->this_phy;
+	queueHead->overlay.alt_next_phy = EHCI_ITEM_TERMINATE;
+	lastDescriptor->token |= EHCI_QTD_IOC;
 
 	*_dataDescriptor = firstDescriptor;
 	if (_directionIn)
@@ -2595,17 +2695,18 @@ EHCI::CreateDescriptor(size_t bufferSize, uint8 pid)
 
 status_t
 EHCI::CreateDescriptorChain(Pipe *pipe, ehci_qtd **_firstDescriptor,
-	ehci_qtd **_lastDescriptor, ehci_qtd *strayDescriptor, size_t bufferSize,
-	uint8 pid)
+	ehci_qtd **_lastDescriptor, ehci_qtd *strayDescriptor, uint8 pid,
+	size_t buffersLength, int32 descriptorCount)
 {
 	size_t packetSize = B_PAGE_SIZE * 4;
-	int32 descriptorCount = (bufferSize + packetSize - 1) / packetSize;
+	if (descriptorCount < 0)
+		descriptorCount = (buffersLength + packetSize - 1) / packetSize;
 
 	bool dataToggle = pipe->DataToggle();
 	ehci_qtd *firstDescriptor = NULL;
 	ehci_qtd *lastDescriptor = *_firstDescriptor;
 	for (int32 i = 0; i < descriptorCount; i++) {
-		ehci_qtd *descriptor = CreateDescriptor(min_c(packetSize, bufferSize),
+		ehci_qtd *descriptor = CreateDescriptor(min_c(packetSize, buffersLength),
 			pid);
 
 		if (!descriptor) {
@@ -2619,7 +2720,8 @@ EHCI::CreateDescriptorChain(Pipe *pipe, ehci_qtd **_firstDescriptor,
 		if (lastDescriptor)
 			LinkDescriptors(lastDescriptor, descriptor, strayDescriptor);
 
-		bufferSize -= packetSize;
+		if (buffersLength != 0)
+			buffersLength -= packetSize;
 		lastDescriptor = descriptor;
 		if (!firstDescriptor)
 			firstDescriptor = descriptor;
