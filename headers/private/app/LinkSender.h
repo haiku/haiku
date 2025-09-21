@@ -11,6 +11,7 @@
 #define _LINK_SENDER_H
 
 
+#include <AffineTransform.h>
 #include <OS.h>
 
 
@@ -43,6 +44,11 @@ class LinkSender {
 		status_t AttachRegion(const BRegion& region);
 		status_t AttachShape(BShape& shape);
 		status_t AttachGradient(const BGradient& gradient);
+		status_t AttachAffineTransform(const BAffineTransform& transform)
+		{
+			return Attach(&transform.sx, sizeof(double) * 6);
+		}
+
 		template <class Type> status_t Attach(const Type& data)
 		{
 			return Attach(&data, sizeof(Type));

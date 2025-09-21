@@ -1951,7 +1951,7 @@ BView::SetTransform(BAffineTransform transform)
 		_CheckLockAndSwitchCurrent();
 
 		fOwner->fLink->StartMessage(AS_VIEW_SET_TRANSFORM);
-		fOwner->fLink->Attach<BAffineTransform>(transform);
+		fOwner->fLink->AttachAffineTransform(transform);
 
 		fState->valid_flags |= B_VIEW_TRANSFORM_BIT;
 	}
@@ -1971,7 +1971,7 @@ BView::Transform() const
 
  		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK)
-			fOwner->fLink->Read<BAffineTransform>(&fState->transform);
+			fOwner->fLink->ReadAffineTransform(&fState->transform);
 
 		fState->valid_flags |= B_VIEW_TRANSFORM_BIT;
 	}
@@ -1993,7 +1993,7 @@ BView::TransformTo(coordinate_space basis) const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK) {
-			fOwner->fLink->Read<BAffineTransform>(&fState->parent_composite_transform);
+			fOwner->fLink->ReadAffineTransform(&fState->parent_composite_transform);
 			fOwner->fLink->Read<float>(&fState->parent_composite_scale);
 			fOwner->fLink->Read<BPoint>(&fState->parent_composite_origin);
 		}

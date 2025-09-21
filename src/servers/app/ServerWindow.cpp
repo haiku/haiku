@@ -1614,7 +1614,7 @@ fDesktop->LockSingleWindow();
 		case AS_VIEW_SET_TRANSFORM:
 		{
 			BAffineTransform transform;
-			if (link.Read<BAffineTransform>(&transform) != B_OK)
+			if (link.ReadAffineTransform(&transform) != B_OK)
 				break;
 
 			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_TRANSFORM: "
@@ -1637,7 +1637,7 @@ fDesktop->LockSingleWindow();
 				transform.shx, transform.sy, transform.tx, transform.ty));
 
 			fLink.StartMessage(B_OK);
-			fLink.Attach<BAffineTransform>(transform);
+			fLink.AttachAffineTransform(transform);
 			fLink.Flush();
 			break;
 		}
@@ -1647,11 +1647,11 @@ fDesktop->LockSingleWindow();
 
 			fLink.StartMessage(B_OK);
 			if (state != NULL) {
-				fLink.Attach<BAffineTransform>(state->CombinedTransform());
+				fLink.AttachAffineTransform(state->CombinedTransform());
 				fLink.Attach<float>(state->CombinedScale());
 				fLink.Attach<BPoint>(state->CombinedOrigin());
 			} else {
-				fLink.Attach<BAffineTransform>(BAffineTransform());
+				fLink.AttachAffineTransform(BAffineTransform());
 				fLink.Attach<float>(1.0f);
 				fLink.Attach<BPoint>(B_ORIGIN);
 			}
@@ -3329,7 +3329,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_VIEW_SET_TRANSFORM:
 		{
 			BAffineTransform transform;
-			if (link.Read<BAffineTransform>(&transform) != B_OK)
+			if (link.ReadAffineTransform(&transform) != B_OK)
 				break;
 
 			picture->WriteSetTransform(transform);

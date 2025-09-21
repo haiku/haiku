@@ -11,6 +11,7 @@
 #define _LINK_RECEIVER_H
 
 
+#include <AffineTransform.h>
 #include <OS.h>
 
 
@@ -42,6 +43,8 @@ class LinkReceiver {
 		status_t ReadRegion(BRegion* region);
 		status_t ReadShape(BShape* shape);
 		status_t ReadGradient(BGradient** gradient);
+		status_t ReadAffineTransform(BAffineTransform *transform)
+			{ return Read(&transform->sx, sizeof(double) * 6); }
 
 		template <class Type> status_t Read(Type *data)
 			{ return Read(data, sizeof(Type)); }
