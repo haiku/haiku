@@ -15,7 +15,11 @@
 #include <Locker.h>
 #include <Messenger.h>
 
+#include <HashMap.h>
+#include <HashString.h>
+
 #include "BasicTerminalBuffer.h"
+#include "HyperLink.h"
 
 
 class TerminalBuffer : public BasicTerminalBuffer, public BLocker {
@@ -57,6 +61,9 @@ public:
 			void				SetMode(uint32 mode);
 			void				ResetMode(uint32 mode);
 
+			uint32				PutHyperLink(const char* id, BString& uri);
+			bool				GetHyperLink(uint32 ref, HyperLink& _link);
+
 protected:
 	virtual	void				NotifyListener();
 
@@ -78,6 +85,12 @@ private:
 
 			uint32				fMode;
 			int					fCursorStyle;
+
+			typedef HashMap<HashKey32<int32>, HyperLink*> HyperLinkRefMap;
+			HyperLinkRefMap		fHyperLinkForRef;
+			typedef HashMap<HashString, HyperLink*> HyperLinkIDMap;
+			HyperLinkIDMap		fHyperLinkForID;
+			uint32				fNextOSCRef;
 };
 
 

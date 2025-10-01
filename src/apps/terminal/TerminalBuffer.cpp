@@ -34,7 +34,8 @@ TerminalBuffer::TerminalBuffer()
 	fColorsPalette(NULL),
 	fListenerValid(false),
 	fMode(MODE_INTERPRET_META_KEY | MODE_META_KEY_SENDS_ESCAPE | MODE_CURSOR_BLINKING),
-	fCursorStyle(BLOCK_CURSOR)
+	fCursorStyle(BLOCK_CURSOR),
+	fNextOSCRef(1)
 {
 }
 
@@ -44,6 +45,14 @@ TerminalBuffer::~TerminalBuffer()
 	free(fAlternateScreen);
 	delete fAlternateHistory;
 	delete[] fColorsPalette;
+
+	HyperLinkRefMap::Iterator iterator = fHyperLinkForRef.GetIterator();
+	while (iterator.HasNext()) {
+		HyperLinkRefMap::Entry entry = iterator.Next();
+		delete entry.value;
+	}
+	fHyperLinkForID.Clear();
+	fHyperLinkForRef.Clear();
 }
 
 
@@ -320,4 +329,34 @@ TerminalBuffer::_SwitchScreenBuffer()
 	std::swap(fScreenOffset, fAlternateScreenOffset);
 	std::swap(fAttributes, fAlternateAttributes);
 	fAlternateScreenActive = !fAlternateScreenActive;
+}
+
+
+uint32
+TerminalBuffer::PutHyperLink(const char* id, BString& uri)
+{
+	HyperLink* hyperLink = NULL;
+	if (id != NULL)
+		hyperLink = fHyperLinkForID.Get(id);
+	if (hyperLink == NULL) {
+		hyperLink = new (std::nothrow) HyperLink(uri, fNextOSCRef++, id);
+		if (id != NULL)
+			fHyperLinkForID.Put(id, hyperLink);
+		HyperLink* oldHyperLink = fHyperLinkForRef.Get(hyperLink->OSCRef());
+		fHyperLinkForRef.Put(hyperLink->OSCRef(), hyperLink);
+		delete oldHyperLink;
+	}
+	return hyperLink->OSCRef();
+}
+
+
+bool
+TerminalBuffer::GetHyperLink(uint32 ref, HyperLink &_link)
+{
+	HyperLink* hyperLink = fHyperLinkForRef.Get(ref);
+	if (hyperLink == NULL) {
+		return false;
+	}
+	_link = *hyperLink;
+	return true;
 }

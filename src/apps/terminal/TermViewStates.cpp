@@ -833,9 +833,18 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 	HyperLink& _link, TermPos& _start, TermPos& _end)
 {
 	TerminalBuffer* textBuffer = fView->fTextBuffer;
+	BasicTerminalBuffer* visibleTextBuffer = fView->fVisibleTextBuffer;
 	BAutolock textBufferLocker(textBuffer);
+	int32 firstVisible = fView->_LineAt(0);
 
 	TermPos pos = fView->_ConvertToTerminal(where);
+
+	UTF8Char character;
+	Attributes attr;
+	if (visibleTextBuffer->GetChar(pos.y - firstVisible, pos.x, character, attr) == A_CHAR
+		&& attr.Hyperlink() != 0) {
+		return textBuffer->GetHyperLink(attr.Hyperlink(), _link);
+	}
 
 	// try to get a URL first
 	BString text;
@@ -1120,6 +1129,7 @@ TermView::HyperLinkMenuState::Prepare(BPoint point, const HyperLink& link)
 	BLayoutBuilder::Menu<> menuBuilder(menu);
 	switch (link.GetType()) {
 		case HyperLink::TYPE_URL:
+		case HyperLink::TYPE_OSC_URL:
 			menuBuilder
 				.AddItem(B_TRANSLATE("Open link"), kMessageOpenLink)
 				.AddItem(B_TRANSLATE("Copy link location"), kMessageCopyLink);
@@ -1161,8 +1171,7 @@ TermView::HyperLinkMenuState::MessageReceived(BMessage* message)
 		case kMessageCopyAbsolutePath:
 		{
 			if (fLink.IsValid()) {
-				BString toCopy = message->what == kMessageCopyLink
-					? fLink.Text() : fLink.Address();
+				BString toCopy = fLink.Address();
 
 				if (!be_clipboard->Lock())
 					return true;

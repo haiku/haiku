@@ -646,6 +646,12 @@ TermParse::EscParse()
 						param[nparam++] = ' ';
 					break;
 
+				case CASE_CSI_EXCL: // ESC [N p
+					// part of soft reset DECSTR
+					if (nparam < NPARAM)
+						param[nparam++] = '!';
+					break;
+
 				case CASE_DEC_DOL: // ESC [? N p
 					// part of change cursor style DECRQM
 					if (nparam < NPARAM)
@@ -838,6 +844,10 @@ TermParse::EscParse()
 								attributes |= INVERSE;
 								break;
 
+							case 8:	/* Hidden	*/
+								attributes |= HIDDEN;
+								break;
+
 							case 21:	/* Double Underline	*/
 								attributes.SetUnder(DOUBLE_UNDERLINE);
 								break;
@@ -852,6 +862,10 @@ TermParse::EscParse()
 
 							case 27:	/* Not Inverse	*/
 								attributes &= ~INVERSE;
+								break;
+
+							case 28:	/* Not Hidden	*/
+								attributes &= ~HIDDEN;
 								break;
 
 							case 53:	/* Overline	*/
@@ -1298,6 +1312,14 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 
+				case CASE_DECSTR:	// DECSTR - soft terminal reset
+					if (nparam == 2 && param[1] == '!') {
+						Attributes attributes;
+						fBuffer->SetAttributes(attributes);
+					}
+					parsestate = groundtable;
+					break;
+
 				default:
 					break;
 			}
@@ -1710,6 +1732,34 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 				fBuffer->ResetColors(indexes, 1, true);
 			}
 			break;
+		// handle hyperlinks
+		case 8:
+		{
+			char* id = NULL;
+			char* start = (char*)params;
+			char* end = strpbrk(start, ";:");
+			for (; end != NULL; start = end + 1) {
+				end = strpbrk(start, ";:");
+				if (end == NULL)
+					break;
+				if (end - start > 3 && strncmp(start, "id=", 3) == 0)
+					id = strndup(start + 3, end - start + 3);
+				if (*end == ';')
+					break;
+			}
+			if (end == NULL)
+				break;
+			BString uri(end + 1);
+			Attributes attributes = fBuffer->GetAttributes();
+			if (uri.IsEmpty()) {
+				attributes.SetHyperlink(0);
+			} else {
+				attributes.SetHyperlink(fBuffer->PutHyperLink(id, uri));
+			}
+			free(id);
+			fBuffer->SetAttributes(attributes);
+			break;
+		}
 		default:
 		//	printf("%d -> %s\n", mode, params);
 			break;

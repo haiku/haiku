@@ -24,8 +24,10 @@ struct Attributes {
 	uint32 background;
 	uint32 underline;
 	int underlineStyle;
+	uint32 hyperlink;
 
-	Attributes() : state(0), foreground(0), background(0), underline(0), underlineStyle(0) {}
+	Attributes() : state(0), foreground(0), background(0), underline(0), underlineStyle(0),
+		hyperlink(0) {}
 
 	inline void Reset()
 	{
@@ -41,6 +43,7 @@ struct Attributes {
 	inline bool IsUnder() const { return (state & UNDERLINE) == UNDERLINE; }
 	inline bool IsInverse() const { return (state & INVERSE) == INVERSE; }
 	inline bool IsOver() const { return (state & OVERLINE) == OVERLINE; }
+	inline bool IsHidden() const { return (state & HIDDEN) == HIDDEN; }
 	inline bool IsMouse() const { return (state & MOUSE) == MOUSE; }
 	inline bool IsForeSet() const { return (state & FORESET) == FORESET; }
 	inline bool IsBackSet() const { return (state & BACKSET) == BACKSET; }
@@ -94,6 +97,11 @@ struct Attributes {
 	{
 		underlineStyle = style;
 		state |= UNDERLINE;
+	}
+
+	inline void SetHyperlink(uint32 id)
+	{
+		hyperlink = id;
 	}
 
 	inline void UnsetForeground()
@@ -159,6 +167,12 @@ struct Attributes {
 		return underlineStyle;
 	}
 
+	inline uint32
+	Hyperlink() const
+	{
+		return hyperlink;
+	}
+
 	inline Attributes&
 	operator&=(uint32 value) { state &= value; return *this; }
 
@@ -178,7 +192,8 @@ struct Attributes {
 			&& foreground == other.foreground
 			&& background == other.background
 			&& underline == other.underline
-			&& underlineStyle == other.underlineStyle;
+			&& underlineStyle == other.underlineStyle
+			&& hyperlink == other.hyperlink;
 	}
 
 	inline bool
@@ -188,7 +203,8 @@ struct Attributes {
 			|| foreground != other.foreground
 			|| background != other.background
 			|| underline != other.underline
-			|| underlineStyle != other.underlineStyle;
+			|| underlineStyle != other.underlineStyle
+			|| hyperlink != other.hyperlink;
 	}
 };
 
@@ -203,7 +219,8 @@ struct TerminalCell {
 		return (attributes.state & CHAR_ATTRIBUTES)
 				!= (other.state & CHAR_ATTRIBUTES)
 			|| attributes.foreground != other.foreground
-			|| attributes.background != other.background;
+			|| attributes.background != other.background
+			|| attributes.hyperlink != other.hyperlink;
 	}
 };
 

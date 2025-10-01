@@ -452,7 +452,7 @@ TermView::BackgroundColor()
 }
 
 
-inline int32
+int32
 TermView::_LineAt(float y) const
 {
 	int32 location = int32(y + fScrollOffset);
@@ -1061,6 +1061,9 @@ void
 TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 	char *buf, int32 width, Highlight* highlight, bool cursor, BView *inView)
 {
+	if (attr.IsHidden())
+		return;
+
 	if (highlight != NULL)
 		attr.state = highlight->Highlighter()->AdjustTextAttributes(attr.state);
 

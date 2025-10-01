@@ -188,7 +188,7 @@ private:
 
 private:
 			// point and text offset conversion
-	inline	int32				_LineAt(float y) const;
+			int32				_LineAt(float y) const;
 	inline	float				_LineOffset(int32 index) const;
 			TermPos				_ConvertToTerminal(const BPoint& point) const;
 	inline	BPoint				_ConvertFromTerminal(const TermPos& pos) const;
