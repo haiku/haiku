@@ -1098,8 +1098,10 @@ ipv6_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 			return EOPNOTSUPP;
 		if (option == IPV6_UNICAST_HOPS)
 			return get_int_option(value, *_length, protocol->time_to_live);
-		if (option == IPV6_V6ONLY)
-			return EOPNOTSUPP;
+		if (option == IPV6_V6ONLY) {
+			int v6only = 1;
+			return get_int_option(value, *_length, v6only);
+		}
 		if (option == IPV6_RECVPKTINFO)
 			return get_int_option(value, *_length, protocol->receive_pktinfo);
 		if (option == IPV6_RECVHOPLIMIT)
@@ -1170,8 +1172,13 @@ ipv6_setsockopt(net_protocol* _protocol, int level, int option,
 			return EOPNOTSUPP;
 		if (option == IPV6_UNICAST_HOPS)
 			return set_int_option(protocol->time_to_live, value, length);
-		if (option == IPV6_V6ONLY)
-			return EOPNOTSUPP;
+		if (option == IPV6_V6ONLY) {
+			int v6only;
+			status_t status = set_int_option(v6only, value, length);
+			if (status == B_OK && v6only == 0)
+				status = B_BAD_VALUE;
+			return status;
+		}
 		if (option == IPV6_RECVPKTINFO)
 			return set_int_option(protocol->receive_pktinfo, value, length);
 		if (option == IPV6_RECVHOPLIMIT)
