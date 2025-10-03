@@ -310,7 +310,8 @@ struct BilinearDefault :
 		// pixel in bottom right corner if necessary
 		if (yMax < y2 && xIndexMax < xIndexR) {
 			const uint8* s = src + this->fWeightsX[xIndexR].index;
-			*(uint32*)d = *(uint32*)s;
+			uint32 t[4] = {s[0], s[1], s[2], s[3]};
+			DrawMode::Blend(d, &t[0]);
 		}
 	}
 };
