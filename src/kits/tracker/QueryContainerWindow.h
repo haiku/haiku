@@ -65,6 +65,8 @@ protected:
 
 	virtual	void				SetupDefaultState();
 
+	virtual	bool				ShouldHaveEditQueryItem(const entry_ref* = NULL);
+
 private:
 	typedef BContainerWindow	_inherited;
 };

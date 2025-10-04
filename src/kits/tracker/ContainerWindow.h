@@ -294,12 +294,12 @@ protected:
 	uint32 fOpenFlags;
 	bool fUsesLayout;
 
-	bool ShouldHaveNavigationMenu(const entry_ref* = NULL);
-	bool ShouldHaveOpenWithMenu(const entry_ref* = NULL);
-	bool ShouldHaveEditQueryItem(const entry_ref* = NULL);
-	bool ShouldHaveMoveCopyMenus(const entry_ref* = NULL);
-	bool ShouldHaveNewFolderItem();
-	bool ShouldHaveAddOnMenus();
+	virtual bool ShouldHaveNavigationMenu(const entry_ref* = NULL);
+	virtual bool ShouldHaveOpenWithMenu(const entry_ref* = NULL);
+	virtual bool ShouldHaveEditQueryItem(const entry_ref* = NULL);
+	virtual bool ShouldHaveMoveCopyMenus(const entry_ref* = NULL);
+	virtual bool ShouldHaveNewFolderItem();
+	virtual bool ShouldHaveAddOnMenus();
 
 public:
 	virtual bool ShouldHaveDraggableFolderIcon();

@@ -113,6 +113,10 @@ BQueryContainerWindow::AddWindowMenu(BMenu* menu)
 	item = Shortcuts()->CloseItem();
 	item->SetTarget(this);
 	menu->AddItem(item);
+
+	item = Shortcuts()->CloseAllInWorkspaceItem();
+	item->SetTarget(this);
+	menu->AddItem(item);
 }
 
 
@@ -182,6 +186,13 @@ BQueryContainerWindow::SetupDefaultState()
 	NamesToAcceptAttrFilter filter(allowAttrs);
 	AttributeStreamFileNode fileNode(&defaultingNode);
 	*opener.StreamNode() << memoryNode << filter << fileNode;
+}
+
+
+bool
+BQueryContainerWindow::ShouldHaveEditQueryItem(const entry_ref*)
+{
+	return true;
 }
 
 

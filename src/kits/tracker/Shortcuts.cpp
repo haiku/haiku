@@ -1093,7 +1093,7 @@ TShortcuts::UpdateEditQueryItem(BMenuItem* item)
 		return;
 
 	if (fInWindow) {
-		item->SetEnabled(HasSelection());
+		item->SetEnabled(IsQuery() || HasSelection());
 		item->SetTarget(PoseView());
 	}
 }
