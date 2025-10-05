@@ -225,8 +225,6 @@ ConditionVariableEntry::Wait(const void* object, uint32 flags,
 // #pragma mark - ConditionVariable
 
 
-/*!	Initialization method for anonymous (unpublished) condition variables.
-*/
 void
 ConditionVariable::Init(const void* object, const char* objectType)
 {

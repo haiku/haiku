@@ -54,9 +54,9 @@
 	\section semaphores Semaphores
 
 	Semaphores are the historical way to signal events in BeOS and Haiku. A semaphore has a counter
-	that can be incremented (release_sem) and decremented (acquire_sem). The counter is not allowed
-	to go below 0, if a thread attempts to acquire an empty semaphore, it will be blocked until
-	someone else releases it.
+	that can be incremented (\ref release_sem) and decremented (\ref acquire_sem). The counter is
+	not allowed to go below 0, if a thread attempts to acquire an empty semaphore, it will be
+	blocked until someone else releases it.
 
 	Seaphores can be used to implement mutexes: by creating a semaphore with a count of 1, threads
 	can enter the critical section by acquiring, and exit it by releasing the semaphore. Additional
@@ -78,8 +78,24 @@
 
 	\section condition_variables Condition Variables
 
-	A more recent addition to Haiku synchronization primitives is condition variables. They allow
-	a thread to wait for a specific condition, which is notified by another thread. This is
-	similar to the use of semaphores outlined above, but provides an easier way to handle race
-	conditions, spurious wakeups, and so on.
+	A more recent addition to Haiku synchronization primitives is \ref ConditionVariable.
+	Condition variables allow a thread to wait for a specific condition, which is notified by
+	another thread. This is similar to the use of semaphores outlined above, but provides an easier
+	way to handle race conditions, spurious wakeups, and so on.
+
+	In user-space programming, condition variables are used for thread synchronization in
+	conjunction with a locking system. One thread will acquire a lock and verify (atomically) that
+	some condition is not satisfied, it will then wait on the condition variable and unlock the
+	lock. Another thread then notifies the condition variable - waking up the thread - when the
+	condition is satisfied.
+
+	The kernel implementation in Haiku is a bit more flexible, which allows it to be used also from
+	interrupt handlers. An interrupt may notify a condition variable. Since interrupts usually
+	cannot be locked with mutexes, the synchronization is provided by other means. In some cases,
+	no synchronization is needed at all: the driver main code can create a ConditionVariableEnty
+	and add it to the condition variable before accessing the hardware in a way that will later
+	schedule an interrupt. In that case, the order of operations is guaranteed: the thread will
+	be watching the condition variable before the interrupt can be triggered, and the interrupt
+	will wake up the thread. In cases where this is possible, condition variables provide a very
+	simple and efficient synchronization primitive and makes writing drivers much safer and simpler.
 */

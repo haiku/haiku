@@ -6,7 +6,7 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
- *		headers/os/drivers/KernelExport;h rev 57477
+ *		headers/os/drivers/KernelExport.h rev 57477
  */
 
 /*!
