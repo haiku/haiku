@@ -641,7 +641,7 @@ module_dependency module_dependencies[] = {
 
 
 // The "block device" associated with the device file. It can be open()
-// multiple times, eash allocating an mmc_disk_handle. It does not interact
+// multiple times, each allocating an mmc_disk_handle. It does not interact
 // with the hardware directly, instead it forwards all IO requests to the
 // disk driver through the IO scheduler.
 struct device_module_info sMMCBlockDevice = {

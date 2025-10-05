@@ -25,12 +25,12 @@
 
 //#define TRACE_SDHCI
 #ifdef TRACE_SDHCI
-#	define TRACE(x...) dprintf("\33[33msdhci:\33[0m " x)
+#	define TRACE(x...) dprintf("\33[33msdhci_pci:\33[0m " x)
 #else
 #	define TRACE(x...) ;
 #endif
-#define TRACE_ALWAYS(x...)	dprintf("\33[33msdhci:\33[0m " x)
-#define ERROR(x...)			dprintf("\33[33msdhci:\33[0m " x)
+#define TRACE_ALWAYS(x...)	dprintf("\33[33msdhci_pci:\33[0m " x)
+#define ERROR(x...)			dprintf("\33[33msdhci_pci:\33[0m " x)
 #define CALLED(x...)		TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
@@ -39,6 +39,18 @@
 
 #define SLOT_NUMBER				"device/slot"
 #define BAR_INDEX				"device/bar"
+
+#define SDHCI_PCI_SLOT_INFO 							0x40
+#define SDHCI_PCI_SLOTS(x) 								((((x) >> 4) & 0x7) + 1)
+#define SDHCI_PCI_SLOT_INFO_FIRST_BASE_INDEX(x)			((x) & 0x7)
+
+// Ricoh specific PCI registers
+// Ricoh devices start in a vendor-specific mode but can be switched
+// to standard sdhci using these PCI registers
+#define SDHCI_PCI_RICOH_MODE_KEY						0xf9
+#define SDHCI_PCI_RICOH_MODE							0x150
+#define SDHCI_PCI_RICOH_MODE_SD20						0x10
+
 
 status_t
 init_bus_pci(device_node* node, void** bus_cookie)

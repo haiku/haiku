@@ -1,9 +1,10 @@
 /*
- * Copyright 2018-2024 Haiku, Inc. All rights reserved.
+ * Copyright 2018-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		B Krishnan Iyer, krishnaniyer97@gmail.com
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *		Ron Ben Aroya, sed4906birdie@gmail.com
  */
 #ifndef _SDHCI_H
@@ -11,61 +12,48 @@
 
 
 #include <device_manager.h>
+
 #include <KernelExport.h>
-
-
-#define SDHCI_PCI_SLOT_INFO 							0x40
-#define SDHCI_PCI_SLOTS(x) 								((((x) >> 4) & 0x7) + 1)
-#define SDHCI_PCI_SLOT_INFO_FIRST_BASE_INDEX(x)			((x) & 0x7)
-
-// Ricoh specific PCI registers
-// Ricoh devices start in a vendor-specific mode but can be switched
-// to standard sdhci using these PCI registers
-#define SDHCI_PCI_RICOH_MODE_KEY						0xf9
-#define SDHCI_PCI_RICOH_MODE							0x150
-#define SDHCI_PCI_RICOH_MODE_SD20						0x10
-
-#define SDHCI_BUS_TYPE_NAME 							"bus/sdhci/v1"
 
 
 class SdhciBus {
 	public:
-							SdhciBus(struct registers* registers, uint8_t irq, bool poll);
-							~SdhciBus();
+								SdhciBus(struct registers* registers, uint8_t irq, bool poll);
+								~SdhciBus();
 
-		void				EnableInterrupts(uint32_t mask);
-		void				DisableInterrupts();
-		status_t			ExecuteCommand(uint8_t command, uint32_t argument,
-								uint32_t* response);
-		int32				HandleInterrupt();
-		status_t			InitCheck();
-		void				Reset();
-		void				SetClock(int kilohertz);
-		status_t			DoIO(uint8_t command, IOOperation* operation,
-								bool offsetAsSectors);
-		void				SetScanSemaphore(sem_id sem);
-		void				SetBusWidth(int width);
-
-	private:
-		bool				PowerOn();
-		void				RecoverError();
-		static status_t			_WorkerThread(void*);
+			void				EnableInterrupts(uint32_t mask);
+			void				DisableInterrupts();
+			status_t			ExecuteCommand(uint8_t command, uint32_t argument,
+									uint32_t* response);
+			int32				HandleInterrupt();
+			status_t			InitCheck();
+			void				Reset();
+			void				SetClock(int kilohertz);
+			status_t			DoIO(uint8_t command, IOOperation* operation,
+									bool offsetAsSectors);
+			void				SetScanSemaphore(sem_id sem);
+			void				SetBusWidth(int width);
 
 	private:
-		struct registers*	fRegisters;
-		uint32_t			fCommandResult;
-		uint8_t				fIrq;
-		sem_id				fSemaphore;
-		sem_id				fScanSemaphore;
-		status_t			fStatus;
-		thread_id			fWorkerThread;
+			bool				PowerOn();
+			void				RecoverError();
+	static	status_t			_WorkerThread(void*);
+
+	private:
+			struct registers*	fRegisters;
+			uint32_t			fCommandResult;
+			uint8_t				fIrq;
+			sem_id				fSemaphore;
+			sem_id				fScanSemaphore;
+			status_t			fStatus;
+			thread_id			fWorkerThread;
 };
 
 
 class SdhciDevice {
 	public:
-		device_node* fNode;
-		uint8_t fRicohOriginalMode;
+		device_node*	fNode;
+		uint8_t			fRicohOriginalMode;
 };
 
 class TransferMode {

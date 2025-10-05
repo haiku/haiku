@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2024 Haiku, Inc. All rights reserved.
+ * Copyright 2018-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,14 +35,11 @@
 
 
 #define SDHCI_DEVICE_MODULE_NAME "busses/mmc/sdhci/driver_v1"
-#define SDHCI_ACPI_MMC_BUS_MODULE_NAME "busses/mmc/sdhci/acpi/device/v1"
-#define SDHCI_PCI_MMC_BUS_MODULE_NAME "busses/mmc/sdhci/pci/device/v1"
 
-#define SLOT_NUMBER				"device/slot"
-#define BAR_INDEX				"device/bar"
 
 device_manager_info* gDeviceManager;
 device_module_info* gMMCBusController;
+
 
 static int32
 sdhci_generic_interrupt(void* data)
@@ -617,6 +614,7 @@ SdhciBus::HandleInterrupt()
 	return B_HANDLED_INTERRUPT;
 }
 
+
 status_t
 SdhciBus::_WorkerThread(void* cookie) {
 	SdhciBus* bus = (SdhciBus*)cookie;
@@ -638,7 +636,9 @@ SdhciBus::_WorkerThread(void* cookie) {
 	return B_OK;
 }
 
+
 // #pragma mark -
+
 
 void
 uninit_bus(void* bus_cookie)
@@ -655,6 +655,7 @@ bus_removed(void* bus_cookie)
 {
 	return;
 }
+
 
 static status_t
 register_child_devices(void* cookie)
@@ -679,6 +680,7 @@ register_child_devices(void* cookie)
 
 	return status;
 }
+
 
 static status_t
 init_device(device_node* node, void** device_cookie)
@@ -705,6 +707,7 @@ init_device(device_node* node, void** device_cookie)
 
 	return B_OK;
 }
+
 
 static void
 uninit_device(void* device_cookie)
@@ -737,6 +740,7 @@ register_device(device_node* parent)
 	return gDeviceManager->register_node(parent, SDHCI_DEVICE_MODULE_NAME,
 		attrs, NULL, NULL);
 }
+
 
 static float
 supports_device(device_node* parent)
@@ -806,6 +810,7 @@ set_bus_width(void* controller, int width)
 	SdhciBus* bus = (SdhciBus*)controller;
 	return bus->SetBusWidth(width);
 }
+
 
 // Root device that binds to the ACPI or PCI bus. It will register an mmc_bus_interface
 // node for each SD slot in the device.
