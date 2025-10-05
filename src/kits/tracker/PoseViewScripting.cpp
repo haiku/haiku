@@ -481,7 +481,7 @@ BPoseView::CountProperty(BMessage*, int32, const char* property,
 		reply->AddInt32("result", fSelectionList->CountItems());
 		handled = true;
 	} else if (strcmp(property, kPropertyEntry) == 0) {
-		reply->AddInt32("result", fPoseList->CountItems());
+		reply->AddInt32("result", CurrentPoseList()->CountItems());
 		handled = true;
 	}
 
@@ -554,7 +554,7 @@ BPoseView::GetProperty(BMessage* specifier, int32 form,
 				}
 		}
 	} else if (strcmp(property, kPropertyEntry) == 0) {
-		int32 count = fPoseList->CountItems();
+		int32 count = CurrentPoseList()->CountItems();
 		switch (form) {
 			case B_DIRECT_SPECIFIER:
 			{
@@ -638,8 +638,8 @@ BPoseView::SetProperty(BMessage* message, BMessage*, int32 form,
 				int32 selEnd;
 				if (message->FindInt32("data", 0, &selStart) == B_OK
 					&& message->FindInt32("data", 1, &selEnd) == B_OK) {
-					if (selStart < 0 || selStart >= fPoseList->CountItems()
-						|| selEnd < 0 || selEnd >= fPoseList->CountItems()) {
+					if (selStart < 0 || selStart >= CurrentPoseList()->CountItems()
+						|| selEnd < 0 || selEnd >= CurrentPoseList()->CountItems()) {
 						result = B_BAD_INDEX;
 						handled = true;
 						break;
