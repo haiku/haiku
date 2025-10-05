@@ -11,6 +11,7 @@
 #define _SDHCI_H
 
 
+#include <condition_variable.h>
 #include <device_manager.h>
 
 #include <KernelExport.h>
@@ -41,9 +42,9 @@ class SdhciBus {
 
 	private:
 			struct registers*	fRegisters;
-			uint32_t			fCommandResult;
-			uint8_t				fIrq;
-			sem_id				fSemaphore;
+			uint32				fCommandResult;
+			uint8				fIrq;
+			ConditionVariable	fInterruptNotifier;
 			sem_id				fScanSemaphore;
 			status_t			fStatus;
 			thread_id			fWorkerThread;
@@ -261,6 +262,10 @@ class HostControl {
 		{
 			value = (value & ~kDataTransferWidthMask) | width;
 		}
+
+		// TODO add other bits for LED control, etc.
+
+		uint8 Bits() { return value; }
 
 		static const uint8_t kDmaMask = 3 << 3;
 		static const uint8_t kSdma = 0 << 3;

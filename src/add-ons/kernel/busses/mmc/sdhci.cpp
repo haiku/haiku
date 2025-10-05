@@ -52,8 +52,7 @@ sdhci_generic_interrupt(void* data)
 SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 	:
 	fRegisters(registers),
-	fIrq(irq),
-	fSemaphore(0)
+	fIrq(irq)
 {
 	if (irq == 0 || irq == 0xff) {
 		ERROR("IRQ not assigned\n");
@@ -61,7 +60,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 		return;
 	}
 
-	fSemaphore = create_sem(0, "SDHCI interrupts");
+	fInterruptNotifier.Init(this, "SDHCI interrupts");
 
 	DisableInterrupts();
 
@@ -76,6 +75,20 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 	// First of all, we have to make sure we are in a sane state. The easiest
 	// way is to reset everything.
 	Reset();
+
+	TRACE("Controller spec version: %d, vendor version: %#02x\n",
+		fRegisters->host_controller_version.specVersion,
+		fRegisters->host_controller_version.vendorVersion);
+
+	TRACE("Capabilities: %" PRIx64 "\n", fRegisters->capabilities.Bits());
+	TRACE("Initial host control: %x\n", fRegisters->host_control.Bits());
+	TRACE("Initial host control 2: %x\n", fRegisters->host_control_2);
+
+	if (fRegisters->host_controller_version.specVersion > 3) {
+		// TODO proper class for manipulating host_control_2
+		fRegisters->host_control_2 &= ~(1<<12);
+		TRACE("Host control 2 after disabling v4 DMA mode: %x\n", fRegisters->host_control_2);
+	}
 
 	// Turn on the power supply to the card, if there is a card inserted
 	if (PowerOn()) {
@@ -107,9 +120,6 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 SdhciBus::~SdhciBus()
 {
 	DisableInterrupts();
-
-	if (fSemaphore != 0)
-		delete_sem(fSemaphore);
 
 	if (fIrq != 0)
 		remove_io_interrupt_handler(fIrq, sdhci_generic_interrupt, this);
@@ -171,6 +181,10 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 		return B_BUSY;
 	}
 
+	// Get ready to accet interrupts that will occur during the command
+	ConditionVariableEntry waiter;
+	fInterruptNotifier.Add(&waiter);
+
 	uint32_t replyType;
 
 	switch (command) {
@@ -231,18 +245,22 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 
 	// Wait for command response to be available ("command complete" interrupt)
 	TRACE("Wait for command complete...");
-	do {
-		//fCommandResult = fRegisters->interrupt_status;
-		acquire_sem(fSemaphore);
+	while (fCommandResult == 0) {
+		status_t result = waiter.Wait();
+		if (result != B_OK)
+			panic("sdhci: Failed to wait for command complete: %s", strerror(result));
+
+		fInterruptNotifier.Add(&waiter);
 		TRACE("command complete sem acquired, status: %x\n", fCommandResult);
 		TRACE("real status = %x command line busy: %d\n",
 			fRegisters->interrupt_status,
 			fRegisters->present_state.CommandInhibit());
-	} while (fCommandResult == 0);
+	}
 
 	TRACE("Command response available\n");
 
 	if (fCommandResult & SDHCI_INT_ERROR) {
+		// TODO is it a good idea to clear interrupts here from outside the interrupt handler?
 		fRegisters->interrupt_status |= fCommandResult;
 		if (fCommandResult & SDHCI_INT_TIMEOUT) {
 			ERROR("Command execution timed out\n");
@@ -291,9 +309,13 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 		// R1b commands may use the data line so we must wait for the
 		// "transfer complete" interrupt here.
 		TRACE("Waiting for data line...\n");
-		do {
-			acquire_sem(fSemaphore);
-		} while (fRegisters->present_state.DataInhibit());
+		fInterruptNotifier.Add(&waiter);
+		while (fRegisters->present_state.DataInhibit()) {
+			status_t result = waiter.Wait();
+			if (result != B_OK)
+				panic("sdhci: Failed to wait for data line release: %s", strerror(result));
+			fInterruptNotifier.Add(&waiter);
+		}
 		TRACE("Dataline is released.\n");
 	}
 
@@ -341,8 +363,8 @@ SdhciBus::SetClock(int kilohertz)
 
 	// Log the value after possible rounding by SetDivider (only even values
 	// are allowed).
-	TRACE("SDCLK frequency: %dMHz / %d = %dkHz\n", base_clock, divider,
-		base_clock * 1000 / divider);
+	TRACE("SDCLK frequency: requested %dkHz, effective %dMHz / %d = %dkHz\n", kilohertz,
+		base_clock, divider, base_clock * 1000 / divider);
 
 	// We have set the divider, now we can enable the internal clock.
 	fRegisters->clock_control.EnableInternal();
@@ -367,7 +389,7 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 	off_t offset = operation->Offset();
 	generic_size_t length = operation->Length();
 
-	TRACE("%s %" B_PRIu64 " bytes at %" B_PRIdOFF "\n",
+	TRACE("%s %" B_PRIuGENADDR " bytes at %" B_PRIdOFF "\n",
 		isWrite ? "Write" : "Read", length, offset);
 
 	// Check that the IO scheduler did its job in following our DMA restrictions
@@ -379,27 +401,6 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 	const generic_io_vec* vecs = operation->Vecs();
 	generic_size_t vecOffset = 0;
 
-	// FIXME can this be moved to the init function instead?
-	//
-	// For simplicity we use a transfer size equal to the sector size. We could
-	// go up to 2K here if the length to read in each individual vec is a
-	// multiple of 2K, but we have no easy way to know this (we would need to
-	// iterate through the IOOperation vecs and check the size of each of them).
-	// We could also do smaller transfers, but it is not possible to start a
-	// transfer anywhere else than the start of a sector, so it's a lot simpler
-	// to always work in complete sectors. We set the B_DMA_ALIGNMENT device
-	// node property accordingly, making sure that we don't get asked to do
-	// transfers that are not aligned with sectors.
-	//
-	// Additionnally, set SDMA buffer boundary aligment to 512K. This is the
-	// largest possible size. We also set the B_DMA_BOUNDARY property on the
-	// published device node, so that the DMA resource manager knows that it
-	// must respect this boundary. As a result, we will never be asked to
-	// do a transfer that crosses this boundary, and we don't need to handle
-	// the DMA boundary interrupt (the transfer will be split in two at an
-	// upper layer).
-	fRegisters->block_size.ConfigureTransfer(kBlockSize,
-		BlockSize::kDmaBoundary512K);
 	status_t result = B_OK;
 
 	while (length > 0) {
@@ -413,14 +414,43 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 			continue;
 		}
 
+		// Follow steps from SD Host Controller Simplified Specification Version 4.20
+		// section 3.7.2.2.
+
 		// With SDMA we can only transfer multiples of 1 sector
 		ASSERT(toCopy % kBlockSize == 0);
 
+		// Step 1: set system address
 		fRegisters->system_address = vecs->base + vecOffset;
+		// TODO detect if the host controller supports "advanced DMA", in that case, use the ADMA
+		// registers:
 		// fRegisters->adma_system_address = fDmaMemory;
 
+		// Step 2: Set block size
+		// For simplicity we use a transfer size equal to the sector size. We could
+		// go up to 2K here if the length to read in each individual vec is a
+		// multiple of 2K, but we have no easy way to know this (we would need to
+		// iterate through the IOOperation vecs and check the size of each of them).
+		// We could also do smaller transfers, but it is not possible to start a
+		// transfer anywhere else than the start of a sector, so it's a lot simpler
+		// to always work in complete sectors. We set the B_DMA_ALIGNMENT device
+		// node property accordingly, making sure that we don't get asked to do
+		// transfers that are not aligned with sectors.
+		//
+		// Additionnally, set SDMA buffer boundary aligment to 512K. This is the
+		// largest possible size. We also set the B_DMA_BOUNDARY property on the
+		// published device node, so that the DMA resource manager knows that it
+		// must respect this boundary. As a result, we will never be asked to
+		// do a transfer that crosses this boundary, and we don't need to handle
+		// the DMA boundary interrupt (the transfer will be split in two at an
+		// upper layer).
+		fRegisters->block_size.ConfigureTransfer(kBlockSize,
+			BlockSize::kDmaBoundary512K);
+
+		// Step 3: set block count
 		fRegisters->block_count = toCopy / kBlockSize;
 
+		// Step 5: set transfer mode
 		uint16 direction;
 		if (isWrite)
 			direction = TransferMode::kWrite;
@@ -430,18 +460,28 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 			| TransferMode::kAutoCmd12Enable
 			| TransferMode::kBlockCountEnable | TransferMode::kDmaEnable;
 
+		// Steps 4 and 6: set argument register and command register
+		// Step 7, 8, 9 (inside ExecuteCommand): wait for command complete interrupt,
+		// clear interrupt, read response
+		ConditionVariableEntry waiter;
+		fInterruptNotifier.Add(&waiter);
+
 		uint32_t response;
 		result = ExecuteCommand(command,
 			offset / (offsetAsSectors ? kBlockSize : 1), &response);
 		if (result != B_OK)
 			break;
 
-		// Wait for DMA transfer to complete
+		// Step 10: Wait for DMA transfer to complete
 		// In theory we could go on and send other commands as long as they
 		// don't need the DAT lines, but it's overcomplicating things.
 		TRACE("Wait for transfer complete...");
-		//while ((fRegisters->interrupt_status & SDHCI_INT_TRANS_CMP) == 0);
-		acquire_sem(fSemaphore);
+		while ((fCommandResult & SDHCI_INT_TRANS_CMP) == 0) {
+			status_t result = waiter.Wait();
+			if (result != B_OK)
+				panic("sdhci: Failed to wait for end of DMA transfer: %s", strerror(result));
+			fInterruptNotifier.Add(&waiter);
+		}
 		TRACE("transfer complete OK.\n");
 
 		length -= toCopy;
@@ -582,19 +622,20 @@ SdhciBus::HandleInterrupt()
 
 	// handling command interrupt
 	if (intmask & SDHCI_INT_CMD_MASK) {
-		fCommandResult = intmask;
+		fCommandResult |= intmask;
 			// Save the status before clearing so the thread can handle it
+
 		fRegisters->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
 
 		// Notify the thread
-		release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
+		fInterruptNotifier.NotifyAll();
 		TRACE("Command complete interrupt handled\n");
 	}
 
 	if (intmask & SDHCI_INT_TRANS_CMP) {
-		fCommandResult = intmask;
+		fCommandResult |= intmask;
 		fRegisters->interrupt_status |= SDHCI_INT_TRANS_CMP;
-		release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
+		fInterruptNotifier.NotifyAll();
 		TRACE("Transfer complete interrupt handled\n");
 	}
 
@@ -623,12 +664,12 @@ SdhciBus::_WorkerThread(void* cookie) {
 		if (intmask & SDHCI_INT_CMD_CMP) {
 			bus->fCommandResult = intmask;
 			bus->fRegisters->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
-			release_sem(bus->fSemaphore);
+			bus->fInterruptNotifier.NotifyAll();
 		}
 		if (intmask & SDHCI_INT_TRANS_CMP) {
 			bus->fCommandResult = intmask;
 			bus->fRegisters->interrupt_status |= SDHCI_INT_TRANS_CMP;
-			release_sem(bus->fSemaphore);
+			bus->fInterruptNotifier.NotifyAll();
 		}
 		snooze(100);
 	}
