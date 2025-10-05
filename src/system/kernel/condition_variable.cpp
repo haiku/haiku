@@ -429,10 +429,9 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 				thread_unblock_locked(thread, result);
 
 			notified++;
+			if (!all)
+				break;
 		}
-
-		if (!all)
-			break;
 	}
 
 	return notified;
