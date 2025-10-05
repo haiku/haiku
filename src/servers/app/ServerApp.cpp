@@ -3423,7 +3423,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_READ_BITMAP:
 		{
 			STRACE(("ServerApp %s: AS_READ_BITMAP\n", Signature()));
+			int32 id;
 			int32 token;
+			link.Read<int32>(&id);
 			link.Read<int32>(&token);
 
 			bool drawCursor = true;
