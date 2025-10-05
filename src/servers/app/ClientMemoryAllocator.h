@@ -40,8 +40,7 @@ public:
 								ClientMemoryAllocator(ServerApp* application);
 								~ClientMemoryAllocator();
 
-			void*				Allocate(size_t size, block** _address,
-									bool& newArea);
+			void*				Allocate(size_t size, block** _address);
 			void				Free(block* cookie);
 
 			void				Detach();
@@ -49,7 +48,7 @@ public:
 			void				Dump();
 
 private:
-			struct block*		_AllocateChunk(size_t size, bool& newArea);
+			struct block*		_AllocateChunk(size_t size);
 
 private:
 			ServerApp*			fApplication;
@@ -76,7 +75,7 @@ public:
 	virtual						~ClientMemory();
 
 			void*				Allocate(ClientMemoryAllocator* allocator,
-									size_t size, bool& newArea);
+									size_t size);
 
 	virtual area_id				Area();
 	virtual uint8*				Address();

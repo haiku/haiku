@@ -1097,7 +1097,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				error = B_NO_MEMORY;
 		} else {
 			BPrivate::AppServerLink link;
-			
+
 			if (area >= B_OK) {
 				// Use area provided by client
 
@@ -1116,11 +1116,11 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 					link.Attach<int32>(0);
 					link.Attach<int32>(area);
 					link.Attach<int32>(areaOffset);
-					
+
 					if (link.FlushWithReply(error) == B_OK && error == B_OK) {
 						link.Read<int32>(&fServerToken);
 						link.Read<area_id>(&fServerArea);
-					
+
 						if (fServerArea >= B_OK) {
 							fSize = size;
 							fColorSpace = colorSpace;
@@ -1129,7 +1129,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 							fFlags = flags;
 							fArea = area;
 							fAreaOffset = areaOffset;
-							
+
 							fBasePointer = (uint8*)info.address + areaOffset;
 						} else
 							error = fServerArea;
@@ -1155,25 +1155,20 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 					// server side success
 					// Get token
 					link.Read<int32>(&fServerToken);
-	
+
 					uint8 allocationFlags;
 					link.Read<uint8>(&allocationFlags);
 					link.Read<area_id>(&fServerArea);
 					link.Read<int32>(&fAreaOffset);
-	
+
 					BPrivate::ServerMemoryAllocator* allocator
 						= BApplication::Private::ServerAllocator();
-	
-					if ((allocationFlags & kNewAllocatorArea) != 0) {
-						error = allocator->AddArea(fServerArea, fArea,
-							fBasePointer, size);
-					} else {
-						error = allocator->AreaAndBaseFor(fServerArea, fArea,
-							fBasePointer);
-						if (error == B_OK)
-							fBasePointer += fAreaOffset;
-					}
-	
+
+					error = allocator->AddArea(fServerArea, fArea,
+						fBasePointer, size);
+					if (error == B_OK)
+						fBasePointer += fAreaOffset;
+
 					if ((allocationFlags & kFramebuffer) != 0) {
 						// The base pointer will now point to an overlay_client_data
 						// structure bytes per row might be modified to match
@@ -1181,7 +1176,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 						link.Read<int32>(&bytesPerRow);
 						size = bytesPerRow * (bounds.IntegerHeight() + 1);
 					}
-	
+
 					if (fServerArea >= B_OK) {
 						fSize = size;
 						fColorSpace = colorSpace;
@@ -1270,7 +1265,12 @@ BBitmap::_CleanUp()
 		link.Attach<int32>(fServerToken);
 		link.Flush();
 
-		// The server areas are deleted via kMsgDeleteServerMemoryArea message
+		if (fServerArea >= B_OK) {
+			BPrivate::ServerMemoryAllocator* allocator
+				= BApplication::Private::ServerAllocator();
+
+			allocator->RemoveArea(fServerArea);
+		}
 
 		fArea = -1;
 		fServerToken = -1;

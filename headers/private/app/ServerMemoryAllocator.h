@@ -9,11 +9,20 @@
 #define SERVER_MEMORY_ALLOCATOR_H
 
 
+#include <map>
+
 #include <OS.h>
-#include <List.h>
 
 
 namespace BPrivate {
+
+
+struct area_mapping {
+	int32	reference_count;
+	area_id	server_area;
+	area_id local_area;
+	uint8*	local_base;
+};
 
 
 class ServerMemoryAllocator {
@@ -28,11 +37,9 @@ public:
 									bool readOnly = false);
 			void				RemoveArea(area_id serverArea);
 
-			status_t			AreaAndBaseFor(area_id serverArea,
-									area_id& area, uint8*& base);
-
 private:
-			BList				fAreas;
+			std::map<area_id, area_mapping>
+								fAreas;
 };
 
 

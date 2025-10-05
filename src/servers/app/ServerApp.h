@@ -96,7 +96,6 @@ public:
 
 			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
 
-			void				NotifyDeleteClientArea(area_id serverArea);
 			AppFontManager*		FontManager() { return fAppFontManager; }
 
 private:

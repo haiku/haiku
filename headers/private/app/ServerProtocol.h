@@ -377,18 +377,11 @@ enum {
 	AS_LAST_CODE
 };
 
-// TODO: move this into a private app header, together with the rest of the
-//		private message definitions in AppDefs.h
-enum {
-	kMsgDeleteServerMemoryArea		= '_DSA',
-};
-
 // bitmap allocation flags
 enum {
 	kAllocator			= 0x1,
 	kFramebuffer		= 0x2,
 	kHeap				= 0x4,
-	kNewAllocatorArea	= 0x8,
 };
 
 #endif	// APP_SERVER_PROTOCOL_H

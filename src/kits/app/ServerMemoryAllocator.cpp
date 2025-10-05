@@ -31,27 +31,18 @@ static const size_t kReserveMaxSize = 32 * 1024 * 1024;
 namespace BPrivate {
 
 
-struct area_mapping {
-	area_id	server_area;
-	area_id local_area;
-	uint8*	local_base;
-};
-
-
 ServerMemoryAllocator::ServerMemoryAllocator()
-	:
-	fAreas(4)
 {
 }
 
 
 ServerMemoryAllocator::~ServerMemoryAllocator()
 {
-	for (int32 i = fAreas.CountItems(); i-- > 0;) {
-		area_mapping* mapping = (area_mapping*)fAreas.ItemAt(i);
-
-		delete_area(mapping->local_area);
-		delete mapping;
+	while (!fAreas.empty()) {
+		std::map<area_id, area_mapping>::iterator it = fAreas.begin();
+		area_mapping& mapping = it->second;
+		delete_area(mapping.local_area);
+		fAreas.erase(it);
 	}
 }
 
@@ -67,11 +58,24 @@ status_t
 ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area,
 	uint8*& _base, size_t size, bool readOnly)
 {
-	area_mapping* mapping = new (std::nothrow) area_mapping;
-	if (mapping == NULL || !fAreas.AddItem(mapping)) {
-		delete mapping;
+	std::map<area_id, area_mapping>::iterator it = fAreas.find(serverArea);
+	if (it != fAreas.end()) {
+		area_mapping& mapping = it->second;
+		mapping.reference_count++;
+
+		_area = mapping.local_area;
+		_base = mapping.local_base;
+
+		return B_OK;
+	}
+
+	area_mapping* mapping;
+	try {
+		mapping = &fAreas[serverArea];
+	} catch (const std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
+	mapping->reference_count = 1;
 
 	status_t status = B_ERROR;
 	uint32 addressSpec = B_ANY_ADDRESS;
@@ -95,8 +99,7 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area,
 	if (mapping->local_area < B_OK) {
 		status = mapping->local_area;
 
-		fAreas.RemoveItem(mapping);
-		delete mapping;
+		fAreas.erase(serverArea);
 
 		return status;
 	}
@@ -114,36 +117,14 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area,
 void
 ServerMemoryAllocator::RemoveArea(area_id serverArea)
 {
-	for (int32 i = fAreas.CountItems(); i-- > 0;) {
-		area_mapping* mapping = (area_mapping*)fAreas.ItemAt(i);
-
-		if (mapping->server_area == serverArea) {
-			// we found the area we should remove
-			delete_area(mapping->local_area);
-			delete mapping;
-			fAreas.RemoveItem(i);
-			break;
+	std::map<area_id, area_mapping>::iterator it = fAreas.find(serverArea);
+	if (it != fAreas.end()) {
+		area_mapping& mapping = it->second;
+		if (mapping.reference_count-- == 1) {
+			delete_area(mapping.local_area);
+			fAreas.erase(serverArea);
 		}
 	}
-}
-
-
-status_t
-ServerMemoryAllocator::AreaAndBaseFor(area_id serverArea, area_id& _area,
-	uint8*& _base)
-{
-	// TODO: why not use a map?
-	for (int32 i = fAreas.CountItems(); i-- > 0;) {
-		area_mapping* mapping = (area_mapping*)fAreas.ItemAt(i);
-
-		if (mapping->server_area == serverArea) {
-			_area = mapping->local_area;
-			_base = mapping->local_base;
-			return B_OK;
-		}
-	}
-
-	return B_ERROR;
 }
 
 
