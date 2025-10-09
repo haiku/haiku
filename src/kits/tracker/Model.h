@@ -208,6 +208,9 @@ public:
 
 	bool Mimeset(bool force);
 		// returns true if mime type changed
+	void SniffMimeIfNeeded();
+		// if the filesystem does not support MIME, sets fMimeType using the MIME sniffer;
+		// makes no attempt to write the file's MIME attribute
 
 	bool HasLocalizedName() const;
 

@@ -1171,6 +1171,7 @@ TTracker::OpenInfoWindows(BMessage* message)
 				wind->Activate();
 				delete model;
 			} else {
+				model->SniffMimeIfNeeded();
 				wind = new BInfoWindow(model, index, &fWindowList);
 				wind->PostMessage(kRestoreState);
 			}

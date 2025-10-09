@@ -1281,7 +1281,24 @@ Model::Mimeset(bool force)
 	opener.OpenNode();
 	AttrChanged(NULL);
 
-	return !oldType.ICompare(MimeType());
+	return oldType.ICompare(MimeType()) != 0;
+}
+
+
+void
+Model::SniffMimeIfNeeded()
+{
+	if (fMimeType != B_FILE_MIMETYPE)
+		return;
+
+	BVolume volume(fStatBuf.st_dev);
+	if (volume.InitCheck() == B_OK && !volume.KnowsMime()) {
+		BMimeType mimeType;
+		if (BMimeType::GuessMimeType(&fEntryRef, &mimeType) == B_OK)
+			fMimeType = mimeType.Type();
+	}
+
+	return;
 }
 
 
