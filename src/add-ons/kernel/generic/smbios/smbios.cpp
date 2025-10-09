@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <boot_item.h>
 #include <vm/vm.h>
 
 
@@ -137,7 +138,16 @@ smbios_scan()
 
 	// map SMBIOS area 0xf0000 - 0xfffff
 	addr_t smBiosBase;
-	area_id smbiosArea = map_physical_memory("pc bios", 0xf0000, 0x10000,
+	phys_addr_t smBiosSearchBase =  0xf0000;
+	phys_addr_t* smbiosRootPointer = (phys_addr_t*)get_boot_item("SMBIOSv3_ROOT_POINTER", NULL);
+	if (smbiosRootPointer != NULL) {
+		smBiosSearchBase = *smbiosRootPointer;
+	} else {
+		smbiosRootPointer = (phys_addr_t*)get_boot_item("SMBIOSv2_ROOT_POINTER", NULL);
+		if (smbiosRootPointer != NULL)
+			smBiosSearchBase = *smbiosRootPointer;
+	}
+	area_id smbiosArea = map_physical_memory("pc bios", smBiosSearchBase, 0x10000,
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&smBiosBase);
 	if (smbiosArea < 0)
 		return;

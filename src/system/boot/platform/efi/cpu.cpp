@@ -13,6 +13,30 @@
 
 #include <arch_cpu.h>
 
+#include "efi_platform.h"
+
+
+static void
+get_smbios_tables()
+{
+	const efi_configuration_table *table = kSystemTable->ConfigurationTable;
+	const size_t entries = kSystemTable->NumberOfTableEntries;
+	// Try to find any SMBIOS table.
+	for (uint32 i = 0; i < entries; i++) {
+		void* vendorTable = table[i].VendorTable;
+		if (table[i].VendorGuid.equals(SMBIOS_TABLE_GUID)) {
+			gBootParams.SetInt64(BOOT_EFI_SMBIOS_V2_ROOT, (addr_t)vendorTable);
+			dprintf("smbios: found v2 at %p\n", vendorTable);
+			continue;
+		}
+		if (table[i].VendorGuid.equals(SMBIOS3_TABLE_GUID)) {
+			gBootParams.SetInt64(BOOT_EFI_SMBIOS_V3_ROOT, (addr_t)vendorTable);
+			dprintf("smbios: found v3 at %p\n", vendorTable);
+			continue;
+		}
+	}
+}
+
 
 void
 cpu_init()
@@ -28,4 +52,6 @@ extern "C" void
 platform_load_ucode(BootVolume& volume)
 {
 	arch_ucode_load(volume);
+
+	get_smbios_tables();
 }

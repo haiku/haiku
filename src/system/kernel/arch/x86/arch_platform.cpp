@@ -15,6 +15,8 @@
 
 
 static phys_addr_t sACPIRootPointer = 0;
+static phys_addr_t sSMBIOSv2RootPointer = 0;
+static phys_addr_t sSMBIOSv3RootPointer = 0;
 
 
 status_t
@@ -31,6 +33,19 @@ arch_platform_init_post_vm(struct kernel_args *args)
 	sACPIRootPointer = args->arch_args.acpi_root.Get();
 	add_boot_item("ACPI_ROOT_POINTER",
 		&sACPIRootPointer, sizeof(sACPIRootPointer));
+
+	KMessage bootVolume;
+	bootVolume.SetTo(args->boot_volume, args->boot_volume_size);
+	sSMBIOSv2RootPointer = bootVolume.GetInt64(BOOT_EFI_SMBIOS_V2_ROOT, 0);
+	if (sSMBIOSv2RootPointer != 0) {
+		add_boot_item("SMBIOSv2_ROOT_POINTER",
+			&sSMBIOSv2RootPointer, sizeof(sSMBIOSv2RootPointer));
+	}
+	sSMBIOSv3RootPointer = bootVolume.GetInt64(BOOT_EFI_SMBIOS_V3_ROOT, 0);
+	if (sSMBIOSv3RootPointer != 0) {
+		add_boot_item("SMBIOSv3_ROOT_POINTER",
+			&sSMBIOSv3RootPointer, sizeof(sSMBIOSv3RootPointer));
+	}
 
 	return B_OK;
 }
