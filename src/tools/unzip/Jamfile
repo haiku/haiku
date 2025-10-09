@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tools unzip ;
 
+SubDirCcFlags -std=c99 ;
+
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin unzip ] ;
 
 DEFINES += NO_CRYPT HAS_JUNK_EXTRA_FIELD_OPTION=1 ;
