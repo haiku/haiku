@@ -97,10 +97,11 @@ public:
 								BMessage* message, BHandler* target);
 							~Shortcut();
 
-			bool			Matches(uint32 key, uint32 modifiers) const;
+			bool			Matches(uint32 key, uint32 preparedModifiers) const;
 
 			uint32			Key() const { return fKey; };
-			uint32			Modifiers() const { return fModifiers; };
+			uint32			Modifiers() const;
+			uint32			PreparedModifiers() const { return fPreparedModifiers; };
 			BMenuItem*		MenuItem() const { return fMenuItem; }
 			BMessage*		Message() const { return fMessage; }
 			BHandler*		Target() const { return fTarget; }
@@ -111,7 +112,7 @@ public:
 
 private:
 			uint32			fKey;
-			uint32			fModifiers;
+			uint32			fPreparedModifiers;
 			BMenuItem*		fMenuItem;
 			BMessage*		fMessage;
 			BHandler*		fTarget;
@@ -244,7 +245,7 @@ BWindow::unpack_cookie::unpack_cookie()
 BWindow::Shortcut::Shortcut(uint32 key, uint32 modifiers, BMenuItem* item)
 	:
 	fKey(PrepareKey(key)),
-	fModifiers(PrepareModifiers(modifiers)),
+	fPreparedModifiers(PrepareModifiers(modifiers)),
 	fMenuItem(item),
 	fMessage(NULL),
 	fTarget(NULL)
@@ -256,7 +257,7 @@ BWindow::Shortcut::Shortcut(uint32 key, uint32 modifiers, BMessage* message,
 	BHandler* target)
 	:
 	fKey(PrepareKey(key)),
-	fModifiers(PrepareModifiers(modifiers)),
+	fPreparedModifiers(PrepareModifiers(modifiers)),
 	fMenuItem(NULL),
 	fMessage(message),
 	fTarget(target)
@@ -272,9 +273,17 @@ BWindow::Shortcut::~Shortcut()
 
 
 bool
-BWindow::Shortcut::Matches(uint32 key, uint32 modifiers) const
+BWindow::Shortcut::Matches(uint32 key, uint32 preparedModifiers) const
 {
-	return fKey == key && fModifiers == modifiers;
+	return fKey == key && fPreparedModifiers == preparedModifiers;
+}
+
+
+uint32
+BWindow::Shortcut::Modifiers() const
+{
+	return fPreparedModifiers
+		| (((fPreparedModifiers & B_COMMAND_KEY) == 0) ? B_NO_COMMAND_KEY : 0);
 }
 
 
@@ -3897,12 +3906,12 @@ BWindow::Shortcut*
 BWindow::_FindShortcut(uint32 key, uint32 modifiers)
 {
 	key = Shortcut::PrepareKey(key);
-	modifiers = Shortcut::PrepareModifiers(modifiers);
+	uint32 preparedModifiers = Shortcut::PrepareModifiers(modifiers);
 
 	int32 shortcutCount = fShortcuts.CountItems();
 	for (int32 index = 0; index < shortcutCount; index++) {
 		Shortcut* shortcut = (Shortcut*)fShortcuts.ItemAt(index);
-		if (shortcut != NULL && shortcut->Matches(key, modifiers))
+		if (shortcut != NULL && shortcut->Matches(key, preparedModifiers))
 			return shortcut;
 	}
 
