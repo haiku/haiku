@@ -38,6 +38,14 @@ static inline struct nvme_ns_data *nvme_ns_get_data(struct nvme_ns *ns)
 	return &ns->ctrlr->nsdata[ns->id - 1];
 }
 
+static inline uint32_t nvme_ns_get_format_index(struct nvme_ns_data *nsdata)
+{
+	uint32_t format_index = nsdata->flbas.format;
+	if (nsdata->nlbaf >= 16)
+		format_index += nsdata->flbas.msb_format << 4;
+	return format_index;
+}
+
 static int nvme_ns_identify_update(struct nvme_ns *ns)
 {
 	struct nvme_ctrlr *ctrlr = ns->ctrlr;
@@ -51,7 +59,8 @@ static int nvme_ns_identify_update(struct nvme_ns *ns)
 		return ret;
 	}
 
-	sector_size = 1 << nsdata->lbaf[nsdata->flbas.format].lbads;
+	uint32_t format_index = nvme_ns_get_format_index(nsdata);
+	sector_size = 1 << nsdata->lbaf[format_index].lbads;
 
 	ns->sector_size = sector_size;
 	ns->sectors_per_max_io = ctrlr->max_xfer_size / sector_size;
@@ -71,10 +80,10 @@ static int nvme_ns_identify_update(struct nvme_ns *ns)
 	if (nsdata->nsrescap.raw)
 		ns->flags |= NVME_NS_RESERVATION_SUPPORTED;
 
-	ns->md_size = nsdata->lbaf[nsdata->flbas.format].ms;
+	ns->md_size = nsdata->lbaf[format_index].ms;
 	ns->pi_type = NVME_FMT_NVM_PROTECTION_DISABLE;
 
-	if (nsdata->lbaf[nsdata->flbas.format].ms && nsdata->dps.pit) {
+	if (nsdata->lbaf[format_index].ms && nsdata->dps.pit) {
 		ns->flags |= NVME_NS_DPS_PI_SUPPORTED;
 		ns->pi_type = nsdata->dps.pit;
 		if (nsdata->flbas.extended)

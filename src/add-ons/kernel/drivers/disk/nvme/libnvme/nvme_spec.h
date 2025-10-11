@@ -1446,7 +1446,8 @@ struct nvme_ns_data {
 	struct {
 		uint8_t		format    : 4;
 		uint8_t		extended  : 1;
-		uint8_t		reserved2 : 3;
+		uint8_t		msb_format: 2;
+		uint8_t		reserved2 : 1;
 	} flbas;
 
 	/*
@@ -1646,9 +1647,7 @@ struct nvme_ns_data {
 		uint32_t	rp	  : 2;
 
 		uint32_t	reserved6 : 6;
-	} lbaf[16];
-
-	uint8_t			reserved6[192];
+	} lbaf[64];
 
 	uint8_t			vendor_specific[3712];
 };
@@ -2066,7 +2065,8 @@ struct nvme_format {
 	uint32_t	pi		: 3;
 	uint32_t	pil		: 1;
 	uint32_t	ses		: 3;
-	uint32_t	reserved	: 20;
+	uint32_t	lbafu	: 2;
+	uint32_t	reserved	: 18;
 };
 nvme_static_assert(sizeof(struct nvme_format) == 4, "Incorrect size");
 
