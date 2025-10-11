@@ -1294,7 +1294,8 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 
 #if PARANOID_KERNEL_FREE
 	if (cache->object_size >= (sizeof(void*) * 2)) {
-		ASSERT_ALWAYS(*(uint32*)object == 0xdeadbeef);
+		ASSERT_ALWAYS_PRINT(*(uint32*)object == 0xdeadbeef,
+			"object %p", object);
 	}
 #endif
 
