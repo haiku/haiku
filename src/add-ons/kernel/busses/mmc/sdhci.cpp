@@ -216,6 +216,7 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 	fInterruptNotifier.Add(&waiter);
 
 	uint32_t replyType;
+	uint16 transferMode = 0;
 
 	switch (command) {
 		case SD_GO_IDLE_STATE:
@@ -236,9 +237,23 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			replyType = Command::kR7Type;
 			break;
 		case SD_READ_SINGLE_BLOCK:
+			transferMode = TransferMode::kRead | TransferMode::kDmaEnable;
+			replyType = Command::kR1Type | Command::kDataPresent;
+			break;
 		case SD_READ_MULTIPLE_BLOCKS:
+			transferMode = TransferMode::kRead | TransferMode::kMulti
+				| TransferMode::kAutoCmd12Enable | TransferMode::kBlockCountEnable
+				| TransferMode::kDmaEnable;
+			replyType = Command::kR1Type | Command::kDataPresent;
+			break;
 		case SD_WRITE_SINGLE_BLOCK:
+			transferMode = TransferMode::kWrite | TransferMode::kDmaEnable;
+			replyType = Command::kR1Type | Command::kDataPresent;
+			break;
 		case SD_WRITE_MULTIPLE_BLOCKS:
+			transferMode = TransferMode::kWrite | TransferMode::kMulti
+				| TransferMode::kAutoCmd12Enable | TransferMode::kBlockCountEnable
+				| TransferMode::kDmaEnable;
 			replyType = Command::kR1Type | Command::kDataPresent;
 			break;
 		case SD_APP_CMD:
@@ -267,25 +282,30 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 	if (fRegisters->present_state.CommandInhibit())
 		panic("Command line busy at start of execute command\n");
 
-	if (replyType == Command::kR1bType)
-		fRegisters->transfer_mode = 0;
-	
 	fRegisters->argument = argument;
+
+	if ((replyType == Command::kR1bType)
+		|| (replyType == (Command::kR1Type | Command::kDataPresent)))
+		fRegisters->transfer_mode = transferMode;
+
 	fRegisters->command.SendCommand(command, replyType);
 
 	// Wait for command response to be available ("command complete" interrupt)
 	TRACE("Wait for command complete...");
-	while (fCommandResult == 0) {
-		status_t result = waiter.Wait();
-		if (result != B_OK)
+	do {
+		status_t result = waiter.Wait(B_RELATIVE_TIMEOUT, 1000000);
+		if (result == B_TIMED_OUT) {
+			TRACE("Command complete interrupt did not trigger for a while, status %x\n",
+				fRegisters->interrupt_status);
+		} else if (result != B_OK)
 			panic("sdhci: Failed to wait for command complete: %s", strerror(result));
 
 		fInterruptNotifier.Add(&waiter);
-		TRACE("command complete sem acquired, status: %x\n", fCommandResult);
+		TRACE("Command status: %x\n", fCommandResult);
 		TRACE("real status = %x command line busy: %d\n",
 			fRegisters->interrupt_status,
 			fRegisters->present_state.CommandInhibit());
-	}
+	} while (fCommandResult == 0);
 
 	TRACE("Command response available\n");
 
@@ -334,7 +354,7 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			break;
 	}
 
-	if (replyType == Command::kR1bType
+	if ((replyType == Command::kR1bType)
 			&& (fCommandResult & SDHCI_INT_TRANS_CMP) == 0) {
 		// R1b commands may use the data line so we must wait for the
 		// "transfer complete" interrupt here.
@@ -480,19 +500,9 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 		// Step 3: set block count
 		fRegisters->block_count = toCopy / kBlockSize;
 
-		// Step 5: set transfer mode
-		uint16 direction;
-		if (isWrite)
-			direction = TransferMode::kWrite;
-		else
-			direction = TransferMode::kRead;
-		fRegisters->transfer_mode = TransferMode::kMulti | direction
-			| TransferMode::kAutoCmd12Enable
-			| TransferMode::kBlockCountEnable | TransferMode::kDmaEnable;
-
-		// Steps 4 and 6: set argument register and command register
-		// Step 7, 8, 9 (inside ExecuteCommand): wait for command complete interrupt,
-		// clear interrupt, read response
+		// Steps done in ExecuteCommand:
+		// Steps 4, 5 and 6: set argument register, transfer_mode and command register
+		// Step 7, 8, 9: wait for command complete interrupt, clear interrupt, read response
 		ConditionVariableEntry waiter;
 		fInterruptNotifier.Add(&waiter);
 
