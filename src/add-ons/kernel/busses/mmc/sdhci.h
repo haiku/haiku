@@ -29,7 +29,7 @@ class SdhciBus {
 			int32				HandleInterrupt();
 			status_t			InitCheck();
 			void				Reset();
-			void				SetClock(int kilohertz);
+			void				SetClock(int kilohertz, bool allowAuto);
 			status_t			DoIO(uint8_t command, IOOperation* operation,
 									bool offsetAsSectors);
 			void				SetScanSemaphore(sem_id sem);

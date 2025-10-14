@@ -124,7 +124,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 	if (PowerOn()) {
 		// Then we configure the clock to the frequency needed for
 		// initialization
-		SetClock(400);
+		SetClock(400, false);
 	}
 
 	fRegisters->timeout_control.SetDivider(fRegisters->capabilities.TimeoutClockFrequency(), 500);
@@ -390,8 +390,15 @@ SdhciBus::Reset()
 
 
 void
-SdhciBus::SetClock(int kilohertz)
+SdhciBus::SetClock(int kilohertz, bool allowAuto)
 {
+	if (allowAuto && (fRegisters->host_controller_version.specVersion > 2)) {
+		TRACE("Ignoring set_clock, controller support presets\n");
+		fRegisters->host_control_2 |= (1<<15);
+		TRACE("Host control 2 after enabling preset mode: %x\n", fRegisters->host_control_2);
+		return;
+	}
+
 	int base_clock = fRegisters->capabilities.BaseClockFrequency();
 	// Try to get as close to 400kHz as possible, but not faster
 	int divider = base_clock * 1000 / kilohertz;
@@ -654,7 +661,7 @@ SdhciBus::HandleInterrupt()
 		// so check the actual state before acting
 		if (fRegisters->present_state.IsCardInserted()) {
 			if (PowerOn())
-				SetClock(400);
+				SetClock(400, false);
 			release_sem_etc(fScanSemaphore, 1, B_DO_NOT_RESCHEDULE);
 		} else
 			TRACE("Card insertion interrupt, but card is removed\n");
@@ -857,7 +864,8 @@ status_t
 set_clock(void* controller, uint32_t kilohertz)
 {
 	SdhciBus* bus = (SdhciBus*)controller;
-	bus->SetClock(kilohertz);
+
+	bus->SetClock(kilohertz, true);
 	return B_OK;
 }
 
