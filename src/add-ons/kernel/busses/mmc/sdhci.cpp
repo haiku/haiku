@@ -517,8 +517,11 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 		// don't need the DAT lines, but it's overcomplicating things.
 		TRACE("Wait for transfer complete...");
 		while ((fCommandResult & SDHCI_INT_TRANS_CMP) == 0) {
-			status_t result = waiter.Wait();
-			if (result != B_OK)
+			status_t result = waiter.Wait(B_RELATIVE_TIMEOUT, 1000000);
+			if (result == B_TIMED_OUT) {
+				TRACE("Transfer complete interrupt did not trigger for a while, status %x\n",
+					fRegisters->interrupt_status);
+			} else if (result != B_OK)
 				panic("sdhci: Failed to wait for end of DMA transfer: %s", strerror(result));
 			fInterruptNotifier.Add(&waiter);
 		}
