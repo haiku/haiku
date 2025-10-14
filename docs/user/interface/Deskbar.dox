@@ -34,9 +34,6 @@
 	\fn BDeskbar::BDeskbar()
 	\brief Undocumented public method
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -44,9 +41,6 @@
 /*!
 	\fn BDeskbar::~BDeskbar()
 	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
 
 	\since Haiku R1
 */

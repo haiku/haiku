@@ -90,9 +90,6 @@
 	\fn BAffineTransform::BAffineTransform()
 	\brief Undocumented public method
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -108,9 +105,6 @@
 	\param tx Undocumented
 	\param ty Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -121,9 +115,6 @@
 
 	\param copyFrom Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -131,9 +122,6 @@
 /*!
 	\fn virtual virtual BAffineTransform::~BAffineTransform()
 	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
 
 	\since Haiku R1
 */

@@ -42,9 +42,6 @@
 	\param resizeMode Undocumented
 	\param flags Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -62,9 +59,6 @@
 	\param resizeMode Undocumented
 	\param flags Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -80,9 +74,6 @@
 	\param channels Undocumented
 	\param flags Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -93,9 +84,6 @@
 
 	\param archive Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -103,9 +91,6 @@
 /*!
 	\fn virtual virtual BChannelSlider::~BChannelSlider()
 	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
 
 	\since Haiku R1
 */

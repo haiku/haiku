@@ -8,6 +8,7 @@
 
 /*!
 \defgroup libroot C, POSIX, GNU and BSD functions
+\brief Implements the C and POSIX standard libraries.
 
 Haiku implements a standard library containing the standard functions from C
 (https://www.iso.org/standard/29237.html) and POSIX

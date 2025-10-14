@@ -1,0 +1,30 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ */
+
+/*!
+\defgroup libshared Experimental functions and classes
+\brief Static library for experimental and work-in progress code.
+
+The main Haiku libraries (libroot, libbe and others) are provided as shared libraries.
+This means in most cases, the ABI and API of functions and classes defined therein cannot be
+changed without breaking existing applications that use them.
+
+This makes it difficult to expose work-in-progress code in these libraries, as any change of
+interface would require all applications using the old interface to be recompiled.
+
+libshared provides a solution for that. It is provided as a static library, which means
+applications using it will embed a fixed version of the libsared code that they were compiled
+against. This way, updates to the library do not affect already compiled binaries, and developers
+can update to a new version of libshared (and make any needed changes) when they recompile their
+code.
+
+All functions and classes in libshared are additionally put in the BPrivate namespace. When an
+API is deemed mature, its final version can be moved to a shared library, and at the same time,
+moved out of the namespace. This makes sure applications that are still using a version from
+libshared do not get interferenced by the newly introduced public version.
+*/

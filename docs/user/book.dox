@@ -117,6 +117,9 @@
 		- BKeyStore
 
 
+	\defgroup device Device Kit
+	\brief The Device Kit provides access to devices such as joysticks and serial ports.
+
 	\defgroup game Game Kit
 	\brief The Game Kit provides classes for producing game sounds and
 		working with full screen apps.
@@ -124,6 +127,10 @@
 
 	\defgroup interface Interface Kit
 	\brief API for displaying a graphical user interface.
+
+	\defgroup kernel Kernel Kit
+	\brief The Kernel Kit provides low-level APIs mainly of use for writing device drivers and
+		kernel modules.
 
 	\defgroup locale Locale Kit
 	\brief Collection of classes for localizing applications.
@@ -565,9 +572,6 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 	\defgroup libbe Main C++ library (libbe.so)
 
-
-	\defgroup libroot C and POSIX standard functions and extensions (libroot.so)
-	\brief Implements the C and POSIX standard libraries.
 */
 
 ///// Subgroups /////

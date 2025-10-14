@@ -1,0 +1,15 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ */
+
+/*!
+\defgroup libtracker Tracker Kit
+\brief Tracker components for use in other applications.
+
+This kit provides user interface and filesystem classes that are part of the Tracker file manager,
+but are useful to other applications as well.
+*/

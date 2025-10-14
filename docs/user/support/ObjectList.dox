@@ -30,12 +30,11 @@
 
 
 /*!
-	\fn template<class T> BObjectList<T>::BObjectList(int32 itemsPerBlock,
-		bool owning)
+	\fn template<class T, bool owning> BObjectList<T>::BObjectList(int32 itemsPerBlock)
 	\brief Creates a new BObjectList.
 
 	\param itemsPerBlock The number of items per block to allocate.
-	\param owning Whether or not the BObjectList deletes its items when
+	\tparam owning Whether or not the BObjectList deletes its items when
 	       it is emptied or deleted.
 
 	\since Haiku R1
@@ -43,8 +42,8 @@
 
 
 /*!
-	\fn template<class T> BObjectList<T>::BObjectList(
-		const BObjectList<T>& list)
+	\fn template<class T, bool owning> BObjectList<T>::BObjectList(
+		const BObjectList& list)
 	\brief Creates a new BObjectList as a copy of another \a list.
 
 	\param list The \a list to copy from.
@@ -54,7 +53,7 @@
 
 
 /*!
-	\fn template<class T> BObjectList<T>::~BObjectList()
+	\fn template<class T, bool owning> BObjectList<T>::~BObjectList()
 	\brief Deletes the list.
 
 	If the list owns its items they are deleted too.
@@ -72,7 +71,7 @@
 
 
 /*!
-	\fn template<class T> BObjectList<T>& BObjectList<T>::operator=(
+	\fn template<class T, bool owning> BObjectList<T>& BObjectList<T>::operator=(
 		const BObjectList<T>& list)
 	\brief Creates a new BObjectList as a copy of another \a list by
 	       overloading the = operator.
@@ -126,7 +125,7 @@
 
 
 /*!
-	\fn template<class T> bool BObjectList<T>::AddList(BObjectList<T>* list)
+	\fn template<class T, bool owning> bool BObjectList<T>::AddList(BObjectList* list)
 	\brief Append a \a list of items to this list.
 
 	The original list is not altered.
@@ -142,7 +141,7 @@
 
 
 /*!
-	\fn template<class T> bool BObjectList<T>::AddList(BObjectList<T>* list,
+	\fn template<class T, bool owning> bool BObjectList<T>::AddList(BObjectList* list,
 		int32 index)
 	\brief Add a \a list of items to this list at the specified \a index.
 

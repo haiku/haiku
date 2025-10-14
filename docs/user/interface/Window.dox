@@ -1299,24 +1299,6 @@
 
 
 /*!
-	\fn void BWindow::AddShortcut(uint32 key, uint32 modifiers, BMenuItem* item)
-	\brief Creates a keyboard shortcut that activates a menu \a item.
-
-	\param key The character that activates the shortcut, case-insensitive.
-	\param modifiers A bit mask of modifiers in addition to \c B_COMMAND_KEY,
-	       options include:
-	       - \c B_SHIFT_KEY
-	       - \c B_OPTION_KEY
-	       - \c B_CONTROL_KEY
-	       - \c B_MENU_KEY
-	       To remove \c B_COMMAND_KEY specify \c B_NO_COMMAND_KEY.
-	\param item The menu \a item to activate.
-
-	\since Haiku R1
-*/
-
-
-/*!
 	\fn void BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage* message)
 	\brief Creates a keyboard shortcut that sends a \a message to the window.
 

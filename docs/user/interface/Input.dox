@@ -39,9 +39,6 @@
 	\fn BInputDevice::~BInputDevice()
 	\brief Undocumented public method
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -158,7 +155,7 @@
 
 /*!
 	\enum input_method_op
-	\ingroup <kit name>
+	\ingroup interface
 	\brief Undocumented enum.
 
 	\since Haiku R1

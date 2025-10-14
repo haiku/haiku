@@ -32,7 +32,7 @@ filesystem hierarchy is available for non packaged software. This can be used to
 locally that is not available yet in HPKG form (for example, as a destination for "make install").
 
 For a complete list of directories and how to access them in a way that is safe to future
-filesystem reorganizations, see \link find_directory, \link find_path, and \link BPathFinder.
+filesystem reorganizations, see \ref find_directory, \ref find_path, and \ref BPathFinder.
 
 */
 

@@ -192,12 +192,14 @@
 /*!
 	\fn status_t add_timer(timer *t, timer_hook hook, bigtime_t period, int32 flags)
 	\ingroup timers
-	\brief Schedule a timer to call the \ref hook function periodically or at a specified time.
+	\brief Schedule a timer to call the \a hook function periodically or at a specified time.
 
-	\param flags If B_ONE_SHOT_ABSOLUTE_TIMER, use the period as a date when the hook should be
-		called. Otherwise, use it as a period to call the hook repeatedly.
-	\param flags If B_TIMER_USE_TIMER_STRUCT_TIMES, use the period defined by \ref t instead of
-		\ref period.
+	\param[out] t Timer handler, for use in \ref cancel_timer.
+	\param flags
+		\li If B_ONE_SHOT_ABSOLUTE_TIMER, use the \a period as a date when the hook should be
+			called. Otherwise, use it as a period to call the hook repeatedly.
+		\li If B_TIMER_USE_TIMER_STRUCT_TIMES, use the period defined by \a t instead of
+			\a period.
 */
 
 /*!

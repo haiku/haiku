@@ -938,6 +938,7 @@ INPUT                  = . \
                          ../../headers/os/game \
                          ../../headers/os/interface \
                          ../../headers/private/interface/ToolTip.h \
+                         ../../headers/os/kernel/fs_query.h \
                          ../../headers/private/kernel/condition_variable.h \
                          ../../headers/os/locale \
                          ../../headers/os/mail \
@@ -949,6 +950,7 @@ INPUT                  = . \
                          ../../headers/os/storage \
                          ../../headers/os/support \
                          ../../headers/os/translation \
+                         ../../headers/posix/dlfcn.h \
                          ../../headers/posix/syslog.h \
                          ../../headers/posix/unistd.h \
                          ../../src/kits/game/GameProducer.h

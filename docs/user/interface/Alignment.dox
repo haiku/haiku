@@ -50,9 +50,6 @@
 	\fn BAlignment::BAlignment()
 	\brief Undocumented public method
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -62,9 +59,6 @@
 	\brief Undocumented public method
 
 	\param other Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
 
 	\since Haiku R1
 */
@@ -76,9 +70,6 @@
 
 	\param horizontal Undocumented
 	\param vertical Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
 
 	\since Haiku R1
 */

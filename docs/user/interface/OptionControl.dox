@@ -44,9 +44,6 @@
 	\param resizeMask Undocumented
 	\param flags Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -60,9 +57,6 @@
 	\param message Undocumented
 	\param flags Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -70,9 +64,6 @@
 /*!
 	\fn virtual virtual BOptionControl::~BOptionControl()
 	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
 
 	\since Haiku R1
 */

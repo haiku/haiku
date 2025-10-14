@@ -42,9 +42,6 @@
 	\param ownsStream Undocumented
 	\param partialReads Undocumented
 
-	\return Undocumented
-	\retval <value> Undocumented
-
 	\since Haiku R1
 */
 
@@ -52,9 +49,6 @@
 /*!
 	\fn virtual virtual BBufferedDataIO::~BBufferedDataIO()
 	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
 
 	\since Haiku R1
 */

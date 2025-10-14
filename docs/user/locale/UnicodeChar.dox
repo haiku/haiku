@@ -278,7 +278,7 @@
 	\fn void BUnicodeChar::ToUTF8(uint32 c, char** out)
 	\brief Transform a character to UTF-8 encoding.
 
-	\returns The UTF-8 encoding of the specified unicode character.
+	\param[out] out Set to the UTF-8 encoding of the specified unicode character.
 
 	\since Haiku R1
 */

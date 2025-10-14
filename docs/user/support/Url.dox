@@ -575,35 +575,6 @@
 
 
 /*!
-	\fn static static BString BUrl::UrlEncode(const BString &url, bool strict=false, bool directory=false)
-	\brief Undocumented public method
-
-	\param url Undocumented
-	\param strict Undocumented
-	\param directory Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn static static BString BUrl::UrlDecode(const BString &url, bool strict=false)
-	\brief Undocumented public method
-
-	\param url Undocumented
-	\param strict Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
-*/
-
-
-/*!
 	\fn static static BArchivable* BUrl::Instantiate(BMessage *archive)
 	\brief Undocumented public method
 
