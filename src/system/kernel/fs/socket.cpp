@@ -392,6 +392,7 @@ create_socket_fd(net_socket* socket, int flags, bool kernel)
 	if (fd < 0) {
 		descriptor->ops = NULL;
 		put_fd(descriptor);
+		return fd;
 	}
 
 	rw_lock_write_lock(&context->lock);
