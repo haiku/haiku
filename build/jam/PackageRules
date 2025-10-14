@@ -307,15 +307,6 @@ rule AddWifiFirmwareToPackage driver : subDirToExtract : archive
 }
 
 
-rule ExtractArchiveToPackage dirTokens : archiveFile : flags : extractedSubDir
-{
-	if ! [ FDontRebuildCurrentPackage ] {
-		ExtractArchiveToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-			: $(dirTokens) : $(archiveFile) : $(flags) : $(extractedSubDir) ;
-	}
-}
-
-
 rule AddDriversToPackage relativeDirectoryTokens : targets
 {
 	if ! [ FDontRebuildCurrentPackage ] {

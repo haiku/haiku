@@ -132,57 +132,6 @@ if [ IsPackageAvailable icu_devel ] {
 }
 
 
-# CLucene
-
-# TODO: Update to packages!
-if ! 1 {
-
-# Automatically install the CLucene feature, when the CLucene package is
-# enabled.
-if [ IsHaikuImagePackageAdded clucene ] {
-	HAIKU_BUILD_FEATURE_CLUCENE = 1 ;
-}
-
-
-HAIKU_CLUCENE_PACKAGE = clucene-0.9.21-x86-gcc4-haiku-2009-08-11.zip ;
-HAIKU_CLUCENE_URL = $(baseURL)/$(HAIKU_CLUCENE_PACKAGE) ;
-
-if $(HAIKU_BUILD_FEATURE_CLUCENE) {
-	if $(TARGET_ARCH) != x86 {
-		Echo "CLucene build feature not available for"
-			"$(TARGET_PACKAGING_ARCH)" ;
-	} else {
-		# Download the zip archive.
-		local zipFile = [ DownloadFile $(HAIKU_CLUCENE_PACKAGE)
-			: $(HAIKU_CLUCENE_URL) ] ;
-
-		# zip file and output directory
-		HAIKU_CLUCENE_ZIP_FILE = $(zipFile) ;
-		HAIKU_CLUCENE_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-			$(HAIKU_CLUCENE_PACKAGE:B) ] ;
-
-		# extract headers and libraries
-		HAIKU_CLUCENE_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_CLUCENE_DIR)
-			: common/include/ : $(zipFile) : extracted-clucene
-		] ;
-
-		HAIKU_CLUCENE_LIBS = [ ExtractArchive $(HAIKU_CLUCENE_DIR)
-			:
-			common/lib/libclucene.a
-			: $(zipFile)
-			 : extracted-clucene
-		] ;
-
-		HAIKU_CLUCENE_HEADERS
-			= [ FDirName $(HAIKU_CLUCENE_DIR) common include ] ;
-
-		EnableBuildFeatures clucene ;
-	}
-}
-
-} # ! 1
-
-
 # Giflib
 if [ IsPackageAvailable giflib_devel ] {
 	ExtractBuildFeatureArchives giflib :
@@ -333,56 +282,6 @@ if [ IsPackageAvailable gutenprint9_devel ] {
 } else {
 	unavailableBuildFeatures += gutenprint ;
 }
-
-
-# TagLib
-
-# TODO: Update to packages!
-if ! 1 {
-
-# Automatically install the TagLib feature, when the optional TagLib optional
-# package is enabled.
-if [ IsHaikuImagePackageAdded taglib ] {
-	HAIKU_BUILD_FEATURE_TAGLIB = 1 ;
-}
-
-HAIKU_TAGLIB_PACKAGE = taglib-1.6.3-r1a4-x86-gcc2-2012-09-03.zip ;
-HAIKU_TAGLIB_URL = $(baseURL)/$(HAIKU_TAGLIB_PACKAGE) ;
-
-if $(HAIKU_BUILD_FEATURE_TAGLIB) {
-	if $(TARGET_ARCH) != x86 {
-		Echo "TagLib build feature not available for $(TARGET_PACKAGING_ARCH)" ;
-	} else {
-		# Download the zip archive.
-		local zipFile = [ DownloadFile $(HAIKU_TAGLIB_PACKAGE)
-			: $(HAIKU_TAGLIB_URL) ] ;
-
-		# zip file and output directory
-		HAIKU_TAGLIB_ZIP_FILE = $(zipFile) ;
-		HAIKU_TAGLIB_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-			$(HAIKU_TAGLIB_PACKAGE:B) ] ;
-
-		# extract headers and libraries
-		HAIKU_TAGLIB_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_TAGLIB_DIR)
-			: common/include/ : $(zipFile) : extracted-taglib
-		] ;
-
-		HAIKU_TAGLIB_LIBS = [ ExtractArchive $(HAIKU_TAGLIB_DIR)
-			:
-			common/lib/libtag.so
-			common/lib/libtag_c.so
-			: $(zipFile)
-			: extracted-taglib
-		] ;
-
-		HAIKU_TAGLIB_HEADERS
-			= [ FDirName $(HAIKU_TAGLIB_DIR) common include taglib ] ;
-
-		EnableBuildFeatures taglib ;
-	}
-}
-
-} # ! 1
 
 
 # WebKit
