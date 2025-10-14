@@ -80,7 +80,38 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 		fRegisters->host_controller_version.specVersion,
 		fRegisters->host_controller_version.vendorVersion);
 
-	TRACE("Capabilities: %" PRIx64 "\n", fRegisters->capabilities.Bits());
+	TRACE("Capabilities: %s%s%s%s%s%s%s%s%s%s%s%s%s%s\n"
+		"    Clock multiplier: %" PRIx8 "\n"
+		"    Retuning modes: %" PRIx8 "\n"
+		"    Retuning timer count: %" PRIx8 "\n"
+		"    Slot type: %" PRIx8 "\n"
+		"    Supported voltages: %" PRIx8 "\n"
+		"    Max block length: %" PRIx8 "\n"
+		"    Base clock frequency: %" PRId8 " MHz\n"
+		"    Timeout clock: %" PRId8 " %s\n",
+		fRegisters->capabilities.UseTuningForSDR50() ? "SDR50 needs retuning, " : "",
+		fRegisters->capabilities.TypeDSupport() ? "Type-D, " : "",
+		fRegisters->capabilities.TypeCSupport() ? "Type-C, " : "",
+		fRegisters->capabilities.TypeASupport() ? "Type-A, " : "",
+		fRegisters->capabilities.DDR50Support() ? "DDR50, " : "",
+		fRegisters->capabilities.SDR104Support() ? "SDR104, " : "",
+		fRegisters->capabilities.SDR50Support() ? "SDR50, " : "",
+		fRegisters->capabilities.AsynchronousInterrupts() ? "Asynchronous interrupts, " : "",
+		fRegisters->capabilities.SystemBus64Bits() ? "64-bit system bus, " : "",
+		fRegisters->capabilities.SuspendResume() ? "Suspend/Resume, " : "",
+		fRegisters->capabilities.SimpleDMA() ? "Simple DMA, " : "",
+		fRegisters->capabilities.HighSpeed() ? "High speed, " : "",
+		fRegisters->capabilities.AdvancedDMA() ? "Advanced DMA, " : "",
+		fRegisters->capabilities.Embedded8Bit() ? "8-bit Embedded mode, " : "",
+		fRegisters->capabilities.ClockMultiplier(),
+		fRegisters->capabilities.RetuningModes(),
+		fRegisters->capabilities.RetuningTimerCount(),
+		fRegisters->capabilities.SlotType(),
+		fRegisters->capabilities.SupportedVoltages(),
+		fRegisters->capabilities.MaxBlockLength(),
+		fRegisters->capabilities.BaseClockFrequency(),
+		fRegisters->capabilities.TimeoutClockFrequency(),
+		fRegisters->capabilities.TimeoutClockUnit() ? "MHz" : "kHz");
 	TRACE("Initial host control: %x\n", fRegisters->host_control.Bits());
 	TRACE("Initial host control 2: %x\n", fRegisters->host_control_2);
 

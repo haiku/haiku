@@ -230,10 +230,29 @@ class SoftwareReset {
 class Capabilities
 {
 	public:
-		uint64_t Bits() { return fBits; }
-
+		uint8_t ClockMultiplier() { return (fBits >> 48) & 0xFF; }
+		uint8_t RetuningModes() { return (fBits >> 46) & 3; }
+		bool UseTuningForSDR50() { return (fBits >> 45) & 1; }
+		uint8_t RetuningTimerCount() { return (fBits >> 40) & 7; }
+		bool TypeDSupport() { return (fBits >> 38) & 1; }
+		bool TypeCSupport() { return (fBits >> 37) & 1; }
+		bool TypeASupport() { return (fBits >> 36) & 1; }
+		bool DDR50Support() { return (fBits >> 34) & 1; }
+		bool SDR104Support() { return (fBits >> 33) & 1; }
+		bool SDR50Support() { return (fBits >> 32) & 1; }
+		uint8_t SlotType() { return (fBits >> 30) & 3; }
+		bool AsynchronousInterrupts() { return (fBits >> 29) & 1; }
+		bool SystemBus64Bits() { return (fBits >> 28) & 1; }
 		uint8_t SupportedVoltages() { return (fBits >> 24) & 7; }
+		bool SuspendResume() { return (fBits >> 23) & 1; }
+		bool SimpleDMA() { return (fBits >> 22) & 1; }
+		bool HighSpeed() { return (fBits >> 21) & 1; }
+		bool AdvancedDMA() { return (fBits >> 19) & 1; }
+		bool Embedded8Bit() { return (fBits >> 18) & 1; }
+		uint8_t MaxBlockLength() { return (fBits >> 16) & 3; }
 		uint8_t BaseClockFrequency() { return (fBits >> 8) & 0xFF; }
+		uint8_t TimeoutClockUnit() { return (fBits >> 7) & 1; }
+		uint8_t TimeoutClockFrequency() { return (fBits >> 0) & 0x1F; }
 
 		static const uint8_t k3v3 = 1;
 		static const uint8_t k3v0 = 2;
