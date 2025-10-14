@@ -185,6 +185,39 @@ class ClockControl
 } __attribute__((packed));
 
 
+class TimeoutControl {
+	public:
+		void SetDivider(uint32_t base_khz, uint32_t delay_ms) {
+			// We need a value i so that:
+			//
+			// base (Hz)        1
+			// --------- < -----------
+			//  2 ^ i       delay (s)
+			//
+			// This will divide the timeout clock to a period longer than the delay needed by the
+			// SD card. Dividing each side of the equation by 1000 allows to use our input units
+			// directly (kHz on one side and ms on the other), and be less worried about overflows.
+			// In the code the equation is rearranged to not have to deal with divisions and lose
+			// precision.
+			//
+			// The allowed range for i is 13 to 27, which is then converted to a value between 0
+			// and 14 to write into the register.
+			//
+			// If we can't reach a sufficiently large delay, the loop will default to the maximum
+			// allowed value of 2^27.
+			uint32_t i;
+			for (i = 13; i < 27; i++) {
+				if ((base_khz * delay_ms) <= (1u << i))
+					break;
+			}
+
+			fBits = i - 13;
+		}
+	private:
+		volatile  uint8_t fBits;
+} __attribute__((packed));
+
+
 class SoftwareReset {
 	public:
 		uint8_t Bits() { return fBits; }
@@ -275,8 +308,14 @@ class Capabilities
 		bool Embedded8Bit() { return (fBits >> 18) & 1; }
 		uint8_t MaxBlockLength() { return (fBits >> 16) & 3; }
 		uint8_t BaseClockFrequency() { return (fBits >> 8) & 0xFF; }
-		uint8_t TimeoutClockUnit() { return (fBits >> 7) & 1; }
-		uint8_t TimeoutClockFrequency() { return (fBits >> 0) & 0x1F; }
+		uint32_t TimeoutClockFrequency()
+		{
+			bool megahertz = (fBits >> 7) & 1;
+			uint32_t frequency = (fBits >> 0) & 0x1F;
+			if (megahertz)
+				frequency *= 1000;
+			return frequency;
+		}
 
 		static const uint8_t k3v3 = 1;
 		static const uint8_t k3v0 = 2;
@@ -374,7 +413,7 @@ struct registers {
 	volatile uint8_t	block_gap_control;
 	volatile uint8_t	wakeup_control;
 	ClockControl		clock_control;
-	volatile uint8_t	timeout_control;
+	TimeoutControl		timeout_control;
 	SoftwareReset		software_reset;
 
 	// Interrupt control

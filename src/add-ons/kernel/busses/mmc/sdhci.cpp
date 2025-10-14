@@ -88,7 +88,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 		"    Supported voltages: %" PRIx8 "\n"
 		"    Max block length: %" PRIx8 "\n"
 		"    Base clock frequency: %" PRId8 " MHz\n"
-		"    Timeout clock: %" PRId8 " %s\n",
+		"    Timeout clock: %" PRId8 " kHz\n",
 		fRegisters->capabilities.UseTuningForSDR50() ? "SDR50 needs retuning, " : "",
 		fRegisters->capabilities.TypeDSupport() ? "Type-D, " : "",
 		fRegisters->capabilities.TypeCSupport() ? "Type-C, " : "",
@@ -110,8 +110,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 		fRegisters->capabilities.SupportedVoltages(),
 		fRegisters->capabilities.MaxBlockLength(),
 		fRegisters->capabilities.BaseClockFrequency(),
-		fRegisters->capabilities.TimeoutClockFrequency(),
-		fRegisters->capabilities.TimeoutClockUnit() ? "MHz" : "kHz");
+		fRegisters->capabilities.TimeoutClockFrequency());
 	TRACE("Initial host control: %x\n", fRegisters->host_control.Bits());
 	TRACE("Initial host control 2: %x\n", fRegisters->host_control_2);
 
@@ -127,6 +126,8 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 		// initialization
 		SetClock(400);
 	}
+
+	fRegisters->timeout_control.SetDivider(fRegisters->capabilities.TimeoutClockFrequency(), 500);
 
 	// Finally, configure some useful interrupts
 	EnableInterrupts(SDHCI_INT_CMD_CMP | SDHCI_INT_CARD_REM
