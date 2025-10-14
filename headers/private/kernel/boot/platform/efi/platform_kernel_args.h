@@ -43,4 +43,4 @@ typedef struct {
 } _PACKED platform_kernel_args;
 
 
-#endif	/* KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H */
+#endif	/* KERNEL_BOOT_PLATFORM_EFI_KERNEL_ARGS_H */
