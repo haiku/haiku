@@ -214,9 +214,9 @@ platform_register_boot_device(Node* device)
 			offset);
 	}
 
-	gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
-	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false);
-	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
+	gBootParams.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
+	gBootParams.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false);
+	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&identifier, sizeof(disk_identifier));
 
 	return B_OK;

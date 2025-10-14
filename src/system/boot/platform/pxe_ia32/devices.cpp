@@ -77,8 +77,8 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 				return B_NO_MEMORY;
 			}
 
-			gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, true);
-			gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_NET);
+			gBootParams.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, true);
+			gBootParams.SetInt32(BOOT_METHOD, BOOT_METHOD_NET);
 			devicesList->Add(disk);
 			return B_OK;
 		} else {
@@ -155,14 +155,14 @@ platform_register_boot_device(Node *device)
 			rootPath = fileNameEnd + 1;
 	}
 
-	if (gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_NET) != B_OK
-		|| gBootVolume.AddInt64("client MAC",
+	if (gBootParams.SetInt32(BOOT_METHOD, BOOT_METHOD_NET) != B_OK
+		|| gBootParams.AddInt64("client MAC",
 			sTFTP.MACAddress().ToUInt64()) != B_OK
-		|| gBootVolume.AddInt32("client IP", sTFTP.IPAddress()) != B_OK
-		|| gBootVolume.AddInt32("server IP", sTFTP.ServerIPAddress()) != B_OK
-		|| gBootVolume.AddInt32("server port", sTFTP.ServerPort()) != B_OK
+		|| gBootParams.AddInt32("client IP", sTFTP.IPAddress()) != B_OK
+		|| gBootParams.AddInt32("server IP", sTFTP.ServerIPAddress()) != B_OK
+		|| gBootParams.AddInt32("server port", sTFTP.ServerPort()) != B_OK
 		|| (sTFTP.RootPath()
-			&& gBootVolume.AddString("net root path", rootPath)
+			&& gBootParams.AddString("net root path", rootPath)
 				!= B_OK)) {
 		return B_NO_MEMORY;
 	}

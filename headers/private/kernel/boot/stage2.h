@@ -13,7 +13,7 @@
 struct stage2_args;
 
 extern struct kernel_args gKernelArgs;
-extern KMessage gBootVolume;
+extern KMessage gBootParams;
 
 #ifdef __cplusplus
 extern "C" {

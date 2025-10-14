@@ -628,14 +628,14 @@ register_boot_file_system(BootVolume& bootVolume)
 		return status;
 	}
 
-	gBootVolume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
+	gBootParams.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
 		partition->offset);
 
 	if (bootVolume.IsPackaged()) {
-		gBootVolume.SetBool(BOOT_VOLUME_PACKAGED, true);
+		gBootParams.SetBool(BOOT_VOLUME_PACKAGED, true);
 		PackageVolumeState* state = bootVolume.GetPackageVolumeState();
 		if (state->Name() != NULL)
-			gBootVolume.AddString(BOOT_VOLUME_PACKAGES_STATE, state->Name());
+			gBootParams.AddString(BOOT_VOLUME_PACKAGES_STATE, state->Name());
 	}
 
 	Node *device = get_node_from(partition->FD());

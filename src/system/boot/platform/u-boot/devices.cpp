@@ -86,7 +86,7 @@ platform_register_boot_device(Node *device)
                 disk_ident.device.unknown.check_sums[i].sum = 0;
         }
 
-	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
+	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&disk_ident, sizeof(disk_ident));
 
 	return B_OK;

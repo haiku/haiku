@@ -161,7 +161,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	TRACE(("boot drive ID: %x\n", gBootDriveID));
 
 //TODO
-	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, gBootedFromImage);
+	gBootParams.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, gBootedFromImage);
 
 	return B_OK;
 }

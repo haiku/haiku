@@ -274,8 +274,8 @@ platform_register_boot_device(Node *device)
 	}
 
 	// ...HARD_DISK, as we pick partition and have checksum (no need to use _CD)
-	gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
-	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
+	gBootParams.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
+	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&identifier, sizeof(disk_identifier));
 
 	return B_OK;

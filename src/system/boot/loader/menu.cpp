@@ -958,7 +958,7 @@ user_menu_boot_volume(Menu* menu, MenuItem* item)
 	status_t status = sBootVolume->SetTo((Directory*)item->Data());
 	update_continue_booting_menu_item(status);
 
-	gBootVolume.SetBool(BOOT_VOLUME_USER_SELECTED, true);
+	gBootParams.SetBool(BOOT_VOLUME_USER_SELECTED, true);
 	return true;
 }
 
@@ -985,7 +985,7 @@ user_menu_boot_volume_state(Menu* menu, MenuItem* _item)
 		item->VolumeInfo(), item->VolumeState());
 	update_continue_booting_menu_item(status);
 
-	gBootVolume.SetBool(BOOT_VOLUME_USER_SELECTED, true);
+	gBootParams.SetBool(BOOT_VOLUME_USER_SELECTED, true);
 	return true;
 }
 
@@ -1294,8 +1294,8 @@ add_boot_volume_menu()
 	menu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
 	item->SetType(MENU_ITEM_NO_CHOICE);
 
-	if (gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
-		int32 bootMethod = gBootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
+	if (gBootParams.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
+		int32 bootMethod = gBootParams.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
 		switch (bootMethod) {
 			case BOOT_METHOD_CD:
 				menu->SetChoiceText("CD-ROM");

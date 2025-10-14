@@ -19,7 +19,7 @@
 static const size_t kChunkSize = 16 * B_PAGE_SIZE;
 
 kernel_args gKernelArgs;
-KMessage gBootVolume;
+KMessage gBootParams;
 
 static void* sFirstFree;
 static void* sLast;

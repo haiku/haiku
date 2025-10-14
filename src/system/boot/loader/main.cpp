@@ -149,16 +149,16 @@ main(stage2_args *args)
 			// clone the boot_volume KMessage into kernel accessible memory
 			// note, that we need to 8-byte align the buffer and thus allocate
 			// 7 more bytes
-			void* buffer = kernel_args_malloc(gBootVolume.ContentSize() + 7);
+			void* buffer = kernel_args_malloc(gBootParams.ContentSize() + 7);
 			if (!buffer) {
 				panic("Could not allocate memory for the boot volume kernel "
 					"arguments");
 			}
 
 			buffer = (void*)(((addr_t)buffer + 7) & ~(addr_t)0x7);
-			memcpy(buffer, gBootVolume.Buffer(), gBootVolume.ContentSize());
+			memcpy(buffer, gBootParams.Buffer(), gBootParams.ContentSize());
 			gKernelArgs.boot_volume = buffer;
-			gKernelArgs.boot_volume_size = gBootVolume.ContentSize();
+			gKernelArgs.boot_volume_size = gBootParams.ContentSize();
 
 			platform_cleanup_devices();
 				// Further cleanup (e.g. heap_release) is the platform's responsibility.

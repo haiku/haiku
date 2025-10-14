@@ -232,7 +232,7 @@ platform_register_boot_device(Node *device)
 	disk.device_type = UNKNOWN_DEVICE;
 	disk.device.unknown.size = device->Size();
 
-	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE, &disk,
+	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE, &disk,
 		sizeof(disk_identifier));
 
 	return B_OK;

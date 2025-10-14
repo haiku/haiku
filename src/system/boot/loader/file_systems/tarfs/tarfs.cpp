@@ -734,7 +734,7 @@ TarFS::Volume::Init(boot::Partition* partition)
 		return status;
 
 	regionDeleter.Detach();
-	int32 bootMethod = gBootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
+	int32 bootMethod = gBootParams.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
 	switch (bootMethod) {
 		case BOOT_METHOD_CD:
 			fName = "CD-ROM";
