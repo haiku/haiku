@@ -307,6 +307,8 @@ TAnalogClock::DrawClock()
 	else
 		SetHighUIColor(B_DOCUMENT_TEXT_COLOR, 0.853);
 
+	rgb_color handsColor = HighColor();
+
 	// hours
 	SetPenSize(2.0);
 	SetLineMode(B_ROUND_CAP, B_MITER_JOIN);
@@ -322,20 +324,20 @@ TAnalogClock::DrawClock()
 	if (fHourDragging)
 		hourColor = ui_color(B_NAVIGATION_BASE_COLOR);
 	else
-		hourColor = HighColor();
+		hourColor = handsColor;
 
 	rgb_color minuteColor;
 	if (fMinuteDragging)
 		minuteColor = ui_color(B_NAVIGATION_BASE_COLOR);
 	else
-		minuteColor = HighColor();
+		minuteColor = handsColor;
 
 	rgb_color secondsColor = make_color(255, 0, 0, 255);
 	rgb_color shadowColor = tint_color(LowColor(), (B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2);
 
 	_DrawHands(fCenterX + 1.5, fCenterY + 1.5, fRadius, shadowColor, shadowColor, shadowColor,
 		shadowColor);
-	_DrawHands(fCenterX, fCenterY, fRadius, hourColor, minuteColor, secondsColor, HighColor());
+	_DrawHands(fCenterX, fCenterY, fRadius, hourColor, minuteColor, secondsColor, handsColor);
 
 	Sync();
 
