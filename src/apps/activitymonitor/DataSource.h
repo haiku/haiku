@@ -295,6 +295,26 @@ private:
 };
 
 
+class ThermalDataSource : public DataSource {
+public:
+						ThermalDataSource();
+	virtual				~ThermalDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual void		Print(BString& text, int64 value) const;
+	virtual	int64		NextValue(SystemInfo& info);
+
+	virtual const char*	InternalName() const;
+	virtual const char*	Name() const;
+	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
+
+private:
+	BString				fLabel;
+};
+
+
 class PageFaultsDataSource : public DataSource {
 public:
 						PageFaultsDataSource();

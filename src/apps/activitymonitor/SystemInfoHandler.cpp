@@ -6,11 +6,13 @@
 
 #include "SystemInfoHandler.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <Clipboard.h>
+#include <Drivers.h>
 #include <Handler.h>
 #include <Input.h>
 #include <List.h>
@@ -28,11 +30,17 @@ SystemInfoHandler::SystemInfoHandler()
 	fMediaNodes = 0;
 	fMediaConnections = 0;
 	fMediaBuffers = 0;
+
+	fThermalFD = open("/dev/power/acpi_thermal/0", O_RDONLY);
+	char buffer[256];
+	if ((fThermalFD > 0) && (ioctl(fThermalFD, B_GET_DEVICE_NAME, buffer, sizeof(buffer)) == B_OK))
+		fThermalZoneName = buffer;
 }
 
 
 SystemInfoHandler::~SystemInfoHandler()
 {
+	close(fThermalFD);
 }
 
 
@@ -197,6 +205,36 @@ uint32
 SystemInfoHandler::MediaBuffers() const
 {
 	return fMediaBuffers;
+}
+
+
+float
+SystemInfoHandler::Temperature() const
+{
+	float temperature = std::nanf("");
+	if (fThermalFD >= 0) {
+		char buffer[256];
+		// TODO it would be nice to use ioctl to get direct access to the temperature instead,
+		// but that provides raw values from the sensors without the "kelvin offset" fixup, making
+		// it unusable.
+		// The ioctl reply also uses a different format for each of the *_thermal drivers, so that
+		// would be a problem if ActivityMonitor is extended to collect info from these as well.
+		pread(fThermalFD, buffer, sizeof(buffer), 0);
+
+		char* currTemp = strstr(buffer, "Current Temperature: ");
+		if (currTemp != NULL)
+			sscanf(currTemp + strlen("Current Temperature: "), "%f", &temperature);
+
+	}
+
+	return temperature;
+}
+
+
+const BString&
+SystemInfoHandler::ThermalZone() const
+{
+	return fThermalZoneName;
 }
 
 

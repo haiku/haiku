@@ -30,6 +30,7 @@ const DataSource* kSources[] = {
 	new CPUFrequencyDataSource(),
 	new CPUUsageDataSource(),
 	new CPUCombinedUsageDataSource(),
+	new ThermalDataSource(),
 	new NetworkUsageDataSource(true),
 	new NetworkUsageDataSource(false),
 	new BlockCacheDataSource(),
@@ -945,6 +946,82 @@ CPUFrequencyDataSource::_SetCPU(int32 cpu)
 
 	fColor = kColors[cpu % kNumColors];
 }
+
+
+//	#pragma mark -
+
+
+ThermalDataSource::ThermalDataSource()
+{
+	fMinimum = 0;
+	fMaximum = 100000000LL;
+
+	fColor = (rgb_color){200, 150, 0, 0};
+}
+
+
+ThermalDataSource::~ThermalDataSource()
+{
+}
+
+
+DataSource*
+ThermalDataSource::Copy() const
+{
+	return new ThermalDataSource();
+}
+
+
+const char*
+ThermalDataSource::InternalName() const
+{
+	return "Temperature";
+}
+
+
+const char*
+ThermalDataSource::Name() const
+{
+	return B_TRANSLATE("Temperature");
+}
+
+
+const char*
+ThermalDataSource::Label() const
+{
+	return fLabel;
+}
+
+
+const char*
+ThermalDataSource::ShortLabel() const
+{
+	return B_TRANSLATE("Temp");
+}
+
+
+void
+ThermalDataSource::Print(BString& text, int64 value) const
+{
+	BString printed;
+	fNumberFormat.Format(printed, (int32)(value / 1000000));
+	text.SetToFormat("%s °C", printed.String());
+}
+
+
+int64
+ThermalDataSource::NextValue(SystemInfo& info)
+{
+	fLabel = info.ThermalZone();
+	int64 value = (int64)ceilf(info.Temperature() * 1000000);
+
+	if (value > fMaximum)
+		SetLimits(0, value);
+
+	return value;
+}
+
+
 
 
 //	#pragma mark -
