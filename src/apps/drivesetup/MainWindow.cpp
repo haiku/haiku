@@ -206,12 +206,12 @@ private:
 MainWindow::MainWindow()
 	:
 	BWindow(BRect(50, 50, 600, 500), B_TRANSLATE_SYSTEM_NAME("DriveSetup"),
-		B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+		B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fCurrentDisk(NULL),
 	fCurrentPartitionID(-1),
 	fSpaceIDMap()
 {
-	fMenuBar = new BMenuBar(Bounds(), "root menu");
+	fMenuBar = new BMenuBar("root menu");
 
 	// create all the menu items
 	fWipeMenuItem = new BMenuItem(B_TRANSLATE("Wipe (not implemented)"),
@@ -281,6 +281,9 @@ MainWindow::MainWindow()
 	fPartitionMenu->AddItem(fOpenDiskProbeMenuItem);
 	fMenuBar->AddItem(fPartitionMenu);
 
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
+	layout->SetInsets(-1, 0, -1, -1);
+	SetLayout(layout);
 	AddChild(fMenuBar);
 
 	// Partition / Drives context menu
@@ -312,18 +315,11 @@ MainWindow::MainWindow()
 	fContextMenu->SetTargetForItems(this);
 
 	// add DiskView
-	BRect r(Bounds());
-	r.top = fMenuBar->Frame().bottom + 1;
-	r.bottom = floorf(r.top + r.Height() * 0.33);
-	fDiskView = new DiskView(r, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-		fSpaceIDMap);
+	fDiskView = new DiskView(fSpaceIDMap);
 	AddChild(fDiskView);
 
 	// add PartitionListView
-	r.top = r.bottom + 2;
-	r.bottom = Bounds().bottom;
-	r.InsetBy(-1, -1);
-	fListView = new PartitionListView(r, B_FOLLOW_ALL);
+	fListView = new PartitionListView();
 	AddChild(fListView);
 
 	// configure PartitionListView

@@ -15,13 +15,11 @@
 class DiskView : public BView {
 	typedef BView Inherited;
 public:
-								DiskView(const BRect& frame,
-									uint32 resizeMode,
-									SpaceIDMap& spaceIDMap);
+								DiskView(SpaceIDMap& spaceIDMap);
 	virtual						~DiskView();
 
 	// BView interface
-	virtual	void				Draw(BRect updateRect);	
+	virtual	void				Draw(BRect updateRect);
 
 			void				SetDiskCount(int32 count);
 			void				SetDisk(BDiskDevice* disk,

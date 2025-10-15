@@ -91,8 +91,7 @@ private:
 class PartitionListView : public BColumnListView {
 	typedef BColumnListView Inherited;
 public:
-								PartitionListView(const BRect& frame,
-									uint32 resizeMode);
+								PartitionListView();
 
 	virtual	void				AttachedToWindow();
 

@@ -456,11 +456,10 @@ public:
 // #pragma mark -
 
 
-DiskView::DiskView(const BRect& frame, uint32 resizeMode,
-		SpaceIDMap& spaceIDMap)
+DiskView::DiskView(SpaceIDMap& spaceIDMap)
 	:
-	Inherited(frame, "diskview", resizeMode,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	Inherited("diskview",
+		B_SUPPORTS_LAYOUT | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fDiskCount(0),
 	fDisk(NULL),
 	fSpaceIDMap(spaceIDMap),
@@ -469,6 +468,8 @@ DiskView::DiskView(const BRect& frame, uint32 resizeMode,
 	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL, kLayoutInset);
 	SetLayout(layout);
 
+	SetExplicitMinSize(BSize(be_plain_font->Size() * 50 + 20, 140));
+	SetExplicitMaxSize(BSize(B_SIZE_UNSET, 140));
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighUIColor(B_PANEL_BACKGROUND_COLOR, B_DARKEN_2_TINT);
 	SetLowUIColor(B_PANEL_BACKGROUND_COLOR, 1.221f);
