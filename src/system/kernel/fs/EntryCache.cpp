@@ -78,6 +78,9 @@ EntryCache::~EntryCache()
 status_t
 EntryCache::Init()
 {
+	WriteLocker locker(fLock);
+	ASSERT(fGenerationCount == 0);
+
 	status_t error = fEntries.Init();
 	if (error != B_OK)
 		return error;

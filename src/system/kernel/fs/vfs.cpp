@@ -4994,6 +4994,7 @@ vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 	context->ref_count = 1;
 	rw_lock_init(&context->lock, "I/O context");
 
+	WriteLocker contextLocker(context->lock);
 	ReadLocker parentLocker;
 
 	size_t tableSize;

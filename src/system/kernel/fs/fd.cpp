@@ -95,6 +95,8 @@ alloc_fd(void)
 bool
 fd_close_on_exec(const struct io_context* context, int fd)
 {
+	ASSERT_READ_LOCKED_RW_LOCK(&context->lock);
+
 	return CHECK_BIT(context->fds_close_on_exec[fd / 8], fd & 7) ? true : false;
 }
 
@@ -102,6 +104,8 @@ fd_close_on_exec(const struct io_context* context, int fd)
 void
 fd_set_close_on_exec(struct io_context* context, int fd, bool closeFD)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&context->lock);
+
 	if (closeFD)
 		context->fds_close_on_exec[fd / 8] |= (1 << (fd & 7));
 	else
@@ -112,6 +116,8 @@ fd_set_close_on_exec(struct io_context* context, int fd, bool closeFD)
 bool
 fd_close_on_fork(const struct io_context* context, int fd)
 {
+	ASSERT_READ_LOCKED_RW_LOCK(&context->lock);
+
 	return CHECK_BIT(context->fds_close_on_fork[fd / 8], fd & 7) ? true : false;
 }
 
@@ -119,6 +125,8 @@ fd_close_on_fork(const struct io_context* context, int fd)
 void
 fd_set_close_on_fork(struct io_context* context, int fd, bool closeFD)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&context->lock);
+
 	if (closeFD)
 		context->fds_close_on_fork[fd / 8] |= (1 << (fd & 7));
 	else
