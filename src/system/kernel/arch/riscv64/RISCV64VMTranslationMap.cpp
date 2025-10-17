@@ -312,15 +312,6 @@ RISCV64VMTranslationMap::Unmap(addr_t start, addr_t end)
 
 
 status_t
-RISCV64VMTranslationMap::DebugMarkRangePresent(addr_t start, addr_t end,
-	bool markPresent)
-{
-	NOT_IMPLEMENTED_PANIC();
-	return B_NOT_SUPPORTED;
-}
-
-
-status_t
 RISCV64VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 	bool updatePageQueue, bool deletingAddressSpace, uint32* _flags)
 {

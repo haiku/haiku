@@ -38,9 +38,6 @@ struct PPCVMTranslationMap460 : PPCVMTranslationMap {
 	virtual status_t			RemapAddressRange(addr_t *_virtualAddress,
 									size_t size, bool unmap);
 
-	virtual	status_t			DebugMarkRangePresent(addr_t start, addr_t end,
-									bool markPresent);
-
 	virtual	status_t			UnmapPage(VMArea* area, addr_t address,
 									bool updatePageQueue,
 									bool deletingAddressSpace, uint32* _flags);

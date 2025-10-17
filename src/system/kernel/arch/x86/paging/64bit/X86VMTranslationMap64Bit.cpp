@@ -317,59 +317,6 @@ X86VMTranslationMap64Bit::Unmap(addr_t start, addr_t end)
 
 
 status_t
-X86VMTranslationMap64Bit::DebugMarkRangePresent(addr_t start, addr_t end,
-	bool markPresent)
-{
-	start = ROUNDDOWN(start, B_PAGE_SIZE);
-	if (start >= end)
-		return B_OK;
-
-	TRACE("X86VMTranslationMap64Bit::DebugMarkRangePresent(%#" B_PRIxADDR
-		", %#" B_PRIxADDR ")\n", start, end);
-
-	ThreadCPUPinner pinner(thread_get_current_thread());
-
-	do {
-		uint64* pageTable = X86PagingMethod64Bit::PageTableForAddress(
-			fPagingStructures->VirtualPMLTop(), start, fIsKernelMap, false,
-			NULL, fPageMapper, fMapCount);
-		if (pageTable == NULL) {
-			// Move on to the next page table.
-			start = ROUNDUP(start + 1, k64BitPageTableRange);
-			continue;
-		}
-
-		for (uint32 index = start / B_PAGE_SIZE % k64BitTableEntryCount;
-				index < k64BitTableEntryCount && start < end;
-				index++, start += B_PAGE_SIZE) {
-			if ((pageTable[index] & X86_64_PTE_PRESENT) == 0) {
-				if (!markPresent)
-					continue;
-
-				X86PagingMethod64Bit::SetTableEntryFlags(&pageTable[index],
-					X86_64_PTE_PRESENT);
-			} else {
-				if (markPresent)
-					continue;
-
-				uint64 oldEntry = X86PagingMethod64Bit::ClearTableEntryFlags(
-					&pageTable[index], X86_64_PTE_PRESENT);
-
-				if ((oldEntry & X86_64_PTE_ACCESSED) != 0) {
-					// Note, that we only need to invalidate the address, if the
-					// accessed flags was set, since only then the entry could
-					// have been in any TLB.
-					InvalidatePage(start);
-				}
-			}
-		}
-	} while (start != 0 && start < end);
-
-	return B_OK;
-}
-
-
-status_t
 X86VMTranslationMap64Bit::UnmapPage(VMArea* area, addr_t address,
 	bool updatePageQueue, bool deletingAddressSpace, uint32* _flags)
 {

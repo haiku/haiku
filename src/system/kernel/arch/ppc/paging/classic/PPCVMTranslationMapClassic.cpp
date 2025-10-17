@@ -586,65 +586,6 @@ PPCVMTranslationMapClassic::RemapAddressRange(addr_t *_virtualAddress,
 
 
 status_t
-PPCVMTranslationMapClassic::DebugMarkRangePresent(addr_t start, addr_t end,
-	bool markPresent)
-{
-	panic("%s: UNIMPLEMENTED", __FUNCTION__);
-	return B_ERROR;
-#if 0//X86
-	start = ROUNDDOWN(start, B_PAGE_SIZE);
-	if (start >= end)
-		return B_OK;
-
-	page_directory_entry *pd = fPagingStructures->pgdir_virt;
-
-	do {
-		int index = VADDR_TO_PDENT(start);
-		if ((pd[index] & PPC_PDE_PRESENT) == 0) {
-			// no page table here, move the start up to access the next page
-			// table
-			start = ROUNDUP(start + 1, kPageTableAlignment);
-			continue;
-		}
-
-		Thread* thread = thread_get_current_thread();
-		ThreadCPUPinner pinner(thread);
-
-		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
-			pd[index] & PPC_PDE_ADDRESS_MASK);
-
-		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
-				index++, start += B_PAGE_SIZE) {
-			if ((pt[index] & PPC_PTE_PRESENT) == 0) {
-				if (!markPresent)
-					continue;
-
-				PPCPagingMethodClassic::SetPageTableEntryFlags(&pt[index],
-					PPC_PTE_PRESENT);
-			} else {
-				if (markPresent)
-					continue;
-
-				page_table_entry oldEntry
-					= PPCPagingMethodClassic::ClearPageTableEntryFlags(&pt[index],
-						PPC_PTE_PRESENT);
-
-				if ((oldEntry & PPC_PTE_ACCESSED) != 0) {
-					// Note, that we only need to invalidate the address, if the
-					// accessed flags was set, since only then the entry could
-					// have been in any TLB.
-					InvalidatePage(start);
-				}
-			}
-		}
-	} while (start != 0 && start < end);
-
-	return B_OK;
-#endif
-}
-
-
-status_t
 PPCVMTranslationMapClassic::UnmapPage(VMArea* area, addr_t address,
 	bool updatePageQueue, bool deletingAddressSpace, uint32* _flags)
 {

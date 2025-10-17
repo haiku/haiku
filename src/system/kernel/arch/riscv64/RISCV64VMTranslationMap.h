@@ -39,9 +39,6 @@ struct RISCV64VMTranslationMap: public VMTranslationMap {
 									vm_page_reservation* reservation);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
 
-	virtual	status_t			DebugMarkRangePresent(addr_t start, addr_t end,
-									bool markPresent);
-
 	virtual	status_t			UnmapPage(VMArea* area, addr_t address,
 									bool updatePageQueue,
 									bool deletingAddressSpace, uint32* _flags);

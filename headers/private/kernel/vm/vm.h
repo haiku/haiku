@@ -84,10 +84,6 @@ const char* vm_cache_type_to_string(int32 type);
 
 void vm_free_page_mapping(page_num_t page, vm_page_mapping* mapping, uint32 flags);
 
-status_t vm_prepare_kernel_area_debug_protection(area_id id, void** cookie);
-status_t vm_set_kernel_area_debug_protection(void* cookie, void* _address,
-			size_t size, uint32 protection);
-
 status_t vm_block_address_range(const char* name, void* address, addr_t size);
 status_t vm_unreserve_address_range(team_id team, void *address, addr_t size);
 status_t vm_reserve_address_range(team_id team, void **_address,
