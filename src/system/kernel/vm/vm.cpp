@@ -6701,8 +6701,13 @@ user_set_memory_swappable(const void* _address, size_t size, bool swappable)
 
 	const addr_t endAddress = address + size;
 
+	status_t error = lock_memory_etc(B_CURRENT_TEAM,
+		(void*)address, endAddress - address, 0);
+	if (error != B_OK)
+		return error;
+
 	AddressSpaceReadLocker addressSpaceLocker;
-	status_t error = addressSpaceLocker.SetTo(team_get_current_team_id());
+	error = addressSpaceLocker.SetTo(team_get_current_team_id());
 	if (error != B_OK)
 		return error;
 	VMAddressSpace* addressSpace = addressSpaceLocker.AddressSpace();
@@ -6721,12 +6726,6 @@ user_set_memory_swappable(const void* _address, size_t size, bool swappable)
 		const addr_t areaEnd = std::min(endAddress, area->Base() + area->Size());
 		nextAddress = areaEnd;
 
-		error = lock_memory_etc(addressSpace->ID(), (void*)areaStart, areaEnd - areaStart, 0);
-		if (error != B_OK) {
-			// We don't need to unset or reset things on failure.
-			break;
-		}
-
 		VMCacheChainLocker cacheChainLocker(vm_area_get_locked_cache(area));
 		VMAnonymousCache* anonCache = NULL;
 		if (dynamic_cast<VMAnonymousNoSwapCache*>(area->cache) != NULL) {
@@ -6740,11 +6739,14 @@ user_set_memory_swappable(const void* _address, size_t size, bool swappable)
 		}
 
 		cacheChainLocker.Unlock();
-
-		unlock_memory_etc(addressSpace->ID(), (void*)areaStart, areaEnd - areaStart, 0);
 		if (error != B_OK)
 			break;
 	}
+
+	addressSpaceLocker.Unlock();
+
+	unlock_memory_etc(B_CURRENT_TEAM,
+		(void*)address, endAddress - address, 0);
 
 	return error;
 #else
