@@ -196,6 +196,7 @@ VMKernelAddressSpace::InsertArea(VMArea* _area, size_t size,
 	TRACE("VMKernelAddressSpace::InsertArea(%p, %" B_PRIu32 ", %#" B_PRIxSIZE
 		", %p \"%s\")\n", addressRestrictions->address,
 		addressRestrictions->address_specification, size, _area, _area->name);
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 
@@ -227,6 +228,7 @@ void
 VMKernelAddressSpace::RemoveArea(VMArea* _area, uint32 allocationFlags)
 {
 	TRACE("VMKernelAddressSpace::RemoveArea(%p)\n", _area);
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 

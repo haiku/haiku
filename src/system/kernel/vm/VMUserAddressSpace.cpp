@@ -164,6 +164,8 @@ VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
 	const virtual_address_restrictions* addressRestrictions,
 	uint32 allocationFlags, void** _address)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
 	addr_t searchBase, searchEnd;
@@ -210,6 +212,8 @@ VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
 void
 VMUserAddressSpace::RemoveArea(VMArea* _area, uint32 allocationFlags)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
 	fAreas.Remove(area);
