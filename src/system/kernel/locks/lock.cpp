@@ -828,6 +828,22 @@ dump_rw_lock_info(int argc, char** argv)
 	kprintf("  owner count:     %#" B_PRIx32 "\n", lock->owner_count);
 	kprintf("  flags:           %#" B_PRIx32 "\n", lock->flags);
 
+#if KDEBUG_RW_LOCK_DEBUG
+	kprintf("  reader threads:");
+	if (lock->active_readers > 0) {
+		ThreadListIterator iterator;
+		while (Thread* thread = iterator.Next()) {
+			for (size_t i = 0; i < B_COUNT_OF(Thread::held_read_locks); i++) {
+				if (thread->held_read_locks[i] == lock) {
+					kprintf(" %" B_PRId32, thread->id);
+					break;
+				}
+			}
+		}
+	}
+	kprintf("\n");
+#endif
+
 	kprintf("  waiting threads:");
 	rw_lock_waiter* waiter = lock->waiters;
 	while (waiter != NULL) {
