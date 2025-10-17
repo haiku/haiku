@@ -3992,7 +3992,7 @@ vm_init(kernel_args* args)
 
 	// allocate areas to represent stuff that already exists
 
-#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
+#if USE_DEBUG_HEAP_FOR_MALLOC
 	address = (void*)ROUNDDOWN(heapBase, B_PAGE_SIZE);
 	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);

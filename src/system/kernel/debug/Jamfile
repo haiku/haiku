@@ -24,6 +24,7 @@ KernelMergeObject kernel_debug.o :
 	font_big.cpp
 	frame_buffer_console.cpp
 	gdb.cpp
+	guarded_heap.cpp
 	safemode_settings.cpp
 	system_profiler.cpp
 	tracing.cpp
