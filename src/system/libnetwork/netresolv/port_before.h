@@ -26,17 +26,11 @@
 // inet_*() are just weak symbols
 #	define	inet_addr		__inet_addr
 #	define	inet_aton		__inet_aton
-#	define	inet_lnaof		__inet_lnaof
-#	define	inet_makeaddr	__inet_makeaddr
 #	define	inet_neta		__inet_neta
-#	define	inet_netof		__inet_netof
-#	define	inet_network	__inet_network
 #	define	inet_net_ntop	__inet_net_ntop
 #	define	inet_net_pton	__inet_net_pton
 #	define	inet_cidr_ntop	__inet_cidr_ntop
 #	define	inet_cidr_pton	__inet_cidr_pton
-#	define	inet_ntoa		__inet_ntoa
-#	define	inet_pton		__inet_pton
 #	define	inet_ntop		__inet_ntop
 #	define	inet_nsap_addr	__inet_nsap_addr
 #	define	inet_nsap_ntoa	__inet_nsap_ntoa
