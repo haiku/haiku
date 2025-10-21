@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2024 Haiku, Inc. All rights reserved.
+ * Copyright 2018-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -183,6 +183,7 @@ supports_device_acpi(device_node* parent)
 {
 	const char* hid;
 	const char* uid;
+	const char* cid;
 	uint32 type;
 
 	if (gDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM, &type, false)
@@ -200,20 +201,16 @@ supports_device_acpi(device_node* parent)
 		return 0.0f;
 	}
 
-	TRACE("supports_device(hid:%s uid:%s)\n", hid, uid);
-
-	if (!(strcmp(hid, "80860F14") == 0
-			||	strcmp(hid, "80860F16") == 0
-			||	strcmp(hid, "80865ACA") == 0
-			||	strcmp(hid, "80865AD0") == 0
-			||	strcmp(hid, "INT33C6") == 0
-			||	strcmp(hid, "INT3436") == 0
-			||	strcmp(hid, "INT344D") == 0
-			||	strcmp(hid, "INT33BB") == 0
-			||	strcmp(hid, "NXP0003") == 0
-			||	strcmp(hid, "RKCP0D40") == 0
-			||	strcmp(hid, "PNP0D40") == 0))
+	if (gDeviceManager->get_attr_string(parent, ACPI_DEVICE_CID_ITEM, &cid, false)) {
+		TRACE("No cid attribute\n");
 		return 0.0f;
+	}
+
+	// The HID and UID determine whether a given host controller is SD, SDIO, or eMMC.
+	// The CID determines whether an ACPI device is a host controller at all.
+	if (strcmp(cid, "PNP0D40") != 0) {
+		return 0.0f;
+	}
 
 	acpi_device_module_info* acpi;
 	acpi_device* device;
