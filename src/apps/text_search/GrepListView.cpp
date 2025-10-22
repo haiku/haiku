@@ -35,6 +35,8 @@ void
 GrepListView::AttachedToWindow()
 {
 	fContextMenu->SetTargetForItems(Window());
+
+	BOutlineListView::AttachedToWindow();
 }
 
 
