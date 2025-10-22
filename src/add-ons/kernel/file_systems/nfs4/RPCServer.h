@@ -21,8 +21,12 @@
 namespace RPC {
 
 struct Request {
+						Request();
+						~Request();
+
 	uint32				fXID;
 	ConditionVariable	fEvent;
+	mutex				fEventLock;
 
 	bool				fDone;
 	Reply**				fReply;
