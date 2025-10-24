@@ -204,6 +204,9 @@ PackageFillingPkgListener::_CreateUpdatePackage(const PackageInfoRef& package,
 	if (!pkg->ProminenceOrderingIsNull())
 		classificationInfoBuilder.WithProminence(static_cast<uint32>(pkg->ProminenceOrdering()));
 
+	if (!pkg->IsDesktopIsNull())
+		classificationInfoBuilder.WithIsDesktop(pkg->IsDesktop());
+
 	if (!pkg->IsNativeDesktopIsNull())
 		classificationInfoBuilder.WithIsNativeDesktop(pkg->IsNativeDesktop());
 

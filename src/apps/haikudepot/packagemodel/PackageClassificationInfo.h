@@ -38,18 +38,21 @@ public:
 			const CategoryRef	CategoryAtIndex(int32 index) const;
 			bool				HasCategoryByCode(const BString& code) const;
 
+			bool				IsDesktop() const;
 			bool				IsNativeDesktop() const;
 
 private:
 			void				SetProminence(uint32 prominence);
 			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);
+			void				SetIsDesktop(bool value);
 			void				SetIsNativeDesktop(bool value);
 
 private:
 			std::vector<CategoryRef>
 								fCategories;
 			uint32				fProminence;
+			bool				fIsDesktop;
 			bool				fIsNativeDesktop;
 };
 
@@ -71,6 +74,8 @@ public:
 			PackageClassificationInfoBuilder&
 								WithProminence(uint32 prominence);
 			PackageClassificationInfoBuilder&
+								WithIsDesktop(bool value);
+			PackageClassificationInfoBuilder&
 								WithIsNativeDesktop(bool value);
 
 			PackageClassificationInfoBuilder&
@@ -86,6 +91,7 @@ private:
 			std::vector<CategoryRef>
 								fCategories;
 			uint32				fProminence;
+			bool				fIsDesktop;
 			bool				fIsNativeDesktop;
 };
 

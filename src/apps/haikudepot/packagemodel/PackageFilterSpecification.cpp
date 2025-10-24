@@ -10,6 +10,8 @@ PackageFilterSpecification::PackageFilterSpecification()
 	fSearchTerms(""),
 	fDepotName(""),
 	fCategory(""),
+	fShowOnlyDesktopPackages(false),
+	fShowOnlyNativeDesktopPackages(false),
 	fShowAvailablePackages(true),
 	fShowInstalledPackages(true),
 	fShowSourcePackages(false),
@@ -27,8 +29,12 @@ bool
 PackageFilterSpecification::operator==(const PackageFilterSpecification& other) const
 {
 	return fSearchTerms == other.SearchTerms() && fDepotName == other.DepotName()
-		&& fCategory == other.Category() && fShowAvailablePackages == other.ShowAvailablePackages()
+		&& fCategory == other.Category()
+		&& fShowOnlyDesktopPackages == other.ShowOnlyDesktopPackages()
+		&& fShowOnlyNativeDesktopPackages == other.ShowOnlyNativeDesktopPackages()
+		&& fShowAvailablePackages == other.ShowAvailablePackages()
 		&& fShowInstalledPackages == other.ShowInstalledPackages()
+		&& fShowSourcePackages == other.ShowSourcePackages()
 		&& fShowDevelopPackages == other.ShowDevelopPackages();
 }
 
@@ -58,6 +64,20 @@ BString
 PackageFilterSpecification::Category() const
 {
 	return fCategory;
+}
+
+
+bool
+PackageFilterSpecification::ShowOnlyDesktopPackages() const
+{
+	return fShowOnlyDesktopPackages;
+}
+
+
+bool
+PackageFilterSpecification::ShowOnlyNativeDesktopPackages() const
+{
+	return fShowOnlyNativeDesktopPackages;
 }
 
 
@@ -111,6 +131,20 @@ PackageFilterSpecification::SetCategory(BString value)
 
 
 void
+PackageFilterSpecification::SetShowOnlyDesktopPackages(bool value)
+{
+	fShowOnlyDesktopPackages = value;
+}
+
+
+void
+PackageFilterSpecification::SetShowOnlyNativeDesktopPackages(bool value)
+{
+	fShowOnlyNativeDesktopPackages = value;
+}
+
+
+void
 PackageFilterSpecification::SetShowAvailablePackages(bool value)
 {
 	fShowAvailablePackages = value;
@@ -146,6 +180,8 @@ PackageFilterSpecificationBuilder::PackageFilterSpecificationBuilder()
 	fSearchTerms(""),
 	fDepotName(""),
 	fCategory(""),
+	fShowOnlyDesktopPackages(false),
+	fShowOnlyNativeDesktopPackages(false),
 	fShowAvailablePackages(true),
 	fShowInstalledPackages(true),
 	fShowSourcePackages(false),
@@ -161,6 +197,8 @@ PackageFilterSpecificationBuilder::PackageFilterSpecificationBuilder(
 	fSearchTerms(""),
 	fDepotName(""),
 	fCategory(""),
+	fShowOnlyDesktopPackages(false),
+	fShowOnlyNativeDesktopPackages(false),
 	fShowAvailablePackages(true),
 	fShowInstalledPackages(true),
 	fShowSourcePackages(false),
@@ -190,6 +228,8 @@ PackageFilterSpecificationBuilder::_Init(const PackageFilterSpecification* value
 	fSearchTerms = value->SearchTerms();
 	fDepotName = value->DepotName();
 	fCategory = value->Category();
+	fShowOnlyDesktopPackages = value->ShowOnlyDesktopPackages();
+	fShowOnlyNativeDesktopPackages = value->ShowOnlyNativeDesktopPackages();
 	fShowAvailablePackages = value->ShowAvailablePackages();
 	fShowInstalledPackages = value->ShowInstalledPackages();
 	fShowSourcePackages = value->ShowSourcePackages();
@@ -207,6 +247,8 @@ PackageFilterSpecificationBuilder::BuildRef()
 	info->SetSearchTerms(fSearchTerms);
 	info->SetDepotName(fDepotName);
 	info->SetCategory(fCategory);
+	info->SetShowOnlyDesktopPackages(fShowOnlyDesktopPackages);
+	info->SetShowOnlyNativeDesktopPackages(fShowOnlyNativeDesktopPackages);
 	info->SetShowAvailablePackages(fShowAvailablePackages);
 	info->SetShowInstalledPackages(fShowInstalledPackages);
 	info->SetShowSourcePackages(fShowSourcePackages);
@@ -243,6 +285,28 @@ PackageFilterSpecificationBuilder::WithCategory(BString value)
 	if (!fSource.IsSet() || fSource->Category() != value) {
 		_InitFromSource();
 		fCategory = value;
+	}
+	return *this;
+}
+
+
+PackageFilterSpecificationBuilder
+PackageFilterSpecificationBuilder::WithShowOnlyDesktopPackages(bool value)
+{
+	if (!fSource.IsSet() || fSource->ShowOnlyDesktopPackages() != value) {
+		_InitFromSource();
+		fShowOnlyDesktopPackages = value;
+	}
+	return *this;
+}
+
+
+PackageFilterSpecificationBuilder
+PackageFilterSpecificationBuilder::WithShowOnlyNativeDesktopPackages(bool value)
+{
+	if (!fSource.IsSet() || fSource->ShowOnlyNativeDesktopPackages() != value) {
+		_InitFromSource();
+		fShowOnlyNativeDesktopPackages = value;
 	}
 	return *this;
 }

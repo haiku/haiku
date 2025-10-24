@@ -15,6 +15,7 @@ PackageClassificationInfo::PackageClassificationInfo()
 	:
 	fCategories(),
 	fProminence(PROMINANCE_ORDERING_NONE),
+	fIsDesktop(false),
 	fIsNativeDesktop(false)
 {
 }
@@ -24,6 +25,7 @@ PackageClassificationInfo::PackageClassificationInfo(const PackageClassification
 	:
 	fCategories(other.fCategories),
 	fProminence(other.Prominence()),
+	fIsDesktop(other.IsDesktop()),
 	fIsNativeDesktop(other.IsNativeDesktop())
 {
 }
@@ -98,6 +100,20 @@ PackageClassificationInfo::IsProminent() const
 
 
 bool
+PackageClassificationInfo::IsDesktop() const
+{
+	return fIsDesktop;
+}
+
+
+void
+PackageClassificationInfo::SetIsDesktop(bool value)
+{
+	fIsDesktop = value;
+}
+
+
+bool
 PackageClassificationInfo::IsNativeDesktop() const
 {
 	return fIsNativeDesktop;
@@ -114,6 +130,9 @@ PackageClassificationInfo::SetIsNativeDesktop(bool value)
 bool
 PackageClassificationInfo::operator==(const PackageClassificationInfo& other) const
 {
+	if (fIsDesktop != other.IsDesktop())
+		return false;
+
 	if (fIsNativeDesktop != other.IsNativeDesktop())
 		return false;
 
@@ -146,6 +165,7 @@ PackageClassificationInfoBuilder::PackageClassificationInfoBuilder()
 	:
 	fCategories(),
 	fProminence(-1L),
+	fIsDesktop(false),
 	fIsNativeDesktop(false)
 {
 }
@@ -196,6 +216,7 @@ PackageClassificationInfoBuilder::BuildRef() const
 	PackageClassificationInfo* classificationInfo = new PackageClassificationInfo();
 
 	classificationInfo->SetProminence(fProminence);
+	classificationInfo->SetIsDesktop(fIsDesktop);
 	classificationInfo->SetIsNativeDesktop(fIsNativeDesktop);
 
 	std::vector<CategoryRef>::const_iterator it;
@@ -213,6 +234,17 @@ PackageClassificationInfoBuilder::WithProminence(uint32 prominence)
 	if (!fSource.IsSet() || fSource->Prominence() != prominence) {
 		_InitFromSource();
 		fProminence = prominence;
+	}
+	return *this;
+}
+
+
+PackageClassificationInfoBuilder&
+PackageClassificationInfoBuilder::WithIsDesktop(bool value)
+{
+	if (!fSource.IsSet() || fSource->IsDesktop() != value) {
+		_InitFromSource();
+		fIsDesktop = value;
 	}
 	return *this;
 }

@@ -44,6 +44,63 @@ ModelListener::~ModelListener()
 }
 
 
+// #pragma mark - PackagesSummary
+
+
+PackagesSummary::PackagesSummary()
+	:
+	fAnyProminentPackages(false),
+	fAnyNativeDesktop(false),
+	fAnyDesktop(false)
+{
+}
+
+
+PackagesSummary::PackagesSummary(bool anyProminentPackages, bool anyNativeDesktop, bool anyDesktop)
+	:
+	fAnyProminentPackages(anyProminentPackages),
+	fAnyNativeDesktop(anyNativeDesktop),
+	fAnyDesktop(anyDesktop)
+{
+}
+
+
+PackagesSummary::~PackagesSummary()
+{
+}
+
+
+PackagesSummary&
+PackagesSummary::operator=(const PackagesSummary& other)
+{
+	fAnyProminentPackages = other.fAnyProminentPackages;
+	fAnyNativeDesktop = other.fAnyNativeDesktop;
+	fAnyDesktop = other.fAnyDesktop;
+	return *this;
+}
+
+
+bool
+PackagesSummary::HasAnyProminentPackages() const
+{
+	return fAnyProminentPackages;
+}
+
+
+bool
+PackagesSummary::HasAnyNativeDesktop() const
+{
+	return fAnyNativeDesktop;
+}
+
+
+bool
+PackagesSummary::HasAnyDesktop() const
+{
+	return fAnyDesktop;
+}
+
+
 // #pragma mark - Model
 
 
@@ -431,13 +488,18 @@ Model::HasPackage(const BString& packageName) const
 }
 
 
-bool
-Model::HasAnyProminentPackages()
+const PackagesSummary
+Model::GeneratePackagesSummary() const
 {
 	BAutolock locker(&fLock);
-	std::map<BString, PackageInfoRef>::iterator it;
+	bool anyProminentPackages = false;
+	bool anyNativeDesktop = false;
+	bool anyDesktop = false;
+	std::map<BString, PackageInfoRef>::const_iterator it;
 
-	for (it = fPackages.begin(); it != fPackages.end(); it++) {
+	for (it = fPackages.begin();
+		it != fPackages.end() && (!anyProminentPackages || !anyNativeDesktop || !anyDesktop);
+		it++) {
 		const PackageInfoRef package = it->second;
 
 		if (package.IsSet()) {
@@ -445,13 +507,14 @@ Model::HasAnyProminentPackages()
 				= package->PackageClassificationInfo();
 
 			if (classificationInfo.IsSet()) {
-				if (classificationInfo->IsProminent())
-					return true;
+				anyProminentPackages = anyProminentPackages | classificationInfo->IsProminent();
+				anyNativeDesktop = anyNativeDesktop | classificationInfo->IsNativeDesktop();
+				anyDesktop = anyDesktop | classificationInfo->IsDesktop();
 			}
 		}
 	}
 
-	return false;
+	return PackagesSummary(anyProminentPackages, anyNativeDesktop, anyDesktop);
 }
 
 

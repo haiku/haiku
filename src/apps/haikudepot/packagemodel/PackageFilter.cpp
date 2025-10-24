@@ -141,6 +141,40 @@ private:
 };
 
 
+class DesktopFilter : public PackageFilter {
+public:
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
+	{
+		if (!package.IsSet())
+			return false;
+
+		PackageClassificationInfoRef classificationInfo = package->PackageClassificationInfo();
+
+		if (!classificationInfo.IsSet())
+			return false;
+
+		return classificationInfo->IsDesktop();
+	}
+};
+
+
+class NativeDesktopFilter : public PackageFilter {
+public:
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
+	{
+		if (!package.IsSet())
+			return false;
+
+		PackageClassificationInfoRef classificationInfo = package->PackageClassificationInfo();
+
+		if (!classificationInfo.IsSet())
+			return false;
+
+		return classificationInfo->IsNativeDesktop();
+	}
+};
+
+
 class SourceFilter : public PackageFilter {
 public:
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
@@ -281,6 +315,20 @@ PackageFilterFactory::CreateStateFilter(PackageState state)
 
 
 /*static*/ PackageFilterRef
+PackageFilterFactory::CreateDesktopFilter()
+{
+	return PackageFilterRef(new DesktopFilter(), true);
+}
+
+
+/*static*/ PackageFilterRef
+PackageFilterFactory::CreateNativeDesktopFilter()
+{
+	return PackageFilterRef(new NativeDesktopFilter(), true);
+}
+
+
+/*static*/ PackageFilterRef
 PackageFilterFactory::CreateSourceFilter()
 {
 	return PackageFilterRef(new SourceFilter(), true);
@@ -318,8 +366,11 @@ PackageFilterFactory::CreateFilter(const PackageFilterSpecificationRef specifica
 	if (!specification->Category().IsEmpty())
 		andFilter->AddFilter(CreateCategoryFilter(specification->Category()));
 
-	if (!specification->ShowAvailablePackages())
-		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateStateFilter(NONE)), true));
+	if (specification->ShowOnlyDesktopPackages())
+		andFilter->AddFilter(CreateDesktopFilter());
+
+	if (specification->ShowOnlyNativeDesktopPackages())
+		andFilter->AddFilter(CreateNativeDesktopFilter());
 
 	if (!specification->ShowInstalledPackages())
 		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateStateFilter(ACTIVATED)), true));

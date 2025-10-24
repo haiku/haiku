@@ -76,12 +76,14 @@ enum BitmapSize {
 #define KEY_DESKBAR_LINK					"deskbar_link"
 
 
-#define SETTING_SHOW_AVAILABLE_PACKAGES			"show available packages"
-#define SETTING_SHOW_INSTALLED_PACKAGES			"show installed packages"
-#define SETTING_SHOW_DEVELOP_PACKAGES			"show develop packages"
-#define SETTING_SHOW_SOURCE_PACKAGES			"show source packages"
-#define SETTING_CAN_SHARE_ANONYMOUS_USER_DATA	"can share anonymous usage data"
-#define SETTING_PACKAGE_LIST_VIEW_MODE			"packageListViewMode"
+#define SETTING_SHOW_DESKTOP_PACKAGES				"show only desktop packages"
+#define SETTING_SHOW_NATIVE_DESKTOP_PACKAGES		"show only native desktop packages"
+#define SETTING_SHOW_AVAILABLE_PACKAGES				"show available packages"
+#define SETTING_SHOW_INSTALLED_PACKAGES				"show installed packages"
+#define SETTING_SHOW_DEVELOP_PACKAGES				"show develop packages"
+#define SETTING_SHOW_SOURCE_PACKAGES				"show source packages"
+#define SETTING_CAN_SHARE_ANONYMOUS_USER_DATA		"can share anonymous usage data"
+#define SETTING_PACKAGE_LIST_VIEW_MODE				"packageListViewMode"
 	// unfortunately historical difference in casing.
 
 

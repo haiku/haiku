@@ -35,6 +35,9 @@ class ShuttingDownWindow;
 class WorkStatusView;
 
 
+enum PackageDesktopFilterMode { DESKTOP, NATIVE_DESKTOP, DESKTOP_AND_NON_DESKTOP };
+
+
 class MainWindow :
 	private ProcessCoordinatorConsumer, public ProcessCoordinatorListener,
 	public UserDetailVerifierListener, public BWindow {
@@ -153,6 +156,8 @@ private:
 									BStringList& packageNames,
 									PackageState state);
 
+			void				_SetPackageDesktopFilterMode(PackageDesktopFilterMode mode);
+
 private:
 			FilterView*			fFilterView;
 			TabView*			fListTabs;
@@ -175,6 +180,9 @@ private:
 			BMenuItem*			fShowInstalledPackagesItem;
 			BMenuItem*			fShowDevelopPackagesItem;
 			BMenuItem*			fShowSourcePackagesItem;
+			BMenuItem*			fShowOnlyDesktopItem;
+			BMenuItem*			fShowOnlyNativeDesktopItem;
+			BMenuItem*			fShowDesktopAndNonDesktopItem;
 
 			BMenuItem*			fRefreshRepositoriesItem;
 

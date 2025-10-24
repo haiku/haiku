@@ -63,6 +63,8 @@ public:
 	static	PackageFilterRef	CreateSearchTermsFilter(const BString& searchTerms);
 	static	PackageFilterRef	CreateDepotFilter(const BString& depotName);
 	static	PackageFilterRef	CreateStateFilter(PackageState state);
+	static	PackageFilterRef	CreateDesktopFilter();
+	static	PackageFilterRef	CreateNativeDesktopFilter();
 	static	PackageFilterRef	CreateSourceFilter();
 	static	PackageFilterRef	CreateDevelopmentFilter();
 	static	PackageFilterRef	CreateFalseFilter();

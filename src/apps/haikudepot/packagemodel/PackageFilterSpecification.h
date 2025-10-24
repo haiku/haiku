@@ -26,6 +26,8 @@ public:
 			BString				SearchTerms() const;
 			BString				DepotName() const;
 			BString				Category() const;
+			bool				ShowOnlyDesktopPackages() const;
+			bool				ShowOnlyNativeDesktopPackages() const;
 			bool				ShowAvailablePackages() const;
 			bool				ShowInstalledPackages() const;
 			bool				ShowSourcePackages() const;
@@ -35,6 +37,8 @@ private:
 			void				SetSearchTerms(BString value);
 			void				SetDepotName(BString value);
 			void				SetCategory(BString value);
+			void				SetShowOnlyDesktopPackages(bool value);
+			void				SetShowOnlyNativeDesktopPackages(bool value);
 			void				SetShowAvailablePackages(bool value);
 			void				SetShowInstalledPackages(bool value);
 			void				SetShowSourcePackages(bool value);
@@ -44,6 +48,8 @@ private:
 			BString				fSearchTerms;
 			BString				fDepotName;
 			BString				fCategory;
+			bool				fShowOnlyDesktopPackages;
+			bool				fShowOnlyNativeDesktopPackages;
 			bool				fShowAvailablePackages;
 			bool				fShowInstalledPackages;
 			bool				fShowSourcePackages;
@@ -72,6 +78,10 @@ public:
 			PackageFilterSpecificationBuilder
 								WithCategory(BString value);
 			PackageFilterSpecificationBuilder
+								WithShowOnlyDesktopPackages(bool value);
+			PackageFilterSpecificationBuilder
+								WithShowOnlyNativeDesktopPackages(bool value);
+			PackageFilterSpecificationBuilder
 								WithShowAvailablePackages(bool value);
 			PackageFilterSpecificationBuilder
 								WithShowInstalledPackages(bool value);
@@ -90,6 +100,8 @@ private:
 			BString				fSearchTerms;
 			BString				fDepotName;
 			BString				fCategory;
+			bool				fShowOnlyDesktopPackages;
+			bool				fShowOnlyNativeDesktopPackages;
 			bool				fShowAvailablePackages;
 			bool				fShowInstalledPackages;
 			bool				fShowSourcePackages;

@@ -58,6 +58,33 @@ public:
 };
 
 
+/*!	This class conveys summary information about all the packages that are
+	stored in the model.
+*/
+
+class PackagesSummary {
+public:
+								PackagesSummary();
+								PackagesSummary(
+									bool anyProminentPackages,
+									bool anyNativeDesktop,
+									bool anyDesktop);
+	virtual						~PackagesSummary();
+
+			PackagesSummary&	operator=(const PackagesSummary& other);
+
+			bool				HasAnyProminentPackages() const;
+			bool				HasAnyNativeDesktop() const;
+			bool				HasAnyDesktop() const;
+
+private:
+			bool				fAnyProminentPackages;
+			bool				fAnyNativeDesktop;
+			bool				fAnyDesktop;
+
+};
+
+
 class Model : public PackageScreenshotRepositoryListener {
 public:
 								Model();
@@ -94,7 +121,7 @@ public:
 			const PackageInfoRef
 								PackageForName(const BString& name) const;
 			bool				HasPackage(const BString& packageName) const;
-			bool				HasAnyProminentPackages();
+	const	PackagesSummary		GeneratePackagesSummary() const;
 
 	const	LanguageRef			PreferredLanguage() const;
 			void				SetPreferredLanguage(const LanguageRef& value);

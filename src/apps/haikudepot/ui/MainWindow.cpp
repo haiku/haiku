@@ -67,28 +67,32 @@
 
 
 enum {
-	MSG_REFRESH_REPOS						= 'mrrp',
-	MSG_MANAGE_REPOS						= 'mmrp',
-	MSG_SOFTWARE_UPDATER					= 'mswu',
-	MSG_SETTINGS							= 'stgs',
-	MSG_LOG_IN								= 'lgin',
-	MSG_AUTHORIZATION_CHANGED				= 'athc',
-	MSG_PACKAGE_FILTER_CHANGED				= 'fpch',
-	MSG_ICONS_CHANGED						= 'icoc',
-	MSG_CATEGORIES_LIST_CHANGED				= 'clic',
-	MSG_PACKAGES_CHANGED					= 'pchd',
-	MSG_PROCESS_COORDINATOR_CHANGED			= 'pccd',
-	MSG_WORK_STATUS_CHANGE					= 'wsch',
-	MSG_WORK_STATUS_CLEAR					= 'wscl',
-	MSG_INCREMENT_VIEW_COUNTER				= 'icrv',
-	MSG_SCREENSHOT_CACHED					= 'ssca',
+	MSG_REFRESH_REPOS							= 'mrrp',
+	MSG_MANAGE_REPOS							= 'mmrp',
+	MSG_SOFTWARE_UPDATER						= 'mswu',
+	MSG_SETTINGS								= 'stgs',
+	MSG_LOG_IN									= 'lgin',
+	MSG_AUTHORIZATION_CHANGED					= 'athc',
+	MSG_PACKAGE_FILTER_CHANGED					= 'fpch',
+	MSG_ICONS_CHANGED							= 'icoc',
+	MSG_CATEGORIES_LIST_CHANGED					= 'clic',
+	MSG_PACKAGES_CHANGED						= 'pchd',
+	MSG_PROCESS_COORDINATOR_CHANGED				= 'pccd',
+	MSG_WORK_STATUS_CHANGE						= 'wsch',
+	MSG_WORK_STATUS_CLEAR						= 'wscl',
+	MSG_INCREMENT_VIEW_COUNTER					= 'icrv',
+	MSG_SCREENSHOT_CACHED						= 'ssca',
 
-	MSG_CHANGE_PACKAGE_LIST_VIEW_MODE		= 'cplm',
-	MSG_SHOW_AVAILABLE_PACKAGES				= 'savl',
-	MSG_SHOW_INSTALLED_PACKAGES				= 'sins',
-	MSG_SHOW_SOURCE_PACKAGES				= 'ssrc',
-	MSG_SHOW_DEVELOP_PACKAGES				= 'sdvl'
+	MSG_CHANGE_PACKAGE_LIST_VIEW_MODE			= 'cplm',
+	MSG_SHOW_DESKTOP_PACKAGES					= 'sodk',
+	MSG_SHOW_NATIVE_DESKTOP_PACKAGES			= 'sond',
+	MSG_SHOW_DESKTOP_AND_NON_DESKTOP_PACKAGES	= 'sdan',
+	MSG_SHOW_AVAILABLE_PACKAGES					= 'savl',
+	MSG_SHOW_INSTALLED_PACKAGES					= 'sins',
+	MSG_SHOW_SOURCE_PACKAGES					= 'ssrc',
+	MSG_SHOW_DEVELOP_PACKAGES					= 'sdvl'
 };
+
 
 #define KEY_ERROR_STATUS				"errorStatus"
 
@@ -512,6 +516,18 @@ MainWindow::MessageReceived(BMessage* message)
 			_HandleChangePackageListViewMode();
 			break;
 
+		case MSG_SHOW_DESKTOP_PACKAGES:
+			_SetPackageDesktopFilterMode(DESKTOP);
+			break;
+
+		case MSG_SHOW_NATIVE_DESKTOP_PACKAGES:
+			_SetPackageDesktopFilterMode(NATIVE_DESKTOP);
+			break;
+
+		case MSG_SHOW_DESKTOP_AND_NON_DESKTOP_PACKAGES:
+			_SetPackageDesktopFilterMode(DESKTOP_AND_NON_DESKTOP);
+			break;
+
 		case MSG_SHOW_AVAILABLE_PACKAGES:
 		{
 			fModel.SetFilterSpecification(
@@ -718,6 +734,10 @@ MainWindow::StoreSettings(BMessage& settings)
 		settings.AddString(SETTING_PACKAGE_LIST_VIEW_MODE,
 			main_window_package_list_view_mode_str(fModel.PackageListViewMode()));
 
+		settings.AddBool(SETTING_SHOW_DESKTOP_PACKAGES,
+			fModel.FilterSpecification()->ShowOnlyDesktopPackages());
+		settings.AddBool(SETTING_SHOW_NATIVE_DESKTOP_PACKAGES,
+			fModel.FilterSpecification()->ShowOnlyNativeDesktopPackages());
 		settings.AddBool(SETTING_SHOW_AVAILABLE_PACKAGES,
 			fModel.FilterSpecification()->ShowAvailablePackages());
 		settings.AddBool(SETTING_SHOW_INSTALLED_PACKAGES,
@@ -869,6 +889,20 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 
 	menu = new BMenu(B_TRANSLATE("Show"));
 
+	fShowDesktopAndNonDesktopItem = new BMenuItem(B_TRANSLATE("Desktop and non-desktop packages"),
+		new BMessage(MSG_SHOW_DESKTOP_AND_NON_DESKTOP_PACKAGES));
+	menu->AddItem(fShowDesktopAndNonDesktopItem);
+
+	fShowOnlyDesktopItem
+		= new BMenuItem(B_TRANSLATE("Desktop packages"), new BMessage(MSG_SHOW_DESKTOP_PACKAGES));
+	menu->AddItem(fShowOnlyDesktopItem);
+
+	fShowOnlyNativeDesktopItem = new BMenuItem(B_TRANSLATE("Native desktop packages"),
+		new BMessage(MSG_SHOW_NATIVE_DESKTOP_PACKAGES));
+	menu->AddItem(fShowOnlyNativeDesktopItem);
+
+	menu->AddSeparatorItem();
+
 	fShowAvailablePackagesItem = new BMenuItem(B_TRANSLATE("Available packages"),
 		new BMessage(MSG_SHOW_AVAILABLE_PACKAGES));
 	menu->AddItem(fShowAvailablePackagesItem);
@@ -987,6 +1021,10 @@ MainWindow::_RestoreModelSettings(const BMessage& settings)
 	bool showOption;
 	PackageFilterSpecificationBuilder filterSpecificationBuilder;
 
+	if (settings.FindBool(SETTING_SHOW_DESKTOP_PACKAGES, &showOption) == B_OK)
+		filterSpecificationBuilder.WithShowOnlyDesktopPackages(showOption);
+	if (settings.FindBool(SETTING_SHOW_NATIVE_DESKTOP_PACKAGES, &showOption) == B_OK)
+		filterSpecificationBuilder.WithShowOnlyNativeDesktopPackages(showOption);
 	if (settings.FindBool(SETTING_SHOW_AVAILABLE_PACKAGES, &showOption) == B_OK)
 		filterSpecificationBuilder.WithShowAvailablePackages(showOption);
 	if (settings.FindBool(SETTING_SHOW_INSTALLED_PACKAGES, &showOption) == B_OK)
@@ -1047,12 +1085,36 @@ MainWindow::_InitPreferredLanguage()
 
 
 void
+MainWindow::_SetPackageDesktopFilterMode(PackageDesktopFilterMode mode)
+{
+	fModel.SetFilterSpecification(PackageFilterSpecificationBuilder(fModel.FilterSpecification())
+			.WithShowOnlyNativeDesktopPackages(mode == NATIVE_DESKTOP)
+			.WithShowOnlyDesktopPackages(mode == DESKTOP)
+			.BuildRef());
+}
+
+
+void
 MainWindow::_AdoptModelControls()
 {
 	if (fSinglePackageMode)
 		return;
 
+	{
+		PackagesSummary packagesSummary = fModel.GeneratePackagesSummary();
+		fShowOnlyDesktopItem->SetEnabled(packagesSummary.HasAnyDesktop());
+		fShowOnlyNativeDesktopItem->SetEnabled(packagesSummary.HasAnyNativeDesktop());
+		fListTabs->TabAt(TAB_PROMINENT_PACKAGES)
+			->SetEnabled(packagesSummary.HasAnyProminentPackages());
+	}
+
 	PackageFilterSpecificationRef packageFilterSpecification = fModel.FilterSpecification();
+
+	fShowOnlyDesktopItem->SetMarked(packageFilterSpecification->ShowOnlyDesktopPackages());
+	fShowOnlyNativeDesktopItem->SetMarked(
+		packageFilterSpecification->ShowOnlyNativeDesktopPackages());
+	fShowDesktopAndNonDesktopItem->SetMarked(!packageFilterSpecification->ShowOnlyDesktopPackages()
+		&& !packageFilterSpecification->ShowOnlyNativeDesktopPackages());
 
 	fShowAvailablePackagesItem->SetMarked(packageFilterSpecification->ShowAvailablePackages());
 	fShowInstalledPackagesItem->SetMarked(packageFilterSpecification->ShowInstalledPackages());
@@ -1227,6 +1289,10 @@ MainWindow::_StartBulkLoad(bool force)
 void
 MainWindow::_BulkLoadCompleteReceived(status_t errorStatus)
 {
+	fFeaturedPackagesView->SetLoading(false);
+	fRefreshRepositoriesItem->SetEnabled(true);
+	PackagesSummary packagesSummary = fModel.GeneratePackagesSummary();
+
 	if (errorStatus != B_OK) {
 		AppUtils::NotifySimpleError(B_TRANSLATE("Package update error"),
 			B_TRANSLATE("While updating package data, a problem has arisen "
@@ -1236,8 +1302,31 @@ MainWindow::_BulkLoadCompleteReceived(status_t errorStatus)
 						"logs." ALERT_MSG_LOGS_USER_GUIDE));
 	}
 
-	fFeaturedPackagesView->SetLoading(false);
-	fRefreshRepositoriesItem->SetEnabled(true);
+	// after the bulk load concludes, if there are no desktop applications
+	// and some error did occur during load then the choice to filter by
+	// desktop applications should be disabled.
+
+	if (errorStatus != B_OK && !packagesSummary.HasAnyDesktop()
+		&& fModel.FilterSpecification()->ShowOnlyDesktopPackages()) {
+		fModel.SetFilterSpecification(
+			PackageFilterSpecificationBuilder(fModel.FilterSpecification())
+				.WithShowOnlyDesktopPackages(false)
+				.BuildRef());
+	}
+
+	// after the bulk load concludes, if there are no native desktop
+	// applications and some error did occur during load then the choice to
+	// filter by native desktop applications should be disabled.
+
+	if (errorStatus != B_OK && !packagesSummary.HasAnyNativeDesktop()
+		&& fModel.FilterSpecification()->ShowOnlyNativeDesktopPackages()) {
+		HDINFO("no native desktop packages; will disable filter");
+		fModel.SetFilterSpecification(
+			PackageFilterSpecificationBuilder(fModel.FilterSpecification())
+				.WithShowOnlyNativeDesktopPackages(false)
+				.BuildRef());
+	}
+
 	_AdoptModel();
 	_UpdateAvailableRepositories();
 
@@ -1246,9 +1335,12 @@ MainWindow::_BulkLoadCompleteReceived(status_t errorStatus)
 	// and the user should be switched to the "all packages" view so
 	// that they are not presented with a blank window!
 
-	bool hasProminentPackages = fModel.HasAnyProminentPackages();
-	fListTabs->TabAt(TAB_PROMINENT_PACKAGES)->SetEnabled(hasProminentPackages);
-	if (!hasProminentPackages && fListTabs->Selection() == TAB_PROMINENT_PACKAGES) {
+	// if there are no prominent packages then the disablement of the featured
+	// tab is made elsewhere.
+
+	if (!packagesSummary.HasAnyProminentPackages()
+		&& fListTabs->Selection() == TAB_PROMINENT_PACKAGES) {
+		HDINFO("no prominent packages; will display all packages instead");
 		fModel.SetPackageListViewMode(ALL);
 		fListTabs->Select(TAB_ALL_PACKAGES);
 	}
