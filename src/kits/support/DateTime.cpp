@@ -1024,7 +1024,7 @@ BDate::LongDayName(int32 day)
 	const BLocale* locale = BLocaleRoster::Default()->GetDefaultLocale();
 	BDateFormat format(locale);
 	BString out;
-	if (format.GetDayName(day, out, B_LONG_DATE_FORMAT) != B_OK)
+	if (format.GetDayName(day, out, B_FULL_DATE_FORMAT) != B_OK)
 		return BString();
 
 	return out;
