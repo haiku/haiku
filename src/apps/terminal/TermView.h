@@ -118,6 +118,7 @@ public:
 			// edit functions
 			void				Copy(BClipboard* clipboard);
 			void				Paste(BClipboard* clipboard);
+			void				SyncClipboard();
 			void				SelectAll();
 			void				Clear();
 

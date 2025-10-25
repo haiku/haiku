@@ -920,6 +920,29 @@ TermView::Paste(BClipboard *clipboard)
 
 
 void
+TermView::SyncClipboard()
+{
+	if (be_clipboard != fMouseClipboard && be_clipboard->Lock()) {
+		if (fMouseClipboard->Lock()) {
+			BMessage* clipMsgA = be_clipboard->Data();
+			const char* text;
+			ssize_t numBytes;
+			if (clipMsgA->FindData("text/plain", B_MIME_TYPE,
+					(const void**)&text, &numBytes) == B_OK ) {
+				fMouseClipboard->Clear();
+				BMessage* clipMsgB = fMouseClipboard->Data();
+				clipMsgB->AddData("text/plain", B_MIME_TYPE,
+					text, numBytes);
+				fMouseClipboard->Commit();
+			}
+			fMouseClipboard->Unlock();
+		}
+		be_clipboard->Unlock();
+	}
+}
+
+
+void
 TermView::SelectAll()
 {
 	BAutolock _(fTextBuffer);
@@ -1691,23 +1714,7 @@ TermView::MessageReceived(BMessage *message)
 			// This message originates from the system clipboard. Overwrite
 			// the contents of the mouse clipboard with the ones from the
 			// system clipboard, in case it contains text data.
-			if (be_clipboard != fMouseClipboard && be_clipboard->Lock()) {
-				if (fMouseClipboard->Lock()) {
-					BMessage* clipMsgA = be_clipboard->Data();
-					const char* text;
-					ssize_t numBytes;
-					if (clipMsgA->FindData("text/plain", B_MIME_TYPE,
-							(const void**)&text, &numBytes) == B_OK ) {
-						fMouseClipboard->Clear();
-						BMessage* clipMsgB = fMouseClipboard->Data();
-						clipMsgB->AddData("text/plain", B_MIME_TYPE,
-							text, numBytes);
-						fMouseClipboard->Commit();
-					}
-					fMouseClipboard->Unlock();
-				}
-				be_clipboard->Unlock();
-			}
+			SyncClipboard();
 			break;
 
 		case B_SELECT_ALL:

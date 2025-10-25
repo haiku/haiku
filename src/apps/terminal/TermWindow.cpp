@@ -1410,6 +1410,7 @@ TermWindow::_AddTab(const Arguments* args, const BString& currentDirectory)
 		fTabView->AddTab(scrollView, tab);
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
 		view->SetMouseClipboard(gMouseClipboard);
+		view->SyncClipboard();
 
 		const BCharacterSet* charset
 			= BCharacterSetRoster::FindCharacterSetByName(
