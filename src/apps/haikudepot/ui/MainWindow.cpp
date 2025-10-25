@@ -52,6 +52,7 @@
 #include "RatePackageWindow.h"
 #include "RatingUtils.h"
 #include "ScreenshotWindow.h"
+#include "ServerHelper.h"
 #include "SettingsWindow.h"
 #include "ShuttingDownWindow.h"
 #include "ToLatestUserUsageConditionsWindow.h"
@@ -1125,8 +1126,10 @@ MainWindow::_HandleIncrementViewCounter(const BMessage* message)
 	if (message->FindString("name", &name) == B_OK) {
 		const PackageInfoRef& viewedPackage = fPackageInfoView->Package();
 		if (viewedPackage.IsSet()) {
-			if (viewedPackage->Name() == name)
-				_IncrementViewCounter(viewedPackage);
+			const BString& viewedPackageName = viewedPackage->Name();
+
+			if (viewedPackageName == name)
+				_IncrementViewCounter(viewedPackageName);
 			else
 				HDINFO("incr. view counter; name mismatch");
 		} else {
@@ -1142,23 +1145,38 @@ MainWindow::_HandleIncrementViewCounter(const BMessage* message)
 
 
 void
-MainWindow::_IncrementViewCounter(const PackageInfoRef package)
+MainWindow::_IncrementViewCounter(const BString& packageName)
 {
-	bool shouldIncrementViewCounter = false;
+	const char* packageNameStr = packageName.String();
+	const PackageInfoRef package = fModel.PackageForName(packageName);
 
-	bool canShareAnonymousUsageData = fModel.CanShareAnonymousUsageData();
-	if (canShareAnonymousUsageData && !PackageUtils::Viewed(package)) {
-		fModel.AddPackage(PackageInfoBuilder(package)
-				.WithLocalInfo(
-					PackageLocalInfoBuilder(package->LocalInfo()).WithViewed().BuildRef())
-				.BuildRef());
-		shouldIncrementViewCounter = true;
+	if (!package.IsSet()) {
+		HDERROR("the package [%s] it not available -- won't increment the view counter",
+			packageNameStr);
+		return;
 	}
 
-	if (shouldIncrementViewCounter) {
-		ProcessCoordinator* incrementViewCoordinator
-			= ProcessCoordinatorFactory::CreateIncrementViewCounter(&fModel, package);
-		_AddProcessCoordinator(incrementViewCoordinator);
+	bool canShareAnonymousUsageData = fModel.CanShareAnonymousUsageData();
+
+	// The logic here checks to see that the user has approved that their viewing of the package
+	// can be anonymously recorded as a metric. We also check that within this session, the
+	// package has not already been incremented as we count a viewing of a package within a
+	// session of HaikuDepot desktop application as unique.
+
+	if (canShareAnonymousUsageData && !PackageUtils::Viewed(package)) {
+		if (ServerHelper::IsNetworkAvailable()) {
+			PackageLocalInfoRef localInfoRef
+				= PackageLocalInfoBuilder(package->LocalInfo()).WithViewed().BuildRef();
+			fModel.AddPackage(PackageInfoBuilder(package).WithLocalInfo(localInfoRef).BuildRef());
+
+			ProcessCoordinator* incrementViewCoordinator
+				= ProcessCoordinatorFactory::CreateIncrementViewCounter(&fModel, package);
+			_AddProcessCoordinator(incrementViewCoordinator);
+
+			HDINFO("pkg [%s] will increment counter", packageNameStr);
+		} else {
+			HDINFO("pkg [%s] won't increment counter; network unavailable", packageNameStr);
+		}
 	}
 }
 
@@ -1364,21 +1382,36 @@ MainWindow::_PopulatePackageAsync(bool forcePopulate)
 	const char* packageNameStr = package->Name().String();
 
 	PackageLocalizedTextRef localized = package->LocalizedText();
+	bool networkAvailable = ServerHelper::IsNetworkAvailable();
 
 	if (localized.IsSet()) {
-		if (localized->HasChangelog() && (forcePopulate || localized->Changelog().IsEmpty())) {
-			_AddProcessCoordinator(ProcessCoordinatorFactory::PopulatePkgChangelogCoordinator(
-				&fModel, package->Name()));
-			HDINFO("pkg [%s] will have changelog updated from server.", packageNameStr);
-		} else {
-			HDDEBUG("pkg [%s] not have changelog updated from server.", packageNameStr);
+		if (forcePopulate || localized->Changelog().IsEmpty()) {
+			if (localized->HasChangelog()) {
+				if (networkAvailable) {
+					_AddProcessCoordinator(
+						ProcessCoordinatorFactory::PopulatePkgChangelogCoordinator(&fModel,
+							package->Name()));
+					HDINFO("pkg [%s] will have changelog updated from server.", packageNameStr);
+				} else {
+					HDINFO(
+						"pkg [%s] will not have changelog updated from server; network unavailable",
+						packageNameStr);
+				}
+			} else {
+				HDINFO("pkg [%s] does not have a changelog -- won't try fetch it.", packageNameStr);
+			}
 		}
 	}
 
 	if (forcePopulate || RatingUtils::ShouldTryPopulateUserRatings(package->UserRatingInfo())) {
-		_AddProcessCoordinator(
-			ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(&fModel, package->Name()));
-		HDINFO("pkg [%s] will have user ratings updated from server.", packageNameStr);
+		if (networkAvailable) {
+			_AddProcessCoordinator(ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(
+				&fModel, package->Name()));
+			HDINFO("pkg [%s] will have user ratings updated from server.", packageNameStr);
+		} else {
+			HDINFO("pkg [%s] won't have user ratings updated from server; network unavailable",
+				packageNameStr);
+		}
 	} else {
 		HDDEBUG("pkg [%s] not have user ratings updated from server.", packageNameStr);
 	}

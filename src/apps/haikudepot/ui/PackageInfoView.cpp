@@ -48,6 +48,7 @@
 #include "ProcessCoordinatorFactory.h"
 #include "RatingView.h"
 #include "ScrollableGroupView.h"
+#include "ServerHelper.h"
 #include "SharedIcons.h"
 #include "TextView.h"
 
@@ -1473,28 +1474,31 @@ void
 PackageInfoView::_SetPackageScreenshotThumb(const PackageInfoRef& package)
 {
 	ScreenshotCoordinate desiredCoordinate = _ScreenshotThumbCoordinate(package);
+	const char* packageNameCStr = package->Name().String();
 	bool hasCachedBitmap = false;
 
 	if (desiredCoordinate.IsValid()) {
 		bool present = false;
+
 		if (fModel->GetPackageScreenshotRepository()->HasCachedScreenshot(desiredCoordinate,
 				&present)
 			!= B_OK) {
-			HDERROR("unable to ascertain if screenshot is present for pkg [%s]",
-				package->Name().String());
+			HDERROR("unable to ascertain if screenshot is present for pkg [%s]", packageNameCStr);
 		} else if (present) {
-			HDDEBUG("screenshot is already cached for [%s] -- will load it",
+			HDDEBUG("screenshot is already cached for [%s] -- will load the cached data",
 				package->Name().String());
 			_HandleScreenshotCached(package, desiredCoordinate);
 			hasCachedBitmap = true;
+		} else if (!ServerHelper::IsNetworkAvailable()) {
+			HDINFO("screenshot won't be cached [%s] -- network unavailable", packageNameCStr);
 		} else {
-			HDDEBUG("screenshot is not cached [%s] -- will cache it", package->Name().String());
+			HDDEBUG("screenshot is not cached [%s] -- will cache it", packageNameCStr);
 			ProcessCoordinator* processCoordinator
 				= ProcessCoordinatorFactory::CacheScreenshotCoordinator(fModel, desiredCoordinate);
 			fProcessCoordinatorConsumer->Consume(processCoordinator);
 		}
 	} else {
-		HDDEBUG("no screenshot for pkg [%s]", package->Name().String());
+		HDDEBUG("no screenshot for pkg [%s]", packageNameCStr);
 	}
 
 	if (!hasCachedBitmap)

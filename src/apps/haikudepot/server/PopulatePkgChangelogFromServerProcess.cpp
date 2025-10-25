@@ -51,6 +51,11 @@ PopulatePkgChangelogFromServerProcess::Description() const
 status_t
 PopulatePkgChangelogFromServerProcess::RunInternal()
 {
+	if (!ServerHelper::IsNetworkAvailable()) {
+		HDINFO("no network so will not populate changelog");
+		return B_OK;
+	}
+
 	// TODO; use API spec to code generation techniques instead of this manually written client.
 
 	BMessage responsePayload;
@@ -66,8 +71,10 @@ PopulatePkgChangelogFromServerProcess::RunInternal()
 
 		if (result == B_OK) {
 			if (resultMessage.FindString("content", &content) == B_OK) {
-				result = _UpdateChangelog(content.Trim());
-				HDDEBUG("changelog populated for [%s]", fPackageName.String());
+				content.Trim();
+				result = _UpdateChangelog(content);
+				HDDEBUG("changelog populated for [%s] (length %" B_PRIi32 ")",
+					fPackageName.String(), content.Length());
 			} else {
 				HDDEBUG("no changelog present for [%s]", fPackageName.String());
 			}

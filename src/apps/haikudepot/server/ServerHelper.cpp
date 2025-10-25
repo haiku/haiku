@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -116,6 +116,12 @@ ServerHelper::NotifyTransportError(status_t error)
 /*static*/ void
 ServerHelper::AlertTransportError(BMessage* message)
 {
+	if (ServerSettings::ForceNoNetwork()) {
+		HDERROR("Even though the user has opted to force no networking, a network transport error"
+				" is being alerted.");
+		return;
+	}
+
 	status_t error = B_OK;
 	int64 errnoInt64;
 	message->FindInt64("errno", &errnoInt64);
@@ -133,17 +139,23 @@ ServerHelper::AlertTransportError(BMessage* message)
 			break;
 	}
 
-	alertText.SetToFormat(B_TRANSLATE("A network transport error has arisen"
-		" communicating with the server system: %s"),
+	alertText.SetToFormat(B_TRANSLATE("A network transport error has arisen communicating with the"
+									  " server system: %s"),
 		errorDescription.String());
 
-	BAlert* alert = new BAlert(
-		B_TRANSLATE("Network transport error"),
-		alertText,
-		B_TRANSLATE("OK"));
+	BAlert* alert = new BAlert(B_TRANSLATE("Network transport error"), alertText,
+		B_TRANSLATE("Stop network use"), B_TRANSLATE("OK"));
 
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go();
+
+	switch (alert->Go()) {
+		case 0:
+			HDINFO("user has opted to disable use of networking");
+			ServerSettings::SetForceNoNetwork(true);
+			break;
+		default:
+			break;
+	}
 }
 
 

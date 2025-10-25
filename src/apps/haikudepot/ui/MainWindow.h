@@ -100,12 +100,9 @@ private:
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
 
-			void				_SetupDelayedIncrementViewCounter(
-									const PackageInfoRef package);
-			void				_HandleIncrementViewCounter(
-									const BMessage* message);
-			void				_IncrementViewCounter(
-									const PackageInfoRef package);
+			void				_SetupDelayedIncrementViewCounter(const PackageInfoRef package);
+			void				_HandleIncrementViewCounter(const BMessage* message);
+			void				_IncrementViewCounter(const BString& packageName);
 
 			void				_PopulatePackageAsync(bool forcePopulate);
 			void				_StartBulkLoad(bool force = false);

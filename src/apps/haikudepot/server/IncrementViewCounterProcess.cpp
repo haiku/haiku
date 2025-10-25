@@ -75,7 +75,7 @@ IncrementViewCounterProcess::RunInternal()
 	int32 attempts = ATTEMPTS;
 	status_t result = B_OK;
 
-	while (attempts > 0 && !WasStopped()) {
+	while (attempts > 0 && !WasStopped() && ServerHelper::IsNetworkAvailable()) {
 		BMessage resultEnvelope;
 		WebAppInterfaceRef webApp = fModel->WebApp();
 		result = webApp->IncrementViewCounter(fPackage, depot, resultEnvelope);

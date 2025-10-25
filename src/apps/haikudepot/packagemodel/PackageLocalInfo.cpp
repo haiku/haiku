@@ -333,7 +333,7 @@ PackageLocalInfoBuilder::BuildRef()
 PackageLocalInfoBuilder&
 PackageLocalInfoBuilder::WithViewed()
 {
-	if (!fSource.IsSet() || fSource->Viewed()) {
+	if (!fSource.IsSet() || !fSource->Viewed()) {
 		_InitFromSource();
 		fViewed = true;
 	}

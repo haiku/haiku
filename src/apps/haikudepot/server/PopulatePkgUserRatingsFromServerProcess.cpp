@@ -53,6 +53,11 @@ PopulatePkgUserRatingsFromServerProcess::Description() const
 status_t
 PopulatePkgUserRatingsFromServerProcess::RunInternal()
 {
+	if (!ServerHelper::IsNetworkAvailable()) {
+		HDINFO("no network so will not populate user ratings");
+		return B_OK;
+	}
+
 	// TODO; use API spec to code generation techniques instead of this manually written client.
 
 	status_t status = B_OK;

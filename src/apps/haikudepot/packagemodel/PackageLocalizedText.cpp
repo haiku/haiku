@@ -82,9 +82,6 @@ void
 PackageLocalizedText::SetHasChangelog(bool value)
 {
 	fHasChangelog = value;
-
-	if (!value)
-		SetChangelog("");
 }
 
 
@@ -92,7 +89,6 @@ void
 PackageLocalizedText::SetChangelog(const BString& value)
 {
 	fChangelog = value;
-	fHasChangelog = !value.IsEmpty();
 }
 
 
