@@ -224,8 +224,8 @@ BMenuFrame::Draw(BRect updateRect)
 		// See also BMenu::UpdateWindowViewSize()
 		font_height height;
 		GetFontHeight(&height);
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-			B_DISABLED_LABEL_TINT));
+		SetHighColor(tint_color(ui_color(B_MENU_ITEM_TEXT_COLOR),
+			ui_color(B_MENU_ITEM_TEXT_COLOR).IsDark() ? B_LIGHTEN_1_TINT : B_DISABLED_LABEL_TINT));
 		BPoint where(
 			(Bounds().Width() - fMenu->StringWidth(kEmptyMenuLabel)) / 2,
 			ceilf(height.ascent + 1));
