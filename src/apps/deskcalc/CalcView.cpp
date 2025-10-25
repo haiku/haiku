@@ -902,7 +902,7 @@ CalcView::SaveSettings(BMessage* archive) const
 		ret = archive->AddInt16("rows", fRows);
 
 	// record color scheme
-	if (ret == B_OK) {
+	if (ret == B_OK && fHasCustomBaseColor) {
 		ret = archive->AddData("rgbBaseColor", B_RGB_COLOR_TYPE,
 			&fBaseColor, sizeof(rgb_color));
 	}
