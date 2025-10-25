@@ -187,6 +187,28 @@ static const char *kExtendedFeatures[32] = {
 	"HYPERVISOR"
 };
 
+static const char *kLeaf7EBXFeatures[32] = {
+	"FSGSBASE", "IA32_TSC_ADJUST", "SGX", "BMI1", "HLE", "AVX2", "FDP_EXCPTN_ONLY", "SMEP",
+	"BMI2", "Enhanced REP MOVSB/STOSB", "INVPCID", "RTM", "RDT-M", "No FPU DS/CS", "MPX", "RDT-A",
+	"AVX512F", "AVX512DQ", "RDSEED", "ADX", "SMAP", "AVX512_IFMA", NULL, "CLFLUSHOPT",
+	"CLWB", "Processor trace", "AVX512PF", "AVX512ER", "AVX512CD", "SHA", "AVX512BW", "AVX512VL"
+};
+static const char *kLeaf7ECXFeatures[32] = {
+	"PREFETCHWT1", "AVX512_VBMI", "UMIP", "PKU", "OSPKE", "WAITPKG", "AVX512_VBMI2", "CET_SS",
+	"GFNI", "VAES", "VPCLMULQDQ", "AVX512_VNNI", "AVX512_BITALG", "TME_EN", "AVX512_VPOPCNTDQ",
+	NULL,
+	"LA57", NULL, NULL, NULL, NULL, NULL, "RDPID", "KL",
+	"BUS_LOCK_DETECT", "CLDEMOTE", NULL, "MOVDIRI", "MOVDIR64B", "ENQCMD", "SGX_LC", "PKS"
+};
+static const char *kLeaf7EDXFeatures[32] = {
+	NULL, "SGX-KEYS", "AVX512_4VNNIW", "AVX512_4FMAPS", "Fast Short REP MOV", "UINTR", NULL, NULL,
+	"AVX512_VP2INTERSECT", "SRBDS_CTRL", "MD_CLEAR", "RTM_ALWAYS_ABORT", NULL, "RTM_FORCE_ABORT",
+	"SERIALIZE", "Hybrid",
+	"TSXLDTRK", NULL, "PCONFIG", "Architectural LBRs", "CET_IBT", NULL, "AMX-BF16", "AVX512_FP16",
+	"AMX-TILE", "AMX-INT8", "IBRS/IBPB", "STIBP", "L1D_FLUSH", "IA32_ARCH_CAPABILITIES",
+	"IA32_CORE_CAPABILITIES", "SSBD"
+};
+
 
 /* AMD Extended features leaf 0x80000001 */
 static const char *kAMDExtFeatures[32] = {
@@ -435,7 +457,7 @@ print_features(const char** table, uint32 features)
 
 	for (int32 i = 0; i < 32; i++) {
 		if ((features & (1UL << i)) && table[i] != NULL) {
-			printf("%s%s", found == 0 ? "\t\t" : " ", table[i]);
+			printf("%s%s", found == 0 ? "\t\t" : ", ", table[i]);
 			found++;
 			if (found > 0 && (found % 16) == 0) {
 				putchar('\n');
@@ -627,6 +649,16 @@ dump_cpu(enum cpu_vendor vendor, uint32 model, int32 cpu)
 			}
 		} else if (vendor == B_CPU_VENDOR_TRANSMETA)
 			print_transmeta_features(cpuInfo.regs.edx);
+	}
+
+	/* Structured Extended Feature Enumeration */
+	if (maxStandardFunction >= 7) {
+		get_cpuid(&cpuInfo, 7, cpu);
+		printf("\tExtended Features (0x00000007): 0x%08" B_PRIx32 " 0x%08" B_PRIx32
+			" 0x%08" B_PRIx32 "\n", cpuInfo.regs.ebx, cpuInfo.regs.ecx, cpuInfo.regs.edx);
+		print_features(kLeaf7EBXFeatures, cpuInfo.regs.ebx);
+		print_features(kLeaf7ECXFeatures, cpuInfo.regs.ecx);
+		print_features(kLeaf7EDXFeatures, cpuInfo.regs.edx);
 	}
 
 	/* Cache/TLB descriptors */
