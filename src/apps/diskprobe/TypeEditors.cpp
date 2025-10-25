@@ -283,6 +283,7 @@ MimeTypeEditor::MimeTypeEditor(BRect rect, DataEditor& editor)
 	: TypeEditorView(rect, B_TRANSLATE("MIME type editor"), B_FOLLOW_LEFT_RIGHT, 0, editor)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 
 	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING,
 		B_TRANSLATE("MIME type:"), NULL, new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
@@ -374,6 +375,7 @@ NumberEditor::NumberEditor(BRect rect, DataEditor &editor)
 	: TypeEditorView(rect, B_TRANSLATE("Number editor"), B_FOLLOW_LEFT_RIGHT, 0, editor)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 
 	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING,
 		_TypeLabel(), NULL, new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
@@ -750,6 +752,7 @@ BooleanEditor::BooleanEditor(BRect rect, DataEditor &editor)
 	: TypeEditorView(rect, B_TRANSLATE("Boolean editor"), B_FOLLOW_NONE, 0, editor)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 
 	BPopUpMenu *menu = new BPopUpMenu("bool");
 	BMessage *message;
@@ -1110,6 +1113,7 @@ MessageView::MessageView(BRect rect, DataEditor &editor)
 	: TypeEditorView(rect, B_TRANSLATE("Message View"), B_FOLLOW_ALL, 0, editor)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 
 	rect = Bounds().InsetByCopy(10, 10);
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
