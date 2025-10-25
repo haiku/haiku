@@ -144,7 +144,7 @@ AttributeWindow::AttributeWindow(BRect _rect, entry_ref *ref,
 	fProbeView->AddSaveMenuItems(menu, 0);
 	fProbeView->AddPrintMenuItems(menu, menu->CountItems() - 2);
 
-	fTypeEditorView = GetTypeEditorFor(rect, fProbeView->Editor());
+	fTypeEditorView = GetTypeEditorFor(fProbeView->Editor());
 
 	tabView->SetTypeEditorTab(fTypeEditorView);
 	tabView->AddRawEditorTab(fProbeView);

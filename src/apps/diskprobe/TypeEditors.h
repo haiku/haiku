@@ -14,9 +14,6 @@ class DataEditor;
 
 class TypeEditorView : public BView {
 public:
-								TypeEditorView(BRect rect, const char* name,
-									uint32 resizingMode, uint32 flags,
-									DataEditor& editor);
 								TypeEditorView(const char* name, uint32 flags,
 									DataEditor& editor);
 	virtual						~TypeEditorView();
@@ -29,10 +26,9 @@ protected:
 };
 
 
-extern TypeEditorView* GetTypeEditorFor(BRect rect, DataEditor& editor);
+extern TypeEditorView* GetTypeEditorFor(DataEditor& editor);
 extern status_t GetNthTypeEditor(int32 index, const char** _name);
-extern TypeEditorView* GetTypeEditorAt(int32 index, BRect rect,
-	DataEditor& editor);
+extern TypeEditorView* GetTypeEditorAt(int32 index, DataEditor& editor);
 
 
 #endif	/* TYPE_EDITORS_H */

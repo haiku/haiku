@@ -197,12 +197,8 @@ private:
 
 class TypeView : public BView {
 public:
-								TypeView(BRect rect, const char* name,
-									int32 index, DataEditor& editor,
-									int32 resizingMode);
+								TypeView(const char* name, int32 index, DataEditor& editor);
 	virtual						~TypeView();
-
-	virtual	void				FrameResized(float width, float height);
 
 private:
 			BView*				fTypeEditorView;
@@ -1019,53 +1015,24 @@ EditorLooper::QuitFind()
 //	#pragma mark - TypeView
 
 
-TypeView::TypeView(BRect rect, const char* name, int32 index,
-		DataEditor& editor, int32 resizingMode)
-	: BView(rect, name, resizingMode, B_FRAME_EVENTS)
+TypeView::TypeView(const char* name, int32 index, DataEditor& editor)
+	: BView(name, B_FRAME_EVENTS)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	fTypeEditorView = GetTypeEditorAt(index, Frame(), editor);
+	fTypeEditorView = GetTypeEditorAt(index, editor);
 	if (fTypeEditorView == NULL) {
-		AddChild(new BStringView(Bounds(), B_TRANSLATE("Type editor"),
-			B_TRANSLATE("Type editor not supported"), B_FOLLOW_NONE));
-	} else
-		AddChild(fTypeEditorView);
-
-	if ((fTypeEditorView->ResizingMode() & (B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM))
-			!= 0) {
-		BRect rect = Bounds();
-
-		BRect frame = fTypeEditorView->Frame();
-		rect.left = frame.left;
-		rect.top = frame.top;
-		if ((fTypeEditorView->ResizingMode() & B_FOLLOW_RIGHT) == 0)
-			rect.right = frame.right;
-		if ((fTypeEditorView->ResizingMode() & B_FOLLOW_BOTTOM) == 0)
-			rect.bottom = frame.bottom;
-
-		fTypeEditorView->ResizeTo(rect.Width(), rect.Height());
+		fTypeEditorView = new BStringView(B_TRANSLATE("Type editor"),
+			B_TRANSLATE("Type editor not supported"));
 	}
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(fTypeEditorView);
 }
 
 
 TypeView::~TypeView()
 {
-}
-
-
-void
-TypeView::FrameResized(float width, float height)
-{
-	BRect rect = Bounds();
-
-	BPoint point = fTypeEditorView->Frame().LeftTop();
-	if ((fTypeEditorView->ResizingMode() & B_FOLLOW_RIGHT) == 0)
-		point.x = (rect.Width() - fTypeEditorView->Bounds().Width()) / 2;
-	if ((fTypeEditorView->ResizingMode() & B_FOLLOW_BOTTOM) == 0)
-		point.y = (rect.Height() - fTypeEditorView->Bounds().Height()) / 2;
-
-	fTypeEditorView->MoveTo(point);
 }
 
 
@@ -1651,13 +1618,12 @@ ProbeView::_SetTypeEditor(int32 index)
 
 		_RemoveTypeEditor();
 
-		fTypeView = new TypeView(Frame(), "type shell", index, fEditor,
-			B_FOLLOW_ALL);
+		fTypeView = new TypeView("type shell", index, fEditor);
 
 		if (Parent() != NULL)
-			Parent()->AddChild(fTypeView);
+			Parent()->GetLayout()->AddView(fTypeView);
 		else
-			Window()->AddChild(fTypeView);
+			Window()->GetLayout()->AddView(fTypeView);
 	}
 }
 
