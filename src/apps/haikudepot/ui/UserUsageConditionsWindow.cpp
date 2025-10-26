@@ -85,8 +85,11 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
 			.End()
 		.End();
 
-	GetLayout()->SetExplicitMinSize(BSize(500, B_SIZE_UNSET));
+	GetLayout()->SetExplicitMinSize(BSize(be_plain_font->StringWidth("W") * 40, B_SIZE_UNSET));
+	GetLayout()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	ResizeToPreferred();
+	// Lock the preferred height as minimum, otherwise the progress bar and button can get cut off.
+	GetLayout()->SetExplicitMinSize(BSize(B_SIZE_UNSET, Size().Height()));
 	CenterOnScreen();
 
 	UserDetail userDetail;
@@ -138,8 +141,11 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
 		.Add(fWorkerIndicator, 1)
 		.End();
 
-	GetLayout()->SetExplicitMinSize(BSize(500, B_SIZE_UNSET));
+	GetLayout()->SetExplicitMinSize(BSize(be_plain_font->StringWidth("W") * 40, B_SIZE_UNSET));
+	GetLayout()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	ResizeToPreferred();
+	// Lock the preferred height as minimum, otherwise the progress bar and button can get cut off.
+	GetLayout()->SetExplicitMinSize(BSize(B_SIZE_UNSET, Size().Height()));
 	CenterOnScreen();
 
 	_FetchData();
