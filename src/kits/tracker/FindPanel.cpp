@@ -2482,7 +2482,7 @@ FindPanel::AddVolumes()
 	BVolume volume;
 	roster.Rewind();
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		if (volume.IsPersistent() && volume.KnowsQuery()) {
+		if (volume.IsPersistent() && volume.Capacity() > 0 && volume.KnowsQuery()) {
 			BDirectory root;
 			if (volume.GetRootDirectory(&root) != B_OK)
 				continue;
