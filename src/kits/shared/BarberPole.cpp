@@ -139,7 +139,7 @@ pthread_once_t MachineRoom::sOnceControl = PTHREAD_ONCE_INIT;
 
 BarberPole::BarberPole(const char* name)
 	:
-	BView(name, B_WILL_DRAW | B_FRAME_EVENTS),
+	BView(name, B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	fIsSpinning(false),
 	fSpinSpeed(0.05),
 	fColors(NULL),
