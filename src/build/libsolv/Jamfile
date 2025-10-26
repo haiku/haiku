@@ -26,7 +26,7 @@ switch $(HOST_PLATFORM) {
 	case freebsd :
 		DEFINES += HAVE_STRCHRNUL HAVE_FUNOPEN ;
 	case darwin :
-		DEFINES += HAVE_FUNOPEN HAVE_QSORT_R ;
+		DEFINES += HAVE_STRCHRNUL HAVE_FUNOPEN HAVE_QSORT_R ;
 	case * :
 		Exit $(SUBDIR)/Jamfile: "Please add a case for your platform"
 			"($(HOST_PLATFORM))!" ;
