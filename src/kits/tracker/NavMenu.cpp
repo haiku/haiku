@@ -431,7 +431,10 @@ BNavMenu::StartBuildingItemList()
 		fIteratingDesktop = true;
 		fContainer = DesktopPoseView::InitDesktopDirentIterator(0, startModel.EntryRef());
 		if (TrackerSettings().MountVolumesOntoDesktop())
-			AddRootItemsIfNeeded();
+			AddVolumeItems();
+		else if (TrackerSettings().ShowDisksIcon())
+			AddRootItem();
+
 		AddTrashItem();
 	} else if (startModel.IsTrash()) {
 		// the trash window needs to display a union of all the
@@ -470,7 +473,19 @@ BNavMenu::StartBuildingItemList()
 
 
 void
-BNavMenu::AddRootItemsIfNeeded()
+BNavMenu::AddRootItem()
+{
+	BEntry entry("/");
+	Model model(&entry);
+	if (model.InitCheck() != B_OK)
+		return;
+
+	AddOneItem(&model);
+}
+
+
+void
+BNavMenu::AddVolumeItems()
 {
 	BVolumeRoster roster;
 	roster.Rewind();

@@ -128,7 +128,8 @@ protected:
 	void BuildVolumeMenu();
 
 	void AddOneItem(Model*);
-	void AddRootItemsIfNeeded();
+	void AddRootItem();
+	void AddVolumeItems();
 	void AddTrashItem();
 	static void SetTrackingHookDeep(BMenu*, bool (*)(BMenu*, void*), void*);
 
