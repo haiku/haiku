@@ -817,6 +817,7 @@ status_t
 FUSEVolume::Unmount()
 {
 printf("FUSEVolume::Unmount()\n");
+	UserlandFS::KernelEmu::put_vnode(fID, fRootNode->id);
 	_FileSystem()->ExitClientFS(B_OK);
 	return B_OK;
 }
