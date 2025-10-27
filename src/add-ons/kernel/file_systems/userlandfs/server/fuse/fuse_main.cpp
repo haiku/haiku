@@ -193,6 +193,14 @@ fuse_session_loop_mt(struct fuse_session* f)
 }
 
 
+struct fuse_session*
+fuse_get_session(struct fuse* f)
+{
+	// TODO: Implement?
+	return NULL;
+}
+
+
 void
 fuse_exit(struct fuse* f)
 {
