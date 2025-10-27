@@ -473,11 +473,17 @@ BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 	BRect rect = _IconRect(poseView, location);
 
 	if (rect.Contains(where)) {
-		return IconCache::sIconCache->IconHitTest(where - location, ResolvedModel(), kNormalIcon,
-			poseView->IconSize());
+		// clicked on icon
+		return IconCache::sIconCache->IconHitTest(where - location,
+			ResolvedModel(), kNormalIcon, poseView->IconSize());
+	} else {
+		// clicked on file name
+		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
+		if (widget != NULL && widget->IsVisible())
+			return widget->CalcRect(location, NULL, poseView).Contains(where);
 	}
 
-	return CalcRect(poseView).Contains(where);
+	return false;
 }
 
 
