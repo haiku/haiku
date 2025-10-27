@@ -1872,7 +1872,7 @@ send_signal_to_process_group(pid_t groupID, const Signal& signal, uint32 flags)
 	ProcessGroup* group = ProcessGroup::Get(groupID);
 	if (group == NULL)
 		return B_BAD_TEAM_ID;
-	BReference<ProcessGroup> groupReference(group);
+	BReference<ProcessGroup> groupReference(group, true);
 
 	T(SendSignal(-group->id, signal.Number(), flags));
 
