@@ -4121,6 +4121,12 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			return ESRCH;
 		BReference<Team> teamReference(team, true);
 
+		// check the target team is the current team or a child of current team
+		for (Team* parentTeam = team; parentTeam != currentTeam; parentTeam = parentTeam->parent) {
+			if (parentTeam == NULL || parentTeam->id == 1)
+				return ESRCH;
+		}
+
 		// lock the new process group and the team's current process group
 		while (true) {
 			// lock the team's current process group
@@ -4191,10 +4197,8 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			// Calling team != target team. The target team must be a child of
 			// the calling team and in the same session. (If that's the case it
 			// isn't a session leader either.)
-			if (team->parent != currentTeam
-				|| team->session_id != currentTeam->session_id) {
+			if (team->session_id != currentTeam->session_id)
 				return B_NOT_ALLOWED;
-			}
 
 			// The call is also supposed to fail on a child, when the child has
 			// already executed exec*() [EACCES].
