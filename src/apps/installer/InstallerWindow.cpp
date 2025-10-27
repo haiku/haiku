@@ -746,7 +746,11 @@ InstallerWindow::_ScanPartitions()
 	if (fSrcMenu->ItemAt(0) != NULL)
 		_PublishPackages();
 
-	_UpdateControls();
+	// If the install is already finished, keep the button as is.
+	if (fInstallStatus != kFinished)
+		_UpdateControls();
+	else
+		PostMessage(MSG_INSTALL_FINISHED);
 }
 
 
