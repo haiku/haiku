@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Haiku, Inc. All Rights Reserved.
+ * Copyright 2015, 2025 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _COMPLEX_H_
@@ -14,6 +14,16 @@
 
 #define complex _Complex
 #define I _Complex_I
+
+#ifdef _Imaginary_I
+#define CMPLX(x, y) ((double complex)((double)(x) + _Imaginary_I * (double)(y)))
+#define CMPLXF(x, y) ((float complex)((float)(x) + _Imaginary_I * (float)(y)))
+#define CMPLXL(x, y) ((long double complex)((long double)(x) + _Imaginary_I * (long double)(y)))
+#else
+#define CMPLX(x, y) (__builtin_complex((double)(x), (double)(y)))
+#define CMPLXF(x, y) (__builtin_complex((float)(x), (float)(y)))
+#define CMPLXL(x, y) (__builtin_complex((long double)(x), (long double)(y)))
+#endif
 
 #ifdef  __cplusplus
 extern "C" {
