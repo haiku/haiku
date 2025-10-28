@@ -213,6 +213,7 @@ NotificationWindow::MessageReceived(BMessage* message)
 
 					group->AddInfo(view);
 
+					SetPosition();
 					_ShowHide();
 
 					reply.AddInt32("error", B_OK);
@@ -276,10 +277,8 @@ NotificationWindow::_ShowHide()
 		return;
 	}
 
-	if (IsHidden()) {
-		SetPosition();
+	if (IsHidden())
 		Show();
-	}
 }
 
 
