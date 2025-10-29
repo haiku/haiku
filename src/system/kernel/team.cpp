@@ -4127,6 +4127,10 @@ _user_setpgid(pid_t processID, pid_t groupID)
 				return ESRCH;
 		}
 
+		// we must not change our process group ID if we're a session leader
+		if (is_session_leader(team))
+			return B_NOT_ALLOWED;
+
 		// lock the new process group and the team's current process group
 		while (true) {
 			// lock the team's current process group
@@ -4187,13 +4191,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 		TeamLocker teamLocker(team, true);
 
 		// perform the checks
-		if (team == currentTeam) {
-			// we set our own group
-
-			// we must not change our process group ID if we're a session leader
-			if (is_session_leader(currentTeam))
-				return B_NOT_ALLOWED;
-		} else {
+		if (team != currentTeam) {
 			// Calling team != target team. The target team must be a child of
 			// the calling team and in the same session. (If that's the case it
 			// isn't a session leader either.)
