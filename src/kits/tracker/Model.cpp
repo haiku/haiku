@@ -317,27 +317,57 @@ Model::InitCheck() const
 
 
 int
-Model::CompareFolderNamesFirst(const Model* compareModel) const
+Model::CompareFolderNamesFirst(const Model* compare) const
 {
-	if (compareModel == NULL)
+	if (compare == NULL)
 		return -1;
 
-	const Model* resolvedCompareModel = compareModel->ResolveIfLink();
-	const Model* resolvedMe = ResolveIfLink();
+	const Model* resolved = ResolveIfLink();
+	const Model* resolvedCompare = compare->ResolveIfLink();
 
-	bool meIsDirOrVolume = resolvedMe->IsDirectory() || resolvedMe->IsVolume()
-		|| resolvedMe->IsVirtualDirectory();
-	bool otherIsDirOrVolume = resolvedCompareModel->IsDirectory()
-		|| resolvedCompareModel->IsVolume()
-		|| resolvedCompareModel->IsVirtualDirectory();
+	bool meIsRoot = resolved->IsRoot();
+	bool otherIsRoot = resolvedCompare->IsRoot();
 
-	if (meIsDirOrVolume) {
-		if (!otherIsDirOrVolume)
-			return -1;
-	} else if (otherIsDirOrVolume)
+	// sort root directory first
+
+	if (meIsRoot && !otherIsRoot)
+		return -1;
+	else if (!meIsRoot && otherIsRoot)
 		return 1;
 
-	return NaturalCompare(Name(), compareModel->Name());
+	bool meIsVolume = resolved->IsVolume();
+	bool otherIsVolume = resolvedCompare->IsVolume();
+
+	// sort volume as a directory if capacity is 0
+
+	if (meIsVolume) {
+		BVolume volume(resolved->NodeRef()->device);
+		if (volume.InitCheck() == B_OK && volume.Capacity() == 0)
+			meIsVolume = false;
+	}
+
+	if (otherIsVolume) {
+		BVolume volume(resolvedCompare->NodeRef()->device);
+		if (volume.InitCheck() == B_OK && volume.Capacity() == 0)
+			otherIsVolume = false;
+	}
+
+	// sort by volume then by directory then by file name
+
+	if (meIsVolume && !otherIsVolume)
+		return -1;
+	else if (!meIsVolume && otherIsVolume)
+		return 1;
+
+	bool meIsDir = resolved->IsDirectory() || resolved->IsVirtualDirectory();
+	bool otherIsDir = resolvedCompare->IsDirectory() || resolvedCompare->IsVirtualDirectory();
+
+	if (meIsDir && !otherIsDir)
+		return -1;
+	else if (!meIsDir && otherIsDir)
+		return 1;
+
+	return NaturalCompare(Name(), compare->Name());
 }
 
 

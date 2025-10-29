@@ -97,7 +97,7 @@ public:
 	status_t SetTo(const node_ref* dirNode, const node_ref* node,
 		const char* name, bool open = false, bool writable = false);
 
-	int CompareFolderNamesFirst(const Model* compareModel) const;
+	int CompareFolderNamesFirst(const Model* compare) const;
 
 	// node management
 	status_t OpenNode(bool writable = false);

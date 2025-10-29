@@ -250,7 +250,7 @@ SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage** message,
 	*typeslist = localTypesList;
 }
 
-}
+} // namespace BPrivate
 
 
 //	#pragma mark - BNavMenu
@@ -730,12 +730,10 @@ BNavMenu::CompareFolderNamesFirstOne(const BMenuItem* i1, const BMenuItem* i2)
 	const ModelMenuItem* item1 = dynamic_cast<const ModelMenuItem*>(i1);
 	const ModelMenuItem* item2 = dynamic_cast<const ModelMenuItem*>(i2);
 
-	if (item1 != NULL && item2 != NULL) {
-		return item1->TargetModel()->CompareFolderNamesFirst(
-			item2->TargetModel());
-	}
+	if (item1 != NULL && item2 != NULL)
+		return item1->TargetModel()->CompareFolderNamesFirst(item2->TargetModel());
 
-	return strcasecmp(i1->Label(), i2->Label());
+	return CompareOne(i1, i2);
 }
 
 
@@ -744,7 +742,7 @@ BNavMenu::CompareOne(const BMenuItem* i1, const BMenuItem* i2)
 {
 	ThrowOnAssert(i1 != NULL && i2 != NULL);
 
-	return strcasecmp(i1->Label(), i2->Label());
+	return NaturalCompare(i1->Label(), i2->Label());
 }
 
 
