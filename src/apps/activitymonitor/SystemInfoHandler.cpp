@@ -11,6 +11,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <Drivers.h>
 #include <Handler.h>
@@ -19,6 +20,9 @@
 #include <MediaRoster.h>
 #include <Messenger.h>
 #include <Roster.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SystemInfoHandler"
 
 
 SystemInfoHandler::SystemInfoHandler()
@@ -35,6 +39,8 @@ SystemInfoHandler::SystemInfoHandler()
 	char buffer[256];
 	if ((fThermalFD > 0) && (ioctl(fThermalFD, B_GET_DEVICE_NAME, buffer, sizeof(buffer)) == B_OK))
 		fThermalZoneName = buffer;
+	else
+		fThermalZoneName = B_TRANSLATE("No thermal sensor");
 }
 
 
@@ -98,7 +104,6 @@ SystemInfoHandler::StartWatching()
 			// to find initial connection count
 		}
 		// TODO: get initial buffer count
-		
 	}
 
 	// doesn't work on R5

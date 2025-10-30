@@ -1013,7 +1013,12 @@ int64
 ThermalDataSource::NextValue(SystemInfo& info)
 {
 	fLabel = info.ThermalZone();
-	int64 value = (int64)ceilf(info.Temperature() * 1000000);
+
+	float temperature = info.Temperature();
+	if (isnan(temperature))
+		return 0;
+
+	int64 value = (int64)ceilf(temperature * 1000000);
 
 	if (value > fMaximum)
 		SetLimits(0, value);
