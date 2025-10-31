@@ -38,7 +38,6 @@ static const uint32 MSG_THEME_MODIFIED			= 'tmdf';
 
 
 class ThemeWindow;
-class BColorPreview;
 class BMenu;
 class BMenuField;
 class BPopUpMenu;
