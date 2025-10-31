@@ -1905,6 +1905,8 @@ err0:
 	if (reservedMemory > 0)
 		vm_unreserve_memory(reservedMemory);
 
+	ASSERT(wiring != B_ALREADY_WIRED);
+
 	return status;
 }
 
