@@ -1242,7 +1242,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 
 	// if this is a private map, we need to create a new cache
 	// to handle the private copies of pages as they are written to
-	VMCache* sourceCache = cache;
+	VMCache* sourceCache = NULL;
 	if (mapping == REGION_PRIVATE_MAP) {
 		VMCache* newCache;
 
@@ -1261,6 +1261,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 
 		cache->AddConsumer(newCache);
 
+		sourceCache = cache;
 		cache = newCache;
 	}
 
@@ -1345,10 +1346,10 @@ err2:
 		// We created this cache, so we must delete it again. Note, that we
 		// need to temporarily unlock the source cache or we'll otherwise
 		// deadlock, since VMCache::_RemoveConsumer() will try to lock it, too.
-		if (sourceCache != cache)
+		if (sourceCache != NULL)
 			sourceCache->Unlock();
-		cache->ReleaseRef();
-		if (sourceCache != cache)
+		cache->ReleaseRefAndUnlock();
+		if (sourceCache != NULL)
 			sourceCache->Lock();
 	}
 err1:
