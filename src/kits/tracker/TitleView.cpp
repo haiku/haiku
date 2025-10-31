@@ -242,7 +242,7 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 	view->StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
 	bounds.bottom--;
 
-	rgb_color baseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color baseColor = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	be_control_look->DrawButtonBackground(view, bounds, bounds, baseColor, 0,
 		BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 
