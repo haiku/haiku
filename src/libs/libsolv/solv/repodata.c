@@ -14,7 +14,7 @@
  * different sets of keys and different sets of solvables
  */
 
-#define _GNU_SOURCE
+#define _DEFAULT_SOURCE
 #include <string.h>
 #include <fnmatch.h>
 
