@@ -2080,10 +2080,14 @@ malloc_usable_size(void *ptr)
 	size_t r;
 	int saved_errno = errno;
 
-	PROLOGUE(getpool(), "malloc_usable_size")
+	d = getpool();
+	_MALLOC_LOCK(d->mutex);
+	d->func = "malloc_usable_size";
+
 	SET_CALLER(d, caller(d));
 	r = omalloc_usable_size(&d, ptr);
-	EPILOGUE()
+
+	_MALLOC_UNLOCK(d->mutex);
 	return r;
 }
 DEF_STRONG(malloc_usable_size);
