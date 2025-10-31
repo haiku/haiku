@@ -452,9 +452,9 @@ LinkReceiver::ReadRegion(BRegion* region)
 	if (status >= B_OK)
 		status = Read(&region->fBounds, sizeof(clipping_rect));
 	if (status >= B_OK) {
-		if (!region->_SetSize(region->fCount))
+		if (!region->_SetSize(region->fCount)) {
 			status = B_NO_MEMORY;
-		else {
+		} else if (region->fCount > 0) {
 			status = Read(region->fData,
 				region->fCount * sizeof(clipping_rect));
 		}
