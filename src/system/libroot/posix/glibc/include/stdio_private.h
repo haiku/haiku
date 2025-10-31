@@ -36,6 +36,10 @@ extern int __printf_fphex (FILE *fp,
 	const struct printf_info *info,
 	const void *const *args);
 
+
+extern void	debugger(const char *message);
+extern void	abort(void) __attribute__((noreturn));
+
 /* Print out MESSAGE on the error output and abort.  */
 static __inline void
 __libc_fatal (__const char *__message)
@@ -43,6 +47,7 @@ __libc_fatal (__const char *__message)
 	debugger(__message);
 	abort();
 }
+
 
 static __inline int
 __readonly_area (const void *ptr, size_t size)
