@@ -2261,7 +2261,7 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 				status = B_BAD_VALUE;
 
 			if (status != B_OK) {
-				free(buffer);
+				object_cache_free(sPathNameCache, buffer, 0);
 				return status;
 			}
 			nextVnode.Unset();
