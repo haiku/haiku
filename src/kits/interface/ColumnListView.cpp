@@ -2296,7 +2296,7 @@ BColumnListView::_UpdateColors()
 	// Unused color
 	fColorList[B_COLOR_EDIT_TEXT] = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
 
-	fColorList[B_COLOR_HEADER_BACKGROUND] = ui_color(B_PANEL_BACKGROUND_COLOR);
+	fColorList[B_COLOR_HEADER_BACKGROUND] = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	fColorList[B_COLOR_HEADER_TEXT] = ui_color(B_PANEL_TEXT_COLOR);
 
 	// Unused colors
@@ -2719,8 +2719,9 @@ TitleView::DrawTitle(BView* view, BRect rect, BColumn* column, bool depressed)
 
 	BRect bgRect = rect;
 
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+	rgb_color base = fMasterView->Color(B_COLOR_HEADER_BACKGROUND);
+	view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_2_TINT));
 	view->StrokeLine(bgRect.LeftBottom(), bgRect.RightBottom());
 
 	bgRect.bottom--;
