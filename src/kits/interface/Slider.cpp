@@ -381,41 +381,30 @@ BSlider::WindowActivated(bool state)
 void
 BSlider::AttachedToWindow()
 {
+	BControl::AttachedToWindow();
+
+	AdoptSystemColors();
 	ResizeToPreferred();
 
 #if USE_OFF_SCREEN_VIEW
 	BRect bounds(Bounds());
 
-	if (!fOffScreenView) {
-		fOffScreenView = new BView(bounds, "", B_FOLLOW_ALL, B_WILL_DRAW);
+	if (fOffScreenView == NULL)
+		fOffScreenView = new BView(bounds, "", B_FOLLOW_ALL, 0);
 
+	if (fOffScreenBits == NULL)
+		fOffScreenBits = new BBitmap(bounds, B_RGBA32, true, false);
+
+	if (fOffScreenView != NULL && fOffScreenBits != NULL) {
 		BFont font;
 		GetFont(&font);
 		fOffScreenView->SetFont(&font);
-	}
 
-	if (!fOffScreenBits) {
-		fOffScreenBits = new BBitmap(bounds, B_RGBA32, true, false);
-
-		if (fOffScreenBits && fOffScreenView)
-			fOffScreenBits->AddChild(fOffScreenView);
-
-	} else if (fOffScreenView)
+		fOffScreenView->SetFlags(Flags());
+		fOffScreenView->AdoptViewColors(this);
 		fOffScreenBits->AddChild(fOffScreenView);
-#endif // USE_OFF_SCREEN_VIEW
-
-	BControl::AttachedToWindow();
-
-	BView* view = OffscreenView();
-	if (view != NULL && view->LockLooper()) {
-		view->SetViewColor(B_TRANSPARENT_COLOR);
-		if (LowUIColor() != B_NO_COLOR)
-			view->SetLowUIColor(LowUIColor());
-		else
-			view->SetLowColor(LowColor());
-
-		view->UnlockLooper();
 	}
+#endif // USE_OFF_SCREEN_VIEW
 
 	int32 value = Value();
 	SetValue(value);
@@ -452,11 +441,9 @@ BSlider::DetachedFromWindow()
 	BControl::DetachedFromWindow();
 
 #if USE_OFF_SCREEN_VIEW
-	if (fOffScreenBits) {
-		delete fOffScreenBits;
-		fOffScreenBits = NULL;
-		fOffScreenView = NULL;
-	}
+	delete fOffScreenBits;
+	fOffScreenBits = NULL;
+	fOffScreenView = NULL;
 #endif
 }
 
@@ -486,7 +473,7 @@ BSlider::FrameResized(float w,float h)
 		return;
 
 #if USE_OFF_SCREEN_VIEW
-	if (fOffScreenBits) {
+	if (fOffScreenView != NULL && fOffScreenBits != NULL) {
 		fOffScreenBits->RemoveChild(fOffScreenView);
 		delete fOffScreenBits;
 
@@ -840,30 +827,26 @@ BSlider::Draw(BRect updateRect)
 	// clear out background
 	BRegion background(updateRect);
 	background.Exclude(BarFrame());
-	bool drawBackground = true;
-	if (Parent() != NULL && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
-		// This view is embedded somewhere, most likely the Tracker Desktop
-		// shelf.
-		drawBackground = false;
+
+	bool drawBackground = background.Frame().IsValid();
+	if (drawBackground) {
+		bool hasTransparentBG = (Flags() & B_TRANSPARENT_BACKGROUND) != 0;
+		bool drawOnChildren = Parent() != NULL
+			&& (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0;
+		drawBackground = !hasTransparentBG && !drawOnChildren;
 	}
 
+	if (drawBackground) {
 #if USE_OFF_SCREEN_VIEW
-	if (!fOffScreenBits)
-		return;
-
-	if (fOffScreenBits->Lock()) {
-		fOffScreenView->SetViewColor(ViewColor());
-		fOffScreenView->SetLowColor(LowColor());
+		if (fOffScreenView != NULL && fOffScreenBits != NULL && fOffScreenBits->Lock()) {
+			fOffScreenView->FillRegion(&background, B_SOLID_LOW);
+			fOffScreenView->Sync();
+			fOffScreenBits->Unlock();
+		}
+#else
+		FillRegion(&background, B_SOLID_LOW);
 #endif
-
-		if (drawBackground && background.Frame().IsValid())
-			OffscreenView()->FillRegion(&background, B_SOLID_LOW);
-
-#if USE_OFF_SCREEN_VIEW
-		fOffScreenView->Sync();
-		fOffScreenBits->Unlock();
 	}
-#endif
 
 	DrawSlider();
 }
@@ -874,10 +857,7 @@ BSlider::DrawSlider()
 {
 	if (LockLooper()) {
 #if USE_OFF_SCREEN_VIEW
-		if (fOffScreenBits == NULL)
-			return;
-
-		if (fOffScreenBits->Lock()) {
+		if (fOffScreenView != NULL && fOffScreenBits != NULL && fOffScreenBits->Lock()) {
 #endif
 			DrawBar();
 			DrawHashMarks();
@@ -900,13 +880,13 @@ BSlider::DrawSlider()
 void
 BSlider::DrawBar()
 {
-	BRect frame = BarFrame();
 	BView* view = OffscreenView();
-
+	BRect frame = BarFrame();
+	rgb_color base = view->LowColor();
 	uint32 flags = be_control_look->Flags(this);
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color rightFillColor = fBarColor;
 	rgb_color leftFillColor = fUseFillColor ? fFillColor : fBarColor;
+
 	be_control_look->DrawSliderBar(view, frame, frame, base, leftFillColor,
 		rightFillColor, Position(), flags, fOrientation);
 }
@@ -918,11 +898,11 @@ BSlider::DrawHashMarks()
 	if (fHashMarks == B_HASH_MARKS_NONE)
 		return;
 
-	BRect frame = HashMarksFrame();
 	BView* view = OffscreenView();
-
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	BRect frame = HashMarksFrame();
+	rgb_color base = view->LowColor();
 	uint32 flags = be_control_look->Flags(this);
+
 	be_control_look->DrawSliderHashMarks(view, frame, frame, base,
 		fHashMarkCount, fHashMarks, flags, fOrientation);
 }
@@ -944,25 +924,29 @@ BSlider::DrawFocusMark()
 	if (!IsFocus())
 		return;
 
-	OffscreenView()->SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-
+	BView* view = OffscreenView();
 	BRect frame = ThumbFrame();
+
+	view->PushState();
+	view->SetHighUIColor(B_KEYBOARD_NAVIGATION_COLOR);
 
 	if (fStyle == B_BLOCK_THUMB) {
 		frame.left += 2.0f;
 		frame.top += 2.0f;
 		frame.right -= 3.0f;
 		frame.bottom -= 3.0f;
-		OffscreenView()->StrokeRect(frame);
+		view->StrokeRect(frame);
 	} else {
 		if (fOrientation == B_HORIZONTAL) {
-			OffscreenView()->StrokeLine(BPoint(frame.left, frame.bottom + 2.0f),
+			view->StrokeLine(BPoint(frame.left, frame.bottom + 2.0f),
 				BPoint(frame.right, frame.bottom + 2.0f));
 		} else {
-			OffscreenView()->StrokeLine(BPoint(frame.left - 2.0f, frame.top),
+			view->StrokeLine(BPoint(frame.left - 2.0f, frame.top),
 				BPoint(frame.left - 2.0f, frame.bottom));
 		}
 	}
+
+	view->PopState();
 }
 
 
@@ -971,9 +955,8 @@ BSlider::DrawText()
 {
 	BRect bounds(Bounds());
 	BView* view = OffscreenView();
-
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color text = ui_color(B_PANEL_TEXT_COLOR);
+	rgb_color base = view->LowColor();
+	rgb_color text = view->HighColor();
 	uint32 flags = be_control_look->Flags(this);
 
 	font_height fontHeight;
@@ -1488,11 +1471,9 @@ BSlider::SetFont(const BFont* font, uint32 properties)
 	BControl::SetFont(font, properties);
 
 #if USE_OFF_SCREEN_VIEW
-	if (fOffScreenView && fOffScreenBits) {
-		if (fOffScreenBits->Lock()) {
-			fOffScreenView->SetFont(font, properties);
-			fOffScreenBits->Unlock();
-		}
+	if (fOffScreenView != NULL && fOffScreenBits != NULL && fOffScreenBits->Lock()) {
+		fOffScreenView->SetFont(font, properties);
+		fOffScreenBits->Unlock();
 	}
 #endif
 

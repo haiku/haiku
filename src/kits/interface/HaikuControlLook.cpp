@@ -32,6 +32,9 @@ static const float kHoverTintFactor = 0.85;
 
 static const int32 kButtonPopUpIndicatorWidth = B_USE_ITEM_SPACING;
 
+static const rgb_color kBlack = { 0, 0, 0, 255 };
+static const rgb_color kWhite = { 255, 255, 255, 255 };
+
 
 HaikuControlLook::HaikuControlLook()
 	:
@@ -1337,6 +1340,8 @@ HaikuControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateR
 	rect.right--;
 	rect.bottom--;
 
+	view->PushState();
+
 	_DrawFrame(view, rect, frameLightColor, frameLightColor,
 		frameShadowColor, frameShadowColor);
 
@@ -1379,7 +1384,7 @@ HaikuControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateR
 		view->StrokeLine(rect.LeftBottom(), rect.RightBottom());
 	}
 
-	view->SetDrawingMode(B_OP_COPY);
+	view->PopState();
 }
 
 
@@ -2218,26 +2223,16 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 	else
 		low = base;
 
-	if ((flags & B_DISABLED) != 0) {
-		color.red = (uint8)(((int32)low.red + color.red + 1) / 2);
-		color.green = (uint8)(((int32)low.green + color.green + 1) / 2);
-		color.blue = (uint8)(((int32)low.blue + color.blue + 1) / 2);
-	}
-
 	drawing_mode oldMode = view->DrawingMode();
 
 	if (isDesktop) {
 		// enforce proper use of desktop label colors
-		if (low.IsDark()) {
-			if (textColor == NULL)
-				color = make_color(255, 255, 255);
-
-			glowColor = make_color(0, 0, 0);
+		if (low.Brightness() <= ui_color(B_DESKTOP_COLOR).Brightness()) {
+			color = kWhite;
+			glowColor = kBlack;
 		} else {
-			if (textColor == NULL)
-				color = make_color(0, 0, 0);
-
-			glowColor = make_color(255, 255, 255);
+			color = kBlack;
+			glowColor = kWhite;
 		}
 
 		// drawing occurs on the desktop
@@ -2265,6 +2260,7 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 
 			view->SetDrawingMode(B_OP_ALPHA);
 			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+
 			// Draw glow or outline
 			if (glowColor.IsLight()) {
 				font.SetFalseBoldWidth(2.0);
@@ -2300,6 +2296,9 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 			}
 		}
 	}
+
+	if ((flags & B_DISABLED) != 0)
+		color = disable_color(color, low);
 
 	view->SetHighColor(color);
 	view->SetDrawingMode(B_OP_OVER);

@@ -44,6 +44,9 @@ namespace BPrivate {
 
 static const float kButtonPopUpIndicatorWidth = 11;
 
+static const rgb_color kBlack = { 0, 0, 0, 255 };
+static const rgb_color kWhite = { 255, 255, 255, 255 };
+
 
 BeControlLook::BeControlLook(image_id id)
 	:
@@ -2180,20 +2183,10 @@ void
 BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	uint32 flags, const BPoint& where, const rgb_color* textColor)
 {
-	view->PushState();
-
-	bool isButton = (flags & B_FLAT) != 0 || (flags & B_HOVER) != 0
-		|| (flags & B_DEFAULT_BUTTON) != 0;
-	bool isEnabled = (flags & B_DISABLED) == 0;
-	bool isActivated = (flags & B_ACTIVATED) != 0;
-
 	BWindow* window = view->Window();
-	bool isDesktop = window != NULL
-		&& window->Feel() == kDesktopWindowFeel
-		&& window->Look() == kDesktopWindowLook
-		&& view->Parent()
-		&& view->Parent()->Parent() == NULL
-		&& (flags & B_IGNORE_OUTLINE) == 0;
+	bool isDesktop = window != NULL && window->Feel() == kDesktopWindowFeel
+		&& window->Look() == kDesktopWindowLook && view->Parent() != NULL
+		&& view->Parent()->Parent() == NULL && (flags & B_IGNORE_OUTLINE) == 0;
 
 	rgb_color low;
 	rgb_color color;
@@ -2215,24 +2208,16 @@ BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	else
 		low = base;
 
-	if (!isEnabled) {
-		color.red = (uint8)(((int32)low.red + color.red + 1) / 2);
-		color.green = (uint8)(((int32)low.green + color.green + 1) / 2);
-		color.blue = (uint8)(((int32)low.blue + color.blue + 1) / 2);
-	}
+	view->PushState();
 
 	if (isDesktop) {
 		// enforce proper use of desktop label colors
-		if (low.IsDark()) {
-			if (textColor == NULL)
-				color = make_color(255, 255, 255);
-
-			glowColor = make_color(0, 0, 0);
+		if (low.Brightness() <= ui_color(B_DESKTOP_COLOR).Brightness()) {
+			color = kWhite;
+			glowColor = kBlack;
 		} else {
-			if (textColor == NULL)
-				color = make_color(0, 0, 0);
-
-			glowColor = make_color(255, 255, 255);
+			color = kBlack;
+			glowColor = kWhite;
 		}
 
 		// drawing occurs on the desktop
@@ -2260,6 +2245,7 @@ BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 			view->SetDrawingMode(B_OP_ALPHA);
 			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+
 			// Draw glow or outline
 			if (glowColor.IsLight()) {
 				font.SetFalseBoldWidth(2.0);
@@ -2296,20 +2282,22 @@ BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 		}
 	}
 
-	rgb_color invertedIfClicked = color;
-	if (isButton && isEnabled && isActivated) {
+	if ((flags & B_DISABLED) != 0)
+		color = disable_color(color, low);
+
+	bool isButton = (flags & B_FLAT) != 0 || (flags & B_HOVER) != 0
+		|| (flags & B_DEFAULT_BUTTON) != 0;
+	if (isButton && (flags & B_DISABLED) == 0 && (flags & B_ACTIVATED) != 0) {
 		// only for enabled and activated buttons
-		invertedIfClicked.red = 255 - invertedIfClicked.red;
-		invertedIfClicked.green = 255 - invertedIfClicked.green;
-		invertedIfClicked.blue = 255 - invertedIfClicked.blue;
+		color.red = 255 - color.red;
+		color.green = 255 - color.green;
+		color.blue = 255 - color.blue;
 	}
 
-	view->SetLowColor(invertedIfClicked);
-	view->SetHighColor(invertedIfClicked);
+	view->SetLowColor(color);
+	view->SetHighColor(color);
 	view->SetDrawingMode(B_OP_OVER);
 	view->DrawString(label, where);
-	view->SetDrawingMode(B_OP_COPY);
-
 	view->PopState();
 }
 

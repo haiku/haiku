@@ -38,8 +38,7 @@ static const uint32 kMsgReconnectVolume = 'rcms';
 
 VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
 	:
-	BSlider("VolumeControl", B_TRANSLATE("Volume"),
-		message, 0, 1, B_HORIZONTAL),
+	BSlider("VolumeControl", B_TRANSLATE("Volume"), message, 0, 1, B_HORIZONTAL),
 	fMixerControl(new MixerControl(volumeWhich)),
 	fBeep(beep),
 	fSnapping(false),
@@ -52,8 +51,7 @@ VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
 	BRect rect(Bounds());
 	rect.top = rect.bottom - 7;
 	rect.left = rect.right - 7;
-	BDragger* dragger = new BDragger(rect, this,
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	BDragger* dragger = new BDragger(rect, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(dragger);
 }
 
@@ -121,9 +119,12 @@ VolumeControl::AttachedToWindow()
 {
 	BSlider::AttachedToWindow();
 
-	if (_IsReplicant())
+	if (_IsReplicant()) {
 		SetEventMask(0, 0);
-	else
+		SetDrawingMode(B_OP_ALPHA);
+		SetFlags(Flags() | B_TRANSPARENT_BACKGROUND);
+		SetViewColor(B_TRANSPARENT_COLOR);
+	} else
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 
 	BMediaRoster* roster = BMediaRoster::Roster();
@@ -322,6 +323,11 @@ VolumeControl::MessageReceived(BMessage* msg)
 			}
 			break;
 
+		case B_WORKSPACE_ACTIVATED:
+			if (_IsReplicant())
+				Invalidate();
+			break;
+
 		default:
 			return BView::MessageReceived(msg);
 	}
@@ -348,22 +354,17 @@ VolumeControl::DrawBar()
 	BRect frame = BarFrame();
 	BView* view = OffscreenView();
 
-	if (be_control_look != NULL) {
-		uint32 flags = be_control_look->Flags(this);
-		rgb_color base = LowColor();
-		rgb_color rightFillColor = (rgb_color){255, 109, 38, 255};
-		rgb_color leftFillColor = (rgb_color){116, 224, 0, 255};
+	uint32 flags = be_control_look->Flags(this);
+	rgb_color base = LowColor();
+	rgb_color rightFillColor = make_color(255, 109, 38, 255);
+	rgb_color leftFillColor = make_color(116, 224, 0, 255);
 
-		int32 min, max;
-		GetLimits(&min, &max);
-		float position = (float)min / (min - max);
+	int32 min, max;
+	GetLimits(&min, &max);
+	float position = (float)min / (min - max);
 
-		be_control_look->DrawSliderBar(view, frame, frame, base, leftFillColor,
-			rightFillColor, position, flags, Orientation());
-		return;
-	}
-
-	BSlider::DrawBar();
+	be_control_look->DrawSliderBar(view, frame, frame, base, leftFillColor,
+		rightFillColor, position, flags, Orientation());
 }
 
 
