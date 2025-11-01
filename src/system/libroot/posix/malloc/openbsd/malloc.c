@@ -2082,11 +2082,13 @@ malloc_usable_size(void *ptr)
 
 	d = getpool();
 	_MALLOC_LOCK(d->mutex);
+	d->active++;
 	d->func = "malloc_usable_size";
 
 	SET_CALLER(d, caller(d));
 	r = omalloc_usable_size(&d, ptr);
 
+	d->active--;
 	_MALLOC_UNLOCK(d->mutex);
 	return r;
 }
