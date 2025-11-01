@@ -831,7 +831,13 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			status_t status = cache->Resize(cache->virtual_base + offset, resizePriority);
+			cacheChainLocker.SetTo(cache);
+
+			// If the cache had other users before, it may have the wrong base.
+			status_t status = cache->Rebase(area->cache_offset, resizePriority);
+			ASSERT_ALWAYS(status == B_OK);
+
+			status = cache->Resize(area->cache_offset + area->Size(), resizePriority);
 			ASSERT_ALWAYS(status == B_OK);
 		}
 
@@ -840,8 +846,6 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			cache->Commit(newCommitmentPages * B_PAGE_SIZE, priority);
 		}
 
-		if (onlyCacheUser)
-			cache->ReleaseRefAndUnlock();
 		return B_OK;
 	}
 
@@ -883,7 +887,13 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// Since VMCache::Rebase() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			status_t status = cache->Rebase(cache->virtual_base + size, resizePriority);
+			cacheChainLocker.SetTo(cache);
+
+			status_t status = cache->Rebase(area->cache_offset + size, resizePriority);
+			ASSERT_ALWAYS(status == B_OK);
+
+			// If the cache had other users before, it may be larger than wanted.
+			status = cache->Resize(cache->virtual_base + area->Size(), resizePriority);
 			ASSERT_ALWAYS(status == B_OK);
 		}
 
@@ -892,9 +902,6 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			const size_t newCommitmentPages = compute_area_page_commitment(area);
 			cache->Commit(newCommitmentPages * B_PAGE_SIZE, priority);
 		}
-
-		if (onlyCacheUser)
-			cache->ReleaseRefAndUnlock();
 
 		return B_OK;
 	}
@@ -1017,6 +1024,10 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			free_etc(secondAreaNewProtections, allocationFlags);
 			return error;
 		}
+
+		// If the cache had other users before, it may have the wrong base.
+		error = cache->Rebase(area->cache_offset, resizePriority);
+		ASSERT_ALWAYS(error == B_OK);
 
 		error = cache->Resize(cache->virtual_base + firstNewSize, resizePriority);
 		ASSERT_ALWAYS(error == B_OK);
