@@ -24,11 +24,13 @@ local straceSources =
 	events.cpp
 	exec.cpp
 	fcntl.cpp
+	file.cpp
 	ioctl.cpp
 	mutex.cpp
 	network.cpp
 	rlimit.cpp
 	signals.cpp
+	util.cpp
 ;
 
 # Our compiler badly chokes when compiling the generated file. So will
@@ -56,6 +58,9 @@ for i in $(straceSyscallsIndices) {
 	ObjectDefines $(object)
 		: GET_SYSCALLS=get_syscalls$(i) SYSCALLS_CHUNK_$(i) ;
 }
+
+TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH)
+	on [ FGristFiles util.o ] += -Wno-format ;
 
 Application strace : $(straceSources)
 	:

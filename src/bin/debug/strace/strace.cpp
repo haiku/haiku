@@ -233,6 +233,7 @@ patch_syscalls()
 	extern void patch_events();
 	extern void patch_exec();
 	extern void patch_fcntl();
+	extern void patch_file();
 	extern void patch_ioctl();
 	extern void patch_mutex();
 	extern void patch_network();
@@ -255,6 +256,7 @@ patch_syscalls()
 	patch_events();
 	patch_exec();
 	patch_fcntl();
+	patch_file();
 	patch_ioctl();
 	patch_mutex();
 	patch_network();

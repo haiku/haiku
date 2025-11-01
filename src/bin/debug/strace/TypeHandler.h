@@ -153,6 +153,8 @@ struct event_wait_info;
 
 struct rlimit;
 
+struct stat;
+
 DEFINE_FACTORY(flock_ptr, flock *);
 DEFINE_FACTORY(ifconf_ptr, ifconf *);
 DEFINE_FACTORY(ifreq_ptr, ifreq *);
@@ -174,6 +176,9 @@ DEFINE_FACTORY(fdset_ptr, fd_set *);
 DEFINE_FACTORY(pollfd_ptr, pollfd *);
 DEFINE_FACTORY(object_wait_infos_ptr, object_wait_info *);
 DEFINE_FACTORY(event_wait_infos_ptr, event_wait_info *);
+
+DEFINE_FACTORY(stat_ptr, struct stat *);
+DEFINE_FACTORY(stat_ptr, const struct stat *);
 
 DEFINE_FACTORY(int_ptr, int *);
 DEFINE_FACTORY(long_ptr, long *);
