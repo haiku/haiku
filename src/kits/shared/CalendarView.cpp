@@ -321,10 +321,6 @@ BCalendarView::Invoke(BMessage* message)
 	clone.AddInt64("when", (int64)system_time());
 	clone.AddMessenger("be:sender", BMessenger(this));
 
-	int32 year;
-	int32 month;
-	_GetYearMonthForSelection(fSelectedDay, &year, &month);
-
 	clone.AddInt32("year", fDate.Year());
 	clone.AddInt32("month", fDate.Month());
 	clone.AddInt32("day", fDate.Day());
@@ -536,20 +532,14 @@ BCalendarView::Day() const
 int32
 BCalendarView::Year() const
 {
-	int32 year;
-	_GetYearMonthForSelection(fSelectedDay, &year, NULL);
-
-	return year;
+	return fDate.Year();
 }
 
 
 int32
 BCalendarView::Month() const
 {
-	int32 month;
-	_GetYearMonthForSelection(fSelectedDay, NULL, &month);
-
-	return month;
+	return fDate.Month();
 }
 
 
@@ -607,10 +597,7 @@ BCalendarView::SetYear(int32 year)
 BDate
 BCalendarView::Date() const
 {
-	int32 year;
-	int32 month;
-	_GetYearMonthForSelection(fSelectedDay, &year, &month);
-	return BDate(year, month, fDate.Day());
+	return fDate;
 }
 
 
