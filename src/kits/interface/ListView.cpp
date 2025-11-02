@@ -895,6 +895,9 @@ BListView::AddItem(BListItem* item, int32 index)
 	if (fLastSelected != -1 && index <= fLastSelected)
 		fLastSelected++;
 
+	if (fAnchorIndex != -1 && index <= fAnchorIndex)
+		fAnchorIndex++;
+
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
@@ -948,6 +951,9 @@ BListView::AddList(BList* list, int32 index)
 
 	if (fLastSelected != -1 && index < fLastSelected)
 		fLastSelected += count;
+
+	if (fAnchorIndex != -1 && index < fAnchorIndex)
+		fAnchorIndex += count;
 
 	if (Window()) {
 		BFont font;
