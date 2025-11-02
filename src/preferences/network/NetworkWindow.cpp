@@ -597,7 +597,7 @@ NetworkWindow::_ShowReplicant(bool show)
 		const char* argv[] = {"--deskbar", NULL};
 
 		status_t status = be_roster->Launch(kNetworkStatusSignature, 1, argv);
-		if (status != B_OK) {
+		if (status != B_OK && status != B_ALREADY_RUNNING) {
 			BString errorMessage;
 			errorMessage.SetToFormat(
 				B_TRANSLATE("Installing NetworkStatus in Deskbar failed: %s"),

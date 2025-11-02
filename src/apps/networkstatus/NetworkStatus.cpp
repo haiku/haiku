@@ -95,8 +95,14 @@ NetworkStatus::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	if (strcmp(argv[1], "--deskbar") == 0)
+	if (strcmp(argv[1], "--deskbar") == 0) {
 		fAutoInstallInDeskbar = true;
+		if (!IsLaunching()) {
+			BDeskbar deskbar;
+			if (deskbar.IsRunning() && !deskbar.HasItem(kDeskbarItemName))
+				_InstallReplicantInDeskbar();
+		}
+	}
 }
 
 
@@ -149,6 +155,7 @@ NetworkStatus::ReadyToRun()
 		}
 
 		_InstallReplicantInDeskbar();
+		Quit();
 		return;
 	}
 
@@ -160,6 +167,7 @@ NetworkStatus::ReadyToRun()
 
 		if (alert->Go() == 1) {
 			_InstallReplicantInDeskbar();
+			Quit();
 			return;
 		}
 	}
@@ -197,8 +205,6 @@ NetworkStatus::_InstallReplicantInDeskbar()
 		BDeskbar deskbar;
 		deskbar.AddItem(&ref);
 	}
-
-	Quit();
 }
 
 
