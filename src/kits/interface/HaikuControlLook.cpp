@@ -2223,7 +2223,7 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 	else
 		low = base;
 
-	drawing_mode oldMode = view->DrawingMode();
+	view->PushState();
 
 	if (isDesktop) {
 		// enforce proper use of desktop label colors
@@ -2303,7 +2303,7 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 	view->SetHighColor(color);
 	view->SetDrawingMode(B_OP_OVER);
 	view->DrawString(label, where);
-	view->SetDrawingMode(oldMode);
+	view->PopState();
 }
 
 
