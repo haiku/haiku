@@ -44,7 +44,6 @@
 #include <PathFinder.h>
 #include <PopUpMenu.h>
 #include <Resources.h>
-#include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
 #include <StringFormat.h>
@@ -110,6 +109,8 @@ static const rgb_color kIdealHaikuOrange = { 255, 69, 0, 255 };
 static const rgb_color kIdealHaikuYellow = { 255, 176, 0, 255 };
 static const rgb_color kIdealBeOSBlue = { 0, 0, 200, 255 };
 static const rgb_color kIdealBeOSRed = { 200, 0, 0, 255 };
+static const rgb_color kBlack = { 0, 0, 0, 255 };
+static const rgb_color kWhite = { 255, 255, 255, 255 };
 
 static const char* kBSDTwoClause = B_TRANSLATE_MARK("BSD (2-clause)");
 static const char* kBSDThreeClause = B_TRANSLATE_MARK("BSD (3-clause)");
@@ -237,8 +238,8 @@ public:
 	virtual	status_t		Archive(BMessage* archive, bool deep = true) const;
 	static	BArchivable*	Instantiate(BMessage* archive);
 
-	virtual	void			AttachedToWindow();
 	virtual	void			AllAttached();
+	virtual	void			AttachedToWindow();
 	virtual	void			Draw(BRect);
 	virtual void			MessageReceived(BMessage* message);
 	virtual void			Pulse();
@@ -249,9 +250,8 @@ public:
 			float			MinHeight() const { return fCachedMinHeight; };
 
 private:
-			void			_AdjustColors();
-			void			_AdjustTextColors() const;
-			rgb_color		_DesktopTextColor(int32 workspace = -1) const;
+			void			_UpdateColors();
+			bool			_IsReplicant() const;
 			bool			_OnDesktop() const;
 			void			_ResizeBy(float, float);
 			void			_ResizeTo(float, float);
@@ -279,8 +279,6 @@ private:
 			float			_UptimeHeight();
 
 private:
-			rgb_color		fDesktopTextColor;
-
 			BStringView*	fVersionLabelView;
 			BStringView*	fVersionInfoView;
 			BStringView*	fCPULabelView;
@@ -694,6 +692,15 @@ SysInfoView::Instantiate(BMessage* archive)
 
 
 void
+SysInfoView::AllAttached()
+{
+	BView::AllAttached();
+
+	_UpdateColors();
+}
+
+
+void
 SysInfoView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
@@ -701,7 +708,7 @@ SysInfoView::AttachedToWindow()
 	Window()->SetPulseRate(500000);
 	DoLayout();
 
-	if (_OnDesktop()) {
+	if (_IsReplicant()) {
 		// if we are a replicant the parent view doesn't do this for us
 		CacheInitialSize();
 		// add extra height for dragger: fixed, and insets: font-dependent
@@ -709,20 +716,6 @@ SysInfoView::AttachedToWindow()
 		float insets = be_control_look->DefaultLabelSpacing() * 2;
 		ResizeTo(fCachedMinWidth, fCachedMinHeight + draggerHeight + insets);
 	}
-}
-
-
-void
-SysInfoView::AllAttached()
-{
-	BView::AllAttached();
-
-	if (_OnDesktop())
-		fDesktopTextColor = _DesktopTextColor();
-
-	// Update colors here to override system colors for replicant,
-	// this works when the view is in AboutView too.
-	_AdjustColors();
 }
 
 
@@ -762,7 +755,7 @@ SysInfoView::Draw(BRect updateRect)
 	BView::Draw(updateRect);
 
 	// stroke a line around the view
-	if (_OnDesktop() && fDragger != NULL && fDragger->AreDraggersDrawn())
+	if (_IsReplicant() && fDragger != NULL && fDragger->AreDraggersDrawn())
 		StrokeRect(Bounds());
 }
 
@@ -772,51 +765,22 @@ SysInfoView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_COLORS_UPDATED:
-		{
 			if (_OnDesktop())
 				break;
 
-			if (message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))) {
-				_AdjustTextColors();
+			if (message->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR))
+				|| message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))) {
+				_UpdateColors();
 				Invalidate();
 			}
-
 			break;
-		}
 
 		case B_WORKSPACE_ACTIVATED:
-		{
-			if (!_OnDesktop())
-				break;
-
-			bool active;
-			int32 workspace;
-			if (message->FindBool("active", &active) == B_OK && active
-				&& message->FindInt32("workspace", &workspace) == B_OK) {
-				BLayout* layout = GetLayout();
-				int32 itemCount = layout->CountItems() - 2;
-					// leave out dragger and uptime
-
-				fDesktopTextColor = _DesktopTextColor(workspace);
-				SetHighColor(fDesktopTextColor);
-
-				for (int32 index = 0; index < itemCount; index++) {
-					BView* view = layout->ItemAt(index)->View();
-					if (view == NULL)
-						continue;
-
-					view->SetDrawingMode(B_OP_ALPHA);
-					view->SetHighColor(fDesktopTextColor);
-				}
-
-				fUptimeView->SetDrawingMode(B_OP_ALPHA);
-				fUptimeView->SetFontAndColor(NULL, 0, &fDesktopTextColor);
-
+			if (_OnDesktop()) {
+				_UpdateColors();
 				Invalidate();
 			}
-
 			break;
-		}
 
 		default:
 			BView::MessageReceived(message);
@@ -844,70 +808,39 @@ SysInfoView::Pulse()
 
 
 void
-SysInfoView::_AdjustColors()
+SysInfoView::_UpdateColors()
 {
 	if (_OnDesktop()) {
-		// SetColor
-		SetFlags(Flags() | B_TRANSPARENT_BACKGROUND);
+		rgb_color textColor = (Parent()->ViewColor().Brightness()
+			<= ui_color(B_DESKTOP_COLOR).Brightness() ? kWhite : kBlack);
+
 		SetDrawingMode(B_OP_ALPHA);
-
+		SetFlags(Flags() | B_TRANSPARENT_BACKGROUND);
 		SetViewColor(B_TRANSPARENT_COLOR);
-		SetLowColor(B_TRANSPARENT_COLOR);
-		SetHighColor(fDesktopTextColor);
-	} else {
-		// SetUIColor
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
-		SetHighUIColor(B_PANEL_TEXT_COLOR);
-	}
+		SetLowColor(blend_color(B_TRANSPARENT_COLOR, textColor, 192));
+		SetHighColor(textColor);
 
-	_AdjustTextColors();
-	Invalidate();
-}
-
-
-void
-SysInfoView::_AdjustTextColors() const
-{
-	BLayout* layout = GetLayout();
-	int32 itemCount = layout->CountItems() - 2;
-		// leave out dragger and uptime
-
-	if (_OnDesktop()) {
-		// SetColor
+		BLayout* layout = GetLayout();
+		int32 itemCount = layout->CountItems() - 2;
+			// leave out dragger and uptime
 		for (int32 index = 0; index < itemCount; index++) {
 			BView* view = layout->ItemAt(index)->View();
 			if (view == NULL)
 				continue;
 
-			view->SetFlags(view->Flags() | B_TRANSPARENT_BACKGROUND);
 			view->SetDrawingMode(B_OP_ALPHA);
-
+			view->SetFlags(view->Flags() | B_TRANSPARENT_BACKGROUND);
 			view->SetViewColor(B_TRANSPARENT_COLOR);
-			view->SetLowColor(blend_color(B_TRANSPARENT_COLOR,
-				fDesktopTextColor, 192));
-			view->SetHighColor(fDesktopTextColor);
+			view->SetLowColor(blend_color(B_TRANSPARENT_COLOR, textColor, 192));
+			view->SetHighColor(textColor);
 		}
 
-		fUptimeView->SetFlags(fUptimeView->Flags() | B_TRANSPARENT_BACKGROUND);
 		fUptimeView->SetDrawingMode(B_OP_ALPHA);
-
+		fUptimeView->SetFlags(fUptimeView->Flags() | B_TRANSPARENT_BACKGROUND);
 		fUptimeView->SetViewColor(B_TRANSPARENT_COLOR);
-		fUptimeView->SetLowColor(blend_color(B_TRANSPARENT_COLOR,
-			fDesktopTextColor, 192));
-		fUptimeView->SetFontAndColor(NULL, 0, &fDesktopTextColor);
+		fUptimeView->SetLowColor(blend_color(B_TRANSPARENT_COLOR, textColor, 192));
+		fUptimeView->SetFontAndColor(NULL, 0, &textColor);
 	} else {
-		// SetUIColor
-		for (int32 index = 0; index < itemCount; index++) {
-			BView* view = layout->ItemAt(index)->View();
-			if (view == NULL)
-				continue;
-
-			view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-			view->SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
-			view->SetHighUIColor(B_PANEL_TEXT_COLOR);
-		}
-
 		fUptimeView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		fUptimeView->SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
@@ -916,20 +849,10 @@ SysInfoView::_AdjustTextColors() const
 }
 
 
-rgb_color
-SysInfoView::_DesktopTextColor(int32 workspace) const
+bool
+SysInfoView::_IsReplicant() const
 {
-	// set text color to black or white depending on desktop background color
-	rgb_color textColor;
-	BScreen screen(Window());
-	if (workspace < 0)
-		workspace = current_workspace();
-
-	rgb_color viewColor = screen.DesktopColor(workspace);
-	textColor.blue = textColor.green = textColor.red = viewColor.IsLight() ? 0 : 255;
-	textColor.alpha = 255;
-
-	return textColor;
+	return dynamic_cast<AboutWindow*>(Window()) == NULL;
 }
 
 
@@ -945,7 +868,7 @@ SysInfoView::_OnDesktop() const
 void
 SysInfoView::_ResizeBy(float widthChange, float heightChange)
 {
-	if (!_OnDesktop() || (widthChange == 0 && heightChange == 0))
+	if (!_IsReplicant() || (widthChange == 0 && heightChange == 0))
 		return;
 
 	ResizeBy(widthChange, heightChange);
