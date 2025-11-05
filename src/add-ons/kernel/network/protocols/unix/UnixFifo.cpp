@@ -203,7 +203,8 @@ UnixBufferQueue::Read(UnixRequest& request)
 	if (fType == UnixFifoType::Datagram) {
 		fDatagrams.RemoveHead();
 
-		memcpy(request.Address(), &datagramEntry->address, sizeof(datagramEntry->address));
+		if (request.Address() != NULL)
+			memcpy(request.Address(), &datagramEntry->address, sizeof(datagramEntry->address));
 		delete datagramEntry;
 
 		if (readable > 0) {
@@ -246,8 +247,8 @@ UnixBufferQueue::Write(UnixRequest& request)
 			return B_NO_MEMORY;
 
 		datagramEntryDeleter.SetTo(datagramEntry);
-		memcpy(&datagramEntry->address, request.Address(),
-			sizeof(datagramEntry->address));
+		if (request.Address() != NULL)
+			memcpy(&datagramEntry->address, request.Address(), sizeof(datagramEntry->address));
 		datagramEntry->size = request.TotalSize();
 
 		// This should have been handled in UnixFifo
@@ -317,7 +318,7 @@ UnixBufferQueue::Write(UnixRequest& request)
 status_t
 UnixBufferQueue::SetCapacity(size_t capacity)
 {
-	if (capacity <= fCapacity)
+	if (capacity < ring_buffer_readable(fBuffer))
 		return B_OK;
 
 	ring_buffer* newBuffer = create_ring_buffer(capacity);
@@ -344,7 +345,8 @@ UnixFifo::UnixFifo(size_t capacity, UnixFifoType type)
 	fWriters(),
 	fReadRequested(0),
 	fWriteRequested(0),
-	fShutdown(0)
+	fShutdown(0),
+	fType(type)
 
 {
 	fReadCondition.Init(this, "unix fifo read");

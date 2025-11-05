@@ -461,6 +461,10 @@ init_unix()
 		error = gStackModule->register_domain_protocols(AF_UNIX, SOCK_DGRAM, 0,
 			"network/protocols/unix/v1", NULL);
 	}
+	if (error == B_OK) {
+		error = gStackModule->register_domain_protocols(AF_UNIX, SOCK_SEQPACKET, 0,
+			"network/protocols/unix/v1", NULL);
+	}
 
 	if (error != B_OK) {
 		gAddressManager.~UnixAddressManager();

@@ -31,10 +31,13 @@ UnixEndpoint::Create(net_socket* socket, UnixEndpoint** _endpoint)
 
 	switch (socket->type) {
 		case SOCK_STREAM:
-			*_endpoint = new(std::nothrow) UnixStreamEndpoint(socket);
+			*_endpoint = new(std::nothrow) UnixStreamEndpoint(socket, false);
 			break;
 		case SOCK_DGRAM:
 			*_endpoint = new(std::nothrow) UnixDatagramEndpoint(socket);
+			break;
+		case SOCK_SEQPACKET:
+			*_endpoint = new(std::nothrow) UnixStreamEndpoint(socket, true);
 			break;
 		default:
 			return EPROTOTYPE;

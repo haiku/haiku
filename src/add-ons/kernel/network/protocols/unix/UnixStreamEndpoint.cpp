@@ -28,7 +28,7 @@
 // -> UnixAddressManager
 
 
-UnixStreamEndpoint::UnixStreamEndpoint(net_socket* socket)
+UnixStreamEndpoint::UnixStreamEndpoint(net_socket* socket, bool atomic)
 	:
 	UnixEndpoint(socket),
 	fPeerEndpoint(NULL),
@@ -36,7 +36,8 @@ UnixStreamEndpoint::UnixStreamEndpoint(net_socket* socket)
 	fState(unix_stream_endpoint_state::Closed),
 	fAcceptSemaphore(-1),
 	fIsChild(false),
-	fWasConnected(false)
+	fWasConnected(false),
+	fAtomic(atomic)
 {
 	TRACE("[%" B_PRId32 "] %p->UnixStreamEndpoint::UnixStreamEndpoint()\n",
 		find_thread(NULL), this);
@@ -287,8 +288,9 @@ UnixStreamEndpoint::Connect(const struct sockaddr* _address)
 	// Allocate FIFOs for us and the socket we're going to spawn. We do that
 	// now, so that the mess we need to cleanup, if allocating them fails, is
 	// harmless.
-	UnixFifo* fifo = new(nothrow) UnixFifo(UNIX_MAX_TRANSFER_UNIT, UnixFifoType::Stream);
-	UnixFifo* peerFifo = new(nothrow) UnixFifo(UNIX_MAX_TRANSFER_UNIT, UnixFifoType::Stream);
+	UnixFifoType type = fAtomic ? UnixFifoType::Datagram : UnixFifoType::Stream;
+	UnixFifo* fifo = new(nothrow) UnixFifo(socket->receive.buffer_size, type);
+	UnixFifo* peerFifo = new(nothrow) UnixFifo(socket->send.buffer_size, type);
 	ObjectDeleter<UnixFifo> fifoDeleter(fifo);
 	ObjectDeleter<UnixFifo> peerFifoDeleter(peerFifo);
 
@@ -384,7 +386,9 @@ UnixStreamEndpoint::Send(const iovec* vecs, size_t vecCount,
 	TRACE("[%" B_PRId32 "] %p->UnixStreamEndpoint::Send(%p, %ld, %p)\n",
 		find_thread(NULL), this, vecs, vecCount, ancillaryData);
 
-	if ((flags & ~(MSG_DONTWAIT)) != 0)
+	// TODO: handle MSG_EOR
+	bool atomic = (flags & MSG_EOR) != 0;
+	if ((atomic && !fAtomic) || (flags & ~(MSG_DONTWAIT | MSG_EOR)) != 0)
 		return EOPNOTSUPP;
 
 	bigtime_t timeout = 0;
@@ -478,7 +482,8 @@ UnixStreamEndpoint::Receive(const iovec* vecs, size_t vecCount,
 	TRACE("[%" B_PRId32 "] %p->UnixStreamEndpoint::Receive(%p, %ld)\n",
 		find_thread(NULL), this, vecs, vecCount);
 
-	if ((flags & ~(MSG_DONTWAIT)) != 0)
+	// TODO: handle MSG_WAITALL
+	if ((flags & ~(MSG_DONTWAIT | MSG_WAITALL)) != 0)
 		return EOPNOTSUPP;
 
 	bigtime_t timeout = 0;
@@ -624,7 +629,7 @@ UnixStreamEndpoint::SetReceiveBufferSize(size_t size)
 	UnixStreamEndpointLocker locker(this);
 
 	if (fReceiveFifo == NULL)
-		return B_BAD_VALUE;
+		return B_OK;
 
 	UnixFifoLocker fifoLocker(fReceiveFifo);
 	return fReceiveFifo->SetBufferCapacity(size);

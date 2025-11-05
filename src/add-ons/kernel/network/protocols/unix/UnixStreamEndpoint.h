@@ -32,7 +32,7 @@ typedef AutoLocker<UnixStreamEndpoint> UnixStreamEndpointLocker;
 
 class UnixStreamEndpoint final : public UnixEndpoint, public BReferenceable {
 public:
-								UnixStreamEndpoint(net_socket* socket);
+								UnixStreamEndpoint(net_socket* socket, bool atomic);
 	virtual						~UnixStreamEndpoint() override;
 
 			status_t			Init() override;
@@ -90,6 +90,7 @@ private:
 	ucred						fCredentials;
 	bool						fIsChild;
 	bool						fWasConnected;
+	bool 						fAtomic;
 };
 
 #endif	// UNIX_STREAM_ENDPOINT_H
