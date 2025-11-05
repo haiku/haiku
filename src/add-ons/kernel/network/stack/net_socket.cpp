@@ -888,7 +888,7 @@ int
 socket_accept(net_socket* socket, struct sockaddr* address,
 	socklen_t* _addressLength, net_socket** _acceptedSocket)
 {
-	if (socket->type != SOCK_STREAM)
+	if (socket->type != SOCK_STREAM && socket->type != SOCK_SEQPACKET)
 		return B_NOT_SUPPORTED;
 	if ((socket->options & SO_ACCEPTCONN) == 0)
 		return B_BAD_VALUE;
@@ -1582,7 +1582,7 @@ socket_socketpair(int family, int type, int protocol, net_socket* sockets[2])
 		error = socket_bind(sockets[0], NULL, 0);
 
 	// start listening
-	if (error == B_OK && type == SOCK_STREAM)
+	if (error == B_OK && (type == SOCK_STREAM || type == SOCK_SEQPACKET))
 		error = socket_listen(sockets[0], 1);
 
 	// connect them
@@ -1593,7 +1593,7 @@ socket_socketpair(int family, int type, int protocol, net_socket* sockets[2])
 
 	if (error == B_OK) {
 		// accept a socket
-		if (type == SOCK_STREAM) {
+		if (type == SOCK_STREAM || type == SOCK_SEQPACKET) {
 			net_socket* acceptedSocket = NULL;
 			error = socket_accept(sockets[0], NULL, NULL, &acceptedSocket);
 			if (error == B_OK) {
