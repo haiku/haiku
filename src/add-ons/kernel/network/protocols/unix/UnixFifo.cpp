@@ -223,6 +223,8 @@ UnixBufferQueue::Read(UnixRequest& request)
 				if (entry != NULL)
 					entry->offset -= offsetDelta;
 			}
+			// for MSG_TRUNC on atomic sockets
+			request.AddBytesTransferred(readable);
 		}
 	}
 

@@ -297,7 +297,7 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 	ancillary_data_container* ancillaryData = NULL;
 	ssize_t bytesRead = socket->first_info->read_data_no_buffer(
 		socket->first_protocol, vecs, vecCount, &ancillaryData, address,
-		addressLen, flags & ~(MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK));
+		addressLen, flags & ~(MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_TRUNC));
 	if (bytesRead < 0)
 		return bytesRead;
 
@@ -315,6 +315,12 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 		header->msg_flags = 0;
 	}
 
+	if (length < (size_t)bytesRead) {
+		if (header != NULL)
+			header->msg_flags = MSG_TRUNC;
+		if ((flags & MSG_TRUNC) == 0)
+			return length;
+	}
 	return bytesRead;
 }
 
