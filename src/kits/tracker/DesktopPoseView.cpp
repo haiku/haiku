@@ -89,11 +89,26 @@ DesktopPoseView::MessageReceived(BMessage* message)
 				|| workspace != current_workspace()) {
 				break;
 			}
-		} // fall-through
-		case B_RESTORE_BACKGROUND_IMAGE:
+
 			AdoptSystemColors();
 			Invalidate();
+
+			_inherited::MessageReceived(message);
 			break;
+		}
+
+		case B_RESTORE_BACKGROUND_IMAGE:
+		{
+			AdoptSystemColors();
+			Invalidate();
+
+			// call workspace activated on child replicant views
+			BMessage forward(B_WORKSPACE_ACTIVATED);
+			forward.AddBool("active", true);
+			forward.AddInt32("workspace", current_workspace());
+			_inherited::MessageReceived(&forward);
+			break;
+		}
 
 		default:
 			_inherited::MessageReceived(message);
