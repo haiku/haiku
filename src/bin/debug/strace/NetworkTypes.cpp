@@ -8,21 +8,12 @@
  */
 
 #include <arpa/inet.h>
-#include <signal.h>
-#include <sys/poll.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <sys/un.h>
-
-#include <map>
-#include <utility>
 
 #include "Context.h"
 #include "MemoryReader.h"
 #include "TypeHandler.h"
-
-using std::map;
-using std::pair;
 
 
 template<typename Type>
@@ -322,167 +313,6 @@ TypeHandlerImpl<sockaddr *>::GetReturnValue(Context &context, uint64 value)
 }
 
 
-#if 0
-static string
-format_pointer(Context &context, sockaddr_args *args)
-{
-	string r;
-
-	r  =   "addr = " + format_pointer_value<sockaddr>(context, args->address);
-	r += ", len = " + context.FormatUnsigned(args->address_length);
-
-	return r;
-}
-
-
-struct socket_option_info {
-	int level;
-	int option;
-	const char *name;
-	TypeHandler *handler;
-	int length;
-};
-
-#define SOCKET_OPTION_INFO_ENTRY(level, option) \
-	{ level, option, #option, NULL, 0 }
-
-#define SOCKET_OPTION_INFO_ENTRY_TYPE(level, option, type) \
-	{ level, option, #option, TypeHandlerFactory<type *>::Create(), sizeof(type) }
-
-static const socket_option_info kSocketOptions[] = {
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_ACCEPTCONN),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_BROADCAST, int32),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_DEBUG, int32),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_DONTROUTE, int32),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_KEEPALIVE, int32),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_OOBINLINE, int32),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_REUSEADDR, int32),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_REUSEPORT, int32),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_USELOOPBACK, int32),
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_LINGER),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_SNDBUF, uint32),
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_SNDLOWAT),
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_SNDTIMEO),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_RCVBUF, uint32),
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_RCVLOWAT),
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_RCVTIMEO),
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_ERROR),
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_TYPE),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(SOL_SOCKET, SO_NONBLOCK, int32),
-	SOCKET_OPTION_INFO_ENTRY(SOL_SOCKET, SO_BINDTODEVICE),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_OPTIONS),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(IPPROTO_IP, IP_HDRINCL, int),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(IPPROTO_IP, IP_TOS, int),
-	SOCKET_OPTION_INFO_ENTRY_TYPE(IPPROTO_IP, IP_TTL, int),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_RECVOPTS),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_RECVRETOPTS),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_RECVDSTADDR),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_RETOPTS),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_MULTICAST_IF),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_MULTICAST_TTL),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_MULTICAST_LOOP),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_ADD_MEMBERSHIP),
-	SOCKET_OPTION_INFO_ENTRY(IPPROTO_IP, IP_DROP_MEMBERSHIP),
-	{ -1, -1, NULL, NULL }
-};
-
-class SocketOptionsMap {
-public:
-	typedef map<pair<int, int>, const socket_option_info *> ThisMap;
-
-	SocketOptionsMap()
-	{
-		for (int i = 0; kSocketOptions[i].name != NULL; i++) {
-			fMap.insert(make_pair(
-					std::make_pair(kSocketOptions[i].level,
-						  kSocketOptions[i].option),
-					&kSocketOptions[i]));
-		}
-	}
-
-	const socket_option_info *GetEntry(int level, int option) const
-	{
-		ThisMap::const_iterator i = fMap.find(std::make_pair(level, option));
-		if (i == fMap.end())
-			return NULL;
-
-		return i->second;
-	}
-
-private:
-	ThisMap fMap;
-};
-
-static const SocketOptionsMap kSocketOptionsMap;
-
-
-static string
-format_pointer(Context &context, sockopt_args *args)
-{
-	const socket_option_info *info =
-		kSocketOptionsMap.GetEntry(args->level, args->option);
-
-	string level, option, value;
-
-	if (context.GetContents(Context::ENUMERATIONS)) {
-		switch (args->level) {
-		case SOL_SOCKET:
-			level = "SOL_SOCKET";
-			break;
-		case IPPROTO_IP:
-			level = "IPPROTO_IP";
-			break;
-		}
-
-		if (info != NULL)
-			option = info->name;
-	}
-
-	if (info != NULL && info->length == args->length)
-		value = info->handler->GetParameterValue(context, NULL, &args->value);
-	else {
-		value  = "value = " + context.FormatPointer(args->value);
-		value += ", len = " + context.FormatUnsigned(args->length);
-	}
-
-	if (level.empty())
-		level = "level = " + context.FormatSigned(args->level, sizeof(int));
-
-	if (option.empty())
-		option = "option = " + context.FormatSigned(args->option, sizeof(int));
-
-	return level + ", " + option + ", " + value;
-}
-
-
-static string
-format_pointer(Context &context, socket_args *args)
-{
-	string r;
-
-	r  = format_socket_family(context, args->family) + ", ";
-	r += format_socket_type(context, args->type) + ", ";
-	r += format_socket_protocol(context, args->protocol);
-
-	return r;
-}
-
-
-static string
-format_pointer(Context &context, message_args *msg)
-{
-	string r;
-
-	r +=   "header = " + format_pointer_value<msghdr>(context, msg->header);
-	r += ", flags = " + context.FormatFlags(msg->flags);
-	r += ", data = " + context.FormatPointer(msg->data);
-	r += ", length = " + context.FormatUnsigned(msg->length);
-
-	return r;
-}
-#endif
-
-
 static string
 format_pointer(Context &context, msghdr *h)
 {
@@ -599,9 +429,4 @@ POINTER_TYPE(ifreq_ptr, ifreq);
 POINTER_TYPE(siginfo_t_ptr, siginfo_t);
 POINTER_TYPE(msghdr_ptr, msghdr);
 DEFINE_TYPE(sockaddr_ptr, sockaddr *);
-#if 0
-POINTER_TYPE(message_args_ptr, message_args);
-POINTER_TYPE(sockaddr_args_ptr, sockaddr_args);
-POINTER_TYPE(sockopt_args_ptr, sockopt_args);
-POINTER_TYPE(socket_args_ptr, socket_args);
-#endif
+
