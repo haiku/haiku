@@ -28,9 +28,6 @@
 #include "Colors.h"
 
 
-using BPrivate::BColorPreview;
-
-
 static const uint32 MSG_COLOR_SCHEME_CHANGED 	= 'mccs';
 static const uint32 MSG_UPDATE_COLOR		 	= 'upcl';
 static const uint32 MSG_COLOR_ATTRIBUTE_CHOSEN	= 'atch';
@@ -43,6 +40,7 @@ class BMenuField;
 class BPopUpMenu;
 class BTextView;
 
+
 class ThemeView : public BGroupView {
 public:
 								ThemeView(const char *name,
@@ -50,7 +48,7 @@ public:
 	virtual						~ThemeView();
 
 	virtual	void				AttachedToWindow();
-	virtual void				WindowActivated(bool active);
+	virtual	void				WindowActivated(bool active);
 	virtual	void				MessageReceived(BMessage *msg);
 
 			void				SetDefaults();
@@ -72,7 +70,7 @@ private:
 			BListView*			fAttrList;
 			const char*			fName;
 			BScrollView*		fScrollView;
-			BColorPreview*		fColorPreview;
+			BPrivate::BColorPreview*	fColorPreview;
 			BMenuField*			fColorSchemeField;
 			BPopUpMenu*			fColorSchemeMenu;
 			BTextView*			fPreview;
@@ -84,7 +82,8 @@ private:
 			BMessenger			fTerminalMessenger;
 
 public:
-	static const char* 			kColorTable[];
+			static const char*	kColorTable[];
 };
+
 
 #endif	// THEME_VIEW_H
