@@ -972,7 +972,7 @@ _user_accept(int socket, struct sockaddr *userAddress,
 ssize_t
 _user_recv(int socket, void *data, size_t length, int flags)
 {
-	if (data == NULL || !is_user_address_range(data, length))
+	if (length > 0 && (data == NULL || !is_user_address_range(data, length)))
 		return B_BAD_ADDRESS;
 
 	SyscallRestartWrapper<ssize_t> result;
@@ -984,7 +984,7 @@ ssize_t
 _user_recvfrom(int socket, void *data, size_t length, int flags,
 	struct sockaddr *userAddress, socklen_t *_addressLength)
 {
-	if (data == NULL || !is_user_address_range(data, length))
+	if (length > 0 && (data == NULL || !is_user_address_range(data, length)))
 		return B_BAD_ADDRESS;
 
 	// check parameters
@@ -1075,7 +1075,7 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 ssize_t
 _user_send(int socket, const void *data, size_t length, int flags)
 {
-	if (data == NULL || !is_user_address_range(data, length))
+	if (length > 0 && (data == NULL || !is_user_address_range(data, length)))
 		return B_BAD_ADDRESS;
 
 	SyscallRestartWrapper<ssize_t> result;
@@ -1087,7 +1087,7 @@ ssize_t
 _user_sendto(int socket, const void *data, size_t length, int flags,
 	const struct sockaddr *userAddress, socklen_t addressLength)
 {
-	if (data == NULL || !is_user_address_range(data, length))
+	if (length > 0 && (data == NULL || !is_user_address_range(data, length)))
 		return B_BAD_ADDRESS;
 
 	if (addressLength < 0
