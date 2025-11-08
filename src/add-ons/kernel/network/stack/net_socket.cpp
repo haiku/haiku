@@ -853,17 +853,21 @@ socket_notify(net_socket* _socket, uint8 event, int32 value)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
 	bool notify = true;
+	bool atomic = (socket->first_info->flags & NET_PROTOCOL_ATOMIC_MESSAGES) != 0;
 
 	switch (event) {
 		case B_SELECT_READ:
 			if ((ssize_t)socket->receive.low_water_mark > value
-				&& value >= B_OK)
+				&& value >= B_OK && !atomic) {
 				notify = false;
+			}
 			break;
 
 		case B_SELECT_WRITE:
-			if ((ssize_t)socket->send.low_water_mark > value && value >= B_OK)
+			if ((ssize_t)socket->send.low_water_mark > value
+				&& value >= B_OK && !atomic) {
 				notify = false;
+			}
 			break;
 
 		case B_SELECT_ERROR:
@@ -1308,8 +1312,8 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		return EDESTADDRREQ;
 	}
 
-	if ((socket->first_info->flags & NET_PROTOCOL_ATOMIC_MESSAGES) != 0
-		&& bytesLeft > socket->send.buffer_size)
+	bool atomic = (socket->first_info->flags & NET_PROTOCOL_ATOMIC_MESSAGES) != 0;
+	if (atomic && bytesLeft > socket->send.buffer_size)
 		return EMSGSIZE;
 
 	if (socket->address.ss_len == 0) {
@@ -1354,7 +1358,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 	size_t vecOffset = 0;
 	uint32 vecIndex = 0;
 
-	while (bytesLeft > 0) {
+	while (bytesLeft > 0 || atomic) {
 		// TODO: useful, maybe even computed header space!
 		net_buffer* buffer = gNetBufferModule.create(256);
 		if (buffer == NULL)
@@ -1425,6 +1429,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 
 		bytesLeft -= bufferSize;
 		bytesSent += bufferSize;
+		atomic = false;
 	}
 
 	return bytesSent;
