@@ -1360,14 +1360,16 @@ TermWindow::_AddTab(const Arguments* args, const BString& currentDirectory)
 			PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE));
 		view->SetListener(this);
 
+		bool firstSession = fSessions.IsEmpty();
+
 		TermViewContainerView* containerView = new TermViewContainerView(view);
 		BScrollView* scrollView = new TermScrollView("scrollView",
-			containerView, view, fSessions.IsEmpty());
+			containerView, view, firstSession);
 		if (!fFullScreen)
 			scrollView->ScrollBar(B_VERTICAL)
 				->ResizeBy(0, -(be_control_look->GetScrollBarWidth(B_VERTICAL) - 1));
 
-		if (fSessions.IsEmpty())
+		if (firstSession)
 			fTabView->SetScrollView(scrollView);
 
 		Session* session = new Session(_NewSessionID(), _NewSessionIndex(),
@@ -1385,7 +1387,7 @@ TermWindow::_AddTab(const Arguments* args, const BString& currentDirectory)
 		if (fMenuBar != NULL)
 			minimumHeight += fMenuBar->Bounds().Height() + 1;
 
-		if (fTabView != NULL && fTabView->CountTabs() > 0)
+		if (!firstSession)
 			minimumHeight += fTabView->TabHeight() + 1;
 
 		SetSizeLimits(MIN_COLS * width - 1, MAX_COLS * width - 1,
@@ -1395,7 +1397,7 @@ TermWindow::_AddTab(const Arguments* args, const BString& currentDirectory)
 			// the terminal can be resized smaller than MIN_ROWS/MIN_COLS!
 
 		// If it's the first time we're called, setup the window
-		if (fTabView != NULL && fTabView->CountTabs() == 0) {
+		if (firstSession) {
 			float viewWidth, viewHeight;
 			containerView->GetPreferredSize(&viewWidth, &viewHeight);
 
@@ -1410,7 +1412,9 @@ TermWindow::_AddTab(const Arguments* args, const BString& currentDirectory)
 		fTabView->AddTab(scrollView, tab);
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
 		view->SetMouseClipboard(gMouseClipboard);
-		view->SyncClipboard();
+		// Only sync clipboard for the initial tab.
+		if (firstSession)
+			view->SyncClipboard();
 
 		const BCharacterSet* charset
 			= BCharacterSetRoster::FindCharacterSetByName(
