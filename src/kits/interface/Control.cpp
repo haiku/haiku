@@ -152,23 +152,6 @@ BControl::WindowActivated(bool active)
 void
 BControl::AttachedToWindow()
 {
-	AdoptParentColors();
-
-	if (ViewColor() == B_TRANSPARENT_COLOR
-		|| Parent() == NULL) {
-		AdoptSystemColors();
-	}
-
-	// Force view color as low color
-	if (Parent() != NULL) {
-		float tint = B_NO_TINT;
-		color_which which = ViewUIColor(&tint);
-		if (which != B_NO_COLOR)
-			SetLowUIColor(which, tint);
-		else
-			SetLowColor(ViewColor());
-	}
-
 	if (!Messenger().IsValid())
 		SetTarget(Window());
 
