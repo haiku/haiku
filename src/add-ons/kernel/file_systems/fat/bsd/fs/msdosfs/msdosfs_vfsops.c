@@ -83,11 +83,11 @@ _remount_ro(void* voidVolume)
 	struct msdosfsmount* fatVolume = VFSTOMSDOSFS(bsdVolume);
 
 	char mntpoint[B_PATH_NAME_LENGTH];
-	strncpy(mntpoint, bsdVolume->mnt_stat.f_mntonname, B_PATH_NAME_LENGTH - 1);
-	char device[B_PATH_NAME_LENGTH];
-	strncpy(device, fatVolume->pm_dev->si_device, B_PATH_NAME_LENGTH - 1);
+	strlcpy(mntpoint, bsdVolume->mnt_stat.f_mntonname, B_PATH_NAME_LENGTH);
+	char device[B_DEV_NAME_LENGTH];
+	strlcpy(device, fatVolume->pm_dev->si_device, B_DEV_NAME_LENGTH);
 	char fs_name[B_FILE_NAME_LENGTH];
-	strncpy(fs_name, bsdVolume->mnt_fsvolume->file_system_name, B_FILE_NAME_LENGTH - 1);
+	strlcpy(fs_name, bsdVolume->mnt_fsvolume->file_system_name, B_FILE_NAME_LENGTH);
 
 	status_t status = _kern_unmount(bsdVolume->mnt_stat.f_mntonname, B_FORCE_UNMOUNT);
 	if (status == B_OK)

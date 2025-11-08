@@ -3244,7 +3244,7 @@ bsd_device_init(mount* bsdVolume, const dev_t devID, const char* deviceFile, cde
 	device->si_refcount = 0;
 	device->si_mountpt = bsdVolume;
 	device->si_name[0] = '\0';
-	strncpy(device->si_device, deviceFile, B_PATH_NAME_LENGTH - 1);
+	strlcpy(device->si_device, deviceFile, B_DEV_NAME_LENGTH);
 	device->si_mediasize = 0;
 	device->si_id = devID;
 

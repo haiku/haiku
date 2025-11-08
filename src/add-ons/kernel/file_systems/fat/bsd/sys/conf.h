@@ -47,7 +47,7 @@ struct cdev {
 	char si_name[SPECNAMELEN + 1];
 
 	// Members added for Haiku port
-	char si_device[B_PATH_NAME_LENGTH + 1];
+	char si_device[B_DEV_NAME_LENGTH];
 	int si_fd;
 	off_t si_mediasize;
 	dev_t si_id;
