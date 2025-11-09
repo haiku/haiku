@@ -31,6 +31,7 @@
 
 #include "Controller.h"
 #include "ControllerObserver.h"
+#include "LocationStringView.h"
 #include "PlaylistItem.h"
 
 
@@ -208,7 +209,7 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	BStringView* locationLabel = _CreateLabel("locationLabel",
 		B_TRANSLATE("Location"));
 	locationLabel->SetHighUIColor(B_PANEL_TEXT_COLOR);
-	fLocationInfo = _CreateInfo("location");
+	fLocationInfo = _CreateInfoLocation("location");
 
 	fCopyrightSeparator = _CreateSeparator();
 	fCopyrightLabel = _CreateLabel("copyrightLabel", B_TRANSLATE("Copyright"));
@@ -371,6 +372,7 @@ InfoWin::_UpdateFile()
 			info = B_TRANSLATE("<unknown>");
 		fLocationInfo->SetText(info.String());
 		fLocationInfo->SetToolTip(info.String());
+		fLocationInfo->CheckAndSetStyleForLink();
 
 		if (fController->GetName(&info) != B_OK || info.IsEmpty())
 			info = B_TRANSLATE("<unnamed media>");
@@ -380,6 +382,7 @@ InfoWin::_UpdateFile()
 		fFilenameView->SetText(B_TRANSLATE("<no media>"));
 		fContainerInfo->SetText("-");
 		fLocationInfo->SetText("-");
+		fLocationInfo->CheckAndSetStyleForLink();
 	}
 
 	if (!iconSet)
@@ -591,6 +594,18 @@ BStringView*
 InfoWin::_CreateInfo(const char* name)
 {
 	BStringView* view = new BStringView(name, "");
+	view->SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
+	view->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	view->SetTruncation(B_TRUNCATE_SMART);
+
+	return view;
+}
+
+
+LocationStringView*
+InfoWin::_CreateInfoLocation(const char* name)
+{
+	LocationStringView* view = new LocationStringView(name, "");
 	view->SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
 	view->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	view->SetTruncation(B_TRUNCATE_SMART);

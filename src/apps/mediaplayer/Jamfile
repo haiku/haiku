@@ -28,6 +28,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Application [ MultiArchDefaultGristFiles MediaPlayer ] :
 			# interface
 			DurationView.cpp
+			LocationStringView.cpp
 			PeakView.cpp
 			PlayPauseButton.cpp
 			PositionToolTip.cpp

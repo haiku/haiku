@@ -18,6 +18,7 @@ class BTextView;
 class Controller;
 class ControllerObserver;
 class IconView;
+class LocationStringView;
 
 
 #define INFO_STATS		0x00000001
@@ -52,6 +53,7 @@ private:
 			BStringView*		_CreateLabel(const char* name,
 									const char* label);
 			BStringView*		_CreateInfo(const char* name);
+			LocationStringView*	_CreateInfoLocation(const char* name);
 			BLayoutItem*		_CreateSeparator();
 			void				_SetVisible(BView* view, bool visible);
 
@@ -74,7 +76,7 @@ private:
 			BStringView*		fAudioFormatInfo;
 			BStringView*		fAudioConfigInfo;
 			BStringView*		fDurationInfo;
-			BStringView*		fLocationInfo;
+			LocationStringView*	fLocationInfo;
 			BLayoutItem*		fCopyrightSeparator;
 			BStringView*		fCopyrightLabel;
 			BStringView*		fCopyrightInfo;
