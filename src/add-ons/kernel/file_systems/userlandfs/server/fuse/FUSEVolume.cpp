@@ -912,6 +912,8 @@ FUSEVolume::ReadFSInfo(fs_info* info)
 
 	memset(info, 0, sizeof(*info));
 	info->flags = B_FS_IS_PERSISTENT;	// assume the FS is persistent
+	if ((st.f_flag & ST_RDONLY) != 0)
+		info->flags |= B_FS_IS_READONLY;
 	info->block_size = st.f_bsize;
 	info->io_size = 64 * 1024;			// some value
 	info->total_blocks = st.f_blocks;
