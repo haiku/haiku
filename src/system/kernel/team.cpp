@@ -1913,6 +1913,44 @@ err1:
 }
 
 
+/*!	Kill all threads but the main thread
+*/
+static void
+team_kill_other_threads_locked(TeamLocker &teamLocker, thread_id threadNotBeKilled = -1)
+{
+	Team* team = teamLocker.Get();
+	team_death_entry deathEntry;
+	deathEntry.condition.Init(team, "team death");
+
+	while (true) {
+		team->death_entry = &deathEntry;
+		deathEntry.remaining_threads = 0;
+
+		for (Thread* thread = team->thread_list.First(); thread != NULL;
+				thread = team->thread_list.GetNext(thread)) {
+			if (thread != team->main_thread && thread->id != threadNotBeKilled) {
+				Signal signal(SIGKILLTHR, SI_USER, B_OK, team->id);
+				send_signal_to_thread(thread, signal, B_DO_NOT_RESCHEDULE);
+				deathEntry.remaining_threads++;
+			}
+		}
+
+		if (deathEntry.remaining_threads == 0)
+			break;
+
+		// there are threads to wait for
+		ConditionVariableEntry entry;
+		deathEntry.condition.Add(&entry);
+
+		teamLocker.Unlock();
+		entry.Wait();
+		teamLocker.Lock();
+	}
+
+	team->death_entry = NULL;
+}
+
+
 /*!	Almost shuts down the current team and loads a new image into it.
 	If successful, this function does not return and will takeover ownership of
 	the arguments provided.
@@ -1942,8 +1980,7 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 		return B_NOT_ALLOWED;
 
 	// we currently need to be single threaded here
-	// TODO: maybe we should just kill all other threads and
-	//	make the current thread the team's main thread?
+	// TODO: make the current thread the team's main thread?
 	Thread* currentThread = thread_get_current_thread();
 	if (currentThread != team->main_thread)
 		return B_NOT_ALLOWED;
@@ -1959,11 +1996,7 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 
 	debugInfoLocker.Unlock();
 
-	for (Thread* thread = team->thread_list.First(); thread != NULL;
-			thread = team->thread_list.GetNext(thread)) {
-		if (thread != team->main_thread && thread->id != nubThreadID)
-			return B_NOT_ALLOWED;
-	}
+	team_kill_other_threads_locked(teamLocker, nubThreadID);
 
 	team->DeleteUserTimers(true);
 	team->ResetSignalsOnExec();
@@ -3222,36 +3255,7 @@ team_shutdown_team(Team* team)
 
 	timeLocker.Unlock();
 
-	// kill all threads but the main thread
-	team_death_entry deathEntry;
-	deathEntry.condition.Init(team, "team death");
-
-	while (true) {
-		team->death_entry = &deathEntry;
-		deathEntry.remaining_threads = 0;
-
-		for (Thread* thread = team->thread_list.First(); thread != NULL;
-				thread = team->thread_list.GetNext(thread)) {
-			if (thread != team->main_thread) {
-				Signal signal(SIGKILLTHR, SI_USER, B_OK, team->id);
-				send_signal_to_thread(thread, signal, B_DO_NOT_RESCHEDULE);
-				deathEntry.remaining_threads++;
-			}
-		}
-
-		if (deathEntry.remaining_threads == 0)
-			break;
-
-		// there are threads to wait for
-		ConditionVariableEntry entry;
-		deathEntry.condition.Add(&entry);
-
-		teamLocker.Unlock();
-		entry.Wait();
-		teamLocker.Lock();
-	}
-
-	team->death_entry = NULL;
+	team_kill_other_threads_locked(teamLocker);
 
 	return debuggerPort;
 }
