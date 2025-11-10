@@ -2268,6 +2268,7 @@ fork_team(void)
 			parentThread->name, parentThread->priority, NULL, team->id, thread);
 		threadCreationAttributes.forkArgs = forkArgs;
 		threadCreationAttributes.flags |= THREAD_CREATION_FLAG_DEFER_SIGNALS;
+		threadCreationAttributes.signal_mask = thread->sig_block_mask;
 		threadID = thread_create_thread(threadCreationAttributes, false);
 		if (threadID < 0) {
 			status = threadID;
