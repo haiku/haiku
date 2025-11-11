@@ -50,6 +50,8 @@ SEARCH_SOURCE += [ FDirName $(posixSources) musl string ] ;
 
 local muslSources =
 	ffs.c
+	ffsl.c
+	ffsll.c
 	rand.c
 	rand_r.c
 	;

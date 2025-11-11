@@ -14,7 +14,9 @@
 extern "C" {
 #endif
 
-static __inline__ int ffs(int i) { return __builtin_ffs(i); }
+extern int		ffs(int i);
+extern int		ffsl(long i);
+extern int		ffsll(long long i);
 
 extern int		strcasecmp(const char *string1, const char *string2);
 extern int		strncasecmp(const char *string1, const char *string2,

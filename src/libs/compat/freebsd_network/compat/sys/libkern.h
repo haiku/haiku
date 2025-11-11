@@ -29,18 +29,6 @@ extern int abs(int a);
 
 
 static __inline __pure2 int
-ffsl(long mask)
-{
-	return (__builtin_ffsl((u_long)mask));
-}
-
-static __inline __pure2 int
-ffsll(long long mask)
-{
-	return (__builtin_ffsll((unsigned long long)mask));
-}
-
-static __inline __pure2 int
 fls(int mask)
 {
 	return (mask == 0 ? 0 :
