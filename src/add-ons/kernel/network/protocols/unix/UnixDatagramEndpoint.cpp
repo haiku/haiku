@@ -327,7 +327,7 @@ UnixDatagramEndpoint::Receive(const iovec* vecs, size_t vecCount,
 	TRACE("[%" B_PRId32 "] %p->UnixDatagramEndpoint::Receive()\n",
 		find_thread(NULL), this);
 
-	if ((flags & ~(MSG_DONTWAIT)) != 0)
+	if ((flags & ~(MSG_DONTWAIT | MSG_PEEK)) != 0)
 		return EOPNOTSUPP;
 
 	bigtime_t timeout = 0;
@@ -370,7 +370,8 @@ UnixDatagramEndpoint::Receive(const iovec* vecs, size_t vecCount,
 
 	struct sockaddr_storage addressStorage;
 
-	ssize_t result = fifo->Read(vecs, vecCount, _ancillaryData, &addressStorage, timeout);
+	ssize_t result = fifo->Read(vecs, vecCount, _ancillaryData, &addressStorage, timeout,
+		(flags & MSG_PEEK) != 0);
 
 	// Notify select()ing writers, if we successfully read anything.
 	size_t writable = fifo->Writable();

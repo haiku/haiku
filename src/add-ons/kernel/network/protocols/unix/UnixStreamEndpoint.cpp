@@ -483,7 +483,7 @@ UnixStreamEndpoint::Receive(const iovec* vecs, size_t vecCount,
 		find_thread(NULL), this, vecs, vecCount);
 
 	// TODO: handle MSG_WAITALL
-	if ((flags & ~(MSG_DONTWAIT | MSG_WAITALL)) != 0)
+	if ((flags & ~(MSG_DONTWAIT | MSG_PEEK | MSG_WAITALL)) != 0)
 		return EOPNOTSUPP;
 
 	bigtime_t timeout = 0;
@@ -521,7 +521,8 @@ UnixStreamEndpoint::Receive(const iovec* vecs, size_t vecCount,
 	// unlock endpoint
 	locker.Unlock();
 
-	ssize_t result = fifo->Read(vecs, vecCount, _ancillaryData, NULL, timeout);
+	ssize_t result = fifo->Read(vecs, vecCount, _ancillaryData, NULL, timeout,
+		(flags & MSG_PEEK) != 0);
 
 	// Notify select()ing writers, if we successfully read anything.
 	size_t writable = fifo->Writable();

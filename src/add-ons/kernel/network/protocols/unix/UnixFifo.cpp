@@ -25,7 +25,7 @@
 
 UnixRequest::UnixRequest(const iovec* vecs, size_t count,
 		ancillary_data_container* ancillaryData,
-		struct sockaddr_storage* address)
+		struct sockaddr_storage* address, bool clone)
 	:
 	fVecs(vecs),
 	fVecCount(count),
@@ -34,7 +34,8 @@ UnixRequest::UnixRequest(const iovec* vecs, size_t count,
 	fBytesTransferred(0),
 	fVecIndex(0),
 	fVecOffset(0),
-	fAddress(address)
+	fAddress(address),
+	fClone(clone)
 {
 	for (size_t i = 0; i < fVecCount; i++)
 		fTotalSize += fVecs[i].iov_len;
@@ -94,6 +95,19 @@ UnixRequest::AddAncillaryData(ancillary_data_container* data)
 }
 
 
+status_t
+UnixRequest::CloneAncillaryData(ancillary_data_container* data)
+{
+	if (fAncillaryData == NULL) {
+		fAncillaryData = gStackModule->create_ancillary_data_container();
+		if (fAncillaryData == NULL)
+			return B_NO_MEMORY;
+	}
+
+	return gStackModule->clone_ancillary_data(data, fAncillaryData);
+}
+
+
 // #pragma mark - UnixBufferQueue
 
 
@@ -147,6 +161,7 @@ UnixBufferQueue::Read(UnixRequest& request)
 	bool user = gStackModule->is_syscall();
 
 	size_t readable = Readable();
+	const bool clone = request.IsClone();
 	void* data;
 	size_t size;
 
@@ -168,19 +183,31 @@ UnixBufferQueue::Read(UnixRequest& request)
 			size = readable;
 
 		ssize_t bytesRead;
-		if (user)
-			bytesRead = ring_buffer_user_read(fBuffer, (uint8*)data, size);
-		else
-			bytesRead = ring_buffer_read(fBuffer, (uint8*)data, size);
-
+		if (user) {
+			if (clone) {
+				bytesRead = ring_buffer_user_peek(fBuffer, request.BytesTransferred(),
+					(uint8*)data, size);
+			} else {
+				bytesRead = ring_buffer_user_read(fBuffer, (uint8*)data, size);
+			}
+		} else {
+			if (clone) {
+				bytesRead = ring_buffer_peek(fBuffer, request.BytesTransferred(),
+					(uint8*)data, size);
+			} else {
+				bytesRead = ring_buffer_read(fBuffer, (uint8*)data, size);
+			}
+		}
 		if (bytesRead < 0)
 			return bytesRead;
 		if (bytesRead == 0)
 			return B_ERROR;
 
-		// Adjust ancillary data entry offsets, respectively attach the ones
-		// that belong to the read data to the request.
-		if (AncillaryDataEntry* entry = fAncillaryData.Head()) {
+		if (clone) {
+			// Clone ancillary data afterwards
+		} else if (AncillaryDataEntry* entry = fAncillaryData.Head()) {
+			// Adjust ancillary data entry offsets, respectively attach the ones
+			// that belong to the read data to the request.
 			size_t offsetDelta = bytesRead;
 			while (entry != NULL && offsetDelta > entry->offset) {
 				// entry data have been read -- add ancillary data to request
@@ -200,7 +227,7 @@ UnixBufferQueue::Read(UnixRequest& request)
 		readable -= bytesRead;
 	}
 
-	if (fType == UnixFifoType::Datagram) {
+	if (!clone && fType == UnixFifoType::Datagram) {
 		fDatagrams.RemoveHead();
 
 		if (request.Address() != NULL)
@@ -227,6 +254,18 @@ UnixBufferQueue::Read(UnixRequest& request)
 			request.AddBytesTransferred(readable);
 		}
 	}
+
+	if (clone) {
+		AncillaryDataEntry* entry = fAncillaryData.Head();
+		size_t offsetDelta = request.BytesTransferred();
+		while (entry != NULL && offsetDelta > entry->offset) {
+			request.CloneAncillaryData(entry->data);
+			entry = fAncillaryData.GetNext(entry);
+		}
+		if (fType == UnixFifoType::Datagram && request.Address() != NULL)
+			memcpy(request.Address(), &datagramEntry->address, sizeof(datagramEntry->address));
+	}
+
 
 	return B_OK;
 }
@@ -389,15 +428,15 @@ UnixFifo::Shutdown(uint32 shutdown)
 ssize_t
 UnixFifo::Read(const iovec* vecs, size_t vecCount,
 	ancillary_data_container** _ancillaryData,
-	struct sockaddr_storage* address, bigtime_t timeout)
+	struct sockaddr_storage* address, bigtime_t timeout, bool peek)
 {
-	TRACE("[%" B_PRId32 "] %p->UnixFifo::Read(%p, %ld, %" B_PRIdBIGTIME ")\n",
-		find_thread(NULL), this, vecs, vecCount, timeout);
+	TRACE("[%" B_PRId32 "] %p->UnixFifo::Read(%p, %ld, %" B_PRIdBIGTIME ") %d\n",
+		find_thread(NULL), this, vecs, vecCount, timeout, peek);
 
 	if (IsReadShutdown() && fBuffer.Readable() == 0)
 		RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
 
-	UnixRequest request(vecs, vecCount, NULL, address);
+	UnixRequest request(vecs, vecCount, NULL, address, peek);
 	fReaders.Add(&request);
 	fReadRequested += request.TotalSize();
 

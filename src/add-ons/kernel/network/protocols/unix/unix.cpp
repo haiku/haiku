@@ -60,6 +60,21 @@ destroy_scm_rights_descriptors(const ancillary_data_header* header,
 }
 
 
+void
+clone_scm_rights_descriptors(const ancillary_data_header* header, void* data)
+{
+	int count = header->len / sizeof(file_descriptor*);
+	file_descriptor** descriptors = (file_descriptor**)data;
+
+	for (int i = 0; i < count; i++) {
+		if (descriptors[i] != NULL) {
+			inc_fd_ref_count(descriptors[i]);
+			inc_fd_open_count(descriptors[i]);
+		}
+	}
+}
+
+
 // #pragma mark -
 
 
@@ -334,7 +349,7 @@ unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 			"container\n", find_thread(NULL), count);
 
 		error = gStackModule->add_ancillary_data(container, &header,
-			descriptors, destroy_scm_rights_descriptors, NULL, NULL);
+			descriptors, destroy_scm_rights_descriptors, clone_scm_rights_descriptors, NULL);
 	}
 
 	// cleanup on error

@@ -37,7 +37,7 @@ class UnixRequest : public DoublyLinkedListLinkImpl<UnixRequest> {
 public:
 	UnixRequest(const iovec* vecs, size_t count,
 			ancillary_data_container* ancillaryData,
-			struct sockaddr_storage* address);
+			struct sockaddr_storage* address, bool clone = false);
 
 	off_t TotalSize() const			{ return fTotalSize; }
 	off_t BytesTransferred() const	{ return fBytesTransferred; }
@@ -48,9 +48,11 @@ public:
 
 	ancillary_data_container* AncillaryData() const	 { return fAncillaryData; }
 	void AddAncillaryData(ancillary_data_container* data);
+	status_t CloneAncillaryData(ancillary_data_container* data);
 	void UnsetAncillaryData();
 
 	struct sockaddr_storage* Address() const	{ return fAddress; }
+	bool IsClone() const			{ return fClone; }
 
 private:
 	const iovec*					fVecs;
@@ -61,6 +63,7 @@ private:
 	size_t							fVecIndex;
 	size_t							fVecOffset;
 	struct sockaddr_storage*		fAddress;
+	bool							fClone;
 };
 
 
@@ -134,7 +137,7 @@ public:
 
 	ssize_t Read(const iovec* vecs, size_t vecCount,
 		ancillary_data_container** _ancillaryData,
-		struct sockaddr_storage* address, bigtime_t timeout);
+		struct sockaddr_storage* address, bigtime_t timeout, bool peek);
 	ssize_t Write(const iovec* vecs, size_t vecCount,
 		ancillary_data_container* ancillaryData,
 		const struct sockaddr_storage* address, bigtime_t timeout);
