@@ -22,6 +22,7 @@
 #include <vm/vm.h>
 
 #include "IORequest.h"
+#include "IOScheduler.h"
 
 extern "C" {
 #include <libnvme/nvme.h>
@@ -76,6 +77,29 @@ static const uint8 kDriveIcon[] = {
 
 static device_manager_info* sDeviceManager;
 
+
+struct NVMeRequestOwner : IORequestOwner {
+	IORequestList requests_queue;
+	NVMeRequestOwner* hash_link;
+
+	void Dump() const {}
+};
+
+struct RequestOwnerHashDefinition {
+	typedef thread_id KeyType;
+	typedef NVMeRequestOwner ValueType;
+
+	size_t HashKey(thread_id key) const			{ return key; }
+	size_t Hash(const ValueType* value) const	{ return value->thread; }
+	bool Compare(thread_id key, const ValueType* value) const
+		{ return value->thread == key; }
+	ValueType*& GetLink(ValueType* value) const
+		{ return value->hash_link; }
+};
+
+typedef BOpenHashTable<RequestOwnerHashDefinition, false> RequestOwnerHashTable;
+
+
 typedef struct {
 	device_node*			node;
 	pci_info				info;
@@ -90,6 +114,9 @@ typedef struct {
 
 	DMAResource				dma_resource;
 	sem_id					dma_buffers_sem;
+
+	RequestOwnerHashTable	request_owners;
+	mutex					request_owners_lock;
 
 	rw_lock					rounded_write_lock;
 
@@ -392,6 +419,11 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		return info->dma_buffers_sem;
 	}
 
+	if (info->request_owners.Init(buffers) != B_OK)
+		return B_ERROR;
+
+	mutex_init(&info->request_owners_lock, "nvme request owners");
+
 	// set up rounded-write lock
 	rw_lock_init(&info->rounded_write_lock, "nvme rounded writes");
 
@@ -690,11 +722,9 @@ nvme_disk_bounced_io(nvme_disk_handle* handle, io_request* request)
 
 
 static status_t
-nvme_disk_io(void* cookie, io_request* request)
+do_io(nvme_disk_handle* handle, io_request* request)
 {
 	CALLED();
-
-	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
 
 	const off_t ns_end = (handle->info->capacity * handle->info->block_size);
 	if ((request->Offset() + (off_t)request->Length()) > ns_end)
@@ -857,6 +887,45 @@ nvme_disk_io(void* cookie, io_request* request)
 		(nvme_request.lba_start * block_size) - rounded_pos);
 	request->SetStatusAndNotify(status);
 	return status;
+}
+
+
+static status_t
+nvme_disk_io(void* cookie, io_request* request)
+{
+	CALLED();
+	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
+
+	MutexLocker requestOwnersLocker(handle->info->request_owners_lock);
+
+	// Use a RequestOwner per-thread to avoid recursion due to
+	// requests being queued inside other requests' notify callbacks.
+	NVMeRequestOwner* existingOwner = handle->info->request_owners.Lookup(
+		thread_get_current_thread_id());
+	if (existingOwner != NULL) {
+		existingOwner->requests_queue.Add(request);
+		return B_OK;
+	}
+
+	NVMeRequestOwner owner;
+	owner.team = thread_get_current_thread()->team->id;
+	owner.thread = thread_get_current_thread_id();
+	owner.priority = thread_get_io_priority(owner.thread);
+	handle->info->request_owners.InsertUnchecked(&owner);
+	requestOwnersLocker.Unlock();
+
+	owner.requests_queue.Add(request);
+
+	while (!owner.requests_queue.IsEmpty()) {
+		request = owner.requests_queue.RemoveHead();
+		status_t status = do_io(handle, request);
+		if (status != B_OK && !request->IsFinished())
+			request->SetStatusAndNotify(status);
+	}
+
+	requestOwnersLocker.Lock();
+	handle->info->request_owners.Remove(&owner);
+	return B_OK;
 }
 
 
