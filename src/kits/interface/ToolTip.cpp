@@ -8,6 +8,7 @@
 
 #include <new>
 
+#include <ControlLook.h>
 #include <Message.h>
 #include <TextView.h>
 #include <ToolTipManager.h>
@@ -139,8 +140,10 @@ BToolTip::Unlock()
 void
 BToolTip::_InitData()
 {
+	float spacing = be_control_look->ComposeSpacing(B_USE_BIG_SPACING);
+
 	fIsSticky = false;
-	fRelativeLocation = BPoint(20, 20);
+	fRelativeLocation = BPoint(spacing, spacing);
 	fAlignment = BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM);
 }
 
