@@ -120,6 +120,47 @@ write_to_buffer(struct ring_buffer *buffer, const uint8 *data, ssize_t length,
 }
 
 
+static ssize_t
+buffer_peek(struct ring_buffer* buffer, size_t offset, void* data,
+	ssize_t length, bool user)
+{
+	size_t available = buffer->in;
+
+	if (offset >= available || length == 0)
+		return 0;
+
+	if (offset + length > available)
+		length = available - offset;
+
+	if ((offset += buffer->first) >= (size_t)buffer->size)
+		offset -= buffer->size;
+
+	if (offset + length <= (size_t)buffer->size) {
+		// simple copy
+		if (user) {
+			if (user_memcpy(data, buffer->buffer + offset, length) < B_OK)
+				return B_BAD_ADDRESS;
+		} else
+			memcpy(data, buffer->buffer + offset, length);
+	} else {
+		// need to copy both ends
+		size_t upper = buffer->size - offset;
+		size_t lower = length - upper;
+
+		if (user) {
+			if (user_memcpy(data, buffer->buffer + offset, upper) < B_OK
+				|| user_memcpy((uint8*)data + upper, buffer->buffer, lower) < B_OK)
+				return B_BAD_ADDRESS;
+		} else {
+			memcpy(data, buffer->buffer + offset, upper);
+			memcpy((uint8*)data + upper, buffer->buffer, lower);
+		}
+	}
+
+	return length;
+}
+
+
 //	#pragma mark -
 
 
@@ -241,30 +282,15 @@ size_t
 ring_buffer_peek(struct ring_buffer* buffer, size_t offset, void* data,
 	size_t length)
 {
-	size_t available = buffer->in;
+	return buffer_peek(buffer, offset, data, length, false);
+}
 
-	if (offset >= available || length == 0)
-		return 0;
 
-	if (offset + length > available)
-		length = available - offset;
-
-	if ((offset += buffer->first) >= (size_t)buffer->size)
-		offset -= buffer->size;
-
-	if (offset + length <= (size_t)buffer->size) {
-		// simple copy
-		memcpy(data, buffer->buffer + offset, length);
-	} else {
-		// need to copy both ends
-		size_t upper = buffer->size - offset;
-		size_t lower = length - upper;
-
-		memcpy(data, buffer->buffer + offset, upper);
-		memcpy((uint8*)data + upper, buffer->buffer, lower);
-	}
-
-	return length;
+ssize_t
+ring_buffer_user_peek(struct ring_buffer* buffer, size_t offset, void* data,
+	ssize_t length)
+{
+	return buffer_peek(buffer, offset, data, length, true);
 }
 
 
