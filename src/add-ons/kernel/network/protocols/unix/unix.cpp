@@ -334,7 +334,7 @@ unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 			"container\n", find_thread(NULL), count);
 
 		error = gStackModule->add_ancillary_data(container, &header,
-			descriptors, destroy_scm_rights_descriptors, NULL);
+			descriptors, destroy_scm_rights_descriptors, NULL, NULL);
 	}
 
 	// cleanup on error

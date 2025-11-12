@@ -29,6 +29,7 @@ struct ancillary_data : DoublyLinkedListLinkImpl<ancillary_data> {
 
 	ancillary_data_header	header;
 	void (*destructor)(const ancillary_data_header*, void*);
+	void (*clone)(const ancillary_data_header*, void*);
 };
 
 typedef DoublyLinkedList<ancillary_data> ancillary_data_list;
@@ -69,6 +70,8 @@ delete_ancillary_data_container(ancillary_data_container* container)
 	\param data If not \c NULL, the data are copied into the allocated storage.
 	\param destructor If not \c NULL, this function will be invoked with the
 		data as parameter when the container is destroyed.
+	\param clone If not \c NULL, this function will be invoked with the
+		data as parameter when the container is cloned.
 	\param _allocatedData Will be set to the storage allocated for the data.
 	\return \c B_OK when everything goes well, another error code otherwise.
 */
@@ -76,6 +79,7 @@ status_t
 add_ancillary_data(ancillary_data_container* container,
 	const ancillary_data_header* header, const void* data,
 	void (*destructor)(const ancillary_data_header*, void*),
+	void (*clone)(const ancillary_data_header*, void*),
 	void** _allocatedData)
 {
 	// check parameters
@@ -94,6 +98,7 @@ add_ancillary_data(ancillary_data_container* container,
 	ancillary_data *ancillaryData = new(dataBuffer) ancillary_data;
 	ancillaryData->header = *header;
 	ancillaryData->destructor = destructor;
+	ancillaryData->clone = clone;
 
 	container->data_list.Add(ancillaryData);
 
@@ -202,4 +207,44 @@ next_ancillary_data(const ancillary_data_container* container, void* previousDat
 		*_header = ancillaryData->header;
 
 	return ancillaryData->Data();
+}
+
+
+/*!
+	Clones all ancillary data from container \c from to the end of the list of
+	ancillary data of container \c to.
+
+	\param from The container from which to clone the ancillary data.
+	\param to The container to which to add the ancillary data.
+	\return \c B_OK when everything goes well, another error code otherwise.
+*/
+status_t
+clone_ancillary_data(const ancillary_data_container* from,
+	ancillary_data_container* to)
+{
+	ancillary_data *ancillaryData = from->data_list.Head();
+
+	while (ancillaryData != NULL) {
+		// allocate buffer
+		void *dataBuffer = malloc(_ALIGN(sizeof(ancillary_data)) + ancillaryData->header.len);
+		if (dataBuffer == NULL)
+			return B_NO_MEMORY;
+
+		// init and attach the structure
+		ancillary_data *clone = new(dataBuffer) ancillary_data;
+		clone->header = ancillaryData->header;
+		if (ancillaryData->clone != NULL)
+			ancillaryData->clone(&ancillaryData->header, ancillaryData->Data());
+		clone->destructor = ancillaryData->destructor;
+		clone->clone = ancillaryData->clone;
+
+		to->data_list.Add(clone);
+
+		if (ancillaryData->Data() != NULL)
+			memcpy(clone->Data(), ancillaryData->Data(), ancillaryData->header.len);
+
+		ancillaryData = from->data_list.GetNext(ancillaryData);
+	}
+
+	return B_OK;
 }

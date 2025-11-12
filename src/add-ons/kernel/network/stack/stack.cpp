@@ -989,7 +989,8 @@ net_stack_module_info gNetStackModule = {
 	add_ancillary_data,
 	remove_ancillary_data,
 	move_ancillary_data,
-	next_ancillary_data
+	next_ancillary_data,
+	clone_ancillary_data
 };
 
 module_info* modules[] = {

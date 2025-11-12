@@ -175,6 +175,7 @@ struct net_stack_module_info {
 	status_t	(*add_ancillary_data)(ancillary_data_container* container,
 					const ancillary_data_header* header, const void* data,
 					void (*destructor)(const ancillary_data_header*, void*),
+					void (*clone)(const ancillary_data_header*, void*),
 					void** _allocatedData);
 	status_t	(*remove_ancillary_data)(ancillary_data_container* container,
 					void* data, bool destroy);
@@ -182,6 +183,8 @@ struct net_stack_module_info {
 					ancillary_data_container* to);
 	void*		(*next_ancillary_data)(const ancillary_data_container* container,
 					void* previousData, ancillary_data_header* _header);
+	status_t	(*clone_ancillary_data)(const ancillary_data_container* from,
+					ancillary_data_container* to);
 };
 
 
