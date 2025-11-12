@@ -1026,7 +1026,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		}
 
 		// If the cache had other users before, it may have the wrong base.
-		error = cache->Rebase(area->cache_offset, resizePriority);
+		// (Let Resize() change commitment, so we don't try to increase
+		// it in this step if we've taken some from this cache already.)
+		error = cache->Rebase(area->cache_offset, -1);
 		ASSERT_ALWAYS(error == B_OK);
 
 		error = cache->Resize(cache->virtual_base + firstNewSize, resizePriority);
