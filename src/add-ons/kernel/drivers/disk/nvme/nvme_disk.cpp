@@ -15,6 +15,7 @@
 #include <AutoDeleter.h>
 #include <kernel.h>
 #include <smp.h>
+#include <thread.h>
 #include <util/AutoLock.h>
 
 #include <fs/devfs.h>
