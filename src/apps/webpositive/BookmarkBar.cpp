@@ -274,26 +274,26 @@ BookmarkBar::MessageReceived(BMessage* message)
 					break;
 
 				BEntry entry(&ref);
-				BEntry parent;
-				entry.GetParent(&parent);
-				entry_ref folderRef;
-				parent.GetRef(&folderRef);
-				BMessenger msgr(kTrackerSignature);
-				// Open parent folder in Tracker
-				BMessage refMsg(B_REFS_RECEIVED);
-				refMsg.AddRef("refs", &folderRef);
-				msgr.SendMessage(&refMsg);
-
-				// Select file
-				BMessage selectMessage(kSelect);
-				entry_ref target;
-				if (entry.GetRef(&target) != B_OK)
+				if (!entry.Exists())
 					break;
 
-				selectMessage.AddRef("refs", &target);
-				// wait 0.3 sec to give Tracker time to populate
-				BMessageRunner::StartSending(BMessenger(kTrackerSignature),
-					&selectMessage, 300000, 1);
+				node_ref node;
+				entry.GetNodeRef(&node);
+
+				BEntry parent;
+				entry.GetParent(&parent);
+				entry_ref parentRef;
+				parent.GetRef(&parentRef);
+
+				// Ask Tracker to open the containing folder and select the
+				// file inside it.
+				BMessenger trackerMessenger("application/x-vnd.Be-TRAK");
+				if (trackerMessenger.IsValid()) {
+					BMessage message(B_REFS_RECEIVED);
+					message.AddRef("refs", &parentRef);
+					message.AddData("nodeRefToSelect", B_RAW_TYPE, &node, sizeof(node_ref));
+					trackerMessenger.SendMessage(&message);
+				}
 			}
 			break;
 		}
