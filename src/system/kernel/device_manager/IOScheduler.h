@@ -14,21 +14,12 @@
 #include "IORequest.h"
 
 
-struct IORequestOwner : DoublyLinkedListLinkImpl<IORequestOwner> {
+struct IORequestOwner {
 	team_id			team;
 	thread_id		thread;
-	int32			priority;
-	IORequestList	requests;
-	IORequestList	completed_requests;
-	IOOperationList	operations;
-	IORequestOwner*	hash_link;
+	thread_id		priority;
 
-			bool				IsActive() const
-									{ return !requests.IsEmpty()
-										|| !completed_requests.IsEmpty()
-										|| !operations.IsEmpty(); }
-
-			void				Dump() const;
+	virtual void	Dump() const = 0;
 };
 
 
