@@ -388,8 +388,11 @@ CliContext::WaitForThreadOrUser()
 
 	AutoLocker<BLocker> locker(fLock);
 
-	while (fStoppedThread == NULL)
+	while (fStoppedThread == NULL) {
 		_WaitForEvent(MSG_THREAD_STATE_CHANGED);
+		if (fTerminating)
+			break;
+	}
 
 	if (fCurrentThread == NULL)
 		SetCurrentThread(fStoppedThread);
@@ -397,7 +400,8 @@ CliContext::WaitForThreadOrUser()
 
 
 void
-CliContext::WaitForEvent(uint32 event) {
+CliContext::WaitForEvent(uint32 event)
+{
 	AutoLocker<BLocker> locker(fLock);
 	_WaitForEvent(event);
 }
