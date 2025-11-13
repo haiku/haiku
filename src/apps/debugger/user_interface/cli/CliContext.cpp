@@ -265,8 +265,8 @@ CliContext::SetCurrentThread(::Thread* thread)
 void
 CliContext::PrintCurrentThread()
 {
-	AutoLocker< ::Team> teamLocker(fTeam);
 	AutoLocker<BLocker> locker(fLock);
+	AutoLocker< ::Team> teamLocker(fTeam);
 
 	if (fCurrentThread != NULL) {
 		printf("current thread: %" B_PRId32 " \"%s\"\n", fCurrentThread->ID(),
