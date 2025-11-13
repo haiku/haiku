@@ -272,6 +272,13 @@ inc_fd_ref_count(struct file_descriptor* descriptor)
 }
 
 
+void
+inc_fd_open_count(struct file_descriptor* descriptor)
+{
+	atomic_add(&descriptor->open_count, 1);
+}
+
+
 static struct file_descriptor*
 get_fd_locked(const struct io_context* context, int fd)
 {
