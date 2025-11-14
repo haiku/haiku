@@ -619,7 +619,7 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 				|| fSettings.scroll_bottomrange > 0.999999) {
 		isSideScrollingH = true;
 	}
-	if (two_or_more_fingers(event)
+	if (two_fingers(event)
 		&& fSettings.scroll_twofinger) {
 		// two finger scrolling is enabled
 		isSideScrollingV = true;
