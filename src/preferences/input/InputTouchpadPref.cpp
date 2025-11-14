@@ -5,6 +5,7 @@
  * Authors:
  *		Preetpal Kaur <preetpalok123@gmail.com>
  *		Pawan Yerramilli <me@pawanyerramilli.com>
+ *		Samuel Rodríguez Pérez <samuelrp84@gmail.com>
  */
 
 

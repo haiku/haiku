@@ -5,6 +5,7 @@
  * Authors:
  *		Preetpal Kaur <preetpalok123@gmail.com>
  *		Pawan Yerramilli <me@pawanyerramilli.com>
+ *		Samuel Rodríguez Pérez <samuelrp84@gmail.com>
  */
 
 
@@ -470,9 +471,9 @@ TouchpadPrefView::SetupView()
 	scrollPrefLayout->AddView(scrollPrefRightLayout);
 
 	fTapSlider = new BSlider("tap_sens", B_TRANSLATE("Tapping sensitivity"),
-		new BMessage(TAP_CONTROL_CHANGED), 0, spacing * 2, B_HORIZONTAL);
+		new BMessage(TAP_CONTROL_CHANGED), 0, 50, B_HORIZONTAL);
 	fTapSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fTapSlider->SetHashMarkCount(7);
+	fTapSlider->SetHashMarkCount(11);
 	fTapSlider->SetLimitLabels(B_TRANSLATE("Off"), B_TRANSLATE("High"));
 
 	fSpeedSlider = new BSlider("pad_speed", B_TRANSLATE("Trackpad speed"),

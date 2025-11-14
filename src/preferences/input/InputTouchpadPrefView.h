@@ -1,9 +1,10 @@
 /*
- * Copyright 2019, Haiku, Inc.
+ * Copyright 2019-2025, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * Author:
+ * Authors:
  *		Preetpal Kaur <preetpalok123@gmail.com>
+ *		Samuel Rodríguez Pérez <samuelrp84@gmail.com>
  */
 
 
