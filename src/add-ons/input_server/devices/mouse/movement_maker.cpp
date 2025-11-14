@@ -603,9 +603,8 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 	bool isSideScrollingV = false;
 	bool isSideScrollingH = false;
 
-	// if a button is pressed don't allow to scroll, we likely be in a drag
-	// action
-	if (fButtonsState != 0)
+	// if a button is pressed don't allow to scroll
+	if (event->buttons != 0)
 		return false;
 
 	if ((fSpecs.areaEndX - fAreaWidth * fSettings.scroll_rightrange
