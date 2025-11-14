@@ -71,9 +71,13 @@ static touchpad_specs gHardwareSpecs;
 
 
 static status_t
+elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
+	uint8 packet[PS2_PACKET_ELANTECH]);
+
+
+static status_t
 get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtime_t timeout)
 {
-	touchpad_movement event;
 	uint8 packet[PS2_PACKET_ELANTECH];
 
 	status_t status = acquire_sem_etc(cookie->sem, 1, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
@@ -91,6 +95,16 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 		TRACE("ELANTECH: error copying buffer\n");
 		return B_ERROR;
 	}
+
+	return elantech_process_packet_v4(cookie, _event, packet);
+}
+
+
+static status_t
+elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
+	uint8 packet[PS2_PACKET_ELANTECH])
+{
+	touchpad_movement event;
 
 	if (cookie->crcEnabled && (packet[3] & 0x08) != 0) {
 		TRACE("ELANTECH: bad crc buffer\n");
@@ -155,7 +169,7 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 	event.fingerWidth = cookie->fingers == 1 ? 4 :0;
 
 	*_event = event;
-	return status;
+	return B_OK;
 }
 
 
