@@ -439,14 +439,14 @@ MouseDevice::_ControlThread()
 			status_t status = ioctl(fDevice, MS_READ_TOUCHPAD, &read, sizeof(read));
 			if (status < 0)
 				status = errno;
-			if (status != B_OK && status != B_INTERRUPTED && status != B_TIMED_OUT) {
+			if (status == B_TIMED_OUT || status == B_BAD_DATA) {
+				read.event = MS_READ_TOUCHPAD;
+				read.u.touchpad = lastTouchpadMovement;
+			} else if (status != B_OK && status != B_INTERRUPTED) {
 				LOG_ERR("Mouse (touchpad) device exiting, %s\n", strerror(errno));
 				_ControlThreadCleanup();
 				// TOAST!
 				return;
-			} else if (status == B_TIMED_OUT) {
-				read.event = MS_READ_TOUCHPAD;
-				read.u.touchpad = lastTouchpadMovement;
 			}
 
 			if (read.event == MS_READ_TOUCHPAD) {
