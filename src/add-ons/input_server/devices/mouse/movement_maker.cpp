@@ -19,17 +19,32 @@
 
 #include "movement_maker.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
 
 //#define TRACE_MOVEMENT_MAKER
+
 #ifdef TRACE_MOVEMENT_MAKER
-	#define TRACE(x...) debug_printf(x)
-	#define CALLED(x...) TRACE("CALLED %s", __PRETTY_FUNCTION__)
+#	include <String.h>
+#	include <headers/private/shared/FunctionTracer.h>
+
+	static int32 sFunctionDepth = -1;
+#	define CALLED(x...)	FunctionTracer _ft(debug_printf, this, __PRETTY_FUNCTION__, sFunctionDepth)
+#	define TRACE(x...)	do { BString _to; \
+							_to.Append(' ', (sFunctionDepth + 1) * 2); \
+							char _extra[1024]; \
+							sprintf(_extra, x); \
+							debug_printf("%p -> %s%s", this, _to.String(), _extra); \
+						} while (0)
+#	define LOG_EVENT(text...) do {} while (0)
+#	define LOG_ERROR(text...) TRACE(text)
 #else
-	#define TRACE(x...)
-	#define CALLED(x...)
+#	define TRACE(x...)
+#	define CALLED(x...)
+#	define LOG_ERROR(x...)  do { debug_printf(x); } while(0)
+#	define LOG_EVENT(x...)
 #endif
 
 
