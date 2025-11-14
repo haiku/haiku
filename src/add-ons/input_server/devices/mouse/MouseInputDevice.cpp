@@ -52,11 +52,11 @@
 							debug_printf("%p -> %s", this, _to.String()); \
 							debug_printf(x); } while (0)
 #	define LOG_EVENT(text...) do {} while (0)
-#	define LOG_ERR(text...) TRACE(text)
+#	define LOG_ERROR(text...) TRACE(text)
 #else
 #	define TRACE(x...) do {} while (0)
 #	define CALLED(x...) TRACE(x)
-#	define LOG_ERR(x...) debug_printf(x)
+#	define LOG_ERROR(x...) debug_printf(x)
 #	define LOG_EVENT(x...) TRACE(x)
 #endif
 
@@ -194,7 +194,7 @@ MouseDevice::Start()
 	}
 
 	if (status < B_OK) {
-		LOG_ERR("%s: can't spawn/resume watching thread: %s\n",
+		LOG_ERROR("%s: can't spawn/resume watching thread: %s\n",
 			fDeviceRef.name, strerror(status));
 		if (fDevice >= 0)
 			close(fDevice);
@@ -395,7 +395,7 @@ MouseDevice::_ControlThread()
 				if (errno == B_INTERRUPTED)
 					continue;
 
-				LOG_ERR("Mouse device exiting, %s\n", strerror(errno));
+				LOG_ERROR("Mouse device exiting, %s\n", strerror(errno));
 				_ControlThreadCleanup();
 				// TOAST!
 				return;
@@ -411,7 +411,7 @@ MouseDevice::_ControlThread()
 				read.event = MS_READ_TOUCHPAD;
 				read.u.touchpad = lastTouchpadMovement;
 			} else if (status != B_OK && status != B_INTERRUPTED) {
-				LOG_ERR("Mouse (touchpad) device exiting, %s\n", strerror(errno));
+				LOG_ERROR("Mouse (touchpad) device exiting, %s\n", strerror(errno));
 				_ControlThreadCleanup();
 				// TOAST!
 				return;
@@ -452,12 +452,12 @@ MouseDevice::_ControlThread()
 		_ComputeAcceleration(movements, deltaX, deltaY, historyDeltaX,
 			historyDeltaY);
 
-		LOG_EVENT("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld, "
-			"wheel_x:%ld, wheel_y:%ld\n",
+		LOG_EVENT("%s: buttons: 0x%" B_PRIx32 ", x: %" B_PRId32 ", y: %" B_PRId32
+			", clicks:%" B_PRId32 ", wheel_x:%" B_PRId32 ", wheel_y:%" B_PRId32 "\n",
 			fDeviceRef.name, movements.buttons,
 			movements.xdelta, movements.ydelta, movements.clicks,
 			movements.wheel_xdelta, movements.wheel_ydelta);
-		LOG_EVENT("%s: x: %ld, y: %ld (%.4f, %.4f)\n", fDeviceRef.name,
+		LOG_EVENT("%s: x: %" B_PRId32 ", y: %" B_PRId32 " (%.4f, %.4f)\n", fDeviceRef.name,
 			deltaX, deltaY, historyDeltaX, historyDeltaY);
 
 		// Send single messages for each event
@@ -538,7 +538,7 @@ MouseDevice::_UpdateSettings()
 	// retrieve current values
 
 	if (get_mouse_map(fDeviceRef.name, &fSettings.map) != B_OK)
-		LOG_ERR("error when get_mouse_map\n");
+		LOG_ERROR("error when get_mouse_map\n");
 	else
 		fDeviceRemapsButtons = ioctl(fDevice, MS_SET_MAP, &fSettings.map) == B_OK;
 
@@ -547,13 +547,13 @@ MouseDevice::_UpdateSettings()
 			fTouchpadMovementMaker.click_speed = fSettings.click_speed;
 		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed);
 	} else
-		LOG_ERR("error when get_click_speed\n");
+		LOG_ERROR("error when get_click_speed\n");
 
 	if (get_mouse_speed(fDeviceRef.name, &fSettings.accel.speed) != B_OK)
-		LOG_ERR("error when get_mouse_speed\n");
+		LOG_ERROR("error when get_mouse_speed\n");
 	else {
 		if (get_mouse_acceleration(fDeviceRef.name, &fSettings.accel.accel_factor) != B_OK)
-			LOG_ERR("error when get_mouse_acceleration\n");
+			LOG_ERROR("error when get_mouse_acceleration\n");
 		else {
 			mouse_accel accel;
 			ioctl(fDevice, MS_GET_ACCEL, &accel);
@@ -564,7 +564,7 @@ MouseDevice::_UpdateSettings()
 	}
 
 	if (get_mouse_type(fDeviceRef.name, &fSettings.type) != B_OK)
-		LOG_ERR("error when get_mouse_type\n");
+		LOG_ERROR("error when get_mouse_type\n");
 	else
 		ioctl(fDevice, MS_SET_TYPE, &fSettings.type);
 }
