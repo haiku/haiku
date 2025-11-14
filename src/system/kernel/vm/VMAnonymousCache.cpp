@@ -713,7 +713,18 @@ VMAnonymousCache::Adopt(VMCache* _source, off_t offset, off_t size,
 
 	locker.Unlock();
 
-	return VMCache::Adopt(source, offset, size, newOffset);
+	uint32 initialPageCount = page_count;
+	status_t status = VMCache::Adopt(source, offset, size, newOffset);
+
+	if (fCanOvercommit) {
+		// We need to adopt the commitment for these pages.
+		uint32 newPages = page_count - initialPageCount;
+		off_t pagesCommitment = newPages * B_PAGE_SIZE;
+		source->committed_size -= pagesCommitment;
+		committed_size += pagesCommitment;
+	}
+
+	return status;
 }
 
 

@@ -22,6 +22,8 @@ public:
 									int32 numGuardPages,
 									uint32 allocationFlags);
 
+	virtual	status_t			Adopt(VMCache* source, off_t offset, off_t size,
+									off_t newOffset);
 	virtual	ssize_t				Discard(off_t offset, off_t size);
 
 	virtual	bool				CanOvercommit();
