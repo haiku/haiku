@@ -450,9 +450,10 @@ MouseDevice::_ControlThread()
 			}
 
 			if (read.event == MS_READ_TOUCHPAD) {
-				lastTouchpadMovement = read.u.touchpad;
 				status = fTouchpadMovementMaker.EventToMovement(&read.u.touchpad,
 					&movements, touchpadEventTimeout);
+				if (status == B_OK)
+					lastTouchpadMovement = read.u.touchpad;
 			} else if (read.event == MS_READ) {
 				movements = read.u.mouse;
 				touchpadEventTimeout = -1;
