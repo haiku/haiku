@@ -22,14 +22,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <KernelExport.h>
-
 
 //#define TRACE_MOVEMENT_MAKER
 #ifdef TRACE_MOVEMENT_MAKER
-#	define TRACE(x...) dprintf(x)
+	#define TRACE(x...) debug_printf(x)
+	#define CALLED(x...) TRACE("CALLED %s", __PRETTY_FUNCTION__)
 #else
-#	define TRACE(x...)
+	#define TRACE(x...)
+	#define CALLED(x...)
 #endif
 
 
@@ -48,6 +48,8 @@ make_small(float value)
 void
 MovementMaker::SetSettings(const touchpad_settings& settings)
 {
+	CALLED();
+
 	fSettings = settings;
 }
 
@@ -55,6 +57,8 @@ MovementMaker::SetSettings(const touchpad_settings& settings)
 void
 MovementMaker::SetSpecs(const touchpad_specs& specs)
 {
+	CALLED();
+
 	fSpecs = specs;
 
 	fAreaWidth = fSpecs.areaEndX - fSpecs.areaStartX;
@@ -69,6 +73,8 @@ MovementMaker::SetSpecs(const touchpad_specs& specs)
 void
 MovementMaker::StartNewMovment()
 {
+	CALLED();
+
 	if (fSettings.scroll_xstepsize <= 0)
 		fSettings.scroll_xstepsize = 1;
 	if (fSettings.scroll_ystepsize <= 0)
@@ -83,6 +89,8 @@ MovementMaker::StartNewMovment()
 void
 MovementMaker::GetMovement(uint32 posX, uint32 posY)
 {
+	CALLED();
+
 	_GetRawMovement(posX, posY);
 }
 
@@ -90,6 +98,8 @@ MovementMaker::GetMovement(uint32 posX, uint32 posY)
 void
 MovementMaker::GetScrolling(uint32 posX, uint32 posY)
 {
+	CALLED();
+
 	int32 stepsX = 0, stepsY = 0;
 	int32 directionMultiplier = fSettings.scroll_reverse ? -1 : 1;
 
@@ -125,6 +135,8 @@ MovementMaker::GetScrolling(uint32 posX, uint32 posY)
 void
 MovementMaker::_GetRawMovement(uint32 posX, uint32 posY)
 {
+	CALLED();
+
 	// calibrated on the synaptics touchpad
 	posX = posX * SYN_WIDTH / fAreaWidth;
 	posY = posY * SYN_HEIGHT / fAreaHeight;
@@ -196,6 +208,8 @@ MovementMaker::_GetRawMovement(uint32 posX, uint32 posY)
 void
 MovementMaker::_ComputeAcceleration(int8 accel_factor)
 {
+	CALLED();
+
 	// acceleration
 	float acceleration = 1;
 	if (accel_factor != 0) {
@@ -216,6 +230,8 @@ MovementMaker::_ComputeAcceleration(int8 accel_factor)
 
 TouchpadMovement::TouchpadMovement()
 {
+	CALLED();
+
 	fMovementStarted = false;
 	fScrollingStarted = false;
 	fTapStarted = false;
@@ -223,11 +239,17 @@ TouchpadMovement::TouchpadMovement()
 	fDoubleClick = false;
 }
 
+TouchpadMovement::~TouchpadMovement() {
+	CALLED();
+}
+
 
 status_t
 TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement* movement,
 	bigtime_t& repeatTimeout)
 {
+	CALLED();
+
 	if (!movement)
 		return B_ERROR;
 
@@ -288,6 +310,8 @@ bool
 TouchpadMovement::_EdgeMotion(const touchpad_movement *event, mouse_movement *movement,
 	bool validStart)
 {
+	CALLED();
+
 	float xdelta = 0;
 	float ydelta = 0;
 
@@ -347,6 +371,8 @@ TouchpadMovement::_EdgeMotion(const touchpad_movement *event, mouse_movement *mo
 void
 TouchpadMovement::_UpdateButtons(mouse_movement *movement)
 {
+	CALLED();
+
 	// set click count correctly according to double click timeout
 	if (movement->buttons != 0 && fButtonsState == 0) {
 		if (fClickLastTime + click_speed > movement->timestamp)
@@ -368,6 +394,8 @@ void
 TouchpadMovement::_NoTouchToMovement(const touchpad_movement *event,
 	mouse_movement *movement)
 {
+	CALLED();
+
 	uint32 buttons = event->buttons;
 
 	if (fMovementStarted)
@@ -420,6 +448,8 @@ TouchpadMovement::_NoTouchToMovement(const touchpad_movement *event,
 void
 TouchpadMovement::_MoveToMovement(const touchpad_movement *event, mouse_movement *movement)
 {
+	CALLED();
+
 	bool isStartOfMovement = false;
 	float pressure = 0;
 
@@ -478,6 +508,8 @@ bool
 TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 	mouse_movement *movement)
 {
+	CALLED();
+
 	bool isSideScrollingV = false;
 	bool isSideScrollingH = false;
 

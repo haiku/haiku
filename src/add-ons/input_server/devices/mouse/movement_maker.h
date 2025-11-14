@@ -63,6 +63,7 @@ enum button_ids
 class TouchpadMovement : public MovementMaker {
 public:
 								TouchpadMovement();
+	virtual						~TouchpadMovement();
 
 			status_t			EventToMovement(const touchpad_movement *event,
 									mouse_movement *movement, bigtime_t &repeatTimeout);
