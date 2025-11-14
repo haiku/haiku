@@ -362,7 +362,7 @@ TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement
 		}
 	}
 
-	if (event->buttons & kLeftButton) {
+	if (event->buttons || two_or_more_fingers(event)) {
 		fTapClicks = 0;
 		fTapdragStarted = false;
 		fTapStarted = false;
