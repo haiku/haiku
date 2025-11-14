@@ -82,7 +82,7 @@ const uint32 kMsgAddressChosen = 'acsn';
 
 struct CompareBStrings {
 	bool
-	operator()(const BString *s1, const BString *s2) const
+	operator()(const BString* s1, const BString* s2) const
 	{
 		return (s1->Compare(*s2) < 0);
 	}
@@ -134,38 +134,40 @@ LabelView::LabelView(const char* label)
 void
 LabelView::SetEnabled(bool enabled)
 {
-	if (enabled != fEnabled) {
-		fEnabled = enabled;
-		Invalidate();
-	}
+	if (enabled == fEnabled)
+		return;
+
+	fEnabled = enabled;
+	Invalidate();
 }
 
 
 void
 LabelView::Draw(BRect updateRect)
 {
-	if (Text() != NULL) {
-		BRect rect = Bounds();
-		// TODO: solve this better (alignment of label and text)
-		rect.top++;
+	if (Text() == NULL)
+		return;
 
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = 0;
-		if (!IsEnabled())
-			flags |= BControlLook::B_DISABLED;
+	BRect rect = Bounds();
+	// TODO: solve this better (alignment of label and text)
+	rect.top++;
 
-		rgb_color text = ui_color(B_PANEL_TEXT_COLOR);
-		be_control_look->DrawLabel(this, Text(), rect, updateRect,
-			base, flags, BAlignment(Alignment(), B_ALIGN_MIDDLE), &text);
-	}
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	uint32 flags = 0;
+	if (!IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+
+	rgb_color text = ui_color(B_PANEL_TEXT_COLOR);
+	be_control_look->DrawLabel(this, Text(), rect, updateRect,
+		base, flags, BAlignment(Alignment(), B_ALIGN_MIDDLE), &text);
 }
 
 
 // #pragma mark - HeaderTextControl
 
 
-HeaderTextControl::HeaderTextControl(const char* label, const char* name,
-	BMessage* message)
+HeaderTextControl::HeaderTextControl(const char* label, const char* name, BMessage* message)
 	:
 	BTextControl(label, name, message)
 {
@@ -176,6 +178,7 @@ void
 HeaderTextControl::AttachedToWindow()
 {
 	BTextControl::AttachedToWindow();
+
 	_UpdateTextViewColors();
 }
 
@@ -316,7 +319,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 				<< account->ReturnAddress() << ">";
 
 			BMessage* msg = new BMessage(kMsgFrom);
-			BMenuItem *item = new BMenuItem(name, msg);
+			BMenuItem* item = new BMenuItem(name, msg);
 
 			msg->AddInt32("id", account->AccountID());
 
@@ -328,7 +331,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 		}
 
 		if (!marked) {
-			BMenuItem *item = fAccountMenu->ItemAt(0);
+			BMenuItem* item = fAccountMenu->ItemAt(0);
 			if (item != NULL) {
 				item->SetMarked(true);
 				fAccountID = item->Message()->FindInt32("id");
@@ -374,6 +377,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 		fCcControl->Hide();
 		fCcLabel->Hide();
 	}
+
 	msg = new BMessage(FIELD_CHANGED);
 	msg->AddInt32("bitmask", FIELD_CC);
 	fCcControl->SetModificationMessage(msg);
@@ -448,9 +452,9 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 		layout->AddView(fBccControl, 3, row++);
 	} else
 		row++;
+
 	layout->AddItem(fSubjectControl->CreateLabelLayoutItem(), 0, row);
-	layout->AddItem(fSubjectControl->CreateTextViewLayoutItem(), 1, row++,
-		3, 1);
+	layout->AddItem(fSubjectControl->CreateTextViewLayoutItem(), 1, row++, 3, 1);
 }
 
 
@@ -684,7 +688,7 @@ THeaderView::SetFromMessage(BEmailMessage* mail)
 
 
 void
-THeaderView::MessageReceived(BMessage *msg)
+THeaderView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case B_SIMPLE_DATA:
@@ -705,12 +709,12 @@ THeaderView::MessageReceived(BMessage *msg)
 
 		case kMsgFrom:
 		{
-			BMenuItem *item;
-			if (msg->FindPointer("source", (void **)&item) >= B_OK)
+			BMenuItem* item;
+			if (msg->FindPointer("source", (void**)&item) >= B_OK)
 				item->SetMarked(true);
 
 			int32 account;
-			if (msg->FindInt32("id",(int32 *)&account) >= B_OK)
+			if (msg->FindInt32("id", (int32*)&account) >= B_OK)
 				fAccountID = account;
 
 			BMessage message(FIELD_CHANGED);

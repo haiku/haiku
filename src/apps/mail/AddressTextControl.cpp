@@ -438,8 +438,7 @@ AddressTextControl::PopUpButton::Draw(BRect updateRect)
 
 	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 	BRect rect = Bounds();
-	be_control_look->DrawMenuFieldBackground(this, rect,
-		updateRect, base, true, flags);
+	be_control_look->DrawMenuFieldBackground(this, rect, updateRect, base, true, flags);
 }
 
 
@@ -617,6 +616,7 @@ AddressTextControl::AddressTextControl(const char* name, BMessage* message)
 {
 	fTextView = new TextView(this);
 	fTextView->SetExplicitMinSize(BSize(100, B_SIZE_UNSET));
+
 	fPopUpButton = new PopUpButton();
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
@@ -666,15 +666,16 @@ AddressTextControl::Draw(BRect updateRect)
 	if (!IsEditable())
 		return;
 
-	BRect bounds(Bounds());
-	rgb_color base(LowColor());
+	BRect rect = Bounds();
+	rgb_color base = LowColor();
+
 	uint32 flags = 0;
 	if (!IsEnabled())
 		flags |= BControlLook::B_DISABLED;
 	if (fWindowActive && fTextView->IsFocus())
 		flags |= BControlLook::B_FOCUSED;
-	be_control_look->DrawTextControlBorder(this, bounds, updateRect, base,
-		flags);
+
+	be_control_look->DrawTextControlBorder(this, rect, updateRect, base, flags);
 }
 
 
@@ -810,7 +811,7 @@ AddressTextControl::MessageReceived(BMessage* message)
 
 		case M_SELECT:
 		{
-			BTextView *textView = (BTextView *)ChildAt(0);
+			BTextView* textView = (BTextView*)ChildAt(0);
 			if (textView != NULL)
 				textView->Select(0, textView->TextLength());
 			break;
