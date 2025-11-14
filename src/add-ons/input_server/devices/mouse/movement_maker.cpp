@@ -1,8 +1,22 @@
 /*
  * Copyright 2008-2011, Clemens Zeidler <haiku@clemens-zeidler.de>
- * Copyright 2022, Haiku, Inc. All rights reserved.
+ * Copyright 2022-2025, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Augustin Cavalier <waddlesplash@gmail.com>
+ *		Adrien Destugues <pulkomandy@pulkomandy.tk>
+ *		Axel Dörfler <axeld@pinc-software.de>
+ *		Fredrik Holmqvist <fredrik.holmqvist@gmail.com>
+ *		Michael Kanis <mks@skweez.net>
+ *		Sylvain Kerjean <sylvain_kerjean@hotmail.com>
+ *		Murai Takashi <tmurai01@gmail.com>
+ *		PawanYr <pawan.yerramilli@gmail.com>
+ *		Samuel Rodríguez Pérez <samuelrp84@gmail.com>
+ *		Clemens Zeidler <clemens.zeidler@googlemail.com>
  */
+
 #include "movement_maker.h"
 
 #include <stdlib.h>
@@ -27,10 +41,7 @@
 static int32
 make_small(float value)
 {
-	if (value > 0)
-		return (int32)floorf(value);
-	else
-		return (int32)ceilf(value);
+	return (int32)truncf(value);
 }
 
 

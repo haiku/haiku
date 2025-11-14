@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2011, Clemens Zeidler <haiku@clemens-zeidler.de>
- * Copyright 2022, Haiku, Inc. All rights reserved.
+ * Copyright 2022-2025, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef MOVEMENT_MAKER_H
