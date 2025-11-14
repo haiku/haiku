@@ -705,9 +705,7 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
 }
 
 
-/*!	If \a preserveModified is \c true, the caller must hold the lock of the
-	page's cache.
-*/
+/*!	The caller must hold the lock of the page's cache. */
 static inline bool
 unmap_page(VMArea* area, addr_t virtualAddress)
 {
@@ -716,9 +714,7 @@ unmap_page(VMArea* area, addr_t virtualAddress)
 }
 
 
-/*!	If \a preserveModified is \c true, the caller must hold the lock of all
-	mapped pages' caches.
-*/
+/*!	The caller must hold the lock of all mapped pages' caches. */
 static inline void
 unmap_pages(VMArea* area, addr_t base, size_t size)
 {
