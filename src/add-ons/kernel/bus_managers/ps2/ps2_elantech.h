@@ -1,13 +1,20 @@
 /*
- * Copyright 2013, Haiku, Inc.
+ * Copyright 2013-2025, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * The elantech_model_info struct and all the hardware specs are taken from the
- * linux driver, thanks a lot!
+ * Hardware specs taken from the linux and BSDs drivers, thanks a lot!
+ *
+ * References:
+ *	- https://cgit.freebsd.org/src/tree/sys/dev/atkbdc/psm.c?h=releng/14.3
+ *	- https://cvsweb.openbsd.org/cgi-bin/cvsweb/src/sys/dev/pckbc/?only_with_tag=OPENBSD_7_8_BASE
+ *	- https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/input/mouse/elantech.c?h=v6.17
+ *	- https://www.kernel.org/doc/html/v4.16/input/devices/elantech.html
  *
  * Authors:
  *		Jérôme Duval <korli@users.berlios.de>
+ *		Samuel Rodríguez Pérez <samuelrp84@gmail.com>
  */
+
 #ifndef _PS2_ELANTECH_H
 #define _PS2_ELANTECH_H
 
@@ -25,7 +32,7 @@ typedef struct {
 	struct	packet_buffer*		ring_buffer;
 			size_t				packet_index;
 
-			uint32				version;
+			uint8				version;
 			uint32				fwVersion;
 
 			uint32				x;

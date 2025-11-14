@@ -1,12 +1,18 @@
 /*
- * Copyright 2013, Haiku, Inc.
+ * Copyright 2013-2025, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * Hardware specs taken from the linux driver, thanks a lot!
- * Based on ps2_alps.c
+ * Hardware specs taken from the linux and BSDs drivers, thanks a lot!
+ *
+ * References:
+ *	- https://cgit.freebsd.org/src/tree/sys/dev/atkbdc/psm.c?h=releng/14.3
+ *	- https://cvsweb.openbsd.org/cgi-bin/cvsweb/src/sys/dev/pckbc/?only_with_tag=OPENBSD_7_8_BASE
+ *	- https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/input/mouse/elantech.c?h=v6.17
+ *	- https://www.kernel.org/doc/html/v4.16/input/devices/elantech.html
  *
  * Authors:
  *		Jérôme Duval <korli@users.berlios.de>
+ *		Samuel Rodríguez Pérez <samuelrp84@gmail.com>
  */
 
 
@@ -27,7 +33,6 @@
 #	define TRACE(x...)
 #endif
 
-
 const char* kElantechPath[4] = {
 	"input/touchpad/ps2/elantech_0",
 	"input/touchpad/ps2/elantech_1",
@@ -41,12 +46,13 @@ const char* kElantechPath[4] = {
 #define ELANTECH_CMD_GET_CAPABILITIES	0x02
 #define ELANTECH_CMD_GET_SAMPLE			0x03
 #define ELANTECH_CMD_GET_RESOLUTION		0x04
+#define ELANTECH_CMD_GET_ICBODY			0x05
+
 
 #define ELANTECH_CMD_REGISTER_READ		0x10
 #define ELANTECH_CMD_REGISTER_WRITE		0x11
 #define ELANTECH_CMD_REGISTER_READWRITE	0x00
 #define ELANTECH_CMD_PS2_CUSTOM_CMD		0xf8
-
 
 // touchpad proportions
 #define EDGE_MOTION_WIDTH	55
@@ -94,7 +100,7 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 		TRACE("ELANTECH: bad crc buffer\n");
 		return B_ERROR;
 	}
-		// https://www.kernel.org/doc/html/v4.16/input/devices/elantech.html
+
 	uint8 packet_type = packet[3] & 3;
 	TRACE("ELANTECH: packet type %d\n", packet_type);
 	TRACE("ELANTECH: packet content 0x%02x%02x%02x%02x%02x%02x\n",
@@ -180,6 +186,9 @@ elantech_dev_send_command(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count)
 }
 
 
+//	#pragma mark - exported functions
+
+
 status_t
 probe_elantech(ps2_dev* dev)
 {
@@ -214,20 +223,50 @@ probe_elantech(ps2_dev* dev)
 		return B_ERROR;
 	}
 
+	uint32 fwVersion = ((val[0] << 16) | (val[1] << 8) | val[2]);
+	bool v1 = fwVersion < 0x020030 || fwVersion == 0x020600;
+	bool v2 = (val[0] & 0xf) == 4 || ((val[0] & 0xf) == 2 && !v1);
+	bool v3 = (val[0] & 0xf) == 5;
+	bool v4 = (val[0] & 0xf) >= 6 && (val[0] & 0xf) <= 15;
+
 	if (val[0] == 0x0 || val[2] == 10 || val[2] == 20 || val[2] == 40
 		|| val[2] == 60 || val[2] == 80 || val[2] == 100 || val[2] == 200) {
 		TRACE("ELANTECH: not found (5)\n");
 		return B_ERROR;
 	}
 
-	INFO("Elantech version %02X%02X%02X, under developement! Using fallback.\n",
-		val[0], val[1], val[2]);
+	// TODO: Update supported after testing all versions.
+	bool supported = !v4 || !v3 || !v2 || !v1;
+
+	if (supported && v3) {
+		uint8 samples[3];
+		if (elantech_dev_send_command(dev, ELANTECH_CMD_GET_SAMPLE, samples, 3) != B_OK) {
+			TRACE("ELANTECH: failed to query sample data\n");
+			return B_ERROR;
+		}
+
+		if (samples[1] == 0x74) {
+			TRACE("ELANTECH: Absolute mode broken, forcing standard PS/2 protocol\n");
+			supported = false;
+		}
+	}
+
+	if (supported) {
+		INFO("Elantech version %02X%02X%02X detected.\n",
+			val[0], val[1], val[2]);
+	} else {
+		INFO("Elantech version %02X%02X%02X, under developement! Using fallback.\n",
+			val[0], val[1], val[2]);
+	}
 
 	dev->name = kElantechPath[dev->idx];
 	dev->packet_size = PS2_PACKET_ELANTECH;
 
-	return B_ERROR;
+	return supported ? B_OK : B_ERROR;
 }
+
+
+//	#pragma mark - Setup functions
 
 
 static status_t
@@ -339,8 +378,8 @@ get_resolution_v4(elantech_cookie* cookie, uint32* x, uint32* y)
 	if (elantech_dev_send_command(cookie->dev, ELANTECH_CMD_GET_RESOLUTION,
 		val, 3) != B_OK)
 		return B_ERROR;
-	*x = (val[1] & 0xf) * 10 + 790;
-	*y = ((val[1] & 0xf) >> 4) * 10 + 790;
+	*x = ((val[1] & 0xf) * 10 + 790) * 10 / 254;
+	*y = (((val[1] & 0xf) >> 4) * 10 + 790) * 10 / 254;
 	return B_OK;
 }
 
@@ -416,19 +455,22 @@ enable_absolute_mode(elantech_cookie* cookie)
 
 	}
 
-	if (cookie->version < 4) {
+	if (status == B_OK && cookie->version < 4) {
 		uint8 val;
 
 		for (uint8 retry = 0; retry < 5; retry++) {
 			status = elantech_read_reg(cookie, 0x10, &val);
 			if (status != B_OK)
 				break;
-			snooze(100);
+			snooze(2000);
 		}
 	}
 
 	return status;
 }
+
+
+//	#pragma mark - Device functions
 
 
 status_t
@@ -502,8 +544,7 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 			case 5:
 				cookie->version = 3;
 				break;
-			case 6:
-			case 7:
+			case 6 ... 15:
 				cookie->version = 4;
 				break;
 			default:
@@ -541,9 +582,12 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 		"-%" B_PRIu32 " (%" B_PRIu32 ")\n", x_min, x_max, y_min, y_max, width);
 
 	uint32 x_res, y_res;
-	if (get_resolution_v4(cookie, &x_res, &y_res) != B_OK) {
-		TRACE("ELANTECH: get resolution failed!\n");
-		goto err4;
+	x_res = 31;
+	y_res = 31;
+	if (cookie->version == 4) {
+		if (get_resolution_v4(cookie, &x_res, &y_res) != B_OK) {
+			TRACE("ELANTECH: get resolution failed!\n");
+		}
 	}
 
 	TRACE("ELANTECH: resolution x %" B_PRIu32 " y %" B_PRIu32 " (dpi)\n",
