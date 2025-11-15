@@ -183,6 +183,7 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 
 	BStringView* containerLabel = _CreateLabel("containerLabel",
 		B_TRANSLATE("Container"));
+	containerLabel->SetHighUIColor(B_PANEL_TEXT_COLOR);
 	fContainerInfo = _CreateInfo("container");
 
 	fVideoSeparator = _CreateSeparator();
@@ -195,15 +196,18 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 
 	fAudioSeparator = _CreateSeparator();
 	fAudioLabel = _CreateLabel("audioLabel", B_TRANSLATE("Audio"));
+	fAudioLabel->SetHighUIColor(B_PANEL_TEXT_COLOR);
 	fAudioFormatInfo = _CreateInfo("audioFormat");
 	fAudioConfigInfo = _CreateInfo("audioConfig");
 
 	BStringView* durationLabel = _CreateLabel("durationLabel",
 		B_TRANSLATE("Duration"));
+	durationLabel->SetHighUIColor(B_PANEL_TEXT_COLOR);
 	fDurationInfo = _CreateInfo("duration");
 
 	BStringView* locationLabel = _CreateLabel("locationLabel",
 		B_TRANSLATE("Location"));
+	locationLabel->SetHighUIColor(B_PANEL_TEXT_COLOR);
 	fLocationInfo = _CreateInfo("location");
 
 	fCopyrightSeparator = _CreateSeparator();
