@@ -9,6 +9,11 @@
 #include <string>
 
 #include "signals.h"
+#include "strace.h"
+#include "Context.h"
+#include "MemoryReader.h"
+#include "Syscall.h"
+#include "TypeHandler.h"
 
 
 // signal names
@@ -47,6 +52,67 @@ static const char *kSignalName[] = {
 	/* 31 */ "SIGRESERVED1",
 	/* 32 */ "SIGRESERVED2",
 };
+
+
+struct enum_info {
+	int index;
+	const char *name;
+};
+
+#define ENUM_INFO_ENTRY(name) \
+	{ name, #name }
+
+static const enum_info kSigmaskHow[] = {
+	ENUM_INFO_ENTRY(SIG_BLOCK),
+	ENUM_INFO_ENTRY(SIG_UNBLOCK),
+	ENUM_INFO_ENTRY(SIG_SETMASK),
+
+	{ 0, NULL }
+};
+
+
+#define sigmask(sig) (1 << ((sig) - 1))
+#define FLAG_INFO_ENTRY(name) \
+	{ sigmask( SIG##name ), #name }
+
+static const FlagsTypeHandler::FlagInfo kSigmaskFlagsInfo[] = {
+	FLAG_INFO_ENTRY(HUP),
+	FLAG_INFO_ENTRY(INT),
+	FLAG_INFO_ENTRY(QUIT),
+	FLAG_INFO_ENTRY(ILL),
+	FLAG_INFO_ENTRY(CHLD),
+	FLAG_INFO_ENTRY(ABRT),
+	FLAG_INFO_ENTRY(PIPE),
+	FLAG_INFO_ENTRY(FPE),
+	FLAG_INFO_ENTRY(KILL),
+	FLAG_INFO_ENTRY(STOP),
+	FLAG_INFO_ENTRY(SEGV),
+	FLAG_INFO_ENTRY(CONT),
+	FLAG_INFO_ENTRY(TSTP),
+	FLAG_INFO_ENTRY(ALRM),
+	FLAG_INFO_ENTRY(TERM),
+	FLAG_INFO_ENTRY(TTIN),
+	FLAG_INFO_ENTRY(TTOU),
+	FLAG_INFO_ENTRY(USR1),
+	FLAG_INFO_ENTRY(USR2),
+	FLAG_INFO_ENTRY(WINCH),
+	FLAG_INFO_ENTRY(KILLTHR),
+	FLAG_INFO_ENTRY(TRAP),
+	FLAG_INFO_ENTRY(POLL),
+	FLAG_INFO_ENTRY(PROF),
+	FLAG_INFO_ENTRY(SYS),
+	FLAG_INFO_ENTRY(URG),
+	FLAG_INFO_ENTRY(VTALRM),
+	FLAG_INFO_ENTRY(XCPU),
+	FLAG_INFO_ENTRY(XFSZ),
+	FLAG_INFO_ENTRY(BUS),
+
+	{ 0, NULL }
+};
+
+
+static FlagsTypeHandler::FlagsList kSigmaskFlags;
+static EnumTypeHandler::EnumMap kSigmaskHowMap;
 
 
 std::string
@@ -198,4 +264,89 @@ signal_info(siginfo_t& info)
 	string += "}";
 
 	return string;
+}
+
+
+class SigsetTypeHandler : public FlagsTypeHandler {
+public:
+	SigsetTypeHandler()
+		:
+		FlagsTypeHandler(kSigmaskFlags)
+	{
+	}
+
+	string GetParameterValue(Context &context, Parameter *param,
+		const void *address)
+	{
+		void *data = *(void **)address;
+
+		if (context.GetContents(Context::POINTER_VALUES)) {
+			int32 bytesRead;
+			sigset_t value;
+			status_t err = context.Reader().Read(data, &value, sizeof(value), bytesRead);
+			if (err != B_OK)
+				return context.FormatPointer(data);
+
+			uint32 count = 0;
+#if __GNUC__ > 2
+                count += __builtin_popcount(value);
+#else
+			{
+				sigset_t mask = value;
+				while (mask > 0) {
+					if ((mask & 1) == 1)
+						count++;
+					mask >>= 1;
+				}
+			}
+#endif
+			string r;
+			// when more than 2/3 of the signals are set, inverse
+			if (count > SIGRESERVED2 * 2 / 3) {
+				value = ~value;
+				r += "~";
+			}
+			value &= (((sigset_t)1 << SIGRESERVED2) - 1);
+
+			r += "[";
+			r += RenderValue(context, value);
+			r += "]";
+			return r;
+		}
+
+		return context.FormatPointer(data);
+	}
+
+	string GetReturnValue(Context &context, uint64 value)
+	{
+		return context.FormatPointer((void *)value);
+	}
+};
+
+
+void
+patch_signal()
+{
+	for (int i = 0; kSigmaskFlagsInfo[i].name != NULL; i++)
+		kSigmaskFlags.push_back(kSigmaskFlagsInfo[i]);
+	for (int i = 0; kSigmaskHow[i].name != NULL; i++) {
+		kSigmaskHowMap[kSigmaskHow[i].index] = kSigmaskHow[i].name;
+	}
+	Syscall *setSignalMask = get_syscall("_kern_set_signal_mask");
+	setSignalMask->GetParameter("how")->SetHandler(new EnumTypeHandler(kSigmaskHowMap));
+	setSignalMask->GetParameter("set")->SetHandler(new SigsetTypeHandler());
+	setSignalMask->GetParameter("oldSet")->SetHandler(new SigsetTypeHandler());
+	setSignalMask->GetParameter("oldSet")->SetOut(true);
+
+	Syscall *sigwait = get_syscall("_kern_sigwait");
+	sigwait->GetParameter("set")->SetHandler(new SigsetTypeHandler());
+	sigwait->GetParameter("info")->SetOut(true);
+
+	Syscall *sigsuspend = get_syscall("_kern_sigsuspend");
+	sigsuspend->GetParameter("mask")->SetHandler(new SigsetTypeHandler());
+
+	Syscall *sigpending = get_syscall("_kern_sigpending");
+	sigpending->GetParameter("set")->SetHandler(new SigsetTypeHandler());
+	sigpending->GetParameter("set")->SetOut(true);
+
 }

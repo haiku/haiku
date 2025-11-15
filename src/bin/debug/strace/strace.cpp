@@ -238,6 +238,7 @@ patch_syscalls()
 	extern void patch_mutex();
 	extern void patch_network();
 	extern void patch_rlimit();
+	extern void patch_signal();
 
 	for (size_t i = 0; i < sSyscallVector.size(); i++) {
 		Syscall *syscall = sSyscallVector[i];
@@ -261,6 +262,7 @@ patch_syscalls()
 	patch_mutex();
 	patch_network();
 	patch_rlimit();
+	patch_signal();
 }
 
 
