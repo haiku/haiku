@@ -894,10 +894,10 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 	menu->AddItem(fShowDesktopAndNonDesktopItem);
 
 	fShowOnlyDesktopItem
-		= new BMenuItem(B_TRANSLATE("Desktop packages"), new BMessage(MSG_SHOW_DESKTOP_PACKAGES));
+		= new BMenuItem(B_TRANSLATE("Desktop packages only"), new BMessage(MSG_SHOW_DESKTOP_PACKAGES));
 	menu->AddItem(fShowOnlyDesktopItem);
 
-	fShowOnlyNativeDesktopItem = new BMenuItem(B_TRANSLATE("Native desktop packages"),
+	fShowOnlyNativeDesktopItem = new BMenuItem(B_TRANSLATE("Native desktop packages only"),
 		new BMessage(MSG_SHOW_NATIVE_DESKTOP_PACKAGES));
 	menu->AddItem(fShowOnlyNativeDesktopItem);
 
