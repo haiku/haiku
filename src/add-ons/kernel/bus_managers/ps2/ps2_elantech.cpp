@@ -156,7 +156,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 */
 			//fingers, no palm
 			cookie->fingers = (packet[4] & 0x80) == 0 ? packet[1] & 0x1f: 0;
-			dprintf("ELANTECH: Fingers %" B_PRId32 ", raw %x (STATUS)\n",
+			TRACE("ELANTECH: Fingers %" B_PRId32 ", raw %x (STATUS)\n",
 				cookie->fingers, packet[1]);
 			break;
 		case HEAD_PACKET:
@@ -174,7 +174,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 * 1. One finger touch and movement.
 			 * 2. Next after status packet to tell new finger positions.
 			 */
-			dprintf("ELANTECH: Fingers %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
+			TRACE("ELANTECH: Fingers %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
 			// only process first finger
 			if ((packet[3] & 0xe0) != 0x20)
 				return B_OK;
@@ -185,7 +185,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 
 			cookie->x = event.xPosition = ((packet[1] & 0xf) << 8) | packet[2];
 			cookie->y = event.yPosition = ((packet[4] & 0xf) << 8) | packet[5];
-			dprintf("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 "\n (HEAD)",
+			TRACE("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 "\n (HEAD)",
 				cookie->x, cookie->y);
 			TRACE("ELANTECH: buttons 0x%x x %" B_PRIu32 " y %" B_PRIu32
 				" z %d\n", event.buttons, event.xPosition, event.yPosition,
@@ -209,7 +209,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 * byte 0 ~ 2 for one finger
 			 * byte 3 ~ 5 for another finger
 			 */
-			dprintf("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);			//Most likely palm
+			TRACE("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);			//Most likely palm
 			if (cookie->fingers == 0) return B_OK;
 			//handle overflow and delta values
 			if ((packet[0] & 0x10) != 0) {
@@ -219,7 +219,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 				event.xPosition = cookie->x += (int8)packet[1];
 				event.yPosition = cookie->y += (int8)packet[2];
 			}
-			dprintf("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 " (Motion)\n",
+			TRACE("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 " (Motion)\n",
 				cookie->x, cookie->y);
 
 			break;
