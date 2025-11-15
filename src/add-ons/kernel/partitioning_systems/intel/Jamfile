@@ -2,7 +2,22 @@ SubDir HAIKU_TOP src add-ons kernel partitioning_systems intel ;
 
 UsePrivateHeaders kernel shared storage ;
 UsePrivateSystemHeaders ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) common ] ;
+
+# Assemble the MBR code, and convert it into a header file
+MBRFLAGS on [ FGristFiles mbr.bin ] = -DMBR_CODE_ONLY ;
+BuildMBR [ FGristFiles mbr.bin ] : mbr.S ;
+
+DataFileToSourceFile [ FGristFiles MBR.h ] : [ FGristFiles mbr.bin ]
+	: kMBR : kMBRSize ;
+
+if $(TARGET_ARCH) = "x86" || $(TARGET_ARCH) = "x86_64" {
+	Includes [ FGristFiles PartitionMapWriter.cpp ] : [ FGristFiles MBR.h ] ;
+}
+
+KernelStaticLibrary intel_partitioning_common.a :
+	PartitionMap.cpp
+	PartitionMapWriter.cpp
+;
 
 KernelAddon intel :
 	intel.cpp
@@ -10,5 +25,5 @@ KernelAddon intel :
 	PartitionMapParser.cpp
 	write_support.cpp
 	:
-	libpartitioning_systemscommon.a
+	intel_partitioning_common.a
 ;

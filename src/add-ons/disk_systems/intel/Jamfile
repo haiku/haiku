@@ -4,7 +4,7 @@ UsePrivateHeaders shared storage ;
 UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE
-	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems common ] ;
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
 
 {
 	local defines = [ FDefines _USER_MODE ] ;

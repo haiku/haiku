@@ -3,7 +3,6 @@ SubDir HAIKU_TOP src add-ons kernel partitioning_systems ;
 HaikuSubInclude amiga ;
 HaikuSubInclude apple ;
 HaikuSubInclude atari ;
-HaikuSubInclude common ;
 HaikuSubInclude gpt ;
 HaikuSubInclude intel ;
 HaikuSubInclude session ;

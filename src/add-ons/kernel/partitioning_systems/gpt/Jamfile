@@ -4,7 +4,7 @@ UsePrivateHeaders interface kernel storage ;
 UsePrivateSystemHeaders ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) common ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) intel ] ;
 
 KernelAddon efi_gpt :
 	gpt.cpp
@@ -13,7 +13,7 @@ KernelAddon efi_gpt :
 	utility.cpp
 	PartitionLocker.cpp
 	:
-	libpartitioning_systemscommon.a
+	intel_partitioning_common.a
 	libuuid_kernel.a
 ;
 
