@@ -75,6 +75,15 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 	uint8 packet[PS2_PACKET_ELANTECH]);
 
 
+/* Common legend
+ * L: Left mouse button pressed
+ * R: Right mouse button pressed
+ * N: number of fingers on touchpad
+ * X: absolute x value (horizontal)
+ * Y: absolute y value (vertical)
+ * W; width of the finger touch
+ * P: pressure
+ */
 static status_t
 get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtime_t timeout)
 {
@@ -122,12 +131,40 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 		packet[4], packet[5]);
 	switch (packet_type) {
 		case STATUS_PACKET:
+			/*               7   6   5   4   3   2   1   0 (LSB)
+			 * -------------------------------------------
+			 * ipacket[0]:   .   .   .   .   0   1   R   L
+			 * ipacket[1]:   .   .   .  F4  F3  F2  F1  F0
+			 * ipacket[2]:   .   .   .   .   .   .   .   .
+			 * ipacket[3]:   .   .   .   1   0   0   0   0
+			 * ipacket[4]:  PL   .   .   .   .   .   .   .
+			 * ipacket[5]:   .   .   .   .   .   .   .   .
+			 * -------------------------------------------
+			 * Fn: finger n is on touchpad
+			 * PL: palm
+			 * HV ver4 sends a status packet to indicate that the numbers
+			 * or identities of the fingers has been changed
+			 */
 			//fingers, no palm
 			cookie->fingers = (packet[4] & 0x80) == 0 ? packet[1] & 0x1f: 0;
 			dprintf("ELANTECH: Fingers %" B_PRId32 ", raw %x (STATUS)\n",
 				cookie->fingers, packet[1]);
 			break;
 		case HEAD_PACKET:
+			/*               7   6   5   4   3   2   1   0 (LSB)
+			 * -------------------------------------------
+			 * ipacket[0]:  W3  W2  W1  W0   0   1   R   L
+			 * ipacket[1]:  P7  P6  P5  P4 X11 X10  X9  X8
+			 * ipacket[2]:  X7  X6  X5  X4  X3  X2  X1  X0
+			 * ipacket[3]: ID2 ID1 ID0   1   0   0   0   1
+			 * ipacket[4]:  P3  P1  P2  P0 Y11 Y10  Y9  Y8
+			 * ipacket[5]:  Y7  Y6  Y5  Y4  Y3  Y2  Y1  Y0
+			 * -------------------------------------------
+			 * ID: finger id
+			 * HW ver 4 sends head packets in two cases:
+			 * 1. One finger touch and movement.
+			 * 2. Next after status packet to tell new finger positions.
+			 */
 			dprintf("ELANTECH: Fingers %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
 			// only process first finger
 			if ((packet[3] & 0xe0) != 0x20)
@@ -146,6 +183,23 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 				event.zPressure);
 			break;
 		case MOTION_PACKET:
+			/*               7   6   5   4   3   2   1   0 (LSB)
+			 * -------------------------------------------
+			 * ipacket[0]: ID2 ID1 ID0  OF   0   1   R   L
+			 * ipacket[1]: DX7 DX6 DX5 DX4 DX3 DX2 DX1 DX0
+			 * ipacket[2]: DY7 DY6 DY5 DY4 DY3 DY2 DY1 DY0
+			 * ipacket[3]: ID2 ID1 ID0   1   0   0   1   0
+			 * ipacket[4]: DX7 DX6 DX5 DX4 DX3 DX2 DX1 DX0
+			 * ipacket[5]: DY7 DY6 DY5 DY4 DY3 DY2 DY1 DY0
+			 * -------------------------------------------
+			 * OF: delta overflows (> 127 or < -128), in this case
+			 *     firmware sends us (delta x / 5) and (delta y / 5)
+			 * ID: finger id
+			 * DX: delta x (two's complement)
+			 * XY: delta y (two's complement)
+			 * byte 0 ~ 2 for one finger
+			 * byte 3 ~ 5 for another finger
+			 */
 			dprintf("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);			//Most likely palm
 			if (cookie->fingers == 0) return B_OK;
 			//handle overflow and delta values
