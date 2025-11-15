@@ -101,9 +101,12 @@ VMAnonymousNoSwapCache::Commit(off_t size, int priority)
 
 		// pre-commit some pages to make a later failure less probable
 		fHasPrecommitted = true;
-		uint32 precommitted = fPrecommittedPages * B_PAGE_SIZE;
+		uint32 precommitted = (fPrecommittedPages * B_PAGE_SIZE);
 		if (size > precommitted)
 			size = precommitted;
+
+		// pre-commit should not shrink existing commitment
+		size += committed_size;
 	}
 
 	// Check to see how much we could commit - we need real memory
