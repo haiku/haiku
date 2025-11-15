@@ -158,10 +158,26 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 * HV ver4 sends a status packet to indicate that the numbers
 			 * or identities of the fingers has been changed
 			 */
+			event.buttons = (packet[0] & 0x3);
+
+			// Event fingers contains a bitmap of fingers.
+			event.fingers = packet[1] & 0x1f;
+			TRACE("ELANTECH: Fingers bitmap %" B_PRId32 ", raw %x (STATUS)\n",
+				event.fingers, packet[1]);
+
+			// This is required for the mouse to not disapear after first iteration.
+			event.xPosition = 0;
+			event.yPosition = 0;
+
+			// Pressure is not provided on this packet, so use a backup value.
+			event.zPressure = cookie->previousZ;
+
 			//fingers, no palm
-			cookie->fingers = (packet[4] & 0x80) == 0 ? packet[1] & 0x1f: 0;
-			TRACE("ELANTECH: Fingers %" B_PRId32 ", raw %x (STATUS)\n",
-				cookie->fingers, packet[1]);
+			cookie->fingers = (packet[4] & 0x80) == 0 ? event.fingers : 0;
+
+			TRACE("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 " (STATUS)\n",
+				cookie->x, cookie->y);
+
 			break;
 		case HEAD_PACKET:
 			/*               7   6   5   4   3   2   1   0 (LSB)
@@ -178,10 +194,14 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 * 1. One finger touch and movement.
 			 * 2. Next after status packet to tell new finger positions.
 			 */
+			event.buttons = (packet[0] & 0x3);
+
 			TRACE("ELANTECH: Fingers %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
 			// only process first finger
 			if ((packet[3] & 0xe0) != 0x20)
 				return IGNORE_EVENT;
+
+			event.fingers = cookie->fingers;
 
 			event.zPressure = (packet[1] & 0xf0) | ((packet[4] & 0xf0) >> 4);
 
@@ -213,9 +233,21 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 * byte 0 ~ 2 for one finger
 			 * byte 3 ~ 5 for another finger
 			 */
-			TRACE("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);			//Most likely palm
-			if (cookie->fingers == 0) return IGNORE_EVENT;
-			//handle overflow and delta values
+
+			event.buttons = (packet[0] & 0x3);
+
+			// Pressure is not provided on this packet, so use a backup value.
+			event.zPressure = cookie->previousZ;
+
+			TRACE("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);
+
+			// Most likely palm
+			if (cookie->fingers == 0)
+				return IGNORE_EVENT;
+
+			event.fingers = cookie->fingers;
+
+			// handle overflow and delta values
 			if ((packet[0] & 0x10) != 0) {
 				event.xPosition = cookie->x += 5 * (int8)packet[1];
 				event.yPosition = cookie->y += 5 * (int8)packet[2];
@@ -232,7 +264,9 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			return IGNORE_EVENT;
 	}
 
-	event.buttons = 0;
+	TRACE("ELANTECH: buttons %d\n", event.buttons);
+	TRACE("ELANTECH: zPressure %d\n", event.zPressure);
+
 	event.fingerWidth = cookie->fingers == 1 ? 4 :0;
 
 	*_event = event;
