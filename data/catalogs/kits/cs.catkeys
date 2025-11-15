@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libbe	2599604529
+1	czech	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Všechna práva vyhrazena.
 gold master	AboutWindow		zlatý mistr
 Undo	TextView		Zpět
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Historie verzí:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nelze nalézt aplikaci replikanta. Chybí podpis aplikace.\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Modrá:
+Special thanks:	AboutWindow		Zvláštní poděkování:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nelze vytvořit replikanta pro \"%description\".\n%error
 Written by:	AboutWindow		Napsal:

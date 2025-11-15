@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-LaunchBox	1878360293
+1	czech	x-vnd.Haiku-LaunchBox	574531707
 Set description…	LaunchBox		Nastavit popis…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Určitě chcete tento blok zavřít?\n(Nebude zapamatován.)
 OK	LaunchBox		OK
@@ -9,6 +9,7 @@ Autostart	LaunchBox		Automatické spuštění
 Clone	LaunchBox		Klonovat
 Description for '%3'	LaunchBox		Popis pro '%3'
 Show window border	LaunchBox		Zobrazit okraj okna
+Failed to open folder - is Tracker running?	LaunchBox		Chyba otevírání složky - je spuštěný Tracker?
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNepodařilo se spustit aplikaci s podpisem '%2'.\n\nChyba:
 Failed to launch 'something', error in Pad data.	LaunchBox		Nepodařilo se spustit 'something', chyba v datové oblasti.
 LaunchBox	System name		Spouštěč

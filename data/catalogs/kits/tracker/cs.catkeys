@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	4192200646
+1	czech	x-vnd.Haiku-libtracker	847073574
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -168,6 +168,7 @@ Property info	AttributesView		Vlastnost
 Sorry, you can't create links in the Trash.	PoseView		Bohužel, nelze vytvářet odkazy v koši.
 From	Email Query Columns		Od
 Open selection with:	OpenWithWindow		Otevřít vybrané v:
+Preferences…	ContainerWindow		Předvolby…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nelze otevřít \"%document\" protože aplikace \"%app\" je v koši. 
 Work Phone	Person Query Columns		Telefon do práce
 Select folders	FindPanel		Vybrat adresáře

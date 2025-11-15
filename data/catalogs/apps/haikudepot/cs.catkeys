@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-HaikuDepot	2555742361
+1	czech	x-vnd.Haiku-HaikuDepot	873730785
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problém se stažením podmínek použití
 Available packages	MainWindow		Dostupné balíčky
 It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
@@ -45,11 +45,13 @@ Click a package to view information	PackageInfoView		Kliknutím na balíček zob
 Cancel	UserLoginWindow		Zrušit
 Rating not possible	MainWindow		Hodnocení není možné
 Package update error	MainWindow		Chyba aktualizace balíčku
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Kliknout zde
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} few{# procesy} other{# procesů}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Stahování uživatelských hodnocení
 Reboot required	PackageManager		Restart vyžadován
 All packages	PackageListView		Všechny balíčky
 Send	RatePackageWindow		Poslat
+Creating package list…	FeaturedPackagesView		Vyrábím seznam balíčků…
 Start package daemon	App		Spustit službu balíčků
 There are problems in the supplied data:	UserLoginWindow		Jsou problémy s poskytnutými daty:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Uživatel '%Nickname%' nesouhlasil s žádnými podmínkami použití.
@@ -162,6 +164,7 @@ Contents	PackageInfoView		Obsah
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Sdílet anonymní data o používání s HaikuDepotServer
 Close	PackageManager		Zavřít
 Changelog	PackageInfoView		Seznam změn
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 k nalezení všech balíčků.
 About	PackageInfoView		O aplikaci
 Password requirements download problem	UserLoginWindow		Problém stažení požadavků na heslo
 Password:	UserLoginWindow		Heslo:
@@ -225,6 +228,7 @@ Category:	FilterView		Kategorie:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	odinstalovat balíček %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Stahuji data vzdálených repozitářů
 Description	PackageListView		Popis
+No results? 	FeaturedPackagesView		Žádné výsledky? 
 User creation error	UserLoginWindow		Chyba vytvoření uživatele
 You need to be logged into an account before you can rate packages.	MainWindow		K hodnocení balíčků, musíte být přihlášeni k účtu.
 Cleaning up…	ShuttingDownWindow		Uklízím…

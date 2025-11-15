@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-screenshot	281883787
+1	czech	x-vnd.haiku-screenshot	3900035709
 Include window border	ScreenshotWindow		Zahrnout okraj okna
 Overwrite	ScreenshotWindow		Přepsat
 Save in:	ScreenshotWindow		Uložit do:
@@ -15,14 +15,18 @@ Desktop	ScreenshotWindow		Plocha
 Artwork folder	ScreenshotWindow		Složka artworků
 Translator Settings	ScreenshotWindow		Nastavení překladače
 Include mouse pointer	ScreenshotWindow		Zahrnout ukazatel myši
+Selected area	ScreenshotWindow		Vybraná oblast
 overwrite	ScreenshotWindow		přepsat
 Settings…	ScreenshotWindow		Nastavení…
+Select area	ScreenshotWindow		Vybrat oblast
 Choose folder	ScreenshotWindow		Vybrat složku
 Name:	ScreenshotWindow		Jméno:
+Active window	ScreenshotWindow		Aktivní okno
 Choose folder…	ScreenshotWindow		Vyberte adresář…
 Please select	ScreenshotWindow		Prosím vyberte
 Failed to save screenshot	ScreenshotWindow		Nepodařilo se uložit snímek obrazovky
 Cancel	ScreenshotWindow		Zrušit
+Whole screen	ScreenshotWindow		Celá obrazovka
 Delay:	ScreenshotWindow		Zpoždění:
 Copy to clipboard	ScreenshotWindow		Kopírovat do schránky
 screenshot	Screenshot	Base filename of screenshot files	snímek

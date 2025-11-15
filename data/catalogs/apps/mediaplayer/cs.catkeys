@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	1732323378
+1	czech	x-vnd.Haiku-MediaPlayer	520971408
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
 Close	MediaPlayer-PlaylistWindow		Zavřít
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
@@ -57,6 +57,7 @@ Video track	MediaPlayer-Main		Video stopa
 Playlist…	MediaPlayer-Main		Playlist…
 <unnamed media>	MediaPlayer-InfoWin		<médium bez názvu>
 Save	MediaPlayer-PlaylistWindow		Uložit
+25% scale	MediaPlayer-Main		25% měřítko
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Zamíchat položky
 Cancel	MediaPlayer-NetworkStream		Zrušit
 Nothing to Play	MediaPlayer-Main		Není co přehrát
