@@ -115,12 +115,21 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 {
 	touchpad_movement event;
 
-	if (cookie->crcEnabled && (packet[3] & 0x08) != 0) {
-		TRACE("ELANTECH: bad crc buffer\n");
-		return B_ERROR;
-	} else if (!cookie->crcEnabled && ((packet[0] & 0x0c) != 0x04
-		|| (packet[3] & 0x1c) != 0x10)) {
-		TRACE("ELANTECH: bad crc buffer\n");
+	int invalidAt = 0;
+
+	if (cookie->crcEnabled) {
+		if ((packet[3] & 0x08) != 0x00)
+			invalidAt = 1;
+	} else if (cookie->icVersion == 7 && cookie->samples[1] == 0x2A) {
+		if ((packet[3] & 0x1c) != 0x10)
+			invalidAt = 2;
+	} else {
+		if (!((packet[0] & 0x08) == 0x00 && (packet[3] & 0x1c) == 0x10))
+			invalidAt = 3;
+	}
+
+	if (invalidAt != 0) {
+		TRACE("ELANTECH: Failed v4 sanity check at %d.\n", invalidAt);
 		return B_ERROR;
 	}
 
@@ -623,6 +632,8 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 	INFO("ELANTECH: version 0x%" B_PRIu32 " (0x%" B_PRIu32 ")\n",
 		cookie->version, cookie->fwVersion);
 
+	cookie->icVersion = (cookie->fwVersion & 0x0f0000) >> 16;
+
 	if (cookie->version >= 3)
 		cookie->send_command = &elantech_dev_send_command;
 	else
@@ -633,6 +644,14 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 		cookie->capabilities, 3) != B_OK) {
 		TRACE("ELANTECH: get capabilities failed!\n");
 		return B_ERROR;
+	}
+
+	if (cookie->version != 1) {
+		if (cookie->send_command(cookie->dev, ELANTECH_CMD_GET_SAMPLE, cookie->samples, 3)
+			!= B_OK) {
+			TRACE("ELANTECH: failed to query sample data\n");
+			return B_ERROR;
+		}
 	}
 
 	if (enable_absolute_mode(cookie) != B_OK) {

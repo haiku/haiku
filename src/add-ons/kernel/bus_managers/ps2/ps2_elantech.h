@@ -35,6 +35,8 @@ typedef struct {
 			uint8				version;
 			uint32				fwVersion;
 
+			uint32				icVersion;
+
 			uint32				x;
 			uint32				y;
 			uint32				fingers;
@@ -42,6 +44,7 @@ typedef struct {
 
 			uint8				buffer[PS2_PACKET_ELANTECH];
 			uint8				capabilities[3];
+			uint8				samples[3];
 
 			uint8				previousZ;
 
