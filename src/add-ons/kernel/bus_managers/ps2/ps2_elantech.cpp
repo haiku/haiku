@@ -67,6 +67,10 @@ const char* kElantechPath[4] = {
 #define HEAD_PACKET		0x1
 #define MOTION_PACKET	0x2
 
+// Error code used by MouseDevice::_ControlThread() in MouseInputDevice.cpp to reuse previous
+// event, basically ignoring the packet.
+#define IGNORE_EVENT B_BAD_DATA
+
 static touchpad_specs gHardwareSpecs;
 
 
@@ -130,7 +134,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 
 	if (invalidAt != 0) {
 		TRACE("ELANTECH: Failed v4 sanity check at %d.\n", invalidAt);
-		return B_ERROR;
+		return IGNORE_EVENT;
 	}
 
 	uint8 packet_type = packet[3] & 3;
@@ -177,7 +181,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			TRACE("ELANTECH: Fingers %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
 			// only process first finger
 			if ((packet[3] & 0xe0) != 0x20)
-				return B_OK;
+				return IGNORE_EVENT;
 
 			event.zPressure = (packet[1] & 0xf0) | ((packet[4] & 0xf0) >> 4);
 
@@ -210,7 +214,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 * byte 3 ~ 5 for another finger
 			 */
 			TRACE("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);			//Most likely palm
-			if (cookie->fingers == 0) return B_OK;
+			if (cookie->fingers == 0) return IGNORE_EVENT;
 			//handle overflow and delta values
 			if ((packet[0] & 0x10) != 0) {
 				event.xPosition = cookie->x += 5 * (int8)packet[1];
@@ -225,7 +229,7 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			break;
 		default:
 			dprintf("ELANTECH: unknown packet type %d\n", packet_type);
-			return B_ERROR;
+			return IGNORE_EVENT;
 	}
 
 	event.buttons = 0;
