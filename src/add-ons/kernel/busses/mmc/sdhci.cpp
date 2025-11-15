@@ -131,7 +131,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 
 	// Finally, configure some useful interrupts
 	EnableInterrupts(SDHCI_INT_CMD_CMP | SDHCI_INT_CARD_REM
-		| SDHCI_INT_TRANS_CMP);
+		| SDHCI_INT_TRANS_CMP | SDHCI_INT_COMMAND_TIMEOUT);
 
 	// We want to see the other bits in the status register, but not have an
 	// interrupt trigger on them (we get a "command complete" interrupt on
