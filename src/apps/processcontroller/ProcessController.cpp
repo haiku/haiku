@@ -232,6 +232,8 @@ ProcessController::~ProcessController()
 		}
 	}
 
+	_SaveSettings();
+
 	delete fMessageRunner;
 	gPCView = NULL;
 
@@ -252,6 +254,8 @@ ProcessController::Init()
 	fMessageRunner = NULL;
 	fLastMemoryHeight = 0;
 	fPrevTime = 0;
+
+	_LoadSettings();
 }
 
 
@@ -270,6 +274,27 @@ ProcessController::_HandleDebugRequest(team_id team, thread_id thread)
 	if (error != B_OK) {
 		// TODO: notify user
 	}
+}
+
+
+void
+ProcessController::_LoadSettings()
+{
+	Preferences preferences(kPreferencesFileName, NULL, false);
+
+	int32 currentMode = get_scheduler_mode();
+	int32 savedMode;
+	if (preferences.ReadInt32(savedMode, "scheduler_mode") && currentMode != savedMode)
+		set_scheduler_mode(savedMode);
+}
+
+
+void
+ProcessController::_SaveSettings()
+{
+	Preferences preferences(kPreferencesFileName);
+
+	preferences.SaveInt32(get_scheduler_mode(), "scheduler_mode");
 }
 
 
@@ -480,12 +505,13 @@ ProcessController::MessageReceived(BMessage *message)
 			BMenuItem* source;
 			if (message->FindPointer("source", (void**)&source) != B_OK)
 				break;
+
 			if (!source->IsMarked())
 				set_scheduler_mode(SCHEDULER_MODE_POWER_SAVING);
 			else
 				set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
-			Preferences preferences(kPreferencesFileName);
-			preferences.SaveInt32(get_scheduler_mode(), "scheduler_mode");
+
+			_SaveSettings();
 			break;
 		}
 
@@ -854,17 +880,9 @@ thread_popup(void *arg)
 	}
 
 	// Scheduler modes
-	int32 currentMode = get_scheduler_mode();
-	Preferences preferences(kPreferencesFileName, NULL, false);
-	int32 savedMode;
-	if (preferences.ReadInt32(savedMode, "scheduler_mode") && currentMode != savedMode) {
-		set_scheduler_mode(savedMode);
-		currentMode = get_scheduler_mode();
-	}
 	BMessage* msg = new BMessage('Schd');
 	item = new BMenuItem(B_TRANSLATE("Power saving"), msg);
-	if ((uint32)currentMode == SCHEDULER_MODE_POWER_SAVING)
-		item->SetMarked(true);
+	item->SetMarked((uint32)get_scheduler_mode() == SCHEDULER_MODE_POWER_SAVING);
 	item->SetTarget(gPCView);
 	addtopbottom(item);
 	addtopbottom(new BSeparatorItem());
