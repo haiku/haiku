@@ -187,58 +187,9 @@ DesktopPoseView::InitDirentIterator(const entry_ref* ref)
 
 
 bool
-DesktopPoseView::FSNotification(const BMessage* message)
-{
-	switch (message->GetInt32("opcode", 0)) {
-		case B_DEVICE_MOUNTED:
-		{
-			dev_t device;
-			if (message->FindInt32("new device", &device) != B_OK)
-				break;
-
-			ASSERT(TargetModel());
-			TrackerSettings settings;
-
-			BVolume volume(device);
-			if (volume.InitCheck() != B_OK)
-				break;
-
-			if (settings.MountVolumesOntoDesktop()
-				&& (!volume.IsShared() || settings.MountSharedVolumesOntoDesktop())) {
-				// place an icon for the volume onto the desktop
-				CreateVolumePose(&volume);
-			}
-		}
-		break;
-	}
-
-	return _inherited::FSNotification(message);
-}
-
-
-bool
 DesktopPoseView::AddPosesThreadValid(const entry_ref*) const
 {
 	return true;
-}
-
-
-void
-DesktopPoseView::AddPosesCompleted()
-{
-	_inherited::AddPosesCompleted();
-
-	CreateTrashPose();
-	CheckAutoPlacedPoses();
-}
-
-
-void
-DesktopPoseView::AddPoses(Model* model)
-{
-	AddVolumePoses();
-
-	_inherited::AddPoses(model);
 }
 
 
@@ -265,11 +216,12 @@ DesktopPoseView::Represents(const entry_ref* ref) const
 void
 DesktopPoseView::StartSettingsWatch()
 {
-	if (be_app->LockLooper()) {
-		be_app->StartWatching(this, kShowDisksIconChanged);
-		be_app->StartWatching(this, kVolumesOnDesktopChanged);
-		be_app->StartWatching(this, kDesktopIntegrationChanged);
-		be_app->UnlockLooper();
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	if (tracker != NULL && tracker->LockLooper()) {
+		tracker->StartWatching(this, kShowDisksIconChanged);
+		tracker->StartWatching(this, kVolumesOnDesktopChanged);
+		tracker->StartWatching(this, kDesktopIntegrationChanged);
+		tracker->UnlockLooper();
 	}
 }
 
@@ -277,11 +229,12 @@ DesktopPoseView::StartSettingsWatch()
 void
 DesktopPoseView::StopSettingsWatch()
 {
-	if (be_app->LockLooper()) {
-		be_app->StopWatching(this, kShowDisksIconChanged);
-		be_app->StopWatching(this, kVolumesOnDesktopChanged);
-		be_app->StopWatching(this, kDesktopIntegrationChanged);
-		be_app->UnlockLooper();
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	if (tracker != NULL && tracker->LockLooper()) {
+		tracker->StopWatching(this, kShowDisksIconChanged);
+		tracker->StopWatching(this, kVolumesOnDesktopChanged);
+		tracker->StopWatching(this, kDesktopIntegrationChanged);
+		tracker->UnlockLooper();
 	}
 }
 

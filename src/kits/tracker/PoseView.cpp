@@ -1285,7 +1285,8 @@ BPoseView::AddPoses(Model* model)
 	if (TargetModel()->IsRoot()) {
 		AddVolumePoses();
 		return;
-	}
+	} else if (IsVolumesRoot())
+		AddVolumePoses();
 
 	ShowBarberPole();
 
@@ -1701,6 +1702,10 @@ BPoseView::AddPosesCompleted()
 	if (window != NULL && window->ShouldAddMenus())
 		window->AddMimeTypesToMenu();
 
+	// add Trash icon to Desktop
+	if (IsVolumesRoot())
+		CreateTrashPose();
+
 	// if we're not in icon mode then we need to check for poses that
 	// were "auto" placed to see if they overlap with other icons
 	if (ViewMode() != kListMode)
@@ -1716,6 +1721,9 @@ BPoseView::AddPosesCompleted()
 		float lastItemTop = (CurrentPoseList()->CountItems() - 1) * fListElemHeight;
 		if (bounds.top > lastItemTop)
 			_inherited::ScrollTo(bounds.left, std::max(lastItemTop, 0.0f));
+
+		SortPoses();
+		Invalidate();
 	}
 }
 
@@ -5397,6 +5405,7 @@ BPoseView::FSNotification(const BMessage* message)
 	node_ref itemNode;
 	dev_t device;
 	Model* targetModel = TargetModel();
+	TrackerSettings settings;
 
 	switch (message->GetInt32("opcode", 0)) {
 		case B_ENTRY_CREATED:
@@ -5414,7 +5423,6 @@ BPoseView::FSNotification(const BMessage* message)
 			// Query windows can get notices on different dirNodes
 			// The Disks window can too
 			// So can the Desktop, as long as the integrate flag is on
-			TrackerSettings settings;
 			if (targetModel != NULL && dirNode != *targetModel->NodeRef()
 				&& !targetModel->IsQuery()
 				&& !targetModel->IsVirtualDirectory()
@@ -5529,16 +5537,19 @@ BPoseView::FSNotification(const BMessage* message)
 			if (message->FindInt32("new device", &device) != B_OK)
 				break;
 
-			if (targetModel != NULL && targetModel->IsRoot()) {
-				BVolume volume(device);
-				if (volume.InitCheck() == B_OK)
-					CreateVolumePose(&volume);
-			} else if (TargetModel()->IsTrash()) {
-				// add trash items from newly mounted volume
+			BVolume volume(device);
+			if (volume.InitCheck() != B_OK)
+				break;
 
+			ASSERT(targetModel != NULL);
+			if (targetModel->IsRoot() // always create volume poses on root
+				|| ((IsVolumesRoot() && settings.MountVolumesOntoDesktop())
+					&& ((!volume.IsShared() || settings.MountSharedVolumesOntoDesktop())))) {
+				CreateVolumePose(&volume);
+			} else if (targetModel->IsTrash()) {
+				// add trash items from newly mounted volume
 				BDirectory trashDir;
 				BEntry entry;
-				BVolume volume(device);
 				if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK
 					&& trashDir.GetEntry(&entry) == B_OK) {
 					Model model(&entry);
@@ -5560,14 +5571,19 @@ BPoseView::FSNotification(const BMessage* message)
 
 		case B_DEVICE_UNMOUNTED:
 			if (message->FindInt32("device", &device) == B_OK) {
-				if (targetModel != NULL
-					&& targetModel->NodeRef()->device == device) {
-					// close the window from a volume that is gone
-					DisableSaveLocation();
-					Window()->Close();
-				} else if (targetModel != NULL) {
-					EachPoseAndModel(fPoseList, &PoseHandleDeviceUnmounted,
-						this, device);
+				ASSERT(targetModel != NULL);
+				if (targetModel->NodeRef()->device == device) {
+					if (IsFilePanel()) {
+						// reset location to home directory
+						BMessage message(kSwitchToHome);
+						Window()->PostMessage(&message, this);
+					} else {
+						// close the window from a volume that is gone
+						DisableSaveLocation();
+						Window()->Close();
+					}
+				} else {
+					EachPoseAndModel(fPoseList, &PoseHandleDeviceUnmounted, this, device);
 				}
 			}
 			break;
@@ -9608,12 +9624,9 @@ BPoseView::SortPoses()
 	PRINT(("===================\n"));
 #endif
 
-	BPose** poses = reinterpret_cast<BPose**>(fPoseList->AsBList()->Items());
-	std::stable_sort(poses, &poses[fPoseList->CountItems()], PoseComparator(this));
-	if (IsFiltering()) {
-		poses = reinterpret_cast<BPose**>(fFilteredPoseList->AsBList()->Items());
-		std::stable_sort(poses, &poses[fFilteredPoseList->CountItems()], PoseComparator(this));
-	}
+	PoseList* poseList = CurrentPoseList();
+	BPose** poses = reinterpret_cast<BPose**>(poseList->AsBList()->Items());
+	std::stable_sort(poses, &poses[poseList->CountItems()], PoseComparator(this));
 }
 
 

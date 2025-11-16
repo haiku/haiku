@@ -62,11 +62,8 @@ public:
 
 protected:
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
-	virtual bool FSNotification(const BMessage*);
 
 	virtual bool AddPosesThreadValid(const entry_ref*) const;
-	virtual void AddPosesCompleted();
-	virtual void AddPoses(Model* model = NULL);
 
 	virtual bool IsDesktopView() const;
 

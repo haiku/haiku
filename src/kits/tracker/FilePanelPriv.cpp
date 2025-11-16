@@ -1755,53 +1755,6 @@ BFilePanelPoseView::StopWatching()
 }
 
 
-bool
-BFilePanelPoseView::FSNotification(const BMessage* message)
-{
-	switch (message->GetInt32("opcode", 0)) {
-		case B_DEVICE_MOUNTED:
-		{
-			if (!IsDesktop() && !TargetModel()->IsRoot())
-				break;
-
-			dev_t device;
-			if (message->FindInt32("new device", &device) != B_OK)
-				break;
-
-			ASSERT(TargetModel() != NULL);
-			TrackerSettings settings;
-
-			BVolume volume(device);
-			if (volume.InitCheck() != B_OK)
-				break;
-
-			// place volume icon onto Desktop or Root
-			if ((!volume.IsShared() || settings.MountSharedVolumesOntoDesktop())
-				&& ((IsVolumesRoot() && settings.MountVolumesOntoDesktop())
-					|| TargetModel()->IsRoot())) {
-				CreateVolumePose(&volume);
-			}
-			break;
-		}
-
-		case B_DEVICE_UNMOUNTED:
-		{
-			dev_t device;
-			if (message->FindInt32("device", &device) == B_OK) {
-				if (TargetModel() != NULL && TargetModel()->NodeRef()->device == device) {
-					// Volume currently shown in this file panel
-					// disappeared, reset location to home directory
-					BMessage message(kSwitchToHome);
-					MessageReceived(&message);
-				}
-			}
-			break;
-		}
-	}
-	return _inherited::FSNotification(message);
-}
-
-
 void
 BFilePanelPoseView::RestoreState(AttributeStreamNode* node)
 {
@@ -1836,26 +1789,11 @@ BFilePanelPoseView::InitDirentIterator(const entry_ref* ref)
 void
 BFilePanelPoseView::AddPosesCompleted()
 {
-	_inherited::AddPosesCompleted();
-
-	if (IsDesktop())
-		CreateTrashPose();
-
 	// the menu that adds these shortcuts may not exist initially
 	Window()->AddShortcut('D', B_COMMAND_KEY, new BMessage(kSwitchToDesktop));
 	Window()->AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
 
-	UpdateScrollRange();
-}
-
-
-void
-BFilePanelPoseView::AddPoses(Model* model)
-{
-	if (IsDesktop())
-		AddVolumePoses();
-
-	_inherited::AddPoses(model);
+	_inherited::AddPosesCompleted();
 }
 
 

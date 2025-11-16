@@ -178,8 +178,6 @@ public:
 	BFilePanelPoseView(Model*);
 
 	virtual bool IsFilePanel() const;
-	virtual bool FSNotification(const BMessage*);
-
 	virtual bool IsDesktop() const { return fIsDesktop; };
 	void SetIsDesktop(bool on) { fIsDesktop = on; };
 
@@ -195,7 +193,6 @@ protected:
 
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 	virtual void AddPosesCompleted();
-	virtual void AddPoses(Model* model = NULL);
 	virtual bool IsVolumesRoot() const { return fIsDesktop; };
 
 	void AdaptToVolumeChange(BMessage*);
