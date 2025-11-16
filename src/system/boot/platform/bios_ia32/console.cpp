@@ -10,8 +10,10 @@
 #include "video.h"
 
 #include <SupportDefs.h>
-#include <util/kernel_cpp.h>
+
 #include <boot/stage2.h>
+#include <utf8_functions.h>
+#include <util/kernel_cpp.h>
 
 #include <string.h>
 
@@ -80,16 +82,51 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferS
 	if (gKernelArgs.frame_buffer.enabled)
 		return bufferSize;
 
-	for (uint32 i = 0; i < bufferSize; i++) {
-		if (string[0] == '\n')
+	size_t length = bufferSize;
+	while (length > 0) {
+		if (string[0] == '\n') {
 			sScreenOffset += sScreenWidth - (sScreenOffset % sScreenWidth);
-		else
+			length--;
+			string++;
+		} else if ((string[0] & 0x80) == 0) {
 			sScreenBase[sScreenOffset++] = sColor | string[0];
+			length--;
+			string++;
+		} else {
+			// UTF8ToCharCode expects a NULL-terminated string, which we can't
+			// guarantee. UTF8NextCharLen checks the bounds and allows us to
+			// know whether we can safely read the next character.
+			uint32 codepoint;
+			uint32 charLen = UTF8NextCharLen(string, length);
+			if (charLen > 0) {
+				codepoint = UTF8ToCharCode(&string);
+				length -= charLen;
+			} else {
+				codepoint = 0xfffd;
+				string++;
+				length--;
+			}
+
+			switch (codepoint) {
+				case 0x25B2:	// BLACK UP-POINTING TRIANGLE
+					sScreenBase[sScreenOffset++] = sColor | 0x1e;
+					break;
+				case 0x25BC:	// BLACK DOWN-POINTING TRIANGLE
+					sScreenBase[sScreenOffset++] = sColor | 0x1f;
+					break;
+				case 0x2026:	// HORIZONTAL ELLIPSIS
+					WriteAt(cookie, -1, "...", 3);
+					break;
+				case 0x00A9:	// COPYRIGHT SIGN
+					WriteAt(cookie, -1, "(C)", 3);
+					break;
+				default:
+					sScreenBase[sScreenOffset++] = sColor | '?';
+			}
+		}
 
 		if (sScreenOffset >= sScreenWidth * sScreenHeight)
 			scroll_up();
-
-		string++;
 	}
 	return bufferSize;
 }
