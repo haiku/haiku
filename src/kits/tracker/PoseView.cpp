@@ -997,14 +997,12 @@ BPoseView::AttachedToWindow()
 {
 	AdoptSystemColors();
 
-	AddFilter(new ShortcutFilter(B_RETURN, B_OPTION_KEY, kOpenSelection,
-		this));
+	AddFilter(new ShortcutFilter(B_RETURN, B_OPTION_KEY, kOpenSelection, this));
 		// add Option-Return as a shortcut filter because AddShortcut
 		// doesn't allow us to have shortcuts without Command yet
 	AddFilter(new ShortcutFilter(B_ESCAPE, 0, B_CANCEL, this));
 		// Escape key, used to abort an on-going clipboard cut or filtering
-	AddFilter(new ShortcutFilter(B_ESCAPE, B_SHIFT_KEY,
-		kCancelSelectionToClipboard, this));
+	AddFilter(new ShortcutFilter(B_ESCAPE, B_SHIFT_KEY, kCancelSelectionToClipboard, this));
 		// Escape + SHIFT will remove current selection from clipboard,
 		// or all poses from current folder if 0 selected
 
@@ -1024,7 +1022,7 @@ BPoseView::AttachedToWindow()
 
 	FSClipboardStartWatch(this);
 
-	BView::AttachedToWindow();
+	_inherited::AttachedToWindow();
 }
 
 
@@ -1717,7 +1715,7 @@ BPoseView::AddPosesCompleted()
 		BRect bounds(Bounds());
 		float lastItemTop = (CurrentPoseList()->CountItems() - 1) * fListElemHeight;
 		if (bounds.top > lastItemTop)
-			BView::ScrollTo(bounds.left, std::max(lastItemTop, 0.0f));
+			_inherited::ScrollTo(bounds.left, std::max(lastItemTop, 0.0f));
 	}
 }
 
@@ -2722,8 +2720,7 @@ BPoseView::MessageReceived(BMessage* message)
 							bool sortFolderNamesFirst;
 							if (message->FindBool("SortFolderNamesFirst",
 								&sortFolderNamesFirst) == B_OK) {
-								settings.SetSortFolderNamesFirst(
-									sortFolderNamesFirst);
+								settings.SetSortFolderNamesFirst(sortFolderNamesFirst);
 							}
 							NameAttributeText::SetSortFolderNamesFirst(
 								settings.SortFolderNamesFirst());
@@ -7622,9 +7619,9 @@ BPoseView::DragSelectedPoses(const BPose* pose, BPoint where, uint32 buttons)
 	BPoint offset;
 	dragBitmap = MakeDragBitmap(dragRect, where, index, offset);
 	if (dragBitmap != NULL)
-		BView::DragMessage(&message, dragBitmap, B_OP_ALPHA, offset);
+		_inherited::DragMessage(&message, dragBitmap, B_OP_ALPHA, offset);
 	else
-		BView::DragMessage(&message, dragRect);
+		_inherited::DragMessage(&message, dragRect);
 
 	// turn on auto scrolling
 	fAutoScrollState = kWaitForTransition;
@@ -8111,7 +8108,7 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 
 				if (pose == NULL && bounds.top > 0) {
 					// scroll up a little
-					BView::ScrollTo(bounds.left, std::max(bounds.top - fListElemHeight, 0.0f));
+					_inherited::ScrollTo(bounds.left, std::max(bounds.top - fListElemHeight, 0.0f));
 				}
 			}
 		}
@@ -9167,7 +9164,7 @@ BPoseView::Draw(BRect updateRect)
 	if ((Flags() & B_DRAW_ON_CHILDREN) == 0)
 		DrawAfterChildren(updateRect);
 
-	BView::Draw(updateRect);
+	_inherited::Draw(updateRect);
 }
 
 
@@ -10440,12 +10437,12 @@ BPoseView::UpdateAfterFilterChange()
 
 	BPose* pose = fFilteredPoseList->LastItem();
 	if (pose == NULL)
-		BView::ScrollTo(0, 0);
+		_inherited::ScrollTo(0, 0);
 	else {
 		BRect bounds = Bounds();
 		float height = fFilteredPoseList->CountItems() * fListElemHeight;
 		if (bounds.top > 0 && bounds.bottom > height)
-			BView::ScrollTo(0, std::max(height - bounds.Height(), 0.0f));
+			_inherited::ScrollTo(0, std::max(height - bounds.Height(), 0.0f));
 	}
 
 	UpdateScrollRange();
