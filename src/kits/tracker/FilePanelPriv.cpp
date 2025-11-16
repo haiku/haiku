@@ -1736,22 +1736,34 @@ BFilePanelPoseView::BFilePanelPoseView(Model* model)
 void
 BFilePanelPoseView::StartWatching()
 {
-	TTracker::WatchNode(0, B_WATCH_MOUNT, this);
-
 	// inter-application observing
 	BMessenger tracker(kTrackerSignature);
 	BHandler::StartWatching(tracker, kVolumesOnDesktopChanged);
+
+	BHandler::StartWatching(tracker, kShowSelectionWhenInactiveChanged);
+	BHandler::StartWatching(tracker, kTransparentSelectionChanged);
+	BHandler::StartWatching(tracker, kSortFolderNamesFirstChanged);
+	BHandler::StartWatching(tracker, kHideDotFilesChanged);
+	BHandler::StartWatching(tracker, kTypeAheadFilteringChanged);
+
+	_inherited::StartWatching();
 }
 
 
 void
 BFilePanelPoseView::StopWatching()
 {
-	stop_watching(this);
-
 	// inter-application observing
 	BMessenger tracker(kTrackerSignature);
 	BHandler::StopWatching(tracker, kVolumesOnDesktopChanged);
+
+	BHandler::StopWatching(tracker, kShowSelectionWhenInactiveChanged);
+	BHandler::StopWatching(tracker, kTransparentSelectionChanged);
+	BHandler::StopWatching(tracker, kSortFolderNamesFirstChanged);
+	BHandler::StopWatching(tracker, kHideDotFilesChanged);
+	BHandler::StopWatching(tracker, kTypeAheadFilteringChanged);
+
+	_inherited::StopWatching();
 }
 
 
