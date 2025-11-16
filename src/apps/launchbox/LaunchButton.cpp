@@ -52,6 +52,7 @@ LaunchButton::LaunchButton(const char* name, const char* label,
 {
 	if (sClickSpeed == 0 || get_click_speed(&sClickSpeed) != B_OK)
 		sClickSpeed = 500000;
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

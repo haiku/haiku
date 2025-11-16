@@ -47,7 +47,7 @@ PadView::PadView(const char* name)
 	  fIconSize(DEFAULT_ICON_SIZE)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 	get_click_speed(&sActivationDelay);
 
 	fButtonLayout->SetInsets(2, 7, 2, 2);
