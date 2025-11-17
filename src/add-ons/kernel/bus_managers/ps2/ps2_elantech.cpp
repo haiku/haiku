@@ -99,6 +99,9 @@ elantech_process_packet_v3(elantech_cookie *cookie, touchpad_movement *_event,
 static status_t
 elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 	uint8 packet[PS2_PACKET_ELANTECH]);
+static status_t
+elantech_process_packet_trackpoint(elantech_cookie *cookie, mouse_movement *_movement,
+	uint8 packet[PS2_PACKET_ELANTECH]);
 
 
 /* Common legend
@@ -111,14 +114,18 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
  * P: pressure
  */
 static status_t
-get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtime_t timeout)
+get_elantech_movement(elantech_cookie *cookie, touchpad_read *_read)
 {
+	touchpad_movement event = {};
+	mouse_movement movement {};
 	uint8 packet[PS2_PACKET_ELANTECH];
 
 	status_t status = acquire_sem_etc(cookie->sem, 1, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
-		timeout);
-	if (status < B_OK)
+		_read->timeout);
+	if (status < B_OK) {
+		TRACE("ELANTECH: acquire_sem_etc err or timeout.\n");
 		return status;
+	}
 
 	if (!cookie->dev->active) {
 		TRACE("ELANTECH: read_event: Error device no longer active\n");
@@ -132,24 +139,32 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 	}
 
 	if ((cookie->capabilities[0] & 0x80) != 0 && (packet[3] & 0x0f) == 0x06) {
-		status = IGNORE_EVENT;
+		status = elantech_process_packet_trackpoint(cookie, &movement, packet);
+		if (status == B_OK) {
+			_read->event = MS_READ;
+			_read->u.mouse = movement;
+		}
 	} else {
 		switch (cookie->version) {
 			case 1:
-				status = elantech_process_packet_v1(cookie, _event, packet);
+				status = elantech_process_packet_v1(cookie, &event, packet);
 				break;
 			case 2:
-				status = elantech_process_packet_v2(cookie, _event, packet);
+				status = elantech_process_packet_v2(cookie, &event, packet);
 				break;
 			case 3:
-				status = elantech_process_packet_v3(cookie, _event, packet);
+				status = elantech_process_packet_v3(cookie, &event, packet);
 				break;
 			case 4:
-				status = elantech_process_packet_v4(cookie, _event, packet);
+				status = elantech_process_packet_v4(cookie, &event, packet);
 				break;
 			default:
 				TRACE("ELANTECH: Unknown version %d.\n", cookie->version);
 				return B_ERROR;
+		}
+		if (status == B_OK) {
+			_read->event = MS_READ_TOUCHPAD;
+			_read->u.touchpad = event;
 		}
 	}
 	return status;
@@ -786,6 +801,64 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 
 
 static status_t
+elantech_process_packet_trackpoint(elantech_cookie *cookie, mouse_movement *_movement,
+	uint8 packet[PS2_PACKET_ELANTECH])
+{
+	/*               7   6   5   4   3   2   1   0 (LSB)
+	 * -------------------------------------------
+	 * ipacket[0]:   0   0  SY  SX   0   M   R   L
+	 * ipacket[1]: ~SX   0   0   0   0   0   0   0
+	 * ipacket[2]: ~SY   0   0   0   0   0   0   0
+	 * ipacket[3]:   0   0 ~SY ~SX   0   1   1   0
+	 * ipacket[4]:  X7  X6  X5  X4  X3  X2  X1  X0
+	 * ipacket[5]:  Y7  Y6  Y5  Y4  Y3  Y2  Y1  Y0
+	 * -------------------------------------------
+	 * X and Y are written in two's complement spread
+	 * over 9 bits with SX/SY the relative top bit and
+	 * X7..X0 and Y7..Y0 the lower bits.
+	 */
+	int32 x, y;
+	uint8 buttons;
+
+	if (!(!(packet[0] & 0xC8) && !(packet[1] & 0x7F)
+			&& !(packet[2] & 0x7F) && !(packet[3] & 0xC9)
+			&& !(packet[0] & 0x10) != !(packet[1] & 0x80)
+			&& !(packet[0] & 0x10) != !(packet[3] & 0x10)
+			&& !(packet[0] & 0x20) != !(packet[2] & 0x80)
+			&& !(packet[0] & 0x20) != !(packet[3] & 0x20)))
+		return IGNORE_EVENT;
+
+	/*
+	* This firmware misreport coordinates for trackpoint
+	* occasionally. Discard packets outside of [-127, 127] range
+	* to prevent cursor jumps.
+	*/
+	if (packet[4] == 0x80 || packet[5] == 0x80
+		|| packet[1] >> 7 == packet[4] >> 7
+		|| packet[2] >> 7 == packet[5] >> 7)
+		return IGNORE_EVENT;
+
+	x = packet[4] - 0x100 + (packet[1] << 1);
+	y = packet[5] - 0x100 + (packet[2] << 1);
+
+	buttons = packet[0] & 7;
+
+	mouse_movement movement = {
+		.buttons = buttons,
+		.xdelta = x,
+		.ydelta = y,
+		.timestamp = system_time(),
+		.wheel_ydelta = 0,
+		.wheel_xdelta = 0,
+	};
+
+	*_movement = movement;
+
+	return B_OK;
+}
+
+
+static status_t
 synaptics_dev_send_command(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count)
 {
 	if (ps2_dev_sliced_command(dev, cmd) != B_OK
@@ -1363,13 +1436,22 @@ elantech_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 			return user_memcpy(buffer, &gHardwareSpecs, sizeof(gHardwareSpecs));
 
 		case MS_READ_TOUCHPAD:
-			TRACE("ELANTECH: MS_READ get event\n");
+			TRACE("ELANTECH: MS_READ_TOUCHPAD get event\n");
 			if (user_memcpy(&read.timeout, &(((touchpad_read*)buffer)->timeout),
 					sizeof(bigtime_t)) != B_OK)
 				return B_BAD_ADDRESS;
-			if ((status = get_elantech_movement(cookie, &read.u.touchpad, read.timeout)) != B_OK)
+			if ((status = get_elantech_movement(cookie, &read)) != B_OK) {
+				TRACE("ELANTECH: ioctl error with status: %s\n", strerror(status));
 				return status;
-			read.event = MS_READ_TOUCHPAD;
+			}
+#ifdef TRACE_PS2_ELANTECH
+			if (read.event = MS_READ_TOUCHPAD) {
+				TRACE("ELANTECH: ioctl touchpad fingers: 0x%x\n", (int)read.u.touchpad.fingers);
+				TRACE("ELANTECH: ioctl touchpad buttons: %d\n", (int)read.u.touchpad.buttons);
+			} else if (read.event = MS_READ) {
+				TRACE("ELANTECH: ioctl mouse buttons: %d\n", (int)read.u.mouse.buttons);
+			}
+#endif
 			return user_memcpy(buffer, &read, sizeof(read));
 
 		default:
