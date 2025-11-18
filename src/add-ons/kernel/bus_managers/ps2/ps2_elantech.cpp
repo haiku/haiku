@@ -80,6 +80,9 @@ static touchpad_specs gHardwareSpecs;
 
 
 static status_t
+elantech_process_packet_v3(elantech_cookie *cookie, touchpad_movement *_event,
+	uint8 packet[PS2_PACKET_ELANTECH]);
+static status_t
 elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 	uint8 packet[PS2_PACKET_ELANTECH]);
 
@@ -114,7 +117,117 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 		return B_ERROR;
 	}
 
-	return elantech_process_packet_v4(cookie, _event, packet);
+	if ((cookie->capabilities[0] & 0x80) != 0 && (packet[3] & 0x0f) == 0x06) {
+		status = IGNORE_EVENT;
+	} else {
+		switch (cookie->version) {
+			case 3:
+				status = elantech_process_packet_v3(cookie, _event, packet);
+				break;
+			case 4:
+				status = elantech_process_packet_v4(cookie, _event, packet);
+				break;
+			default:
+				TRACE("ELANTECH: Unknown version %d.\n", cookie->version);
+				return B_ERROR;
+		}
+	}
+	return status;
+}
+
+
+static status_t
+elantech_process_packet_v3(elantech_cookie *cookie, touchpad_movement *_event,
+	uint8 packet[PS2_PACKET_ELANTECH])
+{
+	/*               7   6   5   4   3   2   1   0 (LSB)
+	 * -------------------------------------------
+	 * ipacket[0]:  N1  N0  W3  W2   0   1   R   L
+	 * ipacket[1]:  P7  P6  P5  P4 X11 X10  X9  X8
+	 * ipacket[2]:  X7  X6  X5  X4  X3  X2  X1  X0
+	 * ipacket[3]:   0   0  W1  W0   0   0   1   0
+	 * ipacket[4]:  P3  P1  P2  P0 Y11 Y10  Y9  Y8
+	 * ipacket[5]:  Y7  Y6  Y5  Y4  Y3  Y2  Y1  Y0
+	 * -------------------------------------------
+	 */
+
+	// Validation based on FreeBSD psm.c driver.
+	bool valid;
+	valid = false;
+	if (cookie->crcEnabled) {
+		if ((packet[3] & 0x09) == 0x08 || (packet[3] & 0xcf) == 0x02)
+			valid = true;
+	} else if (((packet[0] & 0x0c) == 0x04 && (packet[3] & 0xcf) == 0x02)
+				|| ((packet[0] & 0x0c) == 0x0c && (packet[3] & 0xce) == 0x0c))
+		valid = true;
+
+	if (!valid)
+		return IGNORE_EVENT;
+
+	const uint8 debounce_pkt[] = { 0xc4, 0xff, 0xff, 0x02, 0xff, 0xff };
+	uint32 x, y;
+	uint8 n, w, z;
+	uint8 buttons;
+
+	buttons = packet[0] & 3;
+
+	x = ((packet[1] & 0x0f) << 8 | packet[2]);
+	y = ((packet[4] & 0x0f) << 8 | packet[5]);
+	z = 0;
+	n = (packet[0] & 0xc0) >> 6;
+	if (n == 2) {
+		/*
+		 * Two-finger touch causes two packets -- a head packet
+		 * and a tail packet. We report a single event and ignore
+		 * the tail packet.
+		 */
+		if (cookie->crcEnabled) {
+			if ((packet[3] & 0x09) != 0x08)
+				return IGNORE_EVENT;
+		} else {
+			/* The hardware sends this packet when in debounce state.
+			 * The packet should be ignored. */
+			if (!memcmp(packet, debounce_pkt, sizeof(debounce_pkt)))
+				return IGNORE_EVENT;
+			if ((packet[0] & 0x0c) != 0x04 &&
+				(packet[3] & 0xcf) != 0x02) {
+				/* not the head packet -- ignore */
+				return IGNORE_EVENT;
+			}
+		}
+	}
+
+	/* Prevent jumping cursor if pad isn't touched or reports garbage. */
+	if (n == 0 ||
+		((x == 0 || y == 0 || x == gHardwareSpecs.areaEndX || y == gHardwareSpecs.areaEndY)
+		&& (x != cookie->x || y != cookie->y))) {
+		x = cookie->x;
+		y = cookie->y;
+	}
+
+	if (cookie->fwVersion >= 0x020800)
+		z = (packet[1] & 0xf0) | ((packet[4] & 0xf0) >> 4);
+	else if (n)
+		z = DEFAULT_PRESSURE;
+
+	w = ((packet[0] & 0x30) >> 2) | ((packet[3] & 0x30) >> 4);
+
+	cookie->x = x;
+	cookie->y = y;
+
+	touchpad_movement event = {
+		.buttons = buttons,
+		.xPosition = x,
+		.yPosition = y,
+		.zPressure = z,
+		//.nFingers = n,
+		.fingers = (uint8)((1 << n) - 1),
+		.fingerWidth = w,
+	};
+
+	*_event = event;
+
+	return B_OK;
 }
 
 
@@ -803,6 +916,11 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 		if (cookie->send_command(cookie->dev, ELANTECH_CMD_GET_SAMPLE, cookie->samples, 3)
 			!= B_OK) {
 			TRACE("ELANTECH: failed to query sample data\n");
+			return B_ERROR;
+		}
+
+		if (cookie->samples[1] == 0x74 && cookie->version == 3) {
+			TRACE("ELANTECH: absolute mode broken, forcing standard PS/2 protocol\n");
 			return B_ERROR;
 		}
 	}
