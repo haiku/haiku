@@ -18,6 +18,7 @@ panic(const char *format, ...)
 	puts("*** PANIC ***");
 	va_start(args, format);
 	vprintf(format, args);
+	fflush(stdout);
 	va_end(args);
 }
 
@@ -29,6 +30,7 @@ dprintf(const char *format, ...)
 
 	va_start(args, format);
 	vprintf(format, args);
+	fflush(stdout);
 	va_end(args);
 }
 

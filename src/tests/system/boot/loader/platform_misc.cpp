@@ -6,6 +6,8 @@
 
 #include <boot/platform.h>
 
+#include <arch/elf.h>
+
 
 extern bool gShowMenu;
 

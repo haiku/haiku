@@ -6,6 +6,7 @@
 
 #include "Handle.h"
 
+#include <boot/partitions.h>
 #include <boot/platform.h>
 #include <util/kernel_cpp.h>
 
@@ -216,4 +217,10 @@ status_t
 platform_register_boot_device(Node *device)
 {
 	return B_OK;
+}
+
+
+void
+platform_cleanup_devices()
+{
 }

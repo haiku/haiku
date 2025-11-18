@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tests system boot loader ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
-UsePrivateHeaders kernel shared storage system ;
+UsePrivateHeaders kernel shared storage system libroot ;
 SubDirSysHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_KERNEL_ARCH_DIR) ;
 SubDirSysHdrs $(HAIKU_TOP) headers private system arch $(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
@@ -16,7 +16,7 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ;
 # they will really be used instead of their POSIX counterparts
 # in libroot.so
 
-ObjectDefines
+ObjectC++Flags
 	# boot loader
 	main.cpp
 	vfs.cpp
@@ -46,11 +46,17 @@ ObjectDefines
 	PartitionMap.cpp
 	PartitionMapParser.cpp
 	:
-	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close main=boot_main
+	-fvisibility=hidden
+	[ FDefines
+		open=boot_open close=boot_close
+		read_pos=boot_read_pos write_pos=boot_write_pos fstat=boot_fstat
+		main=boot_main
+		get_haiku_revision=__get_haiku_revision __dso_handle=unused_dso_handle ]
 	;
 
 {
 	local defines =
+		_KERNEL_MODE _BOOT_MODE
 		BOOT_ARCH=\\\"$(TARGET_ARCH)\\\"
 			# the boot loader test application will try to load the BeOS kernel
 			# from a supported partition/file system
@@ -85,15 +91,18 @@ SimpleTest BootLoaderTest :
 	platform_menu.cpp
 	platform_misc.cpp
 	platform_mmu.cpp
+	platform_stubs.cpp
 	Handle.cpp
 
 	# boot loader
+	PathBlocklist.cpp
 	main.cpp
 	vfs.cpp
 	partitions.cpp
 	RootFileSystem.cpp
 	elf.cpp
 	menu.cpp
+	package_support.cpp
 	loader.cpp
 	kernel_args.cpp
 	load_driver_settings.cpp
@@ -117,10 +126,11 @@ SimpleTest BootLoaderTest :
 	driver_settings.cpp
 	ring_buffer.cpp
 	KMessage.cpp
-
+	Referenceable.cpp
 	:
-	boottest_bfs.a boottest_amiga_ffs.a boottest_tarfs.a libz.a
-	kernelland_emu
+	boottest_bfs.a boottest_amiga_ffs.a boottest_tarfs.a
+	libkernelland_emu.so
+	[ BuildFeatureAttribute zlib : library ] [ TargetLibstdc++ ]
 ;
 
 # Tell Jam where to find the utility sources
@@ -134,10 +144,15 @@ SEARCH on [ FGristFiles KMessage.cpp ]
 SEARCH on [ FGristFiles driver_settings.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
+SEARCH on [ FGristFiles Referenceable.cpp ]
+    = [ FDirName $(HAIKU_TOP) src kits support ] ;
+
 SEARCH on [ FGristFiles
+		PathBlocklist.cpp
 		main.cpp vfs.cpp partitions.cpp
 		heap.cpp RootFileSystem.cpp
 		elf.cpp menu.cpp loader.cpp
+		package_support.cpp
 		kernel_args.cpp load_driver_settings.cpp pager.cpp
 	] = [ FDirName $(HAIKU_TOP) src system boot loader ] ;
 

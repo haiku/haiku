@@ -10,12 +10,11 @@
 #include <stdio.h>
 
 
-status_t
-platform_allocate_region(void **_address, size_t size, uint8 protection,
-	bool exactAddress)
+extern "C" status_t
+platform_allocate_region(void **_address, size_t size, uint8 protection)
 {
 	printf("platform_allocate_region(address = %p, size = %lu, protection = %u, exactAdress = %d)\n",
-		*_address, size, protection, exactAddress);
+		*_address, size, protection);
 
 	void *address = malloc(size);
 	if (address == NULL)
@@ -26,10 +25,25 @@ platform_allocate_region(void **_address, size_t size, uint8 protection,
 }
 
 
-status_t
+extern "C" status_t
 platform_free_region(void *address, size_t size)
 {
 	free(address);
 	return B_OK;
 }
 
+
+extern "C" status_t
+platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
+{
+	*_result = (addr_t)address;
+	return B_OK;
+}
+
+
+extern "C" status_t
+platform_kernel_address_to_bootloader_address(addr_t address, void **_result)
+{
+	*_result = (void*)address;
+	return B_OK;
+}

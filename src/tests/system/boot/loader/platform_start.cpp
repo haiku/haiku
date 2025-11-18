@@ -8,6 +8,7 @@
 #include <boot/kernel_args.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 extern "C" int boot_main(struct stage2_args *args);
