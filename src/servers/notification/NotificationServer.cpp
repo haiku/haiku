@@ -60,7 +60,7 @@ NotificationServer::MessageReceived(BMessage* message)
 
 			// Emit a sound for this event
 			int32 type = 0;
-			if (message->FindInt32("type", &type) == B_OK) {
+			if (message->FindInt32("_type", &type) == B_OK) {
 				if (type < (int32)(sizeof(kSoundNames) / sizeof(const char*)))
 					system_beep(kSoundNames[type]);
 			}
