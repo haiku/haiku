@@ -61,11 +61,16 @@ const char* kElantechPath[4] = {
 #define REAL_MAX_PRESSURE	50
 #define MAX_PRESSURE		255
 
+#define DEFAULT_PRESSURE		30
+#define DEFAULT_FINGER_WIDTH	4
+
 #define ELANTECH_HISTORY_SIZE	256
 
 #define STATUS_PACKET	0x0
 #define HEAD_PACKET		0x1
 #define MOTION_PACKET	0x2
+
+#define ELANTECH_MAX_FINGERS	5
 
 // Error code used by MouseDevice::_ControlThread() in MouseInputDevice.cpp to reuse previous
 // event, basically ignoring the packet.
@@ -117,7 +122,7 @@ static status_t
 elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 	uint8 packet[PS2_PACKET_ELANTECH])
 {
-	touchpad_movement event;
+	touchpad_movement event = {};
 
 	int invalidAt = 0;
 
@@ -160,6 +165,14 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 */
 			event.buttons = (packet[0] & 0x3);
 
+#ifdef ELANTECH_ENABLE_HARDWARE_PALM_DETECTION
+			cookie->palm = (packet[4] & 0x80) != 0;
+			if (cookie->palm) {
+				TRACE("ELANTECH: Hardware palm detected (HEAD)\n");
+				return IGNORE_EVENT;
+			}
+#endif
+
 			// Event fingers contains a bitmap of fingers.
 			event.fingers = packet[1] & 0x1f;
 			TRACE("ELANTECH: Fingers bitmap %" B_PRId32 ", raw %x (STATUS)\n",
@@ -169,11 +182,11 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			event.xPosition = 0;
 			event.yPosition = 0;
 
-			// Pressure is not provided on this packet, so use a backup value.
-			event.zPressure = cookie->previousZ;
-
-			//fingers, no palm
-			cookie->fingers = (packet[4] & 0x80) == 0 ? event.fingers : 0;
+			// Pressure is not provided on this packet, so make it up with sensible values
+			if (event.fingers == 0)
+				event.zPressure = 0;
+			else
+				event.zPressure = DEFAULT_PRESSURE;
 
 			TRACE("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 " (STATUS)\n",
 				cookie->x, cookie->y);
@@ -196,23 +209,53 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			 */
 			event.buttons = (packet[0] & 0x3);
 
-			TRACE("ELANTECH: Fingers %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
-			// only process first finger
-			if ((packet[3] & 0xe0) != 0x20)
+			TRACE("ELANTECH: Finger id %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
+			int id;
+			id = ((packet[3] & 0xe0) >> 5) - 1;
+			if (id < 0 || id >= ELANTECH_MAX_FINGERS) {
+				TRACE("ELANTECH: Not right fingers (HEAD)");
 				return IGNORE_EVENT;
+			}
 
-			event.fingers = cookie->fingers;
+#ifdef ELANTECH_ENABLE_HARDWARE_PALM_DETECTION
+			if (cookie->palm) {
+				TRACE("ELANTECH: Hardware palm detected (HEAD)\n");
+				return IGNORE_EVENT;
+			}
+#endif
+
+			// Head packet processes 1 finger only. Question is if the id is different than
+			// the one provided by STATUS packet, is this a new finger or a replacement of
+			// the previous ones?
+			// As per testing let's assume a new finger is added.
+			// That's in sync with the logic on BSDs and Linux drivers providing MT events.
+			//event.fingers = cookie->fingers;
+			event.fingers = cookie->fingers | (1 << id);
+			//event.fingers = (1 << id);
+
+			// only process first finger
+			if (id != 0) {
+				TRACE("ELANTECH: RET Only process first finger. (HEAD)\n");
+				return IGNORE_EVENT;
+			}
 
 			event.zPressure = (packet[1] & 0xf0) | ((packet[4] & 0xf0) >> 4);
 
 			cookie->previousZ = event.zPressure;
 
-			cookie->x = event.xPosition = ((packet[1] & 0xf) << 8) | packet[2];
-			cookie->y = event.yPosition = ((packet[4] & 0xf) << 8) | packet[5];
-			TRACE("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 "\n (HEAD)",
+			event.xPosition = ((packet[1] & 0xf) << 8) | packet[2];
+			event.yPosition = ((packet[4] & 0xf) << 8) | packet[5];
+
+			TRACE("ELANTECH: dx: %d dy: %d (HEAD)\n",
+				(int)event.xPosition - (int)cookie->x,
+				(int)event.yPosition - (int)cookie->y);
+
+			cookie->x = event.xPosition;
+			cookie->y = event.yPosition;
+			TRACE("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 " (HEAD)\n",
 				cookie->x, cookie->y);
 			TRACE("ELANTECH: buttons 0x%x x %" B_PRIu32 " y %" B_PRIu32
-				" z %d\n", event.buttons, event.xPosition, event.yPosition,
+				" z %d (HEAD)\n", event.buttons, event.xPosition, event.yPosition,
 				event.zPressure);
 			break;
 		case MOTION_PACKET:
@@ -236,26 +279,97 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 
 			event.buttons = (packet[0] & 0x3);
 
-			// Pressure is not provided on this packet, so use a backup value.
-			event.zPressure = cookie->previousZ;
+			// Pressure is not provided on this packet, so make it up with sensible values
+			event.zPressure = DEFAULT_PRESSURE;
 
-			TRACE("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);
+			TRACE("ELANTECH: Finger %d, raw %x (MOTION id)\n", (packet[0] & 0xe0) >>5, packet[0]);
+			TRACE("ELANTECH: Finger %d, raw %x (MOTION sid)\n", (packet[3] & 0xe0) >>5, packet[3]);
 
-			// Most likely palm
-			if (cookie->fingers == 0)
+			id = ((packet[0] & 0xe0) >> 5) - 1;
+			int sid;
+			sid = ((packet[3] & 0xe0) >> 5) - 1;
+
+			// Motion packet processes 2 fingers only. Question is if the id is different than
+			// the one provided by STATUS packet, are the fingers of these packet new fingers
+			// or a replacement of the previous ones?
+			// As per testing let's assume a new fingers are added.
+			// That's in sync with the logic BSDs and Linux drivers providing MT events.
+			//event.fingers = cookie->fingers;
+			event.fingers = cookie->fingers | (1 << id) | (1 << sid);
+			//event.fingers = (1 << id) | (1 << sid);
+
+			if ((id < 0 || id >= ELANTECH_MAX_FINGERS)
+				&& (sid < 0 || sid >= ELANTECH_MAX_FINGERS)) {
+				TRACE("ELANTECH: Not right fingers (MOTION)");
 				return IGNORE_EVENT;
-
-			event.fingers = cookie->fingers;
-
-			// handle overflow and delta values
-			if ((packet[0] & 0x10) != 0) {
-				event.xPosition = cookie->x += 5 * (int8)packet[1];
-				event.yPosition = cookie->y += 5 * (int8)packet[2];
-			} else {
-				event.xPosition = cookie->x += (int8)packet[1];
-				event.yPosition = cookie->y += (int8)packet[2];
 			}
-			TRACE("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 " (Motion)\n",
+
+#ifdef ELANTECH_ENABLE_HARDWARE_PALM_DETECTION
+			if (cookie->palm) {
+				TRACE("ELANTECH: Hardware palm detected (MOTION)\n");
+				return IGNORE_EVENT;
+			}
+#endif
+
+			int deltaX;
+			int deltaY;
+
+			deltaX = 0;
+			deltaY = 0;
+
+			int weight;
+			weight = (packet[0] & 0x10) ? 5 : 1;
+
+			// Only take care for finger id 0 for now.
+			// TODO: Change this when support for Multi-finger is available on Haiku
+			if (id == 0 || sid ==0) {
+				if (id < 0 || id >= ELANTECH_MAX_FINGERS)
+					event.fingers |= 1 << id;
+				if (sid < 0 || sid >= ELANTECH_MAX_FINGERS)
+					event.fingers |= 1 << sid;
+
+				if (id == 0) {
+					deltaX += weight * (int8)packet[1];
+					deltaY += weight * (int8)packet[2];
+				} else if (sid == 0) {
+					deltaX += weight * (int8)packet[4];
+					deltaY += weight * (int8)packet[5];
+				}
+
+				TRACE("ELANTECH: dx: %d dy: %d (MOTION)\n", deltaX, deltaY);
+			} else {
+				TRACE("ELANTECH: Ignore invalid or non 0 finger ids (MOTION)\n");
+				return IGNORE_EVENT;
+			}
+
+			// TODO: Avoid this conversion from rel to abs coordinates when Haiku supports both
+			// type of coordinate systems for touchpads. Do the conversion as part of the driver
+			// and pretend the device always provide absolute coordinates for the time being.
+			// BEGIN: Conversion and tracking of abs coordinates:
+			// Avoid underoverflow
+			if (deltaX < 0 && (int)cookie->x < abs(deltaX))
+				deltaX = -cookie->x;
+			if (deltaY < 0 && (int)cookie->y < abs(deltaY))
+				deltaY = -cookie->y;
+
+			event.xPosition = cookie->x + deltaX;
+			event.yPosition = cookie->y + deltaY;
+
+			// Adjust to area boundaries
+			if (event.xPosition < gHardwareSpecs.areaStartX)
+				event.xPosition = gHardwareSpecs.areaStartX;
+			if (event.xPosition > gHardwareSpecs.areaEndX)
+				event.xPosition = gHardwareSpecs.areaEndX;
+			if (event.yPosition < gHardwareSpecs.areaStartY)
+				event.yPosition = gHardwareSpecs.areaStartY;
+			if (event.yPosition > gHardwareSpecs.areaEndY)
+				event.yPosition = gHardwareSpecs.areaEndY;
+
+			cookie->x = event.xPosition;
+			cookie->y = event.yPosition;
+			// END: Conversion and tracking of abs coordinates
+
+			TRACE("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 " (MOTION)\n",
 				cookie->x, cookie->y);
 
 			break;
@@ -264,10 +378,11 @@ elantech_process_packet_v4(elantech_cookie *cookie, touchpad_movement *_event,
 			return IGNORE_EVENT;
 	}
 
+	cookie->fingers = event.fingers;
 	TRACE("ELANTECH: buttons %d\n", event.buttons);
 	TRACE("ELANTECH: zPressure %d\n", event.zPressure);
 
-	event.fingerWidth = cookie->fingers == 1 ? 4 :0;
+	event.fingerWidth = DEFAULT_FINGER_WIDTH;
 
 	*_event = event;
 	return B_OK;

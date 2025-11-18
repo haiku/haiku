@@ -24,6 +24,13 @@
 #include "packet_buffer.h"
 #include "ps2_dev.h"
 
+// Palm detection will be more accurate to do by software.
+// Options are:
+// - Improvements on padblocker input filter.
+// - Improvements in user mode input_server device.
+// - General input_server modifications.
+// - Other inprovements on this driver.
+//#define ELANTECH_ENABLE_HARDWARE_PALM_DETECTION
 
 typedef struct {
 			ps2_dev*			dev;
@@ -50,6 +57,10 @@ typedef struct {
 
 			uint8				mode;
 			bool				crcEnabled;
+
+#ifdef ELANTECH_ENABLE_HARDWARE_PALM_DETECTION
+			bool				palm;
+#endif
 
 	status_t (*send_command)(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count);
 } elantech_cookie;
