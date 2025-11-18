@@ -87,7 +87,8 @@
 #define PS2_PACKET_INTELLIMOUSE			4
 #define PS2_PACKET_SYNAPTICS			6
 #define PS2_PACKET_ALPS					6
-#define PS2_PACKET_ELANTECH				6	// version 1 is only 4
+#define PS2_PACKET_ELANTECH_V1			4	// version 1 is only size 4
+#define PS2_PACKET_ELANTECH				6	// version 2, 3 and 4 are size 6
 #define PS2_MAX_PACKET_SIZE				6
 	// Should be equal to the biggest packet size
 

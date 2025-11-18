@@ -77,6 +77,9 @@ const char* kElantechPath[4] = {
 
 #define ELANTECH_MAX_FINGERS	5
 
+#define ELANTECH_CAP_HAS_ROCKER			4
+#define ELANTECH_CAP_TRACKPOINT			0x80
+
 // Error code used by MouseDevice::_ControlThread() in MouseInputDevice.cpp to reuse previous
 // event, basically ignoring the packet.
 #define IGNORE_EVENT B_BAD_DATA
@@ -84,6 +87,9 @@ const char* kElantechPath[4] = {
 static touchpad_specs gHardwareSpecs;
 
 
+static status_t
+elantech_process_packet_v1(elantech_cookie *cookie, touchpad_movement *_event,
+	uint8 packet[PS2_PACKET_ELANTECH]);
 static status_t
 elantech_process_packet_v2(elantech_cookie *cookie, touchpad_movement *_event,
 	uint8 packet[PS2_PACKET_ELANTECH]);
@@ -129,6 +135,9 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 		status = IGNORE_EVENT;
 	} else {
 		switch (cookie->version) {
+			case 1:
+				status = elantech_process_packet_v1(cookie, _event, packet);
+				break;
 			case 2:
 				status = elantech_process_packet_v2(cookie, _event, packet);
 				break;
@@ -146,6 +155,127 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 	return status;
 }
 
+
+static status_t
+elantech_process_packet_v1(elantech_cookie *cookie, touchpad_movement *_event,
+	uint8 packet[PS2_PACKET_ELANTECH_V1])
+{
+	/* HW V1. FW V1.x .*/
+	/*               7   6   5   4   3   2   1   0 (LSB)
+	 * -------------------------------------------
+	 * ipacket[0]:  RD  RU  p1  p2   1  p3   R   L
+	 * ipacket[1]:   f   0  3f  2f  X9  X8  X9  X8
+	 * ipacket[2]:  X7  X6  X5  X4  X3  X2  X1  X0
+	 * ipacket[3]:  Y7  Y6  Y5  Y4  Y3  Y2  Y1  Y0
+	 * -------------------------------------------
+	 * RD: Rocker switch pressed Down.
+	 * RU: Rocker switch pressed Up.
+	 * pn: Odd parity bit for byte n.
+	 * f: 1 when finger touch.
+	 * 2f: 1 when 2 finger touch.
+	 * 3f: 1 when 3 finger touch.
+	 */
+
+	/* HW V1. FW V2.x .*/
+	/*               7   6   5   4   3   2   1   0 (LSB)
+	 * -------------------------------------------
+	 * ipacket[0]:  N1  N0  p2  p1   1  p3   R   L
+	 * ipacket[1]:   .   .   .   .  X9  X8  X9  X8
+	 * ipacket[2]:  X7  X6  X5  X4  X3  X2  X1  X0
+	 * ipacket[3]:  Y7  Y6  Y5  Y4  Y3  Y2  Y1  Y0
+	 * -------------------------------------------
+	 * pn: Odd parity bit for byte n.
+	 */
+
+	const bool kOddParityMap[256] = {
+		0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+		1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+		1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+		0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+		1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+		0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+		0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+		1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+		1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+		0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+		0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+		1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+		0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+		1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+		1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+		0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0
+	};
+
+	uint8 p1, p2, p3;
+	if (cookie->fwVersion < 0x020000) {
+		p1 = (packet[0] & 0x20) >> 5;
+		p2 = (packet[0] & 0x10) >> 4;
+	} else {
+		p1 = (packet[0] & 0x10) >> 4;
+		p2 = (packet[0] & 0x20) >> 5;
+	}
+	p3 = (packet[0] & 0x04) >> 2;
+	if (kOddParityMap[packet[1]] != p1
+		|| kOddParityMap[packet[2]] != p2
+		|| kOddParityMap[packet[3]] != p3)
+		return IGNORE_EVENT;
+
+	uint32 x, y;
+	uint8 n, z;
+	uint8 buttons;
+
+	buttons = packet[0] & 3;
+
+	if (cookie->capabilities[0] & ELANTECH_CAP_HAS_ROCKER) {
+		if (packet[0] & 0x40) /* up */
+			buttons |= 1 << 4;
+		if (packet[0] & 0x80) /* down */
+			buttons |= 1 << 5;
+	}
+
+	if (cookie->fwVersion < 0x20000 || cookie->fwVersion == 0x20600)
+		n = ((packet[1] & 0x80) >> 7) + ((packet[1] & 0x30) >> 4);
+	else
+		n = (packet[0] & 0xc0) >> 6;
+
+	/*
+	 * Firmwares 0x20022 and 0x20600 have a bug, position data in the
+	 * first two reports for single-touch contacts may be corrupt.
+	 */
+	if (cookie->fwVersion == 0x20022 || cookie->fwVersion == 0x20600) {
+		if (n == 1) {
+			if (cookie->quirkInitialPacketForV1 < 2) {
+				cookie->quirkInitialPacketForV1++;
+				return IGNORE_EVENT;
+			}
+		} else if (cookie->quirkInitialPacketForV1) {
+			cookie->quirkInitialPacketForV1 = 0;
+		}
+	}
+
+	/* Hardware version 1 doesn't report pressure. */
+	if (n) {
+		x = ((packet[1] & 0x0c) << 6) | packet[2];
+		y = ((packet[1] & 0x03) << 8) | packet[3];
+		z = DEFAULT_PRESSURE;
+	} else {
+		x = y = z = 0;
+	}
+
+	touchpad_movement event = {
+		.buttons = buttons,
+		.xPosition = x,
+		.yPosition = y,
+		.zPressure = z,
+		//.nFingers = n,
+		.fingers = (uint8)((1 << n) - 1),
+		.fingerWidth = DEFAULT_FINGER_WIDTH,
+	};
+
+	*_event = event;
+
+	return B_OK;
+}
 
 static status_t
 elantech_process_packet_v2(elantech_cookie *cookie, touchpad_movement *_event,
@@ -756,7 +886,7 @@ probe_elantech(ps2_dev* dev)
 	}
 
 	dev->name = kElantechPath[dev->idx];
-	dev->packet_size = PS2_PACKET_ELANTECH;
+	dev->packet_size = v1 ? PS2_PACKET_ELANTECH_V1 : PS2_PACKET_ELANTECH;
 
 	return supported ? B_OK : B_ERROR;
 }
@@ -776,8 +906,11 @@ elantech_write_reg(elantech_cookie* cookie, uint8 reg, uint8 value)
 	ps2_dev* dev = cookie->dev;
 	switch (cookie->version) {
 		case 1:
-			// TODO
-			return B_ERROR;
+			if (ps2_dev_sliced_command(dev, ELANTECH_CMD_REGISTER_WRITE) != B_OK
+				|| ps2_dev_sliced_command(dev, reg) != B_OK
+				|| ps2_dev_sliced_command(dev, value) != B_OK
+				|| ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE11))
+				return B_ERROR;
 			break;
 		case 2:
 			if (ps2_dev_command(dev, ELANTECH_CMD_PS2_CUSTOM_CMD) != B_OK
@@ -831,8 +964,11 @@ elantech_read_reg(elantech_cookie* cookie, uint8 reg, uint8 *value)
 	uint8 val[3];
 	switch (cookie->version) {
 		case 1:
-			// TODO
-			return B_ERROR;
+			if (ps2_dev_sliced_command(dev, ELANTECH_CMD_REGISTER_READ) != B_OK
+				|| ps2_dev_sliced_command(dev, reg) != B_OK
+				|| ps2_dev_command(dev, PS2_CMD_MOUSE_GET_INFO, NULL, 0, val,
+					3) != B_OK)
+				return B_ERROR;
 			break;
 		case 2:
 			if (ps2_dev_command(dev, ELANTECH_CMD_PS2_CUSTOM_CMD) != B_OK
@@ -1065,6 +1201,7 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 		TRACE("ELANTECH: get version failed!\n");
 		goto err4;
 	}
+
 	cookie->fwVersion = (val[0] << 16) | (val[1] << 8) | val[2];
 	if (cookie->fwVersion < 0x020030 || cookie->fwVersion == 0x020600)
 		cookie->version = 1;
@@ -1094,6 +1231,7 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 		cookie->send_command = &elantech_dev_send_command;
 	else
 		cookie->send_command = &synaptics_dev_send_command;
+
 	cookie->crcEnabled = (cookie->fwVersion & 0x4000) == 0x4000;
 
 	if ((cookie->send_command)(cookie->dev, ELANTECH_CMD_GET_CAPABILITIES,

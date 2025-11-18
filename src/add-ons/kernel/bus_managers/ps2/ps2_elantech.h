@@ -62,6 +62,7 @@ typedef struct {
 			uint8				mode;
 			bool				crcEnabled;
 
+			uint8				quirkInitialPacketForV1;
 #ifdef ELANTECH_ENABLE_HARDWARE_PALM_DETECTION
 			bool				palm;
 #endif
