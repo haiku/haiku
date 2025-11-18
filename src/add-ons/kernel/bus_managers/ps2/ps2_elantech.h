@@ -32,6 +32,10 @@
 // - Other inprovements on this driver.
 //#define ELANTECH_ENABLE_HARDWARE_PALM_DETECTION
 
+// Special quirks and options handling
+//#define ELANTECH_EF113_MORE_THAN_TWO_BUTTONS
+//#define ELANTECH_EF113_MIDDLE_BUTTON_IS_LEFT_AND_RIGTH
+
 typedef struct {
 			ps2_dev*			dev;
 

@@ -70,6 +70,11 @@ const char* kElantechPath[4] = {
 #define HEAD_PACKET		0x1
 #define MOTION_PACKET	0x2
 
+#define ELANTECH_XMIN_V2	0
+#define ELANTECH_XMAX_V2	1152
+#define ELANTECH_YMIN_V2	0
+#define ELANTECH_YMAX_V2	768
+
 #define ELANTECH_MAX_FINGERS	5
 
 // Error code used by MouseDevice::_ControlThread() in MouseInputDevice.cpp to reuse previous
@@ -79,6 +84,9 @@ const char* kElantechPath[4] = {
 static touchpad_specs gHardwareSpecs;
 
 
+static status_t
+elantech_process_packet_v2(elantech_cookie *cookie, touchpad_movement *_event,
+	uint8 packet[PS2_PACKET_ELANTECH]);
 static status_t
 elantech_process_packet_v3(elantech_cookie *cookie, touchpad_movement *_event,
 	uint8 packet[PS2_PACKET_ELANTECH]);
@@ -121,6 +129,9 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 		status = IGNORE_EVENT;
 	} else {
 		switch (cookie->version) {
+			case 2:
+				status = elantech_process_packet_v2(cookie, _event, packet);
+				break;
 			case 3:
 				status = elantech_process_packet_v3(cookie, _event, packet);
 				break;
@@ -135,6 +146,148 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtim
 	return status;
 }
 
+
+static status_t
+elantech_process_packet_v2(elantech_cookie *cookie, touchpad_movement *_event,
+	uint8 packet[PS2_PACKET_ELANTECH])
+{
+	const uint8 debounce_pkt[] = { 0x84, 0xff, 0xff, 0x02, 0xff, 0xff };
+	uint32 x, y;
+	uint8 n, w, z;
+	uint8 buttons;
+
+	/*
+	 * The hardware sends this packet when in debounce state.
+	 * The packet should be ignored.
+	 */
+	if (!memcmp(packet, debounce_pkt, sizeof(debounce_pkt)))
+		return IGNORE_EVENT;
+
+	// Constant bit checks based on FreeBSD psm.c and Linux drivers.
+	bool valid = false;
+	if (cookie->fwVersion >= 0x020800)
+		if ((packet[0] & 0x0c) == 0x04 && (packet[3] & 0x0f) == 0x02)
+			valid = true;
+
+	if (!valid && ((packet[0] & 0xc0) == 0x80))
+		if ((packet[0] & 0x0c) == 0x0c && (packet[3] & 0x0e) == 0x08)
+			valid = true;
+
+	if (!valid && ((packet[0] & 0x3c) == 0x3c && (packet[1] & 0xf0) == 0x00
+		&& (packet[3] & 0x3e) == 0x38 && (packet[4] & 0xf0) == 0x00))
+		valid = true;
+
+	if (!valid)
+		return IGNORE_EVENT;
+
+	buttons = packet[0] & 3;
+
+	n = (packet[0] & 0xc0) >> 6;
+	if (n == 1 || n == 3) {
+		/* HW V2. One/Three finger touch */
+		/*               7   6   5   4   3   2   1   0 (LSB)
+		 * -------------------------------------------
+		 * ipacket[0]:  N1  N0  W3  W2   .   .   R   L
+		 * ipacket[1]:  P7  P6  P5  P4 X11 X10  X9  X8
+		 * ipacket[2]:  X7  X6  X5  X4  X3  X2  X1  X0
+		 * ipacket[3]:  N4  VF  W1  W0   .   .   .  B2
+		 * ipacket[4]:  P3  P1  P2  P0 Y11 Y10  Y9  Y8
+		 * ipacket[5]:  Y7  Y6  Y5  Y4  Y3  Y2  Y1  Y0
+		 * -------------------------------------------
+		 * N4: set if more than 3 fingers (only in 3 fingers mode)
+		 * VF: a kind of flag? (only on EF123, 0 when finger
+		 *     is over one of the buttons, 1 otherwise)
+		 * B2: (on EF113 only, 0 otherwise), one button pressed
+		 * P & W is not reported on EF113 touchpads
+		 */
+
+		if (n == 3 && (packet[3] & 0x80))
+			n = 4;
+
+#if ELANTECH_EF113_MORE_THAN_TWO_BUTTONS
+		// According to Linux and BSDs documentation, EF113 does not support multiple buttons
+		// to be clicked at the same time but it's unclear to me that this is the case for left,
+		// right and middle button as the implementation of their drivers differs here.
+		//
+		// For whatever reason neither Linux or any of the BSDs implement the documented
+		// logic perhaps to be consistent with "HW V2. Two finger touch" packet handling
+		// which only has 2 bits to provide button information.
+		// So those drivers implementations threats L and R flags as independent left and right
+		// buttons that can be pressed at the same time. That clashes with middle button mapping.
+		if (cookie->fwVersion == 0x20800) {
+			const int8 buttonsMap[] {
+				0x00,	// 0 = none
+				0x01,	// 1 = Left
+				0x02,	// 2 = Right
+#if ELANTECH_EF113_MIDDLE_BUTTON_IS_LEFT_AND_RIGTH
+				0x04,	// 3 = Middle or (Left and Right)
+						// - Reports middle button
+						// - Unable to report left and right buttons pressed at the same time
+#else
+				0x03,	// 3 = Middle or (Left and Right)
+						// - Reports left and right buttons pressed at the same time
+						// - No middle button supported
+#endif
+				0x08,	// 4 = Forward
+				0x10,	// 5 = Back
+				0x20,	// 6 = Another one
+				0x40,	// 7 = Another one
+			};
+			buttons = buttonsMap[((packet[3] & 1) << 3 ) + (packet[0] & 3)];
+		}
+#endif
+		x = ((packet[1] & 0x0f) << 8) | packet[2];
+		y = ((packet[4] & 0x0f) << 8) | packet[5];
+		if (cookie->fwVersion >= 0x20800) {
+			z = ((packet[1] & 0xf0) | (packet[4] & 0xf0) >> 4);
+			w = ((packet[0] & 0x30) >> 2) | ((packet[3] & 0x30) >> 4);
+		} else {
+			z = DEFAULT_PRESSURE;
+			w = DEFAULT_FINGER_WIDTH;
+		}
+	} else if (n == 2) {
+		/* HW V2. Two finger touch */
+		/*               7   6   5   4   3   2   1   0 (LSB)
+		 * -------------------------------------------
+		 * ipacket[0]:  N1  N0 AY8 AX8   .   .   R   L
+		 * ipacket[1]: AX7 AX6 AX5 AX4 AX3 AX2 AX1 AX0
+		 * ipacket[2]: AY7 AY6 AY5 AY4 AY3 AY2 AY1 AY0
+		 * ipacket[3]:   .   . BY8 BX8   .   .   .   .
+		 * ipacket[4]: BX7 BX6 BX5 BX4 BX3 BX2 BX1 BX0
+		 * ipacket[5]: BY7 BY6 BY5 BY4 BY3 BY2 BY1 BY0
+		 * -------------------------------------------
+		 * AX: lower-left finger absolute x value
+		 * AY: lower-left finger absolute y value
+		 * BX: upper-right finger absolute x value
+		 * BY: upper-right finger absolute y value
+		 */
+#if ELANTECH_EF113_MORE_THAN_TWO_BUTTONS && ELANTECH_EF113_MIDDLE_BUTTON_IS_LEFT_AND_RIGTH
+		if ((buttons & 3) == 3)
+			buttons = 4;
+#endif
+		x = (((packet[0] & 0x10) << 4) | packet[1]) << 2;
+		y = (((packet[0] & 0x20) << 3) | packet[2]) << 2;
+		z = DEFAULT_PRESSURE;
+		w = DEFAULT_FINGER_WIDTH;
+	} else {
+		x = y = z = 0;
+		w = DEFAULT_FINGER_WIDTH;
+	}
+
+	touchpad_movement event = {
+		.buttons = buttons,
+		.xPosition = x,
+		.yPosition = y,
+		.zPressure = z,
+		//.nFingers = n,
+		.fingers = (uint8)((1 << n) - 1),
+		.fingerWidth = w,
+	};
+
+	*_event = event;
+
+	return B_OK;
+}
 
 static status_t
 elantech_process_packet_v3(elantech_cookie *cookie, touchpad_movement *_event,
@@ -741,7 +894,44 @@ get_range(elantech_cookie* cookie, uint32* x_min, uint32* y_min, uint32* x_max,
 			*width = 0;
 			break;
 		case 2:
-			// TODO
+			if (cookie->fwVersion == 0x020800
+				|| cookie->fwVersion == 0x020b00
+				|| cookie->fwVersion == 0x020030) {
+				*x_min = ELANTECH_XMIN_V2;
+				*y_min = ELANTECH_YMIN_V2;
+				*x_max = ELANTECH_XMAX_V2;
+				*y_max = ELANTECH_YMAX_V2;
+			} else {
+				int i;
+				int fixed_dpi;
+
+				i = (cookie->fwVersion > 0x020800
+					&& cookie->fwVersion < 0x020900) ? 1 : 2;
+
+				if ((cookie->send_command)(cookie->dev, ELANTECH_CMD_GET_ID, val, 3)
+					!= B_OK)
+					return B_ERROR;
+
+				fixed_dpi = val[1] & 0x10;
+
+				if (((cookie->fwVersion >> 16) == 0x14) && fixed_dpi) {
+					if ((cookie->send_command)(cookie->dev, ELANTECH_CMD_GET_SAMPLE, val, 3)
+						!= B_OK)
+						return -EINVAL;
+
+					*x_max = (cookie->capabilities[1] - i) * val[1] / 2;
+					*y_max = (cookie->capabilities[2] - i) * val[2] / 2;
+				} else if (cookie->fwVersion == 0x040216) {
+					*x_max = 819;
+					*y_max = 405;
+				} else if (cookie->fwVersion == 0x040219 || cookie->fwVersion == 0x040215) {
+					*x_max = 900;
+					*y_max = 500;
+				} else {
+					*x_max = (cookie->capabilities[1] - i) * 64;
+					*y_max = (cookie->capabilities[2] - i) * 64;
+				}
+			}
 			break;
 		case 3:
 			if ((cookie->send_command)(cookie->dev, ELANTECH_CMD_GET_ID, val, 3)
