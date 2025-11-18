@@ -176,7 +176,7 @@ OpenWithContainerWindow::EntryList() const
 void
 OpenWithContainerWindow::OpenWithSelection()
 {
-	int32 count = PoseView()->SelectionList()->CountItems();
+	int32 count = PoseView()->CountSelected();
 	ASSERT(count == 1);
 	if (count == 0)
 		return;
@@ -259,7 +259,7 @@ SetDefaultAppForOneType(const BString& element, void* castToEntryRef)
 void
 OpenWithContainerWindow::MakeDefaultAndOpen()
 {
-	int32 count = PoseView()->SelectionList()->CountItems();
+	int32 count = PoseView()->CountSelected();
 	ASSERT(count == 1);
 	if (count == 0)
 		return;
@@ -705,7 +705,7 @@ OpenWithPoseView::OpenSelection(BPose* pose, int32*)
 {
 	OpenWithContainerWindow* window = ContainerWindow();
 
-	int32 count = SelectionList()->CountItems();
+	int32 count = CountSelected();
 	if (count == 0)
 		return;
 
@@ -774,7 +774,7 @@ OpenWithPoseView::Pulse()
 
 	OpenWithContainerWindow* window = ContainerWindow();
 
-	if (!SelectionList()->CountItems()) {
+	if (!CountSelected()) {
 		window->SetCanSetAppAsDefault(false);
 		window->SetCanOpen(false);
 		_inherited::Pulse();
@@ -799,7 +799,7 @@ OpenWithPoseView::Pulse()
 		return;
 	}
 
-	ASSERT(SelectionList()->CountItems() == 1);
+	ASSERT(CountSelected() == 1);
 
 	// enable the Open and make default if selected application different
 	// from preferred app ref

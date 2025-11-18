@@ -253,13 +253,10 @@ protected:
 	virtual void PopulateMoveCopyNavMenu(BNavMenu*, uint32,
 		const entry_ref*, bool);
 
-	virtual void SetupOpenWithMenu(BMenu*);
 	virtual void SetupOpenWithMenu(BMenu*, const entry_ref* ref);
 	virtual void SetupNewTemplatesMenu(BMenu*, MenuContext context);
-	virtual void SetupEditQueryItem(BMenu*);
 	virtual void SetupEditQueryItem(BMenu*, const entry_ref* ref);
 	virtual void SetupDiskMenu(BMenu*);
-	virtual void SetupMountMenu(BMenu*, MenuContext context);
 	virtual void SetupMountMenu(BMenu*, MenuContext context, const entry_ref* ref);
 	BMenuItem* DetachMountMenu();
 

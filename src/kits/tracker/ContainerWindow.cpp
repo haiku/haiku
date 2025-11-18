@@ -2005,13 +2005,6 @@ BContainerWindow::SetupNavigationMenu(BMenu* parent, const entry_ref* ref)
 
 
 void
-BContainerWindow::SetupEditQueryItem(BMenu* parent)
-{
-	SetupEditQueryItem(parent, TargetModel()->EntryRef());
-}
-
-
-void
 BContainerWindow::SetupEditQueryItem(BMenu* parent, const entry_ref* ref)
 {
 	ASSERT(parent != NULL);
@@ -2036,13 +2029,6 @@ BContainerWindow::SetupEditQueryItem(BMenu* parent, const entry_ref* ref)
 	parent->AddItem(fEditQueryItem, openIndex + 1);
 
 	Shortcuts()->UpdateEditQueryItem(fEditQueryItem);
-}
-
-
-void
-BContainerWindow::SetupOpenWithMenu(BMenu* parent)
-{
-	SetupOpenWithMenu(parent, TargetModel()->EntryRef());
 }
 
 
@@ -2151,13 +2137,6 @@ BContainerWindow::SetupNewTemplatesMenu(BMenu* parent, MenuContext context)
 
 
 void
-BContainerWindow::SetupMountMenu(BMenu* parent, MenuContext context)
-{
-	SetupMountMenu(parent, context, TargetModel()->EntryRef());
-}
-
-
-void
 BContainerWindow::SetupMountMenu(BMenu* parent, MenuContext context, const entry_ref* ref)
 {
 	ASSERT(parent != NULL);
@@ -2169,9 +2148,10 @@ BContainerWindow::SetupMountMenu(BMenu* parent, MenuContext context, const entry
 	if (ref == NULL)
 		ref = TargetModel()->EntryRef();
 
-	Model model(ref);
+	ASSERT(ref != NULL);
 
 	// bail out if not Desktop, root or volume
+	Model model(ref);
 	if (!(model.IsDesktop() || model.IsRoot() || model.IsVolume()))
 		return;
 
@@ -2902,12 +2882,9 @@ BContainerWindow::UpdateFileMenuOrPoseContextMenu(BMenu* menu, MenuContext conte
 		ref = TargetModel()->EntryRef();
 
 	// "Open with..." menu inserted after Open
-	if (context == kPosePopUpContext) {
-		if (ShouldHaveOpenWithMenu(ref))
-			SetupOpenWithMenu(menu, ref);
-	} else if (context == kFileMenuContext) {
-		if (ShouldHaveOpenWithMenu())
-			SetupOpenWithMenu(menu);
+	if (ShouldHaveOpenWithMenu(ref)
+		&& (context == kPosePopUpContext || context == kFileMenuContext)) {
+		SetupOpenWithMenu(menu, ref);
 	}
 
 	// "Mount >" menu and "Unmount" are inserted here
@@ -2915,19 +2892,13 @@ BContainerWindow::UpdateFileMenuOrPoseContextMenu(BMenu* menu, MenuContext conte
 		Model model(ref);
 		if (model.IsRoot() || model.IsVolume())
 			SetupMountMenu(menu, kPosePopUpContext, ref);
-	} else if (context == kFileMenuContext) {
-		if (TargetModel()->IsRoot())
-			SetupMountMenu(menu, kFileMenuContext);
+	} else if (context == kFileMenuContext && TargetModel()->IsRoot()) {
+		SetupMountMenu(menu, kFileMenuContext, ref);
 	}
 
 	// "Edit query" inserted before "Open with..."
-	if (context == kPosePopUpContext) {
-		if (ShouldHaveEditQueryItem(ref))
-			SetupEditQueryItem(menu, ref);
-	} else {
-		if (ShouldHaveEditQueryItem())
-			SetupEditQueryItem(menu);
-	}
+	if (ShouldHaveEditQueryItem(ref))
+		SetupEditQueryItem(menu, ref);
 
 	// "Move To", "Copy To", "Create Link" menus inserted after "Move to Trash"
 	if (ShouldHaveMoveCopyMenus(ref))
@@ -2954,7 +2925,7 @@ BContainerWindow::UpdateWindowContextMenu(BMenu* menu)
 
 	// "Mount >" menu is inserted at the bottom
 	if (PoseView()->IsDesktopView() || TargetModel()->IsRoot())
-		SetupMountMenu(menu, kWindowPopUpContext);
+		SetupMountMenu(menu, kWindowPopUpContext, TargetModel()->EntryRef());
 
 	if (ShouldHaveAddOnMenus())
 		BuildAddOnsMenu(menu);
@@ -3113,21 +3084,16 @@ BContainerWindow::ShouldHaveMoveCopyMenus(const entry_ref* ref)
 		ref = TargetModel()->EntryRef();
 
 	Model model(ref);
-	if (model.IsPrintersDir())
-		return false;
-
-	return !(model.IsTrash() || model.InTrash());
+	return !(model.IsPrintersDir() || model.IsRoot() || model.IsTrash() || model.InTrash());
 }
 
 
 bool
 BContainerWindow::ShouldHaveNewFolderItem()
 {
-	if (TargetModel()->IsPrintersDir())
-		return false;
-
-	return !(TargetModel()->IsQuery() || TargetModel()->IsRoot() || TargetModel()->IsTrash()
-		|| TargetModel()->InTrash() || TargetModel()->IsVirtualDirectory());
+	return !(TargetModel()->IsQuery() || TargetModel()->IsPrintersDir()
+		|| TargetModel()->IsRoot() || TargetModel()->IsTrash() || TargetModel()->InTrash()
+		|| TargetModel()->IsVirtualDirectory());
 }
 
 
