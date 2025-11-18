@@ -382,24 +382,6 @@ CliContext::QuitSession(bool killTeam)
 
 
 void
-CliContext::WaitForThreadOrUser()
-{
-// TODO: Deal with SIGINT as well!
-
-	AutoLocker<BLocker> locker(fLock);
-
-	while (fStoppedThread == NULL) {
-		_WaitForEvent(MSG_THREAD_STATE_CHANGED);
-		if (fTerminating)
-			break;
-	}
-
-	if (fCurrentThread == NULL)
-		SetCurrentThread(fStoppedThread);
-}
-
-
-void
 CliContext::WaitForEvent(uint32 event)
 {
 	AutoLocker<BLocker> locker(fLock);
@@ -442,7 +424,7 @@ CliContext::MessageReceived(BMessage* message)
 			break;
 		}
 		case MSG_THREAD_STACK_TRACE_CHANGED:
-			if (threadID == fCurrentThread->ID()) {
+			if (fCurrentThread != NULL && threadID == fCurrentThread->ID()) {
 				AutoLocker< ::Team> locker(fTeam);
 				::Thread* thread = fTeam->ThreadByID(threadID);
 

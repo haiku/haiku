@@ -93,7 +93,6 @@ public:
 
 			void				QuitSession(bool killTeam);
 
-			void				WaitForThreadOrUser();
 			void				WaitForEvent(uint32 event);
 
 private:
