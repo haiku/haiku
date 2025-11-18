@@ -23,6 +23,8 @@
 
 #include <keyboard_mouse_driver.h>
 
+#include <util/BitUtils.h>
+
 #include "ps2_service.h"
 
 
@@ -104,6 +106,44 @@ elantech_process_packet_trackpoint(elantech_cookie *cookie, mouse_movement *_mov
 	uint8 packet[PS2_PACKET_ELANTECH]);
 
 
+static inline void
+finger_width_hack(touchpad_movement *event)
+{
+	// TODO: Improve fingerWidth computation by removing hack and updating other drivers.
+	// FingerWidth values as per Synaptic driver "Finger width value".
+	// This is currently used that way by movement_maker.cpp so keep this hack as of now.
+	// Comments from FreeBSD psm.c driver for Synaptic protocol below:
+	/*
+	 * Pressure value.
+	 * Interpretation:
+	 *   z = 0      No finger contact
+	 *   z = 10     Finger hovering near the pad
+	 *   z = 30     Very light finger contact
+	 *   z = 80     Normal finger contact
+	 *   z = 110    Very heavy finger contact
+	 *   z = 200    Finger lying flat on pad surface
+	 *   z = 255    Maximum reportable Z
+	 */
+	/*
+	 * Finger width value
+	 * Interpretation:
+	 *   w = 0      Two finger on the pad (capMultiFinger needed)
+	 *   w = 1      Three or more fingers (capMultiFinger needed)
+	 *   w = 2      Pen (instead of finger) (capPen needed)
+	 *   w = 3      Reserved (passthrough?)
+	 *   w = 4-7    Finger of normal width (capPalmDetect needed)
+	 *   w = 8-14   Very wide finger or palm (capPalmDetect needed)
+	 *   w = 15     Maximum reportable width (capPalmDetect needed)
+	 */
+	if (event->fingerWidth < 4)
+		event->fingerWidth = 4;
+	if (count_set_bits(event->fingers) == 2)
+		event->fingerWidth = 0;
+	else if (count_set_bits(event->fingers) > 2)
+		event->fingerWidth = 1;
+}
+
+
 /* Common legend
  * L: Left mouse button pressed
  * R: Right mouse button pressed
@@ -164,6 +204,8 @@ get_elantech_movement(elantech_cookie *cookie, touchpad_read *_read)
 		}
 		if (status == B_OK) {
 			_read->event = MS_READ_TOUCHPAD;
+			// TODO: remove this hack
+			finger_width_hack(&event);
 			_read->u.touchpad = event;
 		}
 	}
