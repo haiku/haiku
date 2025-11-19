@@ -1141,39 +1141,14 @@ TRoster::HandleSaveRecentLists(BMessage* request)
 
 
 void
-TRoster::HandleRestartAppServer(BMessage* request)
+TRoster::HandleAppServerStarted(BMessage* request)
 {
 	BAutolock _(fLock);
 
-	// TODO: if an app_server is still running, stop it first
-
-	const char* pathString;
-	if (request->FindString("path", &pathString) != B_OK)
-		pathString = "/boot/system/servers";
-	BPath path(pathString);
-	path.Append("app_server");
-	// NOTE: its required at some point that the binary name is "app_server"
-
-	const char **argv = new const char * [2];
-	argv[0] = strdup(path.Path());
-	argv[1] = NULL;
-
-	thread_id threadId = load_image(1, argv, (const char**)environ);
-	int i;
-	for (i = 0; i < 1; i++)
-		delete argv[i];
-	delete [] argv;
-
-	resume_thread(threadId);
-	// give the server some time to create the server port
-	snooze(100000);
-
-	// notify all apps
-	// TODO: whats about ourself?
 	AppInfoListMessagingTargetSet targetSet(fRegisteredApps);
 	if (targetSet.HasNext()) {
 		// send the messages
-		BMessage message(kMsgAppServerRestarted);
+		BMessage message(kMsgAppServerStarted);
 		MessageDeliverer::Default()->DeliverMessage(&message, targetSet);
 	}
 }

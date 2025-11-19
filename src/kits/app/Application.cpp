@@ -691,7 +691,7 @@ BApplication::MessageReceived(BMessage* message)
 			be_roster->ActivateApp(Team());
 			break;
 
-		case kMsgAppServerRestarted:
+		case kMsgAppServerStarted:
 			_ReconnectToServer();
 			break;
 
@@ -1454,6 +1454,12 @@ BApplication::_ConnectToServer()
 void
 BApplication::_ReconnectToServer()
 {
+	team_info dummy;
+	if (get_team_info(fServerLink->TargetTeam(), &dummy) == B_OK) {
+		// We're already connected to the correct server.
+		return;
+	}
+
 	// the sender port belongs to the app_server
 	delete_port(fServerLink->ReceiverPort());
 
@@ -1470,7 +1476,7 @@ BApplication::_ReconnectToServer()
 		if (window == NULL)
 			continue;
 		BMessenger windowMessenger(window);
-		windowMessenger.SendMessage(kMsgAppServerRestarted);
+		windowMessenger.SendMessage(kMsgAppServerStarted);
 	}
 
 	reconnect_bitmaps_to_app_server();

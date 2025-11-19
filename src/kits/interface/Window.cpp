@@ -739,7 +739,7 @@ BWindow::MessageReceived(BMessage* message)
 		if (message->what == B_KEY_DOWN)
 			_KeyboardNavigation();
 
-		if (message->what == (int32)kMsgAppServerRestarted) {
+		if (message->what == kMsgAppServerStarted) {
 			fLink->SetSenderPort(
 				BApplication::Private::ServerLink()->SenderPort());
 
@@ -786,6 +786,7 @@ BWindow::MessageReceived(BMessage* message)
 			// connect all views to the server again
 			fTopView->_CreateSelf();
 
+			EnableUpdates();
 			_SendShowOrHideMessage();
 		}
 

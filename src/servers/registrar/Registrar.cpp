@@ -51,7 +51,7 @@ static const char *kEventQueueName = "timer_thread";
 
 
 /*!	\brief Creates the registrar application class.
-	\param error Passed to the BApplication constructor for returning an
+	\param error Passed to the BServer constructor for returning an
 		   error code.
 */
 Registrar::Registrar(status_t* _error)
@@ -375,9 +375,11 @@ Registrar::_MessageReceived(BMessage *message)
 			}
 			break;
 
-		case kMsgRestartAppServer:
+		case kMsgAppServerStarted:
 		{
-			fRoster->HandleRestartAppServer(message);
+			fRoster->HandleAppServerStarted(message);
+
+			// Don't pass this message on to our BApplication, as that may deadlock.
 			break;
 		}
 
@@ -477,7 +479,7 @@ main()
 			"registrar main() caught exception: %s", exception.what());
 		debugger(buffer);
 	} catch (...) {
-		debugger("registrar main() caught unknown exception");
+		debugger("registrar main() caught unknown exception");
 	}
 
 	PRINT("delete app...\n");

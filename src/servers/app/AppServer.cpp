@@ -17,6 +17,7 @@
 #include <AutoDeleter.h>
 #include <LaunchRoster.h>
 #include <PortLink.h>
+#include <RosterPrivate.h>
 
 #include "BitmapManager.h"
 #include "Desktop.h"
@@ -70,15 +71,19 @@ AppServer::AppServer(status_t* status)
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	gBitmapManager = new BitmapManager();
 
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 #if 0
 	// This is not presently needed, as app_server is launched from the login session.
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	// TODO: check the attached displays, and launch login session for them
 	BMessage data;
 	data.AddString("name", "app_server");
 	data.AddInt32("session", 0);
 	BLaunchRoster().Target("login", data);
 #endif
+
+	// Inform the registrar we've (re)started.
+	BMessage request(kMsgAppServerStarted);
+	BRoster::Private().SendTo(&request, NULL, false);
 #endif
 }
 
