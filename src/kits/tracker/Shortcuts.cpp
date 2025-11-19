@@ -1296,7 +1296,8 @@ TShortcuts::UpdatePasteItem(BMenuItem* item)
 	item->SetShortcut(item->Shortcut(), B_COMMAND_KEY | (modifiers() & B_SHIFT_KEY));
 
 	if (fInWindow) {
-		bool isPastable = FSClipboardHasRefs() && !SelectionIsReadOnly() && !IsTrash();
+		bool isPastable = FSClipboardHasRefs() && TargetIsReadOnly() == false
+			&& !(IsPrintersDir() || IsRoot() || IsTrash() || InTrash() || IsVirtualDirectory());
 		item->SetEnabled(IsCurrentFocusOnTextView() || isPastable);
 
 		item->SetTarget(fContainerWindow);
@@ -1418,6 +1419,13 @@ bool
 TShortcuts::IsDesktop() const
 {
 	return fInWindow && PoseView()->IsDesktopView();
+}
+
+
+bool
+TShortcuts::IsPrintersDir() const
+{
+	return fInWindow && PoseView()->TargetModel()->IsPrintersDir();
 }
 
 

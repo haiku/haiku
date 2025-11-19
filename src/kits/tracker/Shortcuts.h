@@ -199,6 +199,7 @@ public:
 
 			bool				IsCurrentFocusOnTextView() const;
 			bool				IsDesktop() const;
+			bool				IsPrintersDir() const;
 			bool				IsQuery() const;
 			bool				IsQueryTemplate() const;
 			bool				IsRoot() const;
