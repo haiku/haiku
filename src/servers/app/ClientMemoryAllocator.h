@@ -89,7 +89,7 @@ private:
 
 
 /*! Just clones an existing area. */
-class ClonedAreaMemory  : public AreaMemory{
+class ClonedAreaMemory : public AreaMemory {
 public:
 								ClonedAreaMemory();
 	virtual						~ClonedAreaMemory();

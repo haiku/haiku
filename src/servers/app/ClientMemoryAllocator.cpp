@@ -26,6 +26,7 @@
 #include <Autolock.h>
 
 #include "ServerApp.h"
+#include "ServerMemoryAllocator.h"
 
 
 typedef block_list::Iterator block_iterator;
@@ -364,6 +365,10 @@ ClientMemory::AreaOffset()
 // #pragma mark -
 
 
+static BLocker sLocker("ClonedAreaMemory allocator");
+static BPrivate::ServerMemoryAllocator sClonedAreaMemoryAllocator;
+
+
 ClonedAreaMemory::ClonedAreaMemory()
 	:
 	fClonedArea(-1),
@@ -375,18 +380,18 @@ ClonedAreaMemory::ClonedAreaMemory()
 
 ClonedAreaMemory::~ClonedAreaMemory()
 {
-	if (fClonedArea >= 0)
-		delete_area(fClonedArea);
+	BAutolock locker(sLocker);
+	sClonedAreaMemoryAllocator.RemoveArea(fClonedArea);
 }
 
 
 void*
 ClonedAreaMemory::Clone(area_id area, uint32 offset)
 {
-	fClonedArea = clone_area("server_memory", (void**)&fBase, B_ANY_ADDRESS,
-		B_READ_AREA | B_WRITE_AREA, area);
-	if (fBase == NULL)
+	BAutolock locker(sLocker);
+	if (sClonedAreaMemoryAllocator.AddArea(area, fClonedArea, fBase, 0, false) != B_OK)
 		return NULL;
+
 	fOffset = offset;
 	return Address();
 }
