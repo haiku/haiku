@@ -371,6 +371,7 @@ static BPrivate::ServerMemoryAllocator sClonedAreaMemoryAllocator;
 
 ClonedAreaMemory::ClonedAreaMemory()
 	:
+	fArea(-1),
 	fClonedArea(-1),
 	fOffset(0),
 	fBase(NULL)
@@ -381,7 +382,7 @@ ClonedAreaMemory::ClonedAreaMemory()
 ClonedAreaMemory::~ClonedAreaMemory()
 {
 	BAutolock locker(sLocker);
-	sClonedAreaMemoryAllocator.RemoveArea(fClonedArea);
+	sClonedAreaMemoryAllocator.RemoveArea(fArea);
 }
 
 
@@ -392,6 +393,7 @@ ClonedAreaMemory::Clone(area_id area, uint32 offset)
 	if (sClonedAreaMemoryAllocator.AddArea(area, fClonedArea, fBase, 0, false) != B_OK)
 		return NULL;
 
+	fArea = area;
 	fOffset = offset;
 	return Address();
 }

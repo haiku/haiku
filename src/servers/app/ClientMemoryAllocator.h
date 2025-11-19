@@ -101,6 +101,7 @@ public:
 	virtual uint32				AreaOffset();
 
 private:
+			area_id		fArea;
 			area_id		fClonedArea;
 			uint32		fOffset;
 			uint8*		fBase;
