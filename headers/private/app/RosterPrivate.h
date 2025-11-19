@@ -13,7 +13,7 @@
 #include <Roster.h>
 
 
-const int32 kMsgAppServerStarted = '_ASt';
+const uint32 kMsgAppServerStarted = '_ASt';
 
 
 class BRoster::Private {
