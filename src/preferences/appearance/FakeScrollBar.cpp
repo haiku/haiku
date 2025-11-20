@@ -35,8 +35,10 @@ FakeScrollBar::FakeScrollBar(bool drawArrows, bool doubleArrows,
 	fDrawArrows(drawArrows),
 	fDoubleArrows(doubleArrows)
 {
-	SetExplicitMinSize(BSize(160, 20));
-	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 20));
+	float height = be_control_look->GetScrollBarWidth(B_HORIZONTAL);
+	height += be_control_look->ComposeSpacing(B_USE_HALF_ITEM_SPACING);
+		// add some height to draw the ring around the scroll bar
+	SetExplicitSize(BSize(B_SIZE_UNSET, height));
 }
 
 
