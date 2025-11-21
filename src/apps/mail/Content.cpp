@@ -87,16 +87,16 @@ const rgb_color kSpellTextColor = {255, 0, 0, 255};
 const rgb_color kHeaderColor = {72, 72, 72, 255};
 
 const rgb_color kQuoteColors[] = {
-	{0, 0, 0xff, 0},		// 3rd, 6th, ... quote level color (blue)
-	{0, 0xff, 0, 0},		// 1st, 4th, ... quote level color (green)
-	{0xff, 0, 0, 0}			// 2nd, 5th, ... quote level color (red)
+	{0x00, 0x00, 0xff, 0xff},	// 3rd, 6th, ... quote level color (blue)
+	{0x00, 0xff, 0x00, 0xff},	// 1st, 4th, ... quote level color (green)
+	{0xff, 0x00, 0x00, 0xff}	// 2nd, 5th, ... quote level color (red)
 };
 const int32 kNumQuoteColors = 3;
 
 const rgb_color kDiffColors[] = {
-	{0xb0, 0, 0, 0},		// '-', red
-	{0, 0x90, 0, 0},		// '+', green
-	{0x6a, 0x6a, 0x6a, 0}	// '@@', dark grey
+	{0xb0, 0x00, 0x00, 0xff},	// '-', red
+	{0x00, 0x90, 0x00, 0xff},	// '+', green
+	{0x6a, 0x6a, 0x6a, 0xff}	// '@@', dark gray
 };
 
 void Unicode2UTF8(int32 c, char **out);
@@ -484,8 +484,8 @@ FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
 
 				runs[index].offset = pos;
 				runs[index].font = font;
-				runs[index].color = level > 0 ? mix_color(ui_color(B_PANEL_TEXT_COLOR),
-					kQuoteColors[level % kNumQuoteColors], 120) : ui_color(B_PANEL_TEXT_COLOR);
+				runs[index].color = level > 0 ? mix_color(ui_color(B_DOCUMENT_TEXT_COLOR),
+					kQuoteColors[level % kNumQuoteColors], 120) : ui_color(B_DOCUMENT_TEXT_COLOR);
 
 				pos = next;
 				if (++index >= maxStyles)
@@ -508,13 +508,16 @@ FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
 
 			runs[index].offset = pos;
 			runs[index].font = font;
-			if (wasDiff)
-				runs[index].color = kDiffColors[diff_mode('@') - 1];
-			else if (diffMode <= 0) {
-				runs[index].color = level > 0 ? mix_color(ui_color(B_PANEL_TEXT_COLOR),
-					kQuoteColors[level % kNumQuoteColors], 120) : ui_color(B_PANEL_TEXT_COLOR);
-			} else
-				runs[index].color = kDiffColors[diffMode - 1];
+			if (wasDiff) {
+				runs[index].color = mix_color(ui_color(B_DOCUMENT_TEXT_COLOR),
+					kDiffColors[diff_mode('@') - 1], 120);
+			} else if (diffMode <= 0) {
+				runs[index].color = level > 0 ? mix_color(ui_color(B_DOCUMENT_TEXT_COLOR),
+					kQuoteColors[level % kNumQuoteColors], 120) : ui_color(B_DOCUMENT_TEXT_COLOR);
+			} else {
+				runs[index].color = mix_color(ui_color(B_DOCUMENT_TEXT_COLOR),
+					kDiffColors[diffMode - 1], 120);
+			}
 
 			begin = false;
 
@@ -682,6 +685,13 @@ void
 TContentView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
+		case B_COLORS_UPDATED:
+			if (msg->HasColor(ui_color_name(B_DOCUMENT_TEXT_COLOR))
+				|| msg->HasColor(ui_color_name(B_LINK_TEXT_COLOR))) {
+				fTextView->UpdateTextColors();
+			}
+			break;
+
 		case CHANGE_FONT:
 		{
 			BFont *font;
@@ -799,6 +809,8 @@ TTextView::TTextView(bool incoming, TContentView *view,
 	fStopLoading(false),
 	fThread(0),
 	fPanel(NULL),
+	fTextColor(ui_color(B_DOCUMENT_TEXT_COLOR)),
+	fLinkColor(ui_color(B_LINK_TEXT_COLOR)),
 	fIncoming(incoming),
 	fSpellCheck(false),
 	fRaw(false),
@@ -862,6 +874,55 @@ TTextView::UpdateFont(const BFont* newFont)
 	text_run_array *runArray = RunArray(0, INT32_MAX);
 	for (int i = 0; i < runArray->count; i++)
 		runArray->runs[i].font = *newFont;
+
+	SetRunArray(0, INT32_MAX, runArray);
+	FreeRunArray(runArray);
+}
+
+
+void
+TTextView::UpdateTextColors()
+{
+	// update the text color as best we can
+	rgb_color newTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	rgb_color newLinkColor = ui_color(B_LINK_TEXT_COLOR);
+	text_run_array* runArray = RunArray(0, INT32_MAX);
+	for (int i = 0; i < runArray->count; i++) {
+		if (runArray->runs[i].color == fTextColor) {
+			// text color
+			runArray->runs[i].color = newTextColor;
+		} else if (runArray->runs[i].color == fLinkColor) {
+			// link color
+			runArray->runs[i].color = newLinkColor;
+		} else if (runArray->runs[i].color
+				== mix_color(fTextColor, kQuoteColors[1 % kNumQuoteColors], 120)) {
+			// green quote
+			runArray->runs[i].color = mix_color(newTextColor,
+				kQuoteColors[1 % kNumQuoteColors], 120);
+		} else if (runArray->runs[i].color
+				== mix_color(fTextColor, kQuoteColors[2 % kNumQuoteColors], 120)) {
+			// red quote
+			runArray->runs[i].color = mix_color(newTextColor,
+				kQuoteColors[2 % kNumQuoteColors], 120);
+		} else if (runArray->runs[i].color
+				== mix_color(fTextColor, kQuoteColors[3 % kNumQuoteColors], 120)) {
+			// blue quote
+			runArray->runs[i].color = mix_color(newTextColor,
+				kQuoteColors[3 % kNumQuoteColors], 120);
+		} else if (runArray->runs[i].color == mix_color(fTextColor, kDiffColors[0], 120)) {
+			// red diff
+			runArray->runs[i].color = mix_color(newTextColor, kDiffColors[0], 120);
+		} else if (runArray->runs[i].color == mix_color(fTextColor, kDiffColors[1], 120)) {
+			// green diff
+			runArray->runs[i].color = mix_color(newTextColor, kDiffColors[1], 120);
+		} else if (runArray->runs[i].color == mix_color(fTextColor, kDiffColors[2], 120)) {
+			// dark gray diff
+			runArray->runs[i].color = mix_color(newTextColor, kDiffColors[2], 120);
+		}
+	}
+
+	fLinkColor = newLinkColor;
+	fTextColor = newTextColor;
 
 	SetRunArray(0, INT32_MAX, runArray);
 	FreeRunArray(runArray);
@@ -2413,8 +2474,8 @@ TTextView::Reader::Insert(const char *line, int32 count, bool isHyperLink,
 			array.runs[0].color = isHyperLink ? ui_color(B_LINK_TEXT_COLOR) : kHeaderColor;
 			font.SetSize(font.Size() * 0.9);
 		} else {
-			array.runs[0].color = isHyperLink
-				? ui_color(B_LINK_TEXT_COLOR) : ui_color(B_PANEL_TEXT_COLOR);
+			array.runs[0].color
+				= ui_color(isHyperLink ? B_LINK_TEXT_COLOR : B_DOCUMENT_TEXT_COLOR);
 		}
 		array.runs[0].font = font;
 	}
@@ -2686,7 +2747,7 @@ TTextView::InsertText(const char *insertText, int32 length, int32 offset,
 		style.count = 1;
 		style.runs[0].offset = 0;
 		style.runs[0].font = fFont;
-		style.runs[0].color = ui_color(B_PANEL_TEXT_COLOR);
+		style.runs[0].color = ui_color(B_DOCUMENT_TEXT_COLOR);
 		runs = &style;
 	}
 
@@ -2778,7 +2839,7 @@ TTextView::CheckSpelling(int32 start, int32 end, int32 flags)
 	bool		isAlpha;
 	bool		isApost;
 
-	rgb_color normalColor = ui_color(B_PANEL_TEXT_COLOR);
+	rgb_color normalColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 
 	for (next = text + start, endPtr = text + end; next <= endPtr; next++) {
 		//printf("next=%c\n", *next);

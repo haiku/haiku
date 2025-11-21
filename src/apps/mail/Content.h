@@ -178,6 +178,7 @@ class TTextView : public BTextView {
 		void AddQuote(int32 start, int32 finish);
 		void RemoveQuote(int32 start, int32 finish);
 		void UpdateFont(const BFont* newFont);
+		void UpdateTextColors();
 
 		void	WindowActivated(bool flag);
 		void	Undo(BClipboard *clipboard);
@@ -227,6 +228,8 @@ class TTextView : public BTextView {
 		BPopUpMenu *fEnclosureMenu;
 		BPopUpMenu *fLinkMenu;
 		TSavePanel *fPanel;
+		rgb_color fTextColor;
+		rgb_color fLinkColor;
 		bool fIncoming;
 		bool fSpellCheck;
 		bool fRaw;
