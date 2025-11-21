@@ -783,15 +783,15 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 		}
 		case BFS_IOCTL_RESIZE:
 		{
-			if (bufferLength != sizeof(uint64))
+			if (bufferLength != sizeof(resize_control))
 				return B_BAD_VALUE;
 
-			uint64 size;
-			if (user_memcpy((uint8*)&size, buffer, sizeof(uint64)) != B_OK)
+			resize_control control;
+			if (user_memcpy((uint8*)&control, buffer, sizeof(control)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			ResizeVisitor resizer(volume);
-			return resizer.Resize(size, -1);
+			return resizer.Resize(control.new_size, control.dry_run, -1);
 		}
 
 #ifdef DEBUG_FRAGMENTER

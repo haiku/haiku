@@ -1,5 +1,5 @@
 /*
- * ResizeVisitor.h
+ * Copyright 2025, Axel Dörfler, axeld@pinc-software.de.
  * Copyright (C) 2020 Adrien Destugues <pulkomandy@pulkomandy.tk>
  * Copyright 2012, Andreas Henriksson, sausageboy@gmail.com
  *
@@ -23,9 +23,9 @@ class Transaction;
 class ResizeVisitor : public FileSystemVisitor {
 public:
 								ResizeVisitor(Volume* volume);
-	virtual						~ResizeVisitor();
+    virtual						~ResizeVisitor();
 
-			status_t			Resize(off_t size, disk_job_id job);
+			status_t			Resize(off_t size, bool dryRun, disk_job_id job);
 
 	virtual status_t			VisitInode(Inode* inode, const char* treeName);
 
@@ -38,7 +38,7 @@ public:
 
 private:
 			void				_CalculateNewSizes(off_t size);
-			status_t			_IsResizePossible(off_t size);
+            status_t			_IsResizePossible(off_t size) const;
 			status_t			_ResizeVolume();
 
 			// moving the inode
@@ -61,6 +61,7 @@ private:
 									const char* treeName);
 
 private:
+			bool				fDryRun;
 			bool				fError;
 
 			off_t				fNumBlocks;

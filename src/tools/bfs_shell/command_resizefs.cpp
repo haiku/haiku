@@ -17,13 +17,21 @@ namespace FSShell {
 fssh_status_t
 command_resizefs(int argc, const char* const* argv)
 {
-	if (argc != 2) {
-		fssh_dprintf("Usage: %s <new size>\n", argv[0]);
+	if (argc > 3 || argc < 2) {
+		fssh_dprintf("Usage: %s [-n|--dry-run] <new size>\n", argv[0]);
 		return B_ERROR;
 	}
 
-	uint64 newSize;
-	if (fssh_sscanf(argv[1], "%" B_SCNu64, &newSize) < 1) {
+	resize_control control;
+	control.new_size = 0;
+	control.dry_run = false;
+
+	int argIndex = 1;
+	if (strcmp(argv[1], "-n") == 0 || strcmp(argv[1], "--dry-run") == 0) {
+		control.dry_run = true;
+		argIndex++;
+	}
+	if (fssh_sscanf(argv[argIndex], "%" B_SCNu64, &control.new_size) < 1) {
 		fssh_dprintf("Unknown argument or invalid size\n");
 		return B_ERROR;
 	}
@@ -34,8 +42,7 @@ command_resizefs(int argc, const char* const* argv)
 		return rootDir;
 	}
 
-	status_t status = _kern_ioctl(rootDir, BFS_IOCTL_RESIZE,
-		&newSize, sizeof(newSize));
+	status_t status = _kern_ioctl(rootDir, BFS_IOCTL_RESIZE, &control, sizeof(control));
 
 	_kern_close(rootDir);
 
@@ -44,7 +51,10 @@ command_resizefs(int argc, const char* const* argv)
 		return status;
 	}
 
-	fssh_dprintf("File system successfully resized!\n");
+	if (control.dry_run)
+		fssh_dprintf("File system successfully resized in dry mode; no changes made!\n");
+	else
+		fssh_dprintf("File system successfully resized!\n");
 	return B_OK;
 }
 

@@ -105,5 +105,9 @@ struct check_control {
  */
 #define BFS_IOCTL_RESIZE		14205
 
+struct resize_control {
+	uint64	new_size;
+	bool	dry_run;
+};
 
 #endif	/* BFS_CONTROL_H */

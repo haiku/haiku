@@ -1,4 +1,5 @@
 /*
+ * Copyright 2025, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2012, Andreas Henriksson, sausageboy@gmail.com
  * Copyright (C) 2020 Adrien Destugues <pulkomandy@pulkomandy.tk>
  *
@@ -32,8 +33,10 @@ ResizeVisitor::~ResizeVisitor()
 
 
 status_t
-ResizeVisitor::Resize(off_t size, disk_job_id job)
+ResizeVisitor::Resize(off_t size, bool dryRun, disk_job_id job)
 {
+	fDryRun = dryRun;
+
 	_CalculateNewSizes(size);
 
 	status_t status = _IsResizePossible(size);
@@ -73,6 +76,8 @@ ResizeVisitor::Resize(off_t size, disk_job_id job)
 		if (status == B_ENTRY_NOT_FOUND)
 			break;
 	}
+	if (fDryRun)
+		return B_OK;
 
 	// move log and change file system size in the superblock
 	if (fShrinking) {
@@ -128,34 +133,38 @@ ResizeVisitor::VisitInode(Inode* inode, const char* treeName)
 	// start by moving the inode so we can place the stream close to it
 	// if possible
 	if (inodeBlock < fBeginBlock || inodeBlock >= fEndBlock) {
-// 		TODO: this kernel API does not exist anymore/yet
-//		status_t status = mark_vnode_busy(GetVolume()->FSVolume(), inode->ID(), true);
+		INFORM(("Need to move inode %" B_PRIdINO ": %s\n", inode->ID(), name));
+		if (!fDryRun) {
+//	 		TODO: this kernel API does not exist anymore/yet
+//			status_t status = mark_vnode_busy(GetVolume()->FSVolume(), inode->ID(), true);
 
-//		ino_t oldInodeID = inode->ID();
-		off_t newInodeID;
+//			ino_t oldInodeID = inode->ID();
+			off_t newInodeID;
 
-		status_t status = _MoveInode(inode, newInodeID, treeName);
-		if (status != B_OK) {
+			status_t status = _MoveInode(inode, newInodeID, treeName);
+			if (status != B_OK) {
+//				mark_vnode_busy(GetVolume()->FSVolume(), inode->ID(), false);
+				FATAL(("Resize: Failed to move inode %" B_PRIdINO ":%s: %s!\n", inode->ID(),
+					name, strerror(status)));
+				fError = true;
+				return status;
+			}
+
+//			status = change_vnode_id(GetVolume()->FSVolume(), oldInodeID,
+//				newInodeID);
+//			if (status != B_OK) {
+//				mark_vnode_busy(GetVolume()->FSVolume(), inode->ID(), false);
+//				FATAL(("Resize: Failed to change ID in vnode, inode %" B_PRIdINO
+//					", \"%s\"!\n", inode->ID(), name));
+//				fError = true;
+//				return status;
+//			}
+
+			inode->SetID(newInodeID);
+
+			// accessing the inode with the new ID
 //			mark_vnode_busy(GetVolume()->FSVolume(), inode->ID(), false);
-			FATAL(("Resize: Failed to move inode %" B_PRIdINO ", \"%s\"!\n", inode->ID(), name));
-			fError = true;
-			return status;
 		}
-
-//		status = change_vnode_id(GetVolume()->FSVolume(), oldInodeID,
-//			newInodeID);
-//		if (status != B_OK) {
-//			mark_vnode_busy(GetVolume()->FSVolume(), inode->ID(), false);
-//			FATAL(("Resize: Failed to change ID in vnode, inode %" B_PRIdINO
-//				", \"%s\"!\n", inode->ID(), name));
-//			fError = true;
-//			return status;
-//		}
-
-		inode->SetID(newInodeID);
-
-		// accessing the inode with the new ID
-//		mark_vnode_busy(GetVolume()->FSVolume(), inode->ID(), false);
 	}
 
 	// move the stream if necessary
@@ -169,12 +178,15 @@ ResizeVisitor::VisitInode(Inode* inode, const char* treeName)
 	}
 
 	if (!inRange) {
-		status = inode->MoveStream();
-		if (status != B_OK) {
-			FATAL(("Resize: Failed to move file stream, inode %" B_PRIdINO
-				", \"%s\"!\n", inode->ID(), name));
-			fError = true;
-			return status;
+		INFORM(("Need to move data stream of inode %" B_PRIdINO ": %s\n", inode->ID(), treeName));
+		if (!fDryRun) {
+			status = inode->MoveStream();
+			if (status != B_OK) {
+				FATAL(("Resize: Failed to move file stream, inode %" B_PRIdINO
+					", \"%s\"!\n", inode->ID(), name));
+				fError = true;
+				return status;
+			}
 		}
 	}
 
@@ -238,29 +250,62 @@ ResizeVisitor::_CalculateNewSizes(off_t size)
 		fShrinking = true;
 		fEndBlock = fNumBlocks;
 	} else {
+		// We cannot allocate outside the current range, as we would then overwrite the inodes
+		// we're supposed to move to a safe place; the block allocator would need to keep all
+		// changes in memory.
 		fShrinking = false;
 		fEndBlock = GetVolume()->NumBlocks();
 	}
+
+	off_t logStart = GetVolume()->ToBlock(GetVolume()->Log());
+	INFORM(("Current block bitmap from 1 to %" B_PRIdOFF ", log from %" B_PRIdOFF " to %" B_PRIdOFF
+		", %" B_PRIdOFF " blocks\n", 1 + GetVolume()->NumBitmapBlocks(), logStart,
+		logStart + GetVolume()->Log().Length(), GetVolume()->NumBlocks()));
+	INFORM(("New block bitmap from 1 to %" B_PRIdOFF ", new log from %" B_PRIdOFF " to %" B_PRIdOFF
+		"\n", 1 + fBitmapBlocks, GetVolume()->ToBlock(fNewLog), fReservedLength));
+	INFORM(("File system is %s from %" B_PRIdOFF " to %" B_PRIdOFF ". Allowed block range is %"
+		B_PRIdOFF " - %" B_PRIdOFF "\n", fShrinking ? "shrinking" : "growing",
+		GetVolume()->NumBlocks() << blockShift, size, fBeginBlock, fEndBlock));
 }
 
 
 status_t
-ResizeVisitor::_IsResizePossible(off_t size)
+ResizeVisitor::_IsResizePossible(off_t size) const
 {
 	if ((size % GetVolume()->BlockSize()) != 0) {
-		FATAL(("Resize: New size not multiple of block size!\n"));
+		FATAL(("Resize: New size not multiple of block size %" B_PRIu32 "!\n",
+			GetVolume()->BlockSize()));
 		return B_BAD_VALUE;
 	}
 
-	// the new size is limited by what we can fit into the first allocation
-	// group
-	if (fReservedLength > (off_t)(1UL << GetVolume()->AllocationGroupShift())) {
+	// The new size is limited by what we can fit into the first allocation group
+	off_t groupSize = (off_t)(1UL << GetVolume()->AllocationGroupShift());
+	if (fReservedLength > groupSize) {
 		FATAL(("Resize: Reserved area is too large for allocation group!\n"));
 		return B_BAD_VALUE;
 	}
 
 	if (GetVolume()->UsedBlocks() > fNumBlocks) {
 		FATAL(("Resize: Not enough free space for resize!\n"));
+		return B_BAD_VALUE;
+	}
+
+	if (fShrinking)
+		return B_OK;
+
+	// We cannot change the allocation group size
+	if (groupSize * 65535 < fNumBlocks) {
+		FATAL(("Resize: Cannot grow further than %" B_PRIdOFF " blocks!", groupSize * 65535));
+		return B_BAD_VALUE;
+	}
+
+	// Since we're currently restricted to the old volume size, we may run into trouble if
+	// there is less free space than the difference of the block bitmap.
+	off_t logEnd = GetVolume()->ToBlock(GetVolume()->Log()) + GetVolume()->Log().Length();
+	off_t diff = fReservedLength - logEnd;
+	if (diff >= GetVolume()->FreeBlocks()) {
+		FATAL(("Resize: There is not enough free space to move data (possibly needed %" B_PRIdOFF
+			", free %" B_PRIdOFF ")!", diff, GetVolume()->FreeBlocks()));
 		return B_BAD_VALUE;
 	}
 
@@ -271,12 +316,11 @@ ResizeVisitor::_IsResizePossible(off_t size)
 status_t
 ResizeVisitor::_ResizeVolume()
 {
-	status_t status;
 	BlockAllocator& allocator = GetVolume()->Allocator();
 
 	// check that the end blocks are free
 	if (fNumBlocks < GetVolume()->NumBlocks()) {
-		status = allocator.CheckBlocks(fNumBlocks,
+		status_t status = allocator.CheckBlocks(fNumBlocks,
 			GetVolume()->NumBlocks() - fNumBlocks, false);
 		if (status != B_OK)
 			return status;
@@ -286,13 +330,13 @@ ResizeVisitor::_ResizeVolume()
 	if (1 + fBitmapBlocks > GetVolume()->Log().Start())
 		return B_ERROR;
 
-	// clear bitmap blocks - aTODO maybe not use a transaction?
+	// clear bitmap blocks - TODO maybe not use a transaction?
 	Transaction transaction(GetVolume(), 0);
 
 	CachedBlock cached(GetVolume());
 	for (off_t block = 1 + GetVolume()->NumBitmapBlocks();
 		block < 1 + fBitmapBlocks; block++) {
-		status = cached.SetToWritable(transaction, block);
+		status_t status = cached.SetToWritable(transaction, block);
 		if (status != B_OK)
 			return status;
 		uint8* buffer = cached.WritableBlock();
@@ -301,7 +345,7 @@ ResizeVisitor::_ResizeVolume()
 	}
 	cached.Unset();
 
-	status = transaction.Done();
+	status_t status = transaction.Done();
 	if (status != B_OK)
 		return status;
 
