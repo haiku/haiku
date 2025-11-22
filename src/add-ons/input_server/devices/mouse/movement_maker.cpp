@@ -60,6 +60,52 @@ make_small(float value)
 	return (int32)truncf(value);
 }
 
+static inline bool
+two_fingers(const touchpad_movement* event) {
+	// TODO: Replace fingerWith related conditions when drivers are adjusted.
+	// They seem to be taken from specifics of Synaptics device driver values
+	// for w where 0 means 2 fingers and 1 is means 3 or more fingers.
+	return count_set_bits(event->fingers) == 2
+//		|| event->nFingers == 2
+		|| event->fingerWidth == 0;
+}
+
+
+static inline bool
+two_or_more_fingers(const touchpad_movement* event) {
+	// TODO: Replace fingerWith related conditions when drivers are adjusted.
+	// They seem to be taken from specifics of Synaptics device driver values
+	// for w where 0 means 2 fingers and 1 is means 3 or more fingers.
+	return count_set_bits(event->fingers) >= 2
+//		|| event->nFingers >= 2
+		|| event->fingerWidth == 0 || event->fingerWidth == 1;
+}
+
+
+static inline bool
+three_fingers(const touchpad_movement* event) {
+	// TODO: Replace fingerWith related conditions when drivers are adjusted.
+	// They seem to be taken from specifics of Synaptics device driver values
+	// for w where 0 means 2 fingers and 1 is means 3 or more fingers.
+	return count_set_bits(event->fingers) == 3
+//		|| event->nFingers = 3
+		|| event->fingerWidth == 1; // This is 3 or more fingers for Synaptic
+}
+
+
+static inline bool
+three_or_more_fingers(const touchpad_movement* event) {
+	// TODO: Replace fingerWith related conditions when drivers are adjusted.
+	// They seem to be taken from specifics of Synaptics device driver values
+	// for w where 0 means 2 fingers and 1 is means 3 or more fingers.
+	return count_set_bits(event->fingers) > 2
+//		|| event->nFingers > 2
+		|| event->fingerWidth == 1;
+}
+
+
+// #pragma mark -
+
 
 void
 MovementMaker::SetSettings(const touchpad_settings& settings)
@@ -326,7 +372,7 @@ TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement
 	if (event->zPressure >= fSpecs.minPressure
 		&& event->zPressure < fSpecs.maxPressure
 		&& ((event->fingerWidth >= 4 && event->fingerWidth <= 7)
-			|| event->fingerWidth == 0 || event->fingerWidth == 1)
+			|| two_or_more_fingers(event))
 		&& (event->xPosition != 0 || event->yPosition != 0)) {
 		// The touch pad is in touch with at least one finger
 		if (!_CheckScrollingToMovement(event, movement))
@@ -574,7 +620,7 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 				|| fSettings.scroll_bottomrange > 0.999999) {
 		isSideScrollingH = true;
 	}
-	if ((event->fingerWidth == 0 || event->fingerWidth == 1)
+	if (two_or_more_fingers(event)
 		&& fSettings.scroll_twofinger) {
 		// two finger scrolling is enabled
 		isSideScrollingV = true;
