@@ -80,7 +80,7 @@ Buffer consumer	MediaString		Consumadôr di memorie tampon
 Increase latency	MediaString		Aumente latence
 Front-left-center	MediaString		Denant a çampe tal mieç
 MPEG format family	MediaString		Famee di formâts MPEG
-(none)	MediaString		(nissun)
+(none)	MediaString		(nissune)
 Center	MediaString		Tal mieç
  kb/s (max)	MediaString		 kb/s (max)
 Monochrome	MediaString		Monocromatic
