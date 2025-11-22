@@ -191,7 +191,6 @@ AddressTextControl::TextView::TextView(AddressTextControl* parent)
 	fUpdateAutoCompleterChoices(true)
 {
 	MakeResizable(true);
-	SetStylable(true);
 	fAutoCompleter->SetModificationsReported(true);
 }
 
@@ -643,7 +642,7 @@ AddressTextControl::AttachedToWindow()
 	BControl::AttachedToWindow();
 
 	fTextView->MakeSelectable(true);
-	_UpdateTextViewColors();
+	_UpdateTextViewColors(IsEnabled());
 }
 
 
@@ -679,7 +678,7 @@ AddressTextControl::SetEnabled(bool enabled)
 		return;
 
 	fTextView->MakeEditable(enabled);
-	_UpdateTextViewColors();
+	_UpdateTextViewColors(enabled);
 
 	if (enabled && fPopUpButton->IsHidden(this))
 		fPopUpButton->Show();
@@ -699,6 +698,16 @@ void
 AddressTextControl::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_COLORS_UPDATED:
+			if ((IsEnabled()
+				&& (message->HasColor(ui_color_name(B_DOCUMENT_BACKGROUND_COLOR))
+					|| message->HasColor(ui_color_name(B_DOCUMENT_TEXT_COLOR))))
+				|| message->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR))
+				|| message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))) {
+				_UpdateTextViewColors(IsEnabled());
+			}
+			break;
+
 		case B_SIMPLE_DATA:
 		{
 			int32 buttons = -1;
@@ -906,31 +915,16 @@ AddressTextControl::_AddAddress(const char* text)
 
 
 void
-AddressTextControl::_UpdateTextViewColors()
+AddressTextControl::_UpdateTextViewColors(bool enabled)
 {
 	BFont font;
 	fTextView->GetFontAndColor(0, &font);
 
-	rgb_color textColor;
-	if (!fTextView->IsEditable() || IsEnabled())
-		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-	else {
-		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DISABLED_LABEL_TINT);
-	}
-
+	// set text color only, do not set high color
+	rgb_color textColor = ui_color(enabled ? B_DOCUMENT_TEXT_COLOR : B_PANEL_TEXT_COLOR);
 	fTextView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
-	rgb_color color;
-	if (!fTextView->IsEditable())
-		color = ui_color(B_PANEL_BACKGROUND_COLOR);
-	else if (IsEnabled())
-		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	else {
-		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_LIGHTEN_2_TINT);
-	}
-
-	fTextView->SetViewColor(color);
-	fTextView->SetLowColor(color);
+	// set low color and set view color to low
+	fTextView->SetLowUIColor(enabled ? B_DOCUMENT_BACKGROUND_COLOR : B_PANEL_BACKGROUND_COLOR);
+	fTextView->SetViewUIColor(fTextView->LowUIColor());
 }

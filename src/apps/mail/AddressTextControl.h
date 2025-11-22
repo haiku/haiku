@@ -40,7 +40,7 @@ public:
 
 private:
 			void				_AddAddress(const char* text);
-			void				_UpdateTextViewColors();
+			void				_UpdateTextViewColors(bool enabled);
 
 private:
 			class TextView;

@@ -115,7 +115,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			void				_UpdateTextViewColors();
+			void				_UpdateTextViewColors(bool enabled);
 };
 
 
@@ -180,16 +180,21 @@ HeaderTextControl::AttachedToWindow()
 {
 	BTextControl::AttachedToWindow();
 
-	_UpdateTextViewColors();
 	TextView()->MakeSelectable(true);
+	_UpdateTextViewColors(IsEnabled());
 }
 
 
 void
 HeaderTextControl::SetEnabled(bool enabled)
 {
+	if (enabled == IsEnabled())
+		return;
+
+	TextView()->MakeEditable(enabled);
+	_UpdateTextViewColors(enabled);
+
 	BTextControl::SetEnabled(enabled);
-	_UpdateTextViewColors();
 }
 
 
@@ -232,6 +237,16 @@ void
 HeaderTextControl::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_COLORS_UPDATED:
+			if ((IsEnabled()
+				&& (message->HasColor(ui_color_name(B_DOCUMENT_BACKGROUND_COLOR))
+					|| message->HasColor(ui_color_name(B_DOCUMENT_TEXT_COLOR))))
+				|| message->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR))
+				|| message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))) {
+				_UpdateTextViewColors(IsEnabled());
+			}
+			break;
+
 		case M_SELECT:
 		{
 			BTextView* textView = TextView();
@@ -248,35 +263,18 @@ HeaderTextControl::MessageReceived(BMessage* message)
 
 
 void
-HeaderTextControl::_UpdateTextViewColors()
+HeaderTextControl::_UpdateTextViewColors(bool enabled)
 {
-	BTextView* textView = TextView();
-
 	BFont font;
-	textView->GetFontAndColor(0, &font);
+	TextView()->GetFontAndColor(0, &font);
 
-	rgb_color textColor;
-	if (!textView->IsEditable() || IsEnabled())
-		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-	else {
-		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DISABLED_LABEL_TINT);
-	}
+	// set text color only, do not set high color
+	rgb_color textColor = ui_color(enabled ? B_DOCUMENT_TEXT_COLOR : B_PANEL_TEXT_COLOR);
+	TextView()->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
-	textView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
-
-	rgb_color color;
-	if (!textView->IsEditable())
-		color = ui_color(B_PANEL_BACKGROUND_COLOR);
-	else if (IsEnabled())
-		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	else {
-		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_LIGHTEN_2_TINT);
-	}
-
-	textView->SetViewColor(color);
-	textView->SetLowColor(color);
+	// set low color and set view color to low
+	TextView()->SetLowUIColor(enabled ? B_DOCUMENT_BACKGROUND_COLOR : B_PANEL_BACKGROUND_COLOR);
+	TextView()->SetViewUIColor(TextView()->LowUIColor());
 }
 
 
