@@ -171,6 +171,7 @@ HeaderTextControl::HeaderTextControl(const char* label, const char* name, BMessa
 	:
 	BTextControl(label, name, message)
 {
+	TextView()->SetFlags(B_WILL_DRAW | B_NAVIGABLE);
 }
 
 
@@ -180,6 +181,7 @@ HeaderTextControl::AttachedToWindow()
 	BTextControl::AttachedToWindow();
 
 	_UpdateTextViewColors();
+	TextView()->MakeSelectable(true);
 }
 
 
@@ -194,38 +196,35 @@ HeaderTextControl::SetEnabled(bool enabled)
 void
 HeaderTextControl::Draw(BRect updateRect)
 {
-	bool enabled = IsEnabled();
-	bool active = TextView()->IsFocus() && Window()->IsActive();
-
 	BRect rect = TextView()->Frame();
 	rect.InsetBy(-2, -2);
 
+	uint32 flags = 0;
+	if (!IsEnabled())
+		flags |= BControlLook::B_DISABLED;
+	else if (TextView()->IsFocus() && Window()->IsActive())
+		flags |= BControlLook::B_FOCUSED;
+
+	if (IsEnabled()) {
+		rgb_color base = ViewColor();
+		be_control_look->DrawTextControlBorder(this, rect, updateRect, base, flags);
+	}
+
+	if (Label() == NULL)
+		return;
+
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color text = ui_color(B_PANEL_TEXT_COLOR);
-	uint32 flags = 0;
-	if (!enabled)
-		flags = BControlLook::B_DISABLED;
 
-	if (enabled) {
-		if (active)
-			flags |= BControlLook::B_FOCUSED;
+	rect = CreateLabelLayoutItem()->Frame().OffsetByCopy(-Frame().left, -Frame().top);
+	// TODO: solve this better (alignment of label and text)
+	rect.InsetBy(1, 1);
 
-		be_control_look->DrawTextControlBorder(this, rect, updateRect, base,
-			flags);
-	}
+	alignment labelAlignment;
+	GetAlignment(&labelAlignment, NULL);
 
-	if (Label() != NULL) {
-		rect = CreateLabelLayoutItem()->Frame().OffsetByCopy(-Frame().left,
-			-Frame().top);
-		// TODO: solve this better (alignment of label and text)
-		rect.top++;
-
-		alignment labelAlignment;
-		GetAlignment(&labelAlignment, NULL);
-
-		be_control_look->DrawLabel(this, Label(), rect, updateRect,
-			base, flags, BAlignment(labelAlignment, B_ALIGN_MIDDLE), &text);
-	}
+	be_control_look->DrawLabel(this, Label(), rect, updateRect,
+		base, flags, BAlignment(labelAlignment, B_ALIGN_MIDDLE), &text);
 }
 
 
@@ -355,13 +354,9 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 
 	// To
 	fToLabel = new LabelView(B_TRANSLATE("To:"));
-	fToControl = new AddressTextControl(B_TRANSLATE("To:"),
-		new BMessage(TO_FIELD));
-	if (fIncoming || fResending) {
-		fToLabel->SetEnabled(false);
-		fToControl->SetEditable(false);
-		fToControl->SetEnabled(false);
-	}
+	fToControl = new AddressTextControl("to", new BMessage(TO_FIELD));
+	fToLabel->SetEnabled(!(fIncoming || fResending));
+	fToControl->SetEnabled(!(fIncoming || fResending));
 
 	BMessage* msg = new BMessage(FIELD_CHANGED);
 	msg->AddInt32("bitmask", FIELD_TO);
@@ -370,10 +365,9 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 	// Carbon copy
 	fCcLabel = new LabelView(B_TRANSLATE("Cc:"));
 	fCcControl = new AddressTextControl("cc", new BMessage(CC_FIELD));
+	fCcLabel->SetEnabled(!fIncoming);
+	fCcControl->SetEnabled(!fIncoming);
 	if (fIncoming) {
-		fCcLabel->SetEnabled(false);
-		fCcControl->SetEditable(false);
-		fCcControl->SetEnabled(false);
 		fCcControl->Hide();
 		fCcLabel->Hide();
 	}
@@ -388,6 +382,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 		msg = new BMessage(FIELD_CHANGED);
 		msg->AddInt32("bitmask", FIELD_BCC);
 		fBccControl->SetModificationMessage(msg);
+		fBccControl->SetEnabled(true);
 	}
 
 	// Subject
@@ -397,8 +392,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 	msg->AddInt32("bitmask", FIELD_SUBJECT);
 	fSubjectControl->SetModificationMessage(msg);
 	fSubjectControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	if (fIncoming || fResending)
-		fSubjectControl->SetEnabled(false);
+	fSubjectControl->SetEnabled(!fIncoming);
 
 	// Date
 	if (fIncoming) {
@@ -438,7 +432,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 		layout->AddItem(fDateControl->CreateTextViewLayoutItem(), 1, row);
 	}
 
-	if (fIncoming && (fCcControl != NULL)) {
+	if (fIncoming) {
 		layout->AddView(fCcLabel, 2, row);
 		layout->AddView(fCcControl, 3, row++);
 	} else {
@@ -504,7 +498,7 @@ THeaderView::IsCcEmpty() const
 const char*
 THeaderView::Cc() const
 {
-	return fCcControl != NULL ? fCcControl->Text() : NULL;
+	return fCcControl->Text();
 }
 
 
@@ -514,12 +508,10 @@ THeaderView::SetCc(const char* cc)
 	fCcControl->SetText(cc);
 
 	if (fIncoming) {
-		if (cc != NULL && cc[0] != '\0') {
-			if (fCcControl->IsHidden(this)) {
-				fCcControl->Show();
-				fCcLabel->Show();
-			}
-		} else if (!fCcControl->IsHidden(this)) {
+		if (fCcControl->IsHidden(this)) {
+			fCcControl->Show();
+			fCcLabel->Show();
+		} else {
 			fCcControl->Hide();
 			fCcLabel->Hide();
 		}
@@ -694,9 +686,8 @@ THeaderView::MessageReceived(BMessage* msg)
 		case B_SIMPLE_DATA:
 		{
 			BTextView* textView = dynamic_cast<BTextView*>(Window()->CurrentFocus());
-			if (dynamic_cast<AddressTextControl *>(textView->Parent()) != NULL)
-			BMessage message(*msg);
-			textView->Parent()->MessageReceived(msg);
+			if (dynamic_cast<AddressTextControl*>(textView->Parent()) != NULL)
+				Window()->PostMessage(msg, textView->Parent());
 			break;
 		}
 		case B_REFS_RECEIVED:
