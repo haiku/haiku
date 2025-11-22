@@ -11,7 +11,7 @@ BootstrapPackageRepository HaikuPortsCross
 	gcc_bootstrap_syslibs_devel-13.2.0_2023_08_10-1
 	:
 	# repository architecture packages (stage 1)
-	bash_bootstrap-4.4.023-1
+	bash_bootstrap-5.3-1
 	binutils_bootstrap-2.41_2023_08_05-1
 	bison_bootstrap-3.0.5-1
 	coreutils_bootstrap-8.22-1
@@ -25,8 +25,8 @@ BootstrapPackageRepository HaikuPortsCross
 	freetype_bootstrap_devel-2.6.3-1
 	gawk_bootstrap-3.1.8-2
 	grep_bootstrap-2.14-1
-	icu_bootstrap-57.2-1
-	icu_bootstrap_devel-57.2-1
+	icu70_bootstrap-70.1-1
+	icu70_bootstrap_devel-70.1-1
 	less_bootstrap-451-1
 	libffi_bootstrap-3.3-1
 	m4_bootstrap-1.4.19-1
@@ -35,7 +35,7 @@ BootstrapPackageRepository HaikuPortsCross
 	ncurses6_bootstrap_devel-6.2-1
 	python_bootstrap-3.9.1-1
 	sed_bootstrap-4.2.1-1
-	texinfo_bootstrap-4.13a-1
+	texinfo_bootstrap-7.2-1
 	zlib_bootstrap-1.2.13-1
 	zlib_bootstrap_devel-1.2.13-1
 	zstd_bootstrap-1.5.5-1
