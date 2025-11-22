@@ -523,7 +523,7 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 		}
 	} else if (entry.IsFile()) {
 		BString mimeString = _MIMEString(&ref);
-		if (_IsMediaFile(mimeString)) {
+		if (_IsMediaFile(mimeString, ref)) {
 			PlaylistItem* item = new (std::nothrow) FilePlaylistItem(ref);
 			if (!_ExtraMediaExists(playlist, ref)) {
 				_BindExtraMedia(item);
@@ -673,10 +673,27 @@ Playlist::_IsImageFile(const BString& mimeString)
 
 
 /*static*/ bool
-Playlist::_IsMediaFile(const BString& mimeString)
+Playlist::_IsMediaFile(const BString& mimeString, const entry_ref& ref)
 {
 	BMimeType superType;
 	BMimeType fileType(mimeString.String());
+
+	if (fileType.GetSupertype(&superType) != B_OK) {
+		// no superType, try to sniff the type
+		if (BMimeType::GuessMimeType(&ref, &fileType) != B_OK)
+			return false;
+	}
+
+	BEntry entry(&ref);
+	if (entry.IsSymLink()) {
+		// traverse link
+		entry_ref* fileRef = const_cast<entry_ref*>(&ref);
+		if (entry.SetTo(fileRef, true) != B_OK)
+			return false;
+		if (entry.GetRef(fileRef) != B_OK)
+			return false;
+		fileType.SetTo(_MIMEString(fileRef));
+	}
 
 	if (fileType.GetSupertype(&superType) != B_OK)
 		return false;
@@ -699,7 +716,7 @@ Playlist::_IsMediaFile(const BString& mimeString)
 
 	const char* type;
 	for (int32 i = 0; types.FindString("types", i, &type) == B_OK; i++) {
-		if (strcasecmp(mimeString.String(), type) == 0)
+		if (strcasecmp(fileType.Type(), type) == 0)
 			return true;
 	}
 
@@ -791,7 +808,7 @@ Playlist::_BindExtraMedia(FilePlaylistItem* fileItem, const BEntry& entry)
 	entry_ref ref;
 	entry.GetRef(&ref);
 	BString mimeString = _MIMEString(&ref);
-	if (_IsMediaFile(mimeString)) {
+	if (_IsMediaFile(mimeString, ref)) {
 		fileItem->AddRef(ref);
 	} else if (_IsImageFile(mimeString)) {
 		fileItem->AddImageRef(ref);
