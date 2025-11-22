@@ -42,8 +42,10 @@ private:
 			
 			bool				fMovementMakerStarted;
 
+private:
 			uint32				fPreviousX;
 			uint32				fPreviousY;
+
 			float				fDeltaSumX;
 			float				fDeltaSumY;
 

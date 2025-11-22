@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <private/utils/BitUtils.h>
 
 //#define TRACE_MOVEMENT_MAKER
 
@@ -267,6 +268,34 @@ TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement
 
 	if (!movement)
 		return B_ERROR;
+
+	TRACE("TM_EVENT: b:0x%" B_PRIx8 " nf:%" B_PRId8 " f:0x%" B_PRIx8
+		" x:%" B_PRIu32 " y:%" B_PRIu32 " p:%" B_PRIu8 " w:%" B_PRIu8 "\n",
+		event->buttons,
+		count_set_bits(event->fingers),
+		event->fingers,
+		event->xPosition,
+		event->yPosition,
+		event->zPressure,
+		event->fingerWidth
+	);
+	TRACE("TM_STATUS: b:0x%" B_PRIx8 " %c%c%c%c%c%c"
+		" dx:%" B_PRId32 " dy:%" B_PRId32
+		" tcks:%" B_PRId32 " cks:%" B_PRId32 "\n",
+		fButtonsState,
+
+		fMovementStarted	? 'M' : 'm',
+		fScrollingStarted	? 'S' : 's',
+		fTapStarted			? 'T' : 't',
+		fTapdragStarted		? 'D' : 'd',
+		fValidEdgeMotion	? 'E' : 'e',
+		fDoubleClick		? 'C' : 'c',
+
+		fTapDeltaX,
+		fTapDeltaY,
+		fTapClicks,
+		fClickCount
+	);
 
 	movement->xdelta = 0;
 	movement->ydelta = 0;
