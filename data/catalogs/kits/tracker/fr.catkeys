@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	4162514004
+1	french	x-vnd.Haiku-libtracker	2012592487
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -353,7 +353,6 @@ Create link here	ContainerWindow		Créer un lien ici
 Force identify	ContainerWindow		Forcer l’identification
 no items	CountView		aucun élément
 Time	AttributesView		Heure
-Disks	DirMenu		Disques
 Open parent	ContainerWindow		Ouvrir le parent
 Find…	ContainerWindow		Rechercher…
 moving	FSUtils		déplacement

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	2962323248
+1	belarusian	x-vnd.Haiku-libtracker	812401731
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Open with…	ContainerWindow		Адкрыць з дапамогай…
@@ -251,7 +251,6 @@ parent folder	NavMenu		бацькоўскі каталог
 Create link here	ContainerWindow		Стварыць спасылку тут
 Force identify	ContainerWindow		Ідэнтыфікаваць прымусова
 no items	CountView		няма элементаў
-Disks	DirMenu		Дыскі
 Open parent	ContainerWindow		Адкрыць бацькоўскі
 Find…	ContainerWindow		Знайсці…
 moving	FSUtils		перамяшчаеце

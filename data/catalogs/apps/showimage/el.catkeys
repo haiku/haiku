@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	1148406263
+1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	166312083
 ShowImage	System name		ShowImage
 Page setup…	Menus		Διαμόρφωση σελίδας…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' (σελίδα %d) έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
@@ -45,7 +45,6 @@ Stretch to window	Menus		Επιμήκυνση σε παράθυρο
 Job setup	PrintOptionsWindow		Διαμόρφωση εργασίας
 Clear selection	Menus		Εκκαθάριση επιλογής
 Rotate clockwise	Menus		Περιστροφή προς τα δεξιά
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Δεν ήταν δυνατή η φόρτωση της εικόνας! Το αρχείο ή ο μετατροπέας εικόνας δεν υπάρχει.
 Open with…	Menus		Άνοιγμα με…
 Rotate counterclockwise	Menus		Περιστροφή προς τα αριστερά
 Previous page	Menus		Προηγούμενη σελίδα

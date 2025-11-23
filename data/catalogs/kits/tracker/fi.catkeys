@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	847073574
+1	finnish	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Luo linkki tähän
 Force identify	ContainerWindow		Pakota tunnistus
 no items	CountView		ei kohteita
 Time	AttributesView		Aika
-Disks	DirMenu		Levyt
 Open parent	ContainerWindow		Avaa päätaso
 Find…	ContainerWindow		Etsi...
 moving	FSUtils		siirretään

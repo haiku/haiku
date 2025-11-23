@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	847073574
+1	ukrainian	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Створити посилання
 Force identify	ContainerWindow		Ідентифікувати примусово
 no items	CountView		немає елементів
 Time	AttributesView		Час
-Disks	DirMenu		Диски
 Open parent	ContainerWindow		Відкрити батьківський каталог
 Find…	ContainerWindow		Знайти…
 moving	FSUtils		переміщення

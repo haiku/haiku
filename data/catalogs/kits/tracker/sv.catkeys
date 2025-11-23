@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	847073574
+1	swedish	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Skapa länk här
 Force identify	ContainerWindow		Tvinga identifiering
 no items	CountView		inga objekt
 Time	AttributesView		Tid
-Disks	DirMenu		Diskar
 Open parent	ContainerWindow		Öppna förälder
 Find…	ContainerWindow		Sök...
 moving	FSUtils		flyttar

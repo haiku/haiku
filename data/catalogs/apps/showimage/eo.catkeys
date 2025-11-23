@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-ShowImage	575555985
+1	esperanto	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		La Bildmontrilo
 Page setup…	Menus		Agordo de paĝo…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		La dokumento '%s' (paĝo %d) estas ŝanĝita. Ĉu vi volas fermi ĝin?
@@ -43,7 +43,6 @@ Stretch to window	Menus		Streĉi al fenestro
 Job setup	PrintOptionsWindow		Agordo de tasko
 Clear selection	Menus		Rezigni elekton
 Rotate clockwise	Menus		Turni laŭhorloĝe
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ne povas alŝuti bildon! La dosiero aŭ formatpelilo forestas.
 Rotate counterclockwise	Menus		Turni kontraŭhorloĝe
 Previous page	Menus		Antaŭa paĝo
 Fit to window	Menus		Adapti al fenestro

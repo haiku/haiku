@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2199752883
+1	dutch; flemish	x-vnd.Haiku-libtracker	49831366
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -340,7 +340,6 @@ Create link here	ContainerWindow		Maak hier een koppeling
 Force identify	ContainerWindow		Forceer identificatie
 no items	CountView		geen items
 Time	AttributesView		Tijd
-Disks	DirMenu		Schijven
 Open parent	ContainerWindow		Open bovenliggende map
 Find…	ContainerWindow		Zoeken...
 moving	FSUtils		bezig met verplaatsen

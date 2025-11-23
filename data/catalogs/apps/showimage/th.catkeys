@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-ShowImage	575555985
+1	thai	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		แสดงภาพ
 Page setup…	Menus		ตั้งค่าหน้า
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		เอกสาร '%s' (หน้า%d) มีการเปลี่ยนแปลง คุณต้องการปิดเอกสารหรือไม่?
@@ -43,7 +43,6 @@ Stretch to window	Menus		ขยายเต็มหน้าต่าง
 Job setup	PrintOptionsWindow		ตั้งค่างาน
 Clear selection	Menus		ลบการเลือก
 Rotate clockwise	Menus		หมุนตามเข็มนาฬิกา
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		ไม่สามารถโหลดภาพ! อาจไม่มีไฟล์หรือโปรแกรมแปลรูปภาพสำหรับไฟล์
 Rotate counterclockwise	Menus		หมุนทวนเข็มนาฬิกา
 Previous page	Menus		หน้าก่อนหน้า
 Fit to window	Menus		พอดีกับหน้าต่าง

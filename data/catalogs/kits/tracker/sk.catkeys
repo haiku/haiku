@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	228894483
+1	slovak	x-vnd.Haiku-libtracker	2373940262
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Open with…	ContainerWindow		Otvoriť pomocou…
@@ -283,7 +283,6 @@ parent folder	NavMenu		nadradený priečinok
 Create link here	ContainerWindow		Vytvoriť odkaz tu
 Force identify	ContainerWindow		Vynútiť identifikáciu
 no items	CountView		žiadne položky
-Disks	DirMenu		Disky
 Open parent	ContainerWindow		Otvoriť nadradený
 Find…	ContainerWindow		Nájsť…
 moving	FSUtils		presúvanie

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-ShowImage	437869151
+1	croatian	x-vnd.Haiku-ShowImage	3750742267
 ShowImage	System name		Prikaži sliku
 Page setup…	Menus		Postavljanje stranice...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stranica %d) je promjenjen. Želite li zatvoriti dokument?
@@ -42,7 +42,6 @@ Stretch to window	Menus		Rastegni po prozoru
 Job setup	PrintOptionsWindow		Postavljanje posla
 Clear selection	Menus		Očisti odabir
 Rotate clockwise	Menus		Rotiraj u smjeru kazaljke na satu
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ne mogu učitati sliku! Ne postoji datoteka ili prevoditelj slike.
 Rotate counterclockwise	Menus		Rotiraj obrnuto smjeru kazaljke na satu
 Previous page	Menus		Prethodna stranica
 Fit to window	Menus		Pristajanje u prozor

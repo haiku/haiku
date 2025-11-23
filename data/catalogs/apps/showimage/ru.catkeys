@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	2453396430
+1	russian	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		Просмотр изображений
 Page setup…	Menus		Настройка печати…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Растянуть до размеров окна
 Job setup	PrintOptionsWindow		Печать
 Clear selection	Menus		Очистить выделение
 Rotate clockwise	Menus		Повернуть по часовой стрелке
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Не удалось открыть изображение. Либо файл, либо транслятор этого изображения отсутствует.
 Open with…	Menus		Открыть с…
 Rotate counterclockwise	Menus		Повернуть против часовой стрелки
 Previous page	Menus		Предыдущая страница

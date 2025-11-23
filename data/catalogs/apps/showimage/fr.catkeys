@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	2453396430
+1	french	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		Visionneuse
 Page setup…	Menus		Mise en page…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Étirer à la fenêtre
 Job setup	PrintOptionsWindow		Définir la tâche
 Clear selection	Menus		Effacer la sélection
 Rotate clockwise	Menus		Rotation horaire
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L’image n’a pas pu être lue ! Le fichier ou son traducteur n’existe pas.
 Open with…	Menus		Ouvrir avec…
 Rotate counterclockwise	Menus		Rotation antihoraire
 Previous page	Menus		Page précédente

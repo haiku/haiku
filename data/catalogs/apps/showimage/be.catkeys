@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ShowImage	575555985
+1	belarusian	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		Выявы
 Page setup…	Menus		Наладкі старонкі…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' (старонка %d) зменены. Вы жадаеце яго закрыць?
@@ -43,7 +43,6 @@ Stretch to window	Menus		Расцягнуць да вакна
 Job setup	PrintOptionsWindow		Наладка заданняў
 Clear selection	Menus		Ачысціць выдзяленне
 Rotate clockwise	Menus		Павярнуць па гадзіннікавай стрэлцы
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Немагчыма загрузіць выяву. Не існуе або сам файл, або канвертар для яго.
 Rotate counterclockwise	Menus		Павярнуць супраць гадзіннікавай стрэлкі
 Previous page	Menus		Папярэдняя старонка
 Fit to window	Menus		Умясціць у вакно

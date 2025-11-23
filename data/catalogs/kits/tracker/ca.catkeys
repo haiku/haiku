@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	847073574
+1	catalan; valencian	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Crea un enllaç aquí
 Force identify	ContainerWindow		Força la identificació
 no items	CountView		no hi ha cap element
 Time	AttributesView		Hora
-Disks	DirMenu		Discs
 Open parent	ContainerWindow		Obre la carpeta superior
 Find…	ContainerWindow		Troba...
 moving	FSUtils		es mou

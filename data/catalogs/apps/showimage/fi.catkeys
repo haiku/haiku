@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	2453396430
+1	finnish	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		Kuvakatselin
 Page setup…	Menus		Sivuasetus...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Venytä ikkunaan
 Job setup	PrintOptionsWindow		Työasetukset
 Clear selection	Menus		Tyhjennä valinta
 Rotate clockwise	Menus		Pyöritä myötäpäivään
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kuvan lataus epäonnistui! Puuttuu joko tiedosto tai kuvamuunnin sitä varten.
 Open with…	Menus		Avaa sovelluksella…
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
 Previous page	Menus		Edellinen sivu

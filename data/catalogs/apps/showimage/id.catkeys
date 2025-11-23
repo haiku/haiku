@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-ShowImage	2453396430
+1	indonesian	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		ShowImage
 Page setup…	Menus		Atur Halaman…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumen '%s' (halaman %d) telah diubah. Apakah Anda ingin menutup dokumen?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Regangkan ke jendela
 Job setup	PrintOptionsWindow		Pengaturan pekerjaan
 Clear selection	Menus		Bersihkan pilihan
 Rotate clockwise	Menus		Putar searah jarum jam
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Tidak dapat memuat gambar! Entah file atau penerjemah gambar untuk itu tidak ada.
 Open with…	Menus		Bukan dengan…
 Rotate counterclockwise	Menus		Putar berlawanan jarum jam
 Previous page	Menus		Halaman sebelumnya

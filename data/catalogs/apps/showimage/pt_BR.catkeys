@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ShowImage	575555985
+1	portuguese (brazil)	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		Exibir Imagem
 Page setup…	Menus		Configurar página...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Deseja fechar o documento?
@@ -43,7 +43,6 @@ Stretch to window	Menus		Esticar para a janela
 Job setup	PrintOptionsWindow		Configurar trabalho
 Clear selection	Menus		Limpar seleção
 Rotate clockwise	Menus		Girar em sentido horário
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível carregar a imagem! O arquivo, ou o tradutor de imagem para ele, não existe.
 Rotate counterclockwise	Menus		Girar em sentido antiorário
 Previous page	Menus		Página anterior
 Fit to window	Menus		Ajustar à janela

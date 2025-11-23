@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ShowImage	575555985
+1	portuguese	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		ShowImage
 Page setup…	Menus		Configuração de página…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
@@ -43,7 +43,6 @@ Stretch to window	Menus		Esticar à medida da janela
 Job setup	PrintOptionsWindow		Configurar trabalho de impressão
 Clear selection	Menus		Limpar seleção
 Rotate clockwise	Menus		Rodar para a direita
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou não existe o ficheiro, ou um tradutor de imagens para esse formato.
 Rotate counterclockwise	Menus		Rodar para a esquerda
 Previous page	Menus		Página anterior
 Fit to window	Menus		Ajustar à janela

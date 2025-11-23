@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ShowImage	575555985
+1	dutch; flemish	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		ShowImage
 Page setup…	Menus		Paginaconfiguratie...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' (pagina %d) werd veranderd. Wilt u het document sluiten?
@@ -43,7 +43,6 @@ Stretch to window	Menus		Uitrekken tot venster
 Job setup	PrintOptionsWindow		Taakconfiguratie
 Clear selection	Menus		Selectie wissen
 Rotate clockwise	Menus		Roteer rechtsom
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		De afbeelding kon niet geladen worden! Het bestand bestaat mogelijk niet, of er bestaat geen afbeeldings-omzetter voor.
 Rotate counterclockwise	Menus		Roteer linksom
 Previous page	Menus		Vorige pagina
 Fit to window	Menus		Tot venster passend maken

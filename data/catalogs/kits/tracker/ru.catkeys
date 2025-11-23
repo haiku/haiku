@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	847073574
+1	russian	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Создать ссылку здесь
 Force identify	ContainerWindow		Распознать принудительно
 no items	CountView		нет объектов
 Time	AttributesView		Время
-Disks	DirMenu		Диски
 Open parent	ContainerWindow		На папку вверх
 Find…	ContainerWindow		Найти…
 moving	FSUtils		перемещаемый

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	885604331
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3030650110
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -344,7 +344,6 @@ Create link here	ContainerWindow		Δημιουργία συνδέσμου εδώ
 Force identify	ContainerWindow		Εξαναγκασμός αναγνώρισης
 no items	CountView		καθόλου αντικείμενα
 Time	AttributesView		Ώρα
-Disks	DirMenu		Δίσκοι
 Open parent	ContainerWindow		Άνοιγμα γονέα
 Find…	ContainerWindow		Εύρεση…
 moving	FSUtils		μετακίνηση

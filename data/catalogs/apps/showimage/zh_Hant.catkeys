@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ShowImage	2453396430
+1	english	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		圖片展示
 Page setup…	Menus		頁面設定…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		檔案 '%s' (頁 %d) 已更改。您要關閉該文件嗎？
@@ -46,7 +46,6 @@ Stretch to window	Menus		拉伸到視窗
 Job setup	PrintOptionsWindow		工作設定
 Clear selection	Menus		清除選擇
 Rotate clockwise	Menus		順時針旋轉
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		無法載入圖片！該檔案或它的圖片轉譯器不存在。
 Open with…	Menus		開啓以…
 Rotate counterclockwise	Menus		逆時針旋轉
 Previous page	Menus		上一頁

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ShowImage	2453396430
+1	turkish	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		Görsel Görüntüleyicisi
 Page setup…	Menus		Sayfa yapısı…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		“%s” belgesi (sayfa %d) değiştirildi. Belgeyi kapatmak istiyor musunuz?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Pencereye gerdir
 Job setup	PrintOptionsWindow		İş yapısı
 Clear selection	Menus		Seçimi temizle
 Rotate clockwise	Menus		Saat yönünde döndür
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Görsel yüklenemedi. Bu dosya için gerekli çözücü büyük olasılıkla yok.
 Open with…	Menus		Birlikte aç…
 Rotate counterclockwise	Menus		Saat yönünün tersine döndür
 Previous page	Menus		Önceki sayfa

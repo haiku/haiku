@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	170342311
+1	thai	x-vnd.Haiku-libtracker	2315388090
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -328,7 +328,6 @@ Create link here	ContainerWindow		สร้างลิงค์ที่นี�
 Force identify	ContainerWindow		บังคับแสดง
 no items	CountView		ไม่มีรายการ
 Time	AttributesView		เวลา
-Disks	DirMenu		ดิสก์
 Open parent	ContainerWindow		เปิด parent
 Find…	ContainerWindow		ค้นหา
 moving	FSUtils		กำลังย้าย

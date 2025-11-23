@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ShowImage	2453396430
+1	english	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		图像查看器
 Page setup…	Menus		页面启动...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		文档'%s' (page %d) 已经改变。是否关闭文档？
@@ -46,7 +46,6 @@ Stretch to window	Menus		伸展到窗口
 Job setup	PrintOptionsWindow		安装
 Clear selection	Menus		清空选中
 Rotate clockwise	Menus		顺时针旋转
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		无法打开图像！可能文件或者图像解码器不存在。
 Open with…	Menus		打开方式…
 Rotate counterclockwise	Menus		逆时针旋转
 Previous page	Menus		上一页

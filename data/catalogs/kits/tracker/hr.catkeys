@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	607276074
+1	croatian	x-vnd.Haiku-libtracker	2752321853
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Open with…	ContainerWindow		Otvori pomoću...
@@ -237,7 +237,6 @@ Create link here	ContainerWindow		Napravi poveznicu ovdje
 Force identify	ContainerWindow		Forsiraj identificiranje
 no items	CountView		nema stavki
 Time	AttributesView		Vrijeme
-Disks	DirMenu		Diskovi
 Find…	ContainerWindow		Nađi...
 moving	FSUtils		premještanja
 Add	FindPanel		Dodaj

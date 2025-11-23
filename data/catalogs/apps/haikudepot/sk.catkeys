@@ -59,8 +59,8 @@ Close	PackageManager		Zatvoriť
 Changelog	PackageInfoView		Záznam zmien
 About	PackageInfoView		O aplikácii
 Stability	RatePackageWindow		Stabilita
-Cancel	RatePackageWindow		Zrušiť
 Inactive	PackageListView		Neaktívne
+Cancel	RatePackageWindow		Zrušiť
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položiek}}
 Downloading:	PackageInfoView		Sťahuje sa:
 Success	UserLoginWindow		Úspech

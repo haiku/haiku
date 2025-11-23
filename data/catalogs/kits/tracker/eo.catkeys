@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	820259318
+1	esperanto	x-vnd.Haiku-libtracker	2965305097
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -336,7 +336,6 @@ Create link here	ContainerWindow		Krei ligilon ĉi tie
 Force identify	ContainerWindow		Devige identigi
 no items	CountView		neniu elemento
 Time	AttributesView		Horo
-Disks	DirMenu		Diskoj
 Open parent	ContainerWindow		Uzi la patran
 Find…	ContainerWindow		Serĉi...
 moving	FSUtils		movante

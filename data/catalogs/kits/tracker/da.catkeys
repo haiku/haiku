@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	647966243
+1	danish	x-vnd.Haiku-libtracker	2793012022
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -343,7 +343,6 @@ Create link here	ContainerWindow		Opret lænke her
 Force identify	ContainerWindow		Gennemtving identificering
 no items	CountView		ingen elementer
 Time	AttributesView		Tid
-Disks	DirMenu		Diske
 Open parent	ContainerWindow		Åbn forælder
 Find…	ContainerWindow		Søg…
 moving	FSUtils		flytter

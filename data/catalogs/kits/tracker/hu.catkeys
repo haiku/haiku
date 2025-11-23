@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	847073574
+1	hungarian	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Hivatkozás készítése ide
 Force identify	ContainerWindow		Kikényszerített azonosítás
 no items	CountView		nincs elem
 Time	AttributesView		Idő
-Disks	DirMenu		Lemezek
 Open parent	ContainerWindow		Szülő megnyitása
 Find…	ContainerWindow		Keresés…
 moving	FSUtils		mozgatni

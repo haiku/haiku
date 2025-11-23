@@ -137,8 +137,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Local
 Package changes	PackageResult	Window title	Évolutions du paquet
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Considéreriez-vous comme acceptable d’envoyer des données d’utilisation anonymes au système du Serveur de dépôt Haiku depuis cet ordinateur ? Vous pouvez changer votre préférence dans la fenêtre des « Réglages » ultérieurement.
-User rating	RatePackageWindow		Avis de l’utilisateur
 Installed packages	MainWindow		Paquets installés
+User rating	RatePackageWindow		Avis de l’utilisateur
 Date	PackageListView		Date
 Error	App		Erreur
 There was a puzzling response from the web service.	UserLoginWindow		La réponse du service web est incompréhensible.
@@ -160,8 +160,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilité
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Le mot de passe doit être répété afin de réduire le risque d’une saisie erronée.
 Cancel	SettingsWindow		Annuler
-Cancel	RatePackageWindow		Annuler
 Inactive	PackageListView		Inactif
+Cancel	RatePackageWindow		Annuler
 Nickname:	UserLoginWindow		Surnom :
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronisation des métadonnées des dépôts
 OK	MainWindow		Valider

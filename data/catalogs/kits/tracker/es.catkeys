@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	847073574
+1	spanish; castilian	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Crear un enlace aquí
 Force identify	ContainerWindow		Forzar identificación
 no items	CountView		Sin elementos
 Time	AttributesView		Hora
-Disks	DirMenu		Discos
 Open parent	ContainerWindow		Abrir padre
 Find…	ContainerWindow		Encontrar…
 moving	FSUtils		moviendo

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	847073574
+1	czech	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Vytvořit odkaz zde
 Force identify	ContainerWindow		Nucená identita
 no items	CountView		žádné položky
 Time	AttributesView		Čas
-Disks	DirMenu		Disky
 Open parent	ContainerWindow		Otevřít nadřazený
 Find…	ContainerWindow		Vyhledat…
 moving	FSUtils		přesun

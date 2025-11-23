@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ShowImage	2453396430
+1	polish	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		ShowImage
 Page setup…	Menus		Ustawienia strony…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s” (strona %d) został zmieniony. Czy chcesz go zamknąć?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Rozciągnij do okna
 Job setup	PrintOptionsWindow		Ustawienia zadania
 Clear selection	Menus		Wyczyść zaznaczenie
 Rotate clockwise	Menus		Obróć zgodnie z ruchem wskazówek zegara
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nie można załadować obrazu! Prawdopodobnie niepoprawny plik lub nie istnieje translator.
 Open with…	Menus		Otwórz za pomocą…
 Rotate counterclockwise	Menus		Obróć przeciwnie do ruchu wskazówek zegara
 Previous page	Menus		Poprzednia strona

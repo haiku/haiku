@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ShowImage	2453396430
+1	spanish; castilian	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		Mostrar Imagen
 Page setup…	Menus		Configuración de la pagina…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' (página %d) ha cambiado. ¿Desea cerrarlo?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Estirar a la ventana
 Job setup	PrintOptionsWindow		Configuración de tareas
 Clear selection	Menus		Limpiar selección
 Rotate clockwise	Menus		Rotar en sentido horario
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		¡No se pudo cargar la imagen! No existe un archivo o un Intérprete de imagen para el mismo.
 Open with…	Menus		Abrir con…
 Rotate counterclockwise	Menus		Rotar en sentido antihorario
 Previous page	Menus		Página anterior

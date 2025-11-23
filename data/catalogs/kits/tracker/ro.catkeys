@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	847073574
+1	romanian	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Creează o legătură aici
 Force identify	ContainerWindow		Forțează identificarea
 no items	CountView		fără elemente
 Time	AttributesView		Oră
-Disks	DirMenu		Discuri
 Open parent	ContainerWindow		Deschide superior
 Find…	ContainerWindow		Găsește…
 moving	FSUtils		se mută

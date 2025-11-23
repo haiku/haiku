@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用條�
 Available packages	MainWindow		可用軟體套件
 It was not possible to create the new user.	UserLoginWindow		無法創建新使用者。
 An unexpected error has been sent from the server [%li]	ServerHelper		伺服器  [%li] 發送了意外錯誤
-Create account	UserLoginWindow		創建賬戶
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		取得套件的變更日誌
+Create account	UserLoginWindow		創建賬戶
 Agree	ToLatestUserUsageConditionsWindow		同意
 Install %PackageTitle%	PackageManager		安裝 %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		對驗證碼的回應不正確。
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		本地
 Package changes	PackageResult	Window title	套件變動
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		從這台計算機向 HaikuDepotServer 系統發送匿名使用資料是否可以接受？您可以稍後在 \"Settings\" 「設定」視窗中變更您的偏好。
-User rating	RatePackageWindow		用戶評價
 Installed packages	MainWindow		已安裝套件
+User rating	RatePackageWindow		用戶評價
 Date	PackageListView		日期
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		密碼必須至少為 %MinPasswordLength% 字元。 %MinPasswordUppercaseChar% 字元必須是大寫 以及 %MinPasswordDigitsChar% 字元必須是數字。
 Error	App		錯誤
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		穩定
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		密碼必須重複輸入，以減少密碼輸入錯誤的機會。
 Cancel	SettingsWindow		取消
-Cancel	RatePackageWindow		取消
 Inactive	PackageListView		不活躍
+Cancel	RatePackageWindow		取消
 Nickname:	UserLoginWindow		昵稱：
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		同步儲存庫相關的元數據
 OK	MainWindow		確認

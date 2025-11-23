@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-ShowImage	2453396430
+1	korean	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		ShowImage
 Page setup…	Menus		페이지 설정...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		문서 '%s' (페이지 %d)이(가) 변경되었습니다. 문서를 닫으시겠습니까?
@@ -46,7 +46,6 @@ Stretch to window	Menus		창에 맞게 늘이기
 Job setup	PrintOptionsWindow		작업 설정
 Clear selection	Menus		선택 해제
 Rotate clockwise	Menus		시계방향으로 회전
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		이미지를 불러올 수 없습니다! 파일이 존재하지 않거나 알맞은 이미지 변환기가 없습니다.
 Open with…	Menus		다음으로 열기…
 Rotate counterclockwise	Menus		반시계방향으로 회전
 Previous page	Menus		이전 페이지

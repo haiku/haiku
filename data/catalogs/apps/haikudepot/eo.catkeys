@@ -107,8 +107,8 @@ Settings…	MainWindow		Agordo…
 Ratings	PackageInfoView		Taksoj
 Local	LocalPkgDataLoadProcess		Loka
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Ĉu vi permesas sendi anoniman informon pri uzado al la servilo de HaikuTenejo de ĉi tiu komputilo? Vi povas ŝanĝi vian agordon per la fenestro \"Agordo\" poste.
-User rating	RatePackageWindow		Uzanta takso
 Installed packages	MainWindow		Instalitaj pakaĵoj
+User rating	RatePackageWindow		Uzanta takso
 Error	App		Eraro
 There was a puzzling response from the web service.	UserLoginWindow		Estis stranga respondo el la reta servo.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Via takso alŝutiĝis sukcese. Vi povas aktualigi aŭ viŝi ĝin per la retpaĝo de HaikuTeneja Servilo.
@@ -126,8 +126,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabileco
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La pasvorto devas esti ripetiĝita pro averti pasvortajn mistajpojn.
 Cancel	SettingsWindow		Nuligi
-Cancel	RatePackageWindow		Nuligi
 Inactive	PackageListView		Neaktiva
+Cancel	RatePackageWindow		Nuligi
 Nickname:	UserLoginWindow		Kromnomo:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sinkronigado de metadatumo pri deponejoj
 OK	MainWindow		Bone

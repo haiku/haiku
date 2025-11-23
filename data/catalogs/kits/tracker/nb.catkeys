@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	847073574
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Opprett lenke her
 Force identify	ContainerWindow		Tving identifisering
 no items	CountView		Ingen oppføringer
 Time	AttributesView		Tid
-Disks	DirMenu		Disker
 Open parent	ContainerWindow		Åpne overmappe
 Find…	ContainerWindow		Finn...
 moving	FSUtils		flytter

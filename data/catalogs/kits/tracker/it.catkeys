@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	847073574
+1	italian	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Crea collegamento qui
 Force identify	ContainerWindow		Forza indentificazione
 no items	CountView		nessun oggetto
 Time	AttributesView		Ora
-Disks	DirMenu		Dischi
 Open parent	ContainerWindow		Vai alla cartella superiore
 Find…	ContainerWindow		Trova...
 moving	FSUtils		spostamento

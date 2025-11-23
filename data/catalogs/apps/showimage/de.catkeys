@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	2453396430
+1	german	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		Bildbetrachter
 Page setup…	Menus		Seite einrichten …
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Trotzdem schließen?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Auf Fenstergröße vergrößern
 Job setup	PrintOptionsWindow		Druckauftrag bearbeiten
 Clear selection	Menus		Auswahl aufheben
 Rotate clockwise	Menus		Im Uhrzeigersinn rotieren
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Das Bild konnte nicht geladen werden! Entweder die Datei selbst oder ein passender Translator existiert nicht.
 Open with…	Menus		Öffnen mit…
 Rotate counterclockwise	Menus		Gegen Uhrzeigersinn rotieren
 Previous page	Menus		Vorherige Seite

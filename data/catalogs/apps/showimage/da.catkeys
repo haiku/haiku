@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-ShowImage	575555985
+1	danish	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		Billedviser
 Page setup…	Menus		Sideopsætning…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er blevet ændret. Vil du lukke dokumentet?
@@ -43,7 +43,6 @@ Stretch to window	Menus		Udstræk til vindue
 Job setup	PrintOptionsWindow		Jobopsætning
 Clear selection	Menus		Ryd markering
 Rotate clockwise	Menus		Rotér med uret
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke indlæse billede! Enten eksisterer filen eller en billedeoversætter for den, ikke.
 Rotate counterclockwise	Menus		Rotér mod uret
 Previous page	Menus		Forrige side
 Fit to window	Menus		Tilpas til vindue

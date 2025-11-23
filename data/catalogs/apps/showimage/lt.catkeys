@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ShowImage	575555985
+1	lithuanian	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		Paveikslų žiūryklė
 Page setup…	Menus		Puslapio nuostatos…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (%d puslapis) pakeistas. Ar norite dokumentą užverti?
@@ -43,7 +43,6 @@ Stretch to window	Menus		Ištempti iki lango dydžio
 Job setup	PrintOptionsWindow		Užduoties nuostatos
 Clear selection	Menus		Panaikinti žymėjimą
 Rotate clockwise	Menus		Pasukti pagal laikrodžio rodyklę
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepavyko įkelti paveikslo! Arba nėra tokio failo, arba nerastas jam tinkamas keitiklis.
 Rotate counterclockwise	Menus		Pasukti prieš laikrodžio rodyklę
 Previous page	Menus		Ankstesnis puslapis
 Fit to window	Menus		Sutalpinti lange

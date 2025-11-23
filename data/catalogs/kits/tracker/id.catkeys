@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	3086240801
+1	indonesian	x-vnd.Haiku-libtracker	936319284
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -356,7 +356,6 @@ Create link here	ContainerWindow		Buat link di sini
 Force identify	ContainerWindow		Memaksa mengidentifikasi
 no items	CountView		tak ada item
 Time	AttributesView		Waktu
-Disks	DirMenu		Diska
 Open parent	ContainerWindow		Buka induk
 Find…	ContainerWindow		Menemukan…
 moving	FSUtils		memindah

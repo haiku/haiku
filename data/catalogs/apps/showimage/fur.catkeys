@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ShowImage	2453396430
+1	friulian	x-vnd.Haiku-ShowImage	1471302250
 ShowImage	System name		MostreImagjin
 Page setup…	Menus		Impostazions pagjine…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' (pagjine %d) al è stât modificât. Sierâ il document?
@@ -46,7 +46,6 @@ Stretch to window	Menus		Slungje al barcon
 Job setup	PrintOptionsWindow		Configure lavôr
 Clear selection	Menus		Nete selezion
 Rotate clockwise	Menus		Volte in sens orari
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impussibil cjariâ la imagjin! O nol esist il file o nol esist un tradutôr di imagjin par chel file.
 Open with…	Menus		Vierç cun…
 Rotate counterclockwise	Menus		Volte in sens antiorari
 Previous page	Menus		Pagjine precedente

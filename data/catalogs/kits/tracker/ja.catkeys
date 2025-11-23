@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	847073574
+1	japanese	x-vnd.Haiku-libtracker	2992119353
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		ここにリンクを作成
 Force identify	ContainerWindow		ファイル形式の判別
 no items	CountView		0 項目
 Time	AttributesView		時間
-Disks	DirMenu		ディスク
 Open parent	ContainerWindow		親フォルダーを開く
 Find…	ContainerWindow		検索...
 moving	FSUtils		移動中

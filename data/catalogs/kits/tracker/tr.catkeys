@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2520945070
+1	turkish	x-vnd.Haiku-libtracker	371023553
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -360,7 +360,6 @@ Create link here	ContainerWindow		Burada bağlantı oluştur
 Force identify	ContainerWindow		Tanımlamaya zorla
 no items	CountView		öge yok
 Time	AttributesView		Zaman
-Disks	DirMenu		Diskler
 Open parent	ContainerWindow		Üst klasörü aç
 Find…	ContainerWindow		Bul…
 moving	FSUtils		taşıdığınız

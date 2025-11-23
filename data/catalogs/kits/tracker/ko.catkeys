@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-libtracker	1836451181
+1	korean	x-vnd.Haiku-libtracker	3981496960
 Created	ContainerWindow		생성일
 Icon	AttributesView		아이콘
 Open and make preferred	OpenWithWindow		열고 연결 프로그램으로 지정
@@ -358,7 +358,6 @@ Create link here	ContainerWindow		여기에 링크 만들기
 Force identify	ContainerWindow		강제 식별
 no items	CountView		항목 없음
 Time	AttributesView		시간
-Disks	DirMenu		디스크
 Open parent	ContainerWindow		상위 열기
 Find…	ContainerWindow		찾기...
 moving	FSUtils		이동중

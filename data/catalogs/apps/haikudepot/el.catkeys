@@ -141,8 +141,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Τοπικό
 Package changes	PackageResult	Window title	Μεταβολές στα πακέτα
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Θα ήταν αποδεκτή η αποστολή ανώνυμων στοιχείων χρήσης από τη συσκευή αυτή στον εξυπηρετητή του HaikuDepot; Μπορείτε να τροποποιήσετε την επιλογή αυτή αργότερα, μέσα από το παράθυρο \"Ρυθμίσεις\".
-User rating	RatePackageWindow		Αξιολόγηση χρήστη
 Installed packages	MainWindow		Εγκατεστημένα πακέτα
+User rating	RatePackageWindow		Αξιολόγηση χρήστη
 Date	PackageListView		Ημ/νία
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Ο κωδικός πρέπει να αποτελείται από τουλάχιστον %MinPasswordLength% χαρακτήρες. %MinPasswordUppercaseChar% χαρακτήρες πρέπει να είναι κεφαλαία και %MinPasswordDigitsChar% χαρακτήρες πρέπει να είναι αριθμοί.
 Error	App		Σφάλμα
@@ -166,8 +166,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Σταθερότητα
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Ο κωδικός πρέπει να επαναληφθεί, έτσι ώστε να είμαστε βέβαιοι ότι ο κωδικός δεν έχει εισαχθεί λανθασμένα.
 Cancel	SettingsWindow		Άκυρο
-Cancel	RatePackageWindow		Ακύρωση
 Inactive	PackageListView		Ανενεργό
+Cancel	RatePackageWindow		Ακύρωση
 Nickname:	UserLoginWindow		Ψευδώνυμο:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Γίνεται συγχρονισμός μεταδεδομένων των αποθετηρίων
 OK	MainWindow		Εντάξει

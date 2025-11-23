@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	332875816
+1	lithuanian	x-vnd.Haiku-libtracker	2477921595
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Open with…	ContainerWindow		Atverti naudojant…
@@ -252,7 +252,6 @@ parent folder	NavMenu		Viršaplankis
 Create link here	ContainerWindow		Sukurti nuorodą čia
 Force identify	ContainerWindow		Priverstinai atpažinti
 no items	CountView		Objektų nėra
-Disks	DirMenu		Tomai
 Open parent	ContainerWindow		Atverti viršaplankį
 Find…	ContainerWindow		Ieškoti…
 moving	FSUtils		perkeliate

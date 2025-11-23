@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ShowImage	575555985
+1	slovak	x-vnd.Haiku-ShowImage	3888429101
 ShowImage	System name		Prehliadač obrázkov
 Page setup…	Menus		Nastavenie stránky…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ (stránka %d) bol zmenený. Chcete dokument zatvoriť?
@@ -43,7 +43,6 @@ Stretch to window	Menus		Roztiahnuť do okna
 Job setup	PrintOptionsWindow		Nastavenie úlohy
 Clear selection	Menus		Vyčistiť výber
 Rotate clockwise	Menus		Otočiť v smere hodinových ručičiek
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepodarilo sa načítať obrázok! Buď súbor alebo prekladač preň neexistuje.
 Rotate counterclockwise	Menus		Otočiť proti smeru hodinových ručičiek
 Previous page	Menus		Predošlá stránka
 Fit to window	Menus		Vmestiť do okna

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	4192200646
+1	english	x-vnd.Haiku-libtracker	2042279129
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -359,7 +359,6 @@ Create link here	ContainerWindow		创建链接
 Force identify	ContainerWindow		强制标识
 no items	CountView		无项目
 Time	AttributesView		时间
-Disks	DirMenu		磁盘
 Open parent	ContainerWindow		上级目录
 Find…	ContainerWindow		搜索...
 moving	FSUtils		移动中
