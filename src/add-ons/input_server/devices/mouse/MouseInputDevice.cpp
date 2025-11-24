@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2011, Haiku.
+ * Copyright 2004-2025, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  *		Stephan Aßmus, superstippi@gmx.de
+ *		Samuel Rodríguez Pérez, samuelrp84@gmail.com
  */
 
 
@@ -616,6 +617,8 @@ status_t
 MouseDevice::_UpdateTouchpadSettings(BMessage* message)
 {
 	touchpad_settings settings;
+	settings = kDefaultTouchpadSettings;
+
 	message->FindBool("scroll_reverse", &settings.scroll_reverse);
 	message->FindBool("scroll_twofinger", &settings.scroll_twofinger);
 	message->FindBool("scroll_twofinger_horizontal",
