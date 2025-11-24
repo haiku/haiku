@@ -128,6 +128,13 @@ typedef struct {
 #define B_PEN			0x08
 
 
+#define B_EDGE_MOTION_DISABLED					0x00
+#define B_EDGE_MOTION_ON_MOVE					0x01
+#define B_EDGE_MOTION_ON_TAP_DRAG				0x02
+#define B_EDGE_MOTION_ON_BUTTON_CLICK_MOVE		0x04
+#define B_EDGE_MOTION_ON_BUTTON_CLICK_DRAG		0x08
+
+
 typedef struct {
 	uint16		edgeMotionWidth;
 

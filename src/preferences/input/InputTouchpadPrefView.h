@@ -16,6 +16,7 @@
 #include <CheckBox.h>
 #include <GroupView.h>
 #include <Invoker.h>
+#include <OptionPopUp.h>
 #include <Slider.h>
 #include <StringView.h>
 #include <View.h>
@@ -39,6 +40,7 @@ const uint REVERT_SETTINGS = '&rse';
 const uint PADBLOCK_TIME_CHANGED = '&ptc';
 const uint PAD_SPEED_CHANGED = '&psc';
 const uint PAD_ACCELERATION_CHANGED = '&pac';
+const uint EDGE_MOTION_CHANGED = '&emc';
 
 class DeviceListView;
 
@@ -106,6 +108,7 @@ private:
 			BSlider*		fTapSlider;
 			BSlider*		fSpeedSlider;
 			BSlider*		fAccelSlider;
+			BOptionPopUp*	fEdgeMotionOptionPopUp;
 			BButton*		fDefaultButton;
 			BButton*		fRevertButton;
 };

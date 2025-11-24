@@ -26,6 +26,13 @@ typedef struct {
 
 	bool	scroll_reverse;
 	bool	scroll_twofinger_natural_scrolling;
+
+	uint8	edge_motion;			// 0: disabled
+									// or combined flags of:
+									// 0x01: edge motion on move
+									// 0x02: edge motion on tap drag
+									// 0x04: edge motion on button click move
+									// 0x08: edge motion on button click drag
 } touchpad_settings;
 
 
@@ -42,7 +49,8 @@ const static touchpad_settings kDefaultTouchpadSettings = {
 	65536,
 	65536,
 	false,
-	true
+	true,
+	0x02
 };
 
 #define TOUCHPAD_SETTINGS_FILE "Touchpad_settings"

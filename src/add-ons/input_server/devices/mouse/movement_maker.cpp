@@ -366,7 +366,9 @@ TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement
 		fTapClicks = 0;
 		fTapdragStarted = false;
 		fTapStarted = false;
-		fValidEdgeMotion = false;
+		if ((fSettings.edge_motion
+			& (B_EDGE_MOTION_ON_BUTTON_CLICK_MOVE | B_EDGE_MOTION_ON_BUTTON_CLICK_DRAG)) != 0)
+			fValidEdgeMotion = false;
 	}
 
 	if (event->zPressure >= fSpecs.minPressure
@@ -563,9 +565,14 @@ TouchpadMovement::_MoveToMovement(const touchpad_movement *event, mouse_movement
 		movement->buttons = kLeftButton;
 		movement->clicks = 0;
 
-		fValidEdgeMotion = _EdgeMotion(event, movement, fValidEdgeMotion);
+		if (fSettings.edge_motion & B_EDGE_MOTION_ON_TAP_DRAG
+			|| (event->buttons && (fSettings.edge_motion & B_EDGE_MOTION_ON_BUTTON_CLICK_DRAG)))
+			fValidEdgeMotion = _EdgeMotion(event, movement, fValidEdgeMotion);
 		TRACE("TouchpadMovement: tap drag\n");
 	} else {
+		if (fSettings.edge_motion & B_EDGE_MOTION_ON_MOVE
+			|| (event->buttons && (fSettings.edge_motion & B_EDGE_MOTION_ON_BUTTON_CLICK_MOVE)))
+			fValidEdgeMotion = _EdgeMotion(event, movement, fValidEdgeMotion);
 		TRACE("TouchpadMovement: movement set buttons\n");
 		movement->buttons = event->buttons;
 	}

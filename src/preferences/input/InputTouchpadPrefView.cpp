@@ -309,6 +309,12 @@ TouchpadPrefView::MessageReceived(BMessage* message)
 			fTouchpadPref.UpdateRunningSettings();
 			break;
 
+		case EDGE_MOTION_CHANGED:
+			settings.edge_motion = fEdgeMotionOptionPopUp->Value();
+			fRevertButton->SetEnabled(true);
+			fTouchpadPref.UpdateRunningSettings();
+			break;
+
 		case TAP_CONTROL_CHANGED:
 			settings.tapgesture_sensibility = fTapSlider->Value();
 			fRevertButton->SetEnabled(true);
@@ -368,6 +374,8 @@ TouchpadPrefView::AttachedToWindow()
 	fScrollStepXSlider->SetTarget(this);
 	fScrollStepYSlider->SetTarget(this);
 	fScrollAccelSlider->SetTarget(this);
+
+	fEdgeMotionOptionPopUp->SetTarget(this);
 
 	fPadBlockerSlider->SetTarget(this);
 	fTapSlider->SetTarget(this);
@@ -448,6 +456,22 @@ TouchpadPrefView::SetupView()
 	fTwoFingerNaturalScrollingBox = new BCheckBox(B_TRANSLATE("Natural scrolling"),
 		new BMessage(SCROLL_CONTROL_CHANGED));
 
+	fEdgeMotionOptionPopUp = new BOptionPopUp("edge_motion",
+		B_TRANSLATE("Edge motion:"), new BMessage(EDGE_MOTION_CHANGED));
+	fEdgeMotionOptionPopUp->AddOption(B_TRANSLATE("Disabled"), B_EDGE_MOTION_DISABLED);
+#if 0
+	// Not exposed in the UI because it makes little sense to have this enabled on move but not
+	// on drag
+	fEdgeMotionOptionPopUp->AddOption(B_TRANSLATE("On move"), B_EDGE_MOTION_ON_MOVE);
+#endif
+	fEdgeMotionOptionPopUp->AddOption(B_TRANSLATE("On tap-drag only"), B_EDGE_MOTION_ON_TAP_DRAG);
+	fEdgeMotionOptionPopUp->AddOption(B_TRANSLATE("When dragging"),
+		B_EDGE_MOTION_ON_TAP_DRAG
+		| B_EDGE_MOTION_ON_BUTTON_CLICK_MOVE | B_EDGE_MOTION_ON_BUTTON_CLICK_DRAG);
+	fEdgeMotionOptionPopUp->AddOption(B_TRANSLATE("Always"),
+		B_EDGE_MOTION_ON_MOVE | B_EDGE_MOTION_ON_TAP_DRAG
+		| B_EDGE_MOTION_ON_BUTTON_CLICK_MOVE | B_EDGE_MOTION_ON_BUTTON_CLICK_DRAG);
+
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	BView* scrollPrefLeftLayout
@@ -509,6 +533,8 @@ TouchpadPrefView::SetupView()
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(scrollBox)
+		.Add(fEdgeMotionOptionPopUp)
+		.Add(new BSeparatorView(B_HORIZONTAL))
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
 				.Add(fTapSlider)
@@ -542,6 +568,7 @@ TouchpadPrefView::SetValues(touchpad_settings* settings)
 	fTwoFingerNaturalScrollingBox->SetValue(
 		settings->scroll_twofinger_natural_scrolling ? B_CONTROL_ON : B_CONTROL_OFF);
 	fTwoFingerNaturalScrollingBox->SetEnabled(settings->scroll_twofinger);
+	fEdgeMotionOptionPopUp->SetValue(settings->edge_motion);
 	fScrollStepXSlider->SetValue(20 - settings->scroll_xstepsize / 2);
 	fScrollStepYSlider->SetValue(20 - settings->scroll_ystepsize / 2);
 	fScrollAccelSlider->SetValue(settings->scroll_acceleration);
