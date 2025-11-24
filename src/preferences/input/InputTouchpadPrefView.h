@@ -98,6 +98,7 @@ private:
 			BCheckBox*		fScrollReverseBox;
 			BCheckBox*		fTwoFingerBox;
 			BCheckBox*		fTwoFingerHorizontalBox;
+			BCheckBox*		fTwoFingerNaturalScrollingBox;
 			BSlider*		fScrollStepXSlider;
 			BSlider*		fScrollStepYSlider;
 			BSlider*		fScrollAccelSlider;

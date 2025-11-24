@@ -26,7 +26,7 @@ public:
 protected:
 			void				StartNewMovment();
 			void				GetMovement(uint32 posX, uint32 posY);
-			void				GetScrolling(uint32 posX, uint32 posY);
+			void				GetScrolling(uint32 posX, uint32 posY, bool reverse);
 
 			touchpad_specs		fSpecs;
 			touchpad_settings	fSettings;

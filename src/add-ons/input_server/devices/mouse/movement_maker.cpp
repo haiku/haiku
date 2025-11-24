@@ -158,12 +158,12 @@ MovementMaker::GetMovement(uint32 posX, uint32 posY)
 
 
 void
-MovementMaker::GetScrolling(uint32 posX, uint32 posY)
+MovementMaker::GetScrolling(uint32 posX, uint32 posY, bool reverse)
 {
 	CALLED();
 
 	int32 stepsX = 0, stepsY = 0;
-	int32 directionMultiplier = fSettings.scroll_reverse ? -1 : 1;
+	int32 directionMultiplier = reverse ? -1 : 1;
 
 	_GetRawMovement(posX, posY);
 	_ComputeAcceleration(fSettings.scroll_acceleration);
@@ -619,8 +619,9 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 				|| fSettings.scroll_bottomrange > 0.999999) {
 		isSideScrollingH = true;
 	}
-	if (two_fingers(event)
-		&& fSettings.scroll_twofinger) {
+	bool isTwoFingerScrolling = two_fingers(event)
+		&& fSettings.scroll_twofinger;
+	if (isTwoFingerScrolling) {
 		// two finger scrolling is enabled
 		isSideScrollingV = true;
 		isSideScrollingH = fSettings.scroll_twofinger_horizontal;
@@ -641,7 +642,9 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 		fScrollingStarted = true;
 		StartNewMovment();
 	}
-	GetScrolling(event->xPosition, event->yPosition);
+	GetScrolling(event->xPosition, event->yPosition, isTwoFingerScrolling
+			? fSettings.scroll_twofinger_natural_scrolling
+			: fSettings.scroll_reverse);
 	movement->wheel_ydelta = make_small(yDelta);
 	movement->wheel_xdelta = make_small(xDelta);
 

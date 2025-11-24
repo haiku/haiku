@@ -604,6 +604,9 @@ MouseDevice::_UpdateTouchpadSettings(BMessage* message)
 	message->FindInt8("tapgesture_sensibility",
 		(int8*)&settings.tapgesture_sensibility);
 
+	message->FindBool("scroll_twofinger_natural_scrolling",
+		&settings.scroll_twofinger_natural_scrolling);
+
 	if (fIsTouchpad)
 		fTouchpadMovementMaker.SetSettings(settings);
 

@@ -70,6 +70,7 @@ TouchpadPref::BuildSettingsMessage()
 	msg.AddInt16("padblocker_threshold", fSettings.padblocker_threshold);
 	msg.AddInt32("trackpad_speed", fSettings.trackpad_speed);
 	msg.AddInt32("trackpad_acceleration", fSettings.trackpad_acceleration);
+	msg.AddBool("scroll_twofinger_natural_scrolling", fSettings.scroll_twofinger_natural_scrolling);
 
 	return msg;
 }
@@ -151,6 +152,10 @@ TouchpadPref::LoadSettings()
 	settingsMsg.FindInt32("trackpad_speed", &fSettings.trackpad_speed);
 	settingsMsg.FindInt32("trackpad_acceleration", &fSettings.trackpad_acceleration);
 	settingsMsg.FindPoint("window_position", &fWindowPosition);
+
+	fSettings.scroll_twofinger_natural_scrolling = settingsMsg.GetBool(
+		"scroll_twofinger_natural_scrolling",
+		kDefaultTouchpadSettings.scroll_twofinger_natural_scrolling);
 
 	return B_OK;
 }

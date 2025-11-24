@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2025, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TOUCHPAD_SETTINGS_H
@@ -25,6 +25,7 @@ typedef struct {
 	int32  trackpad_acceleration;
 
 	bool	scroll_reverse;
+	bool	scroll_twofinger_natural_scrolling;
 } touchpad_settings;
 
 
@@ -40,7 +41,8 @@ const static touchpad_settings kDefaultTouchpadSettings = {
 	30,
 	65536,
 	65536,
-	false
+	false,
+	true
 };
 
 #define TOUCHPAD_SETTINGS_FILE "Touchpad_settings"
