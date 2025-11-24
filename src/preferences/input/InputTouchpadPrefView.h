@@ -41,6 +41,7 @@ const uint PADBLOCK_TIME_CHANGED = '&ptc';
 const uint PAD_SPEED_CHANGED = '&psc';
 const uint PAD_ACCELERATION_CHANGED = '&pac';
 const uint EDGE_MOTION_CHANGED = '&emc';
+const uint SOFTWARE_BUTTON_AREAS_CHANGED = '&sbc';
 
 class DeviceListView;
 
@@ -101,6 +102,7 @@ private:
 			BCheckBox*		fTwoFingerBox;
 			BCheckBox*		fTwoFingerHorizontalBox;
 			BCheckBox*		fTwoFingerNaturalScrollingBox;
+			BCheckBox*		fSoftwareButtonAreasBox;
 			BSlider*		fScrollStepXSlider;
 			BSlider*		fScrollStepYSlider;
 			BSlider*		fScrollAccelSlider;

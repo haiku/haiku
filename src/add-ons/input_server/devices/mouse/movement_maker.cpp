@@ -307,7 +307,7 @@ TouchpadMovement::~TouchpadMovement() {
 
 
 status_t
-TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement* movement,
+TouchpadMovement::EventToMovement(const touchpad_movement* _event, mouse_movement* movement,
 	bigtime_t& repeatTimeout)
 {
 	CALLED();
@@ -317,13 +317,13 @@ TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement
 
 	TRACE("TM_EVENT: b:0x%" B_PRIx8 " nf:%" B_PRId8 " f:0x%" B_PRIx8
 		" x:%" B_PRIu32 " y:%" B_PRIu32 " p:%" B_PRIu8 " w:%" B_PRIu8 "\n",
-		event->buttons,
-		count_set_bits(event->fingers),
-		event->fingers,
-		event->xPosition,
-		event->yPosition,
-		event->zPressure,
-		event->fingerWidth
+		_event->buttons,
+		count_set_bits(_event->fingers),
+		_event->fingers,
+		_event->xPosition,
+		_event->yPosition,
+		_event->zPressure,
+		_event->fingerWidth
 	);
 	TRACE("TM_STATUS: b:0x%" B_PRIx8 " %c%c%c%c%c%c"
 		" dx:%" B_PRId32 " dy:%" B_PRId32
@@ -351,6 +351,10 @@ TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement
 	movement->modifiers = 0;
 	movement->clicks = 0;
 	movement->timestamp = system_time();
+
+	touchpad_movement event2 = *_event;
+	_SoftwareButtonAreas(&event2);
+	const touchpad_movement* event = &event2;
 
 	if ((movement->timestamp - fTapTime) > fTapTimeOUT) {
 		if (fTapStarted)
@@ -393,6 +397,55 @@ TouchpadMovement::EventToMovement(const touchpad_movement* event, mouse_movement
 	return B_OK;
 }
 
+
+void
+TouchpadMovement::_SoftwareButtonAreas(touchpad_movement *event) {
+	CALLED();
+
+	// Software button areas.
+	// - Emulation of button areas as clickpads do not have separated physical buttons from the one
+	//   overlapping the touch area.
+	// - Pretend the the same button is still pressed if the finger hasn't been released regardless
+	//   of its current possition.
+	// TODO:
+	// - Implement top button area.
+	// - Implement trackpoint emulator in an area.
+	//   i.e.: small centered square on the top of the clickpad.
+	// - Make the areas configurable from settings and Input preference app.
+	//   i.e.: to allow switch left and right buttons, etc.
+	if (event->buttons != 0) {
+		if (fSettings.software_button_areas) {
+			if (fButtonsState == 0) {
+				uint32 evaluatePositionX = (event->xPosition == 0) ? fPreviousX : event->xPosition;
+				uint32 evaluatePositionY = (event->yPosition == 0) ? fPreviousY : event->yPosition;
+				if (evaluatePositionY > 0 && evaluatePositionY < (uint32) fSpecs.areaEndY / 5) {
+					#if 0
+					// 2 software buttons:
+					// - Emulates right buttom hardcoded to half left side of the touchpad,
+					//   otherwise left button.
+					if (evaluatePositionX > (uint32) fSpecs.areaEndX / 2) {
+						event->buttons = 2;
+					} else {
+						event->buttons = 1;
+					}
+					#else
+					// 3 software buttons where the the middle button uses 1/6 of the area.
+					if (evaluatePositionX > (uint32) fSpecs.areaEndX / 12 * 7) {
+						event->buttons = 2;
+					} else if (evaluatePositionX > (uint32) fSpecs.areaEndX / 12 * 5) {
+						// Middle button area smaller than left and right buttons' area.
+						event->buttons = 4;
+					} else {
+						event->buttons = 1;
+					}
+					#endif
+				}
+			} else {
+				event->buttons = fButtonsState;
+			}
+		}
+	}
+}
 
 // in pixel per second
 const int32 kEdgeMotionSpeed = 200;

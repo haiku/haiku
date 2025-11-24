@@ -608,6 +608,8 @@ MouseDevice::_UpdateTouchpadSettings(BMessage* message)
 		&settings.scroll_twofinger_natural_scrolling);
 	message->FindInt8("edge_motion",
 		(int8*)&settings.edge_motion);
+	message->FindBool("software_button_areas",
+		&settings.software_button_areas);
 
 	if (fIsTouchpad)
 		fTouchpadMovementMaker.SetSettings(settings);

@@ -33,6 +33,8 @@ typedef struct {
 									// 0x02: edge motion on tap drag
 									// 0x04: edge motion on button click move
 									// 0x08: edge motion on button click drag
+
+	bool	software_button_areas;
 } touchpad_settings;
 
 
@@ -50,7 +52,8 @@ const static touchpad_settings kDefaultTouchpadSettings = {
 	65536,
 	false,
 	true,
-	0x02
+	0x02,
+	false
 };
 
 #define TOUCHPAD_SETTINGS_FILE "Touchpad_settings"

@@ -42,10 +42,11 @@ private:
 			
 			bool				fMovementMakerStarted;
 
-private:
+protected:
 			uint32				fPreviousX;
 			uint32				fPreviousY;
 
+private:
 			float				fDeltaSumX;
 			float				fDeltaSumY;
 
@@ -75,6 +76,7 @@ private:
 			void				_UpdateButtons(mouse_movement *movement);
 			bool				_EdgeMotion(const touchpad_movement *event,
 									mouse_movement *movement, bool validStart);
+	inline	void				_SoftwareButtonAreas(touchpad_movement *event);
 	inline	void				_NoTouchToMovement(const touchpad_movement *event,
 									mouse_movement *movement);
 	inline	void				_MoveToMovement(const touchpad_movement *event,
