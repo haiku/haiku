@@ -76,6 +76,7 @@ private:
 			void				_UpdateButtons(mouse_movement *movement);
 			bool				_EdgeMotion(const touchpad_movement *event,
 									mouse_movement *movement, bool validStart);
+	inline	bool				_ClickFingerButtonEmulator(touchpad_movement *event);
 	inline	void				_SoftwareButtonAreas(touchpad_movement *event);
 	inline	void				_NoTouchToMovement(const touchpad_movement *event,
 									mouse_movement *movement);

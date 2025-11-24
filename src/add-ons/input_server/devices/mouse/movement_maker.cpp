@@ -353,7 +353,8 @@ TouchpadMovement::EventToMovement(const touchpad_movement* _event, mouse_movemen
 	movement->timestamp = system_time();
 
 	touchpad_movement event2 = *_event;
-	_SoftwareButtonAreas(&event2);
+	if (!_ClickFingerButtonEmulator(&event2))
+		_SoftwareButtonAreas(&event2);
 	const touchpad_movement* event = &event2;
 
 	if ((movement->timestamp - fTapTime) > fTapTimeOUT) {
@@ -395,6 +396,27 @@ TouchpadMovement::EventToMovement(const touchpad_movement* _event, mouse_movemen
 		repeatTimeout = B_INFINITE_TIMEOUT;
 
 	return B_OK;
+}
+
+
+bool
+TouchpadMovement::_ClickFingerButtonEmulator(touchpad_movement *event) {
+	CALLED();
+
+	if (event->buttons != 0) {
+		// ClickFinger behaviour.
+		// Simulate with 2 fingers click => right button click
+		// Simulate with 3 fingers click => middle button click
+		if (fSettings.finger_click && two_fingers(event)) {
+			event->buttons = 2;
+			return true;
+		} else if (fSettings.finger_click && three_fingers(event)) {
+			event->buttons = 4;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

@@ -315,6 +315,12 @@ TouchpadPrefView::MessageReceived(BMessage* message)
 			fTouchpadPref.UpdateRunningSettings();
 			break;
 
+		case FINGER_CLICK_CHANGED:
+			settings.finger_click = fFingerClickBox->Value() == B_CONTROL_ON;
+			fRevertButton->SetEnabled(true);
+			fTouchpadPref.UpdateRunningSettings();
+			break;
+
 		case SOFTWARE_BUTTON_AREAS_CHANGED:
 			settings.software_button_areas = fSoftwareButtonAreasBox->Value() == B_CONTROL_ON;
 			fRevertButton->SetEnabled(true);
@@ -382,6 +388,7 @@ TouchpadPrefView::AttachedToWindow()
 	fScrollAccelSlider->SetTarget(this);
 
 	fEdgeMotionOptionPopUp->SetTarget(this);
+	fFingerClickBox->SetTarget(this);
 	fSoftwareButtonAreasBox->SetTarget(this);
 
 	fPadBlockerSlider->SetTarget(this);
@@ -479,6 +486,8 @@ TouchpadPrefView::SetupView()
 		B_EDGE_MOTION_ON_MOVE | B_EDGE_MOTION_ON_TAP_DRAG
 		| B_EDGE_MOTION_ON_BUTTON_CLICK_MOVE | B_EDGE_MOTION_ON_BUTTON_CLICK_DRAG);
 
+	fFingerClickBox = new BCheckBox(B_TRANSLATE("Finger click"),
+		new BMessage(FINGER_CLICK_CHANGED));
 	fSoftwareButtonAreasBox = new BCheckBox(B_TRANSLATE("Software button areas"),
 		new BMessage(SOFTWARE_BUTTON_AREAS_CHANGED));
 
@@ -545,7 +554,11 @@ TouchpadPrefView::SetupView()
 		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(scrollBox)
 		.Add(fEdgeMotionOptionPopUp)
-		.Add(fSoftwareButtonAreasBox)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+			.Add(fFingerClickBox)
+			.Add(new BSeparatorView(B_VERTICAL))
+			.Add(fSoftwareButtonAreasBox)
+			.End()
 		.Add(new BSeparatorView(B_HORIZONTAL))
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
@@ -580,6 +593,7 @@ TouchpadPrefView::SetValues(touchpad_settings* settings)
 	fTwoFingerNaturalScrollingBox->SetValue(
 		settings->scroll_twofinger_natural_scrolling ? B_CONTROL_ON : B_CONTROL_OFF);
 	fTwoFingerNaturalScrollingBox->SetEnabled(settings->scroll_twofinger);
+	fFingerClickBox->SetValue(settings->finger_click);
 	fSoftwareButtonAreasBox->SetValue(settings->software_button_areas);
 	fEdgeMotionOptionPopUp->SetValue(settings->edge_motion);
 	fScrollStepXSlider->SetValue(20 - settings->scroll_xstepsize / 2);
