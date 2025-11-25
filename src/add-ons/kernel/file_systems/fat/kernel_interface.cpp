@@ -3322,15 +3322,6 @@ bsd_device_init(mount* bsdVolume, const dev_t devID, const char* deviceFile, cde
 			RETURN_ERROR(B_FROM_POSIX_ERROR(errno));
 	}
 
-	// Prevent multiple simultaneous mounts.
-#ifndef FS_SHELL
-	status_t status = _kern_lock_node(device->si_fd);
-	if (status != B_OK) {
-		close(device->si_fd);
-		RETURN_ERROR(status);
-	}
-#endif
-
 	deviceDeleter.Detach();
 	geomDeleter.Detach();
 
