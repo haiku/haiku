@@ -202,9 +202,12 @@ ServerWindow::~ServerWindow()
 {
 	STRACE(("ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
 
+	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
+
 	if (!fWindow->IsOffscreenWindow()) {
 		fWindowAddedToDesktop = false;
 		fDesktop->RemoveWindow(fWindow.Get());
+		fDesktop = NULL;
 	}
 
 	if (App() != NULL) {
@@ -216,8 +219,6 @@ ServerWindow::~ServerWindow()
 
 	free(fTitle);
 	delete_port(fMessagePort);
-
-	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
 
 	fDirectWindowInfo.Unset(); // TODO: is it really needed?
 	STRACE(("ServerWindow(%p) will exit NOW\n", this));
