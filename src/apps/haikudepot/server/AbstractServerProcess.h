@@ -6,6 +6,7 @@
 #define ABSTRACT_SERVER_PROCESS_H
 
 #include <HttpRequest.h>
+#include <HttpResult.h>
 #include <Json.h>
 #include <String.h>
 #include <Url.h>
@@ -14,6 +15,7 @@
 #include "StandardMetaData.h"
 
 
+using BPrivate::Network::BHttpHeaders;
 using BPrivate::Network::BHttpRequest;
 
 
@@ -88,6 +90,8 @@ private:
 
 	static	bool				_LooksLikeGzip(const char *pathStr);
 	static	status_t			_DeGzipInSitu(const BPath& path);
+
+	static	bigtime_t			_ServerUnavailableRetryDelay(const BHttpHeaders& responseHeaders);
 
 private:
 			uint32				fOptions;

@@ -42,6 +42,12 @@ using namespace BPrivate::Network;
 
 static const size_t kFileBufferSize = 10 * 1024;
 
+static const bigtime_t kServerUnavailableRetryDelayMinimum = 1000 * 1000 * 5;
+	// 5 seconds
+static const bigtime_t kServerUnavailableRetryDelayMaximum = 1000 * 1000 * 120;
+	// 120 seconds
+static const bigtime_t kServerUnavailableRetryDelayDefault = 1000 * 1000 * 10;
+	// 10 seconds
 
 // #pragma mark - Interface ReadProgressDataIO
 
@@ -519,6 +525,42 @@ AbstractServerProcess::_DeGzipInSitu(const BPath& path)
 }
 
 
+/*!	This method will return the time that the client should wait before trying to call the server
+	again. If the HTTP response has a `Retry-After` header then this is observed (within some
+	bound) and otherwise sensible defaults are employed.
+*/
+/*static*/ bigtime_t
+AbstractServerProcess::_ServerUnavailableRetryDelay(const BHttpHeaders& responseHeaders)
+{
+	const char* retryAfterC = responseHeaders["Retry-After"];
+	bigtime_t result = kServerUnavailableRetryDelayDefault;
+
+	if (retryAfterC != NULL) {
+		// The HDS server will only ever use the numerical delay in seconds.
+
+		bool allDigits = true;
+
+		for (int i = strlen(retryAfterC) - 1; i >= 0 && allDigits; i--) {
+			if (!isdigit(retryAfterC[i]))
+				allDigits = false;
+		}
+
+		if (allDigits)
+			result = static_cast<bigtime_t>(atoi(retryAfterC)) * 1000 * 1000;
+		else
+			HDERROR("`Retry-After` header [%s] unable to be handled", retryAfterC);
+	}
+
+	if (result < kServerUnavailableRetryDelayMinimum)
+		result = kServerUnavailableRetryDelayMinimum;
+
+	if (result > kServerUnavailableRetryDelayMaximum)
+		result = kServerUnavailableRetryDelayMaximum;
+
+	return result;
+}
+
+
 status_t
 AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath, const BUrl& url,
 	uint32 redirects, uint32 failures)
@@ -569,7 +611,8 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath, const BU
 	fRequest->SetHeaders(headers);
 	fRequest->SetMaxRedirections(0);
 	fRequest->SetTimeout(TIMEOUT_MICROSECONDS);
-	fRequest->SetStopOnError(true);
+	fRequest->SetStopOnError(false);
+		// without this we don't get headers on 5xx HTTP responses.
 	thread = fRequest->Run();
 
 	wait_for_thread(thread, NULL);
@@ -590,14 +633,12 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath, const BU
 		HDINFO("[%s] did complete streaming data [%" B_PRIdSSIZE " bytes]", Name(),
 			listener.ContentLength());
 		return B_OK;
-	} else if (statusCode == B_HTTP_STATUS_NOT_MODIFIED) {
-		HDINFO("[%s] remote data has not changed since [%s] so was not downloaded", Name(),
-			ifModifiedSinceHeader.String());
-		return HD_ERR_NOT_MODIFIED;
-	} else if (statusCode == B_HTTP_STATUS_PRECONDITION_FAILED) {
-		ServerHelper::NotifyClientTooOld(responseHeaders);
-		return HD_CLIENT_TOO_OLD;
-	} else if (BHttpRequest::IsRedirectionStatusCode(statusCode)) {
+	}
+
+	if (responseHeaders.CountHeaders() == 0)
+		HDTRACE("no headers returned in response");
+
+	if (BHttpRequest::IsRedirectionStatusCode(statusCode)) {
 		if (location.Length() != 0) {
 			BUrl redirectUrl(result.Url(), location);
 			HDINFO("[%s] will redirect to; %s", Name(), redirectUrl.UrlString().String());
@@ -606,14 +647,35 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath, const BU
 
 		HDERROR("[%s] unable to find 'Location' header for redirect", Name());
 		return B_IO_ERROR;
-	} else {
-		if (statusCode == 0 || (statusCode / 100) == 5) {
-			HDERROR("error response from server [%" B_PRId32 "] --> retry...", statusCode);
+	}
+
+	switch (statusCode) {
+		case B_HTTP_STATUS_NOT_MODIFIED:
+			HDINFO("[%s] remote data has not changed since [%s] so was not downloaded", Name(),
+				ifModifiedSinceHeader.String());
+			return HD_ERR_NOT_MODIFIED;
+		case B_HTTP_STATUS_PRECONDITION_FAILED:
+			ServerHelper::NotifyClientTooOld(responseHeaders);
+			return HD_CLIENT_TOO_OLD;
+		case B_HTTP_STATUS_SERVICE_UNAVAILABLE:
+		{
+			// 503 is special; it means that the server is temporarily unable to respond and
+			// maybe able to in the near future. The client should observe the `Retry-After`
+			// header and try again soon.
+			bigtime_t delay = _ServerUnavailableRetryDelay(responseHeaders);
+			HDINFO("[%" B_PRId32 "] response from server; will delay for %" B_PRId32 " seconds",
+				statusCode, static_cast<int32>(delay / (1000 * 1000)));
+			snooze(delay);
 			return DownloadToLocalFile(targetFilePath, url, redirects, failures + 1);
 		}
+		default:
+			if (statusCode == 0 || (statusCode / 100) == 5) {
+				HDERROR("error response from server [%" B_PRId32 "] --> retry...", statusCode);
+				return DownloadToLocalFile(targetFilePath, url, redirects, failures + 1);
+			}
 
-		HDERROR("[%s] unexpected response from server [%" B_PRId32 "]", Name(), statusCode);
-		return B_IO_ERROR;
+			HDERROR("[%s] unexpected response from server [%" B_PRId32 "]", Name(), statusCode);
+			return B_IO_ERROR;
 	}
 }
 
