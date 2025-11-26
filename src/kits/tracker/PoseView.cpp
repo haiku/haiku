@@ -1169,22 +1169,22 @@ BPoseView::SetActivePose(BPose* pose)
 void
 BPoseView::CommitActivePose(bool saveChanges)
 {
-	BPose* activePose = ActivePose();
-	if (activePose != NULL) {
-		int32 index = fPoseList->IndexOf(ActivePose());
-		if (IsFiltering())
-			index = fFilteredPoseList->IndexOf(ActivePose());
+	if (ActivePose() == NULL)
+		return;
 
-		BPoint loc(0, index * fListElemHeight);
-		if (ViewMode() != kListMode)
-			loc = ActivePose()->Location(this);
+	int32 index = CurrentPoseList()->IndexOf(fActivePose);
 
-		activePose->Commit(saveChanges, loc, this, index);
-		BPose* pose = fActivePose;
-		fActivePose = NULL;
-		if (IsFiltering() && !FilterPose(pose))
-			RemoveFilteredPose(pose, index);
-	}
+	BPoint poseLoc;
+	if (ViewMode() == kListMode)
+		poseLoc = BPoint(0, index * fListElemHeight);
+	else
+		poseLoc = fActivePose->Location(this);
+
+	fActivePose->Commit(saveChanges, poseLoc, this, index);
+	BPose* activePose = fActivePose;
+	fActivePose = NULL;
+	if (IsFiltering() && !FilterPose(activePose))
+		RemoveFilteredPose(activePose, index);
 }
 
 
@@ -2509,14 +2509,20 @@ BPoseView::MessageReceived(BMessage* message)
 
 		case kEditName:
 		{
-			if (ActivePose())
+			if (ActivePose() != NULL)
 				break;
 
 			BPose* pose = fSelectionList->FirstItem();
-			if (pose != NULL) {
-				BPoint where(0, CurrentPoseList()->IndexOf(pose) * fListElemHeight);
-				pose->EditFirstWidget(where, this);
-			}
+			if (pose == NULL)
+				break;
+
+			BPoint poseLoc;
+			if (ViewMode() == kListMode)
+				poseLoc = BPoint(0, CurrentPoseList()->IndexOf(pose) * fListElemHeight);
+			else
+				poseLoc = pose->Location(this);
+
+			pose->EditFirstWidget(poseLoc, this);
 			break;
 		}
 
@@ -3483,7 +3489,14 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 		UpdateScrollRange();
 		CommitActivePose();
 		SelectPose(pose, index);
-		pose->EditFirstWidget(BPoint(0, index * fListElemHeight), this);
+
+		BPoint poseLoc;
+		if (ViewMode() == kListMode)
+			poseLoc = BPoint(0, index * fListElemHeight);
+		else
+			poseLoc = pose->Location(this);
+
+		pose->EditFirstWidget(poseLoc, this);
 	}
 }
 
@@ -3517,7 +3530,14 @@ BPoseView::NewFolder(const BMessage* message)
 			UpdateScrollRange();
 			CommitActivePose();
 			SelectPose(pose, index);
-			pose->EditFirstWidget(BPoint(0, index * fListElemHeight), this);
+
+			BPoint poseLoc;
+			if (ViewMode() == kListMode)
+				poseLoc = BPoint(0, index * fListElemHeight);
+			else
+				poseLoc = pose->Location(this);
+
+			pose->EditFirstWidget(poseLoc, this);
 		}
 	}
 }
