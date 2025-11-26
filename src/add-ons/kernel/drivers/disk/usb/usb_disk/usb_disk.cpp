@@ -1519,7 +1519,7 @@ normalize_name(char *name, size_t nameLength)
 	size_t insertIndex = 0;
 	for (size_t i = 0; i < nameLength; i++) {
 		bool isSpace = name[i] == ' ';
-		if (isSpace && wasSpace)
+		if (isSpace && (wasSpace || insertIndex == 0))
 			continue;
 
 		name[insertIndex++] = name[i];
