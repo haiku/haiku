@@ -7470,6 +7470,9 @@ BPoseView::MouseUp(BPoint where)
 	if (fSelectionRectInfo.isDragging)
 		_EndSelectionRect();
 
+	// dispose of drag data from previous drag lazily
+	DragStop();
+
 	int32 index;
 	BPose* pose = FindPose(where, &index);
 	uint32 lastButtons = Window()->CurrentMessage()->FindInt32("last_buttons");
