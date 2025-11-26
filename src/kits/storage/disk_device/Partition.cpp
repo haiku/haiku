@@ -555,13 +555,18 @@ BPartition::GetMountPoint(BPath* mountPoint) const
 	\param mountFlags Currently only \c B_MOUNT_READ_ONLY is defined, which
 		   forces the volume to be mounted read-only.
 	\param parameters File system specific mount parameters.
-	\return \c B_OK, if everything went fine, another error code otherwise.
+	\return \c B_OK if everything went fine, another error code otherwise.
+	\return \c B_BUSY if already mounted.
+	\return \c B_BAD_VALUE if volume does not contain a file system.
+	\return \c B_NOT_ALLOWED if a permission error occurs.
 */
 status_t
-BPartition::Mount(const char* mountPoint, uint32 mountFlags,
-	const char* parameters)
+BPartition::Mount(const char* mountPoint, uint32 mountFlags, const char* parameters)
 {
-	if (IsMounted() || !ContainsFileSystem())
+	if (IsMounted())
+		return B_BUSY;
+
+	if (!ContainsFileSystem())
 		return B_BAD_VALUE;
 
 	// get the partition path
