@@ -43,6 +43,7 @@ AutoconfigLooper::AutoconfigLooper(BMessenger target, const char* device)
 
 AutoconfigLooper::~AutoconfigLooper()
 {
+	_RemoveClient();
 }
 
 
@@ -52,7 +53,6 @@ AutoconfigLooper::_RemoveClient()
 	if (fCurrentClient == NULL)
 		return;
 
-	RemoveHandler(fCurrentClient);
 	delete fCurrentClient;
 	fCurrentClient = NULL;
 }
@@ -74,9 +74,16 @@ AutoconfigLooper::_ConfigureIPv4()
 	int32 flags = interface.Flags() & ~IFF_AUTO_CONFIGURED;
 	interface.SetFlags(flags | IFF_CONFIGURING);
 
-	if (fCurrentClient->Initialize() == B_OK)
+	if (fCurrentClient->Start() == B_OK)
 		return;
 
+	_ConfigureIPv4Failed();
+}
+
+
+void
+AutoconfigLooper::_ConfigureIPv4Failed()
+{
 	_RemoveClient();
 
 	puts("DHCP failed miserably!");
@@ -85,6 +92,7 @@ AutoconfigLooper::_ConfigureIPv4()
 	// TODO: have a look at zeroconf
 	// TODO: this could also be done add-on based
 
+	BNetworkInterface interface(fDevice.String());
 	if ((interface.Flags() & IFF_CONFIGURING) == 0) {
 		// Someone else configured the interface in the mean time
 		return;
@@ -176,7 +184,7 @@ AutoconfigLooper::_NetworkMonitorNotification(BMessage* message)
 				// Reconfigure the interface when we have a link again
 				_ConfigureIPv4();
 				//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
-			} else if ((fLastMediaStatus & IFM_ACTIVE) != 0 && (media & IFM_ACTIVE) == 0) {
+			} else if ((media & IFM_ACTIVE) == 0) {
 				_RemoveClient();
 			}
 
@@ -214,6 +222,10 @@ AutoconfigLooper::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgReadyToRun:
 			_ReadyToRun();
+			break;
+
+		case kMsgAutoConfigureFailed:
+			_ConfigureIPv4Failed();
 			break;
 
 		case B_NETWORK_MONITOR:

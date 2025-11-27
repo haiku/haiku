@@ -20,7 +20,7 @@ public:
 									BMessenger target, const char* device);
 	virtual						~AutoconfigClient();
 
-	virtual	status_t			Initialize();
+	virtual	status_t			Start();
 
 			const BMessenger&	Target() const { return fTarget; }
 			const char*			Device() const { return fDevice.String(); }

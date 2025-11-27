@@ -25,7 +25,7 @@ AutoconfigClient::~AutoconfigClient()
 
 
 status_t
-AutoconfigClient::Initialize()
+AutoconfigClient::Start()
 {
 	return B_NOT_SUPPORTED;
 }

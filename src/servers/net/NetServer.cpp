@@ -426,10 +426,12 @@ NetServer::_ConfigureInterface(BMessage& message)
 	if (message.FindInt32("flags", &flags) != B_OK)
 		flags = IFF_UP;
 
-	bool autoConfigured;
+	bool autoConfigured = false;
 	if (message.FindBool("auto_configured", &autoConfigured) == B_OK
 			&& autoConfigured) {
 		flags |= IFF_AUTO_CONFIGURED;
+	} else {
+		_QuitLooperForDevice(name);
 	}
 
 	int32 mtu;
@@ -465,10 +467,8 @@ NetServer::_ConfigureInterface(BMessage& message)
 			&addressMessage) == B_OK; index++) {
 		BNetworkInterfaceAddressSettings addressSettings(addressMessage);
 
-		if (addressSettings.IsAutoConfigure()) {
-			_QuitLooperForDevice(name);
+		if (addressSettings.IsAutoConfigure())
 			startAutoConfig = true;
-		}
 
 		// set address/mask/broadcast/peer
 
@@ -570,8 +570,7 @@ NetServer::_ConfigureInterface(BMessage& message)
 		looper->Run();
 
 		fDeviceMap[name] = looper;
-	} else if (!autoConfigured)
-		_QuitLooperForDevice(name);
+	}
 
 	return B_OK;
 }

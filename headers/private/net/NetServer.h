@@ -12,6 +12,7 @@
 #define kNetServerSignature		"application/x-vnd.haiku-net_server"
 
 #define kMsgConfigureInterface		'COif'
+#define kMsgAutoConfigureFailed		'COaf'
 #define kMsgConfigureResolver		'COrs'
 #define kMsgCountPersistentNetworks	'CPnw'
 #define kMsgGetPersistentNetwork	'GPnw'

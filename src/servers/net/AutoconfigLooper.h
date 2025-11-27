@@ -29,6 +29,7 @@ public:
 private:
 			void				_RemoveClient();
 			void				_ConfigureIPv4();
+			void				_ConfigureIPv4Failed();
 			void				_ReadyToRun();
 			void				_NetworkMonitorNotification(BMessage* message);
 

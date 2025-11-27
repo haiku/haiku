@@ -39,12 +39,13 @@ public:
 									const char* device);
 	virtual						~DHCPClient();
 
-	virtual	status_t			Initialize();
+	virtual	status_t			Start();
 
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			status_t			_Negotiate(dhcp_state state);
+	static	status_t			_NegotiatorThread(void* data);
+			status_t			_Negotiate();
 			status_t			_GotMessage(dhcp_state& state,
 									dhcp_message* message);
 			status_t			_StateTransition(int socket, dhcp_state& state);
@@ -67,6 +68,7 @@ private:
 			BMessage			fConfiguration;
 			BMessage			fResolverConfiguration;
 			BMessageRunner*		fRunner;
+			thread_id			fNegotiateThread;
 			uint8				fMAC[6];
 			BString				fHostName;
 			uint32				fTransactionID;

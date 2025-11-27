@@ -30,6 +30,7 @@
 #include <Debug.h>
 #include <Message.h>
 #include <MessageRunner.h>
+#include <Looper.h>
 
 #include "NetServer.h"
 
@@ -482,6 +483,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fConfiguration(kMsgConfigureInterface),
 	fResolverConfiguration(kMsgConfigureResolver),
 	fRunner(NULL),
+	fNegotiateThread(-1),
 	fAssignedAddress(0),
 	fServer(AF_INET, NULL, DHCP_SERVER_PORT, B_UNCONFIGURED_ADDRESS_FAMILIES),
 	fStartTime(0),
@@ -518,17 +520,26 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 			}
 		}
 	}
-
-	openlog_thread("DHCP", 0, LOG_DAEMON);
 }
 
 
 DHCPClient::~DHCPClient()
 {
-	if (fStatus != B_OK)
-		return;
+	thread_id thread = fNegotiateThread;
+	if (thread != -1) {
+		fNegotiateThread = -1;
+		suspend_thread(thread);
+		resume_thread(thread);
+
+		UnlockLooper();
+		wait_for_thread(thread, NULL);
+		LockLooper();
+	}
 
 	delete fRunner;
+
+	if (fStatus != B_OK)
+		return;
 
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0)
@@ -541,23 +552,42 @@ DHCPClient::~DHCPClient()
 
 	_SendMessage(socket, release, fServer);
 	close(socket);
+}
+
+
+status_t
+DHCPClient::Start()
+{
+	if (fNegotiateThread != -1)
+		return EINPROGRESS;
+
+	fNegotiateThread = spawn_thread(_NegotiatorThread, "DHCP negotiator",
+		B_NORMAL_PRIORITY, this);
+	return resume_thread(fNegotiateThread);
+}
+
+
+status_t
+DHCPClient::_NegotiatorThread(void* data)
+{
+	openlog_thread("DHCP", 0, LOG_DAEMON);
+
+	DHCPClient* client = (DHCPClient*)data;
+	client->LockLooper();
+	client->fStatus = client->_Negotiate();
+	syslog(LOG_DEBUG, "%s: DHCP status = %s\n", client->Device(), strerror(client->fStatus));
+	client->fNegotiateThread = -1;
+	client->UnlockLooper();
 
 	closelog_thread();
+	return B_OK;
 }
 
 
 status_t
-DHCPClient::Initialize()
+DHCPClient::_Negotiate()
 {
-	fStatus = _Negotiate(fAssignedAddress == 0 ? INIT : INIT_REBOOT);
-	syslog(LOG_DEBUG, "%s: DHCP status = %s\n", Device(), strerror(fStatus));
-	return fStatus;
-}
-
-
-status_t
-DHCPClient::_Negotiate(dhcp_state state)
-{
+	dhcp_state state = _CurrentState();
 	if (state == BOUND)
 		return B_OK;
 
@@ -595,7 +625,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 	bigtime_t previousLeaseTime = fLeaseTime;
 
 	status_t status = B_OK;
-	while (state != BOUND) {
+	while (state != BOUND && fNegotiateThread != -1) {
 		status = _StateTransition(socket, state);
 		if (status != B_OK && (state == SELECTING || state == REBOOTING))
 			break;
@@ -618,8 +648,12 @@ DHCPClient::_Negotiate(dhcp_state state)
 	_RestartLease(fRenewalTime);
 
 	fStatus = status;
-	if (status)
+	if (status != B_OK) {
+		// If we were asked to quit, don't inform the looper that we failed.
+		if (fNegotiateThread != -1)
+			Looper()->PostMessage(kMsgAutoConfigureFailed, Looper(), this);
 		return status;
+	}
 
 	// configure interface
 	BMessage reply;
@@ -737,8 +771,12 @@ DHCPClient::_StateTransition(int socket, dhcp_state& state)
 		char buffer[2048];
 		struct sockaddr_in from;
 		socklen_t fromLength = sizeof(from);
+
+		UnlockLooper();
 		ssize_t bytesReceived = recvfrom(socket, buffer, sizeof(buffer),
 			0, (struct sockaddr*)&from, &fromLength);
+		LockLooper();
+
 		if (bytesReceived < 0 && errno == B_TIMED_OUT) {
 			// depending on the state, we'll just try again
 			if (!_TimeoutShift(socket, state, timeout))
@@ -1032,7 +1070,7 @@ DHCPClient::_CurrentState() const
 	bigtime_t now = system_time();
 
 	if (now > fLeaseTime || fStatus != B_OK)
-		return INIT;
+		return fAssignedAddress == 0 ? INIT : INIT_REBOOT;
 	if (now >= fRebindingTime)
 		return REBINDING;
 	if (now >= fRenewalTime)
@@ -1046,7 +1084,7 @@ DHCPClient::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgLeaseTime:
-			_Negotiate(_CurrentState());
+			Start();
 			break;
 
 		default:
