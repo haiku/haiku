@@ -7522,7 +7522,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 			}
 		}
 
-		if (!partition) {
+		if (partition == NULL) {
 			TRACE(("fs_mount(): Partition `%s' not found.\n",
 				normalizedDevice.Path()));
 			return B_ENTRY_NOT_FOUND;
@@ -7538,16 +7538,14 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	// interfering.
 	// TODO: Just mark the partition busy while mounting!
 	KDiskDevice* diskDevice = NULL;
-	if (partition) {
+	if (partition != NULL) {
 		diskDevice = ddm->WriteLockDevice(partition->Device()->ID());
-		if (!diskDevice) {
+		if (diskDevice == NULL) {
 			TRACE(("fs_mount(): Failed to lock disk device!\n"));
 			return B_ERROR;
 		}
 	}
-
 	DeviceWriteLocker writeLocker(diskDevice, true);
-		// this takes over the write lock acquired before
 
 	if (partition != NULL) {
 		// make sure, that the partition is not busy
@@ -7556,10 +7554,15 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 			return B_BUSY;
 		}
 
+		if (partition->IsMounted()) {
+			TRACE(("fs_mount(): Partition is already mounted.\n"));
+			return B_BUSY;
+		}
+
 		// if no FS name had been supplied, we get it from the partition
 		if (fsName == NULL) {
 			KDiskSystem* diskSystem = partition->DiskSystem();
-			if (!diskSystem) {
+			if (diskSystem == NULL) {
 				TRACE(("fs_mount(): No FS name was given, and the DDM didn't "
 					"recognize it.\n"));
 				return B_BAD_VALUE;
