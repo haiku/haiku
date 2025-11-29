@@ -16,44 +16,6 @@
 #include "TypeHandler.h"
 
 
-// signal names
-static const char *kSignalName[] = {
-	/*  0 */ "SIG0",
-	/*  1 */ "SIGHUP",
-	/*  2 */ "SIGINT",
-	/*  3 */ "SIGQUIT",
-	/*  4 */ "SIGILL",
-	/*  5 */ "SIGCHLD",
-	/*  6 */ "SIGABRT",
-	/*  7 */ "SIGPIPE",
-	/*  8 */ "SIGFPE",
-	/*  9 */ "SIGKILL",
-	/* 10 */ "SIGSTOP",
-	/* 11 */ "SIGSEGV",
-	/* 12 */ "SIGCONT",
-	/* 13 */ "SIGTSTP",
-	/* 14 */ "SIGALRM",
-	/* 15 */ "SIGTERM",
-	/* 16 */ "SIGTTIN",
-	/* 17 */ "SIGTTOU",
-	/* 18 */ "SIGUSR1",
-	/* 19 */ "SIGUSR2",
-	/* 20 */ "SIGWINCH",
-	/* 21 */ "SIGKILLTHR",
-	/* 22 */ "SIGTRAP",
-	/* 23 */ "SIGPOLL",
-	/* 24 */ "SIGPROF",
-	/* 25 */ "SIGSYS",
-	/* 26 */ "SIGURG",
-	/* 27 */ "SIGVTALRM",
-	/* 28 */ "SIGXCPU",
-	/* 29 */ "SIGXFSZ",
-	/* 30 */ "SIGBUS",
-	/* 31 */ "SIGRESERVED1",
-	/* 32 */ "SIGRESERVED2",
-};
-
-
 struct enum_info {
 	int index;
 	const char *name;
@@ -61,6 +23,46 @@ struct enum_info {
 
 #define ENUM_INFO_ENTRY(name) \
 	{ name, #name }
+
+static const enum_info kSignals[] = {
+	{ 0, "SIG0"}, 					/* 0 */
+	ENUM_INFO_ENTRY(SIGHUP),
+	ENUM_INFO_ENTRY(SIGINT),
+	ENUM_INFO_ENTRY(SIGQUIT),
+	ENUM_INFO_ENTRY(SIGILL),
+	ENUM_INFO_ENTRY(SIGCHLD),
+	ENUM_INFO_ENTRY(SIGABRT),
+	ENUM_INFO_ENTRY(SIGPIPE),
+	ENUM_INFO_ENTRY(SIGFPE),
+	ENUM_INFO_ENTRY(SIGKILL),
+	ENUM_INFO_ENTRY(SIGSTOP),	/* 10 */
+	ENUM_INFO_ENTRY(SIGSEGV),
+	ENUM_INFO_ENTRY(SIGCONT),
+	ENUM_INFO_ENTRY(SIGTSTP),
+	ENUM_INFO_ENTRY(SIGALRM),
+	ENUM_INFO_ENTRY(SIGTERM),
+	ENUM_INFO_ENTRY(SIGTTIN),
+	ENUM_INFO_ENTRY(SIGTTOU),
+	ENUM_INFO_ENTRY(SIGUSR1),
+	ENUM_INFO_ENTRY(SIGUSR2),
+	ENUM_INFO_ENTRY(SIGWINCH),	/* 20 */
+	ENUM_INFO_ENTRY(SIGKILLTHR),
+	ENUM_INFO_ENTRY(SIGTRAP),
+	ENUM_INFO_ENTRY(SIGPOLL),
+	ENUM_INFO_ENTRY(SIGPROF),
+	ENUM_INFO_ENTRY(SIGSYS),
+	ENUM_INFO_ENTRY(SIGURG),
+	ENUM_INFO_ENTRY(SIGVTALRM),
+	ENUM_INFO_ENTRY(SIGXCPU),
+	ENUM_INFO_ENTRY(SIGXFSZ),
+	ENUM_INFO_ENTRY(SIGBUS),	/* 30 */
+	ENUM_INFO_ENTRY(SIGRESERVED1),
+	ENUM_INFO_ENTRY(SIGRESERVED2),
+	{ 0, NULL }
+};
+
+static EnumTypeHandler::EnumMap kSignalsMap;
+
 
 static const enum_info kSigmaskHow[] = {
 	ENUM_INFO_ENTRY(SIG_BLOCK),
@@ -118,8 +120,9 @@ static EnumTypeHandler::EnumMap kSigmaskHowMap;
 std::string
 signal_name(int signal)
 {
-	if (signal >= 0 && signal <= SIGRESERVED2)
-		return kSignalName[signal];
+	EnumTypeHandler::EnumMap::const_iterator i = kSignalsMap.find(signal);
+	if (i != kSignalsMap.end() && i->second != NULL)
+		return i->second;
 
 	static char buffer[32];
 	sprintf(buffer, "%d", signal);
@@ -329,9 +332,10 @@ patch_signal()
 {
 	for (int i = 0; kSigmaskFlagsInfo[i].name != NULL; i++)
 		kSigmaskFlags.push_back(kSigmaskFlagsInfo[i]);
-	for (int i = 0; kSigmaskHow[i].name != NULL; i++) {
+	for (int i = 0; kSigmaskHow[i].name != NULL; i++)
 		kSigmaskHowMap[kSigmaskHow[i].index] = kSigmaskHow[i].name;
-	}
+	for (int i = 0; kSignals[i].name != NULL; i++)
+		kSignalsMap[kSignals[i].index] = kSignals[i].name;
 	Syscall *setSignalMask = get_syscall("_kern_set_signal_mask");
 	setSignalMask->GetParameter("how")->SetHandler(new EnumTypeHandler(kSigmaskHowMap));
 	setSignalMask->GetParameter("set")->SetHandler(new SigsetTypeHandler());
@@ -349,4 +353,8 @@ patch_signal()
 	sigpending->GetParameter("set")->SetHandler(new SigsetTypeHandler());
 	sigpending->GetParameter("set")->SetOut(true);
 
+	Syscall *sendSignal = get_syscall("_kern_send_signal");
+	sendSignal->GetParameter("signal")->SetHandler(new EnumTypeHandler(kSignalsMap));
+	Syscall *sigaction = get_syscall("_kern_sigaction");
+	sigaction->GetParameter("sig")->SetHandler(new EnumTypeHandler(kSignalsMap));
 }

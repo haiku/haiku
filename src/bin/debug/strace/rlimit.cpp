@@ -16,9 +16,6 @@
 #include "TypeHandler.h"
 
 
-
-static EnumTypeHandler::EnumMap kResourceNames;
-
 struct enum_info {
 	unsigned int index;
 	const char *name;
