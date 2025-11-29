@@ -830,6 +830,7 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 	print_kernel_debugger_message();
 
 	kprintf("Welcome to Kernel Debugging Land...\n");
+	kprintf("revision: %s\n", get_haiku_revision());
 
 	// Set a few temporary debug variables and print on which CPU and in which
 	// thread we are running.
