@@ -58,6 +58,7 @@ respective holders. All rights reserved.
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Locale.h>
+#include <LocaleRoster.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Roster.h>
@@ -906,10 +907,18 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 			return B_ERROR;
 		} else if (FSIsTrashDir(&entry)) {
 			BString errorStr;
+			BString folderName;
+
 			if (moveMode == kCreateLink || moveMode == kCreateRelativeLink)
-				errorStr.SetTo(B_TRANSLATE("You cannot create a link to the Trash directory."));
+				errorStr.SetTo(B_TRANSLATE("You cannot create a link to the %trash% directory."));
 			else
-				errorStr.SetTo(B_TRANSLATE("You cannot copy or move the Trash directory."));
+				errorStr.SetTo(B_TRANSLATE("You cannot copy or move the %trash% directory."));
+
+			if (BLocaleRoster::Default()->IsFilesystemTranslationPreferred())
+				folderName.SetTo(B_TRANSLATE("Trash"));
+			else
+				folderName.SetTo("Trash");
+			errorStr.ReplaceFirst("%trash%", folderName.String());
 
 			BAlert* alert = new BAlert("", errorStr.String(), B_TRANSLATE("Cancel"), 0, 0,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -919,7 +928,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 			return B_ERROR;
 		} else if (FSIsPrintersDir(&entry)
 			&& (moveMode == kCopySelectionTo || moveMode == kMoveSelectionTo)) {
-			BString errorStr(B_TRANSLATE("You cannot copy or move the Printers directory."));
+			BString errorStr(B_TRANSLATE("You cannot copy or move the 'printers' directory."));
 
 			BAlert* alert = new BAlert("", errorStr.String(), B_TRANSLATE("Cancel"), 0, 0,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
