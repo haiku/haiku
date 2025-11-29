@@ -22,7 +22,7 @@ Settings	MainWin		Einstellungen
 force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	Erzwinge 704 × 576, Seitenverhältnis 4:3
 %s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
-Settings…	MainWin		Einstellungen ...
+Settings…	MainWin		Einstellungen …
 None	MainWin		Kein
 Error, interface is busy:\n\n	MainWin		Fehler, Hardware ist beschäftigt:\n\n
 pixel aspect ratio	MainWin		Pixel-Seitenverhältnis

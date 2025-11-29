@@ -223,7 +223,7 @@ Populating package sizes	PopulatePkgSizesProcess		Eintragen der Paketgrößen
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Screenshot
 Email address:	UserLoginWindow		E-Mail-Adresse:
-View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen…
+View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen …
 Category:	FilterView		Kategorie:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	Paket %s deinstallieren\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Paketquellendaten werden geladen

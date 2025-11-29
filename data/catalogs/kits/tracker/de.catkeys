@@ -1,8 +1,8 @@
-1	german	x-vnd.Haiku-libtracker	2992119353
+1	german	x-vnd.Haiku-libtracker	2433311519
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
-Open with…	ContainerWindow		Öffnen mit ...
+Open with…	ContainerWindow		Öffnen mit …
 Kind	ContainerWindow		Art
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fehler beim Verschieben von \"%name\" in den Papierkorb. (%error)
 Or	FindPanel		Oder
@@ -32,6 +32,7 @@ Value	AttributesView		Wert
 Information	InfoWindow		Informationen
 Error emptying Trash	FSUtils		Fehler beim Leeren des Papierkorbs
 Opens with:	InfoWindow		Wird geöffnet mit:
+You cannot copy or move the Printers directory.	FSUtils		Der Ordner 'Printers' kann nicht kopiert oder verschoben werden.
 Size	QueryPoseView		Größe
 Disk mount	TrackerSettingsWindow		Datenträger einhängen
 Type	AttributesView		Typ
@@ -104,7 +105,7 @@ Window	ContainerWindow		Fenster
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Entfernen
 Company	Person Query Columns		Firma
-Select folders…	FindPanel		Ordner wählen…
+Select folders…	FindPanel		Ordner wählen …
 Recent documents	FavoritesMenu		Letzte Dokumente
 Edit templates…	TemplatesMenu		Vorlagen bearbeiten …
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{(# Byte)} other{(# Bytes)}}
@@ -126,7 +127,7 @@ Modified	QueryPoseView		Geändert
 Owner	FilePermissionsView		Besitzer
 Cancel	FSClipBoard		Abbrechen
 Modified	PoseView		Geändert
-Save as template…	FindPanel		Speichern als Vorlage…
+Save as template…	FindPanel		Speichern als Vorlage …
 Move to Trash	ContainerWindow		In Papierkorb verschieben
 All files and folders	FindPanel		Alle Dateien und Ordner
 Add-ons	ContainerWindow		Add-ons
@@ -168,7 +169,7 @@ Property info	AttributesView		Property-Info
 Sorry, you can't create links in the Trash.	PoseView		Im Papierkorb können keine Verknüpfungen erstellt werden.
 From	Email Query Columns		Von
 Open selection with:	OpenWithWindow		Auswahl öffnen mit:
-Preferences…	ContainerWindow		Einstellungen…
+Preferences…	ContainerWindow		Einstellungen …
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Die Datei \"%document\" kann nicht geöffnet werden, weil sich das zugehörige Programm \"%app\" im Papierkorb befindet.
 Work Phone	Person Query Columns		Telefon (geschäftlich)
 Select folders	FindPanel		Ordner wählen
@@ -204,7 +205,7 @@ Cancel	FSUtils		Abbrechen
 Original name	ContainerWindow		Ursprung
 Unknown	WidgetAttributeText		Unbekannt
 32-bit integer	AttributesView		Integer 32-bit
-Save as query…	FindPanel		Speichern als Query…
+Save as query…	FindPanel		Speichern als Query …
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Der angegebene Name wird bereits von einem Ordner benutzt. Bitte einen anderen wählen.
 Modified	ContainerWindow		Geändert
 Mini icon view	ContainerWindow		Mini-Icon-Ansicht
@@ -251,6 +252,7 @@ Favorites	FilePanelPriv		Favoriten
 Point	AttributesView		Punkt
 You can't move or copy items to read-only volumes.	PoseView		Auf schreibgeschützte Datenträger kann nichts verschoben oder kopiert werden.
 home	B_USER_DIRECTORY		Home
+You cannot create a link to the Trash directory.	FSUtils		Auf den Trash-Ordner kann keine Verknüpfung erstellt werden.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Trackers 'Neu'-Vorlagen
 Disk mounting during boot	AutoMounterSettings		Einhängen beim Systemstart
 Don't automount	AutoMounterSettings		Nicht automatisch einhängen
@@ -304,13 +306,14 @@ Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's '
 starts with	SelectionWindow		beginnt mit
 Any	AttributesView		Alle
 Invert	SelectionWindow		Umkehren
-Open…	FindPanel		Öffnen…
+Open…	FindPanel		Öffnen …
 Would you like to find some other suitable application?	FSUtils		Soll eine andere passende Anwendung gesucht werden?
 (unknown)	AttributesView		(unbekannt)
 *+? operand may be empty.	libtracker		*+? Operand könnte leer sein.
 Recent folders	FavoritesMenu		Letzte Ordner
 Signed memory size	AttributesView		Vorzeichenbehaftete Speichergröße
 The specified name is illegal. Please choose another name.	FilePanelPriv		Der angegebene Name ist nicht gültig. Bitte einen anderen wählen.
+You cannot copy or move the Trash directory.	FSUtils		Der Ordner 'Trash' kann nicht kopiert oder verschoben werden.
 of %items	StatusWindow		von %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fehler beim Kopieren der Datei \"%name\":\n\t%error\n\nSoll fortgefahren werden?
 less than	FindPanel		kleiner als
@@ -352,7 +355,7 @@ File offset	AttributesView		Datei-Offset
 Name = %name	FindPanel	FindResultTitle	Name = %name
 Subject	Email Query Columns		Betreff
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fehler beim Kopieren des Ordners \"%name\":\n\t%error\n\nSoll fortgefahren werden?
-You cannot create a link to the root directory.	FSUtils		Auf das Root-Verzeichnis des Laufwerks kann keine Verknüpfung erstellt werden.
+You cannot create a link to the root directory.	FSUtils		Auf den Root-Ordner des Laufwerks kann keine Verknüpfung erstellt werden.
 Other	FilePermissionsView		Andere
 Automatic disk mounting	AutoMounterSettings		Automatisch Einhängen
 parent folder	NavMenu		Übergeordneter Ordner
@@ -393,7 +396,7 @@ There was a problem trying to replace \"%name\". The item might be open or busy.
 Windows	TrackerSettingsWindow		Fenster
 Show space bars on volumes	SettingsView		Speicherplatzbalken bei Datenträgern anzeigen
 Could not update permissions of file \"%name\". %error	FSUtils		Konnte die Berechtigungen der Datei \"%name\" nicht aktualisieren. %error
-Emptying Trash… 	StatusWindow		Papierkorb wird geleert ...
+Emptying Trash… 	StatusWindow		Papierkorb wird geleert …
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{für # Datei} other{für # Dateien}}
 Revert	TrackerSettingsWindow		Rückgängig
 trash	B_TRASH_DIRECTORY		Papierkorb
@@ -460,7 +463,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objekte müssen auf eines der Icons im \"Datenträger\" Fenster fallengelassen werden.
 Version:	InfoWindow		Version:
 OK	PoseView		OK
-Add new submenu…	TemplatesMenu		Neues Untermenü…
+Add new submenu…	TemplatesMenu		Neues Untermenü …
 Find	FindPanel		Suchen
 Empty folder	NavMenu		Leerer Ordner
 Defaults	TrackerSettingsWindow		Vorgabewerte

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2992119353
+1	catalan; valencian	x-vnd.Haiku-libtracker	2433311519
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -32,6 +32,7 @@ Value	AttributesView		Valor
 Information	InfoWindow		Informació
 Error emptying Trash	FSUtils		Error en buidar la paperera
 Opens with:	InfoWindow		S'obre amb:
+You cannot copy or move the Printers directory.	FSUtils		No podeu ni copiar ni moure el directori Impressores.
 Size	QueryPoseView		Mida
 Disk mount	TrackerSettingsWindow		Muntatge de discs
 Type	AttributesView		Tipus
@@ -251,6 +252,7 @@ Favorites	FilePanelPriv		Preferits
 Point	AttributesView		Punt
 You can't move or copy items to read-only volumes.	PoseView		No podeu moure ni copiar elements a volums de només lectura.
 home	B_USER_DIRECTORY		inici
+You cannot create a link to the Trash directory.	FSUtils		No podeu crear un enllaç al directori Paperera.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Plantilles noves del Rastrejador
 Disk mounting during boot	AutoMounterSettings		Muntatge de disc a l'arrencada
 Don't automount	AutoMounterSettings		No el muntis automàticament
@@ -311,6 +313,7 @@ Would you like to find some other suitable application?	FSUtils		Voleu trobar un
 Recent folders	FavoritesMenu		Carpetes recents
 Signed memory size	AttributesView		Mida de memòria signada
 The specified name is illegal. Please choose another name.	FilePanelPriv		El nom especificat és il·legal. Si us plau, trieu-ne un altre.
+You cannot copy or move the Trash directory.	FSUtils		No podeu ni copiar ni moure el directori Paperera.
 of %items	StatusWindow		de %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error en copiar el fitxer \"%name\":\n\t%error\n\nVoleu continuar?
 less than	FindPanel		menys que

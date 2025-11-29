@@ -37,7 +37,7 @@ Select all	TextView		Alles auswählen
 alpha	AboutWindow		Alpha
 Error	PrintJob		Fehler
 %s TiB/s	StringForRate	units per second	%s TiB/s
-About %app…	Dragger		Über %app ...
+About %app…	Dragger		Über %app …
 About %app%	AboutWindow		Über %app%
 {0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s Byte} other{%s Bytes}}
 %s GiB/s	StringForRate	units per second	%s GiB/s

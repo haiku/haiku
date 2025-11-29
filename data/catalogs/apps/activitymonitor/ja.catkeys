@@ -1,4 +1,6 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	2467534740
+1	japanese	x-vnd.Haiku-ActivityMonitor	923507156
+Temp	DataSource		温度
+Temperature	DataSource		温度
 Teams	DataSource		チーム数
 Semaphores	DataSource		セマフォ数
 TX	DataSource	Shorter version for Sending	送信

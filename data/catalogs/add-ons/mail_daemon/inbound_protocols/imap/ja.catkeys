@@ -6,7 +6,7 @@ Cancel	IMAPFolderConfig		中止
 OK	IMAPFolderConfig		OK
 Server storage: %s / %s used.	IMAPFolderConfig		サーバー容量: %s / %s 使用済。
 No encryption	imap_config		暗号化なし
-Fetching IMAP folders, please be patient…	IMAPFolderConfig		Fetching IMAP フォルダーを取得中です、少しお待ちください...
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		IMAP フォルダーを取得中です、少しお待ちください...
 Configure IMAP Folders	imap_config		IMAP フォルダーの設定
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		適用

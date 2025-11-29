@@ -1,4 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	2467534740
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	923507156
+Temp	DataSource		Temp.
+Temperature	DataSource		Temperatura
 Teams	DataSource		Equips
 Semaphores	DataSource		Semàfors
 TX	DataSource	Shorter version for Sending	TX

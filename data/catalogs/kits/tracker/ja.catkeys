@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2992119353
+1	japanese	x-vnd.Haiku-libtracker	1695086308
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -251,6 +251,7 @@ Favorites	FilePanelPriv		お気に入り
 Point	AttributesView		点
 You can't move or copy items to read-only volumes.	PoseView		読み取り専用のボリュームへ移動やコピーはできません。
 home	B_USER_DIRECTORY		ホーム
+You cannot create a link to the Trash directory.	FSUtils		ごみ箱へのリンクは作成できません。
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		新規 Tracker テンプレート
 Disk mounting during boot	AutoMounterSettings		起動時の設定
 Don't automount	AutoMounterSettings		自動マウントを使わない
@@ -311,6 +312,7 @@ Would you like to find some other suitable application?	FSUtils		他に適切な
 Recent folders	FavoritesMenu		最近使ったフォルダー
 Signed memory size	AttributesView		符号付きメモリサイズ
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
+You cannot copy or move the Trash directory.	FSUtils		ごみ箱のコピーや移動はできません。
 of %items	StatusWindow		/ %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" をコピー中にエラーが発生しました:\n\t%error\n\nそれでも続けますか?
 less than	FindPanel		より小さい
@@ -378,7 +380,7 @@ You can't move a folder into itself or any of its own sub-folders.	FSUtils		フ�
 New	ContainerWindow		新規
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		\"Disks\"  ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target を変更すると、%osName は正しく動作しないかもしれません!\n\n変更しますか?
-Sorry, you can't copy items to the Trash.	FSClipBoard		ごみ箱にコピーできません。
+Sorry, you can't copy items to the Trash.	FSClipBoard		すみません、ごみ箱にコピーできません。
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目がすでにフォルダー内に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか?
 When	Email Query Columns		受信日
 Object	AttributesView		オブジェクト

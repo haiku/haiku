@@ -21,7 +21,7 @@ Please close the BootManager window before closing the Installer window.	Install
 Write boot sector to '%s'	InstallerWindow		Bootsektor auf '%s' schreiben
 Boot sector not written because of an internal error.	InstallProgress		Der Bootsektor konnte aufgrund eines internen Fehlers nicht geschrieben werden.
 Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf 'Start' klicken.
-Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		BootManager und DriveSetup laufen ...\n\nBeide Anwendungen müssen beendet werden, um mit der Installation fortzufahren.
+Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		BootManager und DriveSetup laufen …\n\nBeide Anwendungen müssen beendet werden, um mit der Installation fortzufahren.
 Click on 'Set up partitions…' to create one.	InstallerWindow		Auf 'Partitionen einrichten …' klicken, um eine anzulegen.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Herzlich Willkommen zum Haiku-Installer!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? von ??
@@ -70,7 +70,7 @@ Continue	InstallerWindow	In alert after pressing Stop	Fortsetzen
 Scanning for disks…	InstallerWindow		Es wird nach Laufwerken gesucht …
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup läuft …\n\nDriveSetup schließen, um mit der Installation fortzufahren.
 The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Die Installation läuft noch!\nSoll die Installation tatsächlich abgebrochen werden?
-Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		BootManager läuft ...\n\nBootManager muss beendet werden, um mit der Installation fortzufahren.
+Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		BootManager läuft …\n\nBootManager muss beendet werden, um mit der Installation fortzufahren.
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Die Partition konnte nicht eingehangen werden. Bitte eine andere Partition auswählen.
 Set up partitions…	InstallerWindow		Partitionen einrichten …
 Install progress:  	InstallerWindow		Installationsverlauf: 

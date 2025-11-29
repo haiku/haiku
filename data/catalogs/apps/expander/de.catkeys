@@ -33,7 +33,7 @@ Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
 Select	DirectoryFilePanel		Auswählen
 Show contents	ExpanderWindow		Inhalt zeigen
 Stop	ExpanderMenu		Stopp
-Select '%s'…	DirectoryFilePanel		'%s' auswählen
+Select '%s'…	DirectoryFilePanel		'%s' auswählen …
 Expansion	ExpanderPreferences		Entpacken
 Set destination…	ExpanderMenu		Ziel auswählen …
 Continue	ExpanderWindow		Fortsetzen

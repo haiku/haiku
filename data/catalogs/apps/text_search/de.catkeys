@@ -22,7 +22,7 @@ Show files in Tracker	GrepWindow		Dateien im Tracker zeigen
 Please select the files you wish to keep searching.	GrepWindow		Bitte die Dateien auswählen, die weiterhin durchsucht werden sollen.
 Only search files matching the given pattern, e.g. \"*.h\".	GrepWindow		Nur Dateien durchsuchen, die dem Schema entsprechen, z.B. \"*.h\".
 Trim to selection	GrepWindow		Auf Auswahl begrenzen
-Set target…	GrepWindow		Ziel wählen ...
+Set target…	GrepWindow		Ziel wählen …
 Failed to open input pipe!	Grepper		Konnte Input-Pipe nicht öffnen!
 Search	GrepWindow		Suchen
 Copy text to clipboard	GrepWindow		Text in Ablage kopieren

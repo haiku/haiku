@@ -1,4 +1,6 @@
-1	german	x-vnd.Haiku-ActivityMonitor	2467534740
+1	german	x-vnd.Haiku-ActivityMonitor	923507156
+Temp	DataSource		Temp
+Temperature	DataSource		Temperatur
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaphoren
 TX	DataSource	Shorter version for Sending	Senden

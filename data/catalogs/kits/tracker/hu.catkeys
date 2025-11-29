@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2992119353
+1	hungarian	x-vnd.Haiku-libtracker	2433311519
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -32,6 +32,7 @@ Value	AttributesView		Érték
 Information	InfoWindow		Információ
 Error emptying Trash	FSUtils		Hiba történt a Szemetes ürítése közben.
 Opens with:	InfoWindow		Megnyitás ezzel:
+You cannot copy or move the Printers directory.	FSUtils		A Nyomtatók mappa nem másolható vagy mozgatható.
 Size	QueryPoseView		Méret
 Disk mount	TrackerSettingsWindow		Csatolás
 Type	AttributesView		Típus
@@ -251,6 +252,7 @@ Favorites	FilePanelPriv		Kedvencek
 Point	AttributesView		Pont
 You can't move or copy items to read-only volumes.	PoseView		Nem másolhatóak, mozgathatóak elemek egy írásvédett lemezre.
 home	B_USER_DIRECTORY		Saját mappa
+You cannot create a link to the Trash directory.	FSUtils		Nem hozható létre hivatkozás a Szemetesbe.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Új Nyomkövető sablon
 Disk mounting during boot	AutoMounterSettings		Lemezek csatolása bekapcsoláskor
 Don't automount	AutoMounterSettings		Ne csatoljon automatikusan
@@ -311,6 +313,7 @@ Would you like to find some other suitable application?	FSUtils		Szeretne keresn
 Recent folders	FavoritesMenu		Legutóbb használt mappák
 Signed memory size	AttributesView		Előjeles memória méret
 The specified name is illegal. Please choose another name.	FilePanelPriv		A megadott név szabálytalan. Kérlek válassz egy másik nevet.
+You cannot copy or move the Trash directory.	FSUtils		A Szemetes nem másolható vagy mozgatható.
 of %items	StatusWindow		/ %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a másolás közben: \"%name\"\n\t%error\n\nSzeretnéd folytatni?
 less than	FindPanel		kisebb, mint
