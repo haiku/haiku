@@ -37,21 +37,7 @@
 
 using std::nothrow;
 
-
-class FunctionTracer {
-public:
-	FunctionTracer(const char* functionName)
-		: fFunctionName(functionName)
-	{
-		printf("OpenSoundNode::%s()\n", fFunctionName.String());
-	}
-	 ~FunctionTracer()
-	{
-		printf("OpenSoundNode::%s() - leave\n", fFunctionName.String());
-	}
-	BString	fFunctionName;
-};
-
+#include <private/shared/FunctionTracer.h>
 
 // debugging
 #ifdef TRACE
@@ -62,8 +48,9 @@ public:
 #endif
 //#define TRACE_OSS_NODE
 #ifdef TRACE_OSS_NODE
+static int32 sDepth;
 #	define TRACE(x...)		printf(x)
-#	define CALLED(x...)		FunctionTracer _ft(__FUNCTION__)
+#	define CALLED(x...)		FunctionTracer _ft(__PRETTY_FUNCTION__, sDepth)
 #	define PRINTING
 #else
 #	define TRACE(x...)
@@ -214,8 +201,8 @@ public:
 
 	status_t AllocateBuffers(bigtime_t bufferDuration, bigtime_t latency)
 	{
-		TRACE("NodeOutput::AllocateBuffers(bufferDuration = %lld, "
-			"latency = %lld)\n", bufferDuration, latency);
+		TRACE("NodeOutput::AllocateBuffers(bufferDuration = %" B_PRIdBIGTIME ", "
+			"latency = %" B_PRIdBIGTIME ")\n", bufferDuration, latency);
 
 		FreeBuffers();
 
@@ -282,7 +269,7 @@ public:
 			return NULL;
 		}
 		if (sizeUsed < (ssize_t)fOutput.format.u.raw_audio.buffer_size) {
-			TRACE("NodeOutput::%s: requested %d, got %d\n", __FUNCTION__,
+			TRACE("NodeOutput::%s: requested %zu, got %zu\n", __FUNCTION__,
 				fOutput.format.u.raw_audio.buffer_size, sizeUsed);
 		}
 
@@ -576,7 +563,7 @@ OpenSoundNode::NodeRegistered()
 		index++;
 	}
 
-	TRACE("apply configuration in : %lldµs\n", system_time() - start);
+	TRACE("apply configuration in : %" B_PRIdBIGTIME "µs\n", system_time() - start);
 
 	SetPriority(B_REAL_TIME_PRIORITY);
 	Run();
@@ -826,7 +813,8 @@ OpenSoundNode::GetLatencyFor(const media_destination& for_whom,
 	bigtime_t bufferLatency = channel->fRealEngine->PlaybackLatency();
 	*out_latency += bufferLatency;
 
-	TRACE("OpenSoundNode::GetLatencyFor() - EventLatency %lld, OSS %lld\n",
+	TRACE("OpenSoundNode::GetLatencyFor() - EventLatency %" B_PRIdBIGTIME ", OSS %" B_PRIdBIGTIME
+		"\n",
 		EventLatency(), bufferLatency);
 
 	*out_timesource = TimeSource()->ID();
@@ -860,7 +848,7 @@ OpenSoundNode::Connected(const media_source& producer,
 	// use one half buffer length latency
 	size_t bufferSize = channel->fRealEngine->DriverBufferSize() / 2;
 	fInternalLatency = time_for_buffer(bufferSize, with_format);
-	TRACE("  internal latency = %lld\n", fInternalLatency);
+	TRACE("  internal latency = %" B_PRIdBIGTIME "\n", fInternalLatency);
 
 	// TODO: A global node value is assigned a channel specific value!
 	// That can't be correct. For as long as there is only one output
@@ -1233,10 +1221,10 @@ OpenSoundNode::Connect(status_t error, const media_source& source,
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(channel->fOutput.destination, &fLatency, &id);
-	TRACE("\tdownstream latency = %lld\n", fLatency);
+	TRACE("\tdownstream latency = %" B_PRIdBIGTIME "\n", fLatency);
 
 	fInternalLatency = BufferDuration();
-	TRACE("\tbuffer-filling took %lld usec on this machine\n",
+	TRACE("\tbuffer-filling took %" B_PRIdBIGTIME " usec on this machine\n",
 		fInternalLatency);
 	//SetEventLatency(fLatency + fInternalLatency);
 
@@ -1532,8 +1520,8 @@ OpenSoundNode::HandleSeek(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
-	TRACE("OpenSoundNode::HandleSeek(t=%lld, d=%li, bd=%lld)\n",
-		event->event_time,event->data,event->bigdata);
+	TRACE("OpenSoundNode::HandleSeek(t=%" B_PRIdBIGTIME ", d=%" B_PRId32 ", bd=%" B_PRId64 ")\n",
+		event->event_time, event->data, event->bigdata);
 	return B_OK;
 }
 
@@ -1643,7 +1631,7 @@ OpenSoundNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 	if (!mixer)
 		return ENODEV;
 
-	TRACE("id : %i, *ioSize=%d\n", id, *ioSize);
+	TRACE("id : %i, *ioSize=%zd\n", id, *ioSize);
 
 	oss_mixext mixext;
 	status_t err = mixer->GetExtInfo(id, &mixext);
@@ -1760,7 +1748,7 @@ OpenSoundNode::SetParameterValue(int32 id, bigtime_t performance_time,
 {
 	CALLED();
 
-	TRACE("id : %i, performance_time : %lld, size : %i\n", id,
+	TRACE("id : %i, performance_time : %" B_PRIdBIGTIME ", size : %zi\n", id,
 		performance_time, size);
 
 	OpenSoundDeviceMixer *mixer = fDevice->MixerAt(0);
@@ -2263,7 +2251,7 @@ OpenSoundNode::_PlayThread(NodeInput* input)
 		if (!fDevice->Locker()->Lock())
 			break;
 
-		TRACE("OpenSoundNode::_PlayThread: buffers: %ld\n",
+		TRACE("OpenSoundNode::_PlayThread: buffers: %" B_PRId32 "\n",
 			input->fBuffers.CountItems());
 
 		BBuffer* buffer = (BBuffer*)input->fBuffers.RemoveItem((int32)0);
