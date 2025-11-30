@@ -693,6 +693,8 @@ Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 void
 Desktop::SetCursor(ServerCursor* newCursor)
 {
+	AutoWriteLocker _(fWindowLock);
+
 	if (newCursor == NULL)
 		newCursor = fCursorManager.GetCursor(B_CURSOR_ID_SYSTEM_DEFAULT);
 
@@ -716,6 +718,8 @@ Desktop::Cursor() const
 void
 Desktop::SetManagementCursor(ServerCursor* newCursor)
 {
+	AutoWriteLocker _(fWindowLock);
+
 	if (newCursor == fManagementCursor)
 		return;
 

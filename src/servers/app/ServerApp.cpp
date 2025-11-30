@@ -1080,10 +1080,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			fAppCursor.SetTo(fDesktop->GetCursorManager().FindCursor(token), false);
 
+			fDesktop->GetCursorManager().Unlock();
+
 			if (_HasWindowUnderMouse())
 				fDesktop->SetCursor(CurrentCursor());
-
-			fDesktop->GetCursorManager().Unlock();
 
 			if (sync) {
 				// The application is expecting a reply
