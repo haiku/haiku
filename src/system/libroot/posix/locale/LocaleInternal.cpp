@@ -49,6 +49,7 @@ GetLocalesFromEnvironment(int category, const char** locales)
 			to = LC_LAST;
 		} else
 			from = to = category;
+
 		bool haveDifferentLocales = false;
 		locale = NULL;
 		for (int lc = from; lc <= to; lc++) {
@@ -62,7 +63,7 @@ GetLocalesFromEnvironment(int category, const char** locales)
 			if (lastLocale != NULL && strcasecmp(locale, lastLocale) != 0)
 				haveDifferentLocales = true;
 		}
-		if (!haveDifferentLocales) {
+		if (from == 1 && to == LC_LAST && !haveDifferentLocales) {
 			// we can set all locales at once
 			locales[LC_ALL] = locale;
 		}
