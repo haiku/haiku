@@ -13,15 +13,13 @@ namespace BPrivate {
 
 class FunctionTracer {
 public:
-	FunctionTracer(const char* className, const char* functionName,
-			int32& depth)
-		: fFunctionName(),
+	FunctionTracer(const char* functionName, int32& depth)
+		: fFunctionName(functionName),
 		  fPrepend(),
 		  fFunctionDepth(depth)
 	{
 		fFunctionDepth++;
 		fPrepend.Append(' ', fFunctionDepth * 2);
-		fFunctionName << className << "::" << functionName << "()";
 
 		printf("%s%s {\n", fPrepend.String(), fFunctionName.String());
 	}
