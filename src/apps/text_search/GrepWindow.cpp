@@ -52,21 +52,11 @@ static const bigtime_t kChangesPulseInterval = 150000;
 
 //#define TRACE_FUNCTIONS
 #ifdef TRACE_FUNCTIONS
-	class FunctionTracer {
-	public:
-		FunctionTracer(const char* functionName)
-			: fName(functionName)
-		{
-			printf("%s - enter\n", fName.String());
-		}
-		~FunctionTracer()
-		{
-			printf("%s - exit\n", fName.String());
-		}
-	private:
-		BString	fName;
-	};
-# define CALLED()	FunctionTracer functionTracer(__PRETTY_FUNCTION__)
+#include <private/shared/FunctionTracer.h>
+
+static int32 sDepth;
+
+# define CALLED()	FunctionTracer functionTracer(__PRETTY_FUNCTION__, sDepth)
 #else
 # define CALLED()
 #endif // TRACE_FUNCTIONS
