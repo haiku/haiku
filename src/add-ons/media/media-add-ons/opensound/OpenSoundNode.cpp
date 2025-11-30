@@ -50,7 +50,7 @@ using std::nothrow;
 #ifdef TRACE_OSS_NODE
 static int32 sDepth;
 #	define TRACE(x...)		printf(x)
-#	define CALLED(x...)		FunctionTracer _ft(__PRETTY_FUNCTION__, sDepth)
+#	define CALLED(x...)		FunctionTracer _ft(printf, NULL, __PRETTY_FUNCTION__, sDepth)
 #	define PRINTING
 #else
 #	define TRACE(x...)

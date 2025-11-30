@@ -56,7 +56,7 @@ static const bigtime_t kChangesPulseInterval = 150000;
 
 static int32 sDepth;
 
-# define CALLED()	FunctionTracer functionTracer(__PRETTY_FUNCTION__, sDepth)
+# define CALLED()	FunctionTracer functionTracer(printf, this, __PRETTY_FUNCTION__, sDepth)
 #else
 # define CALLED()
 #endif // TRACE_FUNCTIONS

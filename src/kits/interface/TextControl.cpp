@@ -37,7 +37,7 @@
 #	include <stdio.h>
 #	include <FunctionTracer.h>
 	static int32 sFunctionDepth = -1;
-#	define CALLED(x...)	FunctionTracer _ft(__PRETTY_FUNCTION__, sFunctionDepth)
+#	define CALLED(x...)	FunctionTracer _ft(printf, this, __PRETTY_FUNCTION__, sFunctionDepth)
 #	define TRACE(x...)	{ BString _to; \
 							_to.Append(' ', (sFunctionDepth + 1) * 2); \
 							printf("%s", _to.String()); printf(x); }
