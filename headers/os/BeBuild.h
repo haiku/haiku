@@ -98,6 +98,10 @@
 #endif
 #define _IMPORT
 
+#ifndef __has_builtin
+#define __has_builtin(x) 0
+#endif
+
 #define B_DEFINE_SYMBOL_VERSION(function, versionedSymbol)	\
 	__asm__(".symver " function "," versionedSymbol)
 
