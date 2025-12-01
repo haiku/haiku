@@ -268,27 +268,32 @@ _debuggerAssert(const char *file, int line, const char *message)
 	return 0;
 }
 
+
 // TODO: Remove. Temporary debug helper.
 // (accidently these are more or less the same as _sPrintf())
-
-void
+int
 debug_printf(const char *format, ...)
 {
+	int count;
+
 	va_list list;
 	va_start(list, format);
 
-	debug_vprintf(format, list);
+	count = debug_vprintf(format, list);
 
 	va_end(list);
+	return count;
 }
 
-void
+
+int
 debug_vprintf(const char *format, va_list args)
 {
 	char buffer[1024];
-	vsnprintf(buffer, sizeof(buffer), format, args);
+	int count = vsnprintf(buffer, sizeof(buffer), format, args);
 
 	_kern_debug_output(buffer);
+	return count;
 }
 
 
