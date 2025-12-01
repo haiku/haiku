@@ -78,6 +78,7 @@ private:
 	void TrySpinningBarberPole();
 
 	int32 fLastCount;
+	int32 fLastCountSelected;
 	BPoseView* fPoseView;
 	bool fShowingBarberPole : 1;
 	BBitmap* fBarberPoleMap;

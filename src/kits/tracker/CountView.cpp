@@ -66,6 +66,7 @@ BCountView::BCountView(BPoseView* view)
 	:
 	BView("CountVw", B_PULSE_NEEDED | B_WILL_DRAW),
 	fLastCount(-1),
+	fLastCountSelected(-1),
 	fPoseView(view),
 	fShowingBarberPole(false),
 	fBarberPoleMap(NULL),
@@ -188,11 +189,21 @@ BCountView::TextAndBarberPoleRect() const
 void
 BCountView::CheckCount()
 {
-	// invalidate the count text area if necessary
+	bool invalidate = false;
+
 	if (fLastCount != fPoseView->CountItems()) {
 		fLastCount = fPoseView->CountItems();
-		Invalidate(TextInvalRect());
+		invalidate = true;
 	}
+
+	if (fLastCountSelected != fPoseView->CountSelected()) {
+		fLastCountSelected = fPoseView->CountSelected();
+		invalidate = true;
+	}
+
+	// invalidate the count text area if necessary
+	if (invalidate)
+		Invalidate(TextInvalRect());
 
 	// invalidate barber pole area if necessary
 	TrySpinningBarberPole();
@@ -218,15 +229,37 @@ BCountView::Draw(BRect updateRect)
 	if (IsTypingAhead())
 		itemString << TypeAhead();
 	else if (IsFiltering()) {
-		itemString << fLastCount << " " << Filter();
+		if (fLastCountSelected != 0) {
+			static BStringFormat selectedFilteredFormat(B_TRANSLATE_COMMENT(
+				"{0, plural, other{#/%total %filter}}",
+				"Number of selected items from a filtered set: \"10/30 view\""));
+
+			char lastCountStr[32];
+			snprintf(lastCountStr, sizeof(lastCountStr), "%" B_PRId32, fLastCount);
+
+			selectedFilteredFormat.Format(itemString, fLastCountSelected);
+			itemString.ReplaceFirst("%total", lastCountStr);
+			itemString.ReplaceFirst("%filter", Filter());
+		} else
+			itemString << fLastCount << " " << Filter();
 	} else {
 		if (fLastCount == 0)
 			itemString << B_TRANSLATE("no items");
-		else {
-			static BStringFormat format(B_TRANSLATE_COMMENT(
+		else if (fLastCountSelected == 0) {
+			static BStringFormat itemFormat(B_TRANSLATE_COMMENT(
 				"{0, plural, one{# item} other{# items}}",
 				"Number of selected items: \"1 item\" or \"2 items\""));
-			format.Format(itemString, fLastCount);
+			itemFormat.Format(itemString, fLastCount);
+		} else {
+			static BStringFormat selectedFormat(B_TRANSLATE_COMMENT(
+				"{0, plural, other{#/%total selected}}",
+				"Number of selected items out of a total: \"10/30 selected\""));
+
+			char lastCountStr[32];
+			snprintf(lastCountStr, sizeof(lastCountStr), "%" B_PRId32, fLastCount);
+
+			selectedFormat.Format(itemString, fLastCountSelected);
+			itemString.ReplaceFirst("%total", lastCountStr);
 		}
 	}
 
