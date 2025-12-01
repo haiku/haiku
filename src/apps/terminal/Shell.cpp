@@ -453,6 +453,12 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		signal(SIGINT, SIG_DFL);
 		signal(SIGTTOU, SIG_DFL);
 
+		/* unblock sigusr1 */
+		sigset_t blockedSignals;
+		sigemptyset(&blockedSignals);
+		sigaddset(&blockedSignals, SIGUSR1);
+		pthread_sigmask(SIG_UNBLOCK, &blockedSignals, NULL);
+
 		struct termios tio;
 		/* get tty termios (not necessary).
 		 * TODO: so why are we doing it ?
