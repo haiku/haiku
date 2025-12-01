@@ -32,54 +32,22 @@
 //#define TRACE_KEYBOARD_DEVICE
 #ifdef TRACE_KEYBOARD_DEVICE
 
+#include <private/shared/FunctionTracer.h>
+
 static	int32		sFunctionDepth = -1;
 
-class FunctionTracer {
-public:
-	FunctionTracer(const void* pointer, const char* className,
-			const char* functionName)
-		:
-		fFunctionName(),
-		fPrepend(),
-		fPointer(pointer)
-	{
-		sFunctionDepth++;
-		fPrepend.Append(' ', sFunctionDepth * 2);
-		fFunctionName << className << "::" << functionName << "()";
-
-		debug_printf("%p -> %s%s {\n", fPointer, fPrepend.String(),
-			fFunctionName.String());
-	}
-
-	~FunctionTracer()
-	{
-		debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
-		sFunctionDepth--;
-	}
-
-	static int32 Depth() { return sFunctionDepth; }
-
-private:
-			BString		fFunctionName;
-			BString		fPrepend;
-			const void* fPointer;
-};
-
-#	define KD_CALLED(x...) \
-		FunctionTracer _ft(this, "KeyboardDevice", __FUNCTION__)
-#	define KID_CALLED(x...)	\
-		FunctionTracer _ft(this, "KeyboardInputDevice", __FUNCTION__)
+#	define CALLED(x...) \
+		FunctionTracer _ft(debug_printf, this, __PRETTY_FUNCTION__, sFunctionDepth)
 #	define TRACE(x...) \
 		do { BString _to; \
-			_to.Append(' ', (FunctionTracer::Depth() + 1) * 2); \
+			_to.Append(' ', (sFunctionDepth + 1) * 2); \
 			debug_printf("%p -> %s", this, _to.String()); \
 			debug_printf(x); } while (0)
 #	define LOG_EVENT(text...) debug_printf(text)
 #	define LOG_ERR(text...) TRACE(text)
 #else
 #	define TRACE(x...) do {} while (0)
-#	define KD_CALLED(x...) TRACE(x)
-#	define KID_CALLED(x...) TRACE(x)
+#	define CALLED(x...) TRACE(x)
 #	define LOG_ERR(text...) debug_printf(text)
 #	define LOG_EVENT(text...) TRACE(x)
 #endif
@@ -137,7 +105,7 @@ KeyboardDevice::KeyboardDevice(KeyboardInputDevice* owner, const char* path)
 	fSettingsCommand(0),
 	fKeymapLock("keymap lock")
 {
-	KD_CALLED();
+	CALLED();
 
 	strlcpy(fPath, path, B_PATH_NAME_LENGTH);
 	fDeviceRef.name = get_short_name(path);
@@ -153,7 +121,7 @@ KeyboardDevice::KeyboardDevice(KeyboardInputDevice* owner, const char* path)
 
 KeyboardDevice::~KeyboardDevice()
 {
-	KD_CALLED();
+	CALLED();
 	TRACE("delete\n");
 
 	if (fActive)
@@ -171,7 +139,7 @@ KeyboardDevice::~KeyboardDevice()
 void
 KeyboardDevice::MessageReceived(BMessage* message)
 {
-	KD_CALLED();
+	CALLED();
 
 	if (message->what != B_INPUT_METHOD_EVENT) {
 		BHandler::MessageReceived(message);
@@ -190,7 +158,7 @@ KeyboardDevice::MessageReceived(BMessage* message)
 status_t
 KeyboardDevice::Start()
 {
-	KD_CALLED();
+	CALLED();
 	TRACE("name: %s\n", fDeviceRef.name);
 
 	fFD = open(fPath, O_RDWR);
@@ -217,7 +185,7 @@ KeyboardDevice::Start()
 void
 KeyboardDevice::Stop()
 {
-	KD_CALLED();
+	CALLED();
 	TRACE("name: %s\n", fDeviceRef.name);
 
 	fActive = false;
@@ -237,7 +205,7 @@ KeyboardDevice::Stop()
 status_t
 KeyboardDevice::UpdateSettings(uint32 opcode)
 {
-	KD_CALLED();
+	CALLED();
 
 	if (fThread < 0)
 		return B_ERROR;
@@ -264,7 +232,7 @@ KeyboardDevice::_ControlThreadEntry(void* arg)
 int32
 KeyboardDevice::_ControlThread()
 {
-	KD_CALLED();
+	CALLED();
 	TRACE("fPath: %s\n", fPath);
 
 	if (fFD < B_OK) {
@@ -533,7 +501,7 @@ KeyboardDevice::_ControlThreadCleanup()
 void
 KeyboardDevice::_UpdateSettings(uint32 opcode)
 {
-	KD_CALLED();
+	CALLED();
 
 	if (opcode == 0 || opcode == B_KEY_REPEAT_RATE_CHANGED) {
 		if (get_key_repeat_rate(&fSettings.key_repeat_rate) != B_OK) {
@@ -621,7 +589,7 @@ KeyboardInputDevice::KeyboardInputDevice()
 	fDeviceListLock("KeyboardInputDevice list"),
 	fTeamMonitorWindow(NULL)
 {
-	KID_CALLED();
+	CALLED();
 
 	StartMonitoringDevice(kKeyboardDevicesDirectory);
 	_RecursiveScan(kKeyboardDevicesDirectory);
@@ -630,7 +598,7 @@ KeyboardInputDevice::KeyboardInputDevice()
 
 KeyboardInputDevice::~KeyboardInputDevice()
 {
-	KID_CALLED();
+	CALLED();
 
 	if (fTeamMonitorWindow) {
 		fTeamMonitorWindow->PostMessage(B_QUIT_REQUESTED);
@@ -645,7 +613,7 @@ KeyboardInputDevice::~KeyboardInputDevice()
 status_t
 KeyboardInputDevice::SystemShuttingDown()
 {
-	KID_CALLED();
+	CALLED();
 	if (fTeamMonitorWindow)
 		fTeamMonitorWindow->PostMessage(SYSTEM_SHUTTING_DOWN);
 
@@ -656,7 +624,7 @@ KeyboardInputDevice::SystemShuttingDown()
 status_t
 KeyboardInputDevice::InitCheck()
 {
-	KID_CALLED();
+	CALLED();
 	return BInputServerDevice::InitCheck();
 }
 
@@ -664,7 +632,7 @@ KeyboardInputDevice::InitCheck()
 status_t
 KeyboardInputDevice::Start(const char* name, void* cookie)
 {
-	KID_CALLED();
+	CALLED();
 	TRACE("name %s\n", name);
 
 	KeyboardDevice* device = (KeyboardDevice*)cookie;
@@ -676,7 +644,7 @@ KeyboardInputDevice::Start(const char* name, void* cookie)
 status_t
 KeyboardInputDevice::Stop(const char* name, void* cookie)
 {
-	KID_CALLED();
+	CALLED();
 	TRACE("name %s\n", name);
 
 	KeyboardDevice* device = (KeyboardDevice*)cookie;
@@ -690,7 +658,7 @@ status_t
 KeyboardInputDevice::Control(const char* name, void* cookie,
 	uint32 command, BMessage* message)
 {
-	KID_CALLED();
+	CALLED();
 	TRACE("KeyboardInputDevice::Control(%s, code: %" B_PRIu32 ")\n", name,
 		command);
 
@@ -708,7 +676,7 @@ KeyboardInputDevice::Control(const char* name, void* cookie,
 status_t
 KeyboardInputDevice::_HandleMonitor(BMessage* message)
 {
-	KID_CALLED();
+	CALLED();
 
 	const char* path;
 	int32 opcode;
@@ -745,7 +713,7 @@ KeyboardInputDevice::_FindDevice(const char* path) const
 status_t
 KeyboardInputDevice::_AddDevice(const char* path)
 {
-	KID_CALLED();
+	CALLED();
 	TRACE("path: %s\n", path);
 
 	BAutolock _(fDeviceListLock);
@@ -775,7 +743,7 @@ KeyboardInputDevice::_RemoveDevice(const char* path)
 	if (device == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	KID_CALLED();
+	CALLED();
 	TRACE("path: %s\n", path);
 
 	input_device_ref* devices[2];
@@ -793,7 +761,7 @@ KeyboardInputDevice::_RemoveDevice(const char* path)
 void
 KeyboardInputDevice::_RecursiveScan(const char* directory)
 {
-	KID_CALLED();
+	CALLED();
 	TRACE("directory: %s\n", directory);
 
 	BEntry entry;

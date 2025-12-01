@@ -36,43 +36,11 @@
 //#define TRACE_TABLET_DEVICE
 #ifdef TRACE_TABLET_DEVICE
 
-	class FunctionTracer {
-	public:
-		FunctionTracer(const void* pointer, const char* className,
-				const char* functionName,
-				int32& depth)
-			: fFunctionName(),
-			  fPrepend(),
-			  fFunctionDepth(depth),
-			  fPointer(pointer)
-		{
-			fFunctionDepth++;
-			fPrepend.Append(' ', fFunctionDepth * 2);
-			fFunctionName << className << "::" << functionName << "()";
-
-			debug_printf("%p -> %s%s {\n", fPointer, fPrepend.String(),
-				fFunctionName.String());
-		}
-
-		 ~FunctionTracer()
-		{
-			debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
-			fFunctionDepth--;
-		}
-
-	private:
-		BString	fFunctionName;
-		BString	fPrepend;
-		int32&	fFunctionDepth;
-		const void* fPointer;
-	};
-
+#include <private/shared/FunctionTracer.h>
 
 	static int32 sFunctionDepth = -1;
-#	define TD_CALLED(x...)	FunctionTracer _ft(this, "TabletDevice", \
-								__FUNCTION__, sFunctionDepth)
-#	define TID_CALLED(x...)	FunctionTracer _ft(this, "TabletInputDevice", \
-								__FUNCTION__, sFunctionDepth)
+#	define CALLED(x...)	FunctionTracer _ft(debug_printf, this, \
+								__PRETTY_FUNCTION__, sFunctionDepth)
 #	define TRACE(x...)	do { BString _to; \
 							_to.Append(' ', (sFunctionDepth + 1) * 2); \
 							debug_printf("%p -> %s", this, _to.String()); \
@@ -81,8 +49,7 @@
 #	define LOG_ERR(text...) TRACE(text)
 #else
 #	define TRACE(x...) do {} while (0)
-#	define TD_CALLED(x...) TRACE(x)
-#	define TID_CALLED(x...) TRACE(x)
+#	define CALLED(x...) TRACE(x)
 #	define LOG_ERR(x...) debug_printf(x)
 #	define LOG_EVENT(x...) TRACE(x)
 #endif
@@ -151,7 +118,7 @@ TabletDevice::TabletDevice(TabletInputDevice& target, const char* driverPath)
 	fActive(false),
 	fUpdateSettings(false)
 {
-	TD_CALLED();
+	CALLED();
 
 	fDeviceRef.name = _BuildShortName();
 	fDeviceRef.type = B_POINTING_DEVICE;
@@ -161,7 +128,7 @@ TabletDevice::TabletDevice(TabletInputDevice& target, const char* driverPath)
 
 TabletDevice::~TabletDevice()
 {
-	TD_CALLED();
+	CALLED();
 	TRACE("delete\n");
 
 	if (fActive)
@@ -174,7 +141,7 @@ TabletDevice::~TabletDevice()
 status_t
 TabletDevice::Start()
 {
-	TD_CALLED();
+	CALLED();
 
 	fDevice = open(fPath.String(), O_RDWR);
 		// let the control thread handle any error on opening the device
@@ -209,7 +176,7 @@ TabletDevice::Start()
 void
 TabletDevice::Stop()
 {
-	TD_CALLED();
+	CALLED();
 
 	fActive = false;
 		// this will stop the thread as soon as it reads the next packet
@@ -231,7 +198,7 @@ TabletDevice::Stop()
 status_t
 TabletDevice::UpdateSettings()
 {
-	TD_CALLED();
+	CALLED();
 
 	if (fThread < 0)
 		return B_ERROR;
@@ -281,7 +248,7 @@ TabletDevice::_ControlThreadEntry(void* arg)
 void
 TabletDevice::_ControlThread()
 {
-	TD_CALLED();
+	CALLED();
 
 	if (fDevice < 0) {
 		_ControlThreadCleanup();
@@ -415,7 +382,7 @@ TabletDevice::_ControlThreadCleanup()
 void
 TabletDevice::_UpdateSettings()
 {
-	TD_CALLED();
+	CALLED();
 
 	if (get_click_speed(fDeviceRef.name, &fSettings.click_speed) != B_OK)
 		LOG_ERR("error when get_click_speed\n");
@@ -454,7 +421,7 @@ TabletInputDevice::TabletInputDevice()
 	fDevices(2),
 	fDeviceListLock("TabletInputDevice list")
 {
-	TID_CALLED();
+	CALLED();
 
 	StartMonitoringDevice(kTabletDevicesDirectory);
 	_RecursiveScan(kTabletDevicesDirectory);
@@ -463,7 +430,7 @@ TabletInputDevice::TabletInputDevice()
 
 TabletInputDevice::~TabletInputDevice()
 {
-	TID_CALLED();
+	CALLED();
 
 	StopMonitoringDevice(kTabletDevicesDirectory);
 	fDevices.MakeEmpty();
@@ -473,7 +440,7 @@ TabletInputDevice::~TabletInputDevice()
 status_t
 TabletInputDevice::InitCheck()
 {
-	TID_CALLED();
+	CALLED();
 
 	return BInputServerDevice::InitCheck();
 }
@@ -482,7 +449,7 @@ TabletInputDevice::InitCheck()
 status_t
 TabletInputDevice::Start(const char* name, void* cookie)
 {
-	TID_CALLED();
+	CALLED();
 
 	TabletDevice* device = (TabletDevice*)cookie;
 
@@ -506,7 +473,7 @@ status_t
 TabletInputDevice::Control(const char* name, void* cookie,
 	uint32 command, BMessage* message)
 {
-	TRACE("%s(%s, code: %lu)\n", __PRETTY_FUNCTION__, name, command);
+	TRACE("%s(%s, code: %" B_PRIu32 ")\n", __PRETTY_FUNCTION__, name, command);
 
 	TabletDevice* device = (TabletDevice*)cookie;
 
@@ -523,7 +490,7 @@ TabletInputDevice::Control(const char* name, void* cookie,
 status_t
 TabletInputDevice::_HandleMonitor(BMessage* message)
 {
-	TID_CALLED();
+	CALLED();
 
 	const char* path;
 	int32 opcode;
@@ -543,7 +510,7 @@ TabletInputDevice::_HandleMonitor(BMessage* message)
 void
 TabletInputDevice::_RecursiveScan(const char* directory)
 {
-	TID_CALLED();
+	CALLED();
 
 	BEntry entry;
 	BDirectory dir(directory);
@@ -562,7 +529,7 @@ TabletInputDevice::_RecursiveScan(const char* directory)
 TabletDevice*
 TabletInputDevice::_FindDevice(const char* path) const
 {
-	TID_CALLED();
+	CALLED();
 
 	for (int32 i = fDevices.CountItems() - 1; i >= 0; i--) {
 		TabletDevice* device = fDevices.ItemAt(i);
@@ -577,7 +544,7 @@ TabletInputDevice::_FindDevice(const char* path) const
 status_t
 TabletInputDevice::_AddDevice(const char* path)
 {
-	TID_CALLED();
+	CALLED();
 
 	BAutolock _(fDeviceListLock);
 
@@ -608,7 +575,7 @@ TabletInputDevice::_AddDevice(const char* path)
 status_t
 TabletInputDevice::_RemoveDevice(const char* path)
 {
-	TID_CALLED();
+	CALLED();
 
 	BAutolock _(fDeviceListLock);
 
