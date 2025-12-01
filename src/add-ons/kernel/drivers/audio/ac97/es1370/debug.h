@@ -32,16 +32,16 @@
 
 #if DEBUG > 0
 	#define PRINT(a)		log_printf a
-	#define TRACE(a) 		debug_printf a
+	#define TRACE(a) 		es1370_debug_printf a
 	#define LOG(a)			log_printf a
 	#define LOG_CREATE()	log_create()
 	#define ASSERT(a)		if (a) {} else LOG(("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__))
 	void log_create();
 	void log_printf(const char *text,...);
-	void debug_printf(const char *text,...);
+	void es1370_debug_printf(const char *text,...);
 #else
-	void debug_printf(const char *text,...);
-	#define PRINT(a)	debug_printf a
+	void es1370_debug_printf(const char *text,...);
+	#define PRINT(a)	es1370_debug_printf a
 	#define TRACE(a)	((void)(0))
 	#define ASSERT(a)	((void)(0))
 	#define LOG(a)		((void)(0))

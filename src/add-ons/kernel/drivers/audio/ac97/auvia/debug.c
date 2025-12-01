@@ -50,12 +50,12 @@ static sem_id loglock;
 #endif
 
 
-void debug_printf(const char *text,...);
+void auvia_debug_printf(const char *text,...);
 void log_printf(const char *text,...);
 void log_create(void);
 
 
-void debug_printf(const char *text,...)
+void auvia_debug_printf(const char *text,...)
 {
 	char buf[1024];
 	va_list ap;

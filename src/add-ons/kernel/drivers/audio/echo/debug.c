@@ -48,11 +48,11 @@ static sem_id loglock;
 #endif
 
 
-void debug_printf(const char *text,...);
+void echo_debug_printf(const char *text,...);
 void log_printf(const char *text,...);
 
 
-void debug_printf(const char *text,...)
+void echo_debug_printf(const char *text,...)
 {
 	char buf[1024];
 	va_list ap;

@@ -46,11 +46,11 @@
 #undef TRACE
 #undef ASSERT
 
-void debug_printf(const char *text,...);
+void mpu401_debug_printf(const char *text,...);
 
 #if DEBUG > 0
 	#define PRINT(a)		log_printf a
-	#define TRACE(a) 		debug_printf a
+	#define TRACE(a) 		mpu401_debug_printf a
 	#define LOG(a)			log_printf a
 	#define LOG_CREATE()	log_create()
 	#define DEBUG_ONLY(a)	a
@@ -58,7 +58,7 @@ void debug_printf(const char *text,...);
 	void log_create(void);
 	void log_printf(const char *text,...);
 #else
-	#define PRINT(a)	debug_printf a
+	#define PRINT(a)	mpu401_debug_printf a
 	#define TRACE(a)	((void)(0))
 	#define ASSERT(a)	((void)(0))
 	#define LOG(a)		((void)(0))

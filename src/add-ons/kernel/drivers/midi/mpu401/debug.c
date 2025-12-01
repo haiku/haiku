@@ -44,7 +44,7 @@
 #define VERSION "0.2"
 
 
-void debug_printf(const char *text,...)
+void mpu401_debug_printf(const char *text,...)
 {
 	char buf[1024];
 	va_list ap;
