@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <util/BitUtils.h>
+#include <utils/BitUtils.h>
 
 
 namespace BKernel {

@@ -26,10 +26,11 @@
 #include <elf.h>
 #include <safemode.h>
 #include <smp.h>
-#include <util/BitUtils.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
+
+#include <utils/BitUtils.h>
 
 #include <arch_system_info.h>
 #include <arch/x86/apic.h>

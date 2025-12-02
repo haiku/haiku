@@ -8,10 +8,11 @@
 
 #include <StackOrHeapArray.h>
 #include <util/AutoLock.h>
-#include <util/BitUtils.h>
 #include <slab/Slab.h>
 #include <thread.h>
 #include <vfs.h>
+
+#include <utils/BitUtils.h>
 
 #include <vm/VMCache.h>
 #include <vm/vm_page.h>

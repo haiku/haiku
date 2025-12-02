@@ -47,13 +47,14 @@
 #include <team.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
-#include <util/BitUtils.h>
 #include <util/ThreadAutoLock.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
 #include <vm/VMArea.h>
 #include <vm/VMCache.h>
+
+#include <utils/BitUtils.h>
 
 #include "VMAddressSpaceLocking.h"
 #include "VMAnonymousCache.h"
