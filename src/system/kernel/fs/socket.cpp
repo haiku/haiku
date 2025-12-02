@@ -1099,6 +1099,7 @@ _user_sendto(int socket, const void *data, size_t length, int flags,
 
 	// copy address from userland
 	char address[MAX_SOCKET_ADDRESS_LENGTH];
+	memset(address, 0, MAX_SOCKET_ADDRESS_LENGTH);
 	if (userAddress != NULL) {
 		if (!IS_USER_ADDRESS(userAddress)
 			|| user_memcpy(address, userAddress, addressLength) != B_OK) {
