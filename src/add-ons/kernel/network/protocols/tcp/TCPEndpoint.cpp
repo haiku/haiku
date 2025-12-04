@@ -1225,7 +1225,7 @@ TCPEndpoint::_Disconnect(bool closing)
 
 	if (fState == SYNCHRONIZE_RECEIVED || fState == ESTABLISHED) {
 		// We "should send a RST if there is any unread received data,
-		// or if any new data is received" (RFC 2525 § 2.16). This
+		// or if any new data is received" (RFC 2525 § 2.17). This
 		// isn't a TCP state, so use a flag.
 		if (closing && fReceiveQueue.Available() > 0)
 			fFlags |= FLAG_USER_CLOSED;
