@@ -98,7 +98,27 @@ put_stack_interface_module()
 
 
 static status_t
-prepare_userland_address_result(struct sockaddr* userAddress,
+copy_address_from_userland(const sockaddr* userAddress, socklen_t addressLength,
+	sockaddr_storage* address)
+{
+	if (userAddress == NULL || addressLength < 0 || addressLength > MAX_SOCKET_ADDRESS_LENGTH)
+		return B_BAD_VALUE;
+
+	*address = {};
+	if (!IS_USER_ADDRESS(userAddress)
+			|| user_memcpy(address, userAddress, addressLength) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
+	address->ss_len = addressLength;
+		// make sure the sa_len field is set correctly
+
+	return B_OK;
+}
+
+
+static status_t
+prepare_userland_address_result(struct sockaddr*& userAddress,
 	socklen_t* _addressLength, socklen_t& addressLength, bool addressRequired)
 {
 	// check parameters
@@ -110,8 +130,11 @@ prepare_userland_address_result(struct sockaddr* userAddress,
 	} else {
 		if (!IS_USER_ADDRESS(_addressLength))
 			return B_BAD_ADDRESS;
-		if (!IS_USER_ADDRESS(userAddress) && addressRequired)
-			return B_BAD_ADDRESS;
+		if (!IS_USER_ADDRESS(userAddress)) {
+			if (addressRequired)
+				return B_BAD_ADDRESS;
+			userAddress = (struct sockaddr*)(intptr_t)-1;
+		}
 	}
 
 	// copy the buffer size from userland
@@ -190,6 +213,7 @@ prepare_userland_msghdr(const msghdr* userMessage, msghdr& message,
 		if (message.msg_namelen > MAX_SOCKET_ADDRESS_LENGTH)
 			message.msg_namelen = MAX_SOCKET_ADDRESS_LENGTH;
 
+		memset(address, 0, MAX_SOCKET_ADDRESS_LENGTH);
 		message.msg_name = address;
 	}
 
@@ -880,22 +904,13 @@ status_t
 _user_bind(int socket, const struct sockaddr *userAddress,
 	socklen_t addressLength)
 {
-	// check parameters and copy address from userland
-	if (userAddress == NULL || addressLength > MAX_SOCKET_ADDRESS_LENGTH)
-		return B_BAD_VALUE;
-
 	sockaddr_storage address;
-	memset(&address, 0, sizeof(address));
-	if (!IS_USER_ADDRESS(userAddress)
-			|| user_memcpy(&address, userAddress, addressLength) != B_OK) {
-		return B_BAD_ADDRESS;
-	}
+	status_t error = copy_address_from_userland(userAddress, addressLength, &address);
+	if (error != B_OK)
+		return error;
 
-	address.ss_len = addressLength;
-		// make sure the sa_len field is set correctly
-
-	SyscallRestartWrapper<status_t> error;
-	return error = common_bind(socket, (sockaddr*)&address, addressLength,
+	SyscallRestartWrapper<status_t> result;
+	return result = common_bind(socket, (sockaddr*)&address, addressLength,
 		false);
 }
 
@@ -912,23 +927,13 @@ status_t
 _user_connect(int socket, const struct sockaddr *userAddress,
 	socklen_t addressLength)
 {
-	// check parameters and copy address from userland
-	if (userAddress == NULL || addressLength > MAX_SOCKET_ADDRESS_LENGTH)
-		return B_BAD_VALUE;
-
 	sockaddr_storage address;
-	memset(&address, 0, sizeof(address));
-	if (!IS_USER_ADDRESS(userAddress)
-			|| user_memcpy(&address, userAddress, addressLength) != B_OK) {
-		return B_BAD_ADDRESS;
-	}
+	status_t error = copy_address_from_userland(userAddress, addressLength, &address);
+	if (error != B_OK)
+		return error;
 
-	address.ss_len = addressLength;
-		// make sure the sa_len field is set correctly
-
-	SyscallRestartWrapper<status_t> error;
-
-	return error = common_connect(socket, (sockaddr*)&address, addressLength,
+	SyscallRestartWrapper<status_t> result;
+	return result = common_connect(socket, (sockaddr*)&address, addressLength,
 		false);
 }
 
@@ -951,12 +956,11 @@ _user_accept(int socket, struct sockaddr *userAddress,
 		_addressLength, addressLength, false);
 	if (error != B_OK)
 		return error;
+	const socklen_t userAddressBufferSize = addressLength;
 
 	// accept()
 	SyscallRestartWrapper<int> result;
-
-	char address[MAX_SOCKET_ADDRESS_LENGTH];
-	socklen_t userAddressBufferSize = addressLength;
+	char address[MAX_SOCKET_ADDRESS_LENGTH] = {};
 	result = common_accept(socket,
 		userAddress != NULL ? (sockaddr*)address : NULL, &addressLength, flags, false);
 
@@ -995,12 +999,11 @@ _user_recvfrom(int socket, void *data, size_t length, int flags,
 		_addressLength, addressLength, false);
 	if (error != B_OK)
 		return error;
+	const socklen_t userAddressBufferSize = addressLength;
 
 	// recvfrom()
 	SyscallRestartWrapper<ssize_t> result;
-
-	char address[MAX_SOCKET_ADDRESS_LENGTH];
-	socklen_t userAddressBufferSize = addressLength;
+	char address[MAX_SOCKET_ADDRESS_LENGTH] = {};
 	result = common_recvfrom(socket, data, length, flags,
 		userAddress != NULL ? (sockaddr*)address : NULL, &addressLength, false);
 	if (result < 0)
@@ -1052,7 +1055,6 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 
 	// recvmsg()
 	SyscallRestartWrapper<ssize_t> result;
-
 	result = common_recvmsg(socket, &message, flags, false);
 	if (result < 0)
 		return result;
@@ -1092,28 +1094,20 @@ _user_sendto(int socket, const void *data, size_t length, int flags,
 	if (length > 0 && (data == NULL || !is_user_address_range(data, length)))
 		return B_BAD_ADDRESS;
 
-	if (addressLength < 0
-			|| addressLength > MAX_SOCKET_ADDRESS_LENGTH) {
-		return B_BAD_VALUE;
-	}
-
 	// copy address from userland
-	char address[MAX_SOCKET_ADDRESS_LENGTH];
-	memset(address, 0, MAX_SOCKET_ADDRESS_LENGTH);
+	sockaddr_storage address;
 	if (userAddress != NULL) {
-		if (!IS_USER_ADDRESS(userAddress)
-			|| user_memcpy(address, userAddress, addressLength) != B_OK) {
-			return B_BAD_ADDRESS;
-		}
+		status_t error = copy_address_from_userland(userAddress, addressLength, &address);
+		if (error != B_OK)
+			return error;
 	} else {
 		addressLength = 0;
 	}
 
 	// sendto()
 	SyscallRestartWrapper<ssize_t> result;
-
 	return result = common_sendto(socket, data, length, flags,
-		userAddress != NULL ? (sockaddr*)address : NULL, addressLength, false);
+		userAddress != NULL ? (sockaddr*)&address : NULL, addressLength, false);
 }
 
 
@@ -1162,7 +1156,6 @@ _user_sendmsg(int socket, const struct msghdr *userMessage, int flags)
 
 	// sendmsg()
 	SyscallRestartWrapper<ssize_t> result;
-
 	return result = common_sendmsg(socket, &message, flags, false);
 }
 
@@ -1234,10 +1227,10 @@ _user_getpeername(int socket, struct sockaddr *userAddress,
 		addressLength, true);
 	if (error != B_OK)
 		return error;
+	const socklen_t userAddressBufferSize = addressLength;
 
 	// getpeername()
-	char address[MAX_SOCKET_ADDRESS_LENGTH];
-	socklen_t userAddressBufferSize = addressLength;
+	char address[MAX_SOCKET_ADDRESS_LENGTH] = {};
 	error = common_getpeername(socket, (sockaddr*)address, &addressLength,
 		false);
 	if (error != B_OK)
@@ -1264,10 +1257,10 @@ _user_getsockname(int socket, struct sockaddr *userAddress,
 		addressLength, true);
 	if (error != B_OK)
 		return error;
+	const socklen_t userAddressBufferSize = addressLength;
 
 	// getsockname()
-	char address[MAX_SOCKET_ADDRESS_LENGTH];
-	socklen_t userAddressBufferSize = addressLength;
+	char address[MAX_SOCKET_ADDRESS_LENGTH] = {};
 	error = common_getsockname(socket, (sockaddr*)address, &addressLength,
 		false);
 	if (error != B_OK)
