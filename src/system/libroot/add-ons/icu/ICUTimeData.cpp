@@ -321,6 +321,9 @@ ICUTimeData::_SetLCTimePattern(DateFormat* format, char* destination,
 		// last character (via lastCharSeen)
 		for (int i = 0; i <= icuPattern.length(); ++i) {
 			UChar currChar = icuPattern.charAt(i);
+			if (u_isspace(currChar))
+				currChar = ' ';
+
 			if (lastCharSeen != 0 && currChar == lastCharSeen) {
 				lastCharCount++;
 				continue;
