@@ -13,6 +13,7 @@
 
 #include <Alert.h>
 #include <Beep.h>
+#include <Notification.h>
 #include <Notifications.h>
 #include <PropertyInfo.h>
 #include <Roster.h>
@@ -59,9 +60,11 @@ NotificationServer::MessageReceived(BMessage* message)
 				return;
 
 			// Emit a sound for this event
+			// Progress notifications only emit a sound if the visible percentage changed
 			int32 type = 0;
 			if (message->FindInt32("_type", &type) == B_OK) {
-				if (type < (int32)(sizeof(kSoundNames) / sizeof(const char*)))
+				if (type < (int32)(sizeof(kSoundNames) / sizeof(const char*))
+					&& type != B_PROGRESS_NOTIFICATION)
 					system_beep(kSoundNames[type]);
 			}
 

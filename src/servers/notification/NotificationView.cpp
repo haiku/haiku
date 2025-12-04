@@ -529,6 +529,15 @@ NotificationView::MessageID() const
 }
 
 
+int
+NotificationView::ProgressPercent()
+{
+	if (fNotification->Type() == B_PROGRESS_NOTIFICATION)
+		return (int)(fNotification->Progress() * 100.0);
+	return -1;
+}
+
+
 void
 NotificationView::_CalculateSize()
 {

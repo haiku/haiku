@@ -48,6 +48,7 @@ public:
 			void				SetPreviewModeOn(bool enabled);
 
 			const char*			MessageID() const;
+			int					ProgressPercent();
 
 private:
 			void				_CalculateSize();

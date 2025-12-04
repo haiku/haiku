@@ -14,6 +14,7 @@
 
 #include <algorithm>
 
+#include <Beep.h>
 #include <ControlLook.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
@@ -223,6 +224,10 @@ AppGroupView::AddInfo(NotificationView* view)
 		for (int32 i = 0; i < children; i++) {
 			if (id == fInfo[i]->MessageID()) {
 				NotificationView* oldView = fInfo[i];
+				if(view->ProgressPercent() != oldView->ProgressPercent()
+					&& view->ProgressPercent() >= 0) {
+					system_beep("Notification progress");
+				}
 				oldView->RemoveSelf();
 				delete oldView;
 				fInfo[i] = view;
@@ -240,6 +245,8 @@ AppGroupView::AddInfo(NotificationView* view)
 	}
 
 	if (!found) {
+		if(view->ProgressPercent() >= 0)
+			system_beep("Notification progress");
 		fInfo.push_back(view);
 	}
 	GetLayout()->AddView(view);
