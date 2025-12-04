@@ -95,9 +95,19 @@ const char *__strftime_fmt_1(char (*s)[100], size_t *l, int f, const struct tm *
 		if (f=='g') val %= 100;
 		else width = 4;
 		goto number;
+#ifdef __HAIKU__
+	case 'k':
+		def_pad = '_';
+		// fallthrough
+#endif
 	case 'H':
 		val = tm->tm_hour;
 		goto number;
+#ifdef __HAIKU__
+	case 'l':
+		def_pad = '_';
+		// fallthrough
+#endif
 	case 'I':
 		val = tm->tm_hour;
 		if (!val) val = 12;
