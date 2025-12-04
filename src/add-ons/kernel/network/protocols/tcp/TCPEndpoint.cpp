@@ -323,7 +323,8 @@ enum {
 	FLAG_RECOVERY				= 0x40,
 	FLAG_OPTION_SACK_PERMITTED	= 0x80,
 	FLAG_AUTO_RECEIVE_BUFFER_SIZE = 0x100,
-	FLAG_CAN_NOTIFY 			= 0x200
+	FLAG_CAN_NOTIFY 			= 0x200,
+	FLAG_USER_CLOSED			= 0x400
 };
 
 
@@ -821,7 +822,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 
 	TRACE("SendData(buffer %p, size %" B_PRIu32 ", flags %#" B_PRIx32
 		") [total %" B_PRIuSIZE " bytes, has %" B_PRIuSIZE "]", buffer,
-		buffer->size, buffer->flags, fSendQueue.Size(), fSendQueue.Free());
+		buffer->size, buffer->msg_flags, fSendQueue.Size(), fSendQueue.Free());
 	T(APICall(this, "senddata"));
 
 	const uint32 flags = buffer->msg_flags;
@@ -1222,9 +1223,14 @@ TCPEndpoint::_Disconnect(bool closing)
 {
 	tcp_state previousState = fState;
 
-	if (fState == SYNCHRONIZE_RECEIVED || fState == ESTABLISHED)
+	if (fState == SYNCHRONIZE_RECEIVED || fState == ESTABLISHED) {
+		// We "should send a RST if there is any unread received data,
+		// or if any new data is received" (RFC 2525 § 2.16). This
+		// isn't a TCP state, so use a flag.
+		if (closing && fReceiveQueue.Available() > 0)
+			fFlags |= FLAG_USER_CLOSED;
 		fState = FINISH_SENT;
-	else if (fState == FINISH_RECEIVED)
+	} else if (fState == FINISH_RECEIVED)
 		fState = WAIT_FOR_FINISH_ACKNOWLEDGE;
 	else
 		return B_OK;
@@ -1237,6 +1243,9 @@ TCPEndpoint::_Disconnect(bool closing)
 		T(State(this));
 		return status;
 	}
+
+	if ((fFlags & FLAG_USER_CLOSED) != 0)
+		fState = CLOSED;
 
 	return B_OK;
 }
@@ -2344,7 +2353,7 @@ TCPEndpoint::_SendQueued(bool force)
 
 		if ((fSendNext + segmentLength) == fSendQueue.LastSequence() && !force) {
 			if (state_needs_finish(fState))
-				segment.flags |= TCP_FLAG_FINISH;
+				segment.flags |= (fFlags & FLAG_USER_CLOSED) != 0 ? TCP_FLAG_RESET : TCP_FLAG_FINISH;
 			if (length > 0)
 				segment.flags |= TCP_FLAG_PUSH;
 		}
