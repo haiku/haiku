@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2022 Haiku, Inc. All rights reserved.
+ * Copyright 2005-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -400,6 +400,13 @@ AboutWindow::AboutWindow()
 
 	fAboutView = new AboutView();
 	AddChild(fAboutView);
+
+	UpdateSizeLimits();
+
+	// Resize according to golden rule
+	float width = Bounds().IntegerWidth();
+	if (width * 0.618 > Bounds().Height())
+		ResizeTo(width, width * 0.618);
 
 	CenterOnScreen();
 }
