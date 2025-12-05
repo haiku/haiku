@@ -196,6 +196,9 @@ class AllocationGroup {
 public:
 	AllocationGroup();
 
+	void Initialize(uint32 start, uint32 numBits, uint32 numBitmapBlocks);
+	void InitializeEmpty(uint32 start, uint32 numBits, uint32 numBitmapBlocks);
+
 	void AddFreeRange(int32 start, int32 blocks);
 	bool IsFull() const { return fFreeBits == 0; }
 
@@ -204,14 +207,21 @@ public:
 
 	uint32 NumBits() const { return fNumBits; }
 	uint32 NumBitmapBlocks() const { return fNumBitmapBlocks; }
-	int32 Start() const { return fStart; }
+	uint32 Start() const { return fStart; }
+
+	uint32 NumFreeBits() const { return fFreeBits; }
+	int32 FirstFree() const { return fFirstFree; }
+
+	bool LargestValid() const { return fLargestValid; }
+	int32 LargestStart() const { return fLargestStart; }
+	int32 LargestLength() const { return fLargestLength; }
+
+	void SetLargest(int32 start, int32 length);
 
 private:
-	friend class BlockAllocator;
-
 	uint32	fNumBits;
 	uint32	fNumBitmapBlocks;
-	int32	fStart;
+	uint32	fStart;
 	int32	fFirstFree;
 	int32	fFreeBits;
 
@@ -362,9 +372,11 @@ AllocationBlock::Free(uint16 start, uint16 numBlocks)
 //	#pragma mark -
 
 
-/*!	The allocation groups are created and initialized in
-	BlockAllocator::Initialize() and BlockAllocator::InitializeAndClearBitmap()
-	respectively.
+/*!	The allocation groups are created and initialized in BlockAllocator::Initialize()
+	and BlockAllocator::InitializeAndClearBitmap() respectively.
+
+	The constructor will set up the group full, without any free space. You need to
+	call Initialize() (or InitializeEmpty()) before using the group.
 */
 AllocationGroup::AllocationGroup()
 	:
@@ -372,6 +384,25 @@ AllocationGroup::AllocationGroup()
 	fFreeBits(0),
 	fLargestValid(false)
 {
+}
+
+
+void
+AllocationGroup::Initialize(uint32 start, uint32 numBits, uint32 numBitmapBlocks)
+{
+	fStart = start;
+	fNumBits = numBits;
+	fNumBitmapBlocks = numBitmapBlocks;
+}
+
+
+void
+AllocationGroup::InitializeEmpty(uint32 start, uint32 numBits, uint32 numBitmapBlocks)
+{
+	Initialize(start, numBits, numBitmapBlocks);
+	fFirstFree = fLargestStart = 0;
+	fFreeBits = fLargestLength = fNumBits;
+	fLargestValid = true;
 }
 
 
@@ -523,6 +554,15 @@ AllocationGroup::Free(Transaction& transaction, uint16 start, int32 length)
 }
 
 
+void
+AllocationGroup::SetLargest(int32 start, int32 length)
+{
+	fLargestStart = start;
+	fLargestLength = length;
+	fLargestValid = true;
+}
+
+
 //	#pragma mark -
 
 
@@ -604,17 +644,13 @@ BlockAllocator::InitializeAndClearBitmap(Transaction& transaction)
 
 		// the last allocation group may contain less blocks than the others
 		if (i == fNumGroups - 1) {
-			fGroups[i].fNumBits = fVolume->NumBlocks() - i * numBits;
-			fGroups[i].fNumBitmapBlocks = 1 + ((fGroups[i].NumBits() - 1)
+			uint32 lastNumBits = fVolume->NumBlocks() - i * numBits;
+			uint32 lastNumBitmapBlocks = 1 + ((fGroups[i].NumBits() - 1)
 				>> (blockShift + 3));
+			fGroups[i].InitializeEmpty((uint32)offset, lastNumBits, lastNumBitmapBlocks);
 		} else {
-			fGroups[i].fNumBits = numBits;
-			fGroups[i].fNumBitmapBlocks = fBlocksPerGroup;
+			fGroups[i].InitializeEmpty((uint32)offset, numBits, fBlocksPerGroup);
 		}
-		fGroups[i].fStart = offset;
-		fGroups[i].fFirstFree = fGroups[i].fLargestStart = 0;
-		fGroups[i].fFreeBits = fGroups[i].fLargestLength = fGroups[i].fNumBits;
-		fGroups[i].fLargestValid = true;
 
 		offset += fBlocksPerGroup;
 	}
@@ -686,18 +722,17 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 
 		// the last allocation group may contain less blocks than the others
 		if (i == numGroups - 1) {
-			groups[i].fNumBits = volume->NumBlocks() - i * bitsPerGroup;
-			groups[i].fNumBitmapBlocks = 1 + ((groups[i].NumBits() - 1)
+			uint32 lastNumBits = volume->NumBlocks() - i * bitsPerGroup;
+			uint32 lastNumBitmapBlocks = 1 + ((groups[i].NumBits() - 1)
 				>> (blockShift + 3));
+			groups[i].Initialize((uint32)offset, lastNumBits, lastNumBitmapBlocks);
 		} else {
-			groups[i].fNumBits = bitsPerGroup;
-			groups[i].fNumBitmapBlocks = blocks;
+			groups[i].Initialize((uint32)offset, bitsPerGroup, blocks);
 		}
-		groups[i].fStart = offset;
 
 		// finds all free ranges in this allocation group
 		int32 start = -1, range = 0;
-		int32 numBits = groups[i].fNumBits, bit = 0;
+		int32 numBits = groups[i].NumBits(), bit = 0;
 		int32 count = (numBits + 31) / 32;
 
 		for (int32 k = 0; k < count; k++) {
@@ -717,7 +752,7 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 		if (range)
 			groups[i].AddFreeRange(start, range);
 
-		freeBlocks += groups[i].fFreeBits;
+		freeBlocks += groups[i].NumFreeBits();
 
 		offset += blocks;
 	}
@@ -877,19 +912,19 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 		// The wanted maximum is smaller than the largest free block in the
 		// group or already smaller than the minimum
 
-		if (start < group.fFirstFree)
-			start = group.fFirstFree;
+		if (start < group.FirstFree())
+			start = group.FirstFree();
 
-		if (group.fLargestValid) {
-			if (group.fLargestLength < bestLength)
+		if (group.LargestValid()) {
+			if (group.LargestLength() < bestLength)
 				continue;
 
-			if (group.fLargestStart >= start
-				&& group.fLargestStart + group.fLargestLength <= (int32)end) {
-				if (group.fLargestLength >= bestLength) {
+			if (group.LargestStart() >= start
+				&& group.LargestStart() + group.LargestLength() <= (int32)end) {
+				if (group.LargestLength() >= bestLength) {
 					bestGroup = groupIndex;
-					bestStart = group.fLargestStart;
-					bestLength = group.fLargestLength;
+					bestStart = group.LargestStart();
+					bestLength = group.LargestLength();
 
 					if (bestLength >= maximum)
 						break;
@@ -1002,12 +1037,8 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 			}
 		}
 
-		if (canFindGroupLargest && !group.fLargestValid
-			&& groupLargestLength >= 0) {
-			group.fLargestStart = groupLargestStart;
-			group.fLargestLength = groupLargestLength;
-			group.fLargestValid = true;
-		}
+		if (canFindGroupLargest && !group.LargestValid() && groupLargestLength >= 0)
+			group.SetLargest(groupLargestStart, groupLargestLength);
 
 		if (bestLength >= maximum)
 			break;
@@ -1478,9 +1509,9 @@ bool
 BlockAllocator::IsValidBlockRun(block_run run, const char* type)
 {
 	if (run.AllocationGroup() < 0 || run.AllocationGroup() >= fNumGroups
-		|| run.Start() > fGroups[run.AllocationGroup()].fNumBits
+		|| run.Start() > fGroups[run.AllocationGroup()].NumBits()
 		|| uint32(run.Start() + run.Length())
-				> fGroups[run.AllocationGroup()].fNumBits
+				> fGroups[run.AllocationGroup()].NumBits()
 		|| run.length == 0) {
 		PRINT(("%s: block_run(%" B_PRId32 ", %" B_PRIu16 ", %" B_PRIu16")"
 			" is invalid!\n", type, run.AllocationGroup(), run.Start(),
@@ -1579,11 +1610,11 @@ BlockAllocator::Dump(int32 index)
 			group.NumBits(), &group);
 		kprintf("      num blocks:     %" B_PRIu32 "\n", group.NumBitmapBlocks());
 		kprintf("      start:          %" B_PRId32 "\n", group.Start());
-		kprintf("      first free:     %" B_PRId32 "\n", group.fFirstFree);
-		kprintf("      largest start:  %" B_PRId32 "%s\n", group.fLargestStart,
-			group.fLargestValid ? "" : "  (invalid)");
-		kprintf("      largest length: %" B_PRId32 "\n", group.fLargestLength);
-		kprintf("      free bits:      %" B_PRId32 "\n", group.fFreeBits);
+		kprintf("      first free:     %" B_PRId32 "\n", group.FirstFree());
+		kprintf("      largest start:  %" B_PRId32 "%s\n", group.LargestStart(),
+			group.LargestValid() ? "" : "  (invalid)");
+		kprintf("      largest length: %" B_PRId32 "\n", group.LargestLength());
+		kprintf("      free bits:      %" B_PRId32 "\n", group.NumFreeBits());
 	}
 }
 
