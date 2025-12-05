@@ -1564,7 +1564,9 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 void
 BTextView::SelectAll()
 {
-	Select(0, fText->Length());
+	// Place the cursor at the end of the selection.
+	fCaretOffset = fText->Length();
+	Select(0, fCaretOffset);
 }
 
 
