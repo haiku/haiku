@@ -173,15 +173,17 @@ public:
 
 	inline void Allocate(uint16 start, uint16 numBlocks);
 	inline void Free(uint16 start, uint16 numBlocks);
-	inline bool IsUsed(uint16 block);
+	inline bool IsUsed(uint16 block) const;
+	inline bool AreAnyUsed(uint16 block, uint16 numBlocks) const;
 	inline uint32 NextFree(uint16 startBlock);
 
-	status_t SetTo(AllocationGroup& group, uint16 block);
+	status_t SetTo(const AllocationGroup& group, uint16 block);
 	status_t SetToWritable(Transaction& transaction, AllocationGroup& group,
 		uint16 block);
 
 	uint32 NumBlockBits() const { return fNumBits; }
 	uint32& Chunk(int32 index) { return ((uint32*)fBlock)[index]; }
+	uint32 Chunk(int32 index) const { return ((uint32*)fBlock)[index]; }
 	uint8* Block() const { return (uint8*)fBlock; }
 
 private:
@@ -201,6 +203,7 @@ public:
 
 	void AddFreeRange(int32 start, int32 blocks);
 	bool IsFull() const { return fFreeBits == 0; }
+	status_t RangeHasUsedBlocks(Volume* volume, uint16 start, int32 length, bool& _used) const;
 
 	status_t Allocate(Transaction& transaction, uint16 start, int32 length);
 	status_t Free(Transaction& transaction, uint16 start, int32 length);
@@ -232,13 +235,14 @@ private:
 
 
 AllocationBlock::AllocationBlock(Volume* volume)
-	: CachedBlock(volume)
+	:
+	CachedBlock(volume)
 {
 }
 
 
 status_t
-AllocationBlock::SetTo(AllocationGroup& group, uint16 block)
+AllocationBlock::SetTo(const AllocationGroup& group, uint16 block)
 {
 	// 8 blocks per byte
 	fNumBits = fVolume->BlockSize() << 3;
@@ -267,17 +271,6 @@ AllocationBlock::SetToWritable(Transaction& transaction, AllocationGroup& group,
 	fWritable = true;
 #endif
 	return CachedBlock::SetToWritable(transaction, group.Start() + block);
-}
-
-
-bool
-AllocationBlock::IsUsed(uint16 block)
-{
-	if (block > fNumBits)
-		return true;
-
-	// the block bitmap is accessed in 32-bit chunks
-	return Chunk(block >> 5) & HOST_ENDIAN_TO_BFS_INT32(1UL << (block % 32));
 }
 
 
@@ -369,6 +362,41 @@ AllocationBlock::Free(uint16 start, uint16 numBlocks)
 }
 
 
+bool
+AllocationBlock::IsUsed(uint16 block) const
+{
+	if (block > fNumBits)
+		return true;
+
+	// the block bitmap is accessed in 32-bit chunks
+	return Chunk(block >> 5) & HOST_ENDIAN_TO_BFS_INT32(1UL << (block % 32));
+}
+
+
+bool
+AllocationBlock::AreAnyUsed(uint16 start, uint16 numBlocks) const
+{
+	ASSERT(start < fNumBits);
+	ASSERT(uint32(start + numBlocks) <= fNumBits);
+
+	int32 block = start >> 5;
+
+	while (numBlocks > 0) {
+		uint32 mask = 0;
+		for (int32 i = start % 32; i < 32 && numBlocks; i++, numBlocks--)
+			mask |= 1UL << i;
+
+		// check for already set blocks
+		if ((HOST_ENDIAN_TO_BFS_INT32(mask) & Chunk(block)) != 0)
+			return true;
+
+		start = 0;
+		block++;
+	}
+	return false;
+}
+
+
 //	#pragma mark -
 
 
@@ -422,6 +450,39 @@ AllocationGroup::AddFreeRange(int32 start, int32 blocks)
 	}
 
 	fFreeBits += blocks;
+}
+
+
+status_t
+AllocationGroup::RangeHasUsedBlocks(Volume* volume, uint16 start, int32 length, bool& _used) const
+{
+	// calculate block in the block bitmap and position within
+	uint32 bitsPerBlock = volume->BlockSize() << 3;
+	uint32 block = start / bitsPerBlock;
+	start = start % bitsPerBlock;
+
+	AllocationBlock cached(volume);
+
+	while (length > 0) {
+		if (cached.SetTo(*this, block) < B_OK)
+			RETURN_ERROR(B_IO_ERROR);
+
+		uint32 numBlocks = length;
+		if (start + numBlocks > cached.NumBlockBits())
+			numBlocks = cached.NumBlockBits() - start;
+
+		if (cached.AreAnyUsed(start, numBlocks)) {
+			_used = true;
+			return B_OK;
+		}
+
+		length -= numBlocks;
+		start = 0;
+		block++;
+	}
+
+	_used = false;
+	return B_OK;
 }
 
 
@@ -1171,29 +1232,18 @@ BlockAllocator::AllocateBlockRun(Transaction& transaction, block_run run)
 {
 	RecursiveLocker lock(fLock);
 
-	if (run.AllocationGroup() >= fNumGroups)
+	if (run.AllocationGroup() >= fNumGroups || !IsCompletelyInsideAllowedRange(run))
 		return B_BAD_VALUE;
 
-	if (!IsCompletelyInsideAllowedRange(run))
+	AllocationGroup& group = fGroups[run.AllocationGroup()];
+	bool used;
+	status_t status = group.RangeHasUsedBlocks(fVolume, run.Start(), run.Length(), used);
+	if (status != B_OK)
+		return status;
+	if (used)
 		return B_DEVICE_FULL;
 
-	uint32 bitsPerBlock = fVolume->BlockSize() << 3;
-
-	AllocationGroup& group = fGroups[run.AllocationGroup()];
-	AllocationBlock cached(fVolume);
-
-	int32 end = run.Start() + run.Length();
-
-	// check that the requested blocks are free
-	for (int32 block = run.Start(); block < end; block++) {
-		if (cached.SetTo(group, block / bitsPerBlock) < B_OK)
-			RETURN_ERROR(B_ERROR);
-
-		if (cached.IsUsed(block % bitsPerBlock))
-			return B_DEVICE_FULL;
-	}
-
-	status_t status = group.Allocate(transaction, run.Start(), run.Length());
+	status = group.Allocate(transaction, run.Start(), run.Length());
 	if (status != B_OK)
 		return status;
 
