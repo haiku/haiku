@@ -1,4 +1,6 @@
-1	turkish	x-vnd.Haiku-ActivityMonitor	2467534740
+1	turkish	x-vnd.Haiku-ActivityMonitor	923507156
+Temp	DataSource		Sıcaklık
+Temperature	DataSource		Sıcaklık
 Teams	DataSource		Takımlar
 Semaphores	DataSource		Semaforlar
 TX	DataSource	Shorter version for Sending	TX

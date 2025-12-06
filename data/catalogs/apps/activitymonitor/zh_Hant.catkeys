@@ -1,4 +1,6 @@
-1	english	x-vnd.Haiku-ActivityMonitor	2467534740
+1	english	x-vnd.Haiku-ActivityMonitor	923507156
+Temp	DataSource		溫度
+Temperature	DataSource		溫度
 Teams	DataSource		隊列
 Semaphores	DataSource		信號量
 TX	DataSource	Shorter version for Sending	TX

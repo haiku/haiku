@@ -1,7 +1,6 @@
-1	korean	x-vnd.Haiku-Network	543099905
+1	korean	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		이더넷 장치
 Link speed:	IntefaceView		링크 속도:
-disconnected	IntefaceView		연결 끊김
 WPA	WPA protected network		WPA
 Network:	IntefaceView		네트워크:
 Received:	IntefaceView		수신됨:

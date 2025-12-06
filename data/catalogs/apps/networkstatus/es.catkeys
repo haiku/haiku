@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-NetworkStatus	2828540217
+1	spanish; castilian	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		Dirección IPv6:
 Quit	NetworkStatusView		Salir
 Unknown	NetworkStatusView		Desconocido
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Difusión:
 OK	NetworkStatusView		Aceptar
 No link	NetworkStatusView		Sin enlace
 Could not join wireless network:\n	NetworkStatusView		No se pudo conectar a la red inalámbrica:\n
-Ready	NetworkStatusView		Listo
 Network Status	NetworkStatusView		Estado de la red
 Deskbar is not running, giving up.	NetworkStatus		Deskbar no está en ejecución. Cancelando.
 Netmask:	NetworkStatusView		Máscara de red:

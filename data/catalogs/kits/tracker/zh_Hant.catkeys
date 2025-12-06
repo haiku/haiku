@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2992119353
+1	english	x-vnd.Haiku-libtracker	2433311519
 Created	ContainerWindow		創建
 Icon	AttributesView		圖標
 Open and make preferred	OpenWithWindow		開啓並設為首選
@@ -32,6 +32,7 @@ Value	AttributesView		數值
 Information	InfoWindow		資訊
 Error emptying Trash	FSUtils		清空資源回收筒出錯
 Opens with:	InfoWindow		開啓以：
+You cannot copy or move the Printers directory.	FSUtils		印表機目录無法複製或移動。
 Size	QueryPoseView		大小
 Disk mount	TrackerSettingsWindow		磁碟掛載
 Type	AttributesView		類型
@@ -251,6 +252,7 @@ Favorites	FilePanelPriv		收藏夾
 Point	AttributesView		點
 You can't move or copy items to read-only volumes.	PoseView		您無法將項目移動或複製到唯讀磁碟卷。
 home	B_USER_DIRECTORY		主資料夾
+You cannot create a link to the Trash directory.	FSUtils		無法在資源回收筒建立連結。
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker新模板
 Disk mounting during boot	AutoMounterSettings		啟動時挂載磁碟
 Don't automount	AutoMounterSettings		不要自動掛載
@@ -311,6 +313,7 @@ Would you like to find some other suitable application?	FSUtils		您想找到其
 Recent folders	FavoritesMenu		近期資料夾
 Signed memory size	AttributesView		已標記的記憶體大小
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定的名稱不合法。請選擇其他名稱。
+You cannot copy or move the Trash directory.	FSUtils		資源回收筒目录無法複製或移動。
 of %items	StatusWindow		的 %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		複製檔案 \"%name\"時發生錯誤:\n\t%error\n\n您想繼續嗎？
 less than	FindPanel		少於

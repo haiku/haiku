@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-NetworkStatus	2828540217
+1	indonesian	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		Alamat IPv6
 Quit	NetworkStatusView		Keluar
 Unknown	NetworkStatusView		Takdiketahui
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OKE
 No link	NetworkStatusView		Tak ada tautan
 Could not join wireless network:\n	NetworkStatusView		Tidak bisa gabung ke jaringan nirkabel:\n
-Ready	NetworkStatusView		Siap
 Network Status	NetworkStatusView		Status Jaringan
 Deskbar is not running, giving up.	NetworkStatus		Deskbar tidak berjalan, menyerah.
 Netmask:	NetworkStatusView		Netmask:

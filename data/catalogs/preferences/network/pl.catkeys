@@ -1,7 +1,6 @@
-1	polish	x-vnd.Haiku-Network	543099905
+1	polish	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Urządzenie ethernetowe
 Link speed:	IntefaceView		Prędkość połączenia:
-disconnected	IntefaceView		rozłączone
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Sieć:
 Received:	IntefaceView		Otrzymane:

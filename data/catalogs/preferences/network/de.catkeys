@@ -1,7 +1,6 @@
-1	german	x-vnd.Haiku-Network	543099905
+1	german	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Ethernet-Gerät
 Link speed:	IntefaceView		Geschwindigkeit:
-disconnected	IntefaceView		getrennt
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Netzwerk:
 Received:	IntefaceView		Empfangen:

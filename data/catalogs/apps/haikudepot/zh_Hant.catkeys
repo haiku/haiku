@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	873730785
+1	english	x-vnd.Haiku-HaikuDepot	3949833867
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用條件下載問題
 Available packages	MainWindow		可用軟體套件
 It was not possible to create the new user.	UserLoginWindow		無法創建新使用者。
@@ -54,6 +54,7 @@ Send	RatePackageWindow		傳送
 Creating package list…	FeaturedPackagesView		建立包列表…
 Start package daemon	App		啟動套件守護程式
 There are problems in the supplied data:	UserLoginWindow		提供的數據有問題：
+Desktop and non-desktop packages	MainWindow		桌面版与非桌面版套件
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		使用者 '%Nickname%' 尚未同意任何使用條件。
 Usage conditions download problem	UserLoginWindow		使用條件下載問題
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	從庫 %s 安裝軟體包 %s \n
@@ -195,11 +196,13 @@ Repositories	MainWindow		庫
 This rating is visible to other users	RatePackageWindow		其他用戶可以看到此評級
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		更新套件資料時出現了一個問題，可能會導致應用程式顯示的資料過時或遺失。可以從應用程式日誌中獲取有關此問題的其他詳細資訊。\n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		下載使用條件時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
+Stop network use	ServerHelper		中斷網路使用
 View agreed usage conditions…	MainWindow		查看約定的使用條件…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		使用者 [%Nickname%] 已通過身份驗證，但在繼續之前，您需要同意最新的使用條件。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		該軟體套件似乎不在 HaikuDepot 伺服器上，因此無法創建新評級或編輯現有評級。
 Apply	SettingsWindow		套用
 View the password requirements	UserLoginWindow		查看密碼要求
+Desktop packages only	MainWindow		僅桌面版套件
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		使用者 \"%Nickname%\" 先前已同意使用條件，但此後使用條件已更新。現在需要同意更新的使用條件。
 Log out	MainWindow		退出
 Comment language:	RatePackageWindow		評論語言：
@@ -208,6 +211,7 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		檢視使用條件
 OK	ServerHelper		確認
 Reading repository data	LocalPkgDataLoadProcess		正在讀取庫數據
+Native desktop packages only	MainWindow		僅原生桌面套件
 Fatal error	InstallPackageProcess		致命錯誤
 A validation error has occurred	ServerHelper		發生驗證錯誤
 The nickname is required.	UserLoginWindow		暱稱是必需的。

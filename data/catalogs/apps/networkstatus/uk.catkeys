@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-NetworkStatus	2828540217
+1	ukrainian	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		Адреса IPv6:
 Quit	NetworkStatusView		Вийти
 Unknown	NetworkStatusView		Невідомий
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Широкомовна передача:
 OK	NetworkStatusView		ОК
 No link	NetworkStatusView		З'єднання відсутнє
 Could not join wireless network:\n	NetworkStatusView		Не вдалося під'єднатися до безпровідної мережі:\n
-Ready	NetworkStatusView		Під'єднано
 Network Status	NetworkStatusView		Стан мережі
 Deskbar is not running, giving up.	NetworkStatus		Облиште, Deskbar не працює.
 Netmask:	NetworkStatusView		Маска підмережі:

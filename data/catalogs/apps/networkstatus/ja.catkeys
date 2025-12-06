@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-NetworkStatus	2828540217
+1	japanese	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		IPv6 アドレス:
 Quit	NetworkStatusView		終了
 Unknown	NetworkStatusView		不明
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		ブロードキャスト:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		リンク無し
 Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できません:\n
-Ready	NetworkStatusView		完了
 Network Status	NetworkStatusView		ネットワークの状態
 Deskbar is not running, giving up.	NetworkStatus		Deskbar が動作していないので、断念します。
 Netmask:	NetworkStatusView		ネットマスク:

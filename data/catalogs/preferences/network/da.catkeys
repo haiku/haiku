@@ -1,7 +1,6 @@
-1	danish	x-vnd.Haiku-Network	543099905
+1	danish	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Ethernet-enhed
 Link speed:	IntefaceView		Linkhastighed:
-disconnected	IntefaceView		ikke forbundet
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Netværk:
 Received:	IntefaceView		Modtaget:

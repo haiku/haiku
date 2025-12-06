@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-NetworkStatus	2828540217
+1	czech	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		Adresa IPv6:
 Quit	NetworkStatusView		Zavřít
 Unknown	NetworkStatusView		Neznámý
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Všesměrové:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Odpojeno
 Could not join wireless network:\n	NetworkStatusView		Nemohu se připojit do bezdrátové sítě:\n
-Ready	NetworkStatusView		Spojeno
 Network Status	NetworkStatusView		Stav sítě
 Deskbar is not running, giving up.	NetworkStatus		Panel není spuštěn, vzdávám to.
 Netmask:	NetworkStatusView		Maska sítě:

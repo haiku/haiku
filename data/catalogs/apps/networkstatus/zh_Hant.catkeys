@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-NetworkStatus	2828540217
+1	english	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		IPv6 位址：
 Quit	NetworkStatusView		退出
 Unknown	NetworkStatusView		未知
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		播送：
 OK	NetworkStatusView		確認
 No link	NetworkStatusView		沒有鏈結
 Could not join wireless network:\n	NetworkStatusView		無法加入無線網路:\n
-Ready	NetworkStatusView		準備好
 Network Status	NetworkStatusView		網路狀態
 Deskbar is not running, giving up.	NetworkStatus		Deskbar未運行，放棄。
 Netmask:	NetworkStatusView		網路遮罩：

@@ -1,7 +1,6 @@
-1	hungarian	x-vnd.Haiku-Network	543099905
+1	hungarian	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Vezetékes eszköz
 Link speed:	IntefaceView		Kapcsolat sebessége:
-disconnected	IntefaceView		leválasztva
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Hálózat:
 Received:	IntefaceView		Fogadott:

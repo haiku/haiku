@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-NetworkStatus	2828540217
+1	dutch; flemish	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		IPv6-adres:
 Quit	NetworkStatusView		Afsluiten
 Unknown	NetworkStatusView		Onbekend
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		Oké
 No link	NetworkStatusView		Er is geen link
 Could not join wireless network:\n	NetworkStatusView		Kon niet aansluiten bij draadloos netwerk:\n
-Ready	NetworkStatusView		Gereed
 Network Status	NetworkStatusView		Netwerkstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar draait niet, geef op.
 Netmask:	NetworkStatusView		 Netwerkmasker:

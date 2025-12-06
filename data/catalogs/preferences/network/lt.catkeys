@@ -1,7 +1,6 @@
-1	lithuanian	x-vnd.Haiku-Network	2392604972
+1	lithuanian	x-vnd.Haiku-Network	1362516392
 Ethernet device	InterfaceListItem		Laidinio tinklo įrenginys
 Link speed:	IntefaceView		Ryšio sparta:
-disconnected	IntefaceView		atjungtas
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Tinklas:
 Received:	IntefaceView		Gauta:

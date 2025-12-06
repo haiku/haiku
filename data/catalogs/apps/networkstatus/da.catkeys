@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-NetworkStatus	2828540217
+1	danish	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		IPv6-adresse:
 Quit	NetworkStatusView		Afslut
 Unknown	NetworkStatusView		Ukendt
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Udsend:
 OK	NetworkStatusView		O.k.
 No link	NetworkStatusView		Ingen lænke
 Could not join wireless network:\n	NetworkStatusView		Kunne ikke tilslutte trådløst netværk:\n
-Ready	NetworkStatusView		Klar
 Network Status	NetworkStatusView		Netværksstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar kører ikke, giver op.
 Netmask:	NetworkStatusView		Netmaske:

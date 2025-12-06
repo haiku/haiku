@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-NetworkStatus	2828540217
+1	friulian	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		Direzion IPv6:
 Quit	NetworkStatusView		Jes
 Unknown	NetworkStatusView		No cognossût
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Difusion:
 OK	NetworkStatusView		Va ben
 No link	NetworkStatusView		Nissun colegament
 Could not join wireless network:\n	NetworkStatusView		Impussibil unîsi ae rêt cence fîi:\n
-Ready	NetworkStatusView		Pront
 Network Status	NetworkStatusView		Stât de rêt
 Deskbar is not running, giving up.	NetworkStatus		Deskbar nol è in esecuzion, nuie ce fâ.
 Netmask:	NetworkStatusView		Mascare di rêt:

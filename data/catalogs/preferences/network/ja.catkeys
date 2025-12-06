@@ -1,7 +1,6 @@
-1	japanese	x-vnd.Haiku-Network	543099905
+1	japanese	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		イーサネットデバイス
 Link speed:	IntefaceView		リンクスピード:
-disconnected	IntefaceView		切断済
 WPA	WPA protected network		WPA
 Network:	IntefaceView		ネットワーク:
 Received:	IntefaceView		受信:

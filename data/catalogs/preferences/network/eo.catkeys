@@ -1,7 +1,6 @@
-1	esperanto	x-vnd.Haiku-Network	543099905
+1	esperanto	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Eterreta aparato
 Link speed:	IntefaceView		Konekta rapido:
-disconnected	IntefaceView		diskonektita
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Reto:
 Received:	IntefaceView		Ricevita:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2992119353
+1	swedish	x-vnd.Haiku-libtracker	2433311519
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -32,6 +32,7 @@ Value	AttributesView		Värde
 Information	InfoWindow		Information
 Error emptying Trash	FSUtils		Ett fel uppstod när Papperskorgen skulle tömmas
 Opens with:	InfoWindow		Öppnas med:
+You cannot copy or move the Printers directory.	FSUtils		Du kan inte kopiera eller flytta skrivarkatalogen.
 Size	QueryPoseView		Storlek
 Disk mount	TrackerSettingsWindow		Diskmontering
 Type	AttributesView		Typ
@@ -251,6 +252,7 @@ Favorites	FilePanelPriv		Favoriter
 Point	AttributesView		Punkt
 You can't move or copy items to read-only volumes.	PoseView		Du kan inte flytta eller kopiera objekt till skrivskyddade volymer
 home	B_USER_DIRECTORY		hem
+You cannot create a link to the Trash directory.	FSUtils		Du kan inte skapa en länk till papperskorgen.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Nya Mallar
 Disk mounting during boot	AutoMounterSettings		Diskmontering under uppstart
 Don't automount	AutoMounterSettings		Automontera inte
@@ -311,6 +313,7 @@ Would you like to find some other suitable application?	FSUtils		Vill du söka e
 Recent folders	FavoritesMenu		Senaste mapparna
 Signed memory size	AttributesView		Signerad minnesstorlek
 The specified name is illegal. Please choose another name.	FilePanelPriv		Det valda namnet är otillåtet. Var god välj ett annat namn.
+You cannot copy or move the Trash directory.	FSUtils		Du kan inte kopiera eller flytta papperskorgen.
 of %items	StatusWindow		av %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av filen \"%name\":\n\t%error\n\nVill du fortsätta?
 less than	FindPanel		mindre än

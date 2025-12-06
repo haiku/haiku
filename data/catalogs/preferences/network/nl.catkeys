@@ -1,7 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-Network	543099905
+1	dutch; flemish	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Ethernet-apparaat
 Link speed:	IntefaceView		Verbindingssnelheid:
-disconnected	IntefaceView		niet verbonden
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Netwerk:
 Received:	IntefaceView		Ontvangen:

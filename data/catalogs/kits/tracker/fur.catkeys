@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2992119353
+1	friulian	x-vnd.Haiku-libtracker	2433311519
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -32,6 +32,7 @@ Value	AttributesView		Valôr
 Information	InfoWindow		Informazions
 Error emptying Trash	FSUtils		Erôr tal disvuedâ la scovacere
 Opens with:	InfoWindow		Vierç cun:
+You cannot copy or move the Printers directory.	FSUtils		No tu puedis copiâ o spostâ la cartele Stampadoris.
 Size	QueryPoseView		Dimension
 Disk mount	TrackerSettingsWindow		Montaç discs
 Type	AttributesView		Gjenar
@@ -251,6 +252,7 @@ Favorites	FilePanelPriv		Preferîts
 Point	AttributesView		Pont
 You can't move or copy items to read-only volumes.	PoseView		No tu puedis spostâ o copiâ i elements sui volums in dome-leture.
 home	B_USER_DIRECTORY		home
+You cannot create a link to the Trash directory.	FSUtils		No tu puedis creâ un colegament ae cartele Scovacere.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Gnûfs Modei Tracker
 Disk mounting during boot	AutoMounterSettings		Montaç discs dilunc l'inviament
 Don't automount	AutoMounterSettings		No sta montâ in automatic
@@ -311,6 +313,7 @@ Would you like to find some other suitable application?	FSUtils		Cirî cualchi a
 Recent folders	FavoritesMenu		Cartelis resintis
 Signed memory size	AttributesView		Dimension memorie cun segn
 The specified name is illegal. Please choose another name.	FilePanelPriv		Il non specificât al è illegâl. Par plasê, sielç un altri non.
+You cannot copy or move the Trash directory.	FSUtils		No tu puedis copiâ o spostâ la cartele Scovacere.
 of %items	StatusWindow		di %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ il file \"%name\":\n\t%error\n\nContinuâ?
 less than	FindPanel		mancul di

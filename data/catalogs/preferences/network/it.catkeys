@@ -1,7 +1,6 @@
-1	italian	x-vnd.Haiku-Network	543099905
+1	italian	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocità connessione:
-disconnected	IntefaceView		disconnesso
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Rete:
 Received:	IntefaceView		Ricevuti:

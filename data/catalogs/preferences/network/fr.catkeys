@@ -1,7 +1,6 @@
-1	french	x-vnd.Haiku-Network	543099905
+1	french	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Périphérique Ethernet
 Link speed:	IntefaceView		Vitesse du lien :
-disconnected	IntefaceView		déconnecté
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Réseau :
 Received:	IntefaceView		Reçu :

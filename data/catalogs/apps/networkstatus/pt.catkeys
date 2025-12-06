@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-NetworkStatus	2828540217
+1	portuguese	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		Endereço IPv6:
 Quit	NetworkStatusView		Sair
 Unknown	NetworkStatusView		Desconhecido
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Sem ligação
 Could not join wireless network:\n	NetworkStatusView		Não foi possível aceder à rede sem fios:\n
-Ready	NetworkStatusView		Pronto
 Network Status	NetworkStatusView		Estado da Rede
 Deskbar is not running, giving up.	NetworkStatus		A Deskbar não se encontra em execução, a desistir.
 Netmask:	NetworkStatusView		Máscara de rede:

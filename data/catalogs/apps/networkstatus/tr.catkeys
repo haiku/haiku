@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-NetworkStatus	2828540217
+1	turkish	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		IPv6 adresi:
 Quit	NetworkStatusView		Çık
 Unknown	NetworkStatusView		Bilinmeyen
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Yayın:
 OK	NetworkStatusView		Tamam
 No link	NetworkStatusView		Bağlantı yok
 Could not join wireless network:\n	NetworkStatusView		Kablosuz ağa bağlanılamadı:\n
-Ready	NetworkStatusView		Hazır
 Network Status	NetworkStatusView		Ağ Durumu
 Deskbar is not running, giving up.	NetworkStatus		Masaüstü Çubuğu çalışmıyor, vazgeçildi.
 Netmask:	NetworkStatusView		Ağ maskesi:

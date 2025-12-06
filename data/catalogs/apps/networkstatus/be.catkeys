@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-NetworkStatus	504030701
+1	belarusian	x-vnd.Haiku-NetworkStatus	1304772120
 Quit	NetworkStatusView		Выйсці
 Unknown	NetworkStatusView		Невядомае
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не ўдалося запусціць сеткавыя наладкі.\n\nПамылка: 
@@ -8,7 +8,6 @@ NetworkStatus	System name		Статус сеткі
 OK	NetworkStatusView		ОК
 No link	NetworkStatusView		Няма спасылкі
 Could not join wireless network:\n	NetworkStatusView		Не ўдалося далучыцца да бесшнуравой сеткі:\n
-Ready	NetworkStatusView		Гатовы
 Network Status	NetworkStatusView		Статус сеткі
 No stateful configuration	NetworkStatusView		Няма канфігурацыі для ўліку стану пратакола
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Вы можаце запусціць NetworkStatus у вакне або усталяваць на Deskbar.

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-NetworkStatus	2828540217
+1	hungarian	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		IPv6 cím:
 Quit	NetworkStatusView		Kilépés
 Unknown	NetworkStatusView		Ismeretlen
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Átjáró:
 OK	NetworkStatusView		Rendben
 No link	NetworkStatusView		Nincs kapcsolat
 Could not join wireless network:\n	NetworkStatusView		Nem lehet csatlakozni a vezeték nélküli hálózatra:\n
-Ready	NetworkStatusView		Kész
 Network Status	NetworkStatusView		Hálózat állapota
 Deskbar is not running, giving up.	NetworkStatus		Az Asztalsáv nem fut, feladom.
 Netmask:	NetworkStatusView		Hálózati maszk:

@@ -1,7 +1,6 @@
-1	finnish	x-vnd.Haiku-Network	543099905
+1	finnish	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Ethernet-laite
 Link speed:	IntefaceView		Yhteysnopeus:
-disconnected	IntefaceView		katkaistu
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Verkko:
 Received:	IntefaceView		Vastaanotettu:

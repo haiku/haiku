@@ -8,13 +8,13 @@ WebP image translator	WebPTranslator		WebP-kép értelmező
 ©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
 ©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
 Picture	ConfigView		Kép
-Default	ConfigView		‎Alapértelmezett‎
+Default	ConfigView		Alapértelmezett
 Text	ConfigView		Szöveg
-Preprocessing filter	ConfigView		‎Előfeldolgozási szűrő‎
-Compression method:	ConfigView		‎Tömörítési módszer:‎
+Preprocessing filter	ConfigView		Előfeldolgozási szűrő
+Compression method:	ConfigView		Tömörítési módszer:
 Preset	ConfigView		‎Előre beállít‎ott
 Drawing	ConfigView		Rajz
-Output preset:	ConfigView		‎Kimeneti beállítás:‎
+Output preset:	ConfigView		Kimeneti beállítás:
 WebP Settings	main		WebP beállítások
 Icon	ConfigView		Ikon
 WebP image	WebPTranslator		WebP kép

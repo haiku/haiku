@@ -1,7 +1,6 @@
-1	romanian	x-vnd.Haiku-Network	543099905
+1	romanian	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Dispozitiv Ethernet
 Link speed:	IntefaceView		Viteză de legătură:
-disconnected	IntefaceView		deconectat
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Rețea:
 Received:	IntefaceView		Primit:

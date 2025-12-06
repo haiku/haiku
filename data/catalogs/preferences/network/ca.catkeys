@@ -1,7 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-Network	543099905
+1	catalan; valencian	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Dispositiu d'Ethernet
 Link speed:	IntefaceView		Velocitat d'enllaç:
-disconnected	IntefaceView		desconnectat
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Xarxa:
 Received:	IntefaceView		Rebut:

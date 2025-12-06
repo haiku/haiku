@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-NetworkStatus	2828540217
+1	romanian	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		Adresă IPv6:
 Quit	NetworkStatusView		Ieșire
 Unknown	NetworkStatusView		Necunoscut
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Nicio legătură
 Could not join wireless network:\n	NetworkStatusView		Nu s-a putut alătura rețelei fără fir:\n
-Ready	NetworkStatusView		Gata
 Network Status	NetworkStatusView		Starea de rețea
 Deskbar is not running, giving up.	NetworkStatus		Deskbar nu rulează, se renunță.
 Netmask:	NetworkStatusView		Mască de rețea:

@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Haiku-Network	543099905
+1	ukrainian	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Провідний пристрій (Ethernet)
 Link speed:	IntefaceView		Швидкість з'єднання:
-disconnected	IntefaceView		від'єднано
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Мережа:
 Received:	IntefaceView		Отримано:

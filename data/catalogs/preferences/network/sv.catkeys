@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku-Network	543099905
+1	swedish	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Ethernetenhet
 Link speed:	IntefaceView		Länkhastighet:
-disconnected	IntefaceView		frånkopplad
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Nätverk:
 Received:	IntefaceView		Mottaget:

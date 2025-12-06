@@ -1,7 +1,6 @@
-1	czech	x-vnd.Haiku-Network	543099905
+1	czech	x-vnd.Haiku-Network	3807978621
 Ethernet device	InterfaceListItem		Ethernetové zařízení
 Link speed:	IntefaceView		Rychlost spojení:
-disconnected	IntefaceView		odpojeno
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Síť:
 Received:	IntefaceView		Přijato:

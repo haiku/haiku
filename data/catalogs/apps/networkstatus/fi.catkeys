@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-NetworkStatus	2828540217
+1	finnish	x-vnd.Haiku-NetworkStatus	3629281636
 IPv6 address:	NetworkStatusView		IPv6-osoite:
 Quit	NetworkStatusView		Lopeta
 Unknown	NetworkStatusView		Tuntematon
@@ -11,7 +11,6 @@ Broadcast:	NetworkStatusView		Lähetys:
 OK	NetworkStatusView		Valmis
 No link	NetworkStatusView		Ei linkkiä
 Could not join wireless network:\n	NetworkStatusView		Liittyminen langattomaan verkkoon epäonnistui:\n
-Ready	NetworkStatusView		Valmis
 Network Status	NetworkStatusView		Verkkotila
 Deskbar is not running, giving up.	NetworkStatus		Työpöytäpalkki ei ole käynnissä, luovutaan toiminnosta.
 Netmask:	NetworkStatusView		Verkkopeite:

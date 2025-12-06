@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	371023553
+1	turkish	x-vnd.Haiku-libtracker	4107183015
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -32,6 +32,7 @@ Value	AttributesView		Değer
 Information	InfoWindow		Bilgi
 Error emptying Trash	FSUtils		Çöp boşaltılırken hata
 Opens with:	InfoWindow		Şununla açılır:
+You cannot copy or move the Printers directory.	FSUtils		Yazıcılar dizinini kopyalayamaz veya taşıyamazsınız.
 Size	QueryPoseView		Boyut
 Disk mount	TrackerSettingsWindow		Disk bağlama
 Type	AttributesView		Tür
@@ -251,6 +252,7 @@ Favorites	FilePanelPriv		Favoriler
 Point	AttributesView		Nokta
 You can't move or copy items to read-only volumes.	PoseView		Saltokunur disk bölümlerine ögeleri taşıyamaz veya kopyalayamazsınız.
 home	B_USER_DIRECTORY		ana klasör
+You cannot create a link to the Trash directory.	FSUtils		Çöp dizinine bir bağlantı oluşturamazsınız.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Yeni İzleyici Şablonları
 Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
 Don't automount	AutoMounterSettings		Otomatik bağlama yok
@@ -311,6 +313,7 @@ Would you like to find some other suitable application?	FSUtils		Uygun başka bi
 Recent folders	FavoritesMenu		Son kullanılan klasörler
 Signed memory size	AttributesView		İmzalı bellek boyutu
 The specified name is illegal. Please choose another name.	FilePanelPriv		Belirtilen ad kullanılamaz. Lütfen başka bir ad seçin.
+You cannot copy or move the Trash directory.	FSUtils		Çöp dizinini kopyalayamaz veya taşıyamazsınız.
 of %items	StatusWindow		/ %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		“%name” dosyasını kopyalarken hata:\n\t%error\n\nİşlem sürdürülsün mü?
 less than	FindPanel		daha az

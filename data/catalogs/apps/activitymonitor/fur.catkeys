@@ -1,4 +1,6 @@
-1	friulian	x-vnd.Haiku-ActivityMonitor	2467534740
+1	friulian	x-vnd.Haiku-ActivityMonitor	923507156
+Temp	DataSource		Temp
+Temperature	DataSource		Temperadure
 Teams	DataSource		Teams
 Semaphores	DataSource		Semafars
 TX	DataSource	Shorter version for Sending	TX
