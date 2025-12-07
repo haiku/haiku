@@ -8,11 +8,13 @@
 
 #include <arm_mmu.h>
 #include <kernel.h>
+#include <arch/generic/debug_uart.h>
 #include <arch_kernel.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <efi/types.h>
 #include <efi/boot-services.h>
+
 
 #include "efi_platform.h"
 #include "generic_mmu.h"
@@ -29,6 +31,8 @@
 
 static constexpr bool kTraceMemoryMap = false;
 static constexpr bool kTracePageDirectory = false;
+
+extern DebugUART* gUART;
 
 
 // Ignore memory above 512GB
@@ -281,6 +285,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 
 	map_range_to_new_area(gKernelArgs.arch_args.uart.regs,
 		ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_HAIKU_KERNEL_RW | ARM_MMU_L2_FLAG_XN);
+	gUART->SetBase(gKernelArgs.arch_args.uart.regs.start);
 
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);

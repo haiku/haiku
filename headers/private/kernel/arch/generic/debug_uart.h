@@ -35,6 +35,7 @@ public:
 	virtual	void			FlushTx() = 0;
 	virtual	void			FlushRx() = 0;
 
+			void			SetBase(addr_t base) { fBase = base; }
 			addr_t			Base() const { return fBase; }
 			int64			Clock() const { return fClock; }
 			bool			Enabled() const { return fEnabled; }
