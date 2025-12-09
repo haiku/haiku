@@ -540,12 +540,13 @@ TSwitchManager::MessageReceived(BMessage* message)
 			for (int32 index = 0; index < teamCount; index++) {
 				TTeamGroup* group = (TTeamGroup*)fGroupList.ItemAt(index);
 				ASSERT(group);
-				if (strcasecmp(group->Signature(), signature) == 0
-					&& !group->TeamList()->HasItem((void*)(addr_t)team)) {
-					group->CacheTeamIcons(fSmallIconSize, fLargeIconSize);
-					group->TeamList()->AddItem((void*)(addr_t)team);
+				if (strcasecmp(group->Signature(), signature) == 0) {
+					if (!group->TeamList()->HasItem((void*)(addr_t)team)) {
+						group->CacheTeamIcons(fSmallIconSize, fLargeIconSize);
+						group->TeamList()->AddItem((void*)(addr_t)team);
+					}
+					break;
 				}
-				break;
 			}
 			break;
 		}
