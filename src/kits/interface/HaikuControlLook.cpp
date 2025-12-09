@@ -1453,6 +1453,8 @@ HaikuControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	rect.right--;
 	rect.bottom--;
 
+	view->PushState();
+
 	uint32 viewFlags = view->Flags();
 	view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
 	view->SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
@@ -1512,6 +1514,7 @@ HaikuControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	view->FillShape(&shape, gradient);
 
 	view->SetFlags(viewFlags);
+	view->PopState();
 }
 
 
