@@ -108,14 +108,14 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 		fPresetsMenu);
 
 	fQualitySlider = new BSlider("quality", B_TRANSLATE("Output quality:"),
-		new BMessage(kMsgQuality), 0, 100, B_HORIZONTAL, B_BLOCK_THUMB);
+		new BMessage(kMsgQuality), 0, 100, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQualitySlider->SetHashMarkCount(10);
 	fQualitySlider->SetLimitLabels(B_TRANSLATE("Low"), B_TRANSLATE("High"));
 	fQualitySlider->SetValue(fSettings->SetGetInt32(WEBP_SETTING_QUALITY));
 
 	fMethodSlider = new BSlider("method", B_TRANSLATE("Compression method:"),
-		new BMessage(kMsgMethod), 0, 6, B_HORIZONTAL, B_BLOCK_THUMB);
+		new BMessage(kMsgMethod), 0, 6, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fMethodSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMethodSlider->SetHashMarkCount(7);
 	fMethodSlider->SetLimitLabels(B_TRANSLATE("Fast"),

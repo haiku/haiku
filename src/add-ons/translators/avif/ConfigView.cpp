@@ -105,47 +105,39 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 	BMenuField* pixelFormatField = new BMenuField(B_TRANSLATE("Pixel format:"),
 		fPixelFormatMenu);
 
-	rgb_color barColor = { 0, 0, 229, 255 };
-
 	fQualitySlider = new BSlider("quality", B_TRANSLATE("Output quality:"),
 		new BMessage(kMsgQuality), AVIF_QUANTIZER_BEST_QUALITY,
-		AVIF_QUANTIZER_WORST_QUALITY, B_HORIZONTAL, B_BLOCK_THUMB);
+		AVIF_QUANTIZER_WORST_QUALITY, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQualitySlider->SetHashMarkCount(8);
 	fQualitySlider->SetLimitLabels(B_TRANSLATE("Best"), B_TRANSLATE("Worst"));
-	fQualitySlider->UseFillColor(true, &barColor);
 	fQualitySlider->SetValue(fSettings->SetGetInt32(AVIF_SETTING_QUALITY));
 	fQualitySlider->SetEnabled(!lossless);
 
 	fSpeedSlider = new BSlider("speed", B_TRANSLATE("Compression speed:"),
 		new BMessage(kMsgSpeed), AVIF_SPEED_SLOWEST,
-		AVIF_SPEED_FASTEST, B_HORIZONTAL, B_BLOCK_THUMB);
+		AVIF_SPEED_FASTEST, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fSpeedSlider->SetHashMarkCount(11);
 	fSpeedSlider->SetLimitLabels(B_TRANSLATE("Slow"),
 		B_TRANSLATE("Faster but worse quality"));
-	fSpeedSlider->UseFillColor(true, &barColor);
 	fSpeedSlider->SetValue(fSettings->SetGetInt32(AVIF_SETTING_SPEED));
 
 	fHTilesSlider = new BSlider("htiles", B_TRANSLATE("Horizontal tiles:"),
-		new BMessage(kMsgTilesHorizontal), 1, 6, B_HORIZONTAL,
-		B_BLOCK_THUMB);
+		new BMessage(kMsgTilesHorizontal), 1, 6, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fHTilesSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fHTilesSlider->SetHashMarkCount(6);
 	fHTilesSlider->SetLimitLabels(B_TRANSLATE("1"),
 		B_TRANSLATE("2⁶"));
-	fHTilesSlider->UseFillColor(true, &barColor);
 	fHTilesSlider->SetValue(
 		fSettings->SetGetInt32(AVIF_SETTING_TILES_HORIZONTAL));
 
 	fVTilesSlider = new BSlider("vtiles", B_TRANSLATE("Vertical tiles:"),
-		new BMessage(kMsgTilesVertical), 1, 6, B_HORIZONTAL,
-		B_BLOCK_THUMB);
+		new BMessage(kMsgTilesVertical), 1, 6, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fVTilesSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fVTilesSlider->SetHashMarkCount(6);
 	fVTilesSlider->SetLimitLabels(B_TRANSLATE("1"),
 		B_TRANSLATE("2⁶"));
-	fVTilesSlider->UseFillColor(true, &barColor);
 	fVTilesSlider->SetValue(
 		fSettings->SetGetInt32(AVIF_SETTING_TILES_VERTICAL));
 

@@ -396,8 +396,6 @@ SSlider::SSlider(const char* name, const char* label,
 	: BSlider(name, label, message, minValue, maxValue,
 		posture, thumbType, flags)
 {
-	rgb_color barColor = { 0, 0, 229, 255 };
-	UseFillColor(true, &barColor);
 }
 
 
@@ -516,7 +514,7 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 		// settings should already be Acquired()
 {
 	fQualitySlider = new SSlider("quality", B_TRANSLATE("Output quality"),
-		new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
+		new BMessage(VIEW_MSG_SET_QUALITY), 0, 100, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQualitySlider->SetHashMarkCount(10);
 	fQualitySlider->SetLimitLabels(B_TRANSLATE("Low"), B_TRANSLATE("High"));
@@ -524,7 +522,7 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 
 	fSmoothingSlider = new SSlider("smoothing",
 		B_TRANSLATE("Output smoothing strength"),
-		new BMessage(VIEW_MSG_SET_SMOOTHING), 0, 100);
+		new BMessage(VIEW_MSG_SET_SMOOTHING), 0, 100, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fSmoothingSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fSmoothingSlider->SetHashMarkCount(10);
 	fSmoothingSlider->SetLimitLabels(B_TRANSLATE("None"), B_TRANSLATE("High"));

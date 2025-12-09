@@ -54,7 +54,7 @@ HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
 	label << " " << renderSize;
 
 	fRenderSize = new BSlider("renderSize", label.String(),
-		NULL, 1, 32, B_HORIZONTAL);
+		NULL, 1, 32, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fRenderSize->SetValue(renderSize / 8);
 	fRenderSize->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fRenderSize->SetHashMarkCount(16);
