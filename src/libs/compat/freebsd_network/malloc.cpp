@@ -11,7 +11,7 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 
-#include <utils/BitUtils.h>
+#include <util/BitUtils.h>
 
 #include <kernel/heap.h>
 #include <kernel/vm/vm.h>

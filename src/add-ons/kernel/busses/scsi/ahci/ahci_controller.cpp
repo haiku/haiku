@@ -11,8 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <new>
-
-#include <utils/BitUtils.h>
+#include <util/BitUtils.h>
 
 #define TRACE(a...) dprintf("ahci: " a)
 #define FLOW(a...)	dprintf("ahci: " a)

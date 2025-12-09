@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <private/utils/BitUtils.h>
+#include <util/BitUtils.h>
 
 //#define TRACE_MOVEMENT_MAKER
 
