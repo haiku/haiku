@@ -237,21 +237,22 @@ BUSBInterface::SetAlternate(uint32 alternateIndex)
 void
 BUSBInterface::_UpdateDescriptorAndEndpoints()
 {
+	if (fEndpoints != NULL) {
+		// Delete old endpoints
+		for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
+			delete fEndpoints[i];
+		delete[] fEndpoints;
+		fEndpoints = NULL;
+	}
+
 	usb_raw_command command;
 	command.interface_etc.descriptor = &fDescriptor;
 	command.interface_etc.config_index = fConfiguration->Index();
 	command.interface_etc.interface_index = fIndex;
 	command.interface_etc.alternate_index = fAlternate;
 	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR_ETC, &command,
-		sizeof(command)) || command.interface.status != B_USB_RAW_STATUS_SUCCESS)
+			sizeof(command)) || command.interface.status != B_USB_RAW_STATUS_SUCCESS)
 		memset(&fDescriptor, 0, sizeof(fDescriptor));
-
-	if (fEndpoints != NULL) {
-		// Delete old endpoints
-		for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
-			delete fEndpoints[i];
-		delete[] fEndpoints;
-	}
 
 	fEndpoints = new(std::nothrow) BUSBEndpoint *[fDescriptor.num_endpoints];
 	if (fEndpoints == NULL)
