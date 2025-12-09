@@ -18,9 +18,9 @@
 #include <string.h>
 
 #include <StorageDefs.h>
+#include <util/SplayTree.h>
 
 #include "exfat.h"
-#include "SplayTree.h"
 
 
 struct node_key {

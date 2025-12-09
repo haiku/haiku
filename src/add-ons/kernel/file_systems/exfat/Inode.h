@@ -11,9 +11,10 @@
 #include <lock.h>
 #include <string.h>
 
+#include <util/SplayTree.h>
+
 #include "DirectoryIterator.h"
 #include "exfat.h"
-#include "SplayTree.h"
 #include "Volume.h"
 
 

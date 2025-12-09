@@ -8,7 +8,7 @@
 #include <fs_interface.h>
 #include <SupportDefs.h>
 
-#include <kernel/util/DoublyLinkedList.h>
+#include <util/DoublyLinkedList.h>
 
 #include "FSCapabilities.h"
 

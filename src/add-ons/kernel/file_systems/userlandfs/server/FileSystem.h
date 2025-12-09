@@ -9,7 +9,7 @@
 #include <image.h>
 #include <OS.h>
 
-#include <kernel/util/DoublyLinkedList.h>
+#include <util/DoublyLinkedList.h>
 
 #include "FSCapabilities.h"
 #include "Locker.h"

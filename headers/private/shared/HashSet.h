@@ -6,8 +6,8 @@
 #ifndef HASH_SET_H
 #define HASH_SET_H
 
-#include <OpenHashTable.h>
 #include <Locker.h>
+#include <util/OpenHashTable.h>
 
 #include "AutoLocker.h"
 

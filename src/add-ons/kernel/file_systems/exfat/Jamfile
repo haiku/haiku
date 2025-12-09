@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems exfat ;
 
-UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
 UsePrivateHeaders file_systems ;
 UsePrivateKernelHeaders ;

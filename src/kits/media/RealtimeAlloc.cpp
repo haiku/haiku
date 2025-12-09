@@ -19,7 +19,7 @@
 #include <OS.h>
 
 #include <locks.h>
-#include <kernel/util/DoublyLinkedList.h>
+#include <util/DoublyLinkedList.h>
 
 
 //#define TRACE_RTM

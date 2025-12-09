@@ -23,8 +23,6 @@
 
 #include <AutoDeleter.h>
 
-#include "Stack.h"
-
 
 #define READ_BUFFER_SIZE 2048
 

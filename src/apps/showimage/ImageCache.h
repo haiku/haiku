@@ -14,8 +14,8 @@
 #include <Locker.h>
 #include <String.h>
 
-#include <kernel/util/DoublyLinkedList.h>
 #include <Referenceable.h>
+#include <util/DoublyLinkedList.h>
 
 
 class BBitmap;

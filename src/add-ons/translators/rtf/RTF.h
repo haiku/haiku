@@ -6,12 +6,11 @@
 #define RTF_H
 
 
-#include "Stack.h"
-
 #include <List.h>
 #include <String.h>
 #include <GraphicsDefs.h>
 #include <BufferIO.h>
+#include <util/Stack.h>
 
 
 namespace RTF {

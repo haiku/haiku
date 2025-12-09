@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "SudokuSolver.h"
 
+#include <util/Stack.h>
+
 #include "SudokuField.h"
-#include "Stack.h"
 
 
 struct SolutionStep {
