@@ -166,6 +166,8 @@ PersonView::MessageReceived(BMessage* msg)
 			break;
 		}
 
+		default:
+			BGridView::MessageReceived(msg);
 	}
 }
 
