@@ -24,7 +24,7 @@
 
 #	include <debug.h>
 #	include <lock.h>
-#	include <OpenHashTable.h>
+#	include <util/OpenHashTable.h>
 #	include <util/AutoLock.h>
 #	include <vfs.h>
 #	include <vm/vm.h>
