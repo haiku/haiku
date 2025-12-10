@@ -137,6 +137,7 @@ udf_unmount(fs_volume *_volume)
 {
 	TRACE(("udb_unmount: _volume = %p\n", _volume));
 	Volume *volume = (Volume *)_volume->private_volume;
+	put_vnode(_volume, volume->RootIcb()->Id());
 	delete volume;
 	return B_OK;
 }
