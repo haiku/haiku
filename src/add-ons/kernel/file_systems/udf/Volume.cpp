@@ -210,7 +210,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 				status = B_ERROR;				
 			}
 		} else {
-			TRACE(("Invalid partition type %d found!\n", header->type()));
+			TRACE_ERROR(("Invalid partition type %d found!\n", header->type()));
 			status = B_ERROR;
 		}			    
 		offset += header->length();
@@ -224,11 +224,11 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 		           && sparableCount == 0)
 		        ? B_OK : B_ERROR;
 		if (status) {
-			TRACE(("Invalid partition layout found:\n"));
-			TRACE(("  physical partitions: %d\n", physicalCount));
-			TRACE(("  virtual partitions:  %d\n", virtualCount));
-			TRACE(("  sparable partitions: %d\n", sparableCount));
-			TRACE(("  metadata partitions: %d\n", metadataCount));
+			TRACE_ERROR(("Invalid partition layout found:\n"));
+			TRACE_ERROR(("  physical partitions: %d\n", physicalCount));
+			TRACE_ERROR(("  virtual partitions:  %d\n", virtualCount));
+			TRACE_ERROR(("  sparable partitions: %d\n", sparableCount));
+			TRACE_ERROR(("  metadata partitions: %d\n", metadataCount));
 		}		                 
 	}
 	
