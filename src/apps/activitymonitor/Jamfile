@@ -23,4 +23,5 @@ DoCatalogs ActivityMonitor :
 	ActivityWindow.cpp
 	DataSource.cpp
 	SettingsWindow.cpp
+	SystemInfoHandler.cpp
 ;
