@@ -790,18 +790,12 @@ for architecture in $(TARGET_PACKAGING_ARCHS) {
 
 
 # The following directories cannot currently be compiled with DEBUG=1
-SetConfigVar DEBUG : HAIKU_TOP src add-ons disk_systems bfs : 0 : local ;
-SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel drivers audio hda : 0 : local ;
-SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel drivers audio ac97 auich : 0 : local ; # fails with gcc4 only
-SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel drivers audio ac97 auvia : 0 : local ; # fails with gcc4 only
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel drivers audio ac97 sis7018 : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems btrfs : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems ntfs libntfs : 0 : local ;
-SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems udf : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems userlandfs server : 0 : local ; # fails with gcc2 only
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems userlandfs server haiku : 0 : local ; # fails with gcc2 only
 SetConfigVar DEBUG : HAIKU_TOP src add-ons media media-add-ons dvb : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src add-ons print drivers gutenprint : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src servers input : 0 : local ;
-SetConfigVar DEBUG : HAIKU_TOP src servers media_addon : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src system boot loader file_systems bfs : 0 : local ;
