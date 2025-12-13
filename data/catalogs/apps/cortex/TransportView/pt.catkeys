@@ -1,4 +1,4 @@
-1	portuguese	application/x-vnd.Cortex.TransportView	1100783275
+1	portuguese	application/x-vnd.Cortex.TransportView	3928363966
 (none)	TransportView		(nenhum)
 Start	TransportView		Iniciar
 No errors.	TransportView		Sem erros.
@@ -7,7 +7,9 @@ to	TransportView		para
 Stop	TransportView		Parar
 (no group)	TransportView		(nenhum grupo)
 To:	TransportView		Para:
+Recording	TransportView		A gravar
 Increase latency	TransportView		Aumentar latência
 Decrease precision	TransportView		Diminuir precisão
 System clock	TransportView		Relógio de sistema
 From:	TransportView		De:
+Run mode:	TransportView		Modo de execução:

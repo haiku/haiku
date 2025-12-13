@@ -26,7 +26,7 @@ Output	MultiAudio		出力
 Video	MultiAudio		ビデオ
 Line	MultiAudio		Line
 Mic	MultiAudio		Mic
- frequency:	MultiAudio		  周波数:
+ frequency:	MultiAudio		 周波数:
 Enable	MultiAudio		有効にする
 Mute	MultiAudio		ミュート
 Wave	MultiAudio		Wave

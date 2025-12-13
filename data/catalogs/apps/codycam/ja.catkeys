@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		出力先ディレクトリを入力してください
 reply: '%s'\n	SftpClient		返信: '%s'\n
-PASS <suppressed>  (real password sent)	FtpClient		PASS <非表示>  (本物のパスワードが送られます)
+PASS <suppressed>  (real password sent)	FtpClient		PASS <非表示> (本物のパスワードが送られます)
 JPEG image	CodyCam		JPEG 画像
 Remote host has closed the connection.\n	FtpClient		リモートホストが接続を切断しました。\n
 image file format expected	CodyCam		画像ファイルのフォーマットを入力してください

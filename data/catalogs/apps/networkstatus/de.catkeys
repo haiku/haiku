@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-NetworkStatus	3629281636
+1	german	x-vnd.Haiku-NetworkStatus	2979204375
 IPv6 address:	NetworkStatusView		IPv6 Adresse:
 Quit	NetworkStatusView		Beenden
 Unknown	NetworkStatusView		Unbekannt
@@ -10,6 +10,7 @@ NetworkStatus	System name		Netzwerkstatus
 Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Nicht verbunden
+Connected	NetworkStatusView		Verbunden
 Could not join wireless network:\n	NetworkStatusView		Keine Verbindung zum Funknetzwerk:\n
 Network Status	NetworkStatusView		Netzwerkstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar läuft nicht, gebe auf.

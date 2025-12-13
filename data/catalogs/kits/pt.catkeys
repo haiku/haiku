@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libbe	2491350405
+1	portuguese	x-vnd.Haiku-libbe	3818857331
 All Rights Reserved.	AboutWindow		Todos os Direitos Reservados.
 gold master	AboutWindow		gold master
 Undo	TextView		Desfazer
@@ -13,14 +13,20 @@ Green:	ColorControl		Verde:
 Redo	TextView		Refazer
 No pages to print!	PrintJob		Nenhuma página para imprimir!
 beta	AboutWindow		beta
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		OK
 Cut	TextView		Cortar
 Default	Default decorator about box		Predefinido
 Can't delete this replicant from its original application. Life goes on.	Dragger		Não é possível eliminar este replicante da sua aplicação original. A vida continua.
+%s KiB	StringForSize	size unit	%s KiB
 Error	ZombieReplicantView		Erro
 Paste	TextView		Colar
 OK	AboutWindow		OK
+%s MiB/s	StringForRate	units per second	%s MiB/s
+%s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		O decorador de janelas predefinido do Haiku.
+%s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Remover replicante
 Version	AboutWindow		Versão
 Red:	ColorControl		Vermelho:
@@ -29,10 +35,14 @@ Copy	TextView		Copiar
 Select all	TextView		Selecionar tudo
 alpha	AboutWindow		alfa
 Error	PrintJob		Erro
+%s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		Acerca de %app…
 About %app%	AboutWindow		Acerca de %app%
+%s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Histórico de versões:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Não foi possível encontrar a aplicação para o replicante. Não foi fornecida nenhuma assinatura de aplicação.\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Azul:
+Special thanks:	AboutWindow		Agradecimentos especiais:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Não foi possível criar o replicante para \"%description\".\n%error
 Written by:	AboutWindow		Escrito por:

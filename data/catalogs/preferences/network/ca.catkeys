@@ -1,4 +1,5 @@
-1	catalan; valencian	x-vnd.Haiku-Network	3807978621
+1	catalan; valencian	x-vnd.Haiku-Network	3044115400
+no link	IntefaceView		sense enllaç
 Ethernet device	InterfaceListItem		Dispositiu d'Ethernet
 Link speed:	IntefaceView		Velocitat d'enllaç:
 WPA	WPA protected network		WPA
@@ -10,6 +11,7 @@ Other	NetworkWindow		Altres
 Sent:	IntefaceView		Enviat:
 Gateway:	IntefaceAddressView		Passarel·la:
 The netmask defines your local network	IntefaceAddressView		La màscara de xarxa defineix la xarxa local.
+unknown	IntefaceView		desconegut
 Your IP address	IntefaceAddressView		La vostra adreça IP
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		Adreça IP:
@@ -27,12 +29,14 @@ Apply	IntefaceAddressView		Aplica-ho
 Disable	ServiceView		Inhabilita
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Mostra l'estat de la xarxa a la barra d'escriptori
+no stateful configuration	IntefaceView		sense configuració amb estat
 Mode:	IntefaceAddressView		Mode:
 connected	InterfaceListItem		connectat
 OK	NetworkWindow		D'acord
 Static	IntefaceAddressView		Estàtica
 launch error	NetworkWindow		error de llançament
 Renegotiate	IntefaceView		Renegocia
+configuring	IntefaceView		es configura
 MAC address:	IntefaceView		Adreça MAC:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		inhabilitat

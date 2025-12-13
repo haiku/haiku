@@ -1,4 +1,4 @@
-1	portuguese	application/x-vnd.Cortex.MediaRoutingView	2657058946
+1	portuguese	application/x-vnd.Cortex.MediaRoutingView	3137503987
 %refname% (no file)	MediaNodePanel		%refname% (nenhum ficheiro)
 Video output	MediaRoutingView		Saída de vídeo
 Icon view	MediaRoutingView		Vista de ícones
@@ -19,6 +19,7 @@ Select all	MediaRoutingView		Selecionar todos
 Input	MediaJack		Entrada
 Get info	MediaJack		Obter informações
 Error	MediaRoutingView		Erro
+Could not release '%refname%'	MediaRoutingView		Não foi possível libertar '%refname%'
 Output	MediaJack		Saída
 Get info	MediaNodePanel		Obter informações
 Get info	MediaRoutingView		Obter informações

@@ -1,4 +1,4 @@
-1	portuguese	application/x-vnd.Cortex.InfoView	1385552321
+1	portuguese	application/x-vnd.Cortex.InfoView	590006701
 Offset	InfoView		Deslocamento
 Description	DormantNodeInfoView		Descrição
 Byte order	InfoView		Ordem de bytes
@@ -18,12 +18,17 @@ Kinds	LiveNodeInfoView		Tipos
 Application	AppNodeInfoView		Aplicação
 Max. instances	DormantNodeInfoView		Nº máx. instâncias
 \n- Duration:	FileNodeInfoView		\n- Duração:
+Dormant media node	DormantNodeInfoView		Nó de média inactivo
 Latency	LiveNodeInfoView		Latência
 Media type	InfoView		Tipo de multimédia
+Live media node	LiveNodeInfoView		Nó de média activo
 Kinds	DormantNodeInfoView		Tipos
+Node ID	LiveNodeInfoView		ID do nó
 Resolution	InfoView		Resolução
 Chunk size	InfoView		Tamanho do bloco
 File format	AppNodeInfoView		Formato de ficheiro
+Matrix mask	InfoView		Máscara de matriz
+Channel mask	InfoView		Máscara de canal
 Orientation	InfoView		Orientação
 Channels	InfoView		Canais
 Sample rate	InfoView		Taxa de amostragem
@@ -40,6 +45,7 @@ Run mode	LiveNodeInfoView		Modo de execução
 Port	LiveNodeInfoView		Porta
 Output format	DormantNodeInfoView		Formato de saída
 Aspect ratio	InfoView		Proporção
+Application-owned node	AppNodeInfoView		Nó pertencente a aplicação
 Tracks	FileNodeInfoView		Faixas
 Source	InfoView		Origem
 Destination	InfoView		Destino

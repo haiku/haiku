@@ -378,7 +378,7 @@ Proceed	FSUtils		続行
 Edit favorites…	FilePanelPriv		お気に入りの編集...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダーを同じフォルダーやそのサブフォルダーに移動できません。
 New	ContainerWindow		新規
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		\"Disks\"  ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target を変更すると、%osName は正しく動作しないかもしれません!\n\n変更しますか?
 Sorry, you can't copy items to the Trash.	FSClipBoard		すみません、ごみ箱にコピーできません。
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目がすでにフォルダー内に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか?

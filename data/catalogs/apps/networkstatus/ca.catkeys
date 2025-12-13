@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-NetworkStatus	3629281636
+1	catalan; valencian	x-vnd.Haiku-NetworkStatus	2979204375
 IPv6 address:	NetworkStatusView		Adreça IPv6:
 Quit	NetworkStatusView		Surt
 Unknown	NetworkStatusView		Desconegut
@@ -10,6 +10,7 @@ NetworkStatus	System name		Estat de la xarxa
 Broadcast:	NetworkStatusView		Difusió:
 OK	NetworkStatusView		D'acord
 No link	NetworkStatusView		Cap enllaç
+Connected	NetworkStatusView		Connectat
 Could not join wireless network:\n	NetworkStatusView		No s'ha pogut connectar a la xarxa sense fil:\n
 Network Status	NetworkStatusView		Estat de la xarxa
 Deskbar is not running, giving up.	NetworkStatus		La barra d'escriptori no s'executa. Ho deixo estar.

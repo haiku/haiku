@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ScreenSaver	2682415627
+1	portuguese	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Sinalização de Gestão de Energia do Ecrã (DPMS) não disponível
 Blackness	ScreenSaver		Escuridão
 Fade now when mouse is here	ScreenSaver		Desvanecer agora quando o rato estiver aqui
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Cancelar
 Password:	ScreenSaver		Palavra-passe:
 Screensaver settings	ScreenSaver		Definições da proteção de ecrã
 Password Window	ScreenSaver		Janela de Palavra-passe
+Use system password	ScreenSaver		Utilize a palavra-passe do sistema
 Test	ScreenSaver		Testar
 Could not load screen saver	ScreenSaver		Não foi possível carregar a proteção de ecrã
 Use custom password	ScreenSaver		Usar palavra-passe personalizada

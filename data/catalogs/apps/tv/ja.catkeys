@@ -2,7 +2,7 @@
 No menu	MainWin		メニューを消す
 No border	MainWin		枠を消す
 Error, connecting to interface failed:\n\n	MainWin		エラー、インターフェイスへの接続に失敗しました:\n\n
-force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	force 720 × 576, アスペクト比  4:3
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	force 720 × 576, アスペクト比 4:3
 Full screen	MainWin		全画面表示
 Scale to native size	MainWin		本来のサイズに戻す
 unknown	MainWin		不明
@@ -17,9 +17,9 @@ Channel	MainWin		チャンネル
 Previous channel	MainWin		前のチャンネル
 OK	MainWin		OK
 TV	MainWin		TV
-force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	force 544 × 576, アスペクト比  4:3
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	force 544 × 576, アスペクト比 4:3
 Settings	MainWin		設定
-force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	force 704 × 576, アスペクト比  4:3
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	force 704 × 576, アスペクト比 4:3
 %s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		設定...

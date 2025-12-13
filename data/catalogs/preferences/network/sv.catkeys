@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-Network	3807978621
+1	swedish	x-vnd.Haiku-Network	3044115400
+no link	IntefaceView		ingen länk
 Ethernet device	InterfaceListItem		Ethernetenhet
 Link speed:	IntefaceView		Länkhastighet:
 WPA	WPA protected network		WPA
@@ -10,6 +11,7 @@ Other	NetworkWindow		Andra
 Sent:	IntefaceView		Skickat:
 Gateway:	IntefaceAddressView		Förmedlingsnod:
 The netmask defines your local network	IntefaceAddressView		Nätmasken definierar ditt lokala nätverk
+unknown	IntefaceView		okänd
 Your IP address	IntefaceAddressView		Din IP-adress
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		IP-adress:
@@ -27,12 +29,14 @@ Apply	IntefaceAddressView		Använd
 Disable	ServiceView		Inaktivera
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Visa nätverksstatus i Deskbar
+no stateful configuration	IntefaceView		ingen stateful konfiguration
 Mode:	IntefaceAddressView		Läge:
 connected	InterfaceListItem		ansluten
 OK	NetworkWindow		OK
 Static	IntefaceAddressView		Statisk
 launch error	NetworkWindow		Startfel
 Renegotiate	IntefaceView		Omförhandla
+configuring	IntefaceView		konfigurera
 MAC address:	IntefaceView		MAC-adress:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		inaktiverad

@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Input	130668644
+1	portuguese	x-vnd.Haiku-Input	993392905
 Defaults	InputMouse		Predefinições
 Scrolling	TouchpadPrefView		Deslocação
 Long	KeyboardView		Longo
@@ -10,8 +10,11 @@ Double-click speed	SettingsView		Rapidez do duplo clique
 Typing test area	KeyboardView		Área de teste de digitação
 Fast	KeyboardView		Rápida
 Please confirm	TouchpadPrefView		Por favor confime
+Trackpad speed	TouchpadPrefView		Velocidade do Trackpad
 Mouse speed	SettingsView		Velocidade do rato
+Trackpad acceleration	TouchpadPrefView		Aceleração do Trackpad
 Horizontal scrolling	TouchpadPrefView		Deslocação horizontal
+Reverse scroll direction	TouchpadPrefView		Inverter a direcção do scroll
 Keyboard lock delay	TouchpadPrefView		Atraso de bloqueio do teclado
 Input	System name		Dispositivos de Entrada
 Quick	TouchpadPrefView		Rápido
@@ -21,6 +24,7 @@ Slow	KeyboardView		Lenta
 2-Button	SettingsView		2 Botões
 Click to focus and raise	SettingsView		Clique para adquirir foco e ativar
 Vertical	TouchpadPrefView		Vertical
+Low	TouchpadPrefView		Baixo
 Focus follows mouse	SettingsView		Foco segue o rato
 Double-click test area	SettingsView		Área de testes do duplo clique
 Focus mode:	SettingsView		Modo de foco:

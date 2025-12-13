@@ -1,4 +1,5 @@
-1	hungarian	x-vnd.Haiku-Network	3807978621
+1	hungarian	x-vnd.Haiku-Network	3044115400
+no link	IntefaceView		nincs kapcsolat
 Ethernet device	InterfaceListItem		Vezetékes eszköz
 Link speed:	IntefaceView		Kapcsolat sebessége:
 WPA	WPA protected network		WPA
@@ -10,6 +11,7 @@ Other	NetworkWindow		Egyéb
 Sent:	IntefaceView		Küldött:
 Gateway:	IntefaceAddressView		Átjáró:
 The netmask defines your local network	IntefaceAddressView		A hálózati masz határozza meg a helyi hálózatot
+unknown	IntefaceView		ismeretlen
 Your IP address	IntefaceAddressView		Az Ön IP-címe
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		IP-cím:
@@ -27,12 +29,14 @@ Apply	IntefaceAddressView		Alkalmaz
 Disable	ServiceView		Letiltás
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		A felület megjelenítése az Asztalsávon
+no stateful configuration	IntefaceView		nincs működő konfiguráció
 Mode:	IntefaceAddressView		Mód:
 connected	InterfaceListItem		csatlakozva
 OK	NetworkWindow		Rendben
 Static	IntefaceAddressView		Állandó
 launch error	NetworkWindow		indítási hiba
 Renegotiate	IntefaceView		Újracsatlakozás
+configuring	IntefaceView		konfigurálás
 MAC address:	IntefaceView		MAC-cím:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		letiltva

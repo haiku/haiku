@@ -1,7 +1,9 @@
-1	portuguese	application/x-vnd.Cortex.Route	2274524609
+1	portuguese	application/x-vnd.Cortex.Route	1663293897
+Node '%name%' released	CortexRouteApp		Libertado o nó '%name%'
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		Acerca de Cortex/Route…
 File	CortexRouteApp		Ficheiro
+Save nodes…	CortexRouteApp		Guardar nós…
 %producer% and %consumer%	CortexRouteApp		%producer% e %consumer%
 Node '%name%' created	CortexRouteApp		Nó '%name%' criado
 Negotiated format:	CortexRouteApp		Formato negociado:

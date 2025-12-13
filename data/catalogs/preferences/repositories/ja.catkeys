@@ -12,7 +12,7 @@ Changes completed	RepositoriesView	Status view text	変更が完了しました
 Details	TaskLooper	Job log details header	詳細
 Enabled	RepoRow	Tag in the Status column	有効
 Remove	Constants	Button label	削除
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	リポジトリ  %url% を有効にする際にエラーが発生しました。
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	リポジトリ %url% を有効にする際にエラーが発生しました。
 Remove this repository?	RepositoriesView	Removal alert confirmation message	リポジトリを削除しますか?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	リポジトリ %name% のタスクは完了まで時間がかかります。
 Completed	TaskLooper	Completed task status message	完了

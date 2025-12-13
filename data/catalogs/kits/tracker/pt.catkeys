@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	49831366
+1	portuguese	x-vnd.Haiku-libtracker	701934093
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -7,9 +7,13 @@ Kind	ContainerWindow		Tipo
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erro ao mover \"%name\" para o Lixo. (%error)
 Or	FindPanel		Ou
 MIME Description	AttributesView		Descrição MIME
+Query	FindPanel		Consulta
 before	FindPanel		antes
+New folder%d	FSUtils		Nova pasta%d
 Volume icons	TrackerSettingsWindow		Ícones dos volumes
 Ignore case	SelectionWindow		Ignorar maiúsculas/minúsculas
+Save as query template:	FindPanel		Guardar como modelo de consulta:
+Save query:	FindPanel		Guardar consulta:
 Current folder	ContainerWindow		Pasta atual
 Finish: %time - Over %finishtime left	StatusWindow		Fim: %time - Falta mais de %finishtime
 Mount all disks now	AutoMounterSettings		Montar todos os discos agora
@@ -55,6 +59,7 @@ Create link	ContainerWindow		Criar atalho
 starts with	FindPanel		inicia com
 Replace	FSUtils		Substituir
 ?+* follows nothing.	libtracker		?+* vem a seguir a nada.
+Include Trash	FindPanel		Incluir o Lixo
 Rectangle	AttributesView		Retângulo
 Move to	ContainerWindow		Mover para
 Status	Email Query Columns		Estado
@@ -98,6 +103,7 @@ Window	ContainerWindow		Janela
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Remover
 Company	Person Query Columns		Empresa
+Select folders…	FindPanel		Selecionar pastas…
 Recent documents	FavoritesMenu		Documentos recentes
 Edit templates…	TemplatesMenu		Editar modelos…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
@@ -119,10 +125,12 @@ Modified	QueryPoseView		Modificado
 Owner	FilePermissionsView		Proprietário
 Cancel	FSClipBoard		Cancelar
 Modified	PoseView		Modificado
+Save as template…	FindPanel		Guardar como modelo…
 Move to Trash	ContainerWindow		Mover para o Lixo
 All files and folders	FindPanel		Todos os ficheiros e pastas
 Add-ons	ContainerWindow		Extensões
 Too many parenthesis.	libtracker		Demasiados parênteses.
+Save query template:	FindPanel		Guardar modelo de consulta:
 Increase size	ContainerWindow		Aumentar tamanho
 \nShould this be fixed?	FSUtils		\nDeve isto ser corrigido?
 URL	Bookmark Query Columns		URL
@@ -134,6 +142,7 @@ Cut	ContainerWindow		Cortar
 Disks	Model		Discos
 Create a Query template	FindPanel		Criar um modelo de consulta
 Size	FindPanel		Tamanho
+New submenu	ContainerWindow	Folder name of New-template submenu	Novo submenu
 OK	Email Query Columns		OK
 Location	QueryPoseView		Localização
 Edit query	ContainerWindow		Editar consulta
@@ -158,8 +167,10 @@ Property info	AttributesView		Informação sobre a propriedade
 Sorry, you can't create links in the Trash.	PoseView		Desculpe, não é possível criar atalhos no Lixo.
 From	Email Query Columns		De
 Open selection with:	OpenWithWindow		Abrir seleção com:
+Preferences…	ContainerWindow		Preferências…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Não foi possível abrir \"%document\" porque a aplicação \"%app\" encontra-se no Lixo. 
 Work Phone	Person Query Columns		Telefone do Trabalho
+Select folders	FindPanel		Selecionar pastas
 Close	ContainerWindow		Fechar
 Get info	ContainerWindow		Obter informações
 MIME Type	AttributesView		Tipo MIME
@@ -192,6 +203,7 @@ Cancel	FSUtils		Cancelar
 Original name	ContainerWindow		Nome original
 Unknown	WidgetAttributeText		Desconhecido
 32-bit integer	AttributesView		Inteiro de 32 bits
+Save as query…	FindPanel		Guardar como consulta…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		O nome especificado já é usado como nome de uma pasta. Por favor escolha outro nome.
 Modified	ContainerWindow		Modificado
 Mini icon view	ContainerWindow		Vista de mini-ícones
@@ -236,6 +248,7 @@ You must have at least one attribute showing.	PoseView		Deve ter pelo menos um a
 Finish: after several years	StatusWindow		Fim: após vários anos
 Favorites	FilePanelPriv		Favoritos
 Point	AttributesView		Ponto
+You can't move or copy items to read-only volumes.	PoseView		Não pode mover ou copiar items para volumes apenas de leitura.
 home	B_USER_DIRECTORY		pessoal
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novos Modelos do Tracker
 Disk mounting during boot	AutoMounterSettings		Montar discos durante o arranque
@@ -243,6 +256,7 @@ Don't automount	AutoMounterSettings		Não montar automaticamente
 Node ref	AttributesView		Ref. nodo
 Could not find application \"%appname\"	OpenWithWindow		Não foi possível encontrar a aplicação \"%appname\"
 Unmatched parenthesis.	libtracker		Parênteses sem correspondência.
+New folder %d	FSUtils		Nova pasta %d
 Extended attribute	AttributesView		Atributo expandido
 Error %error loading Add-On %name.	ContainerWindow		Erro %error ao carregar a extensão %name.
 Unmatched brackets.	libtracker		Parênteses sem correspondência.
@@ -308,6 +322,7 @@ yes	AttributesView		sim
 Make active printer	ContainerWindow		Tornar impressora ativa
 Copy to	ContainerWindow		Copiar para
 Name	SelectionWindow		Nome
+Location	Default Query Columns		Localização
 by attribute	FindPanel		por atributo
 Write	FilePermissionsView		Escrita
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se alterar a pasta de sistema ou o seu conteúdo, é possível que não consiga arrancar o %osName!\n\nTem a certeza de que quer fazer isso?\n\nPara alterar a pasta de sistema ou o seu conteúdo, mantenha premida a tecla Maiúsculas (Shift) e clique \"Eu sei o que estou a fazer\".
@@ -318,6 +333,7 @@ after	FindPanel		após
 Messenger	AttributesView		Messenger
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte de dados>} other{<# bytes de dados>}}
 Version	OpenWithWindow		Versão
+The entered file name is too long.	FSUtils		O nome de ficheiro introduzido é demasiado longo.
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dos itens selecionados não podem ser movidos para o Lixo. Pretende, em vez disso, apagá-los diretamente? (Esta operação não poderá ser anulada.)
 Add printer…	ContainerWindow		Adicionar impressora…
 Permissions	ContainerWindow		Permissões
@@ -368,6 +384,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar 
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" com a aplicação \"%app\" (Símbolo em falta: %symbol). \n
 New folder	ContainerWindow		Nova pasta
 Name	OpenWithWindow		Nome
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Obter informação
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ocorreu um problema ao tentar substituir \"%name\". O item poderá estar aberto ou ocupado.
 Windows	TrackerSettingsWindow		Janelas
 Show space bars on volumes	SettingsView		Mostrar barras de espaço nos volumes
@@ -377,6 +394,7 @@ Emptying Trash… 	StatusWindow		A esvaziar o Lixo…
 Revert	TrackerSettingsWindow		Reverter
 trash	B_TRASH_DIRECTORY		lixo
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se mover a pasta de sistema ou o seu conteúdo, não conseguirá arrancar o %osName!\n\nTem a certeza de que quer fazer isso?\n\nPara mover de qualquer modo a pasta de sistema ou o seu conteúdo, mantenha premida a tecla Maiúsculas (Shift) e clique \"Mover\".
+Open query:	FindPanel		Abrir consulta:
 Close all in workspace	ContainerWindow		Fechar tudo na área de trabalho
 Corrupted expression.	libtracker		Expressão corrompida.
 Network address	AttributesView		Endereço de rede
@@ -390,6 +408,7 @@ Name	QueryPoseView		Nome
 Error %error loading add-On %name.	ContainerWindow		Erro %error ao carregar a extensão %name.
 Does not handle file	OpenWithWindow		Não suporta o ficheiro
 E-mail	Person Query Columns		Correio eletrónico
+Templates	FindPanel		Modelos
 Arrange by	ContainerWindow		Organizar por
 Attributes	AttributesView		Atributos
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Desculpe, não é permitido guardar mais de um item.
@@ -437,6 +456,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Deve arrastar itens para um dos ícones de disco na janela \"Discos\".
 Version:	InfoWindow		Versão:
 OK	PoseView		OK
+Add new submenu…	TemplatesMenu		Adicionar novo submenu…
 Find	FindPanel		Procurar
 Empty folder	NavMenu		Pasta vazia
 Defaults	TrackerSettingsWindow		Predefinições
@@ -446,6 +466,7 @@ Alignment	AttributesView		Alinhamento
 Move to Trash	FSUtils		Mover para o Lixo
 Handles %type	OpenWithWindow		Suporta %tipo
 Cancel	PoseView		Cancelar
+Options	FindPanel		Opções
 Delete	PoseView		Apagar
 Media parameter	AttributesView		Parâmetro de multimédia
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se alterar a pasta pessoal, o %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isso?\n\nPara alterar de qualquer modo a pasta pessoal, mantenha premida a tecla Maiúsculas (Shift) e clique \"Eu sei o que estou a fazer\".
@@ -458,8 +479,10 @@ If you move %target, %osName may not behave properly!\n\nAre you sure you want t
 Create a Query	FindPanel		Criar uma consulta
 I know what I'm doing	FSUtils	button label	Eu sei o que estou a fazer
 Preparing to copy items…	StatusWindow		A preparar para copiar itens…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Ref. entrada
 Icon view	ContainerWindow		Vista de ícones
+The entered folder name is too long.	FSUtils		O nome da pasta introduzido é demasiado longo.
 Name	ContainerWindow		Nome
 Preferred for %type	OpenWithWindow		Preferida para %type
 Free space color	SettingsView		Cor do espaço livre
