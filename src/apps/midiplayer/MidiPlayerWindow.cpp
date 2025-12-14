@@ -243,7 +243,7 @@ MidiPlayerWindow::CreateViews()
 
 	fVolumeSlider = new BSlider("volumeSlider", NULL, NULL, 0, 100,
 		B_HORIZONTAL);
-	rgb_color color = (rgb_color){ 152, 152, 255 };
+	rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	fVolumeSlider->UseFillColor(true, &color);
 	fVolumeSlider->SetModificationMessage(new BMessage(MSG_VOLUME));
 	fVolumeSlider->SetExplicitMinSize(
