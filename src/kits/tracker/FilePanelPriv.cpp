@@ -840,14 +840,15 @@ TFilePanel::Init(const BMessage*)
 	PoseView()->UpdateScrollRange();
 	PoseView()->ScrollTo(B_ORIGIN);
 
-	// Focus on text control initially, but do not alter focus afterwords
-	// because pose view focus is needed for Cut/Copy/Paste to work.
+	// Always focus pose view initially to make sure the borders are correctly drawn, then switch
+	// focus to text control if this is a save panel, but do not alter focus afterwards because pose
+	// view focus is needed for Cut/Copy/Paste to work.
 
+	PoseView()->MakeFocus();
 	if (fIsSavePanel && fTextControl != NULL) {
 		fTextControl->MakeFocus();
 		fTextControl->TextView()->SelectAll();
-	} else
-		PoseView()->MakeFocus();
+	}
 
 	app_info info;
 	BString title;
