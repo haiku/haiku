@@ -141,20 +141,27 @@ arch_start_kernel(addr_t kernelEntry)
 	}
 
 	addr_t addr = (addr_t)memoryMap;
+	efi_physical_addr loaderCode = 0LL;
 	dprintf("System provided memory map:\n");
-	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; i++) {
 		efi_memory_descriptor *entry
 			= (efi_memory_descriptor *)(addr + i * descriptorSize);
 		dprintf("  phys: 0x%08" PRIx64 "-0x%08" PRIx64
 			", virt: 0x%08" PRIx64 "-0x%08" PRIx64
-			", type: %s (%#x), attr: %#" PRIx64 "\n",
+			", size = 0x%08" PRIx64 ", type: %s (%#x), attr: %#" PRIx64 "\n",
 			entry->PhysicalStart,
 			entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE,
 			entry->VirtualStart,
 			entry->VirtualStart + entry->NumberOfPages * B_PAGE_SIZE,
+			entry->NumberOfPages * B_PAGE_SIZE,
 			memory_region_type_str(entry->Type), entry->Type,
 			entry->Attribute);
+		if (entry->Type == EfiLoaderCode)
+			loaderCode = entry->PhysicalStart;
 	}
+	// This is where our efi loader got relocated, therefore we need to use this
+	// offset for properly align symbols
+	dprintf("Efi loader symbols offset: 0x%0lx:\n", loaderCode);
 
 	// Generate page tables for use after ExitBootServices.
 	uint32_t final_ttbr0 = arch_mmu_generate_post_efi_page_tables(
@@ -173,6 +180,7 @@ arch_start_kernel(addr_t kernelEntry)
 
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
 	serial_disable();
+
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, mapKey) == EFI_SUCCESS) {
 			// Disconnect from EFI serial_io / stdio services

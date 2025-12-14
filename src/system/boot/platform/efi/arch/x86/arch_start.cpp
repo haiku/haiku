@@ -133,6 +133,7 @@ arch_start_kernel(addr_t kernelEntry)
 
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
 	serial_disable();
+
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, mapKey) == EFI_SUCCESS) {
 			// Disconnect from EFI serial_io / stdio services
