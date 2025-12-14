@@ -8,6 +8,7 @@
 #include <boot/platform.h>
 #include <boot/stage2.h>
 
+#include <boot/net/Ethernet.h>
 #include <boot/net/NetStack.h>
 #include <boot/net/RemoteDisk.h>
 
@@ -278,8 +279,8 @@ platform_register_boot_device(Node *device)
 {
 	TRACE("%s: called\n", __func__);
 
+	// TODO not used for network boot, can be moved to disk boot case?
 	disk_identifier identifier;
-
 	identifier.bus_type = UNKNOWN_BUS;
 	identifier.device_type = UNKNOWN_DEVICE;
 	identifier.device.unknown.size = device->Size();
@@ -291,8 +292,33 @@ platform_register_boot_device(Node *device)
 			offset);
 	}
 
-	// ...HARD_DISK, as we pick partition and have checksum (no need to use _CD)
-	gBootParams.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
+	// TODO is there no better way to identify network boot?
+	char buffer[11];
+	device->GetName(buffer, sizeof(buffer));
+	TRACE("Booting from %s\n", buffer);
+
+	if (strcmp(buffer, "RemoteDisk") == 0) {
+		TRACE("Booting from network\n");
+		RemoteDisk* remoteDisk = static_cast<RemoteDisk*>(device);
+		// Tell the kernel we're booting from network and forward the network
+		// configuration
+		auto ethernetInterface = NetStack::Default()->GetEthernetInterface();
+		if (gBootParams.SetInt32(BOOT_METHOD, BOOT_METHOD_NET)
+			|| gBootParams.AddInt64("client MAC",
+				ethernetInterface->MACAddress().ToUInt64()) != B_OK
+			|| gBootParams.AddInt32("client IP",
+				ethernetInterface->IPAddress()) != B_OK
+			|| gBootParams.AddInt32("server IP", remoteDisk->ServerIPAddress())
+				!= B_OK
+			|| gBootParams.AddInt32("server port", remoteDisk->ServerPort())
+				!= B_OK) {
+			return B_NO_MEMORY;
+		}
+	} else {
+		// ...HARD_DISK, as we pick partition and have checksum (no need to use _CD)
+		gBootParams.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
+	}
+
 	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&identifier, sizeof(disk_identifier));
 
