@@ -122,13 +122,11 @@ arch_start_kernel(addr_t kernelEntry)
 	// Allocate a buffer twice as large as needed just in case it gets bigger
 	// between calls to ExitBootServices.
 	size_t actualMemoryMapSize = memoryMapSize * 2;
-	efi_memory_descriptor *memoryMap
-		= (efi_memory_descriptor *)kernel_args_malloc(actualMemoryMapSize +
-			ALIGN_MEMORY_MAP);
-
 	// align memory_map to 4-byte boundary
 	// otherwise we get alignment exception when calling GetMemoryMap below
-	memoryMap = (efi_memory_descriptor *)ROUNDUP((uint32_t)memoryMap, ALIGN_MEMORY_MAP);
+	efi_memory_descriptor *memoryMap
+		= (efi_memory_descriptor *)kernel_args_malloc(actualMemoryMapSize,
+			ALIGN_MEMORY_MAP);
 
 	if (memoryMap == NULL)
 		panic("Unable to allocate memory map.");
