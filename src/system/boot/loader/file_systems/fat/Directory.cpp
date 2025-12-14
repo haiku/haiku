@@ -15,6 +15,8 @@
 
 #include <new>
 
+#include <util/convertutf.h>
+
 #include <StorageDefs.h>
 
 #include "CachedBlock.h"
@@ -156,51 +158,12 @@ bool
 dir_cookie::ConvertNameToUTF8()
 {
 	char name[B_FILE_NAME_LENGTH];
-	uint32 nameOffset = 0;
 
 	const uint16* utf16 = nameBuffer + (MAX_UTF16_NAME_LENGTH - nameLength);
+	ssize_t count = utf16le_to_utf8(utf16, nameLength, name, sizeof(name));
+	if (count < 0)
+		return false;
 
-	for (uint32 i = 0; i < nameLength; i++) {
-		uint8 utf8[4];
-		uint32 count;
-		uint16 c = B_LENDIAN_TO_HOST_INT16(utf16[i]);
-		if (c < 0x80) {
-			utf8[0] = c;
-			count = 1;
-		} else if (c < 0xff80) {
-			utf8[0] = 0xc0 | (c >> 6);
-			utf8[1] = 0x80 | (c & 0x3f);
-			count = 2;
-		} else if ((c & 0xfc00) != 0xd800) {
-			utf8[0] = 0xe0 | (c >> 12);
-			utf8[1] = 0x80 | ((c >> 6) & 0x3f);
-			utf8[2] = 0x80 | (c & 0x3f);
-			count = 3;
-		} else {
-			// surrogate pair
-			if (i + 1 >= nameLength)
-				return false;
-
-			uint16 c2 = B_LENDIAN_TO_HOST_INT16(utf16[++i]);
-			if ((c2 & 0xfc00) != 0xdc00)
-				return false;
-
-			uint32 value = ((c - 0xd7c0) << 10) | (c2 & 0x3ff);
-			utf8[0] = 0xf0 | (value >> 18);
-			utf8[1] = 0x80 | ((value >> 12) & 0x3f);
-			utf8[2] = 0x80 | ((value >> 6) & 0x3f);
-			utf8[3] = 0x80 | (value & 0x3f);
-			count = 4;
-		}
-
-		if (nameOffset + count >= sizeof(name))
-			return false;
-
-		memcpy(name + nameOffset, utf8, count);
-		nameOffset += count;
-	}
-
-	name[nameOffset] = '\0';
 	strlcpy(Name(), name, sizeof(nameBuffer));
 	return true;
 }
