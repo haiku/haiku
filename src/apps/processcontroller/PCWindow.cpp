@@ -24,7 +24,7 @@ PCWindow::PCWindow()
 	:
 	BWindow(BRect(100, 150, 131, 181),
 		B_TRANSLATE_SYSTEM_NAME("ProcessController"), B_TITLED_WINDOW,
-		B_NOT_H_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	Preferences preferences(kPreferencesFileName);
 	preferences.SaveInt32(kCurrentVersion, kVersionName);
@@ -40,9 +40,9 @@ PCWindow::PCWindow()
 	BView* processController = new ProcessController(BRect(BPoint(0, 0),
 		ProcessController::ComposeSize(size.Width() * 10, size.Height())), false);
 
-	BSize limits(processController->Bounds().Width() + spacing * 2,
+	ResizeTo(processController->Bounds().Width() + spacing * 2,
 		processController->Bounds().Height() + spacing * 2);
-	SetSizeLimits(limits.Width(), limits.Width(), limits.Height(), limits.Height());
+	processController->SetResizingMode(B_FOLLOW_ALL);
 
 	topView->AddChild(processController);
 	processController->MoveTo(spacing, spacing);
