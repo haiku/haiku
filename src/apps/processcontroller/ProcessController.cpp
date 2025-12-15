@@ -148,6 +148,12 @@ ProcessController::ComposeSize(float maxWidth, float maxHeight)
 	// For the memory bar
 	width += 8;
 
+	// Scale, and be at least as wide as tall
+	if (maxHeight > 16)
+		width *= (maxHeight / 16);
+	if (width < maxHeight)
+		width = maxHeight;
+
 	// Damn, you got a lot of CPU
 	if (width > maxWidth)
 		width = (int)maxWidth;
