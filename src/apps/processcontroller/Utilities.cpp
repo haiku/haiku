@@ -182,8 +182,8 @@ bar_rect(BRect& frame, BFont* font)
 	rect.top = frame.top + (frame.Height() - barHeight) / 2;
 	rect.bottom = frame.top + (frame.Height() + barHeight) / 2;
 
-	rect.left = frame.right - kMargin - kBarWidth;
-	rect.right = frame.right - kMargin;
+	rect.left = frame.right - font->Size() - kBarWidth;
+	rect.right = frame.right - font->Size();
 
 	return rect;
 }

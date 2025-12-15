@@ -60,6 +60,7 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 
 	BFont font;
 	menu->GetFont(&font);
+	const float margin = font.Size();
 	BRect cadre = bar_rect(frame, &font);
 
 	// draw the bar itself
@@ -133,8 +134,8 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 			menu->SetLowColor(gMenuBackColor);
 			menu->SetHighColor(gMenuBackColor);
 		}
-		BRect trect(cadre.left - kMargin - gMemoryTextWidth, frame.top,
-			cadre.left - kMargin, frame.bottom);
+		BRect trect(cadre.left - margin - gMemoryTextWidth, frame.top,
+			cadre.left - margin, frame.bottom);
 		menu->FillRect(trect);
 		menu->SetHighColor(highColor);
 
@@ -142,11 +143,11 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 		BPoint loc(cadre.left, cadre.bottom + 1);
 
 		string_for_size(fCommittedMemory * 1024.0, infos, sizeof(infos));
-		loc.x -= kMargin + gMemoryTextWidth / 2 + menu->StringWidth(infos);
+		loc.x -= margin + gMemoryTextWidth / 2 + menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
 
 		string_for_size(fCachedMemory * 1024.0, infos, sizeof(infos));
-		loc.x = cadre.left - kMargin - menu->StringWidth(infos);
+		loc.x = cadre.left - margin - menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
 
 		fLastSum = sum;
@@ -161,6 +162,8 @@ KernelMemoryBarMenuItem::GetContentSize(float* _width, float* _height)
 	if (*_height < 16)
 		*_height = 16;
 
-	*_width += 20 + kBarWidth + kMargin + gMemoryTextWidth;
+	BFont font;
+	Menu()->GetFont(&font);
+	*_width += 20 + kBarWidth + font.Size() + gMemoryTextWidth;
 }
 

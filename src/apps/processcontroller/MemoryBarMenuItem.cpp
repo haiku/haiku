@@ -78,6 +78,7 @@ MemoryBarMenuItem::DrawBar(bool force)
 
 	BFont font;
 	menu->GetFont(&font);
+	const float margin = font.Size();
 	BRect rect = bar_rect(frame, &font);
 
 	// draw the bar itself
@@ -165,8 +166,8 @@ MemoryBarMenuItem::DrawBar(bool force)
 	else
 		menu->SetLowColor(gMenuBackColor);
 
-	BRect textRect(rect.left - kMargin - gMemoryTextWidth, frame.top,
-		rect.left - kMargin, frame.bottom);
+	BRect textRect(rect.left - margin - gMemoryTextWidth, frame.top,
+		rect.left - margin, frame.bottom);
 	menu->FillRect(textRect, B_SOLID_LOW);
 
 	fLastWrite = fWriteMemory;
@@ -180,12 +181,12 @@ MemoryBarMenuItem::DrawBar(bool force)
 	char infos[128];
 	string_for_size(fWriteMemory * 1024.0, infos, sizeof(infos));
 
-	BPoint loc(rect.left - kMargin - gMemoryTextWidth / 2 - menu->StringWidth(infos),
+	BPoint loc(rect.left - margin - gMemoryTextWidth / 2 - menu->StringWidth(infos),
 		rect.bottom + 1);
 	menu->DrawString(infos, loc);
 
 	string_for_size(fAllMemory * 1024.0, infos, sizeof(infos));
-	loc.x = rect.left - kMargin - menu->StringWidth(infos);
+	loc.x = rect.left - margin - menu->StringWidth(infos);
 	menu->DrawString(infos, loc);
 	menu->SetHighColor(highColor);
 }
@@ -195,8 +196,11 @@ void
 MemoryBarMenuItem::GetContentSize(float* _width, float* _height)
 {
 	IconMenuItem::GetContentSize(_width, _height);
+
+	BFont font;
+	Menu()->GetFont(&font);
 	*_width += ceilf(be_control_look->DefaultLabelSpacing() * 2.0f)
-		+ kBarWidth + kMargin + gMemoryTextWidth;
+		+ kBarWidth + font.Size() + gMemoryTextWidth;
 }
 
 
