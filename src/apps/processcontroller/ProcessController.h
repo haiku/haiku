@@ -18,9 +18,11 @@ class ThreadBarMenu;
 
 class ProcessController : public BView {
 	public:
+		static BSize	ComposeSize(float maxWidth, float maxHeight);
+
 						ProcessController(BRect frame, bool temp = false);
 						ProcessController(BMessage *data);
-						ProcessController(float width, float height);
+						ProcessController(BSize size);
 		virtual			~ProcessController();
 
 		virtual	void	MessageReceived(BMessage *message);

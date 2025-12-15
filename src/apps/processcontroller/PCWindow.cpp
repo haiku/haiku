@@ -13,6 +13,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Deskbar.h>
 #include <Dragger.h>
 #include <Roster.h>
@@ -29,31 +30,22 @@ PCWindow::PCWindow()
 	preferences.SaveInt32(kCurrentVersion, kVersionName);
 	preferences.LoadWindowPosition(this, kPosPrefName);
 
-	system_info info;
-	get_system_info(&info);
-	int width = 4;
-	if (info.cpu_count > 4)
-		width = info.cpu_count;
-	if (info.cpu_count <= 16)
-		width *= 2;
-
-	// For the memory bar
-	width += 8;
-
-	BRect rect = Bounds();
-
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
+	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
 	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(topView);
 
-	// set up a rectangle && instantiate a new view
-	// view rect should be same size as window rect but with left top at (0, 0)
-	rect.Set(0, 0, width - 1, 15);
-	SetSizeLimits(rect.Width() + 21, rect.Width() + 21, 15 + 21, 15 + 21);
+	BSize size = be_control_look->ComposeIconSize(16);
+	float spacing = be_control_look->ComposeSpacing(B_USE_ITEM_SPACING);
 
-	rect.OffsetTo((Bounds().Width() - 16) / 2, (Bounds().Height() - 16) / 2);
+	BView* processController = new ProcessController(BRect(BPoint(0, 0),
+		ProcessController::ComposeSize(size.Width() * 10, size.Height())), false);
 
-	topView->AddChild(new ProcessController(rect));
+	BSize limits(processController->Bounds().Width() + spacing * 2,
+		processController->Bounds().Height() + spacing * 2);
+	SetSizeLimits(limits.Width(), limits.Width(), limits.Height(), limits.Height());
+
+	topView->AddChild(processController);
+	processController->MoveTo(spacing, spacing);
 
 	// make window visible
 	Show();

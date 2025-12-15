@@ -127,7 +127,16 @@ extern "C" _EXPORT BView*
 instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
 	gInDeskbar = true;
+	return new ProcessController(ProcessController::ComposeSize(maxWidth, maxHeight));
+}
 
+
+//	#pragma mark -
+
+
+BSize
+ProcessController::ComposeSize(float maxWidth, float maxHeight)
+{
 	system_info info;
 	get_system_info(&info);
 	int width = 4;
@@ -143,11 +152,8 @@ instantiate_deskbar_item(float maxWidth, float maxHeight)
 	if (width > maxWidth)
 		width = (int)maxWidth;
 
-	return new ProcessController(width - 1, maxHeight - 1);
+	return BSize(width - 1, maxHeight - 1);
 }
-
-
-//	#pragma mark -
 
 
 ProcessController::ProcessController(BRect frame, bool temp)
@@ -192,10 +198,10 @@ ProcessController::ProcessController(BMessage *data)
 }
 
 
-ProcessController::ProcessController(float width, float height)
+ProcessController::ProcessController(BSize size)
 	:
-	BView(BRect (0, 0, width, height), kDeskbarItemName, B_FOLLOW_NONE,
-		B_WILL_DRAW),
+	BView(BRect(0, 0, size.Width(), size.Height()),
+		kDeskbarItemName, B_FOLLOW_NONE, B_WILL_DRAW),
 	fProcessControllerIcon(kSignature),
 	fProcessorIcon(k_cpu_mini),
 	fTrackerIcon(kTrackerSig),
