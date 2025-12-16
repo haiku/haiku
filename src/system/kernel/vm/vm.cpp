@@ -5640,6 +5640,7 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 	if (addressSpace == NULL)
 		return B_ERROR;
 
+	VMAddressSpacePutter addressSpacePutter(addressSpace);
 
 	VMTranslationMap* map = addressSpace->TranslationMap();
 	if (interrupts)
