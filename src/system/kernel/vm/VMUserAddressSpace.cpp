@@ -281,6 +281,7 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
 			if (next->Size() <= offset) {
 				VMUserArea* nextNext = fAreas.Next(next);
 				RemoveArea(next, allocationFlags);
+				Put();
 				next->~VMUserArea();
 				free_etc(next, allocationFlags);
 				next = nextNext;
