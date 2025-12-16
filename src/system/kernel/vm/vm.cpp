@@ -5615,10 +5615,8 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 	uint32 numEntries = *_numEntries;
 	*_numEntries = 0;
 
-	VMAddressSpace* addressSpace;
 	addr_t virtualAddress = (addr_t)address;
 	addr_t pageOffset = virtualAddress & (B_PAGE_SIZE - 1);
-	phys_addr_t physicalAddress;
 	status_t status = B_OK;
 	int32 index = -1;
 	addr_t offset = 0;
@@ -5630,7 +5628,8 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 	if (numEntries == 0 || numBytes == 0)
 		return B_BAD_VALUE;
 
-	// in which address space is the address to be found?
+	// get the address space
+	VMAddressSpace* addressSpace;
 	if (IS_USER_ADDRESS(virtualAddress)) {
 		if (team == B_CURRENT_TEAM)
 			addressSpace = VMAddressSpace::GetCurrent();
@@ -5638,12 +5637,11 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 			addressSpace = VMAddressSpace::Get(team);
 	} else
 		addressSpace = VMAddressSpace::GetKernel();
-
 	if (addressSpace == NULL)
 		return B_ERROR;
 
-	VMTranslationMap* map = addressSpace->TranslationMap();
 
+	VMTranslationMap* map = addressSpace->TranslationMap();
 	if (interrupts)
 		map->Lock();
 
@@ -5651,6 +5649,7 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 		addr_t bytes = min_c(numBytes - offset, B_PAGE_SIZE);
 		uint32 flags;
 
+		phys_addr_t physicalAddress;
 		if (interrupts) {
 			status = map->Query((addr_t)address + offset, &physicalAddress,
 				&flags);
