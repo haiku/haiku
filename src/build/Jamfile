@@ -8,6 +8,7 @@ SubInclude HAIKU_TOP src build libshared ;
 SubInclude HAIKU_TOP src build libsolv ;
 SubInclude HAIKU_TOP src build libuuid ;
 
-if $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = freebsd {
+if $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = freebsd ||
+   $(HOST_PLATFORM) = netbsd {
 	SubInclude HAIKU_TOP src build libgnuregex ;
 }

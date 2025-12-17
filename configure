@@ -458,7 +458,7 @@ check_native_xattrs()
 			xattr_set="xattr"; xattr_set_args="-w \$NAME \"\$VALUE\""
 			xattr_get="xattr"; xattr_get_args="-p \$NAME"
 			;;
-		freebsd)
+		freebsd|netbsd)
 			xattr_set="setextattr"; xattr_set_args="user \$NAME \"\$VALUE\""
 			xattr_get="getextattr"; xattr_get_args="user \$NAME"
 			;;
@@ -623,13 +623,14 @@ case "${platform}" in
 	Haiku)   HOST_PLATFORM=haiku_host ;;
 	Linux)   HOST_PLATFORM=linux ;;
 	OpenBSD) HOST_PLATFORM=openbsd ;;
+	NetBSD)  HOST_PLATFORM=netbsd ;;
 	*)       echo Unsupported platform: ${platform}
 	         exit 1 ;;
 esac
 
 case $HOST_PLATFORM in
-	darwin|freebsd|openbsd) statCmd='stat -f' ;;
-	*)                      statCmd='stat -c' ;;
+	darwin|freebsd|openbsd|netbsd) statCmd='stat -f' ;;
+	*)                             statCmd='stat -c' ;;
 esac
 
 # ensure git checkout was not done with a restrictive umask
@@ -1038,8 +1039,8 @@ else
 			fi
 
 			case $HOST_PLATFORM in
-				freebsd|openbsd)	MAKE=gmake;;
-				*)					MAKE=make;;
+				freebsd|openbsd|netbsd)	MAKE=gmake;;
+				*)						MAKE=make;;
 			esac
 
 			if ! valid_toolchain "${targetMachine}" "${crossToolsDir}" "${buildCrossTools}"; then

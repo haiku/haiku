@@ -227,11 +227,12 @@ HOST_UNARFLAGS		?= x ;
 
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
-	: linux openbsd freebsd darwin ;
+	: linux openbsd freebsd netbsd darwin ;
 HOST_PLATFORM_(host)_COMPATIBLE = 1 ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
-	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = openbsd {
+	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = openbsd
+	|| $(HOST_PLATFORM) = netbsd {
 	# don't use lex: otherwise rc will not work correctly
 	if $(LEX) = lex {
 		LEX = flex ;
@@ -306,6 +307,7 @@ switch $(HOST_PLATFORM) {
 	case haiku_host	: hostDebugFlags ?= -ggdb ;
 	case linux		: hostDebugFlags ?= -ggdb ;
 	case freebsd	: hostDebugFlags ?= -ggdb ;
+	case netbsd		: hostDebugFlags ?= -ggdb ;
 	case darwin		: hostDebugFlags ?= -ggdb ;
 	case *			: hostDebugFlags ?= -g ;
 }
@@ -374,7 +376,11 @@ if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	HOST_CCFLAGS += $(compatibilityHeader) ;
 	HOST_C++FLAGS += $(compatibilityHeader) ;
 } else {
-	HOST_LINKFLAGS += -lm -ldl ;
+	HOST_LINKFLAGS += -lm ;
+	# NetBSD doesn't have a separate libdl
+	if $(HOST_PLATFORM) != netbsd {
+		HOST_LINKFLAGS += -ldl ;
+	}
 	HOST_LIBSTDC++ = stdc++ ;
 	if $(HOST_PLATFORM) = darwin {
 		HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
@@ -467,6 +473,12 @@ if $(HOST_PLATFORM) = freebsd {
 	# though that's where most things from ports wind up being installed.
 	HOST_HDRS += /usr/local/include /usr/include/gnu ;
 	HOST_LINKFLAGS += -L/usr/local/lib ;
+}
+
+if $(HOST_PLATFORM) = netbsd {
+	# packages live in /usr/pkg on NetBSD
+	HOST_HDRS += /usr/pkg/include ;
+	HOST_LINKFLAGS += -L/usr/pkg/lib -Wl,-rpath,/usr/pkg/lib ;
 }
 
 if $(HOST_PLATFORM) = darwin {
@@ -615,6 +627,7 @@ switch $(HOST_PLATFORM) {
 	case haiku_host	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_HAIKU ;
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
 	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
+	case netbsd		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_NETBSD ;
 	case darwin		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DARWIN ;
 }
 

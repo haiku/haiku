@@ -418,7 +418,7 @@ to_lower(const char *str, std::string &result)
 	if (str) {
 		result = "";
 		for (int i = 0; i < (int)strlen(str); i++)
-			result += tolower(str[i]);
+			result += tolower((unsigned char)str[i]);
 	} else
 		result = "(null)";
 }
@@ -429,7 +429,7 @@ to_lower(const char *str, char *result)
 	if (str && result) {
 		int i;
 		for (i = 0; i < (int)strlen(str); i++)
-			result[i] = tolower(str[i]);
+			result[i] = tolower((unsigned char)str[i]);
 		result[i] = 0;
 	}	
 }

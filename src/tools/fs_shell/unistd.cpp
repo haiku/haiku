@@ -21,6 +21,7 @@
 #	include <Drivers.h>
 #else
 #	if defined(HAIKU_HOST_PLATFORM_FREEBSD) \
+		|| defined(HAIKU_HOST_PLATFORM_NETBSD) \
 		|| defined(HAIKU_HOST_PLATFORM_DARWIN)
 #		include <sys/ioctl.h>
 #		include <sys/stat.h>

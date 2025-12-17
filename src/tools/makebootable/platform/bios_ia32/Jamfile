@@ -11,7 +11,8 @@ SEARCH_SOURCE
 USES_BE_API on <build>makebootable = true ;
 
 local hostPlatformSources ;
-if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd || $(HOST_PLATFORM) = darwin {
+if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd ||
+   $(HOST_PLATFORM) = netbsd || $(HOST_PLATFORM) = darwin {
 	UsePrivateHeaders interface ;
 
 	hostPlatformSources = PartitionMap.cpp PartitionMapParser.cpp

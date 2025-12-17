@@ -41,7 +41,8 @@
 // Include the interface to the host platform attributes support.
 #if defined(HAIKU_HOST_PLATFORM_LINUX)
 #	include "fs_attr_xattr.h"
-#elif defined(HAIKU_HOST_PLATFORM_FREEBSD)
+#elif defined(HAIKU_HOST_PLATFORM_FREEBSD) \
+   || defined(HAIKU_HOST_PLATFORM_NETBSD)
 #	include "fs_attr_extattr.h"
 #elif defined(HAIKU_HOST_PLATFORM_DARWIN)
 #	include "fs_attr_bsdxattr.h"

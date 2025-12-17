@@ -7,7 +7,8 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin keymap ] ;
 USES_BE_API on <build>keymap = true ;
 
 local regexLib ;
-if $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = freebsd {
+if $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = freebsd ||
+   $(HOST_PLATFORM) = netbsd {
 	UseHeaders [ FDirName $(HAIKU_TOP) src build libgnuregex ] : true ;
 	regexLib = libgnuregex_build.so ;
 }
