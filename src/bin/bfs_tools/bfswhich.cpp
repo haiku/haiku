@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2009 pinc Software. All Rights Reserved.
+ * Copyright (c) 2002-2025 pinc Software. All Rights Reserved.
  * Released under the terms of the MIT license.
  */
 
@@ -118,7 +118,7 @@ scanNode(Disk& disk, Inode* inode, const char* name,
 	const block_run& checkForRun)
 {
 	if (checkNode(disk, inode, checkForRun)) {
-		printf("Inode at (%ld, %u, %u) \"%s\" intersects\n",
+		printf("Inode at (%" B_PRIu32 ", %u, %u) \"%s\" intersects\n",
 			inode->BlockRun().allocation_group, inode->BlockRun().start,
 			inode->BlockRun().length, name);
 	}
@@ -154,7 +154,7 @@ scanNodes(Disk& disk, Directory* directory, const char* directoryName,
 			continue;
 
 		if (++gCount % 50 == 0)
-			printf("  %7Ld%s1A\n", gCount, gEscape);
+			printf("  %7" B_PRIdOFF "%s1A\n", gCount, gEscape);
 
 		Inode *inode = Inode::Factory(&disk, run);
 		if (inode != NULL) {
@@ -167,10 +167,10 @@ scanNodes(Disk& disk, Directory* directory, const char* directoryName,
 
 			delete inode;
 		} else {
-			printf("  Directory \"%s\" (%ld, %d) points to corrupt inode \"%s\" "
-				"(%ld, %d)\n", directory->Name(),
-				directory->BlockRun().allocation_group,directory
-					->BlockRun().start,
+			printf("  Directory \"%s\" (%" B_PRIu32 ", %d) points to corrupt inode \"%s\" "
+				"(%" B_PRIu32 ", %d)\n", directory->Name(),
+				directory->BlockRun().allocation_group,
+				directory->BlockRun().start,
 				name, run.allocation_group, run.start);
 		}
 	}
@@ -203,7 +203,7 @@ scanNodes(Disk& disk, const block_run& checkForRun, bool scanAll)
 		delete indices;
 	}
 
-	printf("  %7Ld nodes found.\n", gCount);
+	printf("  %7" B_PRIdOFF " nodes found.\n", gCount);
 }
 
 
@@ -217,7 +217,7 @@ testBitmap(Disk& disk, const block_run& run)
 		return;
 	}
 
-	printf("Block bitmap sees block %lld as %s.\n", disk.ToBlock(run),
+	printf("Block bitmap sees block %" B_PRIdOFF " as %s.\n", disk.ToBlock(run),
 		bitmap.UsedAt(disk.ToBlock(run)) ? "used" : "free");
 }
 
@@ -304,13 +304,13 @@ main(int argc, char** argv)
 	testBitmap(disk, run);
 
 	if (checkForBlockRunIntersection(disk.Log(), run)) {
-		printf("Log area (%lu.%u.%u) intersects\n",
+		printf("Log area (%" B_PRIu32 ".%u.%u) intersects\n",
 			disk.Log().allocation_group, disk.Log().start,
 			disk.Log().length);
 	} else if (block < 1) {
 		printf("Superblock intersects\n");
 	} else if (block < 1 + disk.BitmapSize()) {
-		printf("Block bitmap intersects (start %d, end %lu)\n", 1,
+		printf("Block bitmap intersects (start %d, end %" B_PRIu32 ")\n", 1,
 			disk.BitmapSize());
 	} else
 		scanNodes(disk, run, scanAll);

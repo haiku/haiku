@@ -3,7 +3,7 @@
  * Initial version by Axel Dörfler, axeld@pinc-software.de
  * Parts of this code is based on work previously done by Marcus Overhagen
  *
- * Copyright 2001-2008 pinc Software. All Rights Reserved.
+ * Copyright 2001-2025 pinc Software. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_H
@@ -11,10 +11,6 @@
 
 
 #include <SupportDefs.h>
-
-#if !defined(BEOS_VERSION_DANO) && !defined(__HAIKU__)
-#	define B_BAD_DATA B_ERROR
-#endif
 
 
 // File types as used in BFS and stored in its inodes

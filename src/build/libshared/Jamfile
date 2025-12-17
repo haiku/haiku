@@ -12,6 +12,7 @@ BuildPlatformStaticLibraryPIC libshared_build.a :
 	Keymap.cpp
 	NaturalCompare.cpp
 	RegExp.cpp
+	StringForSize.cpp
 
 	:
 

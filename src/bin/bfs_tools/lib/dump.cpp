@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, pinc Software. All Rights Reserved.
+ * Copyright 2001-2025, pinc Software. All Rights Reserved.
  * Released under the terms of the MIT license.
  */
 
@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #define Print printf
 

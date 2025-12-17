@@ -219,6 +219,21 @@ BStatable::SetModificationTime(time_t mtime)
 	return set_stat(statData, B_STAT_MODIFICATION_TIME);
 }
 
+
+status_t
+BStatable::GetCreationTime(time_t *ctime) const
+{
+	return GetModificationTime(ctime);
+}
+
+
+status_t
+BStatable::SetCreationTime(time_t ctime)
+{
+	return B_ERROR;
+}
+
+
 /*!	\brief Returns the time the node was accessed.
 	Not used.
 	\see GetModificationTime()

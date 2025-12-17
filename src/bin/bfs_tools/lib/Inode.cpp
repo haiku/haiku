@@ -174,6 +174,7 @@ Inode::CopyBuffer()
 /*static*/ bool
 Inode::_LowMemory()
 {
+#ifdef __HAIKU__
 	static bigtime_t lastChecked;
 	static int32 percentUsed;
 
@@ -184,6 +185,9 @@ Inode::_LowMemory()
 	}
 
 	return percentUsed > 75;
+#else
+	return false;
+#endif
 }
 
 

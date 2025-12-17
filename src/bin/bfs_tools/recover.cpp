@@ -804,6 +804,7 @@ main(int argc, char **argv)
 		return -1;
 	}
 
+#ifdef __HAIKU__
 	if (argv[1] != NULL) {
 		dev_t device = dev_for_path(argv[1]);
 		fs_info info;
@@ -824,6 +825,7 @@ main(int argc, char **argv)
 			}
 		}
 	}
+#endif
 
 	bool recreatedSuperBlock = false;
 

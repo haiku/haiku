@@ -1,0 +1,42 @@
+SubDir HAIKU_TOP src tools bfs_tools ;
+
+UsePrivateBuildHeaders libroot shared kernel storage support ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin bfs_tools ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin bfs_tools lib ] ;
+
+USES_BE_API on <build>bfsinfo = true ;
+USES_BE_API on <build>bfswhich = true ;
+USES_BE_API on <build>recover = true ;
+
+BFS_TOOLS_SOURCES =
+	bfs.cpp
+	Bitmap.cpp
+	BPlusTree.cpp
+	Disk.cpp
+	dump.cpp
+	Hashtable.cpp
+	Inode.cpp
+;
+
+BuildPlatformMain <build>bfswhich :
+	bfswhich.cpp
+	$(BFS_TOOLS_SOURCES)
+	:
+	$(HOST_LIBBE) $(HOST_LIBSUPC++)
+;
+
+BuildPlatformMain <build>bfsinfo :
+	bfsinfo.cpp
+	$(BFS_TOOLS_SOURCES)
+	:
+	$(HOST_LIBBE) $(HOST_LIBSUPC++) libshared_build.a
+;
+
+BuildPlatformMain <build>recover :
+	recover.cpp
+	$(BFS_TOOLS_SOURCES)
+	:
+	$(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) libshared_build.a
+;
+

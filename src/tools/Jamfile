@@ -91,6 +91,7 @@ SEARCH on [ FGristFiles
 SubInclude HAIKU_TOP src tools addattr ;
 SubInclude HAIKU_TOP src tools anyboot ;
 SubInclude HAIKU_TOP src tools bfs_shell ;
+SubInclude HAIKU_TOP src tools bfs_tools ;
 SubInclude HAIKU_TOP src tools fat_shell ;
 SubInclude HAIKU_TOP src tools cppunit ;
 SubInclude HAIKU_TOP src tools create_repository_config ;
