@@ -68,15 +68,6 @@ Priority:    medium
 Requires:    - verification of B_OPEN_AT_END behavior
 
 
-Module:      fs_info.h
-Location:    struct fs_info
-Description: Change "char device_name[128]" to "char device_name[B_DEV_NAME_LENGTH]"
-             whenever appropriate, since B_DEV_NAME_LENGTH is now declared in
-             StorageDefs.h.
-Priority:    low
-Requires:    - filesystem support files in the source hierarchy
-
-
 Module:      BMimeType/MimeTypeTest
 Location:    update_mime_info(), create_app_meta_mime()
 Description: Find out, what is the meaning of the force parameter. It does

@@ -31,7 +31,7 @@ typedef struct fs_info {
 	off_t	free_blocks;						/* number of free blocks */
 	off_t	total_nodes;						/* total number of nodes */
 	off_t	free_nodes;							/* number of free nodes */
-	char	device_name[128];					/* device holding fs */
+	char	device_name[B_DEV_NAME_LENGTH];		/* device holding fs */
 	char	volume_name[B_FILE_NAME_LENGTH];	/* volume name */
 	char	fsh_name[B_OS_NAME_LENGTH];			/* name of fs handler */
 } fs_info;
