@@ -28,7 +28,7 @@ static FILE *cookieopen(void *cookie, const char *mode,
   return funopen(cookie, 
       (int (*)(void *, char *, int))(*mode == 'r' ? cread : NULL),		/* readfn */
       (int (*)(void *, const char *, int))(*mode == 'w' ? cwrite : NULL),	/* writefn */
-      (fpos_t (*)(void *, fpos_t, int))NULL,					/* seekfn */
+      NULL,									/* seekfn */
       cclose
       );
 #elif defined(HAVE_FOPENCOOKIE)

@@ -30,7 +30,7 @@ typedef enum {
 #define B_SWAP_INT32(arg)    __swap_int32(arg)
 #define B_SWAP_INT16(arg)    __swap_int16(arg)
 
-#if BYTE_ORDER == __LITTLE_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
 /* Host is little endian */
 
 #define B_HOST_IS_LENDIAN 1

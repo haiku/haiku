@@ -11,6 +11,15 @@
 
 #include "remapped_functions.h"
 
+#if defined(__NetBSD__)
+/* NetBSD explicitly sets the visibility to "default" when declaring public
+   functions, so any visibility attribute on a redeclaration is
+   ignored. However, we can work around this by placing the
+   declarations in a namespace. Since we are dealing with extern "C"
+   declarations, there is no name mangling. */
+namespace hidden_functions
+{
+#endif
 
 extern "C" int HIDDEN_FUNCTION_ATTRIBUTE
 fchmod(int fd, mode_t mode)
@@ -387,3 +396,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 }
 
 #endif // defined(HAIKU_HOST_USE_XATTR) && defined(HAIKU_HOST_PLATFORM_HAIKU)
+
+#if defined(__NetBSD__)
+}
+#endif

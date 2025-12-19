@@ -112,7 +112,7 @@ elif [ $isImage ]; then
 
 		fsShellCommandWrapper()
 		{
-			$actualFSShellCommand 5>&- 6>&- "$@"
+			$actualFSShellCommand 3<&3 4>&4 5>&- 6>&- "$@"
 		}
 
 		bfsShellWrapper()
