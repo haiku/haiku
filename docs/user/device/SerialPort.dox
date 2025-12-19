@@ -1,0 +1,795 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/device/SerialPort.h	hrev59228
+ *		src/kits/device/SerialPort.cpp	hrev59228
+ */
+
+
+/*!
+	\file SerialPort.h
+	\ingroup device
+	\ingroup libdevice
+	\brief Provides the BSerialPort class and its supporting enumerations.
+*/
+
+
+/*!
+	\enum data_rate
+	\brief Defines constants for common baud rates used in serial transmissions,
+		which represents the amount of bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_0_BPS
+	\brief Instructs the port to "hang up".
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_50_BPS
+	\brief Represents a data rate of 50 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_75_BPS
+	\brief Represents a data rate of 75 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_110_BPS
+	\brief Represents a data rate of 110 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_134_BPS
+	\brief Represents a data rate of 134 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_150_BPS
+	\brief Represents a data rate of 150 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_200_BPS
+	\brief Represents a data rate of 200 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_300_BPS
+	\brief Represents a data rate of 300 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_600_BPS
+	\brief Represents a data rate of 600 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_1200_BPS
+	\brief Represents a data rate of 1200 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_1800_BPS
+	\brief Represents a data rate of 1800 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_2400_BPS
+	\brief Represents a data rate of 2400 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_4800_BPS
+	\brief Represents a data rate of 4800 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_9600_BPS
+	\brief Represents a data rate of 9600 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_19200_BPS
+	\brief Represents a data rate of 19200 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_38400_BPS
+	\brief Represents a data rate of 38400 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_57600_BPS
+	\brief Represents a data rate of 57600 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_115200_BPS
+	\brief Represents a data rate of 115200 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_230400_BPS
+	\brief Represents a data rate of 230400 bits per second.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_rate::B_31250_BPS
+	\brief Represents a data rate of 31250 bits per second. This data rate is
+		mostly used for communications of MIDI messages.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\enum data_bits
+	\brief Defines constants for number of bits per
+		character.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_bits::B_DATA_BITS_7
+	\brief Each character comprises 7 bits.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var data_bits::B_DATA_BITS_8
+	\brief Each character comprises 8 bits.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\enum stop_bits
+	\brief Defines constants for the number of bits used to signal the end of
+		a character.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var stop_bits::B_STOP_BITS_1
+	\brief Stops are made of one bit. Alias: \c B_STOP_BIT_1.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var stop_bits::B_STOP_BITS_2
+	\brief Stops are made of two bits.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\enum parity_mode
+	\brief Defines constants to set the parity mode of the transmission, used
+		for detecting communication errors. This sends an additional bit
+		in addition to the character bits, where the number of "1" found in
+		the character plus the parity bit is always odd or even (depending on
+		the kind of parity_mode). A non-matching number means there was an error.
+
+	The parity bit can be disabled with \c B_NO_PARITY.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var parity_mode::B_NO_PARITY
+	\brief No parity bit is sent.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var parity_mode::B_ODD_PARITY
+	\brief A parity bit is appended and set to have
+		an odd number of "1" bits in the transmission.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var parity_mode::B_EVEN_PARITY
+	\brief A parity bit is appended and set to have
+		an even number of "1" bits in the transmission.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var ::B_NOFLOW_CONTROL
+	\brief No flow control is performed. The communication may fail if
+		the transmitter sends data faster than the receiver is able to process,
+		unless additional preventing measures are taken.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var ::B_HARDWARE_CONTROL
+	\brief The flow control is performed using the Request To Send (RTS) and
+		Clear To Send (CTS) pins.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var ::B_SOFTWARE_CONTROL
+	\brief The flow control is done via software, using
+		ASCII control characters XON and XOFF.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\class BSerialPort
+	\ingroup device
+	\ingroup libdevice
+	\brief BSerialPort provides an interface for communicating with devices
+		connected through a serial port.
+
+	To start a connection with a serial port:
+	- Create a BSerialPort object
+	- Use Open() to open a specific serial port
+	- If the port is successfully open, use Read() and Write() to communicate.
+
+	For example:
+	\code{.cpp}
+		status_t
+		SendDataToSerialPort(const char* port, const void* data, size_t length)
+		{
+			// Creates an object and configures it.
+			// At this point the object is not yet connected to any serial port
+			BSerialPort serialPort;
+			serialPort.SetDataRate(B_57600_BPS);
+			serialPort.SetFlowControl(B_SOFTWARE_CONTROL);
+
+			// Opens the serial port
+			if (serialPort.Open(port) <= 0)
+				return B_ERROR;
+
+			// Performs any operations...
+			ssize_t writtenBytes = serialPort.Write(data, length);
+
+			// ...
+
+			serialPort.Close();
+			return (writtenBytes >= 0) ? B_OK : B_IO_ERROR;
+		}
+	\endcode
+
+	To know which serial ports are available to the system, the methods
+	CountDevices() and GetDeviceName() allow to retrieve a list of them:
+
+	\code{.cpp}
+		void
+		GetSerialPortsNames(BStringList& outPortList)
+		{
+			BSerialPort serialPort;
+			char portName[B_OS_NAME_LENGTH]; // Ports paths temporary storage
+
+			outPortList.MakeEmpty();
+
+			for (int32 i = 0; i < serialPort.CountDevices(); i++) {
+				// For each found port...
+				if (serialPort.GetDeviceName(i, portName) == B_OK) {
+					// try to open it to know if it is available to us
+					if (serialPort.Open(portName) > 0) {
+						// Add it to the list because we can access it,
+						// and close it so we can test the next
+						outPortList.Add(portName);
+						serialPort.Close();
+					}
+				}
+			}
+		}
+	\endcode
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BSerialPort::BSerialPort()
+	\brief Creates and initializes a BSerialPort object.
+
+	Queries the driver, and builds a list of the available serial ports.
+	The BSerialPort object is initialized to these values:
+	- \c B_19200_BPS
+	- \c B_DATA_BITS_8
+	- \c B_STOP_BIT_1
+	- \c B_NO_PARITY
+	- \c B_HARDWARE_CONTROL
+	- \c B_INFINITE_TIMEOUT
+	- Blocking mode enabled
+
+	At this point the object does not have any specific serial port selected. To
+	connect and work with a serial port it has to be opened using Open().
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BSerialPort::~BSerialPort()
+	\brief Frees the resources associated with the object.
+
+	Closes the port, if it is open, and deletes the devices list.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BSerialPort::Open(const char *portName)
+	\brief Opens a serial port represented by \a portName.
+
+	\param[in] portName A valid port name (i.e. \c "/dev/ports/serial2").
+
+	\return A positive number (a file descriptor) if the serial port
+		has been succesfully opened or an error code (negative integer)
+		if an error has occurred.
+
+	\retval B_BAD_BALUE \a portName is \c NULL.
+
+	\sa Close()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BSerialPort::Close()
+	\brief Closes the port.
+
+	\sa Open()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn ssize_t BSerialPort::Read(void *buf, size_t count)
+	\brief Reads some bytes from the serial port.
+
+	If blocking mode is enabled, Read() will block, returning either
+	after the whole \a count bytes arrive or the time limit set with
+	SetTimeout() is not infinite and reaches zero. If the timeout is
+	\c B_INFINITE_TIMEOUT it will keep blocking forever.
+
+	With blocking mode disabled, it takes as much bytes as there are in the
+	port's input buffer up to \a count bytes, if any, and returns immediately.
+
+	\param[out] buf The buffer where to copy the data.
+	\param[in] count The maximum amount of bytes to read.
+
+	\return The amount of data read or an error code.
+
+	\retval B_FILE_ERROR The serial port is not available or it was closed.
+	\retval B_WOULD_BLOCK The operation cannot be performed immediately and
+		the request must not block.
+	\retval B_TIMED_OUT Blocking mode is enabled and the timeout period
+		has ended before the \a count amount of data arrived at the serial port.
+	\retval B_INTERRUPTED The operation was interrupted by a signal.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn ssize_t BSerialPort::Write(const void *buf, size_t count)
+	\brief Writes some bytes to the serial port.
+
+	In blocking mode, Write() will write exactly the full contents of \a buf,
+	even if this makes it to wait.
+
+	In non-blocking mode, it will write as many bytes as it can, which may not
+	be the complete buffer, and then returns immediately.
+
+	\param[in] buf The buffer from where to copy the data.
+	\param[in] count The amount of bytes to write.
+
+	\return The amount of data written or an error code.
+
+	\retval B_FILE_ERROR The serial port is not available or it was closed.
+	\retval B_WOULD_BLOCK The operation cannot be performed immediately and
+		the request must not block.
+	\retval B_INTERRUPTED The operation was interrupted by a signal.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BSerialPort::SetBlocking(bool blocking)
+	\brief Sets the blocking mode.
+
+	\param[in] blocking If \c true, enables the blocking mode. If \c false, disables it.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BSerialPort::SetTimeout(bigtime_t microSeconds)
+	\brief Sets the timeout period for how long Read() and WaitForInput()
+		will wait for the data to arrive to the port's input buffer before
+		returning.
+
+	The timeout period only applies when in blocking mode. In non-blocking mode
+	it takes no effect.
+
+	\param[in] microSeconds The timeout for the port.
+	Valid values are:
+	- \c B_INFINITE_TIMEOUT to wait forever
+	- Any value between 0 and 25000000 microseconds.
+
+	\retval B_OK Timeout changed successfully.
+	\retval B_BAD_VALUE The timeout value provided by \a microSeconds was invalid.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BSerialPort::SetDataRate(data_rate bitsPerSecond)
+	\brief Sets the baud rate for the port.
+
+	To set a custom data rate not defined in the data_rate enumeration you can
+	pass the number of bits per second directly in \a bitsPerSecond, but
+	the value has to be above 50.
+
+	\param[in] bitsPerSecond The baud rate.
+
+	\return \c B_OK if successful, or an error code if something went wrong.
+
+	\sa DataRate()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn data_rate BSerialPort::DataRate()
+	\brief Gets the current baud rate.
+
+	\return The current baud rate.
+
+	\sa SetDataRate()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BSerialPort::SetDataBits(data_bits numBits)
+	\brief Sets the data bits.
+
+	This operation will fail silently if the driver does not support
+	the requested number of data bits. To make sure the setting was applied
+	it is required to check DataBits().
+
+	\param[in] numBits The number of data bits.
+
+	\sa DataBits()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn data_bits BSerialPort::DataBits()
+	\brief Gets the current data bits.
+
+	\return The current data bits.
+
+	\sa SetDataBits()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BSerialPort::SetStopBits(stop_bits numBits)
+	\brief Sets the stop bits.
+
+	This operation will fail silently if the driver does not support
+	the requested number of stop bits. To make sure the setting was applied
+	it is required to check StopBits().
+
+	\param[in] numBits The number of stop bits.
+
+	\sa StopBits()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn stop_bits BSerialPort::StopBits()
+	\brief Gets the current stop bits.
+
+	\return The current stop bits.
+
+	\sa SetStopBits()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BSerialPort::SetParityMode(parity_mode which)
+	\brief Sets the parity mode.
+
+	Valid values for \a which are:
+	- ::B_NO_PARITY to not send a parity bit.
+	- ::B_ODD_PARITY to send a parity bit and set it to have
+		an odd number of "1" bits in the transmission.
+	- ::B_EVEN_PARITY to send a parity bit and set it to have
+		an even number of "1" bits in the transmission.
+
+	\param[in] which The parity mode to set.
+
+	\sa ParityMode()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn parity_mode BSerialPort::ParityMode()
+	\brief Gets the parity mode.
+
+	\return The current parity mode.
+
+	\sa SetParityMode()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BSerialPort::ClearInput()
+	\brief Clears the input buffer. This discards the data received but not
+		read by Read().
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BSerialPort::ClearOutput()
+	\brief Clears the output buffer. This discards the data written to the
+		output buffer with Write() but not yet transmitted to the other endpoint.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BSerialPort::SetFlowControl(uint32 method)
+	\brief Sets the flow control.
+
+	Valid values for \a method are:
+	- \c ::B_NOFLOW_CONTROL to not perform flow control.
+	- \c ::B_HARDWARE_CONTROL to perform flow control via hardware.
+	- \c ::B_SOFTWARE_CONTROL to perform flow control via software.
+	- \c ::B_HARDWARE_CONTROL | \c ::B_SOFTWARE_CONTROL to perform flow control
+		via both hardware and software.
+
+	\param[in] method The type of flow control.
+
+	\sa FlowControl()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn uint32 BSerialPort::FlowControl()
+	\brief Returns the selected flow control.
+
+	\return The flow control for the current open port.
+
+	\sa SetFlowControl()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BSerialPort::SetDTR(bool asserted)
+	\brief Sets the Data Terminal Ready (DTR) pin active if \a asserted is
+		\c true, or inactive if it is \c false.
+
+	\param[in] asserted The DTR status wanted.
+
+	\retval B_OK DTR pin state was changed.
+	\retval B_ERROR DTR pin state could not be changed or an error has occurred.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BSerialPort::SetRTS(bool asserted)
+	\brief Sets the Request To Send (RTS) pin active if \a asserted is
+		\c true, or inactive if it is \c false.
+
+	\param[in] asserted The RTS status wanted.
+
+	\retval B_OK RTS pin state was changed.
+	\retval B_ERROR RTS pin state could not be changed or an error has occurred.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BSerialPort::NumCharsAvailable(int32* waitThisMany)
+	\brief Unimplemented.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BSerialPort::IsCTS()
+	\brief Checks if the Clear To Send (CTS) pin is asserted (in an active state).
+
+	\retval true CTS is asserted.
+	\retval false CTS is not asserted.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BSerialPort::IsDSR()
+	\brief Checks if the Data Set Ready (DSR) pin is asserted (in an active state).
+
+	\retval true DSR is asserted.
+	\retval false DSR is not asserted.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BSerialPort::IsRI()
+	\brief Checks if the Ring Indicator (RI) pin is asserted (in an active state).
+
+	\retval true RI is asserted.
+	\retval false RI is not asserted.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BSerialPort::IsDCD()
+	\brief Checks if the Data Carrier Detect (DCD) pin is asserted (in an active state).
+
+	\retval true DCD is asserted.
+	\retval false DCD is not asserted.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn ssize_t BSerialPort::WaitForInput()
+	\brief Waits until there is something to read from the serial port.
+
+	If no data is ready, it will always block, ignoring the
+	value of SetBlocking(); however, it respects the timeout
+	set by SetTimeout().
+
+	\return The number of bytes available to be read or an error code.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BSerialPort::CountDevices()
+	\brief Counts the number of available serial ports.
+
+	\return An integer which represents the number of available
+		serial ports.
+
+	\sa GetDeviceName()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BSerialPort::GetDeviceName(int32 index, char* name,
+								size_t bufSize = B_OS_NAME_LENGTH)
+	\brief Gets the device name by the given \a index.
+
+	\param[in] index Index number of the device to know the name of.
+	\param[out] name The buffer where to store the name.
+	\param[in] bufSize The size of the buffer.
+
+	\retval B_OK The device name of the device at \a index was copied successfully.
+	\retval B_ERROR No device was found at \a index.
+
+	\sa CountDevices()
+	\since BeOS R3
+*/
+

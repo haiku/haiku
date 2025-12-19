@@ -576,6 +576,8 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 	\defgroup libbe Main C++ library (libbe.so)
 
+	\defgroup libdevice Device Kit library (libdevice.so)
+
 */
 
 ///// Subgroups /////

@@ -929,7 +929,7 @@ INPUT                  = . \
                          translation \
                          ../../headers/os/app \
                          ../../headers/private/app/LaunchRoster.h \
-                         ../../headers/os/device/Joystick.h \
+                         ../../headers/os/device \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/KernelExport.h \
                          ../../headers/os/drivers/USB3.h \
