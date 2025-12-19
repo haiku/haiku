@@ -1291,6 +1291,47 @@ void
 AboutView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_COLORS_UPDATED:
+			if (message->HasColor(ui_color_name(B_DOCUMENT_TEXT_COLOR))
+				|| message->HasColor(ui_color_name(B_LINK_TEXT_COLOR))) {
+				rgb_color newTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+				rgb_color newLinkColor = ui_color(B_LINK_TEXT_COLOR);
+				rgb_color newOrangeColor = mix_color(newTextColor, kIdealHaikuOrange, 191);
+				rgb_color newGreenColor = mix_color(newTextColor, kIdealHaikuGreen, 191);
+				rgb_color newYellowColor = mix_color(newTextColor, kIdealHaikuYellow, 191);
+				rgb_color newRedColor = mix_color(newTextColor, kIdealBeOSRed, 191);
+				rgb_color newBlueColor = mix_color(newTextColor, kIdealBeOSBlue, 191);
+
+				text_run_array* runArray = fCreditsView->RunArray(0, INT32_MAX);
+				for (int32 i = 0; i < runArray->count; i++) {
+					if (runArray->runs[i].color == fTextColor)
+						runArray->runs[i].color = newTextColor;
+					else if (runArray->runs[i].color == fLinkColor)
+						runArray->runs[i].color = newLinkColor;
+					else if (runArray->runs[i].color == kIdealHaikuOrange)
+						runArray->runs[i].color = newOrangeColor;
+					else if (runArray->runs[i].color == kIdealHaikuGreen)
+						runArray->runs[i].color = newGreenColor;
+					else if (runArray->runs[i].color == kIdealHaikuYellow)
+						runArray->runs[i].color = newYellowColor;
+					else if (runArray->runs[i].color == kIdealBeOSRed)
+						runArray->runs[i].color = newRedColor;
+					else if (runArray->runs[i].color == kIdealBeOSBlue)
+						runArray->runs[i].color = newBlueColor;
+				}
+				fCreditsView->SetRunArray(0, INT32_MAX, runArray);
+				fCreditsView->FreeRunArray(runArray);
+
+				fTextColor = newTextColor;
+				fLinkColor = newLinkColor;
+				fHaikuOrangeColor = newOrangeColor;
+				fHaikuGreenColor = newGreenColor;
+				fHaikuYellowColor = newYellowColor;
+				fBeOSRedColor = newRedColor;
+				fBeOSBlueColor = newBlueColor;
+			}
+			break;
+
 		case kMsgScrollCreditsView:
 		{
 			BScrollBar* scrollBar = fCreditsView->ScrollBar(B_VERTICAL);
