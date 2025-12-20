@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	3493671468
+1	esperanto	x-vnd.Haiku-Installer	150102172
 Performing installation.	InstallProgress		Instalante.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
 No optional packages available.	PackagesView		Malnepraj pakaĵoj ne estas haveblaj.
@@ -8,7 +8,6 @@ Please choose target	InstallerWindow		Bonvolu elekti celon
 Cancel	InstallProgress		Nuligi
 Are you sure you want to to stop the installation?	InstallerWindow		Ĉu vi certas, ke vi volas ĉesigi la instaladon?
 Installer	System name		Instalilo
-Unknown Type	InstallProgress	Partition content type	Nekonata tipo
 Are you sure you want to stop the installation?	InstallerWindow		Ĉu vi estas certe, ke vi volas halti la instaladon?
 README	InstallerApp		LEGU_MIN
 Quit	InstallerWindow		Ĉesi

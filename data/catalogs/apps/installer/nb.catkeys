@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Installer	2288760834
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		Utfører installasjon.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Vennligst lukk Diskoppsett-vinduet før du lukker Installer-vinduet.
 No optional packages available.	PackagesView		Ingen valgfrie pakker tilgjengelig.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Avbryt
 Are you sure you want to to stop the installation?	InstallerWindow		Er du sikker på at du vil stoppe installasjonen?
 Installer	System name		Installer
-Unknown Type	InstallProgress	Partition content type	Ukjent type
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Trykk på 'Begynn'-knappen for å installere fra '%1s' til '%2s'.
 Are you sure you want to stop the installation?	InstallerWindow		Er du sikker på at du vil stoppe installasjonen?
 README	InstallerApp		LESMEG

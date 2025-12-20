@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	2288760834
+1	hungarian	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!
 No optional packages available.	PackagesView		Nincsenek választható csomagok.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Mégse
 Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítod a telepítést?
 Installer	System name		Telepítő
-Unknown Type	InstallProgress	Partition content type	Ismeretlen típus
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Kattints a 'Mehet' gombra a telepítés megkezdéséhez '%1s' lemezről '%2s' lemezre.
 Are you sure you want to stop the installation?	InstallerWindow		Biztosan le szeretnéd állítani a telepítést?
 README	InstallerApp		OLVASSEL

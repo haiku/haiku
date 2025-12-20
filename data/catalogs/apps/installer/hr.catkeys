@@ -1,11 +1,10 @@
-1	croatian	x-vnd.Haiku-Installer	3373100821
+1	croatian	x-vnd.Haiku-Installer	29531525
 Performing installation.	InstallProgress		Vršim instalaciju.
 <none>	InstallerWindow	No partition available	<nijedan>
 Please choose target	InstallerWindow		Molim izaberite metu
 Cancel	InstallProgress		Odustani
 Are you sure you want to to stop the installation?	InstallerWindow		Jeste li sigurni da želite zaustaviti instalaciju?
 Installer	System name		Instalacijski program
-Unknown Type	InstallProgress	Partition content type	Nepoznata vrsta
 Quit	InstallerWindow		Isključi
 Write boot sector to '%s'	InstallerWindow		Zapišite boot sektor na '%s'
 Welcome to the Haiku Installer!\n\n	InstallerApp		Dobrodošli u Haiku instaler!\n\n

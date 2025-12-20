@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	3125198243
+1	lithuanian	x-vnd.Haiku-Installer	4076596243
 Performing installation.	InstallProgress		Diegiama.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Diskų ženklintuvo langą.
 No optional packages available.	PackagesView		Papildomų paketų nėra.
@@ -8,7 +8,6 @@ Please choose target	InstallerWindow		Pasirinkite paskirties vietą
 Cancel	InstallProgress		Atsisakyti
 Are you sure you want to to stop the installation?	InstallerWindow		Ar tikrai norite nutraukti diegimą?
 Installer	System name		Įdiegimo programa
-Unknown Type	InstallProgress	Partition content type	tipas nežinomas
 README	InstallerApp		Lydimoji instrukcija
 Quit	InstallerWindow		Baigti darbą
 Write boot sector to '%s'	InstallerWindow		Įrašyti paleidimo sektorių į „%s“

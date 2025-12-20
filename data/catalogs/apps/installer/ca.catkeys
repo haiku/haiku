@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	2288760834
+1	catalan; valencian	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
 No optional packages available.	PackagesView		No hi ha paquets opcionals disponibles.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Cancel·la
 Are you sure you want to to stop the installation?	InstallerWindow		Segur que voleu interrompre la instal·lació?
 Installer	System name		Instal·lador
-Unknown Type	InstallProgress	Partition content type	Tipus desconegut
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Premeu el botó Comença per instal·lar des de %1s a %2s.
 Are you sure you want to stop the installation?	InstallerWindow		Segur que voleu interrompre la instal·lació?
 README	InstallerApp		LLEGEIX-ME

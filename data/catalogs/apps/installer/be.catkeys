@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	92411837
+1	belarusian	x-vnd.Haiku-Installer	1043809837
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
 No optional packages available.	PackagesView		Дадатковыя пакункі недаступныя.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Адмена
 Are you sure you want to to stop the installation?	InstallerWindow		Сапраўды жадаеце спыніць усталёўку?
 Installer	System name		Усталёўшчык
-Unknown Type	InstallProgress	Partition content type	Невядомы тып
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Распачніце ўсталёўку з '%1s' на '%2s'.
 Are you sure you want to stop the installation?	InstallerWindow		Сапраўды жадаеце спыніць усталёўку?
 README	InstallerApp		Інструкцыя

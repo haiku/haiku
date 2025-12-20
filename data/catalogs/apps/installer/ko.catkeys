@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Installer	2288760834
+1	korean	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		설치 진행 중입니다.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Installer 창을 닫기 전에 DriveSetup 창을 먼저 닫아 주십시오.
 No optional packages available.	PackagesView		사용 가능한 선택적 패키지가 없습니다.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		취소
 Are you sure you want to to stop the installation?	InstallerWindow		정말 설치를 중단 하시겠습니까?
 Installer	System name		Installer
-Unknown Type	InstallProgress	Partition content type	알수 없는 형식
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s'을(를) '%2s'에 설치하려면 '시작' 버튼을 누르십시오.
 Are you sure you want to stop the installation?	InstallerWindow		정말 설치를 중단 하시겠습니까?
 README	InstallerApp		README

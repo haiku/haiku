@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	2288760834
+1	finnish	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		Suoritetaan asennus.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sulje ”Levyasema-asetukset”-ikkuna ennen Asennusohjelman ikkunan sulkemista.
 No optional packages available.	PackagesView		Valinnaisia pakkauksia ei ole saatavilla.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Peru
 Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
 Installer	System name		Asennusohjelma
-Unknown Type	InstallProgress	Partition content type	Tuntematon tyyppi
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Paina painiketta ’Aloita’ kohteen ’%1s’ asentamiseksi kohteeseen ’%2s’.
 Are you sure you want to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
 README	InstallerApp		LUEMINUT

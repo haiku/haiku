@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	2288760834
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
 No optional packages available.	PackagesView		Δεν υπάρχουν διαθέσιμα προαιρετικά πακέτα.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Ακύρωση
 Are you sure you want to to stop the installation?	InstallerWindow		Είστε σίγουρος ότι θέλετε να σταματήσετε την εγκατάσταση;
 Installer	System name		Πρόγραμμα Εγκατάστασης
-Unknown Type	InstallProgress	Partition content type	Άγνωστος τύπος
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Πατήστε το κουμπί "Έναρξη" για εγκατάσταση από '%1s' σε '%2s'.
 Are you sure you want to stop the installation?	InstallerWindow		Είστε σίγουρος/η ότι θέλετε να σταματήσετε την εγκατάσταση;
 README	InstallerApp		README

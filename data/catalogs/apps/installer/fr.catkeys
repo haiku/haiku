@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	2288760834
+1	french	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		Installation en cours.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l’Installeur.
 No optional packages available.	PackagesView		Pas de paquets optionnels disponibles.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Annuler
 Are you sure you want to to stop the installation?	InstallerWindow		Êtes vous sur de vouloir arrêter l’installation ?
 Installer	System name		Installeur
-Unknown Type	InstallProgress	Partition content type	Type inconnu
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Cliquez sur le bouton « Commencer » pour installer « %1s » sur « %2s ».
 Are you sure you want to stop the installation?	InstallerWindow		Voulez-vous vraiment interrompre l’installation ?
 README	InstallerApp		LISEZ-MOI

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	1928805340
+1	dutch; flemish	x-vnd.Haiku-Installer	2880203340
 Performing installation.	InstallProgress		Uitvoering installatie.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
 No optional packages available.	PackagesView		Geen optionele paketten beschikbaar.
@@ -8,7 +8,6 @@ Please choose target	InstallerWindow		Kies alstublieft een doel
 Cancel	InstallProgress		Annuleren
 Are you sure you want to to stop the installation?	InstallerWindow		Bent u zeker dat u de installatie wilt stoppen?
 Installer	System name		Installatieprogramma
-Unknown Type	InstallProgress	Partition content type	Onbekend Type
 Are you sure you want to stop the installation?	InstallerWindow		Ben je zeker dat je het installeren wil annuleren?
 README	InstallerApp		LEESMIJ
 Quit	InstallerWindow		Afsluiten

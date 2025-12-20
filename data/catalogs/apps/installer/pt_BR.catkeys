@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	1928805340
+1	portuguese (brazil)	x-vnd.Haiku-Installer	2880203340
 Performing installation.	InstallProgress		Executando a instalação.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Gerenciador de Disco antes de fechar o Instalador.
 No optional packages available.	PackagesView		Nenhum pacote opcional disponível.
@@ -8,7 +8,6 @@ Please choose target	InstallerWindow		Favor escolher um destino
 Cancel	InstallProgress		Cancelar
 Are you sure you want to to stop the installation?	InstallerWindow		Tem certeza de que deseja parar a instalação?
 Installer	System name		Instalador
-Unknown Type	InstallProgress	Partition content type	Tipo Desconhecido
 Are you sure you want to stop the installation?	InstallerWindow		Tem certeza de que pretende interromper a instalação?
 README	InstallerApp		LEIA-ME
 Quit	InstallerWindow		Sair

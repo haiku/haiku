@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	2288760834
+1	english	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		正在執行安裝。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		請先關閉 DriveSetup 視窗，然後再關閉安裝程式視窗。
 No optional packages available.	PackagesView		無可用的可選套件。
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		取消
 Are you sure you want to to stop the installation?	InstallerWindow		您確定要中止安裝嗎？
 Installer	System name		安裝程式
-Unknown Type	InstallProgress	Partition content type	未知類型
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		點擊 '開始' 按鍵以安裝從 '%1s' 到 '%2s'。
 Are you sure you want to stop the installation?	InstallerWindow		您確定要中止安裝嗎？
 README	InstallerApp		README

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Installer	2288760834
+1	friulian	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
 No optional packages available.	PackagesView		Nissun pachet facoltatîf disponibil.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Anule
 Are you sure you want to to stop the installation?	InstallerWindow		Interompi pardabon la instalazion?
 Installer	System name		Instaladôr
-Unknown Type	InstallProgress	Partition content type	Gjenar no cognossût
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Frache il boton 'Scomence' par instalâ di '%1s' su '%2s'.
 Are you sure you want to stop the installation?	InstallerWindow		Interompi pardabon la instalazion?
 README	InstallerApp		LEIMI

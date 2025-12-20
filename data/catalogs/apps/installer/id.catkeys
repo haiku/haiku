@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Installer	3601518999
+1	indonesian	x-vnd.Haiku-Installer	257949703
 Performing installation.	InstallProgress		Melakukan instalasi.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
 No optional packages available.	PackagesView		Tidak ada paket opsional yang tersedia.
@@ -8,7 +8,6 @@ Please choose target	InstallerWindow		Silakan pilih target
 Cancel	InstallProgress		Batal
 Are you sure you want to to stop the installation?	InstallerWindow		Anda yakin ingin menghentikan instalasi?
 Installer	System name		Installer
-Unknown Type	InstallProgress	Partition content type	Type tak dikenal
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Tekan tombol 'Mulai' untuk menginstal dari '%1s' ke '%2s'.
 Are you sure you want to stop the installation?	InstallerWindow		Apakah Anda yakin ingin menghentikan penginstalan?
 README	InstallerApp		BACA SAYA

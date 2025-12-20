@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Installer	3125198243
+1	slovak	x-vnd.Haiku-Installer	4076596243
 Performing installation.	InstallProgress		Prebieha inštalácia.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Nastavenie diskových oblastí pred zatvorením okna Inštalátora.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
@@ -8,7 +8,6 @@ Please choose target	InstallerWindow		Prosím, vyberte cieľ
 Cancel	InstallProgress		Zrušiť
 Are you sure you want to to stop the installation?	InstallerWindow		Ste si istí, že chcete zastaviť inštaláciu?
 Installer	System name		Inštalátor
-Unknown Type	InstallProgress	Partition content type	Neznámy typ
 README	InstallerApp		README
 Quit	InstallerWindow		Ukončiť
 Write boot sector to '%s'	InstallerWindow		Zapísať zavádzací sektor na „%s“

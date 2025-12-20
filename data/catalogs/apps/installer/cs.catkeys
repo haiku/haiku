@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Installer	2288760834
+1	czech	x-vnd.Haiku-Installer	3240158834
 Performing installation.	InstallProgress		Probíhá instalace.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Uzavřete, prosím, okno programu nastavení disků před ukončením Instalátoru.
 No optional packages available.	PackagesView		Volitelné balíčky nejsou k dispozici.
@@ -12,7 +12,6 @@ BootManager, the application to configure the Haiku boot menu, could not be laun
 Cancel	InstallProgress		Zrušit
 Are you sure you want to to stop the installation?	InstallerWindow		Určitě chcete instalaci přerušit?
 Installer	System name		Instalační program
-Unknown Type	InstallProgress	Partition content type	Neznámý typ
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Stiskněte tlačítko 'Začít' k instalaci z '%1s' do '%2s'.
 Are you sure you want to stop the installation?	InstallerWindow		Opravdu zastavit instalaci?
 README	InstallerApp		README
