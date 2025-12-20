@@ -1,0 +1,143 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/game/SimpleGameSound.h	hrev59228
+ *		src/kits/game/SimpleGameSound.cpp	hrev59228
+ */
+
+/*!
+	\file SimpleGameSound.h
+	\ingroup game
+	\brief Provides the BSimpleGameSound class.
+*/
+
+
+/*!
+	\class BSimpleGameSound
+	\ingroup game
+	\brief BSimpleGameSound represents a simple sound effect that remains
+		in memory.
+
+	To use BSimpleGameSound is enough to create an instance of it and then call
+	StartPlaying() to start the playback:
+
+	\code{.cpp}
+	const char* filename = ... ;
+	BSimpleGameSound* sound = new BGameSound(filename);
+
+	sound->StartPlaying();
+	\endcode
+
+	The \a device parameter in all of the constructors is currently unused
+	and has to be defined as \c NULL. Its base class BGameSound takes care
+	of that by initializing the default sound device.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn BSimpleGameSound::BSimpleGameSound(const entry_ref* file,
+								BGameSoundDevice* device = NULL)
+	\brief Creates and initializes a BSimpleGameSound object from a sound file's
+		entry_ref and prepares it to be ready for playback.
+
+	\param[in] file An entry_ref reference of the sound file.
+	\param[in] device The sound device where the sound should be played.
+		Setting it to \c NULL makes it to use the default sound device.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn BSimpleGameSound::BSimpleGameSound(const char* file,
+								BGameSoundDevice* device = NULL)
+	\brief Creates and initializes a BSimpleGameSound object from a sound file
+		path and prepares it to be ready for playback.
+
+	\param[in] file The filename path of the sound file.
+	\param[in] device The sound device where the sound should be played.
+		Setting it to \c NULL makes it to use the default sound device.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn BSimpleGameSound::BSimpleGameSound(const void* data,
+								size_t frameCount,
+								const gs_audio_format* format,
+								BGameSoundDevice* device = NULL)
+	\brief Creates and initializes a BSimpleGameSound object from a \a data
+		buffer in memory of \a frameCount frames in a \a format.
+
+	\param[in] data A pointer to the sound data in memory.
+	\param[in] frameCount The number of frames in the sound data.
+	\param[in] format The format of the sound data.
+	\param[in] device The sound device where the sound should be played.
+		Setting it to \c NULL makes it to use the default sound device.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn BSimpleGameSound::BSimpleGameSound(const BSimpleGameSound& other)
+	\brief Copy constructor.
+
+	It creates a deep copy of the sound data in \a other.
+
+	\param[in] other The other BSimpleGameSound object from where to initialize
+		this instance.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn virtual BSimpleGameSound::~BSimpleGameSound()
+	\brief Frees all resources associated with the object.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn virtual BGameSound* BSimpleGameSound::Clone() const
+	\brief Returns a copy of this BSimpleGameSound object.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn status_t BSimpleGameSound::SetIsLooping(bool looping)
+	\brief Enables or disables the playback looping of the sound.
+
+	\param[in] looping If it is \c true turns on looping, and if it is \c false
+		turns it off.
+
+	\retval B_OK The looping was toggled on or off successfully.
+	\retval B_ERROR There was an internal error trying to find the sound data.
+
+	\sa IsLooping()
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn bool BSimpleGameSound::IsLooping() const
+	\brief Returns whether looping is enabled or not.
+
+	\retval true Looping is currently enabled.
+	\retval false Looping is currently disabled.
+
+	\sa SetIsLooping()
+	\since BeOS R4.5
+*/
