@@ -56,14 +56,12 @@ __RCSID("$NetBSD: getnetent.c,v 1.21 2012/03/20 17:44:18 matt Exp $");
 #include <stdio.h>
 #include <string.h>
 
+#include <FindDirectory.h>
+
 #ifdef __weak_alias
 __weak_alias(endnetent,_endnetent)
 __weak_alias(getnetent,_getnetent)
 __weak_alias(setnetent,_setnetent)
-#endif
-
-#ifndef _PATH_NETWORKS
-#define	_PATH_NETWORKS	"/etc/networks"
 #endif
 
 #define	MAXALIASES	35
@@ -97,9 +95,13 @@ static void
 __setnetent(int f)
 {
 
-	if (netf == NULL)
-		netf = fopen(_PATH_NETWORKS, "re");
-	else
+	if (netf == NULL) {
+		char buffer[256];
+		find_directory(B_SYSTEM_DATA_DIRECTORY, 0, false, buffer, sizeof(buffer));
+		strlcat(buffer, "/network/networks", sizeof(buffer));
+
+		netf = fopen(buffer, "re");
+	} else
 		rewind(netf);
 	_net_stayopen |= f;
 }
@@ -121,8 +123,16 @@ getnetent(void)
 	char *p;
 	register char *cp, **q;
 
-	if (netf == NULL && (netf = fopen(_PATH_NETWORKS, "re")) == NULL)
-		return (NULL);
+	if (netf == NULL) {
+		char buffer[256];
+		find_directory(B_SYSTEM_DATA_DIRECTORY, 0, false, buffer, sizeof(buffer));
+		strlcat(buffer, "/network/networks", sizeof(buffer));
+
+		netf = fopen(buffer, "re");
+		if (netf == NULL)
+			return (NULL);
+	}
+
 #if (defined(__sparc__) && defined(_LP64)) ||		\
     defined(__alpha__) ||				\
     (defined(__i386__) && defined(_LP64)) ||		\
