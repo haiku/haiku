@@ -246,10 +246,17 @@ struct bfs_inode {
 
 	static time_t ToSecs(int64 time)
 		{ return time >> INODE_TIME_SHIFT; }
-	static uint32 ToNsecs(int64 time)
-		{ return (time & INODE_TIME_MASK) << 14; }
+	static uint32 ToNsecs(int64 time) {
 		// the 16 bits internal resolution shifted by 14 gives us 2^30
 		// which is roughly 10^9, the maximum value in nanoseconds
+		// The maximum value actually used will be 0xEE6B, so the range 0xF000-0xFFFF is used
+		// to represent non-timestamps (pseudorandom values used when the nanosecond part of the
+		// timestamp is 0, to reduce hash collisions for identical timestamps in query index
+		// tables)
+		if ((time & 0xF000) == 0xF000)
+			return 0;
+		return (time & INODE_TIME_MASK) << 14;
+	}
 } _PACKED;
 
 enum inode_flags {
@@ -285,12 +292,20 @@ struct file_cookie {
 #define INODE_NOTIFICATION_INTERVAL	1000000LL
 
 
-/*!	Converts the nano seconds given to the internal 16 bit resolution that
-	BFS uses. If \a time is zero, 12 bits will get a monotonically increasing
-	number. For all other values, only the lower 4 bits are changed this way.
+/*!	Converts the nano seconds given to the internal 16 bit representation that
+	BFS uses.
 
-	This is done to decrease the number of duplicate time values, which speeds
-	up the way BFS handles the time indices.
+	The original BFS in BeOS only reported a resolution of 1 second to userspace (as POSIX APIs at
+	the time didn't allow for more precision). Haiku modified this to allow for subsecond
+	timestamps.
+
+	However, a lot of code may still set times using APIs with a second resolution. This would
+	lead to a lot of similar or identical timestamps, which result in hash collisions in index
+	tables, and as such, bad performance for queries using modification time.
+
+	To avoid this, the lower 4 bits for non-zero timestamps and the lower 12 bits for zero
+	timestamps are replaced with a monotonically increasing number. That makes sure the values
+	are more evenly distributed between different hash buckets.
 */
 inline uint32
 unique_from_nsec(uint32 time)
@@ -299,7 +314,7 @@ unique_from_nsec(uint32 time)
 	if (time != 0)
 		return (((time + 16383) >> 14) & INODE_TIME_MASK) | (++number & 0xf);
 
-	return ++number & 0xfff;
+	return (++number & 0xfff) | 0xf000;
 }
 
 
