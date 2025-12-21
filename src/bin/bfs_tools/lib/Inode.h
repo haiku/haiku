@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, pinc Software. All Rights Reserved.
+ * Copyright 2001-2025, pinc Software. All Rights Reserved.
  * Released under the terms of the MIT license.
  */
 #ifndef INODE_H
@@ -23,14 +23,14 @@ class Inode {
 		status_t SetTo(bfs_inode *inode);
 		virtual status_t InitCheck() const;
 
-		bool			IsFile() const { return S_ISREG(fInode->mode); }
-		bool			IsDirectory() const { return S_ISDIR(fInode->mode); }
-		bool			IsSymlink() const { return S_ISLNK(fInode->mode); }
-		bool			IsIndex() const { return S_ISINDEX(fInode->mode); }
+		bool			IsFile() const { return BFS_S_ISREG(fInode->mode); }
+		bool			IsDirectory() const { return BFS_S_ISDIR(fInode->mode); }
+		bool			IsSymlink() const { return BFS_S_ISLNK(fInode->mode); }
+		bool			IsIndex() const { return BFS_S_ISINDEX(fInode->mode); }
 		bool			IsAttribute() const
-							{ return (fInode->mode & S_ATTR) != 0; }
+							{ return (fInode->mode & BFS_S_ATTR) != 0; }
 		bool			IsAttributeDirectory() const
-							{ return (fInode->mode & S_ATTR_DIR) != 0; }
+							{ return (fInode->mode & BFS_S_ATTR_DIR) != 0; }
 		bool			IsRoot() const { return BlockRun() == fDisk->Root(); }
 
 		int32			Mode() const { return fInode->mode; }

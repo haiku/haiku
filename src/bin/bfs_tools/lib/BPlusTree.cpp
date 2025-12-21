@@ -1,6 +1,6 @@
 /* BPlusTree - BFS B+Tree implementation
 **
-** Copyright 2001-2002 pinc Software. All Rights Reserved.
+** Copyright 2001-2025 pinc Software. All Rights Reserved.
 ** Released under the terms of the MIT license.
 */
 
@@ -179,18 +179,19 @@ status_t BPlusTree::SetTo(BPositionIO *stream,bool allowDuplicates)
 
 	if (DataStream *dataStream = dynamic_cast<DataStream *>(stream))
 	{
-		uint32 toMode[] = {S_STR_INDEX, S_INT_INDEX, S_UINT_INDEX, S_LONG_LONG_INDEX,
-						   S_ULONG_LONG_INDEX, S_FLOAT_INDEX, S_DOUBLE_INDEX};
-		uint32 mode = dataStream->Mode() & (S_STR_INDEX | S_INT_INDEX | S_UINT_INDEX | S_LONG_LONG_INDEX
-						   | S_ULONG_LONG_INDEX | S_FLOAT_INDEX | S_DOUBLE_INDEX);
+		uint32 toMode[] = {BFS_S_STR_INDEX, BFS_S_INT_INDEX, BFS_S_UINT_INDEX,
+			BFS_S_LONG_LONG_INDEX, BFS_S_ULONG_LONG_INDEX, BFS_S_FLOAT_INDEX, BFS_S_DOUBLE_INDEX};
+		uint32 mode = dataStream->Mode() & (BFS_S_STR_INDEX | BFS_S_INT_INDEX | BFS_S_UINT_INDEX
+			| BFS_S_LONG_LONG_INDEX | BFS_S_ULONG_LONG_INDEX | BFS_S_FLOAT_INDEX
+			| BFS_S_DOUBLE_INDEX);
 	
 		if (header.data_type > BPLUSTREE_DOUBLE_TYPE
-			|| (dataStream->Mode() & S_INDEX_DIR) && toMode[header.data_type] != mode
+			|| (dataStream->Mode() & BFS_S_INDEX_DIR) && toMode[header.data_type] != mode
 			|| !dataStream->IsDirectory())
 			return fStatus = B_BAD_TYPE;
 
 		 // although it's in stat.h, the S_ALLOW_DUPS flag is obviously unused
-		fAllowDuplicates = (dataStream->Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR;
+		fAllowDuplicates = (dataStream->Mode() & (BFS_S_INDEX_DIR | 0777)) == BFS_S_INDEX_DIR;
 
 		//printf("allows duplicates? %s\n",fAllowDuplicates ? "yes" : "no");
 	}

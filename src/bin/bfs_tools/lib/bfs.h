@@ -17,6 +17,31 @@
 #endif
 
 
+// File types as used in BFS and stored in its inodes
+// (coincidentally the same as in Haiku's sys/stat.h)
+#define BFS_S_ATTR_DIR			01000000000	/* attribute directory */
+#define BFS_S_ATTR				02000000000	/* attribute */
+#define BFS_S_INDEX_DIR			04000000000	/* index (or index directory) */
+#define BFS_S_STR_INDEX			00100000000	/* string index */
+#define BFS_S_INT_INDEX			00200000000	/* int32 index */
+#define BFS_S_UINT_INDEX		00400000000	/* uint32 index */
+#define BFS_S_LONG_LONG_INDEX	00010000000	/* int64 index */
+#define BFS_S_ULONG_LONG_INDEX	00020000000	/* uint64 index */
+#define BFS_S_FLOAT_INDEX		00040000000	/* float index */
+#define BFS_S_DOUBLE_INDEX		00001000000	/* double index */
+
+/* standard file types */
+#define BFS_S_IFMT				00000170000 /* type of file */
+#define	BFS_S_IFLNK				00000120000 /* symbolic link */
+#define BFS_S_IFREG 			00000100000 /* regular */
+#define BFS_S_IFDIR 			00000040000 /* directory */
+
+#define BFS_S_ISREG(mode)		(((mode) & BFS_S_IFMT) == BFS_S_IFREG)
+#define BFS_S_ISLNK(mode)		(((mode) & BFS_S_IFMT) == BFS_S_IFLNK)
+#define BFS_S_ISDIR(mode)		(((mode) & BFS_S_IFMT) == BFS_S_IFDIR)
+#define BFS_S_ISINDEX(mode)		(((mode) & BFS_S_INDEX_DIR) == BFS_S_INDEX_DIR)
+
+
 struct __attribute__((packed)) block_run {
 	int32		allocation_group;
 	uint16		start;

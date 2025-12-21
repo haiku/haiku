@@ -606,7 +606,7 @@ void
 Disk::SaveInode(bfs_inode *inode, bool *indices, bfs_inode *indexDir,
 	bool *root, bfs_inode *rootDir)
 {
-	if ((inode->mode & S_INDEX_DIR) == 0) {
+	if ((inode->mode & BFS_S_INDEX_DIR) == 0) {
 		*root = true;
 		printf("\troot node found!\n");
 		if (inode->inode_num.allocation_group != 8
@@ -619,7 +619,7 @@ Disk::SaveInode(bfs_inode *inode, bool *indices, bfs_inode *indexDir,
 		}
 		if (rootDir)
 			memcpy(rootDir, inode, sizeof(bfs_inode));
-	} else if (inode->mode & S_INDEX_DIR) {
+	} else if (inode->mode & BFS_S_INDEX_DIR) {
 		*indices = true;
 		printf("\tindices node found!\n");
 		if (indexDir)

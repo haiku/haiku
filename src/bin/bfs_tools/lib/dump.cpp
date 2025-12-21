@@ -150,7 +150,7 @@ dump_inode(const Inode *nameNode, const bfs_inode *inode, bool showOffsets)
 	Print("  inode_size         = %" B_PRId32 "\n",inode->inode_size);
 	Print("  etc                = %#08" B_PRIx32 "\n",inode->etc);
 	Print("  short_symlink      = %s\n",
-		S_ISLNK(inode->mode) && (inode->flags & INODE_LONG_SYMLINK) == 0
+		BFS_S_ISLNK(inode->mode) && (inode->flags & INODE_LONG_SYMLINK) == 0
 			? inode->short_symlink : "-");
 
 	dump_data_stream(inode, &inode->data, showOffsets);

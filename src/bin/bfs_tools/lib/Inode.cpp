@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008 pinc Software. All Rights Reserved.
+ * Copyright 2001-2025 pinc Software. All Rights Reserved.
  * Released under the terms of the MIT license.
  */
 
@@ -548,19 +548,19 @@ Inode *
 Inode::Factory(Disk *disk, bfs_inode *inode, bool ownBuffer)
 {
 	// attributes (of a file)
-	if ((inode->mode & (S_ATTR | S_ATTR_DIR)) == S_ATTR)
+	if ((inode->mode & (BFS_S_ATTR | BFS_S_ATTR_DIR)) == BFS_S_ATTR)
 		return new Attribute(disk, inode, ownBuffer);
 
 	// directories, attribute directories, indices
-	if (S_ISDIR(inode->mode) || inode->mode & S_ATTR_DIR)
+	if (BFS_S_ISDIR(inode->mode) || inode->mode & BFS_S_ATTR_DIR)
 		return new Directory(disk, inode, ownBuffer);
 
 	// regular files
-	if (S_ISREG(inode->mode))
+	if (BFS_S_ISREG(inode->mode))
 		return new File(disk, inode, ownBuffer);
 
 	// symlinks (short and link in data-stream)
-	if (S_ISLNK(inode->mode))
+	if (BFS_S_ISLNK(inode->mode))
 		return new Symlink(disk, inode, ownBuffer);
 
 	return NULL;
@@ -614,7 +614,7 @@ Inode::EmptyInode(Disk *disk, const char *name, int32 mode)
 	inode->magic1 = INODE_MAGIC1;
 	inode->inode_size = disk->BlockSize();
 	inode->mode = mode;
-	inode->flags = INODE_IN_USE | (mode & S_IFDIR ? INODE_LOGGED : 0);
+	inode->flags = INODE_IN_USE | (mode & BFS_S_IFDIR ? INODE_LOGGED : 0);
 
 	if (name) {
 		small_data *data = inode->small_data_start;

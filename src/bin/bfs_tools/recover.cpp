@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2008 pinc Software. All Rights Reserved.
+ * Copyright (c) 2001-2025 pinc Software. All Rights Reserved.
  * Released under the terms of the MIT license.
  */
 
@@ -339,7 +339,7 @@ getNameIndex(Disk &disk)
 
 		if (!node || !node->IsIndex() || node->Name() == NULL)
 			continue;
-		if (!strcmp(node->Name(), "name") && node->Mode() & S_STR_INDEX)
+		if (!strcmp(node->Name(), "name") && node->Mode() & BFS_S_STR_INDEX)
 			return dynamic_cast<Directory *>(node);
 	}
 
@@ -374,9 +374,9 @@ checkDirectoryContents(Disk& disk, Directory *dir)
 
 			missing->SetParent(dir->BlockRun());
 		}
-//		if (node->Mode() & S_INDEX_DIR)
+//		if (node->Mode() & BFS_S_INDEX_DIR)
 //		{
-//			if (node->Mode() & S_STR_INDEX)
+//			if (node->Mode() & BFS_S_STR_INDEX)
 //				printf("index directory (%ld, %d): \"%s\" is missing (%ld, %d, %d)\n",node->BlockRun().allocation_group,node->BlockRun().start,name,run.allocation_group,run.start,run.length);
 //			else
 //				printf("index directory (%ld, %d): key is missing (%ld, %d, %d)\n",node->BlockRun().allocation_group,node->BlockRun().start,run.allocation_group,run.start,run.length);
@@ -459,10 +459,10 @@ checkStructure(Disk &disk)
 		Inode *parentNode = parentGetter.Node();
 
 		Directory *dir = dynamic_cast<Directory *>(parentNode);
-		if (dir || (parentNode && (node->Mode() & S_ATTR_DIR))) {
+		if (dir || (parentNode && (node->Mode() & BFS_S_ATTR_DIR))) {
 			// entry has a valid parent directory, so it's assumed to be a valid entry
 			disk.BlockBitmap()->BackupSet(node, true);
-		} else if (node->Mode() & S_ATTR) {
+		} else if (node->Mode() & BFS_S_ATTR) {
 			if (gVerbose) {
 				printf("attribute \"%s\" at %" B_PRId32 ",%d misses its parent.\n",
 					node->Name(), node->BlockRun().allocation_group,
@@ -500,7 +500,7 @@ checkStructure(Disk &disk)
 
 					Inode *nameNode = (Inode *)gMissingEmpty.Remove(&run);
 					if (nameNode != NULL) {
-						nameNode->SetMode(S_IFDIR);
+						nameNode->SetMode(BFS_S_IFDIR);
 						if (gVerbose)
 							printf("found missing name!\n");
 					} else {
@@ -509,7 +509,7 @@ checkStructure(Disk &disk)
 							<< ":" << (int32)run.start;
 
 						nameNode = Inode::EmptyInode(&disk, parentName.String(),
-							S_IFDIR);
+							BFS_S_IFDIR);
 						if (nameNode) {
 							nameNode->SetBlockRun(run);
 							nameNode->SetParent(disk.Root());
@@ -580,14 +580,14 @@ checkStructure(Disk &disk)
 				if ((dir = (Directory *)gMissing.Get(run)) != NULL) {
 					if (gVerbose)
 						puts("\tfound in missing");
-					dir->SetMode(dir->Mode() | S_ATTR_DIR);
+					dir->SetMode(dir->Mode() | BFS_S_ATTR_DIR);
 					dir->SetParent(node->BlockRun());
 				} else {
 					if (gVerbose)
 						puts("\tcreate new!");
 
 					Inode *empty = Inode::EmptyInode(&disk, NULL,
-						S_IFDIR | S_ATTR_DIR);
+						BFS_S_IFDIR | BFS_S_ATTR_DIR);
 					if (empty) {
 						empty->SetBlockRun(run);
 						empty->SetParent(node->BlockRun());
