@@ -275,15 +275,19 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 		# files, add those, too.
 		local catalogTargets = $(target) + [ on $(target) return $(NEEDLIBS) ] ;
 		for catalogTarget in $(catalogTargets) {
-			local catalogs
-				= [ on $(catalogTarget) return $(HAIKU_CATALOG_FILES) ] ;
-			if $(catalogs) {
-				local signature
-					= [ on $(catalogTarget)
-						return $(HAIKU_CATALOG_SIGNATURE) ] ;
-				AddFilesToContainer $(container)
-					: $(systemDirTokens) data locale catalogs $(signature)
-					: $(catalogs) ;
+			# NEEDLIBS may also contain .so files, ignore these. They will be added to the image
+			# separately
+			if $(catalogTarget:S) != .so {
+				local catalogs
+					= [ on $(catalogTarget) return $(HAIKU_CATALOG_FILES) ] ;
+				if $(catalogs) {
+					local signature
+						= [ on $(catalogTarget)
+							return $(HAIKU_CATALOG_SIGNATURE) ] ;
+					AddFilesToContainer $(container)
+						: $(systemDirTokens) data locale catalogs $(signature)
+						: $(catalogs) ;
+				}
 			}
 		}
 
