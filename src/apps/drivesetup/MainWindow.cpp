@@ -337,8 +337,15 @@ MainWindow::MainWindow()
 	// visit all disks in the system and show their contents
 	_ScanDrives();
 
-	if (!be_roster->IsRunning(kDeskbarSignature))
+	// If DeskBar isn't running, DriveSetup was probably started from Installer.
+	// Make sure to show on all workspaces, so the window doesn't disappear when using the
+	// workspace switch shortcut.
+	// Also make it not minimizable, because without DeskBar, there is no way to restore a
+	// minimized window.
+	if (!be_roster->IsRunning(kDeskbarSignature)) {
 		SetFlags(Flags() | B_NOT_MINIMIZABLE);
+		SetWorkspaces(B_ALL_WORKSPACES);
+	}
 }
 
 
