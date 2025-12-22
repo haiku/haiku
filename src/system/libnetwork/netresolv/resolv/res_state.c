@@ -102,7 +102,7 @@ __res_get_state(void)
 		res_state_debug("checkout from list", st);
 	} else {
 		pthread_mutex_unlock(&res_mtx);
-		st = malloc(sizeof(*st));
+		st = calloc(1, sizeof(*st));
 		if (st == NULL) {
 			h_errno = NETDB_INTERNAL;
 			return NULL;
