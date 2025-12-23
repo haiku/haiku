@@ -30,6 +30,9 @@ SimpleTest PictureTest :
 	[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	;
 
+Includes [ FGristFiles PictureTest.cpp ]
+	: [ BuildFeatureAttribute expat : headers ] ;
+
 if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : PictureTest
 		: tests!apps ;

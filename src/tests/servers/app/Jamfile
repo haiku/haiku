@@ -123,7 +123,6 @@ local font_src =
 SharedLibrary libtestappserver.so :
 	Angle.cpp
 	ClientMemoryAllocator.cpp
-	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp
 	DelayedMessage.cpp
@@ -266,6 +265,7 @@ SubInclude HAIKU_TOP src tests servers app hide_and_show ;
 SubInclude HAIKU_TOP src tests servers app idle_test ;
 SubInclude HAIKU_TOP src tests servers app inverse_clipping ;
 SubInclude HAIKU_TOP src tests servers app lagging_get_mouse ;
+SubInclude HAIKU_TOP src tests servers app layers_test ;
 SubInclude HAIKU_TOP src tests servers app lock_focus ;
 SubInclude HAIKU_TOP src tests servers app look_and_feel ;
 SubInclude HAIKU_TOP src tests servers app menu_crash ;
