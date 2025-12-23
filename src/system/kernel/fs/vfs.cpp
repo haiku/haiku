@@ -8184,9 +8184,12 @@ fs_write_info(dev_t device, const struct fs_info* info, int mask)
 	if (status != B_OK)
 		return status;
 
-	if (HAS_FS_MOUNT_CALL(mount, write_fs_info))
+	if (HAS_FS_MOUNT_CALL(mount, write_fs_info)) {
 		status = FS_MOUNT_CALL(mount, write_fs_info, info, mask);
-	else
+
+		if ((mask & FS_WRITE_FSINFO_NAME) && status == B_OK)
+			mount->partition->SetContentName(info->volume_name);
+	} else
 		status = B_READ_ONLY_DEVICE;
 
 	put_mount(mount);
