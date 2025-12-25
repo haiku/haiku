@@ -38,11 +38,13 @@ RESCOMP	:= rc
 CC		:= $(CC)
 C++		:= $(CXX)
 
-# Set up CFLAGS.
+# Set up CFLAGS/CXXFLAGS.
 ifeq ($(strip $(TYPE)), DRIVER)
 	CFLAGS	+= -D_KERNEL_MODE=1
+	CXXFLAGS += -D_KERNEL_MODE=1
 else
 	CFLAGS +=
+	CXXFLAGS +=
 endif
 
 # Set up optimization flags.
@@ -67,13 +69,16 @@ ifeq ($(strip $(DEBUGGER)), TRUE)
 	OPTIMIZER = -O0
 endif
 CFLAGS += $(OPTIMIZER) $(DEBUG)
+CXXFLAGS += $(OPTIMIZER) $(DEBUG)
 
 # Set up the warning flags.
 ifeq ($(strip $(WARNINGS)), ALL)
-	CFLAGS += -Wall -Wno-multichar -Wno-ctor-dtor-privacy
+	CFLAGS += -Wall -Wno-multichar
+	CXXFLAGS += -Wall -Wno-multichar -Wno-ctor-dtor-privacy
 else
 ifeq ($(strip $(WARNINGS)), NONE)
 	CFLAGS += -w
+	CXXFLAGS += -w
 endif
 endif
 
@@ -176,9 +181,11 @@ LDFLAGS += $(LINK_PATHS)  $(LINK_LIBS)
 
 # Add the defines to CFLAGS.
 CFLAGS += $(foreach define, $(DEFINES), $(addprefix -D, $(define)))
+CXXFLAGS += $(foreach define, $(DEFINES), $(addprefix -D, $(define)))
 
 # Add the additional compiler flags to CFLAGS.
 CFLAGS += $(COMPILER_FLAGS)
+CXXFLAGS += $(COMPILER_FLAGS)
 
 # Add the additional linkflags to LDFLAGS
 LDFLAGS += $(LINKER_FLAGS)
@@ -288,21 +295,21 @@ $(OBJ_DIR)/%.d : %.CXX
 $(OBJ_DIR)/%.o : %.c
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.cpp
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+	$(C++) -c $< $(INCLUDES) $(CXXFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.cp
-	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+	$(CC) -c $< $(INCLUDES) $(CXXFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.cc
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+	$(C++) -c $< $(INCLUDES) $(CXXFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.cxx
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+	$(C++) -c $< $(INCLUDES) $(CXXFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.C
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.CC
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+	$(C++) -c $< $(INCLUDES) $(CXXFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.CPP
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+	$(C++) -c $< $(INCLUDES) $(CXXFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.CXX
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+	$(C++) -c $< $(INCLUDES) $(CXXFLAGS) -o "$@"
 
 # Rules to compile the resource definition files.
 $(OBJ_DIR)/%.rsrc : %.rdef
