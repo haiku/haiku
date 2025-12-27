@@ -28,7 +28,7 @@ OK	AboutWindow		確認
 Default Haiku window decorator.	Default decorator about box		默認Haiku視窗裝潢器。
 %s GiB	StringForSize	size unit	%s GiB
 %s B	StringForSize	size unit, narrow space	%s B
-Remove replicant	Dragger		消除副本
+Remove replicant	Dragger		移除副本
 Version	AboutWindow		版本
 Red:	ColorControl		紅：
 <empty>	Menu		<空>

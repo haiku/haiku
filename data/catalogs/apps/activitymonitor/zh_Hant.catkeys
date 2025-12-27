@@ -4,17 +4,17 @@ Temperature	DataSource		溫度
 Teams	DataSource		隊列
 Semaphores	DataSource		信號量
 TX	DataSource	Shorter version for Sending	TX
-Block cache memory	DataSource		區塊高速緩衝記憶體
+Block cache memory	DataSource		區塊高速快取記憶體
 %lld ms	SettingsWindow		%lld 毫秒
 Media nodes	DataSource		媒體節點
 Text clipboard	DataSource		文字剪貼簿
 Network send	DataSource		網路傳送
-Cache	DataSource		緩存
+Cache	DataSource		快取
 Running applications	DataSource		運行應用程式
 CPU usage (combined)	DataSource		CPU使用率（合併）
 Threads	DataSource		執行緒數
 Receiving	DataSource		接收
-Remove graph	ActivityView		刪除圖表
+Remove graph	ActivityView		移除圖表
 Swap space	DataSource		交換空間
 CPU	DataSource		CPU
 ActivityMonitor	System name		活動監視器
@@ -22,7 +22,7 @@ CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		更新時間間隔：
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		設定…
-Block cache	DataSource		塊緩存
+Block cache	DataSource		塊快取
 Memory	DataSource		記憶體
 CPU usage	DataSource		CPU使用率
 CPU speed	DataSource		CPU速度
@@ -31,7 +31,7 @@ Raw clipboard	DataSource		原始剪貼簿
 Settings	ActivityWindow		設定
 Used memory	DataSource		使用記憶體
 Show legend	ActivityView		顯示圖例
-Cached memory	DataSource		緩存記憶體
+Cached memory	DataSource		快取記憶體
 CPU %d usage	DataSource		CPU %d 使用率
 CPU %d speed	DataSource		CPU %d 速度
 File	ActivityWindow		檔案

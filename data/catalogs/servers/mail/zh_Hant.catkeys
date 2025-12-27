@@ -16,4 +16,4 @@ Mail status	Notifier		郵件狀態
 Check for mails only	DeskbarView		僅檢查郵件
 Check for mail now	DeskbarView		立即檢查郵件
 Sending mail for %name	Notifier		正在為 %name 發送郵件
-Mail daemon status log	MailDaemon		郵件守護程式狀態日誌
+Mail daemon status log	MailDaemon		郵件守護程式狀態紀錄檔

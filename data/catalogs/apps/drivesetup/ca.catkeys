@@ -26,7 +26,7 @@ Mounted at	PartitionList		Muntada a
 Disk system %s not found!	MainWindow		No s'ha trobat el disc de sistema %s!
 Create…	MainWindow		Crea...
 Write changes	MainWindow		Escriu els canvis
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		No s'ha pogut iniciar la partició %s. (No s'han desat els canvis al disc.)
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Ha fallat iniciar la partició %s. (No s'han desat els canvis al disc.)
 Validation of the given creation parameters failed.	MainWindow		Ha fallat validar els paràmetres de creació indicats.
 Eject	MainWindow		Expulsa
 Surface test (not implemented)	MainWindow		Prova de la superfície (no està implementat)

@@ -2,7 +2,7 @@
 Read	JPEGTranslator		讀取
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be 位圖格式（JPEG轉譯器）
 Show warning messages	JPEGTranslator		顯示警告信息
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		使用 0 的 CMYK 代碼表示 100% 墨水覆蓋率
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		使用 0 的 CMYK 程式碼表示 100% 墨水覆蓋率
 JPEG Library Error: %s\n	be_jerror		JPEG庫錯誤: %s\n
 ©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\n基於 IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\n以及 \"lossless\" 編碼支援補丁作者 Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\n以及一些色彩空間轉換例程作者 Magnus Hellman\n\thttp://www.bebits.com/app/802\n
 None	JPEGTranslator		無

@@ -103,7 +103,7 @@ All disks	FindPanel		所有磁碟
 Affine transform	AttributesView		仿射變換
 Window	ContainerWindow		視窗
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-Remove	FindPanel		消除
+Remove	FindPanel		移除
 Company	Person Query Columns		公司
 Select folders…	FindPanel		選擇資料夾…
 Recent documents	FavoritesMenu		近期檔案

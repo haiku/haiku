@@ -14,7 +14,7 @@ There was an error setting up the bookmark.	WebPositive Window		設定書籤時�
 Fonts	Settings Window		字體
 Path	Cookie Manager		路徑
 Bookmarks	WebPositive Window		書籤
-Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		無法從書籤欄中刪除書籤 '%leaf%'。
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		無法從書籤欄中移除書籤 '%leaf%'。
 Use proxy server to connect to the internet	Settings Window		使用代理伺服器連接到互聯網
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 已完成
 Auto-hide interface in full screen mode	Settings Window		全螢幕模式下自動隱藏介面
@@ -33,7 +33,7 @@ Cancel	Download Window		取消
 Settings	Settings Window		設定
 Downloads	WebPositive Window		下載
 Browse…	Settings Window		瀏覽…
-Resume prior session	Settings Window		恢復之前的會話
+Resume prior session	Settings Window		恢復之前的工作階段
 Match case	WebPositive Window		匹配大小寫
 Proxy password:	Settings Window		代理密碼：
 Failed to delete bookmark:\n'%path%'	BookmarkBar		刪除書籤失敗：\n'%path%'
@@ -70,7 +70,7 @@ Username:	Authentication Panel		使用者名稱：
 Hide password text	Authentication Panel		隱藏密碼文字
 OK	Authentication Panel		確認
 Name	Cookie Manager		名稱
-Remove finished	Download Window		消除完成
+Remove finished	Download Window		移除完成
 Earlier	WebPositive Window		早些時候
 Edit	WebPositive Window		編輯
 Back	WebPositive Window		返回
@@ -114,7 +114,7 @@ Default standard font size:	Settings Window		默認標準字體大小：
 Custom	Settings Window		客製化
 Bookmark this page	WebPositive Window		將此頁加入書籤
 Show tabs if only one page is open	Settings Window		如果僅開啟一頁，則顯示選項卡
-Remove	Download Window		消除
+Remove	Download Window		移除
 Close tab	WebPositive Window		關閉選項卡
 About	WebPositive Window		關於
 Continue downloads	WebPositive		繼續下載
@@ -132,10 +132,10 @@ Remember username and password for this site	Authentication Panel		記住本網�
 (Finish: %date - %duration left)	Download Window		（完成：%date - %duration 剩餘）
 Cookie manager	Cookie Manager		Cookie 管理器
 Show home button	Settings Window		顯示首頁按鍵
-Start new session	Settings Window		開始新會話
+Start new session	Settings Window		開始新工作階段
 The cookie jar is empty!	Cookie Manager		cookie罐是空的！
 Value	Cookie Manager		值
-Remove missing	Download Window		消除缺失的
+Remove missing	Download Window		移除缺失的
 Paste	WebPositive Window		貼上
 Double-click or middle-click to open new tab.	Tab Manager		雙擊或中鍵點選開啟新分頁。
 Next	WebPositive Window		下一步
@@ -160,7 +160,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 OK	BookmarkBar		OK
 Start up:	Settings Window		啟動：
 Confirmation	WebPositive Window		確認
-Session cookie	Cookie Manager		會話cookie
+Session cookie	Cookie Manager		工作階段cookie
 New name:	BookmarkBar		新名字：
 No SSE2 support	WebPositive		不支援 SSE2
 Open all	WebPositive Window		開啓全部

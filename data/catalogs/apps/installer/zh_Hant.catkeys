@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	3240158834
+1	english	x-vnd.Haiku-Installer	1341809802
 Performing installation.	InstallProgress		正在執行安裝。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		請先關閉 DriveSetup 視窗，然後再關閉安裝程式視窗。
 No optional packages available.	PackagesView		無可用的可選套件。
@@ -14,6 +14,7 @@ Are you sure you want to to stop the installation?	InstallerWindow		您確定要
 Installer	System name		安裝程式
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		點擊 '開始' 按鍵以安裝從 '%1s' 到 '%2s'。
 Are you sure you want to stop the installation?	InstallerWindow		您確定要中止安裝嗎？
+Failed to create EFI loader directory!	InstallProgress		無法創建EFI loader目錄!
 README	InstallerApp		README
 Quit	InstallerWindow		退出
 Please close the BootManager window before closing the Installer window.	InstallerWindow		請先關閉BootManager視窗，然後再關閉Installer視窗。
@@ -36,7 +37,7 @@ Additional disk space required: 0.0 KiB	InstallerWindow		所需額外磁盤空�
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		這是測試版軟件！這意味著有丟失重要數據的風險。請經常備份！您已被事先警告了。\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
 Install anyway	InstallProgress		无论如何都要安装
-1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) 如果您要在真實硬件上安裝Haiku（而不是在模擬器內），您可能需要從另一個操作系統準備一個硬盤分區（例如，您可以使用GParted Live-CD，它也可以調整現有分區的大小以騰出空間）。\n您也可以通過從安裝程序啟動DriveSetup來設置分區，但您將無法使用它調整現有分區的大小。盡管多年來DriveSetup已經經過相當徹底的測試，但建議您備份系統上其他分區的最新數據。僅爲以防萬一……
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) 如果您要在真實硬體上安裝Haiku（而不是在模擬器內），您可能需要從另一個操作系統準備一個硬碟分區（例如，您可以使用GParted Live-CD，它也可以調整現有分區的大小以騰出空間）。\n您也可以通過從安裝程序啟動DriveSetup來設置分區，但您將無法使用它調整現有分區的大小。盡管多年來DriveSetup已經經過相當徹底的測試，但建議您備份系統上其他分區的最新數據。僅爲以防萬一……
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) 安裝程式將使Haiku分區本身可啟動，但不會采取任何步驟將Haiku集成到現有的啟動菜單中。如果您已經安裝了GRUB，您可以將Haiku添加到其中。\n有關詳細信息，請參考我們網站上關於啟動Haiku的指南 https://www.haiku-os.org/guides/booting.\n或者您可以從安裝器的 \"工具\" 菜單中設置啓動菜單，參見Haiku User Guide裏面 \"BootManager\"的相關主題。\n\n\n
 Hide optional packages	InstallerWindow		隐藏可选套件
 ???	InstallerWindow	Unknown partition name	???

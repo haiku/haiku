@@ -24,7 +24,7 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		磁碟上的第一個分割區設置得太早，沒有為啟動選單留下足夠的可用空間。\n啟動管理器在第一個分割區之前需要 2 KiB 可用空間。
 Uninstall	DrivesPage	Button	解除安裝
 Update	DrivesPage	Button	更新
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		引導設備的主開機記錄 (MBR):\n\t%s\n現在將被儲存到磁碟。請選擇一個檔案來儲存MBR。\n\n如果安裝出現問題或您以後希望刪除啟動選單，只需執行 bootman 程式並選擇「解除安裝」選項即可。
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		引導設備的主開機記錄 (MBR):\n\t%s\n現在將被儲存到磁碟。請選擇一個檔案來儲存MBR。\n\n如果安裝出現問題或您以後希望移除啟動選單，只需執行 bootman 程式並選擇「解除安裝」選項即可。
 Default Partition	DefaultPartitionPage	Title	默認分區
 Installation of boot menu completed	BootManagerController	Title	啟動選單安裝完成
 After one minute	DefaultPartitionPage		一分鐘後

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ActivityMonitor	923507156
+1	turkish	x-vnd.Haiku-ActivityMonitor	1159274874
 Temp	DataSource		Sıcaklık
 Temperature	DataSource		Sıcaklık
 Teams	DataSource		Takımlar
@@ -24,6 +24,7 @@ RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Ayarlar…
 Block cache	DataSource		Blok önbelleği
 Memory	DataSource		Bellek
+No thermal sensor	SystemInfoHandler		Termal algılayıcı yok
 CPU usage	DataSource		CPU kullanımı
 CPU speed	DataSource		CPU hızı
 Quit	ActivityWindow		Çık

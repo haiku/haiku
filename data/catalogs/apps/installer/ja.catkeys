@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	3240158834
+1	japanese	x-vnd.Haiku-Installer	3980652653
 Performing installation.	InstallProgress		インストールを実行しています。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
 No optional packages available.	PackagesView		オプショナルパッケージはありません。
@@ -10,10 +10,14 @@ Haiku has to be installed on a partition that uses the Be File System, but there
 Please choose target	InstallerWindow		インストール先の選択
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Haikuブートメニュー設定用プログラムのブートマネージャーが起動できませんでした。
 Cancel	InstallProgress		中止
+Failed to rename existing loader!	InstallProgress		既存のローダーの名称変更が失敗しました!
 Are you sure you want to to stop the installation?	InstallerWindow		本当にインストールを中断しますか?
 Installer	System name		インストーラー
+EFI loader successfully installed!	InstallProgress		EFIローダーのインストールに成功しました!
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		'開始' ボタンを押して、'%1s' から '%2s' へのインストールを行います。.
+Failed to read EFI loader file!	InstallProgress		EFIローダーファイルの読み込みが失敗しました!
 Are you sure you want to stop the installation?	InstallerWindow		本当にインストールを中止しますか?
+Failed to create EFI loader directory!	InstallProgress		EFIローダーディレクトリの作成が失敗しました!
 README	InstallerApp		README
 Quit	InstallerWindow		終了
 Please close the BootManager window before closing the Installer window.	InstallerWindow		インストーラーのウィンドウを閉じる前にブートマネージャーのウィンドウを閉じてください。
@@ -35,26 +39,32 @@ Install from:	InstallerWindow		インストール元:
 Additional disk space required: 0.0 KiB	InstallerWindow		必要な追加ディスク容量: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		ベータ品質のソフトウェアです。重要なデータを失う恐れがあります。こまめにバックアップをとってください! さらに、次の点に留意してください。\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Rename	InstallProgress		名前の変更
 Install anyway	InstallProgress		とにかくインストールする
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) Haiku を (エミュレータでなく) 実機にインストールする場合は、先に別の OS からハードディスクのパーティションを用意するとよいでしょう (たとえば、GParted LiveCD が使えます。それは、既存のパーティションをリサイズして空き容量を作成することもできます)。\nまた、インストーラーから DriveSetup を呼び出してパーティションを設定できます。しかし、既存のパーティションのリサイズはできません。DriveSetup は、長年に渡って徹底的にテストされていますが、システムの他のパーティションの最新のバックアップを取ることを勧めます。念の為...
+Unknown type	InstallProgress	Partition content type	不明なタイプ
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) インストーラーは、Haiku のパーティションを起動可能にしますが、Haiku を既存のブートメニューに結合する機能はありません。すでに GRUB がインストールされているなら、Haikuを追加できます。\n詳しくは、Haiku ウェブサイトの Haiku の起動に関するガイドを参考にしてください (https://www.haiku-os.org/guides/booting)。\nまたは、インストーラーの \"ツール\" メニューからブートメニューを設定できます。Haikuユーザーガイドの \"ブートマネージャー(BootManager)\" アプリケーションのトピックを見てください。\n\n\n
 Hide optional packages	InstallerWindow		オプショナルパッケージを隠す
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Haikuを試用していただきありがとうございます。Haikuを堪能してください!
+Failed to copy EFI loader to selected partition!	InstallProgress		EFIローダーの選択されたパーティションへのインストールが失敗しました!
 Quit	InstallerApp		終了
 Quit BootManager and DriveSetup	InstallerWindow		ブートマネージャーとDriveSetupを終了します。
 Error writing boot sector.	InstallProgress		ブートセクターの書き込みに失敗しました。
 OK	InstallerWindow		OK
+Failed to find EFI loader file!	InstallProgress		EFIローダーファイルを見つけられませんでした!
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Haiku のブートに成功したら、忘れずに \"Userguide\" を読んで、\"Quick Tour\" を手に取ってください。 これらはデスクトップ上のリンクおよび WebPositive のブックマーク中にあります。\n\n
 Try installing anyway	InstallProgress		それでもインストールを試みる
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		Haikuをインストールする前の注意\n\n
 Additional disk space required: %s	InstallerWindow		必要な追加ディスク容量: %s
 Stop	InstallerWindow	In alert after pressing Stop	中断
 Boot sector successfully written.	InstallProgress		ブートセクターの書き込みに成功しました。
-Failed to launch BootManager	InstallerWindow		ブートマネージャーの起動に失敗しました
+Failed to launch BootManager	InstallerWindow		ブートマネージャーの起動が失敗しました
+Install EFI loader	InstallerWindow		EFIローダーをインストール
 Writing bootsector.	InstallProgress		ブートセクターを書き込んでいます。
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		エラーが発生しました。インストールは完了していません:\n\nエラー: %s
 Restart	InstallerWindow		再起動
+ (boot disk)	InstallProgress	Marks EFI partitions on boot disk - preserve leading space	 (ブートディスク)
 The disk can't be mounted. Please choose a different disk.	InstallProgress		このディスクをマウントできません。他のディスクを選択してください。
 Begin	InstallerWindow		開始
 Collecting copy information.	InstallProgress		コピー元の情報を集めています...
@@ -74,13 +84,16 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		パーティションの設定...
 Install progress:  	InstallerWindow		進行状況:
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		インストール元ディスクへのインストールはできません。他のディスクを選んでください。
+An EFI loader is already installed on the selected partition! Would you like to rename it?	InstallProgress		EFIローダーは選択されたパーティションにすでにインストールされています。名前を変更しますか?
 Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		インストーラーのウィンドウを閉じる前にブートマネージャーとDriveSetupのウィンドウを閉じてください。
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		ポップアップメニューよりインストール元ディスクを選んでから'開始'ボタンを押してください。
+No valid EFI system data partitions found	InstallerWindow		有効なEFIシステムデータパーティションが見つかりません
 OK	InstallProgress		OK
 Quit BootManager	InstallerWindow		ブートマネージャーを終了
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか?この場合、システムを再起動する必要があります。
 Onto:	InstallerWindow		インストール先:
 Tools	InstallerWindow		ツール
 scanning…	InstallerWindow		ディスクを検出しています...
+Failed to access installation destination!	InstallProgress		インストール先にアクセスできません!
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		ポップアップメニューよりインストールしたいディスクを選んでから'開始'ボタンを押してください。
 Continue	InstallerApp		続ける

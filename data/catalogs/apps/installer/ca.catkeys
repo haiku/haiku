@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	3240158834
+1	catalan; valencian	x-vnd.Haiku-Installer	3980652653
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
 No optional packages available.	PackagesView		No hi ha paquets opcionals disponibles.
@@ -10,10 +10,14 @@ Haiku has to be installed on a partition that uses the Be File System, but there
 Please choose target	InstallerWindow		Si us plau, trieu una destinació.
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		El Gestor d'arrencada, l'aplicació per configurar el menú d'arrencada del Haiku, no s'ha pogut iniciar.
 Cancel	InstallProgress		Cancel·la
+Failed to rename existing loader!	InstallProgress		Ha fallat canviar el nom del carregador existent!
 Are you sure you want to to stop the installation?	InstallerWindow		Segur que voleu interrompre la instal·lació?
 Installer	System name		Instal·lador
+EFI loader successfully installed!	InstallProgress		El carregador EFI s'ha instal·lat correctament!
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Premeu el botó Comença per instal·lar des de %1s a %2s.
+Failed to read EFI loader file!	InstallProgress		Ha fallat llegir el fitxer del carregador EFI!
 Are you sure you want to stop the installation?	InstallerWindow		Segur que voleu interrompre la instal·lació?
+Failed to create EFI loader directory!	InstallProgress		Ha fallat crear el directori del carregador EFI!
 README	InstallerApp		LLEGEIX-ME
 Quit	InstallerWindow		Surt
 Please close the BootManager window before closing the Installer window.	InstallerWindow		Tanqueu la finestra del gestor d'arrencada abans de tancar la finestra de l'instal·lador.
@@ -35,26 +39,32 @@ Install from:	InstallerWindow		Instal·la des de:
 Additional disk space required: 0.0 KiB	InstallerWindow		L'espai de disc addicional necessari és 0.0 KiB.
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Aquest és un programari de qualitat beta! Significa que hi ha risc de perdre dades importants. Feu còpies de seguretat freqüents! Us hem avisat.\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Rename	InstallProgress		Canvia'n el nom
 Install anyway	InstallProgress		Instal·la tanmateix
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Si instal·leu el Haiku en un maquinari real (no dins d'un emulador), potser hauríeu preparar una partició de disc dur des d'un altre sistema operatiu (podríeu, per exemple, usar una versió autònoma del GParted, que també pot canviar la mida de les particions existents per alliberar espai).\nTambé podeu configurar particions amb el Gestor de discs des de l'instal·lador, però no podreu canviar la mida de les particions existents amb aquesta eina. Tot i que, al llarg dels anys, el Gestor de discs s’ha provat força a fons, es recomana tenir còpies de seguretat actualitzades de les altres particions del sistema, només per si de cas…
+Unknown type	InstallProgress	Partition content type	Tipus desconegut
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) L'instal·lador farà que la partició del Haiku sigui arrencable per si mateixa, però no fa cap pas per integrar el Haiku en un menú d'arrencada existent. Si ja teniu el GRUB instal·lat, podeu afegir-hi el Haiku.\nPer obtenir-ne més informació, consulteu la guia d’arrencada del Haiku al nostre lloc web: https://www.haiku-os.org/guides/booting.\nO bé podeu configurar un menú d'arrencada des del menú Eines de l'instal·lador. Consulteu el tema de la Guia de l'usuari de Haiku sobre l'aplicació Gestor d'arrencada (BootManager).\n\n\n
 Hide optional packages	InstallerWindow		Amaga els paquets opcionals
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Divertiu-vos i gràcies per provar el Haiku!
+Failed to copy EFI loader to selected partition!	InstallProgress		Ha fallat copiar el carregador EFI a la partició seleccionada!
 Quit	InstallerApp		Surt
 Quit BootManager and DriveSetup	InstallerWindow		Surt del Gestor d'arrencada i del Gestor de discs
 Error writing boot sector.	InstallProgress		Error en escriure el sector d'arrencada.
 OK	InstallerWindow		D'acord
+Failed to find EFI loader file!	InstallProgress		Ha fallat trobar el fitxer del carregador EFI!
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quan arrenqueu amb èxit el Haiku per primera vegada, assegureu-vos de llegir la nostra Guia de l'usuari i de fer-ne la Visita ràpida. N'hi ha enllaços a l'escriptori i als marcadors del WebPositive.\n\n
 Try installing anyway	InstallProgress		Intenta la instal·lació tanmateix
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACIÓ IMPORTANT ABANS D'INSTAL·LAR EL HAIKU\n\n
 Additional disk space required: %s	InstallerWindow		Espai de disc addicional necessari: %s
 Stop	InstallerWindow	In alert after pressing Stop	Interromp
 Boot sector successfully written.	InstallProgress		S'ha escrit correctament el sector d'arrencada.
-Failed to launch BootManager	InstallerWindow		No s'ha pogut iniciar el gestor d'arrencada.
+Failed to launch BootManager	InstallerWindow		Ha fallat iniciar el gestor d'arrencada.
+Install EFI loader	InstallerWindow		Instal·lació del carregador EFI
 Writing bootsector.	InstallProgress		S'escriu el sector d'arrencada.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		S'ha trobat un error i la instal·lació no s'ha acabat:\n\nError:  %s
 Restart	InstallerWindow		Reinicia
+ (boot disk)	InstallProgress	Marks EFI partitions on boot disk - preserve leading space	 (disc d'arrencada)
 The disk can't be mounted. Please choose a different disk.	InstallProgress		No es pot muntar el disc. Si us plau, trieu-ne un altre.
 Begin	InstallerWindow		Comença
 Collecting copy information.	InstallProgress		Es recopila la informació de còpia.
@@ -74,13 +84,16 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Configura les particions...
 Install progress:  	InstallerWindow		Progrés de la instal·lació:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		No podeu instal·lar el contingut d'un disc en si mateix. Si us plau, trieu-ne un altre.
+An EFI loader is already installed on the selected partition! Would you like to rename it?	InstallProgress		Ja hi ha un carregador EFI instal·lat a la partició seleccionada! Voleu canviar-ne el nom?
 Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Tanqueu les finestres del Gestor d'arrencada i del Gestor de discs abans de tancar la finestra de l'instal·lador.
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Trieu el disc d'origen al menú emergent. A continuació, cliqueu a Comença.
+No valid EFI system data partitions found	InstallerWindow		No s'ha trobat cap partició de dades del sistema EFI vàlida.
 OK	InstallProgress		D'acord
 Quit BootManager	InstallerWindow		Surt del Gestor d'arrencada
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Segur que voleu instal·lar al disc d'arrencada actual? L'Instal·lador haurà de reiniciar la màquina si continueu.
 Onto:	InstallerWindow		Cap a:
 Tools	InstallerWindow		Eines
 scanning…	InstallerWindow		s'escaneja...
+Failed to access installation destination!	InstallProgress		Ha fallat accedir a la destinació d'instal·lació!
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Trieu el disc on voleu instal·lar al menú emergent. A continuació, cliqueu a Comença.
 Continue	InstallerApp		Continua

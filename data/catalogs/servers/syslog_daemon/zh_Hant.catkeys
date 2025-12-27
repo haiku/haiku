@@ -1,4 +1,4 @@
 1	english	x-vnd.Haiku-SystemLogger	2600925901
 Syslog Daemon	SyslogDaemon		Syslog Daemon
 OK	SyslogDaemon		確認
-%s\n\nThis daemon collects all system messages and writes them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\n該守護程式會收集所有系統訊息並將它們寫入系統層級的日誌 \"%s\".\n\n
+%s\n\nThis daemon collects all system messages and writes them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\n該守護程式會收集所有系統訊息並將它們寫入系統層級的紀錄檔 \"%s\".\n\n

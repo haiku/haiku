@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2433311519
+1	catalan; valencian	x-vnd.Haiku-libtracker	734452449
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -165,6 +165,7 @@ Could not open \"%name\" (%error). 	FSUtils		No s'ha pogut muntar \"%name\" (%er
 Media parameter group	AttributesView		Grup de paràmetres multimèdia
 %name info	InfoWindow	InfoWindow Title	Propietats de %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta personal, el sistema %osName podria no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu moure la carpeta personal, manteniu premuda la tecla Maj. i cliqueu a Mou.
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%total seleccionat}}
 Property info	AttributesView		Informació de propietat
 Sorry, you can't create links in the Trash.	PoseView		Disculpeu, no podeu fer enllaços amb la paperera.
 From	Email Query Columns		De
@@ -290,6 +291,7 @@ Show volumes on Desktop	SettingsView		Mostra els volums a l'escriptori
 Recent folders	ContainerWindow		Carpetes recents
 Desktop	Model		Escriptori
 Select all	ContainerWindow		Selecciona-ho tot
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filtre}}
 apps	B_APPS_DIRECTORY		aplicacions
 Error calculating folder size.	InfoWindow		Error en calcular la mida de la carpeta.
 Delete	FSUtils		Suprimeix

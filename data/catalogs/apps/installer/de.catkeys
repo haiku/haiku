@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	3240158834
+1	german	x-vnd.Haiku-Installer	3980652653
 Performing installation.	InstallProgress		Installation läuft.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Das DriveSetup-Fenster muss geschlossen werden, bevor der Installer verlassen werden kann.
 No optional packages available.	PackagesView		Keine optionalen Pakete verfügbar.
@@ -10,10 +10,14 @@ Haiku has to be installed on a partition that uses the Be File System, but there
 Please choose target	InstallerWindow		Bitte Zielpartition auswählen
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		BootManager, die Anwendung zum Erstellen des Haiku Bootmenüs, konnte nicht gestartet werden.
 Cancel	InstallProgress		Abbrechen
+Failed to rename existing loader!	InstallProgress		Vorhandener Loader konnte nicht umbenannt werden!
 Are you sure you want to to stop the installation?	InstallerWindow		Soll die Installation tatsächlich abgebrochen werden?
 Installer	System name		Installer
+EFI loader successfully installed!	InstallProgress		Der EFI Loader wurde erfolgreich installiert!
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		'Start' klicken, um die Installation von '%1s' nach '%2s' durchzuführen.
+Failed to read EFI loader file!	InstallProgress		Die EFI Loader-Datei konnte nicht geladen werden!
 Are you sure you want to stop the installation?	InstallerWindow		Soll die Installation tatsächlich gestoppt werden?
+Failed to create EFI loader directory!	InstallProgress		Der EFI Loader-Ordner konnte nicht erstellt werden!
 README	InstallerApp		LIESMICH
 Quit	InstallerWindow		Beenden
 Please close the BootManager window before closing the Installer window.	InstallerWindow		Bitte BootManager vor dem Installer-Fenster schließen.
@@ -35,16 +39,20 @@ Install from:	InstallerWindow		Installieren von:
 Additional disk space required: 0.0 KiB	InstallerWindow		Zusätzlich benötigter Speicherplatz: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dies ist eine Beta-Version! Es besteht ein gewisses Risiko, dass wichtige Daten verloren gehen können. Man sollte seine Daten unbedingt regelmäßig sichern!\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Rename	InstallProgress		Umbenennen
 Install anyway	InstallProgress		Trotzdem installieren
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)    Wird Haiku auf echter Hardware (nicht in einem Emulator) installiert, kann man dafür vorher eine Festplattenpartition unter einem anderen Betriebssystem vorbereiten. Mit einer GParted Live-CD kann man beispielsweise bestehende Partitionen verkleinern um Platz zu schaffen.\nPartitionen einrichten kann man auch mit DriveSetup, das sich vom Installer aus starten lässt. Partitionen lassen sich damit jedoch nicht verkleinern. DriveSetup wurde zwar über die Jahre reichlich getestet, trotzdem sind aktuelle Backups der übrigen Partitionen des Computers angeraten. Nur zur Sicherheit …
+Unknown type	InstallProgress	Partition content type	Unbekannter Typ
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)    Der Installer wird die Haiku-Partition selbst bootfähig machen, aber nichts unternehmen, um Haiku in ein bestehendes Bootmenü zu integrieren. Ist GRUB bereits installiert, kann man Haiku zu dessen Bootmenü hinzufügen.\nNäheres dazu steht im Booting Guide auf unserer Website unter https://www.haiku-os.org/guides/booting.\nAus Installers \"Werkzeug\" Menü lässt sich auch ein Bootmenü einrichten, siehe das Kapitel zum \"BootManager\" im Haiku User Guide.\n\n\n
 Hide optional packages	InstallerWindow		Optionale Pakete ausblenden
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Viel Spaß und Danke für das Interesse an Haiku!
+Failed to copy EFI loader to selected partition!	InstallProgress		Der EFI Loader konnte nicht auf die gewählte Partition kopiert werden!
 Quit	InstallerApp		Beenden
 Quit BootManager and DriveSetup	InstallerWindow		BootManager und DriveSetup beenden
 Error writing boot sector.	InstallProgress		Fehler beim Schreiben des Bootsektors.
 OK	InstallerWindow		OK
+Failed to find EFI loader file!	InstallProgress		Die EFI Loader-Datei wurde nicht gefunden!
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Nach dem erfolgreichen Start von Haiku sollte man sich den  \"User Guide\" zu Gemüte führen und die \"Quick Tour\" machen. Beides ist auf dem Desktop verlinkt und in WebPositives Lesezeichen zu finden.\n\n
 Try installing anyway	InstallProgress		Trotzdem eine Installation probieren
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		WICHTIGE INFORMATION VOR DER INSTALLATION VON HAIKU\n\n
@@ -52,9 +60,11 @@ Additional disk space required: %s	InstallerWindow		Zusätzlich benötigter Spei
 Stop	InstallerWindow	In alert after pressing Stop	Installation abbrechen
 Boot sector successfully written.	InstallProgress		Der Bootsektor wurde erfolgreich geschrieben.
 Failed to launch BootManager	InstallerWindow		BootManager konnte nicht gestartet werden
+Install EFI loader	InstallerWindow		EFI Loader installieren
 Writing bootsector.	InstallProgress		Bootsektor wird geschrieben.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Es trat ein Fehler auf und die Installation konnte nicht abgeschlossen werden:\n\nFehler:  %s
 Restart	InstallerWindow		Neustarten
+ (boot disk)	InstallProgress	Marks EFI partitions on boot disk - preserve leading space	 (Boot-Disk)
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Das Laufwerk konnte nicht eingehängt werden. Bitte ein anderes Laufwerk wählen.
 Begin	InstallerWindow		Start
 Collecting copy information.	InstallProgress		Es werden Infos über zu kopierende Dateien gesammelt.
@@ -74,13 +84,16 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Partitionen einrichten …
 Install progress:  	InstallerWindow		Installationsverlauf: 
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Der Inhalt einer Partition kann nicht auf sich selbst installiert werden. Bitte eine andere Zielpartition wählen.
+An EFI loader is already installed on the selected partition! Would you like to rename it?	InstallProgress		Auf der gewählten Partition befindet sich bereits ein EFI Loader! Soll er umbenannt werden?
 Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bitte BootManger und DriveSetup vor dem Installer-Fenster schließen.
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf 'Start' klicken.
+No valid EFI system data partitions found	InstallerWindow		Es wurde keine gültige EFI Systemdaten-Partition gefunden
 OK	InstallProgress		OK
 Quit BootManager	InstallerWindow		BootManager beenden
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Soll tatsächlich auf das aktuelle Startlaufwerk installiert werden? Der Installer müsste dann hinterher den Computer neustarten.
 Onto:	InstallerWindow		Nach:
 Tools	InstallerWindow		Werkzeuge
 scanning…	InstallerWindow		Untersuchung läuft …
+Failed to access installation destination!	InstallProgress		Auf das Installations-Ziel konnte nicht zugegriffen werden!
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Bitte die Zielpartition aus dem Menü wählen. Danach auf 'Start' klicken.
 Continue	InstallerApp		Weiter

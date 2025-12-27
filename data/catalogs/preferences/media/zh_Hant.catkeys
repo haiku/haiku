@@ -3,7 +3,7 @@ Couldn't add volume control in Deskbar: %s\n	Media views		無法在桌面欄中�
 Restart media services	Media views		重新啟動媒體服務
 Quit	Media Window		退出
 <none>	VideoInputMenu	Used when no video input is available	<無>
-Couldn't remove volume control in Deskbar: %s\n	Media views		無法刪除Deskbar中的音量控制: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		無法移除Deskbar中的音量控制: %s\n
 Video output:	Media views		視訊輸出：
 Video input:	Media views		視訊輸入：
 Audio output:	Media views		音訊輸出：

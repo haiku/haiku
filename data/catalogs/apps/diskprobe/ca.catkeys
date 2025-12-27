@@ -30,7 +30,7 @@ Open file…	FileWindow		Obre un fitxer...
 DiskProbe request	DiskProbe		Sol·licitud del Sondeig de discs
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
 Block %lld (0x%Lx)	ProbeView		Bloc %lld (0x%Lx)
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No s'ha pogut escriure al disc:\n%s\n\nSi sortiu es perdran tots els canvis.
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Ha fallat escriure al disc:\n%s\n\nSi sortiu, es perdran tots els canvis.
 Native: %lld (0x%0*Lx)	ProbeView		Nadiu: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Navega pel dispositiu:
 Number editor	TypeEditors		Editor de números

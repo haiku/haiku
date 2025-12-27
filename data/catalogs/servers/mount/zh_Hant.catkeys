@@ -4,7 +4,7 @@ Error mounting volume:\n\n%s	AutoMounter		錯誤挂載卷:\n\n%s
 Cancel	AutoMounter		取消
 OK	AutoMounter		確認
 Unmount error	AutoMounter		卸載錯誤
-The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		該卷上的檔案系統不是 Be 檔案系統。建議以唯讀模式掛載，以防止因 Haiku 的錯誤而導致資料意外遺失。
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		該卷上的檔案系統不是Be檔案系統。建議以唯讀模式掛載，以防止因 Haiku 的bug而導致資料意外遺失。
 Mount read/write	AutoMounter		挂載為讀/寫
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		無法卸載盤 \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		正在挂載卷 '%s'\n\n

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	923507156
+1	japanese	x-vnd.Haiku-ActivityMonitor	1159274874
 Temp	DataSource		温度
 Temperature	DataSource		温度
 Teams	DataSource		チーム数
@@ -24,6 +24,7 @@ RX	DataSource	Shorter version for Receiving.	受信
 Settings…	ActivityWindow		設定...
 Block cache	DataSource		ブロックキャッシュ
 Memory	DataSource		メモリ
+No thermal sensor	SystemInfoHandler		温度センサー無し
 CPU usage	DataSource		CPU 使用率
 CPU speed	DataSource		CPU 速度
 Quit	ActivityWindow		終了

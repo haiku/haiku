@@ -36,7 +36,7 @@ Full sync	SoftwareUpdaterWindow	Alert button label	完全同步
 Quit	SoftwareUpdaterWindow	Button label	退出
 Updates have been successfully installed.	UpdateManager		更新已成功安裝。
 Exception occurred while updating packages : %s\n	UpdateAction		更新套件時發生異常：%s\n
-A reboot is necessary to complete the update process.	UpdateManager		需要重新啟動才能完成更新過程。
+A reboot is necessary to complete the update process.	UpdateManager		需要重新啟動才能完成更新行程。
 Exception occurred while checking for updates: %s\n	CheckAction		檢查更新時發生異常：%s\n
 Packages are being updated	UpdateManager		套件正在更新中
 Cancel	SoftwareUpdaterWindow		取消
@@ -59,6 +59,6 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	正在解除安裝的�
 %i of %i	UpdateManager	Do not translate %i	%i 的 %i
 Quit	SoftwareUpdaterWindow		退出
 No updates available	CheckManager		沒有可用的更新
-Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	用法: SoftwareUpdater <command> [ <option> ]\n更新已安裝套件。\n\n命令：\nupdate - 在儲存庫中搜尋所有軟體套件的更新。\ncheck - 檢查可用更新，但僅顯示套件含結果的通知。\nfull-sync - 將已安裝的套件與儲存庫同步。\n\n選項:\n-h or --help 列印此使用說明\n-v or --verbose 輸出詳細資訊\n
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	用法: SoftwareUpdater <command> [ <option> ]\n更新已安裝套件。\n\n指令:\nupdate - 在儲存庫中搜尋所有軟體套件的更新。\ncheck - 檢查可用更新，但僅顯示套件含結果的通知。\nfull-sync - 將已安裝的套件與儲存庫同步。\n\n選項:\n-h or --help 列印此使用說明\n-v or --verbose 輸出詳細資訊\n
 No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	沒有可用的遠端庫。請使用庫預置或「pkgman」指令驗證是否啟用了某些庫。
 Downloading packages	UpdateManager		正在下載套件

@@ -32,7 +32,7 @@ File	Menus		檔案
 Paste	Menus		貼上
 Bold	Menus		粗體
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		檔案 \"%file%\" 已被另一個應用程式修改，是否重新載入？
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		檔案\"%file%\" 已被另一個應用程式刪除，能否恢復？
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		檔案\"%file%\" 已被另一個應用程式移除，能否恢復？
 Lines:	Statistics		行數：
 Strikeout	Menus		刪除線
 Replace in all windows	FindandReplaceWindow		在所有視窗中替換

@@ -32,7 +32,7 @@ Add shape with style	Icon-O-Matic-Menu-Shape		添加形狀和風格
 Change color	Icon-O-Matic-SetColorCmd		改變顏色
 Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		移除 {0, plural, one{頂點} other{頂點}}
 Unassign path	Icon-O-Matic-UnassignPathCmd		取消分配路徑
-Remove	Icon-O-Matic-StylesList		消除
+Remove	Icon-O-Matic-StylesList		移除
 Cancel	Icon-O-Matic-Menu-Settings		取消
 PNG set	Icon-O-Matic-SavePanel		PNG集
 Transformation	Icon-O-Matic-TransformationBoxStates		變形
@@ -73,7 +73,7 @@ Settings	Icon-O-Matic-Menus		設定
 Scale X	Icon-O-Matic-PropertyNames		縮放 X
 Add	Icon-O-Matic-PathsList		添加
 Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		添加 {0, plural, one{風格} other{風格}}
-Remove	Icon-O-Matic-PathManipulator		消除
+Remove	Icon-O-Matic-PathManipulator		移除
 Duplicate	Icon-O-Matic-ShapesList		複製
 Alpha	Icon-O-Matic-PropertyNames		Alpha
 Contour	Transformation		輪廓
@@ -90,7 +90,7 @@ Save	Icon-O-Matic-Menu-Settings		存儲
 Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	點選其中的一個對象
 Export as…	Icon-O-Matic-Menu-File		匯出為…
 Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		凍結 {0, plural, one{形狀} other{形狀}}
-Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		消除 {0, plural, one{形狀} other{形狀}}
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		移除 {0, plural, one{形狀} other{形狀}}
 Undo: %action%	Icon-O-Matic-Main		撤銷: %action%
 Diamond	Icon-O-Matic-StyleTypes		鑽石
 Don't save	Icon-O-Matic-Menu-Settings		不要存儲
@@ -99,22 +99,22 @@ Bummer	Icon-O-Matic-Main	Cancel button - error alert	Bummer
 Translation X	Icon-O-Matic-PropertyNames		移動X軸
 Multi-paste properties	Icon-O-Matic-Properties		多重貼上特性
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		載入 SVG 時，Icon-O-Matic 可能無法解釋 SVG 中的所有資料。透過覆蓋原始文件，該資訊現在將丟失。
-Remove	Icon-O-Matic-TransformersList		消除
+Remove	Icon-O-Matic-TransformersList		移除
 Rotate indices backwards	Icon-O-Matic-PathsList		向後旋轉索引
 Overwrite	Icon-O-Matic-SVGExport		覆蓋
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		添加 {0, plural, one{形狀} other{形狀}}
 Cancel	Icon-O-Matic-SVGExport		取消
 Open…	Icon-O-Matic-Menu-File		開啓…
-Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		消除 {0, plural, one{變形} other{變形}}
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		移除 {0, plural, one{變形} other{變形}}
 Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	點擊上面的形狀
-Remove	Icon-O-Matic-ShapesList		消除
+Remove	Icon-O-Matic-ShapesList		移除
 Multi-paste	Icon-O-Matic-Properties		多重貼上
 Bad news	Title of error alert		壞消息
 HVIF source code	Icon-O-Matic-SavePanel		HVIF 源碼
 Drop shapes	Icon-O-Matic-ShapesList		水滴形狀
 Save icon	Icon-O-Matic-SavePanel	Dialog title	存儲圖示
 Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		分配 {0, plural, one{路徑} other{路徑}}
-Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		消除 {0, plural, one{組件} other{組件}}
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		移除 {0, plural, one{組件} other{組件}}
 Linear	Icon-O-Matic-StyleTypes		線性
 Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		移動 {0, plural, one{組件} other{組件}}
 Add vertex	Icon-O-Matic-AddPointCmd		新增頂點
@@ -126,7 +126,7 @@ Conic	Icon-O-Matic-StyleTypes		錐
 Name	Icon-O-Matic-PropertyNames		名稱
 Reset transformation	Icon-O-Matic-StylesList		重置變形
 Reverse	Icon-O-Matic-PathsList		反向
-Remove	Icon-O-Matic-PathsList		消除
+Remove	Icon-O-Matic-PathsList		移除
 64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
 Load error	Icon-O-Matic-SVGImport		載入錯誤
 Style type	Icon-O-Matic-StyleTypes		款式類型
@@ -164,7 +164,7 @@ Swatches	Icon-O-Matic-Menus		樣本
 Set %property%	Icon-O-Matic-Properties	Don't translate %property%	設定 %property%
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<无可撤销内容>
-Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		刪除  {0, plural, one{路徑} other{路徑}}
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		移除  {0, plural, one{路徑} other{路徑}}
 Add	Icon-O-Matic-StylesList		添加
 Translation Y	Icon-O-Matic-PropertyNames		移動Y軸
 Modify vertex	Icon-O-Matic-ChangePointCmd		修改頂點

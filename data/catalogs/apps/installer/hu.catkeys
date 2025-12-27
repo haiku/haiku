@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	3240158834
+1	hungarian	x-vnd.Haiku-Installer	3980652653
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!
 No optional packages available.	PackagesView		Nincsenek választható csomagok.
@@ -10,10 +10,14 @@ Haiku has to be installed on a partition that uses the Be File System, but there
 Please choose target	InstallerWindow		Válaszd ki, hogy hová szeretnéd telepíteni
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		A Rendszerválasztó, ami a Haiku rendszerbetöltő beállítására használható, nem indítható.
 Cancel	InstallProgress		Mégse
+Failed to rename existing loader!	InstallProgress		Nem tudom átnevezni a meglévő betöltőt!
 Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítod a telepítést?
 Installer	System name		Telepítő
+EFI loader successfully installed!	InstallProgress		Az EFI betöltő sikeresen beállítva!
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Kattints a 'Mehet' gombra a telepítés megkezdéséhez '%1s' lemezről '%2s' lemezre.
+Failed to read EFI loader file!	InstallProgress		Nem tudom olvasni az EFI betöltő fájlt!
 Are you sure you want to stop the installation?	InstallerWindow		Biztosan le szeretnéd állítani a telepítést?
+Failed to create EFI loader directory!	InstallProgress		Nem tudom létrehozni az EFI betöltő mappát!
 README	InstallerApp		OLVASSEL
 Quit	InstallerWindow		Kilépés
 Please close the BootManager window before closing the Installer window.	InstallerWindow		Kérlek zárd be a Rendszerválasztó ablakot mielőtt bezárod a Telepítőt.
@@ -35,16 +39,20 @@ Install from:	InstallerWindow		Honnan:
 Additional disk space required: 0.0 KiB	InstallerWindow		0.0 KiB hely szükséges
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ez egy béta szoftver. Megvan az esélye annak, hogy elvesznek fontos adatok. Gyakran készíts biztonsági mentéseket!\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Rename	InstallProgress		Átnevez
 Install anyway	InstallProgress		Telepítés mindenképp
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) Ha a Haiku-t valódi hardverre telepíted (nem emulátorban), akkor érdemes egy merevlemez-partíciót előkészítened egy másik operációs rendszerből (használhatsz például egy GParted Live-CD-t, amellyel átméretezheted a meglévő partíciókat is).\nPartíciókat úgy is beállíthatsz, hogy elindítod a Lemezkezelőt a Telepítőből, de a meglévő partíciókat nem tudod átméretezni vele. Bár a Lemezkezelőt elég alaposan tesztelték az évek során, ajánlott a rendszer többi partíciójáról naprakész biztonsági másolatot készíteni. Csak a biztonság kedvéért…
+Unknown type	InstallProgress	Partition content type	Ismeretlen típus
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) A Telepítő elindítja a Haiku partíciót, de nem tesz lépéseket a Haiku integrálásához egy meglévő indítómenübe. Ha a GRUB már telepítve van, hozzáadhatod a Haiku-t.\nRészletekért kérjük, olvasd el a Haiku indításáról szóló útmutatót a weboldalunkon: https://www.haiku-os.org/guides/booting.\nVagy beállíthatsz egy indítómenüt az Telepítő \"Eszközök\" menüjéből, lásd a Haiku felhasználói kézikönyv témáját a \"Rendszerválasztó\" alkalmazásban.\n\n\n
 Hide optional packages	InstallerWindow		Választható csomagok elrejtése
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Köszönjük, hogy kipróbálod a Haiku-t, kellemes és hasznos időtöltés kívánunk hozzá!
+Failed to copy EFI loader to selected partition!	InstallProgress		Nem tudtam átmásolni az EFI betöltőt a kiválasztott partícióra!
 Quit	InstallerApp		Kilépés
 Quit BootManager and DriveSetup	InstallerWindow		A Rendszerbetöltő és a Lemezkezelő bezárása
 Error writing boot sector.	InstallProgress		Hiba a boot szektorba írás közben.
 OK	InstallerWindow		Rendben
+Failed to find EFI loader file!	InstallProgress		Nem találom az EFI betöltő fájlt!
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Mikor elsőként sikeresen betöltötted a Haiku-t, olvasd el a \"felhasználói útmutatót\" és nézd meg a \"kezdeti lépéseket\". Ezekhez találsz egy hivatkozást az Asztalon illetve a WebPositive könyvjelzői között.\n\n
 Try installing anyway	InstallProgress		Megpróbálom telepíteni
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		FONTOS TUDNIVALÓK A HAIKU TELEPÍTÉSE ELŐTT\n\n
@@ -52,9 +60,11 @@ Additional disk space required: %s	InstallerWindow		Még ennyi hely szükséges:
 Stop	InstallerWindow	In alert after pressing Stop	Leállítás
 Boot sector successfully written.	InstallProgress		A rendszerindító szektor módosítva lett.
 Failed to launch BootManager	InstallerWindow		Nem sikerült a Rendszerválasztót elindítani
+Install EFI loader	InstallerWindow		EFI betöltő telepítése
 Writing bootsector.	InstallProgress		Boot-szektor írása.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Hiba történt és a telepítés nem ment teljesen végbe:\n\nA hiba: %s
 Restart	InstallerWindow		Újraindítás
+ (boot disk)	InstallProgress	Marks EFI partitions on boot disk - preserve leading space	 (rendszerindító lemez)
 The disk can't be mounted. Please choose a different disk.	InstallProgress		A lemez nem csatolható. Válassz egy másikat!
 Begin	InstallerWindow		Mehet
 Collecting copy information.	InstallProgress		Másolás információinak összegyűjtése…
@@ -74,13 +84,16 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Partíciók szerkesztése…
 Install progress:  	InstallerWindow		Másolás:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Magára a már kiválasztott lemezre nem lehet telepíteni. Kérlek válassz egy másik lemezt.
+An EFI loader is already installed on the selected partition! Would you like to rename it?	InstallProgress		Egy EFI betöltő már létezik a kiválasztott partíción! Szeretnéd átnevezni?
 Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Kérlek zárd be a Rendszerbetöltőt és a Lemezkezelőt mielőtt bezárod a Telepítő ablakát.
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Kérlek válaszd ki a forrást lemezt, majd kattints a 'Mehet'-re.
+No valid EFI system data partitions found	InstallerWindow		Nem található érvényes EFI rendszer-partíció
 OK	InstallProgress		Rendben
 Quit BootManager	InstallerWindow		Rendszerválasztó bezárása
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Biztosan a mostani rendszerindító lemezre telepíted a rendszert? A telepítőnek újra kell indítania a számítógépét, hogy folytathassa a műveletet.
 Onto:	InstallerWindow		Hova:
 Tools	InstallerWindow		Eszközök
 scanning…	InstallerWindow		keresés…
+Failed to access installation destination!	InstallProgress		Nem sikerült hozzáférni a telepítési célhoz!
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Válaszd ki a lemezt ahová telepíteni szeretnél, majd kattints a 'Mehet' gombra.
 Continue	InstallerApp		Folytatás

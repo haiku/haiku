@@ -38,7 +38,7 @@ Send to…	CodyCam		發送至…
 Password:	CodyCam		密碼：
 still image filename expected	CodyCam		預期靜止圖片檔名
 File name:	CodyCam		檔案名稱：
-Directory:	CodyCam		目錄：
+Directory:	CodyCam		目錄:
 Error setting type of output file	VideoConsumer.cpp		輸出文件類型設定錯誤
 Locking the window	VideoConsumer.cpp		正在鎖住視窗
 Cannot find an available video stream	CodyCam		找不到可用的視訊串流

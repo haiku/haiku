@@ -24,7 +24,7 @@ Left	ShortcutsSpec		左
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		快捷方式無法解析您的 KeySet 檔案!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		快捷方式無法存储您的KeySet檔案!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Your Text Here\"
-Remove selected shortcut	ShortcutsWindow		消除選取的捷徑
+Remove selected shortcut	ShortcutsWindow		移除選取的捷徑
 Error, NULL state description?	ShortcutsSpec		錯誤，NULL狀態描述？
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		快捷方式無法開啟您的 KeySet 檔案!

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	923507156
+1	german	x-vnd.Haiku-ActivityMonitor	1159274874
 Temp	DataSource		Temp
 Temperature	DataSource		Temperatur
 Teams	DataSource		Teams
@@ -24,6 +24,7 @@ RX	DataSource	Shorter version for Receiving.	Empfangen
 Settings…	ActivityWindow		Einstellungen …
 Block cache	DataSource		Block-Cache
 Memory	DataSource		Speicher
+No thermal sensor	SystemInfoHandler		Kein Wärmesensor
 CPU usage	DataSource		CPU-Auslastung
 CPU speed	DataSource		CPU-Takt
 Quit	ActivityWindow		Beenden

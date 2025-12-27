@@ -30,5 +30,5 @@ Duration:	GeneralView		週期：
 Application	NotificationView		應用程式
 Enable notifications	GeneralView		啓用通知
 This is a test notification message	PrefletWin		這是一條測試通知訊息
-Remove	NotificationView		消除
+Remove	NotificationView		移除
 Position:	GeneralView		位置：

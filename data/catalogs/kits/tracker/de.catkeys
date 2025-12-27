@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2433311519
+1	german	x-vnd.Haiku-libtracker	734452449
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -165,6 +165,7 @@ Could not open \"%name\" (%error). 	FSUtils		\"%name\" konnte nicht geöffnet we
 Media parameter group	AttributesView		Media-Parametergruppe
 %name info	InfoWindow	InfoWindow Title	Infos zu '%name'
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Wird der Home-Ordner verschoben, kann es sein dass %osName nicht mehr richtig funktioniert!\n\nTrotzdem verschieben?\n\nUm den Home-Ordner trotzdem zu verschieben, Shift-Taste gedrückt halten und \"Verschieben\" klicken.
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%total gewählt}}
 Property info	AttributesView		Property-Info
 Sorry, you can't create links in the Trash.	PoseView		Im Papierkorb können keine Verknüpfungen erstellt werden.
 From	Email Query Columns		Von
@@ -290,6 +291,7 @@ Show volumes on Desktop	SettingsView		Datenträger auf dem Desktop zeigen
 Recent folders	ContainerWindow		Letzte Ordner
 Desktop	Model		Desktop
 Select all	ContainerWindow		Alles auswählen
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
 apps	B_APPS_DIRECTORY		Anwendungen
 Error calculating folder size.	InfoWindow		Fehler beim Ermitteln der Ordnergröße.
 Delete	FSUtils		Löschen

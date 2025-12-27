@@ -1,7 +1,7 @@
 1	catalan; valencian	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		No s'ha pogut connectar al servidor \"%server%\":\n%error%
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		S'actualitzen les subscripcions a les carpetes d'IMAP. Si us plau, tingueu paciència...
-Failed to fetch available storage.	IMAPFolderConfig		No s'ha pogut obtenir l'espai disponible.
+Failed to fetch available storage.	IMAPFolderConfig		Ha fallat obtenir l'espai disponible.
 Cancel	IMAPFolderConfig		Cancel·la
 OK	IMAPFolderConfig		D'acord
 Server storage: %s / %s used.	IMAPFolderConfig		Emmagatzematge del servidor: %s / %s usat.

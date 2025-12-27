@@ -14,7 +14,7 @@ There was an error setting up the bookmark.	WebPositive Window		Hi ha hagut un e
 Fonts	Settings Window		Lletres
 Path	Cookie Manager		Camí
 Bookmarks	WebPositive Window		Marcadors
-Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		No s'ha pogut suprimir el marcador %leaf% de la barra.
+Failed to remove bookmark '%leaf%' from boookmark bar.	BookmarkBar		Ha fallat suprimir el marcador %leaf% de la barra.
 Use proxy server to connect to the internet	Settings Window		Useu un servidor intermediari per connectar-vos a Internet.
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url acabat
 Auto-hide interface in full screen mode	Settings Window		Amaga la interfície automàticament en mode de pantalla completa
@@ -36,7 +36,7 @@ Browse…	Settings Window		Navega...
 Resume prior session	Settings Window		Continua la sessió anterior
 Match case	WebPositive Window		Coincidència de caixa
 Proxy password:	Settings Window		Contrasenya del servidor intermediari:
-Failed to delete bookmark:\n'%path%'	BookmarkBar		No s'ha pogut suprimir el marcador:\n%path%
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Ha fallat suprimir el marcador:\n%path%
 Size:	Font Selection view		Mida:
 Page source	WebPositive Window		Codi font de la pàgina
 Proxy server port:	Settings Window		Port del servidor intermediari:

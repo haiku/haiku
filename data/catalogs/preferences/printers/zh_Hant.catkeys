@@ -1,6 +1,6 @@
 1	english	x-vnd.Be-PRNT	2300534000
 Test page	TestPageView		測試頁
-Remove	PrintersWindow		消除
+Remove	PrintersWindow		移除
 Red	TestPageView		紅
 Default Printer	PrinterListView		默認印表機
 <pick one>	AddPrinterDialog		<選擇一個>

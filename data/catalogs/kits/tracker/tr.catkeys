@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	4107183015
+1	turkish	x-vnd.Haiku-libtracker	2408323945
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -165,6 +165,7 @@ Could not open \"%name\" (%error). 	FSUtils		“%name” açılamadı (%error).
 Media parameter group	AttributesView		Ortam parametreleri grubu
 %name info	InfoWindow	InfoWindow Title	%name bilgisi
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ana klasörü taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve “Taşı”ya basın.
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%total seçili}}
 Property info	AttributesView		Özellik bilgisi
 Sorry, you can't create links in the Trash.	PoseView		Üzgünüm, çöp içinde bağlantılar oluşturamazsınız.
 From	Email Query Columns		Şuradan
@@ -290,6 +291,7 @@ Show volumes on Desktop	SettingsView		Disk bölümlerini Masaüstü’nde göste
 Recent folders	ContainerWindow		Son klasörler
 Desktop	Model		Masaüstü
 Select all	ContainerWindow		Tümünü seç
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
 apps	B_APPS_DIRECTORY		uygulamalar
 Error calculating folder size.	InfoWindow		Klasör boyutu hesaplanırken hata.
 Delete	FSUtils		Sil

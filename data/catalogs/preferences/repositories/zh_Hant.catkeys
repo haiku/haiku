@@ -1,19 +1,19 @@
 1	english	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	這不是有效的 URL。
 Repository URL:	AddRepoWindow	Text box label	庫URL：
-There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	刷新 %name% 的儲存庫緩存時出錯
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	刷新 %name% 的儲存庫快取時出錯
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	停用儲存庫 %name% 時出錯
 Unknown	Constants	Unknown repository name	未知
-Remove all	RepositoriesView	Button label	消除全部
+Remove all	RepositoriesView	Button label	移除全部
 Enable repositories to use with package management:	RepositoriesView	Label text	啓用庫以用於軟體套件管理：
 Disable	RepositoriesView	Button label	停用
 Cancel task	TaskTimer	Button label	取消任務
 Changes completed	RepositoriesView	Status view text	變更完成
 Details	TaskLooper	Job log details header	細節
 Enabled	RepoRow	Tag in the Status column	已啓用
-Remove	Constants	Button label	消除
+Remove	Constants	Button label	移除
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	啟用儲存庫 %url% 時出錯
-Remove this repository?	RepositoriesView	Removal alert confirmation message	消除此庫？
+Remove this repository?	RepositoriesView	Removal alert confirmation message	移除此庫？
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	儲存庫 %name% 的任務需要很長時間才能完成。
 Completed	TaskLooper	Completed task status message	已完成
 OK	Constants	Button label	確認
@@ -33,8 +33,8 @@ Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Appl
 This repository URL already exists.	RepositoriesView	Error message	該庫 URL 已存在。
 Repositories	System name		庫
 Changes pending:	RepositoriesView	Status view text	待更改：
-Remove	RepositoriesView	Button label	消除
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	消除這些庫？
+Remove	RepositoriesView	Button label	移除
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	移除這些庫？
 Keep trying	TaskTimer	Button label	繼續嘗試
 Cancel	Constants	Button label	取消
 Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	每個庫只能啟用一個 URL。請更改您的選擇。

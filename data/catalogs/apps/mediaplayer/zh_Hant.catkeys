@@ -1,5 +1,5 @@
 1	english	x-vnd.Haiku-MediaPlayer	520971408
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		將條目移動到資源回收筒
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		將條目移除到資源回收筒
 Close	MediaPlayer-PlaylistWindow		關閉
 Volume of background clips	MediaPlayer-SettingsWindow		背景片段的音量
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		可以的話使用硬體視訊疊加
@@ -18,7 +18,7 @@ raw audio	MediaPlayer-InfoWin		原始音訊
 Select all	MediaPlayer-PlaylistWindow		選擇全部
 Move Entries	MediaPlayer-MovePLItemsCmd		移動實體
 OK	MediaPlayer-Main		確認
-Remove	MediaPlayer-PlaylistWindow		消除
+Remove	MediaPlayer-PlaylistWindow		移除
 <unknown>	MediaPlayer-InfoWin		<未知>
 Resume:	MediaPlayer-SettingsWindow		恢復：
 Duration	MediaPlayer-InfoWin		週期
@@ -62,7 +62,7 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		隨機條目
 Cancel	MediaPlayer-NetworkStream		取消
 Nothing to Play	MediaPlayer-Main		無可播放內容
 OK	MediaPlayer-SettingsWindow		確認
-Remove Entries	MediaPlayer-RemovePLItemsCmd		消除條目
+Remove Entries	MediaPlayer-RemovePLItemsCmd		移除條目
 never	MediaPlayer-SettingsWindow		絕不
 Loop audio	MediaPlayer-SettingsWindow		循環播放音訊
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		內部錯誤（格式錯誤的訊息）。儲存播放清單失敗。
@@ -135,8 +135,8 @@ Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		平滑縮�
 200% scale	MediaPlayer-Main		200%尺寸
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		無法開啟檔案'%filename'。\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		您想要播放的檔案都不是媒體檔案。
-Remove Entry	MediaPlayer-RemovePLItemsCmd		消除條目
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		將條目移動到資源回收筒
+Remove Entry	MediaPlayer-RemovePLItemsCmd		移除條目
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		將條目移除到資源回收筒
 Subtitle size:	MediaPlayer-SettingsWindow		字幕尺寸：
 No aspect correction	MediaPlayer-Main		無縱橫比校正
 raw video	MediaPlayer-InfoWin		原始視頻

@@ -11,7 +11,7 @@ OK	ProcessController		確認
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		您可以在視窗中執行 ProcessController 或將其安裝在Deskbar中。
 Real-time priority	ProcessController		即時優先權
 Custom priority	ProcessController		自訂優先級
-Debug this thread!	ProcessController		調試這個線程！
+Debug this thread!	ProcessController		除錯此線程！
 Low priority	ProcessController		低優先級
 Urgent display priority	ProcessController		緊急顯示優先權
 Memory usage	ProcessController		記憶體使用情況
@@ -35,13 +35,13 @@ Gone teams…	ProcessController		故去隊列…
 Quit an application	ProcessController		退出一個應用程式
 Cancel	ProcessController		取消
 Install in Deskbar	ProcessController		安裝在Deskbar中
-Debug this team!	ProcessController		調試此隊列！
+Debug this team!	ProcessController		除錯此隊列！
 ProcessController	System name		行程控制器
 Lowest active priority	ProcessController		最低活動優先級
 Restart Tracker	ProcessController		重啓Tracker
 System resources & caches…	ProcessController		系統資源和快取…
 Damned!	ProcessController		該死！
-New Terminal	ProcessController		新創終端
+New Terminal	ProcessController		新創終端機
 Power saving	ProcessController		節電
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController 已安裝在Deskbar中。
 This is the last active processor…\nYou can't turn it off!	ProcessController		這是最後一個活躍處理器…\n您不能關閉它！

@@ -7,7 +7,7 @@ magnify: size must be a multiple of 4	Console		放大：大小必須是 4 的倍
 Stick coordinates	Magnify-Main		搖桿座標
 Copy image	Magnify-Main		複製影像
 Decrease window size	Magnify-Main		減小視窗大小
-Remove a crosshair	Magnify-Main		消除十字準線
+Remove a crosshair	Magnify-Main		移除十字準線
 Add a crosshair	Magnify-Main		新增十字準線
 Freeze image	Magnify-Main		凍結影像
 %width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height @ {0, plural, one{# 像素/像素} other{# 像素/像素}}

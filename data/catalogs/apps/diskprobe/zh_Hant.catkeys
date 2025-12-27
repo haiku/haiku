@@ -1,6 +1,6 @@
 1	english	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		原始編輯器
-Remove	AttributeWindow		消除
+Remove	AttributeWindow		移除
 Close	ProbeView		關閉
 Boolean value:	TypeEditors		布林值：
 File	ProbeView		檔案
@@ -15,7 +15,7 @@ Text	TypeEditors	This is the type of editor	文本
 File offset: 	ProbeView		檔案偏移量：
 Add	ProbeView		添加
 64 bit signed value:	TypeEditors		64 位元有符號值：
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		您確實要從檔案 \"%s\" 中刪除屬性 \"%s\" 嗎?\n\n您無法撤銷此操作。
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		您確實要從檔案 \"%s\" 中移除屬性 \"%s\" 嗎?\n\n您無法撤銷此操作。
 No type editor available	AttributeWindow		沒有可用的類型編輯器
 Print…	ProbeView		列印…
 New…	FileWindow		新創…
@@ -79,7 +79,7 @@ Probe device	OpenWindow		探測裝置
 none	ProbeView	No attributes	無
 Case sensitive	FindWindow		區分大小寫
 32 bit unsigned value:	TypeEditors		32 位元無符號值：
-Remove from file	AttributeWindow		從檔案中刪除
+Remove from file	AttributeWindow		從檔案中移除
 Attributes	ProbeView		屬性
 Message	TypeEditors	This is the type of view	訊息
 Message View	TypeEditors		訊息視圖

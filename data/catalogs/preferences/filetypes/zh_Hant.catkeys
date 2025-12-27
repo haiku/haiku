@@ -17,21 +17,21 @@ Add…	Application Type Window		添加…
 Attribute name:	Attribute Window		屬性名稱：
 Long description:	Application Type Window		詳細描述:
 Cancel	Preferred App Menu		取消
-Remove	FileTypes Window		消除
+Remove	FileTypes Window		移除
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		應用程式 \"%s\" 不支援此檔案類型。\n您確定要設定它嗎？
-Remove	Application Type Window		消除
+Remove	Application Type Window		移除
 Gamma	Application Type Window		伽瑪
 Cancel	Application Type Window		取消
 Attribute	Attribute Window		屬性
 Multiple launch	Application Type Window		多重啓動
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, other{# 應用程式類型可以被刪除}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, other{# 應用程式類型可以被移除}}
 Edit…	Application Types Window		編輯…
 Could not set preferred application	FileTypes Window		無法設定首選應用程式
 Description	FileTypes Window		描述
 Signature:	Application Types Window		簽名:
 None	FileTypes Window		無
 Exclusive launch	Application Type Window		排他啟動
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		刪除檔案類型無法恢復。\n您確定要刪除它嗎？
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		移除檔案類型無法恢復。\n您確定要移除它嗎？
 Integer 64 bit	Attribute ListView		整數 64 位元
 Cancel	New File Type Window		取消
 Select same preferred application as	FileType Window		選擇與以下相同的首選應用程式
@@ -100,10 +100,10 @@ no icon	FileTypes Window		沒有圖示
 Single launch	Application Type Window		單運行
 %s file type	FileType Window		%s 檔案類型
 Default	Attribute ListView		默認
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		刪除超級類型的操作無法恢復。\n屬於該超級類型的所有檔案類型都會遺失！\n\n您確定要這樣做嗎？若要刪除整個群組，請按住 Shift 鍵並按下\"Remove\"（消除）。
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		移除超級類型的操作無法恢復。\n屬於該超級類型的所有檔案類型都會遺失！\n\n您確定要這樣做嗎？若要移除整個群組，請按住 Shift 鍵並按下\"Remove\"（移除）。
 String	Attribute ListView		串
 Add type	New File Type Window		新增類型
-Remove icon	Icon View		消除圖示
+Remove icon	Icon View		移除圖示
 Boolean	Attribute ListView		布林值
 Cancel	Extension Window		取消
 Alignment:	Attribute Window		對齊
@@ -149,7 +149,7 @@ Set preferred application	Preferred App Menu		設定首選應用程式
 New file type	New File Type Window		新檔案類型
 Short description:	Application Type Window		短描述:
 Save request	Application Type Window		存储請求
-Could not remove file type: %s\n	FileTypes Window		無法刪除檔案類型: %s\n
+Could not remove file type: %s\n	FileTypes Window		無法移除檔案類型: %s\n
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	顯示為:
 Done	Type List Window		完畢
 Extra attributes	FileTypes Window		額外屬性

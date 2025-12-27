@@ -33,7 +33,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		登出
 Password requirements	UserLoginWindow		密碼要求
 The following additional package changes have to be made:	PackageResult		必須進行以下額外的軟體套件變更：
-No changelog available.	PackageInfoView		沒有可用的變更日誌。
+No changelog available.	PackageInfoView		沒有可用的變更紀錄檔。
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		目前的使用條件已被同意。
 Cancel	PackageProblem		取消
 Version	PackageListView		版本
@@ -97,7 +97,7 @@ Try again	App		再試一次
 Unknown	PackageListView		未知
 I agree to the usage conditions	UserLoginWindow		我同意使用條件
 Logged in as %User%	MainWindow		登入身份 %User%
-A reboot is necessary to complete the installation process.	PackageManager		需要重新啟動才能完成安裝程序。
+A reboot is necessary to complete the installation process.	PackageManager		需要重新啟動才能完成安裝行程。
 Yes	MainWindow		是的
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{我至少一歲了}other{我大於 # 歲}}
 Pending…	PackageListView		待辦的…
@@ -133,7 +133,7 @@ Starting the package daemon failed:\n\n%Error%	App		啟動包守護程式失敗�
 No user ratings available.	PackageInfoView		沒有可用的用戶評級。
 <no info>	PackageInfoView		<無訊息>
 Usage conditions download problem	UserUsageConditions		使用條件下載問題
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		下載創建新使用者所需的密碼要求時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的HaikuDepot部分。
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		下載創建新使用者所需的密碼要求時發生錯誤。檢查紀錄檔以了解詳細信息，然後重試。 \n有關如何查看紀錄檔的信息，請參閱 Haiku 使用者指南的HaikuDepot部分。
 Fetching screenshot	CacheScreenshotProcess		正在獲取螢幕截圖
 A network transport error has arisen communicating with the server system: %s	ServerHelper		與伺服器系統通訊時出現網路傳輸錯誤：%s
 Rating	PackageListView		評分
@@ -155,7 +155,7 @@ Error	App		錯誤
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		下載使用條件時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
 There was a puzzling response from the web service.	UserLoginWindow		網路服務給了令人費解的回應。
 Opening \"%DeskbarLink%\"	OpenPackageProcess		正開啟 \"%DeskbarLink%\"
-Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		您的評分已成功上傳。您可以在Haiku軟體庫伺服器網站上更新或刪除它。
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		您的評分已成功上傳。您可以在Haiku軟體庫伺服器網站上更新或移除它。
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		無法與伺服器通訊以取得創建新使用者所需的驗證碼影像。
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		提供的驗證碼響應不正確。將產生新的驗證碼；再試一次。
 -	no package publish		-
@@ -164,7 +164,7 @@ The password must be at least eight characters long, consist of at least two dig
 Contents	PackageInfoView		內容
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		與 HaikuDepotServer 分享匿名使用數據
 Close	PackageManager		關閉
-Changelog	PackageInfoView		變更日誌
+Changelog	PackageInfoView		變更紀錄檔
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	搜尋所有包。
 About	PackageInfoView		關於
 Password requirements download problem	UserLoginWindow		下載需要密碼問題
@@ -194,8 +194,8 @@ HaikuDepot is stopping or completing running operations before quitting.	Shuttin
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		使用者%Nickname% 已在HaikuDepotServer 系統中成功創建。您可以使用 Web 介面管理您的使用者詳細資訊。您現在已以新使用者身分登入。
 Repositories	MainWindow		庫
 This rating is visible to other users	RatePackageWindow		其他用戶可以看到此評級
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		更新套件資料時出現了一個問題，可能會導致應用程式顯示的資料過時或遺失。可以從應用程式日誌中獲取有關此問題的其他詳細資訊。\n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
-An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		下載使用條件時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		更新套件資料時出現了一個問題，可能會導致應用程式顯示的資料過時或遺失。可以從應用程式紀錄檔中獲取有關此問題的其他詳細資訊。\n有關如何查看紀錄檔的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		下載使用條件時發生錯誤。檢查紀錄檔以了解詳細信息，然後重試。 \n有關如何查看紀錄檔的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
 Stop network use	ServerHelper		中斷網路使用
 View agreed usage conditions…	MainWindow		查看約定的使用條件…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		使用者 [%Nickname%] 已通過身份驗證，但在繼續之前，您需要同意最新的使用條件。

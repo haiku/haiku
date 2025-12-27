@@ -17,7 +17,7 @@ Are you sure you want to stop expanding this archive? The expanded items may not
 Settings	ExpanderMenu		設定
 Expand	ExpanderWindow		解壓
 Open destination folder after extraction	ExpanderPreferences		解壓縮後開啓目標資料夾
-Same directory as source (archive) file	ExpanderPreferences		與來源（存檔）檔案相同的目錄
+Same directory as source (archive) file	ExpanderPreferences		與原始（存檔）檔案相同的目錄
 Stop	ExpanderWindow		停止
 Cancel	ExpanderWindow		取消
 Expander settings	ExpanderPreferences		解壓設定

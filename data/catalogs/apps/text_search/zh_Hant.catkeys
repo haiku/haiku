@@ -28,7 +28,7 @@ Search	GrepWindow		搜尋
 Copy text to clipboard	GrepWindow		複製文本到剪貼簿
 Show lines	GrepWindow		顯示線
 Failed to open errors pipe!	Grepper		無法開啓錯誤管道！
-The unselected files will be removed from the list.	GrepWindow		未選擇的檔案將從清單中刪除。
+The unselected files will be removed from the list.	GrepWindow		未選擇的檔案將從清單中移除。
 Open files in code editor	GrepWindow		在程式碼編輯器中開啟檔案
 Skip folders starting with a dot	GrepWindow		跳過以點開頭的資料夾
 Failed to open output pipe!	Grepper		無法開啓輸出管道！

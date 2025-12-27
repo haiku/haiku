@@ -22,7 +22,7 @@ The item named '%s' already exists in the given path.\nReplace the item with the
 Installing files and folders	PackageInstall		S'instal·len fitxers i carpetes
 Installed packages	UninstallWindow		Paquets instal·lats
 Remove	UninstallView		Suprimeix
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		No s'ha pogut instal·lar el paquet sol·licitat al sistema. Pot ser que tingueu un problema amb el fitxer del paquet de destinació. Consulteu aquest problema amb el distribuïdor de paquets.
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Ha fallat instal·lar el paquet sol·licitat al sistema. Pot ser que tingueu un problema amb el fitxer del paquet de destinació. Consulteu aquest problema amb el distribuïdor de paquets.
 OK	UninstallView		D'acord
 Accept	PackageTextViewer		Accepta
 Abort	PackageView		Avorta

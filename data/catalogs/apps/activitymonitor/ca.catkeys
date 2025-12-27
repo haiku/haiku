@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	923507156
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	1159274874
 Temp	DataSource		Temp.
 Temperature	DataSource		Temperatura
 Teams	DataSource		Equips
@@ -24,6 +24,7 @@ RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Paràmetres...
 Block cache	DataSource		Bloca la cau
 Memory	DataSource		Memòria
+No thermal sensor	SystemInfoHandler		Sense sensor tèrmic
 CPU usage	DataSource		Ús de la CPU
 CPU speed	DataSource		Velocitat de la CPU
 Quit	ActivityWindow		Surt

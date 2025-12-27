@@ -18,7 +18,7 @@ Real name:	Config Views		真實名稱:
 Outgoing	E-Mail		傳出
 Accounts	Config Window		帳戶
 Outgoing	Config Window		傳出
-Remove	Config Views		消除
+Remove	Config Views		移除
 Show notifications:	Config Window		顯示通知：
 Settings	Config Window		設定
 Never	Config Window	show status window	絕不
@@ -41,11 +41,11 @@ Account settings	Config Views		帳戶設定
 minutes	Config Window		分鐘
 E-mail	System name		電子郵件
 Check every	Config Window		檢查每隔
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		使用「新增」按鈕建立一個新帳戶。\n\n使用所選項目上的「刪除」按鈕刪除帳戶。\n\n選擇清單中的一個項目以變更其設定。
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		使用「新增」按鈕建立一個新帳戶。\n\n使用所選項目上的「移除」按鈕移除帳戶。\n\n選擇清單中的一個項目以變更其設定。
 Account name:	E-Mail		帳戶名稱：
 Edit mailbox menu…	Config Window		編輯郵件選單…
 Server Name:	E-Mail		伺服器名稱：
-Remove	Config Window		消除
+Remove	Config Window		移除
 Login name:	E-Mail		登入名稱：
 While sending	Config Window		發送時
 OK	Config Window		確認

@@ -17,7 +17,7 @@ About Pulse…	PulseView		關於Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar模式
 Pulse settings	PulseApp		Pulse設定
-Remove replicant	CPUButton		消除副本
+Remove replicant	CPUButton		移除副本
 You can't disable the last active CPU.	PulseView		您無法停用最後一個活動的 CPU。
 Width of icon:	ConfigView		圖示寬度：
 Deskbar mode	MiniPulseView		Deskbar模式

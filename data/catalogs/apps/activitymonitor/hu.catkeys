@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	923507156
+1	hungarian	x-vnd.Haiku-ActivityMonitor	1159274874
 Temp	DataSource		Hőfok
 Temperature	DataSource		Hőmérséklet
 Teams	DataSource		Csapatok
@@ -24,6 +24,7 @@ RX	DataSource	Shorter version for Receiving.	Vétel
 Settings…	ActivityWindow		Beállítások…
 Block cache	DataSource		Blokk gyorsítótár
 Memory	DataSource		Memória
+No thermal sensor	SystemInfoHandler		Nincs hőérzékelő
 CPU usage	DataSource		Processzor használat
 CPU speed	DataSource		Processzor sebessége
 Quit	ActivityWindow		Kilépés

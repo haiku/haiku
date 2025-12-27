@@ -34,5 +34,5 @@ Remove button	LaunchBox		移除欄位
 Quit	LaunchBox		退出
 Horizontal layout	LaunchBox		橫向佈局
 New	LaunchBox		新創
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		無法向 Tracker 發送「開啟資料夾」命令。\n\n錯誤：
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		無法向 Tracker 發送「開啟資料夾」指令。\n\n錯誤：
 Pad %1	LaunchBox		Pad %1

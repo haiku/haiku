@@ -2,7 +2,7 @@
 DNS settings	DNSClientServiceAddOn		DNS設定
 Move down	DNSSettingsView		向下移動
 DNS settings	DNSSettingsView		DNS設定
-Remove	DNSSettingsView		消除
+Remove	DNSSettingsView		移除
 Domain:	DNSSettingsView		域：
 Add	DNSSettingsView		添加
 Server:	DNSSettingsView		伺服器：

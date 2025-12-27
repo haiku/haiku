@@ -6,8 +6,8 @@ Always on top	Workspaces		始終位於頂部
 Show window border	Workspaces		顯示視窗邊框
 Show window tab	Workspaces		顯示視窗標籤
 Auto-raise	Workspaces		自動加註
-Remove replicant	Workspaces		消除副本
+Remove replicant	Workspaces		移除副本
 Live in the Deskbar	Workspaces		在Deskbar中實時顯示
-Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		用法: %s [options] [workspace]\n選項  \"options\" 如下:\n  --notitle\t\t標題列被移除，邊框和調整大小保留\n  --noborder\t\t標題、邊框和調整大小已刪除\n  --avoidfocus\t\t防止視窗成為鍵盤事件的目標\n  --alwaysontop\t\t使視窗保持在頂部\n  --notmovable\t\t視窗無法移動\n  --autoraise\t\t當工作區視窗位於螢幕邊緣時自動升起\n  --help\t\t顯示此幫助並退出\n以及 \"workspace\" 是要切換到的工作區的編號 (0-31)\n
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		用法: %s [options] [workspace]\n選項  \"options\" 如下:\n  --notitle\t\t標題列被移除，邊框和調整大小保留\n  --noborder\t\t標題、邊框和調整大小已移除\n  --avoidfocus\t\t防止視窗成為鍵盤事件的目標\n  --alwaysontop\t\t使視窗保持在頂部\n  --notmovable\t\t視窗無法移動\n  --autoraise\t\t當工作區視窗位於螢幕邊緣時自動升起\n  --help\t\t顯示此幫助並退出\n以及 \"workspace\" 是要切換到的工作區的編號 (0-31)\n
 Switch on mouse wheel	Workspaces		打開滑鼠滾輪
 Workspaces	System name		工作區

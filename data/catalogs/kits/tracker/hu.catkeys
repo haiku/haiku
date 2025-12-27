@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2433311519
+1	hungarian	x-vnd.Haiku-libtracker	734452449
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -165,6 +165,7 @@ Could not open \"%name\" (%error). 	FSUtils		Nem sikerült megnyitni: \"%name\" 
 Media parameter group	AttributesView		Média paraméter csoport
 %name info	InfoWindow	InfoWindow Title	%name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ha áthelyezed a saját mappát, akkor a %osName nem biztos, hogy megfelelően működik!\n\nBiztosan ezt akarod tenni?\n\nA saját mappa bármilyen mozgatásához tartsd lenyomva a Shift billentyűt, és kattints az \"Áthelyezés\" gombra.
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%total kijelölve}}
 Property info	AttributesView		Tulajdonság infó
 Sorry, you can't create links in the Trash.	PoseView		Sajnálom, de nem lehet hivatkozást létrehozni a Szemetesbe.
 From	Email Query Columns		Feladó
@@ -290,6 +291,7 @@ Show volumes on Desktop	SettingsView		Lemezek megjelenítése az Asztalon
 Recent folders	ContainerWindow		Legutóbbi mappák
 Desktop	Model		Asztal
 Select all	ContainerWindow		Mind kijelölése
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
 apps	B_APPS_DIRECTORY		Programok
 Error calculating folder size.	InfoWindow		Hiba történt a mappa méretének számítása közben.
 Delete	FSUtils		Törlés

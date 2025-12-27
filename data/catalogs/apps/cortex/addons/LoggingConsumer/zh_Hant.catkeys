@@ -5,7 +5,7 @@ MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNode
 Latency	CortexAddOnsLoggingConsumer		延遲時間
 Logged input	CortexAddOnsLoggingConsumer		已記錄的輸入
 CPU spin percentage	CortexAddOnsLoggingConsumer		CPU 自旋百分比
-NodeLogger	CortexAddOnsLoggingConsumers		節點記錄器
+NodeLogger	CortexAddOnsLoggingConsumers		節點紀錄器
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		開始
 Thread priority	CortexAddOnsLoggingConsumer		執行緒優先級
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer 參數
