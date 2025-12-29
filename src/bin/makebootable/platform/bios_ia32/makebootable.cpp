@@ -179,6 +179,48 @@ read_boot_code_data(const char* programPath)
 }
 
 
+static bool
+is_bfs_partition(int fd)
+{
+	unsigned char bootblock[512];
+	read_pos(fd, 512, &bootblock, sizeof(bootblock));
+	uint32 magic1 = *(uint32*)(bootblock + 0x20);
+	uint32 magic2 = *(uint32*)(bootblock + 0x44);
+	uint32 magic3 = *(uint32*)(bootblock + 0x70);
+
+	if (magic1 != 0x42465331)
+		return false;
+	if (magic2 != 0xdd121031)
+		return false;
+	if (magic3 != 0x15b6830e)
+		return false;
+
+	return true;
+}
+
+
+static bool
+is_bootcode_installed(int fd, const uint8* bootCode, int64* out_partition_offset)
+{
+	unsigned char bootblock[kBootCodeSize];
+	read_pos(fd, 0, &bootblock, kBootCodeSize);
+
+	// Check if first part of bootcode is identical up until the partition offset
+	if (memcmp(bootblock, bootCode, kPartitionOffsetOffset) != 0)
+		return false;
+
+	// Check the second part after the partition offset and superblock
+	if (memcmp(bootblock + kSecondBootCodePartOffset, bootCode + kSecondBootCodePartOffset,
+			kSecondBootCodePartSize) != 0)
+		return false;
+
+	// If bootcode is installed, the out_partition_offset is valid, let's extract it
+	*out_partition_offset = *(uint32*)(bootblock + kPartitionOffsetOffset);
+
+	return true;
+}
+
+
 // write_boot_code_part
 static void
 write_boot_code_part(const char *fileName, int fd, off_t imageOffset,
@@ -616,10 +658,25 @@ main(int argc, const char *const *argv)
 
 		#endif	// HAIKU_TARGET_PLATFORM_HAIKU
 
+		bool isBfs = is_bfs_partition(fd);
+		if (!isBfs) {
+			fprintf(stderr, "Error: %s is not a BFS partition.\n", fileName);
+			exit(1);
+		}
+
 		// adjust the partition offset in the boot code data
 		// hard coded sector size: 512 bytes
 		*(uint32*)(bootCodeData + kPartitionOffsetOffset)
 			= B_HOST_TO_LENDIAN_INT32((uint32)(partitionOffset / 512));
+
+		int64 oldPartitionOffset = 0;
+		bool bootCodeAlreadyInstalled = is_bootcode_installed(fd, bootCodeData,
+			&oldPartitionOffset);
+
+		if (bootCodeAlreadyInstalled && (partitionOffset == oldPartitionOffset * 512)) {
+			fprintf(stderr, "Partition %s is already bootable, nothing to do\n", fileName);
+			exit(0);
+		}
 
 		// write the boot code
 		printf("Writing boot code to \"%s\" (partition offset: %" B_PRId64
