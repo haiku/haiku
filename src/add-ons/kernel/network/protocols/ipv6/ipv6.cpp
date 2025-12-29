@@ -45,9 +45,11 @@
 	#define TRACE_SK(protocol, format, args...) \
 		dprintf("IPv6 [%" B_PRIdBIGTIME "] %p " format "\n", system_time(), \
 			protocol, ##args)
+	#define TRACE_ONLY(x) x
 #else
 	#define TRACE(args...)
 	#define TRACE_SK(args...)
+	#define TRACE_ONLY(x)
 #endif
 
 
@@ -1579,9 +1581,56 @@ ipv6_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 
 
 status_t
-ipv6_error_received(net_error error, net_error_data* errorData, net_buffer* data)
+ipv6_error_received(net_error error, net_error_data* errorData, net_buffer* buffer)
 {
-	return B_ERROR;
+	TRACE("  ipv6_error_received(error %d, buffer %p [%" B_PRIu32 " bytes])",
+		(int)error, buffer, buffer->size);
+
+	NetBufferHeaderReader<IPv6Header> bufferHeader(buffer);
+	if (bufferHeader.Status() != B_OK)
+		return bufferHeader.Status();
+
+	IPv6Header& header = bufferHeader.Data();
+	TRACE_ONLY(dump_ipv6_header(header));
+
+	// We do not check the packet length, as we usually only get a part of it
+	if (header.ProtocolVersion() != IPV6_VERSION)
+		return B_BAD_DATA;
+
+	// Restore addresses of the original buffer
+
+	// lower layers notion of broadcast or multicast have no relevance to us
+	// TODO: they actually have when deciding whether to send an ICMP error
+	buffer->msg_flags &= ~(MSG_BCAST | MSG_MCAST);
+
+	fill_sockaddr_in6((struct sockaddr_in6*)buffer->source, header.Src());
+	fill_sockaddr_in6((struct sockaddr_in6*)buffer->destination,
+		header.Dst());
+
+	// test if the packet is really from us
+	if (!sDatalinkModule->is_local_address(sDomain, buffer->source, NULL,
+			NULL)) {
+		TRACE("  ipv6_error_received(): packet was not for us");
+		return B_ERROR;
+	}
+
+	if (error == B_NET_ERROR_MESSAGE_SIZE) {
+		if (errorData != NULL)
+			errorData->mtu -= sizeof(IPv6Header);
+	} else if (error == B_NET_ERROR_REDIRECT_HOST) {
+		// TODO: Update the routing table!
+	}
+
+	buffer->protocol = header.NextHeader();
+
+	bufferHeader.Remove(sizeof(IPv6Header));
+
+	net_protocol_module_info* protocol = receiving_protocol(buffer->protocol);
+	if (protocol == NULL)
+		return B_ERROR;
+
+	// propagate error
+	return protocol->error_received(error, errorData, buffer);
 }
 
 
