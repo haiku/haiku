@@ -341,14 +341,6 @@ icmp6_receive_data(net_buffer *buffer)
 
 
 status_t
-icmp6_deliver_data(net_protocol *protocol, net_buffer *buffer)
-{
-	// TODO: does this look OK?
-	return icmp6_receive_data(buffer);
-}
-
-
-status_t
 icmp6_error_received(net_error code, net_error_data* errorData, net_buffer* data)
 {
  	return B_ERROR;
@@ -427,7 +419,7 @@ net_protocol_module_info sICMP6Module = {
 	icmp6_get_domain,
 	icmp6_get_mtu,
 	icmp6_receive_data,
-	icmp6_deliver_data,
+	NULL,		// deliver_data
 	icmp6_error_received,
 	icmp6_error_reply,
 	NULL,		// add_ancillary_data()

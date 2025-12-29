@@ -723,64 +723,58 @@ send_fragments(ipv6_protocol* protocol, struct net_route* route,
 }
 
 
-static status_t
-deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
-	bool deliverToRaw, net_interface *interface)
-{
-	sockaddr_in6* multicastAddr = (sockaddr_in6*)buffer->destination;
-
-	MulticastState::ValueIterator it = sMulticastState->Lookup(std::make_pair(
-		&multicastAddr->sin6_addr, interface->index));
-
-	while (it.HasNext()) {
-		IPv6GroupInterface* state = it.Next();
-		ipv6_protocol* ipproto = state->Parent()->Socket();
-
-		if (deliverToRaw && ipproto->raw == NULL)
-			continue;
-
-		if (state->FilterAccepts(buffer)) {
-			// TODO: do as in IPv4 code
-			module->deliver_data(ipproto, buffer);
-		}
-	}
-
-	return B_OK;
-}
-
-
-static status_t
+static bool
 deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 	bool deliverToRaw)
 {
+	TRACE("deliver_multicast(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
 	if (module->deliver_data == NULL)
-		return B_OK;
+		return false;
 
 	MutexLocker _(sMulticastGroupsLock);
 
-	status_t status = B_OK;
-	if (buffer->interface_address != NULL) {
-		status = deliver_multicast(module, buffer, deliverToRaw,
-			buffer->interface_address->interface);
-	} else {
-#if 0 //  FIXME: multicast
-		net_domain_private* domain = (net_domain_private*)sDomain;
-		RecursiveLocker locker(domain->lock);
+	sockaddr_in6* multicastAddr = (sockaddr_in6*)buffer->destination;
 
-		net_interface* interface = NULL;
-		while (true) {
-			interface = (net_interface*)list_get_next_item(
-				&domain->interfaces, interface);
-			if (interface == NULL)
-				break;
+	uint32 index = buffer->index;
+	if (buffer->interface_address != NULL)
+		index = buffer->interface_address->interface->index;
 
-			status = deliver_multicast(module, buffer, deliverToRaw, interface);
-			if (status < B_OK)
-				break;
+	MulticastState::ValueIterator it = sMulticastState->Lookup(std::make_pair(
+		&multicastAddr->sin6_addr, index));
+
+	size_t count = 0;
+
+	while (it.HasNext()) {
+		IPv6GroupInterface* state = it.Next();
+
+		ipv6_protocol* ipProtocol = state->Parent()->Socket();
+		// There is no socket for Neighbor Discovery Protocol
+		if (ipProtocol->socket == NULL)
+			continue;
+		if (deliverToRaw && (ipProtocol->raw == NULL
+				|| ipProtocol->socket->protocol != buffer->protocol))
+			continue;
+
+		if (state->FilterAccepts(buffer)) {
+			net_protocol* protocol = ipProtocol;
+			if (protocol->module != module) {
+				// as multicast filters are installed with an IPv6 protocol
+				// reference, we need to go and find the appropriate instance
+				// related to the 'receiving protocol' with module 'module'.
+				protocol = ipProtocol->socket->first_protocol;
+
+				while (protocol != NULL && protocol->module != module)
+					protocol = protocol->next;
+			}
+
+			if (protocol != NULL) {
+				module->deliver_data(protocol, buffer);
+				count++;
+			}
 		}
-#endif
 	}
-	return status;
+
+	return count > 0;
 }
 
 
@@ -1561,7 +1555,14 @@ ipv6_receive_data(net_buffer* buffer)
 		// model be a little different from the unicast one. We deliver
 		// this frame directly to all sockets registered with interest
 		// for this multicast group.
-		return deliver_multicast(module, buffer, false);
+		deliver_multicast(module, buffer, false);
+		if (protocol != IPPROTO_ICMPV6) {
+			// ICMPv6 will still be passed to receive_data below,
+			// as it might be a neighbor solicitation; otherwise,
+			// we are done.
+			gBufferModule->free(buffer);
+			return B_OK;
+		}
 	}
 
 	return module->receive_data(buffer);
