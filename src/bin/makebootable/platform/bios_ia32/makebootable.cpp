@@ -179,6 +179,28 @@ read_boot_code_data(const char* programPath)
 }
 
 
+static bool
+is_bfs_partition(int fd, int64* out_partition_offset)
+{
+	unsigned char bootblock[512];
+	read_pos(fd, 512, &bootblock, sizeof(bootblock));
+	uint32 magic1 = *(uint32*)(bootblock + 0x20);
+	uint32 magic2 = *(uint32*)(bootblock + 0x44);
+	uint32 magic3 = *(uint32*)(bootblock + 0x70);
+
+	if (magic1 != 0x42465331)
+		return false;
+	if (magic2 != 0xdd121031)
+		return false;
+	if (magic3 != 0x15b6830e)
+		return false;
+
+	read_pos(fd, 0, &bootblock, sizeof(bootblock));
+	*out_partition_offset = *(uint32*)(bootblock + kPartitionOffsetOffset);
+	return true;
+}
+
+
 // write_boot_code_part
 static void
 write_boot_code_part(const char *fileName, int fd, off_t imageOffset,
@@ -615,6 +637,20 @@ main(int argc, const char *const *argv)
 			}
 
 		#endif	// HAIKU_TARGET_PLATFORM_HAIKU
+
+		int64 oldPartitionOffset = 0;
+		bool isBfs = is_bfs_partition(fd, &oldPartitionOffset);
+		if (!isBfs) {
+			fprintf(stderr, "Error: %s is not a BFS partition.\n", fileName);
+			exit(1);
+		}
+
+		if (partitionOffset == oldPartitionOffset * 512) {
+			fprintf(stderr, "Partition %s is already bootable, nothing to do\n", fileName);
+			exit(0);
+		}
+
+		printf("%lx vs %x\n", partitionOffset, oldPartitionOffset);
 
 		// adjust the partition offset in the boot code data
 		// hard coded sector size: 512 bytes
