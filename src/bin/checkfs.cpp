@@ -83,8 +83,7 @@ main(int argc, char** argv)
 	if (status != B_OK) {
 		if (strncmp(path, "/dev", 4)) {
 			// try mounted volume
-			status = roster.FindPartitionByMountPoint(path, &device, &partition)
-				? B_OK : B_BAD_VALUE;
+			status = roster.FindPartitionByMountPoint(path, &device, &partition);
 		}
 
 		// TODO: try to register file device
