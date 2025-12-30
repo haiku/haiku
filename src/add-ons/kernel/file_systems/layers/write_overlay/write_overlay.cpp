@@ -199,7 +199,7 @@ private:
 		status_t			_PopulateAttributeDirents();
 		status_t			_CreateCommon(const char *name, int type, int perms,
 								ino_t *newInodeNumber, OverlayInode **node,
-								bool attribute, type_code attributeType);
+								bool attribute, type_code attributeType, bool exclusive = false);
 
 		recursive_lock		fLock;
 		OverlayVolume *		fVolume;
@@ -558,7 +558,7 @@ OverlayInode::Create(const char *name, int openMode, int perms, void **cookie,
 {
 	OverlayInode *newNode = NULL;
 	status_t result = _CreateCommon(name, attribute ? S_ATTR : S_IFREG, perms,
-		newInodeNumber, &newNode, attribute, attributeType);
+		newInodeNumber, &newNode, attribute, attributeType, (openMode & O_EXCL) != 0);
 	if (result != B_OK)
 		return result;
 
@@ -572,6 +572,9 @@ OverlayInode::Open(int openMode, void **_cookie)
 	RecursiveLocker locker(fLock);
 	if (!fHasStat)
 		_PopulateStat();
+
+	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(fStat.st_mode))
+		return B_NOT_A_DIRECTORY;
 
 	open_cookie *cookie = (open_cookie *)malloc(sizeof(open_cookie));
 	if (cookie == NULL)
@@ -1438,9 +1441,11 @@ close_attr_dir:
 status_t
 OverlayInode::_CreateCommon(const char *name, int type, int perms,
 	ino_t *newInodeNumber, OverlayInode **_node, bool attribute,
-	type_code attributeType)
+	type_code attributeType, bool exclusive)
 {
 	RecursiveLocker locker(fLock);
+	status_t result;
+
 	if (!fHasStat)
 		_PopulateStat();
 
@@ -1448,6 +1453,16 @@ OverlayInode::_CreateCommon(const char *name, int type, int perms,
 		return B_NOT_A_DIRECTORY;
 
 	locker.Unlock();
+
+	if (!attribute && (type == S_IFDIR || type == S_IFLNK || exclusive)) {
+		ino_t lookupInodeNumber;
+		result = Lookup(name, &lookupInodeNumber);
+
+		if (result != B_ENTRY_NOT_FOUND) {
+			put_vnode(Volume(), lookupInodeNumber);
+			return B_FILE_EXISTS;
+		}
+	}
 
 	overlay_dirent *entry = (overlay_dirent *)malloc(sizeof(overlay_dirent));
 	if (entry == NULL)
@@ -1474,7 +1489,7 @@ OverlayInode::_CreateCommon(const char *name, int type, int perms,
 		return B_NO_MEMORY;
 	}
 
-	status_t result = AddEntry(entry, attribute);
+	result = AddEntry(entry, attribute);
 	if (result != B_OK) {
 		free(entry->name);
 		free(entry);
