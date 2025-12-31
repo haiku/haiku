@@ -137,7 +137,7 @@ rssadapt_init(struct ieee80211vap *vap)
 	vap->iv_rs = rs = IEEE80211_MALLOC(sizeof(struct ieee80211_rssadapt),
 	    M_80211_RATECTL, IEEE80211_M_NOWAIT | IEEE80211_M_ZERO);
 	if (rs == NULL) {
-		if_printf(vap->iv_ifp, "couldn't alloc ratectl structure\n");
+		net80211_vap_printf(vap, "couldn't alloc ratectl structure\n");
 		return;
 	}
 	rs->vap = vap;
@@ -178,7 +178,8 @@ rssadapt_node_init(struct ieee80211_node *ni)
 	const struct ieee80211_rateset *rs = &ni->ni_rates;
 
 	if (!rsa) {
-		if_printf(vap->iv_ifp, "ratectl structure was not allocated, "
+		net80211_vap_printf(vap,
+		    "ratectl structure was not allocated, "
 		    "per-node structure allocation skipped\n");
 		return;
 	}
@@ -188,8 +189,8 @@ rssadapt_node_init(struct ieee80211_node *ni)
 		    IEEE80211_MALLOC(sizeof(struct ieee80211_rssadapt_node),
 		        M_80211_RATECTL, IEEE80211_M_NOWAIT | IEEE80211_M_ZERO);
 		if (ra == NULL) {
-			if_printf(vap->iv_ifp, "couldn't alloc per-node ratectl "
-			    "structure\n");
+			net80211_vap_printf(vap,
+			    "couldn't alloc per-node ratectl structure\n");
 			return;
 		}
 	} else
@@ -203,11 +204,13 @@ rssadapt_node_init(struct ieee80211_node *ni)
 	     ra->ra_rix > 0 && (rs->rs_rates[ra->ra_rix] & IEEE80211_RATE_VAL) > 72;
 	     ra->ra_rix--)
 		;
-	ni->ni_txrate = rs->rs_rates[ra->ra_rix] & IEEE80211_RATE_VAL;
+	ieee80211_node_set_txrate_dot11rate(ni,
+	    rs->rs_rates[ra->ra_rix] & IEEE80211_RATE_VAL);
 	ra->ra_ticks = ticks;
 
 	IEEE80211_NOTE(ni->ni_vap, IEEE80211_MSG_RATECTL, ni,
-	    "RSSADAPT initial rate %d", ni->ni_txrate);
+	    "RSSADAPT initial rate %d Mbit/s",
+	    ieee80211_node_get_txrate_kbit(ni) / 1000);
 }
 
 static void
@@ -244,7 +247,8 @@ rssadapt_rate(struct ieee80211_node *ni, void *arg __unused, uint32_t iarg)
 	/* XXX should return -1 here, but drivers may not expect this... */
 	if (!ra)
 	{
-		ni->ni_txrate = ni->ni_rates.rs_rates[0];
+		ieee80211_node_set_txrate_dot11rate(ni,
+		    ni->ni_rates.rs_rates[0]);
 		return 0;
 	}
 
@@ -263,12 +267,13 @@ rssadapt_rate(struct ieee80211_node *ni, void *arg __unused, uint32_t iarg)
 			break;
 	if (rix != ra->ra_rix) {
 		/* update public rate */
-		ni->ni_txrate = ni->ni_rates.rs_rates[rix] & IEEE80211_RATE_VAL;
+		ieee80211_node_set_txrate_dot11rate(ni,
+		    ni->ni_rates.rs_rates[rix] & IEEE80211_RATE_VAL);
 		ra->ra_rix = rix;
 
 		IEEE80211_NOTE(ni->ni_vap, IEEE80211_MSG_RATECTL, ni,
-		    "RSSADAPT new rate %d (pktlen %d rssi %d)",
-		    ni->ni_txrate, pktlen, rssi);
+		    "RSSADAPT new rate %d Mbit/s (pktlen %d rssi %d)",
+		    ieee80211_node_get_txrate_kbit(ni) / 1000, pktlen, rssi);
 	}
 	return rix;
 }

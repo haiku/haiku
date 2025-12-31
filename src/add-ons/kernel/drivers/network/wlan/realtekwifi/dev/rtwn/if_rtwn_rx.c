@@ -52,12 +52,24 @@
 
 #include <dev/rtwn/rtl8192c/r92c_reg.h>
 
+/*
+ * Get the driver rate set for the current operating rateset(s).
+ *
+ * rates_p is set to a mask of 11abg ridx values (not HW rate values.)
+ * htrates_p is set to a mask of 11n ridx values (not HW rate values),
+ *  starting at MCS0 == bit 0.
+ *
+ * maxrate_p is set to the ridx value.
+ *
+ * If basic_rates is 1 then only the 11abg basic rate logic will
+ * be applied; the HT rateset will be applied to 11n rates.
+ */
 void
 rtwn_get_rates(struct rtwn_softc *sc, const struct ieee80211_rateset *rs,
     const struct ieee80211_htrateset *rs_ht, uint32_t *rates_p,
-    int *maxrate_p, int basic_rates)
+    uint32_t *htrates_p, int *maxrate_p, int basic_rates)
 {
-	uint32_t rates;
+	uint32_t rates = 0, htrates = 0;
 	uint8_t ridx;
 	int i, maxrate;
 
@@ -65,7 +77,7 @@ rtwn_get_rates(struct rtwn_softc *sc, const struct ieee80211_rateset *rs,
 	rates = 0;
 	maxrate = 0;
 
-	/* This is for 11bg */
+	/* This is for 11abg */
 	for (i = 0; i < rs->rs_nrates; i++) {
 		/* Convert 802.11 rate to HW rate index. */
 		ridx = rate2ridx(IEEE80211_RV(rs->rs_rates[i]));
@@ -80,25 +92,35 @@ rtwn_get_rates(struct rtwn_softc *sc, const struct ieee80211_rateset *rs,
 	}
 
 	/* If we're doing 11n, enable 11n rates */
-	if (rs_ht != NULL && !basic_rates) {
+	if (rs_ht != NULL) {
 		for (i = 0; i < rs_ht->rs_nrates; i++) {
-			if ((rs_ht->rs_rates[i] & 0x7f) > 0xf)
+			uint8_t rate = rs_ht->rs_rates[i] & 0x7f;
+			bool is_basic = rs_ht->rs_rates[i] &
+			    IEEE80211_RATE_BASIC;
+			/* Only do up to 2-stream rates for now */
+			if ((rate) > 0xf)
 				continue;
-			/* 11n rates start at index 12 */
-			ridx = RTWN_RIDX_HT_MCS((rs_ht->rs_rates[i]) & 0xf);
-			rates |= (1 << ridx);
+
+			if (basic_rates && is_basic == false)
+				continue;
+
+			ridx = rate & 0xf;
+			htrates |= (1 << ridx);
 
 			/* Guard against the rate table being oddly ordered */
-			if (ridx > maxrate)
-				maxrate = ridx;
+			if (RTWN_RIDX_HT_MCS(ridx) > maxrate)
+				maxrate = RTWN_RIDX_HT_MCS(ridx);
 		}
 	}
 
 	RTWN_DPRINTF(sc, RTWN_DEBUG_RA,
-	    "%s: rates 0x%08X, maxrate %d\n", __func__, rates, maxrate);
+	    "%s: rates 0x%08X htrates 0x%08X, maxrate %d\n",
+	    __func__, rates, htrates, maxrate);
 
 	if (rates_p != NULL)
 		*rates_p = rates;
+	if (htrates_p != NULL)
+		*htrates_p = htrates;
 	if (maxrate_p != NULL)
 		*maxrate_p = maxrate;
 }
@@ -110,6 +132,41 @@ rtwn_set_basicrates(struct rtwn_softc *sc, uint32_t rates)
 	RTWN_DPRINTF(sc, RTWN_DEBUG_RA, "%s: rates 0x%08X\n", __func__, rates);
 
 	rtwn_setbits_4(sc, R92C_RRSR, R92C_RRSR_RATE_BITMAP_M, rates);
+}
+
+/*
+ * Configure the initial RTS rate to use.
+ */
+void
+rtwn_set_rts_rate(struct rtwn_softc *sc, uint32_t rates)
+{
+	uint8_t ridx;
+
+	/*
+	 * We shouldn't set the initial RTS/CTS generation rate
+	 * as the highest available rate - that may end up
+	 * with trying to configure something like MCS1 RTS/CTS.
+	 *
+	 * Instead, choose a suitable low OFDM/CCK rate based
+	 * on the basic rate bitmask.  Assume the caller
+	 * has filtered out CCK modes in 5GHz.
+	 */
+	rates &= (1 << RTWN_RIDX_CCK1) | (1 << RTWN_RIDX_CCK55) |
+	    (1 << RTWN_RIDX_CCK11) | (1 << RTWN_RIDX_OFDM6) |
+	    (1 << RTWN_RIDX_OFDM9) | (1 << RTWN_RIDX_OFDM12) |
+	    (1 << RTWN_RIDX_OFDM18) | (1 << RTWN_RIDX_OFDM24);
+	if (rates == 0) {
+		device_printf(sc->sc_dev,
+		    "WARNING: no configured basic RTS rate!\n");
+		return;
+	}
+	ridx = fls(rates) - 1;
+
+	RTWN_DPRINTF(sc, RTWN_DEBUG_RA,
+	    "%s: mask=0x%08x, ridx=%d\n",
+	    __func__, rates, ridx);
+
+	rtwn_write_1(sc, R92C_INIRTS_RATE_SEL, ridx);
 }
 
 static void
@@ -510,7 +567,7 @@ rtwn_set_promisc(struct rtwn_softc *sc)
 	RTWN_ASSERT_LOCKED(sc);
 
 	mask_all = R92C_RCR_ACF | R92C_RCR_ADF | R92C_RCR_AMF | R92C_RCR_AAP;
-	mask_min = R92C_RCR_APM | R92C_RCR_APPFCS;
+	mask_min = R92C_RCR_APM;
 
 	if (sc->bcn_vaps == 0)
 		mask_min |= R92C_RCR_CBSSID_BCN;
@@ -529,5 +586,12 @@ rtwn_set_promisc(struct rtwn_softc *sc)
 		sc->rcr &= ~mask_min;
 		sc->rcr |= mask_all;
 	}
+
+	/*
+	 * Add FCS, to work around occasional 4 byte truncation.
+	 * See the previous comment above R92C_RCR_APPFCS.
+	 */
+	sc->rcr |= R92C_RCR_APPFCS;
+
 	rtwn_rxfilter_set(sc);
 }

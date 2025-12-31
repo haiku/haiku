@@ -49,7 +49,6 @@
 #include <net/if_llc.h>
 #include <net/if_dl.h>
 #include <net/if_var.h>
-#include <net/if_private.h>
 #include <net/ethernet.h>
 
 #include <net/bpf.h>
@@ -63,8 +62,6 @@
 #include <net80211/ieee80211_ratectl.h>
 #include <net80211/ieee80211_sta.h>
 #include <net80211/ieee80211_vht.h>
-
-#define	IEEE80211_RATE2MBS(r)	(((r) & IEEE80211_RATE_VAL) / 2)
 
 static	void sta_vattach(struct ieee80211vap *);
 static	void sta_beacon_miss(struct ieee80211vap *);
@@ -417,10 +414,9 @@ sta_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 				    ether_sprintf(ni->ni_bssid));
 				ieee80211_print_essid(vap->iv_bss->ni_essid,
 				    ni->ni_esslen);
-				/* XXX MCS/HT */
-				printf(" channel %d start %uMb\n",
+				net80211_printf(" channel %d start %uMbit/s\n",
 				    ieee80211_chan2ieee(ic, ic->ic_curchan),
-				    IEEE80211_RATE2MBS(ni->ni_txrate));
+				    ieee80211_node_get_txrate_kbit(ni) / 1000);
 			}
 #endif
 			ieee80211_scan_assoc_success(vap, ni->ni_macaddr);
@@ -637,10 +633,10 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m,
 		 * XXX process data frames whilst scanning.
 		 */
 		if ((! IEEE80211_IS_MULTICAST(wh->i_addr1))
-		    && (! IEEE80211_ADDR_EQ(wh->i_addr1, IF_LLADDR(ifp)))) {
+		    && (! IEEE80211_ADDR_EQ(wh->i_addr1, vap->iv_myaddr))) {
 			IEEE80211_DISCARD_MAC(vap, IEEE80211_MSG_INPUT,
 			    bssid, NULL, "not to cur sta: lladdr=%6D, addr1=%6D",
-			    IF_LLADDR(ifp), ":", wh->i_addr1, ":");
+			    vap->iv_myaddr, ":", wh->i_addr1, ":");
 			vap->iv_stats.is_rx_wrongbss++;
 			goto out;
 		}
@@ -684,7 +680,7 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m,
 		}
 	resubmit_ampdu:
 		if (dir == IEEE80211_FC1_DIR_FROMDS) {
-			if ((ifp->if_flags & IFF_SIMPLEX) &&
+			if (ieee80211_vap_ifp_check_is_simplex(vap) &&
 			    isfromds_mcastecho(vap, wh)) {
 				/*
 				 * In IEEE802.11 network, multicast
@@ -719,7 +715,7 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m,
 				vap->iv_stats.is_rx_wrongdir++;
 				goto out;
 			}
-			if ((ifp->if_flags & IFF_SIMPLEX) &&
+			if (ieee80211_vap_ifp_check_is_simplex(vap) &&
 			    isdstods_mcastecho(vap, wh)) {
 				/*
 				 * In IEEE802.11 network, multicast
@@ -919,7 +915,8 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m,
 #ifdef IEEE80211_DEBUG
 		if ((ieee80211_msg_debug(vap) && doprint(vap, subtype)) ||
 		    ieee80211_msg_dumppkts(vap)) {
-			if_printf(ifp, "received %s from %s rssi %d\n",
+			net80211_vap_printf(vap,
+			    "received %s from %s rssi %d\n",
 			    ieee80211_mgt_subtype_name(subtype),
 			    ether_sprintf(wh->i_addr2), rssi);
 		}
@@ -975,7 +972,8 @@ sta_input(struct ieee80211_node *ni, struct mbuf *m,
 	case IEEE80211_FC0_TYPE_CTL:
 		vap->iv_stats.is_rx_ctl++;
 		IEEE80211_NODE_STAT(ni, rx_ctrl);
-		vap->iv_recv_ctl(ni, m, subtype);
+		if (ieee80211_is_ctl_frame_for_vap(ni, m))
+			vap->iv_recv_ctl(ni, m, subtype);
 		goto out;
 
 	default:
@@ -1373,7 +1371,7 @@ startbgscan(struct ieee80211vap *vap)
 /*
  * Compare two quiet IEs and return if they are equivalent.
  *
- * The tbttcount isnt checked - that's not part of the configuration.
+ * The tbttcount isn't checked - that's not part of the configuration.
  */
 static int
 compare_quiet_ie(const struct ieee80211_quiet_ie *q1,
@@ -1871,14 +1869,13 @@ sta_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0, int subtype,
 				 * We aren't ready for 2GHz VHT support.
 				 */
 				if (IEEE80211_IS_CHAN_2GHZ(ni->ni_chan)) {
-					printf("%s: peer %6D: VHT on 2GHz, ignoring\n",
-					    __func__,
-					    ni->ni_macaddr,
-					    ":");
+					net80211_vap_printf(vap,
+					    "%s: peer %6D: VHT on 2GHz, ignoring\n",
+					    __func__, ni->ni_macaddr, ":");
 				} else {
 					ieee80211_vht_node_init(ni);
 					ieee80211_vht_updateparams(ni, vhtcap, vhtopmode);
-					ieee80211_setup_vht_rates(ni, vhtcap, vhtopmode);
+					ieee80211_setup_vht_rates(ni);
 				}
 			}
 
@@ -1937,7 +1934,7 @@ sta_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0, int subtype,
 		    vap->iv_flags&IEEE80211_F_USEPROT ? ", protection" : "",
 		    ni->ni_flags & IEEE80211_NODE_QOS ? ", QoS" : "",
 		    ni->ni_flags & IEEE80211_NODE_HT ?
-			(ni->ni_chw == 40 ? ", HT40" : ", HT20") : "",
+			(ni->ni_chw == NET80211_STA_RX_BW_40 ? ", HT40" : ", HT20") : "",
 		    ni->ni_flags & IEEE80211_NODE_AMPDU ? " (+AMPDU)" : "",
 		    ni->ni_flags & IEEE80211_NODE_AMSDU ? " (+AMSDU)" : "",
 		    ni->ni_flags & IEEE80211_NODE_MIMO_RTS ? " (+SMPS-DYN)" :
@@ -2057,6 +2054,7 @@ sta_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0, int subtype,
 static void
 sta_recv_ctl(struct ieee80211_node *ni, struct mbuf *m, int subtype)
 {
+
 	switch (subtype) {
 	case IEEE80211_FC0_SUBTYPE_BAR:
 		ieee80211_recv_bar(ni, m);

@@ -4,6 +4,8 @@
  * Distributed under the terms of the MIT License.
  */
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
  * Copyright (c) 2003-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -87,6 +89,8 @@ typedef struct {
 	mtx_assert(IEEE80211_LOCK_OBJ(_ic), MA_OWNED)
 #define	IEEE80211_UNLOCK_ASSERT(_ic) \
 	mtx_assert(IEEE80211_LOCK_OBJ(_ic), MA_NOTOWNED)
+#define	IEEE80211_IS_LOCKED(_ic) \
+	mtx_owned(IEEE80211_LOCK_OBJ(_ic))
 
 /*
  * Transmit lock.
@@ -105,12 +109,22 @@ typedef struct {
 } while (0)
 #define	IEEE80211_TX_LOCK_OBJ(_ic)	(&(_ic)->ic_txlock.mtx)
 #define	IEEE80211_TX_LOCK_DESTROY(_ic) mtx_destroy(IEEE80211_TX_LOCK_OBJ(_ic))
-#define	IEEE80211_TX_LOCK(_ic)	   mtx_lock(IEEE80211_TX_LOCK_OBJ(_ic))
-#define	IEEE80211_TX_UNLOCK(_ic)	   mtx_unlock(IEEE80211_TX_LOCK_OBJ(_ic))
-#define	IEEE80211_TX_LOCK_ASSERT(_ic) \
-	mtx_assert(IEEE80211_TX_LOCK_OBJ(_ic), MA_OWNED)
-#define	IEEE80211_TX_UNLOCK_ASSERT(_ic) \
-	mtx_assert(IEEE80211_TX_LOCK_OBJ(_ic), MA_NOTOWNED)
+#define	IEEE80211_TX_LOCK(_ic) do { \
+	if (!IEEE80211_CONF_SEQNO_OFFLOAD(_ic)) \
+		mtx_lock(IEEE80211_TX_LOCK_OBJ(_ic)); \
+	} while (0);
+#define	IEEE80211_TX_UNLOCK(_ic) do { \
+	if (!IEEE80211_CONF_SEQNO_OFFLOAD(_ic)) \
+		mtx_unlock(IEEE80211_TX_LOCK_OBJ(_ic)); \
+	} while (0);
+#define	IEEE80211_TX_LOCK_ASSERT(_ic) do { \
+	if (!IEEE80211_CONF_SEQNO_OFFLOAD(_ic)) \
+		mtx_assert(IEEE80211_TX_LOCK_OBJ(_ic), MA_OWNED); \
+	} while (0)
+#define	IEEE80211_TX_UNLOCK_ASSERT(_ic) { \
+	if (!IEEE80211_CONF_SEQNO_OFFLOAD(_ic)) \
+		mtx_assert(IEEE80211_TX_LOCK_OBJ(_ic), MA_NOTOWNED); \
+	} while (0)
 
 /*
  * Stageq / ni_tx_superg lock
@@ -156,28 +170,6 @@ typedef struct {
 	mtx_assert(IEEE80211_NODE_LOCK_OBJ(_nt), MA_OWNED)
 
 /*
- * Node table iteration locking definitions; this protects the
- * scan generation # used to iterate over the station table
- * while grabbing+releasing the node lock.
- */
-typedef struct {
-	char		name[16];		/* e.g. "ath0_scan_lock" */
-	struct mtx	mtx;
-} ieee80211_scan_lock_t;
-#define	IEEE80211_NODE_ITERATE_LOCK_INIT(_nt, _name) do {		\
-	ieee80211_scan_lock_t *sl = &(_nt)->nt_scanlock;		\
-	snprintf(sl->name, sizeof(sl->name), "%s_scan_lock", _name);	\
-	mtx_init(&sl->mtx, sl->name, NULL, MTX_DEF);			\
-} while (0)
-#define	IEEE80211_NODE_ITERATE_LOCK_OBJ(_nt)	(&(_nt)->nt_scanlock.mtx)
-#define	IEEE80211_NODE_ITERATE_LOCK_DESTROY(_nt) \
-	mtx_destroy(IEEE80211_NODE_ITERATE_LOCK_OBJ(_nt))
-#define	IEEE80211_NODE_ITERATE_LOCK(_nt) \
-	mtx_lock(IEEE80211_NODE_ITERATE_LOCK_OBJ(_nt))
-#define	IEEE80211_NODE_ITERATE_UNLOCK(_nt) \
-	mtx_unlock(IEEE80211_NODE_ITERATE_LOCK_OBJ(_nt))
-
-/*
  * Power-save queue definitions.
  */
 typedef struct mtx ieee80211_psq_lock_t;
@@ -211,6 +203,18 @@ typedef struct mtx ieee80211_ageq_lock_t;
 #define	IEEE80211_AGEQ_DESTROY(_aq)	mtx_destroy(&(_aq)->aq_lock)
 #define	IEEE80211_AGEQ_LOCK(_aq)	mtx_lock(&(_aq)->aq_lock)
 #define	IEEE80211_AGEQ_UNLOCK(_aq)	mtx_unlock(&(_aq)->aq_lock)
+
+/*
+ * 802.1x MAC ACL database locking definitions.
+ */
+typedef struct mtx acl_lock_t;
+#define	ACL_LOCK_INIT(_as, _name) \
+	mtx_init(&(_as)->as_lock, _name, "802.11 ACL", MTX_DEF)
+#define	ACL_LOCK_DESTROY(_as)		mtx_destroy(&(_as)->as_lock)
+#define	ACL_LOCK(_as)			mtx_lock(&(_as)->as_lock)
+#define	ACL_UNLOCK(_as)			mtx_unlock(&(_as)->as_lock)
+#define	ACL_LOCK_ASSERT(_as) \
+	mtx_assert((&(_as)->as_lock), MA_OWNED)
 
 /*
  * Scan table definitions.
@@ -353,11 +357,16 @@ struct mbuf *ieee80211_getmgtframe(uint8_t **frm, int headroom, int pktlen);
 #define	M_AGE_SUB(m,adj)	(m->m_pkthdr.csum_data -= adj)
 
 /*
- * Store the sequence number.
+ * Store / retrieve the sequence number in an mbuf.
+ *
+ * The sequence number being stored/retreived is the 12 bit
+ * base sequence number, not the 16 bit sequence number field.
+ * I.e., it's from 0..4095 inclusive, with no 4 bit padding for
+ * fragment numbers.
  */
 #define	M_SEQNO_SET(m, seqno) \
-	((m)->m_pkthdr.tso_segsz = (seqno))
-#define	M_SEQNO_GET(m)	((m)->m_pkthdr.tso_segsz)
+	((m)->m_pkthdr.tso_segsz = ((seqno) % IEEE80211_SEQ_RANGE))
+#define	M_SEQNO_GET(m)	(((m)->m_pkthdr.tso_segsz) % IEEE80211_SEQ_RANGE)
 
 #define	MTAG_ABI_NET80211	1132948340	/* net80211 ABI */
 
@@ -365,22 +374,21 @@ struct ieee80211_cb {
 	void	(*func)(struct ieee80211_node *, void *, int status);
 	void	*arg;
 };
-#define	NET80211_TAG_CALLBACK		0 /* xmit complete callback */
-#define	NET80211_TAG_XMIT_PARAMS	1
-	/* See below; this is after the bpf_params definition */
-#define	NET80211_TAG_RECV_PARAMS	2
-#define	NET80211_TAG_TOA_PARAMS		3
-
+#define	NET80211_TAG_CALLBACK	0	/* xmit complete callback */
 int	ieee80211_add_callback(struct mbuf *m,
 		void (*func)(struct ieee80211_node *, void *, int), void *arg);
 void	ieee80211_process_callback(struct ieee80211_node *, struct mbuf *, int);
 
-void	get_random_bytes(void *, size_t);
+#define	NET80211_TAG_XMIT_PARAMS	1
+/* See below; this is after the bpf_params definition */
+
+#define	NET80211_TAG_RECV_PARAMS	2
+
+#define	NET80211_TAG_TOA_PARAMS		3
 
 struct ieee80211com;
-
-int ieee80211_parent_xmitpkt(struct ieee80211com *ic, struct mbuf *m);
-int ieee80211_vap_xmitpkt(struct ieee80211vap *vap, struct mbuf *m);
+int	ieee80211_parent_xmitpkt(struct ieee80211com *, struct mbuf *);
+int	ieee80211_vap_xmitpkt(struct ieee80211vap *, struct mbuf *);
 
 void	net80211_get_random_bytes(void *, size_t);
 
@@ -480,6 +488,23 @@ struct debugnet80211_methods {
 #define DEBUGNET80211_SET(ic, driver)
 #endif /* DEBUGNET */
 
+void ieee80211_vap_sync_mac_address(struct ieee80211vap *);
+void ieee80211_vap_copy_mac_address(struct ieee80211vap *);
+void ieee80211_vap_deliver_data(struct ieee80211vap *, struct mbuf *);
+bool ieee80211_vap_ifp_check_is_monitor(struct ieee80211vap *);
+bool ieee80211_vap_ifp_check_is_simplex(struct ieee80211vap *);
+bool ieee80211_vap_ifp_check_is_running(struct ieee80211vap *);
+void ieee80211_vap_ifp_set_running_state(struct ieee80211vap *, bool);
+const uint8_t * ieee80211_vap_get_broadcast_address(struct ieee80211vap *);
+
+void	net80211_printf(const char *fmt, ...) __printflike(1, 2);
+void	net80211_vap_printf(const struct ieee80211vap *, const char *fmt, ...)
+		__printflike(2, 3);
+void	net80211_ic_printf(const struct ieee80211com *, const char *fmt, ...)
+		__printflike(2, 3);
+
+#endif /* _KERNEL */
+
 /*
  * Structure prepended to raw packets sent through the bpf
  * interface when set to DLT_IEEE802_11_RADIO.  This allows
@@ -514,25 +539,31 @@ struct ieee80211_bpf_params {
 	uint8_t		ibp_rate3;	/* series 4 IEEE tx rate */
 };
 
-int ieee80211_add_xmit_params(struct mbuf *m, const struct ieee80211_bpf_params *params);
-int ieee80211_get_xmit_params(struct mbuf *m, struct ieee80211_bpf_params *params);
-
+#ifdef _KERNEL
 struct ieee80211_tx_params {
 	struct ieee80211_bpf_params params;
 };
+int	ieee80211_add_xmit_params(struct mbuf *m,
+		const struct ieee80211_bpf_params *);
+int	ieee80211_get_xmit_params(struct mbuf *m,
+		struct ieee80211_bpf_params *);
 
 struct ieee80211_rx_params;
 struct ieee80211_rx_stats;
 
-int ieee80211_add_rx_params(struct mbuf *m, const struct ieee80211_rx_stats *rxs);
-int ieee80211_get_rx_params(struct mbuf *m, struct ieee80211_rx_stats *rxs);
+int	ieee80211_add_rx_params(struct mbuf *m,
+		const struct ieee80211_rx_stats *rxs);
+int	ieee80211_get_rx_params(struct mbuf *m,
+		struct ieee80211_rx_stats *rxs);
 const struct ieee80211_rx_stats * ieee80211_get_rx_params_ptr(struct mbuf *m);
 
 struct ieee80211_toa_params {
 	int request_id;
 };
-int	ieee80211_add_toa_params(struct mbuf *m, const struct ieee80211_toa_params *p);
-int	ieee80211_get_toa_params(struct mbuf *m, struct ieee80211_toa_params *p);
+int	ieee80211_add_toa_params(struct mbuf *m,
+		const struct ieee80211_toa_params *p);
+int	ieee80211_get_toa_params(struct mbuf *m,
+		struct ieee80211_toa_params *p);
 
 #ifdef __cplusplus
 }
