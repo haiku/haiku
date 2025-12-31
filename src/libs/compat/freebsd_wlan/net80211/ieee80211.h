@@ -34,7 +34,7 @@
 
 #include <sys/types.h>
 
-#ifndef _KERNEL
+#if !defined(_KERNEL) && !defined(__cplusplus)
 #include <stdbool.h>
 #endif
 
