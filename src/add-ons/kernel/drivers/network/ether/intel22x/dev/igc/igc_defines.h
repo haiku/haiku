@@ -96,7 +96,6 @@
 #define IGC_RXD_ERR_TCPE	0x20    /* TCP/UDP Checksum Error */
 #define IGC_RXD_ERR_IPE	0x40    /* IP Checksum Error */
 #define IGC_RXD_ERR_RXE	0x80    /* Rx Data Error */
-#define IGC_RXD_SPC_VLAN_MASK	0x0FFF  /* VLAN ID is in lower 12 bits */
 
 #define IGC_RXDEXT_STATERR_TST	0x00000100 /* Time Stamp taken */
 #define IGC_RXDEXT_STATERR_LB		0x00040000
@@ -967,11 +966,31 @@
 #define IGC_FLASH_UPDATES	2000
 
 /* NVM Word Offsets */
-#define NVM_COMPAT			0x0003
-#define NVM_ID_LED_SETTINGS		0x0004
-#define NVM_FUTURE_INIT_WORD1		0x0019
-#define NVM_COMPAT_VALID_CSUM		0x0001
+#define NVM_COMPAT				0x0003
+#define NVM_ID_LED_SETTINGS			0x0004
+#define NVM_VERSION				0x0005
+#define NVM_FUTURE_INIT_WORD1			0x0019
+#define NVM_COMPAT_VALID_CSUM			0x0001
 #define NVM_FUTURE_INIT_WORD1_VALID_CSUM	0x0040
+#define NVM_ETRACK_WORD				0x0042
+#define NVM_ETRACK_HIWORD			0x0043
+#define NVM_COMB_VER_OFF			0x0083
+#define NVM_COMB_VER_PTR			0x003d
+
+/* NVM version defines */
+#define NVM_MAJOR_MASK			0xF000
+#define NVM_MINOR_MASK			0x0FF0
+#define NVM_IMAGE_ID_MASK		0x000F
+#define NVM_COMB_VER_MASK		0x00FF
+#define NVM_MAJOR_SHIFT			12
+#define NVM_MINOR_SHIFT			4
+#define NVM_COMB_VER_SHFT		8
+#define NVM_VER_INVALID			0xFFFF
+#define NVM_ETRACK_SHIFT		16
+#define NVM_ETRACK_VALID		0x8000
+#define NVM_NEW_DEC_MASK		0x0F00
+#define NVM_HEX_CONV			16
+#define NVM_HEX_TENS			10
 
 #define NVM_INIT_CONTROL2_REG		0x000F
 #define NVM_INIT_CONTROL3_PORT_B	0x0014

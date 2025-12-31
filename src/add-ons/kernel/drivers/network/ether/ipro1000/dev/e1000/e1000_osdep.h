@@ -80,14 +80,16 @@ ms_scale(int x) {
 	}
 }
 
+extern int e1000_use_pause_delay;
+
 static inline void
 safe_pause_us(int x) {
 #ifndef __HAIKU__
-   if (cold) {
-	   DELAY(x);
-   } else {
-	   pause("e1000_delay", max(1,  x/(1000000/hz)));
-   }
+	if (!e1000_use_pause_delay) {
+		DELAY(x);
+	} else {
+		pause("e1000_delay", max(1,  x/(1000000/hz)));
+	}
 #else
 	DELAY(x);
 #endif
@@ -95,7 +97,7 @@ safe_pause_us(int x) {
 
 static inline void
 safe_pause_ms(int x) {
-	if (cold) {
+	if (!e1000_use_pause_delay) {
 		DELAY(x*1000);
 	} else {
 		pause("e1000_delay", ms_scale(x));
@@ -155,6 +157,9 @@ struct e1000_osdep
 {
 	bus_space_tag_t    mem_bus_space_tag;
 	bus_space_handle_t mem_bus_space_handle;
+#ifdef INVARIANTS
+	bus_size_t	   mem_bus_space_size;
+#endif
 	bus_space_tag_t    io_bus_space_tag;
 	bus_space_handle_t io_bus_space_handle;
 	bus_space_tag_t    flash_bus_space_tag;
@@ -178,27 +183,44 @@ struct e1000_osdep
     bus_space_write_4(((struct e1000_osdep *)(hw)->back)->mem_bus_space_tag, \
     ((struct e1000_osdep *)(hw)->back)->mem_bus_space_handle, offset, value)
 
+static __inline uint32_t
+e1000_rd32(struct e1000_osdep *osdep, uint32_t reg)
+{
+
+	KASSERT(reg < osdep->mem_bus_space_size,
+	    ("e1000: register offset %#jx too large (max is %#jx)",
+	    (uintmax_t)reg, (uintmax_t)osdep->mem_bus_space_size));
+
+	return (bus_space_read_4(osdep->mem_bus_space_tag,
+	    osdep->mem_bus_space_handle, reg));
+}
+
+
+static __inline void
+e1000_wr32(struct e1000_osdep *osdep, uint32_t reg, uint32_t value)
+{
+
+	KASSERT(reg < osdep->mem_bus_space_size,
+	    ("e1000: register offset %#jx too large (max is %#jx)",
+	    (uintmax_t)reg, (uintmax_t)osdep->mem_bus_space_size));
+
+	bus_space_write_4(osdep->mem_bus_space_tag,
+	    osdep->mem_bus_space_handle, reg, value);
+}
+
 /* Register READ/WRITE macros */
 
-#define E1000_READ_REG(hw, reg) \
-    bus_space_read_4(((struct e1000_osdep *)(hw)->back)->mem_bus_space_tag, \
-        ((struct e1000_osdep *)(hw)->back)->mem_bus_space_handle, \
-        E1000_REGISTER(hw, reg))
+#define E1000_READ_REG(hw, reg)	\
+	e1000_rd32((hw)->back, E1000_REGISTER(hw, reg))
 
 #define E1000_WRITE_REG(hw, reg, value) \
-    bus_space_write_4(((struct e1000_osdep *)(hw)->back)->mem_bus_space_tag, \
-        ((struct e1000_osdep *)(hw)->back)->mem_bus_space_handle, \
-        E1000_REGISTER(hw, reg), value)
+	e1000_wr32((hw)->back, E1000_REGISTER(hw, reg), value)
 
 #define E1000_READ_REG_ARRAY(hw, reg, index) \
-    bus_space_read_4(((struct e1000_osdep *)(hw)->back)->mem_bus_space_tag, \
-        ((struct e1000_osdep *)(hw)->back)->mem_bus_space_handle, \
-        E1000_REGISTER(hw, reg) + ((index)<< 2))
+        e1000_rd32((hw)->back, E1000_REGISTER(hw, reg) + ((index) << 2))
 
 #define E1000_WRITE_REG_ARRAY(hw, reg, index, value) \
-    bus_space_write_4(((struct e1000_osdep *)(hw)->back)->mem_bus_space_tag, \
-        ((struct e1000_osdep *)(hw)->back)->mem_bus_space_handle, \
-        E1000_REGISTER(hw, reg) + ((index)<< 2), value)
+        e1000_wr32((hw)->back, E1000_REGISTER(hw, reg) + ((index) << 2), value)
 
 #define E1000_READ_REG_ARRAY_DWORD E1000_READ_REG_ARRAY
 #define E1000_WRITE_REG_ARRAY_DWORD E1000_WRITE_REG_ARRAY
