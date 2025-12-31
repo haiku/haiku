@@ -7664,20 +7664,29 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 	if (poseCount == 0)
 		return NULL;
 
+	// Create a drag rectangle of the maximum drag size, centered around the cursor
 	BRect inner(where.x - roundf(kTransparentDragThreshold.x / 2),
 		where.y - roundf(kTransparentDragThreshold.y / 2),
 		where.x + roundf(kTransparentDragThreshold.x / 2),
 		where.y + roundf(kTransparentDragThreshold.y / 2));
 
-	// (BRect & BRect) doesn't work correctly if the rectangles don't intersect
-	// this catches a bug that is produced somewhere before this function is
-	// called
+	// This would mean the cursor is outside the selection rectangle, in which case a drag
+	// operation should not have been started.
 	if (!inner.Intersects(dragRect))
 		return NULL;
 
-	inner = inner & dragRect;
+	// Nudge the inner rectangle if it is outside the selection/drag rectangle.
+	// Otherwise, we end up wasting a part of its area for showing noting at all.
+	if (inner.right > dragRect.right)
+		inner.OffsetBy(dragRect.right - inner.right, 0);
+	if (inner.bottom > dragRect.bottom)
+		inner.OffsetBy(0, dragRect.bottom - inner.bottom);
+	if (inner.left < dragRect.left)
+		inner.OffsetBy(dragRect.left - inner.left, 0);
+	if (inner.top < dragRect.top)
+		inner.OffsetBy(0, dragRect.top - inner.top);
 
-	float fadeWidth = be_control_look->ComposeIconSize(64).Width();
+	float fadeWidth = be_control_look->ComposeIconSize(32).Width();
 		// not an icon but make this bigger based on font-size
 
 	// If the selection is bigger than the specified limit, the
@@ -7769,22 +7778,22 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 
 		if (fadeLeft) {
 			FadeRGBA32Horizontal(bits, width, int32(rect.bottom), 0,
-				bitmap->Bounds().IntegerWidth());
+				int32(fadeWidth));
 		}
 
 		if (fadeRight) {
 			FadeRGBA32Horizontal(bits, width, int32(rect.bottom), int32(rect.right),
-				int32(rect.right) - bitmap->Bounds().IntegerWidth());
+				int32(rect.right - fadeWidth));
 		}
 
 		if (fadeTop) {
 			FadeRGBA32Vertical(bits, width, int32(rect.bottom), 0,
-				bitmap->Bounds().IntegerHeight());
+				int32(fadeWidth));
 		}
 
 		if (fadeBottom) {
 			FadeRGBA32Vertical(bits, width, int32(rect.bottom), int32(rect.bottom),
-				int32(rect.bottom) - bitmap->Bounds().IntegerHeight());
+				int32(rect.bottom - fadeWidth));
 		}
 	}
 
