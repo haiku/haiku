@@ -2043,17 +2043,6 @@ msk_detach(device_t dev)
 		MSK_IF_LOCK(sc_if);
 	}
 
-	/*
-	 * We're generally called from mskc_detach() which is using
-	 * device_delete_child() to get to here. It's already trashed
-	 * miibus for us, so don't do it here or we'll panic.
-	 *
-	 * if (sc_if->msk_miibus != NULL) {
-	 * 	device_delete_child(dev, sc_if->msk_miibus);
-	 * 	sc_if->msk_miibus = NULL;
-	 * }
-	 */
-
 	msk_rx_dma_jfree(sc_if);
 	msk_txrx_dma_free(sc_if);
 	bus_generic_detach(dev);
@@ -3693,7 +3682,7 @@ msk_intr(void *xsc)
 {
 	struct msk_softc *sc;
 	struct msk_if_softc *sc_if0, *sc_if1;
-	struct ifnet *ifp0, *ifp1;
+	if_t ifp0, ifp1;
 	uint32_t status;
 	int domore;
 
