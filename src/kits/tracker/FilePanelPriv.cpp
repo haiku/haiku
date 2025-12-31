@@ -188,6 +188,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target, const BEntry* s
 	fIsTrackingMenu(false),
 	fDefaultStateRestored(false)
 {
+	Lock();
 	InitIconPreloader();
 
 	fIsSavePanel = (mode == B_SAVE_PANEL);
@@ -286,6 +287,8 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target, const BEntry* s
 	// overwrite user's changes previously saved from another panel object.
 	if (StateNeedsSaving())
 		SaveState(false);
+
+	Unlock();
 }
 
 
