@@ -39,7 +39,7 @@ static struct mbuf*
 MCLGETL(struct mbuf* m, int how, int size)
 {
 	if (m == NULL)
-		return m_get2(size, how, MT_DATA, M_PKTHDR);
+		return m_get3(size, how, MT_DATA, M_PKTHDR);
 
 	m_cljget(m, how, size);
 	return m;

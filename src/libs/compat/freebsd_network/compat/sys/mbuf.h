@@ -312,6 +312,7 @@ struct mbuf*	m_free(struct mbuf*);
 void			m_freem(struct mbuf*);
 struct mbuf*	m_get(int, short);
 struct mbuf*	m_get2(int size, int how, short type, int flags);
+struct mbuf*	m_get3(int size, int how, short type, int flags);
 struct mbuf *	m_getm2(struct mbuf *m, int len, int how, short type, int flags);
 struct mbuf*	m_gethdr(int, short);
 struct mbuf*	m_getjcl(int, short, int, int);
