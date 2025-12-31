@@ -24,6 +24,8 @@ int	 timingsafe_bcmp(const void *, const void *, size_t);
 
 static __inline int imax(int a, int b) { return (a > b ? a : b); }
 static __inline int imin(int a, int b) { return (a < b ? a : b); }
+static __inline long lmax(long a, long b) { return (a > b ? a : b); }
+static __inline long lmin(long a, long b) { return (a < b ? a : b); }
 
 extern int abs(int a);
 
