@@ -133,8 +133,13 @@ BButton::Draw(BRect updateRect)
 {
 	BRect rect(Bounds());
 	rgb_color background = ViewColor();
-	rgb_color base = LowColor();
-	rgb_color text = HighColor();
+
+	// Behave like BeOS: the colors of the button do not depend on the current view colors.
+	// This is relied upon by some code that overrides Draw, changes the colors before calling
+	// the superclass draw, and don't expect that to have any effect. For example, this is seen
+	// in LibLayout used in Wonderbrush.
+	rgb_color text = ui_color(B_CONTROL_TEXT_COLOR);
+	rgb_color base = ui_color(B_CONTROL_BACKGROUND_COLOR);
 
 	uint32 flags = be_control_look->Flags(this);
 	if (_Flag(FLAG_DEFAULT))
@@ -158,6 +163,9 @@ BButton::Draw(BRect updateRect)
 
 	be_control_look->DrawLabel(this, Label(), icon, rect, updateRect, base, flags,
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE), &text);
+
+	// Behave like BeOS: after Draw, the high color is B_CONTROL_TEXT_COLOR that just was used
+	// to draw the label.
 }
 
 
