@@ -30,13 +30,6 @@ const char* kProgramName = __progname;
 
 static int sResolveNames = 1;
 
-struct address_family {
-	int			family;
-	const char*	name;
-	const char*	identifiers[4];
-	void		(*print_address)(sockaddr* address);
-};
-
 enum filter_flags {
 	FILTER_FAMILY_MASK		= 0x0000ff,
 	FILTER_PROTOCOL_MASK	= 0x00ff00,
@@ -55,60 +48,56 @@ enum filter_flags {
 	FILTER_STATE_LISTEN		= 0x010000,
 };
 
-// AF_INET family
+// AF_INET/AF_INET6 families
 static void inet_print_address(sockaddr* address);
-
-static const address_family kFamilies[] = {
-	{
-		AF_INET,
-		"inet",
-		{"AF_INET", "inet", "ipv4", NULL},
-		inet_print_address
-	},
-	{ -1, NULL, {NULL}, NULL }
-};
 
 
 static void
-inet_print_address(sockaddr* _address)
+inet_print_address(sockaddr* address)
 {
-	sockaddr_in& address = *(sockaddr_in *)_address;
-
-	if (address.sin_family != AF_INET || address.sin_len == 0) {
-		printf("%-22s", "-");
+	if ((address->sa_family != AF_INET && address->sa_family != AF_INET6) ||
+		address->sa_len == 0) {
+		printf("%-21s", "-");
 		return;
 	}
 
-	hostent* host = NULL;
-	servent* service = NULL;
+	bool resolvedHostName = false;
+	char hostName[128];
 	if (sResolveNames) {
-		host = gethostbyaddr((const char*)&address.sin_addr, sizeof(in_addr),
-			AF_INET);
-		service = getservbyport(address.sin_port, NULL);
+		// First try to resolve the host name
+		if (getnameinfo(address, address->sa_len, hostName, sizeof(hostName),
+			NULL, 0, NI_NAMEREQD) == 0) {
+			resolvedHostName = true;
+		}
+	}
+	// Now get the port and (optionally) the numeric host address
+	char port[32];
+	if (getnameinfo(address, address->sa_len,
+		resolvedHostName ? NULL : hostName,
+		resolvedHostName ? 0 : sizeof(hostName),
+		port, sizeof(port),
+		NI_NUMERICHOST | (sResolveNames ? 0 : NI_NUMERICSERV)) != 0) {
+		printf("%-21s", "-");
+		return;
 	}
 
-	const char *hostName;
-	if (host != NULL)
-		hostName = host->h_name;
-	else if (address.sin_addr.s_addr == INADDR_ANY)
-		hostName = "*";
-	else
-		hostName = inet_ntoa(address.sin_addr);
-
 	char buffer[128];
-	int length = strlcpy(buffer, hostName, sizeof(buffer));
+	int length;
+	if (address->sa_family != AF_INET
+		|| ((sockaddr_in*)address)->sin_addr.s_addr != INADDR_ANY) {
+		length = snprintf(buffer, sizeof(buffer),
+			resolvedHostName ? "%s" : "[%s]", hostName);
+	} else {
+		// Special handling for IPv4 any address
+		strcpy(buffer, "*");
+		length = 1;
+	}
+	if (length < sizeof(buffer)) {
+		length += snprintf(buffer + length, sizeof(buffer) - length,
+			":%s", port);
+	}
 
-	char port[64];
-	if (service != NULL)
-		strlcpy(port, service->s_name, sizeof(port));
-	else if (address.sin_port == 0)
-		strcpy(port, "*");
-	else
-		snprintf(port, sizeof(port), "%u", ntohs(address.sin_port));
-
-	snprintf(buffer + length, sizeof(buffer) - length, ":%s", port);
-
-	printf("%-22s", buffer);
+	printf("%-21s", buffer);
 }
 
 
@@ -131,25 +120,6 @@ usage(int status)
 	printf("	-l	listen state\n");
 
 	exit(status);
-}
-
-
-bool
-get_address_family(const char* argument, int32& familyIndex)
-{
-	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-		for (int32 j = 0; kFamilies[i].identifiers[j]; j++) {
-			if (!strcmp(argument, kFamilies[i].identifiers[j])) {
-				// found a match
-				familyIndex = i;
-				return true;
-			}
-		}
-	}
-
-	// defaults to AF_INET
-	familyIndex = 0;
-	return false;
 }
 
 
@@ -232,17 +202,20 @@ main(int argc, char** argv)
 	while (_kern_get_next_socket_stat(family, &cookie, &stat) == B_OK) {
 		// Filter families
 		if ((filter & FILTER_FAMILY_MASK) != 0) {
-			if (((filter & FILTER_AF_INET) == 0 || family != AF_INET)
-				&& ((filter & FILTER_AF_INET6) == 0 || family != AF_INET6)
-				&& ((filter & FILTER_AF_UNIX) == 0 || family != AF_UNIX))
+			if ((stat.family != AF_INET && stat.family != AF_INET6
+					&& stat.family != AF_UNIX)
+				|| ((filter & FILTER_AF_INET) == 0 && stat.family == AF_INET)
+				|| ((filter & FILTER_AF_INET6) == 0 && stat.family == AF_INET6)
+				|| ((filter & FILTER_AF_UNIX) == 0 && stat.family == AF_UNIX))
 				continue;
 		}
 		// Filter protocols
 		if ((filter & FILTER_PROTOCOL_MASK) != 0) {
-			if (((filter & FILTER_IPPROTO_TCP) == 0
-					|| stat.protocol != IPPROTO_TCP)
-				&& ((filter & FILTER_IPPROTO_UDP) == 0
-					|| stat.protocol != IPPROTO_UDP))
+			if ((stat.protocol != IPPROTO_TCP && stat.protocol != IPPROTO_UDP)
+				|| ((filter & FILTER_IPPROTO_TCP) == 0
+					&& stat.protocol == IPPROTO_TCP)
+				|| ((filter & FILTER_IPPROTO_UDP) == 0
+					&& stat.protocol == IPPROTO_UDP))
 				continue;
 		}
 		if ((filter & FILTER_STATE_MASK) != 0) {
@@ -261,8 +234,9 @@ main(int argc, char** argv)
 		printf("%6lu ", stat.send_queue_size);
 
 		inet_print_address((sockaddr*)&stat.address);
+		printf(" ");
 		inet_print_address((sockaddr*)&stat.peer);
-		printf("%-12s ", stat.state);
+		printf(" %-12s ", stat.state);
 
 		team_info info;
 		if (printProgram && get_team_info(stat.owner, &info) == B_OK) {
