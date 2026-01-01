@@ -671,6 +671,8 @@ ndp_receive_solicitation(net_buffer* buffer, bool* reuseBuffer)
 		|| header.option_length != 1)
 		return B_OK;
 
+	sockaddr_in6* source = (sockaddr_in6*)buffer->source;
+
 	{
 		MutexLocker locker(sCacheLock);
 
@@ -686,7 +688,7 @@ ndp_receive_solicitation(net_buffer* buffer, bool* reuseBuffer)
 		memcpy(LLADDR(&hardwareAddress), header.link_address,
 			ETHER_ADDRESS_LENGTH);
 
-		ndp_update_entry(header.target_address, &hardwareAddress, 0);
+		ndp_update_entry(source->sin6_addr, &hardwareAddress, 0);
 
 		// check if this request is for us
 
@@ -714,7 +716,6 @@ ndp_receive_solicitation(net_buffer* buffer, bool* reuseBuffer)
 	}
 
 	// fix source and destination address
-	sockaddr_in6* source = (sockaddr_in6*)buffer->source;
 	sockaddr_in6* destination = (sockaddr_in6*)buffer->destination;
 	memcpy(&destination->sin6_addr, &source->sin6_addr, sizeof(in6_addr));
 	memcpy(&source->sin6_addr, &header.target_address, sizeof(in6_addr));
@@ -782,7 +783,7 @@ ndp_receive_router_advertisement(net_buffer* buffer)
 static status_t
 ndp_receive_data(net_buffer* buffer)
 {
-	TRACE("ndp_receive_data\n");
+	TRACE(("ndp_receive_data\n"));
 
 	NetBufferHeaderReader<icmp6_hdr> icmp6Header(buffer);
 	if (icmp6Header.Status() < B_OK)
