@@ -2891,6 +2891,7 @@ sourceroute(struct addrinfo *ai, char *arg, unsigned char **cpp, int *lenp, int 
 
 #ifdef INET6
 	if (ai->ai_family == AF_INET6) {
+#ifndef __HAIKU__
 		if ((rth = inet6_rth_init((void *)*cpp, sizeof(buf),
 					  IPV6_RTHDR_TYPE_0, 0)) == NULL)
 			return -1;
@@ -2898,6 +2899,13 @@ sourceroute(struct addrinfo *ai, char *arg, unsigned char **cpp, int *lenp, int 
 			return -1;
 		*protop = IPPROTO_IPV6;
 		*optp = IPV6_RTHDR;
+#else
+		/*
+		 * Haiku does not support RFC 3542 "Advanced Sockets Application
+		 * Program Interface (API) for IPv6".
+		 */
+		return -1;
+#endif
 	} else
 #endif
       {
@@ -2968,9 +2976,13 @@ sourceroute(struct addrinfo *ai, char *arg, unsigned char **cpp, int *lenp, int 
 		}
 #ifdef INET6
 		if (res->ai_family == AF_INET6) {
+#ifndef __HAIKU__
 			sin6 = (struct sockaddr_in6 *)res->ai_addr;
 			if (inet6_rth_add((void *)rth, &sin6->sin6_addr) == -1)
 				return(0);
+#else
+			return(0);
+#endif
 		} else
 #endif
 	      {

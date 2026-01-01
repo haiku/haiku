@@ -6,7 +6,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs libtelnet ] : false ;
 UseHeaders [ FDirName $(SUBDIR) .. telnet ] : false ;
 
-SubDirCcFlags [ FDefines USE_TERMIO=1 ] ;
+SubDirCcFlags [ FDefines USE_TERMIO=1 INET6=1 ] ;
 
 local sources =
 	authenc.c
