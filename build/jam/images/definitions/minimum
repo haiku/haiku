@@ -110,6 +110,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	telnetd
 	top
 	traceroute
+	traceroute6
 	trash
 	unchop
 	unmount

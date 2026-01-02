@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src bin network traceroute6 ;
+
+SubDirSysHdrs $(HAIKU_TOP) headers compatibility bsd ;
+
+UseHeaders [ FDirName $(SUBDIR) .. traceroute ] : false ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) .. traceroute ] ;
+
+Application traceroute6 :
+	as.c
+	traceroute6.c
+	: $(TARGET_NETWORK_LIBS) $(TARGET_SELECT_UNAME_ETC_LIB) libbsd.so ;
+
+# Installation -- in the test directory for the time being
+HaikuInstall install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
+	: traceroute6 ;
+
+HaikuInstall install-userland-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
+	: traceroute6
+	: installed-userland-networking
+;
