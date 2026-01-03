@@ -20,8 +20,8 @@ Slow	KeyboardView		Žema
 Click to focus and raise	SettingsView		Fokusavimas ir iškėlimas spustelint
 Vertical	TouchpadPrefView		Vertikalioji
 Focus follows mouse	SettingsView		Fokusavimas seka pelės žymeklį
-Double-click test area	SettingsView		Vieta dvigubam spustelėjimui išbandyti
 Focus mode:	SettingsView		Fokusavimo veiksena:
+Double-click test area	SettingsView		Vieta dvigubam spustelėjimui išbandyti
 Revert	TouchpadPrefView		Atšaukti pakeitimus
 4-Button	SettingsView		4 klavišų
 Tapping sensitivity	TouchpadPrefView		Jautrumas bakstelėjimui
@@ -35,8 +35,8 @@ Accept first click	SettingsView		Priimti pirmąjį spustelėjimą
 OK	TouchpadPrefView		Gerai
 Delay until key repeat	KeyboardView		Delsa prieš kartojant klavišą
 Two finger scrolling	TouchpadPrefView		Slinktis dviem pirštais
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Pasirinktoji slinkties zona yra neįprastai didelė ir gali kliudyti įprastam darbui su jutikliniu kilimėliu. Ar tikrai norite ją pakeisti?
 Mouse acceleration	SettingsView		Pelės akceleracija
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Pasirinktoji slinkties zona yra neįprastai didelė ir gali kliudyti įprastam darbui su jutikliniu kilimėliu. Ar tikrai norite ją pakeisti?
 High	TouchpadPrefView		Aukštas
 Defaults	TouchpadPrefView		Numatytai
 1-Button	SettingsView		1 klavišo

@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Kohdista ja nosta napsauttamalla
 Vertical	TouchpadPrefView		Pystysuora
 Low	TouchpadPrefView		Alhainen
 Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
-Double-click test area	SettingsView		Kaksoisnapsautuksen testausalue
 Focus mode:	SettingsView		Kohdistustila:
+Double-click test area	SettingsView		Kaksoisnapsautuksen testausalue
 Revert	TouchpadPrefView		Käänteinen
 4-Button	SettingsView		4-painikkeinen
 Tapping sensitivity	TouchpadPrefView		Naputusherkkyys
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Hyväksy ensimmäisellä napsautuksella
 OK	TouchpadPrefView		Valmis
 Delay until key repeat	KeyboardView		Näppäintoiston viive
 Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja se saattaa hidastuttaa normaalia hiiritoimintaa. Haluatko todella muuttaa sen?
 Mouse acceleration	SettingsView		Hiirikiihdytys
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja se saattaa hidastuttaa normaalia hiiritoimintaa. Haluatko todella muuttaa sen?
 High	TouchpadPrefView		Korkea
 Defaults	TouchpadPrefView		Oletukset
 1-Button	SettingsView		1-painikkeinen

@@ -22,8 +22,8 @@ Slow	KeyboardView		Αρχή
 Click to focus and raise	SettingsView		Να γίνεται κλικ για εστίαση και ανύψωση
 Vertical	TouchpadPrefView		Κάθετο
 Focus follows mouse	SettingsView		Να εστιάζεται όποιο παράθυρο δείχνει ο κέρσορας
-Double-click test area	SettingsView		Περιοχή δοκιμής διπλού κλικ
 Focus mode:	SettingsView		Λειτουργία εστίασης:
+Double-click test area	SettingsView		Περιοχή δοκιμής διπλού κλικ
 Revert	TouchpadPrefView		Επαναφορά
 4-Button	SettingsView		4 κουμπιών
 Tapping sensitivity	TouchpadPrefView		Ευαισθησία αγγίγματος
@@ -39,8 +39,8 @@ Accept first click	SettingsView		Αποδοχή πρώτου κλικ
 OK	TouchpadPrefView		Εντάξει
 Delay until key repeat	KeyboardView		Καθυστέρηση μέχρι την επανάληψη πλήκτρου
 Two finger scrolling	TouchpadPrefView		Κύλιση δύο δαχτύλων
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Η νέα επιφάνεια κύλισης είναι πολύ μεγάλη και ίσως να επηρεάσει την ομαλή λειτουργία του ποντικιού. Είστε σίγουρος πως θέλετε να την αλλάξετε;
 Mouse acceleration	SettingsView		Επιτάχυνση δείκτη
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Η νέα επιφάνεια κύλισης είναι πολύ μεγάλη και ίσως να επηρεάσει την ομαλή λειτουργία του ποντικιού. Είστε σίγουρος πως θέλετε να την αλλάξετε;
 High	TouchpadPrefView		Υψηλή
 Defaults	TouchpadPrefView		Προεπιλογές
 1-Button	SettingsView		1 κουμπιού

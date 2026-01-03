@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla
 Vertical	TouchpadPrefView		Dikey
 Low	TouchpadPrefView		Düşük
 Focus follows mouse	SettingsView		Odak fareyi izler
-Double-click test area	SettingsView		Çift tıklama sınama alanı
 Focus mode:	SettingsView		Odak kipi:
+Double-click test area	SettingsView		Çift tıklama sınama alanı
 Revert	TouchpadPrefView		Eski haline döndür
 4-Button	SettingsView		4 düğmeli
 Tapping sensitivity	TouchpadPrefView		Hafifçe vurma duyarlılığı
@@ -43,8 +43,8 @@ Accept first click	SettingsView		İlk tıklamayı kabul et
 OK	TouchpadPrefView		Tamam
 Delay until key repeat	KeyboardView		Düğme yinelemesine kadar olan gecikme
 Two finger scrolling	TouchpadPrefView		İki parmak sarma
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni sarma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
 Mouse acceleration	SettingsView		Fare ivmelenmesi
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni sarma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
 High	TouchpadPrefView		Yüksek
 Defaults	TouchpadPrefView		Saptanmışlar
 1-Button	SettingsView		1 düğmeli

@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Klicka för att fokusera och höja
 Vertical	TouchpadPrefView		Vertikal
 Low	TouchpadPrefView		Låg
 Focus follows mouse	SettingsView		Fokus följer musen
-Double-click test area	SettingsView		Dubbelklick testområde
 Focus mode:	SettingsView		Fokuserat läge:
+Double-click test area	SettingsView		Dubbelklick testområde
 Revert	TouchpadPrefView		Återställ
 4-Button	SettingsView		4-Knappa
 Tapping sensitivity	TouchpadPrefView		Tappningskänslighet
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Acceptera vid första klickningen
 OK	TouchpadPrefView		OK
 Delay until key repeat	KeyboardView		Fördröjning tills upprepning av tangent
 Two finger scrolling	TouchpadPrefView		Rulla med två fingrar
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya rullnings området är stort och kommer påverka vanliga mus operationer. Vill du verkligen ändra den?
 Mouse acceleration	SettingsView		Mus acceleration
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya rullnings området är stort och kommer påverka vanliga mus operationer. Vill du verkligen ändra den?
 High	TouchpadPrefView		Hög
 Defaults	TouchpadPrefView		Förvalt
 1-Button	SettingsView		1-Knapp

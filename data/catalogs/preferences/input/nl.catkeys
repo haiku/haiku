@@ -21,8 +21,8 @@ Slow	KeyboardView		Langzaam
 Click to focus and raise	SettingsView		Klik om te focussen en naar voren te halen
 Vertical	TouchpadPrefView		Verticaal
 Focus follows mouse	SettingsView		Focus volgt muis
-Double-click test area	SettingsView		Dubbelkik testgebied
 Focus mode:	SettingsView		Focusmodus:
+Double-click test area	SettingsView		Dubbelkik testgebied
 Revert	TouchpadPrefView		Herstellen
 4-Button	SettingsView		4 knoppen
 Tapping sensitivity	TouchpadPrefView		Druk gevoeligheid
@@ -38,8 +38,8 @@ Accept first click	SettingsView		Eerste klik accepteren
 OK	TouchpadPrefView		Okee
 Delay until key repeat	KeyboardView		Vertragen totdat de toets herhaalt
 Two finger scrolling	TouchpadPrefView		Met twee vingers scrollen
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Het nieuwe scrollgebied is erg groot en kan het moeilijk maken om de muis goed te gebruiken. Weet u zeker dat u het wilt veranderen?
 Mouse acceleration	SettingsView		Muisversnelling
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Het nieuwe scrollgebied is erg groot en kan het moeilijk maken om de muis goed te gebruiken. Weet u zeker dat u het wilt veranderen?
 High	TouchpadPrefView		Hoog
 Defaults	TouchpadPrefView		Standaarden
 1-Button	SettingsView		1 knop

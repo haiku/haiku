@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Clic pentru a focaliza și a ridica
 Vertical	TouchpadPrefView		Vertical
 Low	TouchpadPrefView		Scăzut
 Focus follows mouse	SettingsView		Focalizarea urmărește mausul
-Double-click test area	SettingsView		Zonă de test al dublu clicului
 Focus mode:	SettingsView		Mod de focalizare:
+Double-click test area	SettingsView		Zonă de test al dublu clicului
 Revert	TouchpadPrefView		Revenire
 4-Button	SettingsView		Buton-4
 Tapping sensitivity	TouchpadPrefView		Sensibilitate la atingere
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Acceptă primul clic
 OK	TouchpadPrefView		OK
 Delay until key repeat	KeyboardView		Întârziere până la repetarea tastei
 Two finger scrolling	TouchpadPrefView		Derulare cu două degete
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Noua zonă de derulare este foarte mare și poate să împiedice operația normală a mausului. Sigur doriți să o modificați?
 Mouse acceleration	SettingsView		Accelerare de maus
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Noua zonă de derulare este foarte mare și poate să împiedice operația normală a mausului. Sigur doriți să o modificați?
 High	TouchpadPrefView		Ridicat
 Defaults	TouchpadPrefView		Implicite
 1-Button	SettingsView		Buton-1

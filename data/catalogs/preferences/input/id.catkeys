@@ -22,8 +22,8 @@ Slow	KeyboardView		Lambat
 Click to focus and raise	SettingsView		Klik untuk fokus dan naikkan
 Vertical	TouchpadPrefView		Vertikal
 Focus follows mouse	SettingsView		Fokus mengikuti mouse
-Double-click test area	SettingsView		Area pengujian klik dua kali
 Focus mode:	SettingsView		Mode fokus:
+Double-click test area	SettingsView		Area pengujian klik dua kali
 Revert	TouchpadPrefView		Pulihkan
 4-Button	SettingsView		4-Tombol
 Tapping sensitivity	TouchpadPrefView		Sensitivitas penekanan
@@ -39,8 +39,8 @@ Accept first click	SettingsView		Terima klik pertama
 OK	TouchpadPrefView		Oke
 Delay until key repeat	KeyboardView		Tunda hingga tombol berulang
 Two finger scrolling	TouchpadPrefView		Pengguliran dua jari
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah anda benar-benar ingin mengubahnya?
 Mouse acceleration	SettingsView		Akselerasi mouse
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah anda benar-benar ingin mengubahnya?
 High	TouchpadPrefView		Tinggi
 Defaults	TouchpadPrefView		Bawaan
 1-Button	SettingsView		1-Tombol

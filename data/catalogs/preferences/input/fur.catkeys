@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Clic par meti a fûc e parâ denant
 Vertical	TouchpadPrefView		Verticâl
 Low	TouchpadPrefView		Basse
 Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
-Double-click test area	SettingsView		Aree di prove dopli-clic
 Focus mode:	SettingsView		Mût par meti a fûc:
+Double-click test area	SettingsView		Aree di prove dopli-clic
 Revert	TouchpadPrefView		Ripristine
 4-Button	SettingsView		4-Botons
 Tapping sensitivity	TouchpadPrefView		Sensibilitât dal batuçâ
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Acete il prin clic
 OK	TouchpadPrefView		VA BEN
 Delay until key repeat	KeyboardView		Ritart pe ripetizion dal tast
 Two finger scrolling	TouchpadPrefView		Scoriment cun doi dêts
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La gnove aree di scorimetn e je une vore largje e e podarès impedî il normâl funzionament dal mouse. Cambiâle pardabon?
 Mouse acceleration	SettingsView		Acelerazion dal mouse
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La gnove aree di scorimetn e je une vore largje e e podarès impedî il normâl funzionament dal mouse. Cambiâle pardabon?
 High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Predefinîts
 1-Button	SettingsView		1-Boton

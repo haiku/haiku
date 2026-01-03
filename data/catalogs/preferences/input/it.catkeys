@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Click da il focus e ripristina
 Vertical	TouchpadPrefView		Verticale
 Low	TouchpadPrefView		Basso
 Focus follows mouse	SettingsView		Il focus segue il mouse
-Double-click test area	SettingsView		Area di test doppo click
 Focus mode:	SettingsView		Modalità focus:
+Double-click test area	SettingsView		Area di test doppo click
 Revert	TouchpadPrefView		Annulla modifiche
 4-Button	SettingsView		4 Pulsanti
 Tapping sensitivity	TouchpadPrefView		Sensibilità del tap
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Accetta al primo click
 OK	TouchpadPrefView		OK
 Delay until key repeat	KeyboardView		Ritardo dopo ripetizione tasto
 Two finger scrolling	TouchpadPrefView		Scorrimento con due dita
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nuova area di scrolling è molto ampia e potrebbe impedire il normale funzionamento del mouse. Sei sicuro di voler procedere?
 Mouse acceleration	SettingsView		Accelerazione del mouse
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nuova area di scrolling è molto ampia e potrebbe impedire il normale funzionamento del mouse. Sei sicuro di voler procedere?
 High	TouchpadPrefView		Alto
 Defaults	TouchpadPrefView		Predefiniti
 1-Button	SettingsView		1 Pulsante

@@ -22,8 +22,8 @@ Slow	KeyboardView		Lento
 Click to focus and raise	SettingsView		Clic para enfocar y subir
 Vertical	TouchpadPrefView		Vertical
 Focus follows mouse	SettingsView		El foco sigue al ratón
-Double-click test area	SettingsView		Área de prueba de doble clic
 Focus mode:	SettingsView		Modo de enfoque:
+Double-click test area	SettingsView		Área de prueba de doble clic
 Revert	TouchpadPrefView		Revertir
 4-Button	SettingsView		4 botones
 Tapping sensitivity	TouchpadPrefView		Sensibilidad de toque
@@ -39,8 +39,8 @@ Accept first click	SettingsView		Aceptar primer clic
 OK	TouchpadPrefView		Aceptar
 Delay until key repeat	KeyboardView		Demora hasta que se repita la tecla
 Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nueva área de desplazamiento es muy grande y puede impedir el funcionamiento normal del ratón. ¿Realmente desea cambiarla?
 Mouse acceleration	SettingsView		Aceleración del ratón
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nueva área de desplazamiento es muy grande y puede impedir el funcionamiento normal del ratón. ¿Realmente desea cambiarla?
 High	TouchpadPrefView		Alto
 Defaults	TouchpadPrefView		Por defecto
 1-Button	SettingsView		1 botón

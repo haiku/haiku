@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		點擊聚焦並提起
 Vertical	TouchpadPrefView		垂直
 Low	TouchpadPrefView		低
 Focus follows mouse	SettingsView		焦點跟隨滑鼠
-Double-click test area	SettingsView		雙擊測試區域
 Focus mode:	SettingsView		對焦模式：
+Double-click test area	SettingsView		雙擊測試區域
 Revert	TouchpadPrefView		恢復
 4-Button	SettingsView		4鍵
 Tapping sensitivity	TouchpadPrefView		敲擊靈敏度
@@ -43,8 +43,8 @@ Accept first click	SettingsView		接受第一次點擊
 OK	TouchpadPrefView		確認
 Delay until key repeat	KeyboardView		延遲直至按鍵重複
 Two finger scrolling	TouchpadPrefView		兩指滾動
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新的滾動區域非常大，可能會妨礙滑鼠的正常操作。你真的想改變它嗎？
 Mouse acceleration	SettingsView		滑鼠加速
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新的滾動區域非常大，可能會妨礙滑鼠的正常操作。你真的想改變它嗎？
 High	TouchpadPrefView		高
 Defaults	TouchpadPrefView		默認值
 1-Button	SettingsView		1鍵

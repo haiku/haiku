@@ -22,8 +22,8 @@ Slow	KeyboardView		Mała
 Click to focus and raise	SettingsView		Kliknij aby aktywować i wynieść na wierzch
 Vertical	TouchpadPrefView		Poziomy
 Focus follows mouse	SettingsView		Aktywacja podąża za wskaźnikiem
-Double-click test area	SettingsView		Obszar testowania dwukliku
 Focus mode:	SettingsView		Tryb aktywacji:
+Double-click test area	SettingsView		Obszar testowania dwukliku
 Revert	TouchpadPrefView		Cofnij
 4-Button	SettingsView		4-przyciskowa
 Tapping sensitivity	TouchpadPrefView		Czułość na stuknięcia
@@ -39,8 +39,8 @@ Accept first click	SettingsView		Akceptuj pierwsze kliknięcie
 OK	TouchpadPrefView		OK
 Delay until key repeat	KeyboardView		Opóźnienie przed powtórzeniem
 Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nowy obszar przesuwania jest bardzo duży i może przeszkadzać w normalnym używaniu wskaźnika myszy. Na pewno chcesz go ustawić?
 Mouse acceleration	SettingsView		Przyspieszenie myszy
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nowy obszar przesuwania jest bardzo duży i może przeszkadzać w normalnym używaniu wskaźnika myszy. Na pewno chcesz go ustawić?
 High	TouchpadPrefView		Wysoka
 Defaults	TouchpadPrefView		Przywróć domyślne
 1-Button	SettingsView		1-przyciskowa

@@ -22,8 +22,8 @@ Slow	KeyboardView		느리게
 Click to focus and raise	SettingsView		클릭하여 포커스 및 위로 올리기
 Vertical	TouchpadPrefView		수직
 Focus follows mouse	SettingsView		마우스 따라 포커스 이동
-Double-click test area	SettingsView		더블클릭 테스트
 Focus mode:	SettingsView		포커스 모드:
+Double-click test area	SettingsView		더블클릭 테스트
 Revert	TouchpadPrefView		되돌리기
 4-Button	SettingsView		4버튼
 Tapping sensitivity	TouchpadPrefView		두드리기 민감도
@@ -39,8 +39,8 @@ Accept first click	SettingsView		첫 번째 클릭 인식
 OK	TouchpadPrefView		확인
 Delay until key repeat	KeyboardView		키 반복 지연시간
 Two finger scrolling	TouchpadPrefView		두손가락 스크롤링
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		새 스크롤 영역이 너무 넓어 일반 마우스 동작에 영향을 줄 수 있습니다. 정말로 변경하시겠습니까?
 Mouse acceleration	SettingsView		마우스 가속
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		새 스크롤 영역이 너무 넓어 일반 마우스 동작에 영향을 줄 수 있습니다. 정말로 변경하시겠습니까?
 High	TouchpadPrefView		높게
 Defaults	TouchpadPrefView		기본값
 1-Button	SettingsView		1버튼

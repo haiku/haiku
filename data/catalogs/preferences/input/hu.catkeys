@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Fókusz és előtérbe hozás kattintásr
 Vertical	TouchpadPrefView		Függőleges
 Low	TouchpadPrefView		Kicsi
 Focus follows mouse	SettingsView		A fókusz kövesse az egeret
-Double-click test area	SettingsView		Dupla-kattintási terület
 Focus mode:	SettingsView		Fókusz-mód
+Double-click test area	SettingsView		Dupla-kattintási terület
 Revert	TouchpadPrefView		Visszaállít
 4-Button	SettingsView		4 gombos
 Tapping sensitivity	TouchpadPrefView		Érintés érzékenység
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Érvényesítés első kattintásra
 OK	TouchpadPrefView		Rendben
 Delay until key repeat	KeyboardView		Billentyű-ismétlés késleltetése
 Two finger scrolling	TouchpadPrefView		Két ujjas görgetés
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Az új görgető-terület nagyon nagy és akadályozhatja a hagyományos egér-műveleteket. Biztosan megváltoztatod?
 Mouse acceleration	SettingsView		Egér gyorsítása
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Az új görgető-terület nagyon nagy és akadályozhatja a hagyományos egér-műveleteket. Biztosan megváltoztatod?
 High	TouchpadPrefView		Nagy
 Defaults	TouchpadPrefView		Alapértékek
 1-Button	SettingsView		1 gombos

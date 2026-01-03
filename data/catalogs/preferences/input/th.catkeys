@@ -20,8 +20,8 @@ Slow	KeyboardView		ช้า
 Click to focus and raise	SettingsView		คลิดเพื่อดูและขยาย
 Vertical	TouchpadPrefView		แนวตั้ง
 Focus follows mouse	SettingsView		โฟกัสตามเมาส์
-Double-click test area	SettingsView		พื้นที่ทดสอบดับเบิลคลิก
 Focus mode:	SettingsView		โหมดโฟกัส:
+Double-click test area	SettingsView		พื้นที่ทดสอบดับเบิลคลิก
 Revert	TouchpadPrefView		เปลี่ยนกลับ
 4-Button	SettingsView		4 ปุ่ม
 Revert	InputKeyboard		เปลี่ยนกลับ
@@ -34,8 +34,8 @@ Accept first click	SettingsView		ยอมรับการคลิกคร�
 OK	TouchpadPrefView		ตกลง
 Delay until key repeat	KeyboardView		หน่วงเวลาจนกว่าจะกดปุ่มซ้ำ
 Two finger scrolling	TouchpadPrefView		เลื่อนสองนิ้ว
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		พื้นที่เลื่อนใหม่มีขนาดใหญ่มากและอาจขัดขวางการทำงานของเมาส์ปกติ คุณต้องการเปลี่ยนหรือไม่?
 Mouse acceleration	SettingsView		ความเร็วเมาส์
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		พื้นที่เลื่อนใหม่มีขนาดใหญ่มากและอาจขัดขวางการทำงานของเมาส์ปกติ คุณต้องการเปลี่ยนหรือไม่?
 High	TouchpadPrefView		สูง
 Defaults	TouchpadPrefView		ค่าเริ่มต้น
 1-Button	SettingsView		1 ปุ่ม

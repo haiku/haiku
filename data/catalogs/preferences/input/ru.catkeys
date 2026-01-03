@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Кликнуть для фокуса и �
 Vertical	TouchpadPrefView		Вертикальная
 Low	TouchpadPrefView		Медленно
 Focus follows mouse	SettingsView		Фокус следует за курсором
-Double-click test area	SettingsView		Область для проверки двойного клика
 Focus mode:	SettingsView		Режим фокуса:
+Double-click test area	SettingsView		Область для проверки двойного клика
 Revert	TouchpadPrefView		Откатить
 4-Button	SettingsView		Четырёхкнопочная
 Tapping sensitivity	TouchpadPrefView		Отклик на постукивание
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Принимать первый клик
 OK	TouchpadPrefView		ОК
 Delay until key repeat	KeyboardView		Задержка перед повтором клавиши
 Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Выбранная область прокрутки слишком большая и может затруднить обычные операции с мышью. Вы действительно хотите изменить её?
 Mouse acceleration	SettingsView		Ускорение мыши
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Выбранная область прокрутки слишком большая и может затруднить обычные операции с мышью. Вы действительно хотите изменить её?
 High	TouchpadPrefView		Быстро
 Defaults	TouchpadPrefView		По умолчанию
 1-Button	SettingsView		Однокнопочная

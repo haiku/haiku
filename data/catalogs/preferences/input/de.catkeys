@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Klicken aktiviert und holt nach vorn
 Vertical	TouchpadPrefView		Vertikal
 Low	TouchpadPrefView		Niedrig
 Focus follows mouse	SettingsView		Ohne Klicken aktivieren
-Double-click test area	SettingsView		Testfeld für Doppelklick
 Focus mode:	SettingsView		Modus:
+Double-click test area	SettingsView		Testfeld für Doppelklick
 Revert	TouchpadPrefView		Anfangswerte
 4-Button	SettingsView		4-Tasten
 Tapping sensitivity	TouchpadPrefView		Empfindlichkeit
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Auf ersten Klick reagieren
 OK	TouchpadPrefView		OK
 Delay until key repeat	KeyboardView		Verzögerung bis Tastenwiederholung
 Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich gesetzt werden?
 Mouse acceleration	SettingsView		Beschleunigung
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich gesetzt werden?
 High	TouchpadPrefView		Hoch
 Defaults	TouchpadPrefView		Standardwerte
 1-Button	SettingsView		1-Taste

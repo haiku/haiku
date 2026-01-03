@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		クリックでフォーカスと最前�
 Vertical	TouchpadPrefView		垂直方向
 Low	TouchpadPrefView		低い
 Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせる
-Double-click test area	SettingsView		ダブルクリックの確認
 Focus mode:	SettingsView		フォーカスモード:
+Double-click test area	SettingsView		ダブルクリックの確認
 Revert	TouchpadPrefView		戻す
 4-Button	SettingsView		4 ボタン
 Tapping sensitivity	TouchpadPrefView		タップ感度
@@ -43,8 +43,8 @@ Accept first click	SettingsView		最初のクリックを受け入れる
 OK	TouchpadPrefView		OK
 Delay until key repeat	KeyboardView		キーリピート開始までの時間
 Two finger scrolling	TouchpadPrefView		2本指スクロール
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更しますか?
 Mouse acceleration	SettingsView		マウスの加速度
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更しますか?
 High	TouchpadPrefView		高く
 Defaults	TouchpadPrefView		デフォルト
 1-Button	SettingsView		1 ボタン

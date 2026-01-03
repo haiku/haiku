@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Clic per al focus i l'alçament
 Vertical	TouchpadPrefView		Vertical
 Low	TouchpadPrefView		Baixa
 Focus follows mouse	SettingsView		El focus segueix el ratolí
-Double-click test area	SettingsView		Àrea de prova per al clic doble
 Focus mode:	SettingsView		Mode del focus:
+Double-click test area	SettingsView		Àrea de prova per al clic doble
 Revert	TouchpadPrefView		Reverteix
 4-Button	SettingsView		Botó 4
 Tapping sensitivity	TouchpadPrefView		Sensibilitat del toc
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Accepta el primer clic
 OK	TouchpadPrefView		D'acord
 Delay until key repeat	KeyboardView		Retard fins a la repetició de tecla
 Two finger scrolling	TouchpadPrefView		Desplaçament amb dos dits
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		L'àrea de desplaçament nova és molt grossa i pot impedir el funcionament normal del ratolí. Realment voleu canviar-ho?
 Mouse acceleration	SettingsView		Acceleració del ratolí
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		L'àrea de desplaçament nova és molt grossa i pot impedir el funcionament normal del ratolí. Realment voleu canviar-ho?
 High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Valors predeterminats
 1-Button	SettingsView		1 botó

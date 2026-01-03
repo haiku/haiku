@@ -26,8 +26,8 @@ Click to focus and raise	SettingsView		Aktivovat a vyzdvihnout klepnutím
 Vertical	TouchpadPrefView		Svislý
 Low	TouchpadPrefView		Málo
 Focus follows mouse	SettingsView		Aktivace najetím myši nad okno
-Double-click test area	SettingsView		Oblast zkoušení poklepání
 Focus mode:	SettingsView		Režim aktivace:
+Double-click test area	SettingsView		Oblast zkoušení poklepání
 Revert	TouchpadPrefView		Vrátit
 4-Button	SettingsView		4-tlačítková
 Tapping sensitivity	TouchpadPrefView		Citlivost klepnutí
@@ -43,8 +43,8 @@ Accept first click	SettingsView		Přijmout první klepnutí
 OK	TouchpadPrefView		OK
 Delay until key repeat	KeyboardView		Zpoždění opakování
 Two finger scrolling	TouchpadPrefView		Rolování dvěma prsty
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nová rolovací oblast je velmi velká a může zamezit běžnému používání myši. Opravdu ji chcete změnit?
 Mouse acceleration	SettingsView		Zrychlení myši
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nová rolovací oblast je velmi velká a může zamezit běžnému používání myši. Opravdu ji chcete změnit?
 High	TouchpadPrefView		Velký
 Defaults	TouchpadPrefView		Výchozí hodnoty
 1-Button	SettingsView		1-tlačítková
