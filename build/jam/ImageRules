@@ -1545,6 +1545,11 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 		STAT_GET_SIZE = "stat -c %s" ;
 	}
 
+	# The action uses sh arithmetic expressions, which use $().
+	# That would conflict with JAM rules, so we need a variable to insert a literal $ character
+	# in the generated command.
+	DOLLAR = $ ;
+
 	BuildFloppyBootImage1 $(image) : $(haikuLoader) $(archive) ;
 	if $(HAIKU_KERNEL_PLATFORM) = atari_m68k {
 		Depends $(image) : <build>fixup_tos_boot_checksum ;
@@ -1563,9 +1568,8 @@ actions BuildFloppyBootImage1
 	haiku_loader_size=`$(STAT_GET_SIZE) "$(>[1])"`
 	drivers_tgz_size=`$(STAT_GET_SIZE) "$(>[2])"`
 
-	archive_image_offset=`echo "$(ARCHIVE_IMAGE_OFFSET) * 1024" | bc`
-	floppy_tgz_size=\
-		`echo "($(FLOPPY_IMAGE_SIZE) - $(ARCHIVE_IMAGE_OFFSET)) * 1024" | bc`
+	archive_image_offset=$(DOLLAR)(($(ARCHIVE_IMAGE_OFFSET) * 1024))
+	floppy_tgz_size=$(DOLLAR)((($(FLOPPY_IMAGE_SIZE) - $(ARCHIVE_IMAGE_OFFSET)) * 1024))
 	if [ $haiku_loader_size -gt $archive_image_offset ] ; then
 		echo "Error: $(>[1]) is too big ($haiku_loader_size) to fit "
 		echo "       before the boot archive starting at $archive_image_offset!"
