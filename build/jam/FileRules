@@ -261,9 +261,6 @@ rule ExtractArchive directory : entries : archiveFile : grist
 		Depends $(directory) : $(archiveFile) ;
 		switch $(archiveFile:S)
 		{
-			case .zip :
-				ExtractZipArchive1 $(directory) : $(archiveFile) ;
-
 			case .tgz :
 				ExtractTarArchive1 $(directory) : $(archiveFile) ;
 
@@ -283,13 +280,6 @@ rule ExtractArchive directory : entries : archiveFile : grist
 	}
 
 	return $(targets) ;
-}
-
-
-actions ExtractZipArchive1
-{
-	mkdir -p $(1)
-	unzip -q -u -o -d $(1) $(2)
 }
 
 
