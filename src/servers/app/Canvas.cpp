@@ -238,11 +238,6 @@ Canvas::BlendLayer(Layer* layerPtr)
 {
 	BReference<Layer> layer(layerPtr, true);
 
-	if (layer->Opacity() == 255) {
-		layer->Play(this);
-		return;
-	}
-
 	BReference <UtilityBitmap> layerBitmap(layer->RenderToBitmap(this), true);
 	if (layerBitmap == NULL)
 		return;
@@ -257,11 +252,13 @@ Canvas::BlendLayer(Layer* layerPtr)
 	fDrawState->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
 	fDrawState->SetTransformEnabled(false);
 
-	BReference<AlphaMask> mask(new(std::nothrow) UniformAlphaMask(layer->Opacity()), true);
-	if (mask == NULL)
-		return;
+	if (layer->Opacity() < 255) {
+		BReference<AlphaMask> mask(new(std::nothrow) UniformAlphaMask(layer->Opacity()), true);
+		if (mask == NULL)
+			return;
 
-	SetAlphaMask(mask);
+		SetAlphaMask(mask);
+	}
 	ResyncDrawState();
 
 	GetDrawingEngine()->DrawBitmap(layerBitmap, layerBitmap->Bounds(),
