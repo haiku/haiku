@@ -432,11 +432,14 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu->AddItem(fDeleteNext);
 		menu->AddSeparatorItem();
 
-		fPrevMsg = new BMenuItem(B_TRANSLATE("Previous message"),
-			new BMessage(M_PREVMSG), B_UP_ARROW);
+		BMessage* prevMsg = new BMessage(M_PREVMSG);
+		prevMsg->AddBool("keepStatus", false);
+		fPrevMsg = new BMenuItem(B_TRANSLATE("Previous message"), prevMsg, B_UP_ARROW);
 		menu->AddItem(fPrevMsg);
-		fNextMsg = new BMenuItem(B_TRANSLATE("Next message"),
-			new BMessage(M_NEXTMSG), B_DOWN_ARROW);
+
+		BMessage* nextMsg = new BMessage(M_NEXTMSG);
+		nextMsg->AddBool("keepStatus", false);
+		fNextMsg = new BMenuItem(B_TRANSLATE("Next message"), nextMsg, B_DOWN_ARROW);
 		menu->AddItem(fNextMsg);
 	} else {
 		menu->AddItem(fSendNow = new BMenuItem(B_TRANSLATE("Send message"),
@@ -982,6 +985,32 @@ TMailWindow::MenusBeginning()
 		} else {
 			fCut->SetEnabled(false);
 			fPaste->SetEnabled(false);
+
+			if (modifiers() & B_SHIFT_KEY) {
+				fPrevMsg->SetLabel(B_TRANSLATE("Previous message, keep status"));
+				fPrevMsg->SetShortcut(B_UP_ARROW, B_SHIFT_KEY);
+				BMessage* prevMsg = new BMessage(M_PREVMSG);
+				prevMsg->AddBool("keepStatus", true);
+				fPrevMsg->SetMessage(prevMsg);
+
+				fNextMsg->SetLabel(B_TRANSLATE("Next message, keep status"));
+				fNextMsg->SetShortcut(B_DOWN_ARROW, B_SHIFT_KEY);
+				BMessage* nextMsg = new BMessage(M_NEXTMSG);
+				nextMsg->AddBool("keepStatus", true);
+				fNextMsg->SetMessage(nextMsg);
+			} else {
+				fPrevMsg->SetLabel(B_TRANSLATE("Previous message"));
+				fPrevMsg->SetShortcut(B_UP_ARROW, 0);
+				BMessage* prevMsg = new BMessage(M_PREVMSG);
+				prevMsg->AddBool("keepStatus", false);
+				fPrevMsg->SetMessage(prevMsg);
+
+				fNextMsg->SetLabel(B_TRANSLATE("Next message"));
+				fNextMsg->SetShortcut(B_DOWN_ARROW, 0);
+				BMessage* nextMsg = new BMessage(M_NEXTMSG);
+				nextMsg->AddBool("keepStatus", false);
+				fNextMsg->SetMessage(nextMsg);
+			}
 		}
 	}
 
@@ -1599,6 +1628,14 @@ TMailWindow::MessageReceived(BMessage* msg)
 		{
 			if (fRef == NULL)
 				break;
+
+			bool keepStatus;
+			if (msg->FindBool("keepStatus", &keepStatus) != B_OK)
+				keepStatus = false;
+			// When SHIFT-clicking toolbar icon, don't change mail's status
+			if (modifiers() & B_SHIFT_KEY)
+				keepStatus = true;
+
 			entry_ref orgRef = *fRef;
 			entry_ref nextRef = *fRef;
 			if (GetTrackerWindowFile(&nextRef, (msg->what == M_NEXTMSG))) {
@@ -1607,13 +1644,14 @@ TMailWindow::MessageReceived(BMessage* msg)
 				if (window == NULL) {
 					BNode node(fRef);
 					read_flags currentFlag;
-					if (read_read_attr(node, currentFlag) != B_OK)
-						currentFlag = B_UNREAD;
-					if (fAutoMarkRead == true)
-						MarkMessageRead(fRef, B_READ);
-					else if (currentFlag != B_READ && !wasReadMsg)
-						MarkMessageRead(fRef, B_SEEN);
-
+					if (!keepStatus) {
+						if (read_read_attr(node, currentFlag) != B_OK)
+							currentFlag = B_UNREAD;
+						if (fAutoMarkRead == true)
+							MarkMessageRead(fRef, B_READ);
+						else if (currentFlag != B_READ && !wasReadMsg)
+							MarkMessageRead(fRef, B_SEEN);
+					}
 					OpenMessage(&nextRef, _CurrentCharacterSet());
 				} else {
 					window->Activate();
