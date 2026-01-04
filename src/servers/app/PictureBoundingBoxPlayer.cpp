@@ -33,6 +33,7 @@
 #include <PicturePlayer.h>
 #include <PictureProtocol.h>
 #include <Shape.h>
+#include <StackOrHeapArray.h>
 
 
 //#define DEBUG_TRACE_BB
@@ -194,6 +195,23 @@ public:
 	virtual void ScaleBy(double x, double y);
 	virtual void RotateBy(double angleRadians);
 	virtual void BlendLayer(Layer* layer);
+	virtual void ClipToRect(const BRect& rect, bool inverse);
+	virtual void ClipToShape(int32 opCount, const uint32 opList[], int32 ptCount,
+		const BPoint ptList[], bool inverse);
+	virtual void DrawStringLocations(const char* string, size_t length, const BPoint locations[],
+		size_t locationCount);
+	virtual void DrawRectGradient(const BRect& rect, BGradient& gradient, bool fill);
+	virtual void DrawRoundRectGradient(const BRect& rect, const BPoint& radii, BGradient& gradient,
+		bool fill);
+	virtual void DrawBezierGradient(const BPoint controlPoints[4], BGradient& gradient, bool fill);
+	virtual void DrawArcGradient(const BPoint& center, const BPoint& radii, float startTheta,
+		float arcTheta, BGradient& gradient, bool fill);
+	virtual void DrawEllipseGradient(const BRect& rect, BGradient& gradient, bool fill);
+	virtual void DrawPolygonGradient(size_t numPoints, const BPoint points[], bool isClosed,
+		BGradient& gradient, bool fill);
+	virtual void DrawShapeGradient(const BShape& shape, BGradient& gradient, bool fill);
+	virtual void SetFillRule(int32 fillRule);
+	virtual void StrokeLineGradient(const BPoint& start, const BPoint& end, BGradient& gradient);
 
 private:
 	BoundingBoxState* const fState;
@@ -248,7 +266,7 @@ expand_rect_for_pen_size(BoundingBoxState* state, RectType& rect)
 void
 BoundingBoxCallbacks::MovePenBy(const BPoint& delta)
 {
-	TRACE_BB("%p move pen by %.2f %.2f\n", _state, delta.x, delta.y);
+	TRACE_BB("%p move pen by %.2f %.2f\n", fState, delta.x, delta.y);
 
 	fState->GetDrawState()->SetPenLocation(
 		fState->GetDrawState()->PenLocation() + delta);
@@ -259,7 +277,7 @@ void
 BoundingBoxCallbacks::StrokeLine(const BPoint& _start,
 	const BPoint& _end)
 {
-	TRACE_BB("%p stroke line %.2f %.2f -> %.2f %.2f\n", _state,
+	TRACE_BB("%p stroke line %.2f %.2f -> %.2f %.2f\n", fState,
 		_start.x, _start.y, _end.x, _end.y);
 
 	BPoint start = _start;
@@ -295,7 +313,7 @@ BoundingBoxCallbacks::StrokeLine(const BPoint& _start,
 void
 BoundingBoxCallbacks::DrawRect(const BRect& _rect, bool fill)
 {
-	TRACE_BB("%p draw rect fill=%d %.2f %.2f %.2f %.2f\n", _state, fill,
+	TRACE_BB("%p draw rect fill=%d %.2f %.2f %.2f %.2f\n", fState, fill,
 		_rect.left, _rect.top, _rect.right, _rect.bottom);
 
 	BRect rect = _rect;
@@ -344,7 +362,7 @@ BoundingBoxCallbacks::DrawBezier(const BPoint viewPoints[4], bool fill)
 {
 	TRACE_BB("%p draw bezier fill=%d (%.2f %.2f) (%.2f %.2f) "
 		"(%.2f %.2f) (%.2f %.2f)\n",
-		_state,
+		fState,
 		fill,
 		viewPoints[0].x, viewPoints[0].y,
 		viewPoints[1].x, viewPoints[1].y,
@@ -362,7 +380,7 @@ BoundingBoxCallbacks::DrawBezier(const BPoint viewPoints[4], bool fill)
 void
 BoundingBoxCallbacks::DrawEllipse(const BRect& _rect, bool fill)
 {
-	TRACE_BB("%p draw ellipse fill=%d (%.2f %.2f) (%.2f %.2f)\n", _state, fill,
+	TRACE_BB("%p draw ellipse fill=%d (%.2f %.2f) (%.2f %.2f)\n", fState, fill,
 		_rect.left, _rect.top, _rect.right, _rect.bottom);
 
 	BRect rect = _rect;
@@ -390,27 +408,9 @@ determine_bounds_polygon(BoundingBoxState* state, int32 numPoints,
 	if (numPoints <= 0)
 		return;
 
-	if (numPoints <= 200) {
-		// fast path: no malloc/free, also avoid
-		// constructor/destructor calls
-		char data[200 * sizeof(BPoint)];
-		BPoint* points = (BPoint*)data;
-
-		state->PenToLocalTransform().Apply(points, viewPoints, numPoints);
-		get_polygon_frame(points, numPoints, &outRect);
-
-	} else {
-		 // avoid constructor/destructor calls by
-		 // using malloc instead of new []
-		BPoint* points = (BPoint*)malloc(numPoints * sizeof(BPoint));
-		if (points == NULL)
-			return;
-
-		state->PenToLocalTransform().Apply(points, viewPoints, numPoints);
-		get_polygon_frame(points, numPoints, &outRect);
-
-		free(points);
-	}
+	BStackOrHeapArray<BPoint, 200> points(numPoints);
+	state->PenToLocalTransform().Apply(points, viewPoints, numPoints);
+	get_polygon_frame(points, numPoints, &outRect);
 }
 
 
@@ -769,7 +769,155 @@ BoundingBoxCallbacks::BlendLayer(Layer* layer)
 }
 
 
-// #pragma mark - PictureBoundingBoxPlayer
+void
+BoundingBoxCallbacks::DrawRectGradient(const BRect& _rect, BGradient& gradient, bool fill)
+{
+	TRACE_BB("%p draw rect gradient fill=%d %.2f %.2f %.2f %.2f\n", fState, fill,
+		_rect.left, _rect.top, _rect.right, _rect.bottom);
+
+	BRect rect = _rect;
+	const SimpleTransform transform = fState->PenToLocalTransform();
+	transform.Apply(&rect);
+	transform.Apply(&gradient);
+	if (!fill)
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
+}
+
+
+void
+BoundingBoxCallbacks::DrawRoundRectGradient(const BRect& rect, const BPoint& radii,
+	BGradient& gradient, bool fill)
+{
+	TRACE_BB("%p draw round rect gradient fill=%d %.2f %.2f %.2f %.2f\n", fState, fill,
+		rect.left, rect.top, rect.right, rect.bottom);
+	DrawRectGradient(rect, gradient, fill);
+}
+
+
+void
+BoundingBoxCallbacks::DrawBezierGradient(const BPoint controlPoints[4], BGradient& gradient,
+	bool fill)
+{
+	TRACE_BB("%p draw bezier gradient fill=%d (%.2f %.2f) (%.2f %.2f) "
+		"(%.2f %.2f) (%.2f %.2f)\n",
+		fState,
+		fill,
+		viewPoints[0].x, viewPoints[0].y,
+		viewPoints[1].x, viewPoints[1].y,
+		viewPoints[2].x, viewPoints[2].y,
+		viewPoints[3].x, viewPoints[3].y);
+
+	BRect rect;
+	determine_bounds_bezier(fState, controlPoints, rect);
+	fState->PenToLocalTransform().Apply(&gradient);
+	if (!fill)
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
+}
+
+
+void
+BoundingBoxCallbacks::DrawEllipseGradient(const BRect& _rect, BGradient& gradient, bool fill)
+{
+	TRACE_BB("%p draw ellipse gradient fill=%d (%.2f %.2f) (%.2f %.2f)\n", fState, fill,
+		_rect.left, _rect.top, _rect.right, _rect.bottom);
+
+	BRect rect = _rect;
+	const SimpleTransform transform = fState->PenToLocalTransform();
+	transform.Apply(&rect);
+	transform.Apply(&gradient);
+	if (!fill)
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
+}
+
+
+void
+BoundingBoxCallbacks::DrawArcGradient(const BPoint& center, const BPoint& radii, float startTheta,
+	float arcTheta, BGradient& gradient, bool fill)
+{
+	BRect rect(center.x - radii.x, center.y - radii.y,
+		center.x + radii.x - 1, center.y + radii.y - 1);
+	DrawEllipseGradient(rect, gradient, fill);
+}
+
+
+void
+BoundingBoxCallbacks::DrawPolygonGradient(size_t numPoints, const BPoint points[], bool isClosed,
+	BGradient& gradient, bool fill)
+{
+	TRACE_BB("%p draw polygon fill=%d (%ld points)\n", fState, fill, numPoints);
+	if (numPoints <= 0)
+		return;
+
+	BRect rect;
+	determine_bounds_polygon(fState, numPoints, points, rect);
+	fState->PenToLocalTransform().Apply(&gradient);
+	if (!fill)
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
+}
+
+
+void
+BoundingBoxCallbacks::DrawShapeGradient(const BShape& shape, BGradient& gradient, bool fill)
+{
+	BRect rect = shape.Bounds();
+
+	// FIXME: this doesn't work - ShapePainter uses ScreenTransform unconditionally
+	TRACE_BB("%p stroke shape gradient (bounds %.2f %.2f %.2f %.2f)\n", fState,
+		rect.left, rect.top, rect.right, rect.bottom);
+
+	const SimpleTransform transform = fState->PenToLocalTransform();
+	transform.Apply(&rect);
+	transform.Apply(&gradient);
+	if (!fill)
+		expand_rect_for_pen_size(fState, rect);
+	fState->IncludeRect(rect);
+}
+
+
+void
+BoundingBoxCallbacks::ClipToRect(const BRect& rect, bool inverse)
+{
+	// TODO
+}
+
+
+void
+BoundingBoxCallbacks::ClipToShape(int32 opCount, const uint32 opList[], int32 ptCount,
+	const BPoint ptList[], bool inverse)
+{
+	// TODO
+}
+
+
+void
+BoundingBoxCallbacks::DrawStringLocations(const char* string, size_t length,
+	const BPoint locations[], size_t locationCount)
+{
+	// TODO
+}
+
+
+void
+BoundingBoxCallbacks::SetFillRule(int32 fillRule)
+{
+	// TODO
+}
+
+
+void
+BoundingBoxCallbacks::StrokeLineGradient(const BPoint& start, const BPoint& end,
+	BGradient& gradient)
+{
+	TRACE_BB("%p stroke line gradient %.2f %.2f -> %.2f %.2f\n", fState,
+		start.x, start.y, end.x, end.y);
+	const SimpleTransform transform = fState->PenToLocalTransform();
+	transform.Apply(&gradient);
+	StrokeLine(start, end);
+}
 
 
 /* static */ void

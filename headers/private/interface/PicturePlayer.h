@@ -208,8 +208,7 @@ public:
 		BGradient& gradient, bool fill) {}
 	virtual void DrawShapeGradient(const BShape& shape, BGradient& gradient, bool fill) {}
 	virtual void SetFillRule(int32 fillRule) {}
-	virtual void StrokeLineGradient(const BPoint& start, const BPoint& end,
-		const BGradient& gradient) {}
+	virtual void StrokeLineGradient(const BPoint& start, const BPoint& end, BGradient& gradient) {}
 };
 
 

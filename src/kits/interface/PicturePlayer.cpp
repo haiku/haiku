@@ -101,8 +101,7 @@ public:
 		BGradient& gradient, bool fill);
 	virtual void DrawShapeGradient(const BShape& shape, BGradient& gradient, bool fill);
 	virtual void SetFillRule(int32 fillRule);
-	virtual void StrokeLineGradient(const BPoint& start, const BPoint& end,
-		const BGradient& gradient);
+	virtual void StrokeLineGradient(const BPoint& start, const BPoint& end, BGradient& gradient);
 
 private:
 	void* fUserData;
@@ -626,7 +625,7 @@ CallbackAdapterPlayer::SetFillRule(int32 fillRule)
 
 
 void
-CallbackAdapterPlayer::StrokeLineGradient(const BPoint& start, const BPoint& end, const BGradient& gradient)
+CallbackAdapterPlayer::StrokeLineGradient(const BPoint& start, const BPoint& end, BGradient& gradient)
 {
 	fCallbacks->stroke_line_gradient(fUserData, start, end, gradient);
 }
