@@ -411,7 +411,7 @@ i2c_hid_register_child_devices(void *cookie)
 		// might have been unplugged. So we just generate names
 		// until we find one that is not currently in use.
 		int32 index = 0;
-		char pathBuffer[128];
+		char pathBuffer[B_DEV_NAME_LENGTH];
 		const char *basePath = handler->BasePath();
 		while (true) {
 			sprintf(pathBuffer, "%s%" B_PRId32, basePath, index++);

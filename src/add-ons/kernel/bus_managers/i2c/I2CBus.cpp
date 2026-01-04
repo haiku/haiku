@@ -132,7 +132,7 @@ i2c_init_bus(device_node *node, void **_bus)
 
 	*_bus = bus;
 
-	char name[128];
+	char name[B_DEV_NAME_LENGTH];
 	snprintf(name, sizeof(name), "bus/i2c/%d/bus_raw", pathID);
 
 	return gDeviceManager->publish_device(node, name, I2C_BUS_RAW_MODULE_NAME);

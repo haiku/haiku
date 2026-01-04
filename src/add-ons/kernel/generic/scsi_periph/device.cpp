@@ -23,7 +23,7 @@ char *
 periph_compose_device_name(device_node *node, const char *prefix)
 {
 	uint8 pathID, targetID, targetLUN, type;
-	char name[128];
+	char name[B_DEV_NAME_LENGTH];
 	uint32 channel;
 
 	if (gDeviceManager->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &pathID, true) != B_OK

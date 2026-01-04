@@ -243,7 +243,7 @@ amd_thermal_register_child_devices(void* _cookie)
 {
 	device_node* node = (device_node*)_cookie;
 	int path_id;
-	char name[128];
+	char name[B_DEV_NAME_LENGTH];
 
 	path_id = sDeviceManager->create_id(AMD_THERMAL_PATHID_GENERATOR);
 	if (path_id < 0) {

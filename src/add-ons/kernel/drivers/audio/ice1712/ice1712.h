@@ -130,7 +130,7 @@ typedef struct ice1712
 {
 	uint32 irq;
 	pci_info info;
-	char name[128];
+	char name[B_DEV_NAME_LENGTH];
 
 	ice1712Midi midiItf[MAX_MIDI_INTERFACE];
 

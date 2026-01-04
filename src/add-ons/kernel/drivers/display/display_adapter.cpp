@@ -236,7 +236,7 @@ register_displays(const char *parentName, device_node *node)
 		gDeviceManager->register_node(node, DISPLAY_DEVICE_MODULE_NAME, attrs,
 				NULL, &deviceNode);
 
-		char deviceName[128];
+		char deviceName[B_DEV_NAME_LENGTH];
 		snprintf(deviceName, sizeof(deviceName), "%s/%s", parentName, name);
 		gDeviceManager->publish_device(parent, deviceName,
 			DISPLAY_DEVICE_MODULE_NAME);
@@ -288,7 +288,7 @@ displayadapter_register_child_devices(void *_cookie)
 		return B_ERROR;
 	}
 
-	char name[128];
+	char name[B_DEV_NAME_LENGTH];
 	snprintf(name, sizeof(name), DISPLAYADAPTER_BASENAME, path_id);
 	status_t status = gDeviceManager->publish_device(node, name,
 		DISPLAYADAPTER_DEVICE_MODULE_NAME);

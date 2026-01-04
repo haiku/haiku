@@ -337,7 +337,7 @@ i2c_elan_register_child_devices(void *cookie)
 	// might have been unplugged. So we just generate names
 	// until we find one that is not currently in use.
 	int32 index = 0;
-	char pathBuffer[128];
+	char pathBuffer[B_DEV_NAME_LENGTH];
 	while (true) {
 		sprintf(pathBuffer, "input/mouse/" DEVICE_PATH_SUFFIX "/%" B_PRId32, index++);
 		if (gDeviceList->FindDevice(pathBuffer) == NULL) {

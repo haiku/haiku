@@ -294,7 +294,7 @@ acpi_lid_register_child_devices(void *_cookie)
 {
 	acpi_lid_device_info *device = (acpi_lid_device_info *)_cookie;
 	int path_id;
-	char name[128];
+	char name[B_DEV_NAME_LENGTH];
 
 	path_id = sDeviceManager->create_id(ACPI_LID_PATHID_GENERATOR);
 	if (path_id < 0) {

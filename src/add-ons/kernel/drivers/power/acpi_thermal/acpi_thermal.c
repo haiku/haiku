@@ -319,7 +319,7 @@ acpi_thermal_register_child_devices(void* _cookie)
 {
 	device_node* node = _cookie;
 	int path_id;
-	char name[128];
+	char name[B_DEV_NAME_LENGTH];
 
 	path_id = sDeviceManager->create_id(ACPI_THERMAL_PATHID_GENERATOR);
 	if (path_id < 0) {

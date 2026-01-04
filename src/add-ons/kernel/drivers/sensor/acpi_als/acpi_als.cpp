@@ -305,7 +305,7 @@ acpi_als_register_child_devices(void *cookie)
 		return B_ERROR;
 	}
 
-	char name[128];
+	char name[B_DEV_NAME_LENGTH];
 	snprintf(name, sizeof(name), ACPI_ALS_BASENAME, pathID);
 
 	return sDeviceManager->publish_device(device->node, name,
