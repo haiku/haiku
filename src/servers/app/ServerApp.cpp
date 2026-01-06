@@ -2867,9 +2867,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 8) uint32 - flags
 			// 9) font_metric_mode - mode
 			// 10) int32 numStrings
-			// 11) escapement_delta - additional delta (numStrings times)
-			// 12) int32 string length to measure (numStrings times)
-			// 13) string - string (numStrings times)
+			// 11) string - string (numStrings times)
+			// 12) escapement_delta - additional delta (numStrings times)
 
 			// Returns:
 			// 1) BRect - rects with numStrings entries
@@ -2908,8 +2907,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				// This version of ReadString allocates the strings, we free
 				// them below
 				link.ReadString(&stringArray[i], &lengthArray[i]);
-				link.Read<escapement_delta>(&deltaArray[i]);
 			}
+			for (int32 i = 0; i < numStrings; i++)
+				link.Read<escapement_delta>(&deltaArray[i]);
 
 			ServerFont font;
 			status_t status = font.SetFamilyAndStyle(familyID, styleID,

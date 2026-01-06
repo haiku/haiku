@@ -1290,18 +1290,16 @@ BFont::GetBoundingBoxesForStrings(const char* stringArray[], int32 numStrings,
 	link.Attach<font_metric_mode>(mode);
 	link.Attach<int32>(numStrings);
 
+	for (int32 i = 0; i < numStrings; i++)
+		link.AttachString(stringArray[i]);
+
 	if (deltas) {
-		for (int32 i = 0; i < numStrings; i++) {
-			link.AttachString(stringArray[i]);
+		for (int32 i = 0; i < numStrings; i++)
 			link.Attach<escapement_delta>(deltas[i]);
-		}
 	} else {
 		escapement_delta emptyDelta = {0, 0};
-
-		for (int32 i = 0; i < numStrings; i++) {
-			link.AttachString(stringArray[i]);
+		for (int32 i = 0; i < numStrings; i++)
 			link.Attach<escapement_delta>(emptyDelta);
-		}
 	}
 
 	if (link.FlushWithReply(code) != B_OK || code != B_OK)
