@@ -415,6 +415,13 @@ Worker::WaitForJob(Job* waitingJob, const JobKey& key)
 	if (job == NULL)
 		return JOB_DEPENDENCY_NOT_FOUND;
 
+	if (waitingJob->Dependency() == job)
+		return waitingJob->WaitStatus();
+	if (job == waitingJob)
+		debugger("Jobs can't depend on themselves");
+	if (waitingJob->Dependency() != NULL)
+		debugger("Job already has a dependency");
+
 	waitingJob->SetWaitStatus(JOB_DEPENDENCY_ACTIVE);
 	waitingJob->SetDependency(job);
 	job->DependentJobs().Add(waitingJob);
