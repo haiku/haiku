@@ -977,8 +977,10 @@ probe_elantech(ps2_dev* dev)
 	}
 
 	// TODO: Update supported after testing all versions.
-	// Only hardware version 4 devices are supported as of now, the other are untested.
-	bool supported = v4 || !v3 || !v2 || !v1;
+	// Only hardware version 4 devices are known to be supported as of now.
+	// v2 is known to be broken, see #19874.
+	(void)v2;
+	bool supported = v4 || v3 || v1;
 
 	if (supported && v3) {
 		uint8 samples[3];
