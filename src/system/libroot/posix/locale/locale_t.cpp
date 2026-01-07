@@ -260,6 +260,17 @@ uselocale(locale_t newLoc)
 }
 
 
+extern "C" const char*
+getlocalename_l(int category, locale_t l)
+{
+	LocaleBackend* backend = (l == LC_GLOBAL_LOCALE) ?
+		gGlobalLocaleBackend : (LocaleBackend*)((LocaleBackendData*)l)->backend;
+	if (backend == NULL)
+		return "POSIX";
+	return backend->SetLocale(category, NULL);
+}
+
+
 extern "C" locale_t
 __current_locale_t()
 {

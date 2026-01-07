@@ -28,13 +28,8 @@ setlocale(int category, const char* locale)
 	if (category < 0 || category > LC_LAST)
 		return NULL;
 
-	if (locale == NULL) {
-		// query the locale of the given category
-		if (gGlobalLocaleBackend != NULL)
-			return const_cast<char*>(gGlobalLocaleBackend->SetLocale(category, NULL));
-		else
-			return const_cast<char*>("POSIX");
-	}
+	if (locale == NULL)
+		return const_cast<char*>(getlocalename_l(category, LC_GLOBAL_LOCALE));
 
 	// we may have to invoke SetLocale once for each category, so we use an
 	// array to collect the locale per category
