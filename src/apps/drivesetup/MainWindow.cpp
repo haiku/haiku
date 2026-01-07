@@ -529,6 +529,9 @@ MainWindow::MessageReceived(BMessage* message)
 				fRegisterFilePanel = new(std::nothrow) BFilePanel(B_OPEN_PANEL,
 					new BMessenger(this), NULL, B_FILE_NODE, false,
 					new BMessage(MSG_REGISTER), NULL, true);
+				fRegisterFilePanel->Window()->SetTitle(B_TRANSLATE(
+					"DriveSetup: Register disk image"));
+				fRegisterFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Register"));
 			}
 
 			if (fRegisterFilePanel != NULL)
@@ -566,6 +569,9 @@ MainWindow::MessageReceived(BMessage* message)
 					fWriteImageFilePanel = new(std::nothrow) BFilePanel(
 						B_OPEN_PANEL, new BMessenger(this), NULL, B_FILE_NODE,
 						false, new BMessage(MSG_WRITE), NULL, true);
+					fWriteImageFilePanel->Window()->SetTitle(B_TRANSLATE(
+						"DriveSetup: Select disk image"));
+					fWriteImageFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Write"));
 				}
 				if (fWriteImageFilePanel != NULL)
 					fWriteImageFilePanel->Show();
@@ -581,6 +587,7 @@ MainWindow::MessageReceived(BMessage* message)
 				fReadImageFilePanel = new(std::nothrow) BFilePanel(B_SAVE_PANEL,
 					new BMessenger(this), NULL, B_FILE_NODE, false, NULL, NULL,
 					true);
+				fReadImageFilePanel->Window()->SetTitle(B_TRANSLATE("DriveSetup: Save disk image"));
 			}
 
 			if (fReadImageFilePanel != NULL) {
