@@ -27,6 +27,7 @@ uname(struct utsname *info)
 	const char *haikuRevision;
 	uint32 count = 1;
 	status_t error;
+	const char* release = NULL;
 
 	if (!info) {
 		__set_errno(B_BAD_VALUE);
@@ -46,7 +47,6 @@ uname(struct utsname *info)
 	strlcat(info->version, " ", sizeof(info->version));
 	strlcat(info->version, systemInfo.kernel_build_time, sizeof(info->version));
 
-	const char* release = NULL;
 	switch (systemInfo.kernel_version) {
 		case B_HAIKU_VERSION_1_PRE_BETA_5:	release = "R1~beta4+development"; break;
 		case B_HAIKU_VERSION_1_BETA_5:		release = "R1~beta5"; break;
