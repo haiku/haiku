@@ -148,6 +148,7 @@ KernelMergeObject kernel_lib_posix.o :
 	strspn.c
 	strstr.c
 	strtok.c
+	strtok_r.c
 	strupr.c
 
 	$(muslSources)
