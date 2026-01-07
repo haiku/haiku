@@ -49,6 +49,7 @@
 #define _POSIX_CHOWN_RESTRICTED				(1)
 #define _POSIX_CLOCK_SELECTION				(200809L)
 #define _POSIX_CPUTIME						(200809L)
+#define _POSIX_DEVICE_CONTROL				(202405L)
 #define _POSIX_FSYNC						(200809L)
 #define _POSIX_IPV6							(200809L)
 #define _POSIX_JOB_CONTROL					(1)
@@ -305,6 +306,8 @@
 #define _SC_THREAD_KEYS_MAX				140
 #define _SC_THREAD_THREADS_MAX			141
 #define _SC_RE_DUP_MAX					142
+
+#define _SC_DEVICE_CONTROL				143
 
 
 /* confstr() constants */

@@ -169,6 +169,8 @@ __sysconf(int name)
 			return _POSIX_CLOCK_SELECTION;
 		case _SC_CPUTIME:
 			return _POSIX_CPUTIME;
+		case _SC_DEVICE_CONTROL:
+			return _POSIX_DEVICE_CONTROL;
 		case _SC_FSYNC:
 			return _POSIX_FSYNC;
 		case _SC_IPV6:
