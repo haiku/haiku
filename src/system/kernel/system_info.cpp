@@ -42,7 +42,7 @@
 #include <vm/vm_page.h>
 
 
-const static int64 kKernelVersion = 0x1;
+const static int64 kKernelVersion = B_HAIKU_VERSION;
 const static char *kKernelName = "kernel_" HAIKU_ARCH;
 
 
