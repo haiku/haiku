@@ -27,6 +27,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			strpbrk.c
 			strspn.c
 			strstr.c
+			strtok_r.c
 			swab.c
 			;
 	}
