@@ -1,6 +1,6 @@
 #include <string.h>
 
-char *strtok_r(char *restrict s, const char *restrict sep, char **restrict p)
+char *strtok_r(char *s, const char *sep, char **p)
 {
 	if (!s && !(s = *p)) return NULL;
 	s += strspn(s, sep);
