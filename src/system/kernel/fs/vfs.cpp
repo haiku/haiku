@@ -5431,8 +5431,10 @@ open_vnode(struct vnode* vnode, int openMode, bool kernel)
 
 
 /*!
-	Calls fs_open() on the given vnode and returns a new
-	file descriptor for it
+	Creates a new regular file and returns a new file descriptor for it.
+
+	If O_EXCL is not specified and an entry already exists at the path,
+	then that entry will be opened and returned instead.
 */
 static int
 create_vnode(struct vnode* directory, const char* name, int openMode,
@@ -5498,6 +5500,8 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 			if (!create) {
 				if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
 					return B_LINK_LIMIT;
+				if (S_ISDIR(vnode->Type()))
+					return B_IS_A_DIRECTORY;
 
 				int fd = open_vnode(vnode.Get(), openMode & ~O_CREAT, kernel);
 				// on success keep the vnode reference for the FD
