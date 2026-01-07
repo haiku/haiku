@@ -21,7 +21,8 @@ typedef struct _sem_t {
 	int32_t padding[2];
 } sem_t;
 
-#define SEM_FAILED	((sem_t*)(long)-1)
+#define SEM_FAILED		((sem_t*)(long)-1)
+#define SEM_VALUE_MAX	INT_MAX
 
 __BEGIN_DECLS
 

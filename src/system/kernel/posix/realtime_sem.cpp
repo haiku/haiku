@@ -679,7 +679,7 @@ _user_realtime_sem_open(const char* userName, int openFlagsOrShared,
 	if (context == NULL)
 		return B_NO_MEMORY;
 
-	if (semCount > MAX_POSIX_SEM_VALUE)
+	if (semCount > SEM_VALUE_MAX)
 		return B_BAD_VALUE;
 
 	// userSem must always be given

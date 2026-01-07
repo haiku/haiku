@@ -8,6 +8,7 @@
 
 #include <errno.h>
 #include <limits.h>
+#include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -96,7 +97,7 @@ __sysconf(int name)
 			// unlimited, instead of _POSIX_SEM_NSEMS_MAX
 			return -1;
 		case _SC_SEM_VALUE_MAX:
-			return _POSIX_SEM_VALUE_MAX;
+			return SEM_VALUE_MAX;
 		case _SC_IOV_MAX:
 			return IOV_MAX;
 		case _SC_NPROCESSORS_CONF:
