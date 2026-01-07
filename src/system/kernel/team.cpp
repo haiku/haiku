@@ -3059,8 +3059,10 @@ team_set_foreground_process_group(void* tty, pid_t processGroupID)
 	{
 		InterruptsSpinLocker groupHashLocker(sGroupHashLock);
 		ProcessGroup* group = sGroupHash.Lookup(processGroupID);
-		if (group == NULL || group->Session() != session)
+		if (group == NULL)
 			return B_BAD_VALUE;
+		if (group->Session() != session)
+			return EPERM;
 	}
 
 	// If we are a background group, we can do that unharmed only when we
