@@ -54,6 +54,7 @@ local muslSources =
 	ffsll.c
 	rand.c
 	rand_r.c
+	strtok_r.c
 	;
 
 SourceHdrs $(muslSources) :
@@ -148,7 +149,6 @@ KernelMergeObject kernel_lib_posix.o :
 	strspn.c
 	strstr.c
 	strtok.c
-	strtok_r.c
 	strupr.c
 
 	$(muslSources)
