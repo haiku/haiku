@@ -511,15 +511,10 @@ fs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* st)
 static status_t
 fs_open(fs_volume* /*_volume*/, fs_vnode* _node, int openMode, void** /*cookie*/)
 {
-	iso9660_inode* node = (iso9660_inode*)_node->private_node;
-
 	// Do not allow any of the write-like open modes to get by
 	if ((openMode & O_RWMASK) == O_WRONLY || (openMode & O_RWMASK) == O_RDWR
 		|| (openMode & O_TRUNC) != 0 || (openMode & O_CREAT) != 0)
 		return EROFS;
-
-	if ((openMode & O_DIRECTORY) != 0 && (node->flags & ISO_IS_DIR) == 0)
-		return B_NOT_A_DIRECTORY;
 
 	return B_OK;
 }

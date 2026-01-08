@@ -600,8 +600,6 @@ rootfs_open(fs_volume* _volume, fs_vnode* _v, int openMode, void** _cookie)
 
 	if (S_ISDIR(vnode->stream.type) && (openMode & O_RWMASK) != O_RDONLY)
 		return B_IS_A_DIRECTORY;
-	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(vnode->stream.type))
-		return B_NOT_A_DIRECTORY;
 
 	status_t status = rootfs_check_permissions(vnode, open_mode_to_access(openMode));
 	if (status != B_OK)

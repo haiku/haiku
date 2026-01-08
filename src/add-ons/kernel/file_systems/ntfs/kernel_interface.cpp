@@ -816,8 +816,6 @@ fs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	// opening a directory read-only is allowed (but no data can be read)
 	if ((node->mode & S_IFDIR) != 0 && (openMode & O_RWMASK) != 0)
 		return B_IS_A_DIRECTORY;
-	if ((openMode & O_DIRECTORY) != 0 && (node->mode & S_IFDIR) == 0)
-		return B_NOT_A_DIRECTORY;
 
 	status_t status = fs_access(_volume, _node, open_mode_to_access(openMode));
 	if (status != B_OK)

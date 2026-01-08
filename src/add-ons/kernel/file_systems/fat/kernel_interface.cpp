@@ -2177,8 +2177,6 @@ dosfs_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 	// any data from it.
 	if (bsdNode->v_type == VDIR && (openMode & O_RWMASK) != O_RDONLY)
 		return B_IS_A_DIRECTORY;
-	if ((openMode & O_DIRECTORY) != 0 && bsdNode->v_type != VDIR)
-		return B_NOT_A_DIRECTORY;
 
 	if ((bsdVolume->mnt_flag & MNT_RDONLY) != 0 || (fatNode->de_Attributes & ATTR_READONLY) != 0)
 		openMode = (openMode & ~O_RWMASK) | O_RDONLY;

@@ -555,9 +555,6 @@ open_file(Volume* volume, Node* node, int openMode, Transaction& transaction,
 			return B_IS_A_DIRECTORY;
 	}
 
-	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(node->Mode()))
-		return B_NOT_A_DIRECTORY;
-
 	status_t error = check_access(node, accessFlags);
 	if (error != B_OK)
 		return error;

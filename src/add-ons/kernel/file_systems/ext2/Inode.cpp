@@ -523,8 +523,6 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 
 			if (inode->IsDirectory() && (openMode & O_RWMASK) != O_RDONLY)
 				return B_IS_A_DIRECTORY;
-			if ((openMode & O_DIRECTORY) != 0 && !inode->IsDirectory())
-				return B_NOT_A_DIRECTORY;
 
 			if (inode->CheckPermissions(open_mode_to_access(openMode)) != B_OK)
 				return B_NOT_ALLOWED;

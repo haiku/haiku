@@ -573,9 +573,6 @@ OverlayInode::Open(int openMode, void **_cookie)
 	if (!fHasStat)
 		_PopulateStat();
 
-	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(fStat.st_mode))
-		return B_NOT_A_DIRECTORY;
-
 	open_cookie *cookie = (open_cookie *)malloc(sizeof(open_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;

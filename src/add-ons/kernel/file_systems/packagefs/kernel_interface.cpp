@@ -423,8 +423,6 @@ packagefs_open(fs_volume* fsVolume, fs_vnode* fsNode, int openMode,
 	// check the open mode and permissions
 	if (S_ISDIR(node->Mode()) && (openMode & O_RWMASK) != O_RDONLY)
 		return B_IS_A_DIRECTORY;
-	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(node->Mode()))
-		return B_NOT_A_DIRECTORY;
 
 	if ((openMode & O_RWMASK) != O_RDONLY)
 		return B_NOT_ALLOWED;

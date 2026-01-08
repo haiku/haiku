@@ -5414,6 +5414,8 @@ check_open_mode(struct vnode* vnode, int openMode)
 
 	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
 		return B_LINK_LIMIT;
+	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(vnode->Type()))
+		return B_NOT_A_DIRECTORY;
 
 	return B_OK;
 }

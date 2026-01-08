@@ -964,8 +964,6 @@ ramfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	// directory can be opened read-only
 	if (node->IsDirectory() && (openMode & O_RWMASK) != O_RDONLY)
 		error = B_IS_A_DIRECTORY;
-	if (error == B_OK && (openMode & O_DIRECTORY) != 0 && !node->IsDirectory())
-		error = B_NOT_A_DIRECTORY;
 
 	int accessMode = open_mode_to_access(openMode);
 	// check open mode against permissions

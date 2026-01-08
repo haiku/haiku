@@ -1125,8 +1125,6 @@ ext2_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	// any data from it.
 	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0)
 		return B_IS_A_DIRECTORY;
-	if ((openMode & O_DIRECTORY) != 0 && !inode->IsDirectory())
-		return B_NOT_A_DIRECTORY;
 
 	status_t status =  inode->CheckPermissions(open_mode_to_access(openMode));
 	if (status != B_OK)
