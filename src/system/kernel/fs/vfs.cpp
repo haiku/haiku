@@ -2849,11 +2849,6 @@ get_new_fd(struct fd_ops* ops, struct fs_mount* mount, struct vnode* vnode,
 			&& (ops == &sFileOps || ops == &sDirectoryOps))
 		return B_BUSY;
 
-	if ((openMode & O_RDWR) != 0 && (openMode & O_WRONLY) != 0)
-		return B_BAD_VALUE;
-	if ((openMode & O_RWMASK) == O_RDONLY && (openMode & O_TRUNC) != 0)
-		return B_NOT_ALLOWED;
-
 	descriptor = alloc_fd();
 	if (!descriptor)
 		return B_NO_MEMORY;
@@ -5409,6 +5404,21 @@ vfs_init(kernel_args* args)
 //	#pragma mark - fd_ops implementations
 
 
+static status_t
+check_open_mode(struct vnode* vnode, int openMode)
+{
+	if ((openMode & O_RDWR) != 0 && (openMode & O_WRONLY) != 0)
+		return B_BAD_VALUE;
+	if ((openMode & O_RWMASK) == O_RDONLY && (openMode & O_TRUNC) != 0)
+		return B_NOT_ALLOWED;
+
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
+		return B_LINK_LIMIT;
+
+	return B_OK;
+}
+
+
 /*!
 	Calls fs_open() on the given vnode and returns a new
 	file descriptor for it
@@ -5416,8 +5426,12 @@ vfs_init(kernel_args* args)
 static int
 open_vnode(struct vnode* vnode, int openMode, bool kernel)
 {
+	status_t status = check_open_mode(vnode, openMode);
+	if (status != B_OK)
+		return status;
+
 	void* cookie;
-	status_t status = FS_CALL(vnode, open, openMode, &cookie);
+	status = FS_CALL(vnode, open, openMode, &cookie);
 	if (status != B_OK)
 		return status;
 
@@ -5498,8 +5512,6 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 			}
 
 			if (!create) {
-				if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
-					return B_LINK_LIMIT;
 				if (S_ISDIR(vnode->Type()))
 					return B_IS_A_DIRECTORY;
 
@@ -5668,9 +5680,6 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
-		return B_LINK_LIMIT;
-
 	int newFD = open_vnode(vnode.Get(), openMode, kernel);
 	if (newFD >= 0) {
 		cache_node_opened(vnode.Get(), vnode->cache, mountID,
@@ -5699,9 +5708,6 @@ file_open(int fd, char* path, int openMode, bool kernel)
 		&parentID, kernel);
 	if (status != B_OK)
 		return status;
-
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
-		return B_LINK_LIMIT;
 
 	// open the vnode
 	int newFD = open_vnode(vnode.Get(), openMode, kernel);
@@ -6904,8 +6910,9 @@ attr_create(int fd, char* path, const char* name, uint32 type,
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
-		return B_LINK_LIMIT;
+	status = check_open_mode(vnode.Get(), openMode);
+	if (status != B_OK)
+		return status;
 
 	if (!HAS_FS_CALL(vnode, create_attr))
 		return B_READ_ONLY_DEVICE;
@@ -6945,8 +6952,9 @@ attr_open(int fd, char* path, const char* name, int openMode, bool kernel)
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
-		return B_LINK_LIMIT;
+	status = check_open_mode(vnode.Get(), openMode);
+	if (status != B_OK)
+		return status;
 
 	if (!HAS_FS_CALL(vnode, open_attr))
 		return B_UNSUPPORTED;
