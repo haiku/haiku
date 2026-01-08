@@ -409,6 +409,8 @@ MainWindow::~MainWindow()
 	delete fRegisterFilePanel;
 	delete fReadImageFilePanel;
 	delete fWriteImageFilePanel;
+
+	delete fNotification;
 }
 
 
@@ -628,11 +630,14 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_COMPLETE:
 		{
 			const char* status = "";
+			const char* jobid = "";
 
 			message->FindString("status", &status);
+			message->FindString("jobid", &jobid);
 
 			fNotification->SetTitle(BString(B_TRANSLATE("Disk image")));
 			fNotification->SetContent(BString(status));
+			fNotification->SetMessageID(BString(jobid));
 			fNotification->Send();
 
 			break;
@@ -942,30 +947,9 @@ MainWindow::SaveDiskImage(void* data)
 		return -1;
 	}
 
-	size_t bufsize = 1024*1024;
-	off_t sourcesize, targetsize;
-	ssize_t targetbytes = 0;
-
-	source.GetSize(&sourcesize);
-
-	char* buffer = (char*)malloc(bufsize);
-	while (true) {
-		ssize_t bytes = source.Read(buffer, bufsize);
-
-		if (bytes > 0) {
-			target.Write(buffer, (size_t)bytes);
-			target.GetSize(&targetsize);
-
-			targetbytes += bytes;
-		} else
-			break;
-	}
-	free(buffer);
-
-	BMessage message(MSG_COMPLETE);
-	message.AddString("status",
-		B_TRANSLATE("Disk image successfully created."));
-	messenger.SendMessage(&message);
+	_WriteDiskImage(messenger, source, target, targetpath,
+		BString(B_TRANSLATE("Creating disk image")),
+		BString(B_TRANSLATE("Disk image successfully created.")));
 
 	return 0;
 }
@@ -1012,11 +996,31 @@ MainWindow::WriteDiskImage(void* data)
 		return -1;
 	}
 
+	_WriteDiskImage(messenger, source, target, targetpath,
+		BString(B_TRANSLATE("Writing image to disk")),
+		BString(B_TRANSLATE("Disk image successfully written to the target.")));
+
+	return 0;
+}
+
+
+void
+MainWindow::_WriteDiskImage(BMessenger messenger, BFile source, BFile target,
+	const char* targetpath, BString title, BString status)
+{
 	size_t bufsize = 1024 * 1024;
 	off_t sourcesize;
 	ssize_t targetbytes = 0;
 
 	source.GetSize(&sourcesize);
+
+	char maximumBuffer[16], currentBuffer[16];
+	BString statusprogress;
+
+	BNotification progress(B_PROGRESS_NOTIFICATION);
+	progress.SetGroup(BString(B_TRANSLATE_SYSTEM_NAME("DriveSetup")));
+	progress.SetMessageID(BString(targetpath));
+	progress.SetTitle(title);
 
 	char* buffer = (char*)malloc(bufsize);
 	while (true) {
@@ -1026,17 +1030,23 @@ MainWindow::WriteDiskImage(void* data)
 			target.Write(buffer, (size_t)bytes);
 
 			targetbytes += bytes;
+
+			statusprogress.SetToFormat("%s: %s / %s", targetpath,
+				string_for_size(targetbytes, currentBuffer, 16),
+				string_for_size(sourcesize, maximumBuffer, 16));
+
+			progress.SetContent(statusprogress);
+			progress.SetProgress((float)targetbytes / sourcesize);
+			progress.Send();
 		} else
 			break;
 	}
 	free(buffer);
 
 	BMessage message(MSG_COMPLETE);
-	message.AddString("status",
-		B_TRANSLATE("Disk image successfully written to the target."));
+	message.AddString("status", status);
+	message.AddString("jobid", targetpath);
 	messenger.SendMessage(&message);
-
-	return 0;
 }
 
 

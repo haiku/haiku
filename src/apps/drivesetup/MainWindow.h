@@ -56,6 +56,11 @@ public:
 	static	int32				WriteDiskImage(void* data);
 
 private:
+	static	void				_WriteDiskImage(BMessenger messenger,
+									BFile source, BFile target,
+									const char* targetpath,
+									BString title, BString status);
+
 			void				_ScanDrives();
 
 			void				_AdaptToSelectedPartition();
