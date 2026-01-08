@@ -23,6 +23,8 @@ chdir(const char *path)
 int
 fchdir(int fd)
 {
+	if (fd < 0)
+		RETURN_AND_SET_ERRNO(EBADF);
 	RETURN_AND_SET_ERRNO(_kern_setcwd(fd, NULL));
 }
 
