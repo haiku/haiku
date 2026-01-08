@@ -1,33 +1,32 @@
 /*
- * Copyright 2019-2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
- #include "CreateUserDetail.h"
+#include "CreateUserDetail.h"
 
- // These are keys that are used to store this object's data into a BMessage
- // instance.
+// These are keys that are used to store this object's data into a BMessage
+// instance.
 
-#define KEY_NICKNAME							"nickname"
-#define KEY_PASSWORD_CLEAR						"passwordClear"
-#define KEY_IS_PASSWORD_REPEATED				"isPasswordRepeated"
-#define KEY_EMAIL								"email"
-#define KEY_CAPTCHA_TOKEN						"captchaToken"
-#define KEY_CAPTCHA_RESPONSE					"captchaResponse"
-#define KEY_LANGUAGE_ID							"languageId"
-#define KEY_AGREED_USER_USAGE_CONDITIONS_CODE	"agreedUserUsageConditionsCode"
+static const char* const kKeyNickname = "nickname";
+static const char* const kKeyPasswordClear = "password_clear";
+static const char* const kKeyIsPasswordRepeated = "is_password_repeated";
+static const char* const kKeyEmail = "email";
+static const char* const kKeyCaptchaToken = "captcha_token";
+static const char* const kKeyCaptchaResponse = "captcha_response";
+static const char* const kKeyLanguageId = "language_id";
+static const char* const kKeyAgreedUserUsageConditionsCode = "agreed_user_usage_conditions_code";
 
 
 CreateUserDetail::CreateUserDetail(BMessage* from)
 {
-	from->FindString(KEY_NICKNAME, &fNickname);
-	from->FindString(KEY_PASSWORD_CLEAR, &fPasswordClear);
-	from->FindBool(KEY_IS_PASSWORD_REPEATED, &fIsPasswordRepeated);
-	from->FindString(KEY_EMAIL, &fEmail);
-	from->FindString(KEY_CAPTCHA_TOKEN, &fCaptchaToken);
-	from->FindString(KEY_CAPTCHA_RESPONSE, &fCaptchaResponse);
-	from->FindString(KEY_LANGUAGE_ID, &fLanguageId);
-	from->FindString(KEY_AGREED_USER_USAGE_CONDITIONS_CODE,
-		&fAgreedUserUsageConditionsCode);
+	from->FindString(kKeyNickname, &fNickname);
+	from->FindString(kKeyPasswordClear, &fPasswordClear);
+	from->FindBool(kKeyIsPasswordRepeated, &fIsPasswordRepeated);
+	from->FindString(kKeyEmail, &fEmail);
+	from->FindString(kKeyCaptchaToken, &fCaptchaToken);
+	from->FindString(kKeyCaptchaResponse, &fCaptchaResponse);
+	from->FindString(kKeyLanguageId, &fLanguageId);
+	from->FindString(kKeyAgreedUserUsageConditionsCode, &fAgreedUserUsageConditionsCode);
 }
 
 
@@ -160,22 +159,20 @@ CreateUserDetail::Archive(BMessage* into, bool deep) const
 {
 	status_t result = B_OK;
 	if (result == B_OK)
-		result = into->AddString(KEY_NICKNAME, fNickname);
+		result = into->AddString(kKeyNickname, fNickname);
 	if (result == B_OK)
-		result = into->AddString(KEY_PASSWORD_CLEAR, fPasswordClear);
+		result = into->AddString(kKeyPasswordClear, fPasswordClear);
 	if (result == B_OK)
-		result = into->AddBool(KEY_IS_PASSWORD_REPEATED, fIsPasswordRepeated);
+		result = into->AddBool(kKeyIsPasswordRepeated, fIsPasswordRepeated);
 	if (result == B_OK)
-		result = into->AddString(KEY_EMAIL, fEmail);
+		result = into->AddString(kKeyEmail, fEmail);
 	if (result == B_OK)
-		result = into->AddString(KEY_CAPTCHA_TOKEN, fCaptchaToken);
+		result = into->AddString(kKeyCaptchaToken, fCaptchaToken);
 	if (result == B_OK)
-		result = into->AddString(KEY_CAPTCHA_RESPONSE, fCaptchaResponse);
+		result = into->AddString(kKeyCaptchaResponse, fCaptchaResponse);
 	if (result == B_OK)
-		result = into->AddString(KEY_LANGUAGE_ID, fLanguageId);
-	if (result == B_OK) {
-		result = into->AddString(KEY_AGREED_USER_USAGE_CONDITIONS_CODE,
-			fAgreedUserUsageConditionsCode);
-	}
+		result = into->AddString(kKeyLanguageId, fLanguageId);
+	if (result == B_OK)
+		result = into->AddString(kKeyAgreedUserUsageConditionsCode, fAgreedUserUsageConditionsCode);
 	return result;
 }

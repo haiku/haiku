@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "Captcha.h"
@@ -11,8 +11,8 @@
 // These are keys that are used to store this object's data into a BMessage
 // instance.
 
-#define KEY_TOKEN			"token"
-#define KEY_PNG_IMAGE_DATA	"pngImageData"
+static const char* const kKeyToken = "token";
+static const char* const kKeyPngImageData = "png_image_data";
 
 
 Captcha::Captcha(BMessage* from)
@@ -20,16 +20,14 @@ Captcha::Captcha(BMessage* from)
 	fToken(""),
 	fPngImageData(NULL)
 {
-	if (from->FindString(KEY_TOKEN, &fToken) != B_OK) {
-		HDERROR("expected key [%s] in the message data when creating a "
-			"captcha", KEY_TOKEN);
-	}
+	if (from->FindString(kKeyToken, &fToken) != B_OK)
+		HDERROR("expected key [%s] in the message data when creating a captcha", kKeyToken);
 
 	const void* data;
 	ssize_t len;
 
-	if (from->FindData(KEY_PNG_IMAGE_DATA, B_ANY_TYPE, &data, &len) != B_OK)
-		HDERROR("expected key [%s] in the message data", KEY_PNG_IMAGE_DATA);
+	if (from->FindData(kKeyPngImageData, B_ANY_TYPE, &data, &len) != B_OK)
+		HDERROR("expected key [%s] in the message data", kKeyPngImageData);
 	else
 		SetPngImageData(data, len);
 }
@@ -90,10 +88,10 @@ Captcha::Archive(BMessage* into, bool deep) const
 	if (result == B_OK && into == NULL)
 		result = B_ERROR;
 	if (result == B_OK)
-		result = into->AddString(KEY_TOKEN, fToken);
+		result = into->AddString(kKeyToken, fToken);
 	if (result == B_OK && fPngImageData != NULL) {
-		result = into->AddData(KEY_PNG_IMAGE_DATA, B_ANY_TYPE,
-			fPngImageData->Buffer(), fPngImageData->BufferLength());
+		result = into->AddData(kKeyPngImageData, B_ANY_TYPE, fPngImageData->Buffer(),
+			fPngImageData->BufferLength());
 	}
 	return result;
 }

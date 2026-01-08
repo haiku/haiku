@@ -1,5 +1,5 @@
 /*
- * Copyright 2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2025-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -12,9 +12,9 @@
 #include "Logger.h"
 
 
-static const char* kHaikuDepotKeyring = "HaikuDepot";
+static const char* const kHaikuDepotKeyring = "HaikuDepot";
 
-static const char* kKeyIdentifierPrefix = "hds.password.";
+static const char* const kKeyIdentifierPrefix = "hds.password.";
 	// this prefix is added before the nickname in the keystore
 	// so that HDS username/password pairs can be identified.
 

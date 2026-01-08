@@ -24,7 +24,7 @@ public:
 								DeskbarLink(const BString& path,
 									const BString& link);
 								DeskbarLink(const DeskbarLink& other);
-								DeskbarLink(BMessage* from);
+								DeskbarLink(const BMessage* from);
 
 	virtual						~DeskbarLink();
 
@@ -35,6 +35,8 @@ public:
 			bool				operator==(const DeskbarLink& other);
 			bool				operator!=(const DeskbarLink& other);
 			DeskbarLink&		operator=(const DeskbarLink& other);
+
+			bool				IsValid() const;
 
 			status_t			Archive(BMessage* into, bool deep = true) const;
 

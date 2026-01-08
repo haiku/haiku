@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -48,11 +48,11 @@
 
 #define PLACEHOLDER_TEXT B_UTF8_ELLIPSIS
 
-#define KEY_USER_CREDENTIALS			"userCredentials"
-#define KEY_CAPTCHA_IMAGE				"captchaImage"
-#define KEY_USER_USAGE_CONDITIONS		"userUsageConditions"
-#define KEY_PASSWORD_REQUIREMENTS		"passwordRequirements"
-#define KEY_VALIDATION_FAILURES			"validationFailures"
+static const char* const kKeyUserCredentials = "user_credentials";
+static const char* const kKeyCaptchaImage = "captcha_image";
+static const char* const kKeyUserUsageConditions = "user_usage_conditions";
+static const char* const kKeyPasswordRequirements = "password_requirements";
+static const char* const kKeyValidationFailures = "validation_failures";
 
 
 enum ActionTabs {
@@ -305,7 +305,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
-			message->FindString("id", &fPreferredLanguageId);
+			message->FindString(shared_message_keys::kKeyLanguageId, &fPreferredLanguageId);
 			break;
 
 		case MSG_LOGIN_ERROR:
@@ -319,7 +319,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 		case MSG_LOGIN_SUCCESS:
 		{
 			BMessage credentialsMessage;
-			if (message->FindMessage(KEY_USER_CREDENTIALS, &credentialsMessage) != B_OK)
+			if (message->FindMessage(kKeyUserCredentials, &credentialsMessage) != B_OK)
 				debugger("expected key in internal message not found");
 
 			_HandleAuthenticationSuccess(UserCredentials(&credentialsMessage));
@@ -328,7 +328,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 		case MSG_CREATE_ACCOUNT_SUCCESS:
 		{
 			BMessage credentialsMessage;
-			if (message->FindMessage(KEY_USER_CREDENTIALS, &credentialsMessage) != B_OK)
+			if (message->FindMessage(kKeyUserCredentials, &credentialsMessage) != B_OK)
 				debugger("expected key in internal message not found");
 
 			_HandleCreateAccountSuccess(UserCredentials(&credentialsMessage));
@@ -337,7 +337,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 		case MSG_CREATE_ACCOUNT_FAILED:
 		{
 			BMessage validationFailuresMessage;
-			if (message->FindMessage(KEY_VALIDATION_FAILURES, &validationFailuresMessage) != B_OK)
+			if (message->FindMessage(kKeyValidationFailures, &validationFailuresMessage) != B_OK)
 				debugger("expected key in internal message not found");
 			ValidationFailures validationFailures(&validationFailuresMessage);
 			_HandleCreateAccountFailure(validationFailures);
@@ -530,7 +530,7 @@ UserLoginWindow::_AuthenticateThread(UserCredentials& userCredentials)
 			BMessage credentialsMessage;
 			status = userCredentials.Archive(&credentialsMessage);
 			if (status == B_OK)
-				status = message.AddMessage(KEY_USER_CREDENTIALS, &credentialsMessage);
+				status = message.AddMessage(kKeyUserCredentials, &credentialsMessage);
 			if (status == B_OK)
 				messenger.SendMessage(&message);
 		} else {
@@ -578,9 +578,9 @@ UserLoginWindow::_HandleAuthenticationError()
 void
 UserLoginWindow::_HandleAuthenticationFailed()
 {
-	AppUtils::NotifySimpleError(B_TRANSLATE("Authentication failed"),
+	AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Authentication failed"),
 		B_TRANSLATE("The user does not exist or the wrong password was"
-					" supplied. Check your credentials and try again."));
+					" supplied. Check your credentials and try again.")));
 	fPasswordField->SetText("");
 	_EnableMutableControls(true);
 }
@@ -737,21 +737,19 @@ UserLoginWindow::_CreateAccountSetupThreadEntry(void* data)
 			BMessage captchaMessage;
 			result = captcha.Archive(&captchaMessage);
 			if (result == B_OK)
-				result = message.AddMessage(KEY_CAPTCHA_IMAGE, &captchaMessage);
+				result = message.AddMessage(kKeyCaptchaImage, &captchaMessage);
 		}
 		if (result == B_OK && shouldFetchUserUsageConditions) {
 			BMessage userUsageConditionsMessage;
 			result = userUsageConditions.Archive(&userUsageConditionsMessage);
 			if (result == B_OK)
-				result = message.AddMessage(KEY_USER_USAGE_CONDITIONS, &userUsageConditionsMessage);
+				result = message.AddMessage(kKeyUserUsageConditions, &userUsageConditionsMessage);
 		}
 		if (result == B_OK && shouldFetchPasswordRequirements) {
 			BMessage passwordRequirementsMessage;
 			result = passwordRequirements.Archive(&passwordRequirementsMessage);
-			if (result == B_OK) {
-				result
-					= message.AddMessage(KEY_PASSWORD_REQUIREMENTS, &passwordRequirementsMessage);
-			}
+			if (result == B_OK)
+				result = message.AddMessage(kKeyPasswordRequirements, &passwordRequirementsMessage);
 		}
 		if (result == B_OK) {
 			HDDEBUG("successfully completed collection of create account "
@@ -783,10 +781,10 @@ UserLoginWindow::_CreateAccountUserUsageConditionsSetupThread(
 	status_t result = interface->RetrieveUserUsageConditions(NULL, userUsageConditions);
 
 	if (result != B_OK) {
-		AppUtils::NotifySimpleError(B_TRANSLATE("Usage conditions download problem"),
+		AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Usage conditions download problem"),
 			B_TRANSLATE("An error has arisen downloading the usage "
 						"conditions required to create a new user. Check the log for "
-						"details and try again. " ALERT_MSG_LOGS_USER_GUIDE));
+						"details and try again. " ALERT_MSG_LOGS_USER_GUIDE)));
 	}
 
 	return result;
@@ -801,10 +799,11 @@ UserLoginWindow::_CreateAccountPasswordRequirementsSetupThread(
 	status_t result = interface->RetrievePasswordRequirements(passwordRequirements);
 
 	if (result != B_OK) {
-		AppUtils::NotifySimpleError(B_TRANSLATE("Password requirements download problem"),
-			B_TRANSLATE("An error has arisen downloading the password "
-						"requirements required to create a new user. Check the log for "
-						"details and try again. " ALERT_MSG_LOGS_USER_GUIDE));
+		AppUtils::NotifySimpleError(
+			SimpleAlert(B_TRANSLATE("Password requirements download problem"),
+				B_TRANSLATE("An error has arisen downloading the password requirements required to "
+							"create a new user. Check the log for details and try "
+							"again. " ALERT_MSG_LOGS_USER_GUIDE)));
 	}
 
 	return result;
@@ -822,9 +821,9 @@ UserLoginWindow::_CreateAccountCaptchaSetupThread(Captcha& captcha)
 	// check for transport related errors.
 
 	if (status != B_OK) {
-		AppUtils::NotifySimpleError(B_TRANSLATE("Captcha error"),
+		AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Captcha error"),
 			B_TRANSLATE("It was not possible to communicate with the server to "
-						"obtain a captcha image required to create a new user."));
+						"obtain a captcha image required to create a new user.")));
 	}
 
 	// check for server-generated errors.
@@ -841,9 +840,9 @@ UserLoginWindow::_CreateAccountCaptchaSetupThread(Captcha& captcha)
 	if (status == B_OK) {
 		status = _UnpackCaptcha(responsePayload, captcha);
 		if (status != B_OK) {
-			AppUtils::NotifySimpleError(B_TRANSLATE("Captcha error"),
+			AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Captcha error"),
 				B_TRANSLATE("It was not possible to extract necessary captcha "
-							"information from the data sent back from the server."));
+							"information from the data sent back from the server.")));
 		}
 	}
 
@@ -910,13 +909,13 @@ UserLoginWindow::_HandleCreateAccountSetupSuccess(BMessage* message)
 	BMessage userUsageConditionsMessage;
 	BMessage passwordRequirementsMessage;
 
-	if (message->FindMessage(KEY_CAPTCHA_IMAGE, &captchaMessage) == B_OK)
+	if (message->FindMessage(kKeyCaptchaImage, &captchaMessage) == B_OK)
 		_SetCaptcha(new Captcha(&captchaMessage));
 
-	if (message->FindMessage(KEY_USER_USAGE_CONDITIONS, &userUsageConditionsMessage) == B_OK)
+	if (message->FindMessage(kKeyUserUsageConditions, &userUsageConditionsMessage) == B_OK)
 		_SetUserUsageConditions(new UserUsageConditions(&userUsageConditionsMessage));
 
-	if (message->FindMessage(KEY_PASSWORD_REQUIREMENTS, &passwordRequirementsMessage) == B_OK)
+	if (message->FindMessage(kKeyPasswordRequirements, &passwordRequirementsMessage) == B_OK)
 		_SetPasswordRequirements(new PasswordRequirements(&passwordRequirementsMessage));
 
 	_EnableMutableControls(true);
@@ -1243,6 +1242,9 @@ UserLoginWindow::_CreateAccountThreadEntry(void* data)
 void
 UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
 {
+	if (detail->LanguageId().IsEmpty())
+		HDFATAL("the language id was not setup when creating a user");
+
 	WebAppInterfaceRef interface = fModel.WebApp();
 	BMessage responsePayload;
 	BMessenger messenger(this);
@@ -1263,7 +1265,7 @@ UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
 				UserCredentials userCredentials(detail->Nickname(), detail->PasswordClear());
 				userCredentials.Archive(&userCredentialsMessage);
 				BMessage message(MSG_CREATE_ACCOUNT_SUCCESS);
-				message.AddMessage(KEY_USER_CREDENTIALS, &userCredentialsMessage);
+				message.AddMessage(kKeyUserCredentials, &userCredentialsMessage);
 				messenger.SendMessage(&message);
 				break;
 			}
@@ -1274,7 +1276,7 @@ UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
 				BMessage validationFailuresMessage;
 				validationFailures.Archive(&validationFailuresMessage);
 				BMessage message(MSG_CREATE_ACCOUNT_FAILED);
-				message.AddMessage(KEY_VALIDATION_FAILURES, &validationFailuresMessage);
+				message.AddMessage(kKeyValidationFailures, &validationFailuresMessage);
 				messenger.SendMessage(&message);
 				break;
 			}
@@ -1290,7 +1292,7 @@ UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
 				BMessage validationFailuresMessage;
 				validationFailures.Archive(&validationFailuresMessage);
 				BMessage message(MSG_CREATE_ACCOUNT_FAILED);
-				message.AddMessage(KEY_VALIDATION_FAILURES, &validationFailuresMessage);
+				message.AddMessage(kKeyValidationFailures, &validationFailuresMessage);
 				messenger.SendMessage(&message);
 				break;
 			}
@@ -1300,8 +1302,8 @@ UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
 				break;
 		}
 	} else {
-		AppUtils::NotifySimpleError(B_TRANSLATE("User creation error"),
-			B_TRANSLATE("It was not possible to create the new user."));
+		AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("User creation error"),
+			B_TRANSLATE("It was not possible to create the new user.")));
 		messenger.SendMessage(MSG_CREATE_ACCOUNT_ERROR);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -24,8 +24,12 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ServerHelper"
 
-#define KEY_MSG_MINIMUM_VERSION "minimumVersion"
-#define KEY_HEADER_MINIMUM_VERSION "X-Desktop-Application-Minimum-Version"
+static const char* const kKeyMinimumVersion = "minimum_version";
+
+/*! This is an HTTP header that the sever will send back to the client to inform
+	it about a version limit.
+*/
+static const char* const kKeyHeaderMinimumVersion = "X-Desktop-Application-Minimum-Version";
 
 
 /*! \brief This method will cause an alert to be shown to the user regarding a
@@ -165,11 +169,11 @@ ServerHelper::NotifyClientTooOld(const BHttpHeaders& responseHeaders)
 	if (!ServerSettings::IsClientTooOld()) {
 		ServerSettings::SetClientTooOld();
 
-		const char* minimumVersionC = responseHeaders[KEY_HEADER_MINIMUM_VERSION];
+		const char* minimumVersionC = responseHeaders[kKeyHeaderMinimumVersion];
 		BMessage message(MSG_CLIENT_TOO_OLD);
 
 		if (minimumVersionC != NULL && strlen(minimumVersionC) != 0) {
-			message.AddString(KEY_MSG_MINIMUM_VERSION, minimumVersionC);
+			message.AddString(kKeyMinimumVersion, minimumVersionC);
 		}
 
 		be_app->PostMessage(&message);
@@ -183,7 +187,7 @@ ServerHelper::AlertClientTooOld(BMessage* message)
 	BString minimumVersion;
 	BString alertText;
 
-	if (message->FindString(KEY_MSG_MINIMUM_VERSION, &minimumVersion) != B_OK)
+	if (message->FindString(kKeyMinimumVersion, &minimumVersion) != B_OK)
 		minimumVersion = "???";
 
 	alertText.SetToFormat(

@@ -95,9 +95,6 @@ public:
 			void				AddListener(const ModelListenerRef& listener);
 			void				AddPackageListener(const PackageInfoListenerRef& packageListener);
 
-			status_t			DearchiveInfoEvents(const BMessage* message,
-									PackageInfoEvents& packageInfoEvents) const;
-
 			PackageScreenshotRepository*
 								GetPackageScreenshotRepository();
 
@@ -178,8 +175,8 @@ private:
 			void				_NotifyIconsChanged();
 			void				_NotifyAuthorizationChanged();
 			void				_NotifyCategoryListChanged();
-			void				_NotifyPackageChange(const PackageInfoEvent& event);
-			void				_NotifyPackageChanges(const PackageInfoEvents& events);
+			void				_NotifyPackageChange(const PackageChangeEvent& event);
+			void				_NotifyPackageChanges(const PackageChangeEvents& events);
 
 private:
 	mutable	BLocker				fLock;

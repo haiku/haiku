@@ -40,13 +40,14 @@ public:
 
 			void				HandleIconsChanged();
 
-			void				HandlePackagesChanged(const PackageInfoEvents& events);
+			void				HandlePackagesChanged(
+									const std::vector<PackageInfoChangeEvent>& events);
 
 			void				SetLoading(bool isLoading);
 
 private:
 			void				_AdjustViews();
-			void				_HandlePackageChanged(const PackageInfoEvent& event);
+			void				_HandlePackageChanged(const PackageChangeEvent& event);
 			void				_BuildNoResultsView();
 
 private:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "LanguageMenuUtils.h"
@@ -17,9 +17,6 @@
 #include "HaikuDepotConstants.h"
 #include "LocaleUtils.h"
 #include "Logger.h"
-
-
-static const char* kLanguageIdKey = "id";
 
 
 /*! This method will add the supplied languages to the menu.  It will
@@ -57,7 +54,8 @@ LanguageMenuUtils::AddLanguagesToMenu(const std::vector<LanguageRef>& languages,
 /* static */ void
 LanguageMenuUtils::MarkLanguageInMenu(const BString& languageId, BMenu* menu)
 {
-	AppUtils::MarkItemWithKeyValueInMenuOrFirst(menu, kLanguageIdKey, languageId);
+	AppUtils::MarkItemWithKeyValueInMenuOrFirst(menu, shared_message_keys::kKeyLanguageId,
+		languageId);
 }
 
 
@@ -65,7 +63,7 @@ LanguageMenuUtils::MarkLanguageInMenu(const BString& languageId, BMenu* menu)
 LanguageMenuUtils::_AddLanguageToMenu(const BString& id, const BString& name, BMenu* menu)
 {
 	BMessage* message = new BMessage(MSG_LANGUAGE_SELECTED);
-	message->AddString(kLanguageIdKey, id);
+	message->AddString(shared_message_keys::kKeyLanguageId, id);
 	BMenuItem* item = new BMenuItem(name, message);
 	menu->AddItem(item);
 }

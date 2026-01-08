@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -36,6 +36,9 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "App"
+
+
+static const char* const kKeyMainSettings = "main_settings";
 
 
 App::App()
@@ -109,7 +112,7 @@ App::MessageReceived(BMessage* message)
 		case MSG_MAIN_WINDOW_CLOSED:
 		{
 			BMessage windowSettings;
-			if (message->FindMessage(KEY_WINDOW_SETTINGS, &windowSettings) == B_OK)
+			if (message->FindMessage(main_window_keys::kKeyWindowSettings, &windowSettings) == B_OK)
 				_StoreSettings(windowSettings);
 
 			fWindowCount--;
@@ -325,22 +328,9 @@ App::ArgvReceived(int32 argc, char* argv[])
 void
 App::_AlertSimpleError(BMessage* message)
 {
-	BString alertTitle;
-	BString alertText;
-	int32 typeInt;
-
-	if (message->FindString(KEY_ALERT_TEXT, &alertText) != B_OK)
-		alertText = "?";
-
-	if (message->FindString(KEY_ALERT_TITLE, &alertTitle) != B_OK)
-		alertTitle = B_TRANSLATE("Error");
-
-	if (message->FindInt32(KEY_ALERT_TYPE, &typeInt) != B_OK)
-		typeInt = B_INFO_ALERT;
-
-	BAlert* alert = new BAlert(alertTitle, alertText, B_TRANSLATE("OK"), NULL, NULL,
-		B_WIDTH_AS_USUAL, static_cast<alert_type>(typeInt));
-
+	SimpleAlert simpleAlert(message);
+	BAlert* alert = new BAlert(simpleAlert.Title(), simpleAlert.Text(), B_TRANSLATE("OK"), NULL,
+		NULL, B_WIDTH_AS_USUAL, simpleAlert.Type());
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
@@ -421,7 +411,7 @@ App::_LoadSettings(BMessage& settings)
 {
 	if (!fSettingsRead) {
 		fSettingsRead = true;
-		if (load_settings(&fSettings, KEY_MAIN_SETTINGS, "HaikuDepot") != B_OK)
+		if (load_settings(&fSettings, kKeyMainSettings, "HaikuDepot") != B_OK)
 			fSettings.MakeEmpty();
 	}
 	settings = fSettings;
@@ -452,7 +442,7 @@ App::_StoreSettings(const BMessage& settings)
 		}
 	}
 
-	save_settings(&fSettings, KEY_MAIN_SETTINGS, "HaikuDepot");
+	save_settings(&fSettings, kKeyMainSettings, "HaikuDepot");
 }
 
 

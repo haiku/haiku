@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2024, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2026, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,8 +19,8 @@
 #include "Logger.h"
 
 
-#define kPathKey	"path"
-#define kLinkKey	"link"
+static const char* const kKeyPath = "path";
+static const char* const kKeyLink = "link";
 
 
 DeskbarLink::DeskbarLink()
@@ -44,17 +44,13 @@ DeskbarLink::DeskbarLink(const DeskbarLink& other)
 }
 
 
-DeskbarLink::DeskbarLink(BMessage* from)
+DeskbarLink::DeskbarLink(const BMessage* from)
 {
-	if (from->FindString(kPathKey, &fPath) != B_OK) {
-		HDERROR("expected key [%s] in the message data when creating a "
-			"captcha", kPathKey);
-	}
+	if (from->FindString(kKeyPath, &fPath) != B_OK)
+		HDERROR("expected key [%s] in the message data when creating a captcha", kKeyPath);
 
-	if (from->FindString(kLinkKey, &fLink) != B_OK) {
-		HDERROR("expected key [%s] in the message data when creating a "
-			"captcha", kLinkKey);
-	}
+	if (from->FindString(kKeyLink, &fLink) != B_OK)
+		HDERROR("expected key [%s] in the message data when creating a captcha", kKeyLink);
 }
 
 
@@ -96,6 +92,13 @@ DeskbarLink::Title() const
 }
 
 
+bool
+DeskbarLink::IsValid() const
+{
+	return !fPath.IsEmpty() && !fLink.IsEmpty();
+}
+
+
 status_t
 DeskbarLink::Archive(BMessage* into, bool deep) const
 {
@@ -103,9 +106,9 @@ DeskbarLink::Archive(BMessage* into, bool deep) const
 	if (result == B_OK && into == NULL)
 		result = B_ERROR;
 	if (result == B_OK)
-		result = into->AddString(kPathKey, fPath);
+		result = into->AddString(kKeyPath, fPath);
 	if (result == B_OK)
-		result = into->AddString(kLinkKey, fLink);
+		result = into->AddString(kKeyLink, fLink);
 	return result;
 }
 

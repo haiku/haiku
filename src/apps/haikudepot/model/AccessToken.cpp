@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2023-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "AccessToken.h"
@@ -9,8 +9,8 @@
 
 // These are keys that are used to store this object's data into a BMessage instance.
 
-#define KEY_TOKEN				"token"
-#define KEY_EXPIRY_TIMESTAMP	"expiryTimestamp"
+static const char* const kKeyToken = "token";
+static const char* const kKeyExpiryLanguage = "expiry_language";
 
 
 AccessToken::AccessToken(BMessage* from)
@@ -18,14 +18,12 @@ AccessToken::AccessToken(BMessage* from)
 	fToken(""),
 	fExpiryTimestamp(0)
 {
-	if (from->FindString(KEY_TOKEN, &fToken) != B_OK) {
-		HDERROR("expected key [%s] in the message data when creating an access"
-			" token", KEY_TOKEN);
-	}
+	if (from->FindString(kKeyToken, &fToken) != B_OK)
+		HDERROR("expected key [%s] in the message data when creating an access token", kKeyToken);
 
-	if (from->FindUInt64(KEY_EXPIRY_TIMESTAMP, &fExpiryTimestamp) != B_OK) {
-		HDERROR("expected key [%s] in the message data when creating an access"
-			" token", KEY_EXPIRY_TIMESTAMP);
+	if (from->FindUInt64(kKeyExpiryLanguage, &fExpiryTimestamp) != B_OK) {
+		HDERROR("expected key [%s] in the message data when creating an access token",
+			kKeyExpiryLanguage);
 	}
 }
 
@@ -127,8 +125,8 @@ AccessToken::Archive(BMessage* into, bool deep) const
 	if (result == B_OK && into == NULL)
 		result = B_ERROR;
 	if (result == B_OK)
-		result = into->AddString(KEY_TOKEN, fToken);
+		result = into->AddString(kKeyToken, fToken);
 	if (result == B_OK)
-		result = into->AddUInt64(KEY_EXPIRY_TIMESTAMP, fExpiryTimestamp);
+		result = into->AddUInt64(kKeyExpiryLanguage, fExpiryTimestamp);
 	return result;
 }

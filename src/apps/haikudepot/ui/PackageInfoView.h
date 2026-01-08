@@ -1,10 +1,12 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2026, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_VIEW_H
 #define PACKAGE_INFO_VIEW_H
+
+#include <vector>
 
 #include <GroupView.h>
 
@@ -43,7 +45,8 @@ public:
 
 			void				HandleScreenshotCached(const ScreenshotCoordinate& coordinate);
 			void				HandleIconsChanged();
-			void				HandlePackagesChanged(const PackageInfoEvents& events);
+			void				HandlePackagesChanged(
+									const std::vector<PackageInfoChangeEvent>& events);
 
 private:
 	static const ScreenshotCoordinate
@@ -52,7 +55,7 @@ private:
 			void				_HandleScreenshotCached(const PackageInfoRef& package,
 									const ScreenshotCoordinate& coordinate);
 
-			void				_HandlePackageChanged(const PackageInfoEvent& event);
+			void				_HandlePackageChanged(const PackageInfoChangeEvent& event);
 
 private:
 			Model*				fModel;

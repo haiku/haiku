@@ -1,7 +1,7 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2026, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_LIST_VIEW_H
@@ -41,10 +41,11 @@ public:
 			void				AttachWorkStatusView(WorkStatusView* view);
 
 			void				HandleIconsChanged();
-			void				HandlePackagesChanged(const PackageInfoEvents& events);
+			void				HandlePackagesChanged(
+									const std::vector<PackageInfoChangeEvent>& events);
 
 private:
-			void				_HandlePackageChanged(const PackageInfoEvent& event);
+			void				_HandlePackageChanged(const PackageInfoChangeEvent& event);
 
 			void				_AddPackage(const PackageInfoRef& package);
 			void				_RemovePackage(const PackageInfoRef& package);

@@ -1,13 +1,16 @@
 /*
- * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "ScreenshotCoordinate.h"
 
 
-static const char* kCodeKey = "code";
-static const char* kWidthKey = "width";
-static const char* kHeightKey = "height";
+#include "Logger.h"
+
+
+static const char* const kKeyCode = "code";
+static const char* const kKeyWidth = "width";
+static const char* const kKeyHeight = "height";
 
 
 ScreenshotCoordinate::ScreenshotCoordinate()
@@ -21,9 +24,12 @@ ScreenshotCoordinate::ScreenshotCoordinate()
 
 ScreenshotCoordinate::ScreenshotCoordinate(const BMessage* from)
 {
-	from->FindString(kCodeKey, &fCode);
-	from->FindUInt32(kWidthKey, &fWidth);
-	from->FindUInt32(kHeightKey, &fHeight);
+	if (from->FindString(kKeyCode, &fCode) != B_OK)
+		HDERROR("expected key [%s] in the message data", kKeyCode);
+	if (from->FindUInt32(kKeyWidth, &fWidth) != B_OK)
+		HDERROR("expected key [%s] in the message data", kKeyWidth);
+	if (from->FindUInt32(kKeyHeight, &fHeight) != B_OK)
+		HDERROR("expected key [%s] in the message data", kKeyHeight);
 }
 
 
@@ -97,10 +103,10 @@ ScreenshotCoordinate::Archive(BMessage* into, bool deep) const
 {
 	status_t result = B_OK;
 	if (result == B_OK)
-		result = into->AddString(kCodeKey, fCode);
+		result = into->AddString(kKeyCode, fCode);
 	if (result == B_OK)
-		result = into->AddUInt32(kWidthKey, fWidth);
+		result = into->AddUInt32(kKeyWidth, fWidth);
 	if (result == B_OK)
-		result = into->AddUInt32(kHeightKey, fHeight);
+		result = into->AddUInt32(kKeyHeight, fHeight);
 	return result;
 }

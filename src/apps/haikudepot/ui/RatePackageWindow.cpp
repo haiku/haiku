@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -45,6 +45,9 @@ enum {
 	MSG_RATING_ACTIVE_CHANGED		= 'rtac',
 	MSG_RATING_DETERMINATE_CHANGED	= 'rdch'
 };
+
+static const char* const kKeyRating = "rating";
+
 
 //! Layouts the scrollbar so it looks nice with no border and the document
 // window look.
@@ -130,7 +133,7 @@ public:
 	{
 		SetPermanentRating(_RatingForMousePos(where));
 		BMessage message(MSG_PACKAGE_RATED);
-		message.AddFloat("rating", fPermanentRating);
+		message.AddFloat(kKeyRating, fPermanentRating);
 		Window()->PostMessage(&message, Window());
 	}
 
@@ -286,7 +289,7 @@ RatePackageWindow::_InitStabilitiesMenu(BPopUpMenu* menu)
 	for (it = ratingStabilities.begin(); it != ratingStabilities.end(); it++) {
 		const RatingStabilityRef ratingStability = *it;
 		BMessage* message = new BMessage(MSG_STABILITY_SELECTED);
-		message->AddString("code", ratingStability->Code());
+		message->AddString(shared_message_keys::kKeyCode, ratingStability->Code());
 		BMenuItem* item = new BMenuItem(ratingStability->Name(), message);
 		menu->AddItem(item);
 	}
@@ -301,18 +304,18 @@ RatePackageWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_PACKAGE_RATED:
-			message->FindFloat("rating", &fRating);
+			message->FindFloat(kKeyRating, &fRating);
 			fRatingDeterminate = true;
 			fSetRatingView->SetRatingDeterminate(true);
 			fRatingDeterminateCheckBox->SetValue(B_CONTROL_ON);
 			break;
 
 		case MSG_STABILITY_SELECTED:
-			message->FindString("code", &fStabilityCode);
+			message->FindString(shared_message_keys::kKeyCode, &fStabilityCode);
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
-			message->FindString("id", &fCommentLanguageId);
+			message->FindString(shared_message_keys::kKeyLanguageId, &fCommentLanguageId);
 			break;
 
 		case MSG_RATING_DETERMINATE_CHANGED:
@@ -369,7 +372,7 @@ void
 RatePackageWindow::_RefreshPackageData()
 {
 	BMessage message(MSG_SERVER_DATA_CHANGED);
-	message.AddString("name", fPackage->Name());
+	message.AddString(shared_message_keys::kKeyPackageName, fPackage->Name());
 	be_app->PostMessage(&message);
 }
 

@@ -2,7 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -38,6 +38,14 @@ class WorkStatusView;
 enum PackageDesktopFilterMode { DESKTOP, NATIVE_DESKTOP, DESKTOP_AND_NON_DESKTOP };
 
 
+/*! Keys used with BMessages */
+namespace main_window_keys {
+
+extern const char* const kKeyWindowSettings;
+
+}; // namespace main_window_keys
+
+
 class MainWindow :
 	private ProcessCoordinatorConsumer, public ProcessCoordinatorListener,
 	public UserDetailVerifierListener, public BWindow {
@@ -66,7 +74,7 @@ public:
 									const UserDetail& userDetail);
 
 	// services PackageInfoListener via MainWindowPackageInfoListener
-			void				PackagesChanged(const PackageInfoEvents& events);
+			void				PackagesChanged(const PackageChangeEvents& events);
 
 private:
 	static	const BString		_WindowTitleForPackage(const PackageInfoRef& pkg);
@@ -128,7 +136,7 @@ private:
 									ProcessCoordinatorState& coordinatorState);
 
 			void				_HandlePackagesChanged(const BMessage* message);
-			void				_HandlePackagesChanged(const PackageInfoEvents& events);
+			void				_HandlePackagesChanged(const PackageChangeEvents& events);
 
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 	static	status_t			_PopulatePackageWorker(void* arg);

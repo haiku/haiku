@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -10,9 +10,9 @@
 // These are keys that are used to store this object's data into a BMessage
 // instance.
 
-#define KEY_COPY_MARKDOWN	"copyMarkdown"
-#define KEY_CODE			"code"
-#define KEY_MINIMUM_AGE		"minimumAge"
+static const char* const kKeyCode = "code";
+static const char* const kKeyCopyMarkdown = "copy_markdown";
+static const char* const kKeyMinimumAge = "minimum_age";
 
 
 UserUsageConditions::UserUsageConditions(BMessage* from)
@@ -23,14 +23,14 @@ UserUsageConditions::UserUsageConditions(BMessage* from)
 {
 	int16 minimumAge;
 
-	if (from->FindInt16(KEY_MINIMUM_AGE, &minimumAge) != B_OK)
-		HDERROR("expected key [%s] in the message data", KEY_MINIMUM_AGE);
+	if (from->FindInt16(kKeyMinimumAge, &minimumAge) != B_OK)
+		HDERROR("expected key [%s] in the message data", kKeyMinimumAge);
 	fMinimumAge = (uint8) minimumAge;
 
-	if (from->FindString(KEY_CODE, &fCode) != B_OK)
-		HDERROR("expected key [%s] in the message data", KEY_CODE);
-	if (from->FindString(KEY_COPY_MARKDOWN, &fCopyMarkdown) != B_OK)
-		HDERROR("expected key [%s] in the message data", KEY_COPY_MARKDOWN);
+	if (from->FindString(kKeyCode, &fCode) != B_OK)
+		HDERROR("expected key [%s] in the message data", kKeyCode);
+	if (from->FindString(kKeyCopyMarkdown, &fCopyMarkdown) != B_OK)
+		HDERROR("expected key [%s] in the message data", kKeyCopyMarkdown);
 }
 
 
@@ -93,8 +93,12 @@ UserUsageConditions::SetCopyMarkdown(const BString& copyMarkdown)
 status_t
 UserUsageConditions::Archive(BMessage* into, bool deep) const
 {
-	into->AddInt16(KEY_MINIMUM_AGE, (int16) fMinimumAge);
-	into->AddString(KEY_CODE, fCode);
-	into->AddString(KEY_COPY_MARKDOWN, fCopyMarkdown);
-	return B_OK;
+	status_t result = B_OK;
+	if (result == B_OK)
+		result = into->AddInt16(kKeyMinimumAge, (int16)fMinimumAge);
+	if (result == B_OK)
+		result = into->AddString(kKeyCode, fCode);
+	if (result == B_OK)
+		result = into->AddString(kKeyCopyMarkdown, fCopyMarkdown);
+	return result;
 }

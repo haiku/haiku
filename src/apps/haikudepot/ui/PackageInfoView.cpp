@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "PackageInfoView.h"
@@ -506,13 +506,10 @@ private:
 
 class PackageActionView : public BView {
 public:
-	PackageActionView(ProcessCoordinatorConsumer* processCoordinatorConsumer,
-			Model* model)
+	PackageActionView()
 		:
 		BView("about view", B_WILL_DRAW),
-		fModel(model),
 		fLayout(new BGroupLayout(B_HORIZONTAL)),
-		fProcessCoordinatorConsumer(processCoordinatorConsumer),
 		fStatusLabel(NULL),
 		fStatusBar(NULL)
 	{
@@ -524,20 +521,6 @@ public:
 	virtual ~PackageActionView()
 	{
 		Clear();
-	}
-
-	virtual void MessageReceived(BMessage* message)
-	{
-		switch (message->what) {
-			case MSG_PKG_INSTALL:
-			case MSG_PKG_UNINSTALL:
-			case MSG_PKG_OPEN:
-				_RunPackageAction(message);
-				break;
-			default:
-				BView::MessageReceived(message);
-				break;
-		}
 	}
 
 	void SetPackage(const PackageInfoRef package)
@@ -626,6 +609,7 @@ private:
 			BButton* button = (BButton*)fButtons.ItemAtFast(index++);
 			button->SetLabel(action->Title());
 			button->SetMessage(message);
+			button->SetTarget(Window());
 		}
 	}
 
@@ -637,7 +621,7 @@ private:
 			BButton* button = new BButton(action->Title(), message);
 			fLayout->AddView(button);
 			button->SetTarget(this);
-
+			button->SetTarget(Window());
 			fButtons.AddItem(button);
 		}
 	}
@@ -666,19 +650,8 @@ private:
 		}
 	}
 
-	void _RunPackageAction(BMessage* message)
-	{
-		ProcessCoordinator* processCoordinator
-			= ProcessCoordinatorFactory::CreatePackageActionCoordinator(fModel, message);
-		fProcessCoordinatorConsumer->Consume(processCoordinator);
-		_DisableButtonForPackageActionMessage(message);
-	}
-
 private:
-	Model*				fModel;
 	BGroupLayout*		fLayout;
-	ProcessCoordinatorConsumer*
-						fProcessCoordinatorConsumer;
 	BList				fButtons;
 
 	BStringView*		fStatusLabel;
@@ -1352,7 +1325,7 @@ PackageInfoView::PackageInfoView(Model* model,
 	fCardLayout->SetVisibleItem((int32)0);
 
 	fTitleView = new TitleView(fModel);
-	fPackageActionView = new PackageActionView(processCoordinatorConsumer, model);
+	fPackageActionView = new PackageActionView();
 	fPackageActionView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	fPagesView = new PagesView(model);
 
@@ -1422,7 +1395,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 
 
 void
-PackageInfoView::_HandlePackageChanged(const PackageInfoEvent& event)
+PackageInfoView::_HandlePackageChanged(const PackageInfoChangeEvent& event)
 {
 	uint32 changes = event.Changes();
 
@@ -1453,13 +1426,14 @@ PackageInfoView::_HandlePackageChanged(const PackageInfoEvent& event)
 
 
 void
-PackageInfoView::HandlePackagesChanged(const PackageInfoEvents& events)
+PackageInfoView::HandlePackagesChanged(const std::vector<PackageInfoChangeEvent>& events)
 {
 	if (!fPackage.IsSet())
 		return;
-	for (int32 i = events.CountEvents() - 1; i >= 0; i--) {
-		PackageInfoEvent event = events.EventAtIndex(i);
-		_HandlePackageChanged(event);
+	std::vector<PackageInfoChangeEvent>::const_iterator it;
+	for (it = events.begin(); it != events.end(); it++) {
+		const PackageInfoChangeEvent packageInfoChangeEvent = *it;
+		_HandlePackageChanged(packageInfoChangeEvent);
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef HAIKU_DEPOT_CONSTANTS_H
@@ -63,19 +63,20 @@ enum BitmapSize {
 #define REPOSITORY_NAME_SYSTEM				"system"
 #define REPOSITORY_NAME_INSTALLED			"installed"
 
+/*!	Namespace to contain keys that are used for data inside `BMessage` instances
+ */
+namespace shared_message_keys {
 
-#define KEY_ALERT_TEXT						"alert_text"
-#define KEY_ALERT_TITLE						"alert_title"
-#define KEY_ALERT_TYPE						"alert_type"
-#define KEY_WORK_STATUS_TEXT				"work_status_text"
-#define KEY_WORK_STATUS_PROGRESS			"work_status_progress"
-#define KEY_WINDOW_SETTINGS					"window_settings"
-#define KEY_MAIN_SETTINGS					"main_settings"
-#define KEY_PACKAGE_NAME					"package_name"
-#define KEY_TITLE							"title"
-#define KEY_DESKBAR_LINK					"deskbar_link"
+extern const char* const kKeyPackageName;
+extern const char* const kKeyDepotName;
+extern const char* const kKeyCode;
+extern const char* const kKeyLanguageId;
+
+}; // namespace shared_message_keys
 
 
+#define SETTING_NICKNAME							"username"
+	// historical difference
 #define SETTING_SHOW_DESKTOP_PACKAGES				"show only desktop packages"
 #define SETTING_SHOW_NATIVE_DESKTOP_PACKAGES		"show only native desktop packages"
 #define SETTING_SHOW_AVAILABLE_PACKAGES				"show available packages"

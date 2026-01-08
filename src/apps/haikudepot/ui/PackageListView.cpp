@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025, Andrew Lindesay, <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay, <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath, <julian.harnath@rwth-aachen.de>.
  * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
@@ -1167,18 +1167,19 @@ PackageListView::HandleIconsChanged()
 
 
 void
-PackageListView::HandlePackagesChanged(const PackageInfoEvents& events)
+PackageListView::HandlePackagesChanged(const std::vector<PackageInfoChangeEvent>& events)
 {
-	for (int32 i = events.CountEvents() - 1; i >= 0; i--)
-		_HandlePackageChanged(events.EventAtIndex(i));
+	std::vector<PackageInfoChangeEvent>::const_iterator it;
+	for (it = events.begin(); it != events.end(); it++)
+		_HandlePackageChanged(*it);
 }
 
 
 void
-PackageListView::_HandlePackageChanged(const PackageInfoEvent& event)
+PackageListView::_HandlePackageChanged(const PackageInfoChangeEvent& event)
 {
 	uint32 changes = event.Changes();
-	PackageInfoRef package = event.Package();
+	const PackageInfoRef package = event.Package();
 
 	if (!package.IsSet() || 0 == changes)
 		return;
@@ -1221,7 +1222,7 @@ PackageListView::SelectionChanged()
 
 	PackageRow* selected = dynamic_cast<PackageRow*>(CurrentSelection());
 	if (selected != NULL)
-		message.AddString("name", selected->Package()->Name());
+		message.AddString(shared_message_keys::kKeyPackageName, selected->Package()->Name());
 
 	Window()->PostMessage(&message);
 }

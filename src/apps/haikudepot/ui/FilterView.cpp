@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -25,6 +25,9 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FilterView"
+
+
+const char* const filter_view_keys::kKeySearchTerms = "search_terms";
 
 
 FilterView::FilterView()
@@ -85,7 +88,7 @@ FilterView::MessageReceived(BMessage* message)
 		case MSG_SEARCH_TERMS_MODIFIED:
 		{
 			BMessage searchTerms(MSG_SEARCH_TERMS_MODIFIED);
-			searchTerms.AddString("search terms", fSearchTermsText->Text());
+			searchTerms.AddString(filter_view_keys::kKeySearchTerms, fSearchTermsText->Text());
 			Window()->PostMessage(&searchTerms);
 			break;
 		}
@@ -146,7 +149,7 @@ FilterView::_MatchesCategoryCode(BMenuItem* item, const BString& code)
 	if (message == NULL)
 		return false;
 	BString itemCode;
-	message->FindString("code", &itemCode);
+	message->FindString(shared_message_keys::kKeyCode, &itemCode);
 	return itemCode == code;
 }
 
@@ -159,7 +162,7 @@ FilterView::_AddCategoriesToMenu(Model& model, BMenu* menu)
 	for (it = categories.begin(); it != categories.end(); it++) {
 		const CategoryRef& category = *it;
 		BMessage* message = new BMessage(MSG_CATEGORY_SELECTED);
-		message->AddString("code", category->Code());
+		message->AddString(shared_message_keys::kKeyCode, category->Code());
 		BMenuItem* item = new BMenuItem(category->Name(), message);
 		menu->AddItem(item);
 	}

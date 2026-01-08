@@ -125,6 +125,7 @@ local applicationSources =
 	FeaturedPackagesView.cpp
 	FilterView.cpp
 	GeneralContentScrollView.cpp
+	HaikuDepotConstants.cpp
 	IdentityAndAccessUtils.cpp
 	IncrementViewCounterProcess.cpp
 	JobStateListener.cpp
@@ -152,6 +153,7 @@ local applicationSources =
 	ScrollableGroupView.cpp
 	SettingsWindow.cpp
 	SharedIcons.cpp
+	SimpleAlert.cpp
 	ShuttingDownWindow.cpp
 	ToLatestUserUsageConditionsWindow.cpp
 	UserCredentials.cpp

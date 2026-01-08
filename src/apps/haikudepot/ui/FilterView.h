@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef FILTER_VIEW_H
@@ -23,6 +23,13 @@ enum {
 	MSG_SEARCH_TERMS_MODIFIED	= 'stmd',
 };
 
+
+/*! Keys used with BMessages */
+namespace filter_view_keys {
+
+extern const char* const kKeySearchTerms;
+
+}; // namespace filter_view_keys
 
 class FilterView : public BGroupView {
 public:

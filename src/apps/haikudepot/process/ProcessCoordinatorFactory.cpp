@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "ProcessCoordinatorFactory.h"
@@ -137,22 +137,6 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(Model* model, bool forceLoc
 
 
 /*static*/ ProcessCoordinator*
-ProcessCoordinatorFactory::CreatePackageActionCoordinator(Model* model, BMessage* message)
-{
-	switch (message->what) {
-		case MSG_PKG_INSTALL:
-			return _CreateInstallPackageActionCoordinator(model, message);
-		case MSG_PKG_UNINSTALL:
-			return _CreateUninstallPackageActionCoordinator(model, message);
-		case MSG_PKG_OPEN:
-			return _CreateOpenPackageActionCoordinator(model, message);
-		default:
-			HDFATAL("unexpected package action message what");
-	}
-}
-
-
-/*static*/ ProcessCoordinator*
 ProcessCoordinatorFactory::CacheScreenshotCoordinator(Model* model,
 	ScreenshotCoordinate& screenshotCoordinate)
 {
@@ -178,64 +162,41 @@ ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(Model* model,
 }
 
 
-/*static*/ BString
-ProcessCoordinatorFactory::_ExtractPackageNameFromMessage(BMessage* message)
-{
-	BString pkgName;
-	if (message->FindString(KEY_PACKAGE_NAME, &pkgName) != B_OK)
-		HDFATAL("malformed message missing key [%s]", KEY_PACKAGE_NAME);
-	return pkgName;
-}
-
-
 /*static*/ ProcessCoordinator*
-ProcessCoordinatorFactory::_CreateInstallPackageActionCoordinator(Model* model, BMessage* message)
+ProcessCoordinatorFactory::CreateInstallPackageActionCoordinator(Model* model,
+	const InstallPackageAction& action)
 {
 	ProcessCoordinator* processCoordinator
 		= new ProcessCoordinator("InstallPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
-
-	AbstractProcessNode* processNode = new ThreadedProcessNode(
-		new InstallPackageProcess(_ExtractPackageNameFromMessage(message), model), 10);
-
+	AbstractProcessNode* processNode
+		= new ThreadedProcessNode(new InstallPackageProcess(action.PackageName(), model), 10);
 	processCoordinator->AddNode(processNode);
-
 	return processCoordinator;
 }
 
 
 /*static*/ ProcessCoordinator*
-ProcessCoordinatorFactory::_CreateUninstallPackageActionCoordinator(Model* model, BMessage* message)
+ProcessCoordinatorFactory::CreateUninstallPackageActionCoordinator(Model* model,
+	const UninstallPackageAction& action)
 {
 	ProcessCoordinator* processCoordinator
 		= new ProcessCoordinator("UninstallPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
-
-	AbstractProcessNode* processNode = new ThreadedProcessNode(
-		new UninstallPackageProcess(_ExtractPackageNameFromMessage(message), model), 10);
-
+	AbstractProcessNode* processNode
+		= new ThreadedProcessNode(new UninstallPackageProcess(action.PackageName(), model), 10);
 	processCoordinator->AddNode(processNode);
-
 	return processCoordinator;
 }
 
 
 /*static*/ ProcessCoordinator*
-ProcessCoordinatorFactory::_CreateOpenPackageActionCoordinator(Model* model, BMessage* message)
+ProcessCoordinatorFactory::CreateOpenPackageActionCoordinator(Model* model,
+	const OpenPackageAction& action)
 {
 	ProcessCoordinator* processCoordinator
 		= new ProcessCoordinator("OpenPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
-
-	BMessage deskbarLinkMessage;
-
-	if (message->FindMessage(KEY_DESKBAR_LINK, &deskbarLinkMessage) != B_OK)
-		HDFATAL("malformed message missing key [%s]", KEY_DESKBAR_LINK);
-
-	DeskbarLink deskbarLink(&deskbarLinkMessage);
-
 	AbstractProcessNode* processNode = new ThreadedProcessNode(
-		new OpenPackageProcess(_ExtractPackageNameFromMessage(message), model, deskbarLink));
-
+		new OpenPackageProcess(action.PackageName(), model, action.Link()));
 	processCoordinator->AddNode(processNode);
-
 	return processCoordinator;
 }
 

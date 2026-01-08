@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2026, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -137,6 +137,10 @@ OpenPackageProcess::RunInternal()
 {
 	status_t status;
 	BPath path;
+
+	HDDEBUG("open package action from deskbar link [%s], path [%s]", fDeskbarLink.Link().String(),
+		fDeskbarLink.Path().String());
+
 	if (fDeskbarLink.Link().FindFirst('/') == 0) {
 		status = path.SetTo(fDeskbarLink.Link());
 		HDINFO("trying to launch (absolute link): %s", path.Path());

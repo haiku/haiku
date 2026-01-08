@@ -741,7 +741,8 @@ LocalPkgDataLoadProcessUtils::_PopulateModel(LocalPkgDataLoadProcessUtilsData& d
 LocalPkgDataLoadProcessUtils::_NotifyError(const BString& messageText)
 {
 	HDERROR("an error has arisen loading data of packages from local : %s", messageText.String());
-	AppUtils::NotifySimpleError(B_TRANSLATE("Local repository load error"), messageText);
+	AppUtils::NotifySimpleError(
+		SimpleAlert(B_TRANSLATE("Local repository load error"), messageText));
 }
 
 

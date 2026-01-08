@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -22,11 +22,11 @@
 // These are keys that are used to store the ProcessCoordinatorState data into
 // a BMessage instance.
 
-#define KEY_PROCESS_COORDINATOR_IDENTIFIER	"processCoordinatorIdentifier"
-#define KEY_PROGRESS						"progress"
-#define KEY_MESSAGE							"message"
-#define KEY_IS_RUNNING						"isRunning"
-#define KEY_ERROR_STATUS					"errorStatus"
+static const char* const kKeyIdentifier = "identifier";
+static const char* const kKeyProgress = "progress";
+static const char* const kKeyMessage = "message";
+static const char* const kKeyIsRunning = "is_running";
+static const char* const kKeyErrorStatus = "error_status";
 
 
 // #pragma mark - ProcessCoordinatorState implementation
@@ -34,28 +34,18 @@
 
 ProcessCoordinatorState::ProcessCoordinatorState(BMessage* from)
 {
-	if (from->FindString(KEY_PROCESS_COORDINATOR_IDENTIFIER,
-			&fProcessCoordinatorIdentifier) != B_OK) {
-		HDFATAL("unable to find the key [%s]",
-			KEY_PROCESS_COORDINATOR_IDENTIFIER);
-	}
-
-	if (from->FindFloat(KEY_PROGRESS, &fProgress) != B_OK) {
-		HDFATAL("unable to find the key [%s]", KEY_PROGRESS);
-	}
-
-	if (from->FindString(KEY_MESSAGE, &fMessage) != B_OK) {
-		HDFATAL("unable to find the key [%s]", KEY_MESSAGE);
-	}
-
-	if (from->FindBool(KEY_IS_RUNNING, &fIsRunning) != B_OK) {
-		HDFATAL("unable to find the key [%s]", KEY_IS_RUNNING);
-	}
+	if (from->FindString(kKeyIdentifier, &fProcessCoordinatorIdentifier) != B_OK)
+		HDFATAL("unable to find the key [%s]", kKeyIdentifier);
+	if (from->FindFloat(kKeyProgress, &fProgress) != B_OK)
+		HDFATAL("unable to find the key [%s]", kKeyProgress);
+	if (from->FindString(kKeyMessage, &fMessage) != B_OK)
+		HDFATAL("unable to find the key [%s]", kKeyMessage);
+	if (from->FindBool(kKeyIsRunning, &fIsRunning) != B_OK)
+		HDFATAL("unable to find the key [%s]", kKeyIsRunning);
 
 	int64 errorStatusNumeric;
-	if (from->FindInt64(KEY_ERROR_STATUS, &errorStatusNumeric) != B_OK) {
-		HDFATAL("unable to find the key [%s]", KEY_ERROR_STATUS);
-	}
+	if (from->FindInt64(kKeyErrorStatus, &errorStatusNumeric) != B_OK)
+		HDFATAL("unable to find the key [%s]", kKeyErrorStatus);
 	fErrorStatus = static_cast<status_t>(errorStatusNumeric);
 }
 
@@ -117,18 +107,16 @@ status_t
 ProcessCoordinatorState::Archive(BMessage* into, bool deep) const
 {
 	status_t result = B_OK;
-	if (result == B_OK) {
-		result = into->AddString(KEY_PROCESS_COORDINATOR_IDENTIFIER,
-			fProcessCoordinatorIdentifier);
-	}
 	if (result == B_OK)
-		result = into->AddFloat(KEY_PROGRESS, fProgress);
+		result = into->AddString(kKeyIdentifier, fProcessCoordinatorIdentifier);
 	if (result == B_OK)
-		result = into->AddString(KEY_MESSAGE, fMessage);
+		result = into->AddFloat(kKeyProgress, fProgress);
 	if (result == B_OK)
-		result = into->AddBool(KEY_IS_RUNNING, fIsRunning);
+		result = into->AddString(kKeyMessage, fMessage);
 	if (result == B_OK)
-		result = into->AddInt64(KEY_ERROR_STATUS, static_cast<int64>(fErrorStatus));
+		result = into->AddBool(kKeyIsRunning, fIsRunning);
+	if (result == B_OK)
+		result = into->AddInt64(kKeyErrorStatus, static_cast<int64>(fErrorStatus));
 	return result;
 }
 

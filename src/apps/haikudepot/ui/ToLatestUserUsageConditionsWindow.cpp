@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2024 Haiku, Inc. All rights reserved.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -305,9 +305,9 @@ ToLatestUserUsageConditionsWindow::_FetchDataPerform()
 void
 ToLatestUserUsageConditionsWindow::_NotifyFetchProblem()
 {
-	AppUtils::NotifySimpleError(B_TRANSLATE("Usage conditions download problem"),
+	AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Usage conditions download problem"),
 		B_TRANSLATE("An error has arisen downloading the usage conditions. Check the log for "
-					"details and try again. " ALERT_MSG_LOGS_USER_GUIDE));
+					"details and try again. " ALERT_MSG_LOGS_USER_GUIDE)));
 }
 
 
@@ -358,8 +358,8 @@ ToLatestUserUsageConditionsWindow::_AgreePerform()
 	} else {
 		int32 errorCode = WebAppInterface::ErrorCodeFromResponse(responsePayload);
 		if (errorCode == ERROR_CODE_NONE) {
-			AppUtils::NotifySimpleError(B_TRANSLATE("Usage conditions agreed"),
-				B_TRANSLATE("The current usage conditions have been agreed to."));
+			AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Usage conditions agreed"),
+				B_TRANSLATE("The current usage conditions have been agreed to.")));
 			messenger.SendMessage(B_QUIT_REQUESTED);
 		} else {
 			ServerHelper::NotifyServerJsonRpcError(responsePayload);

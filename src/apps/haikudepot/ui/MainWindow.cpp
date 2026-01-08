@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -94,6 +94,18 @@ enum {
 };
 
 
+const char* const main_window_keys::kKeyWindowSettings = "window_settings";
+
+static const char* const kKeyWorkStatusText = "work_status_text";
+static const char* const kKeyWorkStatusProgress = "work_status_progress";
+static const char* const kKeyWindowFrame = "window frame";
+	// use of spaces is historical
+static const char* const kKeySinglePackageWindowFrame = "small window frame";
+	// use of spaces is historical
+static const char* const kKeyColumnSettings = "column settings";
+	// use of spaces is historical
+
+
 #define KEY_ERROR_STATUS				"errorStatus"
 
 const bigtime_t kIncrementViewCounterDelayMicros = 3 * 1000 * 1000;
@@ -180,7 +192,7 @@ public:
 
 private:
 		// PackageInfoListener
-	virtual void PackagesChanged(const PackageInfoEvents& events)
+	virtual void PackagesChanged(const PackageChangeEvents& events)
 	{
 		fMainWindow->PackagesChanged(events);
 	}
@@ -261,7 +273,7 @@ MainWindow::MainWindow(const BMessage& settings)
 	fModel.AddPackageListener(fPackageInfoListener);
 
 	BMessage columnSettings;
-	if (settings.FindMessage("column settings", &columnSettings) == B_OK)
+	if (settings.FindMessage(kKeyColumnSettings, &columnSettings) == B_OK)
 		fPackageListView->LoadState(&columnSettings);
 
 	_RestoreModelSettings(settings);
@@ -410,7 +422,7 @@ MainWindow::QuitRequested()
 	BMessage settings;
 	StoreSettings(settings);
 	BMessage message(MSG_MAIN_WINDOW_CLOSED);
-	message.AddMessage(KEY_WINDOW_SETTINGS, &settings);
+	message.AddMessage(main_window_keys::kKeyWindowSettings, &settings);
 	be_app->PostMessage(&message);
 
 	if (fShuttingDownWindow != NULL) {
@@ -573,7 +585,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_SERVER_DATA_CHANGED:
 		{
 			BString name;
-			if (message->FindString("name", &name) == B_OK) {
+			if (message->FindString(shared_message_keys::kKeyPackageName, &name) == B_OK) {
 				if (fPackageInfoView->Package()->Name() == name) {
 					_PopulatePackageAsync(true);
 				} else {
@@ -592,7 +604,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_PACKAGE_SELECTED:
 		{
 			BString name;
-			if (message->FindString("name", &name) == B_OK) {
+			if (message->FindString(shared_message_keys::kKeyPackageName, &name) == B_OK) {
 				PackageInfoRef package;
 				package = fModel.PackageForName(name);
 
@@ -611,7 +623,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_CATEGORY_SELECTED:
 		{
 			BString code;
-			if (message->FindString("code", &code) != B_OK)
+			if (message->FindString(shared_message_keys::kKeyCode, &code) != B_OK)
 				code = "";
 			fModel.SetFilterSpecification(
 				PackageFilterSpecificationBuilder(fModel.FilterSpecification())
@@ -623,7 +635,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_DEPOT_SELECTED:
 		{
 			BString name;
-			if (message->FindString("name", &name) != B_OK)
+			if (message->FindString(shared_message_keys::kKeyDepotName, &name) != B_OK)
 				name = "";
 			fModel.SetFilterSpecification(
 				PackageFilterSpecificationBuilder(fModel.FilterSpecification())
@@ -637,7 +649,7 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			// TODO: Do this with a delay!
 			BString searchTerms;
-			if (message->FindString("search terms", &searchTerms) != B_OK)
+			if (message->FindString(filter_view_keys::kKeySearchTerms, &searchTerms) != B_OK)
 				searchTerms = "";
 			fModel.SetFilterSpecification(
 				PackageFilterSpecificationBuilder(fModel.FilterSpecification())
@@ -654,6 +666,34 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			ProcessCoordinatorState state(message);
 			_HandleProcessCoordinatorChanged(state);
+			break;
+		}
+
+		case MSG_PKG_INSTALL:
+		{
+			InstallPackageAction action(message);
+			ProcessCoordinator* coordinator
+				= ProcessCoordinatorFactory::CreateInstallPackageActionCoordinator(&fModel, action);
+			_AddProcessCoordinator(coordinator);
+			break;
+		}
+
+		case MSG_PKG_UNINSTALL:
+		{
+			UninstallPackageAction action(message);
+			ProcessCoordinator* coordinator
+				= ProcessCoordinatorFactory::CreateUninstallPackageActionCoordinator(&fModel,
+					action);
+			_AddProcessCoordinator(coordinator);
+			break;
+		}
+
+		case MSG_PKG_OPEN:
+		{
+			OpenPackageAction action(message);
+			ProcessCoordinator* coordinator
+				= ProcessCoordinatorFactory::CreateOpenPackageActionCoordinator(&fModel, action);
+			_AddProcessCoordinator(coordinator);
 			break;
 		}
 
@@ -723,13 +763,13 @@ MainWindow::StoreSettings(BMessage& settings)
 {
 	settings.AddRect(_WindowFrameName(), Frame());
 	if (!fSinglePackageMode) {
-		settings.AddRect("window frame", Frame());
+		settings.AddRect(kKeyWindowFrame, Frame());
 
 		BMessage columnSettings;
 		if (fPackageListView != NULL)
 			fPackageListView->SaveState(&columnSettings);
 
-		settings.AddMessage("column settings", &columnSettings);
+		settings.AddMessage(kKeyColumnSettings, &columnSettings);
 
 		settings.AddString(SETTING_PACKAGE_LIST_VIEW_MODE,
 			main_window_package_list_view_mode_str(fModel.PackageListViewMode()));
@@ -751,7 +791,7 @@ MainWindow::StoreSettings(BMessage& settings)
 			fModel.CanShareAnonymousUsageData());
 	}
 
-	settings.AddString("username", fModel.Nickname());
+	settings.AddString(SETTING_NICKNAME, fModel.Nickname());
 }
 
 
@@ -769,7 +809,7 @@ MainWindow::Consume(ProcessCoordinator* item)
 	in the GUI.
 */
 void
-MainWindow::PackagesChanged(const PackageInfoEvents& events)
+MainWindow::PackagesChanged(const PackageChangeEvents& events)
 {
 	BMessage message(MSG_PACKAGES_CHANGED);
 	status_t result = events.Archive(&message);
@@ -788,32 +828,35 @@ MainWindow::PackagesChanged(const PackageInfoEvents& events)
 void
 MainWindow::_HandlePackagesChanged(const BMessage* message)
 {
-	PackageInfoEvents events;
-
-	// Unpack the changes and at the same time marry them back up to the
-	// package from the model.
-
-	if (fModel.DearchiveInfoEvents(message, events) != B_OK) {
-		HDERROR("unable to de-archive the package info events");
-		return;
-	}
-
-	_HandlePackagesChanged(events);
-}
-
-
-void
-MainWindow::_HandlePackagesChanged(const PackageInfoEvents& events)
-{
+	PackageChangeEvents packageEvents(message);
 
 	// if there are no events to process then drop.
 
-	if (events.IsEmpty()) {
+	if (packageEvents.IsEmpty()) {
 		HDINFO("window encountered an empty packages changed");
 		return;
 	}
 
-	HDTRACE("window processing %" B_PRIi32 " package changes", events.CountEvents());
+	HDTRACE("window processing %" B_PRIi32 " package changes", packageEvents.CountEvents());
+
+	// Transfer the package change events into package *info* change events so
+	// that the immutable PackageInfo instances can be used in the processing
+	// without having to continuously query the model causing lock overhead.
+
+	std::vector<PackageInfoChangeEvent> packageInfoEvents;
+
+	for (int32 i = packageEvents.CountEvents() - 1; i >= 0; i--) {
+		const PackageChangeEvent packageEvent = packageEvents.EventAtIndex(i);
+		const PackageInfoRef packageInfo = fModel.PackageForName(packageEvent.PackageName());
+
+		if (packageInfo.IsSet()) {
+			const PackageInfoChangeEvent packageInfoEvent(packageInfo, packageEvent.Changes());
+			packageInfoEvents.push_back(packageInfoEvent);
+		} else {
+			HDERROR("package [%s] from change event not found",
+				packageEvent.PackageName().String());
+		}
+	}
 
 	// now process the messages by adding and removing them from lists.
 
@@ -826,14 +869,17 @@ MainWindow::_HandlePackagesChanged(const PackageInfoEvents& events)
 		std::vector<PackageInfoRef> addedFeaturedPackages;
 		std::vector<PackageInfoRef> removedFeaturedPackages;
 
-		for (int32 i = events.CountEvents() - 1; i >= 0; i--) {
-			const PackageInfoEvent event = events.EventAtIndex(i);
+		std::vector<PackageInfoChangeEvent>::const_iterator it;
 
-			if (event.Changes() & watchedChanges) {
-				const PackageInfoRef package = event.Package();
-				const bool isProminent = PackageUtils::IsProminent(package);
+		for (it = packageInfoEvents.begin(); it != packageInfoEvents.end(); it++) {
+			const PackageInfoChangeEvent packageInfoEvent = *it;
+
+			if (packageInfoEvent.Changes() & watchedChanges) {
+				const PackageInfoRef package = packageInfoEvent.Package();
 
 				if (package.IsSet()) {
+					const bool isProminent = PackageUtils::IsProminent(package);
+
 					if (filter->AcceptsPackage(package)) {
 						addedPackages.push_back(package);
 
@@ -845,6 +891,9 @@ MainWindow::_HandlePackagesChanged(const PackageInfoEvents& events)
 						if (isProminent)
 							removedFeaturedPackages.push_back(package);
 					}
+				} else {
+					HDFATAL("package change event for missing package");
+						// should have checked earlier so this is an illegal state
 				}
 			}
 		}
@@ -859,11 +908,11 @@ MainWindow::_HandlePackagesChanged(const PackageInfoEvents& events)
 	// determine which packages are assigned.
 
 	if (!fSinglePackageMode) {
-		fFeaturedPackagesView->HandlePackagesChanged(events);
-		fPackageListView->HandlePackagesChanged(events);
+		fFeaturedPackagesView->HandlePackagesChanged(packageInfoEvents);
+		fPackageListView->HandlePackagesChanged(packageInfoEvents);
 	}
 
-	fPackageInfoView->HandlePackagesChanged(events);
+	fPackageInfoView->HandlePackagesChanged(packageInfoEvents);
 }
 
 
@@ -954,7 +1003,7 @@ void
 MainWindow::_RestoreNickname(const BMessage& settings)
 {
 	BString nickname;
-	if (settings.FindString("username", &nickname) == B_OK && nickname.Length() > 0) {
+	if (settings.FindString(SETTING_NICKNAME, &nickname) == B_OK && nickname.Length() > 0) {
 		UserCredentials credentials;
 		if (IdentityAndAccessUtils::RetrieveCredentials(nickname, credentials) == B_OK) {
 			fModel.SetCredentials(credentials);
@@ -972,9 +1021,9 @@ const char*
 MainWindow::_WindowFrameName() const
 {
 	if (fSinglePackageMode)
-		return "small window frame";
+		return kKeySinglePackageWindowFrame;
 
-	return "window frame";
+	return kKeyWindowFrame;
 }
 
 
@@ -1173,7 +1222,7 @@ MainWindow::_SetupDelayedIncrementViewCounter(const PackageInfoRef package)
 		delete fIncrementViewCounterDelayedRunner;
 	}
 	BMessage message(MSG_INCREMENT_VIEW_COUNTER);
-	message.SetString("name", package->Name());
+	message.SetString(shared_message_keys::kKeyPackageName, package->Name());
 	fIncrementViewCounterDelayedRunner
 		= new BMessageRunner(BMessenger(this), &message, kIncrementViewCounterDelayMicros, 1);
 	if (fIncrementViewCounterDelayedRunner->InitCheck() != B_OK)
@@ -1185,7 +1234,7 @@ void
 MainWindow::_HandleIncrementViewCounter(const BMessage* message)
 {
 	BString name;
-	if (message->FindString("name", &name) == B_OK) {
+	if (message->FindString(shared_message_keys::kKeyPackageName, &name) == B_OK) {
 		const PackageInfoRef& viewedPackage = fPackageInfoView->Package();
 		if (viewedPackage.IsSet()) {
 			const BString& viewedPackageName = viewedPackage->Name();
@@ -1294,12 +1343,12 @@ MainWindow::_BulkLoadCompleteReceived(status_t errorStatus)
 	PackagesSummary packagesSummary = fModel.GeneratePackagesSummary();
 
 	if (errorStatus != B_OK) {
-		AppUtils::NotifySimpleError(B_TRANSLATE("Package update error"),
+		AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Package update error"),
 			B_TRANSLATE("While updating package data, a problem has arisen "
 						"that may cause data to be outdated or missing from the "
 						"application's display. Additional details regarding this "
 						"problem may be able to be obtained from the application "
-						"logs." ALERT_MSG_LOGS_USER_GUIDE));
+						"logs." ALERT_MSG_LOGS_USER_GUIDE)));
 	}
 
 	// after the bulk load concludes, if there are no desktop applications
@@ -1373,8 +1422,8 @@ MainWindow::_NotifyWorkStatusChange(const BString& text, float progress)
 	BMessage message(MSG_WORK_STATUS_CHANGE);
 
 	if (!text.IsEmpty())
-		message.AddString(KEY_WORK_STATUS_TEXT, text);
-	message.AddFloat(KEY_WORK_STATUS_PROGRESS, progress);
+		message.AddString(kKeyWorkStatusText, text);
+	message.AddFloat(kKeyWorkStatusProgress, progress);
 
 	this->PostMessage(&message, this);
 }
@@ -1413,7 +1462,8 @@ MainWindow::_SetStateForPackagesByName(BStringList& packageNames, PackageState s
 
 		if (package.IsSet()) {
 			PackageLocalInfoRef localInfo
-				= PackageLocalInfoBuilder(package->LocalInfo()).WithState(state).BuildRef();
+				= PackageLocalInfoBuilder(package->LocalInfo()).WithState(state)
+					.ClearInstallationLocations().BuildRef();
 
 			modifiedPackages.push_back(
 				PackageInfoBuilder(package).WithLocalInfo(localInfo).BuildRef());
@@ -1439,10 +1489,10 @@ MainWindow::_HandleWorkStatusChangeMessageReceived(const BMessage* message)
 	BString text;
 	float progress;
 
-	if (message->FindString(KEY_WORK_STATUS_TEXT, &text) == B_OK)
+	if (message->FindString(kKeyWorkStatusText, &text) == B_OK)
 		fWorkStatusView->SetText(text);
 
-	if (message->FindFloat(KEY_WORK_STATUS_PROGRESS, &progress) == B_OK) {
+	if (message->FindFloat(kKeyWorkStatusProgress, &progress) == B_OK) {
 		if (progress < 0.0f)
 			fWorkStatusView->SetBusy();
 		else
@@ -1590,7 +1640,7 @@ MainWindow::_UpdateAvailableRepositories()
 
 		if (depot->Name().Length() != 0) {
 			BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
-			message->AddString("name", depot->Name());
+			message->AddString(shared_message_keys::kKeyDepotName, depot->Name());
 			BMenuItem* item = new(std::nothrow) BMenuItem(depot->Name(), message);
 
 			if (item == NULL)
@@ -1709,7 +1759,7 @@ MainWindow::UserCredentialsFailed()
 								  "and you should login again with your updated password.");
 	message.ReplaceAll("%Nickname%", fModel.Nickname());
 
-	AppUtils::NotifySimpleError(B_TRANSLATE("Login issue"), message);
+	AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Login issue"), message));
 
 	if (IdentityAndAccessUtils::ClearCredentials() != B_OK)
 		HDERROR("unable to remove stored credentials");

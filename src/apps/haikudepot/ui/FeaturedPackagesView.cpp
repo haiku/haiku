@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2025, Pawan Yerramilli <me@pawanyerramilli.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -300,7 +300,7 @@ public:
 		if (index != -1) {
 			BMessage message(MSG_PACKAGE_SELECTED);
 			BString packageName = fPackages[index]->Name();
-			message.AddString("name", packageName);
+			message.AddString(shared_message_keys::kKeyPackageName, packageName);
 			Window()->PostMessage(&message);
 		}
 	}
@@ -320,17 +320,18 @@ public:
 	// #pragma mark - update / add / remove / clear data
 
 
-	void HandlePackagesChanged(const PackageInfoEvents& events)
+	void HandlePackagesChanged(const std::vector<PackageInfoChangeEvent>& events)
 	{
-		for (int32 i = events.CountEvents() - 1; i >= 0; i--)
-			_HandlePackageChanged(events.EventAtIndex(i));
+		std::vector<PackageInfoChangeEvent>::const_iterator it;
+		for (it = events.begin(); it != events.end(); it++)
+			_HandlePackageChanged(*it);
 	}
 
 
-	void _HandlePackageChanged(const PackageInfoEvent& event)
+	void _HandlePackageChanged(const PackageInfoChangeEvent& event)
 	{
 		uint32 changes = event.Changes();
-		PackageInfoRef package = event.Package();
+		const PackageInfoRef package = event.Package();
 
 		if (!package.IsSet() || 0 == changes)
 			return;
@@ -1089,7 +1090,7 @@ FeaturedPackagesView::HandleIconsChanged()
 
 
 void
-FeaturedPackagesView::HandlePackagesChanged(const PackageInfoEvents& events)
+FeaturedPackagesView::HandlePackagesChanged(const std::vector<PackageInfoChangeEvent>& events)
 {
 	fPackagesView->HandlePackagesChanged(events);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2026, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -93,7 +93,8 @@ UninstallPackageProcess::RunInternal()
 		BString errorString;
 		errorString.SetToFormat("Fatal error occurred while uninstalling package %s: %s (%s)\n",
 			fPackageName.String(), ex.Message().String(), ex.Details().String());
-		AppUtils::NotifySimpleError(B_TRANSLATE("Fatal error"), errorString, B_STOP_ALERT);
+		AppUtils::NotifySimpleError(
+			SimpleAlert(B_TRANSLATE("Fatal error"), errorString, B_STOP_ALERT));
 		SetPackageState(fPackageName, state);
 		return ex.Error();
 	} catch (BAbortedByUserException& ex) {

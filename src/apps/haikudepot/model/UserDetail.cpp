@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -9,18 +9,18 @@
 // These are keys that are used to store this object's data into a BMessage
 // instance.
 
-#define KEY_NICKNAME							"nickname"
-#define KEY_AGREEMENT							"agreement"
-#define KEY_IS_LATEST							"isLatest"
-#define KEY_CODE								"code"
-#define KEY_TIMESTAMP_AGREED					"timestampAgreed"
+static const char* const kKeyNickname = "nickname";
+static const char* const kKeyAgreement = "agreement";
+static const char* const kKeyIsLatest = "is_latest";
+static const char* const kKeyCode = "code";
+static const char* const kKeyTimestampAgreed = "timestamp_agreed";
 
 
 UserUsageConditionsAgreement::UserUsageConditionsAgreement(BMessage* from)
 {
-	from->FindUInt64(KEY_TIMESTAMP_AGREED, &fTimestampAgreed);
-	from->FindString(KEY_CODE, &fCode);
-	from->FindBool(KEY_IS_LATEST, &fIsLatest);
+	from->FindUInt64(kKeyTimestampAgreed, &fTimestampAgreed);
+	from->FindString(kKeyCode, &fCode);
+	from->FindBool(kKeyIsLatest, &fIsLatest);
 }
 
 
@@ -96,11 +96,11 @@ UserUsageConditionsAgreement::Archive(BMessage* into, bool deep) const
 {
 	status_t result = B_OK;
 	if (result == B_OK)
-		result = into->AddUInt64(KEY_TIMESTAMP_AGREED, fTimestampAgreed);
+		result = into->AddUInt64(kKeyTimestampAgreed, fTimestampAgreed);
 	if (result == B_OK)
-		result = into->AddString(KEY_CODE, fCode);
+		result = into->AddString(kKeyCode, fCode);
 	if (result == B_OK)
-		result = into->AddBool(KEY_IS_LATEST, fIsLatest);
+		result = into->AddBool(kKeyIsLatest, fIsLatest);
 	return result;
 }
 
@@ -108,11 +108,9 @@ UserUsageConditionsAgreement::Archive(BMessage* into, bool deep) const
 UserDetail::UserDetail(BMessage* from)
 {
 	BMessage agreementMessage;
-	if (from->FindMessage(KEY_AGREEMENT,
-			&agreementMessage) == B_OK) {
+	if (from->FindMessage(kKeyAgreement, &agreementMessage) == B_OK)
 		fAgreement = UserUsageConditionsAgreement(&agreementMessage);
-	}
-	from->FindString(KEY_NICKNAME, &fNickname);
+	from->FindString(kKeyNickname, &fNickname);
 }
 
 
@@ -175,9 +173,9 @@ UserDetail::Archive(BMessage* into, bool deep) const
 		BMessage agreementMessage;
 		result = fAgreement.Archive(&agreementMessage, true);
 		if (result == B_OK)
-			result = into->AddMessage(KEY_AGREEMENT, &agreementMessage);
+			result = into->AddMessage(kKeyAgreement, &agreementMessage);
 	}
 	if (result == B_OK)
-		result = into->AddString(KEY_NICKNAME, fNickname);
+		result = into->AddString(kKeyNickname, fNickname);
 	return result;
 }

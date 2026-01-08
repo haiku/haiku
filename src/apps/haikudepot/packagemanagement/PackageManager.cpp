@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2024, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2026, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -160,8 +160,13 @@ PackageManager::CollectPackageActions(PackageInfoRef package,
 			break;
 		case NONE:
 		case UNINSTALLED:
-			actionList.Add(_CreateInstallPackageAction(package));
+		{
+			BString packageTitle;
+			PackageUtils::TitleOrName(package, packageTitle);
+			actionList.Add(
+				PackageActionRef(new InstallPackageAction(package->Name(), packageTitle), true));
 			break;
+		}
 		case DOWNLOADING:
 			HDINFO("no package actions for [%s] (downloading)",
 				package->Name().String());
@@ -183,7 +188,11 @@ PackageManager::_CollectPackageActionsForActivatedOrInstalled(
 		PackageInfoRef package,
 		Collector<PackageActionRef>& actionList)
 {
-	actionList.Add(_CreateUninstallPackageAction(package));
+	BString packageTitle;
+	PackageUtils::TitleOrName(package, packageTitle);
+
+	actionList.Add(
+		PackageActionRef(new UninstallPackageAction(package->Name(), packageTitle), true));
 
 	// Add OpenPackageActions for each deskbar link found in the
 	// package
@@ -192,60 +201,14 @@ PackageManager::_CollectPackageActionsForActivatedOrInstalled(
 		std::vector<DeskbarLink>::const_iterator it;
 		for (it = foundLinks.begin(); it != foundLinks.end(); it++) {
 			const DeskbarLink& aLink = *it;
-			actionList.Add(_CreateOpenPackageAction(package, aLink));
+			if (aLink.IsValid()) {
+				actionList.Add(
+					PackageActionRef(new OpenPackageAction(package->Name(), aLink), true));
+			} else {
+				HDERROR("broken deskbar link for [%s]", package->Name().String());
+			}
 		}
 	}
-}
-
-
-PackageActionRef
-PackageManager::_CreateUninstallPackageAction(const PackageInfoRef& package)
-{
-	BString actionTitle = B_TRANSLATE("Uninstall %PackageTitle%");
-	BString packageTitle;
-	PackageUtils::TitleOrName(package, packageTitle);
-	actionTitle.ReplaceAll("%PackageTitle%", packageTitle);
-
-	BMessage message(MSG_PKG_UNINSTALL);
-	message.AddString(KEY_TITLE, actionTitle);
-	message.AddString(KEY_PACKAGE_NAME, package->Name());
-
-	return PackageActionRef(new PackageAction(actionTitle, message), true);
-}
-
-
-PackageActionRef
-PackageManager::_CreateInstallPackageAction(const PackageInfoRef& package)
-{
-	BString actionTitle = B_TRANSLATE("Install %PackageTitle%");
-	BString packageTitle;
-	PackageUtils::TitleOrName(package, packageTitle);
-	actionTitle.ReplaceAll("%PackageTitle%", packageTitle);
-
-	BMessage message(MSG_PKG_INSTALL);
-	message.AddString(KEY_TITLE, actionTitle);
-	message.AddString(KEY_PACKAGE_NAME, package->Name());
-
-	return PackageActionRef(new PackageAction(actionTitle, message), true);
-}
-
-
-PackageActionRef
-PackageManager::_CreateOpenPackageAction(const PackageInfoRef& package, const DeskbarLink& link)
-{
-	BString title = B_TRANSLATE("Open %DeskbarLink%");
-	title.ReplaceAll("%DeskbarLink%", link.Title());
-
-	BMessage deskbarLinkMessage;
-	if (link.Archive(&deskbarLinkMessage) != B_OK)
-		HDFATAL("unable to archive the deskbar link");
-
-	BMessage message(MSG_PKG_OPEN);
-	message.AddString(KEY_TITLE, title);
-	message.AddMessage(KEY_DESKBAR_LINK, &deskbarLinkMessage);
-	message.AddString(KEY_PACKAGE_NAME, package->Name());
-
-	return PackageActionRef(new PackageAction(title, message), true);
 }
 
 

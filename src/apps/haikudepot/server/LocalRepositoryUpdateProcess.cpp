@@ -181,7 +181,5 @@ LocalRepositoryUpdateProcess::_NotifyError(const BString& error,
 		alertText.Append(")");
 	}
 
-	AppUtils::NotifySimpleError(
-		B_TRANSLATE("Repository update error"),
-		alertText);
+	AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Repository update error"), alertText));
 }

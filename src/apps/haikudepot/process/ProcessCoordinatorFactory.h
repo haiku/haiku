@@ -8,6 +8,7 @@
 #include <SupportDefs.h>
 
 #include "AbstractProcess.h"
+#include "PackageAction.h"
 #include "PackageInfo.h"
 #include "PackageScreenshotRepository.h"
 
@@ -32,9 +33,6 @@ public:
 									UserDetailVerifierListener* userDetailVerifierListener,
 									Model* model);
 
-	static	ProcessCoordinator*	CreatePackageActionCoordinator(
-									Model* model, BMessage* message);
-
 	static	ProcessCoordinator*	CacheScreenshotCoordinator(
 									Model* model, ScreenshotCoordinate& screenshotCoordinate);
 
@@ -44,19 +42,17 @@ public:
 	static	ProcessCoordinator*	PopulatePkgUserRatingsCoordinator(Model* model,
 									const BString& packageName);
 
+	static	ProcessCoordinator*	CreateInstallPackageActionCoordinator(Model* model,
+									const InstallPackageAction& action);
+
+	static	ProcessCoordinator*	CreateUninstallPackageActionCoordinator(Model* model,
+									const UninstallPackageAction& action);
+
+	static	ProcessCoordinator*	CreateOpenPackageActionCoordinator(Model* model,
+									const OpenPackageAction& action);
+
 private:
 	static	uint32				_CalculateServerProcessOptions();
-
-	static	BString				_ExtractPackageNameFromMessage(BMessage* message);
-
-	static	ProcessCoordinator*	_CreateInstallPackageActionCoordinator(
-									Model* model, BMessage* message);
-
-	static	ProcessCoordinator*	_CreateUninstallPackageActionCoordinator(
-									Model* model, BMessage* message);
-
-	static	ProcessCoordinator*	_CreateOpenPackageActionCoordinator(
-									Model* model, BMessage* message);
 
 	static	ProcessCoordinator*	_CreateSingleProcessCoordinator(const char* name,
 									AbstractProcess *process);

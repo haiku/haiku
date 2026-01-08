@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -9,16 +9,16 @@
 // These are keys that are used to store this object's data into a BMessage
 // instance.
 
-#define KEY_NICKNAME		"nickname"
-#define KEY_PASSWORD_CLEAR	"passwordClear"
-#define KEY_IS_SUCCESSFUL	"isSuccessful"
+static const char* const kKeyNickname = "nickname";
+static const char* const kKeyPasswordClear = "password_clear";
+static const char* const kKeyIsSuccessful = "is_successful";
 
 
 UserCredentials::UserCredentials(BMessage* from)
 {
-	from->FindString(KEY_NICKNAME, &fNickname);
-	from->FindString(KEY_PASSWORD_CLEAR, &fPasswordClear);
-	from->FindBool(KEY_IS_SUCCESSFUL, &fIsSuccessful);
+	from->FindString(kKeyNickname, &fNickname);
+	from->FindString(kKeyPasswordClear, &fPasswordClear);
+	from->FindBool(kKeyIsSuccessful, &fIsSuccessful);
 }
 
 
@@ -133,10 +133,10 @@ UserCredentials::Archive(BMessage* into, bool deep) const
 {
 	status_t result = B_OK;
 	if (result == B_OK)
-		result = into->AddString(KEY_NICKNAME, fNickname);
+		result = into->AddString(kKeyNickname, fNickname);
 	if (result == B_OK)
-		result = into->AddString(KEY_PASSWORD_CLEAR, fPasswordClear);
+		result = into->AddString(kKeyPasswordClear, fPasswordClear);
 	if (result == B_OK)
-		result = into->AddBool(KEY_IS_SUCCESSFUL, fIsSuccessful);
+		result = into->AddBool(kKeyIsSuccessful, fIsSuccessful);
 	return result;
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "Model.h"
@@ -235,48 +235,6 @@ Model::AddPackageListener(const PackageInfoListenerRef& packageListener)
 }
 
 
-/*!	This method will take the event info data stored in the supplied message
-	and turn it back into an instance of `PackageInfoEvents`. It is done in
-	this way because the lookup of the packages within each `PackageInfoEvent`
-	has to come from the model.
-*/
-status_t
-Model::DearchiveInfoEvents(const BMessage* message, PackageInfoEvents& packageInfoEvents) const
-{
-	BAutolock locker(&fLock);
-	int32 i = 0;
-	BMessage eventMessage;
-	BString packageName;
-	uint32 changeMask;
-
-	while (message->FindMessage(kPackageInfoEventsKey, i, &eventMessage) == B_OK) {
-		status_t result = B_OK;
-
-		if (result == B_OK)
-			result = eventMessage.FindString(kPackageInfoPackageNameKey, &packageName);
-
-		if (result == B_OK)
-			result = eventMessage.FindUInt32(kPackageInfoChangesKey, &changeMask);
-
-		if (result == B_OK) {
-			PackageInfoRef package = PackageForName(packageName);
-
-			if (package.IsSet()) {
-				PackageInfoEvent event(package, changeMask);
-				packageInfoEvents.AddEvent(event);
-			}
-		} else {
-			HDFATAL("broken event info found processing events");
-				// should not occur as the data assembly is entirely inside the application
-		}
-
-		i++;
-	}
-
-	return B_OK;
-}
-
-
 const LanguageRef
 Model::PreferredLanguage() const
 {
@@ -423,7 +381,7 @@ Model::AddPackage(const PackageInfoRef& package)
 	BAutolock locker(&fLock);
 	uint32 changeMask = _ChangeDiff(package);
 	fPackages[package->Name()] = package;
-	_NotifyPackageChange(PackageInfoEvent(package, changeMask));
+	_NotifyPackageChange(PackageChangeEvent(package, changeMask));
 }
 
 
@@ -434,12 +392,12 @@ Model::AddPackages(const std::vector<PackageInfoRef>& packages)
 		return;
 
 	BAutolock locker(&fLock);
-	PackageInfoEvents events;
+	PackageChangeEvents events;
 	std::vector<PackageInfoRef>::const_iterator it;
 
 	for (it = packages.begin(); it != packages.end(); it++) {
 		PackageInfoRef package = *it;
-		events.AddEvent(PackageInfoEvent(package, _ChangeDiff(package)));
+		events.AddEvent(PackageChangeEvent(package, _ChangeDiff(package)));
 		fPackages[package->Name()] = package;
 	}
 
@@ -454,12 +412,12 @@ Model::AddPackagesWithChange(const std::vector<PackageInfoRef>& packages, uint32
 		return;
 
 	BAutolock locker(&fLock);
-	PackageInfoEvents events;
+	PackageChangeEvents events;
 
 	std::vector<PackageInfoRef>::const_iterator it;
 	for (it = packages.begin(); it != packages.end(); it++) {
 		PackageInfoRef package = *it;
-		events.AddEvent(PackageInfoEvent(package, changeMask));
+		events.AddEvent(PackageChangeEvent(package, changeMask));
 		fPackages[package->Name()] = package;
 	}
 
@@ -652,20 +610,20 @@ Model::_NotifyCategoryListChanged()
 
 
 void
-Model::_NotifyPackageChange(const PackageInfoEvent& event)
+Model::_NotifyPackageChange(const PackageChangeEvent& event)
 {
 	std::vector<PackageInfoListenerRef>::const_iterator it;
 	for (it = fPackageListeners.begin(); it != fPackageListeners.end(); it++) {
 		const PackageInfoListenerRef& listener = *it;
 		if (listener.IsSet())
-			listener->PackagesChanged(PackageInfoEvents(event));
+			listener->PackagesChanged(PackageChangeEvents(event));
 	}
 }
 
 
 // TODO: future work to optimize how this is conveyed to the listener in one go.
 void
-Model::_NotifyPackageChanges(const PackageInfoEvents& events)
+Model::_NotifyPackageChanges(const PackageChangeEvents& events)
 {
 	if (events.IsEmpty())
 		return;
