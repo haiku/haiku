@@ -531,8 +531,9 @@ MainWindow::MessageReceived(BMessage* message)
 				fRegisterFilePanel = new(std::nothrow) BFilePanel(B_OPEN_PANEL,
 					new BMessenger(this), NULL, B_FILE_NODE, false,
 					new BMessage(MSG_REGISTER), NULL, true);
-				fRegisterFilePanel->Window()->SetTitle(B_TRANSLATE(
-					"DriveSetup: Register disk image"));
+				BString title(B_TRANSLATE("%appname%: Register disk image"));
+				title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("DriveSetup"));
+				fRegisterFilePanel->Window()->SetTitle(title);
 				fRegisterFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Register"));
 			}
 
@@ -571,8 +572,9 @@ MainWindow::MessageReceived(BMessage* message)
 					fWriteImageFilePanel = new(std::nothrow) BFilePanel(
 						B_OPEN_PANEL, new BMessenger(this), NULL, B_FILE_NODE,
 						false, new BMessage(MSG_WRITE), NULL, true);
-					fWriteImageFilePanel->Window()->SetTitle(B_TRANSLATE(
-						"DriveSetup: Select disk image"));
+					BString title(B_TRANSLATE("%appname%: Select disk image"));
+					title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("DriveSetup"));
+					fWriteImageFilePanel->Window()->SetTitle(title);
 					fWriteImageFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Write"));
 				}
 				if (fWriteImageFilePanel != NULL)
