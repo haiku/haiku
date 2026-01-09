@@ -110,3 +110,45 @@ We can't change this for symbols existing from BeOS, as it would break binary co
 may need to change this in R2. However, we should keep this in mind when adding new functions to
 libroot. There is no well-defined solution for this currently, but the strategies documented above
 can be used if needed.
+
+POSIX non-conformities
+======================
+
+Haiku tries to follow the POSIX specification as closely as possible, however, existing design
+constraints (inherited from BeOS) sometimes prevent to do so.
+
+Negative errno codes
+--------------------
+
+POSIX requires (since Issue 6) that values for errno are positive. In BeOS and Haiku, they are
+negative.
+
+This is sometimes used in a pattern similar to this::
+
+    int getValueOrError(void)
+    {
+        if (everythingOk)
+            return value;
+        else
+            return -EACCESS;
+    }
+
+This will not work on Haiku, as the returned value will be positive in all cases.
+
+There is a further special case for ENOMEM, which normally has the value INT_MIN, and as such
+cannot be negated at all (as -INT32_MIN cannot be stored in an int variable).
+
+The posix_error_mapper library can be used to convert the errno values. Applications that require
+positive error codes should use that library to ensure proper operation. However, this can lead
+to further incompatibilities if error codes are also forwarded between an application and libraries
+or add-ons that don't use the same sign for error codes.
+
+To use the library, you also need to define B_USE_POSITIVE_POSIX_ERRORS as a preprocessor constant
+before including any system headers (typically as a compiler command line switch).
+
+Implementation of atime
+-----------------------
+
+The BFS filesytem does not store the access time.
+
+Currently, stat() and similar functions always return the current time in the atime field.
