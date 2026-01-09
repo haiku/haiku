@@ -83,6 +83,7 @@ private:
 			status_t	_PrepareAndSend(tcp_segment_header& segment, net_buffer* buffer,
 							bool isRetransmit);
 			status_t	_SendAcknowledge(bool force = false);
+			status_t	_SendReset(bool force = false);
 			status_t	_SendQueued(bool force = false);
 
 			status_t	_Disconnect(bool closing);

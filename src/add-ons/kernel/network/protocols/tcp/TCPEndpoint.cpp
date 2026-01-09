@@ -1755,6 +1755,16 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		return DROP;
 	}
 
+	if (fState == FINISH_ACKNOWLEDGED
+		&& segment.AcknowledgeOnly()
+		&& (fReceiveMaxAdvertised - fReceiveNext).Number() == 0
+		&& segmentLength == 0
+		&& segment.acknowledge == fSendUnacknowledged) {
+		// reset the connection - received another ack packet
+		// while finish acknowledged and zero receive window
+		return DROP | RESET;
+	}
+
 	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
 		|| (fState == SYNCHRONIZE_RECEIVED
 			&& (fInitialReceiveSequence > segment.sequence
@@ -1979,7 +1989,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	_UpdateTimestamps(segment, segmentLength);
 
-	TRACE("Receive() Action %" B_PRId32, action);
+	TRACE("Receive() Action 0x%" B_PRIx32, action);
 
 	return action;
 }
@@ -2030,6 +2040,13 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 
 	if (segmentAction & SEND_QUEUED)
 		_SendQueued();
+
+	// handle RESET action separately to use actual connection
+	// to generate the segment information
+	if ((segmentAction & RESET) != 0 && _SendReset(true) == B_OK) {
+		fState = CLOSED;
+		segmentAction &= ~RESET;
+	}
 
 	if ((fFlags & (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE))
 			== (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE)) {
@@ -2296,6 +2313,29 @@ TCPEndpoint::_SendAcknowledge(bool force)
 }
 
 
+/*!	Sends a RST with segment information related to the connection. */
+status_t
+TCPEndpoint::_SendReset(bool force)
+{
+	if (fRoute == NULL || fState == LISTEN)
+		return B_ERROR;
+
+	tcp_segment_header segment = _PrepareSendSegment();
+
+	// Is there actually anything to do?
+	if (!force && (fState != FINISH_ACKNOWLEDGED || (fFlags & FLAG_CLOSED) == 0))
+		return B_OK;
+
+	segment.flags |= TCP_FLAG_RESET;
+
+	net_buffer* buffer = gBufferModule->create(256);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	return _PrepareAndSend(segment, buffer, false);
+}
+
+
 /*!	Sends one or more TCP segments with the data waiting in the queue. */
 status_t
 TCPEndpoint::_SendQueued(bool force)
@@ -2328,12 +2368,15 @@ TCPEndpoint::_SendQueued(bool force)
 
 	if (consumedWindow > sendWindow) {
 		sendWindow = 0;
-		// TODO: enter persist state? try to get a window update.
 	} else
 		sendWindow -= consumedWindow;
 
 	uint32 length = min_c(fSendQueue.Available(fSendNext), sendWindow);
-	if (length == 0 && !state_needs_finish(fState)) {
+	if (!force && length == 0 && !state_needs_finish(fState)) {
+		// try to get a window update
+		if (sendWindow == 0 && !gStackModule->is_timer_active(&fPersistTimer))
+			_StartPersistTimer();
+
 		// Nothing to send.
 		return B_OK;
 	}
