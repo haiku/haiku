@@ -7,8 +7,7 @@
 #include <langinfo.h>
 
 #include "LocaleBackend.h"
-
-#include <PosixLanginfo.h>
+#include "LocaleData.h"
 
 
 using BPrivate::Libroot::gPosixLanginfo;

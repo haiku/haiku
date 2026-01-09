@@ -8,7 +8,7 @@
  */
 
 
-#include <PosixLocaleConv.h>
+#include <LocaleData.h>
 
 #ifndef _KERNEL_MODE
 #include <locale.h>

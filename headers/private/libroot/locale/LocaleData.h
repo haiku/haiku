@@ -2,8 +2,11 @@
  * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _POSIX_CTYPE_H
-#define _POSIX_CTYPE_H
+#ifndef _LOCALE_DATA_H
+#define _LOCALE_DATA_H
+
+
+#include <locale.h>
 
 
 namespace BPrivate {
@@ -22,9 +25,15 @@ extern const unsigned short gPosixClassInfo[384];
 extern const int gPosixToLowerMap[384];
 extern const int gPosixToUpperMap[384];
 
+extern const char* gPosixLanginfo[];
+
+extern const struct lc_time_t gPosixLCTimeInfo;
+
+extern struct lconv gPosixLocaleConv;
+
 
 }	// namespace Libroot
 }	// namespace BPrivate
 
 
-#endif	// _POSIX_CTYPE_H
+#endif	// _LOCALE_DATA_H

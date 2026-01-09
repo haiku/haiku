@@ -8,7 +8,7 @@
 #include <locale.h>
 
 #include <LocaleBackend.h>
-#include <PosixCtype.h>
+#include <LocaleData.h>
 
 
 namespace BPrivate {
@@ -21,9 +21,8 @@ GetClassInfoTable(locale_t l)
 {
 	LocaleBackendData* locale = (LocaleBackendData*)l;
 
-	if (locale->databridge == NULL) {
+	if (locale->databridge == NULL)
 		return &gPosixClassInfo[128];
-	}
 	return *locale->databridge->ctypeDataBridge.addrOfClassInfoTable;
 }
 

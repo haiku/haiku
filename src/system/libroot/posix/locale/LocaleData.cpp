@@ -7,14 +7,12 @@
 #include <ctype.h>
 #include <limits.h>
 
-#include <PosixCtype.h>
-#include <PosixLocaleConv.h>
-
 #ifndef _KERNEL_MODE
 #include <langinfo.h>
-#include <PosixLanginfo.h>
-#include <PosixLCTimeInfo.h>
+#include <timelocal.h>
 #endif
+
+#include <LocaleData.h>
 
 
 /*

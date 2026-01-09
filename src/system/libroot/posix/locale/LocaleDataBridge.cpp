@@ -11,11 +11,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <PosixCtype.h>
-#include <PosixLanginfo.h>
-#include <PosixLCTimeInfo.h>
-#include <PosixLocaleConv.h>
-#include <ThreadLocale.h>
+#include <LocaleData.h>
 
 
 extern const unsigned short* __ctype_b;
