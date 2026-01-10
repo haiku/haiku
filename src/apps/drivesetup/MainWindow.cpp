@@ -591,7 +591,9 @@ MainWindow::MessageReceived(BMessage* message)
 				fReadImageFilePanel = new(std::nothrow) BFilePanel(B_SAVE_PANEL,
 					new BMessenger(this), NULL, B_FILE_NODE, false, NULL, NULL,
 					true);
-				fReadImageFilePanel->Window()->SetTitle(B_TRANSLATE("DriveSetup: Save disk image"));
+				BString title(B_TRANSLATE("%appname%: Save disk image"));
+				title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("DriveSetup"));
+				fReadImageFilePanel->Window()->SetTitle(title);
 			}
 
 			if (fReadImageFilePanel != NULL) {
@@ -762,7 +764,9 @@ FileErrorAlert(const char* text, const char* fileName, alert_type type)
 {
 	BString message;
 	message.SetToFormat(text, fileName);
-	BAlert* alert = new BAlert(B_TRANSLATE("DriveSetup error"), message.String(),
+	BString title(B_TRANSLATE("%appname% error"));
+	title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("DriveSetup"));
+	BAlert* alert = new BAlert(title, message.String(),
 		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_FROM_WIDEST, type);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go(NULL);
@@ -778,13 +782,13 @@ MainWindow::RegisterFileDiskDevice(const char* fileName)
 	if (lstat(fileName, &st) != 0) {
 		status_t error = errno;
 
-		FileErrorAlert(B_TRANSLATE("Failed to get information about %s"),
+		FileErrorAlert(B_TRANSLATE("Failed to get information about '%s'."),
 			fileName, B_STOP_ALERT);
 		return error;
 	}
 
 	if (!S_ISREG(st.st_mode)) {
-		FileErrorAlert(B_TRANSLATE("%s is not a regular file."), fileName,
+		FileErrorAlert(B_TRANSLATE("'%s' is not a regular file."), fileName,
 			B_STOP_ALERT);
 		return B_BAD_VALUE;
 	}
@@ -835,7 +839,7 @@ MainWindow::UnRegisterFileDiskDevice(const char* fileNameOrID)
 			return B_OK;
 		} else {
 			FileErrorAlert(B_TRANSLATE(
-				"No file disk device found with the given ID, trying file %s"),
+				"No file disk device found with the given ID, trying file '%s'."),
 				fileNameOrID, B_WARNING_ALERT);
 		}
 	}
@@ -844,7 +848,7 @@ MainWindow::UnRegisterFileDiskDevice(const char* fileNameOrID)
 	struct stat st;
 	if (lstat(fileNameOrID, &st) != 0) {
 		status_t error = errno;
-		FileErrorAlert(B_TRANSLATE("Failed to get information about %s"),
+		FileErrorAlert(B_TRANSLATE("Failed to get information about '%s'."),
 			fileNameOrID, B_STOP_ALERT);
 		return error;
 	}
@@ -870,7 +874,7 @@ MainWindow::UnRegisterFileDiskDevice(const char* fileNameOrID)
 			status_t error = roster.UnregisterFileDevice(device.ID());
 			if (error != B_OK) {
 				FileErrorAlert(B_TRANSLATE(
-					"Failed to unregister file disk device %s"), fileNameOrID,
+					"Failed to unregister file disk device %s."), fileNameOrID,
 					B_STOP_ALERT);
 				return error;
 			}
@@ -1340,8 +1344,8 @@ MainWindow::_DisplayPartitionError(BString _message,
 	if (error < B_OK) {
 		BString helper = message;
 		const char* errorString
-			= B_TRANSLATE_COMMENT("Error: ", "in any error alert");
-		snprintf(message, sizeof(message), "%s\n\n%s%s", helper.String(),
+			= B_TRANSLATE_COMMENT("Error:", "in any error alert");
+		snprintf(message, sizeof(message), "%s\n\n%s %s", helper.String(),
 			errorString, strerror(error));
 	}
 
