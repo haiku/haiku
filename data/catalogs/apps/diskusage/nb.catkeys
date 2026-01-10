@@ -1,24 +1,17 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskUsage	3399777733
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskUsage	3098961259
 Scanning %refName%	Scanner		Skanner %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d filer
 Size	Info Window		Størrelse
 Rescan	Pie View		Skann på nytt
-Rescan	Volume View		Skann på nytt
-Outdated view	Pie View		Utdatert visning
 Kind	Info Window		Type
 file unavailable	Pie View		fil utilgjengelig
 no supporting apps	Pie View		ingen støttende program
-%d file	Status View		%d fil
 Path	Info Window		Filsti
 Scan	Status View		Skann
-9999.99 GB	Status View		9999.99 GB
 file unavailable	Status View		fil utilgjengelig
-Get Info	Pie View		Hent info
 DiskUsage	System name		Diskbruk
- in %d files	Info Window		 i %d filer
-%d files	Status View		%d filer
 Created	Info Window		Opprettet
 Modified	Info Window		Endret
 Open	Pie View		Åpne
-Open With	Pie View		Åpne med
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Ledig på %refName%

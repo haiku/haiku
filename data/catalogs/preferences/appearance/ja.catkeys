@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Appearance	211365410
+1	japanese	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		コントロールの境界
 Control mark	Colors tab		コントロールの選択部
 Off	AntialiasingSettingsView		無効
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		自動的にセカンダリー�
 Window tab text	Colors tab		ウィンドウタブの文字
 Navigation pulse	Colors tab		ナビゲーションの点滅
 LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
+Progress bar	Colors tab		プログレスバー
 Window tab	Colors tab		ウィンドウタブ
 Link text	Colors tab		リンクテキスト
 Tooltip background	Colors tab		ツールチップの背景
@@ -75,6 +76,5 @@ Inactive window border	Colors tab		アクティブでないウィンドウ枠
 Colors	APRWindow		色
 About control look	DecorSettingsView		コントロール表示について
 Control highlight	Colors tab		コントロールのハイライト
-Status bar	Colors tab		ステータスバー
 Link hover	Colors tab		リンク (ポイント時)
 Single:	DecorSettingsView		一方向:

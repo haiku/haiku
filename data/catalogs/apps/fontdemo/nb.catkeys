@@ -1,16 +1,11 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FontDemo	3522850500
-Outline:	ControlView		Omriss:
-Size: 50	ControlView		Størrelse: 50
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FontDemo	3449067186
 Stop cycling	ControlView		Stopp rotasjon
-Shear: 90	ControlView		Skjevhet: 90
-Spacing: 0	ControlView		Bokstavmellomrom: 0
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Rotasjon: %d
 Shear: %d	ControlView		Skjevhet: %d
 Spacing: %d	ControlView		Bokstavmellomrom: %d
 Cycle fonts	ControlView		Roter skrifttyper
 Font:	ControlView		Skrifttype:
-Rotation: 0	ControlView		Rotasjon: 0
 Drawing mode:	ControlView		Tegnemodus:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Kontroller

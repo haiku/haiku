@@ -4,8 +4,8 @@ Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde partitie onherroepelijk kwijt zijn als u dit doet!
 Device	PartitionList		Apparaat
-Initialize	MainWindow		Initialiseren
 Could not change the parameters of the selected partition.	MainWindow		Kon de parameters van de geselecteerde partitie niet wijzigen.
+Initialize	MainWindow		Initialiseren
 PGP encrypted	Encryption utils		PGP versleuteld
 Delete partition	MainWindow		Partitie verwijderen
 Error: 	MainWindow	in any error alert	Fout:
@@ -24,11 +24,11 @@ DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		Betrokken bij
 Create…	MainWindow		Maken…
 Write changes	MainWindow		Veranderingen schrijven
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisatie van de partitie %s is mislukt. (Er werd niets naar de schijf geschreven.)
 Validation of the given creation parameters failed.	MainWindow		Natrekken van de gegeven creatieparameters is mislukt.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisatie van de partitie %s is mislukt. (Er werd niets naar de schijf geschreven.)
 Eject	MainWindow		Uitwerpen
-Surface test (not implemented)	MainWindow		Oppervlaktetest (niet geïmplementeerd)
 Read only	PartitionList		Alleen lezen
+Surface test (not implemented)	MainWindow		Oppervlaktetest (niet geïmplementeerd)
 The panel could not return successfully.	MainWindow		Het paneel kon niet succesvol terugkeren.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Fout tijdens het schrijven van de parameters van de partitie. Er werden geen veranderingen naar de schijf geschreven.
 Partition %ld	DiskView		Partitie %ld
@@ -46,13 +46,13 @@ End: %s	Support		Einde: %s
 Partition type	PartitionList		Type partitie
 Unable to find the selected partition by ID.	MainWindow		Kan de geselecteerde partitie niet vinden op basis van ID.
 The currently selected partition is not empty.	MainWindow		De nu geselecteerde partitie is niet leeg.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u een gegevensdrager direct wil formatteren zonder initialisatie? (Normaliter wordt deze eerst voorzien van een partitietabel.) U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
-Wipe (not implemented)	MainWindow		Wissen (niet geïmplementeerd)
 The currently selected partition does not have a parent partition.	MainWindow		De nu geselecteerde partitie heeft geen bovenliggende partitie.
+Wipe (not implemented)	MainWindow		Wissen (niet geïmplementeerd)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u een gegevensdrager direct wil formatteren zonder initialisatie? (Normaliter wordt deze eerst voorzien van een partitietabel.) U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
 Validation of the given initialization parameters failed.	MainWindow		Natrekken van de opgegeven initialisatieparameters is mislukt.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Het maken van de partitie is mislukt. Er zijn geen wijzigingen naar de schijf geschreven.
-Shared	PartitionList		Gedeeld
 MIMEs	PartitionList		MIMEs
+Shared	PartitionList		Gedeeld
 BitLocker encrypted	Encryption utils		BitLocker versleuteld
 You need to select a partition entry from the list.	MainWindow		U dient een partitie uit de lijst te selecteren.
 Offset: %s	Support		Offset: %s
@@ -67,8 +67,8 @@ Cancel	AbstractParametersPanel		Annuleren
 Format	MainWindow		Formatteren
 OK	MainWindow		Oké
 Empty space	DiskView		Lege ruimte
-Open with DiskProbe	MainWindow		Open met DiskProbe
 Could not delete the selected partition.	MainWindow		Kon de geselecteerde partitie niet verwijderen.
+Open with DiskProbe	MainWindow		Open met DiskProbe
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Weet u zeker at u de geselecteerde schijf wilt initialiseren? Alle gegevens zullen verloren gaan. Het zal u nogmaals gevraagd worden voordat de gegevens naar de schrijf geschreven zullen worden.\n
 There was an error preparing the disk for modifications.	MainWindow		Fout tijdens het voorbereiden van de schijf voor aanpassingen.
 The disk has been successfully initialized.\n	MainWindow		De schijf werd met succes geïnitialiseerd.\n
@@ -77,10 +77,10 @@ Cancel	MainWindow		Annuleren
 Free space	PartitionList		Vrije ruimte
 Queries	PartitionList		Zoekopdrachten
 Force unmount	MainWindow		Forceer onttrekken
-Partition	MainWindow		Partitie
 Change parameters	MainWindow		Verander parameters
-Rescan	MainWindow		Opnieuw afzoeken
+Partition	MainWindow		Partitie
 There was an error acquiring the partition row.	MainWindow		Er is een fout ontstaan bij het verkrijgen van de partitieregel.
+Rescan	MainWindow		Opnieuw afzoeken
 Failed to initialize the disk %s!\n	MainWindow		Initialisatie van de schijf %s is mislukt!\n
 The partition cannot be unmounted.	MainWindow		De partitie kan niet onttrokken worden.
 Delete	MainWindow		Verwijderen

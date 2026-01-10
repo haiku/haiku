@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme ta
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 An unexpected error has been sent from the server [%li]	ServerHelper		Al è rivât un erôr inspietât dal servidôr [%li]
-Create account	UserLoginWindow		Cree account
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Daûr a recuperâ il regjistri des modifichis pal pachet
+Create account	UserLoginWindow		Cree account
 Agree	ToLatestUserUsageConditionsWindow		Acete
 Install %PackageTitle%	PackageManager		Instale %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Locâl
 Package changes	PackageResult	Window title	Modifichis al pachet
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Acetaressistu di inviâ dâts anonims sul ûs di chest computer al sisteme HaikuDepotServer? Plui indenant tu podarâs modificâ lis tôs preferencis tal barcon \"Impostazions\".
-User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
+User rating	RatePackageWindow		Valutazion utents
 Date	PackageListView		Date
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		La password e scugne vê almancul %MinPasswordLength% caratars. %MinPasswordUppercaseChar% caratars a scugnin jessi maiuscui e %MinPasswordDigitsChar% caratars a scugnin jessi numars.
 Error	App		Erôr
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitât
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Al è necessari ripeti la peraule d'ordin par podê diminuî lis pussibilitâts di inserîle sbaliade.
 Cancel	SettingsWindow		Anule
-Cancel	RatePackageWindow		Anule
 Inactive	PackageListView		Inatîf
+Cancel	RatePackageWindow		Anule
 Nickname:	UserLoginWindow		Sorenon:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sincronizazion meta-dâts in merit ai dipuesits
 OK	MainWindow		Va ben

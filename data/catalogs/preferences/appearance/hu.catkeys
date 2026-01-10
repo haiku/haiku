@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Appearance	211365410
+1	hungarian	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Vezérlőelem kerete
 Control mark	Colors tab		Vezérlőelem jelölése
 Off	AntialiasingSettingsView		Ki
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Inaktív ablakkeret
 Colors	APRWindow		Színek
 About control look	DecorSettingsView		Névjegy
 Control highlight	Colors tab		Kiválasztott vezérlőelem
-Status bar	Colors tab		Állapotsor
 Link hover	Colors tab		Kijelölt hivatkozás
 Single:	DecorSettingsView		Egyszeres:

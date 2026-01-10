@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Appearance	211365410
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Kontrollkant
 Control mark	Colors tab		Kontrollmerke
 Off	AntialiasingSettingsView		Av
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Inaktiv vinduskant
 Colors	APRWindow		Farger
 About control look	DecorSettingsView		Om ControlLook
 Control highlight	Colors tab		Uthevet kontroll
-Status bar	Colors tab		Statuslinje
 Link hover	Colors tab		Link hover
 Single:	DecorSettingsView		Enkel:

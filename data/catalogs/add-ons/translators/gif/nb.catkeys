@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-GIFTranslator	2708495435
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-GIFTranslator	2250422222
 Websafe	GIFView		Web-sikker
 Write interlaced images	GIFView		Skriv sammenflettede bilder
 Optimal	GIFView		Optimal
@@ -7,10 +7,8 @@ Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Format (GIFTranslator)
 GIF image translator	GIFView		GIF bildeoversetter
 GIF image	GIFTranslator		GIF-bilde
 Write transparent images	GIFView		Skriv gjennomsiktige bilder
-Palette	GIFView		Palett
 Use RGB color	GIFView		Bruk RGB-farger
 Use dithering	GIFView		Bruk nyansesimulering
 GIF Settings	GIFTranslator		GIF-innstillinger
 BeOS system	GIFView		BeOS-system
 Automatic (from alpha channel)	GIFView		Automatisk (fra alfa-kanal)
-Colors	GIFView		Farger

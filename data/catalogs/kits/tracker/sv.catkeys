@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2433311519
+1	swedish	x-vnd.Haiku-libtracker	734452449
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -165,6 +165,7 @@ Could not open \"%name\" (%error). 	FSUtils		Kunde inte öppna \"%name\" (%error
 Media parameter group	AttributesView		Mediaparameter grupp
 %name info	InfoWindow	InfoWindow Title	%name information
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Om du flyttar på hemmappen kommer kanske inte %osName fungera som det ska!\n\nÄr du säker på att du vill göra detta?\n\nFör att flytta hemmappen ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Flytta\".
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%totalt valt}}
 Property info	AttributesView		Egenskapsinfo
 Sorry, you can't create links in the Trash.	PoseView		Du kan inte skapa länkar i Papperskorgen.
 From	Email Query Columns		Från
@@ -290,6 +291,7 @@ Show volumes on Desktop	SettingsView		Visa volymer på Skrivbordet
 Recent folders	ContainerWindow		Senaste mapparna
 Desktop	Model		Skrivbord
 Select all	ContainerWindow		Markera allt
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%totalt %filter}}
 apps	B_APPS_DIRECTORY		program
 Error calculating folder size.	InfoWindow		Ett fel uppstod vid beräkningen av mappens storlek.
 Delete	FSUtils		Ta bort

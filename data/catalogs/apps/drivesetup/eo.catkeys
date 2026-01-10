@@ -4,8 +4,8 @@ Mount all	MainWindow		Surmeti ĉiujn
 Disk	MainWindow		Disko
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ĉu vi certas, ke vi volas konservi la ŝanĝojn al disko nun?\n\nĈiu datumo en la elektita subdisko estos senespere perdita se vi faras tion!
 Device	PartitionList		Aparato
-Initialize	MainWindow		Pravalorizi
 Could not change the parameters of the selected partition.	MainWindow		Ne sukcesis ŝanĝi la parametrojn de la elektita subdisko.
+Initialize	MainWindow		Pravalorizi
 PGP encrypted	Encryption utils		Ĉifrita per PGP
 Delete partition	MainWindow		Forigi subdiskon
 Error: 	MainWindow	in any error alert	Eraro: 
@@ -23,11 +23,11 @@ DriveSetup	System name		Diskagordilo
 Mounted at	PartitionList		Surmetita ĉe
 Create…	MainWindow		Krei…
 Write changes	MainWindow		Registri la ŝanĝojn
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Pravalorizado de la dubdisko %s malsukcesis. (Nenio estis skribita al la disko.)
 Validation of the given creation parameters failed.	MainWindow		Pravalorizado de la donitaj kreadaj parametroj malsukcesis.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Pravalorizado de la dubdisko %s malsukcesis. (Nenio estis skribita al la disko.)
 Eject	MainWindow		Eligi
-Surface test (not implemented)	MainWindow		Surfaca testo (ne estas realigita)
 Read only	PartitionList		Nurlega
+Surface test (not implemented)	MainWindow		Surfaca testo (ne estas realigita)
 The panel could not return successfully.	MainWindow		La panelo ne povis reveni sukcese.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Ne povis ŝanĝi la parametrojn de la subdisko. Ŝanĝoj ne estis skribitaj al la disko.
 Partition %ld	DiskView		Subdisko %ld
@@ -45,13 +45,13 @@ End: %s	Support		Fino: %s
 Partition type	PartitionList		Subdiska tipo
 Unable to find the selected partition by ID.	MainWindow		Ne povis trovi la elektitan subdiskon per identigilo.
 The currently selected partition is not empty.	MainWindow		La nuntempe elektita subdisko ne estas malplena.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi krudan diskon? (Kutime homoj pravalorizas la diskon per subdiska sistemo antaŭe) Ni ankaŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
-Wipe (not implemented)	MainWindow		Viŝi (ne estas realigita)
 The currently selected partition does not have a parent partition.	MainWindow		La nuntempe elektita subdisko ne havas patran subdiskon.
+Wipe (not implemented)	MainWindow		Viŝi (ne estas realigita)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi krudan diskon? (Kutime homoj pravalorizas la diskon per subdiska sistemo antaŭe) Ni ankaŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
 Validation of the given initialization parameters failed.	MainWindow		Validigo de la donitaj pravalorizadaj parametroj malsukcesis.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Malsukcesis krei la subdiskon. Neniu ŝanĝo estas konservita al disko.
-Shared	PartitionList		Komuna
 MIMEs	PartitionList		MIME-oj
+Shared	PartitionList		Komuna
 BitLocker encrypted	Encryption utils		Ĉifrita per BitLocker
 You need to select a partition entry from the list.	MainWindow		Vi devas elekti subdiskan eron el la listo.
 Offset: %s	Support		Deŝovo: %s
@@ -66,8 +66,8 @@ Cancel	AbstractParametersPanel		Nuligi
 Format	MainWindow		Strukturi
 OK	MainWindow		Bone
 Empty space	DiskView		Malplena spaco
-Open with DiskProbe	MainWindow		Uzi per la DiskSondilo
 Could not delete the selected partition.	MainWindow		Ne povis forigi la elektitan subdiskon.
+Open with DiskProbe	MainWindow		Uzi per la DiskSondilo
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ĉu vi certas, ke vi volas pravalorizi la elektitan diskon? Ĉiu datumo estos perdita. Vi estos pridemandita aldone antaŭ ŝanĝoj estos konservitaj al la disko.\n
 There was an error preparing the disk for modifications.	MainWindow		Estis eraro kiam pretigi la diskon por modifoj.
 The disk has been successfully initialized.\n	MainWindow		La disko sukcese estis pravalorizita.\n
@@ -76,10 +76,10 @@ Cancel	MainWindow		Nuligi
 Free space	PartitionList		Libera spaco
 Queries	PartitionList		Serĉmendoj
 Force unmount	MainWindow		Demeti perforte
-Partition	MainWindow		Subdisko
 Change parameters	MainWindow		Ŝanĝi parametrojn
-Rescan	MainWindow		Reskani
+Partition	MainWindow		Subdisko
 There was an error acquiring the partition row.	MainWindow		Estis eraro kiam akiri la vicon de la subdisko.
+Rescan	MainWindow		Reskani
 Failed to initialize the disk %s!\n	MainWindow		Ne povis pravalorizi la diskon %s!\n
 The partition cannot be unmounted.	MainWindow		La subdisko ne povas estis demetita.
 Delete	MainWindow		Forigi

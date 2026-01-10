@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Appearance	211365410
+1	catalan; valencian	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Vora del control
 Control mark	Colors tab		Marca de control
 Off	AntialiasingSettingsView		Desactivat
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		Tria automàticament els colors 
 Window tab text	Colors tab		Text de la pestanya de la finestra
 Navigation pulse	Colors tab		Pols de la navegació
 LCD subpixel	AntialiasingSettingsView		Subpíxel LCD
+Progress bar	Colors tab		Barra de progrés
 Window tab	Colors tab		Pestanya de la finestra
 Link text	Colors tab		Text de l'enllaç
 Tooltip background	Colors tab		Fons del consell
@@ -75,6 +76,5 @@ Inactive window border	Colors tab		Vora de la finestra inactiva
 Colors	APRWindow		Colors
 About control look	DecorSettingsView		Quant al Control d'aparença
 Control highlight	Colors tab		Control de realçament
-Status bar	Colors tab		Barra d'estat
 Link hover	Colors tab		Pas per l'enllaç
 Single:	DecorSettingsView		Senzill

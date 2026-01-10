@@ -1,10 +1,10 @@
-1	german	x-vnd.Haiku-HaikuDepot	873730785
+1	german	x-vnd.Haiku-HaikuDepot	3949833867
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 Available packages	MainWindow		Verfügbare Pakete
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
 An unexpected error has been sent from the server [%li]	ServerHelper		Der Server hat einen unerwarteten Fehler gesendet [%li]
-Create account	UserLoginWindow		Benutzerkonto erstellen
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Änderungsprotokoll für Paket wird geladen
+Create account	UserLoginWindow		Benutzerkonto erstellen
 Agree	ToLatestUserUsageConditionsWindow		Zustimmen
 Install %PackageTitle%	PackageManager		%PackageTitle% installieren
 The response to the captcha was incorrect.	ServerHelper		Das Captcha wurde nicht richtig beantwortet.
@@ -54,6 +54,7 @@ Send	RatePackageWindow		Senden
 Creating package list…	FeaturedPackagesView		Erzeuge Paketliste…
 Start package daemon	App		Paket-Daemon starten
 There are problems in the supplied data:	UserLoginWindow		Es gibt Probleme mit den eingegebenen Daten:
+Desktop and non-desktop packages	MainWindow		Desktop und nicht-Desktop Pakete
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		'%Nickname%' hat keinen Nutzungsbedingungen zugestimmt.
 Usage conditions download problem	UserLoginWindow		Problem beim Herunterladen der Nutzungsbedingungen
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	Paket %s aus Paketquelle %s installieren\n
@@ -146,8 +147,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokal
 Package changes	PackageResult	Window title	Paket-Änderungen
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Dürfen anonyme Nutzungsdaten von diesem Computer an den HaikuDepotServer geschickt werden? Die Option kann jederzeit im \"Einstellungen\" Fenster geändert werden.
-User rating	RatePackageWindow		Bewertung
 Installed packages	MainWindow		Installierte Pakete
+User rating	RatePackageWindow		Bewertung
 Date	PackageListView		Datum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Das Kennwort muss mindestens %MinPasswordLength% Zeichen lang sein. Es muss zumindest %MinPasswordUppercaseChar% Großbuchstaben und %MinPasswordDigitsChar% Ziffern enthalten.
 Error	App		Fehler
@@ -172,8 +173,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilität
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Das Kennwort muss wiederholt werden, um die Wahrscheinlichket einer Falscheingabe zu verringern.
 Cancel	SettingsWindow		Abbrechen
-Cancel	RatePackageWindow		Abbrechen
 Inactive	PackageListView		Deaktiviert
+Cancel	RatePackageWindow		Abbrechen
 Nickname:	UserLoginWindow		Benutzername:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronisieren der Metadaten von Paketquellen
 OK	MainWindow		OK
@@ -195,11 +196,13 @@ Repositories	MainWindow		Paketquellen
 This rating is visible to other users	RatePackageWindow		Diese Bewertung is für andere Nutzer sichtbar
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Bei der Aktualisierung von Paketdaten trat ein Problem auf. Dadurch könnten die angezeigten Daten der Anwendung veraltet sein oder fehlen. Weitere Details zu diesem Problem können dem Anwendungs-Log entnommen werden.\nWie diese Logdateien angezeigt werden können, steht im Kapitel 'HaikuDepot' des Haiku User Guide.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Beim Herunterladen der Nutzungsbedingungen ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logdateien angezeigt werden können, steht im Kapitel 'HaikuDepot' des Haiku User Guide.
+Stop network use	ServerHelper		Netzwerknutzung stoppen
 View agreed usage conditions…	MainWindow		Zugestimmte Nutzungsbedingungen lesen …
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		[%Nickname%] wurde angemeldet, muss jedoch bevor es weiter geht noch den aktuellen Nutzungsbedingungen zustimmen.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dieses Paket scheint nicht auf dem HaikuDepot Server zu sein. Es ist daher nicht möglich eine neue Bewertung abzugeben, bzw. eine bestehende zu ändern.
 Apply	SettingsWindow		Anwenden
 View the password requirements	UserLoginWindow		Kennwortvorgaben anzeigen
+Desktop packages only	MainWindow		Nur Desktop Pakete
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		\"%Nickname%\" hat bereits Nutzungsbedingungen zugestimmt, diese wurden seitdem jedoch geändert. Diesen aktualisierten Nutzungsbedingungen muss jetzt zugestimmt werden.
 Log out	MainWindow		Abmelden
 Comment language:	RatePackageWindow		Kommentarsprache:
@@ -208,6 +211,7 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		Nutzungsbedingungen anzeigen
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Einlesen von Paketquellendaten
+Native desktop packages only	MainWindow		Nur native Desktop Pakete
 Fatal error	InstallPackageProcess		Fataler Fehler
 A validation error has occurred	ServerHelper		Fehler bei der Validieren
 The nickname is required.	UserLoginWindow		Der Benutzername wird benötigt.

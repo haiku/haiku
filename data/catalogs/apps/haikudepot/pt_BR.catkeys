@@ -108,8 +108,8 @@ Settings…	MainWindow		Configurações…
 Ratings	PackageInfoView		Classificações
 Local	LocalPkgDataLoadProcess		Local
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Seria aceitável enviar dados anônimos de uso deste computador para o sistema HaikuDepotServer? Você pode alterar suas preferências posteriormente na janela \"Configurações\".
-User rating	RatePackageWindow		Avaliação do utilizador
 Installed packages	MainWindow		Pacotes instalados
+User rating	RatePackageWindow		Avaliação do utilizador
 Error	App		Erro
 There was a puzzling response from the web service.	UserLoginWindow		Houve uma resposta enigmática do serviço web.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Sua avaliação foi enviada com sucesso. Você pode atualizá-lo ou removê-lo no site do servidor HaikuDepot.
@@ -127,8 +127,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Estabilidade
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		A senha deve ser repetida para reduzir a chance de digitação incorreta da senha.
 Cancel	SettingsWindow		Cancelar
-Cancel	RatePackageWindow		Cancelar
 Inactive	PackageListView		Inativo
+Cancel	RatePackageWindow		Cancelar
 Nickname:	UserLoginWindow		Apelido:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sincronizando metadados sobre repositórios
 OK	MainWindow		OK

@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöeht
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 An unexpected error has been sent from the server [%li]	ServerHelper		Odottamaton virhe lähetetty palvelimesta [%li]
-Create account	UserLoginWindow		Luo tili
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Noudetaan pakkauksen muutoslokia
+Create account	UserLoginWindow		Luo tili
 Agree	ToLatestUserUsageConditionsWindow		Hyväksy
 Install %PackageTitle%	PackageManager		Asenna %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Paikallinen
 Package changes	PackageResult	Window title	Pakkausmuutokset
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Olisiko hyväksyttävää lähettää anonyymeja käyttäjätietoja HaikuVarasto-palvelinjärjestelmään tältä tietokoneelta? Voit muuttaa tätä asetusta ”Asetukset”-ikkunassa myöhemmin.
-User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
+User rating	RatePackageWindow		Käyttäjäarvosanat
 Date	PackageListView		Päivämäärä
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Salasanan pituuden on oltava vähintään %MinPasswordLength% merkkiä. Vähintään %MinPasswordUppercaseChar% merkin on oltava isoja kirjaimia ja %MinPasswordDigitsChar% merkin on oltava numeroita.
 Error	App		Virhe
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabiilisuus
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Salasana on toistettava sen mahdollisuuden pienentämiseksi, että se on kirjoitettu väärin.
 Cancel	SettingsWindow		Peru
-Cancel	RatePackageWindow		Peru
 Inactive	PackageListView		Ei käytössä
+Cancel	RatePackageWindow		Peru
 Nickname:	UserLoginWindow		Käyttäjätunnus:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkronoidaan metatietoja tietovaratoista
 OK	MainWindow		Valmis

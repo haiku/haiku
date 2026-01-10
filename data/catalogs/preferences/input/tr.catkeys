@@ -1,14 +1,18 @@
-1	turkish	x-vnd.Haiku-Input	993392905
+1	turkish	x-vnd.Haiku-Input	3371770123
 Defaults	InputMouse		Saptanmışlar
-Scrolling	TouchpadPrefView		Kaydırma
+Scrolling	TouchpadPrefView		Sarma
 Long	KeyboardView		Uzun
 Cancel	TouchpadPrefView		Vazgeç
 Slow	TouchpadPrefView		Yavaş
-Device List	InputWindow		Aygıt Listesi
+Device List	InputWindow		Aygıt listesi
 Double-click speed	SettingsView		Çift tıklama hızı
+On tap-drag only	TouchpadPrefView		Yalnızca vurup sürüklerken
+Edge motion:	TouchpadPrefView		Kenar hareketi
 5-Button	SettingsView		5 düğmeli
 Typing test area	KeyboardView		Yazma sınama alanı
 Fast	KeyboardView		Hızlı
+Always	TouchpadPrefView		Her zaman
+Software button areas	TouchpadPrefView		Yazılımsal düğme alanları
 Please confirm	TouchpadPrefView		Lütfen onaylayın
 Trackpad speed	TouchpadPrefView		İzleme dörtgeni hızı
 Mouse speed	SettingsView		Fare hızı
@@ -23,14 +27,17 @@ Revert	InputMouse		Eski haline döndür
 Slow	KeyboardView		Yavaş
 2-Button	SettingsView		2 düğmeli
 Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla
+Natural scrolling	TouchpadPrefView		Doğal sarma
 Vertical	TouchpadPrefView		Dikey
 Low	TouchpadPrefView		Düşük
 Focus follows mouse	SettingsView		Odak fareyi izler
 Focus mode:	SettingsView		Odak kipi:
 Double-click test area	SettingsView		Çift tıklama sınama alanı
 Revert	TouchpadPrefView		Eski haline döndür
+When dragging	TouchpadPrefView		Sürüklerken
 4-Button	SettingsView		4 düğmeli
 Tapping sensitivity	TouchpadPrefView		Hafifçe vurma duyarlılığı
+Disabled	TouchpadPrefView		Devre dışı
 Revert	InputKeyboard		Eski haline döndür
 Mouse type:	SettingsView		Fare türü:
 Off	TouchpadPrefView		Kapalı
@@ -47,6 +54,7 @@ Mouse acceleration	SettingsView		Fare ivmelenmesi
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni sarma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
 High	TouchpadPrefView		Yüksek
 Defaults	TouchpadPrefView		Saptanmışlar
+Finger click	TouchpadPrefView		Parmakla tıklama
 1-Button	SettingsView		1 düğmeli
 Defaults	InputKeyboard		Saptanmışlar
 Key repeat rate	KeyboardView		Düğme yineleme hızı

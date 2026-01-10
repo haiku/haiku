@@ -4,8 +4,8 @@ Mount all	MainWindow		Monta tutto
 Disk	MainWindow		Disco
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler salvare le modifiche sul disco?\n\nSe procedi tutti i dati sulla partizione selezionata saranno irrimediabilmente perduti!
 Device	PartitionList		Dispositivo
-Initialize	MainWindow		Inizializza
 Could not change the parameters of the selected partition.	MainWindow		Impossibile modificare i parametri della partizione selezionata.
+Initialize	MainWindow		Inizializza
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler applicare le modifiche su disco adesso?\n\nTutti i dati contenuti nella partizione \"%s\" saranno irrimediabilmente persi se procedi!
 PGP encrypted	Encryption utils		Crittografia PGP
 Delete partition	MainWindow		Elimina partizione
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Montato su
 Disk system %s not found!	MainWindow		Il disco di sistema %s non è stato trovato!
 Create…	MainWindow		Crea…
 Write changes	MainWindow		Salva modifiche
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		L'inizializzazione della partizione %s è fallita. (Nessuna modifica è stata scritta sul disco.)
 Validation of the given creation parameters failed.	MainWindow		La validazione dei parametri di creazione forniti è fallita.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		L'inizializzazione della partizione %s è fallita. (Nessuna modifica è stata scritta sul disco.)
 Eject	MainWindow		Espelli
-Surface test (not implemented)	MainWindow		Verifica superficie (non implementato)
 Read only	PartitionList		Sola lettura
+Surface test (not implemented)	MainWindow		Verifica superficie (non implementato)
 The panel could not return successfully.	MainWindow		Il panello non è riuscito a completare l'attività.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Non è stato possibile modificare i parametri della partizione. Nessuna modifica è stata scritta sul disco.
 Partition %ld	DiskView		Partizione %ld
@@ -49,13 +49,13 @@ End: %s	Support		Fine: %s
 Partition type	PartitionList		Tipo di partizione
 Unable to find the selected partition by ID.	MainWindow		Impossibile trovare la partizione selezionata mediante l'ID.
 The currently selected partition is not empty.	MainWindow		La partizione attualmente selezionata non è vuota.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare un disco attualmente allo stato grezzo? (Molte persone inizializzano il disco tramite partizionamento, prima). Ti verrà chiesta nuovamente conferma prima della scrittura effettiva dei cambiamenti sul disco.
-Wipe (not implemented)	MainWindow		Pulisci (non implementato)
 The currently selected partition does not have a parent partition.	MainWindow		La partizione attualmente selezionata non ha una sopra-partizione.
+Wipe (not implemented)	MainWindow		Pulisci (non implementato)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare un disco attualmente allo stato grezzo? (Molte persone inizializzano il disco tramite partizionamento, prima). Ti verrà chiesta nuovamente conferma prima della scrittura effettiva dei cambiamenti sul disco.
 Validation of the given initialization parameters failed.	MainWindow		La validazione dei parametri di inizializzazione forniti è fallita.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Creazione della partizione fallita. Nessuna modifica è stata scritta sul disco.
-Shared	PartitionList		Condiviso
 MIMEs	PartitionList		MIME
+Shared	PartitionList		Condiviso
 BitLocker encrypted	Encryption utils		Crittografia BitLocker
 You need to select a partition entry from the list.	MainWindow		Devi selezionare una partizione dall'elenco.
 Offset: %s	Support		Offset: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Annulla
 Format	MainWindow		Formatta
 OK	MainWindow		OK
 Empty space	DiskView		Spazio libero
-Open with DiskProbe	MainWindow		Apri con Analizza Disco
 Could not delete the selected partition.	MainWindow		Impossibile rimuovere la partizione selezionata.
+Open with DiskProbe	MainWindow		Apri con Analizza Disco
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Sei sicuro di voler inizializzare il disco selezionato? Tutti i dati saranno perduti. Ti sarà nuovamente chiesta conferma prima della scrittura delle modifiche sul disco.\n
 There was an error preparing the disk for modifications.	MainWindow		Si è verificato un errore nella preparazione delle modifiche al disco.
 The disk has been successfully initialized.\n	MainWindow		Il disco è stato inizializzato con successo.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Annulla
 Free space	PartitionList		Spazio disponibile
 Queries	PartitionList		Interrogazioni
 Force unmount	MainWindow		Forza lo smontaggio
-Partition	MainWindow		Partizione
 Change parameters	MainWindow		Modifica i parametri
-Rescan	MainWindow		Riscansiona
+Partition	MainWindow		Partizione
 There was an error acquiring the partition row.	MainWindow		Errore durante l'acquisizione dei dati sulla partizione.
+Rescan	MainWindow		Riscansiona
 Failed to initialize the disk %s!\n	MainWindow		Inizializzazione del disco %s fallita!\n
 The partition cannot be unmounted.	MainWindow		La partizione non può essere smontata.
 Delete	MainWindow		Rimuovi
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		La partizione %s è stata gi�
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sei sicuro di voler modificare i parametri della partizione selezionata?\n\nLa partizione potrebbe non essere più riconosciuta da altri sistemi operativi!
 Boot	PartitionList		Avvio
 OK	AbstractParametersPanel		OK
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler applicare le modifiche su disco adesso?\n\ntutti i dati contenuti nel disco \"%s\" saranno irrimediabilmente persi se procedi!
 Virtual	PartitionList		Virtuale
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler applicare le modifiche su disco adesso?\n\ntutti i dati contenuti nel disco \"%s\" saranno irrimediabilmente persi se procedi!
 Virtual	DiskView		Virtuale
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler salvare le modifiche sul disco?\n\nProcedendo tutti i dati del disco selezionato saranno irrimediabilmente perduti!
 Select a partition from the list below.	DiskView		Seleziona una partizione dall'elenco sottostante.

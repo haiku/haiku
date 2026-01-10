@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	211365410
+1	french	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Bordure des contrôles
 Control mark	Colors tab		Point de contrôle
 Off	AntialiasingSettingsView		Désactivé
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Bordure de fenêtre inactive
 Colors	APRWindow		Couleurs
 About control look	DecorSettingsView		À propos du Contrôleur d’aspect
 Control highlight	Colors tab		Mise en valeur de contrôle
-Status bar	Colors tab		Barre d’état
 Link hover	Colors tab		Lien survolé
 Single:	DecorSettingsView		Simple :

@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Appearance	211365410
+1	portuguese	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Limite do controlo
 Control mark	Colors tab		Marca de controlo
 Off	AntialiasingSettingsView		Desligado
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Limite de janela inativa
 Colors	APRWindow		Cores
 About control look	DecorSettingsView		Acerca do controlador de aspeto
 Control highlight	Colors tab		Realce do controlo
-Status bar	Colors tab		Barra de estado
 Link hover	Colors tab		Realce de hiperligação ao passar por cima
 Single:	DecorSettingsView		Única:

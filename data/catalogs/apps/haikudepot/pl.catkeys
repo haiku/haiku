@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem z p
 Available packages	MainWindow		Dostępne pakiety
 It was not possible to create the new user.	UserLoginWindow		Nie udało się utworzyć nowego użytkownika.
 An unexpected error has been sent from the server [%li]	ServerHelper		Niespodziewany błąd został wysłany z serwera [%li]
-Create account	UserLoginWindow		Utwórz konto
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Pobieranie dziennika zmian pakietu
+Create account	UserLoginWindow		Utwórz konto
 Agree	ToLatestUserUsageConditionsWindow		Zgoda
 Install %PackageTitle%	PackageManager		Zainstaluj %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Odpowiedź na test CAPTCHA była nieprawidłowa.
@@ -143,8 +143,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokalne
 Package changes	PackageResult	Window title	Zmiany pakietów
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Czy zgadzasz się na wysyłanie anonimowych danych o korzystaniu z tego komputera do systemu HaikuDepotServer? Można później zmienić to ustawienie w oknie „Ustawienia”.
-User rating	RatePackageWindow		Ocena użytkowników
 Installed packages	MainWindow		Zainstalowane pakiety
+User rating	RatePackageWindow		Ocena użytkowników
 Date	PackageListView		Data
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Hasło musi mieć przynajmniej %MinPasswordLength% znaków. %MinPasswordUppercaseChar% znaków musi być pisane wielką literą oraz %MinPasswordDigitsChar% znaków musi być cyframi.
 Error	App		Błąd
@@ -168,8 +168,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilność
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Hasło musi zostać wprowadzone dwa razy w celu zredukowania szansy na ustawienie błędnego hasła.
 Cancel	SettingsWindow		Anuluj
-Cancel	RatePackageWindow		Anuluj
 Inactive	PackageListView		Nieaktywny
+Cancel	RatePackageWindow		Anuluj
 Nickname:	UserLoginWindow		Pseudonim:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronizowanie metadanych dotyczących repozytoriów
 OK	MainWindow		OK

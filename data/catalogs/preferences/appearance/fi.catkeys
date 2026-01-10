@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	211365410
+1	finnish	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Säätimen reuna
 Control mark	Colors tab		Ohjausmerkki
 Off	AntialiasingSettingsView		Pois päältä
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
 Colors	APRWindow		Värit
 About control look	DecorSettingsView		Ohjelmasta control look
 Control highlight	Colors tab		Säätimen korostus
-Status bar	Colors tab		Tilapalkki
 Link hover	Colors tab		Linkkileijunta
 Single:	DecorSettingsView		Yksikkö:

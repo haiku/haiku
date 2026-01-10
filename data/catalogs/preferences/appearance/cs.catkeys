@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Appearance	211365410
+1	czech	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Okraj ovládacího prvku
 Control mark	Colors tab		Označení ovládacího prvku
 Off	AntialiasingSettingsView		Vypnuto
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Okraj neaktivního okna
 Colors	APRWindow		Barvy
 About control look	DecorSettingsView		O vzhledu ovládacích prvků
 Control highlight	Colors tab		Zvýraznění ovládacího prvku
-Status bar	Colors tab		Stavový řádek
 Link hover	Colors tab		Umístění ukazatele nad odkaz
 Single:	DecorSettingsView		Jednoduchý:

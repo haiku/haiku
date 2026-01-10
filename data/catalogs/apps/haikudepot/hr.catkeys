@@ -65,8 +65,8 @@ Changelog	PackageInfoView		Dnevnik promjena
 About	PackageInfoView		O programu
 Password:	UserLoginWindow		Lozinka:
 Stability	RatePackageWindow		Stabilnost
-Cancel	RatePackageWindow		Otkaži
 Inactive	PackageListView		Neaktivan
+Cancel	RatePackageWindow		Otkaži
 Nickname:	UserLoginWindow		Nadimak:
 OK	MainWindow		U redu
 Downloading:	PackageInfoView		Preuzimam:

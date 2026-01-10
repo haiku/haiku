@@ -4,8 +4,8 @@ Mount all	MainWindow		Зманатаваць усё
 Disk	MainWindow		Дыск
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
 Device	PartitionList		Прылада
-Initialize	MainWindow		Ініцыялізіраваць
 Could not change the parameters of the selected partition.	MainWindow		Немагчыма змяніць параметры абранага падзела.
+Initialize	MainWindow		Ініцыялізіраваць
 Delete partition	MainWindow		Выдаліць падзел
 Error: 	MainWindow	in any error alert	Памылка: 
 The panel experienced a problem!	MainWindow		З панэллю ёсьць пэўная праблема!
@@ -19,8 +19,8 @@ DriveSetup	System name		Рэдыктар дыскаў
 Mounted at	PartitionList		Змантавана ў
 Create…	MainWindow		Стварыць…
 Write changes	MainWindow		Запісаць змены
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Не ўдалося ініцыялізіраваць падзел %s. (На дыск нічога не запісана.)
 Validation of the given creation parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў стварэння падзелу.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Не ўдалося ініцыялізіраваць падзел %s. (На дыск нічога не запісана.)
 Eject	MainWindow		Выцягнуць
 Surface test (not implemented)	MainWindow		Тэст паверхні (не ажыццявіма)
 The panel could not return successfully.	MainWindow		Панэль не можа вярнуцца карэктна.
@@ -38,8 +38,8 @@ End: %s	Support		Канец: %s
 Partition type	PartitionList		Тып падзела
 Unable to find the selected partition by ID.	MainWindow		Не ўдалося знайсці абраны падзел па ID.
 The currently selected partition is not empty.	MainWindow		Абраны зараз падзел не пусты.
-Wipe (not implemented)	MainWindow		Вынішчыць усе дадзеныя (пакуль не працуе)
 The currently selected partition does not have a parent partition.	MainWindow		Абраны падзел не мае бацькоўскага падзелу.
+Wipe (not implemented)	MainWindow		Вынішчыць усе дадзеныя (пакуль не працуе)
 Validation of the given initialization parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў ініцыялізацыі падзелу.
 You need to select a partition entry from the list.	MainWindow		Вам патрэбна абраць падзел са спісу.
 Offset: %s	Support		Зрух: %s
@@ -57,10 +57,10 @@ The disk has been successfully initialized.\n	MainWindow		Дыск быў пас
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Размантаваць усё роўна?\n\nКалі том зараз ужываецца нейкай праграмай, вы можаце згубіць даныя пры размантаванні.\n
 Cancel	MainWindow		Адмяніць
 Force unmount	MainWindow		Размантаваць усё роўна
-Partition	MainWindow		Падзел
 Change parameters	MainWindow		Змяніць параметры
-Rescan	MainWindow		Перасканіраваць
+Partition	MainWindow		Падзел
 There was an error acquiring the partition row.	MainWindow		Адбылася памылка пры атрыманні раду падзелаў.
+Rescan	MainWindow		Перасканіраваць
 Failed to initialize the disk %s!\n	MainWindow		Не ўдалося ініцыялізіраваць падзел %s!\n
 Delete	MainWindow		Выдаліць
 Partition type:	ChangeParametersPanel		Тып падзела:

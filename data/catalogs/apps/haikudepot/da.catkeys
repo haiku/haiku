@@ -140,8 +140,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokal
 Package changes	PackageResult	Window title	Pakkeændringer
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Vil det være i orden at sende anonym anvendelsesdata til HaikuDepotServer-systemet fra denne computer? Du kan ændre indstillingen i \"Indstillinger\"-vinduet senere.
-User rating	RatePackageWindow		Brugerbedømmelse
 Installed packages	MainWindow		Installerede pakker
+User rating	RatePackageWindow		Brugerbedømmelse
 Date	PackageListView		Dato
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Adgangskoden skal mindst være på %MinPasswordLength% tegn. Mindst %MinPasswordUppercaseChar% tegn skal være store bogstaver og mindst %MinPasswordDigitsChar% tegn skal være tal.
 Error	App		Fejl
@@ -165,8 +165,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Adgangskoden skal gentages for at formindske sandsynligheden for at indtaste adgangskoden forkert.
 Cancel	SettingsWindow		Afbryd
-Cancel	RatePackageWindow		Afbryd
 Inactive	PackageListView		Inaktiv
+Cancel	RatePackageWindow		Afbryd
 Nickname:	UserLoginWindow		Brugernavn:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkroniserer metadata for programarkiver
 OK	MainWindow		O.k.

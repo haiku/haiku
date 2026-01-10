@@ -4,8 +4,8 @@ Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte partisjonen vil gå tapt for godt hvis du gjør det!
 Device	PartitionList		Enhet
-Initialize	MainWindow		Initialiser
 Could not change the parameters of the selected partition.	MainWindow		Kunne ikke endre parametrene for den valgte partisjonen.
+Initialize	MainWindow		Initialiser
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen \"%s\" vil bli uopprettelig tapt hvis du gjør det!
 PGP encrypted	Encryption utils		PGP-kryptert
 Delete partition	MainWindow		Slett partisjon
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Monteringspunkt
 Disk system %s not found!	MainWindow		Disksystem %s ble ikke funnet!
 Create…	MainWindow		Opprett…
 Write changes	MainWindow		Skriv endringer
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisering av partisjonen %s var mislykket. (ingenting ble skrevet til disken.)
 Validation of the given creation parameters failed.	MainWindow		Mislykket validering av de oppgitte opprettingsparametrene.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisering av partisjonen %s var mislykket. (ingenting ble skrevet til disken.)
 Eject	MainWindow		Løs ut
-Surface test (not implemented)	MainWindow		Overflatetest (ikke implementert)
 Read only	PartitionList		Kun lesetilgang
+Surface test (not implemented)	MainWindow		Overflatetest (ikke implementert)
 The panel could not return successfully.	MainWindow		Panelet kunne ikke returnere.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunne ikke endre parametrene til partisjonen. Ingen endringer er skrevet til disken.
 Partition %ld	DiskView		Partisjon %ld
@@ -49,13 +49,13 @@ End: %s	Support		Slutt: %s
 Partition type	PartitionList		Partisjonstype
 Unable to find the selected partition by ID.	MainWindow		Kan ikke finne den valgte partisjonen ved hjelp av ID.
 The currently selected partition is not empty.	MainWindow		Den valgte partisjonen er ikke tom.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du vil formatere en rådisk? (De fleste initialiserer disken med et partisjoneringssystem først). Du vil bli spurt på nytt før endringer skrives til disken.
-Wipe (not implemented)	MainWindow		Slett data (ikke implementert)
 The currently selected partition does not have a parent partition.	MainWindow		Den valgte partisjonen har ingen forelderpartisjon.
+Wipe (not implemented)	MainWindow		Slett data (ikke implementert)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du vil formatere en rådisk? (De fleste initialiserer disken med et partisjoneringssystem først). Du vil bli spurt på nytt før endringer skrives til disken.
 Validation of the given initialization parameters failed.	MainWindow		Mislykket validering av de oppgitte initialiseringsparametrene.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Kunne ikke opprette partisjonen. Ingen endringer er skrevet til disken.
-Shared	PartitionList		Delt
 MIMEs	PartitionList		MIMEr
+Shared	PartitionList		Delt
 BitLocker encrypted	Encryption utils		BitLocker-kryptert
 You need to select a partition entry from the list.	MainWindow		Du må velge en partisjon fra listen.
 Offset: %s	Support		Offset: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Avbryt
 Format	MainWindow		Formater
 OK	MainWindow		OK
 Empty space	DiskView		Tom plass
-Open with DiskProbe	MainWindow		Åpne med DiskProbe
 Could not delete the selected partition.	MainWindow		Kunne ikke slette valgt partisjon.
+Open with DiskProbe	MainWindow		Åpne med DiskProbe
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Er du sikker på at du ønsker å initialisere den valgte disken? Alle data vil bli slettet. Du vil bli spurt igjen før endringer blir skrevet til disken.\n
 There was an error preparing the disk for modifications.	MainWindow		Det oppsto en feil da disken skulle forberedes for endringer.
 The disk has been successfully initialized.\n	MainWindow		Initialiseringen av disken var vellykket.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Avbryt
 Free space	PartitionList		Ledig plass
 Queries	PartitionList		Spørringer
 Force unmount	MainWindow		Tving avmontering
-Partition	MainWindow		Partisjon
 Change parameters	MainWindow		Endre parametere
-Rescan	MainWindow		Skann på nytt
+Partition	MainWindow		Partisjon
 There was an error acquiring the partition row.	MainWindow		Det var en feil ved tilegning av partisjonsrad.
+Rescan	MainWindow		Skann på nytt
 Failed to initialize the disk %s!\n	MainWindow		Klarte ikke å initialisere disken %s!\n
 The partition cannot be unmounted.	MainWindow		Partisjonen kunne ikke avmonteres.
 Delete	MainWindow		Slett
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		Partisjonen %s er allerede av
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Er du sikker på at du vil endre parametere for den valgte partisjonen?\n\nPartisjonen vil kanskje ikke lenger gjenkjennes av andre operativsystemer!
 Boot	PartitionList		Boot
 OK	AbstractParametersPanel		OK
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på disken \"%s\" vil bli uopprettelig tapt hvis du gjør det!
 Virtual	PartitionList		Virtuell
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på disken \"%s\" vil bli uopprettelig tapt hvis du gjør det!
 Virtual	DiskView		Virtuell
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte disken vil gå tapt for godt hvis du gjør det!
 Select a partition from the list below.	DiskView		Velg en partisjon fra listen nedenfor.

@@ -4,8 +4,8 @@ Mount all	MainWindow		Montează toate
 Disk	MainWindow		Disc
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția selectată se vor pierde iremediabil dacă faceți acest lucru!
 Device	PartitionList		Dispozitiv
-Initialize	MainWindow		Inițializare
 Could not change the parameters of the selected partition.	MainWindow		Nu s-au putut modifica parametrii partiției selectate.
+Initialize	MainWindow		Inițializare
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția \„%s\” vor fi pierdute iremediabil dacă faceți asta!
 PGP encrypted	Encryption utils		Criptat PGP
 Delete partition	MainWindow		Șterge partiția
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Montat la
 Disk system %s not found!	MainWindow		Sistemul de disc %s nu a fost găsit!
 Create…	MainWindow		Creare…
 Write changes	MainWindow		Scrie modificările
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inițializarea partiției %s a eșuat. (Nu fost scris nimic pe disc.)
 Validation of the given creation parameters failed.	MainWindow		Validarea parametrilor de creare furnizați a eșuat.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inițializarea partiției %s a eșuat. (Nu fost scris nimic pe disc.)
 Eject	MainWindow		Scoate
-Surface test (not implemented)	MainWindow		Test de suprafață (neimplementat)
 Read only	PartitionList		Doar citire
+Surface test (not implemented)	MainWindow		Test de suprafață (neimplementat)
 The panel could not return successfully.	MainWindow		Panoul nu a putut returna cu succes.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nu s-au putut modifica parametrii partiției. Nu au fost scrise modificări pe disc.
 Partition %ld	DiskView		Partiția %ld
@@ -49,13 +49,13 @@ End: %s	Support		Final: %s
 Partition type	PartitionList		Tip de partiție
 Unable to find the selected partition by ID.	MainWindow		Nu s-a putut găsi partiția selectată după ID.
 The currently selected partition is not empty.	MainWindow		Partiția selectată în prezent nu este goală.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați un disc brut? (Majoritatea persoanelor inițializează discul cu un sistem de partiționare mai întâi) Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.
-Wipe (not implemented)	MainWindow		Șterge (neimplementat)
 The currently selected partition does not have a parent partition.	MainWindow		Partiția selectată în prezent nu are o partiție superioară.
+Wipe (not implemented)	MainWindow		Șterge (neimplementat)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați un disc brut? (Majoritatea persoanelor inițializează discul cu un sistem de partiționare mai întâi) Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.
 Validation of the given initialization parameters failed.	MainWindow		Validarea parametrilor de inițializare furnizați a eșuat.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Nu s-a putut crea partiția. Nu au fost scrise modificări pe disc.
-Shared	PartitionList		Partajat
 MIMEs	PartitionList		MIME-uri
+Shared	PartitionList		Partajat
 BitLocker encrypted	Encryption utils		Criptat BitLocker
 You need to select a partition entry from the list.	MainWindow		Trebuie să selectați o intrare de partiție din listă.
 Offset: %s	Support		Decalaj: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Anulează
 Format	MainWindow		Formatare
 OK	MainWindow		OK
 Empty space	DiskView		Spațiu liber
-Open with DiskProbe	MainWindow		Deschide cu DiskProbe
 Could not delete the selected partition.	MainWindow		Nu s-a putut șterge partiția selectată.
+Open with DiskProbe	MainWindow		Deschide cu DiskProbe
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Sigur doriți să inițializați discul selectat? Toate datele vor fi pierdute. Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.\n
 There was an error preparing the disk for modifications.	MainWindow		A apărut o eroare la pregătirea discului pentru modificări.
 The disk has been successfully initialized.\n	MainWindow		Discul a fost inițializat cu succes.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Anulează
 Free space	PartitionList		Spațiu liber
 Queries	PartitionList		Interogări
 Force unmount	MainWindow		Forțează demontarea
-Partition	MainWindow		Partiție
 Change parameters	MainWindow		Modifică parametrii
-Rescan	MainWindow		Rescanează
+Partition	MainWindow		Partiție
 There was an error acquiring the partition row.	MainWindow		A apărut o eroare la obținerea rândului partiției.
+Rescan	MainWindow		Rescanează
 Failed to initialize the disk %s!\n	MainWindow		Inițializarea discului %s a eșuat!\n
 The partition cannot be unmounted.	MainWindow		Partiția nu poate fi demontată.
 Delete	MainWindow		Șterge
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		Partiția %s este deja demont
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sigur doriți să modificați parametrii partiției selectate?\n\nEste posibil ca partiția să nu mai fie recunoscută de alte sisteme de operare!
 Boot	PartitionList		Boot
 OK	AbstractParametersPanel		OK
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul \„%s\” vor fi pierdute iremediabil dacă faceți asta!
 Virtual	PartitionList		Virtual
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul \„%s\” vor fi pierdute iremediabil dacă faceți asta!
 Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul selectat se vor pierde iremediabil dacă faceți acest lucru!
 Select a partition from the list below.	DiskView		Selectați o partiție din lista de mai jos.

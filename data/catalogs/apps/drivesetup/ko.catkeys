@@ -4,8 +4,8 @@ Mount all	MainWindow		모두 마운트
 Disk	MainWindow		디스크
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		변경 사항을 지금 디스크에 기록하시겠습니까?\n\n선택된 파티션의 모든 데이터가 영원히 지워질것입니다!
 Device	PartitionList		장치
-Initialize	MainWindow		초기화
 Could not change the parameters of the selected partition.	MainWindow		선택된 파티션의 인자를 변경할 수 없습니다.
+Initialize	MainWindow		초기화
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		변경 사항을 지금 디스크에 기록하시겠습니까?\n\n파티션 \"%s\"의 모든 데이터가 영원히 지워질것입니다!
 PGP encrypted	Encryption utils		PGP 암호화
 Delete partition	MainWindow		파티션 지우기
@@ -26,11 +26,11 @@ Mounted at	PartitionList		마운트 위치
 Disk system %s not found!	MainWindow		디스크 시스템 %s를 찾을 수 없습니다!
 Create…	MainWindow		생성…
 Write changes	MainWindow		변경사항 기록
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		파티션 %s를 초기화하는데 실패했습니다. (디스크에 아무 것도 기록되지 않았습니다.)
 Validation of the given creation parameters failed.	MainWindow		주어진 생성 매개 변수의 유효성 검사에 실패했습니다.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		파티션 %s를 초기화하는데 실패했습니다. (디스크에 아무 것도 기록되지 않았습니다.)
 Eject	MainWindow		꺼내기
-Surface test (not implemented)	MainWindow		표면 검사 (아직 구현안됨)
 Read only	PartitionList		읽기전용
+Surface test (not implemented)	MainWindow		표면 검사 (아직 구현안됨)
 The panel could not return successfully.	MainWindow		패널이 정상적으로 돌아갈 수 없습니다.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		파티션의 매개변수를 수정할 수 없습니다. 변경사항이 디스크에 기록되지 않았습니다.
 Partition %ld	DiskView		파티션 %ld
@@ -49,13 +49,13 @@ End: %s	Support		끝: %s
 Partition type	PartitionList		파티션 종류
 Unable to find the selected partition by ID.	MainWindow		선택된 파티션 ID를 찾을 수 없습니다.
 The currently selected partition is not empty.	MainWindow		선택된 파티션이 비어있지 않습니다.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		정말 Raw 디스크를 포맷 하시겠습니까? (대부분의 경우 파티션 시스템으로 초기화를 먼저 합니다) 변경사항을 디스크에 기록 할 때 다시 확인 받을 것입니다.
-Wipe (not implemented)	MainWindow		지우기 (구현되지 않음)
 The currently selected partition does not have a parent partition.	MainWindow		현재 선택된 파티션은 부모 파티션을 가지고 있지 않습니다.
+Wipe (not implemented)	MainWindow		지우기 (구현되지 않음)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		정말 Raw 디스크를 포맷 하시겠습니까? (대부분의 경우 파티션 시스템으로 초기화를 먼저 합니다) 변경사항을 디스크에 기록 할 때 다시 확인 받을 것입니다.
 Validation of the given initialization parameters failed.	MainWindow		지정된 초기화 매개 변수의 유효성 검사에 실패했습니다.
 Failed to create the partition. No changes have been written to disk.	MainWindow		파티션 생성에 실패했습니다. 어떠한 변경사항도 디스크에 기록되지 않았습니다.
-Shared	PartitionList		공유
 MIMEs	PartitionList		MIME
+Shared	PartitionList		공유
 BitLocker encrypted	Encryption utils		BitLocker 암호화됨
 You need to select a partition entry from the list.	MainWindow		목록에서 파티션 항목을 선택해야 합니다.
 Offset: %s	Support		오프셋: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		취소
 Format	MainWindow		포맷
 OK	MainWindow		확인
 Empty space	DiskView		빈 공간
-Open with DiskProbe	MainWindow		DiskProbe로 열기
 Could not delete the selected partition.	MainWindow		선택된 파티션을 지울 수 없습니다.
+Open with DiskProbe	MainWindow		DiskProbe로 열기
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		정말 선택한 디스크를 초기화 하시겠습니까? 모든 데이터가 사라질 것입니다. 변경사항을 디스크에 기록 할 때 다시 확인 받을 것입니다.\n
 There was an error preparing the disk for modifications.	MainWindow		수정을 위해 디스크를 준비하는 중 오류가 발생했습니다.
 The disk has been successfully initialized.\n	MainWindow		디스크가 정상적으로 초기화되었습니다.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		취소
 Free space	PartitionList		유휴 공간
 Queries	PartitionList		쿼리
 Force unmount	MainWindow		강제 마운트 해제
-Partition	MainWindow		파티션
 Change parameters	MainWindow		파티션 변경
-Rescan	MainWindow		다시 탐색
+Partition	MainWindow		파티션
 There was an error acquiring the partition row.	MainWindow		파티션 열의 정보를 얻는 과정에서 오류가 발생했습니다.
+Rescan	MainWindow		다시 탐색
 Failed to initialize the disk %s!\n	MainWindow		디스크 %s 초기화에 실패했습니다!\n
 The partition cannot be unmounted.	MainWindow		파티션의 마운트를 해제할 수 없습니다.
 Delete	MainWindow		지우기
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		%s 파티션은 이미 마운
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		정말 선택된 파티션의 매개변수를 변경하시겠습니까?\n\n다른 OS에서 더 이상 파티션을 인식하지 못할 수 있습니다!
 Boot	PartitionList		부트
 OK	AbstractParametersPanel		확인
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		정말 변경사항을 지금 디스크에 기록하시겠습니까?\n\n진행할 경우 \"%s\" 디스크의 모든 데이터가 영구적으로 사라질 것입니다!
 Virtual	PartitionList		가상
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		정말 변경사항을 지금 디스크에 기록하시겠습니까?\n\n진행할 경우 \"%s\" 디스크의 모든 데이터가 영구적으로 사라질 것입니다!
 Virtual	DiskView		가상
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		정말 변경사항을 지금 디스크에 기록하시겠습니까?\n\n진행할 경우 선택된 디스크의 모든 데이터가 영구적으로 사라질 것입니다!
 Select a partition from the list below.	DiskView		아래의 목록에서 파티션 선택.

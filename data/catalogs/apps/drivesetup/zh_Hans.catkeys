@@ -4,8 +4,8 @@ Mount all	MainWindow		挂载所有磁盘
 Disk	MainWindow		磁盘
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行此操作，选中分区上的所有数据将丢失，无法恢复！
 Device	PartitionList		设备
-Initialize	MainWindow		初始化
 Could not change the parameters of the selected partition.	MainWindow		无法修改所选分区参数。
+Initialize	MainWindow		初始化
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		您确定现在要将更改写回磁盘吗？\n\n如果这样做，分区 \"%s\" 上的所有数据都将不可挽回地丢失！
 PGP encrypted	Encryption utils		PGP 加密
 Delete partition	MainWindow		删除分区
@@ -26,11 +26,11 @@ Mounted at	PartitionList		挂载于
 Disk system %s not found!	MainWindow		找不到磁盘系统 %s！
 Create…	MainWindow		创建…
 Write changes	MainWindow		写入修改
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		初始化分区 %s 失败。(修改未写入磁盘。)
 Validation of the given creation parameters failed.	MainWindow		给定创建参数验证失败。
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		初始化分区 %s 失败。(修改未写入磁盘。)
 Eject	MainWindow		弹出
-Surface test (not implemented)	MainWindow		表面测试（未执行）
 Read only	PartitionList		只读
+Surface test (not implemented)	MainWindow		表面测试（未执行）
 The panel could not return successfully.	MainWindow		面板无法成功返回。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		修改分区参数失败。修改未写入磁盘。
 Partition %ld	DiskView		分区 %ld
@@ -49,13 +49,13 @@ End: %s	Support		末尾：%s
 Partition type	PartitionList		分区类型
 Unable to find the selected partition by ID.	MainWindow		无法通过ID找到所选分区。
 The currently selected partition is not empty.	MainWindow		当前选中分区不为空。
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		是否希望格式化磁盘？(通常需要首先利用分区软件初始化磁盘)在修改写入磁盘前需要再次进行确认。
-Wipe (not implemented)	MainWindow		擦除数据（未实现）
 The currently selected partition does not have a parent partition.	MainWindow		当前选中分区无父分区。
+Wipe (not implemented)	MainWindow		擦除数据（未实现）
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		是否希望格式化磁盘？(通常需要首先利用分区软件初始化磁盘)在修改写入磁盘前需要再次进行确认。
 Validation of the given initialization parameters failed.	MainWindow		给定初始化参数验证失败。
 Failed to create the partition. No changes have been written to disk.	MainWindow		创建分区失败。无改动写入磁盘。
-Shared	PartitionList		共享
 MIMEs	PartitionList		MIMEs
+Shared	PartitionList		共享
 BitLocker encrypted	Encryption utils		BitLocker 加密
 You need to select a partition entry from the list.	MainWindow		您需要从列表中选择一个分区。
 Offset: %s	Support		偏移量：%s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		取消
 Format	MainWindow		格式化
 OK	MainWindow		确定
 Empty space	DiskView		空白
-Open with DiskProbe	MainWindow		使用 DiskProbe 打开
 Could not delete the selected partition.	MainWindow		无法删除所选分区。
+Open with DiskProbe	MainWindow		使用 DiskProbe 打开
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		您是否确定初始化选中磁盘？所有数据将会丢失。在磁盘写入修改之前，您将需要再次确认。\n
 There was an error preparing the disk for modifications.	MainWindow		准备对磁盘写入修改时出现错误。
 The disk has been successfully initialized.\n	MainWindow		磁盘已成功完成初始化。\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		取消
 Free space	PartitionList		未分配空间
 Queries	PartitionList		查询
 Force unmount	MainWindow		强制卸载
-Partition	MainWindow		分区
 Change parameters	MainWindow		修改参数
-Rescan	MainWindow		重新扫描
+Partition	MainWindow		分区
 There was an error acquiring the partition row.	MainWindow		获取分区序列出错。
+Rescan	MainWindow		重新扫描
 Failed to initialize the disk %s!\n	MainWindow		初始化磁盘 %s 失败！\n
 The partition cannot be unmounted.	MainWindow		分区无法挂载。
 Delete	MainWindow		删除
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		分区 %s 已经卸载。
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		是否确定修改所选分区参数？\n\n该分区以后可能无法被其他操作系统所识别！
 Boot	PartitionList		启动
 OK	AbstractParametersPanel		确定
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		您确定现在要将更改写回磁盘吗？\n\n如果这样做，分区 \"%s\" 上的所有数据都将不可挽回地丢失！
 Virtual	PartitionList		虚拟
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		您确定现在要将更改写回磁盘吗？\n\n如果这样做，分区 \"%s\" 上的所有数据都将不可挽回地丢失！
 Virtual	DiskView		虚拟
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，选中磁盘中的所有数据将丢失，无法恢复！
 Select a partition from the list below.	DiskView		请从以下列表选择一个分区。

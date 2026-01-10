@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Appearance	663472720
+1	danish	x-vnd.Haiku-Appearance	3598979163
 Control border	Colors tab		Kontrollér kant
 Control mark	Colors tab		Kontrolmærke
 Off	AntialiasingSettingsView		Slået fra
@@ -74,6 +74,5 @@ Inactive window border	Colors tab		Inaktiv vindueskant
 Colors	APRWindow		Farver
 About control look	DecorSettingsView		Om control look
 Control highlight	Colors tab		Kontrol-highlight
-Status bar	Colors tab		Statuslinje
 Link hover	Colors tab		Link over
 Single:	DecorSettingsView		Enkelt:

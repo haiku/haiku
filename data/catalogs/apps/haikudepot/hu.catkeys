@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma l
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 An unexpected error has been sent from the server [%li]	ServerHelper		A kiszolgáló váratlan hibaüzenetet küldött [%li]
-Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		A csomag változásnaplójának beszerzése
+Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Agree	ToLatestUserUsageConditionsWindow		Egyetértek
 Install %PackageTitle%	PackageManager		%PackageTitle% telepítése
 The response to the captcha was incorrect.	ServerHelper		Hibás válasz a captcha-kódra.
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Helyi
 Package changes	PackageResult	Window title	Csomag-változások
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Hozzájárulsz ahhoz, hogy névtelen felhasználási adatokat küldjünk a HaikuDepot kiszolgálóra? Bármikor módosítható ez a \"Beállítások\" panelen.
-User rating	RatePackageWindow		Felhasználói értékelés
 Installed packages	MainWindow		Telepített csomagok
+User rating	RatePackageWindow		Felhasználói értékelés
 Date	PackageListView		Dátum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		A jelszónak legalább %MinPasswordLength% karakter hosszúnak kell lennie és tartalmaznia kell legalább %MinPasswordUppercaseChar% kis- és nagybetűt illetve %MinPasswordDigitsChar% számot.
 Error	App		Hiba
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitás
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Ismételd meg a jelszót annak érdekében hogy csökkenjen a rossz jelszó megadásának esélye.
 Cancel	SettingsWindow		Mégse
-Cancel	RatePackageWindow		Mégse
 Inactive	PackageListView		Inaktív
+Cancel	RatePackageWindow		Mégse
 Nickname:	UserLoginWindow		Felhasználó:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Meta adatok szinkronizálása
 OK	MainWindow		Rendben

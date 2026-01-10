@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem med
 Available packages	MainWindow		Tilgjengelige pakker
 It was not possible to create the new user.	UserLoginWindow		Det var ikke mulig å opprette brukeren.
 An unexpected error has been sent from the server [%li]	ServerHelper		En uventet feil ble sendt fra serveren [%li]
-Create account	UserLoginWindow		Opprett konto
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Henter endringslogg for pakken
+Create account	UserLoginWindow		Opprett konto
 Agree	ToLatestUserUsageConditionsWindow		Godta
 Install %PackageTitle%	PackageManager		Installer %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchaen var feil.
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokal
 Package changes	PackageResult	Window title	Pakkeendringer
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Vil det være akseptabelt å sende anonyme bruksdata til HaikuDepotServer-systemet fra denne datamaskinen? Du kan endre valgene dine i vinduet \"Innstillinger\" senere.
-User rating	RatePackageWindow		Brukervurdering
 Installed packages	MainWindow		Installerte pakker
+User rating	RatePackageWindow		Brukervurdering
 Date	PackageListView		Dato
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Passordet må bestå av minimum %MinPasswordLength% tegn. %MinPasswordUppercaseChar% tegn må være store bokstaver og %MinPasswordDigitsChar% tegn må være sifre.
 Error	App		Feil
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Passordet må gjentas for å redusere sjansen for å taste inn feil passord.
 Cancel	SettingsWindow		Avbryt
-Cancel	RatePackageWindow		Avbryt
 Inactive	PackageListView		Inaktiv
+Cancel	RatePackageWindow		Avbryt
 Nickname:	UserLoginWindow		Brukernavn:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkronisering av metadata for programarkiver
 OK	MainWindow		OK

@@ -4,8 +4,8 @@ Mount all	MainWindow		Pasang semua
 Disk	MainWindow		Diska
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke diska sekarang?\n\nSemua data pada partisi yang dipilih tidak akan hilang jika Anda melakukannya!
 Device	PartitionList		Perangkat
-Initialize	MainWindow		Inisialisasi
 Could not change the parameters of the selected partition.	MainWindow		Tidak dapat mengubah parameter partisi yang dipilih.
+Initialize	MainWindow		Inisialisasi
 PGP encrypted	Encryption utils		Terenkripsi PGP
 Delete partition	MainWindow		Hapus partisi
 Error: 	MainWindow	in any error alert	Error: 
@@ -23,11 +23,11 @@ DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		Dipasang pada
 Create…	MainWindow		Buat…
 Write changes	MainWindow		Tulis perubahan
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inisialisasi partisi %s gagal. (Tidak ada yang ditulis ke disk.)
 Validation of the given creation parameters failed.	MainWindow		Validasi parameter penciptaan yang diberikan gagal.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inisialisasi partisi %s gagal. (Tidak ada yang ditulis ke disk.)
 Eject	MainWindow		Keluarkan
-Surface test (not implemented)	MainWindow		Tes permukaan (tidak diimplementasikan)
 Read only	PartitionList		Hanya baca
+Surface test (not implemented)	MainWindow		Tes permukaan (tidak diimplementasikan)
 The panel could not return successfully.	MainWindow		Panel tidak berhasil kembali.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Gagal mengubah parameter partisi. Tidak ada perubahan yang ditulis ke diska.
 Partition %ld	DiskView		Partisi %ld
@@ -45,12 +45,12 @@ End: %s	Support		Akhir: %s
 Partition type	PartitionList		Tipe partisi
 Unable to find the selected partition by ID.	MainWindow		Tidak dapat menemukan partisi yang dipilih berdasarkan ID.
 The currently selected partition is not empty.	MainWindow		Partisi yang saat ini dipilih tidak kosong.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat diska mentah? (Kebanyakan orang menginisialisasi disk dengan sistem partisi terlebih dahulu) Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
-Wipe (not implemented)	MainWindow		Sapu(tidak diimplementasikan)
 The currently selected partition does not have a parent partition.	MainWindow		Partisi yang saat ini dipilih tidak memiliki partisi induk.
+Wipe (not implemented)	MainWindow		Sapu(tidak diimplementasikan)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat diska mentah? (Kebanyakan orang menginisialisasi disk dengan sistem partisi terlebih dahulu) Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
 Validation of the given initialization parameters failed.	MainWindow		Validasi parameter inisialisasi yang diberikan gagal.
-Shared	PartitionList		Bersama
 MIMEs	PartitionList		MIME
+Shared	PartitionList		Bersama
 BitLocker encrypted	Encryption utils		Terenkripsi bitLocker
 You need to select a partition entry from the list.	MainWindow		Anda perlu memilih entri partisi dari daftar.
 Offset: %s	Support		Ofset: %s
@@ -63,8 +63,8 @@ LUKS encrypted	Encryption utils		Terenkripsi LUKS
 Cancel	AbstractParametersPanel		Batalkan
 Format	MainWindow		Format
 OK	MainWindow		OKE
-Open with DiskProbe	MainWindow		Buka dengan DiskProbe
 Could not delete the selected partition.	MainWindow		Tidak dapat menghapus partisi yang dipilih.
+Open with DiskProbe	MainWindow		Buka dengan DiskProbe
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Anda yakin ingin menginisialisasi diska yang dipilih? Semua data akan hilang. Anda akan ditanya lagi sebelum perubahan ditulis ke diska.\n
 There was an error preparing the disk for modifications.	MainWindow		Terjadi kesalahan saat mempersiapkan disk untuk modifikasi.
 The disk has been successfully initialized.\n	MainWindow		Disk telah berhasil diinisialisasi.\n
@@ -73,10 +73,10 @@ Cancel	MainWindow		Batalkan
 Free space	PartitionList		Ruang kosong
 Queries	PartitionList		Kueri
 Force unmount	MainWindow		Paksa lepaskan
-Partition	MainWindow		Partisi
 Change parameters	MainWindow		Ubah parameter
-Rescan	MainWindow		Pindai ulang
+Partition	MainWindow		Partisi
 There was an error acquiring the partition row.	MainWindow		Terjadi kesalahan saat mengambil baris partisi.
+Rescan	MainWindow		Pindai ulang
 Failed to initialize the disk %s!\n	MainWindow		Gagal menginisialisasi disk %s!\n
 Delete	MainWindow		Hapus
 Partition type:	ChangeParametersPanel		Tipe partisi:

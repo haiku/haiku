@@ -4,8 +4,8 @@ Mount all	MainWindow		Připojit vše
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Určitě si přejete zapsat změny zpět na disk?\n\nVšechna data na vybraném oddílu budou nenávratně ztracena!
 Device	PartitionList		Zařízení
-Initialize	MainWindow		Inicializovat
 Could not change the parameters of the selected partition.	MainWindow		Nelze změnit parametry vybraného oddílu.
+Initialize	MainWindow		Inicializovat
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Jste si jisti, že chcete zapsat změny zpět na disk?\n\nPokud změnu provedete, všechna data na oddíle \"%s\" budou nenávratně ztracena!
 PGP encrypted	Encryption utils		Zašifrováno PGP
 Delete partition	MainWindow		Odstranit oddíl
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Připojeno na
 Disk system %s not found!	MainWindow		Diskový systém %s nenalezen!
 Create…	MainWindow		Vytvořit…
 Write changes	MainWindow		Zapsat změny
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicializace oddílu %s selhala. (Na disk nebylo nic zapsáno.)
 Validation of the given creation parameters failed.	MainWindow		Ověření zadaných vytvářecích parametrů selhalo.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicializace oddílu %s selhala. (Na disk nebylo nic zapsáno.)
 Eject	MainWindow		Vysunout
-Surface test (not implemented)	MainWindow		Test povrchu (neimplementováno)
 Read only	PartitionList		Pouze pro čtení
+Surface test (not implemented)	MainWindow		Test povrchu (neimplementováno)
 The panel could not return successfully.	MainWindow		Panel se nedokázal úspěšně ukončit.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nepodařilo se změnit parametry oddílu. Na disk nebyly zapsány žádné změny.
 Partition %ld	DiskView		Oddíl %ld
@@ -49,13 +49,13 @@ End: %s	Support		Konec: %s
 Partition type	PartitionList		Typ oddílu
 Unable to find the selected partition by ID.	MainWindow		Vybraný oddíl podle ID nelze nalézt.
 The currently selected partition is not empty.	MainWindow		Právě vybraný oddíl není prázdný.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Opravdu chcete naformátovat čistý disk? (Většina lidí nejprve inicializuje disk zapsáním tabulky oddílů) Budete požádáni znovu, než budou na disk zapsány změny.
-Wipe (not implemented)	MainWindow		Vymazat (není implementováno)
 The currently selected partition does not have a parent partition.	MainWindow		Právě vybraný oddíl nemá nadřazený oddíl.
+Wipe (not implemented)	MainWindow		Vymazat (není implementováno)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Opravdu chcete naformátovat čistý disk? (Většina lidí nejprve inicializuje disk zapsáním tabulky oddílů) Budete požádáni znovu, než budou na disk zapsány změny.
 Validation of the given initialization parameters failed.	MainWindow		Ověření zadaných inicializačních parametrů selhalo.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Nepodařilo se vytvořit oddíl. Změny nebyly zapsány na disk.
-Shared	PartitionList		Sdílený
 MIMEs	PartitionList		MIME
+Shared	PartitionList		Sdílený
 BitLocker encrypted	Encryption utils		Zašifrováno BitLockerem
 You need to select a partition entry from the list.	MainWindow		Musíte si vybrat oddíl ze seznamu.
 Offset: %s	Support		Ofset: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Zrušit
 Format	MainWindow		Formátovat
 OK	MainWindow		OK
 Empty space	DiskView		Prázdné místo
-Open with DiskProbe	MainWindow		Otevřít diskovou sondou
 Could not delete the selected partition.	MainWindow		Nelze odstranit vybraný oddíl.
+Open with DiskProbe	MainWindow		Otevřít diskovou sondou
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Opravdu chcete inicializovat vybraný disk? Všechna data budou ztracena. Budete požádáni znovu, než budou na disk zapsány změny.\n
 There was an error preparing the disk for modifications.	MainWindow		Při přípravě disku na úpravy došlo k chybě.
 The disk has been successfully initialized.\n	MainWindow		Disk byl v pořádku inicializován.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Zrušit
 Free space	PartitionList		Dostupné místo
 Queries	PartitionList		Dotazy
 Force unmount	MainWindow		Vynutit odpojení
-Partition	MainWindow		Oddíl
 Change parameters	MainWindow		Změnit parametry
-Rescan	MainWindow		Opět načíst
+Partition	MainWindow		Oddíl
 There was an error acquiring the partition row.	MainWindow		Při získávání oddílového řádku došlo k chybě.
+Rescan	MainWindow		Opět načíst
 Failed to initialize the disk %s!\n	MainWindow		Nepodařilo se inicializovat disk %s!\n
 The partition cannot be unmounted.	MainWindow		Oddíl se nepodařilo odpojit.
 Delete	MainWindow		Odstranit
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		Oddíl %s je již odpojen.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Opravdu chcete změnit parametry vybraného oddílu?\n\nOddíl už nemusí být rozpoznán jinými operačními systémy!
 Boot	PartitionList		Zaváděcí
 OK	AbstractParametersPanel		OK
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Jste si jisti, že chcete zapsat změny zpět na disk?\n\nPokud změnu provedete, všechna data na disku \"%s\" budou nenávratně ztracena!
 Virtual	PartitionList		Virtuální
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Jste si jisti, že chcete zapsat změny zpět na disk?\n\nPokud změnu provedete, všechna data na disku \"%s\" budou nenávratně ztracena!
 Virtual	DiskView		Virtuální
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Určitě nyní chcete zapsat změny zpět na disk?\n\nJesliže tak učiníte, všechna data na vybraném disku budou nenávratně ztracena!
 Select a partition from the list below.	DiskView		Vyberte oddíl ze seznamu níže.

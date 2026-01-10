@@ -4,8 +4,8 @@ Mount all	MainWindow		Προσάρτηση όλων
 Disk	MainWindow		Δίσκος
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος πως θέλετε να εγγράψετε τις αλλαγές στον δίσκο τώρα;\n\nΌλα τα δεδομένα στην επιλεγμένη κατάτμηση θα διαγραφούν οριστικά!
 Device	PartitionList		Συσκευή
-Initialize	MainWindow		Αρχικοποίηση
 Could not change the parameters of the selected partition.	MainWindow		Δεν ήταν δυνατή η αλλαγή των παραμέτρων της επιλεγμένης κατάτμησης.
+Initialize	MainWindow		Αρχικοποίηση
 PGP encrypted	Encryption utils		Κρυπτογραφημένη με PGP
 Delete partition	MainWindow		Διαγραφή κατάτμησης
 Error: 	MainWindow	in any error alert	Σφάλμα: 
@@ -24,11 +24,11 @@ DriveSetup	System name		Διαχειριστής Δίσκου
 Mounted at	PartitionList		Προσαρτήθηκε στο
 Create…	MainWindow		Δημιουργία…
 Write changes	MainWindow		Εγγραφή αλλαγών
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Η αρχικοποίηση της κατάτμησης %s απέτυχε. (Τίποτα δεν γράφτηκε στο δίσκο.)
 Validation of the given creation parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων δημιουργίας απέτυχε.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Η αρχικοποίηση της κατάτμησης %s απέτυχε. (Τίποτα δεν γράφτηκε στο δίσκο.)
 Eject	MainWindow		Εξαγωγή
-Surface test (not implemented)	MainWindow		Έλεγχος επιφάνειας (δεν υλοποιήθηκε)
 Read only	PartitionList		Μόνο για ανάγνωση
+Surface test (not implemented)	MainWindow		Έλεγχος επιφάνειας (δεν υλοποιήθηκε)
 The panel could not return successfully.	MainWindow		Το πάνελ δεν μπόρεσε να επιστρέψει τιμή με επιτυχία.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Η αλλαγή των παραμέτρων της κατάτμησης απέτυχε. Δεν έχει γίνει καμία αλλαγή στον δίσκο.
 Partition %ld	DiskView		Κατάτμηση %ld
@@ -46,13 +46,13 @@ End: %s	Support		Τέλος: %s
 Partition type	PartitionList		Είδος κατάτμησης
 Unable to find the selected partition by ID.	MainWindow		Δεν ήταν δυνατή η εύρεση της επιλεγμένη κατάτμησης με το αναγνωριστικό της.
 The currently selected partition is not empty.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν είναι άδεια.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Είστε σίγουρος ότι θέλετε να διαμορφώσετε έναν κενό δίσκο; (Οι περισσότεροι αρχικοποιούν πρώτα τον δίσκο με ένα σύστημα κατάτμησης) Θα ρωτηθείτε ξανά πριν εγγραφούν οι αλλαγές στον δίσκο.
-Wipe (not implemented)	MainWindow		Εκκαθάριση (δεν έχει ενσωματωθεί ακόμα)
 The currently selected partition does not have a parent partition.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν έχει κατάτμηση γονέα.
+Wipe (not implemented)	MainWindow		Εκκαθάριση (δεν έχει ενσωματωθεί ακόμα)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Είστε σίγουρος ότι θέλετε να διαμορφώσετε έναν κενό δίσκο; (Οι περισσότεροι αρχικοποιούν πρώτα τον δίσκο με ένα σύστημα κατάτμησης) Θα ρωτηθείτε ξανά πριν εγγραφούν οι αλλαγές στον δίσκο.
 Validation of the given initialization parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων αρχικοποίησης απέτυχε.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Η δημιουργία τομής απέτυχε. Καμιά αλλαγή δεν πραγματοποιήθηκε στο δίσκο.
-Shared	PartitionList		Κοινόχρηστη
 MIMEs	PartitionList		ΜΙΜΕ
+Shared	PartitionList		Κοινόχρηστη
 BitLocker encrypted	Encryption utils		Κρυπτογραφημένη με BitLocker
 You need to select a partition entry from the list.	MainWindow		Θα χρειαστεί να επιλέξετε μια καταχωρημένη κατάτμηση από τη λίστα.
 Offset: %s	Support		Στοίχιση: %s
@@ -67,8 +67,8 @@ Cancel	AbstractParametersPanel		Άκυρο
 Format	MainWindow		Διαμόρφωση
 OK	MainWindow		Εντάξει
 Empty space	DiskView		Κενός χώρος
-Open with DiskProbe	MainWindow		Άνοιγμα με Ελεγχτή Δίσκου
 Could not delete the selected partition.	MainWindow		Αδυναμία διαγραφής της επιλεγμένης κατάτμησης.
+Open with DiskProbe	MainWindow		Άνοιγμα με Ελεγχτή Δίσκου
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Είστε σίγουρος ότι θέλετε να αρχικοποιήσετε τον επιλεγμένο δίσκο; Όλα τα δεδομένα θα διαγραφούν. Θα ρωτηθείτε ξανά πριν εγγραφούν οι αλλαγές στον δίσκο.\n
 There was an error preparing the disk for modifications.	MainWindow		Υπήρξε ένα σφάλμα κατά την προετοιμασία του δίσκου για τροποποιήσεις.
 The disk has been successfully initialized.\n	MainWindow		Ο δίσκος αρχικοποιήθηκε με επιτυχία.\n
@@ -77,10 +77,10 @@ Cancel	MainWindow		Άκυρο
 Free space	PartitionList		Ελεύθερος χώρος
 Queries	PartitionList		Αιτήματα
 Force unmount	MainWindow		Εξαναγκαστική αποπροσάρτηση
-Partition	MainWindow		Κατάτμηση
 Change parameters	MainWindow		Αλλαγή παραμέτρων
-Rescan	MainWindow		Επανάληψη σάρωσης
+Partition	MainWindow		Κατάτμηση
 There was an error acquiring the partition row.	MainWindow		Υπήρξε ένα σφάλμα κατά την απόκτηση της σειράς κατάτμησης.
+Rescan	MainWindow		Επανάληψη σάρωσης
 Failed to initialize the disk %s!\n	MainWindow		Η αρχικοποίηση του δίσκου %s απέτυχε!\n
 The partition cannot be unmounted.	MainWindow		Η τομή δεν μπορεί να αποπροσαρτηστεί.
 Delete	MainWindow		Διαγραφή

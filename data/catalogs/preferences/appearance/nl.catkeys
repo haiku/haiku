@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Appearance	663472720
+1	dutch; flemish	x-vnd.Haiku-Appearance	3598979163
 Control border	Colors tab		Keuzerand
 Control mark	Colors tab		Besturingsteken
 Off	AntialiasingSettingsView		Uit
@@ -74,6 +74,5 @@ Inactive window border	Colors tab		Rand van een inactief venster
 Colors	APRWindow		Kleuren
 About control look	DecorSettingsView		Over de interface stijl
 Control highlight	Colors tab		Keuze-accent
-Status bar	Colors tab		Statusbalk
 Link hover	Colors tab		Zweven over link
 Single:	DecorSettingsView		Enkele:

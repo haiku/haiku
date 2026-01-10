@@ -4,8 +4,8 @@ Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
 Device	PartitionList		Пристрій
-Initialize	MainWindow		Ініціалізація
 Could not change the parameters of the selected partition.	MainWindow		Неможливо змінити параметри вибраного розділу.
+Initialize	MainWindow		Ініціалізація
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що саме зараз потрібно записати зміни на диск?\n\nЯкщо це зробити, всі дані на розділі \«%s\» будуть безповоротно втрачені!
 PGP encrypted	Encryption utils		PGP-шифрування
 Delete partition	MainWindow		Видалити розділ
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Підключено як
 Disk system %s not found!	MainWindow		Дискова система %s не знайдена!
 Create…	MainWindow		Створити…
 Write changes	MainWindow		Записати зміни
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Збій ініціалізації розділу %s. (На диск нічого не було записано.)
 Validation of the given creation parameters failed.	MainWindow		Не вдалося застосувати введені при створенні параметри.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Збій ініціалізації розділу %s. (На диск нічого не було записано.)
 Eject	MainWindow		Вийняти
-Surface test (not implemented)	MainWindow		Тест поверхні (не реалізовано)
 Read only	PartitionList		Лише читання
+Surface test (not implemented)	MainWindow		Тест поверхні (не реалізовано)
 The panel could not return successfully.	MainWindow		Панель не вдалося коректно повернути.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Не вдалося змінити параметри розділу. Зміни не були записані на диск.
 Partition %ld	DiskView		Розділ %ld
@@ -49,13 +49,13 @@ End: %s	Support		Кінець: %s
 Partition type	PartitionList		Тип розділу
 Unable to find the selected partition by ID.	MainWindow		Неможливо знайти розділ за ID.
 The currently selected partition is not empty.	MainWindow		Поточний вибраний розділ не порожній.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте форматувати весь диск як одне ціле? (Зазвичай, спочатку на диску створюються розділи). Повторний запит буде безпосередньо перед записом змін на диск.
-Wipe (not implemented)	MainWindow		Затерти (не реалізовано)
 The currently selected partition does not have a parent partition.	MainWindow		Поточний розділ не має батіківського розділу.
+Wipe (not implemented)	MainWindow		Затерти (не реалізовано)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте форматувати весь диск як одне ціле? (Зазвичай, спочатку на диску створюються розділи). Повторний запит буде безпосередньо перед записом змін на диск.
 Validation of the given initialization parameters failed.	MainWindow		Не вдалося застосувати параметри, введені при ініціалізації.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Не вдалося створити розділ. Ніякі зміни на диск не записувалися.
-Shared	PartitionList		Спільний доступ
 MIMEs	PartitionList		MIME-типи
+Shared	PartitionList		Спільний доступ
 BitLocker encrypted	Encryption utils		Шифрування BitLocker
 You need to select a partition entry from the list.	MainWindow		Ви повинні вибрати розділ зі списку.
 Offset: %s	Support		Зміщення: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Скасувати
 Format	MainWindow		Форматувати
 OK	MainWindow		ОК
 Empty space	DiskView		Без розмітки
-Open with DiskProbe	MainWindow		Відкрити у DiskProbe
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
+Open with DiskProbe	MainWindow		Відкрити у DiskProbe
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ви впевнені, що бажаєте ініціалізувати вибраний диск? Всі дані на цьому диску будуть втрачені. Повторний запит буде видано безпосередньо перед записом змін на диск.\n
 There was an error preparing the disk for modifications.	MainWindow		Сталася помилка при збереженні змін на диск.
 The disk has been successfully initialized.\n	MainWindow		Диск був успішно ініціалізований.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Скасувати
 Free space	PartitionList		Вільне місце
 Queries	PartitionList		Запити
 Force unmount	MainWindow		Примусово відключити
-Partition	MainWindow		Розділ
 Change parameters	MainWindow		Змінити параметри
-Rescan	MainWindow		Пересканувати
+Partition	MainWindow		Розділ
 There was an error acquiring the partition row.	MainWindow		Сталася помилка при одержанні списка розділів.
+Rescan	MainWindow		Пересканувати
 Failed to initialize the disk %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 The partition cannot be unmounted.	MainWindow		Розділ не можна відключити.
 Delete	MainWindow		Видалити
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		Розділ %s вже від
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ви впевнені, що бажаєте змінити параметри вибраного розділу?\n\nРозділ може більше не розпізнаватись іншими операційними системами!
 Boot	PartitionList		Завантажувальний
 OK	AbstractParametersPanel		ОК
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що саме зараз потрібно записати зміни на диск?\n\nЯкщо це зробити, всі дані на диску \«%s\» будуть безповоротно втрачені!
 Virtual	PartitionList		Віртуальний
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що саме зараз потрібно записати зміни на диск?\n\nЯкщо це зробити, всі дані на диску \«%s\» будуть безповоротно втрачені!
 Virtual	DiskView		Віртуальний
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на вибранному диску будуть безповоротно втрачені, якщо Ви продовжите!
 Select a partition from the list below.	DiskView		Виберіть розділ зі списку нижче.

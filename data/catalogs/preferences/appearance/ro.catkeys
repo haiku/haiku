@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Appearance	211365410
+1	romanian	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Margine de control
 Control mark	Colors tab		Semn de control
 Off	AntialiasingSettingsView		Oprit
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Margine de fereastră inactivă
 Colors	APRWindow		Culori
 About control look	DecorSettingsView		Despre aspectul de control
 Control highlight	Colors tab		Evidențiază controlul
-Status bar	Colors tab		Bară de stare
 Link hover	Colors tab		Planare peste legătură
 Single:	DecorSettingsView		Unic:

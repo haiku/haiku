@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Appearance	211365410
+1	spanish; castilian	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Borde del control
 Control mark	Colors tab		Marca de control
 Off	AntialiasingSettingsView		Desactivado
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Borde de ventana inactiva
 Colors	APRWindow		Colores
 About control look	DecorSettingsView		Sobre ControlLook
 Control highlight	Colors tab		Resaltado del control
-Status bar	Colors tab		Barra de estado
 Link hover	Colors tab		Enlace flotante
 Single:	DecorSettingsView		Sencillo:

@@ -141,8 +141,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Local
 Package changes	PackageResult	Window title	Mudanças de pacotes
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Aceita o envio de dados anónimos de utilização para o sistema HaikuDepotServer deste computador? Poderá mudar esta opção na janela \"Settings\" mais tarde.
-User rating	RatePackageWindow		Avaliação do utilizador
 Installed packages	MainWindow		Pacotes instalados
+User rating	RatePackageWindow		Avaliação do utilizador
 Date	PackageListView		Data
 Error	App		Erro
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Ocorreu um erro ao descarregar as condições de utilização. Verifique detalhes no registo e tente novamente. \nNa secção HaikuDepot do Guia do Utilizador do Haiku poderá encontrar informação sobre como visualizar os registos.
@@ -164,8 +164,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Estabilidade
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		A palavra-passe deve ser repetida para diminuir a probabilidade de a introduzir incorretamente.
 Cancel	SettingsWindow		Cancelar
-Cancel	RatePackageWindow		Cancelar
 Inactive	PackageListView		Inativo
+Cancel	RatePackageWindow		Cancelar
 Nickname:	UserLoginWindow		Alcunha:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		A sincronizar meta-dados sobre repositórios
 OK	MainWindow		OK

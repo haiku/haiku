@@ -106,8 +106,8 @@ Settings…	MainWindow		Pengaturan…
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
 Ratings	PackageInfoView		Peringkat
 Local	LocalPkgDataLoadProcess		Lokal
-User rating	RatePackageWindow		Peringkat pengguna
 Installed packages	MainWindow		Paket-paket yang terpasang
+User rating	RatePackageWindow		Peringkat pengguna
 Date	PackageListView		Tanggal
 Error	App		Kesalahan
 There was a puzzling response from the web service.	UserLoginWindow		Ada respon membingungkan dari layanan web.
@@ -126,8 +126,8 @@ Password:	UserLoginWindow		Kata sandi:
 Stability	RatePackageWindow		Kestabilan
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Kata sandi harus diulang untuk mengurangi kemungkinan memasukkan kata sandi yang salah.
 Cancel	SettingsWindow		Batal
-Cancel	RatePackageWindow		Batal
 Inactive	PackageListView		Tak aktif
+Cancel	RatePackageWindow		Batal
 Nickname:	UserLoginWindow		Nama panggilan:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Menyinkronkan meta-data tentang repositori
 OK	MainWindow		OKE

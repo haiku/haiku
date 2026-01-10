@@ -4,8 +4,8 @@ Mount all	MainWindow		Montiraj sve
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite zapisati promjene natrag na disk?\n\nSvi podati na odabranoj particiji biti će nepovratno izgubljeni ako tonapravite!
 Device	PartitionList		Uređaj
-Initialize	MainWindow		Inicijaliziraj
 Could not change the parameters of the selected partition.	MainWindow		Ne mogu promjeniti parametre odabrane particije.
+Initialize	MainWindow		Inicijaliziraj
 Delete partition	MainWindow		Izbriši particiju
 Error: 	MainWindow	in any error alert	Greška: 
 Removable	PartitionList		Uklonjiv
@@ -46,15 +46,15 @@ Partition name:	ChangeParametersPanel		Ime particije:
 Cancel	AbstractParametersPanel		Otkaži
 Format	MainWindow		Formatiraj
 OK	MainWindow		U redu
-Open with DiskProbe	MainWindow		Otvori pomoću DiskProbe
 Could not delete the selected partition.	MainWindow		Nisam mogao obrisati odabranu particiju.
+Open with DiskProbe	MainWindow		Otvori pomoću DiskProbe
 There was an error preparing the disk for modifications.	MainWindow		Došlo je do greške pri pripremanju diska za promjene.
 The disk has been successfully initialized.\n	MainWindow		Disk je uspješno inicijaliziran.\n
 Cancel	MainWindow		Otkaži
 Free space	PartitionList		Slobodni prostor
 Force unmount	MainWindow		Prisili odmontiranje
-Partition	MainWindow		Particija
 Change parameters	MainWindow		Promjeni parametere...
+Partition	MainWindow		Particija
 Rescan	MainWindow		Ponovno skeniraj
 Failed to initialize the disk %s!\n	MainWindow		Neuspjela inicijalizacija diska %s!\n
 Delete	MainWindow		Izbriši

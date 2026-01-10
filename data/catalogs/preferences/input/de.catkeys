@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Input	993392905
+1	german	x-vnd.Haiku-Input	3371770123
 Defaults	InputMouse		Standardwerte
 Scrolling	TouchpadPrefView		Scrollen
 Long	KeyboardView		Lang
@@ -6,9 +6,13 @@ Cancel	TouchpadPrefView		Abbrechen
 Slow	TouchpadPrefView		Langsam
 Device List	InputWindow		Geräteliste
 Double-click speed	SettingsView		Doppelklick-Geschwindigkeit
+On tap-drag only	TouchpadPrefView		Nur bei Tippen-und-Ziehen
+Edge motion:	TouchpadPrefView		Bewegung Kantenbereich:
 5-Button	SettingsView		5-Tasten
 Typing test area	KeyboardView		Feld für Testeingaben
 Fast	KeyboardView		Schnell
+Always	TouchpadPrefView		Immer
+Software button areas	TouchpadPrefView		Software Tasten-Bereiche
 Please confirm	TouchpadPrefView		Bitte bestätigen
 Trackpad speed	TouchpadPrefView		Geschwindigkeit
 Mouse speed	SettingsView		Geschwindigkeit
@@ -23,14 +27,17 @@ Revert	InputMouse		Anfangswerte
 Slow	KeyboardView		Langsam
 2-Button	SettingsView		2-Tasten
 Click to focus and raise	SettingsView		Klicken aktiviert und holt nach vorn
+Natural scrolling	TouchpadPrefView		Natürliches Scrollen
 Vertical	TouchpadPrefView		Vertikal
 Low	TouchpadPrefView		Niedrig
 Focus follows mouse	SettingsView		Ohne Klicken aktivieren
 Focus mode:	SettingsView		Modus:
 Double-click test area	SettingsView		Testfeld für Doppelklick
 Revert	TouchpadPrefView		Anfangswerte
+When dragging	TouchpadPrefView		Beim Ziehen
 4-Button	SettingsView		4-Tasten
 Tapping sensitivity	TouchpadPrefView		Empfindlichkeit
+Disabled	TouchpadPrefView		Deaktiviert
 Revert	InputKeyboard		Anfangswerte
 Mouse type:	SettingsView		Mausart:
 Off	TouchpadPrefView		Aus
@@ -47,6 +54,7 @@ Mouse acceleration	SettingsView		Beschleunigung
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich gesetzt werden?
 High	TouchpadPrefView		Hoch
 Defaults	TouchpadPrefView		Standardwerte
+Finger click	TouchpadPrefView		Finger-Klick
 1-Button	SettingsView		1-Taste
 Defaults	InputKeyboard		Standardwerte
 Key repeat rate	KeyboardView		Tastenwiederholrate

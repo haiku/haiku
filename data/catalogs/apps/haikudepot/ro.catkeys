@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă l
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
 An unexpected error has been sent from the server [%li]	ServerHelper		O eroare neașteptată a fost trimită de la serverul [%li]
-Create account	UserLoginWindow		Creează un cont
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Se aduce istoricul de modificări pentru pachet
+Create account	UserLoginWindow		Creează un cont
 Agree	ToLatestUserUsageConditionsWindow		De acord
 Install %PackageTitle%	PackageManager		Instalează %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Răspunsul la captcha nu a fost corect.
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Local
 Package changes	PackageResult	Window title	Modificări pachet
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Ar fi acceptabil să trimiteți date de utilizare anonime la sistemul HaikuDepotServer de pe acest calculator? Puteți să modifica preferința în fereastra \„Configurări\” mai târziu.
-User rating	RatePackageWindow		Evaluarea utilizatorului
 Installed packages	MainWindow		Pachete instalate
+User rating	RatePackageWindow		Evaluarea utilizatorului
 Date	PackageListView		Data
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Parola trebuie să aibă minimum %MinPasswordLength% caractere. %MinPasswordUppercaseChar% caractere trebuie să fie majuscule, iar %MinPasswordDigitsChar% caractere trebuie să fie cifre.
 Error	App		Eroare
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitate
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Parola trebuie repetată pentru a reduce șansa introducerii incorecte a parolei.
 Cancel	SettingsWindow		Anulează
-Cancel	RatePackageWindow		Anulează
 Inactive	PackageListView		Inactive
+Cancel	RatePackageWindow		Anulează
 Nickname:	UserLoginWindow		Pseudonim:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Se sincronizează metadate despre depozite
 OK	MainWindow		OK

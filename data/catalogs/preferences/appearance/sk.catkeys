@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Appearance	583615507
+1	slovak	x-vnd.Haiku-Appearance	3519121950
 Control border	Colors tab		Okraj ovládacieho prvku
 Control mark	Colors tab		Riadiaca značka
 Off	AntialiasingSettingsView		Vypnutý
@@ -68,6 +68,5 @@ Document text	Colors tab		Text dokumentu
 Inactive window border	Colors tab		Okraj neaktívneho okna
 Colors	APRWindow		Farby
 Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
-Status bar	Colors tab		Stavový panel
 Link hover	Colors tab		Podržanie myši nad odkazom
 Single:	DecorSettingsView		Jednoduché:

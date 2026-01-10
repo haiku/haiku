@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problém se
 Available packages	MainWindow		Dostupné balíčky
 It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
 An unexpected error has been sent from the server [%li]	ServerHelper		Neočekávaná chyba byla poslána ze serveru [%li]
-Create account	UserLoginWindow		Vytvořit účet
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Stahování seznamu změn
+Create account	UserLoginWindow		Vytvořit účet
 Agree	ToLatestUserUsageConditionsWindow		Souhlas
 Install %PackageTitle%	PackageManager		Nainstalovat %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Odpověď na captchu byla chybná.
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Místní
 Package changes	PackageResult	Window title	Změny balíčků
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Souhlasíte s odesíláním anonymních dat o používání z tohoto počítače na HaikuDepotServer? Svou volbu můžete později změnit v okně \"Nastavení\".
-User rating	RatePackageWindow		Uživatelské hodnocení
 Installed packages	MainWindow		Nainstalované balíčky
+User rating	RatePackageWindow		Uživatelské hodnocení
 Date	PackageListView		Datum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Heslo musí mít minimálně %MinPasswordLength% znaků. Nejméně %MinPasswordUppercaseChar% velkých písmen a %MinPasswordDigitsChar% číslic.
 Error	App		Chyba
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilita
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Heslo je třeba zadat znovu, aby se snížila pravděpodobnost chybného zadání hesla.
 Cancel	SettingsWindow		Zrušit
-Cancel	RatePackageWindow		Zrušit
 Inactive	PackageListView		Neaktivní
+Cancel	RatePackageWindow		Zrušit
 Nickname:	UserLoginWindow		Přezdívka:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronizuji meta-data o repozitářích
 OK	MainWindow		OK

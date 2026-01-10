@@ -1,11 +1,10 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SoundRecorder	2149017672
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SoundRecorder	3982150268
 Loop	RecorderWindow		Loop
 Cannot find default audio hardware	RecorderWindow		Kan ikke finne forhåndsvalgt maskinvare for lyd
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan ikke finne den midlertidige filen som ble opprettet for å inneholde den nye innspillingen
 Sample size:	RecorderWindow		Samplingsstørrelse:
 Nothing to play	RecorderWindow		Ingenting å spille
 Duration: 	RecorderWindow		Varighet: 
-Some of the files don't appear to be audio files	RecorderWindow		Noen av filene ser ikke ut til å være lydfiler
 File info	RecorderWindow		Filinformasjon
 Drop files here	SoundListView		Slipp filene her
 Input	RecorderWindow		Input
@@ -19,7 +18,6 @@ Invalid audio files	RecorderWindow		Ugyldige lydfiler
  seconds	RecorderWindow		 sekunder
 OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan ikke åpne den midlertidige filen som ble opprettet for å inneholde den nye innspillingen
-None of the files appear to be audio files	RecorderWindow		Ingen av filene ser ut til å være lydfiler
 Input:	RecorderWindow		Input:
 Forward	RecorderWindow		Fremover
 Play	RecorderWindow		Spill

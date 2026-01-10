@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-PSRV	1761631281
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-PSRV	273685920
 Undefined	ConfigWindow		Udefinert
 Return the number of available transports	PrintServerApp Scripting		Returner antall tilgjengelige transporter
 Return the number of available printers	PrintServerApp Scripting		Returner antall tilgjengelige skrivere
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		Avbryt
 Retrieve a specific printer	PrintServerApp Scripting		Hent en bestemt skriver
 Page %1 to %2	ConfigWindow		Side %1 til %2
 Get name of the printer add-on used for this printer	Printer Scripting		Hent navnet på skrivertillegget som brukes for denne skriveren
-Page setup:	ConfigWindow		Sideoppsett
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Avbryt
 Printer server	ConfigWindow		Skriverserver

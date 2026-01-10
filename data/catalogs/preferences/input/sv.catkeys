@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Input	993392905
+1	swedish	x-vnd.Haiku-Input	3371770123
 Defaults	InputMouse		Förvalt
 Scrolling	TouchpadPrefView		Rulla
 Long	KeyboardView		Lång
@@ -6,9 +6,13 @@ Cancel	TouchpadPrefView		Avbryt
 Slow	TouchpadPrefView		Långsam
 Device List	InputWindow		Enhetslista
 Double-click speed	SettingsView		Dubbelklicks hastighet
+On tap-drag only	TouchpadPrefView		Endast vid tryck-dra
+Edge motion:	TouchpadPrefView		Kantrörelse:
 5-Button	SettingsView		5-Knappar
 Typing test area	KeyboardView		Testskrivningsområde
 Fast	KeyboardView		Snabb
+Always	TouchpadPrefView		Alltid
+Software button areas	TouchpadPrefView		Områden med programknappar
 Please confirm	TouchpadPrefView		Var god bekräfta
 Trackpad speed	TouchpadPrefView		Styrplattans hastighet
 Mouse speed	SettingsView		Mushastighet
@@ -23,14 +27,17 @@ Revert	InputMouse		Återställ
 Slow	KeyboardView		Långsam
 2-Button	SettingsView		2-Knappar
 Click to focus and raise	SettingsView		Klicka för att fokusera och höja
+Natural scrolling	TouchpadPrefView		Naturlig rullning
 Vertical	TouchpadPrefView		Vertikal
 Low	TouchpadPrefView		Låg
 Focus follows mouse	SettingsView		Fokus följer musen
 Focus mode:	SettingsView		Fokuserat läge:
 Double-click test area	SettingsView		Dubbelklick testområde
 Revert	TouchpadPrefView		Återställ
+When dragging	TouchpadPrefView		När du drar
 4-Button	SettingsView		4-Knappa
 Tapping sensitivity	TouchpadPrefView		Tappningskänslighet
+Disabled	TouchpadPrefView		Inaktiverad
 Revert	InputKeyboard		Återställ
 Mouse type:	SettingsView		Mus typ:
 Off	TouchpadPrefView		Av
@@ -47,6 +54,7 @@ Mouse acceleration	SettingsView		Mus acceleration
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya rullnings området är stort och kommer påverka vanliga mus operationer. Vill du verkligen ändra den?
 High	TouchpadPrefView		Hög
 Defaults	TouchpadPrefView		Förvalt
+Finger click	TouchpadPrefView		Fingerklick
 1-Button	SettingsView		1-Knapp
 Defaults	InputKeyboard		Standard
 Key repeat rate	KeyboardView		Tangent upprepningsfrekvens

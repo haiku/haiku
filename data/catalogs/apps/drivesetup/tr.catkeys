@@ -4,8 +4,8 @@ Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Şimdi değişiklikleri diske yazmak istediğinizden emin misiniz?\n\nSeçili bölüntü üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolur!
 Device	PartitionList		Aygıt
-Initialize	MainWindow		İlklendir
 Could not change the parameters of the selected partition.	MainWindow		Seçili bölüntünün parametreleri değiştirilemedi.
+Initialize	MainWindow		İlklendir
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Şimdi diske değişiklikleri geri yazmak istediğinizden emin misiniz?\n\n“%s” bölüntüsündeki tüm veri geri getirilemeyecek biçimde kaybolacaktır!
 PGP encrypted	Encryption utils		PGP şifreli
 Delete partition	MainWindow		Bölüntüyü sil
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Bağlama noktası
 Disk system %s not found!	MainWindow		Disk sistemi %s bulunamadı!
 Create…	MainWindow		Oluştur…
 Write changes	MainWindow		Değişiklikleri yaz
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölüntüsünün ilklendirilmesi başarısız oldu (Diske hiçbir şey yazılmadı).
 Validation of the given creation parameters failed.	MainWindow		Verilen oluşturma parametrelerinin doğrulaması başarısız oldu.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölüntüsünün ilklendirilmesi başarısız oldu (Diske hiçbir şey yazılmadı).
 Eject	MainWindow		Çıkar
-Surface test (not implemented)	MainWindow		Yüzey sınaması (işlevsel değil)
 Read only	PartitionList		Saltokunur
+Surface test (not implemented)	MainWindow		Yüzey sınaması (işlevsel değil)
 The panel could not return successfully.	MainWindow		Panel başarılı bir biçimde dönemedi.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Bölüntü parametrelerinin değiştirilmesi başarısız oldu. Değişiklikler diske yazılmadı.
 Partition %ld	DiskView		%ld. bölüntü
@@ -49,13 +49,13 @@ End: %s	Support		Son: %s
 Partition type	PartitionList		Bölüntü türü
 Unable to find the selected partition by ID.	MainWindow		Seçili bölüntü kimlikle bulunamıyor.
 The currently selected partition is not empty.	MainWindow		Şu an seçili olan bölüntü boş değil.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ham bir diski biçimlendirmek istediğinizden emin misiniz? (Genelde önce diski bir bölüntüleme sistemi ile ilklendirmek daha makbuldür.) Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
-Wipe (not implemented)	MainWindow		Sil (işlevsel değil)
 The currently selected partition does not have a parent partition.	MainWindow		Şu an seçili olan bölüntüde bir ana disk bölüntüsü yok.
+Wipe (not implemented)	MainWindow		Sil (işlevsel değil)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ham bir diski biçimlendirmek istediğinizden emin misiniz? (Genelde önce diski bir bölüntüleme sistemi ile ilklendirmek daha makbuldür.) Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 Validation of the given initialization parameters failed.	MainWindow		Verilen ilklendirme parametrelerinin doğrulanması başarısız oldu.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Bölüntü oluşturulamadı. Diske herhangi bir değişiklik yazılmadı.
-Shared	PartitionList		Paylaşılan
 MIMEs	PartitionList		MIME’ler
+Shared	PartitionList		Paylaşılan
 BitLocker encrypted	Encryption utils		BitLocker şifreli
 You need to select a partition entry from the list.	MainWindow		Listeden bir bölüntü seçmelisiniz.
 Offset: %s	Support		Ofset: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Vazgeç
 Format	MainWindow		Biçimlendir
 OK	MainWindow		Tamam
 Empty space	DiskView		Boş alan
-Open with DiskProbe	MainWindow		Disk Sondası ile aç
 Could not delete the selected partition.	MainWindow		Seçili bölüntü silinemedi.
+Open with DiskProbe	MainWindow		Disk Sondası ile aç
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilklendirmek istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
 There was an error preparing the disk for modifications.	MainWindow		Diski değişikliklere hazırlarken bir hata oluştu.
 The disk has been successfully initialized.\n	MainWindow		Disk başarıyla ilklendirildi.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Vazgeç
 Free space	PartitionList		Boş alan
 Queries	PartitionList		Sorgular
 Force unmount	MainWindow		Zorla bağlantısını kes
-Partition	MainWindow		Bölüntü
 Change parameters	MainWindow		Parametreleri değiştir
-Rescan	MainWindow		Yeniden tara
+Partition	MainWindow		Bölüntü
 There was an error acquiring the partition row.	MainWindow		Bölüntü satırını alırken bir hata oluştu.
+Rescan	MainWindow		Yeniden tara
 Failed to initialize the disk %s!\n	MainWindow		%s diski ilklendirilemedi!\n
 The partition cannot be unmounted.	MainWindow		Bölüntü bağlantısı kesilemiyor.
 Delete	MainWindow		Sil
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		%s bölüntüsünün bağlant
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Seçili bölüntünün parametrelerini değiştirmek istediğinizden emin misiniz?\n\nBölüntü artık başka işletim sistemleri tarafından tanınamayabilir!
 Boot	PartitionList		Önyükleme
 OK	AbstractParametersPanel		Tamam
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Şimdi diske değişiklikleri geri yazmak istediğinizden emin misiniz?\n\n“%s” diskindeki tüm veri geri getirilemeyecek biçimde kaybolacaktır!
 Virtual	PartitionList		Sanal
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Şimdi diske değişiklikleri geri yazmak istediğinizden emin misiniz?\n\n“%s” diskindeki tüm veri geri getirilemeyecek biçimde kaybolacaktır!
 Virtual	DiskView		Sanal
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\nSeçili disk üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
 Select a partition from the list below.	DiskView		Aşağıdaki listeden bir bölüntü seçin.

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Appearance	211365410
+1	italian	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Bordi del controllo
 Control mark	Colors tab		Marcatore del controllo
 Off	AntialiasingSettingsView		Disattivato
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Bordo finestra inattiva
 Colors	APRWindow		Colori
 About control look	DecorSettingsView		Informazioni su ControlLook
 Control highlight	Colors tab		Evidenziazione del controllo
-Status bar	Colors tab		Barra di stato
 Link hover	Colors tab		Testo del collegamento al passaggio del mouse
 Single:	DecorSettingsView		Singolo:

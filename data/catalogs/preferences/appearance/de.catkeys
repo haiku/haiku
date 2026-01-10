@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	211365410
+1	german	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Steuerelement - Rahmen
 Control mark	Colors tab		Steuerelement - Markierung
 Off	AntialiasingSettingsView		Aus
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		Übrige Farben automatisch anpas
 Window tab text	Colors tab		Fensterreiter - Text
 Navigation pulse	Colors tab		Navigation - Leuchtfarbe
 LCD subpixel	AntialiasingSettingsView		LCD-Subpixel
+Progress bar	Colors tab		Fortschrittsbalken
 Window tab	Colors tab		Fensterreiter
 Link text	Colors tab		Link Text
 Tooltip background	Colors tab		Tooltip - Hintergrund
@@ -75,6 +76,5 @@ Inactive window border	Colors tab		Fenster - Rahmen (inaktiv)
 Colors	APRWindow		Farben
 About control look	DecorSettingsView		Über ControlLook
 Control highlight	Colors tab		Steuerelement - Ausgewählt
-Status bar	Colors tab		Statusleiste
 Link hover	Colors tab		Link (unter Mauszeiger)
 Single:	DecorSettingsView		Einfach:

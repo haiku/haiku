@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	923507156
+1	swedish	x-vnd.Haiku-ActivityMonitor	1159274874
 Temp	DataSource		Temp
 Temperature	DataSource		Temperatur
 Teams	DataSource		Processer
@@ -24,6 +24,7 @@ RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Inställningar...
 Block cache	DataSource		Blockbuffert
 Memory	DataSource		Minne
+No thermal sensor	SystemInfoHandler		Ingen termisk sensor
 CPU usage	DataSource		CPU användning
 CPU speed	DataSource		CPU-hastighet
 Quit	ActivityWindow		Avsluta

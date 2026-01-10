@@ -1,9 +1,9 @@
 1	english (united kingdom)	x-vnd.Haiku-DriveSetup	2753519366
-Initialize	MainWindow		Initialise
 Could not change the parameters of the selected partition.	MainWindow		Could not change the parametres of the selected partition.
+Initialize	MainWindow		Initialise
 Validation of the given parameters failed.	MainWindow		Validation of the given parametres failed.
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisation of the partition %s failed. (Nothing has been written to disk.)
 Validation of the given creation parameters failed.	MainWindow		Validation of the given creation parametres failed.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisation of the partition %s failed. (Nothing has been written to disk.)
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Failed to change the parametres of the partition. No changes have been written to disk.
 No disk devices have been recognized.	DiskView		No disc devices have been recognised.
 Change parameters…	MainWindow		Change parametres…

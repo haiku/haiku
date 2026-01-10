@@ -4,8 +4,8 @@ Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
 Device	PartitionList		Laite
-Initialize	MainWindow		Alusta
 Could not change the parameters of the selected partition.	MainWindow		Valitun osion parametrien vaihtaminen epäonnistui.
+Initialize	MainWindow		Alusta
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion \"%s\" tiedot menetetään peruuttamattomasti, jos teet niin!
 PGP encrypted	Encryption utils		PGP-salattu
 Delete partition	MainWindow		Poista osio
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Liittämispiste:
 Disk system %s not found!	MainWindow		Levyjärjestelmä %s ei löytynyt!
 Create…	MainWindow		Luo…
 Write changes	MainWindow		Kirjoita muutokset
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
 Validation of the given creation parameters failed.	MainWindow		Annettujen luontiparametrien todentaminen epäonnistui.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
 Eject	MainWindow		Poista asemasta
-Surface test (not implemented)	MainWindow		Pintatesti (ei toteutettu)
 Read only	PartitionList		Kirjoitussuojattu
+Surface test (not implemented)	MainWindow		Pintatesti (ei toteutettu)
 The panel could not return successfully.	MainWindow		Paneelin paluu epäonnistui.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Osion parametrien vaihtaminen epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
 Partition %ld	DiskView		Osio %ld
@@ -49,13 +49,13 @@ End: %s	Support		Loppu: %s
 Partition type	PartitionList		Osiotyyppi
 Unable to find the selected partition by ID.	MainWindow		Valitun osion löytäminen tunnisteen perusteella epäonnistui.
 The currently selected partition is not empty.	MainWindow		Nykyinen valittu osio ei ole tyhjä.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa raakadatamuotoisen levyn? (Useimmat ihmiset jakavat levyn ensin osioihin) Asiaa kysytään uudelleen ennen muutosten tallentamista levylle.
-Wipe (not implemented)	MainWindow		Alustus (ei ole toteutettu)
 The currently selected partition does not have a parent partition.	MainWindow		Nykyisellä valitulla osiolla ei ole yläosiota.
+Wipe (not implemented)	MainWindow		Alustus (ei ole toteutettu)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa raakadatamuotoisen levyn? (Useimmat ihmiset jakavat levyn ensin osioihin) Asiaa kysytään uudelleen ennen muutosten tallentamista levylle.
 Validation of the given initialization parameters failed.	MainWindow		Annettujen alustusparametrien todentaminen epäonnistui.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Osion luominen epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
-Shared	PartitionList		Jaettu
 MIMEs	PartitionList		MIME-tyypit
+Shared	PartitionList		Jaettu
 BitLocker encrypted	Encryption utils		BitLocker-salattu
 You need to select a partition entry from the list.	MainWindow		Sinun täytyy valita osiorivi luettelosta.
 Offset: %s	Support		Siirrososoite: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Peru
 Format	MainWindow		Alusta
 OK	MainWindow		Valmis
 Empty space	DiskView		Tyhjä tila
-Open with DiskProbe	MainWindow		Avaa DiskProbe-ohjelmalla
 Could not delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
+Open with DiskProbe	MainWindow		Avaa DiskProbe-ohjelmalla
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Oletko varma, etä haluat alustaa valitun levyn? Kaikki olemassaolevat tiedot katoavat. Samaa kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.\n
 There was an error preparing the disk for modifications.	MainWindow		Tapahtui virhe valmisteltaessa levyä muutoksia varten.
 The disk has been successfully initialized.\n	MainWindow		Levyn alustus onnistui.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Peru
 Free space	PartitionList		Vapaa tila
 Queries	PartitionList		Kyselyt
 Force unmount	MainWindow		Pakota irrottaminen
-Partition	MainWindow		Osio
 Change parameters	MainWindow		Vaihda parametreja
-Rescan	MainWindow		Etsi uudelleen
+Partition	MainWindow		Osio
 There was an error acquiring the partition row.	MainWindow		Osioriviä haettaessa syntyi virhe.
+Rescan	MainWindow		Etsi uudelleen
 Failed to initialize the disk %s!\n	MainWindow		Levyn %s alustus epäonnistui!\n
 The partition cannot be unmounted.	MainWindow		Osion liittäminen epäonnistui.
 Delete	MainWindow		Poista
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Oletko varma, että haluat vaihtaa valitun osion parametreja?\n\nMuut käyttöjärjestelmät eivät ehkä enää tunnista osiota!
 Boot	PartitionList		Käynnistä
 OK	AbstractParametersPanel		Valmis
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion \"%s\" tiedot menetetään peruuttamattomasti, jos teet niin!
 Virtual	PartitionList		Virtuaalinen
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion \"%s\" tiedot menetetään peruuttamattomasti, jos teet niin!
 Virtual	DiskView		Virtuaalinen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
 Select a partition from the list below.	DiskView		Valitse osio alapuolella olevasta luettelosta.

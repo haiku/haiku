@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条�
 Available packages	MainWindow		可用软件包
 It was not possible to create the new user.	UserLoginWindow		无法创建新用户。
 An unexpected error has been sent from the server [%li]	ServerHelper		服务器 [%li] 发送了一个意外错误
-Create account	UserLoginWindow		创建账号
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		正在获取软件包的变更日志
+Create account	UserLoginWindow		创建账号
 Agree	ToLatestUserUsageConditionsWindow		同意
 Install %PackageTitle%	PackageManager		安装 %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		验证码反馈不正确。
@@ -144,8 +144,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		本地的
 Package changes	PackageResult	Window title	软件包变更
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		是否同意从这台计算机向 HaikuDepotServer 系统发送匿名使用数据？您可以稍后在 \"设置\" 窗口中更改首选项。
-User rating	RatePackageWindow		用户评分
 Installed packages	MainWindow		已安装软件包
+User rating	RatePackageWindow		用户评分
 Date	PackageListView		日期
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		密码必须至少为%MinPasswordLength%个字符。必须有 %MinPasswordUppercaseChar% 个为大写字母，%MinPasswordDigitsChar% 个为数字。
 Error	App		错误
@@ -169,8 +169,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		稳定性
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		必须重复输入密码以减少输错密码的可能性。
 Cancel	SettingsWindow		取消
-Cancel	RatePackageWindow		取消
 Inactive	PackageListView		未激活
+Cancel	RatePackageWindow		取消
 Nickname:	UserLoginWindow		昵称:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		正在同步仓库元数据信息
 OK	MainWindow		确定

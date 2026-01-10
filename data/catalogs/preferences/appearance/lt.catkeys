@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Appearance	3844378316
+1	lithuanian	x-vnd.Haiku-Appearance	2484917463
 Control border	Colors tab		Valdiklių rėmeliai
 Off	AntialiasingSettingsView		išjungta
 Window border	Colors tab		Veikiamojo lango rėmelis
@@ -73,6 +73,5 @@ Inactive window border	Colors tab		Foninių langų rėmeliai
 Colors	APRWindow		Spalvos
 About control look	DecorSettingsView		Apie valdiklių apipavidalinimą
 Control highlight	Colors tab		Valdiklių paryškinimas
-Status bar	Colors tab		Būsenos juosta
 Link hover	Colors tab		Saitai (užvedus žymeklį)
 Single:	DecorSettingsView		Viengubas:

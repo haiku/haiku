@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Appearance	211365410
+1	swedish	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Kontrollkant
 Control mark	Colors tab		Kontroll märke
 Off	AntialiasingSettingsView		Av
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		Välj automatiskt sekundära fä
 Window tab text	Colors tab		Fönsterflikstext
 Navigation pulse	Colors tab		Navigeringspuls
 LCD subpixel	AntialiasingSettingsView		LCD-subpixel
+Progress bar	Colors tab		Förloppsindikator
 Window tab	Colors tab		Fösterflik
 Link text	Colors tab		Länktext
 Tooltip background	Colors tab		Hjälprutsbakgrund
@@ -75,6 +76,5 @@ Inactive window border	Colors tab		Inaktiverad fönsterkant
 Colors	APRWindow		Färger
 About control look	DecorSettingsView		Om ControlLook
 Control highlight	Colors tab		Framhävd kontroll
-Status bar	Colors tab		Statusrad
 Link hover	Colors tab		Hovrande länk
 Single:	DecorSettingsView		Enkel:

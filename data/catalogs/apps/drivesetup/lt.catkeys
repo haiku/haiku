@@ -4,8 +4,8 @@ Mount all	MainWindow		Prijungti visus
 Disk	MainWindow		Diskas
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skaidinyje, bus negrįžtamai prarasti!
 Device	PartitionList		Įrenginys
-Initialize	MainWindow		Ženklinti
 Could not change the parameters of the selected partition.	MainWindow		Nepavyko pakeisti pasirinktojo skaidinio savybių.
+Initialize	MainWindow		Ženklinti
 Delete partition	MainWindow		Šalinti skaidinį
 Error: 	MainWindow	in any error alert	Klaida: 
 The panel experienced a problem!	MainWindow		Polangyje iškilo problema!
@@ -19,8 +19,8 @@ DriveSetup	System name		Diskų ženklintuvas
 Mounted at	PartitionList		Prijungtas kaip
 Create…	MainWindow		Kurti…
 Write changes	MainWindow		Įrašyti pakeitimus
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Skaidinio „%s“ suženklinti nepavyko. Pakeitimai į diską neįrašyti.
 Validation of the given creation parameters failed.	MainWindow		Nurodyti netinkami kūrimo parametrai.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Skaidinio „%s“ suženklinti nepavyko. Pakeitimai į diską neįrašyti.
 Eject	MainWindow		Išimti
 Surface test (not implemented)	MainWindow		Patikrinti paviršių (dar nerealizuota)
 The panel could not return successfully.	MainWindow		Polangiui nepavyko sėkmingai grįžti.
@@ -38,8 +38,8 @@ End: %s	Support		Pabaiga: %s
 Partition type	PartitionList		Skaidinio tipas
 Unable to find the selected partition by ID.	MainWindow		Pasirinkto skaidinio pagal ID rasti nepavyko.
 The currently selected partition is not empty.	MainWindow		Pasirinktas skaidinys yra ne tuščias.
-Wipe (not implemented)	MainWindow		Ištrinti (dar nerealizuota)
 The currently selected partition does not have a parent partition.	MainWindow		Pasirinkas skaidinys nėra loginis diskas kitame skaidinyje.
+Wipe (not implemented)	MainWindow		Ištrinti (dar nerealizuota)
 Validation of the given initialization parameters failed.	MainWindow		Nurodyti netinkami ženklinimo parametrai.
 You need to select a partition entry from the list.	MainWindow		Būtina iš sąrašo pasirinkti skaidinį.
 Offset: %s	Support		Poslinkis: %s
@@ -57,10 +57,10 @@ The disk has been successfully initialized.\n	MainWindow		Diskas sėkmingai suž
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Ar atjungti skaidinį priverstinai?\n\nPastaba: jeigu į skaidinį šiuo metu rašoma, jo atjungimas gali įtakoti duomenų praradimą.\n
 Cancel	MainWindow		Atsisakyti
 Force unmount	MainWindow		Atjungti priverstinai
-Partition	MainWindow		Skaidinys
 Change parameters	MainWindow		Keisti savybes
-Rescan	MainWindow		Peržvalgyti
+Partition	MainWindow		Skaidinys
 There was an error acquiring the partition row.	MainWindow		Klaida gaunant skaidinių sąrašą.
+Rescan	MainWindow		Peržvalgyti
 Failed to initialize the disk %s!\n	MainWindow		Nepavyko suženklinti disko „%s“!\n
 Delete	MainWindow		Šalinti
 Partition type:	ChangeParametersPanel		Skaidinio tipas:

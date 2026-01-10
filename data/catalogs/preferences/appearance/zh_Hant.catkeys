@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	211365410
+1	english	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		控制邊界
 Control mark	Colors tab		控制標記
 Off	AntialiasingSettingsView		關閉
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		非活動視窗邊框
 Colors	APRWindow		顏色
 About control look	DecorSettingsView		關於 control look
 Control highlight	Colors tab		控制高亮顯示
-Status bar	Colors tab		狀態列
 Link hover	Colors tab		鏈結懸停
 Single:	DecorSettingsView		單一:

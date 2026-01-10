@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Input	993392905
+1	catalan; valencian	x-vnd.Haiku-Input	3371770123
 Defaults	InputMouse		Valors predeterminats
 Scrolling	TouchpadPrefView		Desplaçament
 Long	KeyboardView		Llarg
@@ -6,9 +6,13 @@ Cancel	TouchpadPrefView		Cancel·la
 Slow	TouchpadPrefView		Lent
 Device List	InputWindow		Llista de dispositius
 Double-click speed	SettingsView		Velocitat del clic doble
+On tap-drag only	TouchpadPrefView		Només en tocar i arrossegar
+Edge motion:	TouchpadPrefView		Moviment al marge:
 5-Button	SettingsView		Botó 5
 Typing test area	KeyboardView		Àrea de prova per al tecleig
 Fast	KeyboardView		Ràpid
+Always	TouchpadPrefView		Sempre
+Software button areas	TouchpadPrefView		Àrees de botó del programari
 Please confirm	TouchpadPrefView		Confirmeu-ho, si us plau
 Trackpad speed	TouchpadPrefView		Velocitat de la tauleta tàctil
 Mouse speed	SettingsView		Velocitat del ratolí
@@ -23,14 +27,17 @@ Revert	InputMouse		Reverteix
 Slow	KeyboardView		Lent
 2-Button	SettingsView		2 botons
 Click to focus and raise	SettingsView		Clic per al focus i l'alçament
+Natural scrolling	TouchpadPrefView		Desplaçament natural
 Vertical	TouchpadPrefView		Vertical
 Low	TouchpadPrefView		Baixa
 Focus follows mouse	SettingsView		El focus segueix el ratolí
 Focus mode:	SettingsView		Mode del focus:
 Double-click test area	SettingsView		Àrea de prova per al clic doble
 Revert	TouchpadPrefView		Reverteix
+When dragging	TouchpadPrefView		En arrossegar
 4-Button	SettingsView		Botó 4
 Tapping sensitivity	TouchpadPrefView		Sensibilitat del toc
+Disabled	TouchpadPrefView		Inhabilitat
 Revert	InputKeyboard		Reverteix
 Mouse type:	SettingsView		Tipus de ratolí:
 Off	TouchpadPrefView		Desactivat
@@ -47,6 +54,7 @@ Mouse acceleration	SettingsView		Acceleració del ratolí
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		L'àrea de desplaçament nova és molt grossa i pot impedir el funcionament normal del ratolí. Realment voleu canviar-ho?
 High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Valors predeterminats
+Finger click	TouchpadPrefView		Clic amb el dit
 1-Button	SettingsView		1 botó
 Defaults	InputKeyboard		Valors predeterminats
 Key repeat rate	KeyboardView		Freqüència de repetició de tecla

@@ -4,8 +4,8 @@ Mount all	MainWindow		เมานต์ทั้งหมด
 Disk	MainWindow		ดิสก์
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในพาร์ติชั่นที่เลือกจะหายไปอย่างถาวรหากคุณทำเช่นนั้น!
 Device	PartitionList		อุปกรณ์
-Initialize	MainWindow		เริ่มต้น
 Could not change the parameters of the selected partition.	MainWindow		ไม่สามารถเปลี่ยนพารามิเตอร์ของพาร์ติชันที่เลือกได้
+Initialize	MainWindow		เริ่มต้น
 PGP encrypted	Encryption utils		เข้ารหัส PGP
 Delete partition	MainWindow		ลบพาร์ติชั่น
 Error: 	MainWindow	in any error alert	ผิดพลาด:
@@ -23,11 +23,11 @@ DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		เชื่อมต่อที่
 Create…	MainWindow		สร้าง
 Write changes	MainWindow		เขียนการเปลี่ยนแปลง
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		การเริ่มต้นพาร์ติชัน %s ล้มเหลว (ไม่มีสิ่งใดเขียนลงดิสก์)
 Validation of the given creation parameters failed.	MainWindow		การตรวจสอบพารามิเตอร์การสร้างที่กำหนดล้มเหลว
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		การเริ่มต้นพาร์ติชัน %s ล้มเหลว (ไม่มีสิ่งใดเขียนลงดิสก์)
 Eject	MainWindow		ยกเลิก
-Surface test (not implemented)	MainWindow		การทดสอบพื้นผิว (ไม่ได้ใช้งาน)
 Read only	PartitionList		อ่านเท่านั้น
+Surface test (not implemented)	MainWindow		การทดสอบพื้นผิว (ไม่ได้ใช้งาน)
 The panel could not return successfully.	MainWindow		พาแนลเรียกคืนได้สำเร็จ
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		ไม่สามารถเปลี่ยนพารามิเตอร์ของพาร์ติชันได้ ไม่มีการเปลี่ยนแปลงที่เขียนลงดิสก์
 Partition %ld	DiskView		พาร์ติชั่น %ld
@@ -45,12 +45,12 @@ End: %s	Support		สิ้นสุด: %s
 Partition type	PartitionList		ประเภทพาร์ติชัน
 Unable to find the selected partition by ID.	MainWindow		ไม่พบพาร์ติชันที่เลือกตาม ID
 The currently selected partition is not empty.	MainWindow		พาร์ติชันที่เลือกในปัจจุบันไม่ว่าง
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการจัดรูปแบบดิสก์ดิบ (คนส่วนใหญ่เตรียมใช้งานดิสก์ด้วยระบบการแบ่งพาร์ติชันก่อน) คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนลงดิสก์
-Wipe (not implemented)	MainWindow		ลบ (ไม่ได้ใช้งาน)
 The currently selected partition does not have a parent partition.	MainWindow		พาร์ติชันที่เลือกในปัจจุบันไม่มีพาร์ติชันหลัก
+Wipe (not implemented)	MainWindow		ลบ (ไม่ได้ใช้งาน)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการจัดรูปแบบดิสก์ดิบ (คนส่วนใหญ่เตรียมใช้งานดิสก์ด้วยระบบการแบ่งพาร์ติชันก่อน) คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนลงดิสก์
 Validation of the given initialization parameters failed.	MainWindow		การตรวจสอบความถูกต้องของพารามิเตอร์การกำหนดค่าเริ่มต้นล้มเหลว
-Shared	PartitionList		แบ่งปัน
 MIMEs	PartitionList		MIMEs
+Shared	PartitionList		แบ่งปัน
 BitLocker encrypted	Encryption utils		เข้ารหัส BitLocker
 You need to select a partition entry from the list.	MainWindow		คุณต้องเลือกรายการพาร์ติชันจากรายการ
 Offset: %s	Support		Offset: %s
@@ -63,8 +63,8 @@ LUKS encrypted	Encryption utils		เข้ารหัส LUKS
 Cancel	AbstractParametersPanel		ยกเลิก
 Format	MainWindow		Format
 OK	MainWindow		ตกลง
-Open with DiskProbe	MainWindow		เปิดด้วย DiskProbe
 Could not delete the selected partition.	MainWindow		ไม่สามารถลบพาร์ติชันที่เลือก
+Open with DiskProbe	MainWindow		เปิดด้วย DiskProbe
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		คุณแน่ใจหรือว่าต้องการเริ่มต้นดิสก์ที่เลือก ข้อมูลทั้งหมดจะสูญหาย คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนไปยังดิสก์ \n
 There was an error preparing the disk for modifications.	MainWindow		มีข้อผิดพลาดในการเตรียมดิสก์สำหรับการแก้ไข
 The disk has been successfully initialized.\n	MainWindow		ดิสก์ได้รับการเตรียมใช้งานเรียบร้อยแล้ว \n
@@ -73,10 +73,10 @@ Cancel	MainWindow		ยกเลิก
 Free space	PartitionList		ที่ว่าง
 Queries	PartitionList		สอบถาม
 Force unmount	MainWindow		บังคับ ยกเลิกการเชื่อมต่อ
-Partition	MainWindow		พาร์ติชั่น
 Change parameters	MainWindow		เปลี่ยนพารามิเตอร์
-Rescan	MainWindow		ค้นหาใหม่
+Partition	MainWindow		พาร์ติชั่น
 There was an error acquiring the partition row.	MainWindow		มีข้อผิดพลาดในการรับแถวพาร์ติชัน
+Rescan	MainWindow		ค้นหาใหม่
 Failed to initialize the disk %s!\n	MainWindow		ไม่สามารถเริ่มต้นดิสก์ %s!\n
 Delete	MainWindow		ลบ
 Partition type:	ChangeParametersPanel		ชนิดพาร์ติชั่น:

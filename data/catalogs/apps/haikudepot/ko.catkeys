@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		사용자 �
 Available packages	MainWindow		사용 가능한 패키지
 It was not possible to create the new user.	UserLoginWindow		새 사용자를 생성할 수 없습니다.
 An unexpected error has been sent from the server [%li]	ServerHelper		서버에서 예상하지 못한 오류를 보냈습니다 [%li]
-Create account	UserLoginWindow		계정 만들기
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		패키지 변경 이력 가져오는 중
+Create account	UserLoginWindow		계정 만들기
 Agree	ToLatestUserUsageConditionsWindow		동의
 Install %PackageTitle%	PackageManager		%PackageTitle% 설치
 The response to the captcha was incorrect.	ServerHelper		Captcha 응답이 잘못되었습니다.
@@ -144,8 +144,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		로컬
 Package changes	PackageResult	Window title	패키지 변경
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		이 컴퓨터에서 HaikuDepotServer로 익명의 사용 정보를 보내는 것을 허용하시겠습니까? 나중에 \"설정\"창에서 설정을 바꿀 수 있습니다.
-User rating	RatePackageWindow		사용자 평가
 Installed packages	MainWindow		설치된 패키지
+User rating	RatePackageWindow		사용자 평가
 Date	PackageListView		일자
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		비밀버호틑 최소 %MinPasswordLength%글자 이상이어야 합니다. 최소 %MinPasswordUppercaseChar%개의 대문자와 %MinPasswordDigitsChar%개의 숫자를 포함하여야 합니다.
 Error	App		오류
@@ -169,8 +169,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		안정성
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		비밀번호를 잘못 입력하는 경우를 줄이기 위하여 재입력이 필요합니다.
 Cancel	SettingsWindow		취소
-Cancel	RatePackageWindow		취소
 Inactive	PackageListView		비활성
+Cancel	RatePackageWindow		취소
 Nickname:	UserLoginWindow		별명:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		저장소 메타데이터 동기화 중
 OK	MainWindow		확인

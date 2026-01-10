@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Appearance	211365410
+1	turkish	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Denetim kenarlığı
 Control mark	Colors tab		Denetim imi
 Off	AntialiasingSettingsView		Kapalı
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		İkincil renkleri kendiliğinden
 Window tab text	Colors tab		Pencere sekmesi metni
 Navigation pulse	Colors tab		Navigasyon nabzı
 LCD subpixel	AntialiasingSettingsView		LCD altpiksel
+Progress bar	Colors tab		İlerleme çubuğu
 Window tab	Colors tab		Pencere sekmesi
 Link text	Colors tab		Bağlantı metni
 Tooltip background	Colors tab		Araç ipucu arka planı
@@ -75,6 +76,5 @@ Inactive window border	Colors tab		Etkin olmayan pencere kenarlığı
 Colors	APRWindow		Renkler
 About control look	DecorSettingsView		Görünüm Denetimci hakkında
 Control highlight	Colors tab		Denetim vurgulaması
-Status bar	Colors tab		Durum çubuğu
 Link hover	Colors tab		İmleç bağlantı üzerinde
 Single:	DecorSettingsView		Tekli:

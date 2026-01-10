@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	211365410
+1	polish	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Obramowanie kontrolki
 Control mark	Colors tab		Znak sterujący
 Off	AntialiasingSettingsView		Wyłącz
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Nieaktywne obramowanie okna
 Colors	APRWindow		Kolory
 About control look	DecorSettingsView		O wyglądzie kontrolek
 Control highlight	Colors tab		Podkreślenie kontrolki
-Status bar	Colors tab		Pasek stanu
 Link hover	Colors tab		Zaznaczony odnośnik
 Single:	DecorSettingsView		Pojedyncze:

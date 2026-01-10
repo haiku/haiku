@@ -4,8 +4,8 @@ Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon cumò lis modifichis sul disc?\n\nSe si lu fâs, ducj i dâts te partizion selezionade a laran pierdûts in mût ireparabil!
 Device	PartitionList		Dispositîf
-Initialize	MainWindow		Inizialize
 Could not change the parameters of the selected partition.	MainWindow		Impussibil cambiâ i parametris de partizion selezionade.
+Initialize	MainWindow		Inizialize
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis al disc daurman?\n\nDucj i dâts de partizionon \"%s\" a laran pierdûts in mût insanabil se tu lu fasis!
 PGP encrypted	Encryption utils		Cifrât cun PGP
 Delete partition	MainWindow		Elimine partizion
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Montât su
 Disk system %s not found!	MainWindow		Disc par system %s no cjatât!
 Create…	MainWindow		Cree…
 Write changes	MainWindow		Scrîf lis modifichis
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		La inizializazion de partizion %s e je falide. (Nissune modifiche e je stade scrite sul disc.)
 Validation of the given creation parameters failed.	MainWindow		La convalide dai parametris di creazion definîts e je falide.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		La inizializazion de partizion %s e je falide. (Nissune modifiche e je stade scrite sul disc.)
 Eject	MainWindow		Pare fûr
-Surface test (not implemented)	MainWindow		Verifiche de superficie (no implementât)
 Read only	PartitionList		Dome leture
+Surface test (not implemented)	MainWindow		Verifiche de superficie (no implementât)
 The panel could not return successfully.	MainWindow		Il panel nol è rivât a completâ la ativitât cun sucès.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		No si è rivâts a cambiâ i parametris de partizion. Nissune modifiche e je stade scrite sul disc.
 Partition %ld	DiskView		Partizion %ld
@@ -49,13 +49,13 @@ End: %s	Support		Fin: %s
 Partition type	PartitionList		Gjenar di partizion
 Unable to find the selected partition by ID.	MainWindow		Impussibil cjatâ la partizion selezionade midiant ID.
 The currently selected partition is not empty.	MainWindow		La partizion atualmentri selezionade no je vueide.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Formatâ pardabon un disc grês? (La plui part des personis, prime a inizializin il disc cuntun sisteme di partizionament) Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.
-Wipe (not implemented)	MainWindow		Nete vie (no implementât)
 The currently selected partition does not have a parent partition.	MainWindow		La partizion atualmentri selezionade no à une sore-partizion.
+Wipe (not implemented)	MainWindow		Nete vie (no implementât)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Formatâ pardabon un disc grês? (La plui part des personis, prime a inizializin il disc cuntun sisteme di partizionament) Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.
 Validation of the given initialization parameters failed.	MainWindow		La convalide dai parametris di inizializazion definîts e je falide.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Impussibil creâ la partizion. No je stade scrite nissune modifiche sul disc.
-Shared	PartitionList		Condividût
 MIMEs	PartitionList		MIME
+Shared	PartitionList		Condividût
 BitLocker encrypted	Encryption utils		Cifrât cun BitLocker
 You need to select a partition entry from the list.	MainWindow		Tu âs di selezionâ une partizion de liste.
 Offset: %s	Support		Spostament: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Anule
 Format	MainWindow		Formate
 OK	MainWindow		Va ben
 Empty space	DiskView		Spazi vueit
-Open with DiskProbe	MainWindow		Vierç cun Scandai dal disc
 Could not delete the selected partition.	MainWindow		Impussibil eliminâ la partizion selezionade.
+Open with DiskProbe	MainWindow		Vierç cun Scandai dal disc
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Inizializâ pardabon il disc selezionât? Ducj i dâts a laran pierdûts. Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.\n
 There was an error preparing the disk for modifications.	MainWindow		Si è verificât un erôr tal preparâ il disc aes modifichis.
 The disk has been successfully initialized.\n	MainWindow		Il disc al è stât inizializât cun sucès.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Anule
 Free space	PartitionList		Spazi libar
 Queries	PartitionList		Interogazions
 Force unmount	MainWindow		Sfuarce il dismontaç
-Partition	MainWindow		Partizion
 Change parameters	MainWindow		Modifiche i parametris
-Rescan	MainWindow		Torne scansione
+Partition	MainWindow		Partizion
 There was an error acquiring the partition row.	MainWindow		Si è verificât un erôr te acuisizion de rie de partizion.
+Rescan	MainWindow		Torne scansione
 Failed to initialize the disk %s!\n	MainWindow		No si è rivâts a inizializâ il disc %s!\n
 The partition cannot be unmounted.	MainWindow		Nol è pussibil dismontâ la partizion.
 Delete	MainWindow		Elimine
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		La partizion %s e je stade za
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Cambiâ pardabon i parametris de partizion selezionade?\n\nAltris sistemis operatîfs a podaressin no ricognossi plui la partizion!
 Boot	PartitionList		Inviament
 OK	AbstractParametersPanel		Va ben
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis al disc daurman?\n\nDucj i dâts sul disc \"%s\" a laran pierdûts in mût insanabil se tu lu fasis!
 Virtual	PartitionList		Virtuâl
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis al disc daurman?\n\nDucj i dâts sul disc \"%s\" a laran pierdûts in mût insanabil se tu lu fasis!
 Virtual	DiskView		Virtuâl
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon cumò lis modifichis sul disc?\n\nSe si lu fâs ducj i dâts dal disc selezionât a laran pierdûts in mût irimediabil!
 Select a partition from the list below.	DiskView		Selezione une partizion de liste chi sot.

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	1275638063
+1	turkish	x-vnd.haiku-icon_o_matic	3427646542
 None	Icon-O-Matic-Properties		Yok
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Yolu temizle
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -50,15 +50,17 @@ Stroke	Transformation		Vuruş
 Flip	Icon-O-Matic-PathManipulator		Ters çevir
 edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	için herhangi bir listeye
 Move pivot	Icon-O-Matic-TransformationBoxStates		Ekseni taşı
-Opacity	Icon-O-Matic-PropertyNames		Opaklık
+Opacity	Icon-O-Matic-PropertyNames		Matlık
 OK	Icon-O-Matic-ColorPicker		Tamam
 Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	%property% özelliğini çoklu ayarla
 Error: 	Icon-O-Matic-Main		Hata: 
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		{0, plural, one{Dönüşümü} other{Dönüşümleri}} sıfırla
+SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey will be exported as linear approximations and may look different in other viewers.	Icon-O-Matic-SVGExport		SVG bazı gradyan türlerini (konik, elmas, xy, sqrt_xy) desteklemez.\n\nBunlar doğrusal yaklaşımlar olarak dışa aktarılacaklar ve diğer görüntüleyicilerde farklı görünebilirler.
 Assign style	Icon-O-Matic-AssignStyleCmd		Biçem ata
 Saving your document failed!	Icon-O-Matic-Exporter		Belge kaydedilemedi!
 Snap to grid	Icon-O-Matic-Menu-Settings		Izgaraya hizala
 Opening the document failed!	Icon-O-Matic-Main		Belge açılamadı!
+SVG export	Icon-O-Matic-SVGExport		SVG olarak dışa aktar
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		{0, plural, one{Biçemi} other{Biçemleri}} kaldır
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Bir veya daha çok yolun pek çok tepeciği var. HVIF biçimi yol başına en çok 255 tepecik destekler.
 Add with path & style	Icon-O-Matic-ShapesList		Yol ve biçem ile ekle
@@ -76,6 +78,7 @@ Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		{0, plural,
 Remove	Icon-O-Matic-PathManipulator		Kaldır
 Duplicate	Icon-O-Matic-ShapesList		Çoğalt
 Alpha	Icon-O-Matic-PropertyNames		Alfa
+OK	Icon-O-Matic-SVGExport		Tamam
 Contour	Transformation		Kontur
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		{0, plural, one{Dönüşümcü} other{Dönüşümcüler}} ekle
 Miter limit	Icon-O-Matic-PropertyNames		Gönye sınırı
@@ -96,7 +99,7 @@ Diamond	Icon-O-Matic-StyleTypes		Elmas
 Don't save	Icon-O-Matic-Menu-Settings		Kaydetme
 Add shape with path	Icon-O-Matic-Menu-Shape		Yol içeren şekil ekle
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Tüh
-Translation X	Icon-O-Matic-PropertyNames		X çevirisi
+Translation X	Icon-O-Matic-PropertyNames		X taşıması
 Multi-paste properties	Icon-O-Matic-Properties		Çoklu yapıştır özellikleri
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon–O–Matic, SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Özgün dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
 Remove	Icon-O-Matic-TransformersList		Kaldır
@@ -166,7 +169,7 @@ Icon-O-Matic	System name		Icon–O–Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<geri alınacak bir şey yok>
 Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		{0, plural, one{Yolu} other{Yolları}} kaldır
 Add	Icon-O-Matic-StylesList		Ekle
-Translation Y	Icon-O-Matic-PropertyNames		Y çevirisi
+Translation Y	Icon-O-Matic-PropertyNames		Y taşıması
 Modify vertex	Icon-O-Matic-ChangePointCmd		Tepeciği düzenle
 Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		{0, plural, one{Biçemi} other{Biçemleri}} taşı
 Scale	Icon-O-Matic-TransformationBoxStates		Ölçek

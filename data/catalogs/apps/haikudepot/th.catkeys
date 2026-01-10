@@ -100,8 +100,8 @@ This application writes and reads some working files on your computer in order t
 <Package contents not available for remote packages>	PackageContentsView		<เนื้อหาแพ็คเกจไม่พร้อมใช้งานสำหรับแพ็คเกจแบบรีโมต>
 Ratings	PackageInfoView		อัตรา
 Local	LocalPkgDataLoadProcess		ท้องถิ่น
-User rating	RatePackageWindow		คะแนนจากผู้ใช้
 Installed packages	MainWindow		แพคเกจที่ติดตั้ง
+User rating	RatePackageWindow		คะแนนจากผู้ใช้
 Error	App		ผิดพลาด
 There was a puzzling response from the web service.	UserLoginWindow		มีการตอบสนองที่น่าสงสัยจากบริการบนเว็บ
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		คะแนนของคุณได้รับการอัปโหลดเรียบร้อยแล้ว คุณสามารถอัปเดตหรือลบได้ที่เว็บไซต์เซิร์ฟเวอร์ HaikuDepot
@@ -116,8 +116,8 @@ About	PackageInfoView		เกี่ยวกับ
 Password:	UserLoginWindow		รหัส:
 Stability	RatePackageWindow		ความเสถียร
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		ต้องทำซ้ำรหัสผ่านเพื่อลดโอกาสในการป้อนรหัสผ่านไม่ถูกต้อง
-Cancel	RatePackageWindow		ยกเลิก
 Inactive	PackageListView		ไม่ใช้งาน
+Cancel	RatePackageWindow		ยกเลิก
 Nickname:	UserLoginWindow		ชื่อเล่น:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		การซิงโครไนซ์ข้อมูลเมตาเกี่ยวกับที่เก็บ
 OK	MainWindow		ตกลง

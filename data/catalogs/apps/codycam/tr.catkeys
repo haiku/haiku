@@ -72,11 +72,11 @@ Type:	CodyCam		Tür:
 Rename failed	VideoConsumer.cpp		Yeniden adlandırma başarısız oldu
 unrecognized upload client specified	CodyCam		tanınmayan yükleme istemcisi belirtildi
 Server:	CodyCam		Sunucu:
-Login:	CodyCam		Giriş yap:
+Login:	CodyCam		Oturum aç:
 File	CodyCam		Dosya
 read: %ld\n	SftpClient		oku: %ld\n
 Every hour	CodyCam		Her saat
-login ID expected	CodyCam		giriş kimliği bekleniyordu
+login ID expected	CodyCam		oturum kimliği bekleniyordu
 Video settings	CodyCam		Video ayarları
 Can't find an available connection to the video window	CodyCam		Video penceresine uygun bir bağlantı bulunamıyor
 FTP	CodyCam		FTP

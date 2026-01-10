@@ -4,8 +4,8 @@ Mount all	MainWindow		Montér alle
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på, at du vil skrive ændringerne tilbage til disken nu?\n\nData på det valgte diskafsnit vil blive slettet for stedse!
 Device	PartitionList		Enhed
-Initialize	MainWindow		Initialisér
 Could not change the parameters of the selected partition.	MainWindow		Kunne ikke ændre parameterne for det valgte diskafsnit.
+Initialize	MainWindow		Initialisér
 PGP encrypted	Encryption utils		PGP-krypteret
 Delete partition	MainWindow		Slet diskafsnit
 Error: 	MainWindow	in any error alert	Fejl: 
@@ -24,11 +24,11 @@ DriveSetup	System name		Drevopsætning
 Mounted at	PartitionList		Monteret på
 Create…	MainWindow		Opret…
 Write changes	MainWindow		Skriv ændringer
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialiseringen af diskafsnit %s mislykkedes. (Der er ikke blevet skrevet nogle ændringer til disken).
 Validation of the given creation parameters failed.	MainWindow		Validering af de angivne oprettelses parametre mislykkedes.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialiseringen af diskafsnit %s mislykkedes. (Der er ikke blevet skrevet nogle ændringer til disken).
 Eject	MainWindow		Skub ud
-Surface test (not implemented)	MainWindow		Overfladetest (ikke implementeret)
 Read only	PartitionList		Skrivebeskyttet
+Surface test (not implemented)	MainWindow		Overfladetest (ikke implementeret)
 The panel could not return successfully.	MainWindow		Panelet kunne ikke returneres.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunne ikke ændre parametrene for diskafsnittet. Der blev ikke skrevet nogle ændringer til disken.
 Partition %ld	DiskView		Diskafsnit %ld
@@ -46,13 +46,13 @@ End: %s	Support		Slutning: %s
 Partition type	PartitionList		Diskafsnitstype
 Unable to find the selected partition by ID.	MainWindow		Kunne ikke finde det valgte diskafsnit ud fra id.
 The currently selected partition is not empty.	MainWindow		Det valgte diskafsnit er ikke tomt.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på, at du vil formatere en rå disk? (De fleste folk initialiserer først disken med et diskafsnitssystem). Du vil blive spurgt igen inden ændringerne skrives til disken.
-Wipe (not implemented)	MainWindow		Stryg (ikke implementeret)
 The currently selected partition does not have a parent partition.	MainWindow		Det valgte diskafsnit har ikke nogen forælderdiskafsnit.
+Wipe (not implemented)	MainWindow		Stryg (ikke implementeret)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på, at du vil formatere en rå disk? (De fleste folk initialiserer først disken med et diskafsnitssystem). Du vil blive spurgt igen inden ændringerne skrives til disken.
 Validation of the given initialization parameters failed.	MainWindow		Validering af de angivne initialiseringsparametre mislykkedes.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Kunne ikke oprette diskafsnittet. Der er ikke blevet skrevet nogle ændringer til disken.
-Shared	PartitionList		Delt
 MIMEs	PartitionList		MIME'er
+Shared	PartitionList		Delt
 BitLocker encrypted	Encryption utils		BitLocker-krypteret
 You need to select a partition entry from the list.	MainWindow		Du skal vælge et diskafsnit fra listen.
 Offset: %s	Support		Forskydning: %s
@@ -67,8 +67,8 @@ Cancel	AbstractParametersPanel		Afbryd
 Format	MainWindow		Format
 OK	MainWindow		O.k.
 Empty space	DiskView		Tom plads
-Open with DiskProbe	MainWindow		Åbn med Disksondering
 Could not delete the selected partition.	MainWindow		Kunne ikke slette det valgte diskafsnit.
+Open with DiskProbe	MainWindow		Åbn med Disksondering
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Er du sikker på, du vil initialisere den valgte disk? Alle data vil gå tabt. Du vil blive spurgt igen inden ændringerne skrives til disken.\n
 There was an error preparing the disk for modifications.	MainWindow		Der opstod en fejl ved forberedning af disken til ændringer.
 The disk has been successfully initialized.\n	MainWindow		Disken blev initialiseret.\n
@@ -77,10 +77,10 @@ Cancel	MainWindow		Afbryd
 Free space	PartitionList		Ledig plads
 Queries	PartitionList		Forespørgsler
 Force unmount	MainWindow		Gennemtving afmontering
-Partition	MainWindow		Diskafsnit
 Change parameters	MainWindow		Ændr parametre
-Rescan	MainWindow		Skan på ny
+Partition	MainWindow		Diskafsnit
 There was an error acquiring the partition row.	MainWindow		Der opstod en fejl ved indhentning af diskafsnitsrækken.
+Rescan	MainWindow		Skan på ny
 Failed to initialize the disk %s!\n	MainWindow		Kunne ikke initialisere disken %s!\n
 The partition cannot be unmounted.	MainWindow		Diskafsnittet kan ikke afmonteres.
 Delete	MainWindow		Slet

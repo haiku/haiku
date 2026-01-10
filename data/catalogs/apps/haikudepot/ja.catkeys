@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条�
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
 An unexpected error has been sent from the server [%li]	ServerHelper		サーバーから予期しないエラーが送信されました [%li]
-Create account	UserLoginWindow		アカウントの作成
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		パッケージの変更記録の取得中
+Create account	UserLoginWindow		アカウントの作成
 Agree	ToLatestUserUsageConditionsWindow		同意
 Install %PackageTitle%	PackageManager		%PackageTitle% をインストール
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		ローカル
 Package changes	PackageResult	Window title	パッケージの変更
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		このコンピューターから匿名の使用情報を HaikuDepotServer システムに送信することを受け入れますか?あとから、\"設定\" ウィンドウで選択を変えられます。
-User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済パッケージ
+User rating	RatePackageWindow		ユーザーによる評価
 Date	PackageListView		日付
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		パスワードは %MinPasswordLength% 文字以上である必要があります。%MinPasswordUppercaseChar% 個の文字は大文字で、%MinPasswordDigitsChar% 個の文字は数字である必要があります。
 Error	App		エラー
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		安定度
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		間違って入力する可能性を減らすため、パスワードを繰り返す必要があります。
 Cancel	SettingsWindow		キャンセル
-Cancel	RatePackageWindow		中止
 Inactive	PackageListView		無効
+Cancel	RatePackageWindow		中止
 Nickname:	UserLoginWindow		ニックネーム:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		リポジトリに関するメタデータを同期中
 OK	MainWindow		OK

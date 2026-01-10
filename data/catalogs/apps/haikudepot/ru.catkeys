@@ -3,8 +3,8 @@ Usage conditions download problem	ToLatestUserUsageConditionsWindow		Пробл�
 Available packages	MainWindow		Доступные пакеты
 It was not possible to create the new user.	UserLoginWindow		Не удалось создать нового пользователя.
 An unexpected error has been sent from the server [%li]	ServerHelper		Сервер прислал непредвиденную ошибку [%li]
-Create account	UserLoginWindow		Создать учётную запись
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Получение журнала изменений для пакета
+Create account	UserLoginWindow		Создать учётную запись
 Agree	ToLatestUserUsageConditionsWindow		Принимаю
 Install %PackageTitle%	PackageManager		Установить %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Ответ на капчу был неверным.
@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Локальный
 Package changes	PackageResult	Window title	Зависимости пакетов
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Вы согласны на отправку анонимных данных об этом компьютере на сервер HaikuDepot? Свой выбор Вы всегда сможете изменить позже, в окне \«Настройки\».
-User rating	RatePackageWindow		Пользовательский рейтинг
 Installed packages	MainWindow		Установленные пакеты
+User rating	RatePackageWindow		Пользовательский рейтинг
 Date	PackageListView		Дата
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Пароль должен состоять минимум из %MinPasswordLength% символов. Из них, %MinPasswordUppercaseChar% символов должны быть в ВЕРХНЕМ регистре и %MinPasswordDigitsChar% символов должны быть цифрами.
 Error	App		Ошибка
@@ -172,8 +172,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Стабильность
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Пожалуйста, повторите пароль, чтобы уменьшить вероятность его неправильного ввода.
 Cancel	SettingsWindow		Отменить
-Cancel	RatePackageWindow		Отменить
 Inactive	PackageListView		Неактивный
+Cancel	RatePackageWindow		Отменить
 Nickname:	UserLoginWindow		Пользователь:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Синхронизация метаданных репозитариев
 OK	MainWindow		OK

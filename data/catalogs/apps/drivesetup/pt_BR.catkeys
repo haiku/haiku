@@ -4,8 +4,8 @@ Mount all	MainWindow		Montar tudo
 Disk	MainWindow		Disco
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
 Device	PartitionList		Dispositivo
-Initialize	MainWindow		Inicializar
 Could not change the parameters of the selected partition.	MainWindow		Não foi possível modificar os parâmetros da partição selecionada.
+Initialize	MainWindow		Inicializar
 PGP encrypted	Encryption utils		Criptografado por PGP
 Delete partition	MainWindow		Excluir partição
 Error: 	MainWindow	in any error alert	Erro:
@@ -23,11 +23,11 @@ DriveSetup	System name		Gerenciador de Disco
 Mounted at	PartitionList		Montado em
 Create…	MainWindow		Criar...
 Write changes	MainWindow		Gravar alterações
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicialização da partição %s falhou. (Nada foi gravado no disco.)
 Validation of the given creation parameters failed.	MainWindow		A validação dos parâmetros de criação inseridas falhou.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicialização da partição %s falhou. (Nada foi gravado no disco.)
 Eject	MainWindow		Ejetar
-Surface test (not implemented)	MainWindow		Teste de superfície (não implementado)
 Read only	PartitionList		Somente leitura
+Surface test (not implemented)	MainWindow		Teste de superfície (não implementado)
 The panel could not return successfully.	MainWindow		A janela de diálogo pode não responder adequadamente.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Falha ao modificar os parâmetros da partição. Nenhuma mudança foi gravada no disco.
 Partition %ld	DiskView		Partição %ld
@@ -45,13 +45,13 @@ End: %s	Support		Fim: %s
 Partition type	PartitionList		Tipo de partição
 Unable to find the selected partition by ID.	MainWindow		Não foi possível encontrar a partição selecionada pelo ID.
 The currently selected partition is not empty.	MainWindow		A partição selecionada não está vazia.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Está certo de que deseja formatar um disco não processado? (A maioria das pessoas inicializa o disco com um sistema de particionamento primeiro) Você será questionado novamente antes que mudanças sejam gravadas no disco.
-Wipe (not implemented)	MainWindow		Limpar (não implementado)
 The currently selected partition does not have a parent partition.	MainWindow		A partição selecionada não tem uma partição principal.
+Wipe (not implemented)	MainWindow		Limpar (não implementado)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Está certo de que deseja formatar um disco não processado? (A maioria das pessoas inicializa o disco com um sistema de particionamento primeiro) Você será questionado novamente antes que mudanças sejam gravadas no disco.
 Validation of the given initialization parameters failed.	MainWindow		A validação dos parâmetros de criação inseridas falhou.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Falha ao criar a partição. Nenhuma mudança foi gravada no disco.
-Shared	PartitionList		Compartilhada
 MIMEs	PartitionList		MIMEs
+Shared	PartitionList		Compartilhada
 BitLocker encrypted	Encryption utils		BitLocker criptografado
 You need to select a partition entry from the list.	MainWindow		Você precisa de selecionar uma partição da lista
 Offset: %s	Support		Deslocamento: %s
@@ -66,8 +66,8 @@ Cancel	AbstractParametersPanel		Cancelar
 Format	MainWindow		Formatar
 OK	MainWindow		OK
 Empty space	DiskView		Espaço vazio
-Open with DiskProbe	MainWindow		Abrir com o Analisador de Disco
 Could not delete the selected partition.	MainWindow		Não foi possível excluir a partição selecionada.
+Open with DiskProbe	MainWindow		Abrir com o Analisador de Disco
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Deseja realmente inicializar o disco selecionado? Todos os dados serão perdidos. Perguntaremos de novo antes das alterações serem gravadas.\n
 There was an error preparing the disk for modifications.	MainWindow		Há um erro ao preparar o disco para modificações.
 The disk has been successfully initialized.\n	MainWindow		O disco foi inicializado com sucesso.\n
@@ -76,10 +76,10 @@ Cancel	MainWindow		Cancelar
 Free space	PartitionList		Espaço livre
 Queries	PartitionList		Consultas
 Force unmount	MainWindow		Forçar desmontagem
-Partition	MainWindow		Partição
 Change parameters	MainWindow		Mudar parâmetros
-Rescan	MainWindow		Re-analisar
+Partition	MainWindow		Partição
 There was an error acquiring the partition row.	MainWindow		Houve um erro ao obter a linha de partição.
+Rescan	MainWindow		Re-analisar
 Failed to initialize the disk %s!\n	MainWindow		Falha ao iniciar o disco %s!\n
 The partition cannot be unmounted.	MainWindow		A partição não pode ser desmontada.
 Delete	MainWindow		Excluir

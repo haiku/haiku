@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Appearance	211365410
+1	ukrainian	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Рамка елемента
 Control mark	Colors tab		Відмітка
 Off	AntialiasingSettingsView		Вимкнено
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Рамка неактивного вікна
 Colors	APRWindow		Кольори
 About control look	DecorSettingsView		Про вигляд віджетів
 Control highlight	Colors tab		Виділення елемента
-Status bar	Colors tab		Рядок стану
 Link hover	Colors tab		Посилання під курсором
 Single:	DecorSettingsView		Одинарний:

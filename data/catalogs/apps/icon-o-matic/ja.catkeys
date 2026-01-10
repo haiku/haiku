@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	1275638063
+1	japanese	x-vnd.haiku-icon_o_matic	3427646542
 None	Icon-O-Matic-Properties		解除
 Clean up path	Icon-O-Matic-CleanUpPathCmd		パスのクリーンアップ
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -55,10 +55,12 @@ OK	Icon-O-Matic-ColorPicker		OK
 Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	マルチセット %property%
 Error: 	Icon-O-Matic-Main		エラー:
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		{0, plural, one{箇所の変形} other{箇所の変形}}のリセット
+SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey will be exported as linear approximations and may look different in other viewers.	Icon-O-Matic-SVGExport		SVGはいくつかのグラデーション (conic, diamond, xy, sqrt_xy) をサポートしません。\n\nそれらは線形近似でエクスポートされ、他のビューワでは違って見えるかもしれません。
 Assign style	Icon-O-Matic-AssignStyleCmd		スタイルの割り当て
 Saving your document failed!	Icon-O-Matic-Exporter		ドキュメントの保存に失敗しました!
 Snap to grid	Icon-O-Matic-Menu-Settings		グリッドに沿う
 Opening the document failed!	Icon-O-Matic-Main		ドキュメントの読み込みに失敗しました。
+SVG export	Icon-O-Matic-SVGExport		SVG エクスポート
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		{0, plural, one{個のスタイル} other{個のスタイル}}の削除
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		1 つ以上のパスで頂点が多すぎます。HVIF フォーマットはパス毎に最大 255 個までの頂点をサポートします。
 Add with path & style	Icon-O-Matic-ShapesList		パスとスタイル付きで追加
@@ -76,6 +78,7 @@ Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		{0, plural,
 Remove	Icon-O-Matic-PathManipulator		削除
 Duplicate	Icon-O-Matic-ShapesList		複製
 Alpha	Icon-O-Matic-PropertyNames		アルファ
+OK	Icon-O-Matic-SVGExport		OK
 Contour	Transformation		コンター
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		{0, plural, one{個のトランスフォーマー} other{個のトランスフォーマー}}の追加
 Miter limit	Icon-O-Matic-PropertyNames		マイターリミット

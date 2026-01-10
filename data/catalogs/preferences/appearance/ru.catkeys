@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	211365410
+1	russian	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Граница элемента
 Control mark	Colors tab		Отметка
 Off	AntialiasingSettingsView		Выключить
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Рамка неактивного окна
 Colors	APRWindow		Цвета
 About control look	DecorSettingsView		Об этом виде виджетов
 Control highlight	Colors tab		Подсветка элемента
-Status bar	Colors tab		Строка статуса
 Link hover	Colors tab		Цвет наведенной ссылки
 Single:	DecorSettingsView		Одинарный:

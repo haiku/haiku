@@ -4,8 +4,8 @@ Mount all	MainWindow		Montera alla
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på den valda partitionen kommer att raderas om du gör så!
 Device	PartitionList		Enhet
-Initialize	MainWindow		Initiera
 Could not change the parameters of the selected partition.	MainWindow		Kunde inte ändra parametrarna på den valda partionen.
+Initialize	MainWindow		Initiera
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva tillbaka ändringarna till disken nu?\n\nAll data på partitionen \"%s\" kommer att förloras oåterkalleligt om du gör det!
 PGP encrypted	Encryption utils		PGP-krypterad
 Delete partition	MainWindow		Radera partition
@@ -26,11 +26,11 @@ Mounted at	PartitionList		Monterad vid
 Disk system %s not found!	MainWindow		Disksystemet %s hittades inte!
 Create…	MainWindow		Skapa…
 Write changes	MainWindow		Skriv ändringar
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initiering av partitionen %s misslyckades (Inget skrevs till disken.)
 Validation of the given creation parameters failed.	MainWindow		Utvärdering av den givna parametern misslyckades.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initiering av partitionen %s misslyckades (Inget skrevs till disken.)
 Eject	MainWindow		Mata ut
-Surface test (not implemented)	MainWindow		Yttest (inte implementerat)
 Read only	PartitionList		Endast läsbar
+Surface test (not implemented)	MainWindow		Yttest (inte implementerat)
 The panel could not return successfully.	MainWindow		Panelen kunde inte återskapas.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunde inte ändra parametrar på partionen. Inga ändringar skrivna till disk.
 Partition %ld	DiskView		Partition %ld
@@ -49,13 +49,13 @@ End: %s	Support		Slutar: %s
 Partition type	PartitionList		Partitionstyp
 Unable to find the selected partition by ID.	MainWindow		Kunde inte hitta den valda partitionen via ID.
 The currently selected partition is not empty.	MainWindow		Den valda partitionen är inte tom.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera en rå disk?(De flesta initierar disken med en partion först). Du kommer att få en fråga igen innan ändringar skrivs till disk.
-Wipe (not implemented)	MainWindow		Formatera (inte implementerat)
 The currently selected partition does not have a parent partition.	MainWindow		Den valda partitionen saknar omslutande partition.
+Wipe (not implemented)	MainWindow		Formatera (inte implementerat)
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera en rå disk?(De flesta initierar disken med en partion först). Du kommer att få en fråga igen innan ändringar skrivs till disk.
 Validation of the given initialization parameters failed.	MainWindow		Utvärdering av de givna initialiseringsparametrarna misslyckades.
 Failed to create the partition. No changes have been written to disk.	MainWindow		Det gick inte att skapa partitionen. Inga ändringar har skrivits till disken.
-Shared	PartitionList		Delad
 MIMEs	PartitionList		MIMEs
+Shared	PartitionList		Delad
 BitLocker encrypted	Encryption utils		BitLocker-krypterad
 You need to select a partition entry from the list.	MainWindow		Du måste välja en partiton från listan.
 Offset: %s	Support		Avstånd: %s
@@ -70,8 +70,8 @@ Cancel	AbstractParametersPanel		Avbryt
 Format	MainWindow		Format
 OK	MainWindow		OK
 Empty space	DiskView		Tomt utrymme
-Open with DiskProbe	MainWindow		Öppna med DiskInspekterare
 Could not delete the selected partition.	MainWindow		Kunde inte radera den valda partitionen.
+Open with DiskProbe	MainWindow		Öppna med DiskInspekterare
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Är du säker att du vill initiera den valda disken? All data kommer att förloras. Du kommet att få frågan igen innan ändringarna skrivs till disk.\n
 There was an error preparing the disk for modifications.	MainWindow		Det blev ett fel när diskändringarna förbereddes.
 The disk has been successfully initialized.\n	MainWindow		Partitionen har initierats.\n
@@ -80,10 +80,10 @@ Cancel	MainWindow		Avbryt
 Free space	PartitionList		Ledigt utrymme
 Queries	PartitionList		Frågor
 Force unmount	MainWindow		Tvinga avmontering
-Partition	MainWindow		Partition
 Change parameters	MainWindow		Ändra parametrar
-Rescan	MainWindow		Uppdatera
+Partition	MainWindow		Partition
 There was an error acquiring the partition row.	MainWindow		Ett fel uppstod när partitionsinformationen skulle hämtas.
+Rescan	MainWindow		Uppdatera
 Failed to initialize the disk %s!\n	MainWindow		Misslyckades att initiera partionen %s!\n
 The partition cannot be unmounted.	MainWindow		Partitionen kan inte avmonteras.
 Delete	MainWindow		Ta bort
@@ -99,8 +99,8 @@ The partition %s is already unmounted.	MainWindow		Partitionen %s är redan avmo
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Är du säker på att du vill ändra parametrarna till partionen?\n\nPartionen kommer kanske inte kunna läsas av andra operativsystem!
 Boot	PartitionList		Boot
 OK	AbstractParametersPanel		OK
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva tillbaka ändringarna till disken nu?\n\nAlla data på disken \"%s\" kommer att gå oåterkalleligt förlorade om du gör det!
 Virtual	PartitionList		Virtuell
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva tillbaka ändringarna till disken nu?\n\nAlla data på disken \"%s\" kommer att gå oåterkalleligt förlorade om du gör det!
 Virtual	DiskView		Virtuell
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen kommer att gå förlorad!
 Select a partition from the list below.	DiskView		Välj en partition från listan nedan.

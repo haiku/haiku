@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Appearance	663472720
+1	thai	x-vnd.Haiku-Appearance	3598979163
 Control border	Colors tab		ควบคุมกรอบ
 Control mark	Colors tab		ควบคุมเครื่องหมาย
 Off	AntialiasingSettingsView		ปิด
@@ -74,6 +74,5 @@ Inactive window border	Colors tab		กรอบหน้าต่างที่
 Colors	APRWindow		สี
 About control look	DecorSettingsView		เกี่ยวกับรูปลักษณ์การควบคุม
 Control highlight	Colors tab		ไฮไลต์การควบคุม
-Status bar	Colors tab		สถานะบาร์
 Link hover	Colors tab		Link hover
 Single:	DecorSettingsView		เดี่ยว:

@@ -1,10 +1,10 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	873730785
+1	swedish	x-vnd.Haiku-HaikuDepot	3949833867
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
 An unexpected error has been sent from the server [%li]	ServerHelper		Ett oväntat fel har skickats från servern [%li]
-Create account	UserLoginWindow		Skapa konto
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Hämtar ändringslogg för paket
+Create account	UserLoginWindow		Skapa konto
 Agree	ToLatestUserUsageConditionsWindow		Håller med
 Install %PackageTitle%	PackageManager		Installera %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
@@ -54,6 +54,7 @@ Send	RatePackageWindow		Skicka
 Creating package list…	FeaturedPackagesView		Skapar paketlista...
 Start package daemon	App		Starta paket-servicen
 There are problems in the supplied data:	UserLoginWindow		Det finns problem med de angivna uppgifterna:
+Desktop and non-desktop packages	MainWindow		Stationära och icke-stationära paket
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Användaren '%Nickname%' har inte samtyckt till några användningsvillkor.
 Usage conditions download problem	UserLoginWindow		Fel vid hämtning av användarvillkor
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installera paketet %s från förvaret %s\n
@@ -146,8 +147,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokal
 Package changes	PackageResult	Window title	Paketändringar
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Skulle det vara acceptabelt att skicka anonyma användningsdata till HaikuDepotServer-systemet från den här datorn? Du kan ändra dina preferenser i fönstret \"Inställningar \" senare.
-User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
+User rating	RatePackageWindow		Användarbetyg
 Date	PackageListView		Datum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Lösenordet måste vara minst %MinPasswordLength% tecken. %MinPasswordUppercaseChar% -tecken måste vara versaler och %MinPasswordDigitsChar% -tecken måste vara siffror.
 Error	App		Fel
@@ -172,8 +173,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Lösenordet måste upprepas för att minska risken att det anges felaktigt.
 Cancel	SettingsWindow		Avbryt
-Cancel	RatePackageWindow		Avbryt
 Inactive	PackageListView		Inaktiv
+Cancel	RatePackageWindow		Avbryt
 Nickname:	UserLoginWindow		Användarnamn:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkroniserar metadata från repositorier
 OK	MainWindow		OK
@@ -195,11 +196,13 @@ Repositories	MainWindow		Repositorier
 This rating is visible to other users	RatePackageWindow		Detta betyg är synligt för andra användare
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Under uppdateringen av paketdata har ett problem uppstått som kan leda till att data är föråldrade eller saknas från programmets skärm. Ytterligare information om detta problem kan hämtas från applikationsloggarna.\nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Ett fel har uppstått vid nedladdning av användningsvillkoren. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
+Stop network use	ServerHelper		Stoppa nätverksanvändning
 View agreed usage conditions…	MainWindow		Visa godkända användarvillkor…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Användaren [%Nickname%] har autentiserats, men innan du fortsätter måste du godkänna de senaste användningsvillkoren.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Det här paketet verkar inte finnas på HaikuDepot-servern, så det är inte möjligt att skapa ett nytt betyg eller redigera ett befintligt betyg.
 Apply	SettingsWindow		Tillämpa
 View the password requirements	UserLoginWindow		Se lösenordskraven
+Desktop packages only	MainWindow		Endast skrivbordspaket
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Användaren \"%Nickname%\" har tidigare godkänt användningsvillkoren, men användarvillkoren har uppdaterats sedan dess. De uppdaterade användarvillkoren måste nu godkännas.
 Log out	MainWindow		Logga ut
 Comment language:	RatePackageWindow		Kommentarspråk:
@@ -208,6 +211,7 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		Se användningsvillkoren
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Läser repositoriedata
+Native desktop packages only	MainWindow		Endast inbyggda skrivbordspaket
 Fatal error	InstallPackageProcess		Allvarligt fel
 A validation error has occurred	ServerHelper		Ett valideringsfel har inträffat
 The nickname is required.	UserLoginWindow		Ett användarnamn krävs.

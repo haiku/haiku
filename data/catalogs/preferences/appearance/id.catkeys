@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Appearance	211365410
+1	indonesian	x-vnd.Haiku-Appearance	3146871853
 Control border	Colors tab		Kontrol batas
 Control mark	Colors tab		Penanda kontrol
 Off	AntialiasingSettingsView		Mati
@@ -75,6 +75,5 @@ Inactive window border	Colors tab		Batas jendela non-aktif
 Colors	APRWindow		Warna
 About control look	DecorSettingsView		Tentang control look
 Control highlight	Colors tab		Kontrol sorot
-Status bar	Colors tab		Status bar
 Link hover	Colors tab		Link melayang
 Single:	DecorSettingsView		Tunggal:
