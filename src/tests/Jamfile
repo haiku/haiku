@@ -17,10 +17,11 @@ UnitTest UnitTester
 
 # Install libbe and other libraries for target platform libbe_test.
 if $(TARGET_PLATFORM) = libbe_test {
-	local libs = libbe_haiku.so libbeadapter.so libtranslation.so ;
+	local libs = libbe_test.so libtranslation.so ;
 	HaikuInstall install-unittest-libs : $(TARGET_UNIT_TEST_LIB_DIR)
 		: $(libs)
 		: tests!unittests ;
+	Depends install-unittest-libs : unittests ;
 }
 
 SubInclude HAIKU_TOP src tests add-ons ;

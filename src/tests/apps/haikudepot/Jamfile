@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src tests apps haikudepot ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
+include [ FDirName $(HAIKU_TOP) src apps haikudepot build jam HdsSchemaGenRules ] ;
+
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot model ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
@@ -25,10 +27,42 @@ local sourceDir ;
 for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haikudepot $(sourceDir) ] ;
 }
-SEARCH_SOURCE += [ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
-	dumpexportrepositorybulklistener ] ;
-SEARCH_SOURCE += [ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
-	dumpexportrepositorymodel ] ;
+local dumpExportRepositoryBulkListenerTargetDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
+		dumpexportrepositorybulklistener ] ;
+local dumpExportRepositoryModelTargetDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
+		dumpexportrepositorymodel ] ;
+SEARCH_SOURCE += $(dumpExportRepositoryBulkListenerTargetDirectory) ;
+SEARCH_SOURCE += $(dumpExportRepositoryModelTargetDirectory) ;
+	
+local generatedRepositoryModelSourceFiles = 
+	<src!apps!haikudepot>DumpExportRepository.cpp
+	<src!apps!haikudepot>DumpExportRepositorySource.cpp
+	<src!apps!haikudepot>DumpExportRepositorySourceMirror.cpp
+;
+local generatedRepositoryParserSourceFiles =
+	<src!apps!haikudepot>DumpExportRepositoryJsonListener.cpp
+;
+
+local dummyFile = "dummy.dat" ;
+
+local dumpExportRepositoryBulkListenerTargetFile =
+	[ FDirName $(dumpExportRepositoryBulkListenerTargetDirectory) $(dummyFile) ] ;
+local dumpExportRepositoryModelTargetFile =
+	[ FDirName $(dumpExportRepositoryModelTargetDirectory) $(dummyFile) ] ;
+
+HdsSchemaGenAppSrcDependsOnGeneration
+	$(generatedRepositoryParserSourceFiles)
+	$(generatedRepositoryParserSourceFiles:S=.h)
+	: $(dumpExportRepositoryBulkListenerTargetDirectory)
+	: $(dumpExportRepositoryBulkListenerTargetFile) ;
+	
+HdsSchemaGenAppSrcDependsOnGeneration
+	$(generatedRepositoryModelSourceFiles)
+	$(generatedRepositoryModelSourceFiles:S=.h)
+	: $(dumpExportRepositoryModelTargetDirectory)
+	: $(dumpExportRepositoryModelTargetFile) ;
 
 UnitTestLib haikudepottest.so :
 	HaikuDepotTestAddon.cpp
@@ -36,10 +70,8 @@ UnitTestLib haikudepottest.so :
 	DataIOUtils.cpp
 	DataIOUtilsTest.cpp
 
-	DumpExportRepositorySource.cpp
-	DumpExportRepositorySourceMirror.cpp
-	DumpExportRepository.cpp
-	DumpExportRepositoryJsonListener.cpp
+	$(generatedRepositoryModelSourceFiles)
+	$(generatedRepositoryParserSourceFiles)
 	DumpExportRepositoryJsonListenerTest.cpp
 
 	JwtTokenHelper.cpp

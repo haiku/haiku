@@ -62,7 +62,7 @@ FileTest::StopTest()
 
 	CHK(file.WriteExactly(content.String(), content.Length()) == B_OK);
 
-	BUrl url("file://");
+	BUrl url("file://", true);
 	url.SetPath(tmpl);
 	BUrlRequest *request = BUrlProtocolRoster::MakeRequest(url, &listener);
 	CHK(request != NULL);

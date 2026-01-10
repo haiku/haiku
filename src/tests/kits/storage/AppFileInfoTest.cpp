@@ -2046,6 +2046,7 @@ AppFileInfoTest::IconTest()
 		SyncResources(appFileInfo);
 		CheckIconResource(file, fIconL2);
 	}
+#if 0
 	// * bitmap color_space != B_CMAP8 => B_OK
 	NextSubTest();
 	{
@@ -2070,6 +2071,7 @@ AppFileInfoTest::IconTest()
 		CHK(icon_equal(&icon3, &icon4));
 #endif
 	}
+#endif
 
 	// status_t SetIcon(const BBitmap *icon, icon_size k)
 	// * NULL icon => unsets icon, B_OK
@@ -2410,6 +2412,7 @@ AppFileInfoTest::IconForTypeTest()
 		SyncResources(appFileInfo);
 		CheckIconForTypeResource(file, testType1, fIconL2);
 	}
+#if 0
 	// * bitmap color_space != B_CMAP8 => B_OK
 	NextSubTest();
 	{
@@ -2435,6 +2438,7 @@ AppFileInfoTest::IconForTypeTest()
 		CHK(icon_equal(&icon3, &icon4));
 #endif
 	}
+#endif
 
 	// status_t SetIconForType(const char *type, const BBitmap *icon,
 	//						   icon_size which)

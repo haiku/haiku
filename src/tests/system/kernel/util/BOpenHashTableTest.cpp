@@ -161,7 +161,7 @@ void BOpenHashTableTest::InsertUncheckedUninitializedTest()
 void BOpenHashTableTest::IterateAndCountTest() {
 	const size_t kEntryCount = 20;
 
-	BObjectList<Entry> entries(20, true);
+	BObjectList<Entry, true> entries(20);
 
 	BOpenHashTable<EntryDefinition> table;
 	CPPUNIT_ASSERT_EQUAL(table.Init(kEntryCount * 2), B_OK);
@@ -191,7 +191,7 @@ void BOpenHashTableTest::ResizeTest()
 	// This is the same as IterateAndCountTest, except that the table will
 	// be resized mid insertion.
 	const size_t kEntryCount = 20;
-	BObjectList<Entry> entries(20, true);
+	BObjectList<Entry, true> entries(20);
 	BOpenHashTable<EntryDefinition> table;
 
 	// Start off with capacity for 8 elements. This will mean that the table
@@ -341,7 +341,7 @@ void BOpenHashTableTest::ClearTest()
 {
 	const size_t kEntryCount = 3;
 
-	BObjectList<Entry> entries(20, true);
+	BObjectList<Entry, true> entries(20);
 
 	BOpenHashTable<EntryDefinition> table;
 	CPPUNIT_ASSERT_EQUAL(table.Init(), B_OK);

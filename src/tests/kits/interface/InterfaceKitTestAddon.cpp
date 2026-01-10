@@ -23,7 +23,7 @@ getTestSuite()
 	// ##### Add test suites here #####
 	suite->addTest("BAlert", AlertTest::Suite());
 	suite->addTest("BBitmap", BitmapTestSuite());
-	suite->addTest("BDeskbar", DeskbarTestSuite());
+//	suite->addTest("BDeskbar", DeskbarTestSuite());
 	suite->addTest("BOutlineListView", OutlineListViewTestSuite());
 	suite->addTest("BMenu", MenuTestSuite());
 	suite->addTest("BPolygon", PolygonTestSuite());

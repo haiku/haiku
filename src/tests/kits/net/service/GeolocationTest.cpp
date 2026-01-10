@@ -24,7 +24,7 @@ void
 GeolocationTest::TestLocateSelf()
 {
 	BGeolocation locator(BUrl(
-		"https://location.services.mozilla.com/v1/geolocate?key=test"), BUrl());
+		"https://location.services.mozilla.com/v1/geolocate?key=test", true), BUrl());
 	float latitude, longitude;
 	status_t result = locator.LocateSelf(latitude, longitude);
 
@@ -36,7 +36,7 @@ GeolocationTest::TestLocateSelf()
 void
 GeolocationTest::TestCountry()
 {
-	BGeolocation geocoder(BUrl(""), BUrl("https://secure.geonames.org/?username=demo"));
+	BGeolocation geocoder(BUrl("", true), BUrl("https://secure.geonames.org/?username=demo", true));
 	BCountry country;
 	status_t result = geocoder.Country(47.03f, 10.2f, country);
 	CPPUNIT_ASSERT_EQUAL(B_OK, result);

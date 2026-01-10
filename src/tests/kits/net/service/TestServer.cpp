@@ -49,12 +49,7 @@ void exec(const std::vector<std::string>& args)
 // Return the path of a file path relative to this source file.
 std::string TestFilePath(const std::string& relativePath)
 {
-	char *testFileSource = strdup(__FILE__);
-	MemoryDeleter _(testFileSource);
-
-	std::string testSrcDir(::dirname(testFileSource));
-
-	return testSrcDir + "/" + relativePath;
+	return relativePath;
 }
 
 }
@@ -279,7 +274,7 @@ BUrl TestServer::BaseUrl() const
 	std::string port_string = to_string(fPort.Port());
 
 	std::string baseUrl = scheme + "127.0.0.1:" + port_string + "/";
-	return BUrl(baseUrl.c_str());
+	return BUrl(baseUrl.c_str(), true);
 }
 
 

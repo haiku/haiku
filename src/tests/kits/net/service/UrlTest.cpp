@@ -54,7 +54,7 @@ void UrlTest::ParseTest()
 	{
 		NextSubTest();
 
-		testUrl.SetUrlString(kTestLength[testIndex]);
+		testUrl.SetUrlString(kTestLength[testIndex], true);
 		CPPUNIT_ASSERT_EQUAL(BString(kTestLength[testIndex]),
 			testUrl.UrlString());
 	}
@@ -63,14 +63,14 @@ void UrlTest::ParseTest()
 
 void UrlTest::TestIsValid()
 {
-	BUrl url("http:");
+	BUrl url("http:", true);
 	CPPUNIT_ASSERT_MESSAGE("Created with a scheme but no hierarchical segment.",
 		!url.IsValid());
 
 	url.SetHost("<invalid>");
 	CPPUNIT_ASSERT_MESSAGE("Set to an invalid host", !url.IsValid());
 
-	url.SetUrlString("");
+	url.SetUrlString("", true);
 	url.SetProtocol("\t \n");
 	CPPUNIT_ASSERT_MESSAGE("Set a protocol with whitespace", !url.IsValid());
 	url.SetProtocol("123");
@@ -144,8 +144,8 @@ void UrlTest::TestNullity()
 
 void UrlTest::TestCopy()
 {
-	BUrl url1("http://example.com");
-	BUrl url2(url1);
+	BUrl url1("http://example.com", true);
+	BUrl url2(url1, true);
 
 	url2.SetHost("www.example.com");
 
@@ -215,7 +215,7 @@ void UrlTest::ExplodeImplodeTest()
 	for (testIndex = 0; testIndex < (sizeof(kTestExplode) / sizeof(ExplodeTest)); testIndex++)
 	{
 		NextSubTest();
-		testUrl.SetUrlString(kTestExplode[testIndex].url);
+		testUrl.SetUrlString(kTestExplode[testIndex].url, true);
 
 		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].url),
 			BString(testUrl.UrlString()));
@@ -528,7 +528,7 @@ UrlTest::RelativeUriTest()
 	{
 		NextSubTest();
 
-		BUrl baseUrl(tests[index].base);
+		BUrl baseUrl(tests[index].base, true);
 
 		message.Truncate(7, true);
 		message << tests[index].base;
@@ -596,8 +596,8 @@ UrlTest::IDNTest()
 	{
 		NextSubTest();
 
-		BUrl url(tests[i].escaped);
-		BUrl idn(tests[i].decoded);
+		BUrl url(tests[i].escaped, false);
+		BUrl idn(tests[i].decoded, false);
 		status_t success = idn.IDNAToUnicode();
 
 		CPPUNIT_ASSERT_EQUAL(B_OK, success);

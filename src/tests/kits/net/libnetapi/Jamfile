@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tests kits net libnetapi ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UnitTestLib libnetapitest.so :
 	NetAPITestAddon.cpp
 

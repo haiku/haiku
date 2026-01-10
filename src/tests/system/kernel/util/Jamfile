@@ -4,6 +4,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName util ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits app ] ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel util ] ;

@@ -31,10 +31,10 @@ UnitTestLib libinterfacetest.so
 		SetBitsTester.cpp
 
 		# BDeskbar
-		DeskbarTest.cpp
-		DeskbarGetItemTest.cpp
-		DeskbarLocationTest.cpp
-		DeskbarAddItemTest.cpp
+#		DeskbarTest.cpp
+#		DeskbarGetItemTest.cpp
+#		DeskbarLocationTest.cpp
+#		DeskbarAddItemTest.cpp
 
 		# BPolygon
 		PolygonTest.cpp

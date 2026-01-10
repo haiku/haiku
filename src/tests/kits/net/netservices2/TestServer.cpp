@@ -53,12 +53,7 @@ exec(const std::vector<std::string>& args)
 std::string
 TestFilePath(const std::string& relativePath)
 {
-	char* testFileSource = strdup(__FILE__);
-	MemoryDeleter _(testFileSource);
-
-	std::string testSrcDir(::dirname(testFileSource));
-
-	return testSrcDir + "/" + relativePath;
+	return relativePath;
 }
 
 } // namespace

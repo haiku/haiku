@@ -153,7 +153,7 @@ DataTest::_RunTest(BString url, const char* expected, size_t expectedLength)
 {
 	NextSubTest();
 
-	BUrl testUrl(url);
+	BUrl testUrl(url, true);
 	BMallocIO buffer;
 	ObjectDeleter<BUrlRequest> requestDeleter(
 		BUrlProtocolRoster::MakeRequest(testUrl, &buffer));

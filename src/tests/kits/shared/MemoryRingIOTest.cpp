@@ -208,16 +208,15 @@ MemoryRingIOTest::AddTests(BTestSuite& parent) {
 	caller->addThread("WR", &MemoryRingIOTest::_DisableWriteOnEmptyBuffer);
 	suite->addTest(caller);
 
-	MemoryRingIOTest* single = new MemoryRingIOTest(0);
 	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
 		"MemoryRingIOTest: RW single threaded with resizing",
-		&MemoryRingIOTest::ReadWriteSingleTest, single));
+		&MemoryRingIOTest::ReadWriteSingleTest, new MemoryRingIOTest(0)));
 	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
 		"MemoryRingIOTest: Attempt to truncate buffer",
-		&MemoryRingIOTest::InvalidResizeTest, single));
+		&MemoryRingIOTest::InvalidResizeTest, new MemoryRingIOTest(0)));
 	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
 		"MemoryRingIOTest: Wait timeout",
-		&MemoryRingIOTest::TimeoutTest, single));
+		&MemoryRingIOTest::TimeoutTest, new MemoryRingIOTest(0)));
 
 	parent.addTest("MemoryRingIOTest", suite);
 }

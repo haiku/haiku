@@ -4,6 +4,8 @@ UsePublicHeaders locale ;
 UsePrivateHeaders locale shared ;
 UseBuildFeatureHeaders icu ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 # Pseudo target to build all locale kit tests
 NotFile LocaleKitTests ;
 Depends LocaleKitTests

@@ -6,7 +6,7 @@
 Test *DeskbarTestSuite()
 {
 	TestSuite *testSuite = new TestSuite();
-	
+
 	testSuite->addTest(DeskbarGetItemTest::suite());
 	testSuite->addTest(DeskbarLocationTest::suite());
 	testSuite->addTest(DeskbarAddItemTest::suite());

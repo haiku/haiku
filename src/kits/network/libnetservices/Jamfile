@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src kits network libnetservices ;
 
 UsePrivateHeaders net netservices shared support ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 if [ Glob $(SUBDIR) : DefaultGeolocationServiceKey.h ] {
 	SubDirC++Flags [ FDefines HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY ] ;
 }

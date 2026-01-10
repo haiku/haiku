@@ -155,12 +155,7 @@ void SendAuthenticatedRequest(
 // Return the path of a file path relative to this source file.
 std::string TestFilePath(const std::string& relativePath)
 {
-	char *testFileSource = strdup(__FILE__);
-	MemoryDeleter _(testFileSource);
-
-	std::string testSrcDir(::dirname(testFileSource));
-
-	return testSrcDir + "/" + relativePath;
+	return relativePath;
 }
 
 
@@ -211,7 +206,7 @@ HttpTest::GetTest()
 void
 HttpTest::HeadTest()
 {
-	BUrl testUrl(fTestServer.BaseUrl(), "/");
+	BUrl testUrl(fTestServer.BaseUrl(), BString("/"));
 	BUrlContext* context = new BUrlContext();
 	context->AcquireReference();
 
@@ -259,7 +254,7 @@ HttpTest::HeadTest()
 void
 HttpTest::NoContentTest()
 {
-	BUrl testUrl(fTestServer.BaseUrl(), "/204");
+	BUrl testUrl(fTestServer.BaseUrl(), BString("/204"));
 	BUrlContext* context = new BUrlContext();
 	context->AcquireReference();
 
@@ -301,7 +296,7 @@ HttpTest::NoContentTest()
 void
 HttpTest::ProxyTest()
 {
-	BUrl testUrl(fTestServer.BaseUrl(), "/");
+	BUrl testUrl(fTestServer.BaseUrl(), BString("/"));
 
 	TestProxyServer proxy;
 	CPPUNIT_ASSERT_EQUAL_MESSAGE(
@@ -423,7 +418,7 @@ HttpTest::UploadTest()
 	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BUrl testUrl(fTestServer.BaseUrl(), "/post");
+	BUrl testUrl(fTestServer.BaseUrl(), BString("/post"));
 
 	BUrlContext context;
 
@@ -463,7 +458,7 @@ HttpTest::AuthBasicTest()
 {
 	BUrlContext context;
 
-	BUrl testUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret");
+	BUrl testUrl(fTestServer.BaseUrl(), BString("/auth/basic/walter/secret"));
 
 	std::string expectedResponseBody(
 		"Path: /auth/basic/walter/secret\r\n"
@@ -499,7 +494,7 @@ HttpTest::AuthDigestTest()
 {
 	BUrlContext context;
 
-	BUrl testUrl(fTestServer.BaseUrl(), "/auth/digest/walter/secret");
+	BUrl testUrl(fTestServer.BaseUrl(), BString("/auth/digest/walter/secret"));
 
 	std::string expectedResponseBody(
 		"Path: /auth/digest/walter/secret\r\n"

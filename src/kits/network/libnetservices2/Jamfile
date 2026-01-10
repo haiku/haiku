@@ -5,6 +5,8 @@ UsePrivateHeaders netservices2 ;
 UsePrivateHeaders support ;
 UsePrivateHeaders shared ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {

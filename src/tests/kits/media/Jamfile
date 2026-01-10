@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tests kits media ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 SimpleTest TimedEventQueueTest : TimedEventQueueTest.cpp
 	: libmedia.so be ;
 

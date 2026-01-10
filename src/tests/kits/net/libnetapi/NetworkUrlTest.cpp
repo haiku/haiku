@@ -43,7 +43,7 @@ parsed elements successfully processes and the elements are present.
 
 void NetworkUrlTest::TestValidFullUrl()
 {
-	BUrl url("http://ewe:pea@www.something.co.nz:8888/some/path?key1=value1#fragment");
+	BUrl url("http://ewe:pea@www.something.co.nz:8888/some/path?key1=value1#fragment", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "http");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -66,7 +66,7 @@ void NetworkUrlTest::TestValidFullUrl()
 
 void NetworkUrlTest::TestHostWithPathAndFragment()
 {
-	BUrl url("http://1.2.3.4/some/path#frag/ment");
+	BUrl url("http://1.2.3.4/some/path#frag/ment", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "http");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -85,7 +85,7 @@ void NetworkUrlTest::TestHostWithPathAndFragment()
 
 void NetworkUrlTest::TestHostWithFragment()
 {
-	BUrl url("http://1.2.3.4#frag/ment");
+	BUrl url("http://1.2.3.4#frag/ment", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "http");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -103,7 +103,7 @@ void NetworkUrlTest::TestHostWithFragment()
 
 void NetworkUrlTest::TestIpv6HostPortPathAndRequest()
 {
-	BUrl url("http://[123:a3:0:E3::123]:8080/some/path?key1=value1");
+	BUrl url("http://[123:a3:0:E3::123]:8080/some/path?key1=value1", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "http");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -123,7 +123,7 @@ void NetworkUrlTest::TestIpv6HostPortPathAndRequest()
 
 void NetworkUrlTest::TestFileUrl()
 {
-	BUrl url("file:///northisland/wellington/brooklyn/windturbine");
+	BUrl url("file:///northisland/wellington/brooklyn/windturbine", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "file");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -141,7 +141,7 @@ void NetworkUrlTest::TestFileUrl()
 
 void NetworkUrlTest::TestDataUrl()
 {
-	BUrl url("data:image/png;base64,iVBORw0KGI12P4//8/w38GIErkJggg==");
+	BUrl url("data:image/png;base64,iVBORw0KGI12P4//8/w38GIErkJggg==", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "data");
 	CPPUNIT_ASSERT(!url.HasUserName());
@@ -159,7 +159,7 @@ void NetworkUrlTest::TestDataUrl()
 
 void NetworkUrlTest::TestWithUserNameAndPasswordNoHostAndPort()
 {
-	BUrl url("wierd://tea:tree@/x");
+	BUrl url("wierd://tea:tree@/x", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "wierd");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -179,7 +179,7 @@ void NetworkUrlTest::TestWithUserNameAndPasswordNoHostAndPort()
 
 void NetworkUrlTest::TestHostAndPortWithNoUserNameAndPassword()
 {
-	BUrl url("https://www.something.co.nz:443/z");
+	BUrl url("https://www.something.co.nz:443/z", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "https");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -198,7 +198,7 @@ void NetworkUrlTest::TestHostAndPortWithNoUserNameAndPassword()
 
 void NetworkUrlTest::TestHostWithNoPortOrUserNameAndPassword()
 {
-	BUrl url("https://www.something.co.nz/z");
+	BUrl url("https://www.something.co.nz/z", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "https");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -216,7 +216,7 @@ void NetworkUrlTest::TestHostWithNoPortOrUserNameAndPassword()
 
 void NetworkUrlTest::TestHostWithNoPortNoPath()
 {
-	BUrl url("https://www.something.co.nz");
+	BUrl url("https://www.something.co.nz", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "https");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -233,7 +233,7 @@ void NetworkUrlTest::TestHostWithNoPortNoPath()
 
 void NetworkUrlTest::TestHostWithPortNoPath()
 {
-	BUrl url("https://www.something.co.nz:1234");
+	BUrl url("https://www.something.co.nz:1234", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "https");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -251,7 +251,7 @@ void NetworkUrlTest::TestHostWithPortNoPath()
 
 void NetworkUrlTest::TestHostWithEmptyPort()
 {
-	BUrl url("https://www.something.co.nz:");
+	BUrl url("https://www.something.co.nz:", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "https");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -268,7 +268,7 @@ void NetworkUrlTest::TestHostWithEmptyPort()
 
 void NetworkUrlTest::TestProtocol()
 {
-	BUrl url("olala:");
+	BUrl url("olala:", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "olala");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -284,7 +284,7 @@ void NetworkUrlTest::TestProtocol()
 
 void NetworkUrlTest::TestMailTo()
 {
-	BUrl url("mailto:eric@example.com");
+	BUrl url("mailto:eric@example.com", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "mailto");
 	CPPUNIT_ASSERT(url.HasProtocol());
@@ -304,7 +304,7 @@ void NetworkUrlTest::TestMailTo()
 
 void NetworkUrlTest::TestAuthorityNoUserName()
 {
-	BUrl url("anything://:pwd@host");
+	BUrl url("anything://:pwd@host", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(!url.HasUserName());
 	CPPUNIT_ASSERT(url.HasPassword());
@@ -317,7 +317,7 @@ void NetworkUrlTest::TestAuthorityNoUserName()
 
 void NetworkUrlTest::TestAuthorityWithCredentialsSeparatorNoPassword()
 {
-	BUrl url("anything://unam:@host");
+	BUrl url("anything://unam:@host", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.HasUserName());
 	CPPUNIT_ASSERT(url.UserName() == "unam");
@@ -330,7 +330,7 @@ void NetworkUrlTest::TestAuthorityWithCredentialsSeparatorNoPassword()
 
 void NetworkUrlTest::TestAuthorityWithoutCredentialsSeparatorNoPassword()
 {
-	BUrl url("anything://unam@host");
+	BUrl url("anything://unam@host", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.HasUserName());
 	CPPUNIT_ASSERT(url.UserName() == "unam");
@@ -343,7 +343,7 @@ void NetworkUrlTest::TestAuthorityWithoutCredentialsSeparatorNoPassword()
 
 void NetworkUrlTest::TestAuthorityBadPort()
 {
-	BUrl url("anything://host:aaa");
+	BUrl url("anything://host:aaa", true);
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(!url.HasUserName());
 	CPPUNIT_ASSERT(!url.HasPassword());
@@ -358,35 +358,35 @@ void NetworkUrlTest::TestAuthorityBadPort()
 
 void NetworkUrlTest::TestWhitespaceBefore()
 {
-	BUrl url("   https://www.something.co.nz/z");
+	BUrl url("   https://www.something.co.nz/z", true);
 	CPPUNIT_ASSERT(!url.IsValid());
 }
 
 
 void NetworkUrlTest::TestWhitespaceAfter()
 {
-	BUrl url("https://www.something.co.nz/z\t\t ");
+	BUrl url("https://www.something.co.nz/z\t\t ", true);
 	CPPUNIT_ASSERT(!url.IsValid());
 }
 
 
 void NetworkUrlTest::TestWhitespaceMiddle()
 {
-	BUrl url("https://www.  something.co.nz/z");
+	BUrl url("https://www.  something.co.nz/z", true);
 	CPPUNIT_ASSERT(!url.IsValid());
 }
 
 
 void NetworkUrlTest::TestHttpNoHost()
 {
-	BUrl url("https:///z");
+	BUrl url("https:///z", true);
 	CPPUNIT_ASSERT(!url.IsValid());
 }
 
 
 void NetworkUrlTest::TestEmpty()
 {
-	BUrl url("");
+	BUrl url("", true);
 	CPPUNIT_ASSERT(!url.IsValid());
 }
 
@@ -397,30 +397,30 @@ void NetworkUrlTest::TestEmpty()
 void NetworkUrlTest::TestBadHosts()
 {
 	CPPUNIT_ASSERT_MESSAGE("control check",
-		BUrl("http://host.example.com").IsValid());
+		BUrl("http://host.example.com", true).IsValid());
 
 	CPPUNIT_ASSERT_MESSAGE("hyphen in middle",
-		(BUrl("http://host.peppermint_tea.com").IsValid()));
+		(BUrl("http://host.peppermint_tea.com", true).IsValid()));
 	CPPUNIT_ASSERT_MESSAGE("dot at end",
-		(BUrl("http://host.camomile.co.nz.").IsValid()));
+		(BUrl("http://host.camomile.co.nz.", true).IsValid()));
 	CPPUNIT_ASSERT_MESSAGE("simple host",
-		(BUrl("http://tumeric").IsValid()));
+		(BUrl("http://tumeric", true).IsValid()));
 
 	CPPUNIT_ASSERT_MESSAGE("idn domain encoded",
-		(BUrl("http://xn--bcher-kva.tld").IsValid()));
+		(BUrl("http://xn--bcher-kva.tld", true).IsValid()));
 	CPPUNIT_ASSERT_MESSAGE("idn domain unencoded",
-		(BUrl("http://www.b\xc3\xbcch.at").IsValid()));
+		(BUrl("http://www.b\xc3\xbcch.at", true).IsValid()));
 
 	CPPUNIT_ASSERT_MESSAGE("dot at start",
-		!(BUrl("http://.host.example.com").IsValid()));
+		!(BUrl("http://.host.example.com", true).IsValid()));
 	CPPUNIT_ASSERT_MESSAGE("double dot in domain",
-		!(BUrl("http://host.example..com").IsValid()));
+		!(BUrl("http://host.example..com", true).IsValid()));
 	CPPUNIT_ASSERT_MESSAGE("double dot",
-		!(BUrl("http://host.example..com").IsValid()));
+		!(BUrl("http://host.example..com", true).IsValid()));
 	CPPUNIT_ASSERT_MESSAGE("unexpected characters",
-		!(BUrl("http://<unexpected.characters>").IsValid()));
+		!(BUrl("http://<unexpected.characters>", true).IsValid()));
 	CPPUNIT_ASSERT_MESSAGE("whitespace",
-		!(BUrl("http://host.exa ple.com").IsValid()));
+		!(BUrl("http://host.exa ple.com", true).IsValid()));
 }
 
 

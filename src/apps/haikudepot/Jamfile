@@ -13,7 +13,7 @@ HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 # During the build process, some sources are generated into directories.  These
 # are the directories.
 
-local dumpExportRepositoryBulkListerTargetDirectory =
+local dumpExportRepositoryBulkListenerTargetDirectory =
 	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 		dumpexportrepositorybulklistener ] ;
 local dumpExportPkgBulkListenerTargetDirectory =
@@ -40,8 +40,8 @@ local dumpExportReferenceModelTargetDirectory =
 
 local dummyFile = "dummy.dat" ;
 
-local dumpExportRepositoryBulkListerTargetFile =
-	[ FDirName $(dumpExportRepositoryBulkListerTargetDirectory) $(dummyFile) ] ;
+local dumpExportRepositoryBulkListenerTargetFile =
+	[ FDirName $(dumpExportRepositoryBulkListenerTargetDirectory) $(dummyFile) ] ;
 local dumpExportPkgBulkListenerTargetFile =
 	[ FDirName $(dumpExportPkgBulkListenerTargetDirectory) $(dummyFile) ] ;
 local dumpExportReferenceListenerTargetFile =
@@ -77,7 +77,7 @@ for sourceDir in $(sourceDirs) {
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
 
-SEARCH_SOURCE += $(dumpExportRepositoryBulkListerTargetDirectory) ;
+SEARCH_SOURCE += $(dumpExportRepositoryBulkListenerTargetDirectory) ;
 SEARCH_SOURCE += $(dumpExportPkgBulkListenerTargetDirectory) ;
 SEARCH_SOURCE += $(dumpExportReferenceListenerTargetDirectory) ;
 
@@ -309,7 +309,7 @@ HdsSchemaGenModel $(dumpExportRepositoryModelTargetFile)
 HdsSchemaGenModel $(dumpExportReferenceModelTargetFile)
 	: dumpexportreference.json : jsonschema2cppmodel.py ;
 
-HdsSchemaGenBulkParser $(dumpExportRepositoryBulkListerTargetFile)
+HdsSchemaGenBulkParser $(dumpExportRepositoryBulkListenerTargetFile)
 	: dumpexportrepository.json : jsonschema2cppparser.py ;
 
 HdsSchemaGenBulkParser $(dumpExportPkgBulkListenerTargetFile)
@@ -327,8 +327,8 @@ HdsSchemaGenAppSrcDependsOnGeneration
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedRepositoryParserSourceFiles) ]
 	[ FGristFiles $(generatedRepositoryParserSourceFiles:S=.h) ]
-	: $(dumpExportRepositoryBulkListerTargetDirectory)
-	: $(dumpExportRepositoryBulkListerTargetFile) ;
+	: $(dumpExportRepositoryBulkListenerTargetDirectory)
+	: $(dumpExportRepositoryBulkListenerTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedReferenceParserSourceFiles) ]
@@ -359,7 +359,7 @@ HdsSchemaGenAppSrcDependsOnGeneration
 
 Includes [ FGristFiles $(applicationSources) ]
 	:
-	$(dumpExportRepositoryBulkListerTargetDirectory)
+	$(dumpExportRepositoryBulkListenerTargetDirectory)
 	$(dumpExportPkgBulkListenerTargetDirectory)
 	$(dumpExportReferenceListenerTargetDirectory)
 	$(dumpExportPkgModelTargetDirectory)

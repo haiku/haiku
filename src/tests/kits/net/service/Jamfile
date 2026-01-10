@@ -2,6 +2,22 @@ SubDir HAIKU_TOP src tests kits net service ;
 
 UsePrivateHeaders netservices private shared ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
+rule CopyScript # cloned CopyBAppTestApp
+{
+	# CopyScript  <target> : <source> ;
+	local target = $(1) ;
+	local source = $(2) ;
+
+	MakeLocate $(target) : $(TARGET_UNIT_TEST_DIR) ;
+	File $(target) : $(source) ;
+	MODE on $(target) = $(EXEMODE) ;
+	MimeSet $(target) ;
+
+	UnitTestDependency $(target) ;
+}
+
 UnitTestLib servicekittest.so :
 	ServiceKitTestAddon.cpp
 
@@ -16,3 +32,6 @@ UnitTestLib servicekittest.so :
 	: be libnetservices.a shared $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB)
 	[ TargetLibstdc++ ]
 	;
+CopyScript <tests!unittests>proxy.py : proxy.py ;
+CopyScript <tests!unittests>testserver.py : testserver.py ;
+CopyScript <tests!unittests>testfile.txt : testfile.txt ;

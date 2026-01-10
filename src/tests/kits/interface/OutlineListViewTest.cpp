@@ -73,6 +73,13 @@ class OutlineListViewTest: public TestCase
 		OutlineListViewTest() {}
 		OutlineListViewTest(std::string name) : TestCase(name) {}
 
+		void setUp() {
+			fApplication = new BApplication("application/x-vnd.OutlineListView.test");
+		}
+		void tearDown() {
+			 delete fApplication;
+		}
+
 		void EachItemUnder();
 		void AddUnder();
 		void ItemUnderAt();
@@ -80,6 +87,7 @@ class OutlineListViewTest: public TestCase
 		static Test* Suite();
 
 	private:
+		BApplication *fApplication;
 		static BOutlineListView* _SetupTest(const char* name);
 };
 
@@ -271,9 +279,6 @@ OutlineListViewTest::Suite()
 BOutlineListView*
 OutlineListViewTest::_SetupTest(const char* name)
 {
-	if (be_app == NULL)
-		new BApplication("application/x-vnd.OutlineListView.test");
-
 	BWindow* window = new BWindow(BRect(50, 50, 550, 550), name,
 		B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE, 0);
 

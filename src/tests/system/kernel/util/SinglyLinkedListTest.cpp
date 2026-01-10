@@ -58,14 +58,14 @@ SinglyLinkedListTest::TestList(List &list, Element *values, int valueCount)
 	// PushFront
 	for (int i = 0; i < valueCount; i++) {
 		NextSubTest();
-		CHK(list.Size() == i);
+		CHK(list.Count() == i);
 		list.Add(&values[i]);
-		CHK(list.Size() == i+1);
+		CHK(list.Count() == i+1);
 	}
 	
 	// Prefix increment
 	int preIndex = valueCount-1;
-	for (typename List::Iterator iterator = list.GetIterator();
+	for (typename List::ConstIterator iterator = list.GetIterator();
 			iterator.HasNext(); --preIndex) {
 		NextSubTest();
 
