@@ -1,0 +1,337 @@
+/*
+ * Copyright 2026 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/NetworkRoute.h	hrev59275
+ *		src/kits/network/libnetapi/NetworkRoute.cpp	hrev59275
+ */
+
+
+/*!
+	\file NetworkRoute.h
+	\ingroup network
+	\brief Provides the BNetworkRoute class.
+*/
+
+
+/*!
+	\class BNetworkRoute
+	\ingroup network
+	\brief BNetworkRoute class represents a network route, a path for
+		traffic across one or multiple networks.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkRoute::BNetworkRoute()
+	\brief Creates an uninitialized BNetworkRoute object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkRoute::~BNetworkRoute()
+	\brief Releases all the allocated resources.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoute::SetTo(const BNetworkRoute& other)
+	\brief Initializes this object from \a other BNetworkRoute object.
+
+	\param[in] other The BNetworkRoute instance from where to
+		initialize this object.
+
+	\return \c B_OK if the object was initialized or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoute::SetTo(const route_entry& routeEntry)
+	\brief Initializes this object from a route_entry instance.
+
+	\param[in] routeEntry A route_entry object with the routing information.
+
+	\return \c B_OK if the object was initialized or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkRoute::Adopt(BNetworkRoute& other)
+	\brief Moves \a other to this instance.
+
+	\a other is left uninitialized.
+
+	\param other The other BNetworkRoute object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const route_entry& BNetworkRoute::RouteEntry() const
+	\brief Returns a copy of the route_entry with routing information of this
+		object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const sockaddr* BNetworkRoute::Destination() const
+	\brief Returns the destination address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoute::SetDestination(const sockaddr& destination)
+	\brief Sets the destination address.
+
+	\param[in] destination A sockaddr struct instance with the destination
+		information.
+
+	\retval B_OK The destination has been modified successfully.
+	\retval B_BAD_VALUE The length in \a destination.sa_len is higher than
+		the size of sockaddr_storage struct.
+	\retval B_NO_MEMORY Internal memory allocation error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkRoute::UnsetDestination()
+	\brief Uninitializes the destination address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const sockaddr* BNetworkRoute::Mask() const
+	\brief Returns the subnet mask address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoute::SetMask(const sockaddr& mask)
+	\brief Sets the subnet mask address.
+
+	\param[in] mask A sockaddr struct instance with the mask information.
+
+	\retval B_OK The mask has been modified successfully.
+	\retval B_BAD_VALUE The length in \a mask.sa_len is higher than
+		the size of sockaddr_storage struct.
+	\retval B_NO_MEMORY Internal memory allocation error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkRoute::UnsetMask()
+	\brief Uninitializes the subnet mask address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const sockaddr* BNetworkRoute::Gateway() const
+	\brief Returns the gateway address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoute::SetGateway(const sockaddr& gateway)
+	\brief Sets the gateway address.
+
+	\param[in] gateway A sockaddr struct instance with the gateway information.
+
+	\retval B_OK The gateway has been modified successfully.
+	\retval B_BAD_VALUE The length in \a gateway.sa_len is higher than
+		the size of sockaddr_storage struct.
+	\retval B_NO_MEMORY Internal memory allocation error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkRoute::UnsetGateway()
+	\brief Uninitializes the gateway address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const sockaddr* BNetworkRoute::Source() const
+	\brief Returns the source address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoute::SetSource(const sockaddr& source)
+	\brief Sets the source address.
+
+	\param[in] source A sockaddr struct instance with the source address
+		information.
+
+	\retval B_OK The source address has been modified successfully.
+	\retval B_BAD_VALUE The length in \a source.sa_len is higher than
+		the size of sockaddr_storage struct.
+	\retval B_NO_MEMORY Internal memory allocation error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkRoute::UnsetSource()
+	\brief Uninitializes the source address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BNetworkRoute::Flags() const
+	\brief Returns the route's flags mask.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkRoute::SetFlags(uint32 flags)
+	\brief Sets the route's flags mask.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BNetworkRoute::MTU() const
+	\brief Returns the maximum transmission unit size of the route.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkRoute::SetMTU(uint32 mtu)
+	\brief Sets the maximum transmission unit size of the route.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int BNetworkRoute::AddressFamily() const
+	\brief Returns the route's address family.
+
+	If this object is uninitialized, it returns \c AF_UNSPEC.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static status_t BNetworkRoute::GetDefaultRoute(int family,
+		const char* interfaceName, BNetworkRoute& route)
+	\brief Gets the default route.
+
+	\param[in] family The address family. See the POSIX header file
+		sys/socket.h for the address families.
+	\param[in] interfaceName The network interface name.
+	\param[out] route A BNetworkRoute where to write the default route.
+
+	\retval B_OK The default route was successfully retrieved.
+	\retval B_ENTRY_NOT_FOUND There is not a default route configured.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static status_t BNetworkRoute::GetDefaultGateway(int family,
+		const char* interfaceName, sockaddr& gateway)
+	\brief Gets the default gateway.
+
+	\param[in] family The address family. See the POSIX header file
+		sys/socket.h for the address families.
+	\param[in] interfaceName The network interface name.
+	\param[out] gateway A sockaddr instance where to write the default gateway.
+
+	\return \c B_OK on success, or an error code otherwise.
+
+	\retval B_OK The default gateway was successfully retrieved.
+	\retval B_ENTRY_NOT_FOUND There is not a default route or
+		a default gateway configured.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static status_t BNetworkRoute::GetRoutes(int family,
+		BObjectList<BNetworkRoute, true>& routes)
+	\brief Returns the routes of \a family type into \a routes.
+
+	\sa BNetworkRoute::GetRoutes(int, const char*,
+		uint32, BObjectList<BNetworkRoute, true>&)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static status_t BNetworkRoute::GetRoutes(int family, const char* interfaceName,
+		BObjectList<BNetworkRoute, true>& routes)
+	\brief Returns the routes of \a family type in \a interfaceName
+		into \a routes.
+
+	\sa BNetworkRoute::GetRoutes(int, const char*,
+		uint32, BObjectList<BNetworkRoute, true>&)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static status_t BNetworkRoute::GetRoutes(int family, const char* interfaceName,
+		uint32 filterFlags, BObjectList<BNetworkRoute, true>& routes)
+	\brief Returns the routes of \a family type in \a interfaceName that are not
+		filtered by \a filterFlags into \a routes.
+
+	\param[in] family The address family. See the POSIX header file
+		sys/socket.h for the address families.
+	\param[in] interfaceName The network interface name.
+	\param[in] filterFlags Flag mask to filter out routes. See the
+		POSIX header file net/route.h for the valid route flags.
+	\param[out] routes A BObjectList of BNetworkRoute to store the found routes.
+
+	\since Haiku R1
+*/

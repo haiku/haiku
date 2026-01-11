@@ -1,0 +1,296 @@
+/*
+ * Copyright 2025 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/NetworkRoster.h	hrev59275
+ *		src/kits/network/libnetapi/NetworkRoster.cpp	hrev59275
+ */
+
+
+/*!
+	\file NetworkRoster.h
+	\ingroup network
+	\brief Provides the BNetworkRoster class.
+*/
+
+
+/*!
+	\class BNetworkRoster
+	\ingroup network
+	\brief BNetworkRoster class allows to manage network interfaces as well as
+		persistent (wireless) networks.
+
+	To use this class you have to call the default instance:
+
+	\code{.cpp}
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	\endcode
+
+	Once done, you can manage network interfaces using AddInterface() and
+	RemoveInterface(), or enumerate them using CountInterfaces() and
+	GetNextInterface().
+
+	You can also manage persistent networks using AddPersistentNetwork() and
+	RemovePersistentNetwork(), as well as enumerate them using
+	CountPersistentNetworks() and GetNextPersistentNetwork().
+
+	In addition, you can have access to the network notifications API using
+	StartWatching() and StopWatching(), attaching to it a BMessenger instance
+	as a parameter to start or stop monitoring for network related events.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BNetworkRoster& BNetworkRoster::Default()
+	\brief Returns the default network roster.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Network interfaces
+*/
+
+
+//! @{
+
+
+/*!
+	\fn size_t BNetworkRoster::CountInterfaces() const
+	\brief Returns the number of network interfaces in the system.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoster::GetNextInterface(uint32* cookie, BNetworkInterface& interface) const
+	\brief Iterate through the network interfaces.
+
+	\param[out] cookie A cookie used to keep track of where you are in the list
+		of network interfaces. Before doing the first query, it has to be
+		initialized to \c 0. After that, pass the cookie to each subsequent call
+		to progress the iterator.
+	\param[out] interface A pre-allocated BNetworkInterface where to write the
+		network interface information. For each successful iteration,
+		the existing contents is overwritten.
+
+	\returns \c B_OK if the iteration was successful, or an error code.
+
+	\retval B_OK The iteration was successful and the current
+		interface information was written to \a interface.
+	\retval B_BAD_VALUE \a cookie is \c NULL, or no more interfaces were found.
+	\retval B_NO_MEMORY Internal memory allocation error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoster::AddInterface(const char* name)
+	\brief Add a network interface identified by \a name.
+
+	\param[in] name The name of the interface.
+
+	\returns B_OK if the interface was added, or an error code.
+
+	\retval B_OK Operation performed successfully.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoster::AddInterface(const BNetworkInterface& interface)
+	\brief Add a network interface from a BNetworkInterface object.
+
+	\param[in] interface A BNetworkInterface object from where
+		to create the interface.
+
+	\returns B_OK if the interface was added, or an error code.
+
+	\retval B_OK Operation performed successfully.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoster::RemoveInterface(const char* name)
+	\brief Remove the network interface identified by \a name.
+
+	\param[in] name The name of the interface.
+
+	\returns B_OK if the interface was removed, or an error code.
+
+	\retval B_OK Operation performed successfully.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoster::RemoveInterface(const BNetworkInterface& interface)
+	\brief Remove the network interface matching a BNetworkInterface object.
+
+	\param[in] interface A BNetworkInterface object from where to get the
+		interface name to remove.
+
+	\returns B_OK if the interface was removed, or an error code.
+
+	\retval B_OK Operation performed successfully.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Persistent networks
+*/
+
+
+//! @{
+
+
+/*!
+	\fn int32 BNetworkRoster::CountPersistentNetworks() const
+	\brief Returns the number of saved persistent networks.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoster::GetNextPersistentNetwork(uint32* cookie,
+									wireless_network& network) const
+	\brief Iterate through the saved persistent networks.
+
+	\param[out] cookie A cookie used to keep track of where you are in the list
+		of persistent networks. Before doing the first query, it has to be
+		initialized to \c 0. After that, pass the cookie to each subsequent call
+		to progress the iterator.
+	\param[out] network A pre-allocated wireless_network object where to write
+		the network information. For each successful iteration, the existing
+		contents is overwritten.
+
+	\returns \c B_OK if the iteration was successful, or an error code.
+
+	\retval B_OK The iteration was successful and the current persistent
+		network was written to \a network.
+	\retval B_ERROR There was an error receiving the reply from the net server,
+		the end of the persistent networks was reached,
+		or the network name could not be retrieved.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoster::AddPersistentNetwork(
+									const wireless_network& network) const
+	\brief Add \a network to the list of persistent networks.
+
+	\param[in] network The wireless_network instance containing the network
+		information.
+
+	\returns \c B_OK on success, or an error code otherwise.
+
+	\retval B_OK The network was added to the persistent network list.
+	\retval B_BAD_VALUE wireless_network::name is NULL or its length
+		is equal to \c 0.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRoster::RemovePersistentNetwork(const char* name) const
+	\brief Remove the persistent network identified as \a name.
+
+	\param[in] name The network name.
+
+	\returns \c B_OK on success, or an error code otherwise.
+
+	\retval B_OK The network was removed successfully.
+	\retval B_BAD_VALUE \a name is NULL or its length is equal to \c 0.
+	\retval B_ENTRY_NOT_FOUND A network \a name could not be found in the
+		persistent networks list.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Notifications API
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BNetworkRoster::StartWatching(const BMessenger& target,
+									uint32 eventMask)
+	\brief Subscribes \a target to receive network events' notifications
+		described in \a eventMask.
+
+	Valid values for \a eventMask are any combination of the following:
+	- \c ::B_WATCH_NETWORK_INTERFACE_CHANGES
+	- \c ::B_WATCH_NETWORK_LINK_CHANGES
+	- \c ::B_WATCH_NETWORK_WLAN_CHANGES
+
+	For \c B_WATCH_NETWORK_INTERFACE_CHANGES, the following notifications
+		will be sent to \a target if such events happen:
+	- \c ::B_NETWORK_INTERFACE_ADDED
+	- \c ::B_NETWORK_INTERFACE_REMOVED
+	- \c ::B_NETWORK_INTERFACE_CHANGED
+
+	For \c B_WATCH_NETWORK_LINK_CHANGES, the following notification
+		will be sent to \a target if such event happens:
+	- \c ::B_NETWORK_DEVICE_LINK_CHANGED
+
+	For \c B_WATCH_NETWORK_WLAN_CHANGES, the following notifications
+		will be sent to \a target if such events happen:
+	- \c ::B_NETWORK_WLAN_JOINED
+	- \c ::B_NETWORK_WLAN_LEFT
+	- \c ::B_NETWORK_WLAN_SCANNED
+	- \c ::B_NETWORK_WLAN_MESSAGE_INTEGRITY_FAILED
+
+	If \a eventMask is \c 0, it will stop sending notifications to \a target.
+
+	\param[in] target A BMessenger object to where the notification messages
+		will be delivered.
+	\param[in] eventMask A flags mask for the events to watch. Setting it to
+		\c 0 will stop watching for network events (the same as calling
+		StopWatching()).
+
+	\returns \c B_OK on success or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkRoster::StopWatching(const BMessenger& target)
+	\brief Unsubscribes \a target from receiving network messages.
+
+	\param[in] target A BMessenger object that will not be sent any more messages.
+
+	\since Haiku R1
+*/
+
+
+//! @}

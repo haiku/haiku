@@ -1,0 +1,734 @@
+/*
+ * Copyright 2026 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/NetworkDevice.h	hrev59275
+ *		src/kits/network/libnetapi/NetworkDevice.cpp	hrev59275
+ */
+
+
+/*!
+	\file NetworkDevice.h
+	\ingroup network
+	\brief Provides the BNetworkDevice class and wireless_network struct.
+*/
+
+
+/*!
+	\var ::B_NETWORK_AUTHENTICATION_NONE
+	\brief Authentication is performed without any authentication method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_AUTHENTICATION_WEP
+	\brief Authentication is performed via Wired Equivalent Privacy (WEP)
+		authentication method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_AUTHENTICATION_WPA
+	\brief Authentication is performed via Wi-Fi Protected Access (WPA)
+		authentication method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_AUTHENTICATION_WPA2
+	\brief Authentication is performed via Wi-Fi Protected Access 2 (WPA2)
+		authentication method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_AUTHENTICATION_EAP
+	\brief Authentication is performed via Extensible Authentication Protocol
+		(EAP) authentication method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_CIPHER_NONE
+	\brief The data stream is not ciphered.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_CIPHER_WEP_40
+	\brief The data stream is ciphered using WEP-40: a RC4 based stream cipher
+		consisting of a  40-bit key plus a 24-bit initialization vector.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_CIPHER_WEP_104
+	\brief The data stream is ciphered using WEP-104: a RC4 based stream cipher
+		consisting of a 104-bit key plus a 24-bit initialization vector.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_CIPHER_TKIP
+	\brief The data stream is ciphered using Temporal Key Integrity Protocol
+		(TKIP).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_CIPHER_CCMP
+	\brief The data stream is ciphered using Counter Mode with CBC-MAC
+		Protocol (CCMP).
+
+	\since Haiku R1
+*/
+
+/* RFC 4493 */
+/*!
+	\var ::B_NETWORK_CIPHER_AES_128_CMAC
+	\brief The data stream is ciphered using Advanced Encryption Standard (AES)
+		with a 128-bit block size with Cipher-based Message Authentication Code
+		(CMAC) for data integrity.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_KEY_MODE_IEEE802_1X
+	\brief The cryptographic key is distibuted using IEEE 802.1X mode,
+		making use of the Extensible Authentication Protocol (EAP). Also
+		known as WPA-Enterprise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_KEY_MODE_PSK
+	\brief The cryptographic key is distibuted using Pre-shared Key (PSK) mode.
+		Also known as WPA-Personal.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_KEY_MODE_NONE
+	\brief There is no particular key mode or the network is open
+		(not encrypted).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_KEY_MODE_FT_IEEE802_1X
+	\brief The cryptographic key is distibuted using IEEE 802.1X Fast Transition
+		mode, making use of the Extensible Authentication Protocol (EAP).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_KEY_MODE_FT_PSK
+	\brief The cryptographic key is distibuted using Pre-shared Key (PSK)
+		Fast Transition mode.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_KEY_MODE_IEEE802_1X_SHA256
+	\brief The cryptographic key is distibuted using IEEE 802.1X with SHA-256
+		 mode.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_KEY_MODE_PSK_SHA256
+	\brief The cryptographic key is distibuted using Pre-shared Key (PSK)
+		with SHA-256 mode.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_KEY_MODE_WPS
+	\brief The cryptographic key is distibuted through Wi-Fi Protected Setup
+		(WPS).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_EAP_ENCAPSULATION_NONE
+	\brief There is no particular encapsulation for the Extensible
+		Authentication Protocol (EAP) mode or the network device is not using
+		this protocol.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_EAP_ENCAPSULATION_PEAP
+	\brief The Extensible Authentication Protocol (EAP) authentication is encapsulated
+		within a Protected Extensible Authentication Protocol (PEAP)
+		encrypted tunnel.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var ::B_NETWORK_EAP_ENCAPSULATION_TLS
+	\brief The Extensible Authentication Protocol (EAP) authentication is performed
+		using Transport Layer Security (TLS) for cryptographic negotiation
+		between the endpoints.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_IS_ENCRYPTED
+	\brief The wireless_network is encrypted.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_IS_PERSISTENT
+	\brief The wireless_network is set as persistent.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\struct wireless_network
+	\ingroup network
+	\brief Describes a wireless network.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::name
+
+	\brief The service set identifier (SSID) of the wireless network.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::address
+
+	\brief The basic service set identifier (BSSID) of the wireless network.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::noise_level
+
+	\brief The noise level of the wireless network.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::signal_strength
+
+	\brief The signal strength of the wireless network.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::flags
+	\brief Configuration flags of the wireless_network object.
+
+	Valid values are:
+	- ::B_NETWORK_IS_ENCRYPTED
+	- ::B_NETWORK_IS_PERSISTENT
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::authentication_mode
+
+	\brief The authentication mode of the wireless network.
+
+	The authentication modes are described in this enumeration:
+	\code{.cpp}
+	// authentication modes
+	enum {
+		B_NETWORK_AUTHENTICATION_NONE		= 0,
+		B_NETWORK_AUTHENTICATION_WEP		= 1,
+		B_NETWORK_AUTHENTICATION_WPA		= 2,
+		B_NETWORK_AUTHENTICATION_WPA2		= 3,
+		B_NETWORK_AUTHENTICATION_EAP		= 4
+	};
+	\endcode
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::cipher
+
+	\brief The cipher algorithm of the wireless network.
+
+	The cipher algorithms are described in this enumeration:
+	\code{.cpp}
+	// cipher algorithms
+	enum {
+		B_NETWORK_CIPHER_NONE				= 0x01,
+		B_NETWORK_CIPHER_WEP_40				= 0x02,
+		B_NETWORK_CIPHER_WEP_104			= 0x04,
+		B_NETWORK_CIPHER_TKIP				= 0x08,
+		B_NETWORK_CIPHER_CCMP				= 0x10,
+		B_NETWORK_CIPHER_AES_128_CMAC		= 0x20
+	};
+	\endcode
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::group_cipher
+
+	\brief This field could be defined with one of the values described
+	in wireless_network::cipher.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var wireless_network::key_mode
+
+	\brief The key negotiation mode.
+
+	The key modes are described in this enumeration:
+	\code{.cpp}
+	// key modes
+	enum {
+		B_KEY_MODE_IEEE802_1X				= 0x0001,
+		B_KEY_MODE_PSK						= 0x0002,
+		B_KEY_MODE_NONE						= 0x0004,
+		B_KEY_MODE_FT_IEEE802_1X			= 0x0020,
+		B_KEY_MODE_FT_PSK					= 0x0040,
+		B_KEY_MODE_IEEE802_1X_SHA256		= 0x0080,
+		B_KEY_MODE_PSK_SHA256				= 0x0100,
+		B_KEY_MODE_WPS						= 0x0200
+	};
+	\endcode
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool wireless_network::operator==(const wireless_network& other)
+	\brief Checks if \a other is the same wireless network as this.
+
+	The check ignores the address difference between \a address and
+	\a other.address.
+
+	\returns \c true if both wireless_network objects represent the same
+		wireless network, or \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BNetworkDevice
+	\ingroup network
+	\brief BNetworkDevice class represents a network device.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkDevice::BNetworkDevice()
+	\brief Creates a BNetworkDevice object in an uninitialized state.
+
+	\sa SetTo()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkDevice::BNetworkDevice(const char* name)
+	\brief Creates and initializes a BNetworkDevice object identified by \a name.
+
+	\param[in] name The device name.
+
+	\sa SetTo()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkDevice::Unset()
+	\brief Returns the object to an uninitialized state.
+
+	\sa SetTo()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkDevice::SetTo(const char* name)
+	\brief (Re)initializes the BNetworkDevice object to work with the
+		device in \a name.
+
+	\param[in] name The device name.
+
+	\sa Unset()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BNetworkDevice::Name() const
+	\brief Returns the device name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkDevice::Exists() const
+	\brief Checks if the network device identified as Name() exists in the system.
+
+	\retval true The device exists.
+	\retval false The device does not exist or the BNetworkDevice object
+		is not initialized.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BNetworkDevice::Index() const
+	\brief Returns the index of the device in the list of network devices.
+
+	If the device was not found or this object is not initialized,
+	it returns \c 0.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BNetworkDevice::Flags() const
+	\brief Returns a bit mask of the flags associated with the device.
+
+	Possible flags are those defined in the POSIX header \c net/if.h.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkDevice::HasLink() const
+	\brief Checks if the device has an active connection with another interface.
+
+	\retval true The device has a link.
+	\retval false The device does not have a link.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BNetworkDevice::Media() const
+	\brief Returns a bit mask of the device's media options.
+
+	Possible flags are those defined in the header \c net/if_media.h.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::SetMedia(int32 media)
+	\brief Configures the media options of the device.
+
+	\returns B_OK on success, or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::GetHardwareAddress(BNetworkAddress& address)
+	\brief Gets the MAC address of the device.
+
+	\param[out] address A BNetworkAddress object where to write the address.
+
+	\returns \c B_OK on success, or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkDevice::IsEthernet()
+	\brief Checks if the device media type is ethernet.
+
+	\retval true The device is an ethernet device.
+	\retval false The device is not an ethernet device.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkDevice::IsWireless()
+	\brief Checks if the device media type is IEEE 802.11 (WLAN) or wireless.
+
+	\retval true The device is a wireless device.
+	\retval false The device is not a wireless device.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::Control(int option, void* request)
+	\brief Sends an ioctl request to the device.
+
+	\param[in] option The kind of operation.
+	\param[in] request The request data.
+
+	\returns \c B_OK on success, or an error code.
+
+	\retval B_OK Command sent and processed successfully.
+	\retval B_ERROR Something went wrong, or performing ioctl calls is not
+		supported for the device's media type.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::Scan(bool wait = true, bool forceRescan = true)
+	\brief Scans for a wireless network.
+
+	\param[in] wait Tells the object to wait for any WLAN change before starting
+		to scan.
+	\param[in] forceRescan Flush any previous scan result.
+
+	\return B_OK if the operation was performed successfully or an error code
+		otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::GetNetworks(wireless_network*& networks,
+		uint32& count)
+	\brief Gets all the detected wireless networks from a previous scan.
+
+	\param[out] networks A \c NULL pointer where an array of wireless_network
+		will be written to.
+	\param[out] count How many items there are in \a networks.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE \a networks is not \c NULL.
+	\retval B_NO_MEMORY Internal memory allocation error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::GetNetwork(const char* name,
+		wireless_network& network)
+	\brief Returns a wireless_network object of the network identified as \a name.
+
+	\param[in] name The wireless network name.
+	\param[out] network A wireless_network object where the network information
+		will be written to.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE \a name is \c NULL.
+	\retval B_NO_MEMORY Internal memory allocation error.
+	\retval B_ENTRY_NOT_FOUND There is no network called \a name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::GetNetwork(const BNetworkAddress& address,
+		wireless_network& network)
+	\brief Returns a wireless_network object of the network
+		described in \a address.
+
+	\param[in] address A BNetworkAddress object of the wireless network.
+	\param[out] network A wireless_network object where the network information
+		will be written to.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE \a address'	family is not \c AF_LINK.
+	\retval B_NO_MEMORY Internal memory allocation error.
+	\retval B_ENTRY_NOT_FOUND There is no network called \a name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::JoinNetwork(const char* name,
+		const char* password = NULL)
+	\brief Connects to the network identified as \a name.
+
+	\param[in] name The network name.
+	\param[in] password The network password.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE \a name is \c NULL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::JoinNetwork(const wireless_network& network,
+		const char* password = NULL)
+	\brief Connects to the network described in \a network.
+
+	\param[in] network A wireless_network object with the network information.
+	\param[in] password The network password.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE The name in \a network is \c NULL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::JoinNetwork(const BNetworkAddress& address,
+		const char* password = NULL)
+	\brief Connects to the network in \a address.
+
+	\param[in] address The network address.
+	\param[in] password The network password.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE \a address is not properly initialized.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::LeaveNetwork(const char* name)
+	\brief Disconnects from the wireless network \a name.
+
+	\param[in] name The network name.
+
+	\return \c B_OK if it could leave the network or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::LeaveNetwork(const wireless_network& network)
+	\brief Disconnects from the wireless \a network.
+
+	\param[in] network A wireless_network object with the network name.
+
+	\return \c B_OK if it could leave the network or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::LeaveNetwork(const BNetworkAddress& address)
+	\brief Disconnects from the wireless network in \a address.
+
+	\return \c B_OK if it could leave the network or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::GetNextAssociatedNetwork(uint32& cookie,
+		wireless_network& network)
+	\brief Iterates through the associated networks and saves the next one
+		in \a network.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_ENTRY_NOT_FOUND There are no more associated networks.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkDevice::GetNextAssociatedNetwork(uint32& cookie,
+		BNetworkAddress& address)
+	\brief Iterates through the associated networks and saves the address of
+		next one in \a address.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_ENTRY_NOT_FOUND There are no more associated networks.
+
+	\since Haiku R1
+*/

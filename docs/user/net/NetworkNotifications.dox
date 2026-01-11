@@ -1,0 +1,197 @@
+/*
+ * Copyright 2026 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/NetworkNotifications.h	hrev59275
+ *		src/kits/network/libnetapi/notifications.cpp	hrev59275
+ */
+
+
+/*!
+	\file NetworkNotifications.h
+	\ingroup network
+	\brief Provides C functions to get network related notifications.
+
+	There is a C++ view of the API: BNetworkRoster::StartWatching() to
+	subscribe to get these events and BNetworkRoster::StopWatching() to
+	unsubscribe from them.
+*/
+
+
+/*!
+	\def B_NETWORK_INTERFACE_ADDED
+	\brief Notification sent to subscribers when a network interface was added.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_INTERFACE_REMOVED
+	\brief Notification sent to subscribers when a network interface was removed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_INTERFACE_CHANGED
+	\brief Notification sent to subscribers when a network interface was modified.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_DEVICE_LINK_CHANGED
+	\brief Notification sent to subscribers when a network link was changed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_WLAN_JOINED
+	\brief Notification sent to subscribers when joining a wireless network.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_WLAN_LEFT
+	\brief Notification sent to subscribers when leaving a wireless network.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_WLAN_SCANNED
+	\brief Notification sent to subscribers after scanning for available
+		wireless networks.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_NETWORK_WLAN_MESSAGE_INTEGRITY_FAILED
+	\brief Notification sent to subscribers when in a wireless network using WPA
+		based protocols, the message integrity check sent to prevent tampering
+		of messages by "man in the middle" attacks has failed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_WATCH_NETWORK_INTERFACE_CHANGES
+	\brief Flag to subscribe to receive network interface changes notifications.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_WATCH_NETWORK_LINK_CHANGES
+	\brief Flag to subscribe to receive network link changes notifications.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_WATCH_NETWORK_WLAN_CHANGES
+	\brief Flag to subscribe to receive wireless networks changes notifications.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t start_watching_network(uint32 flags, const BMessenger& target)
+	\brief Subscribes \a target to receive network events' notifications
+		described in \a flags.
+
+	Valid values for \a flags are any combination of the following:
+	- \c ::B_WATCH_NETWORK_INTERFACE_CHANGES
+	- \c ::B_WATCH_NETWORK_LINK_CHANGES
+	- \c ::B_WATCH_NETWORK_WLAN_CHANGES
+
+	For \c B_WATCH_NETWORK_INTERFACE_CHANGES, the following notifications
+		will be sent to \a target if such events happen:
+	- \c ::B_NETWORK_INTERFACE_ADDED
+	- \c ::B_NETWORK_INTERFACE_REMOVED
+	- \c ::B_NETWORK_INTERFACE_CHANGED
+
+	For \c B_WATCH_NETWORK_LINK_CHANGES, the following notification
+		will be sent to \a target if such event happens:
+	- \c ::B_NETWORK_DEVICE_LINK_CHANGED
+
+	For \c B_WATCH_NETWORK_WLAN_CHANGES, the following notifications
+		will be sent to \a target if such events happen:
+	- \c ::B_NETWORK_WLAN_JOINED
+	- \c ::B_NETWORK_WLAN_LEFT
+	- \c ::B_NETWORK_WLAN_SCANNED
+	- \c ::B_NETWORK_WLAN_MESSAGE_INTEGRITY_FAILED
+
+	If \a flags is \c 0, it will stop sending notifications to \a target.
+
+	\param[in] flags A flags mask for the events to watch. Setting it to
+		\c 0 will stop watching for network events.
+	\param[in] target A BMessenger object to where the notification messages
+		will be delivered.
+
+	\retval B_OK \a target was subscribed to receive network notifications.
+	\retval B_NOT_SUPPORTED The network notifications API is not supported.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t start_watching_network(uint32 flags, const BHandler* target,
+		const BLooper* looper = NULL)
+	\brief Subscribes \a target or \a looper to receive network notifications.
+
+	For the valid values for \a flags and the notifications that will be
+	received by the subscriber, see
+	start_watching_network(uint32, const BMessenger&).
+
+	\retval B_OK \a target or \a looper was subscribed to receive
+		network notifications.
+	\retval B_NOT_SUPPORTED The network notifications API is not supported.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t stop_watching_network(const BMessenger& target)
+	\brief Unsubscribes \a target from receiving network messages.
+
+	\retval B_OK \a target was unsubscribed from receiving network notifications.
+	\retval B_NOT_SUPPORTED The network notifications API is not supported.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t stop_watching_network(const BHandler* target,
+		const BLooper* looper = NULL)
+	\brief Unsubscribes \a target or \a looper from receiving network messages.
+
+	\retval B_OK \a target or \a looper was subscribed from receiving
+		network notifications.
+	\retval B_NOT_SUPPORTED The network notifications API is not supported.
+
+	\since Haiku R1
+*/
+
+

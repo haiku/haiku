@@ -1,0 +1,1106 @@
+/*
+ * Copyright 2026 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/net/NetworkAddress.h	hrev59275
+ *		src/kits/network/libnetapi/NetworkAddress.cpp	hrev59275
+ */
+
+
+/*!
+	\file NetworkAddress.h
+	\ingroup network
+	\brief Provides the BNetworkAddress class.
+*/
+
+
+/*!
+	\class BNetworkAddress
+	\ingroup network
+	\brief BNetworkAddress class represents a network address.
+
+	There are several ways to initialize a BNetworkAddress object, from any
+	of the constructors with parameters or the SetTo() methods. Depending on the
+	overloaded version, the parameters could be:
+
+	- The \a address, that is the representation of a host's IP address (such as
+	\c "127.0.0.1" or \c "::1") or hostname (such as \c "www.haiku-os.org").
+
+	- The \a port, a number representing the communication endpoint in the address,
+	that identifies a specific process or application.
+
+	- The \a service, a string with a service name such as \a "http", \a "ftp",
+	etc., that can be mapped to a port number and a protocol.
+
+	- The \a family, the address family identifier. A list of possible values
+	is defined in POSIX header sys/socket.h.
+
+	- \a flags to pass to the address resolver: \c 0 (default value),
+	\c B_NO_ADDRESS_RESOLUTION or \c B_UNCONFIGURED_ADDRESS_FAMILIES.
+
+	A BNetworkAddress object can also be initialized from a socket storage
+	object (sockaddr, sockaddr_storage, sockaddr_in, sockaddr_in6 or
+	sockaddr_dl), or from a raw IP address (in_addr_t for IPv4 or in6_addr
+	for IPv6).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress()
+	\brief Creates an uninitialized BNetworkAddress object.
+
+	It can be later initialized with any of the SetTo() functions.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const char* address, uint16 port = 0, uint32 flags = 0)
+	\brief Creates and initializes a BNetworkAddress object using a network
+		\a address and a \a port.
+
+	\param[in] address A network address.
+	\param[in] port The port in \a address.
+	\param[in] flags Configuration flags to pass to the address resolver.
+
+	\sa SetTo(const char*, uint16, uint32)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const char* address, const char* service, uint32 flags = 0)
+	\brief Creates and initializes a BNetworkAddress object using a network
+		\a address and a \a service.
+
+	\param[in] address A network address.
+	\param[in] service The service to be used.
+	\param[in] flags Configuration flags to pass to the address resolver.
+
+	\sa SetTo(const char*, const char*, uint32)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(int family, const char* address, uint16 port = 0, uint32 flags = 0)
+	\brief Creates and initializes a BNetworkAddress object using a network
+		\a family, \a address and a \a port.
+
+	\param[in] family The address family identifier.
+	\param[in] address A network address.
+	\param[in] port The port in \a address.
+	\param[in] flags Configuration flags to pass to the address resolver.
+
+	\sa SetTo(int, const char*, uint16, uint32)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(int family, const char* address, const char* service, uint32 flags = 0)
+	\brief Creates and initializes a BNetworkAddress object using a network
+		\a family, \a address and a \a service.
+
+	\param[in] family The address family identifier.
+	\param[in] address A network address.
+	\param[in] service The service to be used.
+	\param[in] flags Configuration flags to pass to the address resolver.
+
+	\sa SetTo(int, const char*, const char*, uint32)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const sockaddr& address)
+	\brief Creates and initializes a BNetworkAddress object from a generic
+		socket address storage object.
+
+	\param[in] address The sockaddr instance containing the socket address
+		information.
+
+	\sa SetTo(const sockaddr&)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const sockaddr_storage& address)
+	\brief Creates and initializes a BNetworkAddress object from a generic
+		socket address storage object.
+
+	\param[in] address The sockaddr_storage instance containing the socket
+		address information.
+
+	\sa SetTo(const sockaddr_storage&)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const sockaddr_in& address)
+	\brief Creates and initializes a BNetworkAddress object from a IPv4
+		socket address storage object.
+
+	\param[in] address The sockaddr_in instance containing the socket
+		address	information.
+
+	\sa SetTo(const sockaddr_in&)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const sockaddr_in6& address)
+	\brief Creates and initializes a BNetworkAddress object from a IPv6
+		socket address storage object.
+
+	\param[in] address The sockaddr_in6 instance containing the socket
+		address	information.
+
+	\sa SetTo(const sockaddr_in6&)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const sockaddr_dl& address)
+	\brief Creates and initializes a BNetworkAddress object from a link level
+		socket address storage object.
+
+	\param[in] address The sockaddr_dl instance containing the socket
+		address	information.
+
+	\sa SetTo(const sockaddr_dl&)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(in_addr_t address, uint16 port = 0)
+	\brief Creates and initializes a BNetworkAddress object to a raw
+		IPv4 \a address and a \a port.
+
+	\param[in] address A IPv4 address in 32-bit binary form.
+	\param[in] port The port number.
+
+	\sa SetTo(in_addr_t, uint16)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const in6_addr& address, uint16 port = 0)
+	\brief Creates and initializes a BNetworkAddress object to a raw
+		IPv6 \a address and a \a port.
+
+	\param[in] address A IPv6 address in 128-bit binary form.
+	\param[in] port The port number.
+
+	\sa SetTo(const in6_addr&, uint16)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::BNetworkAddress(const BNetworkAddress& other)
+	\brief Copy constructor.
+
+	\param[in] other Another BNetworkAddress instance from where to initialize.
+
+	\sa SetTo(const BNetworkAddress&)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::~BNetworkAddress()
+	\brief Default destructor.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::InitCheck() const
+	\brief Returns the initialization status of this object.
+
+	If Unset() is used, the initialization status turns into \c B_OK.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Initialization and assignment
+*/
+
+//! @{
+
+
+/*!
+	\fn status_t BNetworkAddress::SetTo(const char* address, uint16 port = 0, uint32 flags = 0)
+	\brief (Re)initializes the object using a network \a address and a \a port.
+
+	\param[in] address A network address.
+	\param[in] port The port in \a address.
+	\param[in] flags Configuration flags to pass to the address resolver.
+
+	\retval B_OK Initialization was successful.
+	\retval B_ERROR Unknown error.
+	\retval B_NO_MEMORY Internal memory allocation error.
+	\retval B_BAD_VALUE Address family not supported, unknown host or service,
+		bad port number or socket type not supported.
+	\retval B_TIMED_OUT Temporary failure in name resolution.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetTo(const char* address, const char* service, uint32 flags = 0)
+	\brief (Re)initializes the object using a network \a address and a \a service.
+
+	\param[in] address A network address.
+	\param[in] service The service to be used.
+	\param[in] flags Configuration flags to pass to the address resolver.
+
+	\retval B_OK Initialization was successful.
+	\retval B_ERROR Unknown error.
+	\retval B_NO_MEMORY Internal memory allocation error.
+	\retval B_BAD_VALUE Address family not supported, unknown host or service,
+		bad port number or socket type not supported.
+	\retval B_TIMED_OUT Temporary failure in name resolution.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetTo(int family, const char* address, uint16 port = 0, uint32 flags = 0)
+	\brief (Re)initializes the object using a network \a family, \a address
+		and a \a port.
+
+	\param[in] family The address family identifier.
+	\param[in] address A network address.
+	\param[in] port The port in \a address.
+	\param[in] flags Configuration flags to pass to the address resolver.
+
+	\retval B_OK Initialization was successful.
+	\retval B_ERROR Unknown error.
+	\retval B_NO_MEMORY Internal memory allocation error.
+	\retval B_BAD_VALUE Address family not supported, unknown host or service,
+		bad port number or socket type not supported.
+	\retval B_TIMED_OUT Temporary failure in name resolution.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetTo(int family, const char* address, const char* service, uint32 flags = 0)
+	\brief (Re)initializes the object using a network \a family, \a address
+		and a \a service.
+
+	\param[in] family The address family identifier.
+	\param[in] address A network address.
+	\param[in] service The service to be used.
+	\param[in] flags Configuration flags to pass to the address resolver.
+
+	\retval B_OK Initialization was successful.
+	\retval B_ERROR Unknown error.
+	\retval B_NO_MEMORY Internal memory allocation error.
+	\retval B_BAD_VALUE Address family not supported, unknown host or service,
+		bad port number or socket type not supported.
+	\retval B_TIMED_OUT Temporary failure in name resolution.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(const sockaddr& address)
+	\brief (Re)initializes the object from a generic
+		socket address storage object.
+
+	It automatically casts the kind of socket according to the address family.
+
+	\param[in] address The sockaddr instance containing the socket address
+		information.
+
+	\sa SetTo(const sockaddr&, size_t)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(const sockaddr& address, size_t length)
+	\brief (Re)initializes the object from a generic
+		socket address storage object.
+
+	\param[in] address The sockaddr instance containing the socket
+		address information.
+	\param[in] length The data length of \a address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(const sockaddr_storage& address)
+	\brief (Re)initializes the object from a generic
+		socket address storage object.
+
+	\param[in] address The sockaddr_storage instance containing the socket
+		address information.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(const sockaddr_in& address)
+	\brief (Re)initializes the object from a IPv4
+		socket address storage object.
+
+	\param[in] address The sockaddr_in instance containing the socket
+		address information.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(const sockaddr_in6& address)
+	\brief (Re)initializes the object from a IPv6
+		socket address storage object.
+
+	\param[in] address The sockaddr_in6 instance containing the socket
+		address information.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(const sockaddr_dl& address)
+	\brief (Re)initializes the object from a link level
+		socket address storage object.
+
+	\param[in] address The sockaddr_dl instance containing the socket
+		address information.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(in_addr_t address, uint16 port = 0)
+	\brief (Re)initializes the object to a raw IPv4 \a address and a \a port.
+
+	\param[in] address The IPv4 address represented with a 32-bit integer.
+	\param[in] port The port number.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(const in6_addr& address, uint16 port = 0)
+	\brief (Re)initializes the object to a raw IPv6 \a address and a \a port.
+
+	\param[in] address The IPv6 address represented in binary form.
+	\param[in] port The port number.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetTo(const BNetworkAddress& other)
+	\brief (Re)initializes the object from \a other instance.
+
+	\param[in] other Another BNetworkAddress instance from where to initialize.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetToBroadcast(int family, uint16 port = 0)
+	\brief (Re)initializes the object to the broadcast address.
+
+	\param[in] family The address family.
+	\param[in] port The port number.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_NOT_SUPPORTED The address family is not \c AF_INET.
+
+	\sa IsBroadCast()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetToLocal(int family = AF_UNSPEC, uint16 port = 0)
+	\brief Unimplemented.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetToLoopback(int family = AF_UNSPEC, uint16 port = 0)
+	\brief (Re)initializes the object to the loopback address.
+
+	The loopback address is \c INADDR_LOOPBACK (\c 127.0.0.1) for the family
+	\c AF_INET, or in6addr_loopback (\c ::1) for the family \c AF_INET6.
+
+	\param[in] family The address family.
+	\param[in] port The port number.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_NOT_SUPPORTED The address family does not support loopback address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetToMask(int family, uint32 prefixLength)
+	\brief (Re)initializes the object to a mask address depending on the
+		address \a family loopback address, and \a prefixLength for the
+		address prefix.
+
+	\param[in] family The address family.
+	\param[in] prefixLength The subnet prefix length.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE \a prefixLength is greater than \c 32 if \a family is
+		\c AF_INET, or greater than \c 128 if \a family is \c AF_INET6.
+	\retval B_NOT_SUPPORTED The address \a family does not support subnet masks
+		(is not \c AF_INET nor \c AF_INET6).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetToWildcard(int family, uint16 port = 0)
+	\brief (Re)initializes the object to the wildcard address.
+
+	\param[in] family The family address.
+	\param[in] port The port number.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_NOT_SUPPORTED The address \a family does not support wildcard
+		addresses.
+
+	\sa IsWildcard()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetAddress(in_addr_t address)
+	\brief Sets the address to a IPv4 \a address.
+
+	\param[in] address A IPv4 network address in 32-bit form.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE The address family is not \c AF_INET.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetAddress(const in6_addr& address)
+	\brief Sets the address to a IPv6 \a address.
+
+	\param[in] address A IPv6 network address in 128-bit form.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE The address family is not \c AF_INET6.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetPort(uint16 port)
+	\brief Changes the port number.
+
+	This works only if the address family is \c AF_INET or \c AF_INET6.
+
+	\param[in] port The port number.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::SetPort(const char* service)
+	\brief Unimplemented.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetToLinkLevel(const uint8* address, size_t length)
+	\brief Sets the address to a link local address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetToLinkLevel(const char* name)
+	\brief Sets the address to a link local address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetToLinkLevel(uint32 index)
+	\brief Sets the address to a link local address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetLinkLevelIndex(uint32 index)
+	\brief Sets the link local address at \a index.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetLinkLevelType(uint8 type)
+	\brief Sets the link local address \a type.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::SetLinkLevelFrameType(uint16 frameType)
+	\brief Sets the link local address \a frameType.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress& BNetworkAddress::operator=(const BNetworkAddress& other)
+	\brief Copies \a other address onto \a this address object.
+
+	\param[in] other The other BNetworkAddress object from where to copy the data.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BNetworkAddress::Unset()
+	\brief Uninitializes the BNetworkAddress object.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\name Information and access
+*/
+
+//! @{
+
+/*!
+	\fn int BNetworkAddress::Family() const
+	\brief Returns the address family.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint16 BNetworkAddress::Port() const
+	\brief Returns the address port.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn size_t BNetworkAddress::Length() const
+	\brief Returns the address length.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsEmpty() const
+	\brief Returns whether the address is empty or not.
+
+	If the address family is \c AF_UNSPEC, it is considered empty.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsWildcard() const
+	\brief Returns whether the address is a wildcard address or not.
+
+	This is valid only for \c AF_INET or \c AF_INET6 address families. For other
+	families it always returns \c false.
+
+	For IPv4 addresses, the wildcard address is \c INADDR_ANY
+	(\c 0.0.0.0), and for IPv6 addresses is \a in6addr_any (\c ::).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsBroadcast() const
+	\brief Returns whether the address is a broadcast address or not.
+
+	This is valid only for \c AF_INET or \c AF_INET6 address families. For other
+	families it always returns \c false.
+
+	The broadcast address is \c INADDR_BROADCAST (\c 255.255.255.255).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsMulticast() const
+	\brief Returns whether the address is a multicast address or not.
+
+	This is valid only for \c AF_INET or \c AF_INET6 address families. For other
+	families it always returns \c false.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsMulticastGlobal() const
+	\brief Returns whether the IPv6 multicast address is of global scope or not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsMulticastNodeLocal() const
+	\brief Returns whether the IPv6 multicast address is node local or not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsMulticastLinkLocal() const
+	\brief Returns whether the IPv6 multicast address is link local or not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsMulticastSiteLocal() const
+	\brief Returns whether the IPv6 multicast address is site local or not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsMulticastOrgLocal() const
+	\brief Returns whether the IPv6 multicast address is organization local or not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsLinkLocal() const
+	\brief Returns whether the address is link local or not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsSiteLocal() const
+	\brief Returns whether the address is site local or not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::IsLocal() const
+	\brief Returns whether the address is local or not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BNetworkAddress::PrefixLength() const
+	\brief Returns the prefix length for the subnet mask.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BNetworkAddress::LinkLevelIndex() const
+	\brief Returns the index of the network interface that
+		the link local address belongs to.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BNetworkAddress::LinkLevelInterface() const
+	\brief Returns the link local address' interface name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BNetworkAddress::LinkLevelType() const
+	\brief Returns the link local address' interface type.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint16 BNetworkAddress::LinkLevelFrameType() const
+	\brief Returns the link local address' frame type.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8* BNetworkAddress::LinkLevelAddress() const
+	\brief Returns a pointer to the link local address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn size_t BNetworkAddress::LinkLevelAddressLength() const
+	\brief Returns the link local address length.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BNetworkAddress::ToString(bool includePort = true) const
+	\brief Returns the network address in a stringified form.
+
+	\param[in] includePort If \c true, includes the port number in the output
+		string.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BNetworkAddress::HostName() const
+	\brief Returns the host name for the network address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BNetworkAddress::ServiceName() const
+	\brief Returns the port number for the current address.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\name Address resolver
+*/
+
+//! @{
+
+/*!
+	\fn status_t BNetworkAddress::ResolveForDestination(const BNetworkAddress& destination)
+	\brief For the given \a destination resolves the source address in the route
+		and sets \a this object address to that source address.
+
+	\param[in] destination The destination address from where to resolve
+		the source address.
+
+	\retval B_OK Source address was resolved successfully.
+	\retval B_BAD_VALUE The destination address family is not the same as this
+		address family.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkAddress::ResolveTo(const BNetworkAddress& address)
+	\brief Sets this object to \a address.
+
+	\param[in] address The addres to be resolved.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE The address family of \a address is not the same as
+		this object's address family.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\name Comparison
+*/
+
+//! @{
+
+/*!
+	\fn bool BNetworkAddress::Equals(const BNetworkAddress& other, bool includePort = true) const
+	\brief Compares if \a this address is equal to \a other address.
+
+	\retval true \a this address is equal to \a other address.
+	\retval false \a this address is not equal to \a other address.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\name BFlattenable implementation
+*/
+
+//! @{
+
+/*!
+	\fn virtual bool BNetworkAddress::IsFixedSize() const
+	\brief Returnd whether or not BNetworkAddress flattened objects
+		always have a fixed size.
+
+	\returns It always returns \c false.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual type_code BNetworkAddress::TypeCode() const
+	\brief Returns the type_code this class flattens to.
+
+	\returns The type code of this class \c ::B_NETWORK_ADDRESS_TYPE.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual ssize_t BNetworkAddress::FlattenedSize() const
+	\brief Returns the size of the flattened object in bytes.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BNetworkAddress::Flatten(void* buffer, ssize_t size) const
+	\brief Flattens the object into the supplied \a buffer.
+
+	\param[in] buffer The buffer to flatten in.
+	\param[in] size The size of the buffer.
+
+	\retval B_OK The object was flattened.
+	\retval B_BAD_VALUE The supplied buffer is \c NULL or the size is lesser than
+		the required size in FlattenedSize().
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BNetworkAddress::Unflatten(type_code code, const void* buffer, ssize_t size)
+	\brief Unflattens the buffer and puts the contents into the current object.
+
+	\param[in] code The type code of the data.
+	\param[in] buffer The buffer to unflatten the data from.
+	\param[in] size The size of the data.
+
+	\retval B_OK The data was unflattened into this object.
+	\retval B_BAD_TYPE This class does not support the type \a code.
+	\retval B_BAD_VALUE The buffer is \c NULL or too small, or it contains an
+		invalid address.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\name Comparison
+*/
+
+//! @{
+
+
+/*!
+	\fn bool BNetworkAddress::operator==(const BNetworkAddress& other) const
+	\brief Compares if \a this address is equal to \a other address.
+
+	\retval true \a this address is equal to \a other address.
+	\retval false \a this address is not equal to \a other address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::operator!=(const BNetworkAddress& other) const
+	\brief Compares if \a this address is not equal to \a other address.
+
+	\retval true \a this address is not equal to \a other address.
+	\retval false \a this address is equal to \a other address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BNetworkAddress::operator<(const BNetworkAddress& other) const
+	\brief Compares if \a this address is less than \a other address.
+
+	\retval true \a this address is less than \a other address.
+	\retval false \a this address is equal to or greater than \a other address.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\name Socket address access and operators
+*/
+
+//! @{
+
+/*!
+	\fn const sockaddr& BNetworkAddress::SockAddr() const
+	\brief Returns a read only reference to the underlying socket address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn sockaddr& BNetworkAddress::SockAddr()
+	\brief Returns a mutable reference to the underlying socket address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::operator const sockaddr*() const
+	\brief Returns a read only pointer to the underlying socket address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::operator const sockaddr&() const
+	\brief Returns a read only reference to the underlying socket address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::operator const sockaddr*()
+	\brief Returns a read only pointer to the underlying socket address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::operator sockaddr*()
+	\brief Returns a mutable pointer to the underlying socket address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::operator const sockaddr&()
+	\brief Returns a read only reference to the underlying socket address.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkAddress::operator sockaddr&()
+	\brief Returns a mutable reference to the underlying socket address.
+
+	\since Haiku R1
+*/
+
+//! @}
