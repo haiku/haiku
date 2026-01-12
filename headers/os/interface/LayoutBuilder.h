@@ -406,6 +406,8 @@ public:
 	inline	ThisBuilder&		GetItem(BMenuItem*& _item);
 
 	inline	ThisBuilder&		SetEnabled(bool enabled);
+	inline	ThisBuilder&		SetTarget(const BHandler* target, const BLooper* looper = NULL);
+	inline	ThisBuilder&		SetMarked(bool marked);
 
 private:
 			BMenuItem*			fMenuItem;
@@ -1835,6 +1837,24 @@ typename MenuItem<ParentBuilder>::ThisBuilder&
 MenuItem<ParentBuilder>::SetEnabled(bool enabled)
 {
 	fMenuItem->SetEnabled(enabled);
+	return *this;
+}
+
+
+template<typename  ParentBuilder>
+typename  MenuItem<ParentBuilder>::ThisBuilder&
+MenuItem<ParentBuilder>::SetTarget(const BHandler* handler, const BLooper* looper)
+{
+	fMenuItem->SetTarget(handler, looper);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename MenuItem<ParentBuilder>::ThisBuilder&
+MenuItem<ParentBuilder>::SetMarked(bool marked)
+{
+	fMenuItem->SetMarked(marked);
 	return *this;
 }
 
