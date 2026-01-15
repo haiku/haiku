@@ -369,15 +369,11 @@ ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 
 	// convert input from UTF-32 to UTF-16
 	UChar ucharBuffer[2];
-	size_t ucharLength;
-	if (U_IS_BMP(wc)) {
-		ucharBuffer[0] = wc;
-		ucharLength = 1;
-	} else {
-		ucharBuffer[0] = U16_LEAD(wc);
-		ucharBuffer[1] = U16_TRAIL(wc);
-		ucharLength = 2;
-	}
+	UBool isError = false;
+	size_t ucharLength = 0;
+	U16_APPEND(ucharBuffer, ucharLength, sizeof(ucharBuffer), wc, isError);
+	if (isError)
+		return B_BAD_VALUE;
 
 	// do the actual conversion
 	UErrorCode icuStatus = U_ZERO_ERROR;
