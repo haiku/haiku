@@ -5,12 +5,11 @@
 
 
 #include "LocaleBackend.h"
+#include "LocaleInternal.h"
 
 #include <dlfcn.h>
 #include <pthread.h>
 #include <string.h>
-
-#include <ThreadLocale.h>
 
 
 namespace BPrivate {

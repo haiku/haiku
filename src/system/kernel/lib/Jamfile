@@ -74,7 +74,7 @@ KernelMergeObject kernel_lib_posix.o :
 	utime.c
 
 	# locale
-	ctype_loc.cpp
+	ctype_loc_global.cpp
 	ctype_l.cpp
 	ctype.cpp
 	localeconv.cpp

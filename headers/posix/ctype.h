@@ -61,15 +61,9 @@ enum {
 	_ISgraph = 0x8000		/* graphical */
 };
 
-/* Characteristics */
-extern const unsigned short int *__ctype_b;
-/* Case conversions */
-extern const int *__ctype_tolower;
-extern const int *__ctype_toupper;
-
-extern const unsigned short int **__ctype_b_loc();
-extern const int **__ctype_tolower_loc();
-extern const int **__ctype_toupper_loc();
+extern const unsigned short int *const *const __ctype_b_loc();
+extern const int *const *const __ctype_tolower_loc();
+extern const int *const *const __ctype_toupper_loc();
 
 #define __isctype(c, type) \
 	((*__ctype_b_loc())[(int)(c)] & (unsigned short int)type)
@@ -95,8 +89,6 @@ extern const int **__ctype_toupper_loc();
 #define isspace(c)	__isctype((c), _ISspace)
 #define isupper(c)	__isctype((c), _ISupper)
 #define isxdigit(c)	__isctype((c), _ISxdigit)
-
-extern unsigned short int __ctype_mb_cur_max;
 
 #ifdef __cplusplus
 }

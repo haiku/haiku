@@ -9,6 +9,15 @@
 #include <locale.h>
 
 
+extern "C" {
+// Global storage (exported for BeOS and older Haiku compatibility)
+extern const unsigned short int *__ctype_b;
+extern const int *__ctype_tolower;
+extern const int *__ctype_toupper;
+extern unsigned short int __ctype_mb_cur_max;
+}
+
+
 namespace BPrivate {
 namespace Libroot {
 

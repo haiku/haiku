@@ -49,7 +49,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			<src!system!libroot!posix!$(architecture)>fcntl.o
 
 			<src!system!libroot!posix!locale!$(architecture)>ctype.o
-			<src!system!libroot!posix!locale!$(architecture)>ctype_loc.o
+			<src!system!libroot!posix!locale!$(architecture)>ctype_loc_global.o
 			<src!system!libroot!posix!locale!$(architecture)>LocaleData.o
 
 			<src!system!libroot!posix!musl!string!$(architecture)>memchr.o

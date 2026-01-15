@@ -25,11 +25,13 @@ private:
 	const unsigned short*		localClassInfoTable;
 	const int*					localToLowerTable;
 	const int*					localToUpperTable;
+	unsigned short				localMbCurMax;
 
 public:
 	const unsigned short**		addrOfClassInfoTable;
 	const int**					addrOfToLowerTable;
 	const int**					addrOfToUpperTable;
+	unsigned short*				addrOfMbCurMax;
 
 	const unsigned short* const	posixClassInfo;
 	const int* const			posixToLowerMap;
@@ -39,7 +41,6 @@ public:
 
 	LocaleCtypeDataBridge(bool isGlobal);
 
-	void setMbCurMax(unsigned short mbCurMax);
 	void ApplyToCurrentThread();
 };
 
@@ -61,7 +62,6 @@ struct LocaleMonetaryDataBridge {
 struct LocaleNumericDataBridge {
 public:
 	const struct lconv* const 	posixLocaleConv;
-	bool						isGlobal;
 
 	LocaleNumericDataBridge(bool isGlobal);
 	~LocaleNumericDataBridge();
@@ -89,7 +89,6 @@ public:
 	int*					addrOfDaylight;
 	long*					addrOfTimezone;
 	char**					addrOfTZName;
-	bool					isGlobal;
 
 	TimeConversionDataBridge(bool isGlobal);
 };
@@ -103,7 +102,6 @@ struct LocaleDataBridge {
 	LocaleTimeDataBridge		timeDataBridge;
 	TimeConversionDataBridge	timeConversionDataBridge;
 	const char** const			posixLanginfo;
-	bool						isGlobal;
 
 	LocaleDataBridge(bool isGlobal);
 
@@ -181,6 +179,7 @@ void SetCurrentLocaleInfo(LocaleBackendData* newLocale);
 LocaleBackend* GetCurrentLocaleBackend();
 extern LocaleBackend* gGlobalLocaleBackend;
 extern LocaleDataBridge gGlobalLocaleDataBridge;
+
 
 }	// namespace Libroot
 }	// namespace BPrivate

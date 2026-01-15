@@ -308,7 +308,7 @@ for platform in [ MultiBootSubDirSetup ] {
 
 		BootMergeObject boot_libroot_$(platform:G=).o :
 			abs.c
-			ctype_loc.cpp
+			ctype_loc_global.cpp
 			ctype_l.cpp
 			ctype.cpp
 			generic_memcpy.c

@@ -74,7 +74,7 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 
 	ucnv_reset(converter);
 
-	fDataBridge->setMbCurMax(ucnv_getMaxCharSize(converter));
+	*fDataBridge->addrOfMbCurMax = ucnv_getMaxCharSize(converter);
 
 	char buffer[] = { 0, 0 };
 	for (int i = 0; i < 256; ++i) {
@@ -150,8 +150,7 @@ ICUCtypeData::SetToPosix()
 		memcpy(fClassInfo, fDataBridge->posixClassInfo, sizeof(fClassInfo));
 		memcpy(fToLowerMap, fDataBridge->posixToLowerMap, sizeof(fToLowerMap));
 		memcpy(fToUpperMap, fDataBridge->posixToUpperMap, sizeof(fToUpperMap));
-
-		fDataBridge->setMbCurMax(1);
+		*fDataBridge->addrOfMbCurMax = 1;
 	}
 
 	return result;
