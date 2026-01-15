@@ -74,7 +74,14 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 
 	ucnv_reset(converter);
 
-	*fDataBridge->addrOfMbCurMax = ucnv_getMaxCharSize(converter);
+	short mbMax = ucnv_getMaxCharSize(converter);
+	if (mbMax > 1 && mbMax < 4) {
+		// ucnv_getMaxCharSize() returns the maximum size of an encoded UChar,
+		// which is 16-bit, and not a 32-bit Unicode codepoint. So, unless
+		// some exotic encoding is being used, 4 is the value we actually want.
+		mbMax = 4;
+	}
+	*fDataBridge->addrOfMbCurMax = mbMax;
 
 	char buffer[] = { 0, 0 };
 	for (int i = 0; i < 256; ++i) {
