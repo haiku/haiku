@@ -180,10 +180,10 @@ read_boot_code_data(const char* programPath)
 
 
 static bool
-is_bfs_partition(int fd)
+is_bfs_partition(int fd, off_t offset)
 {
 	unsigned char bootblock[512];
-	read_pos(fd, 512, &bootblock, sizeof(bootblock));
+	read_pos(fd, offset + 512, &bootblock, sizeof(bootblock));
 	uint32 magic1 = *(uint32*)(bootblock + 0x20);
 	uint32 magic2 = *(uint32*)(bootblock + 0x44);
 	uint32 magic3 = *(uint32*)(bootblock + 0x70);
@@ -200,10 +200,10 @@ is_bfs_partition(int fd)
 
 
 static bool
-is_bootcode_installed(int fd, const uint8* bootCode, int64* out_partition_offset)
+is_bootcode_installed(int fd, off_t offset, const uint8* bootCode, int64* out_partition_offset)
 {
 	unsigned char bootblock[kBootCodeSize];
-	read_pos(fd, 0, &bootblock, kBootCodeSize);
+	read_pos(fd, offset, &bootblock, kBootCodeSize);
 
 	// Check if first part of bootcode is identical up until the partition offset
 	if (memcmp(bootblock, bootCode, kPartitionOffsetOffset) != 0)
@@ -658,7 +658,7 @@ main(int argc, const char *const *argv)
 
 		#endif	// HAIKU_TARGET_PLATFORM_HAIKU
 
-		bool isBfs = is_bfs_partition(fd);
+		bool isBfs = is_bfs_partition(fd, startOffset);
 		if (!isBfs) {
 			fprintf(stderr, "Error: %s is not a BFS partition.\n", fileName);
 			exit(1);
@@ -670,7 +670,7 @@ main(int argc, const char *const *argv)
 			= B_HOST_TO_LENDIAN_INT32((uint32)(partitionOffset / 512));
 
 		int64 oldPartitionOffset = 0;
-		bool bootCodeAlreadyInstalled = is_bootcode_installed(fd, bootCodeData,
+		bool bootCodeAlreadyInstalled = is_bootcode_installed(fd, startOffset, bootCodeData,
 			&oldPartitionOffset);
 
 		if (bootCodeAlreadyInstalled && (partitionOffset == oldPartitionOffset * 512)) {
