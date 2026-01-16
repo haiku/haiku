@@ -47,9 +47,6 @@ LocaleCtypeDataBridge::LocaleCtypeDataBridge(bool isGlobal)
 void
 LocaleCtypeDataBridge::ApplyToCurrentThread()
 {
-	if (isGlobal)
-		abort();
-
 	ThreadLocale* threadLocale = GetCurrentThreadLocale();
 	threadLocale->ctype_b = *addrOfClassInfoTable;
 	threadLocale->ctype_tolower = *addrOfToLowerTable;
