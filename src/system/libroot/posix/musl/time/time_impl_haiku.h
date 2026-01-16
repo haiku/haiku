@@ -4,8 +4,12 @@ __tm_to_tzname(const struct tm *tm)
 	const void *p = tm->tm_zone;
 	if (p)
 		return p;
-	if (tm->tm_isdst >= 0)
-		return tzname[tm->tm_isdst != 0];
+	if (tm->tm_gmtoff == timezone)
+		return tzname[0];
+	if (tm->tm_gmtoff == daylight)
+		return tzname[1];
+	if (tm->tm_gmtoff == 0)
+		return "GMT";
 
 	return "";
 }
