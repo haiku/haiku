@@ -223,7 +223,7 @@ PrintCompact(dev_t device, FormatType format, bool strictPosix, bool all)
 		printf("\x1B[0m\n");
 		PrintType(info.fsh_name);
 		PrintBlocks(info.total_blocks, info.block_size, format);
-		PrintBlocks(usedBlocks, info.block_size, format);
+		PrintBlocks(info.free_blocks, info.block_size, format);
 
 		printf(" ");
 		PrintFlag(info.flags, B_FS_HAS_QUERY, 'Q', '-');
@@ -345,7 +345,7 @@ main(int argc, char **argv)
 				: (format == k512Block ? "512-blocks" : "1024-blocks"));
 	} else {
 		printf("\x1B[1mVolume\x1B[0m\n"
-			   " Type        Total      Free      Flags   Used%% Device\n"
+			   " Type        Total      Free      Flags   Used%%  Device\n"
 			   "----------- ---------- --------- ------- ------ -------------------\n");
 	}
 
