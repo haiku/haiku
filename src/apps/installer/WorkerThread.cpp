@@ -527,9 +527,11 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 
 	// check not installing on boot volume
 	if (strncmp(BOOT_PATH, targetDirectory.Path(), strlen(BOOT_PATH)) == 0) {
-		BAlert* alert = new BAlert("", B_TRANSLATE("Are you sure you want to "
-			"install onto the current boot disk? The Installer will have to "
-			"reboot your machine if you proceed."), B_TRANSLATE("OK"),
+		BString text(B_TRANSLATE("Are you sure you want to "
+		"install onto the current boot disk? The %appname% will have to "
+		"reboot your machine if you proceed."));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Installer"));
+		BAlert* alert = new BAlert("", text, B_TRANSLATE("OK"),
 			B_TRANSLATE("Cancel"), 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() != 0) {

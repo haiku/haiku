@@ -284,10 +284,10 @@ ShortcutsWindow::QuitRequested()
 				// up the file requester
 				if (fLastSaved.InitCheck() == B_OK) {
 					if (_SaveKeySet(fLastSaved) == false) {
-						BAlert* alert = new BAlert(ERROR,
-							B_TRANSLATE("Shortcuts was unable to save your "
-								"KeySet file!"),
-							B_TRANSLATE("Oh no"));
+						BString text(B_TRANSLATE("%prefname% was unable to save your "
+							"KeySet file!"));
+						text.ReplaceFirst("%prefname%", B_TRANSLATE_SYSTEM_NAME("Shortcuts"));
+						BAlert* alert = new BAlert(ERROR, text,B_TRANSLATE("Oh no"));
 						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						alert->Go();
 						result = true; // quit anyway
@@ -569,9 +569,10 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 					_GetSettingsFile(&eref);
 					if (ref == eref) fKeySetModified = false;
 				} else {
-					BAlert* alert = new BAlert(ERROR,
-						B_TRANSLATE("Shortcuts was unable to parse your "
-						"KeySet file!"), B_TRANSLATE("OK"));
+						BString text(B_TRANSLATE("%prefname% was unable to parse your "
+							"KeySet file!"));
+						text.ReplaceFirst("%prefname%", B_TRANSLATE_SYSTEM_NAME("Shortcuts"));
+						BAlert* alert = new BAlert(ERROR, text, B_TRANSLATE("OK"));
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go(NULL);
 					break;
@@ -623,9 +624,9 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 					// open the save requester...
 
 			if (showSaveError) {
-				BAlert* alert = new BAlert(ERROR,
-					B_TRANSLATE("Shortcuts wasn't able to save your keyset."),
-					B_TRANSLATE("OK"));
+				BString text(B_TRANSLATE("%prefname% wasn't able to save your keyset."));
+				text.ReplaceFirst("%prefname%", B_TRANSLATE_SYSTEM_NAME("Shortcuts"));
+				BAlert* alert = new BAlert(ERROR, text, B_TRANSLATE("OK"));
 				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 			}

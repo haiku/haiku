@@ -46,9 +46,13 @@ static const char* kSettingsFileName = "prefs_window_settings";
 
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:
-	BWindow(frame, B_TRANSLATE("Deskbar preferences"), B_TITLED_WINDOW,
+	BWindow(frame, "", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
+	BString title(B_TRANSLATE("%appname% preferences"));
+	title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Deskbar"));
+	SetTitle(title);
+
 	// Initial settings (used by revert button)
 	fSettings = *static_cast<TBarApp*>(be_app)->Settings();
 

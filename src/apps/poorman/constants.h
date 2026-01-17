@@ -44,8 +44,7 @@ const int32 MSG_LOG = 'logg';
 // PoorMan Window
 extern const char* STR_APP_SIG;
 extern const char* STR_APP_NAME;
-extern const char* STR_ERR_WEB_DIR; 	// Alert Box
-extern const char* STR_ERR_CANT_START;
+extern const char* STR_ERR_CANT_START;	// Alert Box
 extern const char* STR_DIR_CREATED;
 
 extern const char* STR_MNU_FILE;
@@ -68,7 +67,6 @@ extern const char* STR_TXT_VIEW;
 
 // ------------------------------------------------------
 // Preferences Window
-extern		 char* STR_WIN_NAME_PREF;
 extern const char* STR_SETTINGS_FILE_NAME;
 extern const char* STR_DEFAULT_WEB_DIRECTORY;
 
@@ -89,7 +87,6 @@ extern const char* STR_BBX_FILE_LOGGING;
 extern const char* STR_CBX_LOG_FILE;
 extern const char* STR_TXT_LOG_FILE_NAME;
 extern const char* STR_BTN_CREATE_LOG_FILE;
-extern const char* STR_FILEPANEL_CREATE_LOG_FILE;
 
 extern const char* STR_TAB_ADVANCED;
 extern const char* STR_BBX_CONNECTION;

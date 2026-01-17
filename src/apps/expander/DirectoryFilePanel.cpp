@@ -90,7 +90,10 @@ DirectoryFilePanel::Show()
 		fCurrentButton->SetTarget(Messenger());
 
 		SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Select"));
-		Window()->SetTitle(B_TRANSLATE("Expander: Choose destination"));
+
+		BString title(B_TRANSLATE("%appname%: Choose destination"));
+		title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Expander"));
+		Window()->SetTitle(title);
 
 		Window()->Unlock();
 

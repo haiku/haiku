@@ -377,7 +377,7 @@ TermWindow::_CanClose(int32 index)
 		// the terminal will be closed.
 		alertMessage = index == -1 || fSessions.CountItems() == 1
 			? B_TRANSLATE("The process \"%1\" is still running.\n"
-				"If you close the Terminal, the process will be killed.")
+				"If you close %appname%, the process will be killed.")
 			: B_TRANSLATE("The process \"%1\" is still running.\n"
 				"If you close the tab, the process will be killed.");
 	} else {
@@ -385,9 +385,9 @@ TermWindow::_CanClose(int32 index)
 		alertMessage = B_TRANSLATE(
 			"The following processes are still running:\n\n"
 			"\t%1\n\n"
-			"If you close the Terminal, the processes will be killed.");
+			"If you close %appname%, the processes will be killed.");
 	}
-
+	alertMessage.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Terminal"));
 	alertMessage.ReplaceFirst("%1", busyProcessNames);
 
 	BAlert* alert = new BAlert(B_TRANSLATE("Really close?"),
@@ -498,13 +498,16 @@ TermWindow::_SetupMenu()
 	if (fEncodingMenu != NULL)
 		MakeEncodingMenu(fEncodingMenu);
 
+	BString newTerminal(B_TRANSLATE("New %appname%"));
+	newTerminal.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Terminal"));
+
 	BLayoutBuilder::Menu<>(fMenuBar = new BMenuBar(Bounds(), "mbar"))
 		// Terminal
-		.AddMenu(B_TRANSLATE_COMMENT("Terminal", "The title for the main window"
-				" menubar entry related to terminal sessions"))
-			.AddItem(B_TRANSLATE("Switch Terminals"), MENU_SWITCH_TERM, B_TAB)
+		.AddMenu(B_TRANSLATE_SYSTEM_NAME("Terminal"))
+			.AddItem(B_TRANSLATE_COMMENT("Switch Terminals", "'Terminals' being this application's "
+				"name"), MENU_SWITCH_TERM, B_TAB)
 				.GetItem(fSwitchTerminalsMenuItem)
-			.AddItem(B_TRANSLATE("New Terminal"), MENU_NEW_TERM, 'N')
+			.AddItem(newTerminal, MENU_NEW_TERM, 'N')
 			.AddItem(B_TRANSLATE("New tab"), kNewTab, 'T')
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS), MENU_PAGE_SETUP)

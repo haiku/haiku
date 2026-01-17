@@ -199,8 +199,9 @@ CPUButton::MouseDown(BPoint point)
 	} else if ((B_SECONDARY_MOUSE_BUTTON & mouseButtons) != 0
 		&& fReplicantInDeskbar) {
 		BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Deskbar menu"));
-		menu->AddItem(new BMenuItem(B_TRANSLATE("About Pulse" B_UTF8_ELLIPSIS),
-			new BMessage(B_ABOUT_REQUESTED)));
+		BString menuLabel(B_TRANSLATE("About %appname%" B_UTF8_ELLIPSIS));
+		menuLabel.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Pulse"));
+		menu->AddItem(new BMenuItem(menuLabel, new BMessage(B_ABOUT_REQUESTED)));
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Remove replicant"),
 			new BMessage(kDeleteReplicant)));

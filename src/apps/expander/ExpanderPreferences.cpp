@@ -43,13 +43,17 @@ static const uint32 MSG_DESTSELECT	= 'mDes';
 
 ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 	:
-	BWindow(BRect(0, 0, 325, 305), B_TRANSLATE("Expander settings"),
+	BWindow(BRect(0, 0, 325, 305), "",
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fSettings(settings),
 	fUsePanel(NULL)
 {
+	BString title(B_TRANSLATE("%appname% settings"));
+	title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Expander"));
+	SetTitle(title);
+
 	const float kSpacing = be_control_look->DefaultItemSpacing();
 
 	BStringView* expansionLabel = new BStringView("stringViewExpansion",

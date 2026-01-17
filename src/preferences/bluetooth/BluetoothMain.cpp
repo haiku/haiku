@@ -94,7 +94,8 @@ BluetoothApplication::MessageReceived(BMessage* message)
 void
 BluetoothApplication::AboutRequested()
 {
-	BAboutWindow* about = new BAboutWindow("Bluetooth", BLUETOOTH_APP_SIGNATURE);
+	BAboutWindow* about = new BAboutWindow(B_TRANSLATE_SYSTEM_NAME("Bluetooth"),
+		BLUETOOTH_APP_SIGNATURE);
 	about->AddCopyright(2010, "Oliver Ruiz Dorantes");
 	about->AddText(B_TRANSLATE(
 		"With support of:\n"

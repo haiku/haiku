@@ -2004,9 +2004,10 @@ MainWindow::_WindowTitleForPackage(const PackageInfoRef& pkg)
 	if (version.IsSet())
 		versionString = version->ToString();
 
-	BString title = B_TRANSLATE("HaikuDepot - %PackageName% %PackageVersion%");
-	title.ReplaceAll("%PackageName%", pkg->Name());
-	title.ReplaceAll("%PackageVersion%", versionString);
+	BString title("%AppName% - %PackageName% %PackageVersion%");
+	title.ReplaceFirst("%AppName%", B_TRANSLATE_SYSTEM_NAME("HaikuDepot"));
+	title.ReplaceFirst("%PackageName%", pkg->Name());
+	title.ReplaceFirst("%PackageVersion%", versionString);
 
 	return title;
 }

@@ -256,8 +256,9 @@ ExpanderWindow::MessageReceived(BMessage* message)
 				BMessenger messenger(this);
 				fSourcePanel = new BFilePanel(B_OPEN_PANEL, &messenger, &srcRef,
 					B_FILE_NODE, false, NULL, new RuleRefFilter(fRules), true);
-				(fSourcePanel->Window())->SetTitle(
-					B_TRANSLATE("Expander: Open"));
+				BString title(B_TRANSLATE("%appname%: Open"));
+				title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Expander"));
+				(fSourcePanel->Window())->SetTitle(title);
 			} else
 				fSourcePanel->SetPanelDirectory(&srcRef);
 			fSourcePanel->Show();

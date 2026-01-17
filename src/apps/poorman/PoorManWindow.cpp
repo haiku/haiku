@@ -186,8 +186,7 @@ PoorManWindow::MessageReceived(BMessage* message)
 			fPrefWindow->MessageReceived(message);
 			break;
 		case MSG_MENU_EDIT_PREF:
-			fPrefWindow = new PoorManPreferencesWindow(fSetwindowFrame,
-				STR_WIN_NAME_PREF);
+			fPrefWindow = new PoorManPreferencesWindow(fSetwindowFrame);
 			fPrefWindow->Show();
 			break;
 		case MSG_MENU_CTRL_RUN:
@@ -535,11 +534,18 @@ PoorManWindow::SaveConsole(BMessage* message, bool selection)
 void
 PoorManWindow::DefaultSettings()
 {
-	BAlert* serverAlert = new BAlert(B_TRANSLATE("Error Server"),
+	BAlert* serverAlert = new BAlert(B_TRANSLATE("Error server"),
 		STR_ERR_CANT_START, B_TRANSLATE("OK"));
 	serverAlert->SetFlags(serverAlert->Flags() | B_CLOSE_ON_ESCAPE);
-	BAlert* dirAlert = new BAlert(B_TRANSLATE("Error Dir"),
-		STR_ERR_WEB_DIR, B_TRANSLATE("Cancel"), B_TRANSLATE("Select"),
+
+	BString text(B_TRANSLATE(
+	  "Please choose the folder to publish on the web.\n\n"
+	  "You can have %appname% create a default \"public_html\" "
+	  "in your home folder.\n"
+	  "Or you select one of your own folders instead."));
+	text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("PoorMan"));
+	BAlert* dirAlert = new BAlert(B_TRANSLATE("Error folder"),
+		text, B_TRANSLATE("Cancel"), B_TRANSLATE("Select"),
 		B_TRANSLATE("Create public_html"), B_WIDTH_AS_USUAL, B_OFFSET_SPACING);
 	dirAlert->SetShortcut(0, B_ESCAPE);
 	int32 buttonIndex = dirAlert->Go();
@@ -552,9 +558,7 @@ PoorManWindow::DefaultSettings()
 			break;
 
 		case 1:
-			fPrefWindow = new PoorManPreferencesWindow(
-					fSetwindowFrame,
-					STR_WIN_NAME_PREF);
+			fPrefWindow = new PoorManPreferencesWindow(fSetwindowFrame);
 			fPrefWindow->ShowWebDirFilePanel();
 			break;
 

@@ -219,8 +219,7 @@ PulseApp::MessageReceived(BMessage* message)
 void
 PulseApp::AboutRequested()
 {
-	BString name = B_TRANSLATE("Pulse");
-
+	BString name = B_TRANSLATE_SYSTEM_NAME("Pulse");
 	BString message = B_TRANSLATE(
 		"%s\n\nBy David Ramsey and Arve Hjønnevåg\n"
 		"Revised by Daniel Switkin\n");

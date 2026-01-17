@@ -301,21 +301,22 @@ BootManagerController::_CreateErrorEntryPage()
 		description << B_TRANSLATE_COMMENT("Partition table not compatible",
 				"Title") << "\n\n"
 			<< B_TRANSLATE("The partition table of the first hard disk is not "
-				"compatible with Boot Manager.\n"
-				"Boot Manager only works with IBM PC MBR partitions.");
+				"compatible.\n"
+				"%appname% only works with IBM PC MBR partitions.");
 	} else if (fCollectPartitionsStatus == B_PARTITION_TOO_SMALL) {
 		description << B_TRANSLATE_COMMENT("First partition starts too early",
 				"Title") << "\n\n"
 			<< B_TRANSLATE("The first partition on the disk starts too early "
 				"and does not leave enough space free for a boot menu.\n"
-				"Boot Manager needs 2 KiB available space before the first "
+				"%appname% needs 2 KiB available space before the first "
 				"partition.");
 	} else {
 		description << B_TRANSLATE_COMMENT("Error reading partition table",
 				"Title") << "\n\n"
-			<< B_TRANSLATE("Boot Manager is unable to read the partition "
+			<< B_TRANSLATE("%appname% is unable to read the partition "
 				"table!");
 	}
+	description.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("BootManager"));
 
 	return new DescriptionPage("errorEntry", description.String(), true);
 }

@@ -129,8 +129,9 @@ CheckManager::HandleProblems()
 	}
 
 	BString title(B_TRANSLATE("Available updates found"));
-	BString text(B_TRANSLATE("Click here to run SoftwareUpdater. Some updates "
+	BString text(B_TRANSLATE("Click here to run %appname%. Some updates "
 		"will require a problem solution to be selected."));
+	text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("SoftwareUpdater"));
 	_SendNotification(title, text);
 
 	throw BAbortedByUserException();

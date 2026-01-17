@@ -144,13 +144,14 @@ SVGExporter::SetOriginalEntry(const entry_ref* ref)
 bool
 SVGExporter::_DisplayWarning() const
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("warning"),
-							   B_TRANSLATE("Icon-O-Matic might not have "
+	BString text(B_TRANSLATE("%appname% might not have "
 							   "interpreted all data from the SVG "
 							   "when it was loaded. "
 							   "By overwriting the original "
 							   "file, this information would now "
-							   "be lost."),
+							   "be lost."));
+	text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Icon-O-Matic"));
+	BAlert* alert = new BAlert(B_TRANSLATE("warning"), text,
 							   B_TRANSLATE("Cancel"), 
 							   B_TRANSLATE("Overwrite"));
 	alert->SetShortcut(0, B_ESCAPE);

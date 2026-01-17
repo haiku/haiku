@@ -631,7 +631,7 @@ DownloadProgressView::DownloadFinished()
 	fStatusBar->SetBarColor(ui_color(B_SUCCESS_COLOR));
 
 	BNotification success(B_INFORMATION_NOTIFICATION);
-	success.SetGroup(B_TRANSLATE("WebPositive"));
+	success.SetGroup(B_TRANSLATE_SYSTEM_NAME("WebPositive"));
 	success.SetTitle(B_TRANSLATE("Download finished"));
 	success.SetContent(fPath.Leaf());
 	BEntry entry(fPath.Path());
@@ -654,7 +654,7 @@ DownloadProgressView::CancelDownload()
 		// Also cancel the download
 		fDownload->Cancel();
 		BNotification success(B_ERROR_NOTIFICATION);
-		success.SetGroup(B_TRANSLATE("WebPositive"));
+		success.SetGroup(B_TRANSLATE_SYSTEM_NAME("WebPositive"));
 		success.SetTitle(B_TRANSLATE("Download aborted"));
 		success.SetContent(fPath.Leaf());
 		// Don't make a click on the notification open the file: it is not

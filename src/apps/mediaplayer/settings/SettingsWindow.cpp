@@ -42,11 +42,14 @@ enum {
 
 SettingsWindow::SettingsWindow(BRect frame)
  	:
- 	BWindow(frame, B_TRANSLATE("MediaPlayer settings"), B_FLOATING_WINDOW_LOOK,
- 		B_FLOATING_ALL_WINDOW_FEEL,
+	BWindow(frame, "", B_FLOATING_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
  		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
  			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
+	BString title(B_TRANSLATE("%appname% settings"));
+	title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("MediaPlayer"));
+	SetTitle(title);
+
 	const float kSpacing = be_control_look->DefaultItemSpacing();
 
 	BBox* settingsBox = new BBox(B_PLAIN_BORDER, NULL);

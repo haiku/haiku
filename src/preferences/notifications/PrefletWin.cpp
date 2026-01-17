@@ -253,10 +253,13 @@ PrefletWin::_DefaultsPossible()
 void
 PrefletWin::_SendExampleNotification()
 {
+	BString title(B_TRANSLATE("%prefname% preflet sample"));
+	title.ReplaceFirst("%prefname%", B_TRANSLATE_SYSTEM_NAME("Notifications"));
+
 	BNotification notification(B_INFORMATION_NOTIFICATION);
 	notification.SetMessageID(kSampleMessageID);
-	notification.SetGroup(B_TRANSLATE("Notifications"));
-	notification.SetTitle(B_TRANSLATE("Notifications preflet sample"));
+	notification.SetGroup(B_TRANSLATE_SYSTEM_NAME("Notifications"));
+	notification.SetTitle(title);
 	notification.SetContent(B_TRANSLATE("This is a test notification message"));
 	notification.Send();
 }

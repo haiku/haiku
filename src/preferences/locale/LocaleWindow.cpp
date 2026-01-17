@@ -440,7 +440,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 			MutableLocaleRoster::Default()->SetFilesystemTranslationPreferred(
 				value == B_CONTROL_ON);
 
-			BAlert* alert = new BAlert(B_TRANSLATE("Locale"),
+			BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Locale"),
 				B_TRANSLATE("Deskbar and Tracker need to be restarted for this "
 				"change to take effect. Would you like to restart them now?"),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Restart"), NULL,

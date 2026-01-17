@@ -233,8 +233,10 @@ CodyCam::_SetUpNodes()
 	INFO("CodyCam acquiring VideoInput node\n");
 	status = fMediaRoster->GetVideoInput(&fProducerNode);
 	if (status != B_OK) {
-		fWindow->ErrorAlert(B_TRANSLATE("Cannot find a video source.\n"
-			"You need a webcam to use CodyCam."), status);
+		BString text(B_TRANSLATE("Cannot find a video source.\n"
+			"You need a webcam to use %appname%."));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("CodyCam"));
+		fWindow->ErrorAlert(text, status);
 		return status;
 	}
 

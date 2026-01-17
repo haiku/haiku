@@ -509,11 +509,13 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			BString status;
 			if (be_roster->IsRunning(kDeskbarSignature)) {
 				fBeginButton->SetLabel(B_TRANSLATE("Quit"));
-				status.SetToFormat(B_TRANSLATE("Installation "
+
+				BString text(B_TRANSLATE("Installation "
 					"completed. Boot sector has been written to '%s'. Press "
-					"'Quit' to leave the Installer or choose a new target "
-					"volume to perform another installation."),
-					dstItem ? dstItem->Name() : B_TRANSLATE_COMMENT("???",
+					"'Quit' to leave the %appname% or choose a new target "
+					"volume to perform another installation."));
+				text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Installer"));
+				status.SetToFormat(text, dstItem ? dstItem->Name() : B_TRANSLATE_COMMENT("???",
 						"Unknown partition name"));
 			} else {
 				fBeginButton->SetLabel(B_TRANSLATE("Restart"));

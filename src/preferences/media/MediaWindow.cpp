@@ -308,9 +308,10 @@ bool
 MediaWindow::QuitRequested()
 {
 	if (fRestartThread > 0) {
-		BString text(B_TRANSLATE("Quitting Media now will stop the "
+		BString text(B_TRANSLATE("Quitting %prefname% now will stop the "
 			"restarting of the media services. Flaky or unavailable media "
 			"functionality is the likely result."));
+		text.ReplaceFirst("%prefname%", B_TRANSLATE_SYSTEM_NAME("Media"));
 
 		fRestartAlert = new BAlert(B_TRANSLATE("Warning!"), text,
 			B_TRANSLATE("Quit anyway"), NULL, NULL,

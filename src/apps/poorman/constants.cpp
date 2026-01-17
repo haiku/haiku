@@ -15,12 +15,6 @@ const char* STR_APP_SIG
 	= "application/x-vnd.Haiku-PoorMan";
 const char* STR_APP_NAME
 	= B_TRANSLATE_SYSTEM_NAME("PoorMan");
-const char* STR_ERR_WEB_DIR
-	= B_TRANSLATE(
-	  "Please choose the folder to publish on the web.\n\n"
-	  "You can have PoorMan create a default \"public_html\" "
-	  "in your home folder.\n"
-	  "Or you select one of your own folders instead.");
 const char* STR_ERR_CANT_START
 	= B_TRANSLATE(
 	  "Cannot start the server");
@@ -66,9 +60,6 @@ const char* STR_TXT_VIEW
 
 // ------------------------------------------------------
 // Preferences Window
-char* STR_WIN_NAME_PREF
-	= (char*)B_TRANSLATE("PoorMan settings");
-
 const char* STR_SETTINGS_FILE_NAME
 	= "PoorMan settings";
 const char* STR_DEFAULT_WEB_DIRECTORY
@@ -106,8 +97,6 @@ const char* STR_TXT_LOG_FILE_NAME
 	= B_TRANSLATE("Log file name:");
 const char* STR_BTN_CREATE_LOG_FILE
 	= B_TRANSLATE("Create log file");
-const char* STR_FILEPANEL_CREATE_LOG_FILE
-	= B_TRANSLATE("Create PoorMan log");
 
 const char* STR_TAB_ADVANCED
 	= B_TRANSLATE("Advanced");

@@ -33,12 +33,12 @@
 #define PLACEHOLDER_TEXT "..."
 
 #define INTRODUCTION_TEXT_LATEST \
-	"HaikuDepot communicates with a " \
+	"%Appname% communicates with a " \
 	"server component called HaikuDepotServer. These are the latest " \
 	"usage conditions for use of the HaikuDepotServer service."
 
 #define INTRODUCTION_TEXT_USER \
-	"HaikuDepot communicates with a " \
+	"%Appname% communicates with a " \
 	"server component called HaikuDepotServer. These are the usage " \
 	"conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% "\
 	"in relation to the use of the HaikuDepotServer service."
@@ -436,7 +436,11 @@ UserUsageConditionsWindow::_IntroductionTextForMode(UserUsageConditionsSelection
 {
 	switch (mode) {
 		case LATEST:
-			return B_TRANSLATE(INTRODUCTION_TEXT_LATEST);
+		{
+			BString text(B_TRANSLATE(INTRODUCTION_TEXT_LATEST));
+			text.ReplaceFirst("%Appname%", B_TRANSLATE_SYSTEM_NAME("HaikuDepot"));
+			return text;
+		}
 		case USER:
 		{
 			BString nicknamePresentation = PLACEHOLDER_TEXT;
@@ -453,6 +457,7 @@ UserUsageConditionsWindow::_IntroductionTextForMode(UserUsageConditionsSelection
 			}
 
 			BString text = B_TRANSLATE(INTRODUCTION_TEXT_USER);
+			text.ReplaceFirst("%Appname%", B_TRANSLATE_SYSTEM_NAME("HaikuDepot"));
 			text.ReplaceAll("%Nickname%", nicknamePresentation);
 			text.ReplaceAll("%AgreedToTimestamp%", agreedToTimestampPresentation);
 			return text;

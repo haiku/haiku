@@ -88,10 +88,11 @@ BrowserApp::BrowserApp()
 	get_cpuid(&info, 1, 0);
 
 	if ((info.eax_1.features & (1 << 26)) == 0) {
-		BAlert alert(B_TRANSLATE("No SSE2 support"), B_TRANSLATE("Your CPU is "
+		BString text(B_TRANSLATE("Your CPU is "
 			"too old and does not support the SSE2 extensions, without which "
-			"WebPositive cannot run. We recommend installing NetSurf instead."),
-			B_TRANSLATE("Darn!"));
+			"%appname% cannot run. We recommend installing NetSurf instead."));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("WebPositive"));
+		BAlert alert(B_TRANSLATE("No SSE2 support"), text, B_TRANSLATE("Darn!"));
 		alert.Go();
 		exit(-1);
 	}
@@ -388,10 +389,11 @@ bool
 BrowserApp::QuitRequested()
 {
 	if (fDownloadWindow->DownloadsInProgress()) {
-		BAlert* alert = new BAlert(B_TRANSLATE("Downloads in progress"),
-			B_TRANSLATE("There are still downloads in progress, do you really "
-			"want to quit WebPositive now?"), B_TRANSLATE("Quit"),
-			B_TRANSLATE("Continue downloads"));
+		BString text(B_TRANSLATE("There are still downloads in progress, do you really "
+			"want to quit %appname% now?"));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("WebPositive"));
+		BAlert* alert = new BAlert(B_TRANSLATE("Downloads in progress"), text,
+			B_TRANSLATE("Quit"), B_TRANSLATE("Continue downloads"));
 		int32 choice = alert->Go();
 		if (choice == 1) {
 			if (fWindowCount == 0) {

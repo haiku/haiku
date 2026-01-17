@@ -21,7 +21,7 @@
 #define B_TRANSLATION_CONTEXT "Locale Preflet"
 
 
-const char* kAppName = B_TRANSLATE("Locale");
+const char* kAppName = B_TRANSLATE_SYSTEM_NAME("Locale");
 const char* kSignature = "application/x-vnd.Haiku-Locale";
 
 

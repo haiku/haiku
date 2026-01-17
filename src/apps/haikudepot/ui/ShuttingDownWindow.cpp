@@ -28,8 +28,10 @@ ShuttingDownWindow::ShuttingDownWindow(BWindow* parent)
 	textView->AdoptSystemColors();
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);
-	textView->SetText(B_TRANSLATE("HaikuDepot is stopping or completing "
+	BString text(B_TRANSLATE("%appname% is stopping or completing "
 		"running operations before quitting."));
+	text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("HaikuDepot"));
+	textView->SetText(text);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,

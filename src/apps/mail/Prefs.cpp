@@ -93,8 +93,7 @@ TPrefsWindow::TPrefsWindow(BPoint leftTop, BFont* font, int32* level,
 	bool* warnUnencodable, bool* spellCheckStartOn, bool* autoMarkRead,
 	uint8* buttonBar)
 	:
-	BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + 100, leftTop.y + 100),
-		B_TRANSLATE("Mail settings"),
+	BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + 100, leftTop.y + 100), "",
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 
@@ -136,6 +135,10 @@ TPrefsWindow::TPrefsWindow(BPoint leftTop, BFont* font, int32* level,
 	fNewAutoMarkRead(autoMarkRead),
 	fAutoMarkRead(*autoMarkRead)
 {
+	BString title(B_TRANSLATE("%appname% settings"));
+	title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Mail"));
+	SetTitle(title);
+
 	strcpy(fSignature, *fNewSignature);
 
 	BMenuField* menu;

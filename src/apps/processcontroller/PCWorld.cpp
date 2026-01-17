@@ -72,9 +72,10 @@ PCApplication::ReadyToRun()
 	BDeskbar deskbar;
 	if (!deskbar.HasItem(kDeskbarItemName)) {
 		// We're not yet installed in the Deskbar, ask if we should
-		BAlert* alert = new BAlert(B_TRANSLATE("Info"),
-			B_TRANSLATE("You can run ProcessController in a window"
-			" or install it in the Deskbar."), B_TRANSLATE("Run in window"),
+		BString text(B_TRANSLATE("You can run %appname% in a window"
+			" or install it in the Deskbar."));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("ProcessController"));
+		BAlert* alert = new BAlert(B_TRANSLATE("Info"), text, B_TRANSLATE("Run in window"),
 			B_TRANSLATE("Install in Deskbar"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
@@ -86,8 +87,9 @@ PCApplication::ReadyToRun()
 			return;
 		}
 	} else {
-		BAlert* alert = new BAlert(B_TRANSLATE("Info"),
-			B_TRANSLATE("ProcessController is already installed in Deskbar."),
+		BString text(B_TRANSLATE("%appname% is already installed in Deskbar."));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("ProcessController"));
+		BAlert* alert = new BAlert(B_TRANSLATE("Info"), text,
 			B_TRANSLATE("OK"), NULL,
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

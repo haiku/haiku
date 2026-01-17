@@ -75,7 +75,7 @@ NormalPulseView::NormalPulseView(BRect rect)
 			CPUBUTTON_MTOP + ITEM_OFFSET * x + CPUBUTTON_HEIGHT + 7);
 		char temp[4];
 		snprintf(temp, sizeof(temp), "%hhd", int8(x + 1));
-		fCpuButtons[x] = new CPUButton(r, B_TRANSLATE("Pulse"), temp, NULL);
+		fCpuButtons[x] = new CPUButton(r, B_TRANSLATE_SYSTEM_NAME("Pulse"), temp, NULL);
 		AddChild(fCpuButtons[x]);
 	}
 

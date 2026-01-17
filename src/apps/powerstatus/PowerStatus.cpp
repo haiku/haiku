@@ -106,9 +106,10 @@ PowerStatus::ReadyToRun()
 
 	if (ACPIDriverInterface().Connect() != B_OK) {
 		if (APMDriverInterface().Connect() != B_OK) {
-			BAlert* alert = new BAlert("",
-				B_TRANSLATE("No supported battery detected. PowerStatus "
-				"cannot be used on your system."), B_TRANSLATE("Too bad!"),
+			BString text(B_TRANSLATE("No supported battery detected. %appname% "
+				"cannot be used on your system."));
+			text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("PowerStatus"));
+			BAlert* alert = new BAlert("", text, B_TRANSLATE("Too bad!"),
 				NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			if (!fAutoInstallInDeskbar)
 				alert->Go();
@@ -131,9 +132,10 @@ PowerStatus::ReadyToRun()
 	}
 
 	if (isDeskbarRunning && !isInstalled) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("You can run PowerStatus in a window "
-			"or install it in the Deskbar."), B_TRANSLATE("Run in window"),
+		BString text(B_TRANSLATE("You can run %appname% in a window "
+			"or install it in the Deskbar."));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("PowerStatus"));
+		BAlert* alert = new BAlert("", text, B_TRANSLATE("Run in window"),
 			B_TRANSLATE("Install in Deskbar"), NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
 

@@ -456,11 +456,12 @@ void
 App::_CheckPackageDaemonRuns()
 {
 	while (!be_roster->IsRunning(kPackageDaemonSignature)) {
-		BAlert* alert = new BAlert(B_TRANSLATE("Start package daemon"),
-			B_TRANSLATE("HaikuDepot needs the package daemon to function, "
+		BString text(B_TRANSLATE("%appname% needs the package daemon to function, "
 						"and it appears to be not running.\n"
-						"Would you like to start it now?"),
-			B_TRANSLATE("No, quit HaikuDepot"), B_TRANSLATE("Start package daemon"), NULL,
+						"Would you like to start it now?"));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("HaikuDepot"));
+		BAlert* alert = new BAlert(B_TRANSLATE("Start package daemon"), text,
+			B_TRANSLATE("No, quit"), B_TRANSLATE("Start package daemon"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 
@@ -482,7 +483,7 @@ App::_LaunchPackageDaemon()
 		errorMessage.ReplaceAll("%Error%", strerror(ret));
 
 		BAlert* alert = new BAlert(B_TRANSLATE("Package daemon problem"), errorMessage,
-			B_TRANSLATE("Quit HaikuDepot"), B_TRANSLATE("Try again"), NULL, B_WIDTH_AS_USUAL,
+			B_TRANSLATE("Quit"), B_TRANSLATE("Try again"), NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 

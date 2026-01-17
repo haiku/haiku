@@ -701,7 +701,7 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 		break;
 
 	case B_ABOUT_REQUESTED: {
-		BAboutWindow* wind = new BAboutWindow("Mandelbrot",
+		BAboutWindow* wind = new BAboutWindow(B_TRANSLATE_SYSTEM_NAME("Mandelbrot"),
 			"application/x-vnd.Haiku-Mandelbrot");
 
 		const char* authors[] = {

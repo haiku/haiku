@@ -87,10 +87,11 @@ NetworkStatus::ArgvReceived(int32 argc, char** argv)
 
 	if (strcmp(argv[1], "--help") == 0
 		|| strcmp(argv[1], "-h") == 0) {
-		const char* str = B_TRANSLATE("NetworkStatus options:\n"
+		BString str = B_TRANSLATE("%appname% options:\n"
 			"\t--deskbar\tautomatically add replicant to Deskbar\n"
 			"\t--help\t\tprint this info and exit");
-		puts(str);
+		str.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("NetworkStatus"));
+		puts(str.String());
 		fQuitImmediately = true;
 		return;
 	}

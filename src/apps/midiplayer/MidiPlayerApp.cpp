@@ -58,7 +58,7 @@ MidiPlayerApp::ReadyToRun()
 void
 MidiPlayerApp::AboutRequested()
 {
-	BAboutWindow* window = new BAboutWindow("MidiPlayer",
+	BAboutWindow* window = new BAboutWindow(B_TRANSLATE_SYSTEM_NAME("MidiPlayer"),
 		MIDI_PLAYER_SIGNATURE);
 
 	const char* extraCopyrights[] = {

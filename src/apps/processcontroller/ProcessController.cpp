@@ -915,10 +915,9 @@ thread_popup(void *arg)
 		addtopbottom(new BSeparatorItem ());
 	}
 
-
-	item = new IconMenuItem(gPCView->fProcessControllerIcon,
-	B_TRANSLATE("About ProcessController" B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED));
+	BString text(B_TRANSLATE("About %appname%" B_UTF8_ELLIPSIS));
+	text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("ProcessController"));
+	item = new IconMenuItem(gPCView->fProcessControllerIcon, text, new BMessage(B_ABOUT_REQUESTED));
 	item->SetTarget(gPCView);
 	addtopbottom(item);
 

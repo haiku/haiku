@@ -71,8 +71,9 @@ void PulseView::Init() {
 	mode2 = new BMenuItem("", NULL, 0, 0);
 	preferences = new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(PV_PREFERENCES), 0, 0);
-	about = new BMenuItem(B_TRANSLATE("About Pulse" B_UTF8_ELLIPSIS),
-		new BMessage(PV_ABOUT), 0, 0);
+	BString menuLabel(B_TRANSLATE("About %appname%" B_UTF8_ELLIPSIS));
+	menuLabel.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Pulse"));
+	about = new BMenuItem(menuLabel, new BMessage(PV_ABOUT), 0, 0);
 
 	popupmenu->AddItem(mode1);
 	popupmenu->AddItem(mode2);

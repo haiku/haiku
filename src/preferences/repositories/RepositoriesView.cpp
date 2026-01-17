@@ -592,9 +592,10 @@ RepositoriesView::_UpdateListFromRoster()
 	BPackageKit::BPackageRoster pRoster;
 	status_t result = pRoster.GetRepositoryNames(repositoryNames);
 	if (result != B_OK) {
-		(new BAlert("error",
-			B_TRANSLATE_COMMENT("Repositories could not retrieve the names of "
-				"the currently enabled repositories.", "Alert error message"),
+		BString text(B_TRANSLATE_COMMENT("%prefname% could not retrieve the names of "
+			"the currently enabled repositories.", "Alert error message"));
+		text.ReplaceFirst("%prefname%", B_TRANSLATE_SYSTEM_NAME("Repositories"));
+		(new BAlert("error", text,
 			kOKLabel, NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 		return;
 	}

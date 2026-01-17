@@ -1702,8 +1702,9 @@ TMailWindow::MessageReceived(BMessage* msg)
 				snooze (1500000);
 			if (!gDictCount) {
 				beep();
-				BAlert* alert = new BAlert("",
-					B_TRANSLATE("Mail couldn't find its dictionary."),
+				BString text(B_TRANSLATE("%appname% couldn't find its dictionary."));
+				text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Mail"));
+				BAlert* alert = new BAlert("", text,
 					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 					B_OFFSET_SPACING, B_STOP_ALERT);
 				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

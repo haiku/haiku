@@ -125,8 +125,9 @@ TermApp::ReadyToRun()
 
 	// failed spawn, print stdout and open alert panel
 	if (status < B_OK) {
-		BAlert* alert = new BAlert("alert",
-			B_TRANSLATE("Terminal couldn't start the shell. Sorry."),
+		BString text(B_TRANSLATE("%appname% couldn't start the shell. Sorry."));
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Terminal"));
+		BAlert* alert = new BAlert("alert", text,
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_FROM_LABEL,
 			B_INFO_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

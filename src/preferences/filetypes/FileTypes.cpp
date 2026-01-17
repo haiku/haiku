@@ -393,7 +393,7 @@ FileTypes::MessageReceived(BMessage* message)
 			if (message->FindMessenger("target", &target) != B_OK)
 				target = be_app_messenger;
 
-			BString title = B_TRANSLATE("FileTypes");
+			BString title = B_TRANSLATE_SYSTEM_NAME("FileTypes");
 			if (subTitle != NULL && subTitle[0]) {
 				title.Append(": ");
 				title.Append(subTitle);

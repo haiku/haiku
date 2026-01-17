@@ -24,12 +24,16 @@
 #define B_TRANSLATION_CONTEXT "PoorMan"
 
 
-PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
-	: BWindow(frame, name, B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame)
+	: BWindow(frame, "", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 		| B_CLOSE_ON_ESCAPE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fWebDirFilePanel(NULL),
 	fLogFilePanel(NULL)
 {
+	BString title(B_TRANSLATE("%appname% settings"));
+	title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("PoorMan"));
+	SetTitle(title);
+
 	fCancelButton = new BButton("Cancel Button", B_TRANSLATE("Cancel"),
 		new BMessage(MSG_PREF_BTN_CANCEL));
 	fDoneButton = new BButton("Done Button", B_TRANSLATE("Done"),
@@ -75,8 +79,9 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 		B_FILE_NODE, false, &message);
 	fLogFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Create"));
 	change_title = fLogFilePanel->Window();
-	change_title->SetTitle(STR_FILEPANEL_CREATE_LOG_FILE);
-
+	title = B_TRANSLATE("Create %appname% log");
+	title.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("PoorMan"));
+	change_title->SetTitle(title);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)

@@ -24,7 +24,7 @@
 
 class PoorManPreferencesWindow: public BWindow {
 public:
-							PoorManPreferencesWindow(BRect frame, char* name);
+							PoorManPreferencesWindow(BRect frame);
 							~PoorManPreferencesWindow();
 
 	virtual	void			MessageReceived(BMessage* message);

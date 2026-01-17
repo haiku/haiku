@@ -12,6 +12,7 @@
 #include "HApp.h"
 #include "HWindow.h"
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Catalog.h>
 #include <Locale.h>
@@ -39,16 +40,19 @@ HApp::~HApp()
 void
 HApp::AboutRequested()
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("About Sounds"),
-		B_TRANSLATE("Sounds\n"
-			"  Brought to you by :\n"
-			"\tOliver Ruiz Dorantes\n"
-			"\tJérôme DUVAL.\n"
-			"  Original work from Atsushi Takamatsu.\n"
-			"Copyright ©2003-2006 Haiku"),
-		B_TRANSLATE("OK"));
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go();
+	BAboutWindow* window = new BAboutWindow(B_TRANSLATE_SYSTEM_NAME("Sounds"),
+		"application/x-vnd.Haiku-Sounds");
+
+	const char* authors[] = {
+		"Atsushi Takamatsu",
+		"Oliver Ruiz Dorantes",
+		"Jérôme DUVAL",
+		NULL
+	};
+
+	window->AddCopyright(2003, "Haiku, Inc.");
+	window->AddAuthors(authors);
+	window->Show();
 }
 
 

@@ -145,10 +145,10 @@ Pairs::_GetVectorIcons()
 	if (fIconMap.size() < kMinIconCount) {
 		char buffer[512];
 		snprintf(buffer, sizeof(buffer),
-			B_TRANSLATE_COMMENT("Pairs did not find enough vector icons "
+			B_TRANSLATE_COMMENT("%s did not find enough vector icons "
 			"to start; it needs at least %zu, found %zu.\n",
-			"Don't translate \"%zu\", but make sure to keep them."),
-			kMinIconCount, fIconMap.size());
+			"Don't translate \"%s\" and \"%zu\", but make sure to keep them."),
+			B_TRANSLATE_SYSTEM_NAME("Pairs"), kMinIconCount, fIconMap.size());
 		BString messageString(buffer);
 		BAlert* alert = new BAlert("Fatal", messageString.String(),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_FROM_WIDEST,

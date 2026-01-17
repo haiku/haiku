@@ -285,8 +285,9 @@ B_TRANSLATE_MARK_VOID("About this system")
 	AddItem(mountMenu);
 #endif
 
-	item = new BMenuItem(B_TRANSLATE("Deskbar preferences" B_UTF8_ELLIPSIS),
-		new BMessage(kConfigShow));
+	BString menuLabel(B_TRANSLATE("%appname% preferences" B_UTF8_ELLIPSIS));
+	menuLabel.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("Deskbar"));
+	item = new BMenuItem(menuLabel, new BMessage(kConfigShow));
 	item->SetTarget(be_app);
 	AddItem(item);
 
