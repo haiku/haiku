@@ -230,7 +230,7 @@ draw_menu(Menu *menu)
 	print_right(console_height() - 1, get_haiku_revision());
 
 	console_set_color(kCopyrightColor, kBackgroundColor);
-	print_centered(4, "Copyright 2004-2025 Haiku, Inc.");
+	print_centered(4, "Copyright 2004-2026 Haiku, Inc.");
 
 	if (menu->Title()) {
 		console_set_cursor(kOffsetX, kFirstLine - 2);
