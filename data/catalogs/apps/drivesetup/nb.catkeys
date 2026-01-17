@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	2521240656
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
@@ -9,7 +9,6 @@ Initialize	MainWindow		Initialiser
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen \"%s\" vil bli uopprettelig tapt hvis du gjør det!
 PGP encrypted	Encryption utils		PGP-kryptert
 Delete partition	MainWindow		Slett partisjon
-Error: 	MainWindow	in any error alert	Feil: 
 Removable	PartitionList		Fjernbar
 Block size	PartitionList		Blokkstørrelse
 The panel experienced a problem!	MainWindow		Panelet opplevde et problem!

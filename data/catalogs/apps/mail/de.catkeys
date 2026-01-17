@@ -94,7 +94,7 @@ Find again	Mail		Weitersuchen
 Size:	Mail		Größe:
 To:	Mail		An:
 Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu verschieben, muss Tracker laufen.
-The mail_daemon could not be started:\n\t	Mail		Der Maildienst (mail_daemon) konnte nicht gestartet werden:\n\t
+The mail_daemon could not be started:\n\t	Mail		Der E-Mail-Dienst (mail_daemon) konnte nicht gestartet werden:\n\t
 <no account found>	Mail		<kein Konto gefunden>
 Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
 helpful message	Mail		Tipp
@@ -107,7 +107,7 @@ Start now	Mail		Jetzt starten
 (Name unavailable)	Mail		(Name nicht verfügbar)
 Move to trash	Mail		In den Papierkorb verschieben
 <none>	Mail		<kein>
-Mail settings	Mail		Mail Eigenschaften
+Mail settings	Mail		E-Mail-Einstellungen
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Rechtschreibung prüfen
 Status:	Mail		Status:
@@ -127,7 +127,7 @@ Forward	Mail		Weiterleiten
 Open attachment	Mail		Anhang öffnen
 mail	B_USER_DIRECTORY/mail		Mail
 Save this message as a draft before closing?	Mail		Nachricht vor dem Schließen als Entwurf speichern?
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht wird versendet, sobald der Dienst wieder läuft.
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der E-Mail-Dienst (mail_daemon) läuft nicht. Die Nachricht wird versendet, sobald der Dienst wieder läuft.
 None	Mail		Keine
 Resend	Mail		Nochmals senden
 Hide	Mail		Ausblenden

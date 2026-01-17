@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	1083453332
+1	belarusian	x-vnd.Haiku-DriveSetup	907523459
 Could not unmount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
 Mount all	MainWindow		Зманатаваць усё
 Disk	MainWindow		Дыск
@@ -7,7 +7,6 @@ Device	PartitionList		Прылада
 Could not change the parameters of the selected partition.	MainWindow		Немагчыма змяніць параметры абранага падзела.
 Initialize	MainWindow		Ініцыялізіраваць
 Delete partition	MainWindow		Выдаліць падзел
-Error: 	MainWindow	in any error alert	Памылка: 
 The panel experienced a problem!	MainWindow		З панэллю ёсьць пэўная праблема!
 Device	DiskView		Прылада
 Unmount	MainWindow		Размантаваць

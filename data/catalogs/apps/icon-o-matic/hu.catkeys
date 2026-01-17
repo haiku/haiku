@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	483948406
+1	hungarian	x-vnd.haiku-icon_o_matic	2635956885
 None	Icon-O-Matic-Properties		Nincs
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Útvonal megtisztítása
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -49,10 +49,12 @@ Opacity	Icon-O-Matic-PropertyNames		Átlátszóság
 OK	Icon-O-Matic-ColorPicker		Rendben
 Error: 	Icon-O-Matic-Main		Hiba:
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		{0, plural, one{Átalakítás} other{Átalakítás}} visszaállítása
+SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey will be exported as linear approximations and may look different in other viewers.	Icon-O-Matic-SVGExport		Az SVG nem támogat néhány átmenetet (kúp, gyémánt, xy, sqrt_xy).\n\nLineáris közelítésként exportálják őket, és más megjelenítőkben másképp nézhetnek ki.
 Assign style	Icon-O-Matic-AssignStyleCmd		Stílus társítása
 Saving your document failed!	Icon-O-Matic-Exporter		A dokumentum mentése sikertelen volt!
 Snap to grid	Icon-O-Matic-Menu-Settings		Rácshoz illesztés
 Opening the document failed!	Icon-O-Matic-Main		Nem sikerült megnyitni a dokumentumot!
+SVG export	Icon-O-Matic-SVGExport		SVG export
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		{0, plural, one{Stílus} other{Stílus}} eltávolítása
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Egy vagy több útvonal is túl sok csúcsot tartalmaz. A HVIF formátum maximum 255-öt támogat útvonalanként.
 Add with path & style	Icon-O-Matic-ShapesList		Hozzáadás útvonallal és stílussal együtt
@@ -70,6 +72,7 @@ Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		{0, plural,
 Remove	Icon-O-Matic-PathManipulator		Eltávolítás
 Duplicate	Icon-O-Matic-ShapesList		Megkettőzés
 Alpha	Icon-O-Matic-PropertyNames		Alfa
+OK	Icon-O-Matic-SVGExport		Rendben
 Contour	Transformation		Körvonal
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		{0, plural, one{Átalakítás} other{Átalakítás}} hozzáadása
 Insert vertex	Icon-O-Matic-InsertPointCmd		Csúcs hozzáadása

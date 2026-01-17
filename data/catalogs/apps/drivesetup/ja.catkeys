@@ -1,15 +1,17 @@
-1	japanese	x-vnd.Haiku-DriveSetup	2521240656
+1	japanese	x-vnd.Haiku-DriveSetup	4193609455
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できません。
+Register disk image…	MainWindow		ディスクイメージを登録…
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
+Disk image has been added.	MainWindow		ディスクイメージが追加されました。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		変更をディスクに保存しますか?\n\nその場合、選択されたパーティションのすべてのデータが失われますので、ご注意ください。
 Device	PartitionList		デバイス
 Could not change the parameters of the selected partition.	MainWindow		選択されたパーティションのパラメーター変更ができません。
 Initialize	MainWindow		初期化
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		本当に変更をディスクに保存しますか?\n\nその場合、選択されたパーティション\"%s\"のすべてのデータが回復不能までに破壊されます!
 PGP encrypted	Encryption utils		PGP で暗号化された
-Delete partition	MainWindow		パーティションの削除
-Error: 	MainWindow	in any error alert	エラー : 
+Delete partition	MainWindow		パーティションを削除
+Write	MainWindow		書き込む
 Removable	PartitionList		リムーバブル
 Block size	PartitionList		ブロックサイズ
 The panel experienced a problem!	MainWindow		パネルに問題が発生しました。
@@ -20,27 +22,33 @@ Unmount	MainWindow		マウント解除
 Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました。\n
 Partition size	CreateParametersPanel		パーティションサイズ
 Validation of the given parameters failed.	MainWindow		指定されたパラメーターの検証に失敗しました。
+Cannot init target partition.	MainWindow		目的のパーティションを初期化できません。
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		マウント先
 Disk system %s not found!	MainWindow		ディスクシステム%sが見つかりません!
 Create…	MainWindow		新規作成...
+Failed to register file disk device: %s	MainWindow		次のファイルディスクデバイスの登録に失敗しました: %s
 Write changes	MainWindow		変更を書き込む
 Validation of the given creation parameters failed.	MainWindow		指定された作成パラメーターの検証に失敗しました。
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		パーティション %s の初期化に失敗しました (ディスクに何も書き込まれていません)。
 Eject	MainWindow		取り出す
+There is not enough free space on target device.	MainWindow		目的のデバイスに充分な空きスペースがありません。
 Read only	PartitionList		読み取り専用
 Surface test (not implemented)	MainWindow		表面チェック (実装されていません)
+Creating disk image	MainWindow		ディスクイメージの作成
 The panel could not return successfully.	MainWindow		パネルは正しく返しません。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		パーティションのパラメーターの変更に失敗しました。ディスクは変更されていません。
 Partition %ld	DiskView		パーティション %ld
 There's no space on the partition where a child partition could be created.	MainWindow		子パーティションを作成するスペースがありません。
+%s does not refer to a file disk device.	MainWindow		%s は、ファイルディスクデバイスを参照できません。
 No disk devices have been recognized.	DiskView		ディスクデバイスが検出されていません。
 Attributes	PartitionList		属性
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
 Change parameters…	MainWindow		パラメーターの変更...
 Format	InitializeParametersPanel		フォーマット
 Could not unmount partition	MainWindow		パーティションをマウント解除できません。
+Target partition is read only.	MainWindow		目的のパーティションは読み取り専用です。
 Create	CreateParametersPanel		新規作成
 File system	PartitionList		ファイルシステム
 Unknown (%s)	PartitionList		不明なパーティション (%s)
@@ -57,10 +65,13 @@ Failed to create the partition. No changes have been written to disk.	MainWindow
 MIMEs	PartitionList		MIME
 Shared	PartitionList		共有
 BitLocker encrypted	Encryption utils		BitLocker で暗号化された
+Cannot init target volume.	MainWindow		対象のボリュームを初期化できません。
 You need to select a partition entry from the list.	MainWindow		一覧からパーティションを一つ選択してください。
 Offset: %s	Support		オフセット: %s
 SafeBoot encrypted	Encryption utils		SafeBoot で暗号化された
 Volume name	PartitionList		ボリューム名
+Disk image	MainWindow		ディスクイメージ
+Save image…	MainWindow		イメージを保存…
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスクのすべてのデータが失われますので、ご注意ください。
 Change	ChangeParametersPanel		変更
 Partition name:	ChangeParametersPanel		パーティション名 :
@@ -69,6 +80,10 @@ Empty space	PartitionList		空のスペース
 Cancel	AbstractParametersPanel		中止
 Format	MainWindow		フォーマット
 OK	MainWindow		OK
+Cannot init target file.	MainWindow		目的のファイルを初期化できません。
+Disk image successfully created.	MainWindow		ディスクイメージが正常に作成されました。
+Unregister disk image	MainWindow		ディスクイメージを登録解除
+The target partition is smaller than the image file.	MainWindow		目的のパーティションはイメージサイズより小さい。
 Empty space	DiskView		空のスペース
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できません。
 Open with DiskProbe	MainWindow		DiskProbe で開く
@@ -76,9 +91,11 @@ Are you sure you want to initialize the selected disk? All data will be lost. Yo
 There was an error preparing the disk for modifications.	MainWindow		ディスクの変更のための準備をする際、エラーが発生しました。
 The disk has been successfully initialized.\n	MainWindow		ディスクは正常に初期化されました。\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		強制的にマウント解除しても良いですか?\n\n注: アプリケーションが現在ボリュームに書き込み中の場合、マウント解除するとデータが失われるかもしれません。\n
+Disk image has been removed.	MainWindow		ディスクイメージは除去されました。
 Cancel	MainWindow		中止
 Free space	PartitionList		空き容量
 Queries	PartitionList		クエリ
+Register	MainWindow		登録
 Force unmount	MainWindow		強制的にマウント解除
 Change parameters	MainWindow		パラメーターの変更
 Partition	MainWindow		パーティション
@@ -89,6 +106,7 @@ The partition cannot be unmounted.	MainWindow		パーティションをアンマ
 Delete	MainWindow		削除
 Partition type:	ChangeParametersPanel		パーティション種別 :
 Parameters	PartitionList		パラメーター
+Disk image successfully written to the target.	MainWindow		ディスクイメージは正常に目標へ書き込まれました。
 Could not acquire partitioning information.	MainWindow		パーティション情報の取得に失敗しました。
 Cannot delete the selected partition.	MainWindow		選択されたパーティションを削除できません。
 Continue	MainWindow		続ける
@@ -96,8 +114,11 @@ Could not mount partition %s.	MainWindow		パーティション %s をマウン�
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションをフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
 The partition %s is already unmounted.	MainWindow		パーティション %s はすでにマウント解除されています。
+Target volume is read only.	MainWindow		目的のボリュームは読み取り専用です。
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		選択したパーティションのパラメーターを変更しますか?\n\nパーティションはほかのオペレーティングシステムからはもう認識されないかもしれません。
+Cannot init source volume.	MainWindow		登録元のボリュームを初期化できません。
 Boot	PartitionList		ブート
+%appname%: Select disk image	MainWindow		%appname%: ディスクイメージを選択
 OK	AbstractParametersPanel		OK
 Virtual	PartitionList		仮想
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		本当に変更をディスクに保存しますか?\n\nその場合、選択されたディスク\"%s\"のすべてのデータが回復不能までに破壊されます!
@@ -106,7 +127,11 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		下記の一覧からパーティションを一つ選択してください。
 Active	PartitionList		アクティブ
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		選択されたパーティションを削除しますか?\n\nその場合、パーティションのすべてのデータが失われます。
+Failed to unregister file disk device.	MainWindow		ファイルディスクデバイスの登録解除に失敗しました。
+Writing image to disk	MainWindow		イメージをディスクに書き込み中
 The partition %s has been successfully formatted.\n	MainWindow		パーティション %s は正常にフォーマットされました。\n
+%appname%: Register disk image	MainWindow		%appname%: ディスクイメージを登録
+Write image…	MainWindow		イメージを書き込む…
 The partition %s is already mounted.	MainWindow		パーティション %s はすでにマウントされています。
 Size	PartitionList		サイズ
 Creation of the partition has failed.	MainWindow		パーティションの作成に失敗しました。

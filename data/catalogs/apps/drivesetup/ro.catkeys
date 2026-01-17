@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	2521240656
+1	romanian	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		Nu s-a putut demonta partiția %s.
 Mount all	MainWindow		Montează toate
 Disk	MainWindow		Disc
@@ -9,7 +9,6 @@ Initialize	MainWindow		Inițializare
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția \„%s\” vor fi pierdute iremediabil dacă faceți asta!
 PGP encrypted	Encryption utils		Criptat PGP
 Delete partition	MainWindow		Șterge partiția
-Error: 	MainWindow	in any error alert	Eroare: 
 Removable	PartitionList		Detașabil
 Block size	PartitionList		Dimensiune bloc
 The panel experienced a problem!	MainWindow		Panoul a întâmpinat o problemă!

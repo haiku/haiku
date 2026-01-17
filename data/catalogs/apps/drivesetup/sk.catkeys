@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DriveSetup	2629236661
+1	slovak	x-vnd.Haiku-DriveSetup	2453306788
 Could not unmount partition %s.	MainWindow		Nepodarilo sa odpojiť oblasť %s.
 Mount all	MainWindow		Pripojiť všetky
 Disk	MainWindow		Disk
@@ -7,7 +7,6 @@ Device	PartitionList		Zariadenie
 Could not change the parameters of the selected partition.	MainWindow		Nepodarilo sa zmeniť parametre vybranej oblasti.
 Initialize	MainWindow		Inicializovať
 Delete partition	MainWindow		Zmazať oblasť
-Error: 	MainWindow	in any error alert	Chyba: 
 The panel experienced a problem!	MainWindow		Vyskytol sa problém v Paneli!
 Device	DiskView		Zariadenie
 Unmount	MainWindow		Odpojiť

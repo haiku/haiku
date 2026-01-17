@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-DriveSetup	4019948501
+1	danish	x-vnd.Haiku-DriveSetup	3844018628
 Could not unmount partition %s.	MainWindow		Kunne ikke afmontere diskafsnit %s.
 Mount all	MainWindow		Montér alle
 Disk	MainWindow		Disk
@@ -8,7 +8,6 @@ Could not change the parameters of the selected partition.	MainWindow		Kunne ikk
 Initialize	MainWindow		Initialisér
 PGP encrypted	Encryption utils		PGP-krypteret
 Delete partition	MainWindow		Slet diskafsnit
-Error: 	MainWindow	in any error alert	Fejl: 
 Removable	PartitionList		Flytbar
 Block size	PartitionList		Blokstørrelse
 The panel experienced a problem!	MainWindow		Panelet løb ind i et problem!

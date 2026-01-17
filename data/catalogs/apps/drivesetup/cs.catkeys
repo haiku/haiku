@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DriveSetup	2521240656
+1	czech	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		Oddíl %s nelze odpojit.
 Mount all	MainWindow		Připojit vše
 Disk	MainWindow		Disk
@@ -9,7 +9,6 @@ Initialize	MainWindow		Inicializovat
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Jste si jisti, že chcete zapsat změny zpět na disk?\n\nPokud změnu provedete, všechna data na oddíle \"%s\" budou nenávratně ztracena!
 PGP encrypted	Encryption utils		Zašifrováno PGP
 Delete partition	MainWindow		Odstranit oddíl
-Error: 	MainWindow	in any error alert	Chyba: 
 Removable	PartitionList		Vyměnitelný
 Block size	PartitionList		Velikost bloku
 The panel experienced a problem!	MainWindow		Na panelu došlo k problému!

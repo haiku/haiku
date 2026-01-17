@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	873730785
+1	hungarian	x-vnd.Haiku-HaikuDepot	3949833867
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -54,6 +54,7 @@ Send	RatePackageWindow		Küldés
 Creating package list…	FeaturedPackagesView		Csomaglista készítése…
 Start package daemon	App		Csomag démon indítása
 There are problems in the supplied data:	UserLoginWindow		Hibás adatok lettek megadva:
+Desktop and non-desktop packages	MainWindow		Asztali és nem asztali csomagok
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		A felhasználó (%Nickname%) nem fogadta el a felhasználási feltételeket.
 Usage conditions download problem	UserLoginWindow		Hiba történt a felhasználási feltételek letöltésekor
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	%s csomag telepítése %s tárolóból\n
@@ -195,11 +196,13 @@ Repositories	MainWindow		Tárolók
 This rating is visible to other users	RatePackageWindow		Ez az értékelés más felhasználók számára is látható
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		A csomagadatok frissítése közben felmerült egy probléma, amely az adatok elavulását vagy hiányát okozhatják az alkalmazásban. A problémával kapcsolatos további információkat az alkalmazásnaplókban tekintheted meg.\nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot szakaszában találhatók.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Hiba történt a használati feltételek letöltése során. Nézd meg a naplót a részletekért, és próbáld újra. \nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot részében találhatók.
+Stop network use	ServerHelper		A hálózat használatának leállítása
 View agreed usage conditions…	MainWindow		Jóváhagyott felhasználási feltételek…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		[%Nickname%] felhasználóval bejelentkeztél, de a folytatás előtt el kell fogadnod a legújabb használati feltételeket.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Úgy tűnik, hogy ez a csomag nincs a HaikuDepot kiszolgálón, ezért nem lehet új minősítést létrehozni vagy meglévő értékelést szerkeszteni.
 Apply	SettingsWindow		Alkalmaz
 View the password requirements	UserLoginWindow		Jelszókövetelmények megjelenítése
+Desktop packages only	MainWindow		Csak asztali csomagok
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		\"%Nickname%\" korábban elfogadta a használati feltételeket, de a használati feltételek azóta frissültek. A frissített használati feltételeket most el kell fogadni.
 Log out	MainWindow		Kijelentkezés
 Comment language:	RatePackageWindow		Hozzászólás nyelve:
@@ -208,6 +211,7 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		Felhasználási feltételek megtekintése
 OK	ServerHelper		Rendben
 Reading repository data	LocalPkgDataLoadProcess		Tároló olvasása
+Native desktop packages only	MainWindow		Csak natív aszali csomagok
 Fatal error	InstallPackageProcess		Végzetes hiba
 A validation error has occurred	ServerHelper		Hitelesítési hiba
 The nickname is required.	UserLoginWindow		Felhasználói név szükséges.

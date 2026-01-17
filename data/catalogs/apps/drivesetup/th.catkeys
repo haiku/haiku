@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-DriveSetup	4018609797
+1	thai	x-vnd.Haiku-DriveSetup	3842679924
 Could not unmount partition %s.	MainWindow		ไม่สามารถยกเลิกการต่อเชื่อมพาร์ติชัน %s
 Mount all	MainWindow		เมานต์ทั้งหมด
 Disk	MainWindow		ดิสก์
@@ -8,7 +8,6 @@ Could not change the parameters of the selected partition.	MainWindow		ไม่
 Initialize	MainWindow		เริ่มต้น
 PGP encrypted	Encryption utils		เข้ารหัส PGP
 Delete partition	MainWindow		ลบพาร์ติชั่น
-Error: 	MainWindow	in any error alert	ผิดพลาด:
 Removable	PartitionList		ลบได้
 Block size	PartitionList		ขนาดบล็อก
 The panel experienced a problem!	MainWindow		พาแนลมีปัญหา!

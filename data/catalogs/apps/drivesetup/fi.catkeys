@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	2521240656
+1	finnish	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -9,7 +9,6 @@ Initialize	MainWindow		Alusta
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion \"%s\" tiedot menetetään peruuttamattomasti, jos teet niin!
 PGP encrypted	Encryption utils		PGP-salattu
 Delete partition	MainWindow		Poista osio
-Error: 	MainWindow	in any error alert	Virhe: 
 Removable	PartitionList		Poistettava
 Block size	PartitionList		Lohkokoko
 The panel experienced a problem!	MainWindow		Paneelissa oli pulma!

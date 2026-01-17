@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-DriveSetup	1623466937
+1	esperanto	x-vnd.Haiku-DriveSetup	1447537064
 Could not unmount partition %s.	MainWindow		Ne sukcesis demeti subdiskon %s.
 Mount all	MainWindow		Surmeti ĉiujn
 Disk	MainWindow		Disko
@@ -8,7 +8,6 @@ Could not change the parameters of the selected partition.	MainWindow		Ne sukces
 Initialize	MainWindow		Pravalorizi
 PGP encrypted	Encryption utils		Ĉifrita per PGP
 Delete partition	MainWindow		Forigi subdiskon
-Error: 	MainWindow	in any error alert	Eraro: 
 Removable	PartitionList		Demetebla
 Block size	PartitionList		Bloka grando
 The panel experienced a problem!	MainWindow		La panelo spertis problemon!

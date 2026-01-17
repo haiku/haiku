@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-DriveSetup	4018609797
+1	indonesian	x-vnd.Haiku-DriveSetup	3842679924
 Could not unmount partition %s.	MainWindow		Tidak dapat melepas partisi %s.
 Mount all	MainWindow		Pasang semua
 Disk	MainWindow		Diska
@@ -8,7 +8,6 @@ Could not change the parameters of the selected partition.	MainWindow		Tidak dap
 Initialize	MainWindow		Inisialisasi
 PGP encrypted	Encryption utils		Terenkripsi PGP
 Delete partition	MainWindow		Hapus partisi
-Error: 	MainWindow	in any error alert	Error: 
 Removable	PartitionList		Dapat dilepas
 Block size	PartitionList		Ukuran blok
 The panel experienced a problem!	MainWindow		Panel mengalami masalah!

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DriveSetup	2521240656
+1	english	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Mount all	MainWindow		挂载所有磁盘
 Disk	MainWindow		磁盘
@@ -9,7 +9,6 @@ Initialize	MainWindow		初始化
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		您确定现在要将更改写回磁盘吗？\n\n如果这样做，分区 \"%s\" 上的所有数据都将不可挽回地丢失！
 PGP encrypted	Encryption utils		PGP 加密
 Delete partition	MainWindow		删除分区
-Error: 	MainWindow	in any error alert	错误：
 Removable	PartitionList		可移动
 Block size	PartitionList		块大小
 The panel experienced a problem!	MainWindow		面板遇到问题！

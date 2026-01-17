@@ -1,7 +1,9 @@
-1	turkish	x-vnd.Haiku-DriveSetup	2521240656
+1	turkish	x-vnd.Haiku-DriveSetup	4193609455
 Could not unmount partition %s.	MainWindow		%s bölüntüsü bağlantısı kesilemedi.
+Register disk image…	MainWindow		Disk kalıbını kaydettir…
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
+Disk image has been added.	MainWindow		Disk kalıbı eklendi.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Şimdi değişiklikleri diske yazmak istediğinizden emin misiniz?\n\nSeçili bölüntü üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolur!
 Device	PartitionList		Aygıt
 Could not change the parameters of the selected partition.	MainWindow		Seçili bölüntünün parametreleri değiştirilemedi.
@@ -9,7 +11,7 @@ Initialize	MainWindow		İlklendir
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Şimdi diske değişiklikleri geri yazmak istediğinizden emin misiniz?\n\n“%s” bölüntüsündeki tüm veri geri getirilemeyecek biçimde kaybolacaktır!
 PGP encrypted	Encryption utils		PGP şifreli
 Delete partition	MainWindow		Bölüntüyü sil
-Error: 	MainWindow	in any error alert	Hata: 
+Write	MainWindow		Yaz
 Removable	PartitionList		Çıkarılabilir
 Block size	PartitionList		Blok boyutu
 The panel experienced a problem!	MainWindow		Panel bir sorun yaşadı!
@@ -20,27 +22,33 @@ Unmount	MainWindow		Bağlantıyı kes
 Failed to format the partition %s!\n	MainWindow		%s bölüntüsünün biçimlendirilmesi başarısız oldu!\n
 Partition size	CreateParametersPanel		Bölüntü boyutu
 Validation of the given parameters failed.	MainWindow		Verilen ayarların doğrulaması başarısız oldu.
+Cannot init target partition.	MainWindow		Hedef bölüntü ilklendirilemiyor.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		“%s” bölüntüsünü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 DriveSetup	System name		Disk İzlencesi
 Mounted at	PartitionList		Bağlama noktası
 Disk system %s not found!	MainWindow		Disk sistemi %s bulunamadı!
 Create…	MainWindow		Oluştur…
+Failed to register file disk device: %s	MainWindow		Dosya diski aygıtı kaydettirilemedi: %s
 Write changes	MainWindow		Değişiklikleri yaz
 Validation of the given creation parameters failed.	MainWindow		Verilen oluşturma parametrelerinin doğrulaması başarısız oldu.
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölüntüsünün ilklendirilmesi başarısız oldu (Diske hiçbir şey yazılmadı).
 Eject	MainWindow		Çıkar
+There is not enough free space on target device.	MainWindow		Hedef aygıtta yeterli boş alan yok.
 Read only	PartitionList		Saltokunur
 Surface test (not implemented)	MainWindow		Yüzey sınaması (işlevsel değil)
+Creating disk image	MainWindow		Disk kalıbı oluşturuluyor…
 The panel could not return successfully.	MainWindow		Panel başarılı bir biçimde dönemedi.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Bölüntü parametrelerinin değiştirilmesi başarısız oldu. Değişiklikler diske yazılmadı.
 Partition %ld	DiskView		%ld. bölüntü
 There's no space on the partition where a child partition could be created.	MainWindow		Bölüntü üzerinde alt bölüntü oluşturabilecek kadar boş alan yok.
+%s does not refer to a file disk device.	MainWindow		%s, bir dosya diski aygıtına başvurmuyor.
 No disk devices have been recognized.	DiskView		Hiçbir disk aygıtı tanımlanamadı.
 Attributes	PartitionList		Öznitelikler
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Bölüntü silinemedi. Değişiklikler diske yazılmadı.
 Change parameters…	MainWindow		Parametreleri değiştir…
 Format	InitializeParametersPanel		Biçimlendir
 Could not unmount partition	MainWindow		Bölüntü bağlantısı kesilemedi
+Target partition is read only.	MainWindow		Hedef bölüntü saltokunur.
 Create	CreateParametersPanel		Oluştur
 File system	PartitionList		Dosya sistemi
 Unknown (%s)	PartitionList		Bilinmeyen (%s)
@@ -57,10 +65,13 @@ Failed to create the partition. No changes have been written to disk.	MainWindow
 MIMEs	PartitionList		MIME’ler
 Shared	PartitionList		Paylaşılan
 BitLocker encrypted	Encryption utils		BitLocker şifreli
+Cannot init target volume.	MainWindow		Hedef disk bölümü ilklendirilemiyor.
 You need to select a partition entry from the list.	MainWindow		Listeden bir bölüntü seçmelisiniz.
 Offset: %s	Support		Ofset: %s
 SafeBoot encrypted	Encryption utils		SafeBoot şifreli
 Volume name	PartitionList		Bölüm adı
+Disk image	MainWindow		Disk kalıbı
+Save image…	MainWindow		Kalıbı kaydet…
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Şimdi değişiklikleri diske yazmak istediğinizden emin misiniz?\n\nBölüntü üzerindeki tüm veri geri alınamayacak bir biçimde kaybolur!
 Change	ChangeParametersPanel		Değiştir
 Partition name:	ChangeParametersPanel		Bölüntü adı:
@@ -69,6 +80,10 @@ Empty space	PartitionList		Boş alan
 Cancel	AbstractParametersPanel		Vazgeç
 Format	MainWindow		Biçimlendir
 OK	MainWindow		Tamam
+Cannot init target file.	MainWindow		Hedef dosya ilklendirilemiyor.
+Disk image successfully created.	MainWindow		Disk kalıbı başarıyla oluşturuldu.
+Unregister disk image	MainWindow		Disk kalıbının kaydını kaldır
+The target partition is smaller than the image file.	MainWindow		Hedef bölüntü, kalıp dosyasından daha küçük.
 Empty space	DiskView		Boş alan
 Could not delete the selected partition.	MainWindow		Seçili bölüntü silinemedi.
 Open with DiskProbe	MainWindow		Disk Sondası ile aç
@@ -76,9 +91,11 @@ Are you sure you want to initialize the selected disk? All data will be lost. Yo
 There was an error preparing the disk for modifications.	MainWindow		Diski değişikliklere hazırlarken bir hata oluştu.
 The disk has been successfully initialized.\n	MainWindow		Disk başarıyla ilklendirildi.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Bölüm bağlantısı kesilmeye zorlansın mı?\n\nNot: Eğer bir uygulama bu bölüme yazıyorsa bağlantıyı kesmek veri kaybına neden olabilir.\n
+Disk image has been removed.	MainWindow		Disk kalıbı kaldırıldı.
 Cancel	MainWindow		Vazgeç
 Free space	PartitionList		Boş alan
 Queries	PartitionList		Sorgular
+Register	MainWindow		Kaydettir
 Force unmount	MainWindow		Zorla bağlantısını kes
 Change parameters	MainWindow		Parametreleri değiştir
 Partition	MainWindow		Bölüntü
@@ -89,6 +106,7 @@ The partition cannot be unmounted.	MainWindow		Bölüntü bağlantısı kesilemi
 Delete	MainWindow		Sil
 Partition type:	ChangeParametersPanel		Bölüntü türü:
 Parameters	PartitionList		Parametreler
+Disk image successfully written to the target.	MainWindow		Disk kalıbı başarıyla hedefe yazıldı.
 Could not acquire partitioning information.	MainWindow		Bölüntüleme bilgisi alınamadı.
 Cannot delete the selected partition.	MainWindow		Seçili bölüntü silinemiyor.
 Continue	MainWindow		Sürdür
@@ -96,8 +114,11 @@ Could not mount partition %s.	MainWindow		%s bölüntüsü bağlanamadı.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Bölüntüyü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 The selected disk is read-only.	MainWindow		Seçili disk saltokunur.
 The partition %s is already unmounted.	MainWindow		%s bölüntüsünün bağlantısı zaten kesilmiş.
+Target volume is read only.	MainWindow		Hedef disk bölümü saltokunur.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Seçili bölüntünün parametrelerini değiştirmek istediğinizden emin misiniz?\n\nBölüntü artık başka işletim sistemleri tarafından tanınamayabilir!
+Cannot init source volume.	MainWindow		Kaynak disk bölümü ilklendirilemiyor.
 Boot	PartitionList		Önyükleme
+%appname%: Select disk image	MainWindow		%appname%: Disk kalıbı seç
 OK	AbstractParametersPanel		Tamam
 Virtual	PartitionList		Sanal
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Şimdi diske değişiklikleri geri yazmak istediğinizden emin misiniz?\n\n“%s” diskindeki tüm veri geri getirilemeyecek biçimde kaybolacaktır!
@@ -106,7 +127,11 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Aşağıdaki listeden bir bölüntü seçin.
 Active	PartitionList		Etkin
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Seçili bölüntüyü silmek istediğinizden emin misiniz?\n\nBölüm üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolur!
+Failed to unregister file disk device.	MainWindow		Dosya diski aygıtının kaydı kaldırılamadı.
+Writing image to disk	MainWindow		Kalıp diske yazılıyor…
 The partition %s has been successfully formatted.\n	MainWindow		%s bölüntüsü başarıyla biçimlendirildi.\n
+%appname%: Register disk image	MainWindow		%appname%: Disk kalıbını kaydettir
+Write image…	MainWindow		Kalıbı yaz…
 The partition %s is already mounted.	MainWindow		%s bölüntüsü halihazırda bağlı.
 Size	PartitionList		Boyut
 Creation of the partition has failed.	MainWindow		Bölüntü oluşturulamadı.

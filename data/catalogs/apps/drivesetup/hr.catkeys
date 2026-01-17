@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-DriveSetup	3334320180
+1	croatian	x-vnd.Haiku-DriveSetup	3158390307
 Could not unmount partition %s.	MainWindow		Ne mogu odmontirati particiju %s.
 Mount all	MainWindow		Montiraj sve
 Disk	MainWindow		Disk
@@ -7,7 +7,6 @@ Device	PartitionList		Uređaj
 Could not change the parameters of the selected partition.	MainWindow		Ne mogu promjeniti parametre odabrane particije.
 Initialize	MainWindow		Inicijaliziraj
 Delete partition	MainWindow		Izbriši particiju
-Error: 	MainWindow	in any error alert	Greška: 
 Removable	PartitionList		Uklonjiv
 The panel experienced a problem!	MainWindow		Ploča je doživjela problem!
 Device	DiskView		Uređaj

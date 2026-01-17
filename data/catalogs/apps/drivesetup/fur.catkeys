@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	2521240656
+1	friulian	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -9,7 +9,6 @@ Initialize	MainWindow		Inizialize
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis al disc daurman?\n\nDucj i dâts de partizionon \"%s\" a laran pierdûts in mût insanabil se tu lu fasis!
 PGP encrypted	Encryption utils		Cifrât cun PGP
 Delete partition	MainWindow		Elimine partizion
-Error: 	MainWindow	in any error alert	Erôr: 
 Removable	PartitionList		Estraibil
 Block size	PartitionList		Dimension bloc
 The panel experienced a problem!	MainWindow		Il panel al à vût un probleme!

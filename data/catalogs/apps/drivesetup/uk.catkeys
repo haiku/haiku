@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	2521240656
+1	ukrainian	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -9,7 +9,6 @@ Initialize	MainWindow		Ініціалізація
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що саме зараз потрібно записати зміни на диск?\n\nЯкщо це зробити, всі дані на розділі \«%s\» будуть безповоротно втрачені!
 PGP encrypted	Encryption utils		PGP-шифрування
 Delete partition	MainWindow		Видалити розділ
-Error: 	MainWindow	in any error alert	Помилка: 
 Removable	PartitionList		Знімний
 Block size	PartitionList		Розмір блоку
 The panel experienced a problem!	MainWindow		З панеллю сталася проблема!

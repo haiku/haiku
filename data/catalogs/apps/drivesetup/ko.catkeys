@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-DriveSetup	2521240656
+1	korean	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		%s 파티션을 마운트 해제할 수 없습니다.
 Mount all	MainWindow		모두 마운트
 Disk	MainWindow		디스크
@@ -9,7 +9,6 @@ Initialize	MainWindow		초기화
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		변경 사항을 지금 디스크에 기록하시겠습니까?\n\n파티션 \"%s\"의 모든 데이터가 영원히 지워질것입니다!
 PGP encrypted	Encryption utils		PGP 암호화
 Delete partition	MainWindow		파티션 지우기
-Error: 	MainWindow	in any error alert	오류: 
 Removable	PartitionList		제거 가능
 Block size	PartitionList		블록 크기
 The panel experienced a problem!	MainWindow		패널에 문제가 발생했습니다!

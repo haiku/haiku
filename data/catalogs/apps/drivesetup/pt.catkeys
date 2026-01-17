@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-DriveSetup	4019948501
+1	portuguese	x-vnd.Haiku-DriveSetup	3844018628
 Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
 Mount all	MainWindow		Montar todos
 Disk	MainWindow		Disco
@@ -8,7 +8,6 @@ Could not change the parameters of the selected partition.	MainWindow		Não foi 
 Initialize	MainWindow		Inicializar
 PGP encrypted	Encryption utils		Encriptado com PGP
 Delete partition	MainWindow		Eliminar partição
-Error: 	MainWindow	in any error alert	Erro: 
 Removable	PartitionList		Removível
 Block size	PartitionList		Tamanho de bloco
 The panel experienced a problem!	MainWindow		O painel encontrou um problema!

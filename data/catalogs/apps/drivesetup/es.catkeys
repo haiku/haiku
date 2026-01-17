@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-DriveSetup	2521240656
+1	spanish; castilian	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		No se pudo desmontar la partición %s.
 Mount all	MainWindow		Montar todo
 Disk	MainWindow		Disco
@@ -9,7 +9,6 @@ Initialize	MainWindow		Inicializar
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		¿Desea escribir ahora mismo los cambios en el disco?\n\nDe continuar, se reemplazarán permanentemente todos los datos de la partición \"%s\".
 PGP encrypted	Encryption utils		Cifrado PGP
 Delete partition	MainWindow		Eliminar partición
-Error: 	MainWindow	in any error alert	Error: 
 Removable	PartitionList		Removible
 Block size	PartitionList		Tamaño de bloque
 The panel experienced a problem!	MainWindow		¡El panel experimentó un problema!

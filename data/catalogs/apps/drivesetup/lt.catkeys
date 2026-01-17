@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	1083453332
+1	lithuanian	x-vnd.Haiku-DriveSetup	907523459
 Could not unmount partition %s.	MainWindow		Skaidinio „%s“ atjungti nepavyko.
 Mount all	MainWindow		Prijungti visus
 Disk	MainWindow		Diskas
@@ -7,7 +7,6 @@ Device	PartitionList		Įrenginys
 Could not change the parameters of the selected partition.	MainWindow		Nepavyko pakeisti pasirinktojo skaidinio savybių.
 Initialize	MainWindow		Ženklinti
 Delete partition	MainWindow		Šalinti skaidinį
-Error: 	MainWindow	in any error alert	Klaida: 
 The panel experienced a problem!	MainWindow		Polangyje iškilo problema!
 Device	DiskView		Įrenginys
 Unmount	MainWindow		Atjungti
