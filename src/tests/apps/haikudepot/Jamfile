@@ -7,16 +7,16 @@ include [ FDirName $(HAIKU_TOP) src apps haikudepot build jam HdsSchemaGenRules 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot model ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
-SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server dumpexportrepository ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot util ] ;
 
 UsePrivateHeaders interface netservices shared ;
+
+HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 
 local sourceDirs =
 	model
 	packagemodel
 	server
-	server/dumpexportrepository
 	util
 	tar
 	textview
@@ -37,13 +37,17 @@ SEARCH_SOURCE += $(dumpExportRepositoryBulkListenerTargetDirectory) ;
 SEARCH_SOURCE += $(dumpExportRepositoryModelTargetDirectory) ;
 	
 local generatedRepositoryModelSourceFiles = 
-	<src!apps!haikudepot>DumpExportRepository.cpp
-	<src!apps!haikudepot>DumpExportRepositorySource.cpp
-	<src!apps!haikudepot>DumpExportRepositorySourceMirror.cpp
+	DumpExportRepository.cpp
+	DumpExportRepositorySource.cpp
+	DumpExportRepositorySourceMirror.cpp
 ;
 local generatedRepositoryParserSourceFiles =
-	<src!apps!haikudepot>DumpExportRepositoryJsonListener.cpp
+	DumpExportRepositoryJsonListener.cpp
 ;
+
+LOCATE on dumpexportrepository.json = [ FDirName $(HAIKU_TOP) src apps haikudepot server schema ] ;
+LOCATE on jsonschema2cppmodel.py = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts ] ;
+LOCATE on jsonschema2cppparser.py = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts ] ;
 
 local dummyFile = "dummy.dat" ;
 
@@ -52,15 +56,21 @@ local dumpExportRepositoryBulkListenerTargetFile =
 local dumpExportRepositoryModelTargetFile =
 	[ FDirName $(dumpExportRepositoryModelTargetDirectory) $(dummyFile) ] ;
 
+HdsSchemaGenModel $(dumpExportRepositoryModelTargetFile)
+	: dumpexportrepository.json : jsonschema2cppmodel.py ;
+
+HdsSchemaGenBulkParser $(dumpExportRepositoryBulkListenerTargetFile)
+	: dumpexportrepository.json : jsonschema2cppparser.py ;
+
 HdsSchemaGenAppSrcDependsOnGeneration
-	$(generatedRepositoryParserSourceFiles)
-	$(generatedRepositoryParserSourceFiles:S=.h)
+	[ FGristFiles $(generatedRepositoryParserSourceFiles) ]
+	[ FGristFiles $(generatedRepositoryParserSourceFiles:S=.h) ]
 	: $(dumpExportRepositoryBulkListenerTargetDirectory)
 	: $(dumpExportRepositoryBulkListenerTargetFile) ;
 	
 HdsSchemaGenAppSrcDependsOnGeneration
-	$(generatedRepositoryModelSourceFiles)
-	$(generatedRepositoryModelSourceFiles:S=.h)
+	[ FGristFiles $(generatedRepositoryModelSourceFiles) ]
+	[ FGristFiles $(generatedRepositoryModelSourceFiles:S=.h) ]
 	: $(dumpExportRepositoryModelTargetDirectory)
 	: $(dumpExportRepositoryModelTargetFile) ;
 

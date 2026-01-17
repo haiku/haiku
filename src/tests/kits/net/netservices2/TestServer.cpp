@@ -266,7 +266,7 @@ TestServer::BaseUrl() const
 	std::string port_string = to_string(fPort.Port());
 
 	std::string baseUrl = scheme + "127.0.0.1:" + port_string + "/";
-	return BUrl(baseUrl.c_str());
+	return BUrl(baseUrl.c_str(), true);
 }
 
 

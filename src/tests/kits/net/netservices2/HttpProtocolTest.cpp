@@ -288,7 +288,7 @@ HttpProtocolTest::HttpRequestTest()
 	// Basic test
 	BHttpRequest request;
 	CPPUNIT_ASSERT(request.IsEmpty());
-	auto url = BUrl("https://www.haiku-os.org");
+	auto url = BUrl("https://www.haiku-os.org", true);
 	request.SetUrl(url);
 	CPPUNIT_ASSERT(request.Url() == url);
 
@@ -490,7 +490,7 @@ HttpIntegrationTest::HostAndNetworkFailTest()
 {
 	// Test hostname resolution fail
 	{
-		auto request = BHttpRequest(BUrl("http://doesnotexist/"));
+		auto request = BHttpRequest(BUrl("http://doesnotexist/", true));
 		auto result = fSession.Execute(std::move(request));
 		try {
 			result.Status();
@@ -503,7 +503,7 @@ HttpIntegrationTest::HostAndNetworkFailTest()
 	// Test connection error fail
 	{
 		// FIXME: find a better way to get an unused local port, instead of hardcoding one
-		auto request = BHttpRequest(BUrl("http://localhost:59445/"));
+		auto request = BHttpRequest(BUrl("http://localhost:59445/", true));
 		auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 		try {
 			result.Status();
@@ -536,7 +536,7 @@ constexpr std::string_view kExpectedGetBody = {"Path: /\r\n"
 void
 HttpIntegrationTest::GetTest()
 {
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/")));
 	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	try {
 		auto receivedFields = result.Fields();
@@ -562,7 +562,7 @@ HttpIntegrationTest::GetTest()
 void
 HttpIntegrationTest::GetWithBufferTest()
 {
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/")));
 	auto body = make_exclusive_borrow<BMallocIO>();
 	auto result = fSession.Execute(std::move(request), BBorrow<BDataIO>(body), fLoggerMessenger);
 	try {
@@ -579,7 +579,7 @@ HttpIntegrationTest::GetWithBufferTest()
 void
 HttpIntegrationTest::HeadTest()
 {
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/")));
 	request.SetMethod(BHttpMethod::Head);
 	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	try {
@@ -610,7 +610,7 @@ static const BHttpFields kExpectedNoContentFields = {
 void
 HttpIntegrationTest::NoContentTest()
 {
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/204"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/204")));
 	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	try {
 		auto receivedStatus = result.Status();
@@ -637,7 +637,7 @@ HttpIntegrationTest::NoContentTest()
 void
 HttpIntegrationTest::AutoRedirectTest()
 {
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/302"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/302")));
 	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	try {
 		auto receivedFields = result.Fields();
@@ -664,14 +664,14 @@ void
 HttpIntegrationTest::BasicAuthTest()
 {
 	// Basic Authentication
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/auth/basic/walter/secret")));
 	request.SetAuthentication({"walter", "secret"});
 	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	CPPUNIT_ASSERT(result.Status().code == 200);
 
 	// Basic Authentication with incorrect credentials
 	try {
-		request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
+		request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/auth/basic/walter/secret")));
 		request.SetAuthentication({"invaliduser", "invalidpassword"});
 		result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 		CPPUNIT_ASSERT(result.Status().code == 401);
@@ -685,7 +685,7 @@ void
 HttpIntegrationTest::StopOnErrorTest()
 {
 	// Test the Stop on Error functionality
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/400"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/400")));
 	request.SetStopOnError(true);
 	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	CPPUNIT_ASSERT(result.Status().code == 400);
@@ -701,7 +701,7 @@ HttpIntegrationTest::RequestCancelTest()
 	// TODO: this test potentially fails if the case is executed before the cancellation is
 	//       processed. In practise, the cancellation always comes first. When the server
 	//       supports a wait parameter, then this test can be made more robust.
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/")));
 	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	fSession.Cancel(result);
 	try {
@@ -763,7 +763,7 @@ HttpIntegrationTest::PostTest()
 	auto postBody = std::make_unique<BMallocIO>();
 	postBody->Write(kPostText.String(), kPostText.Length());
 	postBody->Seek(0, SEEK_SET);
-	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/post"));
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), BString("/post")));
 	request.SetMethod(BHttpMethod::Post);
 	request.SetRequestBody(std::move(postBody), "text/plain", kPostText.Length());
 
