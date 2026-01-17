@@ -504,7 +504,7 @@ Inode::Inode(Volume* volume, ino_t id)
 	fCache(NULL),
 	fMap(NULL)
 {
-	PRINT(("Inode::Inode(volume = %p, id = %" B_PRIdINO ") @ %p\n",
+	FUNCTION_START(("Inode::Inode(volume = %p, id = %" B_PRIdINO ") @ %p\n",
 		volume, id, this));
 
 	rw_lock_init(&fLock, "bfs inode");
@@ -538,7 +538,7 @@ Inode::Inode(Volume* volume, Transaction& transaction, ino_t id, mode_t mode,
 	fCache(NULL),
 	fMap(NULL)
 {
-	PRINT(("Inode::Inode(volume = %p, transaction = %p, id = %" B_PRIdINO
+	FUNCTION_START(("Inode::Inode(volume = %p, transaction = %p, id = %" B_PRIdINO
 		") @ %p\n", volume, &transaction, id, this));
 
 	rw_lock_init(&fLock, "bfs inode");
@@ -576,7 +576,7 @@ Inode::Inode(Volume* volume, Transaction& transaction, ino_t id, mode_t mode,
 
 Inode::~Inode()
 {
-	PRINT(("Inode::~Inode() @ %p\n", this));
+	FUNCTION_START(("Inode::~Inode() @ %p\n", this));
 
 	file_cache_delete(FileCache());
 	file_map_delete(Map());

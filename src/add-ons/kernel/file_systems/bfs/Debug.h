@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2026, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef DEBUG_H
@@ -43,17 +43,13 @@
 //	D()
 //		the statements in D() are only included if DEBUG is defined
 
-#if DEBUG
+#ifdef DEBUG
 	#define PRINT(x) { __out("bfs: "); __out x; }
 	#define REPORT_ERROR(status) \
 		__out("bfs: %s:%d: %s\n", __FUNCTION__, __LINE__, strerror(status));
 	#define RETURN_ERROR(err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
 	#define FATAL(x) { __out("bfs: "); __out x; }
 	#define INFORM(x) { __out("bfs: "); __out x; }
-//	#define FUNCTION() __out("bfs: %s()\n",__FUNCTION__);
-	#define FUNCTION_START(x) { __out("bfs: %s() ",__FUNCTION__); __out x; }
-	#define FUNCTION() ;
-//	#define FUNCTION_START(x) ;
 	#define D(x) {x;};
 	#ifndef ASSERT
 	#	define ASSERT(x) { if (!(x)) DEBUGGER(("bfs: assert failed: " #x "\n")); }
@@ -66,13 +62,19 @@
 //	#define FATAL(x) { panic x; }
 	#define FATAL(x) { __out("bfs: "); __out x; }
 	#define INFORM(x) { __out("bfs: "); __out x; }
-	#define FUNCTION() ;
-	#define FUNCTION_START(x) ;
 	#define D(x) ;
 	#ifndef ASSERT
 	#	define ASSERT(x) { if (!(x)) DEBUGGER(("bfs: assert failed: " #x "\n")); }
 //	#	define ASSERT(x) ;
 	#endif
+#endif
+
+#if DEBUG == 2
+	#define FUNCTION() __out("bfs: %s()\n",__FUNCTION__);
+	#define FUNCTION_START(x) { __out("bfs: %s() ",__FUNCTION__); __out x; }
+#else
+	#define FUNCTION() ;
+	#define FUNCTION_START(x) ;
 #endif
 
 #ifdef DEBUG
