@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2025, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2026, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BLOCK_ALLOCATOR_H
@@ -49,8 +49,10 @@ public:
 								uint16 minimum, block_run& run);
 			status_t		AllocateBlockRun(Transaction& transaction,
 									  block_run run);
+			status_t		AllocateBlocks(Transaction& transaction, off_t start, off_t length);
 
 			status_t		Free(Transaction& transaction, block_run run);
+			status_t		Free(Transaction& transaction, off_t start, off_t length);
 
 			status_t		Trim(uint64 offset, uint64 size,
 								uint64& trimmedSize);

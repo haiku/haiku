@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2025, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2026, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -828,7 +828,7 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 				"(volume is mounted read-only)!\n"));
 		} else {
 			Transaction transaction(volume, 0);
-			if (groups[0].Allocate(transaction, 0, reservedBlocks) != B_OK) {
+			if (allocator->AllocateBlocks(transaction, 0, reservedBlocks) != B_OK) {
 				FATAL(("Could not allocate reserved space for block "
 					"bitmap/log!\n"));
 				volume->Panic();
@@ -1254,11 +1254,40 @@ BlockAllocator::AllocateBlockRun(Transaction& transaction, block_run run)
 }
 
 
+/*!
+	Allocates the specified blocks directly. \c start and \c length are specified
+	in blocks, not bytes.
+*/
+status_t
+BlockAllocator::AllocateBlocks(Transaction& transaction, off_t start, off_t length)
+{
+	if (start < 0 || start + length > fVolume->NumBlocks())
+		return B_BAD_VALUE;
+
+	int32 group = start >> fVolume->AllocationGroupShift();
+	int32 groupOffset = start & ((1LL << fVolume->AllocationGroupShift()) - 1);
+
+	AllocationBlock cached(fVolume);
+	RecursiveLocker locker(fLock);
+
+	while (length > 0) {
+		uint32 blocksInGroup = min_c(length, fGroups[group].NumBits());
+		status_t status = fGroups[group].Allocate(transaction, groupOffset, blocksInGroup);
+		if (status != B_OK)
+			return status;
+
+		length -= blocksInGroup;
+		groupOffset = 0;
+		group++;
+	}
+
+	return B_OK;
+}
+
+
 status_t
 BlockAllocator::Free(Transaction& transaction, block_run run)
 {
-	RecursiveLocker lock(fLock);
-
 	int32 group = run.AllocationGroup();
 	uint16 start = run.Start();
 	uint16 length = run.Length();
@@ -1266,6 +1295,8 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 	FUNCTION_START(("group = %" B_PRId32 ", start = %" B_PRIu16
 		", length = %" B_PRIu16 "\n", group, start, length))
 	T(Free(run));
+
+	RecursiveLocker lock(fLock);
 
 	// doesn't use Volume::IsValidBlockRun() here because it can check better
 	// against the group size (the last group may have a different length)
@@ -1311,6 +1342,35 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 
 	fVolume->SuperBlock().used_blocks =
 		HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() - run.Length());
+	return B_OK;
+}
+
+
+status_t
+BlockAllocator::Free(Transaction& transaction, off_t start, off_t length)
+{
+	FUNCTION_START(("start = %" B_PRIdOFF ", length = %" B_PRIdOFF "\n", start, length))
+
+	RecursiveLocker lock(fLock);
+
+	int32 group = start >> fVolume->AllocationGroupShift();
+	int32 groupOffset = start & ((1LL << fVolume->AllocationGroupShift()) - 1);
+
+	uint32 maxGroupBlocks = 1UL << fVolume->AllocationGroupShift();
+	if (maxGroupBlocks == 65536)
+		maxGroupBlocks = 65535;
+
+	while (length > 0) {
+		block_run run = block_run::Run(group, groupOffset,
+			min_c(fGroups[group].NumBits() - groupOffset, length));
+		status_t status = Free(transaction, run);
+		if (status != B_OK)
+			return status;
+
+		length -= run.Length();
+		groupOffset = 0;
+		group++;
+	}
 	return B_OK;
 }
 
