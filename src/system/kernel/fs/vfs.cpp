@@ -5929,7 +5929,7 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 					break;
 				}
 			}
-			if (status != B_BAD_VALUE && status != B_DEV_INVALID_IOCTL)
+			if (status != B_BAD_VALUE && status != B_DEV_INVALID_IOCTL && status != B_UNSUPPORTED)
 				return status;
 
 			// basic implementation with stat() the node
@@ -5978,7 +5978,13 @@ file_select(struct file_descriptor* descriptor, uint8 event,
 		return B_UNSUPPORTED;
 	}
 
-	return FS_CALL(vnode, select, descriptor->cookie, event, sync);
+	status_t result = FS_CALL(vnode, select, descriptor->cookie, event, sync);
+
+	// A FS may have a select() hook but may not support it in some cases (e.g. write_overlay)
+	if (result == B_UNSUPPORTED && !SELECT_TYPE_IS_OUTPUT_ONLY(event))
+		notify_select_event(sync, event);
+
+	return result;
 }
 
 
