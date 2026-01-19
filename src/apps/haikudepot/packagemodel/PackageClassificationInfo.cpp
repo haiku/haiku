@@ -164,7 +164,7 @@ PackageClassificationInfo::operator!=(const PackageClassificationInfo& other) co
 PackageClassificationInfoBuilder::PackageClassificationInfoBuilder()
 	:
 	fCategories(),
-	fProminence(-1L),
+	fProminence(PROMINANCE_ORDERING_NONE),
 	fIsDesktop(false),
 	fIsNativeDesktop(false)
 {

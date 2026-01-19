@@ -132,7 +132,7 @@ SharedIcons::_CreateIconForResource(int32 resourceID, uint32 size)
 	BitmapHolderRef result(NULL);
 
 	if (SharedIcons::_CreateIconForResourceChecked(resourceID, size, &result) != B_OK) {
-		HDERROR("unable to create bitmap for resource [%d]", resourceID);
+		HDERROR("unable to create bitmap for resource [%" B_PRId32 "]", resourceID);
 		debugger("unable to create bitmap for resource");
 			// the resource is bundled into the build product so not being able to find it is an
 			// illegal state.
@@ -171,7 +171,7 @@ SharedIcons::_CreateIconForResourceChecked(int32 resourceID, uint32 size,
 		data = resources.LoadResource(B_VECTOR_ICON_TYPE, resourceID, &dataSize);
 
 	if (data == NULL) {
-		HDERROR("unable to read the resource [%d]", resourceID);
+		HDERROR("unable to read the resource [%" B_PRId32 "]", resourceID);
 		status = B_ERROR;
 	}
 
@@ -183,7 +183,7 @@ SharedIcons::_CreateIconForResourceChecked(int32 resourceID, uint32 size,
 		status = BIconUtils::GetVectorIcon(reinterpret_cast<const uint8*>(data), dataSize, bitmap);
 
 	if (status != B_OK) {
-		HDERROR("unable to parse the resource [%d] as a vector icon", resourceID);
+		HDERROR("unable to parse the resource [%" B_PRId32 "] as a vector icon", resourceID);
 		delete bitmap;
 		bitmap = NULL;
 	} else {

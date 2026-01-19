@@ -13,6 +13,8 @@
 #include <String.h>
 #include <Referenceable.h>
 
+#include "PackageInfo.h"
+
 
 enum {
 	PKG_CHANGED_LOCALIZED_TEXT				= 1 << 0,
@@ -28,8 +30,8 @@ enum {
 };
 
 
-class PackageInfo;
-typedef BReference<PackageInfo>	PackageInfoRef;
+//class PackageInfo;
+//typedef BReference<PackageInfo>	PackageInfoRef;
 
 
 /*!	PackageInfoChangeEvent is akin to the PackageChangeEvent but couples a
