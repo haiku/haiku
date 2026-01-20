@@ -131,6 +131,20 @@ BSolverRepository::SetTo(BAllInstallationLocations)
 }
 
 
+static bool
+SolverRepositoryAddPackageCallback(void* context, const BPackageInfo& packageInfo)
+{
+	BSolverRepository* repo = (BSolverRepository*)context;
+
+	status_t error = repo->AddPackage(packageInfo);
+	if (error != B_OK) {
+		repo->Unset();
+		return false;
+	}
+	return true;
+}
+
+
 status_t
 BSolverRepository::SetTo(const BRepositoryConfig& config)
 {
@@ -150,14 +164,8 @@ BSolverRepository::SetTo(const BRepositoryConfig& config)
 		return error;
 	}
 
-	BRepositoryCache::Iterator it = cache.GetIterator();
-	while (const BPackageInfo* packageInfo = it.Next()) {
-		error = AddPackage(*packageInfo);
-		if (error != B_OK) {
-			Unset();
-			return error;
-		}
-	}
+	if ((error = cache.GetPackageInfos(SolverRepositoryAddPackageCallback, this)) != B_OK)
+		return error;
 
 	return B_OK;
 }
@@ -175,14 +183,9 @@ BSolverRepository::SetTo(const BRepositoryCache& cache)
 	fName = info.Name();
 	fPriority = info.Priority();
 
-	BRepositoryCache::Iterator it = cache.GetIterator();
-	while (const BPackageInfo* packageInfo = it.Next()) {
-		status_t error = AddPackage(*packageInfo);
-		if (error != B_OK) {
-			Unset();
-			return error;
-		}
-	}
+	status_t error;
+	if ((error = cache.GetPackageInfos(SolverRepositoryAddPackageCallback, this)) != B_OK)
+		return error;
 
 	return B_OK;
 }
@@ -292,7 +295,7 @@ BSolverRepository::AddPackages(BPackageInstallationLocation location)
 	if (error != B_OK)
 		return error;
 
-	BRepositoryCache::Iterator it = packageInfos.GetIterator();
+	BPackageInfoSet::Iterator it = packageInfos.GetIterator();
 	while (const BPackageInfo* packageInfo = it.Next()) {
 		error = AddPackage(*packageInfo);
 		if (error != B_OK)

@@ -18,7 +18,7 @@ namespace BPackageKit {
 
 class BRepositoryCache {
 public:
-			typedef BPackageInfoSet::Iterator Iterator;
+			typedef bool (*GetPackageInfosCallback)(void* /* context */, const BPackageInfo& info);
 
 public:
 								BRepositoryCache();
@@ -30,20 +30,19 @@ public:
 			const BEntry&		Entry() const;
 			bool				IsUserSpecific() const;
 
-			void				SetIsUserSpecific(bool isUserSpecific);
-
-			uint32				CountPackages() const;
-			Iterator			GetIterator() const;
+			status_t			GetPackageInfos(GetPackageInfosCallback callback, void* context) const;
 
 private:
 			struct RepositoryContentHandler;
+
+			status_t			_ReadCache(const BPath& repositoryCachePath,
+									BRepositoryInfo& repositoryInfo,
+									GetPackageInfosCallback callback, void* context) const;
 
 private:
 			BEntry				fEntry;
 			BRepositoryInfo		fInfo;
 			bool				fIsUserSpecific;
-
-			BPackageInfoSet		fPackages;
 };
 
 

@@ -21,7 +21,7 @@
 using namespace BPackageKit;
 
 
-typedef std::list<BPackageResolvable*> ProvidesList;
+typedef std::list<BPackageResolvable> ProvidesList;
 
 
 static const char* sProgramName = "update_package_requires";
@@ -53,10 +53,10 @@ update_requires_expression(BPackageResolvableExpression& expression,
 	const ProvidesList& providesList)
 {
 	// find the best-matching provides
-	BPackageResolvable* bestProvides = NULL;
+	const BPackageResolvable* bestProvides = NULL;
 	for (ProvidesList::const_iterator it = providesList.begin();
 		it != providesList.end(); ++it) {
-		BPackageResolvable* provides = *it;
+		const BPackageResolvable* provides = &*it;
 		if (!expression.Matches(*provides))
 			continue;
 
@@ -116,16 +116,17 @@ main(int argc, const char* const* argv)
 
 	ProvidesMap providesMap;
 
-	for (BRepositoryCache::Iterator it = repositoryCache.GetIterator();
-		const BPackageInfo* info = it.Next();) {
-		const BObjectList<BPackageResolvable, true>& provides = info->ProvidesList();
+	repositoryCache.GetPackageInfos([](void* context, const BPackageInfo& info) -> bool {
+		ProvidesMap* providesMap = (ProvidesMap*)context;
+		const BObjectList<BPackageResolvable, true>& provides = info.ProvidesList();
 		int32 count = provides.CountItems();
 		for (int32 i = 0; i < count; i++) {
 			BPackageResolvable* resolvable = provides.ItemAt(i);
-			ProvidesList& providesList = providesMap[resolvable->Name()];
-			providesList.push_back(resolvable);
+			ProvidesList& providesList = (*providesMap)[resolvable->Name()];
+			providesList.push_back(*resolvable);
 		}
-	}
+		return true;
+	}, &providesMap);
 
 	// load the package info
 	BPackageInfo packageInfo;

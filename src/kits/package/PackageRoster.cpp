@@ -264,7 +264,7 @@ BPackageRoster::IsPackageActive(BPackageInstallationLocation location,
 	if (error != B_OK)
 		return error;
 
-	BRepositoryCache::Iterator it = packageInfos.GetIterator();
+	BPackageInfoSet::Iterator it = packageInfos.GetIterator();
 	while (const BPackageInfo* packageInfo = it.Next()) {
 		if (info.Name() == packageInfo->Name() &&
 			info.Version().Compare(packageInfo->Version()) == 0) {

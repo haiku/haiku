@@ -46,6 +46,14 @@ DEFINE_COMMAND(ListReposCommand, "list-repos", kShortUsage, kLongUsage,
 	COMMAND_CATEGORY_REPOSITORIES)
 
 
+static bool
+CountPackagesCallback(void* context, const BPackageInfo&)
+{
+	*((int32*)context) += 1;
+	return true;
+}
+
+
 int
 ListReposCommand::Execute(int argc, const char* const* argv)
 {
@@ -111,6 +119,9 @@ ListReposCommand::Execute(int argc, const char* const* argv)
 			BRepositoryCache repoCache;
 			result = roster.GetRepositoryCache(repoName, &repoCache);
 			if (result == B_OK) {
+				int32 count = 0;
+				repoCache.GetPackageInfos(CountPackagesCallback, &count);
+
 				printf("\t\tvendor:    %s\n",
 					repoCache.Info().Vendor().String());
 				printf("\t\tsummary:   %s\n",
@@ -118,7 +129,7 @@ ListReposCommand::Execute(int argc, const char* const* argv)
 				printf("\t\tarch:      %s\n", BPackageInfo::kArchitectureNames[
 						repoCache.Info().Architecture()]);
 				printf("\t\tpkg-count: %" B_PRIu32 "\n",
-					repoCache.CountPackages());
+					count);
 				printf("\t\tbase-url:  %s\n",
 					repoCache.Info().BaseURL().String());
 				printf("\t\tidentifier:  %s\n",

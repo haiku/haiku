@@ -164,6 +164,7 @@ static Id add_package_info_to_repo(Repo *repo, Repodata *repoData,
   return solvableId;
 }
 
+#if 0
 static void add_installed_packages(Repo *repo, Repodata *repoData,
   BPackageInstallationLocation location)
 {
@@ -191,6 +192,7 @@ int repo_add_haiku_installed_packages(Repo *repo, const char *rootdir,
 
   return 0;
 }
+#endif
 
 Id repo_add_haiku_package(Repo *repo, const char *hpkgPath, int flags)
 {
@@ -201,6 +203,7 @@ Id repo_add_haiku_package(Repo *repo, const char *hpkgPath, int flags)
   return repo_add_haiku_package_info(repo, packageInfo, flags);
 }
 
+#if 0
 int repo_add_haiku_packages(Repo *repo, const char *repoName, int flags)
 {
   BPackageRoster roster;
@@ -219,6 +222,7 @@ int repo_add_haiku_packages(Repo *repo, const char *repoName, int flags)
 
   return 0;
 }
+#endif
 
 Id repo_add_haiku_package_info(Repo *repo,
   const BPackageKit::BPackageInfo &packageInfo, int flags)

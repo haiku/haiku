@@ -40,12 +40,13 @@ using namespace BHPKG;
 
 
 struct BRepositoryCache::RepositoryContentHandler : BRepositoryContentHandler {
-	RepositoryContentHandler(BRepositoryInfo& repositoryInfo,
-		BPackageInfoSet& packages, BErrorOutput* errorOutput)
+	RepositoryContentHandler(BErrorOutput* errorOutput, BRepositoryInfo& repositoryInfo,
+		GetPackageInfosCallback callback, void* callbackContext)
 		:
 		fRepositoryInfo(repositoryInfo),
 		fPackageInfo(),
-		fPackages(packages),
+		fCallback(callback),
+		fCallbackContext(callbackContext),
 		fPackageInfoContentHandler(fPackageInfo, errorOutput)
 	{
 	}
@@ -55,7 +56,6 @@ struct BRepositoryCache::RepositoryContentHandler : BRepositoryContentHandler {
 		fPackageInfo.Clear();
 		return B_OK;
 	}
-
 
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
@@ -69,9 +69,11 @@ struct BRepositoryCache::RepositoryContentHandler : BRepositoryContentHandler {
 		if (result != B_OK)
 			return result;
 
-		result = fPackages.AddInfo(fPackageInfo);
-		if (result != B_OK)
-			return result;
+		if (fCallback == NULL)
+			return B_CANCELED;
+
+		if (!fCallback(fCallbackContext, fPackageInfo))
+			return B_CANCELED;
 
 		return B_OK;
 	}
@@ -79,7 +81,6 @@ struct BRepositoryCache::RepositoryContentHandler : BRepositoryContentHandler {
 	virtual status_t HandleRepositoryInfo(const BRepositoryInfo& repositoryInfo)
 	{
 		fRepositoryInfo = repositoryInfo;
-
 		return B_OK;
 	}
 
@@ -90,7 +91,9 @@ struct BRepositoryCache::RepositoryContentHandler : BRepositoryContentHandler {
 private:
 	BRepositoryInfo&			fRepositoryInfo;
 	BPackageInfo				fPackageInfo;
-	BPackageInfoSet&			fPackages;
+	GetPackageInfosCallback		fCallback;
+	void*						fCallbackContext;
+
 	BPackageInfoContentHandler	fPackageInfoContentHandler;
 };
 
@@ -100,8 +103,7 @@ private:
 
 BRepositoryCache::BRepositoryCache()
 	:
-	fIsUserSpecific(false),
-	fPackages()
+	fIsUserSpecific(false)
 {
 }
 
@@ -132,21 +134,9 @@ BRepositoryCache::IsUserSpecific() const
 }
 
 
-void
-BRepositoryCache::SetIsUserSpecific(bool isUserSpecific)
-{
-	fIsUserSpecific = isUserSpecific;
-}
-
-
 status_t
 BRepositoryCache::SetTo(const BEntry& entry)
 {
-	// unset
-	fPackages.MakeEmpty();
-	fEntry.Unset();
-
-	// get cache file path
 	fEntry = entry;
 
 	BPath repositoryCachePath;
@@ -154,14 +144,8 @@ BRepositoryCache::SetTo(const BEntry& entry)
 	if ((result = entry.GetPath(&repositoryCachePath)) != B_OK)
 		return result;
 
-	// read repository cache
-	BStandardErrorOutput errorOutput;
-	BRepositoryReader repositoryReader(&errorOutput);
-	if ((result = repositoryReader.Init(repositoryCachePath.Path())) != B_OK)
-		return result;
-
-	RepositoryContentHandler handler(fInfo, fPackages, &errorOutput);
-	if ((result = repositoryReader.ParseContent(&handler)) != B_OK)
+	// read only info from repository cache
+	if ((result = _ReadCache(repositoryCachePath, fInfo, NULL, NULL) != B_OK))
 		return result;
 
 	BPath userSettingsPath;
@@ -175,17 +159,35 @@ BRepositoryCache::SetTo(const BEntry& entry)
 }
 
 
-uint32
-BRepositoryCache::CountPackages() const
+status_t
+BRepositoryCache::GetPackageInfos(GetPackageInfosCallback callback, void* context) const
 {
-	return fPackages.CountInfos();
+	BPath repositoryCachePath;
+	status_t result;
+	if ((result = fEntry.GetPath(&repositoryCachePath)) != B_OK)
+		return result;
+
+	BRepositoryInfo dummy;
+	return _ReadCache(repositoryCachePath, dummy, callback, context);
 }
 
 
-BRepositoryCache::Iterator
-BRepositoryCache::GetIterator() const
+status_t
+BRepositoryCache::_ReadCache(const BPath& repositoryCachePath,
+	BRepositoryInfo& repositoryInfo, GetPackageInfosCallback callback, void* context) const
 {
-	return fPackages.GetIterator();
+	status_t result;
+
+	BStandardErrorOutput errorOutput;
+	BRepositoryReader repositoryReader(&errorOutput);
+	if ((result = repositoryReader.Init(repositoryCachePath.Path())) != B_OK)
+		return result;
+
+	RepositoryContentHandler handler(&errorOutput, repositoryInfo, callback, context);
+	if ((result = repositoryReader.ParseContent(&handler)) != B_OK && result != B_CANCELED)
+		return result;
+
+	return B_OK;
 }
 
 
