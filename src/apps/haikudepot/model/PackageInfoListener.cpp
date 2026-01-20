@@ -52,7 +52,8 @@ PackageChangeEvent::PackageChangeEvent(const BString& packageName, uint32 change
 
 PackageChangeEvent::PackageChangeEvent(const PackageInfoRef& package, uint32 changes)
 	:
-	PackageChangeEvent(package->Name(), changes)
+	fPackageName(package->Name()),
+	fChanges(changes)
 {
 }
 
