@@ -14,6 +14,7 @@
 #define MAXPATHLEN      PATH_MAX
 #define MAXSYMLINKS		SYMLOOP_MAX
 #define NOFILE          OPEN_MAX
+#define DEV_BSIZE		512
 
 
 #ifndef MIN

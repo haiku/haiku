@@ -48,17 +48,6 @@
 #include "sys/types.h"
 
 
-#define DEV_BSHIFT 9 /* log2(DEV_BSIZE) */
-#define DEV_BSIZE (1 << DEV_BSHIFT)
-
-#ifndef MAXPHYS				/* max raw I/O transfer size */
-#ifdef __ILP32__
-#define MAXPHYS		(128 * 1024)
-#else
-#define MAXPHYS		(1024 * 1024)
-#endif
-#endif
-
 /*
  * Machine-independent constants (some used in following include files).
  */

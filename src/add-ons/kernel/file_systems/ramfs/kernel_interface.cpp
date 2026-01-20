@@ -700,7 +700,7 @@ ramfs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat *st)
 	st->st_gid = node->GetGID();
 	st->st_size = node->GetSize();
 	st->st_blksize = kOptimalIOSize;
-	st->st_blocks = (st->st_size + st->st_blksize - 1) / st->st_blksize;
+	st->st_blocks = (st->st_size + DEV_BSIZE - 1) / DEV_BSIZE;
 	st->st_atime = node->GetATime();
 	st->st_mtime = node->GetMTime();
 	st->st_ctime = node->GetCTime();

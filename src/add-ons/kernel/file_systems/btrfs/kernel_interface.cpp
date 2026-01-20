@@ -431,7 +431,7 @@ btrfs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 	inode->GetCreationTime(stat->st_crtim);
 
 	stat->st_size = inode->Size();
-	stat->st_blocks = (inode->Size() + 511) / 512;
+	stat->st_blocks = (inode->Size() + DEV_BSIZE - 1) / DEV_BSIZE;
 
 	return B_OK;
 }

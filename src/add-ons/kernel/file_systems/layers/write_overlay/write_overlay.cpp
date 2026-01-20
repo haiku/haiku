@@ -502,7 +502,7 @@ OverlayInode::ReadStat(struct stat *stat)
 		_PopulateStat();
 
 	memcpy(stat, &fStat, sizeof(struct stat));
-	stat->st_blocks = (stat->st_size + stat->st_blksize - 1) / stat->st_blksize;
+	stat->st_blocks = (stat->st_size + DEV_BSIZE - 1) / DEV_BSIZE;
 	return B_OK;
 }
 

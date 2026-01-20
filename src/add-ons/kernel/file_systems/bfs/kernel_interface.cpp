@@ -90,7 +90,7 @@ fill_stat_buffer(Inode* inode, struct stat& stat)
 	} else
 		stat.st_size = inode->Size();
 
-	stat.st_blocks = inode->AllocatedSize() / 512;
+	stat.st_blocks = inode->AllocatedSize() / DEV_BSIZE;
 }
 
 
@@ -2226,7 +2226,7 @@ bfs_stat_index(fs_volume* _volume, const char* name, struct stat* stat)
 	stat->st_mode = node.Mode();
 
 	stat->st_size = node.data.Size();
-	stat->st_blocks = index.Node()->AllocatedSize() / 512;
+	stat->st_blocks = index.Node()->AllocatedSize() / DEV_BSIZE;
 
 	stat->st_nlink = 1;
 	stat->st_blksize = 65536;

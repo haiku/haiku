@@ -642,8 +642,8 @@ Inode::GetStat(struct stat* st, OpenAttrCookie* attr)
 	delete[] values;
 
 	st->st_blksize = fFileSystem->Root()->IOSize();
-	st->st_blocks = st->st_size / st->st_blksize;
-	st->st_blocks += st->st_size % st->st_blksize == 0 ? 0 : 1;
+	st->st_blocks = st->st_size / DEV_BSIZE;
+	st->st_blocks += (st->st_size % DEV_BSIZE) == 0 ? 0 : 1;
 
 	return B_OK;
 }

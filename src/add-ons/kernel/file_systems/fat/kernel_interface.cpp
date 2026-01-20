@@ -1783,7 +1783,7 @@ dosfs_rstat(fs_volume* volume, fs_vnode* vnode, struct stat* stat)
 
 	fattime2timespec(fatNode->de_CDate, fatNode->de_CTime, fatNode->de_CHun, 1, &stat->st_crtim);
 
-	stat->st_blocks = howmany(fatNode->de_FileSize, 512);
+	stat->st_blocks = howmany(fatNode->de_FileSize, DEV_BSIZE);
 
 	RETURN_ERROR(status);
 }

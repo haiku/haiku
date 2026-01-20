@@ -24,6 +24,9 @@
 #define FSSH_B_MIME_TYPE_LENGTH		(FSSH_B_ATTR_NAME_LENGTH - 15)
 #define FSSH_B_MAX_SYMLINKS			16
 
+// Params
+#define FSSH_DEV_BSIZE				512
+
 // Open Modes
 #define FSSH_B_READ_ONLY 		FSSH_O_RDONLY	// read only
 #define FSSH_B_WRITE_ONLY 		FSSH_O_WRONLY 	// write only

@@ -496,7 +496,7 @@ fs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* st)
 
 	// Same for file/dir in ISO9660
 	st->st_size = node->dataLen[FS_DATA_FORMAT];
-	st->st_blocks = (st->st_size + 511) / 512;
+	st->st_blocks = (st->st_size + DEV_BSIZE) / DEV_BSIZE;
 	if (ConvertRecDate(&(node->recordDate), &time) == B_NO_ERROR) {
 		st->st_ctim.tv_sec = st->st_mtim.tv_sec = st->st_atim.tv_sec = time;
 		st->st_ctim.tv_nsec = st->st_mtim.tv_nsec = st->st_atim.tv_nsec = 0;

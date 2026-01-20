@@ -1087,7 +1087,7 @@ AttributeEntry::ReadStat(struct stat *stat)
 	stat->st_mode = S_ATTR | 0x0777;
 	stat->st_type = fEntry->type;
 	stat->st_atime = stat->st_mtime = stat->st_crtime = time(NULL);
-	stat->st_blocks = (fEntry->size + stat->st_blksize - 1) / stat->st_blksize;
+	stat->st_blocks = (fEntry->size + DEV_BSIZE - 1) / DEV_BSIZE;
 	return B_OK;
 }
 
