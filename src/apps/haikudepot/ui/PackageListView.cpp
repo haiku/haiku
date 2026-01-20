@@ -1125,6 +1125,7 @@ PackageListView::PackageListView(Model* model)
 
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
+	SetSelectionMode(B_SINGLE_SELECTION_LIST);
 }
 
 
