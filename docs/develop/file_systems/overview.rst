@@ -12,8 +12,8 @@ See docs/user/drivers/fs_interface.dox for more detailed documentation
 of this interface.
 
 It's important to note that while there may be some similarities in
-the interface with that of other operations systems, one should not
-make any assumptions about the desired behavior based soley on the
+the interface with that of other operating systems, one should not
+make any assumptions about the desired behavior based solely on the
 function prototypes defined in fs_interface.h.
 
 The following is a list of notes calling out some potential mistakes.
@@ -46,9 +46,9 @@ For the early development steps, it is much easier to run the filesystem code
 in a more controlled environment. This can be achieved through the use of
 a "filesystem shell": a simple application that runs the filesystem code, and
 allows performing specific operations through a command line interface. It can be
-executed on any platform (Haiku or another supported one such as Linux).
+executed on Haiku, or on other supported platforms, such as Linux.
 
-Example of fs_shell implementations are available under src/tests/add-ons/kernel/file_systems/
+Examples of fs_shell implementations are available under src/tests/add-ons/kernel/file_systems/
 for the bfs and btrfs filesystems.
 
 For example, to build the fs_shell for btrfs, use
@@ -74,13 +74,15 @@ userlandfs
 ..........
 
 As a second step, it's possible to use the filesystem as part of a running
-system, while still running it in userland. This allows use of Debugger,
+system, while still running it in userland. This allows the use of Debugger,
 memory protection, and in general any kind of userland debugging or tracing
-tool. When the filesystem crashes, it does not bring down the whole system.
+tool. Moreover, the system and kernel can survive an userland
+filesystem crash, reducing the risk of corrupting data or losing
+work.
 
 Userlandfs can run the filesystem code using the same interface as the kernel,
 therefore, once everything is working with userlandfs, running the filesystem
-as kernel code is usually quite easy (and provides a performance boost)
+as kernel code is usually quite easy (and provides a performance boost).
 
 See more here: :ref:`Userland FS Page`
 
