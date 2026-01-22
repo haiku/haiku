@@ -246,6 +246,25 @@ WorkerThread::MessageReceived(BMessage* message)
 }
 
 
+static BString
+arch_efi_default_prefix()
+{
+#if defined(__i386__)
+	return BString("BOOTIA32");
+#elif defined(__x86_64__)
+	return BString("BOOTX64");
+#elif defined(__arm__) || defined(__ARM__)
+	return BString("BOOTARM");
+#elif defined(__aarch64__) || defined(__arm64__)
+	return BString("BOOTAA64");
+#elif defined(__riscv) && __riscv_xlen == 32
+	return BString("BOOTRISCV32");
+#elif defined(__riscv) && __riscv_xlen == 64
+	return BString("BOOTRISCV64");
+#else
+	#error "Error: Unknown EFI Architecture!"
+#endif
+}
 
 
 void
@@ -263,6 +282,11 @@ WorkerThread::InstallEFILoader(partition_id id, bool rename)
 	off_t size;
 	BString errText;
 	status_t err = B_OK;
+
+	BString archLoader = arch_efi_default_prefix();
+	archLoader.Append(".EFI");
+	BString archLoaderBackup = arch_efi_default_prefix();
+	archLoaderBackup.Append("_old.EFI");
 
 	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &loaderPath) != B_OK
 		|| loaderPath.Append("platform_loaders/haiku_loader.efi") != B_OK
@@ -289,12 +313,12 @@ WorkerThread::InstallEFILoader(partition_id id, bool rename)
 		errText.SetTo(B_TRANSLATE("Failed to create EFI loader directory!"));
 
 	if (errText.IsEmpty() && rename
-		&& (destDir.FindEntry("BOOTX64.EFI", &existingEntry) != B_OK
-		|| existingEntry.Rename("BOOTX64_old.EFI", true) != B_OK))
+		&& (destDir.FindEntry(archLoader, &existingEntry) != B_OK
+		|| existingEntry.Rename(archLoaderBackup, true) != B_OK))
 		errText.SetTo(B_TRANSLATE("Failed to rename existing loader!"));
 
 	if (errText.IsEmpty()
-		&& (err = destDir.CreateFile("BOOTX64.EFI", &loaderDest, true)) == B_FILE_EXISTS) {
+		&& (err = destDir.CreateFile(archLoader, &loaderDest, true)) == B_FILE_EXISTS) {
 		BAlert* confirmAlert = new BAlert("", B_TRANSLATE("An EFI loader is already installed "
 			"on the selected partition! Would you like to rename it?"),
 			B_TRANSLATE("Rename"), B_TRANSLATE("Cancel"));
