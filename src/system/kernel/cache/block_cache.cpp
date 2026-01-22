@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2020, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2026, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -46,9 +46,9 @@
 
 //#define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE
-#	define TRACE(x)	TRACE_ALWAYS(x)
+#	define TRACE(x...)	TRACE_ALWAYS(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
@@ -1332,8 +1332,8 @@ BlockWriter::_WriteBlocks(cached_block** blocks, uint32 count)
 		ASSERT(block->busy_writing);
 		ASSERT(i == 0 || block->block_number == (blocks[i - 1]->block_number + 1));
 
-		TRACE(("BlockWriter::_WriteBlocks(block %" B_PRIdOFF ", count %" B_PRIu32 ")\n",
-			block->block_number, count));
+		TRACE("BlockWriter::_WriteBlocks(block %" B_PRIdOFF ", count %" B_PRIu32 ")\n",
+			block->block_number, count);
 		TB(Write(fCache, block));
 		TB2(BlockData(fCache, block, "before write"));
 
@@ -1345,10 +1345,10 @@ BlockWriter::_WriteBlocks(cached_block** blocks, uint32 count)
 		blocks[0]->block_number * blockSize, vecs, count);
 
 	if (written != (ssize_t)(blockSize * count)) {
-		TB(Error(fCache, block->block_number, "write failed", written));
+		TB(Error(fCache, blocks[0]->block_number, "write failed", written));
 		status_t error = errno;
-		TRACE_ALWAYS("could not write back %" B_PRIu32 " blocks (start block %" B_PRIdOFF
-			"): %s\n", count, blocks[0]->block_number, strerror(error));
+		TRACE_ALWAYS("could not write back %" B_PRIu32 " blocks (start block %" B_PRIdOFF "): %s\n",
+			count, blocks[0]->block_number, strerror(error));
 		if (written < 0 && error != 0)
 			return error;
 		return B_IO_ERROR;
@@ -1389,7 +1389,7 @@ BlockWriter::_BlockDone(cached_block* block,
 
 		// Has the previous transaction been finished with that write?
 		if (--previous->num_blocks == 0) {
-			TRACE(("cache transaction %" B_PRId32 " finished!\n", previous->id));
+			TRACE("cache transaction %" B_PRId32 " finished!\n", previous->id);
 			T(Action("written", fCache, previous));
 
 			notify_transaction_listeners(fCache, previous,
@@ -1482,8 +1482,8 @@ BlockPrefetcher::~BlockPrefetcher()
 status_t
 BlockPrefetcher::Allocate()
 {
-	TRACE(("BlockPrefetcher::Allocate: looking up %" B_PRIuSIZE " blocks, starting with %"
-		B_PRIdOFF "\n", fNumBlocks, fBlockNumber));
+	TRACE("BlockPrefetcher::Allocate: looking up %" B_PRIuSIZE " blocks, starting with %"
+		B_PRIdOFF "\n", fNumRequested, fBlockNumber);
 
 	ASSERT_LOCKED_MUTEX(&fCache->lock);
 
@@ -1500,8 +1500,8 @@ BlockPrefetcher::Allocate()
 		cached_block* block = fCache->hash.Lookup(blockNumIter);
 		if (block != NULL) {
 			// truncate the request
-			TRACE(("BlockPrefetcher::Allocate: found an existing block (%" B_PRIdOFF ")\n",
-				blockNumIter));
+			TRACE("BlockPrefetcher::Allocate: found an existing block (%" B_PRIdOFF ")\n",
+				blockNumIter);
 			fBlocks[i] = NULL;
 			finalNumBlocks = i;
 			break;
@@ -1536,7 +1536,7 @@ BlockPrefetcher::Allocate()
 status_t
 BlockPrefetcher::ReadAsync(WriteLocker& cacheLocker)
 {
-	TRACE(("BlockPrefetcher::Read: reading %" B_PRIuSIZE " blocks\n", fNumAllocated));
+	TRACE("BlockPrefetcher::Read: reading %" B_PRIuSIZE " blocks\n", fNumAllocated);
 
 	size_t blockSize = fCache->block_size;
 	generic_io_vec* vecs = fDestVecs;
@@ -1573,8 +1573,8 @@ BlockPrefetcher::ReadAsync(WriteLocker& cacheLocker)
 BlockPrefetcher::_IOFinishedCallback(void* cookie, io_request* request, status_t status,
 	bool partialTransfer, generic_size_t bytesTransferred)
 {
-	TRACE(("BlockPrefetcher::_IOFinishedCallback: status %s, partial %d\n",
-		strerror(status), partialTransfer));
+	TRACE("BlockPrefetcher::_IOFinishedCallback: status %s, partial %d\n",
+		strerror(status), partialTransfer);
 	((BlockPrefetcher*)cookie)->_IOFinished(status, bytesTransferred);
 }
 
@@ -1587,13 +1587,13 @@ BlockPrefetcher::_IOFinished(status_t status, generic_size_t bytesTransferred)
 	if (bytesTransferred < (fNumAllocated * fCache->block_size)) {
 		_RemoveAllocated(fNumAllocated, fNumAllocated);
 
-		TB(Error(cache, fBlockNumber, "prefetch starting here failed", status));
+		TB(Error(fCache, fBlockNumber, "prefetch starting here failed", status));
 		TRACE_ALWAYS("BlockPrefetcher::_IOFinished: transferred only %" B_PRIuGENADDR
 			" bytes in attempt to read %" B_PRIuSIZE " blocks (start block %" B_PRIdOFF "): %s\n",
 			bytesTransferred, fNumAllocated, fBlockNumber, strerror(status));
 	} else {
 		for (size_t i = 0; i < fNumAllocated; i++) {
-			TB(Read(cache, fBlockNumber + i));
+			TB(Read(fCache, fBlocks[i]));
 			mark_block_unbusy_reading(fCache, fBlocks[i]);
 			fBlocks[i]->last_accessed = system_time() / 1000000L;
 		}
@@ -1609,8 +1609,8 @@ BlockPrefetcher::_IOFinished(status_t status, generic_size_t bytesTransferred)
 void
 BlockPrefetcher::_RemoveAllocated(size_t unbusyCount, size_t removeCount)
 {
-	TRACE(("BlockPrefetcher::_RemoveAllocated:  unbusy %" B_PRIuSIZE " and remove %" B_PRIuSIZE
-		" starting with %" B_PRIdOFF "\n", unbusyCount, removeCount, (*fBlocks)->block_number));
+	TRACE("BlockPrefetcher::_RemoveAllocated:  unbusy %" B_PRIuSIZE " and remove %" B_PRIuSIZE
+		" starting with %" B_PRIdOFF "\n", unbusyCount, removeCount, (*fBlocks)->block_number);
 
 	ASSERT_LOCKED_MUTEX(&fCache->lock);
 
@@ -1807,7 +1807,7 @@ block_cache::FreeBlockParentData(cached_block* block)
 void
 block_cache::RemoveUnusedBlocks(int32 count, int32 minSecondsOld)
 {
-	TRACE(("block_cache: remove up to %" B_PRId32 " unused blocks\n", count));
+	TRACE("block_cache: remove up to %" B_PRId32 " unused blocks\n", count);
 
 	for (block_list::Iterator iterator = unused_blocks.GetIterator();
 			cached_block* block = iterator.Next();) {
@@ -1819,8 +1819,8 @@ block_cache::RemoveUnusedBlocks(int32 count, int32 minSecondsOld)
 			continue;
 
 		TB(Flush(this, block));
-		TRACE(("  remove block %" B_PRIdOFF ", last accessed %" B_PRId32 "\n",
-			block->block_number, block->last_accessed));
+		TRACE("  remove block %" B_PRIdOFF ", last accessed %" B_PRId32 "\n",
+			block->block_number, block->last_accessed);
 
 		// this can only happen if no transactions are used
 		if (block->is_dirty && !block->discard) {
@@ -1873,7 +1873,7 @@ block_cache::DiscardBlock(cached_block* block)
 void
 block_cache::_LowMemoryHandler(void* data, uint32 resources, int32 level)
 {
-	TRACE(("block_cache: low memory handler called with level %" B_PRId32 "\n", level));
+	TRACE("block_cache: low memory handler called with level %" B_PRId32 "\n", level);
 
 	// free some blocks according to the low memory state
 	// (if there is enough memory left, we don't free any)
@@ -1916,15 +1916,15 @@ block_cache::_LowMemoryHandler(void* data, uint32 resources, int32 level)
 
 	cache->RemoveUnusedBlocks(free, secondsOld);
 
-	TRACE(("block_cache::_LowMemoryHandler(): %p: unused: %" B_PRIu32 " -> %" B_PRIu32 "\n",
-		cache, oldUnused, cache->unused_block_count));
+	TRACE("block_cache::_LowMemoryHandler(): %p: unused: %" B_PRIu32 " -> %" B_PRIu32 "\n",
+		cache, oldUnused, cache->unused_block_count);
 }
 
 
 cached_block*
 block_cache::_GetUnusedBlock()
 {
-	TRACE(("block_cache: get unused block\n"));
+	TRACE("block_cache: get unused block\n");
 
 	for (block_list::Iterator iterator = unused_blocks.GetIterator();
 			cached_block* block = iterator.Next();) {
@@ -2195,7 +2195,7 @@ retry:
 	}
 
 	if (block->unused) {
-		//TRACE(("remove block %" B_PRIdOFF " from unused\n", blockNumber));
+		//TRACE("remove block %" B_PRIdOFF " from unused\n", blockNumber);
 		block->unused = false;
 		cache->unused_blocks.Remove(block);
 		cache->unused_block_count--;
@@ -2247,8 +2247,8 @@ static status_t
 get_writable_cached_block(block_cache* cache, off_t blockNumber,
 	int32 transactionID, bool cleared, void** _block)
 {
-	TRACE(("get_writable_cached_block(blockNumber = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
-		blockNumber, transactionID));
+	TRACE("get_writable_cached_block(blockNumber = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
+		blockNumber, transactionID);
 
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
 		panic("get_writable_cached_block: invalid block number %" B_PRIdOFF " (max %" B_PRIdOFF ")",
@@ -3095,7 +3095,7 @@ cache_start_transaction(void* _cache)
 	transaction->id = atomic_add(&cache->next_transaction_id, 1);
 	cache->last_transaction = transaction;
 
-	TRACE(("cache_start_transaction(): id %" B_PRId32 " started\n", transaction->id));
+	TRACE("cache_start_transaction(): id %" B_PRId32 " started\n", transaction->id);
 	T(Action("start", cache, transaction));
 
 	cache->transaction_hash.Insert(transaction);
@@ -3110,7 +3110,7 @@ cache_sync_transaction(void* _cache, int32 id)
 	block_cache* cache = (block_cache*)_cache;
 	bool hadBusy;
 
-	TRACE(("cache_sync_transaction(id %" B_PRId32 ")\n", id));
+	TRACE("cache_sync_transaction(id %" B_PRId32 ")\n", id);
 
 	do {
 		TransactionLocker locker(cache);
@@ -3161,7 +3161,7 @@ cache_end_transaction(void* _cache, int32 id,
 	block_cache* cache = (block_cache*)_cache;
 	TransactionLocker locker(cache);
 
-	TRACE(("cache_end_transaction(id = %" B_PRId32 ")\n", id));
+	TRACE("cache_end_transaction(id = %" B_PRId32 ")\n", id);
 
 	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -3227,7 +3227,7 @@ cache_abort_transaction(void* _cache, int32 id)
 	block_cache* cache = (block_cache*)_cache;
 	TransactionLocker locker(cache);
 
-	TRACE(("cache_abort_transaction(id = %" B_PRId32 ")\n", id));
+	TRACE("cache_abort_transaction(id = %" B_PRId32 ")\n", id);
 
 	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -3246,8 +3246,8 @@ cache_abort_transaction(void* _cache, int32 id)
 		next = block->transaction_next;
 
 		if (block->original_data != NULL) {
-			TRACE(("cache_abort_transaction(id = %" B_PRId32 "): restored contents of "
-				"block %" B_PRIdOFF "\n", transaction->id, block->block_number));
+			TRACE("cache_abort_transaction(id = %" B_PRId32 "): restored contents of "
+				"block %" B_PRIdOFF "\n", transaction->id, block->block_number);
 			memcpy(block->current_data, block->original_data,
 				cache->block_size);
 			cache->Free(block->original_data);
@@ -3280,7 +3280,7 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 	block_cache* cache = (block_cache*)_cache;
 	TransactionLocker locker(cache);
 
-	TRACE(("cache_detach_sub_transaction(id = %" B_PRId32 ")\n", id));
+	TRACE("cache_detach_sub_transaction(id = %" B_PRId32 ")\n", id);
 
 	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -3383,7 +3383,7 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 	block_cache* cache = (block_cache*)_cache;
 	TransactionLocker locker(cache);
 
-	TRACE(("cache_abort_sub_transaction(id = %" B_PRId32 ")\n", id));
+	TRACE("cache_abort_sub_transaction(id = %" B_PRId32 ")\n", id);
 
 	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -3439,9 +3439,9 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 			if (block->parent_data != block->current_data) {
 				// The block has been changed and must be restored - the block
 				// is still dirty and part of the transaction
-				TRACE(("cache_abort_sub_transaction(id = %" B_PRId32 "): "
+				TRACE("cache_abort_sub_transaction(id = %" B_PRId32 "): "
 					"restored contents of block %" B_PRIdOFF "\n",
-					transaction->id, block->block_number));
+					transaction->id, block->block_number);
 				memcpy(block->current_data, block->parent_data,
 					cache->block_size);
 				cache->Free(block->parent_data);
@@ -3468,7 +3468,7 @@ cache_start_sub_transaction(void* _cache, int32 id)
 	block_cache* cache = (block_cache*)_cache;
 	TransactionLocker locker(cache);
 
-	TRACE(("cache_start_sub_transaction(id = %" B_PRId32 ")\n", id));
+	TRACE("cache_start_sub_transaction(id = %" B_PRId32 ")\n", id);
 
 	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -3893,8 +3893,8 @@ block_cache_get_writable_etc(void* _cache, off_t blockNumber,
 	block_cache* cache = (block_cache*)_cache;
 	WriteLocker locker(&cache->lock);
 
-	TRACE(("block_cache_get_writable_etc(block = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
-		blockNumber, transaction));
+	TRACE("block_cache_get_writable_etc(block = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
+		blockNumber, transaction);
 	if (cache->read_only)
 		panic("tried to get writable block on a read-only cache!");
 
@@ -3921,8 +3921,8 @@ block_cache_get_empty(void* _cache, off_t blockNumber, int32 transaction)
 	block_cache* cache = (block_cache*)_cache;
 	WriteLocker locker(&cache->lock);
 
-	TRACE(("block_cache_get_empty(block = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
-		blockNumber, transaction));
+	TRACE("block_cache_get_empty(block = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
+		blockNumber, transaction);
 	if (cache->read_only)
 		panic("tried to get empty writable block on a read-only cache!");
 
@@ -4057,8 +4057,8 @@ status_t
 block_cache_prefetch(void* _cache, off_t blockNumber, size_t* _numBlocks)
 {
 #ifndef BUILDING_USERLAND_FS_SERVER
-	TRACE(("block_cache_prefetch: fetching %" B_PRIuSIZE " blocks starting with %" B_PRIdOFF "\n",
-		*_numBlocks, blockNumber));
+	TRACE("block_cache_prefetch: fetching %" B_PRIuSIZE " blocks starting with %" B_PRIdOFF "\n",
+		*_numBlocks, blockNumber);
 
 	block_cache* cache = reinterpret_cast<block_cache*>(_cache);
 	WriteLocker locker(&cache->lock);
@@ -4070,8 +4070,8 @@ block_cache_prefetch(void* _cache, off_t blockNumber, size_t* _numBlocks)
 
 	status_t status = blockPrefetcher->Allocate();
 	if (status != B_OK || blockPrefetcher->NumAllocated() == 0) {
-		TRACE(("block_cache_prefetch returning early (%s): allocated %" B_PRIuSIZE "\n",
-			strerror(status), blockPrefetcher->NumAllocated()));
+		TRACE("block_cache_prefetch returning early (%s): allocated %" B_PRIuSIZE "\n",
+			strerror(status), blockPrefetcher->NumAllocated());
 		delete blockPrefetcher;
 		return status;
 	}
