@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2025, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2026, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1064,7 +1064,7 @@ Journal::Unlock(Transaction* owner, bool success)
 		if (fSeparateSubTransactions
 			&& recursive_lock_get_recursion(&fLock) == 1)
 			fSeparateSubTransactions = false;
-	} else
+	} else if (owner != NULL)
 		owner->MoveListenersTo(fOwner);
 
 	recursive_lock_unlock(&fLock);
