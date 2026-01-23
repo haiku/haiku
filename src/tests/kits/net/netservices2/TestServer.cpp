@@ -53,7 +53,7 @@ exec(const std::vector<std::string>& args)
 std::string
 TestFilePath(const std::string& relativePath)
 {
-	return relativePath;
+	return "resources/" + relativePath;
 }
 
 } // namespace

@@ -1,9 +1,12 @@
 local haikuUnitTestsPackage = haiku_unittests.hpkg ;
 HaikuPackage $(haikuUnitTestsPackage) ;
 
-CopyDirectoryToPackage add-ons
-	:
-	$(TARGET_UNIT_TEST_DIR)
-;
+local libraries = [ on unittests return $(UNIT_TEST_LIBRARIES) ] ;
+local executables = [ on unittests return $(UNIT_TEST_EXECUTABLES) ] ;
+local resources = [ on unittests return $(UNIT_TEST_RESOURCES) ] ;
+
+AddFilesToPackage add-ons unittests lib : $(libraries) ;
+AddFilesToPackage add-ons unittests resources : $(resources) ;
+AddFilesToPackage add-ons unittests : $(executables) ;
 
 BuildHaikuPackage $(haikuUnitTestsPackage) : haiku_unittests ;

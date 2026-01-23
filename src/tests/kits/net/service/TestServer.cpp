@@ -49,7 +49,7 @@ void exec(const std::vector<std::string>& args)
 // Return the path of a file path relative to this source file.
 std::string TestFilePath(const std::string& relativePath)
 {
-	return relativePath;
+	return "resources/" + relativePath;
 }
 
 }

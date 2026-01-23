@@ -37,6 +37,42 @@ rule UnitTestLib
 	SharedLibrary $(lib) : $(sources) : $(libraries) libcppunit.so ;
 
 	UnitTestDependency $(lib) ;
+	UNIT_TEST_LIBRARIES on unittests += $(lib) ;
+}
+
+
+rule UnitTestResource
+{
+	# UnitTestResource <target> : <source> : <flags> ;
+	#
+	# <flags> supported values: isExec
+	local target = $(1:G=tests!unittests!resources) ;
+	local source = $(2) ;
+	local flags = $(3) ;
+
+	MakeLocate $(target) : [ FDirName $(TARGET_UNIT_TEST_DIR) resources ] ;
+	File $(target) : $(source) ;
+	if isExec in $(flags) {
+		MODE on $(target) = $(EXEMODE) ;
+	}
+	MimeSet $(target) ;
+	UnitTestDependency $(target) ;
+	UNIT_TEST_RESOURCES on unittests += $(target) ;
+}
+
+
+rule UnitTestResources
+{
+	# UnitTestResources <files> : <sourceDir> : <flags> ;
+	#
+	# <flags> supports same values as UnitTestResource
+	local files = $(1) ;
+	local sourceDir = $(2) ;
+	local flags = $(3) ;
+	for file in $(files) {
+		LOCATE on $(file) = $(sourceDir) ;
+		UnitTestResource $(file:G=tests!unittests!resources) : $(file) : $(flags) ;
+	}
 }
 
 
@@ -67,6 +103,7 @@ rule UnitTest
 		: $(resources) ;
 
 	UnitTestDependency $(target) ;
+	UNIT_TEST_EXECUTABLES on unittests += $(target) ;
 }
 
 
