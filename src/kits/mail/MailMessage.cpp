@@ -815,7 +815,11 @@ BEmailMessage::RenderToRFC822(BPositionIO* file)
 		attr = CC();
 		attributed->WriteAttrString(B_MAIL_ATTR_CC, &attr);
 		attr = Subject();
+		if (attr.Length() <= 0)
+			attr = "No Subject";
 		attributed->WriteAttrString(B_MAIL_ATTR_SUBJECT, &attr);
+		SubjectToThread(attr); // Extract the core subject words.
+		attributed->WriteAttrString(B_MAIL_ATTR_THREAD, &attr);
 		attr = ReplyTo();
 		attributed->WriteAttrString(B_MAIL_ATTR_REPLY, &attr);
 		attr = From();
