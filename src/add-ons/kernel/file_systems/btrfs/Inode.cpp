@@ -257,7 +257,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 		else if (compression == BTRFS_EXTENT_COMPRESS_ZLIB)
 			panic("zlib isn't unsupported for regular extent\n");
 		else
-			panic("unknown extent compression; %d\n", compression);
+			ERROR("unknown extent compression; %d\n", compression);
 		return B_BAD_DATA;
 	}
 
@@ -347,8 +347,8 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 		*_length = zStream.total_out;
 
 	} else {
-		panic("unknown extent compression; %d\n", compression);
-		return B_BAD_DATA;
+		ERROR("unknown extent compression; %d\n", compression);
+		return B_NOT_SUPPORTED;
 	}
 	return B_OK;
 
