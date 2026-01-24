@@ -195,7 +195,10 @@ rule DefineDefaultBuildProfiles
 			}
 
 			AddHaikuImageSystemPackages
+				openssh
 				openssl3
+				!gcc2 @{ python3.10 }@
+				gcc2 @{ python3.10_x86@secondary_x86 }@
 				;
 		}
 
