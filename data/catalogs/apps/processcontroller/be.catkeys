@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ProcessController	2791873518
+1	belarusian	x-vnd.Haiku-ProcessController	805862030
 Error saving file	ProcessController		Памылка пры захаванні файла
 Display priority	ProcessController		Прыярытэт адлюстравання
 That's no Fun!	ProcessController		Гэта непрыкольна!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Працэсар %d
 Live in the Deskbar	ProcessController		Прывязаць да Deskbar
 Kill this team!	ProcessController		Знішчыць паток!
 OK	ProcessController		ОК
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можаце запускаць ProcessController у вакне або ўсталяваць яго ў Deskbar.
 Real-time priority	ProcessController		Прыярытэт рэальнага часу
 Custom priority	ProcessController		Нестандартны прыярытэт
 Debug this thread!	ProcessController		Адладжваць паток!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Ужыванне памяці
 Ok!	ProcessController		ОК!
 Normal priority	ProcessController		Нармальны прыярытэт
 Restart Deskbar	ProcessController		Перазапусціць Deskbar
-About ProcessController…	ProcessController		Пра ProcessController…
 Usage: %s [-deskbar]\n	ProcessController		Ужыванне: %s [-deskbar]\n
 Please confirm	ProcessController		Калі ласка падцвердзіце
 Urgent priority	ProcessController		Неадкладны прыярытэт
@@ -42,6 +40,5 @@ System resources & caches…	ProcessController		Сістэмныя рэсурс�
 Damned!	ProcessController		Чорт!
 New Terminal	ProcessController		Новы Тэрмінал
 Power saving	ProcessController		Захаванне энергіі
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController ужо ўсталяваны ў Deskbar.
 This thread is already gone…	ProcessController		Гэты паток ўжо не існуе…
 Run in window	ProcessController		Запускаць у вакне

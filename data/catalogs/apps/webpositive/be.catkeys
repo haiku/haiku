@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-WebPositive	1595792782
+1	belarusian	x-vnd.Haiku-WebPositive	2410484702
 Authentication required	Authentication Panel		Патрабуецца аўтарызацыя
 Previous	WebPositive Window		Папярэдні
 Open bookmarks confirmation	WebPositive Window		Падцвержваць пераход па закладкам
@@ -91,7 +91,6 @@ Remove	Download Window		Выдаліць
 Close tab	WebPositive Window		Зачыніць укладку
 About	WebPositive Window		Пра Праграму
 Continue downloads	WebPositive		Працягваць спампоўку
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		WebPositive яшчэ ня скончыў спампоўку асобных файлаў. Усё роўна жадаеце выйсці?
 Proxy server requires authentication	Settings Window		Проксі сервер патрабуе ідэнтыфікацыі
 Cancel	Settings Window		Скасаваць
 Reset size	WebPositive Window		Вярнуць памер

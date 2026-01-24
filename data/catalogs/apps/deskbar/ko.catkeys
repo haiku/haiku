@@ -1,4 +1,4 @@
-1	korean	x-vnd.Be-TSKB	316181764
+1	korean	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		자동 숨김
 Show all	WindowMenu		모두 보이기
 Edit in Tracker…	PreferencesWindow		트래커에서 편집…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		레플리컨트 보이기
 No windows	WindowMenu		창 없음
 Show clock	Tray		시계 보이기
 Close all	WindowMenu		모두 닫기
-Deskbar preferences	PreferencesWindow		데스크바 환경설정
 About this system	DeskbarMenu		시스템 정보
 Quit application	WindowMenu		응용프로그램 끝내기
 Hide application names	PreferencesWindow		응용 프로그램 이름 숨기기
 Applications	PreferencesWindow		응용 프로그램
 Show application expander	PreferencesWindow		응용 프로그램 확장 보기
-Deskbar preferences…	DeskbarMenu		데스크바 환경설정...
 Suspend	DeskbarMenu		절전
 Shutdown…	DeskbarMenu		시스템 종료…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		데모

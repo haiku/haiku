@@ -1,10 +1,9 @@
-1	croatian	x-vnd.Haiku-Locale	225657701
+1	croatian	x-vnd.Haiku-Locale	78246383
 Medium format:	TimeFormatSettings		Srednji format:
 Negative:	TimeFormatSettings		Negativno:
 Language	Locale Preflet Window		Jezik
 Short format:	TimeFormatSettings		Kratki format:
 24 hour	TimeFormatSettings		24 sata
-Locale	Locale Preflet Window		Jezik
 Time	TimeFormatSettings		Vrijeme
 Defaults	Locale Preflet Window		Zadano
 Locale	System name		Jezik
@@ -13,7 +12,6 @@ OK	Locale Preflet Window		U redu
 Long format:	TimeFormatSettings		Dugi format:
 Numbers	TimeFormatSettings		Brojevi
 Available languages	Locale Preflet Window		Dostupni jezici
-Locale	Locale Preflet		Jezik
 Formatting	Locale Preflet Window		Formatiram
 Use month/day-names from preferred language	TimeFormatSettings		Koristi mjesec/dan-imena iz poželjnih jezika
 already chosen	LanguageListView		već izabran

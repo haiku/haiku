@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-softwareupdater	369324613
+1	romanian	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Se actualizează versiunea
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Clic aici pentru a instala {0, plural, one{# updated package} other{# updated packages}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachetele de dezinstalat
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		A apărut o exc
 Packages are being updated	UpdateManager		Pachetele sunt în curs de actualizare
 Cancel	SoftwareUpdaterWindow		Anulează
 Don't quit	SoftwareUpdaterWindow		Nu ieși
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Clic aici pentru a rula SoftwareUpdater. Unele actualizări vor necesita selectarea unei soluții la problemă.
 Checking for updates	SoftwareUpdaterWindow		Se verifică actualizările
 Updates completed	UpdateManager		Actualizări finalizate
 Reboot	SoftwareUpdaterWindow		Repornire

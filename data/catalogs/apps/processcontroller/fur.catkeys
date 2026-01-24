@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ProcessController	415082887
+1	friulian	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Erôr tal salvâ il file
 Display priority	ProcessController		Prioritât di visualizazion
 That's no Fun!	ProcessController		Nol fâs ridi!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Processôr %d
 Live in the Deskbar	ProcessController		Vîf tal Deskbar
 Kill this team!	ProcessController		Cope chest team!
 OK	ProcessController		Va ben
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Tu puedis eseguî "Controlôr dai procès" intun barcon o instalâlu tal Deskbar.
 Real-time priority	ProcessController		Prioritât in timp reâl
 Custom priority	ProcessController		Prioritât personalizade
 Debug this thread!	ProcessController		Eseguìs il debug di chest thread!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Ûs de memorie
 Ok!	ProcessController		Va ben!
 Normal priority	ProcessController		Prioritât normâl
 Restart Deskbar	ProcessController		Torne invie Deskbar
-About ProcessController…	ProcessController		Informazions su Controlôr dai procès…
 Usage: %s [-deskbar]\n	ProcessController		Ûs: %s [-deskbar]\n
 Please confirm	ProcessController		Conferme
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Risorsis di sisteme e cache…
 Damned!	ProcessController		Maledizion!
 New Terminal	ProcessController		Gnûf terminâl
 Power saving	ProcessController		Sparagn energjetic
-ProcessController is already installed in Deskbar.	ProcessController		Controlôr dai procès al è za instalât tal Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Chest al è l'ultin processôr atîf…\nNo tu puedis distudâlu!
 This thread is already gone…	ProcessController		Chest thread al è za lât…
 Run in window	ProcessController		Eseguìs tal barcon

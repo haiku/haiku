@@ -1,10 +1,9 @@
-1	swedish	x-vnd.Haiku-NetworkStatus	2979204375
+1	swedish	x-vnd.Haiku-NetworkStatus	2192330251
 IPv6 address:	NetworkStatusView		IPv6-adress:
 Quit	NetworkStatusView		Avsluta
 Unknown	NetworkStatusView		Okänd
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Öppning av nätverksinställningarna misslyckades.\n\nFel:
 Install in Deskbar	NetworkStatus		Installera i Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NätverksStatus alternativ:\n\t--deskbar\tlägg automatiskt till replikant i Deskbar\n\t--help\t\tskriv ut denna informationstext och avsluta
 Open network preferences…	NetworkStatusView		Öppna nätverksinställningar...
 NetworkStatus	System name		NätverksStatus
 Broadcast:	NetworkStatusView		Utsända:

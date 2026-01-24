@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CodyCam	12021044
+1	finnish	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		odotettiin kohdehakemistoa
 reply: '%s'\n	SftpClient		vastaus: ’%s’\n
 PASS <suppressed>  (real password sent)	FtpClient		SALASANA <salattu>  (oikea salasana lähetetty)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Video-asetukset
 Can't find an available connection to the video window	CodyCam		Käytettävissä olevan yhteyden löytäminen videoikkunaan epäonnistui
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Virhe luotaessa tulostetiedostoa
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Videolähteen löytäminen epäonnistui.\nCody-kameraohjelman käyttämiseksi tarvitset webbikameran.
 Logging in…	VideoConsumer.cpp		Kirjaudutaan…
 CodyCam	System name		Cody-kameraohjelma
 Error writing output file	VideoConsumer.cpp		Virhe kirjoitettaessa tulostetiedostoa

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PoorMan	1829050509
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Velg nettsidemappe
 Console logging	PoorMan		Konsoll-logging
 Create Log File	PoorMan		Opprett loggfil
@@ -6,9 +6,7 @@ File logging	PoorMan		Fillogging
 Website options	PoorMan		Nettsidevalg
 Log to file	PoorMan		Logg til fil
 Shutting down.	PoorMan		Stenger ned.
-Error Dir	PoorMan		Mappefeil
 Web folder:	PoorMan		Mappe for nettsiden:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vennligst velg mappen du ønsker å publisere på nettet.\n\nDu kan la PoorMan opprette en standard \"public_html\" i din hjemmemappe.\nEller du kan velge én av dine egne mapper i stedet.
 Log To Console	PoorMan		Logg til konsoll
 File Name	PoorMan		Filnavn
 Starting up... 	PoorMan		Starter opp… 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Treff: %lu
 Hits: 0	PoorMan		Treff: 0
 Shutting down.\n	PoorMan		Stenger ned.\n
 Select all	PoorMan		Merk alt
-Error Server	PoorMan		Serverfeil
 Send file listing if there's no start page	PoorMan		Send liste over filer hvis det ikke er noen startside
-Create PoorMan log	PoorMan		Opprett PoorMan-logg
 Max. simultaneous connections:	PoorMan		Maks. samtidige tilkoblinger
 Done	PoorMan		Ferdig
 Site	PoorMan		Side
@@ -48,7 +44,6 @@ Run server	PoorMan		Kjør server
 Create	PoorMan		Opprett
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# tilkobling} other{# tilkoblinger}}
 done.\n	PoorMan		ferdig.\n
-PoorMan settings	PoorMan		PoorMan-innstillinger
 Console Logging	PoorMan		Konsoll-logging
 Clear log file	PoorMan		Tøm loggfilen
 Save log console selection	PoorMan		Lagre utvalg av loggkonsoll

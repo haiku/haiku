@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-TSKB	316181764
+1	belarusian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Схаваць аўтаматычна
 Show all	WindowMenu		Паказаць усё
 Edit in Tracker…	PreferencesWindow		Рэдагаваць у Тракеры…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Паказваць дупліканты
 No windows	WindowMenu		Без вокнаў
 Show clock	Tray		Паказаць гадзіннік
 Close all	WindowMenu		Закрыць усё
-Deskbar preferences	PreferencesWindow		Наладкі Deskbar
 About this system	DeskbarMenu		Пра гэтую сістэму
 Quit application	WindowMenu		Выйсці з праграмы
 Hide application names	PreferencesWindow		Схаваць імёны праграм
 Applications	PreferencesWindow		Праграмы
 Show application expander	PreferencesWindow		Паказваць кнопку спісу праграм
-Deskbar preferences…	DeskbarMenu		Наладкі Deskbar-у…
 Suspend	DeskbarMenu		Прыпыніць
 Shutdown…	DeskbarMenu		Спыніць…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Прыклады

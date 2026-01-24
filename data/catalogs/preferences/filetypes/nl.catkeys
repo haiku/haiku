@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-FileTypes	436017301
+1	dutch; flemish	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Links
 Float	Attribute ListView		Decimaal (float)
 Final	Application Types Window		Laatste
@@ -144,7 +144,6 @@ Open file	FileTypes		Open Bestand
 Version info	Application Type Window		Versie-info
 Final	Application Type Window		Laatste
 Preferred application	FileType Window		Voorkeurstoepassing
-FileTypes	FileTypes		BestandsTypen
 Set preferred application	Preferred App Menu		Voorkeurstoepassing instellen
 New file type	New File Type Window		Nieuw bestandstype
 Short description:	Application Type Window		Korte omschrijving:

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Be-TSKB	316181764
+1	greek, modern (1453-)	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Αυτόματη απόκρυψη
 Show all	WindowMenu		Εμφάνιση όλων
 Edit in Tracker…	PreferencesWindow		Επεξεργασία στον Ιχνηλάτη…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Εμφάνιση λαβών στις ρεπλίκε
 No windows	WindowMenu		Χωρίς παράθυρα
 Show clock	Tray		Εμφάνιση ρολογιού
 Close all	WindowMenu		Κλείσιμο όλων
-Deskbar preferences	PreferencesWindow		Προτιμήσεις Γραμμής Εργασιών
 About this system	DeskbarMenu		Πληροφορίες συστήματος
 Quit application	WindowMenu		Έξοδος εφαρμογής
 Hide application names	PreferencesWindow		Απόκρυψη ονομάτων εφαρμογών
 Applications	PreferencesWindow		Εφαρμογές
 Show application expander	PreferencesWindow		Εμφάνιση λαβής επέκτασης εφαρμογών
-Deskbar preferences…	DeskbarMenu		Προτιμήσεις Γραμμής Εργασιών…
 Suspend	DeskbarMenu		Αναστολή
 Shutdown…	DeskbarMenu		Κλείσιμο…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Επιδείξεις

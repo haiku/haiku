@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku-icon_o_matic	1275638063
+1	italian	x-vnd.haiku-icon_o_matic	150011047
 None	Icon-O-Matic-Properties		Nessuno
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Pulisci tracciato
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -98,7 +98,6 @@ Add shape with path	Icon-O-Matic-Menu-Shape		Aggiungi forma con tracciato
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Bummer
 Translation X	Icon-O-Matic-PropertyNames		Traslazione X
 Multi-paste properties	Icon-O-Matic-Properties		Proprietà incolla multiplo
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic potrebbe non aver interpretato correttamente tutte le informazioni dall'SVG quando è stato caricato. Sovrascrivendo il file originale, queste informazioni andranno perse.
 Remove	Icon-O-Matic-TransformersList		Rimuovi
 Rotate indices backwards	Icon-O-Matic-PathsList		Ruotare gli indici indietro
 Overwrite	Icon-O-Matic-SVGExport		Sovrascrivi

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Shortcuts	3834857117
+1	danish	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Program
 Option	ShortcutsSpec	Name for modifier on keyboard	Valgmulighed
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Tilbagefør til gemte
 Don't save	ShortcutsWindow		Gem ikke
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genveje kunne ikke gemme dit keyset.
 Save	ShortcutsWindow		Gem
 Either	ShortcutsSpec		Vilkårlig
 Oh no	ShortcutsWindow		Åh nej
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Afbryd
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
 Left	ShortcutsSpec		Venstre
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genveje kunne ikke sende din KeySet-fil!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genveje kunne ikke gemme din KeySet-fil!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Din tekst her\"
 Remove selected shortcut	ShortcutsWindow		Fjern valgte genvej
 Error, NULL state description?	ShortcutsSpec		Fejl, NULL-tilstand beskrivelse?

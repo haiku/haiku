@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Shortcuts	3834857117
+1	lithuanian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Programa
 Option	ShortcutsSpec	Name for modifier on keyboard	Alternatyva
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Grįžti prie įrašyto
 Don't save	ShortcutsWindow		Neįrašyti
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
 Save	ShortcutsWindow		Įrašyti
 Either	ShortcutsSpec		Bet kuris
 Oh no	ShortcutsWindow		O, ne!
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Atsisakyti
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Valdymas
 Left	ShortcutsSpec		Kairysis
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio išanalizuoti nepavyko!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Jūsų tekstas čia\"
 Remove selected shortcut	ShortcutsWindow		Pašalinti pažymėtąjį klavišų derinį
 Error, NULL state description?	ShortcutsSpec		Klaida: NULL būsenos aprašas?

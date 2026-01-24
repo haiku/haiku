@@ -1,9 +1,8 @@
-1	finnish	x-vnd.Haiku-Expander	3239308358
+1	finnish	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Kohde
 Other	ExpanderPreferences		Muut
 Automatically show contents listing	ExpanderPreferences		Näytä sisältöluettelo automaattisesti
 Expander	System name		Laajentaja
-Expander: Choose destination	DirectoryFilePanel		Laajentaja: Valitse kohde
 Set source…	ExpanderMenu		Aseta lähde…
 OK	ExpanderWindow		Valmis
 The destination is not a folder.	ExpanderWindow		Kohde ei ole kansio.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Avaa kohdekansio p
 Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto lähde(arkisto)tiedostona
 Stop	ExpanderWindow		Pysäytä
 Cancel	ExpanderWindow		Peru
-Expander settings	ExpanderPreferences		Laajentaja-asetukset
 Error when expanding archive	ExpanderWindow		Virhe laajennettaessa arkistoa
 Expand	ExpanderMenu		Laajenna
 Failed to create the destination folder.	ExpanderWindow		Kohdekansion luominen epäonnistui.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Jatka
 Cancel	ExpanderPreferences		Peru
 Use:	ExpanderPreferences		Käyttö:
 Destination folder	ExpanderPreferences		Kohdekansio
-Expander: Open	ExpanderWindow		Laajentaja: Avaa
 Leave destination folder path empty	ExpanderPreferences		Jätä kohdekansiopolku tyhjäksi
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Kohdekansiota ei ole olemassa. Haluatko luoda sen?
 The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa

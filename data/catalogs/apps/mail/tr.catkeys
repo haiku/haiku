@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Be-MAIL	262401742
+1	turkish	x-vnd.Be-MAIL	3492357554
 Set to Saved	Mail		Kaydedilenlere ekle
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder’e basmak bu iletinizi gönderir; ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter kümesi kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için Vazgeç’e tıklayın.
 Text wrapping:	Mail		Metin kaydırma:
@@ -27,6 +27,7 @@ Save changes to this signature?	Mail		İmzaya yapılan değişiklikler kaydedils
 Save attachment…	Mail		Eki kaydet…
 Paste	Mail		Yapıştır
 E-mail draft could not be saved!	Mail		E-posta taslağı kaydedilemedi!
+Next message, keep status	Mail		Sonraki ileti, durumu tut
 Don't send	Mail		Gönderme
 sent	B_USER_DIRECTORY/mail/sent		gönderilen
 Only files can be added as attachments.	Mail		Yalnızca dosyalar eklenebilir.
@@ -96,7 +97,6 @@ To:	Mail		Kime:
 Need Tracker to move items to trash	Mail		Ögelerin çöpe taşınabilmesi için İzleyici gerekiyor
 The mail_daemon could not be started:\n\t	Mail		mail_daemon başlatılamadı:\n\t
 <no account found>	Mail		<hesap bulunamadı>
-Mail couldn't find its dictionary.	Mail		Posta, kendi sözlüğünü bulamadı.
 helpful message	Mail		yararlı ileti
  Read 	Mail		 Oku 
 Font:	Mail		Yazıtipi:
@@ -107,7 +107,6 @@ Start now	Mail		Şimdi başlat
 (Name unavailable)	Mail		(Ad kullanılamıyor)
 Move to trash	Mail		Çöpe at
 <none>	Mail		<yok>
-Mail settings	Mail		Posta ayarları
 %d - Date	Mail		%d — Tarih
 Check spelling	Mail		Yazımı denetle
 Status:	Mail		Durum:
@@ -158,6 +157,7 @@ Edit	Mail		Düzen
 Page setup…	Mail		Sayfa yapısı…
 An error occurred trying to save this signature.	Mail		İmza kaydedilirken bir hata oluştu.
 Beginner	Mail		Yeni başlayan
+Previous message, keep status	Mail		Önceki ileti, durumu tut
 Send message	Mail		İletiyi gönder
 Delete	Mail		Sil
 Put your favorite e-mail queries and query templates in this folder.	Mail		Favori e-posta sorgularınızı ve sorgu şablonlarını bu klasöre koyun.

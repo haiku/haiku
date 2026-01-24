@@ -1,11 +1,10 @@
-1	japanese	x-vnd.Haiku-Locale	1312749322
+1	japanese	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		中位の形式:
 ERROR	TimeFormatSettings		エラー
 Negative:	TimeFormatSettings		負表記:
 Language	Locale Preflet Window		言語
 Short format:	TimeFormatSettings		短い形式:
 24 hour	TimeFormatSettings		24 時間
-Locale	Locale Preflet Window		言語と書式
 Time	TimeFormatSettings		時刻
 Defaults	Locale Preflet Window		デフォルト
 Locale	System name		言語と書式
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		OK
 Long format:	TimeFormatSettings		長い形式:
 Numbers	TimeFormatSettings		数字
 Available languages	Locale Preflet Window		使用可能な言語
-Locale	Locale Preflet		言語と書式
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		使用できる言語が見つかりません!このプレフレットは使用できません!
 Formatting	Locale Preflet Window		書式設定
 Use month/day-names from preferred language	TimeFormatSettings		優先する言語の月/日の名前を使用する

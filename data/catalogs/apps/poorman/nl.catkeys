@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PoorMan	1829050509
+1	dutch; flemish	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Webmap selecteren
 Console logging	PoorMan		Loggen naar console
 Create Log File	PoorMan		Logbestand maken
@@ -6,9 +6,7 @@ File logging	PoorMan		Bestandsloggen
 Website options	PoorMan		Website-opties
 Log to file	PoorMan		Loggen naar bestand
 Shutting down.	PoorMan		Bezig met afsluiten.
-Error Dir	PoorMan		Fout Map
 Web folder:	PoorMan		Webmap:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kies alstublieft de map die u op het web wilt publiceren.\n\nU kunt PoorMan een standaardmap \"public_html\" laten aanmaken in uw home-map.\nOf u kunt in plaats daarvan een van uw eigen mappen gebruiken.
 Log To Console	PoorMan		Loggen naar console
 File Name	PoorMan		Bestandsnaam
 Starting up... 	PoorMan		Bezig met opstarten...
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Hits: %lu
 Hits: 0	PoorMan		Hits: 0
 Shutting down.\n	PoorMan		Bezig met afsluiten.\n
 Select all	PoorMan		Alles selecteren
-Error Server	PoorMan		Serverfout
 Send file listing if there's no start page	PoorMan		Stuur een bestandslijst als er geen startpagina is
-Create PoorMan log	PoorMan		PoorMan-log aanmaken
 Max. simultaneous connections:	PoorMan		Max. aantal gelijktijdige verbindingen:
 Done	PoorMan		Klaar
 Site	PoorMan		Site
@@ -48,7 +44,6 @@ Run server	PoorMan		Server activeren
 Create	PoorMan		Maken
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# verbinding} other{# verbindingen}}
 done.\n	PoorMan		klaar.\n
-PoorMan settings	PoorMan		PoorMan-instellingen
 Console Logging	PoorMan		Consoleloggen
 Clear log file	PoorMan		Logbestand wissen
 Save log console selection	PoorMan		Selectie uit logconsole bewaren

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-CodyCam	185579625
+1	croatian	x-vnd.Haiku-CodyCam	2960228086
 reply: '%s'\n	SftpClient		odgovor: '%s'\n
 JPEG image	CodyCam		JPEG slika
 Remote host has closed the connection.\n	FtpClient		Udaljeno računalo je prekinlo vezu.\n
@@ -63,7 +63,6 @@ Video settings	CodyCam		Video postavke
 Can't find an available connection to the video window	CodyCam		Ne mogu naći dostupnu vezu prema video prozoru
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Greška pri izradi izlazne datoteke
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Ne mogu naći video izvor.\nPotrebna vam je web kamera da bi ste koristili CodyCam.
 Logging in…	VideoConsumer.cpp		Prijavljujem se...
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Greška pri pisanju izlazne datoteke

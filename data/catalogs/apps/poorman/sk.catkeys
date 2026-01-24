@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PoorMan	1829050509
+1	slovak	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Vybrať webový priečinok
 Console logging	PoorMan		Záznam na konzolu
 Create Log File	PoorMan		Vytvoriť súbor so záznamom
@@ -6,9 +6,7 @@ File logging	PoorMan		Záznam do súboru
 Website options	PoorMan		Nastavenia webstránky
 Log to file	PoorMan		Uložiť záznam do súboru
 Shutting down.	PoorMan		Vypína sa.
-Error Dir	PoorMan		Chybový adresár
 Web folder:	PoorMan		Webový priečinok:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Prosím, vyberte priečinok, ktorý chcete zverejniť na webe.\n\nPoorMan môže pre vás vytvoriť predvolený priečinok „public_html“ vo vašom domovskom priečinku.\nAlebo namiesto toho vyberte jeden z vašich vlastných priečinkov.
 Log To Console	PoorMan		Záznam na konzolu
 File Name	PoorMan		Názov súboru
 Starting up... 	PoorMan		Spúšťa sa... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Zásahov: %lu
 Hits: 0	PoorMan		Zásahov: 0
 Shutting down.\n	PoorMan		Vypína sa.\n
 Select all	PoorMan		Vybrať všetky
-Error Server	PoorMan		Chybový server
 Send file listing if there's no start page	PoorMan		Poslať výpis súborov ak úvodná stránka neexistuje
-Create PoorMan log	PoorMan		Vytvoriť záznam PoorMan
 Max. simultaneous connections:	PoorMan		Max. súčasných spojení:
 Done	PoorMan		Hotovo
 Site	PoorMan		Lokalita
@@ -48,7 +44,6 @@ Run server	PoorMan		Spustiť server
 Create	PoorMan		Vytvoriť
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# spojenie} few{# spojenia} other{# spojení}}
 done.\n	PoorMan		hotovo.\n
-PoorMan settings	PoorMan		Nastavenia PoorMan
 Console Logging	PoorMan		Záznam na konzolu
 Clear log file	PoorMan		Vyčistiť súbor so záznamom
 Save log console selection	PoorMan		Uložiť záznam výberu konzoly

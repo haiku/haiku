@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	3240158834
+1	finnish	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Suoritetaan asennus.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sulje ”Levyasema-asetukset”-ikkuna ennen Asennusohjelman ikkunan sulkemista.
 No optional packages available.	PackagesView		Valinnaisia pakkauksia ei ole saatavilla.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Napsauta valinta
 Welcome to the Haiku Installer!\n\n	InstallerApp		Tervetuloa Haiku-asennusohjelmaan!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Levyasema-asetukset -sovelluksen käynnistäminen osioiden asettamiseksi epäonnistui.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Alkukäynnistyssektori on kirjoitettu kohteeseen ’%s’. Napsauta painiketta ’Poistu’ Asennusohjelmasta poistuaksesi tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Kohdetaltio ei ole tyhjä. Jos se sisältää jo Haiku-asennuksen, se korvataan uudella asennuksella. Se poistaa kaiken asennetun ohjelmiston.\n\nJos haluat päivittää järjestelmäsi poistamatta asennettua ohjelmistoa, katso Haikun käyttöohjeen aihetta sovelluksesta \"Ohjelmistopäivittäjä\" päivityskäskyistä.\n\nOletko varma, että haluat jatkaa asennusta?
 Quit DriveSetup	InstallerWindow		Poistu Levyasema-asetuksista
 Write boot sector	InstallerWindow		Kirjoita käynnistyssektori
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ’Aloita’.
 OK	InstallProgress		Valmis
 Quit BootManager	InstallerWindow		Poistu Käynnistyshallinnasta
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Oletko varma, että haluat asentaa nykyiselle käynnistyslevylle? Asennusohjelman on käynnistettävä tietokoneesi uudelleen, jos jatkat.
 Onto:	InstallerWindow		levylle:
 Tools	InstallerWindow		Työkalut
 scanning…	InstallerWindow		etsitään…

@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Haiku-Terminal	686383766
+1	ukrainian	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
 Insert path	Terminal TermView		Вставити шлях
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Термінал не зміг запустити оболонку. Прикро.
 Text encoding	Terminal TermWindow		Кодування тексту
 Colors	Terminal ThemeWindow		Кольори
 OK	Terminal SetTitleWindow		ОК
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Скасувати
 Defaults	Terminal PrefWindow		Типові настройки
 black	Terminal ThemeView		чорний
 Revert	Terminal PrefWindow		Відкат змін
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Термінал
 Use selection	Terminal FindWindow		Використати вибране
 Find next	Terminal TermWindow		Знайти наступне
 Copy link location	Terminal TermView		Копіювати адресу посилання
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Дійсно закрити?
 Font size	Terminal TermWindow		Розмір шрифту
 OK	Terminal TermApp		ОК
 ANSI bright blue color	Terminal ThemeView		ANSI яскравий синій
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процес \"%1\" все ще запущено.\nЯкщо Ви закриєте Термінал, процес буде знищено.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Нероспізнана опція \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Text not found.	Terminal TermWindow		Текст не знайдено.
 Match word	Terminal FindWindow		Слово повністю
-New Terminal	Terminal TermWindow		Новий Термінал
 Find failed	Terminal TermWindow		Збій пошуку
 Quit	Terminal TermWindow		Вийти
 Match case	Terminal FindWindow		Враховувати регістр
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI яскравий бірюзов�
 Tab title:	Terminal TermWindow		Заголовок вкладки:
 Window title:	Terminal TermWindow		Заголовок вікна:
 ANSI white color	Terminal ThemeView		ANSI білий
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Переключити термінали
 Window size:	Terminal AppearancePrefView		Розмір вікна:
-Switch Terminals	Terminal TermWindow		Переключити термінали
 Decrease	Terminal TermWindow		Зменшити
 Settings…	Terminal TermWindow		Налаштування…
 Cancel	Terminal SetTitleWindow		Скасувати
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Знайти…
 No search string was entered.	Terminal TermWindow		Пошуковий рядок відсутній.
 Move here	Terminal TermView		Перемістити сюди
 Abort	Terminal Shell		Перервати
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступні процеси все ще запущені:\n\n\t%1\n\nЯкщо Ви закриєте Термінал, процеси будуть знищені.
 Set window title	Terminal TermWindow		Встановити заголовок вікна
 ANSI red color	Terminal ThemeView		ANSI червоний
 Increase	Terminal TermWindow		Збільшити

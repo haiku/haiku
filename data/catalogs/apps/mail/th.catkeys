@@ -1,4 +1,4 @@
-1	thai	x-vnd.Be-MAIL	4073987023
+1	thai	x-vnd.Be-MAIL	856240449
 Set to Saved	Mail		ตั้งเป็นบันทึก
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		ข้อความหลักของคุณมีอักขระที่ไม่สามารถถอดรหัสได้ %ld บางทีชุดอักขระที่แตกต่างกัน กดส่งเพื่อส่งต่อไป (ตัวอักขระทดแทนจะถูกใช้แทนตัวอักษรที่ไม่สามารถถอดรหัสได้) หรือเลือกยกเลิกเพื่อย้อนกลับไปและลองแก้ไข
 Text wrapping:	Mail		การตัดข้อความ:
@@ -93,7 +93,6 @@ To:	Mail		ถึง:
 Need Tracker to move items to trash	Mail		ต้องการเครื่องมือติดตามเพื่อย้ายรายการไปยังถังขยะ
 The mail_daemon could not be started:\n\t	Mail		ไม่สามารถเริ่มต้น mail_daemon:\n\t
 <no account found>	Mail		<no account found>
-Mail couldn't find its dictionary.	Mail		จดหมายหาพจนานุกรมไม่พบ
 helpful message	Mail		ข้อความที่เป็นประโยชน์
  Read 	Mail		อ่าน
 Font:	Mail		ตัวอักษร:

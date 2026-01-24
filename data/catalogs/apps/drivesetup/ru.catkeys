@@ -1,7 +1,9 @@
-1	russian	x-vnd.Haiku-DriveSetup	2345310783
+1	russian	x-vnd.Haiku-DriveSetup	2072134749
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
+Register disk image…	MainWindow		Зарегистрировать образ диска…
 Mount all	MainWindow		Подключить все
 Disk	MainWindow		Диск
+Disk image has been added.	MainWindow		Образ диска был добавлен.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на выбранном разделе будут безвозвратно потеряны!
 Device	PartitionList		Устройство
 Could not change the parameters of the selected partition.	MainWindow		Невозможно изменить параметры выбранного раздела.
@@ -9,6 +11,7 @@ Initialize	MainWindow		Инициализировать
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Вы действительно хотите записать изменения на диск прямо сейчас?\n\nЕсли это сделать, все данные на разделе \«%s\» будут безвозвратно утеряны!
 PGP encrypted	Encryption utils		Зашифрован с PGP
 Delete partition	MainWindow		Удалить раздел
+Write	MainWindow		Записать
 Removable	PartitionList		Съёмный
 Block size	PartitionList		Размер блока
 The panel experienced a problem!	MainWindow		С панелью возникла проблема!

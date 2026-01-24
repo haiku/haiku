@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	1732323378
+1	polish	x-vnd.Haiku-MediaPlayer	1545856738
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Usunięcie wpisu do Kosza
 Close	MediaPlayer-PlaylistWindow		Zamknij
 Volume of background clips	MediaPlayer-SettingsWindow		Głośność klipów działających w tle
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Zamknij
 Save error	MediaPlayer-PlaylistWindow		Błąd zapisu
 Attributes	MediaPlayer-Main		Atrybuty
 Bottom of screen	MediaPlayer-SettingsWindow		Na dole ekranu
-MediaPlayer settings	MediaPlayer-SettingsWindow		Ustawienia programu MediaPlayer
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Błędny URL!
 Aspect ratio	MediaPlayer-Main		Proporcje

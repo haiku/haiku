@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	262401742
+1	swedish	x-vnd.Be-MAIL	3492357554
 Set to Saved	Mail		Set till Sparad
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Text wrapping:	Mail		Textradbrytning:
@@ -27,6 +27,7 @@ Save changes to this signature?	Mail		Spara ändringar till denna signatur?
 Save attachment…	Mail		Spara bilagor...
 Paste	Mail		Klistra in
 E-mail draft could not be saved!	Mail		Mailet kunde inte sparas!
+Next message, keep status	Mail		Nästa meddelande, behåll status
 Don't send	Mail		Skicka inte
 sent	B_USER_DIRECTORY/mail/sent		skickat
 Only files can be added as attachments.	Mail		Endast filer kan läggas till som bilaga.
@@ -96,7 +97,6 @@ To:	Mail		Till:
 Need Tracker to move items to trash	Mail		Tracker behöver flytta objekt till papperskorgen
 The mail_daemon could not be started:\n\t	Mail		mail_daemon kunde inte startas:\n\t
 <no account found>	Mail		<inget konto hittades>
-Mail couldn't find its dictionary.	Mail		Mail kunde inte hitta arbetskatalogen.
 helpful message	Mail		hjälpsamt meddelande
  Read 	Mail		 Läs 
 Font:	Mail		Typsnitt:
@@ -107,7 +107,6 @@ Start now	Mail		Starta nu
 (Name unavailable)	Mail		(Namnet kunde inte nås)
 Move to trash	Mail		Flytta till papperskorg
 <none>	Mail		<ingen>
-Mail settings	Mail		E-postinställningar
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Kontrollera stavning
 Status:	Mail		Status:
@@ -158,6 +157,7 @@ Edit	Mail		Redigera
 Page setup…	Mail		Sidinställningar…
 An error occurred trying to save this signature.	Mail		Ett fel uppstod när signaturen skulle sparas.
 Beginner	Mail		Nybörjare
+Previous message, keep status	Mail		Föregående meddelande, behåll status
 Send message	Mail		Skicka meddelande
 Delete	Mail		Ta bort
 Put your favorite e-mail queries and query templates in this folder.	Mail		Lägg din e-post fråga och frågemall i denna folder.

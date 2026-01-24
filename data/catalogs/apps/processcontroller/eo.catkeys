@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-ProcessController	415082887
+1	esperanto	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Eraro dum konservado de dosiero
 Display priority	ProcessController		Prioritaton de montrado
 That's no Fun!	ProcessController		Tio ne estas ŝerco!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Procesoro %d
 Live in the Deskbar	ProcessController		Montri Laborstrie
 Kill this team!	ProcessController		Ĉesigi la procezaron!
 OK	ProcessController		Bone
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vi povas ruli Procezostirilo fenestre aŭ instali ĝin Laborstrie.
 Real-time priority	ProcessController		Realtempa prioritato
 Custom priority	ProcessController		Propra prioritato
 Debug this thread!	ProcessController		Sencimigi la procezon!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Konsumo de memoro
 Ok!	ProcessController		Bone!
 Normal priority	ProcessController		Norma prioritato
 Restart Deskbar	ProcessController		Restartigi Laborstrion
-About ProcessController…	ProcessController		Pri Procezostirilo…
 Usage: %s [-deskbar]\n	ProcessController		Uzado: %s [-deskbar]\n
 Please confirm	ProcessController		Konfirmu
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Sistemaj risurcoj & kaŝmemoroj�
 Damned!	ProcessController		Damne!
 New Terminal	ProcessController		Nova la Terminalo
 Power saving	ProcessController		Ŝparado de energio
-ProcessController is already installed in Deskbar.	ProcessController		Procezostirilo jam estas instalita Laborstrie.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Ĉi tio estas la lasta aktiva procesoro...\nVi ne povas malŝalti ĝin!!
 This thread is already gone…	ProcessController		Ĉi procezo jam estas ĉesigita…
 Run in window	ProcessController		Ruli en fenestro

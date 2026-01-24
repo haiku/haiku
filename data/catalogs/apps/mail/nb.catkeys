@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-MAIL	262401742
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-MAIL	3945726882
 Set to Saved	Mail		Sett som Lagret
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Hovedteksten din inneholder %ld tegn som ikke kan kodifiseres. Kanskje et annet tegnsett ville fungere bedre? Trykk Send for å sende den likevel (et erstatningstegn vil bli brukt i stedet for tegn som ikke kan kodifiseres), eller velg Avbryt for å gå tilbake og prøve å løse problemet.
 Text wrapping:	Mail		Tekstbryting:
@@ -96,7 +96,6 @@ To:	Mail		Til:
 Need Tracker to move items to trash	Mail		Trenger Tracker for å flytte elementer til papirkurven
 The mail_daemon could not be started:\n\t	Mail		Mail-daemonen kunne ikke startes:\n\t
 <no account found>	Mail		<ingen konto funnet>
-Mail couldn't find its dictionary.	Mail		Mail kunne ikke finne ordboken.
 helpful message	Mail		nyttig melding
  Read 	Mail		 Les 
 Font:	Mail		Skrifttype:
@@ -107,7 +106,6 @@ Start now	Mail		Begynn nå
 (Name unavailable)	Mail		(Navn utilgjengelig)
 Move to trash	Mail		Flytt til søppelkurven
 <none>	Mail		<ingen>
-Mail settings	Mail		E-postinnstillinger
 %d - Date	Mail		%d - Dato
 Check spelling	Mail		Stavekontroll
 Status:	Mail		Status:

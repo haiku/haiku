@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	520971408
+1	swedish	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Stäng
 Save error	MediaPlayer-PlaylistWindow		Sparningsfel
 Attributes	MediaPlayer-Main		Attribut
 Bottom of screen	MediaPlayer-SettingsWindow		Nedtill på skärmen
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
 Copyright	MediaPlayer-InfoWin		Upphovsrätt
 Invalid URL inserted!	MediaPlayer-NetworkStream		Ogiltig URL angiven!
 Aspect ratio	MediaPlayer-Main		Bildförhållande

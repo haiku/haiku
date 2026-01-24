@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	2880203340
+1	dutch; flemish	x-vnd.Haiku-Installer	3052779865
 Performing installation.	InstallProgress		Uitvoering installatie.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
 No optional packages available.	PackagesView		Geen optionele paketten beschikbaar.
@@ -61,7 +61,6 @@ Set up partitions…	InstallerWindow		Instellen van partities…
 Install progress:  	InstallerWindow		Voortgang installatie:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		U kunt de inhoud van een schijf niet op zichzelf installeren. Kies alstublieft een andere schijf.
 OK	InstallProgress		Oké
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Bent u zeker dat u op de huidige opstartschijf wilt installeren? Als u doorgaat zal Installer uw computer moeten heropstarten.
 Onto:	InstallerWindow		Naar:
 Tools	InstallerWindow		Gereedschap
 scanning…	InstallerWindow		Scant…

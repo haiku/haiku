@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-softwareupdater	369324613
+1	ukrainian	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Оновлення версії
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Натисніть щоб встановити {0, plural, one{# оновлений пакет} few{# оновлених пакета} other{# оновлених пакетів}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Пакети будуть деінстальовані
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Виникла 
 Packages are being updated	UpdateManager		Пакети оновлено
 Cancel	SoftwareUpdaterWindow		Скасувати
 Don't quit	SoftwareUpdaterWindow		Не виходити
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Натисніть щоб запустити SoftwareUpdater. Деякі оновлення потребують вибрати рішення.
 Checking for updates	SoftwareUpdaterWindow		Перевірка оновлень
 Updates completed	UpdateManager		Оновлення завершені
 Reboot	SoftwareUpdaterWindow		Перезавантажити

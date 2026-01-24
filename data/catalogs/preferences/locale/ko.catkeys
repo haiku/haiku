@@ -1,11 +1,10 @@
-1	korean	x-vnd.Haiku-Locale	1312749322
+1	korean	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		중간 길이 형식:
 ERROR	TimeFormatSettings		오류
 Negative:	TimeFormatSettings		음수:
 Language	Locale Preflet Window		언어
 Short format:	TimeFormatSettings		짧은 형식:
 24 hour	TimeFormatSettings		24 시간
-Locale	Locale Preflet Window		로케일
 Time	TimeFormatSettings		시간
 Defaults	Locale Preflet Window		기본값
 Locale	System name		로케일
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		확인
 Long format:	TimeFormatSettings		긴 형식:
 Numbers	TimeFormatSettings		숫자
 Available languages	Locale Preflet Window		사용 가능한 언어
-Locale	Locale Preflet		로케일
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		사용 가능한 언어가 없습니다! 이 설정판을 사용할 수 없습니다!
 Formatting	Locale Preflet Window		형식
 Use month/day-names from preferred language	TimeFormatSettings		선호하는 언어의 월 및 일 이름 사용

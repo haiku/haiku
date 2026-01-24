@@ -1,11 +1,10 @@
-1	french	x-vnd.Haiku-HaikuDepot	1545161534
+1	french	x-vnd.Haiku-HaikuDepot	3592911490
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Erreur lors du téléchargement des conditions d'utilisation
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
 An unexpected error has been sent from the server [%li]	ServerHelper		Le serveur [%li] a renvoyé une erreur inattendue.
 Create account	UserLoginWindow		Créer un compte
 Agree	ToLatestUserUsageConditionsWindow		Consentir
-Install %PackageTitle%	PackageManager		Installer %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Réponse incorrecte au Captcha.
 Rate package…	PackageInfoView		Évaluer le paquet…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vous êtes désormais authentifié en tant que %Nickname%.
@@ -23,7 +22,6 @@ Authorization or security issue. Logout and log back in again to check that your
 don't activate package %source%	PackageProblem	don't change '%source%	ne pas activer le paquet %source%
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Une erreur est survenue lors de l’initialisation du gestionnaire de paquets : %message%
-Quit HaikuDepot	App		Quitter DépôtHaiku
 Category	FilterView		Catégorie
 A response to the captcha question must be provided.	UserLoginWindow		Vous devez fournir une réponse à la question Captcha.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Une erreur inattendue « %Message% » est survenue avec la propriété « %Property% ».
@@ -35,7 +33,6 @@ No changelog available.	PackageInfoView		La liste des modifications n’est pas 
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Les conditions d'utilisations actuelles n'ont pas été acceptées.
 Cancel	PackageProblem		Annuler
 Version	PackageListView		Version
-No, quit HaikuDepot	App		Non, quitter DépôtHaiku
 Not logged in	MainWindow		Non connecté
 Featured packages	FeaturedPackagesView		Paquets en vitrine
 Available	PackageListView		Disponible
@@ -76,7 +73,6 @@ Language	RatePackageWindow		Langue
 Status	PackageListView		État
 Network transport error	ServerHelper		Erreur de transport réseau
 Cancel	PackageResult		Annuler
-Uninstall %PackageTitle%	PackageManager		Désinstaller %PackageTitle%
 Retry	PackageProblem		Réessayer
 Update	RatePackageWindow		Mettre à jour
 Language	UserLoginWindow		Langue
@@ -103,7 +99,6 @@ Captcha error	UserLoginWindow		Erreur de Captcha
 Manage repositories…	MainWindow		Gérer les dépôts…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Le surnom doit être unique, mais celui fourni est déjà pris. Veuillez choisir un autre surnom.
 OK	UserUsageConditions		OK
-Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 Input validation	UserLoginWindow		Validation des entrées
 Log in…	MainWindow		Connexion…
 Client version too old	ServerHelper		Version du client obsolète
@@ -137,17 +132,15 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Local
 Package changes	PackageResult	Window title	Évolutions du paquet
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Considéreriez-vous comme acceptable d’envoyer des données d’utilisation anonymes au système du Serveur de dépôt Haiku depuis cet ordinateur ? Vous pouvez changer votre préférence dans la fenêtre des « Réglages » ultérieurement.
-Installed packages	MainWindow		Paquets installés
 User rating	RatePackageWindow		Avis de l’utilisateur
+Installed packages	MainWindow		Paquets installés
 Date	PackageListView		Date
-Error	App		Erreur
 There was a puzzling response from the web service.	UserLoginWindow		La réponse du service web est incompréhensible.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Ouverture de « %DeskbarLink% »
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Votre évaluation a été postée avec succès. Vous pouvez la mettre à jour ou la supprimer sur le site Web du Dépôt Haiku.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Impossible de communiquer avec le serveur pour obtenir l’image Captcha nécessaire à la création d’un nouvel utilisateur.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La réponse fournie au Captcha est incorrecte. Un nouveau Captcha sera généré ; essayez à nouveau.
 -	no package publish		-
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Le DépôtHaiku a besoin du serveur de paquets pour fonctionner, et il ne semble pas être démarré.\nVoulez-vous le démarrer maintenant ?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Le mot de passe doit être composé d’au moins huit caractères, composé d’au moins deux chiffres et d’un caractère majuscule.
 Contents	PackageInfoView		Contenu
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Partager des données d’utilisation anonymes avec le système du Serveur de dépôt Haiku
@@ -160,8 +153,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilité
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Le mot de passe doit être répété afin de réduire le risque d’une saisie erronée.
 Cancel	SettingsWindow		Annuler
-Inactive	PackageListView		Inactif
 Cancel	RatePackageWindow		Annuler
+Inactive	PackageListView		Inactif
 Nickname:	UserLoginWindow		Surnom :
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronisation des métadonnées des dépôts
 OK	MainWindow		Valider
@@ -177,7 +170,6 @@ Success	UserLoginWindow		Opération réussie
 Settings	SettingsWindow		Réglages
 Login issue	MainWindow		Problème d’authentification
 Your rating:	RatePackageWindow		Votre évaluation :
-HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		DépôtHaiku s'arrête ou achève les opérations en cours avant de quitter.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L’utilisateur %Nickname% a été créé avec succès dans le système du Serveur de dépôt Haiku. Vous pouvez gérer votre profil utilisateur en utilisant l’interface web. Vous êtes maintenant connecté sous ce nouveau profil utilisateur.
 Repositories	MainWindow		Dépôts
 This rating is visible to other users	RatePackageWindow		Cette évaluation est visible par les autres utilisateurs

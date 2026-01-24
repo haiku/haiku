@@ -1,10 +1,9 @@
-1	esperanto	x-vnd.Haiku-Locale	1081217032
+1	esperanto	x-vnd.Haiku-Locale	933805714
 Medium format:	TimeFormatSettings		Meza formato:
 Negative:	TimeFormatSettings		Negativa:
 Language	Locale Preflet Window		Lingvo
 Short format:	TimeFormatSettings		Mallonga formato:
 24 hour	TimeFormatSettings		24 hora
-Locale	Locale Preflet Window		Lokaĵaro
 Time	TimeFormatSettings		Horo
 Defaults	Locale Preflet Window		Defaŭltoj
 Locale	System name		Lokaĵaro
@@ -13,7 +12,6 @@ OK	Locale Preflet Window		Bone
 Long format:	TimeFormatSettings		Longa formato:
 Numbers	TimeFormatSettings		Nombroj
 Available languages	Locale Preflet Window		Haveblaj lingvoj
-Locale	Locale Preflet		Lokaĵaro
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Ne povas trovi la disponeblajn lingvojn! Vi ne povas uzi ĉi preferileto!
 Formatting	Locale Preflet Window		Formatigo
 Use month/day-names from preferred language	TimeFormatSettings		Uzi nomojn de monatoj/tagoj el preferata lingvo

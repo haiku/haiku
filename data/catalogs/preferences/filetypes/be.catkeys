@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-FileTypes	3116280330
+1	belarusian	x-vnd.Haiku-FileTypes	2904674613
 Left	Attribute Window	Attribute column alignment in Tracker	Злева
 Final	Application Types Window		Фінальная
 FileTypes request	FileTypes Window		Запыт тыпу
@@ -129,7 +129,6 @@ Open file	FileTypes		Адчыніць Файл
 Version info	Application Type Window		Інфармацыя пра версію
 Final	Application Type Window		Канчатковы
 Preferred application	FileType Window		Пажаданая праграма
-FileTypes	FileTypes		FileTypes
 Set preferred application	Preferred App Menu		Прызначыць пажаданую праграму
 New file type	New File Type Window		Стварыць новы тып
 Short description:	Application Type Window		Кароткае апісанне:

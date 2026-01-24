@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-WebPositive	2177752543
+1	croatian	x-vnd.Haiku-WebPositive	3707010395
 Previous	WebPositive Window		Prethodno
 Download folder:	Settings Window		Mapa preuzimanja:
 Close window	WebPositive Window		Zatvori prozor
@@ -84,7 +84,6 @@ Remove	Download Window		Ukloni
 Close tab	WebPositive Window		Zatvori karticu
 About	WebPositive Window		O programu
 Continue downloads	WebPositive		Nastavite sa preuzimanjima
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Još ima preuzimanja u tijeku, želite li zaista sada isključiti WebPositive?
 Cancel	Settings Window		Otkaži
 History	WebPositive Window		Povijest
 Do you really want to clear the browsing history?	WebPositive Window		Želite li doista očistiti povijest pregledavanja?
@@ -97,7 +96,6 @@ Paste	WebPositive Window		Zalijepi
 Next	WebPositive Window		Slijedeće
 Bookmark error	WebPositive Window		Greška zabilješke
 OK	WebPositive Window		U redu
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Spremi stranicu kao…
 Flags	Cookie Manager		Zastave
 Window	WebPositive Window		Prozor

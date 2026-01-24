@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-PowerStatus	969869472
+1	thai	x-vnd.Haiku-PowerStatus	122611080
 Run in window	PowerStatus		ทำงานในหน้าต่าง
 Extended battery info	PowerStatus		ข้อมูลแบตเตอรี่เพิ่มเติม
 Show status icon	PowerStatus		แสดงไอคอนสถานะ
@@ -15,7 +15,6 @@ Battery low	PowerStatus		แบตเตอรี่ต่ำ
 Model number: 	PowerStatus		เลขโมเดล:
 Battery unused	PowerStatus		ไม่ได้ใช้แบตเตอรี่
 Type: 	PowerStatus		ชนิด:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		คุณสามารถเรียกใช้งานแสดงสถานะพลังงานในหน้าต่างหรือติดตั้งในเดสก์บาร์
  mAh	PowerStatus		mAh
 Battery discharging	PowerStatus		กำลังถอดแบตเตอรี่ออก
 Design voltage: 	PowerStatus		แรงดันไฟฟ้าที่กำหนด:

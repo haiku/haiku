@@ -1,7 +1,6 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Terminal	686383766
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Lukk andre faner
 Insert path	Terminal TermView		Sett inn sti
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke starte skallet. Beklager.
 Text encoding	Terminal TermWindow		Tekstkoding
 Colors	Terminal ThemeWindow		Farger
 OK	Terminal SetTitleWindow		OK
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Avbryt
 Defaults	Terminal PrefWindow		Standarder
 black	Terminal ThemeView		svart
 Revert	Terminal PrefWindow		Tilbakestill
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Bruk valgte
 Find next	Terminal TermWindow		Finn neste
 Copy link location	Terminal TermView		Kopier lenkeplassering
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Virkelig lukke?
 Font size	Terminal TermWindow		Skriftstørrelse
 OK	Terminal TermApp		OK
 ANSI bright blue color	Terminal ThemeView		ANSI lys blå farge
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker Terminal vil prosessen bli stoppet.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Ukjent valg \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Fanetittel:
 Text not found.	Terminal TermWindow		Tekst ikke funnet.
 Match word	Terminal FindWindow		Sammenlign ord
-New Terminal	Terminal TermWindow		Ny Terminal
 Find failed	Terminal TermWindow		Søk feilet
 Quit	Terminal TermWindow		Avslutt
 Match case	Terminal FindWindow		Skille store og små bokstaver
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI lys cyan farge
 Tab title:	Terminal TermWindow		Fanetittel:
 Window title:	Terminal TermWindow		Vindustittel:
 ANSI white color	Terminal ThemeView		ANSI hvit farge
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Bytt terminaler
 Window size:	Terminal AppearancePrefView		Vindusstørrelse:
-Switch Terminals	Terminal TermWindow		Bytt terminaler
 Decrease	Terminal TermWindow		Forminsk
 Settings…	Terminal TermWindow		Innstillinger…
 Cancel	Terminal SetTitleWindow		Avbryt
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Finn…
 No search string was entered.	Terminal TermWindow		Ingen søkestreng ble angitt.
 Move here	Terminal TermView		Flytt hit
 Abort	Terminal Shell		Avbryt
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Følgende prosesser kjører fremdeles:\n\n\t%1\n\nHvis du lukker Terminalen vil prosessene bli stoppet.
 Set window title	Terminal TermWindow		Sett vindustittel
 ANSI red color	Terminal ThemeView		ANSI rød farge
 Increase	Terminal TermWindow		Øk

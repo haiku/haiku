@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PowerStatus	1104524835
+1	japanese	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		ウィンドウモードで起動
 Extended battery info	PowerStatus		拡張バッテリー情報
 Show status icon	PowerStatus		状態アイコンの表示
@@ -16,7 +16,6 @@ Battery low	PowerStatus		バッテリー残量低下
 Model number: 	PowerStatus		モデルナンバー:
 Battery unused	PowerStatus		使用していないバッテリー
 Type: 	PowerStatus		タイプ: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		"バッテリーの状態" をウィンドウモードで起動することや、 Deskbar にインストールすることができます。
 Damaged or missing battery	PowerStatus		壊れたか存在しないバッテリー
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		放電中
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		シリアルナンバー:
 Battery critical	PowerStatus		バッテリー残量が空に近い
 Capacity: 	PowerStatus		容量:
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		サポートされたバッテリーが見つからなかったので、"バッテリーの状態"はこのシステムでは使用できません。
 Show percent	PowerStatus		充電率の表示
 Capacity granularity 1: 	PowerStatus		容量精度 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		バッテリー 残量が低下してきたので、デバイスを電源につないでください。

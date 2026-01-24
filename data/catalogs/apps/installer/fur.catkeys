@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Installer	3240158834
+1	friulian	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
 No optional packages available.	PackagesView		Nissun pachet facoltatîf disponibil.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Fâs clic su "Co
 Welcome to the Haiku Installer!\n\n	InstallerApp		Benvignûts tal program di instalazion di Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? di ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impussibil inviâ Gjestion disc, la aplicazion par configurâ lis partizions dai discs.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalazion completade. Il setôr di inviament al è stât scrit su '%s'. Frache 'Jes' par lassâ l'instaladôr opûr sielç un gnûf volum di destinazion par eseguî une altre instalazion.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Il volum di destinazion nol è vueit. Se al conten za une instalazion di Haiku, cheste e vignarà sorescrite. Cheste operazion e gjavarà ducj i software instalâts.\n\nSe tu desideris inzornâ il sisteme cence gjavâ vie i softwares instalâts, bute un voli sul argoment de Vuide utent di Haiku su la aplicazion \"SoftwareUpdater\" par vê istruzions sul inzornament.\n\nContinuâ pardabon la instalazion?
 Quit DriveSetup	InstallerWindow		Jes di Gjestion disc
 Write boot sector	InstallerWindow		Scrîf setôr di inviament
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Sielç il disc sorzint dal menù a tende. Dopo fâs clic su 'Scomence'.
 OK	InstallProgress		Va ben
 Quit BootManager	InstallerWindow		Jes di Gjestôr di inviament
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Instalâ pardabon sul disc di inviament atuâl? Se tu continuis, l'instaladôr al varà di tornâ a inviâ la machine.
 Onto:	InstallerWindow		Su:
 Tools	InstallerWindow		Struments
 scanning…	InstallerWindow		scansion…

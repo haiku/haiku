@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Notifications	4196496676
+1	esperanto	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		Malsupra maldekstra
 Application does not have a valid signature	NotificationView	Alert message	Programo ne havas validan subskribon
 Status	NotificationView		Stato
@@ -7,8 +7,6 @@ Lower right	GeneralView		Malsupra dekstra
 Muted	NotificationView		Silentigita
  is already listed	NotificationView	Alert message	 jam listigita
 OK	PrefletWin		Bone
-Notifications	PrefletWin		Sciigo
-Notifications preflet sample	PrefletWin		Ekzemplo de sciiga preferileto
 Mute notifications from this application	NotificationView		Silentigi sciigojn de ĉi aplikaĵo
 wide	GeneralView	Window width: Slider high text	larĝa
 narrow	GeneralView	Window width: Slider low text	mallarĝa
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Sekvi Laborstrion
 Notifications	System name		Sciigoj
 Allowed	NotificationView		Permesita
 Duration:	GeneralView		Daŭro:
-Application	NotificationView		Programo
 Enable notifications	GeneralView		Permesi sciigojn
+Application	NotificationView		Programo
 This is a test notification message	PrefletWin		Ĉi tio estas testa sciiga mesaĝo
 Remove	NotificationView		Forigi
 Position:	GeneralView		Pozicio:

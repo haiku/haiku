@@ -1,10 +1,11 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	2635956885
+1	hungarian	x-vnd.haiku-icon_o_matic	2302019526
 None	Icon-O-Matic-Properties		Nincs
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Útvonal megtisztítása
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Hozzáadás
 Opening the icon failed!	Icon-O-Matic-Main		Az ikon megnyitása sikertelen!
 Reverse path	Icon-O-Matic-ReversePathCmd		Fordított útvonal
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	Hopp!
 Add with path	Icon-O-Matic-ShapesList		Hozzáadás útvonallal együtt
 Paste properties	Icon-O-Matic-Properties		Beillesztés tulajdonságai
 Copy	Icon-O-Matic-Properties		Másolás
@@ -33,6 +34,7 @@ Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		{0
 Unassign path	Icon-O-Matic-UnassignPathCmd		Útvonal társításának megszüntetése
 Remove	Icon-O-Matic-StylesList		Eltávolítás
 Cancel	Icon-O-Matic-Menu-Settings		Mégse
+PNG set	Icon-O-Matic-SavePanel		PNG-készlet
 Transformation	Icon-O-Matic-TransformationBoxStates		Átalakítás
 Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		{0, plural, one{Útvonal} other{Útvonal}} mozgatása
 Closed	Icon-O-Matic-PropertyNames		Zárt
@@ -40,13 +42,17 @@ Closed	Icon-O-Matic-PropertyNames		Zárt
 Height	Icon-O-Matic-PropertyNames		Magasság
 warning	Icon-O-Matic-SVGExport		figyelmeztetés
 File	Icon-O-Matic-Menus		Fájl
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	bármely másik listában
 Properties	Icon-O-Matic-Menus		Tulajdonságok
 Path	Icon-O-Matic-PropertyNames		Útvonal
 Path	Icon-O-Matic-Menus		Útvonal
 Stroke	Transformation		Kihúzás
 Flip	Icon-O-Matic-PathManipulator		Tükrözés
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	hogy szerkeszd a tulajdonságokat.
+Move pivot	Icon-O-Matic-TransformationBoxStates		Forgáspont mozgatása
 Opacity	Icon-O-Matic-PropertyNames		Átlátszóság
 OK	Icon-O-Matic-ColorPicker		Rendben
+Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Többszörös %property%
 Error: 	Icon-O-Matic-Main		Hiba:
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		{0, plural, one{Átalakítás} other{Átalakítás}} visszaállítása
 SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey will be exported as linear approximations and may look different in other viewers.	Icon-O-Matic-SVGExport		Az SVG nem támogat néhány átmenetet (kúp, gyémánt, xy, sqrt_xy).\n\nLineáris közelítésként exportálják őket, és más megjelenítőkben másképp nézhetnek ki.
@@ -75,6 +81,7 @@ Alpha	Icon-O-Matic-PropertyNames		Alfa
 OK	Icon-O-Matic-SVGExport		Rendben
 Contour	Transformation		Körvonal
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		{0, plural, one{Átalakítás} other{Átalakítás}} hozzáadása
+Miter limit	Icon-O-Matic-PropertyNames		Szegélyhatár
 Insert vertex	Icon-O-Matic-InsertPointCmd		Csúcs hozzáadása
 Rounding	Icon-O-Matic-PropertyNames		Kerekítés
 Joins	Icon-O-Matic-PropertyNames		Csatlakozási pontok
@@ -83,6 +90,7 @@ Cancel	Icon-O-Matic-ColorPicker		Mégse
 Duplicate	Icon-O-Matic-PathsList		Megkettőzés
 Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		{0, plural, one{Alakzat} other{Alakzat}} mozgatása
 Save	Icon-O-Matic-Menu-Settings		Mentés
+Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	Kattints egy elemre
 Export as…	Icon-O-Matic-Menu-File		Exportálás másként…
 Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		{0, plural, one{Alakzat} other{Alakzat}} rögzítése
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		{0, plural, one{Alakzat} other{Alakzat}} eltávolítása
@@ -90,9 +98,9 @@ Undo: %action%	Icon-O-Matic-Main		Visszavonás: %action%
 Diamond	Icon-O-Matic-StyleTypes		Rombusz
 Don't save	Icon-O-Matic-Menu-Settings		Ne mentse
 Add shape with path	Icon-O-Matic-Menu-Shape		Hozzáadás útvonallal
+Bummer	Icon-O-Matic-Main	Cancel button - error alert	Fenébe
 Translation X	Icon-O-Matic-PropertyNames		X fordítás
 Multi-paste properties	Icon-O-Matic-Properties		Többszörös beillesztés tulajdonságai
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Az Icon-O-Matic nem biztos hogy az SVG fájl betöltésekor annak minden részét értelmezte. Az eredeti fájl felülírásával ezeket az adatok elvésznek.
 Remove	Icon-O-Matic-TransformersList		Eltávolítás
 Rotate indices backwards	Icon-O-Matic-PathsList		Forgatás balra
 Overwrite	Icon-O-Matic-SVGExport		Felülírás
@@ -168,6 +176,7 @@ All	Icon-O-Matic-Properties		Összes
 Transformer	Icon-O-Matic-Menus		Átalaktító
 Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		{0, plural, one{Csúcs} other{Csúcs}} tükrözése
 Invert selection	Icon-O-Matic-Properties		Kijelölés megfordítása
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	átalakítók hozzáadásához.
 <unkown property>	Icon-O-Matic-PropertyNames		<ismeretlen tulajdonság>
 Pick a color	Icon-O-Matic-ColorPicker		Szín kiválasztása
 Settings…	Icon-O-Matic-SavePanel		Beállítások…

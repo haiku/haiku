@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Shortcuts	1611284793
+1	slovak	x-vnd.Haiku-Shortcuts	2242910580
 *MouseUp	ShortcutsWindow		*MyšHore
 Application	ShortcutsWindow		Aplikácia
 Option	ShortcutsSpec	Name for modifier on keyboard	Možnosť
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Vrátiť spať uložené
 Don't save	ShortcutsWindow		Neukladať
 *MouseDown	ShortcutsWindow		*MyšDolu
 *Beep	ShortcutsWindow		*Pípnutie
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Aplikácia Skratky nedokázala uložiť vašu sadu kláves.
 Save	ShortcutsWindow		Uložiť
 Oh no	ShortcutsWindow		Ó, nie
 Key	ShortcutsWindow		Kláves
@@ -19,8 +18,6 @@ Quit	ShortcutsWindow		Ukončiť
 Cancel	ShortcutsWindow		Zrušiť
 *MoveMouse +20 +0	ShortcutsWindow		*PresunúťMyš +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Aplikácia skratky nedokázala prečítať formát vášho súboru SadaKláves!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Aplikácia skratky nedokázala uložiť váš súbor SadaKláves!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Váš text sem\"
 Remove selected shortcut	ShortcutsWindow		Odstrániť vybranú skratku
 Error, NULL state description?	ShortcutsSpec		Chyba, NULL popis stavu?

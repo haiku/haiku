@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-TSKB	316181764
+1	russian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Скрывать автоматически
 Show all	WindowMenu		Показать все
 Edit in Tracker…	PreferencesWindow		Изменить меню…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Отображать репликанты
 No windows	WindowMenu		Нет окон
 Show clock	Tray		Показать часы
 Close all	WindowMenu		Закрыть все
-Deskbar preferences	PreferencesWindow		Настройки Deskbar
 About this system	DeskbarMenu		Об этой системе
 Quit application	WindowMenu		Закрыть приложение
 Hide application names	PreferencesWindow		Скрыть имена приложений
 Applications	PreferencesWindow		Приложения
 Show application expander	PreferencesWindow		Отображать список окон приложений
-Deskbar preferences…	DeskbarMenu		Настроить Deskbar…
 Suspend	DeskbarMenu		Приостановить
 Shutdown…	DeskbarMenu		Завершение работы…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо

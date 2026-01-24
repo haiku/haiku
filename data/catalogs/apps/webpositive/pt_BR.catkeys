@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-WebPositive	1510673556
+1	portuguese (brazil)	x-vnd.Haiku-WebPositive	3039931408
 Authentication required	Authentication Panel		Autenticação necessária
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Encerrar: %date)
@@ -107,7 +107,6 @@ Remove	Download Window		Remover
 Close tab	WebPositive Window		Fechar aba
 About	WebPositive Window		Sobre
 Continue downloads	WebPositive		Continuar downloads
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ainda existem downloads em progresso, deseja realmente sair do WebPositive agora?
 Proxy server requires authentication	Settings Window		O servidor proxy requer autenticação
 Cancel	Settings Window		Cancelar
 Reset size	WebPositive Window		Redefinir tamanho
@@ -131,7 +130,6 @@ Next	WebPositive Window		Próximo
 Bookmark error	WebPositive Window		Erro no marcador
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Salvar página como…
 Zoom text only	WebPositive Window		Aumentar somente o texto
 Page source error	WebPositive Window		Erro no código-fonte da página

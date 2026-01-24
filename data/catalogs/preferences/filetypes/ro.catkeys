@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-FileTypes	436017301
+1	romanian	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Stânga
 Float	Attribute ListView		Plutire
 Final	Application Types Window		Final
@@ -144,7 +144,6 @@ Open file	FileTypes		Deschide un fișier
 Version info	Application Type Window		Informații de versiune
 Final	Application Type Window		Final
 Preferred application	FileType Window		Aplicație preferată
-FileTypes	FileTypes		FileTypes
 Set preferred application	Preferred App Menu		Stabilește aplicația preferată
 New file type	New File Type Window		Tip de fișier nou
 Short description:	Application Type Window		Descriere scurtă:

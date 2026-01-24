@@ -1,9 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Expander	3239308358
+1	greek, modern (1453-)	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Προορισμός
 Other	ExpanderPreferences		Άλλο
 Automatically show contents listing	ExpanderPreferences		Αυτόματα εμφάνιση του περιεχομένου
 Expander	System name		Αποσυμπιεστής
-Expander: Choose destination	DirectoryFilePanel		Αποσυμπιεστής: Επιλογή προορισμού
 Set source…	ExpanderMenu		Ορισμός πηγής…
 OK	ExpanderWindow		Εντάξει
 The destination is not a folder.	ExpanderWindow		Ο προορισμός δεν είναι φάκελος.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Ανοιξε το�
 Same directory as source (archive) file	ExpanderPreferences		Ίδιος κατάλογος με τον αρχείο πηγής
 Stop	ExpanderWindow		Σταμάτα
 Cancel	ExpanderWindow		Άκυρο
-Expander settings	ExpanderPreferences		Ρυθμίσεις του Αποσυμπιεστή
 Error when expanding archive	ExpanderWindow		Σφάλμα κατά την επέκταση του αρχείου
 Expand	ExpanderMenu		Επέκταση
 Failed to create the destination folder.	ExpanderWindow		Η δημιουργία φακέλου προορισμού απέτυχε.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Συνέχεια
 Cancel	ExpanderPreferences		Άκυρο
 Use:	ExpanderPreferences		Χρήση:
 Destination folder	ExpanderPreferences		Φάκελος προορισμού
-Expander: Open	ExpanderWindow		Αποσυμπιεστής: Άνοιγμα
 Leave destination folder path empty	ExpanderPreferences		Να αφεθεί η προορισμένη διαδρομή φακέλου κενή
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Ο φάκελος προορισμού δεν υπάρχει. Θέλετε να τον δημιουργήσετε;
 The file doesn't exist	ExpanderWindow		Το αρχείο δεν υπάρχει

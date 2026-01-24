@@ -1,4 +1,4 @@
-1	thai	x-vnd.haiku-softwareupdater	369324613
+1	thai	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	กำลังอัปเดตเวอร์ชัน
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		คลิกที่นี่เพื่อติดตั้ง {0, plural, one{# updated package} อื่นๆ{# updated packages}}
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	แพ็คเกจที่จะถอนการติดตั้ง
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		มีข้อ
 Packages are being updated	UpdateManager		กำลังอัปเดตแพคเกจ
 Cancel	SoftwareUpdaterWindow		ยกเลิก
 Don't quit	SoftwareUpdaterWindow		ไม่ออก
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		คลิกที่นี่เพื่อเรียกใช้ Software Updater การอัปเดตบางอย่างจะต้องเลือกวิธีแก้ไขปัญหา
 Checking for updates	SoftwareUpdaterWindow		ตรวจสอบการอัปเดต
 Updates completed	UpdateManager		การอัปเดตเสร็จสมบูรณ์
 Reboot	SoftwareUpdaterWindow		รีบูธ

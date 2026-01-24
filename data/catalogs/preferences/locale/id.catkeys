@@ -1,11 +1,10 @@
-1	indonesian	x-vnd.Haiku-Locale	1312749322
+1	indonesian	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Format sedang:
 ERROR	TimeFormatSettings		GALAT
 Negative:	TimeFormatSettings		Negatif:
 Language	Locale Preflet Window		Bahasa
 Short format:	TimeFormatSettings		Format pendek:
 24 hour	TimeFormatSettings		24 jam
-Locale	Locale Preflet Window		Lokal
 Time	TimeFormatSettings		Jam
 Defaults	Locale Preflet Window		Defaults
 Locale	System name		Lokal
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		OK
 Long format:	TimeFormatSettings		Format panjang:
 Numbers	TimeFormatSettings		Angka-angka
 Available languages	Locale Preflet Window		Bahasa yang tersedia
-Locale	Locale Preflet		Lokal
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Tidak dapat menemukan bahasa yang tersedia! Anda tidak dapat menggunakan preflet ini
 Formatting	Locale Preflet Window		Memformat
 Use month/day-names from preferred language	TimeFormatSettings		Gunakan nama bulan/hari dari bahasa yang diinginkan

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Pulse	2964417303
+1	lithuanian	x-vnd.Haiku-Pulse	1142202922
 Normal mode	DeskbarPulseView		Įprastinė veiksena
 Info	CPUButton		Informacija
 Quit	DeskbarPulseView		Baigti darbą
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Numatytai
 Mini mode	PrefsWindow		Minimalioji veiksena
 CPU progress bar	NormalPulseView		Procesoriaus užimtumo juosta
 Fade colors	ConfigView		Išblukinti spalvas
-About Pulse…	PulseView		Apie Pulsą…
-Pulse	NormalPulseView		Pulsas
 Deskbar mode	NormalPulseView		Pranešimų srities veiksena
 Remove replicant	CPUButton		Pašalinti replikantą
 You can't disable the last active CPU.	PulseView		Paskutinio aktyvaus procesoriaus negalima išjungti.
@@ -23,10 +21,8 @@ Deskbar mode	MiniPulseView		Pranešimų srities veiksena
 OK	PulseView		Gerai
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nSukūrė David Ramsey ir Arve Hjønnevåg\nPeržiūrėjo Daniel Switkin\n
 OK	PrefsWindow		Gerai
-Pulse	PulseApp		Pulsas
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Nepavyko pašalinti iš pranešimų srities.\n%s
 OK	PulseApp		Gerai
-About Pulse…	CPUButton		Apie Pulsą…
 Deskbar mode	PrefsWindow		Pranešimų srities veiksena
 Mini mode	DeskbarPulseView		Minimalioji veiksena
 You can't disable the last active CPU.	CPUButton		Paskutinio aktyvaus procesoriaus negalima išjungti.

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Pulse	559379362
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Normal modus
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Avslutt
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Standardinnstillinger
 Mini mode	PrefsWindow		Minimodus
 CPU progress bar	NormalPulseView		CPU-fremgangsmåler
 Fade colors	ConfigView		Ton ut farger
-About Pulse…	PulseView		Om Puls…
-Pulse	NormalPulseView		Puls
 Deskbar mode	NormalPulseView		Deskbarmodus
 Pulse settings	PulseApp		Pulse-innstillinger
 Remove replicant	CPUButton		Fjern replikant
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Deskbarmodus
 OK	PulseView		OK
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAv David Ramsey og Arve Hjønnevåg\nRevidert av Daniel Switkin\n
 OK	PrefsWindow		OK
-Pulse	PulseApp		Puls
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Klarte ikke fjerne fra Deskbar.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		Om Puls…
 Deskbar mode	PrefsWindow		Deskbarmodus
 Mini mode	DeskbarPulseView		Minimodus
 You can't disable the last active CPU.	CPUButton		Du kan ikke slå av den siste aktive prosessoren.

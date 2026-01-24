@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Pulse	559379362
+1	french	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Mode normal
 Info	CPUButton		Informations
 Quit	DeskbarPulseView		Quitter
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Par défaut
 Mini mode	PrefsWindow		Mode miniature
 CPU progress bar	NormalPulseView		Jauge d’activité CPU
 Fade colors	ConfigView		Dégradé de couleurs
-About Pulse…	PulseView		À propos de Pulsation…
-Pulse	NormalPulseView		Pulsation
 Deskbar mode	NormalPulseView		Mode Deskbar
 Pulse settings	PulseApp		Réglages de Pulsation
 Remove replicant	CPUButton		Enlever le réplicant
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Mode Deskbar
 OK	PulseView		OK
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nPar David Ramsey et Arve Hjønnevåg\nModifié par Daniel Switkin\n
 OK	PrefsWindow		OK
-Pulse	PulseApp		Pulsation
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Échec du retrait de la Deskbar.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		À propos de Pulsation…
 Deskbar mode	PrefsWindow		Mode deskbar
 Mini mode	DeskbarPulseView		Mode miniature
 You can't disable the last active CPU.	CPUButton		Vous ne pouvez pas désactiver le dernier processeur actif.

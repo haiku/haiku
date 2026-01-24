@@ -1,9 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-Expander	3300517306
+1	dutch; flemish	x-vnd.Haiku-Expander	2101897241
 Destination	ExpanderWindow		Doel
 Other	ExpanderPreferences		Andere
 Automatically show contents listing	ExpanderPreferences		Automatisch een lijst met inhoud weergeven
 Expander	System name		Expander
-Expander: Choose destination	DirectoryFilePanel		Expander: Kies doel
 Set source…	ExpanderMenu		Bron bepalen…
 The destination is not a folder.	ExpanderWindow		Het doel is geen map.
 The folder was either moved, renamed or not supported.	ExpanderWindow		De map is verplaatst of hernoemd, ofwel niet ondersteund.
@@ -19,7 +18,6 @@ Open destination folder after extraction	ExpanderPreferences		Open doelmap na he
 Same directory as source (archive) file	ExpanderPreferences		Dezelfde map als het bronbestand (archief)
 Stop	ExpanderWindow		Stop
 Cancel	ExpanderWindow		Annuleren
-Expander settings	ExpanderPreferences		Expander-instellingen
 Error when expanding archive	ExpanderWindow		Fout tijdens uitpakken archief
 Expand	ExpanderMenu		Uitpakken
 Failed to create the destination folder.	ExpanderWindow		Maken doelmap mislukt.
@@ -40,7 +38,6 @@ Continue	ExpanderWindow		Doorgaan
 Cancel	ExpanderPreferences		Annuleren
 Use:	ExpanderPreferences		Gebruik:
 Destination folder	ExpanderPreferences		Doelmap
-Expander: Open	ExpanderWindow		Expander: Openen
 Leave destination folder path empty	ExpanderPreferences		Laat doelmap pad leeg
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Doelmap bestaat niet. Wilt u deze aanmaken?
 The file doesn't exist	ExpanderWindow		Het bestand bestaat niet

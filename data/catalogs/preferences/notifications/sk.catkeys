@@ -1,12 +1,10 @@
-1	slovak	x-vnd.Haiku-Notifications	823818603
+1	slovak	x-vnd.Haiku-Notifications	2172673233
 Application does not have a valid signature	NotificationView	Alert message	Aplikácia nemá platný podpis
 Status	NotificationView		Stav
 Add…	NotificationView		Pridať…
 Muted	NotificationView		Umlčané
  is already listed	NotificationView	Alert message	 je už uvedená
 OK	PrefletWin		OK
-Notifications	PrefletWin		Oznamy
-Notifications preflet sample	PrefletWin		Vzorka nastavení upozornení
 Mute notifications from this application	NotificationView		Umlčať oznámenia od tejto aplikácie
 Revert	PrefletWin		Vrátiť
 Applications	PrefletView		Aplikácie
@@ -18,7 +16,7 @@ OK	NotificationView		OK
 Notifications	System name		Oznamy
 Allowed	NotificationView		Povolené
 Duration:	GeneralView		Trvanie:
-Application	NotificationView		Aplikácia
 Enable notifications	GeneralView		Zapnúť upozornenia
+Application	NotificationView		Aplikácia
 This is a test notification message	PrefletWin		Toto je testovacia správa oznámenia
 Remove	NotificationView		Odstrániť

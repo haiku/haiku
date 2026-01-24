@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CodyCam	12021044
+1	german	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		Zielverzeichnis erwartet
 reply: '%s'\n	SftpClient		Antwort; '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <unterdrückt>  (echtes Passwort wurde gesendet)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Video-Einstellungen
 Can't find an available connection to the video window	CodyCam		Es wurde keine verfügbare Verbindung zum Videofenster gefunden.
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Fehler bei Erstellung der Ausgabedatei
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Es wurde keine Videoquelle gefunden.\n Um CodyCam zu nutzen, wird eine Webcam benötigt.
 Logging in…	VideoConsumer.cpp		Einloggen …
 CodyCam	System name		Webcam
 Error writing output file	VideoConsumer.cpp		Fehler beim Schreiben der Ausgabedatei

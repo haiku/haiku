@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-TSKB	316181764
+1	dutch; flemish	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Automatisch verbergen
 Show all	WindowMenu		Toon alles
 Edit in Tracker…	PreferencesWindow		In Tracker bewerken…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Toon replicants
 No windows	WindowMenu		Geen vensters
 Show clock	Tray		Klok tonen
 Close all	WindowMenu		Alles sluiten
-Deskbar preferences	PreferencesWindow		Deskbar-voorkeuren
 About this system	DeskbarMenu		Over dit systeem
 Quit application	WindowMenu		Programma afsluiten
 Hide application names	PreferencesWindow		Programmanamen verbergen
 Applications	PreferencesWindow		Toepassingen
 Show application expander	PreferencesWindow		Toon toepassing-expander
-Deskbar preferences…	DeskbarMenu		Deskbar-voorkeuren...
 Suspend	DeskbarMenu		Opschorten
 Shutdown…	DeskbarMenu		Afsluiten...
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo's

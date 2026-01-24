@@ -1,13 +1,12 @@
-1	finnish	x-vnd.Haiku-BootManager	867546001
+1	finnish	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	Vanhan Master Boot Record-tietueen varmuuskopiohäiriö
 At least one partition must be selected!	BootManagerController		Vähintään yksi osio on valittava!
 No space available!	DrivesPage	Cannot install	Tilaa ei ole käytettävissä!
-Boot Manager is unable to read the partition table!	BootManagerController		Käynnistyshallinta ei kykene lukemaan osiotaulua!
 Immediately	DefaultPartitionPage		Heti
 Uninstall Boot Manager	UninstallPage	Title	Poista Käynnistyshallinta
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Tuntematon
-Installation of boot menu failed	BootManagerController	Title	Käynnistysvalikon asennus epäonnistui
 Backup Master Boot Record	BootManagerController	Title	Varmuuskopioi Master Boot Record
+Installation of boot menu failed	BootManagerController	Title	Käynnistysvalikon asennus epäonnistui
 Cannot access!	DrivesPage	Cannot install	Pääsy epäonnistui!
 After one second	DefaultPartitionPage		Sekunnin jälkeen
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Vanha Master Boot Record tallennettiin onnistuneesti kohteeseen %s.
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	Kirjoita käynnistysvalikko
 OK	BootManagerController	Button	Valmis
 Uninstall boot manager	BootManagerController	Title	Poista Käynnistyshallinta
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Seuraavaa käynnistysvalikkoa ollaan kirjoittamassa käynnistyslevylle (%s). Vahvista alla olevat tiedot ennen jatkamista.
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Ensimmäinen osio levyllä alkaa liian aikaisin ja ei jätä kylliksi tilaa vapaaksi käynnistysvalikkoa varten.\nKäynnistyshallinta tarvitsee 2 kibitavua käytettävissä olevaa tilaa ennen ensimmäistä osiota.
 Uninstall	DrivesPage	Button	Poista
 Update	DrivesPage	Button	Päivitä
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Käynnistyslaitteen Master Boot Record (MBR):\n\t %s\ntallennetaan nyt levylle. Valitse tiedosto, mihin MBR tallennetaan.\n\nJos jokin menee asennuksessa väärin tai jos haluat myöhemmin poistaa käynnistysvalikon, suorita vain Käynnistyshallinta-ohjelma ja valitse ’Poista’-valitsin.
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		Viiden sekunnin jälkeen
 Timeout: %s	DefaultPartitionPage		Aikavalvonta: %s
 The Master Boot Record could not be restored!	BootManagerController		Master Boot Record -tietueen palauttaminen epäonnistui!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Ensimmäisen levyaseman käynnistystaulu ei ole yhteensopiva Käynnistyshallinan kanssa.\nKäynnistyshallinta toimii vain IBM PC MBR-osioiden kanssa.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Valitse levyasema, johon haluat kohdistaa Käynnistyshallinnan asennuksen tai asennuksen poiston.
 After four seconds	DefaultPartitionPage		Neljän sekunnin jälkeen
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Nimetön %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Käynnistysval
 After two seconds	DefaultPartitionPage		Kahden sekunnin jälkeen
 Partition table not compatible	BootManagerController	Title	Osiotaulu ei ole yhteensopiva
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Käynnistyslaitteen (%DISK) Master Boot Record palautettiin onnistuneesti tiedostosta %FILE.
-Done	BootManagerController	Button	Valmis
 BootManager	System name		Käynnistyshallinta
+Done	BootManagerController	Button	Valmis
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Paikallista Master Boot Record (MBR) -tietueen tallennustiedosto, josta MBR voidaan palauttaa. Tämä on tiedosto, joka luotiin silloin kun Käynnistyshallinta asennettiin ensimmäisen kerran.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Paikallista Master Boot Record (MBR) -tietueen tallennustiedosto, josta MBR voidaan palauttaa. Tämä on tiedosto, joka luotiin silloin kun Käynnistyshallinta asennettiin ensimmäisen kerran.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Levyn %disk Master Boot Record (MBR) palautetaan tiedostosta %file. Haluatko jatkaa?

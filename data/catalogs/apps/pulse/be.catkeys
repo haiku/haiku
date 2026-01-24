@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Pulse	2964417303
+1	belarusian	x-vnd.Haiku-Pulse	1142202922
 Normal mode	DeskbarPulseView		Звычайны рэжым
 Info	CPUButton		Інфа
 Quit	DeskbarPulseView		Выйсці
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Прадвызначаныя
 Mini mode	PrefsWindow		Міні-рэжым
 CPU progress bar	NormalPulseView		Панель прагрэсу ЦП
 Fade colors	ConfigView		Колеры марнення
-About Pulse…	PulseView		Пра Пульс…
-Pulse	NormalPulseView		Пульс
 Deskbar mode	NormalPulseView		Рэжым Deskbar
 Remove replicant	CPUButton		Выдаліць рэпліканта
 You can't disable the last active CPU.	PulseView		Вы не можаце выключыць апошні актыўны ЦП.
@@ -23,10 +21,8 @@ Deskbar mode	MiniPulseView		Рэжым Deskbar
 OK	PulseView		ОК
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nРаспрацаваны David Ramsey і Arve Hjønnevåg\nПерагледжаны Daniel Switkin\n
 OK	PrefsWindow		ОК
-Pulse	PulseApp		Пульс
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Немагчыма выдаліць з Deskbar.\n%s
 OK	PulseApp		ОК
-About Pulse…	CPUButton		Пра Пульс…
 Deskbar mode	PrefsWindow		Рэжым Deskbar
 Mini mode	DeskbarPulseView		Міні рэжым
 You can't disable the last active CPU.	CPUButton		Вы не можаце выключыць апошні актыўны ЦП.

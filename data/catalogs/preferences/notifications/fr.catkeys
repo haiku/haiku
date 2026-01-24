@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	4196496676
+1	french	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		Inférieur gauche
 Application does not have a valid signature	NotificationView	Alert message	L’application n’a pas de signature valide
 Status	NotificationView		État
@@ -7,8 +7,6 @@ Lower right	GeneralView		Inférieur droit
 Muted	NotificationView		Silencieux
  is already listed	NotificationView	Alert message	 est déjà listé
 OK	PrefletWin		OK
-Notifications	PrefletWin		Notifications
-Notifications preflet sample	PrefletWin		Exemple de notification d’un preflet
 Mute notifications from this application	NotificationView		Ignorer les notifications de cette application
 wide	GeneralView	Window width: Slider high text	large
 narrow	GeneralView	Window width: Slider low text	resserré
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Suivre la Deskbar
 Notifications	System name		Notifications
 Allowed	NotificationView		Autorisé
 Duration:	GeneralView		Durée :
-Application	NotificationView		Application
 Enable notifications	GeneralView		Activer les notifications
+Application	NotificationView		Application
 This is a test notification message	PrefletWin		Ceci est une notification de test
 Remove	NotificationView		Retirer
 Position:	GeneralView		Position :

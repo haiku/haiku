@@ -1,7 +1,6 @@
-1	romanian	x-vnd.Haiku-Terminal	686383766
+1	romanian	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Închide alte file
 Insert path	Terminal TermView		Inserează calea
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nu a putut porni shell. Scuze.
 Text encoding	Terminal TermWindow		Codare de text
 Colors	Terminal ThemeWindow		Culori
 OK	Terminal SetTitleWindow		OK
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Anulează
 Defaults	Terminal PrefWindow		Implicite
 black	Terminal ThemeView		negru
 Revert	Terminal PrefWindow		Revenire
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Utilizează selecția
 Find next	Terminal TermWindow		Găsește următorul
 Copy link location	Terminal TermView		Copiază locația legăturii
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Sigur închideți?
 Font size	Terminal TermWindow		Dimensiunea fontului
 OK	Terminal TermApp		OK
 ANSI bright blue color	Terminal ThemeView		Culoare albastru deschis ANSI
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesul \„%1\” încă rulează.\nDacă închideți Terminalul, procesul va fi terminat.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune nerecunoscută \„%s\”\n
 Tab title:	Terminal AppearancePrefView		Titlul filei:
 Text not found.	Terminal TermWindow		Textul nu a fost găsit.
 Match word	Terminal FindWindow		Potrivește cuvântul
-New Terminal	Terminal TermWindow		Terminal nou
 Find failed	Terminal TermWindow		Găsirea a eșuat
 Quit	Terminal TermWindow		Ieșire
 Match case	Terminal FindWindow		Potrivește majusculele
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		Culoare cyan deschis ANSI
 Tab title:	Terminal TermWindow		Titlul filei:
 Window title:	Terminal TermWindow		Titlul ferestrei:
 ANSI white color	Terminal ThemeView		culoarea albă ANSI
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Comută terminalele
 Window size:	Terminal AppearancePrefView		Dimensiunea ferestrei:
-Switch Terminals	Terminal TermWindow		Comută terminalele
 Decrease	Terminal TermWindow		Micșorează
 Settings…	Terminal TermWindow		Configurări…
 Cancel	Terminal SetTitleWindow		Anulează
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Găsește…
 No search string was entered.	Terminal TermWindow		Nu a fost introdus niciun șir de căutare.
 Move here	Terminal TermView		Mută aici
 Abort	Terminal Shell		Întrerupe
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Următoarele procese încă rulează:\n\n\t%1\n\nDacă închideți Terminal, procesele vor fi terminate.
 Set window title	Terminal TermWindow		Stabilește titlul ferestrei
 ANSI red color	Terminal ThemeView		Culoare roșie ANSI
 Increase	Terminal TermWindow		Mărește

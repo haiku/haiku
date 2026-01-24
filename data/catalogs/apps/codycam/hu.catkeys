@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CodyCam	12021044
+1	hungarian	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		nincs megadva célmappa
 reply: '%s'\n	SftpClient		válasz: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <rejtett> (valódi jelszó elküldve)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Videóbeállítások
 Can't find an available connection to the video window	CodyCam		Nem található használható kapcsolat a videó ablakához
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl készítése során
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nem található videóforrás.\nA CodyCam használatához szükség van egy webkamerához.
 Logging in…	VideoConsumer.cpp		Bejelentkezés…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl írása során

@@ -1,7 +1,6 @@
-1	polish	x-vnd.Haiku-Terminal	686383766
+1	polish	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Zamknij pozostałe karty
 Insert path	Terminal TermView		Wstaw ścieżkę
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić powłoki. Przepraszamy.
 Text encoding	Terminal TermWindow		Kodowanie tekstu
 Colors	Terminal ThemeWindow		Kolory
 OK	Terminal SetTitleWindow		OK
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Anuluj
 Defaults	Terminal PrefWindow		Przywróć domyślne
 black	Terminal ThemeView		czarny
 Revert	Terminal PrefWindow		Cofnij
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Użyj zaznaczenia
 Find next	Terminal TermWindow		Znajdź następny
 Copy link location	Terminal TermView		Kopiuj adres odnośnika
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Na pewno zamknąć?
 Font size	Terminal TermWindow		Rozmiar fontu
 OK	Terminal TermApp		OK
 ANSI bright blue color	Terminal ThemeView		kolor ANSI jasny niebieski
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces „%1” jest wciąż w użyciu.\nJeśli zamkniesz terminal, proces zostanie zatrzymany.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nieznana opcja „%s”\n
 Tab title:	Terminal AppearancePrefView		Tytuł karty:
 Text not found.	Terminal TermWindow		Tekst nie znaleziony.
 Match word	Terminal FindWindow		Dopasuj słowo
-New Terminal	Terminal TermWindow		Nowy terminal
 Find failed	Terminal TermWindow		Nie znaleziono
 Quit	Terminal TermWindow		Zakończ
 Match case	Terminal FindWindow		Dopasuj wielkość liter
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		kolor ANSI jasny cyjan
 Tab title:	Terminal TermWindow		Tytuł karty:
 Window title:	Terminal TermWindow		Tytuł okna:
 ANSI white color	Terminal ThemeView		kolor ANSI biały
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Przełącz terminal
 Window size:	Terminal AppearancePrefView		Rozmiar okna:
-Switch Terminals	Terminal TermWindow		Przełącz terminal
 Decrease	Terminal TermWindow		Zmniejsz
 Settings…	Terminal TermWindow		Ustawienia…
 Cancel	Terminal SetTitleWindow		Anuluj
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Znajdź…
 No search string was entered.	Terminal TermWindow		Nie podano ciągu znaków do wyszukania.
 Move here	Terminal TermView		Przenieś tutaj
 Abort	Terminal Shell		Anuluj
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Następujące procesy są wciąż w użyciu:\n\n\t%1\n\nJeśli zamkniesz terminal, te procesy zostaną zatrzymane.
 Set window title	Terminal TermWindow		Ustaw tytuł okna
 ANSI red color	Terminal ThemeView		kolor ANSI czerwony
 Increase	Terminal TermWindow		Powiększ

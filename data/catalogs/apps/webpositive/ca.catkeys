@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	2225233929
+1	catalan; valencian	x-vnd.Haiku-WebPositive	2402977561
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copia
@@ -63,7 +63,6 @@ WebPositive	System name		WebPositive
 Old name: %s	BookmarkBar		Nom antic: %s
 Expiration	Cookie Manager		Venciment
 Reload	WebPositive Window		Torna a carregar
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La CPU és massa antiga i no admet les extensions SSE2, sense les quals el WebPositive no pot funcionar. Us recomanem que instal·leu el NetSurf.
 Download finished	Download Window		Baixada acabada
 Cookie manager	WebPositive Window		Gestor de galetes
 Username:	Authentication Panel		Nom d'usuari:
@@ -118,7 +117,6 @@ Remove	Download Window		Suprimeix
 Close tab	WebPositive Window		Tanca la pestanya
 About	WebPositive Window		Quant a
 Continue downloads	WebPositive		Continua les baixades
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Encara hi ha baixades en curs, realment voleu sortir del WebPositive ara?
 Proxy server requires authentication	Settings Window		El servidor intermediari requereix autenticació.
 Cancel	Settings Window		Cancel·la
 Reset size	WebPositive Window		Restableix-ne la mida
@@ -142,7 +140,6 @@ Next	WebPositive Window		Següent
 Bookmark error	WebPositive Window		Error de marcador
 OK	WebPositive Window		D'acord
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Desa la pàgina com a...
 Zoom text only	WebPositive Window		Amplia només el text
 Page source error	WebPositive Window		Error del codi font de la pàgina

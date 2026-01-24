@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-CodyCam	12021044
+1	catalan; valencian	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		s'espera un directori de destinació
 reply: '%s'\n	SftpClient		resposta: %s\n
 PASS <suppressed>  (real password sent)	FtpClient		Contrasenya <suppressed>  (contrasenya real enviada)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Paràmetres de vídeo
 Can't find an available connection to the video window	CodyCam		No es pot trobar una connexió a la finestra de vídeo disponible
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Error en crear el fitxer de sortida.
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		No es pot trobar cap font de vídeo.\nCal una càmera web per usar el CodyCam.
 Logging in…	VideoConsumer.cpp		S'entra...
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Error en escriure el fitxer de sortida.

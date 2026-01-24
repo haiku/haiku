@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	436017301
+1	russian	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	По левому краю
 Float	Attribute ListView		С плавающей точкой
 Final	Application Types Window		Финальная
@@ -144,7 +144,6 @@ Open file	FileTypes		Открыть файл
 Version info	Application Type Window		Версия приложения
 Final	Application Type Window		Финальная
 Preferred application	FileType Window		Предпочтительное приложение
-FileTypes	FileTypes		FileTypes
 Set preferred application	Preferred App Menu		Установить предпочтительное приложение
 New file type	New File Type Window		Новый тип файла
 Short description:	Application Type Window		Короткое описание:

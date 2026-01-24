@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-PoorMan	1829050509
+1	danish	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Vælg netstedsmappe
 Console logging	PoorMan		Konsollogning
 Create Log File	PoorMan		Opret logfil
@@ -6,9 +6,7 @@ File logging	PoorMan		Fillogning
 Website options	PoorMan		Valgmuligheder for netsted
 Log to file	PoorMan		Skriv log til fil
 Shutting down.	PoorMan		Lukker ned.
-Error Dir	PoorMan		Fejlmappe
 Web folder:	PoorMan		Netstedsmappe:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vælg venligst mappen, som skal udgives på nettet.\n\nDu kan få PoorMan til at oprette en forvalgt \"public_html\" i din hjemmemappe.\nEller du kan vælge en af dine egne mapper i stedet.
 Log To Console	PoorMan		Skriv log til konsol
 File Name	PoorMan		Filnavn
 Starting up... 	PoorMan		Starter... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Træf: %lu
 Hits: 0	PoorMan		Træf: 0
 Shutting down.\n	PoorMan		Lukker ned.\n
 Select all	PoorMan		Vælg alle
-Error Server	PoorMan		Fejl ved server
 Send file listing if there's no start page	PoorMan		Send filoplistning hvis der ikke er nogen startside
-Create PoorMan log	PoorMan		Opret PoorMan-log
 Max. simultaneous connections:	PoorMan		Maks. samtidige forbindelser:
 Done	PoorMan		Færdig
 Site	PoorMan		Sted
@@ -48,7 +44,6 @@ Run server	PoorMan		Kør server
 Create	PoorMan		Opret
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# forbindelse} other{# forbindelser}}
 done.\n	PoorMan		færdig.\n
-PoorMan settings	PoorMan		PoorMan-indstillinger
 Console Logging	PoorMan		Konsollogning
 Clear log file	PoorMan		Ryd logfil
 Save log console selection	PoorMan		Gem valg af logkonsol

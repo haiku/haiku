@@ -1,9 +1,8 @@
-1	german	x-vnd.Haiku-Expander	3239308358
+1	german	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Ziel
 Other	ExpanderPreferences		Allgemeines
 Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
 Expander	System name		Archiventpacker
-Expander: Choose destination	DirectoryFilePanel		Expander: Zielordner auswählen
 Set source…	ExpanderMenu		Quelle wählen …
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Zielordner nach de
 Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei
 Stop	ExpanderWindow		Stopp
 Cancel	ExpanderWindow		Abbrechen
-Expander settings	ExpanderPreferences		Expander-Einstellungen
 Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
 Expand	ExpanderMenu		Entpacken
 Failed to create the destination folder.	ExpanderWindow		Der Zielordner konnte nicht angelegt werden.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Fortsetzen
 Cancel	ExpanderPreferences		Abbrechen
 Use:	ExpanderPreferences		Benutzerdefiniert:
 Destination folder	ExpanderPreferences		Zielordner
-Expander: Open	ExpanderWindow		Expander: Öffnen
 Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Der Zielordner existiert nicht. Soll er angelegt werden?
 The file doesn't exist	ExpanderWindow		Die Datei existiert nicht

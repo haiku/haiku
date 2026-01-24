@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Notifications	4196496676
+1	ukrainian	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		Нижній лівий
 Application does not have a valid signature	NotificationView	Alert message	Програма не має дійсного підпису
 Status	NotificationView		Стан
@@ -7,8 +7,6 @@ Lower right	GeneralView		Нижній правий
 Muted	NotificationView		Без звуку
  is already listed	NotificationView	Alert message	 вже перелічено
 OK	PrefletWin		ОК
-Notifications	PrefletWin		Оповіщення
-Notifications preflet sample	PrefletWin		Зразок префлета повідомлень
 Mute notifications from this application	NotificationView		Відключити сповіщення від цієї програми
 wide	GeneralView	Window width: Slider high text	широке
 narrow	GeneralView	Window width: Slider low text	вузьке
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Слідкувати за Deskbar
 Notifications	System name		Notifications
 Allowed	NotificationView		Дозволити
 Duration:	GeneralView		Тривалість:
-Application	NotificationView		Програма
 Enable notifications	GeneralView		Включити оповіщення
+Application	NotificationView		Програма
 This is a test notification message	PrefletWin		Це тестове повідомлення
 Remove	NotificationView		Вилучити
 Position:	GeneralView		Позиція:

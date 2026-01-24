@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Shortcuts	4234149315
+1	croatian	x-vnd.Haiku-Shortcuts	148749831
 *MouseUp	ShortcutsWindow		*Mišgore
 Application	ShortcutsWindow		Program
 Option	ShortcutsSpec	Name for modifier on keyboard	Opcija
@@ -16,8 +16,6 @@ Quit	ShortcutsWindow		Izađi
 Cancel	ShortcutsWindow		Otkaži
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Lijevo
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shorcuts nije mogao raščlaniti vaš keyset file!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shorcuts nije mogao snimiti vaš keyset file!
 Remove selected shortcut	ShortcutsWindow		Ukloni odabrani prečac
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Save & apply	ShortcutsWindow		Spremi i primjeni

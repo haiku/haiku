@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Repositories	1220143449
+1	french	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Cette URL n’est pas valide.
 Repository URL:	AddRepoWindow	Text box label	URL du dépôt :
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Une erreur est survenue lors de l’actualisation du cache du dépôt %name%
@@ -20,7 +20,6 @@ OK	Constants	Button label	OK
 Status	RepositoriesView	Column title	État
 Name	RepositoriesView	Column title	Nom
 Add	AddRepoWindow	Button label	Ajouter
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Dépôts n’a pas pu récupérer les noms des dépôts actuellement activés.
 Enable all	RepositoriesView	Button label	Tout activer
 Aborted	TaskLooper	Aborted task status message	Abandon
 URL	RepositoriesView	Column title	URL

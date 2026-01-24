@@ -1,15 +1,12 @@
-1	catalan; valencian	x-vnd.Haiku-Sounds	2694258450
+1	catalan; valencian	x-vnd.Haiku-Sounds	762968133
 Select	SoundFilePanel		Selecciona
 Sounds	System name		Sons
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sons\n  Autor:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  A partir de la feina d'Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
-No such file or directory	HEventList		No existeix el fitxer o la carpeta
 Other…	HWindow		Altres...
-OK	SoundsHApp		D'acord
 Sound file:	HWindow		Fitxer de so:
 <none>	HEventList		<cap>
 Select a sound file	SoundFilePanel		Seleccioneu un fitxer de so
-About Sounds	SoundsHApp		Quant als Sons
 OK	HEventList		D'acord
 Sound	HEventList		So
 Event	HEventList		Esdeveniment
 <none>	HWindow		<cap>
+No such file or directory	HEventList		No existeix el fitxer o la carpeta

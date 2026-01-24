@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-softwareupdater	369324613
+1	czech	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Aktualizuji verzi
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klikněte zde pro instalaci {0, plural, one{# aktualizovaného balíčku} other{# aktualizovaných balíčků}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Balíčky k odinstalování
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Došlo k výjim
 Packages are being updated	UpdateManager		Balíčky se aktualizují
 Cancel	SoftwareUpdaterWindow		Zrušit
 Don't quit	SoftwareUpdaterWindow		Neukončovat
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klikněte zde pro aktualizování. Některé aktualizace potřebují poštelovat.
 Checking for updates	SoftwareUpdaterWindow		Kontroluji aktualizace
 Updates completed	UpdateManager		Aktualizace hotova
 Reboot	SoftwareUpdaterWindow		Restartovat

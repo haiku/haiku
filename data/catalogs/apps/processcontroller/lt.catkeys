@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ProcessController	2791873518
+1	lithuanian	x-vnd.Haiku-ProcessController	805862030
 Error saving file	ProcessController		Klaida įrašant failą
 Display priority	ProcessController		Rodymo prioritetas
 That's no Fun!	ProcessController		Visai nejuokinga!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		%d–asis procesorius
 Live in the Deskbar	ProcessController		Patalpinti pranešimų srityje
 Kill this team!	ProcessController		Nutraukti šios procesų grupės darbą!
 OK	ProcessController		Gerai
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
 Real-time priority	ProcessController		Tikralaikis prioritetas
 Custom priority	ProcessController		Parinktinis prioritetas
 Debug this thread!	ProcessController		Derinti šią giją!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Atminties naudojimas
 Ok!	ProcessController		Gerai!
 Normal priority	ProcessController		Įprastinis prioritetas
 Restart Deskbar	ProcessController		Perleisti Užduočių juostą
-About ProcessController…	ProcessController		Apie Procesų valdiklį…
 Usage: %s [-deskbar]\n	ProcessController		Naudojimas: %s [-deskbar]\n
 Please confirm	ProcessController		Prašome patvirtinti
 Urgent priority	ProcessController		Aukštas prioritetas
@@ -42,6 +40,5 @@ System resources & caches…	ProcessController		Sistemos ištekliai ir podėliai
 Damned!	ProcessController		Po velnių!
 New Terminal	ProcessController		Naujas terminalas
 Power saving	ProcessController		Energijos taupymas
-ProcessController is already installed in Deskbar.	ProcessController		Procesų valdiklis jau patalpintas pranešimų srityje.
 This thread is already gone…	ProcessController		Šios gijos jau nebėra…
 Run in window	ProcessController		Paleisti lange

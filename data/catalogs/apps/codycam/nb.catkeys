@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-CodyCam	12021044
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		mappe på vert forventes
 reply: '%s'\n	SftpClient		svar: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <skjult>     (ekte passord sendt)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Videoinnstillinger
 Can't find an available connection to the video window	CodyCam		Kan ikke finne en tilgjengelig tilkobling til videovinduet
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Feil ved oppretting av utdatafil
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Kan ikke finne en videokilde.\nDu trenger et web-kamera for å bruke CodyCam.
 Logging in…	VideoConsumer.cpp		Logger inn…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Feil ved skriving til utdatafil

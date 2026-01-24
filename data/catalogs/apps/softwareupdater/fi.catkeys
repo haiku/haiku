@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-softwareupdater	153492771
+1	finnish	x-vnd.haiku-softwareupdater	1161547980
 Updating version	SoftwareUpdaterWindow	List item text	Päivitetään versio
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Asentamista varten napsauta tänne {0, plural, one{# päivitetty pakkaus} other{# päivitettyä pakkausta}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Poistettavat asennetut pakkaukset
@@ -40,7 +40,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Päivitysten ta
 Packages are being updated	UpdateManager		Pakkauksia päivitetään
 Cancel	SoftwareUpdaterWindow		Peru
 Don't quit	SoftwareUpdaterWindow		Älä poistu
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Suorita Ohjelmistopäivittäjä napsauttamalla tästä. Jotkut päivitykset vaativat pulmaratkaisun valittavaksi.
 Checking for updates	SoftwareUpdaterWindow		Tarkistetaan päivityksiä
 Updates completed	UpdateManager		Päivitykset valmiina
 Reboot	SoftwareUpdaterWindow		Käynnistä uudelleen

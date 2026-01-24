@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Installer	3980652653
+1	turkish	x-vnd.Haiku-Installer	738307934
 Performing installation.	InstallProgress		Kuruluyor…
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Haiku Kur penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
 No optional packages available.	PackagesView		İsteğe bağlı paket yok.
@@ -29,7 +29,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Bir tane oluştu
 Welcome to the Haiku Installer!\n\n	InstallerApp		Haiku Kur’a hoş geldiniz!\n\n
 ?? of ??	InstallerWindow	Unknown progress	??/??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Disk İzlencesi açılamadı.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme dilimi “%s” konumuna yazıldı. Haiku Kur’dan çıkmak için “Çık”a tıklayın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Hedef disk boş değil; halihazırda bir Haiku kurulumu içeriyorsa üzerine yazılır. Bu işlem tüm kurulu yazılımları kaldırır.\n\nSisteminizi, kurulu yazılımları kaldırmadan güncellemek istiyorsanız güncelleme yönergeleri için Haiku Kullanıcı Kılavuzu’nun “Yazılım Güncelleyicisi” bölümüne bakın.\n\nKurulumu sürdürmek istediğinizden emin misiniz?
 Quit DriveSetup	InstallerWindow		Disk İzlencesi’nden çık
 Write boot sector	InstallerWindow		Önyükleme alanını yaz
@@ -90,7 +89,6 @@ Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow
 No valid EFI system data partitions found	InstallerWindow		Bulunan geçerli EFI sistem verisi bölüntüsü yok
 OK	InstallProgress		Tamam
 Quit BootManager	InstallerWindow		Önyükleme Yöneticisi’nden Çık
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Geçerli önyükleme diskine kurmak istediğinizden emin misiniz? Haiku Kur, makinenizi yeniden başlatacaktır.
 Onto:	InstallerWindow		Şuraya:
 Tools	InstallerWindow		Araçlar
 scanning…	InstallerWindow		taranıyor…

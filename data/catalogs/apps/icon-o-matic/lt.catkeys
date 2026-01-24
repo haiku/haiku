@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	237891374
+1	lithuanian	x-vnd.haiku-icon_o_matic	3407231654
 None	Icon-O-Matic-Properties		Nieko
 Add empty	Icon-O-Matic-ShapesList		Pridėti tuščią
 Opening the icon failed!	Icon-O-Matic-Main		Piktogramos atverti nepavyko!
@@ -58,7 +58,6 @@ Diamond	Icon-O-Matic-StyleTypes		Rombinis
 Don't save	Icon-O-Matic-Menu-Settings		Neįrašyti
 Add shape with path	Icon-O-Matic-Menu-Shape		Pridėti figūrą su kreive
 Translation X	Icon-O-Matic-PropertyNames		X poslinkis
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gali būti, jog, atverdama šį SVG failą, programa nesuinterpretavo visų jo duomenų. Jeigu perrašysite failą, jūs prarasite tuos duomenis.
 Rotate indices backwards	Icon-O-Matic-PathsList		Perkelti galus atgal
 Overwrite	Icon-O-Matic-SVGExport		Perrašyti
 Cancel	Icon-O-Matic-SVGExport		Atsisakyti

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	262401742
+1	polish	x-vnd.Be-MAIL	3945726882
 Set to Saved	Mail		Ustaw do Zapisanych
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Twój główny tekst zawiera %ld niekodowalnych znaków. Być może inny zestaw znaków będzie lepiej działać? Wybierz Wyślij aby wysłać mimo wszystko (znak zastępczy będzie użyty w miejscach niekodowalnych znaków), lub wybierz Anuluj aby wrócić i poprawić to.
 Text wrapping:	Mail		Zawijanie tekstu:
@@ -96,7 +96,6 @@ To:	Mail		Do:
 Need Tracker to move items to trash	Mail		Potrzebujesz Trackera aby przenosić elementy do kosza
 The mail_daemon could not be started:\n\t	Mail		Nie można uruchomić mail_daemon:\n\t
 <no account found>	Mail		<nie znaleziono konta>
-Mail couldn't find its dictionary.	Mail		Poczta nie może znaleźć swojego słownika.
 helpful message	Mail		pomocna wiadomość
  Read 	Mail		Przeczytane
 Font:	Mail		Font:
@@ -107,7 +106,6 @@ Start now	Mail		Rozpocznij teraz
 (Name unavailable)	Mail		(Nazwa niedostępna)
 Move to trash	Mail		Przenieś do kosza
 <none>	Mail		<brak>
-Mail settings	Mail		Ustawienia Poczty
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Sprawdzanie pisowni
 Status:	Mail		Status:

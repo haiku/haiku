@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ProcessController	415082887
+1	hungarian	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Hiba történt a fájl mentése során
 Display priority	ProcessController		Kijelzési prioritás
 That's no Fun!	ProcessController		Ez nem vicces!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		%d processzor
 Live in the Deskbar	ProcessController		Átrakás az Asztalsávra
 Kill this team!	ProcessController		Szál leállítása!
 OK	ProcessController		Rendben
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Futtathatod a Folyamatkezelőt egy ablakban, vagy feltelepítheted azt az Asztalsávra.
 Real-time priority	ProcessController		Valós idejű prioritás
 Custom priority	ProcessController		Egyéni prioritás
 Debug this thread!	ProcessController		Szál hibakeresése!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Memóriahasználat
 Ok!	ProcessController		Rendben!
 Normal priority	ProcessController		Normál prioritás
 Restart Deskbar	ProcessController		Asztalsáv újraindítása
-About ProcessController…	ProcessController		Folyamatkezelő névjegye…
 Usage: %s [-deskbar]\n	ProcessController		Használat: %s [-deskbar]\n
 Please confirm	ProcessController		Jóváhagyás
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Rendszer erőforrásai és gyors
 Damned!	ProcessController		Fenébe!
 New Terminal	ProcessController		Új terminál
 Power saving	ProcessController		Energiatakarékosság
-ProcessController is already installed in Deskbar.	ProcessController		A Folyamatkezelő már telepítve van az Asztalsávra.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Ez az utolsó aktív processzor…\nNem kapcsolható ki.
 This thread is already gone…	ProcessController		Ez a szál már eltűnt…
 Run in window	ProcessController		Futtatás ablakban

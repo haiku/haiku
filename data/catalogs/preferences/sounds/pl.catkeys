@@ -1,13 +1,10 @@
-1	polish	x-vnd.Haiku-Sounds	2763165148
+1	polish	x-vnd.Haiku-Sounds	831874831
 Sounds	System name		Dźwięki
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n autorstwa :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\nGłówny twórca programu : Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
-No such file or directory	HEventList		Nie znaleziono pliku/katalogu
 Other…	HWindow		Inne…
-OK	SoundsHApp		OK
 Sound file:	HWindow		Plik dźwiękowy:
 <none>	HEventList		<puste>
-About Sounds	SoundsHApp		O Sounds
 OK	HEventList		OK
 Sound	HEventList		Dźwięk
 Event	HEventList		Wydarzenie
 <none>	HWindow		<puste>
+No such file or directory	HEventList		Nie znaleziono pliku/katalogu

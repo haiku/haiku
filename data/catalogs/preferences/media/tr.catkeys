@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Media	582516163
+1	turkish	x-vnd.Haiku-Media	4055972908
 Couldn't add volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu’na eklenemedi: %s\n
 Restart media services	Media views		Ortam servislerini yeniden başlat
 Quit	Media Window		Çık
@@ -9,7 +9,6 @@ Video input:	Media views		Video girişi:
 Audio output:	Media views		Ses çıkışı:
 Please select a SoundFont.	Midi View		Lütfen bir SoundFont seçin.
 There are no SoundFonts installed.	Midi View		Kurulu SoundFont yok.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ortam’dan çıkma ortam servislerinin yeniden başlatılmalarını durduracaktır. Bu işlem ortam işlevlerini sekteye uğratabilir.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Ortam sunucusuna bağlanılamadı.\nŞimdi başlatmak ister misiniz?
 Video settings	Media Window		Video ayarları
 Audio mixer	Media Window		Ses karıştırıcısı

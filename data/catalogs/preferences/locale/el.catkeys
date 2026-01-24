@@ -1,11 +1,10 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Locale	1312749322
+1	greek, modern (1453-)	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Μερική μορφή:
 ERROR	TimeFormatSettings		ΣΦΑΛΜΑ
 Negative:	TimeFormatSettings		Αρνητικό:
 Language	Locale Preflet Window		Γλώσσα
 Short format:	TimeFormatSettings		Μικρή διάταξη:
 24 hour	TimeFormatSettings		24 ωρη μορφή
-Locale	Locale Preflet Window		Γλώσσα
 Time	TimeFormatSettings		Ώρα
 Defaults	Locale Preflet Window		Προεπιλογές
 Locale	System name		Γλώσσα
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		Εντάξει
 Long format:	TimeFormatSettings		Μεγάλη διάταξη:
 Numbers	TimeFormatSettings		Νούμερα
 Available languages	Locale Preflet Window		Διαθέσιμες γλώσσες
-Locale	Locale Preflet		Τοποθεσία
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Αδύνατο να βρεθούν διαθέσιμες γλώσσες! Δεν μπορείτε να χρησιμοποιήσετε αυτό το βοηθητικό πρόγραμμα!
 Formatting	Locale Preflet Window		Μορφοποίηση
 Use month/day-names from preferred language	TimeFormatSettings		Χρήση ονομάτων μηνών/μερών από την προτιμούμενη γλώσσα

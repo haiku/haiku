@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-CodyCam	12021044
+1	indonesian	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		direktori tujuan diharapkan
 reply: '%s'\n	SftpClient		balas: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (sandi asli terkirim)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Pengaturan video
 Can't find an available connection to the video window	CodyCam		Tidak dapat menemukan ketersediaan koneksi ke jendela video
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Galat membuat berkas keluaran
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Tidak dapat menemukan suatu sumber video.\nAnda perlu sebuah webcam untuk menggunakan CodyCam.
 Logging in…	VideoConsumer.cpp		Masuk…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Galat menulis berkas keluaran

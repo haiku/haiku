@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Repositories	1220143449
+1	dutch; flemish	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Dit is geen geldige URL.
 Repository URL:	AddRepoWindow	Text box label	Archief-URL:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Er was een fout bij het verversen van de cache van het archief voor %name%
@@ -20,7 +20,6 @@ OK	Constants	Button label	Okee
 Status	RepositoriesView	Column title	Status
 Name	RepositoriesView	Column title	Naam
 Add	AddRepoWindow	Button label	Toevoegen
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	SoftwareArchieven kan de namen van de ingeschakelde archieven niet ophalen.
 Enable all	RepositoriesView	Button label	Allen inschakelen
 Aborted	TaskLooper	Aborted task status message	Afgebroken
 URL	RepositoriesView	Column title	URL

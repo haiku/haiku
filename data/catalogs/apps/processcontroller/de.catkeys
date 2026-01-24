@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ProcessController	415082887
+1	german	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Fehler beim Speichern der Datei
 Display priority	ProcessController		Anzeigen-Priorität
 That's no Fun!	ProcessController		Nicht lustig!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Prozessor %d
 Live in the Deskbar	ProcessController		In der Deskbar laufen
 Kill this team!	ProcessController		Dieses Team beenden!
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Der Systemmanager kann im Fenster ausgeführt oder in der Deskbar installiert werden.
 Real-time priority	ProcessController		Echtzeit-Priorität
 Custom priority	ProcessController		Anwendungsspezifische Priorität
 Debug this thread!	ProcessController		Diesen Thread debuggen!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Speicherverbrauch
 Ok!	ProcessController		OK
 Normal priority	ProcessController		Normale Priorität
 Restart Deskbar	ProcessController		Deskbar neu starten
-About ProcessController…	ProcessController		Über ProcessController …
 Usage: %s [-deskbar]\n	ProcessController		Gebrauch: %s [-deskbar]\n
 Please confirm	ProcessController		Bitte bestätigen
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Systemressourcen & Cache …
 Damned!	ProcessController		Herrje!
 New Terminal	ProcessController		Neues Terminal
 Power saving	ProcessController		Energiespar-Modus
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController ist bereits in der Deskbar installiert.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Dies ist der letzte aktive Prozessor …\nDen kann man nicht ausschalten!
 This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr …
 Run in window	ProcessController		Im Fenster ausführen

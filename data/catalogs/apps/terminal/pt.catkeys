@@ -1,7 +1,6 @@
-1	portuguese	x-vnd.Haiku-Terminal	2536107739
+1	portuguese	x-vnd.Haiku-Terminal	566392757
 Close other tabs	Terminal TermWindow		Fechar os outros separadores
 Insert path	Terminal TermView		Inserir caminho
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		O Terminal não consegiu iniciar a shell. Desculpe.
 Text encoding	Terminal TermWindow		Codificação do texto
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Editar
@@ -28,7 +27,6 @@ Page setup…	Terminal TermWindow		Configuração de página…
 Cancel	Terminal TermView		Cancelar
 Defaults	Terminal PrefWindow		Predefinições
 Revert	Terminal PrefWindow		Reverter
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Usar selecção
 Find next	Terminal TermWindow		Procurar seguinte
 Copy link location	Terminal TermView		Copiar localização da ligação
@@ -43,12 +41,10 @@ Custom	Terminal colors scheme		Personalizado
 Really close?	Terminal TermWindow		Fechar mesmo?
 Font size	Terminal TermWindow		Tamanho do texto
 OK	Terminal TermApp		OK
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		O processo \"%1\" ainda se encontra em execução.\nSe fechar o Terminal, o processo será terminado.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opção desconhecida \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Título do separador:
 Text not found.	Terminal TermWindow		Texto não encontrado.
 Match word	Terminal FindWindow		Palavras exactas
-New Terminal	Terminal TermWindow		Novo Terminal
 Find failed	Terminal TermWindow		Procura falhou
 Quit	Terminal TermWindow		Sair
 Match case	Terminal FindWindow		Corresponder maiúsculas e minúsculas
@@ -66,8 +62,8 @@ Shell 	Terminal TermWindow		Shell
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tO caractere '%'.\n\t%<\t-\tInicia uma secção que apenas será mostrada se um\n\t\t\tmarcador de posição posterior não estiver vazio.\n\t%>\t-\tInicia uma secção que apenas será mostrada se um\n\t\t\tmarcador de posição entre uma secção %< prévia e esta não estiver vazio.\n\t%-\t-\tTermina uma secção %< ou %>.\n\nQualquer caractere não alfanumérico entre '%' e a letra de formato irá inserir um espaço apenas\nse o valor do marcador de posição não estiver vazio. Irá acrescentar à secção %<.
 Tab title:	Terminal TermWindow		Título do separador:
 Window title:	Terminal TermWindow		Título da janela:
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Alternar Terminais
 Window size:	Terminal AppearancePrefView		Tamanho da janela:
-Switch Terminals	Terminal TermWindow		Alternar Terminais
 Decrease	Terminal TermWindow		Diminuir
 Settings…	Terminal TermWindow		Definições…
 Cancel	Terminal SetTitleWindow		Cancelar
@@ -91,7 +87,6 @@ Find…	Terminal TermWindow		Procurar…
 No search string was entered.	Terminal TermWindow		Não foi introduzido nenhum termo de pesquisa.
 Move here	Terminal TermView		Mover para aqui
 Abort	Terminal Shell		Abortar
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Os seguintes processos encontram-se ainda em execução:\n\n\t%1\n\nSe fechar o Terminal, os processos serão terminados.
 Set window title	Terminal TermWindow		Definir título da janela
 Increase	Terminal TermWindow		Aumentar
 OK	Terminal TermWindow		OK

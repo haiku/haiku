@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Pairs	818003250
+1	thai	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		จับคู่
 Quit	PairsWindow		ออก
 Medium	PairsWindow		สื่อ
@@ -6,7 +6,6 @@ Game	PairsWindow		เกม
 Expert (8x8)	PairsWindow		เชี่ยวชาญ (8x8)
 New	PairsWindow		ใหม่
 OK	Pairs		ตกลง
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	จับคู่พบไอคอนเวกเตอร์ไม่เพียงพอที่จะเริ่มต้น มันต้องการอย่างน้อย%zu พบเพียง %zu\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		คุณเล่นจบเกมใน{0, plural, one{# click} อื่นๆ{# clicks}}.\n
 Small	PairsWindow		เล็ก
 Size	PairsWindow		ขนาด

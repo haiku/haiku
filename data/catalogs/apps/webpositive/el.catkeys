@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	2942427387
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	3120171019
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
 Copy	Console Window		Αντιγραφή
@@ -58,7 +58,6 @@ WebPositive	System name		Περιηγητής Ιστού
 %s - Search term	Settings Window		%s – όρος αναζήτησης
 Expiration	Cookie Manager		Λήξη
 Reload	WebPositive Window		Ανανέωση
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Η ΚΜΕ σας είναι πολύ παλιά και δεν υποστηρίζει τις επεκτάσεις SSE2, χωρίς τις οποίες δεν μπορεί να τρέξει ο WebPositive. Συνιστούμε να εγκαταστήσετε την εφαρμογή NetSurf για την πλοήγηση στο Διαδίκτυο.
 Download finished	Download Window		Η λήψη ολοκληρώθηκε
 Cookie manager	WebPositive Window		Διαχειριστής Cookie
 Username:	Authentication Panel		Όνομα χρήστης:
@@ -112,7 +111,6 @@ Remove	Download Window		Αφαίρεση
 Close tab	WebPositive Window		Κλείσιμο καρτέλας
 About	WebPositive Window		Σχετικά
 Continue downloads	WebPositive		Συνέχιση λήψεων
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Υπάρχουν ακόμα λήψεις που βρίσκονται σε εξέλιξη, είστε σίγουρος ότι θέλετε να κλείσετε τον Περιηγητή Ιστού τώρα;
 Proxy server requires authentication	Settings Window		Ο μεσολαβητής απαιτεί ταυτοποίηση
 Cancel	Settings Window		Άκυρο
 Reset size	WebPositive Window		Επαναφορά μεγέθους
@@ -136,7 +134,6 @@ Next	WebPositive Window		Επόμενο
 Bookmark error	WebPositive Window		Σφάλμα σελιδοδείκτη
 OK	WebPositive Window		Εντάξει
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% από %expectedSize%, %rate%/δευτ.)
-WebPositive	Download Window		Περιηγητής Ιστού
 Save page as…	WebPositive Window		Αποθήκευση σελίδας ως…
 Zoom text only	WebPositive Window		Να μεγενθυθεί το κείμενο μόνο
 Page source error	WebPositive Window		Σφάλμα πηγαίου κώδικα σελίδας

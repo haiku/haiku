@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	1043809837
+1	belarusian	x-vnd.Haiku-Installer	2096432414
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
 No optional packages available.	PackagesView		Дадатковыя пакункі недаступныя.
@@ -24,7 +24,6 @@ Running BootManager and DriveSetup…\n\nClose both applications to continue wit
 Welcome to the Haiku Installer!\n\n	InstallerApp		Прывітанне! Гэта ўсталёўшчык Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, праграма для праўкі дыскавых падзелаў, не запусцілася.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершаная. Загрузачны сэктар быў запісаны на '%s'. Націсніце 'Выйсці' каб завяршыць працу Усталёўшчыка альбо абярыце наступны падзел для яшчэ адной усталёўкі.
 Quit DriveSetup	InstallerWindow		Выйсці з DriveSetup
 Write boot sector	InstallerWindow		Запісаць загрузачны сектар
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
@@ -65,7 +64,6 @@ Set up partitions…	InstallerWindow		Правіць падзелы…
 Install progress:  	InstallerWindow		Прагрэс усталёўкі:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Вы не можаце капіяваць файлы на зыходны дыск. Выберыце, калі ласка, іншы.
 OK	InstallProgress		ОК
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Сапрауды жадаеце усталяваць на цяперашні загрузачны дыск? Калі так, Усталёшчык перазапусціць ваш кампутар.
 Onto:	InstallerWindow		На:
 Tools	InstallerWindow		Прылады
 scanning…	InstallerWindow		сканіраванне…

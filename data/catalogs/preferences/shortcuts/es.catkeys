@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Shortcuts	3834857117
+1	spanish; castilian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*Ratón arriba
 Application	ShortcutsWindow		Aplicación
 Option	ShortcutsSpec	Name for modifier on keyboard	Opción
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Volver guardar
 Don't save	ShortcutsWindow		No guardar
 *MouseDown	ShortcutsWindow		*RatónAbajo
 *Beep	ShortcutsWindow		*Pitido
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Atajos no pudo guardar tu conjunto de teclas.
 Save	ShortcutsWindow		Guardar
 Either	ShortcutsSpec		Cualquiera
 Oh no	ShortcutsWindow		Oh no
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Cancelar
 *MoveMouse +20 +0	ShortcutsWindow		*MovimientodelRatón +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Izquierda
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Atajos no puedo analizar el archivo del conjunto de claves.
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Atajos no pudo guardar tu archivo KeySet
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tu texto aquí\"
 Remove selected shortcut	ShortcutsWindow		Eliminar el atajo seleccionado
 Error, NULL state description?	ShortcutsSpec		Error, ¿descripción de estado nula?

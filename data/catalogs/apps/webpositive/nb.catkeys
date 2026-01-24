@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-WebPositive	2225233929
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-WebPositive	2402977561
 Authentication required	Authentication Panel		Autentisering kreves
 Previous	WebPositive Window		Forrige
 Copy	Console Window		Kopier
@@ -63,7 +63,6 @@ WebPositive	System name		WebPositive
 Old name: %s	BookmarkBar		Tidligere navn: %s
 Expiration	Cookie Manager		Utløper
 Reload	WebPositive Window		Last inn på nytt
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU-en din er for gammel og støtter ikke SSE2-utvidelsene, uten disse kan ikke WebPositive kjøre. Vi anbefaler å installere NetSurf i stedet.
 Download finished	Download Window		Nedlasting fullført
 Cookie manager	WebPositive Window		Informasjonskapselbehandler
 Username:	Authentication Panel		Brukernavn:
@@ -118,7 +117,6 @@ Remove	Download Window		Fjern
 Close tab	WebPositive Window		Lukk fane
 About	WebPositive Window		Om
 Continue downloads	WebPositive		Fortsett nedlastinger
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Det er fortsatt aktive nedlastinger, vil du virkelig avslutte WebPositive nå?
 Proxy server requires authentication	Settings Window		Proxy-server krever autentisering
 Cancel	Settings Window		Avbryt
 Reset size	WebPositive Window		Tilbakestill størrelse
@@ -142,7 +140,6 @@ Next	WebPositive Window		Neste
 Bookmark error	WebPositive Window		Feil med bokmerke
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% av %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Lagre siden som…
 Zoom text only	WebPositive Window		Zoom kun tekst
 Page source error	WebPositive Window		Sidekildefeil

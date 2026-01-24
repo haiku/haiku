@@ -1,9 +1,8 @@
-1	lithuanian	x-vnd.Haiku-Expander	784190701
+1	lithuanian	x-vnd.Haiku-Expander	3880537932
 Destination	ExpanderWindow		Paskirtis
 Other	ExpanderPreferences		Kita
 Automatically show contents listing	ExpanderPreferences		Automatiškai rodyti turinį
 Expander	System name		Skleidiklis
-Expander: Choose destination	DirectoryFilePanel		Skleidiklis: parinkite paskirties vietą
 Set source…	ExpanderMenu		Parinkti šaltinį…
 The destination is not a folder.	ExpanderWindow		Nurodyta paskirties vieta nėra aplankas.
 Close window when done expanding	ExpanderPreferences		Viską išskleidus, užverti langą
@@ -16,7 +15,6 @@ Open destination folder after extraction	ExpanderPreferences		Viską išskleidus
 Same directory as source (archive) file	ExpanderPreferences		Aplankas, kuriame yra išskleidžiamas archyvas
 Stop	ExpanderWindow		Nutraukti
 Cancel	ExpanderWindow		Atsisakyti
-Expander settings	ExpanderPreferences		Skleidiklio nuostatos
 Error when expanding archive	ExpanderWindow		Klaida išskleidžiant archyvą
 Expand	ExpanderMenu		Išskleisti
 Failed to create the destination folder.	ExpanderWindow		Nepavyko sukurti paskirties aplanko.
@@ -35,7 +33,6 @@ Continue	ExpanderWindow		Tęsti
 Cancel	ExpanderPreferences		Atsisakyti
 Use:	ExpanderPreferences		Naudoti:
 Destination folder	ExpanderPreferences		Paskirties aplankas
-Expander: Open	ExpanderWindow		Skleidiklis: parinkite archyvą išskleidimui
 Leave destination folder path empty	ExpanderPreferences		Paskirties aplanko lauką palikti tuščią
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Paskirties aplankas neegzistuoja. Ar norite jį sukurti?
 The file doesn't exist	ExpanderWindow		Failas neegzistuoja

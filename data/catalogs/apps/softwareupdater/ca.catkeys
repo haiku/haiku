@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-softwareupdater	369324613
+1	catalan; valencian	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	S'actualitza la versió
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Cliqueu aquí per instal·lar {0, plural, one{# paquet actualitzat} other{# paquets actualitzats}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paquets per desinstal·lar
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Hi ha hagut una
 Packages are being updated	UpdateManager		S'actualitzen els paquets.
 Cancel	SoftwareUpdaterWindow		Cancel·la
 Don't quit	SoftwareUpdaterWindow		No en surtis
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Cliqueu aquí per executar l'Actualitzador de programari. Algunes actualitzacions necessitaran una solució de problema per seleccionar-les.
 Checking for updates	SoftwareUpdaterWindow		Es comprova si hi ha actualitzacions.
 Updates completed	UpdateManager		Actualitzacions completades
 Reboot	SoftwareUpdaterWindow		Reinicia

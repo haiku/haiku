@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	262401742
+1	english	x-vnd.Be-MAIL	3945726882
 Set to Saved	Mail		設定為已存儲
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		您的正文包含 %ld 個無法編碼的字元。也許不同的字符集會更好？點擊“發送”仍然可以發送（將使用替代字元來代替不可編碼的字元），或者選擇“取消”返回並嘗試修復它。
 Text wrapping:	Mail		文字換行：
@@ -96,7 +96,6 @@ To:	Mail		至：
 Need Tracker to move items to trash	Mail		需要追蹤器將組件移至資源回收筒
 The mail_daemon could not be started:\n\t	Mail		mail_daemon無法啓動：\n\t
 <no account found>	Mail		<沒有找到帳戶>
-Mail couldn't find its dictionary.	Mail		Mail找不到它的字典。
 helpful message	Mail		有用的信息
  Read 	Mail		閱讀
 Font:	Mail		字體：
@@ -107,7 +106,6 @@ Start now	Mail		現在開始
 (Name unavailable)	Mail		（名稱不詳）
 Move to trash	Mail		移到資源回收筒
 <none>	Mail		<無>
-Mail settings	Mail		郵件設定
 %d - Date	Mail		%d - 日期
 Check spelling	Mail		檢查拼字
 Status:	Mail		狀態：

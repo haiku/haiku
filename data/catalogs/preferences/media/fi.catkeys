@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Media	582516163
+1	finnish	x-vnd.Haiku-Media	4055972908
 Couldn't add volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen lisääminen Työpöytäpalkkiin epäonnistui: %s\n
 Restart media services	Media views		Käynnistä mediapalvelut uudelleen
 Quit	Media Window		Lopeta
@@ -9,7 +9,6 @@ Video input:	Media views		Videosyöte:
 Audio output:	Media views		Äänituloste:
 Please select a SoundFont.	Midi View		Valitse SoundFont-kirjaimisto.
 There are no SoundFonts installed.	Midi View		SoundFont-kirjaimistoja ei ole asennettuna.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Poistuminen Media-soveluksesta pysäyttää nyt mediapalvelujen käynnistymisen. Tuloksena on todennäköisesti epäluotettava tai poissaoleva mediatoiminnallisuus.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Yhdistäminen mediapalvelimeen epäonnistui.\nHaluaisitko käynnistää sen nyt ?
 Video settings	Media Window		Videoasetukset
 Audio mixer	Media Window		Äänisekoitin

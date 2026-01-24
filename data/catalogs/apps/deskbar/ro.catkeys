@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-TSKB	316181764
+1	romanian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Ascundere automată
 Show all	WindowMenu		Afișează toate
 Edit in Tracker…	PreferencesWindow		Editare în Tracker…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Arată replicanții
 No windows	WindowMenu		Fără ferestre
 Show clock	Tray		Arată ceasul
 Close all	WindowMenu		Închide toate
-Deskbar preferences	PreferencesWindow		Preferințe deskbar
 About this system	DeskbarMenu		Despre acest sistem
 Quit application	WindowMenu		Ieșire din aplicație
 Hide application names	PreferencesWindow		Ascunde numele aplicațiilor
 Applications	PreferencesWindow		Aplicații
 Show application expander	PreferencesWindow		Arată extensorul de aplicație
-Deskbar preferences…	DeskbarMenu		Preferințe deskbar…
 Suspend	DeskbarMenu		Suspendare
 Shutdown…	DeskbarMenu		Oprire…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos

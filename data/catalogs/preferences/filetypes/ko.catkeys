@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-FileTypes	436017301
+1	korean	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	왼쪽
 Float	Attribute ListView		단정도 실수
 Final	Application Types Window		마지막
@@ -144,7 +144,6 @@ Open file	FileTypes		파일 열기
 Version info	Application Type Window		버젼 정보
 Final	Application Type Window		최종
 Preferred application	FileType Window		기본 응용프로그램
-FileTypes	FileTypes		파일형식
 Set preferred application	Preferred App Menu		선호하는 응용 프로그램 설정
 New file type	New File Type Window		새 파일 형식
 Short description:	Application Type Window		짧은 설명:

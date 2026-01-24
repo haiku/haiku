@@ -1,10 +1,9 @@
-1	belarusian	x-vnd.Haiku-Locale	288870027
+1	belarusian	x-vnd.Haiku-Locale	141458709
 Medium format:	TimeFormatSettings		Сярэдні фармат:
 Negative:	TimeFormatSettings		Адмоўна:
 Language	Locale Preflet Window		Мова
 Short format:	TimeFormatSettings		Скарочаны фармат:
 24 hour	TimeFormatSettings		24 гадзіны
-Locale	Locale Preflet Window		Лакаль
 Time	TimeFormatSettings		Час
 Defaults	Locale Preflet Window		Прадвызначаныя
 Locale	System name		Лакаль
@@ -13,7 +12,6 @@ OK	Locale Preflet Window		ОК
 Long format:	TimeFormatSettings		Доўгі фармат:
 Numbers	TimeFormatSettings		Лічбы
 Available languages	Locale Preflet Window		Наяўныя мовы
-Locale	Locale Preflet		Лакаль
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Спіс наяўных моваў не знойдзены! Немагчыма запусціць канфігурацыйную праграму!
 Formatting	Locale Preflet Window		Фарматаванне
 Use month/day-names from preferred language	TimeFormatSettings		Ужываць імены месяцоў і дзён з пажаданай мовы

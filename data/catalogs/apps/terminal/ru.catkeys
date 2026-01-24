@@ -1,7 +1,6 @@
-1	russian	x-vnd.Haiku-Terminal	686383766
+1	russian	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
 Insert path	Terminal TermView		Вставить путь
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Извините.
 Text encoding	Terminal TermWindow		Кодировка
 Colors	Terminal ThemeWindow		Раскраска
 OK	Terminal SetTitleWindow		ОК
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Отмена
 Defaults	Terminal PrefWindow		По умолчанию
 black	Terminal ThemeView		чёрный
 Revert	Terminal PrefWindow		Вернуть
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Терминал
 Use selection	Terminal FindWindow		Использовать выделенный текст
 Find next	Terminal TermWindow		Найти далее
 Copy link location	Terminal TermView		Скопировать ссылку
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Действительно закрыть?
 Font size	Terminal TermWindow		Размер шрифта
 OK	Terminal TermApp		ОК
 ANSI bright blue color	Terminal ThemeView		ANSI яркий синий
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \«%1\» всё ещё работает.\nЕсли Вы закроете Терминал, то этот процесс будет уничтожен.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Нераспознанная опция \«%s\»\n
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Text not found.	Terminal TermWindow		Текст не найден
 Match word	Terminal FindWindow		Только слово целиком
-New Terminal	Terminal TermWindow		Новый терминал
 Find failed	Terminal TermWindow		Строка не найдена
 Quit	Terminal TermWindow		Выход
 Match case	Terminal FindWindow		Учитывать регистр
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI яркий бирюзовый
 Tab title:	Terminal TermWindow		Заголовок вкладки:
 Window title:	Terminal TermWindow		Заголовок окна:
 ANSI white color	Terminal ThemeView		ANSI белый
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Переключить терминалы
 Window size:	Terminal AppearancePrefView		Размер окна:
-Switch Terminals	Terminal TermWindow		Переключить терминалы
 Decrease	Terminal TermWindow		Уменьшить
 Settings…	Terminal TermWindow		Настройки…
 Cancel	Terminal SetTitleWindow		Отмена
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Найти…
 No search string was entered.	Terminal TermWindow		Не введена строка поиска
 Move here	Terminal TermView		Переместить сюда
 Abort	Terminal Shell		Отменить
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Данные процессы всё ещё работают:\n\n\t%1\n\nЕсли Вы закроете Терминал, то эти процессы будут уничтожены.
 Set window title	Terminal TermWindow		Установить заголовок окна
 ANSI red color	Terminal ThemeView		ANSI красный
 Increase	Terminal TermWindow		Увеличить

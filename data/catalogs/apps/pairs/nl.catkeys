@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Pairs	818003250
+1	dutch; flemish	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Pairs
 Quit	PairsWindow		Afsluiten
 Medium	PairsWindow		Medium
@@ -6,7 +6,6 @@ Game	PairsWindow		Spel
 Expert (8x8)	PairsWindow		Expert (8x8)
 New	PairsWindow		Nieuw
 OK	Pairs		Okee
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs heeft niet genoeg vectoriconen gevonden om te beginnen, er zijn tenminste %zu nodig, er zijn slechts %zu gevonden.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		U heeft het spel in {0, plural, one{# klik} other{# kliks}} voltooid.\n
 Small	PairsWindow		Klein
 Size	PairsWindow		Grootte

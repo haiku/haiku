@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Pulse	559379362
+1	indonesian	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Mode normal
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Keluar
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Bawaan
 Mini mode	PrefsWindow		Mode mini
 CPU progress bar	NormalPulseView		Bilah perkembangan CPU
 Fade colors	ConfigView		Warna pudar
-About Pulse…	PulseView		Tentang Pulse…
-Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Mode deskbar
 Pulse settings	PulseApp		Pengaturan Pulse
 Remove replicant	CPUButton		Menghapus replicant
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Mode deskbar
 OK	PulseView		OKE
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nOleh David Ramsey and Arve Hjønnevåg\nDirevisi oleh Daniel Switkin\n
 OK	PrefsWindow		OKE
-Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Menghapus dari Deskbar gagal.\n%s
 OK	PulseApp		OKE
-About Pulse…	CPUButton		Tentang Pulse…
 Deskbar mode	PrefsWindow		Mode deskbar
 Mini mode	DeskbarPulseView		Mode mini
 You can't disable the last active CPU.	CPUButton		Anda tidak dapat menonaktifkan CPU aktif terakhir.

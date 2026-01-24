@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Be-MAIL	262401742
+1	catalan; valencian	x-vnd.Be-MAIL	3492357554
 Set to Saved	Mail		Estableix com a desat
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté %ld caràcters no codificables. Potser amb un conjunt de caràcters diferent funcionaria millor? Premeu Envia per enviar-ho tanmateix (se substituiran per altres els caràcters que no es puguin codificar), o bé trieu Cancel·la per tornar enrere i intentar esmenar-ho.
 Text wrapping:	Mail		Ajustament de línia:
@@ -27,6 +27,7 @@ Save changes to this signature?	Mail		Voleu desar els canvis d'aquesta signatura
 Save attachment…	Mail		Desa el fitxer adjunt...
 Paste	Mail		Enganxa
 E-mail draft could not be saved!	Mail		No s'ha pogut desar l'esborrany!
+Next message, keep status	Mail		Missatge següent, mantén l'estat
 Don't send	Mail		No ho enviïs
 sent	B_USER_DIRECTORY/mail/sent		enviat
 Only files can be added as attachments.	Mail		Només es poden afegir fitxers com a adjunts.
@@ -96,7 +97,6 @@ To:	Mail		A:
 Need Tracker to move items to trash	Mail		Cal el Rastrejador per moure elements a la paperera.
 The mail_daemon could not be started:\n\t	Mail		No s'ha pogut iniciar el dimoni del correu:\n\t
 <no account found>	Mail		<no s'ha trobat cap compte>
-Mail couldn't find its dictionary.	Mail		El Correu no ha pogut trobar el diccionari.
 helpful message	Mail		missatge d'ajuda
  Read 	Mail		 Llegeix 
 Font:	Mail		Tipus de lletra:
@@ -107,7 +107,6 @@ Start now	Mail		Comença ara
 (Name unavailable)	Mail		(El nom no està disponible)
 Move to trash	Mail		Mou a la paperera
 <none>	Mail		<cap>
-Mail settings	Mail		Paràmetres del correu
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Revisa'n l'ortografia
 Status:	Mail		Estat:
@@ -158,6 +157,7 @@ Edit	Mail		Edita
 Page setup…	Mail		Configuració de la pàgina...
 An error occurred trying to save this signature.	Mail		Hi ha hagut un error en intentar desar aquesta signatura.
 Beginner	Mail		Principiant
+Previous message, keep status	Mail		Missatge anterior, mantén l'estat
 Send message	Mail		Envia el missatge
 Delete	Mail		Suprimeix
 Put your favorite e-mail queries and query templates in this folder.	Mail		Poseu les consultes de correu i plantilles de consultes preferides en aquesta carpeta.

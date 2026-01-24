@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Shortcuts	3834857117
+1	korean	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		응용 프로그램
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		저장된 정보로 되돌림
 Don't save	ShortcutsWindow		저장 안함
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		설정한 키 셋을 저장할 수 없습니다.
 Save	ShortcutsWindow		저장
 Either	ShortcutsSpec		양 쪽 모두
 Oh no	ShortcutsWindow		오 이런
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		취소
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		왼쪽
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		키 셋 파일을 읽어들일 수 없습니다!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		키 셋 파일을 저장할 수 없습니다!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"여기에 원하는 텍스트를 입력하세요\"
 Remove selected shortcut	ShortcutsWindow		선택한 단축키 제거
 Error, NULL state description?	ShortcutsSpec		오류, NULL 상태 설명자?

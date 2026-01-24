@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ProcessController	415082887
+1	ukrainian	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Помилка при збереженні файлу
 Display priority	ProcessController		Пріоритет відображення
 That's no Fun!	ProcessController		Це не жарт!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Процесор %d
 Live in the Deskbar	ProcessController		Відображати у Deskbar
 Kill this team!	ProcessController		Знищити цей процес!
 OK	ProcessController		ОК
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Ви можете запустити Контролер процесів у вікні або встановити у Deskbar.
 Real-time priority	ProcessController		Пріоритет реального часу
 Custom priority	ProcessController		Заданий пріоритет
 Debug this thread!	ProcessController		Відладити цей потік!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Використання пам'яті
 Ok!	ProcessController		Ок!
 Normal priority	ProcessController		Звичайний пріоритет
 Restart Deskbar	ProcessController		Перезапустити Deskbar
-About ProcessController…	ProcessController		Про Контролер процесів…
 Usage: %s [-deskbar]\n	ProcessController		Використання: %s [-deskbar]\n
 Please confirm	ProcessController		Підтвердити
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Системні ресурси 
 Damned!	ProcessController		Чорт забирай!
 New Terminal	ProcessController		Новий Термінал
 Power saving	ProcessController		Режим енергозбереження
-ProcessController is already installed in Deskbar.	ProcessController		Контролер процесів вже встановлений у Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Це останній активний процесор…\nВи не можете вимкнути його!
 This thread is already gone…	ProcessController		Цих потоків вже немає…
 Run in window	ProcessController		Виконувати у вікні

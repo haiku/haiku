@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	2467534740
+1	russian	x-vnd.Haiku-ActivityMonitor	2137057658
+Temperature	DataSource		Температура
 Teams	DataSource		Процессы
 Semaphores	DataSource		Семафоры
 TX	DataSource	Shorter version for Sending	Передача
@@ -22,6 +23,7 @@ RX	DataSource	Shorter version for Receiving.	Прием
 Settings…	ActivityWindow		Настройки…
 Block cache	DataSource		Блоковый кэш
 Memory	DataSource		Память
+No thermal sensor	SystemInfoHandler		Нет термальных сенсоров
 CPU usage	DataSource		Использование ЦПУ
 CPU speed	DataSource		Скорость ЦП
 Quit	ActivityWindow		Выход

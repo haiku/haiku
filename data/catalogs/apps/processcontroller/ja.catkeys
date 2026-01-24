@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ProcessController	415082887
+1	japanese	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Display priority	ProcessController		表示優先度
 That's no Fun!	ProcessController		そんなのおもしろくない!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		プロセッサ %d
 Live in the Deskbar	ProcessController		Deskbar 中で実行
 Kill this team!	ProcessController		スレッドの強制終了
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		プロセスコントローラーをウィンドウモードで起動するか、または Deskbar にインストールできます。
 Real-time priority	ProcessController		リアルタイム優先度
 Custom priority	ProcessController		カスタム優先度
 Debug this thread!	ProcessController		このスレッドをデバッグ
@@ -18,7 +17,6 @@ Memory usage	ProcessController		メモリ使用量
 Ok!	ProcessController		Ok!
 Normal priority	ProcessController		通常優先度
 Restart Deskbar	ProcessController		Deskbar の再起動
-About ProcessController…	ProcessController		プロセスコントローラーについて...
 Usage: %s [-deskbar]\n	ProcessController		Usage: %s [-deskbar]\n
 Please confirm	ProcessController		確認してください。
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		システムリソースとキ�
 Damned!	ProcessController		とんでもない!
 New Terminal	ProcessController		新しいターミナル
 Power saving	ProcessController		省電力モード
-ProcessController is already installed in Deskbar.	ProcessController		プロセスコントローラーは、すでに Deskbar にインストールされています
 This is the last active processor…\nYou can't turn it off!	ProcessController		これは最後のアクティブなプロセッサです...\n止められません!
 This thread is already gone…	ProcessController		スレッドはすでに終了しています...
 Run in window	ProcessController		ウィンドウモードで起動

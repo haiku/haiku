@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-TSKB	316181764
+1	finnish	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Piilota automaattisesti
 Show all	WindowMenu		Näytä kaikki
 Edit in Tracker…	PreferencesWindow		Muokkaa Seuraajassa…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Näytä kopiot
 No windows	WindowMenu		Ei ikkunoita
 Show clock	Tray		Näytä kello
 Close all	WindowMenu		Sulje kaikki
-Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
 About this system	DeskbarMenu		Tästä järjestelmästä
 Quit application	WindowMenu		Lopeta sovellus
 Hide application names	PreferencesWindow		Piilota sovellusnimet
 Applications	PreferencesWindow		Sovellukset
 Show application expander	PreferencesWindow		Näytä sovelluslaajentaja
-Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
 Suspend	DeskbarMenu		Keskeytystila
 Shutdown…	DeskbarMenu		Sammuttaminen...
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Esittelyohjelmat

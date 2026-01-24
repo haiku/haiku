@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-FileTypes	436017301
+1	italian	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Sinistra
 Float	Attribute ListView		Numero in virgola mobile
 Final	Application Types Window		Non riassegnabile
@@ -144,7 +144,6 @@ Open file	FileTypes		Apri File
 Version info	Application Type Window		Informazioni versione
 Final	Application Type Window		Finale
 Preferred application	FileType Window		Applicazione preferita
-FileTypes	FileTypes		FileTypes
 Set preferred application	Preferred App Menu		Seleziona l'applicazione preferita
 New file type	New File Type Window		Nuovo tipo di file
 Short description:	Application Type Window		Descrizione breve:

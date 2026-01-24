@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	520971408
+1	finnish	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
 Close	MediaPlayer-PlaylistWindow		Sulje
 Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Sulje
 Save error	MediaPlayer-PlaylistWindow		Tallenna virhe
 Attributes	MediaPlayer-Main		Attribuutit
 Bottom of screen	MediaPlayer-SettingsWindow		Näytön alareuna
-MediaPlayer settings	MediaPlayer-SettingsWindow		Mediasoitinasetukset
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Lisätty virheellinen verkko-osoite!
 Aspect ratio	MediaPlayer-Main		Kuvasuhde

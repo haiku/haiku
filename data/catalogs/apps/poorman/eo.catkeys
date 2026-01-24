@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-PoorMan	1829050509
+1	esperanto	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Elektu dosierujon retpaĝaran
 Console logging	PoorMan		Protokolo de konzolo
 Create Log File	PoorMan		Krei protokolan dosieron
@@ -6,9 +6,7 @@ File logging	PoorMan		Protokolado en dosieron
 Website options	PoorMan		Agordoj de la retejo
 Log to file	PoorMan		Protokoli en dosieron
 Shutting down.	PoorMan		Malŝaltado.
-Error Dir	PoorMan		Dosierujo de eraroj
 Web folder:	PoorMan		Dosierujo de retpaĝaro:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Elektu dosierujon por publikigi rete.\n\nPurmano povas krei defaŭltan dosierujon \"public_html\" en via hejma dosierujo.\nAŭ anstataŭ elektu iun el viaj propraj.
 Log To Console	PoorMan		Protokoli en konzolon
 File Name	PoorMan		Dosiernomo
 Starting up... 	PoorMan		Ŝargante... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Vizitoj: %lu
 Hits: 0	PoorMan		Vizitoj: 0
 Shutting down.\n	PoorMan		Malŝaltado.\n
 Select all	PoorMan		Elekti ĉion
-Error Server	PoorMan		Servila eraro
 Send file listing if there's no start page	PoorMan		Sendi liston de dosieroj se forestas ĉefpaĝo
-Create PoorMan log	PoorMan		Krei protokolon de Purmano
 Max. simultaneous connections:	PoorMan		Maksimumo de samtempaj konektoj:
 Done	PoorMan		Farite
 Site	PoorMan		Retejo
@@ -48,7 +44,6 @@ Run server	PoorMan		Ekruli servilon
 Create	PoorMan		Krei
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# konekto} other{# konektoj}}
 done.\n	PoorMan		farite.\n
-PoorMan settings	PoorMan		Agordo de Purmano
 Console Logging	PoorMan		Konzola protokolado
 Clear log file	PoorMan		Nuligi dosieron de protokolo
 Save log console selection	PoorMan		Konservi elekton el konzola protokolo

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-FileTypes	436017301
+1	polish	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Do lewej
 Float	Attribute ListView		Liczba zmiennoprzecinkowa
 Final	Application Types Window		Finalna
@@ -144,7 +144,6 @@ Open file	FileTypes		Otwórz plik
 Version info	Application Type Window		Informacja o wersji
 Final	Application Type Window		Finalna
 Preferred application	FileType Window		Preferowana aplikacja
-FileTypes	FileTypes		FileTypes
 Set preferred application	Preferred App Menu		Ustaw preferowaną aplikację
 New file type	New File Type Window		Nowy typ pliku
 Short description:	Application Type Window		Krótki opis:

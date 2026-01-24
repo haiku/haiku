@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Installer	3240158834
+1	czech	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Probíhá instalace.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Uzavřete, prosím, okno programu nastavení disků před ukončením Instalátoru.
 No optional packages available.	PackagesView		Volitelné balíčky nejsou k dispozici.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Kliknutím na 'N
 Welcome to the Haiku Installer!\n\n	InstallerApp		Vítejte v Instalátoru Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Aplikace nastavení disků, určena ke konfiguraci diskových oddílů, nemohla být spuštěna.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Nainstalováno, zavaděč byl zapsán do '%s'. Stisknutím 'Zavřít' ukončíte instalaci, nebo zvolte jiný oddíl k další instalaci.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Cílový oddíl není prázdný. Pokud budete pokračovat v instalaci Haiku, přepíše se. Smaže to všechen instalovaný software.\n\nPokud chcete inovovat svůj systém bez smazání software, přečtěte si uživatelskou příručku Haiku, kapitola o aplikaci \"SoftwareUpdater\".\n\nOpravdu pokračovat v instalaci?
 Quit DriveSetup	InstallerWindow		Ukončit nastavení disků
 Write boot sector	InstallerWindow		Zapsat boot sektor
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Zvolte zdrojový disk z rozbalovací nabídky, a pak stiskněte 'Začít'.
 OK	InstallProgress		OK
 Quit BootManager	InstallerWindow		Ukončit Správce spouštění
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Určitě si přejete instalovat do současného startovacího disku? Instalátor bude muset restartovat Váš počítač pokud budete pokračovat.
 Onto:	InstallerWindow		Do:
 Tools	InstallerWindow		Nástroje
 scanning…	InstallerWindow		prohledávání…

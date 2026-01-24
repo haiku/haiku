@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Pairs	818003250
+1	esperanto	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Parkaptado
 Quit	PairsWindow		Ĉesi
 Medium	PairsWindow		Meznivela
@@ -6,7 +6,6 @@ Game	PairsWindow		Ludo
 Expert (8x8)	PairsWindow		Spertnivela (8*8)
 New	PairsWindow		Nova
 OK	Pairs		Bone
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Parkaptado ne trovis sufiĉe da vektorajn piktogramojn por komenci; ĝi bezonas almenaŭ %zu, trovite %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Vi kompletigis la ludon en {0, plural, one{# klakon} other{# klakojn}}.\n
 Small	PairsWindow		Malgranda
 Size	PairsWindow		Grando

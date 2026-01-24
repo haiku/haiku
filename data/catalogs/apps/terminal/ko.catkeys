@@ -1,7 +1,6 @@
-1	korean	x-vnd.Haiku-Terminal	686383766
+1	korean	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		다른 탭 닫기
 Insert path	Terminal TermView		경로 삽입
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		터미널에서 셸을 실행 할 수 없습니다.
 Text encoding	Terminal TermWindow		텍스트 인코딩
 Colors	Terminal ThemeWindow		색상
 OK	Terminal SetTitleWindow		확인
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		취소
 Defaults	Terminal PrefWindow		기본값
 black	Terminal ThemeView		검정색
 Revert	Terminal PrefWindow		되돌리기
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	터미널
 Use selection	Terminal FindWindow		선텍된 부분 사용
 Find next	Terminal TermWindow		다음 찾기
 Copy link location	Terminal TermView		링크 위치 복사
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		정말 닫으시겠습니까?
 Font size	Terminal TermWindow		글꼴 크기
 OK	Terminal TermApp		확인
 ANSI bright blue color	Terminal ThemeView		ANSI 밝은 파란색
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		프로세스 \"%1\"이 아직 실행중입니다.\n터미널을 닫을 시 해당 프로세스가 강제 종료 될 것입니다.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		인식할 수 없는 옵션 \"%s\"\n
 Tab title:	Terminal AppearancePrefView		탭 이름:
 Text not found.	Terminal TermWindow		텍스트를 찾을 수 없습니다.
 Match word	Terminal FindWindow		단어 일치
-New Terminal	Terminal TermWindow		새 터미널
 Find failed	Terminal TermWindow		찾기 실패
 Quit	Terminal TermWindow		조료
 Match case	Terminal FindWindow		대소문자 구분
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI 밝은 청록색
 Tab title:	Terminal TermWindow		탭 이름:
 Window title:	Terminal TermWindow		창 이름:
 ANSI white color	Terminal ThemeView		ANSI 흰색
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	터미널 전환
 Window size:	Terminal AppearancePrefView		창 크기:
-Switch Terminals	Terminal TermWindow		터미널 전환
 Decrease	Terminal TermWindow		작게
 Settings…	Terminal TermWindow		환경 설정...
 Cancel	Terminal SetTitleWindow		취소
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		찾기...
 No search string was entered.	Terminal TermWindow		찾을 문자열이 입력되지 않았습니다.
 Move here	Terminal TermView		여기로 이동
 Abort	Terminal Shell		정보
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		다음 프로세스가 아직 실행중입니다:\n\n\t%1\n\n이대로 터미널을 닫을 경우 프로세스가 강제 종료됩니다.
 Set window title	Terminal TermWindow		창 이름 설정
 ANSI red color	Terminal ThemeView		ANSI 빨간색
 Increase	Terminal TermWindow		크게

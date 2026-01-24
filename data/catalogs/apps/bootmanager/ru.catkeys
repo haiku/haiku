@@ -1,13 +1,12 @@
-1	russian	x-vnd.Haiku-BootManager	867546001
+1	russian	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	Предыдущая загрузочная запись (MBR) не сохранена
 At least one partition must be selected!	BootManagerController		Как минимум один раздел должен быть выбран!
 No space available!	DrivesPage	Cannot install	Нет места для MBR!
-Boot Manager is unable to read the partition table!	BootManagerController		Менеджеру загрузки не удалось прочитать таблицу разделов!
 Immediately	DefaultPartitionPage		Без ожидания
 Uninstall Boot Manager	UninstallPage	Title	Удалить Менеджер Загрузки
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Неизвестная файловая система
-Installation of boot menu failed	BootManagerController	Title	Не удалось установить загрузочное меню
 Backup Master Boot Record	BootManagerController	Title	Сохранить главную загрузочную запись (MBR)
+Installation of boot menu failed	BootManagerController	Title	Не удалось установить загрузочное меню
 Cannot access!	DrivesPage	Cannot install	Невозможно получить доступ!
 After one second	DefaultPartitionPage		1 секунда
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Предыдущая загрузочная запись (MBR) была успешна сохранена в %s.
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	Записать загрузочн
 OK	BootManagerController	Button	ОК
 Uninstall boot manager	BootManagerController	Title	Удалить менеджер загрузки
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для записи загрузочного меню на загрузочный диск (%s). Пожалуйста, проверьте информацию ниже перед тем как продолжить.
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Первый раздел на диске не оставляет свободного места для установки загрузочного меню.\nBoot Manager должен быть расположен до первого раздела и требует 2 КБ дискового пространства.
 Uninstall	DrivesPage	Button	Удалить
 Update	DrivesPage	Button	Обновить
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Новая загрузочная запись (MBR) для устройства:\n\t%s\nсейчас будет записана на диск. Пожалуйста, выберите файл, в который будет сохранена текущая версия MBR.\n\nЕсли что-то пойдет не так во время установки или если позже вы захотите удалить загрузочное меню, просто запустите программу Менеджер загрузки и нажмите кнопку 'Удалить'. Это восстановит предыдущую версию MBR из сохраненного файла.
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		5 секунд
 Timeout: %s	DefaultPartitionPage		Время ожидания: %s
 The Master Boot Record could not be restored!	BootManagerController		Невозможно восстановить загрузочную запись (MBR)!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Таблица разделов на жёстком диске несовместима с Менеджером загрузки.\nМенеджер загрузки поддерживает только IBM PC MBR разделы.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Пожалуйста, выберите диск, на который вы хотите установить или с которого вы хотите удалить менеджер загрузки.
 After four seconds	DefaultPartitionPage		4 секунды
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Удалени
 After two seconds	DefaultPartitionPage		2 секунды
 Partition table not compatible	BootManagerController	Title	Несовместимая таблица разделов
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузочная запись (MBR) устройства (%DISK) была успешна восстановлена из файла %FILE.
-Done	BootManagerController	Button	Готово
 BootManager	System name		Менеджер загрузки
+Done	BootManagerController	Button	Готово
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Пожалуйста, выберите файл, содержащий главную загрузочную запись (MBR) для восстановления. Этот файл был создан при первой установке менеджера загрузки.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Пожалуйста, выберите файл, содержащий загрузочную запись (MBR) для восстановления. Этот файл был создан при первой установке менеджера загрузки.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Все готово для восстановления загрузочной записи (MBR) раздела %disk из файла %file. Хотите продолжить?

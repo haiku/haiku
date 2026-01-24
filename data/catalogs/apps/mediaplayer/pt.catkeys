@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-MediaPlayer	1441754962
+1	portuguese	x-vnd.Haiku-MediaPlayer	1255288322
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eliminar elemento para o Lixo
 Close	MediaPlayer-PlaylistWindow		Fechar
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dos clips em segundo plano
@@ -43,7 +43,6 @@ Close	MediaPlayer-Main		Fechar
 Save error	MediaPlayer-PlaylistWindow		Erro ao guardar
 Attributes	MediaPlayer-Main		Atributos
 Bottom of screen	MediaPlayer-SettingsWindow		Fundo do ecrã
-MediaPlayer settings	MediaPlayer-SettingsWindow		Definições do Reprodutor de Multimédia
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida!
 Aspect ratio	MediaPlayer-Main		Proporção

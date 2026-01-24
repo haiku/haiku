@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	436017301
+1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Αριστερά
 Float	Attribute ListView		Αριθμός κινητής υποδιαστολής
 Final	Application Types Window		Τελικός
@@ -144,7 +144,6 @@ Open file	FileTypes		Άνοιγμα αρχείου
 Version info	Application Type Window		Πληροφορίες έκδοσης
 Final	Application Type Window		Τελικό
 Preferred application	FileType Window		Προτεινόμενη εφαρμογή
-FileTypes	FileTypes		Τύποι Αρχείων
 Set preferred application	Preferred App Menu		Ορισμός προεπιλεγμένης εφαρμογής
 New file type	New File Type Window		Νέος τύπος αρχείου
 Short description:	Application Type Window		Σύντομη περιγραφή:

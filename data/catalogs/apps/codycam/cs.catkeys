@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-CodyCam	12021044
+1	czech	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		očekáván cílový adresář
 reply: '%s'\n	SftpClient		odpověď: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <utajeno>  (reálné heslo odesláno)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Nastavení videa
 Can't find an available connection to the video window	CodyCam		Nemohu najít žádné dostupné připojení k oknu videa
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Chyba při vytváření výstupního souboru
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nepodařil se najít zdroj videa.\nAbyste mohli používat CodyCam, potřebujete webovou kameru.
 Logging in…	VideoConsumer.cpp		Přihlašování…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Chyba při zápisu výstupního souboru

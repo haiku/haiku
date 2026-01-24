@@ -1,7 +1,6 @@
-1	czech	x-vnd.Haiku-Terminal	686383766
+1	czech	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Zavřít ostatní panely
 Insert path	Terminal TermView		Vložit cestu
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminál nemůže spustit shell. Lituji.
 Text encoding	Terminal TermWindow		Kódování textu
 Colors	Terminal ThemeWindow		Barvy
 OK	Terminal SetTitleWindow		OK
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Zrušit
 Defaults	Terminal PrefWindow		Výchozí
 black	Terminal ThemeView		černá
 Revert	Terminal PrefWindow		Vrátit zpět
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
 Use selection	Terminal FindWindow		Použít výběr
 Find next	Terminal TermWindow		Vyhledat další
 Copy link location	Terminal TermView		Kopírovat umístění odkazu
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Opravdu zavřít?
 Font size	Terminal TermWindow		Velikost písma
 OK	Terminal TermApp		OK
 ANSI bright blue color	Terminal ThemeView		ANSI světle modrá barva
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" stále běží.\nUzavřením Terminálu tento proces ukončíte.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná volba \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Nadpis panelu:
 Text not found.	Terminal TermWindow		Text nenalezen.
 Match word	Terminal FindWindow		Shoda slova
-New Terminal	Terminal TermWindow		Nový terminál
 Find failed	Terminal TermWindow		Vyhledávání selhalo
 Quit	Terminal TermWindow		Ukončit
 Match case	Terminal FindWindow		Shoda písmen
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI světle azurová barva
 Tab title:	Terminal TermWindow		Nadpis panelu:
 Window title:	Terminal TermWindow		Nadpis okna:
 ANSI white color	Terminal ThemeView		ANSI bílá barva
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Přepnout terminály
 Window size:	Terminal AppearancePrefView		Velikost okna:
-Switch Terminals	Terminal TermWindow		Přepnout terminály
 Decrease	Terminal TermWindow		Zmenšit
 Settings…	Terminal TermWindow		Nastavení…
 Cancel	Terminal SetTitleWindow		Zrušit
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Najít…
 No search string was entered.	Terminal TermWindow		Nebyl zadán vyhledávací řetězec.
 Move here	Terminal TermView		Přesun sem
 Abort	Terminal Shell		Zrušit
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Následující procesy stále běží:\n\n\t%1\n\nUzavřením Terminálu budou tyto procesy ukončeny.
 Set window title	Terminal TermWindow		Nastavit nadpis okna
 ANSI red color	Terminal ThemeView		ANSI červená barva
 Increase	Terminal TermWindow		Zvětšit

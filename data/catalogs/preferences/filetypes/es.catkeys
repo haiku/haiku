@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-FileTypes	436017301
+1	spanish; castilian	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Izquierda
 Float	Attribute ListView		Flotante
 Final	Application Types Window		Final
@@ -144,7 +144,6 @@ Open file	FileTypes		Abrir archivo
 Version info	Application Type Window		Información de la versión
 Final	Application Type Window		Final
 Preferred application	FileType Window		Aplicación preferida
-FileTypes	FileTypes		Tipo de archivo
 Set preferred application	Preferred App Menu		Seleccione la aplicación preferida
 New file type	New File Type Window		Nuevo tipo de archivo
 Short description:	Application Type Window		Descripción corta:

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-WebPositive	1595792782
+1	lithuanian	x-vnd.Haiku-WebPositive	2410484702
 Authentication required	Authentication Panel		Būtina nustatyti tapatybę
 Previous	WebPositive Window		Ankstesnis
 Open bookmarks confirmation	WebPositive Window		Adresyno įrašų atvėrimo patvirtinimas
@@ -91,7 +91,6 @@ Remove	Download Window		Pašalinti
 Close tab	WebPositive Window		Užverti kortelę
 About	WebPositive Window		Apie
 Continue downloads	WebPositive		Tęsti parsiuntimus
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Dar yra vykstančių parsiuntimų. Ar tikrai norite baigti „WebPositive“ darbą?
 Proxy server requires authentication	Settings Window		Įgaliotasis serveris reikalauja patvirtinti tapatybę
 Cancel	Settings Window		Atsisakyti
 Reset size	WebPositive Window		Atstatyti pradinį dydį

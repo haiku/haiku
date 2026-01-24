@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PoorMan	1829050509
+1	romanian	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Selectează dosarul web
 Console logging	PoorMan		Jurnalizare de consolă
 Create Log File	PoorMan		Creează un fișier istoric
@@ -6,9 +6,7 @@ File logging	PoorMan		Jurnalizare de fișier
 Website options	PoorMan		Opțiunile paginii web
 Log to file	PoorMan		Jurnalizează în fișier
 Shutting down.	PoorMan		Se oprește.
-Error Dir	PoorMan		Director de erori
 Web folder:	PoorMan		Dosar web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Alegeți dosarul de publicat pe web.\n\nPoorMan poate crea un \„public_html\” implicit în dosarul home.\nSau selectați unul dintre propriile dosare.
 Log To Console	PoorMan		Jurnalizează în consolă
 File Name	PoorMan		Nume de fișier
 Starting up... 	PoorMan		Se pornește... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Afișări: %lu
 Hits: 0	PoorMan		Afișări: 0
 Shutting down.\n	PoorMan		Se oprește.\n
 Select all	PoorMan		Selectează toate
-Error Server	PoorMan		Server de erori
 Send file listing if there's no start page	PoorMan		Trimite lista de fișiere dacă nu există o pagină de pornire
-Create PoorMan log	PoorMan		Creează istoric PoorMan
 Max. simultaneous connections:	PoorMan		Numărul maxim de conexiuni simultane:
 Done	PoorMan		Gata
 Site	PoorMan		Pagină web
@@ -48,7 +44,6 @@ Run server	PoorMan		Rulează serverul
 Create	PoorMan		Creează
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
 done.\n	PoorMan		gata.\n
-PoorMan settings	PoorMan		Configurări PoorMan
 Console Logging	PoorMan		Jurnalizare de consolă
 Clear log file	PoorMan		Eliberează fișierul istoric
 Save log console selection	PoorMan		Salvează selecția de consolă a istoricului

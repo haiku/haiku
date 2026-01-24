@@ -1,4 +1,4 @@
-1	czech	x-vnd.Be-TSKB	316181764
+1	czech	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Automaticky skrývat
 Show all	WindowMenu		Ukázat vše
 Edit in Tracker…	PreferencesWindow		Upravit v Trackeru…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Zobrazit replikanty
 No windows	WindowMenu		Žádná okna
 Show clock	Tray		Zobrazit hodiny
 Close all	WindowMenu		Zavřít vše
-Deskbar preferences	PreferencesWindow		Nastavení panelu
 About this system	DeskbarMenu		O tomto systému
 Quit application	WindowMenu		Ukončit aplikaci
 Hide application names	PreferencesWindow		Skrýt názvy aplikací
 Applications	PreferencesWindow		Aplikace
 Show application expander	PreferencesWindow		Zobrazit aplikační rozšíření
-Deskbar preferences…	DeskbarMenu		Nastavení panelu…
 Suspend	DeskbarMenu		Režim spánku
 Shutdown…	DeskbarMenu		Vypnout…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema

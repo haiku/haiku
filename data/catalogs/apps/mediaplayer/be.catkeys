@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	4052471379
+1	belarusian	x-vnd.Haiku-MediaPlayer	3866004739
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элемент у Сметніцу
 Close	MediaPlayer-PlaylistWindow		Закрыць
 Volume of background clips	MediaPlayer-SettingsWindow		Гучнасць фонавых кліпаў
@@ -40,7 +40,6 @@ Close	MediaPlayer-Main		Закрыць
 Save error	MediaPlayer-PlaylistWindow		Памылка захавання
 Attributes	MediaPlayer-Main		Атрыбуты
 Bottom of screen	MediaPlayer-SettingsWindow		Ніз экрана
-MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
 Copyright	MediaPlayer-InfoWin		Аўтарскія правы
 Aspect ratio	MediaPlayer-Main		Суадносіны бакоў
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст.\n\nПамылка: 

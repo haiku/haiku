@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Shortcuts	3834857117
+1	finnish	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*HiiriYlös
 Application	ShortcutsWindow		Sovellus
 Option	ShortcutsSpec	Name for modifier on keyboard	Valitsin
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Palauta tallennettuun
 Don't save	ShortcutsWindow		Älä tallenna
 *MouseDown	ShortcutsWindow		*HiiriAlas
 *Beep	ShortcutsWindow		*Piip
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset-sovellus ei kyennyt tallentamaan keyset-tiedostoa.
 Save	ShortcutsWindow		Tallenna
 Either	ShortcutsSpec		eikä
 Oh no	ShortcutsWindow		Oh ei
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Peru
 *MoveMouse +20 +0	ShortcutsWindow		*SiirräHiiri +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control-painike
 Left	ShortcutsSpec		Vasen
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyennyt tallentamaan KeySet-tiedostoa!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
 Remove selected shortcut	ShortcutsWindow		Poista valittu pikanäppäin
 Error, NULL state description?	ShortcutsSpec		Virhe, NULL-tilakuvaus?

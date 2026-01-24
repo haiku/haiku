@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	2225233929
+1	romanian	x-vnd.Haiku-WebPositive	2402977561
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiază
@@ -63,7 +63,6 @@ WebPositive	System name		WebPositive
 Old name: %s	BookmarkBar		Nume vechi: %s
 Expiration	Cookie Manager		Expirare
 Reload	WebPositive Window		Reîncarcă
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Procesorul este prea vechi și nu suportă extensiile SSE2, fără de care WebPositive nu poate să ruleze. Recomandăm să instalați în schimb NetSurf.
 Download finished	Download Window		Descărcare finalizată
 Cookie manager	WebPositive Window		Manager de cookie
 Username:	Authentication Panel		Nume de utilizator:
@@ -118,7 +117,6 @@ Remove	Download Window		Elimină
 Close tab	WebPositive Window		Închide fila
 About	WebPositive Window		Despre
 Continue downloads	WebPositive		Continuă descărcările
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Există încă descărcări în desfășurare, chiar doriți să ieșiți din WebPositive acum?
 Proxy server requires authentication	Settings Window		Serverul proxy necesită autentificare
 Cancel	Settings Window		Anulează
 Reset size	WebPositive Window		Restabilește dimensiunea
@@ -142,7 +140,6 @@ Next	WebPositive Window		Următorul
 Bookmark error	WebPositive Window		Eroare de marcaj
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% din %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Salvează pagina ca...
 Zoom text only	WebPositive Window		Focalizează doar textul
 Page source error	WebPositive Window		Eroare de sursă a paginii

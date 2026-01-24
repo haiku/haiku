@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	237891374
+1	belarusian	x-vnd.haiku-icon_o_matic	3407231654
 None	Icon-O-Matic-Properties		Няма
 Add empty	Icon-O-Matic-ShapesList		Дадаць пусты
 Opening the icon failed!	Icon-O-Matic-Main		Нельга адкрыць іконку!
@@ -58,7 +58,6 @@ Diamond	Icon-O-Matic-StyleTypes		Ромб
 Don't save	Icon-O-Matic-Menu-Settings		Не захоўваць
 Add shape with path	Icon-O-Matic-Menu-Shape		Дадаць фігуру з шляхам
 Translation X	Icon-O-Matic-PropertyNames		Канвертацыя X
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic, магчыма, не дастаў усю інфармацыю з SVG файла падчас яго загрузкі. Пры перазапісу зыходнага файла гэтая інфармацыя будзе згублена.
 Rotate indices backwards	Icon-O-Matic-PathsList		Павярнуць індэксы назад
 Overwrite	Icon-O-Matic-SVGExport		Перазапісаць
 Cancel	Icon-O-Matic-SVGExport		Адмена

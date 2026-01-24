@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Shortcuts	3834857117
+1	japanese	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		アプリケーション
 Option	ShortcutsSpec	Name for modifier on keyboard	オプション
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
 Don't save	ShortcutsWindow		保存しない
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できません。
 Save	ShortcutsWindow		保存
 Either	ShortcutsSpec		どちらか
 Oh no	ShortcutsWindow		Oh no
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		中止
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		左
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できません。
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できません!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
 Remove selected shortcut	ShortcutsWindow		選択部の削除
 Error, NULL state description?	ShortcutsSpec		エラー、記述がありません?\n

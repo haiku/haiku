@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	4181156212
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2333877542
 Available packages	MainWindow		Pacotes disponíveis
 It was not possible to create the new user.	UserLoginWindow		Não foi possível criar o novo usuário.
 Create account	UserLoginWindow		Criar conta
@@ -15,14 +15,12 @@ Name	PackageListView		Nome
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Autorização ou problema de segurança. Faça logout e login novamente para verificar se sua senha está correta e também se você concordou com as condições de uso mais recentes.
 Rate %Package%	RatePackageWindow		Avaliar %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ocorreu um erro ao inicializar o gerenciador de pacotes: %message%
-Quit HaikuDepot	App		Fechar o Depósito Haiku
 Category	FilterView		Categoria
 A response to the captcha question must be provided.	UserLoginWindow		Uma resposta à pergunta do captcha deve ser fornecida.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Um erro inesperado '%Message%' surgiu com a propriedade '%Property%'
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Um objeto solicitado ou um objeto envolvido na solicitação não foi encontrado no servidor.
 No changelog available.	PackageInfoView		Nenhum relatório de mudanças disponível.
 Version	PackageListView		Versão
-No, quit HaikuDepot	App		Não, fechar Depósito Haiku
 Not logged in	MainWindow		Não autenticado
 Featured packages	FeaturedPackagesView		Pacotes em destaque
 Available	PackageListView		Disponível
@@ -80,7 +78,6 @@ Authentication failed	UserLoginWindow		A autenticação falhou
 Captcha error	UserLoginWindow		Erro de captcha
 Manage repositories…	MainWindow		Gerenciar repositórios…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		O apelido deve ser único, mas o apelido fornecido já existe. Escolha um apelido diferente.
-Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
 Input validation	UserLoginWindow		Validação de entrada
 Log in…	MainWindow		Entrar…
 Client version too old	ServerHelper		Versão do cliente muito antiga
@@ -108,14 +105,12 @@ Settings…	MainWindow		Configurações…
 Ratings	PackageInfoView		Classificações
 Local	LocalPkgDataLoadProcess		Local
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Seria aceitável enviar dados anônimos de uso deste computador para o sistema HaikuDepotServer? Você pode alterar suas preferências posteriormente na janela \"Configurações\".
-Installed packages	MainWindow		Pacotes instalados
 User rating	RatePackageWindow		Avaliação do utilizador
-Error	App		Erro
+Installed packages	MainWindow		Pacotes instalados
 There was a puzzling response from the web service.	UserLoginWindow		Houve uma resposta enigmática do serviço web.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Sua avaliação foi enviada com sucesso. Você pode atualizá-lo ou removê-lo no site do servidor HaikuDepot.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Não foi possível se comunicar com o servidor para obter uma imagem captcha necessária para criar um novo usuário.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		A resposta fornecida ao captcha está incorreta. Um novo captcha será gerado; tente novamente.
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O HaikuDepot precisa do pacote daemon para funcionar, e parece que não estar em funcionando.\nGostaria de iniciá-lo agora?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		A senha deve ter pelo menos oito caracteres, pelo menos dois dígitos e um caractere maiúsculo.
 Contents	PackageInfoView		Conteúdo
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Compartilhar dados anônimos de uso com HaikuDepotServer
@@ -127,8 +122,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Estabilidade
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		A senha deve ser repetida para reduzir a chance de digitação incorreta da senha.
 Cancel	SettingsWindow		Cancelar
-Inactive	PackageListView		Inativo
 Cancel	RatePackageWindow		Cancelar
+Inactive	PackageListView		Inativo
 Nickname:	UserLoginWindow		Apelido:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sincronizando metadados sobre repositórios
 OK	MainWindow		OK

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-WebPositive	2199373698
+1	slovak	x-vnd.Haiku-WebPositive	3728631550
 Authentication required	Authentication Panel		Vyžaduje sa overenie totožnosti
 Previous	WebPositive Window		Predošlé
 (Finish: %date)	Download Window		(Dokončenie: %date)
@@ -103,7 +103,6 @@ Remove	Download Window		Odstrániť
 Close tab	WebPositive Window		Zatvoriť kartu
 About	WebPositive Window		O aplikácii
 Continue downloads	WebPositive		Pokračovať v sťahovaní
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Priebieha sťahovanie. Skutočne chcete teraz ukončiť WebPositive?
 Proxy server requires authentication	Settings Window		Server proxy vyžaduje overenie totožnosti
 Cancel	Settings Window		Zrušiť
 Reset size	WebPositive Window		Znovu nastaviť veľkosť
@@ -125,7 +124,6 @@ Double-click or middle-click to open new tab.	Tab Manager		Novú kartu otvoríte
 Next	WebPositive Window		Ďalší
 Bookmark error	WebPositive Window		Chyba záložky
 OK	WebPositive Window		OK
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Uložiť stránku ako…
 Zoom text only	WebPositive Window		Zväčšovať iba text
 Page source error	WebPositive Window		Chyba zdroja stránky

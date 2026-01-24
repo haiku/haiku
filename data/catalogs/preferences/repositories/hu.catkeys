@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Repositories	1220143449
+1	hungarian	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Érvénytelen cím.
 Repository URL:	AddRepoWindow	Text box label	Tároló címe:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Nem sikerült frissíteni a tároló (%name%) információit
@@ -20,7 +20,6 @@ OK	Constants	Button label	Rendben
 Status	RepositoriesView	Column title	Állapot
 Name	RepositoriesView	Column title	Elnevezés
 Add	AddRepoWindow	Button label	Új
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Nem sikerült beolvasni a jelenleg engedélyezett tárolók nevét.
 Enable all	RepositoriesView	Button label	Összes engedélyezése
 Aborted	TaskLooper	Aborted task status message	Megszakítva
 URL	RepositoriesView	Column title	Cím

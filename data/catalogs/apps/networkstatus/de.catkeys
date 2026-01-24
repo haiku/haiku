@@ -1,10 +1,9 @@
-1	german	x-vnd.Haiku-NetworkStatus	2979204375
+1	german	x-vnd.Haiku-NetworkStatus	2192330251
 IPv6 address:	NetworkStatusView		IPv6 Adresse:
 Quit	NetworkStatusView		Beenden
 Unknown	NetworkStatusView		Unbekannt
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Starten der Netzwerkeinstellungen fehlgeschlagen.\n\nFehler:
 Install in Deskbar	NetworkStatus		In Deskbar installieren
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetzwerkStatus Optionen:\n\t--deskbar\t den Replikanten automatisch der Deskbar hinzufügen\n\t--help\t\t diese Info ausgeben und beenden
 Open network preferences…	NetworkStatusView		Netzwerkeinstellungen öffnen …
 NetworkStatus	System name		Netzwerkstatus
 Broadcast:	NetworkStatusView		Broadcast:

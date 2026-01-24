@@ -1,9 +1,8 @@
-1	esperanto	x-vnd.Haiku-Expander	3300517306
+1	esperanto	x-vnd.Haiku-Expander	2101897241
 Destination	ExpanderWindow		Celo
 Other	ExpanderPreferences		Alia
 Automatically show contents listing	ExpanderPreferences		Aŭtomate montri enhavon de la arkivo
 Expander	System name		Elarkivilo
-Expander: Choose destination	DirectoryFilePanel		Elarkivilo: Elekti elarkivan lokon
 Set source…	ExpanderMenu		Atribui fonton…
 The destination is not a folder.	ExpanderWindow		La elarkiva loko ne estas dosierujo.
 The folder was either moved, renamed or not supported.	ExpanderWindow		La dosierujo estas movita, alinomita aŭ nesubtenata.
@@ -19,7 +18,6 @@ Open destination folder after extraction	ExpanderPreferences		Montri rezultan do
 Same directory as source (archive) file	ExpanderPreferences		Uzi la dosierujon de la fonta arkivo
 Stop	ExpanderWindow		Halti
 Cancel	ExpanderWindow		Nuligi
-Expander settings	ExpanderPreferences		Agordo de la Elarkivilo
 Error when expanding archive	ExpanderWindow		Eraris dum la elarkivado
 Expand	ExpanderMenu		Elarkivigi
 Failed to create the destination folder.	ExpanderWindow		Malsukcesis krei la elarkivan dosierujon.
@@ -40,7 +38,6 @@ Continue	ExpanderWindow		Daŭri
 Cancel	ExpanderPreferences		Nuligi
 Use:	ExpanderPreferences		Uzi:
 Destination folder	ExpanderPreferences		Elarkiva dosiero
-Expander: Open	ExpanderWindow		Elarkivilo: Uzi
 Leave destination folder path empty	ExpanderPreferences		Lasi la elarkivan dosierujon malplene
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La elarkiva dosierujo ne ekzistas. Ĉu vi deziras krei ĝin?
 The file doesn't exist	ExpanderWindow		La dosiero ne ekzistas

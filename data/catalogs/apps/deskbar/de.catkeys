@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-TSKB	316181764
+1	german	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Automatisch ausblenden
 Show all	WindowMenu		Alle einblenden
 Edit in Tracker…	PreferencesWindow		Im Tracker bearbeiten …
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Replikanten einblenden
 No windows	WindowMenu		Keine Fenster
 Show clock	Tray		Uhr anzeigen
 Close all	WindowMenu		Alle schließen
-Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
 About this system	DeskbarMenu		Über dieses System
 Quit application	WindowMenu		Anwendung beenden
 Hide application names	PreferencesWindow		Anwendungsnamen ausblenden
 Applications	PreferencesWindow		Anwendungen
 Show application expander	PreferencesWindow		Expander anzeigen
-Deskbar preferences…	DeskbarMenu		Deskbar-Einstellungen …
 Suspend	DeskbarMenu		Ruhezustand
 Shutdown…	DeskbarMenu		Herunterfahren …
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos

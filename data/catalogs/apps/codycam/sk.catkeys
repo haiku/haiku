@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CodyCam	3512608473
+1	slovak	x-vnd.Haiku-CodyCam	1992289638
 destination directory expected	CodyCam		očakával sa cieľový adresár
 reply: '%s'\n	SftpClient		odpoveď: „%s“\n
 JPEG image	CodyCam		Obrázok JPEG
@@ -78,7 +78,6 @@ Video settings	CodyCam		Nastavenia videa
 Can't find an available connection to the video window	CodyCam		Nebolo nájdené dostupné spojenie s oknom s videom
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Chyba pri vytváraní výstupného súboru
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nepodarilo sa nájsť zdroj videa.\nAby ste mohli používať CodyCam, potrebujete webovú kameru.
 Logging in…	VideoConsumer.cpp		Prihlasuje sa…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Chyba pri zápise výstupného súboru

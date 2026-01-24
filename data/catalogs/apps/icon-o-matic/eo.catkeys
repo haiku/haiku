@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.haiku-icon_o_matic	1244334028
+1	esperanto	x-vnd.haiku-icon_o_matic	118707012
 None	Icon-O-Matic-Properties		Nenio
 Add empty	Icon-O-Matic-ShapesList		Aldoni malplenan
 Opening the icon failed!	Icon-O-Matic-Main		Malsukcesis uzi la piktogramon!
@@ -59,7 +59,6 @@ Diamond	Icon-O-Matic-StyleTypes		Rombformo
 Don't save	Icon-O-Matic-Menu-Settings		Nekonservi
 Add shape with path	Icon-O-Matic-Menu-Shape		Aldoni formon laŭ itinero
 Translation X	Icon-O-Matic-PropertyNames		Konverto X
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Piktogramilo ŝajne ne interpretis la tutan datumon de la ŝargita SVG. Per anstataŭigo de originala dosiero ĝia datumo estos perdita.
 Rotate indices backwards	Icon-O-Matic-PathsList		Turni indeksojn reen.
 Overwrite	Icon-O-Matic-SVGExport		Anstataŭigi
 Cancel	Icon-O-Matic-SVGExport		Nuligi

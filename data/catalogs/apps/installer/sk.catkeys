@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Installer	4076596243
+1	slovak	x-vnd.Haiku-Installer	4249172768
 Performing installation.	InstallProgress		Prebieha inštalácia.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Nastavenie diskových oblastí pred zatvorením okna Inštalátora.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
@@ -48,7 +48,6 @@ Set up partitions…	InstallerWindow		Nastaviť oblasti…
 Install progress:  	InstallerWindow		Priebeh inštalácie:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nemôžete inštalovať obsah disku na rovnaký disk. Prosím, zvoľte iný disk.
 OK	InstallProgress		OK
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ste si istí, že chcete vykonať inštaláciu na disk, z ktorého sa v súčasnosti zavádza systém? Ak budete pokračovať Inštalátor bude musieť reštartovať počítač.
 Onto:	InstallerWindow		Na:
 Tools	InstallerWindow		Nástroje
 scanning…	InstallerWindow		zisťuje sa…

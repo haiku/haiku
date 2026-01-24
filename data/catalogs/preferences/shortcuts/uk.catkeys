@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Shortcuts	3834857117
+1	ukrainian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Програма
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Відкат до збереженого
 Don't save	ShortcutsWindow		Не зберігати
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не вдалося зберегти список клавіатурних скорочень.
 Save	ShortcutsWindow		Зберегти
 Either	ShortcutsSpec		Будь-який
 Oh no	ShortcutsWindow		О ні
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Скасувати
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Лівий
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не вдалося розібрати Ваш файл зі списком клавіатурних скорочень!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не вдалося зберегти Ваш файл зі списком клавіатурних скорочень!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Ваш текст тут\"
 Remove selected shortcut	ShortcutsWindow		Вилучити вибране скорочення
 Error, NULL state description?	ShortcutsSpec		Помилка, опис стану NULL?

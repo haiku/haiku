@@ -1,13 +1,10 @@
-1	esperanto	x-vnd.Haiku-Sounds	2763165148
+1	esperanto	x-vnd.Haiku-Sounds	831874831
 Sounds	System name		Sonoj
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sonojn\n  prezentis al vi:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Origina laboro de Atsushi Takamatsu.\nAŭtorrajtoj ©2003-2006 Haiku
-No such file or directory	HEventList		Disierujo aŭ dosiero forestas
 Other…	HWindow		Aliaj…
-OK	SoundsHApp		Bone
 Sound file:	HWindow		Dosiero de sono:
 <none>	HEventList		<neniu>
-About Sounds	SoundsHApp		Pri sonoj
 OK	HEventList		Bone
 Sound	HEventList		Sono
 Event	HEventList		Evento
 <none>	HWindow		<neniu>
+No such file or directory	HEventList		Disierujo aŭ dosiero forestas

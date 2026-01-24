@@ -1,9 +1,8 @@
-1	slovak	x-vnd.Haiku-Expander	1129502603
+1	slovak	x-vnd.Haiku-Expander	4225849834
 Destination	ExpanderWindow		Cieľ
 Other	ExpanderPreferences		Ďalšie
 Automatically show contents listing	ExpanderPreferences		Automaticky zobrazovať obsah
 Expander	System name		Rozbaľovač
-Expander: Choose destination	DirectoryFilePanel		Rozbaľovač: Vyberte cieľ
 Set source…	ExpanderMenu		Nastaviť zdroj…
 The destination is not a folder.	ExpanderWindow		Cieľ nie je priečinok.
 Close window when done expanding	ExpanderPreferences		Zatvoriť okno po dokončení rozbaľovania
@@ -17,7 +16,6 @@ Open destination folder after extraction	ExpanderPreferences		Otvoriť cieľový
 Same directory as source (archive) file	ExpanderPreferences		Rovnaký ako zdrojový (archívny) súbor
 Stop	ExpanderWindow		Zastaviť
 Cancel	ExpanderWindow		Zrušiť
-Expander settings	ExpanderPreferences		Nastavenia rozbaľovača
 Error when expanding archive	ExpanderWindow		Chyba počas expandovania archívu
 Expand	ExpanderMenu		Rozbaliť
 Failed to create the destination folder.	ExpanderWindow		Nepodarilo sa vytvoriť cieľový priečinok.
@@ -38,7 +36,6 @@ Continue	ExpanderWindow		Pokračovať
 Cancel	ExpanderPreferences		Zrušiť
 Use:	ExpanderPreferences		Použiť:
 Destination folder	ExpanderPreferences		Cieľový priečinok
-Expander: Open	ExpanderWindow		Rozbaľovač: Otvoriť
 Leave destination folder path empty	ExpanderPreferences		Ponechať cestu k cieľovému priečinku prázdnu
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Cieľový priečinok neexistuje. Chcete ho vytvoriť?
 The file doesn't exist	ExpanderWindow		Súbor neexistuje

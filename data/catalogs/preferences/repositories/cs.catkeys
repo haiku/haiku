@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Repositories	1220143449
+1	czech	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Toto není platné URL.
 Repository URL:	AddRepoWindow	Text box label	URL repozitáře:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Při aktualizaci vyrovnávací paměti pro repozitář %name% došlo k chybě
@@ -20,7 +20,6 @@ OK	Constants	Button label	OK
 Status	RepositoriesView	Column title	Stav
 Name	RepositoriesView	Column title	Jméno
 Add	AddRepoWindow	Button label	Přidat
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Nepodařilo se získat jména momentálně aktivních repozitářů.
 Enable all	RepositoriesView	Button label	Aktivovat všechny
 Aborted	TaskLooper	Aborted task status message	Přerušeno
 URL	RepositoriesView	Column title	URL

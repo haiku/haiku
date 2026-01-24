@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-FileTypes	436017301
+1	turkish	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Sol
 Float	Attribute ListView		Kayan
 Final	Application Types Window		Final
@@ -144,7 +144,6 @@ Open file	FileTypes		Dosya aç
 Version info	Application Type Window		Sürüm bilgisi
 Final	Application Type Window		Final
 Preferred application	FileType Window		Tercih edilen uygulama
-FileTypes	FileTypes		Dosya Türleri
 Set preferred application	Preferred App Menu		Tercih edilen uygulamayı ayarla
 New file type	New File Type Window		Yeni dosya türü
 Short description:	Application Type Window		Kısa açıklama:

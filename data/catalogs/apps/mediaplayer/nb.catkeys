@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	520971408
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
 Close	MediaPlayer-PlaylistWindow		Lukk
 Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Lukk
 Save error	MediaPlayer-PlaylistWindow		Feil ved lagring
 Attributes	MediaPlayer-Main		Attributter
 Bottom of screen	MediaPlayer-SettingsWindow		Nederst på skjermen
-MediaPlayer settings	MediaPlayer-SettingsWindow		MedieSpiller innstillinger
 Copyright	MediaPlayer-InfoWin		Opphavsrett
 Invalid URL inserted!	MediaPlayer-NetworkStream		Ugyldig URL satt inn!
 Aspect ratio	MediaPlayer-Main		Størrelsesforhold

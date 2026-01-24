@@ -1,10 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-NetworkStatus	3629281636
+1	spanish; castilian	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		Dirección IPv6:
 Quit	NetworkStatusView		Salir
 Unknown	NetworkStatusView		Desconocido
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Hubo un error al ejecutar el diálogo de preferencias de red.\n\nError:
 Install in Deskbar	NetworkStatus		Instalar en la barra de escritorio
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opciones de NetworkStatus:\n\t--deskbar\t agrega automáticamente el replicante al Deskbar\n\t--help\t\t muestra esta información y finaliza
 Open network preferences…	NetworkStatusView		Abrir preferencias de red…
 NetworkStatus	System name		NetworkStatus
 Broadcast:	NetworkStatusView		Difusión:

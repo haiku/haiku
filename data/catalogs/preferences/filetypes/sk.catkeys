@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-FileTypes	734679611
+1	slovak	x-vnd.Haiku-FileTypes	523073894
 Left	Attribute Window	Attribute column alignment in Tracker	Vľavo
 Final	Application Types Window		Finálne
 FileTypes request	FileTypes Window		Požiadavka Typy súborov
@@ -130,7 +130,6 @@ Open file	FileTypes		Otvoriť súbor
 Version info	Application Type Window		Info o verzii
 Final	Application Type Window		Finálne
 Preferred application	FileType Window		Preferovaná aplikácia
-FileTypes	FileTypes		Typy súborov
 Set preferred application	Preferred App Menu		Nastaviť preferovanú aplikáciu
 New file type	New File Type Window		Nový typ súboru
 Short description:	Application Type Window		Krátky popis:

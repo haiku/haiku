@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PoorMan	1829050509
+1	swedish	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Välj hemsidesmapp
 Console logging	PoorMan		Konsolloggning
 Create Log File	PoorMan		Skapa loggfil
@@ -6,9 +6,7 @@ File logging	PoorMan		Fillogg
 Website options	PoorMan		Hemsidesalternativ
 Log to file	PoorMan		Skriv logg till fil
 Shutting down.	PoorMan		Stänger ner.
-Error Dir	PoorMan		Katalogfel
 Web folder:	PoorMan		Hemsidemapp:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vänligen välj en mapp för hemsidepublicering.\n\nDu kan låta Fattigman skapa en förinställd \"public_html\" i din hemmapp\neller välja en egen map.
 Log To Console	PoorMan		Skriv logg till konsol
 File Name	PoorMan		Filnamn
 Starting up... 	PoorMan		Startar...
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Träffar: %lu
 Hits: 0	PoorMan		Träffar: 0
 Shutting down.\n	PoorMan		Stänger ner.\n
 Select all	PoorMan		Markera allt
-Error Server	PoorMan		Serverfel
 Send file listing if there's no start page	PoorMan		Visa fillista om startsida saknas
-Create PoorMan log	PoorMan		Skapa loggfil
 Max. simultaneous connections:	PoorMan		Maximalt antal samtidiga anslutningar:
 Done	PoorMan		Klar
 Site	PoorMan		Hemsida
@@ -48,7 +44,6 @@ Run server	PoorMan		Kör server
 Create	PoorMan		Skapa
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# koppling} other{# kopplingar}}
 done.\n	PoorMan		klar.\n
-PoorMan settings	PoorMan		Fattigmans inställningar
 Console Logging	PoorMan		Konsollogg
 Clear log file	PoorMan		Rensa loggfil
 Save log console selection	PoorMan		Spara konsolloggsmarkering

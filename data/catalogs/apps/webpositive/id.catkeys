@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	3236552681
+1	indonesian	x-vnd.Haiku-WebPositive	470843237
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
 Previous	WebPositive Window		Sebelumnya
 (Finish: %date)	Download Window		(Selesai: %date)
@@ -106,7 +106,6 @@ Remove	Download Window		Hilangkan
 Close tab	WebPositive Window		Tutup tab
 About	WebPositive Window		Tentang
 Continue downloads	WebPositive		Lanjutkan unduhan
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Masih ada unduhan yang berjalan, apakah Anda ingin keluar dari WebPositive sekarang?
 Proxy server requires authentication	Settings Window		Server proksi membutuhkan otentikasi
 Cancel	Settings Window		Batal
 Reset size	WebPositive Window		Atur ulang ukuran
@@ -130,7 +129,6 @@ Next	WebPositive Window		Selanjutnya
 Bookmark error	WebPositive Window		Kesalahan bookmark
 OK	WebPositive Window		OKE
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% dari %expectedSize%, %rate%/d)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Simpan halaman sebagai…
 Zoom text only	WebPositive Window		Perbesar teks saja
 Page source error	WebPositive Window		Kesalahan sumber laman

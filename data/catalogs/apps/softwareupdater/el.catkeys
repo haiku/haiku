@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-softwareupdater	369324613
+1	greek, modern (1453-)	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Ενημέρωση έκδοσης
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Πατήστε εδώ για να εγκαταστήσετε {0, plural, one{# ενημερωμένο πακέτο} other{# ενημερωμένα πακέτα}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Πακέτα προς απεγκατάσταση
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Προέκυψ�
 Packages are being updated	UpdateManager		Τα πακέτα ενημερώνονται
 Cancel	SoftwareUpdaterWindow		Ακύρωση
 Don't quit	SoftwareUpdaterWindow		Να μην γίνει έξοδος
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Πατήστε εδώ για να χρησιμοποιήσετε τον Ενημερωτή. Ορισμένες ενημερώσεις ενδεχομένως να προκαλέσουν προβλήματα, τα οποία θα πρέπει να επιλύσετε.
 Checking for updates	SoftwareUpdaterWindow		Γίνεται έλεγχος για ενημερώσεις
 Updates completed	UpdateManager		Οι ενημερώσεις ολοκληρώθηκαν
 Reboot	SoftwareUpdaterWindow		Επανεκκίνηση

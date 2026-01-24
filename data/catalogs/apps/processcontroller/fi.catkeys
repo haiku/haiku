@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ProcessController	415082887
+1	finnish	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
 Display priority	ProcessController		Näyttöprioriteetti
 That's no Fun!	ProcessController		Se ei ole hauskaa!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Prosessori %d
 Live in the Deskbar	ProcessController		Suora lähetys Työpöytäpalkista
 Kill this team!	ProcessController		Tuhoa tämä säie!
 OK	ProcessController		Valmis
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Voit suorittaa Prosessiohjaimen ikkunassa tai asentaa sen Työpöytäpalkkiin.
 Real-time priority	ProcessController		Ajantasaprioriteetti
 Custom priority	ProcessController		Räätälöity prioriteetti
 Debug this thread!	ProcessController		Vikajäljitä tätä säiettä!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Muistikäyttö
 Ok!	ProcessController		Valmis!
 Normal priority	ProcessController		Normaaliprioriteetti
 Restart Deskbar	ProcessController		Käynnistä Työpöytäpalkki uudelleen
-About ProcessController…	ProcessController		Ohjelmasta Prosessiohjain...
 Usage: %s [-deskbar]\n	ProcessController		Käyttö: %s [-deskbar]\n
 Please confirm	ProcessController		Vahvista
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Järjestelmäresurssit ja välim
 Damned!	ProcessController		Kirottua!
 New Terminal	ProcessController		Uusi Pääteikkuna
 Power saving	ProcessController		Virransäästö
-ProcessController is already installed in Deskbar.	ProcessController		Prosessiohjain on jo asennettu Työpöytäpalkkiin.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Tämä on viimeinen aktiivi prosessori…\nEt voi kääntää sitä pois päältä!
 This thread is already gone…	ProcessController		Tämä säie on jo poistunut...
 Run in window	ProcessController		Suorita ikkunassa

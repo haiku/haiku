@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Pairs	818003250
+1	korean	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Pairs
 Quit	PairsWindow		종료
 Medium	PairsWindow		중간 크기
@@ -6,7 +6,6 @@ Game	PairsWindow		게임
 Expert (8x8)	PairsWindow		전문가 (8x8)
 New	PairsWindow		새 게임
 OK	Pairs		확인
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs를 시작하는데 충분한 벡터 아이콘을 찾을 수 없습니다; 최소 %zu개가 필요하지만 %zu개를 찾았습니다.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		게임을 {0, plural, one{# 클릭} other{# 클릭}}만에 완료하였습니다.\n
 Small	PairsWindow		작은 크기
 Size	PairsWindow		크기

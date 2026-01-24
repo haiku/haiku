@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Notifications	4196496676
+1	polish	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		Z dołu po lewej
 Application does not have a valid signature	NotificationView	Alert message	Aplikacja nie posiada poprawnej sygnatury
 Status	NotificationView		Status
@@ -7,8 +7,6 @@ Lower right	GeneralView		Z dołu po prawej
 Muted	NotificationView		Wyciszona
  is already listed	NotificationView	Alert message	 jest już na liście
 OK	PrefletWin		OK
-Notifications	PrefletWin		Powiadomienia
-Notifications preflet sample	PrefletWin		Przykład panelu powiadomień
 Mute notifications from this application	NotificationView		Wycisz powiadomienia z tej aplikacji
 wide	GeneralView	Window width: Slider high text	szerokie
 narrow	GeneralView	Window width: Slider low text	wąskie
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Przy Deskbarze
 Notifications	System name		Powiadomienia
 Allowed	NotificationView		Zezwolone
 Duration:	GeneralView		Czas trwania:
-Application	NotificationView		Aplikacja
 Enable notifications	GeneralView		Włącz powiadomienia
+Application	NotificationView		Aplikacja
 This is a test notification message	PrefletWin		To jest próbne powiadomienie
 Remove	NotificationView		Usuń
 Position:	GeneralView		Pozycja:

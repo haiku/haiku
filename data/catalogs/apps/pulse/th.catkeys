@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Pulse	559379362
+1	thai	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		โหมดปกติ
 Info	CPUButton		ข้อมูล
 Quit	DeskbarPulseView		ออก
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		ค่าเริ่มต้น
 Mini mode	PrefsWindow		โหมดขนาดเล็ก
 CPU progress bar	NormalPulseView		แถบความคืบหน้าของ CPU
 Fade colors	ConfigView		สีจาง
-About Pulse…	PulseView		เกี่ยวกับ Pulse
-Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		โหมดเดสก์บาร์
 Pulse settings	PulseApp		การตั้งค่า Pulse
 Remove replicant	CPUButton		ลบตัวจำลอง
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		โหมดเดสก์บาร์
 OK	PulseView		ตกลง
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nโดย David Ramsey และ Arve Hjønnevåg\nแก้ไขโดย Daniel Switkin\n
 OK	PrefsWindow		ตกลง
-Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		การลบออกจากเดสก์บาร์ล้มเหลว\n%s
 OK	PulseApp		ตกลง
-About Pulse…	CPUButton		เกี่ยวกับ Pulse
 Deskbar mode	PrefsWindow		โหมดเดสก์บาร์
 Mini mode	DeskbarPulseView		โหมดขนาดเล็ก
 You can't disable the last active CPU.	CPUButton		คุณไม่สามารถปิดการใช้งาน CPU ที่ใช้งานล่าสุด

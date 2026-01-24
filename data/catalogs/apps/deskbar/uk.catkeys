@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-TSKB	316181764
+1	ukrainian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Ховати автоматично
 Show all	WindowMenu		Показати все
 Edit in Tracker…	PreferencesWindow		Змінити меню у Tracker…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Показати репліканти
 No windows	WindowMenu		Немає вікон
 Show clock	Tray		Показати годинник
 Close all	WindowMenu		Закрити все
-Deskbar preferences	PreferencesWindow		Налаштування Deskbar
 About this system	DeskbarMenu		Про цю систему
 Quit application	WindowMenu		Вийти з програми
 Hide application names	PreferencesWindow		Сховати назви програм
 Applications	PreferencesWindow		Програми
 Show application expander	PreferencesWindow		Показати експандер списку вікон
-Deskbar preferences…	DeskbarMenu		Налаштування Deskbar...
 Suspend	DeskbarMenu		Призупинити
 Shutdown…	DeskbarMenu		Завершити роботу...
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демонстраційні

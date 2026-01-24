@@ -1,9 +1,8 @@
-1	friulian	x-vnd.Haiku-Expander	3239308358
+1	friulian	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Destinazion
 Other	ExpanderPreferences		Altri
 Automatically show contents listing	ExpanderPreferences		Mostre in automatic il listât dai contignûts
 Expander	System name		Espansôr
-Expander: Choose destination	DirectoryFilePanel		Espansôr: Sielç la destinazion
 Set source…	ExpanderMenu		Stabilìs la sorzint…
 OK	ExpanderWindow		Va ben
 The destination is not a folder.	ExpanderWindow		La destinazion no je une cartele.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Vierç la cartele 
 Same directory as source (archive) file	ExpanderPreferences		Stesse cartele dal file (archivi) sorzint
 Stop	ExpanderWindow		Ferme
 Cancel	ExpanderWindow		Anule
-Expander settings	ExpanderPreferences		Impostazions Espansôr
 Error when expanding archive	ExpanderWindow		Erôr te espansion dal archivi
 Expand	ExpanderMenu		Espant
 Failed to create the destination folder.	ExpanderWindow		No si è rivâts a creâ la cartele di destinazion.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Continue
 Cancel	ExpanderPreferences		Cancele
 Use:	ExpanderPreferences		Dopre:
 Destination folder	ExpanderPreferences		Cartele di destinazion
-Expander: Open	ExpanderWindow		Espansôr: Vierç
 Leave destination folder path empty	ExpanderPreferences		Lasse vueit il percors de cartele di destinazion
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La cartele di destinazion no esist. Creâle?
 The file doesn't exist	ExpanderWindow		Il file nol esist

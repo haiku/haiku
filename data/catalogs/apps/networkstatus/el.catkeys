@@ -1,10 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	3629281636
+1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		Διεύθυνση IPv6:
 Quit	NetworkStatusView		Έξοδος
 Unknown	NetworkStatusView		Άγνωστο
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Η εκκίνηση του βοηθητικού προγράμματος δικτύου απέτυχε.\n\nΣφάλμα: 
 Install in Deskbar	NetworkStatus		Εγκατάσταση στην Γραμμή Εργασιών
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Ρυθμίσεις Κατάστασης Δικτύου :\n\t--deskbar\tαυτόματη προσθήκη ρεπλίκας στην γραμμή εργασιών\n\t--help\t\tεκτύπωση του μηνύματος αυτού και έξοδος
 Open network preferences…	NetworkStatusView		Άνοιγμα ρυθμίσεων δικτύου…
 NetworkStatus	System name		Κατάσταση Δικτύου
 Broadcast:	NetworkStatusView		Διεύθυνση broadcast:

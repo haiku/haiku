@@ -1,7 +1,6 @@
-1	slovak	x-vnd.Haiku-Terminal	2409047790
+1	slovak	x-vnd.Haiku-Terminal	439332808
 Close other tabs	Terminal TermWindow		Zatvoriť ostatné karty
 Insert path	Terminal TermView		Vložiť cestu
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminálu sa nepodarilo spustiť shell. Ľutujeme.
 Text encoding	Terminal TermWindow		Kódovanie textu
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Upraviť
@@ -26,7 +25,6 @@ Page setup…	Terminal TermWindow		Nastavenie stránky…
 Cancel	Terminal TermView		Zrušiť
 Defaults	Terminal PrefWindow		Predvoľby
 Revert	Terminal PrefWindow		Vrátiť späť
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
 Use selection	Terminal FindWindow		Použiť výber
 Find next	Terminal TermWindow		Nájsť ďalší
 Copy link location	Terminal TermView		Kopírovať umiestnenie odkazu
@@ -41,12 +39,10 @@ Custom	Terminal colors scheme		Vlastné
 Really close?	Terminal TermWindow		Skutočne zatvoriť?
 Font size	Terminal TermWindow		Veľkosť písma
 OK	Terminal TermApp		OK
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces „%1“ ešte stále beží.\nAk zatvoríte Terminál, proces bude zabitý.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná voľba „%s“\n
 Tab title:	Terminal AppearancePrefView		Titulok karty:
 Text not found.	Terminal TermWindow		Text nenájdený.
 Match word	Terminal FindWindow		Nájsť slovo
-New Terminal	Terminal TermWindow		Nový terminál
 Find failed	Terminal TermWindow		Hľadanie zlyhalo
 Quit	Terminal TermWindow		Ukončiť
 Match case	Terminal FindWindow		Rozlišovať veľkosť písmen
@@ -64,8 +60,8 @@ Shell 	Terminal TermWindow		Shell
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tZnak „%“.\n\t%<\t-\tZačína sekciu, ktorá sa zobrazí iba ak rezervované\n\t\t\tmiesto po nej nie je prázdne.\n\t%>\t-\tZačína sekciu, ktorá sa zobrazí iba ak rezervované\n\t\t\tmiesto medzi predošlou %< sekciou a touto nie je prázdne.\n\t%-\t-\tKončí sekciu %< alebo %>.\n\nAkékoľvek nealfanumerické znaky medzi „%“, a písmenom formátu vložia medzeru iba\nv prípade, že hodnota rezervovaného miesta nie je prázdna. Pridá do sekcie %<.
 Tab title:	Terminal TermWindow		Titulok karty:
 Window title:	Terminal TermWindow		Titulok okna:
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Prepnúť terminály
 Window size:	Terminal AppearancePrefView		Veľkosť okna:
-Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Decrease	Terminal TermWindow		Zmenšiť
 Settings…	Terminal TermWindow		Nastavenia…
 Cancel	Terminal SetTitleWindow		Zrušiť
@@ -88,7 +84,6 @@ Find…	Terminal TermWindow		Nájsť…
 No search string was entered.	Terminal TermWindow		Nebol zadaný vyhľadávací reťazec.
 Move here	Terminal TermView		Presunúť sem
 Abort	Terminal Shell		Zrušiť
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Nasledovné procesy ešte stále bežia:\n\n\t%1\n\nAk zatvoríte Terminál, procesy budú zabité.
 Set window title	Terminal TermWindow		Nastaviť titulok okna
 Increase	Terminal TermWindow		Zväčšiť
 OK	Terminal TermWindow		OK

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FileTypes	436017301
+1	french	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	À gauche
 Float	Attribute ListView		Flottant
 Final	Application Types Window		Finale
@@ -144,7 +144,6 @@ Open file	FileTypes		Ouvrir un fichier
 Version info	Application Type Window		Info de version
 Final	Application Type Window		Finale
 Preferred application	FileType Window		Application préférée 
-FileTypes	FileTypes		Types de Fichiers
 Set preferred application	Preferred App Menu		Définir l’application préférée
 New file type	New File Type Window		Nouveau type de fichier
 Short description:	Application Type Window		Description courte :

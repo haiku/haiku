@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Repositories	1220143449
+1	danish	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Dette er ikke en gyldig URL.
 Repository URL:	AddRepoWindow	Text box label	Programarkiv-URL:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Der opstod en fejl ved genopfriskning af programarkiv-mellemlageret til %name%
@@ -20,7 +20,6 @@ OK	Constants	Button label	O.k.
 Status	RepositoriesView	Column title	Status
 Name	RepositoriesView	Column title	Navn
 Add	AddRepoWindow	Button label	Tilføj
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Programarkiver kunne ikke indhente navnene på de programarkiver, som på nuværende tidspunkt er slået til.
 Enable all	RepositoriesView	Button label	Slå alle til
 Aborted	TaskLooper	Aborted task status message	Afbrudt
 URL	RepositoriesView	Column title	URL

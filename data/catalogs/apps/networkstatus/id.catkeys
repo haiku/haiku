@@ -1,10 +1,9 @@
-1	indonesian	x-vnd.Haiku-NetworkStatus	3629281636
+1	indonesian	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		Alamat IPv6
 Quit	NetworkStatusView		Keluar
 Unknown	NetworkStatusView		Takdiketahui
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Gagal meluncurkan preflet jaringan.\n\nkesalahan: 
 Install in Deskbar	NetworkStatus		Pasang di Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Pilihan NetworkStatus:\n\t--deskbar\totomatos menambah replicant ke Deskbar\n\t--help\t\tcetak info ini dan keluar
 Open network preferences…	NetworkStatusView		Buka preferensi jaringan...
 NetworkStatus	System name		StatusJaringan
 Broadcast:	NetworkStatusView		Broadcast:

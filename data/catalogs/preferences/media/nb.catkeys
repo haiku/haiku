@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Media	582516163
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Media	4055972908
 Couldn't add volume control in Deskbar: %s\n	Media views		Kunne ikke legge til volumkontroll i Deskbar: %s\n
 Restart media services	Media views		Start mediatjenestene på nytt
 Quit	Media Window		Avslutt
@@ -9,7 +9,6 @@ Video input:	Media views		Videoinngang:
 Audio output:	Media views		Lydutgang:
 Please select a SoundFont.	Midi View		Velg en SoundFont.
 There are no SoundFonts installed.	Midi View		Ingen SoundFonts installert.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Hvis du avslutter Media nå, stopper du omstarten av medietjenestene. Det sannsynlige resultatet er ustabil eller utilgjengelig mediefunksjonalitet.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Kunne ikke koble til mediaserveren.\nØnsker du å starte den?
 Video settings	Media Window		Videoinnstillinger
 Audio mixer	Media Window		Lydmikser

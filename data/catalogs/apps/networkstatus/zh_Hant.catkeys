@@ -1,10 +1,9 @@
-1	english	x-vnd.Haiku-NetworkStatus	3629281636
+1	english	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		IPv6 位址：
 Quit	NetworkStatusView		退出
 Unknown	NetworkStatusView		未知
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		啟動網路預置失敗。\n\n錯誤：
 Install in Deskbar	NetworkStatus		安裝至Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		網路狀態選項:\n\t--deskbar\t自動將副本新增至Deskbar\n\t--help\t\t列印此訊息並退出
 Open network preferences…	NetworkStatusView		開啟網路偏好...
 NetworkStatus	System name		網路狀態
 Broadcast:	NetworkStatusView		播送：

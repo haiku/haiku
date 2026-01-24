@@ -1,11 +1,10 @@
-1	russian	x-vnd.Haiku-Locale	1312749322
+1	russian	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Средний формат:
 ERROR	TimeFormatSettings		ОШИБКА
 Negative:	TimeFormatSettings		Отрицательные:
 Language	Locale Preflet Window		Язык
 Short format:	TimeFormatSettings		Короткий формат:
 24 hour	TimeFormatSettings		24 часовой формат
-Locale	Locale Preflet Window		Локаль
 Time	TimeFormatSettings		Время
 Defaults	Locale Preflet Window		По умолчанию
 Locale	System name		Локаль
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		ОК
 Long format:	TimeFormatSettings		Длинный формат:
 Numbers	TimeFormatSettings		Числа
 Available languages	Locale Preflet Window		Доступные языки
-Locale	Locale Preflet		Локаль
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не удаётся найти доступные языки! Вы не можете использовать данные настройки!
 Formatting	Locale Preflet Window		Форматирование
 Use month/day-names from preferred language	TimeFormatSettings		Использовать названия месяцев/дней из предпочитаемого языка

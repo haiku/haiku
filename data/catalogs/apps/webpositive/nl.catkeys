@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	861169737
+1	dutch; flemish	x-vnd.Haiku-WebPositive	1038913369
 Authentication required	Authentication Panel		Aanmelding is vereist
 Previous	WebPositive Window		Vorige
 (Finish: %date)	Download Window		(Voltooid: %date)
@@ -56,7 +56,6 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Zoek term
 Expiration	Cookie Manager		Vervaldatum
 Reload	WebPositive Window		Herladen
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Je CPU is te oud en ondersteund geen SSE2 extensies, zonder deze werkt WebPositive niet. We raden je aan om NetSurf te installeren in de plaats.
 Download finished	Download Window		Download gereed
 Cookie manager	WebPositive Window		Cookiemanager
 Username:	Authentication Panel		Gebruikersnaam:
@@ -109,7 +108,6 @@ Remove	Download Window		Verwijderen
 Close tab	WebPositive Window		Tabblad sluiten
 About	WebPositive Window		Over
 Continue downloads	WebPositive		Downloads hervatten
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Er zijn nog downloads bezig, wilt u WebPositive echt afsluiten?
 Proxy server requires authentication	Settings Window		Proxyserver vereist authenticatie
 Cancel	Settings Window		Annuleren
 Reset size	WebPositive Window		Grootte opnieuw instellen
@@ -133,7 +131,6 @@ Next	WebPositive Window		Volgende
 Bookmark error	WebPositive Window		Bladwijzerfout
 OK	WebPositive Window		Ok
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% van %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Pagina opslaan als…
 Zoom text only	WebPositive Window		Alleen tekst inzoomen
 Page source error	WebPositive Window		Paginabronfout

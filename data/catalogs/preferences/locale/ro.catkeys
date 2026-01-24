@@ -1,11 +1,10 @@
-1	romanian	x-vnd.Haiku-Locale	1312749322
+1	romanian	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Format mediu:
 ERROR	TimeFormatSettings		EROARE
 Negative:	TimeFormatSettings		Negativ:
 Language	Locale Preflet Window		Limbă
 Short format:	TimeFormatSettings		Format scurt:
 24 hour	TimeFormatSettings		24 de ore
-Locale	Locale Preflet Window		Localizare
 Time	TimeFormatSettings		Oră
 Defaults	Locale Preflet Window		Implicite
 Locale	System name		Locale
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		OK
 Long format:	TimeFormatSettings		Format lung:
 Numbers	TimeFormatSettings		Numere
 Available languages	Locale Preflet Window		Limbi disponibile
-Locale	Locale Preflet		Localizare
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nu s-au putut găsi limbile disponibile! Nu puteți utiliza acest preflet!
 Formatting	Locale Preflet Window		Formatare
 Use month/day-names from preferred language	TimeFormatSettings		Utilizează numele de lună/zi din limba preferată

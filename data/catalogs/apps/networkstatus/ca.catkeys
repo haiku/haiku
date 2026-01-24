@@ -1,10 +1,9 @@
-1	catalan; valencian	x-vnd.Haiku-NetworkStatus	2979204375
+1	catalan; valencian	x-vnd.Haiku-NetworkStatus	2192330251
 IPv6 address:	NetworkStatusView		Adreça IPv6:
 Quit	NetworkStatusView		Surt
 Unknown	NetworkStatusView		Desconegut
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Ha fallat l'execució de l'aplicació de preferències de xarxa.\n\nError : 
 Install in Deskbar	NetworkStatus		Instal·la-ho a la barra d'escriptori
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcions de l'Estat de la xarxa:\n\t--deskbar\tafegeix automàticament un replicant a la barra d'escriptori\n\t--help\t\timprimeix aquesta informació i surt
 Open network preferences…	NetworkStatusView		Obre les preferències de la xarxa...
 NetworkStatus	System name		Estat de la xarxa
 Broadcast:	NetworkStatusView		Difusió:

@@ -1,7 +1,6 @@
-1	english	x-vnd.Haiku-Terminal	686383766
+1	english	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		關閉其他選項卡
 Insert path	Terminal TermView		插入路徑
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		終端機無法啟動 shell。抱歉。
 Text encoding	Terminal TermWindow		文字編碼
 Colors	Terminal ThemeWindow		顏色
 OK	Terminal SetTitleWindow		確認
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		取消
 Defaults	Terminal PrefWindow		默認值
 black	Terminal ThemeView		黑色
 Revert	Terminal PrefWindow		恢復
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	終端機
 Use selection	Terminal FindWindow		使用選擇
 Find next	Terminal TermWindow		尋找下一個
 Copy link location	Terminal TermView		複製鏈結位置
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		真的關閉？
 Font size	Terminal TermWindow		字體大小
 OK	Terminal TermApp		確認
 ANSI bright blue color	Terminal ThemeView		ANSI 亮藍色
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		行程 \"%1\"  仍在運行。\n如果關閉終端機，該進程將被終止。
 Unrecognized option \"%s\"\n	Terminal arguments parsing		無法辨識的選項 \"%s\"\n
 Tab title:	Terminal AppearancePrefView		選項卡標題：
 Text not found.	Terminal TermWindow		未找到文字。
 Match word	Terminal FindWindow		匹配單字
-New Terminal	Terminal TermWindow		新創終端機
 Find failed	Terminal TermWindow		尋找失敗
 Quit	Terminal TermWindow		退出
 Match case	Terminal FindWindow		匹配大小寫
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI 亮青色
 Tab title:	Terminal TermWindow		選項卡標題：
 Window title:	Terminal TermWindow		視窗標題：
 ANSI white color	Terminal ThemeView		ANSI 白色
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	切換終端機
 Window size:	Terminal AppearancePrefView		視窗尺寸：
-Switch Terminals	Terminal TermWindow		切換終端機
 Decrease	Terminal TermWindow		減少
 Settings…	Terminal TermWindow		設定…
 Cancel	Terminal SetTitleWindow		取消
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		尋找…
 No search string was entered.	Terminal TermWindow		未輸入搜尋字串。
 Move here	Terminal TermView		移動到此
 Abort	Terminal Shell		中止
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		以下行程仍在運行：\n\n\t%1\n\n如關閉終端機，行程將被終止。
 Set window title	Terminal TermWindow		設定視窗標題
 ANSI red color	Terminal ThemeView		ANSI 紅色
 Increase	Terminal TermWindow		增加

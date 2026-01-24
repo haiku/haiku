@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DriveSetup	4193609455
+1	catalan; valencian	x-vnd.Haiku-DriveSetup	2351839435
 Could not unmount partition %s.	MainWindow		No s'ha pogut desmuntar la partició %s.
 Register disk image…	MainWindow		Registra la imatge del disc...
 Mount all	MainWindow		Munta-ho tot
@@ -25,6 +25,7 @@ Validation of the given parameters failed.	MainWindow		Ha fallat validar els par
 Cannot init target partition.	MainWindow		No es pot iniciar la partició de destinació.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició \"%s\"? Se us preguntarà un cop més abans d'escriure els canvis al disc.
 DriveSetup	System name		Gestor de discs
+Error:	MainWindow	in any error alert	Error:
 Mounted at	PartitionList		Muntada a
 Disk system %s not found!	MainWindow		No s'ha trobat el disc de sistema %s!
 Create…	MainWindow		Crea...
@@ -44,6 +45,7 @@ There's no space on the partition where a child partition could be created.	Main
 %s does not refer to a file disk device.	MainWindow		%s no fa referència a un dispositiu de disc de fitxers.
 No disk devices have been recognized.	DiskView		No s'ha reconegut cap dispositiu de disc.
 Attributes	PartitionList		Atributs
+'%s' is not a regular file.	MainWindow		%s no és un fitxer regular.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Ha fallat suprimir la partició. No s'ha escrit cap canvi al disc.
 Change parameters…	MainWindow		Canvia'n els paràmetres...
 Format	InitializeParametersPanel		Format
@@ -78,6 +80,7 @@ Partition name:	ChangeParametersPanel		Nom de la partició:
 LUKS encrypted	Encryption utils		Encriptat amb LUKS
 Empty space	PartitionList		Espai buit
 Cancel	AbstractParametersPanel		Cancel·la
+%appname%: Save disk image	MainWindow		%appname%: desa la imatge del disc
 Format	MainWindow		Formata
 OK	MainWindow		D'acord
 Cannot init target file.	MainWindow		No es pot iniciar el fitxer de destinació.
@@ -86,12 +89,14 @@ Unregister disk image	MainWindow		Cancel·la el registre de la imatge de disc
 The target partition is smaller than the image file.	MainWindow		La partició de destinació és més petita que el fitxer d'imatge.
 Empty space	DiskView		Espai buit
 Could not delete the selected partition.	MainWindow		No s'ha pogut suprimir la partició seleccionada.
+Failed to get information about '%s'.	MainWindow		Ha fallat obtenir informació sobre %s.
 Open with DiskProbe	MainWindow		Obre amb DiskProbe
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Segur que voleu iniciar el disc seleccionat? Se'n perdran totes les dades. Se us preguntarà un cop més abans d'escriure els canvis al disc.\n
 There was an error preparing the disk for modifications.	MainWindow		Hi ha hagut un error en preparar el disc per a les modificacions.
 The disk has been successfully initialized.\n	MainWindow		El disc s'ha iniciat correctament.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Cal forçar el desmuntatge?\n\nNota: si hi ha alguna aplicació escrivint al volum, desmuntar-lo ara podria comportar una pèrdua de dades.\n
 Disk image has been removed.	MainWindow		S'ha suprimit la imatge de disc.
+No file disk device found with the given ID, trying file '%s'.	MainWindow		No s'ha trobat cap dispositiu de disc de fitxers amb l'ID proporcionat. S'intenta el fitxer %s.
 Cancel	MainWindow		Cancel·la
 Free space	PartitionList		Espai lliure
 Queries	PartitionList		Consultes
@@ -112,7 +117,9 @@ Cannot delete the selected partition.	MainWindow		No es pot suprimir la partici�
 Continue	MainWindow		Continua
 Could not mount partition %s.	MainWindow		No s'ha pogut muntar la partició %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició? Se us preguntarà un cop més abans d'escriure els canvis al disc.
+%appname% error	MainWindow		Error de l'aplicació %appname%
 The selected disk is read-only.	MainWindow		El disc seleccionat és només de lectura.
+Failed to unregister file disk device %s.	MainWindow		Ha fallat cancel·lar el registre del dispositiu de disc de fitxers %s.
 The partition %s is already unmounted.	MainWindow		La partició %s ja està desmuntada.
 Target volume is read only.	MainWindow		El volum de destinació és de només lectura.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Segur que voleu canviar els paràmetres de la partició seleccionada?\n\nEls altres sistemes operatius podrien no reconèixer més la partició!

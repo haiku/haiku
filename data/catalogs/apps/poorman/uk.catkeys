@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PoorMan	1829050509
+1	ukrainian	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Вибрати веб-папку
 Console logging	PoorMan		Консольний лог-файл
 Create Log File	PoorMan		Створити лог-файл
@@ -6,9 +6,7 @@ File logging	PoorMan		Файл журналу роботи
 Website options	PoorMan		Налаштування веб-сайту
 Log to file	PoorMan		Зберегти журнал в файл
 Shutting down.	PoorMan		Вимкнути
-Error Dir	PoorMan		Помилка директорії
 Web folder:	PoorMan		Веб-папка:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть папку для публікації в мережі Інтернет.\n\nPoorMan може створити типову папку \«public_html\» у Вашому домашньому каталозі.\nАбо виберіть одну з своїх власних папок.
 Log To Console	PoorMan		Виводити лог в консоль
 File Name	PoorMan		Назва файлу
 Starting up... 	PoorMan		Запускаєтся… 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Відвідувань: %lu
 Hits: 0	PoorMan		Відвідувань: 0
 Shutting down.\n	PoorMan		Вимкнення.\n
 Select all	PoorMan		Вибрати все
-Error Server	PoorMan		Помилка сервера
 Send file listing if there's no start page	PoorMan		Відправити список файлів, якщо немає домашньої сторінки
-Create PoorMan log	PoorMan		Створити логи PoorMan
 Max. simultaneous connections:	PoorMan		Максимум одночасних підключень:
 Done	PoorMan		Готово
 Site	PoorMan		Сайт
@@ -48,7 +44,6 @@ Run server	PoorMan		Запустити сервер
 Create	PoorMan		Створити
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# з'єднання} few{# з'єднання} other{# з'єднань}}
 done.\n	PoorMan		готово.\n
-PoorMan settings	PoorMan		Налаштування PoorMan
 Console Logging	PoorMan		Консольний лог-файл
 Clear log file	PoorMan		Очистити лог-файл
 Save log console selection	PoorMan		Зберегти логи вибраної консолі

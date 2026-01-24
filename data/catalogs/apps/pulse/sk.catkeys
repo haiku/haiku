@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Pulse	2964417303
+1	slovak	x-vnd.Haiku-Pulse	1142202922
 Normal mode	DeskbarPulseView		Normálny režim
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Ukončiť
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Predvolené
 Mini mode	PrefsWindow		Režim mini
 CPU progress bar	NormalPulseView		Priebeh CPU
 Fade colors	ConfigView		Farebné prechody
-About Pulse…	PulseView		O aplikácii Pulse…
-Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Režim Panelu
 Remove replicant	CPUButton		Odstrániť replikanta
 You can't disable the last active CPU.	PulseView		Nemôžete vypnúť posledný aktívny CPU.
@@ -23,10 +21,8 @@ Deskbar mode	MiniPulseView		Režim Panelu
 OK	PulseView		OK
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nNapísal David Ramsey a Arve Hjønnevåg\nRevidoval Daniel Switkin\n
 OK	PrefsWindow		OK
-Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstránenie z Panelu zlyhalo.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		O aplikácii Pulse…
 Deskbar mode	PrefsWindow		Režim Panelu
 Mini mode	DeskbarPulseView		Režim mini
 You can't disable the last active CPU.	CPUButton		Nemôžete vypnúť posledný aktívny CPU.

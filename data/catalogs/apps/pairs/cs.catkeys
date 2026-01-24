@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Pairs	818003250
+1	czech	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Páry
 Quit	PairsWindow		Ukončit
 Medium	PairsWindow		Střední
@@ -6,7 +6,6 @@ Game	PairsWindow		Hra
 Expert (8x8)	PairsWindow		Expert (8x8)
 New	PairsWindow		Nová
 OK	Pairs		OK
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Hra Páry nenašla dostatek vektorových ikon, aby mohla začít. Potřebuje jich alespoň %zu, nalezeno %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Dokončili jste hru na {0, plural, one{# kliknutí} few{# kliknutí} other{# kliknutí}}.\n
 Small	PairsWindow		Malé
 Size	PairsWindow		Velikost

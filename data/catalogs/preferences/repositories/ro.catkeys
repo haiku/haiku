@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Repositories	1220143449
+1	romanian	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Acesta nu este un URL valid.
 Repository URL:	AddRepoWindow	Text box label	URL de depozit:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	A apărut o eroare la reîmprospătarea cache-ului de depozit pentru %name%
@@ -20,7 +20,6 @@ OK	Constants	Button label	OK
 Status	RepositoriesView	Column title	Stare
 Name	RepositoriesView	Column title	Nume
 Add	AddRepoWindow	Button label	Adaugă
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositories nu a putut obține numele depozitelor activate în prezent.
 Enable all	RepositoriesView	Button label	Activează toate
 Aborted	TaskLooper	Aborted task status message	Întreruptă
 URL	RepositoriesView	Column title	URL

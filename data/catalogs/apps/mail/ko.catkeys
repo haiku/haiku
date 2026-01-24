@@ -1,4 +1,4 @@
-1	korean	x-vnd.Be-MAIL	262401742
+1	korean	x-vnd.Be-MAIL	3945726882
 Set to Saved	Mail		저장하도록 설정
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		본문에 인코딩 할수없는 문자가 %ld 개 있습니다. 다른 문자 세트를 사용하면 작동할 수 있습니다. 무시하고 전송하려면 보내기 버튼을 누르십시오. (인코딩 할수 없는 문자는 대체 문자가 사용됨) 또는 취소를 선택한 후 돌아가서 수정하십시오.
 Text wrapping:	Mail		텍스트 줄바꿈 : 
@@ -96,7 +96,6 @@ To:	Mail		받는 사람:
 Need Tracker to move items to trash	Mail		항목을 휴지통으로 이동하려면 Tracker가 필요합니다
 The mail_daemon could not be started:\n\t	Mail		mail_daemon을 시작할 수 없습니다:\n\t
 <no account found>	Mail		<계정을 찾을 수 없습니다>
-Mail couldn't find its dictionary.	Mail		Mail에서 사전을 찾을 수 없습니다.
 helpful message	Mail		도움이 되는 메세지
  Read 	Mail		 읽음 
 Font:	Mail		글꼴 : 
@@ -107,7 +106,6 @@ Start now	Mail		지금 시작
 (Name unavailable)	Mail		(이름을 사용할 수 없음)
 Move to trash	Mail		휴지통으로 이동
 <none>	Mail		<없음>
-Mail settings	Mail		메일 설정
 %d - Date	Mail		%d - 날짜
 Check spelling	Mail		맞춤법 검사
 Status:	Mail		상태:

@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-MediaPlayer	793596948
+1	thai	x-vnd.Haiku-MediaPlayer	607130308
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		ย้ายรายการไปถังขยะ
 Close	MediaPlayer-PlaylistWindow		ปิด
 Volume of background clips	MediaPlayer-SettingsWindow		ระดับเสียงของคลิปพื้นหลัง
@@ -42,7 +42,6 @@ Close	MediaPlayer-Main		ปิด
 Save error	MediaPlayer-PlaylistWindow		บันทึกผิดพลาด
 Attributes	MediaPlayer-Main		คุณสมบัติ
 Bottom of screen	MediaPlayer-SettingsWindow		ด้านล่างของหน้าจอ
-MediaPlayer settings	MediaPlayer-SettingsWindow		การตั้งค่าเครื่องเล่นสื่อ
 Copyright	MediaPlayer-InfoWin		ลิขสิทธิ์
 Invalid URL inserted!	MediaPlayer-NetworkStream		ใส่ URL ไม่ถูกต้อง!
 Aspect ratio	MediaPlayer-Main		อัตราส่วนภาพ

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DriveSetup	4193609455
+1	swedish	x-vnd.Haiku-DriveSetup	2351839435
 Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Register disk image…	MainWindow		Registrera diskavbildning...
 Mount all	MainWindow		Montera alla
@@ -25,6 +25,7 @@ Validation of the given parameters failed.	MainWindow		Valideringen av den givna
 Cannot init target partition.	MainWindow		Kan inte initiera målpartitionen.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Är du säker att du vill formatera partitionen \"%s\"? Du kommet att få frågan igen innan ändringarna skrivs till disk.
 DriveSetup	System name		DiskHanterare
+Error:	MainWindow	in any error alert	Error:
 Mounted at	PartitionList		Monterad vid
 Disk system %s not found!	MainWindow		Disksystemet %s hittades inte!
 Create…	MainWindow		Skapa…
@@ -44,6 +45,7 @@ There's no space on the partition where a child partition could be created.	Main
 %s does not refer to a file disk device.	MainWindow		%s refererar inte till en fildiskenhet.
 No disk devices have been recognized.	DiskView		Inga diskenheter har identifierats.
 Attributes	PartitionList		Attribut
+'%s' is not a regular file.	MainWindow		'%s' är inte en vanlig fil.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Kunde inte radera partitionen. Inga ändringar har skrivits till disken.
 Change parameters…	MainWindow		Ändra parametrar...
 Format	InitializeParametersPanel		Formatera
@@ -78,6 +80,7 @@ Partition name:	ChangeParametersPanel		Partitionsnamn:
 LUKS encrypted	Encryption utils		LUKS-krypterad
 Empty space	PartitionList		Tomt utrymme
 Cancel	AbstractParametersPanel		Avbryt
+%appname%: Save disk image	MainWindow		%appname%: Spara diskavbildningen
 Format	MainWindow		Format
 OK	MainWindow		OK
 Cannot init target file.	MainWindow		Kan inte initiera målfilen.
@@ -86,12 +89,14 @@ Unregister disk image	MainWindow		Avregistrera diskavbildning
 The target partition is smaller than the image file.	MainWindow		Målpartitionen är mindre än avbildningsfilen.
 Empty space	DiskView		Tomt utrymme
 Could not delete the selected partition.	MainWindow		Kunde inte radera den valda partitionen.
+Failed to get information about '%s'.	MainWindow		Misslyckades med att hämta information om '%s'.
 Open with DiskProbe	MainWindow		Öppna med DiskInspekterare
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Är du säker att du vill initiera den valda disken? All data kommer att förloras. Du kommet att få frågan igen innan ändringarna skrivs till disk.\n
 There was an error preparing the disk for modifications.	MainWindow		Det blev ett fel när diskändringarna förbereddes.
 The disk has been successfully initialized.\n	MainWindow		Partitionen har initierats.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Ska vi tvinga avmonteringen?\n\nNotering: Om ett program skriver till enheten som avmonteras så kan informationen försvinna.\n
 Disk image has been removed.	MainWindow		Diskavbildningen har tagits bort.
+No file disk device found with the given ID, trying file '%s'.	MainWindow		Ingen fildiskenhet hittades med angivet ID, försöker med filen '%s'.
 Cancel	MainWindow		Avbryt
 Free space	PartitionList		Ledigt utrymme
 Queries	PartitionList		Frågor
@@ -112,7 +117,9 @@ Cannot delete the selected partition.	MainWindow		Kan inte radera den valda part
 Continue	MainWindow		Fortsätt
 Could not mount partition %s.	MainWindow		Kunde inte montera partition %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera partitionen? Du kommer att så frågan igen innan ändringarna skrivs till disk.
+%appname% error	MainWindow		%appname% fel
 The selected disk is read-only.	MainWindow		Den valda disken är inte skrivbar.
+Failed to unregister file disk device %s.	MainWindow		Misslyckades med att avregistrera fildiskenheten %s.
 The partition %s is already unmounted.	MainWindow		Partitionen %s är redan avmonterad.
 Target volume is read only.	MainWindow		Målvolymen är skrivskyddad.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Är du säker på att du vill ändra parametrarna till partionen?\n\nPartionen kommer kanske inte kunna läsas av andra operativsystem!

@@ -1,9 +1,8 @@
-1	korean	x-vnd.Haiku-Expander	3239308358
+1	korean	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		목적지
 Other	ExpanderPreferences		기타
 Automatically show contents listing	ExpanderPreferences		자동으로 내용 목록 보여주기
 Expander	System name		Expander
-Expander: Choose destination	DirectoryFilePanel		Expander: 목적지를 선택하십시오
 Set source…	ExpanderMenu		원본 설정…
 OK	ExpanderWindow		확인
 The destination is not a folder.	ExpanderWindow		목적지가 폴더가 아닙니다.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		압축을 푼 후 
 Same directory as source (archive) file	ExpanderPreferences		원본(압축) 파일과 같은 디렉터리
 Stop	ExpanderWindow		정지
 Cancel	ExpanderWindow		취소
-Expander settings	ExpanderPreferences		Expander 설정
 Error when expanding archive	ExpanderWindow		압축을 푸는 중 오류가 발생했습니다
 Expand	ExpanderMenu		압축풀기
 Failed to create the destination folder.	ExpanderWindow		목적지 폴더를 생성할 수 없습니다.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		계속
 Cancel	ExpanderPreferences		취소
 Use:	ExpanderPreferences		사용:
 Destination folder	ExpanderPreferences		목적지 폴더
-Expander: Open	ExpanderWindow		Expander: 열기
 Leave destination folder path empty	ExpanderPreferences		목적지 폴더 경로를 비워둡니다
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		목적지 폴더가 존재하지 않습니다. 새로 생성하시겠습니까?
 The file doesn't exist	ExpanderWindow		파일이 존재하지 않습니다

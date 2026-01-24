@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CodyCam	12021044
+1	english	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		預期目標目錄
 reply: '%s'\n	SftpClient		回覆：'%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (真實密碼已發送)
@@ -81,7 +81,6 @@ Video settings	CodyCam		視頻設定
 Can't find an available connection to the video window	CodyCam		找不到視訊視窗的可用連接
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		建立輸出檔案時出錯
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		找不到視訊來源。\n您需要一個網路攝影機才能使用 CodyCam。
 Logging in…	VideoConsumer.cpp		正在登入…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		寫入輸出檔時出錯

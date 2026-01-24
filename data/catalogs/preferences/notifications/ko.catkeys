@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Notifications	4196496676
+1	korean	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		왼쪽 아래
 Application does not have a valid signature	NotificationView	Alert message	응용 프로그램이 올바른 서명을 가지고 있지 않습니다
 Status	NotificationView		상태
@@ -7,8 +7,6 @@ Lower right	GeneralView		오른쪽 아래
 Muted	NotificationView		알림 꺼짐
  is already listed	NotificationView	Alert message	 은(는) 이미 목록에 있습니다
 OK	PrefletWin		확인
-Notifications	PrefletWin		알림
-Notifications preflet sample	PrefletWin		알림 메세지 예시
 Mute notifications from this application	NotificationView		이 응용 프로그램의 알림 끄기
 wide	GeneralView	Window width: Slider high text	넓게
 narrow	GeneralView	Window width: Slider low text	좁게
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		데스크바 따라가기
 Notifications	System name		알림
 Allowed	NotificationView		허용됨
 Duration:	GeneralView		길이:
-Application	NotificationView		응용 프로그램
 Enable notifications	GeneralView		알림 활성화
+Application	NotificationView		응용 프로그램
 This is a test notification message	PrefletWin		알림 시험용 메세지입니다
 Remove	NotificationView		제거
 Position:	GeneralView		위치:

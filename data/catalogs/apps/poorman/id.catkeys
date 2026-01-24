@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-PoorMan	1829050509
+1	indonesian	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Pilih folder web
 Console logging	PoorMan		Pencatatan pada konsol
 Create Log File	PoorMan		Buat Berkas Log
@@ -6,9 +6,7 @@ File logging	PoorMan		Pencatatan pada berkas
 Website options	PoorMan		Opsi situs web
 Log to file	PoorMan		Log ke berkas
 Shutting down.	PoorMan		Mematikan.
-Error Dir	PoorMan		Dir Galat
 Web folder:	PoorMan		Folder web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Silahkan memilih folder untuk menerbitkan di web.\n\nAnda dapat memiliki PoorMan membuatkan suatu \"public_html\" asali di folder rumah.\nAtau anda memilih salah satu folder milik anda sendiri.
 Log To Console	PoorMan		Catat Ke Konsol
 File Name	PoorMan		Nama Berkas
 Starting up... 	PoorMan		Memulai… 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Hits: %lu
 Hits: 0	PoorMan		Hits: 0
 Shutting down.\n	PoorMan		Mematikan.\n
 Select all	PoorMan		Pilih semua
-Error Server	PoorMan		Server Galat
 Send file listing if there's no start page	PoorMan		Kirim daftar berkas jika tidak ada laman awal
-Create PoorMan log	PoorMan		Buatkan log PoorMan
 Max. simultaneous connections:	PoorMan		Maks. koneksi bersamaan:
 Done	PoorMan		Selesai
 Site	PoorMan		Situs
@@ -48,7 +44,6 @@ Run server	PoorMan		Jalankan server
 Create	PoorMan		Buat
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
 done.\n	PoorMan		selesai.\n
-PoorMan settings	PoorMan		Pengaturan PoorMan
 Console Logging	PoorMan		Pencatatan pada konsol
 Clear log file	PoorMan		Bersihkan file pencatatan
 Save log console selection	PoorMan		Simpan catatan konsol terpilih

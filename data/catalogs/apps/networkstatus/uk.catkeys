@@ -1,10 +1,9 @@
-1	ukrainian	x-vnd.Haiku-NetworkStatus	2979204375
+1	ukrainian	x-vnd.Haiku-NetworkStatus	2192330251
 IPv6 address:	NetworkStatusView		Адреса IPv6:
 Quit	NetworkStatusView		Вийти
 Unknown	NetworkStatusView		Невідомий
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Збій запуску аплета мережевих параметрів.\n\nПомилка: 
 Install in Deskbar	NetworkStatus		Встановити у Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus опції:\n\t--deskbar\tавтоматично додати реплікант до Deskbar\n\t--help\t\tпоказати цю інфо та вийти
 Open network preferences…	NetworkStatusView		Відкрити налаштування мережі…
 NetworkStatus	System name		NetworkStatus
 Broadcast:	NetworkStatusView		Широкомовна передача:

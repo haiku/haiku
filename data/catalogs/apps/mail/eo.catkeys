@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Be-MAIL	4073987023
+1	esperanto	x-vnd.Be-MAIL	856240449
 Set to Saved	Mail		Atribui al Konservita
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Via ĉefa teksto enhavas %ld da nedekodeblaj signoj. Verŝajne alia signaro pli taŭgus? Premu "Sendi" por sendi ĝin malgraŭe (nedekodeblaj signoj estos anstataŭigitaj), aŭ elektu "Rezigni" por provi korekti ilin.
 Text wrapping:	Mail		Teksta ĉirkaŭfluo:
@@ -93,7 +93,6 @@ To:	Mail		Al:
 Need Tracker to move items to trash	Mail		Oni bezonas Spurilo por movi elementojn al la Rubujo
 The mail_daemon could not be started:\n\t	Mail		La mail_daemon (retpoŝta_demono) ne povis esti komencata:\n\t
 <no account found>	Mail		<Neniu trovita konto>
-Mail couldn't find its dictionary.	Mail		Poŝto ne povis trovi ĝian vortaron.
 helpful message	Mail		helpema mesaĝo
  Read 	Mail		 Legita 
 Font:	Mail		Tiparo:

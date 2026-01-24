@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Shortcuts	3834857117
+1	thai	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		แอพพลิเคชั่น
 Option	ShortcutsSpec	Name for modifier on keyboard	ตัวเลือก
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		เปลี่ยนกลับเพื่�
 Don't save	ShortcutsWindow		ไม่บันทึก
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		ทางลัดไม่สามารถบันทึกชุดคีย์ของคุณ
 Save	ShortcutsWindow		บันทึก
 Either	ShortcutsSpec		อย่างใดอย่างหนึ่ง
 Oh no	ShortcutsWindow		โอ ไม่
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		ยกเลิก
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Left
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		ทางลัดไม่สามารถแยกวิเคราะห์ไฟล์ KeySet ของคุณ!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		ทางลัดไม่สามารถบันทึกไฟล์ KeySet ของคุณได้!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"ข้อความของคุณที่นี้\"
 Remove selected shortcut	ShortcutsWindow		ลบทางลัดที่เลือก
 Error, NULL state description?	ShortcutsSpec		ข้อผิดพลาด ยกเลิกคำอธิบายสถานะหรือไม่?

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PoorMan	1829050509
+1	english	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		选择 web 目录
 Console logging	PoorMan		控制台日志
 Create Log File	PoorMan		创建日志文件
@@ -6,9 +6,7 @@ File logging	PoorMan		文件记录
 Website options	PoorMan		网站选项
 Log to file	PoorMan		输出日志到文件
 Shutting down.	PoorMan		关闭.
-Error Dir	PoorMan		目录错误
 Web folder:	PoorMan		Web 目录：
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		请选择将要在网络上发布的目录。\n\n 您可以使用 PoorMan 在 home 目录中创建默认的  \"public_html\"。\n或者选择自定义的目录。
 Log To Console	PoorMan		控制台日志
 File Name	PoorMan		文件名称
 Starting up... 	PoorMan		启动...
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		访问： %lu
 Hits: 0	PoorMan		访问：0
 Shutting down.\n	PoorMan		关闭。\n
 Select all	PoorMan		全选
-Error Server	PoorMan		服务器出错
 Send file listing if there's no start page	PoorMan		如果没有起始页，则发送文件列表。
-Create PoorMan log	PoorMan		创建 PoorMan 日志
 Max. simultaneous connections:	PoorMan		最大同步连接：
 Done	PoorMan		完成
 Site	PoorMan		站点
@@ -48,7 +44,6 @@ Run server	PoorMan		运行服务器
 Create	PoorMan		创建
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# 个连接} other{# 个连接}}
 done.\n	PoorMan		完成。\n
-PoorMan settings	PoorMan		PoorMan 设置
 Console Logging	PoorMan		控制台日志
 Clear log file	PoorMan		清空日志文件
 Save log console selection	PoorMan		保存日志控制台选择

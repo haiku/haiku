@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	2880203340
+1	portuguese (brazil)	x-vnd.Haiku-Installer	3052779865
 Performing installation.	InstallProgress		Executando a instalação.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Gerenciador de Disco antes de fechar o Instalador.
 No optional packages available.	PackagesView		Nenhum pacote opcional disponível.
@@ -61,7 +61,6 @@ Set up partitions…	InstallerWindow		Configurar partições…
 Install progress:  	InstallerWindow		Progresso na instalação:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Você não pode instalar o conteúdo de um disco dentro dele mesmo. Por favor escolha um disco diferente.
 OK	InstallProgress		OK
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Você tem certeza que deseja instalar no atual disco de inicialização? O Instalador irá reiniciar seu computador se você continuar.
 Onto:	InstallerWindow		Para:
 Tools	InstallerWindow		Ferramentas
 scanning…	InstallerWindow		analisando…

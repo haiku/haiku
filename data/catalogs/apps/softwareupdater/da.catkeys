@@ -1,4 +1,4 @@
-1	danish	x-vnd.haiku-softwareupdater	369324613
+1	danish	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Opdaterer udgave
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klik her for at installere {0, plural, one{# opdateret pakke} other{# opdaterede pakker}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakker, som skal afinstalleres
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Der opstod en u
 Packages are being updated	UpdateManager		Pakker opdateres
 Cancel	SoftwareUpdaterWindow		Afbryd
 Don't quit	SoftwareUpdaterWindow		Afslut ikke
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klik her for at køre Programopdatering. Nogle opdateringer kræver at en problemløsning er blevet valgt.
 Checking for updates	SoftwareUpdaterWindow		Søger efter opdateringer
 Updates completed	UpdateManager		Opdateringer fuldført
 Reboot	SoftwareUpdaterWindow		Genstart

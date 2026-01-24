@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-WebPositive	2942427387
+1	danish	x-vnd.Haiku-WebPositive	3120171019
 Authentication required	Authentication Panel		Godkendelse er påkrævet
 Previous	WebPositive Window		Forrige
 Copy	Console Window		Kopiér
@@ -58,7 +58,6 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - søgeterm
 Expiration	Cookie Manager		Udløb
 Reload	WebPositive Window		Genindlæs
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Din CPU er for gammel og understøtter ikke SSE2-udvidelser uden hvilke WebPositive ikke kan køre. Vi anbefaler, du installerer NetSurf i stedet for.
 Download finished	Download Window		Hentning fuldført
 Cookie manager	WebPositive Window		Cookiehåndtering
 Username:	Authentication Panel		Brugernavn:
@@ -112,7 +111,6 @@ Remove	Download Window		Fjern
 Close tab	WebPositive Window		Luk faneblad
 About	WebPositive Window		Om
 Continue downloads	WebPositive		Fortsæt hentninger
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Der er stadig igangværende overførsler, vil du virkelig afslutte WebPositive nu?
 Proxy server requires authentication	Settings Window		Proxy-server kræver godkendelse
 Cancel	Settings Window		Afbryd
 Reset size	WebPositive Window		Nulstil størrelse
@@ -136,7 +134,6 @@ Next	WebPositive Window		Næste
 Bookmark error	WebPositive Window		Bogmærkefejl
 OK	WebPositive Window		O.k.
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% af %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Gem side som…
 Zoom text only	WebPositive Window		Zoom kun tekst
 Page source error	WebPositive Window		Fejl ved sidekilde

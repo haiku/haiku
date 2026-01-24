@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	2225233929
+1	hungarian	x-vnd.Haiku-WebPositive	2402977561
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 Copy	Console Window		Másolás
@@ -63,7 +63,6 @@ WebPositive	System name		WebPositive
 Old name: %s	BookmarkBar		Előző név: %s
 Expiration	Cookie Manager		Érvényesség
 Reload	WebPositive Window		Újratöltés
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		A processzor túl régi, és nem támogatja az SSE2 kiterjesztést, amelyek nélkül a WebPositive nem futhat. Javasoljuk a NetSurf telepítését helyette.
 Download finished	Download Window		Elkészült a letöltés
 Cookie manager	WebPositive Window		Süti kezelő
 Username:	Authentication Panel		Felhasználónév:
@@ -118,7 +117,6 @@ Remove	Download Window		Eltávolít
 Close tab	WebPositive Window		Fül bezárása
 About	WebPositive Window		Névjegy
 Continue downloads	WebPositive		Letöltések folytatása
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Letöltések vannak folyamatban, biztosan bezárjuk a WebPositive-ot?
 Proxy server requires authentication	Settings Window		A proxy szerver azonosítást igényel
 Cancel	Settings Window		Mégse
 Reset size	WebPositive Window		Méret visszaállítása
@@ -142,7 +140,6 @@ Next	WebPositive Window		Következő
 Bookmark error	WebPositive Window		Könyvjelző hiba
 OK	WebPositive Window		Rendben
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% / %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Oldal mentése mint…
 Zoom text only	WebPositive Window		Csak a szöveg nagyítása
 Page source error	WebPositive Window		Hibás az oldal forrása

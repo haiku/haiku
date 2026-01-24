@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-PowerStatus	1104524835
+1	friulian	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		Eseguìs tal barcon
 Extended battery info	PowerStatus		Infomazions batarie completis
 Show status icon	PowerStatus		Mostre icone di stât
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Batarie basse
 Model number: 	PowerStatus		Numar model: 
 Battery unused	PowerStatus		Batarie no doprade
 Type: 	PowerStatus		Gjenar: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Tu puedis eseguî Stât de Batarie intun barcon o instalâlu tal Deskbar.
 Damaged or missing battery	PowerStatus		Ruvinade opûr e mancje la batarie
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Batarie in scjarie
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		Numar seriâl:
 Battery critical	PowerStatus		Nivel critic de batarie
 Capacity: 	PowerStatus		Capacitât: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		No je stade rilevade nissune batarie supuartade. Nol è pussibil doprâ Stât de Batarie sul to computer.
 Show percent	PowerStatus		Mostre percentuâl
 Capacity granularity 1: 	PowerStatus		Granularitât de capacitât 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Il nivel de batarie al sta lant jù, par plasê tache il dispositîf ae prese.

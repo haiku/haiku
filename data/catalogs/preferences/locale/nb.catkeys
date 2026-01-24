@@ -1,11 +1,10 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Locale	1312749322
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Medium format:
 ERROR	TimeFormatSettings		FEIL
 Negative:	TimeFormatSettings		Negativ:
 Language	Locale Preflet Window		Språk
 Short format:	TimeFormatSettings		Kortformat:
 24 hour	TimeFormatSettings		24 timer
-Locale	Locale Preflet Window		Lokalitet
 Time	TimeFormatSettings		Tid
 Defaults	Locale Preflet Window		Standardinnstillinger
 Locale	System name		Språk
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		OK
 Long format:	TimeFormatSettings		Langformat:
 Numbers	TimeFormatSettings		Tall
 Available languages	Locale Preflet Window		Tilgjengelige språk
-Locale	Locale Preflet		Lokalitet
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan ikke finne tilgjengelige språk! Disse innstillingene kan ikke benyttes!
 Formatting	Locale Preflet Window		Format
 Use month/day-names from preferred language	TimeFormatSettings		Bruk måned- og dagsnavn fra foretrukket språk

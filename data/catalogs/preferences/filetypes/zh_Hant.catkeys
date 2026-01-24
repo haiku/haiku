@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-FileTypes	436017301
+1	english	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	左
 Float	Attribute ListView		浮點數
 Final	Application Types Window		最終
@@ -144,7 +144,6 @@ Open file	FileTypes		開啟檔案
 Version info	Application Type Window		版本資訊
 Final	Application Type Window		最終
 Preferred application	FileType Window		首選應用
-FileTypes	FileTypes		檔案類型
 Set preferred application	Preferred App Menu		設定首選應用程式
 New file type	New File Type Window		新檔案類型
 Short description:	Application Type Window		短描述:

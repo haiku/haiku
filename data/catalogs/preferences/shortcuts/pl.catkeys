@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Shortcuts	3834857117
+1	polish	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplikacja
 Option	ShortcutsSpec	Name for modifier on keyboard	Opcja
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Cofnięto do zapisu
 Don't save	ShortcutsWindow		Nie zapisuj
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
 Save	ShortcutsWindow		Zapisz
 Either	ShortcutsSpec		Którykolwiek
 Oh no	ShortcutsWindow		Och nie
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Anuluj
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Left	ShortcutsSpec		Lewy
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Skróty nie zdołały przetworzyć pliku Keyset!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Skróty nie zdołały zapisać pliku Keyset!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tutaj umieść swój tekst\"
 Remove selected shortcut	ShortcutsWindow		Usuń zaznaczony skrót
 Error, NULL state description?	ShortcutsSpec		Błąd, brak opisu stanu?

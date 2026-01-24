@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-WebPositive	1315180462
+1	thai	x-vnd.Haiku-WebPositive	2844438314
 Authentication required	Authentication Panel		ต้องการการรับรองความถูกต้อง
 Previous	WebPositive Window		ก่อนหน้า
 (Finish: %date)	Download Window		(สิ้นสุด: %date)
@@ -105,7 +105,6 @@ Remove	Download Window		ลบ
 Close tab	WebPositive Window		ปิดแท็บ
 About	WebPositive Window		เกี่ยวกับ
 Continue downloads	WebPositive		ดาวน์โหลดต่อไป
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ยังคงมีการดาวน์โหลดอยู่คุณต้องการออกจาก WebPositive ทันทีหรือไม่?
 Proxy server requires authentication	Settings Window		พร็อกซีเซิร์ฟเวอร์ต้องการการรับรองความถูกต้อง
 Cancel	Settings Window		ยกเลิก
 Reset size	WebPositive Window		ตั้งค่าขนาดใหม่
@@ -128,7 +127,6 @@ Double-click or middle-click to open new tab.	Tab Manager		ดับเบิล
 Next	WebPositive Window		ถัดไป
 Bookmark error	WebPositive Window		คั่นหน้าผิดพลาด
 OK	WebPositive Window		ตกลง
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		บันทึกหน้าเป็น
 Zoom text only	WebPositive Window		ขยายข้อความอย่างเดียว
 Page source error	WebPositive Window		ข้อผิดพลาดของแหล่งหน้า

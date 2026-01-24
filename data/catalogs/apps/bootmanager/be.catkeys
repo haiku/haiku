@@ -1,12 +1,11 @@
-1	belarusian	x-vnd.Haiku-BootManager	3355843558
+1	belarusian	x-vnd.Haiku-BootManager	3319482851
 At least one partition must be selected!	BootManagerController		Найменей як адзін падзел павінен быць абраны!
 No space available!	DrivesPage	Cannot install	Недастаткова месца!
-Boot Manager is unable to read the partition table!	BootManagerController		Менеджер Запуску не можа прачытаць табліцу раздзелаў!
 Immediately	DefaultPartitionPage		Неадкладна
 Uninstall Boot Manager	UninstallPage	Title	Выдаліць Менеджэр Запуску
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Невядома
-Installation of boot menu failed	BootManagerController	Title	Устаноўка загрузачнага меню не ўдалася
 Backup Master Boot Record	BootManagerController	Title	Захаваць рэзервовую копію Master Boot Record
+Installation of boot menu failed	BootManagerController	Title	Устаноўка загрузачнага меню не ўдалася
 Cannot access!	DrivesPage	Cannot install	Няма доступу!
 After one second	DefaultPartitionPage		Праз адну секунду
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Зыходны Master Boot Record паспяхова захаваны ў %s.
@@ -49,8 +48,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Выдален
 After two seconds	DefaultPartitionPage		Пасля двух секунд
 Partition table not compatible	BootManagerController	Title	Табліца раздзелаў несумяшчальная
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузачны запіс (MBR) устройства (%DISK) паспяхова адноулены з файла %FILE.
-Done	BootManagerController	Button	Зроблена
 BootManager	System name		Мэнэджэр Загрузкі
+Done	BootManagerController	Button	Зроблена
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Калі ласка, азначце файл, з якога будзе адноўлены MBR. Гэта файл, створаны пры першай ўстаноўцы менеджэра запуску.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Калі ласка, азначце файл, з якога будзе адноўлены MBR. Гэта файл, створаны пры першай ўстаноўцы менеджэра запуску.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Master Boot Record (MBR) дыска %disk зараз будзе адноўлены з выкарыстаннем раней захаванай копіі змешчанай ў файле %file. Жадаеце аднавіць Master Boot Record?

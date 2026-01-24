@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Be-TSKB	316181764
+1	esperanto	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Aŭtomate kaŝi
 Show all	WindowMenu		Montri ĉiujn
 Edit in Tracker…	PreferencesWindow		Redakti per Spurilo…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Montri replikilojn
 No windows	WindowMenu		Neniu fenestro
 Show clock	Tray		Montri la horloĝon
 Close all	WindowMenu		Fermi ĉiujn
-Deskbar preferences	PreferencesWindow		Agordoj de Laborstrio
 About this system	DeskbarMenu		Pri ĉi tiu sistemo
 Quit application	WindowMenu		Ĉesi la programon
 Hide application names	PreferencesWindow		Kaŝi nomojn de programoj
 Applications	PreferencesWindow		Programoj
 Show application expander	PreferencesWindow		Montri liston de programaj fenestroj
-Deskbar preferences…	DeskbarMenu		Agordi Laborstrion…
 Suspend	DeskbarMenu		Halteti
 Shutdown…	DeskbarMenu		Ĉesi laboron…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstraĵoj

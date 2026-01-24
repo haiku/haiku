@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	4196496676
+1	japanese	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		左下
 Application does not have a valid signature	NotificationView	Alert message	アプリケーションは有効なシグネチャーがありません
 Status	NotificationView		ステータス
@@ -7,8 +7,6 @@ Lower right	GeneralView		右下
 Muted	NotificationView		ミュート
  is already listed	NotificationView	Alert message	 はすでにリストにあリます
 OK	PrefletWin		OK
-Notifications	PrefletWin		通知
-Notifications preflet sample	PrefletWin		通知サンプル
 Mute notifications from this application	NotificationView		このアプリケーションからの通知をミュートする
 wide	GeneralView	Window width: Slider high text	広く
 narrow	GeneralView	Window width: Slider low text	狭く
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Deskbar に追随する
 Notifications	System name		通知
 Allowed	NotificationView		許可された
 Duration:	GeneralView		継続期間:
-Application	NotificationView		アプリケーション
 Enable notifications	GeneralView		通知を有効にする
+Application	NotificationView		アプリケーション
 This is a test notification message	PrefletWin		これはテスト通知です
 Remove	NotificationView		除去
 Position:	GeneralView		位置:

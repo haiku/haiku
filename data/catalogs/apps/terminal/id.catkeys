@@ -1,7 +1,6 @@
-1	indonesian	x-vnd.Haiku-Terminal	2382644655
+1	indonesian	x-vnd.Haiku-Terminal	412929673
 Close other tabs	Terminal TermWindow		Tutup tab yang lain
 Insert path	Terminal TermView		Sisipkan jalur
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal tidak dapat memulai shell. Maaf.
 Text encoding	Terminal TermWindow		Pengodean Teks
 OK	Terminal SetTitleWindow		OKE
 Edit	Terminal TermWindow		Sunting
@@ -27,7 +26,6 @@ Page setup…	Terminal TermWindow		Pengaturan halaman…
 Cancel	Terminal TermView		Batalkan
 Defaults	Terminal PrefWindow		Bawaan
 Revert	Terminal PrefWindow		Pulih
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Gunakan seleksi
 Find next	Terminal TermWindow		Cari selanjutnya
 Copy link location	Terminal TermView		Salin lokasi tautan
@@ -42,12 +40,10 @@ Custom	Terminal colors scheme		Gubahan
 Really close?	Terminal TermWindow		Benar-benar hapus?
 Font size	Terminal TermWindow		Ukuran fon
 OK	Terminal TermApp		OKE
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proses \"%1\" masih berjalan.\nJika Anda menutup Terminal, proses akan dibunuh.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opsi tak-dikenal \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Judul tab:
 Text not found.	Terminal TermWindow		Teks tak ditemukan
 Match word	Terminal FindWindow		Kata cocok
-New Terminal	Terminal TermWindow		Terminal Baru
 Find failed	Terminal TermWindow		Pencarian gagal
 Quit	Terminal TermWindow		Keluar
 Match case	Terminal FindWindow		Sesuaikan besar kecil huruf
@@ -65,8 +61,8 @@ Shell 	Terminal TermWindow		Shell
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.
 Tab title:	Terminal TermWindow		Judul tab:
 Window title:	Terminal TermWindow		Judul jendela:
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Beralih Terminal
 Window size:	Terminal AppearancePrefView		Ukuran jendela:
-Switch Terminals	Terminal TermWindow		Beralih Terminal
 Decrease	Terminal TermWindow		Menurunkan
 Settings…	Terminal TermWindow		Pengaturan...
 Cancel	Terminal SetTitleWindow		Batalkan
@@ -90,7 +86,6 @@ Find…	Terminal TermWindow		Cari...
 No search string was entered.	Terminal TermWindow		Tidak ada kata pencarian yang dimasukkan.
 Move here	Terminal TermView		Pindah ke sini
 Abort	Terminal Shell		Gugurkan
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Proses berikut masih berjalan:\n\n\t%1\n\nJika Anda menutup Terminal, proses akan dibunuh.
 Set window title	Terminal TermWindow		Setel judul jendela
 Increase	Terminal TermWindow		Meningkat
 OK	Terminal TermWindow		OKE

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	3240158834
+1	romanian	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Se execută instalarea.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Închideți fereastra DriveSetup înainte de a închide fereastra Installer.
 No optional packages available.	PackagesView		Nu sunt disponibile pachete opționale.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Clic pe „Stabi
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bine ați venit la Installer Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? din ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplicația pentru configurarea partițiilor de disc, nu a putut fi lansată.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalare completă. Sectorul de boot a fost scris la „%s”. Apăsați „Ieșire” pentru a părăsi Installer sau alegeți un nou volum țintă pentru a efectua o altă instalare.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Volumul țintă nu este gol. Dacă acesta conține deja o instalare Haiku, aceasta va fi suprascrisă. Această acțiune va elimina toate programele instalate.\n\nDacă doriți să actualizați sistemul fără a elimina programele instalate, consultați subiectul Ghidului utilizatorului Haiku despre aplicația \„SoftwareUpdater\” pentru instrucțiuni de actualizare.\n\nSigur doriți să continuați instalarea?
 Quit DriveSetup	InstallerWindow		Ieșire din DriveSetup
 Write boot sector	InstallerWindow		Scrie sectorul de boot
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Alegeți discul sursă din meniul contextual. Apoi dați clic pe „Începe”.
 OK	InstallProgress		OK
 Quit BootManager	InstallerWindow		Ieșire BootManager
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Sigur doriți să instalați pe discul de boot curent? Installer va trebui să repornească mașina dacă veți continua.
 Onto:	InstallerWindow		Pe:
 Tools	InstallerWindow		Unelte
 scanning…	InstallerWindow		se scanează…

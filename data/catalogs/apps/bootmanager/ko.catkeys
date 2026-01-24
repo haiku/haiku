@@ -1,13 +1,12 @@
-1	korean	x-vnd.Haiku-BootManager	867546001
+1	korean	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	이전 마스터 부트 레코드 백업 실패
 At least one partition must be selected!	BootManagerController		최소한 하나의 파티션을 선택해야 합니다!
 No space available!	DrivesPage	Cannot install	공간이 부족합니다!
-Boot Manager is unable to read the partition table!	BootManagerController		부트 관리자가 파티션 테이블을 읽을 수 없습니다!
 Immediately	DefaultPartitionPage		즉시
 Uninstall Boot Manager	UninstallPage	Title	부트 관리자 제거
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	알 수 없음
-Installation of boot menu failed	BootManagerController	Title	부트 메뉴 설치 실패
 Backup Master Boot Record	BootManagerController	Title	마스터 부트 레코드 백업
+Installation of boot menu failed	BootManagerController	Title	부트 메뉴 설치 실패
 Cannot access!	DrivesPage	Cannot install	접근 할 수 없습니다!
 After one second	DefaultPartitionPage		1초 후
 The old Master Boot Record was successfully saved to %s.	BootManagerController		이전 마스터 부트 레코드를 %s로 저장하는 데 성공했습니다.
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	부트 메뉴 기록
 OK	BootManagerController	Button	확인
 Uninstall boot manager	BootManagerController	Title	부트 관리자 제거
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		부팅 디스크(%s)에 다음과 같이 부팅 메뉴를 작성할 것입니다. 계속하기 전에 아래 정보를 확인하십시오.
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		디스크의 첫 번째 파티션 위치가 너무 앞으로 당겨져 부트 메뉴를 기록할 공간이 충분하지 않습니다.\n부트 관리자는 첫 번째 파티션 앞에 최소한 2 KiB의 여유 공간을 필요로 합니다.
 Uninstall	DrivesPage	Button	제거
 Update	DrivesPage	Button	갱신
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		부트 장치의 마스터 부트 레코드(MBR):\n\t%s\n이(가) 디스크에 저장될 것입니다. MBR을 저장할 파일을 선택하십시오.\n\n설치 과정에서 문제가 발생하거나 추후 부트 메뉴를 삭제하고 싶은 경우에는 bootman 프로그램을 실행한 후 "제거"옵션을 선택하십시오.
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		5초 후
 Timeout: %s	DefaultPartitionPage		시간초과: %s
 The Master Boot Record could not be restored!	BootManagerController		마스터 부트 레코드를 복구 할 수 없습니다!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		첫 번째 하드디스크의 파티션 테이블이 부트 관리자와 호환되지 않습니다.\n부트 관리자는 IBM PC MBR 파티션에서만 작동합니다.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		부트 관리자를 설치하거나 제거하려는는 드라이브를 선택하십시오.
 After four seconds	DefaultPartitionPage		4초 후
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	부트 메뉴 
 After two seconds	DefaultPartitionPage		2초 후
 Partition table not compatible	BootManagerController	Title	파티션 테이블이 호환되지 않음
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		부트 장치(%DISK)의 마스터 부트 레코드가 %FILE로부터 성공적으로 복구되었습니다.
-Done	BootManagerController	Button	완료
 BootManager	System name		부트관리자
+Done	BootManagerController	Button	완료
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		복구할 마스터 부트 레코드(MBR) 파일을 선택해 주십시오. 해당 파일은 부트 관리자를 처음 설치할 때 만들어졌습니다.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		복구할 마스터 부트 레코드(MBR) 파일을 선택해 주십시오. 해당 파일은 부트 관리자를 처음 설치할 때 만들어졌습니다.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%file로부터 %disk의 마스터 부트 레코드(MBR)를 복구합니다. 계속 하시겠습니까?

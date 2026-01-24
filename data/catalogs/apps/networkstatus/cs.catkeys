@@ -1,10 +1,9 @@
-1	czech	x-vnd.Haiku-NetworkStatus	3629281636
+1	czech	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		Adresa IPv6:
 Quit	NetworkStatusView		Zavřít
 Unknown	NetworkStatusView		Neznámý
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Spuštění okýnka voleb sítě selhalo.\n\nChyba: 
 Install in Deskbar	NetworkStatus		Nainstalovat do Deskbaru
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Možnosti stavu sítě:\n\t--deskbar\tautomaticky přidat replikanta na panel\n\t--help\t\tzobrazit tuto nápovědu
 Open network preferences…	NetworkStatusView		Otevřít volby sítě…
 NetworkStatus	System name		Stav sítě
 Broadcast:	NetworkStatusView		Všesměrové:

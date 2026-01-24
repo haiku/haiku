@@ -1,13 +1,10 @@
-1	korean	x-vnd.Haiku-Sounds	2763165148
+1	korean	x-vnd.Haiku-Sounds	831874831
 Sounds	System name		소리
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\nBrought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\nOriginal work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
-No such file or directory	HEventList		파일이나 디렉터리를 찾을 수 없습니다
 Other…	HWindow		기타…
-OK	SoundsHApp		확인
 Sound file:	HWindow		사운드 파일:
 <none>	HEventList		<없음>
-About Sounds	SoundsHApp		Sounds에 대하여
 OK	HEventList		확인
 Sound	HEventList		사운드
 Event	HEventList		이벤트
 <none>	HWindow		<없음>
+No such file or directory	HEventList		파일이나 디렉터리를 찾을 수 없습니다

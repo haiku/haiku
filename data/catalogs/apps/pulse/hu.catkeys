@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Pulse	559379362
+1	hungarian	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Normál mód
 Info	CPUButton		Infó
 Quit	DeskbarPulseView		Kilépés
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Alapértékek
 Mini mode	PrefsWindow		Mini mód
 CPU progress bar	NormalPulseView		CPU folyamatsáv
 Fade colors	ConfigView		Színek elhalványítása
-About Pulse…	PulseView		Pulzus névjegye…
-Pulse	NormalPulseView		Pulzus
 Deskbar mode	NormalPulseView		Asztalsáv mód
 Pulse settings	PulseApp		Beállítások
 Remove replicant	CPUButton		Replikáns eltávolítása
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Asztalsáv mód
 OK	PulseView		Rendben
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nÍrta: David Ramsey és Arve Hjønnevåg\nÁtírta: Daniel Switkin\n
 OK	PrefsWindow		Rendben
-Pulse	PulseApp		Pulzus
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Nem sikerült eltávolítani az Asztalsávról.\n%s
 OK	PulseApp		Rendben
-About Pulse…	CPUButton		Pulzus névjegye…
 Deskbar mode	PrefsWindow		Asztalsáv mód
 Mini mode	DeskbarPulseView		Mini mód
 You can't disable the last active CPU.	CPUButton		Nem lehet letiltani a legutolsó aktív processzort.

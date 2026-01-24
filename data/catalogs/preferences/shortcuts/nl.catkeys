@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Shortcuts	3834857117
+1	dutch; flemish	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MuisOmhoog
 Application	ShortcutsWindow		Toepassing
 Option	ShortcutsSpec	Name for modifier on keyboard	Optie
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Herstellen naar opgeslagen data
 Don't save	ShortcutsWindow		Niet opslaan
 *MouseDown	ShortcutsWindow		*MuisNeer
 *Beep	ShortcutsWindow		*Piep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatie op te slaan.
 Save	ShortcutsWindow		Opslaan
 Either	ShortcutsSpec		En/of
 Oh no	ShortcutsWindow		Oh nee
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Annuleren
 *MoveMouse +20 +0	ShortcutsWindow		*VerplaatsMuis +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Links
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand te lezen!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand op te slaan!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*VoegTekstIn \"Uw Tekst Hier\"
 Remove selected shortcut	ShortcutsWindow		Geselecteerde sneltoets verwijderen
 Error, NULL state description?	ShortcutsSpec		Fout, NULL-statusbeschrijving?

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-PowerStatus	3477177803
+1	croatian	x-vnd.Haiku-PowerStatus	2629919411
 Run in window	PowerStatus		Pokreni u prozoru
 Extended battery info	PowerStatus		Proširene informacije o bateriji
 Show status icon	PowerStatus		Prikaži statusnu ikonu
@@ -13,7 +13,6 @@ Battery low	PowerStatus		Razina baterije niska
 Model number: 	PowerStatus		Broj modela: 
 Battery unused	PowerStatus		Baterija nekorištena
 Type: 	PowerStatus		Tip: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Možete pokrenuti PowerStatus u prozoru ili ga instalirati u Deskbaru.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Pražnjenje baterije
 discharging	PowerStatus		pražnjenje

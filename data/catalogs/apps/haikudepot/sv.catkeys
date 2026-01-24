@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3949833867
+1	swedish	x-vnd.Haiku-HaikuDepot	1716484992
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -6,7 +6,6 @@ An unexpected error has been sent from the server [%li]	ServerHelper		Ett ovänt
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Hämtar ändringslogg för paket
 Create account	UserLoginWindow		Skapa konto
 Agree	ToLatestUserUsageConditionsWindow		Håller med
-Install %PackageTitle%	PackageManager		Installera %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
 Rate package…	PackageInfoView		Betygsätt paket...
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Du har autentiserat som användare %Nickname%.
@@ -21,11 +20,9 @@ Switch account…	MainWindow		Byt konto...
 Preferred language:	UserLoginWindow		Föredraget språk:
 Name	PackageListView		Namn
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Autoriserings- eller säkerhetsproblem. Logga ut och logga in igen för att kontrollera att ditt lösenord är korrekt och också kontrollera att du har godkänt de senaste användningsvillkoren.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot kommunicerar med en serverkomponent som heter HaikuDepotServer. Dessa är de användningsvillkor som användaren '%Nickname%' gick med på vid %AgreedToTimestamp% i förhållande till användningen av HaikuDepotServer-tjänsten.
 don't activate package %source%	PackageProblem	don't change '%source%	aktivera inte paketet %source%
 Rate %Package%	RatePackageWindow		Betyg %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid initiering av pakethanteraren: %message%
-Quit HaikuDepot	App		Avsluta HaikuDepot
 Category	FilterView		Kategori
 A response to the captcha question must be provided.	UserLoginWindow		Ett svar på captcha-frågan måste tillhandahållas.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Ett oväntat fel '%Message%' har uppstått med egenskapen '%Property%'
@@ -37,7 +34,6 @@ No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		De nuvarande användningsvillkoren har godkänts.
 Cancel	PackageProblem		Avbryt
 Version	PackageListView		Version
-No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
 Not logged in	MainWindow		Inte inloggad
 Featured packages	FeaturedPackagesView		Utvalda paket
 Available	PackageListView		Tillgänglig
@@ -82,7 +78,6 @@ Language	RatePackageWindow		Språk
 Status	PackageListView		Status
 Network transport error	ServerHelper		Nättransportfel
 Cancel	PackageResult		Avbryt
-Uninstall %PackageTitle%	PackageManager		Avinstallera %PackageTitle%
 Retry	PackageProblem		Försök igen
 Update	RatePackageWindow		Uppdatera
 Language	UserLoginWindow		Språk
@@ -109,7 +104,6 @@ Captcha error	UserLoginWindow		Captcha-fel
 Manage repositories…	MainWindow		Hantera repositorier...
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Användarnamnet måste vara unikt, men det medföljande användarnamnet har redan tagits. Välj ett annat användarnamnet .
 OK	UserUsageConditions		OK
-Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 Input validation	UserLoginWindow		Ogiltigt indata
 Log in…	MainWindow		Logga in...
 Client version too old	ServerHelper		Klientversionen är för gammal
@@ -118,7 +112,6 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Alla repositorier
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 Network error	ServerHelper		Nätverksfel
-HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
 Check for updates…	MainWindow		Leta efter uppdateringar…
@@ -126,7 +119,6 @@ Uninstalled	PackageListView		Avinstallera
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Jag godkänner användningsvillkoren
 Installing \"%PackageName%\"	InstallPackageProcess		Installerar \"%PackageName%\"
 OK	App		OK
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot kommunicerar med en serverkomponent som heter HaikuDepotServer. Dessa är de senaste användningsvillkoren för användning av HaikuDepotServer-tjänsten.
 Fatal error	UninstallPackageAction		Allvarligt fel
 Develop packages	MainWindow		Utvecklingspaket
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
@@ -147,11 +139,10 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokal
 Package changes	PackageResult	Window title	Paketändringar
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Skulle det vara acceptabelt att skicka anonyma användningsdata till HaikuDepotServer-systemet från den här datorn? Du kan ändra dina preferenser i fönstret \"Inställningar \" senare.
-Installed packages	MainWindow		Installerade paket
 User rating	RatePackageWindow		Användarbetyg
+Installed packages	MainWindow		Installerade paket
 Date	PackageListView		Datum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Lösenordet måste vara minst %MinPasswordLength% tecken. %MinPasswordUppercaseChar% -tecken måste vara versaler och %MinPasswordDigitsChar% -tecken måste vara siffror.
-Error	App		Fel
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Ett fel har uppstått vid nedladdning av användningsvillkoren. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
 There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Öppnar \"%DeskbarLink%\"
@@ -159,7 +150,6 @@ Your rating was uploaded successfully. You can update or remove it at the HaikuD
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Det var inte möjligt att kommunicera med servern för att få en captcha-bild som krävs för att skapa en ny användare.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Det svaret på captcha är felaktigt. En ny captcha kommer att genereras; försök igen.
 -	no package publish		-
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Servicen behövs för HaikuDepot och den verkar inte köra.\nSkulle du vilja starta den nu?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Lösenordet måste vara minst åtta tecken långt och innehålla minst två siffror och en versal.
 Contents	PackageInfoView		Innehåll
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Dela anonym användningsinformation med HaikuDepotServer
@@ -173,8 +163,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Lösenordet måste upprepas för att minska risken att det anges felaktigt.
 Cancel	SettingsWindow		Avbryt
-Inactive	PackageListView		Inaktiv
 Cancel	RatePackageWindow		Avbryt
+Inactive	PackageListView		Inaktiv
 Nickname:	UserLoginWindow		Användarnamn:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkroniserar metadata från repositorier
 OK	MainWindow		OK
@@ -190,7 +180,6 @@ Success	UserLoginWindow		Klar
 Settings	SettingsWindow		Inställningar
 Login issue	MainWindow		Inloggnings problem
 Your rating:	RatePackageWindow		Dina betyg:
-HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		HaikuDepot stoppar eller slutför pågående operationer innan de avslutar.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Användaren %Nickname% har framgångsrikt skapats i HaikuDepotServer-systemet. Du kan administrera dina användarinformation genom att använda webbgränssnittet. Du är nu inloggad som den här nya användaren.
 Repositories	MainWindow		Repositorier
 This rating is visible to other users	RatePackageWindow		Detta betyg är synligt för andra användare

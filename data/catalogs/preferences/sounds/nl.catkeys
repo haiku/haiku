@@ -1,13 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-Sounds	2763165148
+1	dutch; flemish	x-vnd.Haiku-Sounds	831874831
 Sounds	System name		Geluiden
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Geluiden\n Tot u gebracht door:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Oorspronkelijk een werk van Atsushi Takamatsu.\nAuteursrecht ©2003-2006 Haiku
-No such file or directory	HEventList		Geen dergelijk bestand of map
 Other…	HWindow		Andere...
-OK	SoundsHApp		Oké
 Sound file:	HWindow		Geluidsbestand:
 <none>	HEventList		<geen>
-About Sounds	SoundsHApp		Over Geluiden
 OK	HEventList		Oké
 Sound	HEventList		Geluid
 Event	HEventList		Gebeurtenis
 <none>	HWindow		<geen>
+No such file or directory	HEventList		Geen dergelijk bestand of map

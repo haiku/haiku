@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PoorMan	1829050509
+1	spanish; castilian	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Seleccionar carpeta de web
 Console logging	PoorMan		Registro de consola
 Create Log File	PoorMan		Crear archivo de registro
@@ -6,9 +6,7 @@ File logging	PoorMan		Registrando de archivos
 Website options	PoorMan		Opciones de sitio web
 Log to file	PoorMan		Registrar en un archivo
 Shutting down.	PoorMan		Cerrando.
-Error Dir	PoorMan		Error Dir
 Web folder:	PoorMan		Carpeta web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor, seleccione la carpeta para publicar en la web.\n\nPoorMan puede crear una carpeta \"public_html\" en la carpeta hogar o de inicio.\nO seleccione una de carpeta propia en su lugar.
 Log To Console	PoorMan		Registrar a consola
 File Name	PoorMan		Nombre del archivo
 Starting up... 	PoorMan		Empezando...
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Golpes:%lu
 Hits: 0	PoorMan		Golpes: 0
 Shutting down.\n	PoorMan		Cerrando.\n
 Select all	PoorMan		Seleccionar todo
-Error Server	PoorMan		Error de servidor
 Send file listing if there's no start page	PoorMan		Enviar archivo de lista si no hay página de inicio
-Create PoorMan log	PoorMan		Crear registro de Hombre Pobre
 Max. simultaneous connections:	PoorMan		Máxima conexiones simultáneas:
 Done	PoorMan		Terminado
 Site	PoorMan		Sitio
@@ -48,7 +44,6 @@ Run server	PoorMan		Ejecutar servidor
 Create	PoorMan		Crear
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
 done.\n	PoorMan		terminado.\n
-PoorMan settings	PoorMan		Configuración de Hombre Pobre
 Console Logging	PoorMan		Registrando la consola
 Clear log file	PoorMan		Despejar archivo de registro
 Save log console selection	PoorMan		Guardar registro de la consola de selección

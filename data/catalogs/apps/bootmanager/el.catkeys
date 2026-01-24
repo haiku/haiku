@@ -1,13 +1,12 @@
-1	greek, modern (1453-)	x-vnd.Haiku-BootManager	867546001
+1	greek, modern (1453-)	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	Αποτυχία αντιγράφου ασφαλείας παλιάς Κύριας Εγγραφής Εκκίνησης (MBR)
 At least one partition must be selected!	BootManagerController		Πρέπει να επιλέξετε τουλάχιστον μια κατάτμηση!
 No space available!	DrivesPage	Cannot install	Δεν υπάρχει διαθέσιμος χώρος!
-Boot Manager is unable to read the partition table!	BootManagerController		Ο Διαχειριστής Εκκίνησης δεν μπορεί να διαβάσει τον πίνακα κατατμήσεων!
 Immediately	DefaultPartitionPage		Αμέσως
 Uninstall Boot Manager	UninstallPage	Title	Απεγκατάσταση Διαχειριστή Εκκίνησης
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Άγνωστο
-Installation of boot menu failed	BootManagerController	Title	H εγκατάσταση του μενού εκκίνησης απέτυχε
 Backup Master Boot Record	BootManagerController	Title	Δημιουργία αντίγραφου ασφαλείας της Κύριας Εγγραφής Εκκίνησης
+Installation of boot menu failed	BootManagerController	Title	H εγκατάσταση του μενού εκκίνησης απέτυχε
 Cannot access!	DrivesPage	Cannot install	Αδυναμία πρόσβασης!
 After one second	DefaultPartitionPage		Ύστερα από ένα δευτερόλεπτο
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Η παλιά Κύρια Εγγραφή Εκκίνησης αποθηκεύτηκε με επιτυχία στο %s.
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	Εγγραφή μενού εκκί�
 OK	BootManagerController	Button	Εντάξει
 Uninstall boot manager	BootManagerController	Title	Απεγκατάσταση διαχειριστή εκκίνησης
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Σε λίγο θα γραφτεί το παρακάτω μενού εκκίνησης στον σκληρό δίσκο (%s). Παρακαλώ ελέγξτε τις πληροφορίες πρωτού συνεχίσετε.
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Η πρώτη κατάτμηση αρχίζει πολύ νωρίς και δεν αφήνει αρκετό ελεύθερο χώρο για ένα μενού εκκίνησης.\nΤο Μενού Εκκίνησης χρειάζεται 2 KiB διαθέσιμα πριν από την πρώτη κατάτμηση.
 Uninstall	DrivesPage	Button	Απεγκατάσταση
 Update	DrivesPage	Button	Αναβάθμιση
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Η Κύρια Εγγραφή Εκκίνησης (MBR) του δίσκου εκκίνησης:\n\t%s\nθα αποθηκευτεί στον σκληρό δίσκο. Παρακαλώ επιλέξτε ένα αρχείο για να αποθηκεύσετε το MBR.\n\nΕάν κάτι πάει στραβά με την εγκατάσταση ή εάν θελήσετε μεταγενέστερα να απεγκαταστήσετε το μενού εκκίνησης, απλά τρέξτε το πρόγραμμα Bootman και επιλέξτε την επιλογή "Απεγκατάσταση".
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		Ύστερα από πέντε δευτερόλεπτα
 Timeout: %s	DefaultPartitionPage		Χρόνος αναμονής: %s
 The Master Boot Record could not be restored!	BootManagerController		Δεν ήταν δυνατή η επαναφορά της Κύριας Εγγραφής Εκκίνησης!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Ο πίνακας κατατμήσεων του πρώτου σκληρού δίσκου δεν είναι συμβατός με τον Διαχειριστή Εκκίνησης.\nΟ Διαχειριστής Εκκίνησης δουλεύει μόνο με κατατμήσεις IBM PC MBR.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Παρακαλώ επιλέξτε τον δίσκο από τον οποίο επιθυμείτε να εγκατασταθεί ή να απεγκατασταθεί ο boot manager.
 After four seconds	DefaultPartitionPage		Ύστερα από τέσσερα δευτερόλεπτα
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Άγνωστο %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Η απεγκ�
 After two seconds	DefaultPartitionPage		Ύστερα από δύο δευτερόλετπα
 Partition table not compatible	BootManagerController	Title	Ο πίνακας κατατμήσεων δεν είναι συμβατός
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Η επαναφορά της Κύριας Εγγραφής Εκκίνησης του δίσκου εκκίνησης (%DISK)  από το %FILE ήταν επιτυχής.
-Done	BootManagerController	Button	Έτοιμο
 BootManager	System name		Διαχειριστής Εκκίνησης
+Done	BootManagerController	Button	Έτοιμο
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Παρακαλώ εντοπίστε το αντίγραφο ασφαλείας Κύριας Εγγραφής Εκκίνησης (MBR) για να το επαναφέρετε. Το αρχείο δημιουργήθηκε όταν ο διαχειριστής εκκίνησης εγκαταστάθηκε για πρώτη φορά.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Παρακαλώ εντοπίστε το αντίγραφο ασφαλείας Κύριας Εγγραφής Εκκίνησης (MBR) για να το επαναφέρετε. Το αρχείο δημιουργήθηκε όταν ο Διαχειριστής Εκκίνησης εγκαταστάθηκε για πρώτη φορά.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Θα γίνει επαναφορά της Κύριας Εγγραφής Εκκίνησης (MBR) του δίσκου %disk από το αρχείο %file. Θέλετε να συνεχίσετε;

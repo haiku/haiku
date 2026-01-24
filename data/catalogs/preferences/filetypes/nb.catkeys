@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FileTypes	436017301
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Venstrestill
 Float	Attribute ListView		Float
 Final	Application Types Window		Siste
@@ -144,7 +144,6 @@ Open file	FileTypes		Åpne fil
 Version info	Application Type Window		Versjonsinformasjon
 Final	Application Type Window		Endelig
 Preferred application	FileType Window		Foretrukket program
-FileTypes	FileTypes		Filtyper
 Set preferred application	Preferred App Menu		Angi foretrukket applikasjon
 New file type	New File Type Window		Ny filtype
 Short description:	Application Type Window		Kort beskrivelse

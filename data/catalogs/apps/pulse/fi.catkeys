@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Pulse	559379362
+1	finnish	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Normaalitila
 Info	CPUButton		Tiedot
 Quit	DeskbarPulseView		Lopeta
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Oletukset
 Mini mode	PrefsWindow		Minitila
 CPU progress bar	NormalPulseView		Prosessorin edistymispalkki
 Fade colors	ConfigView		Haalista värit
-About Pulse…	PulseView		Ohjelmasta Pulssi...
-Pulse	NormalPulseView		Pulssi
 Deskbar mode	NormalPulseView		Työpöytäpalkkitila
 Pulse settings	PulseApp		Pulssiasetukset
 Remove replicant	CPUButton		Poista kopio
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Työpöytäpalkkitila
 OK	PulseView		Valmis
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\ntekijät: David Ramsey ja Arve Hjønnevåg\nPäivittäjä: Daniel Switkin\n
 OK	PrefsWindow		Valmis
-Pulse	PulseApp		Pulssi
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Poistaminen Työpöytäpalkista epäonnistui.\n%s
 OK	PulseApp		Valmis
-About Pulse…	CPUButton		Ohjelmasta Pulssi...
 Deskbar mode	PrefsWindow		Työpöytäpalkkitila
 Mini mode	DeskbarPulseView		Minitila
 You can't disable the last active CPU.	CPUButton		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.

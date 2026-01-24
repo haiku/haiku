@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Be-TSKB	316181764
+1	catalan; valencian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Amaga-ho automàticament
 Show all	WindowMenu		Mostra-ho tot
 Edit in Tracker…	PreferencesWindow		Edita-ho al Rastrejador...
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Mostra els replicants
 No windows	WindowMenu		Sense finestres
 Show clock	Tray		Mostra el rellotge
 Close all	WindowMenu		Tanca-ho tot
-Deskbar preferences	PreferencesWindow		Preferències de la barra d'escriptori
 About this system	DeskbarMenu		Quant al sistema
 Quit application	WindowMenu		Surt de l'aplicació
 Hide application names	PreferencesWindow		Amaga el nom de les aplicacions
 Applications	PreferencesWindow		Aplicacions
 Show application expander	PreferencesWindow		Mostra l'expandidora d'aplicacions
-Deskbar preferences…	DeskbarMenu		Preferències de la barra d'escriptori...
 Suspend	DeskbarMenu		Suspensió
 Shutdown…	DeskbarMenu		Atura...
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demostracions

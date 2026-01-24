@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-FileTypes	436017301
+1	esperanto	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Maldekstra
 Float	Attribute ListView		Flosilantapunkto
 Final	Application Types Window		Fina
@@ -144,7 +144,6 @@ Open file	FileTypes		Uzi dosieron
 Version info	Application Type Window		Informo pri versio
 Final	Application Type Window		Fina
 Preferred application	FileType Window		Preferataj programoj
-FileTypes	FileTypes		Dosierspecoj
 Set preferred application	Preferred App Menu		Atribui preferatan programon
 New file type	New File Type Window		Nova dosiera speco
 Short description:	Application Type Window		Mallonga priskribo:

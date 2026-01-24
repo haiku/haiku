@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaPlayer	520971408
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
 Close	MediaPlayer-PlaylistWindow		Tanca
 Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Tanca
 Save error	MediaPlayer-PlaylistWindow		Error de desar
 Attributes	MediaPlayer-Main		Atributs
 Bottom of screen	MediaPlayer-SettingsWindow		Part baixa de la pantalla
-MediaPlayer settings	MediaPlayer-SettingsWindow		Paràmetres del Reproductor multimèdia
 Copyright	MediaPlayer-InfoWin		Dret de reproducció
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL proporcionat no vàlid!
 Aspect ratio	MediaPlayer-Main		Relació d'aspecte

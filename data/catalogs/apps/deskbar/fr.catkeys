@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-TSKB	316181764
+1	french	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Masquer automatiquement
 Show all	WindowMenu		Montrer tout
 Edit in Tracker…	PreferencesWindow		Éditer dans le Tracker…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Afficher les réplicants
 No windows	WindowMenu		Pas de fenêtres
 Show clock	Tray		Afficher l’horloge
 Close all	WindowMenu		Tout fermer
-Deskbar preferences	PreferencesWindow		Réglages de la Deskbar
 About this system	DeskbarMenu		À propos de ce système
 Quit application	WindowMenu		Quitter l’application
 Hide application names	PreferencesWindow		Cacher le nom des applications
 Applications	PreferencesWindow		Applications
 Show application expander	PreferencesWindow		Montrer le dérouleur d’application
-Deskbar preferences…	DeskbarMenu		Réglages de la Deskbar…
 Suspend	DeskbarMenu		Mettre en veille
 Shutdown…	DeskbarMenu		Arrêter…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Démos

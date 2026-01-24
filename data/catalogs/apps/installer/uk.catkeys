@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	3240158834
+1	ukrainian	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Виконання інсталяції.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
 No optional packages available.	PackagesView		Опціональні пакети недоступні.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Натисніт
 Welcome to the Haiku Installer!\n\n	InstallerApp		Вітаємо у програмі Installer системи Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Неможливо запустити утиліту DriveSetup для зміни конфігурації розділів.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Інсталяція завершена. Сектор загрузки записано в «%s». Натисніть «Вийти», щоб закрити Installer, або виберіть новий цільовий том і зробіть іншу інсталяцію.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Цільовий том не порожній. Якщо на ньому вже знаходиться система Haiku, вона буде перезаписана. Це призведе до видалення всього встановленого програмного забезпечення.\n\nЯкщо Ви хочете обновити систему без видалення встановленого програмного забезпечення, зверніться до розділу програми  \«SoftwareUpdater\» в посібнику користувача Haiku, щоб отримати відповідну інструкцію.\n\nВи впевнені, що хочете продовжити інсталяцію?
 Quit DriveSetup	InstallerWindow		Вийти з DriveSetup
 Write boot sector	InstallerWindow		Записати сектор загрузки
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Зі списку, який розкривається, виберіть вихідний диск. Потім натисніть «Почати».
 OK	InstallProgress		ОК
 Quit BootManager	InstallerWindow		Вийти з BootManager
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ви впевнені що, хочете встановлювати на поточний завантажувальний диск? Installer перезавантажить машину, якщо Ви продовжите.
 Onto:	InstallerWindow		На:
 Tools	InstallerWindow		Інструменти
 scanning…	InstallerWindow		сканування…

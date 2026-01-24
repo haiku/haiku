@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Be-TSKB	316181764
+1	turkish	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Kendiliğinden gizle
 Show all	WindowMenu		Tümünü göster
 Edit in Tracker…	PreferencesWindow		İzleyici’de düzenle…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Yinelenenleri göster
 No windows	WindowMenu		Pencere yok
 Show clock	Tray		Saati göster
 Close all	WindowMenu		Tümünü kapat
-Deskbar preferences	PreferencesWindow		Masaüstü Çubuğu tercihleri
 About this system	DeskbarMenu		Bu sistem hakkında
 Quit application	WindowMenu		Uygulamadan çık
 Hide application names	PreferencesWindow		Uygulama adlarını gizle
 Applications	PreferencesWindow		Uygulamalar
 Show application expander	PreferencesWindow		Uygulama genişleticisini göster
-Deskbar preferences…	DeskbarMenu		Masaüstü Çubuğu tercihleri…
 Suspend	DeskbarMenu		Askıya al
 Shutdown…	DeskbarMenu		Bilgisayarı kapat…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demolar

@@ -1,9 +1,8 @@
-1	thai	x-vnd.Haiku-NetworkStatus	1962741882
+1	thai	x-vnd.Haiku-NetworkStatus	1175867758
 Quit	NetworkStatusView		ออก
 Unknown	NetworkStatusView		ไม่รู้จัก
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		การเรียกใช้ preflet เครือข่ายล้มเหลว\n\nข้อผิดพลาด:
 Install in Deskbar	NetworkStatus		ติดตั้งในเดสก์บาร์
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		ตัวเลือก สถานะเครือข่าย:\n\t--เดสก์บาร์\tโดยอัตโนมัติเพิ่มตัวจำลองไปยังเดสก์บาร์\n\t--ช่วย\t\tพิมพ์ข้อมูลนี้และออก
 Open network preferences…	NetworkStatusView		เปิดการตั้งค่าเครือข่าย
 NetworkStatus	System name		สถานะเน็ตเวิร์ค
 OK	NetworkStatusView		ตกลง

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CodyCam	12021044
+1	romanian	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		dosar de destinație așteptat
 reply: '%s'\n	SftpClient		răspuns: „%s”\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (parolă reală trimisă)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Configurări video
 Can't find an available connection to the video window	CodyCam		Nu se poate găsi o conexiune disponibilă la fereastra video
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Eroare la crearea fișierului de ieșire
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nu s-a putut găsi sursa video.\nAveți nevoie de o cameră web pentru a utiliza CodyCam.
 Logging in…	VideoConsumer.cpp		Se loghează…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Eroare la scrierea fișierului de ieșire

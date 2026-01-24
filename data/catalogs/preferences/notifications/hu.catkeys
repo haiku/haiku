@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Notifications	4196496676
+1	hungarian	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		Bal alsó
 Application does not have a valid signature	NotificationView	Alert message	Az alkalmazásnak nincs érvényes azonosítója
 Status	NotificationView		Állapot
@@ -7,8 +7,6 @@ Lower right	GeneralView		Jobb alsó
 Muted	NotificationView		Némítva
  is already listed	NotificationView	Alert message	már szerepel a listában
 OK	PrefletWin		Rendben
-Notifications	PrefletWin		Értesítések
-Notifications preflet sample	PrefletWin		Próba értesítés
 Mute notifications from this application	NotificationView		Az alkalmazás értesítéseinek némítása
 wide	GeneralView	Window width: Slider high text	széles
 narrow	GeneralView	Window width: Slider low text	keskeny
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Asztalsáv követése
 Notifications	System name		Értesítések
 Allowed	NotificationView		Engedélyezve
 Duration:	GeneralView		Időtartam:
-Application	NotificationView		Program
 Enable notifications	GeneralView		Értesítések engedélyezése
+Application	NotificationView		Program
 This is a test notification message	PrefletWin		Ez egy próba értesítés
 Remove	NotificationView		Eltávolítás
 Position:	GeneralView		Pozíció

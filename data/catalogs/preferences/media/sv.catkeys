@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Media	582516163
+1	swedish	x-vnd.Haiku-Media	4055972908
 Couldn't add volume control in Deskbar: %s\n	Media views		Kunde inte lägga till volymkontroll i Deskbar: %s\n
 Restart media services	Media views		Starta om mediatjänsterna
 Quit	Media Window		Avsluta
@@ -9,7 +9,6 @@ Video input:	Media views		Videoingång:
 Audio output:	Media views		Ljudutgång:
 Please select a SoundFont.	Midi View		Vänligen välj en LjudFont.
 There are no SoundFonts installed.	Midi View		Det finns inga LjudFonter installerade.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Avsluta Media nu kommer att starta om media servicen. Förmodligen kommer du att uppleva hispig/konstig eller otillgänglig media fuktionalitet.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Kunde inte ansluta till mediaservern.\nVill du starta den ?
 Video settings	Media Window		Videoinställningar
 Audio mixer	Media Window		Ljudmixer

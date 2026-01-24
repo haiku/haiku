@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	520971408
+1	romanian	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrarea la gunoi
 Close	MediaPlayer-PlaylistWindow		Închide
 Volume of background clips	MediaPlayer-SettingsWindow		Volumul clipurilor de fundal
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Închide
 Save error	MediaPlayer-PlaylistWindow		Eroare de salvare
 Attributes	MediaPlayer-Main		Atribute
 Bottom of screen	MediaPlayer-SettingsWindow		Partea de jos a ecranului
-MediaPlayer settings	MediaPlayer-SettingsWindow		Configurări MediaPlayer
 Copyright	MediaPlayer-InfoWin		Drepturi de autor
 Invalid URL inserted!	MediaPlayer-NetworkStream		A fost introdusă o adresă URL nevalidă!
 Aspect ratio	MediaPlayer-Main		Raport de aspect

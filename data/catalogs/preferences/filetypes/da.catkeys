@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-FileTypes	436017301
+1	danish	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Venstre
 Float	Attribute ListView		Flydende kommatal
 Final	Application Types Window		Endelig
@@ -144,7 +144,6 @@ Open file	FileTypes		Åbn fil
 Version info	Application Type Window		Udgaveoplysninger
 Final	Application Type Window		Endelig
 Preferred application	FileType Window		Foretrukne program
-FileTypes	FileTypes		Filtyper
 Set preferred application	Preferred App Menu		Vælg foretrukne program
 New file type	New File Type Window		Ny filtype
 Short description:	Application Type Window		Kort beskrivelse:

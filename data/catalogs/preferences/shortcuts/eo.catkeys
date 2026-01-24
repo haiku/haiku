@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Shortcuts	3834857117
+1	esperanto	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MusonSupren
 Application	ShortcutsWindow		Programo
 Option	ShortcutsSpec	Name for modifier on keyboard	Opciklavo
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Reveni al konservita
 Don't save	ShortcutsWindow		Ne konservi
 *MouseDown	ShortcutsWindow		*MusonMalsupren
 *Beep	ShortcutsWindow		*Pepo
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Ŝparklavoj ne povis konservi vian klavan atribuaron.
 Save	ShortcutsWindow		Konservi
 Either	ShortcutsSpec		Ajna
 Oh no	ShortcutsWindow		Ho ne
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Nuligi
 *MoveMouse +20 +0	ShortcutsWindow		*ŜoviMuson +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Stirklavo
 Left	ShortcutsSpec		Maldekstra
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Ŝparklavoj ne povis analizi vian dosieron de klava atribuaro!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Ŝparklavoj ne sukcesis konservi vian dosieron de klava atribuaro!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertiĈenon \"Via teksto ĉi tie\"
 Remove selected shortcut	ShortcutsWindow		Forigi elektitan klavan atribuon
 Error, NULL state description?	ShortcutsSpec		Eraro, NULL en stata priskribo?

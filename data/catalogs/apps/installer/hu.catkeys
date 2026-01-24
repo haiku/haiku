@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	3980652653
+1	hungarian	x-vnd.Haiku-Installer	738307934
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!
 No optional packages available.	PackagesView		Nincsenek választható csomagok.
@@ -29,7 +29,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Kattints a 'Part
 Welcome to the Haiku Installer!\n\n	InstallerApp		Üdvözöllek a Haiku Telepítőjében!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A Lemezkezelőt, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés véget ért. A rendszerindító szektor a lemezre ('%s') lett írva. Kattints a 'Kilépésre' a Telepítő bezárásához, vagy válassz egy másik lemezt egy újabb telepítéshez.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		A megadott lemez nem üres. Ha már tartalmaz Haiku telepítést, akkor azt felül fogom írni. Minden telepített program eltávolításra kerül.\n\nHa frissíteni szeretnéd a meglévő rendszert, kérlek olvasd el a Haiku felhasználói útmutató \"Frissítéskezelő\" fejezetét.\n\nBiztosan folytatod a telepítést?
 Quit DriveSetup	InstallerWindow		Kilépés a Lemezkezelőből
 Write boot sector	InstallerWindow		Rendszerbetöltő írása
@@ -90,7 +89,6 @@ Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow
 No valid EFI system data partitions found	InstallerWindow		Nem található érvényes EFI rendszer-partíció
 OK	InstallProgress		Rendben
 Quit BootManager	InstallerWindow		Rendszerválasztó bezárása
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Biztosan a mostani rendszerindító lemezre telepíted a rendszert? A telepítőnek újra kell indítania a számítógépét, hogy folytathassa a műveletet.
 Onto:	InstallerWindow		Hova:
 Tools	InstallerWindow		Eszközök
 scanning…	InstallerWindow		keresés…

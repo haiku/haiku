@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Pulse	559379362
+1	russian	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Обычный режим
 Info	CPUButton		Информация
 Quit	DeskbarPulseView		Выход
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		По умолчанию
 Mini mode	PrefsWindow		Мини режим
 CPU progress bar	NormalPulseView		CPU progress bar
 Fade colors	ConfigView		Затенять цвета
-About Pulse…	PulseView		О программе…
-Pulse	NormalPulseView		Пульс
 Deskbar mode	NormalPulseView		Режим Deskbar
 Pulse settings	PulseApp		Настройки Пульса
 Remove replicant	CPUButton		Удалить репликант
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Режим Deskbar
 OK	PulseView		ОК
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nразработали David Ramsey и Arve Hjønnevåg\nИсправлен Daniel Switkin\n
 OK	PrefsWindow		ОК
-Pulse	PulseApp		Пульс
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Не удалось удалить из Deskbar.\n%s
 OK	PulseApp		ОК
-About Pulse…	CPUButton		О программе…
 Deskbar mode	PrefsWindow		Режим Deskbar
 Mini mode	DeskbarPulseView		Мини режим
 You can't disable the last active CPU.	CPUButton		Нельзя отключить последний активный процессор.

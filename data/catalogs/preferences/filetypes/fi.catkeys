@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-FileTypes	436017301
+1	finnish	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Vasen
 Float	Attribute ListView		Liukuluku
 Final	Application Types Window		Lopullinen
@@ -144,7 +144,6 @@ Open file	FileTypes		Avaa tiedosto
 Version info	Application Type Window		Versiotiedot
 Final	Application Type Window		Lopullinen
 Preferred application	FileType Window		Ensisijainen sovellus
-FileTypes	FileTypes		Tiedostotyypit
 Set preferred application	Preferred App Menu		Aseta ensisijainen sovellus
 New file type	New File Type Window		Uusi tiedostotyyppi
 Short description:	Application Type Window		Lyhyt kuvaus:

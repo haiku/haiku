@@ -1,11 +1,10 @@
-1	czech	x-vnd.Haiku-Locale	1312749322
+1	czech	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Střední formát:
 ERROR	TimeFormatSettings		CHYBA
 Negative:	TimeFormatSettings		Záporná čísla:
 Language	Locale Preflet Window		Jazyk
 Short format:	TimeFormatSettings		Krátký formát:
 24 hour	TimeFormatSettings		24 hodinový
-Locale	Locale Preflet Window		Lokalita
 Time	TimeFormatSettings		Čas
 Defaults	Locale Preflet Window		Původní
 Locale	System name		Lokalita
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		OK
 Long format:	TimeFormatSettings		Dlouhý formát:
 Numbers	TimeFormatSettings		Čísla
 Available languages	Locale Preflet Window		Dostupné jazyky
-Locale	Locale Preflet		Lokalita
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nemohu najít dostupné jazyky! Nemůžete použít toto okno voleb!
 Formatting	Locale Preflet Window		Formátování
 Use month/day-names from preferred language	TimeFormatSettings		Použít názvy měsíců/dnů v týdnu z preferovaného jazyka

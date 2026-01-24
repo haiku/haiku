@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	3834857117
+1	german	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*Maustaste losgelassen
 Application	ShortcutsWindow		Anwendung
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Gespeicherten Stand herstellen
 Don't save	ShortcutsWindow		Verwerfen
 *MouseDown	ShortcutsWindow		*Maus gedrückt
 *Beep	ShortcutsWindow		*Piepton
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
 Save	ShortcutsWindow		Speichern
 Either	ShortcutsSpec		Alle
 Oh no	ShortcutsWindow		Herrje!
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Abbrechen
 *MoveMouse +20 +0	ShortcutsWindow		*Maus 20 Pixel nach rechts bewegen
 Control	ShortcutsSpec	Name for modifier on keyboard	Strg
 Left	ShortcutsSpec		Links
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Text einfügen \"Hier der Text\"
 Remove selected shortcut	ShortcutsWindow		Markierten Eintrag entfernen
 Error, NULL state description?	ShortcutsSpec		Fehler, NULL Status Beschreibung?

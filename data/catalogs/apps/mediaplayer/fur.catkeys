@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-MediaPlayer	520971408
+1	friulian	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposte element te Scovacere
 Close	MediaPlayer-PlaylistWindow		Siere
 Volume of background clips	MediaPlayer-SettingsWindow		Volum des riproduzions di sotfont
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Siere
 Save error	MediaPlayer-PlaylistWindow		Erôr di salvament
 Attributes	MediaPlayer-Main		Atributs
 Bottom of screen	MediaPlayer-SettingsWindow		Part inferiôr dal visôr
-MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazions di MediaPlayer
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Inserît URL no valit!
 Aspect ratio	MediaPlayer-Main		Proporzions

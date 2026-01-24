@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	2225233929
+1	ukrainian	x-vnd.Haiku-WebPositive	2402977561
 Authentication required	Authentication Panel		Потрібна автентифікація
 Previous	WebPositive Window		Попереднє
 Copy	Console Window		Копіювати
@@ -63,7 +63,6 @@ WebPositive	System name		WebPositive
 Old name: %s	BookmarkBar		Стара назва: %s
 Expiration	Cookie Manager		Термін дії
 Reload	WebPositive Window		Перезавантажити
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Ваш процесор занадто старий і не підтримує розширення SSE2, без яких WebPositive не може працювати. Натомість ми рекомендуємо встановити NetSurf.
 Download finished	Download Window		Завантаження завершене
 Cookie manager	WebPositive Window		Менеджер Cookie
 Username:	Authentication Panel		Користувач:
@@ -118,7 +117,6 @@ Remove	Download Window		Вилучити
 Close tab	WebPositive Window		Закрити вкладку
 About	WebPositive Window		Про програму
 Continue downloads	WebPositive		Продовжити завантаження
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Триває завантаження, Ви дійсно бажаєте вийти з WebPositive зараз?
 Proxy server requires authentication	Settings Window		Проксі-сервер потребує автентифікації
 Cancel	Settings Window		Скасувати
 Reset size	WebPositive Window		Скинути розмір
@@ -142,7 +140,6 @@ Next	WebPositive Window		Наступне
 Bookmark error	WebPositive Window		Помилка закладки
 OK	WebPositive Window		ОК
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% of %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Зберегти сторінку як…
 Zoom text only	WebPositive Window		Збільшити тільки текст
 Page source error	WebPositive Window		Помилка в коді сторінки

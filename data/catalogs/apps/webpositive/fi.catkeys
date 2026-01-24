@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	2225233929
+1	finnish	x-vnd.Haiku-WebPositive	2402977561
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 Copy	Console Window		Kopioi
@@ -63,7 +63,6 @@ WebPositive	System name		WebPositive
 Old name: %s	BookmarkBar		Vanha nimi: %s
 Expiration	Cookie Manager		Erääntymisaika
 Reload	WebPositive Window		Lataa uudelleen
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Prosessorisi on liian vanha ja ei tue SSE2-laajennuksia, mitä ilman WebPositive-sovellus ei toimi. Suosittelemme sen sijaan asentamaan NetSurf-sovelluksen.
 Download finished	Download Window		Lataus päättyi
 Cookie manager	WebPositive Window		Evästehallinta
 Username:	Authentication Panel		Käyttäjätunnus:
@@ -118,7 +117,6 @@ Remove	Download Window		Poista
 Close tab	WebPositive Window		Sulje välilehti
 About	WebPositive Window		Ohjelmasta
 Continue downloads	WebPositive		Jatka latauksia
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä käynnissä, haluatko todella poistua WebPositive-ohjelmasta nyt?
 Proxy server requires authentication	Settings Window		Välityspalvelin vaatii todentamista
 Cancel	Settings Window		Peru
 Reset size	WebPositive Window		Palauta oletuskoko
@@ -142,7 +140,6 @@ Next	WebPositive Window		Seuraava
 Bookmark error	WebPositive Window		Kirjanmerkkivirhe
 OK	WebPositive Window		Valmis
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% / %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Tallenna sivu nimellä...
 Zoom text only	WebPositive Window		Kavenna tai avarra vain tekstiä
 Page source error	WebPositive Window		Sivulähdevirhe

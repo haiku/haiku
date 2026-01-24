@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Be-TSKB	316181764
+1	friulian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Plate in automatic
 Show all	WindowMenu		Mostre dut
 Edit in Tracker…	PreferencesWindow		Modifiche in Tracker…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Mostre replicants
 No windows	WindowMenu		Nissun barcon
 Show clock	Tray		Mostre orloi
 Close all	WindowMenu		Siere dut
-Deskbar preferences	PreferencesWindow		Preferencis Deskbar
 About this system	DeskbarMenu		Informazions sul sisteme
 Quit application	WindowMenu		Siere la aplicazion
 Hide application names	PreferencesWindow		Plate i nons des aplicazions
 Applications	PreferencesWindow		Aplicazions
 Show application expander	PreferencesWindow		Mostre estensôr aplicazion
-Deskbar preferences…	DeskbarMenu		Preferencis di Deskbar…
 Suspend	DeskbarMenu		Sospint
 Shutdown…	DeskbarMenu		Jessude di Haiku…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dimostrazions

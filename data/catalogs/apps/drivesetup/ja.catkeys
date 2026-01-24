@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	4193609455
+1	japanese	x-vnd.Haiku-DriveSetup	2351839435
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できません。
 Register disk image…	MainWindow		ディスクイメージを登録…
 Mount all	MainWindow		すべてマウント
@@ -25,6 +25,7 @@ Validation of the given parameters failed.	MainWindow		指定されたパラメ�
 Cannot init target partition.	MainWindow		目的のパーティションを初期化できません。
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 DriveSetup	System name		DriveSetup
+Error:	MainWindow	in any error alert	エラー:
 Mounted at	PartitionList		マウント先
 Disk system %s not found!	MainWindow		ディスクシステム%sが見つかりません!
 Create…	MainWindow		新規作成...
@@ -44,6 +45,7 @@ There's no space on the partition where a child partition could be created.	Main
 %s does not refer to a file disk device.	MainWindow		%s は、ファイルディスクデバイスを参照できません。
 No disk devices have been recognized.	DiskView		ディスクデバイスが検出されていません。
 Attributes	PartitionList		属性
+'%s' is not a regular file.	MainWindow		'%s' は正規のファイルではありません。
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
 Change parameters…	MainWindow		パラメーターの変更...
 Format	InitializeParametersPanel		フォーマット
@@ -78,6 +80,7 @@ Partition name:	ChangeParametersPanel		パーティション名 :
 LUKS encrypted	Encryption utils		LUKS で暗号化された
 Empty space	PartitionList		空のスペース
 Cancel	AbstractParametersPanel		中止
+%appname%: Save disk image	MainWindow		%appname%: ディスクイメージを保存
 Format	MainWindow		フォーマット
 OK	MainWindow		OK
 Cannot init target file.	MainWindow		目的のファイルを初期化できません。
@@ -86,12 +89,14 @@ Unregister disk image	MainWindow		ディスクイメージを登録解除
 The target partition is smaller than the image file.	MainWindow		目的のパーティションはイメージサイズより小さい。
 Empty space	DiskView		空のスペース
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できません。
+Failed to get information about '%s'.	MainWindow		'%s'の情報取得に失敗しました。
 Open with DiskProbe	MainWindow		DiskProbe で開く
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		選択したディスクを初期化しますか? データはすべて失われます。変更をディスクに書き込む直前に再度確認します。\n
 There was an error preparing the disk for modifications.	MainWindow		ディスクの変更のための準備をする際、エラーが発生しました。
 The disk has been successfully initialized.\n	MainWindow		ディスクは正常に初期化されました。\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		強制的にマウント解除しても良いですか?\n\n注: アプリケーションが現在ボリュームに書き込み中の場合、マウント解除するとデータが失われるかもしれません。\n
 Disk image has been removed.	MainWindow		ディスクイメージは除去されました。
+No file disk device found with the given ID, trying file '%s'.	MainWindow		与えられた ID を持つディスクデバイスがありません、ファイル '%s' を試してください。
 Cancel	MainWindow		中止
 Free space	PartitionList		空き容量
 Queries	PartitionList		クエリ
@@ -112,7 +117,9 @@ Cannot delete the selected partition.	MainWindow		選択されたパーティシ
 Continue	MainWindow		続ける
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできません。
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションをフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
+%appname% error	MainWindow		%appname% エラー
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
+Failed to unregister file disk device %s.	MainWindow		ファイルディスクデバイス %s の登録解除に失敗しました。
 The partition %s is already unmounted.	MainWindow		パーティション %s はすでにマウント解除されています。
 Target volume is read only.	MainWindow		目的のボリュームは読み取り専用です。
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		選択したパーティションのパラメーターを変更しますか?\n\nパーティションはほかのオペレーティングシステムからはもう認識されないかもしれません。

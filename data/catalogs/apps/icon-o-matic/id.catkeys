@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.haiku-icon_o_matic	466334521
+1	indonesian	x-vnd.haiku-icon_o_matic	3635674801
 None	Icon-O-Matic-Properties		Tidak ada
 Add empty	Icon-O-Matic-ShapesList		Tambah kosong
 Opening the icon failed!	Icon-O-Matic-Main		Membuka ikon gagal!
@@ -59,7 +59,6 @@ Diamond	Icon-O-Matic-StyleTypes		Wajik
 Don't save	Icon-O-Matic-Menu-Settings		Jangan simpan
 Add shape with path	Icon-O-Matic-Menu-Shape		Tambahkan bentuk dengan jalur
 Translation X	Icon-O-Matic-PropertyNames		Terjemahan X
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic mungkin tidak menafsirkan semua data dari SVG ketika dimuat. Dengan menimpa file asli, informasi ini sekarang akan hilang.
 Rotate indices backwards	Icon-O-Matic-PathsList		Putar indeks ke belakang
 Overwrite	Icon-O-Matic-SVGExport		Tindih
 Cancel	Icon-O-Matic-SVGExport		Batal

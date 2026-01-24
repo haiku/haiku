@@ -1,4 +1,4 @@
-1	friulian	x-vnd.haiku-softwareupdater	369324613
+1	friulian	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Inzornament de version
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Fâs clic achì par instalâ {0, plural, one{# pachet inzornât} other{# pachets inzornâts}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachets di disinstalâ
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Ecezion capitad
 Packages are being updated	UpdateManager		I pachets a son daûr a jessi inzornâts
 Cancel	SoftwareUpdaterWindow		Anule
 Don't quit	SoftwareUpdaterWindow		No sta sierâ
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Fâs clic chi par eseguî SoftwareUpdater. Cualchi inzornament al domandarà di risolvi un probleme e si varà di selezionâ la soluzion.
 Checking for updates	SoftwareUpdaterWindow		Verifiche presince inzornaments
 Updates completed	UpdateManager		Inzornaments completâts
 Reboot	SoftwareUpdaterWindow		Torne invie

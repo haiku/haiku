@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	262401742
+1	french	x-vnd.Be-MAIL	3945726882
 Set to Saved	Mail		Définir comme Sauvé
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Votre texte principal contient %ld caractères non encodables. Peut être qu’un jeu de caractère différent fonctionnerait mieux ? Sélectionnez « Envoyer » pour envoyer le message quand-même (un caractère de substitution remplacera ceux qui ne peuvent être encodés), ou choisissez « Annuler » pour revenir et essayer de corriger le problème.
 Text wrapping:	Mail		Renvoi à la ligne :
@@ -96,7 +96,6 @@ To:	Mail		À :
 Need Tracker to move items to trash	Mail		Le tracker est indispensable pour mettre des objets à la poubelle.
 The mail_daemon could not be started:\n\t	Mail		mail_daemon n’a pas pu être démarré :\n\t
 <no account found>	Mail		<aucun compte trouvé>
-Mail couldn't find its dictionary.	Mail		Mail n’a pas trouvé son dictionnaire.
 helpful message	Mail		message utile
  Read 	Mail		 Lu 
 Font:	Mail		Police :
@@ -107,7 +106,6 @@ Start now	Mail		Démarrer maintenant
 (Name unavailable)	Mail		(Nom non disponible)
 Move to trash	Mail		Déplacer vers la corbeille
 <none>	Mail		<aucun>
-Mail settings	Mail		Réglages emails
 %d - Date	Mail		%d - Date
 Check spelling	Mail		Vérifier l’orthographe
 Status:	Mail		Statut :

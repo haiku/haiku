@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-PowerStatus	1104524835
+1	korean	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		창으로 실행
 Extended battery info	PowerStatus		확장 배터리 정보
 Show status icon	PowerStatus		상태 아이콘 보기
@@ -16,7 +16,6 @@ Battery low	PowerStatus		배터리 낮음
 Model number: 	PowerStatus		모델 번호: 
 Battery unused	PowerStatus		배터리 사용 안함
 Type: 	PowerStatus		형식: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus를 창으로 실행시키거나 데스크바에 설치할 수 있습니다.
 Damaged or missing battery	PowerStatus		배터리가 파손되었거나 없음
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		배터리 방전중
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		시리얼 번호:
 Battery critical	PowerStatus		배터리 매우 낮음
 Capacity: 	PowerStatus		용량: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		지원되는 배터리를 찾을 수 없습니다. PowerStatus를 사용할 수 없습니다.
 Show percent	PowerStatus		백분율 보기
 Capacity granularity 1: 	PowerStatus		용량 정밀도 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		배터리 수준이 낮아지고 있습니다. 전원을연결 해 주십시오.

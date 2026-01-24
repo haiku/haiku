@@ -1,15 +1,12 @@
-1	russian	x-vnd.Haiku-Sounds	2694258450
+1	russian	x-vnd.Haiku-Sounds	762968133
 Select	SoundFilePanel		Выбрать
 Sounds	System name		Звуки
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n\n Разработал:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n\nОригинальную Be версию разработал Atsushi Takamatsu.\nCopyright © 2003-2006 Haiku
-No such file or directory	HEventList		Такого файла или папки не существует
 Other…	HWindow		Другой…
-OK	SoundsHApp		ОК
 Sound file:	HWindow		Звуковой файл:
 <none>	HEventList		<нет>
 Select a sound file	SoundFilePanel		Выбор звукового файла
-About Sounds	SoundsHApp		О программе...
 OK	HEventList		ОК
 Sound	HEventList		Звук
 Event	HEventList		Событие
 <none>	HWindow		<нет>
+No such file or directory	HEventList		Такого файла или папки не существует

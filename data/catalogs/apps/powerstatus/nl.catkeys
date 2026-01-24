@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PowerStatus	3176141767
+1	dutch; flemish	x-vnd.Haiku-PowerStatus	2460122174
 Run in window	PowerStatus		Actief in venster
 Extended battery info	PowerStatus		Uitgebreide accu-informatie
 Show status icon	PowerStatus		Toon status-icoon
@@ -15,7 +15,6 @@ Battery low	PowerStatus		Accu bijna leeg
 Model number: 	PowerStatus		Modelnummer
 Battery unused	PowerStatus		Accu ongebruikt
 Type: 	PowerStatus		Type:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		U kunt PowerStatus in een venster in actie hebben of in Deskbar installeren.
  mAh	PowerStatus		mAh
 Battery discharging	PowerStatus		Accu bezig met ontladen
 Design voltage: 	PowerStatus		Ontwerpvoltage:
@@ -29,7 +28,6 @@ Serial number: 	PowerStatus		Serienummer:
 Battery critical	PowerStatus		Accu-niveau kritisch laag
 Capacity: 	PowerStatus		Capaciteit
  mW	PowerStatus		mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Geen ondersteunende batterij gevonden. PowerStatus kan niet gebruikt worden op je systeem.
 Show percent	PowerStatus		Toon percentage
 Capacity granularity 1: 	PowerStatus		Capaciteit van granulariteit 1:
 The battery level is getting low, please plug in the device.	PowerStatus		De accu is bijna leeg. Sluit alstublieft het apparaat aan op een spanningsbron.

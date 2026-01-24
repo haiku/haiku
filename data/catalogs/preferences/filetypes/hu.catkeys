@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-FileTypes	436017301
+1	hungarian	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Bal
 Float	Attribute ListView		Lebegőpontos
 Final	Application Types Window		Végleges
@@ -144,7 +144,6 @@ Open file	FileTypes		Fájl megnyitása
 Version info	Application Type Window		Verzió információ
 Final	Application Type Window		Végleges
 Preferred application	FileType Window		Előnyben részesített program
-FileTypes	FileTypes		Fájltípusok
 Set preferred application	Preferred App Menu		Előnyben részesített program megadása
 New file type	New File Type Window		Új fájltípus
 Short description:	Application Type Window		Rövid leírás:

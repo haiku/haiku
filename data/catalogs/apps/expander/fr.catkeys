@@ -1,9 +1,8 @@
-1	french	x-vnd.Haiku-Expander	3239308358
+1	french	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Destination
 Other	ExpanderPreferences		Autre
 Automatically show contents listing	ExpanderPreferences		Montrer l’inventaire automatiquement
 Expander	System name		Décompresseur
-Expander: Choose destination	DirectoryFilePanel		Expander : Choix de la destination
 Set source…	ExpanderMenu		Choisir la source…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		La destination n’est pas un dossier.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Ouvrir le dossier 
 Same directory as source (archive) file	ExpanderPreferences		Même répertoire que le fichier source archivé
 Stop	ExpanderWindow		Arrêt
 Cancel	ExpanderWindow		Annuler
-Expander settings	ExpanderPreferences		Réglages du Décompresseur
 Error when expanding archive	ExpanderWindow		Erreur lors de la décompression de l’archive
 Expand	ExpanderMenu		Décompresser
 Failed to create the destination folder.	ExpanderWindow		Impossible de créer le dossier de destination.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Continuer
 Cancel	ExpanderPreferences		Annuler
 Use:	ExpanderPreferences		Utiliser :
 Destination folder	ExpanderPreferences		Dossier de destination
-Expander: Open	ExpanderWindow		Expander : Ouvrir
 Leave destination folder path empty	ExpanderPreferences		Laissez vide le chemin du dossier de destination
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Le dossier de destination n’existe pas. Voulez-vous le créer ?
 The file doesn't exist	ExpanderWindow		Le fichier n’existe pas

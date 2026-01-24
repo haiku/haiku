@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-TSKB	316181764
+1	spanish; castilian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Ocultar automáticamente
 Show all	WindowMenu		Mostar todo
 Edit in Tracker…	PreferencesWindow		Editar en Tracker…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Mostrar replicantes
 No windows	WindowMenu		Sin ventanas
 Show clock	Tray		Mostrar reloj
 Close all	WindowMenu		Cerrar todo
-Deskbar preferences	PreferencesWindow		Preferencias de Deskbar
 About this system	DeskbarMenu		Acerca de este sistema
 Quit application	WindowMenu		Salir de la aplicación
 Hide application names	PreferencesWindow		Ocultar nombres de aplicaciones
 Applications	PreferencesWindow		Aplicaciones
 Show application expander	PreferencesWindow		Mostar expansor de aplicación
-Deskbar preferences…	DeskbarMenu		Preferencias de la barra de escritorio…
 Suspend	DeskbarMenu		Suspender
 Shutdown…	DeskbarMenu		Apagar…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos

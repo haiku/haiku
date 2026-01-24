@@ -1,13 +1,12 @@
-1	esperanto	x-vnd.Haiku-BootManager	867546001
+1	esperanto	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	Eraro okazis dum enarkivigado de antaŭa Ĉefa Ŝargodosiero (MBR)
 At least one partition must be selected!	BootManagerController		Almenaŭ unu subdisko devas esti elektita!
 No space available!	DrivesPage	Cannot install	Ne estas libera spaco!
-Boot Manager is unable to read the partition table!	BootManagerController		Praŝarga Administrilo ne povis legi la subdiskan tablon!
 Immediately	DefaultPartitionPage		Tuj
 Uninstall Boot Manager	UninstallPage	Title	Malinstali Praŝargan Administrilon
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Nekonata
-Installation of boot menu failed	BootManagerController	Title	Eraro okazis dum instalado de praŝarga menuo
 Backup Master Boot Record	BootManagerController	Title	Enarkivigi Ĉefan Ŝargodosieron (MBR)
+Installation of boot menu failed	BootManagerController	Title	Eraro okazis dum instalado de praŝarga menuo
 Cannot access!	DrivesPage	Cannot install	Ne povas atingi!
 After one second	DefaultPartitionPage		Post unu sekundo
 The old Master Boot Record was successfully saved to %s.	BootManagerController		La antaŭa Ĉefa Ŝargodosiero (MBR) sukcese estis konservita al %s.
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	Skribi praŝargan menuon
 OK	BootManagerController	Button	Bone
 Uninstall boot manager	BootManagerController	Title	Malinstali praŝargan administrilon
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		La jena praŝarga menuo estos skribonta al la praŝarga disko (%s). Bonvolu kontroli la suban informo antaŭ vi daŭrigi.
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		La unua subdisko sur la disko komencas tro frue kaj ne lasas sufiĉe da spaco por praŝarga menuo.\nPraŝarga Administrilo bezonas 2 KiB da libera spaco antaŭ la unua subdisko. 
 Uninstall	DrivesPage	Button	Malinstali
 Update	DrivesPage	Button	Ĝisdatigi
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		La Ĉefa Ŝargodosiero (MBR) de la praŝarga aparato:\n\t%s\nnun estos skribonta al la disko. Bonvolu elekti dosieron en kie vi volas konservi la MBR-on.\n\nSe io malbone okazos dum la instalado aŭ se vi pli malfrue volas forigi la praŝargan menuon, simple ekruli Praŝargan Administrilon kaj elektu la 'Malinstali' elekton.
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		Post kvin sekundoj
 Timeout: %s	DefaultPartitionPage		Tempolimo: %s
 The Master Boot Record could not be restored!	BootManagerController		La Ĉefa Ŝargodosiero (MBR) ne povis esti restaŭrita!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		La subdiska tablo de la unua fiksita disko ne estas kongrua kun Praŝarga Administrilo.\nPraŝarga Administrilo nur funkcias kun IBM-aj PC-aj MBR-aj subdiskoj.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Bonvolu elekti la diskon kie vi volas la praŝarga administrilo esti instalita aŭ malinstalita.
 After four seconds	DefaultPartitionPage		Post kvar sekundoj
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Nenomita %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Malinstalado d
 After two seconds	DefaultPartitionPage		Post du sekundoj
 Partition table not compatible	BootManagerController	Title	Subdiska tablo ne estas kongrua
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		La Ĉefa Ŝargodosiero (MBR) de la praŝarga disko (%DISK) sukcese estis restaŭrita el %FILE.
-Done	BootManagerController	Button	Farite
 BootManager	System name		Praŝarga Administrilo
+Done	BootManagerController	Button	Farite
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Bonvolu trovi la Ĉefan Ŝargodosieran (MBR) konservitan dosieron por restaŭrigi. Ĉi tio estas la dosiero kiu estis kreita kiam la praŝarga administrilo unue estis instalita.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Bonvolu trovi la Ĉefan Ŝargodosieran (MBR) konservitan dosieron por restaŭrigi. Ĉi tio estas la dosiero kiu estis kreita kiam la praŝarga administrilo unue estis instalita.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	La Ĉefa Ŝargodosiero (MBR) de %disk estos restaŭronta el %file. Ĉu vi volas daŭrigi?

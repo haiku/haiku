@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1441754962
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1255288322
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar Trash
 Close	MediaPlayer-PlaylistWindow		Afsluiten
 Volume of background clips	MediaPlayer-SettingsWindow		Volume van achtergrondclips
@@ -43,7 +43,6 @@ Close	MediaPlayer-Main		Afsluiten
 Save error	MediaPlayer-PlaylistWindow		Fout opslaan
 Attributes	MediaPlayer-Main		Attributen
 Bottom of screen	MediaPlayer-SettingsWindow		Onderaan scherm
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-instellingen
 Copyright	MediaPlayer-InfoWin		Auteursrecht
 Invalid URL inserted!	MediaPlayer-NetworkStream		Ongeldige URL ingevoerd!
 Aspect ratio	MediaPlayer-Main		Aspect-ratio

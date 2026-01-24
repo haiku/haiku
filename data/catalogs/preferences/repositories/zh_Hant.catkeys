@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Repositories	1220143449
+1	english	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	這不是有效的 URL。
 Repository URL:	AddRepoWindow	Text box label	庫URL：
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	刷新 %name% 的儲存庫快取時出錯
@@ -20,7 +20,6 @@ OK	Constants	Button label	確認
 Status	RepositoriesView	Column title	狀態
 Name	RepositoriesView	Column title	名稱
 Add	AddRepoWindow	Button label	添加
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	庫無法檢索目前啟用的庫的名稱。
 Enable all	RepositoriesView	Button label	啓用所有
 Aborted	TaskLooper	Aborted task status message	已中止
 URL	RepositoriesView	Column title	URL

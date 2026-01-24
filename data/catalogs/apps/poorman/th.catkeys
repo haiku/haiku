@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-PoorMan	1829050509
+1	thai	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		เลือกเว็ปโฟลเดอร์
 Console logging	PoorMan		การบันทึกคอนโซล
 Create Log File	PoorMan		สร้างไฟล์บันทึก
@@ -6,9 +6,7 @@ File logging	PoorMan		บันทึกไฟล์
 Website options	PoorMan		ตัวเลือกเว็บไซต์
 Log to file	PoorMan		เข้าสู่ไฟล์
 Shutting down.	PoorMan		กำลังปิด
-Error Dir	PoorMan		ไดเรกทอรี่ผิดพลาด
 Web folder:	PoorMan		เว็ปโฟลเดอร์
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		โปรดเลือกโฟลเดอร์ที่จะเผยแพร่บนเว็บ\n\nคุณสามารถให้ PoorMan สร้างค่าเริ่มต้น \"public_html\" ในโฟลเดอร์บ้านของคุณได้\nหรือคุณเลือกหนึ่งในโฟลเดอร์ของคุณเองแทน
 Log To Console	PoorMan		เข้าสู่คอนโซล
 File Name	PoorMan		ชื่อไฟล์
 Starting up... 	PoorMan		กำลังเริ่ม
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		พบ: %lu
 Hits: 0	PoorMan		พบ: 0
 Shutting down.\n	PoorMan		กำลังปิด\n
 Select all	PoorMan		เลือกทั้งหมด
-Error Server	PoorMan		เซิฟเวอร์ผิดพลาด
 Send file listing if there's no start page	PoorMan		ส่งรายชื่อไฟล์หากไม่มีหน้าเริ่มต้น
-Create PoorMan log	PoorMan		สร้างบันทึก PoorMan
 Max. simultaneous connections:	PoorMan		การเชื่อมต่อพร้อมกันมากที่สุด:
 Done	PoorMan		เสร็จ
 Site	PoorMan		ไซต์
@@ -48,7 +44,6 @@ Run server	PoorMan		ทำงาานเซิฟเวอร์
 Create	PoorMan		สร้าง
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} อื่นๆ{# connections}}
 done.\n	PoorMan		เสร็จ\n
-PoorMan settings	PoorMan		ตั้งค่า PoorMan
 Console Logging	PoorMan		กำลังเข้าสู่คอนโซล
 Clear log file	PoorMan		สร้างไฟล์บันทึก
 Save log console selection	PoorMan		บันทึกการเลือกคอนโซล

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ProcessController	415082887
+1	french	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Erreur à l’enregistrement du fichier
 Display priority	ProcessController		Priorité affichage
 That's no Fun!	ProcessController		C’est pas fun !
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Processeur %d
 Live in the Deskbar	ProcessController		Installer dans la Deskbar
 Kill this team!	ProcessController		Tuer ce processus !
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vous pouvez exécuter le Gestionnaire de tâche dans une fenêtre ou l’installer dans la Deskbar.
 Real-time priority	ProcessController		Priorité temps-réel
 Custom priority	ProcessController		Priorité personnalisée
 Debug this thread!	ProcessController		Déboguer cette tâche !
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Consommation mémoire
 Ok!	ProcessController		Ok !
 Normal priority	ProcessController		Priorité normale
 Restart Deskbar	ProcessController		Redémarrer la Deskbar
-About ProcessController…	ProcessController		À propos du Gestionnaire de tâche…
 Usage: %s [-deskbar]\n	ProcessController		Utilisation : %s [-deskbar]\n
 Please confirm	ProcessController		Veuillez confirmer
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		©1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Resources du système & caches�
 Damned!	ProcessController		Damnation !
 New Terminal	ProcessController		Nouveau Terminal
 Power saving	ProcessController		Économie d’énergie
-ProcessController is already installed in Deskbar.	ProcessController		ProcessControlleur est déjà installé dans la Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		C’est le dernier processeur actif…\nVous ne pouvez pas l’éteindre !
 This thread is already gone…	ProcessController		Cette tâche n’existe déjà plus…
 Run in window	ProcessController		Exécuter dans une fenêtre

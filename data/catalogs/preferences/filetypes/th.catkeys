@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-FileTypes	436017301
+1	thai	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	ซ้าย
 Float	Attribute ListView		ลอย
 Final	Application Types Window		สุดท้าย
@@ -144,7 +144,6 @@ Open file	FileTypes		เปิดไฟล์
 Version info	Application Type Window		ข้อมูลเวอร์ชั่น
 Final	Application Type Window		สุดท้าย
 Preferred application	FileType Window		แอพพลิเคชั่นที่ต้องการ
-FileTypes	FileTypes		ชนิดไฟล์
 Set preferred application	Preferred App Menu		ตั้งค่าแอปพลิเคชันที่ต้องการ
 New file type	New File Type Window		ชนิดไฟล์ใหม่
 Short description:	Application Type Window		รายละเอียดสั้น:

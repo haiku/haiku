@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Pairs	818003250
+1	greek, modern (1453-)	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Ζευγαράκια
 Quit	PairsWindow		Έξοδος
 Medium	PairsWindow		Μέτριο
@@ -6,7 +6,6 @@ Game	PairsWindow		Παιχνίδι
 Expert (8x8)	PairsWindow		Προχωρημένος (8x8)
 New	PairsWindow		Νέο
 OK	Pairs		Εντάξει
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Το παιχνίδι Ζευγαράκια δεν μπόρεσε να βρει αρκετά εικονίδια-- χρειάζεται τουλάχιστον %zu εικονίδια, ενώ βρέθηκαν μόνο %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ολοκληρώσατε το παιχνίδι σε {0, plural, one{# κλικ} other{# κλικ}}.\n
 Small	PairsWindow		Μικρό
 Size	PairsWindow		Μέγεθος

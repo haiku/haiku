@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Repositories	2658607939
+1	slovak	x-vnd.Haiku-Repositories	2441500256
 This is not a valid URL.	AddRepoWindow	Add URL error message	Toto nie je platná adresa URL.
 Repository URL:	AddRepoWindow	Text box label	URL zdroja softvéru:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Vyskytla sa chyba pri obnovovaní vyrovnávacej pamäte zdrojov softvéru pre %name%
@@ -19,7 +19,6 @@ OK	Constants	Button label	OK
 Status	RepositoriesView	Column title	Stav
 Name	RepositoriesView	Column title	Názov
 Add	AddRepoWindow	Button label	Pridať
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Aplikácii Zdroje softvéru sa nepodarilo zistiť názvy momentálne zapnutých zdrojov softvéru.
 Enable all	RepositoriesView	Button label	Zapnúť všetky
 Aborted	TaskLooper	Aborted task status message	Zrušené
 URL	RepositoriesView	Column title	URL

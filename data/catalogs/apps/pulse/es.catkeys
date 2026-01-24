@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Pulse	559379362
+1	spanish; castilian	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Modo normal
 Info	CPUButton		Información
 Quit	DeskbarPulseView		Salir
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Predeterminada
 Mini mode	PrefsWindow		Modo reducido
 CPU progress bar	NormalPulseView		Barra de progreso de la CPU
 Fade colors	ConfigView		Colores apagados
-About Pulse…	PulseView		Acerca de Pulse…
-Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Modo minimizado
 Pulse settings	PulseApp		Configuración de Pulse
 Remove replicant	CPUButton		Eliminar duplicador
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Modo escritorio
 OK	PulseView		Ok
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nBy David Ramsey y Arve Hjønnevåg\nRevisado por Daniel Switkin\n
 OK	PrefsWindow		Aceptar
-Pulse	PulseApp		Pulso
 Removing from Deskbar failed.\n%s	DeskbarPulseView		La eliminación de la Barra de Escritorio falló.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		Acerca de Pulse…
 Deskbar mode	PrefsWindow		Modo escritorio
 Mini mode	DeskbarPulseView		Modo reducido
 You can't disable the last active CPU.	CPUButton		No se puede deshabilitar el último procesador activo.

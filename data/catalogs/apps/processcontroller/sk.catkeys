@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ProcessController	2791873518
+1	slovak	x-vnd.Haiku-ProcessController	805862030
 Error saving file	ProcessController		Chyba pri ukladaní súboru
 Display priority	ProcessController		Priorita zobrazenie
 That's no Fun!	ProcessController		To nie je sranda!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Procesor %d
 Live in the Deskbar	ProcessController		Zobrazovať v Paneli
 Kill this team!	ProcessController		Ukončiť tento tím!
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Správcu procesov môžete spúšťať v okne alebo ho nainštalovať do Panelu.
 Real-time priority	ProcessController		Priorita v reálnom čase
 Custom priority	ProcessController		Vlastná priorita
 Debug this thread!	ProcessController		Ladiť toto vlákno!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Využitie pamäte
 Ok!	ProcessController		OK
 Normal priority	ProcessController		Normálna priorita
 Restart Deskbar	ProcessController		Reštartovať Panel
-About ProcessController…	ProcessController		O Správcovi procesov…
 Usage: %s [-deskbar]\n	ProcessController		Použitie: %s [-deskbar]\n
 Please confirm	ProcessController		Prosím, potvrďte
 Urgent priority	ProcessController		Naliehavá priorita
@@ -42,6 +40,5 @@ System resources & caches…	ProcessController		Zdroje a vyrovnávacia pamäť s
 Damned!	ProcessController		Sakra!
 New Terminal	ProcessController		Nový terminál
 Power saving	ProcessController		Šetrenie energie
-ProcessController is already installed in Deskbar.	ProcessController		Správca procesov je už v Paneli nainštalovaný.
 This thread is already gone…	ProcessController		Toto vlákno už je preč…
 Run in window	ProcessController		Spustiť v okne

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DriveSetup	4193609455
+1	turkish	x-vnd.Haiku-DriveSetup	2351839435
 Could not unmount partition %s.	MainWindow		%s bölüntüsü bağlantısı kesilemedi.
 Register disk image…	MainWindow		Disk kalıbını kaydettir…
 Mount all	MainWindow		Hepsini bağla
@@ -25,6 +25,7 @@ Validation of the given parameters failed.	MainWindow		Verilen ayarların doğru
 Cannot init target partition.	MainWindow		Hedef bölüntü ilklendirilemiyor.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		“%s” bölüntüsünü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 DriveSetup	System name		Disk İzlencesi
+Error:	MainWindow	in any error alert	Hata:
 Mounted at	PartitionList		Bağlama noktası
 Disk system %s not found!	MainWindow		Disk sistemi %s bulunamadı!
 Create…	MainWindow		Oluştur…
@@ -44,6 +45,7 @@ There's no space on the partition where a child partition could be created.	Main
 %s does not refer to a file disk device.	MainWindow		%s, bir dosya diski aygıtına başvurmuyor.
 No disk devices have been recognized.	DiskView		Hiçbir disk aygıtı tanımlanamadı.
 Attributes	PartitionList		Öznitelikler
+'%s' is not a regular file.	MainWindow		“%s”, düzenli bir dosya değil.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Bölüntü silinemedi. Değişiklikler diske yazılmadı.
 Change parameters…	MainWindow		Parametreleri değiştir…
 Format	InitializeParametersPanel		Biçimlendir
@@ -78,6 +80,7 @@ Partition name:	ChangeParametersPanel		Bölüntü adı:
 LUKS encrypted	Encryption utils		LUKS şifreli
 Empty space	PartitionList		Boş alan
 Cancel	AbstractParametersPanel		Vazgeç
+%appname%: Save disk image	MainWindow		%appname%: Disk kalıbını kaydet
 Format	MainWindow		Biçimlendir
 OK	MainWindow		Tamam
 Cannot init target file.	MainWindow		Hedef dosya ilklendirilemiyor.
@@ -86,12 +89,14 @@ Unregister disk image	MainWindow		Disk kalıbının kaydını kaldır
 The target partition is smaller than the image file.	MainWindow		Hedef bölüntü, kalıp dosyasından daha küçük.
 Empty space	DiskView		Boş alan
 Could not delete the selected partition.	MainWindow		Seçili bölüntü silinemedi.
+Failed to get information about '%s'.	MainWindow		“%s” hakkında bilgi alınamadı.
 Open with DiskProbe	MainWindow		Disk Sondası ile aç
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilklendirmek istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
 There was an error preparing the disk for modifications.	MainWindow		Diski değişikliklere hazırlarken bir hata oluştu.
 The disk has been successfully initialized.\n	MainWindow		Disk başarıyla ilklendirildi.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Bölüm bağlantısı kesilmeye zorlansın mı?\n\nNot: Eğer bir uygulama bu bölüme yazıyorsa bağlantıyı kesmek veri kaybına neden olabilir.\n
 Disk image has been removed.	MainWindow		Disk kalıbı kaldırıldı.
+No file disk device found with the given ID, trying file '%s'.	MainWindow		Verilen kimlik ile bir dosya disk aygıtı bulunamadı, “%s” dosyası deneniyor.
 Cancel	MainWindow		Vazgeç
 Free space	PartitionList		Boş alan
 Queries	PartitionList		Sorgular
@@ -112,7 +117,9 @@ Cannot delete the selected partition.	MainWindow		Seçili bölüntü silinemiyor
 Continue	MainWindow		Sürdür
 Could not mount partition %s.	MainWindow		%s bölüntüsü bağlanamadı.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Bölüntüyü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
+%appname% error	MainWindow		%appname% hatası
 The selected disk is read-only.	MainWindow		Seçili disk saltokunur.
+Failed to unregister file disk device %s.	MainWindow		%s dosya disk aygıtının kaydı kaldırılamadı.
 The partition %s is already unmounted.	MainWindow		%s bölüntüsünün bağlantısı zaten kesilmiş.
 Target volume is read only.	MainWindow		Hedef disk bölümü saltokunur.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Seçili bölüntünün parametrelerini değiştirmek istediğinizden emin misiniz?\n\nBölüntü artık başka işletim sistemleri tarafından tanınamayabilir!

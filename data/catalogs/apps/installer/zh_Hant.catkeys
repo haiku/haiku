@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	1341809802
+1	english	x-vnd.Haiku-Installer	2394432379
 Performing installation.	InstallProgress		正在執行安裝。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		請先關閉 DriveSetup 視窗，然後再關閉安裝程式視窗。
 No optional packages available.	PackagesView		無可用的可選套件。
@@ -26,7 +26,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		單擊「設置�
 Welcome to the Haiku Installer!\n\n	InstallerApp		歡迎使用Haiku安裝程序！ \n\n
 ?? of ??	InstallerWindow	Unknown progress	?? 的 ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		無法啟動用於配置磁盤分區的應用程式 DriveSetup。
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		安裝完成。引導扇區已寫入'%s'。點擊'退出'離開安裝程序或選擇新的目標卷以執行另一次安裝。
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		目標卷不為空。如果它已經包含一個Haiku作業系統安裝，它將被覆蓋。這將移除所有已安裝的軟件。\n\n如果您想升级系统而不移除已安装的软件，请参考Haiku用户指南中关于应用程序的主题 \"SoftwareUpdater\" 尋求安裝指引。\n\n您確定要繼續安裝嗎？
 Quit DriveSetup	InstallerWindow		退出DriveSetup
 Write boot sector	InstallerWindow		寫入引導扇區
@@ -79,7 +78,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		從彈出菜單中選擇源磁盤。然後單擊「開始」。
 OK	InstallProgress		確定
 Quit BootManager	InstallerWindow		退出引導管理器
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		您確定要安裝到當前啟動盤上嗎？如果您繼續，安裝程序將必須重新啟動您的電腦。
 Onto:	InstallerWindow		到：
 Tools	InstallerWindow		工具
 scanning…	InstallerWindow		掃描中…

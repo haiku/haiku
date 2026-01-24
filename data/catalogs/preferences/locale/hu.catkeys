@@ -1,11 +1,10 @@
-1	hungarian	x-vnd.Haiku-Locale	1312749322
+1	hungarian	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Közepes formátum:
 ERROR	TimeFormatSettings		HIBA
 Negative:	TimeFormatSettings		Negatív:
 Language	Locale Preflet Window		Nyelv
 Short format:	TimeFormatSettings		Rövid alak:
 24 hour	TimeFormatSettings		24-órás
-Locale	Locale Preflet Window		Nyelv
 Time	TimeFormatSettings		Idő
 Defaults	Locale Preflet Window		Alapértékek
 Locale	System name		Nyelv
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		Rendben
 Long format:	TimeFormatSettings		Hosszú alak:
 Numbers	TimeFormatSettings		Számok
 Available languages	Locale Preflet Window		Elérhető nyelvek
-Locale	Locale Preflet		Nyelvi beállítások
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nem található a nyelvi fájl! Sajnos így a beállítópanel nem használható!
 Formatting	Locale Preflet Window		Formátum
 Use month/day-names from preferred language	TimeFormatSettings		Előnyben részesített nyelv hónap- és napneveinek használata

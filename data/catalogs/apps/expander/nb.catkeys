@@ -1,9 +1,8 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Expander	3239308358
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Mål
 Other	ExpanderPreferences		Annen
 Automatically show contents listing	ExpanderPreferences		Vis innholdsliste automatisk
 Expander	System name		Expander
-Expander: Choose destination	DirectoryFilePanel		Arkivåpner: Velg mål
 Set source…	ExpanderMenu		Sett kilde…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Målet er ikke en mappe.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Åpne målmappe et
 Same directory as source (archive) file	ExpanderPreferences		Samme mappe som kildefilen (arkivet)
 Stop	ExpanderWindow		Stopp
 Cancel	ExpanderWindow		Avbryt
-Expander settings	ExpanderPreferences		Innstillinger for Arkivåpner
 Error when expanding archive	ExpanderWindow		Feil ved utpakking av arkiv
 Expand	ExpanderMenu		Pakk ut
 Failed to create the destination folder.	ExpanderWindow		Kunne ikke opprette destinasjonsmappen.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Fortsett
 Cancel	ExpanderPreferences		Avbryt
 Use:	ExpanderPreferences		Bruk:
 Destination folder	ExpanderPreferences		Målmappe
-Expander: Open	ExpanderWindow		Arkivåpner: Åpne
 Leave destination folder path empty	ExpanderPreferences		La sti til målmappe være tom
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Destinasjonsmappen finnes ikke. Vil du opprette den?
 The file doesn't exist	ExpanderWindow		Filen finnes ikke

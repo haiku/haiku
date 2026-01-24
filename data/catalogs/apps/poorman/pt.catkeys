@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-PoorMan	1829050509
+1	portuguese	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Selecionar pasta web
 Console logging	PoorMan		Registo em consola
 Create Log File	PoorMan		Criar Ficheiro de Registo
@@ -6,9 +6,7 @@ File logging	PoorMan		Registo em ficheiro
 Website options	PoorMan		Opções do website
 Log to file	PoorMan		Registar para ficheiro
 Shutting down.	PoorMan		A encerrar.
-Error Dir	PoorMan		Pasta de erros
 Web folder:	PoorMan		Pasta web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor, escolha a pasta a publicar na web.\n\nPode selecionar uma pasta à sua escolha, ou pode deixar\no PoorMan criar uma pasta \"public_html\" predefinida\nna sua pasta pessoal.
 Log To Console	PoorMan		Registar para consola
 File Name	PoorMan		Nome do Ficheiro
 Starting up... 	PoorMan		A iniciar... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Solicitações: %lu
 Hits: 0	PoorMan		Solicitações: 0
 Shutting down.\n	PoorMan		A encerrar.\n
 Select all	PoorMan		Selecionar tudo
-Error Server	PoorMan		Erro do Servidor
 Send file listing if there's no start page	PoorMan		Enviar listagem de ficheiros se não houver página inicial
-Create PoorMan log	PoorMan		Criar registo do PoorMan
 Max. simultaneous connections:	PoorMan		Máx. de ligações simultâneas
 Done	PoorMan		Concluído
 Site	PoorMan		Sítio
@@ -48,7 +44,6 @@ Run server	PoorMan		Iniciar servidor
 Create	PoorMan		Criar
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# ligação} other{# ligações}}
 done.\n	PoorMan		concluído.\n
-PoorMan settings	PoorMan		Definições do PoorMan
 Console Logging	PoorMan		Registo em Consola
 Clear log file	PoorMan		Limpar ficheiro de registo
 Save log console selection	PoorMan		Guardar seleção de consola de registo

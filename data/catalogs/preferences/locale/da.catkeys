@@ -1,10 +1,9 @@
-1	danish	x-vnd.Haiku-Locale	1081217032
+1	danish	x-vnd.Haiku-Locale	933805714
 Medium format:	TimeFormatSettings		Mediumformat:
 Negative:	TimeFormatSettings		Negativt:
 Language	Locale Preflet Window		Sprog
 Short format:	TimeFormatSettings		Kort format:
 24 hour	TimeFormatSettings		24 timer
-Locale	Locale Preflet Window		Sprog
 Time	TimeFormatSettings		Tid
 Defaults	Locale Preflet Window		Standarder
 Locale	System name		Sprog
@@ -13,7 +12,6 @@ OK	Locale Preflet Window		O.k.
 Long format:	TimeFormatSettings		Langt format:
 Numbers	TimeFormatSettings		Tal
 Available languages	Locale Preflet Window		Tilgængelige sprog
-Locale	Locale Preflet		Sprog
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Det var ikke muligt at finde tilgængelige sprog! Disse indstillinger kan ikke anvendes!
 Formatting	Locale Preflet Window		Formatering
 Use month/day-names from preferred language	TimeFormatSettings		Brug måneds-/dagnavne fra foretrukne sprog

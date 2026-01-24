@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Shortcuts	3834857117
+1	italian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseRilasciato
 Application	ShortcutsWindow		Applicazione
 Option	ShortcutsSpec	Name for modifier on keyboard	Opzione
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Ripristina quanto salvato
 Don't save	ShortcutsWindow		Non salvare
 *MouseDown	ShortcutsWindow		*MousePremuto
 *Beep	ShortcutsWindow		*Bip
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
 Save	ShortcutsWindow		Salva
 Either	ShortcutsSpec		Entrambi
 Oh no	ShortcutsWindow		Oh no
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Annulla
 *MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Left	ShortcutsSpec		Sinistra
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di elaborare il tuo file di impostazione tasti!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
 Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
 Error, NULL state description?	ShortcutsSpec		Errore: probabile descrizione di stato NULL

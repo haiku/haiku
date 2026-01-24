@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	520971408
+1	english	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		移除条目到垃圾桶
 Close	MediaPlayer-PlaylistWindow		关闭
 Volume of background clips	MediaPlayer-SettingsWindow		背景剪辑音量
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		关闭
 Save error	MediaPlayer-PlaylistWindow		保存错误
 Attributes	MediaPlayer-Main		属性
 Bottom of screen	MediaPlayer-SettingsWindow		屏幕底部
-MediaPlayer settings	MediaPlayer-SettingsWindow		媒体播放器设置
 Copyright	MediaPlayer-InfoWin		版权
 Invalid URL inserted!	MediaPlayer-NetworkStream		无效的 URL 地址！
 Aspect ratio	MediaPlayer-Main		长宽比

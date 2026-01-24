@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PowerStatus	1104524835
+1	hungarian	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		Futtatás ablakban
 Extended battery info	PowerStatus		Akkumulátor információ
 Show status icon	PowerStatus		Állapotikon megjelenítése
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Alacsony töltés
 Model number: 	PowerStatus		Típusszám: 
 Battery unused	PowerStatus		Használatlan akku
 Type: 	PowerStatus		Típus: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futtathatod az Energiaállapotot egy ablakban, vagy az Asztalsávra telepítheted azt.
 Damaged or missing battery	PowerStatus		Hibás vagy hiányzó akkumulátor
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Akku használatban
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		Sorozatszám:
 Battery critical	PowerStatus		Veszélyesen alacsony töltés
 Capacity: 	PowerStatus		Kapacitás: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Nem találtam akkumulátort, az Energiaállapot így nem használható.
 Show percent	PowerStatus		Százalék megjelenítése
 Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Az akkumulátor töltöttsége alacsony, kérlek csatlakoztasd a töltőt.

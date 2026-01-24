@@ -1,9 +1,8 @@
-1	japanese	x-vnd.Haiku-Expander	3239308358
+1	japanese	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		解凍先
 Other	ExpanderPreferences		その他
 Automatically show contents listing	ExpanderPreferences		内容リストを自動的に表示
 Expander	System name		ファイル解凍
-Expander: Choose destination	DirectoryFilePanel		ファイル解凍: 解凍先の選択
 Set source…	ExpanderMenu		書庫ファイルの指定...
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		解凍後に解凍
 Same directory as source (archive) file	ExpanderPreferences		書庫ファイル (アーカイブ) と同じ
 Stop	ExpanderWindow		中止
 Cancel	ExpanderWindow		中止
-Expander settings	ExpanderPreferences		ファイル解凍設定
 Error when expanding archive	ExpanderWindow		書庫ファイルの解凍時にエラーが発生しました
 Expand	ExpanderMenu		解凍
 Failed to create the destination folder.	ExpanderWindow		解凍先のフォルダーを作成できません。
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		続ける
 Cancel	ExpanderPreferences		中止
 Use:	ExpanderPreferences		パスの指定:
 Destination folder	ExpanderPreferences		解凍先フォルダー
-Expander: Open	ExpanderWindow		ファイル解凍: 開く
 Leave destination folder path empty	ExpanderPreferences		解凍時に指定
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		解凍先のフォルダーがありません。作成してもよろしいですか?
 The file doesn't exist	ExpanderWindow		ファイルがありません

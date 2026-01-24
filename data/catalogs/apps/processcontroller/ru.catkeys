@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ProcessController	415082887
+1	russian	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Ошибка при сохранении файла
 Display priority	ProcessController		Приоритет отображения
 That's no Fun!	ProcessController		Это не смешно!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Процессор %d
 Live in the Deskbar	ProcessController		Отображать в Deskbar
 Kill this team!	ProcessController		Убить этот поток!
 OK	ProcessController		ОК
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можете запустить контроллер процессов в окне или установить его в Deskbar.
 Real-time priority	ProcessController		Приоритет реального времени
 Custom priority	ProcessController		Заданный приоритет
 Debug this thread!	ProcessController		Отладить этот поток!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Использование памяти
 Ok!	ProcessController		ОК!
 Normal priority	ProcessController		Нормальный приоритет
 Restart Deskbar	ProcessController		Перезапустить Deskbar
-About ProcessController…	ProcessController		О контроллере процессов…
 Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskbar]\n
 Please confirm	ProcessController		Пожалуйста, подтвердите
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -26,7 +24,7 @@ Urgent priority	ProcessController		Срочный приоритет
 What do you want to do with the thread \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
 Idle priority	ProcessController		Приоритет бездействия
 Real-time display priority	ProcessController		Приоритет отображения реального времени
-Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ
+Threads and CPU usage	ProcessController		Потоки и загрузка процессора
 Quit application	ProcessController		Завершить приложение
 Info	ProcessController		Информация
 Kill this thread!	ProcessController		Убить этот поток!
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Системные ресурс�
 Damned!	ProcessController		Проклятье!
 New Terminal	ProcessController		Новый терминал
 Power saving	ProcessController		Режим энергосбережения
-ProcessController is already installed in Deskbar.	ProcessController		Контроллер процессов уже установлен в Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Это последний активный процессор…\nВы не можете отключить его!
 This thread is already gone…	ProcessController		Этого потока уже не существует…
 Run in window	ProcessController		Запустить в окне

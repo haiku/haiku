@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PowerStatus	1104524835
+1	romanian	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		Rulează în fereastră
 Extended battery info	PowerStatus		Informații extinse despre baterie
 Show status icon	PowerStatus		Arată pictograma de stare
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Baterie descărcată
 Model number: 	PowerStatus		Număr de model: 
 Battery unused	PowerStatus		Baterie neutilizată
 Type: 	PowerStatus		Tip: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți rula PowerStatus într-o fereastră sau îl puteți instala în deskbar.
 Damaged or missing battery	PowerStatus		Baterie lipsă sau deteriorată
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Se descarcă bateria
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		Număr de serie:
 Battery critical	PowerStatus		Baterie critică
 Capacity: 	PowerStatus		Capacitate: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Nu a fost detectată nicio baterie suportată. PowerStatus nu poate fi utilizat pe sistem.
 Show percent	PowerStatus		Arată procentul
 Capacity granularity 1: 	PowerStatus		Capacitatea de granularitate 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Nivelul bateriei scade, conectați dispozitivul.

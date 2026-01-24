@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Be-MAIL	4073987023
+1	indonesian	x-vnd.Be-MAIL	856240449
 Set to Saved	Mail		Setel ke Disimpan
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Teks utama Anda mengandung %ld karakter tak bisa terenkod. Mungkin set karakter lain akan bekerja lebih baik? Tekan kirim untuk tetap mengirim (sebuah karakter pengganti akan digunakan pada karakter yang tak terenkod), atau tekan Batal untuk kembali dan membetulkannya.
 Text wrapping:	Mail		Pembungkus teks:
@@ -93,7 +93,6 @@ To:	Mail		Untuk:
 Need Tracker to move items to trash	Mail		Diperlukan Tracker untuk memindahkan item ke sampah
 The mail_daemon could not be started:\n\t	Mail		Mail_daemon tidak bisa dijalankan:\n\t
 <no account found>	Mail		<tiada akun ditemukan>
-Mail couldn't find its dictionary.	Mail		Mail tidak dapat menemukan kamusnya.
 helpful message	Mail		pesan bermanfaat
  Read 	Mail		 Baca 
 Font:	Mail		Fon:

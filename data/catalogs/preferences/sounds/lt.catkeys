@@ -1,13 +1,10 @@
-1	lithuanian	x-vnd.Haiku-Sounds	2763165148
+1	lithuanian	x-vnd.Haiku-Sounds	831874831
 Sounds	System name		Garsai
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Garsai\n  Autoriai:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Pirminis autorius – Atsushi Takamatsu.\n©2003-2006 Haiku
-No such file or directory	HEventList		Tokio failo ar aplanko nėra
 Other…	HWindow		Kitas…
-OK	SoundsHApp		Gerai
 Sound file:	HWindow		Garso failas:
 <none>	HEventList		<joks>
-About Sounds	SoundsHApp		Apie Garsus
 OK	HEventList		Gerai
 Sound	HEventList		Garsai
 Event	HEventList		Įvykis
 <none>	HWindow		<joks>
+No such file or directory	HEventList		Tokio failo ar aplanko nėra

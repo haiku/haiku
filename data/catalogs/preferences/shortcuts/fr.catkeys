@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	3834857117
+1	french	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*SourisEnHaut
 Application	ShortcutsWindow		Application
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
 Don't save	ShortcutsWindow		Ne pas enregistrer
 *MouseDown	ShortcutsWindow		*SourisEnBas
 *Beep	ShortcutsWindow		*Bip
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Raccourcis n’a pas pu enregistrer votre jeu de touches.
 Save	ShortcutsWindow		Enregistrer
 Either	ShortcutsSpec		Soit
 Oh no	ShortcutsWindow		Oh non !
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Annuler
 *MoveMouse +20 +0	ShortcutsWindow		*BougeSouris +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
 Left	ShortcutsSpec		Gauche
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n’a pas pu analyser votre fichier de jeu de touches !
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n’a pas pu enregistrer votre fichier de jeu de touches !
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
 Remove selected shortcut	ShortcutsWindow		Supprimer le raccourci sélectionné
 Error, NULL state description?	ShortcutsSpec		Erreur : description d’état NULL ?

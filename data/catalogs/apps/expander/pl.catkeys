@@ -1,9 +1,8 @@
-1	polish	x-vnd.Haiku-Expander	3239308358
+1	polish	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Cel
 Other	ExpanderPreferences		Inne
 Automatically show contents listing	ExpanderPreferences		Automatycznie pokaż listę zawartości
 Expander	System name		Expander
-Expander: Choose destination	DirectoryFilePanel		Expander: Wybierz katalog docelowy
 Set source…	ExpanderMenu		Wybierz źródło…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Cel nie jest katalogiem.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Otwórz katalog do
 Same directory as source (archive) file	ExpanderPreferences		Ten sam co archiwum źródłowe
 Stop	ExpanderWindow		Zatrzymaj
 Cancel	ExpanderWindow		Anuluj
-Expander settings	ExpanderPreferences		Ustawienia Expandera
 Error when expanding archive	ExpanderWindow		Wystąpił błąd podczas rozpakowywania archiwum
 Expand	ExpanderMenu		Rozpakuj
 Failed to create the destination folder.	ExpanderWindow		Nie udało się utworzyć katalogu docelowego.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Kontynuuj
 Cancel	ExpanderPreferences		Anuluj
 Use:	ExpanderPreferences		Użyj:
 Destination folder	ExpanderPreferences		Katalog docelowy
-Expander: Open	ExpanderWindow		Expander: Otwórz
 Leave destination folder path empty	ExpanderPreferences		Pozostaw katalog docelowy pusty
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Katalog docelowy nie istnieje. Czy chcesz go utworzyć?
 The file doesn't exist	ExpanderWindow		Plik nie istnieje

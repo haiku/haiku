@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PowerStatus	1104524835
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		Kjør i vindu
 Extended battery info	PowerStatus		Utvidet batteriinformasjon
 Show status icon	PowerStatus		Vis statusikon
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Lavt batterinivå
 Model number: 	PowerStatus		Modellnummer: 
 Battery unused	PowerStatus		Batteri ikke i bruk
 Type: 	PowerStatus		Type: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan kjøre Strøm i et vindu eller installere det i Deskbar
 Damaged or missing battery	PowerStatus		Skadet eller manglende batteri
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Batteri utlader
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		Serienummer:
 Battery critical	PowerStatus		Kritisk batterinivå
 Capacity: 	PowerStatus		Kapasitet: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Ingen støttet batteri oppdaget. PowerStatus kan ikke brukes på systemet ditt.
 Show percent	PowerStatus		Vis prosent
 Capacity granularity 1: 	PowerStatus		Kapasitetsgranularitet 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Batterinivået begynner å bli lavt, vennligst koble til enheten.

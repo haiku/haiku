@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-softwareupdater	369324613
+1	russian	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Обновляется версия
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Нажмите здесь для установки {0, plural, one{# обновленного пакета} other{# обновленных пакетов}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Пакеты, которые будут удалены
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		При пров
 Packages are being updated	UpdateManager		Пакеты были обновлены
 Cancel	SoftwareUpdaterWindow		Отмена
 Don't quit	SoftwareUpdaterWindow		Не выходить
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Нажмите здесь, чтобы запустить Обновление программ. Некоторые обновления потребуют выбора решения.
 Checking for updates	SoftwareUpdaterWindow		Проверка наличия обновлений
 Updates completed	UpdateManager		Обновление завершено
 Reboot	SoftwareUpdaterWindow		Перезагрузить

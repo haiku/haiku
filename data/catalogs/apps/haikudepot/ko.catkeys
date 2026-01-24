@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-HaikuDepot	2555742361
+1	korean	x-vnd.Haiku-HaikuDepot	322393486
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		사용자 약관 다운로드 문제
 Available packages	MainWindow		사용 가능한 패키지
 It was not possible to create the new user.	UserLoginWindow		새 사용자를 생성할 수 없습니다.
@@ -6,7 +6,6 @@ An unexpected error has been sent from the server [%li]	ServerHelper		서버에�
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		패키지 변경 이력 가져오는 중
 Create account	UserLoginWindow		계정 만들기
 Agree	ToLatestUserUsageConditionsWindow		동의
-Install %PackageTitle%	PackageManager		%PackageTitle% 설치
 The response to the captcha was incorrect.	ServerHelper		Captcha 응답이 잘못되었습니다.
 Rate package…	PackageInfoView		패키지 평가…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		사용자 %Nickname%로 정상적으로 인증되었습니다.
@@ -21,11 +20,9 @@ Switch account…	MainWindow		계정 전환하기…
 Preferred language:	UserLoginWindow		선호 언어:
 Name	PackageListView		이름
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		인증 또는 보안 오류입니다. 비밀번호가 올바른지 확인하기 위해 로그아웃 후 다시 로그인을 시도하는 것과 함께 가장 최신 사용자 약관에 동의하였는지 확인이 필요합니다.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot은 HaikuDepotServer라는 서버 요소와 통신합니다. 다음은 사용자 '%Nickname%'이 %AgreedToTimestamp%에 HaikuDepotServer 서비스를 사용하기 위하여 동의한 사용자 약관입니다.
 don't activate package %source%	PackageProblem	don't change '%source%	%source% 패키지 활성화 하지 않기
 Rate %Package%	RatePackageWindow		%Package% 평가
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		패키지 관리자를 초기화하는 데 오류가 발생하였습니다: %message%
-Quit HaikuDepot	App		HaikuDepot 종료
 Category	FilterView		카테고리
 A response to the captcha question must be provided.	UserLoginWindow		Captcha 질문에 대한 대답을 반드시 하여야 합니다.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		예상치 못한 오류 '%Message%'이(가) '%Property%'에 대하여 발생하였습니다
@@ -37,7 +34,6 @@ No changelog available.	PackageInfoView		변경이력 정보 없음.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		동의하여야 하는 현재 사용자 약관입니다.
 Cancel	PackageProblem		취소
 Version	PackageListView		버전
-No, quit HaikuDepot	App		아니오, HaikuDepot을 종료합니다
 Not logged in	MainWindow		로그인 되지 않음
 Featured packages	FeaturedPackagesView		추천 패키지
 Available	PackageListView		사용 가능
@@ -79,7 +75,6 @@ Language	RatePackageWindow		언어
 Status	PackageListView		상태
 Network transport error	ServerHelper		네트워크 전송 오류
 Cancel	PackageResult		취소
-Uninstall %PackageTitle%	PackageManager		%PackageTitle% 제거
 Retry	PackageProblem		재시도
 Update	RatePackageWindow		업데이트
 Language	UserLoginWindow		언어
@@ -106,7 +101,6 @@ Captcha error	UserLoginWindow		Captcha 오류
 Manage repositories…	MainWindow		저장소 관리…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		제시된 별명이 이미 사용 중입니다. 다른 별명을 선택하십시오.
 OK	UserUsageConditions		확인
-Open %DeskbarLink%	PackageManager		%DeskbarLink% 열기
 Input validation	UserLoginWindow		입력 확인
 Log in…	MainWindow		로그인…
 Client version too old	ServerHelper		클라이언트 버전이 너무 오래되었습니다
@@ -115,7 +109,6 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		모든 저장소
 Repository update error	LocalRepositoryUpdateProcess		저장소 업데이트 오류
 Network error	ServerHelper		네트워크 오류
-HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		저장소 새로고침 중 오류가 발생했습니다: %error%
 User Created	UserLoginWindow		사용자 생성됨
 Check for updates…	MainWindow		업데이트 확인…
@@ -123,7 +116,6 @@ Uninstalled	PackageListView		제거됨
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		사용자 약관에 동의합니다
 Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" 설치 중
 OK	App		확인
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot은 HaikuDepotServer라는 서버 요소와 통신합니다. 다음은 HaikuDepotServer 서비스를 사용하기 위한 사용자 약관의 최신 버전입니다.
 Fatal error	UninstallPackageAction		치명적인 오류
 Develop packages	MainWindow		패키지 개발
 Starting the package daemon failed:\n\n%Error%	App		데몬을 시작할 수 없습니다:\n\n%Error%
@@ -144,11 +136,10 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		로컬
 Package changes	PackageResult	Window title	패키지 변경
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		이 컴퓨터에서 HaikuDepotServer로 익명의 사용 정보를 보내는 것을 허용하시겠습니까? 나중에 \"설정\"창에서 설정을 바꿀 수 있습니다.
-Installed packages	MainWindow		설치된 패키지
 User rating	RatePackageWindow		사용자 평가
+Installed packages	MainWindow		설치된 패키지
 Date	PackageListView		일자
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		비밀버호틑 최소 %MinPasswordLength%글자 이상이어야 합니다. 최소 %MinPasswordUppercaseChar%개의 대문자와 %MinPasswordDigitsChar%개의 숫자를 포함하여야 합니다.
-Error	App		오류
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		사용자 약관을 받아오는 데 오류가 발생했습니다. 로그를 통해 상세 사항을 확인하고 다시 시도하십시오.\n로그를 보는 방법에 대한 정보는 Haiku 사용자 설명서의 HaikuDepot 항목에서 볼 수 있습니다.
 There was a puzzling response from the web service.	UserLoginWindow		웹 서비스로부터 인식할 수 없는 응답을 받았습니다.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		\"%DeskbarLink%\" 여는 중
@@ -156,7 +147,6 @@ Your rating was uploaded successfully. You can update or remove it at the HaikuD
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		새 사용자를 생성하는데 필요한 Captcha 이미지를 받아오기 위해 서버와 통신할 수 없습니다.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		제시도니 Captcha 응답이 올바르지 않습니다. 새 Captcha가 생성됩니다; 다시 시도하십시오.
 -	no package publish		-
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot은 작동을 위해 패키지 데몬을 필요로 하지만 현재 실행 중이 아닙니다.\n지금 데몬을 시작하시겠습니까?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		비밀번호는 최소 숫자 2개와 대문자 1개를 포함한 8글자 이상이어야합니다.
 Contents	PackageInfoView		내용
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		HaikuDepotServer와 익명의 사용 정보 공유
@@ -169,8 +159,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		안정성
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		비밀번호를 잘못 입력하는 경우를 줄이기 위하여 재입력이 필요합니다.
 Cancel	SettingsWindow		취소
-Inactive	PackageListView		비활성
 Cancel	RatePackageWindow		취소
+Inactive	PackageListView		비활성
 Nickname:	UserLoginWindow		별명:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		저장소 메타데이터 동기화 중
 OK	MainWindow		확인
@@ -186,7 +176,6 @@ Success	UserLoginWindow		성공
 Settings	SettingsWindow		설정
 Login issue	MainWindow		로그인 문제
 Your rating:	RatePackageWindow		당신의 평가:
-HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		HaikuDepot이 종료 전에 진행 중인 작업을 멈추거나 완료하는 중입니다.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		HaikuDepotServer 시스템에 사용자 %Nickname%을 성공적으로 생성하였습니다. 웹 인터페이스를 통하여 사용자 상세 정보를 관리할 수 있습니다. 이제 새 사용자로 로그인 됩니다.
 Repositories	MainWindow		저장소
 This rating is visible to other users	RatePackageWindow		이 평가는 다른 사용자들에게도 보여집니다

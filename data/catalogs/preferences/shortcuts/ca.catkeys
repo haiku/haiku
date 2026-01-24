@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Shortcuts	3834857117
+1	catalan; valencian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*Ratolí amunt
 Application	ShortcutsWindow		Aplicació
 Option	ShortcutsSpec	Name for modifier on keyboard	Opció
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Torna al desat
 Don't save	ShortcutsWindow		No ho desis
 *MouseDown	ShortcutsWindow		*Ratolí a baix
 *Beep	ShortcutsWindow		*Timbre
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Dreceres no ha pogut desar el joc de claus.
 Save	ShortcutsWindow		Desa
 Either	ShortcutsSpec		Qualsevol
 Oh no	ShortcutsWindow		Oh no!
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Cancel·la
 *MoveMouse +20 +0	ShortcutsWindow		*Mou el ratolí +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Esquerra
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Dreceres no ha pogut analitzar el fitxer de joc de claus!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Dreceres no ha pogut desar el fitxer de joc de claus!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Insereix Text \"el vostre text aquí \"
 Remove selected shortcut	ShortcutsWindow		Suprimeix la drecera seleccionada
 Error, NULL state description?	ShortcutsSpec		Error, descripció de l’estat NULL?

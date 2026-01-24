@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Pairs	818003250
+1	turkish	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Eşler
 Quit	PairsWindow		Çık
 Medium	PairsWindow		Orta
@@ -6,7 +6,6 @@ Game	PairsWindow		Oyun
 Expert (8x8)	PairsWindow		Uzman (8 × 8)
 New	PairsWindow		Yeni
 OK	Pairs		Tamam
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Vektör simge sayısı yetersiz; en az %zu tane gerekli, halbuki %zu tane var.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Oyunu {0, plural, other{# tıkta}} bitirdiniz.\n
 Small	PairsWindow		Küçük
 Size	PairsWindow		Boyut

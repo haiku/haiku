@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	3427646542
+1	japanese	x-vnd.haiku-icon_o_matic	2302019526
 None	Icon-O-Matic-Properties		解除
 Clean up path	Icon-O-Matic-CleanUpPathCmd		パスのクリーンアップ
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -101,7 +101,6 @@ Add shape with path	Icon-O-Matic-Menu-Shape		パス付きシェイプの追加
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	失敗
 Translation X	Icon-O-Matic-PropertyNames		X軸移動
 Multi-paste properties	Icon-O-Matic-Properties		プロパティの複数貼り付け
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic はロードされた SVG のすべてのデータを解釈できなかったかもしれません。元のファイルを上書きすると、この情報は失われるでしょう。
 Remove	Icon-O-Matic-TransformersList		削除
 Rotate indices backwards	Icon-O-Matic-PathsList		インデックスの逆回転
 Overwrite	Icon-O-Matic-SVGExport		上書き

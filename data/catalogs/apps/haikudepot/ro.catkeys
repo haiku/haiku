@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	873730785
+1	romanian	x-vnd.Haiku-HaikuDepot	2935349206
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
@@ -6,7 +6,6 @@ An unexpected error has been sent from the server [%li]	ServerHelper		O eroare n
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Se aduce istoricul de modificări pentru pachet
 Create account	UserLoginWindow		Creează un cont
 Agree	ToLatestUserUsageConditionsWindow		De acord
-Install %PackageTitle%	PackageManager		Instalează %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Răspunsul la captcha nu a fost corect.
 Rate package…	PackageInfoView		Evaluare pachet…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		V-ați autentificat cu succes ca utilizatorul %Nickname%.
@@ -21,11 +20,9 @@ Switch account…	MainWindow		Comutare cont…
 Preferred language:	UserLoginWindow		Limbă preferată:
 Name	PackageListView		Nume
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problemă de autorizare sau securitate. Deautentificați-vă și autentificați-vă din nou pentru a verifica dacă parola este corectă și, de asemenea, dacă ați fost de acord cu cele mai recente condiții de utilizare.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot comunică cu o componentă de server numită HaikuDepotServer. Acestea sunt condițiile de utilizare cu care utilizatorul „%Nickname%” a fost de acord la %AgreedToTimestamp% în legătură cu utilizarea serviciului HaikuDepotServer.
 don't activate package %source%	PackageProblem	don't change '%source%	nu activa pachetul %source%
 Rate %Package%	RatePackageWindow		Evaluează %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		A apărut o eroare la inițializarea managerului de pachete: %message%
-Quit HaikuDepot	App		Ieșire din HaikuDepot
 Category	FilterView		Categorie
 A response to the captcha question must be provided.	UserLoginWindow		Trebuie furnizat un răspuns la întrebarea captcha.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		A apărut o eroare neașteptată „%Message%” cu proprietatea „%Property%”
@@ -37,7 +34,6 @@ No changelog available.	PackageInfoView		Nu există istoric de modificări dispo
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Condițiile actuale de utilizare au fost agreate.
 Cancel	PackageProblem		Anulează
 Version	PackageListView		Versiune
-No, quit HaikuDepot	App		Nu, ieși din HaikuDepot
 Not logged in	MainWindow		Nu sunteți autentificat
 Featured packages	FeaturedPackagesView		Pachete recomandate
 Available	PackageListView		Disponibil
@@ -81,7 +77,6 @@ Language	RatePackageWindow		Limbă
 Status	PackageListView		Stare
 Network transport error	ServerHelper		Eroare de transport în rețea
 Cancel	PackageResult		Anulează
-Uninstall %PackageTitle%	PackageManager		Dezinstalează %PackageTitle%
 Retry	PackageProblem		Reincearcă
 Update	RatePackageWindow		Actualizare
 Language	UserLoginWindow		Limbă
@@ -108,7 +103,6 @@ Captcha error	UserLoginWindow		Eroare de captcha
 Manage repositories…	MainWindow		Gestionare depozite...
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Pseudonimul trebuie să fie unic, dar pseudonimul furnizat este deja luat. Alegeți un alt pseudonim.
 OK	UserUsageConditions		OK
-Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 Input validation	UserLoginWindow		Validarea intrării
 Log in…	MainWindow		Autentificare…
 Client version too old	ServerHelper		Versiunea clientului este prea veche
@@ -117,7 +111,6 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Toate depozitele
 Repository update error	LocalRepositoryUpdateProcess		Eroare de actualizare a depozitului
 Network error	ServerHelper		Eroare de rețea
-HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare la reîmprospătarea depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
 Check for updates…	MainWindow		Verifică pentru actualizări…
@@ -125,7 +118,6 @@ Uninstalled	PackageListView		Dezinstalat
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Sunt de acord cu condițiile de utilizare
 Installing \"%PackageName%\"	InstallPackageProcess		Se instalează \„%PackageName%\”
 OK	App		OK
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot comunică cu o componentă de server numită HaikuDepotServer. Acestea sunt cele mai recente condiții de utilizare pentru utilizarea serviciului HaikuDepotServer.
 Fatal error	UninstallPackageAction		Eroare fatală
 Develop packages	MainWindow		Pachete de dezvoltare
 Starting the package daemon failed:\n\n%Error%	App		Pornirea serviciului de pachete a eșuat:\n\n%Error%
@@ -146,11 +138,10 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Local
 Package changes	PackageResult	Window title	Modificări pachet
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Ar fi acceptabil să trimiteți date de utilizare anonime la sistemul HaikuDepotServer de pe acest calculator? Puteți să modifica preferința în fereastra \„Configurări\” mai târziu.
-Installed packages	MainWindow		Pachete instalate
 User rating	RatePackageWindow		Evaluarea utilizatorului
+Installed packages	MainWindow		Pachete instalate
 Date	PackageListView		Data
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Parola trebuie să aibă minimum %MinPasswordLength% caractere. %MinPasswordUppercaseChar% caractere trebuie să fie majuscule, iar %MinPasswordDigitsChar% caractere trebuie să fie cifre.
-Error	App		Eroare
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		A apărut o eroare la descărcarea condițiilor de utilizare. Verificați jurnalul pentru detalii și încercați din nou.\nInformații despre cum să vizualizați jurnalele sunt disponibile în secțiunea HaikuDepot din Ghidul utilizatorului Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		A existat un răspuns nedumerit din partea serviciului web.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Se deschide \„%DeskbarLink%\”
@@ -158,7 +149,6 @@ Your rating was uploaded successfully. You can update or remove it at the HaikuD
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nu a fost posibil să comunicați cu serverul pentru a obține o imaginea captcha necesară pentru a crea un nou utilizator.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Răspunsul furnizat la captcha nu este corect. Se va genera un nou captcha; încercați din nou.
 -	no package publish		-
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot are nevoie de serviciul de pachete pentru a functiona și pare că nu rulează.\nDoriți să îl porniți acum?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Parola trebuie să aibă cel puțin opt caractere, să aibă cel puțin două cifre și un caracter cu majuscule.
 Contents	PackageInfoView		Conținut
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Partajați date de utilizare anonime cu HaikuDepotServer
@@ -172,8 +162,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitate
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Parola trebuie repetată pentru a reduce șansa introducerii incorecte a parolei.
 Cancel	SettingsWindow		Anulează
-Inactive	PackageListView		Inactive
 Cancel	RatePackageWindow		Anulează
+Inactive	PackageListView		Inactive
 Nickname:	UserLoginWindow		Pseudonim:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Se sincronizează metadate despre depozite
 OK	MainWindow		OK
@@ -189,7 +179,6 @@ Success	UserLoginWindow		Succes
 Settings	SettingsWindow		Configurări
 Login issue	MainWindow		Problemă de autentificare
 Your rating:	RatePackageWindow		Evaluare:
-HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		HaikuDepot oprește sau finalizează operațiunile care rulează înainte de a ieși.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Utilizatorul %Nickname% a fost creat cu succes în sistemul HaikuDepotServer. Puteți administra detaliile utilizatorului utilizând interfața web. Acum sunteți conectat ca nou utilizator.
 Repositories	MainWindow		Depozite
 This rating is visible to other users	RatePackageWindow		Această evaluare este vizibilă pentru alți utilizatori

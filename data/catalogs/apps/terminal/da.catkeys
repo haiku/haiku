@@ -1,7 +1,6 @@
-1	danish	x-vnd.Haiku-Terminal	185459086
+1	danish	x-vnd.Haiku-Terminal	2510711400
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke køre skallen. Beklager.
 Text encoding	Terminal TermWindow		Tekstkodning
 OK	Terminal SetTitleWindow		O.k.
 Edit	Terminal TermWindow		Redigér
@@ -34,7 +33,6 @@ Cancel	Terminal TermView		Afbryd
 Defaults	Terminal PrefWindow		Forvalg
 black	Terminal ThemeView		sort
 Revert	Terminal PrefWindow		Omvendt
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Brug markering
 Find next	Terminal TermWindow		Find næste
 Copy link location	Terminal TermView		Kopiér lænkeplacering
@@ -54,12 +52,10 @@ Really close?	Terminal TermWindow		Er du sikker på, du vil lukke?
 Font size	Terminal TermWindow		Skriftstørrelse
 OK	Terminal TermApp		O.k.
 ANSI bright blue color	Terminal ThemeView		ANSI intens blå farve
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Processen \"%1\" kører stadig.\nHvis du lukker terminalen, vil processen blive dræbt.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Ukendt tilvalg \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Fanebladstitel:
 Text not found.	Terminal TermWindow		Tekst ikke fundet.
 Match word	Terminal FindWindow		Match ord
-New Terminal	Terminal TermWindow		Ny terminal
 Find failed	Terminal TermWindow		Søgning mislykkedes
 Quit	Terminal TermWindow		Afslut
 Match case	Terminal FindWindow		Skel mellem store og små bogstaver
@@ -84,8 +80,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI intens cyan farve
 Tab title:	Terminal TermWindow		Fanebladstitel:
 Window title:	Terminal TermWindow		Vinduestitel:
 ANSI white color	Terminal ThemeView		ANSI hvid farve
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Skift terminal
 Window size:	Terminal AppearancePrefView		Vinduesstørrelse:
-Switch Terminals	Terminal TermWindow		Skift terminal
 Decrease	Terminal TermWindow		Formindsk
 Settings…	Terminal TermWindow		Indstillinger…
 Cancel	Terminal SetTitleWindow		Afbryd
@@ -118,7 +114,6 @@ Find…	Terminal TermWindow		Søg…
 No search string was entered.	Terminal TermWindow		Ingen søgestreng blev indtastet.
 Move here	Terminal TermView		Flyt hertil
 Abort	Terminal Shell		Afbryd
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Følgende processer kører stadig:\n\n\t%1\n\nHvis du lukker terminalen, vil processerne blive dræbt.
 Set window title	Terminal TermWindow		Sæt vinduestitel
 ANSI red color	Terminal ThemeView		ANSI rød farve
 Increase	Terminal TermWindow		Forøg

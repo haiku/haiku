@@ -1,7 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-Terminal	686383766
+1	catalan; valencian	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Tanca altres pestanyes
 Insert path	Terminal TermView		Insereix un camí
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		El terminal no ha pogut obrir l'intèrpret d'ordres. Disculpeu.
 Text encoding	Terminal TermWindow		Codificació del text
 Colors	Terminal ThemeWindow		Colors
 OK	Terminal SetTitleWindow		D'acord
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Cancel·la
 Defaults	Terminal PrefWindow		Valors predeterminats
 black	Terminal ThemeView		negre
 Revert	Terminal PrefWindow		Reverteix
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Usa la selecció
 Find next	Terminal TermWindow		Troba'n el següent
 Copy link location	Terminal TermView		Copia la ubicació de l'enllaç
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Segur que en voleu sortir?
 Font size	Terminal TermWindow		Mida de la lletra
 OK	Terminal TermApp		D'acord
 ANSI bright blue color	Terminal ThemeView		Color blau brillant ANSI
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		El procés \"%1\" encara s'executa.\nTancar el Terminal matarà el procés.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opció no reconeguda \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Títol de la pestanya
 Text not found.	Terminal TermWindow		No s'ha trobat el text.
 Match word	Terminal FindWindow		Coincidència de paraules
-New Terminal	Terminal TermWindow		Obre un terminal
 Find failed	Terminal TermWindow		Ha fallat la cerca
 Quit	Terminal TermWindow		Surt
 Match case	Terminal FindWindow		Coincidència de majúscules i minúscules
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		Color cian brillant ANSI
 Tab title:	Terminal TermWindow		Títol de la pestanya:
 Window title:	Terminal TermWindow		Títol de la finestra:
 ANSI white color	Terminal ThemeView		Color blanc ANSI
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Intercanvia els Terminals
 Window size:	Terminal AppearancePrefView		Mida de la finestra:
-Switch Terminals	Terminal TermWindow		Intercanvia els Terminals
 Decrease	Terminal TermWindow		Redueix
 Settings…	Terminal TermWindow		Paràmetres…
 Cancel	Terminal SetTitleWindow		Cancel·la
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Troba...
 No search string was entered.	Terminal TermWindow		No s'ha proporcionat cap cadena de cerca.
 Move here	Terminal TermView		Mou aquí
 Abort	Terminal Shell		Avorta
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Els processos següents encara s'executen:\n\n\t%1\n\nSi tanqueu el Terminal, els processos es mataran.
 Set window title	Terminal TermWindow		Establiu el títol de la finestra
 ANSI red color	Terminal ThemeView		Color vermell ANSI
 Increase	Terminal TermWindow		Augmenta

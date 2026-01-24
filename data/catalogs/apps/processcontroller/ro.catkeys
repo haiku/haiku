@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ProcessController	415082887
+1	romanian	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Eroare la salvarea fișierului
 Display priority	ProcessController		Prioritate de afișaj
 That's no Fun!	ProcessController		Nu este distractiv!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Procesorul %d
 Live in the Deskbar	ProcessController		Live în deskbar
 Kill this team!	ProcessController		Termină această echipă!
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Puteți rula ProcessController într-o fereastră sau să îl instalați în deskbar.
 Real-time priority	ProcessController		Prioritate în timp real
 Custom priority	ProcessController		Prioritate personalizată
 Debug this thread!	ProcessController		Depanează acest thread!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Utilizarea memoriei
 Ok!	ProcessController		Ok!
 Normal priority	ProcessController		Prioritate normală
 Restart Deskbar	ProcessController		Repornire deskbar
-About ProcessController…	ProcessController		Despre ProcessController…
 Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
 Please confirm	ProcessController		Confirmați
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Resurse de sistem și cache-uri�
 Damned!	ProcessController		Aiurea!
 New Terminal	ProcessController		Terminal nou
 Power saving	ProcessController		Economisire de energie
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController este instalat deja în deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Acesta este ultimul procesor activ…\nNu îl puteți opri!
 This thread is already gone…	ProcessController		Acest thread a dispărut deja…
 Run in window	ProcessController		Rulează în fereastră

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	3834857117
+1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplicativo
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Reverter para salvo
 Don't save	ShortcutsWindow		Não salvar
 *MouseDown	ShortcutsWindow		*Mouse para Baixo
 *Beep	ShortcutsWindow		*Alarme sonoro
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pode salvar sua combinação de teclas
 Save	ShortcutsWindow		Salvar
 Either	ShortcutsSpec		Qualquer
 Oh no	ShortcutsWindow		Oh não!
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Cancelar
 *MoveMouse +20 +0	ShortcutsWindow		*Mover Mouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Esquerda
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		O Atalhos não pode analisar seu arquivo de combinação de teclas!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		O Atalhos não pode salvar seu arquivo combinação de teclas!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Seu Texto Aqui\"
 Remove selected shortcut	ShortcutsWindow		Remover atalho selecionado
 Error, NULL state description?	ShortcutsSpec		Erro, descrição de estado NULL?

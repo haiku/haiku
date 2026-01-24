@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	1275638063
+1	romanian	x-vnd.haiku-icon_o_matic	150011047
 None	Icon-O-Matic-Properties		Nespecificat
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Curăță calea
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -98,7 +98,6 @@ Add shape with path	Icon-O-Matic-Menu-Shape		Adaugă o formă cu cale
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Dezamăgitor
 Translation X	Icon-O-Matic-PropertyNames		Traducerea X
 Multi-paste properties	Icon-O-Matic-Properties		Proprietăți de multi-lipire
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Este posibil ca Icon-O-Matic să nu fi interpretat toate datele din SVG când a fost încărcat. Prin suprascrierea fișierului original, aceste informații ar fi acum pierdute.
 Remove	Icon-O-Matic-TransformersList		Elimină
 Rotate indices backwards	Icon-O-Matic-PathsList		Rotește indicii înapoi
 Overwrite	Icon-O-Matic-SVGExport		Suprascrie

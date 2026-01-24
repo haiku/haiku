@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Pairs	818003250
+1	romanian	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Pairs
 Quit	PairsWindow		Ieșire
 Medium	PairsWindow		Mediu
@@ -6,7 +6,6 @@ Game	PairsWindow		Joc
 Expert (8x8)	PairsWindow		Expert (8x8)
 New	PairsWindow		Nou
 OK	Pairs		OK
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs nu a găsit suficiente pictograme vectoriale pentru a începe; are nevoie de cel putin %zu, s-au găsit %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ați finalizat jocul în {0, plural, one{# click} other{# clicks}}.\n
 Small	PairsWindow		Mic
 Size	PairsWindow		Dimensiune

@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-MediaPlayer	1732323378
+1	korean	x-vnd.Haiku-MediaPlayer	1545856738
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		항목을 쓰레기통에 버리기
 Close	MediaPlayer-PlaylistWindow		닫기
 Volume of background clips	MediaPlayer-SettingsWindow		백그라운드 클립의 음량
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		닫기
 Save error	MediaPlayer-PlaylistWindow		저장 오류
 Attributes	MediaPlayer-Main		속성
 Bottom of screen	MediaPlayer-SettingsWindow		화면 아래
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 설정
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		잘못된 URL이 삽입되었습니다!
 Aspect ratio	MediaPlayer-Main		종횡비

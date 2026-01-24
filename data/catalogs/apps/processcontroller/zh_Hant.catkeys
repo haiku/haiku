@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ProcessController	415082887
+1	english	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		儲存檔案時發生錯誤
 Display priority	ProcessController		顯示優先權
 That's no Fun!	ProcessController		那不好玩！
@@ -8,7 +8,6 @@ Processor %d	ProcessController		處理器 %d
 Live in the Deskbar	ProcessController		于Deskbar上實時顯示
 Kill this team!	ProcessController		殺掉這個team！
 OK	ProcessController		確認
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		您可以在視窗中執行 ProcessController 或將其安裝在Deskbar中。
 Real-time priority	ProcessController		即時優先權
 Custom priority	ProcessController		自訂優先級
 Debug this thread!	ProcessController		除錯此線程！
@@ -18,7 +17,6 @@ Memory usage	ProcessController		記憶體使用情況
 Ok!	ProcessController		確認！
 Normal priority	ProcessController		普通優先級
 Restart Deskbar	ProcessController		重啟Deskbar
-About ProcessController…	ProcessController		關於ProcessController…
 Usage: %s [-deskbar]\n	ProcessController		用法: %s [-deskbar]\n
 Please confirm	ProcessController		請確認
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		系統資源和快取…
 Damned!	ProcessController		該死！
 New Terminal	ProcessController		新創終端機
 Power saving	ProcessController		節電
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController 已安裝在Deskbar中。
 This is the last active processor…\nYou can't turn it off!	ProcessController		這是最後一個活躍處理器…\n您不能關閉它！
 This thread is already gone…	ProcessController		線程已故…
 Run in window	ProcessController		在視窗中運行

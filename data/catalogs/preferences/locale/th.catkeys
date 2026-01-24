@@ -1,10 +1,9 @@
-1	thai	x-vnd.Haiku-Locale	288870027
+1	thai	x-vnd.Haiku-Locale	141458709
 Medium format:	TimeFormatSettings		รูปแบบขนาดกลาง:
 Negative:	TimeFormatSettings		ปฏิเสธ:
 Language	Locale Preflet Window		ภาษา
 Short format:	TimeFormatSettings		รูปแบบสั้น:
 24 hour	TimeFormatSettings		24 ชั่วโมง
-Locale	Locale Preflet Window		สถานที่
 Time	TimeFormatSettings		เวลา
 Defaults	Locale Preflet Window		ค่าเริ่มต้น
 Locale	System name		สถานที่
@@ -13,7 +12,6 @@ OK	Locale Preflet Window		ตกลง
 Long format:	TimeFormatSettings		รูปแบบยาว:
 Numbers	TimeFormatSettings		ตัวเลข
 Available languages	Locale Preflet Window		ภาษาที่ใช้ได้
-Locale	Locale Preflet		สถานที่
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		ไม่พบภาษาที่มี! คุณไม่สามารถใช้ preflet นี้ได้!
 Formatting	Locale Preflet Window		รูปแบบ
 Use month/day-names from preferred language	TimeFormatSettings		ใช้ชื่อเดือน/วันจากภาษาที่ต้องการ

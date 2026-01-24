@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	2225233929
+1	friulian	x-vnd.Haiku-WebPositive	2402977561
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 Copy	Console Window		Copie
@@ -63,7 +63,6 @@ WebPositive	System name		WebPositive
 Old name: %s	BookmarkBar		Non vecjo: %s
 Expiration	Cookie Manager		Scjadince
 Reload	WebPositive Window		Torne cjarie
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La tô CPU e je masse vecje e no supuarte lis estensions SSE2, cence di chês WebPositive nol pues zirâ. O conseìn di instalâ NetSurf al so puest.
 Download finished	Download Window		Discjariament completât
 Cookie manager	WebPositive Window		Gjestôr dai Cookie
 Username:	Authentication Panel		Non utent:
@@ -118,7 +117,6 @@ Remove	Download Window		Gjave
 Close tab	WebPositive Window		Siere schede
 About	WebPositive Window		Informazions
 Continue downloads	WebPositive		Ripie i discjariaments
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Al è ancjemò in pîts cualchi discjariament, vûstu pardabon lâ fûr di WebPositive cumò?
 Proxy server requires authentication	Settings Window		Il servidôr proxy al domande autenticazion
 Cancel	Settings Window		Anule
 Reset size	WebPositive Window		Ristabilìs dimensions
@@ -142,7 +140,6 @@ Next	WebPositive Window		Prossim
 Bookmark error	WebPositive Window		Erôr di segnelibri
 OK	WebPositive Window		Va ben
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% di %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Salve pagjine come…
 Zoom text only	WebPositive Window		Ingrandìs dome il test
 Page source error	WebPositive Window		Erôr sorzint pagjine

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	520971408
+1	japanese	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱に捨てる
 Close	MediaPlayer-PlaylistWindow		閉じる
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		閉じる
 Save error	MediaPlayer-PlaylistWindow		保存エラー
 Attributes	MediaPlayer-Main		属性
 Bottom of screen	MediaPlayer-SettingsWindow		画面の下側
-MediaPlayer settings	MediaPlayer-SettingsWindow		メディアプレーヤー設定
 Copyright	MediaPlayer-InfoWin		著作権
 Invalid URL inserted!	MediaPlayer-NetworkStream		無効な URL が書き込まれました!
 Aspect ratio	MediaPlayer-Main		アスペクト比

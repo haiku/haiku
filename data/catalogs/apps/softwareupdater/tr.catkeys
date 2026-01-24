@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-softwareupdater	369324613
+1	turkish	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Güncellenen sürüm:
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		{0, plural, other{# güncellenmiş paketi}} kurmak için buraya tıklayın.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Kaldırılacak paketler
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Güncellemeler 
 Packages are being updated	UpdateManager		Paketler güncelleniyor
 Cancel	SoftwareUpdaterWindow		Vazgeç
 Don't quit	SoftwareUpdaterWindow		Çıkma
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Yazılım Güncelleyicisi’ni çalıştırmak için buraya tıklayın. Bazı güncellemeler bir sorun çözümünün seçilmesini gerektirecektir.
 Checking for updates	SoftwareUpdaterWindow		Güncellemeler denetleniyor
 Updates completed	UpdateManager		Güncellemeler tamamlandı
 Reboot	SoftwareUpdaterWindow		Yeniden başlat

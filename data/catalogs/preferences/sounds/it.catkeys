@@ -1,15 +1,12 @@
-1	italian	x-vnd.Haiku-Sounds	2694258450
+1	italian	x-vnd.Haiku-Sounds	762968133
 Select	SoundFilePanel		Seleziona
 Sounds	System name		Suoni
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Suoni\n  Realizzato da :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Da un lavoro originale di Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
-No such file or directory	HEventList		File o cartella inesistente
 Other…	HWindow		Altro…
-OK	SoundsHApp		OK
 Sound file:	HWindow		File audio:
 <none>	HEventList		<nessuno>
 Select a sound file	SoundFilePanel		Seleziona un file audio
-About Sounds	SoundsHApp		Informazioni su Suoni
 OK	HEventList		OK
 Sound	HEventList		Suono
 Event	HEventList		Evento
 <none>	HWindow		<nessuno>
+No such file or directory	HEventList		File o cartella inesistente

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PowerStatus	1104524835
+1	english	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		在窗口中运行
 Extended battery info	PowerStatus		附加电池信息
 Show status icon	PowerStatus		显示状态图标
@@ -16,7 +16,6 @@ Battery low	PowerStatus		电池电量低
 Model number: 	PowerStatus		型号：
 Battery unused	PowerStatus		未使用电池
 Type: 	PowerStatus		输入：
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		您可以在窗口中运行 PowerStatus 或将其安装到桌面栏。
 Damaged or missing battery	PowerStatus		电池损坏或缺失
  mAh	PowerStatus		 毫安时
 Battery discharging	PowerStatus		电池供电
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		编号：
 Battery critical	PowerStatus		电池电量严重不足
 Capacity: 	PowerStatus		容量：
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		未检测到支持的电池。PowerStatus 无法在您的系统上使用。
 Show percent	PowerStatus		显示百分比
 Capacity granularity 1: 	PowerStatus		容量粒度1：
 The battery level is getting low, please plug in the device.	PowerStatus		电池剩余电量不足，请连接充电电源。

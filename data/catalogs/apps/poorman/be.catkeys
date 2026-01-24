@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PoorMan	3296382959
+1	belarusian	x-vnd.Haiku-PoorMan	4134958467
 Select web folder	PoorMan		Выбраць выб-каталог
 Console logging	PoorMan		Пратакол на кансоль
 Create Log File	PoorMan		Стварыць файл пратаколу
@@ -6,9 +6,7 @@ File logging	PoorMan		Пратакаліраванне файлаў
 Website options	PoorMan		Опцыі вэб-сайта
 Log to file	PoorMan		Пратакол ў файле
 Shutting down.	PoorMan		Выключэнне.
-Error Dir	PoorMan		Каталог Памылак
 Web folder:	PoorMan		Вэб-каталог:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Калі ласка, выберыце каталог, які трэба апублікаваць.\n\nPoorMan можа стварыць для вас стандартны каталог \"public_html\" у хатнім каталозе.\nАбо вы можаце самі выбраць пажаданы каталог.
 Log To Console	PoorMan		Лог у Кансоль
 File Name	PoorMan		Імя Файла
 Starting up... 	PoorMan		Загрузка... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Пераходы: %lu
 Hits: 0	PoorMan		Пераходы: 0
 Shutting down.\n	PoorMan		Выключэнне.\n
 Select all	PoorMan		Выбраць усё
-Error Server	PoorMan		Сервер Памылак
 Send file listing if there's no start page	PoorMan		Адпраўляць спісы файлаў, калі стартавая старонка не існуе
-Create PoorMan log	PoorMan		Стварыць лог PoorMan
 Max. simultaneous connections:	PoorMan		Макс. колькасць адначасовых спалучэнняў:
 Done	PoorMan		Гатова
 Site	PoorMan		Сайт
@@ -46,7 +42,6 @@ Clear console log	PoorMan		Ачысціць лог кансолі
 Run server	PoorMan		Запусціць сервер
 Create	PoorMan		Стварыць
 done.\n	PoorMan		гатова.\n
-PoorMan settings	PoorMan		Наладкі PoorMan
 Console Logging	PoorMan		Пратакаліраванне Кансолі
 Clear log file	PoorMan		Ачысціць лог-файл
 Save log console selection	PoorMan		Захоўваць выдзяленні кансолі ў лог

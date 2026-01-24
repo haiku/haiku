@@ -1,7 +1,6 @@
-1	finnish	x-vnd.Haiku-Terminal	686383766
+1	finnish	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Sulje muut välilehdet
 Insert path	Terminal TermView		Lisää polku
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Komentotulkin käynnistäminen Pääteikkunassa epäonnistui.
 Text encoding	Terminal TermWindow		Tekstikoodaus
 Colors	Terminal ThemeWindow		Värit
 OK	Terminal SetTitleWindow		Valmis
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Peru
 Defaults	Terminal PrefWindow		Oletukset
 black	Terminal ThemeView		musta
 Revert	Terminal PrefWindow		Palauta
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Pääteikkuna
 Use selection	Terminal FindWindow		Käyttövalinta
 Find next	Terminal TermWindow		Löydä seuraava
 Copy link location	Terminal TermView		Kopioi linkkisijainti
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Suljetaanko todella?
 Font size	Terminal TermWindow		Kirjasinkoko
 OK	Terminal TermApp		Valmis
 ANSI bright blue color	Terminal ThemeView		ANSI-vaaleansininen väri
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet Pääteikkunan, prosessi tapetaan.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Tunnistamaton valitsin ”%s”\n
 Tab title:	Terminal AppearancePrefView		Välilehtiotsikko:
 Text not found.	Terminal TermWindow		Tekstiä ei löydy.
 Match word	Terminal FindWindow		Täsmäävä sana
-New Terminal	Terminal TermWindow		Uusi Pääteikkuna
 Find failed	Terminal TermWindow		Etsintä epäonnistui
 Quit	Terminal TermWindow		Poistu
 Match case	Terminal FindWindow		Kirjainkoosta riippuva
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI-vaaleansinivihreä väri
 Tab title:	Terminal TermWindow		Välilehtiotsikko:
 Window title:	Terminal TermWindow		Ikkunaotsikko:
 ANSI white color	Terminal ThemeView		ANSI-valkoinen väri
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Vaihda pääteikkunoita
 Window size:	Terminal AppearancePrefView		Ikkunakoko:
-Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Decrease	Terminal TermWindow		Vähennä
 Settings…	Terminal TermWindow		Asetukset...
 Cancel	Terminal SetTitleWindow		Peru
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Etsi...
 No search string was entered.	Terminal TermWindow		Hakumerkkijono ei kirjoitettu.
 Move here	Terminal TermView		Siirrä tänne
 Abort	Terminal Shell		Keskeytä
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Seuraavia prosesseja suoritetaan edelleen:\n\n\t%1\n\nJos suljet Pääteikkunan, prosessit tapetaan.
 Set window title	Terminal TermWindow		Aseta ikkunaotsikko
 ANSI red color	Terminal ThemeView		ANSI-punainen väri
 Increase	Terminal TermWindow		Kasvata

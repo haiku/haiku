@@ -1,4 +1,4 @@
-1	thai	x-vnd.Be-TSKB	316181764
+1	thai	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		ซ่อน อัตโนมัติ
 Show all	WindowMenu		แสดงทั้งหมด
 Edit in Tracker…	PreferencesWindow		แก้ไขในตัวติดตาม
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		แสดงตัวจำลอง
 No windows	WindowMenu		ไม่มีหน้าต่าง
 Show clock	Tray		แสดงนาฬิกา
 Close all	WindowMenu		ปิดทั้งหมด
-Deskbar preferences	PreferencesWindow		ตั้งค่าเดสก์บาร์
 About this system	DeskbarMenu		เกี่ยวกับระบบ
 Quit application	WindowMenu		ออกจากแอปพลิเคชั่น
 Hide application names	PreferencesWindow		ซ่อนชื่อแอปพิเคชั่น
 Applications	PreferencesWindow		แอปพลิเคชั่น
 Show application expander	PreferencesWindow		แสดงตัวขยายแอปพลิเคชัน
-Deskbar preferences…	DeskbarMenu		ตั้งค่าเดสก์บาร์
 Suspend	DeskbarMenu		หยุด
 Shutdown…	DeskbarMenu		ปิด
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		ตัวอย่าง

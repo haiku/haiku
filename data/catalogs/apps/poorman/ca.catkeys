@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-PoorMan	1829050509
+1	catalan; valencian	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Seleccioneu la carpeta de xarxa
 Console logging	PoorMan		Registre de consola
 Create Log File	PoorMan		Crea un fitxer de registre
@@ -6,9 +6,7 @@ File logging	PoorMan		Registre de fitxer
 Website options	PoorMan		Opcions del lloc web
 Log to file	PoorMan		Registra-ho a fitxer
 Shutting down.	PoorMan		M'aturo.
-Error Dir	PoorMan		Error de directori
 Web folder:	PoorMan		Carpeta web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Si us plau, trieu la carpeta que vulgueu publicar a la xarxa.\n\nPodeu fer que el PoorMan creï un \"public_html\" predeterminat a la carpeta personal.\nO bé seleccioneu una de les vostres carpetes.
 Log To Console	PoorMan		Registra a la consola
 File Name	PoorMan		Nom del fitxer
 Starting up... 	PoorMan		S'inicia... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Coincidències: %lu
 Hits: 0	PoorMan		Coincidències: 0
 Shutting down.\n	PoorMan		M'aturo.\n
 Select all	PoorMan		Selecciona-ho tot
-Error Server	PoorMan		Error de servidor
 Send file listing if there's no start page	PoorMan		Envia la llista de fitxers si no hi ha cap pàgina inicial.
-Create PoorMan log	PoorMan		Crea el registre del PoorMan
 Max. simultaneous connections:	PoorMan		Màx. connexions simultànies:
 Done	PoorMan		Fet
 Site	PoorMan		Lloc
@@ -48,7 +44,6 @@ Run server	PoorMan		Executa el servidor
 Create	PoorMan		Crea
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connexió} other{# connexions}}
 done.\n	PoorMan		fet.\n
-PoorMan settings	PoorMan		Paràmetres del PoorMan
 Console Logging	PoorMan		Registre de consola
 Clear log file	PoorMan		Neteja el fitxer de registre
 Save log console selection	PoorMan		Desa la selecció de la consola de registre

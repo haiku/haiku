@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	520971408
+1	russian	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Переместить запись в корзину
 Close	MediaPlayer-PlaylistWindow		Закрыть
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Закрыть
 Save error	MediaPlayer-PlaylistWindow		Ошибка сохранения
 Attributes	MediaPlayer-Main		Атрибуты
 Bottom of screen	MediaPlayer-SettingsWindow		нижняя часть экрана
-MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки медиаплеера
 Copyright	MediaPlayer-InfoWin		Авторские права
 Invalid URL inserted!	MediaPlayer-NetworkStream		Указан неверный URL!
 Aspect ratio	MediaPlayer-Main		Соотношение сторон

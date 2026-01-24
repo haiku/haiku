@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	3980652653
+1	japanese	x-vnd.Haiku-Installer	738307934
 Performing installation.	InstallProgress		インストールを実行しています。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
 No optional packages available.	PackagesView		オプショナルパッケージはありません。
@@ -29,7 +29,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		'パーティシ
 Welcome to the Haiku Installer!\n\n	InstallerApp		Haikuインストーラーへようこそ!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		パーティションを設定するDriveSetupアプリケーションが起動できません。
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了しました。ブートセクターは'%s'へ書き込まれました。'終了'を押してインストーラーから離れるか、または別のインストールを行うために新しいボリュームを選択します。
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		インストール先は空ではありません。そこにHaikuのインストールを含む場合、上書きされてしまいます。すべてのインストール済ソフトウェアを削除するでしょう。\n\nインストール済ソフトウェアを削除せずにシステムをアップグレードしたいなら、アップデート方法に関してHaikuユーザーガイドの\"ソフトウェアの更新(SoftwareUpdater)\"アプリケーションの章を見てください。\n\nそれでもインストールを続行しますか?
 Quit DriveSetup	InstallerWindow		DriveSetup の終了
 Write boot sector	InstallerWindow		ブートセクターを書き込む
@@ -90,7 +89,6 @@ Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow
 No valid EFI system data partitions found	InstallerWindow		有効なEFIシステムデータパーティションが見つかりません
 OK	InstallProgress		OK
 Quit BootManager	InstallerWindow		ブートマネージャーを終了
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか?この場合、システムを再起動する必要があります。
 Onto:	InstallerWindow		インストール先:
 Tools	InstallerWindow		ツール
 scanning…	InstallerWindow		ディスクを検出しています...

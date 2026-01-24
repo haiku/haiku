@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	520971408
+1	german	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Schließen
 Save error	MediaPlayer-PlaylistWindow		Speichern ist fehlgeschlagen
 Attributes	MediaPlayer-Main		Attribute
 Bottom of screen	MediaPlayer-SettingsWindow		Unten im Fenster
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Eingegebene URL ungültig!
 Aspect ratio	MediaPlayer-Main		Seitenverhältnis

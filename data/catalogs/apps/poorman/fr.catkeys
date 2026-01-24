@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PoorMan	1829050509
+1	french	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Sélectionner un dossier Web
 Console logging	PoorMan		Console de journalisation
 Create Log File	PoorMan		Créer un journal
@@ -6,9 +6,7 @@ File logging	PoorMan		Fichier de journalisation
 Website options	PoorMan		Options du site web
 Log to file	PoorMan		Consigner vers le journal
 Shutting down.	PoorMan		Extinction.
-Error Dir	PoorMan		Répertoire d’erreurs
 Web folder:	PoorMan		Dossier Web :
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Veuillez choisir le dossier à publier sur le Web.\n\nVous pouvez sélectionnez le dossier de votre choix, ou laisser PoorMan\ncréer le dossier par défaut « public_html » dans votre dossier personnel.
 Log To Console	PoorMan		Consigner vers la console
 File Name	PoorMan		Nom du fichier
 Starting up... 	PoorMan		Démarrage…
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Sollicitations : %lu
 Hits: 0	PoorMan		Sollicitations : 0
 Shutting down.\n	PoorMan		Éteindre.\n
 Select all	PoorMan		Sélectionner tout
-Error Server	PoorMan		Erreur du serveur
 Send file listing if there's no start page	PoorMan		Envoyer la liste des fichiers s’il n’y a pas de page d’accueil.
-Create PoorMan log	PoorMan		Créer un journal pour PoorMan
 Max. simultaneous connections:	PoorMan		Nombre max. de connexions simultanées :
 Done	PoorMan		Fait
 Site	PoorMan		Site
@@ -48,7 +44,6 @@ Run server	PoorMan		Mettre le serveur en fonction
 Create	PoorMan		Créer
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connexion} other{# connexions}}
 done.\n	PoorMan		fait.\n
-PoorMan settings	PoorMan		Réglages de PoorMan
 Console Logging	PoorMan		Console de journalisation
 Clear log file	PoorMan		Vider le journal
 Save log console selection	PoorMan		Sauvegarder la sélection de la console de journalisation

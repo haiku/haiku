@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-TSKB	316181764
+1	slovak	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Automaticky skrývať
 Show all	WindowMenu		Zobraziť všetky
 Edit in Tracker…	PreferencesWindow		Upraviť v Trackeri…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Zobraziť replikantov
 No windows	WindowMenu		Žiadne okná
 Show clock	Tray		Zobraziť hodiny
 Close all	WindowMenu		Zatvoriť všetky
-Deskbar preferences	PreferencesWindow		Nastavenia Panelu
 About this system	DeskbarMenu		O tomto systéme
 Quit application	WindowMenu		Ukončiť aplikáciu
 Hide application names	PreferencesWindow		Skryť názvy aplikácií
 Applications	PreferencesWindow		Aplikácie
 Show application expander	PreferencesWindow		Zobraziť výsuvný zoznam aplikácií
-Deskbar preferences…	DeskbarMenu		Nastavenia Panelu…
 Suspend	DeskbarMenu		Režim spánku
 Shutdown…	DeskbarMenu		Vypnúť…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demá

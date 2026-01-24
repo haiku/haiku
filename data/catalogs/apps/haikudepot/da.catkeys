@@ -1,11 +1,10 @@
-1	danish	x-vnd.Haiku-HaikuDepot	2837468702
+1	danish	x-vnd.Haiku-HaikuDepot	3569822741
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem med at indhente brugsvilkår
 Available packages	MainWindow		Tilgængelige pakker
 It was not possible to create the new user.	UserLoginWindow		Det var ikke muligt at oprette den nye bruger.
 An unexpected error has been sent from the server [%li]	ServerHelper		En uventet fejl er blevet sendt fra serveren [%li]
 Create account	UserLoginWindow		Opret konto
 Agree	ToLatestUserUsageConditionsWindow		Enig
-Install %PackageTitle%	PackageManager		Installér %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Svaret på captcha'en var forkert.
 Rate package…	PackageInfoView		Bedøm pakke…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Det lykkedes at godkende dig som brugeren %Nickname%.
@@ -20,11 +19,9 @@ Switch account…	MainWindow		Skift konto…
 Preferred language:	UserLoginWindow		Foretrukket sprog:
 Name	PackageListView		Navn
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Godkendelse- eller sikkerhedsproblem. Log ud og log ind igen for at bekræfte din adgangskode er korrekt, og undersøg også, at du har givet samtykke til de seneste brugsvilkår.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot kommunikerer med en serverkomponent som hedder HaikuDepotServer. Dette er de brugsvilkår, brugeren '%Nickname%' gik med på ved %AgreedToTimestamp% i forhold til brugen af HaikuDepotServer-tjenesten.
 don't activate package %source%	PackageProblem	don't change '%source%	Slå ikke pakke %source% til
 Rate %Package%	RatePackageWindow		Bedøm %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Der opstod en fejl under klargøring af pakkehåndteringen: %message%
-Quit HaikuDepot	App		Afslut HaikuDepot
 Category	FilterView		Kategori
 A response to the captcha question must be provided.	UserLoginWindow		Der skal gives et svar til captcha-spørgsmålet.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Der opstod en uventet fejl '%Message%' med egenskaben '%Property%'
@@ -36,7 +33,6 @@ No changelog available.	PackageInfoView		Ingen ændringslog tilgængelig.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		De nuværende brugsvilkår er blevet godkendt.
 Cancel	PackageProblem		Afbryd
 Version	PackageListView		Udgave
-No, quit HaikuDepot	App		Nej, afslut HaikuDepot
 Not logged in	MainWindow		Ikke logget ind
 Featured packages	FeaturedPackagesView		Fremhævede pakker
 Available	PackageListView		Tilgængelig
@@ -77,7 +73,6 @@ Language	RatePackageWindow		Sprog
 Status	PackageListView		Status
 Network transport error	ServerHelper		Fejl ved netværkstransport
 Cancel	PackageResult		Afbryd
-Uninstall %PackageTitle%	PackageManager		Afinstallér %PackageTitle%
 Retry	PackageProblem		Prøv igen
 Update	RatePackageWindow		Opdatér
 Language	UserLoginWindow		Sprog
@@ -104,7 +99,6 @@ Captcha error	UserLoginWindow		Fejl ved captcha
 Manage repositories…	MainWindow		Håndtér programarkiver…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Brugernavnet skal være enestående, men det angivne brugernavn er allerede taget. Vælg et andet brugernavn.
 OK	UserUsageConditions		O.k.
-Open %DeskbarLink%	PackageManager		Åbn %DeskbarLink%
 Input validation	UserLoginWindow		Inddatavalidering
 Log in…	MainWindow		Log ind…
 Client version too old	ServerHelper		Klientudgave er for gammel
@@ -120,7 +114,6 @@ Uninstalled	PackageListView		Afinstalleret
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Jeg godkender brugsvilkårene
 Installing \"%PackageName%\"	InstallPackageProcess		Installerer \"%PackageName%\"
 OK	App		O.k.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot kommunikerer med en serverkomponent, som hedder HaikuDepotServer. Dette er de seneste brugsvilkår for brug af HaikuDepotServer-tjenesten.
 Fatal error	UninstallPackageAction		Alvorlig fejl
 Develop packages	MainWindow		Udviklingspakker
 Starting the package daemon failed:\n\n%Error%	App		Start af pakkedæmon mislykkedes:\n\n%Error%
@@ -140,11 +133,10 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokal
 Package changes	PackageResult	Window title	Pakkeændringer
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Vil det være i orden at sende anonym anvendelsesdata til HaikuDepotServer-systemet fra denne computer? Du kan ændre indstillingen i \"Indstillinger\"-vinduet senere.
-Installed packages	MainWindow		Installerede pakker
 User rating	RatePackageWindow		Brugerbedømmelse
+Installed packages	MainWindow		Installerede pakker
 Date	PackageListView		Dato
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Adgangskoden skal mindst være på %MinPasswordLength% tegn. Mindst %MinPasswordUppercaseChar% tegn skal være store bogstaver og mindst %MinPasswordDigitsChar% tegn skal være tal.
-Error	App		Fejl
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		En fejl er opstået ved indhentning af brugsvilkår. Se efter i loggen for detaljer, og prøv igen. \nOplysninger om, hvordan loggene vises, er tilgængelige i HaikuDepot-afsnittet i Haikus brugervejledning.
 There was a puzzling response from the web service.	UserLoginWindow		Der kom et gådefuldt svar fra webtjenesten.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Åbner \"%DeskbarLink%\"
@@ -152,7 +144,6 @@ Your rating was uploaded successfully. You can update or remove it at the HaikuD
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Det var ikke muligt at kommunikere med serveren, for at indhente et captcha-billede, påkrævet for at oprette en ny bruger.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Det angivne svar til captcha'en er forkert. Der genereres en ny captcha; prøv igen.
 -	no package publish		-
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot behøver pakkedæmonen for at fungere, og den ser ikke ud til at køre.\nVil du starte den nu?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Adgangskoden skal være mindst otte tegn langt, bestå af mindst to tal og et stort bogstav.
 Contents	PackageInfoView		Indhold
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Del anonyme brugsdata med HaikuDepotServer
@@ -165,8 +156,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Adgangskoden skal gentages for at formindske sandsynligheden for at indtaste adgangskoden forkert.
 Cancel	SettingsWindow		Afbryd
-Inactive	PackageListView		Inaktiv
 Cancel	RatePackageWindow		Afbryd
+Inactive	PackageListView		Inaktiv
 Nickname:	UserLoginWindow		Brugernavn:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkroniserer metadata for programarkiver
 OK	MainWindow		O.k.
@@ -182,7 +173,6 @@ Success	UserLoginWindow		Lykkedes
 Settings	SettingsWindow		Indstillinger
 Login issue	MainWindow		Problem med at logge ind
 Your rating:	RatePackageWindow		Din bedømmelse:
-HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		HaikuDepot standser eller fuldfører kørende operationer inden lukning.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Brugeren %Nickname% er blevet oprettet i HaikuDepotServer-systemet. Du kan håndtere dine brugerdetaljer ved at bruge webgrænsefladen. Du er nu logget ind som den nye bruger.
 Repositories	MainWindow		Programarkiver
 This rating is visible to other users	RatePackageWindow		Bedømmelsen er synlig for andre brugere

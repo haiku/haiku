@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-TSKB	316181764
+1	polish	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Autoukrywanie
 Show all	WindowMenu		Pokaż wszystkie
 Edit in Tracker…	PreferencesWindow		Edytuj w Trakerze…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Pokaż replikanty
 No windows	WindowMenu		Brak okien aplikacji
 Show clock	Tray		Pokaż zegar
 Close all	WindowMenu		Zamknij wszystkie
-Deskbar preferences	PreferencesWindow		Ustawienia Deskbara
 About this system	DeskbarMenu		Informacje o systemie
 Quit application	WindowMenu		Zakończ aplikację
 Hide application names	PreferencesWindow		Ukryj nazwy aplikacji
 Applications	PreferencesWindow		Aplikacje
 Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
-Deskbar preferences…	DeskbarMenu		Ustawienia Deskbara…
 Suspend	DeskbarMenu		Uśpij
 Shutdown…	DeskbarMenu		Wyłącz komputer…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema

@@ -1,7 +1,6 @@
-1	thai	x-vnd.Haiku-Terminal	3964119708
+1	thai	x-vnd.Haiku-Terminal	1994404726
 Close other tabs	Terminal TermWindow		ปิดแท็บอื่น ๆ
 Insert path	Terminal TermView		แทรกเส้นทาง
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		เทอร์มินัลไม่สามารถเริ่มเชลล์ ขอโทษ
 Text encoding	Terminal TermWindow		การเข้ารหัสข้อความ
 OK	Terminal SetTitleWindow		ตกลง
 Edit	Terminal TermWindow		แก้ไข
@@ -26,7 +25,6 @@ Page setup…	Terminal TermWindow		ตั้งค่าหน้า
 Cancel	Terminal TermView		ยกเลิก
 Defaults	Terminal PrefWindow		ค่าเริ่มต้น
 Revert	Terminal PrefWindow		เปลี่ยนกลับ
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	เทอร์มินอล
 Use selection	Terminal FindWindow		ใช้การเลือก
 Find next	Terminal TermWindow		ค้นหาถัดไป
 Copy link location	Terminal TermView		สำเนาที่ตั้งลิงค์
@@ -41,12 +39,10 @@ Custom	Terminal colors scheme		ปรับแต่ง
 Really close?	Terminal TermWindow		ปิดจริงๆหรือไม่?
 Font size	Terminal TermWindow		ขนาดตัวอักษร
 OK	Terminal TermApp		ตกลง
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		กระบวนการ \"%1\" ยังคงทำงานอยู่\nหากคุณปิดเทอร์มินอล กระบวนการจะหยุดทำงาน
 Unrecognized option \"%s\"\n	Terminal arguments parsing		ตัวเลือกที่ไม่รู้จัก \"%s\"\n
 Tab title:	Terminal AppearancePrefView		ชื่อแท็ป
 Text not found.	Terminal TermWindow		ไม่พบข้อความ
 Match word	Terminal FindWindow		คำตรงกัน
-New Terminal	Terminal TermWindow		เทอร์มินอลใหม่
 Find failed	Terminal TermWindow		ค้นหาล้มเหลว
 Quit	Terminal TermWindow		ออก
 Match case	Terminal FindWindow		กรณีตรงกัน
@@ -64,8 +60,8 @@ Shell 	Terminal TermWindow		เชลล์
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tตัวอักษร '%'\n\t%<\t-\tเริ่มหัวข้อที่จะปรากฏต่อเมื่อ\n\t\t\tข้อความที่ต้องการให้แสดงนั้นไม่ว่างเปล่า\n\t%>\t-\tเริ่มหัวข้อที่จะปรากฏต่อเมื่อข้อความที่ต้องการให้แสดง\n\t\t\tก่อนหน้านี้ %< section และอันนี้ไม่ว่างเปล่า\n\t%-\t-\tสิ้นสุด %< or %> section\n\nอักขระที่ไม่ใช่ตัวอักษรและตัวเลขใดๆระหว่าง '%' และตัวอักษรรูปแบบจะแทรกเว้นวรรคเท่านั้น\nหากข้อความที่ต้องการให้แสดงไม่ว่างเปล่า มันจะเพิ่มไปยัง %< section
 Tab title:	Terminal TermWindow		ชื่อแท็ป:
 Window title:	Terminal TermWindow		ชื่อหน้าต่าง:
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	สลับเทอร์มินอล
 Window size:	Terminal AppearancePrefView		ขนาดหน้าต่าง:
-Switch Terminals	Terminal TermWindow		สลับเทอร์มินอล
 Decrease	Terminal TermWindow		ลดลง
 Settings…	Terminal TermWindow		ตั้งค่า
 Cancel	Terminal SetTitleWindow		ยกเลิก
@@ -89,7 +85,6 @@ Find…	Terminal TermWindow		ค้นหา
 No search string was entered.	Terminal TermWindow		ไม่มีการป้อนสตริงการค้นหา
 Move here	Terminal TermView		ย้ายมาที่นี้
 Abort	Terminal Shell		ยกเลิก
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		กระบวนการต่อไปนี้ยังคงทำงานอยู่:\n\n\t%1\n\nหากคุณปิดเทอร์มินอล กระบวนการจะหยุดการทำงาน
 Set window title	Terminal TermWindow		ตั้งชื่อหน้าต่าง
 Increase	Terminal TermWindow		เพิ่มขึ้น
 OK	Terminal TermWindow		ตกลง

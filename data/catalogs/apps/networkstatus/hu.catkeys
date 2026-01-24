@@ -1,10 +1,9 @@
-1	hungarian	x-vnd.Haiku-NetworkStatus	2979204375
+1	hungarian	x-vnd.Haiku-NetworkStatus	2192330251
 IPv6 address:	NetworkStatusView		IPv6 cím:
 Quit	NetworkStatusView		Kilépés
 Unknown	NetworkStatusView		Ismeretlen
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Nem sikerült elindítani a hálózati prefletet.\n\nHiba:
 Install in Deskbar	NetworkStatus		Telepítés az Asztalsávra
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opciók:\n\t--deskbar\treplikáns automatikus hozzáadása az Asztalsávhoz\n\t--help\t\tezen segítség kiírása, majd kilépés
 Open network preferences…	NetworkStatusView		Hálózati beállítások megnyitása…
 NetworkStatus	System name		Hálózat állapot
 Broadcast:	NetworkStatusView		Átjáró:

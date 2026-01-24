@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	3174700455
+1	polish	x-vnd.haiku-icon_o_matic	2049073439
 None	Icon-O-Matic-Properties		Nic
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Wyczyść ścieżki
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -98,7 +98,6 @@ Add shape with path	Icon-O-Matic-Menu-Shape		Dodaj kształt ze ścieżką
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Klops
 Translation X	Icon-O-Matic-PropertyNames		Translacja X
 Multi-paste properties	Icon-O-Matic-Properties		Wklej wiele właściwości
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gdy Icon-O-Matic otwierał plik SVG, nie mógł przetworzyć wszystkich danych. Po nadpisaniu oryginalnego pliku, te informacje zostaną utracone.
 Rotate indices backwards	Icon-O-Matic-PathsList		Obróć indeksy do tyłu
 Overwrite	Icon-O-Matic-SVGExport		Nadpisz
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Dodaj {0, plural, one{kształt} other{kształty}}

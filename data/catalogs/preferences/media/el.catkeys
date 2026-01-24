@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Media	582516163
+1	greek, modern (1453-)	x-vnd.Haiku-Media	4055972908
 Couldn't add volume control in Deskbar: %s\n	Media views		Αδυναμία προσθήκης του εργαλείου έντασης ήχου στην Γραμμή Εργασιών: %s\n
 Restart media services	Media views		Επανεκκίνηση υπηρεσιών πολυμέσων
 Quit	Media Window		Έξοδος
@@ -9,7 +9,6 @@ Video input:	Media views		Είσοδος βίντεο:
 Audio output:	Media views		Έξοδος ήχου:
 Please select a SoundFont.	Midi View		Παρακαλώ επιλέξτε ένα πακέτο ήχων.
 There are no SoundFonts installed.	Midi View		Δεν υπάρχουν εγκατεστημένα πακέτα ήχων.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Το κλείσιμο της εφαρμογής "Πολυμέσα" θα διακόψει την επανεκκίνηση των υπηρεσιών πολυμέσων. Είναι πιθανό ότι αυτό θα οδηγήσει σε παράξενη ή μη διαθέσιμη λειτουργικότητα πολυμέσων.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Αδυναμία σύνδεσης με τον εξυπηρετητή πολυμέσων.\nΘα θέλατε να τον εκκινήσετε;
 Video settings	Media Window		Ρυθμίσεις εικόνας
 Audio mixer	Media Window		Μίκτης ήχου

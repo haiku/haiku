@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-MediaPlayer	1441754962
+1	danish	x-vnd.Haiku-MediaPlayer	1255288322
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flyt element til papirkurv
 Close	MediaPlayer-PlaylistWindow		Luk
 Volume of background clips	MediaPlayer-SettingsWindow		Lydstyrke for baggrundsklip
@@ -43,7 +43,6 @@ Close	MediaPlayer-Main		Luk
 Save error	MediaPlayer-PlaylistWindow		Fejl ved gemning
 Attributes	MediaPlayer-Main		Attributter
 Bottom of screen	MediaPlayer-SettingsWindow		Nederst på skærmen
-MediaPlayer settings	MediaPlayer-SettingsWindow		Medieafspiller-indstillinger
 Copyright	MediaPlayer-InfoWin		Ophavsret
 Invalid URL inserted!	MediaPlayer-NetworkStream		Ugyldig URL indsat!
 Aspect ratio	MediaPlayer-Main		Højde-bredde-forhold

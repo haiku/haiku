@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Pairs	818003250
+1	english	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		对对碰
 Quit	PairsWindow		退出
 Medium	PairsWindow		中图标
@@ -6,7 +6,6 @@ Game	PairsWindow		游戏
 Expert (8x8)	PairsWindow		骨灰级(8x8)
 New	PairsWindow		新建
 OK	Pairs		确定
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	对对碰未发现足够适量图标，无法启动；至少需要 %zu 个图标，当前仅发现 %zu 个图标。\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		您使用 {0, plural, one{# 次点击} other{# 次点击}} 完成了游戏。\n
 Small	PairsWindow		小图标
 Size	PairsWindow		大小

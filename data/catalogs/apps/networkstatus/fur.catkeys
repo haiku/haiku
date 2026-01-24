@@ -1,10 +1,9 @@
-1	friulian	x-vnd.Haiku-NetworkStatus	3629281636
+1	friulian	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		Direzion IPv6:
 Quit	NetworkStatusView		Jes
 Unknown	NetworkStatusView		No cognossût
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		L'inviament dal preflet di r et al è falît.\n\nErôr: 
 Install in Deskbar	NetworkStatus		Instale tal Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opzions di “Stât de Rêt”:\n\t--deskbar\tzonte in automatic il replicant tal Deskbar\n\t--help\t\tmostre chestis informazions e jes
 Open network preferences…	NetworkStatusView		Vierç lis preferencis di rêt…
 NetworkStatus	System name		Stât de Rêt
 Broadcast:	NetworkStatusView		Difusion:

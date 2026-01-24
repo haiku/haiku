@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-TSKB	316181764
+1	italian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Nascondi automaticamente
 Show all	WindowMenu		Mostra tutto
 Edit in Tracker…	PreferencesWindow		Modifica…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Mostra replicanti
 No windows	WindowMenu		Nessuna finestra
 Show clock	Tray		Mostra orologio
 Close all	WindowMenu		Chiudi tutto
-Deskbar preferences	PreferencesWindow		Preferenze di Deskbar
 About this system	DeskbarMenu		Informazioni sul sistema
 Quit application	WindowMenu		Chiudi l'applicazione
 Hide application names	PreferencesWindow		Nascondi il nome delle applicazioni
 Applications	PreferencesWindow		Applicazioni
 Show application expander	PreferencesWindow		Mostra menu applicazione
-Deskbar preferences…	DeskbarMenu		Preferenze di Deskbar…
 Suspend	DeskbarMenu		Sospendi
 Shutdown…	DeskbarMenu		Uscita da Haiku…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Applicazioni Dimostrative

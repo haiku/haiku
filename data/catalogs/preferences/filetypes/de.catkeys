@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-FileTypes	436017301
+1	german	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Links
 Float	Attribute ListView		Gleitkomma
 Final	Application Types Window		Endversion
@@ -144,7 +144,6 @@ Open file	FileTypes		Datei öffnen
 Version info	Application Type Window		Versionsinformation
 Final	Application Type Window		Endversion
 Preferred application	FileType Window		Bevorzugte Anwendung
-FileTypes	FileTypes		FileTypes
 Set preferred application	Preferred App Menu		Bevorzugte Anwendung wählen
 New file type	New File Type Window		Neuer Dateityp
 Short description:	Application Type Window		Kurzbeschreibung:

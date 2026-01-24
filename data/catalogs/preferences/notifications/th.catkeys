@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Notifications	3906219317
+1	thai	x-vnd.Haiku-Notifications	960106651
 Lower left	GeneralView		Lower left
 Application does not have a valid signature	NotificationView	Alert message	แอปพลิเคชันไม่มีลายเซ็นที่ถูกต้อง
 Status	NotificationView		สถานะ
@@ -7,8 +7,6 @@ Lower right	GeneralView		Lower right
 Muted	NotificationView		ปิดเสียง
  is already listed	NotificationView	Alert message	อยู่ในรายการแล้ว
 OK	PrefletWin		ตกลง
-Notifications	PrefletWin		แจ้ง
-Notifications preflet sample	PrefletWin		แจ้งเตือนตัวอย่าง preflet
 Mute notifications from this application	NotificationView		ปิดเสียงการแจ้งเตือนจากแอปพลิเคชันนี้
 Revert	PrefletWin		เปลี่ยนกลับ
 Applications	PrefletView		แอพลิเคชั่น
@@ -23,8 +21,8 @@ Follow Deskbar	GeneralView		ติดตามเดสก์บาร์
 Notifications	System name		แจ้งเตือน
 Allowed	NotificationView		อนุญาต
 Duration:	GeneralView		ระยะเวลา:
-Application	NotificationView		แอพพลิเคชั่น
 Enable notifications	GeneralView		เปิดใช้งานการแจ้งเตือน
+Application	NotificationView		แอพพลิเคชั่น
 This is a test notification message	PrefletWin		นี่คือข้อความแจ้งเตือนการทดสอบ
 Remove	NotificationView		ลบ
 Position:	GeneralView		ตำแหน่ง:

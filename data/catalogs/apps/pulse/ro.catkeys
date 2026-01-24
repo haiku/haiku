@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Pulse	559379362
+1	romanian	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Modul normal
 Info	CPUButton		Informații
 Quit	DeskbarPulseView		Ieșire
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Implicite
 Mini mode	PrefsWindow		Modul mini
 CPU progress bar	NormalPulseView		Bara de progres a CPU
 Fade colors	ConfigView		Culori translucide
-About Pulse…	PulseView		Despre Pulse…
-Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Modul deskbar
 Pulse settings	PulseApp		Configurări Pulse
 Remove replicant	CPUButton		Elimină replicantul
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Modul deskbar
 OK	PulseView		OK
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin\n
 OK	PrefsWindow		OK
-Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Eliminarea de pe deskbar a eșuat.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		Despre Pulse…
 Deskbar mode	PrefsWindow		Modul deskbar
 Mini mode	DeskbarPulseView		Modul mini
 You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul CPU activ.

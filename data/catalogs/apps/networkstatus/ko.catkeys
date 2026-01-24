@@ -1,10 +1,9 @@
-1	korean	x-vnd.Haiku-NetworkStatus	3629281636
+1	korean	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		IPv6 주소:
 Quit	NetworkStatusView		종료
 Unknown	NetworkStatusView		알 수 없음
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		네트워크 설정을 열 수 없습니다.\n\n오류: 
 Install in Deskbar	NetworkStatus		데스크바에 설치
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus 옵션:\n\t--deskbar\t데스크바에 자동으로 레플리컨트 추가\n\t--help\t\t이 정보를 출력하고 종료
 Open network preferences…	NetworkStatusView		네트워크 설정 열기…
 NetworkStatus	System name		NetworkStatus
 Broadcast:	NetworkStatusView		브로드캐스트:

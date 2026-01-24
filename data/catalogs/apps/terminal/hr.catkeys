@@ -1,7 +1,6 @@
-1	croatian	x-vnd.Haiku-Terminal	1931481794
+1	croatian	x-vnd.Haiku-Terminal	4256734108
 Close other tabs	Terminal TermWindow		Zatvori druge kartice
 Insert path	Terminal TermView		Unesi putanju
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nije mogao pokrenuti shell. Žao nam je.
 Text encoding	Terminal TermWindow		Enkodiranje teksta
 OK	Terminal SetTitleWindow		U redu
 Edit	Terminal TermWindow		Uredi
@@ -24,7 +23,6 @@ Page setup…	Terminal TermWindow		Postavljanje stranice...
 Cancel	Terminal TermView		Odustani
 Defaults	Terminal PrefWindow		Zadano
 Revert	Terminal PrefWindow		Obrnuto
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		koristi izbor
 Find next	Terminal TermWindow		Nađi tekst
 Copy link location	Terminal TermView		Kopiraj lokaciju poveznice
@@ -39,11 +37,9 @@ Custom	Terminal colors scheme		Prilagođeno
 Really close?	Terminal TermWindow		Doista zatvoriti?
 Font size	Terminal TermWindow		Veličina fonta
 OK	Terminal TermApp		U redu
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" i dalje radi.\nAko zatvorite terminal, proces će biti isključen.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Neprepoznata opcija \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Naslov kartice:
 Text not found.	Terminal TermWindow		Tekst nije pronađen
-New Terminal	Terminal TermWindow		Novi terminal
 Find failed	Terminal TermWindow		Neuspjelo nalaženje
 Quit	Terminal TermWindow		Isključi
 Find previous	Terminal TermWindow		Nađi prethodno
@@ -58,8 +54,8 @@ Full screen	Terminal TermWindow		Puni zaslon
 Shell 	Terminal TermWindow		Shell 
 Tab title:	Terminal TermWindow		Naslov kartice:
 Window title:	Terminal TermWindow		Naslov prozora:
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Zamjeni terminale
 Window size:	Terminal AppearancePrefView		Veličina prozora
-Switch Terminals	Terminal TermWindow		Zamjeni terminale
 Decrease	Terminal TermWindow		Smanji
 Settings…	Terminal TermWindow		Postavke...
 Cancel	Terminal SetTitleWindow		Odustani
@@ -81,7 +77,6 @@ Find…	Terminal TermWindow		Nađi...
 No search string was entered.	Terminal TermWindow		Ništa nije uneseno za pretagu.
 Move here	Terminal TermView		Premjesti ovdje
 Abort	Terminal Shell		Prekini
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Sljedeći procesi još rade:\n\n\t%1\n\nAko zatvorite terminal, procesi će biti isključeni.
 Set window title	Terminal TermWindow		Postavi naslov prozora
 Increase	Terminal TermWindow		Povećaj
 OK	Terminal TermWindow		U redu

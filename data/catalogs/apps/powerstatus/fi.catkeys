@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PowerStatus	1104524835
+1	finnish	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		Suorita ikkunassa
 Extended battery info	PowerStatus		Laajennetut akkutiedot
 Show status icon	PowerStatus		Näytä tilakuvake
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Akku lähes tyhjä
 Model number: 	PowerStatus		Mallinumero: 
 Battery unused	PowerStatus		Akku käyttämätön
 Type: 	PowerStatus		Tyyppi: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
 Damaged or missing battery	PowerStatus		Vahingoittunut tai puuttuva akku
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Akkulatauksen purkaminen
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		Sarjanumero:
 Battery critical	PowerStatus		Akku kriittisellä tasolla
 Capacity: 	PowerStatus		Kapasiteetti: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Tuettua akkua ei havaittu. Virtatila-sovelmaa ei voida käyttää järjestelmässäsi.
 Show percent	PowerStatus		Näytä prosenttiluku
 Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Akkutaso on alhainen, kytke laite sähköverkkoon.

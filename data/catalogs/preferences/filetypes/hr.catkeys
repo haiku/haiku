@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-FileTypes	1388182819
+1	croatian	x-vnd.Haiku-FileTypes	1176577102
 Left	Attribute Window	Attribute column alignment in Tracker	Lijevo
 Final	Application Types Window		Završno
 This file type already exists	New File Type Window		Vrsta datoteke već postoji
@@ -117,7 +117,6 @@ Open file	FileTypes		Otvori datoteku
 Version info	Application Type Window		Informacije o verziji
 Final	Application Type Window		Završno
 Preferred application	FileType Window		Poželjni program
-FileTypes	FileTypes		Datotečnevrste
 Set preferred application	Preferred App Menu		Odaberi poželjni program
 New file type	New File Type Window		Nova datotečna vrsta
 Short description:	Application Type Window		Kratki opis:

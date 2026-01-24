@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Pairs	2193803529
+1	lithuanian	x-vnd.Haiku-Pairs	140506076
 Pairs	System name		Poros
 Quit	PairsWindow		Baigti žaidimą
 Medium	PairsWindow		Vidutinės
@@ -6,7 +6,6 @@ Game	PairsWindow		Žaidimas
 Expert (8x8)	PairsWindow		Žinovas (8×8)
 New	PairsWindow		Naujas
 OK	Pairs		Gerai
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Neaptikta pakankamai vektorinių piktogramų „Poroms“ paleisti. Reikia bent %zu, rasta %zu.\n
 Small	PairsWindow		Mažos
 Size	PairsWindow		Dydis
 Quit game	PairsWindow		Baigti žaidimą

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-FileTypes	436017301
+1	czech	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Vlevo
 Float	Attribute ListView		Číslo s plovoucí desetinnou čárkou
 Final	Application Types Window		Finální
@@ -144,7 +144,6 @@ Open file	FileTypes		Otevřít soubor
 Version info	Application Type Window		Informace o verzi
 Final	Application Type Window		Finální
 Preferred application	FileType Window		Preferovaná aplikace
-FileTypes	FileTypes		Typy souborů
 Set preferred application	Preferred App Menu		Nastavit upřednostněnou aplikaci
 New file type	New File Type Window		Nový typ souboru
 Short description:	Application Type Window		Krátký popis:

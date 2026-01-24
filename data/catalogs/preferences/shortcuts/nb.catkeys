@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Shortcuts	3834857117
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MusOpp
 Application	ShortcutsWindow		Program
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Tilbakestill til lagret
 Don't save	ShortcutsWindow		Ikke lagre
 *MouseDown	ShortcutsWindow		*MusNed
 *Beep	ShortcutsWindow		*Bip
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Hurtigtaster klarte ikke å lagre ditt sett med hurtigtaster
 Save	ShortcutsWindow		Lagre
 Either	ShortcutsSpec		Vilkårlig
 Oh no	ShortcutsWindow		Å, nei
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Avbryt
 *MoveMouse +20 +0	ShortcutsWindow		*FlyttMus +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Venstre
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke tolke filen din med hurtigtaster!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Hurtigtaster klarte ikke å lagre filen din med hurtigtaster!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*SettInnStreng \"Din Tekst Her\"
 Remove selected shortcut	ShortcutsWindow		Fjern merket hurtigtast
 Error, NULL state description?	ShortcutsSpec		Feil, NULL-tilstand beskrivelse?

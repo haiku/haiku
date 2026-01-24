@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-softwareupdater	369324613
+1	swedish	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Uppdaterar version
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klicka här för att installera {0, plural, one{# uppdaterat paket} other{# uppdaterade paket}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paket att avinstallera
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Ett eller flera
 Packages are being updated	UpdateManager		Paketen håller på att uppdateras
 Cancel	SoftwareUpdaterWindow		Avbryt
 Don't quit	SoftwareUpdaterWindow		Avsluta inte
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klicka här för att köra ProgramUppdatering. Vissa uppdateringar kräver att en problemlösning väljs.
 Checking for updates	SoftwareUpdaterWindow		Letar efter uppdateringar
 Updates completed	UpdateManager		Uppdatering slutförd
 Reboot	SoftwareUpdaterWindow		Omstart

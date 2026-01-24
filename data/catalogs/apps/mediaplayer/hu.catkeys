@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	520971408
+1	hungarian	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Bejegyzés Szemetesbe helyezése
 Close	MediaPlayer-PlaylistWindow		Bezárás
 Volume of background clips	MediaPlayer-SettingsWindow		Háttérbeli klippek hangereje
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Bezárás
 Save error	MediaPlayer-PlaylistWindow		Mentési hiba
 Attributes	MediaPlayer-Main		Jellemzők
 Bottom of screen	MediaPlayer-SettingsWindow		A képernyő alján
-MediaPlayer settings	MediaPlayer-SettingsWindow		Médialejátszó beállításai
 Copyright	MediaPlayer-InfoWin		Másolásvédett
 Invalid URL inserted!	MediaPlayer-NetworkStream		A megadott cím érvénytelen!
 Aspect ratio	MediaPlayer-Main		Képarány

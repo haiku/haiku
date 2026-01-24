@@ -1,7 +1,6 @@
-1	esperanto	x-vnd.Haiku-Terminal	3964119708
+1	esperanto	x-vnd.Haiku-Terminal	1994404726
 Close other tabs	Terminal TermWindow		Fermi aliajn langetojn
 Insert path	Terminal TermView		Enigi itineron
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Pardonu, sed la terminalo ne povis komenci la ŝelon.
 Text encoding	Terminal TermWindow		Teksta kodprezento
 OK	Terminal SetTitleWindow		Bone
 Edit	Terminal TermWindow		Redakti
@@ -26,7 +25,6 @@ Page setup…	Terminal TermWindow		Agordo de paĝo…
 Cancel	Terminal TermView		Nuligi
 Defaults	Terminal PrefWindow		Defaŭlta
 Revert	Terminal PrefWindow		Malfari ŝanĝojn
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminalo
 Use selection	Terminal FindWindow		Uzi elekton
 Find next	Terminal TermWindow		Serĉi la venontan
 Copy link location	Terminal TermView		Kopii la lokon de la ligilo
@@ -41,12 +39,10 @@ Custom	Terminal colors scheme		Laŭmenda
 Really close?	Terminal TermWindow		Ĉu vere fermi?
 Font size	Terminal TermWindow		Tipara grado
 OK	Terminal TermApp		Bone
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		La procezo \"%1\" daŭras ruli.\nSe vi fermos la terminalon, la procezo finiĝos.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerekonita opcio \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Titolo de la langeto:
 Text not found.	Terminal TermWindow		Teksto ne trovita.
 Match word	Terminal FindWindow		Kongrui vorton
-New Terminal	Terminal TermWindow		Nova Terminalo
 Find failed	Terminal TermWindow		Serĉo malsukcesis
 Quit	Terminal TermWindow		Ĉesi
 Match case	Terminal FindWindow		Kongrui uskleco
@@ -64,8 +60,8 @@ Shell 	Terminal TermWindow		Ŝelo
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tLa karaktro '%'.\n\t%<\t-\tKomencas sekcion kiu nur montriĝus se lokokupo\n\t\t\tposta ne malplenas.\n\t%>\t-\tKomencas sekcion kiu nure montroĝus se lokokupo\n\t\t\inter pasinta %< sekcio kaj ĉi tiu ne malplenas.\n\t%-\t-\tFinas %< o %> sekcion.\n\nĈiu ne alfanumera karaktro inter '%' kaj la litero de formato aldonas unu spacon nur\nse la valoro de la lokokupo ne melplenas. Ĝi aldonos al la %< sekcio.
 Tab title:	Terminal TermWindow		Lagenta titolo:
 Window title:	Terminal TermWindow		Fenestra titolo:
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Interŝanĝi terminalojn
 Window size:	Terminal AppearancePrefView		Fenestra grando:
-Switch Terminals	Terminal TermWindow		Interŝanĝi terminalojn
 Decrease	Terminal TermWindow		Malpliigi
 Settings…	Terminal TermWindow		Agordo…
 Cancel	Terminal SetTitleWindow		Nuligi
@@ -89,7 +85,6 @@ Find…	Terminal TermWindow		Serĉi…
 No search string was entered.	Terminal TermWindow		Neniu serĉa literĉeno estas enigita.
 Move here	Terminal TermView		Movi ĉi tie
 Abort	Terminal Shell		Ĉesigi senkondiĉe
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		La sekvaj procezoj daŭras ruli:\n\n\t%1\n\nSe vi fermos la terminalon, la procezoj finiĝos.
 Set window title	Terminal TermWindow		Elekti fenestran titolon
 Increase	Terminal TermWindow		Pliigi
 OK	Terminal TermWindow		Bone

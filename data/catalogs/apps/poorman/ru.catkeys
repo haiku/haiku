@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PoorMan	1829050509
+1	russian	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Выбрать папку для публикации
 Console logging	PoorMan		Логирование в консоль
 Create Log File	PoorMan		Создать лог файл
@@ -6,9 +6,7 @@ File logging	PoorMan		Логирование в файл
 Website options	PoorMan		Настройки сайта
 Log to file	PoorMan		Сохранять лог в файл
 Shutting down.	PoorMan		Выключение.
-Error Dir	PoorMan		Ошибка директории
 Web folder:	PoorMan		Веб-папка:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Пожалуйста, выберите папку для публикации.\n\nPoorMan может создать папку по умолчанию public_html в вашей домашней папке.\nИли вы можете выбрать любую другую папку.
 Log To Console	PoorMan		Выводить лог в консоль
 File Name	PoorMan		Имя файла
 Starting up... 	PoorMan		Запуск... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Посещений: %lu
 Hits: 0	PoorMan		Посещений: 0
 Shutting down.\n	PoorMan		Выключение.\n
 Select all	PoorMan		Выделить всё
-Error Server	PoorMan		Ошибка сервера
 Send file listing if there's no start page	PoorMan		Отобразить список файлов, если нет стартовой страницы
-Create PoorMan log	PoorMan		Создать log PoorMan
 Max. simultaneous connections:	PoorMan		Максимум одновременных соединений:
 Done	PoorMan		Готово
 Site	PoorMan		Сайт
@@ -48,7 +44,6 @@ Run server	PoorMan		Запустить сервер
 Create	PoorMan		Создать
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# соединение} few{# соединения} other{# соединений}}
 done.\n	PoorMan		готово.\n
-PoorMan settings	PoorMan		Настройки PoorMan
 Console Logging	PoorMan		Логирование в консоль
 Clear log file	PoorMan		Очистить лог файл
 Save log console selection	PoorMan		Сохранить выделенную часть лога консоли

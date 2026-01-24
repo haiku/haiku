@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku-Terminal	686383766
+1	swedish	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Insert path	Terminal TermView		Lägg till sökväg
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalen kunde inte starta skalet.
 Text encoding	Terminal TermWindow		Teckenuppsättning
 Colors	Terminal ThemeWindow		Färger
 OK	Terminal SetTitleWindow		OK
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Avbryt
 Defaults	Terminal PrefWindow		Standard
 black	Terminal ThemeView		svart
 Revert	Terminal PrefWindow		Återställ
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Använd markering
 Find next	Terminal TermWindow		Sök nästa
 Copy link location	Terminal TermView		Kopiera länkplats
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Vill du stänga?
 Font size	Terminal TermWindow		Typsnittsstorlek
 OK	Terminal TermApp		OK
 ANSI bright blue color	Terminal ThemeView		ANSI ljusblå färg
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger Terminalen kommer processen att termineras.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Okänt alternativ \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Fliktitel:
 Text not found.	Terminal TermWindow		Text hittades inte.
 Match word	Terminal FindWindow		Matcha ord
-New Terminal	Terminal TermWindow		Ny terminal
 Find failed	Terminal TermWindow		Sökning misslyckades
 Quit	Terminal TermWindow		Avsluta
 Match case	Terminal FindWindow		Matcha gemener/versaler
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ANSI ljus cyan färg
 Tab title:	Terminal TermWindow		Fliktitel:
 Window title:	Terminal TermWindow		Fönstertitel:
 ANSI white color	Terminal ThemeView		ANSI vit färg
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Växla terminal
 Window size:	Terminal AppearancePrefView		Fönsterstorlek:
-Switch Terminals	Terminal TermWindow		Växla terminal
 Decrease	Terminal TermWindow		Minska
 Settings…	Terminal TermWindow		Inställningar...
 Cancel	Terminal SetTitleWindow		Avbryt
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Sök...
 No search string was entered.	Terminal TermWindow		Ingen söksträng angiven.
 Move here	Terminal TermView		Flytta hit
 Abort	Terminal Shell		Avbryt
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Följande processer körs fortfarande:\n\n\t%1\n\nOm du stänger Terminalen kommer processerna att termineras.
 Set window title	Terminal TermWindow		Ange fönstertitel
 ANSI red color	Terminal ThemeView		ANSI röd färg
 Increase	Terminal TermWindow		Öka

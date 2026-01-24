@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	4052471379
+1	lithuanian	x-vnd.Haiku-MediaPlayer	3866004739
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Išmesti įrašą Šiukšlinėn
 Close	MediaPlayer-PlaylistWindow		Užverti
 Volume of background clips	MediaPlayer-SettingsWindow		Fone leidžiamų įrašų garsis
@@ -40,7 +40,6 @@ Close	MediaPlayer-Main		Užverti
 Save error	MediaPlayer-PlaylistWindow		Klaida įrašant
 Attributes	MediaPlayer-Main		Požymiai
 Bottom of screen	MediaPlayer-SettingsWindow		Ekrano apačioje
-MediaPlayer settings	MediaPlayer-SettingsWindow		Medijos leistuvės nuostatos
 Copyright	MediaPlayer-InfoWin		Autorių teisės
 Aspect ratio	MediaPlayer-Main		Proporcija
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Grojaraščio įrašyti nepavyko.\n\nKlaida:

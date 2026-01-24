@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-CodyCam	40716723
+1	thai	x-vnd.Haiku-CodyCam	2815365184
 destination directory expected	CodyCam		คาดว่าจะมีไดเรกทอรีปลายทาง
 reply: '%s'\n	SftpClient		ตอบ: '%s'\n
 JPEG image	CodyCam		ภาพ JPEG
@@ -80,7 +80,6 @@ Video settings	CodyCam		ตั้งค่าวิดีโอ
 Can't find an available connection to the video window	CodyCam		ไม่พบการเชื่อมต่อที่พร้อมใช้งานกับหน้าต่างวิดีโอ
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		เกิดข้อผิดพลาดในการสร้างไฟล์เอาต์พุต
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		ไม่พบแหล่งวิดีโอ \nคุณต้องมีเว็บแคมเพื่อใช้ CodyCam
 Logging in…	VideoConsumer.cpp		กำลังล็อคอิน
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		เกิดข้อผิดพลาดในการเขียนไฟล์เอาต์พุต

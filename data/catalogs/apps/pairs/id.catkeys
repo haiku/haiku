@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Pairs	818003250
+1	indonesian	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Pasangan
 Quit	PairsWindow		Keluar
 Medium	PairsWindow		Medium
@@ -6,7 +6,6 @@ Game	PairsWindow		Permainan
 Expert (8x8)	PairsWindow		Ahli (8x8)
 New	PairsWindow		Baru
 OK	Pairs		OKE
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs tidak menemukan ikon vektor yang cukup untuk memulai; setidaknya perlu %zu, ditemukan %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Anda menyelesaikan game dalam {0, plural, one{# click} other{# clicks}}.\n
 Small	PairsWindow		Kecil
 Size	PairsWindow		Ukuran

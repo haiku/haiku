@@ -1,9 +1,8 @@
-1	english	x-vnd.Haiku-Expander	3239308358
+1	english	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		目標
 Other	ExpanderPreferences		其他
 Automatically show contents listing	ExpanderPreferences		自動顯示內容列表
 Expander	System name		档案解壓
-Expander: Choose destination	DirectoryFilePanel		档案解壓: 選擇目標位置
 Set source…	ExpanderMenu		設定來源…
 OK	ExpanderWindow		確認
 The destination is not a folder.	ExpanderWindow		目標不是資料夾。
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		解壓縮後開啓
 Same directory as source (archive) file	ExpanderPreferences		與原始（存檔）檔案相同的目錄
 Stop	ExpanderWindow		停止
 Cancel	ExpanderWindow		取消
-Expander settings	ExpanderPreferences		解壓設定
 Error when expanding archive	ExpanderWindow		擴充存檔時出錯
 Expand	ExpanderMenu		解壓
 Failed to create the destination folder.	ExpanderWindow		無法建立目標資料夾。
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		繼續
 Cancel	ExpanderPreferences		取消
 Use:	ExpanderPreferences		使用：
 Destination folder	ExpanderPreferences		目標資料夾
-Expander: Open	ExpanderWindow		解壓：開啓
 Leave destination folder path empty	ExpanderPreferences		留空目標資料夾路徑
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		目標資料夾不存在。您想創建它嗎？
 The file doesn't exist	ExpanderWindow		檔案不存在

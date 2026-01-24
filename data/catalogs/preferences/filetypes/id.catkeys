@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-FileTypes	436017301
+1	indonesian	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Kiri
 Float	Attribute ListView		Mengambang
 Final	Application Types Window		Final
@@ -144,7 +144,6 @@ Open file	FileTypes		Buka file
 Version info	Application Type Window		Info versi
 Final	Application Type Window		Final
 Preferred application	FileType Window		Aplikasi yang disukai
-FileTypes	FileTypes		TypeBerkas
 Set preferred application	Preferred App Menu		Atur aplikasi yang disukai
 New file type	New File Type Window		Tipe berkas baru
 Short description:	Application Type Window		Deskripsi singkat:

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Pulse	559379362
+1	esperanto	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		Norma reĝimo
 Info	CPUButton		Informo
 Quit	DeskbarPulseView		Ĉesi
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		Defaŭltoj
 Mini mode	PrefsWindow		Eta reĝimo
 CPU progress bar	NormalPulseView		Panelo de progreso de CPU
 Fade colors	ConfigView		Fadigi kolorojn
-About Pulse…	PulseView		Pri Pulso…
-Pulse	NormalPulseView		Pulso
 Deskbar mode	NormalPulseView		Reĝimo de Laborstrio
 Pulse settings	PulseApp		Agordoj de Pulso
 Remove replicant	CPUButton		Forigi replikilon
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Reĝimo de Laborstrio
 OK	PulseView		Bone
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey kaj Arve Hjønnevåg\nReviziite per Daniel Switkin\n
 OK	PrefsWindow		Bone
-Pulse	PulseApp		Pulso
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Foriĝo el Laborstrio malsukcesis.\n%s
 OK	PulseApp		Bone
-About Pulse…	CPUButton		Pri Pulso…
 Deskbar mode	PrefsWindow		Reĝimo de Laborstrio
 Mini mode	DeskbarPulseView		Eta reĝimo
 You can't disable the last active CPU.	CPUButton		Vi ne povas malŝalti la lastan aktivan CPU-on.

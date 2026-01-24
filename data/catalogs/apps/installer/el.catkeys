@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	3240158834
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
 No optional packages available.	PackagesView		Δεν υπάρχουν διαθέσιμα προαιρετικά πακέτα.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Επιλέξτε
 Welcome to the Haiku Installer!\n\n	InstallerApp		Καλώς ήλθατε στην εγκατάστη του Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	;; από ;;
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Ο Διαχειριστής Δίσκου, η εφαρμογή για διαμορφώσεις κατατμήσεων δίσκων, δεν μπορεί να εκκινηθεί.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση τελείωσε. Ο τομέας εκκίνησης έχει εγγραφεί στο "%s". Πατήστε "Έξοδος" να βγείτε από την Εγκατάσταση ή επιλέξτε νέο προορισμό για να κάνετε άλλη εγκατάσταση.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Η μονάδα προορισμού δεν είναι κενή. Αν περιέχει ήδη μια εγκατάσταση του Haiku, τότε αυτή θα αντικατασταθεί. Αυτό θα διαγράψει όλο το εγκατεστημένο λογισμικό.\n\nΑν επιθυμείτε να κάνετε μια αναβάθμιση του υπάρχοντος συστήματος, χωρίς αφαίρεση λογισμικού, δείτε το λήμμα του Οδηγού Χρήστη του Haiku σχετικά με την εφαρμογή \"SoftwareUpdater\" για οδηγίες.\n\nΕίστε σίγουρος/η ότι επιθυμείτε να συνεχίσετε την εγκατάσταση;
 Quit DriveSetup	InstallerWindow		Έξοδος από τον Διαχειριστή Δίσκου
 Write boot sector	InstallerWindow		Εγγραφή τομέα εκκίνησης
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Ύστερα επιλέξτε "Έναρξη".
 OK	InstallProgress		Εντάξει
 Quit BootManager	InstallerWindow		Κλείσιμο BootManager
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Είστε σίγουρος ότι θέλετε να εγκαταστήσετε στον τρέχον δίσκο εκκίνησης; Το Πρόγραμμα Εγκατάστασης θα πρέπει να κάνει επανεκκίνηση το σύστημά σας εάν συνεχίσετε.
 Onto:	InstallerWindow		Σε:
 Tools	InstallerWindow		Εργαλεία
 scanning…	InstallerWindow		αναζήτηση…

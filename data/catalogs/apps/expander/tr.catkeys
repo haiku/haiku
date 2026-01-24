@@ -1,9 +1,8 @@
-1	turkish	x-vnd.Haiku-Expander	3239308358
+1	turkish	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Hedef
 Other	ExpanderPreferences		Diğer
 Automatically show contents listing	ExpanderPreferences		İçerik listesini kendiliğinden göster
 Expander	System name		Paketaçar
-Expander: Choose destination	DirectoryFilePanel		Paketaçar: Hedef seç
 Set source…	ExpanderMenu		Kaynak belirle…
 OK	ExpanderWindow		Tamam
 The destination is not a folder.	ExpanderWindow		Hedef bir klasör değil.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Çıkarma bittikte
 Same directory as source (archive) file	ExpanderPreferences		Kaynak (arşiv) dosya ile aynı dizin
 Stop	ExpanderWindow		Durdur
 Cancel	ExpanderWindow		Vazgeç
-Expander settings	ExpanderPreferences		Paketaçar ayarları
 Error when expanding archive	ExpanderWindow		Arşiv genişletilirken hata
 Expand	ExpanderMenu		Genişlet
 Failed to create the destination folder.	ExpanderWindow		Hedef klasör oluşturulamadı.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Sürdür
 Cancel	ExpanderPreferences		Vazgeç
 Use:	ExpanderPreferences		Şunu kullan:
 Destination folder	ExpanderPreferences		Hedef klasör
-Expander: Open	ExpanderWindow		Paketaçar: Aç
 Leave destination folder path empty	ExpanderPreferences		Hedef klasör yolunu boş bırak
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Hedef klasör yok. Oluşturulsun mu?
 The file doesn't exist	ExpanderWindow		Dosya yok

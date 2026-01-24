@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Shortcuts	3834857117
+1	indonesian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplikasi
 Option	ShortcutsSpec	Name for modifier on keyboard	Opsi
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Kembali ke tersimpan
 Don't save	ShortcutsWindow		Jangan simpan
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pemintas tidak bisa menyimpan keyset Anda.
 Save	ShortcutsWindow		Simpan
 Either	ShortcutsSpec		Salah-satu
 Oh no	ShortcutsWindow		Oh tidak
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Batal
 *MoveMouse +20 +0	ShortcutsWindow		*TombolMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
 Left	ShortcutsSpec		Kiri
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pintasan tidak dapat mengurai file KeySet Anda!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pintasan tidak dapat menyimpan file KeySet Anda!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Teks Anda Disini\"
 Remove selected shortcut	ShortcutsWindow		Hapus pintasan yang dipilih
 Error, NULL state description?	ShortcutsSpec		Ada Kesalahan, deskripsi kondisi NULL?

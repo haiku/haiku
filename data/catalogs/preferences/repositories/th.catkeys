@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Repositories	1220143449
+1	thai	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	นี่ไม่ใช่ URL ที่ถูกต้อง
 Repository URL:	AddRepoWindow	Text box label	ที่เก็บ URL:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	มีข้อผิดพลาดในการรีเฟรชแคชที่เก็บข้อมูล %name%
@@ -20,7 +20,6 @@ OK	Constants	Button label	ตกลง
 Status	RepositoriesView	Column title	สถานะ
 Name	RepositoriesView	Column title	ชื่อ
 Add	AddRepoWindow	Button label	เพิ่ม
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	ที่เก็บไม่สามารถเรียกชื่อของที่เก็บที่เปิดใช้งานในปัจจุบัน
 Enable all	RepositoriesView	Button label	เปิดใช้งานทั้งหมด
 Aborted	TaskLooper	Aborted task status message	ยกเลิก
 URL	RepositoriesView	Column title	URL

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Repositories	1220143449
+1	ukrainian	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Це невірна адреса URL.
 Repository URL:	AddRepoWindow	Text box label	URL репозитарія:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при оновленні кеша репозитарія для %name%
@@ -20,7 +20,6 @@ OK	Constants	Button label	ОК
 Status	RepositoriesView	Column title	Статус
 Name	RepositoriesView	Column title	Назва
 Add	AddRepoWindow	Button label	Додати
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Не вдалося отримати імена під'єднаних в даний час репозитаріїв.
 Enable all	RepositoriesView	Button label	Під'єднати всі
 Aborted	TaskLooper	Aborted task status message	Перервано
 URL	RepositoriesView	Column title	URL-адреса

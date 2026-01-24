@@ -1,7 +1,6 @@
-1	friulian	x-vnd.Haiku-Terminal	686383766
+1	friulian	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Siere altris schedis
 Insert path	Terminal TermView		Inserìs percors
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Scuse, ma Terminâl nol à podût inviâ la shell.
 Text encoding	Terminal TermWindow		Codifiche dal test
 Colors	Terminal ThemeWindow		Colôrs
 OK	Terminal SetTitleWindow		Va ben
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Anule
 Defaults	Terminal PrefWindow		Predefinîts
 black	Terminal ThemeView		neri
 Revert	Terminal PrefWindow		Ripristine
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminâl
 Use selection	Terminal FindWindow		Dopre selezion
 Find next	Terminal TermWindow		Cjate prossim
 Copy link location	Terminal TermView		Copie posizion colegament
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Sierâ pardabon?
 Font size	Terminal TermWindow		Dimension caratar
 OK	Terminal TermApp		Va ben
 ANSI bright blue color	Terminal ThemeView		Colôr blu slusint ANSI
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Il procès \"%1\" al è ancjemò in esecuzion.\nSe si siere il terminâl il procès al vignarà copât.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opzion \"%s\" no ricognossude\n
 Tab title:	Terminal AppearancePrefView		Titul schede:
 Text not found.	Terminal TermWindow		Test no cjatât.
 Match word	Terminal FindWindow		Peraule interie
-New Terminal	Terminal TermWindow		Gnûf terminâl
 Find failed	Terminal TermWindow		No si è rivâts a cjatâ
 Quit	Terminal TermWindow		Jes
 Match case	Terminal FindWindow		Coincît maiusculis/minusculis
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		Colôr ciano slusint ANSI
 Tab title:	Terminal TermWindow		Titul schede:
 Window title:	Terminal TermWindow		Titul barcon:
 ANSI white color	Terminal ThemeView		Colôr blanc ANSI
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Scambie terminâi
 Window size:	Terminal AppearancePrefView		Dimensions dal barcon:
-Switch Terminals	Terminal TermWindow		Scambie terminâi
 Decrease	Terminal TermWindow		Diminuìs
 Settings…	Terminal TermWindow		Impostazions…
 Cancel	Terminal SetTitleWindow		Cancele
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Cjate…
 No search string was entered.	Terminal TermWindow		No je stade inseride nissune stringhe di ricercje.
 Move here	Terminal TermView		Sposte achì
 Abort	Terminal Shell		Interomp
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Chescj procès a son ancjemò in esecuzion:\n\n\t%1\n\nSe si siere il terminâl, i procès a vignaran copâts.
 Set window title	Terminal TermWindow		Stabilìs titul barcon
 ANSI red color	Terminal ThemeView		Colôr ros ANSI
 Increase	Terminal TermWindow		Aumente

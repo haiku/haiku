@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-TSKB	316181764
+1	japanese	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		自動的に隠す
 Show all	WindowMenu		すべて表示
 Edit in Tracker…	PreferencesWindow		Tracker で編集...
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		レプリカントの表示
 No windows	WindowMenu		ウィンドウ無し
 Show clock	Tray		時計の表示
 Close all	WindowMenu		すべて閉じる
-Deskbar preferences	PreferencesWindow		Deskbar の設定
 About this system	DeskbarMenu		このシステムについて
 Quit application	WindowMenu		アプリケーションの終了
 Hide application names	PreferencesWindow		アプリケーション名を隠す
 Applications	PreferencesWindow		アプリケーション
 Show application expander	PreferencesWindow		エキスパンダーの表示
-Deskbar preferences…	DeskbarMenu		Deskbar の設定...
 Suspend	DeskbarMenu		サスペンド
 Shutdown…	DeskbarMenu		シャットダウン...
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ

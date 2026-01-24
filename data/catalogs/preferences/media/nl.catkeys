@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Media	582516163
+1	dutch; flemish	x-vnd.Haiku-Media	4055972908
 Couldn't add volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet aan Deskbar worden toegevoegd: %s\n
 Restart media services	Media views		Mediaservices herstarten
 Quit	Media Window		Afsluiten
@@ -9,7 +9,6 @@ Video input:	Media views		Video-invoer:
 Audio output:	Media views		Audio-output:
 Please select a SoundFont.	Midi View		Selecteer een SoundFont.
 There are no SoundFonts installed.	Midi View		Er zijn geen SoundFonts geïnstalleerd.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Nu afsluiten van Media zal de herstart van de media-services stopppen. Dit leidt waarschijnlijk tot het onbetrouwbaar of niet functioneren van media-functionaliteit.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Kon geen verbinding met mediaserver maken.\nWilt u hem starten?
 Video settings	Media Window		Video-instellingen
 Audio mixer	Media Window		Audiomixer

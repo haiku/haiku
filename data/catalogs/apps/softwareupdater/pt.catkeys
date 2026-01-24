@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.haiku-softwareupdater	369324613
+1	portuguese	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	A atualizar versão
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Clique aqui para instalar {0, plural, one{# pacote atualizado} other{# pacotes atualizados}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pacotes a desinstalar
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Ocorreu uma exc
 Packages are being updated	UpdateManager		Os pacotes estão a ser atualizados
 Cancel	SoftwareUpdaterWindow		Cancelar
 Don't quit	SoftwareUpdaterWindow		Não sair
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Clique aqui para executar a Atualização de Software. Certas atualizações podem requerer que selecione a solução para um problema.
 Checking for updates	SoftwareUpdaterWindow		A verificar atualizações
 Updates completed	UpdateManager		Atualizações concluídas
 Reboot	SoftwareUpdaterWindow		Reiniciar

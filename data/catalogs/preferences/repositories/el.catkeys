@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Repositories	1220143449
+1	greek, modern (1453-)	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Αυτός δεν είναι ένας έγκυρος υπερσύνδεσμος.
 Repository URL:	AddRepoWindow	Text box label	Υπερσύνδεσμος αποθετηρίου:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Προέκυψε ένα σφάλμα κατά την ανανέωση προσωρινών δεδομένων για το %name%
@@ -20,7 +20,6 @@ OK	Constants	Button label	Εντάξει
 Status	RepositoriesView	Column title	Κατάσταση
 Name	RepositoriesView	Column title	Όνομα
 Add	AddRepoWindow	Button label	Προσθήκη
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Δεν ήταν δυνατή η λήψη των ονομάτων των ενεργοποιημένων αποθετηρίων από τα αποθετήρια.
 Enable all	RepositoriesView	Button label	Ενεργοποίηση όλων
 Aborted	TaskLooper	Aborted task status message	Ακυρώθηκε
 URL	RepositoriesView	Column title	Υπερσύνδεσμος

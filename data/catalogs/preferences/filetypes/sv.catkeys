@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-FileTypes	436017301
+1	swedish	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Vänster
 Float	Attribute ListView		Flytande
 Final	Application Types Window		Slutgiltig
@@ -144,7 +144,6 @@ Open file	FileTypes		Öppna fil
 Version info	Application Type Window		Versionsinfo
 Final	Application Type Window		Slutgiltig
 Preferred application	FileType Window		Förvalt program
-FileTypes	FileTypes		FilTyper
 Set preferred application	Preferred App Menu		Välj förinställt program
 New file type	New File Type Window		Ny filtyp
 Short description:	Application Type Window		Kort beskrivning:

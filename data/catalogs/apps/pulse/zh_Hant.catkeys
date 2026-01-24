@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Pulse	559379362
+1	english	x-vnd.Haiku-Pulse	3032132277
 Normal mode	DeskbarPulseView		普通模式
 Info	CPUButton		資訊
 Quit	DeskbarPulseView		退出
@@ -13,8 +13,6 @@ Defaults	PrefsWindow		默認值
 Mini mode	PrefsWindow		迷你模式
 CPU progress bar	NormalPulseView		CPU進度條
 Fade colors	ConfigView		褪色
-About Pulse…	PulseView		關於Pulse…
-Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar模式
 Pulse settings	PulseApp		Pulse設定
 Remove replicant	CPUButton		移除副本
@@ -24,10 +22,8 @@ Deskbar mode	MiniPulseView		Deskbar模式
 OK	PulseView		確認
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDavid Ramsey and Arve Hjønnevåg 貢獻\nDaniel Switkin 修訂\n
 OK	PrefsWindow		確認
-Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		從Deskbar上刪除失敗。\n%s
 OK	PulseApp		確認
-About Pulse…	CPUButton		關於Pulse…
 Deskbar mode	PrefsWindow		Deskbar模式
 Mini mode	DeskbarPulseView		迷你模式
 You can't disable the last active CPU.	CPUButton		您無法停用最後一個活動的 CPU。

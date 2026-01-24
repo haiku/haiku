@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-PoorMan	1829050509
+1	italian	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Seleziona cartella web
 Console logging	PoorMan		Logging su console
 Create Log File	PoorMan		Crea file di registro
@@ -6,9 +6,7 @@ File logging	PoorMan		Log su file
 Website options	PoorMan		Opzioni del sito
 Log to file	PoorMan		Log su file
 Shutting down.	PoorMan		Il server è stato arrestato.
-Error Dir	PoorMan		Errore nella cartella
 Web folder:	PoorMan		Cartella Web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Scegliere una cartella da pubblicare sul web.\n\nPoorMan può creare una sottocartella \"public_html\" nella tua cartella personale.\nPuoi anche selezionare un'altra cartella, se preferisci.
 Log To Console	PoorMan		Invia il log alla Console
 File Name	PoorMan		Nome del file
 Starting up... 	PoorMan		Avviamento del server in corso… 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Hit: %lu
 Hits: 0	PoorMan		Richieste: 0
 Shutting down.\n	PoorMan		Il server è stato arrestato.\n
 Select all	PoorMan		Seleziona tutto
-Error Server	PoorMan		Errore del Server
 Send file listing if there's no start page	PoorMan		Mostra la lista dei file se non c'è nessuna pagina iniziale
-Create PoorMan log	PoorMan		Crea un log di PoorMan
 Max. simultaneous connections:	PoorMan		Massimo numero di connessioni simultanee:
 Done	PoorMan		Applica
 Site	PoorMan		Sito
@@ -48,7 +44,6 @@ Run server	PoorMan		Esegui server
 Create	PoorMan		Crea
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connessione} other{# connessioni}}
 done.\n	PoorMan		fatto.\n
-PoorMan settings	PoorMan		Impostazioni di PoorMan
 Console Logging	PoorMan		Log della console
 Clear log file	PoorMan		Cancella file di log
 Save log console selection	PoorMan		Salva la selezione del log della console

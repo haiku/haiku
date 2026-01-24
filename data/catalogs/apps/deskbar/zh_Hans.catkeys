@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-TSKB	316181764
+1	english	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		自动隐藏
 Show all	WindowMenu		显示所有
 Edit in Tracker…	PreferencesWindow		在文件浏览器中编辑…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		显示程序副本
 No windows	WindowMenu		无窗口
 Show clock	Tray		显示时钟
 Close all	WindowMenu		关闭所有
-Deskbar preferences	PreferencesWindow		桌面栏首选项
 About this system	DeskbarMenu		关于操作系统
 Quit application	WindowMenu		退出程序
 Hide application names	PreferencesWindow		隐藏应用名称
 Applications	PreferencesWindow		应用程序
 Show application expander	PreferencesWindow		显示程序扩展
-Deskbar preferences…	DeskbarMenu		桌面栏首选项...
 Suspend	DeskbarMenu		挂起
 Shutdown…	DeskbarMenu		关机...
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		演示程序

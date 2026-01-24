@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Repositories	1220143449
+1	korean	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	올바르지 않은 URL입니다.
 Repository URL:	AddRepoWindow	Text box label	저장소 URL:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name%의 저장소 캐시를 새로고침 하는 데 오류가 발생했습니다
@@ -20,7 +20,6 @@ OK	Constants	Button label	확인
 Status	RepositoriesView	Column title	상태
 Name	RepositoriesView	Column title	이름
 Add	AddRepoWindow	Button label	추가
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	현재 활성화된 저장소의 이름을 가져올 수 없습니다.
 Enable all	RepositoriesView	Button label	전체 활성화
 Aborted	TaskLooper	Aborted task status message	중단됨
 URL	RepositoriesView	Column title	URL

@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	262401742
+1	german	x-vnd.Be-MAIL	3492357554
 Set to Saved	Mail		Status setzen: Saved
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
@@ -27,6 +27,7 @@ Save changes to this signature?	Mail		Änderungen an der Signatur speichern?
 Save attachment…	Mail		Anhang speichern …
 Paste	Mail		Einfügen
 E-mail draft could not be saved!	Mail		Der Entwurf konnte nicht gespeichert werden!
+Next message, keep status	Mail		Nächste Nachricht, Status beibehalten
 Don't send	Mail		Nicht senden
 sent	B_USER_DIRECTORY/mail/sent		Gesendet
 Only files can be added as attachments.	Mail		Nur Dateien können als Anhang hinzugefügt werden.
@@ -96,7 +97,6 @@ To:	Mail		An:
 Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu verschieben, muss Tracker laufen.
 The mail_daemon could not be started:\n\t	Mail		Der E-Mail-Dienst (mail_daemon) konnte nicht gestartet werden:\n\t
 <no account found>	Mail		<kein Konto gefunden>
-Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
 helpful message	Mail		Tipp
  Read 	Mail		 Gelesen 
 Font:	Mail		Schriftart:
@@ -107,7 +107,6 @@ Start now	Mail		Jetzt starten
 (Name unavailable)	Mail		(Name nicht verfügbar)
 Move to trash	Mail		In den Papierkorb verschieben
 <none>	Mail		<kein>
-Mail settings	Mail		E-Mail-Einstellungen
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Rechtschreibung prüfen
 Status:	Mail		Status:
@@ -158,6 +157,7 @@ Edit	Mail		Bearbeiten
 Page setup…	Mail		Seite einrichten …
 An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.
 Beginner	Mail		Anfänger
+Previous message, keep status	Mail		Vorige Nachricht, Status beibehalten
 Send message	Mail		Nachricht senden
 Delete	Mail		Löschen
 Put your favorite e-mail queries and query templates in this folder.	Mail		In diesem Ordner können E-Mail-Queries und Query-Vorlagen abgelegt werden.

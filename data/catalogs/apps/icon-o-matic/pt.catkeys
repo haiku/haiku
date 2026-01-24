@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.haiku-icon_o_matic	3741627193
+1	portuguese	x-vnd.haiku-icon_o_matic	2616000177
 None	Icon-O-Matic-Properties		Nenhum
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Adicionar vazia
@@ -67,7 +67,6 @@ Diamond	Icon-O-Matic-StyleTypes		Diamante
 Don't save	Icon-O-Matic-Menu-Settings		Não guardar
 Add shape with path	Icon-O-Matic-Menu-Shape		Adicionar forma com caminho
 Translation X	Icon-O-Matic-PropertyNames		Translação X
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		O Icon-O-Matic poderá não ter interpretado todos os dados do SVG quando este foi carregado. Ao sobrescrever o ficheiro original, essa informação estaria agora perdida.
 Rotate indices backwards	Icon-O-Matic-PathsList		Rodar índices no sentido inverso
 Overwrite	Icon-O-Matic-SVGExport		Sobrescrever
 Cancel	Icon-O-Matic-SVGExport		Cancelar

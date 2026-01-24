@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Pairs	818003250
+1	friulian	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Pairs
 Quit	PairsWindow		Jes
 Medium	PairsWindow		Medi
@@ -6,7 +6,6 @@ Game	PairsWindow		Zûc
 Expert (8x8)	PairsWindow		Espert (8×8)
 New	PairsWindow		Gnûf
 OK	Pairs		Va ben
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs nol rive a cjatâ vinde iconis vetoriâls par tacâ; al à bisugne di almancul %zu iconis, cjatadis %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Tu âs completât il zûc in {0, plural, one{# clic} other{# clic}}.\n
 Small	PairsWindow		Piçul
 Size	PairsWindow		Dimensions

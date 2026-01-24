@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	3240158834
+1	danish	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Udfører installation.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk vinduet for drevopsætning, før du lukker installationsvinduet.
 No optional packages available.	PackagesView		Ingen valgfri pakker er tilgængelige.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Klik på "Opsæt
 Welcome to the Haiku Installer!\n\n	InstallerApp		Velkommen til Haiku-installationsprogrammet!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? af ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, programmet til at opsætte diskafsnit, kunne ikke begynde.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installationen er gennemført. Opstartssektoren er skrevet til '%s'. Tryk "Afslut" for at afslutte installationsprogrammet, eller vælg et nyt mål for at udføre endnu en installation.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Måldiskområdet er ikke tomt. Hvis det allerede indeholder en Haiku-installation, så vil den blive overskrevet. Det vil fjerne alle installerede programmer.\n\nHvis du vil opgradere dit system uden at fjerne installerede software, se afsnittet om programmet \"Softwareopdatering\" i Haikus brugervejledning for opdateringsinstrukser.\n\nEr du sikker på, du vil fortsætte installationen?
 Quit DriveSetup	InstallerWindow		Afslut drevopsætning
 Write boot sector	InstallerWindow		Skriv opstartssektoren
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Vælg kildedisk fra popup-menu. Klik så 'Begynd'.
 OK	InstallProgress		O.k.
 Quit BootManager	InstallerWindow		Afslut BootManager
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Er du sikker på, du vil installere på nærværende opstartsdisk? Installationsprogrammet genstarter din maskine, hvis du fortsætter.
 Onto:	InstallerWindow		På:
 Tools	InstallerWindow		Værktøjer
 scanning…	InstallerWindow		søger…

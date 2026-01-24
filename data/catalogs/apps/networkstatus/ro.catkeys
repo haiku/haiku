@@ -1,10 +1,9 @@
-1	romanian	x-vnd.Haiku-NetworkStatus	3629281636
+1	romanian	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		Adresă IPv6:
 Quit	NetworkStatusView		Ieșire
 Unknown	NetworkStatusView		Necunoscut
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lansarea mini-aplicației de preferințe de rețea a eșuat.\n\nEroare: 
 Install in Deskbar	NetworkStatus		Instalează pe deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opțiuni NetworkStatus:\n\t--deskbar\tadaugă automat replicantul pe deskbar\n\t--help\t\ttipărește aceste informații și ieși
 Open network preferences…	NetworkStatusView		Deschide preferințele de rețea…
 NetworkStatus	System name		NetworkStatus
 Broadcast:	NetworkStatusView		Broadcast:

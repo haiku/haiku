@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	3240158834
+1	spanish; castilian	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Realizando instalación.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor, cierre la ventana de DriveSetup antes de cerrar la ventana del Instalador.
 No optional packages available.	PackagesView		No hay paquetes opcionales disponibles.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Haga clic en 'Co
 Welcome to the Haiku Installer!\n\n	InstallerApp		¡Bienvenido al instalador de Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, la aplicación para configurar particiones de disco, no pudo iniciarse.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalación finalizada. El sector de arranque ha sido escrito en '%s'. Haga clic en 'Salir' para dejar el Instalador o elija un nuevo volumen de destino para realizar otra instalación.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		El volumen de destino no está vacío. Si ya contiene una instalación previa de Haiku, será sobreescrita.  Esto eliminará todas las aplicaciones instaladas. \n\nSi usted desea actualizar su sistema sin eliminar las aplicaciones instaladas, consulte la Guía de Usuario de Haiku, en la sección acerca de \"SoftwareUpdater\" para obtener mayor información.\n\n¿Está seguro de que desea continuar con la instalación? 
 Quit DriveSetup	InstallerWindow		Salir de la configuración de la unidad
 Write boot sector	InstallerWindow		Escribir sector de arranque
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Elija el disco de origen del menú emergente. A continuación, haga clic en "Comenzar".
 OK	InstallProgress		Aceptar
 Quit BootManager	InstallerWindow		Salir del Gestor de arranque
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		¿Está seguro de querer instalar sobre el disco de arranque actual? El instalador tendrá que reiniciar la máquina.
 Onto:	InstallerWindow		En:
 Tools	InstallerWindow		Herramientas
 scanning…	InstallerWindow		buscando discos…

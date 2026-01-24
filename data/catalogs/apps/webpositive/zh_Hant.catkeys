@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	2225233929
+1	english	x-vnd.Haiku-WebPositive	2402977561
 Authentication required	Authentication Panel		需要身份驗證
 Previous	WebPositive Window		先前
 Copy	Console Window		複製
@@ -63,7 +63,6 @@ WebPositive	System name		WebPositive
 Old name: %s	BookmarkBar		原名稱：%s
 Expiration	Cookie Manager		到期
 Reload	WebPositive Window		重新載入
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		您的 CPU 太舊，不支援 SSE2 擴展，否則 WebPositive 無法運作。我們建議安裝 NetSurf。
 Download finished	Download Window		下載完成
 Cookie manager	WebPositive Window		Cookie 管理器
 Username:	Authentication Panel		使用者名稱：
@@ -118,7 +117,6 @@ Remove	Download Window		移除
 Close tab	WebPositive Window		關閉選項卡
 About	WebPositive Window		關於
 Continue downloads	WebPositive		繼續下載
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		仍有下載正在進行，您真的要現在退出 WebPositive 嗎？
 Proxy server requires authentication	Settings Window		代理伺服器需要身份驗證
 Cancel	Settings Window		取消
 Reset size	WebPositive Window		重置尺寸
@@ -142,7 +140,6 @@ Next	WebPositive Window		下一步
 Bookmark error	WebPositive Window		書籤錯誤
 OK	WebPositive Window		確認
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% 的 %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		將頁面存储為…
 Zoom text only	WebPositive Window		僅縮放文本
 Page source error	WebPositive Window		頁面來源錯誤

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CodyCam	12021044
+1	ukrainian	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		вкажіть каталог призначення
 reply: '%s'\n	SftpClient		відповідь: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (відіслано справжній пароль)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Налаштування відео
 Can't find an available connection to the video window	CodyCam		Неможливо знайти доступне вікно відео
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Помилка при створенні вихідного файла
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не знайдено джерело зображення.\nДля використання CodyCam потрібна вебкамера.
 Logging in…	VideoConsumer.cpp		Авторизація…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Помилка запису вихідного файлу

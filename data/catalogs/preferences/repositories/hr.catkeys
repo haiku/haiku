@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Repositories	2214310510
+1	croatian	x-vnd.Haiku-Repositories	1997202827
 This is not a valid URL.	AddRepoWindow	Add URL error message	Ovo nije valjani URL.
 Repository URL:	AddRepoWindow	Text box label	URL repozitorija:
 Unknown	Constants	Unknown repository name	Nepoznato
@@ -18,7 +18,6 @@ OK	Constants	Button label	U redu
 Status	RepositoriesView	Column title	Status
 Name	RepositoriesView	Column title	Ime
 Add	AddRepoWindow	Button label	Dodaj
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repozitoriji ne mogu primiti imena trenutno omogućenih repozitorija.
 Enable all	RepositoriesView	Button label	Omogući sve
 Aborted	TaskLooper	Aborted task status message	Prekinuto
 URL	RepositoriesView	Column title	URL

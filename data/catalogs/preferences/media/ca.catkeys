@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Media	582516163
+1	catalan; valencian	x-vnd.Haiku-Media	4055972908
 Couldn't add volume control in Deskbar: %s\n	Media views		No s'ha pogut afegir el control del volum a la barra d'escriptori: %s\n
 Restart media services	Media views		Reinicia els serveis multimèdia
 Quit	Media Window		Surt
@@ -9,7 +9,6 @@ Video input:	Media views		Entrada de vídeo:
 Audio output:	Media views		Sortida d'àudio:
 Please select a SoundFont.	Midi View		Si us plau, seleccioneu una font de so.
 There are no SoundFonts installed.	Midi View		No hi ha fonts de so instal·lades.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Sortir-ne ara interromprà el reinici dels serveis multimèdia. El resultat probable és una funcionalitat trencadissa o una no disponibilitat dels mitjans.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		No s'ha pogut connectar amb el servidor multimèdia.\nEl voleu iniciar ?
 Video settings	Media Window		Paràmetres de vídeo
 Audio mixer	Media Window		Mesclador d'àudio

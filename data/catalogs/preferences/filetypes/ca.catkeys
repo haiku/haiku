@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-FileTypes	436017301
+1	catalan; valencian	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Esquerra
 Float	Attribute ListView		Flota
 Final	Application Types Window		Acabat
@@ -144,7 +144,6 @@ Open file	FileTypes		Obre un fitxer
 Version info	Application Type Window		Informació de la versió
 Final	Application Type Window		Acabat
 Preferred application	FileType Window		Aplicació preferida
-FileTypes	FileTypes		Tipus de fitxers
 Set preferred application	Preferred App Menu		Estableix l'aplicació preferida
 New file type	New File Type Window		Tipus de fitxer nou
 Short description:	Application Type Window		Descripció curta:

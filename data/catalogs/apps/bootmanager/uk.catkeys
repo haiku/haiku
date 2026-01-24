@@ -1,13 +1,12 @@
-1	ukrainian	x-vnd.Haiku-BootManager	867546001
+1	ukrainian	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	Збій резервного копіювання старого MBR
 At least one partition must be selected!	BootManagerController		Принаймні один розділ треба вибрати!
 No space available!	DrivesPage	Cannot install	Немає доступного простору!
-Boot Manager is unable to read the partition table!	BootManagerController		BootManager не зміг прочитати таблицю розділів!
 Immediately	DefaultPartitionPage		Без затримки
 Uninstall Boot Manager	UninstallPage	Title	Деінсталяція BootManager
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Невідомий формат
-Installation of boot menu failed	BootManagerController	Title	Збій інсталяції меню загрузки
 Backup Master Boot Record	BootManagerController	Title	Зберегти копію основного загрузочного запису (MBR)
+Installation of boot menu failed	BootManagerController	Title	Збій інсталяції меню загрузки
 Cannot access!	DrivesPage	Cannot install	Доступ заборонено!
 After one second	DefaultPartitionPage		одна секунда
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Попередній MBR успішно збережено в %s.
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	Записати меню загр�
 OK	BootManagerController	Button	ОК
 Uninstall boot manager	BootManagerController	Title	Деінсталяція BootManager
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для запису меню до загрузочного диску (%s). Перевірте інформацію перед тим як продовжити.
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Перший розділ починається зарано і на ньому немає місця для встановлення меню загрузки.\nBootManager потребує принаймні 2 KБ перед першим розділом.
 Uninstall	DrivesPage	Button	Деінсталяція
 Update	DrivesPage	Button	Оновити
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Основний загрузочний запис (MBR) завантажувального пристрою:\n\t%s\nзараз буде записано на диск. Виберіть файл для збереження поточного MBR.\n\nКоли під час інсталяції щось піде не так або Ви захочете вилучити меню загрузки просто запустіть BootManager і натисніть кнопку «Деінсталяція».
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		п'ять секунд
 Timeout: %s	DefaultPartitionPage		Затримка: %s
 The Master Boot Record could not be restored!	BootManagerController		MBR неможливо відновити!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Таблиця розділів першого жорсткого диска несумісна з BootManager.\nBootManager працює тільки з MBR розділами IBM PC.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Виберіть пристрій, на який треба встановити або з якого треба видалити BootManager.
 After four seconds	DefaultPartitionPage		чотири секунди
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Деінста
 After two seconds	DefaultPartitionPage		дві секунди
 Partition table not compatible	BootManagerController	Title	Таблиця розділів несумісна
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		MBR пристрою (%DISK) був успішно відновлений з %FILE.
-Done	BootManagerController	Button	Готово
 BootManager	System name		BootManager
+Done	BootManagerController	Button	Готово
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Виберіть файл з якого треба провести відновлення MBR. Цей файл було створено при першому встановленні BootManager.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Виберіть файл з якого треба провести відновлення MBR. Цей файл було створено при першому встановленні BootManager.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Все готово для відновлення MBR %disk з %file. Ви дійсно бажаєте продовжити?

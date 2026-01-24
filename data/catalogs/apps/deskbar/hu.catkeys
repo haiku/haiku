@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-TSKB	316181764
+1	hungarian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Automatikus elrejtés
 Show all	WindowMenu		Összes megjelenítése
 Edit in Tracker…	PreferencesWindow		Szerkesztés a Nyomkövetőben…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Replikánsok megjelenítése
 No windows	WindowMenu		Nincsenek ablakok
 Show clock	Tray		Óra megjelenítése
 Close all	WindowMenu		Összes bezárása
-Deskbar preferences	PreferencesWindow		Asztalsáv-beállítások
 About this system	DeskbarMenu		Rendszer névjegye
 Quit application	WindowMenu		Kilépés a programból
 Hide application names	PreferencesWindow		Programnevek elrejtése
 Applications	PreferencesWindow		Programok
 Show application expander	PreferencesWindow		Programkibontó mutatása
-Deskbar preferences…	DeskbarMenu		Asztalsáv-beállítások…
 Suspend	DeskbarMenu		Felfüggesztés
 Shutdown…	DeskbarMenu		Leállítás…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Bemutatók

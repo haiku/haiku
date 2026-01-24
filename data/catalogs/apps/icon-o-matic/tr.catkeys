@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	3427646542
+1	turkish	x-vnd.haiku-icon_o_matic	2302019526
 None	Icon-O-Matic-Properties		Yok
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Yolu temizle
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -101,7 +101,6 @@ Add shape with path	Icon-O-Matic-Menu-Shape		Yol içeren şekil ekle
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Tüh
 Translation X	Icon-O-Matic-PropertyNames		X taşıması
 Multi-paste properties	Icon-O-Matic-Properties		Çoklu yapıştır özellikleri
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon–O–Matic, SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Özgün dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
 Remove	Icon-O-Matic-TransformersList		Kaldır
 Rotate indices backwards	Icon-O-Matic-PathsList		Belirticileri geriye doğru döndür
 Overwrite	Icon-O-Matic-SVGExport		Üzerine yaz

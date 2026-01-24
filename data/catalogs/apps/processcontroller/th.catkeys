@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-ProcessController	3123774187
+1	thai	x-vnd.Haiku-ProcessController	1137762699
 Error saving file	ProcessController		การบันทึกไฟล์ผิดพลาด
 Display priority	ProcessController		แสดงลำดับความสำคัญ
 That's no Fun!	ProcessController		ไม่สนุกเลย!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		หน่วยประมวลผล %d
 Live in the Deskbar	ProcessController		ถ่ายทอดสดอยู่ในเดสก์บาร์
 Kill this team!	ProcessController		ปิดทีมนี้!
 OK	ProcessController		ตกลง
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		คุณสามารถเรียกใช้ตัวควบคุมกระบวนการในหน้าต่างหรือติดตั้งในเดสก์บาร์
 Real-time priority	ProcessController		ลำดับความสำคัญตามเวลาจริง
 Custom priority	ProcessController		ลำดับความสำคัญที่กำหนดเอง
 Debug this thread!	ProcessController		แก้ปัญหาเธรดนี้!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		การใช้งานหน่วยคว
 Ok!	ProcessController		ตกลง
 Normal priority	ProcessController		ลำดับความสำคัญปกติ
 Restart Deskbar	ProcessController		รีสตาร์ทเดสก์บาร์
-About ProcessController…	ProcessController		เกี่ยวกับ ตัวควบคุมการทำงาน
 Usage: %s [-deskbar]\n	ProcessController		การใช้งาน: %s [-deskbar]\n
 Please confirm	ProcessController		กรุณายืนยัน
 Urgent priority	ProcessController		ลำดับความสำคัญเร่งด่วน
@@ -42,7 +40,6 @@ System resources & caches…	ProcessController		ทรัพยากรระ�
 Damned!	ProcessController		Damned!
 New Terminal	ProcessController		เทอร์มินัลใหม่
 Power saving	ProcessController		ประหยัดพลังงาน
-ProcessController is already installed in Deskbar.	ProcessController		Process Controller ได้รับการติดตั้งในเดสก์บาร์แล้ว
 This is the last active processor…\nYou can't turn it off!	ProcessController		นี่เป็นโปรเซสเซอร์ที่ใช้งานล่าสุด… \nคุณไม่สามารถปิดได้!
 This thread is already gone…	ProcessController		เธรดนี้หายไปแล้ว
 Run in window	ProcessController		ทำงานในหน้าต่าง

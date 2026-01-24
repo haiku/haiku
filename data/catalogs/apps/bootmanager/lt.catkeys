@@ -1,12 +1,11 @@
-1	lithuanian	x-vnd.Haiku-BootManager	3355843558
+1	lithuanian	x-vnd.Haiku-BootManager	3319482851
 At least one partition must be selected!	BootManagerController		Privalote pasirinkti bent vieną skaidinį!
 No space available!	DrivesPage	Cannot install	Nepakanka laisvos vietos!
-Boot Manager is unable to read the partition table!	BootManagerController		Paleidyklei nepavyko perskaityti skaidinių lentelės!
 Immediately	DefaultPartitionPage		Nelaukti
 Uninstall Boot Manager	UninstallPage	Title	Paleidyklės šalinimas
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	tipas nežinomas
-Installation of boot menu failed	BootManagerController	Title	Paleidimo meniu įdiegti nepavyko
 Backup Master Boot Record	BootManagerController	Title	Esamo paleidimo įrašo atsarginė kopija
+Installation of boot menu failed	BootManagerController	Title	Paleidimo meniu įdiegti nepavyko
 Cannot access!	DrivesPage	Cannot install	Prieiga negalima!
 After one second	DefaultPartitionPage		viena sekundė
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Esamo paleidimo įrašo kopija sėkmingai įrašyta į failą %s.
@@ -49,8 +48,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Paleidyklės m
 After two seconds	DefaultPartitionPage		dvi sekundės
 Partition table not compatible	BootManagerController	Title	Nesuderinama skaidinių lentelė
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Paleidimo įrenginio (%DISK) paleidimo įrašas sėkmingai atkurtas iš failo %FILE.
-Done	BootManagerController	Button	Atlikta
 BootManager	System name		Paleidyklė
+Done	BootManagerController	Button	Atlikta
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Parinkite failą su atsargine paleidimo įrašo (MBR) kopija atkūrimui. Šis failas turėjo būti sukurtas pirmąkart įdiegiant paleidyklę.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Parinkite failą su atsargine paleidimo įrašo (MBR) kopija atkūrimui. Šis failas turėjo būti sukurtas pirmąkart įdiegiant paleidyklę.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Ketinama atkurti disko %disk paleidimo įrašą (MBR) iš failo %file. Ar norite tęsti?

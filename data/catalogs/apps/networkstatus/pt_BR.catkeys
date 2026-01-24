@@ -1,10 +1,9 @@
-1	portuguese (brazil)	x-vnd.Haiku-NetworkStatus	3629281636
+1	portuguese (brazil)	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		Endereço IPv6:
 Quit	NetworkStatusView		Sair
 Unknown	NetworkStatusView		Desconhecido
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao iniciar o preflet da rede.\n\nErro: 
 Install in Deskbar	NetworkStatus		Instalar na Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opções do NetworkStatus:\n\t--deskbar\tadicionar replicante automaticamente no Deskbar\n\t--help\t\texibir esta informação e sair
 Open network preferences…	NetworkStatusView		Abrir preferências de Rede...
 NetworkStatus	System name		Estado da Rede
 Broadcast:	NetworkStatusView		Broadcast:

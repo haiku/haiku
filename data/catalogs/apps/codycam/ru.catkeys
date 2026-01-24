@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CodyCam	12021044
+1	russian	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		укажите папку назначения
 reply: '%s'\n	SftpClient		ответ: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		ПАРОЛЬ <скрыт>  (настоящий пароль отправлен)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Настройка видео
 Can't find an available connection to the video window	CodyCam		Не удалось обнаружить доступного соединения с видео окном
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Ошибка при создании файла
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не найден источник видеосигнала.\nПожалуйста, подключите вебкамеру.
 Logging in…	VideoConsumer.cpp		Авторизация…
 CodyCam	System name		Веб-камера
 Error writing output file	VideoConsumer.cpp		Ошибка при записи файла

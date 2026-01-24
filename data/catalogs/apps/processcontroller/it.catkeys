@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ProcessController	415082887
+1	italian	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Errore nel salvataggio del file
 Display priority	ProcessController		Priorità visualizzazione
 That's no Fun!	ProcessController		Non è divertente!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Processore %d
 Live in the Deskbar	ProcessController		Integrato nella Deskbar
 Kill this team!	ProcessController		Termina questo team!
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		È possibile eseguire Gestione Processi in una finestra o installarlo nella Deskbar.
 Real-time priority	ProcessController		Priorità in tempo reale
 Custom priority	ProcessController		Priorità personalizzata
 Debug this thread!	ProcessController		Esegui il debug di questo thread!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Uso della memoria
 Ok!	ProcessController		Ok!
 Normal priority	ProcessController		Priorità normale
 Restart Deskbar	ProcessController		Riavvia la Deskbar
-About ProcessController…	ProcessController		Informazioni su Gestione Processi…
 Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
 Please confirm	ProcessController		Conferma
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Risorse di sistema e cache…
 Damned!	ProcessController		Accidenti!
 New Terminal	ProcessController		Nuova finestra
 Power saving	ProcessController		Risparmio energetico
-ProcessController is already installed in Deskbar.	ProcessController		Gestione Processi è già installato nella Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Questo è l'ultimo processore attivo…\nNon puoi spegnerlo!
 This thread is already gone…	ProcessController		Questo thread è già terminato…
 Run in window	ProcessController		Esegui in finestra

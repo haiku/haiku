@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-PowerStatus	1104524835
+1	indonesian	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		Jalankan di jendela
 Extended battery info	PowerStatus		Info baterai tambahan
 Show status icon	PowerStatus		Tampilkan ikon status
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Baterai lemah
 Model number: 	PowerStatus		Nomor model: 
 Battery unused	PowerStatus		Baterai tidak digunakan
 Type: 	PowerStatus		Tipe: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Anda dapat menjalankan PowerStatus di jendela atau menginstalnya di Deskbar.
 Damaged or missing battery	PowerStatus		Baterai rusak atau tidak terdeteksi
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Pengosongan baterai
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		Nomor seri:
 Battery critical	PowerStatus		Baterai kritis
 Capacity: 	PowerStatus		Kapasitas: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Baterai yang didukung tidak terdeteksi. PowerStatus tidak dapat digunakan di sistem Anda.
 Show percent	PowerStatus		Tampilkan persen
 Capacity granularity 1: 	PowerStatus		Ketelitian kapasitas 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Daya baterai semakin rendah, silakan tancapkan perangkat.

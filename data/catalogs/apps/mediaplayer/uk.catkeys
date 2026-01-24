@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	520971408
+1	ukrainian	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до смітника
 Close	MediaPlayer-PlaylistWindow		Закрити
 Volume of background clips	MediaPlayer-SettingsWindow		Гучність фонових кліпів
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Закрити
 Save error	MediaPlayer-PlaylistWindow		Помилка збереження
 Attributes	MediaPlayer-Main		Атрибути
 Bottom of screen	MediaPlayer-SettingsWindow		Нижня частина екрана
-MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіаплеєра
 Copyright	MediaPlayer-InfoWin		Авторське право
 Invalid URL inserted!	MediaPlayer-NetworkStream		Помилка введення URL!
 Aspect ratio	MediaPlayer-Main		Співідношення сторін

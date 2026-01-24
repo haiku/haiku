@@ -1,4 +1,4 @@
-1	danish	x-vnd.Be-TSKB	316181764
+1	danish	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Skjul af sig selv
 Show all	WindowMenu		Vis alle
 Edit in Tracker…	PreferencesWindow		Redigér i Tracker…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Vis replikanter
 No windows	WindowMenu		Ingen vinduer
 Show clock	Tray		Vis ur
 Close all	WindowMenu		Luk alle
-Deskbar preferences	PreferencesWindow		Indstillinger for Deskbar
 About this system	DeskbarMenu		Om systemet
 Quit application	WindowMenu		Afslut program
 Hide application names	PreferencesWindow		Skjul programnavne
 Applications	PreferencesWindow		Programmer
 Show application expander	PreferencesWindow		Vis programudvider
-Deskbar preferences…	DeskbarMenu		Indstillinger for Deskbar…
 Suspend	DeskbarMenu		Sæt i hviletilstand
 Shutdown…	DeskbarMenu		Luk ned…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demoer

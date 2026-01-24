@@ -1,9 +1,8 @@
-1	czech	x-vnd.Haiku-Expander	3239308358
+1	czech	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Cíl
 Other	ExpanderPreferences		Ostatní
 Automatically show contents listing	ExpanderPreferences		Automaticky zobrazit výpis obsahu
 Expander	System name		Rozbalovač
-Expander: Choose destination	DirectoryFilePanel		Rozbalovač: Vybrat cíl
 Set source…	ExpanderMenu		Nastavit zdroj…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Cíl není adresář.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Otevřít cílový
 Same directory as source (archive) file	ExpanderPreferences		Stejná složka, jako zdrojový soubor (archív)
 Stop	ExpanderWindow		Zastavit
 Cancel	ExpanderWindow		Zrušit
-Expander settings	ExpanderPreferences		Nastavení rozbalovače
 Error when expanding archive	ExpanderWindow		Chyba při rozbalování archivu
 Expand	ExpanderMenu		Rozbalit
 Failed to create the destination folder.	ExpanderWindow		Chyba při vytváření cílového adresáře.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Pokračovat
 Cancel	ExpanderPreferences		Zrušit
 Use:	ExpanderPreferences		Použití:
 Destination folder	ExpanderPreferences		Cílový adresář
-Expander: Open	ExpanderWindow		Rozbalovač: Otevřít
 Leave destination folder path empty	ExpanderPreferences		Nechat cestu cílového adresáře prázdnou
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Cílový adresář neexistuje. Chcete jej vytvořit?
 The file doesn't exist	ExpanderWindow		Soubor neexistuje

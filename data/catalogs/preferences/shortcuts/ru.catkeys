@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Shortcuts	3834857117
+1	russian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Приложение
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Вернуться к сохраненной в
 Don't save	ShortcutsWindow		Не сохранять
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не удалось сохранить список горячих клавиш.
 Save	ShortcutsWindow		Сохранить
 Either	ShortcutsSpec		Любой
 Oh no	ShortcutsWindow		О нет
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Отмена
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Левый
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не удалось прочитать файл со списком горячих клавиш!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не удалось сохранить файл со списком горячих клавиш!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Ваш текст\"
 Remove selected shortcut	ShortcutsWindow		Удалить выделенную горячую клавишу
 Error, NULL state description?	ShortcutsSpec		Ошибка, состояние описания NULL?

@@ -1,10 +1,9 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-NetworkStatus	3629281636
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		IPv6-adresse:
 Quit	NetworkStatusView		Avslutt
 Unknown	NetworkStatusView		Ukjent
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Åpning av Nettverksinnstillinger mislyktes.\n\nFeilmelding:
 Install in Deskbar	NetworkStatus		Installer i Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Alternativer for NetworkStatus:\n\t--deskbar\tlegg en replikant automatisk til Deskbar\n\t--help\t\tvis denne informasjonen og avslutt
 Open network preferences…	NetworkStatusView		Åpne Nettverksinnstillinger
 NetworkStatus	System name		Nettverkstatus
 Broadcast:	NetworkStatusView		Kringkast:

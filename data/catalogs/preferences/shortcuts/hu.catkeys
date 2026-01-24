@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Shortcuts	3834857117
+1	hungarian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*EgérFel
 Application	ShortcutsWindow		Program
 Option	ShortcutsSpec	Name for modifier on keyboard	Opció
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Visszaállítás az elmentettre
 Don't save	ShortcutsWindow		Ne mentse
 *MouseDown	ShortcutsWindow		*EgérLe
 *Beep	ShortcutsWindow		*Sípolás
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait.
 Save	ShortcutsWindow		Mentés
 Either	ShortcutsSpec		Bármelyik
 Oh no	ShortcutsWindow		Ó jaj
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Mégse
 *MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Left	ShortcutsSpec		Bal
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta beolvasni a beállításait!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*KarakterekBeszúrása \"Ide írja a szöveget\"
 Remove selected shortcut	ShortcutsWindow		Kiválasztott gyorsbillentyű eltávolítása
 Error, NULL state description?	ShortcutsSpec		Hiba, NULL állapotleírás?

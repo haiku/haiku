@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-FileTypes	3626787086
+1	lithuanian	x-vnd.Haiku-FileTypes	3415181369
 Left	Attribute Window	Attribute column alignment in Tracker	kairinė
 Float	Attribute ListView		Slankaus kablelio skaičius (float)
 Final	Application Types Window		Galutinė
@@ -142,7 +142,6 @@ Open file	FileTypes		Atverti failą
 Version info	Application Type Window		Versijos savybės
 Final	Application Type Window		Galutinė
 Preferred application	FileType Window		Pageidautina programa
-FileTypes	FileTypes		Failų tipai
 Set preferred application	Preferred App Menu		Skirti pageidautiną programą
 New file type	New File Type Window		Naujas failų tipas
 Short description:	Application Type Window		Trumpasis aprašas:

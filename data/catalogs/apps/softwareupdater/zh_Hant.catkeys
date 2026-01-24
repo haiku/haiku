@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-softwareupdater	369324613
+1	english	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	即將更新版本
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		點此安裝 {0, plural, one{# 已更新套件} other{# updated 已更新套件}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	需要卸載的套件
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		檢查更新時
 Packages are being updated	UpdateManager		套件正在更新中
 Cancel	SoftwareUpdaterWindow		取消
 Don't quit	SoftwareUpdaterWindow		不退出
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		按一下此處執行軟體更新程式。某些更新需要選擇問題解決方案。
 Checking for updates	SoftwareUpdaterWindow		檢查更新
 Updates completed	UpdateManager		完成更新
 Reboot	SoftwareUpdaterWindow		重新啟動

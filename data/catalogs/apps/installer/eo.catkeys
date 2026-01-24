@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	150102172
+1	esperanto	x-vnd.Haiku-Installer	322678697
 Performing installation.	InstallProgress		Instalante.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
 No optional packages available.	PackagesView		Malnepraj pakaĵoj ne estas haveblaj.
@@ -60,7 +60,6 @@ Set up partitions…	InstallerWindow		Agordi subdiskojn…
 Install progress:  	InstallerWindow		Instalada progreso:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Vi ne povas instali la enhavon de disko al ĝi mem. Bonvolu elekti alian diskon.
 OK	InstallProgress		Bone
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ĉu vi certas, ke vi volas instali en la aktualan startdiskon? La Instalilo devigos restarti la komputilon se vi daŭras.
 Onto:	InstallerWindow		En:
 Tools	InstallerWindow		Iloj
 scanning…	InstallerWindow		skanado…

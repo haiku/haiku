@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-MAIL	262401742
+1	italian	x-vnd.Be-MAIL	3945726882
 Set to Saved	Mail		Imposta come Salvato
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il testo contiene %ld caratteri non codificabili. Se premi 'Invio' questi caratteri saranno sostituiti. Premi 'Annulla' per tornare indietro e verificare il set di caratteri utilizzato.
 Text wrapping:	Mail		A capo automatico
@@ -96,7 +96,6 @@ To:	Mail		A:
 Need Tracker to move items to trash	Mail		Per spostare questi oggetti nel cestino, Tracker deve essere disponibile
 The mail_daemon could not be started:\n\t	Mail		Non è stato possibile avviare il server mail_daemon:\n\t
 <no account found>	Mail		<account non trovato>
-Mail couldn't find its dictionary.	Mail		Mail non trova il dizionario.
 helpful message	Mail		messaggio utile
  Read 	Mail		 Letto 
 Font:	Mail		Tipo di carattere:
@@ -107,7 +106,6 @@ Start now	Mail		Inizia adesso
 (Name unavailable)	Mail		(Nome non disponibile)
 Move to trash	Mail		Sposta nel cestino
 <none>	Mail		<vuoto>
-Mail settings	Mail		Impostazioni Mail
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Controllo ortografico
 Status:	Mail		Stato:

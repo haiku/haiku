@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PoorMan	1829050509
+1	hungarian	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Netes mappa kiválasztása
 Console logging	PoorMan		Konzoli naplózás
 Create Log File	PoorMan		Naplófájl készítése
@@ -6,9 +6,7 @@ File logging	PoorMan		Fájlnaplózás
 Website options	PoorMan		Weboldal beállítások
 Log to file	PoorMan		Naplózás fájlba
 Shutting down.	PoorMan		Leállás.
-Error Dir	PoorMan		Hiba mappa
 Web folder:	PoorMan		Mappa:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérlek válaszd ki azt a mappát, ahol az oldal fájljai találhatóak.\n\nA SzegényEmber létre tud hozni egy alapértelmezett \"public_html\" mappát a saját mappán belül,\nvagy pedig választhatsz egyet helyette.
 Log To Console	PoorMan		Naplózás konzolba
 File Name	PoorMan		Fájlnév
 Starting up... 	PoorMan		Indítás…
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Kérések: %lu
 Hits: 0	PoorMan		Kérések: 0
 Shutting down.\n	PoorMan		Leállás.\n
 Select all	PoorMan		Mind kijelölése
-Error Server	PoorMan		Hibakiszolgáló
 Send file listing if there's no start page	PoorMan		Fájllista küldése ha nincs kezdőlap
-Create PoorMan log	PoorMan		SzegényEmber napló készítése
 Max. simultaneous connections:	PoorMan		Maximális kapcsolatok száma:
 Done	PoorMan		Kész
 Site	PoorMan		Oldal
@@ -48,7 +44,6 @@ Run server	PoorMan		Kiszolgáló futtatása
 Create	PoorMan		Készítés
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# kapcsolat} other{# kapcsolat}}
 done.\n	PoorMan		kész.\n
-PoorMan settings	PoorMan		SzegényEmber beállításai
 Console Logging	PoorMan		Konzoli naplózás
 Clear log file	PoorMan		Naplófájl ürítése
 Save log console selection	PoorMan		Konzolbéli kijelölés mentése

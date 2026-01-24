@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	4073987023
+1	dutch; flemish	x-vnd.Be-MAIL	856240449
 Set to Saved	Mail		Als Bewaard markeren
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Uw hoofdtekst bevat %ld niet-codeerbare tekens. Mogelijk werkt een andere letterset beter? Klik op 'Versturen' om de tekst toch te versturen (een vervangend teken zal dan gebruikt worden op de plaats van elk niet-codeerbaar teken), of kies 'Annuleren' om terug te keren voor een herstelpoging.
 Text wrapping:	Mail		Tekstafbreking:
@@ -93,7 +93,6 @@ To:	Mail		Aan:
 Need Tracker to move items to trash	Mail		Tracker is nodig voor verplaatsing van items naar de Prullenbak
 The mail_daemon could not be started:\n\t	Mail		De mail_daemon kon niet worden gestart:\n\t
 <no account found>	Mail		<geen account gevonden>
-Mail couldn't find its dictionary.	Mail		Mail kon zijn woordenboek niet vinden.
 helpful message	Mail		nuttig bericht
  Read 	Mail		Lezen
 Font:	Mail		Lettertype:

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	4193609455
+1	german	x-vnd.Haiku-DriveSetup	2351839435
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Register disk image…	MainWindow		Datenträgerabbild anmelden …
 Mount all	MainWindow		Alle einhängen
@@ -25,6 +25,7 @@ Validation of the given parameters failed.	MainWindow		Die Überprüfung der ang
 Cannot init target partition.	MainWindow		Zielpartition konnte nicht initialisiert werden.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 DriveSetup	System name		Datenträgerverwaltung
+Error:	MainWindow	in any error alert	Fehler:
 Mounted at	PartitionList		Eingehangen als
 Disk system %s not found!	MainWindow		Medienschema %s nicht gefunden!
 Create…	MainWindow		Anlegen …
@@ -44,6 +45,7 @@ There's no space on the partition where a child partition could be created.	Main
 %s does not refer to a file disk device.	MainWindow		%s ist kein Datei-Disk-Gerät.
 No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
 Attributes	PartitionList		Attribute
+'%s' is not a regular file.	MainWindow		'%s' ist keine Datei.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 Change parameters…	MainWindow		Parameter ändern …
 Format	InitializeParametersPanel		Formatieren
@@ -78,6 +80,7 @@ Partition name:	ChangeParametersPanel		Partitionsname:
 LUKS encrypted	Encryption utils		LUKS verschlüsselt
 Empty space	PartitionList		Freier Platz
 Cancel	AbstractParametersPanel		Abbrechen
+%appname%: Save disk image	MainWindow		%appname%: Datenträgerabbild speichern
 Format	MainWindow		Formatieren
 OK	MainWindow		OK
 Cannot init target file.	MainWindow		Ziel-Datei konnte nicht initialisiert werden.
@@ -86,12 +89,14 @@ Unregister disk image	MainWindow		Datenträgerabbild abmelden
 The target partition is smaller than the image file.	MainWindow		Die Zielpartition ist kleiner als das Datenträgerabbild.
 Empty space	DiskView		Freier Platz
 Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
+Failed to get information about '%s'.	MainWindow		Keine Infos zu '%s' verfügbar.
 Open with DiskProbe	MainWindow		Öffnen mit DiskProbe
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
 There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
 The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Soll das Aushängen erzwungen werden?\n\nAchtung: Sollte der Datenträger gerade durch eine Anwendung beschrieben werden, können beim erzwungenen Aushängen Daten verloren gehen.\n
 Disk image has been removed.	MainWindow		Datenträgerabbild wurde abgemeldet.
+No file disk device found with the given ID, trying file '%s'.	MainWindow		Mit der angegebenen ID wurde kein Datei-Disk-Gerät gefunden. Versuche Datei '%s'.
 Cancel	MainWindow		Abbrechen
 Free space	PartitionList		Freier Speicherplatz
 Queries	PartitionList		Queries
@@ -112,7 +117,9 @@ Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nic
 Continue	MainWindow		Weiter
 Could not mount partition %s.	MainWindow		Die Partition %s konnte nicht eingehangen werden.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+%appname% error	MainWindow		%appname% Fehler
 The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
+Failed to unregister file disk device %s.	MainWindow		Fehler beim Abmelden von Datei-Disk-Gerät %s.
 The partition %s is already unmounted.	MainWindow		Die Partition %s ist bereits ausgehangen.
 Target volume is read only.	MainWindow		Das Ziel ist schreibgeschützt.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!
@@ -127,7 +134,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
 Active	PartitionList		Aktiv
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
-Failed to unregister file disk device.	MainWindow		Fehler beim Abmelden des Datei-Disk-Geräts.
+Failed to unregister file disk device.	MainWindow		Fehler beim Abmelden eines Datei-Disk-Geräts.
 Writing image to disk	MainWindow		Schreibe Abbild auf Datenträger
 The partition %s has been successfully formatted.\n	MainWindow		Die Partition %s wurde erfolgreich formatiert.\n
 %appname%: Register disk image	MainWindow		%appname%: Datenträgerabbild anmelden

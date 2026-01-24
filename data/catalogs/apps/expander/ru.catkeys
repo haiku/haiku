@@ -1,9 +1,8 @@
-1	russian	x-vnd.Haiku-Expander	3239308358
+1	russian	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Назначение
 Other	ExpanderPreferences		Другое
 Automatically show contents listing	ExpanderPreferences		Автоматически отображать содержимое архива
 Expander	System name		Распаковщик
-Expander: Choose destination	DirectoryFilePanel		Expander: Выбор папки для извлечения
 Set source…	ExpanderMenu		Выбрать источник…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Указанный объект не является папкой.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Открыть п�
 Same directory as source (archive) file	ExpanderPreferences		Использовать ту же папку где находится архив
 Stop	ExpanderWindow		Остановить
 Cancel	ExpanderWindow		Отмена
-Expander settings	ExpanderPreferences		Настройки извлечения
 Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
 Expand	ExpanderMenu		Распаковать
 Failed to create the destination folder.	ExpanderWindow		Не удалось создать папку назначения.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Продолжить
 Cancel	ExpanderPreferences		Отмена
 Use:	ExpanderPreferences		Использовать:
 Destination folder	ExpanderPreferences		Путь для извлечения
-Expander: Open	ExpanderWindow		Распаковщик: Открыть
 Leave destination folder path empty	ExpanderPreferences		Оставить путь назначения пустым
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка назначения не существует. Создать её?
 The file doesn't exist	ExpanderWindow		Файл не существует

@@ -1,9 +1,8 @@
-1	thai	x-vnd.Haiku-Expander	3300517306
+1	thai	x-vnd.Haiku-Expander	2101897241
 Destination	ExpanderWindow		ปลายทาง
 Other	ExpanderPreferences		อื่นๆ
 Automatically show contents listing	ExpanderPreferences		แสดงรายการเนื้อหาโดยอัตโนมัติ
 Expander	System name		ตัวขยาย
-Expander: Choose destination	DirectoryFilePanel		ตัวขยาย: เลือกปลายทาง
 Set source…	ExpanderMenu		ตั้งค่าแหล่งที่มา
 The destination is not a folder.	ExpanderWindow		ปลายทางไม่ใช่โฟลเดอร์
 The folder was either moved, renamed or not supported.	ExpanderWindow		โฟลเดอร์ถูกย้ายเปลี่ยนชื่อหรือไม่รองรับ
@@ -19,7 +18,6 @@ Open destination folder after extraction	ExpanderPreferences		เปิดโฟ
 Same directory as source (archive) file	ExpanderPreferences		ไดเร็กทอรีเดียวกันกับไฟล์ซอร์ส (ไฟล์เก็บถาวร)
 Stop	ExpanderWindow		หยุด
 Cancel	ExpanderWindow		ยกเลิก
-Expander settings	ExpanderPreferences		ตั้งค่าตัวขยาย
 Error when expanding archive	ExpanderWindow		เกิดความผิดพลาดขณะเปิดไฟล์
 Expand	ExpanderMenu		ขยาย
 Failed to create the destination folder.	ExpanderWindow		ไม่สามารถสร้างโฟลเดอร์ปลายทาง
@@ -40,7 +38,6 @@ Continue	ExpanderWindow		ต่อไป
 Cancel	ExpanderPreferences		ยกเลิก
 Use:	ExpanderPreferences		ใช้:
 Destination folder	ExpanderPreferences		โฟลเดอร์ปลายทาง
-Expander: Open	ExpanderWindow		ตัวขยาย: เปิด
 Leave destination folder path empty	ExpanderPreferences		เว้นเส้นทางโฟลเดอร์ปลายทางว่างไว้
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		ไม่มีโฟลเดอร์ปลายทาง คุณต้องการที่จะสร้างมันขึ้นมา?
 The file doesn't exist	ExpanderWindow		ไฟล์นี้ไม่มีอยู่

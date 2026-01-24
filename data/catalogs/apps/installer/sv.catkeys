@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	3980652653
+1	swedish	x-vnd.Haiku-Installer	738307934
 Performing installation.	InstallProgress		Verkställer installationen.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
 No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
@@ -29,7 +29,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Klicka på "Konf
 Welcome to the Haiku Installer!\n\n	InstallerApp		Välkommen till Haikus installationsprogram!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? av ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, applikationen för att konfigurera disk partitioner kunde inte startas.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installationen slutförd. Bootsektorn har skrivits till '%s'. Tryck på "Avsluta" för att lämna installationsprogrammet eller välj en ny målvolym för att utföra ytterligare en installation.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Målvolymen är inte tom. Om den redan innehåller en Haiku-installation skrivs den över. Detta tar bort all installerad programvara.\n\nOm du vill uppgradera ditt system utan att ta bort installerad programvara, se avsnittet om Haiku Användarhandbok för applikationen \"SoftwareUpdater\" för uppdateringsinstruktioner. \n\nÄr du säker på att du vill fortsätta installationen?
 Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
 Write boot sector	InstallerWindow		Skriv bootsektor
@@ -90,7 +89,6 @@ Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow
 No valid EFI system data partitions found	InstallerWindow		Inga giltiga EFI-systemdatapartitioner hittades
 OK	InstallProgress		OK
 Quit BootManager	InstallerWindow		Avsluta BootManager
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Är du säker på att du vill installera på den valda startdisken? Om du fortsätter måste Installeraren starta om datorn.
 Onto:	InstallerWindow		Till:
 Tools	InstallerWindow		Verktyg
 scanning…	InstallerWindow		skannar…

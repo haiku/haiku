@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	262401742
+1	ukrainian	x-vnd.Be-MAIL	3945726882
 Set to Saved	Mail		До збережених
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Перенос тексту:
@@ -96,7 +96,6 @@ To:	Mail		Кому:
 Need Tracker to move items to trash	Mail		Для переміщення до смітника потрібен Tracker
 The mail_daemon could not be started:\n\t	Mail		Mail_daemon не запущено:\n\t
 <no account found>	Mail		<обліковий запис не знайдено>
-Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
 helpful message	Mail		корисне повідомлення
  Read 	Mail		 Прочитаним 
 Font:	Mail		Шрифт:
@@ -107,7 +106,6 @@ Start now	Mail		Запустити зараз
 (Name unavailable)	Mail		(Ім'я недоступне)
 Move to trash	Mail		Перемістити до смітника
 <none>	Mail		<пусто>
-Mail settings	Mail		Пошта – Настройки
 %d - Date	Mail		%d – Дата
 Check spelling	Mail		Перевіряти орфографію
 Status:	Mail		Статус:

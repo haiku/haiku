@@ -1,15 +1,12 @@
-1	finnish	x-vnd.Haiku-Sounds	2694258450
+1	finnish	x-vnd.Haiku-Sounds	762968133
 Select	SoundFilePanel		Valitse
 Sounds	System name		Ääniasetukset
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Ääniasetukset\n  Toivat sinulle:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Alkuperäistyö: Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
-No such file or directory	HEventList		Tiedostoa tai hakemistoa ei löydy
 Other…	HWindow		Muut...
-OK	SoundsHApp		Valmis
 Sound file:	HWindow		Äänitiedosto:
 <none>	HEventList		<ei mitään>
 Select a sound file	SoundFilePanel		Valitse äänitiedosto
-About Sounds	SoundsHApp		Ääniasetuksista
 OK	HEventList		Valmis
 Sound	HEventList		Ääni
 Event	HEventList		Tapahtuma
 <none>	HWindow		<ei mitään>
+No such file or directory	HEventList		Tiedostoa tai hakemistoa ei löydy

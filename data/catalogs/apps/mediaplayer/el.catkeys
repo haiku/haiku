@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	1512839444
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	1326372804
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Μετακίνηση Αρχείου στον Κάδο Απορριμάτων
 Close	MediaPlayer-PlaylistWindow		Κλείσιμο
 Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ παρασκηνίου
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Κλείσιμο
 Save error	MediaPlayer-PlaylistWindow		Αποθήκευση σφάλματος
 Attributes	MediaPlayer-Main		Ιδιότητες
 Bottom of screen	MediaPlayer-SettingsWindow		Κάτω μέρος της οθόνης
-MediaPlayer settings	MediaPlayer-SettingsWindow		Ρυθμίσεις Παίκτη Πολυμέσων
 Copyright	MediaPlayer-InfoWin		Πνευματική ιδιοκτησία
 Invalid URL inserted!	MediaPlayer-NetworkStream		Εισήχθη μη έγκυρος υπερσύνδεσμος!
 Aspect ratio	MediaPlayer-Main		Λόγος διαστάσεων

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-PowerStatus	1104524835
+1	italian	x-vnd.Haiku-PowerStatus	388505242
 Run in window	PowerStatus		Esegui in una finestra
 Extended battery info	PowerStatus		Informazioni batteria estese
 Show status icon	PowerStatus		Mostra l'icona di stato
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Livello batteria basso
 Model number: 	PowerStatus		Numero modello: 
 Battery unused	PowerStatus		Batteria non usata
 Type: 	PowerStatus		Tipo: 
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stato Batteria può essere eseguito in una finestra o installato nella Deskbar.
 Damaged or missing battery	PowerStatus		Batteria danneggiata o assente
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Batteria in scarica
@@ -31,7 +30,6 @@ Serial number: 	PowerStatus		Numero seriale:
 Battery critical	PowerStatus		Livello batteria critico
 Capacity: 	PowerStatus		Capacità: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Non è stata rilevata una batteria supportata. Stato Batteria non può essere utilizzato sul tuo computer.
 Show percent	PowerStatus		Mostra percentuale
 Capacity granularity 1: 	PowerStatus		Granularità della capacità 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Il livello della batteria sta scendendo, per favore connetti l'alimentazione.

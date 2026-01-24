@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-MAIL	262401742
+1	spanish; castilian	x-vnd.Be-MAIL	3945726882
 Set to Saved	Mail		Ajustar como Guardado
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El texto que ha escrito contiene %ld caracteres indecodificables. ¿Quizás un carácter diferente podría funcionar mejor? Presione enviar de cualquier manera (un carácter sustituto se utilizará en lugar de los indecodificables), o presione Cancelar para regresar e intentar arreglarlo.
 Text wrapping:	Mail		Ajuste del texto:
@@ -96,7 +96,6 @@ To:	Mail		Para:
 Need Tracker to move items to trash	Mail		Hacer que Tracker mueva elementos a la basura
 The mail_daemon could not be started:\n\t	Mail		El mail_daemon no se pudo iniciar:\n\t
 <no account found>	Mail		<ninguna cuenta encontrada>
-Mail couldn't find its dictionary.	Mail		Mail no pudo encontrar su diccionario.
 helpful message	Mail		mensaje útil
  Read 	Mail		 Leer 
 Font:	Mail		Tipografía:
@@ -107,7 +106,6 @@ Start now	Mail		Iniciar ahora
 (Name unavailable)	Mail		(Nombre indisponible)
 Move to trash	Mail		Mover a la papelera
 <none>	Mail		<ninguno>
-Mail settings	Mail		Ajustes de correo
 %d - Date	Mail		%d - Fecha
 Check spelling	Mail		Comprobar ortografía
 Status:	Mail		Estado:

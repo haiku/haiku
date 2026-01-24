@@ -1,13 +1,12 @@
-1	german	x-vnd.Haiku-BootManager	867546001
+1	german	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	Fehler beim Sichern des alten Master-Boot-Record
 At least one partition must be selected!	BootManagerController		Es muss mindestens eine Partition ausgewählt werden!
 No space available!	DrivesPage	Cannot install	Kein Speicher verfügbar!
-Boot Manager is unable to read the partition table!	BootManagerController		BootManager kann die Partitionstabelle nicht auslesen!
 Immediately	DefaultPartitionPage		Sofort
 Uninstall Boot Manager	UninstallPage	Title	Bootmenü entfernen
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Unbekannt
-Installation of boot menu failed	BootManagerController	Title	Installation des Bootmenüs fehlgeschlagen
 Backup Master Boot Record	BootManagerController	Title	Backup des Master-Boot-Record erstellen
+Installation of boot menu failed	BootManagerController	Title	Installation des Bootmenüs fehlgeschlagen
 Cannot access!	DrivesPage	Cannot install	Zugriff unmöglich!
 After one second	DefaultPartitionPage		Nach einer Sekunde
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Der vorherige Master-Boot-Record (MBR) wurde unter %s gespeichert.
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	Bootmenü schreiben
 OK	BootManagerController	Button	OK
 Uninstall boot manager	BootManagerController	Title	Bootmenü entfernen
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Es wird nun das folgende Bootmenü auf den Datenträger (%s) geschrieben. Die Einstellungen sollten vor dem nächsten Schritt noch einmal geprüft werden.
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Die erste Partition des Datenträgers beginnt zu früh und lässt nicht genügend freien Platz für ein Bootmenü.\nBootManager benötigt 2 KiB freien Speicher vor der ersten Partition.
 Uninstall	DrivesPage	Button	Entfernen
 Update	DrivesPage	Button	Aktualisieren
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Der Master-Boot-Record (MBR) des Bootmediums \n\t%s\n wird nun gesichert.\n\nSollte die Installation fehlschlagen oder soll das Bootmenü wieder entfernt werden, kann BootManager erneut ausgeführt und die Option 'Entfernen' gewählt werden.
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		Nach fünf Sekunden
 Timeout: %s	DefaultPartitionPage		Zeitlimit: %s
 The Master Boot Record could not be restored!	BootManagerController		Der Master-Boot-Record konnte nicht wiederhergestellt werden!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Die Partitionstabelle des ersten Datenträgers ist nicht kompatibel mit Boot Manager.\nBootManager funktioniert nur mit IBM PC MBR Partitionen.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Es muss ein Datenträger ausgewählt werden, auf dem der Bootmanager eingerichtet oder entfernt werden kann.
 After four seconds	DefaultPartitionPage		Nach vier Sekunden
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unbenannt %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Entfernen des 
 After two seconds	DefaultPartitionPage		Nach zwei Sekunden
 Partition table not compatible	BootManagerController	Title	Partitionstabelle nicht kompatibel
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Der Master-Boot-Record des Bootlaufwerks (%DISK) wurde erfolgreich aus der Sicherungsdatei %FILE wiederhergestellt.
-Done	BootManagerController	Button	Fertig
 BootManager	System name		BootManager
+Done	BootManagerController	Button	Fertig
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Es muss eine Sicherungsdatei mit dem Master-Boot-Record (MBR) angegeben werden, der für die Wiederherstellung verwendet werden soll. Diese Datei wurde erstellt, als das Bootmenü das erste Mal installiert wurde.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Es muss eine Sicherungsdatei mit dem Master-Boot-Record (MBR) angegeben werden, der für die Wiederherstellung verwendet werden soll. Diese Datei wurde erstellt, als das Bootmenü das erste Mal installiert wurde.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Im nächsten Schritt wird der Master-Boot-Record (MBR) auf %disk aus der Sicherungsdatei %file wiederhergestellt. Wirklich fortfahren?

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Pairs	818003250
+1	finnish	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Parit
 Quit	PairsWindow		Lopeta
 Medium	PairsWindow		Keskikokoinen
@@ -6,7 +6,6 @@ Game	PairsWindow		Peli
 Expert (8x8)	PairsWindow		Guru (8x8)
 New	PairsWindow		Uusi
 OK	Pairs		Valmis
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Parit-ohjelmalla ei ole tarpeeksi vektorikuvakkeita aloittamista varten; se tarvitsee vähintään %zu, löytyi %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ratkaisit pelin {0, monikko, yksi{# napsauksella} muut{# napsauksella}}.\n
 Small	PairsWindow		Pieni
 Size	PairsWindow		Koko

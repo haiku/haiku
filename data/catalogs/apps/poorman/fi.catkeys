@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PoorMan	1829050509
+1	finnish	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		Valitse webbikansio
 Console logging	PoorMan		Pääteikkunakirjaaminen
 Create Log File	PoorMan		Luo lokitiedosto
@@ -6,9 +6,7 @@ File logging	PoorMan		Tiedostolokikirjaus
 Website options	PoorMan		Webbisivuvalitsimet
 Log to file	PoorMan		Loki tiedostoon
 Shutting down.	PoorMan		Lopetetaan.
-Error Dir	PoorMan		Virhehakemisto
 Web folder:	PoorMan		Webbikansio:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Pettuleipä-palvelimen luoma oletuskansio ”public_html” kotikansiossasi.\nTai voit sen sijaan valita yhden omista kansioistasi.
 Log To Console	PoorMan		Kirjaa konsoliin
 File Name	PoorMan		Tiedostonimi
 Starting up... 	PoorMan		Aloitetaan... 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Osumia: %lu
 Hits: 0	PoorMan		Osumia: 0
 Shutting down.\n	PoorMan		Lopetetaan.\n
 Select all	PoorMan		Valitse kaikki
-Error Server	PoorMan		Virhepalvelin
 Send file listing if there's no start page	PoorMan		Lähetä tiedostoluettelo, jos aloitussivua ei ole
-Create PoorMan log	PoorMan		Luo Pettuleipäloki
 Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
 Done	PoorMan		Valmis
 Site	PoorMan		Sivusto
@@ -48,7 +44,6 @@ Run server	PoorMan		Käynnistä palvelin
 Create	PoorMan		Luo
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# yhteys} other{# yhteyttä}}
 done.\n	PoorMan		valmis.\n
-PoorMan settings	PoorMan		Pettuleipäasetukset
 Console Logging	PoorMan		Pääteikkunakirjaaminen
 Clear log file	PoorMan		Nollaa lokitiedosto
 Save log console selection	PoorMan		Tallenna lokikonsolivalinta

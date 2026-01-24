@@ -1,9 +1,8 @@
-1	romanian	x-vnd.Haiku-Expander	3239308358
+1	romanian	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Destinație
 Other	ExpanderPreferences		Altele
 Automatically show contents listing	ExpanderPreferences		Arată automat listarea conținutului
 Expander	System name		Expander
-Expander: Choose destination	DirectoryFilePanel		Expander: alege destinația
 Set source…	ExpanderMenu		Stabilire sursă…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Destinația nu este un dosar.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Deschide dosarul d
 Same directory as source (archive) file	ExpanderPreferences		Același director ca fișierul sursă (arhivă)
 Stop	ExpanderWindow		Oprește
 Cancel	ExpanderWindow		Anulează
-Expander settings	ExpanderPreferences		Configurări Expander
 Error when expanding archive	ExpanderWindow		Eroare la extinderea arhivei
 Expand	ExpanderMenu		Extinde
 Failed to create the destination folder.	ExpanderWindow		Nu s-a putut crea dosarul de destinație.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Continuă
 Cancel	ExpanderPreferences		Anulează
 Use:	ExpanderPreferences		Utilizare:
 Destination folder	ExpanderPreferences		Dosar de destinație
-Expander: Open	ExpanderWindow		Expander: deschide
 Leave destination folder path empty	ExpanderPreferences		Lăsați liberă calea dosarului de destinație
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Dosarul de destinație nu există. Doriți să îl creați?
 The file doesn't exist	ExpanderWindow		Fișierul nu există

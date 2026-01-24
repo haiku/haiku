@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	634582724
+1	spanish; castilian	x-vnd.Haiku-WebPositive	812326356
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiar
@@ -60,7 +60,6 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Término de búsqueda
 Expiration	Cookie Manager		Caducidad
 Reload	WebPositive Window		Recargar
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Su CPU es demasiado antigua y no soporta la extensión SSE2, sin la cual WebPositive no puede ejecutarse. En cambio le recomendamos instalar NetSurf.
 Download finished	Download Window		Descarga finalizada
 Cookie manager	WebPositive Window		Gestor de cookies
 Username:	Authentication Panel		Nombre de usuario:
@@ -114,7 +113,6 @@ Remove	Download Window		Quitar
 Close tab	WebPositive Window		Cerrar pestaña
 About	WebPositive Window		Acerca de
 Continue downloads	WebPositive		Continuar descargas
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Todavía hay descargas en progreso. ¿Desea cerrar WebPositive ahora?
 Proxy server requires authentication	Settings Window		El servidor proxy requiere autenticación
 Cancel	Settings Window		Cancelar
 Reset size	WebPositive Window		Restablecer tamaño
@@ -138,7 +136,6 @@ Next	WebPositive Window		Siguiente
 Bookmark error	WebPositive Window		Error de marcadores
 OK	WebPositive Window		Aceptar
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
-WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Guardar página como…
 Zoom text only	WebPositive Window		Zoom en el texto únicamente
 Page source error	WebPositive Window		Error del código fuente

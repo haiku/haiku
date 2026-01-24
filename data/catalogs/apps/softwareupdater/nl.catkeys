@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-softwareupdater	369324613
+1	dutch; flemish	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Versie bijwerken
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klik hier om {0, plural, one{# bijgewerkt pakket} other{# bijgewerkte pakketten}} te installeren.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakketten om te verwijderen
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Fout tijdens he
 Packages are being updated	UpdateManager		Pakketten worden bijgewerkt
 Cancel	SoftwareUpdaterWindow		Annuleren
 Don't quit	SoftwareUpdaterWindow		Niet afsluiten
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klik hier om SoftwareUpdater uit te voeren. Sommige updates vereisen dat u een probleemoplossing kiest.
 Checking for updates	SoftwareUpdaterWindow		Controleren op updates
 Updates completed	UpdateManager		Bijwerken voltooid
 Reboot	SoftwareUpdaterWindow		Herstarten

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	3188030699
+1	slovak	x-vnd.Haiku-MediaPlayer	3001564059
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstrániť položku do Koša
 Close	MediaPlayer-PlaylistWindow		Zatvoriť
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitosť klipov na pozadí
@@ -41,7 +41,6 @@ Close	MediaPlayer-Main		Zatvoriť
 Save error	MediaPlayer-PlaylistWindow		Chyba ukladania
 Attributes	MediaPlayer-Main		Atribúty
 Bottom of screen	MediaPlayer-SettingsWindow		Spodok obrazovky
-MediaPlayer settings	MediaPlayer-SettingsWindow		Nastavenia Prehrávača multimédií
 Copyright	MediaPlayer-InfoWin		Autorské práva
 Invalid URL inserted!	MediaPlayer-NetworkStream		Vložené neplatné URL!
 Aspect ratio	MediaPlayer-Main		Pomer strán

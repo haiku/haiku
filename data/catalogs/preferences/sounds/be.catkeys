@@ -1,13 +1,10 @@
-1	belarusian	x-vnd.Haiku-Sounds	2763165148
+1	belarusian	x-vnd.Haiku-Sounds	831874831
 Sounds	System name		Гукі
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Гукі\n  Аўтар :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Першапачатковы аўтар - Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
-No such file or directory	HEventList		Няма такога файла ці каталога
 Other…	HWindow		Іншы…
-OK	SoundsHApp		ОК
 Sound file:	HWindow		Аўдыё файл:
 <none>	HEventList		<няма>
-About Sounds	SoundsHApp		Пра Гукі
 OK	HEventList		ОК
 Sound	HEventList		Гук
 Event	HEventList		Падзея
 <none>	HWindow		<няма>
+No such file or directory	HEventList		Няма такога файла ці каталога

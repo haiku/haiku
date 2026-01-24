@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Notifications	4196496676
+1	danish	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		Nederst til venstre
 Application does not have a valid signature	NotificationView	Alert message	Programmet har ikke en gyldig signatur
 Status	NotificationView		Status
@@ -7,8 +7,6 @@ Lower right	GeneralView		Nederst til højre
 Muted	NotificationView		Lydløst
  is already listed	NotificationView	Alert message	 er allerede oplistet
 OK	PrefletWin		O.k.
-Notifications	PrefletWin		Underretninger
-Notifications preflet sample	PrefletWin		Prøve for underretningspreflet
 Mute notifications from this application	NotificationView		Sæt underretninger fra programmet på lydløst
 wide	GeneralView	Window width: Slider high text	bred
 narrow	GeneralView	Window width: Slider low text	smal
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Følg skrivebordslinje
 Notifications	System name		Underretninger
 Allowed	NotificationView		Tilladt
 Duration:	GeneralView		Varighed:
-Application	NotificationView		Program
 Enable notifications	GeneralView		Slå underretninger til
+Application	NotificationView		Program
 This is a test notification message	PrefletWin		Dette er en test-underretningsmeddelelese
 Remove	NotificationView		Fjern
 Position:	GeneralView		Placering:

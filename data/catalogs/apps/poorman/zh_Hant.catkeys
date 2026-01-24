@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PoorMan	1829050509
+1	english	x-vnd.Haiku-PoorMan	2667626017
 Select web folder	PoorMan		選擇網路資料夾
 Console logging	PoorMan		控制台紀錄檔記錄
 Create Log File	PoorMan		建立紀錄檔
@@ -6,9 +6,7 @@ File logging	PoorMan		檔案紀錄檔
 Website options	PoorMan		網站選項
 Log to file	PoorMan		記錄到檔案
 Shutting down.	PoorMan		正在關閉。
-Error Dir	PoorMan		錯誤目錄
 Web folder:	PoorMan		網頁資料夾：
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		請選擇要在web上發佈的資料夾。 \n\n您可以讓PoorMan在您的主資料夾中創建默認的\“public_html\”。\n或者，您可以選擇自己的資料夾之一。
 Log To Console	PoorMan		登入控制台
 File Name	PoorMan		檔案名稱
 Starting up... 	PoorMan		正在啟動...
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		點擊數：%lu
 Hits: 0	PoorMan		點擊數：0
 Shutting down.\n	PoorMan		正在關閉。\n
 Select all	PoorMan		選擇全部
-Error Server	PoorMan		錯誤伺服器
 Send file listing if there's no start page	PoorMan		如果沒有起始頁則傳送檔案列表
-Create PoorMan log	PoorMan		建立PoorMan紀錄檔
 Max. simultaneous connections:	PoorMan		最大同時連接：
 Done	PoorMan		完畢
 Site	PoorMan		網址
@@ -48,7 +44,6 @@ Run server	PoorMan		運行伺服器
 Create	PoorMan		創建
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# 連接} other{# 連接}}
 done.\n	PoorMan		完畢。\n
-PoorMan settings	PoorMan		PoorMan設定
 Console Logging	PoorMan		控制台紀錄檔
 Clear log file	PoorMan		清除紀錄檔
 Save log console selection	PoorMan		存儲紀錄檔控制台選擇

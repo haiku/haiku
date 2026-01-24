@@ -1,13 +1,12 @@
-1	indonesian	x-vnd.Haiku-BootManager	867546001
+1	indonesian	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	Master Boot Record lama gagal dicadangkan
 At least one partition must be selected!	BootManagerController		Setidaknya satu partisi harus dipilih!
 No space available!	DrivesPage	Cannot install	Tidak ada tempat yang tersedia!
-Boot Manager is unable to read the partition table!	BootManagerController		Boot Manager tidak dapat membaca tabel partisi!
 Immediately	DefaultPartitionPage		Segera
 Uninstall Boot Manager	UninstallPage	Title	Uninstall Manager Boot
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Tidak diketahui
-Installation of boot menu failed	BootManagerController	Title	Pemasangan menu boot gagal
 Backup Master Boot Record	BootManagerController	Title	Cadangkan Master Boot Record
+Installation of boot menu failed	BootManagerController	Title	Pemasangan menu boot gagal
 Cannot access!	DrivesPage	Cannot install	Tidak dapat mengakses!
 After one second	DefaultPartitionPage		Setelah satu detik
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Master Boot Record lama berhasil disimpan ke %s.
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	Tuliskan menu booting
 OK	BootManagerController	Button	OKE
 Uninstall boot manager	BootManagerController	Title	Copot manager boot
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Akan menulis menu but berikut ke diska but(%s). Harap verifikasi informasi di bawah ini sebelum melanjutkan.
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Partisi pertama pada disk dimulai terlalu dini dan tidak meninggalkan ruang kosong untuk menu booting.\nManajer Boot membutuhkan 2 ruang KiB yang tersedia sebelum partisi pertama.
 Uninstall	DrivesPage	Button	Uninstall
 Update	DrivesPage	Button	Memperbarui
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Master Boot Record (MBR) dari perangkat booting:\n\t%s\nakan segera disimpan ke disk. Silakan pilih file untuk menyimpan MBR.\n\nJika ada yang tidak beres dengan instalasi atau jika Anda ingin menghapus menu booting, cukup jalankan program bootman dan pilih opsi 'Uninstall'.
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		Setelah lima detik
 Timeout: %s	DefaultPartitionPage		Waktu habis dalam: %s
 The Master Boot Record could not be restored!	BootManagerController		Master Boot Record tidak dapat dipulihkan!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Tabel partisi hard disk pertama tidak kompatibel dengan Boot Manager.\nBoot Manager hanya bekerja dengan partisi IBM PC MBR.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Silakan pilih drive yang anda inginkan untuk manager boot dipasang atau dihapus darinya.
 After four seconds	DefaultPartitionPage		Setelah empat detik
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Tanpa nama %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	Penghapusan in
 After two seconds	DefaultPartitionPage		Setelah dua detik
 Partition table not compatible	BootManagerController	Title	Tabel partisi tidak kompatibel
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Master Boot Record dari perangkat booting (%DISK) telah berhasil dipulihkan dari %FILE.
-Done	BootManagerController	Button	Selesai
 BootManager	System name		BootManager
+Done	BootManagerController	Button	Selesai
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Silakan cari file save Master Boot Record (MBR) untuk dipulihkan. Ini adalah file yang dibuat saat boot manager pertama kali diinstal.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Silakan cari file save Master Boot Record (MBR) untuk dipulihkan. Ini adalah file yang dibuat saat boot manager pertama kali diinstal.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Akan mengembalikan Master Boot Record (MBR) %disk dari %file. Apakah Anda ingin melanjutkan?

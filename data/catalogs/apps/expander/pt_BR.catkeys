@@ -1,9 +1,8 @@
-1	portuguese (brazil)	x-vnd.Haiku-Expander	3300517306
+1	portuguese (brazil)	x-vnd.Haiku-Expander	2101897241
 Destination	ExpanderWindow		Destino
 Other	ExpanderPreferences		Outro
 Automatically show contents listing	ExpanderPreferences		Exibir automaticamente lista do conteúdo
 Expander	System name		Expansor
-Expander: Choose destination	DirectoryFilePanel		Expansor: Escolher destino
 Set source…	ExpanderMenu		Definir fonte…
 The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
 The folder was either moved, renamed or not supported.	ExpanderWindow		A pasta foi movida, renomeada ou não é suportada.
@@ -19,7 +18,6 @@ Open destination folder after extraction	ExpanderPreferences		Abrir a pasta de d
 Same directory as source (archive) file	ExpanderPreferences		Mesmo diretório que o arquivo fonte (conjunto de arquivos)
 Stop	ExpanderWindow		Parar
 Cancel	ExpanderWindow		Cancelar
-Expander settings	ExpanderPreferences		Configurações do Expansor
 Error when expanding archive	ExpanderWindow		Erro ao expandir conjunto de arquivos
 Expand	ExpanderMenu		Expandir
 Failed to create the destination folder.	ExpanderWindow		Falha ao criar a pasta de destino.
@@ -40,7 +38,6 @@ Continue	ExpanderWindow		Continuar
 Cancel	ExpanderPreferences		Cancelar
 Use:	ExpanderPreferences		Usar:
 Destination folder	ExpanderPreferences		Pasta de destino
-Expander: Open	ExpanderWindow		Expansor: Abrir
 Leave destination folder path empty	ExpanderPreferences		Deixar caminho da pasta de destino vazio
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A pasta de destino não existe. Deseja criá-la?
 The file doesn't exist	ExpanderWindow		O arquivo não existe

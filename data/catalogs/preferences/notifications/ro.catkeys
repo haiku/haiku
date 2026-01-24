@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Notifications	4196496676
+1	romanian	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		Stânga jos
 Application does not have a valid signature	NotificationView	Alert message	Aplicația nu are o semnătură validă
 Status	NotificationView		Stare
@@ -7,8 +7,6 @@ Lower right	GeneralView		Dreapta jos
 Muted	NotificationView		Dezactivat
  is already listed	NotificationView	Alert message	 este deja listat
 OK	PrefletWin		OK
-Notifications	PrefletWin		Notificări
-Notifications preflet sample	PrefletWin		Eșantion preflet de notificări
 Mute notifications from this application	NotificationView		Dezactivează notificările din această aplicație
 wide	GeneralView	Window width: Slider high text	lată
 narrow	GeneralView	Window width: Slider low text	îngustă
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Urmărește Deskbar
 Notifications	System name		Notificări
 Allowed	NotificationView		Permise
 Duration:	GeneralView		Durată:
-Application	NotificationView		Aplicație
 Enable notifications	GeneralView		Activează notificările
+Application	NotificationView		Aplicație
 This is a test notification message	PrefletWin		Acesta este un test de mesaj de notificare
 Remove	NotificationView		Elimină
 Position:	GeneralView		Poziție:

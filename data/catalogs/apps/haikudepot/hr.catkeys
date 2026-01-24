@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-HaikuDepot	2452359633
+1	croatian	x-vnd.Haiku-HaikuDepot	2950008199
 Available packages	MainWindow		Dostupni paketi
 It was not possible to create the new user.	UserLoginWindow		Nije bilo moguće stvoriti novog korisnika.
 Create account	UserLoginWindow		Napravi račun
@@ -42,7 +42,6 @@ Logged in as %User%	MainWindow		Prijavljen kao %User%
 Search terms:	FilterView		Pojmovi pretrage:
 Authentication failed	UserLoginWindow		Neuspjela ovjera
 Manage repositories…	MainWindow		Upravljaj repozitorijima…
-Open %DeskbarLink%	PackageManager		Otvori %DeskbarLink%
 Log in…	MainWindow		Prijava...
 All repositories	MainWindow		Svi repozitoriji
 Repository update error	LocalRepositoryUpdateProcess		Greška pri ažuriranju repozitorija
@@ -58,15 +57,14 @@ Show	MainWindow		Pokaži
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
 Ratings	PackageInfoView		Ocjenjivanja
 Installed packages	MainWindow		Instalirani paketi
-Error	App		Greška
 Contents	PackageInfoView		Sadržaj
 Close	PackageManager		Zatvori
 Changelog	PackageInfoView		Dnevnik promjena
 About	PackageInfoView		O programu
 Password:	UserLoginWindow		Lozinka:
 Stability	RatePackageWindow		Stabilnost
-Inactive	PackageListView		Neaktivan
 Cancel	RatePackageWindow		Otkaži
+Inactive	PackageListView		Neaktivan
 Nickname:	UserLoginWindow		Nadimak:
 OK	MainWindow		U redu
 Downloading:	PackageInfoView		Preuzimam:

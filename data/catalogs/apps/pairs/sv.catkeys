@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Pairs	818003250
+1	swedish	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Par
 Quit	PairsWindow		Avsluta
 Medium	PairsWindow		Mellan
@@ -6,7 +6,6 @@ Game	PairsWindow		Spel
 Expert (8x8)	PairsWindow		Expert (8x8)
 New	PairsWindow		Ny
 OK	Pairs		OK
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs hittade inte tillräckligt många vektor ikoner; det behövs %zu st, hittade %zu st.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Du har klarat spelet på {0, plural, one{# klick} other{# klick}}.\n
 Small	PairsWindow		Liten
 Size	PairsWindow		Storlek

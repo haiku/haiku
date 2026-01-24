@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MediaPlayer	520971408
+1	turkish	x-vnd.Haiku-MediaPlayer	334504768
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi çöpe at
 Close	MediaPlayer-PlaylistWindow		Kapat
 Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Kapat
 Save error	MediaPlayer-PlaylistWindow		Kaydetme hatası
 Attributes	MediaPlayer-Main		Öznitelikler
 Bottom of screen	MediaPlayer-SettingsWindow		Ekranın alt kısmı
-MediaPlayer settings	MediaPlayer-SettingsWindow		Ortam Oynatıcısı ayarları
 Copyright	MediaPlayer-InfoWin		Telif hakkı
 Invalid URL inserted!	MediaPlayer-NetworkStream		Geçersiz URL girildi!
 Aspect ratio	MediaPlayer-Main		En–boy oranı

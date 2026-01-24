@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Shortcuts	3834857117
+1	turkish	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*FareYukarı
 Application	ShortcutsWindow		Uygulama
 Option	ShortcutsSpec	Name for modifier on keyboard	Seçenek
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Kaydedilene döndür
 Don't save	ShortcutsWindow		Kaydetme
 *MouseDown	ShortcutsWindow		*FareAşağı
 *Beep	ShortcutsWindow		*Bip
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Kestirmeler, düğme kümenizi kaydedemedi.
 Save	ShortcutsWindow		Kaydet
 Either	ShortcutsSpec		Herhangi biri
 Oh no	ShortcutsWindow		N’olamaz
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Vazgeç
 *MoveMouse +20 +0	ShortcutsWindow		*FareyiHareketEttir +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
 Left	ShortcutsSpec		Sol
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümesi dosyanızı işleyemedi!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümesi dosyanızı kaydedemedi!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*DiziGir “Buraya metin girin”
 Remove selected shortcut	ShortcutsWindow		Seçili kestirmeyi kaldır
 Error, NULL state description?	ShortcutsSpec		Hata, NULL durum açıklaması?

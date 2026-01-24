@@ -1,10 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-NetworkStatus	3629281636
+1	dutch; flemish	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		IPv6-adres:
 Quit	NetworkStatusView		Afsluiten
 Unknown	NetworkStatusView		Onbekend
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Opstarten van het netwerk is mislukt.\n\nFoutmelding:
 Install in Deskbar	NetworkStatus		Installeren in Deskbar
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus opties:\n\t--deskbar\treplicant automatisch toevoegen in Deskbar\n\t--help\t\tprint deze informatie en sluit
 Open network preferences…	NetworkStatusView		Open netwerkvoorkeuren...
 NetworkStatus	System name		Netwerkstatus
 Broadcast:	NetworkStatusView		Broadcast:

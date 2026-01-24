@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1732323378
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1545856738
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
@@ -44,7 +44,6 @@ Close	MediaPlayer-Main		Cerrar
 Save error	MediaPlayer-PlaylistWindow		Error al guardar
 Attributes	MediaPlayer-Main		Atributos
 Bottom of screen	MediaPlayer-SettingsWindow		Parte inferior de la pantalla
-MediaPlayer settings	MediaPlayer-SettingsWindow		Configuración del Reproductor de Media
 Copyright	MediaPlayer-InfoWin		Derechos de autor
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida.
 Aspect ratio	MediaPlayer-Main		Relación de aspecto

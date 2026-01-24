@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-TSKB	452229503
+1	croatian	x-vnd.Be-TSKB	3917022454
 Auto-hide	PreferencesWindow		Samoskrivanje
 Show all	WindowMenu		Pokaži sve
 Menu	PreferencesWindow		Izbornik
@@ -23,13 +23,11 @@ Defaults	PreferencesWindow		Zadano
 No windows	WindowMenu		Bez prozora
 Show clock	Tray		Pokaži sat
 Close all	WindowMenu		Zatvori sve
-Deskbar preferences	PreferencesWindow		Deskbar osobitosti
 About this system	DeskbarMenu		O ovom sustavu
 Quit application	WindowMenu		Zatvori program
 Hide application names	PreferencesWindow		Sakrij imena programa
 Applications	PreferencesWindow		Programi
 Show application expander	PreferencesWindow		Pokaži proširivač programa
-Deskbar preferences…	DeskbarMenu		Deskbar osobitosti...
 Suspend	DeskbarMenu		Suspendiraj
 Shutdown…	DeskbarMenu		Isključivanje…
 Expand new applications	PreferencesWindow		Proširi nove programe

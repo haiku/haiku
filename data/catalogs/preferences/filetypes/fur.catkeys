@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-FileTypes	436017301
+1	friulian	x-vnd.Haiku-FileTypes	224411584
 Left	Attribute Window	Attribute column alignment in Tracker	Çampe
 Float	Attribute ListView		Numar in virgule mobile
 Final	Application Types Window		Finâl
@@ -144,7 +144,6 @@ Open file	FileTypes		Vierç file
 Version info	Application Type Window		Informazions version
 Final	Application Type Window		Finâl
 Preferred application	FileType Window		Aplicazion preferide
-FileTypes	FileTypes		Gjenars di file
 Set preferred application	Preferred App Menu		Stabilìs aplicazion preferide
 New file type	New File Type Window		Gnûf gjenar di file
 Short description:	Application Type Window		Descrizion curte:

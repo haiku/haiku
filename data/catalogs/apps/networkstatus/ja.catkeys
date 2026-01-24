@@ -1,10 +1,9 @@
-1	japanese	x-vnd.Haiku-NetworkStatus	2979204375
+1	japanese	x-vnd.Haiku-NetworkStatus	2192330251
 IPv6 address:	NetworkStatusView		IPv6 アドレス:
 Quit	NetworkStatusView		終了
 Unknown	NetworkStatusView		不明
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		ネットワーク設定の起動に失敗しました。\n\nエラー:
 Install in Deskbar	NetworkStatus		Deskbar にインストール
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit
 Open network preferences…	NetworkStatusView		ネットワーク設定を開く...
 NetworkStatus	System name		ネットワークの状態
 Broadcast:	NetworkStatusView		ブロードキャスト:

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	4076596243
+1	lithuanian	x-vnd.Haiku-Installer	4249172768
 Performing installation.	InstallProgress		Diegiama.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Diskų ženklintuvo langą.
 No optional packages available.	PackagesView		Papildomų paketų nėra.
@@ -48,7 +48,6 @@ Set up partitions…	InstallerWindow		Tvarkyti skaidinius…
 Install progress:  	InstallerWindow		Įdiegiama: 
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Skaidinio turinio diegti į jį patį negalima. Pasirinkite kitą skaidinį.
 OK	InstallProgress		Gerai
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ar tikrai norite įdiegti į dabartinį paleidimo diską? Jeigu tęsite, įdiegimo programa turės paleisti kompiuterį iš naujo.
 Onto:	InstallerWindow		Į:
 Tools	InstallerWindow		Priemonės
 scanning…	InstallerWindow		žvalgoma…

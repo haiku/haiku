@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	3834857117
+1	swedish	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MusnappUpp
 Application	ShortcutsWindow		Applikation
 Option	ShortcutsSpec	Name for modifier on keyboard	Alternativ
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Återgå till sparade
 Don't save	ShortcutsWindow		Spara inte
 *MouseDown	ShortcutsWindow		*MusknappNer
 *Beep	ShortcutsWindow		*Pip
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara din genvägsuppsättning.
 Save	ShortcutsWindow		Spara
 Either	ShortcutsSpec		Antingen eller
 Oh no	ShortcutsWindow		Åh nej!
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Avbryt
 *MoveMouse +20 +0	ShortcutsWindow		*FlyttaMusenTill +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Left	ShortcutsSpec		Vänster
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genvägar kunde inte läsa dina inställningar!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genvägar kunde inte spara dina inställningar!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InfogaSträng \"Din text\"
 Remove selected shortcut	ShortcutsWindow		Ta bort
 Error, NULL state description?	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?

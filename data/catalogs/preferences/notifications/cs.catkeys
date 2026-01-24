@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Notifications	4196496676
+1	czech	x-vnd.Haiku-Notifications	1250384010
 Lower left	GeneralView		Vlevo dole
 Application does not have a valid signature	NotificationView	Alert message	Aplikace nemá platný podpis
 Status	NotificationView		Stav
@@ -7,8 +7,6 @@ Lower right	GeneralView		Vpravo dole
 Muted	NotificationView		Zakázáno
  is already listed	NotificationView	Alert message	 už je v seznamu
 OK	PrefletWin		OK
-Notifications	PrefletWin		Upozornění
-Notifications preflet sample	PrefletWin		Vzor nastavení upozornění
 Mute notifications from this application	NotificationView		Zakázat upozornění z této aplikace
 wide	GeneralView	Window width: Slider high text	široký
 narrow	GeneralView	Window width: Slider low text	úzký
@@ -27,8 +25,8 @@ Follow Deskbar	GeneralView		Stejně jako Panel
 Notifications	System name		Upozornění
 Allowed	NotificationView		Dovoleno
 Duration:	GeneralView		Doba:
-Application	NotificationView		Aplikace
 Enable notifications	GeneralView		Povolit upozornění
+Application	NotificationView		Aplikace
 This is a test notification message	PrefletWin		Toto je zkušební upozornění
 Remove	NotificationView		Odstranit
 Position:	GeneralView		Poloha:

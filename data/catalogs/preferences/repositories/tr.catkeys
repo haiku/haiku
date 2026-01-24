@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Repositories	1220143449
+1	turkish	x-vnd.Haiku-Repositories	1003035766
 This is not a valid URL.	AddRepoWindow	Add URL error message	Bu geçerli bir URL değil.
 Repository URL:	AddRepoWindow	Text box label	Depo URL’si:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name% depo önbelleği yenilenirken bir hata oluştu
@@ -20,7 +20,6 @@ OK	Constants	Button label	Tamam
 Status	RepositoriesView	Column title	Durum
 Name	RepositoriesView	Column title	Ad
 Add	AddRepoWindow	Button label	Ekle
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Depolar, şu anda etkin olan depoların adını bulup getiremedi.
 Enable all	RepositoriesView	Button label	Tümünü etkinleştir
 Aborted	TaskLooper	Aborted task status message	İptal edildi
 URL	RepositoriesView	Column title	URL

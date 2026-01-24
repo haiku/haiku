@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ProcessController	415082887
+1	swedish	x-vnd.Haiku-ProcessController	2724038695
 Error saving file	ProcessController		Fel vid sparning av fil
 Display priority	ProcessController		Visningsprioritet
 That's no Fun!	ProcessController		Det var inte roligt!
@@ -8,7 +8,6 @@ Processor %d	ProcessController		Processor %d
 Live in the Deskbar	ProcessController		Lev i Deskbar
 Kill this team!	ProcessController		Avsluta tråden!
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Du kan köra ProcessKontroll i ett fönster eller installera den i Deskbar.
 Real-time priority	ProcessController		Realtidsprioritet
 Custom priority	ProcessController		Annan prioritet
 Debug this thread!	ProcessController		Felsök tråden!
@@ -18,7 +17,6 @@ Memory usage	ProcessController		Minnesanvändning
 Ok!	ProcessController		OK!
 Normal priority	ProcessController		Normal prioritet
 Restart Deskbar	ProcessController		Starta om Deskbar
-About ProcessController…	ProcessController		Om ProcessKontroll...
 Usage: %s [-deskbar]\n	ProcessController		Hantering: %s [-deskbar]\n
 Please confirm	ProcessController		Vänligen bekräfta
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -43,7 +41,6 @@ System resources & caches…	ProcessController		Systemresurser & filsystemscache
 Damned!	ProcessController		Attans!
 New Terminal	ProcessController		Ny terminal
 Power saving	ProcessController		Strömbesparing
-ProcessController is already installed in Deskbar.	ProcessController		ProcessKontroll är redan installerad i Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Detta är den sista aktiva processorn…\nDu kan inte stänga av den!
 This thread is already gone…	ProcessController		Tråden är redan avslutad
 Run in window	ProcessController		Kör i fönster

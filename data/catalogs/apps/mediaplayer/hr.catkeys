@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-MediaPlayer	4219770309
+1	croatian	x-vnd.Haiku-MediaPlayer	4033303669
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Ukloni unos u smeće
 Close	MediaPlayer-PlaylistWindow		Zatvori
 Audio	MediaPlayer-InfoWin		Audio
@@ -33,7 +33,6 @@ Close	MediaPlayer-Main		Zatvori
 Save error	MediaPlayer-PlaylistWindow		Spremi grešku
 Attributes	MediaPlayer-Main		Atributi
 Bottom of screen	MediaPlayer-SettingsWindow		Dno zaslona
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer postavke
 Copyright	MediaPlayer-InfoWin		Autorska prava
 Invalid URL inserted!	MediaPlayer-NetworkStream		Neispravan URL je unešen!
 Aspect ratio	MediaPlayer-Main		Omjer slike

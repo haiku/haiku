@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-softwareupdater	369324613
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Oppdaterer versjon
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klikk her for å installere {0, plural, one{# oppdatert pakke} other{# oppdaterte pakker}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakker som skal avinstalleres
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Et unntak oppst
 Packages are being updated	UpdateManager		Pakkene oppdateres
 Cancel	SoftwareUpdaterWindow		Avbryt
 Don't quit	SoftwareUpdaterWindow		Ikke avslutt
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klikk her for å kjøre ProgramOppdatering. Noen oppdateringer krever at en problemløsning velges.
 Checking for updates	SoftwareUpdaterWindow		Ser etter oppdateringer
 Updates completed	UpdateManager		Oppdateringer fullført
 Reboot	SoftwareUpdaterWindow		Start på nytt

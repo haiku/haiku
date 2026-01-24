@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-softwareupdater	369324613
+1	japanese	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	バージョンの更新中
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		ここをクリックして、{0, plural, one{# 個の更新されたパッケージ} other{# 個の更新されたパッケージ}}をインストールします。
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	アンインストールされるパッケージ
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		更新の確認
 Packages are being updated	UpdateManager		パッケージの更新中
 Cancel	SoftwareUpdaterWindow		中止
 Don't quit	SoftwareUpdaterWindow		終了しない
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		クリックしてソフトウェアの更新を起動してください。いくつかの更新は選択すべき問題の解決策を必要とするでしょう。
 Checking for updates	SoftwareUpdaterWindow		更新を確認しています
 Updates completed	UpdateManager		更新が完了しました
 Reboot	SoftwareUpdaterWindow		再起動

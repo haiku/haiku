@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	1441754962
+1	indonesian	x-vnd.Haiku-MediaPlayer	1255288322
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Hapus Entri ke Sampah
 Close	MediaPlayer-PlaylistWindow		Tutup
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dari klip latar
@@ -43,7 +43,6 @@ Close	MediaPlayer-Main		Tutup
 Save error	MediaPlayer-PlaylistWindow		Simpan galat
 Attributes	MediaPlayer-Main		Atribut
 Bottom of screen	MediaPlayer-SettingsWindow		Sisi bawah layar
-MediaPlayer settings	MediaPlayer-SettingsWindow		Pengaturan MediaPlayer
 Copyright	MediaPlayer-InfoWin		Hak cipta
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL yang dimasukkan tidak valid!
 Aspect ratio	MediaPlayer-Main		Rasio aspek

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Pairs	818003250
+1	spanish; castilian	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Pares
 Quit	PairsWindow		Salir
 Medium	PairsWindow		Mediana
@@ -6,7 +6,6 @@ Game	PairsWindow		Juego
 Expert (8x8)	PairsWindow		Experto (8x8)
 New	PairsWindow		Nuevo
 OK	Pairs		Aceptar
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs no ha encontrado los suficientes iconos vectoriales para iniciarse; son necesarios al menos %zu, se encotraron %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ha completado el juego en {0, plural, one{# click} other{# clicks}}.\n
 Small	PairsWindow		Pequeña
 Size	PairsWindow		Tamaño

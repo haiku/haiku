@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-WebPositive	1510673556
+1	esperanto	x-vnd.Haiku-WebPositive	3039931408
 Authentication required	Authentication Panel		Aŭtentigo nepra
 Previous	WebPositive Window		Antaŭa
 (Finish: %date)	Download Window		(Fino: %date)
@@ -107,7 +107,6 @@ Remove	Download Window		Forigi
 Close tab	WebPositive Window		Fermi langeton
 About	WebPositive Window		Pri
 Continue downloads	WebPositive		Daŭrigi elŝutadon
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La elŝutado daŭras, ĉu vi certas ke vi volas ĉesigi Retprosperon nun?
 Proxy server requires authentication	Settings Window		La prokurilo postulas aŭtentigon
 Cancel	Settings Window		Nuligi
 Reset size	WebPositive Window		Restarigi grandon
@@ -131,7 +130,6 @@ Next	WebPositive Window		Sekva
 Bookmark error	WebPositive Window		Eraro de legosignoj
 OK	WebPositive Window		Bone
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% el %expectedSize%, %rate%/s)
-WebPositive	Download Window		Retprospero
 Save page as…	WebPositive Window		Konservi paĝon kiel...
 Zoom text only	WebPositive Window		Zomi nur tekston
 Page source error	WebPositive Window		Eraro de paĝa fonto

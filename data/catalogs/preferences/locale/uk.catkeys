@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-Locale	1312749322
+1	ukrainian	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Середній формат:
 ERROR	TimeFormatSettings		ПОМИЛКА
 Negative:	TimeFormatSettings		Від'ємні:
 Language	Locale Preflet Window		Мова
 Short format:	TimeFormatSettings		Короткий формат:
 24 hour	TimeFormatSettings		24 години
-Locale	Locale Preflet Window		Локаль
 Time	TimeFormatSettings		Час
 Defaults	Locale Preflet Window		Типові настройки
 Locale	System name		Locale
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		ОК
 Long format:	TimeFormatSettings		Довгий формат:
 Numbers	TimeFormatSettings		Числа
 Available languages	Locale Preflet Window		Наявні мови
-Locale	Locale Preflet		Локаль
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не вдалося знайти наявні мови! Ви не можете використовувати цей префлет!
 Formatting	Locale Preflet Window		Формати
 Use month/day-names from preferred language	TimeFormatSettings		Назви місяця/дня як у мові за вподобанням

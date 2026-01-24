@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Installer	257949703
+1	indonesian	x-vnd.Haiku-Installer	430526228
 Performing installation.	InstallProgress		Melakukan instalasi.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
 No optional packages available.	PackagesView		Tidak ada paket opsional yang tersedia.
@@ -66,7 +66,6 @@ You can't install the contents of a disk onto itself. Please choose a different 
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Pilih disk sumber dari menu munculan. Kemudian tekan 'Mulai'.
 OK	InstallProgress		OKE
 Quit BootManager	InstallerWindow		Keluar dari BootManager
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Apakah Anda yakin ingin menginstal ke disk boot saat ini? Installer harus me-reboot komputer Anda jika Anda melanjutkan.
 Onto:	InstallerWindow		Keatas:
 Tools	InstallerWindow		Alat
 scanning…	InstallerWindow		pemindaian…

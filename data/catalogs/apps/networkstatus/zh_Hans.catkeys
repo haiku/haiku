@@ -1,10 +1,9 @@
-1	english	x-vnd.Haiku-NetworkStatus	3629281636
+1	english	x-vnd.Haiku-NetworkStatus	2842407512
 IPv6 address:	NetworkStatusView		IPv6 地址：
 Quit	NetworkStatusView		退出
 Unknown	NetworkStatusView		未知
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		启动网络首选项失败。\n\n错误：
 Install in Deskbar	NetworkStatus		安装到桌面栏
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		网络状态选项：\n\t--deskbar\t自动在桌面栏增加克隆控件\n\t--help\t\t打印本信息并退出
 Open network preferences…	NetworkStatusView		打开网络首选项…
 NetworkStatus	System name		网络状态
 Broadcast:	NetworkStatusView		广播地址：

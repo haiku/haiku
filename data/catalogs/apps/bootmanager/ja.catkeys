@@ -1,13 +1,12 @@
-1	japanese	x-vnd.Haiku-BootManager	867546001
+1	japanese	x-vnd.Haiku-BootManager	1012731949
 Old Master Boot Record backup failure	BootManagerController	Title	旧マスターブートレコードの保存に失敗しました
 At least one partition must be selected!	BootManagerController		少なくとも１つのパーティションが選択されている必要があります。
 No space available!	DrivesPage	Cannot install	空き領域がありません。
-Boot Manager is unable to read the partition table!	BootManagerController		ブートマネージャーはパーティションテーブルを読み込めません。
 Immediately	DefaultPartitionPage		すぐに
 Uninstall Boot Manager	UninstallPage	Title	ブートメニューをアンインストール
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	不明なパーティション
-Installation of boot menu failed	BootManagerController	Title	ブートメニューのインストールに失敗しました
 Backup Master Boot Record	BootManagerController	Title	マスターブートレコードのバックアップ
+Installation of boot menu failed	BootManagerController	Title	ブートメニューのインストールに失敗しました
 Cannot access!	DrivesPage	Cannot install	アクセスできません
 After one second	DefaultPartitionPage		あと 1 秒
 The old Master Boot Record was successfully saved to %s.	BootManagerController		古いマスターブートレコードは%sに正常に保存されました。
@@ -21,7 +20,6 @@ Write boot menu	BootManagerController	Button	ブートメニューを書き込�
 OK	BootManagerController	Button	OK
 Uninstall boot manager	BootManagerController	Title	ブートマネージャーの削除
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		以下のブートメニューを起動ディスク (%s) に書き込みます。続ける前に以下の情報が正しいか確認してください。
-The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		ディスクの第一パーティションの位置が前すぎるので、ブートメニュー用の充分な空きがありません。\nブートマネージャーは第一パーティションの前に 2KiB の空きを必要とします。
 Uninstall	DrivesPage	Button	削除
 Update	DrivesPage	Button	更新
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		起動デバイスのマスターブートレコード (MBR):\n\t %s\n をディスクに保存します。ここで、マスターブートレコードの情報を保存するファイルを指定してください。\n\nなお、インストール中に何か問題が発生したか、ブートメニューを削除したい時には、このブートマネージャーを使って、アンインストールしてください。
@@ -37,7 +35,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		あと 5 秒
 Timeout: %s	DefaultPartitionPage		待ち時間: %s
 The Master Boot Record could not be restored!	BootManagerController		マスターブートレコードは修復されません。
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		一番目のハードディスクのパーティションテーブルがブートマネージャーに対応していません。\nブートマネージャーは、IBM PC MBR のみ扱います。
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		ブートマネージャーをインストール/削除するドライブを選択してください。
 After four seconds	DefaultPartitionPage		あと 4 秒
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
@@ -56,8 +53,8 @@ Uninstallation of boot menu completed	BootManagerController	Title	ブートマ�
 After two seconds	DefaultPartitionPage		あと 2 秒
 Partition table not compatible	BootManagerController	Title	互換性のないパーティションテーブルです
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		起動デバイス (%DISK) のマスターブートレコードは %FILE から正常に修復されました。
-Done	BootManagerController	Button	完了
 BootManager	System name		ブートマネージャー
+Done	BootManagerController	Button	完了
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		修復に使うマスターブートレコード (MBR) ファイルを指定してください。これはブートマネージャーが最初にインストールされた時に作成されたものです。
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		修復に使うマスターブートレコード (MBR) ファイルを指定してください。これはブートマネージャーが初めてインストールされた時に作成されたものです。
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%disk にある %file でマスターブートレコード (MBR) を修復します。続けますか?

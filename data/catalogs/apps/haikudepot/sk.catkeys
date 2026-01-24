@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	2743869471
+1	slovak	x-vnd.Haiku-HaikuDepot	1848120107
 Available packages	MainWindow		Dostupné balíky
 Create account	UserLoginWindow		Vytvoriť účet
 Rate package…	PackageInfoView		Ohodnotiť balík…
@@ -8,10 +8,8 @@ Switch account…	MainWindow		Prepnúť účet…
 Preferred language:	UserLoginWindow		Preferovaný jazyk:
 Name	PackageListView		Názov
 Rate %Package%	RatePackageWindow		Ohodnotiť %Package%
-Quit HaikuDepot	App		Ukončiť HaikuDepot
 Category	FilterView		Kategória
 No changelog available.	PackageInfoView		Záznam zmien nie je dostupný.
-No, quit HaikuDepot	App		Nie, ukončiť HaikuDepot
 Not logged in	MainWindow		Neprihlásený
 Available	PackageListView		Dostupné
 Click a package to view information	PackageInfoView		Informácie zobrazíte kliknutím na balík
@@ -39,7 +37,6 @@ Pending…	PackageListView		Čaká sa…
 Search terms:	FilterView		Hľadaný výraz:
 Authentication failed	UserLoginWindow		Overenie totožnosti zlyhalo
 Manage repositories…	MainWindow		Spravovať zdroje softvéru…
-Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
 Input validation	UserLoginWindow		Overenie platnosti vstupu
 Log in…	MainWindow		Prihlásiť sa…
 Uninstalled	PackageListView		Odinštalované
@@ -53,14 +50,13 @@ Show	MainWindow		Zobraziť
 Ratings	PackageInfoView		Hodnotenia
 Installed packages	MainWindow		Nainštalované balíky
 There was a puzzling response from the web service.	UserLoginWindow		Od webovej služby prišla neočakávaná odpoveď.
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot vyžaduje funkčný démon balíkov. Zdá sa, že nebeží.\nChcete ho teraz spustiť?
 Contents	PackageInfoView		Obsah
 Close	PackageManager		Zatvoriť
 Changelog	PackageInfoView		Záznam zmien
 About	PackageInfoView		O aplikácii
 Stability	RatePackageWindow		Stabilita
-Inactive	PackageListView		Neaktívne
 Cancel	RatePackageWindow		Zrušiť
+Inactive	PackageListView		Neaktívne
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položiek}}
 Downloading:	PackageInfoView		Sťahuje sa:
 Success	UserLoginWindow		Úspech

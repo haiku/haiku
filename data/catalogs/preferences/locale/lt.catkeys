@@ -1,10 +1,9 @@
-1	lithuanian	x-vnd.Haiku-Locale	1081217032
+1	lithuanian	x-vnd.Haiku-Locale	933805714
 Medium format:	TimeFormatSettings		Vidutinis formatas:
 Negative:	TimeFormatSettings		Neigiami:
 Language	Locale Preflet Window		Kalba
 Short format:	TimeFormatSettings		Trumpasis formatas:
 24 hour	TimeFormatSettings		24 valandų
-Locale	Locale Preflet Window		Lokalė
 Time	TimeFormatSettings		Laikas
 Defaults	Locale Preflet Window		Numatytai
 Locale	System name		Lokalė
@@ -13,7 +12,6 @@ OK	Locale Preflet Window		Gerai
 Long format:	TimeFormatSettings		Ilgasis formatas:
 Numbers	TimeFormatSettings		Skaičiai
 Available languages	Locale Preflet Window		Galimos kalbos
-Locale	Locale Preflet		Lokalė
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nepavyko rasti prieinamų kalbų! Šiuo valdymo skydeliu pasinaudoti nepavyks!
 Formatting	Locale Preflet Window		Formatai
 Use month/day-names from preferred language	TimeFormatSettings		Mėnesių ir dienų pavadinimus rašyti pageidautina kalba

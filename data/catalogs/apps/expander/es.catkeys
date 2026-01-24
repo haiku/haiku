@@ -1,9 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-Expander	3239308358
+1	spanish; castilian	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Destino
 Other	ExpanderPreferences		Otro
 Automatically show contents listing	ExpanderPreferences		Mostrar automáticamente el listado de contenido
 Expander	System name		Expander
-Expander: Choose destination	DirectoryFilePanel		Expander: Elegir destino
 Set source…	ExpanderMenu		Elegir origen…
 OK	ExpanderWindow		Aceptar
 The destination is not a folder.	ExpanderWindow		El destino no es una carpeta.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Abrir carpeta dest
 Same directory as source (archive) file	ExpanderPreferences		Misma carpeta que el archivo de origen
 Stop	ExpanderWindow		Parar
 Cancel	ExpanderWindow		Cancelar
-Expander settings	ExpanderPreferences		Configuración de la extracción
 Error when expanding archive	ExpanderWindow		Error extrayendo archivo
 Expand	ExpanderMenu		Extraer
 Failed to create the destination folder.	ExpanderWindow		Fallo al crear la carpeta destino.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Continuar
 Cancel	ExpanderPreferences		Cancelar
 Use:	ExpanderPreferences		Uso:
 Destination folder	ExpanderPreferences		Carpeta de destino
-Expander: Open	ExpanderWindow		Expander: Abrir
 Leave destination folder path empty	ExpanderPreferences		Dejar la ruta de la carpeta de destino vacía
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La carpeta de destino no existe. ¿Desea crearla?
 The file doesn't exist	ExpanderWindow		El archivo no existe

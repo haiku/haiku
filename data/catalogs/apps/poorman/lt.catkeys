@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PoorMan	3296382959
+1	lithuanian	x-vnd.Haiku-PoorMan	4134958467
 Select web folder	PoorMan		Pasirinkite saityne viešintiną aplanką
 Console logging	PoorMan		Žurnalo rodymas pulte
 Create Log File	PoorMan		Sukurti žurnalo failą
@@ -6,9 +6,7 @@ File logging	PoorMan		Žurnalo rašymas į failą
 Website options	PoorMan		Svetainės nuostatos
 Log to file	PoorMan		Rašyti žurnalą į failą
 Shutting down.	PoorMan		Išjungiama.
-Error Dir	PoorMan		Aplanko klaida
 Web folder:	PoorMan		Svetainės aplankas:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Pasirinkite aplanką, kurį norite viešinti saityne.\n\nJeigu norite, programa gali sukurti numatytąjį „public_html“ poaplankį jūsų pradžios aplanke.\nArba galite pasirinkti vieną iš jau sukurtų aplankų.
 Log To Console	PoorMan		Rodyti žurnalą pulte
 File Name	PoorMan		Failo vardas
 Starting up... 	PoorMan		Paleidžiama… 
@@ -22,9 +20,7 @@ Hits: %lu	PoorMan		Apsilankymų: %lu
 Hits: 0	PoorMan		Apsilankymų: 0
 Shutting down.\n	PoorMan		Išjungiama.\n
 Select all	PoorMan		Pažymėti viską
-Error Server	PoorMan		Serverio klaida
 Send file listing if there's no start page	PoorMan		Neradus pradžios tinklapio, siųsti failų sąrašą
-Create PoorMan log	PoorMan		Sukurkite žurnalo failą
 Max. simultaneous connections:	PoorMan		Daugiausiai vienu metu priimamų ryšių:
 Done	PoorMan		Atlikta
 Site	PoorMan		Svetainė
@@ -46,7 +42,6 @@ Clear console log	PoorMan		Išvalyti pulto žurnalą
 Run server	PoorMan		Paleisti serverį
 Create	PoorMan		Sukurti
 done.\n	PoorMan		baigta.\n
-PoorMan settings	PoorMan		Saityno serverio nuostatos
 Console Logging	PoorMan		Žurnalo rodymas pulte
 Clear log file	PoorMan		Išvalyti žurnalo failą
 Save log console selection	PoorMan		Pažymėtosios pulto žurnalo dalies įrašymas

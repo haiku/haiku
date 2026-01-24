@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Installer	3240158834
+1	polish	x-vnd.Haiku-Installer	4292781411
 Performing installation.	InstallProgress		Wykonywanie instalacji.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Zamknij okno DriveSetup przed zamknięciem okna instalatora.
 No optional packages available.	PackagesView		Brak dostępnych opcjonalnych pakietów.
@@ -25,7 +25,6 @@ Click on 'Set up partitions…' to create one.	InstallerWindow		Naciśnij „Kon
 Welcome to the Haiku Installer!\n\n	InstallerApp		Witaj w Instalatorze Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplikacja do konfiguracji partycji, nie mogła zostać uruchomiona.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalacja zakończona. Sektor rozruchowy został zapisany do „%s”. Naciśnij „Zakończ”, aby opuścić instalator, lub wybierz nowy wolumin docelowy aby przeprowadzić kolejną instalację.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Docelowa partycja nie jest pusta. Jeżeli jest już na niej instalacja Haiku, zostanie ona nadpisana. To spowoduje usunięcie wszystkich zainstalowanych programów.\n\nJeśli chcesz zaktualizować system bez usuwania zainstalowanego oprogramowania, instrukcja znajduje się w rozdziale Podręcznika użytkownika Haiku o aplikacji „SoftwareUpdater”.\n\nNa pewno chcesz kontynuować instalację?
 Quit DriveSetup	InstallerWindow		Wyjdź z DriveSetup
 Write boot sector	InstallerWindow		Zapisz sektor rozruchowy
@@ -78,7 +77,6 @@ Please close the BootManager and DriveSetup windows before closing the Installer
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Wybierz z menu dysk źródłowy i naciśnij „Instaluj”.
 OK	InstallProgress		OK
 Quit BootManager	InstallerWindow		Zakończ BootManagera
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Na pewno chcesz zainstalować Haiku na obecny dysk startowy? Instalator musi uruchomić komputer ponownie, jeśli tak wybierzesz.
 Onto:	InstallerWindow		Na:
 Tools	InstallerWindow		Narzędzia
 scanning…	InstallerWindow		skanowanie…

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Media	4205337498
+1	slovak	x-vnd.Haiku-Media	3383826947
 Couldn't add volume control in Deskbar: %s\n	Media views		Nepodarilo sa pridať ovládanie hlasitosti do Panela: %s\n
 Restart media services	Media views		Reštartovať multimediálne služby
 Quit	Media Window		Ukončiť
@@ -6,7 +6,6 @@ Couldn't remove volume control in Deskbar: %s\n	Media views		Nepodarilo sa odstr
 Video output:	Media views		Video výstup:
 Video input:	Media views		Video vstup:
 Audio output:	Media views		Zvukový výstup:
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ak Media teraz ukončíte, zastavíte reštartovanie multimediálnych služieb. To bude mať pravdepodobne za náseldok nefunkčné alebo nedostupné multimediálne funkcie.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepodarilo sa pripojiť k multimediálnemu serveru.\nChcete ho spustiť?
 Video settings	Media Window		Video nastavenia
 Audio mixer	Media Window		Zmiešavač zvuku

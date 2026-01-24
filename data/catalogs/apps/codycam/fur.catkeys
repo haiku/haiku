@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-CodyCam	12021044
+1	friulian	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		si spietave la cartele di destinazion
 reply: '%s'\n	SftpClient		rispuint: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (inviade peraule di ordin reâl)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Impostazions video
 Can't find an available connection to the video window	CodyCam		Impussibil cjatâ une conession disponibile pal barcon video
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Erôr tal creâ il file di jessude
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Impussibil cjatâ une sorzint video.\nTi covente une webam par doprâ CodyCam.
 Logging in…	VideoConsumer.cpp		Autenticazion…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Erôr tal scrivi il file di jessude

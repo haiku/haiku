@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Be-TSKB	316181764
+1	indonesian	x-vnd.Be-TSKB	3780974715
 Auto-hide	PreferencesWindow		Sembunyi otomatis
 Show all	WindowMenu		Tampilkan semua
 Edit in Tracker…	PreferencesWindow		Menyunting di Tracker…
@@ -25,13 +25,11 @@ Show replicants	DeskbarMenu		Tunjukkan replicants
 No windows	WindowMenu		Tidak ada jendela
 Show clock	Tray		Tampilkan jam
 Close all	WindowMenu		Tutup semua
-Deskbar preferences	PreferencesWindow		Preferensi deskbar
 About this system	DeskbarMenu		Tentang sistem ini
 Quit application	WindowMenu		Keluar dari aplikasi
 Hide application names	PreferencesWindow		Sembunyikan nama-nama aplikasi
 Applications	PreferencesWindow		Aplikasi
 Show application expander	PreferencesWindow		Tampilkan aplikasi pengembang
-Deskbar preferences…	DeskbarMenu		Preferensi deskbar…
 Suspend	DeskbarMenu		Menangguhkan
 Shutdown…	DeskbarMenu		Matikan…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-demo

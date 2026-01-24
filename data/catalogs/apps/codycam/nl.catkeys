@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CodyCam	12021044
+1	dutch; flemish	x-vnd.Haiku-CodyCam	2786669505
 destination directory expected	CodyCam		doelmap verwacht
 reply: '%s'\n	SftpClient		antwoord: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <verborgen>  (echt wachtwoord is verzonden)
@@ -81,7 +81,6 @@ Video settings	CodyCam		Video-instellingen
 Can't find an available connection to the video window	CodyCam		Kan geen beschikbare verbinding naar het videovenster vinden
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Fout bij het maken van het uitvoer-bestand
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Geen videobron gevonden.\nU heeft een webcam nodig om CodyCam te kunnen gebruiken.
 Logging in…	VideoConsumer.cpp		Inloggen...
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Fout bij het maken van het uitvoerbestand

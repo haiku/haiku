@@ -1,11 +1,10 @@
-1	portuguese	x-vnd.Haiku-Locale	1312749322
+1	portuguese	x-vnd.Haiku-Locale	1165338004
 Medium format:	TimeFormatSettings		Formato médio:
 ERROR	TimeFormatSettings		ERRO
 Negative:	TimeFormatSettings		Negativo:
 Language	Locale Preflet Window		Idioma
 Short format:	TimeFormatSettings		Formato curto:
 24 hour	TimeFormatSettings		24 horas
-Locale	Locale Preflet Window		Localização
 Time	TimeFormatSettings		Hora
 Defaults	Locale Preflet Window		Predefinições
 Locale	System name		Localização
@@ -14,7 +13,6 @@ OK	Locale Preflet Window		OK
 Long format:	TimeFormatSettings		Formato longo:
 Numbers	TimeFormatSettings		Números
 Available languages	Locale Preflet Window		Idiomas disponíveis
-Locale	Locale Preflet		Região
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Não foi possível encontrar a lista de idiomas! Não pode usar este preflet!
 Formatting	Locale Preflet Window		Formatos
 Use month/day-names from preferred language	TimeFormatSettings		Usar nomes de meses e dias do idioma preferido

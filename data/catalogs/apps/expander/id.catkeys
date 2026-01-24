@@ -1,9 +1,8 @@
-1	indonesian	x-vnd.Haiku-Expander	3239308358
+1	indonesian	x-vnd.Haiku-Expander	2040688293
 Destination	ExpanderWindow		Tujuan
 Other	ExpanderPreferences		Lainnya
 Automatically show contents listing	ExpanderPreferences		Tampilkan daftar kandungan secara otomatis
 Expander	System name		Expander
-Expander: Choose destination	DirectoryFilePanel		Expander: Pilih tujuan
 Set source…	ExpanderMenu		Set sumber…
 OK	ExpanderWindow		OKE
 The destination is not a folder.	ExpanderWindow		Tujuannya bukan suatu folder.
@@ -20,7 +19,6 @@ Open destination folder after extraction	ExpanderPreferences		Buka folder tujuan
 Same directory as source (archive) file	ExpanderPreferences		Direktori sama dengan berkas (arsip) sumber
 Stop	ExpanderWindow		Hentikan
 Cancel	ExpanderWindow		Batalkan
-Expander settings	ExpanderPreferences		Pengaturan Expander
 Error when expanding archive	ExpanderWindow		Ada kesalahan saat mengembangkan arsip
 Expand	ExpanderMenu		Kembangkan
 Failed to create the destination folder.	ExpanderWindow		Gagal untuk membuat folder tujuan.
@@ -41,7 +39,6 @@ Continue	ExpanderWindow		Lanjutkan
 Cancel	ExpanderPreferences		Batalkan
 Use:	ExpanderPreferences		Pakai:
 Destination folder	ExpanderPreferences		Folder tujuan
-Expander: Open	ExpanderWindow		Expander: Buka
 Leave destination folder path empty	ExpanderPreferences		Biarkan alamat folder tujuan kosong
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Folder yang dituju tidak ada. Anda ingin membuatnya sekarang?
 The file doesn't exist	ExpanderWindow		Berkas tidak ada

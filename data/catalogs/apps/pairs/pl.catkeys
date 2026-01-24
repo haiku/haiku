@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Pairs	818003250
+1	polish	x-vnd.Haiku-Pairs	3059673093
 Pairs	System name		Pary
 Quit	PairsWindow		Zamknij
 Medium	PairsWindow		Średnie
@@ -6,7 +6,6 @@ Game	PairsWindow		Gra
 Expert (8x8)	PairsWindow		Ekspert (8x8)
 New	PairsWindow		Nowy
 OK	Pairs		OK
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs nie znalazł wystarczająco wiele ikon by rozpocząć; potrzeba przynajmniej %zu, znaleziono %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ukończyłeś grę w {0, plural, one{# kliknięciu} few{# kliknięciach} many{# kliknięciach} other{# kliknięcia}}.
 Small	PairsWindow		Małe
 Size	PairsWindow		Rozmiar

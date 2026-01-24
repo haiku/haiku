@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	2265987377
+1	esperanto	x-vnd.Haiku-HaikuDepot	418708707
 Available packages	MainWindow		Disponeblaj pakaĵoj
 It was not possible to create the new user.	UserLoginWindow		Krei la novan uzanton ne estis ebla.
 Create account	UserLoginWindow		Krei konton
@@ -15,14 +15,12 @@ Name	PackageListView		Nomo
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Rajtiga aŭ sekureca problemo. Elsalutu kaj reensalutu por kontroli, ke via pasvorto estas ĝusta, kaj ankaŭ kontrolu, ke vi konsentis la plejnovajn uzkondiĉojn.
 Rate %Package%	RatePackageWindow		Taksi %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Eraro okazis dum pravalorizado de la pakaĵa administrilo: %message%
-Quit HaikuDepot	App		Forlasi HaikuTenejon
 Category	FilterView		Kategorio
 A response to the captcha question must be provided.	UserLoginWindow		Respondo al la kapĉa demando estas bezonata.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Neatendita eraro '%Message%' okazis kun atributo '%Property%'
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Petita objekto aŭ objekto de la peto ne troviĝis en la servilo.
 No changelog available.	PackageInfoView		Ŝanĝoprotokolo ne estas disponebla.
 Version	PackageListView		Versio
-No, quit HaikuDepot	App		Ne, ĉesi HaikuTenejon
 Not logged in	MainWindow		Ne ensalutita
 Featured packages	FeaturedPackagesView		Elstarigitaj pakaĵoj
 Available	PackageListView		Disponebla
@@ -79,7 +77,6 @@ Authentication failed	UserLoginWindow		Aŭtentigo malsukcesis
 Captcha error	UserLoginWindow		Kapĉa eraro
 Manage repositories…	MainWindow		Administri deponejojn…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		La kromnomo devas esti unika, sed la donita kromnomo jam estas posedita. Elektu alian kromnomon.
-Open %DeskbarLink%	PackageManager		Uzi %DeskbarLink%-on
 Input validation	UserLoginWindow		Validigo de enigo
 Log in…	MainWindow		Ensaluti…
 Client version too old	ServerHelper		Versio de kliento estas tro maljuna
@@ -107,14 +104,12 @@ Settings…	MainWindow		Agordo…
 Ratings	PackageInfoView		Taksoj
 Local	LocalPkgDataLoadProcess		Loka
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Ĉu vi permesas sendi anoniman informon pri uzado al la servilo de HaikuTenejo de ĉi tiu komputilo? Vi povas ŝanĝi vian agordon per la fenestro \"Agordo\" poste.
-Installed packages	MainWindow		Instalitaj pakaĵoj
 User rating	RatePackageWindow		Uzanta takso
-Error	App		Eraro
+Installed packages	MainWindow		Instalitaj pakaĵoj
 There was a puzzling response from the web service.	UserLoginWindow		Estis stranga respondo el la reta servo.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Via takso alŝutiĝis sukcese. Vi povas aktualigi aŭ viŝi ĝin per la retpaĝo de HaikuTeneja Servilo.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Ne eblis komuniki kun la servilo por akiri defibildon bezonatan por krei novan uzanton.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La donita respondo al la kapĉo estas malĝusta. Nova kapĉo estos kreita; provu denove.
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuTenejo bezonas la pakaĵan demonon por funkcii, kaj ĝi ne ŝajnas aktive.\nĈu vi volas ŝalti ĝin nun?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La pasvorto bezonas almenaŭ ok signojn, inkluzivi almenaŭ du ciferojn kaj unu majusklon.
 Contents	PackageInfoView		Enhavo
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Konigi anoniman informon pri uzado kun servilo de HaikuTenejo
@@ -126,8 +121,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabileco
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La pasvorto devas esti ripetiĝita pro averti pasvortajn mistajpojn.
 Cancel	SettingsWindow		Nuligi
-Inactive	PackageListView		Neaktiva
 Cancel	RatePackageWindow		Nuligi
+Inactive	PackageListView		Neaktiva
 Nickname:	UserLoginWindow		Kromnomo:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sinkronigado de metadatumo pri deponejoj
 OK	MainWindow		Bone

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.haiku-softwareupdater	369324613
+1	esperanto	x-vnd.haiku-softwareupdater	1377379822
 Updating version	SoftwareUpdaterWindow	List item text	Ĝisdatigi version
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Alklaki tie por instali {0, plural, one{# ĝisdatigitan pakaĵon} other{# ĝisdatigitajn pakaĵoin}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Instalotaj pakaĵoj
@@ -41,7 +41,6 @@ Exception occurred while checking for updates: %s\n	CheckAction		Escepto okazis 
 Packages are being updated	UpdateManager		Ĝisdatigotaj pakaĵoj
 Cancel	SoftwareUpdaterWindow		Nuligi
 Don't quit	SoftwareUpdaterWindow		Ne ĉesi
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Alklaku jene por ruli Ĝisdatigilon. Iom da ĝisdatigoj bezonos ke solivgo elektiĝi.
 Checking for updates	SoftwareUpdaterWindow		Determinado de ĝisdatigoj
 Updates completed	UpdateManager		Ĝisdatigo estas kompletigita
 Reboot	SoftwareUpdaterWindow		Restartigi

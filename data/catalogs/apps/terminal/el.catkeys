@@ -1,7 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	686383766
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	3011636080
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε την διαδρομή
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Το Τερματικό δε μπορεί να ξεκινήσει το κέλυφος. Λυπούμαστε.
 Text encoding	Terminal TermWindow		Κωδικοποίηση κειμένου
 Colors	Terminal ThemeWindow		Χρώματα
 OK	Terminal SetTitleWindow		Εντάξει
@@ -35,7 +34,6 @@ Cancel	Terminal TermView		Άκυρο
 Defaults	Terminal PrefWindow		Προεπιλογές
 black	Terminal ThemeView		μαύρο
 Revert	Terminal PrefWindow		Επαναφορά
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Τερματικό
 Use selection	Terminal FindWindow		Χρήση επιλεγμένου
 Find next	Terminal TermWindow		Εύρεση επόμενου
 Copy link location	Terminal TermView		Αντιγραφή υπερσυνδέσμου
@@ -55,12 +53,10 @@ Really close?	Terminal TermWindow		Να κλείσει σίγουρα;
 Font size	Terminal TermWindow		Μέγεθος γραμματοσειράς
 OK	Terminal TermApp		Εντάξει
 ANSI bright blue color	Terminal ThemeView		ανοιχτό μπλε (ANSI)
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" ακόμη εκτελείται.\nΕαν κλείσετε τοτερματικό, η διεργασία θα τερματιστεί.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Μη αναγνωρισμένη επιλογή \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Τίτλος καρτέλας:
 Text not found.	Terminal TermWindow		Το κείμενο δεν βρέθηκε.
 Match word	Terminal FindWindow		Ταίριασμα λέξης
-New Terminal	Terminal TermWindow		Νέο Τερματικό
 Find failed	Terminal TermWindow		Η εύρεση απέτυχε
 Quit	Terminal TermWindow		Έξοδος
 Match case	Terminal FindWindow		Ταίριασμα πεζών/κεφαλαίων
@@ -85,8 +81,8 @@ ANSI bright cyan color	Terminal ThemeView		ανοιχτό γαλάζιο (ANSI)
 Tab title:	Terminal TermWindow		Τίτλος καρτέλας:
 Window title:	Terminal TermWindow		Τίτλος παραθύρου:
 ANSI white color	Terminal ThemeView		λευκό (ANSI)
+Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	Εναλλαγή Τερματικών
 Window size:	Terminal AppearancePrefView		Μέγεθος παραθύρου:
-Switch Terminals	Terminal TermWindow		Εναλλαγή Τερματικών
 Decrease	Terminal TermWindow		Μείωση
 Settings…	Terminal TermWindow		Ρυθμίσεις…
 Cancel	Terminal SetTitleWindow		Άκυρο
@@ -119,7 +115,6 @@ Find…	Terminal TermWindow		Εύρεση…
 No search string was entered.	Terminal TermWindow		Δεν καταχωρήθηκε η συμβολοσειρά για την αναζήτηση.
 Move here	Terminal TermView		Μετακίνηση εδώ
 Abort	Terminal Shell		Ματαίωση
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Οι παρακάτω διεργασίες ακόμη εκτελούνται:\n\n\t%1\n\nΕαν κλείσετε το τερματικό, οι διεργασίες θα τερματιστούν.
 Set window title	Terminal TermWindow		Ορισμός τίτλου παραθύρου
 ANSI red color	Terminal ThemeView		κόκκινο (ANSI)
 Increase	Terminal TermWindow		Άυξηση

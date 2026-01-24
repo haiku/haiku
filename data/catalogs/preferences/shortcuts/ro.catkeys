@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Shortcuts	3834857117
+1	romanian	x-vnd.Haiku-Shortcuts	171515608
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplicație
 Option	ShortcutsSpec	Name for modifier on keyboard	Opțiune
@@ -7,7 +7,6 @@ Revert to saved	ShortcutsWindow		Revenire la salvat
 Don't save	ShortcutsWindow		Nu salva
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts nu a putut să vă salveze setul de taste.
 Save	ShortcutsWindow		Salvează
 Either	ShortcutsSpec		Oricare
 Oh no	ShortcutsWindow		Oh nu
@@ -21,8 +20,6 @@ Cancel	ShortcutsWindow		Anulează
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Stânga
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts nu a putut să vă parseze fișierul KeySet!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts nu a putut să vă salveze fișierul KeySet!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \„Textul aici\”
 Remove selected shortcut	ShortcutsWindow		Elimină scurtătura selectată
 Error, NULL state description?	ShortcutsSpec		Eroare, descrierea stării este NULL?
