@@ -18,9 +18,10 @@ BListItem* gExpected[16];
 int gIndex = 0;
 int gCount = 0;
 
+namespace CppUnit {
 
 template<>
-struct CppUnit::assertion_traits<BListItem*>
+struct assertion_traits<BListItem*>
 {
 	static bool equal(const BListItem* x, const BListItem* y) {
 		return x == y;
@@ -32,6 +33,8 @@ struct CppUnit::assertion_traits<BListItem*>
 		return ((BStringItem*)x)->Text();
 	}
 };
+
+}
 
 
 BListItem*

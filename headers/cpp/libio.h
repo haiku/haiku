@@ -51,6 +51,7 @@
 #define _IOS_APPEND		8
 #define _IOS_BIN		128
 
+#define _IO_USER_BUF 1
 #define _IO_UNBUFFERED 2
 #define _IO_IN_BACKUP 0x100
 #define _IO_LINE_BUF 0x200
