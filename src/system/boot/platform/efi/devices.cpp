@@ -228,7 +228,9 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 			blockIo->Media->RemovableMedia ? "true" : "false",
 			blockIo->Media->BlockSize, blockIo->Media->LastBlock);
 
-		if (!blockIo->Media->MediaPresent || blockIo->Media->LogicalPartition)
+		if (!blockIo->Media->MediaPresent
+			|| blockIo->Media->LogicalPartition
+			|| blockIo->Media->BlockSize == 0)
 			continue;
 
 		// The qemu flash device with a 256K block sizes sometime show up
