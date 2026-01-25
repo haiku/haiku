@@ -88,7 +88,7 @@ private:
 ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	BMessage* settings)
 	:
-	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Expander"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Expander"), B_DOCUMENT_WINDOW,
 		B_NORMAL_WINDOW_FEEL),
 	fSourcePanel(NULL),
 	fDestPanel(NULL),
@@ -152,7 +152,9 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 				.End()
 			.SetInsets(B_USE_WINDOW_SPACING)
 			.End()
-		.Add(fScrollView);
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-2, 0, -2, -2)
+			.Add(fScrollView);
 
 	pathLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	size = GetLayout()->View()->PreferredSize();
