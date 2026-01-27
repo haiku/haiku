@@ -64,15 +64,18 @@ read_stat(Context &context, Parameter *param, void *data)
 
 	string r;
 	if ((statMask & 0xffffffff) == 0xffffffff) {
-		char mode[12];
 		r += ", st_dev = " + format_unsigned(s.st_dev);
 		r += ", st_ino = " + format_unsigned(s.st_ino);
+	}
+	if ((statMask & B_STAT_MODE) != 0) {
+		char mode[12];
 		snprintf(mode, sizeof(mode), "%03" B_PRIo32,
 			(uint32)(s.st_mode & ~(S_IFMT | S_ISUID | S_ISGID | S_ISVTX)));
 		r += ", st_mode = " + format_mode(context, s.st_mode & S_IFMT) + "|";
 		r += mode;
-		r += ", st_nlink = " + format_unsigned(s.st_nlink);
 	}
+	if ((statMask & 0xffffffff) == 0xffffffff)
+		r += ", st_nlink = " + format_unsigned(s.st_nlink);
 	if ((statMask & B_STAT_UID) != 0)
 		r += ", st_uid = " + format_unsigned(s.st_uid);
 	if ((statMask & B_STAT_GID) != 0)
@@ -93,6 +96,10 @@ read_stat(Context &context, Parameter *param, void *data)
 		r += ", st_type = " + format_unsigned(s.st_type);
 		r += ", st_blocks = " + format_unsigned(s.st_blocks);
 	}
+
+	if (r.size() == 0)
+		return "{}";
+
 	return "{" + r.substr(2) + "}";
 }
 
