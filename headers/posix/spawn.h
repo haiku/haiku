@@ -55,6 +55,10 @@ extern int posix_spawn_file_actions_addclose(
 	posix_spawn_file_actions_t *file_actions, int fildes);
 extern int posix_spawn_file_actions_adddup2(
 	posix_spawn_file_actions_t *file_actions, int fildes, int newfildes);
+extern int posix_spawn_file_actions_addchdir(
+	posix_spawn_file_actions_t *file_actions, const char *path);
+extern int posix_spawn_file_actions_addfchdir(
+	posix_spawn_file_actions_t *file_actions, int fildes);
 
 /* spawn attribute functions */
 extern int posix_spawnattr_destroy(posix_spawnattr_t *attr);
