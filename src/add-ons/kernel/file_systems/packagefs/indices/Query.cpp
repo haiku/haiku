@@ -220,6 +220,11 @@ struct Query::QueryPolicy {
 		return NULL;
 	}
 
+	static bool NodeIsDeleted(Node* node)
+	{
+		return node->GetParentUnchecked() == NULL;
+	}
+
 	// Volume interface
 
 	static dev_t ContextGetVolumeID(Context* context)

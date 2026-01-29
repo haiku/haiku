@@ -276,6 +276,11 @@ struct Query::QueryPolicy {
 		return node->GetNextReferrer(entry);
 	}
 
+	static bool NodeIsDeleted(Node* node)
+	{
+		return node->GetFirstReferrer() == NULL;
+	}
+
 	// Volume interface
 
 	static dev_t ContextGetVolumeID(Context* context)

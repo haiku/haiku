@@ -1660,6 +1660,10 @@ Query<QueryPolicy>::_EvaluateLiveUpdate(Entry* entry, Node* node, const char* at
 		// entry was removed
 		opcode = B_ENTRY_REMOVED;
 	} else if ((fFlags & B_QUERY_WATCH_ALL) != 0) {
+		if (QueryPolicy::NodeIsDeleted(node)) {
+			// don't notify
+			return;
+		}
 		// still in query, all attribute changes watched
 		opcode = B_ATTR_CHANGED;
 	} else {
