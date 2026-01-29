@@ -5410,7 +5410,7 @@ check_open_mode(struct vnode* vnode, int openMode)
 	if ((openMode & O_RDWR) != 0 && (openMode & O_WRONLY) != 0)
 		return B_BAD_VALUE;
 	if ((openMode & O_RWMASK) == O_RDONLY && (openMode & O_TRUNC) != 0)
-		return B_NOT_ALLOWED;
+		return B_BAD_VALUE;
 
 	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
 		return B_LINK_LIMIT;
