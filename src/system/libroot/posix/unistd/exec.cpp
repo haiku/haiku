@@ -240,7 +240,7 @@ execle(const char* path, const char* arg, ... /*, char** env */)
 	return do_exec(path, (char* const*)args, env, false);
 }
 
-// TODO: remove this again if possible
+#ifdef __HAIKU_BEOS_COMPATIBLE
 extern int exect(const char *path, char *const *argv);
 
 int
@@ -248,3 +248,4 @@ exect(const char* path, char* const* argv)
 {
 	return execv(path, argv);
 }
+#endif
