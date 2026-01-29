@@ -79,6 +79,7 @@ protected:
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 	virtual void ReturnDirentIterator(EntryListBase* iterator);
 	virtual uint32 WatchNewNodeMask();
+	virtual bool AttributeChanged(const BMessage*);
 	virtual void AddPosesCompleted();
 
 private:
