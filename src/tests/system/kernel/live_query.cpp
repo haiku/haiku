@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <fs_query.h>
+
 #include <Application.h>
 #include <Entry.h>
 #include <NodeMonitor.h>
@@ -35,6 +37,7 @@ static const char *kProgramName = __progname;
 static bool sAllVolumes = false;		// Query all volumes?
 static bool sEscapeMetaChars = true;	// Escape metacharacters?
 static bool sFilesOnly = false;			// Show only files?
+static bool sWatchAll = false;			// Watch all changes?
 
 
 class LiveQuery : public BApplication {
@@ -84,7 +87,7 @@ LiveQuery::ArgvReceived(int32 argc, char** argv)
 
 	// Parse command-line arguments.
 	int opt;
-	while ((opt = getopt(argc, argv, "efav:")) != -1) {
+	while ((opt = getopt(argc, argv, "efawv:")) != -1) {
 		switch (opt) {
 			case 'e':
 				sEscapeMetaChars = false;
@@ -97,6 +100,9 @@ LiveQuery::ArgvReceived(int32 argc, char** argv)
 				break;
 			case 'v':
 				strncpy(volumePath, optarg, B_FILE_NAME_LENGTH);
+				break;
+			case 'w':
+				sWatchAll = true;
 				break;
 
 			default:
@@ -170,6 +176,8 @@ LiveQuery::MessageReceived(BMessage* message)
 			query->SetVolume(&volume);
 			query->SetPredicate(predicate);
 			query->SetTarget(this);
+			if (sWatchAll)
+				query->SetFlags(B_QUERY_WATCH_ALL);
 
 			fQueries.AddItem(query);
 			_PerformQuery(*query);
@@ -184,20 +192,30 @@ LiveQuery::MessageReceived(BMessage* message)
 			int32 device;
 			int64 directory;
 			int64 node;
-			const char* name;
 			message->FindInt32("device", &device);
 			message->FindInt64("directory", &directory);
 			message->FindInt64("node", &node);
-			message->FindString("name", &name);
 
 			switch (what) {
 				case B_ENTRY_CREATED:
-				{
-					printf("CREATED %s\n", name);
+					printf("CREATED %s\n", message->GetString("name"));
 					break;
-				}
+
 				case B_ENTRY_REMOVED:
-					printf("REMOVED %s\n", name);
+					printf("REMOVED %s\n", message->GetString("name"));
+					break;
+
+				case B_ENTRY_MOVED:
+					printf("MOVED %s -> %s\n", message->GetString("from name"),
+						message->GetString("name"));
+					break;
+
+				case B_ATTR_CHANGED:
+					printf("CHANGED %s\n", message->GetString("attr"));
+					break;
+
+				default:
+					printf("unknown message %d\n", what);
 					break;
 			}
 			break;
@@ -217,6 +235,7 @@ LiveQuery::_PrintUsage()
 		"  -e\t\tdon't escape meta-characters\n"
 		"  -f\t\tshow only files (ie. no directories or symbolic links)\n"
 		"  -a\t\tperform the query on all volumes\n"
+		"  -w\t\twatch all attribute changes\n"
 		"  -v <file>\tperform the query on just one volume; <file> can be any\n"
 		"\t\tfile on that volume. Defaults to the current volume.\n"
 		"  Hint: '%s name=bar' will find files named \"bar\"\n",

@@ -39,8 +39,6 @@
 
 #	include <util/SinglyLinkedList.h>
 #	include <util/Stack.h>
-
-#	include <query_private.h>
 #endif	// !FS_SHELL
 
 #include <file_systems/QueryParserUtils.h>

@@ -14,7 +14,6 @@
 #include "Inode.h"
 #include "Volume.h"
 
-#include <query_private.h>
 #include <file_systems/QueryParser.h>
 
 

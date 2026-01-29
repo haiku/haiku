@@ -57,7 +57,6 @@ All rights reserved.
 #include "Tracker.h"
 
 #include <fs_attr.h>
-#include <query_private.h>
 
 
 using std::nothrow;
