@@ -22,20 +22,53 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 	bash bc freetype zlib
 
-	!gcc2 @{ coreutils icu74 wget }@
-	gcc2 @{ coreutils_x86 wget_x86 icu icu74_x86@secondary_x86 }@
-	regular_image @{
-		bzip2 expat ffmpeg6 glu gutenprint9 gzip
-		lame less libedit libicns
-		mesa mesa_devel mesa_swpipe@!gcc2 mesa_swrast@gcc2
-		netcat
-		sed sharutils
-		unzip which zip
+	!gcc2 @{
+		coreutils
+		icu74
+		wget
+	}@
+	gcc2 @{
+		coreutils_x86
+		wget_x86
+		icu
+		icu74_x86@secondary_x86
+	}@
 
-		!gcc2 @{ diffutils findutils gawk grep tar tcpdump zstd }@
+	regular_image @{
+		bzip2
+		expat
+		ffmpeg6
+		glu
+		gutenprint9
+		gzip
+		lame
+		less
+		mesa
+		mesa_devel
+		mesa_swpipe@!gcc2
+		mesa_swrast@gcc2
+		netcat
+		sed
+		sharutils
+		unzip
+		which
+		zip
+
+		!gcc2 @{
+			diffutils
+			findutils
+			gawk
+			grep
+			tar
+			tcpdump
+			zstd
+		}@
 		gcc2 @{
-			diffutils_x86@secondary_x86 findutils_x86@secondary_x86
-			mawk grep_x86@secondary_x86 tar_x86@secondary_x86
+			diffutils_x86@secondary_x86
+			findutils_x86@secondary_x86
+			mawk
+			grep_x86@secondary_x86
+			tar_x86@secondary_x86
 			tcpdump_x86@secondary_x86
 		}@
 	}@
@@ -43,16 +76,33 @@ AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 AddHaikuImageSourcePackages [ FFilterByBuildFeatures
 	bash bc
 
-	!gcc2 @{ coreutils }@
-	gcc2 @{ coreutils_x86 }@
+	!gcc2 @{
+		coreutils
+	}@
+	gcc2 @{
+		coreutils_x86
+	}@
 
 	regular_image @{
-		expat ffmpeg6 findutils grep gutenprint9 gzip
-		lame less libicns
-		sed sharutils
-		tar wget which
-		!gcc2 @{ gawk }@
-		gcc2 @{ mawk }@
+		expat
+		ffmpeg6
+		findutils
+		grep
+		gutenprint9
+		gzip
+		lame
+		less
+		sed
+		sharutils
+		tar
+		wget
+		which
+		!gcc2 @{
+			gawk
+		}@
+		gcc2 @{
+			mawk
+		}@
 	}@
 ] ;
 if $(HAIKU_PACKAGING_ARCHS[1]) != x86_gcc2 {
