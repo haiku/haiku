@@ -579,7 +579,7 @@ if [ IsPackageAvailable ncurses6_devel ] {
 			runtime: lib
 		file: devel ncurses6_devel
 			depends: base
-			library: $(developLibDir)/libncurses.so.6
+			library: $(developLibDir)/libncurses.so
 			headers: $(developHeadersDir)
 		;
 
