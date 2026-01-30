@@ -98,6 +98,7 @@ rule DefineDefaultBuildProfiles
 				openssh
 				pdfwriter
 				pe
+				sounds_community_default
 				timgmsoundfont
 				vision
 				wonderbrush
@@ -149,6 +150,7 @@ rule DefineDefaultBuildProfiles
 				openssh
 				openssl3
 				pe
+				sounds_community_default
 				vision
 				wpa_supplicant
 				# xz_utils can't be built with gcc2, so we install it for
