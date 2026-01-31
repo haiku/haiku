@@ -8,6 +8,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons network_settings ]
 	: true ;
 
+if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+	SubDirC++Flags -Wno-error ;
+}
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
