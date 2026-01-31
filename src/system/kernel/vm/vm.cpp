@@ -251,6 +251,9 @@ static rw_lock sAreaCacheLock = RW_LOCK_INITIALIZER("area->cache");
 
 static rw_spinlock sAvailableMemoryLock = B_RW_SPINLOCK_INITIALIZER;
 static off_t sAvailableMemory;
+#if ENABLE_SWAP_SUPPORT
+static off_t sAvailableMemoryAndSwap;
+#endif
 static off_t sNeededMemory;
 
 static uint32 sPageFaults;
@@ -4724,6 +4727,19 @@ vm_put_physical_page_debug(addr_t vaddr, void* handle)
 }
 
 
+static off_t
+vm_available_memory_locked()
+{
+#if ENABLE_SWAP_SUPPORT
+	// If swap is in use, then either of these may be larger than the other,
+	// so we have to take the minimum of both.
+	return std::min(sAvailableMemory, sAvailableMemoryAndSwap);
+#else
+	return sAvailableMemory;
+#endif
+}
+
+
 void
 vm_get_info(system_info* info)
 {
@@ -4731,7 +4747,7 @@ vm_get_info(system_info* info)
 
 	InterruptsWriteSpinLocker locker(sAvailableMemoryLock);
 	info->needed_memory = sNeededMemory;
-	info->free_memory = sAvailableMemory;
+	info->free_memory = vm_available_memory_locked();
 }
 
 
@@ -4746,7 +4762,7 @@ off_t
 vm_available_memory(void)
 {
 	InterruptsWriteSpinLocker locker(sAvailableMemoryLock);
-	return sAvailableMemory;
+	return vm_available_memory_locked();
 }
 
 
@@ -4764,7 +4780,7 @@ off_t
 vm_available_not_needed_memory(void)
 {
 	InterruptsWriteSpinLocker locker(sAvailableMemoryLock);
-	return sAvailableMemory - sNeededMemory;
+	return vm_available_memory_locked() - sNeededMemory;
 }
 
 
@@ -4774,7 +4790,7 @@ vm_available_not_needed_memory(void)
 off_t
 vm_available_not_needed_memory_debug(void)
 {
-	return sAvailableMemory - sNeededMemory;
+	return vm_available_memory_locked() - sNeededMemory;
 }
 
 
@@ -4794,16 +4810,35 @@ vm_unreserve_memory(size_t amount)
 		return;
 
 	InterruptsReadSpinLocker readLocker(sAvailableMemoryLock);
+#if ENABLE_SWAP_SUPPORT
+	atomic_add64(&sAvailableMemoryAndSwap, amount);
+#endif
 	atomic_add64(&sAvailableMemory, amount);
 }
 
 
-status_t
-vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
+#if ENABLE_SWAP_SUPPORT
+void
+vm_unreserve_memory_or_swap(size_t amount)
+{
+	ASSERT((amount % B_PAGE_SIZE) == 0);
+
+	if (amount == 0)
+		return;
+
+	InterruptsReadSpinLocker readLocker(sAvailableMemoryLock);
+	atomic_add64(&sAvailableMemoryAndSwap, amount);
+}
+#endif
+
+
+static status_t
+vm_try_reserve_internal(off_t& pool, uint32 resource,
+	size_t amount, int priority, bigtime_t absoluteTimeout)
 {
 	ASSERT((amount % B_PAGE_SIZE) == 0);
 	ASSERT(priority >= 0 && priority < (int)B_COUNT_OF(kMemoryReserveForPriority));
-	TRACE(("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory));
+	TRACE(("try to reserve %lu bytes, %Lu left\n", amount, pool));
 
 	const size_t reserve = kMemoryReserveForPriority[priority];
 	const off_t amountPlusReserve = amount + reserve;
@@ -4811,27 +4846,24 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 	// Try with a read-lock and atomics first, but only if there's more than double
 	// the amount of memory we're trying to reserve available, to avoid races.
 	InterruptsReadSpinLocker readLocker(sAvailableMemoryLock);
-	if (atomic_get64(&sAvailableMemory) > (off_t)(amountPlusReserve + amount)) {
-		if (atomic_add64(&sAvailableMemory, -amount) >= amountPlusReserve)
+	if (atomic_get64(&pool) > (off_t)(amountPlusReserve + amount)) {
+		if (atomic_add64(&pool, -amount) >= amountPlusReserve)
 			return B_OK;
 
 		// There wasn't actually enough, we must've raced. Undo what we just did.
-		atomic_add64(&sAvailableMemory, amount);
+		atomic_add64(&pool, amount);
 	}
 	readLocker.Unlock();
 
 	InterruptsWriteSpinLocker writeLocker(sAvailableMemoryLock);
 
-	if (sAvailableMemory >= amountPlusReserve) {
-		sAvailableMemory -= amount;
+	if (pool >= amountPlusReserve) {
+		pool -= amount;
 		return B_OK;
 	}
 
-	if (timeout <= 0)
+	if (absoluteTimeout <= system_time())
 		return B_NO_MEMORY;
-
-	// turn timeout into an absolute timeout
-	timeout += system_time();
 
 	// loop until we're out of retries or the timeout occurs
 	int32 retries = 3;
@@ -4839,22 +4871,62 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 		sNeededMemory += amount;
 
 		// call the low resource manager
-		uint64 requirement = sNeededMemory - (sAvailableMemory - reserve);
+		uint64 requirement = sNeededMemory - (pool - reserve);
 		writeLocker.Unlock();
-		low_resource(B_KERNEL_RESOURCE_MEMORY, requirement,
-			B_ABSOLUTE_TIMEOUT, timeout);
+		low_resource(resource, requirement,
+			B_ABSOLUTE_TIMEOUT, absoluteTimeout);
 		writeLocker.Lock();
 
 		sNeededMemory -= amount;
 
-		if (sAvailableMemory >= amountPlusReserve) {
-			sAvailableMemory -= amount;
+		if (pool >= amountPlusReserve) {
+			pool -= amount;
 			return B_OK;
 		}
-	} while (--retries > 0 && timeout > system_time());
+	} while (--retries > 0 && absoluteTimeout > system_time());
 
 	return B_NO_MEMORY;
 }
+
+
+status_t
+vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
+{
+	timeout += system_time();
+
+#if ENABLE_SWAP_SUPPORT
+	// We have to reserve first from the "memory-and-swap" pool, and
+	// only if that succeeds can we try to reserve from the "memory" pool.
+	status_t status = vm_try_reserve_internal(sAvailableMemoryAndSwap, B_KERNEL_RESOURCE_MEMORY,
+		amount, priority, timeout);
+	if (status != B_OK)
+		return status;
+
+	status = vm_try_reserve_internal(sAvailableMemory, B_KERNEL_RESOURCE_MEMORY,
+		amount, priority, timeout);
+	if (status != B_OK)
+		vm_unreserve_memory_or_swap(amount);
+	return status;
+#else
+	return vm_try_reserve_internal(sAvailableMemory, B_KERNEL_RESOURCE_MEMORY,
+		amount, priority, timeout);
+#endif
+}
+
+
+#if ENABLE_SWAP_SUPPORT
+status_t
+vm_try_reserve_memory_or_swap(size_t amount, int priority, bigtime_t timeout)
+{
+	timeout += system_time();
+
+	// TODO: There should be a MEMORY_AND_SWAP resource; but since little (if any)
+	// kernel memory can be swapped out, there's no point until userland can be
+	// hooked into the low_resource system, too.
+	return vm_try_reserve_internal(sAvailableMemoryAndSwap, B_KERNEL_RESOURCE_MEMORY,
+		amount, priority, timeout);
+}
+#endif
 
 
 status_t

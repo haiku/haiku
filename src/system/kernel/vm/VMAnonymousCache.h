@@ -26,7 +26,6 @@ extern "C" {
 	void swap_init(void);
 	void swap_init_post_modules(void);
 	bool swap_free_page_swap_space(vm_page* page);
-	uint32 swap_available_pages(void);
 	uint32 swap_total_swap_pages(void);
 }
 
@@ -90,7 +89,6 @@ private:
 									swap_addr_t slotIndex, uint32 count);
 			void				_SwapBlockFree(off_t pageIndex, uint32 count);
 			swap_addr_t			_SwapBlockGetAddress(off_t pageIndex);
-			status_t			_Commit(off_t size, int priority);
 
 			void				_MergePagesSmallerConsumer(
 									VMAnonymousCache* source);
@@ -107,7 +105,7 @@ private:
 			uint8				fPrecommittedPages;
 			int32				fGuardedSize;
 			BKernel::Bitmap*	fNoSwapPages;
-			off_t				fCommittedSwapSize;
+			off_t				fReservedSwapSize;
 			off_t				fAllocatedSwapSize;
 };
 
