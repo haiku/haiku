@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Hardlink only packages used in the build from one directory to another,
-# and updates the RemotePackageRepository file at the same time.
+# Copy only packages used in the build from one directory to another,
+# updates the RemotePackageRepository file, and generates a package repo.
 #
-# Copyright 2017-2020 Augustin Cavalier <waddlesplash>
+# Copyright 2017-2026 Augustin Cavalier <waddlesplash>
 # Distributed under the terms of the MIT License.
 
-import sys, os, subprocess, re, hashlib
+import sys, os, subprocess, re, hashlib, shutil
 from pkg_resources import parse_version
 
 # Detect architecture from provided jam remote package repo file
@@ -20,7 +20,7 @@ def probe_architecture(jamf):
 	return text.split(":")[1].strip()
 
 if len(sys.argv) != 4:
-	print("usage: hardlink_packages.py [jam RemotePackageRepository file] "
+	print("usage: generate_build_packages_repo.py [jam RemotePackageRepository file] "
 		+ "[prebuilt packages directory] [destination root directory]")
 	print("  note that the [jam RemotePackageRepository file] will be modified.")
 	print("  note that [target directory] is assumed to have a 'packages' subdirectory, "
@@ -53,7 +53,7 @@ for filename in os.listdir(args_src):
 		continue
 	packageVersions.append(filename)
 
-# Read RemotePackageRepository file and hardlink relevant packages
+# Read RemotePackageRepository file and copy relevant packages
 pattern = re.compile("^[a-z0-9]")
 newFileForJam = []
 packageFiles = []
@@ -88,17 +88,18 @@ with open(args_jamf) as f:
 			filesNotFound = True
 			continue
 		else:
-			# found it, so hardlink it
+			# found it, so copy it
 			if not (os.path.exists(args_dst_packages + greatestVersion)):
-				os.link(args_src + greatestVersion, args_dst_packages + greatestVersion)
+				print("copying: " + pkgname)
+				shutil.copy2(args_src + greatestVersion, args_dst_packages + greatestVersion)
 			if ('packages/' + greatestVersion) not in packageFiles:
 				packageFiles.append('packages/' + greatestVersion)
-			# also hardlink the source package, if one exists
+			# also copy the source package, if one exists
 			srcpkg = greatestVersion.replace("-" + arch + ".hpkg",
 				"-source.hpkg").replace('-', '_source-', 1)
 			if os.path.exists(args_src + srcpkg):
 				if not os.path.exists(args_dst_packages + srcpkg):
-					os.link(args_src + srcpkg, args_dst_packages + srcpkg)
+					shutil.copy2(args_src + srcpkg, args_dst_packages + srcpkg)
 				if ('packages/' + srcpkg) not in packageFiles:
 					packageFiles.append('packages/' + srcpkg)
 		newFileForJam.append("\t" + greatestVersion[:greatestVersion.rfind('-')] + "\n");
