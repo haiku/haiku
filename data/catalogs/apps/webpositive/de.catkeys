@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	2402977561
+1	german	x-vnd.Haiku-WebPositive	4110209091
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
 Copy	Console Window		Kopieren
@@ -89,6 +89,7 @@ New tab	WebPositive Window		Neuer Reiter
 Increase size	WebPositive Window		Vergrößern
 Today	WebPositive Window		Heute
 Open location	WebPositive Window		URL öffnen
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll %appname% wirklich beendet werden?
 New browser window	Download Window		Neues Browser-Fenster
 Open	Download Window		Öffnen
 New window	WebPositive Window		Neues Fenster
@@ -108,6 +109,7 @@ Apply	Settings Window		Anwenden
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error
 Revert	Settings Window		Anfangswerte
 Copy	WebPositive Window		Kopieren
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		Der Prozessor ist zu alt und unterstützt keine SSE2-Erweiterungen, ohne die %appname% nicht läuft. Es wird empfohlen NetSurf zu installieren.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Die letzte Zeile wurde einmal wiederholt.}other{Die letzte Zeile wurde # mal wiederholt.}}
 Default standard font size:	Settings Window		Größe der Standard-Schrift:
 Custom	Settings Window		Benutzerdefiniert

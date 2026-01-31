@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	1716484992
+1	turkish	x-vnd.Haiku-HaikuDepot	3945138144
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
@@ -11,6 +11,7 @@ Rate package…	PackageInfoView		Paketi derecelendir…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Kimlik, %Nickname% olarak başarıyla doğrulandı.
 Package problems	PackageProblem	Window title	Paket sorunları
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Sunucudan geri gönderilen veriyle gerekli CAPTCHA bilgisi alınamadı.
+Install %PackageTitle%	PackageAction		Kur: %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Paket listesi alınırken bir hata oluştu: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Kullanım koşullarını güncelle
 No usage conditions	UserUsageConditions		Kullanım koşulları yok
@@ -30,6 +31,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		Çıkış yap
 Password requirements	UserLoginWindow		Parola gereklilikleri
 The following additional package changes have to be made:	PackageResult		Aşağıdaki ek paket değişikliklerinin yapılması gerekiyor:
+%Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname%, HaikuDepotServer adındaki bir sunucu ile iletişim kurar. Bunlar, HaikuDepotServer hizmetinin kullanımına ilişkin, “%Nickname%” kullanıcısının %AgreedToTimestamp% tarihinde kabul ettiği kullanım koşullarıdır.
 No changelog available.	PackageInfoView		Kullanılabilir bir değişiklik günlüğü yok.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Geçerli kullanım koşulları kabul edildi.
 Cancel	PackageProblem		İptal
@@ -57,6 +59,7 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Paket hizmeti sorunu
 No	MainWindow		Hayır
 Repository	PackageListView		Depo
+%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		%appname% uygulamasının işlevsel olması için paket ardalan sürecine gereksinimi var; ancak bu çalışıyor gibi görünmüyor.\nŞimdi başlatmak ister misiniz?
 Close	RatePackageWindow		Kapat
 Close	UserLoginWindow		Kapat
 The email is malformed.	UserLoginWindow		E-posta biçimi hatalı.
@@ -72,9 +75,11 @@ n/a	PackageInfoView		yok
 Checking user details	UserDetailVerifierProcess		Kullanıcı ayrıntıları denetleniyor…
 Cancel	MainWindow		Vazgeç
 Refresh repositories	MainWindow		Depoları yenile
+Error	SimpleAlert		Hata
 Continue	App		Sürdür
 A password is required.	UserLoginWindow		Bir parola gerekli.
 Language	RatePackageWindow		Dil
+Open %DeskbarLink%	PackageAction		Aç: %DeskbarLink%
 Status	PackageListView		Durum
 Network transport error	ServerHelper		Ağ ulaşım hatası
 Cancel	PackageResult		Vazgeç
@@ -118,6 +123,7 @@ Check for updates…	MainWindow		Güncellemeleri denetle…
 Uninstalled	PackageListView		Kaldırıldı
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Kullanım koşullarını kabul ediyorum
 Installing \"%PackageName%\"	InstallPackageProcess		“%PackageName%” kuruluyor…
+Uninstall %PackageTitle%	PackageAction		Kaldır: %PackageTitle%
 OK	App		Tamam
 Fatal error	UninstallPackageAction		Onulmaz hata
 Develop packages	MainWindow		Geliştirme paketleri
@@ -130,6 +136,7 @@ Fetching screenshot	CacheScreenshotProcess		Ekran görüntüsü getiriliyor…
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Sunucu sistemi ile iletişim kurarken bir ağ ulaşım hatası oluştu: %s
 Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşzamanlanıyor…
+No, quit	App		Hayır, çık
 Show	MainWindow		Göster
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Bu uygulama çalışabilmek için bilgisayarınızda dosya işlemleri yapmaya gereksinim duyar. Görünüşe göre [%TestFilePath%] konumuna bir sınama dosyası yazımında sorunlar var. Lütfen bu uygulamanın dosya yazmasına engel olabilecek disk veya dosya izinleri sıkıntıları olup olmadığını denetleyin. Bu sorunu göz ardı edip işlemi sürdürebilirsiniz; ancak bazı işlevler devre dışı kalabilir.
 Settings…	MainWindow		Ayarlar…
@@ -203,6 +210,7 @@ Reading repository data	LocalPkgDataLoadProcess		Depo bilgisi okunuyor…
 Native desktop packages only	MainWindow		Yalnızca Haiku’ya özel masaüstü paketleri
 Fatal error	InstallPackageProcess		Onulmaz hata
 A validation error has occurred	ServerHelper		Bir doğrulama hatası oluştu
+%Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname%, HaikuDepotServer adındaki bir sunucu bileşeni ile iletişim kurar. Bunlar, HaikuDepotServer hizmetinin kullanımına ilişkin güncel kullanım koşullarıdır.
 The nickname is required.	UserLoginWindow		Takma ad gerekli.
 -	no package size		-
 Apply changes	PackageResult		Değişiklikleri uygula
@@ -225,4 +233,5 @@ No results? 	FeaturedPackagesView		Aradığınızı bulamadınız mı?
 User creation error	UserLoginWindow		Kullanıcı oluşturma hatası
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.
 Cleaning up…	ShuttingDownWindow		Toparlanıyor…
+%appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname%, çıkmadan önce durduruluyor veya çalışan işlemleri tamamlıyor.
 Repeat password:	UserLoginWindow		Parolayı yineleyin:

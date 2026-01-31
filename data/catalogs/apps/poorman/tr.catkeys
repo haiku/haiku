@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-PoorMan	2667626017
+1	turkish	x-vnd.Haiku-PoorMan	3080340918
 Select web folder	PoorMan		Web klasörü seç
 Console logging	PoorMan		Konsol günlüklemesi
 Create Log File	PoorMan		Günlük dosyası oluştur
@@ -9,6 +9,7 @@ Shutting down.	PoorMan		Kapatılıyor…
 Web folder:	PoorMan		Web klasörü:
 Log To Console	PoorMan		Konsola günlükle
 File Name	PoorMan		Dosya adı
+Error folder	PoorMan		Hata: Klasör
 Starting up... 	PoorMan		Başlatılıyor… 
 Select	PoorMan		Seç
 Logging view	PoorMan		Günlük görünümü
@@ -18,11 +19,13 @@ Cancel	PoorMan		Vazgeç
 Directory: 	PoorMan		Dizin: 
 Hits: %lu	PoorMan		Görüntülenme: %lu
 Hits: 0	PoorMan		Görüntülenme: 0
+%appname% settings	PoorMan		%appname% ayarları
 Shutting down.\n	PoorMan		Kapatılıyor…\n
 Select all	PoorMan		Tümünü seç
 Send file listing if there's no start page	PoorMan		Bir başlangıç sayfası yoksa dosya listesini gönder
 Max. simultaneous connections:	PoorMan		En çok eşzamanlı bağlantı:
 Done	PoorMan		Tamam
+Please choose the folder to publish on the web.\n\nYou can have %appname% create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Lütfen web’de yayımlamak üzere kullanılacak klasörü seçin.\n\n%appname% uygulamasının ana klasörünüzde saptanmış bir “public_html” klasörü oluşturmasını sağlayabilirsiniz.\nİsterseniz kendi klasörlerinizden birini de seçebilirsiniz.
 Site	PoorMan		Site
 Cannot start the server	PoorMan		Sunucu başlatılamıyor
 Create log file	PoorMan		Günlük dosyası oluştur
@@ -31,10 +34,12 @@ Clear hit counter	PoorMan		Görüntülenme sayacını sıfırla
 Status: Stopped	PoorMan		Durum: Durduruldu
 File	PoorMan		Dosya
 Settings…	PoorMan		Ayarlar…
+Create %appname% log	PoorMan		%appname% günlüğü oluştur
 Log To File	PoorMan		Dosyaya günlükle
 Connections	PoorMan		Bağlantılar
 Controls	PoorMan		Denetimler
 Log to console	PoorMan		Konsola günlükle
+Error server	PoorMan		Hata: Sunucu
 Advanced	PoorMan		Gelişmiş
 Copy	PoorMan		Kopyala
 Logging	PoorMan		Günlükleme

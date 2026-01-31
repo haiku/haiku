@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-TSKB	3780974715
+1	german	x-vnd.Be-TSKB	1763402521
 Auto-hide	PreferencesWindow		Automatisch ausblenden
 Show all	WindowMenu		Alle einblenden
 Edit in Tracker…	PreferencesWindow		Im Tracker bearbeiten …
@@ -9,6 +9,7 @@ Large	PreferencesWindow		Groß
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar-Ordner ist leer>
 Recent documents	DeskbarMenu		Letzte Dokumente
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
+%appname% preferences	PreferencesWindow		%appname%-Einstellungen
 Always on top	PreferencesWindow		Immer im Vordergrund
 Restart system	DeskbarMenu		Neustarten
 Recent documents:	PreferencesWindow		Letzte Dokumente:
@@ -28,12 +29,14 @@ Close all	WindowMenu		Alle schließen
 About this system	DeskbarMenu		Über dieses System
 Quit application	WindowMenu		Anwendung beenden
 Hide application names	PreferencesWindow		Anwendungsnamen ausblenden
+Deskbar	System name		Deskbar
 Applications	PreferencesWindow		Anwendungen
 Show application expander	PreferencesWindow		Expander anzeigen
 Suspend	DeskbarMenu		Ruhezustand
 Shutdown…	DeskbarMenu		Herunterfahren …
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
 Expand new applications	PreferencesWindow		Neue Anwendungen aufklappen
+%appname% preferences…	DeskbarMenu		%appname%-Einstellungen …
 Recent applications:	PreferencesWindow		Letzte Anwendungen:
 Recent folders:	PreferencesWindow		Letzte Ordner:
 Recent folders	DeskbarMenu		Letzte Ordner

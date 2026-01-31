@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CodyCam	2786669505
+1	japanese	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		出力先ディレクトリを入力してください
 reply: '%s'\n	SftpClient		返信: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <非表示> (本物のパスワードが送られます)
@@ -50,6 +50,7 @@ server address expected	CodyCam		サーバーアドレスを入力してくだ�
 Cannot start the video window	CodyCam		ビデオウィンドウを開始できません
 reply: %d, %d\n	FtpClient		返信: %d, %d\n
 Cannot set the time source for the video window	CodyCam		タイムソースをビデオウィンドウにセットできません
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		ビデオソースを見つけられません。\n%appname% を使うには、webcam が必要です。
 Every 15 minutes	CodyCam		15 分ごと
 Every 24 hours	CodyCam		24 時間ごと
 Image Format Menu	CodyCam		画像形式メニュー

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Expander	2040688293
+1	turkish	x-vnd.Haiku-Expander	2735024965
 Destination	ExpanderWindow		Hedef
 Other	ExpanderPreferences		Diğer
 Automatically show contents listing	ExpanderPreferences		İçerik listesini kendiliğinden göster
@@ -6,12 +6,14 @@ Expander	System name		Paketaçar
 Set source…	ExpanderMenu		Kaynak belirle…
 OK	ExpanderWindow		Tamam
 The destination is not a folder.	ExpanderWindow		Hedef bir klasör değil.
+%appname%: Choose destination	DirectoryFilePanel		%appname%: Hedef konum seç
 The folder was either moved, renamed or not supported.	ExpanderWindow		Klasör taşınmış, yeniden adlandırılmış veya desteklenmiyor olabilir.
 Close window when done expanding	ExpanderPreferences		Genişletme bittikten sonra pencereyi kapat
 Close	ExpanderMenu		Kapat
 Create	ExpanderWindow		Oluştur
 Creating listing for '%s'…	ExpanderWindow		“%s” için listeleme oluşturuluyor…
 Show contents	ExpanderMenu		İçeriği göster
+%appname% settings	ExpanderPreferences		%appname% ayarları
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Bu arşivi genişletmeyi durdurmak istediğinizden emin misiniz? Tüm ögeler çıkarılamamış olabilir.
 Settings	ExpanderMenu		Ayarlar
 Expand	ExpanderWindow		Genişlet
@@ -45,5 +47,6 @@ The file doesn't exist	ExpanderWindow		Dosya yok
 Hide contents	ExpanderWindow		İçeriği gizle
 Source	ExpanderWindow		Kaynak
 The destination is read only.	ExpanderWindow		Hedef saltokunur.
+%appname%: Open	ExpanderWindow		%appname%: Aç
 Select	ExpanderPreferences		Seç
 File	ExpanderMenu		Dosya

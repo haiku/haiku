@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	1716484992
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3945138144
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
@@ -11,6 +11,7 @@ Rate package…	PackageInfoView		Puntueu el paquet...
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Us heu autenticat correctament com a %Nickname%.
 Package problems	PackageProblem	Window title	Problemes amb paquets
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		No s'ha pogut extreure la informació de CAPTCHA necessària de les dades retornades del servidor.
+Install %PackageTitle%	PackageAction		Instal·la %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en obtenir la llista de paquets: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Actualització de les condicions d'ús
 No usage conditions	UserUsageConditions		Sense condicions d'ús
@@ -30,6 +31,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		Tanca la sessió
 Password requirements	UserLoginWindow		Requisits de la contrasenya
 The following additional package changes have to be made:	PackageResult		S'han de fer els canvis addicionals de paquet següents:
+%Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% es comunica amb un component de servidor anomenat HaikuDepotServer. Aquestes són les condicions d'ús que l'usuari %Nickname% va acceptar  (%AgreedToTimestamp%) en relació amb l'ús del servei del Servidor del dipòsit del Haiku.
 No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		S'han acordat les condicions d'ús actuals.
 Cancel	PackageProblem		Cancel·la
@@ -57,6 +59,7 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Problema amb el dimoni de paquets
 No	MainWindow		No
 Repository	PackageListView		Repositori
+%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		%appname% necessita el dimoni del paquet per funcionar, i sembla que no s'executa.\nVoleu iniciar-lo ara?
 Close	RatePackageWindow		Tanca
 Close	UserLoginWindow		Tanca
 The email is malformed.	UserLoginWindow		L'adreça electrònica no és correcta.
@@ -72,9 +75,11 @@ n/a	PackageInfoView		n/d
 Checking user details	UserDetailVerifierProcess		Comprovació de les dades de l'usuari
 Cancel	MainWindow		Cancel·la
 Refresh repositories	MainWindow		Actualitza els repositoris
+Error	SimpleAlert		Error
 Continue	App		Continua
 A password is required.	UserLoginWindow		Cal una contrasenya.
 Language	RatePackageWindow		Llengua
+Open %DeskbarLink%	PackageAction		Obre %DeskbarLink%
 Status	PackageListView		Estat
 Network transport error	ServerHelper		Error de transport de xarxa
 Cancel	PackageResult		Cancel·la
@@ -118,6 +123,7 @@ Check for updates…	MainWindow		Comprova si hi ha actualitzacions...
 Uninstalled	PackageListView		Desinstal·lat
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Accepto les condicions d'ús.
 Installing \"%PackageName%\"	InstallPackageProcess		S'instal·la \"%PackageName%\"
+Uninstall %PackageTitle%	PackageAction		Desinstal·la %PackageTitle%
 OK	App		D'acord
 Fatal error	UninstallPackageAction		Error fatal
 Develop packages	MainWindow		Paquets de desenvolupament
@@ -130,6 +136,7 @@ Fetching screenshot	CacheScreenshotProcess		S'obté la captura
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
 Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
+No, quit	App		No, tanca't
 Show	MainWindow		Mostra...
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aquesta aplicació escriu i llegeix alguns fitxers de treball de l'ordinador per tal de funcionar. Sembla que hi ha problemes per escriure un fitxer de prova a [%TestFilePath%]. Comproveu que no hi ha cap problema amb el disc local o els permisos que pugui evitar que aquesta aplicació escrigui fitxers a la ubicació del directori. Podeu optar per reconèixer aquest problema i continuar, però és possible que alguna funcionalitat estigui inhabilitada.
 Settings…	MainWindow		Paràmetres...
@@ -138,7 +145,7 @@ Ratings	PackageInfoView		Puntuacions
 The following problems have been encountered. Please select a solution for each:	PackageProblem		S'han trobat els problemes següents. Seleccioneu una solució per a cadascun:
 Local	LocalPkgDataLoadProcess		Local
 Package changes	PackageResult	Window title	Canvis de paquets
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Seria acceptable enviar dades d’ús anònimes al sistema del servidor del Dipòsit del Haiku des d’aquest ordinador? En podeu canviar les preferències a la finestra de \Paràmetres\ més endavant.
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Seria acceptable enviar dades d’ús anònimes al sistema del Servidor del dipòsit del Haiku des d’aquest ordinador? En podeu canviar les preferències a la finestra de \Paràmetres\ més endavant.
 User rating	RatePackageWindow		Puntuació de l'usuari
 Installed packages	MainWindow		Paquets instal·lats
 Date	PackageListView		Data
@@ -152,7 +159,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 -	no package publish		-
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La contrasenya ha de tenir com a mínim vuit caràcters, ha de constar d'almenys dos dígits i una majúscula.
 Contents	PackageInfoView		Continguts
-Share anonymous usage data with HaikuDepotServer	SettingsWindow		Comparteix dades d’ús anònimes amb el servidor del Dipòsit del Haiku.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Comparteix dades d’ús anònimes amb el Servidor del dipòsit del Haiku.
 Close	PackageManager		Tanca
 Changelog	PackageInfoView		Registre de canvis
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 per cercar tots els paquets.
@@ -180,7 +187,7 @@ Success	UserLoginWindow		Correcte
 Settings	SettingsWindow		Paràmetres
 Login issue	MainWindow		Problema d’inici de sessió
 Your rating:	RatePackageWindow		La vostra puntuació:
-The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'usuari %Nickname% s'ha creat correctament al sistema del servidor del Dipòsit del Haiku. Podeu administrar les dades de l'usuari mitjançant la interfície web. Ara hi heu entrat com a usuari nou.
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'usuari %Nickname% s'ha creat correctament al sistema del Servidor del dipòsit del Haiku. Podeu administrar les dades de l'usuari mitjançant la interfície web. Ara hi heu entrat com a usuari nou.
 Repositories	MainWindow		Repositoris
 This rating is visible to other users	RatePackageWindow		Aquesta puntuació és visible per a altres usuaris.
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		En actualitzar les dades del paquet, s’ha produït un problema que pot fer que les dades quedin obsoletes o que faltin a la visualització de l’aplicació. És possible que es puguin obtenir detalls addicionals sobre aquest problema als registres de l'aplicació.\nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
@@ -203,6 +210,7 @@ Reading repository data	LocalPkgDataLoadProcess		Es llegeixen les dades del repo
 Native desktop packages only	MainWindow		Només paquets d'escriptori nadius
 Fatal error	InstallPackageProcess		Error fatal
 A validation error has occurred	ServerHelper		Hi ha hagut un error de validació.
+%Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% es comunica amb un component de servidor anomenat HaikuDepotServer. Aquestes són les condicions d'ús més recents per a l'ús del servei del Servidor del dipòsit del Haiku.
 The nickname is required.	UserLoginWindow		Cal el sobrenom.
 -	no package size		-
 Apply changes	PackageResult		Aplica els canvis
@@ -225,4 +233,5 @@ No results? 	FeaturedPackagesView		Cap resultat?
 User creation error	UserLoginWindow		Error de creació d'usuari
 You need to be logged into an account before you can rate packages.	MainWindow		Per poder valorar els paquets, heu d’iniciar sessió en un compte.
 Cleaning up…	ShuttingDownWindow		Es neteja...
+%appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% s'atura o completa les operacions en execució abans de tancar-se.
 Repeat password:	UserLoginWindow		Repetiu la contrasenya:

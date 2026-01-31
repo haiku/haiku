@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Shortcuts	171515608
+1	japanese	x-vnd.Haiku-Shortcuts	641209832
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		アプリケーション
 Option	ShortcutsSpec	Name for modifier on keyboard	オプション
@@ -6,10 +6,12 @@ Save changes before closing?	ShortcutsWindow		閉じる前に変更を保存し�
 Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
 Don't save	ShortcutsWindow		保存しない
 *MouseDown	ShortcutsWindow		*MouseDown
+%prefname% wasn't able to save your keyset.	ShortcutsWindow		%prefname% は、キーセットを保存できませんた。
 *Beep	ShortcutsWindow		*Beep
 Save	ShortcutsWindow		保存
 Either	ShortcutsSpec		どちらか
 Oh no	ShortcutsWindow		Oh no
+%prefname% was unable to save your KeySet file!	ShortcutsWindow		%prefname% は、キーセットファイルを保存できませんでした!
 Key	ShortcutsWindow		Key
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		選択
@@ -41,4 +43,5 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		キーセットを開く...
 File	ShortcutsWindow		ファイル
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+%prefname% was unable to parse your KeySet file!	ShortcutsWindow		%prefname% は、キーセットファイルを解析できませんでした!
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

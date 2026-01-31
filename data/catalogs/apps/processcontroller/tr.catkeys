@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ProcessController	2724038695
+1	turkish	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Dosya kaydedilirken hata
 Display priority	ProcessController		Görüntüleme önceliği
 That's no Fun!	ProcessController		O da nesi öyle!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Düşük öncelik
 Urgent display priority	ProcessController		İvedi görüntüleme önceliği
 Memory usage	ProcessController		Bellek kullanımı
 Ok!	ProcessController		Tamam!
+%appname% is already installed in Deskbar.	ProcessController		%appname%, Masaüstü Çubuğu’nda halihazırda yerleşik.
 Normal priority	ProcessController		Normal öncelik
 Restart Deskbar	ProcessController		Masaüstü Çubuğu’nu yeniden başlat
 Usage: %s [-deskbar]\n	ProcessController		Kullanım: %s [-deskbar]\n
@@ -29,7 +30,9 @@ Quit application	ProcessController		Uygulamadan çık
 Info	ProcessController		Bilgi
 Kill this thread!	ProcessController		Bu iş parçacığını sonlandır!
 This team is already gone…	ProcessController		Bu takım zaten gitmiş…
+About %appname%…	ProcessController		%appname% hakkında…
 Gone teams…	ProcessController		Gidik takımlar…
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		%appname% uygulamasını bir pencerede çalıştırabilir veya onu Masaüstü Çubuğu’na yerleştirebilirsiniz.
 Quit an application	ProcessController		Bir uygulamadan çık
 Cancel	ProcessController		Vazgeç
 Install in Deskbar	ProcessController		Masaüstü Çubuğu’na kur

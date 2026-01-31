@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Expander	2040688293
+1	french	x-vnd.Haiku-Expander	2545978302
 Destination	ExpanderWindow		Destination
 Other	ExpanderPreferences		Autre
 Automatically show contents listing	ExpanderPreferences		Montrer l’inventaire automatiquement
@@ -12,6 +12,7 @@ Close	ExpanderMenu		Fermer
 Create	ExpanderWindow		Créer
 Creating listing for '%s'…	ExpanderWindow		Créer un inventaire pour « %s »…
 Show contents	ExpanderMenu		Montrer le contenu
+%appname% settings	ExpanderPreferences		Réglages de %appname%
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Êtes-vous sûr de vouloir arrêter l’extraction de cette archive ? Les éléments extraits peuvent ne pas être complets.
 Settings	ExpanderMenu		Réglages
 Expand	ExpanderWindow		Décompresser

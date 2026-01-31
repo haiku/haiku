@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	3146871853
+1	french	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Bordure des contrôles
 Control mark	Colors tab		Point de contrôle
 Off	AntialiasingSettingsView		Désactivé
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		Sélection automatique des coule
 Window tab text	Colors tab		Texte des titres de fenêtres
 Navigation pulse	Colors tab		Pulsation de navigation
 LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
+Progress bar	Colors tab		Barre de progression
 Window tab	Colors tab		Titre des fenêtres
 Link text	Colors tab		Texte du lien
 Tooltip background	Colors tab		Arrière plan des bulles d’aide

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	738307934
+1	japanese	x-vnd.Haiku-Installer	2860300425
 Performing installation.	InstallProgress		インストールを実行しています。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
 No optional packages available.	PackagesView		オプショナルパッケージはありません。
@@ -6,6 +6,7 @@ This operating system has to be installed on a partition that uses the Be File S
 The mount point could not be retrieved.	InstallProgress		マウントポイントを取得できません。
 <none>	InstallerWindow	No partition available	<無し>
 Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了しました。ブートセクターは '%s' に書き込まれました。’再起動’を押してコンピューターを再起動するか、別のインストールを行うボリュームを選択してください。
+Are you sure you want to install onto the current boot disk? The %appname% will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか?この場合、%appname% はシステムを再起動する必要があります。
 Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		HaikuはBeファイルシステムを使用するパーティションにインストールする必要がありますが、システムに現在そのようなパーティションがありません。 
 Please choose target	InstallerWindow		インストール先の選択
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Haikuブートメニュー設定用プログラムのブートマネージャーが起動できませんでした。
@@ -31,6 +32,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Haikuインストーラーへ�
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		パーティションを設定するDriveSetupアプリケーションが起動できません。
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		インストール先は空ではありません。そこにHaikuのインストールを含む場合、上書きされてしまいます。すべてのインストール済ソフトウェアを削除するでしょう。\n\nインストール済ソフトウェアを削除せずにシステムをアップグレードしたいなら、アップデート方法に関してHaikuユーザーガイドの\"ソフトウェアの更新(SoftwareUpdater)\"アプリケーションの章を見てください。\n\nそれでもインストールを続行しますか?
 Quit DriveSetup	InstallerWindow		DriveSetup の終了
+Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the %appname% or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了しました。ブートセクターは'%s'へ書き込まれました。'終了'を押して%appname%から離れるか、または別のインストールを行うために新しいボリュームを選択します。
 Write boot sector	InstallerWindow		ブートセクターを書き込む
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 Finishing installation.	InstallProgress		インストールを終了しています。

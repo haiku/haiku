@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PowerStatus	388505242
+1	swedish	x-vnd.Haiku-PowerStatus	4069361317
 Run in window	PowerStatus		Kör i fönster
 Extended battery info	PowerStatus		Ytterligare batteriinformation
 Show status icon	PowerStatus		Visa statusikon
@@ -14,6 +14,7 @@ Quit	PowerStatus		Avsluta
 Battery not charging	PowerStatus		Batteriet laddas inte
 Battery low	PowerStatus		Batterikapaciteten är låg
 Model number: 	PowerStatus		Modellnummer:
+You can run %appname% in a window or install it in the Deskbar.	PowerStatus		Du kan köra %appname% i ett fönster eller installera det i Skrivbordsfältet.
 Battery unused	PowerStatus		Batteri oanvänt
 Type: 	PowerStatus		Typ:
 Damaged or missing battery	PowerStatus		Skadat eller saknat batteri
@@ -38,6 +39,7 @@ Capacity granularity 2: 	PowerStatus		Kapacitetskornighet 2:
 Too bad!	PowerStatus		Synd!
 Technology: 	PowerStatus		Teknik:
 not charging	PowerStatus		laddar inte
+No supported battery detected. %appname% cannot be used on your system.	PowerStatus		Inget batteri som stöds hittades. %appname% kan inte användas på ditt system.
  mWh	PowerStatus		 mWh
 PowerStatus	System name		BatteriStatus
 Design capacity: 	PowerStatus		Tillverkningskapacitet:

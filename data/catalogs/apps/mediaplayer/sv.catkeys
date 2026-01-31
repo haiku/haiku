@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	334504768
+1	swedish	x-vnd.Haiku-MediaPlayer	3337408711
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
@@ -24,6 +24,7 @@ Resume:	MediaPlayer-SettingsWindow		Återuppta:
 Duration	MediaPlayer-InfoWin		Speltid
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importera poster
 Open network stream	MediaPlayer-Main		Öppna nätverksström
+%appname% settings	MediaPlayer-SettingsWindow		%appname% inställningar
 Open file…	MediaPlayer-Main		Öppna fil...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skala kontroller i fullskärmsläge
 View options	MediaPlayer-SettingsWindow		Visningsalternativ
@@ -45,6 +46,7 @@ Save error	MediaPlayer-PlaylistWindow		Sparningsfel
 Attributes	MediaPlayer-Main		Attribut
 Bottom of screen	MediaPlayer-SettingsWindow		Nedtill på skärmen
 Copyright	MediaPlayer-InfoWin		Upphovsrätt
+%appname%: %title%	MediaPlayer-Main		%appname%: %title%
 Invalid URL inserted!	MediaPlayer-NetworkStream		Ogiltig URL angiven!
 Aspect ratio	MediaPlayer-Main		Bildförhållande
 Eject device	MediaPlayer-Main		Mata ut enheten

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	3011636080
+1	swedish	x-vnd.Haiku-Terminal	1164274475
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Insert path	Terminal TermView		Lägg till sökväg
 Text encoding	Terminal TermWindow		Teckenuppsättning
@@ -34,6 +34,7 @@ Cancel	Terminal TermView		Avbryt
 Defaults	Terminal PrefWindow		Standard
 black	Terminal ThemeView		svart
 Revert	Terminal PrefWindow		Återställ
+The following processes are still running:\n\n\t%1\n\nIf you close %appname%, the processes will be killed.	Terminal TermWindow		Följande processer körs fortfarande:\n\n\t%1\n\nOm du stänger %appname% kommer processerna att avslutas.
 Use selection	Terminal FindWindow		Använd markering
 Find next	Terminal TermWindow		Sök nästa
 Copy link location	Terminal TermView		Kopiera länkplats
@@ -85,6 +86,7 @@ Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	V
 Window size:	Terminal AppearancePrefView		Fönsterstorlek:
 Decrease	Terminal TermWindow		Minska
 Settings…	Terminal TermWindow		Inställningar...
+The process \"%1\" is still running.\nIf you close %appname%, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger %appname% kommer processen att avslutas.
 Cancel	Terminal SetTitleWindow		Avbryt
 Blinking cursor	Terminal AppearancePrefView		Blinkande markör
 Use text:	Terminal FindWindow		Använd text:
@@ -104,6 +106,7 @@ The pattern specifying the window titles. The following placeholders\ncan be use
 ANSI bright magenta color	Terminal ThemeView		ANSI ljus magenta färg
 Copy here	Terminal TermView		Kopiera hit
 Use default shell	Terminal Shell		Använd standardskal
+%appname% couldn't start the shell. Sorry.	Terminal TermApp		%appname% kunde inte starta skalet. Tyvärr.
 red	Terminal ThemeView		röd
 white	Terminal ThemeView		vit
 Open link	Terminal TermView		Öppna länk
@@ -125,6 +128,7 @@ Text under cursor	Terminal ThemeView		Text under cursor
 ANSI bright white color	Terminal ThemeView		ANSI ljus vit färg
 Close window	Terminal TermWindow		Stäng fönster
 ANSI magenta color	Terminal ThemeView		ANSI magenta färg
+New %appname%	Terminal TermWindow		Ny %appnamn%
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui och Takashi Murai.\n\nAnvändning: %s [VAL] [SHELL]\n
 cyan	Terminal ThemeView		cyan
 Clear all	Terminal TermWindow		Rensa allt

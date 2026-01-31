@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Expander	2040688293
+1	hungarian	x-vnd.Haiku-Expander	2735024965
 Destination	ExpanderWindow		Célmappa
 Other	ExpanderPreferences		Egyéb
 Automatically show contents listing	ExpanderPreferences		Tartalom listázása automatikusan
@@ -6,12 +6,14 @@ Expander	System name		Kicsomagoló
 Set source…	ExpanderMenu		Csomag megadása…
 OK	ExpanderWindow		Rendben
 The destination is not a folder.	ExpanderWindow		A cél nem egy mappa.
+%appname%: Choose destination	DirectoryFilePanel		%appname%: Cél megadása
 The folder was either moved, renamed or not supported.	ExpanderWindow		A mappa át lett helyezve, át lett nevezve vagy nem használható.
 Close window when done expanding	ExpanderPreferences		A kicsomagolás végeztével zárja be az ablakot
 Close	ExpanderMenu		Bezár
 Create	ExpanderWindow		Létrehozás
 Creating listing for '%s'…	ExpanderWindow		'%s' lista létrehozása…
 Show contents	ExpanderMenu		Tartalom megjelenítése
+%appname% settings	ExpanderPreferences		%appname% beállítások
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Biztosan le akarod állítani a kicsomagolást? A kicsomagolt elemek hiányosak lehetnek.
 Settings	ExpanderMenu		Beállítások
 Expand	ExpanderWindow		Kicsomagol
@@ -45,5 +47,6 @@ The file doesn't exist	ExpanderWindow		A fájl nem létezik
 Hide contents	ExpanderWindow		Tartalom elrejtése
 Source	ExpanderWindow		Csomag
 The destination is read only.	ExpanderWindow		A cél írásvédett.
+%appname%: Open	ExpanderWindow		%appname%: Megnyitás
 Select	ExpanderPreferences		Kiválasztás
 File	ExpanderMenu		Fájl

@@ -17,7 +17,7 @@ DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		IP adresi:
 Netmask:	IntefaceAddressView		Ağ maskesi:
 EAP	EAP protected network		EAP
-Services	NetworkWindow		Servisler
+Services	NetworkWindow		Hizmetler
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ağ Durumu, Masaüstü Çubuğu’na kurulamadı: %s
 Revert	NetworkWindow		Eski haline döndür
 off	ServiceListItem		kapalı

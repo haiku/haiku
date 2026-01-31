@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	171515608
+1	german	x-vnd.Haiku-Shortcuts	641209832
 *MouseUp	ShortcutsWindow		*Maustaste losgelassen
 Application	ShortcutsWindow		Anwendung
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -6,10 +6,12 @@ Save changes before closing?	ShortcutsWindow		Änderungen vor dem Schließen spe
 Revert to saved	ShortcutsWindow		Gespeicherten Stand herstellen
 Don't save	ShortcutsWindow		Verwerfen
 *MouseDown	ShortcutsWindow		*Maus gedrückt
+%prefname% wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
 *Beep	ShortcutsWindow		*Piepton
 Save	ShortcutsWindow		Speichern
 Either	ShortcutsSpec		Alle
 Oh no	ShortcutsWindow		Herrje!
+%prefname% was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
 Key	ShortcutsWindow		Taste
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Öffne Suche-Dialog
 Select	ShortcutsWindow		Auswählen
@@ -41,4 +43,5 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Tastenkürzel öffnen …
 File	ShortcutsWindow		Datei
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+%prefname% was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen

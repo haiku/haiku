@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Pulse	3032132277
+1	swedish	x-vnd.Haiku-Pulse	3118820593
 Normal mode	DeskbarPulseView		Normalläge
 Info	CPUButton		Information
 Quit	DeskbarPulseView		Avsluta
@@ -14,6 +14,7 @@ Mini mode	PrefsWindow		Komprimerat läge
 CPU progress bar	NormalPulseView		CPU progressband
 Fade colors	ConfigView		Tona färger
 Deskbar mode	NormalPulseView		Deskbar-läge
+About %appname%…	PulseView		Om %appnamn%…
 Pulse settings	PulseApp		Pulse inställningar
 Remove replicant	CPUButton		Ta bort replikant
 You can't disable the last active CPU.	PulseView		Du kan inte inaktivera den sista aktiva CPUn.
@@ -26,6 +27,7 @@ Removing from Deskbar failed.\n%s	DeskbarPulseView		Misslyckades att ta bort fr�
 OK	PulseApp		OK
 Deskbar mode	PrefsWindow		Deskbar-läge
 Mini mode	DeskbarPulseView		Komprimerat läge
+About %appname%…	CPUButton		Om %appnamn%…
 You can't disable the last active CPU.	CPUButton		Du kan inte inaktivera den sista aktiva CPUn.
 OK	CPUButton		OK
 Deskbar	CPUButton		Deskbar

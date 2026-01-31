@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	2402977561
+1	japanese	x-vnd.Haiku-WebPositive	4110209091
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 Copy	Console Window		コピー
@@ -89,6 +89,7 @@ New tab	WebPositive Window		新しいタブ
 Increase size	WebPositive Window		拡大
 Today	WebPositive Window		今日
 Open location	WebPositive Window		場所を開く
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		まだダウンロードが進行中です。本当に %appname% をすぐに終了しますか?
 New browser window	Download Window		新しいブラウザーウィンドウ
 Open	Download Window		開く
 New window	WebPositive Window		新しいウィンドウ
@@ -108,6 +109,7 @@ Apply	Settings Window		適用
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークフォルダーを表示する際にエラーが発生しました。\n\nエラー: %error
 Revert	Settings Window		戻す
 Copy	WebPositive Window		コピー
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		CPUが古く、SSE2拡張をサポートしていません。そのため%appname%を動作できません。代わりにNetSurfのインストールをお勧めします
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{最後の行が # 回繰り返されました。}other{最後の行が # 回繰り返されました。}}
 Default standard font size:	Settings Window		標準フォントサイズ:
 Custom	Settings Window		ユーザー設定

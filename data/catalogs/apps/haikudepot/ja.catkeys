@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1107276761
+1	japanese	x-vnd.Haiku-HaikuDepot	3945138144
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
@@ -11,6 +11,7 @@ Rate package…	PackageInfoView		パッケージの評価...
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		ユーザー %Nickname% として無事に認証されました。
 Package problems	PackageProblem	Window title	パッケージの問題
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		サーバーの返信から、必要なキャプチャ情報を抽出できませんでした。
+Install %PackageTitle%	PackageAction		%PackageTitle% をインストール
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		使用条件の更新
 No usage conditions	UserUsageConditions		使用条件なし
@@ -30,6 +31,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		ログアウト
 Password requirements	UserLoginWindow		パスワードの要件
 The following additional package changes have to be made:	PackageResult		以下の追加パッケージの変更が必要です:
+%Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% は、HaikuDepotServer と呼ばれるサーバーコンポーネントと通信します。ユーザー '%Nickname%' が %AgreedToTimestamp% にHaikuDepotServer サービスの利用に関して同意した使用条件があります。
 No changelog available.	PackageInfoView		変更記録はありません。
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		現在の使用条件は同意されています。
 Cancel	PackageProblem		キャンセル
@@ -57,6 +59,7 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		パッケージデーモンの問題
 No	MainWindow		いいえ
 Repository	PackageListView		リポジトリ
+%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		%appname% はパッケージデーモンが動作することを必要としますが、それは動作していないようです。\n今起動しますか?
 Close	RatePackageWindow		閉じる
 Close	UserLoginWindow		閉じる
 The email is malformed.	UserLoginWindow		メールアドレスの形式が正しくありません。
@@ -72,9 +75,11 @@ n/a	PackageInfoView		評価待ち
 Checking user details	UserDetailVerifierProcess		ユーザーの詳細を確認中
 Cancel	MainWindow		中止
 Refresh repositories	MainWindow		リポジトリの更新
+Error	SimpleAlert		エラー
 Continue	App		続行
 A password is required.	UserLoginWindow		パスワードが必要です。
 Language	RatePackageWindow		言語
+Open %DeskbarLink%	PackageAction		%DeskbarLink% を開く
 Status	PackageListView		状態
 Network transport error	ServerHelper		ネットワーク転送エラー
 Cancel	PackageResult		キャンセル
@@ -118,6 +123,7 @@ Check for updates…	MainWindow		更新のチェック...
 Uninstalled	PackageListView		アンインストール済
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		私は使用条件に同意します
 Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" をインストール中
+Uninstall %PackageTitle%	PackageAction		%PackageTitle% をアンインストール
 OK	App		OK
 Fatal error	UninstallPackageAction		致命的なエラー
 Develop packages	MainWindow		開発用パッケージ
@@ -130,6 +136,7 @@ Fetching screenshot	CacheScreenshotProcess		スクリーンショットを取得
 A network transport error has arisen communicating with the server system: %s	ServerHelper		サーバーシステムと通信中にネットワーク転送エラーが発生しました: %s
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
+No, quit	App		いいえ、終了します
 Show	MainWindow		表示
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		このアプリケーションは動作するためにあなたのコンピューター上のいくつかの作業ファイルを読み書きします。テストファイルの [%TestFilePath%] への書き込みに問題があるようです。ローカルディスクに問題がないことや、そのディレクトリにアプリケーションが書込みできない権限になっているかをチェックしてください。この問題を認識して続行することもできますが、いくつかの機能が無効となるかもしれません。
 Settings…	MainWindow		設定...
@@ -185,6 +192,7 @@ Repositories	MainWindow		リポジトリ
 This rating is visible to other users	RatePackageWindow		この評価はほかのユーザーからも見られます
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		パッケージデータの更新中に問題が発生しました。そのためデータが期限切れに、つまりアプリケーションの表示から消えてしまいます。この問題の詳細は、アプリケーションのログから得られるでしょう。\nログの見方についての情報は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
+Stop network use	ServerHelper		ネットワークの使用を中止
 View agreed usage conditions…	MainWindow		同意した使用条件を見る...
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		ユーザー [%Nickname%] は認証されましたが、次に進む前に最新の利用条件に同意することが求められます。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って評価の作成や更新はできません。
@@ -202,6 +210,7 @@ Reading repository data	LocalPkgDataLoadProcess		リポジトリのデータを�
 Native desktop packages only	MainWindow		ネイティブデスクトップパッケージのみ
 Fatal error	InstallPackageProcess		致命的なエラー
 A validation error has occurred	ServerHelper		検証エラーが発生しました
+%Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% HaikuDepotServer と呼ばれるサーバーコンポーネントと通信します。HaikuDepotServer サービスの利用に関する最新の使用条件があります。
 The nickname is required.	UserLoginWindow		ニックネームが必要です。
 -	no package size		-
 Apply changes	PackageResult		変更を適用
@@ -224,4 +233,5 @@ No results? 	FeaturedPackagesView		見つかりませんか?
 User creation error	UserLoginWindow		ユーザー作成エラー
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージの評価前にアカウントにログインする必要があります。
 Cleaning up…	ShuttingDownWindow		クリーンアップしています…
+%appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% は終了前に停止しているか、オペレーションを完了しています。
 Repeat password:	UserLoginWindow		パスワードの再入力:

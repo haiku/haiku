@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	3492357554
+1	hungarian	x-vnd.Be-MAIL	218437132
 Set to Saved	Mail		Mentésre jelöl
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattints a Küldésre, ha mindenképp el akarod küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térj vissza, és javítsd ki azt.
 Text wrapping:	Mail		Szöveg tördelése:
@@ -33,12 +33,14 @@ sent	B_USER_DIRECTORY/mail/sent		Elküldött
 Only files can be added as attachments.	Mail		Csak fájlok adhatóak a levélhez mellékletként.
 Close	Mail		Bezárás
 Untitled	Mail		Névtelen
+%appname% couldn't find its dictionary.	Mail		A %appname% nem találja a mappáját.
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		A melléklet törlésének támogatása a továbbított levélből még nincs elkészítve.\nEmiatt nem is fog az elvárások szerint működni.
 Same recipient	Mail		Azonos címzett
 Previous message	Mail		Előző levél
 (Address unavailable)	Mail		(A cím nem elérhető)
 Mail	System name		Levelezés
 Copy link location	Mail		Hivatkozás címének másolása
+%appname% settings	Mail		%appname% beállítások
 Add attachment…	Mail		Fájl csatolása…
 Next	Mail		Következő
 Attachments:	Mail		Csatolmányok:

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	2302019526
+1	turkish	x-vnd.haiku-icon_o_matic	147386950
 None	Icon-O-Matic-Properties		Yok
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Yolu temizle
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -96,6 +96,7 @@ Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCm
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		{0, plural, one{Şekli} other{Şekilleri}} kaldır
 Undo: %action%	Icon-O-Matic-Main		Geri al: %action%
 Diamond	Icon-O-Matic-StyleTypes		Elmas
+%appname% might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		%appname%, SVG dosyasını yüklerken tüm verileri yorumlamamış olabilir. Özgün dosyanın üzerine yazılmasıyla bu bilgiler kaybolacaktır.
 Don't save	Icon-O-Matic-Menu-Settings		Kaydetme
 Add shape with path	Icon-O-Matic-Menu-Shape		Yol içeren şekil ekle
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Tüh

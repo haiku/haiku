@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BootManager	1012731949
+1	french	x-vnd.Haiku-BootManager	3831721565
 Old Master Boot Record backup failure	BootManagerController	Title	Échec lors de la sauvegarde du Master Boot Record d’origine
 At least one partition must be selected!	BootManagerController		Au moins une partition doit être sélectionnée !
 No space available!	DrivesPage	Cannot install	Espace insuffisant !
@@ -31,6 +31,7 @@ USB Drive	DrivesPage	Default disk name	Disque USB
 Restore MBR	BootManagerController	Button	Restaurer le MBR
 Hard Drive	DrivesPage	Default disk name	Disque Dur
 Drives	DrivesPage	Title	Disques
+%appname% is unable to read the partition table!	BootManagerController		%appname% ne parvient pas à lire la table de partition !
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Les partitions suivantes ont été détectées. Veuillez cocher les cases correspondantes aux partitions à inclure dans le menu d’amorçage. Vous pouvez aussi définir le libellé que vous souhaitez voir apparaître dans le menu d’amorçage pour chacune des partitions.
 After five seconds	DefaultPartitionPage		Après cinq secondes
 Timeout: %s	DefaultPartitionPage		Délai d’expiration : %s

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Repositories	1003035766
+1	swedish	x-vnd.Haiku-Repositories	2642736029
 This is not a valid URL.	AddRepoWindow	Add URL error message	Detta är inte en giltig URL.
 Repository URL:	AddRepoWindow	Text box label	Repositoriets URL:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Ett fel inträffade vid uppdatering av cache för repositoriet %name%
@@ -21,6 +21,7 @@ Status	RepositoriesView	Column title	Status
 Name	RepositoriesView	Column title	Namn
 Add	AddRepoWindow	Button label	Lägg till
 Enable all	RepositoriesView	Button label	Aktivera alla
+%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	%prefname% kunde inte hämta namnen på de för närvarande aktiverade arkiven.
 Aborted	TaskLooper	Aborted task status message	Avbruten
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	Aktivera

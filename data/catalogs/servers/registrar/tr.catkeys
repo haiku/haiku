@@ -1,7 +1,7 @@
 1	turkish	x-vnd.haiku-registrar	2599857937
 Cancel	ShutdownProcess		Vazgeç
 OK	ShutdownProcess		Tamam
-Do you really want to shut down the system?	ShutdownProcess		Sistemi kapatmak istediğinizden emin misiniz?
+Do you really want to shut down the system?	ShutdownProcess		Sistemi kapatmayı gerçekten istiyor musunuz?
 Shutdown status	ShutdownProcess		Kapanma durumu
 Shut down	ShutdownProcess		Kapat
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		“%appName%” uygulaması bir kipsel panelde takılı kalmış olabilir.
@@ -9,7 +9,7 @@ System is shut down	ShutdownProcess		Sistem kapandı
 Restart system	ShutdownProcess		Yeniden başlat
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		“%appName%” uygulaması kapanma işlemini yarıda kesti.
 Asking background applications to quit.	ShutdownProcess		Arka plan uygulamalarına kapanmaları söyleniyor…
-Do you really want to restart the system?	ShutdownProcess		Sistemi yeniden başlatmak istediğinizden emin misiniz?
+Do you really want to restart the system?	ShutdownProcess		Sistemi yeniden başlatmayı gerçekten istiyor musunuz?
 Restart	ShutdownProcess		Yeniden başlat
 It's now safe to turn off the computer.	ShutdownProcess		Bilgisayarınızı şimdi kapatabilirsiniz. Hoşça kalın!
 Asking other processes to quit.	ShutdownProcess		Diğer süreçlere kapanmaları söyleniyor…

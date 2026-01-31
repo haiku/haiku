@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Pairs	3059673093
+1	catalan; valencian	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		Parells
 Quit	PairsWindow		Surt
 Medium	PairsWindow		Mitjà
@@ -14,4 +14,5 @@ Quit game	PairsWindow		Deixa la partida
 Large	PairsWindow		Grossa
 Beginner (4x4)	PairsWindow		Principiant (4x4)
 Intermediate (6x6)	PairsWindow		Intermedi (6x6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	%s no ha trobat prou icones vectorials per començar; en necessita com a mínim %zu i n'ha trobat %zu.\n
 New game	PairsWindow		Partida nova

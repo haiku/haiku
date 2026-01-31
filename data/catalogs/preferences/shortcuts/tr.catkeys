@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Shortcuts	171515608
+1	turkish	x-vnd.Haiku-Shortcuts	641209832
 *MouseUp	ShortcutsWindow		*FareYukarı
 Application	ShortcutsWindow		Uygulama
 Option	ShortcutsSpec	Name for modifier on keyboard	Seçenek
@@ -6,10 +6,12 @@ Save changes before closing?	ShortcutsWindow		Kapatmadan önce değişiklikler k
 Revert to saved	ShortcutsWindow		Kaydedilene döndür
 Don't save	ShortcutsWindow		Kaydetme
 *MouseDown	ShortcutsWindow		*FareAşağı
+%prefname% wasn't able to save your keyset.	ShortcutsWindow		%prefname%, düğme kümenizi kaydedemedi.
 *Beep	ShortcutsWindow		*Bip
 Save	ShortcutsWindow		Kaydet
 Either	ShortcutsSpec		Herhangi biri
 Oh no	ShortcutsWindow		N’olamaz
+%prefname% was unable to save your KeySet file!	ShortcutsWindow		%prefname%, düğme kümesi dosyanızı kaydedemedi.
 Key	ShortcutsWindow		Düğme
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Seç
@@ -41,4 +43,5 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Düğme kümesi aç…
 File	ShortcutsWindow		Dosya
 *LaunchHandler text/html	ShortcutsWindow		*Başlatmaİşleyicisi metin/html
+%prefname% was unable to parse your KeySet file!	ShortcutsWindow		%prefname%, düğme kümesi dosyanızı ayrıştıramadı.
 *MoveMouseTo 50% 50%	ShortcutsWindow		*FareyiHareketEttir %50 %50

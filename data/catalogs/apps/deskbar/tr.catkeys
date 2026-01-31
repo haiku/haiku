@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Be-TSKB	3780974715
+1	turkish	x-vnd.Be-TSKB	1763402521
 Auto-hide	PreferencesWindow		Kendiliğinden gizle
 Show all	WindowMenu		Tümünü göster
 Edit in Tracker…	PreferencesWindow		İzleyici’de düzenle…
@@ -9,6 +9,7 @@ Large	PreferencesWindow		Büyük
 <Deskbar folder is empty>	DeskbarMenu		<Masaüstü Çubuğu klasörü boş>
 Recent documents	DeskbarMenu		Son kullanılan belgeler
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Uygulamalar
+%appname% preferences	PreferencesWindow		%appname% tercihleri
 Always on top	PreferencesWindow		Her zaman üstte
 Restart system	DeskbarMenu		Yeniden başlat
 Recent documents:	PreferencesWindow		Son kullanılan belgeler:
@@ -28,12 +29,14 @@ Close all	WindowMenu		Tümünü kapat
 About this system	DeskbarMenu		Bu sistem hakkında
 Quit application	WindowMenu		Uygulamadan çık
 Hide application names	PreferencesWindow		Uygulama adlarını gizle
+Deskbar	System name		Masaüstü Çubuğu
 Applications	PreferencesWindow		Uygulamalar
 Show application expander	PreferencesWindow		Uygulama genişleticisini göster
 Suspend	DeskbarMenu		Askıya al
 Shutdown…	DeskbarMenu		Bilgisayarı kapat…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demolar
 Expand new applications	PreferencesWindow		Yeni uygulamaları genişlet
+%appname% preferences…	DeskbarMenu		%appname% tercihleri…
 Recent applications:	PreferencesWindow		Son kullanılan uygulamalar:
 Recent folders:	PreferencesWindow		Son kullanılan klasörler:
 Recent folders	DeskbarMenu		Son kullanılan klasörler

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Pairs	3059673093
+1	swedish	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		Par
 Quit	PairsWindow		Avsluta
 Medium	PairsWindow		Mellan
@@ -14,4 +14,5 @@ Quit game	PairsWindow		Avsluta spel
 Large	PairsWindow		Stor
 Beginner (4x4)	PairsWindow		Nybörjare (4x4)
 Intermediate (6x6)	PairsWindow		Medelmåtta (6x6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	%s hittade inte tillräckligt med vektorikoner för att starta; den behöver minst %zu, hittade %zu.\n
 New game	PairsWindow		Nytt spel

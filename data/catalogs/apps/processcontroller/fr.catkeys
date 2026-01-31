@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ProcessController	2724038695
+1	french	x-vnd.Haiku-ProcessController	3402929872
 Error saving file	ProcessController		Erreur à l’enregistrement du fichier
 Display priority	ProcessController		Priorité affichage
 That's no Fun!	ProcessController		C’est pas fun !
@@ -29,6 +29,7 @@ Quit application	ProcessController		Quitter l’application
 Info	ProcessController		Information
 Kill this thread!	ProcessController		Tuer cette tâche !
 This team is already gone…	ProcessController		Ce processus n’existe déjà plus…
+About %appname%…	ProcessController		À propos de %appname%…
 Gone teams…	ProcessController		Processus zombies…
 Quit an application	ProcessController		Quitter une application
 Cancel	ProcessController		Annuler

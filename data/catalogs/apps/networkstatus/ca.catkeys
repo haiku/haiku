@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-NetworkStatus	2192330251
+1	catalan; valencian	x-vnd.Haiku-NetworkStatus	1095906237
 IPv6 address:	NetworkStatusView		Adreça IPv6:
 Quit	NetworkStatusView		Surt
 Unknown	NetworkStatusView		Desconegut
@@ -8,6 +8,7 @@ Open network preferences…	NetworkStatusView		Obre les preferències de la xarx
 NetworkStatus	System name		Estat de la xarxa
 Broadcast:	NetworkStatusView		Difusió:
 OK	NetworkStatusView		D'acord
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcions per a %appname%:\n\t--deskbar\tafegeix automàticament el replicant a la barra d'escriptori\n\t--help\t\tImprimeix aquesta informació i surt
 No link	NetworkStatusView		Cap enllaç
 Connected	NetworkStatusView		Connectat
 Could not join wireless network:\n	NetworkStatusView		No s'ha pogut connectar a la xarxa sense fil:\n

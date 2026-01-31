@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-TSKB	3780974715
+1	hungarian	x-vnd.Be-TSKB	1763402521
 Auto-hide	PreferencesWindow		Automatikus elrejtés
 Show all	WindowMenu		Összes megjelenítése
 Edit in Tracker…	PreferencesWindow		Szerkesztés a Nyomkövetőben…
@@ -9,6 +9,7 @@ Large	PreferencesWindow		Nagy
 <Deskbar folder is empty>	DeskbarMenu		<Az Asztalsáv mappa üres>
 Recent documents	DeskbarMenu		Legutóbb használt fájlok
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programok
+%appname% preferences	PreferencesWindow		%appname% beállítások
 Always on top	PreferencesWindow		Mindig felül
 Restart system	DeskbarMenu		Rendszer újraindítása
 Recent documents:	PreferencesWindow		Legutóbb használt fájlok:
@@ -28,12 +29,14 @@ Close all	WindowMenu		Összes bezárása
 About this system	DeskbarMenu		Rendszer névjegye
 Quit application	WindowMenu		Kilépés a programból
 Hide application names	PreferencesWindow		Programnevek elrejtése
+Deskbar	System name		Asztalsáv
 Applications	PreferencesWindow		Programok
 Show application expander	PreferencesWindow		Programkibontó mutatása
 Suspend	DeskbarMenu		Felfüggesztés
 Shutdown…	DeskbarMenu		Leállítás…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Bemutatók
 Expand new applications	PreferencesWindow		Új programok kibontása
+%appname% preferences…	DeskbarMenu		%appname% beállítások…
 Recent applications:	PreferencesWindow		Legutóbbi programok:
 Recent folders:	PreferencesWindow		Utolsó mappák:
 Recent folders	DeskbarMenu		Legutóbbi mappák

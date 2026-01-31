@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	1716484992
+1	swedish	x-vnd.Haiku-HaikuDepot	3945138144
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -11,6 +11,7 @@ Rate package…	PackageInfoView		Betygsätt paket...
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Du har autentiserat som användare %Nickname%.
 Package problems	PackageProblem	Window title	Paketproblem
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Det var inte möjligt att extrahera nödvändig captcha-information från de data som skickades tillbaka från servern.
+Install %PackageTitle%	PackageAction		Installera %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid hämtning av paketlistan: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Uppdatera användningsvillkor
 No usage conditions	UserUsageConditions		Inga användningsvillkor
@@ -30,6 +31,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		Logga ut
 Password requirements	UserLoginWindow		Lösenordskrav
 The following additional package changes have to be made:	PackageResult		Följande ytterligare paketändringar måste göras:
+%Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% kommunicerar med en serverkomponent som heter HaikuDepotServer. Dessa är de användningsvillkor som användaren '%Nickname%' godkände vid %AgreedToTimestamp% i relation till användningen av HaikuDepotServer-tjänsten.
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		De nuvarande användningsvillkoren har godkänts.
 Cancel	PackageProblem		Avbryt
@@ -57,6 +59,7 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Problem med paketdemonen
 No	MainWindow		Nej
 Repository	PackageListView		Repositorie
+%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		%appname% behöver paketdemonen för att fungera, och det verkar som att den inte körs.\nVill du starta den nu?
 Close	RatePackageWindow		Stäng
 Close	UserLoginWindow		Stäng
 The email is malformed.	UserLoginWindow		E-postadressen är felaktigt angiven.
@@ -72,9 +75,11 @@ n/a	PackageInfoView		oviktigt
 Checking user details	UserDetailVerifierProcess		Kontrollerar användarinformation
 Cancel	MainWindow		Avbryt
 Refresh repositories	MainWindow		Ladda om repositorier
+Error	SimpleAlert		Fel
 Continue	App		Fortsätt
 A password is required.	UserLoginWindow		Ett lösenord krävs.
 Language	RatePackageWindow		Språk
+Open %DeskbarLink%	PackageAction		Öppna %DeskbarLink%
 Status	PackageListView		Status
 Network transport error	ServerHelper		Nättransportfel
 Cancel	PackageResult		Avbryt
@@ -118,6 +123,7 @@ Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstalled	PackageListView		Avinstallera
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Jag godkänner användningsvillkoren
 Installing \"%PackageName%\"	InstallPackageProcess		Installerar \"%PackageName%\"
+Uninstall %PackageTitle%	PackageAction		Avinstallera %PackageTitle%
 OK	App		OK
 Fatal error	UninstallPackageAction		Allvarligt fel
 Develop packages	MainWindow		Utvecklingspaket
@@ -130,6 +136,7 @@ Fetching screenshot	CacheScreenshotProcess		Hämtar skärmdump
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ett nättransportfel har uppstått vid kommunikation med serversystemet: %s
 Rating	PackageListView		Betyg
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
+No, quit	App		Nej, avsluta
 Show	MainWindow		Visa
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Denna applikation skriver och läser några arbetsfiler på din dator för att fungera. Det verkar som om det finns problem med att skriva en testfil på [%TestFilePath%]. Kontrollera att det inte finns några problem med din hårdisk eller behörigheter som kan förhindra programmet från att skriva filer till katalogplatsen. Du kan välja att bara notera detta problem och fortsätta, men vissa funktioner kan vara inaktiverade.
 Settings…	MainWindow		Inställningar...
@@ -203,6 +210,7 @@ Reading repository data	LocalPkgDataLoadProcess		Läser repositoriedata
 Native desktop packages only	MainWindow		Endast inbyggda skrivbordspaket
 Fatal error	InstallPackageProcess		Allvarligt fel
 A validation error has occurred	ServerHelper		Ett valideringsfel har inträffat
+%Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% kommunicerar med en serverkomponent som heter HaikuDepotServer. Dessa är de senaste användningsvillkoren för användning av HaikuDepotServer-tjänsten.
 The nickname is required.	UserLoginWindow		Ett användarnamn krävs.
 -	no package size		-
 Apply changes	PackageResult		Applicera förändringar
@@ -225,4 +233,5 @@ No results? 	FeaturedPackagesView		Inga resultat?
 User creation error	UserLoginWindow		Användarskapande-fel
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 Cleaning up…	ShuttingDownWindow		Städar upp…
+%appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% stoppar eller slutför pågående åtgärder innan de avslutas.
 Repeat password:	UserLoginWindow		Repetera lösenord:

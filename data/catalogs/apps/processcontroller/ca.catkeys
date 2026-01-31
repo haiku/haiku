@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ProcessController	2724038695
+1	catalan; valencian	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Error en desar el fitxer
 Display priority	ProcessController		Mostra'n la prioritat
 That's no Fun!	ProcessController		No té cap gràcia!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Prioritat baixa
 Urgent display priority	ProcessController		Prioritat de visualització urgent
 Memory usage	ProcessController		Ús de la memòria
 Ok!	ProcessController		D'acord!
+%appname% is already installed in Deskbar.	ProcessController		%appname% ja està instal·lada a la barra de l'escriptori.
 Normal priority	ProcessController		Prioritat normal
 Restart Deskbar	ProcessController		Reinicia la barra d'escriptori
 Usage: %s [-deskbar]\n	ProcessController		Ús: %s [-barra d'escriptori]\n
@@ -29,7 +30,9 @@ Quit application	ProcessController		Surt de l'aplicació
 Info	ProcessController		Informació
 Kill this thread!	ProcessController		Mata aquest fil!
 This team is already gone…	ProcessController		Aquest equip ja no hi és...
+About %appname%…	ProcessController		Quant a %appname%…
 Gone teams…	ProcessController		Equips desapareguts...
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		Podeu executar %appname% en una finestra o instal·lar-la a la barra de l'escriptori.
 Quit an application	ProcessController		Surt d'una aplicació
 Cancel	ProcessController		Cancel·la
 Install in Deskbar	ProcessController		Instal·la-ho a la barra d'escriptori

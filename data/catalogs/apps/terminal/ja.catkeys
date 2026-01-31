@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	3011636080
+1	japanese	x-vnd.Haiku-Terminal	1164274475
 Close other tabs	Terminal TermWindow		他のタブを閉じる
 Insert path	Terminal TermView		パスの挿入
 Text encoding	Terminal TermWindow		文字コード
@@ -34,6 +34,7 @@ Cancel	Terminal TermView		中止
 Defaults	Terminal PrefWindow		デフォルト
 black	Terminal ThemeView		ブラック
 Revert	Terminal PrefWindow		戻す
+The following processes are still running:\n\n\t%1\n\nIf you close %appname%, the processes will be killed.	Terminal TermWindow		次のプロセスがまだ実行中です:\n\n\t%1\n\n%appname% を閉じると強制終了されます。
 Use selection	Terminal FindWindow		選択部で検索
 Find next	Terminal TermWindow		次を検索
 Copy link location	Terminal TermView		リンクの場所をコピー
@@ -85,6 +86,7 @@ Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	�
 Window size:	Terminal AppearancePrefView		ウィンドウサイズ:
 Decrease	Terminal TermWindow		縮小
 Settings…	Terminal TermWindow		設定...
+The process \"%1\" is still running.\nIf you close %appname%, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\n%appname% を閉じると強制終了されます。
 Cancel	Terminal SetTitleWindow		中止
 Blinking cursor	Terminal AppearancePrefView		カーソルを点滅させる
 Use text:	Terminal FindWindow		テキスト指定:
@@ -104,6 +106,7 @@ The pattern specifying the window titles. The following placeholders\ncan be use
 ANSI bright magenta color	Terminal ThemeView		ANSI ブライトマゼンタ
 Copy here	Terminal TermView		カレントディレクトリへコピー
 Use default shell	Terminal Shell		デフォルトシェルの使用
+%appname% couldn't start the shell. Sorry.	Terminal TermApp		すみません、%appname% はシェルを起動できません。
 red	Terminal ThemeView		レッド
 white	Terminal ThemeView		ホワイト
 Open link	Terminal TermView		リンクを開く
@@ -125,6 +128,7 @@ Text under cursor	Terminal ThemeView		カーソル位置のテキスト
 ANSI bright white color	Terminal ThemeView		ANSI ブライトホワイト
 Close window	Terminal TermWindow		ウィンドウを閉じる
 ANSI magenta color	Terminal ThemeView		ANSI マゼンタ
+New %appname%	Terminal TermWindow		新しい %appname%
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
 cyan	Terminal ThemeView		シアン
 Clear all	Terminal TermWindow		すべて消去

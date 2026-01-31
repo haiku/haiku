@@ -37,7 +37,7 @@ Eject	MainWindow		取り出す
 There is not enough free space on target device.	MainWindow		目的のデバイスに充分な空きスペースがありません。
 Read only	PartitionList		読み取り専用
 Surface test (not implemented)	MainWindow		表面チェック (実装されていません)
-Creating disk image	MainWindow		ディスクイメージの作成
+Creating disk image	MainWindow		ディスクイメージを作成
 The panel could not return successfully.	MainWindow		パネルは正しく返しません。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		パーティションのパラメーターの変更に失敗しました。ディスクは変更されていません。
 Partition %ld	DiskView		パーティション %ld

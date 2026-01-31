@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PoorMan	2667626017
+1	japanese	x-vnd.Haiku-PoorMan	3080340918
 Select web folder	PoorMan		選択
 Console logging	PoorMan		コンソールログ
 Create Log File	PoorMan		ログファイルの作成
@@ -9,6 +9,7 @@ Shutting down.	PoorMan		シャットダウン中。
 Web folder:	PoorMan		Web フォルダー:
 Log To Console	PoorMan		コンソールにログを出力
 File Name	PoorMan		ファイル名
+Error folder	PoorMan		エラーフォルダー
 Starting up... 	PoorMan		起動中です...
 Select	PoorMan		選択
 Logging view	PoorMan		ログビュー
@@ -18,11 +19,13 @@ Cancel	PoorMan		中止
 Directory: 	PoorMan		ディレクトリ:
 Hits: %lu	PoorMan		ヒット: %lu
 Hits: 0	PoorMan		ヒット: 0
+%appname% settings	PoorMan		%appname% 設定
 Shutting down.\n	PoorMan		シャットダウン中です。\n
 Select all	PoorMan		すべて選択
 Send file listing if there's no start page	PoorMan		スタートページがない場合、ファイルリストを送信します
 Max. simultaneous connections:	PoorMan		最大同時接続数:
 Done	PoorMan		完了
+Please choose the folder to publish on the web.\n\nYou can have %appname% create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\n%appname% にデフォルトの \"public_html\" をホームフォルダーに作らせることもできます。\nまたは、代わりにユーザーのフォルダーを指定することもできます。
 Site	PoorMan		サイト
 Cannot start the server	PoorMan		サーバーを開始できません
 Create log file	PoorMan		作成
@@ -31,10 +34,12 @@ Clear hit counter	PoorMan		ヒットカウンタの消去
 Status: Stopped	PoorMan		状況: 停止中
 File	PoorMan		ファイル
 Settings…	PoorMan		設定...
+Create %appname% log	PoorMan		%appname% ログを作成
 Log To File	PoorMan		ファイルにログを出力
 Connections	PoorMan		接続
 Controls	PoorMan		コントロール
 Log to console	PoorMan		コンソールにログを出力
+Error server	PoorMan		エラーサーバー
 Advanced	PoorMan		詳細設定
 Copy	PoorMan		コピー
 Logging	PoorMan		ログ

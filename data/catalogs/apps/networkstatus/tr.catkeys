@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-NetworkStatus	2192330251
+1	turkish	x-vnd.Haiku-NetworkStatus	1095906237
 IPv6 address:	NetworkStatusView		IPv6 adresi:
 Quit	NetworkStatusView		Çık
 Unknown	NetworkStatusView		Bilinmeyen
@@ -8,6 +8,7 @@ Open network preferences…	NetworkStatusView		Ağ tercihlerini aç…
 NetworkStatus	System name		Ağ Durumu
 Broadcast:	NetworkStatusView		Yayın:
 OK	NetworkStatusView		Tamam
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		%appname% seçenekleri:\n\t--deskbar\tyineleneni kendiliğinden Masaüstü Çubuğu’na ekle\n\t--help\t\tbu bilgiyi yazdır ve çık
 No link	NetworkStatusView		Bağlantı yok
 Connected	NetworkStatusView		Bağlı
 Could not join wireless network:\n	NetworkStatusView		Kablosuz ağa bağlanılamadı:\n

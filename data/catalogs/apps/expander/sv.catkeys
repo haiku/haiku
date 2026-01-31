@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Expander	2040688293
+1	swedish	x-vnd.Haiku-Expander	2735024965
 Destination	ExpanderWindow		Mål
 Other	ExpanderPreferences		Andra
 Automatically show contents listing	ExpanderPreferences		Automatiskt visa list innehåll
@@ -6,12 +6,14 @@ Expander	System name		Expandera
 Set source…	ExpanderMenu		Sätt källa…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
+%appname%: Choose destination	DirectoryFilePanel		%appname%: Välj destination
 The folder was either moved, renamed or not supported.	ExpanderWindow		Mappen har antingen blivit flyttad, bytt namn eller stöds inte.
 Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
 Close	ExpanderMenu		Stäng
 Create	ExpanderWindow		Skapa
 Creating listing for '%s'…	ExpanderWindow		Skapar innehållslista för '%s'...
 Show contents	ExpanderMenu		Visa innehåll
+%appname% settings	ExpanderPreferences		%appname% inställningar
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Är du säker på att du vill sluta expandera detta arkiv? De expanderade objekten är kanske inte fullständiga.
 Settings	ExpanderMenu		Inställningar
 Expand	ExpanderWindow		Expandera
@@ -45,5 +47,6 @@ The file doesn't exist	ExpanderWindow		Filen finns inte
 Hide contents	ExpanderWindow		Göm innehåll
 Source	ExpanderWindow		Källa
 The destination is read only.	ExpanderWindow		Målmappen är inte skrivbar.
+%appname%: Open	ExpanderWindow		%appnamn%: Öppna
 Select	ExpanderPreferences		Välj
 File	ExpanderMenu		Fil

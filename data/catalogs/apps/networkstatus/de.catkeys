@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-NetworkStatus	2192330251
+1	german	x-vnd.Haiku-NetworkStatus	1095906237
 IPv6 address:	NetworkStatusView		IPv6 Adresse:
 Quit	NetworkStatusView		Beenden
 Unknown	NetworkStatusView		Unbekannt
@@ -8,6 +8,7 @@ Open network preferences…	NetworkStatusView		Netzwerkeinstellungen öffnen …
 NetworkStatus	System name		Netzwerkstatus
 Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OK
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		%appname% Optionen:\n\t--deskbar\t den Replikanten automatisch der Deskbar hinzufügen\n\t--help\t\t diese Info ausgeben und beenden
 No link	NetworkStatusView		Nicht verbunden
 Connected	NetworkStatusView		Verbunden
 Could not join wireless network:\n	NetworkStatusView		Keine Verbindung zum Funknetzwerk:\n

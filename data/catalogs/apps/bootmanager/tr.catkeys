@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-BootManager	1012731949
+1	turkish	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	Eski Ana Önyükleme Kaydı yedeği hatası
 At least one partition must be selected!	BootManagerController		En az bir bölüntü seçilmelidir.
 No space available!	DrivesPage	Cannot install	Yeterli alan yok!
@@ -31,6 +31,7 @@ USB Drive	DrivesPage	Default disk name	USB sürücü
 Restore MBR	BootManagerController	Button	AÖK’yi geri yükle
 Hard Drive	DrivesPage	Default disk name	Sabit disk
 Drives	DrivesPage	Title	Sürücüler
+%appname% is unable to read the partition table!	BootManagerController		%appname% bölüntü tablosunu okuyamıyor!
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Aşağıdaki bölüntüler bulundu. Önyükleme menüsünde bulunmasını istediğiniz bölüntülerin yanındaki onay kutusunu tıklayın. Eğer isterseniz bölüntü adlarının önyükleme menüsünde görünecek adlarını da belirtebilirsiniz.
 After five seconds	DefaultPartitionPage		Beş saniye sonra
 Timeout: %s	DefaultPartitionPage		Zaman aşımı: %s
@@ -47,6 +48,7 @@ Previous	WizardView	Button	Önceki
 Uninstallation of boot menu failed	BootManagerController	Title	Açılış menüsü kaldırılırken hata
 Incompatible format!	DrivesPage	Cannot install	Uyumsuz biçim!
 Old Master Boot Record saved	BootManagerController	Title	Eski Ana Önyükleme Kaydı kaydedildi
+The partition table of the first hard disk is not compatible.\n%appname% only works with IBM PC MBR partitions.	BootManagerController		İlk sabit diskin bölüntü tablosu uyumlu değil\n%appname% yalnızca IBM PC MBR bölüntüleriyle çalışır.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Lütfen bir saptanmış bölüntü seçin ve bir zaman aşımı süresi tanımlayın.\nÖnyükleme menüsü eğer başka bir bölüntü seçmezseniz bu bölüntüyü belirtilen zaman aşımında yüklemeye başlayacaktır. Eğer isterseniz önyükleme menüsünün yalnızca sizden gelecek girdiyi beklemesini de sağlayabilirsiniz.\nÖnyükleme sırasında zaman aşımını kapatmak için “KOMUT” düğmesini basılı tutun.
 Partitions	PartitionsPage	Title	Bölüntüler
 Uninstallation of boot menu completed	BootManagerController	Title	Önyükleme menüsünün kaldırılması tamamlandı
@@ -59,6 +61,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Lütfen Ana Önyükleme Kaydı dosyasını konumunu belirtin. Bu dosya önyükleme yöneticisi ilk kurulduğunda oluşturulan dosyadır.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%disk diskinin Ana Önyükleme Kaydı %file dosyasından geri yüklenecek. Sürdürmek istiyor musunuz?
 Install	DrivesPage	Button	Kur
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\n%appname% needs 2 KiB available space before the first partition.	BootManagerController		Diskteki ilk bölüntü pek erken başlıyor ve bir önyükleme menüsü için yeterli boş alan bırakmıyor.\n%appname%, ilk bölüntüden önce 2 KiB boş alana gereksinim duyar.
 File:	FileSelectionPage	Text control label	Dosya:
 Error reading partition table	BootManagerController	Title	Bölüntü tablosu okunurken hata
 Back	BootManagerController	Button	Geri

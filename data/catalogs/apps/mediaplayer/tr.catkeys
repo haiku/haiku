@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MediaPlayer	334504768
+1	turkish	x-vnd.Haiku-MediaPlayer	3337408711
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi çöpe at
 Close	MediaPlayer-PlaylistWindow		Kapat
 Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
@@ -24,6 +24,7 @@ Resume:	MediaPlayer-SettingsWindow		Oynatmayı sürdür:
 Duration	MediaPlayer-InfoWin		Uzunluk
 Import Entries	MediaPlayer-ImportPLItemsCmd		Girdileri içe aktar
 Open network stream	MediaPlayer-Main		Ağ akışı aç
+%appname% settings	MediaPlayer-SettingsWindow		%appname% ayarları
 Open file…	MediaPlayer-Main		Dosya aç…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Tam ekran kipinde denetimleri ölçekle
 View options	MediaPlayer-SettingsWindow		Görüntüleme seçenekleri
@@ -45,6 +46,7 @@ Save error	MediaPlayer-PlaylistWindow		Kaydetme hatası
 Attributes	MediaPlayer-Main		Öznitelikler
 Bottom of screen	MediaPlayer-SettingsWindow		Ekranın alt kısmı
 Copyright	MediaPlayer-InfoWin		Telif hakkı
+%appname%: %title%	MediaPlayer-Main		%appname%: %title%
 Invalid URL inserted!	MediaPlayer-NetworkStream		Geçersiz URL girildi!
 Aspect ratio	MediaPlayer-Main		En–boy oranı
 Eject device	MediaPlayer-Main		Aygıtı çıkar

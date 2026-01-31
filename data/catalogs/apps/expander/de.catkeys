@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Expander	2040688293
+1	german	x-vnd.Haiku-Expander	2735024965
 Destination	ExpanderWindow		Ziel
 Other	ExpanderPreferences		Allgemeines
 Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
@@ -6,12 +6,14 @@ Expander	System name		Archiventpacker
 Set source…	ExpanderMenu		Quelle wählen …
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
+%appname%: Choose destination	DirectoryFilePanel		%appname%: Zielordner auswählen
 The folder was either moved, renamed or not supported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
 Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
 Close	ExpanderMenu		Schließen
 Create	ExpanderWindow		Anlegen
 Creating listing for '%s'…	ExpanderWindow		Dateiliste für '%s' wird erstellt …
 Show contents	ExpanderMenu		Inhalt zeigen
+%appname% settings	ExpanderPreferences		%appname%-Einstellungen
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
 Settings	ExpanderMenu		Einstellungen
 Expand	ExpanderWindow		Entpacken
@@ -45,5 +47,6 @@ The file doesn't exist	ExpanderWindow		Die Datei existiert nicht
 Hide contents	ExpanderWindow		Inhalt verbergen
 Source	ExpanderWindow		Quelle
 The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
+%appname%: Open	ExpanderWindow		%appname%: Öffnen
 Select	ExpanderPreferences		Auwählen
 File	ExpanderMenu		Datei

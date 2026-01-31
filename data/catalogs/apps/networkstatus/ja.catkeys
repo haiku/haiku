@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-NetworkStatus	2192330251
+1	japanese	x-vnd.Haiku-NetworkStatus	1095906237
 IPv6 address:	NetworkStatusView		IPv6 アドレス:
 Quit	NetworkStatusView		終了
 Unknown	NetworkStatusView		不明
@@ -8,6 +8,7 @@ Open network preferences…	NetworkStatusView		ネットワーク設定を開く
 NetworkStatus	System name		ネットワークの状態
 Broadcast:	NetworkStatusView		ブロードキャスト:
 OK	NetworkStatusView		OK
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit
 No link	NetworkStatusView		リンク無し
 Connected	NetworkStatusView		接続済
 Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できません:\n

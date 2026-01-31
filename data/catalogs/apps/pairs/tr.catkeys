@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Pairs	3059673093
+1	turkish	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		Eşler
 Quit	PairsWindow		Çık
 Medium	PairsWindow		Orta
@@ -14,4 +14,5 @@ Quit game	PairsWindow		Oyundan çık
 Large	PairsWindow		Büyük
 Beginner (4x4)	PairsWindow		Acemi (4 × 4)
 Intermediate (6x6)	PairsWindow		Deneyimli (6 × 6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	%s, başlamak için yeterli sayıda vektör simge bulamadı; en az %zu gerekirken %zu bulundu.\n
 New game	PairsWindow		Yeni oyun

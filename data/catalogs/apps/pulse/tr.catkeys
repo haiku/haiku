@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Pulse	3032132277
+1	turkish	x-vnd.Haiku-Pulse	3118820593
 Normal mode	DeskbarPulseView		Normal kip
 Info	CPUButton		Bilgi
 Quit	DeskbarPulseView		Çık
@@ -14,6 +14,7 @@ Mini mode	PrefsWindow		Ufak kip
 CPU progress bar	NormalPulseView		CPU ilerleme çubuğu
 Fade colors	ConfigView		Renkleri soldur
 Deskbar mode	NormalPulseView		Masaüstü Çubuğu kipi
+About %appname%…	PulseView		%appname% hakkında…
 Pulse settings	PulseApp		Nabız ayarları
 Remove replicant	CPUButton		Yineleneni kaldır
 You can't disable the last active CPU.	PulseView		Son etkin CPU’yu devre dışı bırakamazsınız.
@@ -26,6 +27,7 @@ Removing from Deskbar failed.\n%s	DeskbarPulseView		Masaüstü Çubuğu’ndan k
 OK	PulseApp		Tamam
 Deskbar mode	PrefsWindow		Masaüstü Çubuğu kipi
 Mini mode	DeskbarPulseView		Ufak kip
+About %appname%…	CPUButton		%appname% hakkında…
 You can't disable the last active CPU.	CPUButton		Son etkin CPU’yu devre dışı bırakamazsınız.
 OK	CPUButton		Tamam
 Deskbar	CPUButton		Masaüstü Çubuğu

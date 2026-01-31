@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	1716484992
+1	german	x-vnd.Haiku-HaikuDepot	3945138144
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 Available packages	MainWindow		Verfügbare Pakete
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
@@ -11,6 +11,7 @@ Rate package…	PackageInfoView		Paket bewerten …
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Der Benutzer %Nickname% wurde erfolgreich angemeldet.
 Package problems	PackageProblem	Window title	Paket-Probleme
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Aus den vom Server erhaltenen Daten konnten nicht die benötigten Captcha-Infos gewonnen werden.
+Install %PackageTitle%	PackageAction		%PackageTitle% installieren
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Fehler beim Beschaffen der Paketliste: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Nutzungsbedingungen aktualisieren
 No usage conditions	UserUsageConditions		Keine Nutzungsbedingungen
@@ -30,6 +31,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		Ausloggen
 Password requirements	UserLoginWindow		Kennwortvorgaben
 The following additional package changes have to be made:	PackageResult		Es müssen weitere Paket-Änderungen durchgeführt werden:
+%Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% kommuniziert mit einer Serverkomponente, dem HaikuDepotServer. Dies sind die Nutzungsbedingungen, die mit dem HaikuDepotServer-Dienst zu tun haben und denen '%Nickname%' am %AgreedToTimestamp% zugestimmt hat.
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Den aktuellen Nutzungsbedingungen wurde zugestimmt.
 Cancel	PackageProblem		Abbrechen
@@ -57,6 +59,7 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Problem mit Paket-Daemon
 No	MainWindow		Nein
 Repository	PackageListView		Paketquelle
+%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Um richtig zu funktionieren, benötigt %appname% den Paket-Daemon, der aber anscheinend gerade nicht läuft.\nSoll er gestartet werden?
 Close	RatePackageWindow		Schließen
 Close	UserLoginWindow		Schließen
 The email is malformed.	UserLoginWindow		Das Format der E-Mail-Adresse ist inkorrekt.
@@ -72,9 +75,11 @@ n/a	PackageInfoView		n.v.
 Checking user details	UserDetailVerifierProcess		Prüfe Benutzerdaten
 Cancel	MainWindow		Abbrechen
 Refresh repositories	MainWindow		Paketquellen aktualisieren
+Error	SimpleAlert		Fehler
 Continue	App		Weiter
 A password is required.	UserLoginWindow		Es wird ein Kennwort benötigt.
 Language	RatePackageWindow		Sprache
+Open %DeskbarLink%	PackageAction		%DeskbarLink% öffnen
 Status	PackageListView		Status
 Network transport error	ServerHelper		Netzwerk-Transportfehler
 Cancel	PackageResult		Abbrechen
@@ -118,6 +123,7 @@ Check for updates…	MainWindow		Aktualisierungen suchen …
 Uninstalled	PackageListView		Deinstalliert
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Ich stimme den Nutzungsbedingungen zu
 Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" wird installiert
+Uninstall %PackageTitle%	PackageAction		%PackageTitle% deinstallieren
 OK	App		OK
 Fatal error	UninstallPackageAction		Fataler Fehler
 Develop packages	MainWindow		Entwicklungs-Pakete
@@ -130,6 +136,7 @@ Fetching screenshot	CacheScreenshotProcess		Screenshots werden geladen
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Bei der Kommunikation mit dem Server ist ein Netzwerk-Transportfehler aufgetreten: %s
 Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisiere Icons
+No, quit	App		Nein, Beenden
 Show	MainWindow		Anzeigen
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Diese Anwendung schreibt und liest einige Arbeitsdateien auf diesem Computer, um richtig zu funktionieren. Eine Testdatei konnte jedoch nicht nach [%TestFilePath%] geschrieben werden. Bitte prüfen, ob es Probleme mit der lokalen Festplatte gibt oder ob für diesen Ordner nötige Schreibrechte fehlen. Dieses Problem kann zwar ignoriert werden, allerdings wird die Anwendung dann nur eingeschränkt funktionieren.
 Settings…	MainWindow		Einstellungen …
@@ -203,6 +210,7 @@ Reading repository data	LocalPkgDataLoadProcess		Einlesen von Paketquellendaten
 Native desktop packages only	MainWindow		Nur native Desktop Pakete
 Fatal error	InstallPackageProcess		Fataler Fehler
 A validation error has occurred	ServerHelper		Fehler bei der Validieren
+%Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% kommuniziert mit einer Serverkomponente, dem HaikuDepotServer. Dies sind die aktuellen Nutzungsbedingungen, die mit dem HaikuDepotServer-Dienst zu tun haben.
 The nickname is required.	UserLoginWindow		Der Benutzername wird benötigt.
 -	no package size		-
 Apply changes	PackageResult		Änderungen übernehmen
@@ -225,4 +233,5 @@ No results? 	FeaturedPackagesView		Keine Ergebnisse?
 User creation error	UserLoginWindow		Fehler beim Erstellen des Benutzerkontos
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
 Cleaning up…	ShuttingDownWindow		Aufräumarbeiten…
+%appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% schließt vor dem Beenden noch laufende Aufgaben ab.
 Repeat password:	UserLoginWindow		Kennwort wiederholen:

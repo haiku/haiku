@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CodyCam	2786669505
+1	german	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		Zielverzeichnis erwartet
 reply: '%s'\n	SftpClient		Antwort; '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <unterdrückt>  (echtes Passwort wurde gesendet)
@@ -50,6 +50,7 @@ server address expected	CodyCam		Serveradresse erwartet
 Cannot start the video window	CodyCam		Das Videofenster konnte nicht gestartet werden
 reply: %d, %d\n	FtpClient		Antwort: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Konnte keine Zeitquelle für das Videofenster setzen.
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		Es wurde keine Videoquelle gefunden.\nUm %appname% zu nutzen, wird eine Webcam benötigt.
 Every 15 minutes	CodyCam		Alle 15 Minuten
 Every 24 hours	CodyCam		Alle 24 Stunden
 Image Format Menu	CodyCam		Bildformat-Menü

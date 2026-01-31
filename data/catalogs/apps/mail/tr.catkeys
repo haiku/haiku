@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Be-MAIL	3492357554
+1	turkish	x-vnd.Be-MAIL	218437132
 Set to Saved	Mail		Kaydedilenlere ekle
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder’e basmak bu iletinizi gönderir; ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter kümesi kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için Vazgeç’e tıklayın.
 Text wrapping:	Mail		Metin kaydırma:
@@ -33,12 +33,14 @@ sent	B_USER_DIRECTORY/mail/sent		gönderilen
 Only files can be added as attachments.	Mail		Yalnızca dosyalar eklenebilir.
 Close	Mail		Kapat
 Untitled	Mail		Adsız
+%appname% couldn't find its dictionary.	Mail		%appname% kendi sözlüğünü bulamadı.
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		İletilmiş postalardan ekleri kaldırma özelliği henüz işlevsel değil.\nŞu an için düzgün çalışmıyor.
 Same recipient	Mail		Aynı alıcı
 Previous message	Mail		Önceki ileti
 (Address unavailable)	Mail		(Adres kullanılamıyor)
 Mail	System name		Posta
 Copy link location	Mail		Bağlantı konumunu kopyala
+%appname% settings	Mail		%appname% ayarları
 Add attachment…	Mail		Ek ekle…
 Next	Mail		Sonraki
 Attachments:	Mail		Ekler:
@@ -63,7 +65,7 @@ Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and 
 Signature	Mail		İmza
 Use default account	Mail		Saptanmış hesabı kullan
 draft	B_USER_DIRECTORY/mail/draft		taslaklar
-Really delete this signature? This cannot be undone.	Mail		İmza silinsin mi? Bu işlem geri alınamaz.
+Really delete this signature? This cannot be undone.	Mail		Bu imza gerçekten silinsin mi? Bu işlem geri alınamaz.
 spam	B_USER_DIRECTORY/mail/spam		istenmeyen
 Reply to all	Mail		Tümünü yanıtla
 Cancel	Mail		Vazgeç

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BootManager	1012731949
+1	german	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	Fehler beim Sichern des alten Master-Boot-Record
 At least one partition must be selected!	BootManagerController		Es muss mindestens eine Partition ausgewählt werden!
 No space available!	DrivesPage	Cannot install	Kein Speicher verfügbar!
@@ -31,6 +31,7 @@ USB Drive	DrivesPage	Default disk name	USB-Datenträger
 Restore MBR	BootManagerController	Button	MBR wiederherstellen
 Hard Drive	DrivesPage	Default disk name	Festplatte
 Drives	DrivesPage	Title	Datenträger
+%appname% is unable to read the partition table!	BootManagerController		%appname% kann die Partitionstabelle nicht auslesen
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Die folgenden Partitionen wurden erkannt. Nun müssen die Partitionen ausgewählt werden, die im Bootmenü erscheinen sollen. Außerdem können sie so benannt werden, wie sie später im Menü erscheinen sollen.
 After five seconds	DefaultPartitionPage		Nach fünf Sekunden
 Timeout: %s	DefaultPartitionPage		Zeitlimit: %s
@@ -47,6 +48,7 @@ Previous	WizardView	Button	Zurück
 Uninstallation of boot menu failed	BootManagerController	Title	Entfernen des Bootmenüs fehlgeschlagen
 Incompatible format!	DrivesPage	Cannot install	Inkompatibles Format!
 Old Master Boot Record saved	BootManagerController	Title	Alter Master-Boot-Record wurde gespeichert
+The partition table of the first hard disk is not compatible.\n%appname% only works with IBM PC MBR partitions.	BootManagerController		Die Partitionstabelle des ersten Datenträgers ist nicht kompatibel.\n%appname% funktioniert nur mit IBM-PC MBR-Partitionen.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Es muss eine Standard-Partition und ein Zeitlimit angegeben werden.\nDas Bootmenü wird die Standard-Partition nach Ablauf der Zeitbegrenzung laden, sofern keine andere gewählt wird. Es ist auch möglich, das Bootmenü unbegrenzt auf eine bestimmte Auswahl warten zu lassen.\nWenn beim Start die ALT-Taste gedrückt gehalten wird, deaktiviert sich die Zeitbegrenzung.
 Partitions	PartitionsPage	Title	Partitionen
 Uninstallation of boot menu completed	BootManagerController	Title	Entfernen des Bootmenüs abgeschlossen.
@@ -59,6 +61,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Es muss eine Sicherungsdatei mit dem Master-Boot-Record (MBR) angegeben werden, der für die Wiederherstellung verwendet werden soll. Diese Datei wurde erstellt, als das Bootmenü das erste Mal installiert wurde.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Im nächsten Schritt wird der Master-Boot-Record (MBR) auf %disk aus der Sicherungsdatei %file wiederhergestellt. Wirklich fortfahren?
 Install	DrivesPage	Button	Installieren
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\n%appname% needs 2 KiB available space before the first partition.	BootManagerController		Die erste Partition des Datenträgers beginnt zu früh und lässt nicht genügend freien Platz für ein Bootmenü.\n%appname% benötigt 2 KiB freien Speicher vor der ersten Partition.
 File:	FileSelectionPage	Text control label	Datei:
 Error reading partition table	BootManagerController	Title	Fehler beim Lesen der Partitionstabelle
 Back	BootManagerController	Button	Zurück

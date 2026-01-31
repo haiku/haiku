@@ -1,7 +1,8 @@
-1	german	x-vnd.Haiku-Media	4055972908
+1	german	x-vnd.Haiku-Media	2686142259
 Couldn't add volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht in der Deskbar installiert werden: %s\n
 Restart media services	Media views		Mediadienste neustarten
 Quit	Media Window		Beenden
+Quitting %prefname% now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Werden die %prefname% jetzt beendet, wird der Neustart der Mediadienste abgebrochen. Diese Dienste würden dann entweder nicht richtig oder gar nicht funktionieren.
 <none>	VideoInputMenu	Used when no video input is available	<kein>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht aus der Deskbar entfernt werden: %s\n
 Video output:	Media views		Video-Ausgang:

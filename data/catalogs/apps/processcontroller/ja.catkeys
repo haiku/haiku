@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ProcessController	2724038695
+1	japanese	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Display priority	ProcessController		表示優先度
 That's no Fun!	ProcessController		そんなのおもしろくない!
@@ -15,6 +15,7 @@ Low priority	ProcessController		低優先度
 Urgent display priority	ProcessController		緊急表示優先度
 Memory usage	ProcessController		メモリ使用量
 Ok!	ProcessController		Ok!
+%appname% is already installed in Deskbar.	ProcessController		%appname% は、すでに Deskbar にインストールされています。
 Normal priority	ProcessController		通常優先度
 Restart Deskbar	ProcessController		Deskbar の再起動
 Usage: %s [-deskbar]\n	ProcessController		Usage: %s [-deskbar]\n
@@ -29,7 +30,9 @@ Quit application	ProcessController		アプリケーションの終了
 Info	ProcessController		情報
 Kill this thread!	ProcessController		スレッドの強制終了
 This team is already gone…	ProcessController		Team はすでに終了しています...
+About %appname%…	ProcessController		%appname% について…
 Gone teams…	ProcessController		終了した Team...
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		%appname% をウィンドウ内で起動するか、 Deskbar にインストールすることができます。
 Quit an application	ProcessController		アプリケーションの終了
 Cancel	ProcessController		中止
 Install in Deskbar	ProcessController		Deskbar にインストール

@@ -51,7 +51,7 @@ OK	TouchpadPrefView		Tamam
 Delay until key repeat	KeyboardView		Düğme yinelemesine kadar olan gecikme
 Two finger scrolling	TouchpadPrefView		İki parmak sarma
 Mouse acceleration	SettingsView		Fare ivmelenmesi
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni sarma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni sarma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmeyi gerçekten istiyor musunuz?
 High	TouchpadPrefView		Yüksek
 Defaults	TouchpadPrefView		Saptanmışlar
 Finger click	TouchpadPrefView		Parmakla tıklama

@@ -15,7 +15,7 @@ Text	TypeEditors	This is the type of editor	Metin
 File offset: 	ProbeView		Dosya ofseti: 
 Add	ProbeView		Ekle
 64 bit signed value:	TypeEditors		64 bit imzalanmış değer:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		“%s” özniteliğini “%s” dosyasından kaldırmak istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		“%s” özniteliğini “%s” dosyasından kaldırmayı gerçekten istiyor musunuz?\n\nBu işlem geri alınamaz.
 No type editor available	AttributeWindow		Kullanılabilir bir tür düzenleyicisi yok
 Print…	ProbeView		Yazdır…
 New…	FileWindow		Yeni…

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PoorMan	2667626017
+1	german	x-vnd.Haiku-PoorMan	3080340918
 Select web folder	PoorMan		Web-Ordner auswählen
 Console logging	PoorMan		In Konsole loggen
 Create Log File	PoorMan		Logdatei erstellen
@@ -9,6 +9,7 @@ Shutting down.	PoorMan		Herunterfahren.
 Web folder:	PoorMan		Web-Ordner:
 Log To Console	PoorMan		In Konsole loggen
 File Name	PoorMan		Dateiname
+Error folder	PoorMan		Ordner-Fehler
 Starting up... 	PoorMan		Starte …
 Select	PoorMan		Auswählen
 Logging view	PoorMan		Log-Ansicht
@@ -18,11 +19,13 @@ Cancel	PoorMan		Abbrechen
 Directory: 	PoorMan		Ordner:
 Hits: %lu	PoorMan		Zugriffe: %lu
 Hits: 0	PoorMan		Zugriffe: 0
+%appname% settings	PoorMan		%appname%-Einstellungen
 Shutting down.\n	PoorMan		Herunterfahren.\n
 Select all	PoorMan		Alles auswählen
 Send file listing if there's no start page	PoorMan		Dateiaufzählung senden, wenn keine Startseite vorhanden ist
 Max. simultaneous connections:	PoorMan		Max. gleichzeitige Verbindungen:
 Done	PoorMan		Fertig
+Please choose the folder to publish on the web.\n\nYou can have %appname% create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Bitte den Ordner auswählen, der im Web veröffentlicht werden soll.\n\n%appname% kann den standardmäßigen \"public_html\" Ordner im home-Ordner erstellen oder einen frei wählbaren Ordner benutzen.
 Site	PoorMan		Website
 Cannot start the server	PoorMan		Der Server konnte nicht gestartet werden.
 Create log file	PoorMan		Logdatei erstellen
@@ -31,10 +34,12 @@ Clear hit counter	PoorMan		Zugriffszähler löschen
 Status: Stopped	PoorMan		Status: Angehalten
 File	PoorMan		Datei
 Settings…	PoorMan		Einstellungen …
+Create %appname% log	PoorMan		Logdatei erstellen
 Log To File	PoorMan		In Datei loggen
 Connections	PoorMan		Verbindungen
 Controls	PoorMan		Aktionen
 Log to console	PoorMan		In Konsole loggen
+Error server	PoorMan		Server-Fehler
 Advanced	PoorMan		Erweitert
 Copy	PoorMan		Kopieren
 Logging	PoorMan		Log

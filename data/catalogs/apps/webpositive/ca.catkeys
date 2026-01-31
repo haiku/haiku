@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	2402977561
+1	catalan; valencian	x-vnd.Haiku-WebPositive	4110209091
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copia
@@ -89,6 +89,7 @@ New tab	WebPositive Window		Pestanya nova
 Increase size	WebPositive Window		Augmenta'n la mida
 Today	WebPositive Window		Avui
 Open location	WebPositive Window		Obre la ubicació
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		Encara hi ha baixades en curs. De debò que voleu sortir de l'aplicació %appname% ara?
 New browser window	Download Window		Finestra de navegació nova
 Open	Download Window		Obre
 New window	WebPositive Window		Finestra nova
@@ -108,6 +109,7 @@ Apply	Settings Window		Aplica-ho
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hi ha hagut un error en intentar mostrar la carpeta de marcadors.\n\nError: %error
 Revert	Settings Window		Reverteix
 Copy	WebPositive Window		Copia
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		La CPU és massa antiga i no admet les extensions SSE2, sense les quals %appname% no es pot executar. Us recomanem que instal·leu NetSurf.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{S'ha repetit la darrera línia # cop.}other{S'ha repetit la darrera línia # cops.}}
 Default standard font size:	Settings Window		Mida de la lletra estàndard per defecte:
 Custom	Settings Window		Personalitzat

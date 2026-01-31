@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PoorMan	2667626017
+1	swedish	x-vnd.Haiku-PoorMan	3080340918
 Select web folder	PoorMan		Välj hemsidesmapp
 Console logging	PoorMan		Konsolloggning
 Create Log File	PoorMan		Skapa loggfil
@@ -9,6 +9,7 @@ Shutting down.	PoorMan		Stänger ner.
 Web folder:	PoorMan		Hemsidemapp:
 Log To Console	PoorMan		Skriv logg till konsol
 File Name	PoorMan		Filnamn
+Error folder	PoorMan		Felmapp
 Starting up... 	PoorMan		Startar...
 Select	PoorMan		Välj mapp
 Logging view	PoorMan		Loggningsvy
@@ -18,11 +19,13 @@ Cancel	PoorMan		Avbryt
 Directory: 	PoorMan		Mapp:
 Hits: %lu	PoorMan		Träffar: %lu
 Hits: 0	PoorMan		Träffar: 0
+%appname% settings	PoorMan		%appname% inställningar
 Shutting down.\n	PoorMan		Stänger ner.\n
 Select all	PoorMan		Markera allt
 Send file listing if there's no start page	PoorMan		Visa fillista om startsida saknas
 Max. simultaneous connections:	PoorMan		Maximalt antal samtidiga anslutningar:
 Done	PoorMan		Klar
+Please choose the folder to publish on the web.\n\nYou can have %appname% create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Välj mappen att publicera på webben.\n\nDu kan låta %appname% skapa en standardmapp \"public_html\" i din hemmapp.\nEller så väljer du en av dina egna mappar istället.
 Site	PoorMan		Hemsida
 Cannot start the server	PoorMan		Kan inte starta servern
 Create log file	PoorMan		Skapa loggfil
@@ -31,10 +34,12 @@ Clear hit counter	PoorMan		Nollställ träffräknaren
 Status: Stopped	PoorMan		Status: Stoppad
 File	PoorMan		Arkiv
 Settings…	PoorMan		Inställningar...
+Create %appname% log	PoorMan		Skapa %appname% -logg
 Log To File	PoorMan		Skriv logg till fil
 Connections	PoorMan		Anslutningar
 Controls	PoorMan		Kontroller
 Log to console	PoorMan		Skriv logg till konsol
+Error server	PoorMan		Fel server
 Advanced	PoorMan		Avancerat
 Copy	PoorMan		Kopiera
 Logging	PoorMan		Loggar

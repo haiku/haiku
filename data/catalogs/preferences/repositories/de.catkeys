@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Repositories	1003035766
+1	german	x-vnd.Haiku-Repositories	2642736029
 This is not a valid URL.	AddRepoWindow	Add URL error message	Das ist keine gültige URL.
 Repository URL:	AddRepoWindow	Text box label	Paketquellen URL:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Aktualisieren des Paketquellen Cache für %name% fehlgeschlagen
@@ -21,6 +21,7 @@ Status	RepositoriesView	Column title	Status
 Name	RepositoriesView	Column title	Name
 Add	AddRepoWindow	Button label	Hinzu
 Enable all	RepositoriesView	Button label	Alle aktivieren
+%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Konnte die Namen der momentan aktiven Paketquellen nicht ermitteln.
 Aborted	TaskLooper	Aborted task status message	Abgebrochen
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	Aktivieren

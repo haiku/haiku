@@ -1,7 +1,8 @@
-1	turkish	x-vnd.Haiku-Media	4055972908
+1	turkish	x-vnd.Haiku-Media	2686142259
 Couldn't add volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu’na eklenemedi: %s\n
-Restart media services	Media views		Ortam servislerini yeniden başlat
+Restart media services	Media views		Ortam hizmetlerini yeniden başlat
 Quit	Media Window		Çık
+Quitting %prefname% now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		%prefname% tercihlerinden şimdi çıkmak ortam hizmetlerinin yeniden başlatılmasını durduracaktır. Bunun sonucunda büyük olasılıkla ortam işlevselliği ya bozulacaktır ya da düzgün çalışmayacaktır.
 <none>	VideoInputMenu	Used when no video input is available	<yok>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu’ndan kaldırılamadı: %s\n
 Video output:	Media views		Video çıkışı:

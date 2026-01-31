@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Pairs	3059673093
+1	japanese	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		ペアーズ
 Quit	PairsWindow		終了
 Medium	PairsWindow		中
@@ -14,4 +14,5 @@ Quit game	PairsWindow		ゲームの終了
 Large	PairsWindow		大
 Beginner (4x4)	PairsWindow		初級 (4x4)
 Intermediate (6x6)	PairsWindow		中級 (6x6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	%s は、起動するために必要なベクターアイコンを見つけることができなかった; 少なくとも %zu 個必要とするが、見つかったのは %zu 個だった。\n
 New game	PairsWindow		新しいゲーム

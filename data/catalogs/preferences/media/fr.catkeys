@@ -1,7 +1,8 @@
-1	french	x-vnd.Haiku-Media	4055972908
+1	french	x-vnd.Haiku-Media	2686142259
 Couldn't add volume control in Deskbar: %s\n	Media views		Impossible d’insérer le contrôle du volume dans la Deskbar : %s\n
 Restart media services	Media views		Redémarrer les services médias
 Quit	Media Window		Quitter
+Quitting %prefname% now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Si vous quittez %prefname% maintenant, le redémarrage des services multimédias sera interrompu. Cela peut rendre les fonctionnalités multimédias instables ou indisponibles.
 <none>	VideoInputMenu	Used when no video input is available	<aucune>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Impossible de retirer le contrôle du volume de la Deskbar : %s\n
 Video output:	Media views		Sortie vidéo :

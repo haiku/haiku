@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-BootManager	1012731949
+1	japanese	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	旧マスターブートレコードの保存に失敗しました
 At least one partition must be selected!	BootManagerController		少なくとも１つのパーティションが選択されている必要があります。
 No space available!	DrivesPage	Cannot install	空き領域がありません。
@@ -31,6 +31,7 @@ USB Drive	DrivesPage	Default disk name	USBドライブ
 Restore MBR	BootManagerController	Button	MBR の修復
 Hard Drive	DrivesPage	Default disk name	Hard Drive
 Drives	DrivesPage	Title	ドライブ
+%appname% is unable to read the partition table!	BootManagerController		%appname% はパーティションテーブルを読み込めません。
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		下記のパーティションが検出されました。ブートメニューに表示するパーティションにチェックを入れてください。ブートメニューに表示するパーティションの名前を入力することもできます(注意: 英数半角のみで入力してください)。
 After five seconds	DefaultPartitionPage		あと 5 秒
 Timeout: %s	DefaultPartitionPage		待ち時間: %s
@@ -47,6 +48,7 @@ Previous	WizardView	Button	前へ
 Uninstallation of boot menu failed	BootManagerController	Title	ブートマネージャーの削除に失敗しました。
 Incompatible format!	DrivesPage	Cannot install	互換性のないフォーマットです。
 Old Master Boot Record saved	BootManagerController	Title	旧マスターブートレコードが保存されました。
+The partition table of the first hard disk is not compatible.\n%appname% only works with IBM PC MBR partitions.	BootManagerController		一番目のハードディスクのパーティションテーブルが対応していません。\n%appname% は、IBM PC MBR パーティションのみを扱います。
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		デフォルトパーティションと起動するまでの待ち時間を指定してください。\nユーザーが別のパーティションを選択しない限り、システムはデフォルトパーティションから起動します。待ち時間を「永久」にすることで、起動する度にパーティションが選択できるようになります。\n待ち時間を無効にするには、「ALT」キーを押したままシステムを起動してください。
 Partitions	PartitionsPage	Title	パーティション
 Uninstallation of boot menu completed	BootManagerController	Title	ブートマネージャーの削除が完了しました
@@ -59,6 +61,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		修復に使うマスターブートレコード (MBR) ファイルを指定してください。これはブートマネージャーが初めてインストールされた時に作成されたものです。
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%disk にある %file でマスターブートレコード (MBR) を修復します。続けますか?
 Install	DrivesPage	Button	インストール
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\n%appname% needs 2 KiB available space before the first partition.	BootManagerController		ディスクの第一パーティションの位置が前すぎるので、ブートメニュー用の充分な空きがありません。\n%appname% は第一パーティションの前に 2KiB の空きを必要とします。
 File:	FileSelectionPage	Text control label	ファイル:
 Error reading partition table	BootManagerController	Title	パーティションテーブルの読み込み中にエラー発生
 Back	BootManagerController	Button	戻る

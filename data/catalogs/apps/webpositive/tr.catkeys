@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-WebPositive	2402977561
+1	turkish	x-vnd.Haiku-WebPositive	4110209091
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 Copy	Console Window		Kopyala
@@ -89,6 +89,7 @@ New tab	WebPositive Window		Yeni sekme
 Increase size	WebPositive Window		Büyüt
 Today	WebPositive Window		Bugün
 Open location	WebPositive Window		Konum aç
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		Hâlâ sürmekte olan indirmeler var, %appname% uygulamasından çıkmayı gerçekten istiyor musunuz?
 New browser window	Download Window		Yeni tarayıcı penceresi
 Open	Download Window		Aç
 New window	WebPositive Window		Yeni pencere
@@ -108,6 +109,7 @@ Apply	Settings Window		Uygula
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Yer imleri klasörünü açmaya çalışırken bir hata oluştu.\n\nHata: %error
 Revert	Settings Window		Eski haline döndür
 Copy	WebPositive Window		Kopyala
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		CPU’nuz pek eski ve %appname% uygulamasının çalışması için gerekli olan SSE2 genişletmelerini desteklemiyor. Bunun yerine NetSurf uygulamasını kurmanızı öneririz.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Son satır # kez yinelendi.}other{Son satır # kez yinelendi.}}
 Default standard font size:	Settings Window		Saptanmış standart yazıtipi boyutu:
 Custom	Settings Window		Özel
@@ -121,7 +123,7 @@ Proxy server requires authentication	Settings Window		Vekil sunucu oturum açma 
 Cancel	Settings Window		Vazgeç
 Reset size	WebPositive Window		Boyutu sıfırla
 History	WebPositive Window		Geçmiş
-Do you really want to clear the browsing history?	WebPositive Window		Tarama geçmişini temizlemek istediğinizden emin misiniz?
+Do you really want to clear the browsing history?	WebPositive Window		Tarama geçmişini temizlemeyi gerçekten istiyor musunuz?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Arama dizgisinin bir sonraki oluşumunu bul
 Fixed font:	Settings Window		Eş aralıklı yazıtipi
 Quit	WebPositive Window		Çık

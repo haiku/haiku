@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-BluetoothPrefs	3945807779
-Start bluetooth services…	Window		Bluetooth servislerini başlat…
+Start bluetooth services…	Window		Bluetooth hizmetlerini başlat…
 From all devices	Settings view		Tüm aygıtlardan
 Defaults	Window		Saptanmışlar
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Uzak aygıtınızın Bluetooth özelliğinin açık olduğundan emin olun. “Tara”ya basıp taramayı başlatın. Aygıt adlarının getirilme süresi tam bilinememekle birlikte, aygıt başına 3 saniyeyi genelde aşmaz. Bundan sonra aygıtları ana listenize ekleyip bağlanma kısmına geçebilirsiniz.
@@ -23,7 +23,7 @@ Retrieving name of %1	Inquiry panel		%1 adı alınıyor
 Identify host as:	Settings view		Anamakineyi şöyle tanımla:
 Inquiry	Inquiry panel		Tara
 Local devices found on system:	Settings view		Sistemde bulunan yerel aygıtlar
-Service classes: 	Device View		Servis sınıfları: 
+Service classes: 	Device View		Hizmet sınıfları: 
 Incoming connections policy:	Settings view		Gelen bağlantılar ilkesi:
 Remote devices	Window		Uzak aygıtlar
 Retrieving names…	Inquiry panel		Adlar alınıyor…
@@ -31,11 +31,11 @@ Add device to list	Inquiry panel		Aygıtı listeye ekle
 Show name	Extended local device view		Adını göster
 Settings	Window		Ayarlar
 Remaining %1 seconds	Inquiry panel		%1 saniye kaldı
-Stop bluetooth services…	Window		Bluetooth servislerini durdur…
+Stop bluetooth services…	Window		Bluetooth hizmetlerini durdur…
 61 secs	Settings view		61 saniye
 Authenticate	Extended local device view		Kimlik doğrula
 Discoverable	Extended local device view		Bulunabilir
-The Bluetooth services are not currently running on this system.	main		Bluetooth servisleri açık değil.
+The Bluetooth services are not currently running on this system.	main		Bluetooth hizmetleri şu anda bu sistemde çalışır durumda değil.
 Add…	Remote devices		Ekle…
 Scanning completed.	Inquiry panel		Tarama bitti.
 Smart phone	Settings view		Akıllı telefon

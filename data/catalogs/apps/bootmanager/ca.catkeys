@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-BootManager	1012731949
+1	catalan; valencian	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	Fallada de la còpia de seguretat del Registre d'arrencada mestre antic
 At least one partition must be selected!	BootManagerController		Cal seleccionar almenys una partició!
 No space available!	DrivesPage	Cannot install	No hi ha espai disponible!
@@ -31,6 +31,7 @@ USB Drive	DrivesPage	Default disk name	Unitat USB
 Restore MBR	BootManagerController	Button	Restaura el MBR
 Hard Drive	DrivesPage	Default disk name	Disc dur
 Drives	DrivesPage	Title	Unitats de disc
+%appname% is unable to read the partition table!	BootManagerController		%appname% no pot llegir la taula de particions!
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		S'han detectat les particions següents. Si us plau, seleccioneu la casella de cada partició que vulgueu incloure al menú d'arrencada. També podeu establir els noms de les particions perquè apareguin a menú d'arrencada.
 After five seconds	DefaultPartitionPage		Després de 5 segons
 Timeout: %s	DefaultPartitionPage		Temps d'espera: %s
@@ -47,6 +48,7 @@ Previous	WizardView	Button	Anterior
 Uninstallation of boot menu failed	BootManagerController	Title	Ha fallat la desinstal·lació del menú d'arrencada
 Incompatible format!	DrivesPage	Cannot install	Format no compatible!
 Old Master Boot Record saved	BootManagerController	Title	S'ha desat el Registre d'arrencada mestre antic.
+The partition table of the first hard disk is not compatible.\n%appname% only works with IBM PC MBR partitions.	BootManagerController		La taula de particions del primer disc dur no és compatible.\n%appname% només funciona amb particions MBR d'IBM PC.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Si us plau, especifiqueu una partició predeterminada i un temps d'espera. \nEl menú d'arrencada carregarà la partició predeterminada quan hagi passat el temps d'espera si no és que en seleccioneu una altra. També podeu fer que el menú d'arrencada s'esperi indefinidament abans de seleccionar una partició.\nMantingueu premuda la tecla ALT per inhabilitar el temps d'espera a l'arrencada.
 Partitions	PartitionsPage	Title	Particions
 Uninstallation of boot menu completed	BootManagerController	Title	S'ha acabat de desinstal·lar el menú d'arrencada
@@ -59,6 +61,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Si us plau, indiqueu el fitxer des del qual voleu restaurar el Registre d'arrencada mestre (MBR). Aquest fitxer es va crear el primer cop que es va instal·lar el Gestor d'arrencada.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Ara es restaurarà el Registre d'arrencada mestre (MBR) de %disk des de %file. Voleu continuar?
 Install	DrivesPage	Button	Instal·la
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\n%appname% needs 2 KiB available space before the first partition.	BootManagerController		La primera partició del disc s'inicia massa aviat i no deixa prou espai lliure per a un menú d'arrencada.\n%appname% necessita 2 KiB d'espai disponible abans de la primera partició.
 File:	FileSelectionPage	Text control label	Fitxer:
 Error reading partition table	BootManagerController	Title	Error en llegir la taula de particions.
 Back	BootManagerController	Button	Torna

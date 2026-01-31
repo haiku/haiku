@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-softwareupdater	1377379822
+1	japanese	x-vnd.haiku-softwareupdater	3021634705
 Updating version	SoftwareUpdaterWindow	List item text	バージョンの更新中
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		ここをクリックして、{0, plural, one{# 個の更新されたパッケージ} other{# 個の更新されたパッケージ}}をインストールします。
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	アンインストールされるパッケージ
@@ -16,6 +16,7 @@ No updates available	UpdateAction		更新はありません
 New packages to be installed	SoftwareUpdaterWindow	List super item label	インストールされる新しいパッケージ
 Packages to be updated	SoftwareUpdaterWindow	List super item label	更新されるパッケージ
 to	SoftwareUpdaterWindow	List item text	から
+Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		クリックして、%appname% を起動してください。いくつかのアップデートは問題解決の選択を必要とします。
 Attempting to cancel the updates…	SoftwareUpdaterWindow		更新を中止しようとしています...
 Contacting software repositories to check for package updates.	CheckManager		パッケージの更新確認のため、ソフトウェアリポジトリに接続しています。
 Available updates found	CheckManager		利用可能な更新が見つかりました

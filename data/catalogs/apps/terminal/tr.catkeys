@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Terminal	3011636080
+1	turkish	x-vnd.Haiku-Terminal	1164274475
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
 Text encoding	Terminal TermWindow		Metin kodlaması
@@ -34,6 +34,7 @@ Cancel	Terminal TermView		Vazgeç
 Defaults	Terminal PrefWindow		Saptanmışlar
 black	Terminal ThemeView		siyah
 Revert	Terminal PrefWindow		Eski haline döndür
+The following processes are still running:\n\n\t%1\n\nIf you close %appname%, the processes will be killed.	Terminal TermWindow		Aşağıdaki süreçler hâlâ çalışıyor:\n\n\t%1\n\n%appname% uygulamasını kapatırsanız süreçler sonlandırılacaktır.
 Use selection	Terminal FindWindow		Seçimi kullan
 Find next	Terminal TermWindow		Sonrakini bul
 Copy link location	Terminal TermView		Bağlantı konumunu kopyala
@@ -85,6 +86,7 @@ Switch Terminals	Terminal TermWindow	'Terminals' being this application's name	D
 Window size:	Terminal AppearancePrefView		Pencere boyutu:
 Decrease	Terminal TermWindow		Azalt
 Settings…	Terminal TermWindow		Ayarlar…
+The process \"%1\" is still running.\nIf you close %appname%, the process will be killed.	Terminal TermWindow		“%1” süreci hâlâ çalışıyor.\n%appname% uygulamasını kapatırsanız süreç sonlandırılacaktır.
 Cancel	Terminal SetTitleWindow		Vazgeç
 Blinking cursor	Terminal AppearancePrefView		Yanıp sönen imleç
 Use text:	Terminal FindWindow		Şu metni kullan:
@@ -104,6 +106,7 @@ The pattern specifying the window titles. The following placeholders\ncan be use
 ANSI bright magenta color	Terminal ThemeView		ANSI açık mor
 Copy here	Terminal TermView		Buraya kopyala
 Use default shell	Terminal Shell		Saptanmış kabuğu kullan
+%appname% couldn't start the shell. Sorry.	Terminal TermApp		%appname%, kabuğu başlatamadı. Üzgünüz.
 red	Terminal ThemeView		kırmızı
 white	Terminal ThemeView		beyaz
 Open link	Terminal TermView		Bağlantıyı aç
@@ -125,6 +128,7 @@ Text under cursor	Terminal ThemeView		İmleç altındaki metin
 ANSI bright white color	Terminal ThemeView		ANSI açık beyaz
 Close window	Terminal TermWindow		Pencereyi kapat
 ANSI magenta color	Terminal ThemeView		ANSI mor
+New %appname%	Terminal TermWindow		Yeni %appname%
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Uçbirim\nTelif hakkı © 2001–2025 Haiku, Inc.\nTelif hakkı ©1999 Kazuho Okui ve Murai Takaşi.\n\nKullanım: %s [SEÇENEK] [KABUK]\n
 cyan	Terminal ThemeView		camgöbeği
 Clear all	Terminal TermWindow		Tümünü temizle

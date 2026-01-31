@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-CodyCam	2786669505
+1	catalan; valencian	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		s'espera un directori de destinació
 reply: '%s'\n	SftpClient		resposta: %s\n
 PASS <suppressed>  (real password sent)	FtpClient		Contrasenya <suppressed>  (contrasenya real enviada)
@@ -50,6 +50,7 @@ server address expected	CodyCam		s'esperava l'adreça del servidor
 Cannot start the video window	CodyCam		No es pot iniciar la finestra de vídeo.
 reply: %d, %d\n	FtpClient		resposta: %d, %d\n
 Cannot set the time source for the video window	CodyCam		No es pot establir la font horària per a la finestra de vídeo.
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		No es pot trobar cap font de vídeo.\nNecessiteu una càmera web per usar %appname%.
 Every 15 minutes	CodyCam		Cada 15 minuts
 Every 24 hours	CodyCam		Cada 24 hores
 Image Format Menu	CodyCam		Menú del format de la imatge

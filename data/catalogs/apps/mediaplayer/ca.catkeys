@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaPlayer	334504768
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	3337408711
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
 Close	MediaPlayer-PlaylistWindow		Tanca
 Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
@@ -24,6 +24,7 @@ Resume:	MediaPlayer-SettingsWindow		Continua:
 Duration	MediaPlayer-InfoWin		Durada
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importa entrades
 Open network stream	MediaPlayer-Main		Obre el flux de xarxa
+%appname% settings	MediaPlayer-SettingsWindow		Paràmetres per a %appname%
 Open file…	MediaPlayer-Main		Obre un fitxer...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escala els controls en mode de pantalla completa.
 View options	MediaPlayer-SettingsWindow		Opcions de visualització
@@ -45,6 +46,7 @@ Save error	MediaPlayer-PlaylistWindow		Error de desar
 Attributes	MediaPlayer-Main		Atributs
 Bottom of screen	MediaPlayer-SettingsWindow		Part baixa de la pantalla
 Copyright	MediaPlayer-InfoWin		Dret de reproducció
+%appname%: %title%	MediaPlayer-Main		%appname%: %title%
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL proporcionat no vàlid!
 Aspect ratio	MediaPlayer-Main		Relació d'aspecte
 Eject device	MediaPlayer-Main		Expulsa el dispostiu

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	738307934
+1	catalan; valencian	x-vnd.Haiku-Installer	2860300425
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
 No optional packages available.	PackagesView		No hi ha paquets opcionals disponibles.
@@ -6,6 +6,7 @@ This operating system has to be installed on a partition that uses the Be File S
 The mount point could not be retrieved.	InstallProgress		No se n'ha pogut obtenir el punt de muntatge.
 <none>	InstallerWindow	No partition available	<cap>
 Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instal·lació completada. El sector d'arrencada s'ha escrit a %s. Premeu Reinicia per reiniciar l'ordinador o trieu un volum nou de destinació per fer-ne una altra instal·lació.
+Are you sure you want to install onto the current boot disk? The %appname% will have to reboot your machine if you proceed.	InstallProgress		Segur que voleu instal·lar-ho al disc d'arrencada actual? %appname% haurà de reiniciar l'ordinador si continueu.
 Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		El Haiku s'ha d'instal·lar en una partició que usi el sistema de fitxers Be, però actualment no n'hi ha cap de disponible al sistema.
 Please choose target	InstallerWindow		Si us plau, trieu una destinació.
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		El Gestor d'arrencada, l'aplicació per configurar el menú d'arrencada del Haiku, no s'ha pogut iniciar.
@@ -31,6 +32,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Benvingut/da a l'Instal·lador
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		No s'ha pogut executar el Gestor de discs, l'aplicació que configura les particions del disc.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		El volum de destinació no és buit. Si ja conté una instal·lació del Haiku, se sobreescriurà. Això suprimirà tot el programari instal·lat.\n\nSi voleu actualitzar el sistema sense suprimir el programari instal·lat, consulteu el tema de la Guia de l'usuari del Haiku sobre l'aplicació Actualitzador de programari (SoftwareUpdater) per a les instruccions d'actualització.\n\nSegur que voleu continuar la instal·lació?
 Quit DriveSetup	InstallerWindow		Surt del Gestor de discs
+Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the %appname% or choose a new target volume to perform another installation.	InstallerWindow		Instal·lació completada. El sector d'arrencada s'ha escrit a %s. Premeu Surt per sortir de l'aplicació %appname% o trieu un volum de destinació nou per fer una altra instal·lació.
 Write boot sector	InstallerWindow		Escriu el sector d'arrencada
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
 Finishing installation.	InstallProgress		S'acaba la instal·lació.

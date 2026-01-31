@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	2402977561
+1	swedish	x-vnd.Haiku-WebPositive	4110209091
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 Copy	Console Window		Kopiera
@@ -89,6 +89,7 @@ New tab	WebPositive Window		Ny flik
 Increase size	WebPositive Window		Öka storlek
 Today	WebPositive Window		Idag
 Open location	WebPositive Window		Öppna plats
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		Nedladdningar pågår fortfarande, vill du verkligen avsluta %appname% nu?
 New browser window	Download Window		Nytt webbläsarfönster
 Open	Download Window		Öppna
 New window	WebPositive Window		Nytt fönster
@@ -108,6 +109,7 @@ Apply	Settings Window		Tillämpa
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Det inträffade ett fel vid visning av bokmärkesmappen.\n\nFel: %error
 Revert	Settings Window		Återgå
 Copy	WebPositive Window		Kopiera
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		Din processor är för gammal och stöder inte SSE2-tilläggen, utan vilka %appname% inte kan köras. Vi rekommenderar att du installerar NetSurf istället.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Sista raden upprepades # gång.}other{Sista raden upprepades # gånger.}}
 Default standard font size:	Settings Window		Förinställd storlek för standardtypsnitt:
 Custom	Settings Window		Egen inställning

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ProcessController	2724038695
+1	swedish	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Fel vid sparning av fil
 Display priority	ProcessController		Visningsprioritet
 That's no Fun!	ProcessController		Det var inte roligt!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Låg prioritet
 Urgent display priority	ProcessController		Brådskande visningsprioritet
 Memory usage	ProcessController		Minnesanvändning
 Ok!	ProcessController		OK!
+%appname% is already installed in Deskbar.	ProcessController		%appname% är redan installerat i Skrivbordsfältet.
 Normal priority	ProcessController		Normal prioritet
 Restart Deskbar	ProcessController		Starta om Deskbar
 Usage: %s [-deskbar]\n	ProcessController		Hantering: %s [-deskbar]\n
@@ -29,7 +30,9 @@ Quit application	ProcessController		Avsluta program
 Info	ProcessController		Information
 Kill this thread!	ProcessController		Avsluta tråden!
 This team is already gone…	ProcessController		Processen är redan avslutad...
+About %appname%…	ProcessController		Om %appnamn%…
 Gone teams…	ProcessController		Avslutade processer...
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		Du kan köra %appname% i ett fönster eller installera det i Skrivbordsfältet.
 Quit an application	ProcessController		Avsluta ett program
 Cancel	ProcessController		Avbryt
 Install in Deskbar	ProcessController		Installera i Deskbar

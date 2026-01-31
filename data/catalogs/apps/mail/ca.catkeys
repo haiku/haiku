@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Be-MAIL	3492357554
+1	catalan; valencian	x-vnd.Be-MAIL	218437132
 Set to Saved	Mail		Estableix com a desat
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté %ld caràcters no codificables. Potser amb un conjunt de caràcters diferent funcionaria millor? Premeu Envia per enviar-ho tanmateix (se substituiran per altres els caràcters que no es puguin codificar), o bé trieu Cancel·la per tornar enrere i intentar esmenar-ho.
 Text wrapping:	Mail		Ajustament de línia:
@@ -33,12 +33,14 @@ sent	B_USER_DIRECTORY/mail/sent		enviat
 Only files can be added as attachments.	Mail		Només es poden afegir fitxers com a adjunts.
 Close	Mail		Tanca
 Untitled	Mail		Sense títol
+%appname% couldn't find its dictionary.	Mail		%appname% no n'ha pogut trobar el diccionari.
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Encara no està implementada la supressió d'adjunts de missatges reenviats!\nEncara no funcionarà correctament.
 Same recipient	Mail		El mateix destinatari
 Previous message	Mail		Missatge anterior
 (Address unavailable)	Mail		(L'adreça no està disponible)
 Mail	System name		Correu
 Copy link location	Mail		Copia la ubicació de l'enllaç
+%appname% settings	Mail		Paràmetres per a %appname%
 Add attachment…	Mail		Afegeix-hi un adjunt...
 Next	Mail		Següent
 Attachments:	Mail		Adjunts:

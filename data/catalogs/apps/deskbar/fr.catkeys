@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-TSKB	3780974715
+1	french	x-vnd.Be-TSKB	3717898356
 Auto-hide	PreferencesWindow		Masquer automatiquement
 Show all	WindowMenu		Montrer tout
 Edit in Tracker…	PreferencesWindow		Éditer dans le Tracker…
@@ -9,6 +9,7 @@ Large	PreferencesWindow		Grande
 <Deskbar folder is empty>	DeskbarMenu		<Le dossier Deskbar est vide>
 Recent documents	DeskbarMenu		Documents récents
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applications
+%appname% preferences	PreferencesWindow		Préférences de %appname%
 Always on top	PreferencesWindow		Toujours au dessus
 Restart system	DeskbarMenu		Redémarrer l’ordinateur
 Recent documents:	PreferencesWindow		Documents récents :
@@ -34,6 +35,7 @@ Suspend	DeskbarMenu		Mettre en veille
 Shutdown…	DeskbarMenu		Arrêter…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Démos
 Expand new applications	PreferencesWindow		Développer les nouvelles applications
+%appname% preferences…	DeskbarMenu		Préférences de %appname%…
 Recent applications:	PreferencesWindow		Applications récentes :
 Recent folders:	PreferencesWindow		Dossiers récents :
 Recent folders	DeskbarMenu		Dossiers récents

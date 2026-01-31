@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-NetworkStatus	2192330251
+1	swedish	x-vnd.Haiku-NetworkStatus	1095906237
 IPv6 address:	NetworkStatusView		IPv6-adress:
 Quit	NetworkStatusView		Avsluta
 Unknown	NetworkStatusView		Okänd
@@ -8,6 +8,7 @@ Open network preferences…	NetworkStatusView		Öppna nätverksinställningar...
 NetworkStatus	System name		NätverksStatus
 Broadcast:	NetworkStatusView		Utsända:
 OK	NetworkStatusView		OK
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		%appname% alternativ:\n\t--deskbar\tlägger automatiskt till replikant i Deskbar\n\t--help\t\tskriver ut denna information och avslutar
 No link	NetworkStatusView		Ingen länk
 Connected	NetworkStatusView		Ansluten
 Could not join wireless network:\n	NetworkStatusView		Kunde inte ansluta till trådlöst nätverk:\n

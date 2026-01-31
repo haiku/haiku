@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	171515608
+1	french	x-vnd.Haiku-Shortcuts	641209832
 *MouseUp	ShortcutsWindow		*SourisEnHaut
 Application	ShortcutsWindow		Application
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
@@ -6,10 +6,12 @@ Save changes before closing?	ShortcutsWindow		Voulez-vous enregistrer les modifi
 Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
 Don't save	ShortcutsWindow		Ne pas enregistrer
 *MouseDown	ShortcutsWindow		*SourisEnBas
+%prefname% wasn't able to save your keyset.	ShortcutsWindow		%prefname% n'a pas pu enregistrer vos combinaisons de touches.
 *Beep	ShortcutsWindow		*Bip
 Save	ShortcutsWindow		Enregistrer
 Either	ShortcutsSpec		Soit
 Oh no	ShortcutsWindow		Oh non !
+%prefname% was unable to save your KeySet file!	ShortcutsWindow		%prefname% n'a pas pu enregistrer le fichier de vos combinaisons de touches.
 Key	ShortcutsWindow		Touche
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*EnvoyerMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Sélectionner
@@ -41,4 +43,5 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
 Open KeySet…	ShortcutsWindow		Ouvrir un jeu de touches…
 File	ShortcutsWindow		Fichier
 *LaunchHandler text/html	ShortcutsWindow		*GestionnaireDeLancement text/html
+%prefname% was unable to parse your KeySet file!	ShortcutsWindow		%prefname% n'a pas pu analyser votre fichier de combinaisons de touches.
 *MoveMouseTo 50% 50%	ShortcutsWindow		*BougerLaSourisEn 50% 50%

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PowerStatus	388505242
+1	german	x-vnd.Haiku-PowerStatus	4069361317
 Run in window	PowerStatus		Im Fenster ausführen
 Extended battery info	PowerStatus		Erweiterte Akku-Infos
 Show status icon	PowerStatus		Statusicon anzeigen
@@ -14,6 +14,7 @@ Quit	PowerStatus		Beenden
 Battery not charging	PowerStatus		Akku wird nicht geladen
 Battery low	PowerStatus		Ladezustand niedrig
 Model number: 	PowerStatus		Modellnummer:
+You can run %appname% in a window or install it in the Deskbar.	PowerStatus		%appname% kann im Fenster dargestellt oder in der Deskbar installiert werden.
 Battery unused	PowerStatus		Akku unbenutzt
 Type: 	PowerStatus		Typ:
 Damaged or missing battery	PowerStatus		Akku fehlt oder ist beschädigt
@@ -38,6 +39,7 @@ Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
 Too bad!	PowerStatus		Schade!
 Technology: 	PowerStatus		Technologie:
 not charging	PowerStatus		wird nicht geladen
+No supported battery detected. %appname% cannot be used on your system.	PowerStatus		Es wurde kein unterstützter Akku gefunden. Daher funktioniert %appname% auf diesem Computer nicht.
  mWh	PowerStatus		mWh
 PowerStatus	System name		Akkustand
 Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):

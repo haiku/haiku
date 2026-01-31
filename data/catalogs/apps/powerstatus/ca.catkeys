@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-PowerStatus	388505242
+1	catalan; valencian	x-vnd.Haiku-PowerStatus	4069361317
 Run in window	PowerStatus		Executa en una finestra
 Extended battery info	PowerStatus		Informació ampliada de la bateria
 Show status icon	PowerStatus		Mostra la icona de l'estat
@@ -14,6 +14,7 @@ Quit	PowerStatus		Surt
 Battery not charging	PowerStatus		La bateria no carrega.
 Battery low	PowerStatus		Bateria baixa
 Model number: 	PowerStatus		Número del model: 
+You can run %appname% in a window or install it in the Deskbar.	PowerStatus		Podeu executar %appname% en una finestra o instal·lar-la a la barra de l'escriptori.
 Battery unused	PowerStatus		Bateria no usada
 Type: 	PowerStatus		Tipus: 
 Damaged or missing battery	PowerStatus		La bateria està malmesa o no hi és.
@@ -38,6 +39,7 @@ Capacity granularity 2: 	PowerStatus		Granularitat de la capacitat 2:
 Too bad!	PowerStatus		Quina manxiula!
 Technology: 	PowerStatus		Tecnologia: 
 not charging	PowerStatus		no carrega
+No supported battery detected. %appname% cannot be used on your system.	PowerStatus		No s'ha detectat cap bateria compatible. No es pot usar %appname% al sistema.
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Estat de l'energia
 Design capacity: 	PowerStatus		Capacitat del disseny: 

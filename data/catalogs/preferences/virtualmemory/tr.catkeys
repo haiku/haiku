@@ -16,5 +16,5 @@ Use boot volume	SettingsWindow		Önyükleme bölümünü kullan
 Automatic swap management	SettingsWindow		Otomatik takas yönetimi
 Defaults	SettingsWindow		Saptanmışlar
 Quit	SettingsWindow		Çık
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Sanal belleği devre dışı bırakmanın sistem belleği dolduğunda genel kararlılık üzerinde istenmeyen etkileri vardır.\nSanal belleğin bu noktaya ulaşıncaya değin sistem başarımı üzerinde herhangi bir etkisi yoktur.\n\nYine de kapatmak istiyor musunuz?
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Sanal belleği devre dışı bırakmanın sistem belleği dolduğunda genel kararlılık üzerinde istenmeyen etkileri vardır.\nSanal belleğin bu noktaya ulaşıncaya değin sistem başarımı üzerinde herhangi bir etkisi yoktur.\n\nKapatmayı gerçekten istiyor musunuz?
 Enable virtual memory	SettingsWindow		Sanal belleği etkinleştir

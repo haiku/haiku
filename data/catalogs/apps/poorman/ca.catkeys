@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-PoorMan	2667626017
+1	catalan; valencian	x-vnd.Haiku-PoorMan	3080340918
 Select web folder	PoorMan		Seleccioneu la carpeta de xarxa
 Console logging	PoorMan		Registre de consola
 Create Log File	PoorMan		Crea un fitxer de registre
@@ -9,6 +9,7 @@ Shutting down.	PoorMan		M'aturo.
 Web folder:	PoorMan		Carpeta web:
 Log To Console	PoorMan		Registra a la consola
 File Name	PoorMan		Nom del fitxer
+Error folder	PoorMan		Error de carpeta
 Starting up... 	PoorMan		S'inicia... 
 Select	PoorMan		Selecciona
 Logging view	PoorMan		Vista del registre
@@ -18,11 +19,13 @@ Cancel	PoorMan		Cancel·la
 Directory: 	PoorMan		Directori: 
 Hits: %lu	PoorMan		Coincidències: %lu
 Hits: 0	PoorMan		Coincidències: 0
+%appname% settings	PoorMan		Paràmetres per a %appname%
 Shutting down.\n	PoorMan		M'aturo.\n
 Select all	PoorMan		Selecciona-ho tot
 Send file listing if there's no start page	PoorMan		Envia la llista de fitxers si no hi ha cap pàgina inicial.
 Max. simultaneous connections:	PoorMan		Màx. connexions simultànies:
 Done	PoorMan		Fet
+Please choose the folder to publish on the web.\n\nYou can have %appname% create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Si us plau, trieu la carpeta per publicar a la web.\n\nPodeu fer que %appname% creï un \"public_html\" per defecte a la carpeta personal.\nO bé, podeu seleccionar una de les vostres carpetes.
 Site	PoorMan		Lloc
 Cannot start the server	PoorMan		No es pot iniciar el servidor.
 Create log file	PoorMan		Crea un fitxer de registre
@@ -31,10 +34,12 @@ Clear hit counter	PoorMan		Neteja el comptador de coincidències
 Status: Stopped	PoorMan		Estat: interromput
 File	PoorMan		Fitxer
 Settings…	PoorMan		Paràmetres…
+Create %appname% log	PoorMan		Crea el registre per a %appname%
 Log To File	PoorMan		Registra a fitxer
 Connections	PoorMan		Connexions
 Controls	PoorMan		Controls
 Log to console	PoorMan		Registra a la consola
+Error server	PoorMan		Error de servidor
 Advanced	PoorMan		Avançat
 Copy	PoorMan		Copia
 Logging	PoorMan		Registre

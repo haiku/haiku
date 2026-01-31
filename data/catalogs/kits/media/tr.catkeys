@@ -8,5 +8,5 @@ Ready for use.	MediaDefs		Kullanıma hazır.
 Stopping media server…	MediaDefs		Ortam sunucusu durduruluyor…
 Waiting for media_server to quit.	MediaDefs		media_server çıkması için bekleniyor…
 Done shutting down.	MediaDefs		Kapanma bitti.
-Error occurred starting media services.	MediaDefs		Ortam servisleri başlatılırken hata oluştu.
-Media Service	MediaDefs		Ortam Servisi
+Error occurred starting media services.	MediaDefs		Ortam hizmetleri başlatılırken hata oluştu.
+Media Service	MediaDefs		Ortam Hizmeti

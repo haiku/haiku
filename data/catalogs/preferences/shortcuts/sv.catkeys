@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	171515608
+1	swedish	x-vnd.Haiku-Shortcuts	641209832
 *MouseUp	ShortcutsWindow		*MusnappUpp
 Application	ShortcutsWindow		Applikation
 Option	ShortcutsSpec	Name for modifier on keyboard	Alternativ
@@ -6,10 +6,12 @@ Save changes before closing?	ShortcutsWindow		Spara ändringar innan programmet 
 Revert to saved	ShortcutsWindow		Återgå till sparade
 Don't save	ShortcutsWindow		Spara inte
 *MouseDown	ShortcutsWindow		*MusknappNer
+%prefname% wasn't able to save your keyset.	ShortcutsWindow		%prefname% kunde inte spara din nyckeluppsättning.
 *Beep	ShortcutsWindow		*Pip
 Save	ShortcutsWindow		Spara
 Either	ShortcutsSpec		Antingen eller
 Oh no	ShortcutsWindow		Åh nej!
+%prefname% was unable to save your KeySet file!	ShortcutsWindow		%prefname% kunde inte spara din nyckeluppsättning.
 Key	ShortcutsWindow		Tangent
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SkickaMeddelande application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Välj
@@ -41,4 +43,5 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Skift
 Open KeySet…	ShortcutsWindow		Öppna…
 File	ShortcutsWindow		Arkiv
 *LaunchHandler text/html	ShortcutsWindow		*StartHanterare text/html
+%prefname% was unable to parse your KeySet file!	ShortcutsWindow		%prefname% kunde inte analysera din KeySet-fil!
 *MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttaMuspekareTill 50% 50%

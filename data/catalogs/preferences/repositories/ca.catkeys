@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Repositories	1003035766
+1	catalan; valencian	x-vnd.Haiku-Repositories	2642736029
 This is not a valid URL.	AddRepoWindow	Add URL error message	Aquest no és un URL vàlid.
 Repository URL:	AddRepoWindow	Text box label	URL del repositori:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Hi ha hagut un error en actualitzar la cau del repositori per a %name%.
@@ -21,6 +21,7 @@ Status	RepositoriesView	Column title	Estat
 Name	RepositoriesView	Column title	Nom
 Add	AddRepoWindow	Button label	Afegeix
 Enable all	RepositoriesView	Button label	Habilita-ho tot
+%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	%prefname% no ha pogut recuperar els noms dels repositoris actualment habilitats.
 Aborted	TaskLooper	Aborted task status message	Avortat
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	Habilita

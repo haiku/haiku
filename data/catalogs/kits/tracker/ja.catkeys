@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1695086308
+1	japanese	x-vnd.Haiku-libtracker	734452449
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -32,6 +32,7 @@ Value	AttributesView		値
 Information	InfoWindow		情報
 Error emptying Trash	FSUtils		ごみ箱を空にしている際にエラーが発生しました。
 Opens with:	InfoWindow		アプリケーション:
+You cannot copy or move the Printers directory.	FSUtils		プリンターディレクトリのコピーや移動はできません。
 Size	QueryPoseView		サイズ
 Disk mount	TrackerSettingsWindow		ディスクのマウント
 Type	AttributesView		型
@@ -164,6 +165,7 @@ Could not open \"%name\" (%error). 	FSUtils		\"%name\" を開けません (%err
 Media parameter group	AttributesView		メディアパラメーターグループ
 %name info	InfoWindow	InfoWindow Title	%name の情報
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		ホームフォルダーを移動すると、%osName は正しく動作しないかもしれません!\n\n移動しますか?\n\nそれでもホームフォルダーを移動するなら、シフトキーを押しながら \"移動\" を押してください。
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%個のアイテムが選択されました}}
 Property info	AttributesView		プロパティ情報
 Sorry, you can't create links in the Trash.	PoseView		ごみ箱にリンクを作成できません。
 From	Email Query Columns		差出人
@@ -289,6 +291,7 @@ Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示
 Recent folders	ContainerWindow		最近使ったフォルダー
 Desktop	Model		デスクトップ
 Select all	ContainerWindow		すべて選択
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%選択済 %filter}}
 apps	B_APPS_DIRECTORY		アプリケーション
 Error calculating folder size.	InfoWindow		フォルダーサイズの計算中にエラー発生。
 Delete	FSUtils		削除

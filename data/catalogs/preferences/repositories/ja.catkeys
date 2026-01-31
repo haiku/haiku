@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Repositories	1003035766
+1	japanese	x-vnd.Haiku-Repositories	2642736029
 This is not a valid URL.	AddRepoWindow	Add URL error message	これは有効な URL ではありません。
 Repository URL:	AddRepoWindow	Text box label	リポジトリの URL:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name% のリポジトリキャッシュの更新時にエラーが発生しました。
@@ -21,6 +21,7 @@ Status	RepositoriesView	Column title	状況
 Name	RepositoriesView	Column title	名前
 Add	AddRepoWindow	Button label	追加
 Enable all	RepositoriesView	Button label	すべて有効
+%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	%prefname% は、現在有効なリポジトリの名前を取得できません。
 Aborted	TaskLooper	Aborted task status message	中断
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	有効

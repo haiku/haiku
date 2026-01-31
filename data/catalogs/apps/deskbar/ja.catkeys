@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-TSKB	3780974715
+1	japanese	x-vnd.Be-TSKB	1763402521
 Auto-hide	PreferencesWindow		自動的に隠す
 Show all	WindowMenu		すべて表示
 Edit in Tracker…	PreferencesWindow		Tracker で編集...
@@ -9,6 +9,7 @@ Large	PreferencesWindow		大
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar フォルダーは空です>
 Recent documents	DeskbarMenu		最近使ったドキュメント
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
+%appname% preferences	PreferencesWindow		%appname% 設定
 Always on top	PreferencesWindow		常に最前面
 Restart system	DeskbarMenu		再起動
 Recent documents:	PreferencesWindow		最近使ったドキュメント:
@@ -28,12 +29,14 @@ Close all	WindowMenu		すべて閉じる
 About this system	DeskbarMenu		このシステムについて
 Quit application	WindowMenu		アプリケーションの終了
 Hide application names	PreferencesWindow		アプリケーション名を隠す
+Deskbar	System name		Deskbar
 Applications	PreferencesWindow		アプリケーション
 Show application expander	PreferencesWindow		エキスパンダーの表示
 Suspend	DeskbarMenu		サスペンド
 Shutdown…	DeskbarMenu		シャットダウン...
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
 Expand new applications	PreferencesWindow		新しいアプリケーションを展開表示
+%appname% preferences…	DeskbarMenu		%appname% 設定…
 Recent applications:	PreferencesWindow		最近使ったアプリケーション:
 Recent folders:	PreferencesWindow		最近使ったフォルダー:
 Recent folders	DeskbarMenu		最近使ったフォルダー

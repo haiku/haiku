@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	3945726882
+1	french	x-vnd.Be-MAIL	2556300501
 Set to Saved	Mail		Définir comme Sauvé
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Votre texte principal contient %ld caractères non encodables. Peut être qu’un jeu de caractère différent fonctionnerait mieux ? Sélectionnez « Envoyer » pour envoyer le message quand-même (un caractère de substitution remplacera ceux qui ne peuvent être encodés), ou choisissez « Annuler » pour revenir et essayer de corriger le problème.
 Text wrapping:	Mail		Renvoi à la ligne :
@@ -38,6 +38,7 @@ Previous message	Mail		Message précédent
 (Address unavailable)	Mail		(Adresse non disponible)
 Mail	System name		Mail
 Copy link location	Mail		Copier l’adresse du lien
+%appname% settings	Mail		Réglages de %appname%
 Add attachment…	Mail		Ajouter une pièce jointe…
 Next	Mail		Suivant
 Attachments:	Mail		Pièces jointes :

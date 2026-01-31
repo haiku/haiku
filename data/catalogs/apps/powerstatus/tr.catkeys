@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-PowerStatus	388505242
+1	turkish	x-vnd.Haiku-PowerStatus	4069361317
 Run in window	PowerStatus		Pencere içinde çalış
 Extended battery info	PowerStatus		Ek pil bilgisi
 Show status icon	PowerStatus		Durum simgesini göster
@@ -14,6 +14,7 @@ Quit	PowerStatus		Çık
 Battery not charging	PowerStatus		Pil şarj olmuyor
 Battery low	PowerStatus		Pil düşük
 Model number: 	PowerStatus		Model numarası: 
+You can run %appname% in a window or install it in the Deskbar.	PowerStatus		%appname% uygulamasını bir pencerede çalıştırabilir veya onu Masaüstü Çubuğu’na yerleştirebilirsiniz.
 Battery unused	PowerStatus		Pil kullanılmamış
 Type: 	PowerStatus		Tür: 
 Damaged or missing battery	PowerStatus		Hasarlı veya eksik pil
@@ -38,6 +39,7 @@ Capacity granularity 2: 	PowerStatus		Sığa tanecikliği 2:
 Too bad!	PowerStatus		Neyse artık!
 Technology: 	PowerStatus		Teknoloji: 
 not charging	PowerStatus		şarj olmuyor
+No supported battery detected. %appname% cannot be used on your system.	PowerStatus		Desteklenen pil bulunamadı. %appname% sisteminizde kullanılamıyor.
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Güç Durumu
 Design capacity: 	PowerStatus		Fabrika çıkış sığası: 

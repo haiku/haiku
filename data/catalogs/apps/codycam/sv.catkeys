@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CodyCam	2786669505
+1	swedish	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		Målkatalog förväntas
 reply: '%s'\n	SftpClient		svar: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (riktigt lösenord skickat)
@@ -50,6 +50,7 @@ server address expected	CodyCam		serveradress förväntad
 Cannot start the video window	CodyCam		Kan inte starta videofönstret
 reply: %d, %d\n	FtpClient		svar: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Kunde inte ställa in tidskälla för videofönster
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		Det går inte att hitta någon videokälla.\nDu behöver en webbkamera för att använda %appname%.
 Every 15 minutes	CodyCam		Var 15:e minut
 Every 24 hours	CodyCam		Var 24:e timme
 Image Format Menu	CodyCam		Bildformatsmeny

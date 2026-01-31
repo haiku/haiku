@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	3492357554
+1	german	x-vnd.Be-MAIL	218437132
 Set to Saved	Mail		Status setzen: Saved
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
@@ -33,12 +33,14 @@ sent	B_USER_DIRECTORY/mail/sent		Gesendet
 Only files can be added as attachments.	Mail		Nur Dateien können als Anhang hinzugefügt werden.
 Close	Mail		Schließen
 Untitled	Mail		Unbenannt
+%appname% couldn't find its dictionary.	Mail		%appname% konnte das Wörterbuch nicht finden.
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Anhänge von weitergeleiteten Nachrichten zu entfernen wird noch nicht unterstützt.\nEs wird nicht richtig funktionieren.
 Same recipient	Mail		Gleiche Empfänger
 Previous message	Mail		Vorherige Nachricht
 (Address unavailable)	Mail		(Adresse nicht verfügbar)
 Mail	System name		E-Mail
 Copy link location	Mail		Linkadresse kopieren
+%appname% settings	Mail		%appname%-Einstellungen
 Add attachment…	Mail		Anhang hinzufügen…
 Next	Mail		Nächste
 Attachments:	Mail		Anhänge:

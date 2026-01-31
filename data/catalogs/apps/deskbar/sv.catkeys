@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-TSKB	3780974715
+1	swedish	x-vnd.Be-TSKB	1763402521
 Auto-hide	PreferencesWindow		Dölj automatiskt
 Show all	WindowMenu		Visa alla
 Edit in Tracker…	PreferencesWindow		Editera i Tracker…
@@ -9,6 +9,7 @@ Large	PreferencesWindow		Stor
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar mappen är tom>
 Recent documents	DeskbarMenu		Senaste dokument
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
+%appname% preferences	PreferencesWindow		%appname% inställningar
 Always on top	PreferencesWindow		Alltid överst
 Restart system	DeskbarMenu		Starta om
 Recent documents:	PreferencesWindow		Senaste dokument:
@@ -28,12 +29,14 @@ Close all	WindowMenu		Stäng alla
 About this system	DeskbarMenu		Om detta system
 Quit application	WindowMenu		Avsluta program
 Hide application names	PreferencesWindow		Göm programnamnen
+Deskbar	System name		Deskbar
 Applications	PreferencesWindow		Program
 Show application expander	PreferencesWindow		Visa programexpanderare
 Suspend	DeskbarMenu		Vänteläge
 Shutdown…	DeskbarMenu		Stäng av…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
 Expand new applications	PreferencesWindow		Expandera nya program
+%appname% preferences…	DeskbarMenu		%appname% inställningar…
 Recent applications:	PreferencesWindow		Senaste program:
 Recent folders:	PreferencesWindow		Senaste mappar:
 Recent folders	DeskbarMenu		Senaste mappar

@@ -24,7 +24,7 @@ Remote control	DeviceClass		Uzaktan kumanda
 Fully available	DeviceClass		Tümüyle kullanılabilir
 #CommandFailed#Not Valid name	RemoteDevice		#KomutBaşarısız#Geçerli bir ad değil
 Server	DeviceClass		Sunucu
-No service available	DeviceClass		Kullanılabilir servis yok
+No service available	DeviceClass		Kullanılabilir hizmet yok
 Printer	DeviceClass		Yazıcı
 Card reader	DeviceClass		Kart okuyucu
 Wired modem or voice gateway	DeviceClass		Kablolu modem veya ses geçidi
@@ -52,7 +52,7 @@ Not implemented	RemoteDevice		İşlevsel değil
 Gaming/Toy	DeviceClass		Oyun/Oyuncak
 Video camera	DeviceClass		Video kamera
 Handheld	DeviceClass		Elde taşınan
-Service classes: 	DeviceClass		Servis sınıfları: 
+Service classes: 	DeviceClass		Hizmet sınıfları: 
 Loudspeaker	DeviceClass		Hoparlör
 83-99% utilized	DeviceClass		%83–%99 yararlanılıyor
 SIM card reader	DeviceClass		SIM kart okuyucusu

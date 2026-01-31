@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-CodyCam	2786669505
+1	turkish	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		hedef dizin bekleniyordu
 reply: '%s'\n	SftpClient		yanıtla: “%s”\n
 PASS <suppressed>  (real password sent)	FtpClient		PAROLA <gizlenmiş>  (gönderilen gerçek parola)
@@ -50,6 +50,7 @@ server address expected	CodyCam		sunucu adresi bekleniyordu
 Cannot start the video window	CodyCam		Video penceresi başlatılamıyor
 reply: %d, %d\n	FtpClient		yanıtla: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Video penceresi için zaman kaynağı ayarlanamıyor
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		Bir video kaynağı bulunamıyor.\n%appname% uygulamasını kullanmak için bir web kamerasına gereksiniminiz var.
 Every 15 minutes	CodyCam		Her 15 dakikada bir
 Every 24 hours	CodyCam		Her 24 saatte bir
 Image Format Menu	CodyCam		Görsel biçimi menüsü

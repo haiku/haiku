@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Pairs	3059673093
+1	german	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		Pairs
 Quit	PairsWindow		Beenden
 Medium	PairsWindow		Mittel
@@ -14,4 +14,5 @@ Quit game	PairsWindow		Spiel beenden
 Large	PairsWindow		Groß
 Beginner (4x4)	PairsWindow		Anfänger (4x4)
 Intermediate (6x6)	PairsWindow		Fortgeschrittener (6x6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	%s konnte nicht genügend Vektoricons finden um zu starten. Es werden mindestens %zu benötigt, gefunden wurden nur %zu.\n
 New game	PairsWindow		Neues Spiel

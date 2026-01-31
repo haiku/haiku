@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Expander	2040688293
+1	catalan; valencian	x-vnd.Haiku-Expander	2735024965
 Destination	ExpanderWindow		Destinació
 Other	ExpanderPreferences		Altres
 Automatically show contents listing	ExpanderPreferences		Mostra automàticament la llista de continguts
@@ -6,12 +6,14 @@ Expander	System name		Expandidora
 Set source…	ExpanderMenu		Estableix la font...
 OK	ExpanderWindow		D'acord
 The destination is not a folder.	ExpanderWindow		La destinació no és una carpeta.
+%appname%: Choose destination	DirectoryFilePanel		%appname%: trieu una destinació
 The folder was either moved, renamed or not supported.	ExpanderWindow		La carpeta s'ha mogut, se n'ha canviat de nom o no és compatible.
 Close window when done expanding	ExpanderPreferences		Tanca la finestra un cop feta l'expansió.
 Close	ExpanderMenu		Tanca
 Create	ExpanderWindow		Crea
 Creating listing for '%s'…	ExpanderWindow		Es crea la llista per a %s…
 Show contents	ExpanderMenu		Mostra el contingut
+%appname% settings	ExpanderPreferences		Paràmetres per a %appname%
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Segur que voleu interrompre l'expansió d'aquest arxiu? Pot ser que els elements expandits no siguin complets.
 Settings	ExpanderMenu		Paràmetres
 Expand	ExpanderWindow		Expandeix
@@ -45,5 +47,6 @@ The file doesn't exist	ExpanderWindow		No existeix el fitxer
 Hide contents	ExpanderWindow		Amaga els continguts
 Source	ExpanderWindow		Origen
 The destination is read only.	ExpanderWindow		La destinació és només de lectura.
+%appname%: Open	ExpanderWindow		%appname%: obre
 Select	ExpanderPreferences		Selecciona
 File	ExpanderMenu		Fitxer
