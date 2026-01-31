@@ -9,6 +9,7 @@
 #include "bmemoryio/MallocIOTest.h"
 #include "bstring/StringTest.h"
 #include "bblockcache/BlockCacheTest.h"
+#include "bstopwatch/BStopWatchTest.h"
 #include "ByteOrderTest.h"
 #include "DateTimeTest.h"
 
@@ -27,7 +28,9 @@ getTestSuite()
 	suite->addTest("BMallocIO", MallocIOTestSuite());
 	suite->addTest("BString", StringTestSuite());
 	suite->addTest("BBlockCache", BlockCacheTestSuite());
+	suite->addTest("BStopWatch", BStopWatchTestSuite());
 	suite->addTest("ByteOrder", ByteOrderTestSuite());
 
 	return suite;
 }
+

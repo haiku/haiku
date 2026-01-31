@@ -9,6 +9,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) blocker ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmemoryio ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bstring ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bblockcache ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bstopwatch ] ;
 
 UnitTestLib libsupporttest.so
 	: SupportKitTestAddon.cpp
@@ -80,6 +81,9 @@ UnitTestLib libsupporttest.so
 		BlockCacheExerciseTest.cpp
 		BlockCacheConcurrencyTest.cpp
 
+		# BStopWatch
+		BStopWatchTest.cpp
+
 	: be [ TargetLibstdc++ ] libsupporttest_RemoteTestObject.so
 ;
 
@@ -91,4 +95,3 @@ SimpleTest string_utf8_tests : string_utf8_tests.cpp : be ;
 SubInclude HAIKU_TOP src tests kits support barchivable ;
 #SubInclude HAIKU_TOP src tests kits support bautolock ;
 #SubInclude HAIKU_TOP src tests kits support blocker ;
-
