@@ -4,13 +4,23 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage file_systems ;
 UsePrivateKernelHeaders ;
 UseBuildFeatureHeaders zlib ;
-
+local zstdKernelLib ;
+if [ FIsBuildFeatureEnabled zstd ] {
+	SubDirC++Flags -DZSTD_ENABLED ;
+	UseBuildFeatureHeaders zstd ;
+	zstdKernelLib = kernel_libzstd.a ;
+}
 DEFINES += DEBUG_APP="\\\"btrfs\\\"" ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] : true ;
 
 Includes [ FGristFiles Inode.cpp ]
 	: [ BuildFeatureAttribute zlib : headers ] ;
+
+if [ FIsBuildFeatureEnabled zstd ] {
+    Includes [ FGristFiles Inode.cpp ]
+        : [ BuildFeatureAttribute zstd : headers ] ;
+}
 
 KernelAddon btrfs :
 	btrfs_disk_system.cpp
@@ -29,6 +39,7 @@ KernelAddon btrfs :
 	Volume.cpp
 	:
 	kernel_libz.a
+	$(zstdKernelLib)
 	libuuid_kernel.a
 ;
 
