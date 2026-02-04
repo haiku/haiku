@@ -767,6 +767,9 @@ VMAnonymousCache::CanOvercommit()
 bool
 VMAnonymousCache::StoreHasPage(off_t offset)
 {
+	if (fAllocatedSwapSize == 0)
+		return false;
+
 	if (_SwapBlockGetAddress(offset >> PAGE_SHIFT) != SWAP_SLOT_NONE)
 		return true;
 
