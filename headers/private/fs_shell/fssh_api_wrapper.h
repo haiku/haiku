@@ -979,6 +979,7 @@
 
 #define B_LIVE_QUERY		FSSH_B_LIVE_QUERY
 #define B_QUERY_NON_INDEXED	FSSH_B_QUERY_NON_INDEXED
+#define B_QUERY_WATCH_ALL	FSSH_B_QUERY_WATCH_ALL
 
 
 ////////////////////////////////////////////////////////////////////////////////
