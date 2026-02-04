@@ -1153,7 +1153,8 @@ packagefs_std_ops(int32 op, ...)
 				create_object_cache("pkgfs heap buffers",
 					PackageFileHeapAccessorBase::kChunkSize * 4,
 					0);
-			object_cache_set_minimum_reserve(quadChunkCache, 1);
+			PackageFileHeapAccessorBase::sQuadChunkFallbackBuffer =
+				object_cache_alloc(quadChunkCache, 0);
 
 			TwoKeyAVLTreeNode<void*>::sNodeCache =
 				create_object_cache("pkgfs TKAVLTreeNodes",
@@ -1176,6 +1177,9 @@ packagefs_std_ops(int32 op, ...)
 			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
 			PackageFSRoot::GlobalUninit();
 			delete_object_cache(TwoKeyAVLTreeNode<void*>::sNodeCache);
+			object_cache_free((object_cache*)
+				PackageFileHeapAccessorBase::sQuadChunkCache,
+				PackageFileHeapAccessorBase::sQuadChunkFallbackBuffer, 0);
 			delete_object_cache((object_cache*)
 				PackageFileHeapAccessorBase::sQuadChunkCache);
 			StringConstants::Cleanup();

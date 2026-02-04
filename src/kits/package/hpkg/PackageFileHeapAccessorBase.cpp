@@ -11,7 +11,8 @@
 
 #include <algorithm>
 #include <new>
-#ifdef _KERNEL_MODE
+#if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
+#include <util/AutoLock.h>
 #include <slab/Slab.h>
 #endif
 
@@ -30,8 +31,10 @@ namespace BHPKG {
 namespace BPrivate {
 
 
-#if defined(_KERNEL_MODE)
+#if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
 void* PackageFileHeapAccessorBase::sQuadChunkCache = NULL;
+void* PackageFileHeapAccessorBase::sQuadChunkFallbackBuffer = NULL;
+static mutex sFallbackBufferLock = MUTEX_INITIALIZER("PackageFileHeapAccessorBase fallback buffer");
 #endif
 
 
@@ -239,8 +242,15 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 	};
 
 	ObjectCacheDeleter chunkBufferDeleter((object_cache*)sQuadChunkCache);
-	uint8* quadChunkBuffer = (uint8*)object_cache_alloc((object_cache*)sQuadChunkCache, 0);
+	uint8* quadChunkBuffer = (uint8*)object_cache_alloc((object_cache*)sQuadChunkCache,
+		CACHE_DONT_WAIT_FOR_MEMORY);
 	chunkBufferDeleter.object = quadChunkBuffer;
+
+	MutexLocker fallbackBufferLocker(sFallbackBufferLock, false, false);
+	if (quadChunkBuffer == NULL) {
+		fallbackBufferLocker.Lock();
+		quadChunkBuffer = (uint8*)sQuadChunkFallbackBuffer;
+	}
 
 	// segment data buffer
 	iovec localScratch;

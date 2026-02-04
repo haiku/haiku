@@ -100,6 +100,7 @@ public:
 	static	const size_t		kChunkSize = 64 * 1024;
 #if defined(_KERNEL_MODE)
 	static	void*				sQuadChunkCache;
+	static	void*				sQuadChunkFallbackBuffer;
 #endif
 
 protected:
