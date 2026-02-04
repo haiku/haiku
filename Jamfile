@@ -36,11 +36,9 @@ AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 
 	regular_image @{
 		bzip2
-		expat
 		ffmpeg6
 		glu
 		gutenprint9
-		gzip
 		lame
 		less
 		mesa
@@ -59,6 +57,7 @@ AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 			findutils
 			gawk
 			grep
+			gzip
 			tar
 			tcpdump
 			zstd
@@ -68,6 +67,7 @@ AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 			findutils_x86@secondary_x86
 			mawk
 			grep_x86@secondary_x86
+			gzip_x86@secondary_x86
 			tar_x86@secondary_x86
 			tcpdump_x86@secondary_x86
 		}@
@@ -84,12 +84,10 @@ AddHaikuImageSourcePackages [ FFilterByBuildFeatures
 	}@
 
 	regular_image @{
-		expat
 		ffmpeg6
 		findutils
 		grep
 		gutenprint9
-		gzip
 		lame
 		less
 		sed
@@ -99,9 +97,11 @@ AddHaikuImageSourcePackages [ FFilterByBuildFeatures
 		which
 		!gcc2 @{
 			gawk
+			gzip
 		}@
 		gcc2 @{
 			mawk
+			gzip_x86@secondary_x86
 		}@
 	}@
 ] ;
