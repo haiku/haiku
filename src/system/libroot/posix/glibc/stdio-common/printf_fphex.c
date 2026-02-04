@@ -30,6 +30,7 @@
 #include <locale/localeinfo.h>
 #include <stdbool.h>
 #include <rounding-mode.h>
+#include <printf_fphex.h>
 
 /* #define NDEBUG 1*/		/* Undefine this for debugging assertions.  */
 #include <assert.h>
