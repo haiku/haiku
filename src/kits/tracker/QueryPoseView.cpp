@@ -57,6 +57,7 @@ All rights reserved.
 #include "Tracker.h"
 
 #include <fs_attr.h>
+#include <fs_query.h>
 
 
 using std::nothrow;

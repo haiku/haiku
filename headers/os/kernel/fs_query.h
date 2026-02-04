@@ -11,17 +11,11 @@
 
 
 /* Flags for fs_open_[live_]query() */
-
-#define B_LIVE_QUERY		(1 << 0)
-	// Note, if you specify B_LIVE_QUERY, you have to use fs_open_live_query();
-	// it will be ignored in fs_open_query().
-#define B_QUERY_NON_INDEXED	(1 << 1)
-	// Only enable this feature for non time-critical things, it might
-	// take a long time to proceed.
-	// Also, not every file system might support this feature.
-#define B_QUERY_WATCH_ALL	(1 << 2)
-	// Send node monitor (B_ATTR_CHANGED, B_ENTRY_MOVED, etc.) events for all
-	// attributes on all entries in the query.
+enum {
+	B_LIVE_QUERY		= (1 << 0),
+	B_QUERY_NON_INDEXED	= (1 << 1),
+	B_QUERY_WATCH_ALL	= (1 << 2),
+};
 
 
 #ifdef  __cplusplus

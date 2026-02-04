@@ -1,0 +1,47 @@
+/*
+ * Copyright 2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Corresponds to:
+ *		headers/os/storage/fs_query.h	hrev47402
+ */
+
+
+/*!
+	\file fs_query.h
+	\ingroup storage
+*/
+
+
+/*!
+	\var B_LIVE_QUERY
+	\brief Specifies that the query should be "live".
+
+	\note If you specify this flag, you have to use fs_open_live_query();
+		  it will be ignored in fs_open_query().
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_QUERY_NON_INDEXED
+	\brief Specifies that the query should be run even if no indexed attributes are queried.
+
+	\note Only enable this feature for non-time-critical things, it might
+		  take a long time to proceed.
+	\note Some query-enabled filesystems might not support this feature.
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_QUERY_WATCH_ALL
+	\brief Watch all changes to files in live queries, not just additions or removals.
+
+	This is analogous to the \c B_WATCH_ALL node monitor option: instead of only
+	\c B_ENTRY_ADDED and \c B_ENTRY_REMOVED when files are changed such that they
+	enter or leave the query, update messages will be sent for all changes to
+	any files in the query (via \c B_ATTR_CHANGED or \c B_ENTRY_MOVED).
+
+	\since Haiku R1
+*/

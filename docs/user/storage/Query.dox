@@ -334,7 +334,7 @@
 	\fn status_t BQuery::SetFlags(uint32 flags)
 	\brief Sets the flags the query will be opened with.
 
-	The possible flags to set are defined in \file fs_query.h.
+	The possible flags to set are defined in \c fs_query.h.
 
 	This methods fails if called after Fetch(). To reuse the BQuery object it
 	must first be reset via Clear().
