@@ -2572,38 +2572,26 @@ page_writer(void* /*unused*/)
 // #pragma mark -
 
 
-// TODO: This should be done in the page daemon!
-#if 0
 #if ENABLE_SWAP_SUPPORT
 static bool
-free_page_swap_space(int32 index)
+free_page_swap_space(vm_page *page)
 {
-	vm_page *page = vm_page_at_index(index);
-	PageCacheLocker locker(page);
-	if (!locker.IsLocked())
-		return false;
-
-	DEBUG_PAGE_ACCESS_START(page);
+	DEBUG_PAGE_ACCESS_CHECK(page);
+	PAGE_ASSERT(page, page->State() == PAGE_STATE_ACTIVE);
 
 	VMCache* cache = page->Cache();
-	if (cache->temporary && page->WiredCount() == 0
-			&& cache->StoreHasPage(page->cache_offset << PAGE_SHIFT)
-			&& page->usage_count > 0) {
-		// TODO: how to judge a page is highly active?
+	if (cache->temporary && cache->StoreHasPage(page->cache_offset << PAGE_SHIFT)) {
 		if (swap_free_page_swap_space(page)) {
 			// We need to mark the page modified, since otherwise it could be
 			// stolen and we'd lose its data.
-			vm_page_set_state(page, PAGE_STATE_MODIFIED);
+			page->modified = true;
 			TD(FreedPageSwap(page));
-			DEBUG_PAGE_ACCESS_END(page);
 			return true;
 		}
 	}
-	DEBUG_PAGE_ACCESS_END(page);
 	return false;
 }
 #endif
-#endif	// 0
 
 
 static vm_page *
@@ -2768,7 +2756,10 @@ idle_scan_active_pages(page_stats& pageStats)
 			usageCount += page->usage_count + kPageUsageAdvance;
 			if (usageCount > kPageUsageMax)
 				usageCount = kPageUsageMax;
-// TODO: This would probably also be the place to reclaim swap space.
+
+#if ENABLE_SWAP_SUPPORT
+			free_page_swap_space(page);
+#endif
 		} else {
 			usageCount += page->usage_count - (int32)kPageUsageDecline;
 			if (usageCount < 0) {
@@ -2983,7 +2974,10 @@ full_scan_active_pages(page_stats& pageStats, int32 despairLevel)
 			if (usageCount > kPageUsageMax)
 				usageCount = kPageUsageMax;
 			pagesAccessed++;
-// TODO: This would probably also be the place to reclaim swap space.
+
+#if ENABLE_SWAP_SUPPORT
+			free_page_swap_space(page);
+#endif
 		} else {
 			usageCount += page->usage_count - (int32)kPageUsageDecline;
 			if (usageCount <= 0) {
