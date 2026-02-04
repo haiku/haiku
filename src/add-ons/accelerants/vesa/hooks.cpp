@@ -225,6 +225,10 @@ get_accelerant_hook(uint32 feature, void* data)
 			return (void*)vesa_get_display_mode;
 		case B_GET_EDID_INFO:
 			return (void*)vesa_get_edid_info;
+		case B_SET_BRIGHTNESS:
+			return (void*)vesa_set_brightness;
+		case B_GET_BRIGHTNESS:
+			return (void*)vesa_get_brightness;
 		case B_GET_FRAME_BUFFER_CONFIG:
 			return (void*)vesa_get_frame_buffer_config;
 		case B_GET_PIXEL_CLOCK_LIMITS:

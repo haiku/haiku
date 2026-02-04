@@ -283,6 +283,50 @@ vesa_get_edid_info(void* info, size_t size, uint32* _version)
 
 
 status_t
+vesa_set_brightness(float brightness)
+{
+	TRACE(("vesa_set_brightness()\n"));
+
+	if (brightness < 0 || brightness > 1)
+		return B_BAD_VALUE;
+
+	if ((vesa_dpms_capabilities() & B_DPMS_REDUCED_ON) == 0)
+		return B_ENTRY_NOT_FOUND;
+
+	uint32 mode = vesa_dpms_mode();
+	uint32 newMode = mode & ~B_DPMS_REDUCED_ON;
+	if (brightness <= 0.5)
+		newMode |= B_DPMS_REDUCED_ON;
+
+	if (newMode != mode)
+		vesa_set_dpms_mode(newMode);
+
+	return B_OK;
+}
+
+
+status_t
+vesa_get_brightness(float* brightness)
+{
+	TRACE(("vesa_get_brightness()\n"));
+
+	if (brightness == NULL)
+		return B_BAD_VALUE;
+
+	if ((vesa_dpms_capabilities() & B_DPMS_REDUCED_ON) == 0)
+		return B_ENTRY_NOT_FOUND;
+
+	if (vesa_dpms_mode() & B_DPMS_REDUCED_ON) {
+		*brightness = 0.5;
+		return B_OK;
+	} else {
+		*brightness = 1;
+		return B_OK;
+	}
+}
+
+
+status_t
 vesa_get_frame_buffer_config(frame_buffer_config* config)
 {
 	TRACE(("vesa_get_frame_buffer_config()\n"));

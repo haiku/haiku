@@ -31,6 +31,8 @@ status_t vesa_propose_display_mode(display_mode *target,
 status_t vesa_set_display_mode(display_mode *modeToSet);
 status_t vesa_get_display_mode(display_mode *currentMode);
 status_t vesa_get_edid_info(void *info, size_t size, uint32 *_version);
+status_t vesa_set_brightness(float brightness);
+status_t vesa_get_brightness(float* brightness);
 status_t vesa_get_frame_buffer_config(frame_buffer_config *config);
 status_t vesa_get_pixel_clock_limits(display_mode *dm, uint32 *low,
 	uint32 *high);

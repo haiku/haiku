@@ -197,7 +197,8 @@ enum {
 	B_DPMS_ON			= 1 << 0,
 	B_DPMS_STAND_BY		= 1 << 1,
 	B_DPMS_SUSPEND		= 1 << 2,
-	B_DPMS_OFF			= 1 << 3
+	B_DPMS_OFF			= 1 << 3,
+	B_DPMS_REDUCED_ON	= 1 << 4
 };
 
 
