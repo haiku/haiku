@@ -165,7 +165,6 @@ fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 		return B_NO_MEMORY;
 	ObjectDeleter<struct volume> volumeDeleter(volume);
 
-	mutex_init(&volume->lock, "NTFS volume lock");
 	volume->fs_info_flags = B_FS_IS_PERSISTENT;
 
 	unsigned long ntfsFlags = NTFS_MNT_RECOVER | NTFS_MNT_MAY_RDONLY;

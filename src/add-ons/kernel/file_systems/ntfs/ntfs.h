@@ -26,6 +26,11 @@ extern fs_vnode_ops gNtfsVnodeOps;
 
 
 struct volume {
+	volume()
+	{
+		mutex_init(&lock, "NTFS volume lock");
+		lowntfs.abs_mnt_point = NULL;
+	}
 	~volume()
 	{
 		mutex_destroy(&lock);
