@@ -184,7 +184,7 @@ enum xfs_dinode_fmt_t {
  */
 class Inode {
 public:
-	typedef struct Dinode{
+	struct Dinode{
 	public:
 		uint16				di_magic;
 		uint16				di_mode;
