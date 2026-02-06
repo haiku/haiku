@@ -161,8 +161,10 @@ NetworkStatus::ReadyToRun()
 	}
 
 	if (isDeskbarRunning && !isInstalled) {
-		BAlert* alert = new BAlert("", B_TRANSLATE("You can run NetworkStatus "
-			"in a window or install it in the Deskbar."),
+		BString text = B_TRANSLATE(
+			"You can run %appname% in a window or install it in the Deskbar.");
+		text.ReplaceFirst("%appname%", B_TRANSLATE_SYSTEM_NAME("NetworkStatus"));
+		BAlert* alert = new BAlert("", text,
 			B_TRANSLATE("Run in window"), B_TRANSLATE("Install in Deskbar"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
