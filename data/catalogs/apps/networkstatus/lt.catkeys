@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-NetworkStatus	1304772120
+1	lithuanian	x-vnd.Haiku-NetworkStatus	972982814
 Quit	NetworkStatusView		Baigti darbą
 Unknown	NetworkStatusView		Nežinomas
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Tinklo nuostatų atverti nepavyko.\n\nKlaida:
@@ -10,7 +10,6 @@ No link	NetworkStatusView		Ryšio nėra
 Could not join wireless network:\n	NetworkStatusView		Prisijungti prie belaidžio tinklo nepavyko:\n
 Network Status	NetworkStatusView		Tinklo būsena
 No stateful configuration	NetworkStatusView		Pilnavertės konfigūracijos nėra
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
 %ifaceName information:\n	NetworkStatusView		%ifaceName būsena:\n
 Run in window	NetworkStatus		Paleisti lange
 <no wireless networks found>	NetworkStatusView		<belaidžių tinklų nerasta>

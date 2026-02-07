@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ProcessController	2724038695
+1	hungarian	x-vnd.Haiku-ProcessController	3402929872
 Error saving file	ProcessController		Hiba történt a fájl mentése során
 Display priority	ProcessController		Kijelzési prioritás
 That's no Fun!	ProcessController		Ez nem vicces!
@@ -29,6 +29,7 @@ Quit application	ProcessController		Program leállítása
 Info	ProcessController		Infó
 Kill this thread!	ProcessController		Szál leállítása!
 This team is already gone…	ProcessController		Ez a csapat már eltűnt…
+About %appname%…	ProcessController		%appname% névjegye…
 Gone teams…	ProcessController		Eltűnt csapatok…
 Quit an application	ProcessController		Program leállítása
 Cancel	ProcessController		Mégse

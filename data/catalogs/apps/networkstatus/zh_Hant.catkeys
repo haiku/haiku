@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-NetworkStatus	2842407512
+1	english	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		IPv6 位址：
 Quit	NetworkStatusView		退出
 Unknown	NetworkStatusView		未知
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		網路狀態
 Deskbar is not running, giving up.	NetworkStatus		Deskbar未運行，放棄。
 Netmask:	NetworkStatusView		網路遮罩：
 No stateful configuration	NetworkStatusView		無狀態配置
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		您可以在視窗中執行NetworkStatus或將其安裝在Deskbar中。
 IPv4 address:	NetworkStatusView		IPv4 位址：
 %ifaceName information:\n	NetworkStatusView		%ifaceName 資訊:\n
 Run in window	NetworkStatus		在視窗中運行

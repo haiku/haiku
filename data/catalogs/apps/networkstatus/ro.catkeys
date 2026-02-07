@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-NetworkStatus	2842407512
+1	romanian	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		Adresă IPv6:
 Quit	NetworkStatusView		Ieșire
 Unknown	NetworkStatusView		Necunoscut
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		Starea de rețea
 Deskbar is not running, giving up.	NetworkStatus		Deskbar nu rulează, se renunță.
 Netmask:	NetworkStatusView		Mască de rețea:
 No stateful configuration	NetworkStatusView		Fără configurație de stare
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Puteți rula NetworkStatus într-o fereastră sau îl puteți instala pe deskbar.
 IPv4 address:	NetworkStatusView		Adresă IPv4:
 %ifaceName information:\n	NetworkStatusView		Informații %ifaceName:\n
 Run in window	NetworkStatus		Rulează în fereastră

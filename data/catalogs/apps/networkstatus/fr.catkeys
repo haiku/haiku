@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-NetworkStatus	2842407512
+1	french	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		Adresse IPv6 :
 Quit	NetworkStatusView		Quitter
 Unknown	NetworkStatusView		Inconnu
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		État du réseau
 Deskbar is not running, giving up.	NetworkStatus		Deskbar n’est pas lancé, abandon.
 Netmask:	NetworkStatusView		Masque réseau :
 No stateful configuration	NetworkStatusView		Pas de configuration dynamique
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vous pouvez exécuter l’État du réseau dans une fenêtre ou l’installer dans la Deskbar.
 IPv4 address:	NetworkStatusView		Adresse IPv4 :
 %ifaceName information:\n	NetworkStatusView		Informations de %ifaceName :\n
 Run in window	NetworkStatus		Exécuter dans une fenêtre

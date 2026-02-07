@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-NetworkStatus	2842407512
+1	danish	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		IPv6-adresse:
 Quit	NetworkStatusView		Afslut
 Unknown	NetworkStatusView		Ukendt
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		Netværksstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar kører ikke, giver op.
 Netmask:	NetworkStatusView		Netmaske:
 No stateful configuration	NetworkStatusView		Ingen tilstandsbaseret opsætning
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan køre netværksstatus i et vindue, eller installere det i Deskbar.
 IPv4 address:	NetworkStatusView		IPv4-adresse:
 %ifaceName information:\n	NetworkStatusView		Oplysninger om %ifaceName:\n
 Run in window	NetworkStatus		Kør i vindue

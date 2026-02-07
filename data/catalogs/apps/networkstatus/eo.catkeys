@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-NetworkStatus	2842407512
+1	esperanto	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		IPv6 adreso:
 Quit	NetworkStatusView		Ĉesi
 Unknown	NetworkStatusView		Nekonata
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		Stato de reto
 Deskbar is not running, giving up.	NetworkStatus		Laborstrio ne estas rulata, mi rezignas.
 Netmask:	NetworkStatusView		Retmasko:
 No stateful configuration	NetworkStatusView		La agordo ne estas kompleta
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vi povas ruli Retstaton fenestre aŭ instali Laborstrie.
 IPv4 address:	NetworkStatusView		IPv4 adreso:
 %ifaceName information:\n	NetworkStatusView		Informo pri %ifaceName:\n
 Run in window	NetworkStatus		Ekruli fenestre

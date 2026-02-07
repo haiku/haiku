@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-NetworkStatus	2842407512
+1	finnish	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		IPv6-osoite:
 Quit	NetworkStatusView		Lopeta
 Unknown	NetworkStatusView		Tuntematon
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		Verkkotila
 Deskbar is not running, giving up.	NetworkStatus		Työpöytäpalkki ei ole käynnissä, luovutaan toiminnosta.
 Netmask:	NetworkStatusView		Verkkopeite:
 No stateful configuration	NetworkStatusView		Ei tilallista asetusta
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Voit suorittaa Verkontilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
 IPv4 address:	NetworkStatusView		IPv4-osoite:
 %ifaceName information:\n	NetworkStatusView		%ifaceName-tiedot:\n
 Run in window	NetworkStatus		Suorita ikkunassa

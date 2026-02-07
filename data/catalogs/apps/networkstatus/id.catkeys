@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-NetworkStatus	2842407512
+1	indonesian	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		Alamat IPv6
 Quit	NetworkStatusView		Keluar
 Unknown	NetworkStatusView		Takdiketahui
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		Status Jaringan
 Deskbar is not running, giving up.	NetworkStatus		Deskbar tidak berjalan, menyerah.
 Netmask:	NetworkStatusView		Netmask:
 No stateful configuration	NetworkStatusView		Takada konfigurasi tersimpan
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Anda dapat menjalankan StatusJaringan di sebuah Jendela atau memasangnya di Deksbar.
 IPv4 address:	NetworkStatusView		Alamat IPv4
 %ifaceName information:\n	NetworkStatusView		%ifaceName informasi:\n
 Run in window	NetworkStatus		Jalankan di jendela

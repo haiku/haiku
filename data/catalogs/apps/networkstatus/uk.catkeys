@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-NetworkStatus	2192330251
+1	ukrainian	x-vnd.Haiku-NetworkStatus	1860540945
 IPv6 address:	NetworkStatusView		Адреса IPv6:
 Quit	NetworkStatusView		Вийти
 Unknown	NetworkStatusView		Невідомий
@@ -15,7 +15,6 @@ Network Status	NetworkStatusView		Стан мережі
 Deskbar is not running, giving up.	NetworkStatus		Облиште, Deskbar не працює.
 Netmask:	NetworkStatusView		Маска підмережі:
 No stateful configuration	NetworkStatusView		Немає стабільної конфігурації
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Ви можете запустити NetworkStatus у вікні або встановити у Deskbar.
 IPv4 address:	NetworkStatusView		Адреса IPv4:
 %ifaceName information:\n	NetworkStatusView		%ifaceName інформація:\n
 Run in window	NetworkStatus		Виконувати у вікні

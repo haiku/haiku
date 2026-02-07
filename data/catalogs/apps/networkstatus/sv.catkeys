@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-NetworkStatus	1095906237
+1	swedish	x-vnd.Haiku-NetworkStatus	764116931
 IPv6 address:	NetworkStatusView		IPv6-adress:
 Quit	NetworkStatusView		Avsluta
 Unknown	NetworkStatusView		Okänd
@@ -16,7 +16,6 @@ Network Status	NetworkStatusView		Nätverksstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar är inte igång, ger upp.
 Netmask:	NetworkStatusView		Nätmask:
 No stateful configuration	NetworkStatusView		Ingen förbindelseorienterad konfiguration
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan köra NätverksStatus i ett fönster eller installera det i Deskbar.
 IPv4 address:	NetworkStatusView		IPv4-adress:
 %ifaceName information:\n	NetworkStatusView		%ifaceName information:\n
 Run in window	NetworkStatus		Kör i fönster

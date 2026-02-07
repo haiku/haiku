@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-NetworkStatus	2842407512
+1	korean	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		IPv6 주소:
 Quit	NetworkStatusView		종료
 Unknown	NetworkStatusView		알 수 없음
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		네트워크 상태
 Deskbar is not running, giving up.	NetworkStatus		데스크바가 실행 중이 아닙니다.
 Netmask:	NetworkStatusView		넷마스크:
 No stateful configuration	NetworkStatusView		스테이트풀 설정이 없습니다
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		NetworkStatus 를 창에서 실행시키거나 데스크바에 설치 할 수 있습니다.
 IPv4 address:	NetworkStatusView		IPv4 주소:
 %ifaceName information:\n	NetworkStatusView		%ifaceName 정보:\n
 Run in window	NetworkStatus		창으로 실행

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	2842407512
+1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		Διεύθυνση IPv6:
 Quit	NetworkStatusView		Έξοδος
 Unknown	NetworkStatusView		Άγνωστο
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		Κατάσταση Δικτύου
 Deskbar is not running, giving up.	NetworkStatus		Η Γραμμή Εργασιών δεν εκτελείται, δεν είναι δυνατή η λειτουργία αυτή.
 Netmask:	NetworkStatusView		Μάσκα δικτύου:
 No stateful configuration	NetworkStatusView		Καμία stateful ρύθμιση
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Μπορείτε να εκτελέσετε την εφαρμογή Κατάστασης Δικτύου σε ένα παράθυρο ή να το τοποθετήσετε στην Γραμμή Εργασιών.
 IPv4 address:	NetworkStatusView		Διεύθυνση IPv4:
 %ifaceName information:\n	NetworkStatusView		%ifaceΠληροφορίες ονόματος:\n
 Run in window	NetworkStatus		Εκτέλεση σε παράθυρο

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-NetworkStatus	1095906237
+1	catalan; valencian	x-vnd.Haiku-NetworkStatus	764116931
 IPv6 address:	NetworkStatusView		Adreça IPv6:
 Quit	NetworkStatusView		Surt
 Unknown	NetworkStatusView		Desconegut
@@ -16,7 +16,6 @@ Network Status	NetworkStatusView		Estat de la xarxa
 Deskbar is not running, giving up.	NetworkStatus		La barra d'escriptori no s'executa. Ho deixo estar.
 Netmask:	NetworkStatusView		Màscara de xarxa:
 No stateful configuration	NetworkStatusView		No hi ha cap configuració dinàmica.
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Podeu executar l'Estat de la xarxa en una finestra o instal·lar-lo a la barra d’escriptori.
 IPv4 address:	NetworkStatusView		Adreça IPv4:
 %ifaceName information:\n	NetworkStatusView		Informació de %ifaceName:\n
 Run in window	NetworkStatus		Executa en una finestra

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-NetworkStatus	2192330251
+1	hungarian	x-vnd.Haiku-NetworkStatus	1860540945
 IPv6 address:	NetworkStatusView		IPv6 cím:
 Quit	NetworkStatusView		Kilépés
 Unknown	NetworkStatusView		Ismeretlen
@@ -15,7 +15,6 @@ Network Status	NetworkStatusView		Hálózat állapota
 Deskbar is not running, giving up.	NetworkStatus		Az Asztalsáv nem fut, feladom.
 Netmask:	NetworkStatusView		Hálózati maszk:
 No stateful configuration	NetworkStatusView		Nincs konfiguráció
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		A Hálózat állapota futtatható ablakban, vagy telepíthető az Asztalsávra.
 IPv4 address:	NetworkStatusView		IPv4 cím:
 %ifaceName information:\n	NetworkStatusView		%ifaceName információi:\n
 Run in window	NetworkStatus		Futtatás ablakban

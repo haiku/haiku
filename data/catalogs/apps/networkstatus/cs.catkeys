@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-NetworkStatus	2842407512
+1	czech	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		Adresa IPv6:
 Quit	NetworkStatusView		Zavřít
 Unknown	NetworkStatusView		Neznámý
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		Stav sítě
 Deskbar is not running, giving up.	NetworkStatus		Panel není spuštěn, vzdávám to.
 Netmask:	NetworkStatusView		Maska sítě:
 No stateful configuration	NetworkStatusView		Žádná uvedená konfigurace
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Můžete spustit Status Sítě v okně nebo jej nainstalovat do Deskbaru.
 IPv4 address:	NetworkStatusView		Adresa IPv4:
 %ifaceName information:\n	NetworkStatusView		%ifaceName informace:\n
 Run in window	NetworkStatus		Spustit v okně

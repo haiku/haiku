@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-NetworkStatus	2842407512
+1	dutch; flemish	x-vnd.Haiku-NetworkStatus	2510618206
 IPv6 address:	NetworkStatusView		IPv6-adres:
 Quit	NetworkStatusView		Afsluiten
 Unknown	NetworkStatusView		Onbekend
@@ -14,7 +14,6 @@ Network Status	NetworkStatusView		Netwerkstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar draait niet, geef op.
 Netmask:	NetworkStatusView		 Netwerkmasker:
 No stateful configuration	NetworkStatusView		Geen stateful-configuratie
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		U kunt NetwerkStatus in een venster uitvoeren, of in Deskbar installeren
 IPv4 address:	NetworkStatusView		IPv4-adres:
 %ifaceName information:\n	NetworkStatusView		%ifaceName informatie:\n
 Run in window	NetworkStatus		Actief in een venster
