@@ -78,6 +78,15 @@ ShortDirectory::EntrySize(int namelen)
 
 
 status_t
+ShortDirectory::Rewind()
+{
+	fTrack = 0;
+	fLastEntryOffset = 0;
+	return B_OK;
+}
+
+
+status_t
 ShortDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 {
 	TRACE("ShortDirectory::Lookup\n");

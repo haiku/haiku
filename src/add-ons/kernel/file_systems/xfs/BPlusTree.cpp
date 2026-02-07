@@ -457,6 +457,17 @@ TreeDirectory::SearchMapInAllExtent(uint64 blockNo, uint32& mapIndex)
 
 
 status_t
+TreeDirectory::Rewind()
+{
+	fCountOfFilledExtents = 0;
+	fCurMapIndex = 0;
+	fOffset = 0;
+	fCurBlockNumber = 0;
+	return B_OK;
+}
+
+
+status_t
 TreeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 {
 	TRACE("TreeDirectory::GetNext\n");

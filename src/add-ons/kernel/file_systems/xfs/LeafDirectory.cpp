@@ -224,6 +224,15 @@ LeafDirectory::SearchAndFillDataMap(uint64 blockNo)
 
 
 status_t
+LeafDirectory::Rewind()
+{
+	fOffset = 0;
+	fCurBlockNumber = -1;
+	return B_OK;
+}
+
+
+status_t
 LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 {
 	TRACE("LeafDirectory::GetNext\n");

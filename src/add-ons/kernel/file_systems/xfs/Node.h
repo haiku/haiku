@@ -108,6 +108,7 @@ public:
 			uint32				GetOffsetFromAddress(uint32 address);
 			xfs_extnum_t		FirstLeafMapIndex();
 			int					EntrySize(int len) const;
+			status_t			Rewind();
 			status_t			GetNext(char* name, size_t* length,
 									xfs_ino_t* ino);
 			status_t			Lookup(const char* name, size_t length,

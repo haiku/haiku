@@ -110,6 +110,7 @@ public:
 								TreeDirectory(Inode* inode);
 								~TreeDirectory();
 			status_t			InitCheck();
+			status_t			Rewind();
 			status_t			GetNext(char* name, size_t* length,
 									xfs_ino_t* ino);
 			status_t			Lookup(const char* name, size_t length,

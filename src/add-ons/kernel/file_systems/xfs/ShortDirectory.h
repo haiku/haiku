@@ -61,6 +61,7 @@ public:
 			xfs_ino_t			GetIno(ShortFormInodeUnion* inum);
 			xfs_ino_t			GetEntryIno(ShortFormEntry* entry);
 			size_t				EntrySize(int namelen);
+			status_t			Rewind();
 			status_t			GetNext(char* name, size_t* length,
 									xfs_ino_t* ino);
 			status_t			Lookup(const char* name, size_t length,

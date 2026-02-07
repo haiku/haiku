@@ -23,6 +23,9 @@ public:
 			virtual	status_t			Lookup(const char* name, size_t length,
 											xfs_ino_t* id)								=	0;
 
+			virtual status_t			Rewind()										=	0;
+
+
 			static DirectoryIterator*	Init(Inode* inode);
 };
 

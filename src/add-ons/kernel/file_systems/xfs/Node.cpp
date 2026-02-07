@@ -253,6 +253,15 @@ NodeDirectory::SearchAndFillDataMap(uint64 blockNo)
 
 
 status_t
+NodeDirectory::Rewind()
+{
+	fOffset = 0;
+	fCurBlockNumber = -1;
+	return B_OK;
+}
+
+
+status_t
 NodeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 {
 	TRACE("NodeDirectory::GetNext\n");

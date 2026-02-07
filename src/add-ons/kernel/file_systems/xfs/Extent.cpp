@@ -150,6 +150,14 @@ Extent::EntrySize(int len) const
 
 
 status_t
+Extent::Rewind()
+{
+	fOffset = 0;
+	return B_OK;
+}
+
+
+status_t
 Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 {
 	TRACE("Extend::GetNext\n");
