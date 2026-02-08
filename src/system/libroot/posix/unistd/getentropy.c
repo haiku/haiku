@@ -5,27 +5,34 @@
 
 #include <unistd.h>
 
-#include <libroot/errno_private.h>
+#include <errno_private.h>
 #include <random_defs.h>
+#include <syscall_utils.h>
 #include <syscalls.h>
 
 
 int
 getentropy(void *buf, size_t buflen)
 {
-	status_t status;
-	struct random_get_entropy_args args;
-	args.buffer = buf;
-	args.length = buflen;
+	if (buflen > GETENTROPY_MAX)
+		RETURN_AND_SET_ERRNO(EINVAL);
 
-	status = _kern_generic_syscall(RANDOM_SYSCALLS, RANDOM_GET_ENTROPY,
-		&args, sizeof(args));
-	if (args.length < buflen)
-		status = EIO;
+	while (buflen > 0) {
+		status_t status;
+		struct random_get_entropy_args args;
+		args.buffer = buf;
+		args.length = buflen;
 
-	if (status < 0) {
-		__set_errno(status);
-		return -1;
+		status = _kern_generic_syscall(RANDOM_SYSCALLS, RANDOM_GET_ENTROPY,
+			&args, sizeof(args));
+		if (status == EINTR)
+			continue;
+		if (status < 0)
+			RETURN_AND_SET_ERRNO(status);
+
+		buf = (char*)buf + args.length;
+		buflen -= args.length;
 	}
+
 	return 0;
 }

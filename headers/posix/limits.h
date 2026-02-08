@@ -66,6 +66,8 @@
 
 #define	RE_DUP_MAX				(0x7fff)
 
+#define GETENTROPY_MAX			(256)
+
 #ifdef _XOPEN_SOURCE
 /* The XSI name for PAGESIZE, with extra underscore included. Only define if
  * _XOPEN_SOURCE was requested, otherwise it could conflict with the application.
