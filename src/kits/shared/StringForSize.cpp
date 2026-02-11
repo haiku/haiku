@@ -37,7 +37,7 @@ string_for_size(double size, char* string, size_t stringSize)
 	};
 
 	size_t index = 0;
-	while (index < B_COUNT_OF(kFormats) - 1 && size >= 1024.0) {
+	while (index < B_COUNT_OF(kFormats) - 1 && size >= 1000.0) {
 		size /= 1024.0;
 		index++;
 	}
