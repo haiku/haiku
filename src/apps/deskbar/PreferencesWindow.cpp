@@ -18,15 +18,16 @@
 #include <File.h>
 #include <FormattingConventions.h>
 #include <GroupLayout.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
-#include <LayoutBuilder.h>
 #include <OpenWithTracker.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <RadioButton.h>
 #include <Roster.h>
-#include <SeparatorView.h>
 #include <Screen.h>
+#include <SeparatorView.h>
 #include <Slider.h>
 #include <SpaceLayoutItem.h>
 #include <Spinner.h>
@@ -88,8 +89,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsIconSizeSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAppsIconSizeSlider->SetHashMarkCount((kMaximumIconSize - kMinimumIconSize)
 		/ kIconSizeInterval + 1);
-	fAppsIconSizeSlider->SetLimitLabels(B_TRANSLATE("Small"),
-		B_TRANSLATE("Large"));
+	fAppsIconSizeSlider->SetLimitLabels(B_TRANSLATE("Small"), B_TRANSLATE("Large"));
 	fAppsIconSizeSlider->SetModificationMessage(new BMessage(kResizeTeamIcons));
 
 	// Window controls
@@ -122,8 +122,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsShowExpanders->SetValue(fSettings.superExpando);
 	fAppsExpandNew->SetValue(fSettings.expandNewTeams);
 	fAppsHideLabels->SetValue(fSettings.hideLabels);
-	fAppsIconSizeSlider->SetValue(fSettings.iconSize
-		/ kIconSizeInterval);
+	fAppsIconSizeSlider->SetValue(fSettings.iconSize / kIconSizeInterval);
 
 	// Window settings
 	fWindowAlwaysOnTop->SetValue(fSettings.alwaysOnTop);
