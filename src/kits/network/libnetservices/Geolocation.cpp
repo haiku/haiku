@@ -126,7 +126,16 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 		return B_BAD_DATA;
 	}
 
+	// There are no API keys for BeaconDB, instead they ask to set a user agent identifying the
+	// software. Let's also include a contact address in case something goes wrong.
+	http->SetUserAgent("Haiku/R1 haiku-development@freelists.org");
+
 	http->SetMethod(B_HTTP_POST);
+
+	BHttpHeaders headers;
+	headers.AddHeader("Content-Type", "application/json");
+	http->SetHeaders(headers);
+
 	BMemoryIO* io = new BMemoryIO(query.String(), query.Length());
 	http->AdoptInputData(io, query.Length());
 
@@ -227,13 +236,11 @@ BGeolocation::Country(const float latitude, const float longitude,
 }
 
 
+const char* BGeolocation::kDefaultGeolocationService = "https://api.beacondb.net/v1/geolocate";
+
 #ifdef HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY
 
 #include "DefaultGeolocationServiceKey.h"
-
-const char* BGeolocation::kDefaultGeolocationService
-	= "https://location.services.mozilla.com/v1/geolocate?key="
-		DEFAULT_GEOLOCATION_SERVICE_KEY;
 
 const char* BGeolocation::kDefaultGeocodingService
 	= "https://secure.geonames.org/?username="
@@ -241,7 +248,6 @@ const char* BGeolocation::kDefaultGeocodingService
 
 #else
 
-const char* BGeolocation::kDefaultGeolocationService = "";
 const char* BGeolocation::kDefaultGeocodingService = "";
 
 #endif
