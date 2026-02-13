@@ -45,6 +45,7 @@ Application Mail :
 DoCatalogs Mail :
 	x-vnd.Be-MAIL
 	:
+	AddressTextControl.cpp
 	Content.cpp
 	Enclosures.cpp
 	FindWindow.cpp
@@ -54,6 +55,7 @@ DoCatalogs Mail :
 	MailPopUpMenu.cpp
 	MailWindow.cpp
 	Prefs.cpp
+	Settings.cpp
 	Signature.cpp
 	Status.cpp
 ;
