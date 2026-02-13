@@ -130,7 +130,7 @@ AddNewDriversToPackage disk scsi :
 	;
 AddNewDriversToPackage disk virtual :
 	ram_disk
-	virtio_block
+	#virtio_block
 	;
 AddNewDriversToPackage graphics :
 	virtio_gpu
@@ -347,7 +347,7 @@ AddBootModuleSymlinksToPackage
 	<usb>uhci
 	<usb>xhci
 	virtio
-	virtio_block
+	#virtio_block
 	virtio_mmio@riscv64,arm,arm64
 	virtio_pci
 	virtio_scsi
