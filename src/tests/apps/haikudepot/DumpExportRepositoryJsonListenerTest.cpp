@@ -1,12 +1,11 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "DumpExportRepositorySource.h"
-#include "DumpExportRepository.h"
 #include "DumpExportRepositoryJsonListener.h"
 #include "DumpExportRepositoryJsonListenerTest.h"
+#include "DumpExportRepositoryModel.h"
 
 #include <stdio.h>
 
@@ -124,7 +123,7 @@ public:
 							TestBulkContainerItemListener();
 		virtual				~TestBulkContainerItemListener();
 
-			bool			Handle(DumpExportRepository* item);
+			bool			Handle(DumpExportRepositoryRef item);
 			void			Complete();
 
 			BString			ConcatenatedCodes();
@@ -200,21 +199,15 @@ DumpExportRepositoryJsonListenerTest::TestSingle()
 	BPrivate::BJson::Parse(inputData, listener);
 // ----------------------
 
-	DumpExportRepository *repository = listener->Target();
-	ObjectDeleter<DumpExportRepository> repositoryDeleter(repository);
+	DumpExportRepositoryRef repository = listener->Result();
 
 	CPPUNIT_ASSERT_EQUAL(B_OK, listener->ErrorStatus());
 
-	CPPUNIT_ASSERT_EQUAL(
-		BString("haikuports"), *(repository->Code()));
-	CPPUNIT_ASSERT_EQUAL(
-		BString("HaikuPorts"), *(repository->Name()));
-	CPPUNIT_ASSERT_EQUAL(
-		BString("HaikuPorts is a centralized collection..."),
-		*(repository->Description()));
-	CPPUNIT_ASSERT_EQUAL(
-		BString("https://example.com"),
-		*(repository->InformationUrl()));
+	CPPUNIT_ASSERT_EQUAL(BString("haikuports"), repository->Code());
+	CPPUNIT_ASSERT_EQUAL(BString("HaikuPorts"), repository->Name());
+	CPPUNIT_ASSERT_EQUAL(BString("HaikuPorts is a centralized collection..."),
+		repository->Description());
+	CPPUNIT_ASSERT_EQUAL(BString("https://example.com"), repository->InformationUrl());
 	CPPUNIT_ASSERT_EQUAL(2, repository->CountRepositorySources());
 
 	DumpExportRepositorySource *source0 =
@@ -222,12 +215,12 @@ DumpExportRepositoryJsonListenerTest::TestSingle()
 	DumpExportRepositorySource *source1 =
 		repository->RepositorySourcesItemAt(1);
 
-	CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_64"), *(source0->Code()));
-	CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_64"), *(source0->Identifier()));
-	CPPUNIT_ASSERT_EQUAL(BString("zing"), *(source0->ExtraIdentifiersItemAt(0)));
+	CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_64"), source0->Code());
+	CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_64"), source0->Identifier());
+	CPPUNIT_ASSERT_EQUAL(BString("zing"), source0->ExtraIdentifiersItemAt(0));
 
-	CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_gcc2"), *(source1->Code()));
-	CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_gcc2"), *(source1->Identifier()));
+	CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_gcc2"), source1->Code());
+	CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_gcc2"), source1->Identifier());
 }
 
 
@@ -267,21 +260,20 @@ TestBulkContainerItemListener::~TestBulkContainerItemListener()
 */
 
 bool
-TestBulkContainerItemListener::Handle(DumpExportRepository* item)
+TestBulkContainerItemListener::Handle(DumpExportRepositoryRef item)
 {
 	int32 i;
 
 	if (!fConcatenatedCodes.IsEmpty())
 		fConcatenatedCodes.Append(" ");
 
-	fConcatenatedCodes.Append(item->Code()->String());
+	fConcatenatedCodes.Append(item->Code().String());
 
 	for (i = 0; i < item->CountRepositorySources(); i++) {
 		if (!fConcatenatedSourcesUrl.IsEmpty())
     		fConcatenatedSourcesUrl.Append(" ");
 
-		fConcatenatedSourcesUrl.Append(
-			item->RepositorySourcesItemAt(i)->Identifier()->String());
+		fConcatenatedSourcesUrl.Append(item->RepositorySourcesItemAt(i)->Identifier().String());
 	}
 
 	return true;

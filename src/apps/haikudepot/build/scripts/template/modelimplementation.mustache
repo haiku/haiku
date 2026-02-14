@@ -1,0 +1,325 @@
+/*
+ * Generated Model Object for {{outputfilename}}
+ */
+
+#include "{{outputheaderfile}}"{{#objects}}
+
+
+{{#propertyarray}}/*static*/ const uint16 {{cppname}}::k{{property.cppname}}Bitmask = {{cppbitmaskexpression}};
+{{/propertyarray}}
+
+
+{{cppname}}::{{cppname}}()
+    :
+    fHasValueBitmask(0),
+{{#propertyarray}}    {{property.cppmembername}}({{property.cppdefaultvalue}}){{^islast}},{{/islast}}
+{{/propertyarray}}{
+}
+
+
+{{cppname}}::{{cppname}}(const BMessage* from)
+    :
+    fHasValueBitmask(0)
+{
+{{#hasanylistproperties}}    bool arrayIsSet;
+    BString arrayItemKey;
+{{/hasanylistproperties}}
+{{#propertyarray}}{{#property.isstring}}    if (from->FindString("{{property.cppname}}", &{{property.cppmembername}}) == B_OK)
+        fHasValueBitmask |= k{{property.cppname}}Bitmask;
+{{/property.isstring}}{{#property.isboolean}}    if (from->FindBool("{{property.cppname}}", &{{property.cppmembername}}) == B_OK)
+         fHasValueBitmask |= k{{property.cppname}}Bitmask;
+{{/property.isboolean}}{{#property.isnumber}}    if (from->FindDouble("{{property.cppname}}", &{{property.cppmembername}}) == B_OK)
+         fHasValueBitmask |= k{{property.cppname}}Bitmask;
+{{/property.isnumber}}{{#property.isinteger}}    if (from->FindInt64("{{property.cppname}}", &{{property.cppmembername}}) == B_OK)
+         fHasValueBitmask |= k{{property.cppname}}Bitmask;
+{{/property.isinteger}}{{#property.isobject}}    {
+        BMessage objectMessage;
+        if (from->FindMessage("{{property.cppname}}", &objectMessage) == B_OK) {
+            {{property.cpptyperaw}}* object = new {{property.cpptyperaw}}(&objectMessage);
+            {{property.cppmembername}} = {{property.cpptyperaw}}(object, true);
+            fHasValueBitmask |= k{{property.cppname}}Bitmask;
+        }
+    }
+{{/property.isobject}}{{#property.isarray}}    if (from->FindBool("{{property.cppname}}_isSet", &arrayIsSet) == B_OK && arrayIsSet) {
+        status_t arrayItemFindResult = B_OK;
+
+        for (int32 i = 0; arrayItemFindResult == B_OK; i++) {
+            arrayItemKey.SetToFormat("{{property.cppname}}_%" B_PRId32, i);
+{{#property.items.isstring}}            BString arrayItemString;
+            arrayItemFindResult = from->FindString(arrayItemKey, &arrayItemString);
+            if (arrayItemFindResult == B_OK)
+                {{property.cppmembername}}.push_back(arrayItemString);
+{{/property.items.isstring}}{{^property.items.isstring}}            BMessage arrayItemMessage;
+            arrayItemFindResult = from->FindMessage(arrayItemKey, &arrayItemMessage);
+            if (arrayItemFindResult == B_OK) {
+                {{property.items.cpptyperaw}}* arrayItemObject = new {{property.items.cpptyperaw}}(&arrayItemMessage);
+                {{property.cppmembername}}.push_back({{property.items.cpptype}}(arrayItemObject, true));
+            }
+{{/property.items.isstring}}        }
+    }
+{{/property.isarray}}{{/propertyarray}}
+}
+
+
+{{cppname}}::~{{cppname}}()
+{
+}
+
+
+bool
+{{cppname}}::operator==(const {{cppname}}& other) const
+{
+    if (fHasValueBitmask != other.fHasValueBitmask)
+        return false;
+{{#propertyarray}}{{#property.iscppscalartype}}    if (0 != (fHasValueBitmask & k{{property.cppname}}Bitmask) && {{property.cppmembername}} != other.{{property.cppmembername}})
+        return false;
+{{/property.iscppscalartype}}{{/propertyarray}}{{#propertyarray}}{{#property.isstring}}    if (0 != (fHasValueBitmask & k{{property.cppname}}Bitmask) && {{property.cppmembername}} != other.{{property.cppmembername}})
+        return false;
+{{/property.isstring}}{{/propertyarray}}{{#propertyarray}}{{#property.isobject}}    if (0 != (fHasValueBitmask & k{{property.cppname}}Bitmask) && *({{property.cppmembername}}.Get()) != *(other.{{property.cppmembername}}.Get())
+        return false;
+{{/property.isobject}}{{/propertyarray}}{{#propertyarray}}{{#property.isarray}}    if (0 != (fHasValueBitmask & k{{property.cppname}}Bitmask)) {
+        if ({{property.cppmembername}}.size() != other.{{property.cppmembername}}.size())
+            return false;
+        for (int32 i = {{property.cppmembername}}.size() - 1; i >= 0; i--) {
+{{#property.items.isobject}}            if (*({{property.cppmembername}}[i].Get()) != *(other.{{property.cppmembername}}[i].Get()))
+                return false;
+{{/property.items.isobject}}{{^property.items.isobject}}            if ({{property.cppmembername}}[i] != other.{{property.cppmembername}}[i])
+                return false;
+{{/property.items.isobject}}
+        }
+    }
+{{/property.isarray}}{{/propertyarray}}
+    return true;
+}
+
+
+bool
+{{cppname}}::operator!=(const {{cppname}}& other) const
+{
+	return !(*this == other);
+}
+
+
+{{#propertyarray}}void
+{{#property.iscppscalartype}}{{cppname}}::_Set{{property.cppname}}({{property.cpptype}} value)
+{{/property.iscppscalartype}}{{^property.iscppscalartype}}{{cppname}}::_Set{{property.cppname}}(const {{property.cpptype}}& value)
+{{/property.iscppscalartype}}{
+{{#property.isobject}}    if (!{{property.cpptype}}.IsSet())
+        fHasValueBitmask &= ~k{{property.cppname}}Bitmask;
+    else
+        fHasValueBitmask |= k{{property.cppname}}Bitmask;
+{{/property.isobject}}{{^property.isobject}}    fHasValueBitmask |= k{{property.cppname}}Bitmask;
+{{/property.isobject}}    {{property.cppmembername}} = value;
+}
+
+
+void
+{{cppname}}::_Unset{{property.cppname}}()
+{
+    fHasValueBitmask &= ~k{{property.cppname}}Bitmask;
+    {{property.cppmembername}} = {{property.cppdefaultvalue}};
+}
+
+
+bool
+{{cppname}}::IsSet{{property.cppname}}() const
+{
+    return 0 != (fHasValueBitmask & k{{property.cppname}}Bitmask);
+}
+
+
+{{#property.isarray}}void
+{{cppname}}::_AddTo{{property.cppname}}(const {{property.items.cpptype}}& value)
+{
+{{#property.items.isobject}}    if (!value.IsSet()) {
+        debugger("attempt to inset an unset object into an array field [{{property.cppmembername}}] of [{{cppobjectname}}]");
+        return;
+    }
+{{/property.items.isobject}}    fHasValueBitmask |= k{{property.cppname}}Bitmask;
+    {{property.cppmembername}}.push_back(value);
+}
+
+
+const {{property.cpptype}}
+{{cppname}}::{{property.cppname}}() const
+{
+    return {{property.cppmembername}};
+}
+
+
+int32
+{{cppname}}::Count{{property.cppname}}() const
+{
+    return {{property.cppmembername}}.size();
+}
+
+
+const {{property.items.cpptype}}&
+{{cppname}}::{{property.cppname}}ItemAt(int32 index) const
+{
+    return {{property.cppmembername}}[index];
+}
+
+
+{{/property.isarray}}{{^property.isarray}}{{#property.iscppscalartype}}{{property.cpptype}}
+{{cppname}}::{{property.cppname}}() const
+{{/property.iscppscalartype}}{{^property.iscppscalartype}}const {{property.cpptype}}&
+{{cppname}}::{{property.cppname}}() const
+{{/property.iscppscalartype}}{
+    return {{property.cppmembername}};
+}
+
+
+{{/property.isarray}}{{/propertyarray}}
+status_t
+{{cppname}}::Archive(BMessage* into, bool deep) const
+{
+{{#hasanylistproperties}}    BString arrayItemKey;{{/hasanylistproperties}}
+    status_t result = B_OK;
+
+{{#propertyarray}}{{#property.isstring}}    if (result == B_OK && 0 != (fHasValueBitmask & k{{property.cppname}}Bitmask))
+        result = into->AddString("{{property.cppname}}", {{property.cppmembername}});
+{{/property.isstring}}{{#property.isboolean}}    if (result == B_OK && 0 != (fHasValueBitmask & k{{property.cppname}}Bitmask))
+        result = into->AddBool("{{property.cppname}}", {{property.cppmembername}});
+{{/property.isboolean}}{{#property.isnumber}}    if (result == B_OK && 0 != (fHasValueBitmask & k{{property.cppname}}Bitmask))
+        result = into->AddDouble("{{property.cppname}}", {{property.cppmembername}});
+{{/property.isnumber}}{{#property.isinteger}}    if (result == B_OK && 0 != (fHasValueBitmask & k{{property.cppname}}Bitmask))
+        result = into->AddInt64("{{property.cppname}}", {{property.cppmembername}});
+{{/property.isinteger}}{{#property.isobject}}    if (deep && result == B_OK && 0 != (fHasValueBitmask & k{{property.cppname}}Bitmask && {{property.cppmembername}}.IsSet())) {
+        BMessage objectMessage;
+        result = {{property.cppmembername}}->Archive(&objectMessage, deep);
+        if (result == B_OK)
+            result = into->AddMessage("{{property.cppname}}", &objectMessage);
+    }
+{{/property.isobject}}{{#property.isarray}}    if (deep && result == B_OK && 0 != (fHasValueBitmask & k{{property.cppname}}Bitmask)) {
+        for (int32 i = Count{{property.cppname}}() - 1; result == B_OK && i >= 0; i--) {
+            arrayItemKey.SetToFormat("%s_%" B_PRId32, "{{property.cppname}}", i);
+{{#property.items.isstring}}            result = into->AddString(arrayItemKey, {{property.cppname}}ItemAt(i));
+{{/property.items.isstring}}{{#property.items.isobject}}            BMessage arrayItemMessage;
+            result = {{property.cppname}}ItemAt(i)->Archive(&arrayItemMessage, deep);
+            if (result == B_OK)
+                result = into->AddMessage(arrayItemKey, &arrayItemMessage);
+{{/property.items.isobject}}        }
+        if (result == B_OK)
+            result = into->AddBool("{{property.cppname}}_isSet", true);
+    }
+{{/property.isarray}}
+{{/propertyarray}}    return result;
+}
+
+
+{{cppname}}Builder::{{cppname}}Builder()
+    :
+    fHasValueBitmask(0),
+    fSourceRef(),
+{{#propertyarray}}    {{property.cppmembername}}({{property.cppdefaultvalue}}){{^islast}},
+{{/islast}}{{/propertyarray}}
+{
+}
+
+
+{{cppname}}Builder::{{cppname}}Builder(const {{cppname}}Ref& source)
+    :
+    fHasValueBitmask(0),
+    fSourceRef(source),
+{{#propertyarray}}    {{property.cppmembername}}({{property.cppdefaultvalue}}){{^islast}},
+{{/islast}}{{/propertyarray}}
+{
+}
+
+
+{{cppname}}Builder::~{{cppname}}Builder()
+{
+}
+
+
+void
+{{cppname}}Builder::_InitFromSource()
+{
+    if (fSourceRef.IsSet()) {
+        _Init(fSourceRef.Get());
+        fSourceRef.Unset();
+    }
+}
+
+
+void
+{{cppname}}Builder::_Init(const {{cppname}}* source)
+{
+{{#propertyarray}}    if (source->IsSet{{property.cppname}}()) {
+        fHasValueBitmask |= {{cppobjectname}}::k{{property.cppname}}Bitmask;
+        {{property.cppmembername}} = source->{{property.cppname}}();
+    }
+{{/propertyarray}}
+}
+
+
+{{#propertyarray}}{{#property.isarray}}{{cppname}}Builder&
+{{cppname}}Builder::AddTo{{property.cppname}}({{property.items.cpptype}} value)
+{
+{{#property.items.isstring}}    _InitFromSource();
+    fHasValueBitmask |= {{cppobjectname}}::k{{property.cppname}}Bitmask;
+    {{property.cppmembername}}.push_back(value);
+{{/property.items.isstring}}{{#property.items.isobject}}    if (!value.IsSet()) {
+        debugger("value for [{{property.cppname}}] in class [{{cppname}}Builder}}] is unset");
+    } else {
+        _InitFromSource();
+        fHasValueBitmask |= {{cppobjectname}}::k{{property.cppname}}Bitmask;
+        {{property.cppmembername}}.push_back(value);
+    }
+{{/property.items.isobject}}
+    return *this;
+}
+{{/property.isarray}}
+
+{{cppname}}Builder&
+{{cppname}}Builder::With{{property.cppname}}({{property.cpptype}} value)
+{
+{{#property.isobject}}    if (!value->IsSet())
+        return Without{{property.cppname}}();
+{{/property.isobject}}    if (!fSourceRef.IsSet() || !fSourceRef->IsSet{{property.cppname}}() || fSourceRef->{{property.cppname}}() != value) {
+        _InitFromSource();
+        fHasValueBitmask |= {{cppobjectname}}::k{{property.cppname}}Bitmask;
+        {{property.cppmembername}} = value;
+    }
+    return *this;
+}
+
+
+{{cppname}}Builder&
+{{cppname}}Builder::Without{{property.cppname}}()
+{
+    if (!fSourceRef.IsSet() || fSourceRef->IsSet{{property.cppname}}()) {
+        _InitFromSource();
+        fHasValueBitmask &= ~{{cppobjectname}}::k{{property.cppname}}Bitmask;
+        {{property.cppmembername}} = {{property.cppdefaultvalue}};
+    }
+    return *this;
+}
+{{/propertyarray}}
+
+{{cppname}}Ref
+{{cppname}}Builder::BuildRef()
+{
+    if (fSourceRef.IsSet())
+        return fSourceRef;
+
+    {{cppname}}* result = new {{cppname}}();
+
+{{#propertyarray}}    if (0 != (fHasValueBitmask & {{cppobjectname}}::k{{property.cppname}}Bitmask))
+        result->_Set{{property.cppname}}({{property.cppmembername}});
+{{/propertyarray}}
+    return {{cppname}}Ref(result, true);
+}
+
+
+/*! Sets the builder as if it had no values set. Even if it was initialized
+    with an existing object, it will be reset with no values.
+*/
+{{cppname}}Builder&
+{{cppname}}Builder::Clear()
+{
+    fHasValueBitmask = 0;
+    fSourceRef.Unset();
+    return *this;
+}{{/objects}}

@@ -1,0 +1,125 @@
+# =====================================
+# Copyright 2019-2026, Andrew Lindesay
+# Distributed under the terms of the MIT License.
+# =====================================
+
+# HaikuDepotServer has a number of data-transfer-objects (DTO) that are defined
+# by JSON schemas.  The server uses these schemas to produce the objects at
+# compile time.  Likewise, the schema files also generate C++ side DTO model
+# objects in the form of .cpp and .h files as well.  This way the
+# HaikuDepotServer server and HaikuDepot desktop application are able to
+# communicate more 'safely'.  The schema files still need to be copied from
+# the server source to the Haiku source, but the generation process will ensure
+# that the data-structures are consistent.
+#
+# The C++ side classes are generated with python scripts that are included in
+# the Haiku source.  These rules and actions take care of making sure that the
+# python scripts are run when necessary to generate the C++ side classes.  Note
+# that there are two sorts of classes generated here; the model DTO objects and
+# also the supporting classes that parse the DTO objects.  The parsing classes
+# are intended to be used with Haiku JSON parsing systems.
+
+# =====================================
+# pragma mark - Generic
+
+actions JsonSchemaGenTouch
+{
+	touch $(1)
+}
+
+# Because a number of .cpp and .h files will be generated from a single python
+# script's run, it is necessary to introduce a dependency between the known
+# output files and the target for a given python script run.
+
+# 1 : generated files (.h and .cpp)
+# 2 : target directory generated files will be placed in
+# 3 : target that will generate the generated files (dummy file)
+
+rule JsonSchemaGenAppSrcDependsOnGeneration {
+	local generatedFiles = $(1) ;
+	local targetDirectory = $(2) ;
+	local dummy = $(3) ;
+
+	MakeLocate $(generatedFiles) : $(targetDirectory) ;
+	MkDir1 $(targetDirectory) ;
+	Depends $(generatedFiles) : $(targetDirectory) $(dummy) ;
+	Clean clean : $(generatedFiles) ;
+
+	# just in case the dummy file ends up being newer than the generated
+	# sources, update the modified timestamp on the generated files.
+	JsonSchemaGenTouch $(generatedFiles) ;
+}
+
+# =====================================
+# pragma mark - Model Class Generation
+
+# This section is responsible for generation of .h and .cpp files which
+# represent the data model described in the supplied JSON schema file. These
+# files do not include parsers.
+#
+# A dummy file is used as a dependency item which then has the two generated
+# file as it's dependency. This approach avoids complications around the
+# generated target being two files rather than one.
+
+# 1 : the dummy file in the class generation directory (target)
+# 2 : the JSON schema file
+
+rule JsonSchemaGenModel
+{
+	local dummy = $(1) ;
+	local schema = $(2) ;
+
+	local script = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts jsonschema2cppmodel.py ] ;
+	local commonScript = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts jsonschemacommon.py ] ;
+	local headerTemplate = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts template modelheader.mustache ] ;
+	local implementationTemplate = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts template modelimplementation.mustache ] ;
+
+	MkDir1 $(dummy:D) ;
+	CleanDir clean : $(dummy:D) ;
+	Depends $(dummy) : $(schema) $(script) $(commonScript) $(headerTemplate) $(implementationTemplate) $(dummy:D) ;
+	JsonSchemaGenModel1 $(dummy) : $(schema) $(script) $(dummy:D) ;
+}
+
+actions JsonSchemaGenModel1
+{
+	$(HOST_PYTHON) $(2[2]) --jsonschemafile $(2[1]) --outputdirectory $(2[3])
+	touch $(1)
+}
+
+# =====================================
+# pragma mark - Parsing Class Generation
+
+# This section is responsible for generation of .h and .cpp files which
+# represent a listener that is intended for use with the `BJson` class to
+# parse JSON data according to a supplied JSON Schema model. The C++
+# representation of the schema as a model must be also generated with
+# `JsonSchemaGenModel`.
+#
+# A dummy file is used as a dependency item which then has the two generated
+# file as it's dependency. This approach avoids complications around the
+# generated target being two files rather than one.
+
+# 1 : the dummy file in the class generation directory (target)
+# 2 : the JSON schema file
+
+rule JsonSchemaGenParser
+{
+	local dummy = $(1) ;
+	local schema = $(2) ;
+
+	local script = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts jsonschema2cppparser.py ] ;
+	local commonScript = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts jsonschemacommon.py ] ;
+	local headerTemplate = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts template modelheader.mustache ] ;
+	local implementationTemplate = [ FDirName $(HAIKU_TOP) src apps haikudepot build scripts template modelimplementation.mustache ] ;
+
+	MkDir1 $(dummy:D) ;
+	CleanDir clean : $(dummy:D) ;
+	Depends $(dummy) : $(schema) $(script) $(commonScript) $(headerTemplate) $(implementationTemplate) $(dummy:D) ;
+	JsonSchemaGenParser1 $(dummy) : $(schema) $(script) $(dummy:D) ;
+}
+
+actions JsonSchemaGenParser1
+{
+	$(HOST_PYTHON) $(2[2]) --jsonschemafile $(2[1]) --outputdirectory $(2[3])
+	touch $(1)
+}

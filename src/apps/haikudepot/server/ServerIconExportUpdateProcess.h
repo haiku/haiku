@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SERVER_ICON_EXPORT_UPDATE_PROCESS_H
@@ -13,9 +13,6 @@
 
 #include "AbstractSingleFileServerProcess.h"
 #include "Model.h"
-
-
-class DumpExportPkg;
 
 
 class ServerIconExportUpdateProcess : public AbstractSingleFileServerProcess {

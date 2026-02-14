@@ -1,0 +1,916 @@
+/*
+ * Generated Listener Object for {{outputfilename}}
+ */
+
+#include "{{toplevel.cppname}}JsonListener.h"
+
+#include <ObjectList.h>
+
+#include <stdio.h>
+
+// #pragma mark - private interfaces for the stacked listeners
+
+
+/*! This class is the top level of the stacked listeners.  The stack structure
+    is maintained in a linked list and sub-classes implement specific behaviors
+    depending where in the parse tree the stacked listener is working at.
+*/
+class _AbstractStacked{{toplevel.cppname}}JsonListener : public BJsonEventListener {
+public:
+    _AbstractStacked{{toplevel.cppname}}JsonListener(
+        AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+        _AbstractStacked{{toplevel.cppname}}JsonListener* parent);
+    ~_AbstractStacked{{toplevel.cppname}}JsonListener();
+
+    void HandleError(status_t status, int32 line, const char* message);
+    void Complete();
+
+    status_t ErrorStatus();
+
+    _AbstractStacked{{toplevel.cppname}}JsonListener* Parent();
+
+    virtual bool WillPop();
+
+    virtual void Clear();
+
+protected:
+    AbstractMain{{toplevel.cppname}}JsonListener* fMainListener;
+
+    virtual bool Pop();
+
+    void Push(_AbstractStacked{{toplevel.cppname}}JsonListener* stackedListener);
+
+private:
+    _AbstractStacked{{toplevel.cppname}}JsonListener* fParent;
+};
+
+
+/*! This implementation of the listener will consume data from the array and
+    discard it.
+*/
+class _GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener : public _AbstractStacked{{toplevel.cppname}}JsonListener {
+public:
+    _GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener(
+        AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+        _AbstractStacked{{toplevel.cppname}}JsonListener* parent);
+    ~_GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener();
+
+    bool Handle(const BJsonEvent& event);
+};
+
+
+class _GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener : public _AbstractStacked{{toplevel.cppname}}JsonListener {
+public:
+    _GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener(
+        AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+        _AbstractStacked{{toplevel.cppname}}JsonListener* parent);
+    ~_GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener();
+
+    bool Handle(const BJsonEvent& event);
+};
+
+
+/*! Sometimes attributes of objects are able to be arrays of strings.  This
+    listener will parse and return the array of strings.
+*/
+
+class _StringListStacked{{toplevel.cppname}}JsonListener : public _AbstractStacked{{toplevel.cppname}}JsonListener {
+public:
+    _StringListStacked{{toplevel.cppname}}JsonListener(
+        bool (*callback)(void* context, const std::vector<BString>& values),
+        void* callbackContext,
+        AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+        _AbstractStacked{{toplevel.cppname}}JsonListener* parent);
+    ~_StringListStacked{{toplevel.cppname}}JsonListener();
+
+    bool Handle(const BJsonEvent& event);
+
+    void Clear();
+
+protected:
+    bool Pop();
+
+protected:
+    std::vector<BString> fAccumulator;
+    bool (*fCallback)(void* context, const std::vector<BString>& values);
+    void* fCallbackContext;
+};
+{{#allobjs}}
+
+class _{{cppname}}Stacked{{toplevelcppname}}JsonListener : public _AbstractStacked{{toplevelcppname}}JsonListener {
+public:
+    _{{cppname}}Stacked{{toplevelcppname}}JsonListener(
+        bool (*callback)(void* context, const {{cppname}}Ref ref),
+        void* callbackContext,
+        AbstractMain{{toplevelcppname}}JsonListener* mainListener,
+        _AbstractStacked{{toplevelcppname}}JsonListener* parent);
+    ~_{{cppname}}Stacked{{toplevelcppname}}JsonListener();
+
+    bool Handle(const BJsonEvent& event);
+
+    void Clear();
+
+{{#propertyarray}}{{#property.isobject}}    static bool With{{property.cppname}}Callback(void* context, const {{property.cpptype}} value);
+{{/property.isobject}}{{#property.isarray}}    static bool With{{property.cppname}}Callback(void* context, const {{property.cpptype}}& value);
+{{/property.isarray}}{{/propertyarray}}
+
+protected:
+    bool Pop();
+
+protected:
+    {{cppname}}Builder fBuilder;
+    uint16 fNextItemBitmask;
+    bool (*fCallback)(void* context, const {{cppname}}Ref ref);
+    void* fCallbackContext;
+};
+
+class _{{cppname}}ListStacked{{toplevelcppname}}JsonListener : public _AbstractStacked{{toplevelcppname}}JsonListener {
+public:
+    _{{cppname}}ListStacked{{toplevelcppname}}JsonListener(
+        bool (*callback)(void* context, const std::vector<{{cppname}}Ref>& values),
+        void* callbackContext,
+        AbstractMain{{toplevelcppname}}JsonListener* mainListener,
+        _AbstractStacked{{toplevelcppname}}JsonListener* parent);
+    ~_{{cppname}}ListStacked{{toplevelcppname}}JsonListener();
+
+    bool Handle(const BJsonEvent& event);
+
+    void Clear();
+
+    static bool AddItemCallback(void* target, const {{cppname}}Ref value);
+
+protected:
+    bool Pop();
+
+private:
+    std::vector<{{cppname}}Ref> fAccumulator;
+    bool (*fCallback)(void* context, const std::vector<{{cppname}}Ref>& values);
+    void* fCallbackContext;
+};
+{{/allobjs}}
+
+
+class _BulkContainerStacked{{toplevel.cppname}}JsonListener : public _AbstractStacked{{toplevel.cppname}}JsonListener {
+public:
+    _BulkContainerStacked{{toplevel.cppname}}JsonListener(
+        AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+        _AbstractStacked{{toplevel.cppname}}JsonListener* parent,
+        {{toplevel.cppname}}Listener* itemListener);
+    ~_BulkContainerStacked{{toplevel.cppname}}JsonListener();
+
+    bool Handle(const BJsonEvent& event);
+
+    void Clear();
+
+private:
+    bool fNextItemIsItems;
+    {{toplevel.cppname}}Listener* fItemListener;
+};
+
+
+class _BulkContainerItemsStacked{{toplevel.cppname}}JsonListener : public _AbstractStacked{{toplevel.cppname}}JsonListener {
+public:
+    _BulkContainerItemsStacked{{toplevel.cppname}}JsonListener(
+        AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+        _AbstractStacked{{toplevel.cppname}}JsonListener* parent,
+        {{toplevel.cppname}}Listener* itemListener);
+    ~_BulkContainerItemsStacked{{toplevel.cppname}}JsonListener();
+
+    bool Handle(const BJsonEvent& event);
+    bool WillPop();
+
+    static bool NotifyListenerCallback(void* context, const {{toplevel.cppname}}Ref value);
+
+private:
+    {{toplevel.cppname}}Listener* fItemListener;
+};
+
+
+// #pragma mark - implementations for the stacked listeners
+
+
+_AbstractStacked{{toplevel.cppname}}JsonListener::_AbstractStacked{{toplevel.cppname}}JsonListener (
+    AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+    _AbstractStacked{{toplevel.cppname}}JsonListener* parent)
+{
+    fMainListener = mainListener;
+    fParent = parent;
+}
+
+
+_AbstractStacked{{toplevel.cppname}}JsonListener::~_AbstractStacked{{toplevel.cppname}}JsonListener()
+{
+}
+
+
+void
+_AbstractStacked{{toplevel.cppname}}JsonListener::HandleError(status_t status, int32 line, const char* message)
+{
+    fMainListener->HandleError(status, line, message);
+}
+
+
+void
+_AbstractStacked{{toplevel.cppname}}JsonListener::Complete()
+{
+   fMainListener->Complete();
+}
+
+
+status_t
+_AbstractStacked{{toplevel.cppname}}JsonListener::ErrorStatus()
+{
+    return fMainListener->ErrorStatus();
+}
+
+
+_AbstractStacked{{toplevel.cppname}}JsonListener*
+_AbstractStacked{{toplevel.cppname}}JsonListener::Parent()
+{
+    return fParent;
+}
+
+
+void
+_AbstractStacked{{toplevel.cppname}}JsonListener::Push(_AbstractStacked{{toplevel.cppname}}JsonListener* stackedListener)
+{
+    fMainListener->SetStackedListener(stackedListener);
+}
+
+
+bool
+_AbstractStacked{{toplevel.cppname}}JsonListener::WillPop()
+{
+    return true;
+}
+
+
+bool
+_AbstractStacked{{toplevel.cppname}}JsonListener::Pop()
+{
+    bool result = WillPop();
+    fMainListener->SetStackedListener(fParent);
+    return result;
+}
+
+
+void
+_AbstractStacked{{toplevel.cppname}}JsonListener::Clear()
+{
+}
+
+
+_GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener::_GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener(
+    AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+    _AbstractStacked{{toplevel.cppname}}JsonListener* parent)
+    :
+    _AbstractStacked{{toplevel.cppname}}JsonListener(mainListener, parent)
+{
+}
+
+_GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener::~_GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener()
+{
+}
+
+bool
+_GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    switch (event.EventType()) {
+        case B_JSON_OBJECT_NAME:
+        case B_JSON_NUMBER:
+        case B_JSON_STRING:
+        case B_JSON_TRUE:
+        case B_JSON_FALSE:
+        case B_JSON_NULL:
+            // ignore
+            break;
+        case B_JSON_OBJECT_START:
+            Push(new _GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener(fMainListener, this));
+            break;
+        case B_JSON_ARRAY_START:
+            Push(new _GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener(fMainListener, this));
+            break;
+        case B_JSON_ARRAY_END:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected end of array");
+            break;
+        case B_JSON_OBJECT_END:
+        {
+            bool status = Pop() && (ErrorStatus() == B_OK);
+            delete this;
+            return status;
+        }
+    }
+
+    return ErrorStatus() == B_OK;
+}
+
+_GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener::_GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener(
+    AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+    _AbstractStacked{{toplevel.cppname}}JsonListener* parent)
+    :
+    _AbstractStacked{{toplevel.cppname}}JsonListener(mainListener, parent)
+{
+}
+
+_GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener::~_GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener()
+{
+}
+
+bool
+_GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    switch (event.EventType()) {
+        case B_JSON_OBJECT_NAME:
+        case B_JSON_NUMBER:
+        case B_JSON_STRING:
+        case B_JSON_TRUE:
+        case B_JSON_FALSE:
+        case B_JSON_NULL:
+            // ignore
+            break;
+        case B_JSON_OBJECT_START:
+            Push(new _GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener(fMainListener, this));
+            break;
+        case B_JSON_ARRAY_START:
+            Push(new _GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener(fMainListener, this));
+            break;
+        case B_JSON_OBJECT_END:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected end of object");
+            break;
+        case B_JSON_ARRAY_END:
+        {
+            bool status = Pop() && (ErrorStatus() == B_OK);
+            delete this;
+            return status;
+        }
+    }
+
+
+    return ErrorStatus() == B_OK;
+}
+
+_StringListStacked{{toplevel.cppname}}JsonListener::_StringListStacked{{toplevel.cppname}}JsonListener(
+    bool (*callback)(void* context, const std::vector<BString>& values),
+    void* callbackContext,
+    AbstractMain{{toplevel.cppname}}JsonListener* mainListener,
+    _AbstractStacked{{toplevel.cppname}}JsonListener* parent)
+    :
+    _AbstractStacked{{toplevel.cppname}}JsonListener(mainListener, parent),
+    fAccumulator(),
+    fCallback(callback),
+    fCallbackContext(callbackContext)
+{
+}
+
+
+_StringListStacked{{toplevel.cppname}}JsonListener::~_StringListStacked{{toplevel.cppname}}JsonListener()
+{
+}
+
+
+bool
+_StringListStacked{{toplevel.cppname}}JsonListener::Pop()
+{
+    bool callbackResult = fCallback(fCallbackContext, fAccumulator);
+    return _AbstractStacked{{toplevel.cppname}}JsonListener::Pop() && callbackResult;
+}
+
+
+void
+_StringListStacked{{toplevel.cppname}}JsonListener::Clear()
+{
+    _AbstractStacked{{toplevel.cppname}}JsonListener::Clear();
+    fAccumulator.clear();
+}
+
+
+bool
+_StringListStacked{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    switch (event.EventType()) {
+        case B_JSON_ARRAY_END:
+        {
+            bool status = Pop() && (ErrorStatus() == B_OK);
+            delete this;
+            return status;
+        }
+        case B_JSON_STRING:
+        {
+            fAccumulator.push_back(event.Content());
+            break;
+        }
+        default:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
+                "illegal state - unexpected json event parsing a string array");
+            break;
+    }
+
+    return ErrorStatus() == B_OK;
+}
+
+{{#allobjs}}
+_{{cppname}}Stacked{{toplevelcppname}}JsonListener::_{{cppname}}Stacked{{toplevelcppname}}JsonListener(
+    bool (*callback)(void* context, const {{cppname}}Ref ref),
+    void* callbackContext,
+    AbstractMain{{toplevelcppname}}JsonListener* mainListener,
+    _AbstractStacked{{toplevelcppname}}JsonListener* parent)
+    :
+    _AbstractStacked{{toplevelcppname}}JsonListener(mainListener, parent),
+    fBuilder(),
+    fCallback(callback),
+    fCallbackContext(callbackContext)
+{
+}
+
+
+_{{cppname}}Stacked{{toplevelcppname}}JsonListener::~_{{cppname}}Stacked{{toplevelcppname}}JsonListener()
+{
+}
+
+
+bool
+_{{cppname}}Stacked{{toplevelcppname}}JsonListener::Pop()
+{
+    bool callbackResult = fCallback(fCallbackContext, fBuilder.BuildRef());
+    return _AbstractStacked{{toplevelcppname}}JsonListener::Pop() && callbackResult;
+}
+{{#propertyarray}}{{#property.isobject}}
+/*static*/ bool
+_{{cppname}}Stacked{{toplevelcppname}}JsonListener::With{{property.cppname}}Callback(void* context, const {{property.cpptype}} value)
+{{/property.isobject}}{{#property.isarray}}/*static*/ bool
+_{{cppname}}Stacked{{toplevelcppname}}JsonListener::With{{property.cppname}}Callback(void* context, const {{property.cpptype}}& value)
+{{/property.isarray}}{{#property.isobjectorarray}}{
+    {{cppname}}Builder* builder = static_cast<{{cppname}}Builder*>(context);
+    builder->With{{property.cppname}}(value);
+    return true;
+}
+{{/property.isobjectorarray}}{{/propertyarray}}
+
+
+void
+_{{cppname}}Stacked{{toplevelcppname}}JsonListener::Clear()
+{
+    _AbstractStacked{{toplevel.cppname}}JsonListener::Clear();
+    fBuilder.Clear();
+    fNextItemBitmask = 0;
+}
+
+
+bool
+_{{cppname}}Stacked{{toplevelcppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    switch (event.EventType()) {
+        case B_JSON_ARRAY_END:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected start of array");
+            break;
+        case B_JSON_OBJECT_NAME:
+            fNextItemBitmask = 0;
+{{#propertyarray}}            if (0 == strcmp(event.Content(), "{{name}}"))
+                fNextItemBitmask = {{cppobjectname}}::k{{property.cppname}}Bitmask;
+{{/propertyarray}}
+            break;
+        case B_JSON_OBJECT_END:
+        {
+            bool status = Pop() && (ErrorStatus() == B_OK);
+            delete this;
+            return status;
+        }
+        case B_JSON_STRING:
+        {
+{{#propertyarray}}{{#property.isstring}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
+                fBuilder.With{{property.cppname}}(event.Content());
+{{/property.isstring}}{{/propertyarray}}
+            fNextItemBitmask = 0;
+            break;
+        }
+        case B_JSON_TRUE:
+{{#propertyarray}}{{#property.isboolean}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
+                fBuilder.With{{property.cppname}}(true);
+{{/property.isboolean}}{{/propertyarray}}
+            fNextItemBitmask = 0;
+            break;
+        case B_JSON_FALSE:
+{{#propertyarray}}{{#property.isboolean}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
+                fBuilder.With{{property.cppname}}(false);
+{{/property.isboolean}}
+{{/propertyarray}}
+            fNextItemBitmask = 0;
+            break;
+        case B_JSON_NULL:
+        {
+{{#propertyarray}}{{^property.isarray}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
+                fBuilder.Without{{property.cppname}}();
+{{/property.isarray}}{{/propertyarray}}
+            fNextItemBitmask = 0;
+            break;
+        }
+        case B_JSON_NUMBER:
+        {
+{{#propertyarray}}{{#property.isinteger}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
+                fBuilder.With{{property.cppname}}(event.ContentInteger());
+{{/property.isinteger}}
+{{#property.isnumber}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
+                fBuilder.With{{property.cppname}}(event.ContentDouble());
+{{/property.isnumber}}
+{{/propertyarray}}
+            fNextItemBitmask = 0;
+            break;
+        }
+        case B_JSON_OBJECT_START:
+        {
+{{#propertyarray}}{{#property.isobject}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask) {
+                _GeneralNoOpObjectStacked{{toplevelcppname}}JsonListener* nextListener
+                    = new _GeneralNoOpObjectStacked{{toplevelcppname}}JsonListener(
+                        _{{cppname}}Stacked{{toplevelcppname}}JsonListener::With{{property.cppname}},
+                        &fBuilder,
+                        fMainListener,
+                        this);
+                Push(nextListener);
+                fNextItemBitmask = 0;
+                break;
+            }
+{{/property.isobject}}{{/propertyarray}}
+            // a general consumer that will clear any spurious data that was not
+            // part of the schema. This is important for schema evolution.
+            _GeneralNoOpObjectStacked{{toplevelcppname}}JsonListener* nextListener
+                = new _GeneralNoOpObjectStacked{{toplevelcppname}}JsonListener(fMainListener, this);
+            Push(nextListener);
+            fNextItemBitmask = 0;
+            break;
+        }
+        case B_JSON_ARRAY_START:
+        {
+{{#propertyarray}}{{#property.isarray}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask) {
+                {{#property.items.isstring}}
+                _StringListStacked{{toplevelcppname}}JsonListener* nextListener = new _StringListStacked{{toplevelcppname}}JsonListener(
+                    _{{cppname}}Stacked{{toplevelcppname}}JsonListener::With{{property.cppname}}Callback,
+                    &fBuilder,
+                    fMainListener,
+                    this);
+                {{/property.items.isstring}}{{^property.items.isstring}}
+                _{{property.items.cppname}}ListStacked{{toplevelcppname}}JsonListener* nextListener =
+                    new _{{property.items.cppname}}ListStacked{{toplevelcppname}}JsonListener(
+                        _{{cppname}}Stacked{{toplevelcppname}}JsonListener::With{{property.cppname}}Callback,
+                        &fBuilder,
+                        fMainListener,
+                        this);
+                {{/property.items.isstring}}
+                Push(nextListener);
+                fNextItemBitmask = 0;
+                break;
+            }
+{{/property.isarray}}{{/propertyarray}}
+            // a general consumer that will clear any spurious data that was not
+            // part of the schema. This is important for schema evolution.
+            _AbstractStacked{{toplevelcppname}}JsonListener* nextListener
+                = new _GeneralNoOpArrayStacked{{toplevelcppname}}JsonListener(fMainListener, this);
+            Push(nextListener);
+            fNextItemBitmask = 0;
+            break;
+        }
+    }
+
+    return ErrorStatus() == B_OK;
+}
+
+
+_{{cppname}}ListStacked{{toplevelcppname}}JsonListener::_{{cppname}}ListStacked{{toplevelcppname}}JsonListener(
+    bool (*callback)(void* context, const std::vector<{{cppname}}Ref>& values),
+    void* callbackContext,
+    AbstractMain{{toplevelcppname}}JsonListener* mainListener,
+    _AbstractStacked{{toplevelcppname}}JsonListener* parent)
+    :
+    _AbstractStacked{{toplevelcppname}}JsonListener(mainListener, parent),
+    fAccumulator(),
+    fCallback(callback),
+    fCallbackContext(callbackContext)
+{
+}
+
+
+_{{cppname}}ListStacked{{toplevelcppname}}JsonListener::~_{{cppname}}ListStacked{{toplevelcppname}}JsonListener()
+{
+}
+
+
+bool
+_{{cppname}}ListStacked{{toplevelcppname}}JsonListener::Pop()
+{
+    bool callbackResult = fCallback(fCallbackContext, fAccumulator);
+    return _AbstractStacked{{toplevelcppname}}JsonListener::Pop() && callbackResult;
+}
+
+
+/*static*/ bool
+_{{cppname}}ListStacked{{toplevelcppname}}JsonListener::AddItemCallback(void* context, const {{cppname}}Ref value)
+{
+    std::vector<{{cppname}}Ref>* accumulator = static_cast<std::vector<{{cppname}}Ref>*>(context);
+    accumulator->push_back(value);
+    return true;
+}
+
+
+bool
+_{{cppname}}ListStacked{{toplevelcppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    switch (event.EventType()) {
+        case B_JSON_ARRAY_END:
+        {
+            bool status = Pop() && (ErrorStatus() == B_OK);
+            delete this;
+            return status;
+        }
+        case B_JSON_OBJECT_START:
+        {
+            _{{cppname}}Stacked{{toplevelcppname}}JsonListener* nextListener =
+                new _{{cppname}}Stacked{{toplevelcppname}}JsonListener(
+                    AddItemCallback,
+                    &fAccumulator,
+                    fMainListener,
+                    this);
+            Push(nextListener);
+            break;
+        }
+        default:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
+                "illegal state - unexpected json event parsing an array of {{cppname}}");
+            break;
+    }
+
+    return ErrorStatus() == B_OK;
+}
+
+
+void
+_{{cppname}}ListStacked{{toplevelcppname}}JsonListener::Clear()
+{
+    _AbstractStacked{{toplevel.cppname}}JsonListener::Clear();
+    fAccumulator.clear();
+}
+{{/allobjs}}
+
+_BulkContainerStacked{{toplevel.cppname}}JsonListener::_BulkContainerStacked{{toplevel.cppname}}JsonListener(
+    AbstractMain{{toplevel.cppname}}JsonListener* mainListener, _AbstractStacked{{toplevel.cppname}}JsonListener* parent,
+    {{toplevel.cppname}}Listener* itemListener)
+:
+_AbstractStacked{{toplevel.cppname}}JsonListener(mainListener, parent)
+{
+    fItemListener = itemListener;
+}
+
+
+_BulkContainerStacked{{toplevel.cppname}}JsonListener::~_BulkContainerStacked{{toplevel.cppname}}JsonListener()
+{
+}
+
+
+bool
+_BulkContainerStacked{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    switch (event.EventType()) {
+        case B_JSON_ARRAY_END:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected end of array");
+            break;
+        case B_JSON_OBJECT_NAME:
+            fNextItemIsItems = (0 == strcmp(event.Content(), "items"));
+            break;
+        case B_JSON_OBJECT_START:
+            Push(new _GeneralNoOpObjectStacked{{toplevel.cppname}}JsonListener(fMainListener, this));
+            fNextItemIsItems = false;
+            break;
+        case B_JSON_ARRAY_START:
+            if (fNextItemIsItems)
+                Push(new _BulkContainerItemsStacked{{toplevel.cppname}}JsonListener(fMainListener, this, fItemListener));
+            else
+                Push(new _GeneralNoOpArrayStacked{{toplevel.cppname}}JsonListener(fMainListener, this));
+            break;
+        case B_JSON_OBJECT_END:
+        {
+            bool status = Pop() && (ErrorStatus() == B_OK);
+            delete this;
+            return status;
+        }
+        default:
+                // ignore any other fields
+            fNextItemIsItems = false;
+            break;
+    }
+
+    return ErrorStatus() == B_OK;
+}
+
+
+void
+_BulkContainerStacked{{toplevel.cppname}}JsonListener::Clear()
+{
+    _AbstractStacked{{toplevel.cppname}}JsonListener::Clear();
+    fNextItemIsItems = false;
+}
+
+
+_BulkContainerItemsStacked{{toplevel.cppname}}JsonListener::_BulkContainerItemsStacked{{toplevel.cppname}}JsonListener(
+    AbstractMain{{toplevel.cppname}}JsonListener* mainListener, _AbstractStacked{{toplevel.cppname}}JsonListener* parent,
+    {{toplevel.cppname}}Listener* itemListener)
+    :
+    _AbstractStacked{{toplevel.cppname}}JsonListener(mainListener, parent),
+    fItemListener(itemListener)
+{
+}
+
+
+_BulkContainerItemsStacked{{toplevel.cppname}}JsonListener::~_BulkContainerItemsStacked{{toplevel.cppname}}JsonListener()
+{
+}
+
+
+bool
+_BulkContainerItemsStacked{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    switch (event.EventType()) {
+        case B_JSON_OBJECT_START:
+            Push(new _{{toplevel.cppname}}Stacked{{toplevel.cppname}}JsonListener(
+                _BulkContainerItemsStacked{{toplevel.cppname}}JsonListener::NotifyListenerCallback,
+                fItemListener,
+                fMainListener,
+                this
+            ));
+            break;
+        case B_JSON_ARRAY_END:
+        {
+            bool status = Pop() && (ErrorStatus() == B_OK);
+            delete this;
+            return status;
+        }
+        default:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected json event");
+            break;
+    }
+
+    return ErrorStatus() == B_OK;
+}
+
+
+/*static*/ bool
+_BulkContainerItemsStacked{{toplevel.cppname}}JsonListener::NotifyListenerCallback(void* context, const {{toplevel.cppname}}Ref value)
+{
+    {{toplevel.cppname}}Listener* listener = static_cast<{{toplevel.cppname}}Listener*>(context);
+    return listener->Handle(value);
+}
+
+
+bool
+_BulkContainerItemsStacked{{toplevel.cppname}}JsonListener::WillPop()
+{
+    fItemListener->Complete();
+    return true;
+}
+
+
+// #pragma mark - implementations for the main listeners
+
+
+AbstractMain{{toplevel.cppname}}JsonListener::AbstractMain{{toplevel.cppname}}JsonListener()
+{
+    fStackedListener = NULL;
+    fErrorStatus = B_OK;
+}
+
+
+AbstractMain{{toplevel.cppname}}JsonListener::~AbstractMain{{toplevel.cppname}}JsonListener()
+{
+}
+
+
+void
+AbstractMain{{toplevel.cppname}}JsonListener::HandleError(status_t status, int32 line, const char* message)
+{
+    if (message != NULL) {
+        fprintf(stderr, "an error has arisen processing json for '{{toplevel.cppname}}'; %s\\n", message);
+    } else {
+        fprintf(stderr, "an error has arisen processing json for '{{toplevel.cppname}}'\\n");
+    }
+    fErrorStatus = status;
+}
+
+
+void
+AbstractMain{{toplevel.cppname}}JsonListener::Complete()
+{
+}
+
+
+status_t
+AbstractMain{{toplevel.cppname}}JsonListener::ErrorStatus()
+{
+    return fErrorStatus;
+}
+
+void
+AbstractMain{{toplevel.cppname}}JsonListener::SetStackedListener(
+    _AbstractStacked{{toplevel.cppname}}JsonListener* stackedListener)
+{
+    fStackedListener = stackedListener;
+}
+
+
+Single{{toplevel.cppname}}JsonListener::Single{{toplevel.cppname}}JsonListener()
+    :
+    AbstractMain{{toplevel.cppname}}JsonListener(),
+    fResult()
+{
+}
+
+
+Single{{toplevel.cppname}}JsonListener::~Single{{toplevel.cppname}}JsonListener()
+{
+}
+
+
+bool
+Single{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    if (fErrorStatus != B_OK)
+       return false;
+
+    if (fStackedListener != NULL)
+        return fStackedListener->Handle(event);
+
+    switch (event.EventType()) {
+        case B_JSON_OBJECT_START:
+        {
+            _{{toplevel.cppname}}Stacked{{toplevel.cppname}}JsonListener* nextListener
+                = new _{{toplevel.cppname}}Stacked{{toplevel.cppname}}JsonListener(
+                    Single{{toplevel.cppname}}JsonListener::WithResultCallback,
+                    &fResult,
+                    this,
+                    NULL);
+            SetStackedListener(nextListener);
+            break;
+        }
+        default:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
+                "illegal state - unexpected json event parsing top level for {{toplevel.cppname}}");
+            break;
+    }
+
+    return ErrorStatus() == B_OK;
+}
+
+
+/*static*/ bool
+Single{{toplevel.cppname}}JsonListener::WithResultCallback(void* context, const {{toplevel.cppname}}Ref value)
+{
+    {{toplevel.cppname}}Ref* ref = static_cast<{{toplevel.cppname}}Ref*>(context);
+    if (value.IsSet())
+        ref->SetTo(value.Get(), false);
+    else
+        ref->Unset();
+    return true;
+}
+
+
+{{toplevel.cppname}}Ref
+Single{{toplevel.cppname}}JsonListener::Result()
+{
+    return fResult;
+}
+
+
+BulkContainer{{toplevel.cppname}}JsonListener::BulkContainer{{toplevel.cppname}}JsonListener(
+    {{toplevel.cppname}}Listener* itemListener) : AbstractMain{{toplevel.cppname}}JsonListener()
+{
+    fItemListener = itemListener;
+}
+
+
+BulkContainer{{toplevel.cppname}}JsonListener::~BulkContainer{{toplevel.cppname}}JsonListener()
+{
+}
+
+
+bool
+BulkContainer{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& event)
+{
+    if (fErrorStatus != B_OK)
+       return false;
+
+    if (fStackedListener != NULL)
+        return fStackedListener->Handle(event);
+
+    switch (event.EventType()) {
+        case B_JSON_OBJECT_START:
+        {
+            _BulkContainerStacked{{toplevel.cppname}}JsonListener* nextListener =
+                new _BulkContainerStacked{{toplevel.cppname}}JsonListener(this, NULL, fItemListener);
+            SetStackedListener(nextListener);
+            return true;
+            break;
+        }
+        default:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
+                "illegal state - unexpected json event parsing top level for _BulkContainerStacked{{toplevel.cppname}}JsonListener");
+            break;
+    }
+
+    return ErrorStatus() == B_OK;
+}

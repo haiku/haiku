@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -17,11 +17,8 @@
 #include <StopWatch.h>
 #include <Url.h>
 
-#include "DumpExportPkg.h"
-#include "DumpExportPkgCategory.h"
 #include "DumpExportPkgJsonListener.h"
-#include "DumpExportPkgScreenshot.h"
-#include "DumpExportPkgVersion.h"
+#include "DumpExportPkgModel.h"
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "PackageUtils.h"
@@ -49,7 +46,7 @@ public:
 								PackageFillingPkgListener(Model *model, Stoppable* stoppable);
 	virtual						~PackageFillingPkgListener();
 
-	virtual	bool				Handle(DumpExportPkg* item);
+	virtual	bool				Handle(DumpExportPkgRef item);
 	virtual	void				Complete();
 
 			uint32				Count();
@@ -153,19 +150,19 @@ PackageFillingPkgListener::_CreateUpdatePackage(const PackageInfoRef& package,
 
 		DumpExportPkgVersion* pkgVersion = pkg->PkgVersionsItemAt(0);
 
-		if (!pkgVersion->TitleIsNull())
-			localizedTextBuilder.WithTitle(*(pkgVersion->Title()));
+		if (pkgVersion->IsSetTitle())
+			localizedTextBuilder.WithTitle(pkgVersion->Title());
 
-		if (!pkgVersion->SummaryIsNull())
-			localizedTextBuilder.WithSummary(*(pkgVersion->Summary()));
+		if (pkgVersion->IsSetSummary())
+			localizedTextBuilder.WithSummary(pkgVersion->Summary());
 
-		if (!pkgVersion->DescriptionIsNull())
-			localizedTextBuilder.WithDescription(*(pkgVersion->Description()));
+		if (pkgVersion->IsSetDescription())
+			localizedTextBuilder.WithDescription(pkgVersion->Description());
 
-		if (!pkgVersion->PayloadLengthIsNull())
+		if (pkgVersion->IsSetPayloadLength())
 			localInfoBuilder.WithSize(static_cast<off_t>(pkgVersion->PayloadLength()));
 
-		if (!pkgVersion->CreateTimestampIsNull()) {
+		if (pkgVersion->IsSetCreateTimestamp()) {
 			PackageVersionRef versionRef = PackageUtils::Version(package);
 
 			if (versionRef.IsSet()) {
@@ -181,7 +178,7 @@ PackageFillingPkgListener::_CreateUpdatePackage(const PackageInfoRef& package,
 		}
 	}
 
-	if (!pkg->DerivedRatingIsNull()) {
+	if (pkg->IsSetDerivedRating()) {
 		// TODO; unify the naming here!
 		userRatingBuilder.WithSummary(UserRatingSummaryBuilder()
 				.WithAverageRating(pkg->DerivedRating())
@@ -192,22 +189,22 @@ PackageFillingPkgListener::_CreateUpdatePackage(const PackageInfoRef& package,
 	int32 countPkgCategories = pkg->CountPkgCategories();
 
 	for (i = 0; i < countPkgCategories; i++) {
-		BString* categoryCode = pkg->PkgCategoriesItemAt(i)->Code();
-		CategoryRef category = fCategories[*categoryCode];
+		BString categoryCode = pkg->PkgCategoriesItemAt(i)->Code();
+		CategoryRef category = fCategories[categoryCode];
 
 		if (!category.IsSet())
-			HDERROR("unable to find the category for [%s]", categoryCode->String());
+			HDERROR("unable to find the category for [%s]", categoryCode.String());
 		else
 			classificationInfoBuilder.AddCategory(category);
 	}
 
-	if (!pkg->ProminenceOrderingIsNull())
+	if (pkg->IsSetProminenceOrdering())
 		classificationInfoBuilder.WithProminence(static_cast<uint32>(pkg->ProminenceOrdering()));
 
-	if (!pkg->IsDesktopIsNull())
+	if (pkg->IsSetIsDesktop())
 		classificationInfoBuilder.WithIsDesktop(pkg->IsDesktop());
 
-	if (!pkg->IsNativeDesktopIsNull())
+	if (pkg->IsSetIsNativeDesktop())
 		classificationInfoBuilder.WithIsNativeDesktop(pkg->IsNativeDesktop());
 
 	int32 countPkgScreenshots = pkg->CountPkgScreenshots();
@@ -232,7 +229,7 @@ PackageFillingPkgListener::_CreateUpdatePackage(const PackageInfoRef& package,
 PackageFillingPkgListener::_CreateScreenshot(DumpExportPkgScreenshot* screenshot)
 {
 	return ScreenshotInfoRef(
-		new ScreenshotInfo(*(screenshot->Code()), static_cast<int32>(screenshot->Width()),
+		new ScreenshotInfo(screenshot->Code(), static_cast<int32>(screenshot->Width()),
 			static_cast<int32>(screenshot->Height()), static_cast<int32>(screenshot->Length())),
 		true);
 }
@@ -246,14 +243,14 @@ PackageFillingPkgListener::Count()
 
 
 bool
-PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
+PackageFillingPkgListener::Handle(DumpExportPkgRef pkg)
 {
-	const BString packageName = *(pkg->Name());
+	const BString packageName = pkg->Name();
 	PackageInfoRef package = _PackageForName(packageName);
 
 	if (package.IsSet()) {
 		fUpdatedPackages.push_back(_CreateUpdatePackage(package, pkg));
-		HDTRACE("did populate data for [%s]", pkg->Name()->String());
+		HDTRACE("did populate data for [%s]", packageName.String());
 		fCount++;
 	} else {
 		HDINFO("[PackageFillingPkgListener] unable to find the pkg [%s]", packageName.String());

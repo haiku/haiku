@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SERVER_REFERENCE_DATA_UPDATE_PROCESS_H
@@ -13,6 +13,7 @@
 #include <String.h>
 #include <Url.h>
 
+#include "DumpExportReferenceModel.h"
 #include "Model.h"
 #include "PackageInfo.h"
 
@@ -20,7 +21,6 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ServerReferenceDataUpdateProcess"
 
-class DumpExportReference;
 
 class ServerReferenceDataUpdateProcess : public AbstractSingleFileServerProcess
 {
@@ -43,13 +43,10 @@ protected:
 			status_t			GetLocalPath(BPath& path) const;
 
 private:
-			status_t			_ProcessData(DumpExportReference* data);
-			status_t			_ProcessNaturalLanguages(
-									DumpExportReference* data);
-			status_t			_ProcessPkgCategories(
-									DumpExportReference* data);
-			status_t			_ProcessRatingStabilities(
-									DumpExportReference* data);
+			status_t			_ProcessData(DumpExportReferenceRef data);
+			status_t			_ProcessNaturalLanguages(DumpExportReferenceRef data);
+			status_t			_ProcessPkgCategories(DumpExportReferenceRef data);
+			status_t			_ProcessRatingStabilities(DumpExportReferenceRef data);
 
 private:
 			Model*				fModel;

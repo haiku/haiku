@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -11,17 +11,12 @@
 #include <time.h>
 
 #include <AutoDeleter.h>
-#include <AutoLocker.h>
 #include <Catalog.h>
 #include <FileIO.h>
 #include <Url.h>
 
-#include "DumpExportReference.h"
-#include "DumpExportReferenceCountry.h"
 #include "DumpExportReferenceJsonListener.h"
-#include "DumpExportReferenceNaturalLanguage.h"
-#include "DumpExportReferencePkgCategory.h"
-#include "DumpExportReferenceUserRatingStability.h"
+#include "DumpExportReferenceModel.h"
 #include "LocaleUtils.h"
 #include "Logger.h"
 #include "ServerSettings.h"
@@ -80,6 +75,7 @@ status_t
 ServerReferenceDataUpdateProcess::ProcessLocalData()
 {
 	SingleDumpExportReferenceJsonListener* listener = new SingleDumpExportReferenceJsonListener();
+	ObjectDeleter<SingleDumpExportReferenceJsonListener> listenerDeleter(listener);
 
 	BPath localPath;
 	status_t result = GetLocalPath(localPath);
@@ -97,12 +93,12 @@ ServerReferenceDataUpdateProcess::ProcessLocalData()
 	if (result != B_OK)
 		return result;
 
-	return _ProcessData(listener->Target());
+	return _ProcessData(listener->Result());
 }
 
 
 status_t
-ServerReferenceDataUpdateProcess::_ProcessData(DumpExportReference* data)
+ServerReferenceDataUpdateProcess::_ProcessData(DumpExportReferenceRef data)
 {
 	status_t result = B_OK;
 	if (result == B_OK)
@@ -116,7 +112,7 @@ ServerReferenceDataUpdateProcess::_ProcessData(DumpExportReference* data)
 
 
 status_t
-ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(DumpExportReference* data)
+ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(DumpExportReferenceRef data)
 {
 	HDINFO("[%s] will populate from %" B_PRId32 " possible natural languages", Name(),
 		data->CountNaturalLanguages());
@@ -126,7 +122,7 @@ ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(DumpExportReference* 
 
 	for (int32 i = data->CountNaturalLanguages() - 1; i > 0; i--) {
 		DumpExportReferenceNaturalLanguage* naturalLanguage = data->NaturalLanguagesItemAt(i);
-		Language* language = new Language(*(naturalLanguage->Code()), *(naturalLanguage->Name()),
+		Language* language = new Language(naturalLanguage->Code(), naturalLanguage->Name(),
 			naturalLanguage->IsPopular());
 		languages.push_back(LanguageRef(language, true));
 		count++;
@@ -142,7 +138,7 @@ ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(DumpExportReference* 
 
 
 status_t
-ServerReferenceDataUpdateProcess::_ProcessPkgCategories(DumpExportReference* data)
+ServerReferenceDataUpdateProcess::_ProcessPkgCategories(DumpExportReferenceRef data)
 {
 	HDINFO("[%s] will populate %" B_PRId32 " pkg categories", Name(), data->CountPkgCategories());
 
@@ -151,7 +147,7 @@ ServerReferenceDataUpdateProcess::_ProcessPkgCategories(DumpExportReference* dat
 	for (int32 i = 0; i < data->CountPkgCategories(); i++) {
 		DumpExportReferencePkgCategory* pkgCategory = data->PkgCategoriesItemAt(i);
 		assembledCategories.push_back(
-			CategoryRef(new PackageCategory(*(pkgCategory->Code()), *(pkgCategory->Name())), true));
+			CategoryRef(new PackageCategory(pkgCategory->Code(), pkgCategory->Name()), true));
 	}
 
 	fModel->SetCategories(assembledCategories);
@@ -161,7 +157,7 @@ ServerReferenceDataUpdateProcess::_ProcessPkgCategories(DumpExportReference* dat
 
 
 status_t
-ServerReferenceDataUpdateProcess::_ProcessRatingStabilities(DumpExportReference* data)
+ServerReferenceDataUpdateProcess::_ProcessRatingStabilities(DumpExportReferenceRef data)
 {
 	HDINFO("[%s] will populate %" B_PRId32 " rating stabilities", Name(),
 		data->CountUserRatingStabilities());
@@ -172,8 +168,8 @@ ServerReferenceDataUpdateProcess::_ProcessRatingStabilities(DumpExportReference*
 		DumpExportReferenceUserRatingStability* ratingStability
 			= data->UserRatingStabilitiesItemAt(i);
 		assembledRatingStabilities.push_back(
-			RatingStabilityRef(new RatingStability(*(ratingStability->Code()),
-								   *(ratingStability->Name()), ratingStability->Ordering()),
+			RatingStabilityRef(new RatingStability(ratingStability->Code(), ratingStability->Name(),
+								   ratingStability->Ordering()),
 				true));
 	}
 

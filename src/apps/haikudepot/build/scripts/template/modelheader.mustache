@@ -1,0 +1,101 @@
+/*
+ * Generated Model Object for {{outputfilename}}
+ */
+
+#ifndef GEN_JSON_SCHEMA_MODEL__{{outputfilestemupper}}_H
+#define GEN_JSON_SCHEMA_MODEL__{{outputfilestemupper}}_H
+
+#include <vector>
+
+#include <Archivable.h>
+#include <Referenceable.h>
+#include <String.h>{{#objects}}
+
+
+class {{cppname}} : public BArchivable, public BReferenceable
+{
+friend class {{cppname}}Builder;
+
+public:
+    {{cppname}}();
+    {{cppname}}(const BMessage* message);
+    virtual ~{{cppname}}();
+
+	bool operator==(const {{cppname}}& other) const;
+	bool operator!=(const {{cppname}}& other) const;
+
+{{#propertyarray}}{{#property.isarray}}
+    const {{property.cpptype}} {{property.cppname}}() const;
+    int32 Count{{property.cppname}}() const;
+    const {{property.items.cpptype}}& {{property.cppname}}ItemAt(int32 index) const;
+    bool IsSet{{property.cppname}}() const;
+{{/property.isarray}}{{^property.isarray}}
+{{#property.iscppscalartype}}    {{property.cpptype}} {{property.cppname}}() const;
+{{/property.iscppscalartype}}{{^property.iscppscalartype}}    const {{property.cpptype}}& {{property.cppname}}() const;
+{{/property.iscppscalartype}}
+    bool IsSet{{property.cppname}}() const;
+{{/property.isarray}}
+{{/propertyarray}}
+
+    status_t Archive(BMessage* into, bool deep = true) const;
+
+private:
+{{#propertyarray}}{{#property.isarray}}   void _Set{{property.cppname}}(const {{property.cpptype}}& value);
+    void _AddTo{{property.cppname}}(const {{property.items.cpptype}}& value);
+    void _Unset{{property.cppname}}();
+{{/property.isarray}}{{^property.isarray}}
+{{#property.iscppscalartype}}    void _Set{{property.cppname}}({{property.cpptype}} value);
+{{/property.iscppscalartype}}{{^property.iscppscalartype}}    void _Set{{property.cppname}}(const {{property.cpptype}}& value);
+{{/property.iscppscalartype}}
+    void _Unset{{property.cppname}}();
+{{/property.isarray}}
+{{/propertyarray}}
+
+public:
+{{#propertyarray}}    static const uint16 k{{property.cppname}}Bitmask;
+{{/propertyarray}}
+
+private:
+    uint16 fHasValueBitmask;
+{{#propertyarray}}    {{property.cpptype}} {{property.cppmembername}};
+{{/propertyarray}}
+};
+
+
+typedef BReference<{{cppname}}> {{cppname}}Ref;
+
+
+class {{cppname}}Builder
+{
+public:
+    {{cppname}}Builder();
+    {{cppname}}Builder(const {{cppname}}Ref& source);
+    {{cppname}}Builder(const {{cppname}}* source);
+    virtual ~{{cppname}}Builder();
+
+    {{cppname}}Builder& Clear();
+    {{cppname}}Ref BuildRef();
+
+{{#propertyarray}}{{#property.isarray}}
+    {{cppname}}Builder& With{{property.cppname}}({{property.cpptype}} value);
+    {{cppname}}Builder& Without{{property.cppname}}();
+    {{cppname}}Builder& AddTo{{property.cppname}}({{property.items.cpptype}} value);
+{{/property.isarray}}{{^property.isarray}}
+    {{cppname}}Builder& With{{property.cppname}}({{property.cpptype}} value);
+    {{cppname}}Builder& Without{{property.cppname}}();
+{{/property.isarray}}
+{{/propertyarray}}
+
+private:
+    void _InitFromSource();
+    void _Init(const {{cppname}}* source);
+
+private:
+    uint16 fHasValueBitmask;
+    {{cppname}}Ref fSourceRef;
+
+{{#propertyarray}}    {{property.cpptype}} {{property.cppmembername}};
+{{/propertyarray}}
+};{{/objects}}
+
+#endif // GEN_JSON_SCHEMA_MODEL__{{outputfilestemupper}}_H
