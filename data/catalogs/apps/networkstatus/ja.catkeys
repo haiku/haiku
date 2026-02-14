@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-NetworkStatus	764116931
+1	japanese	x-vnd.Haiku-NetworkStatus	3050452699
 IPv6 address:	NetworkStatusView		IPv6 アドレス:
 Quit	NetworkStatusView		終了
 Unknown	NetworkStatusView		不明
@@ -14,6 +14,7 @@ Connected	NetworkStatusView		接続済
 Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できません:\n
 Network Status	NetworkStatusView		ネットワークの状態
 Deskbar is not running, giving up.	NetworkStatus		Deskbar が動作していないので、断念します。
+You can run %appname% in a window or install it in the Deskbar.	NetworkStatus		%appname% をウィンドウ内で実行または Deskbar 内にインストールできます。
 Netmask:	NetworkStatusView		ネットマスク:
 No stateful configuration	NetworkStatusView		ステートフル設定がありません
 IPv4 address:	NetworkStatusView		IPv4 アドレス:

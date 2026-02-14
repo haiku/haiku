@@ -97,7 +97,7 @@ Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		{0, p
 Undo: %action%	Icon-O-Matic-Main		Rückgängig: %action%
 Diamond	Icon-O-Matic-StyleTypes		Raute
 %appname% might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		%appname% konnte vielleicht nicht alle Daten aus dem SVG interpretieren, als es geladen wurde. Wird die Originaldatei überschrieben, werden diese Informationen verloren gehen.
-Don't save	Icon-O-Matic-Menu-Settings		Nicht speichern
+Don't save	Icon-O-Matic-Menu-Settings		Verwerfen
 Add shape with path	Icon-O-Matic-Menu-Shape		Form mit Pfad hinzufügen
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Herrje!
 Translation X	Icon-O-Matic-PropertyNames		Verschiebung X

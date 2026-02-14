@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-NetworkStatus	764116931
+1	swedish	x-vnd.Haiku-NetworkStatus	3050452699
 IPv6 address:	NetworkStatusView		IPv6-adress:
 Quit	NetworkStatusView		Avsluta
 Unknown	NetworkStatusView		Okänd
@@ -14,6 +14,7 @@ Connected	NetworkStatusView		Ansluten
 Could not join wireless network:\n	NetworkStatusView		Kunde inte ansluta till trådlöst nätverk:\n
 Network Status	NetworkStatusView		Nätverksstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar är inte igång, ger upp.
+You can run %appname% in a window or install it in the Deskbar.	NetworkStatus		Du kan köra %appname% i ett fönster eller installera det i Skrivbordsfältet.
 Netmask:	NetworkStatusView		Nätmask:
 No stateful configuration	NetworkStatusView		Ingen förbindelseorienterad konfiguration
 IPv4 address:	NetworkStatusView		IPv4-adress:

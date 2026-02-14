@@ -36,7 +36,7 @@ Integer 64 bit	Attribute ListView		Integer 64-bit
 Cancel	New File Type Window		Abbrechen
 Select same preferred application as	FileType Window		Gleiche bevorzugte Anwendung wählen wie
 Cancel	Type List Window		Abbrechen
-Don't save	Application Type Window		Nicht speichern
+Don't save	Application Type Window		Verwerfen
 Center	Attribute Window	Attribute column alignment in Tracker	Zentriert
 Done	Extension Window		Fertig
 Development	Application Types Window		Entwicklung
