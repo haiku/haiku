@@ -40,7 +40,7 @@ private:
 
 			bool				_AddPoints(const BPoint* points, int32 count,
 									bool computeBounds);
-			void				_ComputeBounds();
+	static	BRect				_ComputeBounds(const BPoint* points, uint32 count);
 			void				_MapPoint(BPoint* point, const BRect& source,
 									const BRect& destination);
 			void				_MapRectangle(BRect* rect, const BRect& source,

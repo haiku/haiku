@@ -129,7 +129,7 @@ BPolygon::PrintToStream() const
 //BPolygon::TransformBy(const BAffineTransform& transform)
 //{
 //	transform.Apply(fPoints, (int32)fCount);
-//	_ComputeBounds();
+//	fBounds = _ComputeBounds(fPoints, fCount);
 //}
 //
 //
@@ -177,35 +177,35 @@ BPolygon::_AddPoints(const BPoint* points, int32 count, bool computeBounds)
 	fCount += count;
 
 	if (computeBounds)
-		_ComputeBounds();
+		fBounds = _ComputeBounds(fPoints, fCount);
 
 	return true;
 }
 
 
-void
-BPolygon::_ComputeBounds()
+BRect
+BPolygon::_ComputeBounds(const BPoint* points, uint32 count)
 {
-	if (fCount == 0) {
-		fBounds = BRect(0.0, 0.0, -1.0f, -1.0f);
-		return;
+	if (count == 0)
+		return BRect(0.0, 0.0, -1.0f, -1.0f);
+
+	BRect bounds(points[0], points[0]);
+
+	for (uint32 i = 1; i < count; i++) {
+		if (points[i].x < bounds.left)
+			bounds.left = points[i].x;
+
+		if (points[i].y < bounds.top)
+			bounds.top = points[i].y;
+
+		if (points[i].x > bounds.right)
+			bounds.right = points[i].x;
+
+		if (points[i].y > bounds.bottom)
+			bounds.bottom = points[i].y;
 	}
 
-	fBounds = BRect(fPoints[0], fPoints[0]);
-
-	for (uint32 i = 1; i < fCount; i++) {
-		if (fPoints[i].x < fBounds.left)
-			fBounds.left = fPoints[i].x;
-
-		if (fPoints[i].y < fBounds.top)
-			fBounds.top = fPoints[i].y;
-
-		if (fPoints[i].x > fBounds.right)
-			fBounds.right = fPoints[i].x;
-
-		if (fPoints[i].y > fBounds.bottom)
-			fBounds.bottom = fPoints[i].y;
-	}
+	return bounds;
 }
 
 
