@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src add-ons kernel drivers input hyperv_hid ;
+
+SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
+SubDirSysHdrs $(HAIKU_TOP) src add-ons kernel drivers input hid_shared ;
+UsePrivateHeaders [ FDirName kernel util ] input drivers device hyperv ;
+UsePrivateKernelHeaders ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel drivers input hid_shared ] ;
+
+KernelAddon hyperv_hid :
+	DeviceList.cpp
+	Driver.cpp
+	HIDDevice.cpp
+
+	HIDCollection.cpp
+	HIDParser.cpp
+	HIDReport.cpp
+	HIDReportItem.cpp
+	HIDWriter.cpp
+
+	ProtocolHandler.cpp
+
+	JoystickProtocolHandler.cpp
+	KeyboardProtocolHandler.cpp
+	MouseProtocolHandler.cpp
+	TabletProtocolHandler.cpp
+;
