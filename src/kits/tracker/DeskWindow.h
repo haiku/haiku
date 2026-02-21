@@ -84,7 +84,6 @@ private:
 
 	BRect fOldFrame;
 
-	node_ref* fNodeRef;
 	char* fShortcutsSettings;
 
 	typedef BContainerWindow _inherited;

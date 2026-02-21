@@ -212,7 +212,6 @@ BDeskWindow::BDeskWindow(LockingList<BWindow>* windowList, uint32 openFlags)
 			| B_NOT_MINIMIZABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES, false),
 	fDeskShelf(NULL),
-	fNodeRef(NULL),
 	fShortcutsSettings(NULL)
 {
 	// create pose view
@@ -341,9 +340,8 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 	if (!update) {
 		BPath path;
 		if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-			BPathMonitor::StartWatching(path.Path(),
-				B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
 			path.Append(kShortcutsSettings);
+			BPathMonitor::StartWatching(path.Path(), B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
 			fShortcutsSettings = new char[strlen(path.Path()) + 1];
 			strcpy(fShortcutsSettings, path.Path());
 		}
@@ -353,12 +351,8 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 
 	BFile shortcutSettings(fShortcutsSettings, B_READ_ONLY);
 	BMessage fileMsg;
-	if (shortcutSettings.InitCheck() != B_OK
-		|| fileMsg.Unflatten(&shortcutSettings) != B_OK) {
-		fNodeRef = NULL;
+	if (shortcutSettings.InitCheck() != B_OK || fileMsg.Unflatten(&shortcutSettings) != B_OK)
 		return;
-	}
-	shortcutSettings.GetNodeRef(fNodeRef);
 
 	int32 i = 0;
 	BMessage message;
@@ -578,19 +572,11 @@ BDeskWindow::MessageReceived(BMessage* message)
 		case B_PATH_MONITOR:
 		{
 			const char* path = "";
-			if (!(message->FindString("path", &path) == B_OK
-					&& strcmp(path, fShortcutsSettings) == 0)) {
-
-				dev_t device;
-				ino_t node;
-				if (fNodeRef == NULL
-					|| message->FindInt32("device", &device) != B_OK
-					|| message->FindInt64("node", &node) != B_OK
-					|| device != fNodeRef->device
-					|| node != fNodeRef->node)
-					break;
+			if (message->FindString("watched_path", &path) == B_OK
+					&& strcmp(path, fShortcutsSettings) == 0) {
+				ApplyShortcutPreferences(true);
 			}
-			ApplyShortcutPreferences(true);
+
 			break;
 		}
 		case B_NODE_MONITOR:
