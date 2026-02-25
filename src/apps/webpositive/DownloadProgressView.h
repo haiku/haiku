@@ -10,6 +10,8 @@
 #include <GroupView.h>
 #include <Path.h>
 #include <String.h>
+#include <shared/BarberPole.h>
+
 
 class BEntry;
 class BStatusBar;
@@ -62,6 +64,8 @@ private:
 private:
 			IconView*			fIconView;
 			BStatusBar*			fStatusBar;
+			BarberPole*			fBarberPole;
+			BStringView*		fFileNameView;
 			BStringView*		fInfoView;
 			SmallButton*		fTopButton;
 			SmallButton*		fBottomButton;
