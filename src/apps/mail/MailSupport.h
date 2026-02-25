@@ -63,6 +63,8 @@ class Words;
 
 
 int32 header_len(BFile*);
+status_t create_label_file(const char* label);
+int32 add_folder_menu_items(BMenu* menu, const char* folder, uint32 what);
 int32 add_query_menu_items(BMenu* menu, const char* attribute, uint32 what,
 	const char* format, bool popup = false);
 

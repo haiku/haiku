@@ -16,6 +16,7 @@ Application Mail :
 	Enclosures.cpp
 	FindWindow.cpp
 	Header.cpp
+	LabelWindow.cpp
 	MailApp.cpp
 	MailPopUpMenu.cpp
 	MailSupport.cpp
@@ -26,7 +27,6 @@ Application Mail :
 	QueryList.cpp
 	QueryMenu.cpp
 	Signature.cpp
-	Status.cpp
 	Utilities.cpp
 	WIndex.cpp
 	Words.cpp
@@ -50,6 +50,7 @@ DoCatalogs Mail :
 	Enclosures.cpp
 	FindWindow.cpp
 	Header.cpp
+	LabelWindow.cpp
 	LocalizedFolders.h
 	MailApp.cpp
 	MailPopUpMenu.cpp
@@ -57,5 +58,4 @@ DoCatalogs Mail :
 	Prefs.cpp
 	Settings.cpp
 	Signature.cpp
-	Status.cpp
 ;

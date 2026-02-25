@@ -80,6 +80,7 @@ public:
 
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				MenusBeginning();
+	virtual void				MenusEnded();
 	virtual	void				MessageReceived(BMessage*);
 	virtual	bool				QuitRequested();
 	virtual	void				Show();
@@ -173,10 +174,11 @@ private:
 			BMenuItem*			fDeleteNext;
 			BMenuItem*			fSpelling;
 			BMenu*				fSaveAddrMenu;
-
+			BMenu*				fLabelMenu;
 			BMenu*				fQueryMenu;
 			BMenu*				fLeaveStatusMenu;
 			BMenu*				fEncodingMenu;
+			BString				fLabel;
 
 	struct BitmapItem {
 		BBitmap* bm;
