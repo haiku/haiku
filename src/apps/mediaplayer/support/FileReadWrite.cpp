@@ -17,7 +17,8 @@ FileReadWrite::FileReadWrite(BFile* file, int32 sourceEncoding)
 	  fSourceEncoding(sourceEncoding),
 	  fPositionInBuffer(0),
 	  fAmtRead(0)
-{}
+{
+}
 
 
 void
@@ -45,6 +46,7 @@ FileReadWrite::Write(const BString& contents) const
 }
 
 
+// returns true when '\n' found and false otherwise
 bool
 FileReadWrite::Next(BString& string)
 {
@@ -52,31 +54,36 @@ FileReadWrite::Next(BString& string)
 	if (fPositionInBuffer == 0)
 		fAmtRead = fFile->Read(&fBuffer, sizeof(fBuffer));
 	while (fAmtRead > 0) {
-		while (fPositionInBuffer < fAmtRead) {
-			// Return true if we hit a newline or the end of the file
-			// TODO: If the source file is expected to have different encoding,
-			// don't we need to check for the line endings in that encoding?!
-			if (fBuffer[fPositionInBuffer] == '\n') {
-				fPositionInBuffer++;
-				if (fSourceEncoding != -1) {
-					int32 state = 0;
-					int32 bufferLen = string.Length();
-					int32 destBufferLen = bufferLen;
-					char destination[destBufferLen];
-					convert_to_utf8(fSourceEncoding, string.String(),
-						&bufferLen, destination, &destBufferLen, &state);
-					string = destination;
-				}
-				return true;
+		// TODO: If the source file is expected to have different encoding,
+		// don't we need to check for the line endings in that encoding?!
+
+		int32 remainingLength = fAmtRead - fPositionInBuffer;
+		char* currentPosition = fBuffer + fPositionInBuffer;
+		char* endLinePosition = (char*)memchr(currentPosition, '\n', remainingLength);
+
+		if (endLinePosition != NULL) {
+			int32 appendLength = endLinePosition - currentPosition;
+			string.Append(currentPosition, appendLength);
+
+			if (fSourceEncoding != -1) {
+				int32 state = 0;
+				int32 bufferLen = string.Length();
+				int32 destBufferLen = bufferLen;
+				char destination[destBufferLen];
+				convert_to_utf8(fSourceEncoding, string.String(), &bufferLen, destination,
+					&destBufferLen, &state);
+				string = destination;
 			}
-			// TODO: Adding one char at a time is very inefficient!
-			string += fBuffer[fPositionInBuffer]; 
-			fPositionInBuffer++;
-		} 
+
+			fPositionInBuffer += (appendLength + 1) % fAmtRead;
+
+			return true;
+		} else
+			string.Append(currentPosition, remainingLength);
 
 		// Once the buffer runs out, grab some more and start again
-		fAmtRead = fFile->Read(&fBuffer, sizeof(fBuffer)); 
+		fAmtRead = fFile->Read(&fBuffer, sizeof(fBuffer));
 		fPositionInBuffer = 0;
-	}	
+	}
 	return false;
 }

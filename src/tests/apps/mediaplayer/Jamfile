@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src tests apps mediaplayer ;
+
+AddSubDirSupportedPlatforms libbe_test ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps mediaplayer ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps mediaplayer support ] ;
+
+# Let Jam know where to find some of our source files
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps mediaplayer support ] ;
+
+UnitTestLib libmediaplayertest.so
+	: MediaPlayerTestAddon.cpp
+
+		# FileReadWrite
+		FileReadWriteTest.cpp
+    	FileReadWrite.cpp
+
+	: be textencoding [ TargetLibstdc++ ]
+;
