@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src tests kits support barchivable ;
-
-SubInclude HAIKU_TOP src tests kits support barchivable remoteobjectdef ;

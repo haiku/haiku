@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src tests kits support remoteobjectdef ;
+
+AddSubDirSupportedPlatforms libbe_test ;
+
+UnitTestLib libsupporttest_RemoteTestObject.so
+	: RemoteTestObject.cpp
+	: be [ TargetLibstdc++ ]
+	: RemoteTestObject.rdef
+;

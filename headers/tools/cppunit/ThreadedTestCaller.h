@@ -4,6 +4,8 @@
 //#include <memory>
 #include <cppunit/TestCase.h>
 #include <cppunit/TestResult.h>
+#include <cppunit/Test.h>
+#include <ThreadedTestCase.h>
 #include <cppunit/TestCaller.h>
 #include <TestShell.h>
 #include <ThreadManager.h>
