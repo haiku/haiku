@@ -801,10 +801,16 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 			Model* model = pose->TargetModel();
 			poseInfo.fInvisible = false;
 
-			if (model->IsRoot())
+			bool isRoot = model->IsRoot();
+			if (isRoot)
 				poseInfo.fInitedDirectory = targetModel->NodeRef()->node;
 			else
 				poseInfo.fInitedDirectory = model->EntryRef()->directory;
+
+			// Trash pose should be invisible except on the Desktop
+			bool isTrash = model->IsTrash();
+			if (model->IsTrash() && !IsDesktopView())
+				poseInfo.fInvisible = true;
 
 			poseInfo.fLocation = pose->Location(this);
 
@@ -845,8 +851,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 			ASSERT(model->InitCheck() == B_OK);
 			// special handling for "root" disks icon
 			// and Trash pose on Desktop directory
-			bool isTrash = model->IsTrash() && IsDesktopView();
-			if (model->IsRoot() || isTrash) {
+			if (isRoot || (isTrash && IsDesktopView())) {
 				BDirectory deskDir;
 				if (FSGetDeskDir(&deskDir) == B_OK) {
 					const char* poseInfoAttr = isTrash ? kAttrTrashPoseInfo : kAttrDisksPoseInfo;

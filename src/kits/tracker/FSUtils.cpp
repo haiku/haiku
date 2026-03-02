@@ -2689,7 +2689,9 @@ FSGetTrashDir(BDirectory* trashDir, dev_t dev)
 		result = trashDir->SetTo(path.Path());
 		if (result != B_OK)
 			return result;
+	}
 
+	if (result == B_OK) {
 		// make Trash directory invisible
 		StatStruct sbuf;
 		trashDir->GetStat(&sbuf);
