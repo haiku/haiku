@@ -177,7 +177,7 @@ private:
 			area_id					fHyperCallArea;
 			phys_addr_t				fHyperCallPhys;
 
-			uint8					fIRQ;
+			int32					fIRQ;
 			uint8					fInterruptVector;
 			int32					fCPUCount;
 			VMBusCPU*				fCPUData;

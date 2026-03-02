@@ -16,7 +16,7 @@ VMBus::VMBus(device_node* node)
 	fHypercallPage(NULL),
 	fHyperCallArea(0),
 	fHyperCallPhys(0),
-	fIRQ(0),
+	fIRQ(-1),
 	fInterruptVector(0),
 	fCPUCount(0),
 	fCPUData(NULL),
@@ -307,7 +307,7 @@ VMBus::AllocateGPADL(uint32 channelID, uint32 length, void** _buffer, uint32* _g
 	if (channel == NULL)
 		return B_DEVICE_NOT_FOUND;
 
-	// Allocate contigous buffer to back the GPADL
+	// Allocate contiguous buffer to back the GPADL
 	void* buffer;
 	phys_addr_t physAddr;
 	area_id areaid = _AllocateBuffer("hv gpadl", length, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
@@ -517,19 +517,20 @@ VMBus::_EnableInterrupts()
 	if (status != B_OK)
 		return status;
 
-	fIRQ = 0;
+	fIRQ = -1;
 	status = gACPI->walk_resources(acpiVMBusHandle, (ACPI_STRING) "_CRS", _InterruptACPICallback,
 		&fIRQ);
 	if (status != B_OK)
 		return status;
-	if (fIRQ == 0)
+	if (fIRQ < 0)
 		return B_IO_ERROR;
 
 	fInterruptVector = fIRQ + ARCH_INTERRUPT_BASE;
-	TRACE("VMBus irq interrupt line: %u, vector: %u\n", fIRQ, fInterruptVector);
+	TRACE("VMBus irq interrupt line: %" B_PRId32 ", vector: %u\n", fIRQ, fInterruptVector);
 	status = install_io_interrupt_handler(fIRQ, _InterruptHandler, this, 0);
 	if (status != B_OK) {
-		ERROR("Can't install interrupt handler for irq %u (%s)\n", fIRQ, strerror(status));
+		ERROR("Can't install interrupt handler for irq %" B_PRId32 " (%s)\n", fIRQ,
+			strerror(status));
 		return status;
 	}
 
@@ -550,6 +551,9 @@ VMBus::_EnableInterruptCPUHandler(void* data, int cpu)
 void
 VMBus::_DisableInterrupts()
 {
+	if (fIRQ < 0)
+		return;
+
 	// Each CPU has its own set of MSRs, disable on all
 	call_all_cpus_sync(_DisableInterruptCPUHandler, this);
 
@@ -567,11 +571,11 @@ VMBus::_DisableInterruptCPUHandler(void* data, int cpu)
 /*static*/ acpi_status
 VMBus::_InterruptACPICallback(ACPI_RESOURCE* res, void* context)
 {
-	uint8* irq = static_cast<uint8*>(context);
+	int32* irq = static_cast<int32*>(context);
 
 	// Grab the first IRQ only. Gen1 usually has two IRQs, Gen2 just one.
 	// Only one IRQ is required for the VMBus device.
-	if (res->Type == ACPI_RESOURCE_TYPE_IRQ && *irq == 0)
+	if (res->Type == ACPI_RESOURCE_TYPE_IRQ && *irq < 0)
 		*irq = res->Data.Irq.Interrupt;
 	return B_OK;
 }
