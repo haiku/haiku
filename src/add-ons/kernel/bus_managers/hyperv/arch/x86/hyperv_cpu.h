@@ -18,6 +18,32 @@
 // Hyper-V signature "Hv#1"
 #define HV_CPUID_INTERFACE_ID					0x31237648
 
+// Hyper-V x86 features from feature CPUID leaf, eax register
+// https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/datatypes/hv_partition_privilege_mask
+#define HV_CPUID_FEATURE_VP_RUNTIME				(1 << 0)
+#define HV_CPUID_FEATURE_TIME_REF_COUNTER		(1 << 1)
+#define HV_CPUID_FEATURE_SYNIC					(1 << 2)
+#define HV_CPUID_FEATURE_SYNTIMER				(1 << 3)
+#define HV_CPUID_FEATURE_APIC					(1 << 4)
+#define HV_CPUID_FEATURE_HYPERCALL				(1 << 5)
+#define HV_CPUID_FEATURE_VP_INDEX				(1 << 6)
+#define HV_CPUID_FEATURE_RESET					(1 << 7)
+#define HV_CPUID_FEATURE_STATS					(1 << 8)
+#define HV_CPUID_FEATURE_REFERENCE_TSC			(1 << 9)
+#define HV_CPUID_FEATURE_GUEST_IDLE				(1 << 10)
+#define HV_CPUID_FEATURE_FREQUENCY				(1 << 11)
+#define HV_CPUID_FEATURE_REENLIGHTMENT			(1 << 13)
+
+// Hyper-V x86 features from feature CPUID leaf, ebx register
+#define HV_CPUID_FEATURE_HYPERCALL_POST_MESSAGE		(1 << 4)
+#define HV_CPUID_FEATURE_HYPERCALL_SIGNAL_EVENT		(1 << 5)
+
+// Required feature bits for VMBus operation
+#define HV_CPUID_EAX_REQUIRED_FEATURES	(HV_CPUID_FEATURE_SYNIC | HV_CPUID_FEATURE_SYNTIMER \
+	| HV_CPUID_FEATURE_HYPERCALL)
+#define HV_CPUID_EBX_REQUIRED_FEATURES	(HV_CPUID_FEATURE_HYPERCALL_POST_MESSAGE \
+	| HV_CPUID_FEATURE_HYPERCALL_SIGNAL_EVENT)
+
 // MSR registers
 #define IA32_MSR_HV_GUEST_OS_ID					0x40000000
 #define IA32_MSR_HV_HYPERCALL					0x40000001

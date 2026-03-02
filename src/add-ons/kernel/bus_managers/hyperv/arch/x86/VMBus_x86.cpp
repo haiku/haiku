@@ -37,6 +37,17 @@ vmbus_detect_hyperv()
 		return B_ERROR;
 	}
 
+	// Check for required Hyper-V features
+	// Some hypervisors claim to be Hyper-V, but may not actually implement all features
+	get_cpuid(&cpuInfo, IA32_CPUID_LEAF_HV_FEAT_ID, 0);
+	TRACE("Hyper-V features: %08" B_PRIX32 ":%08" B_PRIX32 ":%08" B_PRIX32 ":%08" B_PRIX32 "\n",
+		cpuInfo.regs.eax, cpuInfo.regs.ebx, cpuInfo.regs.ecx, cpuInfo.regs.edx);
+	if ((cpuInfo.regs.eax & HV_CPUID_EAX_REQUIRED_FEATURES) == 0
+			|| (cpuInfo.regs.ebx & HV_CPUID_EBX_REQUIRED_FEATURES) == 0) {
+		TRACE("Missing required Hyper-V features\n");
+		return B_ERROR;
+	}
+
 #ifdef TRACE_HYPERV
 	get_cpuid(&cpuInfo, IA32_CPUID_LEAF_HV_SYS_ID, 0);
 	TRACE("Hyper-V version: %d.%d.%d [SP%d]\n", cpuInfo.regs.ebx >> 16, cpuInfo.regs.ebx & 0xFFFF,
