@@ -81,8 +81,7 @@ VMBusDevice::Open(uint32 txLength, uint32 rxLength, hyperv_device_callback callb
 	TRACE("Open channel %u tx length 0x%X rx length 0x%X\n", fChannelID, txLength, rxLength);
 
 	// Create the GPADL used for the ring buffers
-	status_t status = fVMBus->allocate_gpadl(fVMBusCookie, fChannelID, fRingBufferLength,
-		&fRingBuffer, &fRingGPADL);
+	status_t status = AllocateGPADL(fRingBufferLength, &fRingBuffer, &fRingGPADL);
 	if (status != B_OK) {
 		ERROR("Failed to allocate GPADL while opening channel %u (%s)\n", fChannelID,
 			strerror(status));
@@ -133,7 +132,7 @@ VMBusDevice::Close()
 	if (status != B_OK)
 		ERROR("Failed to close channel %u (%s)\n", fChannelID, strerror(status));
 
-	status = fVMBus->free_gpadl(fVMBusCookie, fChannelID, fRingGPADL);
+	status = FreeGPADL(fRingGPADL);
 	if (status != B_OK)
 		ERROR("Failed to free ring GPADL for channel %u (%s)\n", fChannelID, strerror(status));
 
@@ -148,8 +147,8 @@ status_t
 VMBusDevice::WritePacket(uint16 type, const void* buffer, uint32 length, bool responseRequired,
 	uint64 transactionID)
 {
-	TRACE_TX("Channel %u TX pkt %u len 0x%X resp %u tran %lu\n", fChannelID, type, length,
-		responseRequired, transactionID);
+	TRACE_TX("Channel %u TX pkt %u len 0x%X resp %u tran %" B_PRIu64 "\n", fChannelID, type,
+		length, responseRequired, transactionID);
 
 	vmbus_pkt_header header;
 	uint32 totalLength = sizeof(header) + length;
@@ -161,16 +160,53 @@ VMBusDevice::WritePacket(uint16 type, const void* buffer, uint32 length, bool re
 	header.flags = responseRequired ? VMBUS_PKT_FLAGS_RESPONSE_REQUIRED : 0;
 	header.transaction_id = transactionID;
 
-	iovec pkt[3];
+	iovec data[3];
 	uint64 padding = 0;
-	pkt[0].iov_base = &header;
-	pkt[0].iov_len = sizeof(header);
-	pkt[1].iov_base = (void*)buffer;
-	pkt[1].iov_len = length;
-	pkt[2].iov_base = &padding;
-	pkt[2].iov_len = totalLengthAligned - totalLength;
+	data[0].iov_base = &header;
+	data[0].iov_len = sizeof(header);
+	data[1].iov_base = (void*)buffer;
+	data[1].iov_len = length;
+	data[2].iov_base = &padding;
+	data[2].iov_len = totalLengthAligned - totalLength;
 
-	return _WriteTXData(pkt, 3);
+	return _WriteTXData(data, 3);
+}
+
+
+status_t
+VMBusDevice::WriteGPAPacket(uint32 rangeCount, const vmbus_gpa_range* rangesList,
+	uint32 rangesLength, const void* buffer, uint32 length, bool responseRequired,
+	uint64 transactionID)
+{
+	TRACE_TX("Channel %u TX gpa pkt cnt %u gpa len 0x%X len 0x%X resp %u tran %" B_PRIu64 "\n",
+		fChannelID, rangeCount, rangesLength, length, responseRequired, transactionID);
+
+	vmbus_pkt_gpa_header gpa;
+	uint32 headerLength = sizeof(gpa) + rangesLength;
+	uint32 totalLength = headerLength + length;
+	uint32 totalLengthAligned = VMBUS_PKT_ALIGN(totalLength);
+
+	gpa.header.type = VMBUS_PKTTYPE_DATA_USING_GPA_DIRECT;
+	gpa.header.header_length = static_cast<uint16>(headerLength >> VMBUS_PKT_SIZE_SHIFT);
+	gpa.header.total_length = static_cast<uint16>(totalLengthAligned >> VMBUS_PKT_SIZE_SHIFT);
+	gpa.header.flags = responseRequired ? VMBUS_PKT_FLAGS_RESPONSE_REQUIRED : 0;
+	gpa.header.transaction_id = transactionID;
+
+	gpa.reserved = 0;
+	gpa.range_count = rangeCount;
+
+	iovec data[4];
+	uint64 padding = 0;
+	data[0].iov_base = &gpa;
+	data[0].iov_len = sizeof(gpa);
+	data[1].iov_base = (void*)rangesList;
+	data[1].iov_len = rangesLength;
+	data[2].iov_base = (void*)buffer;
+	data[2].iov_len = length;
+	data[3].iov_base = &padding;
+	data[3].iov_len = totalLengthAligned - totalLength;
+
+	return _WriteTXData(data, 4);
 }
 
 
@@ -260,6 +296,20 @@ VMBusDevice::ReadPacket(vmbus_pkt_header* _header, uint32* _headerLength, void* 
 		atomic_get((int32*)&fRXRing->read_index), atomic_get((int32*)&fRXRing->write_index));
 
 	return B_OK;
+}
+
+
+status_t
+VMBusDevice::AllocateGPADL(uint32 length, void** _buffer, uint32* _gpadl)
+{
+	return fVMBus->allocate_gpadl(fVMBusCookie, fChannelID, length, _buffer, _gpadl);
+}
+
+
+status_t
+VMBusDevice::FreeGPADL(uint32 gpadl)
+{
+	return fVMBus->free_gpadl(fVMBusCookie, fChannelID, gpadl);
 }
 
 

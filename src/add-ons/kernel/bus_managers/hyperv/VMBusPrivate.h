@@ -116,6 +116,7 @@ public:
 
 			uint32					GetVersion() const { return fVersion; }
 			status_t				RequestChannels();
+
 			status_t				OpenChannel(uint32 channelID, uint32 gpadlID, uint32 rxOffset,
 										hyperv_bus_callback callback, void* callbackData);
 			status_t				CloseChannel(uint32 channelID);

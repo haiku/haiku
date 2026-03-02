@@ -50,11 +50,19 @@ public:
 			status_t				Open(uint32 txLength, uint32 rxLength,
 										hyperv_device_callback callback, void* callbackData);
 			void					Close();
+
 			status_t				WritePacket(uint16 type, const void* buffer, uint32 length,
 										bool responseRequired, uint64 transactionID);
+			status_t				WriteGPAPacket(uint32 rangeCount,
+										const vmbus_gpa_range* rangesList, uint32 rangesLength,
+										const void* buffer, uint32 length, bool responseRequired,
+										uint64 transactionID);
 			status_t				PeekPacket(void* _buffer, uint32 length);
 			status_t				ReadPacket(vmbus_pkt_header* _header, uint32* _headerLength,
 										void* _buffer, uint32* _length);
+
+			status_t				AllocateGPADL(uint32 length, void** _buffer, uint32* _gpadl);
+			status_t				FreeGPADL(uint32 gpadl);
 
 private:
 	static	void					_CallbackHandler(void* arg);

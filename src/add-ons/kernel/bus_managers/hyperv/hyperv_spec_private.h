@@ -167,14 +167,6 @@ static const uint32 vmbus_versions[] = {
 };
 
 
-typedef struct {
-	uint32	data1;
-	uint16	data2;
-	uint16	data3;
-	uint8	data4[8];
-} _PACKED vmbus_guid_t;
-
-
  // VMBus GPADL range descriptor
 typedef struct {
 	uint32	length;
@@ -321,11 +313,11 @@ typedef struct {
 typedef struct {
 	vmbus_msg_header header;
 
-	uint32				channel_id;
-	uint32				gpadl_id;
-	uint16				total_range_length;
-	uint16				range_count;
-	vmbus_gpadl_range	ranges[1]; // Only 1 range is supported by this driver
+	uint32			channel_id;
+	uint32			gpadl_id;
+	uint16			total_range_length;
+	uint16			range_count;
+	vmbus_gpa_range	ranges[1]; // Only 1 range is supported by this driver
 } _PACKED vmbus_msg_create_gpadl;
 #define VMBUS_MSG_CREATE_GPADL_MAX_PAGES \
 	((HYPERCALL_MAX_DATA_SIZE - sizeof(vmbus_msg_create_gpadl)) / sizeof(uint64))

@@ -9,11 +9,14 @@
 #include <SupportDefs.h>
 
 
-#define HV_PAGE_SIZE			4096
-#define HV_PAGE_SHIFT			12
-#define HV_PAGE_ALIGN(x) 		(((x) + (HV_PAGE_SIZE - 1)) & ~(HV_PAGE_SIZE - 1))
-#define HV_BYTES_TO_PAGES(x)	(HV_PAGE_ALIGN(x) >> HV_PAGE_SHIFT)
-#define HV_MS_TO_US(x)			((x) * 1000ULL)
+#define HV_PAGE_SIZE					4096
+#define HV_PAGE_MASK					(HV_PAGE_SIZE - 1)
+#define HV_PAGE_SHIFT					12
+#define HV_PAGE_ALIGN(x)				(((x) + (HV_PAGE_SIZE - 1)) & ~(HV_PAGE_SIZE - 1))
+#define HV_BYTES_TO_PAGES(x)			(HV_PAGE_ALIGN(x) >> HV_PAGE_SHIFT)
+#define HV_BYTES_TO_SPAN_PAGES(a, l)	((((l) - 1) >> HV_PAGE_SHIFT) \
+	+ (((((l) - 1) & HV_PAGE_MASK) + ((a) & HV_PAGE_MASK)) >> HV_PAGE_SHIFT) + 1);
+#define HV_MS_TO_US(x)					((x) * 1000ULL)
 
 #define HV_STATIC_ASSERT(cond, msg)	static_assert(cond, msg)
 
@@ -56,6 +59,14 @@
 #define VMBUS_TYPE_VSS				"35fa2e29-ea23-4236-96ae-3a6ebacba440"
 
 
+typedef struct {
+	uint32	data1;
+	uint16	data2;
+	uint16	data3;
+	uint8	data4[8];
+} _PACKED vmbus_guid_t;
+
+
 // VMBus packet types
 enum {
 	VMBUS_PKTTYPE_INVALID					= 0,
@@ -89,7 +100,47 @@ typedef struct {
 	uint16	total_length;
 	uint16	flags;
 	uint64	transaction_id;
-} vmbus_pkt_header;
+} _PACKED vmbus_pkt_header;
+
+
+// VMBus transfer range
+// Describes a buffer within an existing defined buffer
+typedef struct {
+	uint32	length;
+	uint32	offset;
+} _PACKED vmbus_transfer_range;
+
+
+// VMBus transfer ranges packet header
+typedef struct {
+	vmbus_pkt_header	header;
+
+	uint16	transfer_pageset_id;
+	uint8	sender_owns_sets;
+	uint8	reserved;
+
+	uint32					range_count;
+	vmbus_transfer_range	ranges[];
+} _PACKED vmbus_pkt_transfer_header;
+
+
+// VMBus GPA (Guest Physical Address) range
+// Describes a buffer made up of one or more physical pages in the guest
+typedef struct {
+	uint32	length;
+	uint32	offset;
+	uint64	page_nums[];
+} _PACKED vmbus_gpa_range;
+
+
+// VMBus GPA packet header
+typedef struct {
+	vmbus_pkt_header	header;
+
+	uint32				reserved;
+	uint32				range_count;
+	vmbus_gpa_range		ranges[];
+} _PACKED vmbus_pkt_gpa_header;
 
 
 #endif // _HYPERV_SPEC_H_

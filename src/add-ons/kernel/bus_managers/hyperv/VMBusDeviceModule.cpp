@@ -76,7 +76,16 @@ vmbus_device_close(hyperv_device cookie)
 
 
 static status_t
-vmbus_device_write_packet(hyperv_device cookie, uint16 type, void* buffer, uint32 length,
+vmbus_device_read_packet(hyperv_device cookie, vmbus_pkt_header* _header, uint32* _headerLength,
+	void* _buffer, uint32* _length)
+{
+	VMBusDevice* device = reinterpret_cast<VMBusDevice*>(cookie);
+	return device->ReadPacket(_header, _headerLength, _buffer, _length);
+}
+
+
+static status_t
+vmbus_device_write_packet(hyperv_device cookie, uint16 type, const void* buffer, uint32 length,
 	bool responseRequired, uint64 transactionID)
 {
 	VMBusDevice* device = reinterpret_cast<VMBusDevice*>(cookie);
@@ -85,11 +94,29 @@ vmbus_device_write_packet(hyperv_device cookie, uint16 type, void* buffer, uint3
 
 
 static status_t
-vmbus_device_read_packet(hyperv_device cookie, vmbus_pkt_header* _header, uint32* _headerLength,
-	void* _buffer, uint32* _length)
+vmbus_device_write_gpa_packet(hyperv_device cookie, uint32 rangeCount,
+	const vmbus_gpa_range* rangesList, uint32 rangesLength, const void* buffer, uint32 length,
+	bool responseRequired, uint64 transactionID)
 {
 	VMBusDevice* device = reinterpret_cast<VMBusDevice*>(cookie);
-	return device->ReadPacket(_header, _headerLength, _buffer, _length);
+	return device->WriteGPAPacket(rangeCount, rangesList, rangesLength, buffer, length,
+		responseRequired, transactionID);
+}
+
+
+static status_t
+vmbus_device_allocate_gpadl(hyperv_device cookie, uint32 length, void** _buffer, uint32* _gpadl)
+{
+	VMBusDevice* device = reinterpret_cast<VMBusDevice*>(cookie);
+	return device->AllocateGPADL(length, _buffer, _gpadl);
+}
+
+
+static status_t
+vmbus_device_free_gpadl(hyperv_device cookie, uint32 gpadl)
+{
+	VMBusDevice* device = reinterpret_cast<VMBusDevice*>(cookie);
+	return device->FreeGPADL(gpadl);
 }
 
 
@@ -128,6 +155,9 @@ hyperv_device_interface gVMBusDeviceModule = {
 	vmbus_device_get_bus_version,
 	vmbus_device_open,
 	vmbus_device_close,
+	vmbus_device_read_packet,
 	vmbus_device_write_packet,
-	vmbus_device_read_packet
+	vmbus_device_write_gpa_packet,
+	vmbus_device_allocate_gpadl,
+	vmbus_device_free_gpadl
 };

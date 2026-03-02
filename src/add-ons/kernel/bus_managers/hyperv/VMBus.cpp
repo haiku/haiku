@@ -1070,13 +1070,14 @@ status_t
 VMBus::_RegisterChannel(VMBusChannel* channel)
 {
 	char typeStr[37];
-	char instanceStr[37];
-
 	snprintf(typeStr, sizeof(typeStr), "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 		channel->type_id.data1, channel->type_id.data2, channel->type_id.data3,
 		channel->type_id.data4[0], channel->type_id.data4[1], channel->type_id.data4[2],
 		channel->type_id.data4[3], channel->type_id.data4[4], channel->type_id.data4[5],
 		channel->type_id.data4[6], channel->type_id.data4[7]);
+
+#ifdef TRACE_VMBUS
+	char instanceStr[37];
 	snprintf(instanceStr, sizeof(instanceStr),
 		"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 		channel->instance_id.data1, channel->instance_id.data2, channel->instance_id.data3,
@@ -1086,6 +1087,7 @@ VMBus::_RegisterChannel(VMBusChannel* channel)
 		channel->instance_id.data4[6], channel->instance_id.data4[7]);
 	TRACE("Registering VMBus channel %u type %s inst %s\n", channel->channel_id, typeStr,
 		instanceStr);
+#endif
 
 	char prettyName[sizeof(HYPERV_PRETTYNAME_VMBUS_DEVICE_FMT) + 8];
 	snprintf(prettyName, sizeof(prettyName), HYPERV_PRETTYNAME_VMBUS_DEVICE_FMT,
@@ -1100,8 +1102,8 @@ VMBus::_RegisterChannel(VMBusChannel* channel)
 			{ .ui32 = channel->channel_id }},
 		{ HYPERV_DEVICE_TYPE_ITEM, B_STRING_TYPE,
 			{ .string = typeStr }},
-		{ HYPERV_INSTANCE_ID_ITEM, B_STRING_TYPE,
-			{ .string = instanceStr }},
+		{ HYPERV_INSTANCE_ID_ITEM, B_RAW_TYPE,
+			{ .raw = { .data = &channel->instance_id, .length = sizeof(channel->instance_id) }}},
 		{ NULL }
 	};
 

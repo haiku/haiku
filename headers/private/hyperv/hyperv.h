@@ -15,7 +15,7 @@
 
 // Device attributes for the VMBus device
 #define HYPERV_CHANNEL_ID_ITEM				"hyperv/channel"
-#define HYPERV_DEVICE_TYPE_ITEM				"hyperv/type"
+#define HYPERV_DEVICE_TYPE_ITEM				"hyperv/type_string"
 #define HYPERV_INSTANCE_ID_ITEM				"hyperv/instance"
 
 #define HYPERV_PRETTYNAME_VMBUS				"Hyper-V Virtual Machine Bus"
@@ -53,10 +53,16 @@ typedef struct hyperv_device_interface {
 	status_t (*open)(hyperv_device cookie, uint32 txLength, uint32 rxLength,
 		hyperv_device_callback callback, void* callbackData);
 	void (*close)(hyperv_device cookie);
-	status_t (*write_packet)(hyperv_device cookie, uint16 type, void* buffer,
-		uint32 length, bool responseRequired, uint64 transactionID);
 	status_t (*read_packet)(hyperv_device cookie, vmbus_pkt_header* _header,
 		uint32* _headerLength, void* _buffer, uint32* _length);
+	status_t (*write_packet)(hyperv_device cookie, uint16 type, const void* buffer,
+		uint32 length, bool responseRequired, uint64 transactionID);
+	status_t (*write_gpa_packet)(hyperv_device cookie, uint32 rangeCount,
+		const vmbus_gpa_range* rangesList, uint32 rangesLength, const void* buffer,
+		uint32 length, bool responseRequired, uint64 transactionID);
+	status_t (*allocate_gpadl)(hyperv_device cookie, uint32 length, void** _buffer,
+		uint32* _gpadl);
+	status_t (*free_gpadl)(hyperv_device cookie, uint32 gpadl);
 } hyperv_device_interface;
 
 
