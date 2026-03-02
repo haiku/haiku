@@ -186,7 +186,7 @@ BTrashWatcher::WatchTrashDirs()
 {
 	BVolumeRoster volRoster;
 	volRoster.Rewind();
-	BVolume	volume;
+	BVolume volume;
 	while (volRoster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsReadOnly() || !volume.IsPersistent())
 			continue;
