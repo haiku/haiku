@@ -5994,8 +5994,8 @@ BPoseView::AttributeChanged(const BMessage* message)
 				continue;
 
 			for (int i = sizeof(sAttrColumnMap) / sizeof(attr_column_relation); i--;) {
-				if (sAttrColumnMap[i].attrHash == PrimarySort()
-					|| sAttrColumnMap[i].attrHash == SecondarySort()) {
+				uint32 attrHash = sAttrColumnMap[i].attrHash;
+				if (attrHash == PrimarySort() || attrHash == SecondarySort()) {
 					if ((fields & sAttrColumnMap[i].fieldMask) != 0) {
 						_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
 						if (IsFiltering() && visible)
