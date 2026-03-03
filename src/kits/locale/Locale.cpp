@@ -13,7 +13,9 @@
 
 
 BLocale::BLocale(const BLanguage* language,
-	const BFormattingConventions* conventions)
+		const BFormattingConventions* conventions)
+	:
+	fLock("BLocale")
 {
 	if (conventions != NULL)
 		fConventions = *conventions;
