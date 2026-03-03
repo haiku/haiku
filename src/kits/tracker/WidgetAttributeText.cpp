@@ -705,7 +705,7 @@ KindAttributeText::ReadValue(BString* outString)
 	char desc[B_MIME_TYPE_LENGTH];
 
 	// get the mime type
-	if (mime.SetType(fModel->MimeType()) != B_OK)
+	if (mime.SetTo(fModel->MimeType()) != B_OK)
 		*outString = B_TRANSLATE("Unknown");
 	else if (mime.GetShortDescription(desc) == B_OK) {
 		// get the short mime type description

@@ -372,7 +372,7 @@ GeneralInfoView::InitStrings(const Model* model)
 			fFileSystemStr = B_TRANSLATE("(unknown)");
 	}
 
-	if (mime.SetType(model->MimeType()) == B_OK
+	if (mime.SetTo(model->MimeType()) == B_OK
 		&& mime.GetShortDescription(kind) == B_OK)
 		fKindStr = kind;
 

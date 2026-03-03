@@ -149,7 +149,7 @@ public:
 	static status_t StopWatching(BMessenger target);
 
 	/* Deprecated. Use SetTo() instead. */
-	status_t SetType(const char* mimeType);
+	status_t SetType(const char* mimeType) _DEPRECATED;
 
 private:
 	BMimeType(const char* mimeType, const char* mimePath);
