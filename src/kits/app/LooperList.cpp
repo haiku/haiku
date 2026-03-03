@@ -12,7 +12,6 @@
 
 #include "LooperList.h"
 
-#include <Autolock.h>
 #include <Looper.h>
 
 #include <algorithm>
@@ -27,37 +26,36 @@ BLooperList gLooperList;
 
 
 BLooperList::BLooperList()
-	:
-	fLock("BLooperList lock")
 {
+	rw_lock_init(&fLock, "BLooperList rwlock");
 }
 
 
 bool
 BLooperList::Lock()
 {
-	return fLock.Lock();
+	return rw_lock_write_lock(&fLock) == B_OK;
 }
 
 
 void
 BLooperList::Unlock()
 {
-	fLock.Unlock();
+	rw_lock_write_unlock(&fLock);
 }
 
 
 bool
 BLooperList::IsLocked()
 {
-	return fLock.IsLocked();
+	return fLock.holder == find_thread(NULL);
 }
 
 
 void
 BLooperList::AddLooper(BLooper* looper)
 {
-	BAutolock locker(fLock);
+	WriteLocker locker(fLock);
 	AssertLocked();
 	if (!IsLooperValid(looper)) {
 		LooperDataIterator i
@@ -76,9 +74,7 @@ BLooperList::AddLooper(BLooper* looper)
 bool
 BLooperList::IsLooperValid(const BLooper* looper)
 {
-	BAutolock locker(fLock);
-	AssertLocked();
-
+	ReadLocker locker(fLock);
 	return find_if(fData.begin(), fData.end(),
 		FindLooperPred(looper)) != fData.end();
 }
@@ -87,7 +83,7 @@ BLooperList::IsLooperValid(const BLooper* looper)
 bool
 BLooperList::RemoveLooper(BLooper* looper)
 {
-	BAutolock locker(fLock);
+	WriteLocker locker(fLock);
 	AssertLocked();
 
 	LooperDataIterator i = find_if(fData.begin(), fData.end(),
@@ -104,8 +100,7 @@ BLooperList::RemoveLooper(BLooper* looper)
 void
 BLooperList::GetLooperList(BList* list)
 {
-	BAutolock locker(fLock);
-	AssertLocked();
+	ReadLocker locker(fLock);
 
 	for (uint32 i = 0; i < fData.size(); ++i) {
 		if (fData[i].looper)
@@ -117,8 +112,7 @@ BLooperList::GetLooperList(BList* list)
 int32
 BLooperList::CountLoopers()
 {
-	BAutolock locker(fLock);
-	AssertLocked();
+	ReadLocker locker(fLock);
 	return (int32)fData.size();
 }
 
@@ -126,8 +120,7 @@ BLooperList::CountLoopers()
 BLooper*
 BLooperList::LooperAt(int32 index)
 {
-	BAutolock locker(fLock);
-	AssertLocked();
+	ReadLocker locker(fLock);
 
 	BLooper* looper = NULL;
 	if (index < (int32)fData.size())
@@ -140,8 +133,7 @@ BLooperList::LooperAt(int32 index)
 BLooper*
 BLooperList::LooperForThread(thread_id thread)
 {
-	BAutolock locker(fLock);
-	AssertLocked();
+	ReadLocker locker(fLock);
 
 	BLooper* looper = NULL;
 	LooperDataIterator i
@@ -156,8 +148,7 @@ BLooperList::LooperForThread(thread_id thread)
 BLooper*
 BLooperList::LooperForName(const char* name)
 {
-	BAutolock locker(fLock);
-	AssertLocked();
+	ReadLocker locker(fLock);
 
 	BLooper* looper = NULL;
 	LooperDataIterator i
@@ -172,8 +163,7 @@ BLooperList::LooperForName(const char* name)
 BLooper*
 BLooperList::LooperForPort(port_id port)
 {
-	BAutolock locker(fLock);
-	AssertLocked();
+	ReadLocker locker(fLock);
 
 	BLooper* looper = NULL;
 	LooperDataIterator i
@@ -188,8 +178,7 @@ BLooperList::LooperForPort(port_id port)
 void
 BLooperList::InitAfterFork()
 {
-	// We need to reinitialize the locker to get a new semaphore
-	new (&fLock) BLocker("BLooperList lock");
+	rw_lock_init(&fLock, "BLooperList lock");
 	fData.clear();
 }
 

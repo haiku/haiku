@@ -11,9 +11,8 @@
 
 #include <vector>
 
-#include <Locker.h>
 #include <OS.h>
-#include <SupportDefs.h>
+#include <locks.h>
 
 
 class BList;
@@ -78,7 +77,7 @@ private:
 			void				AssertLocked();
 
 private:
-			BLocker				fLock;
+			rw_lock					fLock;
 			std::vector<LooperData>	fData;
 };
 

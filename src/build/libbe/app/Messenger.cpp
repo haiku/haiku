@@ -14,7 +14,6 @@
 #include <Application.h>
 #include <Handler.h>
 #include <Looper.h>
-#include <LooperList.h>
 #include <Message.h>
 #include <MessagePrivate.h>
 #include <Messenger.h>
