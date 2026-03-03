@@ -20,6 +20,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#include <package/CleanUpAdminDirectoryRequest.h>
 #include <package/CommitTransactionResult.h>
 #include <package/DownloadFileRequest.h>
 #include <package/RefreshRepositoryRequest.h>
@@ -28,6 +29,7 @@
 #include <package/solver/SolverProblemSolution.h>
 
 #include "pkgman.h"
+#include "JobStateListener.h"
 
 
 using namespace BPackageKit::BPrivate;
@@ -331,6 +333,19 @@ void
 PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
 	printf("[%s] Done.\n", repository.Name().String());
+
+	BInstallationLocationInfo info;
+	if (BPackageRoster().GetInstallationLocationInfo(repository.Location(), info) == B_OK) {
+		// Offer to delete older state and transaction directories.
+		BJobStateListener listener;
+		BContext context(fDecisionProvider, listener);
+
+		const int days = 30;
+		time_t before = time(NULL) - days * 24 * 60 * 60;
+
+		CleanUpAdminDirectoryRequest request(context, info, before, 10);
+		request.Process();
+	}
 
 	if (BPackageRoster().IsRebootNeeded())
 		printf("A reboot is necessary to complete the installation process.\n");
