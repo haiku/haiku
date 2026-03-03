@@ -6,7 +6,7 @@
 #define _BLOCK_CACHE_H
 
 
-#include <Locker.h>
+#include <SupportDefs.h>
 
 
 enum {
@@ -31,16 +31,18 @@ private:
 						BBlockCache	&operator=(const BBlockCache &);
 
 private:
-		struct _FreeBlock;
+	struct _FreeBlock;
 
-		_FreeBlock*	fFreeList;
-		size_t		fBlockSize;
-		int32		fFreeBlocks;
-		int32		fBlockCount;
-		BLocker		fLocker;
-		void*		(*fAlloc)(size_t size);
-		void		(*fFree)(void *pointer);
-		uint32		_reserved[2];
+	_FreeBlock*		fFreeList;
+	const size_t	fBlockSize;
+	void*			(*fAlloc)(size_t size);
+	void			(*fFree)(void *pointer);
+
+	pthread_mutex_t fLock;
+	int32			fFreeBlocks;
+	int32			fBlockCount;
+
+	uint32 _reserved[6];
 };
 
 

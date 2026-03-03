@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <new>
+#include <pthread.h>
 
 
 #ifdef __HAIKU__
@@ -39,11 +40,10 @@ BBlockCache::BBlockCache(uint32 blockCount, size_t blockSize,
 	:
 	fFreeList(0),
 	fBlockSize(blockSize),
+	fAlloc(NULL),
+	fFree(NULL),
 	fFreeBlocks(0),
-	fBlockCount(blockCount),
-	fLocker("some BBlockCache lock"),
-	fAlloc(0),
-	fFree(0)
+	fBlockCount(blockCount)
 {
 	switch (allocationType) {
 		case B_OBJECT_CACHE:
@@ -60,6 +60,8 @@ BBlockCache::BBlockCache(uint32 blockCount, size_t blockSize,
 	// If a debug heap is in use, don't cache anything.
 	if (heap_debug_get_allocation_info != NULL)
 		return;
+
+	pthread_mutex_init(&fLock, NULL);
 
 	// To properly maintain a list of free buffers, a buffer must be
 	// large enough to contain the _FreeBlock struct that is used.
@@ -87,7 +89,7 @@ BBlockCache::BBlockCache(uint32 blockCount, size_t blockSize,
 BBlockCache::~BBlockCache()
 {
 	// walk the free list and deallocate all blocks
-	fLocker.Lock();
+	pthread_mutex_lock(&fLock);
 	while (fFreeList) {
 		ASSERT(fFreeList->magic1 == MAGIC1);
 		ASSERT(fFreeList->magic2 == MAGIC2 + (uint32)(addr_t)fFreeList->next);
@@ -96,7 +98,8 @@ BBlockCache::~BBlockCache()
 		DEBUG_ONLY(memset(pointer, 0xCC, sizeof(_FreeBlock)));
 		fFree(pointer);
 	}
-	fLocker.Unlock();
+
+	pthread_mutex_destroy(&fLock);
 }
 
 
@@ -106,8 +109,7 @@ BBlockCache::Get(size_t blockSize)
 	if (heap_debug_get_allocation_info != NULL)
 		return fAlloc(blockSize);
 
-	if (!fLocker.Lock())
-		return 0;
+	pthread_mutex_lock(&fLock);
 	void *pointer;
 	if (blockSize == fBlockSize && fFreeList != 0) {
 		// we can take a block from the list
@@ -117,14 +119,16 @@ BBlockCache::Get(size_t blockSize)
 		fFreeList = fFreeList->next;
 		fFreeBlocks--;
 		DEBUG_ONLY(memset(pointer, 0xCC, sizeof(_FreeBlock)));
+		pthread_mutex_unlock(&fLock);
+		return pointer;
 	} else {
+		pthread_mutex_unlock(&fLock);
 		if (blockSize < sizeof(_FreeBlock))
 			blockSize = sizeof(_FreeBlock);
 		pointer = fAlloc(blockSize);
 		DEBUG_ONLY(if (pointer) memset(pointer, 0xCC, sizeof(_FreeBlock)));
+		return pointer;
 	}
-	fLocker.Unlock();
-	return pointer;
 }
 
 
@@ -136,8 +140,7 @@ BBlockCache::Save(void *pointer, size_t blockSize)
 		return;
 	}
 
-	if (!fLocker.Lock())
-		return;
+	pthread_mutex_lock(&fLock);
 	if (blockSize == fBlockSize && fFreeBlocks < fBlockCount) {
 		// the block needs to be returned to the cache
 		_FreeBlock *block = reinterpret_cast<_FreeBlock *>(pointer);
@@ -146,11 +149,13 @@ BBlockCache::Save(void *pointer, size_t blockSize)
 		fFreeBlocks++;
 		DEBUG_ONLY(block->magic1 = MAGIC1);
 		DEBUG_ONLY(block->magic2 = MAGIC2 + (uint32)(addr_t)block->next);
+		pthread_mutex_unlock(&fLock);
 	} else {
+		pthread_mutex_unlock(&fLock);
 		DEBUG_ONLY(memset(pointer, 0xCC, sizeof(_FreeBlock)));
 		fFree(pointer);
+		return;
 	}
-	fLocker.Unlock();
 }
 
 
