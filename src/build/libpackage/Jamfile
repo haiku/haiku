@@ -83,18 +83,13 @@ MakeLocate libpackage_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
 
 BuildPlatformSharedLibrary libpackage_build.so
 	:
-	ActivateRepositoryCacheJob.cpp
-	ActivateRepositoryConfigJob.cpp
 	ActivationTransaction.cpp
-	AddRepositoryRequest.cpp
 	Attributes.cpp
 	ChecksumAccessors.cpp
 	CommitTransactionResult.cpp
 	Context.cpp
 	DownloadFileRequest.cpp
-	DropRepositoryRequest.cpp
 	FetchFileJob.cpp
-	InstallationLocationInfo.cpp
 	Job.cpp
 	PackageInfo.cpp
 	PackageInfoContentHandler.cpp
@@ -104,8 +99,6 @@ BuildPlatformSharedLibrary libpackage_build.so
 	PackageResolvableExpression.cpp
 	PackageRoster.cpp
 	PackageVersion.cpp
-	RefreshRepositoryRequest.cpp
-	RemoveRepositoryJob.cpp
 	RepositoryCache.cpp
 	RepositoryConfig.cpp
 	RepositoryInfo.cpp

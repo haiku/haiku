@@ -7,7 +7,7 @@
  */
 
 
-#include <package/ActivateRepositoryCacheJob.h>
+#include "ActivateRepositoryCacheJob.h"
 
 #include <File.h>
 

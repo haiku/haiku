@@ -7,7 +7,7 @@
  */
 
 
-#include <package/ValidateChecksumJob.h>
+#include "ValidateChecksumJob.h"
 
 #include <File.h>
 

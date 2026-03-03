@@ -8,7 +8,7 @@
  */
 
 
-#include <package/ActivateRepositoryConfigJob.h>
+#include "ActivateRepositoryConfigJob.h"
 
 #include <package/Context.h>
 #include <package/RepositoryConfig.h>

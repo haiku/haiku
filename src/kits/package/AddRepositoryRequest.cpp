@@ -13,9 +13,9 @@
 #include <JobQueue.h>
 #include <Path.h>
 
-#include <package/ActivateRepositoryConfigJob.h>
 #include <package/PackageRoster.h>
 
+#include "ActivateRepositoryConfigJob.h"
 #include "FetchFileJob.h"
 
 

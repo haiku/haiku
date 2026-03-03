@@ -13,7 +13,7 @@
 #include <JobQueue.h>
 #include <Path.h>
 
-#include <package/RemoveRepositoryJob.h>
+#include "RemoveRepositoryJob.h"
 
 
 namespace BPackageKit {

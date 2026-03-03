@@ -15,14 +15,14 @@
 
 #include <JobQueue.h>
 
-#include <package/ActivateRepositoryCacheJob.h>
 #include <package/ChecksumAccessors.h>
-#include <package/ValidateChecksumJob.h>
 #include <package/RepositoryCache.h>
 #include <package/RepositoryConfig.h>
 #include <package/PackageRoster.h>
 
+#include "ActivateRepositoryCacheJob.h"
 #include "FetchFileJob.h"
+#include "ValidateChecksumJob.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "RefreshRepositoryRequest"

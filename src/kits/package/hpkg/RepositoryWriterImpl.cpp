@@ -24,9 +24,10 @@
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/PackageReader.h>
 #include <package/ChecksumAccessors.h>
-#include <package/HashableString.h>
 #include <package/PackageInfoContentHandler.h>
 #include <package/RepositoryInfo.h>
+
+#include "HashableString.h"
 
 
 namespace BPackageKit {

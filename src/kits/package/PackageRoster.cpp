@@ -55,6 +55,9 @@ BPackageRoster::~BPackageRoster()
 bool
 BPackageRoster::IsRebootNeeded()
 {
+// This method makes sense only on an installed Haiku, but not for the build
+// tools.
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
 	BInstallationLocationInfo info;
 
 	// We get information on the system package installation location.
@@ -68,6 +71,7 @@ BPackageRoster::IsRebootNeeded()
 	// number of packages in the system package directory.
 	if (info.CurrentlyActivePackageInfos().CountInfos() != 0)
 		return true;
+#endif
 
 	return false;
 }

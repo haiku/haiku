@@ -10,12 +10,13 @@
 #include <new>
 
 #include <package/Context.h>
-#include <package/TempfileManager.h>
 
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <OS.h>
 #include <Path.h>
+
+#include "TempfileManager.h"
 
 
 namespace BPackageKit {

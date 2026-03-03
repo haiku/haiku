@@ -7,7 +7,7 @@
  */
 
 
-#include <package/RemoveRepositoryJob.h>
+#include "RemoveRepositoryJob.h"
 
 #include <Entry.h>
 

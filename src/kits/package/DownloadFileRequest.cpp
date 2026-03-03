@@ -9,10 +9,9 @@
 
 #include <package/DownloadFileRequest.h>
 
-#include <package/ValidateChecksumJob.h>
-
 #include "FetchFileJob.h"
 #include "FetchUtils.h"
+#include "ValidateChecksumJob.h"
 
 
 namespace BPackageKit {
