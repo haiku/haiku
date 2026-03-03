@@ -36,7 +36,6 @@ initialize_forked_child()
 
 	BMessage::Private::StaticReInitForkedChild();
 	BPrivate::gLooperList.InitAfterFork();
-	BPrivate::gDefaultTokens.InitAfterFork();
 	BPrivate::init_team_after_fork();
 
 	// Continuing to use BApplication after forking is not supported.

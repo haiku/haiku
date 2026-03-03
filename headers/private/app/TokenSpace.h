@@ -13,7 +13,6 @@
 #include <map>
 #include <stack>
 
-#include <Locker.h>
 #include <SupportDefs.h>
 
 
@@ -33,10 +32,12 @@ namespace BPrivate {
 class BDirectMessageTarget;
 
 
-class BTokenSpace : public BLocker {
+class BTokenSpace {
 public:
 								BTokenSpace();
 								~BTokenSpace();
+
+			pthread_mutex_t*	GetLock() { return &fLock; }
 
 			int32				NewToken(int16 type, void* object);
 			bool				SetToken(int32 token, int16 type, void* object);
@@ -51,8 +52,6 @@ public:
 			status_t			AcquireHandlerTarget(int32 token,
 									BDirectMessageTarget** _target);
 
-			void				InitAfterFork();
-
 private:
 	struct token_info {
 		int16	type;
@@ -61,6 +60,7 @@ private:
 	};
 	typedef std::map<int32, token_info> TokenMap;
 
+	mutable	pthread_mutex_t		fLock;
 			TokenMap			fTokenMap;
 			int32				fNextToken;
 };

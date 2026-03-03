@@ -33,6 +33,7 @@
 #include <Message.h>
 #include <MessageFilter.h>
 #include <Path.h>
+#include <PthreadMutexLocker.h>
 #include <Region.h>
 #include <Roster.h>
 
@@ -2408,7 +2409,7 @@ void
 Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 {
 	AutoWriteLocker locker(fWindowLock);
-	BAutolock tokenLocker(BPrivate::gDefaultTokens);
+	PthreadMutexLocker tokenLocker(BPrivate::gDefaultTokens.GetLock());
 
 	::ServerWindow* window;
 	if (BPrivate::gDefaultTokens.GetToken(serverToken,
