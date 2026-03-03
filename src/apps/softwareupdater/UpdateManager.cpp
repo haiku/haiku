@@ -369,20 +369,6 @@ void
 UpdateManager::ProgressTransactionCommitted(InstalledRepository& repository,
 	const BCommitTransactionResult& result)
 {
-	_SetCurrentStep(ACTION_STEP_COMPLETE);
-	BString header(B_TRANSLATE("Updates completed"));
-
-	BString detail;
-	if (BPackageRoster().IsRebootNeeded()) {
-		detail = B_TRANSLATE("A reboot is necessary to complete the "
-			"update process.");
-		fStatusWindow->PostMessage(kMsgShowReboot);
-	} else {
-		detail = B_TRANSLATE("Updates have been successfully installed.");
-	}
-
-	_FinalUpdate(header.String(), detail.String());
-
 	if (fVerbose) {
 		const char* repositoryName = repository.Name().String();
 
@@ -410,6 +396,20 @@ UpdateManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
 	if (fVerbose)
 		printf("[%s] Done.\n", repository.Name().String());
+
+	_SetCurrentStep(ACTION_STEP_COMPLETE);
+	BString header(B_TRANSLATE("Updates completed"));
+
+	BString detail;
+	if (BPackageRoster().IsRebootNeeded()) {
+		detail = B_TRANSLATE("A reboot is necessary to complete the "
+			"update process.");
+		fStatusWindow->PostMessage(kMsgShowReboot);
+	} else {
+		detail = B_TRANSLATE("Updates have been successfully installed.");
+	}
+
+	_FinalUpdate(header.String(), detail.String());
 }
 
 
