@@ -100,8 +100,8 @@ BDaemonClient::GetInstallationLocationInfo(
 	if (error != B_OK && error != B_NAME_NOT_FOUND)
 		return error;
 
-	BString oldStateName;
-	error = reply.FindString("old state", &oldStateName);
+	BString activeStateName;
+	error = reply.FindString("active state", &activeStateName);
 	if (error != B_OK && error != B_NAME_NOT_FOUND)
 		return error;
 
@@ -113,7 +113,7 @@ BDaemonClient::GetInstallationLocationInfo(
 	_info.SetLatestActivePackageInfos(latestActivePackages);
 	_info.SetLatestInactivePackageInfos(latestInactivePackages);
 	_info.SetCurrentlyActivePackageInfos(currentlyActivePackages);
-	_info.SetOldStateName(oldStateName);
+	_info.SetActiveStateName(activeStateName);
 	_info.SetChangeCount(changeCount);
 
 	return B_OK;

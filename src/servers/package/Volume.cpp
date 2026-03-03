@@ -558,7 +558,7 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 
 	if (fActiveState != fLatestState) {
 		if (fPackagesDirectoryCount > 1) {
-			fLocationInfoReply.AddString("old state",
+			fLocationInfoReply.AddString("active state",
 				fPackagesDirectories[fPackagesDirectoryCount - 1].Name());
 		}
 

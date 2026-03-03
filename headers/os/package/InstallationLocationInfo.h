@@ -45,8 +45,8 @@ public:
 			void				SetCurrentlyActivePackageInfos(
 									const BPackageInfoSet& infos);
 
-			const BString&		OldStateName() const;
-			void				SetOldStateName(const BString& name);
+			const BString&		ActiveStateName() const;
+			void				SetActiveStateName(const BString& name);
 
 			int64				ChangeCount() const;
 			void				SetChangeCount(int64 changeCount);
@@ -58,7 +58,7 @@ private:
 			BPackageInfoSet		fLatestActivePackageInfos;
 			BPackageInfoSet		fLatestInactivePackageInfos;
 			BPackageInfoSet		fCurrentlyActivePackageInfos;
-			BString				fOldStateName;
+			BString				fActiveStateName;
 			int64				fChangeCount;
 };
 
