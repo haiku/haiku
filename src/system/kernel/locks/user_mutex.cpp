@@ -284,8 +284,10 @@ get_user_mutex_entry(struct user_mutex_context* context,
 	}
 
 	entry = new(std::nothrow) UserMutexEntry;
-	if (entry == NULL)
+	if (entry == NULL) {
+		panic("UserMutexEntry allocation failed!");
 		return entry;
+	}
 
 	entry->address = address;
 	entry->ref_count = 1;
@@ -469,6 +471,7 @@ struct UserMutexContextFetcher {
 		if (!fShared) {
 			fContext = get_team_user_mutex_context();
 			if (fContext == NULL) {
+				panic("UserMutexContext allocation failed!");
 				fInitStatus = B_NO_MEMORY;
 				return;
 			}
