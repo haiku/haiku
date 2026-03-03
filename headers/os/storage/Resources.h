@@ -93,19 +93,18 @@ public:
 			status_t			RemoveResource(const void *resource);
 			status_t			RemoveResource(type_code type, int32 id);
 
-								// deprecated
 			status_t			WriteResource(type_code type, int32 id,
 									const void* data, off_t offset,
-									size_t length);
+									size_t length) _DEPRECATED;
 
 			status_t			ReadResource(type_code type, int32 id,
 									void* data, off_t offset,
-									size_t length);
+									size_t length) _DEPRECATED;
 
 			void*				FindResource(type_code type, int32 id,
-									size_t* lengthFound);
+									size_t* lengthFound) _DEPRECATED;
 			void*				FindResource(type_code type, const char* name,
-									size_t *lengthFound);
+									size_t *lengthFound) _DEPRECATED;
 
 private:
 								// FBC
