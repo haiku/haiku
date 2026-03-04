@@ -9016,9 +9016,15 @@ BPoseView::RecalcExtent()
 	ASSERT(ViewMode() != kListMode);
 
 	ClearExtent();
-	int32 poseCount = fPoseList->CountItems();
-	for (int32 index = 0; index < poseCount; index++)
-		AddToExtent(fPoseList->ItemAt(index)->CalcRect(this));
+	if (IsFiltering()) {
+		int32 poseCount = fFilteredPoseList->CountItems();
+		for (int32 index = 0; index < poseCount; index++)
+			AddToExtent(fFilteredPoseList->ItemAt(index)->CalcRect(this));
+	} else {
+		int32 poseCount = fVSPoseList->CountItems();
+		for (int32 index = 0; index < poseCount; index++)
+			AddToExtent(fVSPoseList->ItemAt(index)->CalcRect(this));
+	}
 }
 
 
