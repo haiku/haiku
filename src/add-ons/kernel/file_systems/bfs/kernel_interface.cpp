@@ -384,14 +384,14 @@ bfs_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 	ASSERT((inode->Flags() & INODE_DELETED) != 0);
 
 	status_t status = inode->Free(transaction);
+	volume->RemovedInodes().Remove(inode);
+
 	if (status == B_OK) {
 		status = transaction.Done();
 	} else if (transaction.HasParent()) {
 		// TODO: for now, we don't let sub-transactions fail
 		status = transaction.Done();
 	}
-
-	volume->RemovedInodes().Remove(inode);
 
 	// TODO: the VFS currently does not allow this to fail
 	delete inode;
