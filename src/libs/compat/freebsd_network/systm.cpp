@@ -4,12 +4,12 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+#include <thread.h>
+
 extern "C" {
 #include <compat/sys/systm.h>
 #include <compat/sys/kernel.h>
 }
-
-#include <thread.h>
 
 
 int

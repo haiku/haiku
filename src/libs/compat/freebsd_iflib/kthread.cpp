@@ -3,12 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <thread.h>
+
 extern "C" {
 #include <sys/systm.h>
 #include <sys/kthread.h>
 }
-
-#include <thread.h>
 
 
 int
