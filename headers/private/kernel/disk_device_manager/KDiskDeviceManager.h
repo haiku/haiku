@@ -9,7 +9,6 @@
 
 
 #include <disk_device_manager.h>
-#include <Locker.h>
 #include <Notifications.h>
 
 

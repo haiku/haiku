@@ -12,7 +12,6 @@
 #include <string.h>
 
 #include <KernelExport.h>
-#include <Locker.h>
 #include <module.h>
 #include <PCI.h>
 
