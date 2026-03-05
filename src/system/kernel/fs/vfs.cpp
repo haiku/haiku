@@ -5450,7 +5450,7 @@ open_vnode(struct vnode* vnode, int openMode, bool kernel)
 	then that entry will be opened and returned instead.
 */
 static int
-create_vnode(struct vnode* directory, const char* name, int openMode,
+file_create_vnode(struct vnode* directory, const char* name, int openMode,
 	int perms, bool kernel)
 {
 	bool traverse = ((openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0);
@@ -5460,10 +5460,8 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 	ino_t newID;
 	char clonedName[B_FILE_NAME_LENGTH + 1];
 
-	if (strcmp(name, ".") == 0) {
-		// a directory
+	if (strcmp(name, ".") == 0)
 		return B_IS_A_DIRECTORY;
-	}
 
 	// This is somewhat tricky: If the entry already exists, the FS responsible
 	// for the directory might not necessarily also be the one responsible for
@@ -5640,7 +5638,7 @@ file_create_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	if (status != B_OK)
 		return status;
 
-	status = create_vnode(directory, name, openMode, perms, kernel);
+	status = file_create_vnode(directory, name, openMode, perms, kernel);
 	put_vnode(directory);
 
 	return status;
@@ -5661,7 +5659,7 @@ file_create(int fd, char* path, int openMode, int perms, bool kernel)
 	if (status < 0)
 		return status;
 
-	return create_vnode(directory.Get(), name, openMode, perms, kernel);
+	return file_create_vnode(directory.Get(), name, openMode, perms, kernel);
 }
 
 
