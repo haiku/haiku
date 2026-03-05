@@ -319,6 +319,7 @@ for platform in [ MultiBootSubDirSetup ] {
 			memchr.c
 			memcmp.c
 			memmove.c
+			stpcpy.c
 			strdup.cpp
 			strndup.cpp
 			strlen.c
@@ -332,6 +333,7 @@ for platform in [ MultiBootSubDirSetup ] {
 			strlcat.c
 			strlcpy.c
 			strchr.c
+			strchrnul.c
 			strrchr.c
 			strtol.c
 			strtoul.c

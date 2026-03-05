@@ -23,10 +23,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			memcmp.c
 			strcasecmp.c
 			strcasestr.c
-			strchr.c
 			strcmp.c
 			strcoll.cpp
-			strcpy.c
 			strdup.cpp
 			strerror.c
 			strlwr.c
