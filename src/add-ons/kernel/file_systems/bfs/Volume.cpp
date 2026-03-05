@@ -414,6 +414,15 @@ Volume::WriteSuperBlock()
 }
 
 
+InodeList&
+Volume::RemovedInodes()
+{
+	// This list is guarded by the transaction lock.
+	fJournal->AssertLocked();
+	return fRemovedInodes;
+}
+
+
 void
 Volume::UpdateLiveQueries(Inode* inode, const char* attribute, int32 type,
 	const uint8* oldKey, size_t oldLength, const uint8* newKey,

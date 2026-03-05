@@ -28,10 +28,10 @@ public:
 			status_t		Lock(Transaction* owner,
 								bool separateSubTransactions);
 			status_t		Unlock(Transaction* owner, bool success);
+			void			AssertLocked() { ASSERT_LOCKED_RECURSIVE(&fLock); }
 
 			status_t		ReplayLog();
 
-			Transaction*	CurrentTransaction() const { return fOwner; }
 			size_t			CurrentTransactionSize() const;
 			bool			CurrentTransactionTooLarge() const;
 

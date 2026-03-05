@@ -99,8 +99,7 @@ public:
 
 			status_t		CreateVolumeID(Transaction& transaction);
 
-			InodeList&		RemovedInodes() { return fRemovedInodes; }
-				// This list is guarded by the transaction lock
+			InodeList&		RemovedInodes();
 
 			// block bitmap
 			BlockAllocator&	Allocator();
