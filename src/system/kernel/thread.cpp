@@ -46,6 +46,7 @@
 #include <tls.h>
 #include <user_runtime.h>
 #include <user_thread.h>
+#include <user_mutex.h>
 #include <vfs.h>
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
@@ -1084,6 +1085,13 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 
 	bool debugNewThread = false;
 	if (!kernel) {
+		// ensure there's a user_mutex_context, if this isn't the main thread
+		if (team->main_thread != NULL && team->user_mutex_context == NULL) {
+			status_t status = allocate_team_user_mutex_context(team);
+			if (status != B_OK)
+				return status;
+		}
+
 		// allocate the user_thread structure, if not already allocated
 		if (thread->user_thread == NULL) {
 			thread->user_thread = team_allocate_user_thread(team);

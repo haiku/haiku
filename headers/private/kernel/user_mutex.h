@@ -7,6 +7,7 @@
 
 
 #include <SupportDefs.h>
+#include <thread_types.h>
 
 
 #ifdef __cplusplus
@@ -17,6 +18,7 @@ struct user_mutex_context;
 
 void		user_mutex_init();
 void		delete_user_mutex_context(struct user_mutex_context* context);
+status_t	allocate_team_user_mutex_context(Team* team);
 
 status_t	_user_mutex_lock(int32* mutex, const char* name, uint32 flags,
 				bigtime_t timeout);
