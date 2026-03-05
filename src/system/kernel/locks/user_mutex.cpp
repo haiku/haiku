@@ -223,7 +223,8 @@ status_t
 allocate_team_user_mutex_context(Team* team)
 {
 	team->AssertLocked();
-	ASSERT(team->user_mutex_context == NULL);
+	if (team->user_mutex_context != NULL)
+		return B_OK;
 
 	struct user_mutex_context* context = new(std::nothrow) user_mutex_context;
 	if (context == NULL)
@@ -465,9 +466,15 @@ struct UserMutexContextFetcher {
 		if (!fShared) {
 			fContext = thread_get_current_thread()->team->user_mutex_context;
 			if (fContext == NULL) {
-				_user_debugger("single-threaded team attempted mutex operation");
-				fInitStatus = EDEADLK;
-				return;
+				// This should only happen for single-threaded applications (some
+				// appear to use mutexes as a sleep mechanism), as the context gets
+				// allocated on the creation of a second thread.
+				Team* team = thread_get_current_thread()->team;
+				team->Lock();
+				fInitStatus = allocate_team_user_mutex_context(team);
+				team->Unlock();
+				if (fInitStatus != B_OK)
+					return;
 			}
 
 			fAddress = (addr_t)mutex;
