@@ -284,6 +284,22 @@ process_ancillary_data(net_socket* socket,
 }
 
 
+static size_t
+calculate_total_length(msghdr* header, void* data, size_t length)
+{
+	size_t totalLength = length;
+	if (header != NULL) {
+		ASSERT((header->msg_iovlen == 0 && data == NULL)
+			|| data == header->msg_iov[0].iov_base);
+
+		// calculate the length considering all of the extra buffers
+		for (int i = 1; i < header->msg_iovlen; i++)
+			totalLength += header->msg_iov[i].iov_len;
+	}
+	return totalLength;
+}
+
+
 static ssize_t
 socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 	size_t length, int flags)
@@ -315,11 +331,12 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 		header->msg_flags = 0;
 	}
 
-	if (length < (size_t)bytesRead) {
+	size_t totalLength = calculate_total_length(header, data, length);
+	if (totalLength < (size_t)bytesRead) {
 		if (header != NULL)
 			header->msg_flags = MSG_TRUNC;
 		if ((flags & MSG_TRUNC) == 0)
-			return length;
+			return totalLength;
 	}
 	return bytesRead;
 }
@@ -1161,15 +1178,7 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	// Mask off flags handled in this function.
 	flags &= ~(MSG_TRUNC);
 
-	size_t totalLength = length;
-	if (header != NULL) {
-		ASSERT((header->msg_iovlen == 0 && data == NULL)
-			|| data == header->msg_iov[0].iov_base);
-
-		// calculate the length considering all of the extra buffers
-		for (int i = 1; i < header->msg_iovlen; i++)
-			totalLength += header->msg_iov[i].iov_len;
-	}
+	size_t totalLength = calculate_total_length(header, data, length);
 
 	net_buffer* buffer;
 	status_t status = socket->first_info->read_data(
