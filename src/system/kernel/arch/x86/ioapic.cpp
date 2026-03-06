@@ -677,16 +677,7 @@ ioapic_is_interrupt_available(int32 gsi)
 
 
 void
-ioapic_preinit(kernel_args* args)
-{
-	sIOAPICPhys = args->arch_args.ioapic_phys;
-
-	// The real IO-APIC initialization occurs after PCI initialization.
-}
-
-
-void
-ioapic_init()
+ioapic_init(kernel_args* args)
 {
 	static const interrupt_controller ioapicController = {
 		"82093AA IOAPIC",
@@ -702,7 +693,7 @@ ioapic_init()
 	if (!apic_available())
 		return;
 
-	if (sIOAPICPhys == 0) {
+	if (args->arch_args.ioapic_phys == 0) {
 		dprintf("no io-apics available, not using io-apics for interrupt "
 			"routing\n");
 		return;
@@ -748,16 +739,6 @@ ioapic_init()
 		// aren't different routings based on it this is non-fatal
 	}
 
-	IRQRoutingTable table;
-	status = prepare_irq_routing(acpiModule, table,
-		&ioapic_is_interrupt_available);
-	if (status != B_OK) {
-		dprintf("IRQ routing preparation failed, not configuring io-apics\n");
-		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
-			// revert to PIC interrupt model just in case
-		return;
-	}
-
 	// use the boot CPU as the target for all interrupts
 	uint8 targetAPIC = x86_get_cpu_apic_id(0);
 
@@ -773,30 +754,8 @@ ioapic_init()
 		current = current->next;
 	}
 
-#ifdef TRACE_IOAPIC
-	dprintf("trying interrupt routing:\n");
-	print_irq_routing_table(table);
-#endif
-
-	status = enable_irq_routing(acpiModule, table);
-	if (status != B_OK) {
-		panic("failed to enable IRQ routing");
-		// if it failed early on it might still work in PIC mode
-		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
-		return;
-	}
-
-	print_irq_routing_table(table);
-
-	// configure the source overrides, but let the PCI config below override it
+	// configure the source overrides, but let the PCI config later override it
 	acpi_configure_source_overrides(madt);
-
-	// configure IO-APIC interrupts from PCI routing table
-	for (int i = 0; i < table.Count(); i++) {
-		irq_routing_entry& entry = table.ElementAt(i);
-		ioapic_configure_io_interrupt(entry.irq,
-			entry.polarity | entry.trigger_mode);
-	}
 
 	// kill the local ints on the local APIC
 	apic_disable_local_ints();
@@ -810,7 +769,7 @@ ioapic_init()
 	uint16 legacyInterrupts;
 	pic_disable(legacyInterrupts);
 
-	// enable previsouly enabled legacy interrupts
+	// enable previously enabled legacy interrupts
 	for (uint8 i = 0; i < 16; i++) {
 		if ((legacyInterrupts & (1 << i)) != 0)
 			ioapic_enable_io_interrupt(i);
@@ -830,7 +789,61 @@ ioapic_init()
 		current = current->next;
 	}
 
+	// IO-APIC interrupt routing occurs after PCI initialization.
+	sIOAPICPhys = args->arch_args.ioapic_phys;
+
 	// prefer the ioapic over the normal pic
 	dprintf("using io-apics for interrupt routing\n");
 	arch_int_set_interrupt_controller(ioapicController);
+}
+
+
+void
+ioapic_routing_init()
+{
+	if (sIOAPICPhys == 0) {
+		dprintf("no io-apics available, not using io-apics for interrupt routing\n");
+		return;
+	}
+
+	// load ACPI module
+	status_t status;
+	acpi_module_info* acpiModule;
+	status = get_module(B_ACPI_MODULE_NAME, (module_info**)&acpiModule);
+	if (status != B_OK) {
+		dprintf("ACPI module not available, not configuring io-apics\n");
+		return;
+	}
+	BPrivate::CObjectDeleter<const char, status_t, put_module>
+		acpiModulePutter(B_ACPI_MODULE_NAME);
+
+	IRQRoutingTable table;
+	status = prepare_irq_routing(acpiModule, table, &ioapic_is_interrupt_available);
+	if (status != B_OK) {
+		dprintf("IRQ routing preparation failed, not configuring io-apics\n");
+		// revert to PIC interrupt model just in case
+		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
+		return;
+	}
+
+#ifdef TRACE_IOAPIC
+	dprintf("trying interrupt routing:\n");
+	print_irq_routing_table(table);
+#endif
+
+	status = enable_irq_routing(acpiModule, table);
+	if (status != B_OK) {
+		panic("failed to enable IRQ routing");
+		// if it failed early on it might still work in PIC mode
+		acpi_set_interrupt_model(acpiModule, ACPI_INTERRUPT_MODEL_PIC);
+		return;
+	}
+
+	print_irq_routing_table(table);
+
+	// configure IO-APIC interrupts from PCI routing table
+	for (int i = 0; i < table.Count(); i++) {
+		irq_routing_entry& entry = table.ElementAt(i);
+		ioapic_configure_io_interrupt(entry.irq, entry.polarity | entry.trigger_mode);
+	}
 }

@@ -161,7 +161,7 @@ X86PCIController::GetRange(uint32 index, pci_resource_range* range)
 status_t
 X86PCIController::Finalize()
 {
-	ioapic_init();
+	ioapic_routing_init();
 	return B_OK;
 }
 
