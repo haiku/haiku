@@ -15,7 +15,7 @@
 
 // Device attributes for the VMBus device
 #define HYPERV_CHANNEL_ID_ITEM				"hyperv/channel"
-#define HYPERV_DEVICE_TYPE_ITEM				"hyperv/type_string"
+#define HYPERV_DEVICE_TYPE_STRING_ITEM		"hyperv/type_string"
 #define HYPERV_INSTANCE_ID_ITEM				"hyperv/instance"
 
 #define HYPERV_PRETTYNAME_VMBUS				"Hyper-V Virtual Machine Bus"

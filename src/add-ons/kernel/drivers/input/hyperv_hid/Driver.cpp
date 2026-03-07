@@ -158,7 +158,8 @@ hyperv_hid_supports_device(device_node* parent)
 
 	// Check if parent is a Hyper-V Input device
 	const char* type;
-	if (sDeviceManager->get_attr_string(parent, HYPERV_DEVICE_TYPE_ITEM, &type, false) != B_OK)
+	if (sDeviceManager->get_attr_string(parent, HYPERV_DEVICE_TYPE_STRING_ITEM, &type, false)
+			!= B_OK)
 		return 0.0f;
 
 	if (strcmp(type, VMBUS_TYPE_INPUT) != 0)

@@ -1100,7 +1100,7 @@ VMBus::_RegisterChannel(VMBusChannel* channel)
 			{ .string = prettyName }},
 		{ HYPERV_CHANNEL_ID_ITEM, B_UINT32_TYPE,
 			{ .ui32 = channel->channel_id }},
-		{ HYPERV_DEVICE_TYPE_ITEM, B_STRING_TYPE,
+		{ HYPERV_DEVICE_TYPE_STRING_ITEM, B_STRING_TYPE,
 			{ .string = typeStr }},
 		{ HYPERV_INSTANCE_ID_ITEM, B_RAW_TYPE,
 			{ .raw = { .data = &channel->instance_id, .length = sizeof(channel->instance_id) }}},
