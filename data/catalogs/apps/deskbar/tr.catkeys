@@ -1,8 +1,9 @@
-1	turkish	x-vnd.Be-TSKB	1763402521
+1	turkish	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Kendiliğinden gizle
 Show all	WindowMenu		Tümünü göster
 Edit in Tracker…	PreferencesWindow		İzleyici’de düzenle…
 Menu	PreferencesWindow		Menü
+Location	PreferencesWindow		Konum
 Tracker always first	PreferencesWindow		İzleyici her zaman ilk sırada
 Hide clock	TimeView		Saati gizle
 Large	PreferencesWindow		Büyük

@@ -1,8 +1,9 @@
-1	catalan; valencian	x-vnd.Be-TSKB	1763402521
+1	catalan; valencian	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Amaga-ho automàticament
 Show all	WindowMenu		Mostra-ho tot
 Edit in Tracker…	PreferencesWindow		Edita-ho al Rastrejador...
 Menu	PreferencesWindow		Menú
+Location	PreferencesWindow		Ubicació
 Tracker always first	PreferencesWindow		El Rastrejador sempre primer
 Hide clock	TimeView		Amaga el rellotge
 Large	PreferencesWindow		Grossa

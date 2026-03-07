@@ -1,8 +1,9 @@
-1	swedish	x-vnd.Be-TSKB	1763402521
+1	swedish	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Dölj automatiskt
 Show all	WindowMenu		Visa alla
 Edit in Tracker…	PreferencesWindow		Editera i Tracker…
 Menu	PreferencesWindow		Meny
+Location	PreferencesWindow		Plats
 Tracker always first	PreferencesWindow		Visa Tracker först
 Hide clock	TimeView		Dölj klockan
 Large	PreferencesWindow		Stor

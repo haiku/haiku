@@ -1,8 +1,9 @@
-1	german	x-vnd.Be-TSKB	1763402521
+1	german	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Automatisch ausblenden
 Show all	WindowMenu		Alle einblenden
 Edit in Tracker…	PreferencesWindow		Im Tracker bearbeiten …
 Menu	PreferencesWindow		Menü
+Location	PreferencesWindow		Position
 Tracker always first	PreferencesWindow		Tracker immer zuerst
 Hide clock	TimeView		Uhr ausblenden
 Large	PreferencesWindow		Groß
