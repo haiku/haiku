@@ -3025,12 +3025,13 @@ empty_trash(void*)
 
 		status = CalcItemsAndSize(&loopControl, &srcList, volume.BlockSize(),
 			&totalCount, &totalSize);
-		if (status != B_OK)
-			break;
 
 		srcList.RemoveItemAt(0);
 			// so that the list doesn't try to free the entry we added above
 		srcList.MakeEmpty();
+
+		if (status != B_OK)
+			break;
 
 		// don't count trash directory itself
 		totalCount--;
