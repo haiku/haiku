@@ -8,7 +8,7 @@ if $(HAIKU_BUILD_TYPE) = bootstrap {
 } else if $(HAIKU_BUILD_TYPE) = minimum {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 } else if $(HAIKU_BUILD_TYPE) = test {
-	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions test ] ;
 } else {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions regular ] ;
 }
