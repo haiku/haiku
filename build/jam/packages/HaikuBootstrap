@@ -99,6 +99,9 @@ AddNewDriversToPackage network :
 AddNewDriversToPackage display :
 #	display_adapter@x86
 	;
+AddNewDriversToPackage hyperv :
+	hyperv_ic@x86,x86_64
+	;
 
 # legacy drivers
 AddDriversToPackage :

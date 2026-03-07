@@ -154,6 +154,9 @@ AddNewDriversToPackage display :
 AddNewDriversToPackage audio hmulti :
 #	virtio_sound
 	;
+AddNewDriversToPackage hyperv :
+	hyperv_ic@x86,x86_64
+	;
 
 # legacy drivers
 AddDriversToPackage :

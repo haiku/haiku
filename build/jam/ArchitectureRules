@@ -665,6 +665,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel drivers display ;
 	EnableWerror src add-ons kernel drivers dvb ;
 	EnableWerror src add-ons kernel drivers graphics ;
+	EnableWerror src add-ons kernel drivers hyperv ;
 	EnableWerror src add-ons kernel drivers input ;
 	EnableWerror src add-ons kernel drivers joystick ;
 	EnableWerror src add-ons kernel drivers midi ;

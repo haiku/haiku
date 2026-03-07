@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src add-ons kernel drivers hyperv hyperv_ic ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers hyperv ;
+
+KernelAddon hyperv_ic :
+	ICBase.cpp
+	ICDriver.cpp
+
+	:
+	hyperv_ic_heartbeat.a
+	;
+
+SubInclude HAIKU_TOP src add-ons kernel drivers hyperv hyperv_ic heartbeat ;
