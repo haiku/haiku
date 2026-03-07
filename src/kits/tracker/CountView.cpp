@@ -229,19 +229,19 @@ BCountView::Draw(BRect updateRect)
 	if (IsTypingAhead())
 		itemString << TypeAhead();
 	else if (IsFiltering()) {
+		BString lastCountStr;
+		fNumberFormat.Format(lastCountStr, fLastCount);
+
 		if (fLastCountSelected != 0) {
 			static BStringFormat selectedFilteredFormat(B_TRANSLATE_COMMENT(
 				"{0, plural, other{#/%total %filter}}",
 				"Number of selected items from a filtered set: \"10/30 view\""));
 
-			char lastCountStr[32];
-			snprintf(lastCountStr, sizeof(lastCountStr), "%" B_PRId32, fLastCount);
-
 			selectedFilteredFormat.Format(itemString, fLastCountSelected);
 			itemString.ReplaceFirst("%total", lastCountStr);
 			itemString.ReplaceFirst("%filter", Filter());
 		} else
-			itemString << fLastCount << " " << Filter();
+			itemString << lastCountStr << " " << Filter();
 	} else {
 		if (fLastCount == 0)
 			itemString << B_TRANSLATE("no items");
@@ -255,8 +255,8 @@ BCountView::Draw(BRect updateRect)
 				"{0, plural, other{#/%total selected}}",
 				"Number of selected items out of a total: \"10/30 selected\""));
 
-			char lastCountStr[32];
-			snprintf(lastCountStr, sizeof(lastCountStr), "%" B_PRId32, fLastCount);
+			BString lastCountStr;
+			fNumberFormat.Format(lastCountStr, fLastCount);
 
 			selectedFormat.Format(itemString, fLastCountSelected);
 			itemString.ReplaceFirst("%total", lastCountStr);

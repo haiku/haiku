@@ -35,6 +35,7 @@ All rights reserved.
 #define _COUNT_VIEW_H
 
 
+#include <NumberFormat.h>
 #include <String.h>
 #include <View.h>
 
@@ -86,6 +87,7 @@ private:
 	bigtime_t fStartSpinningAfter;
 	BString fTypeAheadString;
 	BString fFilterString;
+	BNumberFormat fNumberFormat;
 };
 
 } // namespace BPrivate
