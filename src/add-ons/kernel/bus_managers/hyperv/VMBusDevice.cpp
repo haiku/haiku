@@ -211,89 +211,80 @@ VMBusDevice::WriteGPAPacket(uint32 rangeCount, const vmbus_gpa_range* rangesList
 
 
 status_t
-VMBusDevice::PeekPacket(void* _buffer, uint32 length)
+VMBusDevice::ReadPacket(void* buffer, uint32* bufferLength, uint32* _headerLength,
+	uint32* _dataLength)
 {
-	InterruptsSpinLocker locker(fRXLock);
-
-	// Ensure at least the requested amount of data is present, plus the shifted packet index
-	if (_AvailableRX() < length + sizeof(uint64))
-		return B_DEV_NOT_READY;
-
-	uint32 readIndex = atomic_get((int32*)&fRXRing->read_index);
-	TRACE_TX("Channel %u RX peek read idx 0x%X write idx 0x%X\n", fChannelID, readIndex,
-		atomic_get((int32*)&fRXRing->write_index));
-
-	_ReadRX(readIndex, _buffer, length);
-	return B_OK;
-}
-
-
-status_t
-VMBusDevice::ReadPacket(vmbus_pkt_header* _header, uint32* _headerLength, void* _buffer,
-	uint32* _length)
-{
-	vmbus_pkt_header header;
-	vmbus_pkt_header* headerPtr;
-	if (_header != NULL) {
-		if (_headerLength == NULL || *_headerLength < sizeof(vmbus_pkt_header))
-			return B_BAD_VALUE;
-		headerPtr = _header;
-	} else {
-		headerPtr = &header;
-	}
-
-	status_t status = PeekPacket(headerPtr, sizeof(vmbus_pkt_header));
-	if (status != B_OK)
-		return status;
-
-	uint32 headerLength = headerPtr->header_length << VMBUS_PKT_SIZE_SHIFT;
-	uint32 totalLength = headerPtr->total_length << VMBUS_PKT_SIZE_SHIFT;
-	if (headerLength < sizeof(vmbus_pkt_header) || totalLength < headerLength) {
-		ERROR("Channel %u RX invalid pkt hdr len 0x%X tot len 0x%X\n", fChannelID, headerLength,
-			totalLength);
-		return B_IO_ERROR;
-	}
-	uint32 dataLength = totalLength - headerLength;
-
-	TRACE_RX("Channel %u RX pkt %u hdr len 0x%X tot len 0x%X\n", fChannelID, headerPtr->type,
-		headerLength, totalLength);
-
-	// Ensure provided buffers are large enough
-	if (_header != NULL) {
-		if (*_headerLength < headerLength) {
-			*_headerLength = headerLength;
-			return B_NO_MEMORY;
-		}
-		*_headerLength = headerLength;
-	}
-
-	if (*_length < dataLength) {
-		*_length = dataLength;
-		return B_NO_MEMORY;
-	}
-	*_length = dataLength;
+	if (*bufferLength < sizeof(vmbus_pkt_header))
+		return B_BAD_VALUE;
 
 	InterruptsSpinLocker locker(fRXLock);
 
-	if (_AvailableRX() < totalLength + sizeof(uint64))
+	// Should have at least the standard header and the shifted read index present on the ring
+	if (_AvailableRX() < sizeof(vmbus_pkt_header) + sizeof(uint64))
 		return B_DEV_NOT_READY;
 
 	uint32 readIndexNew = atomic_get((int32*)&fRXRing->read_index);
-	TRACE_TX("Channel %u RX old read idx 0x%X write idx 0x%X\n", fChannelID, readIndexNew,
+	TRACE_RX("Channel %u RX old read idx 0x%X write idx 0x%X\n", fChannelID, readIndexNew,
 		atomic_get((int32*)&fRXRing->write_index));
 
-	// Read the header, data, and seek past the shifted read index
-	if (_header != NULL && headerLength > sizeof(vmbus_pkt_header))
-		readIndexNew = _ReadRX(readIndexNew, _header, headerLength);
-	else
-		readIndexNew = _SeekRX(readIndexNew, headerLength);
-	readIndexNew = _ReadRX(readIndexNew, _buffer, dataLength);
+	// Read in the standard header and determine the length of the remainder of the data
+	vmbus_pkt_header* header = reinterpret_cast<vmbus_pkt_header*>(buffer);
+	readIndexNew = _ReadRX(readIndexNew, header, sizeof(*header));
+
+	uint32 headerLength = header->header_length << VMBUS_PKT_SIZE_SHIFT;
+	uint32 totalLength = header->total_length << VMBUS_PKT_SIZE_SHIFT;
+	if (headerLength < sizeof(*header) || totalLength < headerLength) {
+		ERROR("Channel %u RX invalid pkt hdr len 0x%X tot len 0x%X\n", fChannelID, headerLength,
+			totalLength);
+		return B_BAD_DATA;
+	}
+	void* dataBuffer = reinterpret_cast<uint8*>(buffer) + headerLength;
+	uint32 dataLength = totalLength - headerLength;
+
+	TRACE_RX("Channel %u RX pkt %u hdr len 0x%X data len 0x%X tran %" B_PRIu64 "\n", fChannelID,
+		header->type, headerLength, dataLength, header->transaction_id);
+
+	// Ensure provided buffer is large enough
+	if (*bufferLength < totalLength) {
+		*bufferLength = totalLength;
+		return B_NO_MEMORY;
+	}
+	*bufferLength = totalLength;
+
+	uint32 readLength = totalLength + sizeof(uint64);
+	if (_AvailableRX() < readLength)
+		return B_DEV_NOT_READY;
+
+	// Standard header was already read above; read remainder of header and data
+	// Shifted index is discarded
+	readIndexNew = _ReadRX(readIndexNew, header + 1, headerLength - sizeof(*header));
+	readIndexNew = _ReadRX(readIndexNew, dataBuffer, dataLength);
 	readIndexNew = _SeekRX(readIndexNew, sizeof(uint64));
 	memory_write_barrier();
 
 	atomic_set((int32*)&fRXRing->read_index, (int32)readIndexNew);
-	TRACE_TX("Channel %u RX new read idx 0x%X write idx 0x%X\n", fChannelID,
+	TRACE_RX("Channel %u RX new read idx 0x%X write idx 0x%X\n", fChannelID,
 		atomic_get((int32*)&fRXRing->read_index), atomic_get((int32*)&fRXRing->write_index));
+
+	locker.Unlock();
+
+	*_headerLength = headerLength;
+	*_dataLength = dataLength;
+
+	// Signal Hyper-V if required; signaling is only needed if the RX ring buffer was previously
+	// completely full, and there is now enough space to write pending data (if supported)
+	memory_read_barrier();
+	if (fRXRing->features.pending_send_size_supported) {
+		uint32 pendingSendLength = atomic_get((int32*)&fRXRing->pending_send_size);
+		if (pendingSendLength > 0) {
+			uint32 availableLength = _AvailableRX();
+			if ((availableLength - readLength) < pendingSendLength
+					&& availableLength > pendingSendLength) {
+				atomic_add64((int64*)&fRXRing->guest_to_host_interrupt_count, 1);
+				fVMBus->signal_channel(fVMBusCookie, fChannelID);
+			}
+		}
+	}
 
 	return B_OK;
 }

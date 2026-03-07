@@ -76,11 +76,11 @@ vmbus_device_close(hyperv_device cookie)
 
 
 static status_t
-vmbus_device_read_packet(hyperv_device cookie, vmbus_pkt_header* _header, uint32* _headerLength,
-	void* _buffer, uint32* _length)
+vmbus_device_read_packet(hyperv_device cookie, void* buffer, uint32* bufferLength,
+	uint32* _headerLength, uint32* _dataLength)
 {
 	VMBusDevice* device = reinterpret_cast<VMBusDevice*>(cookie);
-	return device->ReadPacket(_header, _headerLength, _buffer, _length);
+	return device->ReadPacket(buffer, bufferLength, _headerLength, _dataLength);
 }
 
 

@@ -57,9 +57,8 @@ public:
 										const vmbus_gpa_range* rangesList, uint32 rangesLength,
 										const void* buffer, uint32 length, bool responseRequired,
 										uint64 transactionID);
-			status_t				PeekPacket(void* _buffer, uint32 length);
-			status_t				ReadPacket(vmbus_pkt_header* _header, uint32* _headerLength,
-										void* _buffer, uint32* _length);
+			status_t				ReadPacket(void* buffer, uint32* bufferLength,
+										uint32* _headerLength, uint32* _dataLength);
 
 			status_t				AllocateGPADL(uint32 length, void** _buffer, uint32* _gpadl);
 			status_t				FreeGPADL(uint32 gpadl);

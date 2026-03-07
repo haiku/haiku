@@ -36,7 +36,7 @@ HIDDevice::HIDDevice(hyperv_device_interface* hyperv,
 	fProtocolRespEvent.Init(this, "hyper-v hid protoresp");
 	fDeviceInfoEvent.Init(this, "hyper-v hid devinfo");
 
-	fPacket = malloc(HV_HID_RX_PKT_BUFFER_SIZE);
+	fPacket = static_cast<uint8*>(malloc(HV_HID_RX_PKT_BUFFER_SIZE));
 	if (fPacket == NULL) {
 		fStatus = B_NO_MEMORY;
 		return;
@@ -137,12 +137,12 @@ void
 HIDDevice::_Callback()
 {
 	while (true) {
-		vmbus_pkt_header header;
-		uint32 headerLength = sizeof(header);
-		uint32 packetLength = HV_HID_RX_PKT_BUFFER_SIZE;
+		uint32 length = HV_HID_RX_PKT_BUFFER_SIZE;
+		uint32 headerLength;
+		uint32 messageLength;
 
-		status_t status = fHyperV->read_packet(fHyperVCookie, &header, &headerLength,
-			fPacket, &packetLength);
+		status_t status = fHyperV->read_packet(fHyperVCookie, fPacket, &length, &headerLength,
+			&messageLength);
 		if (status == B_DEV_NOT_READY) {
 			break;
 		} else if (status != B_OK) {
@@ -151,7 +151,7 @@ HIDDevice::_Callback()
 		}
 
 		// Check if this is an HID pipe data message
-		hv_hid_pipe_in_msg* message = reinterpret_cast<hv_hid_pipe_in_msg*>(fPacket);
+		hv_hid_pipe_in_msg* message = reinterpret_cast<hv_hid_pipe_in_msg*>(fPacket + headerLength);
 		if (message->pipe_header.type != HV_HID_PIPE_MSGTYPE_DATA) {
 			ERROR("Non-data HID pipe message type %u received\n", message->pipe_header.type);
 			continue;

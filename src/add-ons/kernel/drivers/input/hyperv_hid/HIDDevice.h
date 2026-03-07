@@ -68,7 +68,7 @@ private:
 
 			ConditionVariable		fProtocolRespEvent;
 			ConditionVariable		fDeviceInfoEvent;
-			void*					fPacket;
+			uint8*					fPacket;
 			uint16					fLastX;
 			uint16					fLastY;
 };
