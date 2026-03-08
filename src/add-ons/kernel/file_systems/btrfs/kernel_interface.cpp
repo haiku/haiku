@@ -169,7 +169,7 @@ btrfs_read_fs_info(fs_volume* _volume, struct fs_info* info)
 	info->io_size = BTRFS_IO_SIZE;
 	info->block_size = volume->BlockSize();
 	info->total_blocks = volume->SuperBlock().TotalSize() / volume->BlockSize();
-	info->free_blocks = 0; //volume->NumFreeBlocks();
+	info->free_blocks = 0; // volume->NumFreeBlocks();
 
 	// Volume name
 	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));
@@ -466,7 +466,7 @@ btrfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 		if (!hasWriteAccess)
 			RETURN_ERROR(B_NOT_ALLOWED);
 
-		//TODO: implement file shrinking/growing
+		// TODO: implement file shrinking/growing
 		return B_NOT_SUPPORTED;
 	}
 
@@ -867,8 +867,7 @@ btrfs_rewind_dir(fs_volume* /*_volume*/, fs_vnode* /*node*/, void* _cookie)
 
 
 static status_t
-btrfs_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/,
-	   	void * /*_cookie*/)
+btrfs_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void * /*_cookie*/)
 {
 	return B_OK;
 }
