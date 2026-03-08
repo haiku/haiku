@@ -73,48 +73,56 @@ DiscoveryListener::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case BT_MSG_INQUIRY_DEVICE:
 		{
-			const struct inquiry_info* inquiryInfo;
-			ssize_t	size;
-			RemoteDevice* rd = NULL;
-			bool duplicatedFound = false;
+			uint8 count = 0;
+			if (message->FindUInt8("count", &count) != B_OK || count == 0)
+				break;
 
-			//  TODO: Loop for all inquiryInfo!
-			if (message->FindData("info", B_ANY_TYPE, 0,
-					(const void**)&inquiryInfo, &size) == B_OK) {
+			for (uint8 i = 0; i < count; i++) {
+				ssize_t size;
+				const bdaddr_t* bdaddr;
+				const uint8* devClass;
+				uint8 pageRepetitionMode = 0;
+				uint8 scanPeriodMode = 0;
+				uint8 scanMode = 0;
+				uint16 clockOffset = 0;
+				bool duplicatedFound = false;
+
+				if (message->FindData("bdaddr", B_ANY_TYPE, i, (const void**)&bdaddr, &size) != B_OK
+					|| message->FindData("dev_class", B_ANY_TYPE, i, (const void**)&devClass, &size)
+						!= B_OK) {
+					continue;
+				}
+
+				message->FindUInt8("page_repetition_mode", i, &pageRepetitionMode);
+				message->FindUInt8("scan_period_mode", i, &scanPeriodMode);
+				message->FindUInt8("scan_mode", i, &scanMode);
+				message->FindUInt16("clock_offset", i, &clockOffset);
+
 				// Skip duplicated replies
-				for (int32 index = 0 ; index < fRemoteDevicesList.CountItems();
-					index++) {
-					bdaddr_t b1 = fRemoteDevicesList.ItemAt(index)
-						->GetBluetoothAddress();
-
-					if (bdaddrUtils::Compare(inquiryInfo->bdaddr, b1)) {
+				for (int32 index = 0; index < fRemoteDevicesList.CountItems(); index++) {
+					RemoteDevice* existingDevice = fRemoteDevicesList.ItemAt(index);
+					bdaddr_t b1 = existingDevice->GetBluetoothAddress();
+					if (bdaddrUtils::Compare(*bdaddr, b1)) {
 						// update these values
-						fRemoteDevicesList.ItemAt(index)->fPageRepetitionMode
-							= inquiryInfo->pscan_rep_mode;
-						fRemoteDevicesList.ItemAt(index)->fScanPeriodMode
-							= inquiryInfo->pscan_period_mode;
-						fRemoteDevicesList.ItemAt(index)->fScanMode
-							= inquiryInfo->pscan_mode;
-						fRemoteDevicesList.ItemAt(index)->fClockOffset
-							= inquiryInfo->clock_offset;
-
+						existingDevice->fPageRepetitionMode = pageRepetitionMode;
+						existingDevice->fScanPeriodMode = scanPeriodMode;
+						existingDevice->fScanMode = scanMode;
+						existingDevice->fClockOffset = clockOffset;
 						duplicatedFound = true;
 						break;
 					}
 				}
 
 				if (!duplicatedFound) {
-					rd = new RemoteDevice(inquiryInfo->bdaddr,
-						(uint8*)inquiryInfo->dev_class);
+					RemoteDevice* rd = new RemoteDevice(*bdaddr, (uint8*)devClass);
 					fRemoteDevicesList.AddItem(rd);
 					// keep all inquiry reported data
 					rd->SetLocalDeviceOwner(fLocalDevice);
-					rd->fPageRepetitionMode = inquiryInfo->pscan_rep_mode;
-					rd->fScanPeriodMode = inquiryInfo->pscan_period_mode;
-					rd->fScanMode = inquiryInfo->pscan_mode;
-					rd->fClockOffset = inquiryInfo->clock_offset;
-
-					DeviceDiscovered( rd, rd->GetDeviceClass());
+					rd->fPageRepetitionMode = pageRepetitionMode;
+					rd->fScanPeriodMode = scanPeriodMode;
+					rd->fScanMode = scanMode;
+					rd->fClockOffset = clockOffset;
+					DeviceDiscovered(rd, rd->GetDeviceClass());
 				}
 			}
 			break;
