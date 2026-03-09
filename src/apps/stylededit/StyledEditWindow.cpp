@@ -65,21 +65,6 @@ const char* kInfoAttributeName = "StyledEdit-info";
 #define B_TRANSLATION_CONTEXT "StyledEditWindow"
 
 
-// This is a temporary solution for building BString with printf like format.
-// will be removed in the future.
-static void
-bs_printf(BString* string, const char* format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	char* buf;
-	vasprintf(&buf, format, ap);
-	string->SetTo(buf);
-	free(buf);
-	va_end(ap);
-}
-
-
 // #pragma mark -
 
 
@@ -146,9 +131,9 @@ StyledEditWindow::QuitRequested()
 	if (fTextView->TextLength() == 0 && fSaveMessage == NULL)
 		return true;
 
-	BString alertText;
-	bs_printf(&alertText,
-		B_TRANSLATE("Save changes to the document \"%s\"? "), Title());
+	BString alertText =
+		B_TRANSLATE("Save changes to the document \"%title%\"?");
+	alertText.ReplaceFirst("%title%", Title());
 
 	int32 index = _ShowAlert(alertText, B_TRANSLATE("Cancel"),
 		B_TRANSLATE("Don't save"), B_TRANSLATE("Save"),	B_WARNING_ALERT);
@@ -672,11 +657,10 @@ StyledEditWindow::MessageReceived(BMessage* message)
 		{
 			status_t status = _UnlockFile();
 			if (status != B_OK) {
-				BString text;
-				bs_printf(&text,
-					B_TRANSLATE("Unable to unlock file\n\t%s"),
-					strerror(status));
-				_ShowAlert(text, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
+				BString alertText
+					= B_TRANSLATE("Unable to unlock file\n\t%error%");
+				alertText.ReplaceFirst("%error%", strerror(status));
+				_ShowAlert(alertText, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
 			}
 			PostMessage(UPDATE_STATUS);
 			break;
@@ -854,9 +838,9 @@ StyledEditWindow::Save(BMessage* message)
 			if (!((getuid() == st.st_uid && (S_IWUSR & st.st_mode))
 				|| (getgid() == st.st_gid && (S_IWGRP & st.st_mode))
 				|| (S_IWOTH & st.st_mode))) {
-				BString alertText;
-				bs_printf(&alertText, B_TRANSLATE("This file is marked "
-					"read-only. Save changes to the document \"%s\"? "), name);
+				BString alertText = B_TRANSLATE("This file is marked read-only."
+					" Save changes to the document \"%filename%\"? ");
+				alertText.ReplaceFirst("%filename%", name);
 				switch (_ShowAlert(alertText, B_TRANSLATE("Cancel"),
 						B_TRANSLATE("Don't save"),
 						B_TRANSLATE("Save"), B_WARNING_ALERT)) {
@@ -874,9 +858,10 @@ StyledEditWindow::Save(BMessage* message)
 	}
 
 	if (status != B_OK) {
-		BString alertText;
-		bs_printf(&alertText, B_TRANSLATE("Error saving \"%s\":\n%s"), name,
-			strerror(status));
+		BString alertText =
+			B_TRANSLATE("Error saving \"%filename%\":\n%error%");
+		alertText.ReplaceFirst("%filename%", name);
+		alertText.ReplaceFirst("%error%", strerror(status));
 
 		_ShowAlert(alertText, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
 		return status;
@@ -1551,19 +1536,21 @@ StyledEditWindow::_LoadFile(entry_ref* ref, const char* forceEncoding)
 	}
 
 	if (status != B_OK) {
-		// If an error occured, bail out and tell the user what happened
 		BEntry entry(ref, true);
 		char name[B_FILE_NAME_LENGTH];
 		if (entry.GetName(name) != B_OK)
 			strlcpy(name, B_TRANSLATE("???"), sizeof(name));
 
 		BString text;
-		if (status == B_BAD_TYPE)
-			bs_printf(&text,
-				B_TRANSLATE("Error loading \"%s\":\n\tUnsupported format"), name);
-		else
-			bs_printf(&text, B_TRANSLATE("Error loading \"%s\":\n\t%s"),
-				name, strerror(status));
+		if (status == B_BAD_TYPE) {
+			text = B_TRANSLATE("Error loading \"%filename%\""
+				":\n\tUnsupported format");
+			text.ReplaceFirst("%filename%", name);
+		} else {
+			text = B_TRANSLATE("Error loading \"%filename%\":\n\t%error%");
+			text.ReplaceFirst("%filename%", name);
+			text.ReplaceFirst("%error%", strerror(status));
+		}
 
 		_ShowAlert(text, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
 		return status;
@@ -1624,18 +1611,18 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 		status = entry.GetRef(&ref);
 
 	if (status != B_OK || !entry.Exists()) {
-		BString alertText;
-		bs_printf(&alertText,
-			B_TRANSLATE("Cannot revert, file not found: \"%s\"."), name);
+		BString alertText =
+			B_TRANSLATE("Cannot revert, file not found: \"%filename%\".");
+		alertText.ReplaceFirst("%filename%", name);
 		_ShowAlert(alertText, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
 		return;
 	}
 
 	if (!fClean) {
-		BString alertText;
-		bs_printf(&alertText,
-			B_TRANSLATE("\"%s\" has unsaved changes.\n"
-				"Revert it to the last saved version? "), Title());
+		BString alertText = B_TRANSLATE("\"%title%\" has unsaved changes.\n"
+			"Revert it to the last saved version?");
+		alertText.ReplaceFirst("%title%", Title());
+
 		if (_ShowAlert(alertText, B_TRANSLATE("Cancel"), B_TRANSLATE("Revert"),
 			"", B_WARNING_ALERT) != 1)
 			return;
