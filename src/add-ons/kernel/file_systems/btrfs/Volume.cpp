@@ -49,8 +49,19 @@ btrfs_super_block::IsMagicValid() const
 bool
 btrfs_super_block::IsValid() const
 {
-	// TODO: check some more values!
 	if (!IsMagicValid())
+		return false;
+
+	if (SectorSize() < 512 || (SectorSize() & (SectorSize() - 1)) != 0)
+		return false;
+
+	if (BlockSize() < SectorSize() || (BlockSize() & (BlockSize() - 1)) != 0)
+		return false;
+
+	if (TotalSize() == 0)
+		return false;
+
+	if (B_LENDIAN_TO_HOST_INT64(num_devices) == 0)
 		return false;
 
 	return true;
