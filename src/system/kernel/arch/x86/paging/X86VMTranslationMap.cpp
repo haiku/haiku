@@ -127,13 +127,14 @@ X86VMTranslationMap::Flush()
 		TRACE("flush_tmap: %d pages to invalidate, invalidate list\n",
 			fInvalidPagesCount);
 
-		arch_cpu_invalidate_tlb_list(x86_read_cr3(), fInvalidPages, fInvalidPagesCount);
-
 		if (fIsKernelMap) {
+			arch_cpu_invalidate_tlb_list(0, fInvalidPages, fInvalidPagesCount);
 			smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
 				0, (addr_t)fInvalidPages, fInvalidPagesCount,
 				NULL, SMP_MSG_FLAG_SYNC);
 		} else {
+			arch_cpu_invalidate_tlb_list(x86_read_cr3(), fInvalidPages, fInvalidPagesCount);
+
 			int cpu = smp_get_current_cpu();
 			CPUSet cpuMask = PagingStructures()->active_on_cpus;
 			cpuMask.ClearBit(cpu);
