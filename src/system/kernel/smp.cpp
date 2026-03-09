@@ -95,12 +95,12 @@ void* sEarlyCPUCallCookie;
 
 static struct smp_msg* sFreeMessages = NULL;
 static int32 sFreeMessageCount = 0;
-static spinlock sFreeMessageSpinlock = B_SPINLOCK_INITIALIZER;
+static rw_spinlock sFreeMessageSpinlock = B_RW_SPINLOCK_INITIALIZER;
 
 static struct smp_msg* sCPUMessages[SMP_MAX_CPUS] = { NULL, };
 
 static struct smp_msg* sBroadcastMessages = NULL;
-static spinlock sBroadcastMessageSpinlock = B_SPINLOCK_INITIALIZER;
+static rw_spinlock sBroadcastMessageSpinlock = B_RW_SPINLOCK_INITIALIZER;
 static int32 sBroadcastMessageCounter;
 
 static bool sICIEnabled = false;
@@ -388,131 +388,6 @@ acquire_spinlock(spinlock* lock)
 }
 
 
-static void
-acquire_spinlock_nocheck(spinlock *lock)
-{
-#if DEBUG_SPINLOCKS
-	if (are_interrupts_enabled()) {
-		panic("acquire_spinlock_nocheck: attempt to acquire lock %p with "
-			"interrupts enabled", lock);
-	}
-#endif
-
-	if (sNumCPUs > 1) {
-#if B_DEBUG_SPINLOCK_CONTENTION
-		const bigtime_t start = system_time();
-#endif
-		while (1) {
-			uint32 count = 0;
-			while (lock->lock != 0) {
-				if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
-#if DEBUG_SPINLOCKS
-					panic("acquire_spinlock_nocheck(): Failed to acquire "
-						"spinlock %p for a long time (last caller: %p, value: %"
-						B_PRIx32 ")", lock, find_lock_caller(lock), lock->lock);
-#else
-					panic("acquire_spinlock_nocheck(): Failed to acquire "
-						"spinlock %p for a long time (value: %" B_PRIx32 ")",
-						lock, lock->lock);
-#endif
-					count = 0;
-				}
-
-				cpu_wait(&lock->lock, 0);
-			}
-
-			if (atomic_get_and_set(&lock->lock, 1) == 0)
-				break;
-		}
-
-#if B_DEBUG_SPINLOCK_CONTENTION
-		update_lock_contention(lock, start);
-#endif
-
-#if DEBUG_SPINLOCKS
-		push_lock_caller(arch_debug_get_caller(), lock);
-#endif
-	} else {
-#if B_DEBUG_SPINLOCK_CONTENTION
-		lock->last_acquired = system_time();
-#endif
-#if DEBUG_SPINLOCKS
-		int32 oldValue = atomic_get_and_set(&lock->lock, 1);
-		if (oldValue != 0) {
-			panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice "
-				"on non-SMP system (last caller: %p, value %" B_PRIx32 ")",
-				lock, find_lock_caller(lock), oldValue);
-		}
-
-		push_lock_caller(arch_debug_get_caller(), lock);
-#endif
-	}
-}
-
-
-/*!	Equivalent to acquire_spinlock(), save for currentCPU parameter. */
-static void
-acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
-{
-#if DEBUG_SPINLOCKS
-	if (are_interrupts_enabled()) {
-		panic("acquire_spinlock_cpu: attempt to acquire lock %p with "
-			"interrupts enabled", lock);
-	}
-#endif
-
-	if (sNumCPUs > 1) {
-#if B_DEBUG_SPINLOCK_CONTENTION
-		const bigtime_t start = system_time();
-#endif
-		while (1) {
-			uint32 count = 0;
-			while (lock->lock != 0) {
-				if (++count == SPINLOCK_DEADLOCK_COUNT) {
-#if DEBUG_SPINLOCKS
-					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
-						"%p for a long time (last caller: %p, value: %" B_PRIx32
-						")", lock, find_lock_caller(lock), lock->lock);
-#else
-					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
-						"%p for a long time (value: %" B_PRIx32 ")", lock,
-						lock->lock);
-#endif
-					count = 0;
-				}
-
-				process_all_pending_ici(currentCPU);
-				cpu_wait(&lock->lock, 0);
-			}
-			if (atomic_get_and_set(&lock->lock, 1) == 0)
-				break;
-		}
-
-#if B_DEBUG_SPINLOCK_CONTENTION
-		update_lock_contention(lock, start);
-#endif
-
-#if DEBUG_SPINLOCKS
-		push_lock_caller(arch_debug_get_caller(), lock);
-#endif
-	} else {
-#if B_DEBUG_SPINLOCK_CONTENTION
-		lock->last_acquired = system_time();
-#endif
-#if DEBUG_SPINLOCKS
-		int32 oldValue = atomic_get_and_set(&lock->lock, 1);
-		if (oldValue != 0) {
-			panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
-				"non-SMP system (last caller: %p, value %" B_PRIx32 ")", lock,
-				find_lock_caller(lock), oldValue);
-		}
-
-		push_lock_caller(arch_debug_get_caller(), lock);
-#endif
-	}
-}
-
-
 void
 release_spinlock(spinlock *lock)
 {
@@ -567,15 +442,53 @@ try_acquire_write_spinlock(rw_spinlock* lock)
 void
 acquire_write_spinlock(rw_spinlock* lock)
 {
-#if DEBUG_SPINLOCKS
-	if (are_interrupts_enabled()) {
-		panic("acquire_write_spinlock: attempt to acquire lock %p with "
-			"interrupts enabled", lock);
-	}
-#endif
-
 	uint32 count = 0;
-	int currentCPU = smp_get_current_cpu();
+	int32 currentCPU = smp_get_current_cpu();
+	while (true) {
+		if (try_acquire_write_spinlock(lock))
+			break;
+
+		while (lock->lock != 0) {
+			if (++count == SPINLOCK_DEADLOCK_COUNT) {
+				panic("acquire_write_spinlock(): Failed to acquire spinlock %p "
+					"for a long time!", lock);
+				count = 0;
+			}
+
+			process_all_pending_ici(currentCPU);
+			cpu_wait(&lock->lock, 0);
+		}
+	}
+}
+
+
+static void
+acquire_write_spinlock_nocheck(rw_spinlock* lock)
+{
+	uint32 count = 0;
+	while (true) {
+		if (try_acquire_write_spinlock(lock))
+			break;
+
+		while (lock->lock != 0) {
+			if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
+				panic("acquire_write_spinlock(): Failed to acquire spinlock %p "
+					"for a long time!", lock);
+				count = 0;
+			}
+
+			cpu_wait(&lock->lock, 0);
+		}
+	}
+}
+
+
+/*! Equivalent to acquire_write_spinlock(), save for currentCPU parameter
+ * (in order to avoid accessing the current thread structure.) */
+static void
+acquire_write_spinlock_cpu(int32 currentCPU, rw_spinlock* lock)
+{
+	uint32 count = 0;
 	while (true) {
 		if (try_acquire_write_spinlock(lock))
 			break;
@@ -632,13 +545,6 @@ try_acquire_read_spinlock(rw_spinlock* lock)
 void
 acquire_read_spinlock(rw_spinlock* lock)
 {
-#if DEBUG_SPINLOCKS
-	if (are_interrupts_enabled()) {
-		panic("acquire_read_spinlock: attempt to acquire lock %p with "
-			"interrupts enabled", lock);
-	}
-#endif
-
 	uint32 count = 0;
 	int currentCPU = smp_get_current_cpu();
 	while (1) {
@@ -653,6 +559,27 @@ acquire_read_spinlock(rw_spinlock* lock)
 			}
 
 			process_all_pending_ici(currentCPU);
+			cpu_wait(&lock->lock, 0);
+		}
+	}
+}
+
+
+static void
+acquire_read_spinlock_nocheck(rw_spinlock* lock)
+{
+	uint32 count = 0;
+	while (1) {
+		if (try_acquire_read_spinlock(lock))
+			break;
+
+		while ((lock->lock & (1u << 31)) != 0) {
+			if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
+				panic("acquire_read_spinlock(): Failed to acquire spinlock %p "
+					"for a long time!", lock);
+				count = 0;
+			}
+
 			cpu_wait(&lock->lock, 0);
 		}
 	}
@@ -740,12 +667,12 @@ retry:
 		cpu_pause();
 
 	state = disable_interrupts();
-	acquire_spinlock(&sFreeMessageSpinlock);
+	acquire_write_spinlock(&sFreeMessageSpinlock);
 
 	if (sFreeMessageCount <= 0) {
 		// someone grabbed one while we were getting the lock,
 		// go back to waiting for it
-		release_spinlock(&sFreeMessageSpinlock);
+		release_write_spinlock(&sFreeMessageSpinlock);
 		restore_interrupts(state);
 		goto retry;
 	}
@@ -754,7 +681,7 @@ retry:
 	sFreeMessages = (*msg)->next;
 	sFreeMessageCount--;
 
-	release_spinlock(&sFreeMessageSpinlock);
+	release_write_spinlock(&sFreeMessageSpinlock);
 
 	TRACE("find_free_message: returning msg %p\n", *msg);
 
@@ -771,19 +698,19 @@ find_free_message_interrupts_disabled(int32 currentCPU,
 {
 	TRACE("find_free_message_interrupts_disabled: entry\n");
 
-	acquire_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
+	acquire_write_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
 	while (sFreeMessageCount <= 0) {
-		release_spinlock(&sFreeMessageSpinlock);
+		release_write_spinlock(&sFreeMessageSpinlock);
 		process_all_pending_ici(currentCPU);
 		cpu_pause();
-		acquire_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
+		acquire_write_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
 	}
 
 	*_message = sFreeMessages;
 	sFreeMessages = (*_message)->next;
 	sFreeMessageCount--;
 
-	release_spinlock(&sFreeMessageSpinlock);
+	release_write_spinlock(&sFreeMessageSpinlock);
 
 	TRACE("find_free_message_interrupts_disabled: returning msg %p\n",
 		*_message);
@@ -795,11 +722,16 @@ return_free_message(struct smp_msg* msg)
 {
 	TRACE("return_free_message: returning msg %p\n", msg);
 
-	acquire_spinlock_nocheck(&sFreeMessageSpinlock);
+	acquire_read_spinlock_nocheck(&sFreeMessageSpinlock);
 	msg->next = sFreeMessages;
-	sFreeMessages = msg;
-	sFreeMessageCount++;
-	release_spinlock(&sFreeMessageSpinlock);
+	while (true) {
+		smp_msg* result = atomic_pointer_test_and_set(&sFreeMessages, msg, msg->next);
+		if (result == msg->next)
+			break;
+		msg->next = result;
+	}
+	atomic_add(&sFreeMessageCount, 1);
+	release_read_spinlock(&sFreeMessageSpinlock);
 }
 
 
@@ -824,7 +756,7 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 		!= atomic_get(&sBroadcastMessageCounter)) {
 
 		// try getting one from the broadcast mailbox
-		acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
+		acquire_read_spinlock_nocheck(&sBroadcastMessageSpinlock);
 
 		msg = sBroadcastMessages;
 		while (msg != NULL) {
@@ -841,7 +773,7 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 			sourceMailbox = MAILBOX_BCAST;
 			break;
 		}
-		release_spinlock(&sBroadcastMessageSpinlock);
+		release_read_spinlock(&sBroadcastMessageSpinlock);
 
 		if (msg != NULL) {
 			TRACE(" cpu %d: found msg %p in broadcast mailbox\n", currentCPU,
@@ -864,7 +796,7 @@ finish_message_processing(int currentCPU, struct smp_msg* msg,
 
 	// clean up the message
 	if (sourceMailbox == MAILBOX_BCAST)
-		acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
+		acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
 
 	TRACE("cleaning up message %p\n", msg);
 
@@ -895,7 +827,7 @@ finish_message_processing(int currentCPU, struct smp_msg* msg,
 	}
 
 	if (sourceMailbox == MAILBOX_BCAST)
-		release_spinlock(&sBroadcastMessageSpinlock);
+		release_write_spinlock(&sBroadcastMessageSpinlock);
 
 	if ((msg->flags & SMP_MSG_FLAG_FREE_ARG) != 0 && msg->data_ptr != NULL)
 		free(msg->data_ptr);
@@ -1142,10 +1074,10 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 	bool broadcast = targetCPUs == sNumCPUs - 1;
 
 	// stick it in the broadcast mailbox
-	acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
+	acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
 	msg->next = sBroadcastMessages;
 	sBroadcastMessages = msg;
-	release_spinlock(&sBroadcastMessageSpinlock);
+	release_write_spinlock(&sBroadcastMessageSpinlock);
 
 	atomic_add(&sBroadcastMessageCounter, 1);
 	for (int32 i = 0; i < sNumCPUs; i++) {
@@ -1187,13 +1119,10 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 		message, data, data2, data3, dataPointer, flags);
 
 	if (sICIEnabled) {
-		int state;
-		int currentCPU;
-
 		// find_free_message leaves interrupts disabled
-		state = find_free_message(&msg);
+		cpu_status state = find_free_message(&msg);
 
-		currentCPU = smp_get_current_cpu();
+		int32 currentCPU = smp_get_current_cpu();
 
 		msg->message = message;
 		msg->data = data;
@@ -1210,10 +1139,10 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 			"mbox\n", currentCPU, msg);
 
 		// stick it in the appropriate cpu's mailbox
-		acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
+		acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
 		msg->next = sBroadcastMessages;
 		sBroadcastMessages = msg;
-		release_spinlock(&sBroadcastMessageSpinlock);
+		release_write_spinlock(&sBroadcastMessageSpinlock);
 
 		atomic_add(&sBroadcastMessageCounter, 1);
 		atomic_add(&gCPU[currentCPU].ici_counter, 1);
@@ -1276,10 +1205,10 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 		"into broadcast mbox\n", currentCPU, msg);
 
 	// stick it in the appropriate cpu's mailbox
-	acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
+	acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
 	msg->next = sBroadcastMessages;
 	sBroadcastMessages = msg;
-	release_spinlock(&sBroadcastMessageSpinlock);
+	release_write_spinlock(&sBroadcastMessageSpinlock);
 
 	atomic_add(&sBroadcastMessageCounter, 1);
 	atomic_add(&gCPU[currentCPU].ici_counter, 1);
