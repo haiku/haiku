@@ -510,7 +510,7 @@ status_t
 Volume::WriteSuperBlock()
 {
 	uint32 checksum = calculate_crc((uint32)~1,
-			(uint8 *)(&fSuperBlock + sizeof(fSuperBlock.checksum)),
+			(uint8 *)&fSuperBlock + sizeof(fSuperBlock.checksum),
 			sizeof(fSuperBlock) - sizeof(fSuperBlock.checksum));
 
 	fSuperBlock.checksum[0] = (checksum >>  0) & 0xFF;
