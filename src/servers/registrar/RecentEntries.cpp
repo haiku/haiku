@@ -312,13 +312,12 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 			BPrivate::Storage::escape_path(path.Path(), escapedPath);
 			fprintf(file, "%s %s", tag, escapedPath);
 			std::list<recent_entry*> &list = mapItem->second;
-			int32 i = 0;
+			int32 i __attribute__((unused)) = 0;
 			for (std::list<recent_entry*>::iterator item = list.begin();
 					item != list.end(); i++, item++) {
 				recent_entry *entry = *item;
 				if (entry) {
-					fprintf(file, " \"%s\" %" B_PRId32, entry->sig.c_str(),
-						entry->index);
+					fprintf(file, " \"%s\" %" B_PRId32, entry->sig.c_str(), entry->index);
 				} else {
 					D(PRINT("WARNING: RecentEntries::Save(): The entry %"
 						B_PRId32 " entries from the front of the compiled "

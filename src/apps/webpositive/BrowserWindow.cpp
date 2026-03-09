@@ -132,11 +132,6 @@ enum {
 	CYCLE_TABS									= 'ctab',
 };
 
-
-static const int32 kModifiers = B_SHIFT_KEY | B_COMMAND_KEY
-	| B_CONTROL_KEY | B_OPTION_KEY | B_MENU_KEY;
-
-
 static const char* kHandledProtocols[] = {
 	"http",
 	"https",
