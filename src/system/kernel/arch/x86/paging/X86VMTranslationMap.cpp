@@ -104,7 +104,9 @@ X86VMTranslationMap::Flush()
 			fInvalidPagesCount);
 
 		if (fIsKernelMap) {
+			cpu_status state = disable_interrupts();
 			arch_cpu_global_tlb_invalidate();
+			restore_interrupts(state);
 			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0,
 				NULL, SMP_MSG_FLAG_SYNC);
 		} else {

@@ -1994,16 +1994,13 @@ void
 arch_cpu_global_tlb_invalidate()
 {
 	uint32 flags = x86_read_cr4();
-
-	if (flags & IA32_CR4_GLOBAL_PAGES) {
+	if ((flags & IA32_CR4_GLOBAL_PAGES) != 0) {
 		// disable and reenable the global pages to flush all TLBs regardless
 		// of the global page bit
 		x86_write_cr4(flags & ~IA32_CR4_GLOBAL_PAGES);
 		x86_write_cr4(flags | IA32_CR4_GLOBAL_PAGES);
 	} else {
-		cpu_status state = disable_interrupts();
 		arch_cpu_user_tlb_invalidate(0);
-		restore_interrupts(state);
 	}
 }
 
