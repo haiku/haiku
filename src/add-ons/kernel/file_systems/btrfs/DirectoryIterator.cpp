@@ -96,7 +96,7 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 		return B_BUFFER_OVERFLOW;
 	}
 
-	memcpy(name, entry + 1, length);
+	memcpy(name, entry->name, length);
 	name[length] = '\0';
 	*_nameLength = length;
 	*_id = entry->InodeID();
@@ -138,19 +138,17 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 	btrfs_dir_entry* entry = entries;
 	uint16 current = 0;
 	while (current < length) {
+		if (entry->NameLength() == nameLength
+			&& strncmp((char*)entry->name, name, nameLength) == 0) {
+			*_id = entry->InodeID();
+			free(entries);
+			return B_OK;
+		}
 		current += entry->Length();
-		break;
-		// TODO there could be several entries with the same name hash
 		entry = (btrfs_dir_entry*)((uint8*)entry + entry->Length());
 	}
-
-	TRACE("DirectoryIterator::Lookup() entries_length %ld name_length %d\n",
-		length, entry->NameLength());
-
-	*_id = entry->InodeID();
 	free(entries);
-
-	return B_OK;
+	return B_ENTRY_NOT_FOUND;
 }
 
 
