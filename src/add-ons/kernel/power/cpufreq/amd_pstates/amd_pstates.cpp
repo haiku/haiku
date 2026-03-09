@@ -94,7 +94,7 @@ init_pstates()
 			return B_ERROR;
 	}
 
-	dprintf("using AMD P-States (capabilities: 0x%08" B_PRIx64 "\n",
+	dprintf("using AMD P-States (capabilities: 0x%08" B_PRIx64 ")\n",
 		x86_read_msr(MSR_AMD_CPPC_CAP1));
 
 	pstates_set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
