@@ -760,7 +760,8 @@ BTree::RemoveEntries(Transaction& transaction, Path* path,
 status_t
 BTree::PreviousLeaf(Path* path) const
 {
-	// TODO: use Traverse() ???
+	// Traverse() is not used here because it searches by key value,
+	// while leaf navigation only requires following tree structure.
 	int level = 0;
 	int slot;
 	Node* node = NULL;
