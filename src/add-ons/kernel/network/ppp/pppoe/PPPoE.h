@@ -2,18 +2,19 @@
  * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef PPPoE__H
 #define PPPoE__H
 
 #include <SupportDefs.h>
-#include <net/if.h>
 
+#include <net/if.h>
 #include <ethernet.h>
+
+#ifdef _KERNEL_MODE
 #include <ether_driver.h>
 #include <net_stack.h>
+#endif
 
-class PPPoEDevice;
 
 #define B_NET_FRAME_TYPE_PPPOE	B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_PPPOE)
 #define B_NET_FRAME_TYPE_PPPOE_DISCOVERY B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_PPPOE_DISCOVERY)
@@ -46,9 +47,6 @@ typedef struct pppoe_query_request {
 	thread_id receiver;
 } pppoe_query_request;
 
-extern struct core_module_info *core;
-
-
 typedef struct pppoe_header {
 	uint8 version : 4;
 	uint8 type : 4;
@@ -64,6 +62,10 @@ typedef struct complete_pppoe_header {
 } complete_pppoe_header;
 
 
+#ifdef _KERNEL_MODE
+extern struct core_module_info *core;
+class PPPoEDevice;
+
 // defined in pppoe.cpp
 extern net_device *FindPPPoEInterface(const char *name);
 extern uint32 NewHostUniq();
@@ -74,6 +76,8 @@ extern void remove_device(PPPoEDevice *device);
 // defined in PPPoEDevice.cpp
 extern void dump_packet(net_buffer *packet);
 #endif // DEBUG
+
+#endif
 
 
 #endif

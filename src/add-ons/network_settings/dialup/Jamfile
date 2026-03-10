@@ -1,9 +1,8 @@
 SubDir HAIKU_TOP src add-ons network_settings dialup ;
 
 UsePublicHeaders [ FDirName add-ons network_settings ] ;
-UsePrivateHeaders app libroot kernel net shared ;
+UsePrivateHeaders app libroot net shared ;
 UsePrivateSystemHeaders ;
-UsePrivateKernelHeaders ; # FIXME: shouldn't be needed
 UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] : true ;

@@ -361,14 +361,14 @@ PPPManager::Interfaces(int32 *count,
 		*count = GetInterfaces(interfaces, requestCount, filter);
 		if (*count <= 0) {
 			printf("No interface, count second round: %" B_PRId32 "\n", *count);
-			delete interfaces;
+			delete[] interfaces;
 			return NULL;
 		}
 
 		if (*count < requestCount)
 			break;
 		
-		delete interfaces;
+		delete[] interfaces;
 	}
 	
 	return interfaces;
@@ -429,7 +429,7 @@ PPPManager::InterfaceWithUnit(int32 if_unit) const
 		}
 	}
 	
-	delete interfaces;
+	delete[] interfaces;
 	
 	return id;
 }
@@ -466,7 +466,7 @@ PPPManager::InterfaceWithName(const char *name) const
 		}
 	}
 	
-	delete interfaces;
+	delete[] interfaces;
 	
 	if (id != PPP_UNDEFINED_INTERFACE_ID)
 		return id;
