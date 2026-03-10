@@ -931,6 +931,22 @@ if [ "$("$HAIKU_NASM" -hf | grep -c elf'[36][24] ')" -ne "2" ]; then
 	exit 1
 fi
 
+# locate awk
+if [ -z "$HOST_AWK" ]; then
+	HOST_AWK="awk"
+	awk 'BEGIN{strftime()}' 2>/dev/null
+	if [ $? -ne 0 ]; then
+		# awk does not support strftime, try gawk
+		HOST_AWK="gawk"
+	fi
+fi
+$HOST_AWK 'BEGIN{strftime()}' 2>/dev/null
+if [ $? -ne 0 ]; then
+	echo "A working awk was not found. Install gawk or specify"
+	echo "a different awk with HOST_AWK."
+	exit 1
+fi
+
 # create output directory
 mkdir -p "$buildOutputDir" || exit 1
 
@@ -1171,6 +1187,7 @@ HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
 HOST_EXTENDED_REGEX_SED		?= ${HOST_EXTENDED_REGEX_SED} ;
 HOST_SHA256					?= ${HOST_SHA256} ;
 HOST_PYTHON					?= ${HOST_PYTHON} ;
+HOST_AWK					?= ${HOST_AWK} ;
 HOST_WGET_RETRY_ON_HOST_ERROR			?= ${HOST_WGET_RETRY_ON_HOST_ERROR} ;
 HAIKU_NASM					?= ${HAIKU_NASM} ;
 

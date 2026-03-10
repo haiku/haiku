@@ -54,7 +54,7 @@ extern char *	_nsyytext;
 extern int _nsyylineno;
 %}
 
-%name-prefix "_nsyy"
+%name-prefix="_nsyy"
 
 %union {
 	char *str;

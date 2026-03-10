@@ -1526,15 +1526,30 @@ _haiku_build_creat(const char* path, mode_t mode)
 
 
 int
-_haiku_build_open(const char* path, int openMode, mode_t permissions)
+_haiku_build_open(const char* path, int openMode, ...)
 {
+	mode_t permissions = 0;
+	if ((openMode & O_CREAT) != 0) {
+		va_list args;
+		va_start(args, openMode);
+		permissions = va_arg(args, int);
+		va_end(args);
+	}
 	return _haiku_build_openat(AT_FDCWD, path, openMode, permissions);
 }
 
 
 int
-_haiku_build_openat(int fd, const char* path, int openMode, mode_t permissions)
+_haiku_build_openat(int fd, const char* path, int openMode, ...)
 {
+	mode_t permissions = 0;
+	if ((openMode & O_CREAT) != 0) {
+		va_list args;
+		va_start(args, openMode);
+		permissions = va_arg(args, int);
+		va_end(args);
+	}
+
 	// adapt the permissions as required by POSIX
 	mode_t mask = umask(0);
 	umask(mask);
@@ -1545,8 +1560,13 @@ _haiku_build_openat(int fd, const char* path, int openMode, mode_t permissions)
 
 
 int
-_haiku_build_fcntl(int fd, int op, int argument)
+_haiku_build_fcntl(int fd, int op, ...)
 {
+	va_list args;
+	va_start(args, op);
+	int argument = va_arg(args, int);
+	va_end(args);
+
 	if (is_unknown_or_system_descriptor(fd))
 		return fcntl(fd, op, argument);
 

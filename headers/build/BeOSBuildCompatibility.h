@@ -111,16 +111,9 @@ int		_haiku_build_fchownat(int fd, const char* path, uid_t owner,
 			gid_t group, int flag);
 int		_haiku_build_mknodat(int fd, const char* name, mode_t mode, dev_t dev);
 int		_haiku_build_creat(const char* path, mode_t mode);
-#ifndef _HAIKU_BUILD_DONT_REMAP_FD_FUNCTIONS
 int		_haiku_build_open(const char* path, int openMode, ...);
 int		_haiku_build_openat(int fd, const char* path, int openMode, ...);
 int		_haiku_build_fcntl(int fd, int op, ...);
-#else
-int		_haiku_build_open(const char* path, int openMode, mode_t permissions);
-int		_haiku_build_openat(int fd, const char* path, int openMode,
-			mode_t permissions);
-int		_haiku_build_fcntl(int fd, int op, int argument);
-#endif
 int		_haiku_build_renameat(int fromFD, const char* from, int toFD,
 			const char* to);
 
