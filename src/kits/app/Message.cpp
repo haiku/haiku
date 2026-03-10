@@ -15,7 +15,7 @@
 #include <DirectMessageTarget.h>
 #include <MessengerPrivate.h>
 #include <TokenSpace.h>
-#include <util/KMessage.h>
+#include <kernel/util/KMessage.h>
 
 #include <Alignment.h>
 #include <Application.h>
