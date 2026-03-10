@@ -4,7 +4,7 @@ UsePrivateHeaders [ FDirName debugger ] ;
 UsePrivateHeaders [ FDirName debugger elf ] ;
 UsePrivateHeaders [ FDirName debugger types ] ;
 
-UsePrivateHeaders kernel shared ;
+UsePrivateHeaders shared ;
 UsePrivateSystemHeaders ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;

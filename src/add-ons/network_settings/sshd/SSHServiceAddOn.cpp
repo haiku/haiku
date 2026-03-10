@@ -21,7 +21,7 @@
 #include <NetServer.h>
 #include <RegistrarDefs.h>
 #include <user_group.h>
-#include <util/KMessage.h>
+#include <kernel/util/KMessage.h>
 
 #include "ServiceListItem.h"
 #include "ServiceView.h"

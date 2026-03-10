@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps debuganalyzer model_loader ;
 
-UsePrivateHeaders debug interface kernel shared ;
+UsePrivateHeaders debug interface shared ;
 UsePrivateSystemHeaders ;
 
 UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;

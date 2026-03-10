@@ -17,9 +17,8 @@ UseBuildFeatureHeaders zlib ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 # headers/build/private/kernel is needed for safemode.h and syscalls.h.
-# headers/private/kernel for the util/* stuff.
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
-UsePrivateHeaders kernel support ;
+UsePrivateHeaders support ;
 
 local appServerDir = [ FDirName $(HAIKU_TOP) src servers app ] ;
 

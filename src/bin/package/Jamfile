@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin package ;
 
-UsePrivateHeaders kernel libroot shared storage support ;
+UsePrivateHeaders libroot shared storage support ;
 
 if [ FIsBuildFeatureEnabled zstd ] {
 	SubDirC++Flags -DZSTD_DEFAULT ;

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src servers index ;
 
 AddResources index_server : index_server.rdef ;
 
-UsePrivateHeaders index_server shared storage kernel app ;
+UsePrivateHeaders index_server shared storage app ;
 UsePrivateSystemHeaders ;
 
 Application index_server :

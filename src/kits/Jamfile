@@ -17,7 +17,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 	SubDirC++Flags $(defines) ;
 }
 
-UsePrivateHeaders app interface kernel locale print shared ;
+UsePrivateHeaders app interface locale print shared ;
 
 # Build our libbe.so
 

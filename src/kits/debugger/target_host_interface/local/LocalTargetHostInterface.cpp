@@ -16,7 +16,7 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 #include <system_info.h>
-#include <util/KMessage.h>
+#include <kernel/util/KMessage.h>
 
 #include "debug_utils.h"
 

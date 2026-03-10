@@ -13,7 +13,7 @@
 
 #include <extended_system_info.h>
 #include <extended_system_info_defs.h>
-#include <util/KMessage.h>
+#include <kernel/util/KMessage.h>
 
 
 static void

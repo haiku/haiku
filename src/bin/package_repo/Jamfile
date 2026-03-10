@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src bin package_repo ;
 
-UsePrivateHeaders kernel shared ;
-
+UsePrivateHeaders shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) src bin package ] ;
 
 Application package_repo :

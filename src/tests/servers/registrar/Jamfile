@@ -29,7 +29,6 @@ SimpleTest run_test_registrar
 
 # a shutdown working with the emulation under R5
 UsePrivateHeaders app ;
-UsePrivateHeaders kernel ;
 
 SimpleTest <test>shutdown
 	: shutdown.cpp

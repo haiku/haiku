@@ -5,7 +5,7 @@ SEARCH_SOURCE +=
 	[ FDirName $(HAIKU_TOP) src bin package ]
 	;
 
-UsePrivateHeaders kernel shared ;
+UsePrivateHeaders shared ;
 
 USES_BE_API on <build>package_repo = true ;
 

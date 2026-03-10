@@ -5,7 +5,7 @@ SubDirC++Flags -Wno-error ;
 
 include [ FDirName $(SUBDIR) build jam HdsSchemaGenRules ] ;
 
-UsePrivateHeaders interface kernel net netservices package shared storage ;
+UsePrivateHeaders interface net netservices package shared storage ;
 UsePrivateHeaders support locale ;
 
 HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;

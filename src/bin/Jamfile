@@ -4,7 +4,7 @@ HAIKU_MULTIPLE_LOCALIZED_TARGETS on $(SUBDIR) = 1 ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders app interface libroot kernel shared storage support tracker usb ;
+UsePrivateHeaders app interface libroot shared storage support tracker usb ;
 UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 UseBuildFeatureHeaders ncurses ;

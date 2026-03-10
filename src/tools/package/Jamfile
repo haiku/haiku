@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src tools package ;
 
-UsePrivateBuildHeaders libroot shared kernel storage support ;
+UsePrivateBuildHeaders libroot shared storage support ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
 

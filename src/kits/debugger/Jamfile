@@ -29,7 +29,7 @@ UsePrivateHeaders [ FDirName debugger value value_formatters ] ;
 UsePrivateHeaders [ FDirName debugger value value_nodes ] ;
 UsePrivateHeaders [ FDirName debugger value values ] ;
 
-UsePrivateHeaders app debug interface kernel package shared libroot ;
+UsePrivateHeaders app debug interface package shared libroot ;
 UsePrivateSystemHeaders ;
 
 LINKFLAGS += -Wl,--exclude-libs,ALL ;

@@ -25,7 +25,7 @@ UsePrivateHeaders [ FDirName debugger value value_formatters ] ;
 UsePrivateHeaders [ FDirName debugger value value_nodes ] ;
 UsePrivateHeaders [ FDirName debugger value values ] ;
 
-UsePrivateHeaders app interface kernel shared system ;
+UsePrivateHeaders app interface shared system ;
 UsePrivateSystemHeaders ;
 
 UseBuildFeatureHeaders libedit ;

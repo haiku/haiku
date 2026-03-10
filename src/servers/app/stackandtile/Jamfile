@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src servers app stackandtile ;
 
 UseLibraryHeaders agg lp_solve linprog ;
-UsePrivateHeaders app graphics interface shared kernel ;
+UsePrivateHeaders app graphics interface shared ;
 UseBuildFeatureHeaders freetype ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;

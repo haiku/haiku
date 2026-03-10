@@ -10,7 +10,7 @@
 
 
 #include <Message.h>
-#include <util/KMessage.h>
+#include <kernel/util/KMessage.h>
 
 
 // message formats

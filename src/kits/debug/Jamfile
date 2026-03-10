@@ -1,8 +1,6 @@
 SubDir HAIKU_TOP src kits debug ;
 
 UsePrivateHeaders debug ;
-UsePrivateHeaders kernel ;
-	# for <util/DoublyLinkedList.h>
 UsePrivateHeaders libroot ;
 UsePrivateHeaders runtime_loader ;
 UsePrivateHeaders shared ;

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tests servers launch ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders app kernel libroot shared storage support ;
+UsePrivateHeaders app libroot shared storage support ;
 UsePrivateSystemHeaders ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;

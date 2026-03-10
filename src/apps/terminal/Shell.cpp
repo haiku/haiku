@@ -38,7 +38,7 @@
 #include <OS.h>
 #include <Path.h>
 
-#include <util/KMessage.h>
+#include <kernel/util/KMessage.h>
 
 #include <extended_system_info.h>
 #include <extended_system_info_defs.h>

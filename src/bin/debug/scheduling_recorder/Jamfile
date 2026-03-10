@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin debug scheduling_recorder ;
 
-UsePrivateHeaders debug kernel libroot shared ;
+UsePrivateHeaders debug libroot shared ;
 UsePrivateSystemHeaders ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;

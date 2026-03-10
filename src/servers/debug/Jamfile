@@ -2,7 +2,6 @@ SubDir HAIKU_TOP src servers debug ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders debug ;
-UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 

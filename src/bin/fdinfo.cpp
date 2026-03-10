@@ -14,7 +14,7 @@
 #include <extended_system_info_defs.h>
 #include <syscalls.h>
 #include <vfs_defs.h>
-#include <util/KMessage.h>
+#include <kernel/util/KMessage.h>
 
 #include <ctype.h>
 #include <errno.h>

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src apps terminal ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
-UsePrivateHeaders libroot kernel shared system ;
+UsePrivateHeaders libroot shared system ;
 UsePrivateHeaders textencoding ;
 
 Application Terminal :

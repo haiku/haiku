@@ -9,7 +9,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
 UsePrivateHeaders app shared interface graphics ;
 UseLibraryHeaders agg ;
-UsePrivateHeaders kernel ;
 
 AddResources WinDecorator : resources.rdef ;
 

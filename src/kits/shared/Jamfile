@@ -19,7 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		# for RWLockManager only
 		UsePrivateSystemHeaders ;
-		UsePrivateHeaders kernel libroot ;
+		UsePrivateHeaders libroot ;
 
 		# for BKeymap
 		UsePrivateHeaders interface ;

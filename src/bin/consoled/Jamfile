@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin consoled ;
 
-UsePrivateHeaders input kernel shared ;
+UsePrivateHeaders input shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) src apps terminal ] ;
 
 Application consoled :

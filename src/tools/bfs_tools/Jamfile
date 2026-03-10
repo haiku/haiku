@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src tools bfs_tools ;
 
-UsePrivateBuildHeaders libroot shared kernel storage support ;
+UsePrivateBuildHeaders libroot shared storage support ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin bfs_tools ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin bfs_tools lib ] ;

@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers bluetooth ;
 
-UsePrivateHeaders shared bluetooth net kernel ;
+UsePrivateHeaders shared bluetooth net ;
 
 AddResources bluetooth_server : bluetooth_server.rdef ;
 

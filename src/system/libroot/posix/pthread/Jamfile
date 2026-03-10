@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src system libroot posix pthread ;
 
-UsePrivateHeaders kernel ;
-	# for util/DoublyLinkedList.h
 UsePrivateHeaders libroot shared ;
 
 local architectureObject ;

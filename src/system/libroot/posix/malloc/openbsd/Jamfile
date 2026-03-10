@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix malloc openbsd ;
 
-UsePrivateHeaders kernel libroot shared ;
+UsePrivateHeaders libroot shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 local architectureObject ;

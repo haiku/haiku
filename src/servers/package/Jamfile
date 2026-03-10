@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src servers package ;
 
 UsePrivateSystemHeaders ;
-UsePrivateHeaders app interface kernel shared storage ;
+UsePrivateHeaders app interface shared storage ;
 
 Application package_daemon
 	:
