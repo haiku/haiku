@@ -205,7 +205,7 @@ arch_start_kernel(addr_t kernelEntry)
 	// Copy final kernel args
 	// This should be the last step before jumping to the kernel
 	// as there are some fixups happening to kernel_args even in the last minute
-	memcpy(kernelArgs, &gKernelArgs, sizeof(struct kernel_args));
+	memcpy((void *)kernelArgs, &gKernelArgs, sizeof(struct kernel_args));
 
 	//smp_boot_other_cpus(final_ttbr0, kernelEntry, (addr_t)&gKernelArgs);
 
