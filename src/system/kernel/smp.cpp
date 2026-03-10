@@ -722,16 +722,11 @@ return_free_message(struct smp_msg* msg)
 {
 	TRACE("return_free_message: returning msg %p\n", msg);
 
-	acquire_read_spinlock_nocheck(&sFreeMessageSpinlock);
+	acquire_write_spinlock_nocheck(&sFreeMessageSpinlock);
 	msg->next = sFreeMessages;
-	while (true) {
-		smp_msg* result = atomic_pointer_test_and_set(&sFreeMessages, msg, msg->next);
-		if (result == msg->next)
-			break;
-		msg->next = result;
-	}
-	atomic_add(&sFreeMessageCount, 1);
-	release_read_spinlock(&sFreeMessageSpinlock);
+	sFreeMessages = msg;
+	sFreeMessageCount++;
+	release_write_spinlock(&sFreeMessageSpinlock);
 }
 
 
