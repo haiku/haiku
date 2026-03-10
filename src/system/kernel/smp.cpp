@@ -658,13 +658,15 @@ release_read_seqlock(seqlock* lock, uint32 count)
 static cpu_status
 find_free_message(struct smp_msg** msg)
 {
-	cpu_status state;
-
 	TRACE("find_free_message: entry\n");
 
+	cpu_status state;
+
 retry:
-	while (sFreeMessageCount <= 0)
+	while (sFreeMessageCount <= 0) {
+		ASSERT(are_interrupts_enabled());
 		cpu_pause();
+	}
 
 	state = disable_interrupts();
 	acquire_write_spinlock(&sFreeMessageSpinlock);
@@ -978,17 +980,16 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 		data3, dataPointer, flags);
 
 	if (sICIEnabled) {
-		int state;
-		int currentCPU;
-
 		// find_free_message leaves interrupts disabled
-		state = find_free_message(&msg);
+		cpu_status state = find_free_message(&msg);
 
-		currentCPU = smp_get_current_cpu();
+		int currentCPU = smp_get_current_cpu();
 		if (targetCPU == currentCPU) {
+			// nope, can't do that
+			ASSERT(false);
 			return_free_message(msg);
 			restore_interrupts(state);
-			return; // nope, cant do that
+			return;
 		}
 
 		// set up the message
@@ -1386,25 +1387,25 @@ smp_get_current_cpu(void)
 static void
 call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie, bool sync)
 {
-	cpu_status state = disable_interrupts();
+	thread_pin_to_current_cpu(thread_get_current_thread());
 
 	if (targetCPU == (uint32)smp_get_current_cpu()) {
 		func(cookie, smp_get_current_cpu());
-		restore_interrupts(state);
+		thread_unpin_from_current_cpu(thread_get_current_thread());
 		return;
 	}
 
 	if (!sICIEnabled) {
 		// Early mechanism not available
 		panic("call_single_cpu is not yet available");
-		restore_interrupts(state);
+		thread_unpin_from_current_cpu(thread_get_current_thread());
 		return;
 	}
 
 	smp_send_ici(targetCPU, SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
 		0, 0, (void*)func, sync ? SMP_MSG_FLAG_SYNC : SMP_MSG_FLAG_ASYNC);
 
-	restore_interrupts(state);
+	thread_unpin_from_current_cpu(thread_get_current_thread());
 }
 
 
@@ -1428,16 +1429,15 @@ call_single_cpu_sync(uint32 targetCPU, void (*func)(void*, int), void* cookie)
 static void
 call_all_cpus(void (*func)(void*, int), void* cookie, bool sync)
 {
-	cpu_status state = disable_interrupts();
-
 	// if inter-CPU communication is not yet enabled, use the early mechanism
 	if (!sICIEnabled) {
 		call_all_cpus_early(func, cookie);
-		restore_interrupts(state);
 		return;
 	}
 
-	if (smp_get_num_cpus() > 1) {
+	thread_pin_to_current_cpu(thread_get_current_thread());
+
+	if (sNumCPUs > 1) {
 		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
 			0, 0, (void*)func, sync ? SMP_MSG_FLAG_SYNC : SMP_MSG_FLAG_ASYNC);
 	}
@@ -1445,7 +1445,7 @@ call_all_cpus(void (*func)(void*, int), void* cookie, bool sync)
 	// we need to call this function ourselves as well
 	func(cookie, smp_get_current_cpu());
 
-	restore_interrupts(state);
+	thread_unpin_from_current_cpu(thread_get_current_thread());
 }
 
 
