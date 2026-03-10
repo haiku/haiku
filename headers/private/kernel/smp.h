@@ -300,7 +300,8 @@ release_read_spinlock_inline(rw_spinlock* lock)
 
 
 static inline bool
-try_acquire_write_seqlock_inline(seqlock* lock) {
+try_acquire_write_seqlock_inline(seqlock* lock)
+{
 	bool succeed = try_acquire_spinlock(&lock->lock);
 	if (succeed)
 		atomic_add((int32*)&lock->count, 1);
@@ -309,14 +310,16 @@ try_acquire_write_seqlock_inline(seqlock* lock) {
 
 
 static inline void
-acquire_write_seqlock_inline(seqlock* lock) {
+acquire_write_seqlock_inline(seqlock* lock)
+{
 	acquire_spinlock(&lock->lock);
 	atomic_add((int32*)&lock->count, 1);
 }
 
 
 static inline void
-release_write_seqlock_inline(seqlock* lock) {
+release_write_seqlock_inline(seqlock* lock)
+{
 	atomic_add((int32*)&lock->count, 1);
 	release_spinlock(&lock->lock);
 }
@@ -333,7 +336,6 @@ static inline bool
 release_read_seqlock_inline(seqlock* lock, uint32 count)
 {
 	uint32 current = (uint32)atomic_get((int32*)&lock->count);
-
 	return count % 2 == 0 && current == count;
 }
 
