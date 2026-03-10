@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdint.h>
+#undef memmove
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 typedef __attribute__((__may_alias__)) size_t WT;

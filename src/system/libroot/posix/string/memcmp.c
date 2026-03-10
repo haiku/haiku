@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#undef memcmp
 
 
 #define MISALIGNMENT(PTR, TYPE) ((addr_t)(PTR) & (sizeof(TYPE) - 1))
