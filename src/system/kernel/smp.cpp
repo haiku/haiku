@@ -1384,7 +1384,7 @@ smp_get_current_cpu(void)
 
 
 static void
-_call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie, bool sync)
+call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie, bool sync)
 {
 	cpu_status state = disable_interrupts();
 
@@ -1411,25 +1411,25 @@ _call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie, bool 
 void
 call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie)
 {
-	return _call_single_cpu(targetCPU, func, cookie, false);
+	return call_single_cpu(targetCPU, func, cookie, false);
 }
 
 
 void
 call_single_cpu_sync(uint32 targetCPU, void (*func)(void*, int), void* cookie)
 {
-	return _call_single_cpu(targetCPU, func, cookie, true);
+	return call_single_cpu(targetCPU, func, cookie, true);
 }
 
 
 // #pragma mark - public exported functions
 
 
-void
-call_all_cpus(void (*func)(void*, int), void* cookie)
+static void
+call_all_cpus(void (*func)(void*, int), void* cookie, bool sync)
 {
 	cpu_status state = disable_interrupts();
-	
+
 	// if inter-CPU communication is not yet enabled, use the early mechanism
 	if (!sICIEnabled) {
 		call_all_cpus_early(func, cookie);
@@ -1439,7 +1439,7 @@ call_all_cpus(void (*func)(void*, int), void* cookie)
 
 	if (smp_get_num_cpus() > 1) {
 		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
-			0, 0, (void*)func, SMP_MSG_FLAG_ASYNC);
+			0, 0, (void*)func, sync ? SMP_MSG_FLAG_SYNC : SMP_MSG_FLAG_ASYNC);
 	}
 
 	// we need to call this function ourselves as well
@@ -1450,26 +1450,16 @@ call_all_cpus(void (*func)(void*, int), void* cookie)
 
 
 void
+call_all_cpus(void (*func)(void*, int), void* cookie)
+{
+	call_all_cpus(func, cookie, false);
+}
+
+
+void
 call_all_cpus_sync(void (*func)(void*, int), void* cookie)
 {
-	cpu_status state = disable_interrupts();
-	
-	// if inter-CPU communication is not yet enabled, use the early mechanism
-	if (!sICIEnabled) {
-		call_all_cpus_early(func, cookie);
-		restore_interrupts(state);
-		return;
-	}
-
-	if (smp_get_num_cpus() > 1) {
-		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
-			0, 0, (void*)func, SMP_MSG_FLAG_SYNC);
-	}
-
-	// we need to call this function ourselves as well
-	func(cookie, smp_get_current_cpu());
-
-	restore_interrupts(state);
+	call_all_cpus(func, cookie, true);
 }
 
 
