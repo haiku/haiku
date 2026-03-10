@@ -975,7 +975,10 @@ enter_kernel_debugger(int32 cpu, int32& previousCPU)
 		// First entry on a MP system, send a halt request to all of the other
 		// CPUs. Should they try to enter the debugger they will be caught in
 		// the loop above.
-		smp_send_broadcast_ici_interrupts_disabled(cpu, SMP_MSG_CPU_HALT, 0, 0,
+		CPUSet cpuMask;
+		cpuMask.SetAll();
+		cpuMask.ClearBit(cpu);
+		smp_multicast_ici_interrupts_disabled(cpu, cpuMask, SMP_MSG_CPU_HALT, 0, 0,
 			0, NULL, SMP_MSG_FLAG_SYNC);
 	}
 

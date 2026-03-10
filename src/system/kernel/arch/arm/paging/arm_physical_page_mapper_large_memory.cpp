@@ -508,7 +508,7 @@ LargeMemoryPhysicalPageMapper::GetPage(phys_addr_t physicalAddress,
 	*handle = slot;
 	*virtualAddress = slot->address + physicalAddress % B_PAGE_SIZE;
 
-	smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_RANGE, 0,
+	smp_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_RANGE, 0,
 		*virtualAddress, *virtualAddress, NULL, SMP_MSG_FLAG_SYNC);
 
 	return B_OK;

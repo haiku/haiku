@@ -839,18 +839,9 @@ finish_message_processing(int currentCPU, struct smp_msg* msg,
 }
 
 
-static status_t
-process_pending_ici(int32 currentCPU)
+static void
+invoke_smp_msg(struct smp_msg* msg, int currentCPU, bool* haltCPU)
 {
-	mailbox_source sourceMailbox;
-	struct smp_msg* msg = check_for_message(currentCPU, sourceMailbox);
-	if (msg == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	TRACE("  cpu %" B_PRId32 " message = %" B_PRId32 "\n", currentCPU, msg->message);
-
-	bool haltCPU = false;
-
 	switch (msg->message) {
 		case SMP_MSG_INVALIDATE_PAGE_RANGE:
 			arch_cpu_invalidate_tlb_range(msg->data, msg->data2, msg->data3);
@@ -865,7 +856,7 @@ process_pending_ici(int32 currentCPU)
 			arch_cpu_global_tlb_invalidate();
 			break;
 		case SMP_MSG_CPU_HALT:
-			haltCPU = true;
+			*haltCPU = true;
 			break;
 		case SMP_MSG_CALL_FUNCTION:
 		{
@@ -882,6 +873,21 @@ process_pending_ici(int32 currentCPU)
 				msg->message);
 			break;
 	}
+}
+
+
+static status_t
+process_pending_ici(int32 currentCPU)
+{
+	mailbox_source sourceMailbox;
+	struct smp_msg* msg = check_for_message(currentCPU, sourceMailbox);
+	if (msg == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	TRACE("  cpu %" B_PRId32 " message = %" B_PRId32 "\n", currentCPU, msg->message);
+
+	bool haltCPU = false;
+	invoke_smp_msg(msg, currentCPU, &haltCPU);
 
 	// finish dealing with this message, possibly removing it from the list
 	finish_message_processing(currentCPU, msg, sourceMailbox);
@@ -1032,31 +1038,107 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 
 
 void
-smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
-	addr_t data2, addr_t data3, void *dataPointer, uint32 flags)
+smp_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
+	void *dataPointer, uint32 flags)
 {
-	if (!sICIEnabled)
-		return;
+	if (!sICIEnabled) {
+		smp_msg dummy;
+		dummy.message = message;
+		dummy.data = data;
+		dummy.data2 = data2;
+		dummy.data3 = data3;
+		dummy.data_ptr = dataPointer;
 
-	int currentCPU = smp_get_current_cpu();
+		cpu_status state = disable_interrupts();
+		invoke_smp_msg(&dummy, 0, NULL);
+		restore_interrupts(state);
+		return;
+	}
+
+	TRACE("smp_broadcast_ici: cpu %" B_PRId32 " mess 0x%" B_PRIx32 ", data 0x%lx, data2 "
+		"0x%lx, data3 0x%lx, ptr %p, flags 0x%" B_PRIx32 "\n", smp_get_current_cpu(),
+		message, data, data2, data3, dataPointer, flags);
 
 	// find_free_message leaves interrupts disabled
 	struct smp_msg *msg;
-	int state = find_free_message(&msg);
+	cpu_status state = find_free_message(&msg);
 
-	msg->proc_bitmap = cpuMask;
-	msg->proc_bitmap.ClearBit(currentCPU);
+	int32 currentCPU = smp_get_current_cpu();
+
+	msg->message = message;
+	msg->data = data;
+	msg->data2 = data2;
+	msg->data3 = data3;
+	msg->data_ptr = dataPointer;
+	msg->ref_count = sNumCPUs;
+	msg->flags = flags;
+	msg->proc_bitmap.SetAll();
+	msg->done = 0;
+
+	TRACE("smp_broadcast_ici%d: inserting msg %p into broadcast "
+		"mbox\n", currentCPU, msg);
+
+	// stick it in the appropriate cpu's mailbox
+	acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
+	msg->next = sBroadcastMessages;
+	sBroadcastMessages = msg;
+	release_write_spinlock(&sBroadcastMessageSpinlock);
+
+	atomic_add(&sBroadcastMessageCounter, 1);
+
+	arch_smp_send_broadcast_ici();
+
+	TRACE("smp_broadcast_ici: sent interrupt\n");
+
+	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
+		// wait for the other cpus to finish processing it
+		// the interrupt handler will ref count it to <0
+		// if the message is sync after it has removed it from the mailbox
+		TRACE("smp_broadcast_ici: waiting for ack\n");
+
+		while (msg->done == 0) {
+			process_all_pending_ici(currentCPU);
+			cpu_wait(&msg->done, 1);
+		}
+
+		TRACE("smp_broadcast_ici: returning message to free list\n");
+
+		// for SYNC messages, it's our responsibility to put it
+		// back into the free list
+		return_free_message(msg);
+	} else {
+		// make sure this CPU has processed the message at least
+		process_all_pending_ici(currentCPU);
+	}
+
+	restore_interrupts(state);
+}
+
+
+void
+smp_multicast_ici(const CPUSet& cpuMask, int32 message, addr_t data,
+	addr_t data2, addr_t data3, void *dataPointer, uint32 flags)
+{
+	if (!sICIEnabled) {
+		// how did you decide what CPUs to interrupt?
+		ASSERT(false);
+		return;
+	}
 
 	int32 targetCPUs = 0;
 	for (int32 i = 0; i < sNumCPUs; i++) {
-		if (msg->proc_bitmap.GetBit(i))
+		if (cpuMask.GetBit(i))
 			targetCPUs++;
 	}
 
 	if (targetCPUs == 0) {
-		panic("smp_send_multicast_ici(): 0 CPU mask");
+		panic("smp_multicast_ici(): 0 CPU mask");
 		return;
 	}
+
+	// find_free_message leaves interrupts disabled
+	struct smp_msg *msg;
+	cpu_status state = find_free_message(&msg);
 
 	msg->message = message;
 	msg->data = data;
@@ -1066,8 +1148,12 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 	msg->ref_count = targetCPUs;
 	msg->flags = flags;
 	msg->done = 0;
+	msg->proc_bitmap = cpuMask;
 
-	bool broadcast = targetCPUs == sNumCPUs - 1;
+	int32 currentCPU = smp_get_current_cpu();
+	bool self = cpuMask.GetBit(currentCPU);
+	bool broadcast = (!self && targetCPUs == sNumCPUs - 1)
+		|| (self && targetCPUs == sNumCPUs);
 
 	// stick it in the broadcast mailbox
 	acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
@@ -1081,10 +1167,13 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 			atomic_add(&gCPU[i].ici_counter, 1);
 	}
 
-	if (broadcast)
+	if (broadcast) {
 		arch_smp_send_broadcast_ici();
-	else
-		arch_smp_send_multicast_ici(cpuMask);
+	} else {
+		CPUSet sendMask = cpuMask;
+		sendMask.ClearBit(currentCPU);
+		arch_smp_send_multicast_ici(sendMask);
+	}
 
 	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
 		// wait for the other cpus to finish processing it
@@ -1098,6 +1187,9 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 		// for SYNC messages, it's our responsibility to put it
 		// back into the free list
 		return_free_message(msg);
+	} else if (self) {
+		// make sure this CPU has processed the message at least
+		process_all_pending_ici(currentCPU);
 	}
 
 	restore_interrupts(state);
@@ -1105,83 +1197,26 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 
 
 void
-smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
-	void *dataPointer, uint32 flags)
-{
-	struct smp_msg *msg;
-
-	TRACE("smp_send_broadcast_ici: cpu %" B_PRId32 " mess 0x%" B_PRIx32 ", data 0x%lx, data2 "
-		"0x%lx, data3 0x%lx, ptr %p, flags 0x%" B_PRIx32 "\n", smp_get_current_cpu(),
-		message, data, data2, data3, dataPointer, flags);
-
-	if (sICIEnabled) {
-		// find_free_message leaves interrupts disabled
-		cpu_status state = find_free_message(&msg);
-
-		int32 currentCPU = smp_get_current_cpu();
-
-		msg->message = message;
-		msg->data = data;
-		msg->data2 = data2;
-		msg->data3 = data3;
-		msg->data_ptr = dataPointer;
-		msg->ref_count = sNumCPUs - 1;
-		msg->flags = flags;
-		msg->proc_bitmap.SetAll();
-		msg->proc_bitmap.ClearBit(currentCPU);
-		msg->done = 0;
-
-		TRACE("smp_send_broadcast_ici%d: inserting msg %p into broadcast "
-			"mbox\n", currentCPU, msg);
-
-		// stick it in the appropriate cpu's mailbox
-		acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
-		msg->next = sBroadcastMessages;
-		sBroadcastMessages = msg;
-		release_write_spinlock(&sBroadcastMessageSpinlock);
-
-		atomic_add(&sBroadcastMessageCounter, 1);
-		atomic_add(&gCPU[currentCPU].ici_counter, 1);
-
-		arch_smp_send_broadcast_ici();
-
-		TRACE("smp_send_broadcast_ici: sent interrupt\n");
-
-		if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
-			// wait for the other cpus to finish processing it
-			// the interrupt handler will ref count it to <0
-			// if the message is sync after it has removed it from the mailbox
-			TRACE("smp_send_broadcast_ici: waiting for ack\n");
-
-			while (msg->done == 0) {
-				process_all_pending_ici(currentCPU);
-				cpu_wait(&msg->done, 1);
-			}
-
-			TRACE("smp_send_broadcast_ici: returning message to free list\n");
-
-			// for SYNC messages, it's our responsibility to put it
-			// back into the free list
-			return_free_message(msg);
-		}
-
-		restore_interrupts(state);
-	}
-
-	TRACE("smp_send_broadcast_ici: done\n");
-}
-
-
-void
-smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
-	addr_t data, addr_t data2, addr_t data3, void *dataPointer, uint32 flags)
+smp_multicast_ici_interrupts_disabled(int32 currentCPU, const CPUSet& cpuMask,
+	int32 message, addr_t data, addr_t data2, addr_t data3, void *dataPointer, uint32 flags)
 {
 	if (!sICIEnabled)
 		return;
 
-	TRACE("smp_send_broadcast_ici_interrupts_disabled: cpu %" B_PRId32 " mess 0x%" B_PRIx32 ", "
+	TRACE("smp_multicast_ici_interrupts_disabled: cpu %" B_PRId32 " mess 0x%" B_PRIx32 ", "
 		"data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%" B_PRIx32 "\n",
 		currentCPU, message, data, data2, data3, dataPointer, flags);
+
+	int32 targetCPUs = 0;
+	for (int32 i = 0; i < sNumCPUs; i++) {
+		if (cpuMask.GetBit(i))
+			targetCPUs++;
+	}
+
+	if (targetCPUs == 0) {
+		panic("smp_multicast_ici_interrupts_disabled(): 0 CPU mask");
+		return;
+	}
 
 	struct smp_msg *msg;
 	find_free_message_interrupts_disabled(currentCPU, &msg);
@@ -1191,13 +1226,16 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 	msg->data2 = data2;
 	msg->data3 = data3;
 	msg->data_ptr = dataPointer;
-	msg->ref_count = sNumCPUs - 1;
+	msg->ref_count = targetCPUs;
 	msg->flags = flags;
-	msg->proc_bitmap.SetAll();
-	msg->proc_bitmap.ClearBit(currentCPU);
 	msg->done = 0;
+	msg->proc_bitmap = cpuMask;
 
-	TRACE("smp_send_broadcast_ici_interrupts_disabled %" B_PRId32 ": inserting msg %p "
+	bool self = cpuMask.GetBit(currentCPU);
+	bool broadcast = (!self && targetCPUs == sNumCPUs - 1)
+		|| (self && targetCPUs == sNumCPUs);
+
+	TRACE("smp_multicast_ici_interrupts_disabled %" B_PRId32 ": inserting msg %p "
 		"into broadcast mbox\n", currentCPU, msg);
 
 	// stick it in the appropriate cpu's mailbox
@@ -1207,18 +1245,27 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 	release_write_spinlock(&sBroadcastMessageSpinlock);
 
 	atomic_add(&sBroadcastMessageCounter, 1);
-	atomic_add(&gCPU[currentCPU].ici_counter, 1);
+	for (int32 i = 0; i < sNumCPUs; i++) {
+		if (!cpuMask.GetBit(i))
+			atomic_add(&gCPU[i].ici_counter, 1);
+	}
 
-	arch_smp_send_broadcast_ici();
+	if (broadcast) {
+		arch_smp_send_broadcast_ici();
+	} else {
+		CPUSet sendMask = cpuMask;
+		sendMask.ClearBit(currentCPU);
+		arch_smp_send_multicast_ici(sendMask);
+	}
 
-	TRACE("smp_send_broadcast_ici_interrupts_disabled %" B_PRId32 ": sent interrupt\n",
+	TRACE("smp_multicast_ici_interrupts_disabled %" B_PRId32 ": sent interrupt\n",
 		currentCPU);
 
 	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
 		// wait for the other cpus to finish processing it
 		// the interrupt handler will ref count it to <0
 		// if the message is sync after it has removed it from the mailbox
-		TRACE("smp_send_broadcast_ici_interrupts_disabled %" B_PRId32 ": waiting for "
+		TRACE("smp_multicast_ici_interrupts_disabled %" B_PRId32 ": waiting for "
 			"ack\n", currentCPU);
 
 		while (msg->done == 0) {
@@ -1226,15 +1273,18 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 			cpu_wait(&msg->done, 1);
 		}
 
-		TRACE("smp_send_broadcast_ici_interrupts_disabled %" B_PRId32 ": returning "
+		TRACE("smp_multicast_ici_interrupts_disabled %" B_PRId32 ": returning "
 			"message to free list\n", currentCPU);
 
 		// for SYNC messages, it's our responsibility to put it
 		// back into the free list
 		return_free_message(msg);
+	} else if (self) {
+		// make sure this CPU has processed the message at least
+		process_all_pending_ici(currentCPU);
 	}
 
-	TRACE("smp_send_broadcast_ici_interrupts_disabled: done\n");
+	TRACE("smp_multicast_ici_interrupts_disabled: done\n");
 }
 
 
@@ -1435,17 +1485,12 @@ call_all_cpus(void (*func)(void*, int), void* cookie, bool sync)
 		return;
 	}
 
-	thread_pin_to_current_cpu(thread_get_current_thread());
-
 	if (sNumCPUs > 1) {
-		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
+		smp_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
 			0, 0, (void*)func, sync ? SMP_MSG_FLAG_SYNC : SMP_MSG_FLAG_ASYNC);
+	} else {
+		func(cookie, smp_get_current_cpu());
 	}
-
-	// we need to call this function ourselves as well
-	func(cookie, smp_get_current_cpu());
-
-	thread_unpin_from_current_cpu(thread_get_current_thread());
 }
 
 
