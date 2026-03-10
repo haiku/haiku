@@ -59,7 +59,7 @@
 #undef release_read_seqlock
 
 
-#define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
+#define MSG_ALLOCATE_PER_CPU		(4)
 
 // These macros define the number of unsuccessful iterations in
 // acquire_spinlock() and acquire_spinlock_nocheck() after which the functions
@@ -1323,21 +1323,24 @@ smp_init(kernel_args* args)
 		"Dumps info on an ICI message.\n", 0);
 
 	if (args->num_cpus > 1) {
-		sFreeMessages = NULL;
-		sFreeMessageCount = 0;
-		for (int i = 0; i < MSG_POOL_SIZE; i++) {
-			struct smp_msg* msg
-				= (struct smp_msg*)malloc(sizeof(struct smp_msg));
-			if (msg == NULL) {
-				panic("error creating smp mailboxes\n");
-				return B_ERROR;
-			}
-			memset((void*)msg, 0, sizeof(struct smp_msg));
+		sNumCPUs = args->num_cpus;
+
+		struct smp_msg* messages;
+		size_t size = ROUNDUP(sNumCPUs * MSG_ALLOCATE_PER_CPU * sizeof(smp_msg), B_PAGE_SIZE);
+		area_id area = create_area("smp ici msgs", (void**)&messages, B_ANY_KERNEL_ADDRESS,
+			size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (area < 0) {
+			panic("error creating smp msgs");
+			return area;
+		}
+		memset((void*)messages, 0, size);
+
+		for (size_t i = 0; i < (size / sizeof(smp_msg)); i++) {
+			struct smp_msg* msg = &messages[i];
 			msg->next = sFreeMessages;
 			sFreeMessages = msg;
 			sFreeMessageCount++;
 		}
-		sNumCPUs = args->num_cpus;
 	}
 	TRACE("smp_init: calling arch_smp_init\n");
 
