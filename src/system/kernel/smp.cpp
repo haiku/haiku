@@ -760,7 +760,7 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 
 		msg = sBroadcastMessages;
 		while (msg != NULL) {
-			if (!msg->proc_bitmap.GetBit(currentCPU)) {
+			if (!msg->proc_bitmap.GetBitAtomic(currentCPU)) {
 				// we have handled this one already
 				msg = msg->next;
 				continue;
@@ -1260,7 +1260,7 @@ smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 	smp_cpu_rendezvous(rendezVous);
 
 	while (sBootCPUSpin == 0) {
-		if (sEarlyCPUCallSet.GetBit(cpu))
+		if (sEarlyCPUCallSet.GetBitAtomic(cpu))
 			process_early_cpu_call(cpu);
 
 		cpu_pause();

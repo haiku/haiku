@@ -54,6 +54,7 @@ public:
 	inline	void		ClearBitAtomic(int32 cpu);
 
 	inline	bool		GetBit(int32 cpu) const;
+	inline	bool		GetBitAtomic(int32 cpu) const;
 
 	inline	bool		Matches(const CPUSet& mask) const;
 	inline	CPUSet		And(const CPUSet& mask) const;
@@ -161,6 +162,14 @@ CPUSet::ClearBitAtomic(int32 cpu)
 
 inline bool
 CPUSet::GetBit(int32 cpu) const
+{
+	int32* element = (int32*)&fBitmap[cpu / kArrayBits];
+	return ((uint32)*element & (1u << (cpu % kArrayBits))) != 0;
+}
+
+
+inline bool
+CPUSet::GetBitAtomic(int32 cpu) const
 {
 	int32* element = (int32*)&fBitmap[cpu / kArrayBits];
 	return ((uint32)atomic_get(element) & (1u << (cpu % kArrayBits))) != 0;
