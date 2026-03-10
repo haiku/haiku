@@ -16,7 +16,7 @@ public:
 			//! Constructs an AttributeIterator object for Inode object *inode
 								AttributeIterator(Inode* inode);
 								~AttributeIterator();
-			//! Check if fIterator pointer is valid 
+			//! Check if fIterator pointer is valid
 			status_t			InitCheck();
 
 			/*! Copy details of next Attribute into *name and *_nameLength

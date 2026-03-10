@@ -248,7 +248,7 @@ status_t
 BTree::Node::MoveEntries(uint32 start, uint32 end, int length) const
 {
 	status_t status = _SpaceCheck(length);
-	if (status != B_OK || length == 0/*B_OK*/)
+	if (status != B_OK || length == 0 /*B_OK*/)
 		return status;
 
 	int entrySize = sizeof(btrfs_entry);

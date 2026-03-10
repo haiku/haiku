@@ -255,7 +255,7 @@ CachedExtentTree::_AddFreeExtent(CachedExtent* node)
 		found->offset += diff + node->length;
 		found->length -= diff + node->length;
 		// diff < 0 couldn't happen because of the Compare function
-		if (diff > 0){
+		if (diff > 0) {
 			CachedExtent* left = CachedExtent::Create(node->offset - diff,
 				diff, found->flags);
 			_AddAllocatedExtent(left);

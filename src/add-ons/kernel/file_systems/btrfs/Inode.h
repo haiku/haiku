@@ -99,6 +99,7 @@ private:
 			btrfs_inode fNode;
 };
 
+
 /*!The Vnode class provides a convenience layer upon get_vnode(), so that
  * you don't have to call put_vnode() anymore, which may make code more
  * readable in some cases

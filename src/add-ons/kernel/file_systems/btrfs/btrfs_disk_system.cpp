@@ -17,20 +17,20 @@ parse_initialize_parameters(const char* parameterString,
 {
 	parameters.verbose = false;
 
-	void *handle = parse_driver_settings_string(parameterString);
+	void* handle = parse_driver_settings_string(parameterString);
 	if (handle == NULL)
 		return B_ERROR;
 
 	if (get_driver_boolean_parameter(handle, "verbose", false, true))
 		parameters.verbose = true;
 
-	const char *ss_string = get_driver_parameter(handle, "sector_size",
+	const char* ss_string = get_driver_parameter(handle, "sector_size",
 		NULL, NULL);
 	uint32 sectorSize = B_PAGE_SIZE;
 	if (ss_string != NULL)
 		sectorSize = strtoul(ss_string, NULL, 0);
 
-	const char *bs_string = get_driver_parameter(handle, "block_size",
+	const char* bs_string = get_driver_parameter(handle, "block_size",
 		NULL, NULL);
 	uint32 blockSize = max_c(16384, B_PAGE_SIZE);
 	if (bs_string != NULL)
