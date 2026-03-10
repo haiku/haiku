@@ -118,7 +118,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 	// the passed in kernel args are in a non-allocated range of memory
 	if (currentCPU == 0)
-		memcpy(&sKernelArgs, bootKernelArgs, bootKernelArgs->kernel_args_size);
+		memcpy((void*)&sKernelArgs, bootKernelArgs, bootKernelArgs->kernel_args_size);
 
 	smp_cpu_rendezvous(&sCpuRendezvous2);
 

@@ -992,7 +992,7 @@ virtio_net_init_driver(device_node* node, void** cookie)
 	if (info == NULL)
 		return B_NO_MEMORY;
 
-	memset(info, 0, sizeof(*info));
+	memset((void*)info, 0, sizeof(*info));
 
 	info->node = node;
 

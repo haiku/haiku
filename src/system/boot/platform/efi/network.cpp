@@ -125,11 +125,11 @@ EFIEthernetInterface::FindMACAddress()
 	if (fNetwork == NULL)
 		return B_ERROR;
 
-	memcpy(&fMACAddress, &fNetwork->Mode->CurrentAddress,
+	memcpy((void*)&fMACAddress, &fNetwork->Mode->CurrentAddress,
 		sizeof(fMACAddress));
 
 	if (fMACAddress == kNoMACAddress) {
-		memcpy(&fMACAddress, &fNetwork->Mode->PermanentAddress,
+		memcpy((void*)&fMACAddress, &fNetwork->Mode->PermanentAddress,
 			sizeof(fMACAddress));
 	}
 

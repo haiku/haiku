@@ -138,7 +138,7 @@ void
 List<ITEM, DEFAULT_ITEM_SUPPLIER>::_MoveItems(item_t* items, int32 offset, int32 count)
 {
 	if (count > 0 && offset != 0)
-		memmove(items + offset, items, count * sizeof(item_t));
+		memmove((void*)(items + offset), items, count * sizeof(item_t));
 }
 
 // AddItem

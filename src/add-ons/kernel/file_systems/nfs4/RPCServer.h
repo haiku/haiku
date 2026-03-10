@@ -143,7 +143,7 @@ inline PeerAddress
 Server::LocalID() const
 {
 	PeerAddress addr;
-	memset(&addr, 0, sizeof(addr));
+	memset((void*)&addr, 0, sizeof(addr));
 	fConnection->GetLocalAddress(&addr);
 	return addr;
 }

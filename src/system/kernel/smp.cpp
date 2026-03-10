@@ -1332,7 +1332,7 @@ smp_init(kernel_args* args)
 				panic("error creating smp mailboxes\n");
 				return B_ERROR;
 			}
-			memset(msg, 0, sizeof(struct smp_msg));
+			memset((void*)msg, 0, sizeof(struct smp_msg));
 			msg->next = sFreeMessages;
 			sFreeMessages = msg;
 			sFreeMessageCount++;

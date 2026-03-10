@@ -49,7 +49,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 	memset(&globalState, 0, sizeof(global_item_state));
 
 	local_item_state localState;
-	memset(&localState, 0, sizeof(local_item_state));
+	memset((void*)&localState, 0, sizeof(local_item_state));
 
 	Vector<usage_value> usageStack;
 
@@ -178,7 +178,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 				}
 
 				// reset the local item state
-				memset(&localState, 0, sizeof(local_item_state));
+				memset((void*)&localState, 0, sizeof(local_item_state));
 				usageStack.MakeEmpty();
 				break;
 			}

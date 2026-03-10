@@ -427,7 +427,7 @@ haiku_sem_init(kernel_args *args)
 	if (area < 0)
 		panic("unable to allocate semaphore table!\n");
 
-	memset(sSems, 0, sizeof(struct sem_entry) * sMaxSems);
+	memset((void*)sSems, 0, sizeof(struct sem_entry) * sMaxSems);
 	for (i = 0; i < sMaxSems; i++) {
 		sSems[i].id = -1;
 		free_sem_slot(i, i);

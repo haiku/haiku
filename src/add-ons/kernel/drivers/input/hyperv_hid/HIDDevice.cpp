@@ -327,7 +327,7 @@ HIDDevice::_AddWheelHIDItem(HIDReport* report)
 	memset(&globalState, 0, sizeof(global_item_state));
 
 	local_item_state localState;
-	memset(&localState, 0, sizeof(local_item_state));
+	memset((void*)&localState, 0, sizeof(local_item_state));
 
 	main_item_data_converter converter;
 	converter.flat_data = 0;

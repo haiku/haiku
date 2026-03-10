@@ -288,7 +288,7 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	if (sc == NULL)
 		return B_NO_MEMORY;
 
-	memset(sc, 0, sizeof(acpi_ec_cookie));
+	memset((void*)sc, 0, sizeof(acpi_ec_cookie));
 
 	*_driverCookie = sc;
 	sc->ec_dev = dev;

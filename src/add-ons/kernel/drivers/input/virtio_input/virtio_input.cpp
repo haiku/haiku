@@ -461,7 +461,7 @@ virtio_input_init_driver(device_node *node, void **cookie)
 	if (!info.IsSet())
 		return B_NO_MEMORY;
 
-	memset(info.Get(), 0, sizeof(*info.Get()));
+	memset((void*)info.Get(), 0, sizeof(*info.Get()));
 
 	info->sem_cb.SetTo(create_sem(0, "virtio_input_cb"));
 	if (!info->sem_cb.IsSet())

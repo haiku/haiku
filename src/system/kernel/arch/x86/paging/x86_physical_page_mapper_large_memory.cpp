@@ -338,7 +338,7 @@ LargeMemoryTranslationMapPhysicalPageMapper
 	fSlotCount(sizeof(fSlots) / sizeof(page_slot)),
 	fNextSlot(0)
 {
-	memset(fSlots, 0, sizeof(fSlots));
+	memset((void*)fSlots, 0, sizeof(fSlots));
 }
 
 

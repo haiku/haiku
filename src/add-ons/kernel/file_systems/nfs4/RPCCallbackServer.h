@@ -89,7 +89,7 @@ CallbackServer::LocalID()
 
 	ASSERT(fListener != NULL);
 
-	memset(&address, 0, sizeof(address));
+	memset((void*)&address, 0, sizeof(address));
 	fListener->GetLocalAddress(&address);
 	return address;
 }

@@ -431,7 +431,7 @@ init_driver(void)
 
 		// initialize the structure for later use
 
-		memset(gDeviceInfo[found], 0, sizeof(intel_info));
+		memset((void*)gDeviceInfo[found], 0, sizeof(intel_info));
 		gDeviceInfo[found]->init_status = B_NO_INIT;
 		gDeviceInfo[found]->id = found;
 		gDeviceInfo[found]->pci = info;
