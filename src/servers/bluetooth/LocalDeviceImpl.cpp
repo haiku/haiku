@@ -253,6 +253,7 @@ LocalDeviceImpl::HandleExpectedRequest(struct hci_event_header* event,
 			break;
 
 		case HCI_EVENT_INQUIRY_RESULT_WITH_RSSI:
+			InquiryResultWithRSSI(JumpEventHeader<uint8>(event), request);
 			break;
 
 		case HCI_EVENT_REMOTE_EXTENDED_FEATURES:
@@ -811,6 +812,47 @@ LocalDeviceImpl::InquiryResult(uint8* numberOfResponses, BMessage* request)
 		reply.AddUInt8("scan_period_mode", scan_period_mode_array[i]);
 		reply.AddUInt8("scan_mode", scan_mode_array[i]);
 		reply.AddUInt16("clock_offset", clock_offset_array[i]);
+	}
+
+	printf("%s: Sending reply...\n", __func__);
+	status_t status = request->SendReply(&reply);
+	if (status < B_OK)
+		printf("%s: Error sending reply!\n", __func__);
+}
+
+
+void
+LocalDeviceImpl::InquiryResultWithRSSI(uint8* numberOfResponses, BMessage* request)
+{
+	uint8 count = *numberOfResponses;
+	TRACE_BT("LocalDeviceImpl: %s #responses=%d\n", __FUNCTION__, count);
+	if (count == 0 || request == NULL)
+		return;
+
+	uint8* base_ptr = numberOfResponses + 1;
+
+	// get pointers ready for the parallel arrays
+	bdaddr_t* bdaddr_array = (bdaddr_t*)base_ptr;
+	uint8* page_repetition_mode_array = (uint8*)(bdaddr_array + count);
+	uint8* scan_period_mode_array = page_repetition_mode_array + count;
+	uint8* dev_class_array = scan_period_mode_array + count;
+	uint16* clock_offset_array = (uint16*)(dev_class_array + (count * 3));
+	int8* rssi_array = (int8*)(clock_offset_array + count);
+
+	BMessage reply(BT_MSG_INQUIRY_DEVICE);
+	reply.AddUInt8("count", count);
+
+	for (uint8 i = 0; i < count; i++) {
+		TRACE_BT("LocalDeviceImpl: page_rep=%d scan_period=%d clock=%d rssi=%d\n",
+			page_repetition_mode_array[i], scan_period_mode_array[i], clock_offset_array[i],
+			rssi_array[i]);
+
+		reply.AddData("bdaddr", B_ANY_TYPE, &bdaddr_array[i], sizeof(bdaddr_t));
+		reply.AddData("dev_class", B_ANY_TYPE, &dev_class_array[i * 3], 3);
+		reply.AddUInt8("page_repetition_mode", page_repetition_mode_array[i]);
+		reply.AddUInt8("scan_period_mode", scan_period_mode_array[i]);
+		reply.AddUInt16("clock_offset", clock_offset_array[i]);
+		reply.AddInt8("rssi", rssi_array[i]);
 	}
 
 	printf("%s: Sending reply...\n", __func__);

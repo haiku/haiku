@@ -83,9 +83,11 @@ DiscoveryListener::MessageReceived(BMessage* message)
 				const uint8* devClass;
 				uint8 pageRepetitionMode = 0;
 				uint8 scanPeriodMode = 0;
+				// default value is 0 only, in newer specs this has been removed in such case it
+				// should be set to zero
 				uint8 scanMode = 0;
 				uint16 clockOffset = 0;
-				bool duplicatedFound = false;
+				int8 rssi = HCI_RSSI_INVALID;
 
 				if (message->FindData("bdaddr", B_ANY_TYPE, i, (const void**)&bdaddr, &size) != B_OK
 					|| message->FindData("dev_class", B_ANY_TYPE, i, (const void**)&devClass, &size)
@@ -95,10 +97,14 @@ DiscoveryListener::MessageReceived(BMessage* message)
 
 				message->FindUInt8("page_repetition_mode", i, &pageRepetitionMode);
 				message->FindUInt8("scan_period_mode", i, &scanPeriodMode);
+
+				// if not present, the default value of these fields will be used
 				message->FindUInt8("scan_mode", i, &scanMode);
 				message->FindUInt16("clock_offset", i, &clockOffset);
+				message->FindInt8("rssi", i, &rssi);
 
 				// Skip duplicated replies
+				bool duplicatedFound = false;
 				for (int32 index = 0; index < fRemoteDevicesList.CountItems(); index++) {
 					RemoteDevice* existingDevice = fRemoteDevicesList.ItemAt(index);
 					bdaddr_t b1 = existingDevice->GetBluetoothAddress();
@@ -108,6 +114,7 @@ DiscoveryListener::MessageReceived(BMessage* message)
 						existingDevice->fScanPeriodMode = scanPeriodMode;
 						existingDevice->fScanMode = scanMode;
 						existingDevice->fClockOffset = clockOffset;
+						existingDevice->fRSSI = rssi;
 						duplicatedFound = true;
 						break;
 					}
@@ -122,6 +129,7 @@ DiscoveryListener::MessageReceived(BMessage* message)
 					rd->fScanPeriodMode = scanPeriodMode;
 					rd->fScanMode = scanMode;
 					rd->fClockOffset = clockOffset;
+					rd->fRSSI = rssi;
 					DeviceDiscovered(rd, rd->GetDeviceClass());
 				}
 			}

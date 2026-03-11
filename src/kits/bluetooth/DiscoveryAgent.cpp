@@ -82,6 +82,7 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener,
 
 	// For getting each discovered message
     request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_RESULT);
+	request.AddInt16("eventExpected", HCI_EVENT_INQUIRY_RESULT_WITH_RSSI);
 
 	// For finishing each discovered message
     request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_COMPLETE);

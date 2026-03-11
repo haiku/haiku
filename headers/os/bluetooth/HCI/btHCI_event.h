@@ -21,14 +21,6 @@ struct hci_event_header {
 #define HCI_EVENT_INQUIRY_COMPLETE					0x01
 
 #define HCI_EVENT_INQUIRY_RESULT					0x02
-struct inquiry_info {
-	bdaddr_t	bdaddr;
-	uint8		pscan_rep_mode;
-	uint8		pscan_period_mode;
-	uint8		pscan_mode;
-	uint8		dev_class[3];
-	uint16		clock_offset;
-} __attribute__ ((packed));
 
 #define HCI_EVENT_CONN_COMPLETE						0x03
 struct hci_ev_conn_complete {
@@ -248,14 +240,7 @@ struct hci_ev_flow_specification {
 } __attribute__ ((packed));
 
 #define HCI_EVENT_INQUIRY_RESULT_WITH_RSSI			0x22
-struct hci_ev_inquiry_info_with_rssi {
-	bdaddr_t bdaddr;
-	uint8		pscan_rep_mode;
-	uint8		pscan_period_mode;
-	uint8		dev_class[3];
-	uint16		clock_offset;
-	int8		rssi;
-} __attribute__ ((packed));
+#define HCI_RSSI_INVALID 127
 
 #define HCI_EVENT_REMOTE_EXTENDED_FEATURES			0x23
 struct hci_ev_remote_extended_features {

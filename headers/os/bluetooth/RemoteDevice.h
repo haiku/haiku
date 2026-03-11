@@ -68,7 +68,7 @@ private:
 	uint8		fScanPeriodMode;
 	uint8		fScanMode;
 	uint16		fClockOffset;
-
+	int8        fRSSI;
 };
 
 }

@@ -48,6 +48,7 @@ private:
 
 	// Inquiry
 	void InquiryResult(uint8* numberOfResponses, BMessage* request);
+	void InquiryResultWithRSSI(uint8* numberOfResponses, BMessage* request);
 	void InquiryComplete(uint8* status, BMessage* request);
 	void RemoteNameRequestComplete(struct hci_ev_remote_name_request_complete_reply*
 		remotename, BMessage* request);
