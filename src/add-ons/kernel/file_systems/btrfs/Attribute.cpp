@@ -182,12 +182,13 @@ Attribute::_FindEntry(btrfs_dir_entry* entries, size_t length,
 	btrfs_dir_entry* entry = entries;
 	uint16 current = 0;
 	while (current < length) {
+		if (entry->NameLength() == nameLength
+			&& strncmp((char*)entry->name, name, nameLength) == 0) {
+			*_entry = entry;
+			return B_OK;
+		}
 		current += entry->Length();
-		break;
-		// TODO there could be several entries with the same name hash
 		entry = (btrfs_dir_entry*)((uint8*)entry + entry->Length());
 	}
-
-	*_entry = entry;
-	return B_OK;
+	return B_ENTRY_NOT_FOUND;
 }
