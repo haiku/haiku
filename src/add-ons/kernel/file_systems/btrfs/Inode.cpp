@@ -196,8 +196,11 @@ Inode::FindBlock(off_t pos, off_t& physical, off_t* _length)
 	off_t logical = 0;
 	if (extent_data->Type() == BTRFS_EXTENT_DATA_REGULAR)
 		logical = diff + extent_data->disk_offset;
-	else
-		panic("unknown extent type; %d\n", extent_data->Type());
+	else {
+		ERROR("unknown extent type; %d\n", extent_data->Type());
+		free(extent_data);
+		return B_BAD_DATA;
+	}
 	status = fVolume->FindBlock(logical, physical);
 	if (_length != NULL)
 		*_length = extent_data->Size() - diff;
@@ -270,7 +273,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 
 	off_t diff = pos - search_key.Offset();
 	if (extent_data->Type() != BTRFS_EXTENT_DATA_INLINE) {
-		panic("unknown extent type; %d\n", extent_data->Type());
+		ERROR("unknown extent type; %d\n", extent_data->Type());
 		return B_BAD_DATA;
 	}
 
