@@ -5,6 +5,7 @@ local platform ;
 local kernelArchSources =
 	arch_elf.cpp
 	arch_uart_linflex.cpp
+	arch_uart_samsung.cpp
 ;
 
 local kernelArchReusableSources =
