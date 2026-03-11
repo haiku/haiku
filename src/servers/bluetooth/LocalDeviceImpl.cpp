@@ -255,6 +255,9 @@ LocalDeviceImpl::HandleExpectedRequest(struct hci_event_header* event,
 		case HCI_EVENT_INQUIRY_RESULT_WITH_RSSI:
 			InquiryResultWithRSSI(JumpEventHeader<uint8>(event), request);
 			break;
+		case HCI_EVENT_EXTENDED_INQUIRY_RESULT:
+			ExtendedInquiryResult(JumpEventHeader<uint8>(event), request);
+			break;
 
 		case HCI_EVENT_REMOTE_EXTENDED_FEATURES:
 			break;
@@ -855,6 +858,39 @@ LocalDeviceImpl::InquiryResultWithRSSI(uint8* numberOfResponses, BMessage* reque
 		reply.AddInt8("rssi", rssi_array[i]);
 	}
 
+	printf("%s: Sending reply...\n", __func__);
+	status_t status = request->SendReply(&reply);
+	if (status < B_OK)
+		printf("%s: Error sending reply!\n", __func__);
+}
+
+
+void
+LocalDeviceImpl::ExtendedInquiryResult(uint8* numberOfResponses, BMessage* request)
+{
+	uint8 count = *numberOfResponses;
+	TRACE_BT("LocalDeviceImpl: %s #responses=%d\n", __FUNCTION__, count);
+
+	// the spec says count always equals 1
+	if (count != 1 || request == NULL)
+		return;
+
+	hci_ev_extended_inquiry_info* info = (hci_ev_extended_inquiry_info*)(numberOfResponses + 1);
+
+	BMessage reply(BT_MSG_INQUIRY_DEVICE);
+	reply.AddUInt8("count", count);
+
+	TRACE_BT("LocalDeviceImpl: page_rep=%d scan_period=%d clock=%d rssi=%d\n",
+		info->page_repetition_mode, info->scan_period_mode, info->clock_offset, info->rssi);
+
+	reply.AddData("bdaddr", B_ANY_TYPE, &info->bdaddr, sizeof(bdaddr_t));
+	reply.AddData("dev_class", B_ANY_TYPE, info->dev_class, 3);
+	reply.AddUInt8("page_repetition_mode", info->page_repetition_mode);
+	reply.AddUInt8("scan_period_mode", info->scan_period_mode);
+	reply.AddUInt16("clock_offset", info->clock_offset);
+	reply.AddInt8("rssi", info->rssi);
+
+	// need to implement eir parsing
 	printf("%s: Sending reply...\n", __func__);
 	status_t status = request->SendReply(&reply);
 	if (status < B_OK)
