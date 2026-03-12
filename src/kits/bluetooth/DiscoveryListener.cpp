@@ -88,6 +88,9 @@ DiscoveryListener::MessageReceived(BMessage* message)
 				uint8 scanMode = 0;
 				uint16 clockOffset = 0;
 				int8 rssi = HCI_RSSI_INVALID;
+				BString friendlyName;
+				bool friendlyNameIsComplete = false;
+
 
 				if (message->FindData("bdaddr", B_ANY_TYPE, i, (const void**)&bdaddr, &size) != B_OK
 					|| message->FindData("dev_class", B_ANY_TYPE, i, (const void**)&devClass, &size)
@@ -102,6 +105,9 @@ DiscoveryListener::MessageReceived(BMessage* message)
 				message->FindUInt8("scan_mode", i, &scanMode);
 				message->FindUInt16("clock_offset", i, &clockOffset);
 				message->FindInt8("rssi", i, &rssi);
+				message->FindBool("friendly_name_is_complete", &friendlyNameIsComplete);
+
+				message->FindString("friendly_name", i, &friendlyName);
 
 				// Skip duplicated replies
 				bool duplicatedFound = false;
@@ -115,6 +121,10 @@ DiscoveryListener::MessageReceived(BMessage* message)
 						existingDevice->fScanMode = scanMode;
 						existingDevice->fClockOffset = clockOffset;
 						existingDevice->fRSSI = rssi;
+						if (!existingDevice->fFriendlyNameIsComplete && !friendlyName.IsEmpty()) {
+							existingDevice->fFriendlyNameIsComplete = friendlyNameIsComplete;
+							existingDevice->fFriendlyName = friendlyName;
+						}
 						duplicatedFound = true;
 						break;
 					}
@@ -130,6 +140,8 @@ DiscoveryListener::MessageReceived(BMessage* message)
 					rd->fScanMode = scanMode;
 					rd->fClockOffset = clockOffset;
 					rd->fRSSI = rssi;
+					rd->fFriendlyNameIsComplete = friendlyNameIsComplete;
+					rd->fFriendlyName = friendlyName;
 					DeviceDiscovered(rd, rd->GetDeviceClass());
 				}
 			}

@@ -890,11 +890,66 @@ LocalDeviceImpl::ExtendedInquiryResult(uint8* numberOfResponses, BMessage* reque
 	reply.AddUInt16("clock_offset", info->clock_offset);
 	reply.AddInt8("rssi", info->rssi);
 
-	// need to implement eir parsing
+	ParseEIR(info->eir, reply);
+
 	printf("%s: Sending reply...\n", __func__);
 	status_t status = request->SendReply(&reply);
 	if (status < B_OK)
 		printf("%s: Error sending reply!\n", __func__);
+}
+
+
+void
+LocalDeviceImpl::ParseEIR(const uint8* eir, BMessage& reply)
+{
+	if (eir == NULL)
+		return;
+
+	int offset = 0;
+	BString completeName;
+	BString shortName;
+
+	while (offset < HCI_MAX_EIR_LENGTH) {
+		uint8 length = eir[offset];
+
+		// break either when finished reading buffer or when next data value is zero
+		if (length == 0 || offset + length >= HCI_MAX_EIR_LENGTH)
+			break;
+
+		uint8 type = eir[offset + 1];
+		const uint8* data = &eir[offset + 2];
+		uint8 dataLen = length - 1;
+
+		// TODO:Implement other EIR datatypes
+		switch (type) {
+			case EIR_NAME_SHORT:
+				if (shortName.Length() == 0) {
+					shortName.SetTo((const char*)data, dataLen);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR Short Name: '%s'\n", shortName.String());
+				}
+				break;
+			case EIR_NAME_COMPLETE:
+				if (completeName.Length() == 0) {
+					completeName.SetTo((const char*)data, dataLen);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR Complete Name: '%s'\n",
+						completeName.String());
+				}
+				break;
+			default:
+				TRACE_BT("LocalDeviceImpl: Ignored EIR Type: 0x%02X (Length: %d)\n", type, dataLen);
+				break;
+		}
+
+		offset += length + 1;
+	}
+
+	if (completeName.Length() > 0) {
+		reply.AddString("friendly_name", completeName.String());
+		reply.AddBool("friendly_name_is_complete", true);
+	} else if (shortName.Length() > 0) {
+		reply.AddString("friendly_name", shortName.String());
+		reply.AddBool("friendly_name_is_complete", false);
+	}
 }
 
 

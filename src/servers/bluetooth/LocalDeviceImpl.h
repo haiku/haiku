@@ -50,6 +50,7 @@ private:
 	void InquiryResult(uint8* numberOfResponses, BMessage* request);
 	void InquiryResultWithRSSI(uint8* numberOfResponses, BMessage* request);
 	void ExtendedInquiryResult(uint8* numberOfResponses, BMessage* request);
+	void ParseEIR(const uint8* eir, BMessage& reply);
 	void InquiryComplete(uint8* status, BMessage* request);
 	void RemoteNameRequestComplete(struct hci_ev_remote_name_request_complete_reply*
 		remotename, BMessage* request);

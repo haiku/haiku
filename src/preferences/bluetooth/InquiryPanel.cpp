@@ -283,8 +283,7 @@ InquiryPanel::MessageReceived(BMessage* message)
 						// Really erally expensive operation should be done in a separate thread
 						// once Haiku gets a BarberPole in API replacing the progress bar
 						((DeviceListItem*)fRemoteList->ItemAt(retrievalIndex))
-							->SetDevice((BluetoothDevice*) fDiscoveryAgent
-							->RetrieveDevices(0).ItemAt(retrievalIndex));
+							->SetDevice(fDiscoveryAgent->RetrieveDevices(0).ItemAt(retrievalIndex));
 						fRemoteList->InvalidateItem(retrievalIndex);
 
 						retrievalIndex++;

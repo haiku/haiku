@@ -50,9 +50,8 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 {
 	CALLED();
 	if (!alwaysAsk) {
-		// Check if the name is already retrieved
-		// TODO: Check if It is known from a KnownDevicesList
-		return BString(B_TRANSLATE("Not implemented"));
+		if (!fFriendlyName.IsEmpty() && fFriendlyNameIsComplete)
+			return fFriendlyName;
 	}
 
 	if (fDiscovererLocalDevice == NULL)
@@ -90,6 +89,8 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 		if ((reply.FindInt8("status", &status) == B_OK) && (status == BT_OK)) {
 
 			if ((reply.FindString("friendlyname", &name) == B_OK )) {
+				fFriendlyName = name;
+				fFriendlyNameIsComplete = true;
 				return name;
 			} else {
 				return BString(""); // should not happen
@@ -97,6 +98,9 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 
 		} else {
 			// seems we got a negative event
+			if (!fFriendlyName.IsEmpty())
+				return fFriendlyName;
+
 			return BString(B_TRANSLATE("#CommandFailed#Not Valid name"));
 		}
 	}
@@ -109,7 +113,15 @@ BString
 RemoteDevice::GetFriendlyName()
 {
 	CALLED();
-	return GetFriendlyName(true);
+	return GetFriendlyName(false);
+}
+
+
+BString
+RemoteDevice::GetCachedFriendlyName()
+{
+	CALLED();
+	return fFriendlyName;
 }
 
 

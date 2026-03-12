@@ -57,13 +57,14 @@ RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
 
 	disconnectButton = new BButton("disconnect", B_TRANSLATE("Disconnect"),
 		new BMessage(kMsgDisconnectDevice));
-/*
-	blockButton = new BButton("block", B_TRANSLATE("As blocked"),
-		new BMessage(kMsgBlockDevice));
+	/*
+		blockButton = new BButton("block", B_TRANSLATE("As blocked"),
+			new BMessage(kMsgBlockDevice));
 
-	availButton = new BButton("check", B_TRANSLATE("Refresh" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgRefreshDevices));
-*/
+		//TODO:Here use GetFriendlyName(true)
+		availButton = new BButton("check", B_TRANSLATE("Refresh" B_UTF8_ELLIPSIS),
+			new BMessage(kMsgRefreshDevices));
+	*/
 	// Set up device list
 	fDeviceList = new BListView("DeviceList", B_SINGLE_SELECTION_LIST);
 
