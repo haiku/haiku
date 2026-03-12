@@ -137,6 +137,10 @@ BAlert::BAlert(BMessage* data)
 	fAlertValue = -1;
 
 	fTextView = (BTextView*)FindView("_tv_");
+	  
+	const char*text;
+	if(data->FindString("_text",&text)==B_OK)
+		fTextView->SetText(text);
 
 	// TODO: window loses default button on dearchive!
 	// TODO: ButtonAt() doesn't work afterwards (also affects shortcuts)
