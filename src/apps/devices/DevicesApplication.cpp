@@ -63,6 +63,7 @@ DevicesWindow::MessageReceived(BMessage* message)
 		case kMsgReportCompatibility:
 		case kMsgGenerateSysInfo:
 		case kMsgSelectionChanged:
+		case kMsgOrderBus:
 		case kMsgOrderCategory:
 		case kMsgOrderConnection:
 			fDevicesView->MessageReceived(message);

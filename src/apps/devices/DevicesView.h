@@ -29,12 +29,14 @@ static const uint32 kMsgRefresh				= 'refr';
 static const uint32 kMsgReportCompatibility	= 'repo';
 static const uint32 kMsgGenerateSysInfo		= 'sysi';
 static const uint32 kMsgSelectionChanged	= 'selc';
+static const uint32 kMsgOrderBus			= 'obus';
 static const uint32 kMsgOrderCategory		= 'ocat';
 static const uint32 kMsgOrderConnection		= 'ocon';
 
 typedef enum {
-	ORDER_BY_CONNECTION,
-	ORDER_BY_CATEGORY
+	ORDER_BY_BUS,
+	ORDER_BY_CATEGORY,
+	ORDER_BY_CONNECTION
 } OrderByType;
 
 typedef std::map<Category, Device*> CategoryMap;
