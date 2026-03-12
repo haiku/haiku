@@ -4,7 +4,7 @@ OUTPUT_ARCH(aarch64)
 ENTRY(_start)
 SECTIONS
 {
-  . = 0xFFFFFFFF80000000 + SIZEOF_HEADERS;
+  . = 0xFFFF000000000000 + SIZEOF_HEADERS;
 
   .interp         : { *(.interp) }
   .note.gnu.build-id : { *(.note.gnu.build-id) }

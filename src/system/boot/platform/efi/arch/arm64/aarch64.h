@@ -235,7 +235,7 @@ static inline uint32 arch_mmu_kernel_granule()
  */
 static inline bool arch_mmu_is_kernel_address(uint64 address)
 {
-	return address > KERNEL_BASE;
+	return address >= KERNEL_BASE;
 }
 
 
