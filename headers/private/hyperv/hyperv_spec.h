@@ -16,7 +16,7 @@
 #define HV_BYTES_TO_PAGES(x)			(HV_PAGE_ALIGN(x) >> HV_PAGE_SHIFT)
 #define HV_BYTES_TO_SPAN_PAGES(a, l)	((((l) - 1) >> HV_PAGE_SHIFT) \
 	+ (((((l) - 1) & HV_PAGE_MASK) + ((a) & HV_PAGE_MASK)) >> HV_PAGE_SHIFT) + 1);
-#define HV_MS_TO_US(x)					((x) * 1000ULL)
+#define HV_MS_TO_US(x)					((x) * 1000LL)
 
 #define HV_STATIC_ASSERT(cond, msg)	static_assert(cond, msg)
 
