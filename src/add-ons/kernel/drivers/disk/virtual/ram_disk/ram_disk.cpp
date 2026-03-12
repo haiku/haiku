@@ -33,7 +33,7 @@
 #include "cache_support.h"
 #include "dma_resources.h"
 #include "io_requests.h"
-#include "IOSchedulerSimple.h"
+#include "IORequest.h"
 
 
 //#define TRACE_RAM_DISK
@@ -242,7 +242,7 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 		fFilePath(NULL),
 		fCache(NULL),
 		fDMAResource(NULL),
-		fIOScheduler(NULL)
+		fMaxOperationLength(B_PAGE_SIZE * 128)
 	{
 	}
 
@@ -353,28 +353,11 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			return error;
 		}
 
-		fIOScheduler = new(std::nothrow) IOSchedulerSimple(fDMAResource);
-		if (fIOScheduler == NULL) {
-			Unprepare();
-			return B_NO_MEMORY;
-		}
-
-		error = fIOScheduler->Init("ram disk device scheduler");
-		if (error != B_OK) {
-			Unprepare();
-			return error;
-		}
-
-		fIOScheduler->SetCallback(&_DoIOEntry, this);
-
 		return B_OK;
 	}
 
 	void Unprepare()
 	{
-		delete fIOScheduler;
-		fIOScheduler = NULL;
-
 		delete fDMAResource;
 		fDMAResource = NULL;
 
@@ -597,7 +580,58 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 
 	status_t DoIO(IORequest* request)
 	{
-		return fIOScheduler->ScheduleRequest(request);
+		IOOperation *operation = new(std::nothrow) IOOperation;
+		if (operation == NULL)
+			return B_NO_MEMORY;
+
+		while (!request->IsFinished() || request->RemainingBytes() > 0) {
+			IOBuffer *buffer = request->Buffer();
+
+			if (!buffer->IsMemoryLocked() && buffer->IsVirtual()) {
+				status_t status = buffer->LockMemory(request->TeamID(),
+					request->IsWrite());
+
+				if (status != B_OK) {
+					request->SetStatusAndNotify(status);
+					delete operation;
+					return status;
+				}
+			}
+
+			status_t status = fDMAResource->TranslateNext(request,
+				operation, fMaxOperationLength);
+
+			if (status != B_OK) {
+				delete operation;
+				return status;
+			}
+
+			status = _DoIO(operation);
+			if (status != B_OK) {
+				delete operation;
+				return status;
+			}
+
+			while (!operation->Finish()) {
+				operation->SetStatus(operation->Status(), 0);
+				status = _DoIO(operation);
+
+				if (status != B_OK) {
+					delete operation;
+					return status;
+				}
+			}
+
+			request->OperationFinished(operation);
+			fDMAResource->RecycleBuffer(operation->Buffer());
+			operation->SetParent(NULL);
+		}
+
+		request->NotifyFinished();
+
+		delete operation;
+
+		return B_OK;
 	}
 
 	virtual status_t PublishDevice()
@@ -607,11 +641,6 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 	}
 
 private:
-	static status_t _DoIOEntry(void* data, IOOperation* operation)
-	{
-		return ((RawDevice*)data)->_DoIO(operation);
-	}
-
 	status_t _DoIO(IOOperation* operation)
 	{
 		off_t offset = operation->Offset();
@@ -652,11 +681,11 @@ private:
 			error == B_OK);
 
 		if (error != B_OK) {
-			fIOScheduler->OperationCompleted(operation, error, 0);
+			operation->SetStatus(error, 0);
 			return error;
 		}
 
-		fIOScheduler->OperationCompleted(operation, B_OK, operation->Length());
+		operation->SetStatus(B_OK, operation->Length());
 		return B_OK;
 	}
 
@@ -844,7 +873,7 @@ private:
 	char*			fFilePath;
 	VMCache*		fCache;
 	DMAResource*	fDMAResource;
-	IOScheduler*	fIOScheduler;
+	generic_size_t 	fMaxOperationLength;
 };
 
 
