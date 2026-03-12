@@ -8,6 +8,7 @@
 
 #include <arch/generic/debug_uart.h>
 #include <arch/arm64/arch_uart_samsung.h>
+#include <new>
 
 
 #define ULCON    0x00 // Line control
@@ -130,4 +131,13 @@ ArchUARTSamsung::FlushTx()
 void
 ArchUARTSamsung::FlushRx()
 {
+}
+
+
+ArchUARTSamsung*
+arch_get_uart_samsung(addr_t base, int64 clock)
+{
+	static char buffer[sizeof(ArchUARTSamsung)];
+	ArchUARTSamsung* uart = new(buffer) ArchUARTSamsung(base, clock);
+	return uart;
 }

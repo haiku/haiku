@@ -38,4 +38,7 @@ private:
 };
 
 
+ArchUARTSamsung *arch_get_uart_samsung(addr_t base, int64 clock);
+
+
 #endif
