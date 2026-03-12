@@ -90,11 +90,12 @@ struct VMBusChannel : DoublyLinkedListLinkImpl<VMBusChannel> {
 		mutex_destroy(&lock);
 	}
 
-	uint32_t			channel_id;
+	uint32				channel_id;
 	vmbus_guid_t		type_id;
 	vmbus_guid_t		instance_id;
 	bool				dedicated_int;
-	uint32_t			connection_id;
+	uint32				connection_id;
+	uint32				mmio_size;
 
 	mutex				lock;
 	device_node*		node;

@@ -697,6 +697,7 @@ VMBus::_ProcessPendingMessage(int32_t cpu)
 					channel->dedicated_int = offerMessage->dedicated_int != 0;
 					channel->connection_id = offerMessage->connection_id;
 				}
+				channel->mmio_size = static_cast<uint32>(offerMessage->mmio_size_mb) * 1024 * 1024;
 
 				// Add new channel to offer queue and signal the channel handler thread
 				MutexLocker locker(fChannelQueueLock);
@@ -1093,7 +1094,7 @@ VMBus::_RegisterChannel(VMBusChannel* channel)
 	snprintf(prettyName, sizeof(prettyName), HYPERV_PRETTYNAME_VMBUS_DEVICE_FMT,
 		channel->channel_id);
 
-	device_attr attributes[] = {
+	device_attr attributes[10] = {
 		{ B_DEVICE_BUS, B_STRING_TYPE,
 			{ .string = HYPERV_BUS_NAME }},
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
@@ -1106,6 +1107,17 @@ VMBus::_RegisterChannel(VMBusChannel* channel)
 			{ .raw = { .data = &channel->instance_id, .length = sizeof(channel->instance_id) }}},
 		{ NULL }
 	};
+
+	uint32 attributeCount = 5;
+
+	// Add MMIO attribute if present (typically PCI passthrough and graphics)
+	if (channel->mmio_size > 0) {
+		attributes[attributeCount] = {
+			HYPERV_MMIO_SIZE_ITEM, B_UINT32_TYPE,
+				{ .ui32 = channel->mmio_size }
+		};
+		attributeCount++;
+	}
 
 	// Add to active channel list
 	InterruptsSpinLocker spinLocker(fChannelsSpinlock);
