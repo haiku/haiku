@@ -660,6 +660,16 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "msr_arch ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_SSBD)
 		strlcat(features, "ssbd ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_LASS)
+		strlcat(features, "lass ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_FRED)
+		strlcat(features, "fred ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_LKGS)
+		strlcat(features, "lkgs ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_WRMSRNS)
+		strlcat(features, "wrmsrns ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_NMI_SRC)
+		strlcat(features, "nmi_src ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_AMD_HW_PSTATE)
 		strlcat(features, "hwpstate ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_INVARIANT_TSC)
@@ -1344,6 +1354,7 @@ detect_cpu(int currentCPU, bool full = true)
 	cpu->arch.feature[FEATURE_7_ECX] = 0;
 	cpu->arch.feature[FEATURE_7_EDX] = 0;
 	cpu->arch.feature[FEATURE_D_1_EAX] = 0;
+	cpu->arch.feature[FEATURE_7_1_EAX] = 0;
 	cpu->arch.model_name[0] = 0;
 
 	// print some fun data
@@ -1460,6 +1471,8 @@ detect_cpu(int currentCPU, bool full = true)
 		cpu->arch.feature[FEATURE_7_EBX] = cpuid.regs.ebx;
 		cpu->arch.feature[FEATURE_7_ECX] = cpuid.regs.ecx;
 		cpu->arch.feature[FEATURE_7_EDX] = cpuid.regs.edx;
+		get_current_cpuid(&cpuid, 7, 1);
+		cpu->arch.feature[FEATURE_7_1_EAX] = cpuid.regs.eax;
 	}
 
 	if (maxBasicLeaf >= 0xd) {

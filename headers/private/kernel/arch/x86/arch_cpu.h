@@ -47,6 +47,15 @@
 #define IA32_MSR_MTRR_CAPABILITIES		0xfe
 #define IA32_MSR_ARCH_CAPABILITIES		0x10a
 #define IA32_MSR_FLUSH_CMD				0x10b
+#define IA32_MSR_FRED_RSP0				0x1cc
+#define IA32_MSR_FRED_RSP1				0x1cd
+#define IA32_MSR_FRED_RSP2				0x1ce
+#define IA32_MSR_FRED_RSP3				0x1cf
+#define IA32_MSR_FRED_STKLVLS			0x1d0
+#define IA32_MSR_FRED_SSP1				0x1d1
+#define IA32_MSR_FRED_SSP2				0x1d2
+#define IA32_MSR_FRED_SSP3				0x1d3
+#define IA32_MSR_FRED_CONFIG			0x1d4
 #define IA32_MSR_SYSENTER_CS			0x174
 #define IA32_MSR_SYSENTER_ESP			0x175
 #define IA32_MSR_SYSENTER_EIP			0x176
@@ -378,6 +387,14 @@
 #define IA32_FEATURE_ARCH_CAPABILITIES	(1 << 29)	// IA32_ARCH_CAPABILITIES MSR
 #define IA32_FEATURE_SSBD			(1 << 31)	// Speculative Store Bypass Disable
 
+// x86 features from cpuid eax 0x7, ecx 1, eax register
+// https://www.intel.com/content/www/us/en/content-details/819481/flexible-return-and-event-delivery-fred-specification.html
+#define IA32_FEATURE_LASS			(1 << 0) // Linear Address Space Separation
+#define IA32_FEATURE_FRED			(1 << 17) // FRED transitions
+#define IA32_FEATURE_LKGS			(1 << 18) // LKGS Instruction
+#define IA32_FEATURE_WRMSRNS		(1 << 19) // WRMSRNS Instruction
+#define IA32_FEATURE_NMI_SRC		(1 << 20) // NMI-Source Reporting
+
 // x86 features from cpuid eax 0xd, ecx 1, eax register
 // reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 3-8)
 #define IA32_FEATURE_XSAVEOPT		(1 << 0) // XSAVEOPT Instruction
@@ -438,7 +455,9 @@
 #define CR0_MONITOR_FPU			(1UL << 1)
 
 // Control Register CR4 flags §2.5
-// https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3a-part-1-manual.pdf
+// Intel® 64 and IA-32 Architectures Software Developer's Manual Volume 3A: System Programming Guide, Part 1
+// https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html
+
 #define IA32_CR4_VME			(1UL << 0)
 #define IA32_CR4_PVI			(1UL << 1)
 #define IA32_CR4_TSD			(1UL << 2)
@@ -460,6 +479,12 @@
 #define IA32_CR4_SMEP			(1UL << 20)
 #define IA32_CR4_SMAP			(1UL << 21)
 #define IA32_CR4_PKE			(1UL << 22)
+#define IA32_CR4_CET			(1UL << 23)
+#define IA32_CR4_PKS			(1UL << 24)
+#define IA32_CR4_UINTR			(1UL << 25)
+#define IA32_CR4_LASS			(1UL << 27)
+#define IA32_CR4_LAM_SUP		(1UL << 28)
+#define IA32_CR4_FRED			(1ULL << 32)
 
 // Extended Control Register XCR0 flags §13.3
 // https://software.intel.com/content/dam/develop/public/us/en/documents/253665-sdm-vol-1.pdf
@@ -526,6 +551,7 @@ enum x86_feature_type {
 	FEATURE_EXT_7_EDX,		// cpuid eax=0x80000007, edx register
 	FEATURE_EXT_8_EBX,		// cpuid eax=0x80000008, ebx register
 	FEATURE_D_1_EAX,		// cpuid eax=0xd, ecx=1, eax register
+	FEATURE_7_1_EAX,		// cpuid eax=0x7, ecx=1, eax register
 
 	FEATURE_NUM
 };
