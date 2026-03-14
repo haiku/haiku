@@ -12,6 +12,7 @@ VMBusDevice::VMBusDevice(device_node* node)
 	fNode(node),
 	fStatus(B_NO_INIT),
 	fChannelID(0),
+	fReferenceCounterSupported(false),
 	fDPCHandle(NULL),
 	fIsOpen(false),
 	fRingGPADL(0),
@@ -41,6 +42,9 @@ VMBusDevice::VMBusDevice(device_node* node)
 	mutex_init(&fLock, "vmbus device lock");
 	B_INITIALIZE_SPINLOCK(&fTXLock);
 	B_INITIALIZE_SPINLOCK(&fRXLock);
+
+	fReferenceCounterSupported = _IsReferenceCounterSupported();
+	TRACE("Reference counter: %s\n", fReferenceCounterSupported ? "yes" : "no");
 }
 
 

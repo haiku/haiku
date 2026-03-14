@@ -57,6 +57,15 @@ vmbus_device_get_bus_version(hyperv_device cookie)
 
 
 static status_t
+vmbus_device_get_reference_counter(hyperv_device cookie, uint64* _count)
+{
+	CALLED();
+	VMBusDevice* device = reinterpret_cast<VMBusDevice*>(cookie);
+	return device->GetReferenceCounter(_count);
+}
+
+
+static status_t
 vmbus_device_open(hyperv_device cookie, uint32 txLength, uint32 rxLength,
 	hyperv_device_callback callback, void* callbackData)
 {
@@ -153,6 +162,7 @@ hyperv_device_interface gVMBusDeviceModule = {
 	},
 
 	vmbus_device_get_bus_version,
+	vmbus_device_get_reference_counter,
 	vmbus_device_open,
 	vmbus_device_close,
 	vmbus_device_read_packet,

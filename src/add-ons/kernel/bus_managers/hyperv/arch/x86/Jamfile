@@ -11,4 +11,5 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include plat
 
 KernelStaticLibrary hyperv_arch_bus_manager :
 	VMBus_x86.cpp
+	VMBusDevice_x86.cpp
 	;

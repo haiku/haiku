@@ -47,6 +47,7 @@ public:
 			status_t				InitCheck() const { return fStatus; }
 
 			uint32					GetBusVersion();
+			status_t				GetReferenceCounter(uint64* _count);
 			status_t				Open(uint32 txLength, uint32 rxLength,
 										hyperv_device_callback callback, void* callbackData);
 			void					Close();
@@ -64,6 +65,7 @@ public:
 			status_t				FreeGPADL(uint32 gpadl);
 
 private:
+			bool					_IsReferenceCounterSupported();
 	static	void					_CallbackHandler(void* arg);
 	static	void					_DPCHandler(void* arg);
 
@@ -78,6 +80,7 @@ private:
 			device_node*			fNode;
 			status_t				fStatus;
 			uint32					fChannelID;
+			bool					fReferenceCounterSupported;
 			mutex					fLock;
 			void*					fDPCHandle;
 			bool					fIsOpen;
