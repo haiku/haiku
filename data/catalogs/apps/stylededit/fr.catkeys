@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku-StyledEdit	2592510797
+1	french	x-vnd.Haiku-StyledEdit	1599874629
 Document statistics	Statistics		Statistiques du document
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impossible, fichier non trouvé : « %s ».
 Cut	Menus		Couper
 Center	Menus		Centré
 Increase size	Menus		Augmenter la taille
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		ligne %d, colonne %d
 Words:	Statistics		Mots :
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Récupérer
-Error saving \"%s\":\n%s	SaveAlert		Erreur à l’enregistrement de « %s » :\n%s
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Déverrouiller le fichier
 Italic	Menus		Italique
@@ -34,7 +32,6 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Le fichier « %file% » a été supprimé par une autre application, voulez-vous le restaurer ?
 Lines:	Statistics		Lignes :
 Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		« %s » a des modifications en suspens.\nVoulez-vous rétablir la dernière version sauvegardée ? 
 Save	SaveAlert		Sauvegarder
 Default	Open_and_SaveAsPanel		Défaut
 Cancel	RevertToSavedAlert		Annuler
@@ -43,17 +40,14 @@ Statistics…	Menus		Statistiques…
 Encoding	Open_and_SaveAsPanel		Encodage
 Replace all	FindandReplaceWindow		Tout remplacer
 Close	Menus		Fermer
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erreur de chargement de « %s » :\n\tFormat inconnu
 Left	Menus		À gauche
 Default	Menus		Défaut
 OK	SaveAlert		OK
 Color	Menus		Couleur
-Save changes to the document \"%s\"? 	QuitAlert		Enregistrer les modifications du document « %s » ? 
 StyledEdit	System name		Éditeur stylé
 Underline	Menus		Souligné
 Find:	FindandReplaceWindow		Chercher :
 Undo typing	QuitAlert		Annuler la saisie
-Error loading \"%s\":\n\t%s	LoadAlert		Erreur au de chargement de « %s » :\n\t%s
 Don't save	SaveAlert		Ne pas enregistrer
 Reload…	Menus		Recharger…
 Print…	Menus		Imprimer…
@@ -62,7 +56,6 @@ Redo typing	QuitAlert		Rétablir la saisie
 Ignore	NodeMonitorAlerts		Ignorer
 Wrap lines	Menus		Retour à la ligne
 Text encoding	Menus		Encodage du texte
-Unable to unlock file\n\t%s	QuitAlert		Impossible de déverrouiller le fichier\n\t%s
 Modified	StatusView		Modifié
 OK	LoadAlert		OK
 Save	QuitAlert		Sauvegarder
@@ -83,7 +76,6 @@ Save as…	Menus		Enregistrer sous…
 Replace	FindandReplaceWindow		Remplacer
 Characters:	Statistics		Caractères :
 Don't save	QuitAlert		Ne pas enregistrer
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
 Align	Menus		Aligner
 Font	Menus		Police
 Select all	Menus		Selectionner tout

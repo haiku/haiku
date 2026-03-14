@@ -1,7 +1,6 @@
-1	turkish	x-vnd.Haiku-ShowImage	1471302250
+1	turkish	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		Görsel Görüntüleyicisi
 Page setup…	Menus		Sayfa yapısı…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		“%s” belgesi (sayfa %d) değiştirildi. Belgeyi kapatmak istiyor musunuz?
 Previous file	Menus		Önceki dosya
 View	Menus		Görüntü
 Leave full screen	Menus		Tam ekrandan çık
@@ -27,7 +26,6 @@ Last page	Menus		Son sayfa
 Cancel	ClosePrompt		Vazgeç
 Attributes	Menus		Öznitelikler
 High-quality zooming	Menus		Yüksek kalite yakınlaştırma
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		“%s” belgesi değiştirildi. Belgeyi kapatmak istiyor musunuz?
 Close	Menus		Kapat
 Selection mode	Menus		Seçim kipi
 Reset rating	Menus		Derecelendirmeyi sıfırla

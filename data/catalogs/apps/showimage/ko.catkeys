@@ -1,7 +1,6 @@
-1	korean	x-vnd.Haiku-ShowImage	1471302250
+1	korean	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		ShowImage
 Page setup…	Menus		페이지 설정...
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		문서 '%s' (페이지 %d)이(가) 변경되었습니다. 문서를 닫으시겠습니까?
 Previous file	Menus		이전 파일
 View	Menus		보기
 Leave full screen	Menus		전체 화면 나가기
@@ -27,7 +26,6 @@ Last page	Menus		마지막 페이지
 Cancel	ClosePrompt		취소
 Attributes	Menus		속성
 High-quality zooming	Menus		고품질 확대/축소
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		문서 '%s'이(가) 변경되었습니다. 문서를 닫으시겠습니까?
 Close	Menus		닫기
 Selection mode	Menus		선택 모드
 Reset rating	Menus		평가 재설정

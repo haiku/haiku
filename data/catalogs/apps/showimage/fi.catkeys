@@ -1,7 +1,6 @@
-1	finnish	x-vnd.Haiku-ShowImage	1471302250
+1	finnish	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		Kuvakatselin
 Page setup…	Menus		Sivuasetus...
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
 Previous file	Menus		Edellinen tiedosto
 View	Menus		Näkymä
 Leave full screen	Menus		Jätä kokoruututila
@@ -27,7 +26,6 @@ Last page	Menus		Viimeinen sivu
 Cancel	ClosePrompt		Peru
 Attributes	Menus		Attribuutit
 High-quality zooming	Menus		Korkealaatuinen rajaus
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ on muuttunut. Haluatko sulkea asiakirjan?
 Close	Menus		Sulje
 Selection mode	Menus		Valintatila
 Reset rating	Menus		Nollaa arvosanat

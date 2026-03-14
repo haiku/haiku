@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-StyledEdit	4205187966
+1	finnish	x-vnd.Haiku-StyledEdit	3212551798
 Document statistics	Statistics		Asiakirjan tilastot
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Palauttaminen epäonnistui, tiedostoa ei löytynyt: ”%s”.
 Cut	Menus		Leikkaa
 Center	Menus		Keskitä
 Increase size	Menus		Kasvata kokoa
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		rivi %d, sarake %d
 Words:	Statistics		Sanoja:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Palauta
-Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa ”%s”:\n%s
 OK	RevertToSavedAlert		Valmis
 Unlock file	StatusView		Poista tiedoston lukitus
 Italic	Menus		Kursivointi
@@ -35,7 +33,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Rivejä:
 Strikeout	Menus		Yliviivaa
 Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		tiedostossa ”%s” tallentamattomia muutoksia.\nPalautetaanko se viimeiseen tallennettuun versioon? 
 Save	SaveAlert		Tallenna
 Default	Open_and_SaveAsPanel		Oletus
 Cancel	RevertToSavedAlert		Peru
@@ -44,17 +41,14 @@ Statistics…	Menus		Tilastot...
 Encoding	Open_and_SaveAsPanel		Koodaus
 Replace all	FindandReplaceWindow		Korvaa kaikki
 Close	Menus		Sulje
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa ”%s”:\n\tTukematon muoto
 Left	Menus		Vasen
 Default	Menus		Oletus
 OK	SaveAlert		Valmis
 Color	Menus		Väri
-Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan ”%s”? 
 StyledEdit	System name		Tyylitetty editori
 Underline	Menus		Alleviivaa
 Find:	FindandReplaceWindow		Haku:
 Undo typing	QuitAlert		Peru kirjoitus
-Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
 Don't save	SaveAlert		Älä tallenna
 Reload…	Menus		Lataa uudelleen…
 Print…	Menus		Tulosta...
@@ -63,7 +57,6 @@ Redo typing	QuitAlert		Toista kirjoitus
 Ignore	NodeMonitorAlerts		Ohita
 Wrap lines	Menus		Rivitä
 Text encoding	Menus		Tekstikoodaus
-Unable to unlock file\n\t%s	QuitAlert		Tiedoston lukituksen poisto epäonnistui\n\t%s
 Modified	StatusView		Muokattu
 OK	LoadAlert		Valmis
 Save	QuitAlert		Tallenna
@@ -84,7 +77,6 @@ Save as…	Menus		Tallenna nimellä...
 Replace	FindandReplaceWindow		Korvaa
 Characters:	Statistics		Merkkejä:
 Don't save	QuitAlert		Älä tallenna
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
 Align	Menus		Tasaa
 Font	Menus		Kirjasin
 Select all	Menus		Valitse kaikki

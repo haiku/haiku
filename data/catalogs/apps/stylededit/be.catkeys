@@ -1,6 +1,5 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	3854757778
+1	belarusian	x-vnd.Haiku-StyledEdit	2862121610
 Document statistics	Statistics		Статыстыка дакументу
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Немагчыма вярнуцца, файл \"%s\" ня знойдзены.
 Cut	Menus		Выразаць
 Center	Menus		Цэнтар
 Page setup…	Menus		Наладкі старонкі…
@@ -20,7 +19,6 @@ line %d, column %d	StatusView		радок %d, пазіцыя %d
 Words:	Statistics		Словаў:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Аднавіць
-Error saving \"%s\":\n%s	SaveAlert		Немагчыма захаваць \"%s\":\n%s
 OK	RevertToSavedAlert		ОК
 Unlock file	StatusView		Разблакаваць
 Italic	Menus		Нахілены
@@ -33,7 +31,6 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" быў выдалены іншай праграмай, аднавіць яго?
 Lines:	Statistics		Радкоў:
 Replace in all windows	FindandReplaceWindow		Замяняць ва ўсіх вокнах
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" мае незахаваныя змены.\nВярнуць яго да раней захаванага стану? 
 Save	SaveAlert		Захаваць
 Default	Open_and_SaveAsPanel		Прадвызначаны
 Cancel	RevertToSavedAlert		Скасаваць
@@ -42,16 +39,13 @@ Statistics…	Menus		Статыстыка…
 Encoding	Open_and_SaveAsPanel		Кадоўка
 Replace all	FindandReplaceWindow		Замяняць усё
 Close	Menus		Закрыць
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Немагчыма загрузіць \"%s\":\n\tГэты фармат не падтрымліваецца
 Left	Menus		Левы
 Default	Menus		Прадвызначаны
 OK	SaveAlert		ОК
 Color	Menus		Колер
-Save changes to the document \"%s\"? 	QuitAlert		Захаваць адрэдагаваны дакумент \"%s\"? 
 StyledEdit	System name		Стыльны Рэдактар
 Find:	FindandReplaceWindow		Пошук:
 Undo typing	QuitAlert		Адмяніць увод
-Error loading \"%s\":\n\t%s	LoadAlert		Немагчыма загрузіць \"%s\":\n\t%s
 Don't save	SaveAlert		Не захоўваць
 Reload…	Menus		Перачытаць…
 Print…	Menus		Друкаваць…
@@ -60,7 +54,6 @@ Redo typing	QuitAlert		Паўтарыць увод
 Ignore	NodeMonitorAlerts		Ігнараваць
 Wrap lines	Menus		Пераносіць радкі
 Text encoding	Menus		Кадоўка
-Unable to unlock file\n\t%s	QuitAlert		Немагчыма разблакаваць файл\n\t%s
 Modified	StatusView		Мадыфікаваны
 OK	LoadAlert		Так
 Save	QuitAlert		Захаваць
@@ -80,7 +73,6 @@ Save as…	Menus		Захаваць як…
 Replace	FindandReplaceWindow		Замяніць
 Characters:	Statistics		Знакаў:
 Don't save	QuitAlert		Не захоўваць
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 
 Align	Menus		Раўнаванне
 Font	Menus		Шрыфт
 Select all	Menus		Абраць усё

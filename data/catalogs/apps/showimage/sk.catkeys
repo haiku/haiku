@@ -1,7 +1,6 @@
-1	slovak	x-vnd.Haiku-ShowImage	3888429101
+1	slovak	x-vnd.Haiku-ShowImage	1516714980
 ShowImage	System name		Prehliadač obrázkov
 Page setup…	Menus		Nastavenie stránky…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ (stránka %d) bol zmenený. Chcete dokument zatvoriť?
 Previous file	Menus		Predošlý súbor
 View	Menus		Zobraziť
 Leave full screen	Menus		Opustiť celoobrazovkový režim
@@ -26,7 +25,6 @@ Zoom in	Menus		Priblížiť
 Last page	Menus		Posledná stránka
 Cancel	ClosePrompt		Zrušiť
 High-quality zooming	Menus		Priblíženie vo vysokej kvalite
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ bol zmenený. Chcete dokument zatvoriť?
 Close	Menus		Zatvoriť
 Selection mode	Menus		Režim výberu
 DPI:	PrintOptionsWindow		DPI:

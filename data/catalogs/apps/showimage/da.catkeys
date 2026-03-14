@@ -1,7 +1,6 @@
-1	danish	x-vnd.Haiku-ShowImage	3888429101
+1	danish	x-vnd.Haiku-ShowImage	1516714980
 ShowImage	System name		Billedviser
 Page setup…	Menus		Sideopsætning…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er blevet ændret. Vil du lukke dokumentet?
 Previous file	Menus		Forrige fil
 View	Menus		Vis
 Leave full screen	Menus		Forlad fuldskærm
@@ -26,7 +25,6 @@ Zoom in	Menus		Zoom ind
 Last page	Menus		Sidste side
 Cancel	ClosePrompt		Afbryd
 High-quality zooming	Menus		Højkvalitetszoom
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' er blevet ændret. Vil du lukke dokumentet?
 Close	Menus		Luk
 Selection mode	Menus		Markeringstilstand
 DPI:	PrintOptionsWindow		DPI:

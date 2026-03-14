@@ -1,7 +1,6 @@
-1	esperanto	x-vnd.Haiku-ShowImage	3888429101
+1	esperanto	x-vnd.Haiku-ShowImage	1516714980
 ShowImage	System name		La Bildmontrilo
 Page setup…	Menus		Agordo de paĝo…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		La dokumento '%s' (paĝo %d) estas ŝanĝita. Ĉu vi volas fermi ĝin?
 Previous file	Menus		Antaŭa dosiero
 View	Menus		Rigardi
 Leave full screen	Menus		Malplenekrane
@@ -26,7 +25,6 @@ Zoom in	Menus		Zomi
 Last page	Menus		Lasta paĝo
 Cancel	ClosePrompt		Nuligi
 High-quality zooming	Menus		Bonkvalita zomado
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		La dokumento '%s' estas ŝanĝita. Ĉu vi volas malfermi ĝin?
 Close	Menus		Fermi
 Selection mode	Menus		Reĝimo de elekto
 DPI:	PrintOptionsWindow		Punktoj cole:

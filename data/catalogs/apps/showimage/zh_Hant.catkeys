@@ -1,7 +1,6 @@
-1	english	x-vnd.Haiku-ShowImage	1471302250
+1	english	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		圖片展示
 Page setup…	Menus		頁面設定…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		檔案 '%s' (頁 %d) 已更改。您要關閉該文件嗎？
 Previous file	Menus		上一個檔案
 View	Menus		查看
 Leave full screen	Menus		保留全螢幕
@@ -27,7 +26,6 @@ Last page	Menus		最後一頁
 Cancel	ClosePrompt		取消
 Attributes	Menus		屬性
 High-quality zooming	Menus		高品質縮放
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		檔案 '%s' 已更改。您要關閉該檔案嗎？
 Close	Menus		關閉
 Selection mode	Menus		選擇方式
 Reset rating	Menus		重置評級

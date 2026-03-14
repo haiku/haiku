@@ -1,7 +1,6 @@
-1	croatian	x-vnd.Haiku-ShowImage	3750742267
+1	croatian	x-vnd.Haiku-ShowImage	1379028146
 ShowImage	System name		Prikaži sliku
 Page setup…	Menus		Postavljanje stranice...
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stranica %d) je promjenjen. Želite li zatvoriti dokument?
 Previous file	Menus		Prethodna datoteka
 View	Menus		Pogled
 Leave full screen	Menus		Napusti cijeli zaslon
@@ -26,7 +25,6 @@ Zoom in	Menus		Povećaj
 Last page	Menus		Zadanja stranica
 Cancel	ClosePrompt		Otkaži
 High-quality zooming	Menus		Visoko kvalitetno povećavanje
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' je promijenjen. Želite li zatvoriti dokument?
 Close	Menus		Zatvori
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Postavi sliku u stranicu

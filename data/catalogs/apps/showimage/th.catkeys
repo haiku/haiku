@@ -1,7 +1,6 @@
-1	thai	x-vnd.Haiku-ShowImage	3888429101
+1	thai	x-vnd.Haiku-ShowImage	1516714980
 ShowImage	System name		แสดงภาพ
 Page setup…	Menus		ตั้งค่าหน้า
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		เอกสาร '%s' (หน้า%d) มีการเปลี่ยนแปลง คุณต้องการปิดเอกสารหรือไม่?
 Previous file	Menus		ไฟล์ก่อนหน้า
 View	Menus		ดู
 Leave full screen	Menus		ออกจากเต็มหน้าจอ
@@ -26,7 +25,6 @@ Zoom in	Menus		ซูมเข้า
 Last page	Menus		หน้าสุดท้าย
 Cancel	ClosePrompt		ยกเลิก
 High-quality zooming	Menus		การซูมคุณภาพสูง
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		เอกสาร '%s' มีการเปลี่ยนแปลง คุณต้องการปิดเอกสารหรือไม่?
 Close	Menus		ปิด
 Selection mode	Menus		โหมดการเลือก
 DPI:	PrintOptionsWindow		DPI:

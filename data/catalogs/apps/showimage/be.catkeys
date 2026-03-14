@@ -1,7 +1,6 @@
-1	belarusian	x-vnd.Haiku-ShowImage	3888429101
+1	belarusian	x-vnd.Haiku-ShowImage	1516714980
 ShowImage	System name		Выявы
 Page setup…	Menus		Наладкі старонкі…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' (старонка %d) зменены. Вы жадаеце яго закрыць?
 Previous file	Menus		Папярэдні файл
 View	Menus		Від
 Leave full screen	Menus		Пакінуць рэжым поўнага экрана
@@ -26,7 +25,6 @@ Zoom in	Menus		Павялічыць
 Last page	Menus		Апошняя старонка
 Cancel	ClosePrompt		Адмена
 High-quality zooming	Menus		Высокаякаснае павелічэнне
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' зменены. Вы жадаеце яго закрыць?
 Close	Menus		Закрыць
 Selection mode	Menus		Рэжым Выдзялення
 DPI:	PrintOptionsWindow		DPI:

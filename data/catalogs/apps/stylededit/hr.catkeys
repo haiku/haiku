@@ -1,6 +1,5 @@
-1	croatian	x-vnd.Haiku-StyledEdit	4139431887
+1	croatian	x-vnd.Haiku-StyledEdit	2338599632
 Document statistics	Statistics		Statistike dokumenta
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemoguće obrnuti, datoteka nije pronađena: \"%s\".
 Cut	Menus		Isjeci
 Center	Menus		Centar
 Increase size	Menus		Povećaj veličinu
@@ -18,7 +17,6 @@ Copy	Menus		Kopiraj
 Reload	NodeMonitorAlerts		Ponovno učitaj
 Words:	Statistics		Riječi:
 ???	LoadAlert		???
-Error saving \"%s\":\n%s	SaveAlert		Greška pri spremanju \"%s\":\n%s
 OK	RevertToSavedAlert		U redu
 Unlock file	StatusView		Otključaj datoteku
 Italic	Menus		Italik
@@ -38,15 +36,12 @@ Statistics…	Menus		Statistike...
 Encoding	Open_and_SaveAsPanel		Enkodiranje
 Replace all	FindandReplaceWindow		Zamjeni sve
 Close	Menus		Zatvori
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Greška pri učitavanju \"%s\":\n\tNepodržani format
 Left	Menus		Lijevo
 Default	Menus		Zadano
 OK	SaveAlert		U redu
 Color	Menus		Boja
-Save changes to the document \"%s\"? 	QuitAlert		Spremi izmjene u dokument \"%s\"? 
 StyledEdit	System name		StyleEdit
 Find:	FindandReplaceWindow		Pronađi:
-Error loading \"%s\":\n\t%s	LoadAlert		Greška pri učitavanju \"%s\":\n\t%s
 Don't save	SaveAlert		Nemoj spremiti
 Reload…	Menus		Ponovno učitaj…
 Print…	Menus		Ispis...

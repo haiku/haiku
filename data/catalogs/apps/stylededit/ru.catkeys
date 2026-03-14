@@ -1,6 +1,5 @@
-1	russian	x-vnd.Haiku-StyledEdit	4205187966
+1	russian	x-vnd.Haiku-StyledEdit	3212551798
 Document statistics	Statistics		Статистика документа
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
 Cut	Menus		Вырезать
 Center	Menus		По центру
 Increase size	Menus		Увеличить размер
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		линия %d, позиция %d
 Words:	Statistics		Слов:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Восстановить
-Error saving \"%s\":\n%s	SaveAlert		Ошибка сохранения \"%s\":\n%s
 OK	RevertToSavedAlert		ОК
 Unlock file	StatusView		Разблокировать
 Italic	Menus		Наклонный
@@ -35,7 +33,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Строк:
 Strikeout	Menus		Зачёркнутый
 Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" имеет несохранённые изменения.\nВернуться к его последней сохранённой версии?
 Save	SaveAlert		Сохранить
 Default	Open_and_SaveAsPanel		По умолчанию
 Cancel	RevertToSavedAlert		Отмена
@@ -44,17 +41,14 @@ Statistics…	Menus		Статистика…
 Encoding	Open_and_SaveAsPanel		Кодировка
 Replace all	FindandReplaceWindow		Заменить все
 Close	Menus		Закрыть
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка при открытии \"%s\":\n\tФормат не поддерживается
 Left	Menus		По левому краю
 Default	Menus		По умолчанию
 OK	SaveAlert		ОК
 Color	Menus		Цвет
-Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
 StyledEdit	System name		StyledEdit
 Underline	Menus		Подчёркнутый
 Find:	FindandReplaceWindow		Найти:
 Undo typing	QuitAlert		Отменить ввод
-Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
 Don't save	SaveAlert		Не сохранять
 Reload…	Menus		Перезагрузить…
 Print…	Menus		Печать…
@@ -63,7 +57,6 @@ Redo typing	QuitAlert		Повторить ввод
 Ignore	NodeMonitorAlerts		Игнорировать
 Wrap lines	Menus		Перенос строк
 Text encoding	Menus		Кодировка
-Unable to unlock file\n\t%s	QuitAlert		Невозможно разблокировать файл\n\t%s
 Modified	StatusView		Изменён
 OK	LoadAlert		ОК
 Save	QuitAlert		Сохранить
@@ -84,7 +77,6 @@ Save as…	Menus		Сохранить как…
 Replace	FindandReplaceWindow		Заменить
 Characters:	Statistics		Символов:
 Don't save	QuitAlert		Не сохранять
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
 Align	Menus		Выровнять
 Font	Menus		Шрифт
 Select all	Menus		Выделить всё

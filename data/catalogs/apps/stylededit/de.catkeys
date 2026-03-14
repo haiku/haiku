@@ -1,6 +1,5 @@
-1	german	x-vnd.Haiku-StyledEdit	3875144589
+1	german	x-vnd.Haiku-StyledEdit	2882508421
 Document statistics	Statistics		Dokument-Statistik
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Cut	Menus		Ausschneiden
 Center	Menus		Zentriert
 Increase size	Menus		Vergrößern
@@ -22,7 +21,6 @@ line %d, column %d	StatusView		Zeile %d, Spalte %d
 Words:	Statistics		Wörter:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Wiederherstellen
-Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von \"%s\":\n%s
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Datei entsperren
 Italic	Menus		Kursiv
@@ -36,7 +34,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Zeilen:
 Strikeout	Menus		Durchgestrichen
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" enthält ungespeicherte Änderungen.\nZuletzt gespeicherte Version wiederherstellen?
 Save	SaveAlert		Speichern
 Default	Open_and_SaveAsPanel		Standard
 Cancel	RevertToSavedAlert		Abbrechen
@@ -45,17 +42,14 @@ Statistics…	Menus		Statistik …
 Encoding	Open_and_SaveAsPanel		Kodierung
 Replace all	FindandReplaceWindow		Alle ersetzen
 Close	Menus		Schließen
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fehler beim Öffnen von \"%s\":\n\tDas Dateiformat wird nicht unterstützt.
 Left	Menus		Links
 Default	Menus		Standard
 OK	SaveAlert		OK
 Color	Menus		Farbe
-Save changes to the document \"%s\"? 	QuitAlert		Geändertes Dokument \"%s\" speichern? 
 StyledEdit	System name		Texteditor
 Underline	Menus		Unterstrichen
 Find:	FindandReplaceWindow		Suche:
 Undo typing	QuitAlert		Rückgängig: Eingabe
-Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von \"%s\":\n\t%s
 Don't save	SaveAlert		Verwerfen
 Reload…	Menus		Neu laden …
 Print…	Menus		Drucken …
@@ -64,7 +58,6 @@ Redo typing	QuitAlert		Wiederholen: Eingabe
 Ignore	NodeMonitorAlerts		Ignorieren
 Wrap lines	Menus		Zeilenumbruch
 Text encoding	Menus		Zeichenkodierung
-Unable to unlock file\n\t%s	QuitAlert		Die Datei '%s' konnte nicht entsperrt werden.
 Modified	StatusView		Geändert
 OK	LoadAlert		OK
 Save	QuitAlert		Speichern
@@ -85,7 +78,6 @@ Save as…	Menus		Speichern unter …
 Replace	FindandReplaceWindow		Ersetzen
 Characters:	Statistics		Zeichen:
 Don't save	QuitAlert		Verwerfen
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
 Align	Menus		Ausrichtung
 Font	Menus		Schrift
 Select all	Menus		Alles auswählen

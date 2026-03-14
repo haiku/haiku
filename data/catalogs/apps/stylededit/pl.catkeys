@@ -1,6 +1,5 @@
-1	polish	x-vnd.Haiku-StyledEdit	2592510797
+1	polish	x-vnd.Haiku-StyledEdit	1599874629
 Document statistics	Statistics		Statystyki dokumentu
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: „%s”.
 Cut	Menus		Wytnij
 Center	Menus		Wyśrodkuj
 Increase size	Menus		Zwiększ rozmiar
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		wiersz %d, kolumna %d
 Words:	Statistics		Słów:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Odzyskaj
-Error saving \"%s\":\n%s	SaveAlert		Błąd podczas zapisywania „%s”:\n%s
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Odblokuj plik
 Italic	Menus		Kursywa
@@ -34,7 +32,6 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Plik „%file%” został usunięty przez inny program. Czy chcesz go przywrócić?
 Lines:	Statistics		Linie:
 Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		„%s” zawiera niezapisane zmiany.\nCzy przywrócić ostatnią zapisaną wersję? 
 Save	SaveAlert		Zapisz
 Default	Open_and_SaveAsPanel		Domyślne
 Cancel	RevertToSavedAlert		Anuluj
@@ -43,17 +40,14 @@ Statistics…	Menus		Statystyki…
 Encoding	Open_and_SaveAsPanel		Kodowanie
 Replace all	FindandReplaceWindow		Zamień wszystkie
 Close	Menus		Zamknij
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Błąd podczas otwierania „%s”:\n\tFormat nieobsługiwany
 Left	Menus		Lewo
 Default	Menus		Domyślne
 OK	SaveAlert		OK
 Color	Menus		Kolor
-Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie „%s”? 
 StyledEdit	System name		StyledEdit
 Underline	Menus		Podkreślenie
 Find:	FindandReplaceWindow		Znajdź:
 Undo typing	QuitAlert		Cofnij pisanie
-Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania „%s”:\n\t%s
 Don't save	SaveAlert		Nie zapisuj
 Reload…	Menus		Wczytaj ponownie…
 Print…	Menus		Drukuj…
@@ -62,7 +56,6 @@ Redo typing	QuitAlert		Powtórz pisanie
 Ignore	NodeMonitorAlerts		Ignoruj
 Wrap lines	Menus		Zawijaj wiersze
 Text encoding	Menus		Kodowanie tekstu
-Unable to unlock file\n\t%s	QuitAlert		Nie można odblokować pliku\n\t %s
 Modified	StatusView		Zmieniony
 OK	LoadAlert		OK
 Save	QuitAlert		Zapisz
@@ -83,7 +76,6 @@ Save as…	Menus		Zapisz jako…
 Replace	FindandReplaceWindow		Zamień
 Characters:	Statistics		Znaków:
 Don't save	QuitAlert		Nie zapisuj
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie „%s”? 
 Align	Menus		Wyrównaj
 Font	Menus		Font
 Select all	Menus		Zaznacz wszystko

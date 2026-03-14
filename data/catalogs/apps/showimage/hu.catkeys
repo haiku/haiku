@@ -1,7 +1,6 @@
-1	hungarian	x-vnd.Haiku-ShowImage	1471302250
+1	hungarian	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		Képmegjelenítő
 Page setup…	Menus		Oldalbeállítás…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum %d. oldala megváltozott. Bezárja a dokumentumot?
 Previous file	Menus		Előző fájl
 View	Menus		Nézet
 Leave full screen	Menus		Kilépés a teljes képernyős módból
@@ -27,7 +26,6 @@ Last page	Menus		Utolsó oldal
 Cancel	ClosePrompt		Mégse
 Attributes	Menus		Jellemzők
 High-quality zooming	Menus		Magas minőségű nagyítás
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum megváltozott. Biztosan be szeretnéd zárni?
 Close	Menus		Bezárás
 Selection mode	Menus		Kijelölés mód
 Reset rating	Menus		Értékelés visszaállítása

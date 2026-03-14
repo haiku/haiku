@@ -1,7 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	166312083
+1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	2089565258
 ShowImage	System name		ShowImage
 Page setup…	Menus		Διαμόρφωση σελίδας…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' (σελίδα %d) έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
 Previous file	Menus		Προηγούμενο αρχείο
 View	Menus		Προβολή
 Leave full screen	Menus		Εγκατάλειψη πλήρους οθόνης
@@ -27,7 +26,6 @@ Last page	Menus		Τελευταία σελίδα
 Cancel	ClosePrompt		Άκυρο
 Attributes	Menus		Ιδιότητες
 High-quality zooming	Menus		Υψηλής-ποιότητας μεγένθυση
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
 Close	Menus		Κλείσιμο
 Selection mode	Menus		Λειτουργία επιλογής
 Reset rating	Menus		Επαναφορά βαθμολογίας

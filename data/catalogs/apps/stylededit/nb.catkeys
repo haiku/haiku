@@ -1,6 +1,5 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-StyledEdit	4205187966
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-StyledEdit	3212551798
 Document statistics	Statistics		Dokumentstatistikk
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbakestille, filen \"%s\" ble ikke funnet.
 Cut	Menus		Klipp ut
 Center	Menus		Sentrer
 Increase size	Menus		Øk størrelsen
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		rad %d, kolonne %d
 Words:	Statistics		Ord:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Gjenopprett
-Error saving \"%s\":\n%s	SaveAlert		Feil ved lagring av \"%s\":\n%s
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Lås opp fil
 Italic	Menus		Kursiv
@@ -35,7 +33,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Linjer:
 Strikeout	Menus		Overstrøket
 Replace in all windows	FindandReplaceWindow		Erstatt i alle vinduer
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" har endringer som ikke er lagret.\nVil du gå tilbake til den sist lagrede versjonen?
 Save	SaveAlert		Lagre
 Default	Open_and_SaveAsPanel		Standard
 Cancel	RevertToSavedAlert		Avbryt
@@ -44,17 +41,14 @@ Statistics…	Menus		Statistikk…
 Encoding	Open_and_SaveAsPanel		Koding
 Replace all	FindandReplaceWindow		Erstatt alle
 Close	Menus		Lukk
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Feil ved lasting av \"%s\":\n\tFormatet støttes ikke
 Left	Menus		Venstre
 Default	Menus		Standard
 OK	SaveAlert		OK
 Color	Menus		Farge
-Save changes to the document \"%s\"? 	QuitAlert		Lagre endringer i dokumentet \"%s\"?
 StyledEdit	System name		StyledEdit
 Underline	Menus		Understrek
 Find:	FindandReplaceWindow		Finn:
 Undo typing	QuitAlert		Angre skriving
-Error loading \"%s\":\n\t%s	LoadAlert		Feil ved lasting av \"%s\":\n\t%s
 Don't save	SaveAlert		Ikke lagre
 Reload…	Menus		Last inn på nytt…
 Print…	Menus		Skriv ut…
@@ -63,7 +57,6 @@ Redo typing	QuitAlert		Tilbakestill skriving
 Ignore	NodeMonitorAlerts		Ignorer
 Wrap lines	Menus		Bryt tekst
 Text encoding	Menus		Tekstkoding
-Unable to unlock file\n\t%s	QuitAlert		Kunne ikke låse opp filen\n\t%s
 Modified	StatusView		Endret
 OK	LoadAlert		OK
 Save	QuitAlert		Lagre
@@ -84,7 +77,6 @@ Save as…	Menus		Lagre som…
 Replace	FindandReplaceWindow		Erstatt
 Characters:	Statistics		Bokstaver:
 Don't save	QuitAlert		Ikke lagre
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Denne filen er merket som skrivebeskyttet. Vil du lagre endringer i dokumentet \"%s\"? 
 Align	Menus		Juster
 Font	Menus		Skrifttype
 Select all	Menus		Merk alle

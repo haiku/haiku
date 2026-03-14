@@ -1,7 +1,6 @@
-1	italian	x-vnd.Haiku-ShowImage	1471302250
+1	italian	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		ShowImage
 Page setup…	Menus		Imposta pagina…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
 Previous file	Menus		File precedente
 View	Menus		Visualizza
 Leave full screen	Menus		Esci dallo schermo intero
@@ -27,7 +26,6 @@ Last page	Menus		Ultima pagina
 Cancel	ClosePrompt		Annulla
 Attributes	Menus		Attributi
 High-quality zooming	Menus		Zoom di alta qualità
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' è stato modificato. Vuoi chiudere il documento?
 Close	Menus		Chiudi
 Selection mode	Menus		Modalità selezione
 Reset rating	Menus		Reimposta valutazione

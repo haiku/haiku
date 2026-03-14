@@ -1,7 +1,6 @@
-1	spanish; castilian	x-vnd.Haiku-ShowImage	1471302250
+1	spanish; castilian	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		Mostrar Imagen
 Page setup…	Menus		Configuración de la pagina…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' (página %d) ha cambiado. ¿Desea cerrarlo?
 Previous file	Menus		Archivo anterior
 View	Menus		Ver
 Leave full screen	Menus		Salir de pantalla completa
@@ -27,7 +26,6 @@ Last page	Menus		Última página
 Cancel	ClosePrompt		Cancelar
 Attributes	Menus		Atributos
 High-quality zooming	Menus		Ampliación de alta calidad
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' ha cambiado. ¿Desea cerrarlo?
 Close	Menus		Cerrar
 Selection mode	Menus		Modo de selección
 Reset rating	Menus		Restablecer calificación

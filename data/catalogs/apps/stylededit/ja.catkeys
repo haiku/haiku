@@ -1,6 +1,5 @@
-1	japanese	x-vnd.Haiku-StyledEdit	3875144589
+1	japanese	x-vnd.Haiku-StyledEdit	2882508421
 Document statistics	Statistics		ドキュメント統計
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		ファイル \"%s\" が存在しないため、元に戻せません。
 Cut	Menus		切り取り
 Center	Menus		中央揃え
 Increase size	Menus		拡大
@@ -22,7 +21,6 @@ line %d, column %d	StatusView		%d 行, %d 列
 Words:	Statistics		単語数:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		回復
-Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中にエラーが発生しました:\n%s
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		ロック解除
 Italic	Menus		イタリック
@@ -36,7 +34,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		行数:
 Strikeout	Menus		取り消し線
 Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" に保存されていない変更があります。\n保存された版まで戻しますか? 
 Save	SaveAlert		保存
 Default	Open_and_SaveAsPanel		デフォルト
 Cancel	RevertToSavedAlert		中止
@@ -45,17 +42,14 @@ Statistics…	Menus		統計...
 Encoding	Open_and_SaveAsPanel		文字コード
 Replace all	FindandReplaceWindow		すべて置換
 Close	Menus		閉じる
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中にエラーが発生しました:\n\t サポートされていないフォーマットです。
 Left	Menus		左揃え
 Default	Menus		デフォルト
 OK	SaveAlert		OK
 Color	Menus		色
-Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
 StyledEdit	System name		StyledEdit
 Underline	Menus		下線
 Find:	FindandReplaceWindow		検索:
 Undo typing	QuitAlert		元に戻す
-Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラーが発生しました:\n\t %s
 Don't save	SaveAlert		保存しない
 Reload…	Menus		再読み込み...
 Print…	Menus		印刷...
@@ -64,7 +58,6 @@ Redo typing	QuitAlert		やり直し
 Ignore	NodeMonitorAlerts		無視
 Wrap lines	Menus		ワードラップ
 Text encoding	Menus		文字コード
-Unable to unlock file\n\t%s	QuitAlert		以下のファイルのロック解除が出来ません\n\t%s
 Modified	StatusView		変更あり
 OK	LoadAlert		OK
 Save	QuitAlert		保存
@@ -85,7 +78,6 @@ Save as…	Menus		名前を付けて保存...
 Replace	FindandReplaceWindow		置換
 Characters:	Statistics		文字数:
 Don't save	QuitAlert		保存しない
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更をドキュメント\"%s\"に保存しますか?
 Align	Menus		配置
 Font	Menus		フォント
 Select all	Menus		すべて選択

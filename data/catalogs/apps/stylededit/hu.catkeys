@@ -1,6 +1,5 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	4205187966
+1	hungarian	x-vnd.Haiku-StyledEdit	3212551798
 Document statistics	Statistics		Statisztika
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl \"%s\" nem található.
 Cut	Menus		Kivágás
 Center	Menus		Középre
 Increase size	Menus		Méret növelés
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		%d. sor, %d. oszlop
 Words:	Statistics		Szó:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Helyreállítás
-Error saving \"%s\":\n%s	SaveAlert		Hiba történt \"%s\" mentése közben:\n%s
 OK	RevertToSavedAlert		Rendben
 Unlock file	StatusView		Fájl feloldása
 Italic	Menus		Dőlt
@@ -35,7 +33,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Sor:
 Strikeout	Menus		Áthúzás
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		A fájlban \"%s\" történt módosítások még nincsenek mentve.\nVissza szeretnéd állítani a legutóbbi mentett verziót?
 Save	SaveAlert		Mentés
 Default	Open_and_SaveAsPanel		Alapérték
 Cancel	RevertToSavedAlert		Mégse
@@ -44,17 +41,14 @@ Statistics…	Menus		Statisztika…
 Encoding	Open_and_SaveAsPanel		Kódolás
 Replace all	FindandReplaceWindow		Mindet cseréli
 Close	Menus		Bezárás
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Hiba történt \"%s\" betöltése közben:\n\tA formátum nem támogatott
 Left	Menus		Balra
 Default	Menus		Alapérték
 OK	SaveAlert		Rendben
 Color	Menus		Szín
-Save changes to the document \"%s\"? 	QuitAlert		Mented a dokumentum \"%s\" változtatásait?
 StyledEdit	System name		StyledEdit
 Underline	Menus		Aláhúzás
 Find:	FindandReplaceWindow		Keresés:
 Undo typing	QuitAlert		Gépelés visszavonása
-Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" betöltése sikertelen:\n\t%s
 Don't save	SaveAlert		Ne mentse
 Reload…	Menus		Újratöltés…
 Print…	Menus		Nyomtatás…
@@ -63,7 +57,6 @@ Redo typing	QuitAlert		Újragépelés
 Ignore	NodeMonitorAlerts		Mellőzés
 Wrap lines	Menus		Sortörés
 Text encoding	Menus		Szöveg kódolása
-Unable to unlock file\n\t%s	QuitAlert		Nem tudom feloldani a fájlt:\n\t%s
 Modified	StatusView		Módosítva
 OK	LoadAlert		Rendben
 Save	QuitAlert		Mentés
@@ -84,7 +77,6 @@ Save as…	Menus		Mentés másként…
 Replace	FindandReplaceWindow		Cserél
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Ne mentse
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Mented a \"%s\" dokumentum változtatásait?
 Align	Menus		Igazítás
 Font	Menus		Betűtípus
 Select all	Menus		Összes kijelölése

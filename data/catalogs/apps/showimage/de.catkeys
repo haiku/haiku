@@ -1,7 +1,6 @@
-1	german	x-vnd.Haiku-ShowImage	1471302250
+1	german	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		Bildbetrachter
 Page setup…	Menus		Seite einrichten …
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Trotzdem schließen?
 Previous file	Menus		Vorherige Datei
 View	Menus		Ansicht
 Leave full screen	Menus		Vollbild verlassen
@@ -27,7 +26,6 @@ Last page	Menus		Letzte Seite
 Cancel	ClosePrompt		Abbrechen
 Attributes	Menus		Attribute
 High-quality zooming	Menus		Zoomen mit hoher Qualität
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Das Bild '%s' wurde verändert. Trotzdem schließen?
 Close	Menus		Schließen
 Selection mode	Menus		Auswahlmodus
 Reset rating	Menus		Bewertung zurücksetzen

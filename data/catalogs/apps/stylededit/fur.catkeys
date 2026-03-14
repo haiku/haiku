@@ -1,6 +1,5 @@
-1	friulian	x-vnd.Haiku-StyledEdit	4205187966
+1	friulian	x-vnd.Haiku-StyledEdit	3212551798
 Document statistics	Statistics		Statistichis sul document
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impussibil ripristinâ, file no cjatât: \"%s\".
 Cut	Menus		Taie
 Center	Menus		Centre
 Increase size	Menus		Aumente dimension
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		rie %d, colone %d
 Words:	Statistics		Peraulis:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Ripristine
-Error saving \"%s\":\n%s	SaveAlert		Erôr tal salvâ \"%s\":\n%s
 OK	RevertToSavedAlert		Va ben
 Unlock file	StatusView		Sbloche file
 Italic	Menus		Corsîf
@@ -35,7 +33,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Riis:
 Strikeout	Menus		Tressât
 Replace in all windows	FindandReplaceWindow		Sostituìs in ducj i barcons
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" al à modifichis che no son stadis salvadis.\nTornâ ae ultime version salvade?
 Save	SaveAlert		Salve
 Default	Open_and_SaveAsPanel		Predefinît
 Cancel	RevertToSavedAlert		Anule
@@ -44,17 +41,14 @@ Statistics…	Menus		Statistichis…
 Encoding	Open_and_SaveAsPanel		Codifiche
 Replace all	FindandReplaceWindow		Sostituìs dut
 Close	Menus		Siere
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erôr tal cjariâ \"%s\":\n\tFormât no supuartât
 Left	Menus		Çampe
 Default	Menus		Predefinît
 OK	SaveAlert		Va ben
 Color	Menus		Colôr
-Save changes to the document \"%s\"? 	QuitAlert		Salvâ lis modifichis al document \"%s\"? 
 StyledEdit	System name		StyledEdit
 Underline	Menus		Sotlinee
 Find:	FindandReplaceWindow		Cjate:
 Undo typing	QuitAlert		Disfe scriture
-Error loading \"%s\":\n\t%s	LoadAlert		Erôr tal cjariâ \"%s\":\n\t%s
 Don't save	SaveAlert		No sta salvâ
 Reload…	Menus		Torne cjarie…
 Print…	Menus		Stampe…
@@ -63,7 +57,6 @@ Redo typing	QuitAlert		Torne a meti scriture
 Ignore	NodeMonitorAlerts		Ignore
 Wrap lines	Menus		Gnove rie automatiche
 Text encoding	Menus		Codifiche test
-Unable to unlock file\n\t%s	QuitAlert		Impussibil sblocâ il file\n\t%s
 Modified	StatusView		Modificât
 OK	LoadAlert		Va ben
 Save	QuitAlert		Salve
@@ -84,7 +77,6 @@ Save as…	Menus		Salve come…
 Replace	FindandReplaceWindow		Sostituìs
 Characters:	Statistics		Caratars:
 Don't save	QuitAlert		No sta salvâ
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Chest file al è di dome-leture. Salvâ lis modifichis al document \"%s\"? 
 Align	Menus		Inlineâ
 Font	Menus		Caratar
 Select all	Menus		Selezione dut

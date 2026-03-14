@@ -1,6 +1,5 @@
-1	turkish	x-vnd.Haiku-StyledEdit	3875144589
+1	turkish	x-vnd.Haiku-StyledEdit	2882508421
 Document statistics	Statistics		Belge istatistikleri
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Geri alınamıyor, dosya bulunamadı: “%s”.
 Cut	Menus		Kes
 Center	Menus		Orta
 Increase size	Menus		Büyüt
@@ -22,7 +21,6 @@ line %d, column %d	StatusView		%d. satır, %d. sütun
 Words:	Statistics		Sözcük:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Kurtar
-Error saving \"%s\":\n%s	SaveAlert		“%s” kaydedilirken hata:\n%s
 OK	RevertToSavedAlert		Tamam
 Unlock file	StatusView		Dosya kilidini aç
 Italic	Menus		Eğik
@@ -36,7 +34,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Satır:
 Strikeout	Menus		Üzeri çizili
 Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		“%s” içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yok saymak istediğinizden emin misiniz?
 Save	SaveAlert		Kaydet
 Default	Open_and_SaveAsPanel		Saptanmış
 Cancel	RevertToSavedAlert		Vazgeç
@@ -45,17 +42,14 @@ Statistics…	Menus		İstatistikler…
 Encoding	Open_and_SaveAsPanel		Kodlama
 Replace all	FindandReplaceWindow		Tümünü değiştir
 Close	Menus		Kapat
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		“%s” yüklenirken hata:\n\tDesteklenmeyen biçim
 Left	Menus		Sol
 Default	Menus		Saptanmış
 OK	SaveAlert		Tamam
 Color	Menus		Renk
-Save changes to the document \"%s\"? 	QuitAlert		“%s” içindeki değişiklikler kaydedilsin mi?
 StyledEdit	System name		StyledEdit
 Underline	Menus		Altı çizili
 Find:	FindandReplaceWindow		Bul:
 Undo typing	QuitAlert		Yazımı geri al
-Error loading \"%s\":\n\t%s	LoadAlert		“%s” yüklenirken hata:\n\t%s
 Don't save	SaveAlert		Kaydetme
 Reload…	Menus		Yeniden yükle…
 Print…	Menus		Yazdır…
@@ -64,7 +58,6 @@ Redo typing	QuitAlert		Yazımı yinele
 Ignore	NodeMonitorAlerts		Yok say
 Wrap lines	Menus		Satırları kaydır
 Text encoding	Menus		Metin kodlaması
-Unable to unlock file\n\t%s	QuitAlert		Dosya kilidi açılamıyor\n\t%s
 Modified	StatusView		Değiştirildi
 OK	LoadAlert		Tamam
 Save	QuitAlert		Kaydet
@@ -85,7 +78,6 @@ Save as…	Menus		Farklı kaydet…
 Replace	FindandReplaceWindow		Değiştir
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Kaydetme
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Bu dosya saltokunur olarak imlenmiş. “%s” belgesindeki değişiklikler kaydedilsin mi? 
 Align	Menus		Hizalama
 Font	Menus		Yazıtipi
 Select all	Menus		Tümünü seç

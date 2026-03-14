@@ -1,7 +1,6 @@
-1	russian	x-vnd.Haiku-ShowImage	1471302250
+1	russian	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		Просмотр изображений
 Page setup…	Menus		Настройка печати…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
 Previous file	Menus		Предыдущий файл
 View	Menus		Вид
 Leave full screen	Menus		Выйти из полного экрана
@@ -27,7 +26,6 @@ Last page	Menus		Последняя страница
 Cancel	ClosePrompt		Отмена
 Attributes	Menus		Атрибуты
 High-quality zooming	Menus		Высококачественное масштабирование
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Изображение '%s' было изменено. Вы хотите закрыть его без сохранения?
 Close	Menus		Закрыть
 Selection mode	Menus		Режим выделения
 Reset rating	Menus		Сбросить рейтинг

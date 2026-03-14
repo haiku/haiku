@@ -1,6 +1,5 @@
-1	romanian	x-vnd.Haiku-StyledEdit	4205187966
+1	romanian	x-vnd.Haiku-StyledEdit	3212551798
 Document statistics	Statistics		Statisticile documentului
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, fișierul nu a fost găsit: \„%s\”.
 Cut	Menus		Taie
 Center	Menus		Centru
 Increase size	Menus		Mărește dimensiunea
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		linia %d, coloana %d
 Words:	Statistics		Cuvinte:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Recuperare
-Error saving \"%s\":\n%s	SaveAlert		Eroare la salvarea \„%s\”:\n%s
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Deblochează fișierul
 Italic	Menus		Cursiv
@@ -35,7 +33,6 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Linii:
 Strikeout	Menus		Tăiat
 Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\„%s\” are modificări nesalvate.\nReveniți la ultima versiune salvată? 
 Save	SaveAlert		Salvează
 Default	Open_and_SaveAsPanel		Implicit
 Cancel	RevertToSavedAlert		Anulează
@@ -44,17 +41,14 @@ Statistics…	Menus		Statistici…
 Encoding	Open_and_SaveAsPanel		Codare
 Replace all	FindandReplaceWindow		Înlocuiește toate
 Close	Menus		Închide
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eroare la încărcarea \„%s\”:\n\tFormat nesuportat
 Left	Menus		Stânga
 Default	Menus		Implicit
 OK	SaveAlert		OK
 Color	Menus		Culoare
-Save changes to the document \"%s\"? 	QuitAlert		Salvați modificările documentului \„%s\”? 
 StyledEdit	System name		StyledEdit
 Underline	Menus		Subliniere
 Find:	FindandReplaceWindow		Găsește:
 Undo typing	QuitAlert		Refă tastarea
-Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea \„%s\”:\n\t%s
 Don't save	SaveAlert		Nu salva
 Reload…	Menus		Reîncărcare…
 Print…	Menus		Tipărire…
@@ -63,7 +57,6 @@ Redo typing	QuitAlert		Repetă tastarea
 Ignore	NodeMonitorAlerts		Ignoră
 Wrap lines	Menus		Încadrează liniile
 Text encoding	Menus		Codare de text
-Unable to unlock file\n\t%s	QuitAlert		Nu s-a putut debloca fișierul\n\t%s
 Modified	StatusView		Modificat
 OK	LoadAlert		OK
 Save	QuitAlert		Salvează
@@ -84,7 +77,6 @@ Save as…	Menus		Salvează ca…
 Replace	FindandReplaceWindow		Înlocuiește
 Characters:	Statistics		Caractere:
 Don't save	QuitAlert		Nu salva
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat doar citire. Salvați modificările la documentul \„%s\”? 
 Align	Menus		Aliniază
 Font	Menus		Font
 Select all	Menus		Selectează toate

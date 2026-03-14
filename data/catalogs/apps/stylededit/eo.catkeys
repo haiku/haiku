@@ -1,6 +1,5 @@
-1	esperanto	x-vnd.Haiku-StyledEdit	1628634496
+1	esperanto	x-vnd.Haiku-StyledEdit	635998328
 Document statistics	Statistics		Statistiko pri dokumentoj
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ne povas malfari, dosiero forestas: \"%s\".
 Cut	Menus		Eltondi
 Center	Menus		Centre
 Increase size	Menus		Pligrandigi
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		Vico %d, kolumno %d
 Words:	Statistics		Vortojn:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Restaŭri
-Error saving \"%s\":\n%s	SaveAlert		Eraro dum konservado\"%s\":\n%s
 OK	RevertToSavedAlert		Bone
 Unlock file	StatusView		Malŝlosi dosieron
 Italic	Menus		Kursiva
@@ -34,7 +32,6 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Dosiero \"%file%\" estas forigita per alia programo, ĉu restaŭri ĝin?
 Lines:	Statistics		Vicojn:
 Replace in all windows	FindandReplaceWindow		Anstataŭigi en ĉiuj fenestroj
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" ne konservis ŝanĝojn.\nĈu restaŭri ĝin per la lasta konservita versio? 
 Save	SaveAlert		Konservi
 Default	Open_and_SaveAsPanel		Defaŭlta
 Cancel	RevertToSavedAlert		Nuligi
@@ -43,16 +40,13 @@ Statistics…	Menus		Statistiko…
 Encoding	Open_and_SaveAsPanel		Kodoprezento
 Replace all	FindandReplaceWindow		Anstataŭigi ĉiujn
 Close	Menus		Fermi
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eraro dum ŝargado de \"%s\":\n\tNesubtenata formato
 Left	Menus		Maldekstre
 Default	Menus		Defaŭlta
 OK	SaveAlert		Bone
 Color	Menus		Koloro
-Save changes to the document \"%s\"? 	QuitAlert		Ĉu konservi ŝanĝojn en dokumenton \"%s\"? 
 StyledEdit	System name		Stilredaktilo
 Find:	FindandReplaceWindow		Serĉi:
 Undo typing	QuitAlert		Malfari tajpadon
-Error loading \"%s\":\n\t%s	LoadAlert		Eraro dum ŝargado de \"%s\":\n\t%s
 Don't save	SaveAlert		Ne konservi
 Reload…	Menus		Reŝargi…
 Print…	Menus		Presi…
@@ -61,7 +55,6 @@ Redo typing	QuitAlert		Refari tajpadon
 Ignore	NodeMonitorAlerts		Ignori
 Wrap lines	Menus		Faldi lineojn
 Text encoding	Menus		Teksta kodprezento
-Unable to unlock file\n\t%s	QuitAlert		Ne povas malŝlosi dosieron\n\t%s
 Modified	StatusView		Ŝanĝita
 OK	LoadAlert		Bone
 Save	QuitAlert		Konservi
@@ -82,7 +75,6 @@ Save as…	Menus		Konservi kiel…
 Replace	FindandReplaceWindow		Anstataŭigi
 Characters:	Statistics		Signojn:
 Don't save	QuitAlert		Ne konservi
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		La dosiero estas markita kiel nurlegebla. Ĉu konservi ŝanĝojn en dokumento \"%s\"? 
 Align	Menus		Ĝisrandigi
 Font	Menus		Tiparo
 Select all	Menus		Elekti ĉion

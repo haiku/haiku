@@ -1,7 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-ShowImage	3888429101
+1	dutch; flemish	x-vnd.Haiku-ShowImage	1516714980
 ShowImage	System name		ShowImage
 Page setup…	Menus		Paginaconfiguratie...
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' (pagina %d) werd veranderd. Wilt u het document sluiten?
 Previous file	Menus		Vorige bestand
 View	Menus		Beeld
 Leave full screen	Menus		Volledig scherm verlaten
@@ -26,7 +25,6 @@ Zoom in	Menus		Inzoomen
 Last page	Menus		Laatste pagina
 Cancel	ClosePrompt		Annuleren
 High-quality zooming	Menus		Inzoomen met hoge kwaliteit
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' werd gewijzigd. Wilt u het document sluiten?
 Close	Menus		Sluiten
 Selection mode	Menus		Selectie-modus
 DPI:	PrintOptionsWindow		DPI:

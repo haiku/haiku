@@ -1,7 +1,6 @@
-1	friulian	x-vnd.Haiku-ShowImage	1471302250
+1	friulian	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		MostreImagjin
 Page setup…	Menus		Impostazions pagjine…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' (pagjine %d) al è stât modificât. Sierâ il document?
 Previous file	Menus		File precedent
 View	Menus		Visualize
 Leave full screen	Menus		Lasse mût plen visôr
@@ -27,7 +26,6 @@ Last page	Menus		Ultime pagjine
 Cancel	ClosePrompt		Anule
 Attributes	Menus		Atribûts
 High-quality zooming	Menus		Ingrandiment alte-cualitât
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' al è stât modificât. Sierâ il document?
 Close	Menus		Siere
 Selection mode	Menus		Modalitât selezion
 Reset rating	Menus		Azere valutazion

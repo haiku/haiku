@@ -1,7 +1,6 @@
-1	french	x-vnd.Haiku-ShowImage	1471302250
+1	french	x-vnd.Haiku-ShowImage	3394555425
 ShowImage	System name		Visionneuse
 Page setup…	Menus		Mise en page…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
 Previous file	Menus		Fichier précédent
 View	Menus		Vue
 Leave full screen	Menus		Sortie du plein écran
@@ -27,7 +26,6 @@ Last page	Menus		Dernière page
 Cancel	ClosePrompt		Annuler
 Attributes	Menus		Attributs
 High-quality zooming	Menus		Zoom haute qualité
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » a été modifié. Êtes-vous sûr de vouloir le fermer ?
 Close	Menus		Fermer
 Selection mode	Menus		Mode de sélection
 Reset rating	Menus		Effacer l'évaluation

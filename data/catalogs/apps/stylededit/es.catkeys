@@ -1,6 +1,5 @@
-1	spanish; castilian	x-vnd.Haiku-StyledEdit	2592510797
+1	spanish; castilian	x-vnd.Haiku-StyledEdit	1599874629
 Document statistics	Statistics		Estadísticas del documento
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No se puede revertir, archivo no encontrado: \"%s\".
 Cut	Menus		Cortar
 Center	Menus		Centro
 Increase size	Menus		Aumentar tamaño
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		Línea %d, columna %d
 Words:	Statistics		Palabras:
 ???	LoadAlert		¿¿¿???
 Recover	NodeMonitorAlerts		Recuperar
-Error saving \"%s\":\n%s	SaveAlert		Error guardando \"%s\":\n%s
 OK	RevertToSavedAlert		Aceptar
 Unlock file	StatusView		Desbloquear archivo
 Italic	Menus		Itálica
@@ -34,7 +32,6 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		El archivo \"%file%\" se removió por otra aplicación, ¿recuperarlo?
 Lines:	Statistics		Líneas:
 Replace in all windows	FindandReplaceWindow		Reemplazar en todas las ventanas
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" tiene cambios sin guardar.\n¿Revertir a la última versión guardada? 
 Save	SaveAlert		Guardar
 Default	Open_and_SaveAsPanel		Predeterminado
 Cancel	RevertToSavedAlert		Cancelar
@@ -43,17 +40,14 @@ Statistics…	Menus		Estadísticas…
 Encoding	Open_and_SaveAsPanel		Codificación
 Replace all	FindandReplaceWindow		Reemplazar todo
 Close	Menus		Cerrar
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Error cargando  \"%s\":\n\tFormato no soportado
 Left	Menus		Izquierda
 Default	Menus		Predeterminado
 OK	SaveAlert		Aceptar
 Color	Menus		Color
-Save changes to the document \"%s\"? 	QuitAlert		¿Desea guardar los cambios realizados sobre el documento \"%s\"?
 StyledEdit	System name		Edición con Estilo
 Underline	Menus		Subrayado
 Find:	FindandReplaceWindow		Encontrar:
 Undo typing	QuitAlert		Deshacer lo escrito
-Error loading \"%s\":\n\t%s	LoadAlert		Error cargando \"%s\":\n\t%s
 Don't save	SaveAlert		No guardar
 Reload…	Menus		Recargar…
 Print…	Menus		Imprimir…
@@ -62,7 +56,6 @@ Redo typing	QuitAlert		rehacer lo escrito
 Ignore	NodeMonitorAlerts		Ignorar
 Wrap lines	Menus		Ajustar líneas
 Text encoding	Menus		Codificación de texto
-Unable to unlock file\n\t%s	QuitAlert		No se pudo desbloquear el archivo:\n\t%s
 Modified	StatusView		Modificado
 OK	LoadAlert		Aceptar
 Save	QuitAlert		Guardar
@@ -83,7 +76,6 @@ Save as…	Menus		Guardar como…
 Replace	FindandReplaceWindow		Reemplazar
 Characters:	Statistics		Carácteres:
 Don't save	QuitAlert		No guardar
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este archivo está marcado como solo lectura. ¿Guardar cambios al documento \"%s\"? 
 Align	Menus		Alinear
 Font	Menus		Tipografía
 Select all	Menus		Seleccionar todo

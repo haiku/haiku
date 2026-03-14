@@ -1,7 +1,6 @@
-1	lithuanian	x-vnd.Haiku-ShowImage	3888429101
+1	lithuanian	x-vnd.Haiku-ShowImage	1516714980
 ShowImage	System name		Paveikslų žiūryklė
 Page setup…	Menus		Puslapio nuostatos…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (%d puslapis) pakeistas. Ar norite dokumentą užverti?
 Previous file	Menus		Ankstesnis puslapis
 View	Menus		Rodymas
 Leave full screen	Menus		Normalioji veiksena
@@ -26,7 +25,6 @@ Zoom in	Menus		Didinti
 Last page	Menus		Paskutinis puslapis
 Cancel	ClosePrompt		Atsisakyti
 High-quality zooming	Menus		Aukštos kokybės didinimas
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ pakeistas. Ar norite jį užverti?
 Close	Menus		Užverti
 Selection mode	Menus		Žymėjimo veiksena
 DPI:	PrintOptionsWindow		Raiška (taškais colyje):

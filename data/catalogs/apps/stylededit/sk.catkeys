@@ -1,6 +1,5 @@
-1	slovak	x-vnd.Haiku-StyledEdit	3854757778
+1	slovak	x-vnd.Haiku-StyledEdit	2862121610
 Document statistics	Statistics		Štatistika dokumentu
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie je možné vrátiť späť, súbor nebol nájdený: „%s“.
 Cut	Menus		Vystrihnúť
 Center	Menus		Stred
 Page setup…	Menus		Nastavenie stránky…
@@ -20,7 +19,6 @@ line %d, column %d	StatusView		riadok %d, stĺpec %d
 Words:	Statistics		Slov:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Obnoviť
-Error saving \"%s\":\n%s	SaveAlert		Chyba pri ukladaní „%s“:\n%s
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Odomknúť súbor
 Italic	Menus		Kurzíva
@@ -33,7 +31,6 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Súbor „%file%“ odstránila iná aplikácia. Chcete ho obnoviť?
 Lines:	Statistics		Riadkov:
 Replace in all windows	FindandReplaceWindow		Nahradiť vo všetkých oknách
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		„%s“ má neuložené zmeny.\nChcete vrátiť späť jeho poslednú uloženú verziu? 
 Save	SaveAlert		Uložiť
 Default	Open_and_SaveAsPanel		Predvolené
 Cancel	RevertToSavedAlert		Zrušiť
@@ -42,16 +39,13 @@ Statistics…	Menus		Štatistika…
 Encoding	Open_and_SaveAsPanel		Kódovanie
 Replace all	FindandReplaceWindow		Nahradiť všetky
 Close	Menus		Zatvoriť
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Chyba pri načítaní „%s“:\n\tNepodporovaný formát
 Left	Menus		Vľavo
 Default	Menus		Predvolené
 OK	SaveAlert		OK
 Color	Menus		Farba
-Save changes to the document \"%s\"? 	QuitAlert		Uložiť zmeny v dokumente „%s“? 
 StyledEdit	System name		StyledEdit
 Find:	FindandReplaceWindow		Nájsť:
 Undo typing	QuitAlert		Vrátiť späť písanie
-Error loading \"%s\":\n\t%s	LoadAlert		Chyba pri načítaní „%s“:\n\t%s
 Don't save	SaveAlert		Neukladať
 Reload…	Menus		Znovu načítať...
 Print…	Menus		Tlačiť…
@@ -60,7 +54,6 @@ Redo typing	QuitAlert		Opakovať písanie
 Ignore	NodeMonitorAlerts		Ignorovať
 Wrap lines	Menus		Zalamovať riadky
 Text encoding	Menus		Kódovanie textu
-Unable to unlock file\n\t%s	QuitAlert		Nebolo možné odomknúť súbor\n\t%s
 Modified	StatusView		Zmenený
 OK	LoadAlert		OK
 Save	QuitAlert		Uložiť
@@ -80,7 +73,6 @@ Save as…	Menus		Uložiť ako…
 Replace	FindandReplaceWindow		Nahradiť
 Characters:	Statistics		Znakov:
 Don't save	QuitAlert		Neukladať
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tento súbor je označený iba na čítanie. Uložiť zmeny v dokumente „%s“? 
 Align	Menus		Zarovnať
 Font	Menus		Písmo
 Select all	Menus		Vybrať všetky

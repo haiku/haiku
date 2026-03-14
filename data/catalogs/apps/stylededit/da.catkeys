@@ -1,6 +1,5 @@
-1	danish	x-vnd.Haiku-StyledEdit	2592510797
+1	danish	x-vnd.Haiku-StyledEdit	1599874629
 Document statistics	Statistics		Dokumentstatistik
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbageføre, fil ikke fundet: \"%s\".
 Cut	Menus		Klip
 Center	Menus		Anbring i midten
 Increase size	Menus		Forøg størrelse
@@ -21,7 +20,6 @@ line %d, column %d	StatusView		linje %d, kolonne %d
 Words:	Statistics		Ord:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Gendan
-Error saving \"%s\":\n%s	SaveAlert		Fejl ved gemning \"%s\":\n%s
 OK	RevertToSavedAlert		O.k.
 Unlock file	StatusView		Lås fil op
 Italic	Menus		Kursiv
@@ -34,7 +32,6 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Filen \"%file%\" blev fjernet af et andet program, gendan den?
 Lines:	Statistics		Linjer:
 Replace in all windows	FindandReplaceWindow		Erstat i alle vinduer
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" har ugemte ændringer.\nTilbagefør den til sidste gemte version? 
 Save	SaveAlert		Gem
 Default	Open_and_SaveAsPanel		Forvalg
 Cancel	RevertToSavedAlert		Afbryd
@@ -43,17 +40,14 @@ Statistics…	Menus		Statistikker…
 Encoding	Open_and_SaveAsPanel		Kodning
 Replace all	FindandReplaceWindow		Erstat alle
 Close	Menus		Luk
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fejl ved indlæsning \"%s\":\n\tFormatet understøttes ikke
 Left	Menus		Venstre
 Default	Menus		Forvalgt
 OK	SaveAlert		O.k.
 Color	Menus		Farve
-Save changes to the document \"%s\"? 	QuitAlert		Gem ændringer til dokumentet \"%s\"? 
 StyledEdit	System name		StyledEdit
 Underline	Menus		Understreget
 Find:	FindandReplaceWindow		Søg:
 Undo typing	QuitAlert		Fortryd indtastning
-Error loading \"%s\":\n\t%s	LoadAlert		Fejl ved indlæsning af \"%s\":\n\t%s
 Don't save	SaveAlert		Gem ikke
 Reload…	Menus		Genindlæs…
 Print…	Menus		Udskriv…
@@ -62,7 +56,6 @@ Redo typing	QuitAlert		Omgør indtastning
 Ignore	NodeMonitorAlerts		Ignorér
 Wrap lines	Menus		Tekstombrydning
 Text encoding	Menus		Tekstkodning
-Unable to unlock file\n\t%s	QuitAlert		Kan ikke låse filen op\n\t%s
 Modified	StatusView		Ændret
 OK	LoadAlert		O.k.
 Save	QuitAlert		Gem
@@ -83,7 +76,6 @@ Save as…	Menus		Gem som…
 Replace	FindandReplaceWindow		Erstat
 Characters:	Statistics		Tegn:
 Don't save	QuitAlert		Gem ikke
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Filen er markeret som skrivebeskyttet. Gem ændringer til dokumentet \"%s\"? 
 Align	Menus		Justér
 Font	Menus		Skrifttype
 Select all	Menus		Vælg alt

@@ -1,7 +1,6 @@
-1	portuguese	x-vnd.Haiku-ShowImage	3888429101
+1	portuguese	x-vnd.Haiku-ShowImage	1516714980
 ShowImage	System name		ShowImage
 Page setup…	Menus		Configuração de página…
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
 Previous file	Menus		Ficheiro anterior
 View	Menus		Ver
 Leave full screen	Menus		Sair do ecrã completo
@@ -26,7 +25,6 @@ Zoom in	Menus		Aumentar zoom
 Last page	Menus		Última página
 Cancel	ClosePrompt		Cancelar
 High-quality zooming	Menus		Zoom de alta qualidade
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Você deseja fechar o documento?
 Close	Menus		Fechar
 Selection mode	Menus		Modo de seleção
 DPI:	PrintOptionsWindow		DPI:
