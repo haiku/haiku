@@ -292,16 +292,48 @@ struct hci_ev_extended_inquiry_info {
 #define HCI_EVENT_ENCRYPTION_KEY_REFRESH_COMPLETE	0x30
 
 #define HCI_EVENT_IO_CAPABILITY_REQUEST				0x31
+struct hci_ev_io_capability_request {
+    bdaddr_t    bdaddr;
+} __attribute__((packed));
 
 #define HCI_EVENT_IO_CAPABILITY_RESPONSE			0x32
+struct hci_ev_io_capability_response {
+    bdaddr_t    bdaddr;
+    uint8       capability;
+    uint8       oob_data;
+    uint8       authentication;
+} __attribute__((packed));
 
-#define HCI_EVENT_USER_CONFIRMATION_REQUEST			0x33
+#define HCI_IO_CAP_DISPLAY_ONLY 0x00
+#define HCI_IO_CAP_DISPLAY_YES_NO 0x01
+#define HCI_IO_CAP_KEYBOARD_ONLY 0x02
+#define HCI_IO_CAP_NO_INPUT_NO_OUTPUT 0x03
+
+#define HCI_OOB_DATA_NOT_PRESENT 0x00
+#define HCI_OOB_DATA_PRESENT 0x01
+
+#define HCI_AUTH_REQ_NO_MITM_NO_BOND 0x00
+#define HCI_AUTH_REQ_MITM_NO_BOND 0x01
+#define HCI_AUTH_REQ_NO_MITM_DEDICATED_BOND 0x02
+#define HCI_AUTH_REQ_MITM_DEDICATED_BOND 0x03
+#define HCI_AUTH_REQ_NO_MITM_GENERAL_BOND 0x04
+#define HCI_AUTH_REQ_MITM_GENERAL_BOND 0x05
+
+#define HCI_EVENT_USER_CONFIRMATION_REQUEST 0x33
+struct hci_ev_user_confirmation_request {
+    bdaddr_t    bdaddr;
+    uint32      passkey;
+} __attribute__((packed));
 
 #define HCI_EVENT_USER_PASSKEY_REQUEST				0x34
 
 #define HCI_EVENT_OOB_DATA_REQUEST					0x35
 
 #define HCI_EVENT_SIMPLE_PAIRING_COMPLETE			0x36
+struct hci_ev_simple_pairing_complete {
+    uint8       status;
+    bdaddr_t    bdaddr;
+} __attribute__((packed));
 
 #define HCI_EVENT_LINK_SUPERVISION_TIMEOUT_CHANGED	0x38
 

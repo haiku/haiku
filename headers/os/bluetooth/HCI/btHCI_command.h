@@ -184,7 +184,25 @@ struct hci_command_header {
 		uint16		voice_setting;
 	} __attribute__ ((packed));
 
-	#define OCF_HOST_BUFFER_SIZE		0x0033
+#define OCF_IO_CAPABILITY_REQUEST_REPLY 0x002B
+	struct hci_cp_io_capability_request_reply {
+		bdaddr_t    bdaddr;
+		uint8       capability;
+		uint8       oob_data;
+		uint8       authentication;
+	} __attribute__((packed));
+
+#define OCF_USER_CONFIRM_REPLY 0x002C
+	struct hci_cp_user_confirm_reply {
+		bdaddr_t    bdaddr;
+	} __attribute__((packed));
+
+#define OCF_USER_CONFIRM_NEG_REPLY 0x002D
+	struct hci_cp_user_confirm_neg_reply {
+		bdaddr_t    bdaddr;
+	} __attribute__((packed));
+
+#define OCF_HOST_BUFFER_SIZE 0x0033
 	struct hci_cp_host_buffer_size {
 		uint16		acl_mtu;
 		uint8		sco_mtu;

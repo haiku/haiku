@@ -181,32 +181,8 @@ RemoteDevice::Authenticate()
 	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL,
 		OCF_CREATE_CONN));
 
-	// if authentication needed, we will send any of these commands
-	// to accept or deny the LINK KEY [a]
-	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL,
-		OCF_LINK_KEY_REPLY));
-
-	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL,
-		OCF_LINK_KEY_NEG_REPLY));
-
-	// in negative case, a pincode will be replied [b]
-	// this request will be handled by sepatated by the pincode window
-	// request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	// request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL,
-	//	OCF_PIN_CODE_REPLY));
-
-	// [a] this is expected of authentication required
 	request.AddInt16("eventExpected", HCI_EVENT_LINK_KEY_REQ);
-	// [b] If we deny the key an authentication will be requested
-	// but this request will be handled by sepatated by the pincode
-	// window
-	// request.AddInt16("eventExpected", HCI_EVENT_PIN_CODE_REQ);
-
-	// this almost involves already the happy end
-	request.AddInt16("eventExpected",  HCI_EVENT_LINK_KEY_NOTIFY);
-
+	request.AddInt16("eventExpected", HCI_EVENT_ROLE_CHANGE);
 	request.AddInt16("eventExpected", HCI_EVENT_CONN_COMPLETE);
 
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)

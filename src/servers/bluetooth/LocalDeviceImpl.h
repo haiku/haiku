@@ -76,6 +76,14 @@ private:
 
 	void HardwareError(struct hci_ev_hardware_error* event);
 
+	// Simple Secure Pairing
+	void IOCapabilityRequest(struct hci_ev_io_capability_request* event,
+		BMessage* request);
+	void IOCapabilityResponse(struct hci_ev_io_capability_response* event,
+		BMessage* request);
+	void UserConfirmationRequest(struct hci_ev_user_confirmation_request* event, BMessage* request);
+	void SimplePairingComplete(struct hci_ev_simple_pairing_complete* event,
+		BMessage* request);
 };
 
 #endif

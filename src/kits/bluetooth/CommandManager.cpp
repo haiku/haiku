@@ -261,6 +261,44 @@ buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize)
 }
 
 
+void*
+buildIOCapabilityRequestReply(bdaddr_t bdaddr, uint8 capability, uint8 oob_data,
+	uint8 authentication, size_t* outsize)
+{
+	CALLED();
+	struct hci_cp_io_capability_request_reply* param;
+
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_IO_CAPABILITY_REQUEST_REPLY, (void**)&param,
+		sizeof(struct hci_cp_io_capability_request_reply), outsize);
+
+	if (command != NULL) {
+		param->bdaddr = bdaddr;
+
+		param->capability = capability;
+		param->oob_data = oob_data;
+		param->authentication = authentication;
+	}
+
+	return command;
+}
+
+
+void*
+buildUserConfirmReply(bdaddr_t bdaddr, size_t* outsize)
+{
+	CALLED();
+	struct hci_cp_user_confirm_reply* param;
+
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_USER_CONFIRM_REPLY, (void**)&param,
+		sizeof(struct hci_cp_user_confirm_reply), outsize);
+
+	if (command != NULL)
+		param->bdaddr = bdaddr;
+
+	return command;
+}
+
+
 #if 0
 #pragma mark - INFORMATIONAL_PARAM -
 #endif
