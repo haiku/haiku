@@ -25,13 +25,13 @@ ICBase::ICBase(device_node* node, uint32 packetLength, uint16 messageType,
 	fNode(node),
 	fFrameworkVersion(0),
 	fMessageVersion(0),
+	fHyperV(NULL),
+	fHyperVCookie(NULL),
 	fPacket(NULL),
 	fPacketLength(packetLength),
 	fMessageType(messageType),
 	fMessageVersions(messageVersions),
-	fMessageVersionCount(messageVersionCount),
-	fHyperV(NULL),
-	fHyperVCookie(NULL)
+	fMessageVersionCount(messageVersionCount)
 {
 	CALLED();
 

@@ -39,6 +39,9 @@ protected:
 			uint32				fFrameworkVersion;
 			uint32				fMessageVersion;
 
+			hyperv_device_interface*	fHyperV;
+			hyperv_device				fHyperVCookie;
+
 private:
 			status_t			_NegotiateProtocol(hv_ic_msg_negotiate* message);
 	static	void				_CallbackHandler(void* arg);
@@ -50,9 +53,6 @@ private:
 			uint16				fMessageType;
 			const uint32*		fMessageVersions;
 			uint32				fMessageVersionCount;
-
-			hyperv_device_interface*	fHyperV;
-			hyperv_device				fHyperVCookie;
 };
 
 

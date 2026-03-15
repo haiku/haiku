@@ -13,6 +13,7 @@
 extern device_manager_info* gDeviceManager;
 
 extern driver_module_info gHyperVHeartbeatDriverModule;
+extern driver_module_info gHyperVTimeSyncDriverModule;
 
 
 #endif // _HYPERV_IC_DRIVER_H_

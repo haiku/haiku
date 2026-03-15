@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel drivers hyperv hyperv_ic timesync ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers hyperv ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+KernelStaticLibrary hyperv_ic_timesync :
+	TimeSync.cpp
+	TimeSyncModule.cpp
+	;

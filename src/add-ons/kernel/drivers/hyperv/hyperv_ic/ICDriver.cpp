@@ -18,5 +18,6 @@ module_dependency module_dependencies[] = {
 
 module_info* modules[] = {
 	(module_info*)&gHyperVHeartbeatDriverModule,
+	(module_info*)&gHyperVTimeSyncDriverModule,
 	NULL
 };

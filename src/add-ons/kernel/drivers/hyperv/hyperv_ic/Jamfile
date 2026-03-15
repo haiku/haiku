@@ -9,6 +9,8 @@ KernelAddon hyperv_ic :
 
 	:
 	hyperv_ic_heartbeat.a
+	hyperv_ic_timesync.a
 	;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers hyperv hyperv_ic heartbeat ;
+SubInclude HAIKU_TOP src add-ons kernel drivers hyperv hyperv_ic timesync ;
