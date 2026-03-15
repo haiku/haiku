@@ -53,6 +53,7 @@ AddFilesToPackage add-ons kernel busses random :
 	;
 AddFilesToPackage add-ons kernel busses scsi :
 	ahci
+	hyperv_scsi@x86,x86_64
 	virtio_scsi
 	;
 AddFilesToPackage add-ons kernel busses usb :
@@ -326,6 +327,7 @@ AddBootModuleSymlinksToPackage
 	efi_gpt
 	generic_ide_pci
 	hyperv@x86,x86_64
+	hyperv_scsi@x86,x86_64
 	ide_isa@x86
 	isa@x86,x86_64
 	intel

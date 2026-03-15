@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel busses scsi hyperv ;
+
+UsePrivateHeaders drivers hyperv ;
+UsePrivateKernelHeaders ;
+
+KernelAddon hyperv_scsi :
+	HyperVSCSI.cpp
+	HyperVSCSIModule.cpp
+	HyperVSCSIRequest.cpp
+;
