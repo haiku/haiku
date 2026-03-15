@@ -299,6 +299,22 @@ buildUserConfirmReply(bdaddr_t bdaddr, size_t* outsize)
 }
 
 
+void*
+buildAuthenticationRequested(uint16 handle, size_t* outsize)
+{
+	CALLED();
+	struct hci_cp_auth_requested* param;
+
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_AUTH_REQUESTED, (void**)&param,
+		sizeof(struct hci_cp_auth_requested), outsize);
+
+	if (command != NULL)
+		param->handle = handle;
+
+	return command;
+}
+
+
 #if 0
 #pragma mark - INFORMATIONAL_PARAM -
 #endif

@@ -123,6 +123,7 @@ void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize);
 void* buildIOCapabilityRequestReply(bdaddr_t bdaddr, uint8 capability, uint8 oob_data,
 	uint8 authentication, size_t* outsize);
 void* buildUserConfirmReply(bdaddr_t bdaddr, size_t* outsize);
+void* buildAuthenticationRequested(uint16 handle, size_t* outsize);
 
 /* OGF_INFORMATIONAL_PARAM */
 void* buildReadLocalVersionInformation(size_t* outsize);

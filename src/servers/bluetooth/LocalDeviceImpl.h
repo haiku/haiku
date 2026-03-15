@@ -84,6 +84,7 @@ private:
 	void UserConfirmationRequest(struct hci_ev_user_confirmation_request* event, BMessage* request);
 	void SimplePairingComplete(struct hci_ev_simple_pairing_complete* event,
 		BMessage* request);
+	void AuthComplete(struct hci_ev_auth_complete* eventData, BMessage* request);
 };
 
 #endif

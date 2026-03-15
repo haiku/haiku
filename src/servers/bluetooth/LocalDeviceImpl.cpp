@@ -166,7 +166,7 @@ LocalDeviceImpl::HandleExpectedRequest(struct hci_event_header* event,
 			break;
 
 		case HCI_EVENT_AUTH_COMPLETE:
-
+			AuthComplete(JumpEventHeader<struct hci_ev_auth_complete>(event), request);
 			break;
 
 		case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE:
@@ -821,6 +821,12 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 			ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, opcodeExpected);
 		} break;
 
+		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_AUTH_REQUESTED):
+		{
+			TRACE_BT("LocalDeviceImpl: Command Status for auth requested %x\n", event->status);
+			ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, opcodeExpected);
+		} break;
+
 		default:
 			TRACE_BT("LocalDeviceImpl: Command Status not handled\n");
 		break;
@@ -1375,6 +1381,34 @@ LocalDeviceImpl::SimplePairingComplete(struct hci_ev_simple_pairing_complete* ev
 	if (request != NULL)
 		ClearWantedEvent(request);
 }
+
+
+void
+LocalDeviceImpl::AuthComplete(struct hci_ev_auth_complete* eventData, BMessage* request)
+{
+	int16 handle = B_LENDIAN_TO_HOST_INT16(eventData->handle);
+	int8 status = eventData->status;
+
+	if (status == BT_OK) {
+		TRACE_BT("LocalDeviceImpl: Authentication Successful for handle %d\n", handle);
+	} else {
+		TRACE_BT("LocalDeviceImpl: Authentication Failed for handle %d with status 0x%02x\n",
+			handle, status);
+	}
+
+	if (request != NULL) {
+		BMessage reply;
+		reply.AddInt8("status", status);
+		reply.AddInt16("handle", handle);
+
+		request->SendReply(&reply);
+
+		ClearWantedEvent(request);
+	} else {
+		TRACE_BT("LocalDeviceImpl: Auth Complete received but no local request was waiting.\n");
+	}
+}
+
 
 #if 0
 #pragma mark - Request Methods -

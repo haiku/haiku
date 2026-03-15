@@ -188,10 +188,34 @@ RemoteDevice::Authenticate()
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)
 		reply.FindInt8("status", &btStatus);
 
-	if (btStatus == BT_OK) {
-		reply.FindInt16("handle", (int16*)&fHandle);
+	if (btStatus != BT_OK)
+		return false;
+
+	reply.FindInt16("handle", (int16*)&fHandle);
+
+	BluetoothCommand<typed_command(hci_cp_auth_requested)> authRequest(OGF_LINK_CONTROL,
+		OCF_AUTH_REQUESTED);
+
+	authRequest->handle = fHandle;
+
+	BMessage authRequestMsg(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage authReply;
+
+	authRequestMsg.AddInt32("hci_id", fDiscovererLocalDevice->ID());
+	authRequestMsg.AddData("raw command", B_ANY_TYPE, authRequest.Data(), authRequest.Size());
+
+	authRequestMsg.AddInt16("eventExpected", HCI_EVENT_CMD_STATUS);
+	authRequestMsg.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_AUTH_REQUESTED));
+
+	authRequestMsg.AddInt16("eventExpected", HCI_EVENT_AUTH_COMPLETE);
+
+	int8 authStatus = BT_ERROR;
+	if (fMessenger->SendMessage(&authRequestMsg, &authReply) == B_OK)
+		authReply.FindInt8("status", &authStatus);
+
+	if (authStatus == BT_OK)
 		return true;
-	} else
+	else
 		return false;
 }
 
