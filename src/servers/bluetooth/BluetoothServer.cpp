@@ -233,21 +233,12 @@ void BluetoothServer::MessageReceived(BMessage* message)
 LocalDeviceImpl*
 BluetoothServer::LocateDelegateFromMessage(BMessage* message)
 {
-	LocalDeviceImpl* lDeviceImpl = NULL;
 	hci_id hid;
 
-	if (message->FindInt32("hci_id", &hid) == B_OK) {
-		// Try to find out when a ID was specified
-		int index;
-		for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
-			lDeviceImpl = fLocalDevicesList.ItemAt(index);
-			if (lDeviceImpl->GetID() == hid)
-				break;
-		}
-	}
+	if (message->FindInt32("hci_id", &hid) != B_OK)
+		return NULL;
 
-	return lDeviceImpl;
-
+	return LocateLocalDeviceImpl(hid);
 }
 
 
