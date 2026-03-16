@@ -495,8 +495,16 @@ ECMDevice::_ReadMACAddress(usb_device device, uint8 *buffer)
 	size_t actualLength = 0;
 	size_t macStringLength = 26;
 	uint8 macString[macStringLength];
+	uint8 langid[4];
+
 	status_t result = gUSBModule->get_descriptor(device, USB_DESCRIPTOR_STRING,
-		fMACAddressIndex, 0, macString, macStringLength, &actualLength);
+		0, 0, langid, sizeof(langid), &actualLength);
+	if (result != B_OK)
+		return result;
+
+	result = gUSBModule->get_descriptor(device, USB_DESCRIPTOR_STRING,
+		fMACAddressIndex, ((langid[3] << 8) | langid[2]),
+		macString, macStringLength, &actualLength);
 	if (result != B_OK)
 		return result;
 
