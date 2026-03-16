@@ -25,6 +25,10 @@ FUNCTION(arch_enter_kernel):
 	mov		x4,x1
 	mov		x1,#0	// currentCPU=0
 
+	// clear frame pointer to ensure the kernel doesn't
+	// try to continue a stacktrace back out here
+	mov		fp,#0
+
 	// call the kernel
 	br		x4
 
