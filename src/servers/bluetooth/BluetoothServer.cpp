@@ -459,7 +459,7 @@ BluetoothServer::SDPServerThread(void* data)
 
 	TRACE_BT("SDP: SDP server thread up...\n");
 
-	socketServer = socket(PF_BLUETOOTH, SOCK_STREAM, BLUETOOTH_PROTO_L2CAP);
+	socketServer = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BLUETOOTH_PROTO_L2CAP);
 
 	if (socketServer < 0) {
 		TRACE_BT("SDP: Could not create server socket ...\n");

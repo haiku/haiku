@@ -341,7 +341,7 @@ l2cap_std_ops(int32 op, ...)
 			new(&gL2capEndpointManager) L2capEndpointManager;
 
 			error = gStackModule->register_domain_protocols(AF_BLUETOOTH,
-				SOCK_STREAM, BLUETOOTH_PROTO_L2CAP,
+				SOCK_SEQPACKET, BLUETOOTH_PROTO_L2CAP,
 				NET_BLUETOOTH_L2CAP_NAME, NULL);
 			if (error != B_OK)
 				return error;
