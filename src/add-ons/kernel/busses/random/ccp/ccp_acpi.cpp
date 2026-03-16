@@ -10,7 +10,6 @@
 
 #include <ACPI.h>
 #include <ByteOrder.h>
-#include <condition_variable.h>
 
 extern "C" {
 #	include "acpi.h"
