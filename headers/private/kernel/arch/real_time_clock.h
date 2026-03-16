@@ -20,9 +20,9 @@ extern "C" {
 
 status_t arch_rtc_init(struct kernel_args *args, struct real_time_data *data);
 
-void arch_rtc_set_hw_time(uint32 seconds);
+void arch_rtc_set_hw_time(uint64 seconds);
 	// Set HW clock to 'seconds' since 1/1/1970
-uint32 arch_rtc_get_hw_time(void);
+uint64 arch_rtc_get_hw_time(void);
 	// Returns number of seconds since 1/1/1970 as stored in HW
 
 void arch_rtc_set_system_time_offset(struct real_time_data *data,

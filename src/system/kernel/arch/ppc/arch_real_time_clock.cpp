@@ -41,7 +41,7 @@ arch_rtc_init(kernel_args *args, struct real_time_data *data)
 }
 
 
-uint32
+uint64
 arch_rtc_get_hw_time(void)
 {
 	return PPCPlatform::Default()->GetHardwareRTC();
@@ -49,7 +49,7 @@ arch_rtc_get_hw_time(void)
 
 
 void
-arch_rtc_set_hw_time(uint32 seconds)
+arch_rtc_set_hw_time(uint64 seconds)
 {
 	PPCPlatform::Default()->SetHardwareRTC(seconds);
 }

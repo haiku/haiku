@@ -58,7 +58,7 @@ public:
 	virtual char SerialDebugGetChar();
 	virtual void SerialDebugPutChar(char c);
 
-	virtual	void SetHardwareRTC(uint32 seconds);
+	virtual	void SetHardwareRTC(uint64 seconds);
 	virtual	uint32 GetHardwareRTC();
 
 	virtual	void ShutDown(bool reboot);
@@ -183,7 +183,7 @@ SparcOpenFirmware::SerialDebugPutChar(char c)
 
 // SetHardwareRTC
 void
-SparcOpenFirmware::SetHardwareRTC(uint32 seconds)
+SparcOpenFirmware::SetHardwareRTC(uint64 seconds)
 {
 	struct tm t;
 	rtc_secs_to_tm(seconds, &t);

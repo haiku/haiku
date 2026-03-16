@@ -154,7 +154,7 @@ cmos_to_secs(const cmos_time *cmos)
 
 
 static void
-secs_to_cmos(uint32 seconds, cmos_time *cmos)
+secs_to_cmos(uint64 seconds, cmos_time *cmos)
 {
 	int wholeYear;
 
@@ -185,7 +185,7 @@ arch_rtc_init(struct kernel_args *args, struct real_time_data *data)
 }
 
 
-uint32
+uint64
 arch_rtc_get_hw_time(void)
 {
 	int waitTime;
@@ -209,7 +209,7 @@ arch_rtc_get_hw_time(void)
 
 
 void
-arch_rtc_set_hw_time(uint32 seconds)
+arch_rtc_set_hw_time(uint64 seconds)
 {
 	cmos_time cmos;
 

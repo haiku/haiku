@@ -25,15 +25,15 @@ arch_rtc_init(kernel_args *args, struct real_time_data *data)
 }
 
 
-uint32
+uint64
 arch_rtc_get_hw_time(void)
 {
-	return (uint32)(HtifCmd(2, 0, 0) / 1000000);
+	return (HtifCmd(2, 0, 0) / 1000000);
 }
 
 
 void
-arch_rtc_set_hw_time(uint32 seconds)
+arch_rtc_set_hw_time(uint64 seconds)
 {
 }
 

@@ -30,8 +30,8 @@ bigtime_t rtc_boot_time(void);
 
 // Both functions use the passed struct tm only partially
 // (no tm_wday, tm_yday, tm_isdst).
-uint32 rtc_tm_to_secs(const struct tm *t);
-void rtc_secs_to_tm(uint32 seconds, struct tm *t);
+uint64 rtc_tm_to_secs(const struct tm *t);
+void rtc_secs_to_tm(uint64 seconds, struct tm *t);
 
 uint32 get_timezone_offset(void);
 

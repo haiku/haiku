@@ -155,7 +155,7 @@ public:
 
 	virtual	uint8 ReadRTCReg(uint8 reg);
 	virtual	void WriteRTCReg(uint8 reg, uint8 val);
-	virtual	void SetHardwareRTC(uint32 seconds);
+	virtual	void SetHardwareRTC(uint64 seconds);
 	virtual	uint32 GetHardwareRTC();
 
 	virtual void SetHardwareTimer(bigtime_t timeout);
@@ -617,7 +617,7 @@ M68KAtari::WriteRTCReg(uint8 reg, uint8 val)
 }
 
 void
-M68KAtari::SetHardwareRTC(uint32 seconds)
+M68KAtari::SetHardwareRTC(uint64 seconds)
 {
 #warning M68K: WRITEME
 }

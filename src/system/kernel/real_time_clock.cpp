@@ -53,7 +53,7 @@ real_time_clock_changed()
 static void
 rtc_system_to_hw(void)
 {
-	uint32 seconds;
+	uint64 seconds;
 
 	seconds = (arch_rtc_get_system_time_offset(sRealTimeData) + system_time()
 		+ (sIsGMT ? 0 : sTimezoneOffset)) / 1000000;
@@ -66,7 +66,7 @@ rtc_system_to_hw(void)
 static void
 rtc_hw_to_system(void)
 {
-	uint32 current_time;
+	uint64 current_time;
 
 	current_time = arch_rtc_get_hw_time();
 	set_real_time_clock(current_time + (sIsGMT ? 0 : sTimezoneOffset));
@@ -175,7 +175,7 @@ get_timezone_offset(void)
 /*!	Converts the \a tm data to seconds. Note that the base year is not
 	1900 as in POSIX, but 1970.
 */
-uint32
+uint64
 rtc_tm_to_secs(const struct tm *tm)
 {
 	uint32 days;
@@ -191,13 +191,13 @@ rtc_tm_to_secs(const struct tm *tm)
 		+ 367 * (month - 2 - 12 * ((month - 14) / 12)) / 12
 		- 3 * ((year + 4900 + (month - 14) / 12) / 100) / 4;
 
-	return days * RTC_SECONDS_DAY + tm->tm_hour * 3600 + tm->tm_min * 60
+	return (uint64)days * RTC_SECONDS_DAY + tm->tm_hour * 3600 + tm->tm_min * 60
 		+ tm->tm_sec;
 }
 
 
 void
-rtc_secs_to_tm(uint32 seconds, struct tm *t)
+rtc_secs_to_tm(uint64 seconds, struct tm *t)
 {
 	uint32 year, month, day, l, n;
 
