@@ -1,6 +1,9 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1982, 1986, 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *	The Regents of the University of California.
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -99,6 +102,16 @@ m_align(struct mbuf *m, int len)
 	(M_WRITABLE(m) ? ((m)->m_data - M_START(m)) : 0)
 
 /*
+ * So M_TRAILINGROOM() is for when you want to know how much space
+ * would be there if it was writable. This can be used to
+ * detect changes in mbufs by knowing the value at one point
+ * and then being able to compare it later to the current M_TRAILINGROOM().
+ * The TRAILINGSPACE() macro is not suitable for this since an mbuf
+ * at one point might not be writable and then later it becomes writable
+ * even though the space at the back of it has not changed.
+ */
+#define M_TRAILINGROOM(m) ((M_START(m) + M_SIZE(m)) - ((m)->m_data + (m)->m_len))
+/*
  * Compute the amount of space available after the end of data in an mbuf.
  *
  * The M_WRITABLE() is a temporary, conservative safety measure: the burden
@@ -108,15 +121,12 @@ m_align(struct mbuf *m, int len)
  * for mbufs with external storage.  We now allow mbuf-embedded data to be
  * read-only as well.
  */
-#define	M_TRAILINGSPACE(m)						\
-	(M_WRITABLE(m) ?						\
-		((M_START(m) + M_SIZE(m)) - ((m)->m_data + (m)->m_len)) : 0)
+#define	M_TRAILINGSPACE(m) (M_WRITABLE(m) ? M_TRAILINGROOM(m) : 0)
 
 /*
- * Arrange to prepend space of size plen to mbuf m.
- * If a new mbuf must be allocated, how specifies whether to wait.
- * If the allocation fails, the original mbuf chain is freed and m is
- * set to NULL.
+ * Arrange to prepend space of size plen to mbuf m.  If a new mbuf must be
+ * allocated, how specifies whether to wait.  If the allocation fails, the
+ * original mbuf chain is freed and m is set to NULL.
  */
 #define	M_PREPEND(m, plen, how) do {					\
 	struct mbuf **_mmp = &(m);					\
@@ -212,16 +222,6 @@ m_cljset(struct mbuf *m, void *cl, int type)
 	m->m_flags |= M_EXT;
 }
 
-/* These are for OpenBSD compatibility. */
-#define	MTAG_ABI_COMPAT		0		/* compatibility ABI */
-
-static __inline struct m_tag *
-m_tag_find(struct mbuf *m, uint16_t type, struct m_tag *start)
-{
-	return (SLIST_EMPTY(&m->m_pkthdr.tags) ? (struct m_tag *)NULL :
-		m_tag_locate(m, MTAG_ABI_COMPAT, type, start));
-}
-
 /* mbufq */
 
 struct mbufq {
@@ -233,6 +233,7 @@ struct mbufq {
 static inline void
 mbufq_init(struct mbufq *mq, int maxlen)
 {
+
 	STAILQ_INIT(&mq->mq_head);
 	mq->mq_maxlen = maxlen;
 	mq->mq_len = 0;
@@ -264,12 +265,14 @@ mbufq_drain(struct mbufq *mq)
 static inline struct mbuf *
 mbufq_first(const struct mbufq *mq)
 {
+
 	return (STAILQ_FIRST(&mq->mq_head));
 }
 
 static inline struct mbuf *
 mbufq_last(const struct mbufq *mq)
 {
+
 	return (STAILQ_LAST(&mq->mq_head, mbuf, m_stailqpkt));
 }
 
@@ -282,12 +285,14 @@ mbufq_empty(const struct mbufq *mq)
 static inline int
 mbufq_full(const struct mbufq *mq)
 {
-	return (mq->mq_len >= mq->mq_maxlen);
+
+	return (mq->mq_maxlen > 0 && mq->mq_len >= mq->mq_maxlen);
 }
 
 static inline int
 mbufq_len(const struct mbufq *mq)
 {
+
 	return (mq->mq_len);
 }
 
@@ -324,7 +329,6 @@ mbufq_prepend(struct mbufq *mq, struct mbuf *m)
 	mq->mq_len++;
 }
 
-
 /*
  * Note: this doesn't enforce the maximum list size for dst.
  */
@@ -337,4 +341,5 @@ mbufq_concat(struct mbufq *mq_dst, struct mbufq *mq_src)
 	mq_src->mq_len = 0;
 }
 
-#endif
+
+#endif	/* _FBSD_COMPAT_SYS_MBUF_FBSD_H_ */
