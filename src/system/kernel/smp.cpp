@@ -1130,10 +1130,17 @@ smp_multicast_ici(const CPUSet& cpuMask, int32 message, addr_t data,
 		return;
 	}
 
-	int32 targetCPUs = 0;
+	ASSERT(thread_get_current_thread()->pinned_to_cpu);
+	int32 currentCPU = smp_get_current_cpu();
+	bool self = cpuMask.GetBit(currentCPU);
+
+	int32 targetCPUs = 0, firstNonCurrentCPU = -1;
 	for (int32 i = 0; i < sNumCPUs; i++) {
-		if (cpuMask.GetBit(i))
+		if (cpuMask.GetBit(i)) {
 			targetCPUs++;
+			if (firstNonCurrentCPU < 0 && i != currentCPU)
+				firstNonCurrentCPU = i;
+		}
 	}
 
 	if (targetCPUs == 0) {
@@ -1155,28 +1162,39 @@ smp_multicast_ici(const CPUSet& cpuMask, int32 message, addr_t data,
 	msg->done = 0;
 	msg->proc_bitmap = cpuMask;
 
-	int32 currentCPU = smp_get_current_cpu();
-	bool self = cpuMask.GetBit(currentCPU);
-	bool broadcast = (!self && targetCPUs == sNumCPUs - 1)
-		|| (self && targetCPUs == sNumCPUs);
+	if ((!self && targetCPUs == 1) || (self && targetCPUs == 2)) {
+		// stick it in the appropriate cpu's mailbox
+		prepend_message(sCPUMessages[firstNonCurrentCPU], msg);
 
-	// stick it in the broadcast mailbox
-	acquire_read_spinlock_nocheck(&sBroadcastMessageSpinlock);
-	prepend_message(sBroadcastMessages, msg);
-	release_read_spinlock(&sBroadcastMessageSpinlock);
+		arch_smp_send_ici(firstNonCurrentCPU);
 
-	atomic_add(&sBroadcastMessageCounter, 1);
-	for (int32 i = 0; i < sNumCPUs; i++) {
-		if (!cpuMask.GetBit(i))
-			atomic_add(&gCPU[i].ici_counter, 1);
-	}
-
-	if (broadcast) {
-		arch_smp_send_broadcast_ici();
+		if (self) {
+			// invoke for ourselves
+			invoke_smp_msg(msg, currentCPU, NULL);
+			finish_message_processing(currentCPU, msg, MAILBOX_LOCAL);
+		}
 	} else {
-		CPUSet sendMask = cpuMask;
-		sendMask.ClearBit(currentCPU);
-		arch_smp_send_multicast_ici(sendMask);
+		bool broadcast = (!self && targetCPUs == sNumCPUs - 1)
+			|| (self && targetCPUs == sNumCPUs);
+
+		// stick it in the broadcast mailbox
+		acquire_read_spinlock_nocheck(&sBroadcastMessageSpinlock);
+		prepend_message(sBroadcastMessages, msg);
+		release_read_spinlock(&sBroadcastMessageSpinlock);
+
+		atomic_add(&sBroadcastMessageCounter, 1);
+		for (int32 i = 0; i < sNumCPUs; i++) {
+			if (!cpuMask.GetBit(i))
+				atomic_add(&gCPU[i].ici_counter, 1);
+		}
+
+		if (broadcast) {
+			arch_smp_send_broadcast_ici();
+		} else {
+			CPUSet sendMask = cpuMask;
+			sendMask.ClearBit(currentCPU);
+			arch_smp_send_multicast_ici(sendMask);
+		}
 	}
 
 	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
@@ -1192,7 +1210,7 @@ smp_multicast_ici(const CPUSet& cpuMask, int32 message, addr_t data,
 		// back into the free list
 		return_free_message(msg);
 	} else if (self) {
-		// make sure this CPU has processed the message at least
+		// if broadcast, make sure this CPU has processed the message at least
 		process_all_pending_ici(currentCPU);
 	}
 
