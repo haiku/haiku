@@ -334,6 +334,46 @@ VMTranslationMap::UnaccessedPageUnmapped(VMArea* area, page_num_t pageNumber)
 }
 
 
+/*!	Invokes arch_cpu_user_tlb_invalidate() on the specified CPUs. */
+void
+VMTranslationMap::InvalidateUserTLB(CPUSet cpus, intptr_t context)
+{
+	int32 cpu = smp_get_current_cpu();
+	const bool current = cpus.GetBit(cpu);
+	cpus.ClearBit(cpu);
+	if (!cpus.IsEmpty()) {
+		if (current)
+			cpus.SetBit(cpu);
+		smp_multicast_ici(cpus, SMP_MSG_USER_INVALIDATE_PAGES,
+			context, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+	} else if (current) {
+		cpu_status state = disable_interrupts();
+		arch_cpu_user_tlb_invalidate(context);
+		restore_interrupts(state);
+	}
+}
+
+
+/*!	Invokes arch_cpu_invalidate_tlb_list() on the specified CPUs. */
+void
+VMTranslationMap::InvalidateTLBList(CPUSet cpus, intptr_t context,
+	addr_t* invalidPages, int32 count)
+{
+	int32 cpu = smp_get_current_cpu();
+	const bool current = cpus.GetBit(cpu);
+	cpus.ClearBit(cpu);
+	if (!cpus.IsEmpty()) {
+		if (current)
+			cpus.SetBit(cpu);
+		smp_multicast_ici(cpus, SMP_MSG_INVALIDATE_PAGE_LIST,
+			context, (addr_t)invalidPages, count, NULL,
+			SMP_MSG_FLAG_SYNC);
+	} else if (current) {
+		arch_cpu_invalidate_tlb_list(context, invalidPages, count);
+	}
+}
+
+
 // #pragma mark - ReverseMappingInfoCallback
 
 

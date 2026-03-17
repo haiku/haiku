@@ -89,6 +89,10 @@ protected:
 			void				UnaccessedPageUnmapped(VMArea* area,
 									page_num_t pageNumber);
 
+	static	void				InvalidateUserTLB(CPUSet cpus, intptr_t context);
+	static	void				InvalidateTLBList(CPUSet cpus, intptr_t context,
+									addr_t* invalidPages, int32 count);
+
 protected:
 			recursive_lock		fLock;
 			int32				fMapCount;
