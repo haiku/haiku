@@ -979,61 +979,61 @@ void
 smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 	addr_t data3, void* dataPointer, uint32 flags)
 {
-	struct smp_msg *msg;
+	if (!sICIEnabled)
+		return;
 
 	TRACE("smp_send_ici: target 0x%" B_PRIx32 ", mess 0x%" B_PRIx32 ", data 0x%lx, data2 0x%lx, "
 		"data3 0x%lx, ptr %p, flags 0x%" B_PRIx32 "\n", targetCPU, message, data, data2,
 		data3, dataPointer, flags);
 
-	if (sICIEnabled) {
-		// find_free_message leaves interrupts disabled
-		cpu_status state = find_free_message(&msg);
+	// find_free_message leaves interrupts disabled
+	struct smp_msg *msg;
+	cpu_status state = find_free_message(&msg);
 
-		int currentCPU = smp_get_current_cpu();
-		if (targetCPU == currentCPU) {
-			// nope, can't do that
-			ASSERT(false);
-			return_free_message(msg);
-			restore_interrupts(state);
-			return;
-		}
-
-		// set up the message
-		msg->message = message;
-		msg->data = data;
-		msg->data2 = data2;
-		msg->data3 = data3;
-		msg->data_ptr = dataPointer;
-		msg->ref_count = 1;
-		msg->flags = flags;
-		msg->done = 0;
-
-		// stick it in the appropriate cpu's mailbox
-		struct smp_msg* next;
-		do {
-			cpu_pause();
-			next = atomic_pointer_get(&sCPUMessages[targetCPU]);
-			msg->next = next;
-		} while (atomic_pointer_test_and_set(&sCPUMessages[targetCPU], msg,
-				next) != next);
-
-		arch_smp_send_ici(targetCPU);
-
-		if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
-			// wait for the other cpu to finish processing it
-			// the interrupt handler will ref count it to <0
-			// if the message is sync after it has removed it from the mailbox
-			while (msg->done == 0) {
-				process_all_pending_ici(currentCPU);
-				cpu_wait(&msg->done, 1);
-			}
-			// for SYNC messages, it's our responsibility to put it
-			// back into the free list
-			return_free_message(msg);
-		}
-
+	int currentCPU = smp_get_current_cpu();
+	if (targetCPU == currentCPU) {
+		// nope, can't do that
+		ASSERT(false);
+		return_free_message(msg);
 		restore_interrupts(state);
+		return;
 	}
+
+	// set up the message
+	msg->message = message;
+	msg->data = data;
+	msg->data2 = data2;
+	msg->data3 = data3;
+	msg->data_ptr = dataPointer;
+	msg->ref_count = 1;
+	msg->flags = flags;
+	msg->done = 0;
+
+	// stick it in the appropriate cpu's mailbox
+	struct smp_msg* next;
+	do {
+		cpu_pause();
+		next = atomic_pointer_get(&sCPUMessages[targetCPU]);
+		msg->next = next;
+	} while (atomic_pointer_test_and_set(&sCPUMessages[targetCPU], msg,
+			next) != next);
+
+	arch_smp_send_ici(targetCPU);
+
+	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
+		// wait for the other cpu to finish processing it
+		// the interrupt handler will ref count it to <0
+		// if the message is sync after it has removed it from the mailbox
+		while (msg->done == 0) {
+			process_all_pending_ici(currentCPU);
+			cpu_wait(&msg->done, 1);
+		}
+		// for SYNC messages, it's our responsibility to put it
+		// back into the free list
+		return_free_message(msg);
+	}
+
+	restore_interrupts(state);
 }
 
 
