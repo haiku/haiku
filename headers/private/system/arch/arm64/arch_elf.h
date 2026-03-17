@@ -20,8 +20,8 @@
 #define	R_AARCH64_GLOB_DAT		1025	/* Set GOT entry to data address */
 #define	R_AARCH64_JUMP_SLOT		1026	/* Set GOT entry to code address */
 #define	R_AARCH64_RELATIVE 		1027	/* Add load address of shared object */
-#define	R_AARCH64_TLS_DTPREL64	1028	/* Module-relative offset, 64 bit.  */
-#define	R_AARCH64_TLS_DTPMOD64	1029	/* Module number, 64 bit.  */
+#define	R_AARCH64_TLS_DTPMOD64	1028	/* Module number, 64 bit.  */
+#define	R_AARCH64_TLS_DTPREL64	1029	/* Module-relative offset, 64 bit.  */
 #define	R_AARCH64_TLS_TPREL64 	1030	/* TP-relative offset, 64 bit.  */
 #define	R_AARCH64_TLSDESC 		1031	/* Identify the TLS descriptor */
 #define	R_AARCH64_IRELATIVE		1032	/* STT_GNU_IFUNC relocation.  */

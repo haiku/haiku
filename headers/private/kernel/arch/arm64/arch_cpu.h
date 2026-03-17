@@ -136,6 +136,7 @@ struct iframe {
 	uint64 fp;
 	uint64 lr;
 	uint64 sp;
+	uint64 tpidr;
 
 	// exception info
 	uint64 esr;

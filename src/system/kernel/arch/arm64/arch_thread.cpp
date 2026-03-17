@@ -84,13 +84,6 @@ arch_thread_init_tls(Thread *thread)
 	return B_OK;
 }
 
-
-static void
-arm64_set_tls_context(Thread *thread)
-{
-	WRITE_SPECIALREG(tpidrro_el0, thread->user_local_storage);
-}
-
 extern "C" void _arch_context_swap(arch_thread *from, arch_thread *to);
 
 
@@ -98,7 +91,6 @@ void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
 	arch_vm_aspace_swap(from->team->address_space, to->team->address_space);
-	arm64_set_tls_context(to);
 	_arch_context_swap(&from->arch_info, &to->arch_info);
 }
 
@@ -116,8 +108,6 @@ status_t
 arch_thread_enter_userspace(Thread *thread, addr_t entry,
 	void *arg1, void *arg2)
 {
-	arm64_set_tls_context(thread);
-
 	addr_t threadExitAddr;
 	{
 		addr_t commpageAdr = (addr_t)thread->team->commpage_address;
@@ -137,6 +127,7 @@ arch_thread_enter_userspace(Thread *thread, addr_t entry,
 	frame.x[1] = (uint64_t)arg2;
 	frame.lr = threadExitAddr;
 	frame.sp = thread->user_stack_base + thread->user_stack_size;
+	frame.tpidr = thread->user_local_storage;
 
 	_eret_with_iframe(&frame);
 	return B_ERROR;

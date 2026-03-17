@@ -24,7 +24,7 @@ static inline void**
 get_tls()
 {
 	void **tls;
-	asm volatile("MRS %0, tpidrro_el0" : "=r" (tls));
+	asm volatile("MRS %0, tpidr_el0" : "=r" (tls));
 	return tls;
 }
 

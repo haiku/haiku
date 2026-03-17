@@ -58,12 +58,14 @@ sub	sp, sp, \xt
 	mrs x2, SPSR_EL1
 	mrs x3, ESR_EL1
 	mrs x4, FAR_EL1
+	mrs x5, TPIDR_EL0
 
 	str x0, [x19, #(IFRAME_sp)]
 	str x1, [x19, #(IFRAME_elr)]
 	str x2, [x19, #(IFRAME_spsr)]
 	str x3, [x19, #(IFRAME_esr)]
 	str x4, [x19, #(IFRAME_far)]
+	str x5, [x19, #(IFRAME_tpidr)]
 .endm
 
 .macro EXCEPTION_RETURN el
@@ -107,6 +109,9 @@ sub	sp, sp, \xt
 	// we stored original pointer to IFRAME, no need to unwind again there
 	mov sp, x18
 .endif
+
+	ldr x0, [x19, #(IFRAME_tpidr)]
+	msr TPIDR_EL0, x0
 
 	// finally restore remaining registers
 	ldp x0,   x1, [x19, #(IFRAME_x + 0 * 8)]
@@ -192,6 +197,7 @@ FUNCTION(_eret_with_iframe):
 	EXCEPTION_RETURN 0
 FUNCTION_END(_eret_with_iframe)
 
+
 FUNCTION(_fp_save):
 	stp q0, q1, [x0], #32
 	stp q2, q3, [x0], #32
@@ -264,8 +270,7 @@ FUNCTION(_arch_context_swap):
 	stp x29, x30, [x0], #16
 
 	mov x2, sp
-	mrs x3, TPIDR_EL0
-	stp  x2,  x3, [x0], #16
+	str x2, [x0], #8
 
 	stp  d8,  d9, [x0], #16
 	stp d10, d11, [x0], #16
@@ -280,9 +285,8 @@ FUNCTION(_arch_context_swap):
 	ldp x27, x28, [x1], #16
 	ldp x29, x30, [x1], #16
 
-	ldp  x2,  x3, [x1], #16
+	ldr x2, [x1], #8
 	mov sp, x2
-	msr TPIDR_EL0, x3
 
 	ldp  d8,  d9, [x1], #16
 	ldp d10, d11, [x1], #16
