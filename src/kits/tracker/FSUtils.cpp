@@ -465,13 +465,15 @@ FSSetPoseLocation(ino_t destDirInode, BNode* destNode, BPoint point)
 	poseInfo.fInitedDirectory = destDirInode;
 	poseInfo.fLocation = point;
 
-	status_t result = destNode->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
+	ssize_t bytesWritten = destNode->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 		&poseInfo, sizeof(poseInfo));
 
-	if (result == sizeof(poseInfo))
+	if (bytesWritten == sizeof(poseInfo))
 		return B_OK;
-
-	return result;
+	else if (bytesWritten < 0)
+		return (status_t)bytesWritten;
+	else
+		return B_ERROR;
 }
 
 
@@ -1190,14 +1192,8 @@ MoveTask(BObjectList<entry_ref, true>* srcList, BEntry* destEntry, BList* pointL
 				loc = (BPoint*)pointList->ItemAt(i);
 
 				BNode* sourceNode = GetWritableNode(&sourceEntry);
-				if (sourceNode && sourceNode->InitCheck() == B_OK) {
-					PoseInfo poseInfo;
-					poseInfo.fInvisible = false;
-					poseInfo.fInitedDirectory = deststat.st_ino;
-					poseInfo.fLocation = *loc;
-					sourceNode->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
-						sizeof(poseInfo));
-				}
+				if (sourceNode != NULL && sourceNode->InitCheck() == B_OK)
+					FSSetPoseLocation(deststat.st_ino, sourceNode, *loc);
 				delete sourceNode;
 			}
 
@@ -2028,7 +2024,7 @@ FSCopyFile(BEntry* srcFile, StatStruct* srcStat, BDirectory* destDir,
 static status_t
 MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 {
-	BDirectory trash_dir;
+	BDirectory trashDir;
 	entry_ref ref;
 	status_t result = entry->GetRef(&ref);
 	if (result != B_OK)
@@ -2074,15 +2070,15 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 		}
 
 		// get trash directory on same volume as item being moved
-		result = FSGetTrashDir(&trash_dir, nodeRef.device);
+		result = FSGetTrashDir(&trashDir, nodeRef.device);
 		if (result != B_OK)
 			return result;
 
 		// check hierarchy before moving
 		BEntry trashEntry;
-		trash_dir.GetEntry(&trashEntry);
+		trashDir.GetEntry(&trashEntry);
 
-		if (dir == trash_dir || dir.Contains(&trashEntry)) {
+		if (dir == trashDir || dir.Contains(&trashEntry)) {
 			BAlert* alert = new BAlert("",
 				B_TRANSLATE("You cannot put the selected item(s) "
 					"into the trash."),
@@ -2104,7 +2100,7 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 		be_app->PostMessage(&message);
 	} else {
 		// get trash directory on same volume as item being moved
-		result = FSGetTrashDir(&trash_dir, nodeRef.device);
+		result = FSGetTrashDir(&trashDir, nodeRef.device);
 		if (result != B_OK)
 			return result;
 	}
@@ -2112,21 +2108,17 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 	// make sure name doesn't conflict with anything in trash already
 	char name[B_FILE_NAME_LENGTH];
 	strlcpy(name, ref.name, sizeof(name));
-	if (trash_dir.Contains(name)) {
+	if (trashDir.Contains(name)) {
 		BString suffix(" ");
 		suffix << B_TRANSLATE_COMMENT("copy", "filename copy"),
-		FSMakeOriginalName(name, &trash_dir, suffix.String());
+		FSMakeOriginalName(name, &trashDir, suffix.String());
 		undo.UpdateEntry(entry, name);
 	}
 
 	BNode* sourceNode = 0;
 	if (loc && loc != (BPoint*)-1 && (sourceNode = GetWritableNode(entry, &statbuf)) != 0) {
-		trash_dir.GetStat(&statbuf);
-		PoseInfo poseInfo;
-		poseInfo.fInvisible = false;
-		poseInfo.fInitedDirectory = statbuf.st_ino;
-		poseInfo.fLocation = *loc;
-		sourceNode->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo));
+		trashDir.GetStat(&statbuf);
+		FSSetPoseLocation(statbuf.st_ino, sourceNode, *loc);
 		delete sourceNode;
 	}
 
@@ -2140,7 +2132,7 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 	}
 
 	TrackerCopyLoopControl loopControl;
-	MoveItem(entry, &trash_dir, loc, kMoveSelectionTo, name, undo, &loopControl);
+	MoveItem(entry, &trashDir, loc, kMoveSelectionTo, name, undo, &loopControl);
 
 	return B_OK;
 }
