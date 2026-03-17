@@ -41,6 +41,7 @@ dummy()
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, esr);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, far);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, tpidr);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, fpu);
 
 	DEFINE_OFFSET_MACRO(CPU_ENT, cpu_ent, fault_handler);
 	DEFINE_OFFSET_MACRO(CPU_ENT, cpu_ent, fault_handler_stack_pointer);

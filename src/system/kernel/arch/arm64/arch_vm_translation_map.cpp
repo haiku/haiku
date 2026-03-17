@@ -12,6 +12,7 @@
 
 #include "PMAPPhysicalPageMapper.h"
 #include "VMSAv8TranslationMap.h"
+#include "arm_registers.h"
 
 static char sPhysicalPageMapperData[sizeof(PMAPPhysicalPageMapper)];
 
@@ -82,6 +83,11 @@ arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physical
 	if (ID_AA64MMFR2_CNP(mmfr2) == ID_AA64MMFR2_CNP_IMPL) {
 		VMSAv8TranslationMap::fHwFeature |= VMSAv8TranslationMap::HW_COMMON_NOT_PRIVATE;
 	}
+
+	tcr |= TCR_SH1_IS | TCR_IRGN1_WBWA | TCR_ORGN1_WBWA;
+	tcr |= TCR_SH0_IS | TCR_IRGN0_WBWA | TCR_ORGN0_WBWA;
+	tcr &= ~TCR_T0SZ(0x1f);
+	tcr |= TCR_T0SZ(16);
 
 	VMSAv8TranslationMap::fMair = mair;
 

@@ -10,7 +10,7 @@
 .text
 
 FUNCTION(_thread_exit_syscall):
-	svc #((SYSCALL_EXIT_THREAD << 5) | 1)
+	svc #(SYSCALL_EXIT_THREAD)
 FUNCTION_END(_thread_exit_syscall)
 
 .macro xchg_sp xt
@@ -47,6 +47,9 @@ sub	sp, sp, \xt
 	stp	   x28, fp,  [x19, #(IFRAME_x + 28 * 8)]
 	str	   x30,      [x19, #(IFRAME_lr)]
 
+	add x0, x19, #(IFRAME_fpu)
+	bl	_fp_save
+
 .if \el == 0
 	mrs x0, SP_EL0
 .else
@@ -71,6 +74,9 @@ sub	sp, sp, \xt
 .macro EXCEPTION_RETURN el
 	// x19 is callee-saved so it still points to IFRAME
 	// x0, x1, x18, x19 will be restored at the very end
+
+	add x0, x19, #(IFRAME_fpu)
+	bl	_fp_restore
 
 	ldr x0,  [x19, #(IFRAME_elr)]
 	ldr x1,  [x19, #(IFRAME_spsr)]

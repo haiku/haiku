@@ -35,7 +35,7 @@ arch_user_signal_handler(signal_frame_data* data)
 	// _kern_restore_signal_frame(data)
 	asm volatile(
 		"mov x0, %0;"
-		"svc #" TO_STRING_LITERAL(((SYSCALL_RESTORE_SIGNAL_FRAME << 5) | 1)) ";"
+		"svc #" TO_STRING_LITERAL(SYSCALL_RESTORE_SIGNAL_FRAME) ";"
 		:: "r" (data)
 	);
 

@@ -129,6 +129,8 @@ arch_thread_enter_userspace(Thread *thread, addr_t entry,
 	frame.sp = thread->user_stack_base + thread->user_stack_size;
 	frame.tpidr = thread->user_local_storage;
 
+	thread->arch_info.iframes.index = 0;
+
 	_eret_with_iframe(&frame);
 	return B_ERROR;
 }

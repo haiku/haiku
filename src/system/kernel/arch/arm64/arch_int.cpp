@@ -39,11 +39,6 @@
 // threads yet.
 struct iframe_stack gBootFrameStack;
 
-// In order to avoid store/restore of large FPU state, it is assumed that
-// this code and page fault handling doesn't use FPU.
-// Instead this is called manually when handling IRQ or syscall.
-extern "C" void _fp_save(aarch64_fpu_state *fpu);
-extern "C" void _fp_restore(aarch64_fpu_state *fpu);
 
 void
 arch_int_enable_io_interrupt(int32 irq)
@@ -326,10 +321,8 @@ do_sync_handler(iframe * frame)
 
 		case EXCP_SVC64:
 		{
-			uint32 imm = (frame->esr & 0xffff);
-
-			uint32 count = imm & 0x1f;
-			uint32 syscall = imm >> 5;
+			uint32 syscall = (frame->esr & 0xffff);
+			uint32 count = kExtendedSyscallInfos[syscall].parameter_count;
 
 			uint64_t args[20];
 			if (count > 20) {
@@ -348,14 +341,11 @@ do_sync_handler(iframe * frame)
 				}
 			}
 
-			_fp_save(&frame->fpu);
-
 			thread_at_kernel_entry(system_time());
 			thread_get_current_thread()->arch_info.old_x0 = frame->x[0];
 
 			enable_interrupts();
 			syscall_dispatcher(syscall, (void*)args, &frame->x[0]);
-
 			{
 				disable_interrupts();
 				atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_SYSCALL_RESTARTED);
@@ -378,9 +368,6 @@ do_sync_handler(iframe * frame)
 					frame->elr -= 4;
 				}
 			}
-
-			_fp_restore(&frame->fpu);
-
 			return;
 		}
 	}
@@ -412,15 +399,11 @@ do_irq_handler(iframe * frame)
 
 	IFrameScope scope(frame);
 
-	_fp_save(&frame->fpu);
-
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->HandleInterrupt();
 
 	after_exception();
-
-	_fp_restore(&frame->fpu);
 }
 
 

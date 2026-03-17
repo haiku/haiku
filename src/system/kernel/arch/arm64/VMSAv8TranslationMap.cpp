@@ -661,7 +661,7 @@ VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 	pinner.Unlock();
 
-	if (_flags != NULL) {
+	if (_flags == NULL) {
 		locker.Detach();
 		PageUnmapped(area, (oldPte & kPteAddrMask) >> fPageBits, is_pte_accessed(oldPte),
 			is_pte_dirty(oldPte), updatePageQueue);
