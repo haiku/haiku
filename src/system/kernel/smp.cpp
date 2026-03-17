@@ -1320,6 +1320,8 @@ smp_multicast_ici_interrupts_disabled(int32 currentCPU, const CPUSet& cpuMask,
 bool
 smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 {
+	ASSERT(!are_interrupts_enabled());
+
 	if (cpu == 0) {
 		smp_cpu_rendezvous(rendezVous);
 		return true;
@@ -1462,7 +1464,9 @@ call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie, bool s
 	thread_pin_to_current_cpu(thread_get_current_thread());
 
 	if (targetCPU == (uint32)smp_get_current_cpu()) {
+		cpu_status state = disable_interrupts();
 		func(cookie, smp_get_current_cpu());
+		restore_interrupts(state);
 		thread_unpin_from_current_cpu(thread_get_current_thread());
 		return;
 	}
@@ -1507,12 +1511,8 @@ call_all_cpus(void (*func)(void*, int), void* cookie, bool sync)
 		return;
 	}
 
-	if (sNumCPUs > 1) {
-		smp_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
-			0, 0, (void*)func, sync ? SMP_MSG_FLAG_SYNC : SMP_MSG_FLAG_ASYNC);
-	} else {
-		func(cookie, smp_get_current_cpu());
-	}
+	smp_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
+		0, 0, (void*)func, sync ? SMP_MSG_FLAG_SYNC : SMP_MSG_FLAG_ASYNC);
 }
 
 
