@@ -2682,12 +2682,12 @@ FSGetTrashDir(BDirectory* trashDir, dev_t dev)
 
 	if (result == B_OK) {
 		// make Trash directory invisible
-		StatStruct sbuf;
-		trashDir->GetStat(&sbuf);
-
 		PoseInfo poseInfo;
 		poseInfo.fInvisible = true;
-		poseInfo.fInitedDirectory = sbuf.st_ino;
+
+		StatStruct statbuf;
+		poseInfo.fInitedDirectory = trashDir->GetStat(&statbuf) == B_OK ? statbuf.st_ino : -1LL;
+
 		trashDir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo, sizeof(PoseInfo));
 	}
 
