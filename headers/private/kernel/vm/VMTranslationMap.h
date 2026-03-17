@@ -11,6 +11,7 @@
 
 #include <kernel.h>
 #include <lock.h>
+#include <smp.h>
 
 #include <vm/VMArea.h>
 
