@@ -12,5 +12,9 @@
 bigtime_t
 system_time(void)
 {
-	return 0;
+	uint64 ticks;
+	uint64 freq;
+	asm volatile("mrs %0, CNTPCT_EL0": "=r" (ticks));
+	asm volatile("mrs %0, CNTFRQ_EL0": "=r" (freq));
+	return (ticks * 1000000) / freq;
 }

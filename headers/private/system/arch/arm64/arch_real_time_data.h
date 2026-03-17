@@ -8,14 +8,8 @@
 #include <StorageDefs.h>
 #include <SupportDefs.h>
 
-struct arm64_real_time_data {
-	vint64	system_time_offset;
-};
-
 struct arch_real_time_data {
-	struct arm64_real_time_data	data[2];
-	vint32						system_time_conversion_factor;
-	vint32						version;
+	bigtime_t	system_time_offset;
 };
 
 #endif	/* _KERNEL_ARCH_REAL_TIME_DATA_H */

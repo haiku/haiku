@@ -8,6 +8,7 @@
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 
+#include "arm_registers.h"
 #include "efi_platform.h"
 #include "generic_mmu.h"
 #include "mmu.h"
@@ -183,6 +184,7 @@ arch_start_kernel(addr_t kernelEntry)
 	// EL2 without E2H enabled does not, so we need to drop to EL1
 	if (el == 1 || e2h) {
 		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL1));
+		WRITE_SPECIALREG(CNTKCTL_EL1, 0b11);
 	} else {
 		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL2));
 		arch_cache_disable();
