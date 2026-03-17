@@ -52,6 +52,7 @@ sub	sp, sp, \xt
 
 .if \el == 0
 	mrs x0, SP_EL0
+	add x20, x19, #(IFRAME_sizeof)
 .else
 	// add sizeof back here to store original sp
 	add x0, x19, #(IFRAME_sizeof)
@@ -91,13 +92,12 @@ sub	sp, sp, \xt
 	ldp	   x12, x13, [x19, #(IFRAME_x + 12 * 8)]
 	ldp	   x14, x15, [x19, #(IFRAME_x + 14 * 8)]
 	ldp	   x16, x17, [x19, #(IFRAME_x + 16 * 8)]
-	// x18 and x19 will be restored later
-	ldp	   x20, x21, [x19, #(IFRAME_x + 20 * 8)]
-	ldp	   x22, x23, [x19, #(IFRAME_x + 22 * 8)]
-	ldp	   x24, x25, [x19, #(IFRAME_x + 24 * 8)]
-	ldp	   x26, x27, [x19, #(IFRAME_x + 26 * 8)]
-	ldp	   x28, fp,  [x19, #(IFRAME_x + 28 * 8)]
-	ldr	   x30, [x19, #(IFRAME_lr)]
+	// x18, x19, x20 will be restored later
+	ldp	   x21, x22, [x19, #(IFRAME_x + 21 * 8)]
+	ldp	   x23, x24, [x19, #(IFRAME_x + 23 * 8)]
+	ldp	   x25, x26, [x19, #(IFRAME_x + 25 * 8)]
+	ldp	   x27, x28, [x19, #(IFRAME_x + 27 * 8)]
+	ldp	   x29, x30, [x19, #(IFRAME_x + 29 * 8)]
 
 	// disable interrupts before restoring ELR/SPSR/sp
 	msr DAIFSet, #0xf
@@ -109,8 +109,7 @@ sub	sp, sp, \xt
 	// load stack pointer for EL0 from IFRAME
 	msr SP_EL0, x18
 
-	// unwind our own stack pointer
-	add sp, x19, #(IFRAME_sizeof)
+	mov sp, x20
 .else
 	// we stored original pointer to IFRAME, no need to unwind again there
 	mov sp, x18
@@ -121,6 +120,7 @@ sub	sp, sp, \xt
 
 	// finally restore remaining registers
 	ldp x0,   x1, [x19, #(IFRAME_x + 0 * 8)]
+	ldr x20, [x19, #(IFRAME_x + 20 * 8)]
 	ldp x18, x19, [x19, #(IFRAME_x + 18 * 8)]
 
 	eret
@@ -188,18 +188,8 @@ EXCEPTION_HANDLER 0 el0_fiq do_fiq_handler
 EXCEPTION_HANDLER 0 el0_error do_error_handler
 
 FUNCTION(_eret_with_iframe):
-	mov x20, xzr
-	mov x21, xzr
-	mov x22, xzr
-	mov x23, xzr
-	mov x24, xzr
-	mov x25, xzr
-	mov x26, xzr
-	mov x27, xzr
-	mov x28, xzr
-	mov x29, xzr
-
 	mov x19, x0
+	mov x20, x1
 	EXCEPTION_RETURN 0
 FUNCTION_END(_eret_with_iframe)
 

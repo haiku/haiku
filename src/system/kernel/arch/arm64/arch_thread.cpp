@@ -101,7 +101,7 @@ arch_thread_dump_info(void *info)
 }
 
 
-extern "C" void _eret_with_iframe(iframe *frame);
+extern "C" void _eret_with_iframe(iframe *frame, uint64 kernelStackTop);
 
 
 status_t
@@ -131,7 +131,7 @@ arch_thread_enter_userspace(Thread *thread, addr_t entry,
 
 	thread->arch_info.iframes.index = 0;
 
-	_eret_with_iframe(&frame);
+	_eret_with_iframe(&frame, thread->kernel_stack_top - 1);
 	return B_ERROR;
 }
 
@@ -248,5 +248,5 @@ arch_store_fork_frame(struct arch_fork_arg *arg)
 void
 arch_restore_fork_frame(struct arch_fork_arg *arg)
 {
-	_eret_with_iframe(&arg->frame);
+	_eret_with_iframe(&arg->frame, thread_get_current_thread()->kernel_stack_top - 1);
 }
