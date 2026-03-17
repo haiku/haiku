@@ -3,6 +3,7 @@
  * Released under the terms of the MIT License.
  */
 
+#include <arch/cpu.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 
@@ -169,10 +170,11 @@ map_region(addr_t virt_addr, addr_t  phys_addr, size_t size,
 	TRACE("Level %x, Processing desc %lx indexing %lx\n",
 		level, reinterpret_cast<uint64>(descriptor), ttd.Location());
 
-	if (ttd.IsInvalid()) {
-		// If the physical has the same alignment we could make a block here
-		// instead of using a complete next level table
-		if (size >= currentLevelSize && CurrentRegime.Aligned(phys_addr, level)) {
+	while (remainingSizeInTable > 0 && size > 0) {
+		uint64 sizeMapped = 0;
+		if (size >= currentLevelSize
+			&& CurrentRegime.Aligned(phys_addr, level)
+			&& CurrentRegime.Aligned(virt_addr, level)) {
 			// Set it as block or page
 			if (CurrentRegime.BlocksAllowed(level)) {
 				ttd.SetAsBlock(reinterpret_cast<uint64*>(phys_addr), flags);
@@ -180,74 +182,25 @@ map_region(addr_t virt_addr, addr_t  phys_addr, size_t size,
 				// Most likely in Level 3...
 				ttd.SetAsPage(reinterpret_cast<uint64*>(phys_addr), flags);
 			}
-
-			// Expand!
-			int64 expandedSize = (size > remainingSizeInTable)?remainingSizeInTable:size;
-
-			do {
-				phys_addr += currentLevelSize;
-				expandedSize -= currentLevelSize;
-				if (expandedSize > 0) {
-					ttd.Next();
-					if (CurrentRegime.BlocksAllowed(level)) {
-						ttd.SetAsBlock(reinterpret_cast<uint64*>(phys_addr), flags);
-					} else {
-						// Most likely in Level 3...
-						ttd.SetAsPage(reinterpret_cast<uint64*>(phys_addr), flags);
-					}
-				}
-			} while (expandedSize > 0);
-
-			return (size > remainingSizeInTable)?(size - remainingSizeInTable):0;
-
+			sizeMapped = currentLevelSize;
 		} else {
-			// Set it to next level
-			uint64 offset = 0;
-			uint64 remainingSize = size;
-			do {
-				uint64* page = NULL;
-				if (ttd.IsInvalid()) {
-					// our region is too small would need to create a level below
-					page = CurrentRegime.AllocatePage();
-					ttd.SetToTable(page, flags);
-				} else if (ttd.IsTable()) {
-					// Next table is allocated, follow it
-					page = ttd.Dereference();
-				} else {
-					panic("Required contiguous descriptor in use by Block/Page for %lx\n", ttd.Location());
-				}
-
-				uint64 unprocessedSize = map_region(virt_addr + offset,
-					phys_addr + offset, remainingSize, level + 1, flags, page);
-
-				offset = remainingSize - unprocessedSize;
-
-				remainingSize = unprocessedSize;
-
-				ttd.Next();
-
-			} while (remainingSize > 0);
-
-			return 0;
+			if (ttd.IsInvalid()) {
+				// Need to make a table
+				uint64* page = CurrentRegime.AllocatePage();
+				ttd.SetToTable(page, flags);
+			}
+			sizeMapped = size - map_region(virt_addr, phys_addr, size, level + 1, flags, ttd.Dereference());
 		}
 
-	} else {
+		virt_addr += sizeMapped;
+		phys_addr += sizeMapped;
+		size -= sizeMapped;
+		remainingSizeInTable -= currentLevelSize;
 
-		if ((ttd.IsBlock() && CurrentRegime.BlocksAllowed(level))
-			|| (ttd.IsPage() && CurrentRegime.PagesAllowed(level))
-		) {
-			// TODO: Review, overlap? expand?
-			panic("Re-setting a Block/Page descriptor for %lx\n", ttd.Location());
-			return 0;
-		} else if (ttd.IsTable() && CurrentRegime.TablesAllowed(level)) {
-			// Next Level
-			map_region(virt_addr, phys_addr, size, level + 1, flags, ttd.Dereference());
-			return 0;
-		} else {
-			panic("All descriptor types processed for %lx\n", ttd.Location());
-			return 0;
-		}
+		ttd.Next();
 	}
+
+	return size;
 }
 
 
@@ -287,7 +240,8 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 			address = READ_SPECIALREG(TTBR0_EL2);
 	}
 
-	map_region(virt_addr, phys_addr, size, 0, flags, reinterpret_cast<uint64*>(address));
+	map_region(virt_addr, phys_addr, PAGE_ALIGN(size),
+		0, flags, reinterpret_cast<uint64*>(address));
 
 // 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
 // 		map_page(virt_addr + offset, phys_addr + offset, flags);
@@ -419,11 +373,13 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 			| currentMair.MaskOf(MAIR_NORMAL_WB));
 	}
 
-	// TODO: We actually can only map physical RAM, mapping everything
-	// could cause unwanted MMIO or bus errors on real hardware.
-	map_range(KERNEL_PMAP_BASE, 0, KERNEL_PMAP_SIZE - 1,
-		ARMv8TranslationTableDescriptor::DefaultCodeAttribute
-		| currentMair.MaskOf(MAIR_NORMAL_WB));
+	TRACE("Mapping physical memory\n");
+	for (uint32 i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+		addr_range range = gKernelArgs.physical_memory_range[i];
+		map_range(KERNEL_PMAP_BASE + range.start, range.start, range.size,
+			ARMv8TranslationTableDescriptor::DefaultCodeAttribute
+			| currentMair.MaskOf(MAIR_NORMAL_WB));
+	}
 
 	if (gKernelArgs.arch_args.uart.kind[0] != 0) {
 		// Map uart because we want to use it during early boot.
