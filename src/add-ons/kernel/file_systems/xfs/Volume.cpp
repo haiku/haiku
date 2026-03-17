@@ -43,7 +43,7 @@ Volume::Identify(int fd, XfsSuperBlock *superBlock)
 	//Create a buffer of 512 bytes for Crc verification
 	char buf[512];
 
-	if(read_pos(fd, 0, buf, 512) != 512)
+	if (read_pos(fd, 0, buf, 512) != 512)
 		return B_IO_ERROR;
 
 	memcpy(superBlock, buf, sizeof(XfsSuperBlock));
@@ -56,11 +56,10 @@ Volume::Identify(int fd, XfsSuperBlock *superBlock)
 
 		TRACE("Superblock Crc: (%" B_PRIu32 ")\n", superBlock->Crc());
 
-		if(!xfs_verify_cksum(buf, 512, XfsSuperBlock::Offset_crc())) {
-			 ERROR("Filesystem is corrupted");
-			 return B_BAD_VALUE;
+		if (!xfs_verify_cksum(buf, 512, XfsSuperBlock::Offset_crc())) {
+			ERROR("Filesystem is corrupted");
+			return B_BAD_VALUE;
 		}
-
 	}
 
 	superBlock->SwapEndian();

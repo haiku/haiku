@@ -102,7 +102,7 @@ ShortAttribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* leng
 
 	status_t status = Lookup(fName, &namelength);
 
-	if(status != B_OK) 
+	if (status != B_OK)
 		return status;
 
 	if (pos + *length > fEntry->valuelen)

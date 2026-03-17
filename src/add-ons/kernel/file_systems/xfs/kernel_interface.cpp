@@ -123,7 +123,7 @@ xfs_read_fs_info(fs_volume *_volume, struct fs_info *info)
 	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));
 
 	// Filesystem name
-	if(volume->IsVersion5())
+	if (volume->IsVersion5())
 		strlcpy(info->fsh_name, "xfs V5", sizeof(info->fsh_name));
 	else
 		strlcpy(info->fsh_name, "xfs V4", sizeof(info->fsh_name));
@@ -268,7 +268,7 @@ xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 	inode->GetChangeTime(stat->st_ctim);
 
 	// Only version 3 Inodes has creation time
-	if(inode->Version() == 3)
+	if (inode->Version() == 3)
 		inode->GetCreationTime(stat->st_crtim);
 	else
 		inode->GetChangeTime(stat->st_crtim);
@@ -311,7 +311,7 @@ xfs_open(fs_volume * /*_volume*/, fs_vnode *_node, int openMode,
 
 
 static status_t
-xfs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
+xfs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 	void *buffer, size_t *_length)
 {
 	TRACE("Inode::ReadAt: pos:(%ld), *length:(%ld)\n", pos, *_length);
@@ -327,14 +327,14 @@ xfs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 
 
 static status_t
-xfs_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
+xfs_close(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-xfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
+xfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	TRACE("XFS_FREE_COOKIE:\n");
 	file_cookie* cookie = (file_cookie*)_cookie;
@@ -350,7 +350,7 @@ xfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 
 
 static status_t
-xfs_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
+xfs_access(fs_volume* _volume, fs_vnode* _node, int accessMode)
 {
 	Inode* inode = (Inode*)_node->private_node;
 	return inode->CheckPermissions(accessMode);
@@ -358,8 +358,7 @@ xfs_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
 
 
 static status_t
-xfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
-	size_t *_bufferSize)
+xfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer, size_t* _bufferSize)
 {
 	TRACE("XFS_READ_SYMLINK\n");
 
@@ -377,7 +376,7 @@ xfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 
 
 status_t
-xfs_unlink(fs_volume *_volume, fs_vnode *_directory, const char *name)
+xfs_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -387,22 +386,21 @@ xfs_unlink(fs_volume *_volume, fs_vnode *_directory, const char *name)
 
 
 static status_t
-xfs_create_dir(fs_volume *_volume, fs_vnode *_directory, const char *name,
-	int mode)
+xfs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name, int mode)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 static status_t
-xfs_remove_dir(fs_volume *_volume, fs_vnode *_directory, const char *name)
+xfs_remove_dir(fs_volume* _volume, fs_vnode* _directory, const char* name)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 static status_t
-xfs_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
+xfs_open_dir(fs_volume* /*_volume*/, fs_vnode* _node, void** _cookie)
 {
 	Inode* inode = (Inode*)_node->private_node;
 	TRACE("XFS_OPEN_DIR: (%ld)\n", inode->ID());
@@ -424,8 +422,8 @@ xfs_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
 
 
 static status_t
-xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	struct dirent *buffer, size_t bufferSize, uint32 *_num)
+xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie, struct dirent* buffer,
+	size_t bufferSize, uint32* _num)
 {
 	TRACE("XFS_READ_DIR\n");
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;

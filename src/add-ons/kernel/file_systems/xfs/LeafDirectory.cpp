@@ -214,7 +214,7 @@ LeafDirectory::SearchAndFillDataMap(uint64 blockNo)
 {
 	int len = fInode->DataExtentsCount();
 
-	for(int i = 0; i < len - 1; i++) {
+	for (int i = 0; i < len - 1; i++) {
 		FillMapEntry(i, fDataMap);
 		if (fDataMap->br_startoff <= blockNo
 			&& (blockNo <= fDataMap->br_startoff + fDataMap->br_blockcount - 1))

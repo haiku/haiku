@@ -147,7 +147,7 @@ LeafAttribute::Stat(attr_cookie* cookie, struct stat& stat)
 	// check if this attribute exists
 	status = Lookup(fName, &namelength);
 
-	if(status != B_OK)
+	if (status != B_OK)
 		return status;
 
 	// We have valid attribute entry to stat
@@ -170,7 +170,7 @@ LeafAttribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* lengt
 {
 	TRACE("LeafAttribute::Read\n");
 
-	if(pos < 0)
+	if (pos < 0)
 		return B_BAD_VALUE;
 
 	fName = cookie->name;
@@ -237,7 +237,7 @@ LeafAttribute::GetNext(char* name, size_t* nameLength)
 {
 	TRACE("LeafAttribute::GetNext\n");
 
-	AttrLeafHeader* header  = AttrLeafHeader::Create(fInode,fLeafBuffer);
+	AttrLeafHeader* header = AttrLeafHeader::Create(fInode, fLeafBuffer);
 	AttrLeafEntry* firstEntry = (AttrLeafEntry*)(fLeafBuffer + AttrLeafHeader::Size(fInode));
 
 	int totalEntries = header->Count();
@@ -283,7 +283,7 @@ LeafAttribute::Lookup(const char* name, size_t* nameLength)
 	uint32 hashValueOfRequest = hashfunction(name, *nameLength);
 	TRACE("Hashval:(%" B_PRIu32 ")\n", hashValueOfRequest);
 
-	AttrLeafHeader* header = AttrLeafHeader::Create(fInode,fLeafBuffer);
+	AttrLeafHeader* header = AttrLeafHeader::Create(fInode, fLeafBuffer);
 	AttrLeafEntry* entry = (AttrLeafEntry*)(fLeafBuffer + AttrLeafHeader::Size(fInode));
 
 	int numberOfLeafEntries = header->Count();

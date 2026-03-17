@@ -839,9 +839,9 @@ TreeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 
 uint32
-LongBlock::ExpectedMagic(int8 WhichDirectory, Inode* inode)
+LongBlock::ExpectedMagic(int8 whichDirectory, Inode* inode)
 {
-	if(inode->Version() == 3)
+	if (inode->Version() == 3)
 		return XFS_BMAP_CRC_MAGIC;
 	else
 		return XFS_BMAP_MAGIC;

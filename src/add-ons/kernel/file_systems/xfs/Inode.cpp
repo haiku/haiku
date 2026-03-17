@@ -158,17 +158,17 @@ Inode::VerifyForkoff() const
 	if (!fNode->di_forkoff)
 		return true;
 
-	switch(Format()) {
+	switch (Format()) {
 		case XFS_DINODE_FMT_DEV:
 			if (fNode->di_forkoff != (ROUNDUP(sizeof(uint32), 8) >> 3))
-			return false;
+				return false;
 		break;
 		case XFS_DINODE_FMT_LOCAL:
 		case XFS_DINODE_FMT_EXTENTS:
 		case XFS_DINODE_FMT_BTREE:
 			if (fNode->di_forkoff >= (LITINO(fVolume) >> 3))
 				return false;
-		break;
+			break;
 	default:
 		return false;
 	}
@@ -180,7 +180,7 @@ Inode::VerifyForkoff() const
 bool
 Inode::VerifyInode() const
 {
-	if(fNode->di_magic != INODE_MAGIC) {
+	if (fNode->di_magic != INODE_MAGIC) {
 		ERROR("Bad inode magic number");
 		return false;
 	}
@@ -194,28 +194,28 @@ Inode::VerifyInode() const
 	// verify version 3 inodes first
 	if (Version() == 3) {
 
-		if(!HAS_V3INODES(fVolume)) {
+		if (!HAS_V3INODES(fVolume)) {
 			ERROR("xfs v4 doesn't have v3 inodes");
 			return false;
 		}
 
-		if(!xfs_verify_cksum(fBuffer, fVolume->InodeSize(), INODE_CRC_OFF)) {
+		if (!xfs_verify_cksum(fBuffer, fVolume->InodeSize(), INODE_CRC_OFF)) {
 			ERROR("Inode is corrupted");
 			return false;
 		}
 
-		if(fNode->di_ino != fId) {
+		if (fNode->di_ino != fId) {
 			ERROR("Incorrect inode number");
 			return false;
 		}
 
-		if(!fVolume->UuidEquals(fNode->di_uuid)) {
+		if (!fVolume->UuidEquals(fNode->di_uuid)) {
 			ERROR("UUID is incorrect");
 			return false;
 		}
 	}
 
-	if(fNode->di_size & (1ULL << 63)) {
+	if ((fNode->di_size & (1ULL << 63)) != 0) {
 		ERROR("Invalid EOF of inode");
 		return false;
 	}
@@ -225,7 +225,7 @@ Inode::VerifyInode() const
 		 return false;
 	}
 
-	if(!VerifyForkoff()) {
+	if (!VerifyForkoff()) {
 		ERROR("Invalid inode fork offset");
 		return false;
 	}
@@ -396,10 +396,8 @@ Inode::MaxRecordsPossibleInTreeRoot()
 	size_t lengthOfDataFork;
 	if (ForkOffset() != 0)
 		lengthOfDataFork = ForkOffset() << 3;
-	else if(ForkOffset() == 0) {
-		lengthOfDataFork = GetVolume()->InodeSize()
-			- CoreInodeSize();
-	}
+	else if (ForkOffset() == 0)
+		lengthOfDataFork = GetVolume()->InodeSize() - CoreInodeSize();
 
 	lengthOfDataFork -= sizeof(BlockInDataFork);
 	return lengthOfDataFork / (XFS_KEY_SIZE + XFS_PTR_SIZE);
@@ -645,11 +643,10 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* length)
 			is not possible we will read file of remaining bytes.
 			This meathod will change when we will add file cache for xfs.
 		*/
-		if(lengthLeftInFile >= 4096) {
+		if (lengthLeftInFile >= 4096)
 			*length = 4096;
-		} else {
+		else
 			*length = lengthLeftInFile;
-		}
 
 		// We could be almost at the end of the file
 		if (lengthLeftInFile <= lengthLeftInBlock)
@@ -708,7 +705,7 @@ Inode::GetFromDisk()
 
 	TRACE("AgNumber: (%" B_PRIu32 "), AgRelativeIno: (%" B_PRIu32 "),"
 		"AgRelativeBlockNum: (%" B_PRIu32 "),Offset: (%" B_PRId64 "),"
-		"len: (%" B_PRIu32 ")\n", agNo,agRelativeInodeNo, agBlock, offset, len);
+		"len: (%" B_PRIu32 ")\n", agNo, agRelativeInodeNo, agBlock, offset, len);
 
 	if (agNo > fVolume->AgCount()) {
 		ERROR("Inode::GetFromDisk : AG Number more than number of AGs");
@@ -727,7 +724,7 @@ Inode::GetFromDisk()
 		return B_IO_ERROR;
 	}
 
-	if(fVolume->IsVersion5())
+	if (fVolume->IsVersion5())
 		memcpy(fNode, fBuffer, sizeof(Inode::Dinode));
 	else
 		memcpy(fNode, fBuffer, INODE_CRC_OFF);

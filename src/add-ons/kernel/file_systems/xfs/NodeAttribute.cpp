@@ -59,7 +59,7 @@ NodeAttribute::Init()
 	if (status != B_OK)
 		return status;
 
-	NodeHeader* header = NodeHeader::Create(fInode,fNodeBuffer);
+	NodeHeader* header = NodeHeader::Create(fInode, fNodeBuffer);
 	if (header == NULL)
 		return B_NO_MEMORY;
 
@@ -171,7 +171,7 @@ NodeAttribute::Stat(attr_cookie* cookie, struct stat& stat)
 	// check if this attribute exists
 	status = Lookup(fName, &namelength);
 
-	if(status != B_OK)
+	if (status != B_OK)
 		return status;
 
 	// We have valid attribute entry to stat
@@ -355,7 +355,7 @@ NodeAttribute::Lookup(const char* name, size_t* nameLength)
 	xfs_fsblock_t block = _LogicalToFileSystemBlock(logicalBlock);
 	_FillBuffer(fLeafBuffer, block);
 
-	AttrLeafHeader* header  = AttrLeafHeader::Create(fInode,fLeafBuffer);
+	AttrLeafHeader* header = AttrLeafHeader::Create(fInode, fLeafBuffer);
 	AttrLeafEntry* entry = (AttrLeafEntry*)(fLeafBuffer + AttrLeafHeader::Size(fInode));
 
 	int numberOfLeafEntries = header->Count();

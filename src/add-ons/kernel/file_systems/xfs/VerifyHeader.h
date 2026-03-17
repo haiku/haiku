@@ -35,7 +35,7 @@ bool VerifyHeader(T* header, char* buffer, Inode* inode,
 	}
 
 	// For Block header we pass NULL
-	if(map != NULL) {
+	if (map != NULL) {
 		uint64 actualBlockToRead = inode->FileSystemBlockToAddr(map->br_startblock
 			+ howManyBlocksFurther) / XFS_MIN_BLOCKSIZE;
 
@@ -57,5 +57,6 @@ bool VerifyHeader(T* header, char* buffer, Inode* inode,
 
 	return true;
 }
+
 
 #endif

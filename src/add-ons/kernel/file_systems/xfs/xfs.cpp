@@ -56,19 +56,19 @@ bool
 XfsSuperBlock::IsValidFeatureMask() const
 {
 	// Version 5 superblock feature mask validation
-	if(sb_features_compat & XFS_SB_FEAT_COMPAT_UNKNOWN) {
+	if (sb_features_compat & XFS_SB_FEAT_COMPAT_UNKNOWN) {
 		ERROR("Superblock has unknown compatible features enabled");
 		ERROR("Use more recent kernal");
 	}
 
-    // We cannot have write support if this is set
-	if(sb_features_ro_compat & XFS_SB_FEAT_RO_COMPAT_UNKNOWN) {
+	// We cannot have write support if this is set
+	if (sb_features_ro_compat & XFS_SB_FEAT_RO_COMPAT_UNKNOWN) {
 		ERROR("Superblock has unknown read-only compatible features enabled");
 		ERROR("Filesystem is read-only");
 	}
 
 	// check for incompatible features
-	if(sb_features_incompat & XFS_SB_FEAT_INCOMPAT_UNKNOWN) {
+	if (sb_features_incompat & XFS_SB_FEAT_INCOMPAT_UNKNOWN) {
 		ERROR("Superblock has unknown incompatible features enabled");
 		return false;
 	}
@@ -92,14 +92,12 @@ XfsSuperBlock::IsValid() const
 	}
 
 	// Checking correct version of filesystem
-	if(!(IsValidVersion())) {
+	if (!(IsValidVersion()))
 		return false;
-	}
 
 	if ((Version() & XFS_SB_VERSION_NUMBITS) == 4) {
 
-		if(sb_qflags & (XFS_PQUOTA_ENFD | XFS_GQUOTA_ENFD |
-				XFS_PQUOTA_CHKD | XFS_GQUOTA_CHKD)) {
+		if (sb_qflags & (XFS_PQUOTA_ENFD | XFS_GQUOTA_ENFD | XFS_PQUOTA_CHKD | XFS_GQUOTA_CHKD)) {
 			ERROR("V4 Superblock has XFS_{P|G}QUOTA_{ENFD|CHKD} bits");
 			return false;
 		}
@@ -107,9 +105,8 @@ XfsSuperBlock::IsValid() const
 		return true;
 	}
 
-	if(!(IsValidFeatureMask())) {
+	if (!(IsValidFeatureMask()))
 		return false;
-	}
 
 	// For V5
     if (XFS_MIN_CRC_BLOCKSIZE > sb_blocksize) {
@@ -130,23 +127,23 @@ XfsSuperBlock::IsValid() const
 	*/
 
 	// Sanity Checking
-	if(sb_agcount <= 0
-		||	sb_sectsize < XFS_MIN_SECTORSIZE
-	    ||	sb_sectsize > XFS_MAX_SECTORSIZE
-	    ||	sb_sectlog < XFS_MIN_SECTORSIZE_LOG
-	    ||	sb_sectlog > XFS_MAX_SECTORSIZE_LOG
-	    ||	sb_sectsize != (1 << sb_sectlog)
-	    ||	sb_blocksize < XFS_MIN_BLOCKSIZE
-	    ||	sb_blocksize > XFS_MAX_BLOCKSIZE
-	    ||	sb_blocklog < XFS_MIN_BLOCKSIZE_LOG
-	    ||	sb_blocklog > XFS_MAX_BLOCKSIZE_LOG
-	    ||	sb_blocksize != (uint32)(1 << sb_blocklog)
-	    ||	sb_dirblklog + sb_blocklog > XFS_MAX_BLOCKSIZE_LOG
-	    ||	sb_inodesize < INODE_MIN_SIZE
-	    ||	sb_inodesize > INODE_MAX_SIZE
-	    ||	sb_inodelog < INODE_MINSIZE_LOG
-	    ||	sb_inodelog > INODE_MAXSIZE_LOG
-	    ||	sb_inodesize != (1 << sb_inodelog)) {
+	if (sb_agcount <= 0
+		|| sb_sectsize < XFS_MIN_SECTORSIZE
+		|| sb_sectsize > XFS_MAX_SECTORSIZE
+		|| sb_sectlog < XFS_MIN_SECTORSIZE_LOG
+		|| sb_sectlog > XFS_MAX_SECTORSIZE_LOG
+		|| sb_sectsize != (1 << sb_sectlog)
+		|| sb_blocksize < XFS_MIN_BLOCKSIZE
+		|| sb_blocksize > XFS_MAX_BLOCKSIZE
+		|| sb_blocklog < XFS_MIN_BLOCKSIZE_LOG
+		|| sb_blocklog > XFS_MAX_BLOCKSIZE_LOG
+		|| sb_blocksize != (uint32)(1 << sb_blocklog)
+		|| sb_dirblklog + sb_blocklog > XFS_MAX_BLOCKSIZE_LOG
+		|| sb_inodesize < INODE_MIN_SIZE
+		|| sb_inodesize > INODE_MAX_SIZE
+		|| sb_inodelog < INODE_MINSIZE_LOG
+		|| sb_inodelog > INODE_MAXSIZE_LOG
+		|| sb_inodesize != (1 << sb_inodelog)) {
 
 		ERROR("Sanity checking failed");
 		return false;
@@ -321,11 +318,10 @@ XfsSuperBlock::MagicNum() const
 bool
 XfsSuperBlock::UuidEquals(const uuid_t& u1)
 {
-	if((sb_features_incompat & XFS_SB_FEAT_INCOMPAT_META_UUID) != 0) {
+	if ((sb_features_incompat & XFS_SB_FEAT_INCOMPAT_META_UUID) != 0)
 		return memcmp(&u1, &sb_meta_uuid, sizeof(uuid_t)) == 0;
-	} else {
+	else
 		return memcmp(&u1, &sb_uuid, sizeof(uuid_t)) == 0;
-	}
 	return false;
 }
 
