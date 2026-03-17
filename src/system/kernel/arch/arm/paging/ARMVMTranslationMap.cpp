@@ -107,7 +107,7 @@ ARMVMTranslationMap::Flush()
 			smp_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0,
 				NULL, SMP_MSG_FLAG_SYNC);
 		} else {
-			InvalidateUserTLB(PagingStructures()->active_on_cpus, x86_read_cr3());
+			InvalidateUserTLB(PagingStructures()->active_on_cpus, 0);
 		}
 	} else {
 		TRACE("flush_tmap: %d pages to invalidate, invalidate list\n",
@@ -118,7 +118,7 @@ ARMVMTranslationMap::Flush()
 				0, (addr_t)fInvalidPages, fInvalidPagesCount, NULL,
 				SMP_MSG_FLAG_SYNC);
 		} else {
-			InvalidateTLBList(PagingStructures()->active_on_cpus, x86_read_cr3(),
+			InvalidateTLBList(PagingStructures()->active_on_cpus, 0,
 				fInvalidPages, fInvalidPagesCount);
 		}
 	}
