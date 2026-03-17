@@ -9,11 +9,12 @@
 	.text
 
 /*	status_t arch_enter_kernel(struct kernel_args *kernelArgs,
-		addr_t kernelEntry, addr_t kernelStackTop);
+		addr_t kernelEntry, addr_t kernelStackTop, uint32 cpu);
 
 	x0	- kernelArgs
 	x1	- kernelEntry
 	x2	- kernelStackTop
+	x3	- cpu
 */
 FUNCTION(arch_enter_kernel):
 
@@ -23,7 +24,7 @@ FUNCTION(arch_enter_kernel):
 	// set up kernel _start args
 	//mov	x0,x0	// kernelArgs
 	mov		x4,x1
-	mov		x1,#0	// currentCPU=0
+	mov		x1,x3	// currentCPU
 
 	// clear frame pointer to ensure the kernel doesn't
 	// try to continue a stacktrace back out here

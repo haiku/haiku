@@ -26,6 +26,24 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 status_t
 arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
+	uint64_t tcr = READ_SPECIALREG(TCR_EL1);
+	uint64_t mmfr1 = READ_SPECIALREG(ID_AA64MMFR1_EL1);
+
+	uint64_t hafdbs = ID_AA64MMFR1_HAFDBS(mmfr1);
+	if (hafdbs == ID_AA64MMFR1_HAFDBS_AF) {
+		tcr |= (1UL << 39);
+	}
+	if (hafdbs == ID_AA64MMFR1_HAFDBS_AF_DBS) {
+		tcr |= (1UL << 40) | (1UL << 39);
+	}
+
+	tcr |= TCR_SH1_IS | TCR_IRGN1_WBWA | TCR_ORGN1_WBWA;
+	tcr |= TCR_SH0_IS | TCR_IRGN0_WBWA | TCR_ORGN0_WBWA;
+	tcr &= ~TCR_T0SZ(0x1f);
+	tcr |= TCR_T0SZ(16);
+
+	WRITE_SPECIALREG(TCR_EL1, tcr);
+
 	return 0;
 }
 
@@ -33,6 +51,13 @@ arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 status_t
 arch_cpu_init(kernel_args *args)
 {
+	for (uint32 i = 0; i < args->num_cpus; i++) {
+		cpu_ent* cpu = &gCPU[i];
+
+		cpu->topology_id[CPU_TOPOLOGY_PACKAGE] = 0;
+		cpu->topology_id[CPU_TOPOLOGY_CORE] = i;
+		cpu->topology_id[CPU_TOPOLOGY_SMT] = 0;
+	}
 	return B_OK;
 }
 

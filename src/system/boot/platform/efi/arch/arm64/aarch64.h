@@ -146,6 +146,7 @@ static inline void _arch_mmu_set_sctlr(uint64 sctlr)
 			WRITE_SPECIALREG(SCTLR_EL3, sctlr);
 			break;
 	}
+	asm("isb");
 }
 
 

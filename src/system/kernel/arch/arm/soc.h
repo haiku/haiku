@@ -3,6 +3,7 @@
 
 class InterruptController;
 
+#include <arch/smp.h>
 #include <drivers/bus/FDT.h>
 #include <private/kernel/interrupts.h>
 #include <private/kernel/timer.h>
@@ -15,6 +16,14 @@ public:
 	virtual void DisableInterrupt(int32 irq) = 0;
 
 	virtual void HandleInterrupt() = 0;
+
+	virtual void SendMulticastIci(CPUSet& cpuSet) {
+		panic("SendMulticastIci unimplemented");
+	}
+
+	virtual void SendBroadcastIci() {
+		panic("SendBroadcastIci unimplemented");
+	}
 
 	static InterruptController* Get() {
 		return sInstance;

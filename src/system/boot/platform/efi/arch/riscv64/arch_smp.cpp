@@ -200,7 +200,7 @@ arch_smp_init_other_cpus(void)
 
 
 void
-arch_smp_boot_other_cpus(uint64 satp, uint64 kernel_entry, addr_t virtKernelArgs)
+arch_smp_boot_other_cpus(addr_t satp, uint64 kernel_entry, addr_t virtKernelArgs)
 {
 	dprintf("arch_smp_boot_other_cpus(%p, %p)\n", (void*)satp, (void*)kernel_entry);
 

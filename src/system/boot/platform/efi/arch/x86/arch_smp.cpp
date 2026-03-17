@@ -253,7 +253,7 @@ arch_smp_init_other_cpus(void)
 
 
 void
-arch_smp_boot_other_cpus(uint32 pagedir, uint64 kernelEntry, addr_t virtKernelArgs)
+arch_smp_boot_other_cpus(addr_t pagedir, uint64 kernelEntry, addr_t virtKernelArgs)
 {
 	TRACE("trampolining other cpus\n");
 

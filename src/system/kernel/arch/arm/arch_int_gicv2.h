@@ -15,7 +15,13 @@ public:
 	void EnableInterrupt(int32 irq);
 	void DisableInterrupt(int32 irq);
 	void HandleInterrupt();
+	void SendMulticastIci(CPUSet& cpuSet);
+	void SendBroadcastIci();
 private:
+	void _PerCpuInit();
+	void _EnableInterrupt(int32 irq);
+	void _DisableInterrupt(int32 irq);
+
 	volatile uint32_t *fGicdRegs;
 	volatile uint32_t *fGiccRegs;
 };

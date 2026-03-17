@@ -51,51 +51,27 @@ arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
 status_t
 arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physicalPageMapper)
 {
-	dprintf("arch_vm_translation_map_init\n");
-
 	// nuke TTBR0 mapping, we use identity mapping in kernel space at KERNEL_PMAP_BASE
 	memset((void*) READ_SPECIALREG(TTBR0_EL1), 0, B_PAGE_SIZE);
 
-	uint64_t tcr = READ_SPECIALREG(TCR_EL1);
-	uint32_t t0sz = tcr & 0x1f;
-	uint32_t t1sz = (tcr >> 16) & 0x1f;
-	uint32_t tg0 = (tcr >> 14) & 0x3;
-	uint32_t tg1 = (tcr >> 30) & 0x3;
-	uint64_t ttbr0 = READ_SPECIALREG(TTBR0_EL1);
-	uint64_t ttbr1 = READ_SPECIALREG(TTBR1_EL1);
 	uint64_t mair = READ_SPECIALREG(MAIR_EL1);
 	uint64_t mmfr1 = READ_SPECIALREG(ID_AA64MMFR1_EL1);
 	uint64_t mmfr2 = READ_SPECIALREG(ID_AA64MMFR2_EL1);
-	uint64_t sctlr = READ_SPECIALREG(SCTLR_EL1);
 
 	ASSERT(VMSAv8TranslationMap::fHwFeature == 0);
 	uint64_t hafdbs = ID_AA64MMFR1_HAFDBS(mmfr1);
 	if (hafdbs == ID_AA64MMFR1_HAFDBS_AF) {
 		VMSAv8TranslationMap::fHwFeature = VMSAv8TranslationMap::HW_ACCESS;
-		tcr |= (1UL << 39);
 	}
 	if (hafdbs == ID_AA64MMFR1_HAFDBS_AF_DBS) {
 		VMSAv8TranslationMap::fHwFeature
 			= VMSAv8TranslationMap::HW_ACCESS | VMSAv8TranslationMap::HW_DIRTY;
-		tcr |= (1UL << 40) | (1UL << 39);
 	}
-
 	if (ID_AA64MMFR2_CNP(mmfr2) == ID_AA64MMFR2_CNP_IMPL) {
 		VMSAv8TranslationMap::fHwFeature |= VMSAv8TranslationMap::HW_COMMON_NOT_PRIVATE;
 	}
 
-	tcr |= TCR_SH1_IS | TCR_IRGN1_WBWA | TCR_ORGN1_WBWA;
-	tcr |= TCR_SH0_IS | TCR_IRGN0_WBWA | TCR_ORGN0_WBWA;
-	tcr &= ~TCR_T0SZ(0x1f);
-	tcr |= TCR_T0SZ(16);
-
 	VMSAv8TranslationMap::fMair = mair;
-
-	WRITE_SPECIALREG(TCR_EL1, tcr);
-
-	dprintf("vm config: MMFR1: %lx, MMFR2: %lx, TCR: %lx\nTTBR0: %lx, TTBR1: %lx\nT0SZ: %u, "
-			"T1SZ: %u, TG0: %u, TG1: %u, MAIR: %lx, SCTLR: %lx\n",
-		mmfr1, mmfr2, tcr, ttbr0, ttbr1, t0sz, t1sz, tg0, tg1, mair, sctlr);
 
 	*_physicalPageMapper = new (&sPhysicalPageMapperData) PMAPPhysicalPageMapper();
 

@@ -8,6 +8,7 @@
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <arch_acpi.h>
+#include <arch_smp.h>
 
 #include "serial.h"
 #include "acpi.h"
@@ -94,6 +95,13 @@ arch_handle_acpi()
 				acpi_gic_interface *acpi_gicc = (acpi_gic_interface*)desc;
 				if (acpi_gicc->cpu_interface_num == 0)
 					gicc_base = acpi_gicc->base_address;
+
+				platform_cpu_info* cpu = NULL;
+				arch_smp_register_cpu(&cpu);
+				if (cpu == NULL)
+					continue;
+				cpu->id = acpi_gicc->cpu_interface_num;
+				cpu->mpidr = acpi_gicc->mpidr;
 			} else if (desc->type == ACPI_MADT_GIC_DISTRIBUTOR) {
 				acpi_gic_distributor *acpi_gicd = (acpi_gic_distributor*)desc;
 				gicd_base = acpi_gicd->base_address;

@@ -13,6 +13,7 @@
 #include "generic_mmu.h"
 #include "mmu.h"
 #include "serial.h"
+#include "smp.h"
 
 #include "aarch64.h"
 
@@ -24,7 +25,7 @@ extern void arch_mmu_setup_EL1(uint64 tcr);
 
 // From entry.S
 extern "C" void arch_enter_kernel(struct kernel_args* kernelArgs,
-	addr_t kernelEntry, addr_t kernelStackTop);
+	addr_t kernelEntry, addr_t kernelStackTop, uint32 cpu);
 
 // From arch_mmu.cpp
 extern void arch_mmu_post_efi_setup(size_t memoryMapSize,
@@ -40,6 +41,37 @@ void
 arch_convert_kernel_args(void)
 {
 	fix_address(gKernelArgs.arch_args.fdt);
+}
+
+
+void
+arm64_common_cpu_startup()
+{
+	// If we have E2H available, we want to also enable TGE
+	// so exceptions don't get taken to EL1
+	uint64 el = arch_exception_level();
+	bool e2h = false;
+	if (el == 2) {
+		uint64 hcr = READ_SPECIALREG(HCR_EL2);
+		if ((hcr & HCR_E2H) != 0) {
+			e2h = true;
+			WRITE_SPECIALREG(HCR_EL2, hcr | HCR_TGE);
+		}
+	}
+
+	// EL2 with E2H enabled behaves as a superset of EL1
+	//
+	// EL2 without E2H enabled does not, so we need to drop to EL1
+	if (el == 1 || e2h) {
+		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL1));
+		WRITE_SPECIALREG(CNTKCTL_EL1, 0b11);
+	} else {
+		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL2));
+		arch_cache_disable();
+		_arch_transition_EL2_EL1();
+	}
+
+	arch_cache_enable();
 }
 
 
@@ -128,7 +160,7 @@ arch_start_kernel(addr_t kernelEntry)
 	}
 
 	// Generate page tables for use after ExitBootServices.
-	arch_mmu_generate_post_efi_page_tables(
+	uint64 ttbr1 = arch_mmu_generate_post_efi_page_tables(
 		memoryMapSize, memoryMap, descriptorSize, descriptorVersion);
 
 	// Attempt to fetch the memory map and exit boot services.
@@ -168,38 +200,15 @@ arch_start_kernel(addr_t kernelEntry)
 	serial_init();
 	serial_enable();
 
-	// If we have E2H available, we want to also enable TGE
-	// so exceptions don't get taken to EL1
-	bool e2h = false;
-	if (el == 2) {
-		uint64 hcr = READ_SPECIALREG(HCR_EL2);
-		if ((hcr & HCR_E2H) != 0) {
-			e2h = true;
-			WRITE_SPECIALREG(HCR_EL2, hcr | HCR_TGE);
-		}
-	}
+	arm64_common_cpu_startup();
 
-	// EL2 with E2H enabled behaves as a superset of EL1
-	//
-	// EL2 without E2H enabled does not, so we need to drop to EL1
-	if (el == 1 || e2h) {
-		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL1));
-		WRITE_SPECIALREG(CNTKCTL_EL1, 0b11);
-	} else {
-		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL2));
-		arch_cache_disable();
-		_arch_transition_EL2_EL1();
-	}
-
-	arch_cache_enable();
-
-	// smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
+	smp_boot_other_cpus(ttbr1, kernelEntry, (addr_t)&gKernelArgs);
 
 	if (arch_mmu_read_access(kernelEntry)
 		&& arch_mmu_read_access(gKernelArgs.cpu_kstack[0].start)) {
 		// Enter the kernel!
 		arch_enter_kernel(&gKernelArgs, kernelEntry,
-			gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
+			gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size, 0);
 	} else {
 		// _arch_exception_panic("Kernel or Stack memory not accessible\n", __LINE__);
 		panic("Kernel or Stack memory not accessible\n");
