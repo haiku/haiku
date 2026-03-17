@@ -1,0 +1,34 @@
+resource app_signature "application/x-vnd.Haiku-LabelAs";
+
+resource file_types message {
+	"types" = "text/x-email",
+	"types" = "text/x-partial-email"
+};
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 0,
+
+	internal = 1,
+
+	short_info = "LabelAs, Copyright 2026 Haiku, Inc.",
+	long_info = "A Tracker Add-on that marks emails with the chosen label."
+};
+
+resource vector_icon {
+	$"6E636966060500040167020006023A94CE3C078BBE370C3CD1394B9EF94A1372"
+	$"00FAF9D2FFDDDB8F03FF0000020006023AC26B3A272ABB621E3C2B0B4A03F64A"
+	$"005700010101FF807E5D020006033959AFBA52CE3AE8E03A190A49C920491610"
+	$"2F67CBFFA80594DDFD1BAFFB070A04495D4C5E604A5C480A04363A5C49485D22"
+	$"4A0A044F464A4B504E55490802384244480802BB11C23D3E4B0802B946C3AF3E"
+	$"510606AE0B383D4434BFC9BB81C22FBAAD46314D33C41EBBC74D354936404008"
+	$"0A010100000A0001011001178402040A020101000A030102000A040303040510"
+	$"01178100040A00010630242201178300040A0501062024220A00001001178200"
+	$"04"
+};
+

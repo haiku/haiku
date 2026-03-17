@@ -48,31 +48,6 @@ add_status_item(BMenu* menu, const char* name)
 }
 
 
-static void
-retrieve_status_items(BMenu* menu)
-{
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
-
-	path.Append("Mail/status");
-
-	BDirectory directory(path.Path());
-
-	entry_ref ref;
-	while (directory.GetNextRef(&ref) == B_OK) {
-		if (!strcmp(ref.name, ".") || !strcmp(ref.name, ".."))
-			continue;
-
-		add_status_item(menu, ref.name);
-	}
-
-	add_status_item(menu, "New");
-	add_status_item(menu, "Read");
-	add_status_item(menu, "Replied");
-}
-
-
 // #pragma mark -
 
 
@@ -80,7 +55,9 @@ extern "C" void
 process_refs(entry_ref dir, BMessage* message, void* /*reserved*/)
 {
 	BPopUpMenu* menu = new BPopUpMenu("status");
-	retrieve_status_items(menu);
+	add_status_item(menu, "New");
+	add_status_item(menu, "Read");
+	add_status_item(menu, "Replied");
 
 	BMenuItem* item = menu->Go(mouse_position() - BPoint(5, 5), false, true);
 	if (item == NULL)

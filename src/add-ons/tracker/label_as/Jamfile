@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons tracker label_as ;
+
+UsePrivateHeaders mail ;
+
+AddResources Label\ as… : LabelAs.rdef ;
+
+Addon Label\ as… :
+	LabelAs.cpp
+	: be tracker [ TargetLibsupc++ ] localestub
+;
+
+DoCatalogs Label\ as… :
+	x-vnd.Haiku-LabelAs
+	:
+	LabelAs.cpp
+;
