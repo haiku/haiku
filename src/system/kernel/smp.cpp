@@ -732,6 +732,18 @@ return_free_message(struct smp_msg* msg)
 }
 
 
+static void
+prepend_message(struct smp_msg*& listHead, struct smp_msg* msg)
+{
+	struct smp_msg* next;
+	do {
+		cpu_pause();
+		next = atomic_pointer_get(&listHead);
+		msg->next = next;
+	} while (atomic_pointer_test_and_set(&listHead, msg, next) != next);
+}
+
+
 static struct smp_msg*
 check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 {
@@ -1010,13 +1022,7 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 	msg->done = 0;
 
 	// stick it in the appropriate cpu's mailbox
-	struct smp_msg* next;
-	do {
-		cpu_pause();
-		next = atomic_pointer_get(&sCPUMessages[targetCPU]);
-		msg->next = next;
-	} while (atomic_pointer_test_and_set(&sCPUMessages[targetCPU], msg,
-			next) != next);
+	prepend_message(sCPUMessages[targetCPU], msg);
 
 	arch_smp_send_ici(targetCPU);
 
@@ -1079,10 +1085,9 @@ smp_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 		"mbox\n", currentCPU, msg);
 
 	// stick it in the appropriate cpu's mailbox
-	acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
-	msg->next = sBroadcastMessages;
-	sBroadcastMessages = msg;
-	release_write_spinlock(&sBroadcastMessageSpinlock);
+	acquire_read_spinlock_nocheck(&sBroadcastMessageSpinlock);
+	prepend_message(sBroadcastMessages, msg);
+	release_read_spinlock(&sBroadcastMessageSpinlock);
 
 	atomic_add(&sBroadcastMessageCounter, 1);
 
@@ -1156,10 +1161,9 @@ smp_multicast_ici(const CPUSet& cpuMask, int32 message, addr_t data,
 		|| (self && targetCPUs == sNumCPUs);
 
 	// stick it in the broadcast mailbox
-	acquire_write_spinlock_nocheck(&sBroadcastMessageSpinlock);
-	msg->next = sBroadcastMessages;
-	sBroadcastMessages = msg;
-	release_write_spinlock(&sBroadcastMessageSpinlock);
+	acquire_read_spinlock_nocheck(&sBroadcastMessageSpinlock);
+	prepend_message(sBroadcastMessages, msg);
+	release_read_spinlock(&sBroadcastMessageSpinlock);
 
 	atomic_add(&sBroadcastMessageCounter, 1);
 	for (int32 i = 0; i < sNumCPUs; i++) {
