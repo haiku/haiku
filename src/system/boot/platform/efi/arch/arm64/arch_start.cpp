@@ -167,18 +167,26 @@ arch_start_kernel(addr_t kernelEntry)
 	serial_init();
 	serial_enable();
 
-	switch (el) {
-		case 1:
-			arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL1));
-			break;
-		case 2:
-			arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL2));
-			arch_cache_disable();
-			_arch_transition_EL2_EL1();
-			break;
-		default:
-			panic("Unexpected Exception Level\n");
-			break;
+	// If we have E2H available, we want to also enable TGE
+	// so exceptions don't get taken to EL1
+	bool e2h = false;
+	if (el == 2) {
+		uint64 hcr = READ_SPECIALREG(HCR_EL2);
+		if ((hcr & HCR_E2H) != 0) {
+			e2h = true;
+			WRITE_SPECIALREG(HCR_EL2, hcr | HCR_TGE);
+		}
+	}
+
+	// EL2 with E2H enabled behaves as a superset of EL1
+	//
+	// EL2 without E2H enabled does not, so we need to drop to EL1
+	if (el == 1 || e2h) {
+		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL1));
+	} else {
+		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL2));
+		arch_cache_disable();
+		_arch_transition_EL2_EL1();
 	}
 
 	arch_cache_enable();

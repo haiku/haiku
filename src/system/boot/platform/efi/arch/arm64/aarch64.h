@@ -6,6 +6,7 @@
 #include <efi/types.h>
 
 #include <kernel/arch/arm64/arm_registers.h>
+#include <kernel/arch/arm64/arch_hypervisor.h>
 #include <kernel/arch/arm64/arch_pte.h>
 
 #include <arch_kernel.h>

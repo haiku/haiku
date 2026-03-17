@@ -20,16 +20,6 @@ static char sPhysicalPageMapperData[sizeof(PMAPPhysicalPageMapper)];
 static phys_addr_t sEmptyTable;
 
 
-static void
-arch_vm_alloc_empty_table(void)
-{
-	vm_page_reservation reservation;
-	vm_page_reserve_pages(&reservation, 1, VM_PRIORITY_SYSTEM);
-	vm_page* page = vm_page_allocate_page(&reservation, PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
-	DEBUG_PAGE_ACCESS_END(page);
-	sEmptyTable = page->physical_page_number << PAGE_SHIFT;
-}
-
 
 void
 arch_vm_install_empty_table_ttbr0(void)
@@ -103,6 +93,9 @@ arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physical
 
 	*_physicalPageMapper = new (&sPhysicalPageMapperData) PMAPPhysicalPageMapper();
 
+	// Create an empty page table for use when we don't want a userspace page table.
+	sEmptyTable = vm_allocate_early_physical_page(args) << PAGE_SHIFT;
+
 	return B_OK;
 }
 
@@ -111,9 +104,6 @@ status_t
 arch_vm_translation_map_init_post_sem(kernel_args* args)
 {
 	dprintf("arch_vm_translation_map_init_post_sem\n");
-
-	// Create an empty page table for use when we don't want a userspace page table.
-	arch_vm_alloc_empty_table();
 
 	return B_OK;
 }
