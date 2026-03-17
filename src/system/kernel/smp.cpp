@@ -735,12 +735,13 @@ return_free_message(struct smp_msg* msg)
 static void
 prepend_message(struct smp_msg*& listHead, struct smp_msg* msg)
 {
-	struct smp_msg* next;
-	do {
-		cpu_pause();
-		next = atomic_pointer_get(&listHead);
+	while (true) {
+		struct smp_msg* next = atomic_pointer_get(&listHead);
 		msg->next = next;
-	} while (atomic_pointer_test_and_set(&listHead, msg, next) != next);
+		if (atomic_pointer_test_and_set(&listHead, msg, next) == next)
+			break;
+		cpu_pause();
+	}
 }
 
 
@@ -752,12 +753,15 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 
 	struct smp_msg* msg = atomic_pointer_get(&sCPUMessages[currentCPU]);
 	if (msg != NULL) {
-		do {
+		// since only this CPU ever dequeues, we can just use atomics
+		while (true) {
+			if (atomic_pointer_test_and_set(&sCPUMessages[currentCPU], msg->next, msg) == msg)
+				break;
+
 			cpu_pause();
 			msg = atomic_pointer_get(&sCPUMessages[currentCPU]);
 			ASSERT(msg != NULL);
-		} while (atomic_pointer_test_and_set(&sCPUMessages[currentCPU],
-				msg->next, msg) != msg);
+		}
 
 		TRACE(" cpu %d: found msg %p in cpu mailbox\n", currentCPU, msg);
 		sourceMailbox = MAILBOX_LOCAL;
@@ -789,6 +793,7 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 				msg);
 		}
 	}
+
 	return msg;
 }
 
