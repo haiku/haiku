@@ -216,12 +216,6 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 		return;
 	}
 
-	// TODO: Review this case
-	if (phys_addr == READ_SPECIALREG(TTBR1_EL1)) {
-		TRACE("Trying to map the TTBR itself?!\n");
-		return;
-	}
-
 	if (arch_mmu_read_access(virt_addr) && arch_mmu_read_access(virt_addr + size)) {
 		TRACE("Range already covered in current MMU\n");
 		return;
