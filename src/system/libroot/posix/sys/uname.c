@@ -84,7 +84,7 @@ uname(struct utsname *info)
 				platform = "arm";
 				break;
 			case B_CPU_ARM_64:
-				platform = "aarch64";
+				platform = "arm64";
 				break;
 			case B_CPU_RISC_V:
 				platform = "riscv64";

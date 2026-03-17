@@ -9,16 +9,24 @@
 #include <boot/kernel_args.h>
 
 
-status_t
-arch_get_system_info(system_info *info, size_t size)
-{
-	return B_OK;
-}
-
-
 void
 arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
 {
+	switch (node->type) {
+		case B_TOPOLOGY_ROOT:
+			node->data.root.platform = B_CPU_ARM_64;
+			break;
+		case B_TOPOLOGY_PACKAGE:
+			node->data.package.vendor = B_CPU_VENDOR_UNKNOWN;
+			node->data.package.cache_line_size = CACHE_LINE_SIZE;
+			break;
+		case B_TOPOLOGY_CORE:
+			node->data.core.model = 0;
+			node->data.core.default_frequency = 0;
+			break;
+		default:
+			break;
+	}
 }
 
 
