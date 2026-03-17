@@ -273,8 +273,7 @@ VirtualDirectoryPoseView::_EntryCreated(const BMessage* message)
 		managerLocker.Unlock();
 
 	return entryTranslated
-		? (_DispatchEntryCreatedOrRemovedMessage(B_ENTRY_CREATED, nodeRef,
-			entryRef), true)
+		? (_DispatchEntryCreatedOrRemovedMessage(B_ENTRY_CREATED, nodeRef, entryRef), true)
 		: _inherited::FSNotification(message);
 }
 

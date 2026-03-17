@@ -967,10 +967,8 @@ Model::AttrChanged(const char* attrName)
 		else {
 			// node has a specific mime type
 			fMimeType = type;
-			if (!IsVolume() && !IsSymLink()
-				&& info.GetPreferredApp(type) == B_OK) {
+			if (!IsVolume() && !IsSymLink() && info.GetPreferredApp(type) == B_OK)
 				SetPreferredAppSignature(type);
-			}
 		}
 
 #if xDEBUG

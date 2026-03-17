@@ -167,10 +167,10 @@ public:
 	// Node monitor update call
 	void UpdateEntryRef(const node_ref* dirRef, const char* name);
 	bool AttrChanged(const char* attrName);
-		// returns true if pose needs to update it's icon, etc.
+		// returns true if pose needs to update its icon, etc.
 		// pass null to force full update
 	bool StatChanged();
-		// returns true if pose needs to update it's icon
+		// returns true if pose needs to update its icon
 
 	status_t WatchVolumeAndMountPoint(uint32, BHandler*);
 		// correctly handles boot volume name watching

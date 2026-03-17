@@ -864,8 +864,9 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 						deskDir.RemoveAttr(poseInfoAttrForeign);
 					}
 
-					if (!isTrash && isDesktop && deskDir.WriteAttr(kAttrExtendedDisksPoseInfo,
-						B_RAW_TYPE, 0, extendedPoseInfo, extendedPoseInfoSize)
+					if (isDesktop && !model->IsTrash()
+						&& deskDir.WriteAttr(kAttrExtendedDisksPoseInfo, B_RAW_TYPE, 0,
+								extendedPoseInfo, extendedPoseInfoSize)
 							== (ssize_t)extendedPoseInfoSize) {
 						// nuke opposite endianness
 						deskDir.RemoveAttr(kAttrExtendedDisksPoseInfoForegin);
@@ -2000,8 +2001,7 @@ BPoseView::CreatePoses(Model** models, PoseInfo* poseInfoArray, int32 count,
 		Model* model = models[modelIndex];
 
 		// pose adopts model and deletes it when done
-		if (fInsertedNodes.Contains(*(model->NodeRef()))
-				|| FindZombie(model->NodeRef())) {
+		if (fInsertedNodes.Contains(*(model->NodeRef())) || FindZombie(model->NodeRef())) {
 			watch_node(model->NodeRef(), B_STOP_WATCHING, this);
 			delete model;
 			if (resultingPoses)
@@ -2011,8 +2011,8 @@ BPoseView::CreatePoses(Model** models, PoseInfo* poseInfoArray, int32 count,
 		} else
 			fInsertedNodes.Add(*(model->NodeRef()));
 
-		if ((clipboardMode = FSClipboardFindNodeMode(model, !clipboardLocked,
-				true)) != 0 && !HasPosesInClipboard()) {
+		if ((clipboardMode = FSClipboardFindNodeMode(model, !clipboardLocked, true)) != 0
+			&& !HasPosesInClipboard()) {
 			SetHasPosesInClipboard(true);
 		}
 
@@ -3020,9 +3020,8 @@ BPoseView::ReadPoseInfo(Model* model, PoseInfo* poseInfo)
 			if (model->Node() == NULL)
 				break;
 
-			result = ReadAttr(model->Node(), kAttrPoseInfo,
-				kAttrPoseInfoForeign, B_RAW_TYPE, 0, poseInfo,
-				sizeof(*poseInfo), &PoseInfo::EndianSwap);
+			result = ReadAttr(model->Node(), kAttrPoseInfo, kAttrPoseInfoForeign,
+				B_RAW_TYPE, 0, poseInfo, sizeof(*poseInfo), &PoseInfo::EndianSwap);
 
 			if (result != kReadAttrFailed) {
 				// got it, bail
@@ -3051,8 +3050,7 @@ BPoseView::ReadPoseInfo(Model* model, PoseInfo* poseInfo)
 		poseInfo->fInvisible = false;
 	} else if (TargetModel() == NULL
 		|| (poseInfo->fInitedDirectory != model->EntryRef()->directory
-			&& (poseInfo->fInitedDirectory
-				!= TargetModel()->NodeRef()->node))) {
+			&& (poseInfo->fInitedDirectory != TargetModel()->NodeRef()->node))) {
 		// info was read properly but it's not for this directory
 		poseInfo->fInitedDirectory = -1LL;
 	} else if (poseInfo->fLocation.x < -kSanePoseLocation
@@ -4384,8 +4382,7 @@ BPoseView::TrySettingPoseLocation(BNode* node, BPoint point)
 	ASSERT(targetModel != NULL);
 
 	if (targetModel != NULL && targetModel->NodeRef() != NULL
-		&& FSSetPoseLocation(targetModel->NodeRef()->node, node, point)
-			== B_OK) {
+		&& FSSetPoseLocation(targetModel->NodeRef()->node, node, point) == B_OK) {
 		// get rid of opposite endianness attribute
 		node->RemoveAttr(kAttrPoseInfoForeign);
 	}

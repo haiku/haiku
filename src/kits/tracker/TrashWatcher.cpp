@@ -193,10 +193,10 @@ BTrashWatcher::WatchTrashDirs()
 
 		BDirectory trashDir;
 		if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
-			node_ref trash_node;
-			trashDir.GetNodeRef(&trash_node);
-			watch_node(&trash_node, B_WATCH_DIRECTORY, this);
-			fTrashNodeList.AddItem(new node_ref(trash_node));
+			node_ref trashNode;
+			trashDir.GetNodeRef(&trashNode);
+			watch_node(&trashNode, B_WATCH_DIRECTORY, this);
+			fTrashNodeList.AddItem(new node_ref(trashNode));
 		}
 	}
 }

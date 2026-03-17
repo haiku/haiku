@@ -1693,14 +1693,12 @@ CopyFolder(BEntry* srcEntry, BDirectory* destDir,
 		&newDir, loc);
 
 	while (srcDir.GetNextEntry(&entry) == B_OK) {
-
 		if (loopControl->CheckUserCanceled())
 			throw (status_t)kUserCanceled;
 
 		entry.GetStat(&statbuf);
 
 		if (S_ISDIR(statbuf.st_mode)) {
-
 			// entry is a mount point, do not copy it
 			if (statbuf.st_dev != sourceDeviceID) {
 				PRINT(("Avoiding mount point %" B_PRIdDEV ", %" B_PRIdDEV "\n",
@@ -1720,6 +1718,7 @@ CopyFolder(BEntry* srcEntry, BDirectory* destDir,
 			// Ignore special files
 		}
 	}
+
 	if (removeSource)
 		srcEntry->Remove();
 	else
@@ -1788,7 +1787,7 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 
 			BPath path;
 			entry->GetPath(&path);
-			if (loc && loc != (BPoint*)-1) {
+			if (loc != NULL && loc != (BPoint*)-1) {
 				poseInfo.fInvisible = false;
 				poseInfo.fInitedDirectory = destNode.node;
 				poseInfo.fLocation = *loc;
@@ -1873,10 +1872,8 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 				B_TRANSLATE("Error creating link to \"%name\"."),
 				ref.name);
 
-			if (loc && loc != (BPoint*)-1) {
-				link.WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
-					sizeof(PoseInfo));
-			}
+			if (loc != NULL && loc != (BPoint*)-1)
+				link.WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo, sizeof(PoseInfo));
 
 			BNodeInfo nodeInfo(&link);
 			nodeInfo.SetType(B_LINK_MIMETYPE);

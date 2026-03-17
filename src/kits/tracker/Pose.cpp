@@ -269,8 +269,7 @@ BPose::UpdateWidgetAndModel(const char* attrName, uint32 attrType, int32, BPoint
 			for (int32 i = 0; i < count; i++) {
 				BTextWidget* widget = fWidgetList.ItemAt(i);
 				BColumn* column = poseView->ColumnFor(widget->AttrHash());
-				if (column != NULL
-					&& strcmp(column->AttrName(), attrName) == 0) {
+				if (column != NULL && strcmp(column->AttrName(), attrName) == 0) {
 					widget->CheckAndUpdate(poseLoc, column, poseView, visible);
 					break;
 				}
