@@ -854,10 +854,10 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 			if (isRoot || (isTrash && IsDesktopView())) {
 				BDirectory deskDir;
 				if (FSGetDeskDir(&deskDir) == B_OK) {
-					const char* poseInfoAttr = isTrash ? kAttrTrashPoseInfo : kAttrDisksPoseInfo;
-					const char* poseInfoAttrForeign = isTrash
-						? kAttrTrashPoseInfoForeign
-						: kAttrDisksPoseInfoForeign;
+					const char* poseInfoAttr = model->IsTrash()
+						? kAttrTrashPoseInfo : kAttrDisksPoseInfo;
+					const char* poseInfoAttrForeign = model->IsTrash()
+						? kAttrTrashPoseInfoForeign : kAttrDisksPoseInfoForeign;
 					if (deskDir.WriteAttr(poseInfoAttr, B_RAW_TYPE, 0,
 						&poseInfo, sizeof(poseInfo)) == sizeof(poseInfo)) {
 						// nuke opposite endianness
@@ -869,7 +869,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 								extendedPoseInfo, extendedPoseInfoSize)
 							== (ssize_t)extendedPoseInfoSize) {
 						// nuke opposite endianness
-						deskDir.RemoveAttr(kAttrExtendedDisksPoseInfoForegin);
+						deskDir.RemoveAttr(kAttrExtendedDisksPoseInfoForeign);
 					}
 				}
 			} else {
@@ -879,7 +879,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 
 				if (isDesktop) {
 					model->WriteAttrKillForeign(kAttrExtendedPoseInfo,
-						kAttrExtendedPoseInfoForegin,
+						kAttrExtendedPoseInfoForeign,
 						B_RAW_TYPE, 0, extendedPoseInfo,
 						extendedPoseInfoSize);
 				}
@@ -3080,12 +3080,12 @@ BPoseView::ReadExtendedPoseInfo(Model* model)
 		BDirectory dir;
 		if (FSGetDeskDir(&dir) == B_OK) {
 			extendedPoseInfoAttrName = kAttrExtendedDisksPoseInfo;
-			extendedPoseInfoAttrForeignName = kAttrExtendedDisksPoseInfoForegin;
+			extendedPoseInfoAttrForeignName = kAttrExtendedDisksPoseInfoForeign;
 		} else
 			return NULL;
 	} else {
 		extendedPoseInfoAttrName = kAttrExtendedPoseInfo;
-		extendedPoseInfoAttrForeignName = kAttrExtendedPoseInfoForegin;
+		extendedPoseInfoAttrForeignName = kAttrExtendedPoseInfoForeign;
 	}
 
 	type_code type;
