@@ -71,9 +71,6 @@ ArchUARTSamsung::In32(int reg)
 void
 ArchUARTSamsung::InitPort(uint32 baud)
 {
-	uint32 ucon = In32(UCON);
-	// Disable TX and RX IRQ
-	Out32(UCON, ucon & !(UCON_RXMODE | UCON_TXMODE));
 }
 
 
@@ -82,6 +79,7 @@ ArchUARTSamsung::Enable()
 {
 	DebugUART::Enable();
 }
+
 
 void
 ArchUARTSamsung::Disable()
