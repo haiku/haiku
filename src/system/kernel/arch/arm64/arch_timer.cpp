@@ -14,7 +14,6 @@
 
 static uint64 sTimerTicksUS;
 static bigtime_t sTimerMaxInterval;
-static uint64 sBootTime;
 
 #define TIMER_DISABLED (0)
 #define TIMER_ENABLE (1)
@@ -59,14 +58,5 @@ arch_init_timer(kernel_args *args)
 	WRITE_SPECIALREG(CNTV_CTL_EL0, TIMER_DISABLED);
 	install_io_interrupt_handler(TIMER_IRQ, &arch_timer_interrupt, NULL, 0);
 
-	sBootTime = READ_SPECIALREG(CNTPCT_EL0);
-
 	return B_OK;
-}
-
-
-bigtime_t
-system_time(void)
-{
-	return (READ_SPECIALREG(CNTPCT_EL0) - sBootTime) / sTimerTicksUS;
 }
