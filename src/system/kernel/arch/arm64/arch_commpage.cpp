@@ -12,8 +12,39 @@
 #include <elf.h>
 #include <smp.h>
 
+#include "syscall_numbers.h"
+
 
 extern "C" void _thread_exit_syscall();
+
+
+extern "C" void __attribute__((noreturn))
+arch_user_signal_handler(signal_frame_data* data)
+{
+	if (data->siginfo_handler) {
+		auto handler = (void (*)(int, siginfo_t*, void*, void*))data->handler;
+		handler(data->info.si_signo, &data->info, &data->context, data->user_data);
+	} else {
+		auto handler = (void (*)(int, void*, vregs*))data->handler;
+		handler(data->info.si_signo, data->user_data, &data->context.uc_mcontext);
+	}
+
+	#define TO_STRING_LITERAL_HELPER(number)	#number
+	#define TO_STRING_LITERAL(number)	TO_STRING_LITERAL_HELPER(number)
+
+	// _kern_restore_signal_frame(data)
+	asm volatile(
+		"mov x0, %0;"
+		"svc #" TO_STRING_LITERAL(((SYSCALL_RESTORE_SIGNAL_FRAME << 5) | 1)) ";"
+		:: "r" (data)
+	);
+
+	#undef TO_STRING_LITERAL_HELPER
+	#undef TO_STRING_LITERAL
+
+	__builtin_unreachable();
+}
+
 
 
 static void
@@ -52,6 +83,9 @@ arch_commpage_init_post_cpus(void)
 {
 	register_commpage_function("_thread_exit_syscall", COMMPAGE_ENTRY_ARM64_THREAD_EXIT,
 		"commpage_thread_exit", (addr_t)&_thread_exit_syscall);
+
+	register_commpage_function("arch_user_signal_handler", COMMPAGE_ENTRY_ARM64_SIGNAL_HANDLER,
+		"commpage_signal_handler", (addr_t)&arch_user_signal_handler);
 
 	return B_OK;
 }

@@ -311,7 +311,6 @@ do_sync_handler(iframe * frame)
 					return;
 				}
 			} else if (thread->page_faults_allowed != 0) {
-				dprintf("PF: %lx\n", frame->far);
 				enable_interrupts();
 				addr_t ret = 0;
 				vm_page_fault(frame->far, frame->elr, write, isExec, isUser, &ret);
@@ -352,6 +351,7 @@ do_sync_handler(iframe * frame)
 			_fp_save(&frame->fpu);
 
 			thread_at_kernel_entry(system_time());
+			thread_get_current_thread()->arch_info.old_x0 = frame->x[0];
 
 			enable_interrupts();
 			syscall_dispatcher(syscall, (void*)args, &frame->x[0]);
@@ -369,7 +369,13 @@ do_sync_handler(iframe * frame)
 					thread_at_kernel_exit_no_signals();
 				}
 				if ((THREAD_FLAGS_RESTART_SYSCALL & thread_get_current_thread()->flags) != 0) {
-					panic("syscall restart");
+					atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+					atomic_or(&thread_get_current_thread()->flags, THREAD_FLAGS_SYSCALL_RESTARTED);
+
+					// Restore old syscall argument and go
+					// back an instruction
+					frame->x[0] = thread_get_current_thread()->arch_info.old_x0;
+					frame->elr -= 4;
 				}
 			}
 
