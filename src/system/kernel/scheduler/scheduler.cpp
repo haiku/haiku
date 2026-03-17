@@ -134,7 +134,7 @@ enqueue(Thread* thread, bool newOne)
 
 		if (targetCPU->ID() == smp_get_current_cpu()) {
 			gCPU[targetCPU->ID()].invoke_scheduler = true;
-		} else {
+		} else if (atomic_get_and_set(&gCPU[targetCPU->ID()].invoke_scheduler, true) != true) {
 			smp_send_ici(targetCPU->ID(), SMP_MSG_RESCHEDULE, 0, 0, 0,
 				NULL, SMP_MSG_FLAG_ASYNC);
 		}
@@ -321,7 +321,7 @@ reschedule(int32 nextState)
 	SCHEDULER_ENTER_FUNCTION();
 
 	int32 thisCPU = smp_get_current_cpu();
-	gCPU[thisCPU].invoke_scheduler = false;
+	atomic_set(&gCPU[thisCPU].invoke_scheduler, false);
 
 	CPUEntry* cpu = CPUEntry::GetCPU(thisCPU);
 	CoreEntry* core = CoreEntry::GetCore(thisCPU);
