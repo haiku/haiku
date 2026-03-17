@@ -253,9 +253,20 @@ do_sync_handler(iframe * frame)
 #endif
 
 	InterruptScope scope(frame);
+	debug_exception_type exceptionType;
+	uint32 signalNumber;
+	int32 signalCode;
+	uint64 signalAddress = 0;
 
+	bool isUser = (frame->spsr & PSR_M_MASK) == PSR_M_EL0t;
 	bool isExec = false;
 	switch (ESR_ELx_EXCEPTION(frame->esr)) {
+		case EXCP_PC_ALIGN:
+			exceptionType = B_ALIGNMENT_EXCEPTION;
+			signalNumber = SIGBUS;
+			signalCode = BUS_ADRALN;
+			signalAddress = frame->elr;
+			break;
 		case EXCP_INSN_ABORT_L:
 		case EXCP_INSN_ABORT:
 			isExec = true;
@@ -319,8 +330,6 @@ do_sync_handler(iframe * frame)
 			Thread *thread = thread_get_current_thread();
 			ASSERT(thread);
 
-			bool isUser = (frame->spsr & PSR_M_MASK) == PSR_M_EL0t;
-
 			if ((frame->spsr & PSR_I) != 0) {
 				// interrupts disabled
 				uintptr_t handler = reinterpret_cast<uintptr_t>(thread->fault_handler);
@@ -373,8 +382,25 @@ do_sync_handler(iframe * frame)
 		}
 	}
 
-	panic("unhandled exception! FAR=%lx ELR=%lx ESR=%lx (EC=%lx)",
-		frame->far, frame->elr, frame->esr, (frame->esr >> 26) & 0x3f);
+	if (isUser) {
+		struct sigaction action;
+		Thread* thread = thread_get_current_thread();
+
+		enable_interrupts();
+
+		if ((sigaction(signalNumber, NULL, &action) == 0
+				&& action.sa_handler != SIG_DFL
+				&& action.sa_handler != SIG_IGN)
+			|| user_debug_exception_occurred(exceptionType, signalNumber)) {
+			Signal signal(signalNumber, signalCode, B_ERROR,
+				thread->team->id);
+			signal.SetAddress((void*)signalAddress);
+			send_signal_to_thread(thread, signal, 0);
+		}
+	} else {
+		panic("unhandled exception! FAR=%lx ELR=%lx ESR=%lx (EC=%lx)",
+			frame->far, frame->elr, frame->esr, (frame->esr >> 26) & 0x3f);
+	}
 }
 
 
