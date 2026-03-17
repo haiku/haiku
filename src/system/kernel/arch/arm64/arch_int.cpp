@@ -198,11 +198,9 @@ after_exception()
 }
 
 
-// Little helper class for handling the
-// iframe stack as used by KDL.
-class IFrameScope {
+class InterruptScope {
 public:
-	IFrameScope(struct iframe *iframe) {
+	InterruptScope(struct iframe *iframe) {
 		fThread = thread_get_current_thread();
 		if (fThread)
 			arm64_push_iframe(&fThread->arch_info.iframes, iframe);
@@ -210,12 +208,37 @@ public:
 			arm64_push_iframe(&gBootFrameStack, iframe);
 	}
 
-	virtual ~IFrameScope() {
-		// pop iframe
-		if (fThread)
-			arm64_pop_iframe(&fThread->arch_info.iframes);
-		else
+	virtual ~InterruptScope() {
+		if (fThread == NULL) {
 			arm64_pop_iframe(&gBootFrameStack);
+			return;
+		}
+
+		iframe *frame = fThread->arch_info.iframes.frames[fThread->arch_info.iframes.index - 1];
+		bool isUser = (frame->spsr & PSR_M_MASK) == PSR_M_EL0t;
+		if (isUser) {
+			disable_interrupts();
+			atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_SYSCALL_RESTARTED);
+			if ((thread_get_current_thread()->flags
+				& (THREAD_FLAGS_SIGNALS_PENDING
+				| THREAD_FLAGS_DEBUG_THREAD
+				| THREAD_FLAGS_TRAP_FOR_CORE_DUMP)) != 0) {
+				enable_interrupts();
+				thread_at_kernel_exit();
+			} else {
+				thread_at_kernel_exit_no_signals();
+			}
+			if ((THREAD_FLAGS_RESTART_SYSCALL & thread_get_current_thread()->flags) != 0) {
+				atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+				atomic_or(&thread_get_current_thread()->flags, THREAD_FLAGS_SYSCALL_RESTARTED);
+
+				// Restore old syscall argument and go
+				// back an instruction
+				frame->x[0] = thread_get_current_thread()->arch_info.old_x0;
+				frame->elr -= 4;
+			}
+		}
+		arm64_pop_iframe(&fThread->arch_info.iframes);
 	}
 private:
 	Thread* fThread;
@@ -229,7 +252,7 @@ do_sync_handler(iframe * frame)
 	print_iframe("Sync abort", frame);
 #endif
 
-	IFrameScope scope(frame);
+	InterruptScope scope(frame);
 
 	bool isExec = false;
 	switch (ESR_ELx_EXCEPTION(frame->esr)) {
@@ -346,28 +369,6 @@ do_sync_handler(iframe * frame)
 
 			enable_interrupts();
 			syscall_dispatcher(syscall, (void*)args, &frame->x[0]);
-			{
-				disable_interrupts();
-				atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_SYSCALL_RESTARTED);
-				if ((thread_get_current_thread()->flags
-					& (THREAD_FLAGS_SIGNALS_PENDING
-					| THREAD_FLAGS_DEBUG_THREAD
-					| THREAD_FLAGS_TRAP_FOR_CORE_DUMP)) != 0) {
-					enable_interrupts();
-					thread_at_kernel_exit();
-				} else {
-					thread_at_kernel_exit_no_signals();
-				}
-				if ((THREAD_FLAGS_RESTART_SYSCALL & thread_get_current_thread()->flags) != 0) {
-					atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
-					atomic_or(&thread_get_current_thread()->flags, THREAD_FLAGS_SYSCALL_RESTARTED);
-
-					// Restore old syscall argument and go
-					// back an instruction
-					frame->x[0] = thread_get_current_thread()->arch_info.old_x0;
-					frame->elr -= 4;
-				}
-			}
 			return;
 		}
 	}
@@ -384,7 +385,7 @@ do_error_handler(iframe * frame)
 	print_iframe("Error", frame);
 #endif
 
-	IFrameScope scope(frame);
+	InterruptScope scope(frame);
 
 	panic("unhandled error! FAR=%lx ELR=%lx ESR=%lx", frame->far, frame->elr, frame->esr);
 }
@@ -397,7 +398,7 @@ do_irq_handler(iframe * frame)
 	print_iframe("IRQ", frame);
 #endif
 
-	IFrameScope scope(frame);
+	InterruptScope scope(frame);
 
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
@@ -414,7 +415,7 @@ do_fiq_handler(iframe * frame)
 	print_iframe("FIQ", frame);
 #endif
 
-	IFrameScope scope(frame);
+	InterruptScope scope(frame);
 
 	panic("do_fiq_handler");
 }
