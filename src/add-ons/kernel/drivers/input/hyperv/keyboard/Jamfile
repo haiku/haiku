@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel drivers input hyperv keyboard ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers hyperv input ;
+
+KernelAddon hyperv_keyboard :
+	HyperVKeyboard.cpp
+	HyperVKeyboardModule.cpp
+	;
