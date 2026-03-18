@@ -1686,7 +1686,7 @@ BPoseView::AddTrashPoses()
 	volRoster.Rewind();
 	BVolume volume;
 	while (volRoster.GetNextVolume(&volume) == B_OK) {
-		if (!volume.IsPersistent())
+		if (!volume.IsPersistent() || volume.Capacity() == 0)
 			continue;
 
 		BDirectory trashDir;
