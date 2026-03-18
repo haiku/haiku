@@ -193,7 +193,10 @@ init_module(module *module)
 			// init module
 
 			TRACE(("initializing module %s (at %p)... \n", module->name, module->info->std_ops));
-			status = module->info->std_ops(FSSH_B_MODULE_INIT);
+			if (module->info->std_ops != NULL)
+				status = module->info->std_ops(FSSH_B_MODULE_INIT);
+			else
+				status = FSSH_B_OK;
 			TRACE(("...done (%s)\n", strerror(status)));
 
 			if (status >= FSSH_B_OK)
@@ -254,7 +257,10 @@ uninit_module(module *module)
 			module->state = MODULE_UNINIT;
 
 			TRACE(("uninitializing module %s...\n", module->name));
-			status = module->info->std_ops(FSSH_B_MODULE_UNINIT);
+			if (module->info->std_ops != NULL)
+				status = module->info->std_ops(FSSH_B_MODULE_UNINIT);
+			else
+				status = FSSH_B_OK;
 			TRACE(("...done (%s)\n", strerror(status)));
 
 			if (status == FSSH_B_NO_ERROR) {
