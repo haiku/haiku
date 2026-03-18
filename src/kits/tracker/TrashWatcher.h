@@ -56,8 +56,8 @@ protected:
 	virtual void MessageReceived(BMessage*);
 
 private:
+	void UpdateTrashIcon();
 	void WatchTrashDirs();
-	void UpdateTrashIcons();
 
 	bool fTrashFull;
 	BObjectList<node_ref, true> fTrashNodeList;

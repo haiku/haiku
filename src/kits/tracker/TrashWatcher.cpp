@@ -61,7 +61,7 @@ BTrashWatcher::BTrashWatcher()
 	FSCreateTrashDirs();
 	WatchTrashDirs();
 	fTrashFull = CheckTrashDirs();
-	UpdateTrashIcons();
+	UpdateTrashIcon();
 
 	// watch volumes
 	TTracker::WatchNode(0, B_WATCH_MOUNT, this);
@@ -100,7 +100,7 @@ BTrashWatcher::MessageReceived(BMessage* message)
 		case B_ENTRY_CREATED:
 			if (!fTrashFull) {
 				fTrashFull = true;
-				UpdateTrashIcons();
+				UpdateTrashIcon();
 			}
 			break;
 
@@ -122,7 +122,7 @@ BTrashWatcher::MessageReceived(BMessage* message)
 			bool full = CheckTrashDirs();
 			if (fTrashFull != full) {
 				fTrashFull = full;
-				UpdateTrashIcons();
+				UpdateTrashIcon();
 			}
 			break;
 		}
@@ -142,7 +142,7 @@ BTrashWatcher::MessageReceived(BMessage* message)
 				// Check if the new volume has anything trashed.
 				if (CheckTrashDirs() && !fTrashFull) {
 					fTrashFull = true;
-					UpdateTrashIcons();
+					UpdateTrashIcon();
 				}
 			}
 			break;
@@ -152,31 +152,33 @@ BTrashWatcher::MessageReceived(BMessage* message)
 
 
 void
-BTrashWatcher::UpdateTrashIcons()
+BTrashWatcher::UpdateTrashIcon()
 {
 	// only update Trash icon attributes on boot volume
-	BVolume boot;
-	BDirectory trashDir;
-	if (BVolumeRoster().GetBootVolume(&boot) == B_OK
-		&& FSGetTrashDir(&trashDir, boot.Device()) == B_OK) {
-		// pull out the icons for the current trash state from resources
-		// and apply them onto the trash directory node
-		int32 id = fTrashFull ? R_TrashFullIcon : R_TrashIcon;
-		size_t size = 0;
-		const void* data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE, id, &size);
-		if (data != NULL && size > 0) {
-			// write vector icon attribute
-			trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
-		} else {
-			// write large and mini icon attributes
-			data = GetTrackerResources()->LoadResource('ICON', id, &size);
-			if (data != NULL && size > 0)
-				trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
+	BPath path;
+	if (find_directory(B_TRASH_DIRECTORY, &path) != B_OK)
+		return;
 
-			data = GetTrackerResources()->LoadResource('MICN', id, &size);
-			if (data != NULL && size > 0)
-				trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
-		}
+	BDirectory trashDir(path.Path());
+
+	// pull out the icons for the current trash state from resources
+	// and apply them onto the trash directory node
+	int32 id = fTrashFull ? R_TrashFullIcon : R_TrashIcon;
+	size_t size = 0;
+	const void* data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE, id, &size);
+
+	if (data != NULL && size > 0) {
+		// write vector icon attribute
+		trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
+	} else {
+		// write large and mini icon attributes
+		data = GetTrackerResources()->LoadResource('ICON', id, &size);
+		if (data != NULL && size > 0)
+			trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
+
+		data = GetTrackerResources()->LoadResource('MICN', id, &size);
+		if (data != NULL && size > 0)
+			trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
 	}
 }
 
