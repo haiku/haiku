@@ -64,6 +64,8 @@ protected:
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 
 	virtual bool AddPosesThreadValid(const entry_ref*) const;
+	virtual void AddPosesCompleted();
+	virtual void CreateTrashPose();
 
 	virtual bool IsDesktopView() const;
 

@@ -801,15 +801,14 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 			Model* model = pose->TargetModel();
 			poseInfo.fInvisible = false;
 
-			bool isRoot = model->IsRoot();
-			if (isRoot)
+			// Root and Trash pose are on the Desktop
+			if (model->IsRoot() || (model->IsTrash() && isDesktop))
 				poseInfo.fInitedDirectory = targetModel->NodeRef()->node;
 			else
 				poseInfo.fInitedDirectory = model->EntryRef()->directory;
 
 			// Trash pose should be invisible except on the Desktop
-			bool isTrash = model->IsTrash();
-			if (model->IsTrash() && !IsDesktopView())
+			if (model->IsTrash() && !isDesktop)
 				poseInfo.fInvisible = true;
 
 			poseInfo.fLocation = pose->Location(this);
@@ -851,7 +850,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 			ASSERT(model->InitCheck() == B_OK);
 			// special handling for "root" disks icon
 			// and Trash pose on Desktop directory
-			if (isRoot || (isTrash && IsDesktopView())) {
+			if (model->IsRoot() || (model->IsTrash() && isDesktop)) {
 				BDirectory deskDir;
 				if (FSGetDeskDir(&deskDir) == B_OK) {
 					const char* poseInfoAttr = model->IsTrash()
@@ -1708,10 +1707,6 @@ BPoseView::AddPosesCompleted()
 	if (window != NULL && window->ShouldAddMenus())
 		window->AddMimeTypesToMenu();
 
-	// add Trash icon to Desktop
-	if (IsVolumesRoot())
-		CreateTrashPose();
-
 	// if we're not in icon mode then we need to check for poses that
 	// were "auto" placed to see if they overlap with other icons
 	if (ViewMode() != kListMode)
@@ -1803,28 +1798,6 @@ BPoseView::RemoveRootPose()
 	DeletePose(&nref);
 
 	Invalidate();
-}
-
-
-void
-BPoseView::CreateTrashPose()
-{
-	BVolume boot;
-	if (BVolumeRoster().GetBootVolume(&boot) == B_OK) {
-		BDirectory trash;
-		BEntry entry;
-		node_ref nref;
-		if (FSGetTrashDir(&trash, boot.Device()) == B_OK
-			&& trash.GetEntry(&entry) == B_OK
-			&& entry.GetNodeRef(&nref) == B_OK) {
-			WatchNewNode(&nref, B_WATCH_ATTR, BMessenger(this));
-				// redraw Trash icon when attribute changes
-			Model* model = new Model(&entry);
-			PoseInfo info;
-			ReadPoseInfo(model, &info);
-			CreatePose(model, &info, false, NULL, NULL, true);
-		}
-	}
 }
 
 
@@ -2995,22 +2968,18 @@ BPoseView::ReadPoseInfo(Model* model, PoseInfo* poseInfo)
 	ReadAttrResult result = kReadAttrFailed;
 	BEntry entry;
 	model->GetEntry(&entry);
-	bool isTrash = model->IsTrash() && IsDesktopView();
 
 	// special case the "root" disks icon
-	// as well as the trash on desktop
-	if (model->IsRoot() || isTrash) {
-		BDirectory dir;
-		if (FSGetDeskDir(&dir) == B_OK) {
-			const char* poseInfoAttr = isTrash
-				? kAttrTrashPoseInfo
-				: kAttrDisksPoseInfo;
-			const char* poseInfoAttrForeign = isTrash
-				? kAttrTrashPoseInfoForeign
-				: kAttrDisksPoseInfoForeign;
-			result = ReadAttr(&dir, poseInfoAttr, poseInfoAttrForeign,
-				B_RAW_TYPE, 0, poseInfo, sizeof(*poseInfo),
-				&PoseInfo::EndianSwap);
+	// as well as the Trash on Desktop
+	if (model->IsRoot() || (model->IsTrash() && IsDesktopView())) {
+		BDirectory desktopDir;
+		if (FSGetDeskDir(&desktopDir) == B_OK) {
+			const char* poseInfoAttr = model->IsTrash()
+				? kAttrTrashPoseInfo : kAttrDisksPoseInfo;
+			const char* poseInfoAttrForeign = model->IsTrash()
+				? kAttrTrashPoseInfoForeign : kAttrDisksPoseInfoForeign;
+			result = ReadAttr(&desktopDir, poseInfoAttr, poseInfoAttrForeign,
+				B_RAW_TYPE, 0, poseInfo, sizeof(*poseInfo), &PoseInfo::EndianSwap);
 		}
 	} else {
 		ASSERT(model->IsNodeOpen());
@@ -5924,13 +5893,16 @@ BPoseView::AttributeChanged(const BMessage* message)
 		if (IsFiltering())
 			visible = fFilteredPoseList->FindPose(poseModel->NodeRef(), &index) != NULL;
 
-		status_t infoStatus = B_ERROR;
+		BPoint poseLoc;
+		if (ViewMode() == kListMode)
+			poseLoc.Set(0, index * fListElemHeight);
+		else
+			poseLoc = pose->Location(this);
+
 		if (attrName != NULL) {
+			status_t infoStatus = B_ERROR;
 			memset(&info, 0, sizeof(attr_info));
-			if (strcmp(attrName, kAttrIcon) == 0
-				|| strcmp(attrName, kAttrLargeIcon) == 0
-				|| strcmp(attrName, kAttrMiniIcon) == 0
-				|| strcmp(attrName, kAttrThumbnail) == 0) {
+			if (poseModel->IconAttrChanged(attrName)) {
 				// set icon type manually in case attribute was removed
 				if (strcmp(attrName, kAttrIcon) == 0)
 					info.type = B_VECTOR_ICON_TYPE;
@@ -5948,15 +5920,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 				// the call below might fail if the attribute has been removed
 				infoStatus = poseModel->Node()->GetAttrInfo(attrName, &info);
 			}
-		}
 
-		BPoint poseLoc;
-		if (ViewMode() == kListMode)
-			poseLoc.Set(0, index * fListElemHeight);
-		else
-			poseLoc = pose->Location(this);
-
-		if (attrName != NULL) {
 			// update attr
 			pose->UpdateWidgetAndModel(attrName, infoStatus == B_OK ? info.type : 0,
 				index, poseLoc, this, visible);

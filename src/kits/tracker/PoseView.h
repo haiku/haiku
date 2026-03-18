@@ -493,8 +493,6 @@ protected:
 	virtual void CreateRootPose();
 	virtual void RemoveRootPose();
 
-	void CreateTrashPose();
-
 	virtual bool AddPosesThreadValid(const entry_ref*) const;
 		// verifies whether or not the current set of AddPoses threads
 		// are valid and allowed to be adding poses -- returns false

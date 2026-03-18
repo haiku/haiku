@@ -193,6 +193,42 @@ DesktopPoseView::AddPosesThreadValid(const entry_ref*) const
 }
 
 
+void
+DesktopPoseView::AddPosesCompleted()
+{
+	_inherited::AddPosesCompleted();
+
+	// Create Trash pose after other poses have been added
+	// so that it is positioned in the next available space.
+	CreateTrashPose();
+}
+
+
+void
+DesktopPoseView::CreateTrashPose()
+{
+	BPath path;
+	if (find_directory(B_TRASH_DIRECTORY, &path) != B_OK)
+		return;
+
+	BDirectory trashDir(path.Path());
+	BEntry entry;
+	if (trashDir.GetEntry(&entry) != B_OK)
+		return;
+
+	// redraw Trash icon when attribute changes
+	node_ref nref;
+	if (entry.GetNodeRef(&nref) == B_OK)
+		WatchNewNode(&nref, B_WATCH_ATTR, BMessenger(this));
+
+	Model* trashModel = new Model(&entry);
+	PoseInfo poseInfo;
+	ReadPoseInfo(trashModel, &poseInfo);
+
+	CreatePose(trashModel, &poseInfo, false, NULL, NULL, true);
+}
+
+
 bool
 DesktopPoseView::Represents(const node_ref* ref) const
 {
