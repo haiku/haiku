@@ -223,8 +223,8 @@ void
 scheduler_reschedule_ici()
 {
 	// This function is called as a result of an incoming ICI.
-	// Make sure the reschedule() is invoked.
-	get_cpu_struct()->invoke_scheduler = true;
+	// Since invoke_scheduler will have been set by whatever sent the ICI, we
+	// shouldn't set it here (as the scheduler may have already cleared it.)
 }
 
 
