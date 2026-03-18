@@ -213,11 +213,13 @@ BTrashWatcher::CheckTrashDirs()
 			continue;
 
 		BDirectory trashDir;
-		FSGetTrashDir(&trashDir, volume.Device());
-		trashDir.Rewind();
-		BEntry entry;
-		if (trashDir.GetNextEntry(&entry) == B_OK)
-			return true;
+		if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
+			trashDir.Rewind();
+			// GetNextRef() is a bit faster than GetNextEntry()
+			entry_ref ref;
+			if (trashDir.GetNextRef(&ref) == B_OK)
+				return true;
+		}
 	}
 
 	return false;
