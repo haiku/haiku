@@ -620,11 +620,6 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath, const BU
 	const BHttpResult& result = dynamic_cast<const BHttpResult&>(fRequest->Result());
 	int32 statusCode = result.StatusCode();
 	const BHttpHeaders responseHeaders = result.Headers();
-	const char* locationC = responseHeaders["Location"];
-	BString location;
-
-	if (locationC != NULL)
-		location.SetTo(locationC);
 
 	delete fRequest;
 	fRequest = NULL;
@@ -638,18 +633,26 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath, const BU
 	if (responseHeaders.CountHeaders() == 0)
 		HDTRACE("no headers returned in response");
 
-	if (BHttpRequest::IsRedirectionStatusCode(statusCode)) {
-		if (location.Length() != 0) {
-			BUrl redirectUrl(result.Url(), location);
-			HDINFO("[%s] will redirect to; %s", Name(), redirectUrl.UrlString().String());
-			return DownloadToLocalFile(targetFilePath, redirectUrl, redirects + 1, 0);
-		}
-
-		HDERROR("[%s] unable to find 'Location' header for redirect", Name());
-		return B_IO_ERROR;
-	}
-
 	switch (statusCode) {
+		case B_HTTP_STATUS_MOVED_PERMANENTLY:
+		case B_HTTP_STATUS_FOUND:
+		case B_HTTP_STATUS_SEE_OTHER:
+		{
+			const char* locationC = responseHeaders["Location"];
+			BString location;
+
+			if (locationC != NULL)
+				location.SetTo(locationC);
+
+			if (location.Length() != 0) {
+				BUrl redirectUrl(result.Url(), location);
+				HDINFO("[%s] will redirect to; %s", Name(), redirectUrl.UrlString().String());
+				return DownloadToLocalFile(targetFilePath, redirectUrl, redirects + 1, 0);
+			}
+
+			HDERROR("[%s] unable to find 'Location' header for redirect", Name());
+			return B_IO_ERROR;
+		}
 		case B_HTTP_STATUS_NOT_MODIFIED:
 			HDINFO("[%s] remote data has not changed since [%s] so was not downloaded", Name(),
 				ifModifiedSinceHeader.String());
