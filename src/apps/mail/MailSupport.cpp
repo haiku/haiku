@@ -45,9 +45,11 @@ All rights reserved.
 
 #include <Autolock.h>
 #include <Clipboard.h>
+#include <Collator.h>
 #include <Debug.h>
 #include <E-mail.h>
 #include <InterfaceKit.h>
+#include <Locale.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <StorageKit.h>
@@ -90,6 +92,8 @@ const char* kMailFolder = "mail";
 const char* kMailboxSymlink = "Mail/mailbox";
 	// relative to B_USER_SETTINGS_DIRECTORY
 
+BCollator collator;
+
 
 int32
 header_len(BFile *file)
@@ -118,6 +122,12 @@ header_len(BFile *file)
 	return result;
 }
 
+
+static int
+compare_menu_items(const BMenuItem* a, const BMenuItem* b)
+{
+	return collator.Compare(a->Label(), b->Label());
+}
 
 status_t
 create_label_file(const char* label)
@@ -163,9 +173,7 @@ add_folder_menu_items(BMenu* menu, const char* folder, uint32 what)
 	if (directory.InitCheck() != B_OK)
 		return B_ERROR;
 
-	// skip existing menu items
-	int32 index = menu->CountItems();
-	int32 skipItems = index;
+	BObjectList<BMenuItem> items;
 	while (directory.GetNextEntry(&entry, true) == B_OK) {
 		if (entry.InitCheck() != B_OK)
 			break;
@@ -191,16 +199,24 @@ add_folder_menu_items(BMenu* menu, const char* folder, uint32 what)
 
 		BMessage* message = new BMessage(what);
 		message->AddString("label", label);
-
-		if (index < 9 + skipItems)
-			menu->AddItem(new BMenuItem(label, message, '1' + index - skipItems), index);
-		else
-			menu->AddItem(new BMenuItem(label, message), index);
-
-		index++;
+		items.AddItem(new BMenuItem(label, message));
 	}
 
-	return index;
+	if (!items.IsEmpty()) {
+		if (BLocale::Default()->GetCollator(&collator) == B_OK) {
+			collator.SetNumericSorting(true);
+			items.SortItems(compare_menu_items);
+		}
+	}
+	int32 itemCount = items.CountItems();
+	for (int32 i = 0; i < itemCount; i++) {
+		BMenuItem* item = items.ItemAt(i);
+		if (i < 9)
+			item->SetShortcut('1' + i, B_COMMAND_KEY);
+		menu->AddItem(item);
+	}
+
+	return itemCount;
 }
 
 

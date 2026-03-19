@@ -1061,15 +1061,14 @@ TMailWindow::MenusBeginning()
 		file.ReadAttrString(B_MAIL_ATTR_LABEL, &currentLabel);
 
 		BMenuItem* menuItem = new BMenuItem(B_TRANSLATE("Remove label"),
-			new BMessage(M_REMOVE_LABEL));
+			new BMessage(M_REMOVE_LABEL), '0');
 		fLabelMenu->AddItem(menuItem);
 		fLabelMenu->AddItem(new BMenuItem(B_TRANSLATE("Label as" B_UTF8_ELLIPSIS),
 			new BMessage(M_NEW_LABEL)));
 
 		fLabelMenu->AddSeparatorItem();
 
-		int32 count = fLabelMenu->CountItems();
-		if (add_folder_menu_items(fLabelMenu, "labels", M_SET_LABEL) > count)
+		if (add_folder_menu_items(fLabelMenu, "labels", M_SET_LABEL) > 0)
 			fLabelMenu->AddSeparatorItem();
 
 		fLabelMenu->AddItem(new BMenuItem(B_TRANSLATE("Manage labels" B_UTF8_ELLIPSIS),
