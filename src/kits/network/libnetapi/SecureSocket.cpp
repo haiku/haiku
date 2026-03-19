@@ -321,6 +321,12 @@ BSecureSocket::Private::_CreateContext()
 	// Setup certificate verification
 	SSL_CTX_set_default_verify_file(sContext);
 
+	// Setup certificate callback
+	// OpenSSL defaults to SSL_VERIFY_NONE, which will trust any certificate
+	// regardless of the callback result. SSL_VERIFY_PEER respects the callback
+	// result.
+	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
+
 	// OpenSSL 1.0.2 and later: use the alternate "trusted first" algorithm to
 	// validate certificate chains. This makes the validation stop as soon as a
 	// recognized certificate is found in the chain, instead of validating the
