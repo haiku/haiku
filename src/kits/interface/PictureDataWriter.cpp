@@ -711,6 +711,7 @@ PictureDataWriter::WriteDrawBitmap(const BRect& srcRect, const BRect& dstRect,
 		Write<int32>(bytesPerRow);
 		Write<int32>(colorSpace);
 		Write<int32>(flags);
+		Write<int32>(length);
 		WriteData(data, length);
 		EndOp();
 	} catch (status_t& status) {

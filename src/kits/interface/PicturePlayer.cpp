@@ -1203,19 +1203,19 @@ PicturePlayer::_Play(PicturePlayerCallbacks& callbacks,
 				const uint32* bytesPerRow;
 				const uint32* colorSpace;
 				const uint32* flags;
-				const void* data;
-				size_t length;
+				const int32* length;
+				const uint8* data;
 				if (!reader.Get(sourceRect)
 					|| !reader.Get(destinationRect) || !reader.Get(width)
 					|| !reader.Get(height) || !reader.Get(bytesPerRow)
 					|| !reader.Get(colorSpace) || !reader.Get(flags)
-					|| !reader.GetRemaining(data, length)) {
+					|| !reader.Get(length) || !reader.Get(data, *length)) {
 					break;
 				}
 
 				callbacks.DrawPixels(*sourceRect, *destinationRect,
 					*width, *height, *bytesPerRow, (color_space)*colorSpace,
-					*flags, data, length);
+					*flags, data, *length);
 				break;
 			}
 
