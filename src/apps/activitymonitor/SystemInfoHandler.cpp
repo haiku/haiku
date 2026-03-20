@@ -36,11 +36,16 @@ SystemInfoHandler::SystemInfoHandler()
 	fMediaBuffers = 0;
 
 	fThermalFD = open("/dev/power/acpi_thermal/0", O_RDONLY);
+	if (fThermalFD <= 0) {
+		fThermalZoneName = B_TRANSLATE("No thermal sensor");
+		return;
+	}
+
 	char buffer[256];
-	if ((fThermalFD > 0) && (ioctl(fThermalFD, B_GET_DEVICE_NAME, buffer, sizeof(buffer)) == B_OK))
+	if (ioctl(fThermalFD, B_GET_DEVICE_NAME, buffer, sizeof(buffer)) == B_OK)
 		fThermalZoneName = buffer;
 	else
-		fThermalZoneName = B_TRANSLATE("No thermal sensor");
+		fThermalZoneName = B_TRANSLATE("Unknown thermal sensor");
 }
 
 
