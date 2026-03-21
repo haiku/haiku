@@ -978,23 +978,20 @@ VMCache::AddConsumer(VMCache* consumer)
 /*!	Adds the \a area to this cache.
 	Assumes you have the locked the cache.
 */
-status_t
+void
 VMCache::InsertAreaLocked(VMArea* area)
 {
 	TRACE(("VMCache::InsertAreaLocked(cache %p, area %p)\n", this, area));
 	T(InsertArea(this, area));
-
 	AssertLocked();
 
 	areas.Insert(area, false);
 
 	AcquireStoreRef();
-
-	return B_OK;
 }
 
 
-status_t
+void
 VMCache::RemoveArea(VMArea* area)
 {
 	TRACE(("VMCache::RemoveArea(cache %p, area %p)\n", this, area));
@@ -1010,16 +1007,14 @@ VMCache::RemoveArea(VMArea* area)
 	AutoLocker<VMCache> locker(this);
 
 	areas.Remove(area);
-
-	return B_OK;
 }
 
 
-/*!	Transfers the areas from \a fromCache to this cache. This cache must not
+/*!	Takes the areas from \a fromCache to this cache. This cache must not
 	have areas yet. Both caches must be locked.
 */
 void
-VMCache::TransferAreas(VMCache* fromCache)
+VMCache::TakeAreasFrom(VMCache* fromCache)
 {
 	AssertLocked();
 	fromCache->AssertLocked();
