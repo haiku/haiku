@@ -124,9 +124,9 @@ public:
 
 			void				AddConsumer(VMCache* consumer);
 
-			status_t			InsertAreaLocked(VMArea* area);
-			status_t			RemoveArea(VMArea* area);
-			void				TransferAreas(VMCache* fromCache);
+			void				InsertAreaLocked(VMArea* area);
+			void				RemoveArea(VMArea* area);
+			void				TakeAreasFrom(VMCache* fromCache);
 			uint32				CountWritableAreas(VMArea* ignoreArea) const;
 
 			status_t			WriteModified();

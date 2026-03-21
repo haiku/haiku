@@ -2758,7 +2758,7 @@ vm_copy_on_write_area(VMCache* lowerCache,
 
 	// transfer the lower cache areas to the upper cache
 	rw_lock_write_lock(&sAreaCacheLock);
-	upperCache->TransferAreas(lowerCache);
+	upperCache->TakeAreasFrom(lowerCache);
 	rw_lock_write_unlock(&sAreaCacheLock);
 
 	lowerCache->AddConsumer(upperCache);
