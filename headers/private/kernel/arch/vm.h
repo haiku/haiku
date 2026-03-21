@@ -11,7 +11,7 @@
 
 #include <arch_vm.h>
 
-#include <SupportDefs.h>
+#include <OS.h>
 
 
 struct kernel_args;
@@ -29,7 +29,7 @@ status_t arch_vm_init_end(struct kernel_args *args);
 status_t arch_vm_init_post_modules(struct kernel_args *args);
 void arch_vm_aspace_swap(struct VMAddressSpace *from,
 	struct VMAddressSpace *to);
-bool arch_vm_supports_protection(uint32 protection);
+bool arch_vm_supports_protection(team_id team, uint32 protection);
 
 status_t arch_vm_set_memory_type(struct VMArea *area, phys_addr_t physicalBase,
 	uint32 type, uint32 *effectiveType);

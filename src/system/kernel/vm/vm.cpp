@@ -267,7 +267,7 @@ static status_t map_backing_store(VMAddressSpace* addressSpace,
 	int protection, int protectionMax, int mapping, uint32 flags,
 	const virtual_address_restrictions* addressRestrictions, bool kernel,
 	VMArea** _area, void** _virtualAddress);
-static void fix_protection(uint32* protection);
+static status_t check_protection(team_id& team, uint32* protection);
 
 
 //	#pragma mark -
@@ -1560,13 +1560,10 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 
 	if (size == 0 || size < guardSize)
 		return B_BAD_VALUE;
-	if (!arch_vm_supports_protection(protection))
-		return B_NOT_SUPPORTED;
 
-	if (team == B_CURRENT_TEAM)
-		team = VMAddressSpace::CurrentID();
-	if (team < 0)
-		return B_BAD_TEAM_ID;
+	status_t status = check_protection(team, &protection);
+	if (status != B_OK)
+		return status;
 
 	if (isStack || (protection & B_OVERCOMMITTING_AREA) != 0)
 		canOvercommit = true;
@@ -1694,7 +1691,6 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 
 	AddressSpaceWriteLocker locker;
 	VMAddressSpace* addressSpace;
-	status_t status;
 
 	// For full lock areas reserve the pages before locking the address
 	// space. E.g. block caches can't release their memory while we hold the
@@ -1935,8 +1931,9 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 		B_PRIu32 ", phys = %#" B_PRIxPHYSADDR ")\n", team, name, *_address,
 		addressSpec, size, protection, physicalAddress));
 
-	if (!arch_vm_supports_protection(protection))
-		return B_NOT_SUPPORTED;
+	status_t status = check_protection(team, &protection);
+	if (status != B_OK)
+		return status;
 
 	AddressSpaceWriteLocker locker(team);
 	if (!locker.IsLocked())
@@ -1951,7 +1948,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	size = PAGE_ALIGN(size);
 
 	// create a device cache
-	status_t status = VMCacheFactory::CreateDeviceCache(cache, physicalAddress);
+	status = VMCacheFactory::CreateDeviceCache(cache, physicalAddress);
 	if (status != B_OK)
 		return status;
 
@@ -2046,10 +2043,12 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 		"vecs = %p, vecCount = %" B_PRIu32 ")\n", team, name, *_address,
 		addressSpec, _size, protection, vecs, vecCount));
 
-	if (!arch_vm_supports_protection(protection)
-		|| (addressSpec & B_MEMORY_TYPE_MASK) != 0) {
+	status_t status = check_protection(team, &protection);
+	if (status != B_OK)
+		return status;
+
+	if ((addressSpec & B_MEMORY_TYPE_MASK) != 0)
 		return B_NOT_SUPPORTED;
-	}
 
 	AddressSpaceWriteLocker locker(team);
 	if (!locker.IsLocked())
@@ -2241,6 +2240,10 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	TRACE(("_vm_map_file(fd = %d, offset = %" B_PRIdOFF ", size = %lu, mapping "
 		"%" B_PRIu32 ")\n", fd, offset, size, mapping));
 
+	status_t status = check_protection(team, &protection);
+	if (status != B_OK)
+		return status;
+
 	if ((offset % B_PAGE_SIZE) != 0)
 		return B_BAD_VALUE;
 	size = PAGE_ALIGN(size);
@@ -2290,7 +2293,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 
 	// get the vnode for the object, this also grabs a ref to it
 	struct vnode* vnode = NULL;
-	status_t status = vfs_get_vnode_from_fd(fd, kernel, &vnode);
+	status = vfs_get_vnode_from_fd(fd, kernel, &vnode);
 	if (status < B_OK)
 		return status;
 	VnodePutter vnodePutter(vnode);
@@ -2401,9 +2404,6 @@ vm_map_file(team_id aid, const char* name, void** address, uint32 addressSpec,
 	addr_t size, uint32 protection, uint32 mapping, bool unmapAddressRange,
 	int fd, off_t offset)
 {
-	if (!arch_vm_supports_protection(protection))
-		return B_NOT_SUPPORTED;
-
 	return _vm_map_file(aid, name, address, addressSpec, size, protection,
 		mapping, unmapAddressRange, fd, offset, true);
 }
@@ -2449,6 +2449,10 @@ vm_clone_area(team_id team, const char* name, void** address,
 	uint32 addressSpec, uint32 protection, uint32 mapping, area_id sourceID,
 	bool kernel)
 {
+	status_t status = check_protection(team, &protection);
+	if (status != B_OK)
+		return status;
+
 	// Check whether the source area exists and is cloneable. If so, mark it
 	// B_SHARED_AREA, so that we don't get problems with copy-on-write.
 	{
@@ -2469,7 +2473,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 
 	MultiAddressSpaceLocker locker;
 	VMAddressSpace* sourceAddressSpace;
-	status_t status = locker.AddArea(sourceID, false, &sourceAddressSpace);
+	status = locker.AddArea(sourceID, false, &sourceAddressSpace);
 	if (status != B_OK)
 		return status;
 
@@ -3005,13 +3009,12 @@ status_t
 vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	bool kernel)
 {
-	fix_protection(&newProtection);
-
 	TRACE(("vm_set_area_protection(team = %#" B_PRIx32 ", area = %#" B_PRIx32
 		", protection = %#" B_PRIx32 ")\n", team, areaID, newProtection));
 
-	if (!arch_vm_supports_protection(newProtection))
-		return B_NOT_SUPPORTED;
+	status_t status = check_protection(team, &newProtection);
+	if (status != B_OK)
+		return status;
 
 	bool becomesWritable
 		= (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
@@ -3020,7 +3023,6 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	MultiAddressSpaceLocker locker;
 	VMCache* cache;
 	VMArea* area;
-	status_t status;
 	AreaCacheLocker cacheLocker;
 	bool isWritable;
 
@@ -4846,6 +4848,23 @@ fix_protection(uint32* protection)
 }
 
 
+static status_t
+check_protection(team_id& team, uint32* protection)
+{
+	if (team == B_CURRENT_TEAM)
+		team = VMAddressSpace::CurrentID();
+	if (team < 0)
+		return B_BAD_TEAM_ID;
+
+	fix_protection(protection);
+
+	if (!arch_vm_supports_protection(team, *protection))
+		return B_NOT_SUPPORTED;
+
+	return B_OK;
+}
+
+
 static void
 fill_area_info(struct VMArea* area, area_info* info, size_t size)
 {
@@ -5856,11 +5875,6 @@ __map_physical_memory_haiku(const char* name, phys_addr_t physicalAddress,
 	size_t numBytes, uint32 addressSpec, uint32 protection,
 	void** _virtualAddress)
 {
-	if (!arch_vm_supports_protection(protection))
-		return B_NOT_SUPPORTED;
-
-	fix_protection(&protection);
-
 	return vm_map_physical_memory(VMAddressSpace::KernelID(), name,
 		_virtualAddress, addressSpec, numBytes, protection, physicalAddress,
 		false);
@@ -5886,8 +5900,6 @@ create_area_etc(team_id team, const char* name, size_t size, uint32 lock,
 	const physical_address_restrictions* physicalAddressRestrictions,
 	void** _address)
 {
-	fix_protection(&protection);
-
 	return vm_create_anonymous_area(team, name, size, lock, protection, flags,
 		guardSize, virtualAddressRestrictions, physicalAddressRestrictions,
 		true, _address);
@@ -5898,8 +5910,6 @@ extern "C" area_id
 __create_area_haiku(const char* name, void** _address, uint32 addressSpec,
 	size_t size, uint32 lock, uint32 protection)
 {
-	fix_protection(&protection);
-
 	virtual_address_restrictions virtualRestrictions = {};
 	virtualRestrictions.address = *_address;
 	virtualRestrictions.address_specification = addressSpec;
@@ -6108,8 +6118,6 @@ _user_clone_area(const char* userName, void** userAddress, uint32 addressSpec,
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	fix_protection(&protection);
-
 	area_id clonedArea = vm_clone_area(VMAddressSpace::CurrentID(), name,
 		&address, addressSpec, protection, REGION_NO_PRIVATE_MAP, sourceArea,
 		false);
@@ -6149,8 +6157,6 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 
 	if (addressSpec == B_EXACT_ADDRESS && IS_KERNEL_ADDRESS(address))
 		return B_BAD_VALUE;
-
-	fix_protection(&protection);
 
 	virtual_address_restrictions virtualRestrictions = {};
 	virtualRestrictions.address = address;
@@ -6194,8 +6200,6 @@ _user_map_file(const char* userName, void** userAddress, uint32 addressSpec,
 
 	if ((protection & ~B_USER_AREA_FLAGS) != 0)
 		return B_BAD_VALUE;
-
-	fix_protection(&protection);
 
 	if (!IS_USER_ADDRESS(userName) || !IS_USER_ADDRESS(userAddress)
 		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK
@@ -6270,11 +6274,13 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		return ENOMEM;
 	}
 
-	// extend and check protection
-	if ((protection & ~B_USER_PROTECTION) != 0)
-		return B_BAD_VALUE;
+	team_id team = team_get_current_team_id();
+	status_t status = check_protection(team, &protection);
+	if (status != B_OK)
+		return status;
 
-	fix_protection(&protection);
+	if ((protection & ~(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA)) != 0)
+		return B_BAD_VALUE;
 
 	// We need to write lock the address space, since we're going to play with
 	// the areas. Also make sure that none of the areas is wired and that we're
@@ -6285,7 +6291,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 	do {
 		restart = false;
 
-		status_t status = locker.SetTo(team_get_current_team_id());
+		status_t status = locker.SetTo(team);
 		if (status != B_OK)
 			return status;
 

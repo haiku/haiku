@@ -365,7 +365,7 @@ arch_vm_aspace_swap(struct VMAddressSpace *from, struct VMAddressSpace *to)
 
 
 bool
-arch_vm_supports_protection(uint32 protection)
+arch_vm_supports_protection(team_id team, uint32 protection)
 {
 	return true;
 }

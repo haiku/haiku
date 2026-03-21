@@ -105,7 +105,7 @@ arch_vm_aspace_swap(struct VMAddressSpace* from, struct VMAddressSpace* to)
 
 
 bool
-arch_vm_supports_protection(uint32 protection)
+arch_vm_supports_protection(team_id team, uint32 protection)
 {
 	// User-RO/Kernel-RW is not possible
 	if ((protection & B_READ_AREA) != 0 && (protection & B_WRITE_AREA) == 0
