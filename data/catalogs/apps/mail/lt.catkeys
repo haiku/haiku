@@ -1,5 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	2282345333
-Set to Saved	Mail		Perkelti į Išsaugotus
+1	lithuanian	x-vnd.Be-MAIL	1215254327
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Laiško tekste yra %lt simboliai (-ų), kurių negalima užkoduoti naudojant pasirinktą koduotę. Galbūt norėtumėte parinkti kitą koduotę? Ar norite laišką išsiųsti nepaisant šios problemos (netinkami simboliai bus pakeisti tinkamais)? Jeigu norite pabandyti problemą išspręsti, rinkitės „Atsisakyti“.
 Text wrapping:	Mail		Teksto laužymas:
 Show icons & labels	Mail		Rodyti piktogramas ir tekstą
@@ -60,7 +59,6 @@ spam	B_USER_DIRECTORY/mail/spam		Brukalas
 Reply to all	Mail		Atsakyti visiems
 Cancel	Mail		Atsisakyti
 Off	Mail		Išjungti
-Set to %s	Mail		Pažymėti kaip %s
 Signature:	Mail		Prierašas:
 Forward without attachments	Mail		Persiųsti be priedų
 queries	B_USER_DIRECTORY/mail/queries		Užklausos
@@ -79,8 +77,8 @@ Open this link	Mail		Atverti šį saistą
 Auto signature:	Mail		Numatytasis prierašas:
 Send	Mail		Siųsti
 Open draft	Mail		Atverti juodraštį
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Palikti kaip „New“
 Random	Mail		Atsitiktinį
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Palikti kaip „New“
 Attach attributes:	Mail		Pridedamų failų požymių įtraukimas:
 Find again	Mail		Ieškoti kito
 Size:	Mail		Dydis:
@@ -128,8 +126,8 @@ Send this message before closing?	Mail		Ar išsiųsti šį laišką prieš jį u
 in	B_USER_DIRECTORY/mail/in		Gautieji
 Open	Mail		Atverti
 Don't save	Mail		Neįrašyti
-Leave same	Mail		Palikti kaip yra
 An error occurred trying to save the attachment.	Mail		Bandant įrašyti laiško priedą, įvyko klaida.
+Leave same	Mail		Palikti kaip yra
 Save address	Mail		Įrašyti adresą
 Initial spell check mode:	Mail		Pradinis rašybos tikrinimas:
 Edit queries…	Mail		Taisyti užklausas…
@@ -142,7 +140,6 @@ Edit signatures…	Mail		Taisyti prierašus…
 User interface	Mail		Naudotojo sąsaja
 Inconsistency occurred in the undo/redo buffer.	Mail		Nesutapimas atšaukti/grąžinti buferyje.
 Remove attachment	Mail		Šalinti priedą
-Set to…	Mail		Nustatyti būseną į…
 Edit	Mail		Taisa
 Page setup…	Mail		Puslapio nuostatos…
 An error occurred trying to save this signature.	Mail		Bandant įrašyti šį prierašą, įvyko klaida.

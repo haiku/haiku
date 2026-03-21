@@ -1,51 +1,51 @@
 1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	1159274874
-Temp	DataSource		Temp.
-Temperature	DataSource		Temperatura
 Teams	DataSource		Equips
-Semaphores	DataSource		Semàfors
-TX	DataSource	Shorter version for Sending	TX
+Temp	DataSource		Temp.
 Block cache memory	DataSource		Bloca la memòria cau
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Nodes de mitjans
-Text clipboard	DataSource		Porta-retalls per a text
 Network send	DataSource		Envia amb la xarxa
-Cache	DataSource		Memòria cau
-Running applications	DataSource		Aplicacions en execució
-CPU usage (combined)	DataSource		Ús de la CPU (combinat)
 Threads	DataSource		Fils
-Receiving	DataSource		Es rep
 Remove graph	ActivityView		Suprimeix el gràfic
-Swap space	DataSource		Espai d'intercanvi
-CPU	DataSource		CPU
 ActivityMonitor	System name		Monitor d'activitat
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval d'actualització:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Paràmetres...
 Block cache	DataSource		Bloca la cau
 Memory	DataSource		Memòria
 No thermal sensor	SystemInfoHandler		Sense sensor tèrmic
-CPU usage	DataSource		Ús de la CPU
 CPU speed	DataSource		Velocitat de la CPU
-Quit	ActivityWindow		Surt
+CPU usage	DataSource		Ús de la CPU
 Raw clipboard	DataSource		Porta-retalls en cru
 Settings	ActivityWindow		Paràmetres
 Used memory	DataSource		Memòria usada
-Show legend	ActivityView		Mostra la llegenda
 Cached memory	DataSource		A la memòria cau
-CPU %d usage	DataSource		Ús de la CPU %d
-CPU %d speed	DataSource		Velocitat de la CPU %d
-File	ActivityWindow		Fitxer
 Ports	DataSource		Ports
-Page faults	DataSource		Errors de pàgina
-Additional items	ActivityView		Elements addicionals
 Apps	DataSource		Aplicacions
+Page faults	DataSource		Errors de pàgina
 Add graph	ActivityWindow		Afegeix-hi un gràfic
+Swap	DataSource		Memòria d'intercanvi
+%s faults/s	DataSource		%s errors/s
+Temperature	DataSource		Temperatura
+Semaphores	DataSource		Semàfors
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Porta-retalls per a text
+Running applications	DataSource		Aplicacions en execució
+Cache	DataSource		Memòria cau
+CPU usage (combined)	DataSource		Ús de la CPU (combinat)
+Receiving	DataSource		Es rep
+Swap space	DataSource		Espai d'intercanvi
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Surt
+Show legend	ActivityView		Mostra la llegenda
+File	ActivityWindow		Fitxer
+CPU %d speed	DataSource		Velocitat de la CPU %d
+CPU %d usage	DataSource		Ús de la CPU %d
+Additional items	ActivityView		Elements addicionals
 Sending	DataSource		S'envia
 Always on top	ActivityWindow		Sempre en primer pla
-Swap	DataSource		Memòria d'intercanvi
-%lld sec.	SettingsWindow		%lld seg.
-P-faults	DataSource		Errors de pàg.
 Sems	DataSource		Sems
+P-faults	DataSource		Errors de pàg.
+%lld sec.	SettingsWindow		%lld seg.
 Network receive	DataSource		Rep de la xarxa
-%s faults/s	DataSource		%s errors/s

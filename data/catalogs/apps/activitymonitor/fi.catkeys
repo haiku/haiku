@@ -1,48 +1,48 @@
 1	finnish	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Ryhmät
-Semaphores	DataSource		Opastimet
-TX	DataSource	Shorter version for Sending	Läh.
 Block cache memory	DataSource		Lohkovälimuisti
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Mediasolmut
-Text clipboard	DataSource		Tekstileikepöytä
 Network send	DataSource		Verkkolähetys
-Cache	DataSource		Välimuisti
-Running applications	DataSource		Suoritetaan sovelluksia
-CPU usage (combined)	DataSource		Suoritinkäyttö (yhdistetty)
 Threads	DataSource		Säikeet
-Receiving	DataSource		Vastaanotetaan
 Remove graph	ActivityView		Poista kuvaaja
-Swap space	DataSource		Vaihda tila
-CPU	DataSource		Suoritin
 ActivityMonitor	System name		Aktiviteettivalvonta
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Päivitä aikaväli:
-RX	DataSource	Shorter version for Receiving.	Vast.
 Settings…	ActivityWindow		Asetukset...
 Block cache	DataSource		Lohkovälimuisti
 Memory	DataSource		Muisti
-CPU usage	DataSource		Suoritinkäyttö
 CPU speed	DataSource		Prosessorinopeus
-Quit	ActivityWindow		Poistu
+CPU usage	DataSource		Suoritinkäyttö
 Raw clipboard	DataSource		Raakadataleikepöytä
 Settings	ActivityWindow		Asetukset
 Used memory	DataSource		Käytetty muisti
-Show legend	ActivityView		Näytä merkin selitys
 Cached memory	DataSource		Välimuistitettu muisti
-CPU %d usage	DataSource		CPU %d käyttö
-CPU %d speed	DataSource		Prosessori %d-nopeus
-File	ActivityWindow		Tiedosto
 Ports	DataSource		Portit
-Page faults	DataSource		Sivuvirheet
-Additional items	ActivityView		Lisäkohteet
 Apps	DataSource		Sovellukset
+Page faults	DataSource		Sivuvirheet
 Add graph	ActivityWindow		Lisää kuvaaja
+Swap	DataSource		Vaihda
+%s faults/s	DataSource		%s vikaa/s
+Semaphores	DataSource		Opastimet
+TX	DataSource	Shorter version for Sending	Läh.
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Tekstileikepöytä
+Running applications	DataSource		Suoritetaan sovelluksia
+Cache	DataSource		Välimuisti
+CPU usage (combined)	DataSource		Suoritinkäyttö (yhdistetty)
+Receiving	DataSource		Vastaanotetaan
+Swap space	DataSource		Vaihda tila
+CPU	DataSource		Suoritin
+RX	DataSource	Shorter version for Receiving.	Vast.
+Quit	ActivityWindow		Poistu
+Show legend	ActivityView		Näytä merkin selitys
+File	ActivityWindow		Tiedosto
+CPU %d speed	DataSource		Prosessori %d-nopeus
+CPU %d usage	DataSource		CPU %d käyttö
+Additional items	ActivityView		Lisäkohteet
 Sending	DataSource		Lähetetään
 Always on top	ActivityWindow		Aina päällimmäisenä
-Swap	DataSource		Vaihda
-%lld sec.	SettingsWindow		%lld s
-P-faults	DataSource		P-viat
 Sems	DataSource		Opastimet
+P-faults	DataSource		P-viat
+%lld sec.	SettingsWindow		%lld s
 Network receive	DataSource		Verkkovastaanotto
-%s faults/s	DataSource		%s vikaa/s

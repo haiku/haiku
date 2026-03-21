@@ -1,5 +1,4 @@
-1	turkish	x-vnd.Be-MAIL	3439134129
-Set to Saved	Mail		Kaydedilenlere ekle
+1	turkish	x-vnd.Be-MAIL	4024882639
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder’e basmak bu iletinizi gönderir; ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter kümesi kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için Vazgeç’e tıklayın.
 Text wrapping:	Mail		Metin kaydırma:
 Show icons & labels	Mail		Simgeleri ve etiketleri göster
@@ -71,7 +70,6 @@ spam	B_USER_DIRECTORY/mail/spam		istenmeyen
 Reply to all	Mail		Tümünü yanıtla
 Cancel	Mail		Vazgeç
 Off	Mail		Kapalı
-Set to %s	Mail		%s olarak ayarla
 Signature:	Mail		İmza:
 Forward without attachments	Mail		Ekler olmadan ilet
 None	Settings		Yok
@@ -92,8 +90,8 @@ Auto signature:	Mail		Hep eklenecek imza:
 Same subject	Mail		Aynı konu
 Send	Mail		Gönder
 Open draft	Mail		Taslağı aç
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	“Yeni” olarak bırak
 Random	Mail		Rastgele
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	“Yeni” olarak bırak
 Attach attributes:	Mail		Öznitelik ekle:
 Find again	Mail		Yeniden bul
 Size:	Mail		Boyut:
@@ -113,7 +111,6 @@ Move to trash	Mail		Çöpe at
 <none>	Mail		<yok>
 %d - Date	Mail		%d — Tarih
 Check spelling	Mail		Yazımı denetle
-Status:	Mail		Durum:
 Redo	Mail		Yinele
 Leave as '%s'	Mail		“%s” olarak bırak
 Print…	Mail		Yazdır…
@@ -142,8 +139,8 @@ Send this message before closing?	Mail		Kapatmadan önce bu ileti gönderilsin m
 in	B_USER_DIRECTORY/mail/in		gelen
 Open	Mail		Aç
 Don't save	Mail		Kaydetme
-Leave same	Mail		Aynı bırak
 An error occurred trying to save the attachment.	Mail		Ek kaydedilirken bir hata oluştu.
+Leave same	Mail		Aynı bırak
 Save address	Mail		Adresi kaydet
 Initial spell check mode:	Mail		Başlangıç yazım denetimi kipi:
 Edit queries…	Mail		Sorguları düzenle…
@@ -156,7 +153,6 @@ Edit signatures…	Mail		İmzaları düzenle…
 User interface	Mail		Kullanıcı arayüzü
 Inconsistency occurred in the undo/redo buffer.	Mail		Geri al/yinele arabelleğinde bir uyuşmazlık meydana geldi.
 Remove attachment	Mail		Eki kaldır
-Set to…	Mail		Ayarla…
 Edit	Mail		Düzen
 Page setup…	Mail		Sayfa yapısı…
 An error occurred trying to save this signature.	Mail		İmza kaydedilirken bir hata oluştu.

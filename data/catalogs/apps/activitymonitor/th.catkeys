@@ -1,45 +1,45 @@
 1	thai	x-vnd.Haiku-ActivityMonitor	3094058302
 Teams	DataSource		ทีม
-Semaphores	DataSource		การให้สัญญาณ
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		บล็อกหน่วยความจำแคช
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		โหนดสื่อ
-Text clipboard	DataSource		คลิปบอร์ดข้อความ
 Network send	DataSource		เครือข่ายส่ง
-Cache	DataSource		แคช
-Running applications	DataSource		แอพที่กำลังทำงาน
-CPU usage (combined)	DataSource		การใช้งาน CPU (รวมกัน)
 Threads	DataSource		Threads
-Receiving	DataSource		ได้รับ
 Remove graph	ActivityView		ลบกราฟ
-Swap space	DataSource		สลับพื้นที่
-CPU	DataSource		CPU
 ActivityMonitor	System name		การตรวจสอบกิจกรรม
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		อัปเดตช่วงเวลา:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		การตั้งค่า
 Block cache	DataSource		บล็อคแคช
 Memory	DataSource		หน่วยความจำ
 CPU usage	DataSource		การใช้งาน CPU
-Quit	ActivityWindow		หยุด
 Raw clipboard	DataSource		คลิปบอร์ดต้นฉบับ
 Settings	ActivityWindow		การตั้งค่า
 Used memory	DataSource		หน่วยความจำที่ใช้
-Show legend	ActivityView		แสดงคำอธิบาย
 Cached memory	DataSource		หน่วยความจำแคช
-CPU %d usage	DataSource		การใช้งาน CPU %d
-File	ActivityWindow		ไฟล์
 Ports	DataSource		พอร์ท
-Page faults	DataSource		ความผิดพลาดของหน้า
-Additional items	ActivityView		รายการเพิ่มเติม
 Apps	DataSource		แอพส์
+Page faults	DataSource		ความผิดพลาดของหน้า
 Add graph	ActivityWindow		เพิ่มกราฟ
+Swap	DataSource		สลับ
+Semaphores	DataSource		การให้สัญญาณ
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		คลิปบอร์ดข้อความ
+Running applications	DataSource		แอพที่กำลังทำงาน
+Cache	DataSource		แคช
+CPU usage (combined)	DataSource		การใช้งาน CPU (รวมกัน)
+Receiving	DataSource		ได้รับ
+Swap space	DataSource		สลับพื้นที่
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		หยุด
+Show legend	ActivityView		แสดงคำอธิบาย
+File	ActivityWindow		ไฟล์
+CPU %d usage	DataSource		การใช้งาน CPU %d
+Additional items	ActivityView		รายการเพิ่มเติม
 Sending	DataSource		ส่ง
 Always on top	ActivityWindow		อยู่ด้านบนเสมอ
-Swap	DataSource		สลับ
-%lld sec.	SettingsWindow		%lld sec.
-P-faults	DataSource		P-faults
 Sems	DataSource		Sems
+P-faults	DataSource		P-faults
+%lld sec.	SettingsWindow		%lld sec.
 Network receive	DataSource		เครือข่ายได้รับ

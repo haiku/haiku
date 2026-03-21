@@ -1,5 +1,4 @@
-1	friulian	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Met come Salvât
+1	friulian	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il to test principâl al conten %ld caratars che no si puedin codificâ. Podaressie lâ ben forsit une cumbinazion di caratars diferente? Frache Invie par inviâlu distès (un caratar sostitutîf al vignarà doprât al puest di chei no codificabii), o sielç Anule par tornâ indaûr e justâ il test.
 Text wrapping:	Mail		Rie gnove automatiche:
 Show icons & labels	Mail		Mostre iconis e etichetis
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		malvolude
 Reply to all	Mail		Rispuint a ducj
 Cancel	Mail		Anule
 Off	Mail		Disativât
-Set to %s	Mail		Met a %s
 Signature:	Mail		Firme:
 Forward without attachments	Mail		Mande indenant cence zontis
 queries	B_USER_DIRECTORY/mail/queries		interogazions
@@ -87,8 +85,8 @@ Auto signature:	Mail		Firme automatiche:
 Same subject	Mail		Stes ogjet
 Send	Mail		Invie
 Open draft	Mail		Vierç stampon
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasse come 'Gnûf'
 Random	Mail		Casuâl
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasse come 'Gnûf'
 Attach attributes:	Mail		Atribûts des zontis:
 Find again	Mail		Cjate di gnûf
 Size:	Mail		Dimension:
@@ -108,7 +106,6 @@ Move to trash	Mail		Sposte te scovacere
 <none>	Mail		<vueit>
 %d - Date	Mail		%d - Date
 Check spelling	Mail		Control ortografic
-Status:	Mail		Stât:
 Redo	Mail		Torne fâs
 Leave as '%s'	Mail		Lasse come '%s'
 Print…	Mail		Stampe…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Inviâ chest messaç prime di sierâ?
 in	B_USER_DIRECTORY/mail/in		in jentrade
 Open	Mail		Vierç
 Don't save	Mail		No sta salvâ
-Leave same	Mail		Lasse il stes
 An error occurred trying to save the attachment.	Mail		Si è verificât un erôr cirint di salvâ la zonte.
+Leave same	Mail		Lasse il stes
 Save address	Mail		Salve direzion
 Initial spell check mode:	Mail		Modalitât control ortografic iniziâl:
 Edit queries…	Mail		Modifiche interogazions…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Modifiche firme…
 User interface	Mail		Interface utent
 Inconsistency occurred in the undo/redo buffer.	Mail		Si è verificade une incoerence intal buffer 'disfe/torne fâs'.
 Remove attachment	Mail		Gjave zonte
-Set to…	Mail		Met a…
 Edit	Mail		Modifiche
 Page setup…	Mail		Impostazion pagjine…
 An error occurred trying to save this signature.	Mail		Si è verificât un erôr cirint di salvâ cheste firme.

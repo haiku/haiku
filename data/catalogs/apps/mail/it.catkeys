@@ -1,5 +1,4 @@
-1	italian	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Imposta come Salvato
+1	italian	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il testo contiene %ld caratteri non codificabili. Se premi 'Invio' questi caratteri saranno sostituiti. Premi 'Annulla' per tornare indietro e verificare il set di caratteri utilizzato.
 Text wrapping:	Mail		A capo automatico
 Show icons & labels	Mail		Mostra icone e testo
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		spam
 Reply to all	Mail		Rispondi a tutti
 Cancel	Mail		Annulla
 Off	Mail		Disattivo
-Set to %s	Mail		Imposta a %s
 Signature:	Mail		Firma:
 Forward without attachments	Mail		Inoltra senza allegati
 queries	B_USER_DIRECTORY/mail/queries		interrogazioni
@@ -87,8 +85,8 @@ Auto signature:	Mail		Firma automatica:
 Same subject	Mail		Stesso oggetto
 Send	Mail		Invia
 Open draft	Mail		Apri bozza
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lascia come 'Nuovo'
 Random	Mail		Casuale
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lascia come 'Nuovo'
 Attach attributes:	Mail		Attributi dell'allegato:
 Find again	Mail		Cerca di nuovo
 Size:	Mail		Dimensione:
@@ -108,7 +106,6 @@ Move to trash	Mail		Sposta nel cestino
 <none>	Mail		<vuoto>
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Controllo ortografico
-Status:	Mail		Stato:
 Redo	Mail		Ripeti
 Leave as '%s'	Mail		Lascia come '%s'
 Print…	Mail		Stampa…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Invia questo messaggio prima di chiudere
 in	B_USER_DIRECTORY/mail/in		in entrata
 Open	Mail		Apri
 Don't save	Mail		Non salvare
-Leave same	Mail		Lascia così come è
 An error occurred trying to save the attachment.	Mail		Si è verificato un errore durante il salvataggio dell'allegato.
+Leave same	Mail		Lascia così come è
 Save address	Mail		Salva indirizzo
 Initial spell check mode:	Mail		Correzione ortografica:
 Edit queries…	Mail		Modifica interrogazioni…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Modifica firme…
 User interface	Mail		Interfaccia utente
 Inconsistency occurred in the undo/redo buffer.	Mail		Si è verificata un'inconsistenza nel buffer annulla/ripeti.
 Remove attachment	Mail		Rimuovi allegato
-Set to…	Mail		Imposta a…
 Edit	Mail		Modifica
 Page setup…	Mail		Impostazioni di pagina…
 An error occurred trying to save this signature.	Mail		Si è verificato un errore durante il salvataggio della firma.

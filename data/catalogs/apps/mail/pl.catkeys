@@ -1,5 +1,4 @@
-1	polish	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Ustaw do Zapisanych
+1	polish	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Twój główny tekst zawiera %ld niekodowalnych znaków. Być może inny zestaw znaków będzie lepiej działać? Wybierz Wyślij aby wysłać mimo wszystko (znak zastępczy będzie użyty w miejscach niekodowalnych znaków), lub wybierz Anuluj aby wrócić i poprawić to.
 Text wrapping:	Mail		Zawijanie tekstu:
 Show icons & labels	Mail		Pokaż ikony i etykiety
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		spam
 Reply to all	Mail		Odpowiedz wszystkim
 Cancel	Mail		Anuluj
 Off	Mail		Wyłącz
-Set to %s	Mail		Ustaw dla: %s
 Signature:	Mail		Sygnatura:
 Forward without attachments	Mail		Przekaż bez załączników
 queries	B_USER_DIRECTORY/mail/queries		zapytania
@@ -87,8 +85,8 @@ Auto signature:	Mail		Automatyczna sygnaturka:
 Same subject	Mail		Ten sam temat
 Send	Mail		Wyślij
 Open draft	Mail		Otwórz szkic
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Pozostaw jako „New”
 Random	Mail		Losowe
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Pozostaw jako „New”
 Attach attributes:	Mail		Dołączaj atrybuty:
 Find again	Mail		Znajdź ponownie
 Size:	Mail		Rozmiar:
@@ -108,7 +106,6 @@ Move to trash	Mail		Przenieś do kosza
 <none>	Mail		<brak>
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Sprawdzanie pisowni
-Status:	Mail		Status:
 Redo	Mail		Ponów
 Leave as '%s'	Mail		Pozostaw jako „%s”
 Print…	Mail		Drukuj…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Czy przed zamknięciem wysłać wiadomo�
 in	B_USER_DIRECTORY/mail/in		in
 Open	Mail		Otwórz
 Don't save	Mail		Nie zapisuj
-Leave same	Mail		Pozostaw bez zmian
 An error occurred trying to save the attachment.	Mail		Wystąpił błąd podczas zapisu załącznika.
+Leave same	Mail		Pozostaw bez zmian
 Save address	Mail		Zapisz adres
 Initial spell check mode:	Mail		Początkowy tryb sprawdzania pisowni:
 Edit queries…	Mail		Edytuj zapytania…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Edytuj sygnaturki…
 User interface	Mail		Interfejs użytkownika
 Inconsistency occurred in the undo/redo buffer.	Mail		Powstała niespójność pomiędzy buforem cofnij/powtórz.
 Remove attachment	Mail		Usuń załącznik
-Set to…	Mail		Ustaw do…
 Edit	Mail		Edycja
 Page setup…	Mail		Ustawienia strony…
 An error occurred trying to save this signature.	Mail		Wystąpił błąd podczas próby zapisu sygnaturki.

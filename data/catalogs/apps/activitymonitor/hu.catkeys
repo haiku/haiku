@@ -1,51 +1,51 @@
 1	hungarian	x-vnd.Haiku-ActivityMonitor	1159274874
-Temp	DataSource		Hőfok
-Temperature	DataSource		Hőmérséklet
 Teams	DataSource		Csapatok
-Semaphores	DataSource		Szemaforok
-TX	DataSource	Shorter version for Sending	Adás
+Temp	DataSource		Hőfok
 Block cache memory	DataSource		Blokk gyorsítótár
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Média csomópontok
-Text clipboard	DataSource		Szöveges vágólap
 Network send	DataSource		Küldött adatok
-Cache	DataSource		Gyorsítótár
-Running applications	DataSource		Futó programok
-CPU usage (combined)	DataSource		Processzor használat (kombinált)
 Threads	DataSource		Szálak
-Receiving	DataSource		Fogadás
 Remove graph	ActivityView		Grafikon eltávolítása
-Swap space	DataSource		Virtuális memória
-CPU	DataSource		CPU
 ActivityMonitor	System name		Folyamatmonitor
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Frissítési gyakoriság:
-RX	DataSource	Shorter version for Receiving.	Vétel
 Settings…	ActivityWindow		Beállítások…
 Block cache	DataSource		Blokk gyorsítótár
 Memory	DataSource		Memória
 No thermal sensor	SystemInfoHandler		Nincs hőérzékelő
-CPU usage	DataSource		Processzor használat
 CPU speed	DataSource		Processzor sebessége
-Quit	ActivityWindow		Kilépés
+CPU usage	DataSource		Processzor használat
 Raw clipboard	DataSource		Nyers vágólap
 Settings	ActivityWindow		Beállítások
 Used memory	DataSource		Használt memória
-Show legend	ActivityView		Magyarázat megjelenítése
 Cached memory	DataSource		Gyorsítótárazott memória
-CPU %d usage	DataSource		CPU %d használat
-CPU %d speed	DataSource		%d. processzor sebessége
-File	ActivityWindow		Fájl
 Ports	DataSource		Portok
-Page faults	DataSource		Laphibák
-Additional items	ActivityView		További elemek
 Apps	DataSource		Programok
+Page faults	DataSource		Laphibák
 Add graph	ActivityWindow		Grafikon hozzáadása
+Swap	DataSource		Swap
+%s faults/s	DataSource		%s hiba/mp
+Temperature	DataSource		Hőmérséklet
+Semaphores	DataSource		Szemaforok
+TX	DataSource	Shorter version for Sending	Adás
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Szöveges vágólap
+Running applications	DataSource		Futó programok
+Cache	DataSource		Gyorsítótár
+CPU usage (combined)	DataSource		Processzor használat (kombinált)
+Receiving	DataSource		Fogadás
+Swap space	DataSource		Virtuális memória
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	Vétel
+Quit	ActivityWindow		Kilépés
+Show legend	ActivityView		Magyarázat megjelenítése
+File	ActivityWindow		Fájl
+CPU %d speed	DataSource		%d. processzor sebessége
+CPU %d usage	DataSource		CPU %d használat
+Additional items	ActivityView		További elemek
 Sending	DataSource		Küldés
 Always on top	ActivityWindow		Mindig felül
-Swap	DataSource		Swap
-%lld sec.	SettingsWindow		%lld mp.
-P-faults	DataSource		P hibák
 Sems	DataSource		Szemaforok
+P-faults	DataSource		P hibák
+%lld sec.	SettingsWindow		%lld mp.
 Network receive	DataSource		Fogadott adatok
-%s faults/s	DataSource		%s hiba/mp

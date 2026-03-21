@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	2882508421
+1	german	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		Dokument-Statistik
 Cut	Menus		Ausschneiden
 Center	Menus		Zentriert
@@ -14,6 +14,7 @@ Find again	Menus		Weitersuchen
 Read-only	StatusView		Schreibgeschützt
 Save	Menus		Speichern
 Untitled %d	Window title		Unbenannt %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%filename%\".
 Cancel	QuitAlert		Abbrechen
 Copy	Menus		Kopieren
 Reload	NodeMonitorAlerts		Neu laden
@@ -21,11 +22,13 @@ line %d, column %d	StatusView		Zeile %d, Spalte %d
 Words:	Statistics		Wörter:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Wiederherstellen
+Unable to unlock file\n\t%error%	QuitAlert		Die Datei konnte nicht entsperrt werden\n\t%error%
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Datei entsperren
 Italic	Menus		Kursiv
 Can't undo	Menus		Rückgängig nicht möglich
 Replace…	Menus		Ersetzen …
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument  \"%filename%\ speichern?
 File	Menus		Datei
 Paste	Menus		Einfügen
 Bold	Menus		Fett
@@ -34,7 +37,10 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Zeilen:
 Strikeout	Menus		Durchgestrichen
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
+Error saving \"%filename%\":\n%error%	SaveAlert		Fehler beim Speichern von \"%filename%\":\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Geändertes Dokument \"%title%\" speichern? 
 Save	SaveAlert		Speichern
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" enthält ungespeicherte Änderungen.\nZuletzt gespeicherte Version wiederherstellen?
 Default	Open_and_SaveAsPanel		Standard
 Cancel	RevertToSavedAlert		Abbrechen
 Cancel	FindandReplaceWindow		Abbrechen
@@ -77,8 +83,10 @@ Open…	Menus		Öffnen …
 Save as…	Menus		Speichern unter …
 Replace	FindandReplaceWindow		Ersetzen
 Characters:	Statistics		Zeichen:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		Fehler beim Öffnen von  \"%filename%\:\n\tDas Dateiformat wird nicht unterstützt.
 Don't save	QuitAlert		Verwerfen
 Align	Menus		Ausrichtung
 Font	Menus		Schrift
 Select all	Menus		Alles auswählen
 Right	Menus		Rechts
+Error loading \"%filename%\":\n\t%error%	LoadAlert		Fehler beim Laden von \"%filename%\":\n\t%error%

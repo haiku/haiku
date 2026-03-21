@@ -1,48 +1,48 @@
 1	polish	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Zespoły
-Semaphores	DataSource		Semafory
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blokowa pamięć podręczna
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Węzły multimediów
-Text clipboard	DataSource		Schowek tekstowy
 Network send	DataSource		Wysłane
-Cache	DataSource		Cache
-Running applications	DataSource		Uruchomione aplikacje
-CPU usage (combined)	DataSource		Użycie procesora (całkowite)
 Threads	DataSource		Wątki
-Receiving	DataSource		Otrzymane
 Remove graph	ActivityView		Usuń wykres
-Swap space	DataSource		Przestrzeń wymiany
-CPU	DataSource		Procesor
 ActivityMonitor	System name		Monitor Aktywności
 CPU %d	DataSource		Procesor %d
 Update time interval:	SettingsWindow		Częstotliwość odświeżania:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Ustawienia…
 Block cache	DataSource		Blokowa pamięć podręczna
 Memory	DataSource		Pamięć
-CPU usage	DataSource		Użycie procesora
 CPU speed	DataSource		Prędkość procesora
-Quit	ActivityWindow		Zakończ
+CPU usage	DataSource		Użycie procesora
 Raw clipboard	DataSource		Schowek binarny
 Settings	ActivityWindow		Ustawienia
 Used memory	DataSource		Używana pamięć
-Show legend	ActivityView		Pokaż legendę
 Cached memory	DataSource		Pamięć podręczna
-CPU %d usage	DataSource		Użycie procesora %d
-CPU %d speed	DataSource		Prędkość procesora %d
-File	ActivityWindow		Plik
 Ports	DataSource		Porty
-Page faults	DataSource		Błędy stronicowania
-Additional items	ActivityView		Dodatkowe informacje
 Apps	DataSource		Aplikacje
+Page faults	DataSource		Błędy stronicowania
 Add graph	ActivityWindow		Dodaj wykres
+Swap	DataSource		Przestrzeń wymiany
+%s faults/s	DataSource		%s błędów/s
+Semaphores	DataSource		Semafory
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Schowek tekstowy
+Running applications	DataSource		Uruchomione aplikacje
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		Użycie procesora (całkowite)
+Receiving	DataSource		Otrzymane
+Swap space	DataSource		Przestrzeń wymiany
+CPU	DataSource		Procesor
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Zakończ
+Show legend	ActivityView		Pokaż legendę
+File	ActivityWindow		Plik
+CPU %d speed	DataSource		Prędkość procesora %d
+CPU %d usage	DataSource		Użycie procesora %d
+Additional items	ActivityView		Dodatkowe informacje
 Sending	DataSource		Wysłane
 Always on top	ActivityWindow		Zawsze na wierzchu
-Swap	DataSource		Przestrzeń wymiany
-%lld sec.	SettingsWindow		%lld s
-P-faults	DataSource		P-błędy
 Sems	DataSource		Semy
+P-faults	DataSource		P-błędy
+%lld sec.	SettingsWindow		%lld s
 Network receive	DataSource		Otrzymane
-%s faults/s	DataSource		%s błędów/s

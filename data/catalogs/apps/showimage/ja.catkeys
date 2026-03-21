@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	3394555425
+1	japanese	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		画像ビューワ
 Page setup…	Menus		ページ設定...
 Previous file	Menus		前のファイル
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		高さ:
 Next file	Menus		次のファイル
 Slide show	Menus		スライドショー
 Original size	Menus		元のサイズ
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		ドキュメント '%filename%' は変更されています。ドキュメントを閉じますか?
 Width:	PrintOptionsWindow		幅:
 Resize to (in 1/72 inches):	PrintOptionsWindow		リサイズ (1/72 インチ):
 Zoom factor in %:	PrintOptionsWindow		倍率 (%):
@@ -46,6 +47,7 @@ Clear selection	Menus		選択解除
 Rotate clockwise	Menus		右 90度回転
 Open with…	Menus		次のアプリケーションで開く…
 Rotate counterclockwise	Menus		左 90度回転
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		ドキュメント '%filename%' (ページ %number%) は変更されています。ドキュメントを閉じますか?
 Previous page	Menus		前のページ
 Fit to window	Menus		ウィンドウに合わせる
 Go to page	Menus		指定ページへ

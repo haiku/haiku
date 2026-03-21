@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	2882508421
+1	japanese	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		ドキュメント統計
 Cut	Menus		切り取り
 Center	Menus		中央揃え
@@ -14,6 +14,7 @@ Find again	Menus		次を検索
 Read-only	StatusView		読み込み専用
 Save	Menus		保存
 Untitled %d	Window title		名称未設定 %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		元に戻せません。次のファイルが見つかりませんでした \"%filename%\"。
 Cancel	QuitAlert		中止
 Copy	Menus		コピー
 Reload	NodeMonitorAlerts		再読み込み
@@ -21,11 +22,13 @@ line %d, column %d	StatusView		%d 行, %d 列
 Words:	Statistics		単語数:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		回復
+Unable to unlock file\n\t%error%	QuitAlert		ファイルをアンロックできません\n\t%error%
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		ロック解除
 Italic	Menus		イタリック
 Can't undo	Menus		元に戻せません
 Replace…	Menus		置換...
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		ファイルは読み取り専用としてマークされています。ドキュメント \"%filename%\" への変更を保存しますか? 
 File	Menus		ファイル
 Paste	Menus		貼り付け
 Bold	Menus		太字
@@ -34,7 +37,10 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		行数:
 Strikeout	Menus		取り消し線
 Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
+Error saving \"%filename%\":\n%error%	SaveAlert		\"%filename%\" の保存中にエラー:\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		ドキュメント \"%title%\" への変更を保存しますか?
 Save	SaveAlert		保存
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" には保存されていない変更があります。\n最後に保存されたバージョンに戻しますか?
 Default	Open_and_SaveAsPanel		デフォルト
 Cancel	RevertToSavedAlert		中止
 Cancel	FindandReplaceWindow		中止
@@ -77,8 +83,10 @@ Open…	Menus		開く...
 Save as…	Menus		名前を付けて保存...
 Replace	FindandReplaceWindow		置換
 Characters:	Statistics		文字数:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		\"%filename%\" の読み込み中にエラー:\n\tサポートされていないフォーマット
 Don't save	QuitAlert		保存しない
 Align	Menus		配置
 Font	Menus		フォント
 Select all	Menus		すべて選択
 Right	Menus		右揃え
+Error loading \"%filename%\":\n\t%error%	LoadAlert		\"%filename%\" の読み込み中にエラー:\n\t%error%

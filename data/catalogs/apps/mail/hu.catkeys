@@ -1,5 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	218437132
-Set to Saved	Mail		Mentésre jelöl
+1	hungarian	x-vnd.Be-MAIL	804185642
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattints a Küldésre, ha mindenképp el akarod küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térj vissza, és javítsd ki azt.
 Text wrapping:	Mail		Szöveg tördelése:
 Show icons & labels	Mail		Ikonok és feliratok
@@ -70,7 +69,6 @@ spam	B_USER_DIRECTORY/mail/spam		Levélszemét
 Reply to all	Mail		Válasz mindenkinek
 Cancel	Mail		Mégse
 Off	Mail		Ki
-Set to %s	Mail		Megjelölés: %s
 Signature:	Mail		Aláírás
 Forward without attachments	Mail		Továbbítás mellékletek nélkül
 queries	B_USER_DIRECTORY/mail/queries		Lekérdezések
@@ -90,8 +88,8 @@ Auto signature:	Mail		Automatikus aláírás:
 Same subject	Mail		Azonos cím
 Send	Mail		Küldés
 Open draft	Mail		Piszkozat megnyitása
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Megőrzés 'Új'-ként
 Random	Mail		Véletlen
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Megőrzés 'Új'-ként
 Attach attributes:	Mail		Jellemzők csatolása:
 Find again	Mail		Keresés ismétlése
 Size:	Mail		Méret:
@@ -111,7 +109,6 @@ Move to trash	Mail		Áthelyezés a Szemetesbe
 <none>	Mail		<nincs>
 %d - Date	Mail		%d - dátum
 Check spelling	Mail		Helyesírás-ellenőrzés
-Status:	Mail		Állapot:
 Redo	Mail		Újra
 Leave as '%s'	Mail		Hagyja '%s'-ként
 Print…	Mail		Nyomtatás…
@@ -140,8 +137,8 @@ Send this message before closing?	Mail		Elküldi ezt az üzenetet bezárás elő
 in	B_USER_DIRECTORY/mail/in		Bejövő
 Open	Mail		Megnyitás
 Don't save	Mail		Ne mentse
-Leave same	Mail		Hagyja azonosan
 An error occurred trying to save the attachment.	Mail		Hiba történt a mellékletek csatolása közben.
+Leave same	Mail		Hagyja azonosan
 Save address	Mail		Cím mentése
 Initial spell check mode:	Mail		Helyesírás ellenőrzése:
 Edit queries…	Mail		Lekérdezés szerkesztése…
@@ -154,7 +151,6 @@ Edit signatures…	Mail		Aláírás szerkesztése…
 User interface	Mail		Felhasználói felület
 Inconsistency occurred in the undo/redo buffer.	Mail		Kavarodás történt a visszavon/újra tárolóban.
 Remove attachment	Mail		Eltávolítás
-Set to…	Mail		Megjelöl…
 Edit	Mail		Szerkesztés
 Page setup…	Mail		Oldalbeállítás…
 An error occurred trying to save this signature.	Mail		Hiba történt az aláírás mentése közben.

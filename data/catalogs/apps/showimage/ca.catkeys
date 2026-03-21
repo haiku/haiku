@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ShowImage	3394555425
+1	catalan; valencian	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		Mostra la imatge
 Page setup…	Menus		Configuració de la pàgina...
 Previous file	Menus		Fitxer anterior
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Alçada:
 Next file	Menus		Fitxer següent
 Slide show	Menus		Presentació
 Original size	Menus		Mida original
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		El document %filename% s'ha modificat. Voleu tancar el document?
 Width:	PrintOptionsWindow		Amplada:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Canvia'n la mida a (en 1/72 polzades):
 Zoom factor in %:	PrintOptionsWindow		Factor d'ampliació en %:
@@ -46,6 +47,7 @@ Clear selection	Menus		Neteja la selecció
 Rotate clockwise	Menus		Gira en el sentit del rellotge
 Open with…	Menus		Obre amb...
 Rotate counterclockwise	Menus		Gira en sentit antihorari
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		El document %filename% (pàgina %number%) s'ha modificat. Voleu tancar el document?
 Previous page	Menus		Pàgina anterior
 Fit to window	Menus		Ajusta a la finestra
 Go to page	Menus		Ves a la pàgina

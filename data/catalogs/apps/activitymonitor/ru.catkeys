@@ -1,50 +1,50 @@
 1	russian	x-vnd.Haiku-ActivityMonitor	2137057658
-Temperature	DataSource		Температура
 Teams	DataSource		Процессы
-Semaphores	DataSource		Семафоры
-TX	DataSource	Shorter version for Sending	Передача
 Block cache memory	DataSource		Память блокового кэша
-%lld ms	SettingsWindow		%lld мс
 Media nodes	DataSource		Медиа узлы
-Text clipboard	DataSource		Текстовый буфер обмена
 Network send	DataSource		Исходящий трафик
-Cache	DataSource		Кэш
-Running applications	DataSource		Запущенные приложения
-CPU usage (combined)	DataSource		Использование процессора (всего)
 Threads	DataSource		Потоки
-Receiving	DataSource		Прием
 Remove graph	ActivityView		Удалить график
-Swap space	DataSource		Размер файла подкачки
-CPU	DataSource		Процессор
 ActivityMonitor	System name		Монитор активности
 CPU %d	DataSource		Процессор %d
 Update time interval:	SettingsWindow		Интервал обновления:
-RX	DataSource	Shorter version for Receiving.	Прием
 Settings…	ActivityWindow		Настройки…
 Block cache	DataSource		Блоковый кэш
 Memory	DataSource		Память
 No thermal sensor	SystemInfoHandler		Нет термальных сенсоров
-CPU usage	DataSource		Использование ЦПУ
 CPU speed	DataSource		Скорость ЦП
-Quit	ActivityWindow		Выход
+CPU usage	DataSource		Использование ЦПУ
 Raw clipboard	DataSource		Полный буфер обмена
 Settings	ActivityWindow		Настройки
 Used memory	DataSource		Используемая память
-Show legend	ActivityView		Показать легенду
 Cached memory	DataSource		Кэшируемая память
-CPU %d usage	DataSource		Используется %d ЦП
-CPU %d speed	DataSource		Скорость ЦП %d
-File	ActivityWindow		Файл
 Ports	DataSource		Порты
-Page faults	DataSource		Отказы страниц
-Additional items	ActivityView		Дополнительные графики
 Apps	DataSource		Приложения
+Page faults	DataSource		Отказы страниц
 Add graph	ActivityWindow		Добавить график
+Swap	DataSource		Файл подкачки
+%s faults/s	DataSource		%s отказов/с
+Temperature	DataSource		Температура
+Semaphores	DataSource		Семафоры
+TX	DataSource	Shorter version for Sending	Передача
+%lld ms	SettingsWindow		%lld мс
+Text clipboard	DataSource		Текстовый буфер обмена
+Running applications	DataSource		Запущенные приложения
+Cache	DataSource		Кэш
+CPU usage (combined)	DataSource		Использование процессора (всего)
+Receiving	DataSource		Прием
+Swap space	DataSource		Размер файла подкачки
+CPU	DataSource		Процессор
+RX	DataSource	Shorter version for Receiving.	Прием
+Quit	ActivityWindow		Выход
+Show legend	ActivityView		Показать легенду
+File	ActivityWindow		Файл
+CPU %d speed	DataSource		Скорость ЦП %d
+CPU %d usage	DataSource		Используется %d ЦП
+Additional items	ActivityView		Дополнительные графики
 Sending	DataSource		Отправка
 Always on top	ActivityWindow		Поверх всех окон
-Swap	DataSource		Файл подкачки
-%lld sec.	SettingsWindow		%lld сек.
-P-faults	DataSource		Отказы страниц
 Sems	DataSource		Семафоры
+P-faults	DataSource		Отказы страниц
+%lld sec.	SettingsWindow		%lld сек.
 Network receive	DataSource		Входящий трафик
-%s faults/s	DataSource		%s отказов/с

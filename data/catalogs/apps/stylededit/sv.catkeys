@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	2882508421
+1	swedish	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		Dokumentstatistik
 Cut	Menus		Klipp ut
 Center	Menus		Mitten
@@ -14,6 +14,7 @@ Find again	Menus		Sök igen
 Read-only	StatusView		Skrivskyddad
 Save	Menus		Spara
 Untitled %d	Window title		Namnlös %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Kan inte återställa, filen hittades inte: \"%filename%\".
 Cancel	QuitAlert		Avbryt
 Copy	Menus		Kopiera
 Reload	NodeMonitorAlerts		Uppdatera
@@ -21,11 +22,13 @@ line %d, column %d	StatusView		rad %d, kolumn %d
 Words:	Statistics		Ord:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Återskapa
+Unable to unlock file\n\t%error%	QuitAlert		Det gick inte att låsa upp filen\n\t%error%
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Låsupp fil
 Italic	Menus		Kursiv
 Can't undo	Menus		Kan inte ångra
 Replace…	Menus		Ersätt…
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Den här filen är markerad som skrivskyddad. Spara ändringar i dokumentet \"%filename%\"? 
 File	Menus		Arkiv
 Paste	Menus		Klistra in
 Bold	Menus		Fet
@@ -34,7 +37,10 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Rader:
 Strikeout	Menus		Överstrykning
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
+Error saving \"%filename%\":\n%error%	SaveAlert		Fel vid sparning av \"%filename%\":\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Spara ändringar i dokumentet \"%title%\"?
 Save	SaveAlert		Spara
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" har osparade ändringar.\nÅterställ till den senast sparade versionen?
 Default	Open_and_SaveAsPanel		Standard
 Cancel	RevertToSavedAlert		Avbryt
 Cancel	FindandReplaceWindow		Avbryt
@@ -77,8 +83,10 @@ Open…	Menus		Öppna…
 Save as…	Menus		Spara som...
 Replace	FindandReplaceWindow		Ersätt
 Characters:	Statistics		Tecken:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		Fel vid laddning av \"%filename%\":\n\tFormat som inte stöds
 Don't save	QuitAlert		Spara inte
 Align	Menus		Justera
 Font	Menus		Font
 Select all	Menus		Markera allt
 Right	Menus		Höger
+Error loading \"%filename%\":\n\t%error%	LoadAlert		Fel vid laddning av \"%filename%\":\n\t%error%

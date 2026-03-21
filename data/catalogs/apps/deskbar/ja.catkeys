@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Be-TSKB	1763402521
+1	japanese	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		自動的に隠す
 Show all	WindowMenu		すべて表示
 Edit in Tracker…	PreferencesWindow		Tracker で編集...
 Menu	PreferencesWindow		メニュー
+Location	PreferencesWindow		Location
 Tracker always first	PreferencesWindow		Tracker を常時先頭に表示
 Hide clock	TimeView		時計を隠す
 Large	PreferencesWindow		大

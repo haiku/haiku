@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Aseta tallennetuksi
+1	finnish	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld koodaamatonta merkkiä. Ehkä eri merkistö toimisi paremmin? Napauta Lähetä-painiketta sen lähettämiseksi silti (korvausmerkkejä käytetään koodaamattomien merkkien paikalla), tai valitse Peru palataksesi ja yritä korjata se.
 Text wrapping:	Mail		Tekstin rivitys:
 Show icons & labels	Mail		Näytä kuvakkeet ja nimiöt
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		roskaposti
 Reply to all	Mail		Vastaa kaikille
 Cancel	Mail		Peru
 Off	Mail		Pois päältä
-Set to %s	Mail		Aseta arvoksi %s
 Signature:	Mail		Allekirjoitus:
 Forward without attachments	Mail		Lähetä edelleen ilman liitteitä
 queries	B_USER_DIRECTORY/mail/queries		kyselyt
@@ -87,8 +85,8 @@ Auto signature:	Mail		Automaattiallekirjoitus:
 Same subject	Mail		Sama aihe
 Send	Mail		Lähetä
 Open draft	Mail		Avaa luonnos
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Jätä arvoksi ’New’
 Random	Mail		Satunnainen
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Jätä arvoksi ’New’
 Attach attributes:	Mail		Liittämisattribuutit:
 Find again	Mail		Hae uudelleen
 Size:	Mail		Koko:
@@ -108,7 +106,6 @@ Move to trash	Mail		Siirrä roskakoriin
 <none>	Mail		<ei mitään>
 %d - Date	Mail		%d - Päivämäärä
 Check spelling	Mail		Oikolue
-Status:	Mail		Tila:
 Redo	Mail		Tee uudelleen
 Leave as '%s'	Mail		Jätä arvoksi ’%s’
 Print…	Mail		Tulosta…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Lähetetäänkö viesti ennen sulkemista
 in	B_USER_DIRECTORY/mail/in		tulevat
 Open	Mail		Avaa
 Don't save	Mail		Älä tallenna
-Leave same	Mail		Jätä sama
 An error occurred trying to save the attachment.	Mail		Tapahtui virhe yritettäessä tallentaa liitettä.
+Leave same	Mail		Jätä sama
 Save address	Mail		Tallenna osoite
 Initial spell check mode:	Mail		Alusta oikolukutila:
 Edit queries…	Mail		Muokkaa kyselyjä…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Muokkaa allekirjoituksia…
 User interface	Mail		Käyttöliittymä
 Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
 Remove attachment	Mail		Poista liite
-Set to…	Mail		Aseta arvoon…
 Edit	Mail		Muokkaa
 Page setup…	Mail		Sivuasetukset…
 An error occurred trying to save this signature.	Mail		Tapahtui virhe yritettäessä tallentaa tätä allekirjoitusta.

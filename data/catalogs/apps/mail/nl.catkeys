@@ -1,5 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	856240449
-Set to Saved	Mail		Als Bewaard markeren
+1	dutch; flemish	x-vnd.Be-MAIL	4084116739
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Uw hoofdtekst bevat %ld niet-codeerbare tekens. Mogelijk werkt een andere letterset beter? Klik op 'Versturen' om de tekst toch te versturen (een vervangend teken zal dan gebruikt worden op de plaats van elk niet-codeerbaar teken), of kies 'Annuleren' om terug te keren voor een herstelpoging.
 Text wrapping:	Mail		Tekstafbreking:
 Show icons & labels	Mail		Toon iconen & tekst
@@ -64,7 +63,6 @@ spam	B_USER_DIRECTORY/mail/spam		spam
 Reply to all	Mail		Allen beantwoorden
 Cancel	Mail		Annuleren
 Off	Mail		Uit
-Set to %s	Mail		Instellen als  %s
 Signature:	Mail		Onderschrift:
 Forward without attachments	Mail		Doorsturen zonder bijlagen
 queries	B_USER_DIRECTORY/mail/queries		zoekopdrachten
@@ -84,8 +82,8 @@ Auto signature:	Mail		Automatisch onderschrift:
 Same subject	Mail		Zelfde onderwerp
 Send	Mail		Versturen
 Open draft	Mail		Concept openen
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Behouden als 'Nieuw'
 Random	Mail		Willekeurig
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Behouden als 'Nieuw'
 Attach attributes:	Mail		Attributen bijvoegen:
 Find again	Mail		Opnieuw zoeken
 Size:	Mail		Grootte:
@@ -133,8 +131,8 @@ Send this message before closing?	Mail		Wilt u het bericht versturen voordat u h
 in	B_USER_DIRECTORY/mail/in		in
 Open	Mail		Openen
 Don't save	Mail		Niet opslaan
-Leave same	Mail		Ongewijzigd laten
 An error occurred trying to save the attachment.	Mail		Er is een fout ontstaan bij het opslaan van de bijlage.
+Leave same	Mail		Ongewijzigd laten
 Save address	Mail		Adres opslaan
 Initial spell check mode:	Mail		Aanvankelijke spellingcontrole-modus:
 Edit queries…	Mail		Zoektermen aanpassen…
@@ -147,7 +145,6 @@ Edit signatures…	Mail		Pas onderschriften aan…
 User interface	Mail		Gebruikersinterface
 Inconsistency occurred in the undo/redo buffer.	Mail		Er is een onregelmatigheid ontstaan in het herstel- /herhaalbuffer.
 Remove attachment	Mail		Verwijder bijlage
-Set to…	Mail		Instellen als…
 Edit	Mail		Aanpassen
 Page setup…	Mail		Pagina-opzet…
 An error occurred trying to save this signature.	Mail		Er is een fout ontstaan bij het opslaan van dit onderschrift.

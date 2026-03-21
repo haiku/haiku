@@ -1,51 +1,51 @@
 1	japanese	x-vnd.Haiku-ActivityMonitor	1159274874
-Temp	DataSource		温度
-Temperature	DataSource		温度
 Teams	DataSource		チーム数
-Semaphores	DataSource		セマフォ数
-TX	DataSource	Shorter version for Sending	送信
+Temp	DataSource		温度
 Block cache memory	DataSource		ブロックキャッシュメモリ
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		メディアノード数
-Text clipboard	DataSource		テキストクリップボード
 Network send	DataSource		ネットワーク送信量
-Cache	DataSource		キャッシュ
-Running applications	DataSource		実行中のアプリケーション数
-CPU usage (combined)	DataSource		CPU 使用率 (合計)
 Threads	DataSource		スレッド数
-Receiving	DataSource		受信量
 Remove graph	ActivityView		グラフの削除
-Swap space	DataSource		スワップサイズ
-CPU	DataSource		CPU
 ActivityMonitor	System name		アクティビティモニター
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		更新間隔:
-RX	DataSource	Shorter version for Receiving.	受信
 Settings…	ActivityWindow		設定...
 Block cache	DataSource		ブロックキャッシュ
 Memory	DataSource		メモリ
 No thermal sensor	SystemInfoHandler		温度センサー無し
-CPU usage	DataSource		CPU 使用率
 CPU speed	DataSource		CPU 速度
-Quit	ActivityWindow		終了
+CPU usage	DataSource		CPU 使用率
 Raw clipboard	DataSource		バイナリクリップボード
 Settings	ActivityWindow		設定
 Used memory	DataSource		使用メモリ
-Show legend	ActivityView		説明の表示
 Cached memory	DataSource		キャッシュメモリ
-CPU %d usage	DataSource		CPU %d 使用率
-CPU %d speed	DataSource		CPU %d 速度
-File	ActivityWindow		ファイル
 Ports	DataSource		ポート数
-Page faults	DataSource		ページフォールト数
-Additional items	ActivityView		追加項目
 Apps	DataSource		アプリ
+Page faults	DataSource		ページフォールト数
 Add graph	ActivityWindow		グラフの追加
+Swap	DataSource		スワップ
+%s faults/s	DataSource		%s faults/s
+Temperature	DataSource		温度
+Semaphores	DataSource		セマフォ数
+TX	DataSource	Shorter version for Sending	送信
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		テキストクリップボード
+Running applications	DataSource		実行中のアプリケーション数
+Cache	DataSource		キャッシュ
+CPU usage (combined)	DataSource		CPU 使用率 (合計)
+Receiving	DataSource		受信量
+Swap space	DataSource		スワップサイズ
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	受信
+Quit	ActivityWindow		終了
+Show legend	ActivityView		説明の表示
+File	ActivityWindow		ファイル
+CPU %d speed	DataSource		CPU %d 速度
+CPU %d usage	DataSource		CPU %d 使用率
+Additional items	ActivityView		追加項目
 Sending	DataSource		送信量
 Always on top	ActivityWindow		常に最前面
-Swap	DataSource		スワップ
-%lld sec.	SettingsWindow		%lld 秒
-P-faults	DataSource		ページフォルト
 Sems	DataSource		セマフォ
+P-faults	DataSource		ページフォルト
+%lld sec.	SettingsWindow		%lld 秒
 Network receive	DataSource		ネットワーク受信量
-%s faults/s	DataSource		%s faults/s

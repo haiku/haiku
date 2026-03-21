@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ShowImage	3394555425
+1	swedish	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		BildVisning
 Page setup…	Menus		Sidinställningar...
 Previous file	Menus		Föregående fil
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Höjd:
 Next file	Menus		Nästa fil
 Slide show	Menus		Bildspel
 Original size	Menus		Originalstorlek
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%filename%' har ändrats. Vill du stänga dokumentet?
 Width:	PrintOptionsWindow		Bredd:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ändra storlek till (i måttenheten 1/72 tum):
 Zoom factor in %:	PrintOptionsWindow		Zoomläge i %:
@@ -46,6 +47,7 @@ Clear selection	Menus		Rensa markering
 Rotate clockwise	Menus		Rotera medurs
 Open with…	Menus		Öppna med...
 Rotate counterclockwise	Menus		Rotera moturs
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%filename%' (sida %number%) har ändrats. Vill du stänga dokumentet?
 Previous page	Menus		Tidigare sida
 Fit to window	Menus		Anpassa till fönster
 Go to page	Menus		Gå till sida

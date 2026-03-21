@@ -1,5 +1,4 @@
-1	czech	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Nastavit na Uložené
+1	czech	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Zpráva obsahuje %ld nedefinované znaky. Možná by jiné sady znaků fungovaly lépe? Stiskněte tlačítko Odeslat, chcete-li zprávu přesto odeslat (místo původního znaku se použije náhradní znak), nebo zvolte Zrušit, chcete-li se vrátit a opravit.
 Text wrapping:	Mail		Zalamování textu:
 Show icons & labels	Mail		Zobrazit ikony a štítky
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		nevyžádaná pošta
 Reply to all	Mail		Odpovědět všem
 Cancel	Mail		Zrušit
 Off	Mail		Vypnout
-Set to %s	Mail		Nastavit na %s
 Signature:	Mail		Podpis:
 Forward without attachments	Mail		Přeposlat bez příloh
 queries	B_USER_DIRECTORY/mail/queries		dotazy
@@ -87,8 +85,8 @@ Auto signature:	Mail		Automatický podpis:
 Same subject	Mail		Stejný předmět
 Send	Mail		Odeslat
 Open draft	Mail		Otevřít koncept
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Nechat jako 'Nový'
 Random	Mail		Náhodný
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Nechat jako 'Nový'
 Attach attributes:	Mail		Připojit atributy:
 Find again	Mail		Znovu najít
 Size:	Mail		Velikost:
@@ -108,7 +106,6 @@ Move to trash	Mail		Přesunout do koše
 <none>	Mail		<není>
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Zkontrolovat pravopis
-Status:	Mail		Stav:
 Redo	Mail		Znovu
 Leave as '%s'	Mail		Nechat jako '%s'
 Print…	Mail		Tisk…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Odeslat tuto zprávu před zavřením?
 in	B_USER_DIRECTORY/mail/in		přijato
 Open	Mail		Otevřít
 Don't save	Mail		Neukládat
-Leave same	Mail		Nechat stejné
 An error occurred trying to save the attachment.	Mail		Nastala chyba při pokusu uložit přílohu.
+Leave same	Mail		Nechat stejné
 Save address	Mail		Uložit adresu
 Initial spell check mode:	Mail		Výchozí kontrola pravopisu:
 Edit queries…	Mail		Upravit dotazy…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Upravit podpisy…
 User interface	Mail		Uživatelské prostředí
 Inconsistency occurred in the undo/redo buffer.	Mail		Vyskytla se nekonzistence v bufferu zpět/znovu.
 Remove attachment	Mail		Odstranit příponu
-Set to…	Mail		Nastavit na…
 Edit	Mail		Editovat
 Page setup…	Mail		Nastavení stránky…
 An error occurred trying to save this signature.	Mail		Při pokusu o uložení podpisu došlo k chybě.

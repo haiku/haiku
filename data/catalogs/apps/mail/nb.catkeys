@@ -1,5 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Sett som Lagret
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Hovedteksten din inneholder %ld tegn som ikke kan kodifiseres. Kanskje et annet tegnsett ville fungere bedre? Trykk Send for å sende den likevel (et erstatningstegn vil bli brukt i stedet for tegn som ikke kan kodifiseres), eller velg Avbryt for å gå tilbake og prøve å løse problemet.
 Text wrapping:	Mail		Tekstbryting:
 Show icons & labels	Mail		Vis ikoner og tekst
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		søppelpost
 Reply to all	Mail		Svar til alle
 Cancel	Mail		Avbryt
 Off	Mail		Av
-Set to %s	Mail		Sett til %s
 Signature:	Mail		Underskrift:
 Forward without attachments	Mail		Videresend uten vedlegg
 queries	B_USER_DIRECTORY/mail/queries		søk
@@ -87,8 +85,8 @@ Auto signature:	Mail		Automatisk underskrift:
 Same subject	Mail		Samme emne
 Send	Mail		Send
 Open draft	Mail		Åpne utkast
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Behold som 'New'
 Random	Mail		Tilfeldig
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Behold som 'New'
 Attach attributes:	Mail		Legg ved attributter:
 Find again	Mail		Finn igjen
 Size:	Mail		Størrelse:
@@ -108,7 +106,6 @@ Move to trash	Mail		Flytt til søppelkurven
 <none>	Mail		<ingen>
 %d - Date	Mail		%d - Dato
 Check spelling	Mail		Stavekontroll
-Status:	Mail		Status:
 Redo	Mail		Gjenta
 Leave as '%s'	Mail		Behold som '%s'
 Print…	Mail		Skriv ut…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Vil du sende denne meldingen før du luk
 in	B_USER_DIRECTORY/mail/in		inn
 Open	Mail		Åpne
 Don't save	Mail		Ikke lagre
-Leave same	Mail		Behold som før
 An error occurred trying to save the attachment.	Mail		En feil oppsto da vedlegget skulle lagres.
+Leave same	Mail		Behold som før
 Save address	Mail		Samme adresse
 Initial spell check mode:	Mail		Opprinnelig stavekontrollmodus:
 Edit queries…	Mail		Endre søk…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Rediger underskrifter…
 User interface	Mail		Brukergrensesnitt
 Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsistens oppsto i angre/gjenopprett-bufferen.
 Remove attachment	Mail		Fjern vedlegg
-Set to…	Mail		Sett til…
 Edit	Mail		Rediger
 Page setup…	Mail		Sideoppsett…
 An error occurred trying to save this signature.	Mail		Det oppstod en feil ved forsøk på å lagre denne signaturen.

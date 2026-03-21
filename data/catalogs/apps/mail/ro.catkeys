@@ -1,5 +1,4 @@
-1	romanian	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Stabilește la salvat
+1	romanian	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Textul principal conține caractere necodificabile %ld. Poate că un alt set de caractere ar funcționa mai bine? Apăsați pe Trimite pentru a îl trimite oricum (un caracter substitut va fi utilizat în locul celor necodificabile) sau alegeți Anulează pentru a reveni și a încerca să îl remediați.
 Text wrapping:	Mail		Încadrare text:
 Show icons & labels	Mail		Arată pictogramele și etichetele
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		spam
 Reply to all	Mail		Răspunde la toate
 Cancel	Mail		Anulează
 Off	Mail		Oprit
-Set to %s	Mail		Stabilește la %s
 Signature:	Mail		Semnătură:
 Forward without attachments	Mail		Redirecționează fără atașamente
 queries	B_USER_DIRECTORY/mail/queries		queries
@@ -87,8 +85,8 @@ Auto signature:	Mail		Semnătură automată:
 Same subject	Mail		Același subiect
 Send	Mail		Trimite
 Open draft	Mail		Deschide schița
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasă ca „New”
 Random	Mail		Aleator
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasă ca „New”
 Attach attributes:	Mail		Atribute de atașare:
 Find again	Mail		Găsește din nou
 Size:	Mail		Dimensiune:
@@ -108,7 +106,6 @@ Move to trash	Mail		Mută la gunoi
 <none>	Mail		<none>
 %d - Date	Mail		%d - dată
 Check spelling	Mail		Verifică ortografia
-Status:	Mail		Stare:
 Redo	Mail		Repetă
 Leave as '%s'	Mail		Lasă ca „%s”
 Print…	Mail		Tipărire…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Trimiteți acest mesaj înainte de a în
 in	B_USER_DIRECTORY/mail/in		in
 Open	Mail		Deschide
 Don't save	Mail		Nu salva
-Leave same	Mail		Lasă la fel
 An error occurred trying to save the attachment.	Mail		A apărut o eroare la încercarea de salvare a atașamentului.
+Leave same	Mail		Lasă la fel
 Save address	Mail		Salvează adresa
 Initial spell check mode:	Mail		Modul inițial de verificare ortografică:
 Edit queries…	Mail		Editare interogări…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Editare semnături…
 User interface	Mail		Interfață cu utilizatorul
 Inconsistency occurred in the undo/redo buffer.	Mail		A apărut o inconsistență în preîncărcarea refă/repetă.
 Remove attachment	Mail		Elimină atașamentul
-Set to…	Mail		Stabilire la…
 Edit	Mail		Editare
 Page setup…	Mail		Configurare pagină…
 An error occurred trying to save this signature.	Mail		A apărut o eroare la încercarea de salvare a acestei semnături.

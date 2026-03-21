@@ -1,47 +1,47 @@
 1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Teams
-Semaphores	DataSource		Semaforen
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Geheugen blok-cache
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Media-eenheid
-Text clipboard	DataSource		Tekst klembord
 Network send	DataSource		Netwerk (uitgaand)
-Cache	DataSource		Cache
-Running applications	DataSource		Lopende toepassingen
-CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
 Threads	DataSource		Threads
-Receiving	DataSource		Ontvangend
 Remove graph	ActivityView		Verwijder grafiek
-Swap space	DataSource		Swap-ruimte
-CPU	DataSource		CPU
 ActivityMonitor	System name		ActivityMonitor
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval bijwerktijd:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Instellingen...
 Block cache	DataSource		Blok-cache
 Memory	DataSource		Geheugen
-CPU usage	DataSource		CPU-gebruik
 CPU speed	DataSource		CPU-snelheid
-Quit	ActivityWindow		Afsluiten
+CPU usage	DataSource		CPU-gebruik
 Raw clipboard	DataSource		Onbewerkt klembord
 Settings	ActivityWindow		Instellingen
 Used memory	DataSource		Gebruikt geheugen
-Show legend	ActivityView		Toon legenda
 Cached memory	DataSource		Geheugen in cache
-CPU %d usage	DataSource		CPU %d gebruik
-CPU %d speed	DataSource		Snelheid CPU %d
-File	ActivityWindow		Bestand
 Ports	DataSource		Poorten
-Page faults	DataSource		Page-onderbrekingen
-Additional items	ActivityView		Toegevoegde items
 Apps	DataSource		Toepassingen
+Page faults	DataSource		Page-onderbrekingen
 Add graph	ActivityWindow		Voeg grafiek toe
+Swap	DataSource		Swap
+Semaphores	DataSource		Semaforen
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Tekst klembord
+Running applications	DataSource		Lopende toepassingen
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
+Receiving	DataSource		Ontvangend
+Swap space	DataSource		Swap-ruimte
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Afsluiten
+Show legend	ActivityView		Toon legenda
+File	ActivityWindow		Bestand
+CPU %d speed	DataSource		Snelheid CPU %d
+CPU %d usage	DataSource		CPU %d gebruik
+Additional items	ActivityView		Toegevoegde items
 Sending	DataSource		Versturend
 Always on top	ActivityWindow		Altijd bovenop
-Swap	DataSource		Swap
-%lld sec.	SettingsWindow		%lld sec.
-P-faults	DataSource		P-onderbrekingen
 Sems	DataSource		Semaforen
+P-faults	DataSource		P-onderbrekingen
+%lld sec.	SettingsWindow		%lld sec.
 Network receive	DataSource		Netwerk (ontvangst)

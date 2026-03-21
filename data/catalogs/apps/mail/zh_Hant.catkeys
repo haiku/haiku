@@ -1,5 +1,4 @@
-1	english	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		設定為已存儲
+1	english	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		您的正文包含 %ld 個無法編碼的字元。也許不同的字符集會更好？點擊“發送”仍然可以發送（將使用替代字元來代替不可編碼的字元），或者選擇“取消”返回並嘗試修復它。
 Text wrapping:	Mail		文字換行：
 Show icons & labels	Mail		顯示圖示和標籤
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		垃圾郵件
 Reply to all	Mail		回覆全部
 Cancel	Mail		取消
 Off	Mail		關
-Set to %s	Mail		設定為 %s
 Signature:	Mail		簽名：
 Forward without attachments	Mail		無附件轉發
 queries	B_USER_DIRECTORY/mail/queries		查詢
@@ -87,8 +85,8 @@ Auto signature:	Mail		自動簽名：
 Same subject	Mail		同一主題
 Send	Mail		發送
 Open draft	Mail		開啓草稿
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Leave as 'New'
 Random	Mail		隨機
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Leave as 'New'
 Attach attributes:	Mail		附加屬性：
 Find again	Mail		再次尋找
 Size:	Mail		大小：
@@ -108,7 +106,6 @@ Move to trash	Mail		移到資源回收筒
 <none>	Mail		<無>
 %d - Date	Mail		%d - 日期
 Check spelling	Mail		檢查拼字
-Status:	Mail		狀態：
 Redo	Mail		重做
 Leave as '%s'	Mail		保留為 '%s'
 Print…	Mail		列印…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		在關閉之前發送此訊息？
 in	B_USER_DIRECTORY/mail/in		接收
 Open	Mail		開啟
 Don't save	Mail		不要存儲
-Leave same	Mail		留下同樣的
 An error occurred trying to save the attachment.	Mail		嘗試存儲附件時發生錯誤。
+Leave same	Mail		留下同樣的
 Save address	Mail		存儲地址
 Initial spell check mode:	Mail		初始拼字檢查模式：
 Edit queries…	Mail		編輯查詢…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		編輯簽名…
 User interface	Mail		使用者介面
 Inconsistency occurred in the undo/redo buffer.	Mail		撤銷/重做緩衝區中出現不一致。
 Remove attachment	Mail		移除附件
-Set to…	Mail		設定為…
 Edit	Mail		編輯
 Page setup…	Mail		頁面設定…
 An error occurred trying to save this signature.	Mail		嘗試存儲此簽名時發生錯誤。

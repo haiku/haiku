@@ -1,5 +1,4 @@
-1	german	x-vnd.Be-MAIL	3439134129
-Set to Saved	Mail		Status setzen: Saved
+1	german	x-vnd.Be-MAIL	4024882639
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
 Show icons & labels	Mail		Icons und Beschriftung anzeigen
@@ -71,7 +70,6 @@ spam	B_USER_DIRECTORY/mail/spam		Spam
 Reply to all	Mail		Allen antworten
 Cancel	Mail		Abbrechen
 Off	Mail		Aus
-Set to %s	Mail		Status setzen: %s
 Signature:	Mail		Signatur:
 Forward without attachments	Mail		Mit Anhängen weiterleiten
 None	Settings		Keine
@@ -92,8 +90,8 @@ Auto signature:	Mail		Automatische Signatur:
 Same subject	Mail		Gleicher Betreff
 Send	Mail		Senden
 Open draft	Mail		Entwurf öffnen
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Status 'New' belassen
 Random	Mail		Zufällig
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Status 'New' belassen
 Attach attributes:	Mail		Attribute von Anhängen:
 Find again	Mail		Weitersuchen
 Size:	Mail		Größe:
@@ -113,7 +111,6 @@ Move to trash	Mail		In den Papierkorb verschieben
 <none>	Mail		<kein>
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Rechtschreibung prüfen
-Status:	Mail		Status:
 Redo	Mail		Wiederholen
 Leave as '%s'	Mail		Status '%s' belassen
 Print…	Mail		Drucken …
@@ -142,8 +139,8 @@ Send this message before closing?	Mail		Nachricht vor dem Schließen senden?
 in	B_USER_DIRECTORY/mail/in		Eingang
 Open	Mail		Öffnen
 Don't save	Mail		Verwerfen
-Leave same	Mail		Status belassen
 An error occurred trying to save the attachment.	Mail		Beim Speichern des Anhangs ist ein Fehler aufgetreten.
+Leave same	Mail		Status belassen
 Save address	Mail		Adresse speichern
 Initial spell check mode:	Mail		Rechtschreibprüfung:
 Edit queries…	Mail		Queries bearbeiten …
@@ -156,7 +153,6 @@ Edit signatures…	Mail		Signaturen bearbeiten …
 User interface	Mail		Programmoberfläche
 Inconsistency occurred in the undo/redo buffer.	Mail		Es ist ein Fehler im Rückgängig/Wiederherstellen-Puffer aufgetreten.
 Remove attachment	Mail		Anhang entfernen
-Set to…	Mail		Status setzen …
 Edit	Mail		Bearbeiten
 Page setup…	Mail		Seite einrichten …
 An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.

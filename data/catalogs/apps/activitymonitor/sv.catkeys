@@ -1,51 +1,51 @@
 1	swedish	x-vnd.Haiku-ActivityMonitor	1159274874
-Temp	DataSource		Temp
-Temperature	DataSource		Temperatur
 Teams	DataSource		Processer
-Semaphores	DataSource		Semaforer
-TX	DataSource	Shorter version for Sending	TX
+Temp	DataSource		Temp
 Block cache memory	DataSource		Blockcacheminne
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Medianoder
-Text clipboard	DataSource		Urklipp text
 Network send	DataSource		Nätverkssändning
-Cache	DataSource		Buffert
-Running applications	DataSource		Aktiva program
-CPU usage (combined)	DataSource		CPU användning (kombinerad)
 Threads	DataSource		Trådar
-Receiving	DataSource		Tar emot
 Remove graph	ActivityView		Ta bort graf
-Swap space	DataSource		Växlingsutrymme
-CPU	DataSource		CPU
 ActivityMonitor	System name		AktivitetsÖvervakare
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Uppdateringsintervall:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Inställningar...
 Block cache	DataSource		Blockbuffert
 Memory	DataSource		Minne
 No thermal sensor	SystemInfoHandler		Ingen termisk sensor
-CPU usage	DataSource		CPU användning
 CPU speed	DataSource		CPU-hastighet
-Quit	ActivityWindow		Avsluta
+CPU usage	DataSource		CPU användning
 Raw clipboard	DataSource		Urklipp rådata
 Settings	ActivityWindow		Inställningar
 Used memory	DataSource		Minnesanvändning
-Show legend	ActivityView		Visa graftext
 Cached memory	DataSource		Buffertminne
-CPU %d usage	DataSource		CPU %d användande
-CPU %d speed	DataSource		CPU %d hastighet
-File	ActivityWindow		Arkiv
 Ports	DataSource		Portar
-Page faults	DataSource		Sidfel
-Additional items	ActivityView		Ytterligare mätvärden
 Apps	DataSource		Program
+Page faults	DataSource		Sidfel
 Add graph	ActivityWindow		Lägg till graf
+Swap	DataSource		Växling
+%s faults/s	DataSource		%s fel/s
+Temperature	DataSource		Temperatur
+Semaphores	DataSource		Semaforer
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Urklipp text
+Running applications	DataSource		Aktiva program
+Cache	DataSource		Buffert
+CPU usage (combined)	DataSource		CPU användning (kombinerad)
+Receiving	DataSource		Tar emot
+Swap space	DataSource		Växlingsutrymme
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Avsluta
+Show legend	ActivityView		Visa graftext
+File	ActivityWindow		Arkiv
+CPU %d speed	DataSource		CPU %d hastighet
+CPU %d usage	DataSource		CPU %d användande
+Additional items	ActivityView		Ytterligare mätvärden
 Sending	DataSource		Skickar
 Always on top	ActivityWindow		Alltid överst
-Swap	DataSource		Växling
-%lld sec.	SettingsWindow		%lld sek.
-P-faults	DataSource		P-fel
 Sems	DataSource		Semaforer
+P-faults	DataSource		P-fel
+%lld sec.	SettingsWindow		%lld sek.
 Network receive	DataSource		Nätverksmottagning
-%s faults/s	DataSource		%s fel/s

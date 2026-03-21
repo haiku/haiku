@@ -1,46 +1,46 @@
 1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	941112421
 Teams	DataSource		Equipes
-Semaphores	DataSource		Semáforos
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Bloquear memória em cache
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Nós de mídia
-Text clipboard	DataSource		Área de transferência de texto
 Network send	DataSource		Rede enviados
-Cache	DataSource		Cache
-Running applications	DataSource		Aplicativos em utilização
-CPU usage (combined)	DataSource		Utilização da CPU (combinado)
 Threads	DataSource		Processos
-Receiving	DataSource		Recebendo
 Remove graph	ActivityView		Remover grafo
-Swap space	DataSource		Espaço Swap
-CPU	DataSource		CPU
 ActivityMonitor	System name		Monitor de Atividade
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Intervalo entre atualizações
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Configurações...
 Block cache	DataSource		Bloquear cache
 Memory	DataSource		Memória
-CPU usage	DataSource		Utilização da CPU
 CPU speed	DataSource		Velocidade da CPU
-Quit	ActivityWindow		Sair
+CPU usage	DataSource		Utilização da CPU
 Raw clipboard	DataSource		Área de transferência bruta
 Settings	ActivityWindow		Configurações
 Used memory	DataSource		Memória utilizada
-Show legend	ActivityView		Exibir legendas
 Cached memory	DataSource		Memória em cache
-CPU %d usage	DataSource		Uso de CPU %d
-File	ActivityWindow		Arquivo
 Ports	DataSource		Portas
-Page faults	DataSource		Falha de página
-Additional items	ActivityView		Itens adicionais
 Apps	DataSource		Aplicativos
+Page faults	DataSource		Falha de página
 Add graph	ActivityWindow		Adicionar grafo
+Swap	DataSource		Swap
+Semaphores	DataSource		Semáforos
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Área de transferência de texto
+Running applications	DataSource		Aplicativos em utilização
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		Utilização da CPU (combinado)
+Receiving	DataSource		Recebendo
+Swap space	DataSource		Espaço Swap
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Sair
+Show legend	ActivityView		Exibir legendas
+File	ActivityWindow		Arquivo
+CPU %d usage	DataSource		Uso de CPU %d
+Additional items	ActivityView		Itens adicionais
 Sending	DataSource		Enviando
 Always on top	ActivityWindow		Sempre visível
-Swap	DataSource		Swap
-%lld sec.	SettingsWindow		%lld seg.
-P-faults	DataSource		P-falhas
 Sems	DataSource		Sems
+P-faults	DataSource		P-falhas
+%lld sec.	SettingsWindow		%lld seg.
 Network receive	DataSource		Recebimento de rede

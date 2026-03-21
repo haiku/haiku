@@ -1,48 +1,48 @@
 1	ukrainian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Процеси
-Semaphores	DataSource		Семафори
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Блок кеш-пам'яті
-%lld ms	SettingsWindow		%lld мс
 Media nodes	DataSource		Вузли медіа
-Text clipboard	DataSource		Буфер обміну (Text)
 Network send	DataSource		Відправлено по мережі
-Cache	DataSource		Кеш
-Running applications	DataSource		Запущені програми
-CPU usage (combined)	DataSource		Використання СPU (загальне)
 Threads	DataSource		Потоки
-Receiving	DataSource		Отримання
 Remove graph	ActivityView		Прибрати графік
-Swap space	DataSource		Розмір файлу підкачки
-CPU	DataSource		CPU
 ActivityMonitor	System name		ActivityMonitor
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Інтервал оновлення:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Інтервал…
 Block cache	DataSource		Блок (лінія) кешу
 Memory	DataSource		Пам'ять
-CPU usage	DataSource		Використання CPU
 CPU speed	DataSource		Частота CPU
-Quit	ActivityWindow		Вийти
+CPU usage	DataSource		Використання CPU
 Raw clipboard	DataSource		Буфер обміну (Raw)
 Settings	ActivityWindow		Налаштування
 Used memory	DataSource		Використана пам'ять
-Show legend	ActivityView		Показати легенду з підписами
 Cached memory	DataSource		Файловий кеш
-CPU %d usage	DataSource		Використання CPU %d
-CPU %d speed	DataSource		Частота CPU %d
-File	ActivityWindow		Файл
 Ports	DataSource		Порти
-Page faults	DataSource		Відмови сторінки
-Additional items	ActivityView		Додаткові елементи
 Apps	DataSource		Програми
+Page faults	DataSource		Відмови сторінки
 Add graph	ActivityWindow		Додати графік
+Swap	DataSource		Файл підкачки
+%s faults/s	DataSource		%s відмов/с
+Semaphores	DataSource		Семафори
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld мс
+Text clipboard	DataSource		Буфер обміну (Text)
+Running applications	DataSource		Запущені програми
+Cache	DataSource		Кеш
+CPU usage (combined)	DataSource		Використання СPU (загальне)
+Receiving	DataSource		Отримання
+Swap space	DataSource		Розмір файлу підкачки
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Вийти
+Show legend	ActivityView		Показати легенду з підписами
+File	ActivityWindow		Файл
+CPU %d speed	DataSource		Частота CPU %d
+CPU %d usage	DataSource		Використання CPU %d
+Additional items	ActivityView		Додаткові елементи
 Sending	DataSource		Відправка
 Always on top	ActivityWindow		Завжди зверху
-Swap	DataSource		Файл підкачки
-%lld sec.	SettingsWindow		%lld сек.
-P-faults	DataSource		Відмови сторінки
 Sems	DataSource		Семафори
+P-faults	DataSource		Відмови сторінки
+%lld sec.	SettingsWindow		%lld сек.
 Network receive	DataSource		Отримано по мережі
-%s faults/s	DataSource		%s відмов/с

@@ -1,5 +1,4 @@
-1	korean	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		저장하도록 설정
+1	korean	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		본문에 인코딩 할수없는 문자가 %ld 개 있습니다. 다른 문자 세트를 사용하면 작동할 수 있습니다. 무시하고 전송하려면 보내기 버튼을 누르십시오. (인코딩 할수 없는 문자는 대체 문자가 사용됨) 또는 취소를 선택한 후 돌아가서 수정하십시오.
 Text wrapping:	Mail		텍스트 줄바꿈 : 
 Show icons & labels	Mail		아이콘 및 라벨 보기
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		스팸
 Reply to all	Mail		전체 회신
 Cancel	Mail		취소
 Off	Mail		끄기
-Set to %s	Mail		%s(으)로 설정
 Signature:	Mail		서명 : 
 Forward without attachments	Mail		첨부 없이 전달
 queries	B_USER_DIRECTORY/mail/queries		쿼리
@@ -87,8 +85,8 @@ Auto signature:	Mail		자동 서명 :
 Same subject	Mail		동일한 제목
 Send	Mail		보내기
 Open draft	Mail		초안 열기
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'New'로 남겨둠
 Random	Mail		무작위
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'New'로 남겨둠
 Attach attributes:	Mail		파일 첨부:
 Find again	Mail		다시 찾기
 Size:	Mail		크기:
@@ -108,7 +106,6 @@ Move to trash	Mail		휴지통으로 이동
 <none>	Mail		<없음>
 %d - Date	Mail		%d - 날짜
 Check spelling	Mail		맞춤법 검사
-Status:	Mail		상태:
 Redo	Mail		다시하기
 Leave as '%s'	Mail		'%s'으(로) 남겨두기
 Print…	Mail		인쇄...
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		닫기 전에 이 메시지를 보내시
 in	B_USER_DIRECTORY/mail/in		수신함
 Open	Mail		열기
 Don't save	Mail		저장 안함
-Leave same	Mail		변경하지 않음
 An error occurred trying to save the attachment.	Mail		첨부 저장 중 오류가 발생했습니다.
+Leave same	Mail		변경하지 않음
 Save address	Mail		주소 저장
 Initial spell check mode:	Mail		최초 맞춤법 검사 모드:
 Edit queries…	Mail		쿼리 편집…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		서명 편집…
 User interface	Mail		사용자 인터페이스
 Inconsistency occurred in the undo/redo buffer.	Mail		되돌리기/다시실행 버퍼에서 불일치가 발생했습니다.
 Remove attachment	Mail		첨부 제거
-Set to…	Mail		다음으로 설정…
 Edit	Mail		편집
 Page setup…	Mail		페이지 설정…
 An error occurred trying to save this signature.	Mail		서명을 저장하는 중 오류가 발생했습니다.

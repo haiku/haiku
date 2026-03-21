@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-StyledEdit	2882508421
+1	turkish	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		Belge istatistikleri
 Cut	Menus		Kes
 Center	Menus		Orta
@@ -14,6 +14,7 @@ Find again	Menus		Yeniden bul
 Read-only	StatusView		Saltokunur
 Save	Menus		Kaydet
 Untitled %d	Window title		Başlıksız %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Geri alınamıyor; dosya bulunamadı: “%filename%”.
 Cancel	QuitAlert		Vazgeç
 Copy	Menus		Kopyala
 Reload	NodeMonitorAlerts		Yeniden yükle
@@ -21,11 +22,13 @@ line %d, column %d	StatusView		%d. satır, %d. sütun
 Words:	Statistics		Sözcük:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Kurtar
+Unable to unlock file\n\t%error%	QuitAlert		Dosya kilitlenemiyor:\n\t%error%
 OK	RevertToSavedAlert		Tamam
 Unlock file	StatusView		Dosya kilidini aç
 Italic	Menus		Eğik
 Can't undo	Menus		Değişiklik yok
 Replace…	Menus		Değiştir…
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Bu dosya saltokunur olarak imlenmiş. “%filename%” dosyasına yapılan değişiklikler kaydedilsin mi?
 File	Menus		Dosya
 Paste	Menus		Yapıştır
 Bold	Menus		Kalın
@@ -34,7 +37,10 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Satır:
 Strikeout	Menus		Üzeri çizili
 Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
+Error saving \"%filename%\":\n%error%	SaveAlert		“%filename%” dosyası kaydedilirken hata:\n\t%error%
+Save changes to the document \"%title%\"?	QuitAlert		“%title%” belgesine yapılan değişiklikler kaydedilsin mi?
 Save	SaveAlert		Kaydet
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		“%title%” belgesinde kaydedilmemiş değişiklikler var.\nSon kaydedilmiş sürüme geri dönülsün mü?
 Default	Open_and_SaveAsPanel		Saptanmış
 Cancel	RevertToSavedAlert		Vazgeç
 Cancel	FindandReplaceWindow		Vazgeç
@@ -77,8 +83,10 @@ Open…	Menus		Aç…
 Save as…	Menus		Farklı kaydet…
 Replace	FindandReplaceWindow		Değiştir
 Characters:	Statistics		Karakter:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		“%filename%” yüklenirken hata:\n\tDesteklenmeyen biçim
 Don't save	QuitAlert		Kaydetme
 Align	Menus		Hizalama
 Font	Menus		Yazıtipi
 Select all	Menus		Tümünü seç
 Right	Menus		Sağ
+Error loading \"%filename%\":\n\t%error%	LoadAlert		“%filename%” yüklenirken hata:\n\t%error%

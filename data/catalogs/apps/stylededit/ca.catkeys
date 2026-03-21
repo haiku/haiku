@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-StyledEdit	2882508421
+1	catalan; valencian	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		Estadístiques del document
 Cut	Menus		Retalla
 Center	Menus		Centrat
@@ -14,6 +14,7 @@ Find again	Menus		Repeteix la cerca
 Read-only	StatusView		Només de lectura
 Save	Menus		Desa
 Untitled %d	Window title		%d sense títol
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		No es pot revertir. No s'ha trobat el fitxer \"%filename%\".
 Cancel	QuitAlert		Cancel·la
 Copy	Menus		Copia
 Reload	NodeMonitorAlerts		Torna a carregar
@@ -21,11 +22,13 @@ line %d, column %d	StatusView		línia %d, columna %d
 Words:	Statistics		Paraules:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Recupera
+Unable to unlock file\n\t%error%	QuitAlert		No s'ha pogut desblocar el fitxer\n\t%error%
 OK	RevertToSavedAlert		D'acord
 Unlock file	StatusView		Desbloca el fitxer
 Italic	Menus		Cursiva
 Can't undo	Menus		No es pot refer
 Replace…	Menus		Reemplaça...
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Aquest fitxer està marcat com a només de lectura. Voleu desar els canvis al document \"%filename%\"?
 File	Menus		Fitxer
 Paste	Menus		Enganxa
 Bold	Menus		Negreta
@@ -34,7 +37,10 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Línies:
 Strikeout	Menus		Ratllat
 Replace in all windows	FindandReplaceWindow		Reemplaça-ho a totes les finestres
+Error saving \"%filename%\":\n%error%	SaveAlert		Hi ha hagut un error en desar \"%filename%\":\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Voleu desar els canvis al document \"%title%\"?
 Save	SaveAlert		Desa
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		El fitxer \"%title%\" té canvis no desats.\nVoleu revertir-lo a la darrera versió desada?
 Default	Open_and_SaveAsPanel		Per defecte
 Cancel	RevertToSavedAlert		Cancel·la
 Cancel	FindandReplaceWindow		Cancel·la
@@ -77,8 +83,10 @@ Open…	Menus		Obre...
 Save as…	Menus		Desa com a...
 Replace	FindandReplaceWindow		Reemplaça
 Characters:	Statistics		Caràcters:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		Hi ha hagut un error en carregar \"%filename%\":\n\tFormat no compatible
 Don't save	QuitAlert		No ho desis
 Align	Menus		Alinea
 Font	Menus		Lletra
 Select all	Menus		Selecciona-ho tot
 Right	Menus		Dreta
+Error loading \"%filename%\":\n\t%error%	LoadAlert		Hi ha hagut un error en carregar \"%filename%\":\n\t%error%

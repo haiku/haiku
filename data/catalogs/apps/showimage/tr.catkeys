@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ShowImage	3394555425
+1	turkish	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		Görsel Görüntüleyicisi
 Page setup…	Menus		Sayfa yapısı…
 Previous file	Menus		Önceki dosya
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Yükseklik:
 Next file	Menus		Sonraki dosya
 Slide show	Menus		Slayt gösterisi
 Original size	Menus		Özgün boyut
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		“%filename%” belgesi değiştirildi. Belgeyi kapatmak istiyor musunuz?
 Width:	PrintOptionsWindow		Genişlik:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Yeniden boyutlandır (1/72 inç):
 Zoom factor in %:	PrintOptionsWindow		% olarak yakınlaştırma derecesi:
@@ -46,6 +47,7 @@ Clear selection	Menus		Seçimi temizle
 Rotate clockwise	Menus		Saat yönünde döndür
 Open with…	Menus		Birlikte aç…
 Rotate counterclockwise	Menus		Saat yönünün tersine döndür
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		“%filename%” (%number%. sayfa) belgesi değiştirildi. Belgeyi kapatmak istiyor musunuz?
 Previous page	Menus		Önceki sayfa
 Fit to window	Menus		Pencereye sığdır
 Go to page	Menus		Sayfaya git

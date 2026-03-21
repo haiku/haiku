@@ -1,48 +1,48 @@
 1	czech	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Týmy
-Semaphores	DataSource		Semafory
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Bloková vyrovnávací paměť
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Mediální uzly
-Text clipboard	DataSource		Textová schránka
 Network send	DataSource		Odesláno sítí
-Cache	DataSource		Mezipaměť
-Running applications	DataSource		Spuštěné aplikace
-CPU usage (combined)	DataSource		Využití CPU (kombinované)
 Threads	DataSource		Vlákna
-Receiving	DataSource		Přijímání
 Remove graph	ActivityView		Odebrat graf
-Swap space	DataSource		Odkládací prostor
-CPU	DataSource		CPU
 ActivityMonitor	System name		Monitor aktivit
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval obnovení:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Nastavení…
 Block cache	DataSource		Bloková vyrovnávací paměť
 Memory	DataSource		Paměť
-CPU usage	DataSource		Využití CPU
 CPU speed	DataSource		Rychlost CPU
-Quit	ActivityWindow		Ukončit
+CPU usage	DataSource		Využití CPU
 Raw clipboard	DataSource		Schránka bez formátu
 Settings	ActivityWindow		Nastavení
 Used memory	DataSource		Využitá paměť
-Show legend	ActivityView		Zobrazit legendu
 Cached memory	DataSource		Vyrovnávací paměť
-CPU %d usage	DataSource		Využití CPU %d
-CPU %d speed	DataSource		Rychlost CPU %d
-File	ActivityWindow		Soubor
 Ports	DataSource		Porty
-Page faults	DataSource		Chyby stránkování
-Additional items	ActivityView		Přídavné položky
 Apps	DataSource		Aplikace
+Page faults	DataSource		Chyby stránkování
 Add graph	ActivityWindow		Přidat graf
+Swap	DataSource		Odkládací soubor
+%s faults/s	DataSource		%s chyb/s
+Semaphores	DataSource		Semafory
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Textová schránka
+Running applications	DataSource		Spuštěné aplikace
+Cache	DataSource		Mezipaměť
+CPU usage (combined)	DataSource		Využití CPU (kombinované)
+Receiving	DataSource		Přijímání
+Swap space	DataSource		Odkládací prostor
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Ukončit
+Show legend	ActivityView		Zobrazit legendu
+File	ActivityWindow		Soubor
+CPU %d speed	DataSource		Rychlost CPU %d
+CPU %d usage	DataSource		Využití CPU %d
+Additional items	ActivityView		Přídavné položky
 Sending	DataSource		Odesílání
 Always on top	ActivityWindow		Vždy navrchu
-Swap	DataSource		Odkládací soubor
-%lld sec.	SettingsWindow		%lld sek.
-P-faults	DataSource		P-faults
 Sems	DataSource		Sem
+P-faults	DataSource		P-faults
+%lld sec.	SettingsWindow		%lld sek.
 Network receive	DataSource		Přijato sítí
-%s faults/s	DataSource		%s chyb/s

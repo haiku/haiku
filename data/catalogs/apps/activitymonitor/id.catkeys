@@ -1,48 +1,48 @@
 1	indonesian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Tim
-Semaphores	DataSource		Semaphore
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Memori cache blok
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Simpul media
-Text clipboard	DataSource		Teks clipboard
 Network send	DataSource		Jaringan mengirim
-Cache	DataSource		Cache
-Running applications	DataSource		Menjalankan aplikasi
-CPU usage (combined)	DataSource		Penggunaan CPU (gabungan)
 Threads	DataSource		Benang
-Receiving	DataSource		Menerima
 Remove graph	ActivityView		Menghapus grafik
-Swap space	DataSource		Ruang swap
-CPU	DataSource		CPU
 ActivityMonitor	System name		MonitorAktifitas
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Memperbarui interval waktu:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Pengaturan…
 Block cache	DataSource		Blok cache
 Memory	DataSource		Memory
-CPU usage	DataSource		Penggunaan CPU
 CPU speed	DataSource		kecepatan CPU
-Quit	ActivityWindow		Keluar
+CPU usage	DataSource		Penggunaan CPU
 Raw clipboard	DataSource		Clipboard mentah
 Settings	ActivityWindow		Pengaturan
 Used memory	DataSource		Memori yang digunakan
-Show legend	ActivityView		Tampilkan legenda
 Cached memory	DataSource		Memori cache
-CPU %d usage	DataSource		Penggunaan CPU %d
-CPU %d speed	DataSource		Kecepatan CPU %d
-File	ActivityWindow		Berkas
 Ports	DataSource		Ports
-Page faults	DataSource		Kesalahan halaman
-Additional items	ActivityView		Barang tambahan
 Apps	DataSource		Aplikasi
+Page faults	DataSource		Kesalahan halaman
 Add graph	ActivityWindow		Menambahkan grafis
+Swap	DataSource		Swap
+%s faults/s	DataSource		%s galat/d
+Semaphores	DataSource		Semaphore
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Teks clipboard
+Running applications	DataSource		Menjalankan aplikasi
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		Penggunaan CPU (gabungan)
+Receiving	DataSource		Menerima
+Swap space	DataSource		Ruang swap
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Keluar
+Show legend	ActivityView		Tampilkan legenda
+File	ActivityWindow		Berkas
+CPU %d speed	DataSource		Kecepatan CPU %d
+CPU %d usage	DataSource		Penggunaan CPU %d
+Additional items	ActivityView		Barang tambahan
 Sending	DataSource		Mengirim
 Always on top	ActivityWindow		Selalu di atas
-Swap	DataSource		Swap
-%lld sec.	SettingsWindow		%lld detik.
-P-faults	DataSource		P-faults
 Sems	DataSource		Sems
+P-faults	DataSource		P-faults
+%lld sec.	SettingsWindow		%lld detik.
 Network receive	DataSource		Jaringan menerima
-%s faults/s	DataSource		%s galat/d

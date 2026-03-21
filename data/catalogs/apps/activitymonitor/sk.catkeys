@@ -1,43 +1,43 @@
 1	slovak	x-vnd.Haiku-ActivityMonitor	4165509559
 Teams	DataSource		Tímy
-Semaphores	DataSource		Semafory
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Bloková vyrovnávacia pamäť
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Mediálne uzly
-Text clipboard	DataSource		Textová schránka
 Network send	DataSource		Sieť - odoslané
-Cache	DataSource		Vyrovnávacia pamäť
-Running applications	DataSource		Bežiace aplikácie
-CPU usage (combined)	DataSource		Využitie CPU (kombinované)
 Threads	DataSource		Vlákna
-Receiving	DataSource		Prijíma sa
 Remove graph	ActivityView		Odstrániť graf
-Swap space	DataSource		Odkladací priestor
-CPU	DataSource		CPU
 ActivityMonitor	System name		Monitor aktivity
 Update time interval:	SettingsWindow		Časový interval aktualizácie:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Nastavenia…
 Block cache	DataSource		Bloková cache
 Memory	DataSource		Pamäť
 CPU usage	DataSource		Využitie CPU
-Quit	ActivityWindow		Ukončiť
 Raw clipboard	DataSource		Schránka bez formátu
 Settings	ActivityWindow		Nastavenia
 Used memory	DataSource		Využitá pamäť
-Show legend	ActivityView		Zobraziť legendu
 Cached memory	DataSource		Pamäť v cache
-File	ActivityWindow		Súbor
 Ports	DataSource		Porty
-Page faults	DataSource		Výpadky stránok
-Additional items	ActivityView		Ďalšie položky
 Apps	DataSource		Aplikácie
+Page faults	DataSource		Výpadky stránok
 Add graph	ActivityWindow		Pridať graf
+Swap	DataSource		Odkladací priestor
+Semaphores	DataSource		Semafory
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Textová schránka
+Running applications	DataSource		Bežiace aplikácie
+Cache	DataSource		Vyrovnávacia pamäť
+CPU usage (combined)	DataSource		Využitie CPU (kombinované)
+Receiving	DataSource		Prijíma sa
+Swap space	DataSource		Odkladací priestor
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Ukončiť
+Show legend	ActivityView		Zobraziť legendu
+File	ActivityWindow		Súbor
+Additional items	ActivityView		Ďalšie položky
 Sending	DataSource		Posiela sa
 Always on top	ActivityWindow		Vždy na vrchu
-Swap	DataSource		Odkladací priestor
-%lld sec.	SettingsWindow		%lld sek.
-P-faults	DataSource		P-fault
 Sems	DataSource		Semafory
+P-faults	DataSource		P-fault
+%lld sec.	SettingsWindow		%lld sek.
 Network receive	DataSource		Sieť - prijaté

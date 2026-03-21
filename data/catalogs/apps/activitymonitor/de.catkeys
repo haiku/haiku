@@ -1,51 +1,51 @@
 1	german	x-vnd.Haiku-ActivityMonitor	1159274874
-Temp	DataSource		Temp
-Temperature	DataSource		Temperatur
 Teams	DataSource		Teams
-Semaphores	DataSource		Semaphoren
-TX	DataSource	Shorter version for Sending	Senden
+Temp	DataSource		Temp
 Block cache memory	DataSource		Block-Cache-Speicher
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Media-Nodes
-Text clipboard	DataSource		Text-Ablage
 Network send	DataSource		Netzwerk senden
-Cache	DataSource		Cache
-Running applications	DataSource		Laufende Anwendungen
-CPU usage (combined)	DataSource		CPU-Auslastung (alle)
 Threads	DataSource		Threads
-Receiving	DataSource		Empfangen
 Remove graph	ActivityView		Graph entfernen
-Swap space	DataSource		Auslagerungsspeicher
-CPU	DataSource		CPU
 ActivityMonitor	System name		Aktivitätsanzeige
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Aktualisierungsintervall:
-RX	DataSource	Shorter version for Receiving.	Empfangen
 Settings…	ActivityWindow		Einstellungen …
 Block cache	DataSource		Block-Cache
 Memory	DataSource		Speicher
 No thermal sensor	SystemInfoHandler		Kein Wärmesensor
-CPU usage	DataSource		CPU-Auslastung
 CPU speed	DataSource		CPU-Takt
-Quit	ActivityWindow		Beenden
+CPU usage	DataSource		CPU-Auslastung
 Raw clipboard	DataSource		Raw-Ablage
 Settings	ActivityWindow		Einstellungen
 Used memory	DataSource		Benutzter Speicher
-Show legend	ActivityView		Legende anzeigen
 Cached memory	DataSource		Gecachter Speicher
-CPU %d usage	DataSource		CPU %d Auslastung
-CPU %d speed	DataSource		CPU %d Takt
-File	ActivityWindow		Datei
 Ports	DataSource		Ports
-Page faults	DataSource		Seitenfehler
-Additional items	ActivityView		Zusätzliche Elemente
 Apps	DataSource		Apps
+Page faults	DataSource		Seitenfehler
 Add graph	ActivityWindow		Graphen hinzufügen
+Swap	DataSource		Auslagerung
+%s faults/s	DataSource		%s Fehler/s
+Temperature	DataSource		Temperatur
+Semaphores	DataSource		Semaphoren
+TX	DataSource	Shorter version for Sending	Senden
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Text-Ablage
+Running applications	DataSource		Laufende Anwendungen
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		CPU-Auslastung (alle)
+Receiving	DataSource		Empfangen
+Swap space	DataSource		Auslagerungsspeicher
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	Empfangen
+Quit	ActivityWindow		Beenden
+Show legend	ActivityView		Legende anzeigen
+File	ActivityWindow		Datei
+CPU %d speed	DataSource		CPU %d Takt
+CPU %d usage	DataSource		CPU %d Auslastung
+Additional items	ActivityView		Zusätzliche Elemente
 Sending	DataSource		Senden
 Always on top	ActivityWindow		Immer im Vordergrund
-Swap	DataSource		Auslagerung
-%lld sec.	SettingsWindow		%lld Sek.
-P-faults	DataSource		Seitenfehler
 Sems	DataSource		Sems
+P-faults	DataSource		Seitenfehler
+%lld sec.	SettingsWindow		%lld Sek.
 Network receive	DataSource		Netzwerk empfangen
-%s faults/s	DataSource		%s Fehler/s

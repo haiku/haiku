@@ -1,5 +1,4 @@
-1	danish	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Indstil til gemt
+1	danish	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din hovedtekst indeholder %ld ukodelige tegn. Måske et andet tegnsæt vil virke bedre? Tryk på Send for at sende den alligevel (der bruges et erstatningstegn i stedet for de ukodelige), eller vælg Afbryd for at gå tilbage, og prøve at rette det igen.
 Text wrapping:	Mail		Tekstombrydning:
 Show icons & labels	Mail		Vis ikoner og etiketter
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		spam
 Reply to all	Mail		Svar til alle
 Cancel	Mail		Afbryd
 Off	Mail		Fra
-Set to %s	Mail		Sæt til %s
 Signature:	Mail		Signatur:
 Forward without attachments	Mail		Videresend uden vedhæftninger
 queries	B_USER_DIRECTORY/mail/queries		forespørgsler
@@ -87,8 +85,8 @@ Auto signature:	Mail		Automatisk signatur:
 Same subject	Mail		Samme emne
 Send	Mail		Send
 Open draft	Mail		Åbn kladde
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lad være som 'New'
 Random	Mail		Tilfældig
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lad være som 'New'
 Attach attributes:	Mail		Vedhæft attributter:
 Find again	Mail		Søg igen
 Size:	Mail		Størrelse:
@@ -108,7 +106,6 @@ Move to trash	Mail		Flyt til papirkurven
 <none>	Mail		<ingen>
 %d - Date	Mail		%d - Dato
 Check spelling	Mail		Efterse stavning
-Status:	Mail		Status:
 Redo	Mail		Omgør
 Leave as '%s'	Mail		Lad være som '%s'
 Print…	Mail		Udskriv…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Send meddelelsen inden lukning?
 in	B_USER_DIRECTORY/mail/in		indbakke
 Open	Mail		Åbn
 Don't save	Mail		Undlad at gemme
-Leave same	Mail		Lad være som samme
 An error occurred trying to save the attachment.	Mail		Der opstod en fejl ved gemning af vedhæftning.
+Leave same	Mail		Lad være som samme
 Save address	Mail		Gem adresse
 Initial spell check mode:	Mail		Indledende stavekontrolstilstand:
 Edit queries…	Mail		Redigér forespørgsler…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Redigér signaturer…
 User interface	Mail		Brugergrænseflade
 Inconsistency occurred in the undo/redo buffer.	Mail		Der skete en konsistensfejl i fortryd/gør-historikken.
 Remove attachment	Mail		Fjern vedhæftning
-Set to…	Mail		Sæt til…
 Edit	Mail		Redigér
 Page setup…	Mail		Sideopsætning…
 An error occurred trying to save this signature.	Mail		Der opstod en fejl ved forsøg på at gemme signaturen.

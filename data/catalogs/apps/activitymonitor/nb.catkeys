@@ -1,48 +1,48 @@
 1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Lag
-Semaphores	DataSource		Semaforer
-TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blokkhurtigbufferminne
-%lld ms	SettingsWindow		%lld ms
 Media nodes	DataSource		Medianoder
-Text clipboard	DataSource		Tekst på utklippstavle
 Network send	DataSource		Sendt nettverk
-Cache	DataSource		Hurtigbuffer
-Running applications	DataSource		Kjørende programmer
-CPU usage (combined)	DataSource		CPU-bruk (sammenlagt)
 Threads	DataSource		Tråder
-Receiving	DataSource		Mottar
 Remove graph	ActivityView		Fjern graf
-Swap space	DataSource		Veksleminne
-CPU	DataSource		CPU
 ActivityMonitor	System name		Aktivitetsoversikt
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Oppdateringsintervall:
-RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Innstillinger…
 Block cache	DataSource		Blokk-hurtigbuffer
 Memory	DataSource		Minne
-CPU usage	DataSource		CPU-bruk
 CPU speed	DataSource		CPU-hastighet
-Quit	ActivityWindow		Avslutt
+CPU usage	DataSource		CPU-bruk
 Raw clipboard	DataSource		Data på utklippstavle
 Settings	ActivityWindow		Innstillinger
 Used memory	DataSource		Brukt minne
-Show legend	ActivityView		Vis forklaring
 Cached memory	DataSource		Hurtigbufferminne
-CPU %d usage	DataSource		CPU %d benyttelse
-CPU %d speed	DataSource		CPU %d hastighet
-File	ActivityWindow		Fil
 Ports	DataSource		Porter
-Page faults	DataSource		Sidefeil
-Additional items	ActivityView		Tilleggsobjekter
 Apps	DataSource		Programmer
+Page faults	DataSource		Sidefeil
 Add graph	ActivityWindow		Legg til graf
+Swap	DataSource		Utveksling
+%s faults/s	DataSource		%s feil/s
+Semaphores	DataSource		Semaforer
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+Text clipboard	DataSource		Tekst på utklippstavle
+Running applications	DataSource		Kjørende programmer
+Cache	DataSource		Hurtigbuffer
+CPU usage (combined)	DataSource		CPU-bruk (sammenlagt)
+Receiving	DataSource		Mottar
+Swap space	DataSource		Veksleminne
+CPU	DataSource		CPU
+RX	DataSource	Shorter version for Receiving.	RX
+Quit	ActivityWindow		Avslutt
+Show legend	ActivityView		Vis forklaring
+File	ActivityWindow		Fil
+CPU %d speed	DataSource		CPU %d hastighet
+CPU %d usage	DataSource		CPU %d benyttelse
+Additional items	ActivityView		Tilleggsobjekter
 Sending	DataSource		Sender
 Always on top	ActivityWindow		Alltid øverst
-Swap	DataSource		Utveksling
-%lld sec.	SettingsWindow		%lld sek.
-P-faults	DataSource		P-feil
 Sems	DataSource		Semaforer
+P-faults	DataSource		P-feil
+%lld sec.	SettingsWindow		%lld sek.
 Network receive	DataSource		Mottatt nettverk
-%s faults/s	DataSource		%s feil/s

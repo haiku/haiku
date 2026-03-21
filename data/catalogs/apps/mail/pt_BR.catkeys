@@ -1,5 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-MAIL	856240449
-Set to Saved	Mail		Definir como Salvo
+1	portuguese (brazil)	x-vnd.Be-MAIL	4084116739
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O texto principal contém %ld caracteres não codificáveis. Quem sabe um conjunto de caracteres diferente trabalhe melhor? Clique em Enviar para enviar a mensagem como está (um caractere substituto será usado no lugar dos não codificáveis) ou escolha Cancelar para voltar e tentar consertar isso.
 Text wrapping:	Mail		Quebra de texto:
 Show icons & labels	Mail		Exibir ícones & rótulos
@@ -64,7 +63,6 @@ spam	B_USER_DIRECTORY/mail/spam		mensagens não solicitadas
 Reply to all	Mail		Responder a todos
 Cancel	Mail		Cancelar
 Off	Mail		Desligar
-Set to %s	Mail		Definir para %s
 Signature:	Mail		Assinatura:
 Forward without attachments	Mail		Encaminhar sem anexos
 queries	B_USER_DIRECTORY/mail/queries		consultas
@@ -84,8 +82,8 @@ Auto signature:	Mail		Auto assinatura:
 Same subject	Mail		Mesmo assunto
 Send	Mail		Enviar
 Open draft	Mail		Abrir rascunho
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'Novo'
 Random	Mail		Aleatório
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'Novo'
 Attach attributes:	Mail		Anexar Atributos:
 Find again	Mail		Localizar novamente
 Size:	Mail		Tamanho:
@@ -133,8 +131,8 @@ Send this message before closing?	Mail		Enviar esta mensagem antes de fechar?
 in	B_USER_DIRECTORY/mail/in		em
 Open	Mail		Abrir
 Don't save	Mail		Não salvar
-Leave same	Mail		Deixar o mesmo
 An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar salvar o anexo.
+Leave same	Mail		Deixar o mesmo
 Save address	Mail		Salvar endereço
 Initial spell check mode:	Mail		Modo de verificação ortográfica inicial:
 Edit queries…	Mail		Editar consultas…
@@ -147,7 +145,6 @@ Edit signatures…	Mail		Editar assinaturas…
 User interface	Mail		Interface de usuário
 Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória do Desfazer/Refazer.
 Remove attachment	Mail		Remover anexo
-Set to…	Mail		Definir como…
 Edit	Mail		Editar
 Page setup…	Mail		Configurar página…
 An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar salvar esta assinatura.

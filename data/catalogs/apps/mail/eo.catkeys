@@ -1,5 +1,4 @@
-1	esperanto	x-vnd.Be-MAIL	856240449
-Set to Saved	Mail		Atribui al Konservita
+1	esperanto	x-vnd.Be-MAIL	4084116739
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Via ĉefa teksto enhavas %ld da nedekodeblaj signoj. Verŝajne alia signaro pli taŭgus? Premu "Sendi" por sendi ĝin malgraŭe (nedekodeblaj signoj estos anstataŭigitaj), aŭ elektu "Rezigni" por provi korekti ilin.
 Text wrapping:	Mail		Teksta ĉirkaŭfluo:
 Show icons & labels	Mail		Montri bildsimbolojn kaj etikedojn
@@ -64,7 +63,6 @@ spam	B_USER_DIRECTORY/mail/spam		trudaĵo
 Reply to all	Mail		Respondi al ĉiuj
 Cancel	Mail		Nuligi
 Off	Mail		Malŝalti
-Set to %s	Mail		Atribui al %s
 Signature:	Mail		Subskribo:
 Forward without attachments	Mail		Plusendi sen kunsendaĵoj
 queries	B_USER_DIRECTORY/mail/queries		informpetoj
@@ -84,8 +82,8 @@ Auto signature:	Mail		Aŭtomata subskribo:
 Same subject	Mail		Sama temo
 Send	Mail		Sendi
 Open draft	Mail		Uzi malneton
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasi kiel 'New'
 Random	Mail		Senorda
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasi kiel 'New'
 Attach attributes:	Mail		Aldoni atributojn:
 Find again	Mail		Retrovi
 Size:	Mail		Grando:
@@ -133,8 +131,8 @@ Send this message before closing?	Mail		Sendi ĉi tiun mesaĝon antaŭ fermi?
 in	B_USER_DIRECTORY/mail/in		envena
 Open	Mail		Uzi
 Don't save	Mail		Ne konservi
-Leave same	Mail		Lasi same
 An error occurred trying to save the attachment.	Mail		Eraro okazis dum la konservado de la kunsendaĵo.
+Leave same	Mail		Lasi same
 Save address	Mail		Konservi adreson
 Initial spell check mode:	Mail		Defaŭlta literumila reĝimo:
 Edit queries…	Mail		Redakti informpetojn…
@@ -147,7 +145,6 @@ Edit signatures…	Mail		Redakti subskribojn…
 User interface	Mail		Uzanta interfaco
 Inconsistency occurred in the undo/redo buffer.	Mail		Nekonsekvenco okazis en la malfara/refara bufro.
 Remove attachment	Mail		Forigi kunsendaĵon
-Set to…	Mail		Atribui al…
 Edit	Mail		Redakti
 Page setup…	Mail		Agordo de paĝo…
 An error occurred trying to save this signature.	Mail		Eraro okazis, kiam provas konservi ĉi tiun subskribon.

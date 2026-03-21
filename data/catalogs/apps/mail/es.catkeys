@@ -1,5 +1,4 @@
-1	spanish; castilian	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		Ajustar como Guardado
+1	spanish; castilian	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El texto que ha escrito contiene %ld caracteres indecodificables. ¿Quizás un carácter diferente podría funcionar mejor? Presione enviar de cualquier manera (un carácter sustituto se utilizará en lugar de los indecodificables), o presione Cancelar para regresar e intentar arreglarlo.
 Text wrapping:	Mail		Ajuste del texto:
 Show icons & labels	Mail		Mostrar iconos y etiquetas
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		correo basura
 Reply to all	Mail		Responder a todos
 Cancel	Mail		Cancelar
 Off	Mail		Apagado
-Set to %s	Mail		Establecer a %s
 Signature:	Mail		Firma:
 Forward without attachments	Mail		Reenviar sin archivos adjuntos
 queries	B_USER_DIRECTORY/mail/queries		consultas
@@ -87,8 +85,8 @@ Auto signature:	Mail		Autofirma:
 Same subject	Mail		El mismo asunto
 Send	Mail		Enviar
 Open draft	Mail		Abrir borrador
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Dejar como 'Nuevo'
 Random	Mail		Aleatorio
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Dejar como 'Nuevo'
 Attach attributes:	Mail		Adjuntar atributos:
 Find again	Mail		Buscar de nuevo
 Size:	Mail		Tamaño:
@@ -108,7 +106,6 @@ Move to trash	Mail		Mover a la papelera
 <none>	Mail		<ninguno>
 %d - Date	Mail		%d - Fecha
 Check spelling	Mail		Comprobar ortografía
-Status:	Mail		Estado:
 Redo	Mail		Rehacer
 Leave as '%s'	Mail		Dejar como '%s'
 Print…	Mail		Imprimir…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		¿Enviar este mensaje antes de cerrar?
 in	B_USER_DIRECTORY/mail/in		entrante
 Open	Mail		Abrir
 Don't save	Mail		No guardar
-Leave same	Mail		Dejar el mismo
 An error occurred trying to save the attachment.	Mail		Se produjo un error mientras se trataba de guardar el archivo adjunto.
+Leave same	Mail		Dejar el mismo
 Save address	Mail		Guardar dirección
 Initial spell check mode:	Mail		Modo de comprobación de ortografía inicial:
 Edit queries…	Mail		Editar consultas…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Editar firmas…
 User interface	Mail		Interfaz de usuario
 Inconsistency occurred in the undo/redo buffer.	Mail		Se produjo una inconsistencia en el búfer de deshacer/rehacer.
 Remove attachment	Mail		Quitar archivo adjunto
-Set to…	Mail		Ajustar a…
 Edit	Mail		Editar
 Page setup…	Mail		Configuración de la página…
 An error occurred trying to save this signature.	Mail		Se produjo un error mientras se trataba de guardar esta firma.

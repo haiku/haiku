@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-MAIL	3971025591
+1	croatian	x-vnd.Be-MAIL	2802372473
 Show icons & labels	Mail		Pokaži ikone & natpise
 (Date unavailable)	Mail		(Datum je nedostupan)
 Reply	Mail		Odgovori
@@ -52,7 +52,6 @@ draft	B_USER_DIRECTORY/mail/draft		nacrt
 spam	B_USER_DIRECTORY/mail/spam		neželjena poruka
 Reply to all	Mail		Odgovori svima
 Cancel	Mail		Otkaži
-Set to %s	Mail		Postavi na: %s
 Signature:	Mail		Potpis:
 Forward without attachments	Mail		Proslijedi bez privitaka
 View	Mail		Pogled
@@ -68,8 +67,8 @@ Open this link	Mail		Otvori ovu poveznicu
 Same subject	Mail		Isti naslov
 Send	Mail		Pošalji
 Open draft	Mail		Otvori nacrt
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Ostavi kao 'Novo'
 Random	Mail		Nasumično
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Ostavi kao 'Novo'
 Find again	Mail		Nađi ponovo
 Size:	Mail		Veličina:
 To:	Mail		Za:
@@ -107,8 +106,8 @@ Send this message before closing?	Mail		Poslati ovu poruku prije zatvaranja?
 in	B_USER_DIRECTORY/mail/in		u
 Open	Mail		Otvori
 Don't save	Mail		Nemoj spremiti
-Leave same	Mail		Ostavi isto
 An error occurred trying to save the attachment.	Mail		Došlo je do greške pri spremanju privitka.
+Leave same	Mail		Ostavi isto
 Save address	Mail		Spremi adresu
 Initial spell check mode:	Mail		Početni način rada provjere pravopisa:
 File	Mail		Datoteka
@@ -116,7 +115,6 @@ New mail message	Mail		Nova mail poruka
 An error occurred trying to open this signature.	Mail		Došlo je do greške pri pokušaju otvaranja ovoga potpisa.
 User interface	Mail		Korisničko sučelje
 Remove attachment	Mail		Ukloni privitak
-Set to…	Mail		Postavi na...
 Edit	Mail		Uredi
 An error occurred trying to save this signature.	Mail		Došlo je do greške pri pokušaju spremanja ovoga potpisa.
 Beginner	Mail		Početnik

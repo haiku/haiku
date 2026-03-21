@@ -1,5 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	3945726882
-Set to Saved	Mail		До збережених
+1	ukrainian	x-vnd.Be-MAIL	236508096
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Перенос тексту:
 Show icons & labels	Mail		Показати значки & надписи
@@ -67,7 +66,6 @@ spam	B_USER_DIRECTORY/mail/spam		Спам
 Reply to all	Mail		Відповісти всім
 Cancel	Mail		Скасувати
 Off	Mail		Вимкнути
-Set to %s	Mail		Встановити статус «%s»
 Signature:	Mail		Підпис:
 Forward without attachments	Mail		Переслати без вкладень
 queries	B_USER_DIRECTORY/mail/queries		Запити
@@ -87,8 +85,8 @@ Auto signature:	Mail		Автопідпис:
 Same subject	Mail		Та сама тема
 Send	Mail		Відіслати
 Open draft	Mail		Відкрити чернетки
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Залишити статус «New»
 Random	Mail		Випадковий
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Залишити статус «New»
 Attach attributes:	Mail		Додати атрибути:
 Find again	Mail		Знайти далі
 Size:	Mail		Розмір шрифту:
@@ -108,7 +106,6 @@ Move to trash	Mail		Перемістити до смітника
 <none>	Mail		<пусто>
 %d - Date	Mail		%d – Дата
 Check spelling	Mail		Перевіряти орфографію
-Status:	Mail		Статус:
 Redo	Mail		Повтор дії
 Leave as '%s'	Mail		Залишити статус «%s»
 Print…	Mail		Друкувати…
@@ -137,8 +134,8 @@ Send this message before closing?	Mail		Відіслати це повідомл
 in	B_USER_DIRECTORY/mail/in		Вхідні
 Open	Mail		Відкрити
 Don't save	Mail		Не зберігати
-Leave same	Mail		Залишити саме це
 An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
+Leave same	Mail		Залишити саме це
 Save address	Mail		Зберегти адресу
 Initial spell check mode:	Mail		Перевірка орфографії:
 Edit queries…	Mail		Редагувати запити…
@@ -151,7 +148,6 @@ Edit signatures…	Mail		Редагувати підписи…
 User interface	Mail		Інтерфейс користувача
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/повтора.
 Remove attachment	Mail		Прибрати вкладення
-Set to…	Mail		Встановити статус як…
 Edit	Mail		Редагувати
 Page setup…	Mail		Настройка сторінки…
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.
