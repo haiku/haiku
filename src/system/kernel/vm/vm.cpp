@@ -5845,10 +5845,13 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 		return B_NOT_ALLOWED;
 	}
 
-	// We need to mark the area cloneable so the following operations work.
-	status = set_area_protection(id, info.protection | B_CLONEABLE_AREA);
-	if (status != B_OK)
-		return status;
+	if (!kernel) {
+		// We need to mark the area cloneable so the following operations work.
+		status = vm_set_area_protection(info.team, id,
+			info.protection | B_CLONEABLE_AREA, kernel);
+		if (status != B_OK)
+			return status;
+	}
 
 	area_id clonedArea = vm_clone_area(target, info.name, _address,
 		addressSpec, info.protection, REGION_NO_PRIVATE_MAP, id, kernel);
@@ -5862,7 +5865,7 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 	}
 
 	// Now we can reset the protection to whatever it was before.
-	set_area_protection(clonedArea, info.protection);
+	vm_set_area_protection(target, clonedArea, info.protection, kernel);
 
 	// TODO: The clonedArea is B_SHARED_AREA, which is not really desired.
 
