@@ -978,6 +978,7 @@ mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 			"for locks %p, %p", from, to);
 	}
 #endif
+	ASSERT(from->holder != thread_get_current_thread_id());
 
 	InterruptsSpinLocker locker(to->lock);
 
