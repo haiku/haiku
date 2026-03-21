@@ -28,7 +28,7 @@ const char* kACPIPciRootName = "PNP0A03";
 const char* kACPIPciExpressRootName = "PNP0A08";
 	// Note that some configurations will still return the PCI express root
 	// when querying for the standard PCI root. This is due to the compatible ID
-	// fields in ACPI. TODO: Query both/the correct root device.
+	// fields in ACPI.
 
 // TODO: as per PCI 3.0, the PCI module hardcodes it in various places as well.
 static const uint8 kMaxPCIFunctionCount = 8;
@@ -772,9 +772,14 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
 	char rootPciName[255];
 	acpi_handle rootPciHandle;
 	rootPciName[0] = 0;
-	status_t status = acpi->get_device(kACPIPciRootName, 0, rootPciName, 255);
-	if (status != B_OK)
-		return status;
+
+	// Query the PCIe root bridge, falling back to the PCI root bridge
+	status_t status = acpi->get_device(kACPIPciExpressRootName, 0, rootPciName, 255);
+	if (status != B_OK) {
+		status = acpi->get_device(kACPIPciRootName, 0, rootPciName, 255);
+		if (status != B_OK)
+			return status;
+	}
 
 	status = acpi->get_handle(NULL, rootPciName, &rootPciHandle);
 	if (status != B_OK)
