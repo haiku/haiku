@@ -2612,6 +2612,96 @@ vm_clone_area(team_id team, const char* name, void** address,
 }
 
 
+/*!	Changes all clones of an area (but not the area itself) to use a different cache
+	(and thus no longer be clones of this area.)
+
+	The target cache must be locked.
+*/
+status_t
+vm_change_cache_of_clones(area_id areaId, struct VMCache* toCache)
+{
+	AddressSpaceReadLocker addressSpaceLocker;
+	VMArea* fromArea;
+	addressSpaceLocker.SetFromArea(areaId, fromArea);
+
+	VMCache* cache = vm_area_get_locked_cache(fromArea);
+	addressSpaceLocker.Unlock();
+
+	VMCacheChainLocker cacheChainLocker(cache);
+	cacheChainLocker.LockAllSourceCaches();
+
+	VMArea* area = NULL;
+	int32 releaseStoreRefs = 0;
+	while (true) {
+		if (area == NULL)
+			area = cache->areas.First();
+		else
+			area = cache->areas.GetNext(area);
+
+		if (area == NULL)
+			break;
+		if (area == fromArea)
+			continue;
+		ASSERT(!area->IsWired());
+
+		unmap_pages(area, area->Base(), area->Size());
+
+		rw_lock_write_lock(&sAreaCacheLock);
+
+		// We have to do this manually, because RemoveArea() expects
+		// to be called unlocked, so it can call ReleaseStoreRef().
+		cache->areas.Remove(area);
+
+		area->cache = toCache;
+		area->cache_type = cache->type;
+		toCache->InsertAreaLocked(area);
+		toCache->AcquireRefLocked();
+
+		rw_lock_write_unlock(&sAreaCacheLock);
+
+		cache->ReleaseRefLocked();
+		releaseStoreRefs++;
+
+		// We removed this area, so restart iteration.
+		area = NULL;
+	}
+
+	// Release the store references after dropping the lock.
+	cacheChainLocker.Unlock(cache);
+	cache->Unlock();
+	while (releaseStoreRefs > 0) {
+		cache->ReleaseStoreRef();
+		releaseStoreRefs--;
+	}
+
+	// Release the reference kept when unlocking the chain.
+	cache->ReleaseRef();
+
+	return B_OK;
+}
+
+
+/*!	Changes all clones of an area (but not the area itself) to be null areas.
+*/
+status_t
+vm_change_clones_to_null_areas(area_id areaId)
+{
+	VMCache* cache;
+	status_t status = VMCacheFactory::CreateNullCache(VM_PRIORITY_SYSTEM, cache);
+	if (status != B_OK)
+		return status;
+
+	cache->Lock();
+	cache->temporary = 1;
+	cache->virtual_end = SSIZE_MAX;
+
+	status = vm_change_cache_of_clones(areaId, cache);
+
+	cache->ReleaseRefAndUnlock();
+	return status;
+}
+
+
 /*!	Deletes the specified area of the given address space.
 
 	The address space must be write-locked.
