@@ -22,6 +22,10 @@ typedef struct accelerant_info {
 	int16				current_mode; // index in the mode_list, or -1 if using a custom mode
 
 	vesa_mode			*vesa_modes;
+
+	area_id				frame_buffer_area;
+		// cloned framebuffer
+	void*				frame_buffer;
 } accelerant_info;
 
 extern accelerant_info *gInfo;

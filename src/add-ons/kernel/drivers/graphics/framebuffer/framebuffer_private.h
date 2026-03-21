@@ -23,6 +23,7 @@ struct framebuffer_info {
 	struct vesa_shared_info* shared_info;
 	area_id			shared_area;
 
+	area_id			frame_buffer_area;
 	addr_t			frame_buffer;
 };
 

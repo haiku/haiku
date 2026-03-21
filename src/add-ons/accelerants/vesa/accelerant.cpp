@@ -49,6 +49,7 @@ init_common(int device, bool isClone)
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
 	gInfo->current_mode = UINT16_MAX;
+	gInfo->frame_buffer_area = -1;
 
 	// get basic info from driver
 
@@ -110,6 +111,7 @@ vesa_init_accelerant(int device)
 
 	// Initialize current mode completely from the mode list
 	vesa_propose_display_mode(&gInfo->shared_info->current_mode, NULL, NULL);
+
 	return B_OK;
 }
 

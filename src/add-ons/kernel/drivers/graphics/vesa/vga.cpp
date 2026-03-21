@@ -7,6 +7,7 @@
 #include "vga.h"
 #include "driver.h"
 
+#include <vesa_info.h>
 #include <vga.h>
 
 #include <KernelExport.h>
@@ -40,7 +41,7 @@ vga_set_indexed_colors(uint8 first, uint8 *colors, uint16 count)
 
 
 status_t
-vga_planar_blit(vesa_shared_info *info, uint8 *src, int32 srcBPR,
+vga_planar_blit(vesa_info *info, uint8 *src, int32 srcBPR,
 	int32 left, int32 top, int32 right, int32 bottom)
 {
 	// If we don't actually have an ISA bus, bail.
@@ -48,11 +49,11 @@ vga_planar_blit(vesa_shared_info *info, uint8 *src, int32 srcBPR,
 		return B_BAD_ADDRESS;
 
 	// If we don't actually have a frame_buffer, bail.
-	if (info->frame_buffer == NULL)
+	if (info->frame_buffer == 0)
 		return B_BAD_ADDRESS;
 
-	int32 dstBPR = info->bytes_per_row;
-	uint8 *dst = info->frame_buffer + top * dstBPR + left / 8;
+	int32 dstBPR = info->shared_info->bytes_per_row;
+	uint8 *dst = (uint8*)(info->frame_buffer + top * dstBPR + left / 8);
 
 	// TODO: this is awfully slow...
 	// TODO: assumes BGR order

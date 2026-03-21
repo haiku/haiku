@@ -50,6 +50,7 @@ init_common(int device, bool isClone)
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
 	gInfo->current_mode = UINT16_MAX;
+	gInfo->frame_buffer_area = -1;
 
 	// get basic info from driver
 
@@ -74,6 +75,7 @@ init_common(int device, bool isClone)
 static void
 uninit_common(void)
 {
+	delete_area(gInfo->frame_buffer_area);
 	delete_area(gInfo->shared_info_area);
 	gInfo->shared_info_area = -1;
 	gInfo->shared_info = NULL;
@@ -105,6 +107,16 @@ framebuffer_init_accelerant(int device)
 		uninit_common();
 		return status;
 	}
+
+	area_info info;
+	status = ioctl(gInfo->device, VESA_CLONE_FRAME_BUFFER, &info, sizeof(info));
+	if (status != B_OK) {
+		uninit_common();
+		return status;
+	}
+
+	gInfo->frame_buffer_area = info.area;
+	gInfo->frame_buffer = info.address;
 
 	return B_OK;
 }

@@ -37,11 +37,6 @@ struct vesa_shared_info {
 	display_mode	current_mode;
 	uint32			bytes_per_row;
 
-	area_id			frame_buffer_area;	// area of frame buffer
-	uint8*			frame_buffer;
-		// pointer to frame buffer (visible by all apps!)
-	uint8*			physical_frame_buffer;
-
 	uint32			vesa_mode_offset;
 	uint32			vesa_mode_count;
 
@@ -62,6 +57,7 @@ struct vesa_shared_info {
 // list ioctls
 enum {
 	VESA_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
+	VESA_CLONE_FRAME_BUFFER,
 	VESA_GET_DEVICE_NAME,
 	VESA_SET_DISPLAY_MODE,
 	VESA_GET_DPMS_MODE,

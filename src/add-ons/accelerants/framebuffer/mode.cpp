@@ -134,8 +134,8 @@ framebuffer_get_frame_buffer_config(frame_buffer_config* config)
 {
 	TRACE(("framebuffer_get_frame_buffer_config()\n"));
 
-	config->frame_buffer = gInfo->shared_info->frame_buffer;
-	config->frame_buffer_dma = gInfo->shared_info->physical_frame_buffer;
+	config->frame_buffer = gInfo->frame_buffer;
+	config->frame_buffer_dma = NULL;
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
 	return B_OK;

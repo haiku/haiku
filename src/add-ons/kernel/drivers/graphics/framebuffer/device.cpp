@@ -17,6 +17,7 @@
 #include <OS.h>
 #include <PCI.h>
 #include <SupportDefs.h>
+#include <vm/vm.h>
 
 #include <vesa.h>
 
@@ -112,6 +113,18 @@ device_ioctl(void* cookie, uint32 msg, void* buffer, size_t bufferLength)
 				return B_BAD_ADDRESS;
 
 			return B_OK;
+
+		case VESA_CLONE_FRAME_BUFFER:
+		{
+			void* dummy;
+			area_id area = vm_clone_area(B_CURRENT_TEAM, "cloned framebuffer",
+				&dummy, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, 0,
+				info->frame_buffer_area, true);
+			if (area < 0)
+				return area;
+
+			return _user_get_area_info(area, (area_info*)buffer);
+		}
 
 		// needed to share data between kernel and accelerant
 		case VESA_GET_PRIVATE_DATA:

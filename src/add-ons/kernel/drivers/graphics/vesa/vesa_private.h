@@ -33,6 +33,7 @@ struct vesa_info {
 	uint8			vbe_capabilities;
 	uint8			bits_per_gun;
 
+	area_id			frame_buffer_area;
 	addr_t			frame_buffer;
 	addr_t			physical_frame_buffer;
 	size_t			physical_frame_buffer_size;

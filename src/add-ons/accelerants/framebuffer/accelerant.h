@@ -21,6 +21,10 @@ typedef struct accelerant_info {
 		// cloned list of standard display modes
 	display_mode		*mode_list;
 	uint16				current_mode;
+
+	area_id				frame_buffer_area;
+		// cloned framebuffer
+	void*				frame_buffer;
 } accelerant_info;
 
 extern accelerant_info *gInfo;
