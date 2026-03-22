@@ -911,7 +911,7 @@ void
 CanvasCallbacks::SetFontShear(float shear)
 {
 	ServerFont font;
-	font.SetShear(shear);
+	font.SetShear(shear * (180 / M_PI) + 90);
 	fCanvas->CurrentState()->SetFont(font, B_FONT_SHEAR);
 }
 
@@ -1205,7 +1205,7 @@ ServerPicture::WriteFontState(const ServerFont& font, uint16 mask)
 	}
 
 	if (mask & B_FONT_SHEAR) {
-		WriteSetFontShear(font.Shear());
+		WriteSetFontShear((font.Shear() - 90) * (M_PI / 180));
 	}
 
 	if (mask & B_FONT_ROTATION) {
