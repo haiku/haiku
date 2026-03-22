@@ -959,6 +959,8 @@ process_early_cpu_call(int32 cpu)
 static void
 call_all_cpus_early(void (*function)(void*, int), void* cookie)
 {
+	ASSERT(!are_interrupts_enabled());
+
 	if (sNumCPUs > 1) {
 		sEarlyCPUCallFunction = function;
 		sEarlyCPUCallCookie = cookie;
@@ -1508,16 +1510,23 @@ call_single_cpu_sync(uint32 targetCPU, void (*func)(void*, int), void* cookie)
 
 
 static void
-call_all_cpus(void (*func)(void*, int), void* cookie, bool sync)
+call_all_cpus(void (*function)(void*, int), void* cookie, bool sync)
 {
+	if (sNumCPUs == 1) {
+		cpu_status state = disable_interrupts();
+		function(cookie, 0);
+		restore_interrupts(state);
+		return;
+	}
+
 	// if inter-CPU communication is not yet enabled, use the early mechanism
 	if (!sICIEnabled) {
-		call_all_cpus_early(func, cookie);
+		call_all_cpus_early(function, cookie);
 		return;
 	}
 
 	smp_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
-		0, 0, (void*)func, sync ? SMP_MSG_FLAG_SYNC : SMP_MSG_FLAG_ASYNC);
+		0, 0, (void*)function, sync ? SMP_MSG_FLAG_SYNC : SMP_MSG_FLAG_ASYNC);
 }
 
 
