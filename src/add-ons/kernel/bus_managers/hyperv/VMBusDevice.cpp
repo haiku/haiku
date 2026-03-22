@@ -281,9 +281,9 @@ VMBusDevice::ReadPacket(void* buffer, uint32* bufferLength, uint32* _headerLengt
 	if (fRXRing->features.pending_send_size_supported) {
 		uint32 pendingSendLength = atomic_get((int32*)&fRXRing->pending_send_size);
 		if (pendingSendLength > 0) {
-			uint32 availableLength = _AvailableRX();
-			if ((availableLength - readLength) < pendingSendLength
-					&& availableLength > pendingSendLength) {
+			uint32 writeableLength = fRXRingLength - _AvailableRX();
+			if ((writeableLength - readLength) <= pendingSendLength
+					&& writeableLength > pendingSendLength) {
 				atomic_add64((int64*)&fRXRing->guest_to_host_interrupt_count, 1);
 				fVMBus->signal_channel(fVMBusCookie, fChannelID);
 			}
