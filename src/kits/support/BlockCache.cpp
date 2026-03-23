@@ -45,6 +45,8 @@ BBlockCache::BBlockCache(uint32 blockCount, size_t blockSize,
 	fFreeBlocks(0),
 	fBlockCount(blockCount)
 {
+	pthread_mutex_init(&fLock, NULL);
+
 	switch (allocationType) {
 		case B_OBJECT_CACHE:
 			fAlloc = &operator new[];
@@ -60,8 +62,6 @@ BBlockCache::BBlockCache(uint32 blockCount, size_t blockSize,
 	// If a debug heap is in use, don't cache anything.
 	if (heap_debug_get_allocation_info != NULL)
 		return;
-
-	pthread_mutex_init(&fLock, NULL);
 
 	// To properly maintain a list of free buffers, a buffer must be
 	// large enough to contain the _FreeBlock struct that is used.
