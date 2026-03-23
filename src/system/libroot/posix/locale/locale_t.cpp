@@ -272,10 +272,25 @@ getlocalename_l(int category, locale_t l)
 
 
 extern "C" locale_t
+__posix_locale_t()
+{
+	static LocaleBackendData posix_locale_t;
+	posix_locale_t.backend = NULL;
+	posix_locale_t.databridge = NULL;
+	return &posix_locale_t;
+}
+
+
+extern "C" locale_t
 __current_locale_t()
 {
 	locale_t locale = (locale_t)GetCurrentLocaleInfo();
 	if (locale == NULL) {
+		// If we're called during initialization, the globals might not have
+		// been set up yet.
+		if (gGlobalLocaleDataBridge.posixLanginfo == NULL)
+			return __posix_locale_t();
+
 		static LocaleBackendData global_locale_t;
 		global_locale_t.backend = gGlobalLocaleBackend;
 		global_locale_t.databridge = &gGlobalLocaleDataBridge;
@@ -283,14 +298,4 @@ __current_locale_t()
 	}
 
 	return locale;
-}
-
-
-extern "C" locale_t
-__posix_locale_t()
-{
-	static LocaleBackendData posix_locale_t;
-	posix_locale_t.backend = NULL;
-	posix_locale_t.databridge = NULL;
-	return &posix_locale_t;
 }
