@@ -472,6 +472,7 @@ struct UserMutexContextFetcher {
 				Team* team = thread_get_current_thread()->team;
 				team->Lock();
 				fInitStatus = allocate_team_user_mutex_context(team);
+				fContext = team->user_mutex_context;
 				team->Unlock();
 				if (fInitStatus != B_OK)
 					return;
