@@ -37,14 +37,7 @@ typedef struct {
 } __attribute__((packed)) linkkey_t;
 
 
-/* 128 integer type needed for SDP */
-struct int128 {
-	int8	b[16];
-};
-typedef struct int128	int128;
-typedef struct int128	uint128;
-
-/* Protocol definitions - add to as required... */
+/* Protocol definitions */
 #define BLUETOOTH_PROTO_HCI		134	/* HCI protocol number */
 #define BLUETOOTH_PROTO_L2CAP	135	/* L2CAP protocol number */
 #define BLUETOOTH_PROTO_RFCOMM	136	/* RFCOMM protocol number */
