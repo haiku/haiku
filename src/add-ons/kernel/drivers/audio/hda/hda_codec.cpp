@@ -53,6 +53,7 @@
 #define SIGMATEL_VENDORID			0x8384
 
 
+#ifdef TRACE_CODEC
 static const char* kPortConnector[] = {
 	"Jack", "None", "Fixed", "Dual"
 };
@@ -73,6 +74,7 @@ static const char* kJackColor[] = {
 	"N/A", "Black", "Grey", "Blue", "Green", "Red", "Orange", "Yellow",
 	"Purple", "Pink", "-", "-", "-", "-", "White", "Other"
 };
+#endif
 
 static const struct {
 	uint32 subsystem_vendor_id, subsystem_id;
@@ -101,6 +103,7 @@ static const struct {
 };
 
 
+#ifdef TRACE_CODEC
 static const char*
 get_widget_type_name(hda_widget_type type)
 {
@@ -127,6 +130,7 @@ get_widget_type_name(hda_widget_type type)
 			return "Unknown";
 	}
 }
+#endif
 
 
 const char*
@@ -179,6 +183,8 @@ get_widget_location(uint32 location)
 	return NULL;
 }
 
+
+#ifdef TRACE_CODEC
 
 static void
 dump_widget_audio_capabilities(uint32 capabilities)
@@ -355,6 +361,8 @@ dump_audiogroup_widgets(hda_audio_group* audioGroup)
 		dump_widget_inputs(widget);
 	}
 }
+
+#endif // TRACE_CODEC
 
 
 //	#pragma mark -
@@ -751,7 +759,10 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		GPIO_COUNT_NUM_GPIO(resp[1]), GPIO_COUNT_NUM_GPO(resp[1]),
 		GPIO_COUNT_NUM_GPI(resp[1]), GPIO_COUNT_GPIUNSOL(resp[1]) ? "yes" : "no",
 		GPIO_COUNT_GPIWAKE(resp[1]) ? "yes" : "no");
+
+#ifdef TRACE_CODEC
 	dump_widget_stream_support(audioGroup->widget);
+#endif
 
 	audioGroup->gpio = resp[1];
 	audioGroup->widget_start = SUB_NODE_COUNT_START(resp[2]);
@@ -834,7 +845,9 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			case WT_AUDIO_OUTPUT:
 			case WT_AUDIO_INPUT:
 				hda_widget_get_stream_support(audioGroup, &widget);
+#ifdef TRACE_CODEC
 				dump_widget_stream_support(widget);
+#endif
 				break;
 
 			case WT_PIN_COMPLEX:
@@ -853,6 +866,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 					VID_GET_CONFIGURATION_DEFAULT, 0);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
 					widget.d.pin.config = resp[0];
+#ifdef TRACE_CODEC
 					const char* location =
 						get_widget_location(CONF_DEFAULT_LOCATION(resp[0]));
 					TRACE("\t%s, %s%s%s, %s, %s, Association:%" B_PRIu32 "\n",
@@ -863,6 +877,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 						kConnectionType[CONF_DEFAULT_CONNTYPE(resp[0])],
 						kJackColor[CONF_DEFAULT_COLOR(resp[0])],
 						CONF_DEFAULT_ASSOCIATION(resp[0]));
+#endif
 				}
 				break;
 
@@ -878,11 +893,13 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		hda_widget_get_pm_support(audioGroup, &widget);
 		hda_widget_get_connections(audioGroup, &widget);
 
+#ifdef TRACE_CODEC
 		dump_widget_pm_support(widget);
 		dump_widget_audio_capabilities(capabilities);
 		dump_widget_amplifier_capabilities(widget, true);
 		dump_widget_amplifier_capabilities(widget, false);
 		dump_widget_inputs(widget);
+#endif
 	}
 
 	hda_widget_get_associations(audioGroup);
@@ -1179,7 +1196,9 @@ hda_audio_group_build_tree(hda_audio_group* audioGroup)
 			ERROR("Setting gpio failed!\n");
 	}
 
+#ifdef TRACE_CODEC
 	dump_audiogroup_widgets(audioGroup);
+#endif
 
 	return B_OK;
 }
