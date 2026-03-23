@@ -6278,13 +6278,13 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		return ENOMEM;
 	}
 
+	if ((protection & ~(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA)) != 0)
+		return B_BAD_VALUE;
+
 	team_id team = team_get_current_team_id();
 	status_t status = check_protection(team, &protection);
 	if (status != B_OK)
 		return status;
-
-	if ((protection & ~(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA)) != 0)
-		return B_BAD_VALUE;
 
 	// We need to write lock the address space, since we're going to play with
 	// the areas. Also make sure that none of the areas is wired and that we're
