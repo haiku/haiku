@@ -1127,8 +1127,10 @@ BrowserWindow::MessageReceived(BMessage* message)
 					index = fTabManager->SelectedTabIndex();
 				_ShutdownTab(index);
 				_UpdateTabGroupVisibility();
-			} else
+			} else {
+				_ShutdownTab(0);
 				PostMessage(B_QUIT_REQUESTED);
+			}
 			break;
 
 		case SELECT_TAB:
@@ -1884,7 +1886,7 @@ BrowserWindow::_UpdateTabGroupVisibility()
 	if (Lock()) {
 		if (fInterfaceVisible)
 			fTabGroup->SetVisible(_TabGroupShouldBeVisible());
-		fTabManager->SetCloseButtonsAvailable(fTabManager->CountTabs() > 1);
+		fTabManager->SetCloseButtonsAvailable(true);
 		Unlock();
 	}
 }
