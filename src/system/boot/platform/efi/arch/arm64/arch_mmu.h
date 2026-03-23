@@ -62,7 +62,7 @@ public:
 		| UpperAttributes::BLOCK_UXN;
 
 	static constexpr uint64 DefaultCodeAttribute = LowerAttributes::BLOCK_AF
-		| LowerAttributes::BLOCK_OUTER_SHARE;
+		| LowerAttributes::BLOCK_INNER_SHARE;
 
 	ARMv8TranslationTableDescriptor(uint64_t* descriptor)
 		: fDescriptor(descriptor)
