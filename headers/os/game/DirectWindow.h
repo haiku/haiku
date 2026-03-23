@@ -35,15 +35,14 @@ typedef struct {
 	direct_buffer_state	buffer_state;
 	direct_driver_state	driver_state;
 	void				*bits;
-	void				*pci_bits;
+	addr_t				_reserved; // was pci_bits
 	int32				bytes_per_row;
 	uint32				bits_per_pixel;
 	color_space			pixel_format;
 	buffer_layout		layout;
 	buffer_orientation	orientation;
-	uint32				_reserved[9];
-	uint32				_dd_type_;
-	uint32				_dd_token_;
+	area_id				bits_area;
+	uint32				_reserved1[10];
 	uint32				clip_list_count;
 	clipping_rect		window_bounds;
 	clipping_rect		clip_bounds;
@@ -141,7 +140,7 @@ private:
 			bool				fConnectionEnable;
 			bool				fIsFullScreen;
 			bool				_unused;
-			bool				fInDirectConnect;
+			bool				fInDirectConnected;
 			int32				fDirectLock;
 			sem_id				fDirectSem;
 			uint32				fDirectLockCount;
@@ -151,12 +150,12 @@ private:
 			sem_id				fDisableSemAck;
 
 			uint32				fInitStatus;
-			uint32				fInfoAreaSize;
 
 			uint32				_reserved[2];
 
-			area_id				fClonedClippingArea;
-			area_id				fSourceClippingArea;
+			area_id				fSourceDirectArea;
+			area_id				fClonedDirectArea;
+			area_id				fSourceBitsArea;
 			thread_id			fDirectDaemonId;
 			direct_buffer_info*	fBufferDesc;
 

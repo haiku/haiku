@@ -40,7 +40,7 @@ public:
 			window_feel			OriginalFeel() const { return fOriginalFeel; }
 
 private:
-			status_t			_SyncronizeWithClient();
+			status_t			_SynchronizeWithClient();
 
 			direct_buffer_info*	fBufferInfo;
 			sem_id				fSem;

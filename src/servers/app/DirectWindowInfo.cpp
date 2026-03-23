@@ -15,6 +15,7 @@
 #include <syslog.h>
 
 #include <Autolock.h>
+#include <kernel.h>
 
 #include "RenderingBuffer.h"
 #include "clipping.h"
@@ -35,6 +36,7 @@ DirectWindowInfo::DirectWindowInfo()
 
 	memset(fBufferInfo, 0, DIRECT_BUFFER_INFO_AREA_SIZE);
 	fBufferInfo->buffer_state = B_DIRECT_STOP;
+	fBufferInfo->bits_area = -1;
 
 	fSem = create_sem(0, "direct sem");
 	fAcknowledgeSem = create_sem(0, "direct sem ack");
@@ -92,9 +94,21 @@ DirectWindowInfo::SetState(direct_buffer_state bufferState,
 	if ((int)driverState != -1)
 		fBufferInfo->driver_state = driverState;
 
-	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
-		fBufferInfo->bits = buffer->Bits();
-		fBufferInfo->pci_bits = NULL; // TODO
+	if ((bufferState & B_BUFFER_RESET) != 0 || fBufferInfo->bits_area < 0) {
+		void* bits = buffer->Bits();
+		if (IS_USER_ADDRESS(bits)) {
+			fBufferInfo->bits = NULL;
+
+			area_id area = area_for(bits);
+			fBufferInfo->bits_area = area;
+
+			// make sure the area is cloneable
+			set_area_protection(area, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
+		} else {
+			// framebuffer is in kernel address space
+			// TODO: update all drivers and then drop this case!
+			fBufferInfo->bits = bits;
+		}
 		fBufferInfo->bytes_per_row = buffer->BytesPerRow();
 
 		switch (buffer->ColorSpace()) {
@@ -137,6 +151,9 @@ DirectWindowInfo::SetState(direct_buffer_state bufferState,
 		fBufferInfo->layout = B_BUFFER_NONINTERLEAVED;
 		fBufferInfo->orientation = B_BUFFER_TOP_TO_BOTTOM;
 			// TODO
+	}
+
+	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
 		fBufferInfo->window_bounds = to_clipping_rect(windowFrame);
 
 		const int32 kMaxClipRectsCount = (DIRECT_BUFFER_INFO_AREA_SIZE
@@ -150,7 +167,7 @@ DirectWindowInfo::SetState(direct_buffer_state bufferState,
 			fBufferInfo->clip_list[i] = clipRegion.RectAtInt(i);
 	}
 
-	return _SyncronizeWithClient();
+	return _SynchronizeWithClient();
 }
 
 
@@ -171,7 +188,7 @@ DirectWindowInfo::DisableFullScreen()
 
 
 status_t
-DirectWindowInfo::_SyncronizeWithClient()
+DirectWindowInfo::_SynchronizeWithClient()
 {
 	// Releasing this semaphore causes the client to call
 	// BDirectWindow::DirectConnected()

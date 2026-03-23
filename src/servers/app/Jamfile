@@ -3,6 +3,9 @@ SubDir HAIKU_TOP src servers app ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders app graphics input interface shared storage support ;
 
+UsePrivateKernelHeaders ;
+	# TODO: Remove! (only needed by DirectWindowInfo.cpp)
+
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;

@@ -17,8 +17,10 @@
 
 #include <clipping.h>
 #include <AppServerLink.h>
+#include <ApplicationPrivate.h>
 #include <DirectWindowPrivate.h>
 #include <ServerProtocol.h>
+#include <ServerMemoryAllocator.h>
 
 
 //#define DEBUG		1
@@ -128,7 +130,6 @@ print_direct_buffer_info(const direct_buffer_info &info)
 
 #	if DEBUG > 1
 	OUTPUT("bits: %p\n", info.bits);
-	OUTPUT("pci_bits: %p\n", info.pci_bits);
 	OUTPUT("bytes_per_row: %ld\n", info.bytes_per_row);
 	OUTPUT("bits_per_pixel: %lu\n", info.bits_per_pixel);
 	OUTPUT("pixel_format: %d\n", info.pixel_format);
@@ -366,7 +367,7 @@ BDirectWindow::GetClippingRegion(BRegion* region, BPoint* origin) const
 	if (IsLocked() || !_LockDirect())
 		return B_ERROR;
 
-	if (!fInDirectConnect) {
+	if (!fInDirectConnected) {
 		_UnlockDirect();
 		return B_ERROR;
 	}
@@ -486,9 +487,29 @@ BDirectWindow::_DirectDaemon()
 					== B_DIRECT_START)
 				fConnectionEnable = true;
 
-			fInDirectConnect = true;
+			if (fBufferDesc->bits == NULL) {
+				// (re-)clone the bits area
+				BPrivate::AppServerLink linkLocker;
+					// protects ServerAllocator
+				BPrivate::ServerMemoryAllocator* allocator
+					= BApplication::Private::ServerAllocator();
+				allocator->RemoveArea(fSourceBitsArea);
+				area_id localArea;
+				uint8* bits;
+				status_t status = allocator->AddArea(fBufferDesc->bits_area,
+					localArea, bits, (size_t)-1);
+				if (status != B_OK) {
+					_UnlockDirect();
+					return -1;
+				}
+
+				fBufferDesc->bits = (void*)bits;
+				fSourceBitsArea = fBufferDesc->bits_area;
+			}
+
+			fInDirectConnected = true;
 			DirectConnected(fBufferDesc);
-			fInDirectConnect = false;
+			fInDirectConnected = false;
 
 			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK)
 					== B_DIRECT_STOP)
@@ -559,7 +580,7 @@ BDirectWindow::_InitData()
 {
 	fConnectionEnable = false;
 	fIsFullScreen = false;
-	fInDirectConnect = false;
+	fInDirectConnected = false;
 
 	fInitStatus = 0;
 
@@ -583,14 +604,16 @@ BDirectWindow::_InitData()
 		fInitStatus |= DW_STATUS_SEM_CREATED;
 #endif
 
-	fSourceClippingArea = syncData.area;
+	fSourceDirectArea = syncData.area;
 	fDisableSem = syncData.disable_sem;
 	fDisableSemAck = syncData.disable_sem_ack;
 
-	fClonedClippingArea = clone_area("cloned direct area", (void**)&fBufferDesc,
-		B_ANY_ADDRESS, B_READ_AREA, fSourceClippingArea);
+	fClonedDirectArea = clone_area("cloned direct area", (void**)&fBufferDesc,
+		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, fSourceDirectArea);
 
-	if (fClonedClippingArea > 0) {
+	fSourceBitsArea = -1;
+
+	if (fClonedDirectArea > 0) {
 		fInitStatus |= DW_STATUS_AREA_CLONED;
 
 		fDirectDaemonId = spawn_thread(_daemon_thread, "direct daemon",
@@ -633,7 +656,7 @@ BDirectWindow::_DisposeData()
 #endif
 
 	if (fInitStatus & DW_STATUS_AREA_CLONED)
-		delete_area(fClonedClippingArea);
+		delete_area(fClonedDirectArea);
 }
 
 
