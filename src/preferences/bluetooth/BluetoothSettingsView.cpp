@@ -262,7 +262,8 @@ BluetoothSettingsView::_BuildLocalDevicesMenu()
 void
 BluetoothSettingsView::_MarkLocalDevice(LocalDevice* lDevice)
 {
-	// TODO: Device integrity should be rechecked.
+	if (bdaddrUtils::Compare(lDevice->GetBluetoothAddress(), BDADDR_NULL))
+		return;
 
 	fExtDeviceView->SetLocalDevice(lDevice);
 	fExtDeviceView->SetEnabled(true);
