@@ -18,8 +18,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/L2CAP/btL2CAP.h>
+
+
+static bool
+bdaddrs_equal(const bdaddr_t& ba1, const bdaddr_t& ba2)
+{
+	return memcmp(&ba1, &ba2, sizeof(bdaddr_t)) == 0;
+}
 
 
 static status_t
@@ -27,7 +33,7 @@ l2cap_copy_address(const sockaddr *from, sockaddr **to,
 	bool replaceWithZeros = false, const sockaddr *mask = NULL)
 {
 	if (replaceWithZeros) {
-		*to = (sockaddr *)malloc(sizeof(sockaddr_in));
+		*to = (sockaddr *)malloc(sizeof(sockaddr_l2cap));
 		if (*to == NULL)
 			return B_NO_MEMORY;
 
@@ -40,7 +46,7 @@ l2cap_copy_address(const sockaddr *from, sockaddr **to,
 		if (from->sa_family != AF_BLUETOOTH)
 			return B_MISMATCHED_VALUES;
 
-		*to = (sockaddr *)malloc(sizeof(sockaddr_in));
+		*to = (sockaddr *)malloc(sizeof(sockaddr_l2cap));
 		if (*to == NULL)
 			return B_NO_MEMORY;
 
@@ -52,15 +58,16 @@ l2cap_copy_address(const sockaddr *from, sockaddr **to,
 
 
 static bool
-l2cap_is_empty_address(const sockaddr *address, bool checkPort)
+l2cap_is_empty_address(const sockaddr *_address, bool checkPort)
 {
-	if (address == NULL || address->sa_len == 0
-		|| address->sa_family == AF_UNSPEC)
+	if (_address == NULL || _address->sa_len == 0
+		|| _address->sa_family == AF_UNSPEC)
 		return true;
 
-	return ((bdaddrUtils::Compare(
-		((const sockaddr_l2cap *)address)->l2cap_bdaddr, BDADDR_NULL))
-		&& (!checkPort || ((sockaddr_l2cap *)address)->l2cap_psm == 0));
+	const sockaddr_l2cap *address = (const sockaddr_l2cap *)_address;
+
+	return bdaddrs_equal(address->l2cap_bdaddr, BDADDR_NULL)
+		&& (!checkPort || address->l2cap_psm == 0);
 }
 
 
@@ -75,17 +82,19 @@ l2cap_is_same_family(const sockaddr *address)
 
 
 static bool
-l2cap_equal_addresses(const sockaddr *a, const sockaddr *b)
+l2cap_equal_addresses(const sockaddr *_a, const sockaddr *_b)
 {
-	if (a == NULL && b == NULL)
+	if (_a == NULL && _b == NULL)
 		return true;
-	if (a != NULL && b == NULL)
-		return l2cap_is_empty_address(a, false);
-	if (a == NULL && b != NULL)
-		return l2cap_is_empty_address(b, false);
+	if (_a != NULL && _b == NULL)
+		return l2cap_is_empty_address(_a, false);
+	if (_a == NULL && _b != NULL)
+		return l2cap_is_empty_address(_b, false);
 
-	return bdaddrUtils::Compare(((const sockaddr_l2cap*)a)->l2cap_bdaddr,
-		((sockaddr_l2cap*)b)->l2cap_bdaddr);
+	const sockaddr_l2cap *a = (const sockaddr_l2cap *)_a;
+	const sockaddr_l2cap *b = (const sockaddr_l2cap *)_b;
+
+	return bdaddrs_equal(a->l2cap_bdaddr, b->l2cap_bdaddr);
 }
 
 
@@ -99,18 +108,20 @@ l2cap_equal_ports(const sockaddr *a, const sockaddr *b)
 
 
 static bool
-l2cap_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
+l2cap_equal_addresses_and_ports(const sockaddr *_a, const sockaddr *_b)
 {
-	if (a == NULL && b == NULL)
+	if (_a == NULL && _b == NULL)
 		return true;
-	if (a != NULL && b == NULL)
-		return l2cap_is_empty_address(a, true);
-	if (a == NULL && b != NULL)
-		return l2cap_is_empty_address(b, true);
+	if (_a != NULL && _b == NULL)
+		return l2cap_is_empty_address(_a, true);
+	if (_a == NULL && _b != NULL)
+		return l2cap_is_empty_address(_b, true);
 
-	return (bdaddrUtils::Compare(((const sockaddr_l2cap *)a)->l2cap_bdaddr,
-		((const sockaddr_l2cap *)b)->l2cap_bdaddr))
-		&& ((sockaddr_l2cap *)a)->l2cap_psm == ((sockaddr_l2cap *)b)->l2cap_psm;
+	const sockaddr_l2cap *a = (const sockaddr_l2cap *)_a;
+	const sockaddr_l2cap *b = (const sockaddr_l2cap *)_b;
+
+	return bdaddrs_equal(a->l2cap_bdaddr, b->l2cap_bdaddr)
+		&& (a->l2cap_psm == b->l2cap_psm);
 }
 
 
@@ -241,7 +252,7 @@ l2cap_update_to(sockaddr *_address, const sockaddr *_from)
 	address->l2cap_family = AF_BLUETOOTH;
 	address->l2cap_len = sizeof(sockaddr_l2cap);
 
-	if (bdaddrUtils::Compare(address->l2cap_bdaddr, BDADDR_NULL))
+	if (bdaddrs_equal(address->l2cap_bdaddr, BDADDR_NULL))
 		address->l2cap_bdaddr = from->l2cap_bdaddr;
 
 	if (address->l2cap_psm == 0)
