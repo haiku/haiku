@@ -732,14 +732,6 @@ AccelerantHWInterface::GetDeviceInfo(accelerant_device_info* info)
 
 
 status_t
-AccelerantHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
-{
-	config = fFrameBufferConfig;
-	return B_OK;
-}
-
-
-status_t
 AccelerantHWInterface::GetModeList(display_mode** _modes, uint32* _count)
 {
 	AutoReadLocker _(this);

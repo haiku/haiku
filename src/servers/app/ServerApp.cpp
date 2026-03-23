@@ -3252,27 +3252,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-		case AS_GET_FRAME_BUFFER_CONFIG:
-		{
-			STRACE(("ServerApp %s: get frame buffer config\n", Signature()));
-
-			// We aren't using the screen_id for now...
-			int32 id;
-			link.Read<int32>(&id);
-
-			frame_buffer_config config;
-			// TODO: I wonder if there should be a "desktop" lock...
-			status_t status = fDesktop->HWInterface()->GetFrameBufferConfig(config);
-			if (status == B_OK) {
-				fLink.StartMessage(B_OK);
-				fLink.Attach<frame_buffer_config>(config);
-			} else
-				fLink.StartMessage(status);
-
-			fLink.Flush();
-			break;
-		}
-
 		case AS_GET_RETRACE_SEMAPHORE:
 		{
 			STRACE(("ServerApp %s: get retrace semaphore\n", Signature()));

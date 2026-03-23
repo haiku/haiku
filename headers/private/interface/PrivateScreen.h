@@ -85,9 +85,6 @@ public:
 			status_t			GetBrightness(float*);
 			status_t			SetBrightness(float);
 
-			void*				BaseAddress();
-			uint32				BytesPerRow();
-
 private:
 	friend class BObjectList<BPrivateScreen, true>;
 
@@ -98,8 +95,6 @@ private:
 			bool				_Release();
 
 			sem_id				_RetraceSemaphore();
-			status_t			_GetFrameBufferConfig(
-									frame_buffer_config& config);
 
 	static	BPrivateScreen*		_Get(int32 id, bool check);
 	static	bool				_IsValid(int32 id);

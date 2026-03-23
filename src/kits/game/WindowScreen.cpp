@@ -41,6 +41,8 @@ using BPrivate::AppServerLink;
 
 
 // Acceleration hooks pointers
+static get_frame_buffer_config sGetFrameBufferConfigHook;
+
 static fill_rectangle sFillRectHook;
 static screen_to_screen_blit sBlitRectHook;
 static screen_to_screen_transparent_blit sTransparentBlitHook;
@@ -610,10 +612,6 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 		if (status < B_OK)
 			throw status;
 
-		status = _GetCardInfo();
-		if (status < B_OK)
-			throw status;
-
 		fDebugSem = create_sem(1, "WindowScreen debug sem");
 		if (fDebugSem < B_OK)
 			throw (status_t)fDebugSem;
@@ -690,11 +688,12 @@ status_t
 BWindowScreen::_Activate()
 {
 	CALLED();
-	status_t status = _AssertDisplayMode(fDisplayMode);
+
+	status_t status = _SetupAccelerantHooks();
 	if (status < B_OK)
 		return status;
 
-	status = _SetupAccelerantHooks();
+	status = _AssertDisplayMode(fDisplayMode);
 	if (status < B_OK)
 		return status;
 
@@ -760,6 +759,8 @@ BWindowScreen::_SetupAccelerantHooks()
 		_ResetAccelerantHooks();
 
 	if (status == B_OK) {
+		sGetFrameBufferConfigHook = (get_frame_buffer_config)
+			fGetAccelerantHook(B_GET_FRAME_BUFFER_CONFIG, NULL);
 		sWaitIdleHook = fWaitEngineIdle = (wait_engine_idle)
 			fGetAccelerantHook(B_WAIT_ENGINE_IDLE, NULL);
 		sReleaseEngineHook
@@ -792,6 +793,7 @@ BWindowScreen::_ResetAccelerantHooks()
 	if (fWaitEngineIdle)
 		fWaitEngineIdle();
 
+	sGetFrameBufferConfigHook = NULL;
 	sFillRectHook = NULL;
 	sBlitRectHook = NULL;
 	sTransparentBlitHook = NULL;
@@ -854,16 +856,8 @@ BWindowScreen::_GetCardInfo()
 	if (mode.flags & B_PARALLEL_ACCESS)
 		fCardInfo.flags |= B_PARALLEL_BUFFER_ACCESS;
 
-	AppServerLink link;
-	link.StartMessage(AS_GET_FRAME_BUFFER_CONFIG);
-	link.Attach<screen_id>(screen.ID());
-
-	status_t result = B_ERROR;
-	if (link.FlushWithReply(result) < B_OK || result < B_OK)
-		return result;
-
 	frame_buffer_config config;
-	link.Read<frame_buffer_config>(&config);
+	sGetFrameBufferConfigHook(&config);
 
 	fCardInfo.frame_buffer = config.frame_buffer;
 	fCardInfo.bytes_per_row = config.bytes_per_row;

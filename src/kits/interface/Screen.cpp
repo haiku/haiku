@@ -372,9 +372,7 @@ BScreen::ProposeDisplayMode(display_mode* target, const display_mode* low,
 void*
 BScreen::BaseAddress()
 {
-	if (fScreen != NULL)
-		return fScreen->BaseAddress();
-
+	// deprecated
 	return NULL;
 }
 
@@ -382,8 +380,6 @@ BScreen::BaseAddress()
 uint32
 BScreen::BytesPerRow()
 {
-	if (fScreen != NULL)
-		return fScreen->BytesPerRow();
-
+	// deprecated
 	return 0;
 }

@@ -424,14 +424,6 @@ RemoteHWInterface::GetDeviceInfo(accelerant_device_info* info)
 
 
 status_t
-RemoteHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
-{
-	// We don't actually have a frame buffer.
-	return B_UNSUPPORTED;
-}
-
-
-status_t
 RemoteHWInterface::GetModeList(display_mode** _modes, uint32* _count)
 {
 	AutoReadLocker _(this);

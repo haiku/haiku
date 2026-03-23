@@ -102,13 +102,6 @@ BitmapHWInterface::GetDeviceInfo(accelerant_device_info* info)
 
 
 status_t
-BitmapHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
-{
-	return B_UNSUPPORTED;
-}
-
-
-status_t
 BitmapHWInterface::GetModeList(display_mode** modes, uint32 *count)
 {
 	return B_UNSUPPORTED;

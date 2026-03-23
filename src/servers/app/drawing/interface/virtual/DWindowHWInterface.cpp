@@ -757,20 +757,6 @@ DWindowHWInterface::GetDeviceInfo(accelerant_device_info* info)
 
 
 status_t
-DWindowHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
-{
-	if (!fFrontBuffer.IsSet())
-		return B_ERROR;
-
-	config.frame_buffer = fFrontBuffer->Bits();
-	config.frame_buffer_dma = NULL;
-	config.bytes_per_row = fFrontBuffer->BytesPerRow();
-
-	return B_OK;
-}
-
-
-status_t
 DWindowHWInterface::GetModeList(display_mode** _modes, uint32* _count)
 {
 	AutoReadLocker _(this);
