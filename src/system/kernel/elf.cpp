@@ -2058,7 +2058,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 		if (programHeaders[i].p_flags & PF_READ)
 			protection |= B_READ_AREA;
 
-		status = vm_set_area_protection(team->id, mappedAreas[i], protection,
+		status = vm_set_area_protection(mappedAreas[i], protection,
 			true);
 		if (status != B_OK)
 			return status;

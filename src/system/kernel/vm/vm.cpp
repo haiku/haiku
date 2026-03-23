@@ -3006,15 +3006,11 @@ vm_copy_area(team_id team, const char* name, void** _address,
 
 
 status_t
-vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
+vm_set_area_protection(area_id areaID, uint32 newProtection,
 	bool kernel)
 {
 	TRACE(("vm_set_area_protection(team = %#" B_PRIx32 ", area = %#" B_PRIx32
 		", protection = %#" B_PRIx32 ")\n", team, areaID, newProtection));
-
-	status_t status = check_protection(team, &newProtection);
-	if (status != B_OK)
-		return status;
 
 	bool becomesWritable
 		= (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
@@ -3024,6 +3020,8 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	VMCache* cache;
 	VMArea* area;
 	AreaCacheLocker cacheLocker;
+	status_t status;
+	team_id areaTeam;
 	bool isWritable;
 
 	bool restart;
@@ -3037,13 +3035,19 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 
 		cacheLocker.SetTo(cache, true);	// already locked
 
+		areaTeam = area->address_space->ID();
+		status = check_protection(areaTeam, &newProtection);
+		if (status != B_OK)
+			return status;
+
 		// enforce restrictions
 		if (!kernel && (area->address_space == VMAddressSpace::Kernel()
 				|| (area->protection & B_KERNEL_AREA) != 0)) {
 #if KDEBUG
 			dprintf("vm_set_area_protection: team %" B_PRId32 " tried to "
 				"set protection %#" B_PRIx32 " on kernel area %" B_PRId32
-				" (%s)\n", team, newProtection, areaID, area->name);
+				" (%s)\n", team_get_current_team_id(), newProtection,
+				areaID, area->name);
 #endif
 			return B_NOT_ALLOWED;
 		}
@@ -3053,13 +3057,12 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 #if KDEBUG
 			dprintf("vm_set_area_protection: team %" B_PRId32 " tried to "
 				"set protection %#" B_PRIx32 " (max %#" B_PRIx32 ") on area "
-				"%" B_PRId32 " (%s)\n", team, newProtection,
+				"%" B_PRId32 " (%s)\n", team_get_current_team_id(), newProtection,
 				area->protection_max, areaID, area->name);
 #endif
 			return B_NOT_ALLOWED;
 		}
-		if (team != VMAddressSpace::KernelID()
-			&& area->address_space->ID() != team) {
+		if (!kernel && area->address_space->ID() != VMAddressSpace::CurrentID()) {
 			// unless you're the kernel, you're only allowed to set
 			// the protection of your own areas
 			return B_NOT_ALLOWED;
@@ -3111,7 +3114,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 				// into account that really are in this cache.
 
 				status = cache->Commit(cache->page_count * B_PAGE_SIZE,
-					team == VMAddressSpace::KernelID()
+					areaTeam == VMAddressSpace::KernelID()
 						? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 
 				// TODO: we may be able to join with our source cache, if
@@ -3142,7 +3145,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 			if (cache->temporary) {
 				// the cache's commitment must contain all possible pages
 				status = cache->Commit(cache->virtual_end - cache->virtual_base,
-					team == VMAddressSpace::KernelID()
+					areaTeam == VMAddressSpace::KernelID()
 						? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 			}
 
@@ -5815,8 +5818,7 @@ _get_next_area_info(team_id team, ssize_t* cookie, area_info* info, size_t size)
 status_t
 set_area_protection(area_id area, uint32 newProtection)
 {
-	return vm_set_area_protection(VMAddressSpace::KernelID(), area,
-		newProtection, true);
+	return vm_set_area_protection(area, newProtection, true);
 }
 
 
@@ -5847,7 +5849,7 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 
 	if (!kernel) {
 		// We need to mark the area cloneable so the following operations work.
-		status = vm_set_area_protection(info.team, id,
+		status = vm_set_area_protection(id,
 			info.protection | B_CLONEABLE_AREA, kernel);
 		if (status != B_OK)
 			return status;
@@ -5865,7 +5867,7 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 	}
 
 	// Now we can reset the protection to whatever it was before.
-	vm_set_area_protection(target, clonedArea, info.protection, kernel);
+	vm_set_area_protection(clonedArea, info.protection, kernel);
 
 	// TODO: The clonedArea is B_SHARED_AREA, which is not really desired.
 
@@ -6060,8 +6062,7 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 	if ((newProtection & ~(B_USER_PROTECTION | B_CLONEABLE_AREA)) != 0)
 		return B_BAD_VALUE;
 
-	return vm_set_area_protection(VMAddressSpace::CurrentID(), area,
-		newProtection, false);
+	return vm_set_area_protection(area, newProtection, false);
 }
 
 
@@ -6353,7 +6354,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 				continue;
 			if (offset == 0 && rangeSize == area->Size()) {
 				// The whole area is covered: let set_area_protection handle it.
-				status_t status = vm_set_area_protection(area->address_space->ID(),
+				status_t status = vm_set_area_protection(
 					area->id, protection, false);
 				if (status != B_OK)
 					return status;
