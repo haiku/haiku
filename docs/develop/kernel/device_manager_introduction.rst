@@ -39,7 +39,7 @@ Exploring the Device Tree
 -------------------------
 
 So how does it all work? When building the initial device tree, the
-system only explores a minimum of device drivers only, resulting in a
+system only explores a minimum set of device drivers, resulting in a
 tree that basically only shows the hardware found in the computer.
 
 Now, if the system requires disk access, it will scan the device file
