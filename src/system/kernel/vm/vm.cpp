@@ -4020,6 +4020,7 @@ vm_init_post_thread(kernel_args* args)
 {
 	vm_page_init_post_thread(args);
 	slab_init_post_thread();
+	deferred_free_init();
 	return heap_init_post_thread();
 }
 
