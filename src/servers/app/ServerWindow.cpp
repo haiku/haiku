@@ -4012,8 +4012,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 					// We need to make a copy of the picture, since it can
 					// change after it has been drawn
 					BReference<ServerPicture> copy(App()->CreatePicture(pictureToDraw), true);
-					picture->NestPicture(copy);
-					picture->WriteDrawPicture(where, copy->Token());
+					int32 subPictureIndex = picture->NestPicture(copy);
+					if (subPictureIndex >= 0)
+						picture->WriteDrawPicture(where, subPictureIndex);
 				}
 			}
 			break;
@@ -4063,8 +4064,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 				// We need to make a copy of the picture, since it can
 				// change after it has been drawn
 				BReference<ServerPicture> copy(App()->CreatePicture(pictureToClip), true);
-				picture->NestPicture(copy);
-				picture->WriteClipToPicture(copy->Token(), where, inverse);
+				int32 subPictureIndex = picture->NestPicture(copy);
+				if (subPictureIndex >= 0)
+					picture->WriteClipToPicture(subPictureIndex, where, inverse);
 			}
 			break;
 		}

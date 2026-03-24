@@ -33,13 +33,13 @@
 
 
 static BObjectList<BPicture> sPictureList;
-static mutex sPictureListLock = MUTEX_INITIALIZER("BPicture list");
+static recursive_lock sPictureListLock = RECURSIVE_LOCK_INITIALIZER("BPicture list");
 
 
 void
 reconnect_pictures_to_app_server()
 {
-	MutexLocker _(sPictureListLock);
+	RecursiveLocker _(sPictureListLock);
 	for (int32 i = 0; i < sPictureList.CountItems(); i++) {
 		BPicture::Private picture(sPictureList.ItemAt(i));
 		picture.ReconnectToAppServer();
@@ -215,14 +215,14 @@ BPicture::_InitData()
 
 	fExtent = new (std::nothrow) _BPictureExtent_;
 
-	MutexLocker _(sPictureListLock);
+	RecursiveLocker _(sPictureListLock);
 	sPictureList.AddItem(this);
 }
 
 
 BPicture::~BPicture()
 {
-	MutexLocker _(sPictureListLock);
+	RecursiveLocker _(sPictureListLock);
 	sPictureList.RemoveItem(this, false);
 	_DisposeData();
 }

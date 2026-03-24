@@ -239,7 +239,7 @@ ShapePainter::Draw(BRect frame, bool filled)
 
 class CanvasCallbacks: public BPrivate::PicturePlayerCallbacks {
 public:
-	CanvasCallbacks(Canvas* const canvas);
+	CanvasCallbacks(Canvas* const canvas, BObjectList<ServerPicture>& pictures);
 
 	virtual void MovePenBy(const BPoint& where);
 	virtual void StrokeLine(const BPoint& start, const BPoint& end);
@@ -309,12 +309,14 @@ public:
 
 private:
 	Canvas* const fCanvas;
+	BObjectList<ServerPicture>& fPictures;
 };
 
 
-CanvasCallbacks::CanvasCallbacks(Canvas* const canvas)
+CanvasCallbacks::CanvasCallbacks(Canvas* const canvas, BObjectList<ServerPicture>& pictures)
 	:
-	fCanvas(canvas)
+	fCanvas(canvas),
+	fPictures(pictures)
 {
 }
 
@@ -655,7 +657,7 @@ CanvasCallbacks::DrawPixels(const BRect& src, const BRect& _dest, uint32 width,
 void
 CanvasCallbacks::DrawPicture(const BPoint& where, int32 token)
 {
-	BReference<ServerPicture> picture(fCanvas->GetPicture(token), true);
+	BReference<ServerPicture> picture(fPictures.ItemAt(token), false);
 	if (picture != NULL) {
 		fCanvas->PushState();
 		fCanvas->SetDrawingOrigin(where);
@@ -690,7 +692,7 @@ void
 CanvasCallbacks::ClipToPicture(int32 pictureToken, const BPoint& where,
 	bool clipToInverse)
 {
-	BReference<ServerPicture> picture(fCanvas->GetPicture(pictureToken), true);
+	BReference<ServerPicture> picture(fPictures.ItemAt(pictureToken), false);
 	if (picture == NULL)
 		return;
 	BReference<AlphaMask> mask(new(std::nothrow) PictureAlphaMask(fCanvas->GetAlphaMask(),
@@ -1246,7 +1248,7 @@ ServerPicture::Play(Canvas* target)
 	if (mallocIO == NULL)
 		return;
 
-	CanvasCallbacks callbacks(target);
+	CanvasCallbacks callbacks(target, *fPictures.Get());
 
 	BPrivate::PicturePlayer player(mallocIO->Buffer(),
 		mallocIO->BufferLength(), PictureList::Private(fPictures.Get()).AsBList());
@@ -1283,17 +1285,21 @@ ServerPicture::AppendPicture(ServerPicture* picture)
 }
 
 
-bool
+int32
 ServerPicture::NestPicture(ServerPicture* picture)
 {
 	if (!fPictures.IsSet())
 		fPictures.SetTo(new(std::nothrow) PictureList);
 
-	if (!fPictures.IsSet() || !fPictures->AddItem(picture))
-		return false;
+	if (!fPictures.IsSet())
+		return -1;
+
+	int32 index = fPictures->CountItems();
+	if (!fPictures->AddItem(picture))
+		return -1;
 
 	picture->AcquireReference();
-	return true;
+	return index;
 }
 
 

@@ -60,7 +60,7 @@ public:
 			ServerPicture*		PopPicture();
 
 			void				AppendPicture(ServerPicture* picture);
-			bool				NestPicture(ServerPicture* picture);
+			int32				NestPicture(ServerPicture* picture);
 
 			off_t				DataLength() const;
 

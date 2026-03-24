@@ -73,7 +73,6 @@ public:
 			void			BlendLayer(Layer* layer);
 
 	virtual	DrawingEngine*	GetDrawingEngine() const = 0;
-	virtual ServerPicture*	GetPicture(int32 token) const = 0;
 	virtual	void			RebuildClipping(bool deep) = 0;
 	virtual void			ResyncDrawState() {};
 	virtual void			UpdateCurrentDrawingRegion() {};
@@ -101,8 +100,6 @@ public:
 	virtual void			RebuildClipping(bool deep) { /* TODO */ }
 	virtual void			ResyncDrawState();
 	virtual void			UpdateCurrentDrawingRegion();
-	virtual ServerPicture*	GetPicture(int32 token) const
-								{ /* TODO */ return NULL; }
 	virtual	IntRect			Bounds() const;
 
 protected:
