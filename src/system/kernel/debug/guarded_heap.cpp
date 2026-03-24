@@ -13,6 +13,7 @@
 #include <debug.h>
 #include <heap.h>
 #include <malloc.h>
+#include <safemode.h>
 #include <slab/Slab.h>
 #include <team.h>
 #include <util/SimpleAllocator.h>
@@ -21,11 +22,12 @@
 #include <vm/vm.h>
 #include <vm/vm_page.h>
 
+#include "heaps.h"
 #include "../vm/VMAddressSpaceLocking.h"
 #include "../vm/VMAnonymousNoSwapCache.h"
 
 
-#if USE_GUARDED_HEAP_FOR_MALLOC
+#if DEBUG_HEAPS
 
 
 #define GUARDED_HEAP_STACK_TRACE_DEPTH	0
@@ -95,6 +97,7 @@ protected:
 
 struct guarded_heap {
 	mutex				lock;
+	bool				reuse_memory;
 	ConditionVariable	memory_added_condition;
 
 	GuardedHeapCache*	cache;
@@ -122,7 +125,8 @@ static size_t sGuardedHeapEarlySize;
 static void*
 guarded_heap_allocate_meta(guarded_heap& heap, size_t size, uint32 flags)
 {
-	size_t growSize = ROUNDUP(((HEAP_GROW_SIZE / B_PAGE_SIZE) / 2) * sizeof(GuardedHeapChunk),
+	size_t growSize = ROUNDUP(((kernel_guarded_heap.grow_size / B_PAGE_SIZE) / 2)
+			* sizeof(GuardedHeapChunk),
 		B_PAGE_SIZE);
 	while (heap.meta_allocator.Available() < (growSize / 2)) {
 		if ((flags & HEAP_DONT_LOCK_KERNEL_SPACE) != 0)
@@ -172,7 +176,7 @@ guarded_heap_add_area(guarded_heap& heap, size_t minimumPages, uint32 flags)
 	if (heap.acquiring_pages == thread_get_current_thread_id())
 		return false;
 
-	size_t growPages = HEAP_GROW_SIZE / B_PAGE_SIZE;
+	size_t growPages = kernel_guarded_heap.grow_size / B_PAGE_SIZE;
 	if (minimumPages > growPages)
 		growPages = minimumPages;
 
@@ -245,11 +249,11 @@ guarded_heap_allocate(guarded_heap& heap, size_t size, size_t alignment,
 	MutexLocker locker(heap.lock);
 
 	if (alignment == 0)
-		alignment = 1;
+		alignment = sizeof(void*);
 
 	// If we need more address space, allocate some now, while
 	// there's still space to allocate bookkeeping structures.
-	if (heap.free_pages_count <= (HEAP_GROW_SIZE / B_PAGE_SIZE / 2))
+	if (heap.free_pages_count <= (kernel_guarded_heap.grow_size / B_PAGE_SIZE / 2))
 		guarded_heap_add_area(heap, 0, flags);
 
 	// Allocate a spare meta chunk up-front, since this also might
@@ -442,12 +446,10 @@ guarded_heap_free(guarded_heap& heap, void* address, uint32 flags)
 	vm_unreserve_memory(reservation.count * B_PAGE_SIZE);
 	vm_page_unreserve_pages(&reservation);
 
-#if DEBUG_GUARDED_HEAP_DISABLE_MEMORY_REUSE
-	GuardedHeapChunksTree& tree = heap.dead_chunks;
-#else
-	GuardedHeapChunksTree& tree = heap.free_chunks;
-	heap.free_pages_count += chunk->pages_count;
-#endif
+	GuardedHeapChunksTree& tree = heap.reuse_memory ?
+		heap.free_chunks : heap.dead_chunks;
+	if (heap.reuse_memory)
+		heap.free_pages_count += chunk->pages_count;
 
 	GuardedHeapChunk* joinLower = guarded_heap_find_chunk(tree, chunk->base - 1),
 		*joinUpper = guarded_heap_find_chunk(tree,
@@ -681,9 +683,22 @@ dump_guarded_heap_allocations(int argc, char** argv)
 // #pragma mark - Malloc API
 
 
-status_t
-heap_init(addr_t address, size_t size)
+static status_t
+guarded_heap_init(struct kernel_args* args, addr_t address, size_t size)
 {
+	sGuardedHeap.reuse_memory = DEBUG_GUARDED_HEAP_MEMORY_REUSE_DEFAULT;
+
+	char options[32];
+	size_t optionsSize = sizeof(options);
+	if (get_safemode_option_early(args, "guarded_heap_options", options, &optionsSize) == B_OK) {
+		if (strchr(options, 'r') != NULL)
+			sGuardedHeap.reuse_memory = false;
+		else if (strchr(options, 'R') != NULL)
+			sGuardedHeap.reuse_memory = true;
+	}
+	dprintf("guarded heap settings: %s\n",
+		sGuardedHeap.reuse_memory ? "R" : "r");
+
 	sGuardedHeap.memory_added_condition.Init(&sGuardedHeap, "guarded heap");
 	sGuardedHeap.acquiring_pages = sGuardedHeap.acquiring_meta = -1;
 
@@ -705,8 +720,8 @@ heap_init(addr_t address, size_t size)
 }
 
 
-status_t
-heap_init_post_area()
+static status_t
+guarded_heap_init_post_area()
 {
 	void* address = (void*)sGuardedHeapEarlyMetaBase;
 	area_id metaAreaId = create_area("guarded heap meta", &address, B_EXACT_ADDRESS,
@@ -724,8 +739,8 @@ heap_init_post_area()
 }
 
 
-status_t
-heap_init_post_sem()
+static status_t
+guarded_heap_init_post_sem()
 {
 	new(&sGuardedHeapCache) GuardedHeapCache;
 	sGuardedHeapCache.Init();
@@ -828,200 +843,56 @@ heap_init_post_sem()
 }
 
 
-void*
-memalign(size_t alignment, size_t size)
+static void*
+guarded_heap_memalign(size_t alignment, size_t size, uint32 flags)
 {
-	return memalign_etc(alignment, size, 0);
-}
-
-
-void *
-memalign_etc(size_t alignment, size_t size, uint32 flags)
-{
-	if (size == 0)
-		size = 1;
-
 	return guarded_heap_allocate(sGuardedHeap, size, alignment, flags);
 }
 
 
-extern "C" int
-posix_memalign(void** _pointer, size_t alignment, size_t size)
-{
-	if ((alignment & (sizeof(void*) - 1)) != 0 || _pointer == NULL)
-		return B_BAD_VALUE;
-
-	*_pointer = guarded_heap_allocate(sGuardedHeap, size, alignment, 0);
-	return 0;
-}
-
-
-void
-free_etc(void *address, uint32 flags)
+static void
+guarded_heap_free_etc(void *address, uint32 flags)
 {
 	guarded_heap_free(sGuardedHeap, address, flags);
 }
 
 
-void*
-malloc(size_t size)
-{
-	return memalign_etc(sizeof(void*), size, 0);
-}
-
-
-void
-free(void* address)
-{
-	free_etc(address, 0);
-}
-
-
-void*
-realloc_etc(void* address, size_t newSize, uint32 flags)
+static void*
+guarded_heap_realloc_etc(void* address, size_t newSize, uint32 flags)
 {
 	if (newSize == 0) {
-		free_etc(address, flags);
+		guarded_heap_free(sGuardedHeap, address, flags);
 		return NULL;
 	}
 
 	if (address == NULL)
-		return malloc_etc(newSize, flags);
+		return guarded_heap_memalign(0, newSize, flags);
 
 	return guarded_heap_realloc(sGuardedHeap, address, newSize, flags);
 }
 
 
-void*
-realloc(void* address, size_t newSize)
-{
-	return realloc_etc(address, newSize, 0);
-}
+kernel_heap_implementation kernel_guarded_heap = {
+	"guarded_heap",
+#if USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
+	// This requires a lot of up-front memory to boot at all...
+	/* initial_size */	128 * 1024 * 1024,
+	// ... and a lot of reserves to keep running.
+	/* grow_size */		128 * 1024 * 1024,
+#else
+	/* initial_size */	32 * 1024 * 1024,
+	/* grow size */		32 * 1024 * 1024,
+#endif
 
+	guarded_heap_init,
+	guarded_heap_init_post_area,
+	guarded_heap_init_post_sem,
+	NULL,
 
-#endif	// USE_GUARDED_HEAP_FOR_MALLOC
-
-
-#if USE_GUARDED_HEAP_FOR_OBJECT_CACHE
-
-
-// #pragma mark - Slab API
-
-
-struct ObjectCache {
-	size_t object_size;
-	size_t alignment;
-
-	void* cookie;
-	object_cache_constructor constructor;
-	object_cache_destructor destructor;
+	guarded_heap_memalign,
+	guarded_heap_realloc_etc,
+	guarded_heap_free_etc,
 };
 
 
-object_cache*
-create_object_cache(const char* name, size_t object_size, uint32 flags)
-{
-	return create_object_cache_etc(name, object_size, 0, 0, 0, 0, flags,
-		NULL, NULL, NULL, NULL);
-}
-
-
-object_cache*
-create_object_cache_etc(const char*, size_t objectSize, size_t alignment, size_t, size_t,
-	size_t, uint32, void* cookie, object_cache_constructor ctor, object_cache_destructor dtor,
-	object_cache_reclaimer)
-{
-	ObjectCache* cache = new ObjectCache;
-	if (cache == NULL)
-		return NULL;
-
-	cache->object_size = objectSize;
-	cache->alignment = alignment;
-	cache->cookie = cookie;
-	cache->constructor = ctor;
-	cache->destructor = dtor;
-	return cache;
-}
-
-
-void
-delete_object_cache(object_cache* cache)
-{
-	delete cache;
-}
-
-
-status_t
-object_cache_set_minimum_reserve(object_cache* cache, size_t objectCount)
-{
-	return B_OK;
-}
-
-
-void*
-object_cache_alloc(object_cache* cache, uint32 flags)
-{
-	void* object = memalign_etc(cache->alignment, cache->object_size, flags);
-	if (object == NULL)
-		return NULL;
-
-	if (cache->constructor != NULL)
-		cache->constructor(cache->cookie, object);
-	return object;
-}
-
-
-void
-object_cache_free(object_cache* cache, void* object, uint32 flags)
-{
-	if (cache->destructor != NULL)
-		cache->destructor(cache->cookie, object);
-	return free_etc(object, flags);
-}
-
-
-status_t
-object_cache_reserve(object_cache* cache, size_t objectCount, uint32 flags)
-{
-	return B_OK;
-}
-
-
-void
-object_cache_get_usage(object_cache* cache, size_t* _allocatedMemory)
-{
-	*_allocatedMemory = 0;
-}
-
-
-void
-request_memory_manager_maintenance()
-{
-}
-
-
-void
-slab_init(kernel_args* args)
-{
-}
-
-
-void
-slab_init_post_area()
-{
-}
-
-
-void
-slab_init_post_sem()
-{
-}
-
-
-void
-slab_init_post_thread()
-{
-}
-
-
-#endif	// USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+#endif	// DEBUG_HEAPS

@@ -468,7 +468,7 @@ MemoryManager::Init(kernel_args* args)
 	sFreeAreaCount = 0;
 	sMaintenanceNeeded = false;
 
-#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
+#if DEBUG_HEAPS
 	// Allocate one area immediately. Otherwise, we might try to allocate before
 	// post-area initialization but after page initialization, during which time
 	// we can't actually reserve pages.

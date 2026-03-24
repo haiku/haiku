@@ -23,6 +23,8 @@
 #include <vm/vm.h>
 #include <vm/vm_page.h>
 
+#include "heaps.h"
+
 
 //#define TRACE_HEAP
 #ifdef TRACE_HEAP
@@ -32,9 +34,17 @@
 #endif
 
 
+#if DEBUG_HEAPS
+
+#define USE_DEBUG_HEAP_FOR_MALLOC 1
 #if !USE_DEBUG_HEAP_FOR_MALLOC
 #	undef KERNEL_HEAP_LEAK_CHECK
 #endif
+
+// allocate a dedicated 1MB area for dynamic growing
+#define HEAP_DEDICATED_GROW_SIZE	1 * 1024 * 1024
+// use areas for allocations bigger than 1MB
+#define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
 
 
 #if KERNEL_HEAP_LEAK_CHECK
@@ -57,7 +67,6 @@ static int32 sCallerInfoCount = 0;
 #endif	// KERNEL_HEAP_LEAK_CHECK
 
 
-#if USE_DEBUG_HEAP_FOR_MALLOC
 typedef struct heap_class_s {
 	const char *name;
 	uint32		initial_percentage;
@@ -158,7 +167,7 @@ static const heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
 		B_PAGE_SIZE / 8,			/* max allocation size */
 		B_PAGE_SIZE,				/* page size */
 		8,							/* min bin size */
-		4,							/* bin alignment */
+		sizeof(void*),				/* bin alignment */
 		8,							/* min count per page */
 		16							/* max waste per page */
 	},
@@ -184,6 +193,9 @@ static const heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
 	}
 };
 
+
+static addr_t sInitialBase;
+static size_t sInitialSize;
 
 static uint32 sHeapCount;
 static heap_allocator *sHeaps[HEAP_CLASS_COUNT * SMP_MAX_CPUS];
@@ -1144,7 +1156,7 @@ heap_remove_area(heap_allocator *heap, heap_area *area)
 }
 
 
-heap_allocator *
+static heap_allocator *
 heap_create_allocator(const char *name, addr_t base, size_t size,
 	const heap_class *heapClass, bool allocateOnHeap)
 {
@@ -1505,11 +1517,11 @@ inline bool
 heap_should_grow(heap_allocator *heap)
 {
 	// suggest growing if there is less than 20% of a grow size available
-	return heap->total_free_pages * heap->page_size < HEAP_GROW_SIZE / 5;
+	return heap->total_free_pages * heap->page_size < kernel_debug_heap.grow_size / 5;
 }
 
 
-void *
+static void *
 heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 {
 	TRACE(("memalign(alignment = %lu, size = %lu)\n", alignment, size));
@@ -1579,7 +1591,7 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 }
 
 
-status_t
+static status_t
 heap_free(heap_allocator *heap, void *address)
 {
 	if (address == NULL)
@@ -1970,7 +1982,7 @@ heap_grow_thread(void *)
 				// allocation cannot be fulfilled due to lack of contiguous
 				// pages)
 				if (heap_create_new_heap_area(heap, "additional heap",
-						HEAP_GROW_SIZE) != B_OK)
+						kernel_debug_heap.grow_size) != B_OK)
 					dprintf("heap_grower: failed to create new heap area\n");
 				sLastHandledGrowRequest[i] = sLastGrowRequest[i];
 			}
@@ -1987,9 +1999,12 @@ heap_grow_thread(void *)
 //	#pragma mark -
 
 
-status_t
-heap_init(addr_t base, size_t size)
+static status_t
+debug_heap_init(struct kernel_args*, addr_t base, size_t size)
 {
+	sInitialBase = base;
+	sInitialSize = size;
+
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 		size_t partSize = size * sHeapClasses[i].initial_percentage / 100;
 		sHeaps[i] = heap_create_allocator(sHeapClasses[i].name, base, partSize,
@@ -2040,9 +2055,12 @@ heap_init(addr_t base, size_t size)
 }
 
 
-status_t
-heap_init_post_area()
+static status_t
+debug_heap_init_post_area()
 {
+	create_area("kernel heap", (void**)&sInitialBase, B_EXACT_ADDRESS,
+		sInitialSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
 	void *address = NULL;
 	area_id growHeapArea = create_area("dedicated grow heap", &address,
 		B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_DEDICATED_GROW_SIZE, B_FULL_LOCK,
@@ -2067,7 +2085,7 @@ heap_init_post_area()
 		B_PAGE_SIZE / 8,			/* max allocation size */
 		B_PAGE_SIZE,				/* page size */
 		8,							/* min bin size */
-		4,							/* bin alignment */
+		sizeof(void*),				/* bin alignment */
 		8,							/* min count per page */
 		16							/* max waste per page */
 	};
@@ -2093,8 +2111,8 @@ heap_init_post_area()
 }
 
 
-status_t
-heap_init_post_sem()
+static status_t
+debug_heap_init_post_sem()
 {
 	sHeapGrowSem = create_sem(0, "heap_grow_sem");
 	if (sHeapGrowSem < 0) {
@@ -2112,13 +2130,9 @@ heap_init_post_sem()
 }
 
 
-#endif	// USE_DEBUG_HEAP_FOR_MALLOC
-
-
-status_t
-heap_init_post_thread()
+static status_t
+debug_heap_init_post_thread()
 {
-#if	USE_DEBUG_HEAP_FOR_MALLOC
 	sHeapGrowThread = spawn_kernel_thread(heap_grow_thread, "heap grower",
 		B_URGENT_PRIORITY, NULL);
 	if (sHeapGrowThread < 0) {
@@ -2131,7 +2145,7 @@ heap_init_post_thread()
 		(int32)vm_page_num_pages() / 60 / 1024);
 	for (int32 i = 1; i < heapCount; i++) {
 		addr_t base = 0;
-		size_t size = HEAP_GROW_SIZE * HEAP_CLASS_COUNT;
+		size_t size = kernel_debug_heap.grow_size * HEAP_CLASS_COUNT;
 		area_id perCPUHeapArea = create_area("per cpu initial heap",
 			(void **)&base, B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -2165,7 +2179,6 @@ heap_init_post_thread()
 		"If the optional argument \"stats\" is specified, only the allocation\n"
 		"counts and no individual allocations are printed.\n", 0);
 #endif	// KERNEL_HEAP_LEAK_CHECK
-#endif	// USE_DEBUG_HEAP_FOR_MALLOC
 
 	return B_OK;
 }
@@ -2174,11 +2187,9 @@ heap_init_post_thread()
 //	#pragma mark - Public API
 
 
-#if USE_DEBUG_HEAP_FOR_MALLOC
 
-
-void *
-memalign(size_t alignment, size_t size)
+static void *
+debug_heap_memalign(size_t alignment, size_t size)
 {
 	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("memalign(): called with interrupts disabled\n");
@@ -2270,8 +2281,8 @@ memalign(size_t alignment, size_t size)
 }
 
 
-void *
-memalign_etc(size_t alignment, size_t size, uint32 flags)
+static void *
+debug_heap_memalign_etc(size_t alignment, size_t size, uint32 flags)
 {
 	if ((flags & HEAP_PRIORITY_VIP) != 0)
 		return heap_memalign(sVIPHeap, alignment, size);
@@ -2281,29 +2292,12 @@ memalign_etc(size_t alignment, size_t size, uint32 flags)
 		return memalign_nogrow(alignment, size);
 	}
 
-	return memalign(alignment, size);
+	return debug_heap_memalign(alignment, size);
 }
 
 
-void
-free_etc(void *address, uint32 flags)
-{
-	if ((flags & HEAP_PRIORITY_VIP) != 0)
-		heap_free(sVIPHeap, address);
-	else
-		free(address);
-}
-
-
-void *
-malloc(size_t size)
-{
-	return memalign_etc(0, size, 0);
-}
-
-
-void
-free(void *address)
+static void
+debug_heap_free(void *address)
 {
 	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("free(): called with interrupts disabled\n");
@@ -2350,8 +2344,18 @@ free(void *address)
 }
 
 
-void *
-realloc_etc(void *address, size_t newSize, uint32 flags)
+static void
+debug_heap_free_etc(void *address, uint32 flags)
+{
+	if ((flags & HEAP_PRIORITY_VIP) != 0)
+		heap_free(sVIPHeap, address);
+	else
+		debug_heap_free(address);
+}
+
+
+static void *
+debug_heap_realloc(void *address, size_t newSize, uint32 flags)
 {
 	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("realloc(): called with interrupts disabled\n");
@@ -2359,10 +2363,10 @@ realloc_etc(void *address, size_t newSize, uint32 flags)
 	}
 
 	if (address == NULL)
-		return malloc_etc(newSize, flags);
+		return debug_heap_memalign_etc(0, newSize, flags);
 
 	if (newSize == 0) {
-		free_etc(address, flags);
+		debug_heap_free_etc(address, flags);
 		return NULL;
 	}
 
@@ -2425,11 +2429,22 @@ realloc_etc(void *address, size_t newSize, uint32 flags)
 }
 
 
-void *
-realloc(void *address, size_t newSize)
-{
-	return realloc_etc(address, newSize, 0);
-}
+kernel_heap_implementation kernel_debug_heap = {
+	"debug_heap",
+	// allocate 16MB initial heap for the kernel
+	16 * 1024 * 1024,
+	// grow by another 4MB each time the heap runs out of memory
+	4 * 1024 * 1024,
+
+	debug_heap_init,
+	debug_heap_init_post_area,
+	debug_heap_init_post_sem,
+	debug_heap_init_post_thread,
+
+	debug_heap_memalign_etc,
+	debug_heap_realloc,
+	debug_heap_free_etc,
+};
 
 
-#endif	// USE_DEBUG_HEAP_FOR_MALLOC
+#endif	// DEBUG_HEAPS

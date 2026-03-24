@@ -23,7 +23,15 @@
 #include "MemoryManager.h"
 
 
-#if USE_SLAB_ALLOCATOR_FOR_MALLOC
+#if !USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
+
+
+#if DEBUG_HEAPS
+#include "../debug/heaps.h"
+#define SLAB_PUBLIC_NAME(NAME) slab_##NAME
+#else
+#define SLAB_PUBLIC_NAME(NAME) NAME
+#endif
 
 
 //#define TEST_ALL_CACHES_DURING_BOOT
@@ -170,8 +178,13 @@ block_free(void* block, uint32 flags)
 }
 
 
-void
-block_allocator_init_boot()
+#if DEBUG_HEAPS
+status_t
+slab_heap_init(struct kernel_args*, addr_t, size_t)
+#else
+status_t
+heap_init(struct kernel_args*)
+#endif
 {
 	for (size_t index = 0; index < kNumBlockSizes; index++) {
 		char name[32];
@@ -194,11 +207,13 @@ block_allocator_init_boot()
 		if (sBlockCaches[index] == NULL)
 			panic("allocator: failed to init block cache");
 	}
+
+	return B_OK;
 }
 
 
-void
-block_allocator_init_rest()
+status_t
+SLAB_PUBLIC_NAME(heap_init_post_sem)()
 {
 #ifdef TEST_ALL_CACHES_DURING_BOOT
 	for (int index = 0; kBlockSizes[index] != 0; index++) {
@@ -206,38 +221,23 @@ block_allocator_init_rest()
 			0);
 	}
 #endif
+
+	return B_OK;
 }
 
 
 // #pragma mark - public API
 
 
-void*
-memalign(size_t alignment, size_t size)
-{
-	return block_alloc(size, alignment, 0);
-}
-
-
 void *
-memalign_etc(size_t alignment, size_t size, uint32 flags)
+SLAB_PUBLIC_NAME(memalign_etc)(size_t alignment, size_t size, uint32 flags)
 {
 	return block_alloc(size, alignment, flags & CACHE_ALLOC_FLAGS);
 }
 
 
-int
-posix_memalign(void** _pointer, size_t alignment, size_t size)
-{
-	if ((alignment & (sizeof(void*) - 1)) != 0 || _pointer == NULL)
-		return B_BAD_VALUE;
-	*_pointer = block_alloc(size, alignment, 0);
-	return 0;
-}
-
-
 void
-free_etc(void *address, uint32 flags)
+SLAB_PUBLIC_NAME(free_etc)(void *address, uint32 flags)
 {
 	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
 		deferred_free(address);
@@ -249,21 +249,7 @@ free_etc(void *address, uint32 flags)
 
 
 void*
-malloc(size_t size)
-{
-	return block_alloc(size, 0, 0);
-}
-
-
-void
-free(void* address)
-{
-	block_free(address, 0);
-}
-
-
-void*
-realloc_etc(void* address, size_t newSize, uint32 flags)
+SLAB_PUBLIC_NAME(realloc_etc)(void* address, size_t newSize, uint32 flags)
 {
 	if (newSize == 0) {
 		block_free(address, flags);
@@ -295,6 +281,41 @@ realloc_etc(void* address, size_t newSize, uint32 flags)
 }
 
 
+#if DEBUG_HEAPS
+
+
+kernel_heap_implementation kernel_slab_heap = {
+	"slab_heap",
+	0, 0,
+
+	slab_heap_init,
+	NULL,
+	slab_heap_init_post_sem,
+	NULL,
+
+	slab_memalign_etc,
+	slab_realloc_etc,
+	slab_free_etc,
+};
+
+
+#else
+
+
+void*
+malloc(size_t size)
+{
+	return block_alloc(size, 0, 0);
+}
+
+
+void
+free(void* address)
+{
+	block_free(address, 0);
+}
+
+
 void*
 realloc(void* address, size_t newSize)
 {
@@ -302,7 +323,37 @@ realloc(void* address, size_t newSize)
 }
 
 
-#else
+void*
+memalign(size_t alignment, size_t size)
+{
+	return block_alloc(size, alignment, 0);
+}
+
+
+int
+posix_memalign(void** _pointer, size_t alignment, size_t size)
+{
+	if ((alignment & (sizeof(void*) - 1)) != 0 || _pointer == NULL)
+		return B_BAD_VALUE;
+	*_pointer = block_alloc(size, alignment, 0);
+	return 0;
+}
+
+
+status_t
+heap_init_post_thread()
+{
+	return B_OK;
+}
+
+
+#endif
+
+
+RANGE_MARKER_FUNCTION_END(slab_allocator)
+
+
+#else	// USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
 
 
 void*
@@ -313,19 +364,4 @@ block_alloc_early(size_t size)
 }
 
 
-void
-block_allocator_init_boot()
-{
-}
-
-
-void
-block_allocator_init_rest()
-{
-}
-
-
-#endif	// USE_SLAB_ALLOCATOR_FOR_MALLOC
-
-
-RANGE_MARKER_FUNCTION_END(slab_allocator)
+#endif	// USE_DEBUG_HEAPS_FOR_OBJECT_CACHE

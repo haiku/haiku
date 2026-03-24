@@ -35,7 +35,7 @@
 #include "slab_private.h"
 
 
-#if !USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+#if !USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
 
 
 typedef DoublyLinkedList<ObjectCache> ObjectCacheList;
@@ -1372,8 +1372,6 @@ slab_init(kernel_args* args)
 	MemoryManager::Init(args);
 
 	new (&sObjectCaches) ObjectCacheList();
-
-	block_allocator_init_boot();
 }
 
 
@@ -1431,8 +1429,6 @@ slab_init_post_sem()
 	register_low_resource_handler(object_cache_low_memory, NULL,
 		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
 			| B_KERNEL_RESOURCE_ADDRESS_SPACE, 5);
-
-	block_allocator_init_rest();
 }
 
 
@@ -1457,4 +1453,4 @@ slab_init_post_thread()
 RANGE_MARKER_FUNCTION_END(Slab)
 
 
-#endif	// !USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+#endif	// !USE_DEBUG_HEAPS_FOR_OBJECT_CACHE

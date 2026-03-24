@@ -8,35 +8,10 @@
 #ifndef _KERNEL_HEAP_H
 #define _KERNEL_HEAP_H
 
+
 #include <OS.h>
 
 #include "kernel_debug_config.h"
-
-
-#if USE_GUARDED_HEAP_FOR_MALLOC && USE_GUARDED_HEAP_FOR_OBJECT_CACHE
-
-// This requires a lot of up-front memory to boot at all...
-#define INITIAL_HEAP_SIZE			128 * 1024 * 1024
-// ... and a lot of reserves to keep running.
-#define HEAP_GROW_SIZE				128 * 1024 * 1024
-
-#elif USE_GUARDED_HEAP_FOR_MALLOC
-
-#define INITIAL_HEAP_SIZE			32 * 1024 * 1024
-#define HEAP_GROW_SIZE				32 * 1024 * 1024
-
-#else
-
-// allocate 16MB initial heap for the kernel
-#define INITIAL_HEAP_SIZE			16 * 1024 * 1024
-// grow by another 4MB each time the heap runs out of memory
-#define HEAP_GROW_SIZE				4 * 1024 * 1024
-// allocate a dedicated 1MB area for dynamic growing
-#define HEAP_DEDICATED_GROW_SIZE	1 * 1024 * 1024
-// use areas for allocations bigger than 1MB
-#define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
-
-#endif
 
 
 // allocation/deallocation flags for {malloc,free}_etc()
@@ -58,7 +33,7 @@ void* memalign(size_t alignment, size_t size) _ALIGNED_BY_ARG(1);
 
 void deferred_free(void* block);
 
-status_t heap_init(addr_t heapBase, size_t heapSize);
+status_t heap_init(struct kernel_args* args);
 status_t heap_init_post_area();
 status_t heap_init_post_sem();
 status_t heap_init_post_thread();

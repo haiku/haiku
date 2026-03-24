@@ -20,8 +20,6 @@ static const size_t kMinObjectAlignment = 8;
 void		request_memory_manager_maintenance();
 
 void*		block_alloc_early(size_t size);
-void		block_allocator_init_boot();
-void		block_allocator_init_rest();
 
 
 static inline void*

@@ -85,6 +85,9 @@
 
 // VM
 
+// Enables swap support.
+#define ENABLE_SWAP_SUPPORT				1
+
 // Enables the vm_page::queue field, i.e. it is tracked which queue the page
 // should be in.
 #define DEBUG_PAGE_QUEUE				0
@@ -98,34 +101,37 @@
 // Enables a global list of all vm_cache structures.
 #define DEBUG_CACHE_LIST				KDEBUG_LEVEL_2
 
-// Enables swap support.
-#define ENABLE_SWAP_SUPPORT				1
+// Enables the alternative heaps to be selected at startup.
+#define DEBUG_HEAPS						KDEBUG_LEVEL_2
 
-// Use the selected allocator as generic memory allocator (malloc()/free()).
-#define USE_DEBUG_HEAP_FOR_MALLOC		0
-	// Heap implementation with additional debugging facilities.
-#define USE_GUARDED_HEAP_FOR_MALLOC		0
-	// Heap implementation that allocates memory so that the end of the
-	// allocation always coincides with a page end and is followed by a guard
-	// page which is marked non-present. Out of bounds access (both read and
-	// write) therefore cause a crash (unhandled page fault). Note that this
-	// allocator is neither speed nor space efficient, indeed it wastes huge
-	// amounts of pages and address space so it is quite easy to hit limits.
-#define USE_SLAB_ALLOCATOR_FOR_MALLOC	1
-	// Heap implementation based on the slab allocator (for production use).
+// Sets the default heap to be used as the generic memory allocator (malloc/free)
+// when DEBUG_HEAPS is enabled. (This value can be overridden via "kernel_malloc".)
+//
+// The possible options are:
+//  - "slab": Heap implementation based on the slab allocator (for production use).
+//
+//  - "debug": Heap implementation with additional debugging facilities.
+//
+//  - "guarded": Heap implementation that allocates memory so that the end of the
+//	  allocation always coincides with a page end and is followed by a guard page
+//	  which is marked non-present. Out of bounds access (both read and write)
+//	  therefore cause a crash (page fault). Note that this allocator is neither
+//	  speed nor space efficient, indeed it wastes huge amounts of pages and address
+//    space so it is quite easy to hit limits.
+#define DEBUG_HEAPS_DEFAULT				slab
 
-// Replace the object cache with the guarded heap to force debug features. Also
-// requires the use of the guarded heap for malloc.
-#define USE_GUARDED_HEAP_FOR_OBJECT_CACHE			0
+// Replace the object cache with the chosen debug heap to force debug features.
+#define USE_DEBUG_HEAPS_FOR_OBJECT_CACHE			0
+
+// If 0, disables memory re-use by default in the guarded heap (can be overridden
+// via "guarded_heap_options".) This means freed virtual memory is never reused and
+// stays invalid, causing any access to crash. This is a magnitude more space
+// inefficient than the guarded heap itself; fully booting may not work at all due
+// to address space waste.
+#define DEBUG_GUARDED_HEAP_MEMORY_REUSE_DEFAULT		1
 
 // Enables additional sanity checks in the slab allocator's memory manager.
 #define DEBUG_SLAB_MEMORY_MANAGER_PARANOID_CHECKS	0
-
-// Disables memory re-use in the guarded heap (freed memory is never reused and
-// stays invalid causing every access to crash). Note that this is a magnitude
-// more space inefficient than the guarded heap itself. Fully booting may not
-// work at all due to address space waste.
-#define DEBUG_GUARDED_HEAP_DISABLE_MEMORY_REUSE		0
 
 // When set limits the amount of available RAM (in MB).
 //#define LIMIT_AVAILABLE_MEMORY		256

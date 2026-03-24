@@ -3876,21 +3876,7 @@ vm_init(kernel_args* args)
 	vm_page_init_num_pages(args);
 
 	slab_init(args);
-
-#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
-	size_t heapSize = INITIAL_HEAP_SIZE;
-	// try to accomodate low memory systems
-	while (heapSize > (vm_page_num_pages() * B_PAGE_SIZE) / 8)
-		heapSize /= 2;
-	if (heapSize < 1024 * 1024)
-		panic("vm_init: go buy some RAM please.");
-
-	// map in the new heap and initialize it
-	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
-	TRACE(("heap at 0x%lx\n", heapBase));
-	heap_init(heapBase, heapSize);
-#endif
+	heap_init(args);
 
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
@@ -3907,7 +3893,7 @@ vm_init(kernel_args* args)
 	VMAddressSpace::Init();
 	reserve_boot_loader_ranges(args);
 
-#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
+#if DEBUG_HEAPS
 	heap_init_post_area();
 #endif
 
@@ -3919,12 +3905,6 @@ vm_init(kernel_args* args)
 	slab_init_post_area();
 
 	// allocate areas to represent stuff that already exists
-
-#if USE_DEBUG_HEAP_FOR_MALLOC
-	address = (void*)ROUNDDOWN(heapBase, B_PAGE_SIZE);
-	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-#endif
 
 	allocate_kernel_args(args);
 
@@ -4006,10 +3986,7 @@ vm_init_post_sem(kernel_args* args)
 	arch_vm_translation_map_init_post_sem(args);
 
 	slab_init_post_sem();
-
-#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
 	heap_init_post_sem();
-#endif
 
 	return B_OK;
 }
