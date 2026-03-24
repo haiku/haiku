@@ -23,7 +23,7 @@
 #include "MemoryManager.h"
 
 
-#if !USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
+#if !USE_DEBUG_HEAPS_FOR_ALL_OBJECT_CACHES
 
 
 #if DEBUG_HEAPS
@@ -353,7 +353,7 @@ heap_init_post_thread()
 RANGE_MARKER_FUNCTION_END(slab_allocator)
 
 
-#else	// USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
+#else	// USE_DEBUG_HEAPS_FOR_ALL_OBJECT_CACHES
 
 
 void*
@@ -364,4 +364,4 @@ block_alloc_early(size_t size)
 }
 
 
-#endif	// USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
+#endif	// USE_DEBUG_HEAPS_FOR_ALL_OBJECT_CACHES

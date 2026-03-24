@@ -504,13 +504,13 @@ guarded_heap_realloc(guarded_heap& heap, void* address, size_t newSize, uint32 f
 	if (oldSize == newSize)
 		return address;
 
-	void* newBlock = malloc_etc(newSize, flags);
+	void* newBlock = guarded_heap_allocate(heap, newSize, 0, flags);
 	if (newBlock == NULL)
 		return NULL;
 
 	memcpy(newBlock, address, min_c(oldSize, newSize));
 
-	free_etc(address, flags);
+	guarded_heap_free(heap, address, flags);
 	return newBlock;
 }
 
@@ -874,7 +874,7 @@ guarded_heap_realloc_etc(void* address, size_t newSize, uint32 flags)
 
 kernel_heap_implementation kernel_guarded_heap = {
 	"guarded_heap",
-#if USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
+#if USE_DEBUG_HEAPS_FOR_ALL_OBJECT_CACHES
 	// This requires a lot of up-front memory to boot at all...
 	/* initial_size */	128 * 1024 * 1024,
 	// ... and a lot of reserves to keep running.

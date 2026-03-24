@@ -120,15 +120,19 @@
 //    space so it is quite easy to hit limits.
 #define DEBUG_HEAPS_DEFAULT				slab
 
-// Replace the object cache with the chosen debug heap to force debug features.
-#define USE_DEBUG_HEAPS_FOR_OBJECT_CACHE			0
-
 // If 0, disables memory re-use by default in the guarded heap (can be overridden
 // via "guarded_heap_options".) This means freed virtual memory is never reused and
 // stays invalid, causing any access to crash. This is a magnitude more space
 // inefficient than the guarded heap itself; fully booting may not work at all due
 // to address space waste.
 #define DEBUG_GUARDED_HEAP_MEMORY_REUSE_DEFAULT		1
+
+// If DEBUG_HEAPS is enabled, allow the guarded heap to replace select object_cache(s)
+// (but not slab malloc ones) specified via "guarded_heap_for_object_caches".
+#define GUARDED_HEAP_CAN_REPLACE_OBJECT_CACHES		1
+
+// Replace all object caches with the chosen debug heap to force debug features.
+#define USE_DEBUG_HEAPS_FOR_ALL_OBJECT_CACHES		0
 
 // Enables additional sanity checks in the slab allocator's memory manager.
 #define DEBUG_SLAB_MEMORY_MANAGER_PARANOID_CHECKS	0

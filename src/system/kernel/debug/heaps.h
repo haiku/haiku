@@ -28,5 +28,7 @@ extern kernel_heap_implementation kernel_slab_heap;
 extern kernel_heap_implementation kernel_guarded_heap;
 extern kernel_heap_implementation kernel_debug_heap;
 
+bool guarded_heap_replaces_object_cache(const char* name);
+
 
 #endif	// _KERNEL_DEBUG_HEAPS_H

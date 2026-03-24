@@ -34,8 +34,12 @@
 #include "slab_debug.h"
 #include "slab_private.h"
 
+#if DEBUG_HEAPS
+#include "../debug/heaps.h"
+#endif
 
-#if !USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
+
+#if !USE_DEBUG_HEAPS_FOR_ALL_OBJECT_CACHES
 
 
 typedef DoublyLinkedList<ObjectCache> ObjectCacheList;
@@ -1164,6 +1168,23 @@ create_object_cache_etc(const char* name, size_t objectSize, size_t alignment,
 	uint32 flags, void* cookie, object_cache_constructor constructor,
 	object_cache_destructor destructor, object_cache_reclaimer reclaimer)
 {
+#if DEBUG_HEAPS && GUARDED_HEAP_CAN_REPLACE_OBJECT_CACHES
+	if (guarded_heap_replaces_object_cache(name)) {
+		ObjectCache* cache = (ObjectCache*)
+			kernel_guarded_heap.memalign(0, sizeof(ObjectCache), flags);
+		memset((void*)cache, 0, sizeof(ObjectCache));
+		strcpy(cache->name, name);
+		cache->object_size = objectSize;
+		cache->alignment = alignment;
+		cache->constructor = constructor;
+		cache->destructor = destructor;
+		cache->cookie = cookie;
+
+		cache->flags = (uint32)-1;
+		return cache;
+	}
+#endif
+
 	ObjectCache* cache;
 
 	if (objectSize == 0) {
@@ -1191,6 +1212,13 @@ create_object_cache_etc(const char* name, size_t objectSize, size_t alignment,
 void
 delete_object_cache(object_cache* cache)
 {
+#if DEBUG_HEAPS && GUARDED_HEAP_CAN_REPLACE_OBJECT_CACHES
+	if (cache->flags == (uint32)-1) {
+		kernel_guarded_heap.free(cache, 0);
+		return;
+	}
+#endif
+
 	T(Delete(cache));
 
 	{
@@ -1224,6 +1252,11 @@ delete_object_cache(object_cache* cache)
 status_t
 object_cache_set_minimum_reserve(object_cache* cache, size_t objectCount)
 {
+#if DEBUG_HEAPS && GUARDED_HEAP_CAN_REPLACE_OBJECT_CACHES
+	if (cache->flags == (uint32)-1)
+		return B_OK;
+#endif
+
 	MutexLocker _(cache->lock);
 
 	if (cache->min_object_reserve == objectCount)
@@ -1240,6 +1273,16 @@ object_cache_set_minimum_reserve(object_cache* cache, size_t objectCount)
 void*
 object_cache_alloc(object_cache* cache, uint32 flags)
 {
+#if DEBUG_HEAPS && GUARDED_HEAP_CAN_REPLACE_OBJECT_CACHES
+	if (cache->flags == (uint32)-1) {
+		void* object = kernel_guarded_heap.memalign(cache->alignment,
+			cache->object_size, flags);
+		if (cache->constructor != NULL)
+			cache->constructor(cache->cookie, object);
+		return object;
+	}
+#endif
+
 	void* object = NULL;
 	if ((cache->flags & CACHE_NO_DEPOT) == 0)
 		object = object_depot_obtain(&cache->depot);
@@ -1307,6 +1350,15 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 void
 object_cache_free(object_cache* cache, void* object, uint32 flags)
 {
+#if DEBUG_HEAPS && GUARDED_HEAP_CAN_REPLACE_OBJECT_CACHES
+	if (cache->flags == (uint32)-1) {
+		if (cache->destructor != NULL)
+			cache->destructor(cache->cookie, object);
+		kernel_guarded_heap.free(object, flags);
+		return;
+	}
+#endif
+
 	if (object == NULL)
 		return;
 
@@ -1348,6 +1400,11 @@ object_cache_free(object_cache* cache, void* object, uint32 flags)
 status_t
 object_cache_reserve(object_cache* cache, size_t objectCount, uint32 flags)
 {
+#if DEBUG_HEAPS && GUARDED_HEAP_CAN_REPLACE_OBJECT_CACHES
+	if (cache->flags == (uint32)-1)
+		return B_OK;
+#endif
+
 	if (objectCount == 0)
 		return B_OK;
 
@@ -1453,4 +1510,4 @@ slab_init_post_thread()
 RANGE_MARKER_FUNCTION_END(Slab)
 
 
-#endif	// !USE_DEBUG_HEAPS_FOR_OBJECT_CACHE
+#endif	// !USE_DEBUG_HEAPS_FOR_ALL_OBJECT_CACHES
