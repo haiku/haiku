@@ -2461,7 +2461,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 	{
 		AddressSpaceWriteLocker locker;
 		VMArea* sourceArea;
-		status_t status = locker.SetFromArea(sourceID, sourceArea);
+		status = locker.SetFromArea(sourceID, sourceArea);
 		if (status != B_OK)
 			return status;
 
@@ -2554,6 +2554,9 @@ vm_clone_area(team_id team, const char* name, void** address,
 		// we need to map in everything at this point
 		if (sourceArea->cache_type == CACHE_TYPE_DEVICE) {
 			// we don't have actual pages to map but a physical area
+			uint32 memoryType = sourceArea->MemoryType();
+			newArea->SetMemoryType(sourceArea->MemoryType());
+
 			VMTranslationMap* map
 				= sourceArea->address_space->TranslationMap();
 			map->Lock();
@@ -2582,6 +2585,15 @@ vm_clone_area(team_id team, const char* name, void** address,
 
 			map->Unlock();
 			vm_page_unreserve_pages(&reservation);
+
+			if (memoryType != 0) {
+				status = arch_vm_set_memory_type(newArea, physicalAddress,
+					memoryType, NULL);
+
+				// Resetting the same memory type on the same physical memory
+				// should always succeed.
+				ASSERT_ALWAYS(status == B_OK);
+			}
 		} else {
 			VMTranslationMap* map = targetAddressSpace->TranslationMap();
 			size_t reservePages = map->MaxPagesNeededToMap(
