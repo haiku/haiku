@@ -76,7 +76,8 @@ kevent(int kq,
 				break;
 
 			default:
-				return EINVAL;
+				__set_errno(EINVAL);
+				return -1;
 		}
 
 		if ((changelist[i].flags & EV_ONESHOT) != 0)
@@ -207,13 +208,11 @@ kevent(int kq,
 				if (waitInfos[i].events < 0) {
 					flags |= EV_ERROR;
 					data = waitInfos[i].events;
-				} else if ((waitInfos[i].events & B_EVENT_DISCONNECTED) != 0) {
-					flags |= EV_EOF;
 				} else if ((waitInfos[i].events & B_EVENT_INVALID) != 0) {
 					switch (waitInfos[i].type) {
 						case B_OBJECT_TYPE_FD:
-							flags |= EV_EOF;
-							break;
+							// File descriptor was closed. Silently discard the event.
+							continue;
 
 						case B_OBJECT_TYPE_THREAD: {
 							fflags |= NOTE_EXIT;
@@ -227,6 +226,8 @@ kevent(int kq,
 							break;
 						}
 					}
+				} else if ((waitInfos[i].events & B_EVENT_DISCONNECTED) != 0) {
+					flags |= EV_EOF;
 				} else if ((waitInfos[i].events & B_EVENT_ERROR) != 0) {
 					flags |= EV_ERROR;
 					data = EINVAL;
