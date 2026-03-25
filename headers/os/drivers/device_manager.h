@@ -37,6 +37,7 @@ typedef struct {
 		 */
 } io_resource;
 
+
 /* attribute of a device node */
 typedef struct {
 	const char		*name;
@@ -186,5 +187,6 @@ struct device_module_info {
 	status_t (*select)(void *cookie, uint8 event, selectsync *sync);
 	status_t (*deselect)(void *cookie, uint8 event, selectsync *sync);
 };
+
 
 #endif	/* _DEVICE_MANAGER_H */
