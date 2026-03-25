@@ -6,11 +6,6 @@
 
 
 #include "Inode.h"
-
-#include <real_time_clock.h>
-#include <string.h>
-#include <stdlib.h>
-
 #include "CachedBlock.h"
 #include "DataStream.h"
 #include "Utility.h"
@@ -223,8 +218,16 @@ void
 Inode::_GetTimespec(uint16 date, uint16 time, struct timespec &timespec) const
 {
 	static int32 tzoffset = -1; /* in minutes */
-	if (tzoffset == -1)
-		tzoffset = get_timezone_offset() / 60;
+#ifdef _KERNEL_MODE
+	tzoffset = static_cast<int32>(get_timezone_offset());
+#elif defined USER
+	time_t localTime;
+	time(&localTime);
+
+	struct tm localTm;
+	localtime_r(&localTime, &localTm);
+	tzoffset = localTm.tm_gmtoff;
+#endif
 
 	time_t days = daze[(date >> 5) & 15] + ((date >> 9) + 10) * 365
 		+ leaps((date >> 9) + 10, ((date >> 5) & 15) - 1) + (date & 31) -1;

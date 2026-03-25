@@ -15,6 +15,7 @@
 #include "CachedBlock.h"
 #include "exfat.h"
 
+
 class Inode;
 
 class EntryVisitor {

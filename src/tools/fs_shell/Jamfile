@@ -35,6 +35,7 @@ local kernelEmulationSources =
 	block_cache.cpp
 	byte_order.cpp
 	command_cp.cpp
+	convertutf.cpp
 	disk_device_manager.cpp
 	driver_settings.cpp
 	errno.cpp

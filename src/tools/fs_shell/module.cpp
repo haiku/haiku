@@ -191,14 +191,12 @@ init_module(module *module)
 			module->state = MODULE_INIT;
 
 			// init module
-
 			TRACE(("initializing module %s (at %p)... \n", module->name, module->info->std_ops));
 			if (module->info->std_ops != NULL)
 				status = module->info->std_ops(FSSH_B_MODULE_INIT);
 			else
 				status = FSSH_B_OK;
 			TRACE(("...done (%s)\n", strerror(status)));
-
 			if (status >= FSSH_B_OK)
 				module->state = MODULE_READY;
 			else {

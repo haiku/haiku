@@ -12,11 +12,7 @@
 #define EXFAT_H
 
 
-#include <sys/stat.h>
-
-#include <ByteOrder.h>
-#include <fs_interface.h>
-#include <KernelExport.h>
+#include "system_dependencies.h"
 
 
 typedef uint64 fileblock_t;		// file block number

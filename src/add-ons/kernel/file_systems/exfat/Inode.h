@@ -7,15 +7,10 @@
 #define INODE_H
 
 
-#include <fs_cache.h>
-#include <lock.h>
-#include <string.h>
-
-#include <util/SplayTree.h>
-
 #include "DirectoryIterator.h"
 #include "exfat.h"
 #include "Volume.h"
+#include "system_dependencies.h"
 
 
 //#define TRACE_EXFAT

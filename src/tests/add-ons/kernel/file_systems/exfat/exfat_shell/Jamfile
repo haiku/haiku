@@ -1,0 +1,78 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems exfat exfat_shell ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems exfat ] ;
+
+# prevent inclusion of HaikuBuildCompatibility.h and _BSD_SOURCE headers
+DEFINES += HAIKU_BUILD_COMPATIBILITY_H __STRICT_ANSI__ ; 
+
+# set some additional defines
+{
+	local defines =
+		FS_SHELL
+		;
+
+	defines = [ FDefines $(defines) ] ;
+
+	local c++flags = ;
+
+	SubDirCcFlags $(defines) -Wno-multichar ;
+	SubDirC++Flags $(defines) $(c++flags) -Wno-multichar -fno-rtti ;
+}
+
+# platform specific libraries
+local fsShellCommandLibs ;
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
+}
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers os storage ] : true ;
+
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+}
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared storage fs_shell ;
+UsePrivateHeaders file_systems ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] : true ;
+
+local exfatSource =
+	DataStream.cpp
+	DeviceOpener.cpp
+	DirectoryIterator.cpp
+	kernel_interface.cpp
+	Inode.cpp
+	Volume.cpp
+	Utility.cpp
+	
+;
+
+BuildPlatformMergeObject <build>exfat_shell.o : $(exfatSource) ;
+
+BuildPlatformMain <build>exfat_shell
+	:
+	:
+	<build>exfat_shell.o
+	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBROOT) $(fsShellCommandLibs)
+;
+
+BuildPlatformMain <build>exfat_fuse
+	:
+	:
+	<build>exfat_shell.o
+	<build>fuse_module.a
+	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
+;
+
+SEARCH on [ FGristFiles $(utilitySources) ]
+	+= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+SEARCH on [ FGristFiles QueryParserUtils.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
+SEARCH on [ FGristFiles DeviceOpener.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

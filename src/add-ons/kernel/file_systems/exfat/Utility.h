@@ -13,6 +13,7 @@
 
 
 #include "exfat.h"
+#include "system_dependencies.h"
 
 
 enum inode_type {

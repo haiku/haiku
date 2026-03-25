@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems exfat ;
-
+UsePrivateKernelHeaders ;
+UsePrivateHeaders kernel ;
 UsePrivateHeaders shared storage ;
 UsePrivateHeaders file_systems ;
-UsePrivateKernelHeaders ;
 
 KernelAddon exfat :
 	DataStream.cpp
