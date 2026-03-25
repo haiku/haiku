@@ -1311,10 +1311,8 @@ TCPEndpoint::_Close()
 void
 TCPEndpoint::_HandleReset(status_t error)
 {
-	socket->error = error;
 	_Close();
 
-	gSocketModule->notify(socket, B_SELECT_WRITE, error);
 	gSocketModule->notify(socket, B_SELECT_ERROR, error);
 }
 

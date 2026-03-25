@@ -849,6 +849,13 @@ socket_request_notification(net_socket* _socket, uint8 event, selectsync* sync)
 			if (socket->error != B_OK)
 				notify_select_event(sync, event);
 			break;
+		case B_SELECT_DISCONNECTED:
+		{
+			ssize_t available = socket_read_avail(socket);
+			if (available < 0)
+				notify_select_event(sync, event);
+			break;
+		}
 	}
 
 	return B_OK;
@@ -875,14 +882,14 @@ socket_notify(net_socket* _socket, uint8 event, int32 value)
 	switch (event) {
 		case B_SELECT_READ:
 			if ((ssize_t)socket->receive.low_water_mark > value
-				&& value >= B_OK && !atomic) {
+					&& value >= B_OK && !atomic) {
 				notify = false;
 			}
 			break;
 
 		case B_SELECT_WRITE:
 			if ((ssize_t)socket->send.low_water_mark > value
-				&& value >= B_OK && !atomic) {
+					&& value >= B_OK && !atomic) {
 				notify = false;
 			}
 			break;
@@ -897,6 +904,8 @@ socket_notify(net_socket* _socket, uint8 event, int32 value)
 	if (notify && socket->select_pool != NULL) {
 		notify_select_event_pool(socket->select_pool, event);
 
+		if (event == B_SELECT_READ && value < 0)
+			notify_select_event_pool(socket->select_pool, B_SELECT_DISCONNECTED);
 		if (event == B_SELECT_ERROR) {
 			// always notify read/write on error
 			notify_select_event_pool(socket->select_pool, B_SELECT_READ);
@@ -1731,4 +1740,3 @@ net_socket_module_info gNetSocketModule = {
 	socket_shutdown,
 	socket_socketpair
 };
-
