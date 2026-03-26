@@ -22,8 +22,8 @@ _kernel_malloc(size_t size, int flags)
 {
 	// According to the FreeBSD kernel malloc man page the allocator is expected
 	// to return power of two aligned addresses for allocations up to one page
-	// size. While it also states that this shouldn't be relied upon, at least
-	// bus_dmamem_alloc expects it and drivers may depend on it as well.
+	// size. While it also states that this shouldn't be relied upon, some drivers
+	// may depend on it.
 	void *ptr
 		= memalign_etc(size >= PAGESIZE ? PAGESIZE : next_power_of_2(size), size,
 			(flags & M_NOWAIT) ? HEAP_DONT_WAIT_FOR_MEMORY : 0);
