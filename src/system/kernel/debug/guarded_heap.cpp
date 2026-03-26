@@ -809,6 +809,9 @@ guarded_heap_init_post_sem()
 	}
 
 	locker.Unlock();
+
+	// Release the initial cache reference here, so that if the free triggers
+	// malloc (e.g. for magazines in the object_caches), we're ready.
 	initialCache->ReleaseRef();
 
 	vm_unreserve_memory(reservation.count * B_PAGE_SIZE);
