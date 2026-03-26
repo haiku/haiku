@@ -48,8 +48,11 @@ public:
 
 	virtual	ssize_t				Discard(off_t offset, off_t size);
 
+	virtual	off_t				Commitment() const;
 	virtual	bool				CanOvercommit();
 	virtual	status_t			Commit(off_t size, int priority);
+	virtual	void				TakeCommitmentFrom(VMCache* from, off_t commitment);
+
 	virtual	bool				StoreHasPage(off_t offset);
 	virtual	bool				DebugStoreHasPage(off_t offset);
 
@@ -100,6 +103,7 @@ private:
 private:
 	friend bool swap_free_page_swap_space(vm_page* page);
 
+			off_t				fCommittedSize;
 			bool				fCanOvercommit;
 			bool				fHasPrecommitted;
 			uint8				fPrecommittedPages;

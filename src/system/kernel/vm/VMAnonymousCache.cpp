@@ -452,7 +452,7 @@ VMAnonymousCache::~VMAnonymousCache()
 
 	_FreeSwapPageRange(virtual_base, virtual_end, false);
 	swap_space_unreserve(fReservedSwapSize);
-	vm_unreserve_memory_or_swap(committed_size);
+	vm_unreserve_memory_or_swap(fCommittedSize);
 }
 
 
@@ -469,6 +469,7 @@ VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 	if (error != B_OK)
 		return error;
 
+	fCommittedSize = 0;
 	fCanOvercommit = canOvercommit;
 	fHasPrecommitted = false;
 	fPrecommittedPages = min_c(numPrecommittedPages, 255);
@@ -612,7 +613,7 @@ VMAnonymousCache::Discard(off_t offset, off_t size)
 	_FreeSwapPageRange(offset, offset + size);
 	const ssize_t discarded = VMCache::Discard(offset, size);
 	if (discarded > 0 && fCanOvercommit)
-		Commit(committed_size - discarded, VM_PRIORITY_USER);
+		Commit(fCommittedSize - discarded, VM_PRIORITY_USER);
 	return discarded;
 }
 
@@ -724,11 +725,25 @@ VMAnonymousCache::Adopt(VMCache* _source, off_t offset, off_t size,
 		// We need to adopt the commitment for these pages.
 		uint32 newPages = page_count - initialPageCount;
 		off_t pagesCommitment = newPages * B_PAGE_SIZE;
-		source->committed_size -= pagesCommitment;
-		committed_size += pagesCommitment;
+		source->fCommittedSize -= pagesCommitment;
+		fCommittedSize += pagesCommitment;
 	}
 
 	return status;
+}
+
+
+off_t
+VMAnonymousCache::Commitment() const
+{
+	return fCommittedSize;
+}
+
+
+bool
+VMAnonymousCache::CanOvercommit()
+{
+	return fCanOvercommit;
 }
 
 
@@ -743,7 +758,7 @@ VMAnonymousCache::Commit(off_t size, int priority)
 
 	// If we can overcommit, we don't commit here, but in Fault(). We always
 	// unreserve memory, if we're asked to shrink our commitment, though.
-	if (fCanOvercommit && size > committed_size) {
+	if (fCanOvercommit && size > fCommittedSize) {
 		if (fHasPrecommitted)
 			return B_OK;
 
@@ -754,31 +769,37 @@ VMAnonymousCache::Commit(off_t size, int priority)
 			size = precommitted;
 
 		// pre-commit should not shrink existing commitment
-		size += committed_size;
+		size += fCommittedSize;
 	}
 
 	// Check to see how much we could commit - we need real memory
 
-	if (size > committed_size) {
+	if (size > fCommittedSize) {
 		// try to commit
-		if (vm_try_reserve_memory_or_swap(size - committed_size, priority, 1000000)
+		if (vm_try_reserve_memory_or_swap(size - fCommittedSize, priority, 1000000)
 				!= B_OK) {
 			return B_NO_MEMORY;
 		}
 	} else {
 		// we can release some
-		vm_unreserve_memory_or_swap(committed_size - size);
+		vm_unreserve_memory_or_swap(fCommittedSize - size);
 	}
 
-	committed_size = size;
+	fCommittedSize = size;
 	return B_OK;
 }
 
 
-bool
-VMAnonymousCache::CanOvercommit()
+void
+VMAnonymousCache::TakeCommitmentFrom(VMCache* _from, off_t commitment)
 {
-	return fCanOvercommit;
+	VMAnonymousCache* from = dynamic_cast<VMAnonymousCache*>(_from);
+	ASSERT(from != NULL && from->fCommittedSize >= commitment);
+	AssertLocked();
+	from->AssertLocked();
+
+	from->fCommittedSize -= commitment;
+	fCommittedSize += commitment;
 }
 
 
@@ -1046,7 +1067,7 @@ VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 	if (fCanOvercommit && LookupPage(offset) == NULL && !StoreHasPage(offset)) {
 		if (fPrecommittedPages == 0) {
 			// never commit more than needed
-			if (committed_size / B_PAGE_SIZE > page_count)
+			if (fCommittedSize / B_PAGE_SIZE > page_count)
 				return B_BAD_HANDLER;
 
 			// try to commit additional memory
@@ -1058,7 +1079,7 @@ VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 				return B_NO_MEMORY;
 			}
 
-			committed_size += B_PAGE_SIZE;
+			fCommittedSize += B_PAGE_SIZE;
 		} else
 			fPrecommittedPages--;
 	}
@@ -1079,13 +1100,13 @@ VMAnonymousCache::Merge(VMCache* _source)
 	}
 
 	// take over the source's committed size
-	committed_size += source->committed_size;
-	source->committed_size = 0;
+	fCommittedSize += source->fCommittedSize;
+	source->fCommittedSize = 0;
 
 	off_t actualSize = PAGE_ALIGN(virtual_end - virtual_base);
-	if (committed_size > actualSize) {
-		vm_unreserve_memory_or_swap(committed_size - actualSize);
-		committed_size = actualSize;
+	if (fCommittedSize > actualSize) {
+		vm_unreserve_memory_or_swap(fCommittedSize - actualSize);
+		fCommittedSize = actualSize;
 	}
 
 	// Move all not shadowed swap pages from the source to the consumer cache.

@@ -147,9 +147,10 @@ public:
 
 			status_t			SetMinimalCommitment(off_t commitment,
 									int priority);
-			off_t				Commitment() const;
+	virtual	off_t				Commitment() const;
 	virtual	bool				CanOvercommit();
 	virtual	status_t			Commit(off_t size, int priority);
+	virtual	void				TakeCommitmentFrom(VMCache* from, off_t commitment);
 
 	// backing store operations
 	virtual	bool				StoreHasPage(off_t offset);
@@ -206,8 +207,6 @@ public:
 			VMCache*			source;
 			off_t				virtual_base;
 			off_t				virtual_end;
-			off_t				committed_size;
-				// TODO: Remove!
 			uint32				page_count;
 			uint32				temporary : 1;
 			uint32				type : 6;

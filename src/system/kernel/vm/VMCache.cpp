@@ -638,7 +638,6 @@ VMCache::Init(const char* name, uint32 cacheType, uint32 allocationFlags)
 	source = NULL;
 	virtual_base = 0;
 	virtual_end = 0;
-	committed_size = 0;
 	temporary = 0;
 	page_count = 0;
 	fWiredPagesCount = 0;
@@ -1310,7 +1309,7 @@ VMCache::FlushAndRemoveAllPages()
 off_t
 VMCache::Commitment() const
 {
-	return committed_size;
+	return 0;
 }
 
 
@@ -1326,6 +1325,13 @@ VMCache::Commit(off_t size, int priority)
 {
 	ASSERT_UNREACHABLE();
 	return B_NOT_SUPPORTED;
+}
+
+
+void
+VMCache::TakeCommitmentFrom(VMCache* from, off_t commitment)
+{
+	ASSERT_UNREACHABLE();
 }
 
 

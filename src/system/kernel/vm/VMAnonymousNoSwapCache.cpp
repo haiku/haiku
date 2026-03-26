@@ -49,6 +49,7 @@ VMAnonymousNoSwapCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 	if (error != B_OK)
 		return error;
 
+	committed_size = 0;
 	fCanOvercommit = canOvercommit;
 	fHasPrecommitted = false;
 	fPrecommittedPages = min_c(numPrecommittedPages, 255);
@@ -59,14 +60,19 @@ VMAnonymousNoSwapCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 
 
 status_t
-VMAnonymousNoSwapCache::Adopt(VMCache* from, off_t offset, off_t size,
+VMAnonymousNoSwapCache::Adopt(VMCache* _from, off_t offset, off_t size,
 	off_t newOffset)
 {
+	VMAnonymousNoSwapCache* from = dynamic_cast<VMAnonymousNoSwapCache*>(_from);
+	ASSERT(from != NULL);
+
 	uint32 initialPageCount = page_count;
 	status_t status = VMCache::Adopt(from, offset, size, newOffset);
 
 	if (fCanOvercommit) {
 		// We need to adopt the commitment for these pages.
+		ASSERT(from->fCanOvercommit);
+
 		uint32 newPages = page_count - initialPageCount;
 		off_t pagesCommitment = newPages * B_PAGE_SIZE;
 		from->committed_size -= pagesCommitment;
@@ -84,6 +90,20 @@ VMAnonymousNoSwapCache::Discard(off_t offset, off_t size)
 	if (discarded > 0 && fCanOvercommit)
 		Commit(committed_size - discarded, VM_PRIORITY_USER);
 	return discarded;
+}
+
+
+off_t
+VMAnonymousNoSwapCache::Commitment() const
+{
+	return committed_size;
+}
+
+
+bool
+VMAnonymousNoSwapCache::CanOvercommit()
+{
+	return fCanOvercommit;
 }
 
 
@@ -127,10 +147,16 @@ VMAnonymousNoSwapCache::Commit(off_t size, int priority)
 }
 
 
-bool
-VMAnonymousNoSwapCache::CanOvercommit()
+void
+VMAnonymousNoSwapCache::TakeCommitmentFrom(VMCache* _from, off_t commitment)
 {
-	return fCanOvercommit;
+	VMAnonymousNoSwapCache* from = dynamic_cast<VMAnonymousNoSwapCache*>(_from);
+	ASSERT(from != NULL && from->committed_size >= commitment);
+	AssertLocked();
+	from->AssertLocked();
+
+	from->committed_size -= commitment;
+	committed_size += commitment;
 }
 
 

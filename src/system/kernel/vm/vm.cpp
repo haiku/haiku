@@ -969,9 +969,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		if (!overcommitting && resizePriority != -1) {
 			// Steal some of the original cache's commitment.
 			const size_t steal = PAGE_ALIGN(secondSize);
-			if (cache->committed_size > (off_t)steal) {
-				cache->committed_size -= steal;
-				secondCache->committed_size += steal;
+			if (cache->Commitment() > (off_t)steal) {
+				secondCache->TakeCommitmentFrom(cache, steal);
 				commitmentStolen = steal;
 			}
 		}
@@ -1001,8 +1000,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		}
 
 		if (error != B_OK) {
-			secondCache->committed_size -= commitmentStolen;
-			cache->committed_size += commitmentStolen;
+			cache->TakeCommitmentFrom(secondCache, commitmentStolen);
 
 			// Move the pages back.
 			status_t readoptStatus = cache->Adopt(secondCache,
@@ -1036,9 +1034,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		if (resizePriority == -1) {
 			// Adjust commitments.
 			const off_t areaCommit = compute_area_page_commitment(area) * B_PAGE_SIZE;
-			if (areaCommit < area->cache->committed_size) {
-				secondArea->cache->committed_size += area->cache->committed_size - areaCommit;
-				area->cache->committed_size = areaCommit;
+			if (areaCommit < area->cache->Commitment()) {
+				secondArea->cache->TakeCommitmentFrom(area->cache,
+					area->cache->Commitment() - areaCommit);
 			}
 			area->cache->Commit(areaCommit, priority);
 
@@ -1768,9 +1766,12 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 
 	cache->temporary = 1;
 	cache->virtual_end = size;
-	cache->committed_size = reservedMemory;
-		// TODO: This should be done via a method.
-	reservedMemory = 0;
+
+	if (reservedMemory != 0) {
+		VMAnonymousNoSwapCache* noSwapCache = dynamic_cast<VMAnonymousNoSwapCache*>(cache);
+		noSwapCache->committed_size = reservedMemory;
+		reservedMemory = 0;
+	}
 
 	cache->Lock();
 
@@ -2864,16 +2865,15 @@ vm_copy_on_write_area(VMCache* lowerCache,
 
 	// Shrink the lower cache's commitment (if possible) and steal the remainder;
 	// and increase the upper cache's commitment to the lower cache's old commitment.
-	const off_t lowerOldCommitment = lowerCache->committed_size,
+	const off_t lowerOldCommitment = lowerCache->Commitment(),
 		lowerNewCommitment = (lowerCache->page_count * B_PAGE_SIZE);
 	if (lowerNewCommitment < lowerOldCommitment) {
-		lowerCache->committed_size = lowerNewCommitment;
-		upperCache->committed_size = lowerOldCommitment - lowerNewCommitment;
+		upperCache->TakeCommitmentFrom(lowerCache,
+			lowerOldCommitment - lowerNewCommitment);
 	}
 	status = upperCache->Commit(lowerOldCommitment, VM_PRIORITY_USER);
 	if (status != B_OK) {
-		lowerCache->committed_size += upperCache->committed_size;
-		upperCache->committed_size = 0;
+		lowerCache->TakeCommitmentFrom(upperCache, upperCache->Commitment());
 		upperCache->ReleaseRefAndUnlock();
 		return status;
 	}
