@@ -166,7 +166,7 @@ EntryCache::Remove(ino_t dirID, const char* name)
 		writeLocker.Unlock();
 		free(entry);
 	} else {
-		// We can't free it, since another thread is about to try to move it
+		// We can't free it, since another thread is waiting to try to move it
 		// to another generation. We mark it removed and the other thread will
 		// take care of deleting it.
 		entry->index = kEntryRemoved;
@@ -241,8 +241,8 @@ EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry, bool move)
 		return true;
 	}
 
-	// The current generation is full, so we probably need to clear the oldest
-	// one to make room. We need the write lock for that.
+	// The current generation is full, so the oldest one needs to be cleared
+	// in order to make room. The write lock is needed for that.
 	readLocker.Unlock();
 	WriteLocker writeLocker(fLock);
 
@@ -251,22 +251,23 @@ EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry, bool move)
 	fEntries.ResizeIfNeeded();
 
 	if (entry->index == kEntryRemoved) {
-		// the entry has been removed in the meantime
+		// The entry was removed while we were waiting. Nothing else has a
+		// reference to it at this point besides us, so we free it.
 		writeLocker.Unlock();
 		free(entry);
 		return false;
 	}
 
-	// the generation might not be full yet
 	index = fGenerations[fCurrentGeneration].next_index++;
 	if (index < fGenerations[fCurrentGeneration].entries_size) {
+		// the current generation has already been changed
 		fGenerations[fCurrentGeneration].entries[index] = entry;
 		entry->generation = fCurrentGeneration;
 		entry->index = index;
 		return true;
 	}
 
-	// we have to clear the oldest generation
+	// We have to clear the oldest generation.
 	EntryCacheEntry* entriesToFree = NULL;
 	const int32 newGeneration = (fCurrentGeneration + 1) % fGenerationCount;
 	for (int32 i = 0; i < fGenerations[newGeneration].entries_size; i++) {
