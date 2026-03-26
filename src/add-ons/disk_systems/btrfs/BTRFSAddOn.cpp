@@ -91,10 +91,8 @@ BTRFSAddOn::CreatePartitionHandle(BMutablePartition* partition,
 bool
 BTRFSAddOn::CanInitialize(const BMutablePartition* partition)
 {
-	// We can initialize if the partition is large enough.
-
-	//TODO(lesderid): Check min size
-	return true;
+	// btrfs-progs does not allow volumes smaller than 256MiB
+	return partition->Size() >= 256 * 1024 * 1024;
 }
 
 
