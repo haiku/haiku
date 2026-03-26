@@ -86,6 +86,7 @@ struct kevent {
 /* actions */
 #define EV_ADD		0x0001		/* add event to kq (implies enable) */
 #define EV_DELETE	0x0002		/* delete event from kq */
+#define EV_ENABLE	(0)			/* (not needed) */
 
 /* flags */
 #define EV_ONESHOT	0x0010		/* only report one occurrence */
