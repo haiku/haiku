@@ -607,6 +607,8 @@ compute_area_page_commitment(VMArea* area)
 	if (area->page_protections == NULL) {
 		if ((area->protection & commitProtection) != 0)
 			return area->Size();
+
+		// TODO: We should also include pages in the store here!
 		return area->cache->page_count * B_PAGE_SIZE;
 	}
 
@@ -616,7 +618,8 @@ compute_area_page_commitment(VMArea* area)
 	for (size_t i = 0; i < bytes; i++) {
 		const uint8 protection = area->page_protections[i];
 		const off_t pageOffset = area->cache_offset + (i * 2 * B_PAGE_SIZE);
-		if (area->cache->LookupPage(pageOffset) != NULL)
+		if (area->cache->LookupPage(pageOffset) != NULL
+				|| area->cache->StoreHasPage(pageOffset))
 			pages++;
 		else
 			pages += ((protection & (commitProtection << 0)) != 0) ? 1 : 0;
@@ -624,7 +627,8 @@ compute_area_page_commitment(VMArea* area)
 		if (i == (bytes - 1) && oddPageCount)
 			break;
 
-		if (area->cache->LookupPage(pageOffset + B_PAGE_SIZE) != NULL)
+		if (area->cache->LookupPage(pageOffset + B_PAGE_SIZE) != NULL
+				|| area->cache->StoreHasPage(pageOffset + B_PAGE_SIZE))
 			pages++;
 		else
 			pages += ((protection & (commitProtection << 4)) != 0) ? 1 : 0;
@@ -6552,7 +6556,9 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			const off_t areaCacheBase = area->Base() - area->cache_offset;
 			for (addr_t pageAddress = area->Base() + offset;
 					pageAddress < currentAddress; pageAddress += B_PAGE_SIZE) {
-				if (topCache->LookupPage(pageAddress - areaCacheBase) != NULL) {
+				const off_t cacheOffset = pageAddress - areaCacheBase;
+				if (topCache->LookupPage(cacheOffset) != NULL
+						|| topCache->StoreHasPage(cacheOffset)) {
 					// This page should already be accounted for in the commitment.
 					continue;
 				}
