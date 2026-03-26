@@ -112,11 +112,11 @@ private:
 	uint16					memory_type;	// >> shifted by MEMORY_TYPE_SHIFT
 
 public:
-	VMCache*				cache;
+	VMCache*				cache;			// protected by sAreaCacheLock
 	off_t					cache_offset;
 	uint32					cache_type;
-	VMAreaMappings			mappings;
-	uint8*					page_protections;
+	VMAreaMappings			mappings;		// protected by the TranslationMap lock
+	uint8*					page_protections; // protected by cache lock
 
 	struct VMAddressSpace*	address_space;
 
