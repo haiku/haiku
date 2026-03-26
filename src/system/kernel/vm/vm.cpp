@@ -1198,13 +1198,23 @@ discard_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 }
 
 
-/*! You need to hold the lock of the cache and the write lock of the address
+/*! \brief Creates an area backed by \a cache in \a addressSpace.
+
+	If \a mapping is \c REGION_PRIVATE_MAP, creates a new cache for private copies
+	of pages.
+
+	If \a cache's commitment is too small, it tries to commit more, unless
+	\c CREATE_AREA_DONT_COMMIT_MEMORY is specified.
+
+	You need to hold the lock of the cache and the write lock of the address
 	space when calling this function.
-	Note, that in case of error your cache will be temporarily unlocked.
-	If \a addressSpec is \c B_EXACT_ADDRESS and the
-	\c CREATE_AREA_UNMAP_ADDRESS_RANGE flag is specified, the caller must ensure
-	that no part of the specified address range (base \c *_virtualAddress, size
-	\a size) is wired. The cache will also be temporarily unlocked.
+
+	\note In case of error, the cache will be temporarily unlocked.
+
+	If \a addressSpec is \c B_EXACT_ADDRESS and \c CREATE_AREA_UNMAP_ADDRESS_RANGE
+	is specified, the caller must ensure that no part of the specified address range
+	(base \c *_virtualAddress, size \a size) is wired. The cache will also be
+	temporarily unlocked.
 */
 static status_t
 map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
@@ -1538,6 +1548,13 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 }
 
 
+/*! \brief Creates an anonymous area in \a team's address space.
+
+	A new cache (marked \c temporary) will be created for it.
+
+	See \c create_area and \c map_backing_store for more information on the
+	behavior of the various options.
+*/
 area_id
 vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 	uint32 wiring, uint32 protection, uint32 flags, addr_t guardSize,

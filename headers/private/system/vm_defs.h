@@ -41,6 +41,9 @@ enum {
 enum {
 	// TODO: these are here only temporarily - it's a private
 	// addition to the BeOS create_area() lock flags
+	//! (Only for use during the boot process.) Indicates the specified address
+	//! is already mapped, and the corresponding pages should be found and
+	//! inserted into the new cache.
 	B_ALREADY_WIRED	= 7,
 };
 
