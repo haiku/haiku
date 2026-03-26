@@ -20,14 +20,14 @@ enum {
 										| CACHE_DONT_LOCK_KERNEL_SPACE
 										| CACHE_PRIORITY_VIP,
 
-	/* create_object_cache_etc flags */
-	CACHE_NO_DEPOT					= 0x08000000,
-	CACHE_UNLOCKED_PAGES			= 0x10000000,	// unsupported
-	CACHE_LARGE_SLAB				= 0x20000000,
+	/* create_object_cache flags */
+	CACHE_NO_DEPOT					= (1 << 27),
+	CACHE_UNLOCKED_PAGES			= (1 << 28),	// unsupported
+	CACHE_LARGE_SLAB				= (1 << 29),
 
 	/* internal */
-	CACHE_ALIGN_ON_SIZE				= 0x40000000,
-	CACHE_DURING_BOOT				= 0x80000000
+	CACHE_ALIGN_ON_SIZE				= (1 << 30),
+	CACHE_DURING_BOOT				= (1 << 31)
 };
 
 struct ObjectCache;
