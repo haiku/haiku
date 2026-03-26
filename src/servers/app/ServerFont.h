@@ -150,7 +150,7 @@ class ServerFont {
 			status_t			GetBoundingBoxesForStrings(char *charArray[],
 									size_t lengthArray[], int32 numStrings,
 									BRect rectArray[], font_metric_mode mode,
-									escapement_delta deltaArray[]);
+									const escapement_delta deltaArray[]);
 
 			float				StringWidth(const char *string,
 									int32 numBytes,

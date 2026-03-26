@@ -19,6 +19,7 @@
 
 #include <AffineTransform.h>
 #include <DataIO.h>
+#include <Font.h>
 #include <Gradient.h>
 #include <PictureProtocol.h>
 #include <Shape.h>
@@ -47,8 +48,7 @@ public:
 	virtual void DrawEllipse(const BRect& rect, bool fill);
 	virtual void DrawPolygon(size_t numPoints, const BPoint points[], bool isClosed, bool fill);
 	virtual void DrawShape(const BShape& shape, bool fill);
-	virtual void DrawString(const char* string, size_t length, float spaceEscapement,
-		float nonSpaceEscapement);
+	virtual void DrawString(const char* string, size_t length, const escapement_delta& delta);
 	virtual void DrawPixels(const BRect& source, const BRect& destination, uint32 width,
 		uint32 height, size_t bytesPerRow, color_space pixelFormat, uint32 flags, const void* data,
 		size_t length);
@@ -224,11 +224,11 @@ CallbackAdapterPlayer::DrawShape(const BShape& shape, bool fill)
 
 void
 CallbackAdapterPlayer::DrawString(const char* _string, size_t length,
-	float deltaSpace, float deltaNonSpace)
+	const escapement_delta& delta)
 {
 	char* string = strndup(_string, length);
 
-	fCallbacks->draw_string(fUserData, string, deltaSpace, deltaNonSpace);
+	fCallbacks->draw_string(fUserData, string, delta.nonspace, delta.space);
 
 	free(string);
 }
@@ -1162,17 +1162,14 @@ PicturePlayer::_Play(PicturePlayerCallbacks& callbacks,
 			{
 				const int32* length;
 				const char* string;
-				const float* escapementSpace;
-				const float* escapementNonSpace;
+				const escapement_delta* delta;
 				if (!reader.Get(length)
 					|| !reader.Get(string, *length)
-					|| !reader.Get(escapementSpace)
-					|| !reader.Get(escapementNonSpace)) {
+					|| !reader.Get(delta)) {
 					break;
 				}
 
-				callbacks.DrawString(string, *length,
-					*escapementSpace, *escapementNonSpace);
+				callbacks.DrawString(string, *length, *delta);
 				break;
 			}
 

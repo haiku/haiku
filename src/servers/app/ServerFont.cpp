@@ -1029,7 +1029,7 @@ ServerFont::GetBoundingBoxes(const char* string, int32 numBytes, int32 numChars,
 status_t
 ServerFont::GetBoundingBoxesForStrings(char *charArray[], size_t lengthArray[],
 	int32 numStrings, BRect rectArray[], font_metric_mode mode,
-	escapement_delta deltaArray[])
+	const escapement_delta deltaArray[])
 {
 	// TODO: The font_metric_mode is never used
 	if (charArray == NULL || lengthArray == NULL || numStrings <= 0

@@ -251,8 +251,7 @@ public:
 	virtual void DrawEllipse(const BRect& rect, bool fill);
 	virtual void DrawPolygon(size_t numPoints, const BPoint points[], bool isClosed, bool fill);
 	virtual void DrawShape(const BShape& shape, bool fill);
-	virtual void DrawString(const char* string, size_t length, float spaceEscapement,
-		float nonSpaceEscapement);
+	virtual void DrawString(const char* string, size_t length, const escapement_delta& delta);
 	virtual void DrawPixels(const BRect& source, const BRect& destination, uint32 width,
 		uint32 height, size_t bytesPerRow, color_space pixelFormat, uint32 flags, const void* data,
 		size_t length);
@@ -589,18 +588,16 @@ CanvasCallbacks::StrokeLineGradient(const BPoint& _start, const BPoint& _end,
 
 
 void
-CanvasCallbacks::DrawString(const char* string, size_t length, float deltaSpace,
-	float deltaNonSpace)
+CanvasCallbacks::DrawString(const char* string, size_t length, const escapement_delta& delta)
 {
 	// NOTE: the picture data was recorded with a "set pen location"
 	// command inserted before the "draw string" command, so we can
 	// use PenLocation()
 	BPoint location = fCanvas->CurrentState()->PenLocation();
 
-	escapement_delta delta = { deltaSpace, deltaNonSpace };
 	fCanvas->PenToScreenTransform().Apply(&location);
 	location = fCanvas->GetDrawingEngine()->DrawString(string, length,
-		location, &delta);
+		location, const_cast<escapement_delta*>(&delta));
 
 	fCanvas->PenToScreenTransform().Apply(&location);
 	fCanvas->CurrentState()->SetPenLocation(location);

@@ -21,6 +21,8 @@
 #include <Region.h>
 
 
+struct escapement_delta;
+
 class BAffineTransform;
 class BGradient;
 class BList;
@@ -153,8 +155,7 @@ public:
 	virtual void DrawEllipse(const BRect& rect, bool fill) {}
 	virtual void DrawPolygon(size_t numPoints, const BPoint points[], bool isClosed, bool fill) {}
 	virtual void DrawShape(const BShape& shape, bool fill) {}
-	virtual void DrawString(const char* string, size_t length, float spaceEscapement,
-		float nonSpaceEscapement) {}
+	virtual void DrawString(const char* string, size_t length, const escapement_delta& delta) {}
 	virtual void DrawPixels(const BRect& source, const BRect& destination, uint32 width,
 		uint32 height, size_t bytesPerRow, color_space pixelFormat, uint32 flags, const void* data,
 		size_t length) {}

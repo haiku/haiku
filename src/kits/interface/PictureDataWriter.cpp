@@ -494,8 +494,8 @@ PictureDataWriter::WriteDrawString(const BPoint& where, const char* string,
 		BeginOp(B_PIC_DRAW_STRING);
 		Write<int32>(length);
 		WriteData(string, length);
-		Write<float>(escapement.space);
 		Write<float>(escapement.nonspace);
+		Write<float>(escapement.space);
 		EndOp();
 	} catch (status_t& status) {
 		return status;
