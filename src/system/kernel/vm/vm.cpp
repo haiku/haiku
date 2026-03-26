@@ -1175,7 +1175,7 @@ discard_area_range(VMArea* area, addr_t address, addr_t size)
 	cache->Discard(area->cache_offset + offset, size);
 
 	if (commitmentChange != 0)
-		cache->Commit(cache->committed_size + commitmentChange, VM_PRIORITY_USER);
+		cache->Commit(cache->Commitment() + commitmentChange, VM_PRIORITY_USER);
 
 	cache->ReleaseRefAndUnlock();
 	return B_OK;
@@ -6567,7 +6567,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			}
 
 			if (commitmentChange != 0) {
-				off_t newCommitment = topCache->committed_size + commitmentChange;
+				off_t newCommitment = topCache->Commitment() + commitmentChange;
 				const ssize_t topCacheSize = topCache->virtual_end - topCache->virtual_base;
 				if (newCommitment > topCacheSize) {
 					// This should only happen in the case where this process fork()ed,

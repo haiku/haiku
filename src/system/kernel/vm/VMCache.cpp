@@ -148,7 +148,7 @@ class SetMinimalCommitment : public VMCacheTraceEntry {
 		SetMinimalCommitment(VMCache* cache, off_t commitment)
 			:
 			VMCacheTraceEntry(cache),
-			fOldCommitment(cache->committed_size),
+			fOldCommitment(cache->Commitment()),
 			fCommitment(commitment)
 		{
 			Initialized();
@@ -1080,7 +1080,7 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 
 	// If we don't have enough committed space to cover through to the new end
 	// of the area...
-	if (committed_size < commitment) {
+	if (Commitment() < commitment) {
 #if KDEBUG
 		const off_t size = PAGE_ALIGN(virtual_end - virtual_base);
 		ASSERT_PRINT(commitment <= size, "cache %p, commitment %" B_PRIdOFF ", size %" B_PRIdOFF,
@@ -1304,6 +1304,13 @@ VMCache::FlushAndRemoveAllPages()
 	}
 
 	return B_OK;
+}
+
+
+off_t
+VMCache::Commitment() const
+{
+	return committed_size;
 }
 
 

@@ -278,7 +278,7 @@ update_cache_info_recursively(VMCache* cache, cache_info& info)
 {
 	info.page_count += cache->page_count;
 	if (cache->type == CACHE_TYPE_RAM)
-		info.committed += cache->committed_size;
+		info.committed += cache->Commitment();
 
 	// recurse
 	for (VMCache::ConsumerList::Iterator it = cache->consumers.GetIterator();
@@ -324,7 +324,7 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 		kprintf("/%lu", info.page_count);
 
 	if (cache->type == CACHE_TYPE_RAM || (level == 0 && info.committed > 0)) {
-		kprintf(", committed: %" B_PRIdOFF, cache->committed_size);
+		kprintf(", committed: %" B_PRIdOFF, cache->Commitment());
 
 		if (level == 0)
 			kprintf("/%lu", info.committed);

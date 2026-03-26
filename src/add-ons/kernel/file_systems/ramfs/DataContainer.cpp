@@ -256,7 +256,7 @@ off_t
 DataContainer::GetCommittedSize() const
 {
 	if (_IsCacheMode())
-		return sizeof(VMForVnodeCache) + fCache->committed_size;
+		return sizeof(VMForVnodeCache) + fCache->Commitment();
 	else
 		return fSmallBufferSize;
 }

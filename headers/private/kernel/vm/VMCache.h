@@ -99,6 +99,13 @@ public:
 	inline	void				ReleaseRef();
 	inline	void				ReleaseRefAndUnlock(
 									bool consumerLocked = false);
+			int32				RefCount() const
+									{ return fRefCount; }
+
+			void*				UserData()	{ return fUserData; }
+			void				SetUserData(void* data)	{ fUserData = data; }
+									// Settable by the lock owner and valid as
+									// long as the lock is owned.
 
 	inline	VMCacheRef*			CacheRef() const	{ return fCacheRef; }
 
@@ -129,9 +136,6 @@ public:
 			void				TakeAreasFrom(VMCache* fromCache);
 			uint32				CountWritableAreas(VMArea* ignoreArea) const;
 
-			status_t			WriteModified();
-			status_t			SetMinimalCommitment(off_t commitment,
-									int priority);
 	virtual	status_t			Resize(off_t newSize, int priority);
 	virtual	status_t			Rebase(off_t newBase, int priority);
 	virtual	status_t			Adopt(VMCache* source, off_t offset, off_t size,
@@ -141,20 +145,14 @@ public:
 
 			status_t			FlushAndRemoveAllPages();
 
-			void*				UserData()	{ return fUserData; }
-			void				SetUserData(void* data)	{ fUserData = data; }
-									// Settable by the lock owner and valid as
-									// long as the lock is owned.
-
-			// for debugging only
-			int32				RefCount() const
-									{ return fRefCount; }
-
-	// backing store operations
+			status_t			SetMinimalCommitment(off_t commitment,
+									int priority);
+			off_t				Commitment() const;
 	virtual	bool				CanOvercommit();
 	virtual	status_t			Commit(off_t size, int priority);
-	virtual	bool				StoreHasPage(off_t offset);
 
+	// backing store operations
+	virtual	bool				StoreHasPage(off_t offset);
 	virtual	status_t			Read(off_t offset, const generic_io_vec *vecs,
 									size_t count, uint32 flags,
 									generic_size_t *_numBytes);
@@ -166,6 +164,7 @@ public:
 									generic_size_t numBytes, uint32 flags,
 									AsyncIOCallback* callback);
 	virtual	bool				CanWritePage(off_t offset);
+			status_t			WriteModified();
 
 	virtual	int32				MaxPagesPerWrite() const
 									{ return -1; } // no restriction
