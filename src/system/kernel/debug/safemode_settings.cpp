@@ -105,6 +105,13 @@ get_option_from_kernel_args(kernel_args* args, const char* settingsName,
 						valueStart = settings;
 						elementEnd = &valueEnd;
 					}
+
+					if (*settings == '"' || *settings == '\'') {
+						// Just take everything until the end of the line, and let
+						// the caller deal with the quotations.
+						settings = lineEnd;
+						sawSeparator = true;
+					}
 					break;
 			}
 
