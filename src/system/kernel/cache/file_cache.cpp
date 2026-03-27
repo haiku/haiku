@@ -161,6 +161,7 @@ PrecacheIO::Prepare(vm_page_reservation* reservation)
 	for (generic_size_t pos = 0; pos < fSize; pos += B_PAGE_SIZE) {
 		vm_page* page = vm_page_allocate_page(reservation,
 			PAGE_STATE_CACHED | VM_PAGE_ALLOC_BUSY);
+		page->busy_io = true;
 
 		fCache->InsertPage(page, fOffset + pos);
 
@@ -214,14 +215,25 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 
 		DEBUG_PAGE_ACCESS_TRANSFER(fPages[i], fAllocatingThread);
 
-		fCache->MarkPageUnbusy(fPages[i]);
+		if (!fPages[i]->busy_io) {
+			// The busy_io flag was cleared. Let the cache handle the rest.
+			fCache->FreeRemovedPage(fPages[i]);
+			continue;
+		}
 
+		fPages[i]->busy_io = false;
+		fCache->MarkPageUnbusy(fPages[i]);
 		DEBUG_PAGE_ACCESS_END(fPages[i]);
 	}
 
 	// Free pages after failed I/O
 	for (uint32 i = pagesTransferred; i < fPageCount; i++) {
 		DEBUG_PAGE_ACCESS_TRANSFER(fPages[i], fAllocatingThread);
+		if (!fPages[i]->busy_io) {
+			fCache->FreeRemovedPage(fPages[i]);
+			continue;
+		}
+
 		fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
 		fCache->RemovePage(fPages[i]);
 		vm_page_free(fCache, fPages[i]);
@@ -398,6 +410,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	for (generic_size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
 			reservation, PAGE_STATE_CACHED | VM_PAGE_ALLOC_BUSY);
+		page->busy_io = true;
 
 		cache->InsertPage(page, offset + pos);
 
@@ -421,6 +434,11 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		cache->Lock();
 
 		for (int32 i = 0; i < pageIndex; i++) {
+			if (!pages[i]->busy_io) {
+				cache->FreeRemovedPage(pages[i]);
+				continue;
+			}
+
 			cache->NotifyPageEvents(pages[i], PAGE_EVENT_NOT_BUSY);
 			cache->RemovePage(pages[i]);
 			vm_page_free(cache, pages[i]);
@@ -450,8 +468,14 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
-		DEBUG_PAGE_ACCESS_END(pages[i]);
+		if (!pages[i]->busy_io) {
+			cache->FreeRemovedPage(pages[i]);
+			continue;
+		}
+
+		pages[i]->busy_io = false;
 		cache->MarkPageUnbusy(pages[i]);
+		DEBUG_PAGE_ACCESS_END(pages[i]);
 	}
 
 	return B_OK;
@@ -523,6 +547,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 			reservation,
 			(writeThrough ? PAGE_STATE_CACHED : PAGE_STATE_MODIFIED)
 				| VM_PAGE_ALLOC_BUSY);
+		page->busy_io = true;
 
 		page->modified = !writeThrough;
 
@@ -622,8 +647,13 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
-		ref->cache->MarkPageUnbusy(pages[i]);
+		if (!pages[i]->busy_io) {
+			ref->cache->FreeRemovedPage(pages[i]);
+			continue;
+		}
 
+		pages[i]->busy_io = false;
+		ref->cache->MarkPageUnbusy(pages[i]);
 		DEBUG_PAGE_ACCESS_END(pages[i]);
 	}
 
