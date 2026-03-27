@@ -678,6 +678,8 @@ VMCache::Delete()
 		panic("cache %p to be deleted still has areas", this);
 	if (!consumers.IsEmpty())
 		panic("cache %p to be deleted still has consumers", this);
+	if (!fRemovedBusyPages.IsEmpty())
+		panic("cache %p to be deleted still has removed busy pages", this);
 
 	T(Delete(this));
 
@@ -815,6 +817,20 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 
 	if (page->WiredCount() > 0)
 		IncrementWiredPagesCount();
+}
+
+
+/*!	Frees a page that was removed by _FreePageRange(), but which was busy
+	and couldn't be freed then.
+*/
+void
+VMCache::FreeRemovedPage(vm_page* page)
+{
+	AssertLocked();
+
+	NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
+	fRemovedBusyPages.Remove(page);
+	vm_page_free(this, page);
 }
 
 
@@ -1103,33 +1119,38 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 		page = it.Next()) {
 
 		if (page->busy) {
-			if (page->busy_writing) {
-				// We cannot wait for the page to become available
-				// as we might cause a deadlock this way
-				page->busy_writing = false;
-					// this will notify the writer to free the page
-				if (freedPages != NULL)
-					(*freedPages)++;
-				continue;
+			if (!page->busy_writing) {
+				// wait for page to become unbusy
+				WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
+				return true;
 			}
 
-			// wait for page to become unbusy
-			WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
-			return true;
+			// We cannot wait for the page to become available
+			// as we might cause a deadlock this way
+			page->busy_writing = false;
+				// this will notify the writer to free the page
 		}
 
-		// remove the page and put it into the free queue
-		DEBUG_PAGE_ACCESS_START(page);
-		vm_remove_all_page_mappings(page);
 		ASSERT(page->WiredCount() == 0);
 			// TODO: Find a real solution! If the page is wired
 			// temporarily (e.g. by lock_memory()), we actually must not
 			// unmap it!
+
+		// remove the page and put it into the free queue
+		DEBUG_PAGE_ACCESS_START(page);
+		vm_remove_all_page_mappings(page);
+
 		RemovePage(page);
 			// Note: When iterating through a IteratableSplayTree
 			// removing the current node is safe.
 
-		vm_page_free(this, page);
+		if (page->busy) {
+			fRemovedBusyPages.Add(page);
+			DEBUG_PAGE_ACCESS_END(page);
+		} else {
+			vm_page_free(this, page);
+		}
+
 		if (freedPages != NULL)
 			(*freedPages)++;
 	}

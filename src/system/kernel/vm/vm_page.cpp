@@ -2087,54 +2087,45 @@ PageWriteWrapper::Done(status_t result)
 	DEBUG_PAGE_ACCESS_START(fPage);
 
 	fPage->busy = false;
-		// Set unbusy and notify later by hand, since we might free the page.
+		// Set unbusy and notify later by hand.
 
 	bool success = true;
 
-	if (result == B_OK) {
+	if (!fPage->busy_writing) {
+		// The busy_writing flag was cleared. That means the cache tried to remove
+		// the page while we were trying to write it. Let the cache handle the rest.
+		fCache->FreeRemovedPage(fPage);
+	} else if (result == B_OK) {
 		// put it into the active/inactive queue
 		move_page_to_appropriate_queue(fPage);
 		fPage->busy_writing = false;
 		DEBUG_PAGE_ACCESS_END(fPage);
+
+		fCache->NotifyPageEvents(fPage, PAGE_EVENT_NOT_BUSY);
 	} else {
-		// Writing the page failed. One reason would be that the cache has been
-		// shrunk and the page does no longer belong to the file. Otherwise the
-		// actual I/O failed, in which case we'll simply keep the page modified.
+		// Writing the page failed -- mark the page modified and move it to
+		// an appropriate queue other than the modified queue, so we don't
+		// keep trying to write it over and over again. We keep
+		// non-temporary pages in the modified queue, though, so they don't
+		// get lost in the inactive queue.
+		dprintf("PageWriteWrapper: Failed to write page %p: %s\n", fPage,
+			strerror(result));
 
-		if (!fPage->busy_writing) {
-			// The busy_writing flag was cleared. That means the cache has been
-			// shrunk while we were trying to write the page and we have to free
-			// it now.
-			vm_remove_all_page_mappings(fPage);
-// TODO: Unmapping should already happen when resizing the cache!
-			fCache->RemovePage(fPage);
-			free_page(fPage, false);
-			unreserve_pages(1);
-		} else {
-			// Writing the page failed -- mark the page modified and move it to
-			// an appropriate queue other than the modified queue, so we don't
-			// keep trying to write it over and over again. We keep
-			// non-temporary pages in the modified queue, though, so they don't
-			// get lost in the inactive queue.
-			dprintf("PageWriteWrapper: Failed to write page %p: %s\n", fPage,
-				strerror(result));
+		fPage->modified = true;
+		if (!fCache->temporary)
+			set_page_state(fPage, PAGE_STATE_MODIFIED);
+		else if (fPage->IsMapped())
+			set_page_state(fPage, PAGE_STATE_ACTIVE);
+		else
+			set_page_state(fPage, PAGE_STATE_INACTIVE);
 
-			fPage->modified = true;
-			if (!fCache->temporary)
-				set_page_state(fPage, PAGE_STATE_MODIFIED);
-			else if (fPage->IsMapped())
-				set_page_state(fPage, PAGE_STATE_ACTIVE);
-			else
-				set_page_state(fPage, PAGE_STATE_INACTIVE);
+		fPage->busy_writing = false;
+		DEBUG_PAGE_ACCESS_END(fPage);
 
-			fPage->busy_writing = false;
-			DEBUG_PAGE_ACCESS_END(fPage);
-
-			success = false;
-		}
+		fCache->NotifyPageEvents(fPage, PAGE_EVENT_NOT_BUSY);
+		success = false;
 	}
 
-	fCache->NotifyPageEvents(fPage, PAGE_EVENT_NOT_BUSY);
 	fIsActive = false;
 
 	return success;

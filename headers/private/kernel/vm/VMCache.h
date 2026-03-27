@@ -115,6 +115,7 @@ public:
 									{ if (fPageEventWaiters != NULL)
 										_NotifyPageEvents(page, events); }
 	inline	void				MarkPageUnbusy(vm_page* page);
+			void				FreeRemovedPage(vm_page* page);
 
 			vm_page*			LookupPage(off_t offset);
 			void				InsertPage(vm_page* page, off_t offset);
@@ -232,11 +233,16 @@ private:
 									page_num_t* toPage, page_num_t* freedPages);
 
 private:
+	typedef DoublyLinkedQueue<vm_page, DoublyLinkedListCLink<vm_page,
+		SplayTreeLink<vm_page>, &vm_page::cache_link> > RemovedPagesQueue;
+
+private:
 			int32				fRefCount;
 			mutex				fLock;
 			PageEventWaiter*	fPageEventWaiters;
 			void*				fUserData;
 			VMCacheRef*			fCacheRef;
+			RemovedPagesQueue	fRemovedBusyPages;
 
 			page_num_t			fWiredPagesCount;
 			uint64				fFaultCount;
