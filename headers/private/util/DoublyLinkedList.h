@@ -83,22 +83,23 @@ public:
 	}
 };
 
-// DoublyLinkedListCLink - interface to struct list
-template<typename Element>
+// DoublyLinkedListCLink - interface to struct list (or equivalent)
+template<typename Element, typename CLink = struct list_link,
+	CLink Element::* LinkMember = &Element::link>
 class DoublyLinkedListCLink {
-	private:
-		typedef DoublyLinkedListLink<Element> Link;
+private:
+	typedef DoublyLinkedListLink<Element> Link;
 
-	public:
-		inline Link* operator()(Element* element) const
-		{
-			return (Link*)&element->link;
-		}
+public:
+	inline Link* operator()(Element* element) const
+	{
+		return (Link*)&(element->*LinkMember);
+	}
 
-		inline const Link* operator()(const Element* element) const
-		{
-			return (const Link*)&element->link;
-		}
+	inline const Link* operator()(const Element* element) const
+	{
+		return (Link*)&(element->*LinkMember);
+	}
 };
 
 // for convenience
