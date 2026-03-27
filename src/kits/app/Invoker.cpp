@@ -90,8 +90,9 @@ BInvoker::SetTarget(BMessenger messenger)
 status_t
 BInvoker::SetTarget(const BHandler* handler, const BLooper* looper)
 {
-	fMessenger = BMessenger(handler, looper);
-	return B_OK;
+	status_t result = B_OK;
+	fMessenger = BMessenger(handler, looper, &result);
+	return result;
 }
 
 
