@@ -146,7 +146,7 @@ private:
 	uint8					state : 3;
 public:
 	bool					busy : 1;
-	bool					busy_writing : 1;
+	bool					busy_io : 1;
 	bool					accessed : 1;
 	bool					modified : 1;
 	uint8					_unused : 1;
@@ -207,7 +207,7 @@ vm_page::Init(page_num_t pageNumber)
 	SetCacheRef(NULL);
 
 	InitState(PAGE_STATE_FREE);
-	busy = busy_writing = false;
+	busy = busy_io = false;
 	accessed = modified = false;
 	_unused = 0;
 	usage_count = 0;

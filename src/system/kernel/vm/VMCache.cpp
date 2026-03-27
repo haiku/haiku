@@ -1119,16 +1119,16 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 		page = it.Next()) {
 
 		if (page->busy) {
-			if (!page->busy_writing) {
+			if (!page->busy_io) {
 				// wait for page to become unbusy
 				WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
 				return true;
 			}
 
 			// We cannot wait for the page to become available
-			// as we might cause a deadlock this way
-			page->busy_writing = false;
-				// this will notify the writer to free the page
+			// as we might cause a deadlock that way
+			page->busy_io = false;
+				// this will notify the reader/writer to free the page
 		}
 
 		ASSERT(page->WiredCount() == 0);
