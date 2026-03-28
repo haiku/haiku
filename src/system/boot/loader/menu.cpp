@@ -880,6 +880,25 @@ public:
 		return true;
 	}
 
+	bool AppendQuoted(const char* toAppend)
+	{
+		if (!Append("\"", 1))
+			return false;
+
+		while (*toAppend) {
+			if ((*toAppend == '\\' || *toAppend == '"') && !Append("\\", 1))
+				return false;
+			if (!Append(toAppend, 1))
+				return false;
+			toAppend++;
+		}
+
+		if (!Append("\"", 1))
+			return false;
+
+		return true;
+	}
+
 private:
 	bool _Resize(size_t newLength)
 	{
@@ -1570,7 +1589,7 @@ apply_safe_mode_path_blocklist()
 
 	for (PathBlocklist::Iterator it = sPathBlocklist->GetIterator();
 		BlockedPath* path = it.Next();) {
-		success &= sSafeModeOptionsBuffer.Append(path->Path());
+		success &= sSafeModeOptionsBuffer.AppendQuoted(path->Path());
 		success &= sSafeModeOptionsBuffer.Append("\n", 1);
 	}
 
