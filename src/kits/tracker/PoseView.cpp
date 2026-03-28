@@ -7391,7 +7391,7 @@ BPoseView::MouseIdle(const BMessage* message)
 		// message but we need the buttons state anyway
 		// and B_MOUSE_IDLE message doesn't pass it
 
-	if (buttons == 0 || IsDragging())
+	if (buttons == 0 || !IsDragging())
 		return;
 
 	if (fDropTarget != NULL) {
