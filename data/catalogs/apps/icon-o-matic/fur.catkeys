@@ -1,4 +1,4 @@
-1	friulian	x-vnd.haiku-icon_o_matic	150011047
+1	friulian	x-vnd.haiku-icon_o_matic	147386950
 None	Icon-O-Matic-Properties		Nissun
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Nete il segn
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -55,10 +55,12 @@ OK	Icon-O-Matic-ColorPicker		Va ben
 Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Impostazion multiple %property%
 Error: 	Icon-O-Matic-Main		Erôr: 
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Ristabilìs {0, plural, one{trasformazion} other{trasformazions}}
+SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey will be exported as linear approximations and may look different in other viewers.	Icon-O-Matic-SVGExport		SVG nol supuarte cualchi gjenar di gradient (conic, diamant, xy, sqrt_xy).\n\nA vignaran espuartâts tant che aprossimazions lineârs e al è pussibil che in altris visualizadôrs a vignaran fûr diviers.
 Assign style	Icon-O-Matic-AssignStyleCmd		Assegne stîl
 Saving your document failed!	Icon-O-Matic-Exporter		No si è rivâts a salvâ il document!
 Snap to grid	Icon-O-Matic-Menu-Settings		Vincole ae gridele
 Opening the document failed!	Icon-O-Matic-Main		No si è rivâts a vierzi il document!
+SVG export	Icon-O-Matic-SVGExport		Esportazion SVG
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Gjave {0, plural, one{stîl} other{stîi}}
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Un o plui segns a àn masse vertiçs. Il formât HVIF a'nt supuarte un massim di 255 par grafic.
 Add with path & style	Icon-O-Matic-ShapesList		Zonte cun segn e stîl
@@ -76,6 +78,7 @@ Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Zonte {0, p
 Remove	Icon-O-Matic-PathManipulator		Gjave
 Duplicate	Icon-O-Matic-ShapesList		Dupliche
 Alpha	Icon-O-Matic-PropertyNames		Alfa
+OK	Icon-O-Matic-SVGExport		Va ben
 Contour	Transformation		Contor
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Zonte {0, plural, one{trasformadôr} other{trasformadôrs}}
 Miter limit	Icon-O-Matic-PropertyNames		Limit di comissure
@@ -93,6 +96,7 @@ Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCm
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Gjave {0, plural, one{forme} other{formis}}
 Undo: %action%	Icon-O-Matic-Main		Disfe: %action%
 Diamond	Icon-O-Matic-StyleTypes		Diamant
+%appname% might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Al è pussibil che %appname% nol vedi interpretât ducj i dâts dal SVG cuant che al è stât cjariât. Lant a sorescrivi il file origjinâl, chestis informazions a laran pierdudis.
 Don't save	Icon-O-Matic-Menu-Settings		No sta salvâ
 Add shape with path	Icon-O-Matic-Menu-Shape		Zonte forme cun segn
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Pecjât

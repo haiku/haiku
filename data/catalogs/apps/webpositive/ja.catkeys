@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	4110209091
+1	japanese	x-vnd.Haiku-WebPositive	3459776802
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 Copy	Console Window		コピー
@@ -153,6 +153,7 @@ Proxy server address:	Settings Window		アドレス:
 Search page:	Settings Window		検索ページ:
 Settings	WebPositive Window		設定
 Show in Tracker	BookmarkBar		Tracker に表示
+(%currentSize% received, %rate%/s)	Download Window		(%currentSize% 受信済, %rate%/s)
 Clear	URL Bar		クリア
 Loading %url	WebPositive Window		%url の読み込み中
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.

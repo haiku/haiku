@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Bluetooth	2418272625
+1	croatian	x-vnd.Haiku-Bluetooth	3024644781
 Positioning	DeviceClass		Pozicioniranje
 Controller	DeviceClass		Kontroler
 Common ISDN access	DeviceClass		Uobičajeni ISDN pristup
@@ -30,7 +30,6 @@ Phone	DeviceClass		Telefon
 Laptop	DeviceClass		Prijenosno računalo
 Cordless	DeviceClass		Bežično
 Invalid device class!\n	DeviceClass		Neispravna klasa uređaja!\n
-Not implemented	RemoteDevice		Nije primjenjeno
 Gaming/Toy	DeviceClass		Igranje/Igračka
 Video camera	DeviceClass		Video kamera
 Handheld	DeviceClass		Priručni

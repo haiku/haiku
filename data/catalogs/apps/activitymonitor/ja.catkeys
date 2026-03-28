@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	1159274874
+1	japanese	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		チーム数
 Temp	DataSource		温度
 Block cache memory	DataSource		ブロックキャッシュメモリ
@@ -10,6 +10,7 @@ ActivityMonitor	System name		アクティビティモニター
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		更新間隔:
 Settings…	ActivityWindow		設定...
+Unknown thermal sensor	SystemInfoHandler		不明な温度センサー
 Block cache	DataSource		ブロックキャッシュ
 Memory	DataSource		メモリ
 No thermal sensor	SystemInfoHandler		温度センサー無し

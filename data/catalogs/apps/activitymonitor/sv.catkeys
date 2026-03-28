@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	1159274874
+1	swedish	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Processer
 Temp	DataSource		Temp
 Block cache memory	DataSource		Blockcacheminne
@@ -10,6 +10,7 @@ ActivityMonitor	System name		AktivitetsÖvervakare
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Uppdateringsintervall:
 Settings…	ActivityWindow		Inställningar...
+Unknown thermal sensor	SystemInfoHandler		Okänd termisk sensor
 Block cache	DataSource		Blockbuffert
 Memory	DataSource		Minne
 No thermal sensor	SystemInfoHandler		Ingen termisk sensor

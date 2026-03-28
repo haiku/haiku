@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	804185642
+1	hungarian	x-vnd.Be-MAIL	1977644174
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattints a Küldésre, ha mindenképp el akarod küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térj vissza, és javítsd ki azt.
 Text wrapping:	Mail		Szöveg tördelése:
 Show icons & labels	Mail		Ikonok és feliratok
@@ -47,6 +47,7 @@ Show icons only	Mail		Csak ikonok megjelenítése
 Subject:	Mail		Tárgy:
 OK	Mail		Rendben
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+All people	AddressTextControl		Össze személy
 Quit	Mail		Kilépés
 Title:	Mail		Cím:
 Account from mail	Mail		Levél alapján
@@ -71,6 +72,7 @@ Cancel	Mail		Mégse
 Off	Mail		Ki
 Signature:	Mail		Aláírás
 Forward without attachments	Mail		Továbbítás mellékletek nélkül
+None	Settings		Nincs
 queries	B_USER_DIRECTORY/mail/queries		Lekérdezések
 View	Mail		Nézet
 Signatures	Mail		Aláírás
@@ -91,13 +93,16 @@ Open draft	Mail		Piszkozat megnyitása
 Random	Mail		Véletlen
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Megőrzés 'Új'-ként
 Attach attributes:	Mail		Jellemzők csatolása:
+Remove label	Mail		Cimke eltávolítása
 Find again	Mail		Keresés ismétlése
 Size:	Mail		Méret:
+New label:	LabelWindow		Új cimke:
 To:	Mail		Címzett:
 Need Tracker to move items to trash	Mail		Szükség van a Nyomkövetőre a Szemetesbe mozgatáshoz
 The mail_daemon could not be started:\n\t	Mail		A mail_daemon nem indítható:\n\t
 <no account found>	Mail		<nem található fiók>
 helpful message	Mail		segítőkész üzenet
+Label as…	Mail		Cimkézés…
  Read 	Mail		Olvas
 Font:	Mail		Betűtípus:
 Accounts…	Mail		Fiókok…
@@ -105,6 +110,7 @@ Previous	Mail		Előző
 Include file attributes in attachments	Mail		Csatolás egy külön fájlként.
 Start now	Mail		Kezdés most
 (Name unavailable)	Mail		(A név nem elérhető)
+Cancel	LabelWindow		Mégse
 Move to trash	Mail		Áthelyezés a Szemetesbe
 <none>	Mail		<nincs>
 %d - Date	Mail		%d - dátum
@@ -132,6 +138,7 @@ Hide	Mail		Elrejtés
 From:	Mail		Feladó:
 No file attributes, just plain data	Mail		Csak maga a fájl csatolása.
 Add	Mail		Hozzáadás
+Same label	Mail		Azonos cimke
 out	B_USER_DIRECTORY/mail/out		Kimenő
 Send this message before closing?	Mail		Elküldi ezt az üzenetet bezárás előtt?
 in	B_USER_DIRECTORY/mail/in		Bejövő
@@ -154,13 +161,16 @@ Remove attachment	Mail		Eltávolítás
 Edit	Mail		Szerkesztés
 Page setup…	Mail		Oldalbeállítás…
 An error occurred trying to save this signature.	Mail		Hiba történt az aláírás mentése közben.
+Set label	Mail		Cinke megadása
 Beginner	Mail		Kezdő
 Previous message, keep status	Mail		Előző üzenet, állapot megtartása
 Send message	Mail		Levél küldése
 Delete	Mail		Törlés
 Put your favorite e-mail queries and query templates in this folder.	Mail		Helyezze a kedvenc lekérdezéseket és a lekérdezési sablonokat ebbe a mappába.
+Manage labels…	Mail		Cimkék kezelése…
 Spam	Mail		Levélszemét
 Couldn't open this signature. Sorry.	Mail		Sajnálom, de nem nyitható meg ez az aláírás.
+OK	LabelWindow		Rendben
 Revert	Mail		Visszaállít
 Unknown	Mail		Ismeretlen
 Increase quote level	Mail		Szint növelése

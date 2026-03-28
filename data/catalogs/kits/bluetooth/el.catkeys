@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Bluetooth	3550394259
+1	greek, modern (1453-)	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Τοποθέτηση
 Controller	DeviceClass		Ελεγκτής
 Common ISDN access	DeviceClass		Κοινή πρόσβαση ISDN
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Ασύρματο
 Invalid device class!\n	DeviceClass		Μη έγκυρη κατηγορία συσκευής!\n
 Minor class: 	DeviceClass		Μικρή κατηγορία: 
 Doll/Action figure	DeviceClass		Κούκλα/Φιγούρα δράσης
-Not implemented	RemoteDevice		Δεν εφαρμόζεται
 33-50% utilized	DeviceClass		33-50% σε χρήση
 Gaming/Toy	DeviceClass		Gaming/Παιχνίδια
 Video camera	DeviceClass		Βιντεοκάμερα

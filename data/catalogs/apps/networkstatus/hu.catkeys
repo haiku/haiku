@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-NetworkStatus	1860540945
+1	hungarian	x-vnd.Haiku-NetworkStatus	3050452699
 IPv6 address:	NetworkStatusView		IPv6 cím:
 Quit	NetworkStatusView		Kilépés
 Unknown	NetworkStatusView		Ismeretlen
@@ -8,11 +8,13 @@ Open network preferences…	NetworkStatusView		Hálózati beállítások megnyit
 NetworkStatus	System name		Hálózat állapot
 Broadcast:	NetworkStatusView		Átjáró:
 OK	NetworkStatusView		Rendben
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		%appname% opcióka:\n\t--deskbar\treplikáns elhelyezése az Asztalsávra\n\t--help\t\tez az információ megjelenítése
 No link	NetworkStatusView		Nincs kapcsolat
 Connected	NetworkStatusView		Csatlakozva
 Could not join wireless network:\n	NetworkStatusView		Nem lehet csatlakozni a vezeték nélküli hálózatra:\n
 Network Status	NetworkStatusView		Hálózat állapota
 Deskbar is not running, giving up.	NetworkStatus		Az Asztalsáv nem fut, feladom.
+You can run %appname% in a window or install it in the Deskbar.	NetworkStatus		%appname% futtatható ablakban, de az Asztalsávra is helyezhető.
 Netmask:	NetworkStatusView		Hálózati maszk:
 No stateful configuration	NetworkStatusView		Nincs konfiguráció
 IPv4 address:	NetworkStatusView		IPv4 cím:

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CodyCam	2786669505
+1	hungarian	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		nincs megadva célmappa
 reply: '%s'\n	SftpClient		válasz: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <rejtett> (valódi jelszó elküldve)
@@ -50,6 +50,7 @@ server address expected	CodyCam		kiszolgáló címének megadása szükséges
 Cannot start the video window	CodyCam		Nem sikerült elindítani a videó ablakát
 reply: %d, %d\n	FtpClient		válasz: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Nem lehet beállítani az időforrást a videó ablakának
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		Nem találok videó-forrást.\nA %appname% használatához webkamera szükséges.
 Every 15 minutes	CodyCam		15 percenként
 Every 24 hours	CodyCam		24 óránként
 Image Format Menu	CodyCam		Képformátum menü

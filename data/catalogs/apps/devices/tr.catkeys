@@ -29,8 +29,8 @@ Satellite communications controller	Device		Uydu iletişimi denetleyicisi
 Device class	DeviceSCSI		Aygıt sınıfı
 Device	Device		Aygıt
 Input device controller	Device		Giriş aygıtı denetleyicisi
-ACPI System Indicator	DeviceACPI		ACPI sistem belirteci
 PCI bus	DevicesView		PCI veri yolu
+ACPI System Indicator	DeviceACPI		ACPI sistem belirteci
 ACPI System Bus	DeviceACPI		ACPI sistem veri yolu
 Tape Drive	DeviceSCSI		Kaset sürücüsü
 Changer	DeviceSCSI		Değiştirici

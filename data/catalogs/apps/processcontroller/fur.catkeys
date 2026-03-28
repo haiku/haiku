@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ProcessController	2724038695
+1	friulian	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Erôr tal salvâ il file
 Display priority	ProcessController		Prioritât di visualizazion
 That's no Fun!	ProcessController		Nol fâs ridi!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Prioritât basse
 Urgent display priority	ProcessController		Prioritât visualizazion urgjente
 Memory usage	ProcessController		Ûs de memorie
 Ok!	ProcessController		Va ben!
+%appname% is already installed in Deskbar.	ProcessController		%appname% al è za instalât tal Deskbar.
 Normal priority	ProcessController		Prioritât normâl
 Restart Deskbar	ProcessController		Torne invie Deskbar
 Usage: %s [-deskbar]\n	ProcessController		Ûs: %s [-deskbar]\n
@@ -29,7 +30,9 @@ Quit application	ProcessController		Jes de aplicazion
 Info	ProcessController		Informazions
 Kill this thread!	ProcessController		Cope chest thread!
 This team is already gone…	ProcessController		Chest team al è za lât…
+About %appname%…	ProcessController		Informazions su %appname%…
 Gone teams…	ProcessController		Teams lâts…
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		Tu puedis eseguî %appname% intun barcon o instalâlu tal Deskbar.
 Quit an application	ProcessController		Siere une aplicazion
 Cancel	ProcessController		Cancele
 Install in Deskbar	ProcessController		Instale tal Deskbar

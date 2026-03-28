@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Bluetooth	3550394259
+1	korean	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		위치잡이
 Controller	DeviceClass		컨트롤러
 Common ISDN access	DeviceClass		표준 ISDN 연결
@@ -47,7 +47,6 @@ Cordless	DeviceClass		무선
 Invalid device class!\n	DeviceClass		올바르지 않은 장치 클래스!\n
 Minor class: 	DeviceClass		마이너 클래스:
 Doll/Action figure	DeviceClass		인형/액션 피규어
-Not implemented	RemoteDevice		구현 안됨
 33-50% utilized	DeviceClass		33-50% 활용
 Gaming/Toy	DeviceClass		게이밍/장난감
 Video camera	DeviceClass		비디오 카메라

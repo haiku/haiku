@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Bluetooth	3550394259
+1	lithuanian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Padėties nustatymo įrenginys
 Controller	DeviceClass		Valdiklis
 Common ISDN access	DeviceClass		Bendra ISDN prieiga
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Belaidis
 Invalid device class!\n	DeviceClass		Negalima įrenginio klasė!\n
 Minor class: 	DeviceClass		Tikslesnioji klasė:
 Doll/Action figure	DeviceClass		Lėlė arba figūrėlė
-Not implemented	RemoteDevice		Nerealizuota
 33-50% utilized	DeviceClass		Apkrova 33–50%
 Gaming/Toy	DeviceClass		Žaidimas / žaislas
 Video camera	DeviceClass		Vaizdo kamera

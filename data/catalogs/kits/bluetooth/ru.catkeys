@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Bluetooth	3550394259
+1	russian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Позиционирование
 Controller	DeviceClass		Контроллер
 Common ISDN access	DeviceClass		Общий доступ ISDN
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Беспроводной
 Invalid device class!\n	DeviceClass		Неверный класс устройства!\n
 Minor class: 	DeviceClass		Малый класс: 
 Doll/Action figure	DeviceClass		Кукла/Игрушечная фигурка
-Not implemented	RemoteDevice		Не реализовано
 33-50% utilized	DeviceClass		Использовано 33-50%
 Gaming/Toy	DeviceClass		Игрушка
 Video camera	DeviceClass		Видеокамера

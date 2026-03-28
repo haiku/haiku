@@ -29,8 +29,8 @@ Satellite communications controller	Device		Satellittkommunikasjonskontroller
 Device class	DeviceSCSI		Enhetsklasse
 Device	Device		Enhet
 Input device controller	Device		Input-enhetskontroller
-ACPI System Indicator	DeviceACPI		ACPI-systemindikator
 PCI bus	DevicesView		PCI-buss
+ACPI System Indicator	DeviceACPI		ACPI-systemindikator
 ACPI System Bus	DeviceACPI		ACPI-systembuss
 Tape Drive	DeviceSCSI		Båndstasjon
 Changer	DeviceSCSI		Skifter

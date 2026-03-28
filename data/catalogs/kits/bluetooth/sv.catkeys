@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Bluetooth	3550394259
+1	swedish	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Position
 Controller	DeviceClass		Kontroller
 Common ISDN access	DeviceClass		Allmän ISDN åtkomst
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Trådlös
 Invalid device class!\n	DeviceClass		Ogiltig enhetsklass!\n
 Minor class: 	DeviceClass		Mindre klass:
 Doll/Action figure	DeviceClass		Docka/Leksaksgubbe
-Not implemented	RemoteDevice		Ej implementerat
 33-50% utilized	DeviceClass		33-50% utnyttjat
 Gaming/Toy	DeviceClass		Spel/Leksak
 Video camera	DeviceClass		Videokamera

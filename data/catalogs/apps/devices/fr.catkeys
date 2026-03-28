@@ -29,8 +29,8 @@ Satellite communications controller	Device		Contrôleur de communications par sa
 Device class	DeviceSCSI		Classe de périphérique
 Device	Device		Périphérique
 Input device controller	Device		Contrôleur de périphérique d’entrée
-ACPI System Indicator	DeviceACPI		Indicateur système ACPI
 PCI bus	DevicesView		Bus PCI
+ACPI System Indicator	DeviceACPI		Indicateur système ACPI
 ACPI System Bus	DeviceACPI		Bus système ACPI
 Tape Drive	DeviceSCSI		Lecteur de bandes
 Changer	DeviceSCSI		Changeur de disques

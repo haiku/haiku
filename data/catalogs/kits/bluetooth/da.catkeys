@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Bluetooth	3550394259
+1	danish	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Placering
 Controller	DeviceClass		Controller
 Common ISDN access	DeviceClass		Almen ISDN-adgang
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Trådløs
 Invalid device class!\n	DeviceClass		Ugyldig enhedsklasse!\n
 Minor class: 	DeviceClass		Mindre klasse: 
 Doll/Action figure	DeviceClass		Dukke/actionfigur
-Not implemented	RemoteDevice		Ikke implementeret
 33-50% utilized	DeviceClass		33-50% brugt
 Gaming/Toy	DeviceClass		Spil/legetøj
 Video camera	DeviceClass		Videokamera

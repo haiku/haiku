@@ -29,8 +29,8 @@ Satellite communications controller	Device		Контролер супутник�
 Device class	DeviceSCSI		Клас пристрою
 Device	Device		Пристрій
 Input device controller	Device		Контролер пристроїв вводу
-ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
 PCI bus	DevicesView		Шина PCI
+ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
 ACPI System Bus	DeviceACPI		Шина системи ACPI
 Tape Drive	DeviceSCSI		Стример
 Changer	DeviceSCSI		Чейнджер

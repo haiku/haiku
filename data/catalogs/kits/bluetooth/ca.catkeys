@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Bluetooth	3550394259
+1	catalan; valencian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Posicionament
 Controller	DeviceClass		Controlador
 Common ISDN access	DeviceClass		Accés ISDN genèric
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Sense fil
 Invalid device class!\n	DeviceClass		La classe del dispositiu no és vàlida!\n
 Minor class: 	DeviceClass		Classe secundària: 
 Doll/Action figure	DeviceClass		Nina o figura amb moviment
-Not implemented	RemoteDevice		No s'ha implementat
 33-50% utilized	DeviceClass		Usat entre el 33 i el 50%
 Gaming/Toy	DeviceClass		Joc o joguina
 Video camera	DeviceClass		Càmera de vídeo

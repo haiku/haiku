@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Bluetooth	3550394259
+1	belarusian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Размяшчэнне
 Controller	DeviceClass		Кантролер
 Common ISDN access	DeviceClass		Агульны ISDN доступ
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Бесшнуравая
 Invalid device class!\n	DeviceClass		Неправільны клас прылады!\n
 Minor class: 	DeviceClass		Дробны клас: 
 Doll/Action figure	DeviceClass		Кукла/Манекен
-Not implemented	RemoteDevice		Не ажыццяўлено
 33-50% utilized	DeviceClass		33-50% выкарыстана
 Gaming/Toy	DeviceClass		Гульня/Цацка
 Video camera	DeviceClass		Відэакамера

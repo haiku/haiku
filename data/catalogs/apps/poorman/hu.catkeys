@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PoorMan	2667626017
+1	hungarian	x-vnd.Haiku-PoorMan	3080340918
 Select web folder	PoorMan		Netes mappa kiválasztása
 Console logging	PoorMan		Konzoli naplózás
 Create Log File	PoorMan		Naplófájl készítése
@@ -9,6 +9,7 @@ Shutting down.	PoorMan		Leállás.
 Web folder:	PoorMan		Mappa:
 Log To Console	PoorMan		Naplózás konzolba
 File Name	PoorMan		Fájlnév
+Error folder	PoorMan		Hiba mappa
 Starting up... 	PoorMan		Indítás…
 Select	PoorMan		Kiválasztás
 Logging view	PoorMan		Naplózási nézet
@@ -18,11 +19,13 @@ Cancel	PoorMan		Mégse
 Directory: 	PoorMan		Mappa:
 Hits: %lu	PoorMan		Kérések: %lu
 Hits: 0	PoorMan		Kérések: 0
+%appname% settings	PoorMan		%appname% beállítások
 Shutting down.\n	PoorMan		Leállás.\n
 Select all	PoorMan		Mind kijelölése
 Send file listing if there's no start page	PoorMan		Fájllista küldése ha nincs kezdőlap
 Max. simultaneous connections:	PoorMan		Maximális kapcsolatok száma:
 Done	PoorMan		Kész
+Please choose the folder to publish on the web.\n\nYou can have %appname% create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérlek válassz egy mappát, amit közzé teszel az interneten.\n\nHa szeretnéd, a %appname% létrehozza az alapértelmezett \"public_html\" nappát a Saját mappában.\nVagy megadhatsz egyéni mappát.
 Site	PoorMan		Oldal
 Cannot start the server	PoorMan		Nem sikerült elindítani a szervert
 Create log file	PoorMan		Naplófájl készítése
@@ -31,10 +34,12 @@ Clear hit counter	PoorMan		Kérések nullázása
 Status: Stopped	PoorMan		Állapot: Leállítva
 File	PoorMan		Fájl
 Settings…	PoorMan		Beállítások…
+Create %appname% log	PoorMan		%appname% napló létrehozása
 Log To File	PoorMan		Naplózás fájlba
 Connections	PoorMan		Kapcsolatok
 Controls	PoorMan		Vezérlők
 Log to console	PoorMan		Naplózás konzolba
+Error server	PoorMan		Hiba kiszolgáló
 Advanced	PoorMan		Haladó
 Copy	PoorMan		Másolás
 Logging	PoorMan		Naplózás

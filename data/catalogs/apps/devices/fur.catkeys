@@ -29,8 +29,8 @@ Satellite communications controller	Device		Controlôr di comunicazions satelit�
 Device class	DeviceSCSI		Classe dispositîf
 Device	Device		Dispositîf
 Input device controller	Device		Controlôr dispositîfs di input
-ACPI System Indicator	DeviceACPI		Indicadôr di sisteme ACPI
 PCI bus	DevicesView		Bus PCI
+ACPI System Indicator	DeviceACPI		Indicadôr di sisteme ACPI
 ACPI System Bus	DeviceACPI		Bus di Sisteme ACPI
 Tape Drive	DeviceSCSI		Unitât a curdele magnetiche
 Changer	DeviceSCSI		Modificadôr

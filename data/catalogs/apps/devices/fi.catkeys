@@ -29,8 +29,8 @@ Satellite communications controller	Device		Satelliittiviestintäohjain
 Device class	DeviceSCSI		Laiteluokka
 Device	Device		Laite
 Input device controller	Device		Syötelaiteohjain
-ACPI System Indicator	DeviceACPI		ACPI-järjestelmäindikaattori
 PCI bus	DevicesView		PCI-väylä
+ACPI System Indicator	DeviceACPI		ACPI-järjestelmäindikaattori
 ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
 Tape Drive	DeviceSCSI		Nauha-asema
 Changer	DeviceSCSI		Vaihtaja

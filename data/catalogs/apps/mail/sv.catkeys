@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	4024882639
+1	swedish	x-vnd.Be-MAIL	1977644174
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Text wrapping:	Mail		Textradbrytning:
 Show icons & labels	Mail		Visa ikoner & etiketter
@@ -93,13 +93,16 @@ Open draft	Mail		Öppna utkast
 Random	Mail		Slumpmässigt
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lämna som 'Ny'
 Attach attributes:	Mail		Bifoga attribut:
+Remove label	Mail		Ta bort etiketten
 Find again	Mail		Sök igen
 Size:	Mail		Storlek:
+New label:	LabelWindow		Ny etikett:
 To:	Mail		Till:
 Need Tracker to move items to trash	Mail		Tracker behöver flytta objekt till papperskorgen
 The mail_daemon could not be started:\n\t	Mail		mail_daemon kunde inte startas:\n\t
 <no account found>	Mail		<inget konto hittades>
 helpful message	Mail		hjälpsamt meddelande
+Label as…	Mail		Etikett som...
  Read 	Mail		 Läs 
 Font:	Mail		Typsnitt:
 Accounts…	Mail		Konto…
@@ -107,6 +110,7 @@ Previous	Mail		Föregående
 Include file attributes in attachments	Mail		Inkludera fil attribut i bifogade filer
 Start now	Mail		Starta nu
 (Name unavailable)	Mail		(Namnet kunde inte nås)
+Cancel	LabelWindow		Avbryt
 Move to trash	Mail		Flytta till papperskorg
 <none>	Mail		<ingen>
 %d - Date	Mail		%d - Datum
@@ -134,6 +138,7 @@ Hide	Mail		Dölj
 From:	Mail		Från:
 No file attributes, just plain data	Mail		Inga fil attribut, bara vanlig data
 Add	Mail		Lägg till
+Same label	Mail		Samma etikett
 out	B_USER_DIRECTORY/mail/out		ut
 Send this message before closing?	Mail		Skicka meddelandet innan programmet stängs?
 in	B_USER_DIRECTORY/mail/in		in
@@ -156,13 +161,16 @@ Remove attachment	Mail		Ta bort bifogad fil
 Edit	Mail		Redigera
 Page setup…	Mail		Sidinställningar…
 An error occurred trying to save this signature.	Mail		Ett fel uppstod när signaturen skulle sparas.
+Set label	Mail		Ställ etikett
 Beginner	Mail		Nybörjare
 Previous message, keep status	Mail		Föregående meddelande, behåll status
 Send message	Mail		Skicka meddelande
 Delete	Mail		Ta bort
 Put your favorite e-mail queries and query templates in this folder.	Mail		Lägg din e-post fråga och frågemall i denna folder.
+Manage labels…	Mail		Hantera etiketter...
 Spam	Mail		Skräppost
 Couldn't open this signature. Sorry.	Mail		Kunde inte öppna denna signatur.
+OK	LabelWindow		OK
 Revert	Mail		Återgå
 Unknown	Mail		Okänd
 Increase quote level	Mail		Öka kvotnivå

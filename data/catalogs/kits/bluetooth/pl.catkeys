@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Bluetooth	3550394259
+1	polish	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Urządzenie pozycjonujące
 Controller	DeviceClass		Kontroler
 Common ISDN access	DeviceClass		Urządzenie dostępowe ISDN
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Urządzenie bezprzewodowe
 Invalid device class!\n	DeviceClass		Niepoprawna klasa urządzenia!\n
 Minor class: 	DeviceClass		Klasa drugorzędna: 
 Doll/Action figure	DeviceClass		Lalka
-Not implemented	RemoteDevice		Niezaimplementowane
 33-50% utilized	DeviceClass		33-50% wykorzystane
 Gaming/Toy	DeviceClass		Zabawka
 Video camera	DeviceClass		Kamera

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Bluetooth	3550394259
+1	french	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Géolocalisation
 Controller	DeviceClass		Contrôleur
 Common ISDN access	DeviceClass		Accès Numéris
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Sans fil
 Invalid device class!\n	DeviceClass		Classe de périphérique invalide !\n
 Minor class: 	DeviceClass		Classe mineure : 
 Doll/Action figure	DeviceClass		Poupée/Figurine
-Not implemented	RemoteDevice		Non implémenté
 33-50% utilized	DeviceClass		33 à 55% utilisés
 Gaming/Toy	DeviceClass		Jouet
 Video camera	DeviceClass		Caméra

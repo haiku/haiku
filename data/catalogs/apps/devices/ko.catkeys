@@ -29,8 +29,8 @@ Satellite communications controller	Device		위성 통신 컨트롤러
 Device class	DeviceSCSI		장치 클래스
 Device	Device		장치
 Input device controller	Device		입력 장치 컨트롤러
-ACPI System Indicator	DeviceACPI		ACPI 시스템 지시기
 PCI bus	DevicesView		PCI 버스
+ACPI System Indicator	DeviceACPI		ACPI 시스템 지시기
 ACPI System Bus	DeviceACPI		ACPI 시스템 버스
 Tape Drive	DeviceSCSI		테이프 장치
 Changer	DeviceSCSI		교환기

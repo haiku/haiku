@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Bluetooth	3550394259
+1	english	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		定位
 Controller	DeviceClass		控制器
 Common ISDN access	DeviceClass		通用ISDN接取
@@ -47,7 +47,6 @@ Cordless	DeviceClass		無線
 Invalid device class!\n	DeviceClass		設備類別無效！\n
 Minor class: 	DeviceClass		少數類別：
 Doll/Action figure	DeviceClass		玩偶/可動人偶
-Not implemented	RemoteDevice		未實施
 33-50% utilized	DeviceClass		利用率 33-50%
 Gaming/Toy	DeviceClass		遊戲/玩具
 Video camera	DeviceClass		攝影機

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Bluetooth	3550394259
+1	czech	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Pozicování
 Controller	DeviceClass		Ovladač
 Common ISDN access	DeviceClass		Běžný ISDN přístup
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Bezdrátový
 Invalid device class!\n	DeviceClass		Neplatná třída zařízení!\n
 Minor class: 	DeviceClass		Vedlejší třída: 
 Doll/Action figure	DeviceClass		Panenka/Akční figurka
-Not implemented	RemoteDevice		Neimplementováno
 33-50% utilized	DeviceClass		33-50% využito
 Gaming/Toy	DeviceClass		Hra/Hračka
 Video camera	DeviceClass		Videokamera

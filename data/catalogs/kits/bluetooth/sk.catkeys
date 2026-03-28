@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Bluetooth	3550394259
+1	slovak	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Umiestnenie
 Controller	DeviceClass		Ovládač
 Common ISDN access	DeviceClass		Bežný prístup ISDN
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Bezdrôtový
 Invalid device class!\n	DeviceClass		Neplatná trieda zariadenia!\n
 Minor class: 	DeviceClass		Vedľajšia trieda: 
 Doll/Action figure	DeviceClass		Bábika/akčná figúrka
-Not implemented	RemoteDevice		Neimplementované
 33-50% utilized	DeviceClass		33-50% využitých
 Gaming/Toy	DeviceClass		Hra/hračka
 Video camera	DeviceClass		Videokamera

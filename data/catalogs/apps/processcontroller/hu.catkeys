@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ProcessController	3402929872
+1	hungarian	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Hiba történt a fájl mentése során
 Display priority	ProcessController		Kijelzési prioritás
 That's no Fun!	ProcessController		Ez nem vicces!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Alacsony prioritás
 Urgent display priority	ProcessController		Magas kijelzési prioritás
 Memory usage	ProcessController		Memóriahasználat
 Ok!	ProcessController		Rendben!
+%appname% is already installed in Deskbar.	ProcessController		%appname% már az Asztalsávon található.
 Normal priority	ProcessController		Normál prioritás
 Restart Deskbar	ProcessController		Asztalsáv újraindítása
 Usage: %s [-deskbar]\n	ProcessController		Használat: %s [-deskbar]\n
@@ -31,6 +32,7 @@ Kill this thread!	ProcessController		Szál leállítása!
 This team is already gone…	ProcessController		Ez a csapat már eltűnt…
 About %appname%…	ProcessController		%appname% névjegye…
 Gone teams…	ProcessController		Eltűnt csapatok…
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		%appname% futtatható ablakban, de az Asztalsávra is helyezhető.
 Quit an application	ProcessController		Program leállítása
 Cancel	ProcessController		Mégse
 Install in Deskbar	ProcessController		Telepítés az Asztalsávra

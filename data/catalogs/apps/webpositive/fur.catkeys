@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	2402977561
+1	friulian	x-vnd.Haiku-WebPositive	3459776802
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 Copy	Console Window		Copie
@@ -89,6 +89,7 @@ New tab	WebPositive Window		Gnove schede
 Increase size	WebPositive Window		Aumente dimensions
 Today	WebPositive Window		Vuê
 Open location	WebPositive Window		Vierç posizion
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		A son ancjemò impins discjariaments, desideristu pardabon lâ fûr di %appname% cumò?
 New browser window	Download Window		Gnûf barcon dal navigadôr
 Open	Download Window		Vierç
 New window	WebPositive Window		Gnûf barcon
@@ -108,6 +109,7 @@ Apply	Settings Window		Apliche
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Al è vignût fûr un erôr tal cirî di mostrâ la cartele dai segnelibris.\n\nErôr: %error
 Revert	Settings Window		Ripristine
 Copy	WebPositive Window		Copie
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		La tô CPU e je masse vecje e no supuarte lis estensions SSE2, cence chês %appname% nol pues funzionâ. Al so puest o conseìn la instalazion di NetSurf.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Ultime rie ripetude # volte.}other{Ultime rie ripetude # voltis.}}
 Default standard font size:	Settings Window		Dimension predefinide dal caratar standard:
 Custom	Settings Window		Personalizât
@@ -151,6 +153,7 @@ Proxy server address:	Settings Window		Direzion servidôr proxy:
 Search page:	Settings Window		Pagjine di ricercje:
 Settings	WebPositive Window		Impostazions
 Show in Tracker	BookmarkBar		Mostre tal Tracker
+(%currentSize% received, %rate%/s)	Download Window		(%currentSize% ricevûts, %rate%/s)
 Clear	URL Bar		Nete
 Loading %url	WebPositive Window		Daûr a cjariâ %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ogni mês si fâs la lune, ogni dì si impare une.

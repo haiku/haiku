@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Bluetooth	3550394259
+1	friulian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Posizionament
 Controller	DeviceClass		Controlôr
 Common ISDN access	DeviceClass		Acès ISDN normâl
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Cence fîl
 Invalid device class!\n	DeviceClass		Classe dispositîf no valide.\n
 Minor class: 	DeviceClass		Classe minôr: 
 Doll/Action figure	DeviceClass		Pipine/Riproduzion in scjale
-Not implemented	RemoteDevice		No implementât
 33-50% utilized	DeviceClass		33-50% utilizât
 Gaming/Toy	DeviceClass		Zûc/zughet
 Video camera	DeviceClass		Videocjamare

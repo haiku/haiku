@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Bluetooth	3550394259
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Plassering
 Controller	DeviceClass		Kontroller
 Common ISDN access	DeviceClass		Vanlig ISDN-tilgang
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Trådløs
 Invalid device class!\n	DeviceClass		Ugyldig enhetstype!\n
 Minor class: 	DeviceClass		Mindre klasse:
 Doll/Action figure	DeviceClass		Dukke/Actionfigur
-Not implemented	RemoteDevice		Ikke implementert
 33-50% utilized	DeviceClass		33-50% i bruk
 Gaming/Toy	DeviceClass		Spill/Leke
 Video camera	DeviceClass		Videokamera

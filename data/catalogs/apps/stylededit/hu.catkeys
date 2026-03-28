@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	3212551798
+1	hungarian	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		Statisztika
 Cut	Menus		Kivágás
 Center	Menus		Középre
@@ -13,6 +13,8 @@ Search backwards	FindandReplaceWindow		Keresés visszafelé
 Find again	Menus		Keresés újra
 Read-only	StatusView		Csak olvasható
 Save	Menus		Mentés
+Untitled %d	Window title		Névtelen %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Nem tudom visszaállítani, a fájl nem található: \"%filename%\".
 Cancel	QuitAlert		Mégse
 Copy	Menus		Másolás
 Reload	NodeMonitorAlerts		Újratöltés
@@ -20,11 +22,13 @@ line %d, column %d	StatusView		%d. sor, %d. oszlop
 Words:	Statistics		Szó:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Helyreállítás
+Unable to unlock file\n\t%error%	QuitAlert		Nem tudom feloldani a fájl zárolását\n\t%error%
 OK	RevertToSavedAlert		Rendben
 Unlock file	StatusView		Fájl feloldása
 Italic	Menus		Dőlt
 Can't undo	Menus		Nem vonható vissza
 Replace…	Menus		Csere…
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		A fájl írásvédettnek van jelölve. Mented a változásokat: \"%filename%\"? 
 File	Menus		Fájl
 Paste	Menus		Beillesztés
 Bold	Menus		Félkövér
@@ -33,7 +37,10 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Sor:
 Strikeout	Menus		Áthúzás
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
+Error saving \"%filename%\":\n%error%	SaveAlert		Nem tudom menteni: \"%filename%\":\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Mentsük a változásokat: \"%title%\"?
 Save	SaveAlert		Mentés
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" nem mentett módosításokat tartalmaz.\nVisszaállítod a legutóbbi mentett változatra?
 Default	Open_and_SaveAsPanel		Alapérték
 Cancel	RevertToSavedAlert		Mégse
 Cancel	FindandReplaceWindow		Mégse
@@ -76,8 +83,10 @@ Open…	Menus		Megnyitás…
 Save as…	Menus		Mentés másként…
 Replace	FindandReplaceWindow		Cserél
 Characters:	Statistics		Karakter:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		\"%filename%\" megnyitása sikertelen:\n\tIsmeretlen formátum
 Don't save	QuitAlert		Ne mentse
 Align	Menus		Igazítás
 Font	Menus		Betűtípus
 Select all	Menus		Összes kijelölése
 Right	Menus		Jobbra
+Error loading \"%filename%\":\n\t%error%	LoadAlert		\"%filename%\" megnyitása sikertelen:\n\t%error%

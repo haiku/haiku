@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Bluetooth	3550394259
+1	turkish	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Konumlandırma
 Controller	DeviceClass		Denetleyici
 Common ISDN access	DeviceClass		Yaygın ISDN erişimi
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Kablosuz
 Invalid device class!\n	DeviceClass		Geçersiz aygıt sınıfı\n
 Minor class: 	DeviceClass		Alt sınıf: 
 Doll/Action figure	DeviceClass		Bebek/Koleksiyon figürü
-Not implemented	RemoteDevice		İşlevsel değil
 33-50% utilized	DeviceClass		%33–%50 yararlanılıyor
 Gaming/Toy	DeviceClass		Oyun/Oyuncak
 Video camera	DeviceClass		Video kamera

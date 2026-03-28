@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	3394555425
+1	hungarian	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		Képmegjelenítő
 Page setup…	Menus		Oldalbeállítás…
 Previous file	Menus		Előző fájl
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Magasság:
 Next file	Menus		Következő fájl
 Slide show	Menus		Bemutató
 Original size	Menus		Eredeti méret
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		%filename% megváltozott. Bezárod a dokumentumot?
 Width:	PrintOptionsWindow		Szélesség:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Átméretezés (1/72 colban):
 Zoom factor in %:	PrintOptionsWindow		Nagyítás mértéke százalékban:
@@ -46,6 +47,7 @@ Clear selection	Menus		Kijelölés törlése
 Rotate clockwise	Menus		Forgatás az óramutató irányába
 Open with…	Menus		Megnyitás ezzel…
 Rotate counterclockwise	Menus		Óramutató járásával ellentétes irányú forgatás
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		%filename% (%number%. oldal) megváltozott. Bezárod a dokumentumot?
 Previous page	Menus		Előző oldal
 Fit to window	Menus		Illesztés az ablakhoz
 Go to page	Menus		Oldalra ugrás

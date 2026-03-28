@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Bluetooth	3550394259
+1	thai	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		การวางตำแหน่ง
 Controller	DeviceClass		ตัวควบคุม
 Common ISDN access	DeviceClass		การเข้าถึง ISDN ทั่วไป
@@ -47,7 +47,6 @@ Cordless	DeviceClass		ไร้สาย
 Invalid device class!\n	DeviceClass		คลาสอุปกรณ์ไม่ถูกต้อง!\n
 Minor class: 	DeviceClass		คลาสรอง:
 Doll/Action figure	DeviceClass		Doll/Action figure
-Not implemented	RemoteDevice		ไม่ได้ดำเนินการ
 33-50% utilized	DeviceClass		33-50% utilized
 Gaming/Toy	DeviceClass		เกม/ของเล่น
 Video camera	DeviceClass		กล้องวิดีโอ

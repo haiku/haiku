@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Bluetooth	3550394259
+1	spanish; castilian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Posicionamiento
 Controller	DeviceClass		Controlador
 Common ISDN access	DeviceClass		Acceso común de ISDN
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Sin cable
 Invalid device class!\n	DeviceClass		Clase de dispositivo inválida.\n
 Minor class: 	DeviceClass		Clase menor:
 Doll/Action figure	DeviceClass		Muñeco/Figura de Acción
-Not implemented	RemoteDevice		Sin implementar
 33-50% utilized	DeviceClass		33-50% utilizada
 Gaming/Toy	DeviceClass		Juego/Juguete
 Video camera	DeviceClass		Videocámara

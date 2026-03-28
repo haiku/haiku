@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Pairs	3059673093
+1	hungarian	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		Párok
 Quit	PairsWindow		Kilépés
 Medium	PairsWindow		Közepes
@@ -14,4 +14,5 @@ Quit game	PairsWindow		Kilépés a játékból
 Large	PairsWindow		Nagy
 Beginner (4x4)	PairsWindow		Kezdő (4x4)
 Intermediate (6x6)	PairsWindow		Haladó (6x6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	%s nem talált elég vektoros ikont indításkor; legalább %zu szükséges, de csupán %zu található.\n
 New game	PairsWindow		Új játék

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	1159274874
+1	hungarian	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Csapatok
 Temp	DataSource		Hőfok
 Block cache memory	DataSource		Blokk gyorsítótár
@@ -10,6 +10,7 @@ ActivityMonitor	System name		Folyamatmonitor
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Frissítési gyakoriság:
 Settings…	ActivityWindow		Beállítások…
+Unknown thermal sensor	SystemInfoHandler		Ismeretlen hőmérséklet érzékelő
 Block cache	DataSource		Blokk gyorsítótár
 Memory	DataSource		Memória
 No thermal sensor	SystemInfoHandler		Nincs hőérzékelő

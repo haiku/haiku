@@ -29,8 +29,8 @@ Satellite communications controller	Device		Műholdas kommunikációs vezérlő
 Device class	DeviceSCSI		Eszközosztály
 Device	Device		Eszközök
 Input device controller	Device		Beviteli eszköz vezérlő
-ACPI System Indicator	DeviceACPI		ACPI rendszerjelző
 PCI bus	DevicesView		PCI port
+ACPI System Indicator	DeviceACPI		ACPI rendszerjelző
 ACPI System Bus	DeviceACPI		ACPI rendszerbusz
 Tape Drive	DeviceSCSI		Szalagos meghajtó
 Changer	DeviceSCSI		Cserélő

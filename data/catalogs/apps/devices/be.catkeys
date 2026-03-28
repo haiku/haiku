@@ -26,8 +26,8 @@ Satellite communications controller	Device		Кантролер спадарож�
 Device class	DeviceSCSI		Клас прылады
 Device	Device		Прылада
 Input device controller	Device		Кантролер прылад уводу
-ACPI System Indicator	DeviceACPI		Сістэмны індыкатар ACPI
 PCI bus	DevicesView		Шына PCI
+ACPI System Indicator	DeviceACPI		Сістэмны індыкатар ACPI
 ACPI System Bus	DeviceACPI		Сістэмная шына ACPI
 Tape Drive	DeviceSCSI		Прывад ленты
 Changer	DeviceSCSI		Чэйнджэр

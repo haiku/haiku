@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Pairs	3059673093
+1	friulian	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		Pairs
 Quit	PairsWindow		Jes
 Medium	PairsWindow		Medi
@@ -14,4 +14,5 @@ Quit game	PairsWindow		Jes dal zûc
 Large	PairsWindow		Grant
 Beginner (4x4)	PairsWindow		Principiant (4×4)
 Intermediate (6x6)	PairsWindow		Intermedi (6×6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	%s nol à cjatât avonde iconis vetoriâls par partî; int coventin almancul %zu, cjatadis %zu.\n
 New game	PairsWindow		Gnove partide

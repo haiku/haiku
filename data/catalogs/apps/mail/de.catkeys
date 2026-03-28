@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	4024882639
+1	german	x-vnd.Be-MAIL	1977644174
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
 Show icons & labels	Mail		Icons und Beschriftung anzeigen
@@ -93,13 +93,16 @@ Open draft	Mail		Entwurf öffnen
 Random	Mail		Zufällig
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Status 'New' belassen
 Attach attributes:	Mail		Attribute von Anhängen:
+Remove label	Mail		Label entfernen
 Find again	Mail		Weitersuchen
 Size:	Mail		Größe:
+New label:	LabelWindow		Neues Label:
 To:	Mail		An:
 Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu verschieben, muss Tracker laufen.
 The mail_daemon could not be started:\n\t	Mail		Der E-Mail-Dienst (mail_daemon) konnte nicht gestartet werden:\n\t
 <no account found>	Mail		<kein Konto gefunden>
 helpful message	Mail		Tipp
+Label as…	Mail		Label setzen …
  Read 	Mail		 Gelesen 
 Font:	Mail		Schriftart:
 Accounts…	Mail		Konten …
@@ -107,6 +110,7 @@ Previous	Mail		Vorherige
 Include file attributes in attachments	Mail		Dateiattribute von Anhängen mitsenden
 Start now	Mail		Jetzt starten
 (Name unavailable)	Mail		(Name nicht verfügbar)
+Cancel	LabelWindow		Abbrechen
 Move to trash	Mail		In den Papierkorb verschieben
 <none>	Mail		<kein>
 %d - Date	Mail		%d - Datum
@@ -134,6 +138,7 @@ Hide	Mail		Ausblenden
 From:	Mail		Von:
 No file attributes, just plain data	Mail		Keine Dateiattribute, nur reine Daten
 Add	Mail		Hinzu
+Same label	Mail		Gleiches Label
 out	B_USER_DIRECTORY/mail/out		Ausgang
 Send this message before closing?	Mail		Nachricht vor dem Schließen senden?
 in	B_USER_DIRECTORY/mail/in		Eingang
@@ -156,13 +161,16 @@ Remove attachment	Mail		Anhang entfernen
 Edit	Mail		Bearbeiten
 Page setup…	Mail		Seite einrichten …
 An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.
+Set label	Mail		Label setzen
 Beginner	Mail		Anfänger
 Previous message, keep status	Mail		Vorige Nachricht, Status beibehalten
 Send message	Mail		Nachricht senden
 Delete	Mail		Löschen
 Put your favorite e-mail queries and query templates in this folder.	Mail		In diesem Ordner können E-Mail-Queries und Query-Vorlagen abgelegt werden.
+Manage labels…	Mail		Labels verwalten …
 Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.
+OK	LabelWindow		OK
 Revert	Mail		Anfangswerte
 Unknown	Mail		Unbekannt
 Increase quote level	Mail		Eine Zitatebene tiefer

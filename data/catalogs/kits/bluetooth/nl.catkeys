@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Bluetooth	3550394259
+1	dutch; flemish	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Plaatsen
 Controller	DeviceClass		Controller
 Common ISDN access	DeviceClass		Normale ISDN-toegang
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Draadloos
 Invalid device class!\n	DeviceClass		Ongeldige apparaatklasse!\n
 Minor class: 	DeviceClass		Kleinere klasse:
 Doll/Action figure	DeviceClass		Pop/Actiefiguur
-Not implemented	RemoteDevice		Niet geïmplementeerd
 33-50% utilized	DeviceClass		33-50% in gebruik
 Gaming/Toy	DeviceClass		Gamen/Speelgoed
 Video camera	DeviceClass		Videocamera

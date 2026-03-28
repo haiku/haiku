@@ -29,8 +29,8 @@ Satellite communications controller	Device		Controlor de comunicații prin satel
 Device class	DeviceSCSI		Clasă de dispozitive
 Device	Device		Dispozitiv
 Input device controller	Device		Controlor de dispozitiv de intrare
-ACPI System Indicator	DeviceACPI		Indicator de sistem ACPI
 PCI bus	DevicesView		Magistrală PCI
+ACPI System Indicator	DeviceACPI		Indicator de sistem ACPI
 ACPI System Bus	DeviceACPI		Magistrală de sistem ACPI
 Tape Drive	DeviceSCSI		Unitate de bandă magnetică
 Changer	DeviceSCSI		Schimbător

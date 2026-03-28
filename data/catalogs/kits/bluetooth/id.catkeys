@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Bluetooth	3550394259
+1	indonesian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Memposisikan
 Controller	DeviceClass		Kontroler
 Common ISDN access	DeviceClass		Akses ISDN umum
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Nirkabel
 Invalid device class!\n	DeviceClass		Kelas perangkat tidak valid!\n
 Minor class: 	DeviceClass		Kelas kecil: 
 Doll/Action figure	DeviceClass		Boneka/Gambar bergerak
-Not implemented	RemoteDevice		Tidak diimplementasikan
 33-50% utilized	DeviceClass		terpakai 33-50%
 Gaming/Toy	DeviceClass		Permainan/Mainan
 Video camera	DeviceClass		Video kamera

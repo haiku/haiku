@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Be-TSKB	1763402521
+1	hungarian	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Automatikus elrejtés
 Show all	WindowMenu		Összes megjelenítése
 Edit in Tracker…	PreferencesWindow		Szerkesztés a Nyomkövetőben…
 Menu	PreferencesWindow		Menü
+Location	PreferencesWindow		Hely
 Tracker always first	PreferencesWindow		A Nyomkövető mindig az első
 Hide clock	TimeView		Óra elrejtése
 Large	PreferencesWindow		Nagy

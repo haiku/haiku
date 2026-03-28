@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-StyledEdit	3212551798
+1	friulian	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		Statistichis sul document
 Cut	Menus		Taie
 Center	Menus		Centre
@@ -13,6 +13,8 @@ Search backwards	FindandReplaceWindow		Cîr indaûr
 Find again	Menus		Cjate ancjemò
 Read-only	StatusView		Dome-leture
 Save	Menus		Salve
+Untitled %d	Window title		Cence titul %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Impussibil ripristinâ, file no cjatât: \"%filename%\".
 Cancel	QuitAlert		Anule
 Copy	Menus		Copie
 Reload	NodeMonitorAlerts		Torne cjarie
@@ -20,11 +22,13 @@ line %d, column %d	StatusView		rie %d, colone %d
 Words:	Statistics		Peraulis:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Ripristine
+Unable to unlock file\n\t%error%	QuitAlert		Impussibil sblocâ il file\n\t%error%
 OK	RevertToSavedAlert		Va ben
 Unlock file	StatusView		Sbloche file
 Italic	Menus		Corsîf
 Can't undo	Menus		Impussibil disfâ
 Replace…	Menus		Sostituìs…
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Chest file al è segnât tant che dome-leture. Salvâ lis modifichis al document \"%filename%\"? 
 File	Menus		File
 Paste	Menus		Tache
 Bold	Menus		Neret
@@ -33,7 +37,10 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Riis:
 Strikeout	Menus		Tressât
 Replace in all windows	FindandReplaceWindow		Sostituìs in ducj i barcons
+Error saving \"%filename%\":\n%error%	SaveAlert		Erôr tal salvâ \"%filename%\":\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Salvâ lis modifichis al document \"%title%\"?
 Save	SaveAlert		Salve
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" al à modifichis che no son stadis salvadis.\nRipristinâlu ae ultime version salvade?
 Default	Open_and_SaveAsPanel		Predefinît
 Cancel	RevertToSavedAlert		Anule
 Cancel	FindandReplaceWindow		Anule
@@ -76,8 +83,10 @@ Open…	Menus		Vierç…
 Save as…	Menus		Salve come…
 Replace	FindandReplaceWindow		Sostituìs
 Characters:	Statistics		Caratars:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		Erôr tal cjariâ \"%filename%\":\n\tFormât no supuartât
 Don't save	QuitAlert		No sta salvâ
 Align	Menus		Inlineâ
 Font	Menus		Caratar
 Select all	Menus		Selezione dut
 Right	Menus		Diestre
+Error loading \"%filename%\":\n\t%error%	LoadAlert		Erôr tal cjariâ \"%filename%\":\n\t%error%

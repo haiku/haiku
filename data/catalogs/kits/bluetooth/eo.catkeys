@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Bluetooth	3550394259
+1	esperanto	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Lokado
 Controller	DeviceClass		Ludregilo
 Common ISDN access	DeviceClass		Komuna ISDN aliro
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Sendrata
 Invalid device class!\n	DeviceClass		Nevalida aparata klaso\n
 Minor class: 	DeviceClass		Minora klaso:
 Doll/Action figure	DeviceClass		Pupo/Figuro de Agado
-Not implemented	RemoteDevice		Ne efektivigita
 33-50% utilized	DeviceClass		33-50% utiligita
 Gaming/Toy	DeviceClass		Ludado/Ludilo
 Video camera	DeviceClass		Videa fotilo

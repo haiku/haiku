@@ -29,8 +29,8 @@ Satellite communications controller	Device		Řadič satelitní komunikace
 Device class	DeviceSCSI		Třída zařízení
 Device	Device		Zařízení
 Input device controller	Device		Kontroler vstupních zařízení
-ACPI System Indicator	DeviceACPI		ACPI Systémový Indikátor
 PCI bus	DevicesView		Sběrnice PCI
+ACPI System Indicator	DeviceACPI		ACPI Systémový Indikátor
 ACPI System Bus	DeviceACPI		ACPI Systémová Sběrnice
 Tape Drive	DeviceSCSI		Pásková mechanika
 Changer	DeviceSCSI		Měnič

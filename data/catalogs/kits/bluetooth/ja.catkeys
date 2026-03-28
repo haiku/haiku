@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Bluetooth	3550394259
+1	japanese	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		位置
 Controller	DeviceClass		コントローラー
 Common ISDN access	DeviceClass		一般的な ISDN 接続
@@ -47,7 +47,6 @@ Cordless	DeviceClass		コードレス
 Invalid device class!\n	DeviceClass		無効なデバイスクラスです!\n
 Minor class: 	DeviceClass		副クラス:
 Doll/Action figure	DeviceClass		フィギュア
-Not implemented	RemoteDevice		未実装
 33-50% utilized	DeviceClass		33-50% 使用
 Gaming/Toy	DeviceClass		ゲーム/玩具
 Video camera	DeviceClass		ビデオカメラ

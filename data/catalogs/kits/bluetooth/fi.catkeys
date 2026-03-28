@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Bluetooth	3550394259
+1	finnish	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Sijoittelu
 Controller	DeviceClass		Ohjain
 Common ISDN access	DeviceClass		Yleinen ISDN-liitäntä
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Langaton
 Invalid device class!\n	DeviceClass		Virheellinen laiteluokka!\n
 Minor class: 	DeviceClass		Minor-luokka: 
 Doll/Action figure	DeviceClass		Nukke/Taistelunukke
-Not implemented	RemoteDevice		Ei ole toteutettu
 33-50% utilized	DeviceClass		33-50% käytetty hyödyksi
 Gaming/Toy	DeviceClass		Peli/Lelu
 Video camera	DeviceClass		Videokamera

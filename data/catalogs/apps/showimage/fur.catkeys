@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ShowImage	3394555425
+1	friulian	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		MostreImagjin
 Page setup…	Menus		Impostazions pagjine…
 Previous file	Menus		File precedent
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Altece:
 Next file	Menus		Prossim file
 Slide show	Menus		Proiezion diapositivis
 Original size	Menus		Dimensions origjinâls
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		Il document '%filename%' al è stât modificât. Desideristu sierâ il document?
 Width:	PrintOptionsWindow		Largjece:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensione a (in 1/72 oncis):
 Zoom factor in %:	PrintOptionsWindow		Fatôr di ingrandiment in %:
@@ -46,6 +47,7 @@ Clear selection	Menus		Nete selezion
 Rotate clockwise	Menus		Volte in sens orari
 Open with…	Menus		Vierç cun…
 Rotate counterclockwise	Menus		Volte in sens antiorari
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		Il document '%filename%' (pagjine %number%) al è stât modificât. Desideristu sierâ il document?
 Previous page	Menus		Pagjine precedente
 Fit to window	Menus		Adate al barcon
 Go to page	Menus		Va ae pagjine

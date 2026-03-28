@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	1159274874
+1	german	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Teams
 Temp	DataSource		Temp
 Block cache memory	DataSource		Block-Cache-Speicher
@@ -10,6 +10,7 @@ ActivityMonitor	System name		Aktivitätsanzeige
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Aktualisierungsintervall:
 Settings…	ActivityWindow		Einstellungen …
+Unknown thermal sensor	SystemInfoHandler		Unbekannter Wärmesensor
 Block cache	DataSource		Block-Cache
 Memory	DataSource		Speicher
 No thermal sensor	SystemInfoHandler		Kein Wärmesensor

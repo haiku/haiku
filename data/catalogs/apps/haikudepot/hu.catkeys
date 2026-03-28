@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1716484992
+1	hungarian	x-vnd.Haiku-HaikuDepot	3945138144
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -11,6 +11,7 @@ Rate package…	PackageInfoView		Csomag értékelése…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Sikeres bejelentkezés %Nickname%.
 Package problems	PackageProblem	Window title	Csomag probléma
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nem sikerült kinyerni a captcha információt az elküldött adatokból.
+Install %PackageTitle%	PackageAction		%PackageTitle% telepítése
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Nem sikerült a csomaglista betöltése: %message%.
 Update usage conditions	ToLatestUserUsageConditionsWindow		Felhasználási feltételek frissítése
 No usage conditions	UserUsageConditions		Nincsenek felhasználási feltételek
@@ -30,6 +31,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		Kilépés
 Password requirements	UserLoginWindow		Jelszókövetelmények
 The following additional package changes have to be made:	PackageResult		Az alábbi módosítások elvégzése szükséges a csomagon:
+%Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		A %Appname% a HaikuDepotServer komponensel kommunikál. Ezek a felhasználási feltételek, amit a HaikuDepotServer szolgáltatással kapcsolatban elfogadott '%Nickname%' felhasználó (%AgreedToTimestamp%).
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		A jelenlegi felhasználási feltételek elfogadásra kerültek.
 Cancel	PackageProblem		Mégse
@@ -57,6 +59,7 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Csomagkezelő hiba
 No	MainWindow		Nem
 Repository	PackageListView		Tároló
+%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		A %appname% működéséhez a csomagkezelő szükséges, és úgy tűnik, hogy most nem fut.\nSzeretnéd elindítani?
 Close	RatePackageWindow		Bezárás
 Close	UserLoginWindow		Bezárás
 The email is malformed.	UserLoginWindow		Hibás a levél formátuma.
@@ -72,9 +75,11 @@ n/a	PackageInfoView		nincs értékelve
 Checking user details	UserDetailVerifierProcess		Felhasználó ellenőrzése
 Cancel	MainWindow		Mégse
 Refresh repositories	MainWindow		Tárolók frissítése
+Error	SimpleAlert		Hiba
 Continue	App		Folytatás
 A password is required.	UserLoginWindow		Jelszó szükséges.
 Language	RatePackageWindow		Nyelv
+Open %DeskbarLink%	PackageAction		%DeskbarLink% megnyitása
 Status	PackageListView		Állapot
 Network transport error	ServerHelper		Hálózati átviteli hiba
 Cancel	PackageResult		Mégse
@@ -118,6 +123,7 @@ Check for updates…	MainWindow		Frissítések keresése…
 Uninstalled	PackageListView		Eltávolítva
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Egyetértek a felhasználási feltételekkel
 Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" telepítése
+Uninstall %PackageTitle%	PackageAction		%PackageTitle% eltávolítása
 OK	App		Rendben
 Fatal error	UninstallPackageAction		Végzetes hiba
 Develop packages	MainWindow		Fejlesztői csomagok
@@ -130,6 +136,7 @@ Fetching screenshot	CacheScreenshotProcess		Képernyőkép lekérése
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hálózati hiba lépett fel a szerverrel való kommunikáció során: %s
 Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
+No, quit	App		Nem, kilépés.
 Show	MainWindow		Megjelenítés
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ezen alkalmazás működéséhez a számítógépen szükséges néhány fájt írása/olvasása. Úgy tűnik, hogy problémák vannak egy tesztfájl írásával [%TestFilePath%] útvonalon. Ellenőrizd, hogy a helyi lemezzel vagy az engedélyekkel kapcsolatban nincsenek-e olyan problémák, amelyek megakadályozhatják, hogy az alkalmazás fájlokat írjon az adott mappába. Tudomásul veheted ezt a problémát és folytathatod, de egyes funkciók nem lesznek elérhetők.
 Settings…	MainWindow		Beállítások…
@@ -203,6 +210,7 @@ Reading repository data	LocalPkgDataLoadProcess		Tároló olvasása
 Native desktop packages only	MainWindow		Csak natív aszali csomagok
 Fatal error	InstallPackageProcess		Végzetes hiba
 A validation error has occurred	ServerHelper		Hitelesítési hiba
+%Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		A %Appname% a HaikuDepotServer komponensel kommunikál. Ezek a HaikuDepotServer szolgáltatás legújabb felhasználási feltételei.
 The nickname is required.	UserLoginWindow		Felhasználói név szükséges.
 -	no package size		-
 Apply changes	PackageResult		Változtatások alkalmazása
@@ -225,4 +233,5 @@ No results? 	FeaturedPackagesView		Nincs találat?
 User creation error	UserLoginWindow		Felhasználó létrehozási hiba
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
 Cleaning up…	ShuttingDownWindow		Rendrakás…
+%appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		A %appname% éppen leáll vagy befejezi a folyamatban lévő munkákat kilépés előtt.
 Repeat password:	UserLoginWindow		Jelszó ismétlése:

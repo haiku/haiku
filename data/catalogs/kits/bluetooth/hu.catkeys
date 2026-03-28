@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Bluetooth	3550394259
+1	hungarian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Pozicionálás
 Controller	DeviceClass		Vezérlő
 Common ISDN access	DeviceClass		Közös ISDN hozzáférés
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Vezeték nélküli
 Invalid device class!\n	DeviceClass		Érvénytelen eszközosztály!\n
 Minor class: 	DeviceClass		Alcsoport:
 Doll/Action figure	DeviceClass		Baba/Akciófigura
-Not implemented	RemoteDevice		Nincs implementálva
 33-50% utilized	DeviceClass		33-50% kihasznált
 Gaming/Toy	DeviceClass		Játék/játékszer
 Video camera	DeviceClass		Videókamera

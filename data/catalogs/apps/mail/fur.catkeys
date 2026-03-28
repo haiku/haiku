@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Be-MAIL	236508096
+1	friulian	x-vnd.Be-MAIL	1977644174
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il to test principâl al conten %ld caratars che no si puedin codificâ. Podaressie lâ ben forsit une cumbinazion di caratars diferente? Frache Invie par inviâlu distès (un caratar sostitutîf al vignarà doprât al puest di chei no codificabii), o sielç Anule par tornâ indaûr e justâ il test.
 Text wrapping:	Mail		Rie gnove automatiche:
 Show icons & labels	Mail		Mostre iconis e etichetis
@@ -26,17 +26,20 @@ Save changes to this signature?	Mail		Salve lis modifichis a cheste firme?
 Save attachment…	Mail		Salve zonte…
 Paste	Mail		Tache
 E-mail draft could not be saved!	Mail		No si à podût salvâ il stampon de e-mail!
+Next message, keep status	Mail		Messaç sucessîf, manten il stât
 Don't send	Mail		No sta inviâ
 sent	B_USER_DIRECTORY/mail/sent		inviade
 Only files can be added as attachments.	Mail		Al messaç al è pussibil zontâ dome files.
 Close	Mail		Siere
 Untitled	Mail		Cence titul
+%appname% couldn't find its dictionary.	Mail		%appname% nol è rivât a cjatâ il so dizionari.
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La rimozion des zontis di une e-mail mandade indenant no je ancjemò implementade!\nNol funzionarà ben.
 Same recipient	Mail		Stes destinatari
 Previous message	Mail		Messaç precedent
 (Address unavailable)	Mail		(Direzion no disponibile)
 Mail	System name		Mail
 Copy link location	Mail		Copie posizion colegament
+%appname% settings	Mail		Impostazions di %appname%
 Add attachment…	Mail		Zonte zonte…
 Next	Mail		Sucessîf
 Attachments:	Mail		Zontis:
@@ -44,6 +47,7 @@ Show icons only	Mail		Mostre dome lis iconis
 Subject:	Mail		Ogjet:
 OK	Mail		Va ben
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+All people	AddressTextControl		Dute la int
 Quit	Mail		Jes
 Title:	Mail		Titul:
 Account from mail	Mail		Account de mail
@@ -68,6 +72,7 @@ Cancel	Mail		Anule
 Off	Mail		Disativât
 Signature:	Mail		Firme:
 Forward without attachments	Mail		Mande indenant cence zontis
+None	Settings		Nissun
 queries	B_USER_DIRECTORY/mail/queries		interogazions
 View	Mail		Visualize
 Signatures	Mail		Firmis
@@ -88,13 +93,16 @@ Open draft	Mail		Vierç stampon
 Random	Mail		Casuâl
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasse come 'Gnûf'
 Attach attributes:	Mail		Atribûts des zontis:
+Remove label	Mail		Gjave etichete
 Find again	Mail		Cjate di gnûf
 Size:	Mail		Dimension:
+New label:	LabelWindow		Gnove etichete:
 To:	Mail		A:
 Need Tracker to move items to trash	Mail		Par spostâ i elements te scovacere al covente Tracker
 The mail_daemon could not be started:\n\t	Mail		Nol è stât pussibil inviâ mail_daemon:\n\t
 <no account found>	Mail		<nissun account cjatât>
 helpful message	Mail		messaç util
+Label as…	Mail		Segne etichete…
  Read 	Mail		 Let 
 Font:	Mail		Caratar:
 Accounts…	Mail		Account…
@@ -102,6 +110,7 @@ Previous	Mail		Precedent
 Include file attributes in attachments	Mail		Manten i atribûts dai file tes zontis
 Start now	Mail		Scomence cumò
 (Name unavailable)	Mail		(Non no disponibil)
+Cancel	LabelWindow		Anule
 Move to trash	Mail		Sposte te scovacere
 <none>	Mail		<vueit>
 %d - Date	Mail		%d - Date
@@ -129,6 +138,7 @@ Hide	Mail		Plate
 From:	Mail		Di:
 No file attributes, just plain data	Mail		Nissun atribût, dome dâts grês
 Add	Mail		Zonte
+Same label	Mail		Stesse etichete
 out	B_USER_DIRECTORY/mail/out		in jessude
 Send this message before closing?	Mail		Inviâ chest messaç prime di sierâ?
 in	B_USER_DIRECTORY/mail/in		in jentrade
@@ -151,12 +161,16 @@ Remove attachment	Mail		Gjave zonte
 Edit	Mail		Modifiche
 Page setup…	Mail		Impostazion pagjine…
 An error occurred trying to save this signature.	Mail		Si è verificât un erôr cirint di salvâ cheste firme.
+Set label	Mail		Stabilìs etichete
 Beginner	Mail		Principiant
+Previous message, keep status	Mail		Messaç prime, manten il stât
 Send message	Mail		Invie messaç
 Delete	Mail		Elimine
 Put your favorite e-mail queries and query templates in this folder.	Mail		Met lis tôs interogazions di e-mail preferidis e i modei di interogazion in cheste cartele.
+Manage labels…	Mail		Gjestìs etichetis…
 Spam	Mail		Malvolude
 Couldn't open this signature. Sorry.	Mail		Impussibil vierzi cheste firme. Scuse.
+OK	LabelWindow		Va ben
 Revert	Mail		Ripristine
 Unknown	Mail		No cognossût
 Increase quote level	Mail		Aumente nivel di citazion

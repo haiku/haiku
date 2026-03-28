@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Bluetooth	3550394259
+1	romanian	x-vnd.Haiku-Bluetooth	4156766415
 Positioning	DeviceClass		Poziționare
 Controller	DeviceClass		Controlor
 Common ISDN access	DeviceClass		Acces ISDN comun
@@ -47,7 +47,6 @@ Cordless	DeviceClass		Fără fir
 Invalid device class!\n	DeviceClass		Clasă de dispozitiv nevalidă!\n
 Minor class: 	DeviceClass		Clasă minoră: 
 Doll/Action figure	DeviceClass		Păpușă/Figurină de acțiune
-Not implemented	RemoteDevice		Nu este implementat
 33-50% utilized	DeviceClass		utilizat 33-50%
 Gaming/Toy	DeviceClass		Jocuri/Jucărie
 Video camera	DeviceClass		Cameră video

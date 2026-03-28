@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ActivityMonitor	1159274874
+1	turkish	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Takımlar
 Temp	DataSource		Sıcaklık
 Block cache memory	DataSource		Blok önbellek dosyası
@@ -10,6 +10,7 @@ ActivityMonitor	System name		Etkinlik Monitörü
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Yenileme aralığı:
 Settings…	ActivityWindow		Ayarlar…
+Unknown thermal sensor	SystemInfoHandler		Bilinmeyen ısı algılayıcısı
 Block cache	DataSource		Blok önbelleği
 Memory	DataSource		Bellek
 No thermal sensor	SystemInfoHandler		Termal algılayıcı yok
