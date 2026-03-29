@@ -962,17 +962,46 @@ LocalDeviceImpl::ParseEIR(const uint8* eir, BMessage& reply)
 
 	while (offset < HCI_MAX_EIR_LENGTH) {
 		uint8 length = eir[offset];
-
 		// break either when finished reading buffer or when next data value is zero
 		if (length == 0 || offset + length >= HCI_MAX_EIR_LENGTH)
 			break;
-
 		uint8 type = eir[offset + 1];
 		const uint8* data = &eir[offset + 2];
 		uint8 dataLen = length - 1;
-
-		// TODO:Implement other EIR datatypes
 		switch (type) {
+			case EIR_FLAGS:
+				if (dataLen >= 1) {
+					reply.AddUInt8("eir_flags", data[0]);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR Flags: 0x%02X\n", data[0]);
+				}
+				break;
+			case EIR_UUID16_INCOMPLETE:
+				reply.AddBool("uuid16_complete", false);
+			case EIR_UUID16_COMPLETE:
+				for (uint8 i = 0; i + 1 < dataLen; i += 2) {
+					uint16 uuid = B_LENDIAN_TO_HOST_INT16(*(const uint16*)(data + i));
+					reply.AddUInt16("uuid16", uuid);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR UUID16: 0x%04X\n", uuid);
+				}
+				break;
+			case EIR_UUID32_INCOMPLETE:
+				reply.AddBool("uuid32_complete", false);
+			case EIR_UUID32_COMPLETE:
+				for (uint8 i = 0; i + 3 < dataLen; i += 4) {
+					uint32 uuid = B_LENDIAN_TO_HOST_INT32(*(const uint32*)(data + i));
+					reply.AddUInt32("uuid32", uuid);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR of UUID32: 0x%08" B_PRIx32 "\n", uuid);
+				}
+				break;
+			case EIR_UUID128_INCOMPLETE:
+				reply.AddBool("uuid128_complete", false);
+			case EIR_UUID128_COMPLETE:
+				for (uint8 i = 0; i + 15 < dataLen; i += 16) {
+					// UUID128 is stored as 16 bytes in little-endian format
+					reply.AddData("uuid128", B_ANY_TYPE, data + i, 16);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR UUID128 \n");
+				}
+				break;
 			case EIR_NAME_SHORT:
 				if (shortName.Length() == 0) {
 					shortName.SetTo((const char*)data, dataLen);
@@ -984,6 +1013,29 @@ LocalDeviceImpl::ParseEIR(const uint8* eir, BMessage& reply)
 					completeName.SetTo((const char*)data, dataLen);
 					TRACE_BT("LocalDeviceImpl: Parsed EIR Complete Name: '%s'\n",
 						completeName.String());
+				}
+				break;
+			case EIR_TX_POWER:
+				if (dataLen >= 1) {
+					reply.AddInt8("tx_power", (int8)data[0]);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR TX Power: %d dBm\n", (int8)data[0]);
+				}
+				break;
+			case EIR_CLASS_OF_DEVICE:
+				if (dataLen >= 3) {
+					reply.AddData("dev_class", B_ANY_TYPE, data, 3);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR Class of Device: "
+							 "0x%02X 0x%02X 0x%02X\n",
+						data[0], data[1], data[2]);
+				}
+				break;
+			case EIR_MANUFACTURER_DATA:
+				if (dataLen >= 2) {
+					reply.AddData("manufacturer_data", B_ANY_TYPE, data, dataLen);
+					uint16 company = data[0] | (data[1] << 8);
+					TRACE_BT("LocalDeviceImpl: Parsed EIR Manufacturer Data: "
+							 "company=0x%04X len=%d\n",
+						company, dataLen);
 				}
 				break;
 			default:
@@ -1099,7 +1151,6 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event,
 
 	if (event->status == BT_OK) {
 		uint8 cod[3] = {0, 0, 0};
-
 		// TODO: Review, this rDevice is leaked
 		ConnectionIncoming* iConnection = new ConnectionIncoming(
 			new RemoteDevice(event->bdaddr, cod));

@@ -286,8 +286,19 @@ struct hci_ev_extended_inquiry_info {
     int8     rssi;
     uint8    eir[HCI_MAX_EIR_LENGTH];
 } __attribute__((packed));
+
+#define EIR_FLAGS 0x01
+#define EIR_UUID16_INCOMPLETE 0x02
+#define EIR_UUID16_COMPLETE 0x03
+#define EIR_UUID32_INCOMPLETE 0x04
+#define EIR_UUID32_COMPLETE 0x05
+#define EIR_UUID128_INCOMPLETE 0x06
+#define EIR_UUID128_COMPLETE 0x07
 #define EIR_NAME_SHORT 0x08
 #define EIR_NAME_COMPLETE 0x09
+#define EIR_TX_POWER 0x0A
+#define EIR_CLASS_OF_DEVICE 0x0D
+#define EIR_MANUFACTURER_DATA 0xFF
 
 #define HCI_EVENT_ENCRYPTION_KEY_REFRESH_COMPLETE	0x30
 
