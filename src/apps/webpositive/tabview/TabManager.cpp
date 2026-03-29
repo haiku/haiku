@@ -398,16 +398,6 @@ public:
 
 	void CloseTab(int32 index);
 
-	void SetCloseButtonsAvailable(bool available)
-	{
-		fCloseButtonsAvailable = available;
-	}
-
-	bool CloseButtonsAvailable() const
-	{
-		return fCloseButtonsAvailable;
-	}
-
 	void SetDoubleClickOutsideTabsMessage(const BMessage& message,
 		const BMessenger& target);
 
@@ -419,7 +409,6 @@ public:
 private:
 	TabManager*			fManager;
 	TabContainerGroup*	fTabContainerGroup;
-	bool				fCloseButtonsAvailable;
 	BMessage*			fDoubleClickOutsideTabsMessage;
 	BMessenger			fTarget;
 	BString				fCurrentToolTip;
@@ -496,8 +485,7 @@ WebTabView::MaxSize()
 void
 WebTabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect)
 {
-	if (fController->CloseButtonsAvailable())
-		_DrawCloseButton(owner, frame, updateRect);
+	_DrawCloseButton(owner, frame, updateRect);
 
 	if (fIcon != NULL) {
 		BRect iconBounds(0, 0, kIconSize - 1, kIconSize - 1);
@@ -545,7 +533,7 @@ WebTabView::MouseDown(BPoint where, uint32 buttons)
 	}
 
 	BRect closeRect = _CloseRectFrame(Frame());
-	if (!fController->CloseButtonsAvailable() || !closeRect.Contains(where)) {
+	if (!closeRect.Contains(where)) {
 		TabView::MouseDown(where, buttons);
 		return;
 	}
@@ -577,8 +565,7 @@ WebTabView::MouseMoved(BPoint where, uint32 transit,
 	BRect closeRect = _CloseRectFrame(Frame());
 	bool overCloseRect = closeRect.Contains(where);
 
-	if (overCloseRect != fOverCloseRect
-		&& fController->CloseButtonsAvailable()) {
+	if (overCloseRect != fOverCloseRect) {
 		fOverCloseRect = overCloseRect;
 		ContainerView()->Invalidate(closeRect);
 	}
@@ -683,7 +670,6 @@ TabManagerController::TabManagerController(TabManager* manager)
 	:
 	fManager(manager),
 	fTabContainerGroup(NULL),
-	fCloseButtonsAvailable(false),
 	fDoubleClickOutsideTabsMessage(NULL)
 {
 }
@@ -941,14 +927,4 @@ TabManager::SetTabIcon(const BView* containedView, const BBitmap* icon)
 		TabForView(containedView)));
 	if (tab)
 		tab->SetIcon(icon);
-}
-
-
-void
-TabManager::SetCloseButtonsAvailable(bool available)
-{
-	if (available == fController->CloseButtonsAvailable())
-		return;
-	fController->SetCloseButtonsAvailable(available);
-	fTabContainerView->Invalidate();
 }

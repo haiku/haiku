@@ -1886,7 +1886,6 @@ BrowserWindow::_UpdateTabGroupVisibility()
 	if (Lock()) {
 		if (fInterfaceVisible)
 			fTabGroup->SetVisible(_TabGroupShouldBeVisible());
-		fTabManager->SetCloseButtonsAvailable(true);
 		Unlock();
 	}
 }

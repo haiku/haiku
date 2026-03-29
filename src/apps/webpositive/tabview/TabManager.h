@@ -61,7 +61,6 @@ public:
 	const	BString&			TabLabel(int32);
 			void				SetTabIcon(const BView* containedView,
 									const BBitmap* icon);
-			void				SetCloseButtonsAvailable(bool available);
 
 private:
 #if INTEGRATE_MENU_INTO_TAB_BAR
