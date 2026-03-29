@@ -245,6 +245,7 @@ AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 
 AddFilesToPackage add-ons Tracker :
 	FileType
+	Label\ as…
 	Mark\ as…
 	Mark\ as\ Read
 	Open\ Target\ Folder

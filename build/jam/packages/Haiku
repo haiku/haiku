@@ -399,6 +399,7 @@ AddFilesToPackage add-ons Network\ Settings :
 
 AddFilesToPackage add-ons Tracker :
 	FileType
+	Label\ as…
 	Mark\ as…
 	Mark\ as\ Read
 	Open\ Target\ Folder
