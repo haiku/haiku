@@ -12,7 +12,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 UnitTestLib libkernelutilstest.so
 	: KernelUtilsTestAddon.cpp
 #	  AVLTreeMapTest.cpp
-	  BOpenHashTableTest.cpp
+	  OpenHashTableTest.cpp
 	  BitmapTest.cpp
 	  SinglyLinkedListTest.cpp
 	  DoublyLinkedListTest.cpp

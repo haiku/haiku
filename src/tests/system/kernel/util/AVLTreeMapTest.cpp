@@ -1,32 +1,23 @@
-#include <AVLTreeMapTest.h>
-#include <cppunit/Test.h>
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
-#include <stdio.h>
-#include <TestUtils.h>
+/*
+ * Copyright 2003-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include <TestSuiteAddon.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 #include <AVLTreeMap.h>
 
-AVLTreeMapTest::AVLTreeMapTest(std::string name)
-	: BTestCase(name)
-{
-}
 
-CppUnit::Test*
-AVLTreeMapTest::Suite()
-{
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite("AVLTreeMap");
+class AVLTreeMapTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(AVLTreeMapTest);
+	CPPUNIT_TEST(Test1);
+	CPPUNIT_TEST_SUITE_END();
 
-	suite->addTest(new CppUnit::TestCaller<AVLTreeMapTest>(
-		"SinglyLinkedList::User Strategy Test (default next parameter)",
-		&AVLTreeMapTest::Test1));
+public:
+	void Test1() {}
+};
 
-	return suite;
-}
 
-//! Test1
-void
-AVLTreeMapTest::Test1()
-{
-}
-
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(AVLTreeMapTest, getTestSuiteName());

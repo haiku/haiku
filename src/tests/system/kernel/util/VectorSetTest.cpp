@@ -1,102 +1,53 @@
+/*
+ * Copyright 2003-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
 
 #include <set>
-using std::set;
+#include <string>
 
-#include <TestUtils.h>
-#include <cppunit/Test.h>
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 #include <VectorSet.h>
 
-#include "common.h"
-#include "VectorSetTest.h"
 
 using VectorSetOrder::Ascending;
 using VectorSetOrder::Descending;
 
-VectorSetTest::VectorSetTest(std::string name)
-	: BTestCase(name)
-{
-}
 
-CppUnit::Test*
-VectorSetTest::Suite()
-{
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite("VectorSet");
-
-	ADD_TEST4(VectorSet, suite, VectorSetTest, ConstructorTest);
-	ADD_TEST4(VectorSet, suite, VectorSetTest, InsertTest);
-	ADD_TEST4(VectorSet, suite, VectorSetTest, RemoveTest);
-	ADD_TEST4(VectorSet, suite, VectorSetTest, EraseTest);
-	ADD_TEST4(VectorSet, suite, VectorSetTest, MakeEmptyTest);
-	ADD_TEST4(VectorSet, suite, VectorSetTest, FindTest);
-	ADD_TEST4(VectorSet, suite, VectorSetTest, FindCloseTest);
-	ADD_TEST4(VectorSet, suite, VectorSetTest, IteratorTest);
-
-	return suite;
-}
-
-//! ConstructorTest
-void
-VectorSetTest::ConstructorTest()
-{
-	NextSubTest();
-	VectorSet<int> v1(100);
-	CHK(v1.Count() == 0);
-	CHK(v1.IsEmpty());
-
-	NextSubTest();
-	VectorSet<string> v2(100);
-	CHK(v2.Count() == 0);
-	CHK(v2.IsEmpty());
-
-	NextSubTest();
-	VectorSet<int> v3(0);
-	CHK(v3.Count() == 0);
-	CHK(v3.IsEmpty());
-
-	NextSubTest();
-	VectorSet<string> v4(0);
-	CHK(v4.Count() == 0);
-	CHK(v4.IsEmpty());
-}
-
-// TestIterator
-template<typename Value, typename TestSet, typename MyIterator,
-		 typename ReferenceIterator>
+template<typename Value, typename TestSet, typename MyIterator, typename ReferenceIterator>
 class TestIterator {
-private:
-	typedef TestIterator<Value, TestSet, MyIterator, ReferenceIterator>
-			Iterator;
+	typedef TestIterator<Value, TestSet, MyIterator, ReferenceIterator> Iterator;
 
 public:
-	inline TestIterator(TestSet *s, MyIterator myIt, ReferenceIterator refIt)
-		: fSet(s),
-		  fMyIterator(myIt),
-		  fReferenceIterator(refIt)
+	inline TestIterator(TestSet* s, MyIterator myIt, ReferenceIterator refIt)
+		:
+		fSet(s),
+		fMyIterator(myIt),
+		fReferenceIterator(refIt)
 	{
 	}
 
-	inline TestIterator(const Iterator &other)
-		: fSet(other.fSet),
-		  fMyIterator(other.fMyIterator),
-		  fReferenceIterator(other.fReferenceIterator)
+	inline TestIterator(const Iterator& other)
+		:
+		fSet(other.fSet),
+		fMyIterator(other.fMyIterator),
+		fReferenceIterator(other.fReferenceIterator)
 	{
-		CHK(fMyIterator == other.fMyIterator);
+		CPPUNIT_ASSERT(fMyIterator == other.fMyIterator);
 	}
 
-	inline Iterator &operator++()
+	inline Iterator& operator++()
 	{
-		MyIterator &myResult = ++fMyIterator;
-		ReferenceIterator &refResult = ++fReferenceIterator;
+		MyIterator& myResult = ++fMyIterator;
+		ReferenceIterator& refResult = ++fReferenceIterator;
 		if (refResult == fSet->fReferenceSet.end())
-			CHK(myResult == fSet->fMySet.End());
+			CPPUNIT_ASSERT(myResult == fSet->fMySet.End());
 		else
-			CHK(*myResult == *refResult);
+			CPPUNIT_ASSERT(*myResult == *refResult);
 		return *this;
 	}
 
@@ -105,19 +56,19 @@ public:
 		MyIterator oldMyResult = fMyIterator;
 		MyIterator myResult = fMyIterator++;
 		ReferenceIterator refResult = fReferenceIterator++;
-		CHK(oldMyResult == myResult);
+		CPPUNIT_ASSERT(oldMyResult == myResult);
 		if (refResult == fSet->fReferenceSet.end())
-			CHK(myResult == fSet->fMySet.End());
+			CPPUNIT_ASSERT(myResult == fSet->fMySet.End());
 		else
-			CHK(*myResult == *refResult);
+			CPPUNIT_ASSERT(*myResult == *refResult);
 		return Iterator(fSet, myResult, refResult);
 	}
 
-	inline Iterator &operator--()
+	inline Iterator& operator--()
 	{
-		MyIterator &myResult = --fMyIterator;
-		ReferenceIterator &refResult = --fReferenceIterator;
-		CHK(*myResult == *refResult);
+		MyIterator& myResult = --fMyIterator;
+		ReferenceIterator& refResult = --fReferenceIterator;
+		CPPUNIT_ASSERT(*myResult == *refResult);
 		return *this;
 	}
 
@@ -126,87 +77,86 @@ public:
 		MyIterator oldMyResult = fMyIterator;
 		MyIterator myResult = fMyIterator--;
 		ReferenceIterator refResult = fReferenceIterator--;
-		CHK(oldMyResult == myResult);
-		CHK(*myResult == *refResult);
+		CPPUNIT_ASSERT(oldMyResult == myResult);
+		CPPUNIT_ASSERT(*myResult == *refResult);
 		return Iterator(fSet, myResult, refResult);
 	}
 
-	inline Iterator &operator=(const Iterator &other)
+	inline Iterator& operator=(const Iterator& other)
 	{
 		fSet = other.fSet;
 		fMyIterator = other.fMyIterator;
 		fReferenceIterator = other.fReferenceIterator;
-		CHK(fMyIterator == other.fMyIterator);
+		CPPUNIT_ASSERT(fMyIterator == other.fMyIterator);
 		return *this;
 	}
 
-	inline bool operator==(const Iterator &other) const
+	inline bool operator==(const Iterator& other) const
 	{
 		bool result = (fMyIterator == other.fMyIterator);
-		CHK((fReferenceIterator == other.fReferenceIterator) == result);
+		CPPUNIT_ASSERT((fReferenceIterator == other.fReferenceIterator) == result);
 		return result;
 	}
 
-	inline bool operator!=(const Iterator &other) const
+	inline bool operator!=(const Iterator& other) const
 	{
 		bool result = (fMyIterator != other.fMyIterator);
-		CHK((fReferenceIterator != other.fReferenceIterator) == result);
+		CPPUNIT_ASSERT((fReferenceIterator != other.fReferenceIterator) == result);
 		return result;
 	}
 
-	inline Value &operator*() const
+	inline Value& operator*() const
 	{
-		Value &result = *fMyIterator;
-		CHK(result == *fReferenceIterator);
+		Value& result = *fMyIterator;
+		CPPUNIT_ASSERT(result == *fReferenceIterator);
 		return result;
 	}
 
-	inline Value *operator->() const
+	inline Value* operator->() const
 	{
-		Value *result = fMyIterator.operator->();
-		CHK(*result == *fReferenceIterator);
+		Value* result = fMyIterator.operator->();
+		CPPUNIT_ASSERT(*result == *fReferenceIterator);
 		return result;
 	}
 
 	inline operator bool() const
 	{
 		bool result = fMyIterator;
-		CHK((fMyIterator == fSet->fMySet.Null()) != result);
+		CPPUNIT_ASSERT((fMyIterator == fSet->fMySet.Null()) != result);
 		return result;
 	}
 
 public:
-	TestSet				*fSet;
-	MyIterator			fMyIterator;
-	ReferenceIterator	fReferenceIterator;
+	TestSet* fSet;
+	MyIterator fMyIterator;
+	ReferenceIterator fReferenceIterator;
 };
 
-// TestSet
-template<typename Value, typename MySet, typename ReferenceSet,
-		 typename Compare>
+
+template<typename Value, typename MySet, typename ReferenceSet, typename Compare>
 class TestSet {
 public:
-	typedef TestSet<Value, MySet, ReferenceSet, Compare>	Class;
+	typedef TestSet<Value, MySet, ReferenceSet, Compare>				Class;
 
-	typedef typename MySet::Iterator				MyIterator;
-	typedef typename ReferenceSet::iterator			ReferenceIterator;
-	typedef typename MySet::ConstIterator			MyConstIterator;
-	typedef typename ReferenceSet::const_iterator	ReferenceConstIterator;
-	typedef TestIterator<Value, Class, MyIterator,
-						 ReferenceIterator>			Iterator;
-	typedef TestIterator<const Value, const Class, MyConstIterator,
-						 ReferenceConstIterator>	ConstIterator;
+	typedef typename MySet::Iterator									MyIterator;
+	typedef typename ReferenceSet::iterator								ReferenceIterator;
+	typedef typename MySet::ConstIterator								MyConstIterator;
+	typedef typename ReferenceSet::const_iterator						ReferenceConstIterator;
+	typedef TestIterator<Value, Class, MyIterator, ReferenceIterator>	Iterator;
+	typedef TestIterator<const Value, const Class, MyConstIterator, ReferenceConstIterator>
+		ConstIterator;
 
 	TestSet()
-		: fMySet(),
-		  fReferenceSet(),
-		  fChecking(true)
+		:
+		fMySet(),
+		fReferenceSet(),
+		fChecking(true)
 	{
 	}
 
-	void Insert(const Value &value, bool replace = true)
+	void Insert(const Value& value, bool replace = true)
 	{
-		CHK(fMySet.Insert(value, replace) == B_OK);
+		CPPUNIT_ASSERT(fMySet.Insert(value, replace) == B_OK);
 		ReferenceIterator it = fReferenceSet.find(value);
 		if (it != fReferenceSet.end())
 			fReferenceSet.erase(it);
@@ -214,22 +164,21 @@ public:
 		Check();
 	}
 
-	void Remove(const Value &value)
+	void Remove(const Value& value)
 	{
 		int32 oldCount = Count();
 		fReferenceSet.erase(value);
 		int32 newCount = fReferenceSet.size();
-		CHK(fMySet.Remove(value) == oldCount - newCount);
+		CPPUNIT_ASSERT(fMySet.Remove(value) == oldCount - newCount);
 		Check();
 	}
 
-	Iterator Erase(const Iterator &iterator)
+	Iterator Erase(const Iterator& iterator)
 	{
-		bool outOfRange
-			= (iterator.fReferenceIterator == fReferenceSet.end());
+		bool outOfRange = (iterator.fReferenceIterator == fReferenceSet.end());
 		MyIterator myIt = fMySet.Erase(iterator.fMyIterator);
 		if (outOfRange) {
-			CHK(myIt == fMySet.Null());
+			CPPUNIT_ASSERT(myIt == fMySet.Null());
 			return Iterator(this, myIt, fReferenceSet.end());
 		}
 		Value nextValue;
@@ -245,23 +194,23 @@ public:
 			refIt = fReferenceSet.find(nextValue);
 		Check();
 		if (refIt == fReferenceSet.end())
-			CHK(myIt == fMySet.End());
+			CPPUNIT_ASSERT(myIt == fMySet.End());
 		else
-			CHK(*myIt == *refIt);
+			CPPUNIT_ASSERT(*myIt == *refIt);
 		return Iterator(this, myIt, refIt);
 	}
 
 	inline int32 Count() const
 	{
 		int32 count = fReferenceSet.size();
-		CHK(fMySet.Count() == count);
+		CPPUNIT_ASSERT(fMySet.Count() == count);
 		return count;
 	}
 
 	inline bool IsEmpty() const
 	{
 		bool result = fReferenceSet.empty();
-		CHK(fMySet.IsEmpty() == result);
+		CPPUNIT_ASSERT(fMySet.IsEmpty() == result);
 		return result;
 	}
 
@@ -272,32 +221,19 @@ public:
 		Check();
 	}
 
-	inline Iterator Begin()
-	{
-		return Iterator(this, fMySet.Begin(), fReferenceSet.begin());
-	}
-
+	inline Iterator Begin() { return Iterator(this, fMySet.Begin(), fReferenceSet.begin()); }
 	inline ConstIterator Begin() const
 	{
-		return ConstIterator(this, fMySet.Begin(),
-							 fReferenceSet.begin());
+		return ConstIterator(this, fMySet.Begin(), fReferenceSet.begin());
 	}
 
-	inline Iterator End()
-	{
-		return Iterator(this, fMySet.End(), fReferenceSet.end());
-	}
-
+	inline Iterator End() { return Iterator(this, fMySet.End(), fReferenceSet.end()); }
 	inline ConstIterator End() const
 	{
 		return ConstIterator(this, fMySet.End(), fReferenceSet.end());
 	}
 
-	inline Iterator Null()
-	{
-		return Iterator(this, fMySet.Null(), fReferenceSet.end());
-	}
-
+	inline Iterator Null() { return Iterator(this, fMySet.Null(), fReferenceSet.end()); }
 	inline ConstIterator Null() const
 	{
 		return ConstIterator(this, fMySet.Null(), fReferenceSet.end());
@@ -331,170 +267,161 @@ public:
 		return ConstIterator(this, myIt, refIt);
 	}
 
-	Iterator Find(const Value &value)
+	Iterator Find(const Value& value)
 	{
 		MyIterator myIt = fMySet.Find(value);
 		ReferenceIterator refIt = fReferenceSet.find(value);
 		if (refIt == fReferenceSet.end())
-			CHK(myIt = fMySet.End());
+			CPPUNIT_ASSERT(myIt = fMySet.End());
 		else
-			CHK(*myIt == *refIt);
+			CPPUNIT_ASSERT(*myIt == *refIt);
 		return Iterator(this, myIt, refIt);
 	}
 
-	ConstIterator Find(const Value &value) const
+	ConstIterator Find(const Value& value) const
 	{
 		MyConstIterator myIt = fMySet.Find(value);
 		ReferenceConstIterator refIt = fReferenceSet.find(value);
 		if (refIt == fReferenceSet.end())
-			CHK(myIt = fMySet.End());
+			CPPUNIT_ASSERT(myIt = fMySet.End());
 		else
-			CHK(*myIt == *refIt);
+			CPPUNIT_ASSERT(*myIt == *refIt);
 		return ConstIterator(this, myIt, refIt);
 	}
 
-	Iterator FindClose(const Value &value, bool less)
+	Iterator FindClose(const Value& value, bool less)
 	{
 		MyIterator myIt = fMySet.FindClose(value, less);
 		if (myIt == fMySet.End()) {
 			if (fMySet.Count() > 0) {
 				if (less)
-					CHK(fCompare(*fMySet.Begin(), value) > 0);
+					CPPUNIT_ASSERT(fCompare(*fMySet.Begin(), value) > 0);
 				else
-					CHK(fCompare(*--MyIterator(myIt), value) < 0);
+					CPPUNIT_ASSERT(fCompare(*--MyIterator(myIt), value) < 0);
 			}
 			return End();
 		}
 		if (less) {
-			CHK(fCompare(*myIt, value) <= 0);
+			CPPUNIT_ASSERT(fCompare(*myIt, value) <= 0);
 			MyIterator nextMyIt(myIt);
 			++nextMyIt;
 			if (nextMyIt != fMySet.End())
-				CHK(fCompare(*nextMyIt, value) > 0);
+				CPPUNIT_ASSERT(fCompare(*nextMyIt, value) > 0);
 		} else {
-			CHK(fCompare(*myIt, value) >= 0);
+			CPPUNIT_ASSERT(fCompare(*myIt, value) >= 0);
 			if (myIt != fMySet.Begin()) {
 				MyIterator prevMyIt(myIt);
 				--prevMyIt;
-				CHK(fCompare(*prevMyIt, value) < 0);
+				CPPUNIT_ASSERT(fCompare(*prevMyIt, value) < 0);
 			}
 		}
 		return Iterator(this, myIt, fReferenceSet.find(*myIt));
 	}
 
-	ConstIterator FindClose(const Value &value, bool less) const
+	ConstIterator FindClose(const Value& value, bool less) const
 	{
 		MyConstIterator myIt = fMySet.FindClose(value, less);
 		if (myIt == fMySet.End()) {
 			if (fMySet.Count() > 0) {
 				if (less)
-					CHK(fCompare(*fMySet.Begin(), value) > 0);
+					CPPUNIT_ASSERT(fCompare(*fMySet.Begin(), value) > 0);
 				else
-					CHK(fCompare(*--MyConstIterator(myIt), value) < 0);
+					CPPUNIT_ASSERT(fCompare(*--MyConstIterator(myIt), value) < 0);
 			}
 			return End();
 		}
 		if (less) {
-			CHK(fCompare(*myIt, value) <= 0);
+			CPPUNIT_ASSERT(fCompare(*myIt, value) <= 0);
 			MyConstIterator nextMyIt(myIt);
 			++nextMyIt;
 			if (nextMyIt != fMySet.End())
-				CHK(fCompare(*nextMyIt, value) > 0);
+				CPPUNIT_ASSERT(fCompare(*nextMyIt, value) > 0);
 		} else {
-			CHK(fCompare(*myIt, value) >= 0);
+			CPPUNIT_ASSERT(fCompare(*myIt, value) >= 0);
 			if (myIt != fMySet.Begin()) {
 				MyConstIterator prevMyIt(myIt);
 				--prevMyIt;
-				CHK(fCompare(*prevMyIt, value) < 0);
+				CPPUNIT_ASSERT(fCompare(*prevMyIt, value) < 0);
 			}
 		}
 		return ConstIterator(this, myIt, fReferenceSet.find(*myIt));
 	}
 
-	void SetChecking(bool enable)
-	{
-		fChecking = enable;
-	}
+	void SetChecking(bool enable) { fChecking = enable; }
 
 	void Check() const
 	{
 		if (fChecking) {
 			int32 count = fReferenceSet.size();
-			CHK(fMySet.Count() == count);
-			CHK(fMySet.IsEmpty() == fReferenceSet.empty());
+			CPPUNIT_ASSERT(fMySet.Count() == count);
+			CPPUNIT_ASSERT(fMySet.IsEmpty() == fReferenceSet.empty());
 			MyConstIterator myIt = fMySet.Begin();
 			ReferenceConstIterator refIt = fReferenceSet.begin();
 			for (int32 i = 0; i < count; i++, ++myIt, ++refIt)
-				CHK(*myIt == *refIt);
-			CHK(myIt == fMySet.End());
+				CPPUNIT_ASSERT(*myIt == *refIt);
+			CPPUNIT_ASSERT(myIt == fMySet.End());
 		}
 	}
 
-//private:
 public:
-	MySet			fMySet;
-	ReferenceSet	fReferenceSet;
-	bool			fChecking;
-	Compare			fCompare;
+	MySet fMySet;
+	ReferenceSet fReferenceSet;
+	bool fChecking;
+	Compare fCompare;
 };
 
 
-// IntStrategy
 class IntStrategy {
 public:
-	typedef int	Value;
+	typedef int Value;
 
 	IntStrategy(int32 differentValues = 100000)
-		: fDifferentValues(differentValues)
+		:
+		fDifferentValues(differentValues)
 	{
 		srand(0);
 	}
 
-	Value Generate()
-	{
-		return rand() % fDifferentValues;
-	}
+	Value Generate() { return rand() % fDifferentValues; }
 
 private:
-	int32	fDifferentValues;
+	int32 fDifferentValues;
 };
 
-// StringStrategy
+
 class StringStrategy {
 public:
-	typedef string	Value;
+	typedef std::string Value;
 
 	StringStrategy(int32 differentValues = 100000)
-		: fDifferentValues(differentValues)
+		:
+		fDifferentValues(differentValues)
 	{
 		srand(0);
 	}
 
 	Value Generate()
 	{
-		char buffer[10];
-		sprintf(buffer, "%ld", rand() % fDifferentValues);
+		char buffer[12];
+		sprintf(buffer, "%" B_PRId32, rand() % fDifferentValues);
 		return string(buffer);
 	}
 
 private:
-	int32	fDifferentValues;
+	int32 fDifferentValues;
 };
 
-// CompareWrapper
+
 template<typename Value, typename Compare>
 class CompareWrapper {
 public:
-	inline bool operator()(const Value &a, const Value &b) const
-	{
-		return (fCompare(a, b) < 0);
-	}
+	inline bool operator()(const Value& a, const Value& b) const { return fCompare(a, b) < 0; }
 
 private:
-	Compare	fCompare;
+	Compare fCompare;
 };
 
-// TestStrategy
+
 template<typename _ValueStrategy, template<typename> class _CompareStrategy>
 class TestStrategy {
 public:
@@ -503,361 +430,217 @@ public:
 	typedef _CompareStrategy<Value>							Compare;
 	typedef CompareWrapper<Value, Compare>					BoolCompare;
 	typedef VectorSet<Value, Compare>						MySet;
-	typedef set<Value, BoolCompare>							ReferenceSet;
+	typedef std::set<Value, BoolCompare>					ReferenceSet;
 	typedef TestSet<Value, MySet, ReferenceSet, Compare>	TestClass;
 };
 
-typedef TestStrategy<IntStrategy, Ascending>		AIntTestStrategy;
-typedef TestStrategy<StringStrategy, Ascending>		AStringTestStrategy;
-typedef TestStrategy<IntStrategy, Descending>		DIntTestStrategy;
-typedef TestStrategy<StringStrategy, Descending>	DStringTestStrategy;
 
-// GenericInsertTest
-template<typename _TestStrategy>
-static
-void
-GenericInsertTest(int32 maxNumber)
-{
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::TestClass		TestClass;
-	ValueStrategy strategy;
-	TestClass v;
-	for (int32 i = 0; i < maxNumber; i++)
-		v.Insert(strategy.Generate());
-}
+typedef TestStrategy<IntStrategy, Ascending> IntAscTestStrategy;
+typedef TestStrategy<IntStrategy, Descending> IntDescTestStrategy;
+typedef TestStrategy<StringStrategy, Ascending> StringAscTestStrategy;
+typedef TestStrategy<StringStrategy, Descending> StringDescTestStrategy;
 
-// InsertTest
-void
-VectorSetTest::InsertTest()
-{
-	NextSubTest();
-	GenericInsertTest<AIntTestStrategy>(30);
-	NextSubTest();
-	GenericInsertTest<DIntTestStrategy>(30);
-	NextSubTest();
-	GenericInsertTest<AIntTestStrategy>(200);
-	NextSubTest();
-	GenericInsertTest<DIntTestStrategy>(200);
-	NextSubTest();
-	GenericInsertTest<AStringTestStrategy>(30);
-	NextSubTest();
-	GenericInsertTest<DStringTestStrategy>(30);
-	NextSubTest();
-	GenericInsertTest<AStringTestStrategy>(200);
-	NextSubTest();
-	GenericInsertTest<DStringTestStrategy>(200);
-}
 
-// GenericFill
-template<typename TestClass, typename ValueStrategy>
-static
-void
-GenericFill(TestClass &v, ValueStrategy strategy, int32 maxNumber)
-{
-	v.SetChecking(false);
-	for (int32 i = 0; v.Count() < maxNumber; i++)
-		v.Insert(strategy.Generate());
-	v.SetChecking(true);
-	v.Check();
-}
+template<typename TestStrategy>
+class VectorSetTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(VectorSetTest);
+	CPPUNIT_TEST(Constructor100ElementsTest);
+	CPPUNIT_TEST(Constructor0ElementsTest);
+	CPPUNIT_TEST(Insert30ElementsTest);
+	CPPUNIT_TEST(Insert200ElementsTest);
+	CPPUNIT_TEST(Remove30ElementsTest);
+	CPPUNIT_TEST(Remove200ElementsTest);
+	CPPUNIT_TEST(Erase30ElementsTest);
+	CPPUNIT_TEST(Erase200ElementsTest);
+	CPPUNIT_TEST(MakeEmpty30ElementsTest);
+	CPPUNIT_TEST(MakeEmpty200ElementsTest);
+	CPPUNIT_TEST(Find30ElementsTest);
+	CPPUNIT_TEST(Find200ElementsTest);
+	CPPUNIT_TEST(FindClose30ElementsTest);
+	CPPUNIT_TEST(FindClose200ElementsTest);
+	CPPUNIT_TEST(Iterator30ElementsTest);
+	CPPUNIT_TEST(Iterator200ElementsTest);
+	CPPUNIT_TEST_SUITE_END();
 
-// GenericRemoveTest
-template<typename _TestStrategy>
-static
-void
-GenericRemoveTest(int32 maxNumber)
-{
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Value			Value;
-	typedef typename _TestStrategy::TestClass		TestClass;
-	ValueStrategy strategy;
-	TestClass v;
-	GenericFill(v, strategy, maxNumber);
-	while (v.Count() > 0) {
-		int32 index = rand() % (v.Count());
-		Value value = *v.IteratorForIndex(index);
-		v.Remove(value);
-		v.Remove(value);
-	}
-}
-
-// RemoveTest
-void
-VectorSetTest::RemoveTest()
-{
-	NextSubTest();
-	GenericRemoveTest<AIntTestStrategy>(30);
-	NextSubTest();
-	GenericRemoveTest<DIntTestStrategy>(30);
-	NextSubTest();
-	GenericRemoveTest<AIntTestStrategy>(200);
-	NextSubTest();
-	GenericRemoveTest<DIntTestStrategy>(200);
-	NextSubTest();
-	GenericRemoveTest<AStringTestStrategy>(30);
-	NextSubTest();
-	GenericRemoveTest<DStringTestStrategy>(30);
-	NextSubTest();
-	GenericRemoveTest<AStringTestStrategy>(200);
-	NextSubTest();
-	GenericRemoveTest<DStringTestStrategy>(200);
-}
-
-// GenericEraseTest
-template<typename _TestStrategy>
-static
-void
-GenericEraseTest(int32 maxNumber)
-{
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::TestClass		TestClass;
-	ValueStrategy strategy;
-	TestClass v;
-	GenericFill(v, strategy, maxNumber);
-	for (int32 i = maxNumber - 1; i >= 0; i--) {
-		int32 index = rand() % (i + 1);
-		v.Erase(v.IteratorForIndex(index));
-	}
-}
-
-// EraseTest
-void
-VectorSetTest::EraseTest()
-{
-	NextSubTest();
-	GenericEraseTest<AIntTestStrategy>(30);
-	NextSubTest();
-	GenericEraseTest<DIntTestStrategy>(30);
-	NextSubTest();
-	GenericEraseTest<AIntTestStrategy>(200);
-	NextSubTest();
-	GenericEraseTest<DIntTestStrategy>(200);
-	NextSubTest();
-	GenericEraseTest<AStringTestStrategy>(30);
-	NextSubTest();
-	GenericEraseTest<DStringTestStrategy>(30);
-	NextSubTest();
-	GenericEraseTest<AStringTestStrategy>(200);
-	NextSubTest();
-	GenericEraseTest<DStringTestStrategy>(200);
-}
-
-// GenericMakeEmptyTest
-template<typename _TestStrategy>
-static
-void
-GenericMakeEmptyTest(int32 maxNumber)
-{
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::TestClass		TestClass;
-	ValueStrategy strategy;
-	TestClass v;
-	v.MakeEmpty();
-	GenericFill(v, strategy, maxNumber);
-	v.MakeEmpty();
-	v.MakeEmpty();
-}
-
-// MakeEmptyTest
-void
-VectorSetTest::MakeEmptyTest()
-{
-	NextSubTest();
-	GenericMakeEmptyTest<AIntTestStrategy>(30);
-	NextSubTest();
-	GenericMakeEmptyTest<DIntTestStrategy>(30);
-	NextSubTest();
-	GenericMakeEmptyTest<AIntTestStrategy>(200);
-	NextSubTest();
-	GenericMakeEmptyTest<DIntTestStrategy>(200);
-	NextSubTest();
-	GenericMakeEmptyTest<AStringTestStrategy>(30);
-	NextSubTest();
-	GenericMakeEmptyTest<DStringTestStrategy>(30);
-	NextSubTest();
-	GenericMakeEmptyTest<AStringTestStrategy>(200);
-	NextSubTest();
-	GenericMakeEmptyTest<DStringTestStrategy>(200);
-}
-
-// GenericFindTest
-template<typename _TestStrategy>
-static
-void
-GenericFindTest(int32 maxNumber)
-{
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Value			Value;
-	typedef typename _TestStrategy::TestClass		TestClass;
+	typedef typename TestStrategy::ValueStrategy	ValueStrategy;
+	typedef typename TestStrategy::Value			Value;
+	typedef typename TestStrategy::TestClass		TestClass;
 	typedef typename TestClass::Iterator			Iterator;
 	typedef typename TestClass::ConstIterator		ConstIterator;
-	ValueStrategy strategy;
-	TestClass v;
-	GenericFill(v, strategy, maxNumber);
-	const TestClass &cv = v;
-	// find the values in the set
-	for (int32 i = 0; i < maxNumber; i++) {
-		const Value &value = *v.IteratorForIndex(i);
-		Iterator it = v.Find(value);
-		ConstIterator cit = cv.Find(value);
-		CHK(&*it == &*cit);
-	}
-	// try to find some random values
-	for (int32 i = 0; i < maxNumber; i++) {
-		Value value = strategy.Generate();
-		Iterator it = v.Find(value);
-		ConstIterator cit = cv.Find(value);
-		if (it != v.End())
-			CHK(&*it == &*cit);
-	}
-}
 
-// FindTest
-void
-VectorSetTest::FindTest()
-{
-	NextSubTest();
-	GenericFindTest<AIntTestStrategy>(30);
-	NextSubTest();
-	GenericFindTest<DIntTestStrategy>(30);
-	NextSubTest();
-	GenericFindTest<AIntTestStrategy>(200);
-	NextSubTest();
-	GenericFindTest<DIntTestStrategy>(200);
-	NextSubTest();
-	GenericFindTest<AStringTestStrategy>(30);
-	NextSubTest();
-	GenericFindTest<DStringTestStrategy>(30);
-	NextSubTest();
-	GenericFindTest<AStringTestStrategy>(200);
-	NextSubTest();
-	GenericFindTest<DStringTestStrategy>(200);
-}
-
-// GenericFindCloseTest
-template<typename _TestStrategy>
-static
-void
-GenericFindCloseTest(int32 maxNumber)
-{
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Value			Value;
-	typedef typename _TestStrategy::TestClass		TestClass;
-	typedef typename TestClass::Iterator			Iterator;
-	typedef typename TestClass::ConstIterator		ConstIterator;
-	ValueStrategy strategy;
-	TestClass v;
-	GenericFill(v, strategy, maxNumber);
-	const TestClass &cv = v;
-	// find the values in the set
-	for (int32 i = 0; i < maxNumber; i++) {
-		const Value &value = *v.IteratorForIndex(i);
-		// less
-		Iterator it = v.FindClose(value, true);
-		ConstIterator cit = cv.FindClose(value, true);
-		CHK(*it == value);
-		CHK(&*it == &*cit);
-		// greater
-		it = v.FindClose(value, false);
-		cit = cv.FindClose(value, false);
-		CHK(*it == value);
-		CHK(&*it == &*cit);
+	void InsertTest(int32 maxNumber)
+	{
+		ValueStrategy strategy;
+		TestClass v;
+		for (int32 i = 0; i < maxNumber; i++)
+			v.Insert(strategy.Generate());
 	}
-	// try to find some random values
-	for (int32 i = 0; i < maxNumber; i++) {
-		Value value = strategy.Generate();
-		// less
-		Iterator it = v.FindClose(value, true);
-		ConstIterator cit = cv.FindClose(value, true);
-		if (it != v.End())
-			CHK(&*it == &*cit);
-		// greater
-		it = v.FindClose(value, false);
-		cit = cv.FindClose(value, false);
-		if (it != v.End())
-			CHK(&*it == &*cit);
+
+	void Fill(TestClass& v, ValueStrategy strategy, int32 maxNumber)
+	{
+		v.SetChecking(false);
+		for (int32 i = 0; v.Count() < maxNumber; i++)
+			v.Insert(strategy.Generate());
+		v.SetChecking(true);
+		v.Check();
 	}
-}
 
-// FindCloseTest
-void
-VectorSetTest::FindCloseTest()
-{
-	NextSubTest();
-	GenericFindCloseTest<AIntTestStrategy>(30);
-	NextSubTest();
-	GenericFindCloseTest<DIntTestStrategy>(30);
-	NextSubTest();
-	GenericFindCloseTest<AIntTestStrategy>(200);
-	NextSubTest();
-	GenericFindCloseTest<DIntTestStrategy>(200);
-	NextSubTest();
-	GenericFindCloseTest<AStringTestStrategy>(30);
-	NextSubTest();
-	GenericFindCloseTest<DStringTestStrategy>(30);
-	NextSubTest();
-	GenericFindCloseTest<AStringTestStrategy>(200);
-	NextSubTest();
-	GenericFindCloseTest<DStringTestStrategy>(200);
-}
-
-// GenericIteratorTest
-template<typename _TestStrategy>
-static
-void
-GenericIteratorTest(int32 maxNumber)
-{
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::TestClass		TestClass;
-	typedef typename TestClass::Iterator			Iterator;
-	typedef typename TestClass::ConstIterator		ConstIterator;
-	ValueStrategy strategy;
-	TestClass v;
-	GenericFill(v, strategy, maxNumber);
-	const TestClass &cv = v;
-	Iterator it = v.Begin();
-	ConstIterator cit = cv.Begin();
-	for (; it != v.End(); ++it, ++cit) {
-		CHK(&*it == &*cit);
-		CHK(&*it == it.operator->());
-		CHK(&*cit == cit.operator->());
-		CHK(it);
-		CHK(cit);
+	void RemoveTest(int32 maxNumber)
+	{
+		ValueStrategy strategy;
+		TestClass v;
+		Fill(v, strategy, maxNumber);
+		while (v.Count() > 0) {
+			int32 index = rand() % (v.Count());
+			Value value = *v.IteratorForIndex(index);
+			v.Remove(value);
+			v.Remove(value);
+		}
 	}
-	CHK(cit == cv.End());
-	while (it != v.Begin()) {
-		--it;
-		--cit;
-		CHK(&*it == &*cit);
-		CHK(&*it == it.operator->());
-		CHK(&*cit == cit.operator->());
-		CHK(it);
-		CHK(cit);
+
+	void EraseTest(int32 maxNumber)
+	{
+		ValueStrategy strategy;
+		TestClass v;
+		Fill(v, strategy, maxNumber);
+		for (int32 i = maxNumber - 1; i >= 0; i--) {
+			int32 index = rand() % (i + 1);
+			v.Erase(v.IteratorForIndex(index));
+		}
 	}
-	CHK(cit == cv.Begin());
-	CHK(!v.Null());
-	CHK(!cv.Null());
-}
 
-// IteratorTest
-void
-VectorSetTest::IteratorTest()
-{
-	NextSubTest();
-	GenericIteratorTest<AIntTestStrategy>(30);
-	NextSubTest();
-	GenericIteratorTest<DIntTestStrategy>(30);
-	NextSubTest();
-	GenericIteratorTest<AIntTestStrategy>(200);
-	NextSubTest();
-	GenericIteratorTest<DIntTestStrategy>(200);
-	NextSubTest();
-	GenericIteratorTest<AStringTestStrategy>(30);
-	NextSubTest();
-	GenericIteratorTest<DStringTestStrategy>(30);
-	NextSubTest();
-	GenericIteratorTest<AStringTestStrategy>(200);
-	NextSubTest();
-	GenericIteratorTest<DStringTestStrategy>(200);
-}
+	void MakeEmptyTest(int32 maxNumber)
+	{
+		ValueStrategy strategy;
+		TestClass v;
+		v.MakeEmpty();
+		Fill(v, strategy, maxNumber);
+		v.MakeEmpty();
+		v.MakeEmpty();
+	}
 
+	void FindTest(int32 maxNumber)
+	{
+		ValueStrategy strategy;
+		TestClass v;
+		Fill(v, strategy, maxNumber);
+		const TestClass& cv = v;
+		// find the values in the set
+		for (int32 i = 0; i < maxNumber; i++) {
+			const Value& value = *v.IteratorForIndex(i);
+			Iterator it = v.Find(value);
+			ConstIterator cit = cv.Find(value);
+			CPPUNIT_ASSERT(&*it == &*cit);
+		}
+		// try to find some random values
+		for (int32 i = 0; i < maxNumber; i++) {
+			Value value = strategy.Generate();
+			Iterator it = v.Find(value);
+			ConstIterator cit = cv.Find(value);
+			if (it != v.End())
+				CPPUNIT_ASSERT(&*it == &*cit);
+		}
+	}
+
+	void FindCloseTest(int32 maxNumber)
+	{
+		ValueStrategy strategy;
+		TestClass v;
+		Fill(v, strategy, maxNumber);
+		const TestClass& cv = v;
+		// find the values in the set
+		for (int32 i = 0; i < maxNumber; i++) {
+			const Value& value = *v.IteratorForIndex(i);
+			// less
+			Iterator it = v.FindClose(value, true);
+			ConstIterator cit = cv.FindClose(value, true);
+			CPPUNIT_ASSERT(*it == value);
+			CPPUNIT_ASSERT(&*it == &*cit);
+			// greater
+			it = v.FindClose(value, false);
+			cit = cv.FindClose(value, false);
+			CPPUNIT_ASSERT(*it == value);
+			CPPUNIT_ASSERT(&*it == &*cit);
+		}
+		// try to find some random values
+		for (int32 i = 0; i < maxNumber; i++) {
+			Value value = strategy.Generate();
+			// less
+			Iterator it = v.FindClose(value, true);
+			ConstIterator cit = cv.FindClose(value, true);
+			if (it != v.End())
+				CPPUNIT_ASSERT(&*it == &*cit);
+			// greater
+			it = v.FindClose(value, false);
+			cit = cv.FindClose(value, false);
+			if (it != v.End())
+				CPPUNIT_ASSERT(&*it == &*cit);
+		}
+	}
+
+	void IteratorTest(int32 maxNumber)
+	{
+		ValueStrategy strategy;
+		TestClass v;
+		Fill(v, strategy, maxNumber);
+		const TestClass& cv = v;
+		Iterator it = v.Begin();
+		ConstIterator cit = cv.Begin();
+		for (; it != v.End(); ++it, ++cit) {
+			CPPUNIT_ASSERT(&*it == &*cit);
+			CPPUNIT_ASSERT(&*it == it.operator->());
+			CPPUNIT_ASSERT(&*cit == cit.operator->());
+			CPPUNIT_ASSERT(it);
+			CPPUNIT_ASSERT(cit);
+		}
+		CPPUNIT_ASSERT(cit == cv.End());
+		while (it != v.Begin()) {
+			--it;
+			--cit;
+			CPPUNIT_ASSERT(&*it == &*cit);
+			CPPUNIT_ASSERT(&*it == it.operator->());
+			CPPUNIT_ASSERT(&*cit == cit.operator->());
+			CPPUNIT_ASSERT(it);
+			CPPUNIT_ASSERT(cit);
+		}
+		CPPUNIT_ASSERT(cit == cv.Begin());
+		CPPUNIT_ASSERT(!v.Null());
+		CPPUNIT_ASSERT(!cv.Null());
+	}
+
+public:
+	void Constructor100ElementsTest()
+	{
+		VectorSet<Value> vector(100);
+		CPPUNIT_ASSERT(vector.Count() == 0);
+		CPPUNIT_ASSERT(vector.IsEmpty());
+	}
+
+	void Constructor0ElementsTest()
+	{
+		VectorSet<Value> vector(0);
+		CPPUNIT_ASSERT(vector.Count() == 0);
+		CPPUNIT_ASSERT(vector.IsEmpty());
+	}
+
+	void Insert30ElementsTest() { InsertTest(30); }
+	void Insert200ElementsTest() { InsertTest(200); }
+	void Remove30ElementsTest() { RemoveTest(30); }
+	void Remove200ElementsTest() { RemoveTest(200); }
+	void Erase30ElementsTest() { EraseTest(30); }
+	void Erase200ElementsTest() { EraseTest(200); }
+	void MakeEmpty30ElementsTest() { MakeEmptyTest(30); }
+	void MakeEmpty200ElementsTest() { MakeEmptyTest(200); }
+	void Find30ElementsTest() { FindTest(30); }
+	void Find200ElementsTest() { FindTest(200); }
+	void FindClose30ElementsTest() { FindCloseTest(30); }
+	void FindClose200ElementsTest() { FindCloseTest(200); }
+	void Iterator30ElementsTest() { IteratorTest(30); }
+	void Iterator200ElementsTest() { IteratorTest(200); }
+};
+
+
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(VectorSetTest<IntAscTestStrategy>, getTestSuiteName());
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(VectorSetTest<IntDescTestStrategy>, getTestSuiteName());
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(VectorSetTest<StringAscTestStrategy>, getTestSuiteName());
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(VectorSetTest<StringDescTestStrategy>, getTestSuiteName());

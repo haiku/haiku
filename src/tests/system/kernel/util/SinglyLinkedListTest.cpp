@@ -1,107 +1,110 @@
-#include <cppunit/Test.h>
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
-#include <stdio.h>
-#include <TestUtils.h>
+/*
+ * Copyright 2003-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include "SinglyLinkedListTest.h"
+
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
+
 #include "SinglyLinkedList.h"
 
-SinglyLinkedListTest::SinglyLinkedListTest(std::string name)
-	: BTestCase(name)
-{
-}
-
-CppUnit::Test*
-SinglyLinkedListTest::Suite() {
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite("SLL");
-
-	suite->addTest(new CppUnit::TestCaller<SinglyLinkedListTest>("SinglyLinkedList::User Strategy Test (default next parameter)", &SinglyLinkedListTest::UserDefaultTest));
-	suite->addTest(new CppUnit::TestCaller<SinglyLinkedListTest>("SinglyLinkedList::User Strategy Test (custom next parameter)", &SinglyLinkedListTest::UserCustomTest));
-
-	return suite;
-}
 
 // Class used for testing default User strategy
 class Link {
 public:
 	SinglyLinkedListLink<Link> next;
 	long data;
-	
-	SinglyLinkedListLink<Link>* GetSinglyLinkedListLink() {
-		return &next;
-	}
 
-	bool operator==(const Link &ref) {
-		return data == ref.data;
-	}
+	SinglyLinkedListLink<Link>* GetSinglyLinkedListLink() { return &next; }
+
+	bool operator==(const Link& ref) { return data == ref.data; }
 };
+
 
 // Class used for testing custom User strategy
 class MyLink {
 public:
-	SinglyLinkedListLink<MyLink> mynext;
+	SinglyLinkedListLink<MyLink> next;
 	long data;
 
-	bool operator==(const MyLink &ref) {
-		return data == ref.data;
+	bool operator==(const MyLink& ref) { return data == ref.data; }
+};
+
+
+template<typename Link, typename List>
+class SinglyLinkedListTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(SinglyLinkedListTest);
+	CPPUNIT_TEST(TwoValues_MakeEmpty_ListIsEmpty);
+	CPPUNIT_TEST(EmptyList_AddingValues_CountIncreases);
+	CPPUNIT_TEST(TenValues_AccessingWithIterator_IteratesThroughAllValues);
+	CPPUNIT_TEST_SUITE_END();
+
+	List* fList;
+	static const int fValueCount = 10;
+	Link fValues[fValueCount];
+
+public:
+	void setUp()
+	{
+		fList = new List;
+		for (int i = 0; i < fValueCount; i++) {
+			fValues[i].data = i * 2;
+			if (!(i % 2))
+				fValues[i].next.next = NULL; // Leave some next pointers invalid just for fun
+		}
+	}
+
+	void tearDown()
+	{
+		delete fList;
+	}
+
+	void TwoValues_MakeEmpty_ListIsEmpty()
+	{
+		Link value1, value2;
+		value1.data = 2;
+		value2.data = 5;
+		fList->Add(&value1);
+		fList->Add(&value2);
+		CPPUNIT_ASSERT(fList->Count() == 2);
+
+		fList->MakeEmpty();
+		CPPUNIT_ASSERT(fList->Count() == 0);
+	}
+
+	void EmptyList_AddingValues_CountIncreases() {
+		for (int i = 0; i < fValueCount; i++) {
+			CPPUNIT_ASSERT(fList->Count() == i);
+			fList->Add(&fValues[i]);
+			CPPUNIT_ASSERT(fList->Count() == i + 1);
+		}
+	}
+
+	void TenValues_AccessingWithIterator_IteratesThroughAllValues()
+	{
+		for (int i = 0; i < fValueCount; i++) {
+			fList->Add(&fValues[i]);
+		}
+
+		// Prefix increment
+		int preIndex = fValueCount - 1;
+		for (typename List::ConstIterator iterator = fList->GetIterator(); iterator.HasNext();
+				--preIndex) {
+			Link* element = iterator.Next();
+			CPPUNIT_ASSERT(*element == fValues[preIndex]);
+		}
+		CPPUNIT_ASSERT(preIndex == -1);
 	}
 };
 
-//! Tests the given list
-template <class List, class Element>
-void
-SinglyLinkedListTest::TestList(List &list, Element *values, int valueCount)
-{
-	list.MakeEmpty();
 
-	// PushFront
-	for (int i = 0; i < valueCount; i++) {
-		NextSubTest();
-		CHK(list.Count() == i);
-		list.Add(&values[i]);
-		CHK(list.Count() == i+1);
-	}
-	
-	// Prefix increment
-	int preIndex = valueCount-1;
-	for (typename List::ConstIterator iterator = list.GetIterator();
-			iterator.HasNext(); --preIndex) {
-		NextSubTest();
-
- 		Element* element = iterator.Next();
-		CHK(*element == values[preIndex]);
-	}
-	CHK(preIndex == -1);
-	list.MakeEmpty();	
-}
-
+typedef SinglyLinkedListTest<Link, SinglyLinkedList<Link> > SinglyLinkedListDefaultTest;
+typedef SinglyLinkedListTest<MyLink,
+	SinglyLinkedList<MyLink, SinglyLinkedListMemberGetLink<MyLink, &MyLink::next> > >
+	SinglyLinkedListCustomTest;
 //! Test using the User strategy with the default NextMember.
-void
-SinglyLinkedListTest::UserDefaultTest() {
-	SinglyLinkedList<Link> list;
-	const int valueCount = 10;
-	Link values[valueCount];
-	for (int i = 0; i < valueCount; i++) {
-		values[i].data = i;
-		if (i % 2)
-			values[i].next.next = NULL;	// Leave some next pointers invalid just for fun
-	}
-	
-	TestList(list, values, valueCount);
-}
-
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(SinglyLinkedListDefaultTest, getTestSuiteName());
 //! Test using the User strategy with a custom NextMember.
-void
-SinglyLinkedListTest::UserCustomTest() {
-	SinglyLinkedList<MyLink, SinglyLinkedListMemberGetLink<MyLink, &MyLink::mynext> > list;
-	const int valueCount = 10;
-	MyLink values[valueCount];
-	for (int i = 0; i < valueCount; i++) {
-		values[i].data = i*2;
-		if (!(i % 2))
-			values[i].mynext.next = NULL;	// Leave some next pointers invalid just for fun
-	}
-	
-	TestList(list, values, valueCount);
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(SinglyLinkedListCustomTest, getTestSuiteName());
