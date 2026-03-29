@@ -61,8 +61,6 @@ MMCBus::~MMCBus()
 	status_t result;
 	if (fWorkerThread != 0)
 		wait_for_thread(fWorkerThread, &result);
-
-	// TODO power off cards, stop clock, etc if needed.
 }
 
 
@@ -144,6 +142,13 @@ void MMCBus::_AcquireScanSemaphore()
 }
 
 
+void
+MMCBus::_TerminateBus()
+{
+	fController->terminate_bus(fCookie);
+}
+
+
 status_t
 MMCBus::_WorkerThread(void* cookie)
 {
@@ -211,7 +216,9 @@ MMCBus::_WorkerThread(void* cookie)
 		} else if (response != probe) {
 			ERROR("Card does not support voltage range (expected %x, "
 				"reply %x)\n", probe, response);
-			// TODO we should power off the bus in this case.
+			bus->_TerminateBus();
+			release_sem(bus->fLockSemaphore);
+			return B_ERROR;
 		}
 
 		// Probe OCR, waiting for card to become ready

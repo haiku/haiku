@@ -149,7 +149,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 
 SdhciBus::~SdhciBus()
 {
-	DisableInterrupts();
+	TerminateBus();
 
 	if (fIrq != 0)
 		remove_io_interrupt_handler(fIrq, sdhci_generic_interrupt, this);
@@ -606,6 +606,36 @@ SdhciBus::PowerOn()
 
 
 void
+SdhciBus::PowerOff()
+{
+	fRegisters->power_control.PowerOff();
+}
+
+
+void
+SdhciBus::TerminateBus()
+{
+	CALLED();
+
+	DisableInterrupts();
+	fRegisters->clock_control.DisableSD();
+	PowerOff();
+	/*
+	// Debugging.
+	uint8_t powerBits = fRegisters->power_control.Bits();
+	uint16_t clockBits = fRegisters->clock_control.Bits();
+	if ((powerBits & 0x1) != 0 || (clockBits & (1 << 2)) != 0) {
+		ERROR("TerminateBus: Not killed. "
+			"(power=%#x, clock=%#x)\n", powerBits, clockBits);
+	} else {
+		TRACE("TerminateBus: killed. (power=%#x, "
+			"clock=%#x)\n", powerBits, clockBits);
+	}
+	*/
+}
+
+
+void
 SdhciBus::RecoverError()
 {
 	fRegisters->interrupt_signal_enable &= ~(SDHCI_INT_CMD_CMP
@@ -901,6 +931,14 @@ set_bus_width(void* controller, int width)
 {
 	SdhciBus* bus = (SdhciBus*)controller;
 	return bus->SetBusWidth(width);
+}
+
+
+void
+terminate_bus(void* controller)
+{
+	SdhciBus* bus = (SdhciBus*)controller;
+	bus->TerminateBus();
 }
 
 

@@ -55,6 +55,7 @@ public:
 private:
 				status_t		_ActivateDevice(uint16_t rca);
 				void			_AcquireScanSemaphore();
+				void			_TerminateBus();
 		static	status_t		_WorkerThread(void*);
 
 private:

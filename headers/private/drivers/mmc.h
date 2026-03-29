@@ -88,6 +88,8 @@ typedef struct mmc_bus_interface {
 		// Pass the semaphore used for device rescan to the bus controller
 	void (*set_bus_width)(void* controller, int width);
 		// Set the data bus width to 1, 4 or 8 bit mode.
+	void (*terminate_bus)(void* controller);
+	// Terminate use of the underlying sdhci bus.
 } mmc_bus_interface;
 
 

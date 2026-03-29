@@ -34,9 +34,11 @@ class SdhciBus {
 									bool offsetAsSectors);
 			void				SetScanSemaphore(sem_id sem);
 			void				SetBusWidth(int width);
+			void				TerminateBus();
 
 	private:
 			bool				PowerOn();
+			void				PowerOff();
 			void				RecoverError();
 	static	status_t			_WorkerThread(void*);
 
@@ -516,6 +518,7 @@ status_t do_io(void* controller, uint8_t command,
 	IOOperation* operation, bool offsetAsSectors);
 void set_scan_semaphore(void* controller, sem_id sem);
 void set_bus_width(void* controller, int width);
+void terminate_bus(void* controller);
 
 extern mmc_bus_interface gSDHCIACPIDeviceModule;
 extern mmc_bus_interface gSDHCIPCIDeviceModule;
