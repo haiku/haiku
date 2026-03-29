@@ -197,8 +197,6 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"));
 	fToolBar->SetActionVisible(MSG_FULL_SCREEN, false);
 
-	fToolBar->ResizeTo(viewFrame.Width(), fToolBar->MinSize().height);
-
 	contentView->AddChild(fToolBar);
 
 	if (fShowToolBar)
@@ -243,6 +241,8 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, -1, -1);
 		gridLayout->AddView(hScrollBarContainer, 1, 1);
 	}
+
+	fToolBar->ResizeTo(-fVScrollBar->PreferredSize().width, fToolBar->MinSize().height);
 
 	fVScrollBar->SetTarget(fImageView);
 	fHScrollBar->SetTarget(fImageView);
@@ -529,9 +529,8 @@ ShowImageWindow::_ResizeWindowToImage()
 
 	// TODO: use View::GetPreferredSize() instead?
 	BRect r(bitmap->Bounds());
-	float width = r.Width() + be_control_look->GetScrollBarWidth(B_VERTICAL);
-	float height = r.Height() + 1 + fBar->Frame().Height()
-		+ be_control_look->GetScrollBarWidth(B_HORIZONTAL);
+	float width = r.Width() + fVScrollBar->PreferredSize().width;
+	float height = r.Height() + 1 + fBar->Frame().Height() + fHScrollBar->PreferredSize().height;
 
 	BRect frame = screen.Frame();
 	const float windowBorder = 5;
@@ -1367,8 +1366,8 @@ ShowImageWindow::_ToggleFullScreen()
 		fWindowFrame = Frame();
 		frame = screen.Frame();
 		frame.top -= fBar->Bounds().Height() + 1;
-		frame.right += be_control_look->GetScrollBarWidth(B_VERTICAL);
-		frame.bottom += be_control_look->GetScrollBarWidth(B_HORIZONTAL);
+		frame.right += fVScrollBar->PreferredSize().width;
+		frame.bottom += fHScrollBar->PreferredSize().height;
 
 		SetFlags(Flags() | B_NOT_RESIZABLE | B_NOT_MOVABLE);
 
