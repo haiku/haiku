@@ -2529,6 +2529,7 @@ int32
 BString::_FindBefore(const char* string, int32 offset, int32 length) const
 {
 	if (fPrivateData != NULL) {
+#ifdef __HAIKU__
 		const char* end = fPrivateData + offset - (length - 1);
 		while (end >= fPrivateData) {
 			const char* ptr = (const char*)memrchr(fPrivateData,
@@ -2541,6 +2542,14 @@ BString::_FindBefore(const char* string, int32 offset, int32 length) const
 
 			end = ptr;
 		}
+#else
+		const char* ptr = fPrivateData + offset - length;
+		while (ptr >= fPrivateData) {
+			if (!memcmp(ptr, string, length))
+				return ptr - fPrivateData;
+			ptr--;
+		}
+#endif
 	}
 	return B_ERROR;
 }
