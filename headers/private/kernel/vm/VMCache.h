@@ -353,6 +353,8 @@ void
 VMCache::MarkPageUnbusy(vm_page* page)
 {
 	ASSERT(page->busy);
+	ASSERT(page->Cache() == this);
+
 	page->busy = false;
 	NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 }
