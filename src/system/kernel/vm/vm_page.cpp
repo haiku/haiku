@@ -3695,9 +3695,10 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 	int oldPageState = page->State();
 	page->SetState(pageState);
 	page->busy = (flags & VM_PAGE_ALLOC_BUSY) != 0;
-	page->usage_count = 0;
+	page->busy_io = false;
 	page->accessed = false;
 	page->modified = false;
+	page->usage_count = 0;
 
 	locker.Unlock();
 
@@ -3813,9 +3814,10 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 		if (pageAllocated) {
 			page.SetState(flags & VM_PAGE_ALLOC_STATE);
 			page.busy = (flags & VM_PAGE_ALLOC_BUSY) != 0;
-			page.usage_count = 0;
+			page.busy_io = false;
 			page.accessed = false;
 			page.modified = false;
+			page.usage_count = 0;
 		}
 	}
 
@@ -3856,9 +3858,10 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 
 			page.SetState(flags & VM_PAGE_ALLOC_STATE);
 			page.busy = (flags & VM_PAGE_ALLOC_BUSY) != 0;
-			page.usage_count = 0;
+			page.busy_io = false;
 			page.accessed = false;
 			page.modified = false;
+			page.usage_count = 0;
 
 			freePages.InsertBefore(freePage, &page);
 			freedCachedPages++;
