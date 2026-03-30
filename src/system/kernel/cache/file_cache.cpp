@@ -767,13 +767,15 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 	VMCache* cache = ref->cache;
-	bool useBuffer = buffer != 0;
+
+	const bool useBuffer = buffer != 0;
+	const off_t startOffset = offset;
+	const size_t size = *_size;
 
 	TRACE(("cache_io(ref = %p, offset = %lld, buffer = %p, size = %lu, %s)\n",
-		ref, offset, (void*)buffer, *_size, doWrite ? "write" : "read"));
+		ref, offset, (void*)buffer, size, doWrite ? "write" : "read"));
 
 	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
-	size_t size = *_size;
 	offset -= pageOffset;
 
 	// "offset" and "lastOffset" are always aligned to B_PAGE_SIZE,
@@ -790,15 +792,6 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 		pagesUnreserver(&reservation);
 
 	AutoLocker<VMCache> locker(cache);
-
-	// Now that we have the lock, make sure the situation didn't change.
-	if ((pageOffset + offset) >= cache->virtual_end) {
-		locker.Unlock();
-		*_size = 0;
-		return B_OK;
-	}
-	if ((off_t)(pageOffset + offset + size) > cache->virtual_end)
-		size = cache->virtual_end - (pageOffset + offset);
 
 	size_t bytesLeft = size, lastLeft = size;
 	int32 lastPageOffset = pageOffset;
@@ -913,6 +906,15 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			lastLeft = bytesLeft - bytesInPage;
 			lastOffset = offset + B_PAGE_SIZE;
 			lastPageOffset = 0;
+		}
+
+		if ((lastOffset + (off_t)lastLeft) > cache->virtual_end) {
+			// Someone else must've shrunk the cache.
+			if (lastOffset > startOffset)
+				*_size = lastOffset - startOffset;
+			else
+				*_size = 0;
+			return B_OK;
 		}
 
 		if (bytesLeft <= bytesInPage)
@@ -1310,7 +1312,7 @@ file_cache_disable(void* _cacheRef)
 
 	AutoLocker<VMCache> _(ref->cache);
 
-	// If already disabled, there's nothing to do for us.
+	// If already disabled, there's nothing for us to do.
 	if (ref->disabled_count > 0) {
 		ref->disabled_count++;
 		return B_OK;
