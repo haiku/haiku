@@ -94,8 +94,8 @@ Grepper::Grepper(const char* pattern, const char* glob, const Model* model,
 	  fTarget(target),
 	  fRegularExpression(model->fRegularExpression),
 	  fCaseSensitive(model->fCaseSensitive),
+	  fTextOnly(model->fTextOnly),
 	  fEncoding(model->fEncoding),
-
 	  fIterator(iterator),
 	  fRunnerThreadId(-1),
 	  fXargsInput(-1),
@@ -270,6 +270,11 @@ Grepper::_RunnerThread()
 	argv[argc++] = "grep";
 	argv[argc++] = "-n"; // need matching line(s) number(s)
 	argv[argc++] = "-H"; // need filename prefix
+	if (fTextOnly) {
+		// assume all files are already checked as text files by Files Iterator
+		// so don't let grep consider any of them as binary file
+		argv[argc++] = "--text";
+	}
 	if (! fCaseSensitive)
 		argv[argc++] = "-i";
 	if (! fRegularExpression)

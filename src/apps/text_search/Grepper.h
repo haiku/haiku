@@ -49,6 +49,7 @@ private:
 			BMessenger			fTarget;
 			bool				fRegularExpression : 1;
 			bool				fCaseSensitive : 1;
+			bool				fTextOnly : 1;
 			uint32				fEncoding;
 
 	// The supplier of files to grep
