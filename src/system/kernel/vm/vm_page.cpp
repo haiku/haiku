@@ -4123,13 +4123,7 @@ vm_page_requeue(struct vm_page *page, bool tail)
 {
 	PAGE_ASSERT(page, page->Cache() != NULL);
 	page->Cache()->AssertLocked();
-	// DEBUG_PAGE_ACCESS_CHECK(page);
-		// TODO: This assertion cannot be satisfied by idle_scan_active_pages()
-		// when it requeues busy pages. The reason is that vm_soft_fault()
-		// (respectively fault_get_page()) and the file cache keep newly
-		// allocated pages accessed while they are reading them from disk. It
-		// would probably be better to change that code and reenable this
-		// check.
+	DEBUG_PAGE_ACCESS_CHECK(page);
 
 	VMPageQueue *queue = NULL;
 

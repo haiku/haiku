@@ -4361,6 +4361,7 @@ fault_get_page(PageFaultContext& context)
 			page = vm_page_allocate_page(&context.reservation,
 				PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
 			cache->InsertPage(page, context.cacheOffset);
+			DEBUG_PAGE_ACCESS_END(page);
 
 			// We need to unlock all caches and the address space while reading
 			// the page in. Keep a reference to the cache around.
@@ -4376,6 +4377,7 @@ fault_get_page(PageFaultContext& context)
 				B_PHYSICAL_IO_REQUEST, &bytesRead);
 
 			cache->Lock();
+			DEBUG_PAGE_ACCESS_START(page);
 
 			if (status < B_OK) {
 				// on error remove and free the page

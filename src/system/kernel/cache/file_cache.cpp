@@ -92,9 +92,6 @@ private:
 			off_t				fOffset;
 			uint32				fVecCount;
 			generic_size_t		fSize;
-#if DEBUG_PAGE_ACCESS
-			thread_id			fAllocatingThread;
-#endif
 };
 
 typedef status_t (*cache_func)(file_cache_ref* ref, void* cookie, off_t offset,
@@ -164,15 +161,12 @@ PrecacheIO::Prepare(vm_page_reservation* reservation)
 		page->busy_io = true;
 
 		fCache->InsertPage(page, fOffset + pos);
+		DEBUG_PAGE_ACCESS_END(page);
 
 		add_to_iovec(fVecs, fVecCount, fPageCount,
 			page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
 		fPages[i++] = page;
 	}
-
-#if DEBUG_PAGE_ACCESS
-	fAllocatingThread = find_thread(NULL);
-#endif
 
 	return B_OK;
 }
@@ -203,6 +197,8 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 		bytesTransferred = fCache->virtual_end - fOffset;
 
 	for (uint32 i = 0; i < pagesTransferred; i++) {
+		DEBUG_PAGE_ACCESS_START(fPages[i]);
+
 		if (i == pagesTransferred - 1
 			&& (bytesTransferred % B_PAGE_SIZE) != 0) {
 			// clear partial page
@@ -212,8 +208,6 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 					+ bytesTouched,
 				0, B_PAGE_SIZE - bytesTouched);
 		}
-
-		DEBUG_PAGE_ACCESS_TRANSFER(fPages[i], fAllocatingThread);
 
 		if (!fPages[i]->busy_io) {
 			// The busy_io flag was cleared. Let the cache handle the rest.
@@ -228,7 +222,7 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 
 	// Free pages after failed I/O
 	for (uint32 i = pagesTransferred; i < fPageCount; i++) {
-		DEBUG_PAGE_ACCESS_TRANSFER(fPages[i], fAllocatingThread);
+		DEBUG_PAGE_ACCESS_START(fPages[i]);
 		if (!fPages[i]->busy_io) {
 			fCache->FreeRemovedPage(fPages[i]);
 			continue;
@@ -413,6 +407,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		page->busy_io = true;
 
 		cache->InsertPage(page, offset + pos);
+		DEBUG_PAGE_ACCESS_END(page);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS,
 			page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
@@ -434,6 +429,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		cache->Lock();
 
 		for (int32 i = 0; i < pageIndex; i++) {
+			DEBUG_PAGE_ACCESS_START(pages[i]);
 			if (!pages[i]->busy_io) {
 				cache->FreeRemovedPage(pages[i]);
 				continue;
@@ -468,6 +464,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
+		DEBUG_PAGE_ACCESS_START(pages[i]);
 		if (!pages[i]->busy_io) {
 			cache->FreeRemovedPage(pages[i]);
 			continue;
@@ -552,6 +549,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		page->modified = !writeThrough;
 
 		ref->cache->InsertPage(page, offset + pos);
+		DEBUG_PAGE_ACCESS_END(page);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS,
 			page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
@@ -647,6 +645,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
+		DEBUG_PAGE_ACCESS_START(pages[i]);
 		if (!pages[i]->busy_io) {
 			ref->cache->FreeRemovedPage(pages[i]);
 			continue;
