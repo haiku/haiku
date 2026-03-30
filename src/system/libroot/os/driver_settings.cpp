@@ -28,6 +28,10 @@
 #	undef _KERNEL_MODE
 #endif
 
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+
 #include <BeBuild.h>
 #include <directories.h>
 #include <driver_settings.h>
@@ -57,9 +61,6 @@
 #include <fcntl.h>
 #include <ctype.h>
 
-#ifndef B_BUFFER_OVERFLOW
-#	define B_BUFFER_OVERFLOW B_ERROR
-#endif
 
 #define SETTINGS_DIRECTORY "/kernel/drivers/"
 #define SETTINGS_MAGIC		'DrvS'
@@ -178,10 +179,8 @@ get_word(char **_pos, char **_word, int32 assignmentMode, bool allowNewLine)
 			|| (!allowNewLine && (pos[0] == '\t' || pos[0] == ' '))
 			|| (assignmentMode == ALLOW_ASSIGNMENT && pos[0] == '='))) {
 		// skip any comment lines
-		if (pos[0] == '#') {
-			while (pos[0] && pos[0] != '\n')
-				pos++;
-		}
+		if (pos[0] == '#')
+			pos = strchrnul(pos, '\n');
 		pos++;
 	}
 
