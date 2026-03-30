@@ -11,6 +11,9 @@ StdBinCommands
 	cache_control.cpp
 	;
 
+SimpleTest file_cache_resize_races_test :
+	file_cache_resize_races_test.cpp ;
+
 SimpleTest block_cache_test :
 	block_cache_test.cpp
 	: libkernelland_emu.so ;
