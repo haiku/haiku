@@ -14,6 +14,10 @@
 
 /*! String class supporting common string operations. */
 
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+
 #include <String.h>
 
 #include <ctype.h>
@@ -1167,41 +1171,21 @@ BString::FindFirst(const char* string, int32 fromOffset) const
 int32
 BString::FindFirst(char c) const
 {
-	const char* start = String();
-	const char* end = String() + Length();
-
-	// Scans the string until we found the
-	// character, or we reach the string's start
-	while (start != end && *start != c) {
-		start++;
-	}
-
-	if (start == end)
-		return B_ERROR;
-
-	return start - String();
+	return FindFirst(c, 0);
 }
 
 
 int32
 BString::FindFirst(char c, int32 fromOffset) const
 {
-	if (fromOffset < 0)
+	if (fromOffset < 0 || fromOffset >= Length())
 		return B_ERROR;
 
-	const char* start = String() + min_clamp0(fromOffset, Length());
-	const char* end = String() + Length();
-
-	// Scans the string until we found the
-	// character, or we reach the string's start
-	while (start < end && *start != c) {
-		start++;
-	}
-
-	if (start >= end)
+	const void* start = memchr(String() + fromOffset, c, Length());
+	if (start == NULL)
 		return B_ERROR;
 
-	return start - String();
+	return (const char*)start - String();
 }
 
 
@@ -2545,12 +2529,17 @@ int32
 BString::_FindBefore(const char* string, int32 offset, int32 length) const
 {
 	if (fPrivateData != NULL) {
-		const char* ptr = fPrivateData + offset - length;
+		const char* end = fPrivateData + offset - (length - 1);
+		while (end >= fPrivateData) {
+			const char* ptr = (const char*)memrchr(fPrivateData,
+				string[0], end - fPrivateData);
+			if (ptr == NULL)
+				break;
 
-		while (ptr >= fPrivateData) {
-			if (!memcmp(ptr, string, length))
+			if (memcmp(ptr, string, length) == 0)
 				return ptr - fPrivateData;
-			ptr--;
+
+			end = ptr;
 		}
 	}
 	return B_ERROR;
