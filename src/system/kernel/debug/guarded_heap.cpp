@@ -159,6 +159,9 @@ guarded_heap_allocate_meta(guarded_heap& heap, size_t size, uint32 flags)
 	}
 
 	void* meta = heap.meta_allocator.Allocate(size);
+	if (meta == NULL)
+		return NULL;
+
 	memset(meta, 0, size);
 	return meta;
 }
@@ -260,6 +263,10 @@ guarded_heap_allocate(guarded_heap& heap, size_t size, size_t alignment,
 	// need to unlock the heap to allocate more.
 	GuardedHeapChunk* spareChunk = (GuardedHeapChunk*)
 		guarded_heap_allocate_meta(heap, sizeof(GuardedHeapChunk), flags);
+	if (spareChunk == NULL) {
+		// Various flags can cause this even if there's still memory left.
+		return NULL;
+	}
 
 	// Round up to the page size, plus the guard pages on either end.
 	const size_t guardPages = 1;
