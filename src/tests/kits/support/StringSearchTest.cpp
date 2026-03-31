@@ -32,7 +32,10 @@ class StringSearchTest : public CppUnit::TestFixture {
 	CPPUNIT_TEST(FindFirst_Char_Found);
 	CPPUNIT_TEST(FindFirst_Char_NotFound);
 	CPPUNIT_TEST(FindFirst_CString_ValidOffset_Found_1);
+	CPPUNIT_TEST(FindFirst_Char_ValidOffset_Found);
 	CPPUNIT_TEST(FindFirst_Char_ValidOffset_NotFound);
+	CPPUNIT_TEST(FindFirst_Char_LastOffset_Found);
+	CPPUNIT_TEST(FindFirst_Char_LastOffset_NotFound);
 	CPPUNIT_TEST(FindFirst_CString_ValidOffset_NotFound);
 #ifndef TEST_R5
 	CPPUNIT_TEST(StartsWith_BString_ReturnsTrue);
@@ -213,10 +216,30 @@ public:
 		CPPUNIT_ASSERT_EQUAL(5, string1.FindFirst("b", 3));
 	}
 
-	void FindFirst_Char_ValidOffset_NotFound()
+	void FindFirst_Char_ValidOffset_Found()
 	{
 		BString string1("abcd abcd");
-		CPPUNIT_ASSERT_EQUAL(B_ERROR, string1.FindFirst('e', 3));
+		CPPUNIT_ASSERT_EQUAL(5, string1.FindFirst('a', 3));
+	}
+
+	void FindFirst_Char_ValidOffset_NotFound()
+	{
+		BString string1;
+		string1.SetTo('e', 200);
+		string1.SetTo('a', 190);
+		CPPUNIT_ASSERT_EQUAL(B_ERROR, string1.FindFirst('e', 185));
+	}
+
+	void FindFirst_Char_LastOffset_Found()
+	{
+		BString string1("abcd abcd");
+		CPPUNIT_ASSERT_EQUAL(8, string1.FindFirst('d', 8));
+	}
+
+	void FindFirst_Char_LastOffset_NotFound()
+	{
+		BString string1("abcd abcd");
+		CPPUNIT_ASSERT_EQUAL(B_ERROR, string1.FindFirst('e', 8));
 	}
 
 	void FindFirst_CString_ValidOffset_NotFound()

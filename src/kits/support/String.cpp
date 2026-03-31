@@ -1181,7 +1181,7 @@ BString::FindFirst(char c, int32 fromOffset) const
 	if (fromOffset < 0 || fromOffset >= Length())
 		return B_ERROR;
 
-	const void* start = memchr(String() + fromOffset, c, Length());
+	const void* start = memchr(String() + fromOffset, c, Length() - fromOffset);
 	if (start == NULL)
 		return B_ERROR;
 
