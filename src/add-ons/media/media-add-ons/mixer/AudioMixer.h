@@ -27,7 +27,7 @@ public:
 									bool isSystemMixer);
 	virtual						~AudioMixer();
 
-			void				DisableNodeStop();
+			void				SetAutoStop(bool autoStop);
 
 	// AudioMixer support
 			void				ApplySettings();
@@ -133,7 +133,7 @@ private:
 			BBufferGroup*		fBufferGroup;
 			bigtime_t			fDownstreamLatency;
 			bigtime_t			fInternalLatency;
-			bool				fDisableStop;
+			bool				fAutoStop;
 			media_format		fDefaultFormat;
 			bigtime_t			fLastLateNotification;
 			bigtime_t			fLastLateness;

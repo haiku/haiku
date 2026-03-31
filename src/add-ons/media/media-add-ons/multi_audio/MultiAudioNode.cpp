@@ -353,7 +353,7 @@ status_t
 MultiAudioNode::HandleMessage(int32 message, const void* data, size_t size)
 {
 	CALLED();
-	return B_ERROR;
+	return BMediaEventLooper::HandleMessage(message, data, size);
 }
 
 
@@ -712,8 +712,6 @@ MultiAudioNode::Connected(const media_source& producer,
 	channel->fInput.source = producer;
 	channel->fInput.format = with_format;
 	*out_input = channel->fInput;
-
-	_StartOutputThreadIfNeeded();
 
 	return B_OK;
 }
@@ -1228,8 +1226,8 @@ MultiAudioNode::_HandleStart(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
-	if (RunState() != B_STARTED) {
-	}
+	if (RunState() != B_STARTED)
+		_StartOutputThreadIfNeeded();
 	return B_OK;
 }
 
@@ -1299,10 +1297,6 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 			PRINT(("TimeSourceOp op B_TIMESOURCE_START\n"));
 			if (RunState() != BMediaEventLooper::B_STARTED) {
 				fTimeSourceStarted = true;
-				_StartOutputThreadIfNeeded();
-
-				media_timed_event startEvent(0, BTimedEventQueue::B_START);
-				EventQueue()->AddEvent(startEvent);
 			}
 			break;
 		case B_TIMESOURCE_STOP:

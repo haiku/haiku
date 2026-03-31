@@ -751,7 +751,8 @@ DefaultManager::_ConnectMixerToOutput()
 	ts = fRoster->MakeTimeSourceFor(mixer);
 	start_at = ts->Now() + 50000;
 	fRoster->StartNode(mixer, start_at);
-	fRoster->StartNode(soundcard, start_at);
+
+	// The mixer will be in "auto-stop" mode, so it'll start the output on its own.
 	ts->Release();
 
 finish:

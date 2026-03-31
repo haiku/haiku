@@ -105,7 +105,7 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
 	fBufferGroup(NULL),
 	fDownstreamLatency(1),
 	fInternalLatency(1),
-	fDisableStop(false),
+	fAutoStop(false),
 	fLastLateNotification(0),
 	fLastLateness(0)
 {
@@ -130,8 +130,8 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
 		path.Append("System Audio Mixer");
 		fCore->Settings()->SetSettingsFile(path.Path());
 
-		// disable stop on the auto started (system) mixer
-		DisableNodeStop();
+		// enable auto-stop on the auto started (system) mixer
+		SetAutoStop(true);
 	}
 
 	ApplySettings();
@@ -168,9 +168,9 @@ AudioMixer::ApplySettings()
 
 
 void
-AudioMixer::DisableNodeStop()
+AudioMixer::SetAutoStop(bool autoStop)
 {
-	fDisableStop = true;
+	fAutoStop = autoStop;
 }
 
 
@@ -180,12 +180,12 @@ AudioMixer::DisableNodeStop()
 void
 AudioMixer::Stop(bigtime_t performance_time, bool immediate)
 {
-	if (fDisableStop) {
-		TRACE("AudioMixer STOP is disabled\n");
+	if (fAutoStop) {
+		TRACE("AudioMixer in auto-stop mode; ignoring Stop request\n");
 		return;
-	} else {
-		BMediaEventLooper::Stop(performance_time, immediate);
 	}
+
+	BMediaEventLooper::Stop(performance_time, immediate);
 }
 
 
@@ -432,6 +432,36 @@ AudioMixer::Connected(const media_source &producer,
 
 	fCore->Settings()->LoadConnectionSettings(input);
 
+	if (fAutoStop && fCore->CountInputs() == 1) {
+		// Start our destination node.
+		BMediaRoster* roster = BMediaRoster::Roster();
+		media_node_id outputID = roster->NodeIDFor(
+			fCore->Output()->MediaOutput().destination.port);
+		media_node output;
+		roster->GetNodeFor(outputID, &output);
+
+		bigtime_t startLatency = 10000;
+		roster->GetStartLatencyFor(output,
+			&startLatency);
+		status_t status = roster->StartNode(output, 0 + startLatency);
+		if (status == B_OK) {
+			// We need to wait for the node to actually start. Otherwise, a stale
+			// TimeSource could confuse the just-connected node.
+			bigtime_t performanceTime, realTime;
+			float drift;
+			bigtime_t timeout = system_time() + 1 * 1000 * 1000;
+			while (TimeSource()->GetTime(&performanceTime, &realTime, &drift) != B_OK
+					|| (realTime + 1 * 1000 * 1000) <= system_time()) {
+				snooze(100);
+				if (system_time() >= timeout)
+					break;
+			}
+		}
+
+		roster->ReleaseNode(output);
+		fCore->Start();
+	}
+
 	fCore->Unlock();
 
 	// If we want the producer to use a specific BBufferGroup, we now need
@@ -461,6 +491,10 @@ AudioMixer::Disconnected(const media_source &producer,
 
 	if (!fCore->RemoveInput(where.id)) {
 		TRACE("AudioMixer::Disconnected can't remove input\n");
+	}
+
+	if (fAutoStop && fCore->CountInputs() == 0) {
+		// TODO: stop the mixer and the output node
 	}
 
 	fCore->Unlock();
@@ -1083,7 +1117,7 @@ AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness,
 		case BTimedEventQueue::B_START:
 		{
 			TRACE("AudioMixer::HandleEvent: B_START\n");
-			if (RunState() != B_STARTED) {
+			if (!fAutoStop && RunState() != B_STARTED) {
 				fCore->Lock();
 				fCore->Start();
 				fCore->Unlock();
