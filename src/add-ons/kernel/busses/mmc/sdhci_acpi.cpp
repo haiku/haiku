@@ -240,4 +240,5 @@ mmc_bus_interface gSDHCIACPIDeviceModule = {
 	.set_scan_semaphore = set_scan_semaphore,
 	.set_bus_width = set_bus_width,
 	.terminate_bus = terminate_bus,
+	.set_card_type = set_card_type,
 };

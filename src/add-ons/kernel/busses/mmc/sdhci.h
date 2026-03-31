@@ -16,6 +16,8 @@
 
 #include <KernelExport.h>
 
+#include "mmc.h"
+
 
 class SdhciBus {
 	public:
@@ -34,6 +36,7 @@ class SdhciBus {
 									bool offsetAsSectors);
 			void				SetScanSemaphore(sem_id sem);
 			void				SetBusWidth(int width);
+			void				SetCardType(card_type type);
 			void				TerminateBus();
 
 	private:
@@ -50,6 +53,7 @@ class SdhciBus {
 			sem_id				fScanSemaphore;
 			status_t			fStatus;
 			thread_id			fWorkerThread;
+			card_type			fCardType;
 };
 
 
@@ -518,6 +522,7 @@ status_t do_io(void* controller, uint8_t command,
 	IOOperation* operation, bool offsetAsSectors);
 void set_scan_semaphore(void* controller, sem_id sem);
 void set_bus_width(void* controller, int width);
+void set_card_type(void* controller, card_type type);
 void terminate_bus(void* controller);
 
 extern mmc_bus_interface gSDHCIACPIDeviceModule;

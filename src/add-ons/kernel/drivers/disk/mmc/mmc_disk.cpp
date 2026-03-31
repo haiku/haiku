@@ -152,8 +152,8 @@ mmc_block_get_geometry(mmc_disk_driver_info* info, device_geometry* geometry)
 {
 	struct mmc_disk_csd csd;
 	TRACE("Get geometry\n");
-	status_t error = info->mmc->execute_command(info->parent,
-		info->parentCookie, 0, SD_SEND_CSD, info->rca << 16, (uint32_t*)&csd);
+	status_t error = info->mmc->execute_command(info->parent, info->parentCookie, 0, SEND_CSD,
+		info->rca << 16, (uint32_t*)&csd);
 	if (error != B_OK) {
 		TRACE("Could not get CSD! %s\n", strerror(error));
 		return error;

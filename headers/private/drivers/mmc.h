@@ -17,30 +17,36 @@
 
 struct IOOperation;
 
-
-enum {
+typedef enum card_type {
+	CARD_TYPE_UNKNOWN,
 	CARD_TYPE_MMC,
 	CARD_TYPE_SD,
 	CARD_TYPE_SDHC,
 	CARD_TYPE_UHS1,
 	CARD_TYPE_UHS2,
 	CARD_TYPE_SDIO
-};
+} card_type;
 
 
-// Commands for SD cards defined in SD Specifications Part 1:
-// Physical Layer Simplified Specification Version 8.00
+// Commands for SD/eMMC cards defined in:
+// SD: Physical Layer Simplified Specification Version 8.00
+// eMMC: JEDEC Standard No. 84-B51. Sec 6.10.4
 // They are in the common .h file for the mmc stack because the SDHCI driver
 // currently needs to map them to the corresponding expected response types.
+// card type prefix to distinguish non common commands.
 enum SD_COMMANDS {
 	// Basic commands, class 0
-	SD_GO_IDLE_STATE 		= 0,
-	SD_ALL_SEND_CID			= 2,
-	SD_SEND_RELATIVE_ADDR	= 3,
-	SD_SELECT_DESELECT_CARD	= 7,
-	SD_SEND_IF_COND			= 8,
-	SD_SEND_CSD				= 9,
-	SD_STOP_TRANSMISSION	= 12,
+	GO_IDLE_STATE = 0,
+	MMC_SEND_OP_COND = 1,
+	// MMC only,reserved in SD.
+	ALL_SEND_CID = 2,
+	SD_SEND_RELATIVE_ADDR = 3,
+	MMC_SET_RELATIVE_ADDR = 3,
+	SELECT_DESELECT_CARD = 7,
+	// resp can be R1 per mmc spec,keep R1b for now.
+	SD_SEND_IF_COND = 8,
+	SEND_CSD = 9,
+	SD_STOP_TRANSMISSION = 12,
 
 	// Block oriented read and write commands, class 2
 	SD_READ_SINGLE_BLOCK = 17,
@@ -89,7 +95,7 @@ typedef struct mmc_bus_interface {
 	void (*set_bus_width)(void* controller, int width);
 		// Set the data bus width to 1, 4 or 8 bit mode.
 	void (*terminate_bus)(void* controller);
-	// Terminate use of the underlying sdhci bus.
+	void (*set_card_type)(void* controller, card_type type);
 } mmc_bus_interface;
 
 
