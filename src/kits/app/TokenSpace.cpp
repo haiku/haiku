@@ -34,7 +34,7 @@ BTokenSpace::BTokenSpace()
 	:
 	fNextToken(1)
 {
-	fLock = (pthread_mutex_t)PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+	fLock = (pthread_mutex_t)PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 }
 
 

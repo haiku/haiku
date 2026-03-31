@@ -33,7 +33,6 @@
 #define __pthread_mutex_lock pthread_mutex_lock
 #define __pthread_mutex_trylock pthread_mutex_trylock
 #define __pthread_mutex_unlock pthread_mutex_unlock
-#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP	PTHREAD_RECURSIVE_MUTEX_INITIALIZER
 #define PTHREAD_MUTEX_RECURSIVE_NP	PTHREAD_MUTEX_RECURSIVE
 
 /* Mutex type.  */
