@@ -1522,11 +1522,13 @@ PicturePlayer::_Play(PicturePlayerCallbacks& callbacks,
 
 			case B_PIC_SET_TRANSFORM:
 			{
-				const BAffineTransform* transform;
-				if (!reader.Get(transform))
+				const double* transformValues;
+				if (!reader.Get(transformValues, 6))
 					break;
 
-				callbacks.SetTransform(*transform);
+				BAffineTransform transform;
+				memcpy(&transform.sx, transformValues, 6 * sizeof(double));
+				callbacks.SetTransform(transform);
 				break;
 			}
 

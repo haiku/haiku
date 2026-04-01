@@ -203,11 +203,11 @@ PictureDataWriter::WriteSetScale(const float& scale)
 
 
 status_t
-PictureDataWriter::WriteSetTransform(BAffineTransform transform)
+PictureDataWriter::WriteSetTransform(const BAffineTransform& transform)
 {
 	try {
 		BeginOp(B_PIC_SET_TRANSFORM);
-		Write<BAffineTransform>(transform);
+		WriteData(&transform.sx, 6 * sizeof(double));
 		EndOp();
 	} catch (status_t& status) {
 		return status;
