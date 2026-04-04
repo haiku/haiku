@@ -68,6 +68,16 @@ BTrashWatcher::BTrashWatcher()
 }
 
 
+thread_id
+BTrashWatcher::Run()
+{
+	fTrashFull = CheckTrashDirs();
+	UpdateTrashIcon();
+
+	return BLooper::Run();
+}
+
+
 BTrashWatcher::~BTrashWatcher()
 {
 	stop_watching(this);

@@ -49,6 +49,7 @@ public:
 	BTrashWatcher();
 	virtual ~BTrashWatcher();
 
+	virtual thread_id Run();
 	bool CheckTrashDirs();
 	bool IsTrashNode(const node_ref*) const;
 
