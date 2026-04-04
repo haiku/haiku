@@ -154,6 +154,10 @@ Inode::VerifyFork(int whichFork) const
 bool
 Inode::VerifyForkoff() const
 {
+	// Valid case when there is no attribute fork present
+	if (!fNode->di_forkoff)
+		return true;
+
 	switch(Format()) {
 		case XFS_DINODE_FMT_DEV:
 			if (fNode->di_forkoff != (ROUNDUP(sizeof(uint32), 8) >> 3))
