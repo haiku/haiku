@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Devices	911816421
+1	japanese	x-vnd.Haiku-Devices	1667967532
 ACPI bus	DevicesView		ACPI バス
 Encryption controller	Device		暗号化コントローラー
 Devices	System name		デバイス
@@ -48,6 +48,7 @@ Device name	DeviceACPI		デバイス名
 Card Reader	DeviceSCSI		カードリーダー
 Display controller	Device		ディスプレイコントローラー
 ACPI Button '%1'	DeviceACPI		ACPI ボタン '%1'
+Bus	DevicesView		バス
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		デバイス名
 Disk Drive	DeviceSCSI		ディスクドライブ

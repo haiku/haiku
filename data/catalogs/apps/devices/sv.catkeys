@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	911816421
+1	swedish	x-vnd.Haiku-Devices	1667967532
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringsstyrenhet
 Devices	System name		Enheter
@@ -48,6 +48,7 @@ Device name	DeviceACPI		Enhetsnamn
 Card Reader	DeviceSCSI		Kortläsare
 Display controller	Device		Skärmkontroller
 ACPI Button '%1'	DeviceACPI		ACPI Knapp '%1'
+Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Enhetsnamn
 Disk Drive	DeviceSCSI		Diskenhet
