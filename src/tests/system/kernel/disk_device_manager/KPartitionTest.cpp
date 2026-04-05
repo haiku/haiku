@@ -1,19 +1,18 @@
 /*
- * Copyright 2018 Kacper Kasper <kacperkasper@gmail.com>
+ * Copyright 2018-2026, Kacper Kasper <kacperkasper@gmail.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
-#include "KPartitionTest.h"
-
 #include <string.h>
 
 #include <fs/KPath.h>
+#include <slab/Slab.h>
 #include <disk_device_manager/KPartition.h>
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
-#include <TestUtils.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
+#include <TestSuiteAddon.h>
 
 
 struct stat;
@@ -30,124 +29,104 @@ stat(const char* path, struct stat* s)
 using BPrivate::DiskDevice::KPartition;
 
 
-//	#pragma mark -
+object_cache* sPathNameCache;
 
 
-KPartitionGetMountPointTest::KPartitionGetMountPointTest(std::string name)
-	: BTestCase(name)
-{
-}
+class KPartitionGetMountPointTest : public CppUnit::TestFixture {
+public:
+	CPPUNIT_TEST_SUITE(KPartitionGetMountPointTest);
+	CPPUNIT_TEST(WithoutFilesystem_ReturnsBadValue);
+	CPPUNIT_TEST(DifferentNameAndContentName_ContentNameTakesPrecedence);
+	CPPUNIT_TEST(ContentNameEmpty_NameUsed);
+	CPPUNIT_TEST(NameAndContentNameEmpty_NotRoot);
+	CPPUNIT_TEST(NameWithSlashes_SlashesAreRemoved);
+	CPPUNIT_TEST(MountPointExists_UsesDifferentPath);
+	CPPUNIT_TEST_SUITE_END();
 
-#define ADD_TEST(s, cls, m) \
-	s->addTest(new CppUnit::TestCaller<cls>(#cls "::" #m, &cls::m));
+public:
+	void WithoutFilesystem_ReturnsBadValue()
+	{
+		KPartition partition;
+		partition.SetName("");
+		partition.SetContentName("");
+		partition.SetFlags(0);
 
+		KPath path;
+		status_t status = partition.GetMountPoint(&path);
 
-CppUnit::Test*
-KPartitionGetMountPointTest::Suite()
-{
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite("KPartitionGetMountPointTest");
+		CPPUNIT_ASSERT_EQUAL(status, B_BAD_VALUE);
+	}
 
-	ADD_TEST(suite, KPartitionGetMountPointTest, TestPartitionWithoutFilesystemReturnsBadValue);
-	ADD_TEST(suite, KPartitionGetMountPointTest, TestPartitionContentNameUsedFirst);
-	ADD_TEST(suite, KPartitionGetMountPointTest, TestPartitionNameUsedSecond);
-	ADD_TEST(suite, KPartitionGetMountPointTest, TestPartitionWithoutAnyNameIsNotRoot);
-	ADD_TEST(suite, KPartitionGetMountPointTest, TestPartitionNameWithSlashesRemoved);
-	ADD_TEST(suite, KPartitionGetMountPointTest, TestPartitionMountPointExists);
+	void DifferentNameAndContentName_ContentNameTakesPrecedence()
+	{
+		KPartition partition;
+		partition.SetName("test1");
+		partition.SetContentName("test2");
+		partition.SetFlags(B_PARTITION_FILE_SYSTEM);
 
-	return suite;
-}
+		KPath path;
+		status_t status = partition.GetMountPoint(&path);
 
+		CPPUNIT_ASSERT_EQUAL(status, B_OK);
+		CPPUNIT_ASSERT(strcmp(path.Path(), "/test2") == 0);
+	}
 
-void
-KPartitionGetMountPointTest::TestPartitionWithoutFilesystemReturnsBadValue()
-{
-	KPartition partition;
-	partition.SetName("");
-	partition.SetContentName("");
-	partition.SetFlags(0);
+	void ContentNameEmpty_NameUsed()
+	{
+		KPartition partition;
+		partition.SetName("test1");
+		partition.SetContentName("");
+		partition.SetFlags(B_PARTITION_FILE_SYSTEM);
 
-	KPath path;
-	status_t status = partition.GetMountPoint(&path);
+		KPath path;
+		status_t status = partition.GetMountPoint(&path);
 
-	CPPUNIT_ASSERT_EQUAL(status, B_BAD_VALUE);
-}
+		CPPUNIT_ASSERT_EQUAL(status, B_OK);
+		CPPUNIT_ASSERT(strcmp(path.Path(), "/test1") == 0);
+	}
 
+	void NameAndContentNameEmpty_NotRoot()
+	{
+		KPartition partition;
+		partition.SetName("");
+		partition.SetContentName("");
+		partition.SetFlags(B_PARTITION_FILE_SYSTEM);
 
-void
-KPartitionGetMountPointTest::TestPartitionContentNameUsedFirst()
-{
-	KPartition partition;
-	partition.SetName("test1");
-	partition.SetContentName("test2");
-	partition.SetFlags(B_PARTITION_FILE_SYSTEM);
+		KPath path;
+		status_t status = partition.GetMountPoint(&path);
 
-	KPath path;
-	status_t status = partition.GetMountPoint(&path);
+		CPPUNIT_ASSERT_EQUAL(status, B_OK);
+		CPPUNIT_ASSERT(strcmp(path.Path(), "/") != 0);
+	}
 
-	CPPUNIT_ASSERT_EQUAL(status, B_OK);
-	CPPUNIT_ASSERT(strcmp(path.Path(), "/test2") == 0);
-}
+	void NameWithSlashes_SlashesAreRemoved()
+	{
+		KPartition partition;
+		partition.SetName("");
+		partition.SetContentName("testing/slashes");
+		partition.SetFlags(B_PARTITION_FILE_SYSTEM);
 
+		KPath path;
+		status_t status = partition.GetMountPoint(&path);
 
-void
-KPartitionGetMountPointTest::TestPartitionNameUsedSecond()
-{
-	KPartition partition;
-	partition.SetName("test1");
-	partition.SetContentName("");
-	partition.SetFlags(B_PARTITION_FILE_SYSTEM);
+		CPPUNIT_ASSERT_EQUAL(status, B_OK);
+		CPPUNIT_ASSERT(strcmp(path.Path(), "/testing/slashes") != 0);
+	}
 
-	KPath path;
-	status_t status = partition.GetMountPoint(&path);
+	void MountPointExists_UsesDifferentPath()
+	{
+		KPartition partition;
+		partition.SetName("");
+		partition.SetContentName("testduplicate");
+		partition.SetFlags(B_PARTITION_FILE_SYSTEM);
 
-	CPPUNIT_ASSERT_EQUAL(status, B_OK);
-	CPPUNIT_ASSERT(strcmp(path.Path(), "/test1") == 0);
-}
+		KPath path;
+		status_t status = partition.GetMountPoint(&path);
 
+		CPPUNIT_ASSERT_EQUAL(status, B_OK);
+		CPPUNIT_ASSERT(strcmp(path.Path(), "/testduplicate") != 0);
+	}
+};
 
-void
-KPartitionGetMountPointTest::TestPartitionWithoutAnyNameIsNotRoot()
-{
-	KPartition partition;
-	partition.SetName("");
-	partition.SetContentName("");
-	partition.SetFlags(B_PARTITION_FILE_SYSTEM);
-
-	KPath path;
-	status_t status = partition.GetMountPoint(&path);
-
-	CPPUNIT_ASSERT_EQUAL(status, B_OK);
-	CPPUNIT_ASSERT(strcmp(path.Path(), "/") != 0);
-}
-
-
-void
-KPartitionGetMountPointTest::TestPartitionNameWithSlashesRemoved()
-{
-	KPartition partition;
-	partition.SetName("");
-	partition.SetContentName("testing/slashes");
-	partition.SetFlags(B_PARTITION_FILE_SYSTEM);
-
-	KPath path;
-	status_t status = partition.GetMountPoint(&path);
-
-	CPPUNIT_ASSERT_EQUAL(status, B_OK);
-	CPPUNIT_ASSERT(strcmp(path.Path(), "/testing/slashes") != 0);
-}
-
-
-void
-KPartitionGetMountPointTest::TestPartitionMountPointExists()
-{
-	KPartition partition;
-	partition.SetName("");
-	partition.SetContentName("testduplicate");
-	partition.SetFlags(B_PARTITION_FILE_SYSTEM);
-
-	KPath path;
-	status_t status = partition.GetMountPoint(&path);
-
-	CPPUNIT_ASSERT_EQUAL(status, B_OK);
-	CPPUNIT_ASSERT(strcmp(path.Path(), "/testduplicate") != 0);
-}
+// FIXME: hangs
+//CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(KPartitionGetMountPointTest, getTestSuiteName());

@@ -18,7 +18,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
 
 DEFINES += _KERNEL_MODE ;
 
-SharedLibrary test_disk_device_manager.so :
+StaticLibrary test_disk_device_manager.a :
 #	ddm_userland_interface.cpp
 	disk_device_manager.cpp
 	KDiskDevice.cpp
@@ -40,19 +40,17 @@ SharedLibrary test_disk_device_manager.so :
 
 	# notifications
 	Notifications.cpp
-
-	: be libkernelland_emu.so [ TargetLibsupc++ ]
 ;
 
 UnitTestLib libkerneldiskdevicemanagertest.so :
 	DiskDeviceManagerTestAddon.cpp
 	KPartitionTest.cpp
-	: test_disk_device_manager.so [ TargetLibstdc++ ]
+	: be [ TargetLibsupc++ ] [ TargetLibstdc++ ] test_disk_device_manager.a libkernelland_emu.so
 ;
 
 SimpleTest DiskDeviceManagerTest :
 	DiskDeviceManagerTest.cpp
-	: test_disk_device_manager.so be
+	: be [ TargetLibsupc++ ] test_disk_device_manager.a libkernelland_emu.so 
 ;
 
 # Also build all modules:

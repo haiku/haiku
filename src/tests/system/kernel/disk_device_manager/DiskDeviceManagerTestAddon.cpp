@@ -1,13 +1,15 @@
+/*
+ * Copyright 2024, Haiku Inc.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
+
 #include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
-#include "KPartitionTest.h"
 
-
-BTestSuite*
-getTestSuite()
+const char*
+getTestSuiteName()
 {
-	BTestSuite *suite = new BTestSuite("DiskDeviceManager");
-	suite->addTest("KPartitionGetMountPointTest", KPartitionGetMountPointTest::Suite());
-	return suite;
+	return "KernelDiskDeviceManager";
 }
