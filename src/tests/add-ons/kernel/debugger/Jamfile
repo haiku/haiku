@@ -4,7 +4,7 @@ SubDirHdrs $(HAIKU_TOP) src kits debugger demangler ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel debugger demangle ;
 
 UnitTestLib libkerneldebuggertest.so :
-	KernelDebuggerTest.cpp
+	KernelDebuggerTestAddon.cpp
 
 	DemangleTest.cpp
 
