@@ -4,6 +4,7 @@
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 
 SYSTEM_APPS = [ FFilterByBuildFeatures
+	Debugger@libedit
 	NetworkStatus
 	ProcessController
 	SerialConnect
@@ -11,3 +12,68 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 	Workspaces ] ;
 
 DESKBAR_APPLICATIONS = SerialConnect Terminal ;
+
+rule HaikuImageGetSystemLibs
+{
+	return
+		# libs with special grist
+		[ MultiArchDefaultGristFiles libroot.so : revisioned ]
+		[ Libstdc++ForImage ]
+		# libs with standard grist
+		[ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
+			libalm.so
+			libbe.so
+			libbsd.so
+			libbnetapi.so
+			libbluetooth.so
+			libdebug.so
+			libdebugger.so@primary
+			libdevice.so
+			libgame.so
+			libglut.so@mesa
+			libgnu.so
+			libmail.so
+			libmedia.so
+			libmidi.so@fluidlite
+			libmidi2.so
+			libnetwork.so
+			libpackage.so
+			libscreensaver.so
+			libtextencoding.so
+			libtracker.so
+			libtranslation.so
+		] ]
+		;
+}
+
+SYSTEM_SERVERS += [ FFilterByBuildFeatures
+	mail_daemon
+	media_addon_server
+	media_server
+	midi_server
+	nfs4_idmapper_server
+	bluetooth_server
+	print_server
+	print_addon_server
+] ;
+
+SYSTEM_ADD_ONS_TRANSLATORS += [ FFilterByBuildFeatures
+	AVIFTranslator@libavif
+	BMPTranslator
+	GIFTranslator
+	HVIFTranslator
+	ICOTranslator
+	ICNSTranslator@libicns
+	JPEGTranslator@jpeg	JPEG2000Translator@jasper
+	PCXTranslator
+	PNGTranslator@libpng
+	PPMTranslator
+	PSDTranslator
+	RAWTranslator
+	RTFTranslator
+	SGITranslator
+	TGATranslator
+	TIFFTranslator@tiff
+	WebPTranslator@libwebp
+	WonderBrushTranslator
+] ;
