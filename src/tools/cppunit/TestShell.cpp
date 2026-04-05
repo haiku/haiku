@@ -10,6 +10,7 @@
 #include <image.h>
 #include <Locker.h>
 #include <Path.h>
+#include <String.h>
 #include <TLS.h>
 
 #include <cppunit/Exception.h>
@@ -139,9 +140,15 @@ BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 	while (libDir->GetNextEntry(&addonEntry, true) == B_OK) {
 		status_t err;
 		status_t addonStatus = B_ERROR;
+		bool getTestSuiteFound = false;
 		err = addonEntry.GetPath(&addonPath);
 		if (!err) {
-			cout << "Checking " << addonPath.Path() << "..." << endl;
+			cout << "Checking " << addonPath.Path() << "";
+			BString filename(addonPath.Leaf());
+			if (!filename.EndsWith(".so")) {
+				cout << ", wrong extension. Skipping." << endl;
+				continue;
+			}
 			addonImage = load_add_on(addonPath.Path());
 			addonStatus = (addonImage >= 0 ? B_OK : B_ERROR);
 		}
@@ -149,9 +156,11 @@ BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 			err = get_image_symbol(addonImage, "getTestSuite",
 				B_SYMBOL_TYPE_TEXT, reinterpret_cast<void **>(&func));
 		} else {
-			// cout << " getTestSuite error == " << err << endl;
+			// cout << ", getTestSuite error == " << err << endl;
 		}
 		if (err == B_OK) {
+			cout << ", found getTestSuite()";
+			getTestSuiteFound = true;
 			err = AddSuite(func());
 			if (err == B_OK)
 				count++;
@@ -160,15 +169,18 @@ BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 			err = get_image_symbol(addonImage, "getTestSuiteName",
 				B_SYMBOL_TYPE_TEXT, reinterpret_cast<void **>(&nameF));
 			if(err == B_OK) {
+				cout << ", found getTestSuiteName()";
 				const char* testSuiteName = nameF();
 				CppUnit::TestFactoryRegistry &registry =
 					CppUnit::TestFactoryRegistry::getRegistry(testSuiteName);
 				AddSuite(static_cast<CppUnit::TestSuite*>(registry.makeTest()));
 				count++;
-			} else {
-				// cout << " getTestSuiteName error == " << err << endl;
+			} else if (!getTestSuiteFound) {
+				cout << ", getTestSuiteName error == " << err << endl;
+				continue;
 			}
 		}
+		cout << ", OK." << endl;
 	}
 	return count;
 }
