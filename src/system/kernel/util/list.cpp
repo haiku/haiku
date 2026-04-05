@@ -8,13 +8,17 @@
 #include <util/DoublyLinkedList.h>
 #include <BytePointer.h>
 
+#include <debug.h>
+
 
 #define GET_ITEM(list, item) ({ BytePointer<void> pointer((uint8*)item \
 	- list->offset); &pointer; })
 #define GET_LINK(list, item) ({ BytePointer<list_link> pointer((uint8*)item \
 	+ list->offset); &pointer; })
 
+#if __GNUC__ > 2
 STATIC_ASSERT(sizeof(DoublyLinkedListLink<void*>) == sizeof(list_link));
+#endif
 
 
 /** Initializes the list with a specified offset to the link
