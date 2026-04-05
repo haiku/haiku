@@ -45,7 +45,7 @@ StaticLibrary test_disk_device_manager.a :
 UnitTestLib libkerneldiskdevicemanagertest.so :
 	DiskDeviceManagerTestAddon.cpp
 	KPartitionTest.cpp
-	: be [ TargetLibsupc++ ] [ TargetLibstdc++ ] test_disk_device_manager.a libkernelland_emu.so
+	: be [ TargetLibsupc++ ] [ TargetLibstdc++ ] test_disk_device_manager.a : libkernelland_emu.so
 ;
 
 SimpleTest DiskDeviceManagerTest :

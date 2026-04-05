@@ -9,11 +9,13 @@ rule UnitTestDependency
 
 rule UnitTestLib
 {
-	# UnitTestLib <lib> : <sources> : <libraries> ;
+	# UnitTestLib <lib> : <sources> : <libraries> : <local_libraries> : <rdefs> ;
 	#
 	local lib = $(1) ;
 	local sources = $(2) ;
 	local libraries = $(3) ;
+	local local_libraries = $(4) ;
+	local rdefs = $(5) ;
 
 	# if TEST_DEBUG is defined, we turn on debugging
 	if $(TEST_DEBUG) {
@@ -34,10 +36,19 @@ rule UnitTestLib
 	UseCppUnitObjectHeaders $(sources) ;
 
 	MakeLocate $(lib) : $(TARGET_UNIT_TEST_LIB_DIR) ;
-	SharedLibrary $(lib) : $(sources) : $(libraries) libcppunit.so ;
+	SharedLibrary $(lib) : $(sources) : $(libraries) $(local_libraries) libcppunit.so : $(rdefs) ;
 
 	UnitTestDependency $(lib) ;
 	UNIT_TEST_LIBRARIES on unittests += $(lib) ;
+	UNIT_TEST_LIBRARIES on unittests += $(local_libraries) ;
+	for dep in $(local_libraries) {
+		local dep_grist = $(dep:G=unittests) ;
+		MakeLocate $(dep_grist) : [ FDirName $(TARGET_UNIT_TEST_DIR) lib ] ;
+		File $(dep_grist) : $(dep) ;
+		MimeSet $(dep_grist) ;
+		MODE on $(dep_grist) = $(EXEMODE) ;
+		UnitTestDependency $(dep_grist) ;
+	}
 }
 
 
