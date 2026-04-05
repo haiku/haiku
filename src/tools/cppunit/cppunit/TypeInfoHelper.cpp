@@ -4,6 +4,9 @@
 
 #include <string>
 #include <cppunit/extensions/TypeInfoHelper.h>
+#if __GNUC__ > 2
+#include <cxxabi.h>
+#endif
 
 
 using std::string;
@@ -16,6 +19,14 @@ TypeInfoHelper::getClassName( const type_info &info )
 {
     static const string classPrefix( "class " );
     string name( info.name() );
+
+#if __GNUC__ > 2
+    int status = 0;
+    char* demangled_ptr = abi::__cxa_demangle(info.name(), NULL, NULL, &status);
+    if (status == 0) {
+        name = demangled_ptr;
+    }
+#endif
 
     bool has_class_prefix = 0 ==
 #if CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST
