@@ -4,18 +4,11 @@
  */
 
 
-#include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
-#include "KPathTest.h"
 
-
-BTestSuite*
-getTestSuite()
+const char*
+getTestSuiteName()
 {
-	BTestSuite* suite = new BTestSuite("KernelFS");
-
-	KPathTest::AddTests(*suite);
-
-	return suite;
+	return "KernelFS";
 }
