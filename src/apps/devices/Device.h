@@ -83,10 +83,10 @@ public:
 								const BString& devPathsPublished = "unknown");
 	virtual					~Device();
 
-	virtual BString			GetName();
-	virtual BString			GetManufacturer();
-	virtual BString			GetDriverUsed();
-	virtual BString			GetDevPathsPublished();
+	virtual BString			GetName() const;
+	virtual BString			GetManufacturer() const;
+	virtual BString			GetDriverUsed() const;
+	virtual BString			GetDevPathsPublished() const;
 	virtual Category		GetCategory() const
 								{ return fCategory; }
 	virtual Device*			GetPhysicalParent() const
@@ -94,12 +94,16 @@ public:
 	virtual BusType			GetBusType() const
 								{ return fBusType; }
 
-	virtual Attributes		GetAllAttributes();
-	virtual BString			GetAllStrings();
+	virtual Attributes		GetAllAttributes() const;
+	virtual BString			GetAllStrings() const;
 
-	virtual Attribute		GetAttribute(const BString& name)
-								{ return Attribute(name.String(),
-									 fAttributeMap[name]); }
+	virtual Attribute		GetAttribute(const BString& name) const
+								{
+									AttributeMapIterator it = fAttributeMap.find(name);
+									if (it != fAttributeMap.end())
+										return Attribute(name.String(), it->second);
+									return Attribute(name.String(), "");
+								}
 
 	virtual void 			SetAttribute(const BString& name,
 								const BString& value);

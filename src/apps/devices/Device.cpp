@@ -74,30 +74,42 @@ Device::~Device()
 
 
 BString
-Device::GetName()
+Device::GetName() const
 {
-	return fAttributeMap[B_TRANSLATE("Device name")];
+	AttributeMapIterator it = fAttributeMap.find(B_TRANSLATE("Device name"));
+	if (it != fAttributeMap.end())
+		return it->second;
+	return BString("unkown");
 }
 
 
 BString
-Device::GetManufacturer()
+Device::GetManufacturer() const
 {
-	return fAttributeMap[B_TRANSLATE("Manufacturer")];
+	AttributeMapIterator it = fAttributeMap.find(B_TRANSLATE("Manufacturer"));
+	if (it != fAttributeMap.end())
+		return it->second;
+	return BString("Unknown");
 }
 
 
 BString
-Device::GetDriverUsed()
+Device::GetDriverUsed() const
 {
-	return fAttributeMap[B_TRANSLATE("Driver used")];
+	AttributeMapIterator it = fAttributeMap.find(B_TRANSLATE("Driver used"));
+	if (it != fAttributeMap.end())
+		return it->second;
+	return BString("Unknown");
 }
 
 
 BString
-Device::GetDevPathsPublished()
+Device::GetDevPathsPublished() const
 {
-	return fAttributeMap[B_TRANSLATE("Device paths")];
+	AttributeMapIterator it = fAttributeMap.find(B_TRANSLATE("Device paths"));
+	if (it != fAttributeMap.end())
+		return it->second;
+	return BString("Unknown");
 }
 
 
@@ -112,7 +124,7 @@ Device::SetAttribute(const BString& name, const BString& value)
 
 
 Attributes
-Device::GetAllAttributes()
+Device::GetAllAttributes() const
 {
 	Attributes attributes;
 	AttributeMapIterator iter;
@@ -124,7 +136,7 @@ Device::GetAllAttributes()
 
 
 BString
-Device::GetAllStrings()
+Device::GetAllStrings() const
 {
 	BString str;
 	AttributeMapIterator iter;
