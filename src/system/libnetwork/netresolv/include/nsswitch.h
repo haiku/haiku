@@ -38,8 +38,18 @@
 
 #define	NSS_MODULE_INTERFACE_VERSION	0
 
+#ifdef __HAIKU__
+
+/* Yacc generated nsparser.y needs _PATH_NS_CONF for error reporting purpose */
+#undef _PATH_NS_CONF
+#define _PATH_NS_CONF	nsswitch_conf_file_path()
+
+#else
+
 #ifndef _PATH_NS_CONF
 #define _PATH_NS_CONF	"/etc/nsswitch.conf"
+#endif
+
 #endif
 
 #define	NS_CONTINUE	0
@@ -215,6 +225,11 @@ typedef struct {
 #include <sys/cdefs.h>
 
 __BEGIN_DECLS
+
+#ifdef __HAIKU__
+char *	nsswitch_conf_file_path(void);
+#endif
+
 int	nsdispatch(void *, const ns_dtab [], const char *,
 			const char *, const ns_src [], ...);
 

@@ -87,7 +87,16 @@ __RCSID("$NetBSD: nsdispatch.c,v 1.37 2012/03/13 21:13:42 christos Exp $");
 
 #include <libutil.h>
 
+#ifdef __HAIKU__
+
+#include <FindDirectory.h>
+int __isthreaded = 1;
+
+#else
+
 #define __isthreaded 1
+
+#endif
 
 extern	FILE 	*_nsyyin;
 extern	int	 _nsyyparse(void);
@@ -179,7 +188,12 @@ static pthread_mutex_t _ns_drec_lock = PTHREAD_MUTEX_INITIALIZER;
 /*
  * Runtime determination of whether we are dynamically linked or not.
  */
+
+#ifdef __HAIKU__
+#define	is_dynamic()		(1)	/* accept to load dynamic NSS modules */
+#else
 #define	is_dynamic()		(0)	/* don't bother - switch to ELF! */
+#endif
 
 
 /*
@@ -478,6 +492,19 @@ _nsdbtput(const ns_dbt *dbt)
 	return (0);
 }
 
+#ifdef __HAIKU__
+
+char *
+nsswitch_conf_file_path(void)
+{
+	static char path[256];
+	find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, false, path, sizeof(path));
+	strlcat(path, "/network/nsswitch.conf", sizeof(path));
+	return path;
+}
+
+#endif
+
 /*
  * This function is called each time nsdispatch() is called.  If this
  * is the first call, or if the configuration has changed, (re-)prepare
@@ -492,9 +519,11 @@ _nsconfigure(void)
 	static time_t	_nsconfmod;
 	struct stat	statbuf;
 
+	char * path = nsswitch_conf_file_path();
+
 	pthread_mutex_lock(&_nsconflock);
 
-	if (stat(_PATH_NS_CONF, &statbuf) == -1) {
+	if (stat(path, &statbuf) == -1) {
 		/*
 		 * No nsswitch.conf; just use whatever configuration we
 		 * currently have, or fall back on the defaults specified
@@ -521,7 +550,7 @@ _nsconfigure(void)
 	 */
 	pthread_rwlock_wrlock(&_nslock);
 
-	_nsyyin = fopen(_PATH_NS_CONF, "r");
+	_nsyyin = fopen(path, "r");
 	if (_nsyyin == NULL) {
 		/*
 		 * Unable to open nsswitch.conf; behave as though the
