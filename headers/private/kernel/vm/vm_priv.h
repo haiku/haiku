@@ -36,6 +36,7 @@ void vm_unreserve_memory_or_swap(size_t bytes);
 status_t vm_try_reserve_memory_or_swap(size_t bytes, int priority, bigtime_t timeout);
 
 void vm_debug_init();
+void vm_kernel_args_init_post_area(kernel_args* args);
 status_t vm_daemon_init(void);
 
 const char *page_state_to_string(int state);
