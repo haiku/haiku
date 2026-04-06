@@ -16,9 +16,10 @@
 #include <bluetooth/HCI/btHCI_transport.h>
 #include <bluetooth/HCI/btHCI_command.h>
 
-#include "HCIDelegate.h"
 #include "DeviceManager.h"
+#include "HCIDelegate.h"
 #include "LocalDeviceImpl.h"
+#include "SDPServer.h"
 
 #include <PortListener.h>
 
@@ -86,9 +87,7 @@ private:
 	
 	BPoint 					fCenter;
 	
-	thread_id				fSDPThreadID;
-	
-	bool					fIsShuttingDown;
+	SDPServer*               fSDPServer;
 };
 
 #endif

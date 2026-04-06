@@ -27,9 +27,10 @@
 #include <bluetooth/bluetooth.h>
 
 #include "BluetoothServer.h"
+#include "Debug.h"
 #include "DeskbarReplicant.h"
 #include "LocalDeviceImpl.h"
-#include "Debug.h"
+#include "SDPServer.h"
 
 
 status_t
@@ -58,15 +59,14 @@ DispatchEvent(struct hci_event_header* header, int32 code, size_t size)
 
 BluetoothServer::BluetoothServer()
 	:
-	BApplication(BLUETOOTH_SIGNATURE),
-	fSDPThreadID(-1),
-	fIsShuttingDown(false)
+	BApplication(BLUETOOTH_SIGNATURE)
 {
 	fDeviceManager = new DeviceManager();
 	fLocalDevicesList.MakeEmpty();
 
 	fEventListener2 = new BluetoothPortListener(BT_USERLAND_PORT_NAME,
 		(BluetoothPortListener::port_listener_func)&DispatchEvent);
+	fSDPServer = new SDPServer();
 }
 
 
@@ -79,13 +79,8 @@ bool BluetoothServer::QuitRequested(void)
 
 	_RemoveDeskbarIcon();
 
-	// stop the SDP server thread
-	fIsShuttingDown = true;
-
-	status_t threadReturnStatus;
-	wait_for_thread(fSDPThreadID, &threadReturnStatus);
-	TRACE_BT("BluetoothServer server thread exited with: %s\n",
-		strerror(threadReturnStatus));
+	fSDPServer->Stop();
+	delete fSDPServer;
 
 	delete fEventListener2;
 	TRACE_BT("Shutting down bluetooth_server.\n");
@@ -117,16 +112,9 @@ void BluetoothServer::ReadyToRun(void)
 
 	_InstallDeskbarIcon();
 
-	// Spawn the SDP server thread
-	fSDPThreadID = spawn_thread(SDPServerThread, "SDP server thread",
-		B_NORMAL_PRIORITY, this);
-
-#define _USE_FAKE_SDP_SERVER
-#ifdef _USE_FAKE_SDP_SERVER
-	if (fSDPThreadID <= 0 || resume_thread(fSDPThreadID) != B_OK) {
+	status_t status = fSDPServer->Start();
+	if (status != B_OK)
 		TRACE_BT("BluetoothServer: Failed launching the SDP server thread\n");
-	}
-#endif
 }
 
 
@@ -444,87 +432,6 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 #if 0
 #pragma mark -
 #endif
-
-int32
-BluetoothServer::SDPServerThread(void* data)
-{
-	const BluetoothServer* server = (BluetoothServer*)data;
-
-	// Set up the SDP socket
-	struct sockaddr_l2cap loc_addr = { 0 };
-	int socketServer;
-	int client;
-	status_t status;
-	char buffer[512] = "";
-
-	TRACE_BT("SDP: SDP server thread up...\n");
-
-	socketServer = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BLUETOOTH_PROTO_L2CAP);
-
-	if (socketServer < 0) {
-		TRACE_BT("SDP: Could not create server socket ...\n");
-		return B_ERROR;
-	}
-
-	// bind socket to port 0x1001 of the first available
-	// bluetooth adapter
-	loc_addr.l2cap_family = AF_BLUETOOTH;
-	loc_addr.l2cap_bdaddr = BDADDR_ANY;
-	loc_addr.l2cap_psm = B_HOST_TO_LENDIAN_INT16(1);
-	loc_addr.l2cap_len = sizeof(struct sockaddr_l2cap);
-
-	status = bind(socketServer, (struct sockaddr*)&loc_addr,
-		sizeof(struct sockaddr_l2cap));
-
-	if (status < 0) {
-		TRACE_BT("SDP: Could not bind server socket (%s)...\n", strerror(status));
-		return status;
-	}
-
-	// setsockopt(sock, SOL_L2CAP, SO_L2CAP_OMTU, &omtu, len );
-	// getsockopt(sock, SOL_L2CAP, SO_L2CAP_IMTU, &omtu, &len );
-
-	// Listen for up to 10 connections
-	status = listen(socketServer, 10);
-
-	if (status != B_OK) {
-		TRACE_BT("SDP: Could not listen server socket (%s)...\n", strerror(status));
-		return status;
-	}
-
-	while (!server->fIsShuttingDown) {
-
-		TRACE_BT("SDP: Waiting connection for socket (%s)...\n", strerror(status));
-
-		uint len = sizeof(struct sockaddr_l2cap);
-		client = accept(socketServer, (struct sockaddr*)&loc_addr, &len);
-
-		TRACE_BT("SDP: Incomming connection... %d\n", client);
-
-		ssize_t receivedSize;
-
-		do {
-			receivedSize = recv(client, buffer, 29 , 0);
-			if (receivedSize < 0)
-				TRACE_BT("SDP: Error reading client socket\n");
-			else {
-				TRACE_BT("SDP: Received from SDP client: %ld:\n", receivedSize);
-				for (int i = 0; i < receivedSize ; i++)
-					TRACE_BT("SDP: %x:", buffer[i]);
-
-				TRACE_BT("\n");
-			}
-		} while (receivedSize >= 0);
-
-		snooze(5000000);
-		TRACE_BT("SDP: Waiting for next connection...\n");
-	}
-
-	// Close the socket
-	close(socketServer);
-
-	return B_NO_ERROR;
-}
 
 
 void

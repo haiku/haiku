@@ -13,6 +13,7 @@ Application bluetooth_server
 	HCITransportAccessor.cpp
 	LocalDeviceHandler.cpp
 	LocalDeviceImpl.cpp
+	SDPServer.cpp
 	: be network libbluetooth.so localestub
 	[ TargetLibstdc++ ]
 ;
