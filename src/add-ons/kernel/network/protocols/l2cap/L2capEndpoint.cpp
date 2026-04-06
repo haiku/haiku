@@ -10,10 +10,10 @@
 
 #include <NetBufferUtilities.h>
 
-#include <btDebug.h>
 #include "L2capEndpointManager.h"
 #include "l2cap_address.h"
 #include "l2cap_signal.h"
+#include <btDebug.h>
 
 
 static l2cap_qos sDefaultQOS = {
@@ -137,7 +137,8 @@ L2capEndpoint::Shutdown()
 		fAcceptSemaphore = -1;
 		gSocketModule->set_max_backlog(socket, 0);
 		fState = BOUND;
-		return B_OK;
+		locker.Unlock();
+		return Unbind();
 	}
 
 	status_t status;
