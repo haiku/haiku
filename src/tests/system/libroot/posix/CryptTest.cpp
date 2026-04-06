@@ -12,10 +12,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "CryptTest.h"
-
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 
 #define PASSWORD "password"
@@ -32,114 +31,70 @@
 #define BSD_RESULT "_7C/.Bf/4gZk10RYRs4Y"
 
 
-CryptTest::CryptTest()
-{
-}
+class CryptTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(CryptTest);
+	CPPUNIT_TEST(TestLegacy);
+	CPPUNIT_TEST(TestLegacyBSD);
+	CPPUNIT_TEST(TestCustomSalt);
+	CPPUNIT_TEST(TestSaltGeneration);
+	CPPUNIT_TEST(TestBadSalt);
+	CPPUNIT_TEST(TestCryptR);
+	CPPUNIT_TEST_SUITE_END();
+
+public:
+	void TestLegacy()
+	{
+		char* buf = crypt(PASSWORD, LEGACY_SALT);
+		CPPUNIT_ASSERT(buf != NULL);
+		CPPUNIT_ASSERT(strcmp(buf, LEGACY_RESULT) == 0);
+	}
+
+	void TestLegacyBSD()
+	{
+		char* buf = crypt(PASSWORD, BSD_SALT);
+		CPPUNIT_ASSERT(buf != NULL);
+		CPPUNIT_ASSERT(strcmp(buf, BSD_RESULT) == 0);
+	}
+
+	void TestCustomSalt()
+	{
+		char* buf = crypt(PASSWORD, HASH_SALT);
+		CPPUNIT_ASSERT(buf != NULL);
+		CPPUNIT_ASSERT(strcmp(buf, HASH_RESULT) == 0);
+	}
+
+	void TestSaltGeneration()
+	{
+		char tmp[200];
+
+		char* buf = crypt(PASSWORD, NULL);
+		CPPUNIT_ASSERT(buf != NULL);
+		strlcpy(tmp, buf, sizeof(tmp));
+		buf = crypt(PASSWORD, tmp);
+		CPPUNIT_ASSERT(strcmp(buf, tmp) == 0);
+	}
+
+	void TestBadSalt()
+	{
+		errno = 0;
+		CPPUNIT_ASSERT(crypt(PASSWORD, HASH_BAD_SALT) == NULL);
+		CPPUNIT_ASSERT(errno == EINVAL);
+	}
+
+	void TestCryptR()
+	{
+		char tmp[200];
+
+		struct crypt_data data;
+		data.initialized = 0;
+
+		char* buf = crypt_r(PASSWORD, NULL, &data);
+		CPPUNIT_ASSERT(buf != NULL);
+		strlcpy(tmp, buf, sizeof(tmp));
+		buf = crypt(PASSWORD, tmp);
+		CPPUNIT_ASSERT(strcmp(buf, tmp) == 0);
+	}
+};
 
 
-CryptTest::~CryptTest()
-{
-}
-
-
-void
-CryptTest::setUp()
-{
-}
-
-
-void
-CryptTest::tearDown()
-{
-}
-
-
-void
-CryptTest::TestLegacy()
-{
-	char* buf = crypt(PASSWORD, LEGACY_SALT);
-	CPPUNIT_ASSERT(buf != NULL);
-	CPPUNIT_ASSERT(strcmp(buf, LEGACY_RESULT) == 0);
-}
-
-
-void
-CryptTest::TestLegacyBSD()
-{
-	char* buf = crypt(PASSWORD, BSD_SALT);
-	CPPUNIT_ASSERT(buf != NULL);
-	CPPUNIT_ASSERT(strcmp(buf, BSD_RESULT) == 0);
-}
-
-
-void
-CryptTest::TestCustomSalt()
-{
-	char* buf = crypt(PASSWORD, HASH_SALT);
-	CPPUNIT_ASSERT(buf != NULL);
-	CPPUNIT_ASSERT(strcmp(buf, HASH_RESULT) == 0);
-}
-
-
-void
-CryptTest::TestSaltGeneration()
-{
-	char tmp[200];
-
-	char* buf = crypt(PASSWORD, NULL);
-	CPPUNIT_ASSERT(buf != NULL);
-	strlcpy(tmp, buf, sizeof(tmp));
-	buf = crypt(PASSWORD, tmp);
-	CPPUNIT_ASSERT(strcmp(buf, tmp) == 0);
-}
-
-
-void
-CryptTest::TestBadSalt()
-{
-	errno = 0;
-	CPPUNIT_ASSERT(crypt(PASSWORD, HASH_BAD_SALT) == NULL);
-	CPPUNIT_ASSERT(errno == EINVAL);
-}
-
-
-void
-CryptTest::TestCryptR()
-{
-	char tmp[200];
-
-	struct crypt_data data;
-	data.initialized = 0;
-
-	char* buf = crypt_r(PASSWORD, NULL, &data);
-	CPPUNIT_ASSERT(buf != NULL);
-	strlcpy(tmp, buf, sizeof(tmp));
-	buf = crypt(PASSWORD, tmp);
-	CPPUNIT_ASSERT(strcmp(buf, tmp) == 0);
-}
-
-
-void
-CryptTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("CryptTest");
-	suite.addTest(new CppUnit::TestCaller<CryptTest>(
-		"CryptTest::TestLegacy",
-		&CryptTest::TestLegacy));
-	suite.addTest(new CppUnit::TestCaller<CryptTest>(
-		"CryptTest::TestLegacyBSD",
-		&CryptTest::TestLegacyBSD));
-	suite.addTest(new CppUnit::TestCaller<CryptTest>(
-		"CryptTest::TestCustomSalt",
-		&CryptTest::TestCustomSalt));
-	suite.addTest(new CppUnit::TestCaller<CryptTest>(
-		"CryptTest::TestSaltGeneration",
-		&CryptTest::TestSaltGeneration));
-	suite.addTest(new CppUnit::TestCaller<CryptTest>(
-		"CryptTest::TestBadSalt",
-		&CryptTest::TestBadSalt));
-	suite.addTest(new CppUnit::TestCaller<CryptTest>(
-		"CryptTest::TestCryptR",
-		&CryptTest::TestCryptR));
-	parent.addTest("CryptTest", &suite);
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CryptTest, getTestSuiteName());

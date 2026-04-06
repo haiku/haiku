@@ -7,16 +7,11 @@
  */
 
 
-#include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
-#include "CryptTest.h"
 
-
-BTestSuite*
-getTestSuite()
+const char*
+getTestSuiteName()
 {
-	BTestSuite* suite = new BTestSuite("LibRootPosix");
-	CryptTest::AddTests(*suite);
-	return suite;
+	return "LibRootPosix";
 }
