@@ -3,18 +3,12 @@
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
-#include <TestSuite.h>
+
 #include <TestSuiteAddon.h>
 
-#include "SimpleTransformTest.h"
 
-
-BTestSuite*
-getTestSuite()
+const char*
+getTestSuiteName()
 {
-	BTestSuite* suite = new BTestSuite("AppServerUnitTests");
-
-	SimpleTransformTest::AddTests(*suite);
-
-	return suite;
+	return "AppServerUnitTests";
 }
