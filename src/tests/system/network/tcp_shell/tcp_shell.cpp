@@ -990,7 +990,7 @@ domain_receive_data(net_buffer *buffer)
 
 
 status_t
-domain_error(net_error error, net_buffer* data)
+domain_error(net_error error, net_error_data* errorData, net_buffer* data)
 {
 	return B_ERROR;
 }
