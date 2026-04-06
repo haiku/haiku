@@ -17,6 +17,7 @@
 #include <OS.h>
 
 #include <AutoDeleter.h>
+#include <BinarySemaphore.h>
 
 #include <arch/cpu.h>
 #include <arch/vm_translation_map.h>
@@ -196,65 +197,8 @@ typedef DoublyLinkedList<PageReservationWaiter> PageReservationWaiterList;
 static PageReservationWaiterList sPageReservationWaiters;
 
 
-struct DaemonCondition {
-	void Init(const char* name)
-	{
-		mutex_init(&fLock, "daemon condition");
-		fCondition.Init(this, name);
-		fActivated = false;
-	}
-
-	bool Lock()
-	{
-		return mutex_lock(&fLock) == B_OK;
-	}
-
-	void Unlock()
-	{
-		mutex_unlock(&fLock);
-	}
-
-	bool Wait(bigtime_t timeout, bool clearActivated)
-	{
-		MutexLocker locker(fLock);
-		if (clearActivated)
-			fActivated = false;
-		else if (fActivated)
-			return true;
-
-		ConditionVariableEntry entry;
-		fCondition.Add(&entry);
-
-		locker.Unlock();
-
-		return entry.Wait(B_RELATIVE_TIMEOUT, timeout) == B_OK;
-	}
-
-	void WakeUp()
-	{
-		if (fActivated)
-			return;
-
-		MutexLocker locker(fLock);
-		fActivated = true;
-		fCondition.NotifyOne();
-	}
-
-	void ClearActivated()
-	{
-		MutexLocker locker(fLock);
-		fActivated = false;
-	}
-
-private:
-	mutex				fLock;
-	ConditionVariable	fCondition;
-	bool				fActivated;
-};
-
-
-static DaemonCondition sPageWriterCondition;
-static DaemonCondition sPageDaemonCondition;
+static BinarySemaphore sPageWriterCondition;
+static BinarySemaphore sPageDaemonCondition;
 
 
 #if PAGE_ALLOCATION_TRACING
