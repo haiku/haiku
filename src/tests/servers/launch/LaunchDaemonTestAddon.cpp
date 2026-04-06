@@ -4,22 +4,11 @@
  */
 
 
-#include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
-#include "ConditionsTest.h"
-#include "SettingsParserTest.h"
-#include "UtilityTest.h"
 
-
-BTestSuite*
-getTestSuite()
+const char*
+getTestSuiteName()
 {
-	BTestSuite* suite = new BTestSuite("LaunchDaemon");
-
-	SettingsParserTest::AddTests(*suite);
-	ConditionsTest::AddTests(*suite);
-	UtilityTest::AddTests(*suite);
-
-	return suite;
+	return "LaunchDaemon";
 }

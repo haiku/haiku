@@ -4,53 +4,39 @@
  */
 
 
-#include "UtilityTest.h"
-
 #include <stdlib.h>
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 #include "Utility.h"
 
 
-UtilityTest::UtilityTest()
-{
-}
+class UtilityTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(UtilityTest);
+	CPPUNIT_TEST(TestTranslatePath);
+	CPPUNIT_TEST_SUITE_END();
+
+public:
+	void TestTranslatePath()
+	{
+		CPPUNIT_ASSERT_EQUAL(BString("/boot/home/test"),
+			Utility::TranslatePath("$HOME/test"));
+		CPPUNIT_ASSERT_EQUAL(BString("/boot/home/test"),
+			Utility::TranslatePath("${HOME}/test"));
+		CPPUNIT_ASSERT_EQUAL(BString("--/boot/home--"),
+			Utility::TranslatePath("--${HOME}--"));
+		CPPUNIT_ASSERT_EQUAL(BString("$(HOME)/test"),
+			Utility::TranslatePath("$(HOME)/test"));
+		CPPUNIT_ASSERT_EQUAL(BString("/boot/home/test"),
+			Utility::TranslatePath("~/test"));
+		CPPUNIT_ASSERT_EQUAL(BString("~baron/test"),
+			Utility::TranslatePath("~baron/test"));
+		CPPUNIT_ASSERT_EQUAL(BString("/~/test"),
+			Utility::TranslatePath("/~/test"));
+	}
+};
 
 
-UtilityTest::~UtilityTest()
-{
-}
-
-
-void
-UtilityTest::TestTranslatePath()
-{
-	CPPUNIT_ASSERT_EQUAL(BString("/boot/home/test"),
-		Utility::TranslatePath("$HOME/test"));
-	CPPUNIT_ASSERT_EQUAL(BString("/boot/home/test"),
-		Utility::TranslatePath("${HOME}/test"));
-	CPPUNIT_ASSERT_EQUAL(BString("--/boot/home--"),
-		Utility::TranslatePath("--${HOME}--"));
-	CPPUNIT_ASSERT_EQUAL(BString("$(HOME)/test"),
-		Utility::TranslatePath("$(HOME)/test"));
-	CPPUNIT_ASSERT_EQUAL(BString("/boot/home/test"),
-		Utility::TranslatePath("~/test"));
-	CPPUNIT_ASSERT_EQUAL(BString("~baron/test"),
-		Utility::TranslatePath("~baron/test"));
-	CPPUNIT_ASSERT_EQUAL(BString("/~/test"),
-		Utility::TranslatePath("/~/test"));
-}
-
-
-/*static*/ void
-UtilityTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("UtilityTest");
-
-	suite.addTest(new CppUnit::TestCaller<UtilityTest>(
-		"UtilityTest::TestTranslatePath", &UtilityTest::TestTranslatePath));
-
-	parent.addTest("UtilityTest", &suite);
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(UtilityTest, getTestSuiteName());
