@@ -16,9 +16,9 @@
 #include <string.h>
 #include <errno.h>
 
-#include <AreaKeeper.h>
 #include <boot_item.h>
 #include <driver_settings.h>
+#include <util/AreaKeeper.h>
 #include <util/kernel_cpp.h>
 
 #include <vesa_info.h>

@@ -23,9 +23,9 @@
 #include <errno.h>
 
 #include <ACPI.h>
-#include <AreaKeeper.h>
 #include <boot_item.h>
 #include <driver_settings.h>
+#include <util/AreaKeeper.h>
 #include <util/kernel_cpp.h>
 #include <vm/vm.h>
 

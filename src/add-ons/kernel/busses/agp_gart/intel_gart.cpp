@@ -12,7 +12,6 @@
  */
 
 
-#include <AreaKeeper.h>
 #include <intel_extreme.h>
 
 #include <stdlib.h>
@@ -20,6 +19,7 @@
 #include <AGP.h>
 #include <KernelExport.h>
 #include <PCI.h>
+#include <util/AreaKeeper.h>
 
 #include <new>
 

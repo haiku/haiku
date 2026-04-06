@@ -7,12 +7,12 @@
  */
 
 
-#include <AreaKeeper.h>
 #include <Drivers.h>
 #include <Errors.h>
 #include <KernelExport.h>
 #include <PCI.h>
 #include <bus/PCI.h>
+#include <util/AreaKeeper.h>
 
 #include <stdio.h>
 #include <stdlib.h>
