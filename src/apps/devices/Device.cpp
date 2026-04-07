@@ -79,7 +79,7 @@ Device::GetName() const
 	AttributeMapIterator it = fAttributeMap.find(B_TRANSLATE("Device name"));
 	if (it != fAttributeMap.end())
 		return it->second;
-	return BString("unkown");
+	return BString("unknown");
 }
 
 
