@@ -1,11 +1,16 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file sniffer/Err.h
 	Mime Sniffer Error class declarations
 */
+
 #ifndef _SNIFFER_ERR_H
 #define _SNIFFER_ERR_H
 
@@ -20,7 +25,7 @@ namespace Sniffer {
 /*! Each exception contains an error message, and an byte offset into
 	the original rule that generated the error, for the sake of
 	providing spiffy error messages of the following sort:
-	
+
 	<code>
 	"1.0 ('abc' & 0xFFAAFFAA)"
 	              ^    Sniffer pattern error: pattern and mask lengths do not match
@@ -49,10 +54,8 @@ private:
 	ssize_t fPos;
 };
 
-};	// namespace Sniffer
-};	// namespace Storage
-};	// namespace BPrivate
+}; // namespace Sniffer
+}; // namespace Storage
+}; // namespace BPrivate
 
-#endif	// _SNIFFER_ERR_H
-
-
+#endif // _SNIFFER_ERR_H

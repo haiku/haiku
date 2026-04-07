@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//----------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file sniffer/Parser.cpp
 	MIME sniffer rule parser implementation
@@ -10,47 +14,56 @@
 #include "Parser.h"
 #include "Pattern.h"
 #include "PatternList.h"
-#include "Range.h"
 #include "RPattern.h"
 #include "RPatternList.h"
+#include "Range.h"
 #include "Rule.h"
 
+#include <String.h>
 #include <new>
 #include <stdio.h>
-#include <stdlib.h>	// For atol(), atof()
+#include <stdlib.h> // For atol(), atof()
 #include <string.h>
-#include <String.h>
 
 using namespace BPrivate::Storage::Sniffer;
 
-//------------------------------------------------------------------------------
-// Helper functions
-//------------------------------------------------------------------------------
+
+// #pragma mark - helper functions
+
 
 static bool
-isHexChar(char ch) {
+isHexChar(char ch)
+{
 	return ('0' <= ch && ch <= '9')
-	         || ('a' <= ch && ch <= 'f')
-	           || ('A' <= ch && ch <= 'F');
+		|| ('a' <= ch && ch <= 'f')
+		|| ('A' <= ch && ch <= 'F');
 }
 
+
 static bool
-isWhiteSpace(char ch) {
+isWhiteSpace(char ch)
+{
 	return ch == ' ' || ch == '\n' || ch == '\t';
 }
 
-static bool
-isOctalChar(char ch) {
-	return ('0' <= ch && ch <= '7');
-}
 
 static bool
-isDecimalChar(char ch) {
-	return ('0' <= ch && ch <= '9');
+isOctalChar(char ch)
+{
+	return '0' <= ch && ch <= '7';
 }
 
+
 static bool
-isPunctuation(char ch) {
+isDecimalChar(char ch)
+{
+	return '0' <= ch && ch <= '9';
+}
+
+
+static bool
+isPunctuation(char ch)
+{
 	switch (ch) {
 		case '&':
 		case '(':
@@ -65,8 +78,10 @@ isPunctuation(char ch) {
 	}
 }
 
+
 static char
-escapeChar(char ch) {
+escapeChar(char ch)
+{
 	// I've manually handled all the escape sequences I could come
 	// up with, and for anything else I just return the character
 	// passed in. Hex escapes are handled elsewhere, so \x just
@@ -94,42 +109,56 @@ escapeChar(char ch) {
 
 // Converts 0x|ch| to a single char
 static char
-hexToChar(char hex) {
-	if ('0' <= hex && hex <= '9')
-		return hex-'0';
-	else if ('a' <= hex && hex <= 'f')
-		return hex-'a'+10;
-	else if ('A' <= hex && hex <= 'F')
-		return hex-'A'+10;
-	else
-		throw new Err(std::string("Sniffer parser error: invalid hex digit '") + hex + "' passed to hexToChar()", -1);
+hexToChar(char hex)
+{
+	if ('0' <= hex && hex <= '9') {
+		return hex - '0';
+	} else if ('a' <= hex && hex <= 'f') {
+		return hex - 'a' + 10;
+	} else if ('A' <= hex && hex <= 'F') {
+		return hex - 'A' + 10;
+	} else {
+		throw new Err(std::string("Sniffer parser error: invalid hex digit '") + hex
+			+ "' passed to hexToChar()", -1);
+	}
 }
 
 // Converts 0x|hi|low| to a single char
 static char
-hexToChar(char hi, char low) {
-	return (hexToChar(hi) << 4)	| hexToChar(low);
+hexToChar(char hi, char low)
+{
+	return (hexToChar(hi) << 4) | hexToChar(low);
 }
 
+
 static char
-octalToChar(char hi, char mid, char low) {
+octalToChar(char hi, char mid, char low)
+{
 	if (isOctalChar(hi) && isOctalChar(mid) && isOctalChar(low)) {
 		// Check for octals >= decimal 256
-		if ((hi-'0') <= 3)
-			return ((hi-'0') << 6) | ((mid-'0') << 3) | (low-'0');
-		else
-			throw new Err("Sniffer pattern error: invalid octal literal (octals must be between octal 0 and octal 377 inclusive)", -1);
-	} else
-		throw new Err(std::string("Sniffer parser error: invalid octal digit passed to hexToChar()"), -1);
+		if ((hi - '0') <= 3) {
+			return ((hi - '0') << 6) | ((mid - '0') << 3) | (low - '0');
+		} else {
+			throw new Err("Sniffer pattern error: invalid octal literal (octals must be between "
+				"octal 0 and octal 377 inclusive)", -1);
+		}
+	} else {
+		throw new Err(
+			std::string("Sniffer parser error: invalid octal digit passed to hexToChar()"), -1);
+	}
 }
 
+
 static char
-octalToChar(char hi, char low) {
+octalToChar(char hi, char low)
+{
 	return octalToChar('0', hi, low);
 }
 
+
 static char
-octalToChar(char octal) {
+octalToChar(char octal)
+{
 	return octalToChar('0', '0', octal);
 }
 
@@ -152,30 +181,37 @@ octalToChar(char octal) {
 	- B_BAD_MIME_SNIFFER_RULE: Failure
 */
 status_t
-BPrivate::Storage::Sniffer::parse(const char *rule, Rule *result, BString *parseError) {
+BPrivate::Storage::Sniffer::parse(const char* rule, Rule* result, BString* parseError)
+{
 	Parser parser;
 	return parser.Parse(rule, result, parseError);
 }
 
-//------------------------------------------------------------------------------
-// Token
-//------------------------------------------------------------------------------
+
+// #pragma mark - Token
+
 
 Token::Token(TokenType type, const ssize_t pos)
-	: fType(type)
-	, fPos(pos)
+	:
+	fType(type),
+	fPos(pos)
 {
 //	if (type != EmptyToken)
 //		cout << "New Token, fType == " << tokenTypeToString(fType) << endl;
 }
 
-Token::~Token() {
+
+Token::~Token()
+{
 }
 
+
 TokenType
-Token::Type() const {
+Token::Type() const
+{
 	return fType;
 }
+
 
 const std::string&
 Token::String() const
@@ -183,23 +219,31 @@ Token::String() const
 	throw new Err("Sniffer scanner error: Token::String() called on non-string token", fPos);
 }
 
+
 int32
-Token::Int() const {
+Token::Int() const
+{
 	throw new Err("Sniffer scanner error: Token::Int() called on non-integer token", fPos);
 }
 
+
 double
-Token::Float() const {
+Token::Float() const
+{
 	throw new Err("Sniffer scanner error: Token::Float() called on non-float token", fPos);
 }
 
+
 ssize_t
-Token::Pos() const {
+Token::Pos() const
+{
 	return fPos;
 }
 
+
 bool
-Token::operator==(Token &ref) const {
+Token::operator==(Token& ref) const
+{
 	// Compare types, then data if necessary
 	if (Type() == ref.Type()) {
 		switch (Type()) {
@@ -215,95 +259,119 @@ Token::operator==(Token &ref) const {
 			default:
 				return true;
 		}
-	} else
+	} else {
 		return false;
+	}
 }
 
-//------------------------------------------------------------------------------
-// StringToken
-//------------------------------------------------------------------------------
 
-StringToken::StringToken(const std::string &str, const ssize_t pos)
-	: Token(CharacterString, pos)
-	, fString(str)
+// #pragma mark - StringToken
+
+
+StringToken::StringToken(const std::string& str, const ssize_t pos)
+	:
+	Token(CharacterString, pos),
+	fString(str)
 {
 }
 
-StringToken::~StringToken() {
+
+StringToken::~StringToken()
+{
 }
 
+
 const std::string&
-StringToken::String() const {
+StringToken::String() const
+{
 	return fString;
 }
 
-//------------------------------------------------------------------------------
-// IntToken
-//------------------------------------------------------------------------------
+
+// #pragma mark - IntToken
+
 
 IntToken::IntToken(const int32 value, const ssize_t pos)
-	: Token(Integer, pos)
-	, fValue(value)
+	:
+	Token(Integer, pos),
+	fValue(value)
 {
 }
 
-IntToken::~IntToken() {
+
+IntToken::~IntToken()
+{
 }
 
+
 int32
-IntToken::Int() const {
+IntToken::Int() const
+{
 	return fValue;
 }
 
+
 double
-IntToken::Float() const {
+IntToken::Float() const
+{
 	return (double)fValue;
 }
 
-//------------------------------------------------------------------------------
-// FloatToken
-//------------------------------------------------------------------------------
+
+// #pragma mark - FloatToken
+
 
 FloatToken::FloatToken(const double value, const ssize_t pos)
-	: Token(FloatingPoint, pos)
-	, fValue(value)
+	:
+	Token(FloatingPoint, pos),
+	fValue(value)
 {
 }
 
-FloatToken::~FloatToken() {
+
+FloatToken::~FloatToken()
+{
 }
 
 
 double
-FloatToken::Float() const {
+FloatToken::Float() const
+{
 	return fValue;
 }
 
-//------------------------------------------------------------------------------
-// TokenStream
-//------------------------------------------------------------------------------
 
-TokenStream::TokenStream(const BString &string)
-	: fCStatus(B_NO_INIT)
-	, fPos(-1)
-	, fStrLen(-1)
+// #pragma mark - TokenStream
+
+
+TokenStream::TokenStream(const BString& string)
+	:
+	fCStatus(B_NO_INIT),
+	fPos(-1),
+	fStrLen(-1)
 {
 	SetTo(string);
 }
 
+
 TokenStream::TokenStream()
-	: fCStatus(B_NO_INIT)
-	, fPos(-1)
-	, fStrLen(-1)
+	:
+	fCStatus(B_NO_INIT),
+	fPos(-1),
+	fStrLen(-1)
 {
 }
 
-TokenStream::~TokenStream() {
+
+TokenStream::~TokenStream()
+{
 	Unset();
 }
 
+
 status_t
-TokenStream::SetTo(const BString& string) {
+TokenStream::SetTo(const BString& string)
+{
 	Unset();
 	fStrLen = string.Length();
 	CharStream stream(string);
@@ -499,14 +567,16 @@ TokenStream::SetTo(const BString& string) {
 				if (isHexChar(ch)) {
 					try {
 						charStr += hexToChar(lastChar, ch);
-					} catch (Err *err) {
+					} catch (Err* err) {
 						if (err)
 							err->SetPos(pos);
 						throw err;
 					}
 					state = tsssTwoHex;
-				} else
-					throw new Err(std::string("Sniffer pattern error: bad hex literal"), pos);	// Same as R5
+				} else {
+					throw new Err(std::string("Sniffer pattern error: bad hex literal"),
+						pos); // Same as R5
+				}
 				break;
 
 			case tsssTwoHex:
@@ -521,9 +591,9 @@ TokenStream::SetTo(const BString& string) {
 				break;
 
 			case tsssIntOrFloat:
-				if (isDecimalChar(ch))
+				if (isDecimalChar(ch)) {
 					charStr += ch;
-				else if (ch == '.') {
+				} else if (ch == '.') {
 					charStr += ch;
 					state = tsssFloat;
 				} else if (ch == 'e' || ch == 'E') {
@@ -540,9 +610,9 @@ TokenStream::SetTo(const BString& string) {
 				break;
 
 			case tsssFloat:
-				if (isDecimalChar(ch))
+				if (isDecimalChar(ch)) {
 					charStr += ch;
-				else if (ch == 'e' || ch == 'E') {
+				} else if (ch == 'e' || ch == 'E') {
 					charStr += ch;
 					state = tsssLonelyFloatExtension;
 				} else {
@@ -660,7 +730,7 @@ TokenStream::SetTo(const BString& string) {
 					// First handle the octal
 					try {
 						charStr += octalToChar(lastChar);
-					} catch (Err *err) {
+					} catch (Err* err) {
 						if (err)
 							err->SetPos(startPos);
 						throw err;
@@ -677,7 +747,7 @@ TokenStream::SetTo(const BString& string) {
 				if (isOctalChar(ch)) {
 					try {
 						charStr += octalToChar(lastLastChar, lastChar, ch);
-					} catch (Err *err) {
+					} catch (Err* err) {
 						if (err)
 							err->SetPos(startPos);
 						throw err;
@@ -687,7 +757,7 @@ TokenStream::SetTo(const BString& string) {
 					// First handle the octal
 					try {
 						charStr += octalToChar(lastLastChar, lastChar);
-					} catch (Err *err) {
+					} catch (Err* err) {
 						if (err)
 							err->SetPos(startPos);
 						throw err;
@@ -704,7 +774,7 @@ TokenStream::SetTo(const BString& string) {
 				if (isHexChar(ch)) {
 					try {
 						charStr += hexToChar(lastChar, ch);
-					} catch (Err *err) {
+					} catch (Err* err) {
 						if (err)
 							err->SetPos(pos);
 						throw err;
@@ -713,10 +783,9 @@ TokenStream::SetTo(const BString& string) {
 				} else
 					throw new Err(std::string("Sniffer pattern error: incomplete escaped hex code"), pos);
 				break;
-
 		}
 	}
-	if (state == tsssStart)	{
+	if (state == tsssStart) {
 		fCStatus = B_OK;
 		fPos = 0;
 	} else {
@@ -726,8 +795,10 @@ TokenStream::SetTo(const BString& string) {
 	return fCStatus;
 }
 
+
 void
-TokenStream::Unset() {
+TokenStream::Unset()
+{
 	std::vector<Token*>::iterator i;
 	for (i = fTokenList.begin(); i != fTokenList.end(); i++)
 		delete *i;
@@ -736,8 +807,10 @@ TokenStream::Unset() {
 	fStrLen = -1;
 }
 
+
 status_t
-TokenStream::InitCheck() const {
+TokenStream::InitCheck() const
+{
 	return fCStatus;
 }
 
@@ -746,7 +819,8 @@ TokenStream::InitCheck() const {
     If Get() is called at the end of the stream, a pointer to a Err object is thrown.
 */
 const Token*
-TokenStream::Get() {
+TokenStream::Get()
+{
 	if (fCStatus != B_OK)
 		throw new Err("Sniffer parser error: TokenStream::Get() called on uninitialized TokenStream object", -1);
 	if (fPos < (ssize_t)fTokenList.size())
@@ -760,9 +834,10 @@ TokenStream::Get() {
 
 //! Places token returned by the most recent call to Get() back on the head of the stream.
 /*! If Unget() is called at the beginning of the stream, a pointer to a Err object is thrown.
-*/
+ */
 void
-TokenStream::Unget() {
+TokenStream::Unget()
+{
 	if (fCStatus != B_OK)
 		throw new Err("Sniffer parser error: TokenStream::Unget() called on uninitialized TokenStream object", -1);
 	if (fPos > 0)
@@ -776,8 +851,9 @@ TokenStream::Unget() {
 	throwing a pointer to a Err object if it is not.
 */
 void
-TokenStream::Read(TokenType type) {
-	const Token *t = Get();
+TokenStream::Read(TokenType type)
+{
+	const Token* t = Get();
 	if (t->Type() != type) {
 		throw new Err((std::string("Sniffer pattern error: expected ") + tokenTypeToString(type)
 	                + ", found " + tokenTypeToString(t->Type())).c_str(), t->Pos());
@@ -790,8 +866,9 @@ TokenStream::Read(TokenType type) {
 	given type, false is returned and the token remains at the head of the stream.
 */
 bool
-TokenStream::CondRead(TokenType type) {
-	const Token *t = Get();
+TokenStream::CondRead(TokenType type)
+{
+	const Token* t = Get();
 	if (t->Type() == type) {
 		return true;
 	} else {
@@ -800,51 +877,67 @@ TokenStream::CondRead(TokenType type) {
 	}
 }
 
+
 ssize_t
-TokenStream::Pos() const {
+TokenStream::Pos() const
+{
 	return fPos < (ssize_t)fTokenList.size() ? fTokenList[fPos]->Pos() : fStrLen;
 }
 
+
 ssize_t
-TokenStream::EndPos() const {
+TokenStream::EndPos() const
+{
 	return fStrLen;
 }
 
+
 bool
-TokenStream::IsEmpty() const {
+TokenStream::IsEmpty() const
+{
 	return fCStatus != B_OK || fPos >= (ssize_t)fTokenList.size();
 }
 
+
 void
-TokenStream::AddToken(TokenType type, ssize_t pos) {
-	Token *token = new Token(type, pos);
+TokenStream::AddToken(TokenType type, ssize_t pos)
+{
+	Token* token = new Token(type, pos);
 	fTokenList.push_back(token);
 }
 
+
 void
-TokenStream::AddString(const std::string &str, ssize_t pos) {
-	Token *token = new StringToken(str, pos);
+TokenStream::AddString(const std::string& str, ssize_t pos)
+{
+	Token* token = new StringToken(str, pos);
 	fTokenList.push_back(token);
 }
 
+
 void
-TokenStream::AddInt(const char *str, ssize_t pos) {
+TokenStream::AddInt(const char* str, ssize_t pos)
+{
 	// Convert the string to an int
 	int32 value = atol(str);
-	Token *token = new IntToken(value, pos);
+	Token* token = new IntToken(value, pos);
 	fTokenList.push_back(token);
 }
+
 
 void
-TokenStream::AddFloat(const char *str, ssize_t pos) {
+TokenStream::AddFloat(const char* str, ssize_t pos)
+{
 	// Convert the string to a float
 	double value = atof(str);
-	Token *token = new FloatToken(value, pos);
+	Token* token = new FloatToken(value, pos);
 	fTokenList.push_back(token);
 }
 
+
 const char*
-BPrivate::Storage::Sniffer::tokenTypeToString(TokenType type) {
+BPrivate::Storage::Sniffer::tokenTypeToString(TokenType type)
+{
 	switch (type) {
 		case LeftParen:
 			return "LeftParen";
@@ -885,21 +978,26 @@ BPrivate::Storage::Sniffer::tokenTypeToString(TokenType type) {
 	}
 }
 
-//------------------------------------------------------------------------------
-// Parser
-//------------------------------------------------------------------------------
+
+// #pragma mark - Parser
+
 
 Parser::Parser()
-	: fOutOfMemErr(new(std::nothrow) Err("Sniffer parser error: out of memory", -1))
+	:
+	fOutOfMemErr(new(std::nothrow) Err("Sniffer parser error: out of memory", -1))
 {
 }
 
-Parser::~Parser() {
+
+Parser::~Parser()
+{
 	delete fOutOfMemErr;
 }
 
+
 status_t
-Parser::Parse(const char *rule, Rule *result, BString *parseError) {
+Parser::Parse(const char* rule, Rule* result, BString* parseError)
+{
 	try {
 		if (!rule)
 			throw new Err("Sniffer pattern error: NULL pattern", -1);
@@ -911,8 +1009,7 @@ Parser::Parse(const char *rule, Rule *result, BString *parseError) {
 		ParseRule(result);
 
 		return B_OK;
-
-	} catch (Err *err) {
+	} catch (Err* err) {
 //		cout << "Caught error" << endl;
 		if (parseError)
 			parseError->SetTo(ErrorMessage(err, rule).c_str());
@@ -921,22 +1018,26 @@ Parser::Parse(const char *rule, Rule *result, BString *parseError) {
 	}
 }
 
+
 std::string
-Parser::ErrorMessage(Err *err, const char *rule) {
+Parser::ErrorMessage(Err* err, const char* rule)
+{
 	const char* msg = (err && err->Msg())
-    	                ? err->Msg()
-    	                  : "Sniffer parser error: Unexpected error with no supplied error message";
-    ssize_t pos = err && (err->Pos() >= 0) ? err->Pos() : 0;
-    std::string str = std::string(rule ? rule : "") + "\n";
-    for (int i = 0; i < pos; i++)
-    	str += " ";
-    str += "^    ";
-    str += msg;
-    return str;
+		? err->Msg()
+		: "Sniffer parser error: Unexpected error with no supplied error message";
+	ssize_t pos = err && (err->Pos() >= 0) ? err->Pos() : 0;
+	std::string str = std::string(rule ? rule : "") + "\n";
+	for (int i = 0; i < pos; i++)
+		str += " ";
+	str += "^    ";
+	str += msg;
+	return str;
 }
 
+
 void
-Parser::ParseRule(Rule *result) {
+Parser::ParseRule(Rule* result)
+{
 	if (!result)
 		throw new Err("Sniffer parser error: NULL Rule object passed to Parser::ParseRule()", -1);
 
@@ -948,24 +1049,29 @@ Parser::ParseRule(Rule *result) {
 	result->SetTo(priority, list);
 }
 
+
 double
-Parser::ParsePriority() {
-	const Token *t = stream.Get();
+Parser::ParsePriority()
+{
+	const Token* t = stream.Get();
 	if (t->Type() == FloatingPoint || t->Type() == Integer) {
 		double result = t->Float();
-		if (0.0 <= result && result <= 1.0)
+		if (0.0 <= result && result <= 1.0) {
 			return result;
-		else {
+		} else {
 //			cout << "(priority == " << result << ")" << endl;
 			throw new Err("Sniffer pattern error: invalid priority", t->Pos());
 		}
-	} else
-		throw new Err("Sniffer pattern error: match level expected", t->Pos());	// Same as R5
+	} else {
+		throw new Err("Sniffer pattern error: match level expected", t->Pos()); // Same as R5
+	}
 }
 
+
 std::vector<DisjList*>*
-Parser::ParseConjList() {
-	std::vector<DisjList*> *list = new(std::nothrow) std::vector<DisjList*>;
+Parser::ParseConjList()
+{
+	std::vector<DisjList*>* list = new(std::nothrow) std::vector<DisjList*>;
 	if (!list)
 		ThrowOutOfMemError(stream.Pos());
 	try {
@@ -973,9 +1079,9 @@ Parser::ParseConjList() {
 		int count = 0;
 		while (true) {
 			DisjList* expr = ParseDisjList();
-			if (!expr)
+			if (!expr) {
 				break;
-			else {
+			} else {
 				list->push_back(expr);
 				count++;
 			}
@@ -989,8 +1095,10 @@ Parser::ParseConjList() {
 	return list;
 }
 
+
 DisjList*
-Parser::ParseDisjList() {
+Parser::ParseDisjList()
+{
 	// If we've run out of tokens right now, it's okay, but
 	// we need to let ParseConjList() know what's up
 	if (stream.IsEmpty())
@@ -998,15 +1106,15 @@ Parser::ParseDisjList() {
 
 	// Peek ahead, then let the appropriate Parse*List()
 	// functions handle things
-	const Token *t1 = stream.Get();
+	const Token* t1 = stream.Get();
 
 	// PatternList | RangeList
 	if (t1->Type() == LeftParen) {
-		const Token *t2 = stream.Get();
+		const Token* t2 = stream.Get();
 		// Skip the case-insensitive flag, if there is one
-		const Token *tokenOfInterest = (t2->Type() == CaseInsensitiveFlag) ? stream.Get() : t2;
+		const Token* tokenOfInterest = (t2->Type() == CaseInsensitiveFlag) ? stream.Get() : t2;
 		if (t2 != tokenOfInterest)
-			stream.Unget();	// We called Get() three times
+			stream.Unget(); // We called Get() three times
 		stream.Unget();
 		stream.Unget();
 		// RangeList
@@ -1014,14 +1122,14 @@ Parser::ParseDisjList() {
 			return ParseRPatternList();
 		// PatternList
 		} else {
-			return ParsePatternList(Range(0,0));
+			return ParsePatternList(Range(0, 0));
 		}
 	// Range, PatternList
 	} else if (t1->Type() == LeftBracket) {
 		stream.Unget();
 		return ParsePatternList(ParseRange());
 	} else {
-		throw new Err("Sniffer pattern error: missing pattern", t1->Pos());	// Same as R5
+		throw new Err("Sniffer pattern error: missing pattern", t1->Pos()); // Same as R5
 	}
 
 	// PatternList
@@ -1029,31 +1137,34 @@ Parser::ParseDisjList() {
 	// Range + PatternList
 }
 
+
 Range
-Parser::ParseRange() {
+Parser::ParseRange()
+{
 	int32 start, end;
 	// LeftBracket
 	stream.Read(LeftBracket);
 	// Integer
 	{
-		const Token *t = stream.Get();
+		const Token* t = stream.Get();
 		if (t->Type() == Integer) {
 			start = t->Int();
-			end = start;	// In case we aren't given an explicit end
-		} else
+			end = start; // In case we aren't given an explicit end
+		} else {
 			throw new Err("Sniffer pattern error: pattern offset expected", t->Pos());
+		}
 	}
 	// [Colon, Integer] RightBracket
 	{
-		const Token *t = stream.Get();
+		const Token* t = stream.Get();
 		// Colon, Integer, RightBracket
 		if (t->Type() == Colon) {
 			// Integer
 			{
-				const Token *t = stream.Get();
-				if (t->Type() == Integer) {
+				const Token* t = stream.Get();
+				if (t->Type() == Integer)
 					end = t->Int();
-				} else
+				else
 					ThrowUnexpectedTokenError(Integer, t);
 			}
 			// RightBracket
@@ -1063,8 +1174,9 @@ Parser::ParseRange() {
 			// Nothing to do here...
 
 		// Something else...
-		} else
+		} else {
 			ThrowUnexpectedTokenError(Colon, Integer, t);
+		}
 	}
 	Range range(start, end);
 	if (range.InitCheck() == B_OK)
@@ -1073,9 +1185,11 @@ Parser::ParseRange() {
 		throw range.GetErr();
 }
 
+
 DisjList*
-Parser::ParsePatternList(Range range) {
-	PatternList *list = new(std::nothrow) PatternList(range);
+Parser::ParsePatternList(Range range)
+{
+	PatternList* list = new(std::nothrow) PatternList(range);
 	if (!list)
 		ThrowOutOfMemError(stream.Pos());
 	try {
@@ -1093,7 +1207,7 @@ Parser::ParsePatternList(Range range) {
 				break;
 		}
 		// RightParen
-		const Token *t = stream.Get();
+		const Token* t = stream.Get();
 		if (t->Type() != RightParen)
 			throw new Err("Sniffer pattern error: expecting '|', ')', or possibly '&'", t->Pos());
 	} catch (...) {
@@ -1103,9 +1217,11 @@ Parser::ParsePatternList(Range range) {
 	return list;
 }
 
+
 DisjList*
-Parser::ParseRPatternList() {
-	RPatternList *list = new(std::nothrow) RPatternList();
+Parser::ParseRPatternList()
+{
+	RPatternList* list = new(std::nothrow) RPatternList();
 	if (!list)
 		ThrowOutOfMemError(stream.Pos());
 	try {
@@ -1123,7 +1239,7 @@ Parser::ParseRPatternList() {
 				break;
 		}
 		// RightParen
-		const Token *t = stream.Get();
+		const Token* t = stream.Get();
 		if (t->Type() != RightParen)
 			throw new Err("Sniffer pattern error: expecting '|', ')', or possibly '&'", t->Pos());
 	} catch (...) {
@@ -1133,33 +1249,38 @@ Parser::ParseRPatternList() {
 	return list;
 }
 
+
 RPattern*
-Parser::ParseRPattern() {
+Parser::ParseRPattern()
+{
 	// Range
 	Range range = ParseRange();
 	// Pattern
-	Pattern *pattern = ParsePattern();
+	Pattern* pattern = ParsePattern();
 
-	RPattern *result = new(std::nothrow) RPattern(range, pattern);
+	RPattern* result = new(std::nothrow) RPattern(range, pattern);
 	if (result) {
-		if (result->InitCheck() == B_OK)
+		if (result->InitCheck() == B_OK) {
 			return result;
-		else {
-			Err *err = result->GetErr();
+		} else {
+			Err* err = result->GetErr();
 			delete result;
 			throw err;
 		}
-	} else
+	} else {
 		ThrowOutOfMemError(stream.Pos());
+	}
 	return NULL;
 }
 
+
 Pattern*
-Parser::ParsePattern() {
+Parser::ParsePattern()
+{
 	std::string str;
 	// String
 	{
-		const Token *t = stream.Get();
+		const Token* t = stream.Get();
 		if (t->Type() == CharacterString)
 			str = t->String();
 		else
@@ -1168,69 +1289,74 @@ Parser::ParsePattern() {
 	// [Ampersand, String]
 	if (stream.CondRead(Ampersand)) {
 		// String (i.e. Mask)
-		const Token *t = stream.Get();
+		const Token* t = stream.Get();
 		if (t->Type() == CharacterString) {
-			Pattern *result = new(std::nothrow) Pattern(str, t->String());
+			Pattern* result = new(std::nothrow) Pattern(str, t->String());
 			if (!result)
 				ThrowOutOfMemError(t->Pos());
 			if (result->InitCheck() == B_OK) {
 				return result;
 			} else {
-				Err *err = result->GetErr();
+				Err* err = result->GetErr();
 				delete result;
-				if (err) {
+				if (err)
 					err->SetPos(t->Pos());
-				}
 				throw err;
 			}
-		} else
+		} else {
 			ThrowUnexpectedTokenError(CharacterString, t);
+		}
 	} else {
 		// No mask specified.
-		Pattern *result = new(std::nothrow) Pattern(str);
+		Pattern* result = new(std::nothrow) Pattern(str);
 		if (result) {
-			if (result->InitCheck() == B_OK)
+			if (result->InitCheck() == B_OK) {
 				return result;
-			else {
-				Err *err = result->GetErr();
+			} else {
+				Err* err = result->GetErr();
 				delete result;
 				throw err;
 			}
-		} else
+		} else {
 			ThrowOutOfMemError(stream.Pos());
+		}
 	}
 	return NULL;
 }
 
+
 void
-Parser::ThrowEndOfStreamError() {
+Parser::ThrowEndOfStreamError()
+{
 	throw new Err("Sniffer pattern error: unterminated rule", stream.EndPos());
 }
 
-inline
-void
-Parser::ThrowOutOfMemError(ssize_t pos) {
+
+inline void
+Parser::ThrowOutOfMemError(ssize_t pos)
+{
 	if (fOutOfMemErr)
 		fOutOfMemErr->SetPos(pos);
-	Err *err = fOutOfMemErr;
+	Err* err = fOutOfMemErr;
 	fOutOfMemErr = NULL;
 	throw err;
 }
 
+
 void
-Parser::ThrowUnexpectedTokenError(TokenType expected, const Token *found) {
+Parser::ThrowUnexpectedTokenError(TokenType expected, const Token* found)
+{
 	throw new Err((std::string("Sniffer pattern error: expected ") + tokenTypeToString(expected)
 	                + ", found " + (found ? tokenTypeToString(found->Type()) : "NULL token")).c_str()
 	                , (found ? found->Pos() : stream.EndPos()));
 }
 
+
 void
-Parser::ThrowUnexpectedTokenError(TokenType expected1, TokenType expected2, const Token *found) {
+Parser::ThrowUnexpectedTokenError(TokenType expected1, TokenType expected2, const Token* found)
+{
 	throw new Err((std::string("Sniffer pattern error: expected ") + tokenTypeToString(expected1)
 	                + " or " + tokenTypeToString(expected2) + ", found "
 	                + (found ? tokenTypeToString(found->Type()) : "NULL token")).c_str()
 	                , (found ? found->Pos() : stream.EndPos()));
 }
-
-
-

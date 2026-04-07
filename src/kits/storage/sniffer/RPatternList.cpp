@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file RPatternList.cpp
 	MIME sniffer rpattern list implementation
@@ -16,25 +20,33 @@
 
 using namespace BPrivate::Storage::Sniffer;
 
+
 RPatternList::RPatternList()
-	: DisjList()
+	:
+	DisjList()
 {
 }
 
-RPatternList::~RPatternList() {
+
+RPatternList::~RPatternList()
+{
 	// Clear our rpattern list
 	std::vector<RPattern*>::iterator i;
 	for (i = fList.begin(); i != fList.end(); i++)
 		delete *i;
 }
 
+
 status_t
-RPatternList::InitCheck() const {
+RPatternList::InitCheck() const
+{
 	return B_OK;
 }
 
+
 Err*
-RPatternList::GetErr() const {
+RPatternList::GetErr() const
+{
 	return NULL;
 }
 
@@ -43,10 +55,11 @@ RPatternList::GetErr() const {
 	over its own specified range.
 */
 bool
-RPatternList::Sniff(BPositionIO *data) const {
-	if (InitCheck() != B_OK)
+RPatternList::Sniff(BPositionIO* data) const
+{
+	if (InitCheck() != B_OK) {
 		return false;
-	else {
+	} else {
 		bool result = false;
 		std::vector<RPattern*>::const_iterator i;
 		for (i = fList.begin(); i != fList.end(); i++) {
@@ -64,7 +77,7 @@ ssize_t
 RPatternList::BytesNeeded() const
 {
 	ssize_t result = InitCheck();
-	
+
 	// Tally up the BytesNeeded() values for all the RPatterns and return the largest.
 	if (result == B_OK) {
 		result = 0; // Just to be safe...
@@ -81,15 +94,14 @@ RPatternList::BytesNeeded() const
 				}
 			}
 		}
-	}	
+	}
 	return result;
 }
-	
+
+
 void
-RPatternList::Add(RPattern *rpattern) {
+RPatternList::Add(RPattern* rpattern)
+{
 	if (rpattern)
 		fList.push_back(rpattern);
 }
-
-
-

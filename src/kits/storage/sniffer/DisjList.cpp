@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file DisjList.cpp
 	MIME sniffer Disjunction List class implementation
@@ -11,24 +15,28 @@
 
 using namespace BPrivate::Storage::Sniffer;
 
+
 DisjList::DisjList()
-	: fCaseInsensitive(false)
+	:
+	fCaseInsensitive(false)
 {
 }
 
-DisjList::~DisjList() {
+
+DisjList::~DisjList()
+{
 }
 
+
 void
-DisjList::SetCaseInsensitive(bool how) {
+DisjList::SetCaseInsensitive(bool how)
+{
 	fCaseInsensitive = how;
 }
 
+
 bool
-DisjList::IsCaseInsensitive() {
+DisjList::IsCaseInsensitive()
+{
 	return fCaseInsensitive;
 }
-
-
-
-

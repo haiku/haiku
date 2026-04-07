@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file PatternList.cpp
 	MIME sniffer pattern list implementation
@@ -16,26 +20,34 @@
 
 using namespace BPrivate::Storage::Sniffer;
 
+
 PatternList::PatternList(Range range)
-	: DisjList()
-	, fRange(range)
+	:
+	DisjList(),
+	fRange(range)
 {
 }
 
-PatternList::~PatternList() {
+
+PatternList::~PatternList()
+{
 	// Clean up
 	std::vector<Pattern*>::iterator i;
 	for (i = fList.begin(); i != fList.end(); i++)
-		delete *i;	
+		delete *i;
 }
 
+
 status_t
-PatternList::InitCheck() const {
+PatternList::InitCheck() const
+{
 	return fRange.InitCheck();
 }
 
+
 Err*
-PatternList::GetErr() const {
+PatternList::GetErr() const
+{
 	return fRange.GetErr();
 }
 
@@ -43,10 +55,11 @@ PatternList::GetErr() const {
 	any of the list's patterns.
 */
 bool
-PatternList::Sniff(BPositionIO *data) const {
-	if (InitCheck() != B_OK)
+PatternList::Sniff(BPositionIO* data) const
+{
+	if (InitCheck() != B_OK) {
 		return false;
-	else {
+	} else {
 		bool result = false;
 		std::vector<Pattern*>::const_iterator i;
 		for (i = fList.begin(); i != fList.end(); i++) {
@@ -56,7 +69,7 @@ PatternList::Sniff(BPositionIO *data) const {
 		return result;
 	}
 }
-	
+
 /*! \brief Returns the number of bytes needed to perform a complete sniff, or an error
 	code if something goes wrong.
 */
@@ -68,7 +81,8 @@ PatternList::BytesNeeded() const
 	// Find the number of bytes needed to sniff any of our
 	// patterns from a single location in a data stream
 	if (result == B_OK) {
-		result = 0;	// I realize it already *is* zero if it == B_OK, but just in case that changes...	
+		result = 0;
+			// I realize it already *is* zero if it == B_OK, but just in case that changes...
 		std::vector<Pattern*>::const_iterator i;
 		for (i = fList.begin(); i != fList.end(); i++) {
 			if (*i) {
@@ -89,14 +103,13 @@ PatternList::BytesNeeded() const
 	if (result >= 0)
 		result += fRange.End();
 
-	return result;	
+	return result;
 }
 
+
 void
-PatternList::Add(Pattern *pattern) {
+PatternList::Add(Pattern* pattern)
+{
 	if (pattern)
 		fList.push_back(pattern);
 }
-
-
-

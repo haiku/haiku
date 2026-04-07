@@ -1,11 +1,16 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file sniffer/Range.h
 	MIME sniffer range declarations
 */
+
 #ifndef _SNIFFER_RANGE_H
 #define _SNIFFER_RANGE_H
 
@@ -35,10 +40,8 @@ private:
 	status_t fCStatus;
 };
 
-};	// namespace Sniffer
-};	// namespace Storage
-};	// namespace BPrivate
+}; // namespace Sniffer
+}; // namespace Storage
+}; // namespace BPrivate
 
-#endif	// _SNIFFER_RANGE_H
-
-
+#endif // _SNIFFER_RANGE_H

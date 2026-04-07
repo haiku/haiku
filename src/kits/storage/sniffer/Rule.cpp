@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file Rule.cpp
 	MIME sniffer rule implementation
@@ -10,8 +14,8 @@
 #include <DataIO.h>
 #include <stdio.h>
 
-#include "Err.h"
 #include "DisjList.h"
+#include "Err.h"
 #include "Rule.h"
 
 using namespace BPrivate::Storage::Sniffer;
@@ -20,37 +24,44 @@ using namespace BPrivate::Storage::Sniffer;
 	must pass a pointer to the object to Sniffer::parse().
 */
 Rule::Rule()
-	: fPriority(0.0)
-	, fConjList(NULL)
+	:
+	fPriority(0.0),
+	fConjList(NULL)
 {
 }
 
-Rule::~Rule() {
-	Unset();	
+
+Rule::~Rule()
+{
+	Unset();
 }
 
+
 status_t
-Rule::InitCheck() const {
+Rule::InitCheck() const
+{
 	return fConjList ? B_OK : B_NO_INIT;
 }
 
 //! Returns the priority of the rule. 0.0 <= priority <= 1.0.
 double
-Rule::Priority() const {
+Rule::Priority() const
+{
 	return fPriority;
 }
 
 //! Sniffs the given data stream. Returns true if the rule matches, false if not.
 bool
-Rule::Sniff(BPositionIO *data) const {
-	if (InitCheck() != B_OK)
+Rule::Sniff(BPositionIO* data) const
+{
+	if (InitCheck() != B_OK) {
 		return false;
-	else {
+	} else {
 		bool result = true;
 		std::vector<DisjList*>::const_iterator i;
 		for (i = fConjList->begin(); i != fConjList->end(); i++) {
 			if (*i)
-				result &= (*i)->Sniff(data);		
+				result &= (*i)->Sniff(data);
 		}
 		return result;
 	}
@@ -63,7 +74,7 @@ ssize_t
 Rule::BytesNeeded() const
 {
 	ssize_t result = InitCheck();
-	
+
 	// Tally up the BytesNeeded() values for all the DisjLists and return the largest.
 	if (result == B_OK) {
 		result = 0; // Just to be safe...
@@ -80,14 +91,15 @@ Rule::BytesNeeded() const
 				}
 			}
 		}
-	}	
+	}
 	return result;
 }
 
 
 void
-Rule::Unset() {
- 	if (fConjList){
+Rule::Unset()
+{
+	if (fConjList) {
 		delete fConjList;
 		fConjList = NULL;
 	}
@@ -95,7 +107,8 @@ Rule::Unset() {
 
 //! Called by Parser::Parse() after successfully parsing a sniffer rule.
 void
-Rule::SetTo(double priority, std::vector<DisjList*>* list) {
+Rule::SetTo(double priority, std::vector<DisjList*>* list)
+{
 	Unset();
 	if (0.0 <= priority && priority <= 1.0)
 		fPriority = priority;
@@ -103,9 +116,3 @@ Rule::SetTo(double priority, std::vector<DisjList*>* list) {
 		throw new Err("Sniffer pattern error: invalid priority", -1);
 	fConjList = list;
 }
-
-
-
-
-
-

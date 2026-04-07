@@ -1,15 +1,19 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file Pattern.cpp
 	MIME sniffer pattern implementation
 */
 
 #include <DataIO.h>
-#include <stdio.h>	// for SEEK_* defines
 #include <new>
+#include <stdio.h>
 
 #include <AutoDeleter.h>
 
@@ -18,16 +22,20 @@
 
 using namespace BPrivate::Storage::Sniffer;
 
-Pattern::Pattern(const std::string &string, const std::string &mask)
-	: fCStatus(B_NO_INIT)
-	, fErrorMessage(NULL)
+
+Pattern::Pattern(const std::string& string, const std::string& mask)
+	:
+	fCStatus(B_NO_INIT),
+	fErrorMessage(NULL)
 {
 	SetTo(string, mask);
 }
 
-Pattern::Pattern(const std::string &string)
-	: fCStatus(B_NO_INIT)
-	, fErrorMessage(NULL)
+
+Pattern::Pattern(const std::string& string)
+	:
+	fCStatus(B_NO_INIT),
+	fErrorMessage(NULL)
 {
 	// Build a mask with all bits turned on of the
 	// appropriate length
@@ -37,24 +45,33 @@ Pattern::Pattern(const std::string &string)
 	SetTo(string, mask);
 }
 
-Pattern::~Pattern() {
+
+Pattern::~Pattern()
+{
 	delete fErrorMessage;
 }
 
+
 status_t
-Pattern::InitCheck() const {
+Pattern::InitCheck() const
+{
 	return fCStatus;
 }
 
+
 Err*
-Pattern::GetErr() const {
+Pattern::GetErr() const
+{
 	if (fCStatus == B_OK)
 		return NULL;
 	else
 		return new(std::nothrow) Err(*fErrorMessage);
 }
 
-void dumpStr(const std::string &string, const char *label = NULL) {
+
+void
+dumpStr(const std::string& string, const char* label = NULL)
+{
 	if (label)
 		printf("%s: ", label);
 	for (uint i = 0; i < string.length(); i++)
@@ -62,20 +79,21 @@ void dumpStr(const std::string &string, const char *label = NULL) {
 	printf("\n");
 }
 
+
 status_t
-Pattern::SetTo(const std::string &string, const std::string &mask) {
+Pattern::SetTo(const std::string& string, const std::string& mask)
+{
 	fString = string;
 	if (fString.length() == 0) {
-		SetStatus(B_BAD_VALUE, "Sniffer pattern error: illegal empty pattern");		
+		SetStatus(B_BAD_VALUE, "Sniffer pattern error: illegal empty pattern");
 	} else {
 		fMask = mask;
 //		dumpStr(string, "data");
 //		dumpStr(mask, "mask");
-		if (fString.length() != fMask.length()) {
+		if (fString.length() != fMask.length())
 			SetStatus(B_BAD_VALUE, "Sniffer pattern error: pattern and mask lengths do not match");
-		} else {
+		else
 			SetStatus(B_OK);
-		}		
 	}
 	return fCStatus;
 }
@@ -85,12 +103,13 @@ Pattern::SetTo(const std::string &string, const std::string &mask) {
 	false if not.
 */
 bool
-Pattern::Sniff(Range range, BPositionIO *data, bool caseInsensitive) const {
+Pattern::Sniff(Range range, BPositionIO* data, bool caseInsensitive) const
+{
 	int32 start = range.Start();
 	int32 end = range.End();
 	off_t size = data->Seek(0, SEEK_END);
 	if (end >= size)
-		end = size-1;	// Don't bother searching beyond the end of the stream
+		end = size - 1; // Don't bother searching beyond the end of the stream
 	for (int i = start; i <= end; i++) {
 		if (Sniff(i, size, data, caseInsensitive))
 			return true;
@@ -98,7 +117,7 @@ Pattern::Sniff(Range range, BPositionIO *data, bool caseInsensitive) const {
 	return false;
 }
 
-// BytesNeeded
+
 /*! \brief Returns the number of bytes needed to perform a complete sniff, or an error
 	code if something goes wrong.
 */
@@ -111,10 +130,12 @@ Pattern::BytesNeeded() const
 	return result;
 }
 
+
 bool
-Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive) const {
+Pattern::Sniff(off_t start, off_t size, BPositionIO* data, bool caseInsensitive) const
+{
 	off_t len = fString.length();
-	char *buffer = new(std::nothrow) char[len+1];
+	char* buffer = new(std::nothrow) char[len + 1];
 	if (buffer) {
 		ArrayDeleter<char> _(buffer);
 		ssize_t bytesRead = data->ReadAt(start, buffer, len);
@@ -123,22 +144,26 @@ Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive)
 		// string, should we just return false (which is what we're
 		// doing now), or should we compare as many bytes as we
 		// can and return true if those match?
-		if (bytesRead < len)
+		if (bytesRead < len) {
 			return false;
-		else {
+		} else {
 			bool result = true;
 			if (caseInsensitive) {
 				for (int i = 0; i < len; i++) {
 					char secondChar;
-					if ('A' <= fString[i] && fString[i] <= 'Z')
-						secondChar = 'a' + (fString[i] - 'A');	// Also check lowercase
-					else if ('a' <= fString[i] && fString[i] <= 'z')
-						secondChar = 'A' + (fString[i] - 'a');	// Also check uppercase
-					else
-						secondChar = fString[i]; // Check the same char twice as punishment for doing a case insensitive search ;-)
+					if ('A' <= fString[i] && fString[i] <= 'Z') {
+						// Also check lowercase
+						secondChar = 'a' + (fString[i] - 'A');
+					} else if ('a' <= fString[i] && fString[i] <= 'z') {
+						// Also check uppercase
+						secondChar = 'A' + (fString[i] - 'a');
+					} else {
+						secondChar = fString[i];
+							// Check the same char twice as punishment for
+							// doing a case insensitive search ;-)
+					}
 					if (((fString[i] & fMask[i]) != (buffer[i] & fMask[i]))
-					     && ((secondChar & fMask[i]) != (buffer[i] & fMask[i])))
-					{
+						&& ((secondChar & fMask[i]) != (buffer[i] & fMask[i]))) {
 						result = false;
 						break;
 					}
@@ -152,31 +177,32 @@ Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive)
 				}
 			}
 			return result;
-		}	
-	} else
-		return false;
-}
-
-void
-Pattern::SetStatus(status_t status, const char *msg) {
-	fCStatus = status;
-	if (status == B_OK)
-		SetErrorMessage(NULL);
-	else {
-		if (msg)
-			SetErrorMessage(msg);
-		else {
-			SetErrorMessage("Sniffer parser error: Pattern::SetStatus() -- NULL msg with non-B_OK status.\n"
-				"(This is officially the most helpful error message you will ever receive ;-)");
 		}
+	} else {
+		return false;
 	}
 }
 
+
 void
-Pattern::SetErrorMessage(const char *msg) {
-	delete fErrorMessage;
-	fErrorMessage = (msg) ? (new(std::nothrow) Err(msg, -1)) : (NULL);
+Pattern::SetStatus(status_t status, const char* msg)
+{
+	fCStatus = status;
+	if (status == B_OK) {
+		SetErrorMessage(NULL);
+	} else if (msg) {
+		SetErrorMessage(msg);
+	} else {
+		SetErrorMessage(
+			"Sniffer parser error: Pattern::SetStatus() -- NULL msg with non-B_OK status.\n"
+			"(This is officially the most helpful error message you will ever receive ;-)");
+	}
 }
 
 
-
+void
+Pattern::SetErrorMessage(const char* msg)
+{
+	delete fErrorMessage;
+	fErrorMessage = (msg) ? (new(std::nothrow) Err(msg, -1)) : (NULL);
+}

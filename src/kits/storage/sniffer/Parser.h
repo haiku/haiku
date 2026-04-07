@@ -1,17 +1,22 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT License.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
 /*!
 	\file sniffer/Parser.h
 	MIME sniffer rule parser declarations
 */
+
 #ifndef _SNIFFER_PARSER_H
 #define _SNIFFER_PARSER_H
 
-#include <SupportDefs.h>
 #include <CharStream.h>
 #include <List.h>
+#include <SupportDefs.h>
 #include <string>
 #include <vector>
 
@@ -31,15 +36,12 @@ class DisjList;
 class RPattern;
 class Pattern;
 
-//------------------------------------------------------------------------------
-// The mighty parsing function ;-)
-//------------------------------------------------------------------------------
+//! The mighty parsing function ;-)
+status_t parse(const char* rule, Rule* result, BString* parseError = NULL);
 
-status_t parse(const char *rule, Rule *result, BString *parseError = NULL);
 
-//------------------------------------------------------------------------------
-// Classes used internally by the parser
-//------------------------------------------------------------------------------
+// #pragma mark - Classes used internally by the parser
+
 
 //! Types of tokens
 typedef enum TokenType {
@@ -64,9 +66,9 @@ const char* tokenTypeToString(TokenType type);
 
 //! Base token class returned by TokenStream
 /*! Each token represents a single chunk of relevant information
-    in a given rule. For example, the floating point number "1.2e-35",
-    originally represented as a 7-character string, is added to the
-    token stream as a single FloatToken object.
+	in a given rule. For example, the floating point number "1.2e-35",
+	originally represented as a 7-character string, is added to the
+	token stream as a single FloatToken object.
 */
 class Token {
 public:
@@ -99,8 +101,8 @@ protected:
 
 //! Integer token class
 /*! Signed or unsigned integer literals are coverted to IntToken objects,
-    which may then be treated as either ints or floats (since a priority
-    of "1" would be valid, but scanned as an int instead of a float).
+	which may then be treated as either ints or floats (since a priority
+	of "1" would be valid, but scanned as an int instead of a float).
 */
 class IntToken : public Token {
 public:
@@ -114,7 +116,7 @@ protected:
 
 //! Floating point token class
 /*! Signed or unsigned, extended or non-extended notation floating point
-    numbers are converted to FloatToken objects by the scanner.
+	numbers are converted to FloatToken objects by the scanner.
 */
 class FloatToken : public Token {
 public:
@@ -127,11 +129,11 @@ protected:
 
 //! Manages a stream of Token objects
 /*! Provides Get() and Unget() operations, some handy shortcut operations (Read()
-    and CondRead()), and handles memory management with respect to all the
-    Token objects in the stream (i.e. never delete a Token object returned by Get()).
-    
-    Also, the scanner portion of the parser is implemented in the TokenStream's
-    SetTo() function.
+	and CondRead()), and handles memory management with respect to all the
+	Token objects in the stream (i.e. never delete a Token object returned by Get()).
+
+	Also, the scanner portion of the parser is implemented in the TokenStream's
+	SetTo() function.
 */
 class TokenStream {
 public:
@@ -173,16 +175,16 @@ private:
 //! Handles parsing a sniffer rule, yielding either a parsed rule or a descriptive error message.
 /*! A MIME sniffer rule is valid if it is well-formed with respect to the
 	following grammar and fulfills some further conditions listed thereafter:
-	
+
 	<code>
-	Rule			::= LWS Priority LWS ConjList LWS	
-	ConjList		::= DisjList (LWS DisjList)*	
-	DisjList		::= "(" LWS PatternList LWS ")"										
-						| "(" LWS RPatternList LWS ")"									
-						| Range LWS "(" LWS PatternList LWS ")"						
-	RPatternList	::= [Flag LWS] RPattern (LWS "|" LWS [Flag LWS] RPattern)*	
+	Rule			::= LWS Priority LWS ConjList LWS
+	ConjList		::= DisjList (LWS DisjList)*
+	DisjList		::= "(" LWS PatternList LWS ")"
+						| "(" LWS RPatternList LWS ")"
+						| Range LWS "(" LWS PatternList LWS ")"
+	RPatternList	::= [Flag LWS] RPattern (LWS "|" LWS [Flag LWS] RPattern)*
 	PatternList		::= [Flag LWS] Pattern (LWS "|" LWS [Flag LWS] Pattern)*
-	
+
 	RPattern		::= LWS Range LWS Pattern
 	Pattern			::= PString [ LWS "&" LWS Mask ]
 	Range			::=	"[" LWS SDecimal [LWS ":" LWS SDecimal] LWS "]"
@@ -193,7 +195,7 @@ private:
 
 	HexLiteral		::= "0x" HexPair HexPair*
 	HexPair			::= HexChar HexChar
-	
+
 	QuotedString	::= SingleQuotedString | DoubleQuotedString
 	SQuotedString	:= "'" SQChar+ "'"
 	DQuotedString	:= '"' DQChar+ '"'
@@ -212,7 +214,7 @@ private:
 	Sign			::= "+" | "-"
 
 	PunctuationChar	::= "(" | ")" | "[" | "]" | "|" | "&" | ":"
-	OctHiChar		::= "0" | "1" | "2" | "3" 
+	OctHiChar		::= "0" | "1" | "2" | "3"
 	OctChar			::= OctHiChar | "4" | "5" | "6" | "7"
 	DecChar			::= OctChar | "8" | "9"
 	HexChar			::= DecChar | "a" | "b" | "c" | "d" | "e" | "f" | "A" | "B" | "C"
@@ -232,7 +234,7 @@ private:
 	  length as the pattern string.
 	- 0.0 <= Priority <= 1.0
 	- 0 <= Range begin <= Range end
-	
+
 	Notes:
 	- If a case-insensitive flag ("-i") appears in front of any Pattern or RPattern
 	  in a DisjList, case-insensitivity is applied to the entire DisjList.
@@ -262,14 +264,14 @@ private:
 
 	Real examples:
 	- 0.20 ([0]"//" | [0]"/\*" | [0:32]"#include" | [0:32]"#ifndef"
-	        | [0:32]"#ifdef")
+			| [0:32]"#ifdef")
 	  text/x-source-code
 	- 0.70 ("8BPS  \000\000\000\000" & 0xffffffff0000ffffffff )
 	  image/x-photoshop
 	- 0.40 [0:64]( -i "&lt;HTML" | "&lt;HEAD" | "&lt;TITLE" | "&lt;BODY"
 			| "&lt;TABLE" | "&lt;!--" | "&lt;META" | "&lt;CENTER")
 	  text/html
-	  
+
 */
 class Parser {
 public:
@@ -301,12 +303,8 @@ private:
 	Err *fOutOfMemErr;
 };
 
-};	// namespace Sniffer
-};	// namespace Storage
-};	// namespace BPrivate
+}; // namespace Sniffer
+}; // namespace Storage
+}; // namespace BPrivate
 
-#endif	// _SNIFFER_PARSER_H
-
-
-
-
+#endif // _SNIFFER_PARSER_H
