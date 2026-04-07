@@ -19,7 +19,9 @@
 #include <AutoDeleter.h>
 #include <util/AutoLock.h>
 
+#include <heap.h>
 #include <low_resource_manager.h>
+#include <thread.h>
 #include <vfs.h>
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
