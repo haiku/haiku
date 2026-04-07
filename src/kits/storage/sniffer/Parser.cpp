@@ -81,7 +81,8 @@ Token::Type() const {
 }
 
 const std::string&
-Token::String() const {
+Token::String() const
+{
 	throw new Err("Sniffer scanner error: Token::String() called on non-string token", fPos);
 }
 
@@ -212,7 +213,7 @@ FloatToken::Float() const {
 // TokenStream
 //------------------------------------------------------------------------------
 
-TokenStream::TokenStream(const std::string &string)
+TokenStream::TokenStream(const BString &string)
 	: fCStatus(B_NO_INIT)
 	, fPos(-1)
 	, fStrLen(-1)
@@ -232,12 +233,10 @@ TokenStream::~TokenStream() {
 }
 	
 status_t
-TokenStream::SetTo(const std::string &string) {
+TokenStream::SetTo(const BString& string) {
 	Unset();
-	fStrLen = string.length();
+	fStrLen = string.Length();
 	CharStream stream(string);
-	if (stream.InitCheck() != B_OK) 
-		throw new Err("Sniffer scanner error: Unable to intialize character stream", -1);
 	
 	typedef enum TokenStreamScannerState {
 		tsssStart,

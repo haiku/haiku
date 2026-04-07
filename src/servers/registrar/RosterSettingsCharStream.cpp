@@ -10,7 +10,6 @@
 #include "RosterSettingsCharStream.h"
 
 #include <StorageDefs.h>
-
 #include <stdio.h>
 
 #include "Debug.h"
@@ -24,19 +23,17 @@ const status_t RosterSettingsCharStream::kComment;
 const status_t RosterSettingsCharStream::kUnexpectedState;
 const status_t RosterSettingsCharStream::kStringTooLong;
 
-using namespace BPrivate::Storage::Sniffer;
 
-
-RosterSettingsCharStream::RosterSettingsCharStream(const std::string &string)
+RosterSettingsCharStream::RosterSettingsCharStream(const BString& string)
 	:
-	CharStream(string)
+	BPrivate::CharStream(string)
 {
 }
 
 
 RosterSettingsCharStream::RosterSettingsCharStream()
 	:
-	CharStream()
+	BPrivate::CharStream(BString())
 {
 }
 
@@ -85,9 +82,7 @@ status_t
 RosterSettingsCharStream::GetString(char *result)
 {
 	status_t error = result ? B_OK : B_BAD_VALUE;
-	if (!error)
-		error = InitCheck();
-	if (error)
+	if (error != B_OK)
 		return error;
 
 	enum RosterSettingsScannerState {

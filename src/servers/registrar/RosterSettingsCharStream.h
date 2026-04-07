@@ -30,7 +30,7 @@
 #ifndef _ROSTER_SETTINGS_CHAR_STREAM_H
 #define _ROSTER_SETTINGS_CHAR_STREAM_H
 
-#include <sniffer/CharStream.h>
+#include <CharStream.h>
 #include <SupportDefs.h>
 
 #include <string>
@@ -50,9 +50,9 @@
 	used when a valid string containing invalid data is discovered in the middle
 	of a line.
 */
-class RosterSettingsCharStream : public BPrivate::Storage::Sniffer::CharStream {
+class RosterSettingsCharStream : public BPrivate::CharStream {
 public:
-	RosterSettingsCharStream(const std::string &string);
+	RosterSettingsCharStream(const BString& string);
 	RosterSettingsCharStream();
 	virtual ~RosterSettingsCharStream();
 	

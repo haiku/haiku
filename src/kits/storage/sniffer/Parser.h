@@ -10,7 +10,7 @@
 #define _SNIFFER_PARSER_H
 
 #include <SupportDefs.h>
-#include <sniffer/CharStream.h>
+#include <CharStream.h>
 #include <List.h>
 #include <string>
 #include <vector>
@@ -135,11 +135,11 @@ protected:
 */
 class TokenStream {
 public:
-	TokenStream(const std::string &string);
+	TokenStream(const BString &string);
 	TokenStream();
 	~TokenStream();
 	
-	status_t SetTo(const std::string &string);
+	status_t SetTo(const BString &string);
 	void Unset();
 	status_t InitCheck() const;
 	

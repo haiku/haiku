@@ -1885,7 +1885,7 @@ TRoster::_LoadRosterSettings(const char* path)
 	}
 	if (!error) {
 		data[size] = 0;
-		error = stream.SetTo(std::string(data));
+		error = stream.SetTo(BString(data));
 	}
 
 	delete[] data;

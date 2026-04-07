@@ -57,7 +57,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			storage_support.cpp
 
 			# sniffer
-			CharStream.cpp
 			Err.cpp
 			DisjList.cpp
 			Pattern.cpp

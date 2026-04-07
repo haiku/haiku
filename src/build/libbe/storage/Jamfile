@@ -54,7 +54,6 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	TextSnifferAddon.cpp
 
 	# sniffer
-	CharStream.cpp
 	Err.cpp
 	DisjList.cpp
 	Pattern.cpp
