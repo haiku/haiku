@@ -11,14 +11,11 @@
 	MIME sniffer pattern implementation
 */
 
-#include <DataIO.h>
 #include <new>
-#include <stdio.h>
-
-#include <AutoDeleter.h>
 
 #include "Err.h"
 #include "Pattern.h"
+#include "Data.h"
 
 using namespace BPrivate::Storage::Sniffer;
 
@@ -103,15 +100,14 @@ Pattern::SetTo(const std::string& string, const std::string& mask)
 	false if not.
 */
 bool
-Pattern::Sniff(Range range, BPositionIO* data, bool caseInsensitive) const
+Pattern::Sniff(Range range, const Data& data, bool caseInsensitive) const
 {
 	int32 start = range.Start();
 	int32 end = range.End();
-	off_t size = data->Seek(0, SEEK_END);
-	if (end >= size)
-		end = size - 1; // Don't bother searching beyond the end of the stream
+	if ((size_t)end >= data.length)
+		end = data.length - 1; // Don't bother searching beyond the end of the stream
 	for (int i = start; i <= end; i++) {
-		if (Sniff(i, size, data, caseInsensitive))
+		if (Sniff(i, data, caseInsensitive))
 			return true;
 	}
 	return false;
@@ -132,22 +128,19 @@ Pattern::BytesNeeded() const
 
 
 bool
-Pattern::Sniff(off_t start, off_t size, BPositionIO* data, bool caseInsensitive) const
+Pattern::Sniff(off_t start, const Data& data, bool caseInsensitive) const
 {
 	off_t len = fString.length();
-	char* buffer = new(std::nothrow) char[len + 1];
-	if (buffer == NULL)
-		return false;
-
-	ArrayDeleter<char> _(buffer);
-	ssize_t bytesRead = data->ReadAt(start, buffer, len);
 	// \todo If there are fewer bytes left in the data stream
 	// from the given position than the length of our data
 	// string, should we just return false (which is what we're
 	// doing now), or should we compare as many bytes as we
 	// can and return true if those match?
-	if (bytesRead < len)
+	if ((data.length - start) < (size_t)len)
 		return false;
+
+	const uint8* string = (const uint8*)fString.data();
+	const uint8* mask = (const uint8*)fMask.data();
 
 	bool result = true;
 	if (caseInsensitive) {
@@ -164,15 +157,15 @@ Pattern::Sniff(off_t start, off_t size, BPositionIO* data, bool caseInsensitive)
 					// Check the same char twice as punishment for
 					// doing a case insensitive search ;-)
 			}
-			if (((fString[i] & fMask[i]) != (buffer[i] & fMask[i]))
-				&& ((secondChar & fMask[i]) != (buffer[i] & fMask[i]))) {
+			if (((string[i] & mask[i]) != (data.buffer[start + i] & mask[i]))
+				&& ((secondChar & mask[i]) != (data.buffer[start + i] & mask[i]))) {
 				result = false;
 				break;
 			}
 		}
 	} else {
 		for (int i = 0; i < len; i++) {
-			if ((fString[i] & fMask[i]) != (buffer[i] & fMask[i])) {
+			if ((string[i] & mask[i]) != (data.buffer[start + i] & mask[i])) {
 				result = false;
 				break;
 			}

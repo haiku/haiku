@@ -11,7 +11,6 @@
 	MIME sniffer rule implementation
 */
 
-#include <DataIO.h>
 #include <stdio.h>
 
 #include "DisjList.h"
@@ -19,6 +18,7 @@
 #include "Rule.h"
 
 using namespace BPrivate::Storage::Sniffer;
+
 
 /*! \brief Creates an unitialized Sniffer::Rule object. To initialize it, you
 	must pass a pointer to the object to Sniffer::parse().
@@ -43,6 +43,7 @@ Rule::InitCheck() const
 	return fConjList ? B_OK : B_NO_INIT;
 }
 
+
 //! Returns the priority of the rule. 0.0 <= priority <= 1.0.
 double
 Rule::Priority() const
@@ -50,9 +51,10 @@ Rule::Priority() const
 	return fPriority;
 }
 
+
 //! Sniffs the given data stream. Returns true if the rule matches, false if not.
 bool
-Rule::Sniff(BPositionIO* data) const
+Rule::Sniff(const Data& data) const
 {
 	if (InitCheck() != B_OK) {
 		return false;
@@ -66,6 +68,7 @@ Rule::Sniff(BPositionIO* data) const
 		return result;
 	}
 }
+
 
 /*! \brief Returns the number of bytes needed for this rule to perform a complete sniff,
 	or an error code if something goes wrong.
@@ -104,6 +107,7 @@ Rule::Unset()
 		fConjList = NULL;
 	}
 }
+
 
 //! Called by Parser::Parse() after successfully parsing a sniffer rule.
 void

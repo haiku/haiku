@@ -50,12 +50,13 @@ RPatternList::GetErr() const
 	return NULL;
 }
 
+
 /*! Sniffs the given data stream, searching for a match
 	with any of the list's patterns. Each pattern is searched
 	over its own specified range.
 */
 bool
-RPatternList::Sniff(BPositionIO* data) const
+RPatternList::Sniff(const Data& data) const
 {
 	if (InitCheck() != B_OK) {
 		return false;
@@ -69,6 +70,7 @@ RPatternList::Sniff(BPositionIO* data) const
 		return result;
 	}
 }
+
 
 /*! \brief Returns the number of bytes needed to perform a complete sniff, or an error
 	code if something goes wrong.

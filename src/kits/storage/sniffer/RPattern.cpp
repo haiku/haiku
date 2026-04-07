@@ -11,12 +11,11 @@
 	MIME sniffer rpattern implementation
 */
 
-#include <DataIO.h>
-
 #include "Err.h"
 #include "Pattern.h"
 #include "RPattern.h"
 #include "Range.h"
+#include "Data.h"
 
 using namespace BPrivate::Storage::Sniffer;
 
@@ -64,9 +63,9 @@ RPattern::~RPattern()
 
 //! Sniffs the given data stream over the object's range for the object's pattern
 bool
-RPattern::Sniff(BPositionIO* data, bool caseInsensitive) const
+RPattern::Sniff(const Data& data, bool caseInsensitive) const
 {
-	if (!data || InitCheck() != B_OK)
+	if (!data.buffer || InitCheck() != B_OK)
 		return false;
 	else
 		return fPattern->Sniff(fRange, data, caseInsensitive);

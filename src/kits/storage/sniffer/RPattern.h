@@ -16,14 +16,13 @@
 
 #include "Range.h"
 
-class BPositionIO;
-
 namespace BPrivate {
 namespace Storage {
 namespace Sniffer {
 
 class Err;
 class Pattern;
+struct Data;
 
 //! A Pattern and a Range, bundled into one.
 class RPattern {
@@ -34,7 +33,7 @@ public:
 	status_t InitCheck() const;
 	Err* GetErr() const;
 	
-	bool Sniff(BPositionIO *data, bool caseInsensitive) const;
+	bool Sniff(const Data& data, bool caseInsensitive) const;
 	ssize_t BytesNeeded() const;
 private:
 	Range fRange;

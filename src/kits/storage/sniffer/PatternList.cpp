@@ -11,7 +11,6 @@
 	MIME sniffer pattern list implementation
 */
 
-#include <DataIO.h>
 #include <stdio.h>
 
 #include "Err.h"
@@ -55,7 +54,7 @@ PatternList::GetErr() const
 	any of the list's patterns.
 */
 bool
-PatternList::Sniff(BPositionIO* data) const
+PatternList::Sniff(const Data& data) const
 {
 	if (InitCheck() != B_OK) {
 		return false;

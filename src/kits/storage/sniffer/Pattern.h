@@ -18,13 +18,14 @@
 #include <SupportDefs.h>
 #include <string>
 
-class BPositionIO;
 
 namespace BPrivate {
 namespace Storage {
 namespace Sniffer {
 
 class Err;
+struct Data;
+
 
 //! A byte string and optional mask to be compared against a data stream.
 /*! The byte string and mask (if supplied) must be of the same length. */
@@ -33,16 +34,17 @@ public:
 	Pattern(const std::string &string, const std::string &mask);
 	Pattern(const std::string &string);
 	~Pattern();
-	
+
 	status_t InitCheck() const;
 	Err* GetErr() const;
-	
-	bool Sniff(Range range, BPositionIO *data, bool caseInsensitive) const;
+
+	bool Sniff(Range range, const Data& data, bool caseInsensitive) const;
 	ssize_t BytesNeeded() const;
-	
+
 	status_t SetTo(const std::string &string, const std::string &mask);
+
 private:
-	bool Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive) const;
+	bool Sniff(off_t start, const Data& data, bool caseInsensitive) const;
 	
 	void SetStatus(status_t status, const char *msg = NULL);
 	void SetErrorMessage(const char *msg);
@@ -54,8 +56,10 @@ private:
 	Err *fErrorMessage;
 };
 
+
 }; // namespace Sniffer
 }; // namespace Storage
 }; // namespace BPrivate
+
 
 #endif // _SNIFFER_PATTERN_H

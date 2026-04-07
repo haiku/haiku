@@ -19,13 +19,14 @@
 #include <sys/types.h>
 #include <vector>
 
-class BPositionIO;
 
 namespace BPrivate {
 namespace Storage {
 namespace Sniffer {
 
 class DisjList;
+struct Data;
+
 
 /*! \brief A priority and a list of expressions to be used for sniffing out the
 	type of an untyped file.
@@ -34,10 +35,10 @@ class Rule {
 public:
 	Rule();
 	~Rule();
-	
-	status_t InitCheck() const;	
-	double Priority() const;	
-	bool Sniff(BPositionIO *data) const;	
+
+	status_t InitCheck() const;
+	double Priority() const;
+	bool Sniff(const Data& data) const;
 	ssize_t BytesNeeded() const;
 private:
 	friend class Parser;
@@ -48,6 +49,7 @@ private:
 	double fPriority;
 	std::vector<DisjList*> *fConjList;	// A list of DisjLists to be ANDed
 };
+
 
 }; // namespace Sniffer
 }; // namespace Storage

@@ -18,8 +18,6 @@
 #include "DisjList.h"
 #include "Range.h"
 
-class BPositionIO;
-
 namespace BPrivate {
 namespace Storage {
 namespace Sniffer {
@@ -38,7 +36,7 @@ public:
 	status_t InitCheck() const;
 	Err* GetErr() const;
 	
-	virtual bool Sniff(BPositionIO *data) const;
+	virtual bool Sniff(const Data& data) const;
 	virtual ssize_t BytesNeeded() const;
 	
 	void Add(Pattern *pattern);
