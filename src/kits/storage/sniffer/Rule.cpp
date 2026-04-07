@@ -7,11 +7,12 @@
 	MIME sniffer rule implementation
 */
 
-#include <sniffer/Err.h>
-#include <sniffer/DisjList.h>
-#include <sniffer/Rule.h>
 #include <DataIO.h>
 #include <stdio.h>
+
+#include "Err.h"
+#include "DisjList.h"
+#include "Rule.h"
 
 using namespace BPrivate::Storage::Sniffer;
 

@@ -7,9 +7,10 @@
 	MIME sniffer Error class implementation
 */
 
-#include <sniffer/Err.h>
 #include <new>
 #include <string.h>
+
+#include "Err.h"
 
 using namespace BPrivate::Storage::Sniffer;
 

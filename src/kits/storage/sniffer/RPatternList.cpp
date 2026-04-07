@@ -7,11 +7,12 @@
 	MIME sniffer rpattern list implementation
 */
 
-#include <sniffer/Err.h>
-#include <sniffer/RPattern.h>
-#include <sniffer/RPatternList.h>
 #include <DataIO.h>
 #include <stdio.h>
+
+#include "Err.h"
+#include "RPattern.h"
+#include "RPatternList.h"
 
 using namespace BPrivate::Storage::Sniffer;
 

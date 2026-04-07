@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src tests kits storage ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders storage ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
 
 UnitTestLib libstoragetest.so
 	: StorageKitTestAddon.cpp

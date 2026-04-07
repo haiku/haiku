@@ -9,7 +9,7 @@
 #ifndef _SNIFFER_R_PATTERN_H
 #define _SNIFFER_R_PATTERN_H
 
-#include <sniffer/Range.h>
+#include "Range.h"
 
 class BPositionIO;
 

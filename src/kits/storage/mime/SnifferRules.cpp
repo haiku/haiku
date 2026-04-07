@@ -25,11 +25,12 @@
 #include <mime/DatabaseDirectory.h>
 #include <mime/DatabaseLocation.h>
 #include <mime/MimeSniffer.h>
-#include <sniffer/Parser.h>
-#include <sniffer/Rule.h>
 #include <StorageDefs.h>
 #include <storage_support.h>
 #include <String.h>
+
+#include "../sniffer/Parser.h"
+#include "../sniffer/Rule.h"
 
 
 #define DBG(x) x

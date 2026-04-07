@@ -11,12 +11,13 @@
 
 #include <SupportDefs.h>
 #include <sniffer/CharStream.h>
-#include <sniffer/Err.h>
-#include <sniffer/Range.h>
-#include <sniffer/Rule.h>
 #include <List.h>
 #include <string>
 #include <vector>
+
+#include "Err.h"
+#include "Range.h"
+#include "Rule.h"
 
 class BString;
 

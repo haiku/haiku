@@ -7,13 +7,13 @@
 	MIME sniffer rule parser implementation
 */
 
-#include <sniffer/Parser.h>
-#include <sniffer/Pattern.h>
-#include <sniffer/PatternList.h>
-#include <sniffer/Range.h>
-#include <sniffer/RPattern.h>
-#include <sniffer/RPatternList.h>
-#include <sniffer/Rule.h>
+#include "Parser.h"
+#include "Pattern.h"
+#include "PatternList.h"
+#include "Range.h"
+#include "RPattern.h"
+#include "RPatternList.h"
+#include "Rule.h"
 
 #include <new>
 #include <stdio.h>

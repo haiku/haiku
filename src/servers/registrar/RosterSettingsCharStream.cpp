@@ -9,7 +9,6 @@
 
 #include "RosterSettingsCharStream.h"
 
-#include <sniffer/Err.h>
 #include <StorageDefs.h>
 
 #include <stdio.h>

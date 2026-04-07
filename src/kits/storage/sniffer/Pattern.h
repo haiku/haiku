@@ -11,7 +11,7 @@
 
 #include <SupportDefs.h>
 #include <string>
-#include <sniffer/Range.h>
+#include "Range.h"
 
 class BPositionIO;
 

@@ -5,16 +5,17 @@
 #include <cppunit/Test.h>
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>
-#include <sniffer/Rule.h>
-#include <sniffer/Parser.h>
 #include <DataIO.h>
 #include <Mime.h>
 #include <String.h>		// BString
 #include <TestUtils.h>
 
 #include <stdio.h>
-
 #include <iostream>
+
+#include "sniffer/Rule.h"
+#include "sniffer/Parser.h"
+
 using std::cout;
 using std::endl;
 

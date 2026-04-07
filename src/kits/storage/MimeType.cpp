@@ -14,8 +14,6 @@
 #include <Bitmap.h>
 #include <mime/database_support.h>
 #include <mime/DatabaseLocation.h>
-#include <sniffer/Rule.h>
-#include <sniffer/Parser.h>
 
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
@@ -24,6 +22,9 @@
 #include <new>
 #include <stdio.h>
 #include <strings.h>
+
+#include "sniffer/Rule.h"
+#include "sniffer/Parser.h"
 
 
 using namespace BPrivate;
