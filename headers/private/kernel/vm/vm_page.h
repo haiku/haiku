@@ -46,7 +46,7 @@ void vm_page_free_etc(VMCache* cache, vm_page* page,
 	vm_page_reservation* reservation);
 
 void vm_page_set_state(struct vm_page *page, int state);
-void vm_page_requeue(struct vm_page *page, bool tail);
+void vm_page_requeue(struct vm_page *page, bool tail, struct VMPageQueue** _queue);
 
 // get some data about the number of pages in the system
 page_num_t vm_page_num_pages(void);

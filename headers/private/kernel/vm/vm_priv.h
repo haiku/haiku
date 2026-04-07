@@ -39,6 +39,8 @@ void vm_debug_init();
 void vm_kernel_args_init_post_area(kernel_args* args);
 status_t vm_daemon_init(void);
 
+bool vm_page_should_do_active_paging();
+
 const char *page_state_to_string(int state);
 	// for debugging purposes only
 

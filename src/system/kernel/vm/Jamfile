@@ -12,6 +12,7 @@ KernelMergeObject kernel_vm.o :
 	vm_debug.cpp
 	vm_init.cpp
 	vm_page.cpp
+	vm_page_writer.cpp
 	VMAddressSpace.cpp
 	VMAddressSpaceLocking.cpp
 	VMAnonymousCache.cpp

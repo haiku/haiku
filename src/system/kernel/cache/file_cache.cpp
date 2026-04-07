@@ -890,7 +890,7 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			if (page->State() == PAGE_STATE_CACHED
 					|| page->State() == PAGE_STATE_MODIFIED) {
 				DEBUG_PAGE_ACCESS_START(page);
-				vm_page_requeue(page, true);
+				vm_page_requeue(page, true, NULL);
 				DEBUG_PAGE_ACCESS_END(page);
 			}
 
