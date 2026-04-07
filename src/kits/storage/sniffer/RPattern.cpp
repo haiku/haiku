@@ -12,7 +12,6 @@
 */
 
 #include "Err.h"
-#include "Pattern.h"
 #include "RPattern.h"
 #include "Range.h"
 #include "Data.h"
@@ -20,10 +19,10 @@
 using namespace BPrivate::Storage::Sniffer;
 
 
-RPattern::RPattern(Range range, Pattern* pattern)
+RPattern::RPattern(Range range, const std::string& string, std::string mask)
 	:
-	fRange(range),
-	fPattern(pattern)
+	Pattern(string, mask),
+	fRange(range)
 {
 }
 
@@ -33,9 +32,7 @@ RPattern::InitCheck() const
 {
 	status_t err = fRange.InitCheck();
 	if (!err)
-		err = fPattern ? B_OK : B_BAD_VALUE;
-	if (!err)
-		err = fPattern->InitCheck();
+		err = Pattern::InitCheck();
 	return err;
 }
 
@@ -45,21 +42,19 @@ RPattern::GetErr() const
 {
 	if (fRange.InitCheck() != B_OK) {
 		return fRange.GetErr();
-	} else if (fPattern) {
-		if (fPattern->InitCheck() != B_OK)
-			return fPattern->GetErr();
+	} else {
+		if (Pattern::InitCheck() != B_OK)
+			return Pattern::GetErr();
 		else
 			return NULL;
-	} else {
-		return new Err("Sniffer parser error: RPattern::RPattern() -- NULL pattern parameter", -1);
 	}
 }
 
 
 RPattern::~RPattern()
 {
-	delete fPattern;
 }
+
 
 //! Sniffs the given data stream over the object's range for the object's pattern
 bool
@@ -68,8 +63,9 @@ RPattern::Sniff(const Data& data, bool caseInsensitive) const
 	if (!data.buffer || InitCheck() != B_OK)
 		return false;
 	else
-		return fPattern->Sniff(fRange, data, caseInsensitive);
+		return Pattern::Sniff(fRange, data, caseInsensitive);
 }
+
 
 /*! \brief Returns the number of bytes needed to perform a complete sniff, or an error
 	code if something goes wrong.
@@ -79,7 +75,7 @@ RPattern::BytesNeeded() const
 {
 	ssize_t result = InitCheck();
 	if (result == B_OK)
-		result = fPattern->BytesNeeded();
+		result = Pattern::BytesNeeded();
 	if (result >= 0)
 		result += fRange.End();
 	return result;

@@ -20,25 +20,18 @@
 using namespace BPrivate::Storage::Sniffer;
 
 
-Pattern::Pattern(const std::string& string, const std::string& mask)
+Pattern::Pattern(const std::string& string, std::string mask)
 	:
 	fCStatus(B_NO_INIT),
 	fErrorMessage(NULL)
 {
-	SetTo(string, mask);
-}
+	if (mask.empty()) {
+		// Build a mask with all bits turned on of the
+		// appropriate length
+		for (uint i = 0; i < string.length(); i++)
+			mask += (char)0xFF;
+	}
 
-
-Pattern::Pattern(const std::string& string)
-	:
-	fCStatus(B_NO_INIT),
-	fErrorMessage(NULL)
-{
-	// Build a mask with all bits turned on of the
-	// appropriate length
-	std::string mask = "";
-	for (uint i = 0; i < string.length(); i++)
-		mask += (char)0xFF;
 	SetTo(string, mask);
 }
 

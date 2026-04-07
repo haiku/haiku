@@ -295,7 +295,8 @@ private:
 	DisjList* ParseRPatternList();
 	RPattern* ParseRPattern();
 	Pattern* ParsePattern();
-	
+	void ParsePattern(std::string& str, std::string& mask);
+
 	TokenStream stream;
 	
 	Err *fOutOfMemErr;

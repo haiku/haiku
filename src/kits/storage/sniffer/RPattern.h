@@ -15,19 +15,20 @@
 #define _SNIFFER_R_PATTERN_H
 
 #include "Range.h"
+#include "Pattern.h"
 
 namespace BPrivate {
 namespace Storage {
 namespace Sniffer {
 
 class Err;
-class Pattern;
 struct Data;
 
+
 //! A Pattern and a Range, bundled into one.
-class RPattern {
+class RPattern : private Pattern {
 public:
-	RPattern(Range range, Pattern *pattern);
+	RPattern(Range range, const std::string& string, std::string mask);
 	~RPattern();	
 	
 	status_t InitCheck() const;
@@ -37,8 +38,8 @@ public:
 	ssize_t BytesNeeded() const;
 private:
 	Range fRange;
-	Pattern *fPattern;
 };
+
 
 }; // namespace Sniffer
 }; // namespace Storage

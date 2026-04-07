@@ -1257,9 +1257,10 @@ Parser::ParseRPattern()
 	// Range
 	Range range = ParseRange();
 	// Pattern
-	Pattern* pattern = ParsePattern();
+	std::string str, mask;
+	ParsePattern(str, mask);
 
-	RPattern* result = new(std::nothrow) RPattern(range, pattern);
+	RPattern* result = new(std::nothrow) RPattern(range, str, mask);
 	if (result) {
 		if (result->InitCheck() == B_OK) {
 			return result;
@@ -1278,7 +1279,28 @@ Parser::ParseRPattern()
 Pattern*
 Parser::ParsePattern()
 {
-	std::string str;
+	std::string str, mask;
+	ParsePattern(str, mask);
+
+	Pattern* result = new(std::nothrow) Pattern(str, mask);
+	if (!result)
+		ThrowOutOfMemError(stream.Pos());
+	if (result->InitCheck() == B_OK) {
+		return result;
+	} else {
+		Err* err = result->GetErr();
+		delete result;
+		if (err)
+			err->SetPos(stream.Pos());
+		throw err;
+	}
+	return result;
+}
+
+
+void
+Parser::ParsePattern(std::string& str, std::string& mask)
+{
 	// String
 	{
 		const Token* t = stream.Get();
@@ -1292,37 +1314,14 @@ Parser::ParsePattern()
 		// String (i.e. Mask)
 		const Token* t = stream.Get();
 		if (t->Type() == CharacterString) {
-			Pattern* result = new(std::nothrow) Pattern(str, t->String());
-			if (!result)
-				ThrowOutOfMemError(t->Pos());
-			if (result->InitCheck() == B_OK) {
-				return result;
-			} else {
-				Err* err = result->GetErr();
-				delete result;
-				if (err)
-					err->SetPos(t->Pos());
-				throw err;
-			}
+			mask = t->String();
 		} else {
 			ThrowUnexpectedTokenError(CharacterString, t);
 		}
 	} else {
 		// No mask specified.
-		Pattern* result = new(std::nothrow) Pattern(str);
-		if (result) {
-			if (result->InitCheck() == B_OK) {
-				return result;
-			} else {
-				Err* err = result->GetErr();
-				delete result;
-				throw err;
-			}
-		} else {
-			ThrowOutOfMemError(stream.Pos());
-		}
+		mask = std::string();
 	}
-	return NULL;
 }
 
 

@@ -31,8 +31,7 @@ struct Data;
 /*! The byte string and mask (if supplied) must be of the same length. */
 class Pattern {
 public:
-	Pattern(const std::string &string, const std::string &mask);
-	Pattern(const std::string &string);
+	Pattern(const std::string &string, std::string mask = std::string());
 	~Pattern();
 
 	status_t InitCheck() const;
