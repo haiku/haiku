@@ -31,25 +31,26 @@ struct Data;
 /*! The byte string and mask (if supplied) must be of the same length. */
 class Pattern {
 public:
-	Pattern(const std::string &string, std::string mask = std::string());
+	Pattern(bool caseInsensitive, const std::string &string, std::string mask = std::string());
 	~Pattern();
 
 	status_t InitCheck() const;
 	Err* GetErr() const;
 
-	bool Sniff(Range range, const Data& data, bool caseInsensitive) const;
+	bool Sniff(Range range, const Data& data) const;
 	ssize_t BytesNeeded() const;
 
-	status_t SetTo(const std::string &string, const std::string &mask);
+	status_t SetTo(bool caseInsensitive, const std::string &string, const std::string &mask);
 
 private:
-	bool Sniff(off_t start, const Data& data, bool caseInsensitive) const;
+	bool Sniff(off_t start, const Data& data) const;
 	
 	void SetStatus(status_t status, const char *msg = NULL);
 	void SetErrorMessage(const char *msg);
 
 	std::string fString;
 	std::string fMask;
+	bool fCaseInsensitive;
 
 	status_t fCStatus;
 	Err *fErrorMessage;

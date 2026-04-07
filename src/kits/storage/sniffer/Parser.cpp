@@ -1197,12 +1197,13 @@ Parser::ParsePatternList(Range range)
 		// LeftParen
 		stream.Read(LeftParen);
 		// [Flag] Pattern, (Divider, [Flag] Pattern)*
+		bool caseInsensitive = false;
 		while (true) {
 			// [Flag]
 			if (stream.CondRead(CaseInsensitiveFlag))
-				list->SetCaseInsensitive(true);
+				caseInsensitive = true;
 			// Pattern
-			list->Add(ParsePattern());
+			list->Add(ParsePattern(caseInsensitive));
 			// [Divider]
 			if (!stream.CondRead(Divider))
 				break;
@@ -1229,12 +1230,13 @@ Parser::ParseRPatternList()
 		// LeftParen
 		stream.Read(LeftParen);
 		// [Flag] RPattern, (Divider, [Flag] RPattern)*
+		bool caseInsensitive = false;
 		while (true) {
 			// [Flag]
 			if (stream.CondRead(CaseInsensitiveFlag))
-				list->SetCaseInsensitive(true);
+				caseInsensitive = true;
 			// RPattern
-			list->Add(ParseRPattern());
+			list->Add(ParseRPattern(caseInsensitive));
 			// [Divider]
 			if (!stream.CondRead(Divider))
 				break;
@@ -1252,7 +1254,7 @@ Parser::ParseRPatternList()
 
 
 RPattern*
-Parser::ParseRPattern()
+Parser::ParseRPattern(bool caseInsensitive)
 {
 	// Range
 	Range range = ParseRange();
@@ -1260,7 +1262,7 @@ Parser::ParseRPattern()
 	std::string str, mask;
 	ParsePattern(str, mask);
 
-	RPattern* result = new(std::nothrow) RPattern(range, str, mask);
+	RPattern* result = new(std::nothrow) RPattern(range, caseInsensitive, str, mask);
 	if (result) {
 		if (result->InitCheck() == B_OK) {
 			return result;
@@ -1277,12 +1279,12 @@ Parser::ParseRPattern()
 
 
 Pattern*
-Parser::ParsePattern()
+Parser::ParsePattern(bool caseInsensitive)
 {
 	std::string str, mask;
 	ParsePattern(str, mask);
 
-	Pattern* result = new(std::nothrow) Pattern(str, mask);
+	Pattern* result = new(std::nothrow) Pattern(caseInsensitive, str, mask);
 	if (!result)
 		ThrowOutOfMemError(stream.Pos());
 	if (result->InitCheck() == B_OK) {

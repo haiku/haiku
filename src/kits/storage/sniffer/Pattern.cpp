@@ -20,7 +20,7 @@
 using namespace BPrivate::Storage::Sniffer;
 
 
-Pattern::Pattern(const std::string& string, std::string mask)
+Pattern::Pattern(bool caseInsensitive, const std::string& string, std::string mask)
 	:
 	fCStatus(B_NO_INIT),
 	fErrorMessage(NULL)
@@ -32,7 +32,7 @@ Pattern::Pattern(const std::string& string, std::string mask)
 			mask += (char)0xFF;
 	}
 
-	SetTo(string, mask);
+	SetTo(caseInsensitive, string, mask);
 }
 
 
@@ -71,8 +71,9 @@ dumpStr(const std::string& string, const char* label = NULL)
 
 
 status_t
-Pattern::SetTo(const std::string& string, const std::string& mask)
+Pattern::SetTo(bool caseInsensitive, const std::string& string, const std::string& mask)
 {
+	fCaseInsensitive = caseInsensitive;
 	fString = string;
 	if (fString.length() == 0) {
 		SetStatus(B_BAD_VALUE, "Sniffer pattern error: illegal empty pattern");
@@ -93,14 +94,14 @@ Pattern::SetTo(const std::string& string, const std::string& mask)
 	false if not.
 */
 bool
-Pattern::Sniff(Range range, const Data& data, bool caseInsensitive) const
+Pattern::Sniff(Range range, const Data& data) const
 {
 	int32 start = range.Start();
 	int32 end = range.End();
 	if ((size_t)end >= data.length)
 		end = data.length - 1; // Don't bother searching beyond the end of the stream
 	for (int i = start; i <= end; i++) {
-		if (Sniff(i, data, caseInsensitive))
+		if (Sniff(i, data))
 			return true;
 	}
 	return false;
@@ -121,7 +122,7 @@ Pattern::BytesNeeded() const
 
 
 bool
-Pattern::Sniff(off_t start, const Data& data, bool caseInsensitive) const
+Pattern::Sniff(off_t start, const Data& data) const
 {
 	off_t len = fString.length();
 	// \todo If there are fewer bytes left in the data stream
@@ -136,7 +137,7 @@ Pattern::Sniff(off_t start, const Data& data, bool caseInsensitive) const
 	const uint8* mask = (const uint8*)fMask.data();
 
 	bool result = true;
-	if (caseInsensitive) {
+	if (fCaseInsensitive) {
 		for (int i = 0; i < len; i++) {
 			char secondChar;
 			if ('A' <= fString[i] && fString[i] <= 'Z') {

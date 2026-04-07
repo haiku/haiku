@@ -28,13 +28,13 @@ struct Data;
 //! A Pattern and a Range, bundled into one.
 class RPattern : private Pattern {
 public:
-	RPattern(Range range, const std::string& string, std::string mask);
+	RPattern(Range range, bool caseInsensitive, const std::string& string, std::string mask);
 	~RPattern();	
 	
 	status_t InitCheck() const;
 	Err* GetErr() const;
 	
-	bool Sniff(const Data& data, bool caseInsensitive) const;
+	bool Sniff(const Data& data) const;
 	ssize_t BytesNeeded() const;
 private:
 	Range fRange;

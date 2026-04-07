@@ -17,26 +17,10 @@ using namespace BPrivate::Storage::Sniffer;
 
 
 DisjList::DisjList()
-	:
-	fCaseInsensitive(false)
 {
 }
 
 
 DisjList::~DisjList()
 {
-}
-
-
-void
-DisjList::SetCaseInsensitive(bool how)
-{
-	fCaseInsensitive = how;
-}
-
-
-bool
-DisjList::IsCaseInsensitive()
-{
-	return fCaseInsensitive;
 }

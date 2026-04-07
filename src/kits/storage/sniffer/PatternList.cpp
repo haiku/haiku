@@ -63,7 +63,7 @@ PatternList::Sniff(const Data& data) const
 		std::vector<Pattern*>::const_iterator i;
 		for (i = fList.begin(); i != fList.end(); i++) {
 			if (*i)
-				result |= (*i)->Sniff(fRange, data, fCaseInsensitive);
+				result |= (*i)->Sniff(fRange, data);
 		}
 		return result;
 	}

@@ -235,7 +235,8 @@ private:
 
 	Notes:
 	- If a case-insensitive flag ("-i") appears in front of any Pattern or RPattern
-	  in a DisjList, case-insensitivity is applied to the entire DisjList.
+	  in a DisjList, case-insensitivity is applied to all following patterns in
+	  the DisjList.
 
 	Examples:
 	- 1.0 ('ABCD')
@@ -293,8 +294,8 @@ private:
 	Range ParseRange();
 	DisjList* ParsePatternList(Range range);
 	DisjList* ParseRPatternList();
-	RPattern* ParseRPattern();
-	Pattern* ParsePattern();
+	RPattern* ParseRPattern(bool caseInsensitive);
+	Pattern* ParsePattern(bool caseInsensitive);
 	void ParsePattern(std::string& str, std::string& mask);
 
 	TokenStream stream;

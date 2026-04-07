@@ -30,11 +30,6 @@ public:
 
 	virtual bool Sniff(const Data& data) const = 0;
 	virtual ssize_t BytesNeeded() const = 0;
-	
-	void SetCaseInsensitive(bool how);
-	bool IsCaseInsensitive();
-protected:
-	bool fCaseInsensitive;
 };
 
 

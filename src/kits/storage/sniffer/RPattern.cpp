@@ -19,9 +19,9 @@
 using namespace BPrivate::Storage::Sniffer;
 
 
-RPattern::RPattern(Range range, const std::string& string, std::string mask)
+RPattern::RPattern(Range range, bool caseInsensitive, const std::string& string, std::string mask)
 	:
-	Pattern(string, mask),
+	Pattern(caseInsensitive, string, mask),
 	fRange(range)
 {
 }
@@ -58,12 +58,12 @@ RPattern::~RPattern()
 
 //! Sniffs the given data stream over the object's range for the object's pattern
 bool
-RPattern::Sniff(const Data& data, bool caseInsensitive) const
+RPattern::Sniff(const Data& data) const
 {
 	if (!data.buffer || InitCheck() != B_OK)
 		return false;
 	else
-		return Pattern::Sniff(fRange, data, caseInsensitive);
+		return Pattern::Sniff(fRange, data);
 }
 
 

@@ -65,7 +65,7 @@ RPatternList::Sniff(const Data& data) const
 		std::vector<RPattern*>::const_iterator i;
 		for (i = fList.begin(); i != fList.end(); i++) {
 			if (*i)
-				result |= (*i)->Sniff(data, fCaseInsensitive);
+				result |= (*i)->Sniff(data);
 		}
 		return result;
 	}

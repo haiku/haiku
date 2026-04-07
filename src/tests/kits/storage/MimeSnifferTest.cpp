@@ -1268,7 +1268,7 @@ is ten times as fun			<br>		\n\
 		true, true, true, true, false, true, true,
 		false, false, false, false,
 		false, false, true,
-		true, true, false, true
+		true, false, false, true
 	}
 },
 //---------  <= Ten characters in
@@ -1288,7 +1288,7 @@ is ten times as fun			<br>		\n\
 		false, false, false, false, false, false, false,
 		false, false, false, false,
 		false, false, false,
-		true, true, false, true
+		true, false, false, true
 	}
 },
 //------------------------------
