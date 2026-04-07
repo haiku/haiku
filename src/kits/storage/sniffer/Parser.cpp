@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>	// For atol(), atof()
 #include <string.h>
-#include <String.h>	// BString
+#include <String.h>
 
 using namespace BPrivate::Storage::Sniffer;
 
@@ -107,34 +107,7 @@ Token::operator==(Token &ref) const {
 	if (Type() == ref.Type()) {
 		switch (Type()) {
 			case CharacterString:
-//				printf(" str1 == '%s'\n", String());
-//				printf(" str2 == '%s'\n", ref.String());
-//				printf(" strcmp() == %d\n", strcmp(String(), ref.String()));
-			{
 				return String() == ref.String();				
-				
-/*				
-				// strcmp() seems to choke on certain, non-normal ASCII chars
-				// (i.e. chars outside the usual alphabets, but still valid
-				// as far as ASCII is concerned), so we'll just compare the
-				// strings by hand to be safe.
-				const char *str1 = String();
-				const char *str2 = ref.String();				
-				int len1 = strlen(str1);
-				int len2 = strlen(str2);
-//				printf("len1 == %d\n", len1);
-//				printf("len2 == %d\n", len2);
-				if (len1 == len2) {
-					for (int i = 0; i < len1; i++) {
-//						printf("i == %d, str1[%d] == %x, str2[%d] == %x\n", i, i, str1[i], i, str2[i]);
-						if (str1[i] != str2[i])
-							return false;
-					}
-				}
-				return true;
-*/
-			}
-//				return strcmp(String(), ref.String()) == 0;
 			
 			case Integer:
 				return Int() == ref.Int();
