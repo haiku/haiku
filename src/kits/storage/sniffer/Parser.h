@@ -20,10 +20,6 @@
 #include <string>
 #include <vector>
 
-#include "Err.h"
-#include "Range.h"
-#include "Rule.h"
-
 class BString;
 
 //! MIME Sniffer related classes
@@ -35,6 +31,8 @@ class Rule;
 class DisjList;
 class RPattern;
 class Pattern;
+class Range;
+class Err;
 
 //! The mighty parsing function ;-)
 status_t parse(const char* rule, Rule* result, BString* parseError = NULL);

@@ -18,6 +18,7 @@
 #include "RPatternList.h"
 #include "Range.h"
 #include "Rule.h"
+#include "Err.h"
 
 #include <String.h>
 #include <new>
