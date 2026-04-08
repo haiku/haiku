@@ -701,7 +701,7 @@ Response::Read(BDataIO& stream)
 	char c;
 	ssize_t bytesRead = stream.Read(&c, 1);
 	if (bytesRead == 1) {
-		printf("%c", c);
+		TRACE("%c", c);
 		return c;
 	}
 

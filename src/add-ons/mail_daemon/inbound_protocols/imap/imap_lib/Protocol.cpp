@@ -321,6 +321,7 @@ Protocol::HandleResponse(Command* command, bigtime_t timeout,
 	bool done = false;
 	while (!done) {
 		try {
+			TRACE("S: ");
 			status_t status = parser.NextResponse(response, timeout);
 			if (status != B_OK) {
 				// we might have lost the connection, clear the connection state
@@ -339,7 +340,7 @@ Protocol::HandleResponse(Command* command, bigtime_t timeout,
 					}
 				}
 				if (!handled)
-					printf("Unhandled S: %s\n", response.ToString().String());
+					TRACE(" => Unhandled\n");
 			} else {
 				CommandIDMap::iterator found
 					= fOngoingCommands.find(response.Tag());
@@ -350,7 +351,7 @@ Protocol::HandleResponse(Command* command, bigtime_t timeout,
 
 					fOngoingCommands.erase(found);
 				} else
-					printf("Unknown tag S: %s\n", response.ToString().String());
+					TRACE(" => Unknown tag\n");
 			}
 		} catch (ParseException& exception) {
 			printf("Error during parsing: %s\n", exception.Message());

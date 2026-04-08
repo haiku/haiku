@@ -82,6 +82,7 @@ public:
 
 	virtual	BString				CommandString();
 	virtual	bool				HandleUntagged(Response& response);
+	virtual	status_t			HandleTagged(Response& response);
 
 			const ArgumentList&	Capabilities() const { return fCapabilities; }
 
