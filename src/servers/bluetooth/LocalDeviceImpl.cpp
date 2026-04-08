@@ -1259,6 +1259,7 @@ LocalDeviceImpl::ReturnLinkKeys(struct hci_ev_return_link_keys* returnedKeys)
 			LinkKeyUtils::ToString(linkKeys->link_key).String());
 
 		linkKeys++;
+		numKeys--;
 	}
 }
 
