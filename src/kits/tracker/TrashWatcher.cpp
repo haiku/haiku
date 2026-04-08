@@ -47,6 +47,7 @@ All rights reserved.
 #include "Attributes.h"
 #include "Bitmaps.h"
 #include "FSUtils.h"
+#include "IconCache.h"
 #include "Tracker.h"
 
 
@@ -71,8 +72,16 @@ BTrashWatcher::BTrashWatcher()
 thread_id
 BTrashWatcher::Run()
 {
-	fTrashFull = CheckTrashDirs();
-	UpdateTrashIcon();
+	// refresh Trash icon cache
+	BPath path;
+	if (find_directory(B_TRASH_DIRECTORY, &path) == B_OK) {
+		BDirectory trashDir(path.Path());
+		BEntry entry;
+		if (trashDir.GetEntry(&entry) == B_OK) {
+			Model trashModel(&entry);
+			IconCache::sIconCache->IconChanged(&trashModel);
+		}
+	}
 
 	return BLooper::Run();
 }

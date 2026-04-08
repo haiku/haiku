@@ -965,9 +965,6 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 				entry = GetPrinterIcon(nodeCacheLocker, sharedCacheLocker,
 					&resultingOpenCache, model, source, mode, size, &lazyBitmap);
 				ASSERT(entry != NULL);
-			} else if (model->IsTrash()) {
-				// do not preload Trash icon, TrashWatcher handles it.
-				source = kNode;
 			} else {
 				if (source == kUnknownSource) {
 					// look for node icons first
