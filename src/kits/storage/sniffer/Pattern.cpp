@@ -129,12 +129,17 @@ Pattern::GetErr() const
 bool
 Pattern::Sniff(Range range, const Data& data) const
 {
-	int32 start = range.Start();
-	int32 end = range.End();
-	if ((size_t)end >= data.length)
-		end = data.length - 1; // Don't bother searching beyond the end of the stream
-	for (int i = start; i <= end; i++) {
-		if (Sniff(i, data))
+	int32 firstStart = range.Start();
+	int32 lastStart = range.End();
+	int32 searchEnd = lastStart + fStringLength;
+	if ((size_t)searchEnd > data.length) {
+		// Don't search beyond the end of the stream
+		searchEnd = data.length;
+		lastStart = searchEnd - fStringLength;
+	}
+
+	for (off_t start = firstStart; start <= lastStart; start++) {
+		if (_SniffNext(start, searchEnd, data))
 			return true;
 	}
 	return false;
@@ -155,27 +160,29 @@ Pattern::BytesNeeded() const
 
 
 bool
-Pattern::Sniff(off_t start, const Data& data) const
+Pattern::_SniffNext(off_t& start, off_t end, const Data& data) const
 {
-	int32 len = fStringLength;
-	// \todo If there are fewer bytes left in the data stream
-	// from the given position than the length of our data
-	// string, should we just return false (which is what we're
-	// doing now), or should we compare as many bytes as we
-	// can and return true if those match?
-	if ((data.length - start) < (size_t)len)
-		return false;
-
 	const uint8* string = fData;
 	const uint8* buffer = data.buffer + start;
 
-	// Compare the "unmasked" portion of the pattern.
+	// Try to find a start point using the "unmasked" portion of the pattern.
 	if (fUnmaskedStartLength != 0) {
-		if (memcmp(string, buffer, fUnmaskedStartLength) != 0)
+		void* strStart = memmem(buffer, end - start, string, fUnmaskedStartLength);
+		if (strStart == NULL) {
+			start = end;
 			return false;
+		}
 		if (fUnmaskedStartLength == fStringLength)
 			return true;
+
+		buffer = (uint8*)strStart;
+		start = buffer - data.buffer;
 	}
+
+	// See if the buffer is still long enough for a match.
+	int32 len = fStringLength;
+	if ((data.length - start) < (size_t)len)
+		return false;
 
 	// Compare the remainder.
 	string += fUnmaskedStartLength;

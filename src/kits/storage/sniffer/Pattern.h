@@ -50,7 +50,7 @@ protected:
 	Pattern(bool caseInsensitive, const std::string& string, std::string mask);
 
 private:
-	bool Sniff(off_t start, const Data& data) const;
+	bool _SniffNext(off_t& start, off_t end, const Data& data) const;
 
 	void SetStatus(status_t status, const char *msg = NULL);
 	void SetErrorMessage(const char *msg);
