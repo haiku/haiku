@@ -12,9 +12,10 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "sniffer/Rule.h"
-#include "sniffer/Parser.h"
 #include "sniffer/Data.h"
+#include "sniffer/Err.h"
+#include "sniffer/Parser.h"
+#include "sniffer/Rule.h"
 
 using std::cout;
 using std::endl;
