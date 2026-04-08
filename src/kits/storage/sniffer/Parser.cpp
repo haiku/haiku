@@ -1262,7 +1262,7 @@ Parser::ParseRPattern(bool caseInsensitive)
 	std::string str, mask;
 	ParsePattern(str, mask);
 
-	RPattern* result = new(std::nothrow) RPattern(range, caseInsensitive, str, mask);
+	RPattern* result = RPattern::Create(range, caseInsensitive, str, mask);
 	if (result) {
 		if (result->InitCheck() == B_OK) {
 			return result;
@@ -1284,7 +1284,7 @@ Parser::ParsePattern(bool caseInsensitive)
 	std::string str, mask;
 	ParsePattern(str, mask);
 
-	Pattern* result = new(std::nothrow) Pattern(caseInsensitive, str, mask);
+	Pattern* result = Pattern::Create(caseInsensitive, str, mask);
 	if (!result)
 		ThrowOutOfMemError(stream.Pos());
 	if (result->InitCheck() == B_OK) {
