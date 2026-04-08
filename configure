@@ -647,7 +647,6 @@ fi
 #
 GIT_DIR=`git -C "$configureDir" rev-parse --git-dir | sed 's/^gitdir: //'`
 HOST_GCC_MACHINE=`$CC -dumpmachine`
-HOST_GCC_VERSION=`$CC -dumpversion`
 HAIKU_INCLUDE_SOURCES=0
 HAIKU_INCLUDE_3RDPARTY=0
 HAIKU_DISTRO_COMPATIBILITY=default
@@ -753,9 +752,6 @@ while [ $# -gt 0 ] ; do
 			esac
 			set_variable buildCrossToolsMachine_$targetArch $targetMachine
 			targetArchs="$targetArchs $targetArch"
-			if [ "$targetArch" = "x86_gcc2" ] && [ ${HOST_GCC_VERSION%%.*} -ge 14 ]; then
-				CC="$CC -Wno-error=implicit-int -Wno-error=implicit-function-declaration"
-			fi
 			;;
 		--cross-tools-prefix)
 			assertparam "$1" $#

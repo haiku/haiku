@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Parameters <haiku sourcedir> <buildtools dir> <install dir>
-# Influential environmental variable:
+# Influential environment variable:
 # * haikuRequiredLegacyGCCVersion: The required version of the gcc. Will be
 #   checked against the version in the buildtools directory.
 
@@ -17,6 +17,11 @@ set -e
 if [ -z "$MAKE" ]; then
 	echo "MAKE undefined. Assuming make."
 	export MAKE=make
+fi
+
+if [ -z "$CC" ]; then
+	echo "CC undefined. Assuming gcc."
+	export CC=gcc
 fi
 
 haikuSourceDir=$1
@@ -107,18 +112,28 @@ if [ -n "$SECONDARY_ARCH" ]; then
 	gccConfigureArgs="$gccConfigureArgs --with-hybrid-secondary=$SECONDARY_ARCH"
 fi
 
-# force the POSIX locale, as the build (makeinfo) might choke otherwise
-export LC_ALL=POSIX
+# force the C/POSIX locale, as the build (makeinfo) might choke otherwise
+export LC_ALL=C
 
 # drop an multiple job arguments from MAKEFLAGS
 if [ ! -z "$MAKEFLAGS" ]; then
 	export MAKEFLAGS=$(echo $MAKEFLAGS | sed -e 's/-j\s*[0-9][0-9]*//g')
 fi
 
+# set up base flags (in $CC so they're used for the host compiler only)
+export CC="$CC -Og"
+CC_VERSION=`$CC -dumpversion`
+if [ ${CC_VERSION%%.*} -ge 10 ]; then
+	export CC="$CC -fcommon"
+fi
+if [ ${CC_VERSION%%.*} -ge 14 ]; then
+	export CC="$CC -std=gnu89"
+fi
+
 
 # build binutils
 cd $binutilsObjDir
-CFLAGS="-O2 -fcommon" CXXFLAGS="-O2 -fcommon" $buildToolsDir/binutils/configure \
+$buildToolsDir/binutils/configure \
 	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
 	--disable-nls --enable-shared=yes --disable-werror || exit 1
 $MAKE $additionalMakeArgs || exit 1
@@ -155,11 +170,13 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 (cd $buildToolsDir/gcc/gcc; touch c-parse.c c-parse.h cexp.c cp/parse.c \
 	cp/parse.h c-gperf.h)
 
+# GCC 2 compiled for 64-bit on most systems is somewhat broken
+# (e.g. "cast specifies signature type", spurious "maybe uninitialized" warnings)
+export CC="$CC -m32"
+
 # configure gcc
 cd $gccObjDir
-# GCC 2 compiled for x86_64 on most systems is broken, compile for 32-bit.
-export CC="gcc -m32"
-CFLAGS="-O2 -U_FORTIFY_SOURCE -fcommon" CXXFLAGS="-O2 -fcommon" $buildToolsDir/gcc/configure \
+$buildToolsDir/gcc/configure \
 	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
 	--disable-nls --enable-shared=yes --enable-languages=c,c++ \
 	--with-headers=$tmpIncludeDir --with-libs=$tmpLibDir $gccConfigureArgs \
