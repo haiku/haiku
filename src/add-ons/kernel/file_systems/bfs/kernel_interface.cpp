@@ -1271,16 +1271,13 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 
 	inode->WriteLockInTransaction(transaction);
 
-	volume->UpdateLiveQueriesRenameMove(inode, oldDirectory->ID(), oldName,
-		newDirectory->ID(), newName);
-
 	// update the name only when they differ
 	if (strcmp(oldName, newName)) {
 		status = inode->SetName(transaction, newName);
 		if (status == B_OK) {
 			Index index(volume);
 			index.UpdateName(transaction, oldName, newName, inode,
-				false /* we already updated live queries, above */);
+				false /* we'll notify live queries when finished */);
 		}
 	}
 
@@ -1321,6 +1318,8 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 				if (status == B_OK) {
 					notify_entry_moved(volume->ID(), oldDirectory->ID(),
 						oldName, newDirectory->ID(), newName, id);
+					volume->UpdateLiveQueriesRenameMove(inode, oldDirectory->ID(), oldName,
+						newDirectory->ID(), newName);
 					return B_OK;
 				}
 
