@@ -10,10 +10,10 @@
 #include <errno.h>
 
 
-int *
-_fssh_errnop(void)
+int
+_fssh_errno(void)
 {
-	return &errno;
+	return errno;
 }
 
 
