@@ -183,34 +183,38 @@ _haiku_build_strerror(int errnum)
 	return strerror(to_host_error(errnum));
 }
 
-// _haiku_build_errno
-int *
-_haiku_build_errno()
-{
-	static int previousErrno = 0;
-	static int localErrno = 0;
-	static int previousLocalErrno = 0;
-
-	// If the localErrno has been changed and the real errno has not changed
-	// in the meantime, we update errno itself, so that the local update will
-	// be reflected. If errno has changed we always update localErrno.
-	int currentErrno = errno;
-	if (currentErrno == previousErrno) {
-		if (localErrno != previousLocalErrno) {
-			errno = previousErrno = to_host_error(localErrno);
-			previousLocalErrno = localErrno;
-		}
-	} else {
-		previousErrno = currentErrno;
-		previousLocalErrno = localErrno = to_haiku_error(errno);
-	}
-
-	return &localErrno;
-}
-
 // _haiku_to_host_error
 int
 _haiku_to_host_error(int error)
 {
 	return to_host_error(error);
+}
+
+
+// #pragma mark - errno handling
+
+
+BuildErrnoWrapper build_errno;
+static int sPreviousErrno = 0;
+static int sLocalErrno = 0;
+
+
+const int
+_haiku_build_errno()
+{
+	int currentErrno = errno;
+	if (currentErrno != sPreviousErrno) {
+		sPreviousErrno = currentErrno;
+		sLocalErrno = to_haiku_error(currentErrno);
+	}
+
+	return sLocalErrno;
+}
+
+
+void
+_haiku_build_set_errno(int error)
+{
+	sLocalErrno = error;
+	errno = sPreviousErrno = to_host_error(error);
 }

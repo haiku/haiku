@@ -494,23 +494,44 @@
 	#define ENOEXEC HAIKU_ENOEXEC
 	#define EPIPE HAIKU_EPIPE
 	#define ENOATTR HAIKU_ENOATTR
-
-	#undef errno
-	#define errno (*_haiku_build_errno())
 #elif defined(HAIKU_HOST_PLATFORM_HAIKU)
-#	include <../os/support/Errors.h>
+#	include_next <Errors.h>
 #endif	// ! BUILDING_HAIKU_ERROR_MAPPER
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int *_haiku_build_errno();
+extern const int _haiku_build_errno();
+extern void _haiku_build_set_errno(int error);
 extern int _haiku_to_host_error(int error);
 
 #ifdef __cplusplus
-}
+} // extern "C"
+
+struct BuildErrnoWrapper {
+	int operator=(int value)
+	{
+		_haiku_build_set_errno(value);
+		return value;
+	}
+	operator int()
+	{
+		return _haiku_build_errno();
+	}
+};
 #endif
+
+/* build-specific code */
+#ifndef BUILDING_HAIKU_ERROR_MAPPER
+#undef errno
+#ifndef __cplusplus
+#define errno (_haiku_build_errno())
+#else
+extern BuildErrnoWrapper build_errno;
+#define errno build_errno
+#endif
+#endif	// ! BUILDING_HAIKU_ERROR_MAPPER
 
 
 #endif	/* _BUILD_ERRORS_H */
