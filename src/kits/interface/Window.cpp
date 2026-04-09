@@ -3745,7 +3745,10 @@ BWindow::_HandleKeyDown(BMessage* event)
 		// chance to update its menus. This may install new shortcuts,
 		// which is why we have to call it here, before trying to find
 		// a shortcut for the given key.
-		MenusBeginning();
+		// Only do this if Command key is down, it's too expensive to
+		// do this on every key press.
+		if ((modifiers & B_COMMAND_KEY) != 0)
+			MenusBeginning();
 
 		Shortcut* shortcut = _FindShortcut(key, modifiers
 			| (((modifiers & B_COMMAND_KEY) == 0) ? B_NO_COMMAND_KEY : 0));
@@ -3781,7 +3784,8 @@ BWindow::_HandleKeyDown(BMessage* event)
 			}
 		}
 
-		MenusEnded();
+		if ((modifiers & B_COMMAND_KEY) != 0)
+			MenusEnded();
 
 		if (shortcut != NULL)
 			return true;
