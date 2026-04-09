@@ -82,6 +82,16 @@ powerpc-*)
 	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
 	gccConfigureArgs="$gccConfigureArgs --disable-tls"
 	;;
+powerpc64-*)
+	binutilsConfigureArgs="--disable-multilib"
+	gccConfigureArgs="--disable-multilib"
+	gdbConfigureArgs="--disable-multilib --disable-werror"
+	gdbTarget="powerpc64-unknown-elf"
+
+	# TODO: Disable building with TLS support for PPC64 until implemented.
+	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
+	gccConfigureArgs="$gccConfigureArgs --disable-tls"
+	;;
 *)
 	binutilsConfigureArgs="--disable-multilib"
 	gccConfigureArgs="--disable-multilib"

@@ -231,6 +231,14 @@ rule KernelArchitectureSetup architecture
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 384 ; # in kB
 
+		case ppc64 :
+			HAIKU_KERNEL_PLATFORM ?= openfirmware ;
+			HAIKU_BOOT_TARGETS += openfirmware ;
+
+			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
+			# offset in floppy image (>= sizeof(haiku_loader))
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 384 ; # in kB
+
 		case sparc :
 			HAIKU_KERNEL_PLATFORM ?= openfirmware ;
 			HAIKU_BOOT_TARGETS += openfirmware ;

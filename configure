@@ -289,6 +289,7 @@ standard_gcc_settings()
 		i?86-*)		targetCpu=x86;;
 		m68k-*)		targetCpu=m68k;;
 		powerpc-*)	targetCpu=ppc;;
+		powerpc64-*)	targetCpu=ppc64;;
 		riscv64-*)	targetCpu=riscv64;;
 		sparc64-*)	targetCpu=sparc;;
 		x86_64-*)	targetCpu=x86_64;;
@@ -696,6 +697,7 @@ supportedTargetArchs="
 	arm64
 	m68k
 	ppc
+	ppc64
 	riscv64
 	sparc
 	x86
@@ -747,6 +749,7 @@ while [ $# -gt 0 ] ; do
 				x86)		targetMachine=i586-pc-haiku;;
 				x86_64)		targetMachine=x86_64-unknown-haiku;;
 				ppc)		targetMachine=powerpc-apple-haiku;;
+				ppc64)		targetMachine=powerpc64-unknown-haiku;;
 				m68k)		targetMachine=m68k-unknown-haiku;;
 				arm)		targetMachine=arm-unknown-haiku;;
 				arm64)		targetMachine=aarch64-unknown-haiku;;
@@ -808,6 +811,7 @@ while [ $# -gt 0 ] ; do
 				x86)		targetMachine=i586-pc-haiku;;
 				x86_64)		targetMachine=x86_64-unknown-haiku;;
 				ppc)		targetMachine=powerpc-apple-haiku;;
+				ppc64)		targetMachine=powerpc64-unknown-haiku;;
 				arm)		targetMachine=arm-unknown-haiku;;
 				arm64)		targetMachine=aarch64-unknown-haiku;;
 				riscv64)	targetMachine=riscv64-unknown-haiku;;

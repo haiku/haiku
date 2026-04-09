@@ -19,6 +19,9 @@ case "$1" in
 	"ppc")
 		echo "powerpc-apple-haiku"
 		;;
+	"ppc64")
+		echo "powerpc64-unknown-haiku"
+		;;
 	"sparc")
 		echo "sparc64-unknown-haiku"
 		;;
