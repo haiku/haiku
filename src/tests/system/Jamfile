@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src tests system ;
 SubInclude HAIKU_TOP src tests system benchmarks ;
 SubInclude HAIKU_TOP src tests system boot ;
 SubInclude HAIKU_TOP src tests system glue ;
-if $(TARGET_CC_IS_LEGACY_GCC_$(architecture)) = 0 {
+if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 0 {
 	SubInclude HAIKU_TOP src tests system kernel ;
 }
 SubInclude HAIKU_TOP src tests system libroot ;
