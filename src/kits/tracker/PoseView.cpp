@@ -198,14 +198,11 @@ OneMatches(BPose* pose, BPoseView*, void* castToPose)
 
 
 static void
-CopySelectionListToEntryRefList(const PoseList* original,
-	BObjectList<entry_ref, true>* copy)
+CopySelectionListToEntryRefList(const PoseList* original, BObjectList<entry_ref, true>* copy)
 {
-	int32 count = original->CountItems();
-	for (int32 index = 0; index < count; index++) {
-		copy->AddItem(new entry_ref(*(original->ItemAt(
-			index)->TargetModel()->EntryRef())));
-	}
+	int32 selectionCount = original->CountItems();
+	for (int32 index = 0; index < selectionCount; index++)
+		copy->AddItem(new entry_ref(*(original->ItemAt(index)->TargetModel()->EntryRef())));
 }
 
 
@@ -4323,8 +4320,7 @@ BPoseView::CanHandleDragSelection(const Model* target,
 
 			for (int32 index = 0; index < selectCount; index++) {
 				// get the mime type of the model, following a possible symlink
-				BEntry entry(selectionList->ItemAt(
-					index)->TargetModel()->EntryRef(), true);
+				BEntry entry(selectionList->ItemAt(index)->TargetModel()->EntryRef(), true);
 				if (entry.InitCheck() != B_OK)
 					continue;
 
@@ -4477,7 +4473,7 @@ BPoseView::HandleMessageDropped(BMessage* message)
 		return false;
 
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
-	if (window != NULL && message->HasData("RGBColor", 'RGBC')) {
+	if (window != NULL && message->HasData("RGBColor", B_RGB_COLOR_TYPE)) {
 		// do not handle roColor-style drops here, pass them on to the desktop
 		BMessenger((BHandler*)window).SendMessage(message);
 
@@ -4502,8 +4498,7 @@ BPoseView::HandleMessageDropped(BMessage* message)
 	if (targetPose != NULL) {
 		targetModel = targetPose->TargetModel();
 		if (targetModel->IsSymLink()
-			&& tmpTarget.SetTo(targetPose->TargetModel()->EntryRef(),
-				true, true) == B_OK) {
+			&& tmpTarget.SetTo(targetPose->TargetModel()->EntryRef(), true, true) == B_OK) {
 			targetModel = &tmpTarget;
 		}
 	}
@@ -4513,8 +4508,8 @@ BPoseView::HandleMessageDropped(BMessage* message)
 
 
 bool
-BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
-	BPose* targetPose, BView* view, BPoint dropPoint)
+BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* targetPose,
+	BView* view, BPoint dropPoint)
 {
 	uint32 buttons = (uint32)message->FindInt32("buttons");
 
@@ -4564,10 +4559,8 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 				BStringList actionSpecifiers(10);
 				for (int32 index = 0; ; index++) {
 					const char* string;
-					if (message->FindString("be:actionspecifier", index,
-							&string) != B_OK) {
+					if (message->FindString("be:actionspecifier", index, &string) != B_OK)
 						break;
-					}
 
 					ASSERT(string != NULL);
 					actionSpecifiers.Add(string);
@@ -4578,17 +4571,14 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 				BStringList typeNames(10);
 				for (int32 index = 0; ; index++) {
 					const char* string;
-					if (message->FindString("be:filetypes", index, &string)
-							!= B_OK) {
+					if (message->FindString("be:filetypes", index, &string) != B_OK)
 						break;
-					}
 
 					ASSERT(string != NULL);
 					types.Add(string);
 
 					const char* typeName = "";
-					message->FindString("be:type_descriptions", index,
-						&typeName);
+					message->FindString("be:type_descriptions", index, &typeName);
 					typeNames.Add(typeName);
 				}
 
@@ -4596,12 +4586,10 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 				int32 specificActionIndex = -1;
 
 				// if control down, run a popup menu
-				if (canCopy
-					&& SecondaryMouseButtonDown(modifiers(), buttons)) {
+				if (canCopy && SecondaryMouseButtonDown(modifiers(), buttons)) {
 					if (actionSpecifiers.CountStrings() > 0) {
-						specificActionIndex = RunMimeTypeDestinationMenu(NULL,
-							NULL, &actionSpecifiers,
-							view->ConvertToScreen(dropPoint));
+						specificActionIndex = RunMimeTypeDestinationMenu(NULL, NULL,
+							&actionSpecifiers, view->ConvertToScreen(dropPoint));
 
 						if (specificActionIndex == -1)
 							return false;
@@ -4618,9 +4606,8 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 
 				char name[B_FILE_NAME_LENGTH];
 				BFile file;
-				if (CreateClippingFile(poseView, file, name, &targetDirectory,
-						message, B_TRANSLATE("Untitled clipping"),
-						targetPose == NULL, dropPoint) != B_OK) {
+				if (CreateClippingFile(poseView, file, name, &targetDirectory, message,
+					B_TRANSLATE("Untitled clipping"), targetPose == NULL, dropPoint) != B_OK) {
 					return false;
 				}
 
@@ -4632,8 +4619,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 				reply.AddString("be:types", B_FILE_MIME_TYPE);
 				if (specificTypeIndex != -1) {
 					// we had the user pick a specific type from a menu, use it
-					reply.AddString("be:filetypes",
-						types.StringAt(specificTypeIndex).String());
+					reply.AddString("be:filetypes", types.StringAt(specificTypeIndex).String());
 
 					if (typeNames.StringAt(specificTypeIndex).Length()) {
 						reply.AddString("be:type_descriptions",
@@ -4659,10 +4645,9 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 				// support
 				for (int32 index = 0; ; index++) {
 					const char* type;
-					if (message->FindString("be:filetypes", index, &type)
-							!= B_OK) {
+					if (message->FindString("be:filetypes", index, &type) != B_OK)
 						break;
-					}
+
 					reply.AddString("be:filetypes", type);
 				}
 
@@ -4676,8 +4661,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 			// look for specific command or bring up popup
 			// Unify this with local drag&drop
 
-			if (!targetModel->IsDirectory()
-				&& !targetModel->IsVirtualDirectory()) {
+			if (!targetModel->IsDirectory() && !targetModel->IsVirtualDirectory()) {
 				// bail if we are not a directory
 				return false;
 			}
@@ -4727,14 +4711,13 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 			}
 
 			// handle refs by performing a copy
-			BObjectList<entry_ref, true>* entryList
-				= new BObjectList<entry_ref, true>(10);
-
+			BObjectList<entry_ref, true>* entryList = new BObjectList<entry_ref, true>(10);
 			for (int32 index = 0; ; index++) {
 				// copy all enclosed refs into a list
 				entry_ref ref;
 				if (message->FindRef("refs", index, &ref) != B_OK)
 					break;
+
 				entryList->AddItem(new entry_ref(ref));
 			}
 
@@ -4748,11 +4731,9 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 					// force the the icons to lay out in 5 columns
 					for (int32 index = 0; count; index++) {
 						for (int32 j = 0; count && j < 4; j++, count--) {
-							BPoint point(
-								dropPoint + BPoint(j * poseView->fGrid.x,
+							BPoint point(dropPoint + BPoint(j * poseView->fGrid.x,
 								index * poseView->fGrid.y));
-							pointList->AddItem(
-								new BPoint(poseView->PinToGrid(point,
+							pointList->AddItem(new BPoint(poseView->PinToGrid(point,
 								poseView->fGrid, poseView->fOffset)));
 						}
 					}
@@ -4838,12 +4819,9 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 			}
 
 			BMessage embeddedBitmap;
-			if (message->FindMessage(kBitmapMimeType, &embeddedBitmap)
-					!= B_OK
-				&& message->FindMessage(kLargeIconType, &embeddedBitmap)
-					!= B_OK
-				&& message->FindMessage(kMiniIconType, &embeddedBitmap)
-					!= B_OK) {
+			if (message->FindMessage(kBitmapMimeType, &embeddedBitmap) != B_OK
+				&& message->FindMessage(kLargeIconType, &embeddedBitmap) != B_OK
+				&& message->FindMessage(kMiniIconType, &embeddedBitmap) != B_OK) {
 				return false;
 			}
 
@@ -4948,10 +4926,9 @@ AddOneToLaunchMessage(BPose* pose, BPoseView*, void* castToParams)
 	ThrowOnAssert(pose != NULL);
 	ThrowOnAssert(pose->TargetModel() != NULL);
 
-	if (params->app->IsDropTarget(params->checkTypes
-			? pose->TargetModel() : NULL, true)) {
+	Model* model = params->checkTypes ? pose->TargetModel() : NULL;
+	if (params->app->IsDropTarget(model, true))
 		params->refsMessage->AddRef("refs", pose->TargetModel()->EntryRef());
-	}
 
 	return false;
 }
@@ -4996,19 +4973,18 @@ void
 BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	bool forceCopy, bool forceMove, bool createLink, bool relativeLink)
 {
+	BPoint dropPoint;
 	uint32 buttons;
-	BPoint loc;
-	GetMouse(&loc, &buttons);
-	MoveSelectionInto(destFolder, srcWindow,
-		dynamic_cast<BContainerWindow*>(Window()), buttons, loc, forceCopy,
-		forceMove, createLink, relativeLink);
+	GetMouse(&dropPoint, &buttons);
+	MoveSelectionInto(destFolder, srcWindow, dynamic_cast<BContainerWindow*>(Window()),
+		buttons, dropPoint, forceCopy, forceMove, createLink, relativeLink);
 }
 
 
 void
 BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
-	BContainerWindow* destWindow, uint32 buttons, BPoint loc, bool forceCopy,
-	bool forceMove, bool createLink, bool relativeLink, BPoint where, bool dropOnGrid)
+	BContainerWindow* destWindow, uint32 buttons, BPoint dropPoint, bool forceCopy,
+	bool forceMove, bool createLink, bool relativeLink, BPoint where, bool pinToGrid)
 {
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
@@ -5020,10 +4996,9 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		return;
 
 	bool createRelativeLink = relativeLink;
-	if (SecondaryMouseButtonDown(modifiers(), buttons)
-		&& destWindow != NULL) {
-		switch (destWindow->ShowDropContextMenu(loc,
-				srcWindow != NULL ? srcWindow->PoseView() : NULL)) {
+	if (destWindow != NULL && SecondaryMouseButtonDown(modifiers(), buttons)) {
+		BPoseView* poseView = (srcWindow != NULL ? srcWindow->PoseView() : NULL);
+		switch (destWindow->ShowDropContextMenu(dropPoint, poseView)) {
 			case kCreateRelativeLink:
 				createRelativeLink = true;
 				break;
@@ -5051,7 +5026,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	if (*srcWindow->PoseView()->TargetModel()->NodeRef() == *destFolder->NodeRef()) {
 		BPoseView* targetView = srcWindow->PoseView();
 		if (forceCopy) {
-			targetView->DuplicateSelection(&where, &loc);
+			targetView->DuplicateSelection(&where, &dropPoint);
 			return;
 		}
 
@@ -5065,7 +5040,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			return;
 		}
 
-		BPoint delta = loc - where;
+		BPoint delta = dropPoint - where;
 		int32 selectCount = targetView->CountSelected();
 		for (int32 index = 0; index < selectCount; index++) {
 			BPose* pose = targetView->SelectionList()->ItemAt(index);
@@ -5077,7 +5052,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			targetView->RemoveFromVSList(pose);
 			BPoint location(pose->Location(targetView) + delta);
 			BRect oldBounds(pose->CalcRect(targetView));
-			if (dropOnGrid) {
+			if (pinToGrid) {
 				location = targetView->PinToGrid(location, targetView->fGrid,
 					targetView->fOffset);
 			}
@@ -5149,8 +5124,8 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
-		BList* pointList = destWindow->PoseView()->GetDropPointList(where, loc, selectionList,
-			srcWindow->PoseView()->ViewMode() == kListMode, dropOnGrid);
+		BList* pointList = destWindow->PoseView()->GetDropPointList(where, dropPoint,
+			selectionList, srcWindow->PoseView()->ViewMode() == kListMode, pinToGrid);
 		int32 selectionSize = selectionList->CountItems();
 		BObjectList<entry_ref, true>* srcList = new BObjectList<entry_ref, true>(selectionSize);
 
@@ -5212,8 +5187,8 @@ BPoseView::MoveSelectionTo(BPoint dropPoint, BPoint where, BContainerWindow* src
 
 
 inline void
-UpdateWasBrokenSymlinkBinder(BPose* pose, Model* model, int32 index,
-	BPoseView* poseView, BObjectList<Model>* fBrokenLinks)
+UpdateWasBrokenSymlinkBinder(BPose* pose, Model* model, int32 index, BPoseView* poseView,
+	BObjectList<Model>* fBrokenLinks)
 {
 	if (!model->IsSymLink())
 		return;
@@ -6053,7 +6028,7 @@ BPoseView::ConvertZombieToPose(Model* zombie, int32 index)
 
 BList*
 BPoseView::GetDropPointList(BPoint dropStart, BPoint dropEnd, const PoseList* poses,
-	bool sourceInListMode, bool dropOnGrid) const
+	bool sourceInListMode, bool pinToGrid) const
 {
 	if (ViewMode() == kListMode)
 		return NULL;
@@ -6068,7 +6043,7 @@ BPoseView::GetDropPointList(BPoint dropStart, BPoint dropEnd, const PoseList* po
 		else
 			poseLoc = dropEnd + (pose->Location(this) - dropStart);
 
-		if (dropOnGrid)
+		if (pinToGrid)
 			poseLoc = PinToGrid(poseLoc, fGrid, fOffset);
 
 		pointList->AddItem(new BPoint(poseLoc));
@@ -6110,8 +6085,9 @@ BPoseView::DuplicateSelection(BPoint* dropStart, BPoint* dropEnd)
 
 		BList* dropPoints;
 		if (dropStart) {
+			bool pinToGrid = (modifiers() & B_COMMAND_KEY) != 0;
 			dropPoints = GetDropPointList(*dropStart, *dropEnd, fSelectionList,
-				ViewMode() == kListMode, (modifiers() & B_COMMAND_KEY) != 0);
+				ViewMode() == kListMode, pinToGrid);
 		} else
 			dropPoints = NULL;
 

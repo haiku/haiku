@@ -1477,7 +1477,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 				PoseView()->MoveSelectionInto(&model, this, false, false,
 					message->what == kCreateLink,
 					message->what == kCreateRelativeLink);
-			} else if (!TargetModel()->IsQuery() && !TargetModel()->IsVirtualDirectory()) {
+			} else if (!(TargetModel()->IsQuery() || TargetModel()->IsVirtualDirectory())) {
 				// no destination specified, create link in same dir as item
 				PoseView()->MoveSelectionInto(TargetModel(), this, false, false,
 					message->what == kCreateLink,
@@ -2250,8 +2250,7 @@ BContainerWindow::PopulateMoveCopyNavMenu(BNavMenu* navMenu, uint32 what, const 
 	if (entry.SetTo(ref) == B_OK
 		&& entry.GetParent(&entry) == B_OK
 		&& model.SetTo(&entry) == B_OK) {
-		BNavMenu* menu = new BNavMenu(B_TRANSLATE("Current folder"), what,
-			this);
+		BNavMenu* menu = new BNavMenu(B_TRANSLATE("Current folder"), what, this);
 		menu->SetNavDir(model.EntryRef());
 		menu->SetShowParent(true);
 

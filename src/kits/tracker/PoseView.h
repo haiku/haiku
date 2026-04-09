@@ -283,14 +283,11 @@ public:
 	virtual void OpenParent();
 	virtual bool CanOpenParent();
 
-	virtual void OpenSelection(BPose* clicked_pose = NULL,
-		int32* index = NULL);
-	void OpenSelectionUsing(BPose* clicked_pose = NULL,
-		int32* index = NULL);
+	virtual void OpenSelection(BPose* clicked_pose = NULL, int32* index = NULL);
+	void OpenSelectionUsing(BPose* clicked_pose = NULL, int32* index = NULL);
 		// launches the open with window
 	virtual void MoveSelectionTo(BPoint, BPoint, BContainerWindow*);
-	void DuplicateSelection(BPoint* dropStart = NULL,
-		BPoint* dropEnd = NULL);
+	void DuplicateSelection(BPoint* dropStart = NULL,BPoint* dropEnd = NULL);
 
 	// Move to trash calls try to select the next pose in the view
 	// when they are dones
@@ -661,7 +658,7 @@ protected:
 
 	// misc
 	BList* GetDropPointList(BPoint dropPoint, BPoint startPoint,
-		const PoseList*, bool sourceInListMode, bool dropOnGrid) const;
+		const PoseList*, bool sourceInListMode, bool pinToGrid) const;
 	void SendSelectionAsRefs(uint32 what, bool onlyQueries = false);
 	void MoveListToTrash(BObjectList<entry_ref, true>*, bool selectNext,
 		bool deleteDirectly);

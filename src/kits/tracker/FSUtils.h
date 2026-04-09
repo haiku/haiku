@@ -76,7 +76,7 @@ public:
 									bool allowContinue);
 
 	virtual	void				UpdateStatus(const char* name,
-									const entry_ref& ref, int32 count,
+									const entry_ref& ref, int32 bytes,
 									bool optional = false);
 
 	//! \return \c true if canceled
@@ -134,7 +134,7 @@ public:
 									bool allowContinue);
 
 	virtual	void				UpdateStatus(const char* name,
-									const entry_ref& ref, int32 count,
+									const entry_ref& ref, int32 bytes,
 									bool optional = false);
 
 	virtual	bool				CheckUserCanceled();
