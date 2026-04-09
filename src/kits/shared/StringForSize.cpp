@@ -21,8 +21,23 @@ using BPrivate::gSystemCatalog;
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "StringForSize"
 
+static BNumberFormat* sNumberFormat0;
+static BNumberFormat* sNumberFormat2;
+static pthread_once_t sNumberFormatInit = PTHREAD_ONCE_INIT;
+
 
 namespace BPrivate {
+
+
+static void
+InitializeNumberFormats()
+{
+	sNumberFormat0 = new BNumberFormat;
+	sNumberFormat0->SetPrecision(0);
+
+	sNumberFormat2 = new BNumberFormat;
+	sNumberFormat2->SetPrecision(2);
+}
 
 
 const char*
@@ -47,10 +62,13 @@ string_for_size(double size, char* string, size_t stringSize)
 		gSystemCatalog.GetString(kFormats[index], B_TRANSLATION_CONTEXT, "size unit"));
 	formatter.Format(format, size);
 
+	// Initializing and changing the parameters of BNumberFormats is expensive,
+	// so we cache the two we need globally.
+	pthread_once(&sNumberFormatInit, InitializeNumberFormats);
+
 	BString printedSize;
-	BNumberFormat numberFormat;
-	numberFormat.SetPrecision(index == 0 ? 0 : 2);
-	numberFormat.Format(printedSize, size);
+	BNumberFormat* numberFormat = (index == 0) ? sNumberFormat0 : sNumberFormat2;
+	numberFormat->Format(printedSize, size);
 
 	snprintf(string, stringSize, format.String(), printedSize.String());
 
