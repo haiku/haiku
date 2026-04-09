@@ -266,9 +266,6 @@ AddFilesToPackage data user_launch : $(userLaunchScripts) ;
 
 # first login scripts
 local firstLoginFiles = default_deskbar_items.sh ;
-if $(HAIKU_BUILD_TYPE) = test {
-	firstLoginFiles += test_image.sh ;
-}
 firstLoginFiles = $(firstLoginFiles:G=first-login) ;
 SEARCH on $(firstLoginFiles)
 	= [ FDirName $(HAIKU_TOP) data system boot first_login ] ;

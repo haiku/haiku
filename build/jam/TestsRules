@@ -17,6 +17,8 @@ rule UnitTestLib
 	local local_libraries = $(4) ;
 	local rdefs = $(5) ;
 
+	AddResources $(lib) : $(rdefs) ;
+
 	# if TEST_DEBUG is defined, we turn on debugging
 	if $(TEST_DEBUG) {
 		DEBUG on $(lib) [ FGristFiles $(sources:S=$(SUFOBJ)) ] ?= 1 ;
@@ -36,7 +38,7 @@ rule UnitTestLib
 	UseCppUnitObjectHeaders $(sources) ;
 
 	MakeLocate $(lib) : $(TARGET_UNIT_TEST_LIB_DIR) ;
-	SharedLibrary $(lib) : $(sources) : $(libraries) $(local_libraries) libcppunit.so : $(rdefs) ;
+	SharedLibrary $(lib) : $(sources) : $(libraries) $(local_libraries) libcppunit.so ;
 
 	UnitTestDependency $(lib) ;
 	UNIT_TEST_LIBRARIES on unittests += $(lib) ;

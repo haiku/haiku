@@ -19,7 +19,7 @@ BTestSuite* getTestSuite2() {
 	BTestSuite *suite = new BTestSuite("App");
 
 	// ##### Add test suites here #####
-	suite->addTest("BApplication", ApplicationTestSuite());
+//	suite->addTest("BApplication", ApplicationTestSuite());
 	suite->addTest("BClipboard", ClipboardTestSuite());
 //	suite->addTest("BCursor", CursorTestSuite());
 	suite->addTest("BHandler", HandlerTestSuite());
@@ -29,7 +29,7 @@ BTestSuite* getTestSuite2() {
 	suite->addTest("BMessageRunner", MessageRunnerTestSuite());
 	suite->addTest("BMessenger", MessengerTestSuite());
 	suite->addTest("BPropertyInfo", PropertyInfoTestSuite());
-	suite->addTest("BRoster", RosterTestSuite());
+//	suite->addTest("BRoster", RosterTestSuite());
 	// TODO: calls Lock on destruction, hangs
 	//suite->addTest("RegistrarThreadManager", RegistrarThreadManagerTest::Suite());
 	

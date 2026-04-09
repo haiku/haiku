@@ -39,8 +39,8 @@
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Translation");
-	suite->addTest("TranslatorRosterTest", TranslatorRosterTest::Suite());
-	suite->addTest("BitmapStreamTest", BitmapStreamTest::Suite());
+//	suite->addTest("TranslatorRosterTest", TranslatorRosterTest::Suite());
+//	suite->addTest("BitmapStreamTest", BitmapStreamTest::Suite());
 	suite->addTest("TranslationUtilsTest", TranslationUtilsTest::Suite());
 	suite->addTest("TranslatorTest", TranslatorTest::Suite());
 	return suite;

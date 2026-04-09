@@ -3,6 +3,14 @@
 # import everything from the minimum image
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 
+local runTestsBootscript = TestsBootscript ;
+SEARCH on $(runTestsBootscript) = [ FDirName $(HAIKU_TOP) src tests ] ;
+AddFilesToHaikuImage home config settings boot launch : $(runTestsBootscript) ;
+
+local debugServerSettings = debug_server_settings ;
+SEARCH on $(debugServerSettings) = [ FDirName $(HAIKU_TOP) src tests ] ;
+AddFilesToHaikuImage home config settings system debug_server : $(debugServerSettings) : settings ;
+
 SYSTEM_APPS = [ FFilterByBuildFeatures
 	Debugger@libedit
 	NetworkStatus
