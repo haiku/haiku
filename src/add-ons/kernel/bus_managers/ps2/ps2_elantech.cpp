@@ -1490,10 +1490,10 @@ elantech_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 				return status;
 			}
 #ifdef TRACE_PS2_ELANTECH
-			if (read.event = MS_READ_TOUCHPAD) {
+			if (read.event == MS_READ_TOUCHPAD) {
 				TRACE("ELANTECH: ioctl touchpad fingers: 0x%x\n", (int)read.u.touchpad.fingers);
 				TRACE("ELANTECH: ioctl touchpad buttons: %d\n", (int)read.u.touchpad.buttons);
-			} else if (read.event = MS_READ) {
+			} else if (read.event == MS_READ) {
 				TRACE("ELANTECH: ioctl mouse buttons: %d\n", (int)read.u.mouse.buttons);
 			}
 #endif
