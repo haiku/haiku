@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons mail_daemon inbound_protocols imap ;
 
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
-UsePrivateHeaders mail shared ;
+UsePrivateHeaders mail shared libroot ;
 SubDirHdrs [ FDirName $(SUBDIR) imap_lib ] ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;

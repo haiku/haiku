@@ -15,6 +15,8 @@
 
 #include <mail_util.h>
 
+#include <system_revision.h>
+
 
 IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 	:
@@ -258,6 +260,10 @@ IMAPProtocol::HandleFetchBody(const entry_ref& ref, const BMessenger& replyTo)
 void
 IMAPProtocol::ReadyToRun()
 {
+	const char* haikuRevision = __get_haiku_revision();
+	if (haikuRevision[0] != '\0')
+		printf("IMAP: version %s\n", haikuRevision);
+
 	puts("IMAP: ready to run!");
 	if (fSettings.IdleMode())
 		SyncMessages();

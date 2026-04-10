@@ -221,6 +221,42 @@ LoginCommand::HandleTagged(Response& response)
 // #pragma mark -
 
 
+IDCommand::IDCommand()
+{
+}
+
+
+BString
+IDCommand::CommandString()
+{
+	BString command = "ID";
+	// Don't be shy, share some info about this IMAP client:
+	command << " (\"name\" \"IMAP mail_daemon add-on\" \"os\" \"Haiku\")";
+	return command;
+}
+
+
+bool
+IDCommand::HandleUntagged(Response& response)
+{
+	if (response.IsCommand("ID") && response.IsListAt(1)) {
+		puts("IMAP server info:");
+		ArgumentList& list = response.ListAt(1);
+		for (int32 i = 0; i < list.CountItems(); i += 2) {
+			printf("  %s: %s\n",
+				list.ItemAt(i)->ToString().String(),
+				list.ItemAt(i + 1)->ToString().String());
+		}
+		return true;
+	}
+
+	return false;
+}
+
+
+// #pragma mark -
+
+
 SelectCommand::SelectCommand()
 	:
 	fNextUID(0),

@@ -93,6 +93,15 @@ private:
 };
 
 
+class IDCommand : public Command, public Handler {
+public:
+								IDCommand();
+
+	virtual BString				CommandString();
+	virtual	bool				HandleUntagged(Response& response);
+};
+
+
 class SelectCommand : public Command, public Handler {
 public:
 								SelectCommand();
