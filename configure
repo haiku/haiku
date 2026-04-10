@@ -328,6 +328,13 @@ standard_gcc_settings()
 			bootLibgcc=`$gcc -print-file-name=libgcc.a`
 			bootLibSupCxx=`$gcc -print-file-name=libsupc++.a`
 
+			if [ "$bootLibSupCxx" = "libsupc++.a" ]; then
+				echo "libsupc++.a could not be found!"
+				if [ "$HOST_PLATFORM" = "haiku_host" ]; then
+					echo "try installing gcc_syslibs_devel or using the cross-tools"
+				fi
+				exit 1
+			fi
 			local headersBase=$gccdir/../../../..
 			local headers=$headersBase/$gccMachine/include/c++/$gccRawVersion
 			if [ ! -d $headers ]; then
