@@ -771,8 +771,6 @@ BContainerWindow::Init(const BMessage* message)
 	}
 
 	AddContextMenus();
-	AddShortcut(B_DELETE, B_NO_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDeleteSelection),
-		PoseView());
 	AddShortcut('K', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kCleanupAll), PoseView());
 	AddShortcut('Q', B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_CONTROL_KEY,
 		new BMessage(kQuitTracker));
@@ -1884,7 +1882,6 @@ BContainerWindow::AddShortcuts()
 	AddShortcut('I', B_COMMAND_KEY, new BMessage(kGetInfo), PoseView());
 	AddShortcut('E', B_COMMAND_KEY, new BMessage(kEditName), PoseView());
 	AddShortcut('D', B_COMMAND_KEY, new BMessage(kDuplicateSelection), PoseView());
-	AddShortcut(B_DELETE, B_NO_COMMAND_KEY, new BMessage(kMoveSelectionToTrash), PoseView());
 	AddShortcut('K', B_COMMAND_KEY, new BMessage(kCleanup), PoseView());
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), PoseView());
 	AddShortcut('S', B_COMMAND_KEY, new BMessage(kInvertSelection), PoseView());

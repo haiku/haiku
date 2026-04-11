@@ -6752,6 +6752,12 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 			}
 			break;
 
+		case B_DELETE:
+		{
+			DoMoveToTrash();
+			break;
+		}
+
 		case B_BACKSPACE:
 		{
 			if (IsTypeAheadFiltering()) {
