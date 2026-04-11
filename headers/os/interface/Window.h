@@ -381,7 +381,9 @@ private:
 			uint32				_unused1;
 			BMenuBar*			fKeyMenuBar;
 			BButton*			fDefaultButton;
-			BList				fShortcuts;
+			void*				fShortcuts;
+			void*				_unused2;
+			int32				_unused3[5];
 			int32				fTopViewToken;
 			bool				fUpdateRequested;
 			bool				fOffscreen;
