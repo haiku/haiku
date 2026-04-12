@@ -39,6 +39,8 @@
 #include <stdio.h>
 #include <strings.h>
 
+#include <tracker_private.h>
+
 
 // TODO: think about adopting Tracker's info window style here (pressable path)
 
@@ -414,7 +416,7 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 
 		if (be_roster->FindApp(fCurrentType.Type(), &ref) == B_OK) {
 			// Set launch message
-			BMessenger tracker("application/x-vnd.Be-TRAK");
+			BMessenger tracker(kTrackerSignature);
 			BMessage* message = new BMessage(B_REFS_RECEIVED);
 			message->AddRef("refs", &ref);
 
@@ -475,7 +477,7 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 			BEntry entry(path.Path());
 			entry_ref directoryRef;
 			if (entry.GetRef(&directoryRef) == B_OK) {
-				BMessenger tracker("application/x-vnd.Be-TRAK");
+				BMessenger tracker(kTrackerSignature);
 				BMessage* message = new BMessage(B_REFS_RECEIVED);
 				message->AddRef("refs", &directoryRef);
 
