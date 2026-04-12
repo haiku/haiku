@@ -29,7 +29,7 @@ PropertyItemView::PropertyItemView(Property* property)
 			B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	  fParent(NULL),
 	  fEditorView(/*factory->*/EditorFor(property)),
-	  	// NOTE: can be NULL if property is NULL or unkown
+	  	// NOTE: can be NULL if property is NULL or unknown
 	  fSelected(false),
 	  fEnabled(true),
 	  fLabelWidth(0.0)

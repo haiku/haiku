@@ -2136,7 +2136,7 @@ Painter::_RasterizePath(VertexSource& path, const BGradient& gradient)
 
 		default:
 		case BGradient::TYPE_NONE:
-			GTRACE(("Painter::_FillPathGradient> type == TYPE_NONE/unkown\n"));
+			GTRACE(("Painter::_FillPathGradient> type == TYPE_NONE/unknown\n"));
 			break;
 	}
 

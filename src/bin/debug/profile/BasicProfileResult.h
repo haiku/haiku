@@ -47,7 +47,7 @@ public:
 
 protected:
 			int64				fTotalTicks;
-			int64				fUnkownTicks;
+			int64				fUnknownTicks;
 			int64				fExpectedTicks;
 			int64				fDroppedTicks;
 			int64				fTotalSampleCount;

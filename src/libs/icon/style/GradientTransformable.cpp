@@ -550,7 +550,7 @@ string_for_type(gradients_type type)
 		case GRADIENT_SQRT_XY:
 			return "GRADIENT_SQRT_XY";
 	}
-	return "<unkown>";
+	return "<unknown>";
 }
 
 //string_for_interpolation
@@ -563,7 +563,7 @@ string_for_interpolation(interpolation_type type)
 		case INTERPOLATION_SMOOTH:
 			return "INTERPOLATION_SMOOTH";
 	}
-	return "<unkown>";
+	return "<unknown>";
 }
 
 // GradientArea

@@ -1106,7 +1106,7 @@ BString MediaString::forVideoOrientation(
 			return B_TRANSLATE("Bottom to top, left to right");
 		}
 		default: {
-			return B_TRANSLATE("(unkown video orientation)");
+			return B_TRANSLATE("(unknown video orientation)");
 		}
 	}
 }

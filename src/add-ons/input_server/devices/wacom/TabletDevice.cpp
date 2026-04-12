@@ -37,7 +37,7 @@
 TabletDevice::TabletDevice(MasterServerDevice* parent, DeviceReader* reader)
 	: PointingDevice(parent, reader),
 	  fThreadID(B_ERROR),
-	  fDeviceMode(DEVICE_UNKOWN),
+	  fDeviceMode(DEVICE_UNKNOWN),
 	  fMaxX(1.0),
 	  fMaxY(1.0),
 	  fPosX(0.5),
@@ -946,7 +946,7 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 			break;
 
 		default:
-			*name = "<unkown wacom tablet>";
+			*name = "<unknown wacom tablet>";
 			break;
 	}
 }

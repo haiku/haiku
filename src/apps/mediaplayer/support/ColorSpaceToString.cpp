@@ -8,7 +8,7 @@
 const char*
 color_space_to_string(color_space format)
 {
-	const char* name = "<unkown format>";
+	const char* name = "<unknown format>";
 	switch (format) {
 		case B_RGB32:
 			name = "B_RGB32";

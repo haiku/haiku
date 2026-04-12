@@ -119,7 +119,7 @@ BasicImageProfileResult::UnknownHits() const
 BasicProfileResult::BasicProfileResult()
 	:
 	fTotalTicks(0),
-	fUnkownTicks(0),
+	fUnknownTicks(0),
 	fExpectedTicks(0),
 	fDroppedTicks(0),
 	fTotalSampleCount(0)
@@ -201,8 +201,8 @@ BasicProfileResult::PrintResults(ImageProfileResultContainer* container)
 
 	fprintf(gOptions.output,
 		"  unknown ticks:  %" B_PRId64 " (%" B_PRId64 " us, %6.2f%%)\n",
-		fUnkownTicks, fUnkownTicks * fInterval,
-		100.0 * fUnkownTicks / totalTicks);
+		fUnknownTicks, fUnknownTicks * fInterval,
+		100.0 * fUnknownTicks / totalTicks);
 	fprintf(gOptions.output,
 		"  dropped ticks:  %" B_PRId64 " (%" B_PRId64 " us, %6.2f%%)\n",
 		fDroppedTicks, fDroppedTicks * fInterval,
@@ -320,7 +320,7 @@ InclusiveProfileResult::AddSamples(ImageProfileResultContainer* container,
 	}
 
 	if (unknownSamples == sampleCount)
-		fUnkownTicks++;
+		fUnknownTicks++;
 
 	fTotalTicks++;
 	fTotalSampleCount += sampleCount;
@@ -357,7 +357,7 @@ ExclusiveProfileResult::AddSamples(ImageProfileResultContainer* container,
 		if (firstImage != NULL)
 			firstImage->AddUnknownHit();
 		else
-			fUnkownTicks++;
+			fUnknownTicks++;
 	}
 
 	fTotalTicks++;

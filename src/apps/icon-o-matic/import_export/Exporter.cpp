@@ -184,7 +184,7 @@ Exporter::_Export(const Icon* icon, const entry_ref* docRef)
 			ret = Export(icon, &outFile);
 		} catch (...) {
 			printf("Exporter::_Export() - "
-				   "unkown exception occured!\n");
+				   "unknown exception occured!\n");
 			ret = B_ERROR;
 		}
 		if (ret < B_OK) {

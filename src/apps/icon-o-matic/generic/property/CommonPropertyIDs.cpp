@@ -98,7 +98,7 @@ name_for_id(int32 id)
 			break;
 
 		default:
-			name = B_TRANSLATE("<unkown property>");
+			name = B_TRANSLATE("<unknown property>");
 			break;
 	}
 	return name;

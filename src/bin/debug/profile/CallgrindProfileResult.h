@@ -85,7 +85,7 @@ private:
 									int32 functionIndex, bool called);
 private:
 			int64				fTotalTicks;
-			int64				fUnkownTicks;
+			int64				fUnknownTicks;
 			int64				fExpectedTicks;
 			int64				fDroppedTicks;
 			int32				fNextImageOutputIndex;

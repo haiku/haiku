@@ -59,7 +59,7 @@ enum {
 const char*
 string_for_color_space(color_space format)
 {
-	const char* name = "<unkown format>";
+	const char* name = "<unknown format>";
 	switch (format) {
 		case B_RGBA64:
 			name = "B_RGBA64";

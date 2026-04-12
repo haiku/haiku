@@ -93,8 +93,8 @@ AuthenticationPanel::GetAuthentication(const char* server,
 {
 	// configure panel and layout controls
 	BString helper("Enter login for: ");
-	helper << (server ? server : "<unkown host>") << "/";
-	helper << (share ? share : "<unkown share>");
+	helper << (server ? server : "<unknown host>") << "/";
+	helper << (share ? share : "<unknown share>");
 
 	// ignore the previous password, if it didn't work
 	if (badPassword)

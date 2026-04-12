@@ -376,7 +376,7 @@ PropertyListView::SetTo(PropertyObject* object)
 			Property* property = object->PropertyAt(i);
 			if (!item->AdoptProperty(property)) {
 				// the reason for this can be that the property is
-				// unkown to the PropertyEditorFactory and therefor
+				// unknown to the PropertyEditorFactory and therefor
 				// there is no editor view at this item
 				fprintf(stderr, "PropertyListView::_SetTo() - "
 								"property mismatch at %" B_PRId32 "\n", i);

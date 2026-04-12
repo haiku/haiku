@@ -122,7 +122,7 @@ CallgrindImageProfileResult::SetOutputIndex(int32 index)
 CallgrindProfileResult::CallgrindProfileResult()
 	:
 	fTotalTicks(0),
-	fUnkownTicks(0),
+	fUnknownTicks(0),
 	fExpectedTicks(0),
 	fDroppedTicks(0),
 	fNextImageOutputIndex(1),
@@ -159,7 +159,7 @@ CallgrindProfileResult::AddSamples(ImageProfileResultContainer* container,
 	}
 
 	if (unknownSamples == sampleCount)
-		fUnkownTicks++;
+		fUnknownTicks++;
 
 	fTotalTicks++;
 }
@@ -253,12 +253,12 @@ CallgrindProfileResult::PrintResults(ImageProfileResultContainer* container)
 	}
 
 	// print pseudo-functions for unknown and dropped ticks
-	if (fUnkownTicks + fDroppedTicks > 0) {
+	if (fUnknownTicks + fDroppedTicks > 0) {
 		fprintf(out, "\nob=<pseudo>\n");
 
-		if (fUnkownTicks > 0) {
+		if (fUnknownTicks > 0) {
 			fprintf(out, "\nfn=unknown\n");
-			fprintf(out, "0 %" B_PRId64 "\n", fUnkownTicks);
+			fprintf(out, "0 %" B_PRId64 "\n", fUnknownTicks);
 		}
 
 		if (fDroppedTicks > 0) {

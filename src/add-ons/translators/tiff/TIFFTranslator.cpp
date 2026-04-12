@@ -695,7 +695,7 @@ switch (compression) {
 if (compressionString)
 printf("using compression: %s\n", compressionString);
 else
-printf("using unkown compression (%ld).\n", compression);
+printf("using unknown compression (%ld).\n", compression);
 */
 		TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
 

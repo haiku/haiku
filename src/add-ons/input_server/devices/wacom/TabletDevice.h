@@ -68,7 +68,7 @@ class TabletDevice : public PointingDevice {
 									const char** name) const;
 
 	enum {
-		DEVICE_UNKOWN,
+		DEVICE_UNKNOWN,
 		DEVICE_PENPARTNER,
 		DEVICE_GRAPHIRE,
 		DEVICE_INTUOS,
