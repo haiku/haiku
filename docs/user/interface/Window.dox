@@ -1025,6 +1025,11 @@
 	MessageReceived() instead to alter the window's message dispatching
 	mechanism.
 
+	\warning BWindow::DispatchMessage() calls MenusBeginning() and MenusEnded()
+	when \c B_COMMAND_KEY is held down to register shortcuts in dynamically
+	created menus. BeOS did this so we must too. For shortcuts that use
+	\c B_NO_COMMAND_KEY you must register them in dynamic menus yourself.
+
 	\see BLooper::DispatchMessage()
 
 	\since BeOS R3
