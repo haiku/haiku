@@ -102,18 +102,18 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	fHintingMenuField = new BMenuField("hinting", B_TRANSLATE("Glyph hinting:"),
 		fHintingMenu);
 
-	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 	// controls pane
-		.AddMenuField(fHintingMenuField, 0, 0)
-		.AddMenuField(fAntialiasingMenuField, 0, 1)
-		.Add(fAverageWeightControl, 0, 2, 3)
-
-		.AddGlue(0, 3)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
+			.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 1)
+			.AddGlue(2, 0)
+		.End()
+		.Add(fAverageWeightControl)
+		.AddGlue()
 		.SetInsets(B_USE_WINDOW_SPACING);
-
-	BGridLayout* layout = dynamic_cast<BGridLayout*>(GetLayout());
-	layout->SetMinColumnWidth(0,
-		StringWidth(B_TRANSLATE("Antialiasing type:")) * 2);
 
 	_SetCurrentAntialiasing();
 	_SetCurrentHinting();
