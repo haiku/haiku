@@ -1672,6 +1672,11 @@ BContainerWindow::MessageReceived(BMessage* message)
 			UpdateTitle();
 			break;
 
+		case B_META_MIME_CHANGED:
+			if (fMenuBar != NULL)
+				AddMimeTypesToMenu(fAttrMenu);
+			break;
+
 		default:
 			_inherited::MessageReceived(message);
 			break;

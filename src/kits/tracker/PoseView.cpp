@@ -2242,6 +2242,8 @@ BPoseView::MessageReceived(BMessage* message)
 
 		case B_META_MIME_CHANGED:
 			NoticeMetaMimeChanged(message);
+			if (Window() != NULL)
+				Window()->MessageReceived(message);
 			break;
 
 		case B_NODE_MONITOR:
