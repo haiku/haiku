@@ -522,6 +522,24 @@ void
 BMenu::KeyDown(const char* bytes, int32 numBytes)
 {
 	// TODO: Test how it works on BeOS R5 and implement this correctly
+
+	// turn on sticky mode and obscure cursor on nav key press
+	switch (bytes[0]) {
+		case B_UP_ARROW:
+		case B_DOWN_ARROW:
+		case B_LEFT_ARROW:
+		case B_RIGHT_ARROW:
+		case B_HOME:
+		case B_END:
+		case B_PAGE_UP:
+		case B_PAGE_DOWN:
+			if (!_IsStickyMode())
+				_SetStickyMode(true);
+
+			be_app->ObscureCursor();
+			break;
+	}
+
 	switch (bytes[0]) {
 		case B_UP_ARROW:
 		case B_DOWN_ARROW:
@@ -3100,11 +3118,6 @@ BMenu::_SelectNextItem(BMenuItem* item, bool forward)
 		return false;
 
 	_SelectItem(nextItem, dynamic_cast<BMenuBar*>(this) != NULL);
-
-	if (LockLooper()) {
-		be_app->ObscureCursor();
-		UnlockLooper();
-	}
 
 	return true;
 }

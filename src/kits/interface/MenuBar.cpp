@@ -557,10 +557,9 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 	BPoint where;
 	uint32 buttons;
 	if (LockLooper()) {
-		if (startIndex != -1) {
-			be_app->ObscureCursor();
+		if (startIndex != -1)
 			_SelectItem(ItemAt(startIndex), true, false);
-		}
+
 		GetMouse(&where, &buttons);
 		UnlockLooper();
 	}
