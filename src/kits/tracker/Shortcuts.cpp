@@ -496,8 +496,17 @@ TShortcuts::MoveToLabel()
 BMenuItem*
 TShortcuts::MoveToTrashItem()
 {
-	return new BMenuItem(MoveToTrashLabel(), new BMessage(kMoveSelectionToTrash), B_DELETE,
-		B_NO_COMMAND_KEY);
+	BMenuItem* item = new(std::nothrow) BMenuItem(MoveToTrashLabel(),
+		new BMessage(kMoveSelectionToTrash), B_DELETE, B_NO_COMMAND_KEY);
+	if (item == NULL)
+		return NULL;
+
+	// We have to set the target here because B_NO_COMMAND_KEY shortcut
+	// items don't get registered in MenusBeginning(). This wouldn't work
+	// if "Move to Trash" were created dynamically, luckily it is not.
+	UpdateMoveToTrashItem(item);
+
+	return item;
 }
 
 
