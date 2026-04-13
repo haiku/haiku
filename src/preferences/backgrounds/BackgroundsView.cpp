@@ -37,6 +37,8 @@
 #include <be_apps/Tracker/Background.h>
 #include <ScreenDefs.h>
 
+#include <tracker_private.h>
+
 #include "ImageFilePanel.h"
 
 
@@ -673,7 +675,7 @@ BackgroundsView::_Save()
 void
 BackgroundsView::_NotifyServer()
 {
-	BMessenger tracker("application/x-vnd.Be-TRAK");
+	BMessenger tracker(kTrackerSignature);
 
 	if (fCurrent->IsDesktop()) {
 		tracker.SendMessage(new BMessage(B_RESTORE_BACKGROUND_IMAGE));
