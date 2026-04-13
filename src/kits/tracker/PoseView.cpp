@@ -1265,6 +1265,17 @@ BPoseView::WatchNewNode(const node_ref* item, uint32 mask, BMessenger messenger)
 }
 
 
+status_t
+BPoseView::StopWatchingNode(const node_ref* item)
+{
+	if (WatchNewNodeMask() == 0)
+		return B_OK;
+
+	return watch_node(item, B_STOP_WATCHING, this);
+}
+
+
+
 struct AddPosesParams {
 	BMessenger target;
 	entry_ref ref;
@@ -1975,7 +1986,7 @@ BPoseView::CreatePoses(Model** models, PoseInfo* poseInfoArray, int32 count,
 
 		// pose adopts model and deletes it when done
 		if (fInsertedNodes.Contains(*(model->NodeRef())) || FindZombie(model->NodeRef())) {
-			watch_node(model->NodeRef(), B_STOP_WATCHING, this);
+			StopWatchingNode(model->NodeRef());
 			delete model;
 			if (resultingPoses)
 				resultingPoses[modelIndex] = NULL;
@@ -5622,7 +5633,7 @@ BPoseView::EntryCreated(const node_ref* dirNode, const node_ref* itemNode,
 	ReadPoseInfo(model, &poseInfo);
 
 	if (!PoseVisible(model, &poseInfo)) {
-		watch_node(model->NodeRef(), B_STOP_WATCHING, this);
+		StopWatchingNode(model->NodeRef());
 		delete model;
 		return NULL;
 	}
@@ -5630,7 +5641,7 @@ BPoseView::EntryCreated(const node_ref* dirNode, const node_ref* itemNode,
 	// model is a symlink, cache up the symlink target or scrap
 	// everything if target is invisible
 	if (model->IsSymLink() && !CreateSymlinkPoseTarget(model)) {
-		watch_node(model->NodeRef(), B_STOP_WATCHING, this);
+		StopWatchingNode(model->NodeRef());
 		delete model;
 		return NULL;
 	}
@@ -8029,7 +8040,7 @@ BPoseView::DeleteSymLinkPoseTarget(const node_ref* itemNode, BPose* pose, int32 
 bool
 BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 {
-	watch_node(itemNode, B_STOP_WATCHING, this);
+	StopWatchingNode(itemNode);
 
 	if (pose == NULL)
 		pose = fPoseList->FindPose(itemNode, &index);

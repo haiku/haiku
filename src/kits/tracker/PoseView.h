@@ -570,6 +570,7 @@ protected:
 	virtual uint32 WatchNewNodeMask();
 		// override to change different watch modes for query pose
 		// view, etc.
+	status_t StopWatchingNode(const node_ref* item);
 
 	// drag&drop handling
 	static bool EachItemInDraggedSelection(const BMessage* message,
