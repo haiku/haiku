@@ -2240,11 +2240,6 @@ BPoseView::MessageReceived(BMessage* message)
 			AddPosesCompleted();
 			break;
 
-		case kRestoreBackgroundImage:
-			if (ContainerWindow() != NULL)
-				ContainerWindow()->MessageReceived(message);
-			break;
-
 		case B_META_MIME_CHANGED:
 			NoticeMetaMimeChanged(message);
 			break;

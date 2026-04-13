@@ -67,6 +67,7 @@ All rights reserved.
 #include "Attributes.h"
 #include "AutoDeleter.h"
 #include "AutoLock.h"
+#include "Background.h"
 #include "BackgroundImage.h"
 #include "Commands.h"
 #include "CountView.h"
@@ -1503,7 +1504,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
 
-		case kRestoreBackgroundImage:
+		case B_RESTORE_BACKGROUND_IMAGE:
 			UpdateBackgroundImage();
 			break;
 

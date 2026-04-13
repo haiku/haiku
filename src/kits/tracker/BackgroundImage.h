@@ -59,8 +59,6 @@ extern const char* kBackgroundImageInfoMode;
 extern const char* kBackgroundImageInfoWorkspaces;
 extern const char* kBackgroundImageInfoPath;
 
-const uint32 kRestoreBackgroundImage = 'Tbgr';
-
 class BackgroundImage {
 	// This class knows everything about which bitmap to use for a given
 	// view and how.

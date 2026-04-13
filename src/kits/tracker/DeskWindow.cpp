@@ -58,6 +58,7 @@ All rights reserved.
 
 #include "Attributes.h"
 #include "AutoLock.h"
+#include "Background.h"
 #include "BackgroundImage.h"
 #include "Commands.h"
 #include "FSUtils.h"
@@ -593,6 +594,11 @@ BDeskWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
+		case B_RESTORE_BACKGROUND_IMAGE:
+			UpdateBackgroundImage();
+			PoseView()->MessageReceived(message);
+			break;
 
 		default:
 			_inherited::MessageReceived(message);

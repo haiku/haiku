@@ -63,6 +63,7 @@ All rights reserved.
 
 #include "Attributes.h"
 #include "AutoLock.h"
+#include "Background.h"
 #include "BackgroundImage.h"
 #include "Bitmaps.h"
 #include "Commands.h"
@@ -536,7 +537,7 @@ TTracker::MessageReceived(BMessage* message)
 			MountServer().SendMessage(message);
 			break;
 
-		case kRestoreBackgroundImage:
+		case B_RESTORE_BACKGROUND_IMAGE:
 		{
 			BDeskWindow* desktop = GetDeskWindow();
 			AutoLock<BWindow> lock(desktop);
