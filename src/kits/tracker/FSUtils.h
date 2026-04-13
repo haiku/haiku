@@ -172,7 +172,7 @@ _IMPEXP_TRACKER void FSDuplicate(BObjectList<entry_ref, true>* srcList,
 _IMPEXP_TRACKER void FSMoveToFolder(BObjectList<entry_ref, true>* srcList, BEntry*,
 	uint32 moveMode, BList* pointList = NULL);
 _IMPEXP_TRACKER void FSMakeOriginalName(char* name, BDirectory* destDir,
-	const char* suffix);
+	const char* suffix, size_t suffixLength);
 _IMPEXP_TRACKER bool FSIsTrashDir(const BEntry*);
 _IMPEXP_TRACKER bool FSIsPrintersDir(const BEntry*);
 _IMPEXP_TRACKER bool FSIsDeskDir(const BEntry*);
@@ -240,8 +240,9 @@ ReadAttrResult GetAttrInfo(const BNode*, const char* hostAttrName,
 
 status_t FSCreateNewFolder(entry_ref*);
 status_t FSRecursiveCreateFolder(const char* path);
-void FSMakeOriginalName(BString &name, const BDirectory* destDir,
-	const char* suffix = 0);
+void FSMakeOriginalName(char* name, const BDirectory* destDir, BString &suffix);
+void FSMakeOriginalName(char* name, const BDirectory* destDir,
+	const char* suffix = NULL, size_t suffixLength = 0);
 
 status_t FSGetParentVirtualDirectoryAware(const BEntry& entry, entry_ref& _ref);
 status_t FSGetParentVirtualDirectoryAware(const BEntry& entry, BEntry& _entry);

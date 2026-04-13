@@ -3421,7 +3421,9 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 	// TODO: Localise this
 	char fileName[B_FILE_NAME_LENGTH] = "New ";
 	strlcat(fileName, message->FindString("name"), sizeof(fileName));
-	FSMakeOriginalName(fileName, &destDir, " copy");
+	BString suffix(" ");
+	suffix << B_TRANSLATE_COMMENT("copy", "filename copy");
+	FSMakeOriginalName(fileName, &destDir, suffix);
 
 	entry_ref srcRef;
 	message->FindRef("refs_template", &srcRef);
@@ -4379,7 +4381,7 @@ BPoseView::CreateClippingFile(BPoseView* poseView, BFile &result,
 	else
 		strcpy(resultingName, fallbackName);
 
-	FSMakeOriginalName(resultingName, directory, "");
+	FSMakeOriginalName(resultingName, directory, "", 0);
 
 	// create a clipping file
 	status_t error = directory->CreateFile(resultingName, &result, true);

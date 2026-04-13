@@ -1280,9 +1280,8 @@ CopyFile(BEntry* srcFile, StatStruct* srcStat, BDirectory* destDir,
 
 	if (makeOriginalName) {
 		BString suffix(" ");
-		// execute first line, but use value from second
-		suffix << B_TRANSLATE_COMMENT("copy", "filename copy"),
-			FSMakeOriginalName(destName, destDir, suffix.String());
+		suffix << B_TRANSLATE_COMMENT("copy", "filename copy");
+		FSMakeOriginalName(destName, destDir, suffix);
 		undo.UpdateEntry(srcFile, destName);
 	}
 
@@ -1592,15 +1591,14 @@ CopyFolder(BEntry* srcEntry, BDirectory* destDir,
 	srcEntry->GetRef(&ref);
 
 	char destName[B_FILE_NAME_LENGTH];
-	strlcpy(destName, ref.name, sizeof(destName));
+	strlcpy(destName, ref.name, B_FILE_NAME_LENGTH);
 
 	loopControl->UpdateStatus(ref.name, ref, 1024, true);
 
 	if (makeOriginalName) {
 		BString suffix(" ");
-		// execute first line, but use value from second
-		suffix << B_TRANSLATE_COMMENT("copy", "filename copy"),
-			FSMakeOriginalName(destName, destDir, suffix.String());
+		suffix << B_TRANSLATE_COMMENT("copy", "filename copy");
+		FSMakeOriginalName(destName, destDir, suffix);
 		undo.UpdateEntry(srcEntry, destName);
 	}
 
@@ -1756,13 +1754,12 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 		if (moveMode == kCreateLink || moveMode == kCreateRelativeLink) {
 			PoseInfo poseInfo;
 			char name[B_FILE_NAME_LENGTH];
-			strlcpy(name, ref.name, sizeof(name));
+			strlcpy(name, ref.name, B_FILE_NAME_LENGTH);
 
 			BSymLink link;
 			BString suffix(" ");
-			// execute first line, but use value from second
-			suffix << B_TRANSLATE_COMMENT("link", "filename link"),
-				FSMakeOriginalName(name, destDir, suffix.String());
+			suffix << B_TRANSLATE_COMMENT("link", "filename link");
+			FSMakeOriginalName(name, destDir, suffix);
 			undo.UpdateEntry(entry, name);
 
 			BPath path;
@@ -2090,12 +2087,11 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 
 	// make sure name doesn't conflict with anything in trash already
 	char name[B_FILE_NAME_LENGTH];
-	strlcpy(name, ref.name, sizeof(name));
+	strlcpy(name, ref.name, B_FILE_NAME_LENGTH);
 	if (trashDir.Contains(name)) {
 		BString suffix(" ");
-		// execute first line, but use value from second
-		suffix << B_TRANSLATE_COMMENT("copy", "filename copy"),
-			FSMakeOriginalName(name, &trashDir, suffix.String());
+		suffix << B_TRANSLATE_COMMENT("copy", "filename copy");
+		FSMakeOriginalName(name, &trashDir, suffix);
 		undo.UpdateEntry(entry, name);
 	}
 
@@ -2433,20 +2429,37 @@ FSDeleteFolder(BEntry* dirEntry, CopyLoopControl* loopControl,
 
 
 void
-FSMakeOriginalName(BString &string, const BDirectory* destDir,
-	const char* suffix)
+FSMakeOriginalName(char* name, const BDirectory* destDir, BString &suffix)
 {
-	if (!destDir->Contains(string.String()))
-		return;
-
-	FSMakeOriginalName(string.LockBuffer(B_FILE_NAME_LENGTH),
-		const_cast<BDirectory*>(destDir), suffix ? suffix : NULL);
-	string.UnlockBuffer();
+	FSMakeOriginalName(name, destDir, suffix.String(), suffix.Length());
 }
 
 
 void
-FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
+FSMakeOriginalName(char* name, const BDirectory* destDir, const char* suffix,
+	size_t suffixLength)
+{
+	BString string(name);
+
+	if (!destDir->Contains(string.String()))
+		return;
+
+	if (suffix == NULL) {
+		FSMakeOriginalName(string.LockBuffer(B_FILE_NAME_LENGTH),
+			const_cast<BDirectory*>(destDir), NULL, 0);
+		string.UnlockBuffer();
+	} else {
+		FSMakeOriginalName(string.LockBuffer(B_FILE_NAME_LENGTH),
+			const_cast<BDirectory*>(destDir), suffix, suffixLength);
+		string.UnlockBuffer();
+	}
+
+	strlcpy(name, string.String(), B_FILE_NAME_LENGTH);
+}
+
+
+void
+FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix, size_t suffixLength)
 {
 	char		root[B_FILE_NAME_LENGTH];
 	char		copybase[B_FILE_NAME_LENGTH];
@@ -2456,11 +2469,6 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 	// is this name already original?
 	if (!destDir->Contains(name))
 		return;
-
-	BString copySuffix(B_TRANSLATE_COMMENT("copy", "filename copy"));
-	size_t suffixLength = copySuffix.Length();
-	if (suffix == NULL)
-		suffix = copySuffix;
 
 	// Determine if we're copying a 'copy'. This algorithm isn't perfect.
 	// If you're copying a file whose REAL name ends with 'copy' then
@@ -3226,12 +3234,13 @@ FSCreateNewFolder(entry_ref* ref)
 		return result;
 
 	// ToDo: is that really necessary here?
-	BString name(ref->name);
-	FSMakeOriginalName(name, &dir, " -");
-	ref->set_name(name.String()); // update ref in case the folder got renamed
+	char name[B_FILE_NAME_LENGTH];
+	strlcpy(name, ref->name, B_FILE_NAME_LENGTH);
+	FSMakeOriginalName(name, &dir, " -", 2);
+	ref->set_name(name); // update ref in case the folder got renamed
 
 	BDirectory newDir;
-	result = dir.CreateDirectory(name.String(), &newDir);
+	result = dir.CreateDirectory(name, &newDir);
 	if (result != B_OK)
 		return result;
 
@@ -3250,7 +3259,7 @@ FSCreateNewFolderIn(const node_ref* dirNode, entry_ref* newRef,
 	status_t result = dir.InitCheck();
 	if (result == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
-		strlcpy(name, B_TRANSLATE("New folder"), sizeof(name));
+		strlcpy(name, B_TRANSLATE("New folder"), B_FILE_NAME_LENGTH);
 
 		int fnum = 1;
 		while (dir.Contains(name)) {
