@@ -649,6 +649,7 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate
 	}
 
 	bool addAllVolumes = volMenu->ItemAt(0)->IsMarked();
+	bool addBootVolume = false;
 	BMessage messageContainingVolumeInfo;
 	for (int32 i = 0; i < volumeItemsCount; i++) {
 		BMenuItem* volumeMenuItem = volMenu->ItemAt(firstVolumeItem + i);
@@ -657,9 +658,28 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate
 		if (messageOfVolumeMenuItem->FindInt32("device", &device) != B_OK)
 			continue;
 
+		if (volumeMenuItem->IsMarked() && messageOfVolumeMenuItem->GetBool("boot", false))
+			addBootVolume = true;
+
 		if (volumeMenuItem->IsMarked() || addAllVolumes) {
 			BVolume volume(device);
 			EmbedUniqueVolumeInfo(&messageContainingVolumeInfo, &volume);
+		}
+	}
+
+	// Search packagefs volumes on "All disks" and boot volume
+	if (addAllVolumes || addBootVolume) {
+		BVolumeRoster roster;
+		BVolume volume;
+		roster.Rewind();
+		while (roster.GetNextVolume(&volume) == B_OK) {
+			if (volume.IsPersistent() && volume.KnowsQuery() && volume.Capacity() == 0) {
+				fs_info info;
+				if (fs_stat_dev(volume.Device(), &info) == B_OK
+					&& strcmp(info.fsh_name, "packagefs") == 0) {
+					EmbedUniqueVolumeInfo(&messageContainingVolumeInfo, &volume);
+				}
+			}
 		}
 	}
 
@@ -2480,6 +2500,8 @@ FindPanel::AddVolumes()
 
 	BVolumeRoster roster;
 	BVolume volume;
+	BVolume boot;
+	roster.GetBootVolume(&boot);
 	roster.Rewind();
 	while (roster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsPersistent() && volume.Capacity() > 0 && volume.KnowsQuery()) {
@@ -2496,6 +2518,8 @@ FindPanel::AddVolumes()
 
 			message = new BMessage(kVolumeItem);
 			message->AddInt32("device", volume.Device());
+			if (volume == boot)
+				message->AddBool("boot", true);
 			fVolMenu->AddItem(new ModelMenuItem(&model, model.Name(), message));
 			fVolumeItemsCount++;
 		}
