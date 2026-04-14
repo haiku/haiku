@@ -22,6 +22,7 @@
 
 struct kernel_args;
 struct ObjectCache;
+class ModifiedPageQueue;
 
 
 enum {
@@ -166,6 +167,7 @@ public:
 									generic_size_t numBytes, uint32 flags,
 									AsyncIOCallback* callback);
 	virtual	bool				CanWritePage(off_t offset);
+	virtual	ModifiedPageQueue*	ModifiedQueue();
 			status_t			WriteModified();
 
 	virtual	int32				MaxPagesPerWrite() const
@@ -262,7 +264,7 @@ public:
 								int32 numGuardPages, bool swappable,
 								int priority);
 	static	status_t		CreateVnodeCache(VMCache*& cache,
-								struct vnode* vnode);
+								struct vnode* vnode, ModifiedPageQueue* queue);
 	static	status_t		CreateDeviceCache(VMCache*& cache,
 								addr_t baseAddress);
 	static	status_t		CreateNullCache(int priority, VMCache*& cache);

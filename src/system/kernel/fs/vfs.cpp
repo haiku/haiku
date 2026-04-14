@@ -4769,10 +4769,14 @@ vfs_get_vnode_cache(struct vnode* vnode, VMCache** _cache, bool allocate)
 			bool wasBusy = vnode->IsBusy();
 			vnode->SetBusy(true);
 
+			ModifiedPageQueue* queue = NULL;
+			if (vnode->mount->partition != NULL)
+				queue = vnode->mount->partition->Device()->ModifiedQueue();
+
 			vnode->Unlock();
 			rw_lock_read_unlock(&sVnodeLock);
 
-			status = vm_create_vnode_cache(vnode, &vnode->cache);
+			status = vm_create_vnode_cache(vnode, queue, &vnode->cache);
 
 			rw_lock_read_lock(&sVnodeLock);
 			vnode->Lock();

@@ -2205,9 +2205,10 @@ vm_create_null_area(team_id team, const char* name, void** address,
 	The vnode has to be marked busy when calling this function.
 */
 status_t
-vm_create_vnode_cache(struct vnode* vnode, struct VMCache** cache)
+vm_create_vnode_cache(struct vnode *vnode, ModifiedPageQueue* queue,
+	VMCache **cache)
 {
-	return VMCacheFactory::CreateVnodeCache(*cache, vnode);
+	return VMCacheFactory::CreateVnodeCache(*cache, vnode, queue);
 }
 
 

@@ -15,6 +15,7 @@
 #include <KernelExport.h>
 #include <Drivers.h>
 
+#include "../vm/ModifiedPageQueue.h"
 #include "ddm_userland_interface.h"
 #include "KDiskDeviceUtils.h"
 #include "KPath.h"
@@ -31,6 +32,7 @@ KDiskDevice::KDiskDevice(partition_id id)
 	:
 	KPartition(id),
 	fDeviceData(),
+	fModifiedQueue(NULL),
 	fFD(-1),
 	fMediaStatus(B_ERROR)
 {
@@ -80,6 +82,12 @@ KDiskDevice::SetTo(const char* path)
 		_ResetGeometry();
 	}
 
+	fModifiedQueue = new ModifiedPageQueue;
+	fModifiedQueue->Init();
+	error = fModifiedQueue->StartWriter(path);
+	if (error != B_OK)
+		return error;
+
 	_UpdateDeviceFlags();
 	_InitPartitionData();
 	return B_OK;
@@ -92,6 +100,10 @@ KDiskDevice::Unset()
 	if (fFD >= 0) {
 		close(fFD);
 		fFD = -1;
+	}
+	if (fModifiedQueue != NULL) {
+		fModifiedQueue->ReleaseReference();
+		fModifiedQueue = NULL;
 	}
 	fMediaStatus = B_ERROR;
 	fDeviceData.id = -1;
@@ -277,6 +289,13 @@ int
 KDiskDevice::FD() const
 {
 	return fFD;
+}
+
+
+ModifiedPageQueue*
+KDiskDevice::ModifiedQueue()
+{
+	return fModifiedQueue;
 }
 
 

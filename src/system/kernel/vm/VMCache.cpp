@@ -1139,12 +1139,21 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 		DEBUG_PAGE_ACCESS_START(page);
 		vm_remove_all_page_mappings(page);
 
+		if (page->State() == PAGE_STATE_MODIFIED) {
+			// pages can't be freed in MODIFIED state
+			page->modified = false;
+			vm_page_set_state(page, PAGE_STATE_CACHED);
+		}
+
 		RemovePage(page);
 			// Note: When iterating through a IteratableSplayTree
 			// removing the current node is safe.
 
 		if (page->busy) {
+			// As the page has been "removed" from this cache,
+			// we can wake up anyone waiting on it.
 			NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
+
 			fRemovedBusyPages.Add(page);
 			DEBUG_PAGE_ACCESS_END(page);
 		} else {
@@ -1417,6 +1426,13 @@ VMCache::CanWritePage(off_t offset)
 }
 
 
+ModifiedPageQueue*
+VMCache::ModifiedQueue()
+{
+	return NULL;
+}
+
+
 status_t
 VMCache::Fault(struct VMAddressSpace *aspace, off_t offset)
 {
@@ -1678,7 +1694,8 @@ VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
 
 
 /*static*/ status_t
-VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode)
+VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode,
+	ModifiedPageQueue* modifiedQueue)
 {
 	const uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
 		| HEAP_DONT_LOCK_KERNEL_SPACE;
@@ -1689,7 +1706,7 @@ VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode)
 	if (cache == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = cache->Init(vnode, allocationFlags);
+	status_t error = cache->Init(vnode, modifiedQueue, allocationFlags);
 	if (error != B_OK) {
 		cache->Delete();
 		return error;

@@ -46,8 +46,12 @@
 	// the maximum I/O priority shall be reached when this many pages need to
 	// be written
 
-#define PAGES_FLUSH_DURATION_QUOTA				(3 * 1000 * 1000)
-	// target maximum time needed to write out all modified pages
+#define PAGES_FLUSH_DURATION_LOCAL_QUOTA		(3 * 1000 * 1000)
+#define PAGES_FLUSH_DURATION_GLOBAL_QUOTA		(5 * 1000 * 1000)
+	// target maximum time needed to write out all modified pages, in one & all queues
+
+int64 ModifiedPageQueue::sGlobalModifiedCount = 0;
+bigtime_t ModifiedPageQueue::sGlobalEstimatedWriteDuration = 0;
 
 
 #if PAGE_WRITER_TRACING
@@ -550,10 +554,11 @@ ModifiedPageQueue::_PageWriter()
 
 	page_num_t pagesSinceLastSuccessfulWrite = 0;
 
-	while (true) {
+	while (fWriterThread >= 0) {
 		if (queue.Count() < kNumPages) {
-			fPageWriterCondition.Wait(PAGES_FLUSH_DURATION_QUOTA, true);
-				// wait the full amount when no one triggers us
+			// wait the full amount when no one triggers us
+			if (!fPageWriterCondition.Wait(PAGES_FLUSH_DURATION_LOCAL_QUOTA, true))
+				continue;
 		}
 
 		page_num_t modifiedPages = queue.Count();
@@ -587,10 +592,6 @@ ModifiedPageQueue::_PageWriter()
 
 		uint32 numPages = 0;
 		run.PrepareNextRun();
-
-		// TODO: make this laptop friendly, too (ie. only start doing
-		// something if someone else did something or there is really
-		// enough to do).
 
 		// collect pages to be written
 #ifdef TRACE_VM_PAGE_WRITER
@@ -653,14 +654,8 @@ ModifiedPageQueue::_PageWriter()
 			}
 
 			run.AddPage(page);
-				// TODO: We're possibly adding pages of different caches and
-				// thus maybe of different underlying file systems here. This
-				// is a potential problem for loop file systems/devices, since
-				// we could mark a page busy that would need to be accessed
-				// when writing back another page, thus causing a deadlock.
 
 			DEBUG_PAGE_ACCESS_END(page);
-
 			//dprintf("write page %p, cache %p (%ld)\n", page, page->cache, page->cache->ref_count);
 			TPW(WritePage(page));
 
@@ -913,13 +908,29 @@ vm_page_schedule_write_page_range(struct VMCache *cache, uint32 firstPage,
 }
 
 
-status_t
-ModifiedPageQueue::StartWriter()
+ModifiedPageQueue::~ModifiedPageQueue()
 {
-	fPageWriterCondition.Init("page writer");
-	fUnderQuotaCondition.Init(this, "ModifiedPageQueue");
+	thread_id writerThread = fWriterThread;
+	if (writerThread < 0)
+		return;
 
-	fWriterThread = spawn_kernel_thread(&_WriterThreadEntry, "page writer",
+	fWriterThread = -1;
+	fPageWriterCondition.WakeUp();
+	wait_for_thread(writerThread, NULL);
+}
+
+
+status_t
+ModifiedPageQueue::StartWriter(const char* name)
+{
+	char threadName[B_OS_NAME_LENGTH];
+	snprintf(threadName, sizeof(threadName), "page writer: %s", name);
+
+	fPageWriterCondition.Init(threadName);
+	fUnderQuotaCondition.Init(this, "ModifiedPageQueue");
+	fLastAveragePageWriteDuration = 0;
+
+	fWriterThread = spawn_kernel_thread(&_WriterThreadEntry, threadName,
 		B_NORMAL_PRIORITY + 1, this);
 	if (fWriterThread < 0)
 		return fWriterThread;
@@ -933,11 +944,24 @@ ModifiedPageQueue::IsOverQuota(page_num_t additionalPages)
 {
 	InterruptsSpinLocker _(fLock);
 
-	if (fLastAveragePageWriteDuration == 0)
-		return false;
+	bigtime_t estimatedWriteDuration = (fCount * fLastAveragePageWriteDuration);
+	if ((int64)fCount != fLastReportedModifiedCount
+			|| estimatedWriteDuration != fLastReportedEstimatedWriteDuration) {
+		atomic_add64(&sGlobalModifiedCount, fCount - fLastReportedModifiedCount);
+		fLastReportedModifiedCount = fCount;
 
-	const page_num_t quota = PAGES_FLUSH_DURATION_QUOTA / fLastAveragePageWriteDuration;
-	return (quota < (fCount + additionalPages));
+		atomic_add64(&sGlobalEstimatedWriteDuration,
+			estimatedWriteDuration - fLastReportedEstimatedWriteDuration);
+		fLastReportedEstimatedWriteDuration = estimatedWriteDuration;
+	}
+
+	bigtime_t additionalPagesDuration = fLastAveragePageWriteDuration * additionalPages;
+	if ((estimatedWriteDuration + additionalPagesDuration)
+			> PAGES_FLUSH_DURATION_LOCAL_QUOTA)
+		return true;
+
+	return ((atomic_get64(&sGlobalEstimatedWriteDuration) + additionalPagesDuration)
+		> PAGES_FLUSH_DURATION_GLOBAL_QUOTA);
 }
 
 

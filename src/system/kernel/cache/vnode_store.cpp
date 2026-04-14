@@ -15,10 +15,24 @@
 #include <vm/vm.h>
 
 #include "IORequest.h"
+#include "../vm/ModifiedPageQueue.h"
+
+
+VMVnodeCache::VMVnodeCache()
+{
+	// empty, but needed due to the BReference<> member
+}
+
+
+VMVnodeCache::~VMVnodeCache()
+{
+	fModifiedPageQueue.Unset();
+}
 
 
 status_t
-VMVnodeCache::Init(struct vnode* vnode, uint32 allocationFlags)
+VMVnodeCache::Init(struct vnode* vnode, ModifiedPageQueue* modifiedQueue,
+	uint32 allocationFlags)
 {
 	status_t error = VMCache::Init("VMVnodeCache", CACHE_TYPE_VNODE, allocationFlags);
 	if (error != B_OK)
@@ -26,6 +40,7 @@ VMVnodeCache::Init(struct vnode* vnode, uint32 allocationFlags)
 
 	fVnode = vnode;
 	fFileCacheRef = NULL;
+	fModifiedPageQueue.SetTo(modifiedQueue, false);
 	fVnodeDeleted = false;
 
 	vfs_vnode_to_node_ref(fVnode, &fDevice, &fInode);
@@ -127,6 +142,13 @@ VMVnodeCache::CanWritePage(off_t offset)
 {
 	// all pages can be written
 	return true;
+}
+
+
+ModifiedPageQueue*
+VMVnodeCache::ModifiedQueue()
+{
+	return fModifiedPageQueue.Get();
 }
 
 

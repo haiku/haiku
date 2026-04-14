@@ -8,6 +8,7 @@
 
 
 #include <vm/VMCache.h>
+#include <Referenceable.h>
 
 
 struct file_cache_ref;
@@ -16,7 +17,10 @@ struct file_cache_ref;
 class VMVnodeCache final : public VMCache {
 public:
 			status_t			Init(struct vnode* vnode,
+									ModifiedPageQueue* modifiedQueue,
 									uint32 allocationFlags);
+								VMVnodeCache();
+	virtual						~VMVnodeCache();
 
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				StoreHasPage(off_t offset);
@@ -32,6 +36,7 @@ public:
 									generic_size_t numBytes, uint32 flags,
 									AsyncIOCallback* callback);
 	virtual	bool				CanWritePage(off_t offset);
+	virtual	ModifiedPageQueue*	ModifiedQueue();
 
 	virtual	status_t			Fault(struct VMAddressSpace* aspace,
 									off_t offset);
@@ -62,6 +67,7 @@ private:
 			file_cache_ref*		fFileCacheRef;
 			ino_t				fInode;
 			dev_t				fDevice;
+	BReference<ModifiedPageQueue> fModifiedPageQueue;
 	volatile bool				fVnodeDeleted;
 };
 

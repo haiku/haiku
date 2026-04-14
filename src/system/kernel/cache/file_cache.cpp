@@ -542,14 +542,15 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		// TODO: the pages we allocate here should have been reserved upfront
 		//	in cache_io()
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
-			reservation,
-			(writeThrough ? PAGE_STATE_CACHED : PAGE_STATE_MODIFIED)
-				| VM_PAGE_ALLOC_BUSY);
+			reservation, PAGE_STATE_CACHED | VM_PAGE_ALLOC_BUSY);
 		page->busy_io = true;
 
-		page->modified = !writeThrough;
-
 		ref->cache->InsertPage(page, offset + pos);
+
+		page->modified = !writeThrough;
+		if (!writeThrough)
+			vm_page_set_state(page, PAGE_STATE_MODIFIED);
+
 		DEBUG_PAGE_ACCESS_END(page);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS,
@@ -794,8 +795,11 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	AutoLocker<VMCache> locker(cache);
 
 	ModifiedPageQueue* modifiedQueue = NULL;
-	if (doWrite)
-		modifiedQueue = vm_page_get_modified_queue();
+	if (doWrite) {
+		modifiedQueue = cache->ModifiedQueue();
+		if (modifiedQueue == NULL)
+			modifiedQueue = vm_page_default_modified_queue();
+	}
 
 	size_t bytesLeft = size, lastLeft = size;
 	int32 lastPageOffset = pageOffset;

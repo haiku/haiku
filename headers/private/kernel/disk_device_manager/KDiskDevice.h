@@ -13,6 +13,9 @@
 #include "KPartition.h"
 
 
+class ModifiedPageQueue;
+
+
 namespace BPrivate {
 namespace DiskDevice {
 
@@ -65,6 +68,8 @@ public:
 	// File descriptor: valid only for kernel threads.
 	int FD() const;
 
+	ModifiedPageQueue* ModifiedQueue();
+
 	// access to C style device data
 	disk_device_data *DeviceData();
 	const disk_device_data *DeviceData() const;
@@ -85,6 +90,7 @@ private:
 	void _UpdateDeviceFlags();
 
 	disk_device_data	fDeviceData;
+	ModifiedPageQueue*	fModifiedQueue;
 	rw_lock				fLocker;
 	int					fFD;
 	status_t			fMediaStatus;
