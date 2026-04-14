@@ -27,6 +27,7 @@
 #include <vm/VMCache.h>
 
 #include "IORequest.h"
+#include "../vm/ModifiedPageQueue.h"
 
 
 //#define TRACE_FILE_CACHE
@@ -792,6 +793,10 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 	AutoLocker<VMCache> locker(cache);
 
+	ModifiedPageQueue* modifiedQueue = NULL;
+	if (doWrite)
+		modifiedQueue = vm_page_get_modified_queue();
+
 	size_t bytesLeft = size, lastLeft = size;
 	int32 lastPageOffset = pageOffset;
 	addr_t lastBuffer = buffer;
@@ -801,9 +806,10 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	cache_func function = NULL;
 
 	while (bytesLeft > 0) {
-		// Periodically reevaluate the low memory situation and select the
-		// read/write hook accordingly
-		if (pagesProcessed % 32 == 0) {
+		// periodic rechecks
+		if ((pagesProcessed % MAX_IO_VECS) == 0) {
+			// Re-evaluate the low memory situation and select the
+			// read/write hook accordingly
 			if (size >= BYPASS_IO_SIZE
 				&& low_resource_state(B_KERNEL_RESOURCE_PAGES)
 					!= B_NO_LOW_RESOURCE) {
@@ -812,6 +818,32 @@ do_cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				function = doWrite ? write_to_file : read_from_file;
 			} else
 				function = doWrite ? write_to_cache : read_into_cache;
+
+			if (doWrite) {
+				// Make sure there's enough space in the modified queue for the
+				// next set of pages. The situation can change while we have locks
+				// released, but since the modified quota is "best effort" anyway
+				// as mapped pages may be modified at any time, that's acceptable.
+				page_num_t toModified = 0;
+				for (size_t i = 0; i < bytesLeft && i < (B_PAGE_SIZE * MAX_IO_VECS);
+						i += B_PAGE_SIZE) {
+					vm_page* page = cache->LookupPage(offset + i);
+					if (page == NULL || page->State() != PAGE_STATE_MODIFIED)
+						toModified++;
+				}
+
+				locker.Unlock();
+				status_t status = modifiedQueue->WaitIfOverQuota(toModified, 0, B_CAN_INTERRUPT);
+				locker.Lock();
+				if (status != B_OK) {
+					if (bytesLeft == size)
+						return status;
+
+					// don't return the error, but treat this as a partial write
+					*_size = size - bytesLeft;
+					return B_OK;
+				}
+			}
 		}
 
 		// check if this page is already in memory

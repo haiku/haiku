@@ -46,6 +46,9 @@
 	// the maximum I/O priority shall be reached when this many pages need to
 	// be written
 
+#define PAGES_FLUSH_DURATION_QUOTA				(3 * 1000 * 1000)
+	// target maximum time needed to write out all modified pages
+
 
 #if PAGE_WRITER_TRACING
 
@@ -537,7 +540,6 @@ ModifiedPageQueue::_PageWriter()
 	uint32 writtenPages = 0;
 	bigtime_t lastWrittenTime = 0;
 	bigtime_t pageCollectionTime = 0;
-	bigtime_t pageWritingTime = 0;
 #endif
 
 	PageWriterRun run;
@@ -549,10 +551,9 @@ ModifiedPageQueue::_PageWriter()
 	page_num_t pagesSinceLastSuccessfulWrite = 0;
 
 	while (true) {
-// TODO: Maybe wait shorter when memory is low!
 		if (queue.Count() < kNumPages) {
-			fPageWriterCondition.Wait(3000000, true);
-				// all 3 seconds when no one triggers us
+			fPageWriterCondition.Wait(PAGES_FLUSH_DURATION_QUOTA, true);
+				// wait the full amount when no one triggers us
 		}
 
 		page_num_t modifiedPages = queue.Count();
@@ -696,17 +697,15 @@ ModifiedPageQueue::_PageWriter()
 			continue;
 
 		// write pages to disk and do all the cleanup
-#ifdef TRACE_VM_PAGE_WRITER
-		pageWritingTime -= system_time();
-#endif
+		bigtime_t runStart = system_time();
 		uint32 failedPages = run.Go();
-#ifdef TRACE_VM_PAGE_WRITER
-		pageWritingTime += system_time();
 
+#ifdef TRACE_VM_PAGE_WRITER
 		// debug output only...
 		writtenPages += numPages;
 		if (writtenPages >= 1024) {
 			bigtime_t now = system_time();
+			bigtime pageWritingTime = now - runStart;
 			TRACE(("page writer: wrote 1024 pages (total: %" B_PRIu64 " ms, "
 				"collect: %" B_PRIu64 " ms, write: %" B_PRIu64 " ms)\n",
 				(now - lastWrittenTime) / 1000,
@@ -723,6 +722,12 @@ ModifiedPageQueue::_PageWriter()
 			pagesSinceLastSuccessfulWrite += modifiedPages - maxPagesToSee;
 		else
 			pagesSinceLastSuccessfulWrite = 0;
+
+		if (failedPages == 0 && numPages >= 8)
+			fLastAveragePageWriteDuration = (system_time() - runStart) / numPages;
+
+		if (!IsOverQuota())
+			fUnderQuotaCondition.NotifyAll();
 	}
 
 	return B_OK;
@@ -734,7 +739,6 @@ ModifiedPageQueue::_WriterThreadEntry(void* _this)
 {
 	return ((ModifiedPageQueue*)_this)->_PageWriter();
 }
-
 
 
 //	#pragma mark - private kernel API
@@ -913,6 +917,7 @@ status_t
 ModifiedPageQueue::StartWriter()
 {
 	fPageWriterCondition.Init("page writer");
+	fUnderQuotaCondition.Init(this, "ModifiedPageQueue");
 
 	fWriterThread = spawn_kernel_thread(&_WriterThreadEntry, "page writer",
 		B_NORMAL_PRIORITY + 1, this);
@@ -920,4 +925,47 @@ ModifiedPageQueue::StartWriter()
 		return fWriterThread;
 
 	return resume_thread(fWriterThread);
+}
+
+
+bool
+ModifiedPageQueue::IsOverQuota(page_num_t additionalPages)
+{
+	InterruptsSpinLocker _(fLock);
+
+	if (fLastAveragePageWriteDuration == 0)
+		return false;
+
+	const page_num_t quota = PAGES_FLUSH_DURATION_QUOTA / fLastAveragePageWriteDuration;
+	return (quota < (fCount + additionalPages));
+}
+
+
+status_t
+ModifiedPageQueue::WaitIfOverQuota(page_num_t additionalPages,
+	bigtime_t timeout, uint32 flags)
+{
+	if ((flags & B_RELATIVE_TIMEOUT) != 0) {
+		// Convert to an absolute timeout, so that we can wait multiple times if needed.
+		timeout += system_time();
+		flags = (flags & ~B_RELATIVE_TIMEOUT) | B_ABSOLUTE_TIMEOUT;
+	}
+
+	while (IsOverQuota(additionalPages)) {
+		ConditionVariableEntry waitEntry;
+		fUnderQuotaCondition.Add(&waitEntry);
+
+		if (!IsOverQuota(additionalPages))
+			return B_OK;
+
+		fPageWriterCondition.WakeUp();
+		status_t status = waitEntry.Wait(flags, timeout);
+		if (status != B_OK)
+			return status;
+
+		// The queue itself is now under-quota, but it may still be over
+		// when considering additionalPages. So, we loop again.
+	}
+
+	return B_OK;
 }

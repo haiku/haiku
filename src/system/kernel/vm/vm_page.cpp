@@ -1460,6 +1460,13 @@ unreserve_pages(uint32 count)
 }
 
 
+ModifiedPageQueue*
+vm_page_get_modified_queue()
+{
+	return &sModifiedPageQueue;
+}
+
+
 static VMPageQueue*
 page_queue_for(vm_page* page, uint8 state)
 {
