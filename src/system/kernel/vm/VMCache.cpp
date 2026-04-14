@@ -828,7 +828,6 @@ VMCache::FreeRemovedPage(vm_page* page)
 {
 	AssertLocked();
 
-	NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 	fRemovedBusyPages.Remove(page);
 	vm_page_free(this, page);
 }
@@ -1145,6 +1144,7 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 			// removing the current node is safe.
 
 		if (page->busy) {
+			NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 			fRemovedBusyPages.Add(page);
 			DEBUG_PAGE_ACCESS_END(page);
 		} else {
