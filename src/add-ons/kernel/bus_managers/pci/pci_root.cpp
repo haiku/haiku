@@ -28,22 +28,13 @@
 static status_t
 pci_root_register_device(device_node* parent)
 {
-// XXX how do we handle this for PPC?
-// I/O port for PCI config space address
-#define PCI_CONFIG_ADDRESS 0xcf8
-
-	io_resource resources[2] = {
-		{B_IO_PORT, PCI_CONFIG_ADDRESS, 8},
-		{}
-	};
 	device_attr attrs[] = {
 		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "PCI"}},
 		{B_DEVICE_FLAGS, B_UINT32_TYPE, {.ui32 = B_KEEP_DRIVER_LOADED}},
 		{}
 	};
 
-	return gDeviceManager->register_node(parent, PCI_ROOT_MODULE_NAME, attrs,
-		resources, NULL);
+	return gDeviceManager->register_node(parent, PCI_ROOT_MODULE_NAME, attrs, NULL, NULL);
 }
 
 

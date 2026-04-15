@@ -46,13 +46,20 @@ X86PCIController::SupportsDevice(device_node* parent)
 status_t
 X86PCIController::RegisterDevice(device_node* parent)
 {
+	// I/O port for PCI config space address
+#define PCI_CONFIG_ADDRESS 0xcf8
+
+	io_resource resources[2] = {
+		{B_IO_PORT, PCI_CONFIG_ADDRESS, 8},
+		{}
+	};
 	device_attr attrs[] = {
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "X86 PCI Host Controller"} },
 		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, {.string = "bus_managers/pci/root/driver_v1"} },
 		{}
 	};
 
-	return gDeviceManager->register_node(parent, PCI_X86_DRIVER_MODULE_NAME, attrs, NULL, NULL);
+	return gDeviceManager->register_node(parent, PCI_X86_DRIVER_MODULE_NAME, attrs, resources, NULL);
 }
 
 
