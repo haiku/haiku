@@ -39,6 +39,8 @@ arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 
 	WRITE_SPECIALREG(TCR_EL1, tcr);
 
+	gCPU[curr_cpu].arch.mpidr = READ_SPECIALREG(MPIDR_EL1);
+
 	return 0;
 }
 
