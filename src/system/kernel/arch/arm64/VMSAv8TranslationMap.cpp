@@ -259,7 +259,7 @@ VMSAv8TranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 	constexpr uint64_t level0Range = level1Range * 512;
 
 	if (start == 0) {
-		start = level3Range - B_PAGE_SIZE;
+		start = level0Range - B_PAGE_SIZE;
 		end += start;
 	}
 
