@@ -124,6 +124,11 @@ DevicesView::DeleteDevices()
 		delete fDevices.back();
 		fDevices.pop_back();
 	}
+
+	CategoryMapIterator iter;
+	for (iter = fCategoryMap.begin(); iter != fCategoryMap.end(); iter++)
+		delete iter->second;
+	fCategoryMap.clear();
 }
 
 
@@ -355,6 +360,7 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 		if (attributes[i].fName == "controller_name") {
 			newDevice = new Device(parent, BUS_PCI,
 				CAT_MASS, attributes[i].fValue);
+			break;
 		}
 
 		// SCSI device node
