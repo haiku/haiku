@@ -297,41 +297,42 @@ AddFilesToPackage add-ons disk_systems :
 # boot module links
 AddBootModuleSymlinksToPackage
 	acpi@x86,x86_64
+	ahci
 	ata
+	ata_adapter
+	bfs
+	dpc
+	efi_gpt
+	generic_ide_pci
+	highpoint_ide_pci
+	hyperv@x86,x86_64
+	hyperv_scsi@x86,x86_64
+	isa@x86,x86_64
+	intel
+	it8211
+	legacy_sata
+	ide_isa@x86
+	openpic@ppc
+	packagefs
 	pci
 	<pci>designware@riscv64
 	<pci>ecam@riscv64,arm,arm64
 	<pci>x86@x86,x86_64
-	isa@x86,x86_64
-	dpc
+	remote_disk
 	scsi
-	usb
-	openpic@ppc
-	ata_adapter
+	scsi_cd
+	scsi_disk
 	scsi_periph
-	ahci
-	generic_ide_pci
-	it8211
-	legacy_sata
 	silicon_image_3112
-	highpoint_ide_pci
-	ide_isa@x86
+	smbios@x86,x86_64
+	usb
 	<usb>uhci
 	<usb>ohci
 	<usb>ehci
-	remote_disk
-	scsi_cd
-	scsi_disk
 	virtio
 	virtio_pci
 	virtio_block@arm,arm64,riscv64
 	virtio_scsi
-	hyperv@x86,x86_64
-	hyperv_scsi@x86,x86_64
-	efi_gpt
-	intel
-	bfs
-	packagefs
 	$(SYSTEM_ADD_ONS_DRIVERS_NET)
 	stack
 	$(SYSTEM_NETWORK_DEVICES)

@@ -17,6 +17,7 @@
 #include <dpc.h>
 #include <KernelExport.h>
 #include <PCI.h>
+#include <drivers/smbios.h>
 
 #include <safemode.h>
 
@@ -222,6 +223,21 @@ acpi_std_ops(int32 op,...)
 			if (checkAndLogFailure(AcpiInitializeTables(NULL, 0, TRUE),
 					"AcpiInitializeTables failed"))
 				goto err_acpi;
+
+#if defined(__i386__) || defined(__x86_64__)
+			smbios_module_info* smbios;
+			if (get_module(SMBIOS_MODULE_NAME, (module_info**)&smbios) == B_OK) {
+				if (smbios->match_vendor_product("Apple Inc.", NULL)
+					|| smbios->match_vendor_product("Apple Computer, Inc.", NULL)) {
+					// Apple's ACPI disables certain hardware (iGPUs, Thunderbolt
+					// controllers) when _OSI returns values other than "Darwin".
+					if (AcpiUpdateInterfaces(ACPI_DISABLE_ALL_VENDOR_STRINGS) != AE_OK
+						|| AcpiInstallInterface((ACPI_STRING)"Darwin") != AE_OK)
+						ERROR("failed to install Darwin OSI");
+				}
+				put_module(SMBIOS_MODULE_NAME);
+			}
+#endif
 
 			if (checkAndLogFailure(AcpiLoadTables(),
 					"AcpiLoadTables failed"))

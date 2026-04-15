@@ -324,6 +324,7 @@ AddBootModuleSymlinksToPackage
 	dpc
 	efi_gpt
 	generic_ide_pci
+	highpoint_ide_pci
 	hyperv@x86,x86_64
 	hyperv_scsi@x86,x86_64
 	ide_isa@x86
@@ -346,7 +347,7 @@ AddBootModuleSymlinksToPackage
 	scsi_disk
 	scsi_periph
 	silicon_image_3112
-	highpoint_ide_pci
+	smbios@x86,x86_64
 	sdhci
 	usb
 	usb_disk

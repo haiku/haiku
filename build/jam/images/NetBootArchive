@@ -69,6 +69,7 @@ AddFilesToNetBootArchive system add-ons kernel file_systems
 AddFilesToNetBootArchive system add-ons kernel generic :
 	ata_adapter
 	scsi_periph
+    smbios@x86,x86_64
 	;
 AddFilesToNetBootArchive system add-ons kernel partitioning_systems :
 	intel
@@ -147,6 +148,7 @@ AddBootModuleSymlinksToNetBootArchive
 	$(SYSTEM_NETWORK_DATALINK_PROTOCOLS)
 	$(SYSTEM_NETWORK_PPP)
 	$(SYSTEM_NETWORK_PROTOCOLS)
+    smbios@x86,x86_64
 ;
 
 

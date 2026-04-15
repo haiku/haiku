@@ -67,6 +67,7 @@ AddFilesToFloppyBootArchive system add-ons kernel file_systems
 AddFilesToFloppyBootArchive system add-ons kernel generic :
 	ata_adapter
 	scsi_periph
+    smbios@x86,x86_64
 	;
 AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems :
 	intel
@@ -173,6 +174,7 @@ AddBootModuleSymlinksToFloppyBootArchive [ FFilterByBuildFeatures
 	session
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
 	$(BOOT_ADD_ONS_NET)
+    smbios@x86,x86_64
 ] ;
 
 
