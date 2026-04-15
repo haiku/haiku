@@ -25,9 +25,8 @@ local genericSources =
 	addmul_1.c mul_1.c
 
 	cmp.c dbl2mpn.c divrem.c
-	mpn2dbl.c mpn2flt.c mpn2ldbl.c
+	mpn2dbl.c mpn2flt.c
 	mul.c mul_n.c
-	ldbl2mpn.c
 
 	s_cacos.c s_cacosf.c s_cacosl.c
 	s_cacoshl.c
@@ -42,6 +41,10 @@ local genericSources =
 	s_csqrtl.c
 	s_ctanhl.c
 	;
+local ldblSources =
+	ldbl2mpn.c
+	mpn2ldbl.c
+	;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup riscv64 ] {
@@ -50,10 +53,14 @@ for architectureObject in [ MultiArchSubDirSetup riscv64 ] {
 
 		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH).o :
 			$(genericSources)
+			$(ldblSources)
 			;
 
 		SEARCH on [ FGristFiles $(genericSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
 				generic ] ;
+		SEARCH on [ FGristFiles $(ldblSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
+				generic ldbl-128 ] ;
 	}
 }
