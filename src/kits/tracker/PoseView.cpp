@@ -5210,6 +5210,10 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		else
 			moveMode = kMoveSelectionTo;
 
+		// move will replace current selection
+		if (moveMode == kMoveSelectionTo)
+			destWindow->PoseView()->ClearSelection();
+
 		FSMoveToFolder(srcList, destEntry, moveMode, pointList);
 		return;
 	}
@@ -5795,7 +5799,11 @@ BPoseView::EntryMoved(const BMessage* message)
 	} else if (oldDir == thisDirNode.node) {
 		DeletePose(&itemNode);
 	} else if (dirNode.node == thisDirNode.node) {
-		EntryCreated(&dirNode, &itemNode, name);
+		BPose* pose = EntryCreated(&dirNode, &itemNode, name);
+
+		// select new pose
+		if (pose != NULL)
+			AddPoseToSelection(pose, IndexOfPose(pose), false);
 	}
 
 	TryUpdatingBrokenLinks();
