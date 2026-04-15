@@ -332,7 +332,7 @@ arch_mmu_allocate_kernel_page_tables(void)
 }
 
 
-uint32_t
+phys_addr_t
 arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	efi_memory_descriptor* memory_map, size_t descriptor_size,
 	uint32_t descriptor_version)

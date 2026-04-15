@@ -32,7 +32,7 @@ extern void arch_mmu_post_efi_setup(size_t memoryMapSize,
 	efi_memory_descriptor *memoryMap, size_t descriptorSize,
 	uint32_t descriptorVersion);
 
-extern uint32_t arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
+extern phys_addr_t arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 	efi_memory_descriptor *memoryMap, size_t descriptorSize,
 	uint32_t descriptorVersion);
 
