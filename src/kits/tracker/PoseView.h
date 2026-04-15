@@ -309,6 +309,8 @@ public:
 	void AddRemovePoseFromSelection(BPose* pose, int32 index,
 		bool select);
 	int32 CountSelected() const;
+	bool ExtendSelection() const;
+
 	bool SelectedVolumeIsReadOnly() const;
 	bool TargetVolumeIsReadOnly() const;
 	bool CanEditName() const;
@@ -925,11 +927,24 @@ BPoseView::SelectionList() const
 	return fSelectionList;
 }
 
+
 inline int32
 BPoseView::CountSelected() const
 {
 	return fSelectionList->CountItems();
 }
+
+
+inline bool
+BPoseView::ExtendSelection() const
+{
+	if (!fMultipleSelection)
+		return false;
+
+	uint32 mods = modifiers();
+	return (mods & B_COMMAND_KEY) != 0 || (mods & B_SHIFT_KEY) != 0;
+}
+
 
 inline BStringList*
 BPoseView::MimeTypesInSelection()
