@@ -635,7 +635,8 @@ Pipe::Enable(bool enable)
 	if (enable) {
 		write32(pipeReg, read32(pipeReg) | INTEL_PIPE_ENABLED);
 		wait_for_vblank();
-		write32(planeReg, read32(planeReg) | DISPLAY_CONTROL_ENABLED);
+		write32(planeReg, (read32(planeReg) | DISPLAY_CONTROL_ENABLED)
+			& ~DISPLAY_CONTROL_X_TILED);
 
 		//Enable default display main watermarks
 		if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {

@@ -486,6 +486,23 @@ assign_pipes()
 }
 
 
+static void
+disable_fences()
+{
+	if (gInfo->shared_info->device_type.Generation() >= 6) {
+		int numFences = 16;
+		if (gInfo->shared_info->device_type.Generation() >= 7
+			&& !gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV)
+			&& !gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV)) {
+			numFences = 32;
+		}
+
+		for (int i = 0; i < numFences; i++)
+			write32(INTEL_GRAPHICS_MEMORY_FENCE_GEN6(i), 0);
+	}
+}
+
+
 //	#pragma mark - public accelerant functions
 
 
@@ -525,6 +542,8 @@ intel_init_accelerant(int device)
 		uninit_common();
 		return status;
 	}
+
+	disable_fences();
 
 	return B_OK;
 }

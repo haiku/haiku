@@ -1316,6 +1316,7 @@ struct intel_brightness_legacy {
 #define DISPLAY_CONTROL_RGB16_SKY		(0x0eUL << 24)
 #define DISPLAY_CONTROL_RGB32_SKY		(0x04UL << 24)
 #define DISPLAY_CONTROL_RGB64_SKY		(0x06UL << 24)
+#define DISPLAY_CONTROL_X_TILED			(1UL << 10)
 
 // INTEL_DISPLAY_A_PIPE_CONTROL ILK+
 #define INTEL_PIPE_DITHER_TYPE_MASK		(0x0000000c)
@@ -1770,6 +1771,8 @@ struct overlay_scale {
 #define OVERLAY_MIRROR_NORMAL			0x0
 #define OVERLAY_MIRROR_HORIZONTAL		0x1
 #define OVERLAY_MIRROR_VERTICAL			0x2
+
+#define INTEL_GRAPHICS_MEMORY_FENCE_GEN6(i) (0x100000 + (i * 8))
 
 // The real overlay registers are written to using an update buffer
 
