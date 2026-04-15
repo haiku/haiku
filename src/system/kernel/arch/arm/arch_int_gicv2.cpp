@@ -8,6 +8,7 @@
 #include <kernel.h>
 #include <vm/vm.h>
 #include <smp.h>
+#include <KernelExport.h>
 
 #include "arch_int_gicv2.h"
 #include "gicv2_regs.h"
@@ -17,7 +18,7 @@
 #define SHARED_IRQ_BASE 32
 
 
-GICv2InterruptController::GICv2InterruptController(uint32_t gicd_addr, uint32_t gicc_addr)
+GICv2InterruptController::GICv2InterruptController(phys_addr_t gicd_addr, phys_addr_t gicc_addr)
 : InterruptController()
 {
 	reserve_io_interrupt_vectors(1020, 0, INTERRUPT_TYPE_IRQ);
@@ -51,7 +52,6 @@ GICv2InterruptController::GICv2InterruptController(uint32_t gicd_addr, uint32_t 
 	// enable GICD
 	fGicdRegs[GICD_REG_CTLR] = 0x03;
 
-	_PerCpuInit();
 	call_all_cpus_sync([](void *arg, int cpu) {
 		GICv2InterruptController* self = (GICv2InterruptController *)arg;
 		self->_PerCpuInit();
@@ -74,7 +74,6 @@ void GICv2InterruptController::_PerCpuInit()
 
 void GICv2InterruptController::EnableInterrupt(int32 irq)
 {
-	_EnableInterrupt(irq);
 	if (irq < SHARED_IRQ_BASE) {
 		call_all_cpus_sync([](void *arg, int cpu) {
 			int32 irq = (int32)(addr_t)arg;
@@ -83,6 +82,8 @@ void GICv2InterruptController::EnableInterrupt(int32 irq)
 
 			self->_EnableInterrupt(irq);
 		}, (void*)(addr_t)irq);
+	} else {
+		_EnableInterrupt(irq);
 	}
 }
 

@@ -11,7 +11,7 @@
 
 class GICv2InterruptController : public InterruptController {
 public:
-	GICv2InterruptController(uint32_t gicd_regs = 0, uint32_t gicc_regs = 0);
+	GICv2InterruptController(phys_addr_t gicd_regs = 0, phys_addr_t gicc_regs = 0);
 	void EnableInterrupt(int32 irq);
 	void DisableInterrupt(int32 irq);
 	void HandleInterrupt();
