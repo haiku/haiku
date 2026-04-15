@@ -119,6 +119,7 @@ public:
 
 private:
 	ECAMPCIControllerACPI fECAMPCIController;
+	Vector<pci_resource_range> fResourceRanges;
 };
 
 

@@ -23,12 +23,30 @@
 
 struct PCIDev;
 
+
+class PCIResourceWindow {
+public:
+	status_t		AllocateResource(uint64 size, pci_resource_range& out, uint8 flags);
+	void			FreeResource(pci_resource_range resource);
+	status_t		ReserveResource(uint64 start, uint64 size, pci_resource_range& out);
+
+private:
+	void			_MergeResourcesAt(int lower, int upper);
+
+	Vector<pci_resource_range> fResources;
+};
+
+
 struct PCIBus {
 	PCIDev *			parent;
 	PCIDev *			child;
 	uint8				domain;
 	uint8				bus;
+
+	PCIResourceWindow	io_window;
+	PCIResourceWindow	memory_window;
 };
+
 
 struct PCIDev {
 	PCIDev *			next;
@@ -43,6 +61,8 @@ struct PCIDev {
 	msi_info			msi;
 	msix_info			msix;
 	ht_mapping_info		ht_mapping;
+
+	pci_resource_range	bar[6];
 };
 
 
@@ -170,6 +190,8 @@ private:
 			void			_ReadHeaderInfo(PCIDev *dev);
 
 			void			_ConfigureBridges(PCIBus *bus);
+			void			_ReserveBARs(PCIBus *bus);
+			void			_AssignBARs(PCIBus *bus);
 			void			_RefreshDeviceInfo(PCIBus *bus);
 
 			uint64			_BarSize(uint64 bits);
@@ -216,6 +238,7 @@ private:
 };
 
 extern PCI *gPCI;
+
 
 
 extern "C" {

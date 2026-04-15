@@ -615,6 +615,9 @@ PCI::InitBus(PCIBus *bus)
 	_ConfigureBridges(bus);
 	ClearDeviceStatus(bus, false);
 	_RefreshDeviceInfo(bus);
+	_ReserveBARs(bus);
+	_AssignBARs(bus);
+	_RefreshDeviceInfo(bus);
 }
 
 
@@ -700,7 +703,11 @@ PCI::AddController(pci_controller_module_info *controller,
 	data.controller_cookie = controllerCookie;
 	data.root_node = rootNode;
 
-	data.bus = new(std::nothrow) PCIBus {.domain = domain};
+	data.bus = new(std::nothrow) PCIBus {
+		.domain = domain,
+		.io_window = PCIResourceWindow(),
+		.memory_window = PCIResourceWindow(),
+	};
 	if (data.bus == NULL)
 		return B_NO_MEMORY;
 
@@ -710,6 +717,22 @@ PCI::AddController(pci_controller_module_info *controller,
 	fDomainCount++;
 
 	InitDomainData(data);
+
+	// Add resource ranges provided by the PCI controller
+	// to bus 0. These ranges will later be split up and given to
+	// devices in _ReserveBARs and _AssignBARs.
+	for (int32 i = 0; i < data.ranges.Count(); i++) {
+		const pci_resource_range curResource = data.ranges[i];
+
+		PCIResourceWindow* window;
+		if (curResource.type == B_IO_PORT)
+			window = &data.bus->io_window;
+		else
+			window = &data.bus->memory_window;
+
+		window->FreeResource(curResource);
+	}
+
 	InitBus(data.bus);
 	if (data.controller->finalize != NULL)
 		data.controller->finalize(data.controller_cookie);
@@ -1156,6 +1179,153 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 
 
 void
+PCI::_ReserveBARs(PCIBus *bus)
+{
+	for (PCIDev* dev = bus->child; dev; dev = dev->next) {
+		// Find ranges pre-allocated by system firmware and
+		// reserve them so we won't try to assign them
+		// again later in _AssignBARs.
+		int nbars = (dev->child != NULL) ? 2 : 6;
+		for (int i = 0, next = 1; i < nbars; i = next, next++) {
+			uint32 flags;
+			uint64 addr, size;
+			if (dev->child == NULL) {
+				flags = dev->info.u.h0.base_register_flags[i];
+				addr = dev->info.u.h0.base_registers_pci[i];
+				size = dev->info.u.h0.base_register_sizes[i];
+
+				if ((flags & PCI_address_type) == PCI_address_type_64) {
+					addr |= (uint64)dev->info.u.h0.base_registers_pci[i + 1] << 32;
+					size |= (uint64)dev->info.u.h0.base_register_sizes[i + 1] << 32;
+					next++;
+				}
+			} else {
+				flags = dev->info.u.h1.base_register_flags[i];
+				addr = dev->info.u.h1.base_registers_pci[i];
+				size = dev->info.u.h1.base_register_sizes[i];
+
+				if ((flags & PCI_address_type) == PCI_address_type_64) {
+					addr |= (uint64)dev->info.u.h1.base_registers_pci[i + 1] << 32;
+					size |= (uint64)dev->info.u.h1.base_register_sizes[i + 1] << 32;
+					next++;
+				}
+			}
+
+			if (size == 0)
+				continue;
+
+			PCIResourceWindow* window;
+			if ((flags & PCI_address_space) == 1)
+				window = &bus->io_window;
+			else
+				window = &bus->memory_window;
+
+			window->ReserveResource(addr, size, dev->bar[i]);
+		}
+
+		if (dev->child != NULL) {
+			// PCI-to-PCI bridges each have three ranges of address space
+			// (I/O ports, memory, prefetchable memory) which determine
+			// when memory accesses will be forwarded to a bridge's children.
+			//
+			// For each of these ranges, we reserve the range in the bridge's
+			// parent's PCIResourceWindow (as we do with BARs above), then
+			// add the range to the bridge's PCIResourceWindows. These ranges
+			// can then be reserved or allocated for the bridge's children.
+			uint32 ioBase = (((uint32)(dev->info.u.h1.io_base & 0xf0)) << 8)
+				| (((uint32)dev->info.u.h1.io_base_upper16) << 16);
+			uint32 ioLimit = (((((uint32)(dev->info.u.h1.io_limit & 0xf0)) << 8)
+				| (((uint32)dev->info.u.h1.io_limit_upper16) << 16)))
+				+ 0xfff;
+			uint32 ioSize = ioLimit + 1 - ioBase;
+			// base > limit means the register was not programmed (no memory
+			// was assigned by system firmware), so there is nothing to reserve.
+			// Same for memory and prefetchable memory below.
+			if (ioLimit > ioBase) {
+				pci_resource_range range = {};
+				if (dev->parent->io_window.ReserveResource(ioBase, ioSize, range) == B_OK)
+					dev->child->io_window.FreeResource(range);
+			}
+
+			uint32 memBase = (((uint32)(dev->info.u.h1.memory_base & 0xfff0)) << 16);
+			uint32 memLimit = (((uint32)(dev->info.u.h1.memory_limit & 0xfff0)) << 16)
+				+ 0xfffff;
+			uint32 memSize = memLimit + 1 - memBase;
+			if (memLimit > memBase) {
+				pci_resource_range range = {};
+				if (dev->parent->memory_window.ReserveResource(
+						memBase, memSize, range) == B_OK)
+					dev->child->memory_window.FreeResource(range);
+			}
+
+			uint64 prefetchBase = (((uint64)dev->info.u.h1.prefetchable_memory_base & 0xfff0) << 16)
+				| (((uint64)dev->info.u.h1.prefetchable_memory_base_upper32) << 32);
+			uint64 prefetchLimit =
+				((((uint64)dev->info.u.h1.prefetchable_memory_limit & 0xfff0) << 16)
+				| ((uint64)dev->info.u.h1.prefetchable_memory_limit_upper32 << 32))
+				+ 0xfffff;
+			uint64 prefetchSize = prefetchLimit + 1 - prefetchBase;
+			if (prefetchLimit > prefetchBase) {
+				pci_resource_range range = {};
+				if (dev->parent->memory_window.ReserveResource(
+						prefetchBase, prefetchSize, range) == B_OK)
+					dev->child->memory_window.FreeResource(range);
+			}
+
+			_ReserveBARs(dev->child);
+		}
+	}
+}
+
+
+void
+PCI::_AssignBARs(PCIBus *bus)
+{
+	for (PCIDev* dev = bus->child; dev; dev = dev->next) {
+		if (dev->child != NULL) {
+			// This is a bridge. We don't currently try to allocate
+			// resources for the bridge itself, so continue on
+			// to the bridge's children.
+			_AssignBARs(dev->child);
+			continue;
+		}
+
+		for (int i = 0, next = 1; i < 6; i = next, next++) {
+			uint32 flags = dev->info.u.h0.base_register_flags[i];
+			uint64 size = dev->info.u.h0.base_register_sizes[i];
+			pci_resource_range& resource = dev->bar[i];
+
+			if ((flags & PCI_address_type) == PCI_address_type_64) {
+				size |= (uint64)dev->info.u.h0.base_register_sizes[i + 1] << 32;
+				next++;
+			}
+
+			// BAR was already assigned or does not need any space allocated
+			if (resource.type != 0 || size == 0)
+				continue;
+
+			PCIResourceWindow* window;
+			if ((flags & PCI_address_space) == 1)
+				window = &bus->io_window;
+			else
+				window = &bus->memory_window;
+
+			if (window->AllocateResource(size, resource, flags) == B_OK) {
+				dprintf("PCI: Assigned BAR %d of %02x:%02x.%u address 0x%" B_PRIxPHYSADDR"\n",
+					i, dev->bus, dev->device, dev->function, resource.pci_address);
+				WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
+					i * 4 + PCI_base_registers, 4, resource.pci_address);
+				if ((flags & PCI_address_type) == PCI_address_type_64) {
+					WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
+						(i + 1) * 4 + PCI_base_registers, 4, resource.pci_address >> 32);
+				}
+			}
+		}
+	}
+}
+
+
+void
 PCI::_DiscoverBus(PCIBus *bus)
 {
 	FLOW("PCI: DiscoverBus, domain %u, bus %u\n", bus->domain, bus->bus);
@@ -1217,14 +1387,16 @@ PCI::_DiscoverDevice(PCIBus *bus, uint8 dev, uint8 function)
 PCIBus *
 PCI::_CreateBus(PCIDev *parent, uint8 domain, uint8 bus)
 {
-	PCIBus *newBus = new(std::nothrow) PCIBus;
+	PCIBus *newBus = new(std::nothrow) PCIBus {
+		.parent = parent,
+		.child = NULL,
+		.domain = domain,
+		.bus = bus,
+		.io_window = PCIResourceWindow(),
+		.memory_window = PCIResourceWindow(),
+	};
 	if (newBus == NULL)
 		return NULL;
-
-	newBus->parent = parent;
-	newBus->child = NULL;
-	newBus->domain = domain;
-	newBus->bus = bus;
 
 	// append
 	parent->child = newBus;
@@ -1239,7 +1411,7 @@ PCI::_CreateDevice(PCIBus *parent, uint8 device, uint8 function)
 	FLOW("PCI: CreateDevice, domain %u, bus %u, dev %u, func %u:\n", parent->domain,
 		parent->bus, device, function);
 
-	PCIDev *newDev = new(std::nothrow) PCIDev;
+	PCIDev *newDev = new(std::nothrow) PCIDev();
 	if (newDev == NULL)
 		return NULL;
 
@@ -2450,4 +2622,122 @@ PCI::_DisableMSIX(PCIDev *device)
 		info->control_value);
 
 	return B_OK;
+}
+
+
+status_t
+PCIResourceWindow::AllocateResource(uint64 size, pci_resource_range& newResource, uint8 flags)
+{
+	// Find an appropriately sized free range in this window
+	// that matches the requested prefetchability and
+	// is within the 32-bit address space (if required)
+	for (int i = 0; i < fResources.Count(); i++) {
+		if (fResources[i].size >= size
+			&& ((flags & PCI_address_type_64) || fResources[i].pci_address < 0x100000000)
+			&& ((flags & PCI_address_prefetchable)
+				== (fResources[i].address_type & PCI_address_prefetchable)))
+			return ReserveResource(fResources[i].pci_address, size, newResource);
+	}
+
+	// We couldn't allocate prefetchable memory,
+	// try to allocate non-prefetchable instead.
+	if ((flags & PCI_address_prefetchable) != 0)
+		return AllocateResource(size, newResource, flags & ~PCI_address_prefetchable);
+	return B_NO_MEMORY;
+}
+
+
+void
+PCIResourceWindow::FreeResource(pci_resource_range resource)
+{
+	// Add the given resource to the list of resources, so
+	// it may be reserved or allocated later
+	int i = 0;
+	for (; i <= fResources.Count(); i++) {
+		if (i == fResources.Count() || fResources[i].pci_address > resource.pci_address)
+			break;
+	}
+
+	fResources.Insert(resource, i);
+
+	// Try to merge the resource we just added with the
+	// previous and next resource, if possible.
+	if (i != 0) {
+		_MergeResourcesAt(i - 1, i);
+		i--;
+	}
+	if (i != fResources.Count() - 1)
+		_MergeResourcesAt(i, i + 1);
+}
+
+
+status_t
+PCIResourceWindow::ReserveResource(uint64 start, uint64 size, pci_resource_range& resourceOut)
+{
+	// Find which resource contains the given start address
+	bool found = false;
+	int i = 0;
+	for (; i < fResources.Count(); i++) {
+		auto& resource = fResources[i];
+		if (resource.pci_address <= start
+				&& (resource.pci_address + resource.size) > start) {
+			found = true;
+			break;
+		}
+	}
+	if (!found)
+		return B_ENTRY_NOT_FOUND;
+	if (start + size > fResources[i].pci_address + fResources[i].size) {
+		dprintf("PCI: BAR/bridge window 0x%" PRIx64 "-0x%" PRIx64
+			" exceeds parent window 0x%" PRIx64 "-0x%" PRIx64 "\n",
+			start, start + size,
+			fResources[i].pci_address, fResources[i].pci_address + fResources[i].size);
+	}
+
+	uint64 offsetWithinResource = (start - fResources[i].pci_address);
+	resourceOut.type = fResources[i].type;
+	resourceOut.address_type = fResources[i].address_type;
+	resourceOut.pci_address = fResources[i].pci_address + offsetWithinResource;
+	resourceOut.host_address = fResources[i].host_address + offsetWithinResource;
+	resourceOut.size = size;
+
+	// If reserving this range results in a hole in the middle
+	// of the range owned by this PCIResourceWindow, we need
+	// to add a new range after the hole
+	if (fResources[i].size - offsetWithinResource > size) {
+		fResources.Insert(pci_resource_range {
+			.type = fResources[i].type,
+			.address_type = fResources[i].address_type,
+			.host_address = (phys_addr_t)(fResources[i].host_address
+				+ offsetWithinResource + size),
+			.pci_address = (phys_addr_t)(fResources[i].pci_address
+				+ offsetWithinResource + size),
+			.size = fResources[i].size - offsetWithinResource - size
+		}, i + 1);
+	}
+
+	// Shrink the range we just reserved from, and delete
+	// it if we reserved the whole range
+	if (offsetWithinResource == 0)
+		fResources.Erase(i);
+	else
+		fResources[i].size = offsetWithinResource;
+
+	return B_OK;
+}
+
+
+void
+PCIResourceWindow::_MergeResourcesAt(int lower, int upper)
+{
+	// Merge two resources, with the specified indices,
+	// if they're adjacent and are the same type.
+	auto& resourceLower = fResources[lower];
+	auto& resourceUpper = fResources[upper];
+	if (resourceLower.type == resourceUpper.type
+			&& resourceLower.address_type == resourceUpper.address_type
+			&& resourceLower.pci_address + resourceLower.size == resourceUpper.pci_address) {
+		resourceLower.size += resourceUpper.size;
+		fResources.Erase(upper);
+	}
 }

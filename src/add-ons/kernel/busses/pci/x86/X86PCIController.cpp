@@ -358,6 +358,20 @@ X86PCIControllerMethPcie::InitDriverInt(device_node* node)
 	}
 
 	status = fECAMPCIController.ReadResourceInfo(acpiNode);
+
+	for (int i = 0;; i++) {
+		pci_resource_range resource;
+		if (fECAMPCIController.GetRange(i, &resource) != B_OK)
+			break;
+
+		// Areas in the lower part of the address space are special
+		// (BIOS ROM, VGA, etc.) and should not be touched.
+		if (resource.type == B_IO_MEMORY && resource.pci_address < 0x80000000)
+			continue;
+
+		fResourceRanges.Add(resource);
+	}
+
 	gDeviceManager->put_node(acpiNode);
 	return status;
 }
@@ -403,5 +417,9 @@ X86PCIControllerMethPcie::GetMaxBusDevices(int32& count)
 status_t
 X86PCIControllerMethPcie::GetRange(uint32 index, pci_resource_range* range)
 {
-	return fECAMPCIController.GetRange(index, range);
+	if (index >= (uint32)fResourceRanges.Count())
+		return B_BAD_INDEX;
+
+	*range = fResourceRanges[index];
+	return B_OK;
 }
