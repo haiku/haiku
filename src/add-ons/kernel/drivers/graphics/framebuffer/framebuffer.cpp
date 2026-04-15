@@ -39,6 +39,8 @@ get_color_space_for_depth(uint32 depth)
 			return B_RGB16;
 		case 24:
 			return B_RGB24;
+		case 30:
+			return B_RGB30;
 		case 32:
 			return B_RGB32;
 	}

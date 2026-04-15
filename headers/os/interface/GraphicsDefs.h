@@ -175,6 +175,7 @@ typedef enum {
 	B_RGB48				= 0x0011,	// RGB		 RGB 16:16:16
 	B_RGB32				= 0x0008,	// BGR-		-RGB 8:8:8:8
 	B_RGBA32			= 0x2008,	// BGRA		ARGB 8:8:8:8
+	B_RGB30				= 0x0009,   // BGR-     -RGB 2:10:10:10
 	B_RGB24				= 0x0003,	// BGR		 RGB 8:8:8
 	B_RGB16				= 0x0005,	// BGR		 RGB 5:6:5
 	B_RGB15				= 0x0010,	// BGR-		-RGB 1:5:5:5
@@ -188,6 +189,7 @@ typedef enum {
 	B_RGB48_BIG			= 0x1011,	//  RGB		RGB  16:16:16
 	B_RGB32_BIG			= 0x1008,	// -RGB		BGR- 8:8:8:8
 	B_RGBA32_BIG		= 0x3008,	// ARGB		BGRA 8:8:8:8
+	B_RGB30_BIG			= 0x1009,	// -RGB		BGR- 10:10:10:2
 	B_RGB24_BIG			= 0x1003,	//  RGB		BGR  8:8:8
 	B_RGB16_BIG			= 0x1005,	//  RGB		BGR  5:6:5
 	B_RGB15_BIG			= 0x1010,	// -RGB		BGR- 5:5:5:1
@@ -198,6 +200,7 @@ typedef enum {
 	B_RGB48_LITTLE		= B_RGB48,
 	B_RGB32_LITTLE		= B_RGB32,
 	B_RGBA32_LITTLE		= B_RGBA32,
+	B_RGB30_LITTLE		= B_RGB30,
 	B_RGB24_LITTLE		= B_RGB24,
 	B_RGB16_LITTLE		= B_RGB16,
 	B_RGB15_LITTLE		= B_RGB15,

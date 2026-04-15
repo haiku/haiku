@@ -232,6 +232,7 @@ bitmaps_support_space(color_space space, uint32 *supportFlags)
 		// supported, but cannot draw
 		case B_RGBA64: case B_RGBA64_BIG:
 		case B_RGB48: case B_RGB48_BIG:
+		case B_RGB30: case B_RGB30_BIG:
 		case B_YCbCr422: case B_YCbCr411: case B_YCbCr444: case B_YCbCr420:
 		case B_YUV422: case B_YUV411: case B_YUV444: case B_YUV420:
 		case B_UVL24: case B_UVL32: case B_UVLA32:

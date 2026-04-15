@@ -177,9 +177,10 @@ platform_init_video(void)
 
 	TRACE(("looking for best graphics mode...\n"));
 
+	size_t depth = 0, bytes_per_row = 0;
+	efi_graphics_output_mode_information *info = NULL;
 	for (size_t mode = 0; mode < sGraphicsOutput->Mode->MaxMode; ++mode) {
-		efi_graphics_output_mode_information *info;
-		size_t size, depth;
+		size_t size;
 		sGraphicsOutput->QueryMode(sGraphicsOutput, mode, &size, &info);
 		size_t area = info->HorizontalResolution * info->VerticalResolution;
 		TRACE(("  mode: %lu\n", mode));
@@ -191,6 +192,12 @@ platform_init_video(void)
 		} else if (info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
 			// seen this in the wild, but acts like RGB, go figure...
 			depth = 32;
+		} else if (info->PixelFormat == PixelBitMask
+			&& info->PixelInformation.RedMask == 0x3FF00000
+			&& info->PixelInformation.GreenMask == 0x000FFC00
+			&& info->PixelInformation.BlueMask == 0x000003FF
+			&& info->PixelInformation.ReservedMask == 0xC0000000) {
+			depth = 30;
 		} else if (info->PixelFormat == PixelBitMask
 			&& info->PixelInformation.RedMask == 0xFF0000
 			&& info->PixelInformation.GreenMask == 0x00FF00
@@ -210,13 +217,15 @@ platform_init_video(void)
 		}
 		TRACE(("  depth: %lu\n", depth));
 
+		bytes_per_row = info->PixelsPerScanLine * ((depth + 7) / 8);
+
 		video_mode *videoMode = (video_mode*)malloc(sizeof(struct video_mode));
 		if (videoMode != NULL) {
 			videoMode->mode = mode;
 			videoMode->width = info->HorizontalResolution;
 			videoMode->height = info->VerticalResolution;
 			videoMode->bits_per_pixel = depth;
-			videoMode->bytes_per_row = info->PixelsPerScanLine * depth / 8;
+			videoMode->bytes_per_row = bytes_per_row;
 			add_video_mode(videoMode);
 		}
 
@@ -237,6 +246,10 @@ platform_init_video(void)
 	}
 
 	gKernelArgs.frame_buffer.enabled = true;
+	gKernelArgs.frame_buffer.depth = depth;
+	gKernelArgs.frame_buffer.width = info->HorizontalResolution;
+	gKernelArgs.frame_buffer.height = info->VerticalResolution;
+	gKernelArgs.frame_buffer.bytes_per_row = bytes_per_row;
 	sModeChosen = false;
 	sSettingsLoaded = false;
 
@@ -268,15 +281,6 @@ platform_switch_to_logo(void)
 		sGraphicsOutput->Mode->FrameBufferBase;
 	gKernelArgs.frame_buffer.physical_buffer.size =
 		sGraphicsOutput->Mode->FrameBufferSize;
-	gKernelArgs.frame_buffer.width =
-		sGraphicsOutput->Mode->Info->HorizontalResolution;
-	gKernelArgs.frame_buffer.height =
-		sGraphicsOutput->Mode->Info->VerticalResolution;
-	gKernelArgs.frame_buffer.depth =
-		sGraphicsOutput->Mode->Info->PixelFormat == PixelBitMask ? 24 : 32;
-	gKernelArgs.frame_buffer.bytes_per_row =
-		sGraphicsOutput->Mode->Info->PixelsPerScanLine
-			* gKernelArgs.frame_buffer.depth / 8;
 
 	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start);
 }

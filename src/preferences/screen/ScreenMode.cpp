@@ -130,7 +130,8 @@ int32
 screen_mode::BitsPerPixel() const
 {
 	switch (space) {
-		case B_RGB32:	return 32;
+		case B_RGB30:	return 30;
+		case B_RGB32:	return 24;
 		case B_RGB24:	return 24;
 		case B_RGB16:	return 16;
 		case B_RGB15:	return 15;

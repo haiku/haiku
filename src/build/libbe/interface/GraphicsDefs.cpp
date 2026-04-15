@@ -73,6 +73,7 @@ get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment, 
 		case B_HSV32: case B_HSVA32:
 		case B_HLS32: case B_HLSA32:
 		case B_CMY32: case B_CMYA32: case B_CMYK32:
+		case B_RGB30: case B_RGB30_BIG:
 			bytesPerPixel = 4;
 			pixPerChunk = 1;
 			break;
@@ -162,6 +163,7 @@ bitmaps_support_space(color_space space, uint32 *supportFlags)
 		case B_RGB48:		case B_RGB48_BIG:
 		case B_RGB32:		case B_RGBA32:		case B_RGB24:
 		case B_RGB32_BIG:	case B_RGBA32_BIG:	case B_RGB24_BIG:
+		case B_RGB30:		case B_RGB30_BIG:
 		case B_RGB16:		case B_RGB15:		case B_RGBA15:
 		case B_RGB16_BIG:	case B_RGB15_BIG:	case B_RGBA15_BIG:
 		case B_CMAP8:		case B_GRAY8:		case B_GRAY1:

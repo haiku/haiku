@@ -71,6 +71,7 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 		case B_CMY32: case B_CMYA32: case B_CMYK32:
 			bpr = 4 * width;
 			break;
+		case B_RGB30: case B_RGB30_BIG:
 		case B_RGB24: case B_RGB24_BIG:
 		case B_UVL24: case B_LAB24: case B_HSI24:
 		case B_HSV24: case B_HLS24: case B_CMY24:

@@ -76,14 +76,14 @@ const char* kBackgroundsSignature = "application/x-vnd.Haiku-Backgrounds";
 // list of officially supported colour spaces
 static const struct {
 	color_space	space;
-	int32		bits_per_pixel;
 	const char*	label;
 } kColorSpaces[] = {
-	{ B_CMAP8, 8, B_TRANSLATE("8 bits/pixel, 256 colors") },
-	{ B_RGB15, 15, B_TRANSLATE("15 bits/pixel, 32768 colors") },
-	{ B_RGB16, 16, B_TRANSLATE("16 bits/pixel, 65536 colors") },
-	{ B_RGB24, 24, B_TRANSLATE("24 bits/pixel, 16 Million colors") },
-	{ B_RGB32, 32, B_TRANSLATE("32 bits/pixel, 16 Million colors") }
+	{ B_CMAP8, B_TRANSLATE("8 bits/pixel, 256 colors") },
+	{ B_RGB15, B_TRANSLATE("15 bits/pixel, 32768 colors") },
+	{ B_RGB16, B_TRANSLATE("16 bits/pixel, 65536 colors") },
+	{ B_RGB24, B_TRANSLATE("24 bits/pixel, 16 million colors") },
+	{ B_RGB32, B_TRANSLATE("24 bits/pixel, 16 million colors") },
+	{ B_RGB30, B_TRANSLATE("30 bits/pixel, 1 billion colors") }
 };
 static const int32 kColorSpaceCount = B_COUNT_OF(kColorSpaces);
 
@@ -396,7 +396,6 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			continue;
 
 		BMessage* message = new BMessage(POP_COLORS_MSG);
-		message->AddInt32("bits_per_pixel", kColorSpaces[i].bits_per_pixel);
 		message->AddInt32("space", kColorSpaces[i].space);
 
 		BMenuItem* item = new BMenuItem(kColorSpaces[i].label, message);

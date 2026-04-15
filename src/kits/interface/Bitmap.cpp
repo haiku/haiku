@@ -95,6 +95,7 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 			break;
 		case B_RGB32: case B_RGBA32:
 		case B_RGB32_BIG: case B_RGBA32_BIG:
+		case B_RGB30: case B_RGB30_BIG:
 		case B_UVL32: case B_UVLA32:
 		case B_LAB32: case B_LABA32:
 		case B_HSI32: case B_HSIA32:

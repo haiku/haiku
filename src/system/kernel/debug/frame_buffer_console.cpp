@@ -78,8 +78,7 @@ static uint16 sPalette16[] = {
 	// bbbbbggggggrrrrr (5-6-5)
 	0xffff, 0x3333, 0x4cc0, 0x04d3, 0xc800, 0x722f, 0xdd40, 0x0000,
 };
-static uint32 sPalette32[] = {
-	// is also used by 24 bit modes
+static uint32 sPalette24[] = {
 	0xffffff,	// white
 	0x336698,	// blue
 	0x4e9a00,	// green
@@ -88,6 +87,16 @@ static uint32 sPalette32[] = {
 	0x73447b,	// magenta
 	0xdaa800,	// yellow
 	0x000000,	// black
+};
+static uint32 sPalette30[] = {
+	0x3fcff3fc,	// white
+	0x0cc66260,	// blue
+	0x1389a000,	// green
+	0x01898268,	// cyan
+	0x33000000,	// red
+	0x1cc441ec,	// magenta
+	0x368a8000,	// yellow
+	0x00000000,	// black
 };
 
 static struct console_info sConsole;
@@ -122,8 +131,10 @@ get_palette_entry(uint8 index)
 			return (uint8*)&sPalette15[index];
 		case 16:
 			return (uint8*)&sPalette16[index];
+		case 30:
+			return (uint8*)&sPalette30[index];
 		default:
-			return (uint8*)&sPalette32[index];
+			return (uint8*)&sPalette24[index];
 	}
 }
 

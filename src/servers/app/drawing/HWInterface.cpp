@@ -650,6 +650,27 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 			break;
 		}
 
+		case B_RGB30:
+		{
+			dst += y * dstBPR + x * 4;
+			for (; y <= bottom; y++) {
+				uint32* srcHandle = (uint32*)dst;
+				uint32* dstHandle = (uint32*)src;
+				for (int32 left = x; left <= right; left++, srcHandle++, dstHandle++) {
+					uint32 r = (*dstHandle) & 0xff;
+					uint32 g = (*dstHandle >> 8) & 0xff;
+					uint32 b = (*dstHandle >> 16) & 0xff;
+					*srcHandle = ((r * 1023) / 255)
+						| (((g * 1023) / 255) << 10)
+						| (((b * 1023) / 255) << 20);
+				}
+
+				src += srcBPR;
+				dst += dstBPR;
+			}
+			break;
+		}
+
 		case B_RGB24:
 		{
 			// offset to left top pixel in dest buffer

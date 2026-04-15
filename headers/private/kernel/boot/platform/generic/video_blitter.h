@@ -129,6 +129,32 @@ blit24(const BlitParameters& params)
 
 
 static void
+blit30(const BlitParameters& params)
+{
+	const uint8* data = params.from;
+	data += (params.fromWidth * params.fromTop + params.fromLeft) * 3;
+	uint32* start = (uint32*)(params.to
+		+ params.toBytesPerRow * params.toTop
+		+ 4 * params.toLeft);
+
+	for (int32 y = params.fromTop; y < params.fromBottom; y++) {
+		const uint8* src = data;
+		uint32* dst = start;
+		for (int32 x = params.fromLeft; x < params.fromRight; x++) {
+			dst[0] = (((src[2] * 1023) / 255) << 20)
+				| (((src[1] * 1023) / 255) << 10)
+				| ((src[0] * 1023) / 255);
+			dst++;
+			src += 3;
+		}
+
+		data += params.fromWidth * 3;
+		start = (uint32*)((addr_t)start + params.toBytesPerRow);
+	}
+}
+
+
+static void
 blit32(const BlitParameters& params)
 {
 	const uint8* data = params.from;
@@ -167,6 +193,9 @@ blit(const BlitParameters& params, int32 depth)
 			return;
 		case 24:
 			blit24(params);
+			return;
+		case 30:
+			blit30(params);
 			return;
 		case 32:
 			blit32(params);
