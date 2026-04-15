@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <boot/stage2.h>
+#include <debug.h>
 
 
 void
@@ -88,7 +89,7 @@ build_physical_allocated_list(size_t memoryMapSize, efi_memory_descriptor* memor
 			case EfiLoaderData: {
 				uint64_t base = entry->PhysicalStart;
 				uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-				insert_physical_allocated_range(base, size);
+				ASSERT_ALWAYS(insert_physical_allocated_range(base, size) == B_OK);
 				break;
 			}
 			default:
