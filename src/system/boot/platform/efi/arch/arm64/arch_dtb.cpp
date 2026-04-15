@@ -18,6 +18,11 @@ extern "C" {
 
 #include "dtb.h"
 
+
+void arm64_handle_fdt_psci_node(const void *fdt, int node);
+void arm64_handle_fdt_cpu_node(const void *fdt, int node);
+
+
 /* TODO: Code taken from ARM port just for building purposes */
 
 /* The potential interrupt controoller would be present in the dts as:
@@ -43,15 +48,7 @@ arch_handle_fdt(const void* fdt, int node)
 
 	if (deviceType != NULL) {
 		if (strcmp(deviceType, "cpu") == 0) {
-			platform_cpu_info* info = NULL;
-			arch_smp_register_cpu(&info);
-			if (info == NULL)
-				return;
-			info->id = fdt32_to_cpu(*(uint32*)fdt_getprop(fdt, node,
-				"reg", NULL));
-			dprintf("cpu\n");
-			dprintf("  id: %" B_PRIu32 "\n", info->id);
-
+			arm64_handle_fdt_cpu_node(fdt, node);
 		}
 	}
 
@@ -76,6 +73,9 @@ arch_handle_fdt(const void* fdt, int node)
 			}
 		}
 	}
+
+	if (strcmp(compatible, "arm,psci-1.0") == 0)
+		arm64_handle_fdt_psci_node(fdt, node);
 }
 
 

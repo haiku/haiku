@@ -136,34 +136,9 @@ private:
 
 
 class MemoryAttributeIndirection {
-
 public:
-	MemoryAttributeIndirection(uint8 el = kInvalidExceptionLevel)
-	{
-		if (el == kInvalidExceptionLevel) {
-			el = arch_exception_level();
-		}
-
-		switch(el)
-		{
-			case 1:
-				fMair = READ_SPECIALREG(MAIR_EL1);
-				break;
-			case 2:
-				fMair = READ_SPECIALREG(MAIR_EL2);
-				break;
-			case 3:
-				fMair = READ_SPECIALREG(MAIR_EL3);
-				break;
-			default:
-				fMair = 0x00u;
-				break;
-		}
-	}
-
 	uint8 IndexOf(uint8 requirement) {
-
-		uint64 processedMair = fMair;
+		uint64 processedMair = MAIR_VALUE;
 		uint8 index = 0;
 
 		while (((processedMair & 0xFF) != requirement) && (index < 8)) {
@@ -178,9 +153,6 @@ public:
 	uint64 MaskOf(uint8 requirement) {
 		return IndexOf(requirement) << 2;
 	}
-
-private:
-	uint64 fMair;
 };
 
 

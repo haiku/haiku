@@ -20,8 +20,6 @@
 
 extern const char* granule_type_str(int tg);
 
-extern void arch_mmu_setup_EL1(uint64 tcr);
-
 
 // From entry.S
 extern "C" void arch_enter_kernel(struct kernel_args* kernelArgs,
@@ -37,6 +35,9 @@ extern phys_addr_t arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 	uint32_t descriptorVersion);
 
 
+void arm64_mmu_setup();
+
+
 void
 arch_convert_kernel_args(void)
 {
@@ -47,15 +48,17 @@ arch_convert_kernel_args(void)
 void
 arm64_common_cpu_startup()
 {
-	// If we have E2H available, we want to also enable TGE
-	// so exceptions don't get taken to EL1
+	arch_cache_disable();
+
+	// Enable EL2 host bits if FEAT_VHE is available
 	uint64 el = arch_exception_level();
 	bool e2h = false;
 	if (el == 2) {
-		uint64 hcr = READ_SPECIALREG(HCR_EL2);
-		if ((hcr & HCR_E2H) != 0) {
+		uint64 id_aa64mmfr1_el1 = READ_SPECIALREG(ID_AA64MMFR1_EL1);
+		if (ID_AA64MMFR1_VH(id_aa64mmfr1_el1) == ID_AA64MMFR1_VH_IMPL) {
 			e2h = true;
-			WRITE_SPECIALREG(HCR_EL2, hcr | HCR_TGE);
+			WRITE_SPECIALREG(HCR_EL2, HCR_RW | HCR_TGE | HCR_E2H | HCR_AMO | HCR_IMO | HCR_FMO);
+			WRITE_SPECIALREG(CPACR_EL1, CPACR_FPEN_TRAP_NONE);
 		}
 	}
 
@@ -63,13 +66,16 @@ arm64_common_cpu_startup()
 	//
 	// EL2 without E2H enabled does not, so we need to drop to EL1
 	if (el == 1 || e2h) {
-		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL1));
+		arm64_mmu_setup();
 		WRITE_SPECIALREG(CNTKCTL_EL1, 0b11);
 	} else {
-		arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL2));
-		arch_cache_disable();
+		arm64_mmu_setup();
 		_arch_transition_EL2_EL1();
 	}
+
+	WRITE_SPECIALREG(SCTLR_EL1, SCTLR_LSMAOE | SCTLR_nTLSMD
+		| SCTLR_UCI | SCTLR_SPAN | SCTLR_IESB | SCTLR_nTWE | SCTLR_nTWI
+		| SCTLR_UCT | SCTLR_DZE | SCTLR_SED | SCTLR_SA0 | SCTLR_SA);
 
 	arch_cache_enable();
 }

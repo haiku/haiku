@@ -6,6 +6,7 @@
 #include <arch/cpu.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
+#include <efi/types.h>
 
 #include "efi_platform.h"
 #include "generic_mmu.h"
@@ -39,11 +40,10 @@ ARMv8TranslationRegime::TranslationDescriptor translation4Kb48bits = {
 
 
 ARMv8TranslationRegime CurrentRegime(translation4Kb48bits);
-/* ARM port */
-static uint64_t* sPageDirectory = NULL;
-// static uint64_t* sFirstPageTable = NULL;
+
+static uint64_t* sTTBR0 = NULL;
+static uint64_t* sTTBR1 = NULL;
 static uint64_t* sNextPageTable = NULL;
-// static uint64_t* sLastPageTable = NULL;
 
 
 const char*
@@ -99,35 +99,28 @@ arch_mmu_dump_table(uint64* table, uint8 currentLevel)
 void
 arch_mmu_dump_present_tables()
 {
-	uint64 address = arch_mmu_base_register();
-	dprintf("Under TTBR0: %lx\n", address);
+	dprintf("Under allocated TTBR0_EL1:\n");
+	arch_mmu_dump_table(sTTBR0, 0);
 
-	arch_mmu_dump_table(reinterpret_cast<uint64*>(address), 0);
-
-	/* We are willing to transition, but still in EL2, present MMU configuration
-	 * for user is present in EL2 by TTBR0_EL2. Kernel side is not active, but
-	 * allocated under sPageDirectory, defined under TTBR1_EL1.
-	 */
 	dprintf("Under allocated TTBR1_EL1:\n");
-	arch_mmu_dump_table(sPageDirectory, 0);
+	arch_mmu_dump_table(sTTBR1, 0);
 }
 
 
-void arch_mmu_setup_EL1(uint64 tcr) {
+void
+arm64_mmu_setup()
+{
+	// 48-bit address space
+	// Inner-shareable, write-back/write-allocate page table walks
+	uint64 tcr = TCR_TxSZ(16)
+		| TCR_SH0_IS | TCR_IRGN0_WBWA | TCR_ORGN0_WBWA
+		| TCR_SH1_IS | TCR_IRGN1_WBWA | TCR_ORGN1_WBWA;
 
-	// Enable TTBR1
-	tcr &= ~TCR_EPD1_DISABLE;
-
-	// Set space for kernel space
-	tcr &= ~T1SZ_MASK; // Clear
-	// TODO: Compiler dependency?
-	tcr |= TCR_T1SZ(__builtin_popcountl(KERNEL_BASE));
-
-	// Set granule sizes to 4KB
-	tcr &= ~TCR_TG0_MASK;
-	tcr |= TCR_TG0_4K;
-	tcr &= ~TCR_TG1_MASK;
-	tcr |= TCR_TG1_4K;
+#if B_PAGE_SIZE == 4096
+	tcr |= TCR_TG0_4K | TCR_TG1_4K;
+#elif B_PAGE_SIZE == 16384
+	tcr |= TCR_TG0_16K | TCR_TG1_16K;
+#endif
 
 	// Set the maximum PA size to the maximum supported by the hardware.
 	uint64_t pa_size = READ_SPECIALREG(ID_AA64MMFR0_EL1) & ID_AA64MMFR0_PA_RANGE_MASK;
@@ -136,13 +129,15 @@ void arch_mmu_setup_EL1(uint64 tcr) {
 	// we don't support, so clamp the maximum to 256 terabytes.
 	if (pa_size == ID_AA64MMFR0_PA_RANGE_4P)
 		pa_size = ID_AA64MMFR0_PA_RANGE_256T;
-	tcr &= ~IPS_MASK;
 	tcr |= pa_size << TCR_IPS_SHIFT;
 
 	// Flush the cache so that we don't receive unexpected writebacks later.
 	_arch_cache_clean_poc();
 
 	WRITE_SPECIALREG(TCR_EL1, tcr);
+	WRITE_SPECIALREG(MAIR_EL1, MAIR_VALUE);
+	WRITE_SPECIALREG(TTBR0_EL1, sTTBR0);
+	WRITE_SPECIALREG(TTBR1_EL1, sTTBR1);
 
 	// Invalidate all TLB entries. Also ensures that all memory traffic has
 	// resolved, and flushes the instruction pipeline.
@@ -216,32 +211,19 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 		return;
 	}
 
-	if (arch_mmu_read_access(virt_addr) && arch_mmu_read_access(virt_addr + size)) {
-		TRACE("Range already covered in current MMU\n");
-		return;
-	}
-
 	uint64 address;
-
 	if (arch_mmu_is_kernel_address(virt_addr)) {
-		// Use TTBR1
-		address = READ_SPECIALREG(TTBR1_EL1);
+		address = (uint64)sTTBR1;
 	} else {
-		// ok, but USE instead TTBR0
-		if (arch_exception_level() == 1)
-			address = READ_SPECIALREG(TTBR0_EL1);
-		else
-			address = READ_SPECIALREG(TTBR0_EL2);
+		address = (uint64)sTTBR0;
 	}
 
 	map_region(virt_addr, phys_addr, PAGE_ALIGN(size),
 		0, flags, reinterpret_cast<uint64*>(address));
 
-// 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
-// 		map_page(virt_addr + offset, phys_addr + offset, flags);
-// 	}
-
-	ASSERT_ALWAYS(insert_virtual_allocated_range(virt_addr, size) >= B_OK);
+	if (arch_mmu_is_kernel_address(virt_addr)) {
+		ASSERT_ALWAYS(insert_virtual_allocated_range(virt_addr, size) >= B_OK);
+	}
 }
 
 
@@ -303,32 +285,11 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 void
 arch_mmu_allocate_kernel_page_tables(void)
 {
-	uint64* page = NULL;
-	uint64 ttbr1 = READ_SPECIALREG(TTBR1_EL1);
-
-	// Trust possible previous allocations of TTBR1
-	// only if we come from a preset EL1 context
-	if (ttbr1 != 0ll) {
-		if (arch_exception_level() == 1) {
-			page = reinterpret_cast<uint64*>(ttbr1);
-			TRACE("Reusing TTBR1_EL1 present : %" B_PRIx64 "\n", ttbr1);
-		} else if (arch_exception_level() == 2) {
-			TRACE("Ignoring EL1 TTBR1(%" B_PRIx64") tables\n", ttbr1);
-		}
+	sTTBR0 = CurrentRegime.AllocatePage();
+	sTTBR1 = CurrentRegime.AllocatePage();
+	if (sTTBR0 == NULL || sTTBR1 == NULL) {
+		panic("Not enough memory for kernel initial page tables\n");
 	}
-
-	// NOTE: On devices supporting multiple translation base registers, TTBR0 must
-	// be used solely.
-	if (page == NULL) {
-		page = CurrentRegime.AllocatePage();
-		if (page != NULL) {
-			WRITE_SPECIALREG(TTBR1_EL1, page);
-		} else {
-			panic("Not enough memory for kernel initial page\n");
-		}
-	}
-
-	sPageDirectory = page;
 }
 
 
@@ -347,11 +308,17 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		descriptor_size, descriptor_version,
 		PHYSICAL_MEMORY_LOW, PHYSICAL_MEMORY_HIGH);
 
-	TRACE("Mapping EFI_MEMORY_RUNTIME\n");
+	TRACE("Mapping EFI memory\n");
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor* entry = (efi_memory_descriptor*)(memory_map_addr + i * descriptor_size);
-		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0)
-			map_range(entry->VirtualStart, entry->PhysicalStart,
+		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0
+			|| (entry->Type == EfiLoaderCode)
+			|| (entry->Type == EfiLoaderData)
+			|| (entry->Type == EfiBootServicesData)
+			|| (entry->Type == EfiBootServicesCode)
+			|| (entry->Type == EfiReservedMemoryType)
+			)
+			map_range(entry->PhysicalStart, entry->PhysicalStart,
 				entry->NumberOfPages * B_PAGE_SIZE,
 				ARMv8TranslationTableDescriptor::DefaultCodeAttribute | currentMair.MaskOf(MAIR_NORMAL_WB));
 	}
@@ -381,6 +348,9 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		uint64 regs_size = ROUNDUP(gKernelArgs.arch_args.uart.regs.size, B_PAGE_SIZE);
 		uint64 base = get_next_virtual_address(regs_size);
 
+		map_range(regs_start, regs_start, regs_size,
+			ARMv8TranslationTableDescriptor::DefaultPeripheralAttribute |
+			currentMair.MaskOf(MAIR_DEVICE_nGnRnE));
 		map_range(base, regs_start, regs_size,
 			ARMv8TranslationTableDescriptor::DefaultPeripheralAttribute |
 			currentMair.MaskOf(MAIR_DEVICE_nGnRnE));
@@ -392,11 +362,11 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		gKernelArgs.num_virtual_allocated_ranges);
 
 	addr_t vir_pgdir;
-	platform_bootloader_address_to_kernel_address((void*)sPageDirectory, &vir_pgdir);
+	platform_bootloader_address_to_kernel_address((void*)sTTBR1, &vir_pgdir);
 
-	gKernelArgs.arch_args.phys_pgdir = (uint64)sPageDirectory;
+	gKernelArgs.arch_args.phys_pgdir = (uint64)sTTBR1;
 	gKernelArgs.arch_args.vir_pgdir = (uint32)vir_pgdir;
-	gKernelArgs.arch_args.next_pagetable = (uint64)(sNextPageTable) - (uint64)sPageDirectory;
+	gKernelArgs.arch_args.next_pagetable = (uint64)(sNextPageTable) - (uint64)sTTBR1;
 
 	TRACE("gKernelArgs.arch_args.phys_pgdir     = 0x%08x\n",
 		(uint32_t)gKernelArgs.arch_args.phys_pgdir);
@@ -408,5 +378,5 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	if (kTracePageDirectory)
 		arch_mmu_dump_present_tables();
 
-	return (uint64_t)sPageDirectory;
+	return (uint64_t)sTTBR1;
 }

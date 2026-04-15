@@ -499,11 +499,16 @@
 /* MAIR_EL1 - Memory Attribute Indirection Register */
 #define	MAIR_ATTR_MASK(idx)	(0xff << ((n)* 8))
 #define	MAIR_ATTR(attr, idx) ((attr) << ((idx) * 8))
-#define	 MAIR_DEVICE_nGnRnE	0x00
-#define	 MAIR_DEVICE_nGnRE	0x04
-#define	 MAIR_NORMAL_NC		0x44
-#define	 MAIR_NORMAL_WT		0xbb
-#define	 MAIR_NORMAL_WB		0xff
+#define	 MAIR_DEVICE_nGnRnE	0x00UL
+#define	 MAIR_DEVICE_nGnRE	0x04UL
+#define	 MAIR_NORMAL_NC		0x44UL
+#define	 MAIR_NORMAL_WT		0xbbUL
+#define	 MAIR_NORMAL_WB		0xffUL
+#define	MAIR_VALUE (MAIR_ATTR(MAIR_DEVICE_nGnRnE, 0) | \
+			MAIR_ATTR(MAIR_DEVICE_nGnRE, 1) | \
+			MAIR_ATTR(MAIR_NORMAL_NC, 2) | \
+			MAIR_ATTR(MAIR_NORMAL_WT, 3) | \
+			MAIR_ATTR(MAIR_NORMAL_WB, 4))
 
 /* PAR_EL1 - Physical Address Register */
 #define	PAR_F_SHIFT		0

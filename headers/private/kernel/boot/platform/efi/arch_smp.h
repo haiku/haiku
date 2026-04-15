@@ -29,6 +29,7 @@ void arch_smp_register_cpu(platform_cpu_info** cpu);
 struct platform_cpu_info {
 	uint32 id;
 	uint64 mpidr;
+	uint64 releaseAddr;
 };
 
 void arch_smp_register_cpu(platform_cpu_info** cpu);

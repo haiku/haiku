@@ -52,7 +52,7 @@ status_t
 arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physicalPageMapper)
 {
 	// nuke TTBR0 mapping, we use identity mapping in kernel space at KERNEL_PMAP_BASE
-	memset((void*) READ_SPECIALREG(TTBR0_EL1), 0, B_PAGE_SIZE);
+	memset((void*) (KERNEL_PMAP_BASE + READ_SPECIALREG(TTBR0_EL1)), 0, B_PAGE_SIZE);
 
 	uint64_t mair = READ_SPECIALREG(MAIR_EL1);
 	uint64_t mmfr1 = READ_SPECIALREG(ID_AA64MMFR1_EL1);

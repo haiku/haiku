@@ -37,11 +37,6 @@ arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 		tcr |= (1UL << 40) | (1UL << 39);
 	}
 
-	tcr |= TCR_SH1_IS | TCR_IRGN1_WBWA | TCR_ORGN1_WBWA;
-	tcr |= TCR_SH0_IS | TCR_IRGN0_WBWA | TCR_ORGN0_WBWA;
-	tcr &= ~TCR_T0SZ(0x1f);
-	tcr |= TCR_T0SZ(16);
-
 	WRITE_SPECIALREG(TCR_EL1, tcr);
 
 	return 0;
