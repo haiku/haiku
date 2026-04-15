@@ -144,7 +144,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 
 status_t 
-platform_register_boot_device(Node *device)
+platform_register_boot_device(Node *device, disk_identifier* defaultDiskID)
 {
 	TRACE("platform_register_boot_device\n");
 

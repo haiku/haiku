@@ -92,44 +92,6 @@ EfiDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 }
 
 
-static off_t
-get_next_check_sum_offset(int32 index, off_t maxSize)
-{
-	TRACE("%s: called\n", __func__);
-
-	if (index < 2)
-		return index * 512;
-
-	if (index < 4)
-		return (maxSize >> 10) + index * 2048;
-
-	return ((system_time() + index) % (maxSize >> 9)) * 512;
-}
-
-
-static uint32
-compute_check_sum(Node *device, off_t offset)
-{
-	TRACE("%s: called\n", __func__);
-
-	char buffer[512];
-	ssize_t bytesRead = device->ReadAt(NULL, offset, buffer, sizeof(buffer));
-	if (bytesRead < B_OK)
-		return 0;
-
-	if (bytesRead < (ssize_t)sizeof(buffer))
-		memset(buffer + bytesRead, 0, sizeof(buffer) - bytesRead);
-
-	uint32 *array = (uint32*)buffer;
-	uint32 sum = 0;
-
-	for (uint32 i = 0; i < (bytesRead + sizeof(uint32) - 1) / sizeof(uint32); i++)
-		sum += array[i];
-
-	return sum;
-}
-
-
 static bool
 device_contains_partition(EfiDevice *device, boot::Partition *partition)
 {
@@ -277,22 +239,9 @@ platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
 
 
 status_t
-platform_register_boot_device(Node *device)
+platform_register_boot_device(Node *device, disk_identifier* defaultDiskID)
 {
 	TRACE("%s: called\n", __func__);
-
-	// TODO not used for network boot, can be moved to disk boot case?
-	disk_identifier identifier;
-	identifier.bus_type = UNKNOWN_BUS;
-	identifier.device_type = UNKNOWN_DEVICE;
-	identifier.device.unknown.size = device->Size();
-
-	for (uint32 i = 0; i < NUM_DISK_CHECK_SUMS; ++i) {
-		off_t offset = get_next_check_sum_offset(i, device->Size());
-		identifier.device.unknown.check_sums[i].offset = offset;
-		identifier.device.unknown.check_sums[i].sum = compute_check_sum(device,
-			offset);
-	}
 
 	// TODO is there no better way to identify network boot?
 	char buffer[11];
@@ -322,7 +271,7 @@ platform_register_boot_device(Node *device)
 	}
 
 	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
-		&identifier, sizeof(disk_identifier));
+		defaultDiskID, sizeof(disk_identifier));
 
 	return B_OK;
 }

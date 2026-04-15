@@ -8,6 +8,7 @@
 
 #include <SupportDefs.h>
 #include <boot/vfs.h>
+#include <boot/disk_identifier.h>
 
 
 struct stage2_args;
@@ -60,7 +61,7 @@ extern status_t platform_add_boot_device(struct stage2_args *args, NodeList *dev
 extern status_t platform_add_block_devices(struct stage2_args *args, NodeList *devicesList);
 extern status_t platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
 					NodeList *partitions, NodeList *bootPartitions);
-extern status_t platform_register_boot_device(Node *device);
+extern status_t platform_register_boot_device(Node *device, disk_identifier *defaultDiskID);
 extern void platform_cleanup_devices();
 extern void platform_load_ucode(BootVolume& volume);
 

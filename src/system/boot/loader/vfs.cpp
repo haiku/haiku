@@ -614,6 +614,32 @@ vfs_init(stage2_args *args)
 }
 
 
+/**	Computes a check sum for the specified block.
+ *	The check sum is the sum of all data in that block interpreted as an
+ *	array of uint32 values.
+ *	Note, this must use the same method as the one used in kernel/fs/vfs_boot.cpp.
+ */
+static uint32
+compute_check_sum(Node* device, off_t offset)
+{
+	char buffer[512];
+	ssize_t bytesRead = device->ReadAt(NULL, offset, buffer, sizeof(buffer));
+	if (bytesRead < B_OK)
+		return 0;
+
+	if (bytesRead < (ssize_t)sizeof(buffer))
+		memset(buffer + bytesRead, 0, sizeof(buffer) - bytesRead);
+
+	uint32 *array = (uint32*)buffer;
+	uint32 sum = 0;
+
+	for (uint32 i = 0; i < (bytesRead + sizeof(uint32) - 1) / sizeof(uint32); i++)
+		sum += array[i];
+
+	return sum;
+}
+
+
 status_t
 register_boot_file_system(BootVolume& bootVolume)
 {
@@ -644,7 +670,25 @@ register_boot_file_system(BootVolume& bootVolume)
 		return B_ERROR;
 	}
 
-	return platform_register_boot_device(device);
+	disk_identifier defaultDiskID = {
+		.bus_type = UNKNOWN_BUS,
+		.device_type = UNKNOWN_DEVICE,
+	};
+	defaultDiskID.device.unknown.size = device->Size();
+	// Checksum the first four blocks, which will cover the
+	// whole MBR partition table and the disk GUID on GPT,
+	// plus one block suggested by the file system, which will cover 
+	// the BFS root inode.
+	for (uint32 i = 0; i < NUM_DISK_CHECK_SUMS; ++i) {
+		off_t offset = i * 512;
+		if (i == NUM_DISK_CHECK_SUMS - 1)
+			offset = partition->offset + partition->BlockForIdentifierChecksum();
+		defaultDiskID.device.unknown.check_sums[i].offset = offset;
+		defaultDiskID.device.unknown.check_sums[i].sum = compute_check_sum(device,
+			offset);
+	}
+
+	return platform_register_boot_device(device, &defaultDiskID);
 }
 
 

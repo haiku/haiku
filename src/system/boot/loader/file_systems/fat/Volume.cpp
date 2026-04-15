@@ -403,7 +403,7 @@ Volume::_ClusterAllocated(uint32 cluster)
 
 
 float
-dosfs_identify_file_system(boot::Partition *partition)
+dosfs_identify_file_system(boot::Partition *partition, off_t *_blockForChecksum)
 {
 	TRACE(("%s()\n", __FUNCTION__));
 	Volume volume(partition);

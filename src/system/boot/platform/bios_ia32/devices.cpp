@@ -363,51 +363,6 @@ fill_disk_identifier_v2(disk_identifier &disk, const drive_parameters &parameter
 	return B_OK;
 }
 
-
-static off_t
-get_next_check_sum_offset(int32 index, off_t maxSize)
-{
-	// The boot block often contains the disk superblock, and should be
-	// unique enough for most cases
-	if (index < 2)
-		return index * 512;
-
-	// Try some data in the first part of the drive
-	if (index < 4)
-		return (maxSize >> 10) + index * 2048;
-
-	// Some random value might do
-	return ((system_time() + index) % (maxSize >> 9)) * 512;
-}
-
-
-/**	Computes a check sum for the specified block.
- *	The check sum is the sum of all data in that block interpreted as an
- *	array of uint32 values.
- *	Note, this must use the same method as the one used in kernel/fs/vfs_boot.cpp.
- */
-
-static uint32
-compute_check_sum(BIOSDrive *drive, off_t offset)
-{
-	char buffer[512];
-	ssize_t bytesRead = drive->ReadAt(NULL, offset, buffer, sizeof(buffer));
-	if (bytesRead < B_OK)
-		return 0;
-
-	if (bytesRead < (ssize_t)sizeof(buffer))
-		memset(buffer + bytesRead, 0, sizeof(buffer) - bytesRead);
-
-	uint32 *array = (uint32 *)buffer;
-	uint32 sum = 0;
-
-	for (uint32 i = 0; i < (bytesRead + sizeof(uint32) - 1) / sizeof(uint32); i++) {
-		sum += array[i];
-	}
-
-	return sum;
-}
-
 /**	Checks if the specified drive is usable for reading.
  */
 
@@ -419,106 +374,8 @@ is_drive_readable(BIOSDrive *drive)
 }
 
 
-static void
-find_unique_check_sums(NodeList *devices)
-{
-	NodeIterator iterator = devices->GetIterator();
-	Node *device;
-	int32 index = 0;
-	off_t minSize = 0;
-	const int32 kMaxTries = 200;
-
-	while (index < kMaxTries) {
-		bool clash = false;
-
-		iterator.Rewind();
-
-		while ((device = iterator.Next()) != NULL) {
-			BIOSDrive *drive = (BIOSDrive *)device;
-#if 0
-			// there is no RTTI in the boot loader...
-			BIOSDrive *drive = dynamic_cast<BIOSDrive *>(device);
-			if (drive == NULL)
-				continue;
-#endif
-
-			// TODO: currently, we assume that the BIOS provided us with unique
-			//	disk identifiers... hopefully this is a good idea
-			if (drive->Identifier().device_type != UNKNOWN_DEVICE)
-				continue;
-
-			if (minSize == 0 || drive->Size() < minSize)
-				minSize = drive->Size();
-
-			// check for clashes
-
-			NodeIterator compareIterator = devices->GetIterator();
-			while ((device = compareIterator.Next()) != NULL) {
-				BIOSDrive *compareDrive = (BIOSDrive *)device;
-
-				if (compareDrive == drive
-					|| compareDrive->Identifier().device_type != UNKNOWN_DEVICE)
-					continue;
-
-// TODO: Until we can actually get and compare *all* fields of the disk
-// identifier in the kernel, we cannot compare the whole structure (we also
-// should be more careful zeroing the structure before we fill it).
-#if 0
-				if (!memcmp(&drive->Identifier(), &compareDrive->Identifier(),
-						sizeof(disk_identifier))) {
-					clash = true;
-					break;
-				}
-#else
-				const disk_identifier& ourId = drive->Identifier();
-				const disk_identifier& otherId = compareDrive->Identifier();
-				if (memcmp(&ourId.device.unknown.check_sums,
-						&otherId.device.unknown.check_sums,
-						sizeof(ourId.device.unknown.check_sums)) == 0) {
-					clash = true;
-				}
-#endif
-			}
-
-			if (clash)
-				break;
-		}
-
-		if (!clash) {
-			// our work here is done.
-			return;
-		}
-
-		// add a new block to the check sums
-
-		off_t offset = get_next_check_sum_offset(index, minSize);
-		int32 i = index % NUM_DISK_CHECK_SUMS;
-		iterator.Rewind();
-
-		while ((device = iterator.Next()) != NULL) {
-			BIOSDrive *drive = (BIOSDrive *)device;
-
-			disk_identifier& disk = drive->Identifier();
-			disk.device.unknown.check_sums[i].offset = offset;
-			disk.device.unknown.check_sums[i].sum = compute_check_sum(drive, offset);
-
-			TRACE(("disk %x, offset %lld, sum %" B_PRIu32 "\n", drive->DriveID(), offset,
-				disk.device.unknown.check_sums[i].sum));
-		}
-
-		index++;
-	}
-
-	// If we get here, we couldn't find a way to differentiate all disks from each other.
-	// It's very likely that one disk is an exact copy of the other, so there is nothing
-	// we could do, anyway.
-
-	dprintf("Could not make BIOS drives unique! Might boot from the wrong disk...\n");
-}
-
-
 static status_t
-add_block_devices(NodeList *devicesList, bool identifierMissing)
+add_block_devices(NodeList *devicesList)
 {
 	if (sBlockDevicesAdded)
 		return B_OK;
@@ -550,14 +407,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 			continue;
 		}
 
-		if (drive->FillIdentifier() != B_OK)
-			identifierMissing = true;
-	}
-
-	if (identifierMissing) {
-		// we cannot distinguish between all drives by identifier, we need
-		// compute checksums for them
-		find_unique_check_sums(devicesList);
+		drive->FillIdentifier();
 	}
 
 	sBlockDevicesAdded = true;
@@ -836,13 +686,6 @@ BIOSDrive::FillIdentifier()
 	}
 
 	fIdentifier.bus_type = UNKNOWN_BUS;
-	fIdentifier.device_type = UNKNOWN_DEVICE;
-	fIdentifier.device.unknown.size = Size();
-
-	for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
-		fIdentifier.device.unknown.check_sums[i].offset = -1;
-		fIdentifier.device.unknown.check_sums[i].sum = 0;
-	}
 
 	return B_ERROR;
 }
@@ -868,7 +711,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	if (drive->FillIdentifier() != B_OK) {
 		// We need to add all block devices to give the kernel the possibility
 		// to find the right boot volume
-		add_block_devices(devicesList, true);
+		add_block_devices(devicesList);
 	}
 
 	TRACE(("boot drive size: %lld bytes\n", drive->Size()));
@@ -907,20 +750,25 @@ platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
 status_t
 platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 {
-	return add_block_devices(devicesList, false);
+	return add_block_devices(devicesList);
 }
 
 
 status_t
-platform_register_boot_device(Node *device)
+platform_register_boot_device(Node *device, disk_identifier *defaultDiskID)
 {
 	BIOSDrive *drive = (BIOSDrive *)device;
 
 	check_cd_boot(drive);
 
 	gBootParams.SetInt64("boot drive number", drive->DriveID());
-	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
-		&drive->Identifier(), sizeof(disk_identifier));
+	if (drive->Identifier().bus_type != UNKNOWN_BUS) {
+		gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
+			&drive->Identifier(), sizeof(disk_identifier));
+	} else {
+		gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
+			defaultDiskID, sizeof(disk_identifier));
+	}
 
 	return B_OK;
 }

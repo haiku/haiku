@@ -214,7 +214,7 @@ platform_add_block_devices(struct stage2_args *args, NodeList *list)
 
 
 status_t 
-platform_register_boot_device(Node *device)
+platform_register_boot_device(Node *device, disk_identifier *defaultDiskID)
 {
 	return B_OK;
 }

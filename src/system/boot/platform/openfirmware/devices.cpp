@@ -224,15 +224,9 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 
 status_t 
-platform_register_boot_device(Node *device)
+platform_register_boot_device(Node *device, disk_identifier *defaultDiskID)
 {
-	disk_identifier disk;
-
-	disk.bus_type = UNKNOWN_BUS;
-	disk.device_type = UNKNOWN_DEVICE;
-	disk.device.unknown.size = device->Size();
-
-	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE, &disk,
+	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE, defaultDiskID,
 		sizeof(disk_identifier));
 
 	return B_OK;

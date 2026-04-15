@@ -135,11 +135,17 @@ Volume::ToBlockRun(off_t block) const
 
 
 float
-bfs_identify_file_system(boot::Partition *partition)
+bfs_identify_file_system(boot::Partition *partition, off_t *_blockForChecksum)
 {
 	Volume volume(partition);
 
-	return volume.InitCheck() < B_OK ? 0 : 0.8;
+	if (volume.InitCheck() < B_OK)
+		return 0;
+
+	// Root inode has a unique be:volume_id attribute
+	// within small_data plus some unique timestamps
+	*_blockForChecksum = volume.BlockSize() * volume.ToBlock(volume.Root());
+	return 0.8;
 }
 
 
@@ -166,4 +172,3 @@ file_system_module_info gBFSFileSystemModule = {
 	bfs_identify_file_system,
 	bfs_get_file_system
 };
-

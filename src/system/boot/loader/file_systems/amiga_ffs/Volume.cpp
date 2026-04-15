@@ -101,7 +101,7 @@ Volume::InitCheck()
 
 
 float
-amiga_ffs_identify_file_system(boot::Partition *partition)
+amiga_ffs_identify_file_system(boot::Partition *partition, off_t *_blockForChecksum)
 {
 	Volume volume(partition);
 

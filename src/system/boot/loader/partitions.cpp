@@ -359,13 +359,15 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		if (sFileSystemModules[i]->identify_file_system == NULL)
 			continue;
 
-		float priority = sFileSystemModules[i]->identify_file_system(this);
+		off_t blockForChecksum = 0;
+		float priority = sFileSystemModules[i]->identify_file_system(this, &blockForChecksum);
 		if (priority <= 0)
 			continue;
 
 		if (priority > bestFSPriority) {
 			bestFSModule = sFileSystemModules[i];
 			bestFSPriority = priority;
+			fBlockForChecksum = blockForChecksum;
 		}
 	}
 
