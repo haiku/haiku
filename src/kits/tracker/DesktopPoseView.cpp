@@ -64,6 +64,7 @@ DesktopPoseView::DesktopPoseView(Model* model, uint32 viewMode)
 	BPoseView(model, viewMode)
 {
 	SetFlags(Flags() | B_DRAW_ON_CHILDREN);
+	SetAutoScroll(false);
 }
 
 
@@ -176,6 +177,13 @@ bool
 DesktopPoseView::HasSystemColors() const
 {
 	return false;
+}
+
+
+void
+DesktopPoseView::ScrollTo(BPoint where)
+{
+	debugger("DesktopPoseView::ScrollTo() - Forbidden to scroll Desktop.");
 }
 
 
