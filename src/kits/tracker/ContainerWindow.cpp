@@ -2433,7 +2433,8 @@ BContainerWindow::ShowDropContextMenu(BPoint where, BPoseView* source)
 		}
 	}
 
-	item = fDropContextMenu->Go(global, true, true);
+	// Don't send message, sticky menu, synchronous
+	item = fDropContextMenu->Go(global, false, true, false);
 	if (item != NULL)
 		return item->Command();
 

@@ -4514,6 +4514,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* target
 	BView* view, BPoint dropPoint)
 {
 	uint32 buttons = (uint32)message->FindInt32("buttons");
+	uint32 moveMode = 0;
 
 	BContainerWindow* window = NULL;
 	BPoseView* poseView = dynamic_cast<BPoseView*>(view);
@@ -4698,7 +4699,6 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* target
 					canCopy = true;
 			}
 
-			uint32 moveMode;
 			if (canCopy)
 				moveMode = kCopySelectionTo;
 			else if (canMove)
@@ -4899,11 +4899,11 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* target
 		}
 	}
 
-	if (poseView != NULL && !wasHandled) {
-		BPoint where = message->FindPoint("click_pt");
+	if (!wasHandled && poseView != NULL) {
+		BPoint where = message->GetPoint("click_pt", B_ORIGIN);
 		// TODO: removed check for root here need to do that, possibly at a
 		// different level
-		poseView->MoveSelectionTo(dropPoint, where, srcWindow);
+		poseView->MoveSelectionTo(targetModel, dropPoint, srcWindow, where, moveMode);
 	}
 
 	if (poseView != NULL && poseView->fEnsurePosesVisible)
@@ -4971,22 +4971,82 @@ BPoseView::DragSelectionContains(const BPose* target,
 }
 
 
+/* MoveTo/CopyTo/LinkTo menu version of MoveSelectionInto()
+ *
+ * The mouse cursor location is not helpful here since we're navigating
+ * menus potentially on a different view. Find the next available slot
+ * to move/copy/link the poses to.
+ */
 void
 BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	bool forceCopy, bool forceMove, bool createLink, bool relativeLink)
 {
-	BPoint dropPoint;
+	BPoint where;
 	uint32 buttons;
-	GetMouse(&dropPoint, &buttons);
-	MoveSelectionInto(destFolder, srcWindow, dynamic_cast<BContainerWindow*>(Window()),
-		buttons, dropPoint, forceCopy, forceMove, createLink, relativeLink);
+	GetMouse(&where, &buttons);
+
+	int32 end = 0;
+	BPoint dropPoint(where);
+		// drop point is valid but not very helpful right now
+
+	// get destination view drop point in view coordinates if we can
+	BContainerWindow* destWindow = NULL;
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	if (tracker != NULL) {
+		destWindow = tracker->FindContainerWindow(destFolder->NodeRef());
+		if (destWindow != NULL && destWindow->LockLooper()) {
+			BPoseView* destPoseView = destWindow->PoseView();
+			if (destPoseView != NULL && destPoseView->ViewMode() != kListMode) {
+				BRect destViewBounds(destPoseView->Bounds());
+				PoseList* poseList = destPoseView->CurrentPoseList();
+				// find an empty slot to put the new pose
+				if (poseList != NULL && poseList->ItemAt(0) != NULL) {
+					end = poseList->CountItems();
+					BRect slotRect(poseList->ItemAt(0)->CalcRect(destPoseView));
+					for (int32 i = 0; i < end && SlotOccupied(slotRect, destViewBounds); i++)
+						NextSlot(poseList->ItemAt(i), slotRect, destViewBounds);
+					// set the drop point to the next empty slot
+					dropPoint = slotRect.LeftTop();
+				} else {
+					// empty folder, set drop point to top left of view offset by a bit
+					dropPoint = destViewBounds.OffsetByCopy(20, 20).LeftTop();
+				}
+				// translate coordinates from dest view to view
+				dropPoint = ConvertFromScreen(destPoseView->ConvertToScreen(dropPoint));
+			}
+			destWindow->UnlockLooper();
+		}
+	}
+
+	MoveSelectionInto(destFolder, srcWindow, destWindow, buttons, dropPoint,
+		forceCopy, forceMove, createLink, relativeLink, where - dropPoint);
+
+	// auto-place new poses
+	if (destWindow != NULL && destWindow->LockLooper()) {
+		BPoseView* destPoseView = destWindow->PoseView();
+		if (destPoseView != NULL && destPoseView->ViewMode() != kListMode) {
+			int32 start = end;
+			PoseList* poseList = destPoseView->CurrentPoseList();
+			if (poseList != NULL) {
+				end = poseList->CountItems();
+				for (int32 i = start; i < end; i++) {
+					BPose* pose = poseList->ItemAt(i);
+					if (pose != NULL)
+						pose->SetAutoPlaced(true);
+				}
+			}
+			if (end > start)
+				destPoseView->CheckAutoPlacedPoses();
+		}
+		destWindow->UnlockLooper();
+	}
 }
 
 
 void
 BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	BContainerWindow* destWindow, uint32 buttons, BPoint dropPoint, bool forceCopy,
-	bool forceMove, bool createLink, bool relativeLink, BPoint where, bool pinToGrid)
+	bool forceMove, bool createLink, bool createRelativeLink, BPoint dragStart, bool pinToGrid)
 {
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
@@ -4997,7 +5057,6 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	if (srcWindow->PoseView()->CountSelected() == 0)
 		return;
 
-	bool createRelativeLink = relativeLink;
 	if (destWindow != NULL && SecondaryMouseButtonDown(modifiers(), buttons)) {
 		BPoseView* poseView = (srcWindow != NULL ? srcWindow->PoseView() : NULL);
 		switch (destWindow->ShowDropContextMenu(dropPoint, poseView)) {
@@ -5025,15 +5084,11 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	}
 
 	// make sure source and destination folders are different
-	if (*srcWindow->PoseView()->TargetModel()->NodeRef() == *destFolder->NodeRef()) {
+	if (*srcWindow->PoseView()->TargetModel()->NodeRef() == *destFolder->NodeRef()
+		&& !(createLink || createRelativeLink)) {
 		BPoseView* targetView = srcWindow->PoseView();
 		if (forceCopy) {
-			targetView->DuplicateSelection(&where, &dropPoint);
-			return;
-		}
-
-		if (createLink || createRelativeLink) {
-			// cannot create link or relative link in the same folder
+			targetView->DuplicateSelection(&dragStart, &dropPoint);
 			return;
 		}
 
@@ -5042,7 +5097,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			return;
 		}
 
-		BPoint delta = dropPoint - where;
+		BPoint delta = dropPoint - dragStart;
 		int32 selectCount = targetView->CountSelected();
 		for (int32 index = 0; index < selectCount; index++) {
 			BPose* pose = targetView->SelectionList()->ItemAt(index);
@@ -5052,16 +5107,14 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			// need to do this because bsearch uses top of pose
 			// to locate pose to remove
 			targetView->RemoveFromVSList(pose);
-			BPoint location(pose->Location(targetView) + delta);
+			BPoint loc(pose->Location(targetView) + delta);
 			BRect oldBounds(pose->CalcRect(targetView));
-			if (pinToGrid) {
-				location = targetView->PinToGrid(location, targetView->fGrid,
-					targetView->fOffset);
-			}
+			if (pinToGrid)
+				loc = targetView->PinToGrid(loc, targetView->fGrid, targetView->fOffset);
 
 			// TODO: don't drop poses under desktop elements
 			//		 ie: replicants, deskbar
-			pose->MoveTo(location, targetView);
+			pose->MoveTo(loc, targetView);
 
 			targetView->RemoveFromExtent(oldBounds);
 			targetView->AddToExtent(pose->CalcRect(targetView));
@@ -5126,9 +5179,9 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
-		BList* pointList = destWindow->PoseView()->GetDropPointList(where, dropPoint,
+		BList* pointList = destWindow->PoseView()->GetDropPointList(dragStart, dropPoint,
 			selectionList, srcWindow->PoseView()->ViewMode() == kListMode, pinToGrid);
-		int32 selectionSize = selectionList->CountItems();
+		int32 selectionSize = srcWindow->PoseView()->CountSelected();
 		BObjectList<entry_ref, true>* srcList = new BObjectList<entry_ref, true>(selectionSize);
 
 		if (srcWindow->TargetModel()->IsVirtualDirectory()) {
@@ -5166,7 +5219,8 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 
 
 void
-BPoseView::MoveSelectionTo(BPoint dropPoint, BPoint where, BContainerWindow* srcWindow)
+BPoseView::MoveSelectionTo(Model* model, BPoint dropPoint, BContainerWindow* srcWindow,
+	BPoint dragStart, uint32 moveMode)
 {
 	// Moves selection from srcWindow into this window, copying if necessary.
 
@@ -5174,17 +5228,22 @@ BPoseView::MoveSelectionTo(BPoint dropPoint, BPoint where, BContainerWindow* src
 	if (window == NULL)
 		return;
 
-	ASSERT(window->PoseView() != NULL);
-	ASSERT(TargetModel() != NULL);
+	if (model == NULL)
+		model = TargetModel();
+
+	ASSERT(model != NULL);
 
 	// make sure this window is a legal drop target
-	if (srcWindow != window && !TargetModel()->IsDropTarget())
+	if (srcWindow != window && !model->IsDropTarget())
 		return;
 
-	uint32 buttons = (uint32)window->CurrentMessage()->FindInt32("buttons");
+	ASSERT(window->CurrentMessage() != NULL);
+
+	uint32 buttons = (uint32)window->CurrentMessage()->GetInt32("buttons", 0);
 	bool pinToGrid = (modifiers() & B_COMMAND_KEY) != 0;
-	MoveSelectionInto(TargetModel(), srcWindow, window, buttons, dropPoint,
-		false, false, false, false, where, pinToGrid);
+
+	MoveSelectionInto(model, srcWindow, window, buttons, dropPoint, false, false,
+		moveMode == kCreateLink, moveMode == kCreateRelativeLink, dragStart, pinToGrid);
 }
 
 

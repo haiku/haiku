@@ -980,6 +980,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 		}
 
 		case kCreateLink:
+		case kCreateRelativeLink:
 			if (numItems > 10) {
 				// this will be fast, only put up status if lots of items
 				// moved, links created
@@ -1317,7 +1318,7 @@ CopyFile(BEntry* srcFile, StatStruct* srcStat, BDirectory* destDir,
 				throw (status_t)err;
 			} else {
 				// user selected continue in spite of error, update status bar
-				loopControl->UpdateStatus(NULL, ref, (int32)srcStat->st_size);
+				loopControl->UpdateStatus(NULL, ref, srcStat->st_size);
 			}
 		}
 	}
@@ -1752,9 +1753,10 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 		MoveError::FailOnError(destDir->GetNodeRef(&destNode));
 
 		if (moveMode == kCreateLink || moveMode == kCreateRelativeLink) {
-			PoseInfo poseInfo;
 			char name[B_FILE_NAME_LENGTH];
 			strlcpy(name, ref.name, B_FILE_NAME_LENGTH);
+
+			loopControl->UpdateStatus(ref.name, ref, statbuf.st_size, true);
 
 			BSymLink link;
 			BString suffix(" ");
@@ -1762,15 +1764,7 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 			FSMakeOriginalName(name, destDir, suffix);
 			undo.UpdateEntry(entry, name);
 
-			BPath path;
-			entry->GetPath(&path);
-
-			if (loc != NULL && loc != (BPoint*)-1) {
-				poseInfo.fInvisible = false;
-				poseInfo.fInitedDirectory = destNode.node;
-				poseInfo.fLocation = *loc;
-			}
-
+			BPath path(entry);
 			status_t err = B_ERROR;
 
 			if (moveMode == kCreateRelativeLink) {
@@ -1849,11 +1843,21 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 				B_TRANSLATE("Error creating link to \"%name\"."),
 				ref.name);
 
-			if (loc != NULL && loc != (BPoint*)-1)
-				link.WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo, sizeof(PoseInfo));
+			BFile srcFile(entry, B_READ_ONLY);
+			struct stat srcStat;
+			srcFile.GetStat(&srcStat);
+
+			// copy or write new pose location
+			SetupPoseLocation(ref.directory, destNode.node, &srcFile, &link, loc);
 
 			BNodeInfo nodeInfo(&link);
 			nodeInfo.SetType(B_LINK_MIMETYPE);
+
+			link.SetPermissions(srcStat.st_mode);
+			link.SetOwner(srcStat.st_uid);
+			link.SetGroup(srcStat.st_gid);
+			link.SetModificationTime(srcStat.st_mtime);
+			link.SetCreationTime(srcStat.st_crtime);
 
 			return B_OK;
 		}
@@ -2242,9 +2246,7 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	if (moveMode == kCreateLink || moveMode == kCreateRelativeLink) {
 		// if we are creating link in the same directory, the conflict will
 		// be handled later by giving the link a unique name
-		sourceEntry->GetParent(&srcDirectory);
-
-		if (srcDirectory == *destDir)
+		if (sourceEntry->GetParent(&srcDirectory) == B_OK && srcDirectory == *destDir)
 			return B_OK;
 	}
 

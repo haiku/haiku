@@ -919,7 +919,7 @@ OpenWithPoseView::MoveSelectionToTrash(bool)
 
 
 void
-OpenWithPoseView::MoveSelectionTo(BPoint, BPoint, BContainerWindow*)
+OpenWithPoseView::MoveSelectionTo(Model*, BPoint, BContainerWindow*, BPoint, uint32)
 {
 }
 

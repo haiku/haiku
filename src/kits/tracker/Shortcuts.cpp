@@ -1007,7 +1007,7 @@ TShortcuts::UpdateCreateLinkItem(BMenuItem* item)
 
 	if (fInWindow) {
 		item->SetEnabled(HasSelection());
-		item->SetTarget(PoseView());
+		item->SetTarget(fContainerWindow);
 	}
 }
 
@@ -1023,7 +1023,7 @@ TShortcuts::UpdateCreateLinkHereItem(BMenuItem* item)
 
 	if (fInWindow) {
 		item->SetEnabled(HasSelection());
-		item->SetTarget(PoseView());
+		item->SetTarget(fContainerWindow);
 	}
 }
 
@@ -1199,7 +1199,7 @@ TShortcuts::UpdateMoveToItem(BMenuItem* item)
 
 	if (fInWindow) {
 		item->SetEnabled(HasSelection() && !SelectionIsReadOnly());
-		item->SetTarget(PoseView());
+		item->SetTarget(fContainerWindow);
 	}
 }
 

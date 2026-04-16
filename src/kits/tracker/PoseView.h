@@ -286,7 +286,7 @@ public:
 	virtual void OpenSelection(BPose* clicked_pose = NULL, int32* index = NULL);
 	void OpenSelectionUsing(BPose* clicked_pose = NULL, int32* index = NULL);
 		// launches the open with window
-	virtual void MoveSelectionTo(BPoint, BPoint, BContainerWindow*);
+	virtual void MoveSelectionTo(Model*, BPoint, BContainerWindow*, BPoint, uint32);
 	void DuplicateSelection(BPoint* dropStart = NULL,BPoint* dropEnd = NULL);
 
 	// Move to trash calls try to select the next pose in the view
@@ -370,9 +370,9 @@ public:
 	void MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow, bool forceCopy,
 		bool forceMove = false, bool createLink = false, bool relativeLink = false);
 	static void MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
-		BContainerWindow* destWindow, uint32 buttons, BPoint loc, bool forceCopy,
+		BContainerWindow* destWindow, uint32 buttons, BPoint dropPoint, bool forceCopy,
 		bool forceMove = false, bool createLink = false, bool relativeLink = false,
-		BPoint where = B_ORIGIN, bool pinToGrid = false);
+		BPoint dragStart = B_ORIGIN, bool pinToGrid = false);
 
 	bool UpdateDropTarget(BPoint, const BMessage*, bool trackingContextMenu);
 		// return true if drop target changed
