@@ -987,6 +987,10 @@ BPoseView::Pulse()
 void
 BPoseView::ScrollTo(BPoint where)
 {
+	// never scroll Desktop
+	if (IsDesktopView())
+		return;
+
 	_inherited::ScrollTo(where);
 
 	// keep the view state in sync
