@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2026 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/Statable.h	hrev47402
- *		src/kits/storage/Statable.cpp	hrev47402
+ *		headers/os/storage/Statable.h	hrev59636
+ *		src/kits/storage/Statable.cpp	hrev59636
  */
 
 
@@ -59,11 +59,13 @@
 
 	\param stat The stat structure to be filled in.
 
-	\returns A status code.
+	\returns \c B_OK on success, or an error code on failure.
+
 	\retval B_OK Everything went fine.
-	\retval B_NO_MEMORY Could not allocate enough memory.
-	\retval B_BAD_VALUE The node does not exist.
-	\retval B_NOT_ALLOWED Node or volume was read only.
+	\retval B_BAD_VALUE The node does not exist, possibly renamed or deleted.
+	\retval B_FILE_ERROR File descriptor not found.
+	\retval B_ENTRY_NOT_FOUND The node inside a directory could not be found.
+	\retval B_NOT_A_DIRECTORY The node is not a directory, but it should be.
 
 	\since BeOS R3
 */
