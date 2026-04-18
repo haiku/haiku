@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.support	761210807
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		Header har flagg
 32 bit HLS	MediaString		32-biters HLS
 Recording	MediaString		Opptak
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Topp-front-venstre
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Offline
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(Ukjent videoorientering)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32-biters HLSA
 Top-Front-center	MediaString		Topp-front-senter

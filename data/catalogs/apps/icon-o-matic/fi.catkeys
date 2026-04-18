@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	150011047
+1	finnish	x-vnd.haiku-icon_o_matic	2321853629
 None	Icon-O-Matic-Properties		Ei mitään
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -174,7 +174,6 @@ Transformer	Icon-O-Matic-Menus		Muunnin
 Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Käännä {0, plural, one{kärki} other{kärkeä}}
 Invert selection	Icon-O-Matic-Properties		Käännä valinta
 to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	liitetään muuttujiin.
-<unkown property>	Icon-O-Matic-PropertyNames		<tuntematon ominaisuus>
 Pick a color	Icon-O-Matic-ColorPicker		Poimi väri
 Settings…	Icon-O-Matic-SavePanel		Asetukset...
 Select all	Icon-O-Matic-PathManipulator		Valitse kaikki

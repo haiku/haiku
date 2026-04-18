@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	118707012
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	2290549594
 None	Icon-O-Matic-Properties		Geen
 Add empty	Icon-O-Matic-ShapesList		Lege toevoegen
 Opening the icon failed!	Icon-O-Matic-Main		Openen van het icoon is mislukt!
@@ -103,7 +103,6 @@ Scale	Icon-O-Matic-TransformationBoxStates		Schaal veranderen
 All	Icon-O-Matic-Properties		Alle
 Transformer	Icon-O-Matic-Menus		Transformator
 Invert selection	Icon-O-Matic-Properties		Selectie omkeren
-<unkown property>	Icon-O-Matic-PropertyNames		<onbekende eigenschap>
 Pick a color	Icon-O-Matic-ColorPicker		Kleur kiezen
 Settings…	Icon-O-Matic-SavePanel		Instellingen...
 Add with style	Icon-O-Matic-ShapesList		Toevoegen met stijl

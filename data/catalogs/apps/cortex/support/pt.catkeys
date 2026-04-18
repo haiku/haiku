@@ -1,4 +1,4 @@
-1	portuguese	application/x-vnd.Cortex.support	877546517
+1	portuguese	application/x-vnd.Cortex.support	3566446305
 Recording	MediaString		Gravação
 (unknown format)	MediaString		(formato desconhecido)
 Clean buffers	MediaString		Limpar buffers
@@ -11,7 +11,6 @@ Port	MediaString		Porta
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Desligado
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(orientação de vídeo desconhecida)
 QuickTime	MediaString		QuickTime
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(formato de vídeo desconhecido)

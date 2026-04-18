@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3495375988
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	1372251274
 None	Icon-O-Matic-Properties		Κανένα
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Καθάρισμα διαδρομής
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -140,7 +140,6 @@ Scale	Icon-O-Matic-TransformationBoxStates		Κλίμακα
 All	Icon-O-Matic-Properties		Όλα
 Transformer	Icon-O-Matic-Menus		Μεταμορφωτής
 Invert selection	Icon-O-Matic-Properties		Αντιστροφή επιλεγμένου
-<unkown property>	Icon-O-Matic-PropertyNames		<άγνωστη ιδιότητα>
 Pick a color	Icon-O-Matic-ColorPicker		Διάλεξε ένα χρώμα
 Settings…	Icon-O-Matic-SavePanel		Ρυθμίσεις…
 Select all	Icon-O-Matic-PathManipulator		Επιλογή όλων

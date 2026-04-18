@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.support	3667963625
+1	french	application/x-vnd.Cortex.support	2061896117
 Header has flags	MediaString		L’en-tête comporte des drapeaux
 Recording	MediaString		Enregistrement
 (unknown format)	MediaString		(format inconnu)
@@ -17,7 +17,6 @@ Top-Front-left	MediaString		Avant-gauche-haut
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Hors ligne
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(orientation vidéo inconnue)
 Top-Front-center	MediaString		Avant-centre-haut
 BeOS format family	MediaString		Famille de format BeOS
 Back-center	MediaString		Arrière-centre

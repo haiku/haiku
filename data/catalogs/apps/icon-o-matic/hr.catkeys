@@ -1,4 +1,4 @@
-1	croatian	x-vnd.haiku-icon_o_matic	3339060598
+1	croatian	x-vnd.haiku-icon_o_matic	1215935884
 None	Icon-O-Matic-Properties		Nijedan
 Add empty	Icon-O-Matic-ShapesList		Dodaj prazno
 Opening the icon failed!	Icon-O-Matic-Main		Neuspjelo otvaranje ikone!
@@ -69,7 +69,6 @@ Save as…	Icon-O-Matic-Menu-File		Spremi kao...
 Add	Icon-O-Matic-StylesList		Dodaj
 All	Icon-O-Matic-Properties		Sve
 Invert selection	Icon-O-Matic-Properties		Obrnuti odabir
-<unkown property>	Icon-O-Matic-PropertyNames		<nepoznato svojstvo>
 Pick a color	Icon-O-Matic-ColorPicker		Odaberi boju
 Settings…	Icon-O-Matic-SavePanel		Postavke...
 Add with style	Icon-O-Matic-ShapesList		Dodaj sa stilom

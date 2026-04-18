@@ -1,4 +1,4 @@
-1	korean	x-vnd.haiku-icon_o_matic	2785173031
+1	korean	x-vnd.haiku-icon_o_matic	662048317
 None	Icon-O-Matic-Properties		없음
 Clean up path	Icon-O-Matic-CleanUpPathCmd		패스 정리하기
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16×16
@@ -169,7 +169,6 @@ Transformer	Icon-O-Matic-Menus		변환기
 Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		{0, plural, one{버텍스} other{버텍스}} 전환
 Invert selection	Icon-O-Matic-Properties		선택 반전
 to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	도형을 선택하십시오.
-<unkown property>	Icon-O-Matic-PropertyNames		<알 수 없는 속성>
 Pick a color	Icon-O-Matic-ColorPicker		색상 선택
 Settings…	Icon-O-Matic-SavePanel		설정...
 Select all	Icon-O-Matic-PathManipulator		전체 선택

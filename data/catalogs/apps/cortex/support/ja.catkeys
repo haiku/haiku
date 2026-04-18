@@ -1,4 +1,4 @@
-1	japanese	application/x-vnd.Cortex.support	761210807
+1	japanese	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		ヘッダーにフラグ有り
 32 bit HLS	MediaString		32 ビット HLS
 Recording	MediaString		レコーディング
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Top-Front-left
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		オフライン
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(不明なビデオの向き)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32 ビット HLSA
 Top-Front-center	MediaString		Top-Front-center

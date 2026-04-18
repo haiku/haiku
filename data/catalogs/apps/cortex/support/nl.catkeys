@@ -1,4 +1,4 @@
-1	dutch; flemish	application/x-vnd.Cortex.support	2097798758
+1	dutch; flemish	application/x-vnd.Cortex.support	491731250
 Header has flags	MediaString		De header heeft opties
 32 bit HLS	MediaString		32-bit HLS
 Recording	MediaString		Aan het opnemen
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Boven-voor-links
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Offline
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(onbekende video-oriëntatie)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32-bit HLSA
 Top-Front-center	MediaString		Top-voor-midden

@@ -1,4 +1,4 @@
-1	spanish; castilian	application/x-vnd.Cortex.support	761210807
+1	spanish; castilian	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		El encabezado tiene marcas
 32 bit HLS	MediaString		HLS de 32 bits
 Recording	MediaString		Grabación
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Superior delantero izquierdo
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Sin conexión
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(orientación de video desconocida)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		HLSA de 32 bits
 Top-Front-center	MediaString		Central delantero superior

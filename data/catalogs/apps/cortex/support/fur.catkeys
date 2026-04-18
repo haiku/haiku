@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Cortex.support	761210807
+1	friulian	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		La intestazion e à opzions
 32 bit HLS	MediaString		HLS a 32 bit
 Recording	MediaString		Regjistrazion
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		In alt denant a çampe
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Fûr rêt
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(orientament dal video no cognossût)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		HLSA a 32 bit
 Top-Front-center	MediaString		In alt denant tal mieç

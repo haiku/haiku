@@ -1,4 +1,4 @@
-1	turkish	application/x-vnd.Cortex.support	761210807
+1	turkish	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		Üstbilginin bayrakları var
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Kayıt yapılıyor
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Üst sol ön
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Çevrimdışı
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(bilinmeyen video yönü)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32 bit HLSA
 Top-Front-center	MediaString		Üst ön merkez

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.haiku-icon_o_matic	147386950
+1	friulian	x-vnd.haiku-icon_o_matic	2319229532
 None	Icon-O-Matic-Properties		Nissun
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Nete il segn
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -178,7 +178,6 @@ Transformer	Icon-O-Matic-Menus		Trasformadôr
 Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Ribalte {0, plural, one{vertiç} other{vertiçs}}
 Invert selection	Icon-O-Matic-Properties		Invertìs selezion
 to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	par colegâ i trasformadôrs.
-<unkown property>	Icon-O-Matic-PropertyNames		<proprietât no cognossude>
 Pick a color	Icon-O-Matic-ColorPicker		Sielç un colôr
 Settings…	Icon-O-Matic-SavePanel		Impostazions…
 Select all	Icon-O-Matic-PathManipulator		Selezione dut

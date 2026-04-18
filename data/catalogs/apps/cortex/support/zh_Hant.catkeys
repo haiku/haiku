@@ -1,4 +1,4 @@
-1	english	x-vnd.Cortex.support	761210807
+1	english	x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		標頭具有旗標
 32 bit HLS	MediaString		32 位元 HLS
 Recording	MediaString		錄製
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		前左上
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		離線
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		未知的視訊來源
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32 位元 HLSA
 Top-Front-center	MediaString		前上中

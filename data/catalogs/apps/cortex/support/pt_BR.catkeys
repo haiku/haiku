@@ -1,4 +1,4 @@
-1	portuguese (brazil)	application/x-vnd.Cortex.support	1625162530
+1	portuguese (brazil)	application/x-vnd.Cortex.support	19095022
 Header has flags	MediaString		Cabeçalho tem sinalizadores
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Gravação
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Cima-Frente-Esquerda
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Desligado
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(orientação de vídeo desconhecida)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32 bit HLSA
 Top-Front-center	MediaString		Superior-Frontal-Centro

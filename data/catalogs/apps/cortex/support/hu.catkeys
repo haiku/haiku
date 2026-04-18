@@ -1,4 +1,4 @@
-1	hungarian	application/x-vnd.Cortex.support	761210807
+1	hungarian	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		A fejlécnek vannak zászlói
 32 bit HLS	MediaString		32 bites HLS
 Recording	MediaString		Felvétel
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Bal elülső-felső
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Offline
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(ismeretlen videó orientáció)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32 bites HLSA
 Top-Front-center	MediaString		Közép elülső-felső

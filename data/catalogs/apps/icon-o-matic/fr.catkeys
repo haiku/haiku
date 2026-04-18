@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	2366299052
+1	french	x-vnd.haiku-icon_o_matic	243174338
 None	Icon-O-Matic-Properties		Aucun
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Ajouter une forme vide
@@ -110,7 +110,6 @@ Scale	Icon-O-Matic-TransformationBoxStates		Échelle
 All	Icon-O-Matic-Properties		Tout
 Transformer	Icon-O-Matic-Menus		Transformation
 Invert selection	Icon-O-Matic-Properties		Inverser la sélection
-<unkown property>	Icon-O-Matic-PropertyNames		<propriétés inconnue>
 Pick a color	Icon-O-Matic-ColorPicker		Choisissez une couleur
 Settings…	Icon-O-Matic-SavePanel		Réglages…
 Select all	Icon-O-Matic-PathManipulator		Sélectionner tout

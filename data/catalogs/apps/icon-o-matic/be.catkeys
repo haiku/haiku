@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	3407231654
+1	belarusian	x-vnd.haiku-icon_o_matic	1284106940
 None	Icon-O-Matic-Properties		Няма
 Add empty	Icon-O-Matic-ShapesList		Дадаць пусты
 Opening the icon failed!	Icon-O-Matic-Main		Нельга адкрыць іконку!
@@ -100,7 +100,6 @@ Scale	Icon-O-Matic-TransformationBoxStates		Масштаб
 All	Icon-O-Matic-Properties		Усё
 Transformer	Icon-O-Matic-Menus		Трансформер
 Invert selection	Icon-O-Matic-Properties		Інвертаваць выдзяленне
-<unkown property>	Icon-O-Matic-PropertyNames		<невядомая уласцівасць>
 Pick a color	Icon-O-Matic-ColorPicker		Падабраць колер
 Settings…	Icon-O-Matic-SavePanel		Наладкі…
 Add with style	Icon-O-Matic-ShapesList		Дадаць са стылем

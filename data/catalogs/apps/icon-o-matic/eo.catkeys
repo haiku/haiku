@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.haiku-icon_o_matic	118707012
+1	esperanto	x-vnd.haiku-icon_o_matic	2290549594
 None	Icon-O-Matic-Properties		Nenio
 Add empty	Icon-O-Matic-ShapesList		Aldoni malplenan
 Opening the icon failed!	Icon-O-Matic-Main		Malsukcesis uzi la piktogramon!
@@ -103,7 +103,6 @@ Scale	Icon-O-Matic-TransformationBoxStates		Skali
 All	Icon-O-Matic-Properties		Ĉio
 Transformer	Icon-O-Matic-Menus		Tramsformigilo
 Invert selection	Icon-O-Matic-Properties		Inverti elekton
-<unkown property>	Icon-O-Matic-PropertyNames		<nekonata atributo>
 Pick a color	Icon-O-Matic-ColorPicker		Elektu koloron
 Settings…	Icon-O-Matic-SavePanel		Agordo…
 Add with style	Icon-O-Matic-ShapesList		Aldoni kun stilo

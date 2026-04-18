@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	147386950
+1	japanese	x-vnd.haiku-icon_o_matic	2319229532
 None	Icon-O-Matic-Properties		解除
 Clean up path	Icon-O-Matic-CleanUpPathCmd		パスのクリーンアップ
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -178,7 +178,6 @@ Transformer	Icon-O-Matic-Menus		トランスフォーマー
 Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		{0, plural, one{個の頂点} other{個の頂点}}の反転
 Invert selection	Icon-O-Matic-Properties		選択範囲の反転
 to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	トランスフォーマーの追加。
-<unkown property>	Icon-O-Matic-PropertyNames		<不明なプロパティ>
 Pick a color	Icon-O-Matic-ColorPicker		カラーの選択
 Settings…	Icon-O-Matic-SavePanel		設定...
 Select all	Icon-O-Matic-PathManipulator		すべて選択

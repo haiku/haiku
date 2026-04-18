@@ -1,4 +1,4 @@
-1	romanian	application/x-vnd.Cortex.support	761210807
+1	romanian	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		Antetul are fanioane
 32 bit HLS	MediaString		HLS pe 32 biți
 Recording	MediaString		Înregistare
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Sus-față-stânga
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Deconectat
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(orientare video necunoscută)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		HLSA pe 32 biți
 Top-Front-center	MediaString		Sus-față-centru

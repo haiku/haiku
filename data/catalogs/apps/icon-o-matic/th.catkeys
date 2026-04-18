@@ -1,4 +1,4 @@
-1	thai	x-vnd.haiku-icon_o_matic	118707012
+1	thai	x-vnd.haiku-icon_o_matic	2290549594
 None	Icon-O-Matic-Properties		ไม่มี
 Add empty	Icon-O-Matic-ShapesList		การเพิ่มว่างเปล่า
 Opening the icon failed!	Icon-O-Matic-Main		การเปิดไอคอนล้มเหลว!
@@ -103,7 +103,6 @@ Scale	Icon-O-Matic-TransformationBoxStates		ขนาด
 All	Icon-O-Matic-Properties		ทั้งหมด
 Transformer	Icon-O-Matic-Menus		ตัวแปลง
 Invert selection	Icon-O-Matic-Properties		สลับการเลือก
-<unkown property>	Icon-O-Matic-PropertyNames		<unkown property>
 Pick a color	Icon-O-Matic-ColorPicker		เลือกสี
 Settings…	Icon-O-Matic-SavePanel		การตั้งค่า
 Add with style	Icon-O-Matic-ShapesList		เพิ่มด้วยสไตล์

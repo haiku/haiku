@@ -1,4 +1,4 @@
-1	danish	application/x-vnd.Cortex.support	2097798758
+1	danish	application/x-vnd.Cortex.support	491731250
 Header has flags	MediaString		Header har flag
 32 bit HLS	MediaString		32-bit HLS
 Recording	MediaString		Optagelse
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Op-front-venstre
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Offline
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(ukendt videorientering)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32-bit HLSA
 Top-Front-center	MediaString		Op-front-midt

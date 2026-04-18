@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	application/x-vnd.Cortex.support	761210807
+1	greek, modern (1453-)	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		Η κεφαλίδα έχει παραμέτρους
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Εγγραφή σε εξέλιξη
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Πάνω-μπροστά-αριστερά
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Εκτός σύνδεσης
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(άγνωστος προσανατολισμός βίντεο)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32 bit HLSA
 Top-Front-center	MediaString		Πάνω-μπροστά-κέντρο

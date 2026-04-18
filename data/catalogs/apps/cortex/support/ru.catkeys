@@ -1,4 +1,4 @@
-1	russian	application/x-vnd.Cortex.support	761210807
+1	russian	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		Заголовок имеет флаги
 32 bit HLS	MediaString		32-битный HLS
 Recording	MediaString		Запись
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Верхний-Фронт-левый
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Офлайн
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		неизвестная ориентация видео
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32-битный HLSA
 Top-Front-center	MediaString		Верхний-Фронт-центр

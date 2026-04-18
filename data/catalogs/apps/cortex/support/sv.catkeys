@@ -1,4 +1,4 @@
-1	swedish	application/x-vnd.Cortex.support	761210807
+1	swedish	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		Rubrik har flaggor
 32 bit HLS	MediaString		32-bitars HLS
 Recording	MediaString		Inspelning
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Upp-Fram-vänster
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Off-line
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(okänd videorientering)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32-bitars HLSA
 Top-Front-center	MediaString		Upp-Fram-mitt

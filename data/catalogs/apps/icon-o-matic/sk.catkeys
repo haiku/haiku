@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	737366900
+1	slovak	x-vnd.haiku-icon_o_matic	2909209482
 None	Icon-O-Matic-Properties		Žiadne
 Add empty	Icon-O-Matic-ShapesList		Pridať prázdne
 Opening the icon failed!	Icon-O-Matic-Main		Otvorenie ikony zlyhalo!
@@ -102,7 +102,6 @@ Scale	Icon-O-Matic-TransformationBoxStates		Mierka
 All	Icon-O-Matic-Properties		Všetky
 Transformer	Icon-O-Matic-Menus		Transformátor
 Invert selection	Icon-O-Matic-Properties		Invertovať výber
-<unkown property>	Icon-O-Matic-PropertyNames		<neznáma vlastnosť>
 Pick a color	Icon-O-Matic-ColorPicker		Vybrať farbu
 Settings…	Icon-O-Matic-SavePanel		Nastavenia…
 Add with style	Icon-O-Matic-ShapesList		Pridať so štýlom

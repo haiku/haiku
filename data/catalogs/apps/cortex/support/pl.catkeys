@@ -1,4 +1,4 @@
-1	polish	application/x-vnd.Cortex.support	761210807
+1	polish	application/x-vnd.Cortex.support	3450110595
 Header has flags	MediaString		Nagłówek ma flagi
 32 bit HLS	MediaString		32-bitowy HLS
 Recording	MediaString		Nagrywanie
@@ -20,7 +20,6 @@ Top-Front-left	MediaString		Górny przedni lewy
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Wyłączony
 YUV422	MediaString		YUV422
-(unkown video orientation)	MediaString		(nieznana orientacja wideo)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32-bitowy HLSA
 Top-Front-center	MediaString		Górny przedni środkowy
