@@ -49,6 +49,7 @@ public:
 			const char*			DownloadFileName() const;
 			off_t				DownloadBytes() const;
 			off_t				DownloadTotalBytes() const;
+			status_t			Stop();
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	virtual void	DownloadProgress(BUrlRequest*,
@@ -69,6 +70,10 @@ private:
 			float				fDownloadProgress;
 			off_t				fBytes;
 			off_t				fTotalBytes;
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+			BUrlRequest*			fUrlRequest;
+#endif
 };
 
 

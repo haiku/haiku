@@ -398,9 +398,13 @@ BPackageManager::JobProgress(BSupportKit::BJob* job)
 {
 	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
 		FetchFileJob* fetchJob = (FetchFileJob*)job;
-		fUserInteractionHandler->ProgressPackageDownloadActive(
-			fetchJob->DownloadFileName(), fetchJob->DownloadProgress(),
-			fetchJob->DownloadBytes(), fetchJob->DownloadTotalBytes());
+		try {
+			fUserInteractionHandler->ProgressPackageDownloadActive(
+				fetchJob->DownloadFileName(), fetchJob->DownloadProgress(),
+				fetchJob->DownloadBytes(), fetchJob->DownloadTotalBytes());
+		} catch (BAbortedByUserException&) {
+			fetchJob->Stop();
+		}
 	}
 }
 

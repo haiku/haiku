@@ -102,21 +102,21 @@ FetchFileJob::Execute()
 	}
 
 	do {
-		BUrlRequest* request = BUrlProtocolRoster::MakeRequest(fFileURL.String(),
+		fUrlRequest = BUrlProtocolRoster::MakeRequest(fFileURL.String(),
 			&fTargetFile, this);
-		if (request == NULL)
+		if (fUrlRequest == NULL)
 			return B_BAD_VALUE;
 
 		// Try to resume the download where we left off
 		off_t currentPosition;
-		BHttpRequest* http = dynamic_cast<BHttpRequest*>(request);
+		BHttpRequest* http = dynamic_cast<BHttpRequest*>(fUrlRequest);
 		if (http != NULL && fTargetFile.GetSize(&currentPosition) == B_OK
 			&& currentPosition > 0) {
 			http->SetRangeStart(currentPosition);
 			fTargetFile.Seek(0, SEEK_END);
 		}
 
-		thread_id thread = request->Run();
+		thread_id thread = fUrlRequest->Run();
 		wait_for_thread(thread, NULL);
 
 		if (fError != B_IO_ERROR && fError != B_DEV_TIMEOUT && fError != B_OK) {
@@ -221,6 +221,13 @@ FetchFileJob::Cleanup(status_t jobResult)
 }
 
 
+status_t
+FetchFileJob::Stop()
+{
+	return fUrlRequest->Stop();
+}
+
+
 #else // HAIKU_TARGET_PLATFORM_HAIKU
 
 
@@ -278,6 +285,13 @@ FetchFileJob::DownloadTotalBytes() const
 
 status_t
 FetchFileJob::Execute()
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+FetchFileJob::Stop()
 {
 	return B_UNSUPPORTED;
 }
