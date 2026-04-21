@@ -770,6 +770,7 @@ TBarView::_ChangeState(BMessage* message)
 
 	bool vertSwap = (Vertical() != vertical);
 	bool leftSwap = (Left() != left);
+	bool topSwap = (Top() != top);
 	bool stateChanged = (State() != state);
 
 	fBarApp->Settings()->vertical = vertical;
@@ -777,25 +778,25 @@ TBarView::_ChangeState(BMessage* message)
 	fBarApp->Settings()->top = top;
 	fBarApp->Settings()->state = state;
 
-	if (stateChanged || vertSwap) {
-		be_app->PostMessage(kStateChanged);
+	if (vertSwap || topSwap || stateChanged) {
+		message->what = kStateChanged;
+		be_app->PostMessage(message);
 			// Send a message to the preferences window to let it know to
 			// enable or disable preference items.
+	}
 
-		TBarWindow* barWindow = dynamic_cast<TBarWindow*>(Window());
-		if (barWindow != NULL)
-			barWindow->SetSizeLimits();
+	if (stateChanged || vertSwap)
+		static_cast<TBarWindow*>(Window())->SetSizeLimits();
 
-		if (vertSwap && fExpandoMenuBar != NULL) {
-			if (Vertical()) {
-				fInlineScrollView->SetOrientation(B_VERTICAL);
-				fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_COLUMN);
-				fExpandoMenuBar->StartMonitoringWindows();
-			} else {
-				fInlineScrollView->SetOrientation(B_HORIZONTAL);
-				fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_ROW);
-				fExpandoMenuBar->StopMonitoringWindows();
-			}
+	if (vertSwap && fExpandoMenuBar != NULL) {
+		if (Vertical()) {
+			fInlineScrollView->SetOrientation(B_VERTICAL);
+			fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_COLUMN);
+			fExpandoMenuBar->StartMonitoringWindows();
+		} else {
+			fInlineScrollView->SetOrientation(B_HORIZONTAL);
+			fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_ROW);
+			fExpandoMenuBar->StopMonitoringWindows();
 		}
 	}
 

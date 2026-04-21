@@ -24,8 +24,6 @@ static const float kMonitorBorderSize = 3.0f;
 static const float kArrowSize = 11.0f;
 static const float kStopSize = 15.0f;
 
-static const int32 kExpandBit = 1 << 3;
-
 
 ScreenCornerSelector::ScreenCornerSelector(BRect frame, const char* name, BMessage* message,
 	uint32 resizingMode)
@@ -120,21 +118,25 @@ ScreenCornerSelector::Draw(BRect updateRect)
 }
 
 
-int32
-ScreenCornerSelector::Value()
-{
-	return (int32)fCurrentCorner;
-}
-
-
 status_t
 ScreenCornerSelector::Invoke(BMessage* message)
 {
+	if (message == NULL)
+		message = Message();
+
 	BMessage clone(*message);
 	clone.AddInt32("location", Value() & ~kExpandBit);
 	clone.AddBool("expand", (Value() & kExpandBit) != 0);
 		// TODO add support for "expand" values as well
+
 	return BInvoker::Invoke(&clone);
+}
+
+
+int32
+ScreenCornerSelector::Value()
+{
+	return (int32)fCurrentCorner;
 }
 
 
@@ -145,26 +147,26 @@ ScreenCornerSelector::SetValue(int32 corner)
 		case B_DESKBAR_TOP:
 		case B_DESKBAR_BOTTOM:
 		case B_DESKBAR_LEFT_TOP:
-		case B_DESKBAR_LEFT_BOTTOM:
 		case B_DESKBAR_RIGHT_TOP:
+		case B_DESKBAR_LEFT_BOTTOM:
 		case B_DESKBAR_RIGHT_BOTTOM:
-		case B_DESKBAR_TOP | kExpandBit:
-		case B_DESKBAR_BOTTOM | kExpandBit:
 		case B_DESKBAR_LEFT_TOP | kExpandBit:
-		// case B_DESKBAR_LEFT_BOTTOM | kExpandBit:
 		case B_DESKBAR_RIGHT_TOP | kExpandBit:
-		// case B_DESKBAR_RIGHT_BOTTOM | kExpandBit:
+#if 0
+		case B_DESKBAR_LEFT_BOTTOM | kExpandBit:
+		case B_DESKBAR_RIGHT_BOTTOM | kExpandBit:
+#endif
 			break;
 
 		default:
 			return;
 	}
+
 	if (corner == fCurrentCorner)
 		return;
 
 	fCurrentCorner = corner;
 	Invalidate(_InnerFrame(_MonitorFrame()));
-	Invoke(Message());
 }
 
 
@@ -186,27 +188,42 @@ ScreenCornerSelector::SetCorner(deskbar_location corner)
 void
 ScreenCornerSelector::_DrawArrow(BRect innerFrame)
 {
+	// TODO: support horizontal mini-mode
+
 	switch (fCurrentCorner) {
+		case B_DESKBAR_TOP:
+			innerFrame.bottom = innerFrame.top + kArrowSize / 2;
+			break;
+
+		case B_DESKBAR_BOTTOM:
+			innerFrame.top = innerFrame.bottom - kArrowSize / 2;
+			break;
+
 		case B_DESKBAR_LEFT_TOP:
 			innerFrame.right = innerFrame.left + kArrowSize;
 			innerFrame.bottom = innerFrame.top + kArrowSize;
 			break;
+
 		case B_DESKBAR_RIGHT_TOP:
 			innerFrame.left = innerFrame.right - kArrowSize;
 			innerFrame.bottom = innerFrame.top + kArrowSize;
 			break;
+
 		case B_DESKBAR_LEFT_BOTTOM:
 			innerFrame.right = innerFrame.left + kArrowSize;
 			innerFrame.top = innerFrame.bottom - kArrowSize;
 			break;
+
 		case B_DESKBAR_RIGHT_BOTTOM:
 			innerFrame.left = innerFrame.right - kArrowSize;
 			innerFrame.top = innerFrame.bottom - kArrowSize;
 			break;
+
 		case B_DESKBAR_LEFT_TOP | kExpandBit:
 			innerFrame.right = innerFrame.left + kArrowSize;
 			innerFrame.bottom = innerFrame.top + 2 * kArrowSize;
 			break;
+
 		case B_DESKBAR_RIGHT_TOP | kExpandBit:
 			innerFrame.left = innerFrame.right - kArrowSize;
 			innerFrame.bottom = innerFrame.top + 2 * kArrowSize;
@@ -216,17 +233,12 @@ ScreenCornerSelector::_DrawArrow(BRect innerFrame)
 			innerFrame.right = innerFrame.left + kArrowSize;
 			innerFrame.top = innerFrame.bottom - 2 * kArrowSize;
 			break;
+
 		case B_DESKBAR_RIGHT_BOTTOM | kExpandBit:
 			innerFrame.left = innerFrame.right - kArrowSize;
 			innerFrame.top = innerFrame.bottom - 2 * kArrowSize;
 			break;
 #endif
-		case B_DESKBAR_TOP:
-			innerFrame.bottom = innerFrame.top + kArrowSize / 2;
-			break;
-		case B_DESKBAR_BOTTOM:
-			innerFrame.top = innerFrame.bottom - kArrowSize / 2;
-			break;
 	}
 
 	innerFrame.InsetBy(1, 1);
@@ -247,25 +259,32 @@ ScreenCornerSelector::_ScreenCorner(BPoint point) const
 	float centerY = innerFrame.top + innerFrame.Height() / 2;
 	float bottomY = innerFrame.top + 2 * innerFrame.Height() / 3;
 
+	// TODO: support horizontal mini-mode
+
 	// Note: expanded mode from the bottom is not supported at the moment
 	if (point.x < leftX) {
 		if (point.y < topY)
 			return B_DESKBAR_LEFT_TOP;
+
 		if (point.y > bottomY)
 			return B_DESKBAR_LEFT_BOTTOM;
+
 		return B_DESKBAR_LEFT_TOP | kExpandBit;
 	}
 
 	if (point.x > rightX) {
 		if (point.y < topY)
 			return B_DESKBAR_RIGHT_TOP;
+
 		if (point.y > bottomY)
 			return B_DESKBAR_RIGHT_BOTTOM;
+
 		return B_DESKBAR_RIGHT_TOP | kExpandBit;
 	}
 
 	if (point.y < centerY)
 		return B_DESKBAR_TOP;
+
 	return B_DESKBAR_BOTTOM;
 }
 
@@ -275,6 +294,7 @@ ScreenCornerSelector::MouseDown(BPoint where)
 {
 	fDragging = true;
 	SetValue(_ScreenCorner(where));
+	Invoke(Message());
 	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	static BCursor grabCursor(B_CURSOR_ID_GRAB);
 	SetViewCursor(&grabCursor);
@@ -297,6 +317,7 @@ ScreenCornerSelector::MouseMoved(BPoint where, uint32 transit, const BMessage* d
 		return;
 
 	SetValue(_ScreenCorner(where));
+	Invoke(Message());
 }
 
 
@@ -304,48 +325,49 @@ void
 ScreenCornerSelector::KeyDown(const char* bytes, int32 numBytes)
 {
 	switch (bytes[0]) {
-#if 0
 		case B_LEFT_ARROW:
 		case '4':
-			if (Corner() == UP_RIGHT_CORNER)
-				SetCorner(UP_LEFT_CORNER);
-			else if (Corner() == DOWN_RIGHT_CORNER)
-				SetCorner(DOWN_LEFT_CORNER);
+			SetValue(B_DESKBAR_LEFT_TOP | kExpandBit);
 			break;
+
 		case B_RIGHT_ARROW:
 		case '6':
-			if (Corner() == UP_LEFT_CORNER)
-				SetCorner(UP_RIGHT_CORNER);
-			else if (Corner() == DOWN_LEFT_CORNER)
-				SetCorner(DOWN_RIGHT_CORNER);
+			SetValue(B_DESKBAR_RIGHT_TOP | kExpandBit);
 			break;
-#endif
+
 		case B_UP_ARROW:
 		case '8':
-			SetCorner(B_DESKBAR_TOP);
+			SetValue(B_DESKBAR_TOP);
 			break;
+
 		case B_DOWN_ARROW:
 		case '2':
-			SetCorner(B_DESKBAR_BOTTOM);
+			SetValue(B_DESKBAR_BOTTOM);
 			break;
+
 		case B_HOME:
 		case '7':
-			SetCorner(B_DESKBAR_LEFT_TOP);
+			SetValue(B_DESKBAR_LEFT_TOP);
 			break;
+
 		case B_PAGE_UP:
 		case '9':
-			SetCorner(B_DESKBAR_RIGHT_TOP);
+			SetValue(B_DESKBAR_RIGHT_TOP);
 			break;
+
 		case B_PAGE_DOWN:
 		case '3':
-			SetCorner(B_DESKBAR_RIGHT_BOTTOM);
+			SetValue(B_DESKBAR_RIGHT_BOTTOM);
 			break;
+
 		case B_END:
 		case '1':
-			SetCorner(B_DESKBAR_LEFT_BOTTOM);
+			SetValue(B_DESKBAR_LEFT_BOTTOM);
 			break;
 
 		default:
-			BControl::KeyDown(bytes, numBytes);
+			return BControl::KeyDown(bytes, numBytes);
 	}
+
+	Invoke(Message());
 }

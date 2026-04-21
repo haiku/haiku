@@ -14,6 +14,9 @@
 #include <Deskbar.h>
 
 
+static const int32 kExpandBit = 1 << 3;
+
+
 class ScreenCornerSelector : public BControl {
 public:
 								ScreenCornerSelector(BRect frame,
@@ -21,18 +24,18 @@ public:
 									uint32 resizingMode);
 
 	virtual	void				Draw(BRect updateRect);
+	virtual status_t			Invoke(BMessage* message = NULL);
+	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MouseDown(BPoint point);
-	virtual	void				MouseUp(BPoint point);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
-	virtual	void				KeyDown(const char* bytes, int32 numBytes);
+	virtual	void				MouseUp(BPoint point);
 
-	virtual	void				SetValue(int32 value);
 	virtual	int32				Value();
-	virtual status_t			Invoke(BMessage* message);
+	virtual	void				SetValue(int32 value);
 
-			void				SetCorner(deskbar_location corner);
 			deskbar_location	Corner() const;
+			void				SetCorner(deskbar_location corner);
 
 private:
 			BRect				_MonitorFrame() const;

@@ -58,6 +58,7 @@ private:
 			status_t		_SaveSettings(BMessage* settings);
 
 			void			_SetInitialSettings();
+			void			_SetWindowLocation(bool vertical, bool left, bool top, int32 state);
 
 			void			_UpdateButtons();
 			void			_UpdatePreferences(desk_settings* settings);
@@ -78,7 +79,6 @@ private:
 			BCheckBox*		fAppsExpandNew;
 			BCheckBox*		fAppsHideLabels;
 			BSlider*		fAppsIconSizeSlider;
-
 
 			BControl*		fWindowLocation;
 			BCheckBox*		fWindowAlwaysOnTop;
