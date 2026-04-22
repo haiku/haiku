@@ -96,27 +96,24 @@ public:
 			void			SaveSettings();
 
 			void			UpdatePlacement();
-			void			ChangeState(int32 state, bool vertical, bool left,
-								bool top, bool aSync = false);
+			void			ChangeState(bool vertical, bool left, bool top, int32 state,
+								bool aSync = false);
 
 			void			RaiseDeskbar(bool raise);
 			void			HideDeskbar(bool hide);
 
 	// window placement methods
-			bool			Vertical() const { return fVertical; };
-			bool			Left() const { return fLeft; };
-			bool			Top() const { return fTop; };
-			bool			AcrossTop() const { return fTop && !fVertical
-								&& fState != kMiniState; };
-			bool			AcrossBottom() const { return !fTop && !fVertical
-								&& fState != kMiniState; };
+			bool			Vertical() const;
+			bool			Left() const;
+			bool			Top() const;
+			bool			AcrossTop() const;
+			bool			AcrossBottom() const;
 
 	// window state methods
-			bool			ExpandoState() const
-								{ return fState == kExpandoState; };
-			bool			FullState() const { return fState == kFullState; };
-			bool			MiniState() const { return fState == kMiniState; };
-			int32			State() const { return fState; };
+			bool			ExpandoState() const { return State() == kExpandoState; };
+			bool			FullState() const { return State() == kFullState; };
+			bool			MiniState() const { return State() == kMiniState; };
+			int32			State() const;
 
 	// drag and drop methods
 			void			CacheDragData(const BMessage* incoming);
@@ -200,11 +197,6 @@ private:
 
 			bool			fIsRaised : 1;
 			bool			fMouseDownOutside : 1;
-
-			bool			fVertical : 1;
-			bool			fTop : 1;
-			bool			fLeft : 1;
-			int32			fState;
 
 			bigtime_t		fPulseRate;
 			bool			fRefsRcvdOnly;
