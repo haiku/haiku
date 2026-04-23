@@ -107,6 +107,10 @@ BQueryPoseView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kIconMode:
+		case kMiniIconMode:
+			break;
+
 		default:
 			_inherited::MessageReceived(message);
 			break;
