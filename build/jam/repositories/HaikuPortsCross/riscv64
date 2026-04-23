@@ -6,40 +6,39 @@ BootstrapPackageRepository HaikuPortsCross
 	noto-20170202-7
 	:
 	# repository architecture packages (stage 0)
-	gcc_bootstrap-13.2.0_2023_08_10-1
-	gcc_bootstrap_syslibs-13.2.0_2023_08_10-1
-	gcc_bootstrap_syslibs_devel-13.2.0_2023_08_10-1
+	gcc_bootstrap-13.3.0_2026_03_29-1
+	gcc_bootstrap_syslibs-13.3.0_2026_03_29-1
+	gcc_bootstrap_syslibs_devel-13.3.0_2026_03_29-1
 	:
 	# repository architecture packages (stage 1)
-	bash_bootstrap-4.4.023-1
-	binutils_bootstrap-2.41_2023_08_05-1
-	bison_bootstrap-3.0.5-1
-	coreutils_bootstrap-8.22-1
-	curl_bootstrap-7.40.0-1
-	curl_bootstrap_devel-7.40.0-1
+	bash_bootstrap-5.3-1
+	binutils_bootstrap-2.41_2026_03_10-1
+	bison_bootstrap-3.8.2-1
+	coreutils_bootstrap-9.9-1
+	curl_bootstrap-8.19.0-1
+	curl_bootstrap_devel-8.19.0-1
 	expat_bootstrap-2.5.0-1
 	expat_bootstrap_devel-2.5.0-1
-	findutils_bootstrap-4.6.0-1
+	findutils_bootstrap-4.9.0-1
 	flex_bootstrap-2.5.35-1
 	freetype_bootstrap-2.6.3-1
 	freetype_bootstrap_devel-2.6.3-1
 	gawk_bootstrap-3.1.8-2
-	grep_bootstrap-2.14-1
-	icu_bootstrap-67.1-2
-	icu_bootstrap_devel-67.1-2
-	less_bootstrap-451-1
-	libffi_bootstrap-3.3-1
+	grep_bootstrap-3.11-1
+	icu74_bootstrap-74.1-1
+	icu74_bootstrap_devel-74.1-1
+	less_bootstrap-668-1
+	libffi_bootstrap-3.4.6-1
+	libffi_bootstrap_devel-3.4.6-1
 	m4_bootstrap-1.4.19-1
-	make_bootstrap-4.3-1
-	ncurses6_bootstrap-6.2-1
-	ncurses6_bootstrap_devel-6.2-1
-	python_bootstrap-3.9.1-1
-	sed_bootstrap-4.2.1-1
-	texinfo_bootstrap-4.13a-1
+	make_bootstrap-4.4.1-1
+	ncurses6_bootstrap-6.6-1
+	ncurses6_bootstrap_devel-6.6-1
+	python3.10_bootstrap-3.10.19-1
+	sed_bootstrap-4.9-1
+	texinfo_bootstrap-7.2-1
 	zlib_bootstrap-1.2.13-1
 	zlib_bootstrap_devel-1.2.13-1
-	zstd_bootstrap-1.5.5-1
-	zstd_bootstrap_devel-1.5.5-1
 	:
 	# repository architecture packages (stage 2)
 	:
@@ -65,7 +64,6 @@ BootstrapPackageRepository HaikuPortsCross
 	sed_bootstrap
 	texinfo_bootstrap
 	zlib_bootstrap
-	zstd_bootstrap
 	:
 	# debuginfo packages
 	;
