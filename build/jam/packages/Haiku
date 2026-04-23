@@ -362,6 +362,8 @@ AddBootModuleSymlinksToPackage
 
 # add-ons
 AddFilesToPackage add-ons accelerants :
+	framebuffer.accelerant
+	virtio_gpu.accelerant
 	$(SYSTEM_ADD_ONS_ACCELERANTS) ;
 AddFilesToPackage add-ons locale catalogs :
 	$(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;

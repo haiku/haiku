@@ -188,7 +188,6 @@ SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 		neomagic.accelerant
 		s3.accelerant
 	}@ # x86
-	virtio_gpu.accelerant
 ] ;
 
 SYSTEM_ADD_ONS_TRANSLATORS += [ FFilterByBuildFeatures

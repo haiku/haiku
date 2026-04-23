@@ -239,7 +239,9 @@ local terminalThemes = [ Glob $(HAIKU_TOP)/data/system/data/terminal_themes : "[
 AddFilesToPackage data Terminal Themes : $(terminalThemes) ;
 
 # add-ons
-AddFilesToPackage add-ons accelerants	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
+AddFilesToPackage add-ons accelerants :
+	framebuffer.accelerant
+	$(SYSTEM_ADD_ONS_ACCELERANTS) ;
 AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 
