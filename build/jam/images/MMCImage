@@ -186,6 +186,8 @@ for platform in [ MultiBootSubDirSetup ] {
 	}
 }
 
+RmTemps $(HAIKU_MMC) : $(HAIKU_IMAGE_NAME) ;
+
 #BlessSDImage haiku-$(TARGET_KERNEL_ARCH).mmc ;
 NotFile haiku-mmc-image ;
 Depends haiku-mmc-image : $(HAIKU_MMC_NAME) ;
