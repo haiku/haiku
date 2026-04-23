@@ -4,6 +4,7 @@
  */
 
 
+#define _DEFAULT_SOURCE
 #include "BaseJob.h"
 
 #include <errno.h>
@@ -251,20 +252,17 @@ BaseJob::_GetSourceFileEnvironment(const char* script, BStringList& environment)
 
 		const char* chunk = buffer;
 		while (true) {
-			const char* separator = strchr(chunk, '\n');
-			if (separator == NULL) {
-				line.Append(chunk, bytesRead);
-				break;
-			}
+			const char* separator = strchrnul(chunk, '\n');
 			line.Append(chunk, separator - chunk);
-			chunk = separator + 1;
 
 			_ParseExportVariable(environment, line);
 			line.Truncate(0);
+
+			if (*separator == '\0')
+				break;
+			chunk = separator + 1;
 		}
 	}
-	if (!line.IsEmpty())
-		_ParseExportVariable(environment, line);
 
 	close(pipes[0]);
 }
