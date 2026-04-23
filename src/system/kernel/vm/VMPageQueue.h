@@ -25,9 +25,7 @@ public:
 	typedef PageList::ConstIterator Iterator;
 
 public:
-			void				Init(const char* name);
-
-			const char*			Name() const	{ return fName; }
+			void				Init();
 
 	inline	void				Append(vm_page* page);
 	inline	void				Prepend(vm_page* page);
@@ -56,7 +54,6 @@ public:
 	inline	spinlock&			GetLock()	{ return fLock; }
 
 protected:
-			const char*			fName;
 			spinlock			fLock;
 			page_num_t			fCount;
 			PageList			fPages;

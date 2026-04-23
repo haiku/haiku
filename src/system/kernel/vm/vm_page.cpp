@@ -2433,12 +2433,12 @@ vm_page_init(kernel_args *args)
 	TRACE(("vm_page_init: entry\n"));
 
 	// init page queues
-	sModifiedPageQueue.Init("modified pages queue");
-	sInactivePageQueue.Init("inactive pages queue");
-	sActivePageQueue.Init("active pages queue");
-	sCachedPageQueue.Init("cached pages queue");
-	sFreePageQueue.Init("free pages queue");
-	sClearPageQueue.Init("clear pages queue");
+	sModifiedPageQueue.Init();
+	sInactivePageQueue.Init();
+	sActivePageQueue.Init();
+	sCachedPageQueue.Init();
+	sFreePageQueue.Init();
+	sClearPageQueue.Init();
 
 	new (&sPageReservationWaiters) PageReservationWaiterList;
 

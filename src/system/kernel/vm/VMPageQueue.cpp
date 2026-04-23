@@ -11,12 +11,11 @@
 
 
 void
-VMPageQueue::Init(const char* name)
+VMPageQueue::Init()
 {
 	new(&fPages) PageList;
 
 	B_INITIALIZE_SPINLOCK(&fLock);
 
-	fName = name;
 	fCount = 0;
 }
