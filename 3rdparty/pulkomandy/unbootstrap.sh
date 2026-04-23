@@ -7,11 +7,12 @@
 # these package before we can get the bootstrap image to run reliably enough
 # to actually bootstrap the packages.
 
+set -e
+
 mkdir -p work
 cd work
 
-for package in ../packages/*.hpkg
-do
+for package in ../packages/*.hpkg; do
 	echo --- Processing $package ---
 	echo Cleaning work directory...
 	rm -rf *
@@ -19,7 +20,8 @@ do
 	package extract $package
 	echo Converting .PackageInfo...
 	sed -i .PackageInfo -e s/_bootstrap//g
-	name=`basename $package|sed -e s/_bootstrap//g`
+	sed -i .PackageInfo -e '/^version/ s/-/_bootstrap-/1'
+	name=$(basename $package | sed -e s/_bootstrap// | sed 's/-/_bootstrap-/2')
 	# If this is a source package, we need to correct the source directory.
 	if [[ $name = *"-source.hpkg" ]]; then
 		oldpkgname=$(basename $package | sed -e s/-source.hpkg//g | sed -e s/_source//g)
@@ -32,5 +34,5 @@ do
 		fi
 	fi
 	echo Regenerating package...
-	package create ../$name
+	package create -z zlib ../$name
 done
