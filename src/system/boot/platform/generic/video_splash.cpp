@@ -138,7 +138,7 @@ video_display_splash(addr_t frameBuffer)
 	switch (gKernelArgs.frame_buffer.depth) {
 		case 8:
 			platform_set_palette(k8BitPalette);
-			uncompressedLogo = (uint8*)kernel_args_malloc(uncompressedSize);
+			uncompressedLogo = (uint8*)malloc(uncompressedSize);
 			if (uncompressedLogo == NULL)
 				return B_NO_MEMORY;
 
@@ -148,7 +148,7 @@ video_display_splash(addr_t frameBuffer)
 		break;
 		default: // 24 bits is assumed here
 			uncompressedSize *= 3;
-			uncompressedLogo = (uint8*)kernel_args_malloc(uncompressedSize);
+			uncompressedLogo = (uint8*)malloc(uncompressedSize);
 			if (uncompressedLogo == NULL)
 				return B_NO_MEMORY;
 
@@ -167,7 +167,7 @@ video_display_splash(addr_t frameBuffer)
 	video_blit_image(frameBuffer, uncompressedLogo, width, height,
 		kSplashLogoWidth, x, y);
 
-	kernel_args_free(uncompressedLogo);
+	free(uncompressedLogo);
 
 	const uint8* lowerHalfIconImage;
 	uncompressedSize = kSplashIconsWidth * kSplashIconsHeight;
