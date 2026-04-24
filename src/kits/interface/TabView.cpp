@@ -205,7 +205,14 @@ BTab::Deselect()
 void
 BTab::SetEnabled(bool enable)
 {
+	if (fView == NULL)
+		return;
+
+	if (fEnabled == enable)
+		return;
+
 	fEnabled = enable;
+	fTabView->Invalidate();
 }
 
 

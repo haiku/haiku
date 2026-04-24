@@ -837,6 +837,8 @@ MainWindow::_HandlePackagesChanged(const BMessage* message)
 		return;
 	}
 
+	bool isFeaturedTabEnabled = fListTabs->TabAt(TAB_PROMINENT_PACKAGES)->IsEnabled();
+
 	HDTRACE("window processing %" B_PRIi32 " package changes", packageEvents.CountEvents());
 
 	// Transfer the package change events into package *info* change events so
@@ -850,6 +852,11 @@ MainWindow::_HandlePackagesChanged(const BMessage* message)
 		const PackageInfoRef packageInfo = fModel.PackageForName(packageEvent.PackageName());
 
 		if (packageInfo.IsSet()) {
+			if (!isFeaturedTabEnabled && !PackageUtils::IsProminent(packageInfo)) {
+				fListTabs->TabAt(TAB_PROMINENT_PACKAGES)->SetEnabled(true);
+				isFeaturedTabEnabled = true;
+			}
+
 			const PackageInfoChangeEvent packageInfoEvent(packageInfo, packageEvent.Changes());
 			packageInfoEvents.push_back(packageInfoEvent);
 		} else {
