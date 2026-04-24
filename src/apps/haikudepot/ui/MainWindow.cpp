@@ -82,6 +82,7 @@ enum {
 	MSG_WORK_STATUS_CLEAR						= 'wscl',
 	MSG_INCREMENT_VIEW_COUNTER					= 'icrv',
 	MSG_SCREENSHOT_CACHED						= 'ssca',
+	MSG_SELECTED_PACKAGE_CHANGED				= 'spch',
 
 	MSG_CHANGE_PACKAGE_LIST_VIEW_MODE			= 'cplm',
 	MSG_SHOW_DESKTOP_PACKAGES					= 'sodk',
@@ -173,6 +174,12 @@ public:
 	{
 		if (fMessenger.IsValid())
 			fMessenger.SendMessage(MSG_ICONS_CHANGED);
+	}
+
+	virtual void SelectedPackageChanged()
+	{
+		if (fMessenger.IsValid())
+			fMessenger.SendMessage(MSG_SELECTED_PACKAGE_CHANGED);
 	}
 
 private:
@@ -505,6 +512,10 @@ MainWindow::MessageReceived(BMessage* message)
 			_UpdateAuthorization();
 			break;
 
+		case MSG_SELECTED_PACKAGE_CHANGED:
+			_HandleSelectedPackageChanged();
+			break;
+
 		case MSG_ICONS_CHANGED:
 			_HandleIconsChanged();
 			break;
@@ -583,25 +594,6 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_INCREMENT_VIEW_COUNTER:
 			_HandleIncrementViewCounter(message);
 			break;
-
-		case MSG_PACKAGE_SELECTED:
-		{
-			BString name;
-			if (message->FindString(shared_message_keys::kKeyPackageName, &name) == B_OK) {
-				PackageInfoRef package;
-				package = fModel.PackageForName(name);
-
-				if (!package.IsSet() || name != package->Name()) {
-					debugger("unable to find the named package");
-				} else {
-					_AdoptPackage(package);
-					_SetupDelayedIncrementViewCounter(package);
-				}
-			} else {
-				_ClearPackage();
-			}
-			break;
-		}
 
 		case MSG_CATEGORY_SELECTED:
 		{
@@ -805,6 +797,23 @@ MainWindow::StoreSettings(BMessage& settings)
 	}
 
 	settings.AddString(SETTING_NICKNAME, fModel.Nickname());
+}
+
+
+/*!	Informs the window that the selected package has changed. This gives the
+	window the opportunity to update the UI accordingly.
+*/
+void
+MainWindow::_HandleSelectedPackageChanged()
+{
+	PackageInfoRef package = fModel.SelectedPackage();
+
+	if (package.IsSet()) {
+		_AdoptPackage(package);
+		_SetupDelayedIncrementViewCounter(package);
+	} else {
+		_ClearPackage();
+	}
 }
 
 

@@ -131,6 +131,8 @@ private:
 			void				_HandleProcessCoordinatorChanged(
 									ProcessCoordinatorState& coordinatorState);
 
+			void				_HandleSelectedPackageChanged();
+
 			void				_HandlePackagesChanged(const BMessage* message);
 			void				_HandlePackagesChanged(const PackageChangeEvents& events);
 

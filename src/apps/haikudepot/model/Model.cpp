@@ -130,6 +130,48 @@ Model::~Model()
 }
 
 
+/*!	Returns the currently selected package. If there is no selected package then
+	this will return an empty reference.
+*/
+PackageInfoRef
+Model::SelectedPackage() const
+{
+	BAutolock locker(&fLock);
+	if (fSelectedPackageName.IsEmpty())
+		return PackageInfoRef();
+	return PackageForName(fSelectedPackageName);
+}
+
+
+/*!	Sets the currently selected package. The package can be unset in which case
+	there will be no selected package. If the selected package changes then a
+	notification will be sent to the listeners.
+*/
+void
+Model::SetSelectedPackage(const PackageInfoRef& package)
+{
+	BAutolock locker(&fLock);
+	if (package.IsSet() && package->Name() != fSelectedPackageName) {
+		fSelectedPackageName = package->Name();
+		_NotifySelectedPackageChanged();
+	} else if (!fSelectedPackageName.IsEmpty()) {
+		fSelectedPackageName = "";
+		_NotifySelectedPackageChanged();
+	}
+}
+
+
+void
+Model::ClearSelectedPackage()
+{
+	BAutolock locker(&fLock);
+	if (!fSelectedPackageName.IsEmpty()) {
+		fSelectedPackageName = "";
+		_NotifySelectedPackageChanged();
+	}
+}
+
+
 const std::vector<LanguageRef>
 Model::Languages() const
 {
@@ -582,6 +624,20 @@ Model::SetCredentials(const UserCredentials& credentials)
 
 
 // #pragma mark - listener notification methods
+
+
+/*!	Assumes that the class is locked.
+ */
+void
+Model::_NotifySelectedPackageChanged()
+{
+	std::vector<ModelListenerRef>::const_iterator it;
+	for (it = fListeners.begin(); it != fListeners.end(); it++) {
+		const ModelListenerRef& listener = *it;
+		if (listener.IsSet())
+			listener->SelectedPackageChanged();
+	}
+}
 
 
 /*!	Assumes that the class is locked.

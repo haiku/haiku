@@ -9,7 +9,6 @@ enum {
 	MSG_PACKAGE_ACTION_DONE					= 'mpad',
 	MSG_BULK_LOAD_DONE						= 'mmwd',
 	MSG_MAIN_WINDOW_CLOSED					= 'mwcl',
-	MSG_PACKAGE_SELECTED					= 'pkgs',
 	MSG_PACKAGE_WORKER_BUSY					= 'pkwb',
 	MSG_PACKAGE_WORKER_IDLE					= 'pkwi',
 	MSG_CLIENT_TOO_OLD						= 'oldc',

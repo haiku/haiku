@@ -39,6 +39,7 @@ class ModelListener : public BReferenceable {
 public:
 	virtual						~ModelListener();
 
+	virtual void				SelectedPackageChanged() = 0;
 	virtual	void				AuthorizationChanged() = 0;
 	virtual void				CategoryListChanged() = 0;
 	virtual void				ScreenshotCached(const ScreenshotCoordinate& coordinate) = 0;
@@ -91,6 +92,10 @@ public:
 	virtual						~Model();
 
 			void				Clear();
+
+			PackageInfoRef		SelectedPackage() const;
+			void				SetSelectedPackage(const PackageInfoRef& package);
+			void				ClearSelectedPackage();
 
 			void				AddListener(const ModelListenerRef& listener);
 			void				AddPackageListener(const PackageInfoListenerRef& packageListener);
@@ -173,6 +178,7 @@ private:
 									const BMessage &responsePayload,
 									const char *sourceDescription) const;
 
+			void				_NotifySelectedPackageChanged();
 			void				_NotifyPackageFilterChanged();
 			void				_NotifyIconsChanged();
 			void				_NotifyAuthorizationChanged();
@@ -182,6 +188,8 @@ private:
 
 private:
 	mutable	BLocker				fLock;
+
+			BString				fSelectedPackageName;
 
 			LanguageRef			fPreferredLanguage;
 

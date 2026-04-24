@@ -1219,13 +1219,10 @@ PackageListView::SelectionChanged()
 	if (fIgnoreSelectionChanged)
 		return;
 
-	BMessage message(MSG_PACKAGE_SELECTED);
-
 	PackageRow* selected = dynamic_cast<PackageRow*>(CurrentSelection());
-	if (selected != NULL)
-		message.AddString(shared_message_keys::kKeyPackageName, selected->Package()->Name());
 
-	Window()->PostMessage(&message);
+	if (selected != NULL)
+		fModel->SetSelectedPackage(selected->Package());
 }
 
 
