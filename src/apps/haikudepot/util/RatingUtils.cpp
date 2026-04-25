@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -98,27 +98,4 @@ RatingUtils::Draw(BView* target, BPoint at, float value, const BBitmap* star)
 		target->SetDrawingMode(B_OP_ALPHA);
 		target->FillRect(shadeOverRect, B_SOLID_HIGH);
 	}
-}
-
-
-/*!	With the `userRatingInfo` provided, does it make sense for the application
-	to attempt to download the user ratings? If it looks like there are none
-	then it's making no sense and if it has already downloaded some then it
-	also does not make any sense.
-*/
-/*static*/ bool
-RatingUtils::ShouldTryPopulateUserRatings(PackageUserRatingInfoRef userRatingInfo)
-{
-	if (!userRatingInfo.IsSet())
-		return true;
-
-	UserRatingSummaryRef summary = userRatingInfo->Summary();
-
-	if (!summary.IsSet())
-		return true;
-
-	if (summary->RatingCount() == 0)
-		return false;
-
-	return !userRatingInfo->UserRatingsPopulated();
 }

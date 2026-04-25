@@ -33,12 +33,6 @@ public:
 									UserDetailVerifierListener* userDetailVerifierListener,
 									Model* model);
 
-	static	ProcessCoordinator*	CacheScreenshotCoordinator(
-									Model* model, ScreenshotCoordinate& screenshotCoordinate);
-
-	static	ProcessCoordinator*	PopulatePkgChangelogCoordinator(Model* model,
-									const BString& packageName);
-
 	static	ProcessCoordinator*	PopulatePkgUserRatingsCoordinator(Model* model,
 									const BString& packageName);
 
@@ -51,12 +45,20 @@ public:
 	static	ProcessCoordinator*	CreateOpenPackageActionCoordinator(Model* model,
 									const OpenPackageAction& action);
 
+	static	ProcessCoordinator*	CreateCacheScreenshotPackageActionCoordinator(Model* model,
+									const CacheScreenshotPackageAction& action);
+
+	static	ProcessCoordinator*	CreatePopulateChangelogPackageActionCoordinator(Model* model,
+									const PopulateChangelogPackageAction& action);
+
+	static	ProcessCoordinator*	CreatePopulateUserRatingsPackageActionCoordinator(Model* model,
+									const PopulateUserRatingsPackageAction& action);
+
 private:
 	static	uint32				_CalculateServerProcessOptions();
 
-	static	ProcessCoordinator*	_CreateSingleProcessCoordinator(const char* name,
+	static	ProcessCoordinator*	_CreateSingleProcessCoordinator(const char* name, BMessage* message,
 									AbstractProcess *process);
-
 };
 
 #endif // PROCESS_COORDINATOR_FACTORY_H

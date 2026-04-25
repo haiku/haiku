@@ -236,7 +236,7 @@ MainWindow::MainWindow(const BMessage& settings)
 	fFilterView = new FilterView();
 	fFeaturedPackagesView = new FeaturedPackagesView(fModel);
 	fPackageListView = new PackageListView(&fModel);
-	fPackageInfoView = new PackageInfoView(&fModel, this);
+	fPackageInfoView = new PackageInfoView(&fModel);
 
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
 
@@ -329,7 +329,7 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef package)
 	fPackageInfoListener = PackageInfoListenerRef(new MainWindowPackageInfoListener(this), true);
 
 	fFilterView = new FilterView();
-	fPackageInfoView = new PackageInfoView(&fModel, this);
+	fPackageInfoView = new PackageInfoView(&fModel);
 	fWorkStatusView = new WorkStatusView("work status");
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -580,23 +580,6 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-			// this may be triggered by, for example, a user rating being added
-			// or having been altered.
-		case MSG_SERVER_DATA_CHANGED:
-		{
-			BString name;
-			if (message->FindString(shared_message_keys::kKeyPackageName, &name) == B_OK) {
-				if (fPackageInfoView->Package()->Name() == name) {
-					_PopulatePackageAsync(true);
-				} else {
-					HDDEBUG("pkg [%s] is updated on the server, but is not selected so will not be "
-							"updated.",
-						name.String());
-				}
-			}
-			break;
-		}
-
 		case MSG_INCREMENT_VIEW_COUNTER:
 			_HandleIncrementViewCounter(message);
 			break;
@@ -684,6 +667,36 @@ MainWindow::MessageReceived(BMessage* message)
 			ProcessCoordinator* coordinator
 				= ProcessCoordinatorFactory::CreateUninstallPackageActionCoordinator(&fModel,
 					action);
+			_AddProcessCoordinator(coordinator);
+			break;
+		}
+
+		case MSG_PKG_CACHE_SCREENSHOT:
+		{
+			CacheScreenshotPackageAction action(message);
+			ProcessCoordinator* coordinator
+				= ProcessCoordinatorFactory::CreateCacheScreenshotPackageActionCoordinator(&fModel,
+					action);
+			_AddProcessCoordinator(coordinator);
+			break;
+		}
+
+		case MSG_PKG_POPULATE_CHANGELOG:
+		{
+			PopulateChangelogPackageAction action(message);
+			ProcessCoordinator* coordinator
+				= ProcessCoordinatorFactory::CreatePopulateChangelogPackageActionCoordinator(
+					&fModel, action);
+			_AddProcessCoordinator(coordinator);
+			break;
+		}
+
+		case MSG_PKG_POPULATE_USER_RATINGS:
+		{
+			PopulateUserRatingsPackageAction action(message);
+			ProcessCoordinator* coordinator
+				= ProcessCoordinatorFactory::CreatePopulateUserRatingsPackageActionCoordinator(
+					&fModel, action);
 			_AddProcessCoordinator(coordinator);
 			break;
 		}
@@ -792,13 +805,6 @@ MainWindow::StoreSettings(BMessage& settings)
 	}
 
 	settings.AddString(SETTING_NICKNAME, fModel.Nickname());
-}
-
-
-void
-MainWindow::Consume(ProcessCoordinator* item)
-{
-	_AddProcessCoordinator(item);
 }
 
 
@@ -1310,8 +1316,6 @@ MainWindow::_AdoptPackage(const PackageInfoRef& package)
 		if (fPackageListView != NULL)
 			fPackageListView->SelectPackage(package);
 	}
-
-	_PopulatePackageAsync(false);
 }
 
 
@@ -1507,62 +1511,6 @@ MainWindow::_HandleWorkStatusChangeMessageReceived(const BMessage* message)
 	} else {
 		HDERROR("work status change missing progress on update message");
 		fWorkStatusView->SetProgress(0.0f);
-	}
-}
-
-
-/*! Initially only superficial data is loaded from the server into the data
-	model of the packages.  When the package is viewed, additional data needs
-	to be populated including ratings.
-
-	This method will cause the package to have its data refreshed from
-	the server application.  The refresh happens in the background; this method
-	is asynchronous.
-*/
-
-void
-MainWindow::_PopulatePackageAsync(bool forcePopulate)
-{
-	const PackageInfoRef package = fPackageInfoView->Package();
-
-	if (!fModel.CanPopulatePackage(package))
-		return;
-
-	const char* packageNameStr = package->Name().String();
-
-	PackageLocalizedTextRef localized = package->LocalizedText();
-	bool networkAvailable = ServerHelper::IsNetworkAvailable();
-
-	if (localized.IsSet()) {
-		if (forcePopulate || localized->Changelog().IsEmpty()) {
-			if (localized->HasChangelog()) {
-				if (networkAvailable) {
-					_AddProcessCoordinator(
-						ProcessCoordinatorFactory::PopulatePkgChangelogCoordinator(&fModel,
-							package->Name()));
-					HDINFO("pkg [%s] will have changelog updated from server.", packageNameStr);
-				} else {
-					HDINFO(
-						"pkg [%s] will not have changelog updated from server; network unavailable",
-						packageNameStr);
-				}
-			} else {
-				HDINFO("pkg [%s] does not have a changelog -- won't try fetch it.", packageNameStr);
-			}
-		}
-	}
-
-	if (forcePopulate || RatingUtils::ShouldTryPopulateUserRatings(package->UserRatingInfo())) {
-		if (networkAvailable) {
-			_AddProcessCoordinator(ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(
-				&fModel, package->Name()));
-			HDINFO("pkg [%s] will have user ratings updated from server.", packageNameStr);
-		} else {
-			HDINFO("pkg [%s] won't have user ratings updated from server; network unavailable",
-				packageNameStr);
-		}
-	} else {
-		HDDEBUG("pkg [%s] not have user ratings updated from server.", packageNameStr);
 	}
 }
 

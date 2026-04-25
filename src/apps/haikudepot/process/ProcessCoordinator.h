@@ -67,16 +67,6 @@ public:
 };
 
 
-/*!	Classes implementing this 'interface' are able to consume process
-	coordinators.  This may be in order to run them.
-*/
-
-class ProcessCoordinatorConsumer {
-public:
-	virtual	void				Consume(ProcessCoordinator *item) = 0;
-};
-
-
 /*! It is possible to create a number of ProcessNodes (themselves associated
     with AbstractProcess-s) that may have dependencies (predecessors and
     successors) and then an instance of this class is able to coordinate the

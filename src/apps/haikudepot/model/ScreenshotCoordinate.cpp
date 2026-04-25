@@ -22,6 +22,15 @@ ScreenshotCoordinate::ScreenshotCoordinate()
 }
 
 
+ScreenshotCoordinate::ScreenshotCoordinate(const ScreenshotCoordinate& other)
+	:
+	fCode(other.fCode),
+	fWidth(other.fWidth),
+	fHeight(other.fHeight)
+{
+}
+
+
 ScreenshotCoordinate::ScreenshotCoordinate(const BMessage* from)
 {
 	if (from->FindString(kKeyCode, &fCode) != B_OK)
@@ -75,10 +84,27 @@ ScreenshotCoordinate::IsValid() const
 }
 
 
+ScreenshotCoordinate&
+ScreenshotCoordinate::operator=(const ScreenshotCoordinate& other)
+{
+	fCode = other.fCode;
+	fHeight = other.fHeight;
+	fWidth = other.fWidth;
+	return *this;
+}
+
+
 bool
 ScreenshotCoordinate::operator==(const ScreenshotCoordinate& other) const
 {
 	return fCode == other.fCode && fHeight == other.fHeight && fWidth == other.fWidth;
+}
+
+
+bool
+ScreenshotCoordinate::operator!=(const ScreenshotCoordinate& other) const
+{
+	return !(*this == other);
 }
 
 

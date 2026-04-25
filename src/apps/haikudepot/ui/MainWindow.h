@@ -46,9 +46,9 @@ extern const char* const kKeyWindowSettings;
 }; // namespace main_window_keys
 
 
-class MainWindow :
-	private ProcessCoordinatorConsumer, public ProcessCoordinatorListener,
-	public UserDetailVerifierListener, public BWindow {
+class MainWindow : public ProcessCoordinatorListener,
+				   public UserDetailVerifierListener,
+				   public BWindow {
 public:
 								MainWindow(const BMessage& settings);
 								MainWindow(const BMessage& settings,
@@ -60,9 +60,6 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 			void				StoreSettings(BMessage& message);
-
-	// ProcessCoordinatorConsumer
-	virtual	void				Consume(ProcessCoordinator *item);
 
 	// ProcessCoordinatorListener
 	virtual void				CoordinatorChanged(
@@ -115,7 +112,6 @@ private:
 			void				_HandleIncrementViewCounter(const BMessage* message);
 			void				_IncrementViewCounter(const BString& packageName);
 
-			void				_PopulatePackageAsync(bool forcePopulate);
 			void				_StartBulkLoad(bool force = false);
 			void				_BulkLoadCompleteReceived(status_t errorStatus);
 
@@ -211,7 +207,6 @@ private:
 
 			BMessageRunner*		fIncrementViewCounterDelayedRunner;
 };
-
 
 
 #endif // MAIN_WINDOW_H

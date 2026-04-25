@@ -137,27 +137,10 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(Model* model, bool forceLoc
 
 
 /*static*/ ProcessCoordinator*
-ProcessCoordinatorFactory::CacheScreenshotCoordinator(Model* model,
-	ScreenshotCoordinate& screenshotCoordinate)
-{
-	return _CreateSingleProcessCoordinator("CacheScreenshot",
-		new CacheScreenshotProcess(model, screenshotCoordinate));
-}
-
-
-/*static*/ ProcessCoordinator*
-ProcessCoordinatorFactory::PopulatePkgChangelogCoordinator(Model* model, const BString& packageName)
-{
-	return _CreateSingleProcessCoordinator("PopulatePkgChangelog",
-		new PopulatePkgChangelogFromServerProcess(packageName, model));
-}
-
-
-/*static*/ ProcessCoordinator*
 ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(Model* model,
 	const BString& packageName)
 {
-	return _CreateSingleProcessCoordinator("PopulatePkgUserRatings",
+	return _CreateSingleProcessCoordinator("PopulatePkgUserRatings", NULL,
 		new PopulatePkgUserRatingsFromServerProcess(packageName, model));
 }
 
@@ -166,12 +149,8 @@ ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(Model* model,
 ProcessCoordinatorFactory::CreateInstallPackageActionCoordinator(Model* model,
 	const InstallPackageAction& action)
 {
-	ProcessCoordinator* processCoordinator
-		= new ProcessCoordinator("InstallPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
-	AbstractProcessNode* processNode
-		= new ThreadedProcessNode(new InstallPackageProcess(action.PackageName(), model), 10);
-	processCoordinator->AddNode(processNode);
-	return processCoordinator;
+	return _CreateSingleProcessCoordinator("InstallPackage", new BMessage(MSG_PACKAGE_ACTION_DONE),
+		new InstallPackageProcess(action.PackageName(), model));
 }
 
 
@@ -179,12 +158,9 @@ ProcessCoordinatorFactory::CreateInstallPackageActionCoordinator(Model* model,
 ProcessCoordinatorFactory::CreateUninstallPackageActionCoordinator(Model* model,
 	const UninstallPackageAction& action)
 {
-	ProcessCoordinator* processCoordinator
-		= new ProcessCoordinator("UninstallPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
-	AbstractProcessNode* processNode
-		= new ThreadedProcessNode(new UninstallPackageProcess(action.PackageName(), model), 10);
-	processCoordinator->AddNode(processNode);
-	return processCoordinator;
+	return _CreateSingleProcessCoordinator("UninstallPackage",
+		new BMessage(MSG_PACKAGE_ACTION_DONE),
+		new UninstallPackageProcess(action.PackageName(), model));
 }
 
 
@@ -192,12 +168,37 @@ ProcessCoordinatorFactory::CreateUninstallPackageActionCoordinator(Model* model,
 ProcessCoordinatorFactory::CreateOpenPackageActionCoordinator(Model* model,
 	const OpenPackageAction& action)
 {
-	ProcessCoordinator* processCoordinator
-		= new ProcessCoordinator("OpenPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
-	AbstractProcessNode* processNode = new ThreadedProcessNode(
+	return _CreateSingleProcessCoordinator("OpenPackage", new BMessage(MSG_PACKAGE_ACTION_DONE),
 		new OpenPackageProcess(action.PackageName(), model, action.Link()));
-	processCoordinator->AddNode(processNode);
-	return processCoordinator;
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::CreateCacheScreenshotPackageActionCoordinator(Model* model,
+	const CacheScreenshotPackageAction& action)
+{
+	return _CreateSingleProcessCoordinator("CacheScreenshot", new BMessage(MSG_PACKAGE_ACTION_DONE),
+		new CacheScreenshotProcess(model, action.Coordinate()));
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::CreatePopulateChangelogPackageActionCoordinator(Model* model,
+	const PopulateChangelogPackageAction& action)
+{
+	return _CreateSingleProcessCoordinator("PopulatePkgChangelog",
+		new BMessage(MSG_PACKAGE_ACTION_DONE),
+		new PopulatePkgChangelogFromServerProcess(action.PackageName(), model));
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::CreatePopulateUserRatingsPackageActionCoordinator(Model* model,
+	const PopulateUserRatingsPackageAction& action)
+{
+	return _CreateSingleProcessCoordinator("PopulatePkgUserRatings",
+		new BMessage(MSG_PACKAGE_ACTION_DONE),
+		new PopulatePkgUserRatingsFromServerProcess(action.PackageName(), model));
 }
 
 
@@ -225,10 +226,10 @@ ProcessCoordinatorFactory::_CalculateServerProcessOptions()
 
 
 /*static*/ ProcessCoordinator*
-ProcessCoordinatorFactory::_CreateSingleProcessCoordinator(const char* name,
+ProcessCoordinatorFactory::_CreateSingleProcessCoordinator(const char* name, BMessage* message,
 	AbstractProcess* process)
 {
-	ProcessCoordinator* processCoordinator = new ProcessCoordinator(name);
+	ProcessCoordinator* processCoordinator = new ProcessCoordinator(name, message);
 	AbstractProcessNode* cacheScreenshotNode = new ThreadedProcessNode(process);
 	processCoordinator->AddNode(cacheScreenshotNode);
 	return processCoordinator;

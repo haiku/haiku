@@ -26,6 +26,7 @@
 #include "LanguageMenuUtils.h"
 #include "Logger.h"
 #include "MarkupParser.h"
+#include "PackageAction.h"
 #include "PackageUtils.h"
 #include "RatingView.h"
 #include "ServerHelper.h"
@@ -371,8 +372,8 @@ RatePackageWindow::MessageReceived(BMessage* message)
 void
 RatePackageWindow::_RefreshPackageData()
 {
-	BMessage message(MSG_SERVER_DATA_CHANGED);
-	message.AddString(shared_message_keys::kKeyPackageName, fPackage->Name());
+	PopulateUserRatingsPackageAction action(fPackage->Name());
+	BMessage message = action.Message();
 	be_app->PostMessage(&message);
 }
 

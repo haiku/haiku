@@ -16,6 +16,10 @@
 
 static const char* const kKeyTitle = "title";
 static const char* const kKeyDeskbarLink = "deskbar_link";
+static const char* const kKeyScreenshotCoordinates = "screenshot_coordinates";
+
+
+// #pragma mark - PackageAction
 
 
 /*!	An abstract superclass of the various sorts of package actions which can be
@@ -84,6 +88,9 @@ PackageAction::Archive(BMessage* into, bool deep) const
 }
 
 
+// #pragma mark - UninstallPackageAction
+
+
 UninstallPackageAction::UninstallPackageAction(const BString& packageName,
 	const BString& packageTitle)
 	:
@@ -113,6 +120,9 @@ UninstallPackageAction::MessageWhat() const
 }
 
 
+// #pragma mark - InstallPackageAction
+
+
 InstallPackageAction::InstallPackageAction(const BString& packageName,
 	const BString& packageTitle)
 	:
@@ -140,6 +150,9 @@ InstallPackageAction::MessageWhat() const
 {
 	return MSG_PKG_INSTALL;
 }
+
+
+// #pragma mark - OpenPackageAction
 
 
 OpenPackageAction::OpenPackageAction(const BString& packageName, const DeskbarLink& deskbarLink)
@@ -196,4 +209,121 @@ OpenPackageAction::Archive(BMessage* into, bool deep) const
 	}
 
 	return result;
+}
+
+
+// #pragma mark - CacheScreenshotPackageAction
+
+
+CacheScreenshotPackageAction::CacheScreenshotPackageAction(const BString& packageName,
+	const ScreenshotCoordinate& screenshotCoordinate)
+	:
+	PackageAction("Screenshot", packageName),
+	fScreenshotCoordinate(screenshotCoordinate)
+{
+}
+
+
+CacheScreenshotPackageAction::CacheScreenshotPackageAction(const BMessage* from)
+	:
+	PackageAction(from)
+{
+	BMessage screenshotCoordinateMessage;
+	if (from->FindMessage(kKeyScreenshotCoordinates, &screenshotCoordinateMessage) == B_OK)
+		fScreenshotCoordinate = ScreenshotCoordinate(&screenshotCoordinateMessage);
+	else
+		HDFATAL("missing key [%s]", kKeyScreenshotCoordinates);
+}
+
+
+CacheScreenshotPackageAction::~CacheScreenshotPackageAction()
+{
+}
+
+
+const uint32
+CacheScreenshotPackageAction::MessageWhat() const
+{
+	return MSG_PKG_CACHE_SCREENSHOT;
+}
+
+
+ScreenshotCoordinate
+CacheScreenshotPackageAction::Coordinate() const
+{
+	return fScreenshotCoordinate;
+}
+
+
+status_t
+CacheScreenshotPackageAction::Archive(BMessage* into, bool deep) const
+{
+	status_t result = PackageAction::Archive(into, deep);
+
+	if (result == B_OK) {
+		BMessage screenshotCoordinateMessage;
+		result = fScreenshotCoordinate.Archive(&screenshotCoordinateMessage);
+		if (result == B_OK)
+			result = into->AddMessage(kKeyScreenshotCoordinates, &screenshotCoordinateMessage);
+	}
+
+	return result;
+}
+
+
+// #pragma mark - PopulateChangelogPackageAction
+
+
+PopulateChangelogPackageAction::PopulateChangelogPackageAction(const BString& packageName)
+	:
+	PackageAction("Populate Changelog", packageName)
+{
+}
+
+
+PopulateChangelogPackageAction::PopulateChangelogPackageAction(const BMessage* from)
+	:
+	PackageAction(from)
+{
+}
+
+
+PopulateChangelogPackageAction::~PopulateChangelogPackageAction()
+{
+}
+
+
+const uint32
+PopulateChangelogPackageAction::MessageWhat() const
+{
+	return MSG_PKG_POPULATE_CHANGELOG;
+}
+
+
+// #pragma mark - PopulateUserRatingsPackageAction
+
+
+PopulateUserRatingsPackageAction::PopulateUserRatingsPackageAction(const BString& packageName)
+	:
+	PackageAction("Populate User Ratings", packageName)
+{
+}
+
+
+PopulateUserRatingsPackageAction::PopulateUserRatingsPackageAction(const BMessage* from)
+	:
+	PackageAction(from)
+{
+}
+
+
+PopulateUserRatingsPackageAction::~PopulateUserRatingsPackageAction()
+{
+}
+
+
+const uint32
+PopulateUserRatingsPackageAction::MessageWhat() const
+{
+	return MSG_PKG_POPULATE_USER_RATINGS;
 }

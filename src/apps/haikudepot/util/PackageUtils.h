@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_UTILS_H
@@ -14,6 +14,12 @@ public:
 	static	void			TitleOrName(const PackageInfoRef& package, BString& title);
 	static	void			Title(const PackageInfoRef& package, BString& title);
 	static	void			Summary(const PackageInfoRef& package, BString& summary);
+
+	static	bool			HasChangelog(const PackageInfoRef& package);
+	static	bool			IsPopulatedChangelog(const PackageInfoRef& package);
+
+	static	bool			HasUserRatings(const PackageInfoRef& package);
+	static	bool			IsPopulatedUserRatings(const PackageInfoRef& package);
 
 	static	PackageVersionRef
 							Version(const PackageInfoRef& package);

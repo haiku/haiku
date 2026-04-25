@@ -10,6 +10,7 @@
 #include <String.h>
 
 #include "DeskbarLink.h"
+#include "ScreenshotCoordinate.h"
 
 
 class PackageAction : public BReferenceable, public BArchivable
@@ -77,6 +78,46 @@ public:
 
 private:
 			DeskbarLink			fLink;
+};
+
+
+class CacheScreenshotPackageAction : public PackageAction {
+public:
+								CacheScreenshotPackageAction(const BString& packageName,
+									const ScreenshotCoordinate& screenshotCoordinate);
+								CacheScreenshotPackageAction(const BMessage* from);
+								~CacheScreenshotPackageAction();
+
+	virtual	const uint32		MessageWhat() const;
+
+			ScreenshotCoordinate
+								Coordinate() const;
+
+	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+
+private:
+			ScreenshotCoordinate
+								fScreenshotCoordinate;
+};
+
+
+class PopulateChangelogPackageAction : public PackageAction {
+public:
+								PopulateChangelogPackageAction(const BString& packageName);
+								PopulateChangelogPackageAction(const BMessage* from);
+	virtual						~PopulateChangelogPackageAction();
+
+	virtual	const uint32		MessageWhat() const;
+};
+
+
+class PopulateUserRatingsPackageAction : public PackageAction {
+public:
+								PopulateUserRatingsPackageAction(const BString& packageName);
+								PopulateUserRatingsPackageAction(const BMessage* from);
+	virtual						~PopulateUserRatingsPackageAction();
+
+	virtual	const uint32		MessageWhat() const;
 };
 
 

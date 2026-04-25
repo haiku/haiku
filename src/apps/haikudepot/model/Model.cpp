@@ -530,6 +530,10 @@ bool
 Model::CanPopulatePackage(const PackageInfoRef& package)
 {
 	const BString depotName = PackageUtils::DepotName(package);
+
+	if (depotName == SINGLE_PACKAGE_DEPOT_NAME)
+		return false;
+
 	const DepotInfoRef& depot = DepotForName(depotName);
 
 	if (!depot.IsSet())

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2023-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef CACHE_SCREENSHOT_PROCESS__H
@@ -15,8 +15,8 @@ class Model;
 
 class CacheScreenshotProcess : public AbstractProcess {
 public:
-								CacheScreenshotProcess(
-									Model* model, ScreenshotCoordinate& screenshotCoordinate);
+								CacheScreenshotProcess(Model* model,
+									const ScreenshotCoordinate& screenshotCoordinate);
 	virtual						~CacheScreenshotProcess();
 
 			const char*			Name() const;

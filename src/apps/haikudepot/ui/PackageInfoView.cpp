@@ -45,7 +45,6 @@
 #include "PackageInfo.h"
 #include "PackageManager.h"
 #include "PackageUtils.h"
-#include "ProcessCoordinatorFactory.h"
 #include "RatingView.h"
 #include "ScrollableGroupView.h"
 #include "ServerHelper.h"
@@ -1226,35 +1225,84 @@ public:
 		fAboutView->SetScreenshotThumbnail(bitmap);
 	}
 
-	void SetPackage(const PackageInfoRef package, bool switchToDefaultTab)
+	void PopulateDataForTab(int32 index)
 	{
-		if (switchToDefaultTab)
-			Select(TAB_ABOUT);
+		switch (index) {
+			case TAB_ABOUT:
+				break;
+			case TAB_RATINGS:
+				_MaybePopulateUserRatings(fPackage);
+				break;
+			case TAB_CHANGELOG:
+				_MaybePopulateChangelog(fPackage);
+				break;
+			case TAB_CONTENTS:
+				break;
+			default:
+				HDERROR("unhandled tab index for data population");
+				break;
+		}
+	}
+
+	void SetPackage(const PackageInfoRef package)
+	{
+		fPackage = package;
 
 		bool enableUserRatingsTab = false;
 		bool enableChangelogTab = false;
 		bool enableContentsTab = false;
 
 		if (package.IsSet()) {
-			PackageLocalizedTextRef localizedText = package->LocalizedText();
-
-			if (localizedText.IsSet())
-				enableChangelogTab = localizedText->HasChangelog();
-
+			enableChangelogTab = _ShowChangelog(package);
 			enableContentsTab = PackageUtils::IsActivatedOrLocalFile(package);
-			enableUserRatingsTab = _PackageCanHaveRatings(package);
+			enableUserRatingsTab = _ShowUserRatings(package);
 		}
 
 		TabAt(TAB_CHANGELOG)->SetEnabled(enableChangelogTab);
 		TabAt(TAB_CONTENTS)->SetEnabled(enableContentsTab);
 		TabAt(TAB_RATINGS)->SetEnabled(enableUserRatingsTab);
-		Invalidate(TabFrame(TAB_CHANGELOG));
-		Invalidate(TabFrame(TAB_CONTENTS));
 
 		fAboutView->SetPackage(package);
 		fUserRatingsView->SetPackage(package);
 		fChangelogView->SetPackage(package);
 		fContentsView->SetPackage(package);
+
+		int32 currentTab = Selection();
+		int32 futureTab = currentTab;
+
+		switch (futureTab) {
+			case TAB_ABOUT:
+				break;
+			case TAB_RATINGS:
+				if (!enableUserRatingsTab)
+					futureTab = TAB_ABOUT;
+				break;
+			case TAB_CHANGELOG:
+				if (!enableChangelogTab)
+					futureTab = TAB_ABOUT;
+				break;
+			case TAB_CONTENTS:
+				if (!enableContentsTab)
+					futureTab = TAB_ABOUT;
+				break;
+			default:
+				HDERROR("unhandled tab index");
+				futureTab = TAB_ABOUT;
+				break;
+		}
+
+		if (currentTab != futureTab)
+			Select(futureTab);
+		else
+			PopulateDataForTab(currentTab);
+	}
+
+	/*!	This is overridden so that data can be loaded as the tab is selected
+		on-demand rather than load all the data anyway.
+	*/
+	virtual void Select(int32 index) {
+		BTabView::Select(index);
+		PopulateDataForTab(index);
 	}
 
 	void Clear()
@@ -1266,22 +1314,78 @@ public:
 	}
 
 private:
-	/*!	It is only possible for a package to have ratings if it is associated with a server-side
-		repository (depot). Otherwise there will be no means to display ratings.
-	*/
-	bool _PackageCanHaveRatings(const PackageInfoRef package)
+
+	bool _ShowUserRatings(const PackageInfoRef package)
 	{
-		BString depotName = PackageUtils::DepotName(package);
+		if (!package.IsSet())
+    		return false;
+		return PackageUtils::IsPopulatedUserRatings(package)
+			|| (fModel->CanPopulatePackage(package) && ServerHelper::IsNetworkAvailable()
+				&& PackageUtils::HasUserRatings(package));
+	}
 
-		if (depotName == SINGLE_PACKAGE_DEPOT_NAME)
-			return false;
+	bool _ShowChangelog(const PackageInfoRef package) {
+		if (!package.IsSet())
+    		return false;
+		return PackageUtils::IsPopulatedChangelog(package)
+			|| (fModel->CanPopulatePackage(package) && ServerHelper::IsNetworkAvailable()
+				&& PackageUtils::HasChangelog(package));
+	}
 
-		const DepotInfoRef depotInfo = fModel->DepotForName(depotName);
+	/*!	Returns true if the changelog should be available.
+	*/
+	void _MaybePopulateChangelog(const PackageInfoRef package) {
+		if (!package.IsSet())
+			return;
 
-		if (depotInfo.IsSet())
-			return !depotInfo->WebAppRepositoryCode().IsEmpty();
+		if (PackageUtils::IsPopulatedChangelog(package))
+			return;
 
-		return false;
+		if (!fModel->CanPopulatePackage(package))
+			return;
+
+		if (!ServerHelper::IsNetworkAvailable()) {
+			HDINFO("will skip populating changelog for [%s] as no network is available",
+            	package->Name().String());
+			return;
+		}
+
+		if (!PackageUtils::HasChangelog(package))
+			return;
+
+		// This will case a background task to start which will fetch the changelog
+		// from the server and populate it into the package data stored in the model.
+		// The correct view will be updated when the data arrives to present.
+		PopulateChangelogPackageAction action(package->Name());
+		BMessage message = action.Message();
+		Window()->PostMessage(&message);
+	}
+
+	void _MaybePopulateUserRatings(const PackageInfoRef package) {
+		if (!package.IsSet())
+			return;
+
+		if (PackageUtils::IsPopulatedUserRatings(package))
+			return;
+
+		if (!fModel->CanPopulatePackage(package))
+			return;
+
+		if (!ServerHelper::IsNetworkAvailable()) {
+			HDINFO("will skip populating user ratings for [%s] as no network is available",
+            	package->Name().String());
+			return;
+		}
+
+		if (!PackageUtils::HasUserRatings(package))
+			return;
+
+		// This will case a background task to start which will fetch the user ratings
+		// from the server and populate it into the package data stored in the model.
+		// The correct view will be updated when the data arrives to present.
+		PopulateUserRatingsPackageAction action(package->Name());
+		BMessage message = action.Message();
+		Window()->PostMessage(&message);
 	}
 
 private:
@@ -1290,18 +1394,17 @@ private:
 	UserRatingsView*	fUserRatingsView;
 	ChangelogView*		fChangelogView;
 	ContentsView* 		fContentsView;
+	PackageInfoRef		fPackage;
 };
 
 
 // #pragma mark - PackageInfoView
 
 
-PackageInfoView::PackageInfoView(Model* model,
-	ProcessCoordinatorConsumer* processCoordinatorConsumer)
+PackageInfoView::PackageInfoView(Model* model)
 	:
 	BView("package info view", 0),
-	fModel(model),
-	fProcessCoordinatorConsumer(processCoordinatorConsumer)
+	fModel(model)
 {
 	fCardLayout = new BCardLayout();
 	SetLayout(fCardLayout);
@@ -1362,23 +1465,9 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 		return;
 	}
 
-	bool switchToDefaultTab = true;
-	if (fPackage == packageRef) {
-		// When asked to display the already showing package ref,
-		// don't switch to the default tab.
-		switchToDefaultTab = false;
-	} else if (fPackage.IsSet() && packageRef.IsSet() && fPackage->Name() == packageRef->Name()) {
-		// When asked to display a different PackageInfo instance,
-		// but it has the same package title as the already showing
-		// instance, this probably means there was a repository
-		// refresh and we are in fact still requested to show the
-		// same package as before the refresh.
-		switchToDefaultTab = false;
-	}
-
 	fTitleView->SetPackage(packageRef);
 	fPackageActionView->SetPackage(packageRef);
-	fPagesView->SetPackage(packageRef, switchToDefaultTab);
+	fPagesView->SetPackage(packageRef);
 
 	_SetPackageScreenshotThumb(packageRef);
 
@@ -1411,7 +1500,7 @@ PackageInfoView::_HandlePackageChanged(const PackageInfoChangeEvent& event)
 
 		if ((changes & PKG_CHANGED_LOCALIZED_TEXT) != 0 || (changes & PKG_CHANGED_SCREENSHOTS) != 0
 			|| (changes & PKG_CHANGED_RATINGS) != 0 || (changes & PKG_CHANGED_LOCAL_INFO) != 0) {
-			fPagesView->SetPackage(package, false);
+			fPagesView->SetPackage(package);
 		}
 
 		if ((changes & PKG_CHANGED_LOCALIZED_TEXT) != 0 || (changes & PKG_CHANGED_RATINGS) != 0)
@@ -1443,7 +1532,6 @@ PackageInfoView::HandlePackagesChanged(const std::vector<PackageInfoChangeEvent>
 	the background. A message will come through later once it is
 	cached and ready to load.
 */
-
 void
 PackageInfoView::_SetPackageScreenshotThumb(const PackageInfoRef& package)
 {
@@ -1467,9 +1555,9 @@ PackageInfoView::_SetPackageScreenshotThumb(const PackageInfoRef& package)
 			HDINFO("screenshot won't be cached [%s] -- network unavailable", packageNameCStr);
 		} else {
 			HDDEBUG("screenshot is not cached [%s] -- will cache it", packageNameCStr);
-			ProcessCoordinator* processCoordinator
-				= ProcessCoordinatorFactory::CacheScreenshotCoordinator(fModel, desiredCoordinate);
-			fProcessCoordinatorConsumer->Consume(processCoordinator);
+			CacheScreenshotPackageAction action(package->Name(), desiredCoordinate);
+			BMessage message = action.Message();
+			Window()->PostMessage(&message);
 		}
 	} else {
 		HDDEBUG("no screenshot for pkg [%s]", packageNameCStr);
