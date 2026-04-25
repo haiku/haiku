@@ -1,5 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	1319108693
+1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Ομάδες
+Temp	DataSource		Θερμ.
 Block cache memory	DataSource		Αποκλεισμός λανθάνουσας μνήμης
 Media nodes	DataSource		Κόμβοι πολυμέσων
 Network send	DataSource		Αποστολή δικτύου
@@ -9,8 +10,10 @@ ActivityMonitor	System name		Διαχείριση Εργασιών
 CPU %d	DataSource		ΚΜΕ %d
 Update time interval:	SettingsWindow		Ενημέρωση χρονικού διαστήματος:
 Settings…	ActivityWindow		Ρυθμίσεις…
+Unknown thermal sensor	SystemInfoHandler		Άγνωστος αισθητήρας θερμοκρασίας
 Block cache	DataSource		Αποκλεισμός cache
 Memory	DataSource		Μνήμη
+No thermal sensor	SystemInfoHandler		Δεν βρέθηκαν αισθητήρες θερμοκρασίας
 CPU speed	DataSource		Ταχύτητα ΚΜΕ
 CPU usage	DataSource		Χρήση ΚΜΕ
 Raw clipboard	DataSource		Ακατέργαστο πρόχειρο
@@ -22,6 +25,8 @@ Apps	DataSource		Εφαρμογές
 Page faults	DataSource		Σφάλματα σελίδας
 Add graph	ActivityWindow		Προσθήκη γραφήματος
 Swap	DataSource		Swap
+%s faults/s	DataSource		%s σφάλματα/δ
+Temperature	DataSource		Θερμοκρασία
 Semaphores	DataSource		Σηματοφόροι
 TX	DataSource	Shorter version for Sending	ΑΠ
 %lld ms	SettingsWindow		%lld ms

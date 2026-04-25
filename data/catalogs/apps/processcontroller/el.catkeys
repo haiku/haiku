@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	2724038695
+1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Σφάλμα αποθήκευσης αρχείου
 Display priority	ProcessController		Προτεραιότητα εμφάνισης
 That's no Fun!	ProcessController		Αυτό δεν έχει πλάκα!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Χαμηλή προτεραιότητα
 Urgent display priority	ProcessController		Επείγουσα προτεραιότητα εμφάνισης
 Memory usage	ProcessController		Χρήση μνήμης
 Ok!	ProcessController		Εντάξει!
+%appname% is already installed in Deskbar.	ProcessController		Η εφαρμογή %appname% είναι ήδη εγκατεστημένη στο Deskbar.
 Normal priority	ProcessController		Κανονική προτεραιότητα
 Restart Deskbar	ProcessController		Επανεκκίνηση Γραμμής Εργασιών
 Usage: %s [-deskbar]\n	ProcessController		Χρήση: %s [-deskbar]\n
@@ -29,7 +30,9 @@ Quit application	ProcessController		Έξοδος εφαρμογής
 Info	ProcessController		Πληροφορίες
 Kill this thread!	ProcessController		Τερματισμός αυτού του νήματος!
 This team is already gone…	ProcessController		Αυτή η ομάδα έχει ήδη εξαφανιστεί…
+About %appname%…	ProcessController		Σχετικά με την εφαρμογή %appname%…
 Gone teams…	ProcessController		Ομάδες που εξαφανίστηκαν…
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		Μπορείτε να τρέξετε την εφαρμογή %appname% σε παράθυρο ή να την εγκαταστήσετε στο Deskbar.
 Quit an application	ProcessController		Έξοδος από μια εφαρμογή
 Cancel	ProcessController		Άκυρο
 Install in Deskbar	ProcessController		Εγκατάσταση στην Γραμμή Εργασιών

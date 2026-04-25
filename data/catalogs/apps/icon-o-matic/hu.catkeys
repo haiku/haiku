@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	2319229532
+1	hungarian	x-vnd.haiku-icon_o_matic	1029251628
 None	Icon-O-Matic-Properties		Nincs
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Útvonal megtisztítása
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -161,6 +161,7 @@ Untitled	Icon-O-Matic-Main		Névtelen
 Max LOD	Icon-O-Matic-PropertyNames		Max RSz
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Menti a változtatásokat a jelenlegi ikonba bezárás előtt?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nem sikerült megnyit a fájlt (%s), mint SVG dokumentum.\n\n
+<unknown property>	Icon-O-Matic-PropertyNames		<ismeretlen tulajdonság>
 Save as…	Icon-O-Matic-Menu-File		Mentés másként…
 Swatches	Icon-O-Matic-Menus		Paletta
 <modify path>	Icon-O-Matic-PathCmd		<útvonal módosítása>

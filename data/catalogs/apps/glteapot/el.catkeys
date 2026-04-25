@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-GLTeapot	400822745
+1	greek, modern (1453-)	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Δεξιά
 Backface culling	TeapotWindow		Κλείσιμο οπίσθιας όψης
 Add a teapot	TeapotWindow		Προσθήκη τσαγιέρας
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Κάτω αριστερά
 Fog	TeapotWindow		Ομίχλη
 FPS display	TeapotWindow		Προβολή FPS
 GLTeapot	System name		GL-Τσαγιέρα
+Limit FPS to refresh rate	TeapotWindow		Περιορισμός των FPS στη συχνότητα ανανέωσης
 Settings	TeapotWindow		Ρυθμίσεις
 Gouraud shading	TeapotWindow		Σκίαση Gouraud
 Lighting	TeapotWindow		Φωτισμός

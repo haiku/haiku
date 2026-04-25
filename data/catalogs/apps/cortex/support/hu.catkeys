@@ -1,4 +1,4 @@
-1	hungarian	application/x-vnd.Cortex.support	3450110595
+1	hungarian	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		A fejlécnek vannak zászlói
 32 bit HLS	MediaString		32 bites HLS
 Recording	MediaString		Felvétel
@@ -46,6 +46,7 @@ Right	MediaString		Jobb
 System mixer	MediaString		Rendszer keverő
 Physical output	MediaString		Fizikai kimenet
 Top-Back-center	MediaString		Közép hátsó-felső
+(unknown video orientation)	MediaString		(ismeretlen videó tájolás)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Fentről lefelé, balról jobbra
 (unknown run mode)	MediaString		(ismeretlen futási mód)

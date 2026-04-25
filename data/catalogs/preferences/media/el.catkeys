@@ -1,7 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Media	4055972908
+1	greek, modern (1453-)	x-vnd.Haiku-Media	2686142259
 Couldn't add volume control in Deskbar: %s\n	Media views		Αδυναμία προσθήκης του εργαλείου έντασης ήχου στην Γραμμή Εργασιών: %s\n
 Restart media services	Media views		Επανεκκίνηση υπηρεσιών πολυμέσων
 Quit	Media Window		Έξοδος
+Quitting %prefname% now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Τερματίζοντας το %prefname% τώρα θα σταματήσει την επανεκκίνηση των υπηρεσιών πολυμέσων. Αυτό μπορεί να προξενήσει αστάθεια ή απενεργοποίηση ορισμένων πολυμεσικών δυνατοτήτων.
 <none>	VideoInputMenu	Used when no video input is available	<κανένα>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Αδυναμία αφαίρεσης του εργαλείου έντασης ήχου από την Γραμμή Εργασιών: %s\n
 Video output:	Media views		Έξοδος βίντεο:

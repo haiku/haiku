@@ -1,4 +1,4 @@
-1	catalan; valencian	application/x-vnd.Cortex.support	3450110595
+1	catalan; valencian	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		La capçalera té banderes.
 32 bit HLS	MediaString		HLS de 32 bits
 Recording	MediaString		Gravació
@@ -46,6 +46,7 @@ Right	MediaString		Dreta
 System mixer	MediaString		Mesclador del sistema
 Physical output	MediaString		Sortida física
 Top-Back-center	MediaString		Dalt-darrere-centre
+(unknown video orientation)	MediaString		(orientació de vídeo desconeguda)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		De dalt a baix, d’esquerra a dreta
 (unknown run mode)	MediaString		(mode d'execució desconegut)

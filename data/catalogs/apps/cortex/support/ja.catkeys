@@ -1,4 +1,4 @@
-1	japanese	application/x-vnd.Cortex.support	3450110595
+1	japanese	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		ヘッダーにフラグ有り
 32 bit HLS	MediaString		32 ビット HLS
 Recording	MediaString		レコーディング
@@ -46,6 +46,7 @@ Right	MediaString		右
 System mixer	MediaString		System mixer
 Physical output	MediaString		物理出力
 Top-Back-center	MediaString		Top-Back-center
+(unknown video orientation)	MediaString		(不明なビデオの向き)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Top to bottom, left to right
 (unknown run mode)	MediaString		(不明な実行モード)

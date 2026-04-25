@@ -1,15 +1,19 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3030650110
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	734452449
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
 Open with…	ContainerWindow		Άνοιγμα με…
 Kind	ContainerWindow		Είδος
-Error moving \"%name\" to Trash. (%error)	FSUtils		Σφάλμα κατά τη μετακίνηση του \"%name\" στον Κάδο Απορριμμάτων. (%error)
+Error moving \"%name\" to Trash. (%error)	FSUtils		Σφάλμα κατά τη μετακίνηση του \"%name\" στον Κάδο απορριμμάτων. (%error)
 Or	FindPanel		Ή
 MIME Description	AttributesView		Περιγραφή MIME
+Query	FindPanel		Ερώτημα
 before	FindPanel		πριν
+New folder%d	FSUtils		Νέος κατάλογος%d
 Volume icons	TrackerSettingsWindow		Εικονίδια τόμου
 Ignore case	SelectionWindow		Αγνόηση
+Save as query template:	FindPanel		Αποθήκευση ως πρότυπο ερωτήματος:
+Save query:	FindPanel		Αποθήκευση ερωτήματος:
 Current folder	ContainerWindow		Τρέχων κατάλογος
 Finish: %time - Over %finishtime left	StatusWindow		Ολοκλήρωση: %time - Παραμένουν πάνω από %finishtime
 Mount all disks now	AutoMounterSettings		Προσάρτηση όλων των δίσκων τώρα
@@ -26,8 +30,9 @@ Eject when unmounting	AutoMounterSettings		Εξαγωγή κατά την απο
 Searching for disks to mount…	StatusWindow		Αναζήτηση δίσκων για προσάρτηση…
 Value	AttributesView		Τιμή
 Information	InfoWindow		Πληροφορίες
-Error emptying Trash	FSUtils		Σφάλμα αδειάσματος Κάδου Απορριμάτων
+Error emptying Trash	FSUtils		Σφάλμα αδειάσματος Κάδου απορριμμάτων
 Opens with:	InfoWindow		Άνοιγμα με:
+You cannot copy or move the Printers directory.	FSUtils		Δεν μπορείτε να αντιγράψετε ή να μετακινήσετε τον κατάλογο Εκτυπωτές.
 Size	QueryPoseView		Μέγεθος
 Disk mount	TrackerSettingsWindow		Προσάρτηση δίσκου
 Type	AttributesView		Τύπος
@@ -55,6 +60,7 @@ Create link	ContainerWindow		Δημιουργία σύνδεσμου
 starts with	FindPanel		ξεκινά με
 Replace	FSUtils		Αντικατάσταση
 ?+* follows nothing.	libtracker		δεν υπάρχει τίποτα μετά το ?+*.
+Include Trash	FindPanel		Συμπερίληψη Κάδου απορριμμάτων στην αναζήτηση
 Rectangle	AttributesView		Παραλληλόγραμμο
 Move to	ContainerWindow		Μετακίνηση στο
 Status	Email Query Columns		Κατάσταση
@@ -99,6 +105,7 @@ Window	ContainerWindow		Παράθυρο
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Αφαίρεση
 Company	Person Query Columns		Εταιρία
+Select folders…	FindPanel		Επιλογή καταλόγων…
 Recent documents	FavoritesMenu		Πρόσφατα έγγραφα
 Edit templates…	TemplatesMenu		Επεξεργασία προτύπων…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
@@ -120,10 +127,12 @@ Modified	QueryPoseView		Τροποποιήθηκε
 Owner	FilePermissionsView		Ιδιοκτήτης
 Cancel	FSClipBoard		Άκυρο
 Modified	PoseView		Τροποποήθηκε
-Move to Trash	ContainerWindow		Μετακίνηση στον Κάδο
+Save as template…	FindPanel		Αποθήκευση ως προτύπου…
+Move to Trash	ContainerWindow		Μετακίνηση στον Κάδο απορριμμάτων
 All files and folders	FindPanel		Όλα τα αρχεία και τους φακέλους
 Add-ons	ContainerWindow		Πρόσθετα
 Too many parenthesis.	libtracker		Υπερβολικά πολλές παρενθέσεις.
+Save query template:	FindPanel		Αποθήκευση προτύπου ερωτήματος:
 Increase size	ContainerWindow		Αύξηση μεγέθους
 \nShould this be fixed?	FSUtils		\nΠρέπει αυτό να διορθωθεί;
 URL	Bookmark Query Columns		Υπερσύνδεσμος
@@ -135,6 +144,7 @@ Cut	ContainerWindow		Αποκοπή
 Disks	Model		Δίσκοι
 Create a Query template	FindPanel		Δημιουργία ενός προτύπου Ερωτημάτος
 Size	FindPanel		Μέγεθος
+New submenu	ContainerWindow	Folder name of New-template submenu	Νέο υπομενού
 OK	Email Query Columns		Εντάξει
 Location	QueryPoseView		Τοποθεσία
 Edit query	ContainerWindow		Επεξεργασία ερωτήματος
@@ -155,12 +165,15 @@ Could not open \"%name\" (%error). 	FSUtils		Αδυναμία ανοίγματο
 Media parameter group	AttributesView		Ομάδα παραμέτρων πολυμέσων
 %name info	InfoWindow	InfoWindow Title	%name πληροφορίες
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Αν μετακινήσετε τον αρχικό φάκελο, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΘέλετε σίγουρα να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον αρχικό φάκελο ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Μετακίνηση\".
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%total επιλεγμένα}}
 Property info	AttributesView		Πληροφορίες ιδιοτήτων
-Sorry, you can't create links in the Trash.	PoseView		Συγνώμη, δεν μπορείτε να δημιουργήσετε συνδέσμους στο Κάδο.
+Sorry, you can't create links in the Trash.	PoseView		Συγνώμη, δεν μπορείτε να δημιουργήσετε συνδέσμους στον Κάδο απορριμμάτων.
 From	Email Query Columns		Από
 Open selection with:	OpenWithWindow		Άνοιγμα επιλεγμένου με:
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Αδυναμία ανοίγματος του \"%document\" επειδή η εφαρμογή \"%app\" είναι στον Κάδο Απορριμάτων. 
+Preferences…	ContainerWindow		Ρυθμίσεις…
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Αδυναμία ανοίγματος του \"%document\" επειδή η εφαρμογή \"%app\" είναι στον Κάδο απορριμμάτων. 
 Work Phone	Person Query Columns		Τηλέφωνο εργασίας
+Select folders	FindPanel		Επιλογή καταλόγων
 Close	ContainerWindow		Κλείσιμο
 Get info	ContainerWindow		Λήψη πληροφοριών
 MIME Type	AttributesView		Τύπος MIME
@@ -193,6 +206,7 @@ Cancel	FSUtils		Άκυρο
 Original name	ContainerWindow		Πρωτότυπο όνομα
 Unknown	WidgetAttributeText		Άγνωστο
 32-bit integer	AttributesView		Ακέραιος αριθμός 32-bit
+Save as query…	FindPanel		Αποθήκευση ως ερωτήματος…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα ήδη χρησιμοποιείται ως όνομα φακέλου. Παρακαλώ διαλέξτε άλλο όνομα.
 Modified	ContainerWindow		Τροποποιήθηκε
 Mini icon view	ContainerWindow		Προβολή μικρών εικονιδίων
@@ -239,23 +253,25 @@ Favorites	FilePanelPriv		Αγαπημένα
 Point	AttributesView		Σημείο
 You can't move or copy items to read-only volumes.	PoseView		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε αντικείμενα σε τόμους που είναι μόνο για ανάγνωση.
 home	B_USER_DIRECTORY		Αρχικός φάκελος
+You cannot create a link to the Trash directory.	FSUtils		Δεν μπορείτε να δημιουργήσετε σύνδεσμο προς τον Κάδο απορριμμάτων.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Νέα πρότυπα Ιχνηλάτη
 Disk mounting during boot	AutoMounterSettings		Προσάρτηση δίσκου κατά την εκκίνηση
 Don't automount	AutoMounterSettings		Να μη γίνει αυτόματη προσάρτηση
 Node ref	AttributesView		Αναφορά κόμβου
 Could not find application \"%appname\"	OpenWithWindow		Αδυναμία εύρεσης της εφαρμογής  \"%appname\"
 Unmatched parenthesis.	libtracker		Η παρένθεση δεν κλείνει.
+New folder %d	FSUtils		Νέος κατάλογος %d
 Extended attribute	AttributesView		Εκτεταμένη ιδιότητα
 Error %error loading Add-On %name.	ContainerWindow		Σφάλμα %error κατά την φόρτωση προσθέτου %name.
 Unmatched brackets.	libtracker		Οι αγκύλες δεν αντιστοιχούν.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Προσπαθείτε να αντικαταστήσετε το στοιχείο:\n\t%name%dest\nwith:\n\t%name%src\n\nΘα θέλατε να το αντικαταστήσετε με αυτό που %movemode;
-Empty Trash	ContainerWindow		Άδειασμα Κάδου
+Empty Trash	ContainerWindow		Άδειασμα Κάδου απορριμμάτων
 no supporting apps	OpenWithWindow		καμία υποστηριζόμενη εφαρμογή
 32-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 32-bit
-Preparing to empty Trash…	StatusWindow		Γίνεται προετοιμασία καθαρισμού του Κάδου…
+Preparing to empty Trash…	StatusWindow		Γίνεται προετοιμασία καθαρισμού του Κάδου απορριμμάτων…
 Deleting: 	StatusWindow		Γίνεται διαγραφή: 
 the MIME settings	FSUtils		οι ρυθμίσεις MIME
-You can't move or copy the trash.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στο καλάθι αχρήστων.
+You can't move or copy the trash.	FSUtils		Δεν μπορείτε να αντιγράψετε ή να μετακινήσετε τον Κάδο απορριμμάτων.
 label too long	PoseView		ετικέτα πολύ μεγάλη
 Error creating link to \"%name\".	FSUtils		Σφάλμα κατά τη δημιουργία συνδέσμου με το \"%name\".
 Unknown	FilePermissionsView		Άγνωστο
@@ -264,6 +280,7 @@ Restoring: 	StatusWindow		Γίνεται αποκατάσταση:
 The Tracker must be running to set the default printer.	PoseView		Ο Ιχνηλάτης πρέπει να εκτελείται για να οριστεί ο προεπιλεγμένος εκτυπωτής.
 calculating…	InfoWindow		γίνεται υπολογισμός…
 Preferred for file	OpenWithWindow		Προτινόμενο για το αρχείο
+{0, plural, one{# selected} other{# selected}}	FindPanel	\"1 selected (singular)\" or \"2 selected (plural)\"	{0, plural, one{# επιλεγμένο} other{# επιλεγμένα}}
 OK	AutoMounterSettings		Εντάξει
 copying	FSUtils		αντιγραφή
 MIME String	AttributesView		Γραμματοσειρά MIME
@@ -274,6 +291,7 @@ Show volumes on Desktop	SettingsView		Προβολή κατατμήσεων στ
 Recent folders	ContainerWindow		Πρόσφατοι φάκελοι
 Desktop	Model		Επιφάνεια εργασίας
 Select all	ContainerWindow		Επιλογή όλων
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
 apps	B_APPS_DIRECTORY		εφαρμογές
 Error calculating folder size.	InfoWindow		Προέκυψε σφάλμα κατά τον υπολογισμό του μεγέθους του φακέλου.
 Delete	FSUtils		Διαγραφή
@@ -285,16 +303,19 @@ config	B_USER_CONFIG_DIRECTORY		ρύθμιση
 Error moving \"%name\".	FSUtils		Σφάλμα κατα τη μετακίνηση του \"%name\".
 Open	ContainerWindow		Άνοιγμα
 Settings…	MountMenu		Ρυθμίσεις…
-You cannot put the selected item(s) into the trash.	FSUtils		Δεν μπορείτε να τοποθετήσετε την επιλογή σας στον Κάδο Απορριμάτων.
+You cannot put the selected item(s) into the trash.	FSUtils		Δεν μπορείτε να τοποθετήσετε τα επιλεγμένα στοιχεία στον Κάδο απορριμμάτων.
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Αναζήτηση σε:
 starts with	SelectionWindow		ξεκινάει με
 Any	AttributesView		Οποιοδήποτε
 Invert	SelectionWindow		Αντιστροφή
+Open…	FindPanel		Άνοιγμα…
 Would you like to find some other suitable application?	FSUtils		Θα θέλετα να επιλέξετε μια ποιο κατάλληλη εφαρμογή;
 (unknown)	AttributesView		(άγνωστο)
 *+? operand may be empty.	libtracker		*+? τελεστής ενδέχεται να είναι κενός.
 Recent folders	FavoritesMenu		Πρόσφατοι φάκελοι
 Signed memory size	AttributesView		Μέγεθος μνήμης με πρόσημο
 The specified name is illegal. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα είναι μη αποδεκτό. Παρακαλώ διαλέξτε άλλο όνομα.
+You cannot copy or move the Trash directory.	FSUtils		Δεν μπορείτε να αντιγράψετε ή να μετακινήσετε τον κατάλογο Κάδος απορριμμάτων.
 of %items	StatusWindow		από %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Σφάλμα αντιγραφής του αρχείου \"%name\":\n\t%error\n\nΘα θέλατε να συνεχίσετε;
 less than	FindPanel		λιγότερο από
@@ -322,12 +343,12 @@ Messenger	AttributesView		Αγγελιαφόρος
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte δεδομένων>} other {<# bytes δεδομένων>}}
 Version	OpenWithWindow		Έκδοση
 The entered file name is too long.	FSUtils		Το όνομα αρχείου είναι υπερβολικά μεγάλο.
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Μερικά από τα επιλεγμένα στοιχεία δεν μπορούν να μετακινηθούν στον Κάδο Απορριμμάτων. Θα θέλατε να τα διαγράψετε αντ' αυτού; (Αυτή η λειτουργία δεν μπορεί να επανέλθει.)
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Μερικά από τα επιλεγμένα στοιχεία δεν μπορούν να μετακινηθούν στον Κάδο απορριμμάτων. Θα θέλατε να τα διαγράψετε αντ' αυτού; (Αυτή η επιλογή είναι μη αντιστρέψιμη)
 Add printer…	ContainerWindow		Προσθήκη εκτυπωτή…
 Permissions	ContainerWindow		Άδειες
 Size:	InfoWindow		Μέγεθος:
 Copy	ContainerWindow		Αντιγραφή
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		To επιλεγμένο στοιχείο δεν μπορεί να μετακινηθεί στον Κάδο Απορριμμάτων. Θα θέλατε εναλλακτικά να το διαγράψετε; (Αυτή η λειτουργία δεν μπορεί να επανέλθει.)
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		To επιλεγμένο στοιχείο δεν μπορεί να μετακινηθεί στον Κάδο Απορριμμάτων. Θα θέλατε εναλλακτικά να το διαγράψετε; (Αυτή η επιλογή είναι μη αντιστρέψιμη)
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Συγνώμη, η ιδιότητα 'Χαρακτήρας' δεν μπορεί να αποθηκεύσει έναν γλύφο πολλών byte.
 And	FindPanel		Και
 Palette-indexed picture	AttributesView		Εικόνα με ίνδικα παλέττας
@@ -362,7 +383,7 @@ You can't move a folder into itself or any of its own sub-folders.	FSUtils		Δε
 New	ContainerWindow		Νέο
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Πρέπει να αφήσετε τα αντικείμενα σε ένα από τα εικονίδια δίσκων στο παράθυρο \"Δίσκοι\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Αν πειράξετε το %target, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό;
-Sorry, you can't copy items to the Trash.	FSClipBoard		Συγνώμη, δεν μπορείτε να αντιγράψετε στοιχεία στον Κάδο Απορριμάτων.
+Sorry, you can't copy items to the Trash.	FSClipBoard		Συγνώμη, δεν μπορείτε να αντιγράψετε στοιχεία στον Κάδο απορριμμάτων.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Ορισμένα στοιχεία υπάρχουν ήδη σε αυτόν το φάκελο με τα ίδια ονόματα με τα στοιχεία που %verb.\n \nΘα θέλατε να τα αντικαταστήσετε με αυτά που %verb ή θα θέλατε να αποφασίσετε για κάθε αρχείο μεμονωμένα;
 When	Email Query Columns		Πότε
 Object	AttributesView		Αντικείμενο
@@ -377,11 +398,12 @@ There was a problem trying to replace \"%name\". The item might be open or busy.
 Windows	TrackerSettingsWindow		Παράθυρα
 Show space bars on volumes	SettingsView		Εμφάνιση μπαρών διαστήματος στους τόμους
 Could not update permissions of file \"%name\". %error	FSUtils		Αδυναμία αναθεώρησης των δικαιωμάτων του αρχείου \"%name\". %error
-Emptying Trash… 	StatusWindow		Άδειασμα Κάδου Απορριμάτων… 
+Emptying Trash… 	StatusWindow		Άδειασμα Κάδου απορριμμάτων… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{για # αρχείο} other{για # αρχεία}}
 Revert	TrackerSettingsWindow		Επαναφορά
-trash	B_TRASH_DIRECTORY		κάδος
+trash	B_TRASH_DIRECTORY		κάδος απορριμμάτων
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Αν μετακινήσετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον φάκελο συστήματος ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε το πλήκτρο Shift πατημένο και κάντε κλικ στο κουμπί \"Μετακίνηση\".
+Open query:	FindPanel		Άνοιγμα ερωτήματος:
 Close all in workspace	ContainerWindow		Κλείσιμο όλων
 Corrupted expression.	libtracker		Κατεστραμμένη έκφραση.
 Network address	AttributesView		Διεύθυνση δικτύου
@@ -395,6 +417,7 @@ Name	QueryPoseView		Όνομα
 Error %error loading add-On %name.	ContainerWindow		Σφάλμα %error κατά την φόρτωση του προσθέτου %name.
 Does not handle file	OpenWithWindow		Δε χειρίζεται το αρχείο
 E-mail	Person Query Columns		E-mail
+Templates	FindPanel		Πρότυπα
 Arrange by	ContainerWindow		Ταξινόμιση κατά
 Attributes	AttributesView		Ιδιότητες
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Δεν επιτρέπεται η αποθήκευση περισσότερων του ενός αντικειμένου.
@@ -442,19 +465,21 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Πρέπει να αφήσετε τα αντικείμενα σε ένα από τα εικονίδια δίσκων στο παράθυρο \"Δίσκοι\".
 Version:	InfoWindow		Έκδοση:
 OK	PoseView		Εντάξει
+Add new submenu…	TemplatesMenu		Προσθήκη υπομενού…
 Find	FindPanel		Εύρεση
 Empty folder	NavMenu		Άδειος φάκελος
 Defaults	TrackerSettingsWindow		Προεπιλεγμένα
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Δεν υπάρχει ο απαιτούμενος ελευθερος χώρος στον τόμο για την αποθήκευση.
 True-color picture	AttributesView		Φωτογραφία ρεαλιστικών χρωμάτων
 Alignment	AttributesView		Στοίχιση
-Move to Trash	FSUtils		Μετακίνηση στον Κάδο
+Move to Trash	FSUtils		Μετακίνηση στον Κάδο απορριμμάτων
 Handles %type	OpenWithWindow		Χειρίζεται %type
 Cancel	PoseView		Άκυρο
+Options	FindPanel		Επιλογές
 Delete	PoseView		Διαγραφή
 Media parameter	AttributesView		Παράμετρος πολυμέσων
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Αν πειράξετε τον αρχικό φάκελο, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΘέλετε σίγουρα να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον αρχικό φάκελο ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Ξέρω τι κάνω\".
-Sorry, you can't copy items to the Trash.	PoseView		Δεν μπορείτε να αντιγράψετε στοιχεία στον Κάδο Απορριμάτων.
+Sorry, you can't copy items to the Trash.	PoseView		Συγνώμη, δεν μπορείτε να αντιγράψετε στοιχεία στον Κάδο απορριμμάτων.
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# αντικείμενο} other{# αντικείμενα}}
 Name	AttributesView		Όνομα
 Invalid bracket range.	libtracker		Λανθασμένο εύρος αγκυλών.

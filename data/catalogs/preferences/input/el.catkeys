@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Input	130668644
+1	greek, modern (1453-)	x-vnd.Haiku-Input	1020704344
 Defaults	InputMouse		Προεπιλογές
 Scrolling	TouchpadPrefView		Κύλιση
 Long	KeyboardView		Μικρή
@@ -9,9 +9,13 @@ Double-click speed	SettingsView		Ταχύτητα διπλού κλικ
 5-Button	SettingsView		5 κουμπιών
 Typing test area	KeyboardView		Περιοχή δοκιμής πληκτρολόγησης
 Fast	KeyboardView		Γρήγορη
+Always	TouchpadPrefView		Πάντα
 Please confirm	TouchpadPrefView		Παρακαλώ επιβεβαιώστε
+Trackpad speed	TouchpadPrefView		Ταχύτητα trackpad
 Mouse speed	SettingsView		Ταχύτητα ποντικιού
+Trackpad acceleration	TouchpadPrefView		Επιτάχυνση trackpad
 Horizontal scrolling	TouchpadPrefView		Οριζόντια κύλιση
+Reverse scroll direction	TouchpadPrefView		Αντιστροφή κατεύθυνσης κύλισης
 Keyboard lock delay	TouchpadPrefView		Καθυστέρηση κλειδώματος πληκτρολογίου
 Input	System name		Εισαγωγή
 Quick	TouchpadPrefView		Γρήγορα
@@ -20,7 +24,9 @@ Revert	InputMouse		Επαναφορά
 Slow	KeyboardView		Αρχή
 2-Button	SettingsView		2 κουμπιών
 Click to focus and raise	SettingsView		Να γίνεται κλικ για εστίαση και ανύψωση
+Natural scrolling	TouchpadPrefView		Φυσική κύλιση
 Vertical	TouchpadPrefView		Κάθετο
+Low	TouchpadPrefView		Αργά
 Focus follows mouse	SettingsView		Να εστιάζεται όποιο παράθυρο δείχνει ο κέρσορας
 Focus mode:	SettingsView		Λειτουργία εστίασης:
 Double-click test area	SettingsView		Περιοχή δοκιμής διπλού κλικ

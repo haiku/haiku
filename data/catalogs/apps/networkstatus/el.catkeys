@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	2510618206
+1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	3050452699
 IPv6 address:	NetworkStatusView		Διεύθυνση IPv6:
 Quit	NetworkStatusView		Έξοδος
 Unknown	NetworkStatusView		Άγνωστο
@@ -8,10 +8,13 @@ Open network preferences…	NetworkStatusView		Άνοιγμα ρυθμίσεων
 NetworkStatus	System name		Κατάσταση Δικτύου
 Broadcast:	NetworkStatusView		Διεύθυνση broadcast:
 OK	NetworkStatusView		Εντάξει
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Επιλογές της εφαρμογής %appname%:\n\t--deskbar\tαυτόματη προσθήκη ρεπλίκας στο Deskbar\n\t--help\t\tεμφάνιση αυτού του μηνύματος και έξοδος
 No link	NetworkStatusView		Χωρίς σύνδεσμο
+Connected	NetworkStatusView		Σε σύνδεση
 Could not join wireless network:\n	NetworkStatusView		Αδυναμία σύνδεσης στο ασύρματο δίκτυο:\n
 Network Status	NetworkStatusView		Κατάσταση Δικτύου
 Deskbar is not running, giving up.	NetworkStatus		Η Γραμμή Εργασιών δεν εκτελείται, δεν είναι δυνατή η λειτουργία αυτή.
+You can run %appname% in a window or install it in the Deskbar.	NetworkStatus		Μπορείτε να τρέξετε την εφαρμογή %appname% σε παράθυρο ή να την εγκαταστήσετε στο Deskbar.
 Netmask:	NetworkStatusView		Μάσκα δικτύου:
 No stateful configuration	NetworkStatusView		Καμία stateful ρύθμιση
 IPv4 address:	NetworkStatusView		Διεύθυνση IPv4:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	2319229532
+1	swedish	x-vnd.haiku-icon_o_matic	1029251628
 None	Icon-O-Matic-Properties		Ingen
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Rensa vägen
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -161,6 +161,7 @@ Untitled	Icon-O-Matic-Main		Namnlös
 Max LOD	Icon-O-Matic-PropertyNames		Max LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Spara ändringarna till ikonen innan stängning?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Det gick inte att öppna filen '%s' som ett SVG-dokument.\n\n
+<unknown property>	Icon-O-Matic-PropertyNames		<okänd egenskap>
 Save as…	Icon-O-Matic-Menu-File		Spara som...
 Swatches	Icon-O-Matic-Menus		Penslar
 <modify path>	Icon-O-Matic-PathCmd		<modifiera bana>

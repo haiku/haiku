@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	application/x-vnd.Cortex.support	3450110595
+1	greek, modern (1453-)	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Η κεφαλίδα έχει παραμέτρους
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Εγγραφή σε εξέλιξη
@@ -46,6 +46,7 @@ Right	MediaString		Δεξιά
 System mixer	MediaString		Μίκτης συστήματος
 Physical output	MediaString		Φυσική έξοδος
 Top-Back-center	MediaString		Πάνω-πίσω-κέντρο
+(unknown video orientation)	MediaString		(άγνωστος προσανατολισμός βίντεο)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Πάνω προς κάτω, αριστερά προς δεξιά
 (unknown run mode)	MediaString		(άγνωστη κατάσταση εκτέλεσης)

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	2089565258
+1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		ShowImage
 Page setup…	Menus		Διαμόρφωση σελίδας…
 Previous file	Menus		Προηγούμενο αρχείο
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Ύψος:
 Next file	Menus		Επόμενο αρχείο
 Slide show	Menus		Παρουσίαση
 Original size	Menus		Αρχικό μέγεθος
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		Το αρχείο "%filename%" έχει αλλάξει. Θέλετε να κλείσετε το αρχείο;
 Width:	PrintOptionsWindow		Πλάτος:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Αλλαγή μεγέθους σε (στο 1/72 ίντσες):
 Zoom factor in %:	PrintOptionsWindow		Συντελεστής κλίμακας σε %:
@@ -37,6 +38,7 @@ OK	SaveToFile		Εντάξει
 Print…	Menus		Εκτύπωση…
 The file '%s' could not be written.	SaveToFile		Το αρχείο '%s' δεν μπορεί να γραφτεί.
 Quit	Menus		Έξοδος
+Get info	Menus		Πληροφορίες
 Rating	Menus		Βαθμολογία
 Close document	ClosePrompt		Κλείσιμο εγγράφου
 Stretch to window	Menus		Επιμήκυνση σε παράθυρο
@@ -45,6 +47,7 @@ Clear selection	Menus		Εκκαθάριση επιλογής
 Rotate clockwise	Menus		Περιστροφή προς τα δεξιά
 Open with…	Menus		Άνοιγμα με…
 Rotate counterclockwise	Menus		Περιστροφή προς τα αριστερά
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		Το αρχείο "%filename%" (σελίδα %number%) έχει αλλάξει. Θέλετε να κλείσετε το αρχείο; 
 Previous page	Menus		Προηγούμενη σελίδα
 Fit to window	Menus		Προσαρμογή σε παράθυρο
 Go to page	Menus		Πήγαινε στη σελίδα

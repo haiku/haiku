@@ -1,8 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	199758088
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	1478243293
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Σφάλμα λήψης όρων χρήσης
 Available packages	MainWindow		Διαθέσιμα πακέτα
 It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
 An unexpected error has been sent from the server [%li]	ServerHelper		Ένα απρόσμενο σφάλμα ήρθε ως απάντηση από τον εξυπηρετητή [%li]
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Λήψη αρχείου καταγραφής αλλαγών για το πακέτο
 Create account	UserLoginWindow		Δημιουργία λογαριασμού
 Agree	ToLatestUserUsageConditionsWindow		Συμφωνώ
 The response to the captcha was incorrect.	ServerHelper		Η απάντηση στο captcha είναι λανθασμένη.
@@ -10,6 +11,7 @@ Rate package…	PackageInfoView		Αξιολόγηση πακέτου…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Έχετε ταυτοποιηθεί επιτυχώς ως ο χρήστης %Nickname%.
 Package problems	PackageProblem	Window title	Προβλήματα πακέτου
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Δεν ήταν δυνατή η εξαγωγή απαραίτητων δεδομένων captcha από τα δεδομένα που λήφθηκαν από τον διακομιστή.
+Install %PackageTitle%	PackageAction		Εγκατάσταση %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Προέκυψε σφάλμα κατά την λήψη λίστας πακέτων: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Ανανέωση όρων χρήσης
 No usage conditions	UserUsageConditions		Δεν υπάρχουν όροι χρήσης
@@ -29,6 +31,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		Έξοδος
 Password requirements	UserLoginWindow		Απαιτήσεις κωδικού πρόσβασης
 The following additional package changes have to be made:	PackageResult		Πρέπει να πραγματοποιηθούν οι παρακάτω επιπλέον μεταβολές στα πακέτα:
+%Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		Η εφαρμογή %Appname% επικοινωνεί με ένα λογισμικό διακομιστή ονόματι HaikuDepotServer. Ακολουθούν οι όροι χρήσης που έχουν συμφωνηθεί από το χρήστη "%Nickname%" στις %AgreedToTimestamp% αναφορικά με τη χρήση της υπηρεσίας HaikuDepotServer.
 No changelog available.	PackageInfoView		Δεν υπάρχει διαθέσιμη καταγραφή αλλαγών.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Έχετε συμφωνήσει στους τρέχοντες όρους χρήσης.
 Cancel	PackageProblem		Άκυρο
@@ -40,10 +43,13 @@ Click a package to view information	PackageInfoView		Κάντε κλικ σε έ
 Cancel	UserLoginWindow		Ακύρωση
 Rating not possible	MainWindow		Δεν είναι δυνατή η αξιολόγηση
 Package update error	MainWindow		Σφάλμα ενημέρωσης πακέτου
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Πατήστε εδώ
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# διαδικασία} other{# διαδικασίες}}
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Λήψη βαθμολογιών χρηστών για το πακέτο
 Reboot required	PackageManager		Απαιτείται επανεκκίνηση
 All packages	PackageListView		Όλα τα πακέτα
 Send	RatePackageWindow		Αποστολή
+Creating package list…	FeaturedPackagesView		Σύνταξη λίστας πακέτων…
 Start package daemon	App		Έναρξη προγράμματος παρασκηνίου πακέτων
 There are problems in the supplied data:	UserLoginWindow		Υπάρχουν προβλήματα με τις παρεχόμενες πληροφορίες:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Ο/Η χρήστης/-τρια "%Nickname%" δεν έχει δηλώσει συμφωνία με τους όρους χρήσης για καμία υπηρεσία.
@@ -52,6 +58,7 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Πρόβλημα προγράμματος παρασκηνίου πακέτων
 No	MainWindow		Όχι
 Repository	PackageListView		Αποθετήριο
+%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Η εφαρμογή %appname% χρειάζεται την υπηρεσία παρασκηνίου για να μπορεί να λειτουργήσει σωστά, η οποία δεν φαίνεται να εκτελείται.\nΘα θέλατε να την εκκινήσετε τώρα;
 Close	RatePackageWindow		Κλείσιμο
 Close	UserLoginWindow		Κλείσιμο
 The email is malformed.	UserLoginWindow		Η διεύθυνση ηλεκτρονικού ταχυδρομείου δεν είναι έγκυρη.
@@ -67,9 +74,11 @@ n/a	PackageInfoView		δ/υ
 Checking user details	UserDetailVerifierProcess		Έλεγχος στοιχείων χρήστη
 Cancel	MainWindow		Ακύρωση
 Refresh repositories	MainWindow		Ανανέωση αποθετηρίων
+Error	SimpleAlert		Σφάλμα
 Continue	App		Συνέχεια
 A password is required.	UserLoginWindow		Απαιτείται κωδικός πρόσβασης.
 Language	RatePackageWindow		Γλώσσα
+Open %DeskbarLink%	PackageAction		Άνοιγμα %DeskbarLink%
 Status	PackageListView		Κατάσταση
 Network transport error	ServerHelper		Δικτυακό σφάλμα μεταφοράς
 Cancel	PackageResult		Άκυρο
@@ -113,6 +122,7 @@ Check for updates…	MainWindow		Έλεγχος για ενημερώσεις…
 Uninstalled	PackageListView		Έγινε απεγκατάσταση
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Συμφωνώ με τους όρους χρήσης
 Installing \"%PackageName%\"	InstallPackageProcess		Εγκαθίσταται το πακέτο \"%PackageName%\"
+Uninstall %PackageTitle%	PackageAction		Απεγκατάσταση %PackageTitle%
 OK	App		Εντάξει
 Fatal error	UninstallPackageAction		Κρίσιμο σφάλμα
 Develop packages	MainWindow		Ανάπτυξη πακέτων
@@ -125,6 +135,7 @@ Fetching screenshot	CacheScreenshotProcess		Λήψη στιγμιοτύπου σ
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ένα δικτυακό σφάλμα μεταφοράς προέκυψε κατά την επικοινωνία με τον εξυπηρετητή: %s
 Rating	PackageListView		Αξιολόγηση
 Synchronizing icons	ServerIconExportUpdateProcess		Γίνεται συγχρονισμός εικονιδίων
+No, quit	App		Όχι, έξοδος
 Show	MainWindow		Εμφάνιση
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Η εφαρμογή θα αναγνώσει και θα δημιουργήσει κάποια αρχεία στον υπολογιστή σας, έτσι ώστε να λειτουργήσει σωστά. Φαίνεται πως προέκυψαν προβλήματα κατά την εγγραφή ενός δοκιμαστικού αρχείου στην διαδρομή [%TestFilePath%]. Ελέγξτε ότι δεν υπάρχουν προβλήματα με τον δίσκο σας ή με τις άδειες, τα οποία θα μπορούσαν να αποτρέψουν την εφαρμογή από το να εγγράψει αρχεία σε αυτήν την τοποθεσία. Μπορείτε να συνεχίσετε, εφόσον έχετε ενημερωθεί για το πρόβλημα αυτό, αλλά ορισμένες λειτουργίες ενδεχομένως να είναι απενεργοποιημένες.
 Settings…	MainWindow		Ρυθμίσεις...
@@ -150,6 +161,7 @@ Contents	PackageInfoView		Περιεχόμενο
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Διαμοιρασμός ανώνυμων στατιστικών χρήσης με το HaikuDepotServer
 Close	PackageManager		Κλείσιμο
 Changelog	PackageInfoView		Καταγραφή αλλαγών
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 για να αναζητήσετε μεταξύ όλων των πακέτων.
 About	PackageInfoView		Σχετικά
 Password requirements download problem	UserLoginWindow		Πρόβλημα λήψης απαιτήσεων κωδικού πρόσβασης
 Password:	UserLoginWindow		Κωδικός πρόσβασης:
@@ -179,6 +191,7 @@ Repositories	MainWindow		Αποθετήρια
 This rating is visible to other users	RatePackageWindow		Η αξιολόγηση είναι ορατή και σε άλλους χρήστες
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Κατά την ενημέρωση των στοιχείων πακέτων προέκυψε ένα πρόβλημα που μπορεί να προκαλέσει την εμφάνιση απαρχαιωμένων πακέτων και την απόκρυψη άλλων. Περισσότερες πληροφορίες σχετικά με το πρόβλημα αυτό μπορούν να αντληθούν από τα αρχεία καταγραφής της εφαρμογής.\nΠληροφορίες για το αρχείο καταγραφών υπάρχει στο λήμμα του Οδηγού Χρήστη του Haiku για την εφαρμογή HaikuDepot.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Ένα σφάλμα έχει εκδηλωθεί κατά την λήψη των όρων χρήσης. Ελέγξτε το αρχείο καταγραφής για λεπτομέρειες και ξαναπροσπαθήστε.\nΠληροφορίες για το πως μπορείτε να βρείτε τα αρχεία καταγραφής υπάρχουν στην ενότητα HaikuDepot του Εγχειριδίου Χρήστη Haiku.
+Stop network use	ServerHelper		Άρση χρήσης δικτύου
 View agreed usage conditions…	MainWindow		Προβολή συμφωνημένων όρων χρήσης…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Έχετε μπει στο σύστημα ως [%Nickname%], αλλά πριν συνεχίσετε, πρέπει να συμφωνήσετε με την πιο πρόσφατη έκδοση των όρων χρήσης της υπηρεσίας.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Αυτό το πακέτο δεν φαίνεται να υπάρχει στον διακομιστή του HaikuDepot, άρα δεν μπορείτε να δημιουργήσετε μία νέα ή να επεξεργαστείτε μία προϋπάρχουσα αξιολόγηση.
@@ -194,6 +207,7 @@ OK	ServerHelper		Εντάξει
 Reading repository data	LocalPkgDataLoadProcess		Ανάγνωση δεδομένων αποθετηρίου
 Fatal error	InstallPackageProcess		Κρίσιμο σφάλμα
 A validation error has occurred	ServerHelper		Προέκυψε σφάλμα επικύρωσης
+%Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		Η εφαρμογή %Appname% επικοινωνεί με ένα λογισμικό διακομιστή ονόματι HaikuDepotServer. Ακολουθούν οι πλέον πρόσφατοι όροι χρήσης της υπηρεσίας HaikuDepotServer.
 The nickname is required.	UserLoginWindow		Απαιτείται ψευδώνυμο.
 -	no package size		-
 Apply changes	PackageResult		Εφαρμογή αλλαγών
@@ -212,7 +226,9 @@ Category:	FilterView		Κατηγορία:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	απεγκατάσταση πακέτου %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Γίνεται λήψη απομακρυσμένων δεδομένων αποθετηρίων
 Description	PackageListView		Περιγραφή
+No results? 	FeaturedPackagesView		Κανένα αποτέλεσμα; 
 User creation error	UserLoginWindow		Σφάλμα δημιουργίας χρήστη
 You need to be logged into an account before you can rate packages.	MainWindow		Πρέπει να εισέλθετε σε έναν λογαριασμό για να μπορέσετε να αξιολογήσετε πακέτα.
 Cleaning up…	ShuttingDownWindow		Συγύρισμα...
+%appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		Η εφαρμογή %appname% παύει ή ολοκληρώνει ενεργές διεργασίες πριν τον τερματισμό.
 Repeat password:	UserLoginWindow		Επανάληψη κωδικού:

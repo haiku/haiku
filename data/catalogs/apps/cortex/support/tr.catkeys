@@ -1,4 +1,4 @@
-1	turkish	application/x-vnd.Cortex.support	3450110595
+1	turkish	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Üstbilginin bayrakları var
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Kayıt yapılıyor
@@ -46,6 +46,7 @@ Right	MediaString		Sağ
 System mixer	MediaString		Sistem karıştırıcısı
 Physical output	MediaString		Fiziksel çıkış
 Top-Back-center	MediaString		Üst arka merkez
+(unknown video orientation)	MediaString		(bilinmeyen video yönelimi)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Üstten alta, soldan sağa
 (unknown run mode)	MediaString		(bilinmeyen çalıştırma kipi)

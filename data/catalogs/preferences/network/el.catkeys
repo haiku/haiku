@@ -1,4 +1,5 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Network	3807978621
+1	greek, modern (1453-)	x-vnd.Haiku-Network	1086926074
+no link	IntefaceView		δεν υπάρχει σύνδεση
 Ethernet device	InterfaceListItem		Συσκευή Ethernet
 Link speed:	IntefaceView		Ταχύτητα σύνδεσης:
 WPA	WPA protected network		WPA
@@ -10,6 +11,7 @@ Other	NetworkWindow		Άλλο
 Sent:	IntefaceView		Απεστάλη:
 Gateway:	IntefaceAddressView		Πύλη δικτύου:
 The netmask defines your local network	IntefaceAddressView		Η μάσκα δικτύου καθορίζει το τοπικό σας δίκτυο
+unknown	IntefaceView		άγνωστο
 Your IP address	IntefaceAddressView		Η διεύθυνση IP σας
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		Διεύθυνση IP:
@@ -33,6 +35,7 @@ OK	NetworkWindow		Εντάξει
 Static	IntefaceAddressView		Στατική
 launch error	NetworkWindow		σφάλμα εκκίνησης
 Renegotiate	IntefaceView		Επαναδιαπραγμάτευση
+configuring	IntefaceView		ρύθμιση
 MAC address:	IntefaceView		Διεύθυνση MAC:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		απενεργοποιημένο

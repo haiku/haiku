@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	1599874629
+1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		Στατιστικά εγγράφου
 Cut	Menus		Αποκοπή
 Center	Menus		Κέντρο
@@ -13,6 +13,8 @@ Search backwards	FindandReplaceWindow		Αναζήτηση προς τα πίσω
 Find again	Menus		Εύρεση ξανά
 Read-only	StatusView		Μόνο για ανάγνωση
 Save	Menus		Αποθήκευση
+Untitled %d	Window title		Άτιτλο %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Δεν είναι δυνατή η επαναφορά επειδή το αρχείο δεν βρέθηκε: \"%filename%\".
 Cancel	QuitAlert		Άκυρο
 Copy	Menus		Αντιγραφή
 Reload	NodeMonitorAlerts		Επαναφόρτωση
@@ -20,19 +22,25 @@ line %d, column %d	StatusView		γραμμή %d, στήλη %d
 Words:	Statistics		Λέξεις:
 ???	LoadAlert		;;;
 Recover	NodeMonitorAlerts		Επαναφορά
+Unable to unlock file\n\t%error%	QuitAlert		Δεν είναι δυνατή η άρση κλειδώματος του αρχείου:\n\t%error%
 OK	RevertToSavedAlert		Εντάξει
 Unlock file	StatusView		Ξεκλείδωμα αρχείου
 Italic	Menus		Πλάγια
 Can't undo	Menus		Αδυναμία αναίρεσης
 Replace…	Menus		Αντικατάσταση…
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Το αρχείο αυτό έχει επισημανθεί ως μόνο για ανάγνωση. Αποθήκευση των αλλαγών στο αρχείο \"%filename%\";
 File	Menus		Αρχείο
 Paste	Menus		Επικόλληση
 Bold	Menus		Έντονα
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Το αρχείο \"%file%\" έχει επεξεργαστεί από μία άλλη εφαρμογή, θέλετε να το επαναφορτώσετε;
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Το αρχείο \"%file%\" έχει αφαιρεθεί από μία άλλη εφαρμογή, θέλετε να το επαναφέρετε;
 Lines:	Statistics		Γραμμές:
+Strikeout	Menus		Διαγραφή
 Replace in all windows	FindandReplaceWindow		Αντικατάσταση σε όλα τα παράθυρα
+Error saving \"%filename%\":\n%error%	SaveAlert		Σφάλμα αποθήκευσης του αρχείου \"%filename%\":\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Αποθήκευση των αλλαγών στο αρχείο \"%title%\";
 Save	SaveAlert		Αποθήκευση
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		Το αρχείο \"%title%\" έχει αλλαγές που δεν έχουν αποθηκευτεί.\nΕπαναφορά του αρχείου στην τελευταία αποθηκευμένη εκδοχή του;
 Default	Open_and_SaveAsPanel		Προκαθορισμένο
 Cancel	RevertToSavedAlert		Άκυρο
 Cancel	FindandReplaceWindow		Άκυρο
@@ -75,8 +83,10 @@ Open…	Menus		Άνοιγμα…
 Save as…	Menus		Αποθήκευση ως…
 Replace	FindandReplaceWindow		Αντικατάσταση
 Characters:	Statistics		Χαρακτήρες:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		Σφάλμα αποθήκευσης του αρχείου \"%filename%\":\n\tΜη υποστηριζόμενο μορφότυπο
 Don't save	QuitAlert		Χωρίς αποθήκευση
 Align	Menus		Στοίχιση
 Font	Menus		Γραμματοσειρά
 Select all	Menus		Επιλογή όλων
 Right	Menus		Δεξιά
+Error loading \"%filename%\":\n\t%error%	LoadAlert		Σφάλμα ανάγνωσης του αρχείου \"%filename%\":\n\t%error%

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	2319229532
+1	turkish	x-vnd.haiku-icon_o_matic	1029251628
 None	Icon-O-Matic-Properties		Yok
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Yolu temizle
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -161,6 +161,7 @@ Untitled	Icon-O-Matic-Main		Adsız
 Max LOD	Icon-O-Matic-PropertyNames		En yüksek ayrıntı düzeyi
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Kapatmadan önce değişiklikler kaydedilsin mi?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		“%s” dosyası bir SVG belgesi olarak açılamadı.\n\n
+<unknown property>	Icon-O-Matic-PropertyNames		<bilinmeyen özellik>
 Save as…	Icon-O-Matic-Menu-File		Farklı kaydet…
 Swatches	Icon-O-Matic-Menus		Örnekler
 <modify path>	Icon-O-Matic-PathCmd		<yol düzenle>

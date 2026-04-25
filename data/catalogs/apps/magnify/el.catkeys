@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Magnify	1465621918
+1	greek, modern (1453-)	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  το μέγεθος πρέπει να είναι > 4 και πολλαπλάσιο του 4
 Decrease pixel size	Magnify-Main		Μείωση μεγέθους pixel
 no clip msg	In console, when clipboard is empty after clicking Copy image		καμία αντιγραφή
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Αύξηση μεγέθους του παρα
 Save image	Magnify-Main		Αποθήκευση εικόνας
 Show grid	Magnify-Main		Εμφάνιση πλέγματος
 Magnify	System name		Μεγεθυντικός Φακός
+height	Magnify-Main		ύψος
+width	Magnify-Main		πλάτος
 Info	Magnify-Main		Πληροφορίες
 Show info	Magnify-Main		Εμφάνιση πληροφοριών
 Make square	Magnify-Main		Δημιουργία τετραγώνου

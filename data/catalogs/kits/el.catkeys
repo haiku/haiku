@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libbe	2491350405
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Με επιφύλαξη παντός δικαιώματος.
 gold master	AboutWindow		gold master
 Undo	TextView		Αναίρεση
@@ -6,6 +6,7 @@ OK	PrintJob		Εντάξει
 OK	Dragger		Εντάξει
 gamma	AboutWindow		gamma
 development	AboutWindow		σε ανάπτυξη
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s byte/δ} other{%s bytes/δ}}
 Print Server is not responding.	PrintJob		Ο Εξυπηρετητής Εκτυπώσεων δεν ανταποκρίνεται.
 About %app%	AboutMenuItem		Σχετικά με το %app%
 Warning	Dragger		Προειδοποίηση
@@ -13,14 +14,20 @@ Green:	ColorControl		Πράσινο:
 Redo	TextView		Επαναφορά
 No pages to print!	PrintJob		Δεν υπάρχουν σελίδες προς εκτύπωση!
 beta	AboutWindow		beta
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		Εντάξει
 Cut	TextView		Αποκοπή
 Default	Default decorator about box		Προεπιλογή
 Can't delete this replicant from its original application. Life goes on.	Dragger		Η διαγραφή της ρεπλίκας από την αρχική της θέση απέτυχε. Η ζωή συνεχίζεται.
+%s KiB	StringForSize	size unit	%s KiB
 Error	ZombieReplicantView		Σφάλμα
 Paste	TextView		Επικόλληση
 OK	AboutWindow		Εντάξει
+%s MiB/s	StringForRate	units per second	%s MiB/s
+%s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Προεπιλεγμένη διακόσμηση παραθύρων Haiku.
+%s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Αφαίρεση ρεπλίκας
 Version	AboutWindow		Έκδοση
 Red:	ColorControl		Κόκκινο:
@@ -29,10 +36,15 @@ Copy	TextView		Αντιγραφή
 Select all	TextView		Επιλογή όλων
 alpha	AboutWindow		alpha
 Error	PrintJob		Σφάλμα
+%s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		Σχετικά με το %app…
 About %app%	AboutWindow		Σχετικά με το %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s byte} other{%s bytes}}
+%s GiB/s	StringForRate	units per second	%s GiB/δ
 Version history:	AboutWindow		Ιστορικό έκδοσης:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ο εντοπισμός της εφαρμογής που αντιστοιχεί στη ρεπλίκα απέτυχε. Δεν παρέχεται υπογραφή εφαρμογής.\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/δ
 Blue:	ColorControl		Μπλέ:
+Special thanks:	AboutWindow		Ειδική μνεία:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Η δημιουργία της ρεπλίκας για το \"%description\" απέτυχε.\n%error
 Written by:	AboutWindow		Αναπτύχθηκε από τον:

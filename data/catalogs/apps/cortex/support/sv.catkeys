@@ -1,4 +1,4 @@
-1	swedish	application/x-vnd.Cortex.support	3450110595
+1	swedish	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Rubrik har flaggor
 32 bit HLS	MediaString		32-bitars HLS
 Recording	MediaString		Inspelning
@@ -46,6 +46,7 @@ Right	MediaString		Höger
 System mixer	MediaString		Systemblandare
 Physical output	MediaString		Fysisk produktion
 Top-Back-center	MediaString		Topp-Baksida-mitt
+(unknown video orientation)	MediaString		(okänd videoorientering)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Uppifrån och ned, vänster till höger
 (unknown run mode)	MediaString		(okänt körläge)

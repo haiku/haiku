@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Appearance	3598979163
+1	greek, modern (1453-)	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Περίγραμμα στοιχείων ελέγχου
 Control mark	Colors tab		Επισήμανση στοιχείων ελέγχου
 Off	AntialiasingSettingsView		Κλειστό
@@ -43,9 +43,11 @@ Selected menu item text	Colors tab		Επιλεγμένο κείμενο μενο
 Size:	Font Selection view		Μέγεθος:
 Panel background	Colors tab		Φόντο πάνελ
 Plain font:	Font view		Απλή γραμματοσειρά:
+Automatically pick secondary colors	Colors tab		Αυτόματη επιλογή παράγωγων χρωμάτων
 Window tab text	Colors tab		Κείμενο καρτέλας παράθυρου
 Navigation pulse	Colors tab		Παλμός πλοήγησης
 LCD subpixel	AntialiasingSettingsView		Υπο-εικονοστοιχείο LCD
+Progress bar	Colors tab		Μπάρα προόδου
 Window tab	Colors tab		Καρτέλα παράθυρου
 Link text	Colors tab		Κείμενο υπερσυνδέσμου
 Tooltip background	Colors tab		Φόντο αναδυόμενης συμβουλής

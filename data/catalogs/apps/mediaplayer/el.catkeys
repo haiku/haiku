@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	1326372804
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	3337408711
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Μετακίνηση Αρχείου στον Κάδο Απορριμάτων
 Close	MediaPlayer-PlaylistWindow		Κλείσιμο
 Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ παρασκηνίου
@@ -24,6 +24,7 @@ Resume:	MediaPlayer-SettingsWindow		Συνέχιση:
 Duration	MediaPlayer-InfoWin		Διάρκεια
 Import Entries	MediaPlayer-ImportPLItemsCmd		Εισαγωγή
 Open network stream	MediaPlayer-Main		Άνοιγμα ροής δικτύου
+%appname% settings	MediaPlayer-SettingsWindow		Ρυθμίσεις της εφαρμογής %appname%
 Open file…	MediaPlayer-Main		Άνοιγμα αρχείου…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Να μεταβάλλεται το μέγεθος των κουμπιών ελέγχου σε λειτουργία πλήρης οθόνης 
 View options	MediaPlayer-SettingsWindow		Προβολή ρυθμίσεων
@@ -45,8 +46,10 @@ Save error	MediaPlayer-PlaylistWindow		Αποθήκευση σφάλματος
 Attributes	MediaPlayer-Main		Ιδιότητες
 Bottom of screen	MediaPlayer-SettingsWindow		Κάτω μέρος της οθόνης
 Copyright	MediaPlayer-InfoWin		Πνευματική ιδιοκτησία
+%appname%: %title%	MediaPlayer-Main		%appname%: %title%
 Invalid URL inserted!	MediaPlayer-NetworkStream		Εισήχθη μη έγκυρος υπερσύνδεσμος!
 Aspect ratio	MediaPlayer-Main		Λόγος διαστάσεων
+Eject device	MediaPlayer-Main		Εξαγωγή συσγκευής
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Η αποθήκευση λίστας αναπαραγωγής απέτυχε.\n\nΣφάλμα: 
 <no media>	MediaPlayer-InfoWin		<δεν υπάρχουν πολυμέσα>
 Hide interface	MediaPlayer-Main		Απόκρυψη διεπαφής
@@ -55,6 +58,7 @@ Video track	MediaPlayer-Main		Κομμάτι βίντεο
 Playlist…	MediaPlayer-Main		Λίστα Αναπαραγωγής…
 <unnamed media>	MediaPlayer-InfoWin		<πολυμέσα χωρίς όνομα>
 Save	MediaPlayer-PlaylistWindow		Αποθήκευση
+25% scale	MediaPlayer-Main		Μέγεθος 25%
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Τυχαία Κατανομή Αρχείων
 Cancel	MediaPlayer-NetworkStream		Ακύρωση
 Nothing to Play	MediaPlayer-Main		Τίποτα προς αναπαραγωγή
@@ -123,6 +127,7 @@ Full screen	MediaPlayer-Main		Πλήρη οθόνη
 OK	MediaPlayer-NetworkStream		Εντάξει
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (το κλείδωμα απέτυχε). Η αποθήκευση της λίστας αναπαραγωγής απέτυχε.
 100% scale	MediaPlayer-Main		κλίμακα 100%
+New player	MediaPlayer-Main		Νέος αναπαραγωγέας
 <nothing to redo>	MediaPlayer-PlaylistWindow		<τίποτε προς επαναφορά>
 Bad URL	MediaPlayer-NetworkStream		Κακός υπερσύνδεσμος
 Save	MediaPlayer-Main		Αποθήκευση
