@@ -15,6 +15,12 @@ WRAPPER_FUNCTION(int, pthread_sigmask,
 )
 
 
+WRAPPER_FUNCTION(int, sigaction, (int signal, const struct sigaction *action,
+	struct sigaction *oldAction),
+	return B_TO_POSITIVE_ERROR(sReal_sigaction(signal, action, oldAction));
+)
+
+
 WRAPPER_FUNCTION(int, sigwait, (const sigset_t *set, int *signal),
 	return B_TO_POSITIVE_ERROR(sReal_sigwait(set, signal));
 )
