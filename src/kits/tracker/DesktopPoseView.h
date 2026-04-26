@@ -55,8 +55,6 @@ public:
 	virtual void AdoptSystemColors();
 	virtual bool HasSystemColors() const;
 
-	virtual void ScrollTo(BPoint where);
-
 	static EntryListBase* InitDesktopDirentIterator(BPoseView*, const entry_ref*);
 
 	void StartSettingsWatch();
