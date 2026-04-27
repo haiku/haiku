@@ -91,7 +91,7 @@ static int32 sBootCPUSpin = 0;
 static int32 sEarlyCPUCallCount;
 static CPUSet sEarlyCPUCallSet;
 static void (*sEarlyCPUCallFunction)(void*, int);
-void* sEarlyCPUCallCookie;
+static void* sEarlyCPUCallCookie;
 
 static struct smp_msg* sFreeMessages = NULL;
 static int32 sFreeMessageCount = 0;
