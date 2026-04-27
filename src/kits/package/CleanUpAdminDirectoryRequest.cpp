@@ -39,6 +39,8 @@ protected:
 	virtual	status_t Execute();
 
 private:
+	friend class CleanUpAdminDirectoryRequest;
+
 	status_t _GetOldStateDirectories(BStringList& directories);
 
 private:
@@ -188,6 +190,26 @@ CleanUpAdminDirectoryRequest::CleanUpAdminDirectoryRequest(const BContext& conte
 
 CleanUpAdminDirectoryRequest::~CleanUpAdminDirectoryRequest()
 {
+}
+
+
+status_t
+CleanUpAdminDirectoryRequest::GetOldStatesCount(size_t& count)
+{
+	status_t status = InitCheck();
+	if (status != B_OK)
+		return B_NO_INIT;
+
+	CleanUpAdminDirectoryJob temp(fContext, "",
+		fLocationInfo, fCleanupBefore, fMinimumStatesToKeep);
+
+	BStringList dirs;
+	status = temp._GetOldStateDirectories(dirs);
+	if (status != B_OK)
+		return status;
+
+	count = dirs.CountStrings();
+	return B_OK;
 }
 
 

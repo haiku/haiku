@@ -43,4 +43,8 @@ void	print_usage_and_exit(bool error);
 #define COMMAND_CATEGORY_OTHER			"other"
 
 
+static const size_t kCleanUpKeepDays = 30;
+static const size_t kCleanUpKeepStates = 10;
+
+
 #endif	// PKGMAN_H

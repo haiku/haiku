@@ -25,6 +25,7 @@ public:
 									time_t cleanupBefore, int32 minStatesToKeep);
 	virtual						~CleanUpAdminDirectoryRequest();
 
+			status_t			GetOldStatesCount(size_t& count);
 	virtual	status_t			CreateInitialJobs();
 
 private:
