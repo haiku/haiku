@@ -58,6 +58,11 @@ static const uint32 kMsgSetZoomLimits = 'iSZL';
 static const uint32 kMsgReboot = 'iREB';
 static const uint32 kMsgShowReboot = 'iSRB';
 
+enum {
+	kMsgSettings = 'iSET',
+	kSettingMsgAutoCleanUp = 'iS00',
+};
+
 // Message data keys
 #define kKeyHeader "key_header"
 #define kKeyDetail "key_detail"
@@ -70,5 +75,6 @@ static const uint32 kMsgShowReboot = 'iSRB';
 // Settings keys
 #define kKeyShowDetails "ShowDetails"
 #define kKeyWindowFrame "WindowFrame"
+#define kKeyAutoCleanUpAdminDirectory "AutoCleanUpAdminDirectory"
 
 #endif // CONSTANTS_H

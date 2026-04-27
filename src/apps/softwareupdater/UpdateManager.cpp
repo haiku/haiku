@@ -26,6 +26,8 @@
 #include <Notification.h>
 #include <Roster.h>
 
+#include <package/CleanUpAdminDirectoryRequest.h>
+#include <package/InstallationLocationInfo.h>
 #include <package/manager/Exceptions.h>
 #include <package/solver/SolverPackage.h>
 
@@ -396,6 +398,21 @@ UpdateManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
 	if (fVerbose)
 		printf("[%s] Done.\n", repository.Name().String());
+
+	if (fStatusWindow->ShouldCleanUpAdminDirectory()) {
+		BInstallationLocationInfo info;
+		if (BPackageRoster().GetInstallationLocationInfo(repository.Location(), info) == B_OK) {
+			BDecisionProvider decisionProvider;
+			BJobStateListener listener;
+			BContext context(decisionProvider, listener);
+
+			const int days = 30;
+			time_t before = time(NULL) - days * 24 * 60 * 60;
+
+			CleanUpAdminDirectoryRequest request(context, info, before, 10);
+			request.Process();
+		}
+	}
 
 	_SetCurrentStep(ACTION_STEP_COMPLETE);
 	BString header(B_TRANSLATE("Updates completed"));
