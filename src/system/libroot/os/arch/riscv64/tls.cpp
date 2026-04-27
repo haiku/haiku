@@ -1,7 +1,10 @@
 /*
- * Copyright 2019-2021, Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2021, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
+
+#include <atomic>
 
 #include <runtime_loader/runtime_loader.h>
 
@@ -16,8 +19,8 @@ struct tls_index {
 
 extern "C" void* __tls_get_addr(struct tls_index* ti);
 
-// TODO: use std::atomic<int> here like x86_64
-static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
+
+static std::atomic<int> gNextSlot(TLS_FIRST_FREE_SLOT);
 
 
 static inline void**
