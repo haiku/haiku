@@ -64,6 +64,7 @@ typedef struct CACHE_LINE_ALIGN cpu_ent {
 	bigtime_t		last_kernel_time;
 	bigtime_t		last_user_time;
 
+	struct smp_msg* cpu_msg;
 	int32			ici_counter;
 
 	// used in the kernel debugger

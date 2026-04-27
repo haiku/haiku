@@ -97,8 +97,6 @@ static struct smp_msg* sFreeMessages = NULL;
 static int32 sFreeMessageCount = 0;
 static rw_spinlock sFreeMessageSpinlock = B_RW_SPINLOCK_INITIALIZER;
 
-static struct smp_msg* sCPUMessages[SMP_MAX_CPUS] = { NULL, };
-
 static struct smp_msg* sBroadcastMessages = NULL;
 static rw_spinlock sBroadcastMessageSpinlock = B_RW_SPINLOCK_INITIALIZER;
 static int32 sBroadcastMessageCounter;
@@ -214,7 +212,7 @@ update_lock_held(spinlock* lock)
 #endif // B_DEBUG_SPINLOCK_CONTENTION
 
 
-int
+static int
 dump_ici_messages(int argc, char** argv)
 {
 	// count broadcast messages
@@ -239,14 +237,14 @@ dump_ici_messages(int argc, char** argv)
 	// count per-CPU messages
 	for (int32 i = 0; i < sNumCPUs; i++) {
 		count = 0;
-		message = sCPUMessages[i];
+		message = gCPU[i].cpu_msg;
 		while (message != NULL) {
 			count++;
 			message = message->next;
 		}
 
 		kprintf("CPU %" B_PRId32 " messages: %" B_PRId32 ", first: %p\n", i,
-			count, sCPUMessages[i]);
+			count, gCPU[i].cpu_msg);
 	}
 
 	return 0;
@@ -733,12 +731,12 @@ return_free_message(struct smp_msg* msg)
 
 
 static void
-prepend_message(struct smp_msg*& listHead, struct smp_msg* msg)
+prepend_message(struct smp_msg*& mailbox, struct smp_msg* msg)
 {
 	while (true) {
-		struct smp_msg* next = atomic_pointer_get(&listHead);
+		struct smp_msg* next = atomic_pointer_get(&mailbox);
 		msg->next = next;
-		if (atomic_pointer_test_and_set(&listHead, msg, next) == next)
+		if (atomic_pointer_test_and_set(&mailbox, msg, next) == next)
 			break;
 		cpu_pause();
 	}
@@ -751,15 +749,16 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 	if (!sICIEnabled)
 		return NULL;
 
-	struct smp_msg* msg = atomic_pointer_get(&sCPUMessages[currentCPU]);
+	struct smp_msg** mailbox = &gCPU[currentCPU].cpu_msg;
+	struct smp_msg* msg = atomic_pointer_get(mailbox);
 	if (msg != NULL) {
 		// since only this CPU ever dequeues, we can just use atomics
 		while (true) {
-			if (atomic_pointer_test_and_set(&sCPUMessages[currentCPU], msg->next, msg) == msg)
+			if (atomic_pointer_test_and_set(mailbox, msg->next, msg) == msg)
 				break;
 
 			cpu_pause();
-			msg = atomic_pointer_get(&sCPUMessages[currentCPU]);
+			msg = atomic_pointer_get(mailbox);
 			ASSERT(msg != NULL);
 		}
 
@@ -779,7 +778,7 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 				continue;
 			}
 
-			// mark it so we wont try to process this one again
+			// mark it so we won't try to process this one again
 			msg->proc_bitmap.ClearBitAtomic(currentCPU);
 			atomic_add(&gCPU[currentCPU].ici_counter, 1);
 
@@ -1029,7 +1028,7 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 	msg->done = 0;
 
 	// stick it in the appropriate cpu's mailbox
-	prepend_message(sCPUMessages[targetCPU], msg);
+	prepend_message(gCPU[targetCPU].cpu_msg, msg);
 
 	arch_smp_send_ici(targetCPU);
 
@@ -1171,7 +1170,7 @@ smp_multicast_ici(const CPUSet& cpuMask, int32 message, addr_t data,
 
 	if ((!self && targetCPUs == 1) || (self && targetCPUs == 2)) {
 		// stick it in the appropriate cpu's mailbox
-		prepend_message(sCPUMessages[firstNonCurrentCPU], msg);
+		prepend_message(gCPU[firstNonCurrentCPU].cpu_msg, msg);
 
 		arch_smp_send_ici(firstNonCurrentCPU);
 
