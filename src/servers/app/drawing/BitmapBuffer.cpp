@@ -6,7 +6,7 @@
 
 // TODO: It should be more or less guaranteed that this object
 // is not used if InitCheck() returns an error, so the checks
-// in all thos functions should probably be removed...
+// in all those functions should probably be removed...
 
 // constructor
 BitmapBuffer::BitmapBuffer(ServerBitmap* bitmap)

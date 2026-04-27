@@ -98,7 +98,7 @@ AGGTextRenderer::SetAntialiasing(bool antialiasing)
 	if (fAntialias != antialiasing) {
 		fAntialias = antialiasing;
 		// NOTE: The fSubpixRasterizer is not used when anti-aliasing is
-		// disbaled.
+		// disabled.
 		if (!fAntialias)
 			fRasterizer.gamma(agg::gamma_threshold(0.5));
 		else
@@ -196,7 +196,7 @@ public:
 	{
 		// "glyphBounds" is the bounds of the glyph transformed
 		// by the x y location of the glyph along the base line,
-		// it is therefor yet "untransformed" in case there is an
+		// it is therefore yet "untransformed" in case there is an
 		// embedded transformation.
 		const agg::rect_i& r = glyph->bounds;
 		if (!r.is_valid())

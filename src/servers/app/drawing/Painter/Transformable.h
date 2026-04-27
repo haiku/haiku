@@ -42,7 +42,7 @@ class Transformable : public BArchivable,
 //			bool				operator==(const Transformable& other) const;
 //			bool				operator!=(const Transformable& other) const;
 
-								// transforms coordiantes
+								// transforms coordinates
 			void				Transform(double* x, double* y) const;
 			void				Transform(BPoint* point) const;
 			BPoint				Transform(const BPoint& point) const;

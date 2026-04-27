@@ -999,7 +999,7 @@ TabDecorator::_LayoutTabItems(Decorator::Tab* _tab, const BRect& tabRect)
 	BRect& closeRect = tab->closeRect;
 	BRect& zoomRect = tab->zoomRect;
 
-	// calulate close rect based on the tab rectangle
+	// calculate close rect based on the tab rectangle
 	if (tab->look != kLeftTitledWindowLook) {
 		closeRect.Set(tabRect.left + offset, tabRect.top + offset,
 			tabRect.left + offset + size, tabRect.top + offset + size);

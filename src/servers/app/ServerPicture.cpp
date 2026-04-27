@@ -271,7 +271,7 @@ public:
 	virtual void SetPenSize(float size);
 	virtual void SetForeColor(const rgb_color& color);
 	virtual void SetBackColor(const rgb_color& color);
-	virtual void SetStipplePattern(const pattern& patter);
+	virtual void SetStipplePattern(const pattern& pattern);
 	virtual void SetScale(float scale);
 	virtual void SetFontFamily(const char* familyName, size_t length);
 	virtual void SetFontStyle(const char* styleName, size_t length);

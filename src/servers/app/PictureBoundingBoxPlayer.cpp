@@ -177,7 +177,7 @@ public:
 	virtual void SetPenSize(float size);
 	virtual void SetForeColor(const rgb_color& color);
 	virtual void SetBackColor(const rgb_color& color);
-	virtual void SetStipplePattern(const pattern& patter);
+	virtual void SetStipplePattern(const pattern& pattern);
 	virtual void SetScale(float scale);
 	virtual void SetFontFamily(const char* familyName, size_t length);
 	virtual void SetFontStyle(const char* styleName, size_t length);
@@ -492,7 +492,7 @@ BoundingBoxCallbacks::DrawPicture(const BPoint& where, int32 token)
 void
 BoundingBoxCallbacks::SetClippingRects(size_t numRects, const clipping_rect rects[])
 {
-	TRACE_BB("%p cliping rects (%ld rects)\n", fState, numRects);
+	TRACE_BB("%p clipping rects (%ld rects)\n", fState, numRects);
 
 	// TODO
 	(void)rects;

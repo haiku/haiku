@@ -260,7 +260,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 		fValidClipping = fClippingRegion != NULL
 			&& fClippingRegion->Frame().IsValid();
 
-		// These are the AGG renderes and rasterizes which
+		// These are the AGG renders and rasterizes which
 		// will be used for stroking paths
 
 		_SetRendererColor(fPatternHandler.HighColor());
@@ -1710,7 +1710,7 @@ Painter::_UpdateDrawingMode()
 	// DrawingMode*Solid ones) as of now. The PixelFormat knows the
 	// PatternHandler and makes its decision based on the pattern.
 	// When a solid pattern is used, _SetRendererColor()
-	// has to be called so that all internal colors in the renderes
+	// has to be called so that all internal colors in the renderers
 	// are up to date for use by the solid drawing mode version.
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
 }

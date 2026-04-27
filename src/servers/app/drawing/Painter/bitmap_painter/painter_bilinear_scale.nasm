@@ -152,7 +152,7 @@ bilinear_scale_xloop_mmxsse:
 	mov		eax, [ebp + PAR_xmin]	; loop counter
 	mov		edx, [ebp + PAR_xWeightPtr]	; xWeights array
 	mov		esi, [ebp + PAR_srcPtr]		; source bitmap
-	mov		edi, [ebp + PAR_dstPtr]		; desination bitmap
+	mov		edi, [ebp + PAR_dstPtr]		; destination bitmap
 	movq	mm6, [c4x16UW_129_LShift8]
 	movq	mm7, [c2x32UD_ff000000]
 

@@ -5,7 +5,7 @@
 void
 align_rect_to_pixels(BRect* rect)
 {
-	// round the rect with the least ammount of distortion
+	// round the rect with the least amount of distortion
 	rect->OffsetTo(roundf(rect->left), roundf(rect->top));
 	rect->right = roundf(rect->right);
 	rect->bottom = roundf(rect->bottom);

@@ -562,7 +562,7 @@ Window::SetTopView(View* topView)
 
 	if (fTopView.IsSet()) {
 		// the top view is special, it has a coordinate system
-		// as if it was attached directly to the desktop, therefor,
+		// as if it was attached directly to the desktop, therefore,
 		// the coordinate conversion through the view tree works
 		// as expected, since the top view has no "parent" but has
 		// fFrame as if it had
@@ -720,7 +720,7 @@ Window::GetEffectiveDrawingRegion(View* view, BRegion& region)
 	// TODO: this is a region that needs to be cached later in the server
 	// when the current view in ServerWindow is set, and we are currently
 	// in an update (fInUpdate), than we can set this region and remember
-	// it for the comming drawing commands until the current view changes
+	// it for the coming drawing commands until the current view changes
 	// again or fEffectiveDrawingRegionValid is suddenly false.
 	region = fEffectiveDrawingRegion;
 	if (!fContentRegionValid)
@@ -1295,9 +1295,9 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 	fLook = look;
 
 	fContentRegionValid = false;
-		// mabye a resize handle was added...
+		// maybe a resize handle was added...
 	fEffectiveDrawingRegionValid = false;
-		// ...and therefor the drawing region is
+		// ...and therefore the drawing region is
 		// likely not valid anymore either
 
 	if (!fCurrentStack.IsSet())
@@ -1888,7 +1888,7 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 	// NOTE: since we might "shift" parts of the
 	// internal dirty regions from the desktop thread
 	// in response to Window::ResizeBy(), which
-	// might move arround views, the user of this function
+	// might move around views, the user of this function
 	// needs to hold the global clipping lock so that the internal
 	// dirty regions are not messed with from the Desktop thread
 	// and ServerWindow thread at the same time.
@@ -1954,7 +1954,7 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 	link.Attach<int32>(B_NULL_TOKEN);
 	link.Flush();
 
-	// supress back to front buffer copies in the drawing engine
+	// suppress back to front buffer copies in the drawing engine
 	fDrawingEngine->SetCopyToFrontEnabled(false);
 
 	if (fDrawingEngine->LockParallelAccess()) {
@@ -1973,7 +1973,7 @@ Window::EndUpdate()
 	// NOTE: see comment in _BeginUpdate()
 
 	if (fInUpdate) {
-		// reenable copy to front
+		// re-enable copy to front
 		fDrawingEngine->SetCopyToFrontEnabled(true);
 
 		BRegion* dirty = fRegionPool.GetRegion(
@@ -2031,7 +2031,7 @@ Window::_ObeySizeLimits()
 	// BWindow::ResizeTo() even honors the limits, I would guess
 	// this is a bug that we don't have to adopt.
 	// Note that most current apps will do unnecessary resizing
-	// after having set the limits, but the overhead is neglible.
+	// after having set the limits, but the overhead is negligible.
 
 	float minWidthDiff = fMinWidth - fFrame.Width();
 	float minHeightDiff = fMinHeight - fFrame.Height();

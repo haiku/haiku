@@ -634,7 +634,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 	_UpdateHooksAfterModeChange();
 
-	// update backbuffer if neccessary
+	// update backbuffer if necessary
 	if (!fBackBuffer.IsSet()
 		|| fBackBuffer->Width() != fFrontBuffer->Width()
 		|| fBackBuffer->Height() != fFrontBuffer->Height()
@@ -1421,8 +1421,8 @@ AccelerantHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
 uint32
 AccelerantHWInterface::_NativeColor(const rgb_color& color) const
 {
-	// NOTE: This functions looks somehow suspicios to me.
-	// It assumes that all graphics cards have the same native endianess, no?
+	// NOTE: This functions looks somehow suspicious to me.
+	// It assumes that all graphics cards have the same native endianness, no?
 	switch (fDisplayMode.space) {
 		case B_CMAP8:
 		case B_GRAY8:

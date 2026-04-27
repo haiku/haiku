@@ -14,7 +14,7 @@
 	attached to a CursorManager, you can delete cursors like any other object.
 
 	Unlike BeOS, cursors can be any size or color space, and this class
-	accomodates and expands the BeOS API.
+	accommodates and expands the BeOS API.
 */
 
 

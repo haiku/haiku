@@ -211,7 +211,7 @@ RGBColor::RGBColor(uint8 color)
 
 
 /*!
-	\brief Copy Contructor
+	\brief Copy Constructor
 	\param color color to initialize from
 */
 RGBColor::RGBColor(const RGBColor &color)
@@ -439,7 +439,7 @@ RGBColor::PrintToStream(void) const
 
 
 /*!
-	\brief Overloaded comaparison
+	\brief Overloaded comparison
 	\return true if all color elements are exactly equal
 */
 bool
@@ -453,7 +453,7 @@ RGBColor::operator==(const rgb_color &color) const
 
 
 /*!
-	\brief Overloaded comaparison
+	\brief Overloaded comparison
 	\return true if all color elements are exactly equal
 */
 bool

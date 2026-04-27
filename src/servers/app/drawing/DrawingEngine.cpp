@@ -447,7 +447,7 @@ DrawingEngine::SetTransform(const BAffineTransform& transform, int32 xOffset,
 // and bottom of rect C, so that's the one we want to copy first
 // (for positive x and y offsets).
 // Since A is to the left of C and B is to the top of C, The "node"
-// for C will point to the nodes of A and B as its "successors". Therefor,
+// for C will point to the nodes of A and B as its "successors". Therefore,
 // A and B will have an "indegree" of 1 for C pointing to them. C will
 // have an "indegree" of 0, because there was no rect to which C
 // was to the left or top of. When comparing A and B, neither is left

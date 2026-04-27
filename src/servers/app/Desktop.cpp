@@ -3210,9 +3210,9 @@ Desktop::_HideWindow(Window* window)
 
 
 /*!	Updates the workspaces of all subset windows with regard to the
-	specifed window.
+	specified window.
 	If newIndex is not -1, it will move all subset windows that belong to
-	the specifed window to the new workspace; this form is only called by
+	the specified window to the new workspace; this form is only called by
 	SetWorkspace().
 */
 void
@@ -3498,7 +3498,7 @@ Desktop::_TriggerWindowRedrawing(BRegion& dirtyRegion, BRegion& exposeRegion)
 void
 Desktop::_SetBackground(BRegion& background)
 {
-	// NOTE: the drawing operation is caried out
+	// NOTE: the drawing operation is carried out
 	// in the clipping region rebuild, but it is
 	// ok actually, because it also avoids trails on
 	// moving windows

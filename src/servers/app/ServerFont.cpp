@@ -414,7 +414,7 @@ ServerFont::GetTransformedFace(bool rotate, bool shear) const
 		smatrix.yx = (FT_Fixed)(0);
 		smatrix.yy = (FT_Fixed)(0x10000);
 
-		// Multiply togheter and apply transform
+		// Multiply together and apply transform
 		FT_Matrix_Multiply(&rmatrix, &smatrix);
 		FT_Set_Transform(face, &smatrix, NULL);
 	}
@@ -565,7 +565,7 @@ ParseFcMap(FcChar32 charMap[], FcChar32 baseCodePoint, unicode_block& blocksForM
 				while (startBlock <= endBlock) {
 					// if the starting codepoint is found in a different block
 					// than the ending codepoint, we should add all the blocks
-					// inbetween.
+					// in between.
 					blocksForMap = blocksForMap
 						| kUnicodeBlockMap[startBlock].block;
 					++startBlock;
@@ -595,7 +595,7 @@ ParseFcMap(FcChar32 charMap[], FcChar32 baseCodePoint, unicode_block& blocksForM
 			while (startBlock <= endBlock) {
 				// if the starting codepoint is found in a different block
 				// than the ending codepoint, we should add all the blocks
-				// inbetween.
+				// in between.
 				blocksForMap = blocksForMap
 					| kUnicodeBlockMap[startBlock].block;
 				++startBlock;

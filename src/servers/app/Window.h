@@ -118,7 +118,7 @@ public:
 	inline	BRegion&			VisibleRegion() { return fVisibleRegion; }
 			BRegion&			VisibleContentRegion();
 
-			// TODO: not protected by a lock, but noone should need this anyways
+			// TODO: not protected by a lock, but no one should need this anyways
 			// make private? when used inside Window, it has the ReadLock()
 			void				GetFullRegion(BRegion* region);
 			void				GetBorderRegion(BRegion* region);

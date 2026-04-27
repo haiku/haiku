@@ -367,9 +367,9 @@ MultiLocker::IsReadLocked() const
 /* can be uniquely mapped to a slot in the array by performing: */
 /* 		thread_id % max_threads */
 /* each time ReadLock is called while in debug mode the thread_id	*/
-/* is retrived in register_thread() and the count is adjusted in the */
+/* is retrieved in register_thread() and the count is adjusted in the */
 /* array.  If register thread is ever called and the count is not 0 then */
-/* an illegal, potentially deadlocking nested ReadLock occured */
+/* an illegal, potentially deadlocking nested ReadLock occurred */
 /* unregister_thread clears the appropriate slot in the array */
 
 /* this system could be expanded or retracted to include multiple arrays of information */

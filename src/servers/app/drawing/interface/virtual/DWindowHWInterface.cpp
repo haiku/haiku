@@ -834,7 +834,7 @@ DWindowHWInterface::ProposeMode(display_mode* candidate,
 {
 	// We should be able to get away with this because we're not dealing with
 	// any specific hardware. This is a Good Thing(TM) because we can support
-	// any hardware we wish within reasonable expectaions and programmer
+	// any hardware we wish within reasonable expectations and programmer
 	// laziness. :P
 	return B_OK;
 }

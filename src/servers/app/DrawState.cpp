@@ -380,7 +380,7 @@ DrawState::SetTransform(BAffineTransform transform)
 
 
 /* Can be used to temporarily disable all BAffineTransforms in the state
-   stack, and later reenable them.
+   stack, and later re-enable them.
 */
 void
 DrawState::SetTransformEnabled(bool enabled)

@@ -356,7 +356,7 @@ EventDispatcher::RemoveTarget(EventTarget& target)
 	\brief Adds the specified listener or updates its event mask and options
 		if already added.
 
-	It follows the BView semantics in that specifiying an event mask of zero
+	It follows the BView semantics in that specifying an event mask of zero
 	leaves the event mask untouched and just updates the options.
 */
 bool
@@ -900,7 +900,7 @@ EventDispatcher::_EventLoop()
 
 				if (fFocus != NULL && _AddTokens(event, fFocus,
 						B_KEYBOARD_EVENTS)) {
-					// if tokens were added, we need to explicetly suspend
+					// if tokens were added, we need to explicitly suspend
 					// focus in the event - if not, the event is simply not
 					// forwarded to the target
 					addedTokens = true;

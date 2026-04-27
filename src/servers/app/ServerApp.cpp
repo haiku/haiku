@@ -337,7 +337,7 @@ ServerApp::InWorkspace(int32 index) const
 	BAutolock locker(fWindowListLock);
 
 	// we could cache this, but then we'd have to recompute the cached
-	// value everytime a window has closed or changed workspaces
+	// value every time a window has closed or changed workspaces
 
 	// TODO: support initial application workspace!
 
@@ -367,7 +367,7 @@ ServerApp::Workspaces() const
 	BAutolock locker(fWindowListLock);
 
 	// we could cache this, but then we'd have to recompute the cached
-	// value everytime a window has closed or changed workspaces
+	// value every time a window has closed or changed workspaces
 
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* serverWindow = fWindowList.ItemAt(i);
@@ -577,7 +577,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			port_id clientReplyPort = -1;
 			status_t status = _CreateWindow(code, link, clientReplyPort);
 
-			// if sucessful, ServerWindow::Run() will already have replied
+			// if successful, ServerWindow::Run() will already have replied
 			if (status < B_OK) {
 				// window creation failed, we need to notify the client
 				BPrivate::LinkSender reply(clientReplyPort);

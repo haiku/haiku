@@ -109,7 +109,7 @@ struct DrawBitmapNearestNeighborCopy {
 			// buffer offset into destination
 			uint8* dst = aggInterface.fBuffer.row_ptr(y1) + x1 * 4;
 
-			// x and y are needed as indeces into the wheight arrays, so the
+			// x and y are needed as indices into the weight arrays, so the
 			// offset into the target buffer needs to be compensated
 			const int32 xIndexL = x1 - left - filterWeightXIndexOffset;
 			const int32 xIndexR = x2 - left - filterWeightXIndexOffset;

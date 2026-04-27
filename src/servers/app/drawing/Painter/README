@@ -16,7 +16,7 @@ Currently, there is a generic fallback bitmap drawing routine that handles all c
 
 3) Article
 
-I have written a Newsletter article, that explains the concepts of AGG, how Painter is therefor designed and how it can be improved with the knowledge of AGG inner workings.
+I have written a Newsletter article, that explains the concepts of AGG, how Painter is therefore designed and how it can be improved with the knowledge of AGG inner workings.
 
 <http://www.haiku-os.org/documents/dev/painter_and_how_agg_works>
 

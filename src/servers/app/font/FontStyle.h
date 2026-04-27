@@ -121,7 +121,7 @@ class FontStyle : public BReferenceable {
 		const char*		Path() const;
 		void			UpdatePath(const node_ref& parentNodeRef);
 
-		void			GetHeight(float size, font_height &heigth) const;
+		void			GetHeight(float size, font_height &height) const;
 		font_direction	Direction() const
 							{ return B_FONT_LEFT_TO_RIGHT; }
 		font_file_format FileFormat() const

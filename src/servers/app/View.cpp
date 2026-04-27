@@ -332,7 +332,7 @@ View::RemoveChild(View* view)
 View*
 View::TopView()
 {
-	// returns the top level view of the hirarchy,
+	// returns the top level view of the hierarchy,
 	// it doesn't have to be the top level of a window
 
 	if (fParent)
@@ -819,7 +819,7 @@ View::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fWindow->RecycleRegion(dirty);
 
 	// the screen clipping of this view and it's
-	// childs is no longer valid
+	// children is no longer valid
 	InvalidateScreenClipping();
 	RebuildClipping(false);
 }
@@ -871,9 +871,9 @@ View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 	// move src rect to destination here for efficiency reasons
 	visibleSrc.OffsetBy(xOffset, yOffset);
 
-	// we need to interstect the copyRegion two times, onces
+	// we need to interstect the copyRegion two times, once
 	// at the source and once at the destination (here done
-	// the other way arround but it doesn't matter)
+	// the other way around but it doesn't matter)
 	// the reason for this is that we are not supposed to visually
 	// copy children in the source rect and neither to copy onto
 	// children in the destination rect...
@@ -974,7 +974,7 @@ View::PushState()
 	fDrawState.SetTo(newState);
 	// In BeAPI, B_SUBPIXEL_PRECISE is a view flag, and not affected by the
 	// view state. Our implementation moves it to the draw state, but let's
-	// be compatible with the API here and make it survive accross state
+	// be compatible with the API here and make it survive across state
 	// changes.
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
@@ -1451,7 +1451,7 @@ View::ScreenAndUserClipping(const BRegion* windowContentClipping, bool force) co
 void
 View::InvalidateScreenClipping()
 {
-// TODO: appearantly, we are calling ScreenClipping() on
+// TODO: apparently, we are calling ScreenClipping() on
 // views who's parents don't have a valid screen clipping yet,
 // this messes up the logic that for any given view with
 // fScreenClippingValid == false, all children have
@@ -1469,7 +1469,7 @@ View::InvalidateScreenClipping()
 
 	fScreenAndUserClipping.SetTo(NULL);
 	fScreenClippingValid = false;
-	// invalidate the childrens screen clipping as well
+	// invalidate the children's screen clipping as well
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		child->InvalidateScreenClipping();
 	}
@@ -1511,7 +1511,7 @@ View::_MoveScreenClipping(int32 x, int32 y, bool deep)
 	}
 
 	if (deep) {
-		// move the childrens screen clipping as well
+		// move the children's screen clipping as well
 		for (View* child = FirstChild(); child; child = child->NextSibling()) {
 			child->_MoveScreenClipping(x, y, deep);
 		}
