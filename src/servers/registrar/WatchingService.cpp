@@ -86,7 +86,7 @@ WatchingService::~WatchingService()
 // AddWatcher
 /*!	\brief Registers a new watcher to the watching service.
 
-	The ownership of \a watcher is transfered to the watching service, that
+	The ownership of \a watcher is transferred to the watching service, that
 	is the caller must not delete it after the method returns.
 
 	If the service already contains a Watcher with the same target BMessenger
@@ -133,7 +133,7 @@ WatchingService::AddWatcher(const BMessenger &target)
 /*!	\brief Unregisters a watcher from the watching service and optionally
 		   deletes it.
 
-	If \a deleteWatcher is \c false, the ownership of \a watcher is transfered
+	If \a deleteWatcher is \c false, the ownership of \a watcher is transferred
 	to the caller, otherwise it is deleted.
 
 	\param watcher The watcher to be unregistered.
@@ -162,7 +162,7 @@ WatchingService::RemoveWatcher(Watcher *watcher, bool deleteWatcher)
 	The watcher is identified by its target BMessenger.
 
 	If \a deleteWatcher is \c false, the ownership of the concerned watcher is
-	transfered to the caller, otherwise it is deleted.
+	transferred to the caller, otherwise it is deleted.
 
 	\param target The target BMessenger identifying the watcher to be
 		   unregistered.

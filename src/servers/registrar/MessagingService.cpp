@@ -123,7 +123,7 @@ MessagingArea::PopCommand()
 		= (messaging_command*)((char*)fHeader + fHeader->first_command);
 
 	// remove it from the area
-	// (as long as the area is still locked, noone will overwrite the contents)
+	// (as long as the area is still locked, no one will overwrite the contents)
 	if (--fHeader->command_count == 0)
 		fHeader->first_command = fHeader->last_command = 0;
 	else

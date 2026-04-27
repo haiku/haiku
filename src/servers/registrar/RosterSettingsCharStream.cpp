@@ -55,7 +55,7 @@ RosterSettingsCharStream::~RosterSettingsCharStream()
 	  signatures, integers, or Recent{Doc,Folder,App}, this does not
 	  currently pose a problem.
 	- Quotes are " or '
-	- An unquoted string begins with any character execept whitespace
+	- An unquoted string begins with any character except whitespace
 	  or a quote and continues until a whitespace character, newline,
 	  or comment is encountered. Whitespace may be included in the
 	  unquoted string if each whitespace character is escaped with a
@@ -265,7 +265,7 @@ RosterSettingsCharStream::GetString(char *result)
 
 	// Read past any comments
 	if (error == kComment) {
-		// Read to the end of the line. If a valid read still occured,
+		// Read to the end of the line. If a valid read still occurred,
 		// leave the newline in the stream for next time.
 		char ch;
 		while (true) {

@@ -84,7 +84,7 @@ Watcher::Target() const
 
 	\param message The message to be sent.
 	\return \c B_OK, if everything went fine, another error code, if an error
-			occured.
+			occurred.
 */
 status_t
 Watcher::SendMessage(BMessage *message)

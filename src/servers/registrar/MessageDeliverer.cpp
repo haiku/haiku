@@ -465,7 +465,7 @@ struct MessageDeliverer::TargetPortMap : public map<port_id, TargetPort*> {
 
 	For the user of the service only the MessageDeliverer::DeliverMessage()
 	will be of interest. Some of them allow broadcasting a message to several
-	recepients.
+	recipients.
 
 	The class maintains a TargetPort for each target port which was full at the
 	time a message was to be delivered to it. A TargetPort has a queue of

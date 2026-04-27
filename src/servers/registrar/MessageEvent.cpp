@@ -77,7 +77,7 @@ MessageEvent::MessageEvent(bigtime_t time, BHandler* handler, uint32 command)
 // constructor
 /*!	\brief Creates a new MessageEvent with a target BHandler and a message.
 
-	The caller retains ownership of the supplied message. It can savely be
+	The caller retains ownership of the supplied message. It can safely be
 	deleted after the constructor returns.
 
 	\note The supplied BHandler must be valid the whole life time of the
@@ -116,7 +116,7 @@ MessageEvent::MessageEvent(bigtime_t time, const BMessenger& messenger,
 // constructor
 /*!	\brief Creates a new MessageEvent with a target BMessenger and a message.
 
-	The caller retains ownership of the supplied message. It can savely be
+	The caller retains ownership of the supplied message. It can safely be
 	deleted after the constructor returns.
 
 	\param time The time at which the message shall be sent.

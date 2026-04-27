@@ -142,7 +142,7 @@ Event::IsAutoDelete() const
 	return value is taken into consideration. To be precise the logical OR
 	of IsAutoDelete() and the return value of Do() specifies whether the
 	object shall be deleted. The reason for this handling is that there are
-	usally two kind of events: "one-shot" events and those that are reused
+	usually two kind of events: "one-shot" events and those that are reused
 	periodically or from time to time. The first kind can simply be
 	constructed with "auto delete" set to \c true and doesn't need to care
 	about Do()'s return value. The second kind shall usually not be deleted,

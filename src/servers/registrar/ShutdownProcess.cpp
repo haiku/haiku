@@ -739,7 +739,7 @@ ShutdownProcess::Init(BMessage* request)
 	if (!fInternalEvents)
 		RETURN_ERROR(B_NO_MEMORY);
 
-	// create the event sempahore
+	// create the event semaphore
 	fInternalEventSemaphore = create_sem(0, "shutdown events");
 	if (fInternalEventSemaphore < 0)
 		RETURN_ERROR(fInternalEventSemaphore);

@@ -69,7 +69,7 @@ RegistrarThreadManager::MessageReceived(BMessage* message)
 }
 
 // LaunchThread
-/*! \brief Launches the given thread, passing responsiblity for it onto the
+/*! \brief Launches the given thread, passing responsibility for it onto the
 	RegistrarThreadManager object.
 
 	\param thread Pointer to a newly allocated \c RegistrarThread object.
