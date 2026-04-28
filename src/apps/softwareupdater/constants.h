@@ -12,6 +12,9 @@
 #define kAppSignature "application/x-vnd.haiku-softwareupdater"
 #define kSettingsFilename "SoftwareUpdater_settings"
 
+static const size_t kCleanUpKeepDays = 30;
+static const size_t kCleanUpKeepStates = 10;
+
 enum {
 	ACTION_STEP_INIT = 0,
 	ACTION_STEP_START,

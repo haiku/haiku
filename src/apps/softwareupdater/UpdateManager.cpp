@@ -406,10 +406,9 @@ UpdateManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 			BJobStateListener listener;
 			BContext context(decisionProvider, listener);
 
-			const int days = 30;
-			time_t before = time(NULL) - days * 24 * 60 * 60;
+			time_t before = time(NULL) - kCleanUpKeepDays * 24 * 60 * 60;
 
-			CleanUpAdminDirectoryRequest request(context, info, before, 10);
+			CleanUpAdminDirectoryRequest request(context, info, before, kCleanUpKeepStates);
 			request.Process();
 		}
 	}

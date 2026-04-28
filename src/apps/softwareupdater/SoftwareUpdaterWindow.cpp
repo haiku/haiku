@@ -725,10 +725,10 @@ SoftwareUpdaterWindow::_ShowSettingsDialog()
 {
 	BWindow* window = new BWindow(BRect(Frame().left + 50, Frame().top + 50, 0, 0),
 		B_TRANSLATE("Settings"), B_FLOATING_WINDOW,
-		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE);
+		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_CLOSE_ON_ESCAPE);
 
 	BCheckBox* autoCleanUp = new BCheckBox(B_TRANSLATE(
-		"Automatically clean up administrative directory"));
+		"Automatically clean up old install states"));
 	autoCleanUp->SetValue(fAutoCleanUpAdminDirectory);
 	autoCleanUp->SetMessage(new BMessage(kSettingMsgAutoCleanUp));
 	autoCleanUp->SetTarget(this);
