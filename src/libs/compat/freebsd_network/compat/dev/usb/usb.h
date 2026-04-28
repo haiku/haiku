@@ -68,6 +68,7 @@ struct usb_endpoint_descriptor {
 #define	UE_CONTROL	0x00
 #define	UE_BULK	0x02
 #define	UE_INTERRUPT	0x03
+#define	UE_BULK_INTR	0xfe		/* matches either BULK or INTR */
 #define	UE_GET_XFERTYPE(a)	((a) & UE_XFERTYPE)
 	uWord	wMaxPacketSize;
 	uByte	bInterval;

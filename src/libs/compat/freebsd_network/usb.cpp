@@ -390,8 +390,13 @@ usbd_transfer_setup(struct freebsd_usb_device* udev,
 		uint8_t iface_index = ifaces[setup->if_index];
 		if (endpoint == UE_ADDR_ANY) {
 			for (int i = 0; i < udev->endpoints_max; i++) {
-				if (UE_GET_XFERTYPE(udev->endpoints[i].edesc->bmAttributes) != xfer->type
-					|| UE_GET_DIR(udev->endpoints[i].edesc->bEndpointAddress) != setup->direction)
+				const uint8 type = UE_GET_XFERTYPE(udev->endpoints[i].edesc->bmAttributes);
+				const uint8 dir = UE_GET_DIR(udev->endpoints[i].edesc->bEndpointAddress);
+				if (type != xfer->type
+						&& !(xfer->type == UE_BULK_INTR
+							&& (type == UE_BULK || type == UE_INTERRUPT)))
+					continue;
+				if (dir != setup->direction)
 					continue;
 
 				endpoint = udev->endpoints[i].edesc->bEndpointAddress;
