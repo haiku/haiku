@@ -327,6 +327,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET += [ FFilterByBuildFeatures
 		marvell88w8335
 		ralinkwifi
 		realtekwifi
+		zydwifi1211
 	}@ # x86,x86_64,riscv64
 ] ;
 

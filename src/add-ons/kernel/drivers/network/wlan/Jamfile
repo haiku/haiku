@@ -12,6 +12,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network wlan marvell88w8335 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan marvell88w8363 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan ralinkwifi ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan realtekwifi ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan zydwifi1211 ;
 
 # OpenBSD drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iaxwifi200 ;
