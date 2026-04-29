@@ -55,6 +55,7 @@ dummy()
 	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, syscall_rsp);
 	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, user_rsp);
 	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, current_stack);
+	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, user_fpu_state);
 #endif
 
 	// struct iframe

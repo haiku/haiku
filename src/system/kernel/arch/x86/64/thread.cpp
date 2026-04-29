@@ -70,7 +70,7 @@ class RestartSyscall : public AbstractTraceEntry {
 extern "C" void x86_64_thread_entry();
 
 // Initial thread saved state.
-static arch_thread sInitialState _ALIGNED(64);
+arch_thread gInitialState _ALIGNED(64);
 extern uint64 gFPUSaveLength;
 extern bool gHasXsave;
 extern bool gHasXsavec;
@@ -172,25 +172,26 @@ arch_thread_init(kernel_args* args)
 {
 	// Save one global valid FPU state; it will be copied in the arch dependent
 	// part of each new thread.
+	// Use 0xFFFFFFFF as the mask to save all supported state components.
 	if (gHasXsave || gHasXsavec) {
 		if (gHasXsavec) {
 			asm volatile (
 				"clts;"		\
 				"fninit;"	\
 				"fnclex;"	\
-				"movl $0x7,%%eax;"	\
-				"movl $0x0,%%edx;"	\
+				"movl $0xFFFFFFFF,%%eax;"	\
+				"movl $0xFFFFFFFF,%%edx;"	\
 				"xsavec64 %0"
-				:: "m" (sInitialState.user_fpu_state));
+				:: "m" (gInitialState.user_fpu_state));
 		} else {
 			asm volatile (
 				"clts;"		\
 				"fninit;"	\
 				"fnclex;"	\
-				"movl $0x7,%%eax;"	\
-				"movl $0x0,%%edx;"	\
+				"movl $0xFFFFFFFF,%%eax;"	\
+				"movl $0xFFFFFFFF,%%edx;"	\
 				"xsave64 %0"
-				:: "m" (sInitialState.user_fpu_state));
+				:: "m" (gInitialState.user_fpu_state));
 		}
 	} else {
 		asm volatile (
@@ -198,15 +199,18 @@ arch_thread_init(kernel_args* args)
 			"fninit;"	\
 			"fnclex;"	\
 			"fxsaveq %0"
-			:: "m" (sInitialState.user_fpu_state));
+			:: "m" (gInitialState.user_fpu_state));
 	}
 
 	// FNINIT does not affect MXCSR or data registers, so we reset them in the state.
-	savefpu* initialState = ((savefpu*)&sInitialState.user_fpu_state);
+	savefpu* initialState = ((savefpu*)&gInitialState.user_fpu_state);
 	initialState->fp_fxsave.mxcsr = 0x1F80; // __INITIAL_MXCSR__
 	memset(initialState->fp_fxsave.fp, 0, sizeof(initialState->fp_fxsave.fp));
 	memset(initialState->fp_fxsave.xmm, 0, sizeof(initialState->fp_fxsave.xmm));
-	memset(initialState->fp_ymm, 0, sizeof(initialState->fp_ymm));
+	// Clear the rest of the state, which should all be data registers.
+	char* remainingState = (char*)initialState + offsetof(savefpu, fp_ymm);
+	size_t remainingStateSize = sizeof(gInitialState.user_fpu_state) - offsetof(savefpu, fp_ymm);
+	memset(remainingState, 0, remainingStateSize);
 
 	register_generic_syscall(THREAD_SYSCALLS, arch_thread_control, 1, 0);
 	return B_OK;
@@ -217,7 +221,7 @@ status_t
 arch_thread_init_thread_struct(Thread* thread)
 {
 	// Copy the initial saved FPU state to the new thread.
-	memcpy(&thread->arch_info, &sInitialState, sizeof(arch_thread));
+	memcpy(&thread->arch_info, &gInitialState, sizeof(arch_thread));
 
 	// Initialise the current thread pointer.
 	thread->arch_info.thread = thread;
@@ -370,12 +374,14 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	signalFrameData->context.uc_mcontext.rip = frame->ip;
 	signalFrameData->context.uc_mcontext.rflags = frame->flags;
 
+	uint64 userFPUSaveLength = min_c(gFPUSaveLength, sizeof(savefpu));
+
 	if (frame->fpu != nullptr) {
 		memcpy((void*)&signalFrameData->context.uc_mcontext.fpu, frame->fpu,
-			gFPUSaveLength);
+			userFPUSaveLength);
 	} else {
 		memcpy((void*)&signalFrameData->context.uc_mcontext.fpu,
-			sInitialState.user_fpu_state, gFPUSaveLength);
+			gInitialState.user_fpu_state, userFPUSaveLength);
 	}
 
 	signalFrameData->context.uc_mcontext.fpu.fp_fxsave.fault_address = x86_read_cr2();
@@ -454,14 +460,14 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 	// Note: the error_code and vector fields are not restored. These are provided to the signal
 	// handler for information purposes only, and are not used after the signal handling is
 	// complete.
-	
+
 	frame->cs = signalFrameData->context.uc_mcontext.fpu.fp_fxsave.cs;
 	frame->ss = signalFrameData->context.uc_mcontext.fpu.fp_fxsave.ss;
 
 	Thread* thread = thread_get_current_thread();
 
 	memcpy(thread->arch_info.user_fpu_state,
-		(void*)&signalFrameData->context.uc_mcontext.fpu, gFPUSaveLength);
+		(void*)&signalFrameData->context.uc_mcontext.fpu, min_c(gFPUSaveLength, sizeof(savefpu)));
 	frame->fpu = &thread->arch_info.user_fpu_state;
 
 	// The syscall return code overwrites frame->ax with the return value of

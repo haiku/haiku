@@ -60,10 +60,10 @@ struct arch_thread {
 	uint8			fpu_state[512] _ALIGNED(16);
 #else
 	// floating point save point - this must be 64 byte aligned for xsave and
-	// have enough space for all the registers, at least 2560 bytes according
-	// to Intel Architecture Instruction Set Extensions Programming Reference,
-	// Section 3.2.4, table 3-8
-	uint8			user_fpu_state[2560] _ALIGNED(64);
+	// have enough space for all the registers.
+	// This is sufficient for AVX, AVX-512 (which we conditionally enable)
+	// and PT (may be force-enabled by the host when we are running under VMs).
+	uint8			user_fpu_state[2688] _ALIGNED(64);
 #endif
 
 	addr_t			GetFramePointer() const;

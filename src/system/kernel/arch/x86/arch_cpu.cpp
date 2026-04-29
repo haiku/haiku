@@ -89,6 +89,7 @@ extern addr_t _xsave;
 extern addr_t _xsavec;
 extern addr_t _xrstor;
 extern addr_t _vzeroall;
+extern addr_t _xrstor_initial;
 uint64 gXsaveMask;
 uint64 gFPUSaveLength = 512;
 bool gHasXsave = false;
@@ -1934,6 +1935,10 @@ arch_cpu_init_post_vm(kernel_args* args)
 		cpuid_info cpuid;
 		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_XSTATE, 0);
 		gXsaveMask |= (cpuid.regs.eax & IA32_XCR0_AVX);
+		if (x86_check_feature(IA32_FEATURE_AVX512F, FEATURE_7_EBX)) {
+			gXsaveMask |= cpuid.regs.eax
+				& (IA32_XCR0_OPMASK | IA32_XCR0_ZMM_HI256 | IA32_XCR0_HI16_ZMM);
+		}
 		call_all_cpus_sync(&enable_xsavemask, NULL);
 		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_XSTATE, 0);
 		gFPUSaveLength = cpuid.regs.ebx;
@@ -1945,8 +1950,17 @@ arch_cpu_init_post_vm(kernel_args* args)
 		arch_altcodepatch_replace(ALTCODEPATCH_TAG_XRSTOR,
 			&_xrstor, 4);
 
-		if ((gXsaveMask & IA32_XCR0_AVX) != 0)
-			arch_altcodepatch_replace(ALTCODEPATCH_TAG_CLEAR_FPU, &_vzeroall, 3);
+		if ((gXsaveMask & IA32_XCR0_AVX) != 0) {
+			if ((gXsaveMask & ~(IA32_XCR0_X87 | IA32_XCR0_SSE | IA32_XCR0_AVX)) == 0) {
+				// If we are stopping at AVX, VZEROALL should suffice.
+				arch_altcodepatch_replace(ALTCODEPATCH_TAG_CLEAR_FPU,
+					&_vzeroall, 3);
+			} else {
+				// Otherwise, use XRSTOR to reset every supported state.
+				arch_altcodepatch_replace(ALTCODEPATCH_TAG_CLEAR_FPU,
+					&_xrstor_initial, 24);
+			}
+		}
 
 		dprintf("enable %s 0x%" B_PRIx64 " %" B_PRId64 "\n",
 			gHasXsavec ? "XSAVEC" : "XSAVE", gXsaveMask, gFPUSaveLength);

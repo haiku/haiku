@@ -6,6 +6,8 @@
 
 #include <asm_defs.h>
 
+#include "asm_offsets.h"
+
 
 .section .rodata
 
@@ -32,3 +34,10 @@ FUNCTION_END(_xrstor)
 FUNCTION(_vzeroall):
 	vzeroall
 FUNCTION_END(_vzeroall)
+
+FUNCTION(_xrstor_initial):
+	movabsq		$gInitialState + ARCH_THREAD_user_fpu_state, %rdi
+	mov 		$0xFFFFFFFF, %eax
+	mov 		$0xFFFFFFFF, %edx
+	xrstor64	(%rdi)
+FUNCTION_END(_xrstor_initial)
