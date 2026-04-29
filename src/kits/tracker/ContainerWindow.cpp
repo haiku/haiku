@@ -629,8 +629,7 @@ BContainerWindow::CreatePoseView(Model* model)
 			fNavigator->Hide();
 	}
 
-	SetPathWatchingEnabled(settings.ShowNavigator()
-		|| settings.ShowFullPathInTitleBar());
+	SetPathWatchingEnabled(settings.ShowNavigator() || settings.ShowFullPathInTitleBar());
 }
 
 
