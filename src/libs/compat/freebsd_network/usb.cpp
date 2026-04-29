@@ -400,6 +400,7 @@ usbd_transfer_setup(struct freebsd_usb_device* udev,
 					continue;
 
 				endpoint = udev->endpoints[i].edesc->bEndpointAddress;
+				xfer->type = type;
 				break;
 			}
 		}
