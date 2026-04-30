@@ -427,12 +427,12 @@ BPoseView::RestoreColumnState(AttributeStreamNode* node)
 			columnsAttrForeign = kAttrColumnsForeign;
 		}
 
-		bool wrongEndianness = false;
+		bool wrongEndian = false;
 		const char* name = columnsAttr;
 		size_t size = (size_t)node->Contains(name, B_RAW_TYPE);
 		if (size == 0) {
 			name = columnsAttrForeign;
-			wrongEndianness = true;
+			wrongEndian = true;
 			size = (size_t)node->Contains(name, B_RAW_TYPE);
 		}
 
@@ -452,8 +452,7 @@ BPoseView::RestoreColumnState(AttributeStreamNode* node)
 				// for overlaps below.
 				BObjectList<BColumn> tempSortedList;
 				for (;;) {
-					BColumn* column = BColumn::InstantiateFromStream(&stream,
-						wrongEndianness);
+					BColumn* column = BColumn::InstantiateFromStream(&stream, wrongEndian);
 					if (column == NULL)
 						break;
 					tempSortedList.AddItem(column);
@@ -548,12 +547,12 @@ BPoseView::RestoreState(AttributeStreamNode* node)
 			viewStateAttrForeign = ForeignViewStateAttributeName();
 		}
 
-		bool wrongEndianness = false;
+		bool wrongEndian = false;
 		const char* name = viewStateAttr;
 		size_t size = (size_t)node->Contains(name, B_RAW_TYPE);
 		if (!size) {
 			name = viewStateAttrForeign;
-			wrongEndianness = true;
+			wrongEndian = true;
 			size = (size_t)node->Contains(name, B_RAW_TYPE);
 		}
 
@@ -566,12 +565,10 @@ BPoseView::RestoreState(AttributeStreamNode* node)
 				BMallocIO stream;
 				stream.WriteAt(0, buffer, size);
 				stream.Seek(0, SEEK_SET);
-				BViewState* viewstate
-					= BViewState::InstantiateFromStream(&stream,
-						wrongEndianness);
-				if (viewstate) {
+				BViewState* state = BViewState::InstantiateFromStream(&stream, wrongEndian);
+				if (state != NULL) {
 					delete fViewState;
-					fViewState = viewstate;
+					fViewState = state;
 				}
 			}
 			delete[] buffer;
@@ -590,10 +587,10 @@ BPoseView::RestoreState(const BMessage &message)
 {
 	RestoreColumnState(message);
 
-	BViewState* viewstate = BViewState::InstantiateFromMessage(message);
-	if (viewstate != NULL) {
+	BViewState* state = BViewState::InstantiateFromMessage(message);
+	if (state != NULL) {
 		delete fViewState;
-		fViewState = viewstate;
+		fViewState = state;
 	}
 
 	if (IsDesktopView() && ViewMode() == kListMode) {
@@ -620,16 +617,16 @@ ClearViewOriginOne(const char* DEBUG_ONLY(name), uint32 type, off_t size,
 	BMallocIO stream;
 	stream.WriteAt(0, viewStateArchive, (size_t)size);
 	stream.Seek(0, SEEK_SET);
-	BViewState* viewstate = BViewState::InstantiateFromStream(&stream, false);
-	if (!viewstate)
+	BViewState* state = BViewState::InstantiateFromStream(&stream, false);
+	if (state == NULL)
 		return false;
 
 	// this is why we are here - zero out
-	viewstate->SetListOrigin(B_ORIGIN);
-	viewstate->SetIconOrigin(B_ORIGIN);
+	state->SetListOrigin(B_ORIGIN);
+	state->SetIconOrigin(B_ORIGIN);
 
 	stream.Seek(0, SEEK_SET);
-	viewstate->ArchiveToStream(&stream);
+	state->ArchiveToStream(&stream);
 	stream.ReadAt(0, viewStateArchive, (size_t)size);
 
 	return true;
@@ -5280,8 +5277,7 @@ BPoseView::TryUpdatingBrokenLinks()
 	BObjectList<Model>* brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
 
 	// try fixing broken symlinks, and detecting broken ones.
-	EachPoseAndModel(fPoseList, &UpdateWasBrokenSymlinkBinder, this,
-		fBrokenLinks);
+	EachPoseAndModel(fPoseList, &UpdateWasBrokenSymlinkBinder, this, fBrokenLinks);
 
 	for (int i = brokenLinksCopy->CountItems() - 1; i >= 0; i--) {
 		if (!fBrokenLinks->HasItem(brokenLinksCopy->ItemAt(i)))
