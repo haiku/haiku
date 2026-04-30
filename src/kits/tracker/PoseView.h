@@ -643,6 +643,7 @@ protected:
 	// background AddPoses task calls
 	static status_t AddPosesTask(void*);
 	virtual void AddPosesCompleted();
+	virtual void CreateTrashPose();
 	bool IsValidAddPosesThread(thread_id) const;
 
 	// typeahead filtering

@@ -539,13 +539,8 @@ BPoseView::RestoreState(AttributeStreamNode* node)
 		const char* viewStateAttr;
 		const char* viewStateAttrForeign;
 
-		if (TargetModel() != NULL && TargetModel()->IsRoot()) {
-			viewStateAttr = kAttrDisksViewState;
-			viewStateAttrForeign = kAttrDisksViewStateForeign;
-		} else {
-			viewStateAttr = ViewStateAttributeName();
-			viewStateAttrForeign = ForeignViewStateAttributeName();
-		}
+		viewStateAttr = ViewStateAttributeName();
+		viewStateAttrForeign = ForeignViewStateAttributeName();
 
 		bool wrongEndian = false;
 		const char* name = viewStateAttr;
@@ -657,15 +652,28 @@ BPoseView::SetupDefaultColumnsIfNeeded()
 const char*
 BPoseView::ViewStateAttributeName() const
 {
-	return IsDesktopView() ? kAttrDesktopViewState : kAttrViewState;
+	if (IsDesktopView())
+		return kAttrDesktopViewState;
+	else if (TargetModel()->IsRoot())
+		return kAttrDisksPoseInfo;
+	else if (TargetModel()->IsTrash())
+		return kAttrTrashPoseInfo;
+	else
+		return kAttrViewState;
 }
 
 
 const char*
 BPoseView::ForeignViewStateAttributeName() const
 {
-	return IsDesktopView() ? kAttrDesktopViewStateForeign
-		: kAttrViewStateForeign;
+	if (IsDesktopView())
+		return kAttrDesktopViewStateForeign;
+	else if (TargetModel()->IsRoot())
+		return kAttrDisksPoseInfoForeign;
+	else if (TargetModel()->IsTrash())
+		return kAttrTrashPoseInfoForeign;
+	else
+		return kAttrViewStateForeign;
 }
 
 
@@ -721,13 +729,8 @@ BPoseView::SaveState(AttributeStreamNode* node)
 
 	const char* viewStateAttr;
 	const char* viewStateAttrForeign;
-	if (TargetModel() != NULL && TargetModel()->IsRoot()) {
-		viewStateAttr = kAttrDisksViewState;
-		viewStateAttrForeign = kAttrDisksViewStateForeign;
-	} else {
-		viewStateAttr = ViewStateAttributeName();
-		viewStateAttrForeign = ForeignViewStateAttributeName();
-	}
+	viewStateAttr = ViewStateAttributeName();
+	viewStateAttrForeign = ForeignViewStateAttributeName();
 
 	node->Write(viewStateAttr, viewStateAttrForeign, B_RAW_TYPE,
 		stream.Position(), stream.Buffer());
@@ -802,7 +805,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 				poseInfo.fInitedDirectory = model->EntryRef()->directory;
 
 			// Trash pose should be invisible except on the Desktop
-			if (model->IsTrash() && !isDesktop)
+			if (model->IsTrash() && !IsVolumesRoot())
 				poseInfo.fInvisible = true;
 
 			poseInfo.fLocation = pose->Location(this);
@@ -1732,6 +1735,31 @@ BPoseView::AddPosesCompleted()
 		if (bounds.top > lastItemTop)
 			_inherited::ScrollTo(bounds.left, std::max(lastItemTop, 0.0f));
 	}
+}
+
+
+void
+BPoseView::CreateTrashPose()
+{
+	BPath path;
+	if (find_directory(B_TRASH_DIRECTORY, &path) != B_OK)
+		return;
+
+	BDirectory trashDir(path.Path());
+	BEntry entry;
+	if (trashDir.GetEntry(&entry) != B_OK)
+		return;
+
+	// redraw Trash icon when attribute changes
+	node_ref nref;
+	if (entry.GetNodeRef(&nref) == B_OK)
+		WatchNewNode(&nref, B_WATCH_ATTR, BMessenger(this));
+
+	Model* trashModel = new Model(&entry);
+	PoseInfo poseInfo;
+	ReadPoseInfo(trashModel, &poseInfo);
+
+	CreatePose(trashModel, &poseInfo, false, NULL, NULL, true);
 }
 
 
@@ -2974,7 +3002,7 @@ BPoseView::ReadPoseInfo(Model* model, PoseInfo* poseInfo)
 
 	// special case the "root" disks icon
 	// as well as the Trash on Desktop
-	if (model->IsRoot() || (model->IsTrash() && IsDesktopView())) {
+	if (model->IsRoot() || (model->IsTrash() && IsVolumesRoot())) {
 		BDirectory desktopDir;
 		if (FSGetDeskDir(&desktopDir) == B_OK) {
 			const char* poseInfoAttr = model->IsTrash()

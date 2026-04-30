@@ -561,15 +561,7 @@ TFilePanel::SwitchDirectory(const entry_ref* ref)
 
 	PoseView()->SetIsDesktop(isDesktop);
 	_inherited::SwitchDirectory(&setToRef);
-
-	if (PoseView()->IsDesktop())
-		PoseView()->AddVolumePoses();
-
-	AddShortcut('D', B_COMMAND_KEY, new BMessage(kSwitchToDesktop));
-	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
-		// our shortcut got possibly removed because the home
-		// menu item got removed - we shouldn't really have to do
-		// this - this is a workaround for a kit bug.
+		// calls AddPosesCompleted() for the rest
 
 	// update the menu field
 	for (int32 index = fDirMenu->CountItems() - 1; index >= 0; index--)
@@ -1807,6 +1799,12 @@ BFilePanelPoseView::AddPosesCompleted()
 	Window()->AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
 
 	_inherited::AddPosesCompleted();
+
+	// add volume poses and Trash to Desktop
+	if (IsVolumesRoot()) {
+		AddVolumePoses();
+		CreateTrashPose();
+	}
 }
 
 
