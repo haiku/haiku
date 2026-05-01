@@ -660,7 +660,7 @@ protected:
 
 	// misc
 	BList* GetDropPointList(BPoint dropPoint, BPoint startPoint,
-		const PoseList*, bool sourceInListMode, bool pinToGrid) const;
+		const PoseList*, BPoseView*, bool pinToGrid) const;
 	void SendSelectionAsRefs(uint32 what, bool onlyQueries = false);
 	void MoveListToTrash(BObjectList<entry_ref, true>*, bool selectNext,
 		bool deleteDirectly);

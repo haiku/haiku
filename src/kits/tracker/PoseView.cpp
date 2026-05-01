@@ -5043,17 +5043,20 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	BContainerWindow* destWindow, uint32 buttons, BPoint dropPoint, bool forceCopy,
 	bool forceMove, bool createLink, bool createRelativeLink, BPoint dragStart, bool pinToGrid)
 {
+	ASSERT(srcWindow != NULL);
+	ASSERT(srcWindow->PoseView() != NULL);
+	ASSERT(srcWindow->PoseView()->TargetModel() != NULL);
+
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
 		return;
 
-	ASSERT(srcWindow->PoseView()->TargetModel() != NULL);
-
-	if (srcWindow->PoseView()->CountSelected() == 0)
+	BPoseView* sourceView = srcWindow->PoseView();
+	if (sourceView->CountSelected() == 0)
 		return;
 
 	if (destWindow != NULL && SecondaryMouseButtonDown(modifiers(), buttons)) {
-		BPoseView* poseView = (srcWindow != NULL ? srcWindow->PoseView() : NULL);
+		BPoseView* poseView = (srcWindow != NULL ? sourceView : NULL);
 		switch (destWindow->ShowDropContextMenu(dropPoint, poseView)) {
 			case kCreateRelativeLink:
 				createRelativeLink = true;
@@ -5078,44 +5081,43 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		}
 	}
 
-	// make sure source and destination folders are different
-	if (*srcWindow->PoseView()->TargetModel()->NodeRef() == *destFolder->NodeRef()
+	// same folder and not creating a link
+	if (*sourceView->TargetModel()->NodeRef() == *destFolder->NodeRef()
 		&& !(createLink || createRelativeLink)) {
-		BPoseView* targetView = srcWindow->PoseView();
 		if (forceCopy) {
-			targetView->DuplicateSelection(&dragStart, &dropPoint);
+			sourceView->DuplicateSelection(&dragStart, &dropPoint);
 			return;
 		}
 
-		if (targetView->ViewMode() == kListMode) {
+		if (sourceView->ViewMode() == kListMode) {
 			// can't move in list view
 			return;
 		}
 
 		BPoint delta = dropPoint - dragStart;
-		int32 selectCount = targetView->CountSelected();
+		int32 selectCount = sourceView->CountSelected();
 		for (int32 index = 0; index < selectCount; index++) {
-			BPose* pose = targetView->SelectionList()->ItemAt(index);
+			BPose* pose = sourceView->SelectionList()->ItemAt(index);
 
 			// remove pose from VSlist before changing location
 			// so that we "find" the correct pose to remove
 			// need to do this because bsearch uses top of pose
 			// to locate pose to remove
-			targetView->RemoveFromVSList(pose);
-			BPoint loc(pose->Location(targetView) + delta);
-			BRect oldBounds(pose->CalcRect(targetView));
+			sourceView->RemoveFromVSList(pose);
+			BPoint loc(pose->Location(sourceView) + delta);
+			BRect oldBounds(pose->CalcRect(sourceView));
 			if (pinToGrid)
-				loc = targetView->PinToGrid(loc, targetView->fGrid, targetView->fOffset);
+				loc = sourceView->PinToGrid(loc, sourceView->fGrid, sourceView->fOffset);
 
 			// TODO: don't drop poses under desktop elements
 			//		 ie: replicants, deskbar
-			pose->MoveTo(loc, targetView);
+			pose->MoveTo(loc, sourceView);
 
-			targetView->RemoveFromExtent(oldBounds);
-			targetView->AddToExtent(pose->CalcRect(targetView));
+			sourceView->RemoveFromExtent(oldBounds);
+			sourceView->AddToExtent(pose->CalcRect(sourceView));
 
 			// remove and reinsert pose to keep VSlist sorted
-			targetView->AddToVSList(pose);
+			sourceView->AddToVSList(pose);
 		}
 
 		return;
@@ -5175,7 +5177,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
 		BList* pointList = destWindow->PoseView()->GetDropPointList(dragStart, dropPoint,
-			selectionList, srcWindow->PoseView()->ViewMode() == kListMode, pinToGrid);
+			selectionList, srcWindow->PoseView(), pinToGrid);
 		int32 selectionSize = srcWindow->PoseView()->CountSelected();
 		BObjectList<entry_ref, true>* srcList = new BObjectList<entry_ref, true>(selectionSize);
 
@@ -6099,24 +6101,36 @@ BPoseView::ConvertZombieToPose(Model* zombie, int32 index)
 
 
 BList*
-BPoseView::GetDropPointList(BPoint dropStart, BPoint dropEnd, const PoseList* poses,
-	bool sourceInListMode, bool pinToGrid) const
+BPoseView::GetDropPointList(BPoint dropStart, BPoint dropEnd, const PoseList* poseList,
+	BPoseView* sourcePoseView, bool pinToGrid) const
 {
-	if (ViewMode() == kListMode)
-		return NULL;
+	ASSERT(poseList != NULL);
+	ASSERT(sourcePoseView != NULL);
 
-	int32 poseCount = poses->CountItems();
+	int32 poseCount = poseList->CountItems();
 	BList* pointList = new BList(poseCount);
 	for (int32 index = 0; index < poseCount; index++) {
-		BPose* pose = poses->ItemAt(index);
-		BPoint poseLoc;
-		if (sourceInListMode)
-			poseLoc = dropEnd + BPoint(0, index * (IconPoseHeight() + 3));
-		else
-			poseLoc = dropEnd + (pose->Location(this) - dropStart);
+		BPose* pose = poseList->ItemAt(index);
+		if (pose == NULL)
+			break;
 
-		if (pinToGrid)
-			poseLoc = PinToGrid(poseLoc, fGrid, fOffset);
+		BPoint poseLoc;
+		if (ViewMode() == kListMode) {
+			// drop poses at the end of the list
+			poseLoc = dropEnd + BPoint(0, index * fListElemHeight);
+		} else {
+			if (pose->HasLocation()) {
+				// copy the source location
+				poseLoc = dropEnd + (pose->Location(sourcePoseView) - dropStart);
+			} else {
+				// no source location, auto-place the pose in the destination
+				BRect destViewBounds(Bounds());
+				const_cast<BPoseView*>(this)->PlacePose(pose, destViewBounds);
+				poseLoc = dropEnd + (pose->Location(this) - dropStart);
+			}
+			if (pinToGrid)
+				poseLoc = PinToGrid(poseLoc, fGrid, fOffset);
+		}
 
 		pointList->AddItem(new BPoint(poseLoc));
 	}
@@ -6155,13 +6169,11 @@ BPoseView::DuplicateSelection(BPoint* dropStart, BPoint* dropEnd)
 		BObjectList<entry_ref, true>* srcList = new BObjectList<entry_ref, true>(CountSelected());
 		CopySelectionListToEntryRefList(fSelectionList, srcList);
 
-		BList* dropPoints;
+		BList* dropPoints = NULL;
 		if (dropStart) {
 			bool pinToGrid = (modifiers() & B_COMMAND_KEY) != 0;
-			dropPoints = GetDropPointList(*dropStart, *dropEnd, fSelectionList,
-				ViewMode() == kListMode, pinToGrid);
-		} else
-			dropPoints = NULL;
+			dropPoints = GetDropPointList(*dropStart, *dropEnd, fSelectionList, this, pinToGrid);
+		}
 
 		// perform asynchronous duplicate
 		FSDuplicate(srcList, dropPoints);
