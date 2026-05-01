@@ -124,26 +124,3 @@ FUNCTION(arch_debug_call_with_fault_handler):
 	movq	$1, %rsi
 	call	longjmp
 FUNCTION_END(arch_debug_call_with_fault_handler)
-
-
-	.section .rodata
-FUNCTION(_stac):
-	stac
-FUNCTION_END(_stac)
-
-FUNCTION(_clac):
-	clac
-FUNCTION_END(_clac)
-
-FUNCTION(_xsave):
-	xsave64		(%rdi)
-FUNCTION_END(_xsave)
-
-FUNCTION(_xsavec):
-	xsavec64	(%rdi)
-FUNCTION_END(_xsavec)
-
-FUNCTION(_xrstor):
-	xrstor64	(%rdi)
-FUNCTION_END(_xrstor)
-
