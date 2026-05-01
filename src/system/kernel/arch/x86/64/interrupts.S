@@ -118,6 +118,7 @@
   1:
 
 #define CLEAR_FPU_STATE() \
+	CODEPATCH_START \
 	pxor %xmm0, %xmm0; \
 	pxor %xmm1, %xmm1; \
 	pxor %xmm2, %xmm2; \
@@ -133,7 +134,8 @@
 	pxor %xmm12, %xmm12; \
 	pxor %xmm13, %xmm13; \
 	pxor %xmm14, %xmm14; \
-	pxor %xmm15, %xmm15
+	pxor %xmm15, %xmm15; \
+	CODEPATCH_END(ALTCODEPATCH_TAG_CLEAR_FPU)
 
 // The following code defines the interrupt service routines for all 256
 // interrupts. It creates a block of handlers, each 16 bytes, that the IDT

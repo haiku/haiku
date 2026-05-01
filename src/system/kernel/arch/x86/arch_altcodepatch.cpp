@@ -45,7 +45,9 @@ arch_altcodepatch_replace(uint16 tag, void* newcodepatch, size_t length)
 		void* address = (void*)(KERNEL_LOAD_BASE + patch->kernel_offset);
 		if (patch->length < length)
 			panic("can't copy patch: new code is too long\n");
+
 		memcpy(address, newcodepatch, length);
+		memset((uint8*)address + length, 0x90 /* nop */, patch->length - length);
 		count++;
 	}
 

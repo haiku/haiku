@@ -28,3 +28,7 @@ FUNCTION_END(_xsavec)
 FUNCTION(_xrstor):
 	xrstor64	(%rdi)
 FUNCTION_END(_xrstor)
+
+FUNCTION(_vzeroall):
+	vzeroall
+FUNCTION_END(_vzeroall)

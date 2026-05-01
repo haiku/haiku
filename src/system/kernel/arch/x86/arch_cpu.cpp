@@ -88,6 +88,7 @@ extern addr_t _clac;
 extern addr_t _xsave;
 extern addr_t _xsavec;
 extern addr_t _xrstor;
+extern addr_t _vzeroall;
 uint64 gXsaveMask;
 uint64 gFPUSaveLength = 512;
 bool gHasXsave = false;
@@ -1943,6 +1944,9 @@ arch_cpu_init_post_vm(kernel_args* args)
 			gHasXsavec ? &_xsavec : &_xsave, 4);
 		arch_altcodepatch_replace(ALTCODEPATCH_TAG_XRSTOR,
 			&_xrstor, 4);
+
+		if ((gXsaveMask & IA32_XCR0_AVX) != 0)
+			arch_altcodepatch_replace(ALTCODEPATCH_TAG_CLEAR_FPU, &_vzeroall, 3);
 
 		dprintf("enable %s 0x%" B_PRIx64 " %" B_PRId64 "\n",
 			gHasXsavec ? "XSAVEC" : "XSAVE", gXsaveMask, gFPUSaveLength);
