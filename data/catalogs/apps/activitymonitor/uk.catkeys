@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	2467534740
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	1753371419
 Teams	DataSource		Процеси
 Block cache memory	DataSource		Блок кеш-пам'яті
 Media nodes	DataSource		Вузли медіа
@@ -9,8 +9,10 @@ ActivityMonitor	System name		ActivityMonitor
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Інтервал оновлення:
 Settings…	ActivityWindow		Інтервал…
+Unknown thermal sensor	SystemInfoHandler		Невідомий датчик температури
 Block cache	DataSource		Блок (лінія) кешу
 Memory	DataSource		Пам'ять
+No thermal sensor	SystemInfoHandler		Датчик температури відсутній
 CPU speed	DataSource		Частота CPU
 CPU usage	DataSource		Використання CPU
 Raw clipboard	DataSource		Буфер обміну (Raw)
@@ -23,6 +25,7 @@ Page faults	DataSource		Відмови сторінки
 Add graph	ActivityWindow		Додати графік
 Swap	DataSource		Файл підкачки
 %s faults/s	DataSource		%s відмов/с
+Temperature	DataSource		Температура
 Semaphores	DataSource		Семафори
 TX	DataSource	Shorter version for Sending	TX
 %lld ms	SettingsWindow		%lld мс

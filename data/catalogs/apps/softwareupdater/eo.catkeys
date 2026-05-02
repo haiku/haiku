@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Foraj deponejoj
 Software {0, plural, one{update} other{updates}} available	CheckManager		Programara(j) {0, plural, one{ĝisdatigo} other{ĝisdatigoj}} estas disponebla(j)
 Reboot	SoftwareUpdaterWindow	Button label	Restartigi
 Update	SoftwareUpdaterWindow	Alert button label	Ĝisdatigi
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Uzi deponejojn
 Updates did not complete	UpdateAction		Ĝisdatigoj ne estas kompletaj
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Uzi deponejojn
 Invalid update type, cannot continue with updates	UpdateAction		Nevalida ĝisdatiga speco, ne povas daŭrigi ĝisdatigon
 Uninstalling version	SoftwareUpdaterWindow	List item text	Malinstalado de versio
 %i of %i	UpdateManager	Do not translate %i	%i el %i

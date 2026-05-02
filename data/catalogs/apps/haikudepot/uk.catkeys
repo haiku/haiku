@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2935349206
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3302130305
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні умов використання
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -71,6 +71,7 @@ n/a	PackageInfoView		немає
 Checking user details	UserDetailVerifierProcess		Перевірка даних користувача
 Cancel	MainWindow		Скасувати
 Refresh repositories	MainWindow		Оновити репозитарії
+Error	SimpleAlert		Помилка
 Continue	App		Продовжити
 A password is required.	UserLoginWindow		Потрібне гасло.
 Language	RatePackageWindow		Мова

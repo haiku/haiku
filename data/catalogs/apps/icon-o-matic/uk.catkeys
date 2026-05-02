@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	2321853629
+1	ukrainian	x-vnd.haiku-icon_o_matic	1624218665
 None	Icon-O-Matic-Properties		Пусто
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Очистити контур
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -76,6 +76,7 @@ Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Додат�
 Remove	Icon-O-Matic-PathManipulator		Прибрати
 Duplicate	Icon-O-Matic-ShapesList		Дублікат
 Alpha	Icon-O-Matic-PropertyNames		Альфа
+OK	Icon-O-Matic-SVGExport		OK
 Contour	Transformation		Обрис
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Додати {0, plural, one{трансформатор} few{трансформатори} other{трансформаторів}}
 Miter limit	Icon-O-Matic-PropertyNames		Межа вістря

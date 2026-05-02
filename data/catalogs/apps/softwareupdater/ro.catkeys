@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Nu sunt disponi
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{update} other{updates}} de software disponibil(e)
 Reboot	SoftwareUpdaterWindow	Button label	Repornire
 Update	SoftwareUpdaterWindow	Alert button label	Actualizează
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Deschide depozitele
 Updates did not complete	UpdateAction		Actualizările nu s-au finalizat
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Deschide depozitele
 Invalid update type, cannot continue with updates	UpdateAction		Tipul de actualizare nu este valid, nu se poate continua cu actualizările
 Uninstalling version	SoftwareUpdaterWindow	List item text	Se dezinstalează versiunea
 %i of %i	UpdateManager	Do not translate %i	%i din %i

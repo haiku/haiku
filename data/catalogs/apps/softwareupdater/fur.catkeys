@@ -52,8 +52,8 @@ No remote repositories are available	UpdateManager	Error message	Nissun dipuesit
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Inzornament software disponibil} other{Inzornaments software disponibii}}
 Reboot	SoftwareUpdaterWindow	Button label	Torne invie
 Update	SoftwareUpdaterWindow	Alert button label	Inzorne
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Vierç dipuesits
 Updates did not complete	UpdateAction		I inzornaments no son stâts completâts
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Vierç dipuesits
 Invalid update type, cannot continue with updates	UpdateAction		Gjenar di inzornament no valit, impussibil continuâ cui inzornaments
 Uninstalling version	SoftwareUpdaterWindow	List item text	Disinstalazion de version
 %i of %i	UpdateManager	Do not translate %i	%i di %i

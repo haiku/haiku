@@ -44,8 +44,8 @@ No remote repositories are available	UpdateManager	Error message	Nijedan udaljen
 Software {0, plural, one{update} other{updates}} available	CheckManager		Software {0, plural, one{update} other{updates}} dostupan
 Reboot	SoftwareUpdaterWindow	Button label	Ponovno podigni sustav
 Update	SoftwareUpdaterWindow	Alert button label	Ažuriraj
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Otvoreni repozitoriji
 Updates did not complete	UpdateAction		Ažuriranja nisu kompletirana
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Otvoreni repozitoriji
 Invalid update type, cannot continue with updates	UpdateAction		Neispravna vrsta ažuriranja, ne mogu nastaviti sa ažuriranjima
 Uninstalling version	SoftwareUpdaterWindow	List item text	Deinstaliram inačicu
 %i of %i	UpdateManager	Do not translate %i	%i of %i

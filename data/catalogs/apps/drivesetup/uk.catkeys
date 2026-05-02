@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	2345310783
+1	ukrainian	x-vnd.Haiku-DriveSetup	1406376304
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -21,6 +21,7 @@ Partition size	CreateParametersPanel		Розмір розділу
 Validation of the given parameters failed.	MainWindow		Збій при перевірці введених параметрів.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \«%s\»? Повторний запит буде видано безпосередньо перед записом змін на диск.
 DriveSetup	System name		DriveSetup
+Error:	MainWindow	in any error alert	Помилка:
 Mounted at	PartitionList		Підключено як
 Disk system %s not found!	MainWindow		Дискова система %s не знайдена!
 Create…	MainWindow		Створити…

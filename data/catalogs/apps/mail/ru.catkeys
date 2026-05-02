@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	236508096
+1	russian	x-vnd.Be-MAIL	1095898962
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите Отправить чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите Отмена и попробуйте исправить их вручную.
 Text wrapping:	Mail		Перенос строк:
 Show icons & labels	Mail		Отображать иконки и надписи
@@ -102,6 +102,7 @@ Previous	Mail		Предыдущее
 Include file attributes in attachments	Mail		Добавлять атрибуты файла во вложение
 Start now	Mail		Запустить сейчас
 (Name unavailable)	Mail		(Имя недоступно)
+Cancel	LabelWindow		Отменить
 Move to trash	Mail		Переместить в корзину
 <none>	Mail		<пусто>
 %d - Date	Mail		%d - Дата
@@ -157,6 +158,7 @@ Delete	Mail		Удалить
 Put your favorite e-mail queries and query templates in this folder.	Mail		Перенесите в эту папку ваши почтовые запросы.
 Spam	Mail		Спам
 Couldn't open this signature. Sorry.	Mail		Невозможно открыть эту подпись. Извините.
+OK	LabelWindow		OK
 Revert	Mail		Вернуть
 Unknown	Mail		Неизвестно
 Increase quote level	Mail		Добавить префикс цитирования

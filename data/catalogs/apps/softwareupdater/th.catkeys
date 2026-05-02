@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	ไม่มี
 Software {0, plural, one{update} other{updates}} available	CheckManager		ซอฟ์แวร์ {0, plural, one{update} อืนๆ{updates}} พร้อมใช้งาน
 Reboot	SoftwareUpdaterWindow	Button label	รีบูท
 Update	SoftwareUpdaterWindow	Alert button label	อัปเดต
-Open Repositories	SoftwareUpdaterWindow	Alert button label	เปิดที่เก็บข้อมูล
 Updates did not complete	UpdateAction		อัปเดตไม่สมบรูณ์
+Open Repositories	SoftwareUpdaterWindow	Alert button label	เปิดที่เก็บข้อมูล
 Invalid update type, cannot continue with updates	UpdateAction		ประเภทการอัปเดตไม่ถูกต้อง ไม่สามารถดำเนินการอัปเดตได้
 Uninstalling version	SoftwareUpdaterWindow	List item text	ยกเลิกการติดตั้งเวอร์ชั่น
 %i of %i	UpdateManager	Do not translate %i	%i ของ %i

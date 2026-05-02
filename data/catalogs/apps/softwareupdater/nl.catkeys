@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Er zijn geen on
 Software {0, plural, one{update} other{updates}} available	CheckManager		Software {0, plural, one{update} other{updates}} beschikbaar
 Reboot	SoftwareUpdaterWindow	Button label	Herstarten
 Update	SoftwareUpdaterWindow	Alert button label	Bijwerken
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Archieven openen
 Updates did not complete	UpdateAction		Bijwerken is niet voltooid
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Archieven openen
 Invalid update type, cannot continue with updates	UpdateAction		Ongeldig update-type, kan niet doorgaan met bijwerken
 Uninstalling version	SoftwareUpdaterWindow	List item text	Versie verwijderen
 %i of %i	UpdateManager	Do not translate %i	%i van %i

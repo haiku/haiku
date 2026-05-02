@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	无可用远程
 Software {0, plural, one{update} other{updates}} available	CheckManager		可用软件更新 {0, plural, one{update} other{updates}} 
 Reboot	SoftwareUpdaterWindow	Button label	重启
 Update	SoftwareUpdaterWindow	Alert button label	更新
-Open Repositories	SoftwareUpdaterWindow	Alert button label	打开仓库
 Updates did not complete	UpdateAction		更新未能完成
+Open Repositories	SoftwareUpdaterWindow	Alert button label	打开仓库
 Invalid update type, cannot continue with updates	UpdateAction		无效更新类型，无法继续执行更新
 Uninstalling version	SoftwareUpdaterWindow	List item text	卸载版本
 %i of %i	UpdateManager	Do not translate %i	%i / %i

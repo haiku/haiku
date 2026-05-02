@@ -52,8 +52,8 @@ No remote repositories are available	UpdateManager	Error message	Kullanılabilir
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, other{güncelleme}} var
 Reboot	SoftwareUpdaterWindow	Button label	Yeniden başlat
 Update	SoftwareUpdaterWindow	Alert button label	Güncelle
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Açık depolar
 Updates did not complete	UpdateAction		Güncellemeler tamamlanmadı
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Açık depolar
 Invalid update type, cannot continue with updates	UpdateAction		Geçersiz güncelleme türü, güncellemeler sürdürülemiyor
 Uninstalling version	SoftwareUpdaterWindow	List item text	Kaldırılan sürüm
 %i of %i	UpdateManager	Do not translate %i	%i/%i

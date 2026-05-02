@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Žádné vzdál
 Software {0, plural, one{update} other{updates}} available	CheckManager		Aktualizace {0, plural, one{programu} other{programů}} je dostupná
 Reboot	SoftwareUpdaterWindow	Button label	Restart
 Update	SoftwareUpdaterWindow	Alert button label	Aktualizace
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Otevřít repozitáře
 Updates did not complete	UpdateAction		Instalace aktualizací nebyla dokončena
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Otevřít repozitáře
 Invalid update type, cannot continue with updates	UpdateAction		Chybný typ aktualizace, nelze pokračovat
 Uninstalling version	SoftwareUpdaterWindow	List item text	Odinstalace verze
 %i of %i	UpdateManager	Do not translate %i	%i z %i

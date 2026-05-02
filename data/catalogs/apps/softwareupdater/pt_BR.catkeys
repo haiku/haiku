@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Nenhum reposit�
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Atualização} other{Atualizações}} de software {0, plural, one{disponível} other{disponíveis}}
 Reboot	SoftwareUpdaterWindow	Button label	Reiniciar
 Update	SoftwareUpdaterWindow	Alert button label	Atualizar
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Abrir Repositórios
 Updates did not complete	UpdateAction		As atualizações não foram concluídas
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Abrir Repositórios
 Invalid update type, cannot continue with updates	UpdateAction		Tipo de atualização inválida, não se pode continuar com as atualizações
 Uninstalling version	SoftwareUpdaterWindow	List item text	Desinstalando versão
 %i of %i	UpdateManager	Do not translate %i	%i de %i

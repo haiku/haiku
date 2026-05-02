@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2935349206
+1	russian	x-vnd.Haiku-HaikuDepot	3302130305
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблемы при загрузке Условий использования
 Available packages	MainWindow		Доступные пакеты
 It was not possible to create the new user.	UserLoginWindow		Не удалось создать нового пользователя.
@@ -71,6 +71,7 @@ n/a	PackageInfoView		н/д
 Checking user details	UserDetailVerifierProcess		Проверка данных пользователя
 Cancel	MainWindow		Отменить
 Refresh repositories	MainWindow		Обновить репозитории
+Error	SimpleAlert		Ошибка
 Continue	App		Продолжить
 A password is required.	UserLoginWindow		Требуется пароль.
 Language	RatePackageWindow		Язык

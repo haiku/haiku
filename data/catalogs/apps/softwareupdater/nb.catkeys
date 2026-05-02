@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Ingen eksterne 
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Programoppdatering} other{Programoppdateringer}} tilgjengelig
 Reboot	SoftwareUpdaterWindow	Button label	Start på nytt
 Update	SoftwareUpdaterWindow	Alert button label	Oppdater
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Åpne Programarkiver
 Updates did not complete	UpdateAction		Oppdateringer ble ikke fullført
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Åpne Programarkiver
 Invalid update type, cannot continue with updates	UpdateAction		Ugyldig oppdateringstype, kan ikke fortsette med oppdateringer
 Uninstalling version	SoftwareUpdaterWindow	List item text	Avinstallerer versjon
 %i of %i	UpdateManager	Do not translate %i	%i av %i

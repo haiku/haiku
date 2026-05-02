@@ -52,8 +52,8 @@ No remote repositories are available	UpdateManager	Error message	Δεν υπάρ
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Υπάρχει διαθέσιμη ενημέρωση λογισμικού} other{Υπάρχουν διαθέσιμες ενημερώσεις λογισμικού}}
 Reboot	SoftwareUpdaterWindow	Button label	Επανεκκίνηση
 Update	SoftwareUpdaterWindow	Alert button label	Ενημέρωση
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Άνοιγμα Αποθετηρίων
 Updates did not complete	UpdateAction		Οι ενημερώσεις δεν ολοκληρώθηκαν
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Άνοιγμα Αποθετηρίων
 Invalid update type, cannot continue with updates	UpdateAction		Μη έγκυρος τύπος ενημέρωσης, δεν είναι δυνατή η ενημέρωση.
 Uninstalling version	SoftwareUpdaterWindow	List item text	Απεγκατάσταση έκδοσης
 %i of %i	UpdateManager	Do not translate %i	%i από %i

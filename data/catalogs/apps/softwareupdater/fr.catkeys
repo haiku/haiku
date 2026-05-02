@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Aucun dépôt d
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Mise à jour logicielle disponible} other{Mises à jour logicielles disponibles}}
 Reboot	SoftwareUpdaterWindow	Button label	Redémarrer
 Update	SoftwareUpdaterWindow	Alert button label	Mise à jour
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Ouvrir les Dépôts
 Updates did not complete	UpdateAction		Les mises à jour n’ont pas abouti
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Ouvrir les Dépôts
 Invalid update type, cannot continue with updates	UpdateAction		Type de mise à jour invalide, la mise à jour est interrompue
 Uninstalling version	SoftwareUpdaterWindow	List item text	Désinstallation de la version
 %i of %i	UpdateManager	Do not translate %i	%i sur %i

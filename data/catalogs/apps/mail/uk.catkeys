@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	236508096
+1	ukrainian	x-vnd.Be-MAIL	1095898962
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Перенос тексту:
 Show icons & labels	Mail		Показати значки & надписи
@@ -102,6 +102,7 @@ Previous	Mail		Попереднє
 Include file attributes in attachments	Mail		Додавати атрибути файлу у вкладення
 Start now	Mail		Запустити зараз
 (Name unavailable)	Mail		(Ім'я недоступне)
+Cancel	LabelWindow		Скасувати
 Move to trash	Mail		Перемістити до смітника
 <none>	Mail		<пусто>
 %d - Date	Mail		%d – Дата
@@ -157,6 +158,7 @@ Delete	Mail		Видалити
 Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть обрані поштові запити і шаблони запитів у цю папку.
 Spam	Mail		Спам
 Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
+OK	LabelWindow		OK
 Revert	Mail		Відкат змін
 Unknown	Mail		Невідомо
 Increase quote level	Mail		Додати префікс цитати

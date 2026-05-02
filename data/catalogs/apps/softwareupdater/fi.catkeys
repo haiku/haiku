@@ -50,8 +50,8 @@ No remote repositories are available	UpdateManager	Error message	Yhtään etäti
 Software {0, plural, one{update} other{updates}} available	CheckManager		Ohjelmiston {0, plural, one{päivitys} other{päivitystä}} saatavilla
 Reboot	SoftwareUpdaterWindow	Button label	Käynnistä uudelleen
 Update	SoftwareUpdaterWindow	Alert button label	Päivitä
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Avaa tietovarastot
 Updates did not complete	UpdateAction		Päivitykset eivät valmistuneet
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Avaa tietovarastot
 Invalid update type, cannot continue with updates	UpdateAction		Virheellinen päivitystyyppi, päivitysten jatkaminen epäonnistui
 Uninstalling version	SoftwareUpdaterWindow	List item text	Poistetaan asennettu versio
 %i of %i	UpdateManager	Do not translate %i	%i / %i

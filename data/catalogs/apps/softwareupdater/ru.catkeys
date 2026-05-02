@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Нет дост
 Software {0, plural, one{update} other{updates}} available	CheckManager		Доступно {0, plural, one{обновление} few{# обновления} other{обновлений}} программного обеспечения
 Reboot	SoftwareUpdaterWindow	Button label	Перезагрузить
 Update	SoftwareUpdaterWindow	Alert button label	Обновить
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Открыть Репозитории
 Updates did not complete	UpdateAction		Обновление не было завершено
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Открыть Репозитории
 Invalid update type, cannot continue with updates	UpdateAction		Неверный тип обновления, невозможно продолжить
 Uninstalling version	SoftwareUpdaterWindow	List item text	Удаляемая версия
 %i of %i	UpdateManager	Do not translate %i	%i из %i

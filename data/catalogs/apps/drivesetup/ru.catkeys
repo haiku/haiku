@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	2072134749
+1	russian	x-vnd.Haiku-DriveSetup	1133200270
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Register disk image…	MainWindow		Зарегистрировать образ диска…
 Mount all	MainWindow		Подключить все
@@ -24,6 +24,7 @@ Partition size	CreateParametersPanel		Размер раздела
 Validation of the given parameters failed.	MainWindow		Проверка введённых параметров не удалась.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел \«%s\»?\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 DriveSetup	System name		Разметка диска
+Error:	MainWindow	in any error alert	Ошибка:
 Mounted at	PartitionList		Подключен как
 Disk system %s not found!	MainWindow		Дисковая система %s не найдена!
 Create…	MainWindow		Создать…

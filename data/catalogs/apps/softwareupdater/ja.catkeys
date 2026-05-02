@@ -52,8 +52,8 @@ No remote repositories are available	UpdateManager	Error message	リモートリ
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{個の} other{個の}}ソフトウェアアップデートが利用できます
 Reboot	SoftwareUpdaterWindow	Button label	再起動
 Update	SoftwareUpdaterWindow	Alert button label	更新
-Open Repositories	SoftwareUpdaterWindow	Alert button label	リポジトリを開く
 Updates did not complete	UpdateAction		更新は完了しなかった
+Open Repositories	SoftwareUpdaterWindow	Alert button label	リポジトリを開く
 Invalid update type, cannot continue with updates	UpdateAction		無効な更新タイプです、更新を継続できません
 Uninstalling version	SoftwareUpdaterWindow	List item text	アンインストール中のバージョン
 %i of %i	UpdateManager	Do not translate %i	%i / %i

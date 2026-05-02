@@ -51,8 +51,8 @@ No remote repositories are available	UpdateManager	Error message	Tidak ada repos
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{update} other{updates}} aplikasi tersedia
 Reboot	SoftwareUpdaterWindow	Button label	Boot-ulang
 Update	SoftwareUpdaterWindow	Alert button label	Memperbarui
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Buka Repositori
 Updates did not complete	UpdateAction		Pembaruan tidak selesai
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Buka Repositori
 Invalid update type, cannot continue with updates	UpdateAction		Jenis pembaruan tidak sah, tidak dapat melanjutkan pembaruan
 Uninstalling version	SoftwareUpdaterWindow	List item text	Menghapus versi
 %i of %i	UpdateManager	Do not translate %i	%i dari %i
