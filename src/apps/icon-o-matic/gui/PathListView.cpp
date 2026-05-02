@@ -897,7 +897,7 @@ PathListView::_UpdateMarks()
 {
 	int32 count = CountItems();
 	if (fCurrentShape != NULL) {
-		// enable display of marks and mark items whoes
+		// enable display of marks and mark items whose
 		// path is contained in fCurrentShape
 		for (int32 i = 0; i < count; i++) {
 			PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));

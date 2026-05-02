@@ -27,6 +27,7 @@ UnassignPathCommand::UnassignPathCommand(PathSourceShape* shape,
 	  fPath(path),
 	  fPathRemoved(false)
 {
+	fPath->AcquireReference();
 }
 
 // destructor
