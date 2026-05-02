@@ -992,7 +992,7 @@ BPoseView::ScrollTo(BPoint where)
 
 	// keep the view state in sync
 	if (ViewMode() == kListMode)
-		fViewState->SetListOrigin(Extent().LeftTop());
+		fViewState->SetListOrigin(LeftTop());
 	else
 		fViewState->SetIconOrigin(Extent().LeftTop());
 }
