@@ -265,14 +265,20 @@ BCountView::Draw(BRect updateRect)
 
 	BRect textRect(TextInvalRect());
 
-	TruncateString(&itemString, IsTypingAhead() ? B_TRUNCATE_BEGINNING
-			: IsFiltering() ? B_TRUNCATE_MIDDLE : B_TRUNCATE_END,
-		textRect.Width());
+	int32 truncateMode;
+	if (IsTypingAhead())
+		truncateMode = B_TRUNCATE_BEGINNING;
+	else if (IsFiltering())
+		truncateMode = B_TRUNCATE_MIDDLE;
+	else
+		truncateMode = B_TRUNCATE_END;
 
-	if (IsTypingAhead()) {
-		// use a muted gray for the typeahead
+	TruncateString(&itemString, truncateMode, textRect.Width());
+
+	// use a muted gray for typeahead filtering
+	if (IsTypingAhead())
 		SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
-	} else
+	else
 		SetHighUIColor(B_PANEL_TEXT_COLOR);
 
 	MovePenTo(textRect.LeftBottom());
