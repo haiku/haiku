@@ -265,6 +265,11 @@ BCountView::Draw(BRect updateRect)
 
 	BRect textRect(TextInvalRect());
 
+	// leave room for pop up indicator
+	float popUpWidth = be_control_look->DefaultItemSpacing();
+	if (!fPoseView->TargetModel()->IsRoot())
+		textRect.right -= popUpWidth;
+
 	int32 truncateMode;
 	if (IsTypingAhead())
 		truncateMode = B_TRUNCATE_BEGINNING;
@@ -283,6 +288,15 @@ BCountView::Draw(BRect updateRect)
 
 	MovePenTo(textRect.LeftBottom());
 	DrawString(itemString.String());
+
+	// draw pop up indicator
+	if (!fPoseView->TargetModel()->IsRoot()) {
+		BRect arrowRect(bounds);
+		arrowRect.left = bounds.right - popUpWidth;
+		float fgTint = (color.IsLight() ? B_DARKEN_4_TINT : 2.f - B_DARKEN_4_TINT);
+		be_control_look->DrawArrowShape(this, arrowRect, updateRect, color,
+			BControlLook::B_DOWN_ARROW, 0, fgTint);
+	}
 
 	bounds.top++;
 
