@@ -135,11 +135,6 @@ enum {
 	kInsertAfter
 };
 
-const BPoint kTransparentDragThreshold(be_control_look->ComposeIconSize(256).Width(),
-	be_control_look->ComposeIconSize(192).Width());
-	// maximum size of the transparent drag bitmap, use a drag rect
-	// if larger in any direction
-
 struct attr_column_relation {
 	uint32	attrHash;
 	int32	fieldMask;
@@ -7750,11 +7745,8 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 	if (poseCount == 0)
 		return NULL;
 
-	// Create a drag rectangle of the maximum drag size, centered around the cursor
-	BRect inner(where.x - roundf(kTransparentDragThreshold.x / 2),
-		where.y - roundf(kTransparentDragThreshold.y / 2),
-		where.x + roundf(kTransparentDragThreshold.x / 2),
-		where.y + roundf(kTransparentDragThreshold.y / 2));
+	// Create a drag rectangle of the maximum drag size, centered around the cursor.
+	BRect inner(where.x, where.y, where.x + bounds.Width(), where.y + bounds.Height());
 
 	// This would mean the cursor is outside the selection rectangle, in which case a drag
 	// operation should not have been started.
@@ -7762,7 +7754,7 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 		return NULL;
 
 	// Nudge the inner rectangle if it is outside the selection/drag rectangle.
-	// Otherwise, we end up wasting a part of its area for showing noting at all.
+	// Otherwise, we end up wasting a part of its area for showing nothing at all.
 	if (inner.right > dragRect.right)
 		inner.OffsetBy(dragRect.right - inner.right, 0);
 	if (inner.bottom > dragRect.bottom)
@@ -7771,33 +7763,6 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 		inner.OffsetBy(dragRect.left - inner.left, 0);
 	if (inner.top < dragRect.top)
 		inner.OffsetBy(0, dragRect.top - inner.top);
-
-	float fadeWidth = be_control_look->ComposeIconSize(32).Width();
-		// not an icon but make this bigger based on font-size
-
-	// If the selection is bigger than the specified limit, the
-	// contents will fade out when they come near the borders
-	bool fadeTop = false;
-	bool fadeBottom = false;
-	bool fadeLeft = false;
-	bool fadeRight = false;
-	bool fade = false;
-	if (inner.left > dragRect.left) {
-		inner.left = std::max(inner.left - fadeWidth, dragRect.left);
-		fade = fadeLeft = true;
-	}
-	if (inner.right < dragRect.right) {
-		inner.right = std::min(inner.right + fadeWidth, dragRect.right);
-		fade = fadeRight = true;
-	}
-	if (inner.top > dragRect.top) {
-		inner.top = std::max(inner.top - fadeWidth, dragRect.top);
-		fade = fadeTop = true;
-	}
-	if (inner.bottom < dragRect.bottom) {
-		inner.bottom = std::min(inner.bottom + fadeWidth, dragRect.bottom);
-		fade = fadeBottom = true;
-	}
 
 	// set the offset for the dragged bitmap (for the BView::DragMessage() call)
 	offset = where - BPoint(2, 1) - inner.LeftTop();
@@ -7818,14 +7783,6 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 	view->ConstrainClippingRegion(&newClip);
 
 	memset(bitmap->Bits(), 0, bitmap->BitsLength());
-
-	view->SetDrawingMode(B_OP_ALPHA);
-	view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-	uint8 alpha = fade ? 164 : 192; // set the level of opacity by value
-	if (HighColor().IsDark())
-		view->SetHighColor(0, 0, 0, alpha);
-	else
-		view->SetHighColor(255, 255, 255, alpha);
 
 	BPoint offsetBy = B_ORIGIN;
 	BPoint rowLocation = B_ORIGIN;
@@ -7856,34 +7813,8 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint where, int32 poseIndex, BPoint&
 	}
 
 	view->Sync();
-
-	// fade out the contents if necessary
-	if (fade) {
-		uint32* bits = (uint32*)bitmap->Bits();
-		int32 width = bitmap->BytesPerRow() / 4;
-
-		if (fadeLeft) {
-			FadeRGBA32Horizontal(bits, width, int32(rect.bottom), 0,
-				int32(fadeWidth));
-		}
-
-		if (fadeRight) {
-			FadeRGBA32Horizontal(bits, width, int32(rect.bottom), int32(rect.right),
-				int32(rect.right - fadeWidth));
-		}
-
-		if (fadeTop) {
-			FadeRGBA32Vertical(bits, width, int32(rect.bottom), 0,
-				int32(fadeWidth));
-		}
-
-		if (fadeBottom) {
-			FadeRGBA32Vertical(bits, width, int32(rect.bottom), int32(rect.bottom),
-				int32(rect.bottom - fadeWidth));
-		}
-	}
-
 	bitmap->Unlock();
+
 	return bitmap;
 }
 
