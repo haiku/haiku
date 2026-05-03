@@ -651,10 +651,19 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 	// BPose::Draw before and after calling this function.
 
 	bool direct = drawView == view;
+	bool dragging = false;
+	if (!direct && view->Window() != NULL && view->Window()->CurrentMessage() != NULL)
+		dragging = view->Window()->CurrentMessage()->what == kMsgMouseDragged;
 
 	if (selected) {
-		// erase selection rect background
-		drawView->SetDrawingMode(B_OP_COPY);
+		if (dragging) {
+			drawView->SetDrawingMode(B_OP_ALPHA);
+			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+		} else {
+			// erase selection rect background
+			drawView->SetDrawingMode(B_OP_COPY);
+		}
+
 		BRect invertRect(textRect);
 		invertRect.left = ceilf(invertRect.left);
 		invertRect.top = ceilf(invertRect.top);
@@ -665,38 +674,32 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 		// High color is set to inverted low, then the whole thing is
 		// inverted again so that the background color "shines through".
 		drawView->SetHighColor(InvertColorSmart(drawView->LowColor()));
-	} else if (clipboardMode == kMoveSelectionTo) {
-		drawView->SetDrawingMode(B_OP_ALPHA);
-		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-		uint8 alpha = 128; // 50% opaque
-		if (drawView->LowColor().IsLight())
-			drawView->SetHighColor(0, 0, 0, alpha);
-		else
-			drawView->SetHighColor(255, 255, 255, alpha);
 	} else {
-		drawView->SetDrawingMode(B_OP_OVER);
 		if (view->IsDesktopView())
 			drawView->SetHighColor(view->HighColor());
 		else
 			drawView->SetHighUIColor(view->HighUIColor());
 	}
 
+	if (dragging || (direct && clipboardMode == kMoveSelectionTo)) {
+		drawView->SetDrawingMode(B_OP_ALPHA);
+		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+	} else {
+		drawView->SetDrawingMode(B_OP_OVER);
+	}
+
+	// high color and drawing mode are set to draw text
+
 	float decenderHeight = roundf(view->FontInfo().descent);
 	BPoint location(textRect.left, textRect.bottom - decenderHeight);
 
 	const char* fittingText = fText->FittingText(view);
 
-	// Draw text outline unless selected or column resizing.
-	// The direct parameter is false when dragging or column resizing.
-	if (!selected && direct && view->WidgetTextOutline()) {
+	// Draw text outline if enabled unless selected or column resizing.
+	if (view->WidgetTextOutline() && !selected && (direct || dragging)) {
 		// draw a halo around the text by using the "false bold"
 		// feature for text rendering. Either black or white is used for
 		// the glow (whatever acts as contrast) with a some alpha value,
-		if (direct && clipboardMode != kMoveSelectionTo) {
-			drawView->SetDrawingMode(B_OP_ALPHA);
-			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
-		}
-
 		BFont font;
 		drawView->GetFont(&font);
 
@@ -741,9 +744,6 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 			drawView->DrawString(fittingText, location + BPoint(1, 1));
 		}
 
-		if (direct && clipboardMode != kMoveSelectionTo)
-			drawView->SetDrawingMode(B_OP_OVER);
-
 		drawView->SetHighColor(textColor);
 	}
 
@@ -753,23 +753,11 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 		// TODO:
 		// this should be exported to the WidgetAttribute class, probably
 		// by having a per widget kind style
-		if (direct && clipboardMode != kMoveSelectionTo) {
-			rgb_color underlineColor = drawView->HighColor();
-			underlineColor.alpha = 180;
-
-			drawView->SetDrawingMode(B_OP_ALPHA);
-			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
-			drawView->SetHighColor(underlineColor);
-		}
-
 		BRect lineRect(textRect.OffsetByCopy(0, decenderHeight > 2 ? -(decenderHeight - 2) : 0));
 			// move underline 2px under text
 		lineRect.InsetBy(roundf(textRect.Width() - fText->Width(view)), 0);
 			// only underline text part
 		drawView->StrokeLine(lineRect.LeftBottom(), lineRect.RightBottom(), B_MIXED_COLORS);
-
-		if (direct && clipboardMode != kMoveSelectionTo)
-			drawView->SetDrawingMode(B_OP_OVER);
 	}
 
 	drawView->ConstrainClippingRegion(NULL);

@@ -144,7 +144,7 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 	view->SetDrawingMode(B_OP_ALPHA);
 
 	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
-	textColor.alpha = 192; // 75% opaque
+	textColor.alpha = 128; // 50% opaque
 	view->SetHighColor(textColor);
 	view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 
