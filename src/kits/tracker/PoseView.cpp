@@ -4898,8 +4898,6 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* target
 
 	if (!wasHandled && poseView != NULL) {
 		BPoint where = message->GetPoint("click_pt", B_ORIGIN);
-		// TODO: removed check for root here need to do that, possibly at a
-		// different level
 		poseView->MoveSelectionTo(targetModel, dropPoint, srcWindow, where, moveMode);
 	}
 
@@ -5233,6 +5231,14 @@ BPoseView::MoveSelectionTo(Model* model, BPoint dropPoint, BContainerWindow* src
 		model = TargetModel();
 
 	ASSERT(model != NULL);
+
+	// use this directory unless we were passed a directory
+	if (!(model->IsDirectory() || model->IsVirtualDirectory()))
+		model = TargetModel();
+
+	// don't allow dropping files onto root
+	if (model->IsRoot())
+		return;
 
 	// make sure this window is a legal drop target
 	if (srcWindow != window && !model->IsDropTarget())
