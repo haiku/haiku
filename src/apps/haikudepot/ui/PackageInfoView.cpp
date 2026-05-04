@@ -36,11 +36,13 @@
 
 #include "BitmapView.h"
 #include "GeneralContentScrollView.h"
+#include "InterfaceDefs.h"
 #include "LinkView.h"
 #include "LinkedBitmapView.h"
 #include "LocaleUtils.h"
 #include "Logger.h"
 #include "MarkupTextView.h"
+#include "NotAvailableStringView.h"
 #include "PackageContentsView.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
@@ -57,10 +59,16 @@
 
 
 enum {
-	TAB_ABOUT		= 0,
-	TAB_RATINGS		= 1,
-	TAB_CHANGELOG	= 2,
-	TAB_CONTENTS	= 3
+	TAB_ABOUT = 0,
+	TAB_RATINGS = 1,
+	TAB_CHANGELOG = 2,
+	TAB_CONTENTS = 3
+};
+
+
+enum {
+	CARD_AVAILABLE = 0,
+	CARD_NOT_AVAILABLE = 1
 };
 
 
@@ -159,8 +167,8 @@ private:
 
 
 enum {
-	MSG_MOUSE_ENTERED_RATING	= 'menr',
-	MSG_MOUSE_EXITED_RATING		= 'mexr',
+	MSG_MOUSE_ENTERED_RATING = 'menr',
+	MSG_MOUSE_EXITED_RATING = 'mexr',
 };
 
 
@@ -662,7 +670,7 @@ private:
 
 
 enum {
-	MSG_VISIT_PUBLISHER_WEBSITE		= 'vpws',
+	MSG_VISIT_PUBLISHER_WEBSITE = 'vpws',
 };
 
 
@@ -907,10 +915,12 @@ public:
 		SetHighColor(color);
 		StrokeLine(Bounds().LeftBottom(), Bounds().RightBottom());
 	}
-
 };
 
 
+/*!	This class will draw a little graphic of the relative count of the ratings
+	that have been assigned to the package.
+*/
 class RatingSummaryView : public BGridView {
 public:
 	RatingSummaryView()
@@ -989,24 +999,39 @@ private:
 };
 
 
+/*!	This view renders the ratings information for the package. It will appear
+	when the user chooses the "ratings" tab.
+*/
 class UserRatingsView : public BGroupView {
 public:
 	UserRatingsView()
 		:
 		BGroupView("package ratings view", B_HORIZONTAL)
 	{
+		fPackageName = "";
+		fAmPopulating = false;
+
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fRatingSummaryView = new RatingSummaryView();
 
 		ScrollableGroupView* ratingsContainerView = new ScrollableGroupView();
-		ratingsContainerView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR,
-												kContentTint);
+		ratingsContainerView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 		fRatingContainerLayout = ratingsContainerView->GroupLayout();
 
 		BScrollView* scrollView
 			= new RatingsScrollView("ratings scroll view", ratingsContainerView);
 		scrollView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+
+		fNoRatingsView = new NotAvailableStringView(
+		"no ratings",B_TRANSLATE("No user ratings available."));
+		fNoRatingsView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
+
+		// This allows for switching between the "no ratings" and the
+		// list of ratings views if there are any.
+		fRatingContainerCardView = new BCardView();
+		fRatingContainerCardView->AddChild(scrollView);
+		fRatingContainerCardView->AddChild(fNoRatingsView);
 
 		BLayoutBuilder::Group<>(this)
 			.AddGroup(B_VERTICAL)
@@ -1015,7 +1040,7 @@ public:
 				.SetInsets(0.0f, B_USE_DEFAULT_SPACING, 0.0f, 0.0f)
 			.End()
 			.AddStrut(64.0)
-			.Add(scrollView, 1.0f)
+			.Add(fRatingContainerCardView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f);
 	}
 
@@ -1041,14 +1066,11 @@ public:
 		if (userRatingInfo.IsSet())
 			count = userRatingInfo->CountUserRatings();
 
+		BString packageName = package.IsSet() ? package->Name() : "";
+		fAmPopulating = fAmPopulating && (packageName == fPackageName) && count == 0;
+
 		if (count == 0) {
-			BStringView* noRatingsView
-				= new BStringView("no ratings", B_TRANSLATE("No user ratings available."));
-			noRatingsView->SetViewUIColor(ViewUIColor(), kContentTint);
-			noRatingsView->SetAlignment(B_ALIGN_CENTER);
-			noRatingsView->SetHighColor(disable_color(ui_color(B_PANEL_TEXT_COLOR), ViewColor()));
-			noRatingsView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-			fRatingContainerLayout->AddView(0, noRatingsView);
+			_SetNotAvailable();
 		} else {
 			for (int i = count - 1; i >= 0; i--) {
 				UserRatingRef rating = userRatingInfo->UserRatingAtIndex(i);
@@ -1058,15 +1080,18 @@ public:
 				RatingItemView* view = new RatingItemView(rating);
 				fRatingContainerLayout->AddView(0, view);
 			}
+			fRatingContainerCardView->CardLayout()->SetVisibleItem(CARD_AVAILABLE);
 		}
 
 		InvalidateLayout();
+
+		fPackageName = packageName;
 	}
 
 	void Clear()
 	{
-		fRatingSummaryView->Clear();
-		ClearRatings();
+		fAmPopulating = false;
+		_SetNotAvailable();
 	}
 
 	void ClearRatings()
@@ -1074,8 +1099,6 @@ public:
 		for (int32 i = fRatingContainerLayout->CountItems() - 1;
 			BLayoutItem* item = fRatingContainerLayout->ItemAt(i); i--) {
 			BView* view = dynamic_cast<RatingItemView*>(item->View());
-			if (view == NULL)
-				view = dynamic_cast<BStringView*>(item->View());
 			if (view != NULL) {
 				view->RemoveSelf();
 				delete view;
@@ -1083,9 +1106,32 @@ public:
 		}
 	}
 
+	void _SetNotAvailable() {
+		fNoRatingsView->SetText(_NotAvailableText());
+		fRatingContainerCardView->CardLayout()->SetVisibleItem(CARD_NOT_AVAILABLE);
+		fRatingSummaryView->Clear();
+		ClearRatings();
+	}
+
+	// TODO; need some way to signal failure.
+	void SetAmPopulating() {
+		fAmPopulating = true;
+		_SetNotAvailable();
+	}
+
+	const char* _NotAvailableText() {
+		if (fAmPopulating)
+			return B_TRANSLATE("User ratings loading" B_UTF8_ELLIPSIS);
+		return B_TRANSLATE("No user ratings available.");
+	}
+
 private:
-	BGroupLayout*			fRatingContainerLayout;
-	RatingSummaryView*		fRatingSummaryView;
+	BString fPackageName;
+	bool fAmPopulating;
+	NotAvailableStringView* fNoRatingsView;
+	BGroupLayout* fRatingContainerLayout;
+	RatingSummaryView* fRatingSummaryView;
+	BCardView* fRatingContainerCardView;
 };
 
 
@@ -1101,8 +1147,15 @@ public:
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fPackageContents = new PackageContentsView("contents_list");
-		AddChild(fPackageContents);
 
+		fNotAvailableView = new NotAvailableStringView("no contents",
+		B_TRANSLATE("No contents available."));
+
+		fCardView = new BCardView();
+		fCardView->AddChild(fPackageContents);
+		fCardView->AddChild(fNotAvailableView);
+
+		AddChild(fCardView);
 	}
 
 	virtual ~ContentsView()
@@ -1115,40 +1168,64 @@ public:
 
 	void SetPackage(const PackageInfoRef package)
 	{
-		fPackageContents->SetPackage(package);
+		// if the package is not installed and is not a local file on disk then
+		// there is no point in attempting to populate data for it.
+
+		if (PackageUtils::IsActivatedOrLocalFile(package)) {
+			fPackageContents->SetPackage(package);
+			fCardView->CardLayout()->SetVisibleItem(CARD_AVAILABLE);
+		} else {
+			Clear();
+		}
 	}
 
 	void Clear()
 	{
 		fPackageContents->Clear();
+		fCardView->CardLayout()->SetVisibleItem(CARD_NOT_AVAILABLE);
 	}
 
 private:
-	PackageContentsView*	fPackageContents;
+	BCardView* fCardView;
+	NotAvailableStringView* fNotAvailableView;
+	PackageContentsView* fPackageContents;
 };
 
 
 // #pragma mark - ChangelogView
 
 
+/*!	This view appears to show the Changelog when the user chooses the
+	changelog tab.
+*/
 class ChangelogView : public BGroupView {
 public:
 	ChangelogView()
 		:
 		BGroupView("package changelog view", B_HORIZONTAL)
 	{
+		fAmPopulating = false;
+		fPackageName = "";
+
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fTextView = new MarkupTextView("changelog view");
 		fTextView->SetLowUIColor(ViewUIColor());
 		fTextView->SetInsets(be_plain_font->Size());
+		fTextScrollView = new GeneralContentScrollView("changelog scroll view", fTextView);
 
-		BScrollView* scrollView = new GeneralContentScrollView("changelog scroll view", fTextView);
+		fNotAvailableView = new NotAvailableStringView("no changelog", _NotAvailableText());
+
+		fCardView = new BCardView();
+		fCardView->AddChild(fTextScrollView);
+		fCardView->AddChild(fNotAvailableView);
 
 		BLayoutBuilder::Group<>(this)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
-			.Add(scrollView, 1.0f)
+			.Add(fCardView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f);
+
+		Clear();
 	}
 
 	virtual ~ChangelogView()
@@ -1161,6 +1238,11 @@ public:
 
 	void SetPackage(const PackageInfoRef package)
 	{
+		if (package.IsSet())
+			HDDEBUG("setting package on changelog view [%s]", package->Name().String());
+		else
+			HDDEBUG("setting package on changelog view to empty package");
+
 		PackageLocalizedTextRef localizedText = package->LocalizedText();
 		BString changelog;
 
@@ -1169,19 +1251,52 @@ public:
 				changelog = localizedText->Changelog();
 		}
 
-		if (changelog.Length() > 0)
+		BString packageName = package.IsSet() ? package->Name() : "";
+		fAmPopulating = fAmPopulating && (packageName == fPackageName) && changelog.Length() == 0;
+
+		if (changelog.Length() > 0) {
 			fTextView->SetText(changelog);
-		else
-			fTextView->SetDisabledText(B_TRANSLATE("No changelog available."));
+			fCardView->CardLayout()->SetVisibleItem(CARD_AVAILABLE);
+		} else {
+			_SetNotAvailable();
+		}
+
+		fPackageName = packageName;
+	}
+
+	// TODO; need some way to signal failure.
+	void SetAmPopulating() {
+		HDDEBUG("set am populating changelog view");
+		fAmPopulating = true;
+		_SetNotAvailable();
 	}
 
 	void Clear()
 	{
+		HDDEBUG("clearing changelog view");
+		fAmPopulating = false;
+		_SetNotAvailable();
+	}
+
+	void _SetNotAvailable() {
+		fNotAvailableView->SetText(_NotAvailableText());
+		fCardView->CardLayout()->SetVisibleItem(CARD_NOT_AVAILABLE);
 		fTextView->SetText("");
 	}
 
+	const char* _NotAvailableText() {
+		if (fAmPopulating)
+			return B_TRANSLATE("Changelog loading" B_UTF8_ELLIPSIS);
+		return B_TRANSLATE("No changelog available.");
+	}
+
 private:
-	MarkupTextView*		fTextView;
+	BString fPackageName;
+	MarkupTextView* fTextView;
+	BCardView* fCardView;
+	NotAvailableStringView* fNotAvailableView;
+	BScrollView* fTextScrollView;
+	bool fAmPopulating;
 };
 
 
@@ -1359,6 +1474,8 @@ private:
 		PopulateChangelogPackageAction action(package->Name());
 		BMessage message = action.Message();
 		Window()->PostMessage(&message);
+
+		fChangelogView->SetAmPopulating();
 	}
 
 	void _MaybePopulateUserRatings(const PackageInfoRef package) {
@@ -1386,6 +1503,8 @@ private:
 		PopulateUserRatingsPackageAction action(package->Name());
 		BMessage message = action.Message();
 		Window()->PostMessage(&message);
+
+		fUserRatingsView->SetAmPopulating();
 	}
 
 private:
@@ -1436,10 +1555,8 @@ PackageInfoView::PackageInfoView(Model* model)
 		.AddGroup(B_HORIZONTAL, 0.0f)
 			.Add(fTitleView, 6.0f)
 			.Add(fPackageActionView, 1.0f)
-			.SetInsets(
-				B_USE_DEFAULT_SPACING, 0.0f,
-				B_USE_DEFAULT_SPACING, 0.0f)
-		.End()
+			.SetInsets(B_USE_DEFAULT_SPACING, 0.0f, B_USE_DEFAULT_SPACING, 0.0f)
+			.End()
 		.Add(fPagesView);
 
 	Clear();
