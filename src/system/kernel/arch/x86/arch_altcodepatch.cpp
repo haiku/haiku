@@ -38,16 +38,30 @@ arch_altcodepatch_replace(uint16 tag, void* newcodepatch, size_t length)
 	const uint32 kernelProtection = B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA;
 	set_area_protection(info->text_region.id, kernelProtection | B_KERNEL_WRITE_AREA);
 
+	const uint8 kNOPs[9][9] = {
+		{X86_NOP1}, {X86_NOP2}, {X86_NOP3}, {X86_NOP4}, {X86_NOP5}, {X86_NOP6},
+		{X86_NOP7}, {X86_NOP8}, {X86_NOP9}
+	};
+
 	for (altcodepatch* patch = &altcodepatch_begin; patch < &altcodepatch_end;
 			patch++) {
 		if (patch->tag != tag)
 			continue;
-		void* address = (void*)(KERNEL_LOAD_BASE + patch->kernel_offset);
+		uint8* address = (uint8*)(KERNEL_LOAD_BASE + patch->kernel_offset);
 		if (patch->length < length)
 			panic("can't copy patch: new code is too long\n");
 
 		memcpy(address, newcodepatch, length);
-		memset((uint8*)address + length, 0x90 /* nop */, patch->length - length);
+		address += length;
+
+		size_t remainder = patch->length - length;
+		while (remainder > 0) {
+			size_t toWrite = min_c(remainder, 9);
+			memcpy(address, kNOPs[toWrite - 1], toWrite);
+			address += toWrite;
+			remainder -= toWrite;
+		}
+
 		count++;
 	}
 
