@@ -262,8 +262,8 @@ i2c_hid_support(device_node *parent)
 	CALLED();
 
 	// make sure parent is really the I2C bus manager
-	const char *bus;
-	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+	const char *bus = NULL;
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false) != B_OK)
 		return -1;
 
 	if (strcmp(bus, "i2c"))
@@ -280,13 +280,13 @@ i2c_hid_support(device_node *parent)
 
 	const char *name;
 	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &name,
-		false) == B_OK && strcmp(name, ACPI_NAME_HID_DEVICE) == 0) {
+		false) == B_OK && name != NULL && strcmp(name, ACPI_NAME_HID_DEVICE) == 0) {
 		TRACE("i2c_hid_support found an hid i2c device\n");
 		return 0.6;
 	}
 
 	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_CID_ITEM, &name,
-		false) == B_OK && strcmp(name, ACPI_NAME_HID_DEVICE) == 0) {
+		false) == B_OK && name != NULL && strcmp(name, ACPI_NAME_HID_DEVICE) == 0) {
 		TRACE("i2c_hid_support found a compatible hid i2c device\n");
 		return 0.6;
 	}
@@ -474,13 +474,15 @@ driver_module_info i2c_hid_driver_module = {
 		&std_ops
 	},
 
-	i2c_hid_support,
-	i2c_hid_register_device,
-	i2c_hid_init_driver,
-	i2c_hid_uninit_driver,
-	i2c_hid_register_child_devices,
-	NULL,	// rescan
-	NULL,	// removed
+	.supports_device = i2c_hid_support,
+	.register_device = i2c_hid_register_device,
+	.init_driver = i2c_hid_init_driver,
+	.uninit_driver = i2c_hid_uninit_driver,
+	.register_child_devices = i2c_hid_register_child_devices,
+	.rescan_child_devices = NULL,
+	.device_removed = NULL,
+	.suspend = NULL,
+	.resume = NULL,
 };
 
 
