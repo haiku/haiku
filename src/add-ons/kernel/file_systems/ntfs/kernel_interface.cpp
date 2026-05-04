@@ -831,6 +831,8 @@ fs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	ObjectDeleter<file_cookie> cookieDeleter(cookie);
 
 	cookie->open_mode = openMode;
+	cookie->last_size = node->size;
+	cookie->last_notification = system_time();
 
 	// We don't actually support uncached mode; it would require us to handle
 	// passing user buffers to libntfs, among other things.
@@ -858,6 +860,11 @@ fs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 			return errno;
 		node->size = na->data_size;
 		file_cache_set_size(node->file_cache, node->size);
+
+		if (cookie->last_size != 0) {
+			cookie->last_size = node->size;
+			notify_stat_changed(_volume->id, node->parent_inode, node->inode, B_STAT_SIZE);
+		}
 	}
 
 	cookieDeleter.Detach();

@@ -1164,7 +1164,10 @@ ext2_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 		if (status != B_OK)
 			return status;
 
-		// TODO: No need to notify file size changed?
+		if (cookie->last_size != 0) {
+			cookie->last_size = inode->Size();
+			notify_stat_changed(volume->ID(), -1, inode->ID(), B_STAT_SIZE);
+		}
 	}
 
 	fileCacheEnabler.Detach();

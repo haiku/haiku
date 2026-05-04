@@ -582,9 +582,11 @@ OverlayInode::Open(int openMode, void **_cookie)
 	*_cookie = cookie;
 
 	if (fIsVirtual) {
-		if (openMode & O_TRUNC) {
+		if ((openMode & O_TRUNC) && fStat.st_size != 0) {
 			fStat.st_size = 0;
 			_TrimBuffers();
+
+			notify_stat_changed(SuperVolume()->id, -1, fInodeNumber, B_STAT_SIZE);
 		}
 
 		return B_OK;
@@ -600,6 +602,8 @@ OverlayInode::Open(int openMode, void **_cookie)
 			_TrimBuffers();
 			if (!fIsDataModified)
 				SetDataModified();
+
+			notify_stat_changed(SuperVolume()->id, -1, fInodeNumber, B_STAT_SIZE);
 		}
 	}
 

@@ -2207,6 +2207,11 @@ dosfs_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 		status = file_cache_set_size(bsdNode->v_cache, 0);
 		if (status != B_OK)
 			RETURN_ERROR(status);
+
+		if (cookie->fLastSize != 0) {
+			cookie->fLastSize = fatNode->de_FileSize;
+			notify_stat_changed(volume->id, bsdNode->v_parent, fatNode->de_inode, B_STAT_SIZE);
+		}
 	}
 
 	cookieDeleter.Detach();

@@ -1384,6 +1384,11 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 			status = transaction.Done();
 		if (status != B_OK)
 			return status;
+
+		if (cookie->last_size != 0) {
+			cookie->last_size = inode->Size();
+			notify_stat_changed(volume->ID(), inode->ParentID(), inode->ID(), B_STAT_SIZE);
+		}
 	}
 
 	fileCacheEnabler.Detach();
