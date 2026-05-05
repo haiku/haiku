@@ -220,73 +220,71 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 
 	uint32_t replyType;
 	uint16 transferMode = 0;
-	bool cmdResolved = false;
 
-	// Resolve replyType for card type specific commands.
-	if (fCardType == CARD_TYPE_MMC) {
-		if (command == MMC_SET_RELATIVE_ADDR) {
+	switch (command) {
+		// Basic reply types
+		case GO_IDLE_STATE:
+			replyType = Command::kNoReplyType;
+			break;
+		case SD_APP_CMD:
+		case SD_ERASE_WR_BLK_START:
+		case SD_ERASE_WR_BLK_END:
+		case SD_SET_BUS_WIDTH: // SD Application command
 			replyType = Command::kR1Type;
-			cmdResolved = true;
-		}
-	} else if (command == SD_SEND_RELATIVE_ADDR) {
-		replyType = Command::kR6Type;
-		cmdResolved = true;
-	}
-	if (cmdResolved == false) {
-		switch (command) {
-			case GO_IDLE_STATE:
-				replyType = Command::kNoReplyType;
-				break;
-			case ALL_SEND_CID:
-			case SEND_CSD:
-				replyType = Command::kR2Type;
-				break;
-			case SELECT_DESELECT_CARD:
-			case SD_ERASE:
-				replyType = Command::kR1bType;
-				break;
-			case SD_SEND_IF_COND:
-				replyType = Command::kR7Type;
-				break;
-			case SD_READ_SINGLE_BLOCK:
-				transferMode = TransferMode::kRead | TransferMode::kDmaEnable;
-				replyType = Command::kR1Type | Command::kDataPresent;
-				break;
-			case SD_READ_MULTIPLE_BLOCKS:
-				transferMode = TransferMode::kRead | TransferMode::kMulti
-					| TransferMode::kAutoCmd12Enable | TransferMode::kBlockCountEnable
-					| TransferMode::kDmaEnable;
-				replyType = Command::kR1Type | Command::kDataPresent;
-				break;
-			case SD_WRITE_SINGLE_BLOCK:
-				transferMode = TransferMode::kWrite | TransferMode::kDmaEnable;
-				replyType = Command::kR1Type | Command::kDataPresent;
-				break;
-			case SD_WRITE_MULTIPLE_BLOCKS:
-				transferMode = TransferMode::kWrite | TransferMode::kMulti
-					| TransferMode::kAutoCmd12Enable | TransferMode::kBlockCountEnable
-					| TransferMode::kDmaEnable;
-				replyType = Command::kR1Type | Command::kDataPresent;
-				break;
-			case SD_APP_CMD:
-			case SD_ERASE_WR_BLK_START:
-			case SD_ERASE_WR_BLK_END:
-			case SD_SET_BUS_WIDTH: // SD Application command
+			break;
+		case SELECT_DESELECT_CARD:
+		case SD_ERASE:
+			replyType = Command::kR1bType;
+			break;
+		case ALL_SEND_CID:
+		case SEND_CSD:
+			replyType = Command::kR2Type;
+			break;
+		case MMC_SEND_OP_COND:
+		case SD_SEND_OP_COND: // SD Application command
+			replyType = Command::kR3Type;
+			break;
+
+		// Commands defined with different reply types in SD and MMC specifications
+		case SD_SEND_RELATIVE_ADDR: // also MMC_SET_RELATIVE_ADDR
+			if (fCardType == CARD_TYPE_MMC)
 				replyType = Command::kR1Type;
-				break;
-			case SD_SEND_OP_COND: // SD Application command
-				replyType = Command::kR3Type;
-				break;
-			// MMC / eMMC commands
-			case MMC_SEND_OP_COND:
-				// MMC/eMMC SEND_OP_COND command, CMD1.
-				replyType = Command::kR3Type;
-				break;
-			default:
-				ERROR("Unknown command %x\n", command);
-				return B_BAD_DATA;
-		}
+			else
+				replyType = Command::kR6Type;
+			break;
+		case SD_SEND_IF_COND: // also MMC_SEND_EXT_CSD
+			if (fCardType == CARD_TYPE_MMC)
+				replyType = Command::kR1Type;
+			else
+				replyType = Command::kR7Type;
+			break;
+
+		// Commands with data transfer replies, also set transferMode
+		case SD_READ_SINGLE_BLOCK:
+			transferMode = TransferMode::kRead | TransferMode::kDmaEnable;
+			replyType = Command::kR1Type | Command::kDataPresent;
+			break;
+		case SD_READ_MULTIPLE_BLOCKS:
+			transferMode = TransferMode::kRead | TransferMode::kMulti
+				| TransferMode::kAutoCmd12Enable | TransferMode::kBlockCountEnable
+				| TransferMode::kDmaEnable;
+			replyType = Command::kR1Type | Command::kDataPresent;
+			break;
+		case SD_WRITE_SINGLE_BLOCK:
+			transferMode = TransferMode::kWrite | TransferMode::kDmaEnable;
+			replyType = Command::kR1Type | Command::kDataPresent;
+			break;
+		case SD_WRITE_MULTIPLE_BLOCKS:
+			transferMode = TransferMode::kWrite | TransferMode::kMulti
+				| TransferMode::kAutoCmd12Enable | TransferMode::kBlockCountEnable
+				| TransferMode::kDmaEnable;
+			replyType = Command::kR1Type | Command::kDataPresent;
+			break;
+		default:
+			ERROR("Unknown command %x\n", command);
+			return B_BAD_DATA;
 	}
+
 	// Check if DATA line is available (if needed)
 	if ((replyType & Command::k32BitResponseCheckBusy) != 0
 		&& command != SD_STOP_TRANSMISSION && command != SD_IO_ABORT) {

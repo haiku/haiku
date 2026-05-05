@@ -31,20 +31,27 @@ typedef enum card_type {
 // Commands for SD/eMMC cards defined in:
 // SD: Physical Layer Simplified Specification Version 8.00
 // eMMC: JEDEC Standard No. 84-B51. Sec 6.10.4
+//
 // They are in the common .h file for the mmc stack because the SDHCI driver
 // currently needs to map them to the corresponding expected response types.
-// card type prefix to distinguish non common commands.
+//
+// TODO maybe it would be simpler to have the upper layers (the bus manager and mmc_disk) specify
+// the expected response type when sending a command. This would avoid hardcoding command types
+// and the corresponding response types in the command sending code.
+//
+// When the commands are specific to SD or MMC types, the constant is named with the corresponding
+// prefix.
 enum SD_COMMANDS {
 	// Basic commands, class 0
 	GO_IDLE_STATE = 0,
 	MMC_SEND_OP_COND = 1,
-	// MMC only,reserved in SD.
+		// MMC only,reserved in SD.
 	ALL_SEND_CID = 2,
 	SD_SEND_RELATIVE_ADDR = 3,
 	MMC_SET_RELATIVE_ADDR = 3,
 	SELECT_DESELECT_CARD = 7,
-	// resp can be R1 per mmc spec,keep R1b for now.
 	SD_SEND_IF_COND = 8,
+	MMC_SEND_EXT_CSD = 8,
 	SEND_CSD = 9,
 	SD_STOP_TRANSMISSION = 12,
 
