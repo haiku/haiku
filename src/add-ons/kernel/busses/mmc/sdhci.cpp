@@ -229,7 +229,6 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 		case SD_APP_CMD:
 		case SD_ERASE_WR_BLK_START:
 		case SD_ERASE_WR_BLK_END:
-		case SD_SET_BUS_WIDTH: // SD Application command
 			replyType = Command::kR1Type;
 			break;
 		case SELECT_DESELECT_CARD:
@@ -246,6 +245,12 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			break;
 
 		// Commands defined with different reply types in SD and MMC specifications
+		case SD_SET_BUS_WIDTH: // SD application command. Also MMC_SWITCH, which is not.
+			if (fCardType == CARD_TYPE_MMC)
+				replyType = Command::kR1bType;
+			else
+				replyType = Command::kR1Type;
+			break;
 		case SD_SEND_RELATIVE_ADDR: // also MMC_SET_RELATIVE_ADDR
 			if (fCardType == CARD_TYPE_MMC)
 				replyType = Command::kR1Type;

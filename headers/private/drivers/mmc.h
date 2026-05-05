@@ -46,10 +46,10 @@ enum SD_COMMANDS {
 	// Basic commands, class 0
 	GO_IDLE_STATE = 0,
 	MMC_SEND_OP_COND = 1,
-		// MMC only,reserved in SD.
 	ALL_SEND_CID = 2,
 	SD_SEND_RELATIVE_ADDR = 3,
 	MMC_SET_RELATIVE_ADDR = 3,
+	MMC_SWITCH = 6, // Same command number as SD_SET_BUS_WIDTH, but this one is not an ACMD
 	SELECT_DESELECT_CARD = 7,
 	SD_SEND_IF_COND = 8,
 	MMC_SEND_EXT_CSD = 8,
@@ -76,6 +76,7 @@ enum SD_COMMANDS {
 };
 
 
+// Application commands are sent with a prefix CMD55 (SD_APP_CMD)
 enum SDHCI_APPLICATION_COMMANDS {
 	SD_SET_BUS_WIDTH = 6,
 	SD_SEND_OP_COND = 41,
