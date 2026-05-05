@@ -134,7 +134,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq, bool poll)
 
 	// Finally, configure some useful interrupts
 	EnableInterrupts(SDHCI_INT_CMD_CMP | SDHCI_INT_CARD_REM
-		| SDHCI_INT_TRANS_CMP | SDHCI_INT_COMMAND_TIMEOUT);
+		| SDHCI_INT_TRANS_CMP | SDHCI_INT_DATA_TIMEOUT | SDHCI_INT_COMMAND_TIMEOUT);
 
 	// We want to see the other bits in the status register, but not have an
 	// interrupt trigger on them (we get a "command complete" interrupt on
@@ -332,7 +332,9 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			// At this point, the "command inhibit" bit is not set yet, it will be set only after
 			// another command is sent while the controller is in the timeout state.
 			// But resetting the controller state pre-emptively will allow to send another command.
-			fRegisters->software_reset.ResetCommandLine();
+			//
+			// Clear the data line at the same time if it is busy
+			fRegisters->software_reset.ResetCommandAndDataLines();
 			return B_TIMED_OUT;
 		}
 		if (fCommandResult & SDHCI_INT_COMMAND_CRC) {
@@ -369,7 +371,7 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 	}
 
 	if ((replyType == Command::kR1bType)
-			&& (fCommandResult & SDHCI_INT_TRANS_CMP) == 0) {
+			&& (fCommandResult & SDHCI_INT_TRANSFER_MASK) == 0) {
 		// R1b commands may use the data line so we must wait for the
 		// "transfer complete" interrupt here.
 		TRACE("Waiting for data line...\n");
@@ -537,7 +539,7 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 		// In theory we could go on and send other commands as long as they
 		// don't need the DAT lines, but it's overcomplicating things.
 		TRACE("Wait for transfer complete...");
-		while ((fCommandResult & SDHCI_INT_TRANS_CMP) == 0) {
+		while ((fCommandResult & SDHCI_INT_TRANSFER_MASK) == 0) {
 			status_t result = waiter.Wait(B_RELATIVE_TIMEOUT, 1000000);
 			if (result == B_TIMED_OUT) {
 				TRACE("Transfer complete interrupt did not trigger for a while, status %x\n",
@@ -546,6 +548,13 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 				panic("sdhci: Failed to wait for end of DMA transfer: %s", strerror(result));
 			fInterruptNotifier.Add(&waiter);
 		}
+
+		if (fCommandResult & SDHCI_INT_DATA_TIMEOUT) {
+			TRACE_ALWAYS("Request timed out!\n");
+			fRegisters->software_reset.ResetDataLine();
+			return B_TIMED_OUT;
+		}
+
 		TRACE("transfer complete OK.\n");
 
 		length -= toCopy;
@@ -733,9 +742,9 @@ SdhciBus::HandleInterrupt()
 		TRACE("Command complete interrupt handled\n");
 	}
 
-	if (intmask & SDHCI_INT_TRANS_CMP) {
+	if (intmask & SDHCI_INT_TRANSFER_MASK) {
 		fCommandResult |= intmask;
-		fRegisters->interrupt_status |= SDHCI_INT_TRANS_CMP;
+		fRegisters->interrupt_status |= (intmask & SDHCI_INT_TRANSFER_MASK);
 		fInterruptNotifier.NotifyAll();
 		TRACE("Transfer complete interrupt handled\n");
 	}

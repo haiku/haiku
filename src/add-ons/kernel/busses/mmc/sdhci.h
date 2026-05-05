@@ -237,9 +237,19 @@ class SoftwareReset {
 			return i < 10;
 		}
 
+		void ResetCommandAndDataLines() {
+			fBits |= 6;
+			while(fBits & 6);
+		}
+
 		void ResetCommandLine() {
 			fBits |= 2;
 			while(fBits & 2);
+		}
+
+		void ResetDataLine() {
+			fBits |= 4;
+			while(fBits & 4);
 		}
 
 	private:
@@ -279,6 +289,7 @@ class SoftwareReset {
 		| SDHCI_INT_COMMAND_CRC | SDHCI_INT_COMMAND_END_BIT | SDHCI_INT_COMMAND_INDEX)
 
 #define SDHCI_INT_CMD_MASK 			(SDHCI_INT_CMD_CMP | SDHCI_INT_CMD_ERROR_MASK)
+#define SDHCI_INT_TRANSFER_MASK 	(SDHCI_INT_TRANS_CMP | SDHCI_INT_DATA_TIMEOUT)
 
 #define SDHCI_INT_ERROR_MASK		(SDHCI_INT_VENDOR_ERRORS | SDHCI_INT_TUNING_ERROR \
 	| SDHCI_INT_ADMA_ERROR | SDHCI_INT_AUTO_CMD_ERROR | SDHCI_INT_BUS_POWER | SDHCI_INT_DATA_END \
