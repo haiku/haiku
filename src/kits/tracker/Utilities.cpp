@@ -655,7 +655,7 @@ DraggableIcon::MouseDown(BPoint point)
 	dragBitmap->Lock();
 	BView* view = new BView(dragBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
 	dragBitmap->AddChild(view);
-	view->SetOrigin(0, 0);
+	view->SetOrigin(B_ORIGIN);
 	BRect clipRect(view->Bounds());
 	BRegion newClip;
 	newClip.Set(clipRect);
@@ -665,8 +665,7 @@ DraggableIcon::MouseDown(BPoint point)
 	view->SetHighColor(0, 0, 0, 0);
 	view->FillRect(view->Bounds());
 	view->SetDrawingMode(B_OP_ALPHA);
-	view->SetHighColor(0, 0, 0, 128);
-		// set the level of opacity by value
+	view->SetHighColor(0, 0, 0, 128); // 50% opaque
 	view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 	view->DrawBitmap(fBitmap);
 	view->Sync();

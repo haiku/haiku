@@ -423,7 +423,7 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 
 			BView* view = new BView(dragBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
 			dragBitmap->AddChild(view);
-			view->SetOrigin(0, 0);
+			view->SetOrigin(B_ORIGIN);
 
 			BRect clipRect(view->Bounds());
 			BRegion newClip;
@@ -436,8 +436,7 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 			view->SetDrawingMode(B_OP_ALPHA);
 
 			rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
-			textColor.alpha = 128;
-				// set transparency by value
+			textColor.alpha = 128; // 50% opaque
 			view->SetHighColor(textColor);
 			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 
