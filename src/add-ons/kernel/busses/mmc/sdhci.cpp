@@ -331,11 +331,10 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 		fRegisters->interrupt_status |= fCommandResult;
 		if (fCommandResult & SDHCI_INT_COMMAND_TIMEOUT) {
 			ERROR("Command execution timed out\n");
-			if (fRegisters->present_state.CommandInhibit()) {
-				TRACE("Command line is still busy, clearing it\n");
-				// Clear the stall
-				fRegisters->software_reset.ResetCommandLine();
-			}
+			// At this point, the "command inhibit" bit is not set yet, it will be set only after
+			// another command is sent while the controller is in the timeout state.
+			// But resetting the controller state pre-emptively will allow to send another command.
+			fRegisters->software_reset.ResetCommandLine();
 			return B_TIMED_OUT;
 		}
 		if (fCommandResult & SDHCI_INT_COMMAND_CRC) {
