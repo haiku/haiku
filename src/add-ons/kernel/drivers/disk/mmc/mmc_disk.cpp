@@ -101,7 +101,10 @@ mmc_disk_supports_device(device_node* parent)
 		TRACE("SD card found, parent: %p\n", parent);
 	else if (deviceType == CARD_TYPE_SDHC)
 		TRACE("SDHC card found, parent: %p\n", parent);
-	else
+	else if (deviceType == CARD_TYPE_SDIO) {
+		// Ignore silently, since it is not mass storage and should be handled by other drivers
+		return 0.0;
+	} else
 		return 0.0;
 
 	return 0.8;
@@ -237,7 +240,6 @@ mmc_disk_init_driver(device_node* node, void** cookie)
 
 	// SD and MMC cards use byte offsets for IO commands, later ones (SDHC,
 	// SDXC, ...) use sectors.
-	// TODO eMMC uses sectors as well if defined in the OCR register bits 30:29
 	if (deviceType == CARD_TYPE_SD || deviceType == CARD_TYPE_MMC)
 		info->flags = 0;
 	else

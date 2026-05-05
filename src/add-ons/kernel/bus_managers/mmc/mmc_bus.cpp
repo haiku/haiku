@@ -224,27 +224,27 @@ MMCBus::_WorkerThread(void* cookie)
 			TRACE("Card does not implement CMD8, may be a V1 SD or MMC card\n");
 			// Do not check for SDHC support in this case
 			hcs = 0;
-			uint32_t mmcOcr;
 
 			TRACE("Trying MMC CMD1 initialization...\n");
 			do {
-				status = bus->ExecuteCommand(0, MMC_SEND_OP_COND, 0xFF8000, &mmcOcr);
+				status = bus->ExecuteCommand(0, MMC_SEND_OP_COND, 0xFF8000, &ocr);
 				// full voltage window, byte addressable, should look into this.
 				if (status != B_OK) {
 					TRACE("MMC CMD1 failed\n");
 					break;
 				}
-				if ((mmcOcr & (1 << 31)) == 0) {
+				if ((ocr & (1 << 31)) == 0) {
 					TRACE("MMC card is busy\n");
 					snooze(100000);
 				}
-			} while ((mmcOcr & (1 << 31)) == 0);
+			} while ((ocr & (1 << 31)) == 0);
 
-			if (status == B_OK && (mmcOcr & (1 << 31)) != 0) {
+			if (status == B_OK && (ocr & (1 << 31)) != 0) {
 				TRACE("Detected MMC card after CMD1\n");
-				cardType = CARD_TYPE_MMC;
-				// Reuse the probed OCR value for logging and later handling
-				ocr = mmcOcr;
+				if ((ocr & (1 << 30)) != 0)
+					cardType = CARD_TYPE_MMC_EXTENDED_CAPACITY;
+				else
+					cardType = CARD_TYPE_MMC;
 			}
 		} else if (response != probe) {
 			ERROR("Card does not support voltage range (expected %x, "
@@ -257,7 +257,7 @@ MMCBus::_WorkerThread(void* cookie)
 		// Probe OCR, waiting for card to become ready
 		// We keep repeating ACMD41 until the card replies that it is
 		// initialized. For MMC we already probed using CMD1 above.
-		if (cardType != CARD_TYPE_MMC) {
+		if ((cardType != CARD_TYPE_MMC) && (cardType != CARD_TYPE_MMC_EXTENDED_CAPACITY)) {
 			do {
 				uint32_t cardStatus;
 				while (bus->ExecuteCommand(0, SD_APP_CMD, 0, &cardStatus) == B_BUSY) {
@@ -314,7 +314,7 @@ MMCBus::_WorkerThread(void* cookie)
 		bool cardFound = false;
 		// This being an if statement as opposed to a while statement restricts
 		// it to one device per bus.
-		if (cardType == CARD_TYPE_MMC) {
+		if ((cardType == CARD_TYPE_MMC) || (cardType == CARD_TYPE_MMC_EXTENDED_CAPACITY)) {
 			if (bus->ExecuteCommand(0, ALL_SEND_CID, 0, cid) == B_OK) {
 				// We currently support only a single card, so use a fixed RCA.
 				rca = 1;
