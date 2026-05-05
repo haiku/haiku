@@ -5201,8 +5201,17 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
-		BList* pointList = destWindow->PoseView()->GetDropPointList(dragStart, dropPoint,
-			selectionList, srcWindow->PoseView(), pinToGrid);
+		BList* pointList = NULL;
+		if (destWindow != NULL) {
+			// destination window is available e.g. drag and drop
+			pointList = destWindow->PoseView()->GetDropPointList(dragStart, dropPoint,
+				selectionList, srcWindow->PoseView(), pinToGrid);
+		} else {
+			// destination window is closed e.g. Move to/Copy to/Link to
+			// pose positions will be offset by their position in the source window
+			pointList = srcWindow->PoseView()->GetDropPointList(dragStart, dropPoint,
+				selectionList, srcWindow->PoseView(), pinToGrid);
+		}
 		int32 selectionSize = srcWindow->PoseView()->CountSelected();
 		BObjectList<entry_ref, true>* srcList = new BObjectList<entry_ref, true>(selectionSize);
 
