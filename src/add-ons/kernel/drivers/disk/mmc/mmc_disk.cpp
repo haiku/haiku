@@ -237,6 +237,7 @@ mmc_disk_init_driver(device_node* node, void** cookie)
 
 	// SD and MMC cards use byte offsets for IO commands, later ones (SDHC,
 	// SDXC, ...) use sectors.
+	// TODO eMMC uses sectors as well if defined in the OCR register bits 30:29
 	if (deviceType == CARD_TYPE_SD || deviceType == CARD_TYPE_MMC)
 		info->flags = 0;
 	else

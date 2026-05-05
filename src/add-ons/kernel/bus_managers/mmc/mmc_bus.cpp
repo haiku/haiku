@@ -225,6 +225,7 @@ MMCBus::_WorkerThread(void* cookie)
 			// Do not check for SDHC support in this case
 			hcs = 0;
 			uint32_t mmcOcr;
+
 			TRACE("Trying MMC CMD1 initialization...\n");
 			do {
 				status = bus->ExecuteCommand(0, MMC_SEND_OP_COND, 0xFF8000, &mmcOcr);
@@ -288,6 +289,10 @@ MMCBus::_WorkerThread(void* cookie)
 				TRACE("Card supports 1.8v");
 		}
 		TRACE("Voltage range: %x\n", ocr & 0xFFFFFF);
+
+		// Set the card type so the next commands have the correct reply types
+		// (MMC and SD commands with the same identifier sometime expect different responses)
+		bus->SetCardType((card_type)cardType);
 
 		// TODO send CMD11 to switch to low voltage mode if card supports it?
 
@@ -359,8 +364,6 @@ MMCBus::_WorkerThread(void* cookie)
 		}
 
 		if (cardFound) {
-			bus->SetCardType((card_type)cardType);
-
 			device_attr attrs[] = {
 				{ B_DEVICE_BUS, B_STRING_TYPE, {.string = "mmc" }},
 				{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "mmc device" }},
