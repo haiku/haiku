@@ -399,10 +399,12 @@ typedef struct {
 #define ELF32_ST_BIND(i) ((i) >> 4)
 #define ELF32_ST_TYPE(i) ((i) & 0xf)
 #define ELF32_ST_INFO(b, t) (((b) << 4) + ((t) & 0xf))
+#define ELF32_ST_VISIBILITY(o) ((o) & 0x3)
 
 #define ELF64_ST_BIND(i) ((i) >> 4)
 #define ELF64_ST_TYPE(i) ((i) & 0xf)
 #define ELF64_ST_INFO(b, t) (((b) << 4) + ((t) & 0xf))
+#define ELF64_ST_VISIBILITY(o) ((o) & 0x3)
 
 /* symbol types */
 #define STT_NOTYPE 0
@@ -420,6 +422,12 @@ typedef struct {
 #define STB_WEAK 2
 #define STB_LOPROC 13
 #define STB_HIPROC 15
+
+/* symbol visibility */
+#define STV_DEFAULT 0
+#define STV_INTERNAL 1
+#define STV_HIDDEN 2
+#define STV_PROTECTED 3
 
 /* special symbol indices */
 #define STN_UNDEF 0
