@@ -911,16 +911,45 @@
 
 /*!
 	\fn int32 BListView::CurrentSelection(int32 index) const
-	\brief Returns the index of a currently selected item relative to the passed
-	       in \a index.
+	\brief Returns the index in the list of the \a index'th selected item.
 
-	If the index of the selected item is lower than \a index the value returned
-	is negative, if the index of the selected item is greater than \a index the
-	value returned is positive. If the index of the selected item is equal to
-	\a index then 0 is returned.
+	A negative value is returned when there are not enough selected items.
 
-	\param index The \a index of the item to get relative to the selected item's
-	       index.
+	For example, a list containing the sorted letters of the English alphabet
+	with the vowels selected would return the following values:
+
+	<table>
+		<tr>
+			<th>\a index</th>
+			<th>value</th>
+		</tr>
+		<tr>
+			<td>0</td>
+			<td>0 (the list index of 'A')</td>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>4 (the list index of 'E')</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>8 (the list index of 'I')</td>
+		</tr>
+		<tr>
+			<td>3</td>
+			<td>14 (the list index of 'O')</td>
+		</tr>
+		<tr>
+			<td>4</td>
+			<td>20 (the list index of 'U')</td>
+		</tr>
+		<tr>
+			<td>5</td>
+			<td>-1 (no more items are selected)</td>
+		</tr>
+	</table>
+
+	\param index The \a index in the selection set of the item to get.
 
 	\since BeOS R3
 */
