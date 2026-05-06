@@ -221,6 +221,8 @@ public:
 
 	virtual bool AddPosesThreadValid(const entry_ref*) const;
 
+	virtual bool IsOpenWithView() const;
+
 protected:
 	// don't do any volume watching and memtamime watching in open with
 	// panels for now
@@ -272,6 +274,13 @@ private:
 
 	typedef BPoseView _inherited;
 };
+
+
+inline bool
+OpenWithPoseView::IsOpenWithView() const
+{
+	return true;
+}
 
 
 class OpenWithRefFilter: public BRefFilter {

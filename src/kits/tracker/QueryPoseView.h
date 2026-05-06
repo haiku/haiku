@@ -58,6 +58,8 @@ public:
 	virtual void AdoptSystemColors();
 	virtual bool HasSystemColors() const;
 
+	virtual bool IsQueryView() const;
+
 	const char* SearchForType() const;
 	BQueryContainerWindow* ContainerWindow() const;
 	bool ActiveOnDevice(dev_t) const;
@@ -96,6 +98,13 @@ private:
 
 	typedef BPoseView _inherited;
 };
+
+
+inline bool
+BQueryPoseView::IsQueryView() const
+{
+	return true;
+}
 
 
 class QueryRefFilter : public BRefFilter {

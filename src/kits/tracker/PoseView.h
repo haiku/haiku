@@ -109,6 +109,8 @@ public:
 
 	virtual bool IsFilePanel() const;
 	virtual bool IsDesktopView() const;
+	virtual bool IsOpenWithView() const;
+	virtual bool IsQueryView() const;
 
 	// state saving/restoring
 	virtual void SaveState(AttributeStreamNode* node);
@@ -1033,6 +1035,20 @@ BPoseView::IsFilePanel() const
 
 inline bool
 BPoseView::IsDesktopView() const
+{
+	return false;
+}
+
+
+inline bool
+BPoseView::IsOpenWithView() const
+{
+	return false;
+}
+
+
+inline bool
+BPoseView::IsQueryView() const
 {
 	return false;
 }
