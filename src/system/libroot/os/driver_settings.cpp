@@ -443,7 +443,7 @@ load_driver_settings_from_file(int file, const char *driverName)
 	if (fstat(file, &stat) < B_OK)
 		return NULL;
 
-	if (stat.st_size > B_OK && stat.st_size < MAX_SETTINGS_SIZE) {
+	if (stat.st_size >= 0 && stat.st_size < MAX_SETTINGS_SIZE) {
 		char *text = (char *)malloc(stat.st_size + 1);
 		if (text != NULL && read(file, text, stat.st_size) == stat.st_size) {
 			settings_handle *handle;

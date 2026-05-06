@@ -409,7 +409,7 @@ load_driver_settings_from_file(int file, const char *driverName)
 	if (fssh_fstat(file, &stat) < FSSH_B_OK)
 		return NULL;
 
-	if (stat.fssh_st_size > FSSH_B_OK && stat.fssh_st_size < MAX_SETTINGS_SIZE) {
+	if (stat.fssh_st_size >= 0 && stat.fssh_st_size < MAX_SETTINGS_SIZE) {
 		char *text = (char *)malloc(stat.fssh_st_size + 1);
 		if (text != NULL && fssh_read(file, text, stat.fssh_st_size) == stat.fssh_st_size) {
 			settings_handle *handle;
