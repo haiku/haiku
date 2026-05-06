@@ -5242,7 +5242,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			moveMode = kMoveSelectionTo;
 
 		// move will replace current selection
-		if (moveMode == kMoveSelectionTo)
+		if (moveMode == kMoveSelectionTo && destWindow != NULL)
 			destWindow->PoseView()->ClearSelection();
 
 		FSMoveToFolder(srcList, destEntry, moveMode, pointList);
