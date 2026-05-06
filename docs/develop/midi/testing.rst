@@ -448,7 +448,7 @@ and SetProperties(). It should also make and break connections.
 
 -  If you get a "registered" event, and you do FindEndpoint() for that
    id, you'll get its BMidiEndpoint object. If you get an "unregistered"
-   event, then FindEndpoint() returns NULL. So the events are send
+   event, then FindEndpoint() returns NULL. So the events are sent
    *after* the roster is modified.
 
 --------------

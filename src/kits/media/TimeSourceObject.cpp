@@ -35,7 +35,7 @@ TimeSourceObject::TimeSourceObject(const media_node& node)
 		delete_port(fControlPort);
 
 	// We use the control port of the real time source object.
-	// this way, all messages are send to the real time source,
+	// this way, all messages are sent to the real time source,
 	// and this shadow object won't receive any.
 	fControlPort = node.port;
 

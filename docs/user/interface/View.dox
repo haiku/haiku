@@ -3912,7 +3912,7 @@ SetViewColor(Parent()->ViewColor());
 	picture. Use the DrawPicture() method to render the \a picture.
 
 	Only drawing instructions performed directly on the view, not its child views
-	are send to the BPicture object and BPicture captures only primitive graphics
+	are sent to the BPicture object and BPicture captures only primitive graphics
 	operations. The view must be attached to a window for the drawing instruction
 	to be recorded. Drawing instructions are recorded even if the view is hidden or
 	resides outside the clipping region or the window is off-screen.
