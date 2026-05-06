@@ -61,6 +61,8 @@ public:
 	void StartBarberPole();
 	void EndBarberPole();
 
+	bool ShouldHaveDirectoryPopUpMenu();
+
 	void SetTypeAhead(const char*);
 	const char* TypeAhead() const;
 	bool IsTypingAhead() const;

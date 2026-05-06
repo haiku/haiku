@@ -267,7 +267,8 @@ BCountView::Draw(BRect updateRect)
 
 	// leave room for pop up indicator
 	float popUpWidth = be_control_look->DefaultItemSpacing();
-	if (!fPoseView->TargetModel()->IsRoot())
+	bool popsUp = ShouldHaveDirectoryPopUpMenu();
+	if (popsUp)
 		textRect.right -= popUpWidth;
 
 	int32 truncateMode;
@@ -290,7 +291,7 @@ BCountView::Draw(BRect updateRect)
 	DrawString(itemString.String());
 
 	// draw pop up indicator
-	if (!fPoseView->TargetModel()->IsRoot()) {
+	if (popsUp) {
 		BRect arrowRect(bounds);
 		arrowRect.left = bounds.right - popUpWidth;
 		float fgTint = (color.IsLight() ? B_DARKEN_4_TINT : 2.f - B_DARKEN_4_TINT);
@@ -346,10 +347,7 @@ BCountView::MouseDown(BPoint)
 	window->Activate();
 	window->UpdateIfNeeded();
 
-	if (fPoseView->IsFilePanel() || fPoseView->TargetModel() == NULL)
-		return;
-
-	if (window->TargetModel()->IsRoot())
+	if (fPoseView->TargetModel() == NULL || !ShouldHaveDirectoryPopUpMenu())
 		return;
 
 	BDirMenu menu(NULL, be_app, B_REFS_RECEIVED);
@@ -372,6 +370,14 @@ void
 BCountView::AttachedToWindow()
 {
 	CheckCount();
+}
+
+
+bool
+BCountView::ShouldHaveDirectoryPopUpMenu()
+{
+	return !(fPoseView->TargetModel()->IsRoot() || fPoseView->IsFilePanel()
+		|| fPoseView->IsOpenWithView());
 }
 
 
