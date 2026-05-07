@@ -1408,8 +1408,7 @@ StyledEditWindow::_BuildFontColorMenu(BMenu* menu)
 			topLeft.y + itemHeight);
 		buttonArea.OffsetBy(margin, itemHeight + margin + margin);
 		menu->AddItem(
-			new ColorMenuItem("", palette[i], new BMessage(msgTemplate)),
-			buttonArea);
+			new ColorMenuItem("", palette[i], new BMessage(msgTemplate)), buttonArea);
 		buttonArea.OffsetBy(margin, margin);
 		matrixArea = matrixArea | buttonArea;
 	}

@@ -23,6 +23,7 @@ public:
 			rgb_color			Color() { return fItemColor; };
 
 protected:
+	virtual	void				Draw();
 	virtual void				DrawContent();
 
 private:
