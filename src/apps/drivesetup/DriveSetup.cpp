@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2026, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -22,7 +22,7 @@
 
 DriveSetup::DriveSetup()
 	: BApplication("application/x-vnd.Haiku-DriveSetup"),
-	fWindow(NULL),
+	fWindow(new MainWindow()),
 	fSettings((uint32)0)
 {
 }
@@ -36,10 +36,16 @@ DriveSetup::~DriveSetup()
 void
 DriveSetup::ReadyToRun()
 {
-	fWindow = new MainWindow();
 	if (_RestoreSettings() != B_OK)
 		fWindow->ApplyDefaultSettings();
 	fWindow->Show();
+}
+
+
+void
+DriveSetup::RefsReceived(BMessage* message)
+{
+	BMessenger(fWindow).SendMessage(message, be_app_messenger);
 }
 
 

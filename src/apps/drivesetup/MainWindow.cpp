@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -378,11 +378,18 @@ MainWindow::MainWindow()
 	BNode node(&info.ref);
 	if (BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon) == B_OK)
 		fNotification->SetIcon(&icon);
+}
 
-	status_t status = fDiskDeviceRoster.StartWatching(BMessenger(this));
-	if (status != B_OK) {
+
+thread_id
+MainWindow::Run()
+{
+	thread_id thread = BWindow::Run();
+
+	status_t result = fDiskDeviceRoster.StartWatching(BMessenger(this));
+	if (result != B_OK) {
 		fprintf(stderr, "Failed to start watching for device changes: %s\n",
-			strerror(status));
+			strerror(result));
 	}
 
 	// visit all disks in the system and show their contents
@@ -397,6 +404,8 @@ MainWindow::MainWindow()
 		SetFlags(Flags() | B_NOT_MINIMIZABLE);
 		SetWorkspaces(B_ALL_WORKSPACES);
 	}
+
+	return thread;
 }
 
 
@@ -516,16 +525,26 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case B_REFS_RECEIVED:
 		case MSG_REGISTER:
 		{
-			entry_ref entryRef;
-			message->FindRef("refs", &entryRef);
-			BEntry entry(&entryRef);
+			BEntry entry;
 			BPath path;
-			if (entry.GetPath(&path) == B_OK) {
-				RegisterFileDiskDevice(path.Path());
-				break;
+			entry_ref ref;
+			status_t result = B_ERROR;
+
+			int32 i = 0;
+			while (message->FindRef("refs", i++, &ref) == B_OK) {
+				entry.SetTo(&ref, true);
+				if (entry.GetPath(&path) == B_OK) {
+					result = RegisterFileDiskDevice(path.Path());
+					if (result == B_OK && message->what == MSG_REGISTER)
+						break; // out of while loop
+				}
 			}
+
+			if (result == B_OK || message->what != MSG_REGISTER)
+				break; // out of switch case
 
 			if (fRegisterFilePanel == NULL) {
 				fRegisterFilePanel = new(std::nothrow) BFilePanel(B_OPEN_PANEL,
@@ -550,9 +569,9 @@ MainWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_WRITE:
 		{
-			entry_ref entryRef;
-			message->FindRef("refs", &entryRef);
-			BEntry entry(&entryRef);
+			entry_ref ref;
+			message->FindRef("refs", &ref);
+			BEntry entry(&ref);
 			BPath path;
 			if (entry.GetPath(&path) == B_OK) {
 				BMessage* msg = new BMessage();
@@ -607,9 +626,9 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			BMessage* msg = new BMessage();
 
-			entry_ref entryRef;
-			message->FindRef("directory", &entryRef);
-			BEntry entry(&entryRef);
+			entry_ref ref;
+			message->FindRef("directory", &ref);
+			BEntry entry(&ref);
 			BPath path;
 			entry.GetPath(&path);
 			msg->AddString("targetfolder", path.Path());
@@ -650,24 +669,6 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_UPDATE_ZOOM_LIMITS:
 			_UpdateWindowZoomLimits();
 			break;
-
-		case B_REFS_RECEIVED:
-		{
-			entry_ref ref;
-			int32 i = 0;
-
-			while (message->FindRef("refs", i++, &ref) == B_OK) {
-				BEntry entry(&ref, true);
-				BPath path(&entry);
-				BNode node(&entry);
-
-				if (node.IsFile()) {
-					if (entry.GetPath(&path) == B_OK)
-						RegisterFileDiskDevice(path.Path());
-				}
-			}
-			break;
-		}
 
 		default:
 			BWindow::MessageReceived(message);

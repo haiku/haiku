@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Copyright 2002-2026, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef DRIVE_SETUP_H
@@ -21,6 +21,7 @@ public:
 	virtual						~DriveSetup();
 
 	virtual	void				ReadyToRun();
+	virtual	void				RefsReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
 private:

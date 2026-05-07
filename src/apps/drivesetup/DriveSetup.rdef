@@ -6,7 +6,7 @@ resource app_name_catalog_entry "x-vnd.Haiku-DriveSetup:System name:DriveSetup";
 resource app_version {
 	major  = 1,
 	middle = 0,
-	minor  = 0,
+	minor  = 1,
 
 	/* 0 = development	1 = alpha			2 = beta
 	   3 = gamma		4 = golden master	5 = final */
@@ -15,10 +15,18 @@ resource app_version {
 	internal = 0,
 
 	short_info = "DriveSetup",
-	long_info  = "DriveSetup ©2002-2009 Haiku"
+	long_info  = "DriveSetup ©2002-2026 Haiku, Inc. All rights reserved."
 };
 
 resource app_flags B_SINGLE_LAUNCH;
+
+resource(1, "BEOS:FILE_TYPES") message
+{
+	"types" = "application/x-bfs-image",
+	"types" = "application/x-cd-image",
+	"types" = "application/x-intel-image",
+	"types" = "application/x-ntfs-image"
+};
 
 resource vector_icon {
 	$"6E6369660F03010000020016023AF81C3830AFBB29EB3E24FE4903D742949400"

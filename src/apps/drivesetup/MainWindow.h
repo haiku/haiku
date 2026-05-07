@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2026, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -42,6 +42,7 @@ public:
 	virtual						~MainWindow();
 
 	// BWindow interface
+	virtual	thread_id			Run();
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
 
