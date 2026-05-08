@@ -5202,10 +5202,11 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
 		BList* pointList = NULL;
-		if (destWindow != NULL) {
+		if (destWindow != NULL && destWindow->LockLooper()) {
 			// destination window is available e.g. drag and drop
 			pointList = destWindow->PoseView()->GetDropPointList(dragStart, dropPoint,
 				selectionList, srcWindow->PoseView(), pinToGrid);
+			destWindow->UnlockLooper();
 		} else {
 			// destination window is closed e.g. Move to/Copy to/Link to
 			// pose positions will be offset by their position in the source window
@@ -5242,8 +5243,10 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			moveMode = kMoveSelectionTo;
 
 		// move will replace current selection
-		if (moveMode == kMoveSelectionTo && destWindow != NULL)
+		if (moveMode == kMoveSelectionTo && destWindow != NULL && destWindow->LockLooper()) {
 			destWindow->PoseView()->ClearSelection();
+			destWindow->UnlockLooper();
+		}
 
 		FSMoveToFolder(srcList, destEntry, moveMode, pointList);
 		return;
