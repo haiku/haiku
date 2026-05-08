@@ -145,9 +145,9 @@ MMCBus::_ActivateDevice(uint16_t rca)
 
 void MMCBus::_AcquireScanSemaphore()
 {
-	release_sem(fLockSemaphore);
+	ReleaseBus();
 	acquire_sem(fScanSemaphore);
-	acquire_sem(fLockSemaphore);
+	AcquireBus();
 }
 
 
@@ -164,7 +164,7 @@ MMCBus::_WorkerThread(void* cookie)
 	MMCBus* bus = (MMCBus*)cookie;
 	uint32_t response;
 
-	acquire_sem(bus->fLockSemaphore);
+	bus->AcquireBus();
 
 	// We assume the bus defaults to 400kHz clock and has already powered on
 	// cards.
@@ -180,7 +180,7 @@ MMCBus::_WorkerThread(void* cookie)
 		// Check if we need to exit early (possible if the parent device did
 		// not manage initialize itself correctly)
 		if (bus->fStatus == B_SHUTTING_DOWN) {
-			release_sem(bus->fLockSemaphore);
+			bus->ReleaseBus();
 			return B_OK;
 		}
 
@@ -250,7 +250,7 @@ MMCBus::_WorkerThread(void* cookie)
 			ERROR("Card does not support voltage range (expected %x, "
 				"reply %x)\n", probe, response);
 			bus->_TerminateBus();
-			release_sem(bus->fLockSemaphore);
+			bus->ReleaseBus();
 			return B_ERROR;
 		}
 
@@ -397,7 +397,7 @@ MMCBus::_WorkerThread(void* cookie)
 		bus->_AcquireScanSemaphore();
 	}
 
-	release_sem(bus->fLockSemaphore);
+	bus->ReleaseBus();
 
 	TRACE("poller thread terminating");
 	return B_OK;
