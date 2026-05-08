@@ -82,12 +82,12 @@ UserRatingSummary::SetRatingByStar(int star, int ratingCount)
 		fRatingCountNoStar = ratingCount;
 
 	if (ratingCount < 0) {
-		HDERROR("bad rating count %" B_PRId32, ratingCount);
+		HDERROR("bad rating count %d", ratingCount);
 		return;
 	}
 
 	if (star < RATING_MISSING_STAR || star > 5) {
-		HDERROR("bad star %" B_PRId32, star);
+		HDERROR("bad star %d", star);
 		return;
 	}
 
@@ -194,7 +194,7 @@ UserRatingSummaryBuilder&
 UserRatingSummaryBuilder::AddRatingByStar(int star, int ratingCount)
 {
 	if (star < RATING_MISSING_STAR || star > 5) {
-		HDERROR("bad star %" B_PRId32 " in builder", star);
+		HDERROR("bad star %d in builder", star);
 		return *this;
 	}
 

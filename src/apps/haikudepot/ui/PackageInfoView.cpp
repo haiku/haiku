@@ -1066,7 +1066,9 @@ public:
 		if (userRatingInfo.IsSet())
 			count = userRatingInfo->CountUserRatings();
 
-		BString packageName = package.IsSet() ? package->Name() : "";
+		BString packageName;
+		if (package.IsSet())
+			packageName = package->Name();
 		fAmPopulating = fAmPopulating && (packageName == fPackageName) && count == 0;
 
 		if (count == 0) {
@@ -1251,7 +1253,9 @@ public:
 				changelog = localizedText->Changelog();
 		}
 
-		BString packageName = package.IsSet() ? package->Name() : "";
+		BString packageName;
+		if (package.IsSet())
+			packageName = package->Name();
 		fAmPopulating = fAmPopulating && (packageName == fPackageName) && changelog.Length() == 0;
 
 		if (changelog.Length() > 0) {
@@ -1726,7 +1730,7 @@ PackageInfoView::HandleIconsChanged()
 void
 PackageInfoView::HandleScreenshotCached(const ScreenshotCoordinate& coordinate)
 {
-	HDINFO("handle screenshot cached [%s] %" B_PRIu16 " x %" B_PRIu16, coordinate.Code().String(),
+	HDINFO("handle screenshot cached [%s] %" B_PRIu32 " x %" B_PRIu32, coordinate.Code().String(),
 		coordinate.Width(), coordinate.Height());
 	_HandleScreenshotCached(fPackage, coordinate);
 }
