@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-softwareupdater	3021634705
+1	japanese	x-vnd.haiku-softwareupdater	3893717149
 Updating version	SoftwareUpdaterWindow	List item text	バージョンの更新中
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		ここをクリックして、{0, plural, one{# 個の更新されたパッケージ} other{# 個の更新されたパッケージ}}をインストールします。
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	アンインストールされるパッケージ
@@ -8,6 +8,7 @@ There were no updates found.	CheckManager		更新が見つからなかった。
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		更新は完了していません。本当に終了してよいですか?
 Updates found	SoftwareUpdaterWindow		更新が見つかりました
 Update now	SoftwareUpdaterWindow		いますぐ更新
+Settings	SoftwareUpdaterWindow		設定
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		コンピューターを再起動できません。
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	認識されない引数
@@ -55,6 +56,7 @@ Update	SoftwareUpdaterWindow	Alert button label	更新
 Updates did not complete	UpdateAction		更新は完了しなかった
 Open Repositories	SoftwareUpdaterWindow	Alert button label	リポジトリを開く
 Invalid update type, cannot continue with updates	UpdateAction		無効な更新タイプです、更新を継続できません
+Settings…	SoftwareUpdaterWindow		設定…
 Uninstalling version	SoftwareUpdaterWindow	List item text	アンインストール中のバージョン
 %i of %i	UpdateManager	Do not translate %i	%i / %i
 Quit	SoftwareUpdaterWindow		終了

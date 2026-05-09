@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Helyi
 Package changes	PackageResult	Window title	Csomag-változások
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Hozzájárulsz ahhoz, hogy névtelen felhasználási adatokat küldjünk a HaikuDepot kiszolgálóra? Bármikor módosítható ez a \"Beállítások\" panelen.
-User rating	RatePackageWindow		Felhasználói értékelés
 Installed packages	MainWindow		Telepített csomagok
+User rating	RatePackageWindow		Felhasználói értékelés
 Date	PackageListView		Dátum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		A jelszónak legalább %MinPasswordLength% karakter hosszúnak kell lennie és tartalmaznia kell legalább %MinPasswordUppercaseChar% kis- és nagybetűt illetve %MinPasswordDigitsChar% számot.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Hiba történt a használati feltételek letöltése során. Nézd meg a naplót a részletekért, és próbáld újra. \nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot részében találhatók.
@@ -170,8 +170,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitás
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Ismételd meg a jelszót annak érdekében hogy csökkenjen a rossz jelszó megadásának esélye.
 Cancel	SettingsWindow		Mégse
-Cancel	RatePackageWindow		Mégse
 Inactive	PackageListView		Inaktív
+Cancel	RatePackageWindow		Mégse
 Nickname:	UserLoginWindow		Felhasználó:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Meta adatok szinkronizálása
 OK	MainWindow		Rendben

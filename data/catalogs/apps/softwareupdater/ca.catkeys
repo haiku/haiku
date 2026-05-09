@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-softwareupdater	3021634705
+1	catalan; valencian	x-vnd.haiku-softwareupdater	3893717149
 Updating version	SoftwareUpdaterWindow	List item text	S'actualitza la versió
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Cliqueu aquí per instal·lar {0, plural, one{# paquet actualitzat} other{# paquets actualitzats}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paquets per desinstal·lar
@@ -8,6 +8,7 @@ There were no updates found.	CheckManager		No s'ha trobat cap actualització.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		No s’han completat les actualitzacions, segur que voleu deixar-ho?
 Updates found	SoftwareUpdaterWindow		S'han trobat actualitzacions.
 Update now	SoftwareUpdaterWindow		Actualitza-ho ara
+Settings	SoftwareUpdaterWindow		Paràmetres
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Per algun motiu, no hem pogut reiniciar l'ordinador.
 OK	UpdateManager		D'acord
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argument no reconegut
@@ -55,6 +56,7 @@ Update	SoftwareUpdaterWindow	Alert button label	Actualitza
 Updates did not complete	UpdateAction		Les actualitzacions no s'han completat.
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Obre els repositoris
 Invalid update type, cannot continue with updates	UpdateAction		El tipus d’actualització no és vàlid, no es poden continuar les actualitzacions.
+Settings…	SoftwareUpdaterWindow		Paràmetres...
 Uninstalling version	SoftwareUpdaterWindow	List item text	Es desinstal·la la versió
 %i of %i	UpdateManager	Do not translate %i	%i de %i
 Quit	SoftwareUpdaterWindow		Surt

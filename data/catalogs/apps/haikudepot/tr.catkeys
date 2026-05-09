@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Yerel
 Package changes	PackageResult	Window title	Paket değişiklikleri
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Anonim kullanım istatistiklerini Haiku Depo sunucusu ile paylaşmak ister misiniz? Tercihinizi daha sonra “Ayarlar” penceresinden değiştirebilirsiniz.
-User rating	RatePackageWindow		Kullanıcı oyları
 Installed packages	MainWindow		Kurulu paketler
+User rating	RatePackageWindow		Kullanıcı oyları
 Date	PackageListView		Tarih
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Parola en az %MinPasswordLength% karakter olmalıdır. %MinPasswordUppercaseChar% karakter BÜYÜK harf ve %MinPasswordDigitsChar% sayı zorunluluğu vardır.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu’nun Haiku Depo bölümünden erişilebilir.
@@ -170,8 +170,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Kararlılık
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Yanlış girme olasılığını ortadan kaldırmak için parolanız bir kez daha girilmelidir.
 Cancel	SettingsWindow		Vazgeç
-Cancel	RatePackageWindow		Vazgeç
 Inactive	PackageListView		Etkin değil
+Cancel	RatePackageWindow		Vazgeç
 Nickname:	UserLoginWindow		Takma ad:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Depolar üst verisi eşzamanlanıyor…
 OK	MainWindow		Tamam

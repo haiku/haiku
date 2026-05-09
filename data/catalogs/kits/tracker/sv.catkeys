@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	734452449
+1	swedish	x-vnd.Haiku-libtracker	2732592561
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -351,6 +351,7 @@ Copy	ContainerWindow		Kopiera
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det markerade objektet kan inte flyttas till Papperskorgen. Vill du ta bort den istället? (Denna operation kan inte ångras.)
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Ledsen, attributet 'Character' kan inte spara ett multibyte tecken.
 And	FindPanel		Och
+copy	PoseView	filename copy	kopiera
 Palette-indexed picture	AttributesView		Palettindexerad bild
 Drawing pattern	AttributesView		Ritningsmönster
 File offset	AttributesView		Filoffset

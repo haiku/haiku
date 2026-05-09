@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokal
 Package changes	PackageResult	Window title	Paket-Änderungen
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Dürfen anonyme Nutzungsdaten von diesem Computer an den HaikuDepotServer geschickt werden? Die Option kann jederzeit im \"Einstellungen\" Fenster geändert werden.
-User rating	RatePackageWindow		Bewertung
 Installed packages	MainWindow		Installierte Pakete
+User rating	RatePackageWindow		Bewertung
 Date	PackageListView		Datum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Das Kennwort muss mindestens %MinPasswordLength% Zeichen lang sein. Es muss zumindest %MinPasswordUppercaseChar% Großbuchstaben und %MinPasswordDigitsChar% Ziffern enthalten.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Beim Herunterladen der Nutzungsbedingungen ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logdateien angezeigt werden können, steht im Kapitel 'HaikuDepot' des Haiku User Guide.
@@ -170,8 +170,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilität
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Das Kennwort muss wiederholt werden, um die Wahrscheinlichket einer Falscheingabe zu verringern.
 Cancel	SettingsWindow		Abbrechen
-Cancel	RatePackageWindow		Abbrechen
 Inactive	PackageListView		Deaktiviert
+Cancel	RatePackageWindow		Abbrechen
 Nickname:	UserLoginWindow		Benutzername:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronisieren der Metadaten von Paketquellen
 OK	MainWindow		OK

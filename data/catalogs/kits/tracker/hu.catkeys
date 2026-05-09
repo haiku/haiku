@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	734452449
+1	hungarian	x-vnd.Haiku-libtracker	2732592561
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -351,6 +351,7 @@ Copy	ContainerWindow		Másolás
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		A kiválasztott elemet nem lehet a Szemetesbe mozgatni. Szeretnéd inkább törölni? (Nem vonható vissza.)
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Sajnálom, de a 'Karakter' jellemző nem tartalmazhat többájtos betűképet.
 And	FindPanel		És
+copy	PoseView	filename copy	másolat
 Palette-indexed picture	AttributesView		Paletta-indexelt kép
 Drawing pattern	AttributesView		Rajz minta
 File offset	AttributesView		Fájl eltolás

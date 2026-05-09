@@ -135,8 +135,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokalne
 Package changes	PackageResult	Window title	Zmiany pakietów
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Czy zgadzasz się na wysyłanie anonimowych danych o korzystaniu z tego komputera do systemu HaikuDepotServer? Można później zmienić to ustawienie w oknie „Ustawienia”.
-User rating	RatePackageWindow		Ocena użytkowników
 Installed packages	MainWindow		Zainstalowane pakiety
+User rating	RatePackageWindow		Ocena użytkowników
 Date	PackageListView		Data
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Hasło musi mieć przynajmniej %MinPasswordLength% znaków. %MinPasswordUppercaseChar% znaków musi być pisane wielką literą oraz %MinPasswordDigitsChar% znaków musi być cyframi.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Wystąpił błąd podczas pobierania warunków korzystania. Sprawdź szczegóły w dzienniku i spróbuj ponownie. \nInformacje o tym jak dostać się do dziennika znajdują się w rozdziale HaikuDepot Podręcznika użytkownika Haiku.
@@ -158,8 +158,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilność
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Hasło musi zostać wprowadzone dwa razy w celu zredukowania szansy na ustawienie błędnego hasła.
 Cancel	SettingsWindow		Anuluj
-Cancel	RatePackageWindow		Anuluj
 Inactive	PackageListView		Nieaktywny
+Cancel	RatePackageWindow		Anuluj
 Nickname:	UserLoginWindow		Pseudonim:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronizowanie metadanych dotyczących repozytoriów
 OK	MainWindow		OK

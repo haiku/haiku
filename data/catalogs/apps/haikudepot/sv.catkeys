@@ -146,8 +146,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Lokal
 Package changes	PackageResult	Window title	Paketändringar
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Skulle det vara acceptabelt att skicka anonyma användningsdata till HaikuDepotServer-systemet från den här datorn? Du kan ändra dina preferenser i fönstret \"Inställningar \" senare.
-User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
+User rating	RatePackageWindow		Användarbetyg
 Date	PackageListView		Datum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Lösenordet måste vara minst %MinPasswordLength% tecken. %MinPasswordUppercaseChar% -tecken måste vara versaler och %MinPasswordDigitsChar% -tecken måste vara siffror.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Ett fel har uppstått vid nedladdning av användningsvillkoren. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
@@ -170,8 +170,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Stabilitet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Lösenordet måste upprepas för att minska risken att det anges felaktigt.
 Cancel	SettingsWindow		Avbryt
-Cancel	RatePackageWindow		Avbryt
 Inactive	PackageListView		Inaktiv
+Cancel	RatePackageWindow		Avbryt
 Nickname:	UserLoginWindow		Användarnamn:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkroniserar metadata från repositorier
 OK	MainWindow		OK

@@ -139,8 +139,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		Локальний
 Package changes	PackageResult	Window title	Залежності пакетів
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Вам прийнятна відправка анонімних даних про використання в систему HaikuDepotServer з цього комп'ютера? Пізніше, Ви можете змінити свої уподобання у вікні \«Налаштування\».
-User rating	RatePackageWindow		Оцінки користувачів
 Installed packages	MainWindow		Встановлені пакети
+User rating	RatePackageWindow		Оцінки користувачів
 Date	PackageListView		Дата
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Пароль має складатися мінімум з %MinPasswordLength% символів. З них, ВЕЛИКИХ літер повинно бути %MinPasswordUppercaseChar% і %MinPasswordDigitsChar% символи повинні бути цифрами.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		При завантаженні умов користування виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
@@ -163,8 +163,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		Стабільність
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Гасло потрібно повторити, щоб зменшити ймовірність його неправильного введення.
 Cancel	SettingsWindow		Скасувати
-Cancel	RatePackageWindow		Скасувати
 Inactive	PackageListView		Неактивний
+Cancel	RatePackageWindow		Скасувати
 Nickname:	UserLoginWindow		Користувач:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Синхронізація метаданих репозитаріїв.
 OK	MainWindow		ОК

@@ -139,8 +139,8 @@ The following problems have been encountered. Please select a solution for each:
 Local	LocalPkgDataLoadProcess		本地
 Package changes	PackageResult	Window title	套件變動
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		從這台計算機向 HaikuDepotServer 系統發送匿名使用資料是否可以接受？您可以稍後在 \"Settings\" 「設定」視窗中變更您的偏好。
-User rating	RatePackageWindow		用戶評價
 Installed packages	MainWindow		已安裝套件
+User rating	RatePackageWindow		用戶評價
 Date	PackageListView		日期
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		密碼必須至少為 %MinPasswordLength% 字元。 %MinPasswordUppercaseChar% 字元必須是大寫 以及 %MinPasswordDigitsChar% 字元必須是數字。
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		下載使用條件時發生錯誤。檢查日誌以了解詳細信息，然後重試。 \n有關如何查看日誌的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
@@ -163,8 +163,8 @@ This application is too old to communicate with the server system. Obtain a newe
 Stability	RatePackageWindow		穩定
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		密碼必須重複輸入，以減少密碼輸入錯誤的機會。
 Cancel	SettingsWindow		取消
-Cancel	RatePackageWindow		取消
 Inactive	PackageListView		不活躍
+Cancel	RatePackageWindow		取消
 Nickname:	UserLoginWindow		昵稱：
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		同步儲存庫相關的元數據
 OK	MainWindow		確認
