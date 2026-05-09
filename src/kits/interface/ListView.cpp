@@ -30,8 +30,8 @@
 struct track_data {
 	BPoint		drag_start;
 	int32		item_index;
-	int32		buttons;
 	uint32		selected_click_count;
+	bool		is_active;
 	bool		was_selected;
 	bool		try_drag;
 	bool		is_dragging;
@@ -621,17 +621,13 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 void
 BListView::MouseDown(BPoint where)
 {
+	if (fTrack->is_active)
+		return BView::MouseDown(where);
+
 	if (!IsFocus()) {
 		MakeFocus();
 		Sync();
 		Window()->UpdateIfNeeded();
-	}
-
-	int32 buttons = 0;
-	if (Window() != NULL) {
-		BMessage* currentMessage = Window()->CurrentMessage();
-		if (currentMessage != NULL)
-			currentMessage->FindInt32("buttons", &buttons);
 	}
 
 	int32 index = IndexOf(where);
@@ -663,6 +659,7 @@ BListView::MouseDown(BPoint where)
 	}
 
 	if (!doubleClick) {
+		fTrack->is_active = true;
 		fTrack->drag_start = where;
 		fTrack->last_click_time = system_time();
 		fTrack->item_index = index;
@@ -673,8 +670,7 @@ BListView::MouseDown(BPoint where)
 	}
 
 	// increment/reset selected click count
-	fTrack->buttons = buttons;
-	if (fTrack->buttons > 0 && fTrack->was_selected)
+	if (fTrack->was_selected)
 		fTrack->selected_click_count++;
 	else
 		fTrack->selected_click_count = 0;
@@ -688,10 +684,13 @@ BListView::MouseDown(BPoint where)
 void
 BListView::MouseUp(BPoint where)
 {
+	if (!fTrack->is_active)
+		return BView::MouseUp(where);
+
 	bool wasDragging = fTrack->is_dragging;
 
 	// drag is over
-	fTrack->buttons = 0;
+	fTrack->is_active = false;
 	fTrack->try_drag = false;
 	fTrack->is_dragging = false;
 
@@ -728,6 +727,9 @@ BListView::MouseUp(BPoint where)
 void
 BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
+	if (!fTrack->is_active)
+		return BView::MouseMoved(where, code, dragMessage);
+
 	if (fTrack->item_index >= 0 && fTrack->try_drag) {
 		// initiate a drag if the mouse was moved far enough
 		BPoint offset = where - fTrack->drag_start;
@@ -749,9 +751,9 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 			index = CountItems() - 1;
 	}
 
-	// don't scroll if button not pressed or index is invalid
+	// don't scroll if index is invalid
 	int32 lastIndex = fFirstSelected;
-	if (fTrack->buttons == 0 || index == -1)
+	if (index == -1)
 		return BView::MouseMoved(where, code, dragMessage);
 
 	// don't scroll if mouse is left or right of the view
@@ -1616,8 +1618,8 @@ BListView::_InitObject(list_view_type type)
 	fTrack = new track_data;
 	fTrack->drag_start = B_ORIGIN;
 	fTrack->item_index = -1;
-	fTrack->buttons = 0;
 	fTrack->selected_click_count = 0;
+	fTrack->is_active = false;
 	fTrack->was_selected = false;
 	fTrack->try_drag = false;
 	fTrack->is_dragging = false;

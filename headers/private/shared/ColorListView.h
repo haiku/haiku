@@ -24,7 +24,6 @@ public:
 	virtual						~BColorListView();
 
 	virtual	bool				InitiateDrag(BPoint where, int32 index, bool wasSelected);
-	virtual	void				MouseUp(BPoint where);
 };
 
 

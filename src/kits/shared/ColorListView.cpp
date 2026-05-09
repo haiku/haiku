@@ -115,12 +115,4 @@ BColorListView::InitiateDrag(BPoint where, int32 index, bool wasSelected)
 }
 
 
-void
-BColorListView::MouseUp(BPoint where)
-{
-	// TODO drag and drop from an external view should not alter selection
-	BView::MouseUp(where);
-}
-
-
 } // namespace BPrivate
