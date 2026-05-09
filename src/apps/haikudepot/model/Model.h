@@ -112,6 +112,8 @@ public:
 			const std::vector<PackageInfoRef>
 								FilteredPackages() const;
 			void				AddPackage(const PackageInfoRef& package);
+			void				AddPackageWithChange(const PackageInfoRef& package,
+									uint32 changeMask);
 			void				AddPackages(const std::vector<PackageInfoRef>& packages);
 			void				AddPackagesWithChange(const std::vector<PackageInfoRef>& packages,
 									uint32 changesMask);

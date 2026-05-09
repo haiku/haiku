@@ -386,6 +386,17 @@ Model::AddPackage(const PackageInfoRef& package)
 
 
 void
+Model::AddPackageWithChange(const PackageInfoRef& package, uint32 changeMask)
+{
+	if (!package.IsSet())
+		HDFATAL("attempt to add an unset package");
+	BAutolock locker(&fLock);
+	fPackages[package->Name()] = package;
+	_NotifyPackageChange(PackageChangeEvent(package, changeMask));
+}
+
+
+void
 Model::AddPackages(const std::vector<PackageInfoRef>& packages)
 {
 	if (packages.empty())
