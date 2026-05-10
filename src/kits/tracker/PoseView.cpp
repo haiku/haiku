@@ -5931,6 +5931,9 @@ BPoseView::StopWatchingParentsOf(const entry_ref* ref)
 bool
 BPoseView::AttributeChanged(const BMessage* message)
 {
+	ASSERT(ContainerWindow() != NULL);
+	ASSERT(CurrentPoseList() != NULL);
+
 	node_ref itemNode;
 	message->FindInt32("device", &itemNode.device);
 	message->FindInt64("node", (int64*)&itemNode.node);
@@ -5957,7 +5960,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 
 	int32 index;
 	attr_info info;
-	PoseList* posesFound = fPoseList->FindAllPoses(&itemNode);
+	PoseList* posesFound = CurrentPoseList()->FindAllPoses(&itemNode);
 	int32 posesCount = posesFound->CountItems();
 	for (int i = 0; i < posesCount; i++) {
 		BPose* pose = posesFound->ItemAt(i);
@@ -5984,11 +5987,8 @@ BPoseView::AttributeChanged(const BMessage* message)
 			continue;
 		}
 
-		bool visible = fPoseList->FindPose(poseModel->NodeRef(), &index) != NULL;
+		bool visible = CurrentPoseList()->FindPose(poseModel->NodeRef(), &index) != NULL;
 		int32 poseListIndex = index;
-
-		if (IsFiltering())
-			visible = fFilteredPoseList->FindPose(poseModel->NodeRef(), &index) != NULL;
 
 		BPoint poseLoc;
 		if (ViewMode() == kListMode)
@@ -6029,28 +6029,12 @@ BPoseView::AttributeChanged(const BMessage* message)
 		}
 		poseModel->CloseNode();
 
-		if (IsFiltering()) {
-			if (!visible && FilterPose(pose)) {
-				visible = true;
-				float scrollBy = 0;
-				BRect bounds = Bounds();
-				AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy, true);
-				continue;
-			} else if (visible && !FilterPose(pose)) {
-				RemoveFilteredPose(pose, index);
-				continue;
-			}
-		}
-
 		if (attrName != NULL) {
 			// note: the following code is wrong, because this sort of hashing
 			// may overlap and we get aliasing
 			uint32 attrHash = AttrHashString(attrName, info.type);
-			if (attrHash == PrimarySort() || attrHash == SecondarySort()) {
-				_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
-				if (IsFiltering() && visible)
-					_CheckPoseSortOrder(fFilteredPoseList, pose, index);
-			}
+			if (attrHash == PrimarySort() || attrHash == SecondarySort())
+				_CheckPoseSortOrder(CurrentPoseList(), pose, poseListIndex);
 		} else {
 			int32 fields;
 			if (message->FindInt32("fields", &fields) != B_OK)
@@ -6060,9 +6044,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 				uint32 attrHash = sAttrColumnMap[i].attrHash;
 				if (attrHash == PrimarySort() || attrHash == SecondarySort()) {
 					if ((fields & sAttrColumnMap[i].fieldMask) != 0) {
-						_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
-						if (IsFiltering() && visible)
-							_CheckPoseSortOrder(fFilteredPoseList, pose, index);
+						_CheckPoseSortOrder(CurrentPoseList(), pose, poseListIndex);
 						break;
 					}
 				}
