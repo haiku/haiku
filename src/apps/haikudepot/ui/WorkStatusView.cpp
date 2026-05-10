@@ -15,8 +15,6 @@
 #include <StringFormat.h>
 #include <StringView.h>
 
-#include <stdio.h>
-
 #include "BarberPole.h"
 
 

@@ -2,11 +2,11 @@
  * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "LanguageMenuUtils.h"
 
 #include <algorithm>
-
-#include <string.h>
 
 #include <Application.h>
 #include <Collator.h>

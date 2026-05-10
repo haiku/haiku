@@ -3,12 +3,13 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include <View.h>
 
+#include "RatingUtils.h"
+
+#include <View.h>
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
-#include "RatingUtils.h"
 #include "SharedIcons.h"
 
 

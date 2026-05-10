@@ -5,14 +5,8 @@
 #ifndef SHUTTING_DOWN_WINDOW_H
 #define SHUTTING_DOWN_WINDOW_H
 
-#include <Locker.h>
-#include <Messenger.h>
-#include <Window.h>
 
-#include "BarberPole.h"
-#include "HaikuDepotConstants.h"
-#include "UserDetail.h"
-#include "UserUsageConditions.h"
+#include <Window.h>
 
 
 class BButton;

@@ -2,15 +2,11 @@
  * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "AbstractProcess.h"
 
-#include <errno.h>
-#include <string.h>
-#include <unistd.h>
-
-#include <AutoDeleter.h>
 #include <AutoLocker.h>
-#include <Locker.h>
 #include <StopWatch.h>
 
 #include "HaikuDepotConstants.h"

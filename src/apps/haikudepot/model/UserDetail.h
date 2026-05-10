@@ -6,12 +6,9 @@
 #ifndef USER_DETAIL_H
 #define USER_DETAIL_H
 
-#include <stdio.h>
 
 #include <Archivable.h>
 #include <String.h>
-
-#include "DateTime.h"
 
 
 class UserUsageConditionsAgreement : public BArchivable {

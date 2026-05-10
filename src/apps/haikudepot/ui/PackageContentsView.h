@@ -6,10 +6,12 @@
 #ifndef PACKAGE_CONTENTS_VIEW_H
 #define PACKAGE_CONTENTS_VIEW_H
 
+
 #include <Locker.h>
 #include <View.h>
 
 #include "PackageInfo.h"
+
 
 class BOutlineListView;
 

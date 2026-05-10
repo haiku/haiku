@@ -2,11 +2,12 @@
  * Copyright 2006-2012 Stephan Aßmus <superstippi@gmx.de>
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef UNDOABLE_EDIT_H
 #define UNDOABLE_EDIT_H
 
+
 #include <Referenceable.h>
+
 
 class BString;
 class EditContext;

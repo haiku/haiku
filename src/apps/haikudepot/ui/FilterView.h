@@ -6,6 +6,7 @@
 #ifndef FILTER_VIEW_H
 #define FILTER_VIEW_H
 
+
 #include <GroupView.h>
 
 

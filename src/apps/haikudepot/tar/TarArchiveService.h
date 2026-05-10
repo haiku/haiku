@@ -5,11 +5,12 @@
 #ifndef TAR_ARCHIVE_SERVICE_H
 #define TAR_ARCHIVE_SERVICE_H
 
+
 #include "Stoppable.h"
 #include "TarArchiveHeader.h"
 
+#include <DataIO.h>
 #include <String.h>
-#include <Path.h>
 
 
 class TarEntryListener {

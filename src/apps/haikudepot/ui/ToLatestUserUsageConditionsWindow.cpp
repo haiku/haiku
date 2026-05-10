@@ -4,16 +4,14 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "ToLatestUserUsageConditionsWindow.h"
 
-#include <Alert.h>
+#include "ToLatestUserUsageConditionsWindow.h"
 
 #include <Autolock.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <LayoutBuilder.h>
-#include <Locker.h>
 #include <SeparatorView.h>
 
 #include "AppUtils.h"
@@ -26,6 +24,7 @@
 #include "TextView.h"
 #include "UserUsageConditionsWindow.h"
 #include "WebAppInterface.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ToLatestUserUsageConditionsWindow"

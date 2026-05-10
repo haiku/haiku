@@ -6,6 +6,7 @@
 #ifndef RATE_PACKAGE_WINDOW_H
 #define RATE_PACKAGE_WINDOW_H
 
+
 #include <vector>
 
 #include <PopUpMenu.h>

@@ -5,11 +5,12 @@
 #ifndef PROCESS_COORDINATOR_H
 #define PROCESS_COORDINATOR_H
 
+
 #include "ProcessCoordinator.h"
 
+#include <Archivable.h>
 #include <ObjectList.h>
 
-#include "AbstractProcess.h"
 #include "AbstractProcessNode.h"
 #include "ProcessListener.h"
 

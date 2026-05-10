@@ -11,6 +11,7 @@
  *      Andrew Lindesay, apl@lindesay.co.nz
  */
 
+
 #include "ParagraphLayout.h"
 
 #include <new>

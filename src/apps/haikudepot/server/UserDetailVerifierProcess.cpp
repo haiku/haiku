@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "UserDetailVerifierProcess.h"
 
 #include <AutoLocker.h>
@@ -13,6 +14,7 @@
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "ServerHelper.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "UserDetailVerifierProcess"

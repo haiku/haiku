@@ -3,15 +3,16 @@
  * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef COMPOUND_EDIT_H
 #define COMPOUND_EDIT_H
+
 
 #include <vector>
 
 #include <String.h>
 
 #include "UndoableEdit.h"
+
 
 class CompoundEdit : public UndoableEdit {
 public:

@@ -10,6 +10,7 @@
 #ifndef PACKAGE_MANAGER_H
 #define PACKAGE_MANAGER_H
 
+
 #include <Locker.h>
 
 #include <package/DaemonClient.h>

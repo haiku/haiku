@@ -6,6 +6,7 @@
 #ifndef PACKAGE_INFO_VIEW_H
 #define PACKAGE_INFO_VIEW_H
 
+
 #include <vector>
 
 #include <GroupView.h>

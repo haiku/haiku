@@ -3,17 +3,16 @@
  * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "PackageInfoView.h"
 
 #include <algorithm>
 
-#include <Alert.h>
-#include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
 #include <CardLayout.h>
 #include <Catalog.h>
-#include <ColumnListView.h>
 #include <ControlLook.h>
 #include <Font.h>
 #include <GridView.h>
@@ -21,18 +20,12 @@
 #include <LayoutUtils.h>
 #include <LocaleRoster.h>
 #include <Message.h>
-#include <OutlineListView.h>
 #include <ScrollView.h>
 #include <SpaceLayoutItem.h>
 #include <StatusBar.h>
 #include <StringView.h>
 #include <TabView.h>
 #include <Url.h>
-
-#include <package/hpkg/NoErrorOutput.h>
-#include <package/hpkg/PackageContentHandler.h>
-#include <package/hpkg/PackageEntry.h>
-#include <package/hpkg/PackageReader.h>
 
 #include "BitmapView.h"
 #include "GeneralContentScrollView.h"

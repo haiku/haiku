@@ -9,14 +9,9 @@
 #include <map>
 
 #include "AbstractProcess.h"
-
 #include "Model.h"
-#include "PackageInfo.h"
 
-#include <File.h>
-#include <Path.h>
 #include <String.h>
-#include <Url.h>
 
 #include <package/RepositoryCache.h>
 

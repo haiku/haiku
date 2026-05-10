@@ -12,6 +12,7 @@
 #include "PackagePublisherInfo.h"
 #include "PackageVersion.h"
 
+
 using BPackageKit::BPackageVersion;
 
 

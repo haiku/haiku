@@ -6,9 +6,6 @@
 
 #include "ServerHelper.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>

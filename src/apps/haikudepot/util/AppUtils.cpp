@@ -6,8 +6,6 @@
 
 #include "AppUtils.h"
 
-#include <string.h>
-
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <MenuItem.h>

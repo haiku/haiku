@@ -5,12 +5,14 @@
 #ifndef PROCESS_COORDINATOR_FACTORY_H
 #define PROCESS_COORDINATOR_FACTORY_H
 
+
 #include <SupportDefs.h>
 
 #include "AbstractProcess.h"
 #include "PackageAction.h"
 #include "PackageInfo.h"
 #include "PackageScreenshotRepository.h"
+
 
 class Model;
 class PackageInfoListener;

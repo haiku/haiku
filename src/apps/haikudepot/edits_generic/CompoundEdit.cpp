@@ -4,9 +4,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "CompoundEdit.h"
 
-#include <stdio.h>
+#include "CompoundEdit.h"
 
 
 CompoundEdit::CompoundEdit(const char* name)

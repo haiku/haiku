@@ -7,7 +7,6 @@
 
 
 #include <DataIO.h>
-#include <HashMap.h>
 #include <HashString.h>
 #include <Path.h>
 #include <Referenceable.h>

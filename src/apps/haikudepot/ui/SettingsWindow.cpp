@@ -2,18 +2,18 @@
  * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "SettingsWindow.h"
 
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <LayoutBuilder.h>
-#include <Locker.h>
 #include <SeparatorView.h>
 
 #include "Logger.h"
 #include "Model.h"
-#include "UserUsageConditionsWindow.h"
 #include "ServerHelper.h"
 #include "WebAppInterface.h"
 

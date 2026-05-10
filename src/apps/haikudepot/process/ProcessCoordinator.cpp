@@ -11,6 +11,7 @@
 #include <StringFormat.h>
 #include <Uuid.h>
 
+#include "AbstractProcess.h"
 #include "Logger.h"
 
 

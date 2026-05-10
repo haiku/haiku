@@ -7,8 +7,6 @@
 
 #include "RatingView.h"
 
-#include <stdio.h>
-
 #include <LayoutUtils.h>
 
 #include "HaikuDepotConstants.h"

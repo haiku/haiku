@@ -4,13 +4,12 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "RatePackageWindow.h"
 
 #include <algorithm>
-#include <stdio.h>
 
 #include <Alert.h>
-#include <AutoLocker.h>
 #include <Autolock.h>
 #include <Button.h>
 #include <Catalog.h>

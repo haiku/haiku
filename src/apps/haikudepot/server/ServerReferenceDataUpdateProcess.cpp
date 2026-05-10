@@ -6,20 +6,13 @@
 
 #include "ServerReferenceDataUpdateProcess.h"
 
-#include <stdio.h>
-#include <sys/stat.h>
-#include <time.h>
-
 #include <AutoDeleter.h>
 #include <Catalog.h>
-#include <FileIO.h>
-#include <Url.h>
 
 #include "DumpExportReferenceJsonListener.h"
 #include "DumpExportReferenceModel.h"
 #include "LocaleUtils.h"
 #include "Logger.h"
-#include "ServerSettings.h"
 #include "StorageUtils.h"
 
 

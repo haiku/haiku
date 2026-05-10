@@ -8,9 +8,6 @@
 
 #include <Collator.h>
 
-#include "LocaleUtils.h"
-#include "Logger.h"
-
 
 bool
 IsRatingStabilityRefLess(const RatingStabilityRef& rs1, const RatingStabilityRef& rs2)

@@ -5,9 +5,11 @@
 #ifndef STOPPABLE_H
 #define STOPPABLE_H
 
+
 class Stoppable {
 public:
 	virtual	bool				WasStopped() = 0;
 };
+
 
 #endif // STOPPABLE_H

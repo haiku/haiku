@@ -6,6 +6,7 @@
 #ifndef SCREENSHOT_WINDOW_H
 #define SCREENSHOT_WINDOW_H
 
+
 #include <Locker.h>
 #include <Messenger.h>
 #include <ToolBar.h>

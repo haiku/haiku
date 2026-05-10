@@ -5,6 +5,7 @@
 #ifndef PACKAGE_USER_RATING_INFO_H
 #define PACKAGE_USER_RATING_INFO_H
 
+
 #include <vector>
 
 #include <Referenceable.h>

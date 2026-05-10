@@ -2,8 +2,9 @@
  * Copyright 2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "PackageIconDefaultRepository.h"
 
+
+#include "PackageIconDefaultRepository.h"
 
 #include <IconUtils.h>
 

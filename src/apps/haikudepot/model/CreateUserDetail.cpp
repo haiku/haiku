@@ -2,7 +2,10 @@
  * Copyright 2019-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "CreateUserDetail.h"
+
 
 // These are keys that are used to store this object's data into a BMessage
 // instance.

@@ -7,7 +7,6 @@
 #define RATING_VIEW_H
 
 
-#include <Referenceable.h>
 #include <View.h>
 
 

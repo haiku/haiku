@@ -5,14 +5,15 @@
 #ifndef TO_LATEST_USER_USAGE_CONDITIONS_WINDOW_H
 #define TO_LATEST_USER_USAGE_CONDITIONS_WINDOW_H
 
+
 #include <Locker.h>
-#include <Messenger.h>
 #include <Window.h>
 
 #include "BarberPole.h"
 #include "HaikuDepotConstants.h"
 #include "UserDetail.h"
 #include "UserUsageConditions.h"
+
 
 class BButton;
 class BCheckBox;

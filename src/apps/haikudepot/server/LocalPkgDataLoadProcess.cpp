@@ -18,8 +18,6 @@
 #include <vector>
 
 #include <AutoDeleter.h>
-#include <AutoLocker.h>
-#include <Autolock.h>
 #include <Catalog.h>
 #include <Roster.h>
 #include <StringList.h>

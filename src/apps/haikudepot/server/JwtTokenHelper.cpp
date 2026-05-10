@@ -6,11 +6,11 @@
 
 #include "JwtTokenHelper.h"
 
+#include <ctype.h>
+
 #include "DataIOUtils.h"
 #include "Json.h"
 #include "JsonMessageWriter.h"
-
-#include <ctype.h>
 
 
 /*static*/ bool

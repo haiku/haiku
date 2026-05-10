@@ -3,9 +3,12 @@
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "UserUsageConditions.h"
 
 #include "Logger.h"
+
 
 // These are keys that are used to store this object's data into a BMessage
 // instance.

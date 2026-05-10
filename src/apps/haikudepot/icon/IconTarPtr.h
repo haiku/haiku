@@ -5,7 +5,6 @@
 #ifndef ICON_TAR_PTR_H
 #define ICON_TAR_PTR_H
 
-#include <stdlib.h>
 
 #include <Referenceable.h>
 #include <String.h>

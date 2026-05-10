@@ -6,9 +6,7 @@
 #define PACKAGE_ICON_DEFAULT_REPOSITORY_H
 
 
-#include <HashMap.h>
 #include <HashString.h>
-
 
 #include "LRUCache.h"
 #include "PackageIconRepository.h"

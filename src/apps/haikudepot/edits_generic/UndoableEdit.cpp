@@ -3,9 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "UndoableEdit.h"
 
-#include <stdio.h>
+#include "UndoableEdit.h"
 
 #include <OS.h>
 #include <String.h>

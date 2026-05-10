@@ -7,8 +7,6 @@
 
 #include "App.h"
 
-#include <stdio.h>
-
 #include <Alert.h>
 #include <Catalog.h>
 #include <Entry.h>

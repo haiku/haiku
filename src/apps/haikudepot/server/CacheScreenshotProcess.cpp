@@ -2,6 +2,8 @@
  * Copyright 2023-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "CacheScreenshotProcess.h"
 
 #include <Catalog.h>

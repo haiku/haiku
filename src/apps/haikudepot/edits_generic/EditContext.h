@@ -2,11 +2,12 @@
  * Copyright 2013 Stephan Aßmus <superstippi@gmx.de>
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef EDIT_CONTEXT_H
 #define EDIT_CONTEXT_H
 
+
 #include <Referenceable.h>
+
 
 /**
  * EditContext is passed to UndoableEdits in Perform(), Undo(), and Redo().

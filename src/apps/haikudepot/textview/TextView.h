@@ -5,6 +5,7 @@
 #ifndef TEXT_VIEW_H
 #define TEXT_VIEW_H
 
+
 #include <String.h>
 #include <View.h>
 

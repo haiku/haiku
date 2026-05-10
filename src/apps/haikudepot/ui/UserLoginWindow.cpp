@@ -4,10 +4,10 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "UserLoginWindow.h"
 
 #include <algorithm>
-#include <ctype.h>
 
 #include <mail_encoding.h>
 

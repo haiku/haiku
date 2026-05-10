@@ -2,8 +2,9 @@
  * Copyright 2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "ScreenshotCoordinate.h"
 
+
+#include "ScreenshotCoordinate.h"
 
 #include "Logger.h"
 

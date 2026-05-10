@@ -4,6 +4,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "PackageContentsView.h"
 
 #include <algorithm>
@@ -31,6 +32,7 @@
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageReader.h>
+
 
 using namespace BPackageKit;
 

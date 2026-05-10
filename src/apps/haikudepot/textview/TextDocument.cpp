@@ -4,6 +4,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "TextDocument.h"
 
 #include <algorithm>

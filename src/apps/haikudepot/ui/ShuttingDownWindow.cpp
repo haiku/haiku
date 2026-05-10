@@ -2,11 +2,12 @@
  * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "ShuttingDownWindow.h"
 
 #include <Catalog.h>
 #include <LayoutBuilder.h>
-#include <Locker.h>
 
 
 #undef B_TRANSLATION_CONTEXT

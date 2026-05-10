@@ -2,10 +2,9 @@
  * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "ProcessCoordinatorFactory.h"
 
-#include <AutoLocker.h>
-#include <Autolock.h>
+
+#include "ProcessCoordinatorFactory.h"
 
 #include <package/Context.h>
 #include <package/PackageRoster.h>

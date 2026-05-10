@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "StorageUtils.h"
 
 #include <errno.h>
@@ -18,6 +19,7 @@
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
+
 
 #define FILE_TO_STRING_BUFFER_LEN 64
 

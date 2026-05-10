@@ -4,35 +4,18 @@
  * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "Model.h"
 
 #include <algorithm>
-#include <ctime>
-
-#include <stdarg.h>
-#include <stdint.h>
-#include <time.h>
 
 #include <Autolock.h>
-#include <Catalog.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <File.h>
-#include <KeyStore.h>
-#include <Locale.h>
-#include <LocaleRoster.h>
-#include <Message.h>
-#include <Path.h>
 
 #include "HaikuDepotConstants.h"
 #include "LocaleUtils.h"
 #include "Logger.h"
 #include "PackageUtils.h"
-#include "StorageUtils.h"
-
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "Model"
 
 
 static const uint32 kChangeMaskAll = UINT32_MAX;

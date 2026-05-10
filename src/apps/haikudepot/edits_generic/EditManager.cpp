@@ -1,17 +1,14 @@
 /*
  * Copyright 2006-2012, Stephan Aßmus <superstippi@gmx.de>
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2021-2026, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "EditManager.h"
 
 #include <algorithm>
 
-#include <stdio.h>
-#include <string.h>
-
-#include <Locker.h>
 #include <String.h>
 
 

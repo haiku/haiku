@@ -6,7 +6,7 @@
 
 #include "ThreadedProcessNode.h"
 
-#include <unistd.h>
+#include <AutoLocker.h>
 
 #include "AbstractProcess.h"
 #include "Logger.h"

@@ -9,6 +9,7 @@
 #include <Archivable.h>
 #include <String.h>
 
+
 /*!	The operator may choose to create a User.  In this case, he or she is
 	required to supply some details such as the nickname, password, email...
 	and those details are then collated and provided to the application server

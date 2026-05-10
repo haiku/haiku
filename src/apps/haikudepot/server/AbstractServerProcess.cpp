@@ -7,9 +7,6 @@
 #include "AbstractServerProcess.h"
 
 #include <errno.h>
-#include <math.h>
-#include <string.h>
-#include <unistd.h>
 
 #include <AutoDeleter.h>
 #include <BufferedDataIO.h>

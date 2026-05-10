@@ -2,22 +2,17 @@
  * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "ServerRepositoryDataUpdateProcess.h"
 
-#include <stdio.h>
-#include <sys/stat.h>
-#include <time.h>
+
+#include "ServerRepositoryDataUpdateProcess.h"
 
 #include <AutoDeleter.h>
 #include <Catalog.h>
-#include <FileIO.h>
-#include <Url.h>
 
 #include "DumpExportRepositoryJsonListener.h"
 #include "DumpExportRepositoryModel.h"
 #include "Logger.h"
 #include "PackageInfo.h"
-#include "ServerSettings.h"
 #include "StorageUtils.h"
 
 

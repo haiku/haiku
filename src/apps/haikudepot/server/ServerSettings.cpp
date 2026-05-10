@@ -3,9 +3,9 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "ServerSettings.h"
 
-#include <stdlib.h>
 #include <pthread.h>
 
 #include <Application.h>

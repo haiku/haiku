@@ -5,6 +5,7 @@
 #ifndef CHARACTER_STYLE_H
 #define CHARACTER_STYLE_H
 
+
 #include "CharacterStyleData.h"
 
 

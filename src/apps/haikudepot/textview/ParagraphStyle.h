@@ -5,6 +5,7 @@
 #ifndef PARAGRAPH_STYLE_H
 #define PARAGRAPH_STYLE_H
 
+
 #include "ParagraphStyleData.h"
 
 

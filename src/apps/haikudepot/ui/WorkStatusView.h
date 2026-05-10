@@ -9,8 +9,6 @@
 
 #include <View.h>
 
-#include "PackageInfo.h"
-
 
 class BarberPole;
 class BCardLayout;

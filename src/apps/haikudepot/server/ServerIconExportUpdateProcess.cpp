@@ -2,21 +2,18 @@
  * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "ServerIconExportUpdateProcess.h"
 
-#include <sys/stat.h>
-#include <time.h>
+
+#include "ServerIconExportUpdateProcess.h"
 
 #include <AutoDeleter.h>
 #include <BufferIO.h>
 #include <Catalog.h>
-#include <FileIO.h>
 
 #include "DataIOUtils.h"
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "PackageIconTarRepository.h"
-#include "ServerHelper.h"
 #include "StandardMetaDataJsonEventListener.h"
 #include "StorageUtils.h"
 #include "TarArchiveService.h"

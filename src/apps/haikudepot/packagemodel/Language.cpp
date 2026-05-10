@@ -8,7 +8,6 @@
 
 #include "Language.h"
 
-
 #include "Logger.h"
 #include "StringUtils.h"
 

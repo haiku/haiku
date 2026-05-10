@@ -6,12 +6,12 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+
 #include <vector>
 #include <map>
 
 #include <Locker.h>
 
-#include "AbstractProcess.h"
 #include "DepotInfo.h"
 #include "PackageFilter.h"
 #include "PackageFilterSpecification.h"

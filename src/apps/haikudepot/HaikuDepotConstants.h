@@ -5,6 +5,7 @@
 #ifndef HAIKU_DEPOT_CONSTANTS_H
 #define HAIKU_DEPOT_CONSTANTS_H
 
+
 enum {
 	MSG_PACKAGE_ACTION_DONE					= 'mpad',
 	MSG_BULK_LOAD_DONE						= 'mmwd',

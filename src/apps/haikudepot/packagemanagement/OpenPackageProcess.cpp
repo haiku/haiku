@@ -31,6 +31,7 @@
 #include "Logger.h"
 #include "PackageKitUtils.h"
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "OpenPackageProcess"
 

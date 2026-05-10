@@ -10,7 +10,6 @@
 
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
-#include <Locker.h>
 #include <util/OpenHashTable.h>
 
 #include "Model.h"

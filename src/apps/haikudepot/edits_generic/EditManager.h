@@ -6,10 +6,12 @@
 #ifndef EDIT_MANAGER_H
 #define EDIT_MANAGER_H
 
+
 #include <vector>
 #include <stack>
 
 #include "UndoableEdit.h"
+
 
 class BString;
 class EditContext;

@@ -6,6 +6,7 @@
 #ifndef USER_RATING_SUMMARY_H
 #define USER_RATING_SUMMARY_H
 
+
 #include <Referenceable.h>
 
 

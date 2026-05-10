@@ -5,10 +5,8 @@
 #ifndef STANDARD_META_DATA_H
 #define STANDARD_META_DATA_H
 
+
 #include <DateTime.h>
-#include <File.h>
-#include <HttpHeaders.h>
-#include <Locker.h>
 #include <String.h>
 
 

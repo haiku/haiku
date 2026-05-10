@@ -30,10 +30,6 @@ enum {
 };
 
 
-//class PackageInfo;
-//typedef BReference<PackageInfo>	PackageInfoRef;
-
-
 /*!	PackageInfoChangeEvent is akin to the PackageChangeEvent but couples a
 	change-mask together with the actual PackageInfo class rather than just the
 	name.

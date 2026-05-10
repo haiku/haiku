@@ -4,20 +4,18 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "FilterView.h"
 
 #include <algorithm>
 #include <stdio.h>
 
-#include <AutoLocker.h>
 #include <Catalog.h>
-#include <CheckBox.h>
 #include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
-#include <TextControl.h>
 
 #include "Model.h"
 #include "support.h"

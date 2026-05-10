@@ -5,6 +5,8 @@
 #ifndef ABSTRACT_PROCESS_H
 #define ABSTRACT_PROCESS_H
 
+
+#include <Locker.h>
 #include <String.h>
 #include <Url.h>
 

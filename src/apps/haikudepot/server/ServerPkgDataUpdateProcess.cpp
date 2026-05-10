@@ -6,23 +6,15 @@
 
 #include "ServerPkgDataUpdateProcess.h"
 
-#include <stdio.h>
-#include <sys/stat.h>
-#include <time.h>
-
 #include <AutoDeleter.h>
-#include <AutoLocker.h>
 #include <Catalog.h>
-#include <FileIO.h>
 #include <StopWatch.h>
-#include <Url.h>
 
 #include "DumpExportPkgJsonListener.h"
 #include "DumpExportPkgModel.h"
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "PackageUtils.h"
-#include "ServerSettings.h"
 #include "StorageUtils.h"
 
 

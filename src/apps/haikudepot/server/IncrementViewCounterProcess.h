@@ -5,6 +5,7 @@
 #ifndef INCREMENT_VIEW_COUNTER_PROCESS_H
 #define INCREMENT_VIEW_COUNTER_PROCESS_H
 
+
 #include "AbstractProcess.h"
 #include "Model.h"
 #include "PackageInfo.h"

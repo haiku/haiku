@@ -5,14 +5,10 @@
 #ifndef SETTINGS_WINDOW_H
 #define SETTINGS_WINDOW_H
 
-#include <Locker.h>
-#include <Messenger.h>
+
 #include <Window.h>
 
-#include "BarberPole.h"
 #include "HaikuDepotConstants.h"
-#include "UserDetail.h"
-#include "UserUsageConditions.h"
 
 
 class BButton;

@@ -7,9 +7,9 @@
 #define BITMAP_VIEW_H
 
 
-#include "BitmapHolder.h"
-
 #include <View.h>
+
+#include "BitmapHolder.h"
 
 
 class BitmapView : public BView {

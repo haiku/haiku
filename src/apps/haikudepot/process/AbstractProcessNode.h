@@ -6,10 +6,8 @@
 #define ABSTRACT_PROCESS_NODE_H
 
 
-#include <AutoLocker.h>
 #include <Locker.h>
 #include <ObjectList.h>
-#include <OS.h>
 #include <String.h>
 
 

@@ -7,6 +7,8 @@
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "MainWindow.h"
 
 #include <algorithm>
@@ -28,14 +30,12 @@
 #include <Messenger.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <ScrollView.h>
 #include <StopWatch.h>
 #include <StringList.h>
 #include <StringView.h>
 #include <TabView.h>
 
 #include "AppUtils.h"
-#include "AutoDeleter.h"
 #include "AutoLocker.h"
 #include "DecisionProvider.h"
 #include "FeaturedPackagesView.h"

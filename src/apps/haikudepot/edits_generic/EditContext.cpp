@@ -3,9 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "EditContext.h"
 
-#include <stdio.h>
+#include "EditContext.h"
 
 
 EditContext::EditContext()

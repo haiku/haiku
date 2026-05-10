@@ -3,9 +3,9 @@
  * Copyright 2026, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "PackageInfoListener.h"
 
-#include <stdio.h>
+
+#include "PackageInfoListener.h"
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"

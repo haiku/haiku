@@ -8,6 +8,7 @@
 
 #include <GroupView.h>
 
+
 //! A group view to hold items in a vertically scrollable area. Needs to
 // be embedded into a BScrollView with vertical scrollbar to work. Get the
 // BGroupLayout with GroupLayout() and add or remove items/views to the layout.

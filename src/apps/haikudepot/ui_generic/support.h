@@ -2,9 +2,9 @@
  * Copyright 2006, 2013 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef SUPPORT_H
 #define SUPPORT_H
+
 
 #include <Rect.h>
 

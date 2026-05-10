@@ -8,6 +8,7 @@
 
 #include <Referenceable.h>
 
+
 class TextDocument;
 class UndoableEditRef;
 

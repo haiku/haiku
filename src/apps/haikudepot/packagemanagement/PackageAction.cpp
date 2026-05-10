@@ -2,6 +2,8 @@
  * Copyright 2021-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "PackageAction.h"
 
 #include <Catalog.h>
@@ -9,6 +11,7 @@
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "PackageUtils.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageAction"

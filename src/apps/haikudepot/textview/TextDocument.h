@@ -5,6 +5,7 @@
 #ifndef TEXT_DOCUMENT_H
 #define TEXT_DOCUMENT_H
 
+
 #include <Referenceable.h>
 
 #include "CharacterStyle.h"

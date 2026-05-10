@@ -11,7 +11,6 @@
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
-#include "ServerHelper.h"
 #include "ServerSettings.h"
 #include "StorageUtils.h"
 

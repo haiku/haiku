@@ -6,7 +6,9 @@
 #define RATING_UTILS_H
 
 
+#include <Point.h>
 #include <Referenceable.h>
+#include <Size.h>
 
 #include "PackageUserRatingInfo.h"
 

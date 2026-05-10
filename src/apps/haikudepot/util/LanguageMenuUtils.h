@@ -8,7 +8,6 @@
 
 #include <vector>
 
-#include <Array.h>
 #include <Menu.h>
 
 #include "Model.h"

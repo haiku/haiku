@@ -9,13 +9,9 @@
 
 #include "AbstractPackageProcess.h"
 
-#include <Autolock.h>
-
 #include "Logger.h"
 #include "Model.h"
 #include "PackageKitUtils.h"
-#include "PackageManager.h"
-#include "PackageUtils.h"
 
 
 using namespace BPackageKit;

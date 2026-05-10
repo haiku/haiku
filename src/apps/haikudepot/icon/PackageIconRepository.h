@@ -5,10 +5,10 @@
 #ifndef PACKAGE_ICON_REPOSITORY_H
 #define PACKAGE_ICON_REPOSITORY_H
 
+
 #include <String.h>
 
 #include "BitmapHolder.h"
-#include "HaikuDepotConstants.h"
 
 
 class PackageIconRepository : public BReferenceable {

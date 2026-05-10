@@ -3,9 +3,11 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "PackageUtils.h"
 
 #include "Logger.h"
+
 
 /*!	This method will obtain the title from the package if this is possible or
 	otherwise it will return the name of the package.

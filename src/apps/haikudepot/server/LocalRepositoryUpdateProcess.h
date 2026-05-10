@@ -10,10 +10,7 @@
 
 #include "AbstractProcess.h"
 
-#include <File.h>
-#include <Path.h>
 #include <String.h>
-#include <Url.h>
 
 #include <package/Context.h>
 #include <package/PackageRoster.h>

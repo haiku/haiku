@@ -7,12 +7,11 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "PackageListView.h"
 
 #include <algorithm>
-#include <stdio.h>
 
-#include <Autolock.h>
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <NumberFormat.h>
@@ -20,14 +19,12 @@
 #include <StringForSize.h>
 #include <StringFormat.h>
 #include <Window.h>
-#include <package/hpkg/Strings.h>
 
 #include "LocaleUtils.h"
 #include "Logger.h"
 #include "PackageUtils.h"
 #include "RatingUtils.h"
 #include "SharedIcons.h"
-#include "WorkStatusView.h"
 
 
 #undef B_TRANSLATION_CONTEXT

@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "TextDocumentView.h"
 
 #include <algorithm>
@@ -14,6 +15,7 @@
 #include <ScrollBar.h>
 #include <Shape.h>
 #include <Window.h>
+
 
 const char* kMimeTypePlainText = "text/plain";
 

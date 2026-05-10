@@ -10,7 +10,6 @@
 
 #include "PopulatePkgUserRatingsFromServerProcess.h"
 
-#include <Autolock.h>
 #include <Catalog.h>
 
 #include "Logger.h"

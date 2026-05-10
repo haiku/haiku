@@ -6,6 +6,7 @@
 #ifndef USER_LOGIN_WINDOW_H
 #define USER_LOGIN_WINDOW_H
 
+
 #include <Locker.h>
 #include <Messenger.h>
 #include <Window.h>

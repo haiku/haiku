@@ -2,9 +2,9 @@
  * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef USER_DETAIL_VERIFIER_PROCESS_H
 #define USER_DETAIL_VERIFIER_PROCESS_H
+
 
 #include <String.h>
 

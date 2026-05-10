@@ -2,9 +2,9 @@
  * Copyright 2019-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "LocaleUtils.h"
 
-#include <stdlib.h>
+
+#include "LocaleUtils.h"
 
 #include <Catalog.h>
 #include <Collator.h>

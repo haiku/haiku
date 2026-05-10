@@ -5,6 +5,7 @@
 #ifndef CHARACTER_STYLE_DATA_H
 #define CHARACTER_STYLE_DATA_H
 
+
 #include <Font.h>
 #include <Referenceable.h>
 

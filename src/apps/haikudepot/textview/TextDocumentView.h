@@ -5,6 +5,7 @@
 #ifndef TEXT_DOCUMENT_VIEW_H
 #define TEXT_DOCUMENT_VIEW_H
 
+
 #include <Invoker.h>
 #include <String.h>
 #include <View.h>

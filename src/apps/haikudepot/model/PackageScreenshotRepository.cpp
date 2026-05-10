@@ -2,6 +2,8 @@
  * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "PackageScreenshotRepository.h"
 
 #include <unistd.h>
@@ -13,7 +15,6 @@
 #include "Logger.h"
 #include "Model.h"
 #include "StorageUtils.h"
-#include "WebAppInterface.h"
 
 
 static const uint32 kMaxRetainedCachedScreenshots = 25;

@@ -5,12 +5,10 @@
 #ifndef USER_USAGE_CONDITIONS_WINDOW_H
 #define USER_USAGE_CONDITIONS_WINDOW_H
 
-#include <Locker.h>
-#include <Messenger.h>
+
 #include <Window.h>
 
 #include "HaikuDepotConstants.h"
-#include "PackageInfo.h"
 #include "UserDetail.h"
 #include "UserUsageConditions.h"
 

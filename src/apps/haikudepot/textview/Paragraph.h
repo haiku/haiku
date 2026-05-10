@@ -6,6 +6,7 @@
 #ifndef PARAGRAPH_H
 #define PARAGRAPH_H
 
+
 #include <vector>
 
 #include "ParagraphStyle.h"
