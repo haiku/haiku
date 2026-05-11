@@ -11,6 +11,7 @@
 
 #include <BeBuild.h>
 #include <Errors.h>
+#include <config/HaikuVersion.h>
 
 #include <inttypes.h>
 #include <sys/types.h>
