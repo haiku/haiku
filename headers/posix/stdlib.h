@@ -9,10 +9,10 @@
 #include <alloca.h>
 #include <div_t.h>
 #include <limits.h>
-#include <stddef.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <wchar_t.h>
+
 
 #define RAND_MAX      0x7fffffff
 #define MB_CUR_MAX    (__ctype_get_mb_cur_max())

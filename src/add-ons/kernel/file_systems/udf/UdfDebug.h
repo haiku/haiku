@@ -39,7 +39,6 @@ extern "C" int 	vsprintf(char *s, const char *format, va_list arg);
 //#		include <stdio.h>
 #		define __out printf
 #	else
-//#		include <null.h>
 #		define __out dprintf
 #	endif
 #	include <stdio.h>

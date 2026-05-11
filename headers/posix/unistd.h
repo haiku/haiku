@@ -6,7 +6,6 @@
 #define _UNISTD_H_
 
 
-#include <null.h>
 #include <stdint.h>
 #include <sys/types.h>
 

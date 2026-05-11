@@ -35,7 +35,6 @@
 #		include <stdio.h>
 #		define __out printf
 #	else
-#		include <null.h>
 #		define __out dprintf
 #	endif
 #endif

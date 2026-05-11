@@ -7,7 +7,8 @@
 
 
 #include <locale_t.h>
-#include <null.h>
+#include <stddef.h>
+
 
 struct lconv {
 	char *decimal_point;

@@ -51,7 +51,6 @@
 #	endif
 #else
 #	include <KernelExport.h>
-#	include <null.h>
 #	if DEBUG_PRINT
 #		define __out dbg_printf
 #		define __outv dbg_vprintf

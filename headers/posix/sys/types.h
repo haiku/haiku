@@ -1,14 +1,14 @@
 /*
- * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_TYPES_H
 #define _SYS_TYPES_H
 
 
-#include <config/types.h>
-
 #include <BeBuild.h>
+#include <config/types.h>
+#include <stddef.h>
 
 
 /* BSD compatibility */
@@ -18,12 +18,17 @@ typedef unsigned short 		u_short;
 typedef unsigned char 		u_char;
 
 
-/* sysV compatibility */
+/* SysV compatibility */
 typedef unsigned long 		ulong;
 typedef unsigned short 		ushort;
 typedef unsigned int 		uint;
 typedef unsigned char		unchar;
 
+
+#if __GNUC__ > 2 && !defined(__ssize_t__)
+#define __ssize_t__
+typedef long signed int	ssize_t;
+#endif
 
 typedef __haiku_int64 		blkcnt_t;
 typedef __haiku_std_int32	blksize_t;
@@ -43,9 +48,9 @@ typedef __haiku_std_uint32	umode_t;
 typedef __haiku_std_int32	nlink_t;
 
 #ifdef __HAIKU_BEOS_COMPATIBLE_TYPES
-	typedef int		daddr_t;	/* disk address */
+typedef int		daddr_t;	/* disk address */
 #else
-	typedef off_t	daddr_t;	/* disk address */
+typedef off_t	daddr_t;	/* disk address */
 #endif
 typedef char*				caddr_t;
 
@@ -122,8 +127,6 @@ struct _pthread_spinlock {
 };
 
 
-#include <null.h>
-#include <size_t.h>
 #include <time.h>
 
 #endif
