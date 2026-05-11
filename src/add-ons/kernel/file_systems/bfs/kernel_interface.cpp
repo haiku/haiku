@@ -2172,6 +2172,10 @@ bfs_create_index(fs_volume* _volume, const char* name, uint32 type,
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
+	Inode* indices = volume->IndicesNode();
+	if (indices == NULL)
+		return B_UNSUPPORTED;
+
 	Transaction transaction(volume, volume->Indices());
 
 	Index index(volume);
