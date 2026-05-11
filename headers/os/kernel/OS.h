@@ -5,7 +5,6 @@
 #ifndef _OS_H
 #define _OS_H
 
-/** Kernel specific structures and functions */
 
 #include <limits.h>
 #include <stdarg.h>
@@ -412,15 +411,6 @@ extern bigtime_t	set_alarm(bigtime_t when, uint32 flags);
 /* Debugger */
 
 extern void			debugger(const char *message);
-
-/*
-   calling this function with a non-zero value will cause your thread
-   to receive signals for any exceptional conditions that occur (i.e.
-   you'll get SIGSEGV for data access exceptions, SIGFPE for floating
-   point errors, SIGILL for illegal instructions, etc).
-
-   to re-enable the default debugger pass a zero.
-*/
 extern int			disable_debugger(int state);
 
 /* TODO: Remove. Temporary debug helper. */
