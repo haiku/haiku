@@ -129,7 +129,11 @@ typedef uint64_t uintmax_t;
 #define SIG_ATOMIC_MIN INT32_MIN
 #define SIG_ATOMIC_MAX INT32_MAX
 
+#ifdef __SIZE_MAX__
+#define SIZE_MAX __SIZE_MAX__
+#else
 #define SIZE_MAX 	__HAIKU_ADDR_MAX
+#endif
 
 #define WINT_MIN 	0
 #define WINT_MAX 	((wint_t)-1)
