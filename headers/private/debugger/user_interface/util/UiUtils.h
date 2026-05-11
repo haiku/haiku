@@ -6,8 +6,7 @@
 #ifndef UI_UTILS_H
 #define UI_UTILS_H
 
-#include <size_t.h>
-
+#include <stddef.h>
 #include <image.h>
 
 #include "Types.h"

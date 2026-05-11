@@ -49,7 +49,7 @@
 #ifdef __HAIKU__
 #include <endian.h>
 #include <kernel.h>
-#include <size_t.h>
+#include <stddef.h>
 #include <stdint.h>
 uint32 calculate_crc32c(uint32 crc32c, const unsigned char *buffer,
 	unsigned int length);
