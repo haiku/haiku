@@ -1,0 +1,981 @@
+/*
+ * Copyright 2026 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/device/USBKit.h				hrev59275
+ *		src/kits/device/USBRoster.cpp			hrev59275
+ *		src/kits/device/USBDevice.cpp			hrev59275
+ *		src/kits/device/USBConfiguration.cpp	hrev59275
+ *		src/kits/device/USBInterface.cpp		hrev59275
+ *		src/kits/device/USBEndpoint.cpp			hrev59275
+ */
+
+
+/*!
+	\file USBKit.h
+	\ingroup device
+	\ingroup libdevice
+	\brief Provides the classes BUSBRoster, BUSBDevice, BUSBConfiguration,
+		BUSBInterface and BUSBEndpoint.
+*/
+
+
+/*!
+	\class BUSBRoster
+	\ingroup device
+	\ingroup libdevice
+	\brief Abstract class to implement to watch for devices that get attached
+		or removed from the USB bus.
+
+	The roster subclass must implement the pure virtual hooks DeviceAdded() and
+	DeviceRemoved().
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BUSBRoster::BUSBRoster()
+	\brief Default constructor.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BUSBRoster::~BUSBRoster()
+	\brief Stops the USB roster looper and releases the allocated resources.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BUSBRoster::DeviceAdded(BUSBDevice* device) = 0
+	\brief Hook method called when a new device gets attached to the USB bus.
+
+	The hook is called with an initialized BUSBDevice object. If you return
+	\c B_OK from your hook the object will stay valid and the DeviceRemoved()
+	hook will be called for it. Otherwise the object is deleted and
+	DeviceRemoved() is not called.
+
+	\param[in] device A BUSBDevice instance of the device attached.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BUSBRoster::DeviceRemoved(BUSBDevice* device) = 0
+	\brief Hook method called when a device gets detached from the USB bus.
+
+	The device object gets invalid and will be deleted as soon as you return
+	from the hook so be sure to remove all references to it.
+
+	\param[in] device A BUSBDevice instance of the device removed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BUSBRoster::Start()
+	\brief Starts the USB roster looper to monitor for attachment or detachment
+		events.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BUSBRoster::Stop()
+	\brief Stops the USB roster looper and releases its resources.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BUSBDevice
+	\ingroup device
+	\ingroup libdevice
+	\brief Represents an interface to a USB device.
+
+	You can either get it through the BUSBRoster or by creating one yourself
+	and setting it to a valid raw usb device (with a path of \c "/dev/bus/usb/x").
+
+	The device class provides direct accessors for descriptor fields as well
+	as convenience functions to directly get string representations of fields.
+	The BUSBDevice also provides access for the BUSBConfiguration objects of
+	a device. These objects and all of their child objects depend on the
+	parent device and will be deleted as soon as the device object is
+	destroyed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BUSBDevice::BUSBDevice(const char* path = NULL)
+	\brief Initializes the USB device with \a path.
+
+	You should check if the object was initialized successfully by calling
+	InitCheck().
+
+	\param[in] path The path of the USB device.
+
+	\sa SetTo()
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BUSBDevice::~BUSBDevice()
+	\brief Releases all the allocated resources by this object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BUSBDevice::InitCheck()
+	\brief Checks the object initialization status.
+
+	\retval B_OK The object was initialized to the given device path.
+	\retval B_ERROR The object is not initialized properly or the path of the
+		device does not exist.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BUSBDevice::SetTo(const char* path)
+	\brief (Re)initializes the object to the device with \a path.
+
+	If it was opened successfully, this will load the device descriptor
+	and the associated device configurations.
+
+	\param[in] path The path of the USB device.
+
+	\retval B_OK Initialization successful and device opened.
+	\retval B_BAD_VALUE The device \a path is \c NULL.
+	\retval B_ERROR The device \a path could not be opened, or the USB version or
+		descriptor for the device could not be retrieved.
+	\retval B_NO_MEMORY Internal memory error trying to get device configurations.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BUSBDevice::Unset()
+	\brief Uninitializes the object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BUSBDevice::Location() const
+	\brief Returns the location on the bus represented as hub/device sequence.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BUSBDevice::IsHub() const
+	\brief Returns \c true if the device is a USB hub or \c false otherwise.
+
+	\since Haiku R1
+*/
+
+/*!
+    \name Device descriptor
+*/
+
+
+//! @{
+
+
+/*!
+	\fn uint16 BUSBDevice::USBVersion() const
+	\brief Returns the minimum USB version supported by the device.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BUSBDevice::Class() const
+	\brief Returns the USB device class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BUSBDevice::Subclass() const
+	\brief Returns the USB device subclass.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BUSBDevice::Protocol() const
+	\brief Returns the device protocol.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BUSBDevice::MaxEndpoint0PacketSize() const
+	\brief Returns the max packet size for the endpoint 0.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint16 BUSBDevice::VendorID() const
+	\brief Returns the vendor identifier.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint16 BUSBDevice::ProductID() const
+	\brief Returns the product identifier.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint16 BUSBDevice::Version() const
+	\brief Returns the device version.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BUSBDevice::ManufacturerString() const
+	\brief Returns a string of the manufacturer name.
+
+	If a string for the manufacturer is not available in the descriptor data,
+	an empty string is returned.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BUSBDevice::ProductString() const
+	\brief Returns a string of the product name.
+
+	If a string for the product name is not available in the descriptor data,
+	an empty string is returned.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BUSBDevice::SerialNumberString() const
+	\brief Returns a string of the serial number.
+
+	If a string for the serial number is not available in the descriptor data,
+	an empty string is returned.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const usb_device_descriptor* BUSBDevice::Descriptor() const
+	\brief Returns a pointer to the device descriptor.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn size_t BUSBDevice::GetStringDescriptor(uint32 index,
+		usb_string_descriptor* descriptor, size_t length)
+	\brief Retrieves the raw usb_string_descriptor at the given \a index.
+
+	The string contained is usually two-byte unicode encoded.
+
+	\param[in] index The index of the string.
+	\param[out] descriptor A pointer to a pre-allocated usb_string_descriptor
+		instance to write the data into.
+	\param[in] length The length of \a descriptor.
+
+	\returns The length of the string or an error code.
+
+	\retval 0 The string descriptor could not be retrieved.
+	\retval B_BAD_VALUE \a descriptor is \c NULL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn char* BUSBDevice::DecodeStringDescriptor(uint32 index) const
+	\brief Convenience method to get a null terminated C string for the
+		given string \a index.
+
+	Notice that this will allocate memory on the heap for the returned string. The
+	caller needs to delete it to release the memory.
+
+	\param[in] index The index of the string.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn size_t BUSBDevice::GetDescriptor(uint8 type, uint8 index,
+		uint16 languageID, void* data, size_t length) const
+	\brief Gets the descriptor with \a type and \a languageID at \a index.
+
+	\param[in] type The descriptor type.
+	\param[in] index The index of the descriptor to get.
+	\param[in] languageID The language identifier of the descriptor.
+	\param[out] data A pre-allocated buffer where to write the descriptor into.
+	\param[in] length The \a data buffer size.
+
+	\returns The amount of data written or an error code.
+
+	\retval 0 The operation could not be performed.
+	\retval B_BAD_VALUE \a data is \c NULL.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+    \name Device configurations
+*/
+
+
+//! @{
+
+
+/*!
+	\fn uint32 BUSBDevice::CountConfigurations() const
+	\brief Returns the number of configurations that the device contains.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBConfiguration* BUSBDevice::ConfigurationAt(uint32 index) const
+	\brief Returns the device configuration at the given \a index.
+
+	\param[in] index The index of the configuration.
+
+	\returns A read-only pointer to the configuration at \a index or \c NULL
+		if the index number is invalid or there are no configurations.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBConfiguration* BUSBDevice::ActiveConfiguration() const
+	\brief Returns the active device configuration.
+
+	\returns A read-only pointer to the current configuration or \c NULL
+		if there are no configurations.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BUSBDevice::SetConfiguration(const BUSBConfiguration* configuration)
+	\brief Activates a device configuration in the USB device.
+
+	\param[in] configuration A pointer to a BUSBConfiguration with the
+		configuration data.
+
+	\retval B_OK The configuration was activated successfully. It has become the
+		active configuration.
+	\retval B_BAD_VALUE \c configuration is NULL, or the index value of it
+		is out of range (see CountConfigurations()).
+	\retval B_ERROR There was an error trying to activate the configuration.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BUSBDevice::ControlTransfer(uint8 requestType, uint8 request,
+		uint16 value, uint16 index, uint16 length, void* data) const
+	\brief Sends a request to the device using the default pipe.
+
+	\param[in] requestType The request type.
+	\param[in] request The request you want to perform.
+	\param[in] value The value of the request.
+	\param[in] index The index of the request.
+	\param[in] length The size of the \a data buffer.
+	\param[out] data The buffer where to write the result in.
+
+	\returns The amount of data written or an error code.
+	\retval B_BAD_VALUE \a data is \c NULL.
+	\retval B_ERROR The operation request failed.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+
+/*!
+	\class BUSBConfiguration
+	\ingroup device
+	\ingroup libdevice
+	\brief Represents one of possibly multiple configurations a device might have.
+
+	The only way to get a valid object is through
+	BUSBDevice::ConfigurationAt() or BUSBDevice::ActiveConfiguration().
+
+	BUSBConfiguration provides further access into the configuration by
+	providing CountInterfaces() and InterfaceAt() to retrieve BUSBInterface
+	objects.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BUSBConfiguration::Index() const
+	\brief Returns the index of this configuration within
+		the configurations list in Device().
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBDevice* BUSBConfiguration::Device() const
+	\brief Returns the parent device of this configuration.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BUSBConfiguration::ConfigurationString() const
+	\brief Gets a descriptive string for this configuration.
+
+	If it is not available, an empty string is returned.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const usb_configuration_descriptor* BUSBConfiguration::Descriptor() const
+	\brief Returns a pointer to a usb_configuration_descriptor instace with the
+		descriptor of this configuration.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BUSBConfiguration::CountInterfaces() const
+	\brief Returns the number of child interfaces within this configuration.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBInterface* BUSBConfiguration::InterfaceAt(uint32 index) const
+	\brief Returns the child interface of this configuration at the given \a index.
+
+	If the \a index is invalid (see CountInterfaces()) or there are no child
+	interfaces, it returns \c NULL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BUSBInterface
+	\ingroup device
+	\ingroup libdevice
+	\brief Represents an interface of a configuration in a USB device.
+
+	This class can be used to access the descriptor fields of
+	an underlying USB interface. In addition, it can be used to
+	iterate over and retrieve BUSBEndpoint objects that can be used to
+	transfer data over the bus.
+
+	\since Haiku R1
+*/
+
+
+/*!
+    \name Access
+*/
+
+//! @{
+
+/*!
+	\fn uint32 BUSBInterface::Index() const
+	\brief Returns the index in the interfaces list of the parent configuration.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BUSBInterface::AlternateIndex() const
+	\brief Returns the alternate interface index.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBConfiguration* BUSBInterface::Configuration() const
+	\brief Returns a pointer to the parent configuration of this interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBDevice* BUSBInterface::Device() const
+	\brief Convenience method to directly return the parent device of this
+		interface.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+    \name Descriptor and descriptor fields
+*/
+
+//! @{
+
+/*!
+	\fn uint8 BUSBInterface::Class() const
+	\brief Returns the class of the interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BUSBInterface::Subclass() const
+	\brief Returns the subclass of the interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BUSBInterface::Protocol() const
+	\brief Returns the protocol of the interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BUSBInterface::InterfaceString() const
+	\brief Returns a descriptive string for the interface.
+
+	If there is no string available it returns an empty string.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const usb_interface_descriptor* BUSBInterface::Descriptor() const
+	\brief Returns a pointer to a usb_interface_descriptor
+		with the descriptor of this interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BUSBInterface::OtherDescriptorAt(uint32 index,
+		usb_descriptor* descriptor, size_t length) const
+	\brief Gets generic descriptors for an interface.
+
+	These are usually device/interface class specific or they may
+	represent vendor specific extensions.
+
+	\param[in] index The index of the generic descriptor.
+	\param[out] descriptor A pointer to a pre-allocated usb_descriptor instance
+		where to write the data.
+	\param[in] length The size of \a descriptor.
+
+	\retval B_OK Operation performed successfully.
+	\retval B_BAD_VALUE \a descriptor is \c NULL or \a length is invalid
+		(less than or equal to zero).
+	\retval B_ERROR The descriptor could not be fetched.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+    \name Endpoints
+*/
+
+//! @{
+
+/*!
+	\fn uint32 BUSBInterface::CountEndpoints() const
+	\brief Returns the number of endpoints available in this interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBEndpoint* BUSBInterface::EndpointAt(uint32 index) const
+	\brief Returns a pointer to the endpoint at the given \a index.
+
+	This is the only valid way to get BUSBEndpoint object.
+
+	Note that these objects will get invalid and deleted as soon as the
+	parent interface is deleted.
+
+	If \a index is invalid or there are no endpoints, this will return \c NULL.
+
+	\param[in] index The index of the endpoint.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+    \name Alternate interfaces
+*/
+
+//! @{
+
+/*!
+	\fn uint32 BUSBInterface::CountAlternates() const
+	\brief Returns the number of alternate interfaces for this interface.
+
+	Note that this interface itself counts as an alternate so an alternate count
+	of one really means that you are currently using the sole interface present.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BUSBInterface::ActiveAlternateIndex() const
+	\brief Returns the index of the currently active alternate interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBInterface* BUSBInterface::AlternateAt(uint32 alternateIndex) const
+	\brief Returns the interface descriptor of the alternate interface
+		with the specified index.
+
+	This allows to peek at the attributes of that alternate (including endpoints)
+	without having to switch to this alternate interface.
+
+	Note that you cannot use any endpoint you retrieve through an
+	interface you get through AlternateAt(). Even if you switch to that
+	alternate later on, you cannot use an interface returned by
+	AlternateAt(). Instead switch to that alternate using the interface
+	you got from the configuration and then use this switched interface
+	to enumerate the endpoints.
+
+	\param[in] alternateIndex The index of the alternate interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BUSBInterface::SetAlternate(uint32 alternateIndex)
+	\brief Switches this object to the alternate interface at \a alternateIndex.
+
+	Note that all endpoints retrieved through EndpointAt() will become invalid
+	and will be deleted as soon as you set an alternate interface (even if the
+	resulting interface is the same you were using before).
+
+	\param[in] alternateIndex The index of the alternate interface to switch into.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\class BUSBEndpoint
+	\ingroup device
+	\ingroup libdevice
+	\brief Represents a device endpoint that can be used to send or receive data.
+
+	It also allows to query endpoint characteristics like endpoint type or
+	direction.
+
+	\since Haiku R1
+*/
+
+/*!
+    \name Access
+*/
+
+//! @{
+
+/*!
+	\fn uint32 BUSBEndpoint::Index()
+	\brief Returns the index of the endpoint in the list of endpoints of the
+		parent interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBInterface* BUSBEndpoint::Interface() const
+	\brief Returns the parent interface of this endpoint.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBConfiguration* BUSBEndpoint::Configuration() const
+	\brief Convenience method to directly reach the parent configuration of
+		this endpoint.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUSBDevice* BUSBEndpoint::Device() const
+	\brief Convenience method to directly reach the parent device of this
+		endpoint.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+    \name Endpoints characteristics
+*/
+
+//! @{
+
+/*!
+	\fn bool BUSBEndpoint::IsBulk() const
+	\brief Returns if the transfer type is bulk.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BUSBEndpoint::IsInterrupt() const
+	\brief Returns if the transfer type is interrupt.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BUSBEndpoint::IsIsochronous() const
+	\brief Returns if the transfer type is isochronous.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BUSBEndpoint::IsControl() const
+	\brief Returns if the transfer type is control.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BUSBEndpoint::IsInput() const
+	\brief Returns if the address direction is input.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BUSBEndpoint::IsOutput() const
+	\brief Returns if the address direction is output.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint16 BUSBEndpoint::MaxPacketSize() const
+	\brief Returns the maximum packet size that this endpoint is able to receive
+		or send.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BUSBEndpoint::Interval() const
+	\brief Returns the polling interval of this endpoint for data transfers.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const usb_endpoint_descriptor* BUSBEndpoint::Descriptor() const
+	\brief Returns a pointer to a usb_endpoint_descriptor instance with the
+		descriptor of this endpoint.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+    \name Transfers
+*/
+
+//! @{
+
+/*!
+	\fn ssize_t BUSBEndpoint::ControlTransfer(uint8 requestType, uint8 request,
+		uint16 value, uint16 index, uint16 length, void *data) const
+	\brief Perform a control transfer operation.
+
+	\param[in] requestType The request type.
+	\param[in] request The request you want to perform.
+	\param[in] value The value of the request.
+	\param[in] index The index of the request.
+	\param[in] length The size of the buffer pointed by \a data.
+	\param[out] data The buffer where to write the result.
+
+	\returns The actual number of bytes written or an error code.
+	\retval B_BAD_VALUE \a data is \c NULL
+	\retval B_ERROR The request failed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BUSBEndpoint::InterruptTransfer(void *data, size_t length) const
+	\brief Perform an interrupt transfer operation.
+
+	\param data The data buffer you want to pass.
+	\param[in] length The size of the data buffer.
+
+	\returns The actual number of bytes written or an error code.
+	\retval B_BAD_VALUE \a data is \c NULL
+	\retval B_ERROR The request failed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BUSBEndpoint::BulkTransfer(void *data, size_t length) const
+	\brief Perform a bulk transfer operation.
+
+	\param data The data buffer you want to pass.
+	\param[in] length The size of the data buffer.
+
+	\returns The actual number of bytes written or an error code.
+	\retval B_BAD_VALUE \a data is \c NULL
+	\retval B_ERROR The request failed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BUSBEndpoint::IsochronousTransfer(void *data, size_t length,
+		usb_iso_packet_descriptor *packetDescriptors, uint32 packetCount) const
+	\brief Perform an isochronous transfer operation.
+
+	\param data The data buffer you want to pass.
+	\param[in] length The size of the data buffer.
+	\param packetDescriptors Packet descriptors for the isochronous request.
+	\param[in] packetCount The number of entries in \a packetDescriptors.
+
+	\returns The actual number of bytes written or an error code.
+	\retval B_BAD_VALUE \a data is \c NULL
+	\retval B_ERROR The request failed.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+    \name Halt state
+*/
+
+//! @{
+
+/*!
+	\fn bool BUSBEndpoint::IsStalled() const
+	\brief Gets the halt state of the endpoint.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BUSBEndpoint::ClearStall() const
+	\brief Clears the halt state of the endpoint.
+
+	\since Haiku R1
+*/
+
+//! @}
+

@@ -13,12 +13,14 @@
 /*!
 	\file Joystick.h
 	\ingroup device
+	\ingroup libdevice
 	\brief BJoystick class definition.
 */
 
 /*!
-	\class Joystick
+	\class BJoystick
 	\ingroup device
+	\ingroup libdevice
 	\brief Class that provides an interface to joysticks and game controllers.
 
 	This class allows application to access the data from game controllers of
