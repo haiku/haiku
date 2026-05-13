@@ -945,7 +945,7 @@ BPoseView::ExtendSelection() const
 		return false;
 
 	uint32 mods = modifiers();
-	return (mods & B_COMMAND_KEY) != 0 || (mods & B_SHIFT_KEY) != 0;
+	return fTrackMouseUp && ((mods & B_COMMAND_KEY) != 0 || (mods & B_SHIFT_KEY) != 0);
 }
 
 
