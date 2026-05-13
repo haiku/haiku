@@ -37,7 +37,7 @@ switch $(HOST_PLATFORM) {
 SubDirCcFlags -Wno-sign-compare -Wno-missing-prototypes ;
 
 SubDirCcFlags $(HOST_PIC_CCFLAGS) ;
-SubDirC++Flags $(HOST_PIC_C++FLAGS) ;
+SubDirC++Flags $(HOST_PIC_C++FLAGS) -std=gnu++11 ;
 
 
 # libsolv

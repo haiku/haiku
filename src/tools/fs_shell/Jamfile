@@ -16,6 +16,8 @@ DEFINES += FS_SHELL=1 ;
 # prevent inclusion of HaikuBuildCompatibility.h and _BSD_SOURCE headers
 DEFINES += HAIKU_BUILD_COMPATIBILITY_H __STRICT_ANSI__ ;
 
+SubDirC++Flags -std=c++11 ;
+
 # platform specific sources/libraries
 local fsShellCommandSources ;
 local externalCommandsSources ;

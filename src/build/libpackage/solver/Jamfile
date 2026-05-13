@@ -4,6 +4,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs libsolv ] : true ;
 
 UsePrivateHeaders shared ;
 
+SubDirC++Flags -std=gnu++11 ;
+
 USES_BE_API on libpackage-add-on-libsolv_build.so = true ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
