@@ -44,7 +44,7 @@
 #define PATH_MAX				(1024)
 #define PIPE_BUF				(4 * 1024)
 #define PIPE_MAX				(512)
-#define PTHREAD_KEYS_MAX		(256)
+#define PTHREAD_KEYS_MAX		(512)
 #define PTHREAD_STACK_MIN		(2 * PAGESIZE)
 #define PTHREAD_DESTRUCTOR_ITERATIONS	(4)
 #define SSIZE_MAX		  		__HAIKU_SADDR_MAX
