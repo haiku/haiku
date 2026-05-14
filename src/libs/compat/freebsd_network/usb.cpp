@@ -545,6 +545,13 @@ usbd_xfer_get_frame(struct usb_xfer* xfer, usb_frcount_t frindex)
 }
 
 
+extern "C" void *
+usbd_xfer_get_frame_buffer(struct usb_xfer *xfer, usb_frcount_t frindex)
+{
+	return usbd_xfer_get_frame(xfer, frindex)->buffer;
+}
+
+
 extern "C" void
 usbd_frame_zero(struct usb_page_cache* cache,
 	usb_frlength_t offset, usb_frlength_t len)

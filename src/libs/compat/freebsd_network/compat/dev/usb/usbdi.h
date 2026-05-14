@@ -391,6 +391,7 @@ void	usbd_xfer_set_priv(struct usb_xfer* xfer, void* ptr);
 uint8_t	usbd_xfer_state(struct usb_xfer *xfer);
 usb_frlength_t usbd_xfer_max_len(struct usb_xfer *xfer);
 struct usb_page_cache *usbd_xfer_get_frame(struct usb_xfer *, usb_frcount_t);
+void*	usbd_xfer_get_frame_buffer(struct usb_xfer *xfer, usb_frcount_t frindex);
 void	usbd_xfer_set_frames(struct usb_xfer *xfer, usb_frcount_t n);
 void	usbd_xfer_set_frame_data(struct usb_xfer *xfer, usb_frcount_t frindex,
 		void *ptr, usb_frlength_t len);
