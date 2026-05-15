@@ -654,6 +654,8 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 	bool dragging = false;
 	if (!direct && view->Window() != NULL && view->Window()->CurrentMessage() != NULL)
 		dragging = view->Window()->CurrentMessage()->what == kMsgMouseDragged;
+	bool drawOutlines = view->WidgetTextOutline() && !selected && (direct || dragging);
+	bool drawCut = clipboardMode == kMoveSelectionTo;
 
 	if (selected) {
 		if (dragging) {
@@ -681,7 +683,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 			drawView->SetHighUIColor(view->HighUIColor());
 	}
 
-	if (dragging || (direct && clipboardMode == kMoveSelectionTo)) {
+	if (drawOutlines || dragging || (direct && drawCut)) {
 		drawView->SetDrawingMode(B_OP_ALPHA);
 		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 	} else {
@@ -696,7 +698,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 	const char* fittingText = fText->FittingText(view);
 
 	// Draw text outline if enabled unless selected or column resizing.
-	if (view->WidgetTextOutline() && !selected && (direct || dragging)) {
+	if (drawOutlines) {
 		// draw a halo around the text by using the "false bold"
 		// feature for text rendering. Either black or white is used for
 		// the glow (whatever acts as contrast) with a some alpha value,
