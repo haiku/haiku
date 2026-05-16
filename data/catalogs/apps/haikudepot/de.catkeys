@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-HaikuDepot	3945138144
+1	german	x-vnd.Haiku-HaikuDepot	2108618135
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
+User ratings loading…	PackageInfoView		Bewertungen werden geladen …
 Available packages	MainWindow		Verfügbare Pakete
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
 An unexpected error has been sent from the server [%li]	ServerHelper		Der Server hat einen unerwarteten Fehler gesendet [%li]
@@ -51,6 +52,7 @@ All packages	PackageListView		Alle Pakete
 Send	RatePackageWindow		Senden
 Creating package list…	FeaturedPackagesView		Erzeuge Paketliste…
 Start package daemon	App		Paket-Daemon starten
+Changelog loading…	PackageInfoView		Änderungsprotokoll wird geladen …
 There are problems in the supplied data:	UserLoginWindow		Es gibt Probleme mit den eingegebenen Daten:
 Desktop and non-desktop packages	MainWindow		Desktop und nicht-Desktop Pakete
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		'%Nickname%' hat keinen Nutzungsbedingungen zugestimmt.
@@ -138,6 +140,7 @@ Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisiere Icons
 No, quit	App		Nein, Beenden
 Show	MainWindow		Anzeigen
+No contents available.	PackageInfoView		Paketinhalt nicht verfügbar.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Diese Anwendung schreibt und liest einige Arbeitsdateien auf diesem Computer, um richtig zu funktionieren. Eine Testdatei konnte jedoch nicht nach [%TestFilePath%] geschrieben werden. Bitte prüfen, ob es Probleme mit der lokalen Festplatte gibt oder ob für diesen Ordner nötige Schreibrechte fehlen. Dieses Problem kann zwar ignoriert werden, allerdings wird die Anwendung dann nur eingeschränkt funktionieren.
 Settings…	MainWindow		Einstellungen …
 <Package contents not available for remote packages>	PackageContentsView		<Der Inhalt kann nur für bereits heruntergeladene Pakete angezeigt werden>

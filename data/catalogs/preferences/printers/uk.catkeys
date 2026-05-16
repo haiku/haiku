@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Пробна сторінка
-Remove	PrintersWindow		Вилучити
+Remove	PrintersWindow		Прибрати
 Red	TestPageView		Червоний
 Default Printer	PrinterListView		Принтер за замовчуванням
 <pick one>	AddPrinterDialog		<виберіть>
@@ -21,12 +21,12 @@ Print jobs for %printer_name%	PrintersWindow		Завдання на друк %pr
 Add printer	AddPrinterDialog		Додати принтер
 Printers	PrintersWindow		Принтери
 No printer found!	TransportMenu		Принтер не знайдено!
-Add…	PrintersWindow		Додати …
+Add…	PrintersWindow		Додати…
 Magenta	TestPageView		Пурпурний
 Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
 Add	AddPrinterDialog		Додати
 Print jobs: No printer selected	PrintersWindow		Завдання на друк: Принтер не вибрано
-Printer name:	AddPrinterDialog		Ім'я принтера:
+Printer name:	AddPrinterDialog		Назва принтера:
 Yellow	TestPageView		Жовтий
 Black	TestPageView		Чорний
 Printer type:	AddPrinterDialog		Тип принтера:
@@ -35,7 +35,7 @@ Printers	System name		Printers
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Green	TestPageView		Зелений
 Print test page	PrintersWindow		Тестова сторінка
-Restart job	PrintersWindow		Перезапустити завдання
+Restart job	PrintersWindow		Перезапустити
 Driver: %driver%	PrinterListView		Драйвер: %driver%
-Cancel job	PrintersWindow		Скасувати завдання
+Cancel job	PrintersWindow		Скасувати
 %.2f KB	JobListView		%.2f KБ

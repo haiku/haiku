@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2732592561
+1	german	x-vnd.Haiku-libtracker	3291400395
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -32,7 +32,6 @@ Value	AttributesView		Wert
 Information	InfoWindow		Informationen
 Error emptying Trash	FSUtils		Fehler beim Leeren des Papierkorbs
 Opens with:	InfoWindow		Wird geöffnet mit:
-You cannot copy or move the Printers directory.	FSUtils		Der Ordner 'Printers' kann nicht kopiert oder verschoben werden.
 Size	QueryPoseView		Größe
 Disk mount	TrackerSettingsWindow		Datenträger einhängen
 Type	AttributesView		Typ
@@ -253,7 +252,6 @@ Favorites	FilePanelPriv		Favoriten
 Point	AttributesView		Punkt
 You can't move or copy items to read-only volumes.	PoseView		Auf schreibgeschützte Datenträger kann nichts verschoben oder kopiert werden.
 home	B_USER_DIRECTORY		Home
-You cannot create a link to the Trash directory.	FSUtils		Auf den Trash-Ordner kann keine Verknüpfung erstellt werden.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Trackers 'Neu'-Vorlagen
 Disk mounting during boot	AutoMounterSettings		Einhängen beim Systemstart
 Don't automount	AutoMounterSettings		Nicht automatisch einhängen
@@ -315,7 +313,6 @@ Would you like to find some other suitable application?	FSUtils		Soll eine ander
 Recent folders	FavoritesMenu		Letzte Ordner
 Signed memory size	AttributesView		Vorzeichenbehaftete Speichergröße
 The specified name is illegal. Please choose another name.	FilePanelPriv		Der angegebene Name ist nicht gültig. Bitte einen anderen wählen.
-You cannot copy or move the Trash directory.	FSUtils		Der Ordner 'Trash' kann nicht kopiert oder verschoben werden.
 of %items	StatusWindow		von %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fehler beim Kopieren der Datei \"%name\":\n\t%error\n\nSoll fortgefahren werden?
 less than	FindPanel		kleiner als

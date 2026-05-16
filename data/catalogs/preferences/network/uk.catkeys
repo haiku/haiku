@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Network	3807978621
+1	ukrainian	x-vnd.Haiku-Network	3970246430
 Ethernet device	InterfaceListItem		Провідний пристрій (Ethernet)
 Link speed:	IntefaceView		Швидкість з'єднання:
 WPA	WPA protected network		WPA
@@ -10,6 +10,7 @@ Other	NetworkWindow		Інший
 Sent:	IntefaceView		Відправлено:
 Gateway:	IntefaceAddressView		Шлюз:
 The netmask defines your local network	IntefaceAddressView		Маска підмережі визначає Вашу локальну мережу
+unknown	IntefaceView		невідомо
 Your IP address	IntefaceAddressView		Ваша IP-адреса
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		IP-адреса:

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-softwareupdater	3893717149
+1	hungarian	x-vnd.haiku-softwareupdater	2012285635
 Updating version	SoftwareUpdaterWindow	List item text	Jelenlegi:
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Kattints ide {0, plural, one{# friss csomag} other{# friss csomag}} telepítéséhez.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Eltávolítandó csomagok
@@ -19,6 +19,7 @@ Packages to be updated	SoftwareUpdaterWindow	List super item label	Frissítendő
 to	SoftwareUpdaterWindow	List item text	, új:
 Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		Kattintson ide a %appname% futtatásához. Néhány probléma megoldásához frissítésre van szükség.
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Frissítés megszakítása…
+Automatically clean up old install states	SoftwareUpdaterWindow		Korábbi telepítési állapotok automatikus eltávolítása
 Contacting software repositories to check for package updates.	CheckManager		Kapcsolódás a tárolókhoz frissítések kereséséhez.
 Available updates found	CheckManager		Frissítések érhetők el
 from repository	SoftwareUpdaterWindow	List item text	tároló:

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2732592561
+1	japanese	x-vnd.Haiku-libtracker	3291400395
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -32,7 +32,6 @@ Value	AttributesView		値
 Information	InfoWindow		情報
 Error emptying Trash	FSUtils		ごみ箱を空にしている際にエラーが発生しました。
 Opens with:	InfoWindow		アプリケーション:
-You cannot copy or move the Printers directory.	FSUtils		プリンターディレクトリのコピーや移動はできません。
 Size	QueryPoseView		サイズ
 Disk mount	TrackerSettingsWindow		ディスクのマウント
 Type	AttributesView		型
@@ -253,7 +252,6 @@ Favorites	FilePanelPriv		お気に入り
 Point	AttributesView		点
 You can't move or copy items to read-only volumes.	PoseView		読み取り専用のボリュームへ移動やコピーはできません。
 home	B_USER_DIRECTORY		ホーム
-You cannot create a link to the Trash directory.	FSUtils		ごみ箱へのリンクは作成できません。
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		新規 Tracker テンプレート
 Disk mounting during boot	AutoMounterSettings		起動時の設定
 Don't automount	AutoMounterSettings		自動マウントを使わない
@@ -315,7 +313,6 @@ Would you like to find some other suitable application?	FSUtils		他に適切な
 Recent folders	FavoritesMenu		最近使ったフォルダー
 Signed memory size	AttributesView		符号付きメモリサイズ
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
-You cannot copy or move the Trash directory.	FSUtils		ごみ箱のコピーや移動はできません。
 of %items	StatusWindow		/ %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" をコピー中にエラーが発生しました:\n\t%error\n\nそれでも続けますか?
 less than	FindPanel		より小さい

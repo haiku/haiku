@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-softwareupdater	3021634705
+1	turkish	x-vnd.haiku-softwareupdater	2012285635
 Updating version	SoftwareUpdaterWindow	List item text	Güncellenen sürüm:
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		{0, plural, other{# güncellenmiş paketi}} kurmak için buraya tıklayın.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Kaldırılacak paketler
@@ -8,6 +8,7 @@ There were no updates found.	CheckManager		Güncelleme bulunamadı.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Güncellemeler tamamlanmadı, çıkmak istediğinizden emin misiniz?
 Updates found	SoftwareUpdaterWindow		Güncellemeler bulundu
 Update now	SoftwareUpdaterWindow		Şimdi güncelle
+Settings	SoftwareUpdaterWindow		Ayarlar
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Hiçbir şey olmasa bile bir şeyler oldu ve bilgisayarınızı yeniden başlatamadık.
 OK	UpdateManager		Tamam
 Unrecognized argument	SoftwareUpdaterApp	Error message	Tanımlanamayan değişken
@@ -18,6 +19,7 @@ Packages to be updated	SoftwareUpdaterWindow	List super item label	Güncellenece
 to	SoftwareUpdaterWindow	List item text	 →
 Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		%appname% uygulamasını çalıştırmak için buraya tıklayın. Bazı güncellemelerin seçilebilmesi için bir sorun çözümü gerekecektir.
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Güncelleme işlemi durduruluyor…
+Automatically clean up old install states	SoftwareUpdaterWindow		Eski kurulum kalıplarını kendiliğinden temizle
 Contacting software repositories to check for package updates.	CheckManager		Paket güncellemeleri için yazılım depolarıyla iletişim kuruluyor…
 Available updates found	CheckManager		Yeni güncellemeler bulundu
 from repository	SoftwareUpdaterWindow	List item text	şu depodan:
@@ -55,6 +57,7 @@ Update	SoftwareUpdaterWindow	Alert button label	Güncelle
 Updates did not complete	UpdateAction		Güncellemeler tamamlanmadı
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Açık depolar
 Invalid update type, cannot continue with updates	UpdateAction		Geçersiz güncelleme türü, güncellemeler sürdürülemiyor
+Settings…	SoftwareUpdaterWindow		Ayarlar…
 Uninstalling version	SoftwareUpdaterWindow	List item text	Kaldırılan sürüm
 %i of %i	UpdateManager	Do not translate %i	%i/%i
 Quit	SoftwareUpdaterWindow		Çık

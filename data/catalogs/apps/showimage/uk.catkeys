@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	3394555425
+1	ukrainian	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		ShowImage
 Page setup…	Menus		Налаштування сторінки…
 Previous file	Menus		Попередній файл
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Висота:
 Next file	Menus		Наступний файл
 Slide show	Menus		Показ слайдів
 Original size	Menus		Оригінальний розмір
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		Документ «%filename%» було змінено. Ви хочете закрити документ?
 Width:	PrintOptionsWindow		Ширина:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Змінити розмір (в 1/72 дюйма):
 Zoom factor in %:	PrintOptionsWindow		Масштаб зображення %:
@@ -46,12 +47,13 @@ Clear selection	Menus		Зняти виділення
 Rotate clockwise	Menus		Повернути за годинником
 Open with…	Menus		Відкрити з…
 Rotate counterclockwise	Menus		Повернути проти годинника
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		Документ «%filename%» (сторінка %number%) було змінено. Ви хочете закрити документ?
 Previous page	Menus		Попередня сторінка
 Fit to window	Menus		Припасувати до вікна
 Go to page	Menus		Перейти до сторінки
 Browse	Menus		Перегляд
 Progress monitor	ProgressWindow		Монітор виконання
-Edit	Menus		Редагувати
+Edit	Menus		Коректив
 Move to Trash	Menus		Перемістити до смітника
 Use as background…	Menus		Використати як фон…
 Open…	Menus		Відкрити…

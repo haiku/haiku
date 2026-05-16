@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3945138144
+1	hungarian	x-vnd.Haiku-HaikuDepot	2108618135
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
+User ratings loading…	PackageInfoView		Felhasználói értékelések betöltése…
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 An unexpected error has been sent from the server [%li]	ServerHelper		A kiszolgáló váratlan hibaüzenetet küldött [%li]
@@ -51,6 +52,7 @@ All packages	PackageListView		Minden csomag
 Send	RatePackageWindow		Küldés
 Creating package list…	FeaturedPackagesView		Csomaglista készítése…
 Start package daemon	App		Csomag démon indítása
+Changelog loading…	PackageInfoView		Változásnapló betöltése…
 There are problems in the supplied data:	UserLoginWindow		Hibás adatok lettek megadva:
 Desktop and non-desktop packages	MainWindow		Asztali és nem asztali csomagok
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		A felhasználó (%Nickname%) nem fogadta el a felhasználási feltételeket.
@@ -138,6 +140,7 @@ Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
 No, quit	App		Nem, kilépés.
 Show	MainWindow		Megjelenítés
+No contents available.	PackageInfoView		Tartalom nem érhető el.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ezen alkalmazás működéséhez a számítógépen szükséges néhány fájt írása/olvasása. Úgy tűnik, hogy problémák vannak egy tesztfájl írásával [%TestFilePath%] útvonalon. Ellenőrizd, hogy a helyi lemezzel vagy az engedélyekkel kapcsolatban nincsenek-e olyan problémák, amelyek megakadályozhatják, hogy az alkalmazás fájlokat írjon az adott mappába. Tudomásul veheted ezt a problémát és folytathatod, de egyes funkciók nem lesznek elérhetők.
 Settings…	MainWindow		Beállítások…
 <Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>

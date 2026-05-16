@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	734452449
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1293260283
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -32,7 +32,6 @@ Value	AttributesView		Τιμή
 Information	InfoWindow		Πληροφορίες
 Error emptying Trash	FSUtils		Σφάλμα αδειάσματος Κάδου απορριμμάτων
 Opens with:	InfoWindow		Άνοιγμα με:
-You cannot copy or move the Printers directory.	FSUtils		Δεν μπορείτε να αντιγράψετε ή να μετακινήσετε τον κατάλογο Εκτυπωτές.
 Size	QueryPoseView		Μέγεθος
 Disk mount	TrackerSettingsWindow		Προσάρτηση δίσκου
 Type	AttributesView		Τύπος
@@ -253,7 +252,6 @@ Favorites	FilePanelPriv		Αγαπημένα
 Point	AttributesView		Σημείο
 You can't move or copy items to read-only volumes.	PoseView		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε αντικείμενα σε τόμους που είναι μόνο για ανάγνωση.
 home	B_USER_DIRECTORY		Αρχικός φάκελος
-You cannot create a link to the Trash directory.	FSUtils		Δεν μπορείτε να δημιουργήσετε σύνδεσμο προς τον Κάδο απορριμμάτων.
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Νέα πρότυπα Ιχνηλάτη
 Disk mounting during boot	AutoMounterSettings		Προσάρτηση δίσκου κατά την εκκίνηση
 Don't automount	AutoMounterSettings		Να μη γίνει αυτόματη προσάρτηση
@@ -315,7 +313,6 @@ Would you like to find some other suitable application?	FSUtils		Θα θέλετ
 Recent folders	FavoritesMenu		Πρόσφατοι φάκελοι
 Signed memory size	AttributesView		Μέγεθος μνήμης με πρόσημο
 The specified name is illegal. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα είναι μη αποδεκτό. Παρακαλώ διαλέξτε άλλο όνομα.
-You cannot copy or move the Trash directory.	FSUtils		Δεν μπορείτε να αντιγράψετε ή να μετακινήσετε τον κατάλογο Κάδος απορριμμάτων.
 of %items	StatusWindow		από %items
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Σφάλμα αντιγραφής του αρχείου \"%name\":\n\t%error\n\nΘα θέλατε να συνεχίσετε;
 less than	FindPanel		λιγότερο από

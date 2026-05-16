@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3945138144
+1	japanese	x-vnd.Haiku-HaikuDepot	2108618135
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
+User ratings loading…	PackageInfoView		ユーザー評価読み込み中…
 Available packages	MainWindow		使用可能なパッケージ
-It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
+It was not possible to create the new user.	UserLoginWindow		新規ユーザーを作成できません。
 An unexpected error has been sent from the server [%li]	ServerHelper		サーバーから予期しないエラーが送信されました [%li]
 Fetching changelog for package	PopulatePkgChangelogFromServerProcess		パッケージの変更記録の取得中
 Create account	UserLoginWindow		アカウントの作成
@@ -51,6 +52,7 @@ All packages	PackageListView		すべてのパッケージ
 Send	RatePackageWindow		送信する
 Creating package list…	FeaturedPackagesView		パッケージリストを作成中…
 Start package daemon	App		パッケージデーモンの起動
+Changelog loading…	PackageInfoView		変更履歴読み込み中…
 There are problems in the supplied data:	UserLoginWindow		入力されたデータに問題があります:
 Desktop and non-desktop packages	MainWindow		デスクトップと非デスクトップパッケージ
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		ユーザー '%Nickname%' は利用条件に同意していません。
@@ -65,7 +67,7 @@ Close	UserLoginWindow		閉じる
 The email is malformed.	UserLoginWindow		メールアドレスの形式が正しくありません。
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
 View the usage conditions	UserLoginWindow		使用条件を見る
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新しいユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新規ユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		利用条件が同意されました
 Size	PackageListView		サイズ
 All categories	FilterView		すべての分類
@@ -107,7 +109,7 @@ The nickname is malformed. The nickname may only contain digits and lower case l
 Authentication failed	UserLoginWindow		認証に失敗しました
 Captcha error	UserLoginWindow		キャプチャエラー
 Manage repositories…	MainWindow		リポジトリの管理...
-The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		ニックネームはユニークである必要がありますが、入力されたニックネームはすでに取られています。別のニックネームを選んでください。
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		ニックネームはユニークである必要がありますが、入力されたニックネームはすでに使用されています。別のニックネームを選んでください。
 OK	UserUsageConditions		OK
 Input validation	UserLoginWindow		入力検証
 Log in…	MainWindow		ログイン...
@@ -138,6 +140,7 @@ Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 No, quit	App		いいえ、終了します
 Show	MainWindow		表示
+No contents available.	PackageInfoView		コンテンツは利用できません。
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		このアプリケーションは動作するためにあなたのコンピューター上のいくつかの作業ファイルを読み書きします。テストファイルの [%TestFilePath%] への書き込みに問題があるようです。ローカルディスクに問題がないことや、そのディレクトリにアプリケーションが書込みできない権限になっているかをチェックしてください。この問題を認識して続行することもできますが、いくつかの機能が無効となるかもしれません。
 Settings…	MainWindow		設定...
 <Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
@@ -147,14 +150,14 @@ Local	LocalPkgDataLoadProcess		ローカル
 Package changes	PackageResult	Window title	パッケージの変更
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		このコンピューターから匿名の使用情報を HaikuDepotServer システムに送信することを受け入れますか?あとから、\"設定\" ウィンドウで選択を変えられます。
 Installed packages	MainWindow		インストール済パッケージ
-User rating	RatePackageWindow		ユーザーによる評価
+User rating	RatePackageWindow		ユーザー評価
 Date	PackageListView		日付
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		パスワードは %MinPasswordLength% 文字以上である必要があります。%MinPasswordUppercaseChar% 個の文字は大文字で、%MinPasswordDigitsChar% 個の文字は数字である必要があります。
-An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		新しいユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		新規ユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
 Opening \"%DeskbarLink%\"	OpenPackageProcess		\"%DeskbarLink%\" を開く
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
-It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		新しいユーザーを作成するために必要なキャプチャの取得のためのサーバーとの通信ができませんでした。
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		新規ユーザーを作成するために必要なキャプチャの取得のためのサーバーとの通信ができませんでした。
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		キャプチャへの返答が間違っています。新しいキャプチャが生成されます、もう一度試してください。
 -	no package publish		-
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		パスワードは、最小8文字以上の長さで、少なくとも2つの数字と1つの英大文字を含む必要があります。

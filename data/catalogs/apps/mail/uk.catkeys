@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	1095898962
+1	ukrainian	x-vnd.Be-MAIL	2927169578
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Перенос тексту:
 Show icons & labels	Mail		Показати значки & надписи
@@ -37,6 +37,7 @@ Previous message	Mail		Попереднє повідомлення
 (Address unavailable)	Mail		(Адреса недоступна)
 Mail	System name		Mail
 Copy link location	Mail		Копіювати адресу посилання
+%appname% settings	Mail		Налаштування %appname%
 Add attachment…	Mail		Додати вкладення…
 Next	Mail		Наступне
 Attachments:	Mail		Вкладення:
@@ -44,6 +45,7 @@ Show icons only	Mail		Показати тільки значки
 Subject:	Mail		Тема:
 OK	Mail		ОК
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+All people	AddressTextControl		Всі адресати
 Quit	Mail		Вийти
 Title:	Mail		Заголовок:
 Account from mail	Mail		Обліковий запис з листа
@@ -68,6 +70,7 @@ Cancel	Mail		Скасувати
 Off	Mail		Вимкнути
 Signature:	Mail		Підпис:
 Forward without attachments	Mail		Переслати без вкладень
+None	Settings		Пусто
 queries	B_USER_DIRECTORY/mail/queries		Запити
 View	Mail		Режим перегляду
 Signatures	Mail		Підписи
@@ -149,7 +152,7 @@ Edit signatures…	Mail		Редагувати підписи…
 User interface	Mail		Інтерфейс користувача
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/повтора.
 Remove attachment	Mail		Прибрати вкладення
-Edit	Mail		Редагувати
+Edit	Mail		Коректив
 Page setup…	Mail		Настройка сторінки…
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.
 Beginner	Mail		Початківець

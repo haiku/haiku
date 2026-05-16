@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	3212551798
+1	russian	x-vnd.Haiku-StyledEdit	2882508421
 Document statistics	Statistics		Статистика документа
 Cut	Menus		Вырезать
 Center	Menus		По центру
@@ -13,6 +13,7 @@ Search backwards	FindandReplaceWindow		Искать снизу вверх
 Find again	Menus		Найти далее
 Read-only	StatusView		Только чтение
 Save	Menus		Сохранить
+Untitled %d	Window title		Без названия %d
 Cancel	QuitAlert		Отмена
 Copy	Menus		Копировать
 Reload	NodeMonitorAlerts		Перезагрузить

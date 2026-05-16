@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3302130305
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3799951777
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні умов використання
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -130,6 +130,7 @@ Fetching screenshot	CacheScreenshotProcess		Отримую знімок екра
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Виникла помилка мережевого транспорту при взаємодії з серверною системою: %s
 Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізація піктограм
+No, quit	App		Ні, вийти
 Show	MainWindow		Показати
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ця програма записує та зчитує деякі робочі файли на Вашому комп’ютері, щоб функціонувати. Здається, що запис тестового файлу до [%TestFilePath%] викликає проблеми. Переконайтеся, що все гаразд з Вашим локальним диском або дозволами, які могли б перешкодити цій програмі записувати файли в згадану папку. Ви можете визнати цю проблему та продовжити, але деякі функції можуть бути відключені.
 Settings…	MainWindow		Налаштування…

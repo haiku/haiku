@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Devices	911816421
+1	ukrainian	x-vnd.Haiku-Devices	1667967532
 ACPI bus	DevicesView		Шина ACPI
 Encryption controller	Device		Контроллер шифрування
 Devices	System name		Devices
@@ -22,7 +22,7 @@ Unknown device	DevicesView		Невідомий пристрій
 Unknown	DevicePCI		Невідомий
 ACPI node '%1'	DeviceACPI		Вузол ACPI '%1'
 Optical Drive	DeviceSCSI		Оптичний привід
-Name	PropertyList		Ім'я
+Name	PropertyList		Назва
 Manufacturer	DeviceSCSI		Виробник
 Device name	Device		Назва пристрою
 Satellite communications controller	Device		Контролер супутникового зв’язку
@@ -48,7 +48,8 @@ Device name	DeviceACPI		Назва пристрою
 Card Reader	DeviceSCSI		Кардрідер
 Display controller	Device		Контролер дисплея
 ACPI Button '%1'	DeviceACPI		Кнопка ACPI '%1'
-ACPI <unknown>	DeviceACPI		ACPI <невідомий>
+Bus	DevicesView		Шина
+ACPI <unknown>	DeviceACPI		ACPI <невідомо>
 Device name	DevicePCI		Назва пристрою
 Disk Drive	DeviceSCSI		Дисковий привід
 Report compatibility	DevicesView		Звіт про сумісність
@@ -80,4 +81,4 @@ Network controller	Device		Мережевий контролер
 Driver used	Device		Використовує драйвер
 Communication controller	Device		Контролер зв’язку
 ACPI bus	Device		Шина ACPI
-unknown	Device		невідомий
+unknown	Device		невідомо

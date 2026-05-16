@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.support	3450110595
+1	ukrainian	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Заголовок з позначками
 32 bit HLS	MediaString		32-бітовий HLS
 Recording	MediaString		Запис
@@ -46,6 +46,7 @@ Right	MediaString		Правий
 System mixer	MediaString		Системний мікшер
 Physical output	MediaString		Фізичний вихід
 Top-Back-center	MediaString		Зверху-Тил-центр
+(unknown video orientation)	MediaString		(орієнтація відео невідома)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Зверху вниз, зліва направо
 (unknown run mode)	MediaString		(невстановлений режим роботи)

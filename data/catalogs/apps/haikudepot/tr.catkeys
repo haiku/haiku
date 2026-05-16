@@ -1,5 +1,6 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	3945138144
+1	turkish	x-vnd.Haiku-HaikuDepot	2108618135
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
+User ratings loading…	PackageInfoView		Kullanıcı derecelendirmeleri yükleniyor…
 Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 An unexpected error has been sent from the server [%li]	ServerHelper		Sunucudan beklenmeyen bir hata alındı [%li]
@@ -51,6 +52,7 @@ All packages	PackageListView		Tüm paketler
 Send	RatePackageWindow		Gönder
 Creating package list…	FeaturedPackagesView		Paket listesi oluşturuluyor…
 Start package daemon	App		Paket hizmetini başlat
+Changelog loading…	PackageInfoView		Değişiklik günlüğü yükleniyor…
 There are problems in the supplied data:	UserLoginWindow		Girilen veride sorunlar var:
 Desktop and non-desktop packages	MainWindow		Masaüstü ve masaüstü dışı paketler
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		“%Nickname%” kullanıcısı herhangi bir kullanım koşulunu kabul etmedi.
@@ -138,6 +140,7 @@ Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşzamanlanıyor…
 No, quit	App		Hayır, çık
 Show	MainWindow		Göster
+No contents available.	PackageInfoView		Kullanılabilir içerik yok.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Bu uygulama çalışabilmek için bilgisayarınızda dosya işlemleri yapmaya gereksinim duyar. Görünüşe göre [%TestFilePath%] konumuna bir sınama dosyası yazımında sorunlar var. Lütfen bu uygulamanın dosya yazmasına engel olabilecek disk veya dosya izinleri sıkıntıları olup olmadığını denetleyin. Bu sorunu göz ardı edip işlemi sürdürebilirsiniz; ancak bazı işlevler devre dışı kalabilir.
 Settings…	MainWindow		Ayarlar…
 <Package contents not available for remote packages>	PackageContentsView		<Uzak konum paketleri için paket içeriği kullanılamıyor>

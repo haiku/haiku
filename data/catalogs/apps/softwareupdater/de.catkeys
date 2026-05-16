@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-softwareupdater	3893717149
+1	german	x-vnd.haiku-softwareupdater	2012285635
 Updating version	SoftwareUpdaterWindow	List item text	Aktualisieren der Version
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Hier klicken, um {0, plural, one{# aktualisiertes Paket} other{# aktualisierte Pakete}} zu installieren.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Zu deinstallierende Pakete
@@ -19,6 +19,7 @@ Packages to be updated	SoftwareUpdaterWindow	List super item label	Pakete werden
 to	SoftwareUpdaterWindow	List item text	auf
 Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		Hier klicken, um %appname% zu starten. Für einige Aktualisierungen muss eine Problemlösung gewählt werden.
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Versuche die Aktualisierungen abzubrechen …
+Automatically clean up old install states	SoftwareUpdaterWindow		Alte Installationsdaten automatisch entfernen.
 Contacting software repositories to check for package updates.	CheckManager		Um nach Aktualisierungen zu suchen, wird eine Verbindung mit den Paketquellen hergestellt.
 Available updates found	CheckManager		Aktualisierungen gefunden
 from repository	SoftwareUpdaterWindow	List item text	von Paketquelle

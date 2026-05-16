@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3302130305
+1	russian	x-vnd.Haiku-HaikuDepot	3799951777
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблемы при загрузке Условий использования
 Available packages	MainWindow		Доступные пакеты
 It was not possible to create the new user.	UserLoginWindow		Не удалось создать нового пользователя.
@@ -130,6 +130,7 @@ Fetching screenshot	CacheScreenshotProcess		Получение снимков э
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Произошла ошибка при обмене данными с сервером HaikuDepot: %s
 Rating	PackageListView		Оценка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронизация значков
+No, quit	App		Нет, выйти
 Show	MainWindow		Показывать
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Во время работы это приложение записывает и читает некоторые рабочие файлы на вашем компьютере. Похоже есть проблема с записью тестового файла в папку [%TestFilePath%]. Проверьте нет ли каких-то проблем с локальным диском или правами доступа к этой папке. Вы можете продолжить пользоваться этим приложением, но часть функционала будет отключена.
 Settings…	MainWindow		Настройки…

@@ -1,5 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3945138144
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2108618135
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
+User ratings loading…	PackageInfoView		Es carreguen les valoracions dels usuaris...
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
 An unexpected error has been sent from the server [%li]	ServerHelper		S'ha enviat un error inesperat des del servidor [%li]
@@ -51,6 +52,7 @@ All packages	PackageListView		Tots els paquets
 Send	RatePackageWindow		Envia
 Creating package list…	FeaturedPackagesView		Es crea la llista de paquets...
 Start package daemon	App		Inicia el dimoni de paquets
+Changelog loading…	PackageInfoView		Es carrega el registre de canvis...
 There are problems in the supplied data:	UserLoginWindow		Hi ha problemes en les dades subministrades:
 Desktop and non-desktop packages	MainWindow		Paquets d'escriptori i no d'escriptori
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		L'usuari %Nickname% no ha acceptat cap condició d'ús.
@@ -138,6 +140,7 @@ Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 No, quit	App		No, tanca't
 Show	MainWindow		Mostra...
+No contents available.	PackageInfoView		No hi ha contingut disponible.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aquesta aplicació escriu i llegeix alguns fitxers de treball de l'ordinador per tal de funcionar. Sembla que hi ha problemes per escriure un fitxer de prova a [%TestFilePath%]. Comproveu que no hi ha cap problema amb el disc local o els permisos que pugui evitar que aquesta aplicació escrigui fitxers a la ubicació del directori. Podeu optar per reconèixer aquest problema i continuar, però és possible que alguna funcionalitat estigui inhabilitada.
 Settings…	MainWindow		Paràmetres...
 <Package contents not available for remote packages>	PackageContentsView		<El contingut del paquet no està disponible per als paquets remots>
