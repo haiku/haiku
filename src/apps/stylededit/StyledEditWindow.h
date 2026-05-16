@@ -107,6 +107,7 @@ private:
 			BMessage*			fPrintSettings;
 			BMessage*			fSaveMessage;
 
+			BMenu*				fStyleMenu;
 			BMenu*				fFontMenu;
 			BMenu*				fFontSizeMenu;
 			BMenu*				fFontColorMenu;
