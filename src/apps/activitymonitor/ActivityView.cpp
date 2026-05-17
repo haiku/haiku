@@ -140,6 +140,7 @@ public:
 
 	virtual	BView*			View();
 
+	virtual BSize			BaseMinSize();
 	virtual	BSize			BasePreferredSize();
 
 private:
@@ -451,10 +452,16 @@ ActivityView::HistoryLayoutItem::View()
 
 
 BSize
+ActivityView::HistoryLayoutItem::BaseMinSize()
+{
+	return BSize(B_SIZE_UNSET, be_control_look->DefaultLabelSpacing() * 5.0f);
+}
+
+
+BSize
 ActivityView::HistoryLayoutItem::BasePreferredSize()
 {
-	BSize size(BaseMaxSize());
-	return size;
+	return BSize(B_SIZE_UNSET, be_control_look->DefaultLabelSpacing() * 8.0f);
 }
 
 
@@ -510,7 +517,7 @@ ActivityView::LegendLayoutItem::BaseMinSize()
 {
 	// TODO: Cache the info. Might be too expensive for this call.
 	BSize size;
-	size.width = 80;
+	size.width = fParent->StringWidth("W") * 16;
 	size.height = fParent->_LegendHeight();
 
 	return size;
