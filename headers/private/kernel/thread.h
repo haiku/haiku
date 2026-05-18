@@ -411,6 +411,7 @@ static inline void
 thread_unpin_from_current_cpu(Thread* thread)
 {
 	thread->pinned_to_cpu--;
+	ASSERT(thread->pinned_to_cpu >= 0);
 }
 
 
