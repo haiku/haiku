@@ -126,7 +126,7 @@ CC_VERSION=`$CC -dumpversion`
 if [ ${CC_VERSION%%.*} -ge 10 ]; then
 	export CC="$CC -fcommon"
 fi
-if [ ${CC_VERSION%%.*} -ge 14 ]; then
+if [ ${CC_VERSION%%.*} -ge 13 ]; then
 	export CC="$CC -std=gnu89"
 fi
 
