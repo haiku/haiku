@@ -1328,6 +1328,8 @@ LegacyDevice::Control(void* _cookie, int32 op, void* buffer, size_t length)
 {
 	switch (op) {
 		case B_GET_DRIVER_FOR_DEVICE:
+			if (fDriver == NULL)
+				return ENODEV;
 			if (length != 0 && length <= strlen(fDriver->path))
 				return ERANGE;
 			return user_strlcpy(static_cast<char*>(buffer), fDriver->path, length);
