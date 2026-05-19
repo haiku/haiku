@@ -151,6 +151,7 @@ static bool sPreviousDprintfState;
 static volatile bool sHandOverKDL = false;
 static int32 sHandOverKDLToCPU = -1;
 static bool sCPUTrapped[SMP_MAX_CPUS];
+static int32 sCPUsTrapped = 0;
 
 
 // #pragma mark - DebugOutputFilter
@@ -829,6 +830,11 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 	print_kernel_debugger_message();
 
+	if (atomic_get(&sCPUsTrapped) != (smp_get_num_cpus() - 1)) {
+		kprintf("PANIC: %d/%d CPUs are not trapped in the kernel debugger!\n",
+			smp_get_num_cpus() - (sCPUsTrapped + 1), smp_get_num_cpus());
+	}
+
 	kprintf("Welcome to Kernel Debugging Land...\n");
 	kprintf("revision: %s\n", get_haiku_revision());
 
@@ -978,8 +984,20 @@ enter_kernel_debugger(int32 cpu, int32& previousCPU)
 		CPUSet cpuMask;
 		cpuMask.SetAll();
 		cpuMask.ClearBit(cpu);
-		smp_multicast_ici_interrupts_disabled(cpu, cpuMask, SMP_MSG_CPU_HALT, 0, 0,
-			0, NULL, SMP_MSG_FLAG_SYNC);
+		smp_multicast_ici_interrupts_disabled(cpu, cpuMask, SMP_MSG_CPU_HALT,
+			0, 0, 0, NULL, 0);
+
+		// We don't use a synchronous message in order to avoid hanging when
+		// other CPU(s) are stuck somewhere they won't notice ICIs.
+		bigtime_t timeout = system_time() + 1 * 1000 * 1000;
+		while (atomic_get(&sCPUsTrapped) < (smp_get_num_cpus() - 1)) {
+			cpu_pause();
+			if (system_time() >= timeout) {
+				// Just continue entering KDL. The main loop will print
+				// a message about the stuck CPUs.
+				break;
+			}
+		}
 	}
 
 	previousCPU = sDebuggerOnCPU;
@@ -1826,6 +1844,7 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 	arch_debug_save_registers(&sDebugRegisters[cpu]);
 
 	sCPUTrapped[cpu] = true;
+	atomic_add(&sCPUsTrapped, 1);
 
 	while (sInDebugger != 0) {
 		arch_debug_snooze(10000);
@@ -1841,6 +1860,7 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 	}
 
 	sCPUTrapped[cpu] = false;
+	atomic_add(&sCPUsTrapped, -1);
 }
 
 
