@@ -520,7 +520,7 @@ Team::~Team()
 	delete_owned_ports(this);
 	sem_delete_owned_sems(this);
 
-	DeleteUserTimers(false);
+	ASSERT(fUserTimers.IsEmpty());
 
 	fPendingSignals.Clear();
 

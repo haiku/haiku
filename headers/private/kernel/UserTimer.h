@@ -54,8 +54,6 @@ protected:
 	inline	void				UpdatePeriodicStartTime();
 	inline	void				CheckPeriodicOverrun(bigtime_t now);
 
-	inline	void				CancelTimer();
-
 protected:
 			int32				fID;
 			timer				fTimer;
@@ -64,11 +62,12 @@ protected:
 			bigtime_t			fInterval;
 			uint32				fOverrunCount;
 			bool				fScheduled;	// fTimer scheduled
-			int32				fSkip;
 };
 
 
 struct SystemTimeUserTimer : public UserTimer {
+								SystemTimeUserTimer();
+
 	virtual	void				Schedule(bigtime_t nextTime, bigtime_t interval,
 									uint32 flags, bigtime_t& _oldRemainingTime,
 									bigtime_t& _oldInterval);
@@ -78,9 +77,13 @@ struct SystemTimeUserTimer : public UserTimer {
 
 protected:
 	virtual	void				HandleTimer();
+			void				_HandleTimerLocked();
 
 			void				ScheduleKernelTimer(bigtime_t now,
 									bool checkPeriodicOverrun);
+
+protected:
+			seqlock				fLock;
 };
 
 
@@ -105,7 +108,7 @@ public:
 
 
 struct TeamTimeUserTimer : public UserTimer {
-								TeamTimeUserTimer(team_id teamID);
+								TeamTimeUserTimer(Team* team);
 								~TeamTimeUserTimer();
 
 	virtual	void				Schedule(bigtime_t nextTime, bigtime_t interval,
@@ -125,11 +128,10 @@ protected:
 	virtual	void				HandleTimer();
 
 private:
-			void				_Update(bool unscheduling,
+			void				_Update(Thread* unscheduledThread, bool checkRunning,
 									Thread* lockedThread = NULL);
 
 private:
-			team_id				fTeamID;
 			Team*				fTeam;
 			int32				fRunningThreads;
 			bool				fAbsolute;
@@ -141,7 +143,7 @@ public:
 
 
 struct TeamUserTimeUserTimer : public UserTimer {
-								TeamUserTimeUserTimer(team_id teamID);
+								TeamUserTimeUserTimer(Team* team);
 								~TeamUserTimeUserTimer();
 
 	virtual	void				Schedule(bigtime_t nextTime, bigtime_t interval,
@@ -155,7 +157,6 @@ struct TeamUserTimeUserTimer : public UserTimer {
 			void				Check();
 
 private:
-			team_id				fTeamID;
 			Team*				fTeam;
 
 public:
@@ -165,7 +166,7 @@ public:
 
 
 struct ThreadTimeUserTimer : public UserTimer {
-								ThreadTimeUserTimer(thread_id threadID);
+								ThreadTimeUserTimer(Thread* thread);
 								~ThreadTimeUserTimer();
 
 	virtual	void				Schedule(bigtime_t nextTime, bigtime_t interval,
@@ -185,8 +186,7 @@ protected:
 	virtual	void				HandleTimer();
 
 private:
-			thread_id			fThreadID;
-			Thread*				fThread;	// != NULL only when active
+			Thread*				fThread;
 			bool				fAbsolute;
 
 public:
@@ -204,6 +204,7 @@ struct UserTimerList {
 			void				RemoveTimer(UserTimer* timer)
 									{ fTimers.Remove(timer); }
 			int32				DeleteTimers(bool userDefinedOnly);
+			bool				IsEmpty() { return fTimers.IsEmpty(); }
 
 private:
 			typedef DoublyLinkedList<UserTimer> TimerList;

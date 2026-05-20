@@ -37,8 +37,6 @@ static const bigtime_t kMinPeriodicTimerInterval = 100;
 static RealTimeUserTimerList sAbsoluteRealTimeTimers;
 static spinlock sAbsoluteRealTimeTimersLock = B_SPINLOCK_INITIALIZER;
 
-static seqlock sUserTimerLock = B_SEQLOCK_INITIALIZER;
-
 
 // #pragma mark - TimerLocker
 
@@ -126,8 +124,7 @@ UserTimer::UserTimer()
 	fNextTime(0),
 	fInterval(0),
 	fOverrunCount(0),
-	fScheduled(false),
-	fSkip(0)
+	fScheduled(false)
 {
 	// mark the timer unused
 	fTimer.user_data = this;
@@ -198,21 +195,7 @@ UserTimer::Cancel()
 UserTimer::HandleTimerHook(struct timer* timer)
 {
 	UserTimer* userTimer = reinterpret_cast<UserTimer*>(timer->user_data);
-
-	InterruptsLocker _;
-
-	bool locked = false;
-	while (!locked && atomic_get(&userTimer->fSkip) == 0) {
-		locked = try_acquire_write_seqlock(&sUserTimerLock);
-		if (!locked)
-			cpu_pause();
-	}
-
-	if (locked) {
-		userTimer->HandleTimer();
-		release_write_seqlock(&sUserTimerLock);
-	}
-
+	userTimer->HandleTimer();
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -239,7 +222,7 @@ UserTimer::HandleTimer()
 /*!	Updates the start time for a periodic timer after it expired, enforcing
 	sanity limits and updating \c fOverrunCount, if necessary.
 
-	The caller must not hold \c sUserTimerLock.
+	Locking is the caller's responsibility.
 */
 void
 UserTimer::UpdatePeriodicStartTime()
@@ -263,7 +246,7 @@ UserTimer::UpdatePeriodicStartTime()
 /*!	Checks whether the timer start time lies too much in the past and, if so,
 	adjusts it and updates \c fOverrunCount.
 
-	The caller must not hold \c sUserTimerLock.
+	Locking is the caller's responsibility.
 
 	\param now The current time.
 */
@@ -285,37 +268,32 @@ UserTimer::CheckPeriodicOverrun(bigtime_t now)
 }
 
 
-void
-UserTimer::CancelTimer()
-{
-	ASSERT(fScheduled);
-
-	atomic_set(&fSkip, 1);
-	cancel_timer(&fTimer);
-	atomic_set(&fSkip, 0);
-}
-
-
 // #pragma mark - SystemTimeUserTimer
+
+
+SystemTimeUserTimer::SystemTimeUserTimer()
+	:
+	fLock(B_SEQLOCK_INITIALIZER)
+{
+}
 
 
 void
 SystemTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
-	InterruptsWriteSequentialLocker locker(sUserTimerLock);
+	InterruptsWriteSequentialLocker locker(fLock);
 
 	// get the current time
 	bigtime_t now = system_time();
 
 	// Cancel the old timer, if still scheduled, and get the previous values.
 	if (fScheduled) {
-		CancelTimer();
+		fScheduled = false;
+		cancel_timer(&fTimer);
 
 		_oldRemainingTime = fNextTime - now;
 		_oldInterval = fInterval;
-
-		fScheduled = false;
 	} else {
 		_oldRemainingTime = B_INFINITE_TIMEOUT;
 		_oldInterval = 0;
@@ -342,7 +320,7 @@ SystemTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 {
 	uint32 count;
 	do {
-		count = acquire_read_seqlock(&sUserTimerLock);
+		count = acquire_read_seqlock(&fLock);
 
 		if (fScheduled) {
 			_remainingTime = fNextTime - system_time();
@@ -353,12 +331,26 @@ SystemTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 		}
 
 		_overrunCount = fOverrunCount;
-	} while (!release_read_seqlock(&sUserTimerLock, count));
+	} while (!release_read_seqlock(&fLock, count));
 }
 
 
 void
 SystemTimeUserTimer::HandleTimer()
+{
+	while (!try_acquire_write_seqlock(&fLock)) {
+		if (!fScheduled)
+			return;
+		cpu_pause();
+	}
+	WriteSequentialLocker locker(fLock, true);
+
+	_HandleTimerLocked();
+}
+
+
+void
+SystemTimeUserTimer::_HandleTimerLocked()
 {
 	UserTimer::HandleTimer();
 
@@ -372,7 +364,7 @@ SystemTimeUserTimer::HandleTimer()
 
 /*!	Schedules the kernel timer.
 
-	The caller must hold \c sUserTimerLock.
+	The caller must hold \c fLock.
 
 	\param now The current system time to be used.
 	\param checkPeriodicOverrun If \c true, calls CheckPeriodicOverrun() first,
@@ -387,13 +379,12 @@ SystemTimeUserTimer::ScheduleKernelTimer(bigtime_t now,
 		CheckPeriodicOverrun(now);
 
 	uint32 timerFlags = B_ONE_SHOT_ABSOLUTE_TIMER
-			| B_TIMER_USE_TIMER_STRUCT_TIMES;
+		| B_TIMER_USE_TIMER_STRUCT_TIMES;
 
 	fTimer.schedule_time = std::max(fNextTime, (bigtime_t)0);
 	fTimer.period = 0;
 
 	add_timer(&fTimer, &HandleTimerHook, fTimer.schedule_time, timerFlags);
-
 	fScheduled = true;
 }
 
@@ -405,14 +396,15 @@ void
 RealTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
-	InterruptsWriteSequentialLocker locker(sUserTimerLock);
+	InterruptsWriteSequentialLocker locker(fLock);
 
 	// get the current time
 	bigtime_t now = system_time();
 
 	// Cancel the old timer, if still scheduled, and get the previous values.
 	if (fScheduled) {
-		CancelTimer();
+		fScheduled = false;
+		cancel_timer(&fTimer);
 
 		_oldRemainingTime = fNextTime - now;
 		_oldInterval = fInterval;
@@ -421,8 +413,6 @@ RealTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 			SpinLocker globalListLocker(sAbsoluteRealTimeTimersLock);
 			sAbsoluteRealTimeTimers.Remove(this);
 		}
-
-		fScheduled = false;
 	} else {
 		_oldRemainingTime = B_INFINITE_TIMEOUT;
 		_oldInterval = 0;
@@ -458,13 +448,14 @@ RealTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 
 /*!	Called when the real-time clock has been changed.
 
-	The caller must hold \c sUserTimerLock. Optionally the caller may also
-	hold \c sAbsoluteRealTimeTimersLock.
+	The caller may hold \c sAbsoluteRealTimeTimersLock.
 */
 void
 RealTimeUserTimer::TimeWarped()
 {
 	ASSERT(fScheduled && fAbsolute);
+
+	InterruptsWriteSequentialLocker locker(fLock);
 
 	// get the new real-time offset
 	bigtime_t oldRealTimeOffset = fRealTimeOffset;
@@ -473,7 +464,8 @@ RealTimeUserTimer::TimeWarped()
 		return;
 
 	// cancel the kernel timer and reschedule it
-	CancelTimer();
+	fScheduled = false;
+	cancel_timer(&fTimer);
 
 	fNextTime += oldRealTimeOffset - fRealTimeOffset;
 
@@ -484,7 +476,14 @@ RealTimeUserTimer::TimeWarped()
 void
 RealTimeUserTimer::HandleTimer()
 {
-	SystemTimeUserTimer::HandleTimer();
+	while (!try_acquire_write_seqlock(&fLock)) {
+		if (!fScheduled)
+			return;
+		cpu_pause();
+	}
+	WriteSequentialLocker locker(fLock, true);
+
+	SystemTimeUserTimer::_HandleTimerLocked();
 
 	// remove from global list, if no longer scheduled
 	if (!fScheduled && fAbsolute) {
@@ -497,17 +496,21 @@ RealTimeUserTimer::HandleTimer()
 // #pragma mark - TeamTimeUserTimer
 
 
-TeamTimeUserTimer::TeamTimeUserTimer(team_id teamID)
+TeamTimeUserTimer::TeamTimeUserTimer(Team* team)
 	:
-	fTeamID(teamID),
-	fTeam(NULL)
+	fTeam(team)
 {
+	if (fTeam != NULL)
+		fTeam->AcquireReference();
 }
 
 
 TeamTimeUserTimer::~TeamTimeUserTimer()
 {
-	ASSERT(fTeam == NULL);
+	ASSERT(!fScheduled);
+
+	if (fTeam != NULL)
+		fTeam->ReleaseReference();
 }
 
 
@@ -515,26 +518,24 @@ void
 TeamTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
-	InterruptsWriteSequentialLocker locker(sUserTimerLock);
-	SpinLocker timeLocker(fTeam != NULL ? &fTeam->time_lock : NULL);
+	if (fTeam == NULL) {
+		_oldRemainingTime = B_INFINITE_TIMEOUT;
+		_oldInterval = 0;
+		return;
+	}
 
-	// get the current time, but only if needed
-	bool nowValid = fTeam != NULL;
-	bigtime_t now = nowValid ? fTeam->CPUTime(false) : 0;
+	InterruptsSpinLocker timeLocker(fTeam->time_lock);
+
+	bigtime_t now = fTeam->CPUTime(false);
 
 	// Cancel the old timer, if still scheduled, and get the previous values.
-	if (fTeam != NULL) {
-		if (fScheduled) {
-			CancelTimer();
-			fScheduled = false;
-		}
+	if (fScheduled) {
+		fScheduled = false;
+		cancel_timer(&fTimer);
+		fTeam->UserTimerDeactivated(this);
 
 		_oldRemainingTime = fNextTime - now;
 		_oldInterval = fInterval;
-
-		fTeam->UserTimerDeactivated(this);
-		fTeam->ReleaseReference();
-		fTeam = NULL;
 	} else {
 		_oldRemainingTime = B_INFINITE_TIMEOUT;
 		_oldInterval = 0;
@@ -548,28 +549,21 @@ TeamTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	if (fNextTime == B_INFINITE_TIMEOUT)
 		return;
 
-	// Get the team. If it doesn't exist anymore, just don't schedule the
-	// timer anymore.
-	Team* newTeam = Team::Get(fTeamID);
-	if (newTeam == NULL) {
+	// if the team is going away, don't reschedule
+	if (fTeam->state >= TEAM_STATE_SHUTDOWN) {
+		timeLocker.Unlock();
+		fTeam->ReleaseReference();
 		fTeam = NULL;
 		return;
-	} else if (fTeam == NULL)
-		timeLocker.SetTo(newTeam->time_lock, false);
-	fTeam = newTeam;
+	}
 
 	fAbsolute = (flags & B_RELATIVE_TIMEOUT) == 0;
 
 	// convert relative to absolute timeouts
-	if (!fAbsolute) {
-		if (!nowValid)
-			now = fTeam->CPUTime(false);
+	if (!fAbsolute)
 		fNextTime += now;
-	}
 
-	fTeam->UserTimerActivated(this);
-
-	// schedule/udpate the kernel timer
+	// schedule/update the kernel timer
 	Update(NULL);
 }
 
@@ -578,27 +572,22 @@ void
 TeamTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 	uint32& _overrunCount)
 {
-	uint32 count;
-	do {
-		count = acquire_read_seqlock(&sUserTimerLock);
-
-		if (fTeam != NULL) {
-			InterruptsSpinLocker timeLocker(fTeam->time_lock);
-			_remainingTime = fNextTime - fTeam->CPUTime(false);
-			_interval = fInterval;
-		} else {
-			_remainingTime = B_INFINITE_TIMEOUT;
-			_interval = 0;
-		}
-
+	if (fTeam != NULL) {
+		InterruptsSpinLocker timeLocker(fTeam->time_lock);
+		_remainingTime = fNextTime - fTeam->CPUTime(false);
+		_interval = fInterval;
 		_overrunCount = fOverrunCount;
-	} while (!release_read_seqlock(&sUserTimerLock, count));
+	} else {
+		_remainingTime = B_INFINITE_TIMEOUT;
+		_interval = 0;
+		_overrunCount = fOverrunCount;
+	}
 }
 
 
 /*!	Deactivates the timer, if it is activated.
 
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 */
 void
 TeamTimeUserTimer::Deactivate()
@@ -606,16 +595,12 @@ TeamTimeUserTimer::Deactivate()
 	if (fTeam == NULL)
 		return;
 
-	// unschedule, if scheduled
+	// unschedule & deactivate, if scheduled
 	if (fScheduled) {
-		CancelTimer();
 		fScheduled = false;
+		cancel_timer(&fTimer);
+		fTeam->UserTimerDeactivated(this);
 	}
-
-	// deactivate
-	fTeam->UserTimerDeactivated(this);
-	fTeam->ReleaseReference();
-	fTeam = NULL;
 }
 
 
@@ -626,7 +611,7 @@ TeamTimeUserTimer::Deactivate()
 	was just set. Schedules a kernel timer for the remaining time, respectively
 	cancels it.
 
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 
 	\param unscheduledThread If not \c NULL, this is the thread that is
 		currently running and which is in the process of being unscheduled.
@@ -637,23 +622,14 @@ TeamTimeUserTimer::Update(Thread* unscheduledThread, Thread* lockedThread)
 	if (fTeam == NULL)
 		return;
 
-	// determine how many of the team's threads are currently running
-	fRunningThreads = 0;
-	int32 cpuCount = smp_get_num_cpus();
-	for (int32 i = 0; i < cpuCount; i++) {
-		Thread* thread = gCPU[i].running_thread;
-		if (thread != unscheduledThread && thread->team == fTeam)
-			fRunningThreads++;
-	}
-
-	_Update(unscheduledThread != NULL, lockedThread);
+	_Update(unscheduledThread, true, lockedThread);
 }
 
 
 /*!	Called when the team's CPU time clock which this timer refers to has been
 	set.
 
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 
 	\param changedBy The value by which the clock has changed.
 */
@@ -669,53 +645,67 @@ TeamTimeUserTimer::TimeWarped(bigtime_t changedBy)
 		fNextTime += changedBy;
 
 	// reschedule the kernel timer
-	_Update(false);
+	_Update(NULL, false);
 }
 
 
 void
 TeamTimeUserTimer::HandleTimer()
 {
+	while (!try_acquire_spinlock(&fTeam->time_lock)) {
+		if (!fScheduled)
+			return;
+		cpu_pause();
+	}
+	SpinLocker timeLocker(fTeam->time_lock, true);
+
 	UserTimer::HandleTimer();
 
 	// If the timer is not periodic, it is no longer active. Otherwise
 	// reschedule the kernel timer.
-	if (fTeam != NULL) {
-		if (fInterval == 0) {
-			fTeam->UserTimerDeactivated(this);
-			fTeam->ReleaseReference();
-			fTeam = NULL;
-		} else {
-			UpdatePeriodicStartTime();
-			_Update(false);
-		}
+	fTeam->UserTimerDeactivated(this);
+
+	if (fInterval != 0) {
+		UpdatePeriodicStartTime();
+		_Update(NULL, false);
 	}
 }
 
 
 /*!	Schedules/cancels the kernel timer as necessary.
 
-	\c fRunningThreads must be up-to-date.
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 
 	\param unscheduling \c true, when the current thread is in the process of
 		being unscheduled.
 */
 void
-TeamTimeUserTimer::_Update(bool unscheduling, Thread* lockedThread)
+TeamTimeUserTimer::_Update(Thread* unscheduledThread, bool checkRunning, Thread* lockedThread)
 {
-	// unschedule the kernel timer, if scheduled
-	if (fScheduled)
-		CancelTimer();
-
-	// if no more threads are running, we're done
-	if (fRunningThreads == 0) {
-		fScheduled = false;
-		return;
+	if (checkRunning) {
+		// determine how many of the team's threads are currently running
+		fRunningThreads = 0;
+		int32 cpuCount = smp_get_num_cpus();
+		for (int32 i = 0; i < cpuCount; i++) {
+			Thread* thread = gCPU[i].running_thread;
+			if (thread != unscheduledThread && thread->team == fTeam)
+				fRunningThreads++;
+		}
 	}
 
+	// unschedule the kernel timer, if scheduled
+	if (fScheduled) {
+		fScheduled = false;
+		cancel_timer(&fTimer);
+		fTeam->UserTimerDeactivated(this);
+	}
+
+	// if no more threads are running, we're done
+	if (fRunningThreads == 0)
+		return;
+
 	// There are still threads running. Reschedule the kernel timer.
-	bigtime_t now = fTeam->CPUTime(unscheduling, lockedThread);
+	bigtime_t now = fTeam->CPUTime(unscheduledThread != NULL, lockedThread);
 
 	// If periodic, check whether the start time is too far in the past.
 	if (fInterval > 0)
@@ -738,6 +728,7 @@ TeamTimeUserTimer::_Update(bool unscheduling, Thread* lockedThread)
 		// We use B_TIMER_USE_TIMER_STRUCT_TIMES, so period remains 0, which
 		// our base class expects.
 
+	fTeam->UserTimerActivated(this);
 	fScheduled = true;
 }
 
@@ -745,17 +736,21 @@ TeamTimeUserTimer::_Update(bool unscheduling, Thread* lockedThread)
 // #pragma mark - TeamUserTimeUserTimer
 
 
-TeamUserTimeUserTimer::TeamUserTimeUserTimer(team_id teamID)
+TeamUserTimeUserTimer::TeamUserTimeUserTimer(Team* team)
 	:
-	fTeamID(teamID),
-	fTeam(NULL)
+	fTeam(team)
 {
+	if (fTeam != NULL)
+		fTeam->AcquireReference();
 }
 
 
 TeamUserTimeUserTimer::~TeamUserTimeUserTimer()
 {
-	ASSERT(fTeam == NULL);
+	ASSERT(!fScheduled);
+
+	if (fTeam != NULL)
+		fTeam->ReleaseReference();
 }
 
 
@@ -763,21 +758,24 @@ void
 TeamUserTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
-	InterruptsWriteSequentialLocker locker(sUserTimerLock);
-	SpinLocker timeLocker(fTeam != NULL ? &fTeam->time_lock : NULL);
+	if (fTeam == NULL){
+		_oldRemainingTime = B_INFINITE_TIMEOUT;
+		_oldInterval = 0;
+		return;
+	}
 
-	// get the current time, but only if needed
-	bool nowValid = fTeam != NULL;
-	bigtime_t now = nowValid ? fTeam->UserCPUTime() : 0;
+	InterruptsSpinLocker timeLocker(fTeam->time_lock);
+
+	bigtime_t now = fTeam->UserCPUTime();
 
 	// Cancel the old timer, if still active, and get the previous values.
-	if (fTeam != NULL) {
+	if (fScheduled) {
+		fScheduled = false;
+		cancel_timer(&fTimer);
+		fTeam->UserTimerDeactivated(this);
+
 		_oldRemainingTime = fNextTime - now;
 		_oldInterval = fInterval;
-
-		fTeam->UserTimerDeactivated(this);
-		fTeam->ReleaseReference();
-		fTeam = NULL;
 	} else {
 		_oldRemainingTime = B_INFINITE_TIMEOUT;
 		_oldInterval = 0;
@@ -791,24 +789,17 @@ TeamUserTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	if (fNextTime == B_INFINITE_TIMEOUT)
 		return;
 
-	// Get the team. If it doesn't exist anymore, just don't schedule the
-	// timer anymore.
-	Team* newTeam = Team::Get(fTeamID);
-	if (newTeam == NULL) {
+	// if the team is going away, don't reschedule
+	if (fTeam->state >= TEAM_STATE_SHUTDOWN) {
+		timeLocker.Unlock();
+		fTeam->ReleaseReference();
 		fTeam = NULL;
 		return;
-	} else if (fTeam == NULL)
-		timeLocker.SetTo(newTeam->time_lock, false);
-	fTeam = newTeam;
-
-	// convert relative to absolute timeouts
-	if ((flags & B_RELATIVE_TIMEOUT) != 0) {
-		if (!nowValid)
-			now = fTeam->CPUTime(false);
-		fNextTime += now;
 	}
 
-	fTeam->UserTimerActivated(this);
+	// convert relative to absolute timeouts
+	if ((flags & B_RELATIVE_TIMEOUT) != 0)
+		fNextTime += now;
 
 	// fire the event, if already timed out
 	Check();
@@ -819,27 +810,22 @@ void
 TeamUserTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 	uint32& _overrunCount)
 {
-	uint32 count;
-	do {
-		count = acquire_read_seqlock(&sUserTimerLock);
-
-		if (fTeam != NULL) {
-			InterruptsSpinLocker timeLocker(fTeam->time_lock);
-			_remainingTime = fNextTime - fTeam->UserCPUTime();
-			_interval = fInterval;
-		} else {
-			_remainingTime = B_INFINITE_TIMEOUT;
-			_interval = 0;
-		}
-
+	if (fTeam != NULL) {
+		InterruptsSpinLocker timeLocker(fTeam->time_lock);
+		_remainingTime = fNextTime - fTeam->UserCPUTime();
+		_interval = fInterval;
 		_overrunCount = fOverrunCount;
-	} while (!release_read_seqlock(&sUserTimerLock, count));
+	} else {
+		_remainingTime = B_INFINITE_TIMEOUT;
+		_interval = 0;
+		_overrunCount = fOverrunCount;
+	}
 }
 
 
 /*!	Deactivates the timer, if it is activated.
 
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 */
 void
 TeamUserTimeUserTimer::Deactivate()
@@ -847,16 +833,16 @@ TeamUserTimeUserTimer::Deactivate()
 	if (fTeam == NULL)
 		return;
 
-	// deactivate
-	fTeam->UserTimerDeactivated(this);
-	fTeam->ReleaseReference();
-	fTeam = NULL;
+	if (fScheduled) {
+		fTeam->UserTimerDeactivated(this);
+		fScheduled = false;
+	}
 }
 
 
 /*!	Checks whether the timer is up, firing an event, if so.
 
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 */
 void
 TeamUserTimeUserTimer::Check()
@@ -875,8 +861,6 @@ TeamUserTimeUserTimer::Check()
 	// the event time.
 	if (fInterval == 0) {
 		fTeam->UserTimerDeactivated(this);
-		fTeam->ReleaseReference();
-		fTeam = NULL;
 		return;
 	}
 
@@ -884,6 +868,8 @@ TeamUserTimeUserTimer::Check()
 	// (CheckPeriodicOverrun() only makes it > now - fInterval).
 	CheckPeriodicOverrun(now);
 	fNextTime += fInterval;
+
+	fTeam->UserTimerActivated(this);
 	fScheduled = true;
 }
 
@@ -891,17 +877,21 @@ TeamUserTimeUserTimer::Check()
 // #pragma mark - ThreadTimeUserTimer
 
 
-ThreadTimeUserTimer::ThreadTimeUserTimer(thread_id threadID)
+ThreadTimeUserTimer::ThreadTimeUserTimer(Thread* thread)
 	:
-	fThreadID(threadID),
-	fThread(NULL)
+	fThread(thread)
 {
+	if (fThread != NULL)
+		fThread->AcquireReference();
 }
 
 
 ThreadTimeUserTimer::~ThreadTimeUserTimer()
 {
-	ASSERT(fThread == NULL);
+	ASSERT(!fScheduled);
+
+	if (fThread != NULL)
+		fThread->ReleaseReference();
 }
 
 
@@ -909,26 +899,24 @@ void
 ThreadTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
-	InterruptsWriteSequentialLocker locker(sUserTimerLock);
-	SpinLocker timeLocker(fThread != NULL ? &fThread->time_lock : NULL);
+	if (fThread == NULL) {
+		_oldRemainingTime = B_INFINITE_TIMEOUT;
+		_oldInterval = 0;
+		return;
+	}
 
-	// get the current time, but only if needed
-	bool nowValid = fThread != NULL;
-	bigtime_t now = nowValid ? fThread->CPUTime(false) : 0;
+	InterruptsSpinLocker timeLocker(fThread->time_lock);
+
+	bigtime_t now = fThread->CPUTime(false);
 
 	// Cancel the old timer, if still scheduled, and get the previous values.
-	if (fThread != NULL) {
-		if (fScheduled) {
-			CancelTimer();
-			fScheduled = false;
-		}
+	if (fScheduled) {
+		fScheduled = false;
+		cancel_timer(&fTimer);
+		fThread->UserTimerDeactivated(this);
 
 		_oldRemainingTime = fNextTime - now;
 		_oldInterval = fInterval;
-
-		fThread->UserTimerDeactivated(this);
-		fThread->ReleaseReference();
-		fThread = NULL;
 	} else {
 		_oldRemainingTime = B_INFINITE_TIMEOUT;
 		_oldInterval = 0;
@@ -942,26 +930,19 @@ ThreadTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	if (fNextTime == B_INFINITE_TIMEOUT)
 		return;
 
-	// Get the thread. If it doesn't exist anymore, just don't schedule the
-	// timer anymore.
-	Thread* newThread = Thread::Get(fThreadID);
-	if (newThread == NULL) {
+	// if the thread is going away, don't reschedule
+	if (fThread->state >= THREAD_STATE_FREE_ON_RESCHED) {
+		timeLocker.Unlock();
+		fThread->ReleaseReference();
 		fThread = NULL;
 		return;
-	} else if (fThread == NULL)
-		timeLocker.SetTo(newThread->time_lock, false);
-	fThread = newThread;
+	}
 
 	fAbsolute = (flags & B_RELATIVE_TIMEOUT) == 0;
 
 	// convert relative to absolute timeouts
-	if (!fAbsolute) {
-		if (!nowValid)
-			now = fThread->CPUTime(false);
+	if (!fAbsolute)
 		fNextTime += now;
-	}
-
-	fThread->UserTimerActivated(this);
 
 	// If the thread is currently running, also schedule a kernel timer.
 	if (fThread->cpu != NULL)
@@ -973,27 +954,22 @@ void
 ThreadTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 	uint32& _overrunCount)
 {
-	uint32 count;
-	do {
-		count = acquire_read_seqlock(&sUserTimerLock);
-
-		if (fThread != NULL) {
-			SpinLocker timeLocker(fThread->time_lock);
-			_remainingTime = fNextTime - fThread->CPUTime(false);
-			_interval = fInterval;
-		} else {
-			_remainingTime = B_INFINITE_TIMEOUT;
-			_interval = 0;
-		}
-
+	if (fThread != NULL) {
+		InterruptsSpinLocker timeLocker(fThread->time_lock);
+		_remainingTime = fNextTime - fThread->CPUTime(false);
+		_interval = fInterval;
 		_overrunCount = fOverrunCount;
-	} while (!release_read_seqlock(&sUserTimerLock, count));
+	} else {
+		_remainingTime = B_INFINITE_TIMEOUT;
+		_interval = 0;
+		_overrunCount = fOverrunCount;
+	}
 }
 
 
 /*!	Deactivates the timer, if it is activated.
 
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 */
 void
 ThreadTimeUserTimer::Deactivate()
@@ -1001,16 +977,12 @@ ThreadTimeUserTimer::Deactivate()
 	if (fThread == NULL)
 		return;
 
-	// unschedule, if scheduled
+	// unschedule & deactivate, if scheduled
 	if (fScheduled) {
-		CancelTimer();
 		fScheduled = false;
+		cancel_timer(&fTimer);
+		fThread->UserTimerDeactivated(this);
 	}
-
-	// deactivate
-	fThread->UserTimerDeactivated(this);
-	fThread->ReleaseReference();
-	fThread = NULL;
 }
 
 
@@ -1020,7 +992,7 @@ ThreadTimeUserTimer::Deactivate()
 	scheduled, or, when the timer was just set and the thread is already
 	running. Schedules a kernel timer for the remaining time.
 
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 */
 void
 ThreadTimeUserTimer::Start()
@@ -1049,6 +1021,7 @@ ThreadTimeUserTimer::Start()
 	uint32 flags = B_ONE_SHOT_ABSOLUTE_TIMER | B_TIMER_USE_TIMER_STRUCT_TIMES;
 	add_timer(&fTimer, &HandleTimerHook, fTimer.schedule_time, flags);
 
+	fThread->UserTimerActivated(this);
 	fScheduled = true;
 }
 
@@ -1058,7 +1031,7 @@ ThreadTimeUserTimer::Start()
 	Called when the thread whose CPU time is referred to by the timer is
 	unscheduled, or, when the timer is canceled.
 
-	The caller must hold \c sUserTimerLock.
+	The caller must hold \c time_lock.
 */
 void
 ThreadTimeUserTimer::Stop()
@@ -1069,8 +1042,9 @@ ThreadTimeUserTimer::Stop()
 	ASSERT(fScheduled);
 
 	// cancel the kernel timer
-	CancelTimer();
 	fScheduled = false;
+	cancel_timer(&fTimer);
+	fThread->UserTimerDeactivated(this);
 
 	// TODO: To avoid odd race conditions, we should check the current time of
 	// the thread (ignoring the time since last_time) and manually fire the
@@ -1081,7 +1055,7 @@ ThreadTimeUserTimer::Stop()
 /*!	Called when the team's CPU time clock which this timer refers to has been
 	set.
 
-	The caller must hold \c time_lock and \c sUserTimerLock.
+	The caller must hold \c time_lock.
 
 	\param changedBy The value by which the clock has changed.
 */
@@ -1107,19 +1081,21 @@ ThreadTimeUserTimer::TimeWarped(bigtime_t changedBy)
 void
 ThreadTimeUserTimer::HandleTimer()
 {
-	UserTimer::HandleTimer();
+	while (!try_acquire_spinlock(&fThread->time_lock)) {
+		if (!fScheduled)
+			return;
+		cpu_pause();
+	}
+	SpinLocker timeLocker(fThread->time_lock, true);
 
-	if (fThread != NULL) {
-		// If the timer is periodic, reschedule the kernel timer. Otherwise it
-		// is no longer active.
-		if (fInterval > 0) {
-			UpdatePeriodicStartTime();
-			Start();
-		} else {
-			fThread->UserTimerDeactivated(this);
-			fThread->ReleaseReference();
-			fThread = NULL;
-		}
+	UserTimer::HandleTimer();
+	fThread->UserTimerDeactivated(this);
+
+	// If the timer is periodic, reschedule the kernel timer. Otherwise it
+	// is no longer active.
+	if (fInterval > 0) {
+		UpdatePeriodicStartTime();
+		Start();
 	}
 }
 
@@ -1252,19 +1228,19 @@ create_timer(clockid_t clockID, int32 timerID, Team* team, Thread* thread,
 
 		case CLOCK_THREAD_CPUTIME_ID:
 			timer = new(std::nothrow) ThreadTimeUserTimer(
-				thread_get_current_thread()->id);
+				thread_get_current_thread());
 			break;
 
 		case CLOCK_PROCESS_CPUTIME_ID:
 			if (team == NULL)
 				return B_BAD_VALUE;
-			timer = new(std::nothrow) TeamTimeUserTimer(team->id);
+			timer = new(std::nothrow) TeamTimeUserTimer(team);
 			break;
 
 		case CLOCK_PROCESS_USER_CPUTIME_ID:
 			if (team == NULL)
 				return B_BAD_VALUE;
-			timer = new(std::nothrow) TeamUserTimeUserTimer(team->id);
+			timer = new(std::nothrow) TeamUserTimeUserTimer(team);
 			break;
 
 		default:
@@ -1284,12 +1260,13 @@ create_timer(clockid_t clockID, int32 timerID, Team* team, Thread* thread,
 			uid_t uid = geteuid();
 			uid_t teamUID = timedTeam->effective_uid;
 
-			timedTeam->UnlockAndReleaseReference();
+			timedTeam->Unlock();
 
 			if (uid != 0 && uid != teamUID)
 				return B_NOT_ALLOWED;
 
-			timer = new(std::nothrow) TeamTimeUserTimer(clockID);
+			timer = new(std::nothrow) TeamTimeUserTimer(timedTeam);
+			timedTeam->ReleaseReference();
 			break;
 		}
 	}
@@ -1554,8 +1531,7 @@ void
 user_timer_real_time_clock_changed()
 {
 	// we need to update all absolute real-time timers
-	InterruptsWriteSequentialLocker locker(sUserTimerLock);
-	SpinLocker globalListLocker(sAbsoluteRealTimeTimersLock);
+	InterruptsSpinLocker globalListLocker(sAbsoluteRealTimeTimersLock);
 
 	for (RealTimeUserTimerList::Iterator it
 				= sAbsoluteRealTimeTimers.GetIterator();
@@ -1784,13 +1760,13 @@ _user_create_timer(clockid_t clockID, thread_id threadID, uint32 flags,
 	Team* team = thread_get_current_thread()->team;
 	Thread* thread = NULL;
 	if (threadID >= 0) {
-		thread = Thread::GetAndLock(threadID);
+		thread = Thread::Get(threadID);
 		if (thread == NULL)
 			return B_BAD_THREAD_ID;
-
-		thread->Unlock();
 	}
 	BReference<Thread> threadReference(thread, true);
+	if (thread != NULL && thread->team != team)
+		return B_BAD_THREAD_ID;
 
 	// create the timer
 	return create_timer(clockID, -1, team, thread, flags, event,
