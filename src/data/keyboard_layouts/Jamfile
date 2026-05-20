@@ -20,8 +20,8 @@ actions GenerateKeyboardLayoutLocalizationHeader1
 	for name in "$(HAIKU_KEYBOARD_LAYOUT_FILES)" ; do
 		echo "B_TRANSLATE_MARK_VOID(\"$name\")" >> $(1)
 	done
-	echo "B_TRANSLATE_MARK_VOID(\"Apple\ Aluminum\")" >> $(1)
-	for name in "$(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES)" ; do
+	echo "B_TRANSLATE_MARK_VOID(\"Apple\ Magic\")" >> $(1)
+	for name in "$(HAIKU_APPLE_MAGIC_KEYBOARD_LAYOUT_FILES)" ; do
 		echo "B_TRANSLATE_MARK_VOID(\"$name\")" >> $(1)
 	done
 	echo "B_TRANSLATE_MARK_VOID(\"ThinkPad\")" >> $(1)
@@ -45,20 +45,19 @@ HAIKU_KEYBOARD_LAYOUT_FILES =
 HAIKU_KEYBOARD_LAYOUT_FILES = $(HAIKU_KEYBOARD_LAYOUT_FILES) ;
 SEARCH on $(HAIKU_KEYBOARD_LAYOUT_FILES) = $(keyboardLayoutsDir) ;
 
-# Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
+# Add Apple Magic keyboard layout files to the image in an Apple Magic
 # subdirectory. The subdirectory is turned into a submenu in the Layout menu
 # of the Keymap preference app.
-local appleAluminumDir
-	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts
-		Apple\ Aluminum ] ;
-HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES =
-	"Apple Aluminium Extended International"
-	"Apple Aluminium International"
-	"Apple Aluminum (US)"
-	"Apple Aluminum Extended (US)" ;
-HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES
-	= $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES) ;
-SEARCH on $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES) = $(appleAluminumDir) ;
+local appleMagicDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts Apple\ Magic ] ;
+HAIKU_APPLE_MAGIC_KEYBOARD_LAYOUT_FILES =
+	"Apple Magic Extended International"
+	"Apple Magic International"
+	"Apple Magic (US)"
+	"Apple Magic Extended (US)" ;
+HAIKU_APPLE_MAGIC_KEYBOARD_LAYOUT_FILES
+	= $(HAIKU_APPLE_MAGIC_KEYBOARD_LAYOUT_FILES) ;
+SEARCH on $(HAIKU_APPLE_MAGIC_KEYBOARD_LAYOUT_FILES) = $(appleMagicDir) ;
 
 # Add ThinkPad keyboard layout files to the image in a ThinkPad
 # subdirectory. The subdirectory is turned into a submenu in the Layout menu

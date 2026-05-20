@@ -1,0 +1,28 @@
+name = Apple Magic Extended International
+
+# Size shortcuts
+default-size = 10,10
+$l = 4,10
+$esc = 17,10
+$back = 17,10
+$lshift = 13,10
+$ctrl = 14,10
+$alt = 12,10
+$cmd = 14,10
+$b = 5,10
+$d = 15,10
+$e = l12,20,8
+$f = 10,20
+$two = 20,10
+
+# Key rows
+[ 0,0;  $l:-; $esc:0x01; :+12; 15,10:-; :+3; 5,10:-; :0x7006B; :+3; ]
+[ 0,10; $l:-; :0x11+12; $back:+; $b:-; :-; :0x20; :+1; $b:-; :+1; :0x6a; 
+	:0x23+1 ]
+[ 0,20; $l:-; $d:0x26; :+12; $e:0x47; $b:-; :0x34-0x36; $b:-; :+3; :0x25 ]
+[ 0,30; $l:led-caps; # integrated into caps key
+	17,10:0x3b; :+11; :0x33; 50,10:-; :0x48-0x4a; :0x3a ]
+[ 0,40; $l:-; $lshift:0x4b; :0x69; :0x4c+9; 24,10:+1; 15,10:-; :+1; 
+	15,10:-; :+3; $f:+1 ]
+[ 0,50; $l:-; $ctrl:0x5c; $alt:0x5d; $cmd:0x66; 67,10:0x5e; $cmd:0x67; 
+	$alt:0x5f; $ctrl:0x60; $b:-; :+3; $b:-; $two:+1; :+1 ]

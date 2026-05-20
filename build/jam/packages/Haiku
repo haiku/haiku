@@ -305,8 +305,8 @@ for keymapAlias in $(HAIKU_KEYMAP_ALIASES) {
 # keyboard layouts
 AddFilesToPackage data KeyboardLayouts
 	: $(HAIKU_KEYBOARD_LAYOUT_FILES) ;
-AddFilesToPackage data KeyboardLayouts Apple\ Aluminum
-	: $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES) ;
+AddFilesToPackage data KeyboardLayouts Apple\ Magic
+	: $(HAIKU_APPLE_MAGIC_KEYBOARD_LAYOUT_FILES) ;
 AddFilesToPackage data KeyboardLayouts ThinkPad
 	: $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES) ;
 
