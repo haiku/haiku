@@ -537,6 +537,8 @@ Thread::ResetSignalsOnExec()
 status_t
 Thread::AddUserTimer(UserTimer* timer)
 {
+	ASSERT_LOCKED_MUTEX(&fLock);
+
 	// If the timer is user-defined, check timer limit and increment
 	// user-defined count.
 	if (timer->ID() < 0 && !team->CheckAddUserDefinedTimer())
@@ -558,6 +560,8 @@ Thread::AddUserTimer(UserTimer* timer)
 void
 Thread::RemoveUserTimer(UserTimer* timer)
 {
+	ASSERT_LOCKED_MUTEX(&fLock);
+
 	fUserTimers.RemoveTimer(timer);
 
 	if (timer->ID() >= USER_TIMER_FIRST_USER_DEFINED_ID)

@@ -638,8 +638,9 @@ private:
 
 			UserTimerList		fUserTimers;			// protected by fLock
 			TeamTimeUserTimerList fCPUTimeUserTimers;
-									// protected by scheduler lock
+									// protected by time_lock
 			TeamUserTimeUserTimerList fUserTimeUserTimers;
+									// protected by time_lock
 			int32				fUserDefinedTimerCount;	// accessed atomically
 
 			ConditionVariable*	fCoreDumpCondition;

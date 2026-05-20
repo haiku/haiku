@@ -829,6 +829,8 @@ Team::InheritSignalActions(Team* parent)
 status_t
 Team::AddUserTimer(UserTimer* timer)
 {
+	AssertLocked();
+
 	// don't allow addition of timers when already shutting the team down
 	if (state >= TEAM_STATE_SHUTDOWN)
 		return B_BAD_TEAM_ID;
@@ -854,6 +856,8 @@ Team::AddUserTimer(UserTimer* timer)
 void
 Team::RemoveUserTimer(UserTimer* timer)
 {
+	AssertLocked();
+
 	fUserTimers.RemoveTimer(timer);
 
 	if (timer->ID() >= USER_TIMER_FIRST_USER_DEFINED_ID)
