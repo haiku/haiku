@@ -1879,6 +1879,7 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	else
 		kprintf("\n");
 	kprintf("cpumask:            %#" B_PRIx32 "\n", thread->cpumask.Bits(0));
+	kprintf("pinned_to_cpu:      %#" B_PRIx32 "\n", thread->pinned_to_cpu);
 	kprintf("sig_pending:        %#" B_PRIx64 " (blocked: %#" B_PRIx64
 		", before sigsuspend(): %#" B_PRIx64 ")\n",
 		(int64)thread->ThreadPendingSignals(),
