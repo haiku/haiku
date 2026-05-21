@@ -68,9 +68,6 @@
 /* Local Vector Table defines */
 #define APIC_LVT_MASKED							(1 << 16)
 
-// timer defines
-#define APIC_LVT_TIMER_MASK						0xfffcef00
-
 // LINT0/1 defines
 #define APIC_LVT_LINT_MASK						0xfffe0800
 #define APIC_LVT_LINT_INPUT_POLARITY			(1 << 13)
