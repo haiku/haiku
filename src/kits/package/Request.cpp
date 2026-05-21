@@ -33,6 +33,7 @@ BRequest::BRequest(const BContext& context)
 
 BRequest::~BRequest()
 {
+	delete fJobQueue;
 }
 
 
