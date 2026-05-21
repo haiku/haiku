@@ -1,4 +1,5 @@
 /*
+ * Copyright 2026, Haiku, Inc. All rights reserved.
  * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
@@ -9,7 +10,7 @@
  */
 
 
-/*! Functionality for symetrical multi-processors */
+/*! Functionality for symmetrical multi-processors */
 
 
 #include <smp.h>
@@ -108,46 +109,7 @@ static int32 process_pending_ici(int32 currentCPU);
 
 
 #if DEBUG_SPINLOCKS
-#define NUM_LAST_CALLERS	32
-
-static struct {
-	void		*caller;
-	spinlock	*lock;
-} sLastCaller[NUM_LAST_CALLERS];
-
-static int32 sLastIndex = 0;
-	// Is incremented atomically. Must be % NUM_LAST_CALLERS before being used
-	// as index into sLastCaller. Note, that it has to be casted to uint32
-	// before applying the modulo operation, since otherwise after overflowing
-	// that would yield negative indices.
-
-
-static void
-push_lock_caller(void* caller, spinlock* lock)
-{
-	int32 index = (uint32)atomic_add(&sLastIndex, 1) % NUM_LAST_CALLERS;
-
-	sLastCaller[index].caller = caller;
-	sLastCaller[index].lock = lock;
-}
-
-
-static void*
-find_lock_caller(spinlock* lock)
-{
-	int32 lastIndex = (uint32)atomic_get(&sLastIndex) % NUM_LAST_CALLERS;
-
-	for (int32 i = 0; i < NUM_LAST_CALLERS; i++) {
-		int32 index = (NUM_LAST_CALLERS + lastIndex - 1 - i) % NUM_LAST_CALLERS;
-		if (sLastCaller[index].lock == lock)
-			return sLastCaller[index].caller;
-	}
-
-	return NULL;
-}
-
-
-int
+static int
 dump_spinlock(int argc, char** argv)
 {
 	if (argc != 2) {
@@ -162,9 +124,9 @@ dump_spinlock(int argc, char** argv)
 	spinlock* lock = (spinlock*)(addr_t)address;
 	kprintf("spinlock %p:\n", lock);
 	bool locked = B_SPINLOCK_IS_LOCKED(lock);
-	if (locked) {
-		kprintf("  locked from %p\n", find_lock_caller(lock));
-	} else
+	if (locked)
+		kprintf("  locked\n");
+	else
 		kprintf("  not locked\n");
 
 #if B_DEBUG_SPINLOCK_CONTENTION
@@ -176,8 +138,6 @@ dump_spinlock(int argc, char** argv)
 
 	return 0;
 }
-
-
 #endif	// DEBUG_SPINLOCKS
 
 
@@ -315,10 +275,6 @@ try_acquire_spinlock(spinlock* lock)
 	update_lock_contention(lock, system_time());
 #endif
 
-#if DEBUG_SPINLOCKS
-	push_lock_caller(arch_debug_get_caller(), lock);
-#endif
-
 	return true;
 }
 
@@ -342,15 +298,9 @@ acquire_spinlock(spinlock* lock)
 			uint32 count = 0;
 			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
-#if DEBUG_SPINLOCKS
-					panic("acquire_spinlock(): Failed to acquire spinlock %p "
-						"for a long time (last caller: %p, value: %" B_PRIx32
-						")", lock, find_lock_caller(lock), lock->lock);
-#else
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time (value: %" B_PRIx32 ")", lock,
 						lock->lock);
-#endif
 					count = 0;
 				}
 
@@ -364,10 +314,6 @@ acquire_spinlock(spinlock* lock)
 #if B_DEBUG_SPINLOCK_CONTENTION
 		update_lock_contention(lock, start);
 #endif
-
-#if DEBUG_SPINLOCKS
-		push_lock_caller(arch_debug_get_caller(), lock);
-#endif
 	} else {
 #if B_DEBUG_SPINLOCK_CONTENTION
 		lock->last_acquired = system_time();
@@ -376,11 +322,8 @@ acquire_spinlock(spinlock* lock)
 		int32 oldValue = atomic_get_and_set(&lock->lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock: attempt to acquire lock %p twice on "
-				"non-SMP system (last caller: %p, value %" B_PRIx32 ")", lock,
-				find_lock_caller(lock), oldValue);
+				"non-SMP system (value %" B_PRIx32 ")", lock, oldValue);
 		}
-
-		push_lock_caller(arch_debug_get_caller(), lock);
 #endif
 	}
 }
@@ -596,7 +539,6 @@ release_read_spinlock(rw_spinlock* lock)
 #else
 	atomic_add(&lock->lock, -1);
 #endif
-
 }
 
 
