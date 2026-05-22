@@ -140,7 +140,7 @@ local applicationSources =
 	MainWindow.cpp
 	MarkupTextView.cpp
 	Model.cpp
-	NotAvailableStringView.cpp
+	NotAvailableView.cpp
 	PackageContentsView.cpp
 	PackageInfoListener.cpp
 	PackageInfoView.cpp

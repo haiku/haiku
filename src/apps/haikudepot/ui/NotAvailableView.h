@@ -15,20 +15,29 @@
  *	not convenient for this use-case. In addition, this view will centralize
  *	the configuration of colors etc... for this purpose.
  */
-class NotAvailableStringView : public BView {
+class NotAvailableView : public BView {
 public:
-								NotAvailableStringView(const char* name, const char* text);
-	virtual						~NotAvailableStringView();
+								NotAvailableView(const char* name, const char* text, bool isImage);
+	virtual						~NotAvailableView();
 
 	virtual	BSize				MaxSize();
-	virtual BAlignment			LayoutAlignment();
+	virtual	BAlignment			LayoutAlignment();
 
 			void				SetText(const char* text);
 			const char*			Text() const;
 
-	virtual	void				Draw(BRect bounds);
+			void				SetIsImage(bool value);
+			bool				IsImage() const;
+
+	virtual	void				Draw(BRect updateRect);
 
 private:
+			void				_DrawIsImage(BRect updateRect);
+			void				_DrawStippledBorder(BRect box);
+			void				_DrawText(BRect textRect, BRect updateRect);
+
+private:
+			bool				fIsImage;
 			BString				fText;
 };
 

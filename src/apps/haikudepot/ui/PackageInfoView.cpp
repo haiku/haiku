@@ -35,7 +35,7 @@
 #include "LocaleUtils.h"
 #include "Logger.h"
 #include "MarkupTextView.h"
-#include "NotAvailableStringView.h"
+#include "NotAvailableView.h"
 #include "PackageContentsView.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
@@ -673,6 +673,9 @@ public:
 		:
 		BView("about view", 0)
 	{
+		fPackageName = "";
+		fIsPopulatingScreenshot = false;
+
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fDescriptionView = new MarkupTextView("description view");
@@ -692,6 +695,15 @@ public:
 		fScreenshotView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 		fScreenshotView->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
 
+		fScreenshotNotAvailableView = new NotAvailableView("screenshot not available", "XYZ", true);
+		fScreenshotView->SetExplicitMinSize(BSize(64.0f, 64.0f));
+		fScreenshotView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+
+		// This allows for switching between the "no screenshot" and the actual screenshot.
+		fScreenshotCardView = new BCardView();
+		fScreenshotCardView->AddChild(fScreenshotView);
+		fScreenshotCardView->AddChild(fScreenshotNotAvailableView);
+
 		fWebsiteIconView = new BitmapView("website icon view");
 		fWebsiteLinkView
 			= new LinkView("website link view", "", new BMessage(MSG_VISIT_PUBLISHER_WEBSITE));
@@ -700,11 +712,12 @@ public:
 		BGroupView* leftGroup = new BGroupView(B_VERTICAL, B_USE_DEFAULT_SPACING);
 
 		fScreenshotView->SetViewUIColor(ViewUIColor(), kContentTint);
+		fScreenshotNotAvailableView->SetViewUIColor(ViewUIColor(), kContentTint);
 		fWebsiteLinkView->SetViewUIColor(ViewUIColor(), kContentTint);
 
 		BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0.0f)
 			.AddGroup(leftGroup, 1.0f)
-				.Add(fScreenshotView)
+				.Add(fScreenshotCardView)
 				.AddGroup(B_HORIZONTAL)
 					.AddGrid(B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING)
 						.Add(fWebsiteIconView, 0, 1)
@@ -765,21 +778,29 @@ public:
 	void SetScreenshotThumbnail(BitmapHolderRef bitmapHolderRef)
 	{
 		if (bitmapHolderRef.IsSet()) {
+			fIsPopulatingScreenshot = false;
 			fScreenshotView->SetBitmap(bitmapHolderRef);
 			fScreenshotView->SetEnabled(true);
+			fScreenshotNotAvailableView->SetText("");
+			fScreenshotCardView->CardLayout()->SetVisibleItem(CARD_AVAILABLE);
 		} else {
 			fScreenshotView->UnsetBitmap();
 			fScreenshotView->SetEnabled(false);
+			fScreenshotNotAvailableView->SetText(_NotAvailableScreenshotText());
+			fScreenshotCardView->CardLayout()->SetVisibleItem(CARD_NOT_AVAILABLE);
 		}
 	}
 
 	void SetPackage(const PackageInfoRef package)
 	{
+		BString packageName = "";
 		BString summary = "";
 		BString description = "";
 		BString publisherWebsite = "";
 
 		if (package.IsSet()) {
+			packageName = package->Name();
+
 			PackageLocalizedTextRef localizedText = package->LocalizedText();
 
 			if (localizedText.IsSet()) {
@@ -800,6 +821,9 @@ public:
 		fDescriptionView->SetText(summary, description);
 		fWebsiteIconView->SetBitmap(SharedIcons::IconHTMLPackage16Scaled());
 		_SetContactInfo(fWebsiteLinkView, publisherWebsite);
+
+		fIsPopulatingScreenshot = fIsPopulatingScreenshot && (packageName == fPackageName);
+		fPackageName = packageName;
 	}
 
 	void Clear()
@@ -807,11 +831,23 @@ public:
 		fDescriptionView->SetText("");
 		fWebsiteIconView->UnsetBitmap();
 		fWebsiteLinkView->SetText("");
-		fScreenshotView->UnsetBitmap();
-		fScreenshotView->SetEnabled(false);
+		SetScreenshotThumbnail(BitmapHolderRef());
+		fIsPopulatingScreenshot = false;
+	}
+
+	// TODO; need some way to signal failure.
+	void SetIsPopulatingScreenshot() {
+		fIsPopulatingScreenshot = true;
+		fScreenshotNotAvailableView->SetText(_NotAvailableScreenshotText());
 	}
 
 private:
+	const char* _NotAvailableScreenshotText() {
+		if (fIsPopulatingScreenshot)
+			return B_TRANSLATE("Screenshot loading" B_UTF8_ELLIPSIS);
+		return B_TRANSLATE("No screenshot available.");
+	}
+
 	void _SetContactInfo(LinkView* view, const BString& string)
 	{
 		if (string.Length() > 0) {
@@ -824,9 +860,14 @@ private:
 	}
 
 private:
+	BString				fPackageName;
+
 	MarkupTextView*		fDescriptionView;
 
+	BCardView*			fScreenshotCardView;
+	NotAvailableView*	fScreenshotNotAvailableView;
 	LinkedBitmapView*	fScreenshotView;
+	bool				fIsPopulatingScreenshot;
 
 	BitmapView*			fWebsiteIconView;
 	LinkView*			fWebsiteLinkView;
@@ -1002,7 +1043,7 @@ public:
 		BGroupView("package ratings view", B_HORIZONTAL)
 	{
 		fPackageName = "";
-		fAmPopulating = false;
+		fIsPopulating = false;
 
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
@@ -1016,8 +1057,8 @@ public:
 			= new RatingsScrollView("ratings scroll view", ratingsContainerView);
 		scrollView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
-		fNoRatingsView = new NotAvailableStringView(
-		"no ratings",B_TRANSLATE("No user ratings available."));
+		fNoRatingsView = new NotAvailableView(
+			"no ratings",B_TRANSLATE("No user ratings available."), false);
 		fNoRatingsView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		// This allows for switching between the "no ratings" and the
@@ -1062,7 +1103,7 @@ public:
 		BString packageName;
 		if (package.IsSet())
 			packageName = package->Name();
-		fAmPopulating = fAmPopulating && (packageName == fPackageName) && count == 0;
+		fIsPopulating = fIsPopulating && (packageName == fPackageName) && count == 0;
 
 		if (count == 0) {
 			_SetNotAvailable();
@@ -1085,7 +1126,7 @@ public:
 
 	void Clear()
 	{
-		fAmPopulating = false;
+		fIsPopulating = false;
 		_SetNotAvailable();
 	}
 
@@ -1109,21 +1150,21 @@ public:
 	}
 
 	// TODO; need some way to signal failure.
-	void SetAmPopulating() {
-		fAmPopulating = true;
+	void SetIsPopulating() {
+		fIsPopulating = true;
 		_SetNotAvailable();
 	}
 
 	const char* _NotAvailableText() {
-		if (fAmPopulating)
+		if (fIsPopulating)
 			return B_TRANSLATE("User ratings loading" B_UTF8_ELLIPSIS);
 		return B_TRANSLATE("No user ratings available.");
 	}
 
 private:
 	BString fPackageName;
-	bool fAmPopulating;
-	NotAvailableStringView* fNoRatingsView;
+	bool fIsPopulating;
+	NotAvailableView* fNoRatingsView;
 	BGroupLayout* fRatingContainerLayout;
 	RatingSummaryView* fRatingSummaryView;
 	BCardView* fRatingContainerCardView;
@@ -1143,8 +1184,8 @@ public:
 
 		fPackageContents = new PackageContentsView("contents_list");
 
-		fNotAvailableView = new NotAvailableStringView("no contents",
-		B_TRANSLATE("No contents available."));
+		fNotAvailableView = new NotAvailableView("no contents",
+			B_TRANSLATE("No contents available."), false);
 
 		fCardView = new BCardView();
 		fCardView->AddChild(fPackageContents);
@@ -1182,7 +1223,7 @@ public:
 
 private:
 	BCardView* fCardView;
-	NotAvailableStringView* fNotAvailableView;
+	NotAvailableView* fNotAvailableView;
 	PackageContentsView* fPackageContents;
 };
 
@@ -1199,7 +1240,7 @@ public:
 		:
 		BGroupView("package changelog view", B_HORIZONTAL)
 	{
-		fAmPopulating = false;
+		fIsPopulating = false;
 		fPackageName = "";
 
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
@@ -1209,7 +1250,7 @@ public:
 		fTextView->SetInsets(be_plain_font->Size());
 		fTextScrollView = new GeneralContentScrollView("changelog scroll view", fTextView);
 
-		fNotAvailableView = new NotAvailableStringView("no changelog", _NotAvailableText());
+		fNotAvailableView = new NotAvailableView("no changelog", _NotAvailableText(), false);
 
 		fCardView = new BCardView();
 		fCardView->AddChild(fTextScrollView);
@@ -1249,7 +1290,7 @@ public:
 		BString packageName;
 		if (package.IsSet())
 			packageName = package->Name();
-		fAmPopulating = fAmPopulating && (packageName == fPackageName) && changelog.Length() == 0;
+		fIsPopulating = fIsPopulating && (packageName == fPackageName) && changelog.Length() == 0;
 
 		if (changelog.Length() > 0) {
 			fTextView->SetText(changelog);
@@ -1262,16 +1303,16 @@ public:
 	}
 
 	// TODO; need some way to signal failure.
-	void SetAmPopulating() {
+	void SetIsPopulating() {
 		HDDEBUG("set am populating changelog view");
-		fAmPopulating = true;
+		fIsPopulating = true;
 		_SetNotAvailable();
 	}
 
 	void Clear()
 	{
 		HDDEBUG("clearing changelog view");
-		fAmPopulating = false;
+		fIsPopulating = false;
 		_SetNotAvailable();
 	}
 
@@ -1282,7 +1323,7 @@ public:
 	}
 
 	const char* _NotAvailableText() {
-		if (fAmPopulating)
+		if (fIsPopulating)
 			return B_TRANSLATE("Changelog loading" B_UTF8_ELLIPSIS);
 		return B_TRANSLATE("No changelog available.");
 	}
@@ -1291,9 +1332,9 @@ private:
 	BString fPackageName;
 	MarkupTextView* fTextView;
 	BCardView* fCardView;
-	NotAvailableStringView* fNotAvailableView;
+	NotAvailableView* fNotAvailableView;
 	BScrollView* fTextScrollView;
-	bool fAmPopulating;
+	bool fIsPopulating;
 };
 
 
@@ -1335,6 +1376,11 @@ public:
 	void SetScreenshotThumbnail(BitmapHolderRef bitmap)
 	{
 		fAboutView->SetScreenshotThumbnail(bitmap);
+	}
+
+	void SetIsPopulatingScreenshot()
+	{
+		fAboutView->SetIsPopulatingScreenshot();
 	}
 
 	void PopulateDataForTab(int32 index)
@@ -1472,7 +1518,7 @@ private:
 		BMessage message = action.Message();
 		Window()->PostMessage(&message);
 
-		fChangelogView->SetAmPopulating();
+		fChangelogView->SetIsPopulating();
 	}
 
 	void _MaybePopulateUserRatings(const PackageInfoRef package) {
@@ -1501,7 +1547,7 @@ private:
 		BMessage message = action.Message();
 		Window()->PostMessage(&message);
 
-		fUserRatingsView->SetAmPopulating();
+		fUserRatingsView->SetIsPopulating();
 	}
 
 private:
@@ -1672,6 +1718,7 @@ PackageInfoView::_SetPackageScreenshotThumb(const PackageInfoRef& package)
 			CacheScreenshotPackageAction action(package->Name(), desiredCoordinate);
 			BMessage message = action.Message();
 			Window()->PostMessage(&message);
+			fPagesView->SetIsPopulatingScreenshot();
 		}
 	} else {
 		HDDEBUG("no screenshot for pkg [%s]", packageNameCStr);
