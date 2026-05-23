@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3291400395
+1	hungarian	x-vnd.Haiku-libtracker	1792277746
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -103,6 +103,7 @@ Affine transform	AttributesView		Affinis transzformáció
 Window	ContainerWindow		Ablak
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/mp
 Remove	FindPanel		Eltávolítás
+You cannot create a link to the %trash% directory.	FSUtils		Nem hozható létre hivatkozás a %trash% mappába.
 Company	Person Query Columns		Szervezet
 Select folders…	FindPanel		Mappák megadása…
 Recent documents	FavoritesMenu		Legutóbbi dokumentumok
@@ -262,6 +263,7 @@ New folder %d	FSUtils		Új mappa %d
 Extended attribute	AttributesView		Kiegészített jellemzők
 Error %error loading Add-On %name.	ContainerWindow		Hiba történt a bővítmény (%name) betöltése közben: %error.
 Unmatched brackets.	libtracker		Páratlan kapcsos-zárójel.
+You cannot copy or move the 'printers' directory.	FSUtils		Nem mozgathatod/másolhatod a 'printers' mappát.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Ezt akarod most felülírni:\n\t%name %dest\nezzel:\n\t%name %src\n\nBiztos ki akarod cserélni azzal amit most akarsz %movemode?
 Empty Trash	ContainerWindow		Szemetes ürítése
 no supporting apps	OpenWithWindow		nincs használható program
@@ -274,6 +276,7 @@ label too long	PoseView		túl hosszú címke
 Error creating link to \"%name\".	FSUtils		Hiba történt a hivatkozás (\"%name\") létrehozása közben.
 Unknown	FilePermissionsView		Ismeretlen
 Paste links	ContainerWindow		Hivatkozások beillesztése
+You cannot copy or move the %trash% directory.	FSUtils		Nem mozgathatod/másolhatod a %trash% mappát.
 Restoring: 	StatusWindow		Visszaállítás: 
 The Tracker must be running to set the default printer.	PoseView		A Nyomkövetőnek futnia kell az alapértelmezett nyomtató megadásához.
 calculating…	InfoWindow		számolás…
@@ -343,6 +346,7 @@ The entered file name is too long.	FSUtils		A megadott fájlnév túl hosszú.
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Néhányat a kiválasztott elem közül nem lehet a Szemetesbe mozgatni. Szeretnéd inkább törölni? (Nem vonható vissza.)
 Add printer…	ContainerWindow		Nyomtató hozzáadása…
 Permissions	ContainerWindow		Engedélyek
+Trash	FSUtils		Szemetes
 Size:	InfoWindow		Méret:
 Copy	ContainerWindow		Másolás
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		A kiválasztott elemet nem lehet a Szemetesbe mozgatni. Szeretnéd inkább törölni? (Nem vonható vissza.)

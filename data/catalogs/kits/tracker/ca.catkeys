@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	3291400395
+1	catalan; valencian	x-vnd.Haiku-libtracker	1792277746
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -103,6 +103,7 @@ Affine transform	AttributesView		Transformació afí
 Window	ContainerWindow		Finestra
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Suprimeix
+You cannot create a link to the %trash% directory.	FSUtils		No podeu crear un enllaç al directori %trash%.
 Company	Person Query Columns		Companyia
 Select folders…	FindPanel		Selecció de carpetes...
 Recent documents	FavoritesMenu		Documents recents
@@ -262,6 +263,7 @@ New folder %d	FSUtils		Carpeta nova %d
 Extended attribute	AttributesView		Atribut ampliat
 Error %error loading Add-On %name.	ContainerWindow		Hi ha hagut un error (%error) en carregar el complement %name.
 Unmatched brackets.	libtracker		Claudàtors no coincidents.
+You cannot copy or move the 'printers' directory.	FSUtils		No podeu copiar ni moure el directori d'impressores.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Esteu intentant reemplaçar l'element\n\t%name%dest\nper\n\t%name%src\n\nSegur que el voleu reemplaçar per %movemode?
 Empty Trash	ContainerWindow		Buida la paperera
 no supporting apps	OpenWithWindow		aplicacions no compatibles
@@ -274,6 +276,7 @@ label too long	PoseView		l'etiqueta és massa llarga
 Error creating link to \"%name\".	FSUtils		Hi ha hagut un error en enllaçar amb \"%name\".
 Unknown	FilePermissionsView		Desconegut
 Paste links	ContainerWindow		Enganxa els enllaços
+You cannot copy or move the %trash% directory.	FSUtils		No podeu copiar ni moure el directori %trash%.
 Restoring: 	StatusWindow		Es restaura: 
 The Tracker must be running to set the default printer.	PoseView		El Rastrejador ha d'executar-se per establir la impressora predeterminada.
 calculating…	InfoWindow		es calcula...
@@ -343,6 +346,7 @@ The entered file name is too long.	FSUtils		El nom de fitxer introduït és mass
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dels elements seleccionats no es poden moure a la paperera. Els voleu suprimir? (Aquesta operació no es pot desfer.)
 Add printer…	ContainerWindow		Afegeix-hi una impressora...
 Permissions	ContainerWindow		Permisos
+Trash	FSUtils		Paperera
 Size:	InfoWindow		Mida:
 Copy	ContainerWindow		Copia
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'element seleccionat no es pot moure a la paperera. El voleu suprimir? (Aquesta operació no es pot desfer.)

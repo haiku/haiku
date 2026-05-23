@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3291400395
+1	swedish	x-vnd.Haiku-libtracker	1792277746
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -103,6 +103,7 @@ Affine transform	AttributesView		Affin transformering
 Window	ContainerWindow		Fönster
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Ta bort
+You cannot create a link to the %trash% directory.	FSUtils		Du kan inte skapa en länk till katalogen %trash%.
 Company	Person Query Columns		Företag
 Select folders…	FindPanel		Välj mappar...
 Recent documents	FavoritesMenu		Senaste dokumenten
@@ -262,6 +263,7 @@ New folder %d	FSUtils		Ny mapp %d
 Extended attribute	AttributesView		Utökat attribut
 Error %error loading Add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
 Unmatched brackets.	libtracker		Omatchade paranteser.
+You cannot copy or move the 'printers' directory.	FSUtils		Du kan inte kopiera eller flytta katalogen 'printers'.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Du försöker ersätta objektet:\n\t%name%dest\nmed\n\t%name%src\n\nVill du ersätta den med den som du %movemode?
 Empty Trash	ContainerWindow		Töm Papperskorgen
 no supporting apps	OpenWithWindow		program saknas
@@ -274,6 +276,7 @@ label too long	PoseView		etiketten är för lång
 Error creating link to \"%name\".	FSUtils		Fel vid skapande av länk till \"%name\".
 Unknown	FilePermissionsView		Okänd
 Paste links	ContainerWindow		Klistra in länkar
+You cannot copy or move the %trash% directory.	FSUtils		Du kan inte kopiera eller flytta katalogen %trash%.
 Restoring: 	StatusWindow		Återställer:
 The Tracker must be running to set the default printer.	PoseView		Tracker måste ha startats för att kunna sätta förvald printer.
 calculating…	InfoWindow		beräknar...
@@ -343,6 +346,7 @@ The entered file name is too long.	FSUtils		Det angivna filnamnet är för lång
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Vissa av de markerade objekten kan inte flyttas till Papperskorgen. Vill du ta bort dem istället? (Denna operation kan inte ångras.)
 Add printer…	ContainerWindow		Lägg till skrivare...
 Permissions	ContainerWindow		Behörigheter
+Trash	FSUtils		Skräp
 Size:	InfoWindow		Storlek:
 Copy	ContainerWindow		Kopiera
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det markerade objektet kan inte flyttas till Papperskorgen. Vill du ta bort den istället? (Denna operation kan inte ångras.)
