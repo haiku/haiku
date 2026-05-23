@@ -480,6 +480,42 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			// copy back to user space
 			return user_memcpy(buffer, &attrInfo, sizeof(device_attr_info));
 		}
+
+		case DM_GET_DRIVER_PATH:
+		{
+			struct device_attr_info attrInfo;
+			if (!IS_USER_ADDRESS(buffer))
+				return B_BAD_ADDRESS;
+			if (bufferSize != sizeof(device_attr_info))
+				return B_BAD_VALUE;
+			if (user_memcpy(&attrInfo, buffer, sizeof(device_attr_info)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			device_node* node = (device_node*)attrInfo.node_cookie;
+			if (node == NULL)
+				return B_BAD_VALUE;
+
+			const char* driverPath = NULL;
+			if (node->ModuleName() != NULL)
+				driverPath = node->ModuleName();
+
+			if (driverPath == NULL || driverPath[0] == '\0')
+				return B_ENTRY_NOT_FOUND;
+
+			char* allocatedPath = NULL;
+			status_t status = module_get_path(driverPath, &allocatedPath);
+
+			if (status == B_OK && allocatedPath != NULL) {
+				strlcpy(attrInfo.value.string, allocatedPath, sizeof(attrInfo.value.string));
+				free(allocatedPath);
+			} else {
+				attrInfo.value.string[0] = '\0';
+			}
+
+			attrInfo.type = B_STRING_TYPE;
+
+			return user_memcpy(buffer, &attrInfo, sizeof(device_attr_info));
+		}
 	}
 
 	return B_BAD_HANDLER;
@@ -675,7 +711,7 @@ publish_device(device_node *node, const char *path, const char *moduleName)
 	attr = new(std::nothrow) device_attr_private();
 	if (attr != NULL) {
 		char buf[256];
-		sprintf(buf, "dev/%" B_PRIdINO "/path", device->ID());
+		snprintf(buf, sizeof(buf), "dev/%" B_PRIdINO "/path", device->ID());
 		attr->name = strdup(buf);
 		attr->type = B_STRING_TYPE;
 		attr->value.string = strdup(path);
@@ -685,10 +721,20 @@ publish_device(device_node *node, const char *path, const char *moduleName)
 	attr = new(std::nothrow) device_attr_private();
 	if (attr != NULL) {
 		char buf[256];
-		sprintf(buf, "dev/%" B_PRIdINO "/driver", device->ID());
+		snprintf(buf, sizeof(buf), "dev/%" B_PRIdINO "/driver", device->ID());
 		attr->name = strdup(buf);
 		attr->type = B_STRING_TYPE;
 		attr->value.string = strdup(moduleName);
+		node->Attributes().Add(attr);
+	}
+
+	attr = new(std::nothrow) device_attr_private();
+	if (attr != NULL) {
+		attr->name = strdup(B_DEVICE_PUBLISHED_PATH);
+		attr->type = B_STRING_TYPE;
+		char buf[256];
+		snprintf(buf, sizeof(buf), "/dev/%s", path);
+		attr->value.string = strdup(buf);
 		node->Attributes().Add(attr);
 	}
 

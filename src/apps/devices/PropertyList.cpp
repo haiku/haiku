@@ -55,9 +55,8 @@ PropertyList::PropertyList(const char* name)
 	AddColumn(nameColumn = new BStringColumn(B_TRANSLATE("Name"), 150, 50, 500,
 			B_TRUNCATE_MIDDLE),
 		kNameColumn);
-	AddColumn(new BStringColumn(B_TRANSLATE("Value"), 300, 50, 500,
+	AddColumn(new BStringColumn(B_TRANSLATE("Value"), 400, 100, 1000,
 		B_TRUNCATE_END), kValueColumn);
-	SetSortColumn(nameColumn, false, true);
 }
 
 
@@ -71,9 +70,23 @@ void
 PropertyList::AddAttributes(const Attributes& attributes)
 {
 	RemoveAll();
+
+	PropertyRow* basicRoot = new PropertyRow(B_TRANSLATE("Basic information"), "");
+	PropertyRow* advancedRoot = new PropertyRow(B_TRANSLATE("Attributes"), "");
+
+	AddRow(basicRoot);
+	AddRow(advancedRoot);
+
 	for (unsigned int i = 0; i < attributes.size(); i++) {
-		AddRow(new PropertyRow(attributes[i].fName, attributes[i].fValue));
+		PropertyRow* childRow = new PropertyRow(attributes[i].fName, attributes[i].fValue);
+
+		if (attributes[i].fName.FindFirst('/') != B_ERROR)
+			AddRow(childRow, advancedRoot);
+		else
+			AddRow(childRow, basicRoot);
 	}
+	ExpandOrCollapse(basicRoot, true);
+	ExpandOrCollapse(advancedRoot, true);
 }
 
 

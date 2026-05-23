@@ -16,6 +16,7 @@
 #define DM_GET_CHILD			2
 #define DM_GET_NEXT_CHILD		3
 #define DM_GET_NEXT_ATTRIBUTE	4
+#define DM_GET_DRIVER_PATH		5
 
 typedef addr_t device_node_cookie;
 

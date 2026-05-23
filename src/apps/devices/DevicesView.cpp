@@ -16,6 +16,13 @@
 
 #include <iostream>
 
+#include <Drivers.h>
+#include <StorageDefs.h>
+
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
 #include "DevicesView.h"
 
 #undef B_TRANSLATION_CONTEXT
@@ -384,10 +391,31 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 			CAT_NONE, B_TRANSLATE("Unknown device"));
 	}
 
+	struct device_attr_info driverAttrInfo;
+	driverAttrInfo.node_cookie = *node;
+	driverAttrInfo.cookie = 0;
+	dm_get_driver_path(&driverAttrInfo);
+
+	bool hasPublishedPath = false;
+
 	// Add its attributes to the device, initialize it and add to the list.
 	for (unsigned int i = 0; i < attributes.size(); i++) {
+		if (attributes[i].fName == B_DEVICE_PUBLISHED_PATH) {
+			newDevice->SetAttribute(B_TRANSLATE("Device paths"), attributes[i].fValue);
+			hasPublishedPath = true;
+			continue;
+		}
+
 		newDevice->SetAttribute(attributes[i].fName, attributes[i].fValue);
 	}
+
+	if (driverAttrInfo.value.string[0] != '\0')
+		newDevice->SetAttribute(B_TRANSLATE("Driver used"), driverAttrInfo.value.string);
+	else
+		newDevice->SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE("Unknown"));
+	if (!hasPublishedPath)
+		newDevice->SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE("None"));
+
 	newDevice->InitFromAttributes();
 	fDevices.push_back(newDevice);
 

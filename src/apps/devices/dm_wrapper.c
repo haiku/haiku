@@ -67,3 +67,11 @@ dm_get_next_attr(struct device_attr_info *attr)
 	return _kern_generic_syscall(DEVICE_MANAGER_SYSCALLS,
 		DM_GET_NEXT_ATTRIBUTE, attr, sizeof(struct device_attr_info));
 }
+
+
+status_t
+dm_get_driver_path(struct device_attr_info *attr)
+{
+	return _kern_generic_syscall(DEVICE_MANAGER_SYSCALLS,
+		DM_GET_DRIVER_PATH, attr, sizeof(struct device_attr_info));
+}

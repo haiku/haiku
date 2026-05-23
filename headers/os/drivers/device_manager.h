@@ -150,6 +150,8 @@ struct driver_module_info {
 
 #define B_DEVICE_UNIQUE_ID			"device/unique id"			/* string */
 
+#define B_DEVICE_PUBLISHED_PATH		"device/published path"
+
 /* device flags */
 #define B_FIND_CHILD_ON_DEMAND		0x01
 #define B_FIND_MULTIPLE_CHILDREN	0x02

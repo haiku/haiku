@@ -17,5 +17,6 @@ status_t get_root(device_node_cookie *cookie);
 status_t get_child(device_node_cookie *cookie);
 status_t get_next_child(device_node_cookie *cookie);
 status_t dm_get_next_attr(struct device_attr_info *attr);
+status_t dm_get_driver_path(struct device_attr_info *attr);
 
 #endif /* DM_WRAPPER_H */
