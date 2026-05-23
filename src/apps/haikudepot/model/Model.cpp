@@ -534,7 +534,10 @@ void
 Model::SetPackageListViewMode(package_list_view_mode mode)
 {
 	BAutolock locker(&fLock);
-	fPackageListViewMode = mode;
+	if (fPackageListViewMode != mode) {
+		fPackageListViewMode = mode;
+		_NotifyPackageListViewModeChanged();
+	}
 }
 
 
@@ -659,6 +662,18 @@ Model::_NotifyCategoryListChanged()
 		const ModelListenerRef& listener = *it;
 		if (listener.IsSet())
 			listener->CategoryListChanged();
+	}
+}
+
+
+void
+Model::_NotifyPackageListViewModeChanged()
+{
+	std::vector<ModelListenerRef>::const_iterator it;
+	for (it = fListeners.begin(); it != fListeners.end(); it++) {
+		const ModelListenerRef& listener = *it;
+		if (listener.IsSet())
+			listener->PackageListViewModeChanged();
 	}
 }
 

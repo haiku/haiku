@@ -39,12 +39,13 @@ class ModelListener : public BReferenceable {
 public:
 	virtual						~ModelListener();
 
-	virtual void				SelectedPackageChanged() = 0;
+	virtual	void				SelectedPackageChanged() = 0;
 	virtual	void				AuthorizationChanged() = 0;
-	virtual void				CategoryListChanged() = 0;
-	virtual void				ScreenshotCached(const ScreenshotCoordinate& coordinate) = 0;
-	virtual void				IconsChanged() = 0;
-	virtual void				PackageFilterChanged() = 0;
+	virtual	void				CategoryListChanged() = 0;
+	virtual	void				ScreenshotCached(const ScreenshotCoordinate& coordinate) = 0;
+	virtual	void				IconsChanged() = 0;
+	virtual	void				PackageFilterChanged() = 0;
+	virtual	void				PackageListViewModeChanged() = 0;
 };
 
 
@@ -185,6 +186,7 @@ private:
 			void				_NotifyCategoryListChanged();
 			void				_NotifyPackageChange(const PackageChangeEvent& event);
 			void				_NotifyPackageChanges(const PackageChangeEvents& events);
+			void				_NotifyPackageListViewModeChanged();
 
 private:
 	mutable	BLocker				fLock;

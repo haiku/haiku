@@ -83,8 +83,9 @@ enum {
 	MSG_INCREMENT_VIEW_COUNTER					= 'icrv',
 	MSG_SCREENSHOT_CACHED						= 'ssca',
 	MSG_SELECTED_PACKAGE_CHANGED				= 'spch',
+	MSG_PACKAGE_LIST_MODE_CHANGED				= 'pkmc',
 
-	MSG_CHANGE_PACKAGE_LIST_VIEW_MODE			= 'cplm',
+	MSG_PACKAGE_LIST_MODE_TAB_CHANGED			= 'cplm',
 	MSG_SHOW_DESKTOP_PACKAGES					= 'sodk',
 	MSG_SHOW_NATIVE_DESKTOP_PACKAGES			= 'sond',
 	MSG_SHOW_DESKTOP_AND_NON_DESKTOP_PACKAGES	= 'sdan',
@@ -182,6 +183,13 @@ public:
 			fMessenger.SendMessage(MSG_SELECTED_PACKAGE_CHANGED);
 	}
 
+	virtual	void PackageListViewModeChanged()
+	{
+		if (fMessenger.IsValid())
+			fMessenger.SendMessage(MSG_PACKAGE_LIST_MODE_CHANGED);
+	}
+
+
 private:
 	BMessenger fMessenger;
 };
@@ -251,7 +259,7 @@ MainWindow::MainWindow(const BMessage& settings)
 	fPackageListView->AttachWorkStatusView(fWorkStatusView);
 
 	fListTabs
-		= new TabView(BMessenger(this), BMessage(MSG_CHANGE_PACKAGE_LIST_VIEW_MODE), "list tabs");
+		= new TabView(BMessenger(this), BMessage(MSG_PACKAGE_LIST_MODE_TAB_CHANGED), "list tabs");
 	fListTabs->AddTab(fFeaturedPackagesView);
 	fListTabs->AddTab(fPackageListView);
 
@@ -285,12 +293,6 @@ MainWindow::MainWindow(const BMessage& settings)
 
 	_RestoreModelSettings(settings);
 	_MaybePromptCanShareAnonymousUserData(settings);
-
-	if (fModel.PackageListViewMode() == PROMINENT)
-		fListTabs->Select(TAB_PROMINENT_PACKAGES);
-	else
-		fListTabs->Select(TAB_ALL_PACKAGES);
-
 	_RestoreNickname(settings);
 	_UpdateAuthorization();
 	_RestoreWindowFrame(settings);
@@ -535,7 +537,17 @@ MainWindow::MessageReceived(BMessage* message)
 			_AdoptModel();
 			break;
 
-		case MSG_CHANGE_PACKAGE_LIST_VIEW_MODE:
+		case MSG_PACKAGE_LIST_MODE_CHANGED:
+			// This message will originate from a change in the model.
+			_AdoptModelControls();
+			break;
+
+		case MSG_PACKAGE_LIST_MODE_TAB_CHANGED:
+			// This message fired when the user chooses one of list view mode
+			// tabs. It is happening as a result of a UI interaction rather
+			// than a model change; the model change is handled on a different
+			// event.
+			_PackageListViewRevokeFocus();
 			_HandleChangePackageListViewMode();
 			break;
 
@@ -735,7 +747,11 @@ MainWindow::MessageReceived(BMessage* message)
 		}
 
 		case MSG_SHOW_ALL_PACKAGES_TAB:
-			fListTabs->Select(TAB_ALL_PACKAGES);
+			// An example of where this might be sent is the hyperlink in the
+			// featured packages view where there is a link to the all packages
+			// view if the list is empty. By setting this on the model, an
+			// event will return back to this class to switch the tabs.
+			fModel.SetPackageListViewMode(ALL);
 			break;
 
 		default:
@@ -1194,12 +1210,55 @@ MainWindow::_AdoptModelControls()
 	fShowSourcePackagesItem->SetMarked(packageFilterSpecification->ShowSourcePackages());
 	fShowDevelopPackagesItem->SetMarked(packageFilterSpecification->ShowDevelopPackages());
 
-	if (fModel.PackageListViewMode() == PROMINENT)
-		fListTabs->Select(TAB_PROMINENT_PACKAGES);
-	else
-		fListTabs->Select(TAB_ALL_PACKAGES);
+	switch (fModel.PackageListViewMode()) {
+		case PROMINENT:
+			fListTabs->Select(TAB_PROMINENT_PACKAGES);
+			break;
+		case ALL:
+			fListTabs->Select(TAB_ALL_PACKAGES);
+			break;
+		default:
+			HDFATAL("attempt to select unknown tab");
+			break;
+	}
 
 	fFilterView->AdoptModel(fModel);
+}
+
+
+void
+MainWindow::_PackageListViewRevokeFocus()
+{
+	BView* currentFocusView = CurrentFocus();
+	if (currentFocusView != NULL && _IsPackageListView(currentFocusView)) {
+		currentFocusView->MakeFocus(false);
+		HDINFO("revoked focus on package list view");
+	}
+}
+
+
+/*!	Returns true if the view supplied is a sub-view of one of the package list
+ *	views.
+ */
+bool
+MainWindow::_IsPackageListView(BView* view)
+{
+	if (view == NULL)
+		return false;
+
+	BView* packageListViews[2] = {fFeaturedPackagesView, fPackageListView};
+
+	for (int i = 0; i < 2; i++) {
+		BView* v = view;
+
+		while (v != NULL) {
+			if (v == packageListViews[i])
+				return true;
+			v = v->Parent();
+		}
+	}
+
+	return false;
 }
 
 
@@ -1413,7 +1472,6 @@ MainWindow::_BulkLoadCompleteReceived(status_t errorStatus)
 		&& fListTabs->Selection() == TAB_PROMINENT_PACKAGES) {
 		HDINFO("no prominent packages; will display all packages instead");
 		fModel.SetPackageListViewMode(ALL);
-		fListTabs->Select(TAB_ALL_PACKAGES);
 	}
 }
 
@@ -1828,7 +1886,6 @@ MainWindow::_StopProcessCoordinators()
 	A change may mean that a new process has started / stopped etc... or it
 	may mean that the entire coordinator has finished.
 */
-
 void
 MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 {
@@ -1892,24 +1949,24 @@ MainWindow::_HandleProcessCoordinatorChanged(ProcessCoordinatorState& coordinato
 }
 
 
-static package_list_view_mode
-main_window_tab_to_package_list_view_mode(int32 tab)
-{
-	if (tab == TAB_PROMINENT_PACKAGES)
-		return PROMINENT;
-	return ALL;
-}
-
-
+/*!	This method will update the selected tab in the model but does not change
+ *	the UI display directly. Instead, the model will message back to this
+ *	class to do that.
+ */
 void
 MainWindow::_HandleChangePackageListViewMode()
 {
-	package_list_view_mode tabMode
-		= main_window_tab_to_package_list_view_mode(fListTabs->Selection());
-	package_list_view_mode modelMode = fModel.PackageListViewMode();
-
-	if (tabMode != modelMode)
-		fModel.SetPackageListViewMode(tabMode);
+	switch (fListTabs->Selection()) {
+		case TAB_PROMINENT_PACKAGES:
+			fModel.SetPackageListViewMode(PROMINENT);
+			break;
+		case TAB_ALL_PACKAGES:
+			fModel.SetPackageListViewMode(ALL);
+			break;
+		default:
+			HDFATAL("unknown package list tab");
+			break;
+	}
 }
 
 

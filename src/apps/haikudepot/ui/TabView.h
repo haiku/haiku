@@ -23,11 +23,15 @@ public:
 
 	virtual void Select(int32 tabIndex)
 	{
+		int32 previousTabIndex = Selection();
+
 		BTabView::Select(tabIndex);
 
-		BMessage message(fMessage);
-		message.AddInt32("tab index", tabIndex);
-		fTarget.SendMessage(&message);
+		if (tabIndex != previousTabIndex) {
+			BMessage message(fMessage);
+			message.AddInt32("tab index", tabIndex);
+			fTarget.SendMessage(&message);
+		}
 	}
 
 private:

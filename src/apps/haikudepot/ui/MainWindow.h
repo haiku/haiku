@@ -165,6 +165,9 @@ private:
 
 			void				_SetPackageDesktopFilterMode(PackageDesktopFilterMode mode);
 
+			void				_PackageListViewRevokeFocus();
+			bool				_IsPackageListView(BView* view);
+
 private:
 			FilterView*			fFilterView;
 			TabView*			fListTabs;
