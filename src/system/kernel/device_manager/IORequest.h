@@ -140,6 +140,11 @@ public:
 			off_t				Offset() const;
 			generic_size_t		Length() const;
 
+			off_t				TotalOffset() const
+									{ return fOffset; }
+			generic_size_t		TotalLength() const
+									{ return fLength; }
+
 			off_t				OriginalOffset() const
 									{ return fOriginalOffset; }
 			generic_size_t		OriginalLength() const

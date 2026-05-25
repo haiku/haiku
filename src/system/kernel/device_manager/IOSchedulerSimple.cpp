@@ -172,6 +172,14 @@ IOSchedulerSimple::~IOSchedulerSimple()
 	}
 
 	delete fRequestOwners;
+
+	// Remove any remaining write blocks
+	WriteBlock* currentWriteBlock = fWriteBlocks.Head();
+	while (currentWriteBlock != NULL) {
+		WriteBlock* nextWriteBlock = fWriteBlocks.GetNext(currentWriteBlock);
+		delete currentWriteBlock;
+		currentWriteBlock = nextWriteBlock;
+	}
 }
 
 
@@ -359,6 +367,11 @@ IOSchedulerSimple::_Finisher()
 
 		bool operationFinished = operation->Finish();
 
+		if (operationFinished) {
+			MutexLocker locker(fLock);
+			_RemoveWriteBlocksForOperation(operation);
+		}
+
 		IOSchedulerRoster::Default()->Notify(IO_SCHEDULER_OPERATION_FINISHED,
 			this, operation->Parent(), operation);
 			// Notify for every time the operation is passed to the I/O hook,
@@ -463,6 +476,11 @@ IOSchedulerSimple::_PrepareRequestOperations(IORequest* request,
 			}
 //dprintf("  prepared operation %p\n", operation);
 
+			if (!_CheckAndBlockWrites(operations, operation)) {
+				((RequestOwner*)operation->Parent()->Owner())->operations.Add(operation);
+				continue;
+			}
+
 			off_t bandwidth = operation->Length();
 			quantum -= bandwidth;
 			usedBandwidth += bandwidth;
@@ -488,6 +506,11 @@ IOSchedulerSimple::_PrepareRequestOperations(IORequest* request,
 		operation->SetOriginalRange(request->Offset(), request->Length());
 		request->Advance(request->Length());
 
+		if (!_CheckAndBlockWrites(operations, operation)) {
+			((RequestOwner*)operation->Parent()->Owner())->operations.Add(operation);
+			return true;
+		}
+
 		off_t bandwidth = operation->Length();
 		quantum -= bandwidth;
 		usedBandwidth += bandwidth;
@@ -497,6 +520,84 @@ IOSchedulerSimple::_PrepareRequestOperations(IORequest* request,
 	}
 
 	return true;
+}
+
+
+bool
+IOSchedulerSimple::_CheckAndBlockWrites(IOOperationList& operations, IOOperation* operation)
+{
+	ASSERT_LOCKED_MUTEX(&fLock);
+
+	// Operations that are part of a read request are not blocked
+	if (operation->Parent()->IsRead())
+		return true;
+
+	off_t begin = operation->TotalOffset();
+	off_t end = begin + operation->TotalLength() - 1;
+
+	// Check if operation is blocked
+	WriteBlock* currentWriteBlock = fWriteBlocks.Head();
+	while (currentWriteBlock != NULL) {
+		WriteBlock* nextWriteBlock = fWriteBlocks.GetNext(currentWriteBlock);
+
+		if (currentWriteBlock->operation != operation
+			&& (currentWriteBlock->begin <= end && begin <= currentWriteBlock->end))
+			return false;
+
+		currentWriteBlock = nextWriteBlock;
+	}
+
+	if (operation->HasPartialBegin() || operation->HasPartialEnd()) {
+		// Add write block for the operation
+		// Do we already have write blocks set for this op?
+		currentWriteBlock = fWriteBlocks.Head();
+		while (currentWriteBlock != NULL) {
+			WriteBlock* nextWriteBlock = fWriteBlocks.GetNext(currentWriteBlock);
+
+			if (currentWriteBlock->operation == operation)
+				return true;
+
+			currentWriteBlock = nextWriteBlock;
+		}
+
+		// Add the write blocks
+		if (operation->HasPartialBegin()) {
+			WriteBlock* writeBlock = new WriteBlock();
+			writeBlock->begin = operation->TotalOffset();
+			writeBlock->end = writeBlock->begin + fBlockSize -1;
+			writeBlock->operation = operation;
+			fWriteBlocks.Add(writeBlock);
+		}
+
+		if (operation->HasPartialEnd()) {
+			WriteBlock* writeBlock = new WriteBlock();
+			writeBlock->begin = operation->TotalOffset() + operation->TotalLength() - fBlockSize;
+			writeBlock->end = writeBlock->begin + fBlockSize -1;
+			writeBlock->operation = operation;
+			fWriteBlocks.Add(writeBlock);
+		}
+	}
+
+	return true;
+}
+
+
+void
+IOSchedulerSimple::_RemoveWriteBlocksForOperation(IOOperation* operation)
+{
+	ASSERT_LOCKED_MUTEX(&fLock);
+
+	WriteBlock* currentWriteBlock = fWriteBlocks.Head();
+	while (currentWriteBlock != NULL) {
+		WriteBlock* nextWriteBlock = fWriteBlocks.GetNext(currentWriteBlock);
+
+		if (operation == currentWriteBlock->operation) {
+			fWriteBlocks.Remove(currentWriteBlock);
+			delete currentWriteBlock;
+		}
+
+		currentWriteBlock = nextWriteBlock;
+	}
 }
 
 
@@ -625,6 +726,7 @@ IOSchedulerSimple::_Scheduler()
 		MutexLocker locker(fLock);
 
 		IOOperationList operations;
+		IOOperationList removedOperations;
 		int32 operationCount = 0;
 		bool resourcesAvailable = true;
 		off_t iterationBandwidth = fIterationBandwidth;
@@ -651,9 +753,11 @@ IOSchedulerSimple::_Scheduler()
 			while (IOOperation* operation = owner->operations.RemoveHead()) {
 				// TODO: We might actually grant the owner more bandwidth than
 				// it deserves.
-				// TODO: We should make sure that after the first read operation
-				// of a partial write, no other write operation to the same
-				// location is scheduled!
+				if (!_CheckAndBlockWrites(operations, operation)) {
+					removedOperations.Add(operation);
+					continue;
+				}
+
 				operations.Add(operation);
 				operationCount++;
 				off_t bandwidth = operation->Length();
@@ -661,10 +765,13 @@ IOSchedulerSimple::_Scheduler()
 				iterationBandwidth -= bandwidth;
 
 				if (quantum < (off_t)fBlockSize
-					|| iterationBandwidth < (off_t)fBlockSize) {
+					|| iterationBandwidth < (off_t)fBlockSize)
 					break;
-				}
 			}
+
+			// Add operations that were blocked back to the owner
+			while (IOOperation* removedOperation = removedOperations.RemoveHead())
+				owner->operations.Add(removedOperation);
 
 			while (resourcesAvailable && quantum >= (off_t)fBlockSize
 					&& iterationBandwidth >= (off_t)fBlockSize) {

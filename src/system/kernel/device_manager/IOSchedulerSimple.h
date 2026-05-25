@@ -17,6 +17,16 @@
 #include "IOScheduler.h"
 
 
+struct WriteBlock : DoublyLinkedListLinkImpl<WriteBlock> {
+	off_t begin;
+	off_t end;
+	IOOperation* operation;
+};
+
+
+typedef DoublyLinkedList<WriteBlock> WriteBlockList;
+
+
 class IOSchedulerSimple : public IOScheduler {
 public:
 								IOSchedulerSimple(DMAResource* resource);
@@ -57,6 +67,8 @@ private:
 									IOOperationList& operations,
 									int32& operationsPrepared, off_t quantum,
 									off_t& usedBandwidth);
+			bool				_CheckAndBlockWrites(IOOperationList& operations, IOOperation* operation);
+			void				_RemoveWriteBlocksForOperation(IOOperation* operation);
 			void				_SortOperations(IOOperationList& operations,
 									off_t& lastOffset);
 			status_t			_Scheduler();
@@ -81,6 +93,7 @@ private:
 			IOOperation**		fOperationArray;
 			IOOperationList		fUnusedOperations;
 			IOOperationList		fCompletedOperations;
+			WriteBlockList		fWriteBlocks;
 			RequestOwnerList	fActiveRequestOwners;
 			RequestOwnerHashTable* fRequestOwners;
 			generic_size_t		fBlockSize;
