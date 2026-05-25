@@ -1,0 +1,469 @@
+/*
+ * Copyright 2026 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina
+ *
+ * Corresponds to:
+ *		headers/os/kernel/image.h
+ */
+
+
+/*!
+	\file image.h
+	\ingroup kernel
+	\brief Contains definitions and functions to deal with executable images
+		and the symbols they contain.
+
+	It also contains the function clear_caches() to invalidate or flush
+	sections in the CPU caches.
+*/
+
+
+/*!
+	\typedef int32 image_id
+	\brief Defines a type to identify images of binaries in memory.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\typedef enum {} image_type
+	\brief Contains identifiers for the type of images.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var ::B_APP_IMAGE
+	\brief The image is an application image.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var ::B_LIBRARY_IMAGE
+	\brief The image is a library image.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var ::B_ADD_ON_IMAGE
+	\brief The image is an add-on image.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var ::B_SYSTEM_IMAGE
+	\brief The image is a system image.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\struct {} image_info
+	\ingroup kernel
+	\brief Contains information about a running image.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var image_id image_info::id
+	\brief The image's identifier number.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var image_type image_info::type
+	\brief The type of the image.
+
+	It is one of the following:
+	- ::B_APP_IMAGE
+	- ::B_LIBRARY_IMAGE
+	- ::B_ADD_ON_IMAGE
+	- ::B_SYSTEM_IMAGE
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var int32 image_info::sequence
+	\brief A number that indicates the order in which the image was loaded
+		respective to the other images in this team.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var int32 image_info::init_order
+	\brief A number that indicates the order in which the image was initialized
+		respective to the other images in this team.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\typedef void (*image_info::init_routine)()
+	\brief A pointer to the function used to initialize the image.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\typedef void (*image_info::term_routine)()
+	\brief A pointer to the function used to clean up the image before unloading.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var dev_t image_info::device
+	\brief The identifier of the device where the image file is located.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var ino_t image_info::node
+	\brief The file node identifier of the image file.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var char image_info::name[MAXPATHLEN]
+	\brief The path of the file from where the image was created.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var void* image_info::text
+	\brief The address of the image's .text section.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var void* image_info::data
+	\brief The address of the image's .data section.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var int32 image_info::text_size
+	\brief The size of the image's .text section.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var int32 image_info::data_size
+	\brief The size of the image's .data section.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var int32 image_info::api_version
+	\brief The Haiku application programming interface version used by the image.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var int32 image_info::abi
+	\brief The Haiku application binary interface used by the image.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Flags for cache management
+*/
+
+//! @{
+
+/*!
+	\def B_FLUSH_DCACHE
+	\brief Flushes a segment in the processor data cache.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_FLUSH_ICACHE
+	\brief Flushes a segment in the processor instruction cache.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_INVALIDATE_DCACHE
+	\brief Invalidates a segment in the processor data cache.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_INVALIDATE_ICACHE
+	\brief Invalidates a segment in the processor instruction cache.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\name Image's symbol types
+*/
+
+//! @{
+
+/*!
+	\def B_SYMBOL_TYPE_DATA
+	\brief The symbol type .data for variables.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_SYMBOL_TYPE_TEXT
+	\brief The symbol type .text for executable instructions.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_SYMBOL_TYPE_ANY
+	\brief If the binary format distinguishes between .data and .text section
+		symbols, use either type. Or else, the format does not distinguish
+		between symbols of both sections.
+
+	\since BeOS R3
+*/
+
+//! @}
+
+
+/*!
+	\name Symbol's address definitions
+*/
+
+//! @{
+
+/*!
+	\def B_APP_IMAGE_SYMBOL
+	\brief Defines a value that can be used instead of a pointer to a symbol
+		in the program image.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_CURRENT_IMAGE_SYMBOL
+	\brief Defines a pointer to a symbol in the caller's image.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\fn thread_id load_image(int32 argc, const char** argv, const char** environ)
+	\brief Loads an executable image with its own team and returns the identifier
+		of the main thread of the spawned team.
+
+	\param[in] argc The number of arguments in \a argv.
+	\param[in] argv The list of argument parameters to pass to the image.
+	\param[in] environ The list of environment variables to pass.
+
+	\return A thread_id of the spawned team (a positive number) or an error code.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn image_id load_add_on(const char* path)
+	\brief Loads an add-on image from a \a path into the caller address space.
+
+	\param[in] path The path of the add-on's image file.
+
+	\return An image_id of the add-on or an error code.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t unload_add_on(image_id image)
+	\brief Unloads an add-on \a image and releases its resources.
+
+	\param[in] image The image_id identifier of the add-on to unload.
+
+	\return \c B_OK if successful or an error code.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t get_image_symbol(image_id image, const char* name,
+		int32 symbolType, void** _symbolLocation)
+	\brief Searches for the symbol with \a name and \a symbolType in an \a image
+		and saves a pointer to its address into \a _symbolLocation.
+
+	\param[in] image The image_id identifier of the image containing the symbol.
+	\param[in] name The symbol name.
+	\param[in] symbolType The symbol type:
+		- ::B_SYMBOL_TYPE_DATA
+		- ::B_SYMBOL_TYPE_TEXT
+		- ::B_SYMBOL_TYPE_ANY
+	\param[out] _symbolLocation A pointer to a pointer where to return the
+		symbol address.
+
+	\return \c B_OK if the symbol was found or an error code.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t get_nth_image_symbol(image_id image, int32 n, char* nameBuffer,
+		int32* _nameLength, int32* _symbolType, void** _symbolLocation)
+	\brief Searches for the \c n-th symbol in an \a image and returns its
+		name, type and address.
+
+	\param[in] image The image_id identifier of the image to read the symbols from.
+	\param[in] n The index of the symbol among all the symbols in the image.
+	\param[out] nameBuffer A pre-allocated string buffer where to write
+		the symbol name.
+	\param[in out] _nameLength As an input, specifies the length of the
+		string buffer. If an image was found, this is then set to the actual
+		length of the symbol name. This allows to call this function again
+		with a larger nameBuffer if its length was smaller than the symbol name.
+	\param[out] _symbolType A pre-allocated int32 variable where to write the
+		symbol type. This will be one of these:
+			- ::B_SYMBOL_TYPE_DATA
+			- ::B_SYMBOL_TYPE_TEXT
+			- ::B_SYMBOL_TYPE_ANY
+	\param[out] _symbolLocation A pointer to a pointer where to write the address
+		of the symbol.
+
+	\retval B_OK A symbol was found and the information was saved to the parameters.
+	\retval B_BAD_IMAGE_ID \a image does not point to an existing image.
+	\retval B_BAD_INDEX The image does not contain a symbol at the \a n-th position.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void clear_caches(void* address, size_t length, uint32 flags)
+	\brief Clears or invalidates the data or instruction caches of the processor
+		at a certain \a address.
+
+	\param address The address where the section of the cache to flush or
+		invalidate starts.
+	\param[in] length The number of bytes of the section to flush or invalidate.
+	\param[in] flags Configuration flags, that is of these:
+		- ::B_FLUSH_DCACHE
+		- ::B_FLUSH_ICACHE
+		- ::B_INVALIDATE_DCACHE
+		- ::B_INVALIDATE_ICACHE
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def get_image_info(image, info)
+	\brief Retrieves information about a specific \a image into \a info.
+
+	\param[in] image An image_id containing the identifier for the target image
+		to get the information from.
+	\param[out] info A pointer to an image_info instance where to write the
+		information.
+
+	\retval B_OK The \a image was found and the information was written into
+		\a info.
+	\retval B_BAD_VALUE The size of the object pointed by \a info is invalid.
+	\retval B_ENTRY_NOT_FOUND The \a image was not found.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def get_next_image_info(team_id team, cookie, info)
+	\brief Iterates through the list of images in a \a team to get an image_info
+		with information of the queried image.
+
+	For example, the following snippet shows how to iterate through every image
+	in a team:
+
+	\code{.cpp}
+	team_id team = ...;
+	int32 cookie = 0;
+	image_info info = {};
+	while(get_next_image_info(team, &cookie, &info) == B_OK) {
+		printf("Image [%d]: identifier=%d\n", cookie, info.id);
+		// do anything else...
+	}
+	\endcode
+
+	\param[in] team A team_id with the identifier of the team to analyze.
+	\param[out] cookie A pointer to an int32 variable used to keep track of the
+		current position in team's list of images. It must be initialized to
+		\c 0 beforehand.
+	\param[out] info A pointer to an image_info structure where to write the
+		information about the currently iterated image.
+
+	\retval B_OK An image of \a team was found and the data about it was written
+		into \a info.
+	\retval B_BAD_VALUE The size of the object pointed by \a info is invalid.
+	\retval B_BAD_TEAM_ID The \a team identifier is invalid, does not point to
+		a running team.
+	\retval B_ENTRY_NOT_FOUND There are no more images to visit from this \a team.
+
+	\since BeOS R3
+*/
+

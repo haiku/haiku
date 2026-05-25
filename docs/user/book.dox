@@ -44,6 +44,12 @@
 			- The \link layout_intro Layout API \endlink is a new addition
 				to the Interface Kit in Haiku which provides resources to
 				layout your application flexibly and easily.
+		- The \ref kernel contains functions and definitions to work with the
+			applications' running behaviors. This includes handling teams and
+			their threads, loaded executable images and their symbols, or deal
+			with big stretches of shared memory known as areas. In addition, it also
+			provides utilities to perform scheduling and thread access protection
+			through semaphores.
 		- The \ref locale includes classes to localize your application to
 			different languages, timezones, number formatting conventions and
 			much more.
