@@ -17,6 +17,7 @@ public:
 
 			void				TestPrimitivesToMessage();
 			void				TestMessage();
+			void				TestFromMessage();
 			void				TestParent();
 			void				TestConverter();
 			void				TestWildcard();

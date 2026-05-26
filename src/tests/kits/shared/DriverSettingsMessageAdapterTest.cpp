@@ -6,9 +6,11 @@
 
 #include "DriverSettingsMessageAdapterTest.h"
 
+#include <stdarg.h>
 #include <stdlib.h>
 
 #include <driver_settings.h>
+#include <ByteOrder.h>
 #include <String.h>
 
 #include <DriverSettingsMessageAdapter.h>
@@ -45,6 +47,105 @@ public:
 private:
 	void* fSettings;
 };
+
+
+void
+FailWithMessage(const char* fmt, ...)
+{
+	BString errorMessage;
+	va_list args;
+	va_start(args, fmt);
+	errorMessage.SetToFormatVarArgs(fmt, args);
+	va_end(args);
+
+	CppUnit::Asserter::fail(errorMessage.String());
+}
+
+
+void
+AssertMessagesEqual(const BMessage& expected, const BMessage& actual)
+{
+	if (expected.CountNames(B_ANY_TYPE) != actual.CountNames(B_ANY_TYPE)) {
+		expected.PrintToStream();
+		actual.PrintToStream();
+		CppUnit::Asserter::fail("Messages don't match");
+	}
+
+	int32 index = 0;
+	char* name = NULL;
+	type_code type;
+	int32 count;
+	while (expected.GetInfo(B_ANY_TYPE, index++, &name, &type, &count) == B_OK) {
+		type_code actualType;
+		int32 actualCount;
+		if (actual.GetInfo(name, &actualType, &actualCount) != B_OK)
+			FailWithMessage("Couldn't find property %s", name);
+		if (actualType != type) {
+			int32 expectedCodeType = B_SWAP_INT32(type);
+			int32 actualCodeType = B_SWAP_INT32(actualType);
+			FailWithMessage("Expected type %4s for property %s, but found %4s",
+				(char*)&expectedCodeType, name, (char*)&actualCodeType);
+		}
+		if (actualCount != count) {
+			FailWithMessage("Expected %" B_PRId32 " items for property %s, but found %" B_PRId32,
+				count, name, actualCount);
+		}
+
+		for (int32 valueIndex = 0; valueIndex < count; valueIndex++) {
+			switch (type) {
+				case B_BOOL_TYPE:
+				{
+					bool data, actualData;
+					expected.FindBool(name, valueIndex, &data);
+					actual.FindBool(name, valueIndex, &actualData);
+					if (data != actualData) {
+						FailWithMessage("Expected %c for property %s, but found %c",
+							data ? 'Y' : 'N', name, actualData ? 'Y' : 'N');
+					}
+
+					break;
+				}
+
+				case B_STRING_TYPE:
+				{
+					const char* data;
+					const char* actualData;
+					expected.FindString(name, valueIndex, &data);
+					actual.FindString(name, valueIndex, &actualData);
+					if (strcmp(data, actualData) != 0) {
+						FailWithMessage("Expected '%s' for property %s, but found '%s'",
+							data, name, actualData);
+					}
+
+					break;
+				}
+
+				case B_INT32_TYPE:
+				{
+					int32 data, actualData;
+					expected.FindInt32(name, valueIndex, &data);
+					actual.FindInt32(name, valueIndex, &actualData);
+					if (data != actualData) {
+						FailWithMessage("Expected %" B_PRId32
+							" for property %s, but found %" B_PRId32, data, name, actualData);
+					}
+
+					break;
+				}
+
+				case B_MESSAGE_TYPE:
+				{
+					BMessage data, actualData;
+					expected.FindMessage(name, valueIndex, &data);
+					actual.FindMessage(name, valueIndex, &actualData);
+					AssertMessagesEqual(data, actualData);
+
+					break;
+				}
+			}
+		}
+	}
+}
 
 
 }	// empty namespace
@@ -169,6 +270,87 @@ DriverSettingsMessageAdapterTest::TestMessage()
 	Settings settingsC("\n");
 	CPPUNIT_ASSERT_EQUAL(B_OK, settingsC.ToMessage(kTemplate, message));
 	CPPUNIT_ASSERT(message.IsEmpty());
+}
+
+
+void
+DriverSettingsMessageAdapterTest::TestFromMessage()
+{
+	const settings_template kTemplateNoParent[] = {
+		{B_STRING_TYPE, NULL, NULL},
+		{}
+	};
+	const settings_template kTemplateName[] = {
+		{B_STRING_TYPE, "name", NULL, true},
+		{B_STRING_TYPE, NULL, NULL},
+		{}
+	};
+	const settings_template kTemplate[] = {
+		{B_STRING_TYPE, NULL, NULL},
+		{B_INT32_TYPE, "int+", NULL},
+		{B_INT32_TYPE, "int-", NULL},
+		{B_BOOL_TYPE, "Yay", NULL},
+		{B_BOOL_TYPE, "Nay", NULL},
+		{B_MESSAGE_TYPE, "message_no_subparent", kTemplateNoParent},
+		{B_MESSAGE_TYPE, "message_subparent", kTemplateName},
+		{B_MESSAGE_TYPE, "empty_message_no_subparent", kTemplateNoParent},
+		{B_MESSAGE_TYPE, "empty_message_subparent", kTemplateName},
+		{}
+	};
+
+	BMessage initialMessage;
+	initialMessage.AddString("1", "with spaces");
+	initialMessage.AddString("2", "array 1");
+	initialMessage.AddString("2", "array 2");
+	initialMessage.AddString("2", "array {");
+	initialMessage.AddString("4", "{");
+	initialMessage.AddString("5", "}");
+	initialMessage.AddString("6", "how about a newline?\nand stuff");
+	initialMessage.AddString("7", "\"qu\"ote\"");
+	initialMessage.AddString("8", "'nother'quote'");
+	initialMessage.AddString("9", "\\back\\slash\\");
+	initialMessage.AddString("10", "#NotAComment");
+	initialMessage.AddString("11", "NotA;Separator");
+	initialMessage.AddString("12", "v=3");
+	initialMessage.AddString("empty", "");
+	initialMessage.AddString("space", " ");
+	initialMessage.AddString("space", "\f");
+	initialMessage.AddString("space", "\n");
+	initialMessage.AddString("space", "\r");
+	initialMessage.AddString("space", "\t");
+	initialMessage.AddString("space", "\v");
+	initialMessage.AddString("should check the same in names", "but this is enough");
+	initialMessage.AddInt32("int+", 42);
+	initialMessage.AddInt32("int-", -54);
+	initialMessage.AddBool("Yay", true);
+	initialMessage.AddBool("Nay", false);
+
+	BMessage submessage;
+	submessage.AddString("name", "with spaces");
+	submessage.AddString("close group mark", "}");
+	submessage.AddString("a", "value\n");
+	submessage.AddString("b", "value\\");
+	submessage.AddString("c", "value\n1");
+	initialMessage.AddMessage("message_no_subparent", &submessage);
+	initialMessage.AddMessage("message_subparent", &submessage);
+
+	submessage.MakeEmpty();
+	initialMessage.AddMessage("empty_message_no_subparent", &submessage);
+	initialMessage.AddMessage("empty_message_subparent", &submessage);
+
+	submessage.AddString("name", "aName");
+	initialMessage.AddMessage("message_subparent", &submessage);
+
+	BString settingsBuffer;
+	DriverSettingsMessageAdapter adapter;
+	CPPUNIT_ASSERT_EQUAL(B_OK,
+		adapter.ConvertToDriverSettings(kTemplate, settingsBuffer, initialMessage));
+
+	Settings settings(settingsBuffer.String());
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, settings.ToMessage(kTemplate, message));
+
+	AssertMessagesEqual(initialMessage, message);
 }
 
 
@@ -340,6 +522,9 @@ DriverSettingsMessageAdapterTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<DriverSettingsMessageAdapterTest>(
 		"DriverSettingsMessageAdapterTest::TestMessage",
 		&DriverSettingsMessageAdapterTest::TestMessage));
+	suite.addTest(new CppUnit::TestCaller<DriverSettingsMessageAdapterTest>(
+		"DriverSettingsMessageAdapterTest::TestFromMessage",
+		&DriverSettingsMessageAdapterTest::TestFromMessage));
 	suite.addTest(new CppUnit::TestCaller<DriverSettingsMessageAdapterTest>(
 		"DriverSettingsMessageAdapterTest::TestParent",
 		&DriverSettingsMessageAdapterTest::TestParent));

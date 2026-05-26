@@ -16,6 +16,18 @@
 
 #include <File.h>
 #include <String.h>
+#include <StringList.h>
+
+
+static void
+EscapeString(BString& value)
+{
+	if (value.IsEmpty()) {
+		value = "''";
+		return;
+	}
+	value.CharacterEscape(" \t\n\"\\#;'={}\r\f\v", '\\');
+}
 
 
 DriverSettingsConverter::DriverSettingsConverter()
@@ -318,9 +330,12 @@ DriverSettingsMessageAdapter::_AppendSettings(
 	if (settingName == NULL)
 		settingName = name;
 
+	BString escapedName(settingName);
+	EscapeString(escapedName);
+
 	if (type != B_MESSAGE_TYPE) {
 		settings.Append("\n");
-		settings.Append(settingName);
+		settings.Append(escapedName);
 		settings.Append("\t");
 	}
 
@@ -351,11 +366,12 @@ DriverSettingsMessageAdapter::_AppendSettings(
 
 			case B_STRING_TYPE:
 			{
-				const char* value = NULL;
+				BString value;
 				status_t result = message.FindString(name, valueIndex, &value);
 				if (result != B_OK)
 					return result;
 
+				EscapeString(value);
 				settings.Append(value);
 				break;
 			}
@@ -388,16 +404,37 @@ DriverSettingsMessageAdapter::_AppendSettings(
 						subMessage, parentValueTemplate->name,
 						parentValueTemplate->type, 1, name);
 					subMessage.RemoveName(parentValueTemplate->name);
+				} else {
+					settings.Append("\n");
+					settings.Append(escapedName);
+					settings.Append(" ");
 				}
 
 				BString subSettings;
-				ConvertToDriverSettings(valueTemplate->sub_template,
-					subSettings, subMessage);
-				subSettings.ReplaceAll("\n", "\n\t");
-				subSettings.RemoveFirst("\n");
+				ConvertToDriverSettings(valueTemplate->sub_template, subSettings, subMessage);
 
 				if (!subSettings.IsEmpty()) {
-					settings.Append(" {\n");
+					BStringList lines;
+					subSettings.Split("\n", false, lines);
+					subSettings = lines.StringAt(0);
+					bool escapedNewline = false;
+					int count = lines.CountStrings();
+					for (int i = 1; i < count; i++) {
+						BString line = lines.StringAt(i);
+						if (escapedNewline)
+							subSettings.Append("\n");
+						else
+							subSettings.Append("\n\t");
+						subSettings.Append(line);
+
+						int length = line.Length();
+						int backslashRun = length - 1;
+						while (backslashRun >= 0 && line[backslashRun] == '\\')
+							backslashRun--;
+						escapedNewline = (length - backslashRun) % 2 == 0;
+					}
+
+					settings.Append(" {");
 					settings.Append(subSettings);
 					settings.Append("\n}");
 				}
