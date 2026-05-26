@@ -30,7 +30,7 @@ const char* kSettingsKeySearchPageURL = "search page url";
 const char* kDefaultDownloadPath = "/boot/home/Desktop/";
 const char* kDefaultStartPageURL
 	= "file:///boot/home/config/settings/WebPositive/LoaderPages/Welcome";
-const char* kDefaultSearchPageURL = "https://duckduckgo.com/?q=%s";
+const char* kDefaultSearchPageURL = "https://noai.duckduckgo.com/?q=%s";
 
 const char* kSettingsKeyUseProxy = "use http proxy";
 const char* kSettingsKeyProxyAddress = "http proxy address";
@@ -44,9 +44,9 @@ const char* kSettingsShowBookmarkBar = "show bookmarks bar";
 const struct SearchEngine kSearchEngines[] = {
 	{ "Baidu",      "https://www.baidu.com/search?wd=%s",             "a " },
 	{ "Bing",       "https://bing.com/search?q=%s",                   "b " },
-	{ "DuckDuckGo", "https://duckduckgo.com/?q=%s",                   "d " },
+	{ "DuckDuckGo", "https://noai.duckduckgo.com/?q=%s",              "d " },
 	{ "Ecosia",     "https://www.ecosia.org/search?q=%s",             "e " },
-	{ "Google",     "https://google.com/search?q=%s",                 "g " },
+	{ "Google",     "https://google.com/search?udm=14&q=%s",          "g " },
 	{ "Qwant",      "https://www.qwant.com/?q=%s",                    "q " },
 	{ "Wikipedia",  "https://en.wikipedia.org/w/index.php?search=%s", "w " },
 	{ "Yandex",     "https://yandex.com/search/?text=%s",             "y " },
