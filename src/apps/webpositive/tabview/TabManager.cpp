@@ -49,7 +49,7 @@ public:
 
 	virtual BSize MinSize()
 	{
-		return BSize(12, 12);
+		return BSize(StringWidth("M"), StringWidth("M"));
 	}
 
 	virtual BSize MaxSize()
@@ -67,14 +67,13 @@ public:
 		BRect bounds(Bounds());
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 		uint32 flags = be_control_look->Flags(this);
-		uint32 borders = BControlLook::B_TOP_BORDER
-			| BControlLook::B_BOTTOM_BORDER;
-		be_control_look->DrawTabFrame(this, bounds, updateRect, base,
-			0, borders, B_NO_BORDER);
+		uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
+		be_control_look->DrawTabFrame(this, bounds, updateRect, base, 0, borders, B_NO_BORDER);
+		if (fHovered)
+			flags |= BControlLook::B_HOVER;
 		if (IsEnabled()) {
-			rgb_color button = tint_color(base, 1.07);
 			be_control_look->DrawButtonBackground(this, bounds, updateRect,
-				button, flags, 0);
+				ui_color(B_CONTROL_BACKGROUND_COLOR), flags, 0);
 		}
 
 		BRect symbolRect(bounds);
@@ -82,13 +81,38 @@ public:
 		symbolRect.top = (symbolRect.top + symbolRect.bottom) / 2 - 6;
 		symbolRect.right = symbolRect.left + 12;
 		symbolRect.bottom = symbolRect.top + 12;
-		DrawSymbol(symbolRect, updateRect, base);
+		DrawSymbol(symbolRect, updateRect, ui_color(B_CONTROL_TEXT_COLOR));
 	}
 
-	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
-		const rgb_color& base)
+	virtual void MouseMoved(BPoint where, uint32 transit,
+		const BMessage* dragMessage)
+	{
+		switch (transit) {
+			case B_ENTERED_VIEW:
+				fHovered = true;
+				Invalidate();
+				break;
+			case B_EXITED_VIEW:
+				fHovered = false;
+				Invalidate();
+				break;
+			case B_INSIDE_VIEW:
+				fHovered = true;
+				break;
+			case B_OUTSIDE_VIEW:
+				fHovered = false;
+				break;
+		}
+
+		BButton::MouseMoved(where, transit, dragMessage);
+	}
+
+	virtual void DrawSymbol(BRect frame, const BRect& updateRect, const rgb_color& base)
 	{
 	}
+
+	private:
+		bool fHovered = false;
 };
 
 
@@ -99,12 +123,16 @@ public:
 	{
 	}
 
-	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
-		const rgb_color& base)
+	virtual void DrawSymbol(BRect frame, const BRect& updateRect, const rgb_color& base)
 	{
-		float tint = IsEnabled() ? B_DARKEN_4_TINT : B_DARKEN_1_TINT;
-		be_control_look->DrawArrowShape(this, frame, updateRect,
-			base, BControlLook::B_LEFT_ARROW, 0, tint);
+		float tint = B_NO_TINT;
+		if (base.IsLight())
+			tint = IsEnabled() ? B_DARKEN_4_TINT : B_DARKEN_1_TINT;
+		else // isDark
+			tint = IsEnabled() ? B_NO_TINT : 0.5f;
+
+		be_control_look->DrawArrowShape(this, frame, updateRect, base, BControlLook::B_LEFT_ARROW,
+			0, tint);
 	}
 };
 
@@ -120,9 +148,14 @@ public:
 		const rgb_color& base)
 	{
 		frame.OffsetBy(1, 0);
-		float tint = IsEnabled() ? B_DARKEN_4_TINT : B_DARKEN_1_TINT;
-		be_control_look->DrawArrowShape(this, frame, updateRect,
-			base, BControlLook::B_RIGHT_ARROW, 0, tint);
+		float tint = B_NO_TINT;
+		if (base.IsLight())
+			tint = IsEnabled() ? B_DARKEN_4_TINT : B_DARKEN_1_TINT;
+		else // isDark
+			tint = IsEnabled() ? 0.5f : B_NO_TINT;
+
+		be_control_look->DrawArrowShape(this, frame, updateRect, base, BControlLook::B_RIGHT_ARROW,
+			0, tint);
 	}
 };
 
@@ -137,17 +170,16 @@ public:
 
 	virtual BSize MinSize()
 	{
-		return BSize(18, 12);
+		return BSize(StringWidth("＋") * 1.5, StringWidth("＋"));
 	}
 
-	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
-		const rgb_color& base)
+	virtual void DrawSymbol(BRect frame, const BRect& updateRect, const rgb_color& base)
 	{
-		SetHighColor(tint_color(base, B_DARKEN_4_TINT));
 		float inset = 3;
 		frame.InsetBy(2, 2);
 		frame.top++;
 		frame.left++;
+		SetHighColor(base);
 		FillRoundRect(BRect(frame.left, frame.top + inset,
 			frame.right, frame.bottom - inset), 1, 1);
 		FillRoundRect(BRect(frame.left + inset, frame.top,
@@ -166,14 +198,13 @@ public:
 
 	virtual BSize MinSize()
 	{
-		return BSize(18, 12);
+		return BSize(StringWidth("˅") * 5, StringWidth("˅"));
 	}
 
-	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
-		const rgb_color& base)
+	virtual void DrawSymbol(BRect frame, const BRect& updateRect, const rgb_color& base)
 	{
-		be_control_look->DrawArrowShape(this, frame, updateRect,
-			base, BControlLook::B_DOWN_ARROW, 0, B_DARKEN_4_TINT);
+		be_control_look->DrawArrowShape(this, frame, updateRect, base, BControlLook::B_DOWN_ARROW,
+			0, B_NO_TINT);
 	}
 
 	virtual void MouseDown(BPoint point)
@@ -195,7 +226,7 @@ public:
 
 	virtual void MouseUp(BPoint point)
 	{
-		// Do nothing
+
 	}
 
 	void MenuClosed()

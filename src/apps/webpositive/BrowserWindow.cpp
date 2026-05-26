@@ -273,22 +273,29 @@ public:
 		BButton("close button", NULL, message),
 		fOverCloseRect(false)
 	{
-		// Button is 16x16 regardless of font size
 		SetExplicitMinSize(BSize(15, 15));
-		SetExplicitMaxSize(BSize(15, 15));
+	}
+
+	virtual bool HasHeightForWidth()
+	{
+		return true;
+	}
+
+	virtual void GetHeightForWidth(float width, float* min, float* max, float* preferred)
+	{
+		if (min)
+			*min = width;
+		if (max)
+			*max = width;
+		if (preferred)
+			*preferred = width;
 	}
 
 	virtual void Draw(BRect updateRect)
 	{
 		BRect frame = Bounds();
 		BRect closeRect(frame.InsetByCopy(4, 4));
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		float tint = B_DARKEN_1_TINT;
-
-		if (fOverCloseRect)
-			tint *= 1.4;
-		else
-			tint *= 1.2;
+		rgb_color base = ui_color(B_CONTROL_BACKGROUND_COLOR);
 
 		if (Value() == B_CONTROL_ON && fOverCloseRect) {
 			// Draw the button frame
@@ -298,14 +305,13 @@ public:
 			be_control_look->DrawButtonBackground(this, frame,
 				updateRect, base, BControlLook::B_ACTIVATED);
 			closeRect.OffsetBy(1, 1);
-			tint *= 1.2;
 		} else {
 			SetHighColor(base);
 			FillRect(updateRect);
 		}
 
 		// Draw the ×
-		base = tint_color(base, tint);
+		base = ui_color(B_CONTROL_TEXT_COLOR);
 		SetHighColor(base);
 		SetPenSize(2);
 		StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
