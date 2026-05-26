@@ -390,11 +390,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings, const BS
 	fTabManager = new TabManager(BMessenger(this), newTabMessage);
 
 	// Menu
-#if INTEGRATE_MENU_INTO_TAB_BAR
-	BMenu* mainMenu = new BMenu("≡");
-#else
 	BMenu* mainMenu = new BMenuBar("Main menu");
-#endif
 	BMenu* menu = new BMenu(B_TRANSLATE("Window"));
 	BMessage* newWindowMessage = new BMessage(NEW_WINDOW);
 	newWindowMessage->AddString("url", "");
@@ -613,14 +609,8 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings, const BS
 		new BMessage(TOGGLE_FULLSCREEN));
 	toggleFullscreenButton->SetBackgroundMode(BBitmapButton::MENUBAR_BACKGROUND);
 
-#if !INTEGRATE_MENU_INTO_TAB_BAR
 	BMenu* mainMenuItem = mainMenu;
 	fMenuGroup = (new BGroupView(B_HORIZONTAL, 0))->GroupLayout();
-#else
-	BMenu* mainMenuItem = new BMenuBar("Main menu");
-	mainMenuItem->AddItem(mainMenu);
-	fMenuGroup = fTabManager->MenuContainerLayout();
-#endif
 	BLayoutBuilder::Group<>(fMenuGroup)
 		.Add(mainMenuItem)
 		.Add(toggleFullscreenButton, 0.0f)
@@ -637,9 +627,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings, const BS
 	// Layout
 	BGroupView* topView = new BGroupView(B_VERTICAL, 0.0);
 
-#if !INTEGRATE_MENU_INTO_TAB_BAR
 	topView->AddChild(fMenuGroup);
-#endif
 	topView->AddChild(fTabManager->TabGroup());
 	topView->AddChild(navigationGroup);
 	if (fBookmarkBar != NULL)
@@ -2497,10 +2485,7 @@ BrowserWindow::_ShowInterface(bool show)
 	fInterfaceVisible = show;
 
 	if (show) {
-#if !INTEGRATE_MENU_INTO_TAB_BAR
-		fMenuGroup->SetVisible(
-			(fVisibleInterfaceElements & INTERFACE_ELEMENT_MENU) != 0);
-#endif
+		fMenuGroup->SetVisible((fVisibleInterfaceElements & INTERFACE_ELEMENT_MENU) != 0);
 		fTabGroup->SetVisible(_TabGroupShouldBeVisible());
 		fNavigationGroup->SetVisible(
 			(fVisibleInterfaceElements & INTERFACE_ELEMENT_NAVIGATION) != 0);

@@ -23,8 +23,6 @@ class TabContainerGroup;
 class TabContainerView;
 class TabManagerController;
 
-#define INTEGRATE_MENU_INTO_TAB_BAR 0
-
 
 class TabManager {
 public:
@@ -34,10 +32,6 @@ public:
 
 			void				SetTarget(const BMessenger& target);
 			const BMessenger&	Target() const;
-
-#if INTEGRATE_MENU_INTO_TAB_BAR
-			BGroupLayout*		MenuContainerLayout() const;
-#endif
 
 			BView*				TabGroup() const;
 			BView*				GetTabContainerView() const;
@@ -63,9 +57,6 @@ public:
 									const BBitmap* icon);
 
 private:
-#if INTEGRATE_MENU_INTO_TAB_BAR
-			BGroupView*			fMenuContainer;
-#endif
 			TabContainerGroup*	fTabContainerGroup;
 			TabContainerView*	fTabContainerView;
 			BView*				fContainerView;

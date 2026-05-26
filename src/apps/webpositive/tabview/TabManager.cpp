@@ -764,12 +764,6 @@ TabManager::TabManager(const BMessenger& target, BMessage* newTabMessage)
 
 	fController->SetTabContainerGroup(fTabContainerGroup);
 
-#if INTEGRATE_MENU_INTO_TAB_BAR
-	fMenuContainer = new BGroupView(B_HORIZONTAL, 0);
-	fMenuContainer->GroupLayout()->SetInsets(0, -3, 0, -3);
-	fTabContainerGroup->GroupLayout()->AddView(fMenuContainer, 0.0f);
-#endif
-
 	fTabContainerGroup->GroupLayout()->AddView(fTabContainerView);
 	fTabContainerGroup->AddScrollLeftButton(new ScrollLeftTabButton(
 		new BMessage(MSG_SCROLL_TABS_LEFT)));
@@ -801,15 +795,6 @@ TabManager::Target() const
 {
 	return fTarget;
 }
-
-
-#if INTEGRATE_MENU_INTO_TAB_BAR
-BGroupLayout*
-TabManager::MenuContainerLayout() const
-{
-	return fMenuContainer->GroupLayout();
-}
-#endif
 
 
 BView*
