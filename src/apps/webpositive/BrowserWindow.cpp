@@ -142,8 +142,7 @@ static const char* kHandledProtocols[] = {
 	"https",
 	"file",
 	"about",
-	"data",
-	"gopher"
+	"data"
 };
 
 static const char* kBookmarkBarSubdir = "Bookmark bar";
