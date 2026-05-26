@@ -671,7 +671,8 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 	// If we can't start burst mode, continue anyway.
 	status = EcCommand(sc, EC_COMMAND_BURST_ENABLE);
 	if (status == B_OK) {
-		if (EC_GET_DATA(sc) == EC_BURST_ACK) {
+		if (EC_GET_DATA(sc) == EC_BURST_ACK
+			&& (EC_GET_CSR(sc) & EC_FLAG_BURST_MODE) != 0) {
 			TRACE("burst enabled.\n");
 			sc->ec_burstactive = TRUE;
 		}
@@ -811,14 +812,7 @@ EcCommand(struct acpi_ec_cookie* sc, EC_COMMAND cmd)
 	int32 generationCount = sc->ec_gencount;
 	EC_SET_CSR(sc, cmd);
 	status = EcWaitEvent(sc, event, generationCount);
-	if (status == AE_OK) {
-		// If we succeeded, burst flag should now be present.
-		if (cmd == EC_COMMAND_BURST_ENABLE) {
-			EC_STATUS ec_status = EC_GET_CSR(sc);
-			if ((ec_status & EC_FLAG_BURST_MODE) == 0)
-				status = AE_ERROR;
-		}
-	} else
+	if (status != AE_OK)
 		TRACE("EcCommand: no response to %#x\n", cmd);
 
 	return status;
