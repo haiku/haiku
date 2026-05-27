@@ -22,7 +22,6 @@ struct screen_configuration {
 	display_mode	mode;
 	float			brightness;
 	bool			has_info;
-	bool			is_current;
 };
 
 
@@ -31,7 +30,7 @@ public:
 								ScreenConfigurations();
 								~ScreenConfigurations();
 
-			screen_configuration* CurrentByID(int32 id) const;
+			screen_configuration* GetByID(int32 id) const;
 			screen_configuration* BestFit(int32 id, const monitor_info* info,
 									bool* _exactMatch = NULL) const;
 

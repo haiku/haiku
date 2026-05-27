@@ -512,6 +512,7 @@ Desktop::Init()
 	}
 
 	status_t status = fVirtualScreen.SetConfiguration(*this,
+		fWorkspaces[0].StoredScreenConfiguration(),
 		fWorkspaces[0].CurrentScreenConfiguration());
 	if (status != B_OK) {
 		debug_printf("app_server: Failed to initialize virtual screen configuration: %s\n",
@@ -799,7 +800,7 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 	} else {
 		// retrieve from settings
 		screen_configuration* configuration
-			= fWorkspaces[workspace].CurrentScreenConfiguration().CurrentByID(
+			= fWorkspaces[workspace].CurrentScreenConfiguration().GetByID(
 				screen->ID());
 		if (configuration != NULL
 			&& !memcmp(&configuration->mode, &mode, sizeof(display_mode)))
@@ -850,7 +851,7 @@ Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
 
 	// retrieve from settings
 	screen_configuration* configuration
-		= fWorkspaces[workspace].CurrentScreenConfiguration().CurrentByID(id);
+		= fWorkspaces[workspace].CurrentScreenConfiguration().GetByID(id);
 	if (configuration == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -882,7 +883,7 @@ Desktop::GetScreenFrame(int32 workspace, int32 id, BRect& frame)
 
 	// retrieve from settings
 	screen_configuration* configuration
-		= fWorkspaces[workspace].CurrentScreenConfiguration().CurrentByID(id);
+		= fWorkspaces[workspace].CurrentScreenConfiguration().GetByID(id);
 	if (configuration == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -910,12 +911,15 @@ Desktop::RevertScreenModes(uint32 workspaces)
 
 		for (int32 index = 0; index < fVirtualScreen.CountScreens(); index++) {
 			Screen* screen = fVirtualScreen.ScreenAt(index);
+			monitor_info info;
+			bool hasInfo = (screen->GetMonitorInfo(info) == B_OK);
 
 			// retrieve configurations
 			screen_configuration* stored = fWorkspaces[workspace]
-				.StoredScreenConfiguration().CurrentByID(screen->ID());
+				.StoredScreenConfiguration().BestFit(screen->ID(),
+					hasInfo ? &info : NULL);
 			screen_configuration* current = fWorkspaces[workspace]
-				.CurrentScreenConfiguration().CurrentByID(screen->ID());
+				.CurrentScreenConfiguration().GetByID(screen->ID());
 
 			if ((stored != NULL && current != NULL
 					&& !memcmp(&stored->mode, &current->mode,
@@ -945,12 +949,13 @@ Desktop::SetBrightness(int32 id, float brightness)
 	status_t result = HWInterface()->SetBrightness(brightness);
 
 	if (result == B_OK) {
-		if (fWorkspaces[0].StoredScreenConfiguration().CurrentByID(id) == NULL) {
+		screen_configuration* current = fWorkspaces[0].CurrentScreenConfiguration().GetByID(id);
+		if (fWorkspaces[0].StoredScreenConfiguration().BestFit(id,
+				current->has_info ? &current->info : NULL) == NULL) {
 			// store the current configuration if empty
-			screen_configuration* current
-				= fWorkspaces[0].CurrentScreenConfiguration().CurrentByID(id);
 			fWorkspaces[0].StoredScreenConfiguration().Set(id,
-				current->has_info ? &current->info : NULL, current->frame, current->mode);
+				current->has_info ? &current->info : NULL,
+				current->frame, current->mode);
 		}
 		fWorkspaces[0].StoredScreenConfiguration().SetBrightness(id,
 			brightness);
@@ -3709,6 +3714,7 @@ Desktop::_SetCurrentWorkspaceConfiguration()
 
 	uint32 changedScreens;
 	fVirtualScreen.SetConfiguration(*this,
+		fWorkspaces[fCurrentWorkspace].CurrentScreenConfiguration(),
 		fWorkspaces[fCurrentWorkspace].CurrentScreenConfiguration(),
 		&changedScreens);
 

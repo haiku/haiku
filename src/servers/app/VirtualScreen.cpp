@@ -50,8 +50,8 @@ VirtualScreen::_Reset()
 
 
 status_t
-VirtualScreen::SetConfiguration(Desktop& desktop,
-	ScreenConfigurations& configurations, uint32* _changedScreens)
+VirtualScreen::SetConfiguration(Desktop& desktop, const ScreenConfigurations& configurations,
+	ScreenConfigurations& currentConfigurations, uint32* _changedScreens)
 {
 	// Remember previous screen modes
 
@@ -90,7 +90,7 @@ VirtualScreen::SetConfiguration(Desktop& desktop,
 	for (int32 i = 0; i < list.CountItems(); i++) {
 		Screen* screen = list.ItemAt(i);
 
-		AddScreen(screen, configurations);
+		AddScreen(screen, configurations, currentConfigurations);
 
 		if (!previousModesFailed && _changedScreens != NULL) {
 			// Figure out which screens have changed their mode
@@ -110,7 +110,8 @@ VirtualScreen::SetConfiguration(Desktop& desktop,
 
 
 status_t
-VirtualScreen::AddScreen(Screen* screen, ScreenConfigurations& configurations)
+VirtualScreen::AddScreen(Screen* screen, const ScreenConfigurations& configurations,
+	ScreenConfigurations& currentConfigurations)
 {
 	screen_item* item = new(std::nothrow) screen_item;
 	if (item == NULL)
@@ -133,7 +134,7 @@ VirtualScreen::AddScreen(Screen* screen, ScreenConfigurations& configurations)
 			monitor_info info;
 			bool hasInfo = screen->GetMonitorInfo(info) == B_OK;
 			screen->GetMode(mode);
-			configurations.Set(screen->ID(), hasInfo ? &info : NULL, screen->Frame(), mode);
+			currentConfigurations.Set(screen->ID(), hasInfo ? &info : NULL, screen->Frame(), mode);
 		}
 		if (status != B_OK)
 			status = screen->SetBestMode(1024, 768, B_RGB32, 60.f);
@@ -243,7 +244,7 @@ VirtualScreen::CountScreens() const
 
 
 status_t
-VirtualScreen::_GetMode(Screen* screen, ScreenConfigurations& configurations,
+VirtualScreen::_GetMode(Screen* screen, const ScreenConfigurations& configurations,
 	display_mode& mode) const
 {
 	monitor_info info;
@@ -255,8 +256,5 @@ VirtualScreen::_GetMode(Screen* screen, ScreenConfigurations& configurations,
 		return B_NAME_NOT_FOUND;
 
 	mode = configuration->mode;
-	configuration->is_current = true;
-
 	return B_OK;
 }
-

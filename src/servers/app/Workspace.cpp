@@ -55,7 +55,7 @@ Workspace::Private::RestoreConfiguration(const BMessage& settings)
 		fColor = color;
 
 	fStoredScreenConfiguration.Restore(settings);
-	fCurrentScreenConfiguration.Restore(settings);
+	fCurrentScreenConfiguration.Restore(BMessage());
 }
 
 

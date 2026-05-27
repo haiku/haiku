@@ -35,11 +35,13 @@ public:
 									{ return fHWInterface; }
 
 			status_t			SetConfiguration(Desktop& desktop,
-									ScreenConfigurations& configurations,
+									const ScreenConfigurations& configurations,
+									ScreenConfigurations& currentConfigurations,
 									uint32* _changedScreens = NULL);
 
 			status_t			AddScreen(Screen* screen,
-									ScreenConfigurations& configurations);
+									const ScreenConfigurations& configurations,
+									ScreenConfigurations& currentConfigurations);
 			status_t			RemoveScreen(Screen* screen);
 
 			void				UpdateFrame();
@@ -56,7 +58,7 @@ public:
 
 private:
 			status_t			_GetMode(Screen* screen,
-									ScreenConfigurations& configurations,
+									const ScreenConfigurations& configurations,
 									display_mode& mode) const;
 			void				_Reset();
 
