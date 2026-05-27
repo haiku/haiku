@@ -18,11 +18,12 @@
 
 #include <btModules.h>
 
-#include "snet_buffer.h"
+#include "bluetooth/HCI/btHCI_transport.h"
 #include "h2cfg.h"
 #include "h2debug.h"
 #include "h2transactions.h"
 #include "h2util.h"
+#include "snet_buffer.h"
 
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -316,36 +317,47 @@ device_added(usb_device dev, void** cookie)
 		config->interface_count);
 
 	// Find endpoints that we need
-	uif = config->interface->active;
-	for (e = 0; e < uif->descr->num_endpoints; e++) {
+	for (size_t i = 0; i < config->interface_count; i++) {
+		uif = config->interface[i].active;
+		for (e = 0; e < uif->descr->num_endpoints; e++) {
 
-		ep = &uif->endpoint[e];
-		switch (ep->descr->attributes & USB_ENDPOINT_ATTR_MASK) {
-			case USB_ENDPOINT_ATTR_INTERRUPT:
-				if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
-				{
-					new_bt_dev->intr_in_ep = ep;
-					new_bt_dev->max_packet_size_intr_in
-						= ep->descr->max_packet_size;
-					TRACE("%s: INT in\n", __func__);
-				} else {
-					TRACE("%s: INT out\n", __func__);
-				}
-			break;
+			ep = &uif->endpoint[e];
+			switch (ep->descr->attributes & USB_ENDPOINT_ATTR_MASK) {
+				case USB_ENDPOINT_ATTR_INTERRUPT:
+					if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
+						new_bt_dev->intr_in_ep = ep;
+						new_bt_dev->max_packet_size_intr_in = ep->descr->max_packet_size;
+						TRACE("%s: INT in\n", __func__);
+					} else {
+						TRACE("%s: INT out\n", __func__);
+					}
+					break;
 
-			case USB_ENDPOINT_ATTR_BULK:
-				if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)	{
-					new_bt_dev->bulk_in_ep  = ep;
-					new_bt_dev->max_packet_size_bulk_in
-						= ep->descr->max_packet_size;
-					TRACE("%s: BULK int\n", __func__);
-				} else	{
-					new_bt_dev->bulk_out_ep = ep;
-					new_bt_dev->max_packet_size_bulk_out
-						= ep->descr->max_packet_size;
-					TRACE("%s: BULK out\n", __func__);
-				}
-			break;
+				case USB_ENDPOINT_ATTR_BULK:
+					if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
+						new_bt_dev->bulk_in_ep = ep;
+						new_bt_dev->max_packet_size_bulk_in = ep->descr->max_packet_size;
+						TRACE("%s: BULK in\n", __func__);
+					} else {
+						new_bt_dev->bulk_out_ep = ep;
+						new_bt_dev->max_packet_size_bulk_out = ep->descr->max_packet_size;
+						TRACE("%s: BULK out\n", __func__);
+					}
+					break;
+#ifdef BT_DRIVER_SUPPORTS_SCO
+				case USB_ENDPOINT_ATTR_ISOCHRONOUS:
+					if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
+						new_bt_dev->iso_in_ep = ep;
+						new_bt_dev->max_packet_size_isoc_in = ep->descr->max_packet_size;
+						TRACE("%s: ISO in found\n", __func__);
+					} else {
+						new_bt_dev->iso_out_ep = ep;
+						new_bt_dev->max_packet_size_isoc_out = ep->descr->max_packet_size;
+						TRACE("%s: ISO out found\n", __func__);
+					}
+					break;
+#endif
+			}
 		}
 	}
 
@@ -355,6 +367,11 @@ device_added(usb_device dev, void** cookie)
 		goto bail;
 	}
 
+
+	if (!new_bt_dev->iso_in_ep || !new_bt_dev->iso_out_ep) {
+		ERROR("%s: Endpoints for BT SCO not found\n", __func__);
+		new_bt_dev->driver_info |= BT_SCO_NOT_WORKING;
+	}
 	// Look into the devices suported to understand this
 	if (new_bt_dev->driver_info & BT_DIGIANSWER)
 		new_bt_dev->ctrl_req = USB_TYPE_VENDOR;
@@ -401,6 +418,10 @@ device_removed(void* cookie)
 		usb->cancel_queued_transfers(bdev->bulk_in_ep->handle);
 	if (bdev->bulk_out_ep != NULL)
 		usb->cancel_queued_transfers(bdev->bulk_out_ep->handle);
+	if (bdev->iso_in_ep != NULL)
+		usb->cancel_queued_transfers(bdev->iso_in_ep->handle);
+	if (bdev->iso_out_ep != NULL)
+		usb->cancel_queued_transfers(bdev->iso_out_ep->handle);
 
 	bdev->connected = false;
 
@@ -566,6 +587,12 @@ device_close(void* cookie)
 
 		if (bdev->bulk_out_ep!=NULL)
 			usb->cancel_queued_transfers(bdev->bulk_out_ep->handle);
+
+		if (bdev->iso_in_ep != NULL)
+			usb->cancel_queued_transfers(bdev->iso_in_ep->handle);
+
+		if (bdev->iso_out_ep != NULL)
+			usb->cancel_queued_transfers(bdev->iso_out_ep->handle);
 	}
 
 	// TX
