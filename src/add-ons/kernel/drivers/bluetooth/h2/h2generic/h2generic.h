@@ -86,9 +86,9 @@ struct bt_usb_dev {
 
 #ifdef BT_DRIVER_SUPPORTS_SCO
 	const usb_endpoint_info*	iso_in_ep;
-		  uint16                max_packet_size_isoc_in;
+		  uint16                max_packet_size_iso_in;
 	const usb_endpoint_info*	iso_out_ep;
-		  uint16                max_packet_size_isoc_out;
+		  uint16                max_packet_size_iso_out;
 #endif
 
 	/* This so called rooms, are for dumping the USB RX frames
@@ -96,6 +96,7 @@ struct bt_usb_dev {
 	 */
 	struct list eventRoom;
 	struct list aclRoom;
+	struct list scoRoom;
 
 	// Tx buffers: net_buffers for BT_ACL and snet_buffers for BT_COMMAND
 	// in the same array

@@ -25,6 +25,8 @@
 
 /* Forward declaration */
 
+void sco_tx_complete(void* cookie, status_t status, void* data, size_t actual_len);
+void sco_rx_complete(void* cookie, status_t status, void* data, size_t actual_len);
 void acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len);
 void acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len);
 void command_complete(void* cookie, status_t status, void* data, size_t actual_len);
@@ -239,6 +241,29 @@ acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 }
 
 
+void
+sco_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
+{
+	sco_tx_transfer_t* transfer = (sco_tx_transfer_t*)cookie;
+	bt_usb_dev* bdev = transfer->bdev;
+
+	if (status == B_OK) {
+		bdev->stat.successfulTX++;
+		bdev->stat.bytesTX += actual_len;
+	} else {
+		bdev->stat.errorTX++;
+	}
+
+	nb_destroy(transfer->nbuf);
+
+	free(transfer->packet_descriptors);
+	free(transfer);
+
+#ifdef BT_RESCHEDULING_AFTER_COMPLETITIONS
+	schedTxProcessing(bdev);
+#endif
+}
+
 #if 0
 #pragma mark --- TX ---
 #endif
@@ -308,13 +333,57 @@ submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
 
 
 status_t
-submit_tx_sco(bt_usb_dev* bdev)
+submit_tx_sco(bt_usb_dev* bdev, net_buffer* nbuf)
 {
+	status_t error;
 
-	if (!GET_BIT(bdev->state, RUNNING)) {
+	if (!GET_BIT(bdev->state, RUNNING))
 		return B_DEV_NOT_READY;
+
+	SET_DEVICE(nbuf, bdev->hdev);
+
+	size_t maxPacketSize = bdev->max_packet_size_iso_out;
+	if (maxPacketSize == 0)
+		return B_ERROR;
+
+	uint32 packetCount = (nbuf->size + maxPacketSize - 1) / maxPacketSize;
+
+	sco_tx_transfer_t* transfer = (sco_tx_transfer_t*)malloc(sizeof(sco_tx_transfer_t));
+	usb_iso_packet_descriptor* descriptors
+		= (usb_iso_packet_descriptor*)malloc(sizeof(usb_iso_packet_descriptor) * packetCount);
+
+	if (transfer == NULL || descriptors == NULL) {
+		free(transfer);
+		free(descriptors);
+		return B_NO_MEMORY;
 	}
 
-	// not yet implemented
-	return B_ERROR;
+	size_t remaining = nbuf->size;
+	for (uint32 i = 0; i < packetCount; i++) {
+		descriptors[i].request_length = (remaining > maxPacketSize) ? maxPacketSize : remaining;
+		descriptors[i].actual_length = 0;
+		descriptors[i].status = B_OK;
+
+		remaining -= descriptors[i].request_length;
+	}
+
+
+	transfer->bdev = bdev;
+	transfer->nbuf = nbuf;
+	transfer->packet_descriptors = descriptors;
+
+	uint32 startingFrameNumber = 0;
+	error = usb->queue_isochronous(bdev->iso_out_ep->handle, nb_get_whole_buffer(nbuf), nbuf->size,
+		descriptors, packetCount, &startingFrameNumber, USB_ISO_ASAP, sco_tx_complete,
+		(void*)transfer);
+
+	if (error != B_OK) {
+		free(descriptors);
+		free(transfer);
+		bdev->stat.rejectedTX++;
+	} else {
+		bdev->stat.acceptedTX++;
+	}
+
+	return error;
 }

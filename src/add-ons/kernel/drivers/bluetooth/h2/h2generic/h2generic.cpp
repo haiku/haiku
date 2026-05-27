@@ -348,11 +348,11 @@ device_added(usb_device dev, void** cookie)
 				case USB_ENDPOINT_ATTR_ISOCHRONOUS:
 					if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
 						new_bt_dev->iso_in_ep = ep;
-						new_bt_dev->max_packet_size_isoc_in = ep->descr->max_packet_size;
+						new_bt_dev->max_packet_size_iso_in = ep->descr->max_packet_size;
 						TRACE("%s: ISO in found\n", __func__);
 					} else {
 						new_bt_dev->iso_out_ep = ep;
-						new_bt_dev->max_packet_size_isoc_out = ep->descr->max_packet_size;
+						new_bt_dev->max_packet_size_iso_out = ep->descr->max_packet_size;
 						TRACE("%s: ISO out found\n", __func__);
 					}
 					break;
@@ -460,6 +460,9 @@ submit_nbuffer(hci_id hid, net_buffer* nbuf)
 
 	if (bdev != NULL) {
 		switch (nbuf->protocol) {
+			case BT_SCO:
+				return submit_tx_sco(bdev, nbuf);
+				break;
 			case BT_COMMAND:
 				// not issued this way
 			break;
@@ -528,7 +531,7 @@ device_open(const char* name, uint32 flags, void **cookie)
 	// dumping the USB frames
 	init_room(&bdev->eventRoom);
 	init_room(&bdev->aclRoom);
-	// init_room(new_bt_dev->scoRoom);
+	init_room(&bdev->scoRoom);
 
 	list_init(&bdev->snetBufferRecycleTrash);
 
@@ -613,6 +616,7 @@ device_close(void* cookie)
 
 	purge_room(&bdev->eventRoom);
 	purge_room(&bdev->aclRoom);
+	purge_room(&bdev->scoRoom);
 
 	// Device no longer in our Stack
 	if (btDevices != NULL)
@@ -780,9 +784,9 @@ dump_driver(int argc, char** argv)
 
 		if (bt_usb_devices[i] != NULL) {
 			kprintf("%s : \n", bt_usb_devices[i]->name);
-			kprintf("\taclroom = %d\teventroom = %d\tcommand & events =%d\n",
+			kprintf("\teventroom = %d\taclroom = %d\t\tscoroom = %dcommand & events =%d\n",
 				snb_packets(&bt_usb_devices[i]->eventRoom),
-				snb_packets(&bt_usb_devices[i]->aclRoom),
+				snb_packets(&bt_usb_devices[i]->aclRoom), snb_packets(&bt_usb_devices[i]->scoRoom),
 				snb_packets(&bt_usb_devices[i]->snetBufferRecycleTrash));
 
 			while ((item = (snet_buffer*)list_get_next_item(
