@@ -11,7 +11,7 @@
 #include "VMUserArea.h"
 
 
-struct VMUserAddressSpace final : VMAddressSpace {
+struct VMUserAddressSpace : VMAddressSpace {
 public:
 								VMUserAddressSpace(team_id id, addr_t base,
 									size_t size);

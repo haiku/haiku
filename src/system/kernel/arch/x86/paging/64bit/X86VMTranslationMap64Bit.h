@@ -13,7 +13,7 @@
 struct X86PagingStructures64Bit;
 
 
-struct X86VMTranslationMap64Bit final : X86VMTranslationMap {
+struct X86VMTranslationMap64Bit : X86VMTranslationMap {
 								X86VMTranslationMap64Bit(bool la57);
 	virtual						~X86VMTranslationMap64Bit();
 

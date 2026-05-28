@@ -263,13 +263,6 @@ static VMPhysicalPageMapper* sPhysicalPageMapper;
 // function declarations
 static void delete_area(VMAddressSpace* addressSpace, VMArea* area,
 	bool deletingAddressSpace, bool alreadyRemoved = false);
-static status_t vm_soft_fault(VMAddressSpace* addressSpace, addr_t address,
-	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage);
-static status_t map_backing_store(VMAddressSpace* addressSpace,
-	VMCache* cache, off_t offset, const char* areaName, addr_t size, int wiring,
-	int protection, int protectionMax, int mapping, uint32 flags,
-	const virtual_address_restrictions* addressRestrictions, bool kernel,
-	VMArea** _area, void** _virtualAddress);
 static status_t check_protection(team_id& team, uint32* protection);
 
 
@@ -996,7 +989,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			cacheChainLocker.SetTo(cache);
 
 			// Map the second area.
-			error = map_backing_store(addressSpace, secondCache,
+			error = vm_map_cache(addressSpace, secondCache,
 				secondCacheOffset, area->name, secondSize,
 				area->wiring, area->protection, area->protection_max,
 				REGION_NO_PRIVATE_MAP, CREATE_AREA_DONT_COMMIT_MEMORY,
@@ -1049,7 +1042,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		}
 	} else {
 		// Reuse the existing cache.
-		error = map_backing_store(addressSpace, cache, secondCacheOffset,
+		error = vm_map_cache(addressSpace, cache, secondCacheOffset,
 			area->name, secondSize, area->wiring, area->protection,
 			area->protection_max, REGION_NO_PRIVATE_MAP, 0,
 			&addressRestrictions, kernel, &secondArea, NULL);
@@ -1098,8 +1091,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	The address space must be write-locked.
 	The caller must ensure that no part of the given range is wired.
 */
-static status_t
-unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
+status_t
+vm_unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 	bool kernel)
 {
 	size = PAGE_ALIGN(size);
@@ -1111,7 +1104,7 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 			VMArea* area = it.Next();) {
 
 			if ((area->protection & B_KERNEL_AREA) != 0) {
-				dprintf("unmap_address_range: team %" B_PRId32 " tried to "
+				dprintf("vm_unmap_address_range: team %" B_PRId32 " tried to "
 					"unmap range of kernel area %" B_PRId32 " (%s)\n",
 					team_get_current_team_id(), area->id, area->name);
 				return B_NOT_ALLOWED;
@@ -1218,14 +1211,14 @@ discard_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 	(base \c *_virtualAddress, size \a size) is wired. The cache will also be
 	temporarily unlocked.
 */
-static status_t
-map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
+status_t
+vm_map_cache(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	const char* areaName, addr_t size, int wiring, int protection,
 	int protectionMax, int mapping,
 	uint32 flags, const virtual_address_restrictions* addressRestrictions,
 	bool kernel, VMArea** _area, void** _virtualAddress)
 {
-	TRACE(("map_backing_store: aspace %p, cache %p, virtual %p, offset 0x%"
+	TRACE(("vm_map_cache: aspace %p, cache %p, virtual %p, offset 0x%"
 		B_PRIx64 ", size %" B_PRIuADDR ", addressSpec %" B_PRIu32 ", wiring %d"
 		", protection %d, protectionMax %d, area %p, areaName '%s'\n",
 		addressSpace, cache, addressRestrictions->address, offset, size,
@@ -1235,7 +1228,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 
 	if (size == 0) {
 #if KDEBUG
-		panic("map_backing_store(): called with size=0 for area '%s'!",
+		panic("vm_map_cache(): called with size=0 for area '%s'!",
 			areaName);
 #endif
 		return B_BAD_VALUE;
@@ -1315,7 +1308,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 		// some existing area, and unmap_address_range also needs to lock that
 		// cache to delete the area.
 		cache->Unlock();
-		status = unmap_address_range(addressSpace,
+		status = vm_unmap_address_range(addressSpace,
 			(addr_t)addressRestrictions->address, size, kernel);
 		cache->Lock();
 		if (status != B_OK)
@@ -1350,7 +1343,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	// grab a ref to the address space (the area holds this)
 	addressSpace->Get();
 
-//	ktrace_printf("map_backing_store: cache: %p (source: %p), \"%s\" -> %p",
+//	ktrace_printf("vm_map_cache: cache: %p (source: %p), \"%s\" -> %p",
 //		cache, sourceCache, areaName, area);
 
 	*_area = area;
@@ -1500,7 +1493,7 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = address;
 	addressRestrictions.address_specification = B_EXACT_ADDRESS;
-	status = map_backing_store(addressSpace, cache, 0, name, size,
+	status = vm_map_cache(addressSpace, cache, 0, name, size,
 		B_NO_LOCK, 0, REGION_NO_PRIVATE_MAP, 0, CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &area, NULL);
 	if (status != B_OK) {
@@ -1554,7 +1547,7 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 
 	A new cache (marked \c temporary) will be created for it.
 
-	See \c create_area and \c map_backing_store for more information on the
+	See \c create_area and \c vm_map_cache for more information on the
 	behavior of the various options.
 */
 area_id
@@ -1779,7 +1772,7 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 
 	cache->Lock();
 
-	status = map_backing_store(addressSpace, cache, 0, name, size, wiring,
+	status = vm_map_cache(addressSpace, cache, 0, name, size, wiring,
 		protection, 0, REGION_NO_PRIVATE_MAP, flags,
 		virtualAddressRestrictions, kernel, &area, _address);
 
@@ -1984,7 +1977,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec & ~B_MEMORY_TYPE_MASK;
-	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
+	status = vm_map_cache(locker.AddressSpace(), cache, 0, name, size,
 		B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &area, _address);
 
@@ -2106,7 +2099,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec & ~B_MEMORY_TYPE_MASK;
-	result = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
+	result = vm_map_cache(locker.AddressSpace(), cache, 0, name, size,
 		B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &area, _address);
 
@@ -2191,7 +2184,7 @@ vm_create_null_area(team_id team, const char* name, void** address,
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = *address;
 	addressRestrictions.address_specification = addressSpec;
-	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
+	status = vm_map_cache(locker.AddressSpace(), cache, 0, name, size,
 		B_LAZY_LOCK, B_KERNEL_READ_AREA, B_KERNEL_READ_AREA,
 		REGION_NO_PRIVATE_MAP, flags | CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &area, address);
@@ -2387,12 +2380,12 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec;
-	status = map_backing_store(locker.AddressSpace(), cache, offset, name, size,
+	status = vm_map_cache(locker.AddressSpace(), cache, offset, name, size,
 		0, protection, protectionMax, mapping, mappingFlags,
 		&addressRestrictions, kernel, &area, _address);
 
 	if (status != B_OK || mapping == REGION_PRIVATE_MAP) {
-		// map_backing_store() cannot know we no longer need the ref
+		// vm_map_cache() cannot know we no longer need the ref
 		cache->ReleaseRefLocked();
 	}
 
@@ -2557,7 +2550,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 	VMArea* newArea;
 	addressRestrictions.address = *address;
 	addressRestrictions.address_specification = addressSpec;
-	status = map_backing_store(targetAddressSpace, cache,
+	status = vm_map_cache(targetAddressSpace, cache,
 		sourceArea->cache_offset, name, sourceArea->Size(),
 		sourceArea->wiring, protection, protectionMax,
 		mapping, mappingFlags, &addressRestrictions,
@@ -2566,7 +2559,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 		return status;
 
 	if (mapping != REGION_PRIVATE_MAP) {
-		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed to
+		// If the mapping is REGION_PRIVATE_MAP, vm_map_cache() needed to
 		// create a new cache, and has therefore already acquired a reference
 		// to the source cache - but otherwise it has no idea that we need one.
 		cache->AcquireRefLocked();
@@ -3087,7 +3080,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec;
-	status = map_backing_store(targetAddressSpace, cache, source->cache_offset,
+	status = vm_map_cache(targetAddressSpace, cache, source->cache_offset,
 		name, source->Size(), source->wiring, source->protection,
 		source->protection_max,
 		sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
@@ -3110,7 +3103,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	}
 
 	if (sharedArea) {
-		// The new area uses the old area's cache, but map_backing_store()
+		// The new area uses the old area's cache, but vm_map_cache()
 		// hasn't acquired a ref. So we have to do that now.
 		cache->AcquireRefLocked();
 	}
@@ -4041,7 +4034,7 @@ fault_get_page(PageFaultContext& context)
 		via this parameter.
 	\return \c B_OK on success, another error code otherwise.
 */
-static status_t
+status_t
 vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage)
 {
@@ -6005,7 +5998,7 @@ _user_unmap_memory(void* _address, size_t size)
 			size, &locker));
 
 	// unmap
-	return unmap_address_range(locker.AddressSpace(), address, size, false);
+	return vm_unmap_address_range(locker.AddressSpace(), address, size, false);
 }
 
 
