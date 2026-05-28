@@ -274,6 +274,19 @@ device_added(usb_device dev, void** cookie)
 		goto bail;
 	}
 
+	// TODO: Do this only when sco is needed
+	if (config->interface_count > 1 && config->interface[1].alt_count > 5) {
+		interface = &config->interface[1].alt[5];
+		err = usb->set_alt_interface(new_bt_dev->dev, interface);
+
+		if (err != B_OK) {
+			ERROR("%s: set_alt_interface() error on interface 1, alt 2.\n", __func__);
+			new_bt_dev->driver_info |= BT_SCO_NOT_WORKING;
+		}
+	} else {
+		new_bt_dev->driver_info |= BT_SCO_NOT_WORKING;
+	}
+
 	// call set_configuration() only after calling set_alt_interface()
 	err = usb->set_configuration(dev, config);
 	if (err != B_OK) {
@@ -344,7 +357,6 @@ device_added(usb_device dev, void** cookie)
 						TRACE("%s: BULK out\n", __func__);
 					}
 					break;
-#ifdef BT_DRIVER_SUPPORTS_SCO
 				case USB_ENDPOINT_ATTR_ISOCHRONOUS:
 					if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
 						new_bt_dev->iso_in_ep = ep;
@@ -356,7 +368,6 @@ device_added(usb_device dev, void** cookie)
 						TRACE("%s: ISO out found\n", __func__);
 					}
 					break;
-#endif
 			}
 		}
 	}
@@ -461,6 +472,8 @@ submit_nbuffer(hci_id hid, net_buffer* nbuf)
 	if (bdev != NULL) {
 		switch (nbuf->protocol) {
 			case BT_SCO:
+				if (bdev->driver_info & BT_SCO_NOT_WORKING)
+					return B_NOT_SUPPORTED;
 				return submit_tx_sco(bdev, nbuf);
 				break;
 			case BT_COMMAND:
@@ -719,11 +732,19 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 			}
 			#endif
 
-			bdev->state = SET_BIT(bdev->state, RUNNING);
+			// TODO: Do this only when SCO is needed
+			if ((bdev->driver_info & BT_SCO_NOT_WORKING) == 0) {
+				for (i = 0; i < MAX_SCO_IN_WINDOW; i++) {
+					err = submit_rx_sco(bdev);
+					if (err != B_OK && i == 0) {
+						bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
+						ERROR("%s: Queuing failed device stops running\n", __func__);
+						break;
+					}
+				}
+			}
 
-			#if BT_DRIVER_SUPPORTS_SCO
-				// TODO:  SCO / eSCO
-			#endif
+			bdev->state = SET_BIT(bdev->state, RUNNING);
 
 			ERROR("%s: Device online\n", __func__);
 		break;

@@ -54,13 +54,26 @@ sched_tx_processing(bt_usb_dev* bdev)
 				}
 			}
 
+#ifdef EMPTY_SCO_QUEUE
+			while (!list_is_empty(&bdev->nbuffersTx[BT_SCO])) {
+#else
+			if (!list_is_empty(&bdev->nbuffersTx[BT_SCO])) {
+#endif
+				nbuf = (net_buffer*)list_remove_head_item(&bdev->nbuffersTx[BT_SCO]);
+				err = submit_tx_sco(bdev, nbuf);
+				if (err != B_OK) {
+					// re-head it
+					list_insert_item_before(&bdev->nbuffersTx[BT_SCO],
+						list_get_first_item(&bdev->nbuffersTx[BT_SCO]), nbuf);
+				}
+			}
+
 			// check ACl
-	#define EMPTY_ACL_QUEUE
-	#ifdef EMPTY_ACL_QUEUE
+#ifdef EMPTY_ACL_QUEUE
 			while (!list_is_empty(&bdev->nbuffersTx[BT_ACL])) {
-	#else
+#else
 			if (!list_is_empty(&bdev->nbuffersTx[BT_ACL])) {
-	#endif
+#endif
 				nbuf = (net_buffer*)
 					list_remove_head_item(&bdev->nbuffersTx[BT_ACL]);
 				err = submit_tx_acl(bdev, nbuf);
@@ -70,10 +83,6 @@ sched_tx_processing(bt_usb_dev* bdev)
 							list_get_first_item(&bdev->nbuffersTx[BT_ACL]),
 							nbuf);
 				}
-			}
-
-			if (!list_is_empty(&bdev->nbuffersTx[BT_SCO])) {
-				// TODO to be implemented
 			}
 
 		} while (GET_BIT(bdev->state, SENDING));
