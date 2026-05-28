@@ -8,6 +8,7 @@
 
 #include "h2generic.h"
 
+#define SCO_PACKETS_PER_BUFFER 8
 
 status_t submit_rx_event(bt_usb_dev* bdev);
 status_t submit_rx_acl(bt_usb_dev* bdev);
@@ -23,4 +24,8 @@ typedef struct {
     usb_iso_packet_descriptor* packet_descriptors;
 } sco_tx_transfer_t;
 
+typedef struct {
+    bt_usb_dev* bdev;
+    usb_iso_packet_descriptor descriptors[SCO_PACKETS_PER_BUFFER];
+} sco_rx_transfer_t;
 #endif

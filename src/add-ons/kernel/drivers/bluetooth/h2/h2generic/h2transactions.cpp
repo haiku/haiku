@@ -15,6 +15,7 @@
 #include <kernel.h>
 #include <string.h>
 
+#include "Errors.h"
 #include "h2debug.h"
 #include "h2generic.h"
 #include "h2upper.h"
@@ -127,6 +128,65 @@ resubmit:
 }
 
 
+void
+sco_rx_complete(void* cookie, status_t status, void* data, size_t actual_len)
+{
+	sco_rx_transfer_t* ctx = (sco_rx_transfer_t*)cookie;
+
+	if (ctx == NULL)
+		return;
+
+	bt_usb_dev* bdev = ctx->bdev;
+	status_t error;
+
+	if (status == B_CANCELED)
+		return;
+
+	size_t packetSize = bdev->max_packet_size_iso_in;
+
+	if (status != B_OK || actual_len == 0)
+		goto resubmit;
+	{
+		bool frame_errors = false;
+		uint8* frame_ptr = (uint8*)data;
+
+		for (uint32 i = 0; i < SCO_PACKETS_PER_BUFFER; i++) {
+			if (ctx->descriptors[i].status == B_OK && ctx->descriptors[i].actual_length > 0) {
+				if (assembly_rx(bdev, BT_SCO, frame_ptr, ctx->descriptors[i].actual_length) != B_OK)
+					frame_errors = true;
+			}
+			frame_ptr += packetSize;
+		}
+
+		if (!frame_errors)
+			bdev->stat.successfulRX++;
+		else
+			bdev->stat.errorRX++;
+	}
+
+resubmit:
+
+	for (uint32 i = 0; i < SCO_PACKETS_PER_BUFFER; i++) {
+		ctx->descriptors[i].request_length = packetSize;
+		ctx->descriptors[i].actual_length = 0;
+		ctx->descriptors[i].status = B_OK;
+	}
+
+	uint32 startingFrame = 0;
+	error = usb->queue_isochronous(bdev->iso_in_ep->handle, data,
+		SCO_PACKETS_PER_BUFFER * packetSize, ctx->descriptors, SCO_PACKETS_PER_BUFFER,
+		&startingFrame, USB_ISO_ASAP, sco_rx_complete, (void*)ctx);
+
+	if (error != B_OK) {
+		reuse_room(&bdev->scoRoom, ctx);
+		bdev->stat.rejectedRX++;
+		ERROR("%s: RX sco resubmittion failed %s\n", __func__, strerror(error));
+	} else {
+		bdev->stat.acceptedRX++;
+	}
+}
+
+
 #if 0
 #pragma mark --- RX ---
 #endif
@@ -183,8 +243,41 @@ submit_rx_acl(bt_usb_dev* bdev)
 status_t
 submit_rx_sco(bt_usb_dev* bdev)
 {
-	// not yet implemented
-	return B_ERROR;
+
+	size_t packetSize = bdev->max_packet_size_iso_in;
+	if (packetSize == 0)
+		return B_ERROR;
+
+	size_t dataSize = SCO_PACKETS_PER_BUFFER * packetSize;
+	size_t roomSize = sizeof(sco_rx_transfer_t) + dataSize;
+
+	sco_rx_transfer_t* ctx = (sco_rx_transfer_t*)alloc_room(&bdev->scoRoom, roomSize);
+	if (ctx == NULL)
+		return B_NO_MEMORY;
+
+	ctx->bdev = bdev;
+
+	for (uint32 i = 0; i < SCO_PACKETS_PER_BUFFER; i++) {
+		ctx->descriptors[i].request_length = packetSize;
+		ctx->descriptors[i].actual_length = 0;
+		ctx->descriptors[i].status = B_OK;
+	}
+
+	void* dataBuffer = (uint8*)ctx + sizeof(sco_rx_transfer_t);
+
+	uint32 startingFrame = 0;
+	status_t status
+		= usb->queue_isochronous(bdev->iso_in_ep->handle, dataBuffer, dataSize, ctx->descriptors,
+			SCO_PACKETS_PER_BUFFER, &startingFrame, USB_ISO_ASAP, sco_rx_complete, ctx);
+
+	if (status != B_OK) {
+		reuse_room(&bdev->scoRoom, ctx);
+		bdev->stat.rejectedRX++;
+	} else {
+		bdev->stat.acceptedRX++;
+	}
+
+	return status;
 }
 
 
