@@ -228,10 +228,15 @@ Model::FillHistoryMenu(BMenu* menu) const
 	if (!_LoadHistory(items))
 		return;
 
+	BFont font;
+	menu->GetFont(&font);
+	float maxWidth = font.StringWidth("M") * 80;
+
 	for (int32 t = items.CountItems() - 1; t >= 0; --t) {
 		BString* item = static_cast<BString*>(items.ItemAtFast(t));
 		BMessage* message = new BMessage(MSG_SELECT_HISTORY);
 		message->AddString("text", item->String());
+		font.TruncateString(item, B_TRUNCATE_MIDDLE, maxWidth);
 		menu->AddItem(new BMenuItem(item->String(), message));
 	}
 
