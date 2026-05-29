@@ -1245,7 +1245,9 @@ AccelerantHWInterface::SetCursor(ServerCursor* cursor)
 		cursorSet = fAccSetCursorBitmap(width, height, xHotSpot,
 			yHotSpot, cursor->ColorSpace(), (uint16)cursor->BytesPerRow(),
 			cursor->Bits()) == B_OK;
-	} else if (cursor->CursorData() != NULL && fAccSetCursorShape != NULL) {
+	}
+
+	if (!cursorSet && cursor->CursorData() != NULL && fAccSetCursorShape != NULL) {
 		// BeOS BCursor, 16x16 monochrome
 		uint8 size = cursor->CursorData()[0];
 		// CursorData()[1] is color depth (always monochrome)
