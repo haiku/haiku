@@ -14,7 +14,7 @@
 #include "listusb.h"
 
 void
-DumpCDCDescriptor(const usb_generic_descriptor* descriptor, int subclass)
+DumpCDCDescriptor(const usb_generic_descriptor* descriptor, const BUSBInterface* interface)
 {
 	if (descriptor->descriptor_type == 0x24) {
 		printf("                    Type ............. CDC interface descriptor\n");
@@ -122,8 +122,196 @@ DumpCDCDescriptor(const usb_generic_descriptor* descriptor, int subclass)
 				printf("CAPI control\n");
 				break;
 			case 0x0F:
+			{
 				printf("Ethernet\n");
-				break;
+				printf("                    MAC Address ...... %s\n",
+					interface->Device()->DecodeStringDescriptor(descriptor->data[1]));
+				printf("                    Statistics ....... ");
+				bool somethingPrinted = false;
+				if ((descriptor->data[2] & 0x01) != 0) {
+					printf("XMIT_OK");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[2] & 0x02) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("RCV_OK");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[2] & 0x04) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_ERROR");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[2] & 0x08) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("RCV_ERROR");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[2] & 0x10) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("RCV_NO_BUFFER");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[2] & 0x20) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("DIRECTED_BYTES_XMIT");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[2] & 0x40) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("DIRECTED_FRAMES_XMIT");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[2] & 0x80) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("MULTICAST_BYTES_XMIT");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x01) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("MULTICAST_FRAMES_XMIT");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x02) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("BROADCAST_BYTES_XMIT");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x04) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("BROADCAST_FRAMES_XMIT");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x08) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("DIRECTED_BYTES_RCV");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x10) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("DIRECTED_FRAMES_RCV");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x20) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("MULTICAST_BYTES_RCV");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x40) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("MULTICAST_FRAMES_RCV");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x80) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("BROADCAST_BYTES_RCV");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[4] & 0x01) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("BROADCAST_FRAMES_RCV");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[4] & 0x02) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("RCV_CRC_ERROR");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[4] & 0x04) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("TRANSMIT_QUEUE_LENGTH");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[4] & 0x08) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("RCV_ERROR_ALIGNMENT");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[4] & 0x10) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_ONE_COLLISION");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[4] & 0x20) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_MORE_COLLISIONS");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[4] & 0x40) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_DEFERRED");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[4] & 0x80) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_MAX_COLLISIONS");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[5] & 0x01) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("RCV_OVERRUN");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[5] & 0x02) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_UNDERRUN");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[5] & 0x04) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_HEARTBEAT_FAILURE");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[5] & 0x08) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_TIMES_CRS_LOST");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[5] & 0x10) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("XMIT_LATE_COLLISIONS");
+					somethingPrinted = true;
+				}
+				// 4 bytes - Bitfield indicating collected statistics
+				if (!somethingPrinted)
+					printf("None");
+				printf("\n");
+				printf("                    Max. Segment Size  %d\n",
+					descriptor->data[6] | descriptor->data[7] << 8);
+				printf("                    Multicast filters  %d\n",
+					descriptor->data[8] | descriptor->data[9] << 8);
+				printf("                    Power filters ...  %d\n",
+					descriptor->data[10]);
+				return;
+			}
 			case 0x10:
 				printf("ATM\n");
 				break;
@@ -155,8 +343,57 @@ DumpCDCDescriptor(const usb_generic_descriptor* descriptor, int subclass)
 				printf("Object Exchange service identifier\n");
 				break;
 			case 0x1A:
-				printf("NCM\n");
-				break;
+			{
+				printf("Network Control Model (NCM)\n");
+				printf("                    Version .......... %d.%d\n",
+					descriptor->data[2], descriptor->data[1]);
+				printf("                    Capabilities ..... ");
+				bool somethingPrinted = false;
+				if ((descriptor->data[3] & 0x80) != 0) {
+					printf("Extended 1.1 capabilitiies");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x20) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("8-bit Get/SetNbInputSize");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x10) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("Get/SetCrcMode");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x08) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("Get/SetMaxDatagramSize");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x04) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("SendEncapsulatedCommand/GetEncapsulatedResponse");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x02) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("Get/SetNetAddress");
+					somethingPrinted = true;
+				}
+				if ((descriptor->data[3] & 0x01) != 0) {
+					if (somethingPrinted)
+						printf(", ");
+					printf("SetEthernetPacketFilter");
+					somethingPrinted = true;
+				}
+				if (!somethingPrinted)
+					printf("None");
+				printf("\n");
+				return;
+			}
 			default:
 				printf("0x%02x\n", descriptor->data[0]);
 		}

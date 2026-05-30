@@ -16,7 +16,7 @@
 
 void DumpDescriptorData(const usb_generic_descriptor* descriptor);
 
-void DumpCDCDescriptor(const usb_generic_descriptor* descriptor, int subclass);
+void DumpCDCDescriptor(const usb_generic_descriptor* descriptor, const BUSBInterface* interface);
 void DumpAudioDescriptor(const usb_generic_descriptor* descriptor, int subclass);
 void DumpVideoDescriptor(const usb_generic_descriptor* descriptor, int subclass);
 

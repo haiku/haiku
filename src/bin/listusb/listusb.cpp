@@ -54,24 +54,23 @@ DumpEndpointSSCompanionDescriptor(
 
 
 void
-DumpDescriptor(const usb_generic_descriptor* descriptor,
-	int classNum, int subclass)
+DumpDescriptor(const usb_generic_descriptor* descriptor, const BUSBInterface* interface)
 {
 	if (descriptor->descriptor_type == USB_DESCRIPTOR_ENDPOINT_SS_COMPANION) {
 		DumpEndpointSSCompanionDescriptor((const usb_endpoint_ss_companion_descriptor*)descriptor);
 		return;
 	}
 
-	switch (classNum) {
+	switch (interface->Class()) {
 		case USB_AUDIO_DEVICE_CLASS:
-			DumpAudioDescriptor(descriptor, subclass);
+			DumpAudioDescriptor(descriptor, interface->Subclass());
 			break;
 		case USB_VIDEO_DEVICE_CLASS:
-			DumpVideoDescriptor(descriptor, subclass);
+			DumpVideoDescriptor(descriptor, interface->Subclass());
 			break;
 		case USB_COMMUNICATION_DEVICE_CLASS:
 		case USB_COMMUNICATION_WIRELESS_DEVICE_CLASS:
-			DumpCDCDescriptor(descriptor, subclass);
+			DumpCDCDescriptor(descriptor, interface);
 			break;
 		default:
 			DumpDescriptorData(descriptor);
@@ -131,7 +130,7 @@ DumpInterface(const BUSBInterface* interface)
 	for (uint32 i = 0;
 			interface->OtherDescriptorAt(i, generic, 256) == B_OK; i++) {
 		printf("                [Descriptor %" B_PRIu32 "]\n", i);
-		DumpDescriptor(&generic->generic, interface->Class(), interface->Subclass());
+		DumpDescriptor(&generic->generic, interface);
 	}
 }
 
