@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Input	993392905
+1	russian	x-vnd.Haiku-Input	1794165409
 Defaults	InputMouse		По умолчанию
 Scrolling	TouchpadPrefView		Прокрутка
 Long	KeyboardView		Длинная
@@ -9,6 +9,7 @@ Double-click speed	SettingsView		Скорость двойного клика
 5-Button	SettingsView		Пятикнопочная
 Typing test area	KeyboardView		Тестовая область
 Fast	KeyboardView		Быстро
+Always	TouchpadPrefView		Всегда
 Please confirm	TouchpadPrefView		Пожалуйста, подтвердите
 Trackpad speed	TouchpadPrefView		Скорость трекпада
 Mouse speed	SettingsView		Скорость курсора

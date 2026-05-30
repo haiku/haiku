@@ -1,16 +1,16 @@
-1	russian	x-vnd.Haiku-Repositories	1003035766
+1	russian	x-vnd.Haiku-Repositories	2642736029
 This is not a valid URL.	AddRepoWindow	Add URL error message	Это неправильный URL-адрес.
 Repository URL:	AddRepoWindow	Text box label	URL репозитария:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Произошла ошибка обновления кеша репозитария для %name%
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Произошла ошибка при отключении репозитария %name%
 Unknown	Constants	Unknown repository name	Неизвестно
 Remove all	RepositoriesView	Button label	Удалить все
-Enable repositories to use with package management:	RepositoriesView	Label text	Список репозитариев для работы с пакетным менеджером:
+Enable repositories to use with package management:	RepositoriesView	Label text	Репозитарии для использования в системе управления пакетами:
 Disable	RepositoriesView	Button label	Отключить
 Cancel task	TaskTimer	Button label	Отменить задачу
 Changes completed	RepositoriesView	Status view text	Изменения завершены
 Details	TaskLooper	Job log details header	Детали
-Enabled	RepoRow	Tag in the Status column	Включен
+Enabled	RepoRow	Tag in the Status column	Подключен
 Remove	Constants	Button label	Удалить
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Ошибка при подключении репозитария %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Удалить этот репозитарий
@@ -20,22 +20,23 @@ OK	Constants	Button label	OK
 Status	RepositoriesView	Column title	Статус
 Name	RepositoriesView	Column title	Название
 Add	AddRepoWindow	Button label	Добавить
-Enable all	RepositoriesView	Button label	Включить все
+Enable all	RepositoriesView	Button label	Подключить все
+%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	%prefname% не удалось получить названия репозитариев, подключенных в данный момент.
 Aborted	TaskLooper	Aborted task status message	Прервано
 URL	RepositoriesView	Column title	URL-адрес
-Enable	RepositoriesView	Button label	Включить
+Enable	RepositoriesView	Button label	Подключить
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Ошибка получения конфигурации для %name%.
 Description	TaskLooper	Failed task error description	Описание
 Failed	TaskLooper	Failed task status message	Ошибка
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Хорошие новости! Задача для репозитария %name% завершена.
-Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Некоторые задачи еще выполняются. Остановить их и выйти?
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Некоторые задачи ещё выполняются. Остановить их и выйти?
 This repository URL already exists.	RepositoriesView	Error message	URL-адрес этого репозитария уже существует.
 Repositories	System name		Репозитарии
 Changes pending:	RepositoriesView	Status view text	Ожидаются изменения:
 Remove	RepositoriesView	Button label	Удалить
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Удалить эти репозитарии?
-Keep trying	TaskTimer	Button label	Продолжать пытаться
-Cancel	Constants	Button label	Отмена
+Keep trying	TaskTimer	Button label	Продолжать попытки
+Cancel	Constants	Button label	Отменить
 Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Для каждого репозитария может быть включён только один URL. Пожалуйста, измените Ваш выбор.
 Stop and quit	RepositoriesWindow	Button label	Остановить и выйти
 Disable all	RepositoriesView	Button label	Отключить все

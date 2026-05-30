@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PowerStatus	388505242
+1	ukrainian	x-vnd.Haiku-PowerStatus	4069361317
 Run in window	PowerStatus		Запустити у вікні
 Extended battery info	PowerStatus		Розширені дані батареї
 Show status icon	PowerStatus		Показати значок стану
@@ -14,6 +14,7 @@ Quit	PowerStatus		Вийти
 Battery not charging	PowerStatus		Батарея не заряджається
 Battery low	PowerStatus		Батарея розряджена
 Model number: 	PowerStatus		Номер моделі: 
+You can run %appname% in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити %appname% у вікні або встановити на Deskbar.
 Battery unused	PowerStatus		Батарея не використовується
 Type: 	PowerStatus		Тип: 
 Damaged or missing battery	PowerStatus		Пошкоджений або відсутній акумулятор
@@ -38,6 +39,7 @@ Capacity granularity 2: 	PowerStatus		Деталізація ємності 2:
 Too bad!	PowerStatus		Дуже погано!
 Technology: 	PowerStatus		Технологія: 
 not charging	PowerStatus		не заряджається
+No supported battery detected. %appname% cannot be used on your system.	PowerStatus		Не виявлено сумісної батареї. %appname% не може працювати на Вашій системі.
  mWh	PowerStatus		 мВт·год
 PowerStatus	System name		PowerStatus
 Design capacity: 	PowerStatus		Паспортна ємність: 

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	2040688293
+1	russian	x-vnd.Haiku-Expander	3730797215
 Destination	ExpanderWindow		Назначение
 Other	ExpanderPreferences		Другое
 Automatically show contents listing	ExpanderPreferences		Автоматически отображать содержимое архива
@@ -45,5 +45,6 @@ The file doesn't exist	ExpanderWindow		Файл не существует
 Hide contents	ExpanderWindow		Скрыть содержимое
 Source	ExpanderWindow		Источник
 The destination is read only.	ExpanderWindow		Путь назначения доступен только для чтения.
+%appname%: Open	ExpanderWindow		%appname%: Открыть
 Select	ExpanderPreferences		Выбрать
 File	ExpanderMenu		Файл

@@ -1,8 +1,9 @@
-1	russian	x-vnd.Haiku-Network	3807978621
+1	russian	x-vnd.Haiku-Network	3044115400
+no link	IntefaceView		нет соединения
 Ethernet device	InterfaceListItem		Проводное устройство
 Link speed:	IntefaceView		Скорость соединения:
 WPA	WPA protected network		WPA
-Network:	IntefaceView		Сеть
+Network:	IntefaceView		Сеть:
 Received:	IntefaceView		Получено:
 New…	NetworkWindow		Создать…
 no link	InterfaceListItem		нет соединения
@@ -10,6 +11,7 @@ Other	NetworkWindow		Другая
 Sent:	IntefaceView		Отправлено:
 Gateway:	IntefaceAddressView		Шлюз:
 The netmask defines your local network	IntefaceAddressView		Маска подсети определяет вашу локальную сеть
+unknown	IntefaceView		неизвестно
 Your IP address	IntefaceAddressView		Ваш IP-адрес
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		IP-адрес:
@@ -17,7 +19,7 @@ Netmask:	IntefaceAddressView		Маска подсети:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Службы
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не удалось установить NetworkStatus в Deskbar: %s
-Revert	NetworkWindow		Вернуть
+Revert	NetworkWindow		Откатить
 off	ServiceListItem		выключен
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<беспроводные сети не найдены>
@@ -26,13 +28,15 @@ connected	IntefaceView		подключено
 Apply	IntefaceAddressView		Применить
 Disable	ServiceView		Отключить
 WPA2	WPA2 protected network		WPA2
-Show network status in Deskbar	NetworkWindow		Отображать статус интерфейсов в Deskbar
+Show network status in Deskbar	NetworkWindow		Отображать статус сети в Deskbar
+no stateful configuration	IntefaceView		конфигурация без сохранения состояния
 Mode:	IntefaceAddressView		Режим:
 connected	InterfaceListItem		подключено
 OK	NetworkWindow		OK
 Static	IntefaceAddressView		Статический
 launch error	NetworkWindow		Ошибка запуска
-Renegotiate	IntefaceView		Переполучить
+Renegotiate	IntefaceView		Пересогласовать
+configuring	IntefaceView		настраивается
 MAC address:	IntefaceView		MAC-адрес:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		отключен

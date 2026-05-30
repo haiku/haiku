@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	3394555425
+1	russian	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		Просмотр изображений
 Page setup…	Menus		Настройка печати…
 Previous file	Menus		Предыдущий файл
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Высота:
 Next file	Menus		Следующий файл
 Slide show	Menus		Слайд шоу
 Original size	Menus		Оригинальный размер
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		Документ «%filename%» был изменён. Хотите закрыть документ?
 Width:	PrintOptionsWindow		Ширина:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1/72 дюйма):
 Zoom factor in %:	PrintOptionsWindow		Масштаб в %:
@@ -46,6 +47,7 @@ Clear selection	Menus		Очистить выделение
 Rotate clockwise	Menus		Повернуть по часовой стрелке
 Open with…	Menus		Открыть с…
 Rotate counterclockwise	Menus		Повернуть против часовой стрелки
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		Документ «%filename%» (страница %number%) был изменён. Хотите закрыть документ?
 Previous page	Menus		Предыдущая страница
 Fit to window	Menus		Подогнать под размер окна
 Go to page	Menus		Перейти к странице

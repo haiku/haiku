@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-Media	4055972908
+1	russian	x-vnd.Haiku-Media	2686142259
 Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось добавить регулятор громкости в Deskbar: %s\n
 Restart media services	Media views		Перезапустить медиа службы
 Quit	Media Window		Выход
+Quitting %prefname% now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Завершение работы %prefname% прервёт перезапуск медиасервисов. В результате медиафункции могут стать недоступными.
 <none>	VideoInputMenu	Used when no video input is available	<отсутствует>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не удалось удалить регулятор громкости из Deskbar: %s\n
 Video output:	Media views		Видео выход:

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ProcessController	2724038695
+1	ukrainian	x-vnd.Haiku-ProcessController	3071891193
 Error saving file	ProcessController		Помилка при збереженні файлу
 Display priority	ProcessController		Пріоритет відображення
 That's no Fun!	ProcessController		Це не жарт!
@@ -21,7 +21,7 @@ Usage: %s [-deskbar]\n	ProcessController		Використання: %s [-deskbar
 Please confirm	ProcessController		Підтвердити
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		Терміновий пріоритет
-What do you want to do with the thread \"%s\"?	ProcessController		Що Ви бажаєте зробити з потоком \"%s\"?
+What do you want to do with the thread \"%s\"?	ProcessController		Що Ви бажаєте зробити з потоком \«%s\»?
 Idle priority	ProcessController		Пріоритет простою
 Real-time display priority	ProcessController		Пріоритет відображення реального часу
 Threads and CPU usage	ProcessController		Потоки і використання CPU
@@ -29,7 +29,9 @@ Quit application	ProcessController		Вийти з програми
 Info	ProcessController		Інфо
 Kill this thread!	ProcessController		Знищити цей потік!
 This team is already gone…	ProcessController		Процес вже завершено…
+About %appname%…	ProcessController		Про програму %appname%…
 Gone teams…	ProcessController		Завершені процеси…
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		Ви можете запустити %appname% у вікні або встановити на Deskbar.
 Quit an application	ProcessController		Вийти з програми
 Cancel	ProcessController		Скасувати
 Install in Deskbar	ProcessController		Встановити у Deskbar

@@ -1,4 +1,4 @@
-1	russian	application/x-vnd.Cortex.support	3450110595
+1	russian	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Заголовок имеет флаги
 32 bit HLS	MediaString		32-битный HLS
 Recording	MediaString		Запись
@@ -46,6 +46,7 @@ Right	MediaString		Правый
 System mixer	MediaString		Системный микшер
 Physical output	MediaString		Физический выход
 Top-Back-center	MediaString		Верхний-Тыл-центр
+(unknown video orientation)	MediaString		(неизвестная ориентация видео)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Сверху вниз, слева направо
 (unknown run mode)	MediaString		(неустановленный режим работы)

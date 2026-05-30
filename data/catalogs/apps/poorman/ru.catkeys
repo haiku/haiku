@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PoorMan	2667626017
+1	russian	x-vnd.Haiku-PoorMan	30371317
 Select web folder	PoorMan		Выбрать папку для публикации
 Console logging	PoorMan		Логирование в консоль
 Create Log File	PoorMan		Создать лог файл
@@ -35,6 +35,7 @@ Log To File	PoorMan		Сохранять лог в файл
 Connections	PoorMan		Соединения
 Controls	PoorMan		Управление
 Log to console	PoorMan		Выводить лог в консоль
+Error server	PoorMan		Ошибка сервера
 Advanced	PoorMan		Дополнительно
 Copy	PoorMan		Копировать
 Logging	PoorMan		Логирование

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	2402977561
+1	russian	x-vnd.Haiku-WebPositive	3459776802
 Authentication required	Authentication Panel		Требуется авторизация
 Previous	WebPositive Window		Ранее
 Copy	Console Window		Копировать
@@ -29,7 +29,7 @@ Copy URL to clipboard	Download Window		Копировать ссылку на з
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Вы хотите открыть сразу %addedCount закладок?
 Clone current page	Settings Window		Клонировать текущую страницу
 Start page:	Settings Window		Начальная страница:
-Cancel	Download Window		Отмена
+Cancel	Download Window		Отменить
 Settings	Settings Window		Настройки
 Downloads	WebPositive Window		Загрузки
 Browse…	Settings Window		Выбрать…
@@ -59,7 +59,7 @@ The download could not be opened.	Download Window		Невозможно откр
 Cookies for %s	Cookie Manager		Куки для %s
 Close	Download Window		Закрыть
 WebPositive	System name		WebPositive
-%s - Search term	Settings Window		%s - Условия поиска
+%s - Search term	Settings Window		%s – Условия поиска
 Old name: %s	BookmarkBar		Старое название: %s
 Expiration	Cookie Manager		Срок действия
 Reload	WebPositive Window		Обновить
@@ -68,13 +68,13 @@ Cookie manager	WebPositive Window		Менеджер куков
 Username:	Authentication Panel		Имя пользователя:
 Hide password text	Authentication Panel		Скрыть текст пароля
 OK	Authentication Panel		OK
-Name	Cookie Manager		Имя
+Name	Cookie Manager		Название
 Remove finished	Download Window		Убрать загруженные
 Earlier	WebPositive Window		Ранее
-Edit	WebPositive Window		Изменить
+Edit	WebPositive Window		Правка
 Back	WebPositive Window		Назад
 Yesterday	WebPositive Window		Вчера
-Quit	WebPositive		Выход
+Quit	WebPositive		Выйти
 Download aborted	Download Window		Загрузка прервана
 Number of days to keep links in History menu:	Settings Window		Количество дней хранения ссылок в меню «История»:
 Password:	Authentication Panel		Пароль:
@@ -89,12 +89,13 @@ New tab	WebPositive Window		Новая вкладка
 Increase size	WebPositive Window		Увеличить размер
 Today	WebPositive Window		Сегодня
 Open location	WebPositive Window		Открыть адрес
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		Загрузка ещё не завершена. Вы хотите закрыть %appname% именно сейчас?
 New browser window	Download Window		Новое окно браузера
 Open	Download Window		Открыть
 New window	WebPositive Window		Новое окно
 New windows:	Settings Window		Новые окна:
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Папка с загруженными файлами не может быть открыта.\n\nОшибка: %error
-Cancel	Authentication Panel		Отмена
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Папка загрузок не открывается.\n\nОшибка: %error
+Cancel	Authentication Panel		Отменить
 Style:	Font Selection view		Стиль:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при создании закладки.\n\nОшибка: %error
 OK	Download Window		OK
@@ -106,8 +107,9 @@ Restart	Download Window		Перезапустить
 Serif font:	Settings Window		Шрифт с засечками:
 Apply	Settings Window		Применить
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при открытии папки с закладками.\n\nОшибка: %error
-Revert	Settings Window		Вернуть
+Revert	Settings Window		Откатить
 Copy	WebPositive Window		Копировать
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		Ваш процессор не поддерживает расширения SSE2, без которых %appname% не может работать. Мы рекомендуем установить NetSurf.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Крайняя строка повторена́ # раз.} few{Крайняя строка повторена́ # раза.} other{Крайняя строка повторена́ # раз.}}
 Default standard font size:	Settings Window		Размер стандартного шрифта:
 Custom	Settings Window		Вручную
@@ -118,18 +120,18 @@ Close tab	WebPositive Window		Закрыть вкладку
 About	WebPositive Window		О программе
 Continue downloads	WebPositive		Продолжить загрузку
 Proxy server requires authentication	Settings Window		Прокси требует проверки подлинности
-Cancel	Settings Window		Отмена
+Cancel	Settings Window		Отменить
 Reset size	WebPositive Window		Сбросить размер
 History	WebPositive Window		История
 Do you really want to clear the browsing history?	WebPositive Window		Вы действительно хотите очистить историю посещений?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Найти вперёд
 Fixed font:	Settings Window		Моноширинный шрифт:
-Quit	WebPositive Window		Выход
+Quit	WebPositive Window		Выйти
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Найти назад
 Remember username and password for this site	Authentication Panel		Запомнить имя пользователя и пароль для этого сайта
-(Finish: %date - %duration left)	Download Window		(Завершение: %date - %duration осталось)
+(Finish: %date - %duration left)	Download Window		(Завершение: %date – %duration осталось)
 Cookie manager	Cookie Manager		Менеджер куков
-Show home button	Settings Window		Показывать кнопку Домой
+Show home button	Settings Window		Показывать кнопку «Домой»
 Start new session	Settings Window		Запуск нового сеанса
 The cookie jar is empty!	Cookie Manager		Архив куков пуст!
 Value	Cookie Manager		Значение
@@ -151,6 +153,7 @@ Proxy server address:	Settings Window		Адрес прокси-сервера:
 Search page:	Settings Window		Страница поиска:
 Settings	WebPositive Window		Настройки
 Show in Tracker	BookmarkBar		Показать в Tracker
+(%currentSize% received, %rate%/s)	Download Window		(%currentSize% получено, %rate%/s)
 Clear	URL Bar		Очистить
 Loading %url	WebPositive Window		Загрузка %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
@@ -165,7 +168,7 @@ Cut	WebPositive Window		Вырезать
 Downloads	Download Window		Загрузки
 Open blank page	Settings Window		Открыть пустую страницу
 Clear history	WebPositive Window		Очистить историю
-Cancel	WebPositive Window		Отмена
+Cancel	WebPositive Window		Отменить
 Script console	Console Window		Консоль сценариев
 Copy	URL Bar		Копировать
 Open in new tab	BookmarkBar		Открыть в новой вкладке

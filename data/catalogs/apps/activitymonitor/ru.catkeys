@@ -1,5 +1,6 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	2137057658
+1	russian	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Процессы
+Temp	DataSource		Температура
 Block cache memory	DataSource		Память блокового кэша
 Media nodes	DataSource		Медиа узлы
 Network send	DataSource		Исходящий трафик
@@ -9,6 +10,7 @@ ActivityMonitor	System name		Монитор активности
 CPU %d	DataSource		Процессор %d
 Update time interval:	SettingsWindow		Интервал обновления:
 Settings…	ActivityWindow		Настройки…
+Unknown thermal sensor	SystemInfoHandler		Неизвестный датчик температуры
 Block cache	DataSource		Блоковый кэш
 Memory	DataSource		Память
 No thermal sensor	SystemInfoHandler		Нет термальных сенсоров

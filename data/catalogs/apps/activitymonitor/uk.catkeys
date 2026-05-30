@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	1753371419
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Процеси
+Temp	DataSource		Температура
 Block cache memory	DataSource		Блок кеш-пам'яті
 Media nodes	DataSource		Вузли медіа
 Network send	DataSource		Відправлено по мережі

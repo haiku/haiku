@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	2402977561
+1	ukrainian	x-vnd.Haiku-WebPositive	3459776802
 Authentication required	Authentication Panel		Потрібна автентифікація
 Previous	WebPositive Window		Попереднє
 Copy	Console Window		Копіювати
@@ -36,7 +36,7 @@ Browse…	Settings Window		Переглянути…
 Resume prior session	Settings Window		Продовжити попередній сеанс
 Match case	WebPositive Window		Враховувати регістр
 Proxy password:	Settings Window		Пароль проксі:
-Failed to delete bookmark:\n'%path%'	BookmarkBar		Помилка видалення вкладки:\n'%path%'
+Failed to delete bookmark:\n'%path%'	BookmarkBar		Помилка видалення вкладки:\n«%path%»
 Size:	Font Selection view		Розмір:
 Page source	WebPositive Window		Код сторінки
 Proxy server port:	Settings Window		Порт проксі-сервера:
@@ -68,10 +68,10 @@ Cookie manager	WebPositive Window		Менеджер Cookie
 Username:	Authentication Panel		Користувач:
 Hide password text	Authentication Panel		Приховати текст пароля
 OK	Authentication Panel		ОК
-Name	Cookie Manager		Ім'я
+Name	Cookie Manager		Назва
 Remove finished	Download Window		Прибрати завантажені
 Earlier	WebPositive Window		Раніше
-Edit	WebPositive Window		Редагувати
+Edit	WebPositive Window		Коректив
 Back	WebPositive Window		Назад
 Yesterday	WebPositive Window		Вчора
 Quit	WebPositive		Вийти
@@ -89,11 +89,12 @@ New tab	WebPositive Window		Нова вкладка
 Increase size	WebPositive Window		Збільшити розмір
 Today	WebPositive Window		Сьогодні
 Open location	WebPositive Window		Відкрити розташування
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		Завантаження ще триває. Ви хочете закрити %appname% саме зараз?
 New browser window	Download Window		Нове вікно браузера
 Open	Download Window		Відкрити
 New window	WebPositive Window		Нове вікно
 New windows:	Settings Window		Нові вікна:
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Неможливо відкрити папку завантажень.\n\nПомилка: %error
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Папка завантажень не відкривається.\n\nПомилка: %error
 Cancel	Authentication Panel		Скасувати
 Style:	Font Selection view		Стиль:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при створенні закладки.\n\nПомилка: %error
@@ -108,11 +109,12 @@ Apply	Settings Window		Застосувати
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при спробі показати папку закладок.\n\nПомилка: %error
 Revert	Settings Window		Відкат змін
 Copy	WebPositive Window		Копіювати
-{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Останній рядок повторено # раз.} few{Останній рядок повторено # рази.} other{Останній рядок повторено # разів.}}
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		Ваш процесор не підтримує розширення SSE2, без яких %appname% не може працювати. Ми рекомендуємо встановити NetSurf.
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Останній рядок повторили # раз.} few{Останній рядок повторили # рази.} other{Останній рядок повторили # разів.}}
 Default standard font size:	Settings Window		Розмір шрифту за замовчуванням:
 Custom	Settings Window		Вибір користувача
 Bookmark this page	WebPositive Window		Додати до закладок
-Show tabs if only one page is open	Settings Window		Показати вкладки, якщо відкрито лише одну сторінку
+Show tabs if only one page is open	Settings Window		Показувати панель вкладок, навіть якщо відкрито лише одну сторінку
 Remove	Download Window		Вилучити
 Close tab	WebPositive Window		Закрити вкладку
 About	WebPositive Window		Про програму
@@ -127,19 +129,19 @@ Fixed font:	Settings Window		Моноширинний шрифт:
 Quit	WebPositive Window		Вийти
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Знайти попереднє входження за умовами пошуку
 Remember username and password for this site	Authentication Panel		Запам'ятати логін та пароль для цього сайту
-(Finish: %date - %duration left)	Download Window		(Завершення: %date - %duration залишилось)
-Cookie manager	Cookie Manager		Менеджер coookie
-Show home button	Settings Window		Показати кнопку «Додому»
+(Finish: %date - %duration left)	Download Window		(Завершення: %date – %duration залишилось)
+Cookie manager	Cookie Manager		Менеджер cookie
+Show home button	Settings Window		Показувати кнопку «Додому»
 Start new session	Settings Window		Запуск нового сеансу
 The cookie jar is empty!	Cookie Manager		Архів cookie порожній!
 Value	Cookie Manager		Значення
 Remove missing	Download Window		Прибрати відсутні
 Paste	WebPositive Window		Вставити
-Double-click or middle-click to open new tab.	Tab Manager		Подвійний або середній клік для відкриття нової вкладки.
+Double-click or middle-click to open new tab.	Tab Manager		Подвійний або середній клік відкриє нову вкладку.
 Next	WebPositive Window		Наступне
 Bookmark error	WebPositive Window		Помилка закладки
 OK	WebPositive Window		ОК
-(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% of %expectedSize%, %rate%/s)
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% з %expectedSize%, %rate%/s)
 Save page as…	WebPositive Window		Зберегти сторінку як…
 Zoom text only	WebPositive Window		Збільшити тільки текст
 Page source error	WebPositive Window		Помилка в коді сторінки
@@ -151,6 +153,7 @@ Proxy server address:	Settings Window		Адреса проксі-сервера:
 Search page:	Settings Window		Сторінка пошуку:
 Settings	WebPositive Window		Налаштування
 Show in Tracker	BookmarkBar		Відкрити у Tracker
+(%currentSize% received, %rate%/s)	Download Window		(%currentSize% отримано, %rate%/s)
 Clear	URL Bar		Очистити
 Loading %url	WebPositive Window		Завантаження %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Факт ґринджол: бій псюг вщух, з’їм шче яєць.

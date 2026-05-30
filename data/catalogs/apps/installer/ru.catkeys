@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	2605956470
+1	russian	x-vnd.Haiku-Installer	738307934
 Performing installation.	InstallProgress		Выполняется установка…
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте окно разметки диска перед закрытием окна Установщика.
 No optional packages available.	PackagesView		Опциональные пакеты недоступны.
@@ -86,10 +86,12 @@ You can't install the contents of a disk onto itself. Please choose a different 
 An EFI loader is already installed on the selected partition! Would you like to rename it?	InstallProgress		EFI загрузчик уже установлен на выбранном разделе! Хотите переименовать его?
 Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Закройте окна BootManager и DriveSetup до закрытия окна Установщика.
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Выберите исходный диск из всплывающего меню. Затем нажмите кнопку «Установить».
+No valid EFI system data partitions found	InstallerWindow		Не найден валидный системный раздел EFI
 OK	InstallProgress		ОК
 Quit BootManager	InstallerWindow		Завершить BootManager
 Onto:	InstallerWindow		На диск:
 Tools	InstallerWindow		Инструменты
 scanning…	InstallerWindow		сканирование…
+Failed to access installation destination!	InstallProgress		Нет доступа к месту инсталляции!
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Выберите целевой диск из всплывающего меню. Затем нажмите кнопку «Установить».
 Continue	InstallerApp		Продолжить

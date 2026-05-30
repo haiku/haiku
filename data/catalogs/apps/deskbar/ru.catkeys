@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-TSKB	1826478880
+1	russian	x-vnd.Be-TSKB	1874926759
 Auto-hide	PreferencesWindow		Скрывать автоматически
 Show all	WindowMenu		Показать все
 Edit in Tracker…	PreferencesWindow		Изменить меню…
@@ -9,6 +9,7 @@ Large	PreferencesWindow		Крупные
 <Deskbar folder is empty>	DeskbarMenu		<Папка Deskbar пуста>
 Recent documents	DeskbarMenu		Недавние документы
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения
+%appname% preferences	PreferencesWindow		Настройки %appname%
 Always on top	PreferencesWindow		Всегда сверху
 Restart system	DeskbarMenu		Перезагрузить компьютер
 Recent documents:	PreferencesWindow		Недавние документы:
@@ -27,10 +28,10 @@ Show clock	Tray		Показать часы
 Close all	WindowMenu		Закрыть все
 About this system	DeskbarMenu		Об этой системе
 Quit application	WindowMenu		Закрыть приложение
-Hide application names	PreferencesWindow		Скрыть имена приложений
+Hide application names	PreferencesWindow		Скрыть названия
 Deskbar	System name		Deskbar
 Applications	PreferencesWindow		Приложения
-Show application expander	PreferencesWindow		Отображать список окон приложений
+Show application expander	PreferencesWindow		Отображать список окон
 Suspend	DeskbarMenu		Приостановить
 Shutdown…	DeskbarMenu		Завершение работы…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
@@ -40,8 +41,8 @@ Recent folders:	PreferencesWindow		Недавние папки:
 Recent folders	DeskbarMenu		Недавние папки
 Recent applications	DeskbarMenu		Недавние приложения
 Hide all	WindowMenu		Скрыть все
-Sort applications by name	PreferencesWindow		Сортировать приложения по имени
-Revert	PreferencesWindow		Вернуть
+Sort applications by name	PreferencesWindow		Сортировать по названию
+Revert	PreferencesWindow		Откатить
 Window	PreferencesWindow		Окно
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
 Time preferences…	TimeView		Настроить часы…

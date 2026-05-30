@@ -1,16 +1,16 @@
 1	japanese	x-vnd.Haiku-hmulti_audio.media_addon	451057402
-Master	MultiAudio		Master
+Master	MultiAudio		マスター
 SPDIF	MultiAudio		SPDIF
 Gain	MultiAudio		ゲイン
 Output 3D center	MultiAudio		Output 3D center
 Extended Setup	MultiAudio		高度な設定
 CD	MultiAudio		CD
-Tone control	MultiAudio		Tone control
-Phone	MultiAudio		Phone
+Tone control	MultiAudio		トーンコントロール
+Phone	MultiAudio		電話
 Aux	MultiAudio		Aux
 Output bass	MultiAudio		Output bass
 Headphones	MultiAudio		ヘッドホン
-Beep	MultiAudio		Beep
+Beep	MultiAudio		ビープ音
 Output mono mix	MultiAudio		Output mono mix
 Output stereo mix	MultiAudio		Output stereo mix
 Input	MultiAudio		入力
@@ -19,7 +19,7 @@ Mono mix	MultiAudio		Mono mix
 General	MultiAudio		一般
 Input & Output	MultiAudio		入出力
 Enhanced Setup	MultiAudio		高度なセットアップ
-Stereo mix	MultiAudio		Stereo mix
+Stereo mix	MultiAudio		ステレオミックス
 Output 3D depth	MultiAudio		Output 3D depth
 Volume	MultiAudio		音量
 Output	MultiAudio		出力

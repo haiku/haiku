@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	2882508421
+1	russian	x-vnd.Haiku-StyledEdit	201361663
 Document statistics	Statistics		Статистика документа
 Cut	Menus		Вырезать
 Center	Menus		По центру
@@ -21,6 +21,7 @@ line %d, column %d	StatusView		линия %d, позиция %d
 Words:	Statistics		Слов:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Восстановить
+Unable to unlock file\n\t%error%	QuitAlert		Не удаётся разблокировать файл\n\t%error%
 OK	RevertToSavedAlert		ОК
 Unlock file	StatusView		Разблокировать
 Italic	Menus		Наклонный
@@ -34,6 +35,8 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Строк:
 Strikeout	Menus		Зачёркнутый
 Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
+Error saving \"%filename%\":\n%error%	SaveAlert		Ошибка сохранения \«%filename%\»:\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Сохранить изменения в документе \«%title%\»?
 Save	SaveAlert		Сохранить
 Default	Open_and_SaveAsPanel		По умолчанию
 Cancel	RevertToSavedAlert		Отмена
@@ -77,8 +80,10 @@ Open…	Menus		Открыть…
 Save as…	Menus		Сохранить как…
 Replace	FindandReplaceWindow		Заменить
 Characters:	Statistics		Символов:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		Ошибка загрузки \«%filename%\»:\n\tНеподдерживаемый формат
 Don't save	QuitAlert		Не сохранять
 Align	Menus		Выровнять
 Font	Menus		Шрифт
 Select all	Menus		Выделить всё
 Right	Menus		По правому краю
+Error loading \"%filename%\":\n\t%error%	LoadAlert		Ошибка загрузки \«%filename%\»:\n\t%error%

@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	1624218665
+1	russian	x-vnd.haiku-icon_o_matic	334240761
 None	Icon-O-Matic-Properties		Ничего
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Очистить контур
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -158,6 +158,7 @@ Untitled	Icon-O-Matic-Main		Новый значок
 Max LOD	Icon-O-Matic-PropertyNames		Макс. LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Сохранить изменения теущего значка перед закрытием?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Не удалось открыть файл «%s» как документ SVG.\n\n
+<unknown property>	Icon-O-Matic-PropertyNames		<неизвестное свойство>
 Save as…	Icon-O-Matic-Menu-File		Сохранить как…
 Swatches	Icon-O-Matic-Menus		Палитра
 <modify path>	Icon-O-Matic-PathCmd		<изменить контур>

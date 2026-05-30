@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	1624218665
+1	ukrainian	x-vnd.haiku-icon_o_matic	334240761
 None	Icon-O-Matic-Properties		Пусто
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Очистити контур
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -154,10 +154,11 @@ Cancel	Icon-O-Matic-StyledTextImport		Скасувати
 Add circle	Icon-O-Matic-PathsList		Додати коло
 Freeze transformation	Icon-O-Matic-ShapesList		Зафіксувати трансформацію
 META:ICON attribute	Icon-O-Matic-SavePanel		атрибут META:ICON
-Untitled	Icon-O-Matic-Main		Неназваний
+Untitled	Icon-O-Matic-Main		Без назви
 Max LOD	Icon-O-Matic-PropertyNames		Mакс. LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Зберегти зміни поточного значка перед закриттям?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Не вдалося відкрити файл «%s» як документ SVG.\n\n
+<unknown property>	Icon-O-Matic-PropertyNames		<невідома властивість>
 Save as…	Icon-O-Matic-Menu-File		Зберегти як…
 Swatches	Icon-O-Matic-Menus		Палітри
 <modify path>	Icon-O-Matic-PathCmd		<змінити контур>
@@ -189,4 +190,4 @@ Width	Icon-O-Matic-PropertyNames		Ширина
 Add reference image	Icon-O-Matic-ShapesList		Додати референсне зображення
 Style	Icon-O-Matic-Menus		Стиль
 Off	Icon-O-Matic-Menu-Settings		Прибрати сітку
-Edit	Icon-O-Matic-Menus		Редагувати
+Edit	Icon-O-Matic-Menus		Коректив

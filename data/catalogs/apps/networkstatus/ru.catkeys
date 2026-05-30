@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-NetworkStatus	2510618206
+1	russian	x-vnd.Haiku-NetworkStatus	1860540945
 IPv6 address:	NetworkStatusView		IPv6 адрес:
 Quit	NetworkStatusView		Выход
 Unknown	NetworkStatusView		Неизвестно
@@ -9,6 +9,7 @@ NetworkStatus	System name		Статус сети
 Broadcast:	NetworkStatusView		Широковещательный
 OK	NetworkStatusView		ОК
 No link	NetworkStatusView		Нет соединения
+Connected	NetworkStatusView		Подключено
 Could not join wireless network:\n	NetworkStatusView		Не удалось подключиться к беспроводной сети:\n
 Network Status	NetworkStatusView		Статус сети
 Deskbar is not running, giving up.	NetworkStatus		Deskbar не запущен, сдаюсь.

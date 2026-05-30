@@ -1,4 +1,5 @@
-1	ukrainian	x-vnd.Haiku-Network	3970246430
+1	ukrainian	x-vnd.Haiku-Network	3044115400
+no link	IntefaceView		з'єднання відсутнє
 Ethernet device	InterfaceListItem		Провідний пристрій (Ethernet)
 Link speed:	IntefaceView		Швидкість з'єднання:
 WPA	WPA protected network		WPA
@@ -28,12 +29,14 @@ Apply	IntefaceAddressView		Застосувати
 Disable	ServiceView		Відключити
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Відображати стан мережі у Deskbar
+no stateful configuration	IntefaceView		конфігурація без збереження стану
 Mode:	IntefaceAddressView		Режим:
 connected	InterfaceListItem		під'єднано
 OK	NetworkWindow		ОК
 Static	IntefaceAddressView		Статичний
 launch error	NetworkWindow		помилка запуску
 Renegotiate	IntefaceView		Під'єднати 
+configuring	IntefaceView		налаштовується
 MAC address:	IntefaceView		MAC-адреса:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		заборонити

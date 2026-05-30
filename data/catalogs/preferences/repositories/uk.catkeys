@@ -1,19 +1,19 @@
-1	ukrainian	x-vnd.Haiku-Repositories	1003035766
+1	ukrainian	x-vnd.Haiku-Repositories	2642736029
 This is not a valid URL.	AddRepoWindow	Add URL error message	Це невірна адреса URL.
 Repository URL:	AddRepoWindow	Text box label	URL репозитарія:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при оновленні кеша репозитарія для %name%
-There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка відімкнення репозитарія %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при від'єднанні репозитарія %name%
 Unknown	Constants	Unknown repository name	Невідомо
-Remove all	RepositoriesView	Button label	Вилучити всі
-Enable repositories to use with package management:	RepositoriesView	Label text	Репозитарії для роботи з менеджером пакетів:
+Remove all	RepositoriesView	Button label	Прибрати всі
+Enable repositories to use with package management:	RepositoriesView	Label text	Репозитарії для використання в системі управління пакетами:
 Disable	RepositoriesView	Button label	Від'єднати
 Cancel task	TaskTimer	Button label	Скасувати завдання
 Changes completed	RepositoriesView	Status view text	Зміни проведені
 Details	TaskLooper	Job log details header	Деталі
-Enabled	RepoRow	Tag in the Status column	Доступно
+Enabled	RepoRow	Tag in the Status column	Під'єднано
 Remove	Constants	Button label	Вилучити
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Сталася помилка при підключенні репозитарія %url%
-Remove this repository?	RepositoriesView	Removal alert confirmation message	Вилучити цей репозитарій?
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Прибрати цей репозитарій?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Завдання репозитарію %name% потребує багато часу для завершення.
 Completed	TaskLooper	Completed task status message	Завершено
 OK	Constants	Button label	ОК
@@ -21,6 +21,7 @@ Status	RepositoriesView	Column title	Статус
 Name	RepositoriesView	Column title	Назва
 Add	AddRepoWindow	Button label	Додати
 Enable all	RepositoriesView	Button label	Під'єднати всі
+%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	%prefname% не вдалося отримати назви репозитаріїв, які зараз під'єднані.
 Aborted	TaskLooper	Aborted task status message	Перервано
 URL	RepositoriesView	Column title	URL-адреса
 Enable	RepositoriesView	Button label	Під'єднати
@@ -33,9 +34,9 @@ This repository URL already exists.	RepositoriesView	Error message	URL-адре�
 Repositories	System name		Repositories
 Changes pending:	RepositoriesView	Status view text	Очікування змін:
 Remove	RepositoriesView	Button label	Вилучити
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Вилучити ці репозитарії?
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Прибрати ці репозитарії?
 Keep trying	TaskTimer	Button label	Спробувати ще
 Cancel	Constants	Button label	Скасувати
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Може бути включений тільки один URL для репозитарія. Будь-ласка змініть вибір.
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Для репозитарія може бути включений тільки один URL . Будь ласка змініть вибір.
 Stop and quit	RepositoriesWindow	Button label	Зупинити та вийти
 Disable all	RepositoriesView	Button label	Від'єднати всі
