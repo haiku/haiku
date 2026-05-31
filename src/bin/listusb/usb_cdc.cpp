@@ -121,180 +121,182 @@ DumpCDCDescriptor(const usb_generic_descriptor* descriptor, const BUSBInterface*
 			case 0x0E:
 				printf("CAPI control\n");
 				break;
-			case 0x0F:
+			case USB_CDC_ETHERNET_FUNCTIONAL_DESCRIPTOR:
 			{
 				printf("Ethernet\n");
+				const usb_cdc_ethernet_functional_descriptor* ethDesc
+					= (const usb_cdc_ethernet_functional_descriptor*)descriptor;
 				printf("                    MAC Address ...... %s\n",
-					interface->Device()->DecodeStringDescriptor(descriptor->data[1]));
+					interface->Device()->DecodeStringDescriptor(ethDesc->mac_address_index));
 				printf("                    Statistics ....... ");
 				bool somethingPrinted = false;
-				if ((descriptor->data[2] & 0x01) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x01) != 0) {
 					printf("XMIT_OK");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[2] & 0x02) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x02) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("RCV_OK");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[2] & 0x04) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x04) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_ERROR");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[2] & 0x08) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x08) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("RCV_ERROR");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[2] & 0x10) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x10) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("RCV_NO_BUFFER");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[2] & 0x20) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x20) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("DIRECTED_BYTES_XMIT");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[2] & 0x40) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x40) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("DIRECTED_FRAMES_XMIT");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[2] & 0x80) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x80) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("MULTICAST_BYTES_XMIT");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[3] & 0x01) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x0100) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("MULTICAST_FRAMES_XMIT");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[3] & 0x02) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x0200) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("BROADCAST_BYTES_XMIT");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[3] & 0x04) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x0400) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("BROADCAST_FRAMES_XMIT");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[3] & 0x08) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x0800) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("DIRECTED_BYTES_RCV");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[3] & 0x10) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x1000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("DIRECTED_FRAMES_RCV");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[3] & 0x20) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x2000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("MULTICAST_BYTES_RCV");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[3] & 0x40) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x4000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("MULTICAST_FRAMES_RCV");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[3] & 0x80) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x8000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("BROADCAST_BYTES_RCV");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[4] & 0x01) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x010000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("BROADCAST_FRAMES_RCV");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[4] & 0x02) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x020000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("RCV_CRC_ERROR");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[4] & 0x04) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x040000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("TRANSMIT_QUEUE_LENGTH");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[4] & 0x08) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x080000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("RCV_ERROR_ALIGNMENT");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[4] & 0x10) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x100000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_ONE_COLLISION");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[4] & 0x20) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x200000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_MORE_COLLISIONS");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[4] & 0x40) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x400000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_DEFERRED");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[4] & 0x80) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x800000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_MAX_COLLISIONS");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[5] & 0x01) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x01000000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("RCV_OVERRUN");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[5] & 0x02) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x02000000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_UNDERRUN");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[5] & 0x04) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x04000000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_HEARTBEAT_FAILURE");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[5] & 0x08) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x08000000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_TIMES_CRS_LOST");
 					somethingPrinted = true;
 				}
-				if ((descriptor->data[5] & 0x10) != 0) {
+				if ((ethDesc->ethernet_statistics & 0x10000000) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("XMIT_LATE_COLLISIONS");
@@ -305,11 +307,11 @@ DumpCDCDescriptor(const usb_generic_descriptor* descriptor, const BUSBInterface*
 					printf("None");
 				printf("\n");
 				printf("                    Max. Segment Size  %d\n",
-					descriptor->data[6] | descriptor->data[7] << 8);
+					ethDesc->max_segment_size);
 				printf("                    Multicast filters  %d\n",
-					descriptor->data[8] | descriptor->data[9] << 8);
-				printf("                    Power filters ...  %d\n",
-					descriptor->data[10]);
+					ethDesc->num_multi_cast_filters);
+				printf("                    Wakeup filters ..  %d\n",
+					ethDesc->num_wakeup_pattern_filters);
 				return;
 			}
 			case 0x10:

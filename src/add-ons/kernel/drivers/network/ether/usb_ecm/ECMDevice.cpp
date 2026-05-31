@@ -303,7 +303,7 @@ ECMDevice::Removed()
 
 	// the notify hook is different from the read and write hooks as it does
 	// itself schedule traffic (while the other hooks only release a semaphore
-	// to notify another thread which in turn safly checks for the removed
+	// to notify another thread which in turn safely checks for the removed
 	// case) - so we must ensure that we are not inside the notify hook anymore
 	// before returning, as we would otherwise violate the promise not to use
 	// any of the pipes after returning from the removed hook
@@ -397,8 +397,8 @@ ECMDevice::_SetupDevice()
 		for (size_t j = 0; j < config->interface_count && !found; j++) {
 			const usb_interface_info *interface = config->interface[j].active;
 			usb_interface_descriptor *descriptor = interface->descr;
-			if (descriptor->interface_class != USB_INTERFACE_CLASS_CDC
-				|| descriptor->interface_subclass != USB_INTERFACE_SUBCLASS_ECM
+			if (descriptor->interface_class != USB_CDC_COMMUNICATION_INTERFACE_CLASS
+				|| descriptor->interface_subclass != USB_CDC_COMMUNICATION_INTERFACE_ECM_SUBCLASS
 				|| interface->generic_count == 0) {
 				continue;
 			}
@@ -409,14 +409,14 @@ ECMDevice::_SetupDevice()
 			for (size_t k = 0; k < interface->generic_count; k++) {
 				usb_generic_descriptor *generic = &interface->generic[k]->generic;
 				if (generic->length >= 5
-					&& generic->data[0] == FUNCTIONAL_SUBTYPE_UNION) {
+					&& generic->data[0] == USB_CDC_UNION_FUNCTIONAL_DESCRIPTOR) {
 					controlIndex = generic->data[1];
 					dataIndex = generic->data[2];
 					foundUnionDescriptor = true;
-				} else if (generic->length >= sizeof(ethernet_functional_descriptor)
-					&& generic->data[0] == FUNCTIONAL_SUBTYPE_ETHERNET) {
-					ethernet_functional_descriptor *ethernet
-						= (ethernet_functional_descriptor *)generic->data;
+				} else if (generic->length >= sizeof(usb_cdc_ethernet_functional_descriptor)
+					&& generic->data[0] == USB_CDC_ETHERNET_FUNCTIONAL_DESCRIPTOR) {
+					usb_cdc_ethernet_functional_descriptor *ethernet
+						= (usb_cdc_ethernet_functional_descriptor *)generic;
 					fMACAddressIndex = ethernet->mac_address_index;
 					fMaxSegmentSize = ethernet->max_segment_size;
 					foundEthernetDescriptor = true;
@@ -450,8 +450,8 @@ ECMDevice::_SetupDevice()
 	// check that the indicated control interface fits our needs
 	usb_interface_info *interface = config->interface[controlIndex].active;
 	usb_interface_descriptor *descriptor = interface->descr;
-	if ((descriptor->interface_class != USB_INTERFACE_CLASS_CDC
-		|| descriptor->interface_subclass != USB_INTERFACE_SUBCLASS_ECM)
+	if ((descriptor->interface_class != USB_COMMUNICATION_DEVICE_CLASS
+		|| descriptor->interface_subclass != USB_CDC_COMMUNICATION_INTERFACE_ECM_SUBCLASS)
 		|| interface->endpoint_count == 0) {
 		TRACE_ALWAYS("control interface invalid\n");
 		return B_ERROR;
@@ -475,7 +475,7 @@ ECMDevice::_SetupDevice()
 	// alternate 0 is the disabled, endpoint-less default interface
 	interface = &config->interface[dataIndex].alt[1];
 	descriptor = interface->descr;
-	if (descriptor->interface_class != USB_INTERFACE_CLASS_CDC_DATA
+	if (descriptor->interface_class != USB_CDC_DATA_INTERFACE_CLASS
 		|| interface->endpoint_count < 2) {
 		TRACE_ALWAYS("data interface invalid\n");
 		return B_ERROR;

@@ -16,7 +16,7 @@ enum { // Communication Interface Subclasses
 	USB_CDC_COMMUNICATION_INTERFACE_TCM_SUBCLASS,			// Telephone Control Model
 	USB_CDC_COMMUNICATION_INTERFACE_MCCM_SUBCLASS,			// Multi-Channel Control Model
 	USB_CDC_COMMUNICATION_INTERFACE_CAPICM_SUBCLASS,    	// CAPI Control Model
-	USB_CDC_COMMUNICATION_INTERFACE_ENCM_SUBCLASS,			// Ethernet Networking Control Model
+	USB_CDC_COMMUNICATION_INTERFACE_ECM_SUBCLASS,			// Ethernet Control Model
 	USB_CDC_COMMUNICATION_INTERFACE_ATMNCM_SUBCLASS			// ATM Networking Control Model
 };
 
@@ -35,7 +35,8 @@ enum { // Functional Descriptors Subtypes
 	USB_CDC_HEADER_FUNCTIONAL_DESCRIPTOR = 0x00,
 	USB_CDC_CM_FUNCTIONAL_DESCRIPTOR,
 	USB_CDC_ACM_FUNCTIONAL_DESCRIPTOR,
-	USB_CDC_UNION_FUNCTIONAL_DESCRIPTOR = 0x06
+	USB_CDC_UNION_FUNCTIONAL_DESCRIPTOR = 0x06,
+	USB_CDC_ETHERNET_FUNCTIONAL_DESCRIPTOR = 0x0f
 };
 
 typedef struct usb_cdc_header_function_descriptor {
@@ -80,6 +81,16 @@ typedef struct usb_cdc_union_functional_descriptor {
 	uint8	slave_interfaces[1];
 } _PACKED usb_cdc_union_functional_descriptor;
 
+typedef struct usb_cdc_ethernet_functional_descriptor {
+	uint8	length;
+	uint8	descriptor_type;
+	uint8	descriptor_subtype; // USB_CDC_ETHERNET_FUNCTIONAL_DESCRIPTOR
+	uint8	mac_address_index;
+	uint32	ethernet_statistics;
+	uint16	max_segment_size;
+	uint16	num_multi_cast_filters;
+	uint8	num_wakeup_pattern_filters;
+} _PACKED usb_cdc_ethernet_functional_descriptor;
 
 enum { // Management Element Requests (p62)
 	USB_CDC_SEND_ENCAPSULATED_COMMAND		= 0x00,

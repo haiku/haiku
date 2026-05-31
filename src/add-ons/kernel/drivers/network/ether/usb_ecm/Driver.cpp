@@ -166,13 +166,15 @@ usb_ecm_supports_device(device_node *parent)
 		if (!strcmp(attr->name, USB_DEVICE_SUBCLASS))
 			subclass = attr->value.ui8;
 		if (baseClass != 0 && subclass != 0) {
-			if (baseClass == USB_INTERFACE_CLASS_CDC && subclass == USB_INTERFACE_SUBCLASS_ECM)
+			if (baseClass == USB_COMMUNICATION_DEVICE_CLASS
+				&& subclass == USB_CDC_COMMUNICATION_INTERFACE_ECM_SUBCLASS)
 				break;
 			baseClass = subclass = 0;
 		}
 	}
 
-	if (baseClass != USB_INTERFACE_CLASS_CDC || subclass != USB_INTERFACE_SUBCLASS_ECM)
+	if (baseClass != USB_CDC_COMMUNICATION_INTERFACE_CLASS
+		|| subclass != USB_CDC_COMMUNICATION_INTERFACE_ECM_SUBCLASS)
 		return 0.0;
 
 	TRACE("USB-ECM device found!\n");

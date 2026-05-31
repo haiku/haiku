@@ -11,6 +11,7 @@
 #include <KernelExport.h>
 #include <OS.h>
 #include <USB3.h>
+#include <usb/USB_cdc.h>
 
 #include <util/kernel_cpp.h>
 
@@ -18,23 +19,7 @@
 #define MAX_DEVICES	8
 
 /* class and subclass codes */
-#define USB_INTERFACE_CLASS_CDC			0x02
-#define USB_INTERFACE_SUBCLASS_ECM		0x06
-#define USB_INTERFACE_CLASS_CDC_DATA	0x0a
 #define USB_INTERFACE_SUBCLASS_DATA		0x00
-
-/* communication device descriptor subtypes */
-#define FUNCTIONAL_SUBTYPE_UNION		0x06
-#define FUNCTIONAL_SUBTYPE_ETHERNET		0x0f
-
-typedef struct ethernet_functional_descriptor_s {
-	uint8	functional_descriptor_subtype;
-	uint8	mac_address_index;
-	uint32	ethernet_statistics;
-	uint16	max_segment_size;
-	uint16	num_multi_cast_filters;
-	uint8	num_wakeup_pattern_filters;
-} _PACKED ethernet_functional_descriptor;
 
 /* notification definitions */
 #define CDC_NOTIFY_NETWORK_CONNECTION		0x00
