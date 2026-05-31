@@ -197,6 +197,8 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"));
 	fToolBar->SetActionVisible(MSG_FULL_SCREEN, false);
 
+	fToolBar->ResizeTo(viewFrame.Width(), fToolBar->MinSize().height);
+
 	contentView->AddChild(fToolBar);
 
 	if (fShowToolBar)
