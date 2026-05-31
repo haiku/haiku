@@ -287,10 +287,13 @@ URLInputGroup::URLTextView::KeyDown(const char* bytes, int32 numBytes)
 		{
 			BString currentText = Text();
 			BTextView::KeyDown(bytes, numBytes);
+
 			// Lock the URL input if it was modified
-			if (!fURLInputGroup->IsURLInputLocked()
-				&& Text() != currentText)
+			if (!fURLInputGroup->IsURLInputLocked() && Text() != currentText) {
+				fURLInputGroup->MarkAsInvalid(false);
+				fURLInputGroup->Invalidate();
 				fURLInputGroup->LockURLInput();
+			}
 			break;
 		}
 	}
@@ -391,6 +394,8 @@ URLInputGroup::URLTextView::InsertText(const char* inText, int32 inLength,
 	}
 
 	fURLAutoCompleter->TextModified(fUpdateAutoCompleterChoices);
+	fURLInputGroup->MarkAsInvalid(false);
+	fURLInputGroup->Invalidate();
 }
 
 
@@ -699,6 +704,13 @@ URLInputGroup::WindowActivated(bool active)
 
 
 void
+URLInputGroup::MarkAsInvalid(bool invalid)
+{
+	fInvalid = invalid;
+}
+
+
+void
 URLInputGroup::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
@@ -706,6 +718,9 @@ URLInputGroup::Draw(BRect updateRect)
 	uint32 flags = 0;
 	if (fWindowActive && fTextView->IsFocus())
 		flags |= BControlLook::B_FOCUSED;
+	if (fInvalid)
+		flags |= BControlLook::B_INVALID;
+
 	be_control_look->DrawTextControlBorder(this, bounds, updateRect, base,
 		flags);
 }

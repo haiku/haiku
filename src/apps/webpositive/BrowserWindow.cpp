@@ -104,6 +104,7 @@ enum {
 	STOP										= 'stop',
 	HOME										= 'home',
 	GOTO_URL									= 'goul',
+	GOTO_URL_BUTTON								= 'gobt',
 	RELOAD										= 'reld',
 	SHOW_HIDE_BOOKMARK_BAR						= 'shbb',
 	CLEAR_HISTORY								= 'clhs',
@@ -528,7 +529,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings, const BS
 		fHomeButton->Hide();
 
 	// URL input group
-	fURLInputGroup = new URLInputGroup(new BMessage(GOTO_URL));
+	fURLInputGroup = new URLInputGroup(new BMessage(GOTO_URL_BUTTON));
 
 	// Status Bar
 	fStatusText = new BStringView("status", "");
@@ -825,15 +826,22 @@ BrowserWindow::MessageReceived(BMessage* message)
 			_ShowBookmarkBar(fBookmarkBar->IsHidden());
 			break;
 
+		case GOTO_URL_BUTTON:
 		case GOTO_URL:
 		{
 			BString url;
 			if (message->FindString("url", &url) != B_OK)
 				url = fURLInputGroup->Text();
 
-			_SetPageIcon(CurrentWebView(), NULL);
-			_SmartURLHandler(url);
+			if (message->what == GOTO_URL_BUTTON && url.IsEmpty()) {
+				fURLInputGroup->MarkAsInvalid(true);
+				fURLInputGroup->Invalidate();
+			} else {
+				fURLInputGroup->MarkAsInvalid(false);
 
+				_SetPageIcon(CurrentWebView(), NULL);
+				_SmartURLHandler(url);
+			}
 			break;
 		}
 

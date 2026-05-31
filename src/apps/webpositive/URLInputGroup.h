@@ -21,10 +21,12 @@ public:
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MakeFocus(bool focus = true);
 
+
 			BTextView*			TextView() const;
 			void				SetText(const char* text);
 			const char*			Text() const;
 
+			void				MarkAsInvalid(bool invalid);
 			BButton*			GoButton() const;
 
 			void				SetPageIcon(const BBitmap* icon);
@@ -41,6 +43,7 @@ private:
 			BButton*			fGoButton;
 			bool				fWindowActive;
 			bool				fURLLocked;
+			bool				fInvalid;
 };
 
 #endif // URL_INPUT_GROUP_H
