@@ -146,26 +146,35 @@ const struct supported_device {
 	{0x1604, 0x162a, INTEL_MODEL_BDWS, "Broadwell GT3 Server"},
 	{0x1604, 0x162d, INTEL_MODEL_BDW,  "Broadwell GT3 Workstation"},
 
-	// XXX: 0x1904 only confirmed on 0x1916
-	{0x1904, 0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
-	{0x1904, 0x1906, INTEL_MODEL_SKYM, "Skylake GT1"},
-	{0x1904, 0x190a, INTEL_MODEL_SKYS, "Skylake GT1"},
-	{0x1904, 0x190b, INTEL_MODEL_SKY,  "Skylake GT1"},
-	{0x1904, 0x190e, INTEL_MODEL_SKYM, "Skylake GT1"},
-	{0x191f, 0x1912, INTEL_MODEL_SKY,  "Skylake GT2"}, // confirmed
-	{0x1904, 0x1916, INTEL_MODEL_SKYM, "Skylake GT2"},
-	{0x1904, 0x191a, INTEL_MODEL_SKYS, "Skylake GT2"},
-	{0x1904, 0x191b, INTEL_MODEL_SKY,  "Skylake GT2"},
-	{0x1904, 0x191d, INTEL_MODEL_SKY,  "Skylake GT2"},
-	{0x1904, 0x191e, INTEL_MODEL_SKYM, "Skylake GT2"},
-	{0x1904, 0x1921, INTEL_MODEL_SKYM, "Skylake GT2F"},
-	{0x1904, 0x1926, INTEL_MODEL_SKYM, "Skylake GT3"},
-	{0x1904, 0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
-	{0x1904, 0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
+	// Skylake
+	// Bridge ID determines if it is mobile or desktop
+	// Mobile: SKL_U (0x1904), SKL_Y (0x190c), SKL_HQ (0x1910)
+	// Desktop: SKL_HD (0x1900), SKL_SD (0x190f), SKL_SQ (0x191f)
+	// Server: SKL_E3 (0x1918)
+	{0x1900, 0x1906, INTEL_MODEL_SKYM, "Skylake H GT1"},
+	{0x1900, 0x191B, INTEL_MODEL_SKYM, "Skylake H GT2"},
+	{0x1904, 0x1906, INTEL_MODEL_SKYM, "Skylake U GT1"},
+	{0x1904, 0x1916, INTEL_MODEL_SKYM, "Skylake U GT2"},
+	{0x1904, 0x191B, INTEL_MODEL_SKYM, "Skylake U GT2"},
+	{0x1904, 0x191E, INTEL_MODEL_SKYM, "Skylake U GT2"},
+	{0x1904, 0x1921, INTEL_MODEL_SKYM, "Skylake U GT2F"},
+	{0x1904, 0x1923, INTEL_MODEL_SKYM, "Skylake U GT3"},
+	{0x1904, 0x1926, INTEL_MODEL_SKYM, "Skylake U GT3e"},
+	{0x1904, 0x1927, INTEL_MODEL_SKYM, "Skylake U GT3e"},
+	{0x190c, 0x191E, INTEL_MODEL_SKYM, "Skylake Y GT2"},
+	{0x190f, 0x1902, INTEL_MODEL_SKY,  "Skylake S GT1"},
+	{0x190f, 0x1912, INTEL_MODEL_SKY,  "Skylake S GT2"},
+	{0x1910, 0x190B, INTEL_MODEL_SKYM, "Skylake H GT1F"},
+	{0x1910, 0x191B, INTEL_MODEL_SKYM, "Skylake H GT2"}, // Confirmed on Inspiron 7559 / i7-6700HQ
+	{0x1910, 0x193B, INTEL_MODEL_SKYM, "Skylake H GT4e"},
+	{0x1918, 0x191D, INTEL_MODEL_SKYS, "Skylake E3 GT2"},
+	{0x1918, 0x192D, INTEL_MODEL_SKYS, "Skylake E3 GT3fe"},
+	{0x1918, 0x193D, INTEL_MODEL_SKYS, "Skylake E3 GT4e"},
+	{0x191f, 0x1912, INTEL_MODEL_SKY,  "Skylake S GT2"}, // confirmed
+	{0x191f, 0x191D, INTEL_MODEL_SKY,  "Skylake S GT2 WKS"},
 
 	{0x5af0, 0x5a84, INTEL_MODEL_KBYM, "Apollo Lake GT1.5"},
 	{0x5af0, 0x5a85, INTEL_MODEL_KBYM, "Apollo Lake GT1"},
-
 	{0x5904, 0x5906, INTEL_MODEL_KBY,  "Kabylake ULT GT1"},
 	{0x590f, 0x5902, INTEL_MODEL_KBY,  "Kabylake DT GT1"},
 	{0x5904, 0x5916, INTEL_MODEL_KBYM, "Kabylake ULT GT2"},
