@@ -404,12 +404,14 @@ static inline void
 thread_pin_to_current_cpu(Thread* thread)
 {
 	thread->pinned_to_cpu++;
+	memory_full_barrier();
 }
 
 
 static inline void
 thread_unpin_from_current_cpu(Thread* thread)
 {
+	memory_full_barrier();
 	thread->pinned_to_cpu--;
 	ASSERT(thread->pinned_to_cpu >= 0);
 }
