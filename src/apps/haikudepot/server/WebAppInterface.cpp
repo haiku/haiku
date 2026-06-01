@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -886,6 +886,15 @@ WebAppInterface::RetrievePasswordRequirements(PasswordRequirements& passwordRequ
 		passwordRequirements.SetMinPasswordDigitsChar((uint32)value);
 
 	return result;
+}
+
+
+status_t
+WebAppInterface::GetRuntimeInformation(BMessage& message)
+{
+	BMemoryIO* requestEnvelopeData = new BMemoryIO("{}", 2);
+	return _SendJsonRequest("miscellaneous/get-runtime-information", requestEnvelopeData, 2, 0,
+		message);
 }
 
 

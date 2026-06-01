@@ -145,6 +145,7 @@ private:
 									const BMessage& onSuccessMessage);
 			void				_OpenSettingsWindow();
 			void				_StartUserVerify();
+			void				_StartServerRuntimeInformationVerify();
 			void				_UpdateAuthorization();
 			void				_UpdateAvailableRepositories();
 			void				_RatePackage();
@@ -168,6 +169,8 @@ private:
 			void				_PackageListViewRevokeFocus();
 			bool				_IsPackageListView(BView* view);
 
+			void				_HandleLogout();
+
 private:
 			FilterView*			fFilterView;
 			TabView*			fListTabs;
@@ -185,6 +188,7 @@ private:
 			BMenuItem*			fLogInItem;
 			BMenuItem*			fLogOutItem;
 			BMenuItem*			fUsersUserUsageConditionsMenuItem;
+			BMenuItem*			fLatestUserUsageConditionsMenuItem;
 
 			BMenuItem*			fShowAvailablePackagesItem;
 			BMenuItem*			fShowInstalledPackagesItem;

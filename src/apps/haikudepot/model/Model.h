@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -46,6 +46,7 @@ public:
 	virtual	void				IconsChanged() = 0;
 	virtual	void				PackageFilterChanged() = 0;
 	virtual	void				PackageListViewModeChanged() = 0;
+	virtual void				CanNicknamePasswordAuthenticateChanged() = 0;
 };
 
 
@@ -159,6 +160,9 @@ public:
 			void				SetCanShareAnonymousUsageData(bool value);
 			bool				CanShareAnonymousUsageData() const;
 
+			void				SetCanNicknamePasswordAuthenticate(bool value);
+			bool				CanNicknamePasswordAuthenticate();
+
 			bool				CanPopulatePackage(const PackageInfoRef& package);
 
 			void				SetCredentials(const UserCredentials& credentials);
@@ -187,6 +191,8 @@ private:
 			void				_NotifyPackageChange(const PackageChangeEvent& event);
 			void				_NotifyPackageChanges(const PackageChangeEvents& events);
 			void				_NotifyPackageListViewModeChanged();
+			void				_NotifyCanNicknamePasswordAuthenticateChanged();
+
 
 private:
 	mutable	BLocker				fLock;
@@ -209,6 +215,8 @@ private:
 								fPackageListViewMode;
 
 			bool				fCanShareAnonymousUsageData;
+
+			bool				fCanNicknamePasswordAuthenticate;
 
 			WebAppInterfaceRef	fWebApp;
 

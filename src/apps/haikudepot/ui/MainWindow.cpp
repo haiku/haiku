@@ -67,32 +67,32 @@
 
 
 enum {
-	MSG_REFRESH_REPOS							= 'mrrp',
-	MSG_MANAGE_REPOS							= 'mmrp',
-	MSG_SOFTWARE_UPDATER						= 'mswu',
-	MSG_SETTINGS								= 'stgs',
-	MSG_LOG_IN									= 'lgin',
-	MSG_AUTHORIZATION_CHANGED					= 'athc',
-	MSG_PACKAGE_FILTER_CHANGED					= 'fpch',
-	MSG_ICONS_CHANGED							= 'icoc',
-	MSG_CATEGORIES_LIST_CHANGED					= 'clic',
-	MSG_PACKAGES_CHANGED						= 'pchd',
-	MSG_PROCESS_COORDINATOR_CHANGED				= 'pccd',
-	MSG_WORK_STATUS_CHANGE						= 'wsch',
-	MSG_WORK_STATUS_CLEAR						= 'wscl',
-	MSG_INCREMENT_VIEW_COUNTER					= 'icrv',
-	MSG_SCREENSHOT_CACHED						= 'ssca',
-	MSG_SELECTED_PACKAGE_CHANGED				= 'spch',
-	MSG_PACKAGE_LIST_MODE_CHANGED				= 'pkmc',
-
-	MSG_PACKAGE_LIST_MODE_TAB_CHANGED			= 'cplm',
-	MSG_SHOW_DESKTOP_PACKAGES					= 'sodk',
-	MSG_SHOW_NATIVE_DESKTOP_PACKAGES			= 'sond',
-	MSG_SHOW_DESKTOP_AND_NON_DESKTOP_PACKAGES	= 'sdan',
-	MSG_SHOW_AVAILABLE_PACKAGES					= 'savl',
-	MSG_SHOW_INSTALLED_PACKAGES					= 'sins',
-	MSG_SHOW_SOURCE_PACKAGES					= 'ssrc',
-	MSG_SHOW_DEVELOP_PACKAGES					= 'sdvl'
+	MSG_REFRESH_REPOS								= 'mrrp',
+	MSG_MANAGE_REPOS								= 'mmrp',
+	MSG_SOFTWARE_UPDATER							= 'mswu',
+	MSG_SETTINGS									= 'stgs',
+	MSG_LOG_IN										= 'lgin',
+	MSG_AUTHORIZATION_CHANGED						= 'athc',
+	MSG_PACKAGE_FILTER_CHANGED						= 'fpch',
+	MSG_ICONS_CHANGED								= 'icoc',
+	MSG_CATEGORIES_LIST_CHANGED						= 'clic',
+	MSG_PACKAGES_CHANGED							= 'pchd',
+	MSG_PROCESS_COORDINATOR_CHANGED					= 'pccd',
+	MSG_WORK_STATUS_CHANGE							= 'wsch',
+	MSG_WORK_STATUS_CLEAR							= 'wscl',
+	MSG_INCREMENT_VIEW_COUNTER						= 'icrv',
+	MSG_SCREENSHOT_CACHED							= 'ssca',
+	MSG_SELECTED_PACKAGE_CHANGED					= 'spch',
+	MSG_PACKAGE_LIST_MODE_CHANGED					= 'pkmc',
+	MSG_PACKAGE_LIST_MODE_TAB_CHANGED				= 'cplm',
+	MSG_SHOW_DESKTOP_PACKAGES						= 'sodk',
+	MSG_SHOW_NATIVE_DESKTOP_PACKAGES				= 'sond',
+	MSG_SHOW_DESKTOP_AND_NON_DESKTOP_PACKAGES		= 'sdan',
+	MSG_SHOW_AVAILABLE_PACKAGES						= 'savl',
+	MSG_SHOW_INSTALLED_PACKAGES						= 'sins',
+	MSG_SHOW_SOURCE_PACKAGES						= 'ssrc',
+	MSG_SHOW_DEVELOP_PACKAGES						= 'sdvl',
+	MSG_CAN_NICKNAME_PASSWORD_AUTHENTICATE_CHANGED	= 'cnpc'
 };
 
 
@@ -189,6 +189,11 @@ public:
 			fMessenger.SendMessage(MSG_PACKAGE_LIST_MODE_CHANGED);
 	}
 
+	virtual void CanNicknamePasswordAuthenticateChanged()
+	{
+		if (fMessenger.IsValid())
+			fMessenger.SendMessage(MSG_CAN_NICKNAME_PASSWORD_AUTHENTICATE_CHANGED);
+	}
 
 private:
 	BMessenger fMessenger;
@@ -301,6 +306,7 @@ MainWindow::MainWindow(const BMessage& settings)
 	BPackageRoster().StartWatching(this, B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
 
 	_AdoptModel();
+	_StartServerRuntimeInformationVerify();
 	_StartBulkLoad();
 }
 
@@ -487,6 +493,8 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_LOG_IN:
+			if (!fModel.CanNicknamePasswordAuthenticate())
+				HDFATAL("nickname and password authentication is disabled");
 			_OpenLoginWindow(BMessage());
 			break;
 
@@ -495,9 +503,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_LOG_OUT:
-			if (IdentityAndAccessUtils::ClearCredentials() != B_OK)
-				HDERROR("unable to remove stored credentials");
-			fModel.SetCredentials(UserCredentials());
+			_HandleLogout();
 			break;
 
 		case MSG_VIEW_LATEST_USER_USAGE_CONDITIONS:
@@ -752,6 +758,12 @@ MainWindow::MessageReceived(BMessage* message)
 			// view if the list is empty. By setting this on the model, an
 			// event will return back to this class to switch the tabs.
 			fModel.SetPackageListViewMode(ALL);
+			break;
+
+		case MSG_CAN_NICKNAME_PASSWORD_AUTHENTICATE_CHANGED:
+			// A check with the server will have verified if this is possible or
+			// not from the server side.
+			_UpdateAuthorization();
 			break;
 
 		default:
@@ -1025,10 +1037,10 @@ MainWindow::_BuildUserMenu(BMenuBar* menuBar)
 	fLogOutItem = new BMenuItem(B_TRANSLATE("Log out"), new BMessage(MSG_LOG_OUT));
 	fUserMenu->AddItem(fLogOutItem);
 
-	BMenuItem* latestUserUsageConditionsMenuItem
+	fLatestUserUsageConditionsMenuItem
 		= new BMenuItem(B_TRANSLATE("View latest usage conditions" B_UTF8_ELLIPSIS),
 			new BMessage(MSG_VIEW_LATEST_USER_USAGE_CONDITIONS));
-	fUserMenu->AddItem(latestUserUsageConditionsMenuItem);
+	fUserMenu->AddItem(fLatestUserUsageConditionsMenuItem);
 
 	fUsersUserUsageConditionsMenuItem
 		= new BMenuItem(B_TRANSLATE("View agreed usage conditions" B_UTF8_ELLIPSIS),
@@ -1616,21 +1628,27 @@ MainWindow::_StartUserVerify()
 
 
 void
+MainWindow::_StartServerRuntimeInformationVerify()
+{
+	ProcessCoordinator* coordinator
+		= ProcessCoordinatorFactory::CreateServerRuntimeInformationVerifierCoordinator(&fModel);
+	_AddProcessCoordinator(coordinator);
+}
+
+
+void
 MainWindow::_UpdateAuthorization()
 {
+	bool networking = ServerHelper::IsNetworkAvailable();
 	BString nickname(fModel.Nickname());
 	bool hasUser = !nickname.IsEmpty();
 
-	if (fLogOutItem != NULL)
-		fLogOutItem->SetEnabled(hasUser);
-	if (fUsersUserUsageConditionsMenuItem != NULL)
-		fUsersUserUsageConditionsMenuItem->SetEnabled(hasUser);
-	if (fLogInItem != NULL) {
-		if (hasUser)
-			fLogInItem->SetLabel(B_TRANSLATE("Switch account" B_UTF8_ELLIPSIS));
-		else
-			fLogInItem->SetLabel(B_TRANSLATE("Log in" B_UTF8_ELLIPSIS));
-	}
+	// At some point in the future, the HDS server may not allow older HaikuDepot clients to
+	// continue to authenticate with nickname and password. To be able to handle this gracefully,
+	// the server is able to inform the client if it supported and if not then this client is able
+	// to resort to a logged out only experience but most things will function.
+
+	bool canNicknamePasswordAuthenticate = fModel.CanNicknamePasswordAuthenticate();
 
 	if (fUserMenu != NULL) {
 		BString label;
@@ -1638,10 +1656,39 @@ MainWindow::_UpdateAuthorization()
 			label = B_TRANSLATE("Logged in as %User%");
 			label.ReplaceAll("%User%", nickname);
 		} else {
-			label = B_TRANSLATE("Not logged in");
+			if (!canNicknamePasswordAuthenticate)
+				label = B_TRANSLATE("Login disabled");
+			else
+				label = B_TRANSLATE("Not logged in");
 		}
 		fUserMenu->Superitem()->SetLabel(label);
 	}
+
+	if (fLogInItem != NULL) {
+		if (hasUser)
+			fLogInItem->SetLabel(B_TRANSLATE("Switch account" B_UTF8_ELLIPSIS));
+		else
+			fLogInItem->SetLabel(B_TRANSLATE("Log in" B_UTF8_ELLIPSIS));
+		fLogInItem->SetEnabled(canNicknamePasswordAuthenticate && networking);
+	}
+
+	if (fLogOutItem != NULL)
+		fLogOutItem->SetEnabled(hasUser);
+
+	if (fUsersUserUsageConditionsMenuItem != NULL)
+		fUsersUserUsageConditionsMenuItem->SetEnabled(hasUser && networking);
+
+	if (fLatestUserUsageConditionsMenuItem != NULL)
+		fLatestUserUsageConditionsMenuItem->SetEnabled(networking);
+}
+
+
+void
+MainWindow::_HandleLogout()
+{
+	if (IdentityAndAccessUtils::ClearCredentials() != B_OK)
+		HDERROR("unable to remove stored credentials");
+	fModel.SetCredentials(UserCredentials());
 }
 
 
@@ -1714,6 +1761,11 @@ MainWindow::_SelectedPackageHasWebAppRepositoryCode()
 void
 MainWindow::_RatePackage()
 {
+	if (!ServerHelper::IsNetworkAvailable()) {
+		HDERROR("no network available -> not possible to rate package");
+		return;
+	}
+
 	if (!_SelectedPackageHasWebAppRepositoryCode()) {
 		BAlert* alert = new(std::nothrow) BAlert(B_TRANSLATE("Rating not possible"),
 			B_TRANSLATE("This package doesn't seem to be on the HaikuDepot Server, so it's not "
@@ -1724,6 +1776,11 @@ MainWindow::_RatePackage()
 	}
 
 	if (fModel.Nickname().IsEmpty()) {
+		if (!fModel.CanNicknamePasswordAuthenticate()) {
+			HDERROR("nickname / password auth not available -> not possible to rate package");
+			return;
+		}
+
 		BAlert* alert = new(std::nothrow) BAlert(B_TRANSLATE("Not logged in"),
 			B_TRANSLATE("You need to be logged into an account before you can rate packages."),
 			B_TRANSLATE("Cancel"), B_TRANSLATE("Login or Create account"));

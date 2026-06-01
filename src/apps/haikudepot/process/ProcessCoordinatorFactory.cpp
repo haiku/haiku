@@ -30,6 +30,7 @@
 #include "ServerPkgDataUpdateProcess.h"
 #include "ServerReferenceDataUpdateProcess.h"
 #include "ServerRepositoryDataUpdateProcess.h"
+#include "ServerRuntimeInformationVerifierProcess.h"
 #include "ServerSettings.h"
 #include "StorageUtils.h"
 #include "ThreadedProcessNode.h"
@@ -59,6 +60,18 @@ ProcessCoordinatorFactory::CreateUserDetailVerifierCoordinator(
 	AbstractProcessNode* userDetailVerifier
 		= new ThreadedProcessNode(new UserDetailVerifierProcess(model, userDetailVerifierListener));
 	processCoordinator->AddNode(userDetailVerifier);
+	return processCoordinator;
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::CreateServerRuntimeInformationVerifierCoordinator(Model* model)
+{
+	ProcessCoordinator* processCoordinator
+		= new ProcessCoordinator("ServerRuntimeInformationVerifier");
+	AbstractProcessNode* serverRuntimeInformationVerifier
+		= new ThreadedProcessNode(new ServerRuntimeInformationVerifierProcess(model));
+	processCoordinator->AddNode(serverRuntimeInformationVerifier);
 	return processCoordinator;
 }
 

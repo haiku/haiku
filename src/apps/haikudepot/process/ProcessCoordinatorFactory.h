@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PROCESS_COORDINATOR_FACTORY_H
@@ -34,6 +34,8 @@ public:
 	static	ProcessCoordinator*	CreateUserDetailVerifierCoordinator(
 									UserDetailVerifierListener* userDetailVerifierListener,
 									Model* model);
+
+	static ProcessCoordinator*	CreateServerRuntimeInformationVerifierCoordinator(Model* model);
 
 	static	ProcessCoordinator*	PopulatePkgUserRatingsCoordinator(Model* model,
 									const BString& packageName);

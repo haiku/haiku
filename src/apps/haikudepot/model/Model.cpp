@@ -94,6 +94,7 @@ Model::Model()
 	fCategories(),
 	fPackageListViewMode(PROMINENT),
 	fCanShareAnonymousUsageData(false),
+	fCanNicknamePasswordAuthenticate(true),
 	fWebApp(WebAppInterfaceRef(new WebAppInterface(UserCredentials()), true)),
 	fLanguages(LocaleUtils::WellKnownLanguages())
 {
@@ -134,11 +135,13 @@ void
 Model::SetSelectedPackage(const PackageInfoRef& package)
 {
 	BAutolock locker(&fLock);
-	if (package.IsSet() && package->Name() != fSelectedPackageName) {
-		fSelectedPackageName = package->Name();
-		_NotifySelectedPackageChanged();
-	} else if (!fSelectedPackageName.IsEmpty()) {
-		fSelectedPackageName = "";
+	BString packageName;
+
+	if (package.IsSet())
+		packageName = package->Name();
+
+	if (packageName != fSelectedPackageName) {
+		fSelectedPackageName = packageName;
 		_NotifySelectedPackageChanged();
 	}
 }
@@ -557,6 +560,31 @@ Model::SetCanShareAnonymousUsageData(bool value)
 }
 
 
+void
+Model::SetCanNicknamePasswordAuthenticate(bool value)
+{
+	BAutolock locker(&fLock);
+	if (fCanNicknamePasswordAuthenticate != value) {
+		fCanNicknamePasswordAuthenticate = value;
+		_NotifyCanNicknamePasswordAuthenticateChanged();
+	}
+}
+
+
+/*!	At some point in the future HaikuDepot will support authentication via SSO rather than
+ *	nickname + password. At this time the server will no longer support nickname + password
+ *	as well. To make this transition easier for people using older versions of HaikuDepot,
+ *	this flag will indicate if the server (HDS) has signaled it no longer supports nickname +
+ *	password.
+ */
+bool
+Model::CanNicknamePasswordAuthenticate()
+{
+	BAutolock locker(&fLock);
+	return fCanNicknamePasswordAuthenticate;
+}
+
+
 // #pragma mark - information retrieval
 
 /*!	It may transpire that the package has no corresponding record on the
@@ -674,6 +702,18 @@ Model::_NotifyPackageListViewModeChanged()
 		const ModelListenerRef& listener = *it;
 		if (listener.IsSet())
 			listener->PackageListViewModeChanged();
+	}
+}
+
+
+void
+Model::_NotifyCanNicknamePasswordAuthenticateChanged()
+{
+	std::vector<ModelListenerRef>::const_iterator it;
+	for (it = fListeners.begin(); it != fListeners.end(); it++) {
+		const ModelListenerRef& listener = *it;
+		if (listener.IsSet())
+			listener->CanNicknamePasswordAuthenticateChanged();
 	}
 }
 

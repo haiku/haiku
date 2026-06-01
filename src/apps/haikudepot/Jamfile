@@ -216,11 +216,12 @@ local applicationSources =
 	ProcessCoordinator.cpp
 	ProcessCoordinatorFactory.cpp
 	ServerHelper.cpp
+	ServerIconExportUpdateProcess.cpp
 	ServerSettings.cpp
 	ServerPkgDataUpdateProcess.cpp
 	ServerReferenceDataUpdateProcess.cpp
 	ServerRepositoryDataUpdateProcess.cpp
-	ServerIconExportUpdateProcess.cpp
+	ServerRuntimeInformationVerifierProcess.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaData.cpp
 	ThreadedProcessNode.cpp

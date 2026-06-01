@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -146,6 +146,8 @@ public:
 
 			status_t			RetrievePasswordRequirements(
 									PasswordRequirements& passwordRequirements);
+
+			status_t			GetRuntimeInformation(BMessage& message);
 
 	static	int32				ErrorCodeFromResponse(
 									BMessage& responseEnvelopeMessage);

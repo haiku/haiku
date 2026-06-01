@@ -441,6 +441,17 @@ public:
 
 		fRatingLayout->SetVisible(_PackageCanHaveRatings(package));
 
+		{
+			// TODO (apl) it would be ideal if the button were enabled disabled dynamically as the
+			// user logged in/out and the `canAuth` changed. This would require more additional
+			// plumbing and event handling.
+
+			bool networking = ServerHelper::IsNetworkAvailable();
+			bool hasUser = !fModel->Nickname().IsEmpty();
+			bool canAuth = fModel->CanNicknamePasswordAuthenticate();
+			fRateButton->SetEnabled(networking && (hasUser || canAuth));
+		}
+
 		InvalidateLayout();
 		Invalidate();
 	}
