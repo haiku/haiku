@@ -1146,10 +1146,10 @@ MainWindow::_PromptCanShareAnonymousUserData()
 		B_TRANSLATE("Would it be acceptable to send anonymous usage data to the"
 					" HaikuDepotServer system from this computer? You can change your"
 					" preference in the \"Settings\" window later."),
-		B_TRANSLATE("No"), B_TRANSLATE("Yes"));
+		B_TRANSLATE("Yes"), B_TRANSLATE("No"));
 
 	int32 result = alert->Go();
-	fModel.SetCanShareAnonymousUsageData(1 == result);
+	fModel.SetCanShareAnonymousUsageData(0 == result);
 }
 
 
