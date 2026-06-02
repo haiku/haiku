@@ -381,7 +381,7 @@ AddMimeTypeString(BStringList& list, Model* model)
 
 
 BContainerWindow::BContainerWindow(LockingList<BWindow>* list, uint32 openFlags, window_look look,
-	window_feel feel, uint32 windowFlags, uint32 workspace, bool useLayout)
+	window_feel feel, uint32 windowFlags, uint32 workspace, bool useLayout, bool runIt)
 	:
 	BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, windowFlags, workspace),
 	fWindowList(list),
@@ -454,7 +454,8 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list, uint32 openFlags,
 
 	AddCommonFilter(new BMessageFilter(B_MOUSE_DOWN, ActivateWindowFilter));
 
-	Run();
+	if (runIt)
+		Run();
 
 	// watch out for settings changes
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);

@@ -176,7 +176,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target, const BEntry* s
 	uint32 openFlags, window_look look, window_feel feel, uint32 windowFlags, uint32 workspace,
 	bool hideWhenDone)
 	:
-	BContainerWindow(0, openFlags, look, feel, windowFlags, workspace, false),
+	BContainerWindow(0, openFlags, look, feel, windowFlags, workspace, false, false),
 	fDirMenu(NULL),
 	fDirMenuField(NULL),
 	fTextControl(NULL),
@@ -255,7 +255,6 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target, const BEntry* s
 
 	fTaskLoop = new PiggybackTaskLoop;
 
-	AutoLock<BWindow> lock(this);
 	fBorderedView = new BorderedView;
 	CreatePoseView(model);
 	fBorderedView->GroupLayout()->SetInsets(1);

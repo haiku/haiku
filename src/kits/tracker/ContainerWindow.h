@@ -102,7 +102,7 @@ public:
 		window_look look = B_DOCUMENT_WINDOW_LOOK,
 		window_feel feel = B_NORMAL_WINDOW_FEEL,
 		uint32 windowFlags = B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION,
-		uint32 workspace = B_CURRENT_WORKSPACE, bool useLayout = true);
+		uint32 workspace = B_CURRENT_WORKSPACE, bool useLayout = true, bool runIt = true);
 
 	virtual ~BContainerWindow();
 
