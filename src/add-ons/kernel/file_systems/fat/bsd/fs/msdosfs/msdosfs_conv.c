@@ -61,6 +61,11 @@
 #include <sys/malloc.h>
 #include <sys/mount.h>
 
+// Haiku port - use kernel utility functions for character conversion.
+#ifndef FS_SHELL
+#include <util/convertutf.h>
+#endif // !FS_SHELL
+
 #include <fs/msdosfs/bpb.h>
 #include <fs/msdosfs/direntry.h>
 #include <fs/msdosfs/msdosfsmount.h>
@@ -83,7 +88,7 @@ static uint16_t unix2winchr(const u_char **, size_t *, int, struct msdosfsmount 
  * 2 - character ('.' and ' ') should be skipped in DOS file name,
  *     and generation number inserted.
  */
-static const u_char
+const u_char
 unix2dos[256] = {
 /* iso8859-1 -> cp850 */
 	0,    0,    0,    0,    0,    0,    0,    0,	/* 00-07 */
@@ -157,7 +162,7 @@ dos2unix[256] = {
 	0xb0, 0xa8, 0xb7, 0xb9, 0xb3, 0xb2, 0x3f, 0x3f,	/* f8-ff */
 };
 
-static const u_char
+const u_char
 u2l[256] = {
 /* tolower */
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, /* 00-07 */
@@ -194,42 +199,9 @@ u2l[256] = {
 	0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff, /* f8-ff */
 };
 
-static const u_char
-l2u[256] = {
-/* toupper */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, /* 00-07 */
-	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, /* 08-0f */
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, /* 10-17 */
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, /* 18-1f */
-	0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, /* 20-27 */
-	0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, /* 28-2f */
-	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, /* 30-37 */
-	0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, /* 38-3f */
-	0x40, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, /* 40-47 */
-	0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, /* 48-4f */
-	0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, /* 50-57 */
-	0x78, 0x79, 0x7a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, /* 58-5f */
-	0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, /* 60-67 */
-	0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, /* 68-6f */
-	0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, /* 70-77 */
-	0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, /* 78-7f */
-	0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, /* 80-87 */
-	0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, /* 88-8f */
-	0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, /* 90-97 */
-	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, /* 98-9f */
-	0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, /* a0-a7 */
-	0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, /* a8-af */
-	0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, /* b0-b7 */
-	0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, /* b8-bf */
-	0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, /* c0-c7 */
-	0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef, /* c8-cf */
-	0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xd7, /* d0-d7 */
-	0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xdf, /* d8-df */
-	0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, /* e0-e7 */
-	0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef, /* e8-ef */
-	0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, /* f0-f7 */
-	0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff, /* f8-ff */
-};
+// Haiku port: l2u removed because unix2dos[] maps to capital letters anyway; also
+// there appear to be inaccuracies in l2u that were compensated for by using it
+// in conjunction with unix2dos[].
 
 /*
  * DOS filenames are made of 2 parts, the name part and the extension part.
@@ -259,6 +231,9 @@ dos2unixfn(u_char dn[11], u_char *un, int lower, struct msdosfsmount *pmp)
 	if (*dn == SLOT_E5)
 		*dn = 0xe5;
 
+	// Haiku port: internal support for SJIS short filenames.
+	if ((pmp->pm_flags & MSDOSFSMNT_KICONV) == 0 && (pmp->pm_flags & MSDOSFS_SJIS) != 0)
+		return sjis_to_utf8(dn, un, lower);
 	/*
 	 * Copy the name portion into the unix filename string.
 	 */
@@ -314,30 +289,11 @@ unix2dosfn(const u_char *un, u_char dn[12], size_t unlen, u_int gen,
 	const u_char *cp, *dp, *dp1;
 	u_char gentext[6], *wcp;
 	uint16_t c;
+	int adjpos = 0;
 
 	// Haiku port: enable SJIS encoding if appropriate
 	int sjis = 0;
 	int status = 0;
-	int unicodeSize = MAXNAMLEN * 2 + 1;
-	uchar unicodeString[unicodeSize];
-	int resultLength = 0;
-#ifndef USER
-	// We don't have access to libiconv, so the driver will default to code page 850.
-	// Check for Japanese characters in un and use SJIS encoding instead if found.
-	status = B_TO_POSIX_ERROR(utf8_to_unicode((const char*) un, unicodeString, unicodeSize));
-	if (status < 0)
-		return 0;
-	else
-		resultLength = status;
-	for (i = 0; i < resultLength; i += 2) {
-		uint16 unicodeChar;
-		memcpy(&unicodeChar, unicodeString + i, 2);
-		if (is_unicode_japanese(B_LENDIAN_TO_HOST_INT16(unicodeChar))) {
-			sjis = 1;
-			break;
-		}
-	}
-#endif // !USER
 
 	/*
 	 * Fill the dos filename string with blanks. These are DOS's pad
@@ -347,27 +303,37 @@ unix2dosfn(const u_char *un, u_char dn[12], size_t unlen, u_int gen,
 		dn[i] = ' ';
 	dn[11] = 0;
 
+	/*
+	 * The filenames "." and ".." are handled specially, since they
+	 * don't follow dos filename rules.
+	 */
+	if (un[0] == '.' && unlen == 1) {
+		dn[0] = '.';
+		return gen <= 1;
+	}
+	if (un[0] == '.' && un[1] == '.' && unlen == 2) {
+		dn[0] = '.';
+		dn[1] = '.';
+		return gen <= 1;
+	}
+
+	if ((pmp->pm_flags & MSDOSFSMNT_KICONV) == 0) {
+		// No access to libiconv. We can encode the name in either CP 850 or SJIS.
+		if ((pmp->pm_flags & MSDOSFS_SJIS) != 0) {
+			sjis = 1;
+		} else if ((pmp->pm_flags & MSDOSFS_CP850) == 0) {
+			// Check for Japanese characters in un and use SJIS encoding if found.
+			if (utf8_contains_japanese(un, unlen))
+				sjis = 1;
+		}
+	}
+
 	if (sjis == 1) {
-		status = B_TO_POSIX_ERROR(
-			generate_short_name_sjis(un, (const uint16*) unicodeString, resultLength, dn));
+		status = B_TO_POSIX_ERROR(generate_short_name_sjis(un, dn));
 		if (status != 0)
 			return 0;
 		conv = 3;
 	} else {
-		/*
-		 * The filenames "." and ".." are handled specially, since they
-		 * don't follow dos filename rules.
-		 */
-		if (un[0] == '.' && unlen == 1) {
-			dn[0] = '.';
-			return gen <= 1;
-		}
-		if (un[0] == '.' && un[1] == '.' && unlen == 2) {
-			dn[0] = '.';
-			dn[1] = '.';
-			return gen <= 1;
-		}
-
 		/*
 		 * Filenames with only blanks and dots are not allowed!
 		 */
@@ -496,7 +462,6 @@ unix2dosfn(const u_char *un, u_char dn[12], size_t unlen, u_int gen,
 		 */
 		if (!j)
 			dn[0] = '_';
-
 	}
 
 	/*
@@ -528,7 +493,17 @@ unix2dosfn(const u_char *un, u_char dn[12], size_t unlen, u_int gen,
 	 * Correct posision to where insert the generation number
 	 */
 	cp = dn;
-	i -= mbsadjpos((const char**)&cp, i, unlen, 1, pmp->pm_flags, pmp->pm_d2u);
+	// Haiku port: mbsadjpos is called here in FreeBSD, presumably to avoid splitting a character
+	// when the generation number is inserted, if the operative DOS code page is capable of
+	// multibyte characters. mbsadjpos can only make an appropriate adjustment in this context if
+	// libiconv is available. If it isn't, we imitate the legacy Haiku FAT driver and make a manual
+	// adjustment for SJIS since that is the only multibyte DOS code page that the driver
+	// supports internally.
+	if ((pmp->pm_flags & MSDOSFSMNT_KICONV) != 0 && msdosfs_iconv != NULL)
+		adjpos = mbsadjpos((const char**)&cp, i, unlen, 1, pmp->pm_flags, pmp->pm_d2u);
+	else if (sjis == 1 && is_initial_sjis_byte(dn[i]))
+		adjpos = 1;
+	i -= adjpos;
 
 	dn[i++] = '~';
 	while (wcp < gentext + sizeof(gentext))
@@ -627,11 +602,10 @@ winChkName(struct mbnambuf *nbp, const u_char *un, size_t unlen, int chksum,
 {
 	// Haiku port: uses Haiku's struct dirent, which is a flexible struct and has no d_namlen.
 	size_t len;
-	uint16_t c1, c2;
-	char *np;
-		// Haiku port: type changed to avoid compiler warning
+	uint16_t c1[2], c2[2];
+		// Haiku port: support two-unit UTF-16 characters.
+	u_char* np;
 	struct dirent* dirbuf = (struct dirent*)alloca(sizeof(struct dirent) + MAXNAMLEN + 1);
-
 	/*
 	 * We already have winentry in *nbp.
 	 */
@@ -650,16 +624,34 @@ winChkName(struct mbnambuf *nbp, const u_char *un, size_t unlen, int chksum,
 	if (unlen != len)
 		return -2;
 
-	for (np = dirbuf->d_name; unlen > 0 && len > 0;) {
+	for (np = (u_char*)dirbuf->d_name; unlen > 0 && len > 0;) {
+		// Haiku port: use Haiku utility function instead of unix2winchr, which has limitations
+		// when libiconv is not available.
+		size_t converted1, converted2;
+
 		/*
 		 * Comparison must be case insensitive, because FAT disallows
 		 * to look up or create files in case sensitive even when
 		 * it's a long file name.
 		 */
-		c1 = unix2winchr(__DECONST(const u_char **, &np), &len,
-		    LCASE_BASE, pmp);
-		c2 = unix2winchr(&un, &unlen, LCASE_BASE, pmp);
-		if (c1 != c2)
+		converted1 = utf8_char_len(*np);
+		c1[1] = 0;
+		UTF8_TO_UTF16HE((char*)np, &converted1, c1, 2, NULL, false);
+		np += converted1;
+		len -= converted1;
+		// TODO: properly handle upper-case characters above Unicode point 0xFF
+		if (c1[0] < 0x100)
+			c1[0] = u2l[c1[0]];
+
+		converted2 = utf8_char_len(*un);
+		c2[1] = 0;
+		UTF8_TO_UTF16HE((char*)un, &converted2, c2, 2, NULL, false);
+		un += converted2;
+		unlen -= converted2;
+		if (c2[0] < 0x100)
+			c2[0] = u2l[c2[0]];
+
+		if (memcmp((void*)c1, (void*)c2, 4) != 0)
 			return -2;
 	}
 	return chksum;
@@ -786,6 +778,9 @@ winSlotCnt(const u_char *un, size_t unlen, struct msdosfsmount *pmp)
 {
 	size_t wlen;
 	char wn[WIN_MAXLEN * 2 + 1], *wnp;
+	size_t units = 0;
+		// the number of UTF-16 units required to represent the input string
+	size_t unindex, charlen;
 
 	unlen = winLenFixup(un, unlen);
 
@@ -798,9 +793,25 @@ winSlotCnt(const u_char *un, size_t unlen, struct msdosfsmount *pmp)
 		return howmany(WIN_MAXLEN - wlen/2, WIN_CHARS);
 	}
 
-	if (unlen > WIN_MAXLEN)
+	// Haiku port: account for the possibility that a character will take up 4 bytes
+	// in a winentry.
+	for (unindex = 0, charlen = 0; unindex < unlen; unindex += charlen) {
+		charlen = utf8_corrected_char_len(un + unindex, unlen - unindex);
+		if (charlen <= 3) {
+			units += 1;
+		} else {
+			// This usually means the UTF-16 encoding is two units, but if the conversion
+			// routine doesn't recognize the character, it will be converted to the special
+			// replacement character, which is only one unit; do a redundant character
+			// conversion now just to check for this.
+			uint16_t utf16chr[2];
+			units += utf8_to_utf16le((char*)(un + unindex), &charlen, utf16chr, 2, NULL, false);
+		}
+	}
+
+	if (units > WIN_MAXLEN)
 		return 0;
-	return howmany(unlen, WIN_CHARS);
+	return howmany(units, WIN_CHARS);
 }
 
 /*
@@ -815,6 +826,8 @@ winLenFixup(const u_char *un, size_t unlen)
 	return unlen;
 }
 
+// Haiku port: note that without libiconv support, this function can only be relied on if
+// instr uses a fixed one-byte-per-character encoding such as CP 850.
 /*
  * Store an area with multi byte string instr, and returns left
  * byte of instr and moves pointer forward. The area's size is
@@ -866,13 +879,21 @@ dos2unixchr(u_char *outbuf, const u_char **instr, size_t *ilen, int lower, struc
 			*outp++ = '?';
 		}
 	} else {
+		// Haiku port: output encoding changed from ISO 8859-1 to UTF-8.
 		(*ilen)--;
 		c = *(*instr)++;
 		c = dos2unix[c];
+
 		if (lower & (LCASE_BASE | LCASE_EXT))
 			c = u2l[c];
-		*outp++ = c;
-		outbuf[1] = '\0';
+		if (c <= 0x7F) {
+			*outp++ = c;
+		} else {
+			// Unicode points 0x80 - 0xFF have 2-byte UTF-8 representations
+			uint16_t utf16unit = c;
+			ssize_t outlen = UTF16HE_TO_UTF8(&utf16unit, 1, (char*)outp, 4);
+			outp += outlen;
+		}
 	}
 
 	*outp = '\0';
@@ -890,6 +911,7 @@ unix2doschr(const u_char **instr, size_t *ilen, struct msdosfsmount *pmp)
 	char *up, *outp, unicode[3], outbuf[3];
 	uint16_t wc;
 	size_t len, ucslen, unixlen, olen;
+	uint32_t charlen;
 
 	if (pmp->pm_flags & MSDOSFSMNT_KICONV && msdosfs_iconv) {
 		/*
@@ -950,10 +972,32 @@ unix2doschr(const u_char **instr, size_t *ilen, struct msdosfsmount *pmp)
 		return (wc);
 	}
 
-	(*ilen)--;
-	c = *(*instr)++;
-	c = l2u[c];
-	c = unix2dos[c];
+	// Haiku port: treat input as UTF-8 rather than ISO 8859-1.
+	charlen = utf8_corrected_char_len(*instr, *ilen);
+	if (charlen == 1) {
+		// ASCII character
+		c = unix2dos[**instr];
+			// converts to CP 850, and capitalizes
+		(*ilen)--;
+		(*instr)++;
+	} else if (charlen == 2) {
+		// some 2-byte characters can be converted to code page 850
+		uint16_t utf16chr[2];
+		ssize_t unitswritten
+			= UTF8_TO_UTF16HE((char*)*instr, (size_t*)&charlen, utf16chr, 2, NULL, false);
+		if (unitswritten == 1 && utf16chr[0] <= 0xFF)
+			c = unix2dos[utf16chr[0]];
+		else
+			c = 1;
+		*ilen -= 2;
+		*instr += 2;
+	} else {
+		// all 3- and 4-byte characters are replaced by an underscore
+		c = 1;
+		*ilen -= charlen;
+		*instr += charlen;
+	}
+
 	return ((uint16_t)c);
 }
 
@@ -1075,7 +1119,8 @@ mbnambuf_write(struct mbnambuf *nbp, char *name, int id)
 	slot = &nbp->nb_buf[id * WIN_CHARS];
 	count = strlen(name);
 	newlen = nbp->nb_len + count;
-	if (newlen > WIN_MAXLEN || newlen > MAXNAMLEN) {
+	// Haiku port: allow extra room for the working name and fix it in mbnambuf_flush if needed
+	if (newlen > sizeof(nbp->nb_buf) - 1) {
 #ifdef MSDOSFS_DEBUG
 		printf("msdosfs: file name length %zu too large\n", newlen);
 #endif
@@ -1110,10 +1155,19 @@ char *
 mbnambuf_flush(struct mbnambuf *nbp, struct dirent *dp)
 {
 
-	// Haiku port: modified to work with Haiku's struct dirent.
-	if (nbp->nb_len > NAME_MAX - 1) {
-		mbnambuf_init(nbp);
-		return (NULL);
+	// Haiku port: modified to work with Haiku's struct dirent and for backward compatability
+	// with filenames miscoded by earlier version of Haiku driver.
+	if (nbp->nb_len > WIN_MAXLEN || nbp->nb_len > MAXNAMLEN) {
+		// Miscoded names can have literal UTF-8 translations that exceed B_FILE_NAME_LENGTH.
+		// Try to replace the UTF-8 string with what it would be if the UTF-16 source was correct.
+		int status = fix_miscoded_mbnambuf(nbp);
+		if (status != 0 || nbp->nb_len > WIN_MAXLEN || nbp->nb_len > MAXNAMLEN) {
+#ifdef _KERNEL_MODE
+			dprintf("mbnmabuf_flush flm status %s, nb_len %lu\n", strerror(status), nbp->nb_len);
+#endif
+			mbnambuf_init(nbp);
+			return NULL;
+		}
 	}
 	memcpy(dp->d_name, &nbp->nb_buf[0], nbp->nb_len);
 	dp->d_name[nbp->nb_len] = '\0';

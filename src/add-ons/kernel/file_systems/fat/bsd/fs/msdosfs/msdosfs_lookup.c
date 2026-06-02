@@ -65,6 +65,9 @@
 #include <fs/msdosfs/fat.h>
 #include <fs/msdosfs/msdosfsmount.h>
 
+#include "encodings.h"
+
+
 static int
 msdosfs_lookup_checker(struct msdosfsmount *pmp, struct vnode *dvp,
     struct denode *tdp, struct vnode **vpp)
@@ -170,6 +173,7 @@ msdosfs_lookup_ino(struct vnode *vdp, struct vnode **vpp, struct componentname
 	int wincnt = 1;
 	int chksum = -1, chksum_ok;
 	int olddos = 1;
+	uint16_t carryover = 0;
 
 #ifdef MSDOSFS_DEBUG
 	printf("msdosfs_lookup(): looking for %s\n", cnp->cn_nameptr);
@@ -205,7 +209,25 @@ msdosfs_lookup_ino(struct vnode *vdp, struct vnode **vpp, struct componentname
 	switch (unix2dosfn((const u_char *)cnp->cn_nameptr, dosfilename,
 	    cnp->cn_namelen, 0, pmp)) {
 	case 0:
-		return (EINVAL);
+	{
+		// Haiku port: compatability with filenames miscoded due to earlier Haiku driver bug.
+		if (nameiop != CREATE) {
+			// If the name being looked up came from miscoded winentries, it could contain
+			// illegal characters that cause unix2dosfn to fail to generate a short name to
+			// search for. If this may be the reason for the failure, try to find a long
+			// name match rather than giving up now.
+			bool strictlyLegal = 1;
+			if (is_filename_legal(cnp->cn_nameptr, 1, &strictlyLegal) && !strictlyLegal) {
+				dosfilename[0] = ' ';
+				wincnt = winSlotCnt((const u_char*)cnp->cn_nameptr, cnp->cn_namelen, pmp) + 1;
+			} else {
+				return EINVAL;
+			}
+			break;
+		} else {
+			return EINVAL;
+		}
+	}
 	case 1:
 		break;
 	case 2:
@@ -310,9 +332,7 @@ msdosfs_lookup_ino(struct vnode *vdp, struct vnode **vpp, struct componentname
 					if (pmp->pm_flags & MSDOSFSMNT_SHORTNAME)
 						continue;
 
-					chksum = win2unixfn(&nb,
-					    (struct winentry *)dep, chksum,
-					    pmp);
+					chksum = winentry_to_utf8(&nb, (struct winentry*)dep, chksum, &carryover);
 					continue;
 				}
 
@@ -336,6 +356,7 @@ msdosfs_lookup_ino(struct vnode *vdp, struct vnode **vpp, struct componentname
 				/*
 				 * Check for a checksum or name match
 				 */
+
 				chksum_ok = (chksum == winChksum(dep->deName));
 				if (!chksum_ok
 				    && (!olddos || bcmp(dosfilename, dep->deName, 11))) {
@@ -346,6 +367,7 @@ msdosfs_lookup_ino(struct vnode *vdp, struct vnode **vpp, struct componentname
 				printf("msdosfs_lookup(): match blkoff %lu, diroff %d\n",
 				    blkoff, diroff);
 #endif
+
 				/*
 				 * Remember where this directory
 				 * entry came from for whoever did
@@ -705,6 +727,8 @@ createde(struct denode *dep, struct denode *ddep, struct denode **depp,
 		const u_char *un = (const u_char *)cnp->cn_nameptr;
 		int unlen = cnp->cn_namelen;
 		int cnt = 1;
+		uint16_t carryover = 0;
+		size_t unoffset = 0;
 
 		while (--ddep->de_fndcnt >= 0) {
 			if (!(ddep->de_fndoffset & pmp->pm_crbomask)) {
@@ -732,9 +756,10 @@ createde(struct denode *dep, struct denode *ddep, struct denode **depp,
 				ddep->de_fndoffset -= sizeof(struct direntry);
 			}
 			rootde_alloced(ddep);
-			if (!unix2winfn(un, unlen, (struct winentry *)ndep,
-					cnt++, chksum, pmp))
+			if (!utf8_to_winentry(un, unlen, (struct winentry*)ndep, cnt++, chksum, pmp, &carryover,
+					&unoffset)) {
 				break;
+			}
 		}
 	}
 

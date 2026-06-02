@@ -84,6 +84,10 @@ extern "C" {
 #include "fs/msdosfs/msdosfsmount.h"
 }
 
+
+template<typename Value> class Vector;
+
+
 //**************************************
 // File names and volume labels
 
@@ -94,10 +98,17 @@ extern "C" {
 #define LABEL_CSTRING 12
 #define LABEL_LENGTH 11
 
-// legal characters in a short file name
-const char sAcceptable[] = "!#$%&'()-0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`{}~";
-// characters not permitted in a short file name
-const char sIllegal[] = "\\/:*?\"<>|";
+// size of each long file name component in a winentry
+#define WEPART1_BYTES 10
+#define WEPART2_BYTES 12
+#define WEPART3_BYTES 4
+
+// Buffer size for holding output of short name or label conversion to UTF-8, including the addition
+// of a period (possibly) and a terminating NULL. This is larger than needed for CP 850 or SJIS, but
+// if libiconv is enabled in the userlandfs module, any code page could be used, and there may be
+// code pages in which some single byte characters map to 4-byte UTF-8 characters.
+#define SHORT_TO_UTF8_SIZE 46
+
 
 // C++ struct used to simplify handling of the FreeBSD C struct componentname
 struct ComponentName {
@@ -110,11 +121,24 @@ struct ComponentName {
 	componentname fData;
 };
 
-bool is_filename_legal(const char* name);
 bool is_shortname_legal(const u_char* name);
-status_t label_to_fat(char* label);
-void label_from_fat(char* name);
-status_t read_label(const msdosfsmount* volume, int fd, const uint8* buffer, char* label);
+status_t label_to_fat(const char* utf8Label, uint8* fatLabel, msdosfsmount* fatVolume);
+int label_from_fat(const uint8* fatLabel, char* utf8Label, msdosfsmount* fatVolume);
+status_t read_label(msdosfsmount* volume, int fd, const uint8* buffer, char* label);
+status_t read_longname(struct vnode* bsdNode, u_long dirOffset, uint16* buffer, size_t bufferUnits);
+
+
+inline bool
+is_winentry(const direntry* entry)
+{
+	if (entry->deName[0] != SLOT_EMPTY && entry->deName[0] != SLOT_DELETED
+		&& entry->deAttributes == ATTR_WIN95) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 
 //**************************************
 // Bootsector and fsinfo sector
@@ -159,6 +183,8 @@ status_t init_csi(msdosfsmount* fatVolume, uint32 cluster, uint32 sector, struct
 status_t validate_cs(msdosfsmount* fatVolume, uint32 cluster, uint32 sector);
 off_t fs_sector(struct csi* csi);
 status_t iter_csi(struct csi* csi, int sectors);
+status_t read_dir_entries(mount* bsdVolume, const vnode* bsdNode, Vector<direntry>& entries);
+
 
 /*! Return the cluster number of the first cluster of the root directory.
 
@@ -203,8 +229,11 @@ struct NodePutter {
 	vnode* fNode;
 };
 
+status_t walk_private(mount* bsdVolume, vnode* bsdDir, const char* name, ino_t* _id,
+	vnode** bsdResult);
 status_t get_location(mount* bsdVolume, ino_t vnid, u_long* dirclust, u_long* diroffset);
 status_t assign_inode_and_get(mount* bsdVolume, daddr_t cluster, u_long offset, vnode** bsdNode);
+status_t recycle_bin_inode(mount* bsdVolume, ino_t* id);
 
 
 inline ino_t

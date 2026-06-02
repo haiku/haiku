@@ -38,6 +38,7 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	# kernel
 	AVLTreeBase.cpp
 	block_cache.cpp
+	convertutf.cpp
 	file_map.cpp
 	Notifications.cpp
 	Referenceable.cpp
@@ -69,6 +70,7 @@ SEARCH on [ FGristFiles
 
 SEARCH on [ FGristFiles
 		AVLTreeBase.cpp
+		convertutf.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles

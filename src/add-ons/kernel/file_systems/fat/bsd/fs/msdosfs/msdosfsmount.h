@@ -287,6 +287,9 @@ struct msdosfs_args {
 #define	MSDOSFS_FATMIRROR	0x20000000	/* FAT is mirrored */
 #define	MSDOSFS_FSIMOD		0x01000000
 #define	MSDOSFS_ERR_RO		0x00800000	/* remouning ro due to error */
+#define	MSDOSFS_CP850		0x100		/* Haiku port: always use CP 850 for short names */
+#define	MSDOSFS_SJIS		0x200		/* Haiku port: always use SJIS for short names */
+
 
 #ifdef _KERNEL
 void msdosfs_integrity_error(struct msdosfsmount *pmp);

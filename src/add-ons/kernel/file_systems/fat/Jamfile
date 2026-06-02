@@ -9,4 +9,5 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 KernelAddon fat :
 	$(commonSource)
+	debug.cpp
 	;

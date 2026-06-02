@@ -38,6 +38,7 @@
 #include "fssh_api_wrapper.h"
 #else
 #include <fs_interface.h>
+#include <interrupts.h>
 #include <lock.h>
 #endif
 
@@ -146,6 +147,11 @@ assert_vop_elocked(struct vnode* vp, const char* str)
 {
 	if (vp == NULL)
 		return;
+#ifdef _KERNEL_MODE
+	// skip the assert when in the kernel debugger where the lock can't be acquired
+	if (!are_interrupts_enabled())
+		return;
+#endif // _KERNEL_MODE
 	ASSERT_WRITE_LOCKED_RW_LOCK(&vp->v_vnlock->haikuRW);
 }
 

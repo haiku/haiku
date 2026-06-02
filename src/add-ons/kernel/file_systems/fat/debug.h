@@ -23,6 +23,12 @@
 #define __out dprintf
 #endif
 
+#if defined USER || defined FS_SHELL
+#define __out_bytes ;
+#else
+#define __out_bytes dprintf_bytes
+#endif
+
 // Which debugger should be used when?
 // The DEBUGGER() macro actually has no effect if DEBUG is not defined,
 // use the DIE() macro if you really want to die.
@@ -62,6 +68,11 @@
 		__out("fat[%" B_PRId32 "]: ", find_thread(NULL)); \
 		__out(__VA_ARGS__); \
 	}
+#define PRINT_BYTES(...) \
+	{ \
+		__out("fat[%" B_PRId32 "] %s:\n", find_thread(NULL), __FUNCTION__); \
+		__out_bytes(__VA_ARGS__); \
+	}
 #define REPORT_ERROR(status) \
 	__out("fat[%" B_PRId32 "]: %s:%d: %s\n", find_thread(NULL), __FUNCTION__, __LINE__, \
 		strerror(status));
@@ -94,6 +105,7 @@
 	};
 #else // !DEBUG
 #define PRINT(...) ;
+#define PRINT_BYTES(...) ;
 #define REPORT_ERROR(status) \
 	__out("fat[%" B_PRId32 "]: %s:%d: %s\n", find_thread(NULL), __FUNCTION__, __LINE__, \
 		strerror(status));
@@ -116,12 +128,14 @@
 #define D(x) ;
 #endif // !DEBUG
 
+void dprintf_bytes(const uint8* buffer, uint32 count);
 int kprintf_volume(int argc, char** argv);
 status_t dprintf_volume(struct mount* bsdVolume);
 int kprintf_node(int argc, char** argv);
 status_t dprintf_node(struct vnode* bsdNode);
-status_t dprintf_winentry(struct msdosfsmount* fatVolume, struct winentry* entry,
-	const uint32* index);
+status_t dprintf_direntry(struct direntry* entry, uint32 index);
+status_t dprintf_winentry(struct winentry* entry, uint32 index, int chkSum, uint16 unpaired);
+status_t dprintf_fat_dir(mount* bsdVolume, vnode* bsdNode, size_t& count);
 
 
 #endif // FAT_DEBUG_H

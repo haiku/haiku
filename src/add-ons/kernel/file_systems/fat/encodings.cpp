@@ -1,11 +1,11 @@
 /*
-	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
+ * Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
+ * Copyright 2026, Haiku, Inc. All rights reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
 
 
 #include "encodings.h"
-#include "support.h"
 
 #include <ctype.h>
 #ifndef FS_SHELL
@@ -14,42 +14,64 @@
 #include <string.h>
 #endif // !FS_SHELL
 
-#define TOUCH(x) ((void)(x))
+#if defined TEST || defined TOOL
+#include <OS.h>
+#endif // TEST || TOOL
 
-#ifdef USER
-	#define dprintf printf
-	#undef DEBUG
-	int _assert_(char *,int,char *) {return 0;}
-#endif
+#ifndef FS_SHELL
+#include <debug.h>
+#include <util/Vector.h>
+#include <util/convertutf.h>
+#endif // !FS_SHELL
 
-#define DPRINTF(a, b) ((void)0)
+#define _KERNEL
+extern "C"
+{
+#include "fs/msdosfs/direntry.h"
+}
 
-enum {
-	MS_DOS_CONVERSION = 1,
-	SJIS_CONVERSION
-};
+#include "debug.h"
+#include "dosfs.h"
+#if !defined TEST && !defined TOOL
+#include "support.h"
+#endif // !TEST && !TOOL
 
-#define BEGINS_UTF8CHAR(byte) (((byte) & 0xc0) != 0x80)
 
-const uint16 msdostou[] = {
-0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
-0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
-0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
-0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039, 0x003A, 0x003B, 0x003C, 0x003D, 0x003E, 0x003F,
-0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047, 0x0048, 0x0049, 0x004A, 0x004B, 0x004C, 0x004D, 0x004E, 0x004F,
-0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057, 0x0058, 0x0059, 0x005A, 0x005B, 0x005C, 0x005D, 0x005E, 0x005F,
-0x0060, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067, 0x0068, 0x0069, 0x006A, 0x006B, 0x006C, 0x006D, 0x006E, 0x006F,
-0x0070, 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077, 0x0078, 0x0079, 0x007A, 0x007B, 0x007C, 0x007D, 0x007E, 0x007F,
-0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7, 0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x00EE, 0x00EC, 0x00C4, 0x00C5,
-0x00C9, 0x00E6, 0x00C6, 0x00F4, 0x00F6, 0x00F2, 0x00FB, 0x00F9, 0x00FF, 0x00D6, 0x00DC, 0x00A2, 0x00A3, 0x00A5, 0x20A7, 0x0192,
-0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x00AA, 0x00BA, 0x00BF, 0x2310, 0x00AC, 0x00BD, 0x00BC, 0x00A1, 0x00AB, 0x00BB,
-0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x255D, 0x255C, 0x255B, 0x2510,
-0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256C, 0x2567,
-0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x2584, 0x258C, 0x2590, 0x2580,
-0x03B1, 0x00DF, 0x0393, 0x03C0, 0x03A3, 0x03C3, 0x00B5, 0x03C4, 0x03A6, 0x0398, 0x03A9, 0x03B4, 0x221E, 0x03C6, 0x03B5, 0x2229,
-0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x207F, 0x00B2, 0x25A0, 0x00A0,
-0xFFFF
-};
+/* General note on long file name handling: in FreeBSD, libiconv is linked in the kernel and the
+FAT driver uses it for character conversion. The BSD driver includes backup code in case libiconv
+is not available, but since it normally is, there was no reason to actively maintain that code in
+FreeBSD. As a result, it still assumes the names passed by the OS are encoded in ISO 8859-1 rather
+than UTF-8. Recent versions of the Haiku FAT driver used this code, and when it created file names
+it did not write non-ASCII characters in correct UTF-16: it just copied each UTF-8 byte into the
+low byte of each word in the long file name. When reading the name, it reversed this process.
+
+With the name writing and reading code now corrected, the UTF-8 string that the driver constructs
+when reading a miscoded filename will be different from the UTF-8 that was originally passed in
+when the file was created (each byte of the UTF-8 argument supplied when the file was created will
+be treated as a Unicode point).
+
+Miscoded filenames can be corrected by calling fix_miscoded_longname(), which is used in the
+fatfixname tool. Generally the driver does not use fix_miscoded_longname automatically. There are
+two exceptions. A miscoded name that is very long, when converted to UTF-8, may exceed
+B_FILE_NAME_LENGTH. When this happens, dosfs_readdir auto-corrects the name before passing it to
+the VFS. If sending a file to the recycle bin would be blocked for the reason explained in the next
+paragraph, the name will be auto-corrected to avoid forcing the user to use fatfixname just to
+recycle a file. Expanding the automatic use of fix_miscoded_longname would reduce need for manual
+intervention, but this is liable to damage some names that are already correct. For example, a
+correct name consisting of UTF-16 units 0xE2 0xA7 0xA3 cannot be definitely categorized as correct
+since the high bytes are all zero and the low bytes happen to form a valid UTF-8 character.
+Applying fix_miscoded_longname on the assumption that is incorrect would yield a filename
+consisting of unit 0x29E3.
+
+In some cases, the UTF-8 translation of a miscoded name will contain characters that are illegal
+in a FAT filename (for example, the original UTF-8 name that the VFS passed to dosfs_create may
+have contained a continuation byte in the range 0x80 to 0xA0; these values are illegal when
+treated as Unicode points). Such files can still be read, written, and deleted, but will need to be
+fixed with fatfixname before they can be moved or copied, because the driver will refuse to create
+the destination file. Rename operations in which the new name retains illegal code points would
+also be blocked.
+*/
+
 
 const uint16 sjis00tou[] = {
 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
@@ -843,202 +865,6 @@ const table_segment	sjistables[] = { {sjis00tou, 0x0000},
 									 {NULL, 0x0000} };
 
 
-// From EncodingComversions.cpp
-
-// Pierre's Uber Macro
-#define u_lendian_to_utf8(str, uni_str)\
-{\
-	if ((B_LENDIAN_TO_HOST_INT16(uni_str[0])&0xff80) == 0)\
-		*str++ = B_LENDIAN_TO_HOST_INT16(*uni_str++);\
-	else if ((B_LENDIAN_TO_HOST_INT16(uni_str[0])&0xf800) == 0) {\
-		str[0] = 0xc0|(B_LENDIAN_TO_HOST_INT16(uni_str[0])>>6);\
-		str[1] = 0x80|(B_LENDIAN_TO_HOST_INT16(*uni_str++)&0x3f);\
-		str += 2;\
-	} else if ((B_LENDIAN_TO_HOST_INT16(uni_str[0])&0xfc00) != 0xd800) {\
-		str[0] = 0xe0|(B_LENDIAN_TO_HOST_INT16(uni_str[0])>>12);\
-		str[1] = 0x80|((B_LENDIAN_TO_HOST_INT16(uni_str[0])>>6)&0x3f);\
-		str[2] = 0x80|(B_LENDIAN_TO_HOST_INT16(*uni_str++)&0x3f);\
-		str += 3;\
-	} else {\
-		int   val;\
-		val = ((B_LENDIAN_TO_HOST_INT16(uni_str[0])-0xd7c0)<<10) | (B_LENDIAN_TO_HOST_INT16(uni_str[1])&0x3ff);\
-		str[0] = 0xf0 | (val>>18);\
-		str[1] = 0x80 | ((val>>12)&0x3f);\
-		str[2] = 0x80 | ((val>>6)&0x3f);\
-		str[3] = 0x80 | (val&0x3f);\
-		uni_str += 2; str += 4;\
-	}\
-}
-
-// Pierre's Uber Macro
-#define u_hostendian_to_utf8(str, uni_str)\
-{\
-	if ((uni_str[0]&0xff80) == 0)\
-		*str++ = *uni_str++;\
-	else if ((uni_str[0]&0xf800) == 0) {\
-		str[0] = 0xc0|(uni_str[0]>>6);\
-		str[1] = 0x80|(*uni_str++&0x3f);\
-		str += 2;\
-	} else if ((uni_str[0]&0xfc00) != 0xd800) {\
-		str[0] = 0xe0|(uni_str[0]>>12);\
-		str[1] = 0x80|((uni_str[0]>>6)&0x3f);\
-		str[2] = 0x80|(*uni_str++&0x3f);\
-		str += 3;\
-	} else {\
-		int   val;\
-		val = ((uni_str[0]-0xd7c0)<<10) | (uni_str[1]&0x3ff);\
-		str[0] = 0xf0 | (val>>18);\
-		str[1] = 0x80 | ((val>>12)&0x3f);\
-		str[2] = 0x80 | ((val>>6)&0x3f);\
-		str[3] = 0x80 | (val&0x3f);\
-		uni_str += 2; str += 4;\
-	}\
-}
-
-// Another Uber Macro
-#define utf8_to_u_hostendian(str, uni_str, err_flag) \
-{\
-	err_flag = 0;\
-	if ((str[0]&0x80) == 0)\
-		*uni_str++ = *str++;\
-	else if ((str[1] & 0xC0) != 0x80) {\
-		*uni_str++ = 0xfffd;\
-		str+=1;\
-	} else if ((str[0]&0x20) == 0) {\
-		*uni_str++ = ((str[0]&31)<<6) | (str[1]&63);\
-		str+=2;\
-	} else if ((str[2] & 0xC0) != 0x80) {\
-		*uni_str++ = 0xfffd;\
-		str+=2;\
-	} else if ((str[0]&0x10) == 0) {\
-		*uni_str++ = ((str[0]&15)<<12) | ((str[1]&63)<<6) | (str[2]&63);\
-		str+=3;\
-	} else if ((str[3] & 0xC0) != 0x80) {\
-		*uni_str++ = 0xfffd;\
-		str+=3;\
-	} else {\
-		err_flag = 1;\
-	}\
-}
-
-// Count the number of bytes of a UTF-8 character
-#define utf8_char_len(c) ((((int32)0xE5000000 >> ((c >> 3) & 0x1E)) & 3) + 1)
-
-// converts LENDIAN unicode to utf8
-static status_t
-_lendian_unicode_to_utf8(
-	const char *src,
-	int32 *srcLen,
-	char *dst,
-	int32 *dstLen)
-{
-	int32 srcLimit = *srcLen;
-	int32 dstLimit = *dstLen;
-	int32 srcCount = 0;
-	int32 dstCount = 0;
-
-	for (srcCount = 0; srcCount < srcLimit; srcCount += 2) {
-		uint16  *UNICODE = (uint16 *)&src[srcCount];
-		uchar	utf8[4];
-		uchar	*UTF8 = utf8;
-		int32 utf8Len;
-		int32 j;
-
-		u_lendian_to_utf8(UTF8, UNICODE);
-
-		utf8Len = UTF8 - utf8;
-		if ((dstCount + utf8Len) > dstLimit)
-			break;
-
-		for (j = 0; j < utf8Len; j++)
-			dst[dstCount + j] = utf8[j];
-		dstCount += utf8Len;
-	}
-
-	*srcLen = srcCount;
-	*dstLen = dstCount;
-
-	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
-}
-
-// utf8 to LENDIAN unicode
-static status_t
-_utf8_to_lendian_unicode(
-	const char	*src,
-	int32		*srcLen,
-	char		*dst,
-	int32		*dstLen)
-{
-	int32 srcLimit = *srcLen;
-	int32 dstLimit = *dstLen - 1;
-	int32 srcCount = 0;
-	int32 dstCount = 0;
-
-	while ((srcCount < srcLimit) && (dstCount < dstLimit)) {
-		uint16	unicode;
-		uint16	*UNICODE = &unicode;
-		uchar	*UTF8 = (uchar *)src + srcCount;
-		int     err_flag;
-
-		if ((srcCount + utf8_char_len(src[srcCount])) > srcLimit)
-			break;
-
-		utf8_to_u_hostendian(UTF8, UNICODE, err_flag);
-		if(err_flag == 1)
-			return EINVAL;
-
-		unicode = B_HOST_TO_LENDIAN_INT16(unicode);
-		dst[dstCount++] = unicode & 0xFF;
-		dst[dstCount++] = unicode >> 8;
-
-		srcCount += UTF8 - ((uchar *)(src + srcCount));
-	}
-
-	*srcLen = srcCount;
-	*dstLen = dstCount;
-
-	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
-}
-
-// table translation to utf8
-static status_t
-_one_to_utf8(
-	const uint16	*table,
-	const char		*src,
-	int32			*srcLen,
-	char			*dst,
-	int32			*dstLen)
-{
-	int32 srcLimit = *srcLen;
-	int32 dstLimit = *dstLen;
-	int32 srcCount = 0;
-	int32 dstCount = 0;
-
-	for (srcCount = 0; srcCount < srcLimit; srcCount++) {
-		// table should be in host endian
-		uint16	unicode = table[(uchar)src[srcCount]];
-		uint8* UNICODE = reinterpret_cast<uint8*>(&unicode);
-		uchar	utf8[4];
-		uchar	*UTF8 = utf8;
-
-		memset(utf8, 0, 4);
-		u_hostendian_to_utf8(UTF8, UNICODE);
-	
-		int32 utf8Len = UTF8 - utf8;
-		if ((dstCount + utf8Len) > dstLimit)
-			break;
-
-		for (int32 j = 0; j < utf8Len; j++)
-			dst[dstCount + j] = utf8[j];
-		dstCount += utf8Len;
-	}
-
-	*srcLen = srcCount;
-	*dstLen = dstCount;
-
-	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
-}
-
 // converts utf8 to BENDIAN sjis
 status_t
 _utf8_to_sjis_bendian(
@@ -1053,43 +879,48 @@ _utf8_to_sjis_bendian(
 	int32 dstCount = 0;
 
 	while ((srcCount < srcLimit) && (dstCount < dstLimit)) {
-		if ((srcCount + utf8_char_len(src[srcCount])) > srcLimit)
+		const uchar* UTF8 = reinterpret_cast<const uchar*>(src) + srcCount;
+		size_t utf8CharLen = utf8_corrected_char_len(UTF8, srcLimit - srcCount);
+		if ((srcCount + static_cast<int32>(utf8CharLen)) > srcLimit)
 			break;
 
-		uint16 unicode;
-		uint16 *UNICODE = &unicode;
-		int				err_flag;
-		bool			multibyte = false;
-		const uint16	*table = NULL;
-		uchar			*UTF8 = (uchar *)src + srcCount;
-
-		utf8_to_u_hostendian(UTF8, UNICODE, err_flag);
-		if(err_flag == 1)
+		uint16 utf16[2];
+		ssize_t unitsWritten = UTF8_TO_UTF16HE(reinterpret_cast<const char*>(UTF8), &utf8CharLen,
+			utf16, 2, NULL, false);
+		if (unitsWritten <= 0)
 			return EINVAL;
+		UTF8 += utf8CharLen;
 
-		// XXX horrible horrible way to convert
-		for (int32 t = 0; (table = sjistables[t].table) != NULL; t++) {
-			for (int32 i = 0; table[i] != 0xFFFF; i++) {
-				if (unicode == table[i]) {
-					uint16 offset = sjistables[t].offset;
+		bool multibyte = false;
+		if (unitsWritten == 2) {
+			// character has a Unicode point > 0xFFFF, so it cannot be expressed in SJIS
+			dst[dstCount] = 0x1a;
+		} else {
+			const uint16* table = NULL;
 
-					if (offset == 0x0000)
-						dst[dstCount] = i;
-					else {
-						if ((dstCount + 1) < dstLimit) {
+			// XXX horrible horrible way to convert
+			for (int32 t = 0; (table = sjistables[t].table) != NULL; t++) {
+				for (int32 i = 0; table[i] != 0xFFFF; i++) {
+					if (utf16[0] == table[i]) {
+						uint16 offset = sjistables[t].offset;
+
+						if (offset == 0x0000) {
+							dst[dstCount] = i;
+						} else if ((dstCount + 1) < dstLimit) {
 							uint16 sjis = offset + i;
 							// bendian
 							*(uint16 *)&dst[dstCount] = B_HOST_TO_BENDIAN_INT16(sjis);
 							multibyte = true;
-						} else
+						} else {
 							goto exit;
+						}
+						goto donesearch;
 					}
-					goto donesearch;
 				}
 			}
+			// we must not have found it
+			dst[dstCount] = 0x1a;
 		}
-		// we must not have found it
-		dst[dstCount] = 0x1a;
 
 donesearch:
 		srcCount += UTF8 - ((uchar *)(src + srcCount));
@@ -1104,290 +935,21 @@ exit:
 }
 
 
-inline bool is_initial_sjis_byte(uchar c)
-{
-	return (((c >= 0x81) && (c <= 0x9F)) ||
-			((c >= 0xE0) && (c <= 0xEF)) );
-}
-
-// takes a unicode name of unilen uchar's and converts to a utf8 name of at
-// most utf8len uint8's
-status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
-	uint32 utf8len)
-{
-	status_t result;
-	uint32 origlen = unilen;
-
-	DPRINTF(0, ("unicode_to_utf8\n"));
-
-	result = _lendian_unicode_to_utf8((char *)uni,
-			(int32 *)&unilen, (char *)utf8, (int32 *)&utf8len);
-
-	if (unilen < origlen) {
-		dprintf("Name is too long (%" B_PRIu32 " < %" B_PRIu32 ")\n", unilen,
-			origlen);
-		return B_ERROR;
-	}
-
-	return result;
-}
-
-// from dir.c
-const char underbar[] = "+,;=[]"
-		"\x83\x85\x88\x89\x8A\x8B\x8C\x8D"
-		"\x93\x95\x96\x97\x98"
-		"\xA0\xA1\xA2\xA3";
-const char capitalize_from[] = "\x81\x82\x84\x86\x87\x91\x94\xA4";
-const char capitalize_to[]   = "\x9A\x90\x8E\x8F\x80\x92\x99\xA5";
-
-/* XXX: this doesn't work quite right, but it's okay for now since having
- * lfn's where they aren't needed doesn't hurt */
-bool requires_long_name(const char *utf8, const uchar *unicode)
-{
-	int i, j;
-
-	DPRINTF(0, ("requires_long_name\n"));
-
-	for (i=0;unicode[i] || unicode[i+1];i+=2) {
-		uint16 ar = (unicode[i+1] << 8) | unicode[i];
-		if (is_unicode_japanese(ar)) {
-			DPRINTF(1, ("All Japanese names require long file names for now\n"));
-			return true;
-		}
-	}
-
-	for (i=0;i<8;i++) {
-		if (utf8[i] == 0) return false;
-		if (utf8[i] == '.') break;
-		/* XXX: should also check for upper-ascii stuff (requires matching
-		 * unicode with msdostou table, but doesn't hurt for now */
-		if (!strchr(sAcceptable, utf8[i])) return true;
-	}
-
-	if (utf8[i] == 0) return false;
-	if ((i == 8) && (utf8[i] != '.')) return true; /* name too long */
-	i++;
-	if (utf8[i] == 0) return true; /* filenames with trailing periods */
-
-	for (j=0;j<3;j++,i++) {
-		if (utf8[i] == 0) return false;
-		/* XXX: same here */
-		if (!strchr(sAcceptable, utf8[i])) return true;
-	}
-
-	return (utf8[i] == 0) ? false : true;
-}
-
-status_t utf8_to_unicode(const char *utf8, uchar *uni, uint32 unilen)
-{
-	status_t result;
-	uint32 utf8len, origlen;
-
-	DPRINTF(0, ("utf8_to_unicode\n"));
-
-	utf8len = origlen = strlen(utf8) + 1;
-
-	result = _utf8_to_lendian_unicode(utf8,
-			(int32 *)&utf8len, (char *)uni, (int32 *)&unilen);
-
-	if (origlen < utf8len) {
-		dprintf("Name is too long (%" B_PRIu32 " < %" B_PRIu32 ")\n", unilen,
-			origlen);
-		return B_ERROR;
-	}
-
-	return (result == B_OK) ? unilen : result;
-}
-
-static
-status_t munge_short_name_english(uchar nshort[11], uint64 value)
-{
-	char buffer[8];
-	int len, i;
-
-	DPRINTF(0, ("munge_short_name_english\n"));
-
-	// short names must have only numbers following
-	// the tilde and cannot begin with 0
-	sprintf(buffer, "~%" B_PRIu64, value);
-	len = strlen(buffer);
-	i = 7 - len;
-
-	ASSERT((i > 0) && (i < 8));
-
-	while ((nshort[i] == ' ') && (i > 0)) i--;
-	i++;
-
-	memcpy(nshort + i, buffer, len);
-
-	return B_OK;
-}
-
-static
-status_t munge_short_name_sjis(uchar nshort[11], uint64 value)
-{
-	char buffer[8];
-	int len, i, last;
-
-	DPRINTF(0, ("munge_short_name_sjis\n"));
-
-	// short names must have only numbers following
-	// the tilde and cannot begin with 0
-	sprintf(buffer, "~%" B_PRIu64, value);
-	len = strlen(buffer);
-
-	last = 0;
-	for (i=0;i<=8-len;i++) {
-		last = i;
-		if (nshort[i] == ' ') break;
-		if (is_initial_sjis_byte(nshort[i])) i++;
-	}
-
-	memcpy(nshort + last, buffer, len);
-	memset(nshort + last + len, ' ', 8 - (last + len));
-
-	return B_OK;
-}
-
-status_t munge_short_name2(uchar nshort[11], int encoding)
-{
-	uint64 value;
-
-	DPRINTF(0, ("munge_short_name2\n"));
-
-	value = system_time() % 100000LL;
-	if (!value) value++;
-
-	/* XXX: what if it's zero? */
-	if (encoding == MS_DOS_CONVERSION)
-		return munge_short_name_english(nshort, value);
-	else if (encoding == SJIS_CONVERSION)
-		return munge_short_name_sjis(nshort, value);
-
-	return EINVAL;
-}
-
-status_t munge_short_name1(uchar nshort[11], int iteration, int encoding)
-{
-	DPRINTF(0, ("munge_short_name1\n"));
-
-	if (encoding == MS_DOS_CONVERSION)
-		return munge_short_name_english(nshort, iteration);
-	else if (encoding == SJIS_CONVERSION)
-		return munge_short_name_sjis(nshort, iteration);
-
-	return EINVAL;
-}
-
-/*
-	rules:
-	1.	if there are multiple '.'s in the name, the last one signals the
-		extension. else scandisk complains.
-	2.  a lower case letter gets translated to its upper case equivalent in the
-		short name. this includes weird upper-ascii letters.
-	3.	devices (CON, PRN, etc) are not valid short names. (implemented in
-		dir.c)
-	4.  ignore leading '.'s; a name of all '.'s is illegal
-*/
-
-static status_t
-generate_short_name_msdos(const uchar *utf8, const uint16 *uni,
-		uint32 unilen, uchar nshort[11])
-{
-	int i;
-	char *cp;
-	const uint16 *puni;
-
-	TOUCH(utf8);
-
-	DPRINTF(0, ("generate_short_name_msdos\n"));
-
-	puni = uni;
-	for (i=0; (i < 8) && (puni < uni + unilen / 2); puni++) {
-		uint16 match;
-		uint32 c;
-
-		match = B_LENDIAN_TO_HOST_INT16(*puni);
-
-		if (match == 0) return B_OK;
-		if (match == '.') {
-			/* skip leading dots */
-			if (i == 0) continue; else break;
-		}
-
-		for (c = 0; c < 0x100; c++)
-			if (msdostou[c] == match)
-				break;
-
-		if (c < 0x100) {
-			if (strchr(sIllegal, c)) return EINVAL;
-
-			if ((c >= 'a') && (c <= 'z'))
-				nshort[i++] = c - 'a' + 'A';
-			else if (strchr(underbar, c))
-				nshort[i++] = '_';
-			else if ((cp = strchr(capitalize_from, c)) != NULL)
-				nshort[i++] = capitalize_to[(int)(cp - capitalize_from)];
-			else if (strchr(sAcceptable, c) || strchr(capitalize_to, c))
-				nshort[i++] = c;
-		}
-	}
-
-	/* find the final dot */
-	for (puni = uni + unilen / 2 - 1; puni >= uni; puni--)
-		if (B_LENDIAN_TO_HOST_INT16(*puni) == '.')
-			break;
-
-	if (puni < uni) return B_OK;
-
-	puni ++;
-
-	for (i=8; (i < 11) && (puni < uni + unilen / 2); puni++) {
-		uint16 match;
-		uint32 c;
-
-		match = B_LENDIAN_TO_HOST_INT16(*puni);
-		if (match == 0) return B_OK;
-
-		for (c=0; c<0x100; c++)
-			if (msdostou[c] == match)
-				break;
-
-		if (c < 0x100) {
-			if (strchr(sIllegal, c)) return EINVAL;
-
-			if ((c >= 'a') && (c <= 'z'))
-				nshort[i++] = c - 'a' + 'A';
-			else if (strchr(underbar, c))
-				nshort[i++] = '_';
-			else if ((cp = strchr(capitalize_from, c)) != NULL)
-				nshort[i++] = capitalize_to[(int)(cp - capitalize_from)];
-			else if (strchr(sAcceptable, c) || strchr(capitalize_to, c))
-				nshort[i++] = c;
-		}
-	}
-
-	return B_OK;
-}
-
 status_t
-generate_short_name_sjis(const uchar *utf8, const uint16 *uni,
-		uint32 unilen, uchar nshort[11])
+generate_short_name_sjis(const uchar* utf8, uchar nshort[11])
 {
 	uchar *sjis, *s, *t;
 	int32 utf8len, sjislen;
 	status_t result;
 	int32 state = 0;
 
-	TOUCH(uni);
-
-	DPRINTF(0, ("generate_short_name_sjis\n"));
-
-	sjis = (uchar *)malloc(unilen);
-	if (sjis == NULL) return ENOMEM;
-
 	utf8len = strlen((const char *)utf8) + 1;
-	sjislen = unilen;
+	sjislen = utf8len;
+		// maximum possible length of the SJIS conversion, given that ratio of UTF-8:SJIS bytes per
+		// character will range from 1:1 to 3:1
+	sjis = reinterpret_cast<uchar*>(malloc(sjislen));
+	if (sjis == NULL)
+		return ENOMEM;
 
 	result = _utf8_to_sjis_bendian((char *)utf8,
 			(int32 *)&utf8len, (char *)sjis, (int32 *)&sjislen);
@@ -1412,7 +974,14 @@ generate_short_name_sjis(const uchar *utf8, const uint16 *uni,
 		} else {
 			if (*s == '.') break;
 			if (*s == 0) goto bi;
-			if ((*s >= 'a') && (*s <= 'z')) *s = *s - 'a' + 'A';
+			// Adjust the SJIS name to comply with FAT short name requirements.
+			// While the unix2dos array is not designed for SJIS, we can use it
+			// for this purpose because the 1 values in the array are
+			// all assigned to ASCII code points.
+			if ((*s >= 'a') && (*s <= 'z'))
+				*s = *s - 'a' + 'A';
+			else if (*s == 0x1a || unix2dos[*s] == 1)
+				*s = '_';
 		}
 		nshort[state++] = *(s++);
 	}
@@ -1431,164 +1000,257 @@ generate_short_name_sjis(const uchar *utf8, const uint16 *uni,
 					break;
 			} else {
 				if (*s == 0) break;
-				if ((*s >= 'a') && (*s <= 'z')) *s = *s - 'a' + 'A';
+				if ((*s >= 'a') && (*s <= 'z'))
+					*s = *s - 'a' + 'A';
+				else if (*s == 0x1a || unix2dos[*s] == 1)
+					*s = '_';
 			}
 			nshort[state++] = *(s++);
 		}
 	}
 
 bi:
-	if (result < 0) {
-		dprintf("generate_short_name_sjis error: %" B_PRId32 " (%s)\n", result,
-			strerror(result));
-	}
+	if (result < 0)
+		REPORT_ERROR(result);
 
 	free(sjis);
 
 	return result;
 }
 
-status_t generate_short_name(const uchar *name, const uchar *uni,
-		uint32 unilen, uchar nshort[11], int *encoding)
-{
-	uint32 i;
-	status_t result;
 
-	DPRINTF(0, ("generate_short_name\n"));
-
-	ASSERT(encoding != NULL);
-	memset(nshort, ' ', 11);
-
-	/* assume english by default */
-	*encoding = MS_DOS_CONVERSION;
-
-	/* check for japanese */
-	for (i=0;i<unilen;i+=2) {
-		if (is_unicode_japanese(B_LENDIAN_TO_HOST_INT16(*(uint16 *)&uni[i]))) {
-			*encoding = SJIS_CONVERSION;
-			break;
-		}
-	}
-
-	if (*encoding == MS_DOS_CONVERSION)
-		result = generate_short_name_msdos(name, (const uint16 *)uni, unilen, nshort);
-	else if (*encoding == SJIS_CONVERSION)
-		result = generate_short_name_sjis(name, (const uint16 *)uni, unilen, nshort);
-	else
-		return EINVAL;
-
-	if (result == B_OK) {
-		if (!memcmp(nshort, "           ", 11)) /* no blank names allowed */
-			nshort[0] = '_';
-	}
-
-	return result;
-}
-
-/* called to convert a short ms-dos filename to utf8.
-   XXX: encoding is assumed to be standard US code page, never shift-JIS
+/*! Use internal tables to convert a single SJIS character to UTF-16.
+	@param lower If true, force all ASCII letters to lower case.
+	@return Number of input bytes converted.
 */
-status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len, uint8 toLower)
+static int
+sjis_to_utf16chr(u_char* sjis, size_t sjisLen, bool lower, uint16* utf16)
 {
-	uchar normalized[8+1+3+1];
-	int32 i, pos;
+	uint16 codePoint;
+	uint32 advanced = 1;
 
-	DPRINTF(0, ("msdos_to_utf8\n"));
-
-	pos = 0;
-	for (i=0;i<8;i++) {
-		if (msdos[i] == ' ')
-			break;
-		normalized[pos++] = ((i == 0) && (msdos[i] == 5)) ? 0xe5 :
-			((toLower & 0x08) ? tolower(msdos[i]) : msdos[i]);
-	}
-
-	if (msdos[8] != ' ') {
-		normalized[pos++] = '.';
-		for (i=8;i<11;i++) {
-			if (msdos[i] == ' ')
-				break;
-			normalized[pos++]
-				= ((toLower & 0x10) ? tolower(msdos[i]) : msdos[i]);
+	// convert from SJIS to Unicode point
+	if (sjis[0] < 0x80) {
+		// single-byte character (modified ASCII)
+		u_char adjustedCase = lower ? u2l[sjis[0]] : sjis[0];
+		codePoint = sjis00tou[adjustedCase];
+	} else if (sjis[0] == 0x80) {
+		codePoint = 0x3F;
+	} else if (sjis[0] < 0xA0) {
+		// double-byte
+		if (sjisLen <= 1) {
+			codePoint = 0x3F;
+		} else {
+			uint32 mapIndex = (sjis[0] * 16 * 16);
+			mapIndex += sjis[1];
+			mapIndex -= 0x8100;
+			codePoint = sjis81tou[mapIndex];
+			advanced = 2;
 		}
+	} else if (sjis[1] == 0xA0) {
+		codePoint = 0x3F;
+	} else if (sjis[0] < 0xE0) {
+		// single-byte (katakana)
+		codePoint = sjis00tou[sjis[0]];
+	} else if (sjis[0] < 0xF0) {
+		// double-byte
+		if (sjisLen <= 1) {
+			codePoint = 0x3F;
+		} else {
+			uint32 mapIndex = sjis[0] * 16 * 16;
+			mapIndex += sjis[1];
+			mapIndex -= 0xE000;
+			codePoint = sjise0tou[mapIndex];
+			advanced = 2;
+		}
+	} else {
+		codePoint = 0x3F;
 	}
 
-	normalized[pos++] = 0;
+	// all SJIS characters have Unicode points <= 0xFFFF, so the UTF-16 encoding
+	// equals the code point
+	*utf16 = codePoint;
 
-	return _one_to_utf8(msdostou, (char *)normalized, &pos,
-			(char *)utf8, (int32 *)&utf8len);
+	return advanced;
 }
 
-bool requires_munged_short_name(const uchar *utf8name, const uchar nshort[11],
-	int encoding)
+
+/*!	Convert a SJIS short file name to UTF-8.
+	@param utf8 Buffer of at least 35 bytes to hold up to 3 bytes per shortname character, plus
+	an added terminating NULL and possibly an inserted period.
+	@return The strlen of the output written to \a utf8.
+*/
+int
+sjis_to_utf8(u_char* sjis, u_char* utf8, int toLower)
 {
-	int leading = 0;
-	int trailing = 0;
-	int i, len;
+	// We have an internal table that in effect converts SJIS to hostendian UTF-16, so we first
+	// convert to UTF-16, then from there to UTF-8.
+	uint16 utf16[8 + 1 + 3 + 1];
+	int32 sjisPos, utf16Pos;
 
-	if (encoding != MS_DOS_CONVERSION)
-		return true;
-
-	for ( ; *utf8name != 0; utf8name++) {
-		if (!BEGINS_UTF8CHAR(*utf8name))
-			continue;
-		if (*utf8name == '.')
+	sjisPos = utf16Pos = 0;
+	while (sjisPos < 8) {
+		if (sjis[sjisPos] == ' ')
 			break;
-		leading++;
-		if (leading > 8)
-			return true;
-		if ((nshort[leading - 1] == '_') && (*utf8name != '_'))
-			return true;
+		sjisPos += sjis_to_utf16chr(sjis + sjisPos, 8 - sjisPos, toLower & LCASE_BASE,
+			utf16 + utf16Pos);
+		++utf16Pos;
 	}
 
-	if (*utf8name != 0) {
-		utf8name++;
-
-		for ( ; *utf8name != 0; utf8name++) {
-			if (!BEGINS_UTF8CHAR(*utf8name)) continue;
-			if (*utf8name == '.') return true;
-			trailing++;
-			if (trailing > 3) return true;
-			if ((nshort[leading + trailing - 1] == '_') && (*utf8name != '_')) return true;
+	if (sjis[8] != ' ') {
+		utf16[utf16Pos++] = '.';
+		sjisPos = 8;
+		while (sjisPos < 11) {
+			if (sjis[sjisPos] == ' ')
+				break;
+			sjisPos += sjis_to_utf16chr(sjis + sjisPos, 11 - sjisPos, toLower & LCASE_EXT,
+				utf16 + utf16Pos);
+			++utf16Pos;
 		}
 	}
 
-	for (i = 0, len = 0; i < 8; i++)
-		if (nshort[i] != ' ') len++;
-	if (len != leading) return true;
+	utf16[utf16Pos++] = 0;
+	ssize_t outBytes = UTF16HE_TO_UTF8(utf16, utf16Pos, reinterpret_cast<char*>(utf8), 35);
 
-	for (i = 8, len = 0; i < 11; i++)
-		if (nshort[i] != ' ') len++;
-	if (len != trailing) return true;
+	return outBytes - 1;
+}
+
+
+/*!	Check a string for Japanese characters that can be represented in the SJIS code page.
+	@return True if there is at least one Japanese character in the string.
+*/
+bool
+utf8_contains_japanese(const u_char* utf8, size_t utf8Len)
+{
+	uint16 utf16[B_FILE_NAME_LENGTH + 1];
+	UTF8_TO_UTF16HE(reinterpret_cast<const char*>(utf8), &utf8Len, utf16, B_FILE_NAME_LENGTH + 1,
+		NULL, true);
+	for (uint32 i = 0; utf16[i] != 0; ++i) {
+		if (utf16[i] >= 0x3000) {
+			if (is_unicode_japanese(utf16[i]))
+				return true;
+		}
+	}
 
 	return false;
 }
 
-#ifdef USER
 
-int main(int argc, char **argv)
+/*!	Check whether a long file name is consistent with the scheme the old BSD fallback code
+	used to write long file name entries if given UTF-8, vice ISO 8859-1, input.
+	@param longName A little-endian UTF-16 name.
+	@param nameUnits The length of \a longName, in words.
+	@return If false, \a longName was not written by the BSD fallback code. If true, it may or
+	may not have been.
+*/
+bool
+possibly_miscoded_longname(uint8* longName, size_t nameUnits)
 {
-	int i;
+	size_t nameBytes = nameUnits * 2;
 
-	for (i=1;i<argc;i++) {
-		char unicode[512];
-		status_t result;
-		result = utf8_to_unicode(argv[i], (uchar*)unicode, 512);
-		printf("result of %s = %" B_PRIi32 " ", argv[i], result);
-		if (result > 0) {
-			char nshort[11];
-			int enc;
-			result = generate_short_name((uchar*)argv[i], (uchar*)unicode, result, (uchar*)nshort,
-				&enc);
-			printf("short [%s] ", nshort);
-			munge_short_name1((uchar*)nshort, 1234, MS_DOS_CONVERSION);
-			printf("munged [%s] ", nshort);
-			printf("long name: %x\n", requires_long_name(argv[i], (uchar*)unicode));
-		}
-		printf("\n");
+	// if it was written by the fallback code, all high bytes will be zero
+	for (uint32 i = 1; i < nameBytes; i += 2) {
+		if (longName[i] != 0)
+			return false;
 	}
 
-	return 0;
+	// if written by the fallback code, the low bytes will look like UTF-8
+	bool foundMultibyte = false;
+	for (uint32 i = 0; i < nameBytes;) {
+		if (begins_utf8_multibyte_char(longName[i])) {
+			// longName[i] looks like the start of a multibyte UTF-8 character
+			foundMultibyte = true;
+			uint32 expectedWords = utf8_char_len(longName[i]);
+			uint32 actualWords = expectedWords;
+			for (uint32 j = i + 2; j < i + expectedWords * 2; j += 2) {
+				if (j >= nameBytes || BEGINS_UTF8CHAR(longName[j])) {
+					actualWords = (j - i) / 2;
+					break;
+				}
+			}
+			if (actualWords == expectedWords)
+				i += actualWords * 2;
+			else
+				return false;
+		} else if BEGINS_UTF8CHAR(longName[i]) {
+			// looks like a single-byte UTF-8 char
+			i += 2;
+		} else {
+			// something else
+			return false;
+		}
+	}
+
+	// if the name consists of only ASCII characters, no correction is needed
+	if (!foundMultibyte)
+		return false;
+
+	return true;
 }
 
-#endif
+
+/*!	Repair an incorrectly encoded long file name. It should only be used on badly encoded names.
+	Usually, it can tell that a name is already correct and leave it untouched, but this is not
+	guaranteed.
+	@param name The UTF-8 translation of a long file name that was miscoded. May or may not
+	be NULL-termindated (for compatability with mbnambuf).
+	@return B_OK if conversion was successful. B_CANCELED if \a name is obviously not miscoded.
+	@post If B_OK was returned, \a name has been updated to the UTF-8 string that would have been
+	obtained when the long name was read, if the long name had been written to disk in correct
+	UTF-16. The output name is only NULL-terminated if the input name was.
+*/
+status_t
+fix_miscoded_longname(char* name, size_t nameLength, size_t bufferSize)
+{
+	char fixed[B_FILE_NAME_LENGTH + 1];
+
+	// undo the UTF-16 to UTF-8 routine to recreate the name as it was stored on disk
+	uint16 utf16[WIN_MAXLEN + 1];
+	ssize_t written = UTF8_TO_UTF16HE(name, &nameLength, utf16, WIN_MAXLEN + 1, NULL, true);
+	if (written < 0)
+		return written;
+
+	if (possibly_miscoded_longname(reinterpret_cast<uint8*>(utf16), written) == false)
+		return B_CANCELED;
+
+	// In miscoded names, the low byte of each UTF-16 unit reflects the original UTF-8 string.
+	// Use these bytes to reconstruct it.
+	for (int32 i = 0; i < written && i < B_FILE_NAME_LENGTH + 1; ++i) {
+		// all high bytes must be zero if we passed the above check
+		ASSERT(utf16[i] <= UCHAR_MAX);
+		fixed[i] = static_cast<char>(utf16[i]);
+	}
+
+	// make another attempt to catch already-valid names that should be left alone
+	uint16 utf16Check[WIN_MAXLEN + 1];
+	ssize_t writtenCheck;
+	size_t fixedLength = strlen(fixed);
+	writtenCheck = UTF8_TO_UTF16HE(fixed, &fixedLength, utf16Check, WIN_MAXLEN + 1, NULL, true);
+	for (int32 i = 0; i < writtenCheck; ++i) {
+		if (utf16Check[i] == 0xFFFD) {
+			// the 'fixed' name contains malformed UTF-8, probably the result of trying to fix
+			// an already-valid name
+			return B_CANCELED;
+		}
+	}
+
+	strlcpy(name, fixed, bufferSize);
+
+	return B_OK;
+}
+
+
+status_t
+fix_miscoded_mbnambuf(struct mbnambuf* mbnambuf)
+{
+	char* slot = &mbnambuf->nb_buf[mbnambuf->nb_last_id * WIN_CHARS];
+		// don't start at index zero, these names are built backwards starting at the end
+	size_t slotSpace = MISCODED_UTF8_SIZE - (slot - mbnambuf->nb_buf);
+
+	status_t status = fix_miscoded_longname(slot, mbnambuf->nb_len, slotSpace);
+	if (status != B_OK)
+		return B_ERROR;
+	mbnambuf->nb_len = strlen(slot);
+
+	return B_OK;
+}

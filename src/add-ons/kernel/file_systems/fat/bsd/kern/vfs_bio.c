@@ -210,6 +210,12 @@ bawrite(struct buf* bp)
 void
 brelse(struct buf* bp)
 {
+	struct mount* bsdVolume;
+	struct msdosfsmount* fatVolume;
+	void* blockCache;
+	off_t cachedBlock;
+	bool readOnly;
+
 	if (bp == NULL)
 		return;
 
@@ -218,11 +224,11 @@ brelse(struct buf* bp)
 		return;
 	}
 
-	struct mount* bsdVolume = bp->b_vp->v_rdev->si_mountpt;
-	struct msdosfsmount* fatVolume = (struct msdosfsmount*)bsdVolume->mnt_data;
-	void* blockCache = bsdVolume->mnt_cache;
-	off_t cachedBlock = BLOCK_TO_SECTOR(fatVolume, bp->b_blkno);
-	bool readOnly = MOUNTED_READ_ONLY(VFSTOMSDOSFS(bsdVolume));
+	bsdVolume = bp->b_vp->v_rdev->si_mountpt;
+	fatVolume = (struct msdosfsmount*)bsdVolume->mnt_data;
+	blockCache = bsdVolume->mnt_cache;
+	cachedBlock = BLOCK_TO_SECTOR(fatVolume, bp->b_blkno);
+	readOnly = MOUNTED_READ_ONLY(VFSTOMSDOSFS(bsdVolume));
 
 	if (bp->b_owned == false) {
 		if (readOnly == true)

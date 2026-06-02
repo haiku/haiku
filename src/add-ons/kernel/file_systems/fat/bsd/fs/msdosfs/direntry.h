@@ -138,7 +138,9 @@ struct winentry {
 struct mbnambuf {
 	size_t	nb_len;
 	int	nb_last_id;
-	char	nb_buf[WIN_MAXLEN + 1];
+#define MISCODED_UTF8_SIZE (WIN_MAXLEN * 2 + 1)
+	// Haiku port: larger buffer to allow handling of some miscoded filenames
+	char	nb_buf[MISCODED_UTF8_SIZE];
 };
 
 struct dirent;
@@ -157,8 +159,12 @@ int	winChkName(struct mbnambuf *nbp, const u_char *un, size_t unlen,
 	    int chksum, struct msdosfsmount *pmp);
 int	win2unixfn(struct mbnambuf *nbp, struct winentry *wep, int chksum,
 	    struct msdosfsmount *pmp);
+
 uint8_t winChksum(uint8_t *name);
 int	winSlotCnt(const u_char *un, size_t unlen, struct msdosfsmount *pmp);
 size_t	winLenFixup(const u_char *un, size_t unlen);
+
+extern const u_char unix2dos[256];
+extern const u_char u2l[256];
 #endif	/* _KERNEL */
 #endif	/* !_FS_MSDOSFS_DIRENTRY_H_ */

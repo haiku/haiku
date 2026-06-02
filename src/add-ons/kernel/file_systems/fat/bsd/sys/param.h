@@ -59,15 +59,11 @@
 #define EJUSTRETURN (-2) /* don't modify regs, just return */
 
 /* Macros for counting and rounding. */
-#ifndef rounddown
+#ifdef FS_SHELL
 #define rounddown(x, y) (((x) / (y)) * (y))
-#endif
-#ifndef roundup
-#define roundup(x, y) ((((x) + ((y) -1)) / (y)) * (y)) /* to any y */
-#endif
-#ifndef powerof2
+#define roundup(x, y) ((((x) + ((y) - 1)) / (y)) * (y)) /* to any y */
 #define powerof2(x) ((((x) -1) & (x)) == 0)
-#endif
+#endif // FS_SHELL
 
 
 #endif // FAT_PARAM_H

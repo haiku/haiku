@@ -3,12 +3,24 @@
 # This file should be moved to the directory
 # /boot/home/config/settings/kernel/drivers/
 #
-# OEM code page:
+
+# kernel code page:
+# 0 = always use code page 850 to encode and decode short file names
+# 1 = (default) use CP 850 to encode short file names unless Japanese characters are found
+#     in the file name, in which case use SJIS; always use CP 850 to decode short names
+#     since the driver cannot detect the code page in which a short name was encoded
+# 2 = always use SJIS to encode and decode short file names
+# Most users will not need to adjust this setting. Usually the short file name is ignored
+# when a long file name is found.
+# This setting does not affect the FAT userlandfs module.
+kernel_code_page 1
+
+# userlandfs code page:
 # Code page to use for DOS short filenames in the FAT userlandfs module.
 # Back up your data before changing this setting.
-# Has no effect on the regular FAT driver or FAT shell, which always use CP850.
-# If not set, defaults to CP1252.
-OEM_code_page CP1252
+# This setting does not affect the FAT kernel driver or FAT shell.
+# If not set, defaults to CP 1252.
+userland_code_page CP1252
 
 # sync mode:
 # 0 = (default) no sync after each operation

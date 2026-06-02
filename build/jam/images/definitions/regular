@@ -12,6 +12,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 	clipboard
 	CortexAddOnHost
 	dpms
+	fatfixname
 	FirstBootPrompt
 	<bin>i2c@x86,x86_64
 	installsound

@@ -1,0 +1,29 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems fat ;
+
+include [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems fat JamCommon ] ;
+
+SEARCH_SOURCE += $(fatTop) ;
+SEARCH_SOURCE += [ FDirName $(fatTop) bsd fs msdosfs ] ;
+
+local defines = [ FDefines TEST USER=1 ] ;
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+UsePrivateKernelHeaders ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+SimpleTest fat_shortname_test :
+	fat_shortname.cpp
+	encodings.cpp
+	encodings_bsd.cpp
+	msdosfs_conv.c
+	: libkernelland_emu.so
+;
+
+SimpleTest fat_longname_test :
+	fat_longname.cpp
+	encodings.cpp
+	encodings_bsd.cpp
+	msdosfs_conv.c
+	: libkernelland_emu.so [ TargetLibstdc++ ]
+;

@@ -29,18 +29,15 @@
 #define WITH_FLOPPY_SUPPORT
 
 
+/*!	Create a volume name directory entry in the 512 byte sector.
+	@param label A space-padded OEM array of size LABEL_LENGTH.
+*/
 static void
-create_volume_label_sector(void *sector, const char *label)
+create_volume_label_sector(void* sector, const uint8* label)
 {
-	// create a volume name directory entry in the 512 byte sector
-	// XXX convert from UTF8, and check for valid characters
-	// XXX this could be changed to use long file name entrys,
-	// XXX but the dosfs would have to be updated, too
-
 	struct direntry* d = (struct direntry*)sector;
 	memset(d, 0, sizeof(*d));
-	memset(d->deName, 0x20, 11);
-	memcpy(d->deName, label, min_c(11, strlen(label)));
+	memcpy(d->deName, label, LABEL_LENGTH);
 	d->deAttributes = 0x08;
 }
 
@@ -99,9 +96,9 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 	update_disk_device_job_progress(job, 0);
 
 	int fatbits = parameters.fatBits;
-	char label[LABEL_CSTRING];
-	strlcpy(label, name, LABEL_CSTRING);
-	status = label_to_fat(label);
+
+	uint8 fatLabel[LABEL_LENGTH];
+	status = label_to_fat(name, fatLabel, NULL);
 	if (status != B_OK)
 		return status;
 
@@ -396,9 +393,10 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 
 	dprintf("dosfs: fatbits = %d, clustersize = %d\n", fatbits, sectorPerCluster * sectorSize);
 	dprintf("dosfs: FAT size is %" B_PRIu32 " sectors\n", FATSize);
-	dprintf("dosfs: disk label: %s\n", label);
-
-
+	dprintf("dosfs: disk label: [ ");
+	for (int i = 0; i < LABEL_LENGTH; ++i)
+		dprintf("%c ", fatLabel[i]);
+	dprintf("]\n");
 
 	if (status < B_OK) {
 		dprintf("dosfs: Initializing volume failed: %s\n", strerror(status));
@@ -443,7 +441,7 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 		uint32 volID = B_HOST_TO_LENDIAN_INT32(system_time());
 		memcpy(bs->BS_VolID, &volID, 4);
 		memset(bs->BS_VolLab, 0x20, 11);
-		memcpy(bs->BS_VolLab, label, min_c(11, strlen(label)));
+		memcpy(bs->BS_VolLab, fatLabel, LABEL_LENGTH);
 		memcpy(bs->BS_FilSysType,"FAT32   ",8);
 		bs->signature = B_HOST_TO_LENDIAN_INT16(0xAA55);
 	} else {
@@ -474,7 +472,7 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 		uint32 volID = B_HOST_TO_LENDIAN_INT32(system_time());
 		memcpy(bs->BS_VolID, &volID, 4);
 		memset(bs->BS_VolLab, 0x20, 11);
-		memcpy(bs->BS_VolLab, label, min_c(11, strlen(label)));
+		memcpy(bs->BS_VolLab, fatLabel, LABEL_LENGTH);
 		memcpy(bs->BS_FilSysType,(fatbits == 12) ? "FAT12   " : "FAT16   ",8);
 		bs->signature = B_HOST_TO_LENDIAN_INT16(0xAA55);
 	}
@@ -599,7 +597,7 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 	if (fatbits == 12 || fatbits == 16) {
 		uint8 data[512];
 		memset(data, 0, 512);
-		create_volume_label_sector(data, label);
+		create_volume_label_sector(data, fatLabel);
 		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize);
 		written = write_pos(fd, rootDirSector * sectorSize, data, 512);
 		if (written != 512) {
@@ -611,7 +609,7 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 		int size = sectorSize * sectorPerCluster;
 		uint8 *cluster = (uint8*)malloc(size);
 		memset(cluster, 0, size);
-		create_volume_label_sector(cluster, label);
+		create_volume_label_sector(cluster, fatLabel);
 		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize)
 			+ rootDirSectors;
 		written = write_pos(fd, rootDirSector * sectorSize, cluster, size);

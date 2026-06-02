@@ -10,6 +10,7 @@
 #ifdef FS_SHELL
 #include "fssh_defines.h"
 #else
+#include <Drivers.h>
 #include <SupportDefs.h>
 #endif
 
@@ -28,6 +29,9 @@
 
 // true only for the root directory in a FAT12/FAT16 volume
 #define IS_FIXED_ROOT(fatNode) ((fatNode)->de_StartCluster == 0)
+
+// the first cluster of the root dir for FAT32, or 0 for FAT12/16
+#define ROOTCLUSTER(fatVolume) (FAT32((fatVolume)) ? (fatVolume)->pm_rootdirblk : MSDOSFSROOT)
 
 #define SECTORS_PER_CLUSTER(fat_volume) \
 	((fat_volume->pm_bpcluster) / (fat_volume->pm_BlkPerSec * DEV_BSIZE))
@@ -68,16 +72,25 @@
 #define _GENERIC_DIRLEN(namlen) ((offsetof(struct dirent, d_name) + (namlen) + 1 + 7) & ~7)
 #define GENERIC_DIRSIZ(dp) _GENERIC_DIRLEN(strlen((dp)->d_name))
 
+// Print a list of entries in a given directory to the system log.
+#define FAT_IOCTL_DUMP_DIR (B_DEVICE_OP_CODES_END + 1)
+// Return the host-endian UTF-16 long file name (bypassing the usual translation to UTF-8).
+// If the node being queried is a directory file, its UTF-8 name must be passed as input in the
+// ioctl buffer argument.
+#define FAT_IOCTL_GET_UTF16_LONGNAME (B_DEVICE_OP_CODES_END + 2)
+
+
 struct mount;
 struct vnode;
 struct fs_vnode_ops;
 struct fs_volume_ops;
 
+struct msdosfsmount;
+struct winentry;
+struct mbnambuf;
 
 enum FatType { fat12, fat16, fat32 };
 
-
-extern const char* LABEL_ILLEGAL;
 extern struct fs_vnode_ops gFATVnodeOps;
 extern struct fs_volume_ops gFATVolumeOps;
 
@@ -91,6 +104,7 @@ status_t _dosfs_access(const struct mount* bsdVolume, const struct vnode* bsdNod
 status_t assign_inode(struct mount* volume, ino_t* inode);
 bool node_exists(struct mount* bsdVolume, uint64_t inode);
 status_t discard_clusters(struct vnode* bsdNode, off_t newLength);
+bool is_filename_legal(const char* name, bool permissive, bool* strictlyLegal);
 #ifdef __cplusplus
 }
 #endif

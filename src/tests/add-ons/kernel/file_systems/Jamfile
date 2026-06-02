@@ -4,6 +4,7 @@ HaikuSubInclude bfs ;
 HaikuSubInclude btrfs ;
 HaikuSubInclude cdda ;
 HaikuSubInclude exfat ;
+HaikuSubInclude fat ;
 HaikuSubInclude iso9660 ;
 HaikuSubInclude shared ;
 HaikuSubInclude udf ;

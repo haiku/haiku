@@ -1,0 +1,26 @@
+SubDir HAIKU_TOP src bin fat_tools ;
+
+include [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems fat JamCommon ] ;
+
+SEARCH_SOURCE += $(fatTop) ;
+SEARCH_SOURCE += [ FDirName $(fatTop) bsd fs msdosfs ] ;
+
+local defines = [ FDefines TOOL USER=1 ] ;
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+UsePrivateKernelHeaders ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+Application fatdumpdir :
+	fatdumpdir.cpp
+	: libkernelland_emu.so [ TargetLibstdc++ ]
+;
+
+Application fatfixname :
+	fatfixname.cpp
+	encodings.cpp
+	encodings_bsd.cpp
+	msdosfs_conv.c
+	: libkernelland_emu.so be [ TargetLibstdc++ ]
+;
