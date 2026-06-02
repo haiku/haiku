@@ -494,13 +494,8 @@ Model::OpenNodeCommon(bool writable)
 #if DEBUG
 			PrintToStream();
 #endif
-			TRESPASS();
-				// this can only happen if GetStat failed before,
-				// in which case we shouldn't be here
-
-			// ToDo: Obviously, we can also be here if the type could not
-			// be determined, for example for block devices (so the TRESPASS()
-			// macro shouldn't be used here)!
+			// Unhandled node type (for example, a device or a fifo pipe)
+			// TODO: handle and display them in some form
 			return fStatus = B_ERROR;
 	}
 
