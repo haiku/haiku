@@ -1443,8 +1443,7 @@ hda_audio_group_get_widgets(hda_audio_group* audioGroup, hda_stream* stream)
 		}
 
 		if (widget.type != type || (widget.flags & flags) == 0
-			|| (widget.capabilities.audio
-				& (AUDIO_CAP_STEREO | AUDIO_CAP_DIGITAL)) != AUDIO_CAP_STEREO
+			|| (widget.capabilities.audio & AUDIO_CAP_STEREO) == 0
 			|| widget.d.io.formats == 0)
 			continue;
 
