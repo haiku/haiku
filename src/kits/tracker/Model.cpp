@@ -1507,8 +1507,14 @@ Model::PrintToStream(int32 level, bool deep)
 		PRINT(("symlink to:\n"));
 		tmp.PrintToStream();
 	}
+
+#if 0
+	// Results in infinite recursion through TrackIconSource -> BModelOpener
+	// -> ModelNodeLatyOpener -> ModelNodeLazyOpener::OpenNode -> OpenNode -> OpenNodeCommon
+	// -> PrintToStream
 	TrackIconSource(B_MINI_ICON);
 	TrackIconSource(B_LARGE_ICON);
+#endif
 }
 
 
