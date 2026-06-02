@@ -779,7 +779,6 @@ VideoProducer::_FrameGeneratorThread()
 						wasCached = true;
 							// Don't send the buffer: we don't have a buffer
 						err = B_OK;
-						running = false;
 					}
 					// Send the buffer on down to the consumer
 					if (wasCached || ((err = SendBuffer(buffer, fOutput.source,
