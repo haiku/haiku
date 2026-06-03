@@ -492,6 +492,11 @@ scheduler_reschedule(int32 nextState)
 		return;
 	}
 
+	if (thread_get_current_thread()->cpu->reschedule_disabled) {
+		ASSERT(nextState == B_THREAD_READY);
+		return;
+	}
+
 	reschedule(nextState);
 }
 

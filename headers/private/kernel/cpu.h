@@ -54,6 +54,7 @@ typedef struct CACHE_LINE_ALIGN cpu_ent {
 
 	// used to force a reschedule at quantum expiration time
 	bool			preempted;
+	bool			reschedule_disabled;
 	timer			quantum_timer;
 
 	// keeping track of CPU activity
