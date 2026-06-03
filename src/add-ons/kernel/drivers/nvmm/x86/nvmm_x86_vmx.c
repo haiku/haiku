@@ -180,30 +180,13 @@ vmx_vmclear(paddr_t *pa)
 static inline void
 vmx_cli(void)
 {
-#if defined(__HAIKU__)
-	/*
-	 * vmx_cli() and vmx_sti() are only called from vmx_vcpu_run(). They
-	 * are called after vmx_vmcs_enter() (which disables preemption) and
-	 * before vmx_vmcs_leave() (which enables preemption). In Haiku we
-	 * need to disable interrupts to disable preemption, so if we leave
-	 * this code unmodified the call to vmx_sti() would enable preemption
-	 * before vmx_vmcs_leave() is called, when it should be still disabled.
-	 */
-	OS_ASSERT(!interrupts_enabled());
-	__asm volatile("" ::: "memory");
-#else
 	__asm volatile ("cli" ::: "memory");
-#endif
 }
 
 static inline void
 vmx_sti(void)
 {
-#if defined(__HAIKU__)
-	__asm volatile("" ::: "memory");
-#else
 	__asm volatile ("sti" ::: "memory");
-#endif
 }
 
 #define MSR_IA32_FEATURE_CONTROL	0x003A
@@ -2473,11 +2456,6 @@ vmx_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		if (exit->reason != NVMM_VCPU_EXIT_NONE) {
 			break;
 		}
-
-#if defined(__HAIKU__)
-		// FIXME: ugly hack
-		break;
-#endif
 	}
 
 	cpudata->vmcs_launched = launched;

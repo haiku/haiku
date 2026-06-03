@@ -361,10 +361,9 @@ void os_cpuset_setrunning(os_cpuset_t *cpuset);
 #define os_preempt_enable()	crit_exit()
 #define os_preempt_disabled()	(curthread->td_critcount != 0)
 #elif defined(__HAIKU__)
-extern cpu_status *interrupt_status;
-#define os_preempt_disable()	interrupt_status[haiku_smp_get_current_cpu()] = disable_interrupts()
-#define os_preempt_enable()	restore_interrupts(interrupt_status[haiku_smp_get_current_cpu()])
-#define os_preempt_disabled()	!interrupts_enabled()
+void os_preempt_disable();
+void os_preempt_enable();
+bool os_preempt_disabled();
 #endif
 
 /* Asserts. */
@@ -415,6 +414,7 @@ void		os_pa_free(paddr_t);
 int		os_contigpa_zalloc(paddr_t *, vaddr_t *, size_t);
 void		os_contigpa_free(paddr_t, vaddr_t, size_t);
 
+#ifndef __HAIKU__
 static inline bool
 os_return_needed(void)
 {
@@ -434,14 +434,14 @@ os_return_needed(void)
 		return true;
 	}
 	return false;
-#elif defined(__HAIKU__)
-	// FIXME.
-	return false;
 #endif
 }
+#endif
 
 // Haiku auxiliary functions
 #if defined(__HAIKU__)
+bool os_return_needed();
+
 int haiku_get_xsave_mask();
 
 int32 haiku_smp_get_current_cpu();
@@ -540,11 +540,11 @@ os_ipi_broadcast(void (*func)(void *, int), void *arg)
 	call_all_cpus_sync(func, arg);
 }
 
-int haiku_thread_bind();
-void haiku_thread_unbind();
+int haiku_thread_pin();
+void haiku_thread_unpin();
 
-#define curlwp_bind()		haiku_thread_bind()
-#define curlwp_bindx(bound)	haiku_thread_unbind()
+#define curlwp_bind()		haiku_thread_pin()
+#define curlwp_bindx(bound)	haiku_thread_unpin()
 
 #endif /* __NetBSD__ */
 

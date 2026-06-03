@@ -112,7 +112,7 @@ os_ipi_unicast(os_cpu_t *cpu, void (*func)(void *, int), void *arg)
 
 
 extern "C" int
-haiku_thread_bind()
+haiku_thread_pin()
 {
 	thread_pin_to_current_cpu(thread_get_current_thread());
 	return 0;
@@ -120,9 +120,39 @@ haiku_thread_bind()
 
 
 extern "C" void
-haiku_thread_unbind()
+haiku_thread_unpin()
 {
 	thread_unpin_from_current_cpu(thread_get_current_thread());
+}
+
+
+extern "C" void
+os_preempt_disable()
+{
+	thread_get_current_thread()->cpu->reschedule_disabled = true;
+}
+
+
+extern "C" void
+os_preempt_enable()
+{
+	thread_get_current_thread()->cpu->reschedule_disabled = false;
+	if (os_return_needed())
+		scheduler_reschedule_if_necessary();
+}
+
+
+extern "C" bool
+os_preempt_disabled()
+{
+	return thread_get_current_thread()->cpu->reschedule_disabled;
+}
+
+
+extern "C" bool
+os_return_needed()
+{
+	return thread_get_current_thread()->cpu->invoke_scheduler;
 }
 
 
@@ -216,7 +246,6 @@ struct haiku_cpuset {
 };
 
 os_vmmap_t *os_kernel_map;
-cpu_status *interrupt_status;
 
 
 extern "C" void *
@@ -662,7 +691,6 @@ status_t
 init_driver(void)
 {
 	status_t status;
-	int32 n_cpus;
 	if (nvmm_init())
 		return B_ERROR;
 
@@ -673,18 +701,6 @@ init_driver(void)
 	}
 
 	os_kernel_map->address_space = VMAddressSpace::Kernel();
-
-	n_cpus = smp_get_num_cpus();
-	if (n_cpus <= 0) {
-		status = B_BAD_VALUE;
-		goto err2;
-	}
-
-	interrupt_status = (cpu_status *)malloc(n_cpus * sizeof(cpu_status));
-	if (interrupt_status == NULL) {
-		status = B_NO_MEMORY;
-		goto err2;
-	}
 
 	TRACE_ALWAYS("nvmm: init_driver OK\n");
 	return B_OK;
@@ -703,5 +719,4 @@ uninit_driver(void)
 	TRACE_ALWAYS("nvmm: uninit_driver\n");
 	nvmm_fini();
 	free(os_kernel_map);
-	free(interrupt_status);
 }
