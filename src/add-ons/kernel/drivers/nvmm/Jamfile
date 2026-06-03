@@ -21,6 +21,7 @@ KernelAddon nvmm :
 	nvmm_x86_vmx.c
 	nvmm_x86_vmxfunc.S
 	nvmm_x86_svm.c
+	nvmm_x86_svmfunc.S
 	
 	nvmm_haiku.cpp
 	VMVirtualAddressSpace.cpp

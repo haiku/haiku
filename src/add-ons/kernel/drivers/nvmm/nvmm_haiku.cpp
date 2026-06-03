@@ -32,6 +32,7 @@ extern "C" {
 #include "VMVirtualAddressSpace.h"
 
 #include <paging/nested/X86VMTranslationMapEPT.h>
+#include <paging/nested/X86VMTranslationMapRVI.h>
 
 
 extern "C" void
@@ -281,9 +282,19 @@ os_vmspace_create(vaddr_t vmin, vaddr_t vmax)
 	os_vmspace_t *ret = (os_vmspace_t *)os_mem_alloc(sizeof(os_vmspace_t));
 	if (ret == NULL)
 		return NULL;
-		
-	X86VMTranslationMapEPT *translationMap = new(std::nothrow) X86VMTranslationMapEPT;
-	status_t status = translationMap->Init();
+
+	X86VMTranslationMap *translationMap = NULL;
+	status_t status = B_ERROR;
+	if (nvmm_impl == &nvmm_x86_vmx) {
+		X86VMTranslationMapEPT *map = new(std::nothrow) X86VMTranslationMapEPT;
+		status = map->Init();
+		translationMap = map;
+	} else if (nvmm_impl == &nvmm_x86_svm) {
+		X86VMTranslationMapRVI *map = new(std::nothrow) X86VMTranslationMapRVI;
+		status = map->Init();
+		translationMap = map;
+	}
+
 	if (status != B_OK) {
 		delete translationMap;
 		os_mem_free(ret, sizeof(os_vmspace_t));

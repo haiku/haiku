@@ -39,8 +39,11 @@
 #include "../nvmm_internal.h"
 #include "nvmm_x86.h"
 
-#if 0
+#ifdef __HAIKU__
+void svm_vmrun(paddr_t, uint64_t *, uint64_t *);
+#else
 void svm_vmrun(paddr_t, uint64_t *);
+#endif
 
 static inline void
 svm_clgi(void)
@@ -53,7 +56,6 @@ svm_stgi(void)
 {
 	__asm volatile ("stgi" ::: "memory");
 }
-#endif
 
 #define	MSR_VM_HSAVE_PA	0xC0010117
 
@@ -343,6 +345,10 @@ struct vmcb_ctrl {
 	uint64_t exitcode;
 	uint64_t exitinfo1;
 	uint64_t exitinfo2;
+#ifdef __HAIKU__
+#define PGEX_W		0x02	/* during a Write cycle */
+#define PGEX_I		0x10	/* during an instruction fetch */
+#endif
 
 	uint64_t exitintinfo;
 #define VMCB_CTRL_EXITINTINFO_VECTOR	__BITS(7,0)
@@ -542,7 +548,6 @@ static uint64_t svm_xcr0_mask __read_mostly;
 
 /* -------------------------------------------------------------------------- */
 
-#if 0
 struct svm_machdata {
 	volatile uint64_t mach_htlb_gen;
 };
@@ -833,13 +838,11 @@ svm_inkernel_advance(struct vmcb *vmcb)
 	vmcb->ctrl.intr &= ~VMCB_CTRL_INTR_SHADOW;
 }
 
-#endif
 #define SVM_CPUID_MAX_BASIC		0xD
 #define SVM_CPUID_MAX_HYPERVISOR	0x40000000
 #define SVM_CPUID_MAX_EXTENDED		0x8000001F
 static uint32_t svm_cpuid_max_basic __read_mostly;
 static uint32_t svm_cpuid_max_extended __read_mostly;
-#if 0
 
 static void
 svm_inkernel_exec_cpuid(struct svm_cpudata *cpudata, uint32_t eax, uint32_t ecx)
@@ -1377,10 +1380,8 @@ svm_exit_invalid(struct nvmm_vcpu_exit *exit, uint64_t code)
 	exit->reason = NVMM_VCPU_EXIT_INVALID;
 }
 
-#endif // 0
 /* -------------------------------------------------------------------------- */
 
-#if 0
 static void
 svm_vcpu_guest_fpu_enter(struct nvmm_cpu *vcpu)
 {
@@ -1472,11 +1473,9 @@ svm_vcpu_guest_misc_leave(struct nvmm_cpu *vcpu)
 	wrmsr(MSR_FSBASE, cpudata->hstate.fsbase);
 	wrmsr(MSR_KERNELGSBASE, cpudata->hstate.kernelgsbase);
 }
-#endif
 
 /* -------------------------------------------------------------------------- */
 
-#if 0
 static inline void
 svm_gtlb_catchup(struct nvmm_cpu *vcpu, int hcpu)
 {
@@ -1637,7 +1636,7 @@ svm_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		}
 #endif
 
-		svm_vmrun(cpudata->vmcb_pa, cpudata->gprs);
+		svm_vmrun(cpudata->vmcb_pa, cpudata->gprs, os_curcpu_gdt());
 		svm_htlb_flush_ack(cpudata, machgen);
 		svm_vcpu_guest_fpu_leave(vcpu);
 		svm_stgi();
@@ -1741,11 +1740,9 @@ svm_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 
 	return error;
 }
-#endif
 
 /* -------------------------------------------------------------------------- */
 
-#if 0
 #define SVM_MSRBM_READ	__BIT(0)
 #define SVM_MSRBM_WRITE	__BIT(1)
 
@@ -2121,11 +2118,9 @@ svm_vcpu_state_commit(struct nvmm_cpu *vcpu)
 	vcpu->comm->state_commit = 0;
 	svm_vcpu_setstate(vcpu);
 }
-#endif // 0
 
 /* -------------------------------------------------------------------------- */
 
-#if 0
 static void
 svm_asid_alloc(struct nvmm_cpu *vcpu)
 {
@@ -2373,11 +2368,9 @@ svm_vcpu_destroy(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 
 	os_pagemem_free(cpudata, sizeof(*cpudata));
 }
-#endif
 
 /* -------------------------------------------------------------------------- */
 
-#if 0
 static int
 svm_vcpu_configure_cpuid(struct svm_cpudata *cpudata, void *data)
 {
@@ -2445,11 +2438,9 @@ svm_vcpu_configure(struct nvmm_cpu *vcpu, uint64_t op, void *data)
 		return EINVAL;
 	}
 }
-#endif
 
 /* -------------------------------------------------------------------------- */
 
-#if 0
 #ifdef __NetBSD__
 static void
 svm_tlb_flush(struct pmap *pm)
@@ -2500,7 +2491,6 @@ svm_machine_configure(struct nvmm_machine *mach, uint64_t op, void *data)
 {
 	panic("%s: impossible", __func__);
 }
-#endif // 0
 
 /* -------------------------------------------------------------------------- */
 
@@ -2728,7 +2718,7 @@ const struct nvmm_impl nvmm_x86_svm = {
 	.ident = svm_ident,
 	.init = svm_init,
 	.fini = svm_fini,
-	.capability = svm_capability/*,
+	.capability = svm_capability,
 	.mach_conf_max = NVMM_X86_MACH_NCONF,
 	.mach_conf_sizes = NULL,
 	.vcpu_conf_max = NVMM_X86_VCPU_NCONF,
@@ -2743,5 +2733,5 @@ const struct nvmm_impl nvmm_x86_svm = {
 	.vcpu_setstate = svm_vcpu_setstate,
 	.vcpu_getstate = svm_vcpu_getstate,
 	.vcpu_inject = svm_vcpu_inject,
-	.vcpu_run = svm_vcpu_run*/
+	.vcpu_run = svm_vcpu_run
 };

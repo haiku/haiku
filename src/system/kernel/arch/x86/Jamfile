@@ -45,6 +45,7 @@ if $(TARGET_ARCH) = x86_64 {
 		# paging/nested
 		X86PagingMethodEPT.cpp
 		X86VMTranslationMapEPT.cpp
+		X86VMTranslationMapRVI.cpp
 	;
 } else {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 32 ] ;

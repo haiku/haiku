@@ -34,12 +34,15 @@
 #define _LOCORE
 #include "assym.h"
 #include <machine/asm.h>
+#include <machine/segments.h>
 #elif defined(__DragonFly__)
 #include <machine/asmacros.h>
-#include "assym.s"
-#endif
-
 #include <machine/segments.h>
+#include "assym.s"
+#elif defined(__HAIKU__)
+#define _C_LABEL(x)	x
+#include <machine/asmacros.h>
+#endif
 
 #define ASM_NVMM
 #include "nvmm_x86.h"
@@ -76,7 +79,8 @@
 
 #define HOST_SAVE_TR		\
 	strw	%ax		;\
-	pushq	%rax
+	pushq	%rdx	;/*Haiku*/\
+	pushq	%rax	;\
 
 #if defined(__NetBSD__)
 #define HOST_RESTORE_TR				\
@@ -96,6 +100,14 @@
 	movq	PCPU(tss_gdt),%rax		;\
 	/* Clear the busy bit for reloading. */	\
 	andq	$~0x0200,4(%rax)		;\
+	ltrw	%dx
+#elif defined(__HAIKU__)
+#define HOST_RESTORE_TR				\
+	popq	%rax				;\
+	movzwq	%ax,%rdx			;\
+	popq	%rax				;\
+	/* Clear the busy bit for reloading. */	\
+	andq	$~0x0200,4(%rax,%rdx, 1)	;\
 	ltrw	%dx
 #endif
 
@@ -146,6 +158,7 @@
 /*
  * %rdi = PA of VMCB
  * %rsi = VA of guest GPR state
+ * %rdx = VA of GDT entry
  */
 ENTRY(svm_vmrun)
 	/* Save the Host GPRs. */
