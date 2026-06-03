@@ -26,6 +26,12 @@ ssize_t utf16le_to_utf8(const uint16* source, size_t sourceCodeUnitCount,
 ssize_t utf16be_to_utf8(const uint16* source, size_t sourceCodeUnitCount,
 	char* target, size_t targetLength);
 
+ssize_t utf8_to_utf16le(const char* source, size_t* sourceLength, uint16* target,
+	size_t targetUnits, uint16* surrogateOverflow, bool nullTerminate);
+
+ssize_t utf8_to_utf16be(const char* source, size_t* sourceLength, uint16* target,
+	size_t targetUnits, uint16* surrogateOverflow, bool nullTerminate);
+
 
 #ifdef __cplusplus
 };

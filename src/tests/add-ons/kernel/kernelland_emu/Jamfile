@@ -23,12 +23,14 @@ SharedLibrary libkernelland_emu.so :
 	vfs.cpp
 	vm.cpp
 
+	convertutf.cpp
 	list.cpp
 	StringHash.cpp
 
 	: be [ TargetLibstdc++ ] ;
 
 SEARCH on [ FGristFiles
+		convertutf.cpp
 		list.cpp
 		StringHash.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;

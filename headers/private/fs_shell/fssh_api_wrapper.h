@@ -27,6 +27,7 @@
 
 #include "fssh_atomic.h"
 #include "fssh_byte_order.h"
+#include "fssh_convertutf.h"
 #include "fssh_defs.h"
 #include "fssh_disk_device_defs.h"
 #include "fssh_disk_device_manager.h"
@@ -131,6 +132,15 @@
 #define __swap_int64		__fssh_swap_int64
 #define __swap_int32		__fssh_swap_int32
 #define __swap_int16		__fssh_swap_int16
+
+
+////////////////////////////////////////////////////////////////////////////////
+// #pragma mark - fssh_convertutf.h
+
+#define utf16le_to_utf8	fssh_utf16le_to_utf8
+#define utf16be_to_utf8	fssh_utf16be_to_utf8
+#define utf8_to_utf16le	fssh_utf8_to_utf16le
+#define utf8_to_utf16be	fssh_utf8_to_utf16be
 
 
 ////////////////////////////////////////////////////////////////////////////////

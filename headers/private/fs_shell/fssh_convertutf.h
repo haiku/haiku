@@ -19,11 +19,17 @@ extern "C"
 #endif
 
 
-ssize_t utf16le_to_utf8(const uint16* source, size_t sourceCodeUnitCount,
-	char* target, size_t targetLength);
+ssize_t fssh_utf16le_to_utf8(const uint16_t* source, size_t sourceCodeUnitCount, char* target,
+	size_t targetLength);
 
-ssize_t utf16be_to_utf8(const uint16* source, size_t sourceCodeUnitCount,
-	char* target, size_t targetLength);
+ssize_t fssh_utf16be_to_utf8(const uint16_t* source, size_t sourceCodeUnitCount, char* target,
+	size_t targetLength);
+
+ssize_t fssh_utf8_to_utf16le(const char* source, size_t* sourceLength, uint16_t* target,
+	size_t targetUnits, uint16_t* surrogateOverflow, bool nullTerminate);
+
+ssize_t fssh_utf8_to_utf16be(const char* source, size_t* sourceLength, uint16_t* target,
+	size_t targetUnits, uint16_t* surrogateOverflow, bool nullTerminate);
 
 
 #ifdef __cplusplus
