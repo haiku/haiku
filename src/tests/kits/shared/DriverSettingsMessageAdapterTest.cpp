@@ -83,7 +83,7 @@ AssertMessagesEqual(const BMessage& expected, const BMessage& actual)
 		if (actualType != type) {
 			int32 expectedCodeType = B_SWAP_INT32(type);
 			int32 actualCodeType = B_SWAP_INT32(actualType);
-			FailWithMessage("Expected type %4s for property %s, but found %4s",
+			FailWithMessage("Expected type %.4s for property %s, but found %.4s",
 				(char*)&expectedCodeType, name, (char*)&actualCodeType);
 		}
 		if (actualCount != count) {
