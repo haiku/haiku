@@ -1187,12 +1187,6 @@ status_t NodeManager::connect(
 		finalInput.destination.id, finalInput.destination.port));
 
 	uint32 cflags = Connection::INTERNAL;
-	if(outputRef->m_info.node.kind & B_FILE_INTERFACE) {
-		// 3aug99:
-		// workaround for bug 19990802-12798:
-		//   connections involving a file-interface node aren't removed
-		cflags |= Connection::LOCKED;
-	}
 
 	Connection* con = new Connection(
 		m_nextConID++,
