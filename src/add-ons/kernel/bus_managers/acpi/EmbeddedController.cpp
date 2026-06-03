@@ -53,6 +53,9 @@
 #define ACPI_EC_PATHID_GENERATOR "embedded_controller/path_id"
 
 
+static acpi_ec_cookie* sEarlyEc = NULL;
+
+
 uint8
 bus_space_read_1(int address)
 {
@@ -68,8 +71,7 @@ bus_space_write_1(int address, uint8 value)
 
 
 status_t
-acpi_GetInteger(acpi_device_module_info* acpi, acpi_device& acpiCookie,
-	const char* path, int* number)
+acpi_GetInteger(acpi_handle handle, const char* path, int* number)
 {
 	acpi_data buf;
 	acpi_object_type object;
@@ -78,7 +80,7 @@ acpi_GetInteger(acpi_device_module_info* acpi, acpi_device& acpiCookie,
 
 	// Assume that what we've been pointed at is an Integer object, or
 	// a method that will return an Integer.
-	status_t status = acpi->evaluate_method(acpiCookie, path, NULL, &buf);
+	status_t status = evaluate_method(handle, path, NULL, &buf);
 	if (status == B_OK) {
 		if (object.object_type == ACPI_TYPE_INTEGER)
 			*number = object.integer.integer;
@@ -90,8 +92,7 @@ acpi_GetInteger(acpi_device_module_info* acpi, acpi_device& acpiCookie,
 
 
 acpi_handle
-acpi_GetReference(acpi_module_info* acpi, acpi_handle scope,
-	acpi_object_type* obj)
+acpi_GetReference(acpi_handle scope, acpi_object_type* obj)
 {
 	if (obj == NULL)
 		return NULL;
@@ -107,7 +108,7 @@ acpi_GetReference(acpi_module_info* acpi, acpi_handle scope,
 			// scope can be NULL.
 			// TODO: This may not always be the case.
 			acpi_handle handle;
-			if (acpi->get_handle(scope, obj->string.string, &handle)
+			if (get_handle(scope, obj->string.string, &handle)
 					== B_OK)
 				return handle;
 		}
@@ -279,59 +280,149 @@ embedded_controller_register_device(device_node* node)
 
 
 static status_t
+embedded_controller_init_common(acpi_ec_cookie* sc)
+{
+	status_t status;
+
+	sc->ec_condition_var.Init(NULL, "ec condition variable");
+	mutex_init(&sc->ec_lock, "ec lock");
+
+	// Read the global lock value to see if we should acquire it when
+	// accessing the EC.
+	status = acpi_GetInteger(sc->ec_handle, "_GLK", &sc->ec_glk);
+	if (status != B_OK)
+		sc->ec_glk = 0;
+
+	// Install a handler for this EC's GPE bit.  We want edge-triggered
+	// behavior.
+	TRACE("attaching GPE handler\n");
+	status = install_gpe_handler(sc->ec_gpehandle,
+		sc->ec_gpebit, ACPI_GPE_EDGE_TRIGGERED, &EcGpeHandler, sc);
+	if (status != B_OK) {
+		TRACE("can't install ec GPE handler\n");
+		goto error;
+	}
+
+	// Install address space handler
+	TRACE("attaching address space handler\n");
+	status = install_address_space_handler(sc->ec_handle,
+		ACPI_ADR_SPACE_EC, &EcSpaceHandler, &EcSpaceSetup, sc);
+	if (status != B_OK) {
+		ERROR("can't install address space handler\n");
+		goto error;
+	}
+
+	// Enable runtime GPEs for the handler.
+	status = enable_gpe(sc->ec_gpehandle, sc->ec_gpebit);
+	if (status != B_OK) {
+		ERROR("AcpiEnableGpe failed.\n");
+		goto error;
+	}
+
+	sc->ec_suspending = FALSE;
+
+	return B_OK;
+
+error:
+	remove_gpe_handler(sc->ec_gpehandle, sc->ec_gpebit,
+		&EcGpeHandler);
+	remove_address_space_handler(sc->ec_handle, ACPI_ADR_SPACE_EC,
+		EcSpaceHandler);
+
+	return ENXIO;
+}
+
+
+void
+embedded_controller_probe_ecdt()
+{
+	ACPI_TABLE_ECDT* ecdt;
+	ACPI_STATUS status;
+
+	status = AcpiGetTable((char*)ACPI_SIG_ECDT, 1, (ACPI_TABLE_HEADER **)&ecdt);
+	if (ACPI_FAILURE(status))
+		return;
+
+	acpi_ec_cookie* sc = (acpi_ec_cookie*)malloc(sizeof(acpi_ec_cookie));
+	if (sc == NULL)
+		return;
+
+	sc->ec_uid = ecdt->Uid;
+	sc->ec_gpehandle = NULL;
+	sc->ec_gpebit = ecdt->Gpe;
+	sc->ec_csr_pci_address = ecdt->Control.Address;
+	sc->ec_data_pci_address = ecdt->Data.Address;
+
+	if (get_handle(NULL, (const char*)ecdt->Id, &sc->ec_handle) != B_OK) {
+		ERROR("failed to get EC handle using ECDT\n");
+		goto error;
+	}
+
+	if (embedded_controller_init_common(sc) != B_OK)
+		goto error;
+
+	sEarlyEc = sc;
+	return;
+
+error:
+	free(sc);
+}
+
+
+static status_t
 embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 {
 	TRACE("init driver\n");
 
-	acpi_ec_cookie* sc;
-	sc = (acpi_ec_cookie*)malloc(sizeof(acpi_ec_cookie));
-	if (sc == NULL)
-		return B_NO_MEMORY;
+	device_node* parent = gDeviceManager->get_parent_node(dev);
+	acpi_device ec_device;
+	gDeviceManager->get_driver(parent, NULL, (void**)&ec_device);
+	gDeviceManager->put_node(parent);
 
-	memset((void*)sc, 0, sizeof(acpi_ec_cookie));
+	// Read the unique ID to check if we already initialized
+	// this EC using the ECDT
+	int uid;
+	status_t status = acpi_GetInteger(ec_device->handle, "_UID",
+		&uid);
+	if (status != B_OK)
+		uid = 0;
+
+	acpi_ec_cookie* sc;
+	if (sEarlyEc != NULL && sEarlyEc->ec_uid == uid) {
+		sc = sEarlyEc;
+	} else {
+		sc = (acpi_ec_cookie*)malloc(sizeof(acpi_ec_cookie));
+		if (sc == NULL)
+			return B_NO_MEMORY;
+		memset((void*)sc, 0, sizeof(acpi_ec_cookie));
+	}
 
 	*_driverCookie = sc;
 	sc->ec_dev = dev;
 
-	sc->ec_condition_var.Init(NULL, "ec condition variable");
-	mutex_init(&sc->ec_lock, "ec lock");
-	device_node* parent = gDeviceManager->get_parent_node(dev);
-	gDeviceManager->get_driver(parent, (driver_module_info**)&sc->ec_acpi,
-		(void**)&sc->ec_handle);
-	gDeviceManager->put_node(parent);
+	if (sc == sEarlyEc)
+		return 0;
 
-	if (get_module(B_ACPI_MODULE_NAME, (module_info**)&sc->ec_acpi_module)
-			!= B_OK)
-		return B_ERROR;
+	sc->ec_uid = uid;
+	sc->ec_handle = ec_device->handle;
 
 	acpi_data buf;
 	buf.pointer = NULL;
 	buf.length = ACPI_ALLOCATE_BUFFER;
 
-	// Read the unit ID to check for duplicate attach and the
-	// global lock value to see if we should acquire it when
-	// accessing the EC.
-	status_t status = acpi_GetInteger(sc->ec_acpi, sc->ec_handle, "_UID",
-		&sc->ec_uid);
-	if (status != B_OK)
-		sc->ec_uid = 0;
-	status = acpi_GetInteger(sc->ec_acpi, sc->ec_handle, "_GLK", &sc->ec_glk);
-	if (status != B_OK)
-		sc->ec_glk = 0;
-
 	// Evaluate the _GPE method to find the GPE bit used by the EC to
 	// signal status (SCI).  If it's a package, it contains a reference
 	// and GPE bit, similar to _PRW.
-	status = sc->ec_acpi->evaluate_method(sc->ec_handle, "_GPE", NULL, &buf);
+	status = evaluate_method(sc->ec_handle, "_GPE", NULL, &buf);
 	if (status != B_OK) {
 		ERROR("can't evaluate _GPE %s\n", strerror(status));
-		goto error2;
+		goto error;
 	}
 
 	acpi_object_type* obj;
 	obj = (acpi_object_type*)buf.pointer;
 	if (obj == NULL)
-		goto error2;
+		goto error;
 
 	switch (obj->object_type) {
 		case ACPI_TYPE_INTEGER:
@@ -340,63 +431,33 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 			break;
 		case ACPI_TYPE_PACKAGE:
 			if (!ACPI_PKG_VALID(obj, 2))
-				goto error2;
-			sc->ec_gpehandle = acpi_GetReference(sc->ec_acpi_module, NULL,
-				&obj->package.objects[0]);
+				goto error;
+			sc->ec_gpehandle = acpi_GetReference(NULL, &obj->package.objects[0]);
 			if (sc->ec_gpehandle == NULL
 				|| acpi_PkgInt32(obj, 1, (uint32*)&sc->ec_gpebit) != B_OK)
-				goto error2;
+				goto error;
 			break;
 		default:
 			ERROR("_GPE has invalid type %i\n", int(obj->object_type));
-			goto error2;
+			goto error;
 	}
 
-	sc->ec_suspending = FALSE;
 
 	// Attach bus resources for data and command/status ports.
-	status = sc->ec_acpi->walk_resources(sc->ec_handle, (ACPI_STRING)"_CRS",
+	status = walk_resources(sc->ec_handle, (ACPI_STRING)"_CRS",
 		embedded_controller_io_ports_parse_callback, sc);
 	if (status != B_OK) {
 		ERROR("Error while getting IO ports addresses\n");
-		goto error2;
+		goto error;
 	}
 
-	// Install a handler for this EC's GPE bit.  We want edge-triggered
-	// behavior.
-	TRACE("attaching GPE handler\n");
-	status = sc->ec_acpi_module->install_gpe_handler(sc->ec_gpehandle,
-		sc->ec_gpebit, ACPI_GPE_EDGE_TRIGGERED, &EcGpeHandler, sc);
-	if (status != B_OK) {
-		TRACE("can't install ec GPE handler\n");
-		goto error1;
-	}
-
-	// Install address space handler
-	TRACE("attaching address space handler\n");
-	status = sc->ec_acpi->install_address_space_handler(sc->ec_handle,
-		ACPI_ADR_SPACE_EC, &EcSpaceHandler, &EcSpaceSetup, sc);
-	if (status != B_OK) {
-		ERROR("can't install address space handler\n");
-		goto error1;
-	}
-
-	// Enable runtime GPEs for the handler.
-	status = sc->ec_acpi_module->enable_gpe(sc->ec_gpehandle, sc->ec_gpebit);
-	if (status != B_OK) {
-		ERROR("AcpiEnableGpe failed.\n");
-		goto error1;
-	}
+	status = embedded_controller_init_common(sc);
+	if (status != B_OK)
+		goto error;
 
 	return 0;
 
-error1:
-	sc->ec_acpi_module->remove_gpe_handler(sc->ec_gpehandle, sc->ec_gpebit,
-		&EcGpeHandler);
-	sc->ec_acpi->remove_address_space_handler(sc->ec_handle, ACPI_ADR_SPACE_EC,
-		EcSpaceHandler);
-
-error2:
+error:
 	free(buf.pointer);
 
 	// remove child nodes
@@ -415,7 +476,6 @@ embedded_controller_uninit_driver(void* driverCookie)
 	acpi_ec_cookie* sc = (struct acpi_ec_cookie*)driverCookie;
 	mutex_destroy(&sc->ec_lock);
 	free(sc);
-	put_module(B_ACPI_MODULE_NAME);
 }
 
 
@@ -559,7 +619,7 @@ EcGpeQueryHandlerSub(struct acpi_ec_cookie *sc)
 	char qxx[5];
 	snprintf(qxx, sizeof(qxx), "_Q%02X", data);
 	AcpiUtStrupr(qxx);
-	status = sc->ec_acpi->evaluate_method(sc->ec_handle, qxx, NULL, NULL);
+	status = evaluate_method(sc->ec_handle, qxx, NULL, NULL);
 	if (status != B_OK) {
 		TRACE("evaluation of query method %s failed\n", qxx);
 	}

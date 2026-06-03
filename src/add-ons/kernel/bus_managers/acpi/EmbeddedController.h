@@ -136,9 +136,7 @@ typedef uint8							EC_EVENT;
  */
 struct acpi_ec_cookie {
 	device_node*				ec_dev;
-	acpi_module_info*			ec_acpi_module;
-	acpi_device_module_info* 	ec_acpi;
-	acpi_device					ec_handle;
+	acpi_handle					ec_handle;
 	int							ec_uid;
 	acpi_handle					ec_gpehandle;
 	uint8						ec_gpebit;
@@ -189,8 +187,7 @@ EcLock(struct acpi_ec_cookie *sc)
 {
 	/* If _GLK is non-zero, acquire the global lock. */
 	if (sc->ec_glk) {
-		status_t status = sc->ec_acpi_module->acquire_global_lock(EC_LOCK_TIMEOUT,
-			&sc->ec_glkhandle);
+		status_t status = acquire_global_lock(EC_LOCK_TIMEOUT, &sc->ec_glkhandle);
 		if (status != B_OK)
 			return status;
 	}
@@ -203,7 +200,7 @@ EcUnlock(struct acpi_ec_cookie *sc)
 {
 	mutex_unlock(&sc->ec_lock);
 	if (sc->ec_glk)
-		sc->ec_acpi_module->release_global_lock(sc->ec_glkhandle);
+		release_global_lock(sc->ec_glkhandle);
 }
 
 

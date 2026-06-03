@@ -236,6 +236,8 @@ acpi_std_ops(int32 op,...)
 					"AcpiEnableSubsystem failed"))
 				goto err_acpi;
 
+			embedded_controller_probe_ecdt();
+
 			if (checkAndLogFailure(AcpiInitializeObjects(
 						ACPI_FULL_INITIALIZATION),
 					"AcpiInitializeObjects failed"))

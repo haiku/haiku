@@ -254,6 +254,8 @@ status_t reboot(void);
 
 status_t get_table(const char* signature, uint32 instance, void** tableHeader);
 
+void embedded_controller_probe_ecdt();
+
 __END_DECLS
 
 
