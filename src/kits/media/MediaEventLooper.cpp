@@ -245,7 +245,7 @@ BMediaEventLooper::ControlLoop()
 				DispatchEvent(&event, lateness, hasRealtime);
 			}
 		} else if (err != B_OK)
-			return;
+			break;
 
 		// BMediaEventLooper compensates your performance time by adding
 		// the event latency (see SetEventLatency()) and the scheduling
@@ -278,6 +278,12 @@ BMediaEventLooper::ControlLoop()
 		} else
 			err = WaitForMessage(waitUntil);
 	}
+
+	// Drain remaining messages on port. This is required because clients may
+	// wait for reply.
+	do {
+		err = WaitForMessage(0);
+	} while (err != B_TIMED_OUT && err != B_BAD_PORT_ID && err != B_WOULD_BLOCK);
 }
 
 
