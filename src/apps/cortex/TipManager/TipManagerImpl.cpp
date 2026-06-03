@@ -97,11 +97,11 @@ status_t _ViewEntry::add(BView* pView, const tip_entry& tipEntry) {
 	}
 	if(pCurView != m_target)
 		return B_ERROR; // +++++ ever so descriptive
-		
+
 	// walk down the child hierarchy, making ViewEntries as
 	// needed
 	_ViewEntry* viewEntry = this;
-	
+
 	// [e.moon 13oct99] clone tipEntry
 	tip_entry* newTipEntry = new tip_entry(tipEntry);
 
@@ -114,7 +114,7 @@ status_t _ViewEntry::add(BView* pView, const tip_entry& tipEntry) {
 				viewEntry->m_childViews.begin(),
 				viewEntry->m_childViews.end(),
 				entry_target_matches_view(*itView));
-		
+
 		// add new _ViewEntry if necessary
 		if(itEntry == viewEntry->m_childViews.end()) {
 			viewEntry->m_childViews.push_back(new _ViewEntry(*itView, viewEntry));
@@ -122,7 +122,7 @@ status_t _ViewEntry::add(BView* pView, const tip_entry& tipEntry) {
 		} else
 			viewEntry = *itEntry;
 	}
-	
+
 	// found a home; can it hold the tip?
 	if(viewEntry->m_tips.size() &&
 		!(*viewEntry->m_tips.begin())->rect.IsValid()) {
@@ -130,7 +130,7 @@ status_t _ViewEntry::add(BView* pView, const tip_entry& tipEntry) {
 		delete newTipEntry;
 		return B_ERROR; // +++++ error: full-view tip leaves no room
 	}
-	
+
 	// remove matching tip if any, then add the new one:
 	// [e.moon 13oct99] ref'd by pointer
 	tip_entry_set::iterator itFound = viewEntry->m_tips.find(newTipEntry);
@@ -138,13 +138,13 @@ status_t _ViewEntry::add(BView* pView, const tip_entry& tipEntry) {
 		delete *itFound;
 		viewEntry->m_tips.erase(itFound);
 	}
-	
+
 	pair<tip_entry_set::iterator, bool> ret;
 	ret = viewEntry->m_tips.insert(newTipEntry);
 
 	// something's terribly wrong if insert() failed
 	ASSERT(ret.second);
-	
+
 	return B_OK;
 }
 
@@ -167,7 +167,7 @@ status_t _ViewEntry::remove(
 	}
 	if(pCurView != m_target)
 		return B_ERROR; // +++++ ever so descriptive
-	
+
 	// walk down the child tree to the entry for the
 	// target view
 	_ViewEntry* viewEntry = this;
@@ -180,14 +180,14 @@ status_t _ViewEntry::remove(
 				viewEntry->m_childViews.begin(),
 				viewEntry->m_childViews.end(),
 				entry_target_matches_view(*itView));
-		
+
 		// it'd better be there!
 		if(itEntry == viewEntry->m_childViews.end())
 			return B_ERROR;
-		
+
 		viewEntry = *itEntry;
 	}
-	
+
 	// remove matching entries:
 	// [13oct99 e.moon] now ref'd by pointer; find and erase all matching tips
 	if(rect.IsValid()) {
@@ -213,11 +213,11 @@ status_t _ViewEntry::remove(
 			delete *it;
 		}
 		viewEntry->m_tips.clear();
-		
+
 //		PRINT((
 //			"### - freed all tips\n"));
 
-		// [27oct99 e.moon] remove all child views		
+		// [27oct99 e.moon] remove all child views
 		for(
 			list<_ViewEntry*>::iterator itChild = viewEntry->m_childViews.begin();
 			itChild != viewEntry->m_childViews.end(); ++itChild) {
@@ -228,26 +228,26 @@ status_t _ViewEntry::remove(
 
 //		PRINT((
 //			"### - freed all child views\n"));
-		
-		// remove the view entry if possible		
+
+		// remove the view entry if possible
 		if(viewEntry->m_parent) {
 			PRINT((
 				"### - removing view entry from %p\n",
 					viewEntry->m_parent));
-		
+
 			list<_ViewEntry*>::iterator it =
 				find_if(
 					viewEntry->m_parent->m_childViews.begin(),
 					viewEntry->m_parent->m_childViews.end(),
 					entry_target_matches_view(pView));
 			ASSERT(it != viewEntry->m_parent->m_childViews.end());
-			
+
 			_ViewEntry* parent = viewEntry->m_parent;
 			delete viewEntry;
 			parent->m_childViews.erase(it);
 		}
 	}
-	
+
 	return B_OK;
 }
 
@@ -259,42 +259,42 @@ pair<BView*, const tip_entry*> _ViewEntry::match(
 
 	// fetch this view's current frame rect
 	BRect f = Frame();
-	
+
 	// check for a full-frame tip:
-	
+
 	const tip_entry* pFront = fullFrameTip();
 	if(pFront) {
 		// match, and stop recursing here; children can't have tips.
 		m_target->ConvertFromParent(&f);
 		return make_pair(m_target, f.Contains(point) ? pFront : 0);
-	}		
+	}
 
-	// match against tips for my target view	
+	// match against tips for my target view
 	if(m_tips.size()) {
-	
+
 		tip_entry matchEntry(BRect(point, point));
 		tip_entry_set::iterator itCur = m_tips.lower_bound(&matchEntry);
 //		tip_entry_set::iterator itCur = m_tips.begin();
 		tip_entry_set::iterator itEnd = m_tips.end();
-	
+
 		while(itCur != itEnd) {
 			// match:
 			const tip_entry* entry = *itCur;
 			if(entry->rect.Contains(point))
 				return pair<BView*, const tip_entry*>(m_target, entry);
-			
+
 			++itCur;
 		}
 	}
-	
-	// recurse through children	
+
+	// recurse through children
 	for(list<_ViewEntry*>::iterator it = m_childViews.begin();
 		it != m_childViews.end(); it++) {
 
 		_ViewEntry* entry = *it;
 		BPoint childPoint =
 			entry->target()->ConvertFromParent(point);
-		
+
 		pair<BView*, const tip_entry*> ret = entry->match(
 			childPoint,
 			screenPoint);
@@ -302,7 +302,7 @@ pair<BView*, const tip_entry*> _ViewEntry::match(
 		if(ret.second)
 			return ret;
 	}
-	
+
 	// nothing found
 	return pair<BView*, const tip_entry*>(0, 0);
 }
@@ -339,7 +339,7 @@ size_t _ViewEntry::countTips() const {
 		it != m_childViews.end(); it++) {
 		tips += (*it)->countTips();
 	}
-	
+
 	return tips;
 }
 
@@ -379,7 +379,7 @@ _WindowEntry::~_WindowEntry() {
 // - the given view is NOT attached to the target window, or
 // - tips can't be added to this view due to it, or one of its
 //   parents, having a full-frame tip.
-	
+
 status_t _WindowEntry::add(
 	BView*											view,
 	const tip_entry&						entry) {
@@ -392,13 +392,13 @@ status_t _WindowEntry::add(
 	BView* parent = view;
 	while(parent && parent->Parent())
 		parent = parent->Parent();
-	
+
 	// look for a _ViewEntry matching the parent & hand off
 	for(list<_ViewEntry*>::iterator it = m_views.begin();
 		it != m_views.end(); ++it)
 		if((*it)->target() == parent)
 			return (*it)->add(view, entry);
-	
+
 	// create _ViewEntry for the parent & hand off
 	_ViewEntry* v = new _ViewEntry(parent, 0);
 	m_views.push_back(v);
@@ -423,7 +423,7 @@ status_t _WindowEntry::remove(
 	BView* parent = view;
 	while(parent && parent->Parent())
 		parent = parent->Parent();
-	
+
 	// look for a matching _ViewEntry	& hand off
 	for(list<_ViewEntry*>::iterator it = m_views.begin();
 		it != m_views.end(); ++it)
@@ -443,9 +443,9 @@ status_t _WindowEntry::remove(
 	// not found
 	PRINT((
 		"!!! _WindowEntry::remove(): no matching view\n"));
-	return B_ERROR;	
+	return B_ERROR;
 }
-		
+
 // match the given point (in screen coordinates)
 // against tips in this window's views.
 
@@ -454,9 +454,9 @@ pair<BView*, const tip_entry*> _WindowEntry::match(
 
 	for(list<_ViewEntry*>::iterator it = m_views.begin();
 		it != m_views.end(); ++it) {
-		
+
 		// +++++ failing on invalid views? [e.moon 27oct99]
-		
+
 		BView* target = (*it)->target();
 		if(target->Window() != m_target) {
 			PRINT((
@@ -472,7 +472,7 @@ pair<BView*, const tip_entry*> _WindowEntry::match(
 		if(ret.second)
 			return ret;
 	}
-	
+
 	return pair<BView*,const tip_entry*>(0,0);
 }
 
@@ -506,7 +506,7 @@ _TipManagerView::~_TipManagerView() {
 	}
 	if(m_messageRunner)
 		delete m_messageRunner;
-		
+
 	// clean up the tip-display window
 	m_tipWindow->Lock();
 	m_tipWindow->Quit();
@@ -531,7 +531,7 @@ _TipManagerView::_TipManagerView(
 	m_lastEventTime(0LL),
 	m_triggered(false),
 	m_armedTip(0) {
-	
+
 	ASSERT(m_tipWindow);
 	ASSERT(m_manager);
 
@@ -540,11 +540,11 @@ _TipManagerView::_TipManagerView(
 
 	// request to be sent all mouse & keyboard events
 	SetEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS);
-	
+
 	// don't draw
 	SetViewColor(B_TRANSPARENT_COLOR);
 }
-	
+
 
 // -------------------------------------------------------- //
 // *** operations
@@ -560,13 +560,13 @@ status_t _TipManagerView::armTip(
 	TipManager::offset_mode_t		offsetMode,
 	BPoint											offset,
 	uint32 											flags) {
-	
+
 	ASSERT(Looper()->IsLocked());
-	
+
 	ASSERT(text);
 	if(!screenRect.IsValid())
 		return B_BAD_VALUE;
-	
+
 	// cancel previous manual tip operation
 	if(m_armedTip) {
 		ASSERT(m_tipWindowState == TIP_WINDOW_ARMED);
@@ -581,7 +581,7 @@ status_t _TipManagerView::armTip(
 		m_tipWindow->setText(text);
 		return B_OK;
 	}
-	
+
 	// create new entry; enter 'armed' state
 	m_armedTip = new tip_entry(
 		screenRect,
@@ -590,18 +590,18 @@ status_t _TipManagerView::armTip(
 		offset,
 		flags);
 	m_tipWindowState = TIP_WINDOW_ARMED;
-	
+
 	return B_OK;
 }
-		
+
 // Hide tip corresponding to the given screenRect, if any.
 // [e.moon 29nov99] Cancel 'one-off' tip for the given rect if any.
 
 status_t _TipManagerView::hideTip(
 	const BRect&								screenRect) {
-	
+
 	ASSERT(Looper()->IsLocked());
-	
+
 	// check for armed tip
 	if(m_armedTip) {
 		ASSERT(m_tipWindowState == TIP_WINDOW_ARMED);
@@ -613,14 +613,14 @@ status_t _TipManagerView::hideTip(
 			return B_OK;
 		}
 	}
-	
+
 	// check for visible tip
 	if(m_tipWindowState != TIP_WINDOW_VISIBLE)
 		return B_BAD_VALUE;
-	
+
 	if(m_visibleTipRect != screenRect)
 		return B_BAD_VALUE;
-	
+
 	_hideTip();
 	m_tipWindowState = TIP_WINDOW_HIDDEN;
 
@@ -638,11 +638,11 @@ status_t _TipManagerView::setTip(
 	ASSERT(text);
 	ASSERT(view);
 	ASSERT(Looper()->IsLocked());
-	
+
 	BWindow* window = view->Window();
 	if(!window)
 		return B_ERROR; // can't add non-attached views
-	
+
 	// construct & add an entry
 	tip_entry e(rect, text, offsetMode, offset, flags);
 
@@ -652,11 +652,11 @@ status_t _TipManagerView::setTip(
 		if((*it)->target() == window)
 			return (*it)->add(view, e);
 	}
-	
+
 	// create new window entry
 	_WindowEntry* windowEntry = new _WindowEntry(window);
 	m_windows.push_back(windowEntry);
-	
+
 	return windowEntry->add(view, e);
 }
 
@@ -666,7 +666,7 @@ status_t _TipManagerView::setTip(
 status_t _TipManagerView::removeTip(
 	const BRect&								rect,
 	BView*											view) {
-	
+
 	ASSERT(view);
 	ASSERT(Looper()->IsLocked());
 
@@ -691,7 +691,7 @@ status_t _TipManagerView::removeTip(
 
 			// remove
 			status_t ret = (*it)->remove(view, rect);
-			
+
 			if(!(*it)->countViews()) {
 
 				// emptied window entry; remove it
@@ -708,7 +708,7 @@ status_t _TipManagerView::removeTip(
 			return ret;
 		}
 	}
-	
+
 	PRINT((
 		"!!! _TipManagerView::removeTip(): window entry not found!\n\n"));
 	return B_ERROR;
@@ -716,10 +716,10 @@ status_t _TipManagerView::removeTip(
 
 status_t _TipManagerView::removeAll(
 	BWindow*										window) {
-	
+
 	ASSERT(window);
 	ASSERT(Looper()->IsLocked());
-	
+
 //	PRINT((
 //		"### _TipManagerView::removeAll()\n"));
 
@@ -732,7 +732,7 @@ status_t _TipManagerView::removeAll(
 			return B_OK;
 		}
 	}
-	
+
 	PRINT((
 		"!!! _TipManagerView::removeAll(): window entry not found!\n"));
 	return B_ERROR;
@@ -766,7 +766,7 @@ void _TipManagerView::KeyDown(
 	if(m_tipWindowState == TIP_WINDOW_VISIBLE) {
 		_hideTip();
 		m_tipWindowState = TIP_WINDOW_HIDDEN;
-	}	
+	}
 
 	m_lastEventTime = system_time();
 }
@@ -782,7 +782,7 @@ void _TipManagerView::MouseDown(
 	if(m_tipWindowState == TIP_WINDOW_VISIBLE) {
 		_hideTip();
 		m_tipWindowState = TIP_WINDOW_HIDDEN;
-	}	
+	}
 
 	m_lastEventTime = system_time();
 	ConvertToScreen(&point);
@@ -804,7 +804,7 @@ void _TipManagerView::MouseMoved(
 	ConvertToScreen(&point);
 
 	bool moved = (point != m_lastMousePoint);
-	
+
 	if(m_tipWindowState == TIP_WINDOW_ARMED) {
 		ASSERT(m_armedTip);
 		if(moved && !m_armedTip->rect.Contains(point)) {
@@ -823,11 +823,11 @@ void _TipManagerView::MouseMoved(
 			_hideTip();
 			m_tipWindowState = TIP_WINDOW_HIDDEN;
 		}
-		
+
 		// don't reset timing state until the tip is closed
 		return;
 	}
-	
+
 	// if the mouse has moved, reset timing state:
 	if(moved) {
 		m_lastMousePoint = point;
@@ -878,14 +878,14 @@ inline void _TipManagerView::_timePassed() {
 
 	// trigger!
 	m_triggered = true;
-	
+
 	if(m_tipWindowState == TIP_WINDOW_ARMED) {
 		// a tip has been manually set
 		ASSERT(m_armedTip);
 		m_visibleTipRect = m_armedTip->rect;
 		_showTip(m_armedTip);
 		m_tipWindowState = TIP_WINDOW_VISIBLE;
-		
+
 		// clean up
 		delete m_armedTip;
 		m_armedTip = 0;
@@ -896,25 +896,25 @@ inline void _TipManagerView::_timePassed() {
 	for(
 		list<_WindowEntry*>::iterator it = m_windows.begin();
 		it != m_windows.end(); ++it) {
-	
+
 		// lock the window
 		BWindow* window = (*it)->target();
 		ASSERT(window);
 
-		// [e.moon 21oct99] does autolock work in this context?
-		//BAutolock _l(window);
-		window->Lock();
-			
+		// do not block to avoid deadlock
+		if(window->LockWithTimeout(0) != B_OK)
+			continue;
+
 		// match
 		pair<BView*, const tip_entry*> found =
 			(*it)->match(m_lastMousePoint);
-			
+
 		// if no tip found, or the view's no longer attached, bail:
 		if(!found.second || found.first->Window() != window) {
 			window->Unlock();
 			continue;
 		}
-		
+
 		// found a tip under the mouse; see if it's obscured
 		// by another window
 		BRegion clipRegion;
@@ -925,7 +925,7 @@ inline void _TipManagerView::_timePassed() {
 			window->Unlock();
 			continue;
 		}
-		
+
 		// show the tip
 		if(found.second->rect.IsValid())
 			m_visibleTipRect = found.first->ConvertToScreen(
@@ -936,7 +936,7 @@ inline void _TipManagerView::_timePassed() {
 
 		_showTip(found.second);
 		m_tipWindowState = TIP_WINDOW_VISIBLE;
-		
+
 		window->Unlock();
 		break;
 	}
@@ -944,20 +944,20 @@ inline void _TipManagerView::_timePassed() {
 
 inline void _TipManagerView::_showTip(
 	const tip_entry*						entry) {
-	
+
 //	PRINT((
 //		"### _TipManagerView::_showTip()\n"));
-	
+
 	ASSERT(m_tipWindow);
 	ASSERT(m_tipWindowState != TIP_WINDOW_VISIBLE);
 	ASSERT(entry);
-	
+
 	BAutolock _l(m_tipWindow);
 
-	// set text	
+	// set text
 	m_tipWindow->SetWorkspaces(B_ALL_WORKSPACES);
 	m_tipWindow->setText(entry->text.String());
-	
+
 	// figure position
 	BPoint offset = (entry->offset == TipManager::s_useDefaultOffset) ?
 		TipManager::s_defaultOffset :
@@ -989,7 +989,7 @@ inline void _TipManagerView::_showTip(
 
 	// constrain window to be on-screen:
 	m_tipWindow->MoveTo(p);
-	
+
 	BRect screenR = BScreen(m_tipWindow).Frame();
 	BRect tipR = m_tipWindow->Frame();
 
@@ -997,12 +997,12 @@ inline void _TipManagerView::_showTip(
 		tipR.left = screenR.left;
 	else if(tipR.right > screenR.right)
 		tipR.left = screenR.right - tipR.Width();
-	
+
 	if(tipR.top < screenR.top)
 		tipR.top = screenR.top;
 	else if(tipR.bottom > screenR.bottom)
 		tipR.top = screenR.bottom - tipR.Height();
-	
+
 	if(tipR.LeftTop() != p)
 		m_tipWindow->MoveTo(tipR.LeftTop());
 
@@ -1013,14 +1013,14 @@ inline void _TipManagerView::_showTip(
 inline void _TipManagerView::_hideTip() {
 //	PRINT((
 //		"### _TipManagerView::_hideTip()\n"));
-	
+
 	ASSERT(m_tipWindow);
 	ASSERT(m_tipWindowState == TIP_WINDOW_VISIBLE);
 	BAutolock _l(m_tipWindow);
-	
+
 	if(m_tipWindow->IsHidden())
 		return;
-		
+
 	m_tipWindow->Hide();
 }
 
