@@ -456,6 +456,12 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list, uint32 openFlags,
 
 	if (runIt)
 		Run();
+	else {
+		// The window is created locked and unlocked when first run.
+		// When not running the thread, this constructor should still exit with the window unlocked
+		// so that Lock() can be called later and not block.
+		Unlock();
+	}
 
 	// watch out for settings changes
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
