@@ -350,7 +350,7 @@ x86_init_fpu(void)
 #ifndef __x86_64__
 	if (!x86_check_feature(IA32_FEATURE_FPU, FEATURE_COMMON)) {
 		// No FPU... time to install one in your 386?
-		dprintf("%s: Warning: CPU has no reported FPU.\n", __func__);
+		panic("CPU has no reported FPU!\n");
 		gX86SwapFPUFunc = x86_noop_swap;
 		return;
 	}
@@ -359,17 +359,13 @@ x86_init_fpu(void)
 		|| !x86_check_feature(IA32_FEATURE_FXSR, FEATURE_COMMON)) {
 		dprintf("%s: CPU has no SSE... just enabling FPU.\n", __func__);
 		// we don't have proper SSE support, just enable FPU
-		x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 		gX86SwapFPUFunc = x86_fnsave_swap;
 		return;
 	}
-#endif
 
-	dprintf("%s: CPU has SSE... enabling FXSR and XMM.\n", __func__);
-#ifndef __x86_64__
 	// enable OS support for SSE
+	dprintf("%s: CPU has SSE... enabling FXSR and XMM.\n", __func__);
 	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
-	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 
 	gX86SwapFPUFunc = x86_fxsave_swap;
 	gHasSSE = true;
@@ -1565,6 +1561,9 @@ x86_double_fault_get_cpu()
 status_t
 arch_cpu_preboot_init_percpu(kernel_args* args, int cpu)
 {
+	// Reset CR0.
+	x86_write_cr0(CR0_PROTECTED_MODE | CR0_PAGING | CR0_WRITE_PROTECT | CR0_NUMERIC_ERROR);
+
 	if (cpu == 0) {
 		// We can't allocate pages at this stage in the boot process, only virtual addresses.
 		sDoubleFaultStacks = vm_allocate_early(args,

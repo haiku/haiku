@@ -89,8 +89,6 @@ smp_start_kernel(void)
 	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
 		gKernelArgs.kernel_image.Pointer());
 
-	// Important.  Make sure supervisor threads can fault on read only pages...
-	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 	asm("cld");
 	asm("fninit");
 

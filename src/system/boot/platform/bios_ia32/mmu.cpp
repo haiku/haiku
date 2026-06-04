@@ -372,8 +372,6 @@ init_page_directory(void)
 	// switch to the new pgdir and enable paging
 	asm("movl %0, %%eax;"
 		"movl %%eax, %%cr3;" : : "m" (sPageDirectory) : "eax");
-	// Important.  Make sure supervisor threads can fault on read only pages...
-	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 }
 
 

@@ -181,9 +181,6 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 			start, start + size, size);
 	}
 #endif
-
-	// Important.  Make sure supervisor threads can fault on read only pages...
-	asm("mov %%rax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 }
 
 

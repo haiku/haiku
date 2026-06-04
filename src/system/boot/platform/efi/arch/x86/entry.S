@@ -53,12 +53,9 @@ FUNCTION(arch_enter_kernel):
 	movl	%esi, %eax
 	lgdt	(%eax)
 
-	// initialize CR0
-	// - bit #31: Enable Paging
-	// - bit #16: Write Protect
-	// - bit  #5: Numeric Error Handling
-	// - bit  #0: Protected Mode
-	movl	$0x80010021, %eax
+	movl	%cr0, %eax
+	orl		$0x01, %eax			// set the PE bit (0) to switch to protected mode
+	orl		$0x80000000, %eax	// set the PG bit (31) to enable paging
 	movl	%eax, %cr0
 
 	// Set data segments.

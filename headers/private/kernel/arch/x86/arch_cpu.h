@@ -449,10 +449,14 @@
 	| X86_EFLAGS_AUXILIARY_CARRY | X86_EFLAGS_ZERO | X86_EFLAGS_SIGN \
 	| X86_EFLAGS_DIRECTION | X86_EFLAGS_OVERFLOW)
 
+#define CR0_PAGING				(1UL << 31)
 #define CR0_CACHE_DISABLE		(1UL << 30)
 #define CR0_NOT_WRITE_THROUGH	(1UL << 29)
+#define CR0_WRITE_PROTECT		(1UL << 16)
+#define CR0_NUMERIC_ERROR		(1UL << 5)
 #define CR0_FPU_EMULATION		(1UL << 2)
 #define CR0_MONITOR_FPU			(1UL << 1)
+#define CR0_PROTECTED_MODE		(1UL << 0)
 
 // Control Register CR4 flags §2.5
 // Intel® 64 and IA-32 Architectures Software Developer's Manual Volume 3A: System Programming Guide, Part 1

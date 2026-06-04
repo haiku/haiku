@@ -318,8 +318,6 @@ long_smp_start_kernel(void)
 {
 	uint32 cpu = smp_get_current_cpu();
 
-	// Important.  Make sure supervisor threads can fault on read only pages...
-	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 	asm("cld");
 	asm("fninit");
 	enable_sse();
