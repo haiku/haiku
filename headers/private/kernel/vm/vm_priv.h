@@ -23,8 +23,8 @@
 
 
 #ifdef __cplusplus
-extern "C" {
-#endif
+
+class VMAddressSpace;
 
 // should only be used by VM internals
 
@@ -57,8 +57,6 @@ bool vm_page_should_do_active_paging();
 const char *page_state_to_string(int state);
 	// for debugging purposes only
 
-#ifdef __cplusplus
-}
 #endif
 
 #endif	/* _KERNEL_VM_VM_PRIV_H */
