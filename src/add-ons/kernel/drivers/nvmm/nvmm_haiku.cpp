@@ -245,7 +245,11 @@ struct haiku_cpuset {
 	CPUSet set;
 };
 
-os_vmmap_t *os_kernel_map;
+
+static os_vmmap_t sDummyKernelMap;
+static os_vmmap_t sDummyCurrentProcessMap;
+os_vmmap_t *os_kernel_map = &sDummyKernelMap;
+os_vmmap_t *os_curproc_map = &sDummyCurrentProcessMap;
 
 
 extern "C" void *
@@ -481,6 +485,19 @@ os_vmobj_rel(os_vmobj_t *vmobj)
 }
 
 
+static VMAddressSpace*
+address_space_for(os_vmmap_t *map)
+{
+	if (map == &sDummyCurrentProcessMap)
+		return thread_get_current_thread()->team->address_space;
+	else if (map == &sDummyKernelMap)
+		return VMAddressSpace::GetKernel();
+
+	ASSERT(map->address_space != NULL);
+	return map->address_space;
+}
+
+
 //! shared indicates whether the mapping is inherit on fork calls or not
 extern "C" int
 os_vmobj_map(os_vmmap_t *map, vaddr_t *addr, vsize_t size, os_vmobj_t *vmobj,
@@ -489,14 +506,15 @@ os_vmobj_map(os_vmmap_t *map, vaddr_t *addr, vsize_t size, os_vmobj_t *vmobj,
 	if (!vmobj->cache->Lock())
 		return B_ERROR;
 
-	status_t status = map->address_space->WriteLock();
+	VMAddressSpace* addressSpace = address_space_for(map);
+	status_t status = addressSpace->WriteLock();
 	if (status != B_OK)
 		return status;
 
 	uint32 wiring = wired ? B_FULL_LOCK : B_NO_LOCK;
 	uint32 flags = fixed ? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0;
 	bool kernel = false;
-	if (map->address_space == VMAddressSpace::Kernel())
+	if (addressSpace == VMAddressSpace::Kernel())
 		kernel = true;
 
 	virtual_address_restrictions addressRestrictions = {
@@ -505,7 +523,7 @@ os_vmobj_map(os_vmmap_t *map, vaddr_t *addr, vsize_t size, os_vmobj_t *vmobj,
 		.alignment = B_PAGE_SIZE,
 	};
 	VMArea *area;
-	status = vm_map_cache(map->address_space, vmobj->cache,
+	status = vm_map_cache(addressSpace, vmobj->cache,
 		vmobj->cache->virtual_base + offset, "nvmm_vmobj_area",
 		size, wiring, prot, maxprot, REGION_NO_PRIVATE_MAP, flags,
 		&addressRestrictions, kernel, &area, (void **)addr);
@@ -514,7 +532,7 @@ os_vmobj_map(os_vmmap_t *map, vaddr_t *addr, vsize_t size, os_vmobj_t *vmobj,
 	if (status == B_OK)
 		vmobj->cache->AcquireRefLocked();
 
-	map->address_space->WriteUnlock();
+	addressSpace->WriteUnlock();
 	vmobj->cache->Unlock();
 
 	return status;
@@ -526,30 +544,10 @@ extern "C" void
 os_vmobj_unmap(os_vmmap_t *map, vaddr_t start, vaddr_t end,
 	bool wired __unused)
 {
-	map->address_space->WriteLock();
-	vm_unmap_address_range(map->address_space, start, end - start - 1, true);
-	map->address_space->WriteUnlock();
-}
-
-
-extern "C" os_vmmap_t *
-os_get_curproc_map()
-{
-	os_vmmap_t *ret = (os_vmmap_t *)os_mem_alloc(sizeof(os_vmmap_t));
-	if (ret == NULL)
-		return NULL;
-
-	ret->address_space = VMAddressSpace::GetCurrent();
-	return ret;
-}
-
-
-extern "C" void
-os_free_curproc_map(os_vmmap_t *map)
-{
-	if (map->address_space != NULL)
-		map->address_space->Put();
-	os_mem_free(map, sizeof(os_vmmap_t));
+	VMAddressSpace* addressSpace = address_space_for(map);
+	addressSpace->WriteLock();
+	vm_unmap_address_range(addressSpace, start, end - start - 1, true);
+	addressSpace->WriteUnlock();
 }
 
 
@@ -678,9 +676,10 @@ status_t
 init_hardware(void)
 {
 	if (nvmm_ident() == NULL) {
-		TRACE_ALWAYS("nvmm: cpu not supported\n");
+		TRACE_ALWAYS("nvmm: CPU not supported\n");
 		return B_ERROR;
 	}
+
 	return B_OK;
 }
 
@@ -688,7 +687,6 @@ init_hardware(void)
 const char**
 publish_devices(void)
 {
-	TRACE_ALWAYS("nvmm: publish_devices\n");
 	return sDevices;
 }
 
@@ -696,7 +694,6 @@ publish_devices(void)
 device_hooks*
 find_device(const char* name)
 {
-	TRACE_ALWAYS("nvmm: find_device\n");
 	return &sHooks;
 }
 
@@ -704,26 +701,11 @@ find_device(const char* name)
 status_t
 init_driver(void)
 {
-	status_t status;
 	if (nvmm_init())
 		return B_ERROR;
 
-	os_kernel_map = (os_vmmap_t *)malloc(sizeof(os_vmmap_t));
-	if (os_kernel_map == NULL) {
-		status = B_NO_MEMORY;
-		goto err1;
-	}
-
-	os_kernel_map->address_space = VMAddressSpace::Kernel();
-
 	TRACE_ALWAYS("nvmm: init_driver OK\n");
 	return B_OK;
-
-err2:
-	free(os_kernel_map);
-err1:
-	nvmm_fini();
-	return status;
 }
 
 
@@ -732,5 +714,4 @@ uninit_driver(void)
 {
 	TRACE_ALWAYS("nvmm: uninit_driver\n");
 	nvmm_fini();
-	free(os_kernel_map);
 }

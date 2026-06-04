@@ -141,8 +141,7 @@ typedef mutex			os_mtx_t;
 #define os_curproc_map		&curproc->p_vmspace->vm_map
 #elif defined(__HAIKU__)
 extern os_vmmap_t *os_kernel_map;
-os_vmmap_t* os_get_curproc_map();
-void os_free_curproc_map(os_vmmap_t *map);
+extern os_vmmap_t *os_curproc_map;
 #endif
 
 /* R/W locks. */

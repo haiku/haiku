@@ -411,20 +411,12 @@ nvmm_vcpu_create(struct nvmm_owner *owner, struct nvmm_ioc_vcpu_create *args)
 
 	memset(vcpu->comm, 0, NVMM_COMM_PAGE_SIZE);
 
-#if defined(__HAIKU__)
-	os_vmmap_t *os_curproc_map = os_get_curproc_map();
-#endif
-
 	/* Map the comm page on the user side, as pageable. */
 	error = os_vmobj_map(os_curproc_map, (vaddr_t *)&args->comm,
 	    NVMM_COMM_PAGE_SIZE, mach->commvmobj,
 	    args->cpuid * NVMM_COMM_PAGE_SIZE, false /* !wired */,
 	    false /* !fixed */, true /* shared */, PROT_READ | PROT_WRITE,
 	    PROT_READ | PROT_WRITE);
-
-#if defined(__HAIKU__)
-	os_free_curproc_map(os_curproc_map);
-#endif
 
 	if (error) {
 		nvmm_vcpu_free(mach, vcpu);
@@ -747,16 +739,9 @@ nvmm_hmapping_free(struct nvmm_machine *mach, uintptr_t hva, size_t size)
 			continue;
 		}
 
-#if defined(__HAIKU__)
-		os_vmmap_t *os_curproc_map = os_get_curproc_map();
-#endif
 		os_vmobj_unmap(os_curproc_map, hmapping->hva,
 		    hmapping->hva + hmapping->size, false);
 		os_vmobj_rel(hmapping->vmobj);
-
-#if defined(__HAIKU__)
-		os_free_curproc_map(os_curproc_map);
-#endif
 
 		hmapping->vmobj = NULL;
 		hmapping->present = false;
@@ -794,18 +779,10 @@ nvmm_hva_map(struct nvmm_owner *owner, struct nvmm_ioc_hva_map *args)
 	hmapping->vmobj = os_vmobj_create(hmapping->size);
 	uva = hmapping->hva;
 
-#if defined(__HAIKU__)
-	os_vmmap_t *os_curproc_map = os_get_curproc_map();
-#endif
-
 	/* Map the vmobj into the user address space, as pageable. */
 	error = os_vmobj_map(os_curproc_map, &uva, hmapping->size,
 	    hmapping->vmobj, 0, false /* !wired */, true /* fixed */,
 	    true /* shared */, PROT_READ | PROT_WRITE, PROT_READ | PROT_WRITE);
-
-#if defined(__HAIKU__)
-	os_free_curproc_map(os_curproc_map);
-#endif
 
 out:
 	nvmm_machine_put(mach);
