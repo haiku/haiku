@@ -6,21 +6,24 @@
 #define _KERNEL_ARCH_ARM64_ARCH_ATOMIC_H_
 
 
-static inline void memory_read_barrier_inline(void)
+static inline void
+memory_read_barrier_inline(void)
 {
-	__asm__ __volatile__("dmb ishld");
+	__asm__ __volatile__("dmb ishld" : : : "memory");
 }
 
 
-static inline void memory_write_barrier_inline(void)
+static inline void
+memory_write_barrier_inline(void)
 {
-	__asm__ __volatile__("dsb ishst");
+	__asm__ __volatile__("dsb ishst" : : : "memory");
 }
 
 
-static inline void memory_full_barrier_inline(void)
+static inline void
+memory_full_barrier_inline(void)
 {
-	__asm__ __volatile__("dsb sy");
+	__asm__ __volatile__("dsb sy" : : : "memory");
 }
 
 
