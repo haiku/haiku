@@ -830,7 +830,7 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 	print_kernel_debugger_message();
 
-	if (atomic_get(&sCPUsTrapped) != (smp_get_num_cpus() - 1)) {
+	if (!gKernelStartup && atomic_get(&sCPUsTrapped) != (smp_get_num_cpus() - 1)) {
 		kprintf("PANIC: %d/%d CPUs are not trapped in the kernel debugger!\n",
 			smp_get_num_cpus() - (sCPUsTrapped + 1), smp_get_num_cpus());
 	}
