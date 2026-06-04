@@ -194,6 +194,7 @@ AddDriversToPackage input :
 AddDriversToPackage misc :
 	<driver>poke
 	<driver>mem
+	#nvmm@x86_64
 	;
 AddDriversToPackage net
 	: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;

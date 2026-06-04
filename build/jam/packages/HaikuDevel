@@ -79,6 +79,12 @@ CopyDirectoryToPackage develop headers private libs compat
 	: [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ]
 	: : -x *.c -x Jamfile ;
 
+CopyDirectoryToPackage develop headers private libs
+	: [ FDirName $(HAIKU_TOP) headers libs nvmm ] ;
+CopyDirectoryToPackage develop headers private libs nvmm
+	: [ FDirName $(HAIKU_TOP) src add-ons kernel drivers nvmm ]
+	: driver : -x *.c -x *.cpp -x include -x Jamfile ;
+
 # create be -> os symlink for now
 AddSymlinkToPackage develop headers : os : be ;
 
