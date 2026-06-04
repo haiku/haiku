@@ -151,6 +151,25 @@ X86VMTranslationMapEPT::Init()
 }
 
 
+void
+X86VMTranslationMapEPT::SetFlushCallback(void (**callback)(void*), void* arg)
+{
+	fFlushCallback = callback;
+	fFlushCallbackArg = arg;
+}
+
+
+void
+X86VMTranslationMapEPT::Flush()
+{
+	if (fInvalidPagesCount <= 0)
+		return;
+
+	if (fFlushCallback != NULL && *fFlushCallback != NULL)
+		(*fFlushCallback)(fFlushCallbackArg);
+}
+
+
 size_t
 X86VMTranslationMapEPT::MaxPagesNeededToMap(addr_t start, addr_t end) const
 {

@@ -48,6 +48,25 @@ X86VMTranslationMapRVI::Init()
 }
 
 
+void
+X86VMTranslationMapRVI::SetFlushCallback(void (**callback)(void*), void* arg)
+{
+	fFlushCallback = callback;
+	fFlushCallbackArg = arg;
+}
+
+
+void
+X86VMTranslationMapRVI::Flush()
+{
+	if (fInvalidPagesCount <= 0)
+		return;
+
+	if (fFlushCallback != NULL && *fFlushCallback != NULL)
+		(*fFlushCallback)(fFlushCallbackArg);
+}
+
+
 status_t
 X86VMTranslationMapRVI::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 	uint32 attributes, uint32 memoryType, vm_page_reservation* reservation)

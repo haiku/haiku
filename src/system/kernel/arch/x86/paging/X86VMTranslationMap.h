@@ -27,7 +27,7 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 	virtual	addr_t				MappedSize() const final;
 
-	virtual	void				Flush() final;
+	virtual	void				Flush();
 
 	virtual	X86PagingStructures* PagingStructures() const = 0;
 

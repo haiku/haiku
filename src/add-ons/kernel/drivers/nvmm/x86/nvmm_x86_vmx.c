@@ -3208,7 +3208,7 @@ vmx_vcpu_configure(struct nvmm_cpu *vcpu, uint64_t op, void *data)
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __NetBSD__
+#if defined(__NetBSD__) || defined(__HAIKU__)
 static void
 vmx_tlb_flush(struct pmap *pm)
 {
@@ -3233,8 +3233,8 @@ vmx_machine_create(struct nvmm_machine *mach)
 	struct vmx_machdata *machdata;
 
 	/* Transform into an EPT pmap. */
-#if defined(__NetBSD__)
-	pmap_ept_transform(pmap);
+#if defined(__NetBSD__) || defined(__HAIKU__)
+	//pmap_ept_transform(pmap);
 	os_pmap_mach(pmap) = (void *)mach;
 	pmap->pm_tlb_flush = vmx_tlb_flush;
 #elif defined(__DragonFly__)

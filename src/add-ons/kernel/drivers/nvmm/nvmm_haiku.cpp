@@ -308,18 +308,21 @@ os_vmspace_create(vaddr_t vmin, vaddr_t vmax)
 	if (vmax < vmin)
 		return NULL;
 
-	os_vmspace_t *ret = (os_vmspace_t *)os_mem_alloc(sizeof(os_vmspace_t));
+	os_vmspace_t *ret = (os_vmspace_t *)os_mem_zalloc(sizeof(os_vmspace_t));
 	if (ret == NULL)
 		return NULL;
 
 	X86VMTranslationMap *translationMap = NULL;
 	status_t status = B_ERROR;
+	typedef void (**callback_type)(void*);
 	if (nvmm_impl == &nvmm_x86_vmx) {
-		X86VMTranslationMapEPT *map = new(std::nothrow) X86VMTranslationMapEPT;
+		X86VMTranslationMapEPT *map = new(std::nothrow) X86VMTranslationMapEPT();
+		map->SetFlushCallback((callback_type)&ret->pmap.pm_tlb_flush, &ret->pmap);
 		status = map->Init();
 		translationMap = map;
 	} else if (nvmm_impl == &nvmm_x86_svm) {
-		X86VMTranslationMapRVI *map = new(std::nothrow) X86VMTranslationMapRVI;
+		X86VMTranslationMapRVI *map = new(std::nothrow) X86VMTranslationMapRVI();
+		map->SetFlushCallback((callback_type)&ret->pmap.pm_tlb_flush, &ret->pmap);
 		status = map->Init();
 		translationMap = map;
 	}
@@ -338,7 +341,6 @@ os_vmspace_create(vaddr_t vmin, vaddr_t vmax)
 		return NULL;
 	}
 
-	ret->pmap.pm_invgen = 0;
 	return ret;
 }
 
@@ -346,6 +348,18 @@ os_vmspace_create(vaddr_t vmin, vaddr_t vmax)
 extern "C" void
 os_vmspace_destroy(os_vmspace_t *vm)
 {
+	if (nvmm_impl == &nvmm_x86_vmx) {
+		X86VMTranslationMapEPT *map = (X86VMTranslationMapEPT *)vm->address_space->TranslationMap();
+		map->Lock();
+		map->SetFlushCallback(NULL, NULL);
+		map->Unlock();
+	} else if (nvmm_impl == &nvmm_x86_svm) {
+		X86VMTranslationMapRVI *map = (X86VMTranslationMapRVI *)vm->address_space->TranslationMap();
+		map->Lock();
+		map->SetFlushCallback(NULL, NULL);
+		map->Unlock();
+	}
+
 	vm->address_space->Put();
 	os_mem_free(vm, sizeof(os_vmspace_t));
 }

@@ -18,6 +18,9 @@ struct X86VMTranslationMapEPT final : X86VMTranslationMap {
 
 			status_t			Init();
 
+			void				SetFlushCallback(void (**callback)(void*), void* arg);
+	virtual	void				Flush() final;
+
 	virtual	size_t				MaxPagesNeededToMap(addr_t start,
 									addr_t end) const;
 
@@ -56,6 +59,9 @@ struct X86VMTranslationMapEPT final : X86VMTranslationMap {
 
 private:
 	X86PagingStructures64Bit*	fPagingStructures;
+
+	void (**fFlushCallback)(void*);
+	void* fFlushCallbackArg;
 };
 
 

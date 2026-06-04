@@ -1503,7 +1503,7 @@ svm_htlb_flush(struct nvmm_machine *mach, struct svm_cpudata *cpudata)
 	struct vmcb *vmcb = cpudata->vmcb;
 	uint64_t machgen;
 
-#if defined(__NetBSD__)
+#if defined(__NetBSD__) || defined(__HAIKU__)
 	machgen = ((struct svm_machdata *)mach->machdata)->mach_htlb_gen;
 #elif defined(__DragonFly__)
 	clear_xinvltlb();
@@ -2441,7 +2441,7 @@ svm_vcpu_configure(struct nvmm_cpu *vcpu, uint64_t op, void *data)
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __NetBSD__
+#if defined(__NetBSD__) || defined(__HAIKU__)
 static void
 svm_tlb_flush(struct pmap *pm)
 {
@@ -2466,7 +2466,7 @@ svm_machine_create(struct nvmm_machine *mach)
 	struct svm_machdata *machdata;
 
 	/* Transform pmap. */
-#if defined(__NetBSD__)
+#if defined(__NetBSD__) || defined(__HAIKU__)
 	os_pmap_mach(pmap) = (void *)mach;
 	pmap->pm_tlb_flush = svm_tlb_flush;
 #elif defined(__DragonFly__)

@@ -248,12 +248,11 @@ extern bool pmap_ept_has_ad;
 #define os_vmspace_pmap(vm)	vmspace_pmap(vm)
 #define os_vmspace_pdirpa(vm)	(vtophys(vmspace_pmap(vm)->pm_pml4))
 #elif defined(__HAIKU__)
-// contains some fields
-// present at struct pmap from DragonFlyBSD
-// see sys/platform/pc64/include/pmap.h
 struct pmap {
-	uint64_t pm_invgen;
+	void (*pm_tlb_flush)(struct pmap *);
+	void *pm_data;
 };
+#define os_pmap_mach(pm)	((pm)->pm_data)
 struct pmap *os_vmspace_pmap(os_vmspace_t *vm);
 paddr_t os_vmspace_pdirpa(os_vmspace_t *vm);
 os_vmmap_t *os_vmspace_get_vmmap(os_vmspace_t *vm);
@@ -538,6 +537,17 @@ static inline void
 os_ipi_broadcast(void (*func)(void *, int), void *arg)
 {
 	call_all_cpus_sync(func, arg);
+}
+
+static void
+haiku_dummy_ipi(void*, int)
+{
+}
+
+static inline void
+os_ipi_kickall(void)
+{
+	os_ipi_broadcast(haiku_dummy_ipi, NULL);
 }
 
 int haiku_thread_pin();

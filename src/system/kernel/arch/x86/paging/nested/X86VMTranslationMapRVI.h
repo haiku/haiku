@@ -15,6 +15,9 @@ struct X86VMTranslationMapRVI final : X86VMTranslationMap64Bit {
 
 			status_t			Init();
 
+			void				SetFlushCallback(void (**callback)(void*), void* arg);
+	virtual	void				Flush() final;
+
 	virtual	status_t			Map(addr_t virtualAddress,
 									phys_addr_t physicalAddress,
 									uint32 attributes, uint32 memoryType,
@@ -22,6 +25,10 @@ struct X86VMTranslationMapRVI final : X86VMTranslationMap64Bit {
 
 	virtual	status_t			Protect(addr_t base, addr_t top,
 									uint32 attributes, uint32 memoryType) override;
+
+private:
+	void (**fFlushCallback)(void*);
+	void* fFlushCallbackArg;
 };
 
 
