@@ -727,8 +727,6 @@ MediaWindow::_MakeEmptyParamView()
 	fContentLayout->AddView(stringView);
 	fContentLayout->SetVisibleItem(fContentLayout->CountItems() - 1);
 
-	rgb_color panel = stringView->LowColor();
-	stringView->SetHighColor(tint_color(panel,
-		B_DISABLED_LABEL_TINT));
+	stringView->SetHighUIColor(B_PANEL_TEXT_COLOR);
 }
 
