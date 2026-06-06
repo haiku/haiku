@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BootManager	3831721565
+1	russian	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	Предыдущая загрузочная запись (MBR) не сохранена
 At least one partition must be selected!	BootManagerController		Как минимум один раздел должен быть выбран!
 No space available!	DrivesPage	Cannot install	Нет места для MBR!
@@ -48,6 +48,7 @@ Previous	WizardView	Button	Назад
 Uninstallation of boot menu failed	BootManagerController	Title	Не удалось удалить загрузочное меню
 Incompatible format!	DrivesPage	Cannot install	Несовместимый формат!
 Old Master Boot Record saved	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
+The partition table of the first hard disk is not compatible.\n%appname% only works with IBM PC MBR partitions.	BootManagerController		Таблица разделов первого диска не поддерживается.\n%appname% работает только с разделами IBM PC MBR.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Пожалуйста, укажите раздел по умолчанию и время ожидания.\nЗагрузочное меню передаст управление этому разделу по истечении времени ожидания, если только вы не выберите другой раздел.\nЗажмите клавишу 'ALT' при загрузке для отключения ожидания.
 Partitions	PartitionsPage	Title	Разделы
 Uninstallation of boot menu completed	BootManagerController	Title	Удаление загрузочного меню завершено
@@ -60,6 +61,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Пожалуйста, выберите файл, содержащий загрузочную запись (MBR) для восстановления. Этот файл был создан при первой установке менеджера загрузки.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Все готово для восстановления загрузочной записи (MBR) раздела %disk из файла %file. Хотите продолжить?
 Install	DrivesPage	Button	Установить
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\n%appname% needs 2 KiB available space before the first partition.	BootManagerController		Первый раздел на диске начинается слишком рано и не оставляет места для меню загрузки.\n%appname% нужно 2 КиБ свободного места перед первым разделом.
 File:	FileSelectionPage	Text control label	Файл:
 Error reading partition table	BootManagerController	Title	Ошибка чтения таблицы разделов
 Back	BootManagerController	Button	Назад

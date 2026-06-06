@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	2927169578
+1	ukrainian	x-vnd.Be-MAIL	1977644174
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Перенос тексту:
 Show icons & labels	Mail		Показати значки & надписи
@@ -26,11 +26,13 @@ Save changes to this signature?	Mail		Зберегти зміни в цьому 
 Save attachment…	Mail		Зберегти вкладення…
 Paste	Mail		Вставити
 E-mail draft could not be saved!	Mail		Чернетка листа не збережена!
+Next message, keep status	Mail		Наступне повідомлення, зберегти статус
 Don't send	Mail		Не надсилати
 sent	B_USER_DIRECTORY/mail/sent		Надіслані
-Only files can be added as attachments.	Mail		Тільки файли можуть бути додані в якості вкладень.
+Only files can be added as attachments.	Mail		В якості вкладень можуть бути додані тільки файли.
 Close	Mail		Закрити
 Untitled	Mail		Без назви
+%appname% couldn't find its dictionary.	Mail		%appname% не вдалося знайти свій словник.
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Видалення вкладень з листа що пересилається не підтримується!\nЦе не працюватиме правильно.
 Same recipient	Mail		Той самий отримувач
 Previous message	Mail		Попереднє повідомлення
@@ -76,7 +78,7 @@ View	Mail		Режим перегляду
 Signatures	Mail		Підписи
 On	Mail		Увімкнути
 Find	Mail		Знайти
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте, не знайдено програми що підтримує дані типу «Person».
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте, програму що підтримує дані типу «Person» не знайдено.
 Date:	Mail		Дата:
 Expert	Mail		Експерт
 Automatically mark mail as read:	Mail		Автоматично помітити як прочитане:
@@ -91,13 +93,16 @@ Open draft	Mail		Відкрити чернетки
 Random	Mail		Випадковий
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Залишити статус «New»
 Attach attributes:	Mail		Додати атрибути:
+Remove label	Mail		Прибрати мітку
 Find again	Mail		Знайти далі
 Size:	Mail		Розмір шрифту:
+New label:	LabelWindow		Нова мітка:
 To:	Mail		Кому:
 Need Tracker to move items to trash	Mail		Для переміщення до смітника потрібен Tracker
 The mail_daemon could not be started:\n\t	Mail		Mail_daemon не запущено:\n\t
 <no account found>	Mail		<обліковий запис не знайдено>
 helpful message	Mail		корисне повідомлення
+Label as…	Mail		Помітити як…
  Read 	Mail		 Прочитаним 
 Font:	Mail		Шрифт:
 Accounts…	Mail		Облікові записи…
@@ -133,6 +138,7 @@ Hide	Mail		Сховати
 From:	Mail		Від:
 No file attributes, just plain data	Mail		Ніяких атрибутів, тільки чисті дані
 Add	Mail		Додати
+Same label	Mail		Та сама мітка
 out	B_USER_DIRECTORY/mail/out		Вихідні
 Send this message before closing?	Mail		Відіслати це повідомлення перед закриттям?
 in	B_USER_DIRECTORY/mail/in		Вхідні
@@ -155,10 +161,13 @@ Remove attachment	Mail		Прибрати вкладення
 Edit	Mail		Коректив
 Page setup…	Mail		Настройка сторінки…
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.
+Set label	Mail		Позначити міткою
 Beginner	Mail		Початківець
+Previous message, keep status	Mail		Попереднє повідомлення, зберегти статус
 Send message	Mail		Відіслати повідомлення
 Delete	Mail		Видалити
 Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть обрані поштові запити і шаблони запитів у цю папку.
+Manage labels…	Mail		Управління мітками…
 Spam	Mail		Спам
 Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
 OK	LabelWindow		OK

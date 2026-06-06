@@ -2,7 +2,7 @@
 IPv6 address:	NetworkStatusView		Адреса IPv6:
 Quit	NetworkStatusView		Вийти
 Unknown	NetworkStatusView		Невідомий
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Збій запуску аплета мережевих параметрів.\n\nПомилка: 
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Збій запуску префлета параметрів мережі.\n\nПомилка: 
 Install in Deskbar	NetworkStatus		Встановити у Deskbar
 Open network preferences…	NetworkStatusView		Відкрити налаштування мережі…
 NetworkStatus	System name		NetworkStatus

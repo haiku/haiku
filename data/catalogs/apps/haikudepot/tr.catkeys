@@ -192,8 +192,8 @@ Login issue	MainWindow		Oturum açma sorunu
 Your rating:	RatePackageWindow		Derecelendirmeniz:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		HaikuDepotServer sisteminde %Nickname% kullanıcısı başarıyla oluşturuldu. Kullanıcı bilgilerinizi web arayüzünü kullanarak yönetebilirsiniz. Şu anda bu kullanıcı ile giriş yapmış bulunmaktasınız.
 Repositories	MainWindow		Depolar
-This rating is visible to other users	RatePackageWindow		Bu derecelendirme diğer kullanıcılar tarafından görüntülenebilir
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Paket verisi güncellenirken verinin uygulamaya yansıtılamamasına neden olan bir sorun oluştu. Bu sorun hakkında ayrıntılı bilgiye uygulama günlüklerinden erişilebilir.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
+This rating is visible to other users	RatePackageWindow		Bu derecelendirme diğer kullanıcılar tarafından görüntülenebilir
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu’nun Haiku Depo bölümünden erişilebilir.
 Stop network use	ServerHelper		Ağ kullanımını durdur
 View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…

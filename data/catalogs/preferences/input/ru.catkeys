@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Input	1794165409
+1	russian	x-vnd.Haiku-Input	1746072289
 Defaults	InputMouse		По умолчанию
 Scrolling	TouchpadPrefView		Прокрутка
 Long	KeyboardView		Длинная
@@ -30,6 +30,7 @@ Focus follows mouse	SettingsView		Фокус следует за курсоро�
 Focus mode:	SettingsView		Режим фокуса:
 Double-click test area	SettingsView		Область для проверки двойного клика
 Revert	TouchpadPrefView		Откатить
+When dragging	TouchpadPrefView		При перетаскивании
 4-Button	SettingsView		Четырёхкнопочная
 Tapping sensitivity	TouchpadPrefView		Отклик на постукивание
 Revert	InputKeyboard		Откатить

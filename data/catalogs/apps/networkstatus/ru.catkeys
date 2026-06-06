@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-NetworkStatus	1860540945
+1	russian	x-vnd.Haiku-NetworkStatus	3050452699
 IPv6 address:	NetworkStatusView		IPv6 адрес:
 Quit	NetworkStatusView		Выход
 Unknown	NetworkStatusView		Неизвестно
@@ -8,11 +8,13 @@ Open network preferences…	NetworkStatusView		Открыть настройки
 NetworkStatus	System name		Статус сети
 Broadcast:	NetworkStatusView		Широковещательный
 OK	NetworkStatusView		ОК
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Параметры запуска %appname%:\n\t--deskbar\tавтоматическое добавление репликанта в Deskbar\n\t--help\t\tпоказать справку и выйти
 No link	NetworkStatusView		Нет соединения
 Connected	NetworkStatusView		Подключено
 Could not join wireless network:\n	NetworkStatusView		Не удалось подключиться к беспроводной сети:\n
 Network Status	NetworkStatusView		Статус сети
 Deskbar is not running, giving up.	NetworkStatus		Deskbar не запущен, сдаюсь.
+You can run %appname% in a window or install it in the Deskbar.	NetworkStatus		Вы можете запустить %appname% в окне или установить в Deskbar.
 Netmask:	NetworkStatusView		Маска подсети
 No stateful configuration	NetworkStatusView		Нет полноценной конфигурации
 IPv4 address:	NetworkStatusView		IPv4 адрес:

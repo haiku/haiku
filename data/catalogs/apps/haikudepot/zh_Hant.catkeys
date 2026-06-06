@@ -182,8 +182,8 @@ Login issue	MainWindow		登入問題
 Your rating:	RatePackageWindow		你的評分：
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		使用者%Nickname% 已在HaikuDepotServer 系統中成功創建。您可以使用 Web 介面管理您的使用者詳細資訊。您現在已以新使用者身分登入。
 Repositories	MainWindow		庫
-This rating is visible to other users	RatePackageWindow		其他用戶可以看到此評級
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		更新套件資料時出現了一個問題，可能會導致應用程式顯示的資料過時或遺失。可以從應用程式紀錄檔中獲取有關此問題的其他詳細資訊。\n有關如何查看紀錄檔的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
+This rating is visible to other users	RatePackageWindow		其他用戶可以看到此評級
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		下載使用條件時發生錯誤。檢查紀錄檔以了解詳細信息，然後重試。 \n有關如何查看紀錄檔的信息，請參閱 Haiku 使用者指南的 HaikuDepot 部分。
 Stop network use	ServerHelper		中斷網路使用
 View agreed usage conditions…	MainWindow		查看約定的使用條件…

@@ -18,7 +18,7 @@ Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Відкат 
 Cancel	QuitAlert		Скасувати
 Copy	Menus		Копіювати
 Reload	NodeMonitorAlerts		Перезавантажити
-line %d, column %d	StatusView		рядок %d, колонка %d
+line %d, column %d	StatusView		рядок %d, стовпець %d
 Words:	Statistics		Слів:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Відновити
@@ -26,14 +26,14 @@ Unable to unlock file\n\t%error%	QuitAlert		Не вдається розблок
 OK	RevertToSavedAlert		ОК
 Unlock file	StatusView		Розблокувати
 Italic	Menus		Курсив
-Can't undo	Menus		Неможливо відмінити
+Can't undo	Menus		Відкат дії неможливий
 Replace…	Menus		Замінити…
 This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Цей файл має атрибут «тільки для читання». Зберегти зміни в документі \«%filename%\»? 
 File	Menus		Файл
 Paste	Menus		Вставити
 Bold	Menus		Жирний
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" був змінений іншою програмою, перезавантажити його?
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" був вилучений іншою програмою, відновити його?
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \«%file%\» був змінений іншою програмою, перезавантажити його?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \«%file%\» був видалений іншою програмою, відновити його?
 Lines:	Statistics		Рядків:
 Strikeout	Menus		Закреслений
 Replace in all windows	FindandReplaceWindow		Замінити у всіх вікнах
@@ -77,7 +77,7 @@ Decrease size	Menus		Зменшити розмір
 Autodetect	Menus		Автовизначення
 Replace next	Menus		Замінити наступний
 OK	QuitAlert		ОК
-Edit	Menus		Редагувати
+Edit	Menus		Коректив
 Replace with:	FindandReplaceWindow		Замінити на:
 Open…	Menus		Відкрити…
 Save as…	Menus		Зберегти як…

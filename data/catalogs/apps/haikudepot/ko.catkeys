@@ -178,8 +178,8 @@ Login issue	MainWindow		로그인 문제
 Your rating:	RatePackageWindow		당신의 평가:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		HaikuDepotServer 시스템에 사용자 %Nickname%을 성공적으로 생성하였습니다. 웹 인터페이스를 통하여 사용자 상세 정보를 관리할 수 있습니다. 이제 새 사용자로 로그인 됩니다.
 Repositories	MainWindow		저장소
-This rating is visible to other users	RatePackageWindow		이 평가는 다른 사용자들에게도 보여집니다
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		패키지 업데이트 중 문제가 발생하여 보여지는 응용 프로그램과 일부 데이터가 맞지 않거나 누락되었을 가능성이 있습니다. 문제에 대한 추가적인 상세 정보는 응용 프로그램 로그에서 확인할 수 있습니다.\n로그를 보는 방법에 대한 정보는 Haiku 사용자 가이드의 HaikuDepot 항목에서 확인할 수 있습니다.
+This rating is visible to other users	RatePackageWindow		이 평가는 다른 사용자들에게도 보여집니다
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		사용자 약관을 받아오는 데 오류가 발생했습니다. 로그를 통해 상세 사항을 확인하고 다시 시도하십시오.\n로그를 보는 방법에 대한 정보는 Haiku 사용자 설명서의 HaikuDepot 항목에서 볼 수 있습니다.
 View agreed usage conditions…	MainWindow		동의한 사용자 약관 보기…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		사용자 [%Nickname%]이(가) 인증되었습니다. 하지만 계속 진행하려면 최신 사용자 약관에 동의하여야 합니다.

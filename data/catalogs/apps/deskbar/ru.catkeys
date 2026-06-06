@@ -1,8 +1,9 @@
-1	russian	x-vnd.Be-TSKB	1874926759
+1	russian	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Скрывать автоматически
 Show all	WindowMenu		Показать все
 Edit in Tracker…	PreferencesWindow		Изменить меню…
 Menu	PreferencesWindow		Меню
+Location	PreferencesWindow		Размещение
 Tracker always first	PreferencesWindow		Tracker всегда первый
 Hide clock	TimeView		Скрыть часы
 Large	PreferencesWindow		Крупные
@@ -36,6 +37,7 @@ Suspend	DeskbarMenu		Приостановить
 Shutdown…	DeskbarMenu		Завершение работы…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
 Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
+%appname% preferences…	DeskbarMenu		Настройки %appname%…
 Recent applications:	PreferencesWindow		Недавние приложения:
 Recent folders:	PreferencesWindow		Недавние папки:
 Recent folders	DeskbarMenu		Недавние папки

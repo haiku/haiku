@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-TSKB	1874926759
+1	ukrainian	x-vnd.Be-TSKB	1763402521
 Auto-hide	PreferencesWindow		Ховати автоматично
 Show all	WindowMenu		Показати все
 Edit in Tracker…	PreferencesWindow		Змінити меню у Tracker…
@@ -36,6 +36,7 @@ Suspend	DeskbarMenu		Призупинити
 Shutdown…	DeskbarMenu		Завершити роботу...
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демонстраційні
 Expand new applications	PreferencesWindow		Розкривати список після запуску
+%appname% preferences…	DeskbarMenu		Налаштування %appname%…
 Recent applications:	PreferencesWindow		Недавні програми:
 Recent folders:	PreferencesWindow		Недавні папки:
 Recent folders	DeskbarMenu		Недавні папки

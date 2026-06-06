@@ -192,8 +192,8 @@ Login issue	MainWindow		Inloggnings problem
 Your rating:	RatePackageWindow		Dina betyg:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Användaren %Nickname% har framgångsrikt skapats i HaikuDepotServer-systemet. Du kan administrera dina användarinformation genom att använda webbgränssnittet. Du är nu inloggad som den här nya användaren.
 Repositories	MainWindow		Repositorier
-This rating is visible to other users	RatePackageWindow		Detta betyg är synligt för andra användare
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Under uppdateringen av paketdata har ett problem uppstått som kan leda till att data är föråldrade eller saknas från programmets skärm. Ytterligare information om detta problem kan hämtas från applikationsloggarna.\nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.
+This rating is visible to other users	RatePackageWindow		Detta betyg är synligt för andra användare
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Ett fel har uppstått vid nedladdning av användningsvillkoren. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
 Stop network use	ServerHelper		Stoppa nätverksanvändning
 View agreed usage conditions…	MainWindow		Visa godkända användarvillkor…

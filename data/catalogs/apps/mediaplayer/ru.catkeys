@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	334504768
+1	russian	x-vnd.Haiku-MediaPlayer	3337408711
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Переместить запись в корзину
 Close	MediaPlayer-PlaylistWindow		Закрыть
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
@@ -24,6 +24,7 @@ Resume:	MediaPlayer-SettingsWindow		Возобновить:
 Duration	MediaPlayer-InfoWin		Длительность
 Import Entries	MediaPlayer-ImportPLItemsCmd		импортирование записей
 Open network stream	MediaPlayer-Main		Открыть сетевой поток
+%appname% settings	MediaPlayer-SettingsWindow		Настройки %appname%
 Open file…	MediaPlayer-Main		Открыть файл…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабировать кнопки управления в полноэкранном режиме
 View options	MediaPlayer-SettingsWindow		Настройки вида
@@ -45,6 +46,7 @@ Save error	MediaPlayer-PlaylistWindow		Ошибка сохранения
 Attributes	MediaPlayer-Main		Атрибуты
 Bottom of screen	MediaPlayer-SettingsWindow		нижняя часть экрана
 Copyright	MediaPlayer-InfoWin		Авторские права
+%appname%: %title%	MediaPlayer-Main		%appname%: %title%
 Invalid URL inserted!	MediaPlayer-NetworkStream		Указан неверный URL!
 Aspect ratio	MediaPlayer-Main		Соотношение сторон
 Eject device	MediaPlayer-Main		Извлечь устройство

@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	334240761
+1	russian	x-vnd.haiku-icon_o_matic	1029251628
 None	Icon-O-Matic-Properties		Ничего
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Очистить контур
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -55,10 +55,12 @@ OK	Icon-O-Matic-ColorPicker		ОК
 Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Мультисет %property%
 Error: 	Icon-O-Matic-Main		Ошибка: 
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Сбросить {0, plural, one{преобразование} few{преобразования} other{преобразований}}
+SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey will be exported as linear approximations and may look different in other viewers.	Icon-O-Matic-SVGExport		SVG не поддерживает некоторые типы градиентов (конические, ромбы, xy, sqrt_xy).\n\nБудут экспортированы их линейные аппроксимации; в других программах они могут выглядеть иначе.
 Assign style	Icon-O-Matic-AssignStyleCmd		Определить стиль
 Saving your document failed!	Icon-O-Matic-Exporter		Не удалось сохранить документ!
 Snap to grid	Icon-O-Matic-Menu-Settings		Выровнять по сетке
 Opening the document failed!	Icon-O-Matic-Main		Не удалось открыть документ!
+SVG export	Icon-O-Matic-SVGExport		Экспорт SVG
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Убрать {0, plural, one{стиль} few{стиля} other{стилей}}
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Один или несколько контуров содержат слишком много точек. HVIF поддерживает максимум 255 точек на контур.
 Add with path & style	Icon-O-Matic-ShapesList		Добавить с контуром & стилем
@@ -94,6 +96,7 @@ Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCm
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Убрать {0, plural, one{форму} few{формы} other{форм}}
 Undo: %action%	Icon-O-Matic-Main		Откатить: %action%
 Diamond	Icon-O-Matic-StyleTypes		Ромбовидный
+%appname% might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		%appname% не удалось интерпретировать все данные из SVG при его загрузке. При перезаписи исходного файла они будут утеряны.
 Don't save	Icon-O-Matic-Menu-Settings		Не сохранять
 Add shape with path	Icon-O-Matic-Menu-Shape		Добавить форму с контуром
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Досадно

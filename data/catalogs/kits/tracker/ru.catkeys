@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2992119353
+1	russian	x-vnd.Haiku-libtracker	4065007242
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -103,6 +103,7 @@ Affine transform	AttributesView		Аффинное преобразование
 Window	ContainerWindow		Окно
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Удалить
+You cannot create a link to the %trash% directory.	FSUtils		Нельзя создать ссылку на каталог %trash%.
 Company	Person Query Columns		Компания
 Select folders…	FindPanel		Выбрать папки…
 Recent documents	FavoritesMenu		Недавние документы
@@ -164,6 +165,7 @@ Could not open \"%name\" (%error). 	FSUtils		Невозможно открыть
 Media parameter group	AttributesView		Группа параметров медиа
 %name info	InfoWindow	InfoWindow Title	Сведения о «%name»
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите home, %osName может начать работать неверно!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку home или её содержимое, зажмите клавишу Shift и нажмите \«Переместить\».
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, one{#/%total выделенный} other{#/%total выделенных}}
 Property info	AttributesView		Информация о свойствах
 Sorry, you can't create links in the Trash.	PoseView		Извините, но вы не можете создавать ссылки в корзине.
 From	Email Query Columns		От
@@ -261,6 +263,7 @@ New folder %d	FSUtils		Новая папка %d
 Extended attribute	AttributesView		Расширенные атрибуты
 Error %error loading Add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
 Unmatched brackets.	libtracker		Непарные скобки.
+You cannot copy or move the 'printers' directory.	FSUtils		Нельзя копировать или перемещать каталог «printers».
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Заменить существующий файл:\n\t%name%dest\nна %movemode:\n\t%name%src
 Empty Trash	ContainerWindow		Очистить корзину
 no supporting apps	OpenWithWindow		нет поддерживающих программ
@@ -273,6 +276,7 @@ label too long	PoseView		слишком длинное имя
 Error creating link to \"%name\".	FSUtils		Ошибка при создании ссылки к \«%name\».
 Unknown	FilePermissionsView		Неизвестно
 Paste links	ContainerWindow		Вставить ссылки
+You cannot copy or move the %trash% directory.	FSUtils		Нельзя копировать или перемещать каталог %trash%.
 Restoring: 	StatusWindow		Восстановление: 
 The Tracker must be running to set the default printer.	PoseView		Чтобы установить принтер по умолчанию Tracker должен быть запущен.
 calculating…	InfoWindow		подсчёт…
@@ -341,11 +345,13 @@ The entered file name is too long.	FSUtils		Введённое имя файла
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Некоторые из выбранных объектов не могут быть перемещены в корзину. Хотите ли вы вместо этого удалить эти объекты? (Эту операцию будет невозможно отменить)
 Add printer…	ContainerWindow		Добавить принтер…
 Permissions	ContainerWindow		Права
+Trash	FSUtils		Корзина
 Size:	InfoWindow		Размер:
 Copy	ContainerWindow		Копировать
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбранный объект не может быть перемещён в корзину. Хотите ли вы вместо этого удалить его? (Эту операцию будет невозможно отменить)
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Извините, но атрибут «Character» не может хранить многобайтовый глиф.
 And	FindPanel		и
+copy	PoseView	filename copy	копия
 Palette-indexed picture	AttributesView		Индексированная картинка
 Drawing pattern	AttributesView		Отрисовка шаблона
 File offset	AttributesView		Смещение файла

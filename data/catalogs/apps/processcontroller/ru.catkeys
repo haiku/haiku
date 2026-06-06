@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ProcessController	3071891193
+1	russian	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Ошибка при сохранении файла
 Display priority	ProcessController		Приоритет отображения
 That's no Fun!	ProcessController		Это не смешно!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Низкий приортитет
 Urgent display priority	ProcessController		Срочный приоритет отображения
 Memory usage	ProcessController		Использование памяти
 Ok!	ProcessController		ОК!
+%appname% is already installed in Deskbar.	ProcessController		%appname% уже установлен в Deskbar.
 Normal priority	ProcessController		Нормальный приоритет
 Restart Deskbar	ProcessController		Перезапустить Deskbar
 Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskbar]\n

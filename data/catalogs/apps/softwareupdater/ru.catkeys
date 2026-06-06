@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-softwareupdater	1377379822
+1	russian	x-vnd.haiku-softwareupdater	2012285635
 Updating version	SoftwareUpdaterWindow	List item text	Обновляется версия
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Нажмите здесь для установки {0, plural, one{# обновленного пакета} other{# обновленных пакетов}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Пакеты, которые будут удалены
@@ -8,6 +8,7 @@ There were no updates found.	CheckManager		Обновлений не было н
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Обновление не было завершено, вы уверены, что хотите выйти?
 Updates found	SoftwareUpdaterWindow		Найдены обновления
 Update now	SoftwareUpdaterWindow		Обновить сейчас
+Settings	SoftwareUpdaterWindow		Настройки
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		По какой-то причине не удалось перезагрузить ваш компьютер.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Нераспознанный аргумент
@@ -16,7 +17,9 @@ No updates available	UpdateAction		Обновления отсутствуют
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Будут установлены новые пакеты
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Пакеты, которые будут обновлены
 to	SoftwareUpdaterWindow	List item text	до
+Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		Нажмите здесь, чтобы запустить %appname%. Некоторые обновления потребуют выбрать способ устранения проблемы.
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Попытка отменить обновления…
+Automatically clean up old install states	SoftwareUpdaterWindow		Автоматическая очистка предыдущих инсталляций
 Contacting software repositories to check for package updates.	CheckManager		Устанавливаем связь с репозиториями для проверки обновлений.
 Available updates found	CheckManager		Найдены доступные обновления
 from repository	SoftwareUpdaterWindow	List item text	из репозитария
@@ -54,6 +57,7 @@ Update	SoftwareUpdaterWindow	Alert button label	Обновить
 Updates did not complete	UpdateAction		Обновление не было завершено
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Открыть Репозитории
 Invalid update type, cannot continue with updates	UpdateAction		Неверный тип обновления, невозможно продолжить
+Settings…	SoftwareUpdaterWindow		Настройки…
 Uninstalling version	SoftwareUpdaterWindow	List item text	Удаляемая версия
 %i of %i	UpdateManager	Do not translate %i	%i из %i
 Quit	SoftwareUpdaterWindow		Выйти

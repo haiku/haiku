@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Expander	2040688293
+1	ukrainian	x-vnd.Haiku-Expander	2735024965
 Destination	ExpanderWindow		Куди розпакувати
 Other	ExpanderPreferences		Інше
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
@@ -6,12 +6,14 @@ Expander	System name		Expander
 Set source…	ExpanderMenu		Що розпакувати…
 OK	ExpanderWindow		ОК
 The destination is not a folder.	ExpanderWindow		Папка призначення не є папкою.
+%appname%: Choose destination	DirectoryFilePanel		%appname%: Вибір папки призначення
 The folder was either moved, renamed or not supported.	ExpanderWindow		Папка була переміщена, перейменована або не підтримується.
 Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки
 Close	ExpanderMenu		Закрити
 Create	ExpanderWindow		Створити
-Creating listing for '%s'…	ExpanderWindow		Створення списку для '%s'…
+Creating listing for '%s'…	ExpanderWindow		Створення списку для «%s»…
 Show contents	ExpanderMenu		Показати вміст
+%appname% settings	ExpanderPreferences		Налаштування %appname%
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені що бажаєте зупинити розпаковку архіву? Деякі розпаковані елементи можуть бути неповними.
 Settings	ExpanderMenu		Налаштування
 Expand	ExpanderWindow		Розпакувати
@@ -24,20 +26,20 @@ Expand	ExpanderMenu		Розпакувати
 Failed to create the destination folder.	ExpanderWindow		Не вдалося створити папку призначення.
 Settings…	ExpanderMenu		Налаштування…
 Select current	DirectoryFilePanel		Вибрати поточний
-Expanding '%s'…	ExpanderWindow		Розпаковка '%s'…
+Expanding '%s'…	ExpanderWindow		Розпаковка «%s»…
 OK	ExpanderPreferences		ОК
 File expanded	ExpanderWindow		Розпаковка файлу
 Automatically expand files	ExpanderPreferences		Автоматично розпакувати файли
 Select	DirectoryFilePanel		Вибрати
 Show contents	ExpanderWindow		Показати вміст
 Stop	ExpanderMenu		Зупинити
-Select '%s'…	DirectoryFilePanel		Вибрати '%s'…
-Expansion	ExpanderPreferences		Розширення
+Select '%s'…	DirectoryFilePanel		Вибрати «%s»…
+Expansion	ExpanderPreferences		Розпаковка
 Set destination…	ExpanderMenu		Куди розпакувати…
 Continue	ExpanderWindow		Продовжити
  is not supported	ExpanderWindow		 не підтримується
 Cancel	ExpanderPreferences		Скасувати
-Use:	ExpanderPreferences		Використати:
+Use:	ExpanderPreferences		Використати іншу папку:
 Destination folder	ExpanderPreferences		Папка призначення
 Leave destination folder path empty	ExpanderPreferences		Зберегти шлях папки призначення пустим
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка призначення не існує. Створити її?
@@ -45,5 +47,6 @@ The file doesn't exist	ExpanderWindow		Файл відсутній
 Hide contents	ExpanderWindow		Сховати вміст
 Source	ExpanderWindow		Що розпакувати
 The destination is read only.	ExpanderWindow		Папка призначення тільки для читання.
+%appname%: Open	ExpanderWindow		%appname%: Відкрити
 Select	ExpanderPreferences		Вибрати
 File	ExpanderMenu		Файл

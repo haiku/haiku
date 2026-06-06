@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2799291155
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2108618135
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні умов використання
 User ratings loading…	PackageInfoView		Завантажуються оцінки користувачів…
 Available packages	MainWindow		Доступні пакети
@@ -52,6 +52,7 @@ All packages	PackageListView		Усі пакети
 Send	RatePackageWindow		Надіслати
 Creating package list…	FeaturedPackagesView		Створення списку пакетів…
 Start package daemon	App		Запустити демон пакетів
+Changelog loading…	PackageInfoView		Завантаження журналу змін…
 There are problems in the supplied data:	UserLoginWindow		У наданих даних існують проблеми:
 Desktop and non-desktop packages	MainWindow		Пакети десктоп- и недесктоп-програм
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Користувач «%Nickname%» не погодився з жодними умовами використання.
@@ -191,8 +192,8 @@ Login issue	MainWindow		Проблема входу в систему
 Your rating:	RatePackageWindow		Ваша оцінка:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Користувач %Nickname% був успішно створений в системі HaikuDepotServer. Ви можете адмініструвати дані цього користувача за допомогою веб-інтерфейсу. Зараз Ви увійшли в систему під його ім'ям, як новий користувач.
 Repositories	MainWindow		Репозитарії
-This rating is visible to other users	RatePackageWindow		Оцінку видно і іншим користувачам
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Під час оновлення даних пакету виникла проблема, яка може призвести до відображення програмою недостовірних даних. Додаткові відомості про цю проблему можна отримати в журналах застосунку.\nІнформація про те, як переглядати журнали, доступна у розділі HaikuDepot посібника користувача Haiku.
+This rating is visible to other users	RatePackageWindow		Оцінку видно і іншим користувачам
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		При завантаженні умов користування виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі застосунку HaikuDepot посібника користувача Haiku.
 Stop network use	ServerHelper		Припинити використання мережі
 View agreed usage conditions…	MainWindow		Погоджені умови користування…

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	201361663
+1	russian	x-vnd.Haiku-StyledEdit	2777022576
 Document statistics	Statistics		Статистика документа
 Cut	Menus		Вырезать
 Center	Menus		По центру
@@ -14,10 +14,11 @@ Find again	Menus		Найти далее
 Read-only	StatusView		Только чтение
 Save	Menus		Сохранить
 Untitled %d	Window title		Без названия %d
-Cancel	QuitAlert		Отмена
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Откат назад невозможен, файл не найден: \«%filename%\».
+Cancel	QuitAlert		Отменить
 Copy	Menus		Копировать
 Reload	NodeMonitorAlerts		Перезагрузить
-line %d, column %d	StatusView		линия %d, позиция %d
+line %d, column %d	StatusView		строка %d, колонка %d
 Words:	Statistics		Слов:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Восстановить
@@ -25,22 +26,24 @@ Unable to unlock file\n\t%error%	QuitAlert		Не удаётся разблоки
 OK	RevertToSavedAlert		ОК
 Unlock file	StatusView		Разблокировать
 Italic	Menus		Наклонный
-Can't undo	Menus		Невозможно отменить
+Can't undo	Menus		Отмена невозможна
 Replace…	Menus		Заменить…
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		У файла установлен атрибут «только для чтения». Сохранить изменения в документе \«%filename%\»? 
 File	Menus		Файл
 Paste	Menus		Вставить
 Bold	Menus		Жирный
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" был изменен другой программой, перезагрузить его?
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" был удален другой программой, восстановить его?
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \«%file%\» был изменен другой программой, перезагрузить его?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \«%file%\» был удален другой программой, восстановить его?
 Lines:	Statistics		Строк:
 Strikeout	Menus		Зачёркнутый
 Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
 Error saving \"%filename%\":\n%error%	SaveAlert		Ошибка сохранения \«%filename%\»:\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		Сохранить изменения в документе \«%title%\»?
 Save	SaveAlert		Сохранить
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\«%title%\» содержит несохранённые изменения.\nВернуться к последней сохранённой версии?
 Default	Open_and_SaveAsPanel		По умолчанию
-Cancel	RevertToSavedAlert		Отмена
-Cancel	FindandReplaceWindow		Отмена
+Cancel	RevertToSavedAlert		Отменить
+Cancel	FindandReplaceWindow		Отменить
 Statistics…	Menus		Статистика…
 Encoding	Open_and_SaveAsPanel		Кодировка
 Replace all	FindandReplaceWindow		Заменить все
@@ -56,7 +59,7 @@ Undo typing	QuitAlert		Отменить ввод
 Don't save	SaveAlert		Не сохранять
 Reload…	Menus		Перезагрузить…
 Print…	Menus		Печать…
-Quit	Menus		Выход
+Quit	Menus		Выйти
 Redo typing	QuitAlert		Повторить ввод
 Ignore	NodeMonitorAlerts		Игнорировать
 Wrap lines	Menus		Перенос строк
@@ -67,14 +70,14 @@ Save	QuitAlert		Сохранить
 Case-sensitive	FindandReplaceWindow		Учитывать регистр
 Find selection	Menus		Найти выделенное
 Find…	Menus		Найти…
-Cancel	SaveAlert		Отмена
-Revert	RevertToSavedAlert		Вернуть
+Cancel	SaveAlert		Отменить
+Revert	RevertToSavedAlert		Откатить
 Size	Menus		Размер
 Decrease size	Menus		Уменьшить размер
 Autodetect	Menus		Автоопределение
 Replace next	Menus		Заменить далее
 OK	QuitAlert		ОК
-Edit	Menus		Изменить
+Edit	Menus		Правка
 Replace with:	FindandReplaceWindow		Заменить на:
 Open…	Menus		Открыть…
 Save as…	Menus		Сохранить как…

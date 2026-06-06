@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Pairs	3059673093
+1	ukrainian	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		Pairs
 Quit	PairsWindow		Вийти
 Medium	PairsWindow		Середній
@@ -9,9 +9,10 @@ OK	Pairs		ОК
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ви завершили гру в {0, plural, one{# клік} few{# кліка} other{# кліків}}.\n
 Small	PairsWindow		Малий
 Size	PairsWindow		Розмір
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tрозробив Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Завершити гру
 Large	PairsWindow		Великий
 Beginner (4x4)	PairsWindow		Початківець (4x4)
 Intermediate (6x6)	PairsWindow		Середняк (6x6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	Для запуску %s недостатньо векторних значків; потрібно щонайменше %zu, знайдено %zu.\n
 New game	PairsWindow		Нова гра

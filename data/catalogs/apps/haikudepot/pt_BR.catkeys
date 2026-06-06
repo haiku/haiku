@@ -138,8 +138,8 @@ Login issue	MainWindow		Problema de login
 Your rating:	RatePackageWindow		Sua avaliação:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		O usuário %Nickname% foi criado com sucesso no sistema HaikuDepotServer. Você pode administrar seus detalhes de usuário usando a interface da web. Agora você está logado como este novo usuário.
 Repositories	MainWindow		Repositórios
-This rating is visible to other users	RatePackageWindow		Esta avaliação é visível para outros usuários
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Ao atualizar os dados do pacote, surgiu um problema que pode fazer com que os dados fiquem desatualizados ou faltem na tela do aplicativo. Detalhes adicionais sobre esse problema podem ser obtidos nos logs do aplicativo.\nAs informações sobre como visualizar os logs estão disponíveis na seção HaikuDepot do Guia do usuário do Haiku.
+This rating is visible to other users	RatePackageWindow		Esta avaliação é visível para outros usuários
 View agreed usage conditions…	MainWindow		Ver as condições de uso acordadas…
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Este pacote não parece estar no servidor HaikuDepot, portanto, não é possível criar uma nova classificação ou editar uma classificação existente.
 Apply	SettingsWindow		Aplicar
