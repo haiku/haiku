@@ -68,6 +68,42 @@ haiku_get_xsave_mask()
 }
 
 
+extern "C" void
+haiku_save_fpu(void* area, uint64_t xsave_features)
+{
+	switch (xsave_features) {
+		case IA32_XCR0_X87:
+			asm volatile("fnsave %0" : "=m" (*(char*)area));
+			break;
+
+		case IA32_XCR0_X87 | IA32_XCR0_SSE:
+			asm volatile("fxsaveq %0" : "=m" (*(char*)area));
+			break;
+
+		default:
+			panic("nvmm save_fpu: unimplemented xsave_features state");
+	}
+}
+
+
+extern "C" void
+haiku_restore_fpu(const void* area, uint64_t xsave_features)
+{
+	switch (xsave_features) {
+		case IA32_XCR0_X87:
+			asm volatile("frstor %0" :: "m" (*(const char*)area));
+			break;
+
+		case IA32_XCR0_X87 | IA32_XCR0_SSE:
+			asm volatile("fxrstorq %0" :: "m" (*(const char*)area));
+			break;
+
+		default:
+			panic("nvmm restore_fpu: unimplemented xsave_features state");
+	}
+}
+
+
 extern "C" int32
 haiku_smp_get_current_cpu()
 {
