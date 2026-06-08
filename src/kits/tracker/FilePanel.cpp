@@ -115,10 +115,12 @@ BFilePanel::Show()
 			fWindow->MoveTo(fWindow->AlertPosition(BScreen(fWindow).Frame()));
 	}
 
-	// Calling Show() will start the looper and unlock the "initial" lock
 	if (!IsShowing())
 		fWindow->Show();
-	else
+
+	// Calling Show() the first time will start the looper and unlock the
+	// "initial" lock. Subsequent times won't unlock, so we have to check.
+	if (fWindow->IsLocked())
 		fWindow->Unlock();
 
 	fWindow->Activate();
