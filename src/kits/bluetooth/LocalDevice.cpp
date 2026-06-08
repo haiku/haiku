@@ -422,6 +422,31 @@ LocalDevice::_ReadLocalVersion()
 
 
 status_t
+LocalDevice::_ReadLocalSupportedCommands()
+{
+	int8 bt_status = BT_ERROR;
+
+	BluetoothCommand<> localSupportedCommands(OGF_INFORMATIONAL_PARAM,
+		OCF_READ_LOCAL_SUPPORTED_COMMANDS);
+
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+
+	request.AddInt32("hci_id", fHid);
+	request.AddData("raw command", B_ANY_TYPE,
+		localSupportedCommands.Data(), localSupportedCommands.Size());
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM,
+		OCF_READ_LOCAL_SUPPORTED_COMMANDS));
+
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindInt8("status", &bt_status);
+
+	return bt_status;
+}
+
+
+status_t
 LocalDevice::_ReadBufferSize()
 {
 	int8 bt_status = BT_ERROR;
@@ -572,6 +597,7 @@ LocalDevice::LocalDevice(hci_id hid)
 	_ReadBufferSize();
 	_ReadLocalFeatures();
 	_ReadLocalVersion();
+	_ReadLocalSupportedCommands();
 	_ReadTimeouts();
 	_ReadLinkKeys();
 

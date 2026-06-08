@@ -330,6 +330,15 @@ buildReadLocalVersionInformation(size_t* outsize)
 
 
 void*
+buildReadLocalSupportedCommands(size_t* outsize)
+{
+	CALLED();
+	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_SUPPORTED_COMMANDS,
+		NULL, 0, outsize);
+}
+
+
+void*
 buildReadBufferSize(size_t* outsize)
 {
 	CALLED();

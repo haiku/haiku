@@ -127,6 +127,7 @@ void* buildAuthenticationRequested(uint16 handle, size_t* outsize);
 
 /* OGF_INFORMATIONAL_PARAM */
 void* buildReadLocalVersionInformation(size_t* outsize);
+void* buildReadLocalSupportedCommands(size_t* outsize);
 void* buildReadBufferSize(size_t* outsize);
 void* buildReadBdAddr(size_t* outsize);
 

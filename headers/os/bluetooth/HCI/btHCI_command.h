@@ -23,9 +23,9 @@ struct hci_command_header {
 
 
 /* - Informational Parameters Command definition - */
-#define OGF_INFORMATIONAL_PARAM	0x04
+#define OGF_INFORMATIONAL_PARAM 0x04
 
-	#define OCF_READ_LOCAL_VERSION		0x0001
+	#define OCF_READ_LOCAL_VERSION				0x0001
 	struct hci_rp_read_loc_version {
 		uint8		status;
 		uint8		hci_version;
@@ -35,13 +35,19 @@ struct hci_command_header {
 		uint16		lmp_subversion;
 	} __attribute__ ((packed));
 
-	#define OCF_READ_LOCAL_FEATURES		0x0003
+	#define OCF_READ_LOCAL_SUPPORTED_COMMANDS	0x0002
+	struct hci_rp_read_loc_supported_cmd {
+		uint8		status;
+		uint8		supported_commands[64];
+	} __attribute__ ((packed));
+
+	#define OCF_READ_LOCAL_FEATURES				0x0003
 	struct hci_rp_read_loc_features {
 		uint8		status;
 		uint8		features[8];
 	} __attribute__ ((packed));
 
-	#define OCF_READ_BUFFER_SIZE		0x0005
+	#define OCF_READ_BUFFER_SIZE				0x0005
 	struct hci_rp_read_buffer_size {
 		uint8		status;
 		uint16		acl_mtu;
@@ -50,7 +56,7 @@ struct hci_command_header {
 		uint16		sco_max_pkt;
 	} __attribute__ ((packed));
 
-	#define OCF_READ_BD_ADDR			0x0009
+	#define OCF_READ_BD_ADDR					0x0009
 	struct hci_rp_read_bd_addr {
 		uint8		status;
 		bdaddr_t	bdaddr;

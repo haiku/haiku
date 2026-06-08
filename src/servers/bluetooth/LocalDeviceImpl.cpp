@@ -534,6 +534,32 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 			break;
 		}
 
+		case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_SUPPORTED_COMMANDS):
+		{
+			struct hci_rp_read_loc_supported_cmd* supported_commands
+				= JumpEventHeader<struct hci_rp_read_loc_supported_cmd,
+				struct hci_ev_cmd_complete>(event);
+
+			if (supported_commands->status == BT_OK) {
+
+				if (!IsPropertyAvailable("supported_commands"))
+					fProperties->AddData("supported_commands", B_ANY_TYPE,
+						&supported_commands->supported_commands, 64);
+
+			}
+
+			TRACE_BT("LocalDeviceImpl: Reply for Supported Commands %x\n",
+				supported_commands->status);
+
+			reply.AddInt8("status", supported_commands->status);
+			status = request->SendReply(&reply);
+			// printf("Sending reply... %d\n", status);
+			// debug reply.PrintToStream();
+
+			// This request is not gonna be used anymore
+			ClearWantedEvent(request);
+			break;
+		}
 
 		case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR):
 		{

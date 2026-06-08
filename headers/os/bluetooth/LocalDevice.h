@@ -56,6 +56,7 @@ private:
 			virtual	~LocalDevice();
 
 			status_t		_ReadLocalVersion();
+			status_t		_ReadLocalSupportedCommands();
 			status_t		_ReadBufferSize();
 			status_t		_ReadLocalFeatures();
 			status_t		_ReadTimeouts();
