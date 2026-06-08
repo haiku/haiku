@@ -159,12 +159,8 @@ os_return_needed()
 extern "C" status_t
 os_mtx_lock(os_mtx_t *lock)
 {
-	if (!are_interrupts_enabled())
-		while (mutex_trylock(lock) != B_OK);
-	else
-		return mutex_lock(lock);
-
-	return B_OK;
+	ASSERT(!os_preempt_disabled());
+	return mutex_lock(lock);
 }
 
 
