@@ -104,8 +104,9 @@ BluetoothWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgSetConnectionPolicy:
 		case kMsgSetDeviceClass:
+		case kMsgSetFriendlyName:
 			fSettingsView->MessageReceived(message);
-		break;
+			break;
 
 		case kMsgSetDefaults:
 /*			fColorsView -> MessageReceived(new BMessage(DEFAULT_SETTINGS));

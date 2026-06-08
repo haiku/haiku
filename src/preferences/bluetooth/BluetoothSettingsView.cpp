@@ -102,12 +102,17 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 
 	fClassMenu->SetValue(_GetClassForMenu());
 
+	fFriendlyName = new BTextControl("FriendlyName", B_TRANSLATE("Friendly Name:"),
+		ActiveLocalDevice->GetFriendlyName(), new BMessage(kMsgSetFriendlyName));
+
 	BLayoutBuilder::Grid<>(this, 0)
 		.SetInsets(10)
+
 		.Add(fClassMenu, 0, 0)
 		.Add(fPolicyMenu, 0, 1)
+		.Add(fFriendlyName, 0, 2)
 
-		.Add(fInquiryTimeControl, 0, 2, 2)
+		.Add(fInquiryTimeControl, 0, 3, 2)
 
 		.Add(fLocalDevicesMenuField->CreateLabelLayoutItem(), 0, 5)
 		.Add(fLocalDevicesMenuField->CreateMenuBarLayoutItem(), 1, 5)
@@ -187,6 +192,22 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 
 			break;
 		}
+
+		case kMsgSetFriendlyName:
+		{
+			BString friendlyName = fFriendlyName->Text();
+
+			BMenuItem* item = fLocalDevicesMenu->FindItem(ActiveLocalDevice->GetFriendlyName());
+			item->SetLabel(friendlyName);
+			item->SetMarked(true);
+
+			ActiveLocalDevice->SetFriendlyName(friendlyName);
+
+			fExtDeviceView->SetLocalDevice(ActiveLocalDevice);
+
+			break;
+		}
+
 		case kMsgRefresh:
 		{
 			_BuildLocalDevicesMenu();

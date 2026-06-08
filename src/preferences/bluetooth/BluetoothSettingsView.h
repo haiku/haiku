@@ -20,6 +20,7 @@ class BMenuField;
 class BPopUpMenu;
 class BSlider;
 class BOptionPopUp;
+class BTextControl;
 
 class BluetoothSettingsView : public BView {
 public:
@@ -46,6 +47,7 @@ protected:
 			BOptionPopUp*		fClassMenu;
 			BMenuField*			fLocalDevicesMenuField;
 			BPopUpMenu*			fLocalDevicesMenu;
+			BTextControl*		fFriendlyName;
 
 			ExtendedLocalDeviceView* 	fExtDeviceView;
 
