@@ -75,8 +75,12 @@ CheckVisitor::StartBitmapPass()
 
 	// TODO: check reserved area in bitmap!
 
-	Start(VISIT_REGULAR | VISIT_INDICES | VISIT_REMOVED
-		| VISIT_ATTRIBUTE_DIRECTORIES);
+	uint32 flags = VISIT_REGULAR | VISIT_REMOVED | VISIT_ATTRIBUTE_DIRECTORIES;
+
+	if (!GetVolume()->Indices().IsZero())
+		flags |= VISIT_INDICES;
+
+	Start(flags);
 
 	return B_OK;
 }
