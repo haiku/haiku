@@ -295,9 +295,6 @@ struct ifnet {
 	sem_id				link_state_sem;
 	int32				open_count;
 	int32				flags;
-
-	/* WLAN specific additions */
-	sem_id				scan_done_sem;
 };
 
 typedef void if_init_f_t(void *);

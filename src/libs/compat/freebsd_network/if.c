@@ -167,9 +167,6 @@ if_alloc_inplace(struct ifnet *ifp, u_char type)
 	ifp->if_type = type;
 	ifq_init(&ifp->receive_queue, semName);
 
-	ifp->scan_done_sem = -1;
-		// WLAN specific, doesn't hurt when initialized for other devices
-
 	// Search for the first free device slot, and use that one
 	IFNET_WLOCK();
 	if (ifindex_alloc_locked(&index) != ENOERR) {

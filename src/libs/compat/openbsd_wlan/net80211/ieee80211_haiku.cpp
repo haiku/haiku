@@ -493,9 +493,6 @@ ieee80211_rtm_80211info_task(void* arg)
 void
 ieee80211_notify_scan_done(struct ieee80211vap* vap)
 {
-	release_sem_etc(vap->iv_ifp->scan_done_sem, 1,
-		B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
-
 	TRACE("%s\n", __FUNCTION__);
 
 	if (sNotificationModule != NULL) {

@@ -165,8 +165,6 @@ start_wlan(device_t device)
 	KASSERT(gDevices[gDeviceCount - 1] == vap->iv_ifp,
 		("start_wlan: gDevices[i] != vap->iv_ifp"));
 
-	vap->iv_ifp->scan_done_sem = create_sem(0, "wlan scan done");
-
 	// We aren't connected to a WLAN, yet.
 	if_link_state_change(vap->iv_ifp, LINK_STATE_DOWN);
 
@@ -183,8 +181,6 @@ stop_wlan(device_t device)
 	struct ifnet* ifp = get_ifnet(device, i);
 	if (ifp == NULL)
 		return B_BAD_VALUE;
-
-	delete_sem(ifp->scan_done_sem);
 
 	struct ieee80211vap* vap = (ieee80211vap*)ifp->if_softc;
 	struct ieee80211com* ic = vap->iv_ic;
@@ -222,7 +218,7 @@ wlan_close(void* cookie)
 	ifp->if_flags &= ~IFF_UP;
 	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
 
-	return release_sem_etc(ifp->scan_done_sem, 1, B_RELEASE_ALL);
+	return B_OK;
 }
 
 
@@ -902,9 +898,6 @@ ieee80211_notify_node_leave(struct ieee80211_node* ni)
 void
 ieee80211_notify_scan_done(struct ieee80211vap* vap)
 {
-	release_sem_etc(vap->iv_ifp->scan_done_sem, 1,
-		B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
-
 	TRACE("%s\n", __FUNCTION__);
 
 	if (sNotificationModule != NULL) {
