@@ -195,7 +195,18 @@ os_return_needed()
 extern "C" status_t
 os_mtx_lock(os_mtx_t *lock)
 {
-	ASSERT(!os_preempt_disabled());
+	if (os_preempt_disabled()) {
+		// This happens under the VMX backend during ASID allocation, at least.
+		int32 spins = 0;
+		while (mutex_trylock(lock) != B_OK) {
+			cpu_pause();
+			spins++;
+			if (spins > 1000000)
+				panic("os_mtx_lock: failed to acquire mutex for a long time");
+		}
+		return B_OK;
+	}
+
 	return mutex_lock(lock);
 }
 
