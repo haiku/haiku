@@ -102,7 +102,7 @@ ScreenConfigurations::BestFit(int32 id, const monitor_info* info,
 
 status_t
 ScreenConfigurations::Set(int32 id, const monitor_info* info,
-	const BRect& frame, const display_mode& mode)
+	const BRect& frame, const display_mode& mode, float brightness)
 {
 	screen_configuration* configuration = NULL;
 
@@ -139,6 +139,7 @@ ScreenConfigurations::Set(int32 id, const monitor_info* info,
 
 	configuration->id = id;
 	configuration->frame = frame;
+	configuration->brightness = brightness;
 
 	if (info != NULL) {
 		memcpy(&configuration->info, info, sizeof(monitor_info));
@@ -149,28 +150,6 @@ ScreenConfigurations::Set(int32 id, const monitor_info* info,
 	memcpy(&configuration->mode, &mode, sizeof(display_mode));
 
 	return B_OK;
-}
-
-
-void
-ScreenConfigurations::SetBrightness(int32 id, float brightness)
-{
-	for (int32 i = fConfigurations.CountItems(); i-- > 0;) {
-		screen_configuration* configuration = fConfigurations.ItemAt(i);
-		configuration->brightness = brightness;
-	}
-}
-
-
-float
-ScreenConfigurations::Brightness(int32 id)
-{
-	screen_configuration* configuration = fConfigurations.ItemAt(0);
-
-	if (configuration == NULL)
-		return -1;
-
-	return configuration->brightness;
 }
 
 

@@ -525,6 +525,21 @@ Desktop::Init()
 		return B_ERROR;
 	}
 
+	HWInterface()->SetDPMSMode(B_DPMS_ON);
+
+	// Restore brightness
+	{
+		Screen* screen = fVirtualScreen.ScreenAt(0);
+		monitor_info info;
+		bool hasInfo = (screen->GetMonitorInfo(info) == B_OK);
+
+		screen_configuration* stored = fWorkspaces[0]
+			.StoredScreenConfiguration().BestFit(screen->ID(),
+				hasInfo ? &info : NULL);
+		if (stored != NULL && stored->brightness > 0)
+			HWInterface()->SetBrightness(stored->brightness);
+	}
+
 	// now that the mode is set, see if we should increase the default font size
 	if (fSettings->DefaultPlainFont() == *gFontManager->DefaultPlainFont()
 			&& !fSettings->DidLoadFontSettings()) {
@@ -561,12 +576,6 @@ Desktop::Init()
 #endif
 
 	fCursorManager.InitializeCursors(fSettings->DefaultBoldFont().Size() / 12.0f);
-
-	HWInterface()->SetDPMSMode(B_DPMS_ON);
-
-	float brightness = fWorkspaces[0].StoredScreenConfiguration().Brightness(0);
-	if (brightness > 0)
-		HWInterface()->SetBrightness(brightness);
 
 	fVirtualScreen.HWInterface()->MoveCursorTo(
 		fVirtualScreen.Frame().Width() / 2,
@@ -950,17 +959,19 @@ Desktop::SetBrightness(int32 id, float brightness)
 
 	if (result == B_OK) {
 		screen_configuration* current = fWorkspaces[0].CurrentScreenConfiguration().GetByID(id);
-		if (fWorkspaces[0].StoredScreenConfiguration().BestFit(id,
-				current->has_info ? &current->info : NULL) == NULL) {
-			// store the current configuration if empty
-			fWorkspaces[0].StoredScreenConfiguration().Set(id,
-				current->has_info ? &current->info : NULL,
-				current->frame, current->mode);
+		if (current != NULL) {
+			HWInterface()->GetBrightness(&brightness);
+			current->brightness = brightness;
+
+			screen_configuration* stored = fWorkspaces[0].StoredScreenConfiguration().BestFit(id,
+				current->has_info ? &current->info : NULL);
+			if (stored != NULL) {
+				stored->brightness = brightness;
+
+				// Save brightness for next boot
+				StoreWorkspaceConfiguration(0);
+			}
 		}
-		fWorkspaces[0].StoredScreenConfiguration().SetBrightness(id,
-			brightness);
-		// Save brightness for next boot
-		StoreWorkspaceConfiguration(0);
 	}
 
 	return result;
