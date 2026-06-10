@@ -182,12 +182,12 @@ SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 		nvidia.accelerant
 		radeon.accelerant
 		radeon_hd.accelerant
+		s3.accelerant
 		via.accelerant
 	}@ # x86,x86_64
 	x86 @{
 		3dfx.accelerant
 		neomagic.accelerant
-		s3.accelerant
 	}@ # x86
 ] ;
 
@@ -297,12 +297,12 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures
 		nvidia
 		radeon
 		radeon_hd
+		s3
 		via
 	}@ # x86,x86_64
 	x86 @{
 		3dfx
 		neomagic
-		s3
 	}@ # x86
 ] ;
 
