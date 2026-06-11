@@ -36,7 +36,10 @@ public:
 
 	// Reorder items
 			void				Sort(bool ignoreCase = false);
-									// TODO: Sort() with custom sort function.
+			void				Sort(int (*compareFunc)(const char*,
+									const char*, void* context), void* context);
+			void				Sort(int (*compareFunc)(const BString&,
+									const BString&, void* context), void* context);
 			bool				Swap(int32 indexA, int32 indexB);
 			bool				Move(int32 fromIndex, int32 toIndex);
 

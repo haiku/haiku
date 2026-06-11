@@ -212,6 +212,48 @@ BStringList::Sort(bool ignoreCase)
 }
 
 
+void
+BStringList::Sort(int (*compareFunc)(const BString&, const BString&, void* context),
+	void* context)
+{
+	struct _sortContext {
+		static int localSort(const void* pa, const void* pb, void* customSort) {
+			struct _sortContext* context = (struct _sortContext*)customSort;
+			return context->compareFunc(BString::Private::StringFromData(*(char **)pa),
+				BString::Private::StringFromData(*(char **)pb), context->context);
+		}
+		int (*compareFunc)(const BString&, const BString&, void* context);
+		void* context;
+	} sortContext;
+	sortContext.compareFunc = compareFunc;
+	sortContext.context = context;
+
+	const char** list = (const char**)fStrings.Items();
+	qsort_r(list, fStrings.CountItems(), sizeof(*list), _sortContext::localSort, &sortContext);
+}
+
+
+void
+BStringList::Sort(int (*compareFunc)(const char*, const char*, void* context),
+	void* context)
+{
+	struct _sortContext {
+		static int localSort(const void* pa, const void* pb, void* customSort) {
+			struct _sortContext* context = (struct _sortContext*)customSort;
+			return context->compareFunc(*(const char **)pa,
+				*(const char **)pb, context->context);
+		}
+		int (*compareFunc)(const char*, const char*, void* context);
+		void* context;
+	} sortContext;
+	sortContext.compareFunc = compareFunc;
+	sortContext.context = context;
+
+	const char** list = (const char**)fStrings.Items();
+	qsort_r(list, fStrings.CountItems(), sizeof(*list), _sortContext::localSort, &sortContext);
+}
+
+
 bool
 BStringList::Swap(int32 indexA, int32 indexB)
 {

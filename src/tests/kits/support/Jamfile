@@ -41,6 +41,8 @@ UnitTestLib libsupporttest.so
 		StringSubCopyTest.cpp
 		StringUTF8Test.cpp
 
+		StringListTest.cpp
+
 	: be [ TargetLibstdc++ ] libsupporttest_RemoteTestObject.so
 ;
 
