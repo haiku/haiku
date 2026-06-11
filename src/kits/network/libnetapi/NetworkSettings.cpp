@@ -795,8 +795,6 @@ BNetworkSettings::_ConvertNetworkFromSettings(BMessage& message)
 
 	const char* authentication = NULL;
 	if (message.FindString("authentication", &authentication) == B_OK) {
-		message.RemoveName("authentication");
-
 		if (strcasecmp(authentication, "none") == 0) {
 			message.AddUInt32("authentication_mode",
 				B_NETWORK_AUTHENTICATION_NONE);
@@ -810,6 +808,8 @@ BNetworkSettings::_ConvertNetworkFromSettings(BMessage& message)
 			message.AddUInt32("authentication_mode",
 				B_NETWORK_AUTHENTICATION_WPA2);
 		}
+
+		message.RemoveName("authentication");
 	}
 
 	int32 index = 0;
