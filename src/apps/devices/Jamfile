@@ -99,7 +99,7 @@ Application Devices :
 	DeviceUSB.cpp
 	Device.cpp
 	PropertyList.cpp
-	: be device libcolumnlistview.a tracker [ TargetLibsupc++ ]
+	: be device libcolumnlistview.a tracker shared [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ]	localestub
 	: Devices.rdef
 ;

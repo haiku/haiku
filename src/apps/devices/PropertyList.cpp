@@ -9,6 +9,11 @@
 
 #include "PropertyList.h"
 
+#include <HashMap.h>
+#include <HashString.h>
+#include <set>
+#include <string.h>
+
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <ColumnTypes.h>
@@ -66,6 +71,81 @@ PropertyList::~PropertyList()
 }
 
 
+static BString
+InsertNode(HashMap<HashString, std::set<BString> >& tree, const BString& path,
+	const BString& part)
+{
+	std::set<BString>* children = NULL;
+	if (!tree.Get(path.String(), children)) {
+		tree.Put(path.String(), std::set<BString>());
+		tree.Get(path.String(), children);
+	}
+	if (children != NULL)
+		children->insert(part.String());
+
+	BString nextPath = path;
+	nextPath << "/" << part;
+	return nextPath;
+}
+
+
+static void
+UpdateTree(const BString& name, const BString& value,
+	HashMap<HashString, std::set<BString> >& tree, HashMap<HashString, BString>& values)
+{
+	int32 start = 0;
+	int32 nextSlash;
+	BString currentPath = "";
+	while ((nextSlash = name.FindFirst('/', start)) != B_ERROR) {
+		BString part;
+		name.CopyInto(part, start, nextSlash - start);
+		currentPath = InsertNode(tree, currentPath, part);
+		start = nextSlash + 1;
+	}
+	BString leaf;
+	name.CopyInto(leaf, start, name.Length() - start);
+	BString fullPath = InsertNode(tree, currentPath, leaf);
+	values.Put(fullPath.String(), value);
+}
+
+
+void
+AddCollapsedRows(PropertyList* list, PropertyRow* parent, BString path,
+	HashMap<HashString, std::set<BString> >& tree, HashMap<HashString, BString>& values)
+{
+	std::set<BString>* children = NULL;
+	if (!tree.Get(path.String(), children))
+		return;
+
+	for (std::set<BString>::iterator it = children->begin(); it != children->end(); ++it) {
+		BString childName = *it;
+		BString fullPath = path;
+		fullPath << "/" << childName;
+
+		BString displayName = childName;
+		BString currentPath = fullPath;
+
+		std::set<BString>* subChildren = NULL;
+		while (tree.Get(currentPath.String(), subChildren) && subChildren->size() == 1
+			&& !values.ContainsKey(currentPath.String())) {
+			BString nextChild = *subChildren->begin();
+			displayName << "/" << nextChild;
+			currentPath << "/" << nextChild;
+		}
+
+		BString value = "";
+		if (values.ContainsKey(currentPath.String()))
+			value = values.Get(currentPath.String());
+
+		PropertyRow* newRow = new PropertyRow(displayName.String(), value.String());
+		list->AddRow(newRow, parent);
+
+		if (tree.ContainsKey(currentPath.String()))
+			AddCollapsedRows(list, newRow, currentPath, tree, values);
+	}
+}
+
+
 void
 PropertyList::AddAttributes(const Attributes& attributes)
 {
@@ -77,14 +157,21 @@ PropertyList::AddAttributes(const Attributes& attributes)
 	AddRow(basicRoot);
 	AddRow(advancedRoot);
 
-	for (unsigned int i = 0; i < attributes.size(); i++) {
-		PropertyRow* childRow = new PropertyRow(attributes[i].fName, attributes[i].fValue);
+	HashMap<HashString, std::set<BString> > tree;
+	HashMap<HashString, BString> values;
 
-		if (attributes[i].fName.FindFirst('/') != B_ERROR)
-			AddRow(childRow, advancedRoot);
+	for (uint32 i = 0; i < attributes.size(); i++) {
+		BString name = attributes[i].fName;
+		BString value = attributes[i].fValue;
+
+		if (name.FindFirst('/') != B_ERROR)
+			UpdateTree(name, value, tree, values);
 		else
-			AddRow(childRow, basicRoot);
+			AddRow(new PropertyRow(name.String(), value.String()), basicRoot);
 	}
+
+	AddCollapsedRows(this, advancedRoot, "", tree, values);
+
 	ExpandOrCollapse(basicRoot, true);
 	ExpandOrCollapse(advancedRoot, true);
 }
