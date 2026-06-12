@@ -167,7 +167,7 @@ RemoteDevice::Authenticate()
 
 	uint32 packetType;
 	fDiscovererLocalDevice->GetProperty("packet_type", &packetType);
-	createConnection->pkt_type = (uint16)packetType;
+	createConnection->pkt_type = (uint16)packetType & ACL_PTYPE_MASK;
 
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
