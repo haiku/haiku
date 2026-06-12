@@ -119,7 +119,7 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
 
     cancelInquiryCommand = buildInquiryCancel(&size);
     request.AddData("raw command", B_ANY_TYPE, cancelInquiryCommand, size);
-    request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
+    request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
     request.AddInt16("opcodeExpected",
 		PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL));
 

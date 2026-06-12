@@ -40,6 +40,7 @@ extern uint8 GetInquiryTime();
 
 static const uint32 kMsgStart = 'InSt';
 static const uint32 kMsgFinish = 'InFn';
+static const uint32 kMsgCancel = 'InCl';
 static const uint32 kMsgShowDebug = 'ShDG';
 
 static const uint32 kMsgInquiry = 'iQbt';
@@ -73,10 +74,24 @@ public:
 
 
 	void
-	InquiryCompleted(int discType)
+	InquiryResponse(int discType)
 	{
-		BMessage* message = new BMessage(kMsgFinish);
-		fInquiryPanel->PostMessage(message);
+		BMessage* message;
+		switch (discType)
+		{
+			case BT_INQUIRY_COMPLETED:
+				message = new BMessage(kMsgFinish);
+				fInquiryPanel->PostMessage(message);
+				break;
+
+			case BT_INQUIRY_TERMINATED:
+				message = new BMessage(kMsgCancel);
+				fInquiryPanel->PostMessage(message);
+				break;
+
+			case BT_INQUIRY_ERROR:
+				break;
+		}
 	}
 
 
@@ -119,6 +134,10 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	fInquiryButton = new BButton("Inquiry", B_TRANSLATE("Inquiry"),
 		new BMessage(kMsgInquiry), B_WILL_DRAW);
 
+	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
+		new BMessage(kMsgCancel), B_WILL_DRAW);
+	fCancelButton->SetEnabled(false);
+
 	fAddButton = new BButton("add", B_TRANSLATE("Add device to list"),
 		new BMessage(kMsgAddToRemoteList), B_WILL_DRAW);
 	fAddButton->SetEnabled(false);
@@ -159,6 +178,7 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 		.AddGroup(B_HORIZONTAL, 10)
 			.Add(fAddButton)
 			.AddGlue()
+			.Add(fCancelButton)
 			.Add(fInquiryButton)
 		.End()
 	.End();
@@ -222,6 +242,7 @@ InquiryPanel::MessageReceived(BMessage* message)
 
 			fAddButton->SetEnabled(false);
 			fInquiryButton->SetEnabled(false);
+			fCancelButton->SetEnabled(true);
 
 			BMessageRunner::StartSending(fMessenger, fSecondsMessage, 1000000, timer);
 
@@ -236,8 +257,24 @@ InquiryPanel::MessageReceived(BMessage* message)
 			fScanning = false;
 			fRetrieving = true;
 			labelPlaced = false;
+			fCancelButton->SetEnabled(false);
 			fScanProgress->SetTo(100);
 			fScanProgress->SetTrailingText(B_TRANSLATE("Retrieving names"
+				B_UTF8_ELLIPSIS));
+			BMessageRunner::StartSending(fMessenger, fRetrieveMessage, 1000000, 1);
+
+		break;
+
+		case kMsgCancel:
+
+			fDiscoveryAgent->CancelInquiry(fDiscoveryListener);
+			retrievalIndex = 0;
+			fScanning = false;
+			fRetrieving = true;
+			labelPlaced = false;
+			fCancelButton->SetEnabled(false);
+			fScanProgress->SetTo(100);
+			fScanProgress->SetTrailingText(B_TRANSLATE("Canceling Inquiry"
 				B_UTF8_ELLIPSIS));
 			BMessageRunner::StartSending(fMessenger, fRetrieveMessage, 1000000, 1);
 
@@ -328,6 +365,11 @@ InquiryPanel::UpdateListStatus(void)
 bool
 InquiryPanel::QuitRequested(void)
 {
+	if (fScanning)
+		fDiscoveryAgent->CancelInquiry(fDiscoveryListener);
+
+	if (fDiscoveryListener->Lock())
+		fDiscoveryListener->Quit();
 
 	return true;
 }

@@ -33,6 +33,7 @@ private:
 	BStatusBar*				fScanProgress;
 	BButton*				fAddButton;
 	BButton*				fInquiryButton;
+	BButton*				fCancelButton;
 	BTextView*				fMessage;
 	BListView*				fRemoteList;
 	BScrollView*			fScrollView;

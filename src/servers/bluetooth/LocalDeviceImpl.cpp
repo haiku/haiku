@@ -738,6 +738,26 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 			break;
 		}
 
+		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL):
+		{
+			reply.AddInt8("status", *(uint8*)(event + 1));
+
+			TRACE_BT("LocalDeviceImpl: %s for %s status %x\n", __FUNCTION__,
+				BluetoothCommandOpcode(opcodeExpected), *(uint8*)(event + 1));
+
+			status = request->SendReply(&reply);
+			printf("%s: Sending reply write...\n", __func__);
+			if (status < B_OK)
+				printf("%s: Error sending reply write!\n", __func__);
+
+			BMessage* inquiry_request = FindPetition(HCI_EVENT_INQUIRY_COMPLETE);
+			if (inquiry_request != NULL)
+				ClearWantedEvent(inquiry_request);
+
+			ClearWantedEvent(request);
+			break;
+		}
+
 		// place here all CC that just replies a uint8 status
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET):
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE):

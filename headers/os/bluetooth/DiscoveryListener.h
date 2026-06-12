@@ -42,7 +42,7 @@ public:
 	virtual void servicesDiscovered(int transID, ServiceRecord[] servRecord);
 	virtual void serviceSearchCompleted(int transID, int respCode);
 	*/
-	virtual void InquiryCompleted(int discType);
+	virtual void InquiryResponse(int discType);
 
 	/* JSR82 non-defined methods */
 	virtual void InquiryStarted(status_t status);

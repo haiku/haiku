@@ -37,7 +37,7 @@ DiscoveryListener::InquiryStarted(status_t status)
 
 
 void
-DiscoveryListener::InquiryCompleted(int discType)
+DiscoveryListener::InquiryResponse(int discType)
 {
 	CALLED();
 }
@@ -156,15 +156,15 @@ DiscoveryListener::MessageReceived(BMessage* message)
 			break;
 
 		case BT_MSG_INQUIRY_COMPLETED:
-			InquiryCompleted(BT_INQUIRY_COMPLETED);
+			InquiryResponse(BT_INQUIRY_COMPLETED);
 			break;
 
 		case BT_MSG_INQUIRY_TERMINATED: /* inquiry was cancelled */
-			InquiryCompleted(BT_INQUIRY_TERMINATED);
+			InquiryResponse(BT_INQUIRY_TERMINATED);
 			break;
 
 		case BT_MSG_INQUIRY_ERROR:
-			InquiryCompleted(BT_INQUIRY_ERROR);
+			InquiryResponse(BT_INQUIRY_ERROR);
 			break;
 
 		default:
