@@ -131,10 +131,7 @@ VirtualScreen::AddScreen(Screen* screen, const ScreenConfigurations& configurati
 		// sane values
 		status = screen->SetPreferredMode();
 		if (status == B_OK) {
-			monitor_info info;
-			bool hasInfo = screen->GetMonitorInfo(info) == B_OK;
 			screen->GetMode(mode);
-			currentConfigurations.Set(screen->ID(), hasInfo ? &info : NULL, screen->Frame(), mode);
 		}
 		if (status != B_OK)
 			status = screen->SetBestMode(1024, 768, B_RGB32, 60.f);
@@ -148,6 +145,10 @@ VirtualScreen::AddScreen(Screen* screen, const ScreenConfigurations& configurati
 			return status;
 		}
 	}
+
+	monitor_info info;
+	bool hasInfo = screen->GetMonitorInfo(info) == B_OK;
+	currentConfigurations.Set(screen->ID(), hasInfo ? &info : NULL, screen->Frame(), mode);
 
 	// TODO: this works only for single screen configurations
 	fDrawingEngine = screen->GetDrawingEngine();
