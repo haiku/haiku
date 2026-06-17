@@ -460,9 +460,10 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		initialTextColor = view->HighColor();
 
 	BRect rect(bounds);
-	rect.OffsetBy(view->ViewMode() == kListMode ? -2 : 0, -2);
-	BTextView* textView = new BTextView(rect, "WidgetTextView", rect, be_plain_font,
-		&initialTextColor, B_FOLLOW_ALL, B_WILL_DRAW);
+	rect.OffsetTo(roundf(rect.left), roundf(rect.top));
+
+	BTextView* textView = new BTextView(rect.InsetByCopy(-2, -2), "WidgetTextView",
+		rect.OffsetToCopy(2, 2), be_plain_font, &initialTextColor, B_FOLLOW_ALL, B_WILL_DRAW);
 
 	textView->SetWordWrap(false);
 	textView->SetInsets(2, 2, 2, 2);
@@ -496,8 +497,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		textView->AddFilter(new BMessageFilter(B_PASTE, TextViewPasteFilter));
 
 	// get full text length
-	rect.right = rect.left + textView->LineWidth();
-	rect.bottom = rect.top + textView->LineHeight() - 1 + 4;
+	rect.right = rect.left + textView->LineWidth() - 1;
+	rect.bottom = rect.top + textView->LineHeight() - 1;
 
 	if (view->ViewMode() == kListMode) {
 		// limit max width to column width in list mode
@@ -508,17 +509,17 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		// limit max width to 30em in icon and mini icon mode
 		fMaxWidth = textView->StringWidth("M") * 30;
 
-		if (textView->LineWidth() > fMaxWidth
-			|| view->ViewMode() == kMiniIconMode) {
-			// compensate for text going over right inset
-			rect.OffsetBy(-2, 0);
+		// center under the icon if text is longer than column-width
+		if (view->ViewMode() == kIconMode && rect.Width() > bounds.Width()) {
+			float newWidth = std::min(fMaxWidth, rect.Width());
+			rect.OffsetBy(roundf((bounds.Width() - newWidth) / 2), 0);
+			textView->MoveTo(rect.left - 2, rect.top - 2);
 		}
 	}
 
 	// resize textView
-	textView->MoveTo(rect.LeftTop());
-	textView->ResizeTo(std::min(fMaxWidth, rect.Width()), rect.Height());
-	textView->SetTextRect(rect);
+	textView->ResizeTo(std::min(fMaxWidth, rect.Width()) + 4, rect.Height() + 4);
+	textView->SetTextRect(rect.OffsetToCopy(2, 2));
 
 	// set alignment before adding textView so it doesn't redraw
 	switch (view->ViewMode()) {
@@ -692,8 +693,8 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 
 	// high color and drawing mode are set to draw text
 
-	float decenderHeight = roundf(view->FontInfo().descent);
-	BPoint location(textRect.left, textRect.bottom - decenderHeight);
+	BPoint location(textRect.left, roundf(textRect.top) + view->FontInfo().ascent + 1);
+		// let's determine the baseline position
 
 	const char* fittingText = fText->FittingText(view);
 
@@ -755,11 +756,12 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 		// TODO:
 		// this should be exported to the WidgetAttribute class, probably
 		// by having a per widget kind style
-		BRect lineRect(textRect.OffsetByCopy(0, decenderHeight > 2 ? -(decenderHeight - 2) : 0));
-			// move underline 2px under text
+		BRect lineRect(textRect);
+		lineRect.OffsetTo(location.x, std::min(location.y + 2, textRect.bottom));
+			// underline goes 2px under the baseline
 		lineRect.InsetBy(roundf(textRect.Width() - fText->Width(view)), 0);
 			// only underline text part
-		drawView->StrokeLine(lineRect.LeftBottom(), lineRect.RightBottom(), B_MIXED_COLORS);
+		drawView->StrokeLine(lineRect.LeftTop(), lineRect.RightTop(), B_MIXED_COLORS);
 	}
 
 	drawView->ConstrainClippingRegion(NULL);

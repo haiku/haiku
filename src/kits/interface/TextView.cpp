@@ -1840,7 +1840,7 @@ BTextView::PointAt(int32 offset, float* _height) const
 		float lineWidth = onEmptyLastLine ? 0.0 : LineWidth(lineNum);
 		float alignmentOffset = fTextRect.Width() + 1 - lineWidth;
 		if (fAlignment == B_ALIGN_CENTER)
-			alignmentOffset = floorf(alignmentOffset / 2);
+			alignmentOffset = roundf(alignmentOffset / 2);
 		result.x += alignmentOffset;
 	}
 
@@ -1888,7 +1888,7 @@ BTextView::OffsetAt(BPoint point) const
 	if (fAlignment != B_ALIGN_LEFT) {
 		float alignmentOffset = fTextRect.Width() + 1 - LineWidth(lineNum);
 		if (fAlignment == B_ALIGN_CENTER)
-			alignmentOffset = floorf(alignmentOffset / 2);
+			alignmentOffset = roundf(alignmentOffset / 2);
 		point.x -= alignmentOffset;
 	}
 
@@ -3979,7 +3979,7 @@ BTextView::_RecalculateLineBreaks(int32* startLine, int32* endLine)
 	fTextRect.bottom = fTextRect.top + newHeight;
 
 	if (!fWrap) {
-		fMinTextRectWidth = fLines->MaxWidth() - 1;
+		fMinTextRectWidth = roundf(fLines->MaxWidth() - 1);
 
 		// expand width if needed
 		switch (fAlignment) {
@@ -3996,8 +3996,7 @@ BTextView::_RecalculateLineBreaks(int32* startLine, int32* endLine)
 
 			case B_ALIGN_CENTER:
 				// move both edges
-				fTextRect.InsetBy(roundf((fTextRect.Width()
-					- fMinTextRectWidth) / 2), 0);
+				fTextRect.InsetBy((fTextRect.Width() - fMinTextRectWidth) / 2, 0);
 				break;
 		}
 
@@ -4454,7 +4453,7 @@ BTextView::_DrawLine(BView* view, const int32 &lineNum,
 	} else if (fAlignment != B_ALIGN_LEFT) {
 		float alignmentOffset = fTextRect.Width() + 1 - LineWidth(lineNum);
 		if (fAlignment == B_ALIGN_CENTER)
-			alignmentOffset = floorf(alignmentOffset / 2);
+			alignmentOffset = roundf(alignmentOffset / 2);
 		startLeft += alignmentOffset;
 	}
 
@@ -5159,15 +5158,17 @@ BTextView::_AutoResize(bool redraw)
 	// move container view if not left aligned
 	float oldWidth = Bounds().Width();
 	float newWidth = _TextWidth();
-	float right = oldWidth - newWidth;
+	float grow = newWidth - oldWidth;
 
-	if (fAlignment == B_ALIGN_CENTER)
-		fContainerView->MoveBy(roundf(right / 2), 0);
-	else if (fAlignment == B_ALIGN_RIGHT)
-		fContainerView->MoveBy(right, 0);
+	if (fAlignment == B_ALIGN_CENTER) {
+		grow = (int)(grow) / 2;
+		fContainerView->MoveBy(-grow, 0);
+		grow *= 2;
+	} else if (fAlignment == B_ALIGN_RIGHT) {
+		fContainerView->MoveBy(-grow, 0);
+	}
 
 	// resize container view
-	float grow = newWidth - oldWidth;
 	fContainerView->ResizeBy(grow, 0);
 
 	// reposition text view
