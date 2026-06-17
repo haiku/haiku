@@ -345,7 +345,7 @@ BPoseView::InitCommon()
 	// static - init just once
 	if (sFontHeight == -1) {
 		be_plain_font->GetHeight(&sFontInfo);
-		sFontHeight = sFontInfo.ascent + sFontInfo.descent + 1;
+		sFontHeight = ceilf(sFontInfo.ascent + sFontInfo.descent) + 1;
 	}
 
 	// init things related to laying out items

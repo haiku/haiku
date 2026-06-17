@@ -136,8 +136,8 @@ BTextWidget::ColumnRect(BPoint poseLoc, const BColumn* column,
 	BRect rect;
 	rect.left = column->Offset() + poseLoc.x;
 	rect.right = rect.left + column->Width();
-	rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + ActualFontHeight(view)) / 2.f);
-	rect.top = rect.bottom - floorf(ActualFontHeight(view));
+	rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + view->FontHeight()) / 2.f);
+	rect.top = rect.bottom - view->FontHeight();
 
 	return rect;
 }
@@ -181,8 +181,8 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 				break;
 		}
 
-		rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + ActualFontHeight(view)) / 2.f);
-		rect.top = rect.bottom - floorf(ActualFontHeight(view));
+		rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + view->FontHeight()) / 2.f);
+		rect.top = rect.bottom - view->FontHeight();
 	} else {
 		float iconSize = (float)view->IconSizeInt();
 		textWidth = floorf(textWidth);
@@ -194,13 +194,13 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 
 			rect.left = poseLoc.x + roundf((iconSize - viewWidth) / 2.f);
 			rect.bottom = poseLoc.y + ceilf(view->IconPoseHeight());
-			rect.top = rect.bottom - floorf(ActualFontHeight(view));
+			rect.top = rect.bottom - view->FontHeight();
 		} else {
 			// mini icon mode
 			viewWidth = ceilf(textWidth);
 
 			rect.left = poseLoc.x + iconSize + kMiniIconSeparator;
-			rect.bottom = poseLoc.y + roundf((iconSize + ActualFontHeight(view)) / 2.f);
+			rect.bottom = poseLoc.y + roundf((iconSize + view->FontHeight()) / 2.f);
 			rect.top = poseLoc.y;
 		}
 
