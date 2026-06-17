@@ -15,6 +15,7 @@
 #include <KernelExport.h>
 #include <ByteOrder.h>
 #include <Drivers.h>
+#include <StackOrHeapArray.h>
 
 #include <btModules.h>
 
@@ -441,11 +442,11 @@ device_removed(void* cookie)
 
 
 static bt_hci_transport_hooks bluetooth_hooks = {
-	NULL,
-	&submit_nbuffer,
-	&submit_nbuffer,
-	NULL,
-	NULL,
+	&submit_nbuffer, 
+	&submit_nbuffer, 
+	&submit_nbuffer, 
+	NULL, 
+	NULL, 
 	H2
 };
 
@@ -477,8 +478,23 @@ submit_nbuffer(hci_id hid, net_buffer* nbuf)
 				return submit_tx_sco(bdev, nbuf);
 				break;
 			case BT_COMMAND:
-				// not issued this way
-			break;
+			{
+				snet_buffer* snbuf = snb_fetch(&bdev->snetBufferRecycleTrash, nbuf->size);
+				if (snbuf == NULL)
+					return B_NO_MEMORY;
+
+				BStackOrHeapArray<uint8, 512> data(nbuf->size);
+				if (!data.IsValid()) {
+					snb_park(&bdev->snetBufferRecycleTrash, snbuf);
+					return B_NO_MEMORY;
+				}
+
+				nb->read(nbuf, 0, data, nbuf->size);
+				snb_put(snbuf, data, nbuf->size);
+
+				return submit_tx_command(bdev, snbuf);
+				break;
+			}
 
 			case BT_ACL:
 				return submit_tx_acl(bdev, nbuf);

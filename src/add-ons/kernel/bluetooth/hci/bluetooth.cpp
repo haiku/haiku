@@ -295,6 +295,24 @@ UnregisterDriver(hci_id id)
 }
 
 
+status_t
+PostCommand(hci_id hciId, net_buffer* buffer)
+{
+	if (buffer == NULL)
+		panic("passing null buffer");
+
+	bluetooth_device* device = FindDeviceByID(hciId);
+	if (device == NULL) {
+		ERROR("%s: No device 0x%" B_PRIx32 "\n", __func__, hciId);
+		return B_ERROR;
+	}
+
+	buffer->protocol = BT_COMMAND;
+
+	return device->hooks->SendCommand(hciId, buffer);
+}
+
+
 // PostACL
 status_t
 PostACL(hci_id hciId, net_buffer* buffer)
@@ -360,7 +378,16 @@ PostACL(hci_id hciId, net_buffer* buffer)
 status_t
 PostSCO(hci_id hciId, net_buffer* buffer)
 {
-	return B_ERROR;
+	bluetooth_device* device = FindDeviceByID(hciId);
+
+	if (device == NULL) {
+		ERROR("%s: No device 0x%" B_PRIx32 "\n", __func__, hciId);
+		return B_ERROR;
+	}
+
+	buffer->protocol = BT_SCO;
+
+	return device->hooks->SendSCO(hciId, buffer);
 }
 
 
@@ -465,16 +492,17 @@ bluetooth_std_ops(int32 op, ...)
 
 bt_hci_module_info sBluetoothModule = {
 	{
-		BT_HCI_MODULE_NAME,
-		B_KEEP_LOADED,
+		BT_HCI_MODULE_NAME, 
+		B_KEEP_LOADED, 
 		bluetooth_std_ops
-	},
-	RegisterDriver,
+	}, 
+	RegisterDriver, 
 	UnregisterDriver,
-	FindDeviceByID,
-	PostTransportPacket,
-	PostACL,
-	PostSCO,
+	FindDeviceByID, 
+	PostTransportPacket, 
+	PostCommand, 
+	PostACL, 
+	PostSCO, 
 	PostESCO
 };
 

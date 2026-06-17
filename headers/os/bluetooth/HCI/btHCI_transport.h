@@ -98,7 +98,7 @@ typedef struct bt_hci_device {
  */
 typedef struct bt_hci_transport_hooks {
 	// to be filled by driver
-	status_t	(*SendCommand)(hci_id hciId, void* command);
+	status_t	(*SendCommand)(hci_id hciId, net_buffer* nbuf);
 	status_t	(*SendACL)(hci_id hciId, net_buffer* nbuf);
 	status_t	(*SendSCO)(hci_id hciId, net_buffer* nbuf);
 	status_t	(*SendESCO)(hci_id hciId, net_buffer* nbuf);
@@ -153,6 +153,7 @@ typedef struct bt_hci_module_info {
 							void* data, size_t count);
 
 	// To be called from upper layers
+	status_t        (*PostCommand)(hci_id hid, net_buffer* buffer);
 	status_t		(*PostACL)(hci_id hciId, net_buffer* buffer);
 	status_t		(*PostSCO)(hci_id hciId, net_buffer* buffer);
 	status_t		(*PostESCO)(hci_id hciId, net_buffer* buffer);
