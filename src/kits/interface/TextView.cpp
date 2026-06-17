@@ -529,6 +529,13 @@ BTextView::DetachedFromWindow()
 void
 BTextView::Draw(BRect updateRect)
 {
+	if (fOffscreen == NULL) {
+		BRegion margin(updateRect);
+		margin.Exclude(fTextRect);
+		SetLowColor(ViewColor());
+		FillRegion(&margin, B_SOLID_LOW);
+	}
+
 	// what lines need to be drawn?
 	int32 startLine = _LineAt(BPoint(0.0, updateRect.top));
 	int32 endLine = _LineAt(BPoint(0.0, updateRect.bottom));
@@ -2379,8 +2386,14 @@ BTextView::MakeSelectable(bool selectable)
 
 	fSelectable = selectable;
 
-	if (fActive && fSelStart != fSelEnd && Window() != NULL)
-		Highlight(fSelStart, fSelEnd);
+	if (fActive && Window() != NULL) {
+		if (fSelStart != fSelEnd)
+			Highlight(fSelStart, fSelEnd);
+		else if (fSelectable)
+			_ShowCaret();
+		else
+			_HideCaret();
+	}
 }
 
 
@@ -4715,7 +4728,7 @@ BTextView::_DrawCaret(int32 offset, bool visible)
 inline void
 BTextView::_ShowCaret()
 {
-	if (fActive && !fCaretVisible && fEditable && fSelStart == fSelEnd)
+	if (fActive && !fCaretVisible && (fEditable || fSelectable) && fSelStart == fSelEnd)
 		_InvertCaret();
 }
 
