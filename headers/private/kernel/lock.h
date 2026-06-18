@@ -78,7 +78,7 @@ typedef struct rw_lock {
 #	define ASSERT_WRITE_LOCKED_RW_LOCK(l) \
 		{ ASSERT(find_thread(NULL) == (l)->holder); }
 #	if KDEBUG_RW_LOCK_DEBUG
-		extern bool _rw_lock_is_read_locked(rw_lock* lock);
+		extern bool _rw_lock_is_read_locked(const rw_lock* lock);
 #		define ASSERT_READ_LOCKED_RW_LOCK(l) \
 			{ ASSERT_PRINT(_rw_lock_is_read_locked(l), "rwlock %p", l); }
 #		define ASSERT_UNLOCKED_RW_LOCK(l) \

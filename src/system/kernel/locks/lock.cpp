@@ -452,7 +452,7 @@ rw_lock_destroy(rw_lock* lock)
 #if KDEBUG_RW_LOCK_DEBUG
 
 bool
-_rw_lock_is_read_locked(rw_lock* lock)
+_rw_lock_is_read_locked(const rw_lock* lock)
 {
 	if (lock->holder == thread_get_current_thread_id())
 		return true;
