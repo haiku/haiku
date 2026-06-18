@@ -6057,14 +6057,53 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			size_t rangeSize = min_c(area->Size() - offset, sizeLeft);
 
 			AreaCacheLocker cacheLocker(area);
+			VMCache* cache = cacheLocker.Get();
 
-			if (wait_if_area_range_is_wired(area, currentAddress, rangeSize,
-					&locker, &cacheLocker)) {
+			if (!cache->consumers.IsEmpty()) {
+				// We need to make the area copy-on-write.
+				// Unlock, then reacquire locks using MultiLocker.
+				area_id areaId = area->id;
+				addr_t areaBase = area->Base();
+				size_t areaSize = area->Size();
+				cacheLocker.Unlock();
+				locker.Unlock();
+
+				MultiAddressSpaceLocker multiLocker;
+				status = multiLocker.AddAreaCacheAndLock(areaId, false, false, area, &cache);
+				if (status != B_OK)
+					return status;
+				cacheLocker.SetTo(cache, true);
+
+				if (area->Base() != areaBase || area->Size() != areaSize) {
+					restart = true;
+					break;
+				}
+
+				for (VMArea* otherArea = cache->areas.First(); otherArea != NULL;
+						otherArea = cache->areas.GetNext(otherArea)) {
+					if (wait_if_area_is_wired(otherArea, &multiLocker, &cacheLocker)) {
+						restart = true;
+						break;
+					}
+				}
+				if (restart)
+					break;
+
+				status = vm_copy_on_write_area(cache, NULL);
+				if (status != B_OK)
+					return status;
+
+				// since we unlocked, we have to restart
 				restart = true;
 				break;
+			} else {
+				if (wait_if_area_range_is_wired(area, currentAddress, rangeSize,
+						&locker, &cacheLocker)) {
+					restart = true;
+					break;
+				}
+				cacheLocker.Unlock();
 			}
-
-			cacheLocker.Unlock();
 
 			currentAddress += rangeSize;
 			sizeLeft -= rangeSize;
@@ -6090,25 +6129,19 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		if (area->page_protections == NULL) {
 			if (area->protection == protection)
 				continue;
+
 			if (offset == 0 && rangeSize == area->Size()) {
-				// The whole area is covered: let set_area_protection handle it.
-				status_t status = vm_set_area_protection(
-					area->id, protection, false);
+				// The whole area is covered: don't allocate page_protections.
+				// (area->protection will be updated later on.)
+			} else {
+				status_t status = allocate_area_page_protections(area);
 				if (status != B_OK)
 					return status;
-				continue;
 			}
-
-			status_t status = allocate_area_page_protections(area);
-			if (status != B_OK)
-				return status;
 		}
 
-		// We need to lock the complete cache chain, since we potentially unmap
-		// pages of lower caches.
 		VMCache* topCache = vm_area_get_locked_cache(area);
-		VMCacheChainLocker cacheChainLocker(topCache);
-		cacheChainLocker.LockAllSourceCaches();
+		AreaCacheLocker cacheLocker(topCache);
 
 		// Adjust the committed size, if necessary.
 		if (is_area_only_cache_user(area) && !topCache->CanOvercommit()) {
@@ -6155,20 +6188,21 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			}
 		}
 
+		if (area->page_protections == NULL)
+			area->protection = protection;
+
+		map->Lock();
 		for (addr_t pageAddress = area->Base() + offset;
 				pageAddress < currentAddress; pageAddress += B_PAGE_SIZE) {
-			map->Lock();
-
-			set_area_page_protection(area, pageAddress, protection);
+			if (area->page_protections != NULL)
+				set_area_page_protection(area, pageAddress, protection);
 
 			phys_addr_t physicalAddress;
 			uint32 flags;
 
 			status_t error = map->Query(pageAddress, &physicalAddress, &flags);
-			if (error != B_OK || (flags & PAGE_PRESENT) == 0) {
-				map->Unlock();
+			if (error != B_OK || (flags & PAGE_PRESENT) == 0)
 				continue;
-			}
 
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page == NULL) {
@@ -6178,23 +6212,17 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 				return B_ERROR;
 			}
 
-			// If the page is not in the topmost cache and write access is
-			// requested, we have to unmap it. Otherwise we can re-map it with
-			// the new protection.
-			bool unmapPage = page->Cache() != topCache
-				&& (protection & B_WRITE_AREA) != 0;
-
-			if (!unmapPage)
+			// If the page is in the topmost cache, we can change all protections.
+			// Otherwise, we change only non-write protections. The fault handler will
+			// take care of copying pages as needed.
+			if (page->Cache() == topCache) {
 				map->ProtectPage(area, pageAddress, protection);
-
-			map->Unlock();
-
-			if (unmapPage) {
-				DEBUG_PAGE_ACCESS_START(page);
-				unmap_page(area, pageAddress);
-				DEBUG_PAGE_ACCESS_END(page);
+			} else {
+				map->ProtectPage(area, pageAddress,
+					protection & ~(B_WRITE_AREA | B_KERNEL_WRITE_AREA));
 			}
 		}
+		map->Unlock();
 	}
 
 	return B_OK;
