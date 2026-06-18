@@ -219,7 +219,7 @@ AddressSpaceWriteLocker::Unset()
 status_t
 AddressSpaceWriteLocker::SetTo(team_id team)
 {
-	ASSERT(fSpace == NULL);
+	Unset();
 
 	fSpace = VMAddressSpace::Get(team);
 	if (fSpace == NULL)
@@ -234,7 +234,7 @@ AddressSpaceWriteLocker::SetTo(team_id team)
 void
 AddressSpaceWriteLocker::SetTo(VMAddressSpace* space, bool getNewReference)
 {
-	ASSERT(fSpace == NULL);
+	Unset();
 
 	fSpace = space;
 
@@ -249,7 +249,7 @@ AddressSpaceWriteLocker::SetTo(VMAddressSpace* space, bool getNewReference)
 status_t
 AddressSpaceWriteLocker::SetFromArea(area_id areaID, VMArea*& area)
 {
-	ASSERT(fSpace == NULL);
+	Unset();
 
 	fSpace = GetAddressSpaceByAreaID(areaID);
 	if (fSpace == NULL)
@@ -273,7 +273,7 @@ status_t
 AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 	bool allowKernel, VMArea*& area)
 {
-	ASSERT(fSpace == NULL);
+	Unset();
 
 	VMAreas::ReadLock();
 
@@ -560,8 +560,7 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 		// done.
 		if (cache == oldCache && firstArea == cache->areas.First()) {
 			_area = area;
-			if (_cache != NULL)
-				*_cache = cache;
+			*_cache = cache;
 			return B_OK;
 		}
 
