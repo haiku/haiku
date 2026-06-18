@@ -218,8 +218,10 @@ IOBuffer::FreeVirtualVecCookie(void* _cookie)
 {
 	virtual_vec_cookie* cookie = (virtual_vec_cookie*)_cookie;
 
-	if (cookie->mapped_area >= 0)
+	if (cookie->mapped_area >= 0) {
 		delete_area(cookie->mapped_area);
+		cookie->mapped_area = -1;
+	}
 	cookie->PutPhysicalPageIfNeeded();
 
 	free_etc(cookie, fVIP ? HEAP_PRIORITY_VIP : 0);
