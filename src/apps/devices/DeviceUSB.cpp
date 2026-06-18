@@ -9,6 +9,7 @@
 
 #include "DeviceUSB.h"
 
+#include <new>
 #include <sstream>
 #include <stdlib.h>
 
@@ -16,8 +17,10 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <Path.h>
+
 #include <USBKit.h>
 #include <bus/USB.h>
+#include <usb/USB_hid.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DeviceUSB"
@@ -99,6 +102,71 @@ FindDevicePath(const char* currentPath, uint16 vendor, uint16 product)
 	}
 
 	return "";
+}
+
+
+static ssize_t
+FetchReportDescriptor(BUSBDevice& device, uint16 interfaceNumber, uint8* buffer, uint16 length)
+{
+	return device.ControlTransfer(USB_REQTYPE_INTERFACE_IN, USB_REQUEST_GET_DESCRIPTOR,
+		B_USB_HID_DESCRIPTOR_REPORT << 8, interfaceNumber, length, buffer);
+}
+
+
+static BString
+GetHIDReportDescriptor(BUSBDevice& device, const BUSBInterface& interface)
+{
+	// A descriptor's length field is 1 byte, so a descriptor could be 256 bytes total
+	uint8 buffer[256];
+	usb_hid_descriptor* hidDescriptor = NULL;
+	// 128 is a limit to avoid potential infinite loops
+	for (uint32 i = 0; i < 128; i++) {
+		usb_descriptor* generic = reinterpret_cast<usb_descriptor*>(buffer);
+		if (interface.OtherDescriptorAt(i, generic, sizeof(buffer)) != B_OK)
+			break;
+		if (generic->generic.descriptor_type == B_USB_HID_DESCRIPTOR_HID) {
+			hidDescriptor = reinterpret_cast<usb_hid_descriptor*>(buffer);
+			break;
+		}
+	}
+
+	if (hidDescriptor == NULL)
+		return "";
+
+	uint16 reportLength = 0;
+	for (uint8 i = 0; i < hidDescriptor->num_descriptors; i++) {
+		if (hidDescriptor->descriptor_info[i].descriptor_type == B_USB_HID_DESCRIPTOR_REPORT) {
+			reportLength = hidDescriptor->descriptor_info[i].descriptor_length;
+			break;
+		}
+	}
+
+	if (reportLength == 0)
+		return "";
+
+	uint8* reportBuffer = new(std::nothrow) uint8[reportLength];
+
+	if (reportBuffer == NULL)
+		return "";
+
+	BString result;
+	ssize_t read = FetchReportDescriptor(device, interface.Descriptor()->interface_number,
+		reportBuffer, reportLength);
+
+	if (read <= 0) {
+		delete[] reportBuffer;
+		return "";
+	}
+
+	for (ssize_t i = 0; i < read; i++) {
+		char hex[4];
+		snprintf(hex, sizeof(hex), "%02x ", reportBuffer[i]);
+		result << hex;
+	}
+	result.Trim();
+
+	delete[] reportBuffer;
+	return result;
 }
 
 
@@ -217,6 +285,13 @@ BuildUSBTree(BUSBDevice& device, DeviceUSB* node)
 						BString interval;
 						interval.SetToFormat(B_TRANSLATE("%u ms"), endpointDesc->interval);
 						node->SetAttribute(BString(endpointPath) << "/interval", interval);
+					}
+				}
+				if (alt->Class() == USB_HID_DEVICE_CLASS) {
+					BString reportDescriptor = GetHIDReportDescriptor(device, *alt);
+					if (reportDescriptor.Length() > 0) {
+						node->SetAttribute(BString(altPath) << "/hid_report_descriptor",
+							reportDescriptor);
 					}
 				}
 			}
