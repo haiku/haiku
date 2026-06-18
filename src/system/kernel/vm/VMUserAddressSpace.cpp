@@ -259,6 +259,8 @@ status_t
 VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
 	uint32 allocationFlags)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
 	const addr_t oldEnd = area->Base() + (area->Size() - 1);
@@ -316,6 +318,8 @@ status_t
 VMUserAddressSpace::ShrinkAreaHead(VMArea* area, size_t size,
 	uint32 allocationFlags)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	size_t oldSize = area->Size();
 	if (size == oldSize)
 		return B_OK;
@@ -331,6 +335,8 @@ status_t
 VMUserAddressSpace::ShrinkAreaTail(VMArea* area, size_t size,
 	uint32 allocationFlags)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	size_t oldSize = area->Size();
 	if (size == oldSize)
 		return B_OK;
@@ -346,6 +352,8 @@ VMUserAddressSpace::ReserveAddressRange(size_t size,
 	const virtual_address_restrictions* addressRestrictions,
 	uint32 flags, uint32 allocationFlags, void** _address)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	// check to see if this address space has entered DELETE state
 	if (fDeleting) {
 		// okay, someone is trying to delete this address space now, so we
@@ -377,6 +385,8 @@ status_t
 VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
 	uint32 allocationFlags)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	// check to see if this address space has entered DELETE state
 	if (fDeleting) {
 		// okay, someone is trying to delete this address space now, so we can't
@@ -410,6 +420,8 @@ VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
 void
 VMUserAddressSpace::UnreserveAllAddressRanges(uint32 allocationFlags)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	for (VMUserAreaTree::Iterator it = fAreas.GetIterator();
 			VMUserArea* area = it.Next();) {
 		if (area->id == RESERVED_AREA_ID) {
