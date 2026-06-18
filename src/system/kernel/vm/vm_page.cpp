@@ -2686,8 +2686,7 @@ vm_page *
 vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 {
 	uint32 pageState = flags & VM_PAGE_ALLOC_STATE;
-	ASSERT(pageState != PAGE_STATE_FREE);
-	ASSERT(pageState != PAGE_STATE_CLEAR);
+	ASSERT(pageState != PAGE_STATE_FREE && pageState != PAGE_STATE_CLEAR);
 
 	ASSERT(reservation->count > 0);
 	reservation->count--;
@@ -2737,7 +2736,9 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 
 	DEBUG_PAGE_ACCESS_START(page);
 
-	int oldPageState = page->State();
+	uint8 oldPageState = page->State();
+	ASSERT(oldPageState == PAGE_STATE_FREE || oldPageState == PAGE_STATE_CLEAR);
+
 	page->SetState(pageState);
 	page->busy = (flags & VM_PAGE_ALLOC_BUSY) != 0;
 	page->busy_io = false;
