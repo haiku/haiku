@@ -83,7 +83,12 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 		B_TRANSLATE("Local devices found on system:"),
 		fLocalDevicesMenu);
 
+	fFriendlyName = new BTextControl("FriendlyName", B_TRANSLATE("Friendly Name:"), NULL,
+		new BMessage(kMsgSetFriendlyName));
+
 	if (ActiveLocalDevice != NULL) {
+		fFriendlyName->SetText(ActiveLocalDevice->GetFriendlyName());
+
 		fExtDeviceView->SetLocalDevice(ActiveLocalDevice);
 		fExtDeviceView->SetEnabled(true);
 
@@ -101,9 +106,6 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	fClassMenu->AddOption(B_TRANSLATE_NOCOLLECT(kPhoneLabel), 5);
 
 	fClassMenu->SetValue(_GetClassForMenu());
-
-	fFriendlyName = new BTextControl("FriendlyName", B_TRANSLATE("Friendly Name:"),
-		ActiveLocalDevice->GetFriendlyName(), new BMessage(kMsgSetFriendlyName));
 
 	BLayoutBuilder::Grid<>(this, 0)
 		.SetInsets(10)
@@ -195,6 +197,9 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 
 		case kMsgSetFriendlyName:
 		{
+			if (ActiveLocalDevice == NULL)
+				break;
+
 			BString friendlyName = fFriendlyName->Text();
 
 			BMenuItem* item = fLocalDevicesMenu->FindItem(ActiveLocalDevice->GetFriendlyName());
@@ -286,6 +291,7 @@ BluetoothSettingsView::_MarkLocalDevice(LocalDevice* lDevice)
 	if (bdaddrUtils::Compare(lDevice->GetBluetoothAddress(), BDADDR_NULL))
 		return;
 
+	fFriendlyName->SetText(lDevice->GetFriendlyName());
 	fExtDeviceView->SetLocalDevice(lDevice);
 	fExtDeviceView->SetEnabled(true);
 	ActiveLocalDevice = lDevice;
