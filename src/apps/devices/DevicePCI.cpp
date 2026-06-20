@@ -80,7 +80,7 @@ DevicePCI::InitFromAttributes()
 	const char *venFull;
 	get_vendor_info(fVendorId, &venShort, &venFull);
 	if (!venShort && !venFull) {
-		ManufacturerName << B_TRANSLATE("Unknown");
+		ManufacturerName << B_TRANSLATE("unknown");
 	} else if (venShort && venFull) {
 		ManufacturerName << venFull << "(" << venShort << ")";
 	} else {
@@ -94,7 +94,7 @@ DevicePCI::InitFromAttributes()
 	get_device_info(fVendorId, fDeviceId, fSubsystemVendorId, fSubSystemId,
 		&devShort, &devFull);
 	if (!devShort && !devFull) {
-		DeviceName << B_TRANSLATE("Unknown");
+		DeviceName << B_TRANSLATE("unknown");
 	} else if (devShort && devFull) {
 		DeviceName << devFull << "(" << devShort << ")";
 	} else {

@@ -1018,7 +1018,7 @@ WorkspacesApp::AboutRequested()
 void
 WorkspacesApp::Usage(const char *programName)
 {
-	printf(B_TRANSLATE("Usage: %s [options] [workspace|movement]\n"
+	printf(B_TRANSLATE("Usage: %s [options] [workspace|direction]\n"
 		"where \"options\" are:\n"
 		"  --notitle\t\ttitle bar removed, border and resize kept\n"
 		"  --noborder\t\ttitle, border, and resize removed\n"
@@ -1026,13 +1026,13 @@ WorkspacesApp::Usage(const char *programName)
 		"keyboard events\n"
 		"  --alwaysontop\t\tkeeps window on top\n"
 		"  --notmovable\t\twindow can't be moved around\n"
-		"  --autoraise\t\tauto-raise the workspace window when it's at the "
+		"  --autoraise\t\tauto-raise the workspace window when mouse is at the "
 		"screen edge\n"
 		"  --help\t\tdisplay this help and exit\n"
 		"  -i\t\t\tdisplay workspace layout and exit\n"
-		"\"workspace\" is the number of the Workspace to which to switch (0-31)\n"
-		"and \"movement\" is the move to find the Workspace to which to switch "
-		"(+|-left|right|top|down)\n"),
+		"\"workspace\" is the number of the Workspace to which to switch (+|-|0-31)\n"
+		"and \"direction\" is the direction of the Workspace to switch to "
+		"(left|right|up|down)\n"),
 		programName);
 
 	// quit only if we aren't running already

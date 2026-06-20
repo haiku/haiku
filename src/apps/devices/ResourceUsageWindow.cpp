@@ -189,8 +189,8 @@ RangeItem::Compare(const void *firstArg, const void *secondArg)
 
 // ResourceUsageWindow - Constructor
 ResourceUsageWindow::ResourceUsageWindow(BRect frame, BList &list) 
-	: BWindow (frame, B_TRANSLATE("Resource Usage"), B_TITLED_WINDOW_LOOK,
-		B_NORMAL_WINDOW_FEEL , B_NOT_ZOOMABLE|B_NOT_RESIZABLE)
+	: BWindow (frame, B_TRANSLATE("Resource usage"), B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+	  B_NOT_ZOOMABLE|B_NOT_RESIZABLE)
 {
 	InitWindow(list);
 	CenterOnScreen();
@@ -258,14 +258,14 @@ void ResourceUsageWindow::InitWindow(BList &list)
 	tab->SetLabel(B_TRANSLATE("DMA"));
 	tab = new BTab();
 	tabView->AddTab(IORangeScrollView, tab);
-	tab->SetLabel(B_TRANSLATE("IO Range"));
+	tab->SetLabel(B_TRANSLATE("I/O range"));
 	tab = new BTab();
 	tabView->AddTab(memoryScrollView, tab);
-	tab->SetLabel(B_TRANSLATE("Memory Range"));
-	
+	tab->SetLabel(B_TRANSLATE("Memory range"));
+
 	{
 		uint32 mask = 1;
-		
+
 		for (int i=0;i<16;mask<<=1,i++) {
 			bool first = true;
 			

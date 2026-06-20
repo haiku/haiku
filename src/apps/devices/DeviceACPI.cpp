@@ -90,17 +90,17 @@ DeviceACPI::InitFromAttributes()
 
 	// Identify Predefined root namespaces (ACPI Spec 4.0a, p162)
 	if (rootACPIPath == "\\_SB_") {
-		deviceName = B_TRANSLATE("ACPI System Bus");
+		deviceName = B_TRANSLATE("ACPI system bus");
 	} else if (rootACPIPath == "\\_TZ_") {
-		deviceName = B_TRANSLATE("ACPI Thermal Zone");
+		deviceName = B_TRANSLATE("ACPI thermal zone");
 	} else if (rootACPIPath == "\\_PR_.") {
 		// This allows to localize apostrophes, too
-		BString string(B_TRANSLATE("ACPI Processor Namespace '%2'"));
+		BString string(B_TRANSLATE("ACPI processor namespace '%2'"));
 		string.ReplaceFirst("%2", nodeACPIPath);
 		// each CPU node is considered a root node
 		deviceName << string.String();
 	} else if (rootACPIPath == "\\_SI_") {
-		deviceName = B_TRANSLATE("ACPI System Indicator");
+		deviceName = B_TRANSLATE("ACPI system indicator");
 	} else if (hidDevName != NULL) {
 		deviceName << hidDevName;
 	} else if (cidDevName != NULL) {
@@ -113,8 +113,8 @@ DeviceACPI::InitFromAttributes()
 	} else if (nodeACPIPath == "" && nodeACPIHid != "") {
 		// Handle ACPI HID entries that do not return a path
 		nodeACPIHid.Remove(0, nodeACPIHid.FindLast("_") + 1);
-		BString string(B_TRANSLATE("ACPI Button '%1'")); 
-		string.ReplaceFirst("%1", nodeACPIHid); 
+		BString string(B_TRANSLATE("ACPI button '%1'"));
+		string.ReplaceFirst("%1", nodeACPIHid);
 		deviceName << string.String();
 	} else {
 		BString string(B_TRANSLATE("ACPI <unknown>"));
@@ -127,7 +127,7 @@ DeviceACPI::InitFromAttributes()
 	if (nodeACPIHid != "")
 		acpi_get_vendor_info(nodeACPIHid, &vendorName);
 	if (vendorName == NULL) {
-		manufacturerLabel << B_TRANSLATE("Unknown");
+		manufacturerLabel << B_TRANSLATE("unknown");
 	} else {
 		manufacturerLabel << vendorName;
 	};

@@ -412,9 +412,9 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 	if (driverAttrInfo.value.string[0] != '\0')
 		newDevice->SetAttribute(B_TRANSLATE("Driver used"), driverAttrInfo.value.string);
 	else
-		newDevice->SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE("Unknown"));
+		newDevice->SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE("unknown"));
 	if (!hasPublishedPath)
-		newDevice->SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE("None"));
+		newDevice->SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE("none"));
 
 	newDevice->InitFromAttributes();
 	fDevices.push_back(newDevice);

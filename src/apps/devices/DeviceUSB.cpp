@@ -77,14 +77,14 @@ DeviceUSB::InitFromAttributes()
 	usb_get_vendor_info(fVendorId, &vendorName);
 	usb_get_device_info(fVendorId, fDeviceId, &deviceName);
 	if (vendorName == NULL) {
-		manufacturerLabel << B_TRANSLATE("Unknown");
+		manufacturerLabel << B_TRANSLATE("unknown");
 	} else {
 		manufacturerLabel << vendorName;
 	};
 
 	// Fetch DeviceName
 	if (deviceName == NULL) {
-		deviceLabel << B_TRANSLATE("Unknown");
+		deviceLabel << B_TRANSLATE("unknown");
 	} else {
 		deviceLabel << deviceName;
 	}
