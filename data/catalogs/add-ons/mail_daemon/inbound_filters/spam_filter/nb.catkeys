@@ -1,6 +1,7 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SpamFilter	160316705
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		eller tom e-post
 Genuine below and uncertain above:	SpamFilterConfig		Ekte under og usikker over:
 Spam above:	SpamFilterConfig		Spam over:
 Add spam rating to start of subject	SpamFilterConfig		Legg til vurdering til start av emne
+Bayesian Spam Filter	SpamFilter		Bayesisk Spamfilter
 Learn from all incoming e-mail	SpamFilterConfig		Lær fra alle innkommende e-poster

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Screen	2577971458
+1	ukrainian	x-vnd.Haiku-Screen	1459314753
 no	Screen		ні
 bits/pixel	Screen		бітів/піксель
 15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
@@ -11,7 +11,7 @@ Keep	Screen		Зберегти
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu кГц\nВертикальна частота:\t%lu - %lu Гц\n\nМаксимально пікселів:\t%g МГц
 Refresh rate:	Screen		Частота оновлення:
 Video format:	Screen		Відео формат:
-Undo	Screen		Відмінити
+Undo	Screen		Відкат дії
 OK	Screen		ОК
 Current workspace	Screen		Поточна робоча область
 %ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
@@ -33,11 +33,9 @@ Revert	Screen		Відкат змін
 always	Screen		завжди
 Confirm changes	Screen		Підтвердити зміни
 Warning	Screen		Увага
-24 bits/pixel, 16 Million colors	Screen		24біти/піксель, 16 міліонів кольорів
 Hz	Screen		Гц
 Workspaces	Screen		Робочі області
 Brightness:	Screen		Яскравість:
-32 bits/pixel, 16 Million colors	Screen		32 біти/піксель, 16 мільйонів кольорів
 Done	Screen		Готово
 16 bits/pixel, 65536 colors	Screen		16 біт/піксель, 65536 кольорів
 Screen preferences by the Haiku team	Screen		Налаштування екрану від команди Haiku

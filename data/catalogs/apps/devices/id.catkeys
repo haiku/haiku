@@ -48,13 +48,13 @@ ACPI Button '%1'	DeviceACPI		Tombol ACPI '%1'
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nama perangkat
 Disk Drive	DeviceSCSI		Disk Drive
-Report compatibility	DevicesView		Laporkan kompatibilitas
 Other	DeviceSCSI		Lain
+Report compatibility	DevicesView		Laporkan kompatibilitas
 Computer	Device		Komputer
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Enklosur
-ACPI Thermal Zone	DeviceACPI		Zona Suhu ACPI
 Order by:	DevicesView		Urutkan berdasarkan:
+ACPI Thermal Zone	DeviceACPI		Zona Suhu ACPI
 Intelligent controller	Device		Pengontrol cerdas
 Multimedia controller	Device		Pengontrol multimedia
 Quit	DevicesView		Berhenti

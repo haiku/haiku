@@ -1,5 +1,6 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ActivityMonitor	2467534740
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Lag
+Temp	DataSource		Temp
 Block cache memory	DataSource		Blokkhurtigbufferminne
 Media nodes	DataSource		Medianoder
 Network send	DataSource		Sendt nettverk
@@ -9,8 +10,10 @@ ActivityMonitor	System name		Aktivitetsoversikt
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Oppdateringsintervall:
 Settings…	ActivityWindow		Innstillinger…
+Unknown thermal sensor	SystemInfoHandler		Ukjent termosensor
 Block cache	DataSource		Blokk-hurtigbuffer
 Memory	DataSource		Minne
+No thermal sensor	SystemInfoHandler		Ingen termosensor
 CPU speed	DataSource		CPU-hastighet
 CPU usage	DataSource		CPU-bruk
 Raw clipboard	DataSource		Data på utklippstavle
@@ -23,6 +26,7 @@ Page faults	DataSource		Sidefeil
 Add graph	ActivityWindow		Legg til graf
 Swap	DataSource		Utveksling
 %s faults/s	DataSource		%s feil/s
+Temperature	DataSource		Temperatur
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
 %lld ms	SettingsWindow		%lld ms

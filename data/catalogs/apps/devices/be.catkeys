@@ -46,13 +46,13 @@ Card Reader	DeviceSCSI		Чытальнік картак
 Display controller	Device		Кантролер экрану
 Device name	DevicePCI		Імя прылады
 Disk Drive	DeviceSCSI		Прывад дыскау
-Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
 Other	DeviceSCSI		Іншы(я)
+Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
 Computer	Device		Кампутар
 PCI bus	Device		Шына PCI
 Enclosure	DeviceSCSI		Уключэнне
-ACPI Thermal Zone	DeviceACPI		Тэрмальная зона ACPI
 Order by:	DevicesView		Парадкаваць па:
+ACPI Thermal Zone	DeviceACPI		Тэрмальная зона ACPI
 Intelligent controller	Device		Інтэлектуальны кантролер
 Multimedia controller	Device		Кантролер мультымедыя
 Quit	DevicesView		Выйсці

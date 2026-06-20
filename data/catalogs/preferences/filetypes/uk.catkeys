@@ -17,9 +17,9 @@ Add…	Application Type Window		Додати…
 Attribute name:	Attribute Window		Назва атрибута:
 Long description:	Application Type Window		Докладний опис:
 Cancel	Preferred App Menu		Скасувати
-Remove	FileTypes Window		Вилучити
+Remove	FileTypes Window		Прибрати
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Програма \«%s\» Не підтримує цей тип файлів.\nВи дійсно бажаєте встановити його?
-Remove	Application Type Window		Вилучити
+Remove	Application Type Window		Прибрати
 Gamma	Application Type Window		Гамма
 Cancel	Application Type Window		Скасувати
 Attribute	Attribute Window		Атрибут
@@ -100,7 +100,7 @@ no icon	FileTypes Window		значок відсутній
 Single launch	Application Type Window		Одноразовий запуск
 %s file type	FileType Window		Тип файлу %s
 Default	Attribute ListView		За замовчуванням
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Вилучення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені, що бажаєте цього? Щоб вилучити цілу групу, утримуйти клавішу Shift та натисніть \«Вилучити\».
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Вилучення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені, що бажаєте цього? Щоб вилучити цілу групу, утримуйти клавішу Shift та натисніть \«Прибрати\».
 String	Attribute ListView		Рядок
 Add type	New File Type Window		Додати тип
 Remove icon	Icon View		Вилучити значок

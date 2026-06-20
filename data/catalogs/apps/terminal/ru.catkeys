@@ -9,14 +9,14 @@ Edit	Terminal TermWindow		Изменить
 Select all	Terminal TermWindow		Выделить всё
 Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если процессы ещё запущены
 Color scheme:	Terminal ThemeView		Цветовая схема:
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tТекущий каталог активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример «%2d» отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса текущей вкладки.\n\t%t\t-\tЗаголовок текущей вкладки.\n
 Copy	Terminal TermWindow		Копировать
 Edit tab title…	Terminal TermWindow		Переименовать вкладку…
 Print	Terminal TermWindow		Печать
 Settings	Terminal TermWindow		Настройки
 %app% settings	Terminal PrefWindow	window title	Настройки терминала
 ANSI bright black color	Terminal ThemeView		ANSI яркий чёрный
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tТекущий рабочий каталог активного процесса.\n\t\t\tКак опция; указывает максимальное количество компонентов\n\t\t\tпути. Например, '%2d' - не более двух компонентов.\n\t%i\t-\tИндекс вкладки.\n\t%e\t-\tКодировка текущей вкладки. Не отображается для UTF-8.\n\t%p\t-\tНазвание активного процесса.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tТекущий рабочий каталог активного процесса.\n\t\t\tКак опция; указывает максимальное количество компонентов\n\t\t\tпути. Например, «%2d» – не более двух компонентов.\n\t%i\t-\tИндекс вкладки.\n\t%e\t-\tКодировка текущей вкладки. Не отображается для UTF-8.\n\t%p\t-\tНазвание активного процесса.
 Use default	Terminal SetTitleWindow		По умолчанию
 Close tab	Terminal TermWindow		Закрыть вкладку
 Error!	Terminal getString		Ошибка!
@@ -30,10 +30,10 @@ Change directory	Terminal TermView		Сменить каталог
 Custom	Terminal AppearancePrefView	Window size	Выбор пользователя
 Page setup…	Terminal TermWindow		Настройка печати…
 ANSI yellow color	Terminal ThemeView		ANSI жёлтый
-Cancel	Terminal TermView		Отмена
+Cancel	Terminal TermView		Отменить
 Defaults	Terminal PrefWindow		По умолчанию
 black	Terminal ThemeView		чёрный
-Revert	Terminal PrefWindow		Вернуть
+Revert	Terminal PrefWindow		Откатить
 The following processes are still running:\n\n\t%1\n\nIf you close %appname%, the processes will be killed.	Terminal TermWindow		Эти процессы всё ещё запущены:\n\n\t%1\n\nЕсли Вы закроете %appname%, они будут завершены.
 Use selection	Terminal FindWindow		Использовать выделенный текст
 Find next	Terminal TermWindow		Найти далее
@@ -59,7 +59,7 @@ Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Text not found.	Terminal TermWindow		Текст не найден
 Match word	Terminal FindWindow		Только слово целиком
 Find failed	Terminal TermWindow		Строка не найдена
-Quit	Terminal TermWindow		Выход
+Quit	Terminal TermWindow		Выйти
 Match case	Terminal FindWindow		Учитывать регистр
 Find previous	Terminal TermWindow		Найти ранее
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:
@@ -75,9 +75,9 @@ ANSI cyan color	Terminal ThemeView		ANSI бирюзовый
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \«%1\» всё ещё работает.\nЕсли Вы закроете вкладку, то этот процесс будет уничтожен.
 Full screen	Terminal TermWindow		На весь экран
 Shell 	Terminal TermWindow		Консоль 
-Revert	Terminal ThemeWindow		Вернуть
+Revert	Terminal ThemeWindow		Откатить
 ANSI green color	Terminal ThemeView		ANSI зелёный
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол '%'.\n\t%<\t-\tНачало секции, которая будет отображена если заполнитель\n\t\t\tпосле начала не пустой.\n\t%>\t-\tНачало секции, которая будет отображена если заполнитель\n\t\t\tмежду предыдущей секцией %< и этой не пустой.\n\t%-\t-\tКонец секции %< или %>.\n\nЛюбой не буквенно-цифровой символ между '%' и буквой формата вставит пробел\nесли значение заполнителя не пустое. Он будет добавлен в секцию %<.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол «%».\n\t%<\t-\tНачало секции, которая будет отображена если заполнитель\n\t\t\tпосле начала не пустой.\n\t%>\t-\tНачало секции, которая будет отображена если заполнитель\n\t\t\tмежду предыдущей секцией %< и этой не пустой.\n\t%-\t-\tКонец секции %< или %>.\n\nЛюбой не буквенно-цифровой символ между «%» и буквой формата вставит пробел\nесли значение заполнителя не пустое. Он будет добавлен в секцию %<.
 ANSI bright cyan color	Terminal ThemeView		ANSI яркий бирюзовый
 Tab title:	Terminal TermWindow		Заголовок вкладки:
 Window title:	Terminal TermWindow		Заголовок окна:

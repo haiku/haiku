@@ -16,12 +16,12 @@ Icon	FileTypes Window		Значок
 Add…	Application Type Window		Добавить…
 Attribute name:	Attribute Window		Название атрибута:
 Long description:	Application Type Window		Подробное описание:
-Cancel	Preferred App Menu		Отмена
+Cancel	Preferred App Menu		Отменить
 Remove	FileTypes Window		Удалить
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Приложение \«%s\» не поддерживает данный тип файлов.\nВы действительно хотите установить его?
 Remove	Application Type Window		Удалить
 Gamma	Application Type Window		Гамма
-Cancel	Application Type Window		Отмена
+Cancel	Application Type Window		Отменить
 Attribute	Attribute Window		Атрибут
 Multiple launch	Application Type Window		Множественный запуск
 {0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# тип приложения был удалён} few{# типа приложений были удалены} other{# типов приложений было удалено}}
@@ -33,9 +33,9 @@ None	FileTypes Window		Не выбрано
 Exclusive launch	Application Type Window		Единственный запуск
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Удаление типа файла невозможно отменить.\nВы уверены, что хотите удалить его?
 Integer 64 bit	Attribute ListView		Целое 64 бит
-Cancel	New File Type Window		Отмена
+Cancel	New File Type Window		Отменить
 Select same preferred application as	FileType Window		Выбрать такое же предпочтительное приложение как у
-Cancel	Type List Window		Отмена
+Cancel	Type List Window		Отменить
 Don't save	Application Type Window		Не сохранять
 Center	Attribute Window	Attribute column alignment in Tracker	По центру
 Done	Extension Window		Готово
@@ -105,7 +105,7 @@ String	Attribute ListView		Строка
 Add type	New File Type Window		Добавить тип
 Remove icon	Icon View		Удалить значок
 Boolean	Attribute ListView		Булево
-Cancel	Extension Window		Отмена
+Cancel	Extension Window		Отменить
 Alignment:	Attribute Window		Выравнивание:
 Icon	FileType Window		Значок
 Signature:	Application Type Window		Сигнатура:
@@ -121,14 +121,14 @@ Select…	FileTypes Window		Выбрать…
 File recognition	FileTypes Window		Распознавание файла
 Application types…	FileTypes Window		Типы приложений…
 Add icon…	Icon View		Добавить значок…
-Cancel	FileTypes Window		Отмена
+Cancel	FileTypes Window		Отменить
 Save into resource file…	Application Type Window		Сохранить в ресурс-файл…
 Special:	Attribute Window		Особый:
 Type:	Attribute Window		Тип:
 Could not retrieve application signature	Preferred App Menu		Невозможно определить сигнатуру приложения
 Beta	Application Types Window		Бета
 Add group	New File Type Window		Добавить группу
-Cancel	Attribute Window		Отмена
+Cancel	Attribute Window		Отменить
 Gamma	Application Types Window		Гамма
 Supported types	Application Type Window		Поддерживаемые типы
 Integer 32 bit	Attribute ListView		Целое 32 бита
@@ -160,7 +160,7 @@ Extension	Extension Window		Расширение
 Rule:	FileTypes Window		Правило:
 FileTypes	System name		Типы файлов
 Version	Application Types Window		Версия
-Quit	FileTypes Window		Выход
+Quit	FileTypes Window		Выйти
 File type	FileType Window		Тип файла
 Internal name:	FileTypes Window		MIME-тип:
 Add…	FileTypes Window		Добавить…

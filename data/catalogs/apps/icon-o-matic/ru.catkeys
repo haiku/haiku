@@ -38,7 +38,7 @@ PNG set	Icon-O-Matic-SavePanel		Набор PNG
 Transformation	Icon-O-Matic-TransformationBoxStates		Преобразование
 Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Переместить {0, plural, one{контур} few{контура} other{ко́нтуров}}
 Closed	Icon-O-Matic-PropertyNames		Замкнут
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<нечего возвращать>
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<нечего повторять>
 Height	Icon-O-Matic-PropertyNames		Высота
 warning	Icon-O-Matic-SVGExport		предупреждение
 File	Icon-O-Matic-Menus		Файл
@@ -153,7 +153,7 @@ Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Обход точек к
 Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		Добавить {0, plural, one{элемент} few{элемента} other{элементов}}
 Rotate indices forwards	Icon-O-Matic-PathsList		Переместить начало контура вперед
 Save	Icon-O-Matic-Menu-File		Сохранить
-Cancel	Icon-O-Matic-StyledTextImport		Отмена
+Cancel	Icon-O-Matic-StyledTextImport		Отменить
 Add circle	Icon-O-Matic-PathsList		Добавить окружность
 Freeze transformation	Icon-O-Matic-ShapesList		Зафиксировать преобразование
 META:ICON attribute	Icon-O-Matic-SavePanel		Атрибут META:ICON
@@ -193,4 +193,4 @@ Width	Icon-O-Matic-PropertyNames		Ширина
 Add reference image	Icon-O-Matic-ShapesList		Добавить референсное изображение
 Style	Icon-O-Matic-Menus		Стиль
 Off	Icon-O-Matic-Menu-Settings		Без сетки
-Edit	Icon-O-Matic-Menus		Изменить
+Edit	Icon-O-Matic-Menus		Правка

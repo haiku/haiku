@@ -13,12 +13,12 @@ Flags	InfoView		Позначки
 Media output	InfoView		Медіавихід
 Active lines	InfoView		Активні лінії
 Buffer size	InfoView		Розмір буфера
-\n- Quality:	FileNodeInfoView		\n- Якість:
+\n- Quality:	FileNodeInfoView		\n– Якість:
 Kinds	LiveNodeInfoView		Категорії
 Application	AppNodeInfoView		Програма
 Flavor flags	DormantNodeInfoView		Позначки сімейства
 Max. instances	DormantNodeInfoView		Макс. екземплярів
-\n- Duration:	FileNodeInfoView		\n- Тривалість:
+\n- Duration:	FileNodeInfoView		\n– Тривалість:
 Dormant media node	DormantNodeInfoView		Пасивна медіанода
 Latency	LiveNodeInfoView		Латентність
 Media type	InfoView		Тип медіа
@@ -47,7 +47,7 @@ AddOn ID	DormantNodeInfoView		ID Доповнення
 Frame size	InfoView		Розмір кадру
 Flavor ID	DormantNodeInfoView		ID у сімействі
 Run mode	LiveNodeInfoView		Режим роботи
-\n- Codec:	FileNodeInfoView		\n- Кодек:
+\n- Codec:	FileNodeInfoView		\n– Кодек:
 Port	LiveNodeInfoView		Порт
 Output format	DormantNodeInfoView		Вихідний формат
 Aspect ratio	InfoView		Співвідношення сторін

@@ -8,13 +8,13 @@ CD	MultiAudio		CD
 Tone control	MultiAudio		Регулятор тембру
 Phone	MultiAudio		Телефон
 Aux	MultiAudio		Лінійний вхід
-Output bass	MultiAudio		Вихід басів
+Output bass	MultiAudio		Вихід НЧ
 Headphones	MultiAudio		Навушники
 Beep	MultiAudio		Сигнал
 Output mono mix	MultiAudio		Змішування виходу моно
 Output stereo mix	MultiAudio		Змішування виходу стерео
 Input	MultiAudio		Вхід
-Output treble	MultiAudio		Вихід високих
+Output treble	MultiAudio		Вихід ВЧ
 Mono mix	MultiAudio		Змішування моно
 General	MultiAudio		Загальні
 Input & Output	MultiAudio		Вхід & Вихід

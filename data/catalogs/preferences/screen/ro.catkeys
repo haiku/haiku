@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Screen	2577971458
+1	romanian	x-vnd.Haiku-Screen	1459314753
 no	Screen		nu
 bits/pixel	Screen		biți/pixel
 15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 de culori
@@ -33,11 +33,9 @@ Revert	Screen		Revenire
 always	Screen		întotdeauna
 Confirm changes	Screen		Confirmă modificările
 Warning	Screen		Avertisment
-24 bits/pixel, 16 Million colors	Screen		24 biți/pixel, 16 milioane de culori
 Hz	Screen		Hz
 Workspaces	Screen		Spații de lucru
 Brightness:	Screen		Luminozitate:
-32 bits/pixel, 16 Million colors	Screen		32 biți/pixel, 16 milioane de culori
 Done	Screen		Gata
 16 bits/pixel, 65536 colors	Screen		16 biți/pixel, 65536 de culori
 Screen preferences by the Haiku team	Screen		Preferințe de ecran de echipa Haiku

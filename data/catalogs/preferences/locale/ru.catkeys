@@ -19,8 +19,8 @@ Use month/day-names from preferred language	TimeFormatSettings		Использо
 already chosen	LanguageListView		уже выбран
 Preferred languages	Locale Preflet Window		Предпочитаемые языки
 Full format:	TimeFormatSettings		Полный формат:
-Cancel	Locale Preflet Window		Отмена
-Revert	Locale Preflet Window		Вернуть
+Cancel	Locale Preflet Window		Отменить
+Revert	Locale Preflet Window		Откатить
 Translate application and folder names	TimeFormatSettings		Переводить имена приложений и папок
 12 hour	TimeFormatSettings		12 часовой формат
 Positive:	TimeFormatSettings		Положительные:

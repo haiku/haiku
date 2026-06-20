@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Screen	2568028818
+1	croatian	x-vnd.Haiku-Screen	1449372113
 no	Screen		ne
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 boja
@@ -27,10 +27,8 @@ Swap displays:	Screen		Zamjeni ekrane:
 Revert	Screen		Preokreni
 always	Screen		uvijek
 Warning	Screen		Upozorenje
-24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Miliona boja
 Hz	Screen		Hz
 Workspaces	Screen		Radni prostori
-32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Miliona boja
 Done	Screen		Završeno
 16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 boja
 Screen preferences by the Haiku team	Screen		Osobitosti ekrana koje je načinio Haiku tim

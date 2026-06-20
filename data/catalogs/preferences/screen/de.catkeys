@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Screen	2577971458
+1	german	x-vnd.Haiku-Screen	1459314753
 no	Screen		nein
 bits/pixel	Screen		Bits/Pixel
 15 bits/pixel, 32768 colors	Screen		15 Bits/Pixel, 32768 Farben
@@ -33,11 +33,9 @@ Revert	Screen		Anfangswerte
 always	Screen		immer
 Confirm changes	Screen		Änderungen bestätigen
 Warning	Screen		Warnung
-24 bits/pixel, 16 Million colors	Screen		24 Bits/Pixel, 16 Millionen Farben
 Hz	Screen		Hz
 Workspaces	Screen		Arbeitsflächen
 Brightness:	Screen		Helligkeit:
-32 bits/pixel, 16 Million colors	Screen		32 Bits/Pixel, 16 Millionen Farben
 Done	Screen		Fertig
 16 bits/pixel, 65536 colors	Screen		16 Bits/Pixel, 65535 Farben
 Screen preferences by the Haiku team	Screen		Bildschirm-Einstellungen vom Haiku-Team

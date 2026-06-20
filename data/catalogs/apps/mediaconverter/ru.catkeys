@@ -3,7 +3,7 @@ Input file not recognized as Audio or Video	MediaConverter		Входной фа�
 Source files	MediaConverter		Исходные файлы
 Error writing video frame %lld	MediaConverter		Ошибка записи видеокадра %lld
 Audio quality: %s	MediaConverter		Качество аудио: %s
-Error converting '%filename'	MediaConverter		Ошибка конвертации '%filename'
+Error converting '%filename'	MediaConverter		Ошибка конвертации «%filename»
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Выбранный каталог не найден. Выбираем по умолчанию /boot/home
 Conversion completed	MediaConverter		Конвертация завершена
 Audio:	MediaConverter-FileInfo		Аудио:
@@ -21,7 +21,7 @@ Output format	MediaConverter		Формат вывода
 %.1f kHz mono	MediaFileInfo		%.1f кГц моно
 %.1f kHz stereo	MediaFileInfo		%.1f кГц стерео
 OK	MediaConverter		ОК
-Error creating '%filename'	MediaConverter		Ошибка создания '%filename'
+Error creating '%filename'	MediaConverter		Ошибка создания «%filename»
 Error loading a file	MediaConverter		Ошибка при загрузке файла
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кодирования
 Open…	Menu		Открыть…
@@ -41,7 +41,7 @@ Error loading files	MediaConverter		Ошибка при загрузке фай�
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# бит} few{# бита} other{# битов}}
 Video quality: %s	MediaConverter		Качество видео: %s
 End   [ms]: 	MediaConverter		Конец [мс]: 
-Cancel	MediaConverter		Отмена
+Cancel	MediaConverter		Отменить
 OK	MediaConverter-FileInfo		ОК
 Video encoding:	MediaConverter		Кодирование видео:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Произошла ошибка при чтении информации о файле.\n\nОшибка: 

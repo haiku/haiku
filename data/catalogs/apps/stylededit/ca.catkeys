@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-StyledEdit	2777022576
+1	catalan; valencian	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Estadístiques del document
 Cut	Menus		Retalla
 Center	Menus		Centrat
@@ -39,6 +39,7 @@ Strikeout	Menus		Ratllat
 Replace in all windows	FindandReplaceWindow		Reemplaça-ho a totes les finestres
 Error saving \"%filename%\":\n%error%	SaveAlert		Hi ha hagut un error en desar \"%filename%\":\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		Voleu desar els canvis al document \"%title%\"?
+Style	Menus		Estil
 Save	SaveAlert		Desa
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		El fitxer \"%title%\" té canvis no desats.\nVoleu revertir-lo a la darrera versió desada?
 Default	Open_and_SaveAsPanel		Per defecte

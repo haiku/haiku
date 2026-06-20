@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Screen	2577971458
+1	finnish	x-vnd.Haiku-Screen	1459314753
 no	Screen		ei
 bits/pixel	Screen		bittiä/pikseli
 15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
@@ -33,11 +33,9 @@ Revert	Screen		Palauta
 always	Screen		aina
 Confirm changes	Screen		Vahvista muutokset
 Warning	Screen		Varoitus
-24 bits/pixel, 16 Million colors	Screen		24 bittiä/pikseli, 16 miljoonaa väriä
 Hz	Screen		Hz
 Workspaces	Screen		Työtilat
 Brightness:	Screen		Kirkkaus:
-32 bits/pixel, 16 Million colors	Screen		32 bittiä/pikseli, 16 miljoonaa väriä
 Done	Screen		Valmis
 16 bits/pixel, 65536 colors	Screen		16 bittiä/pikseli, 65536 väriä
 Screen preferences by the Haiku team	Screen		Haiku-ryhmän näyttöasetukset

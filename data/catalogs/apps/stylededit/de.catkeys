@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	2777022576
+1	german	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Dokument-Statistik
 Cut	Menus		Ausschneiden
 Center	Menus		Zentriert
@@ -39,6 +39,7 @@ Strikeout	Menus		Durchgestrichen
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
 Error saving \"%filename%\":\n%error%	SaveAlert		Fehler beim Speichern von \"%filename%\":\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		Geändertes Dokument \"%title%\" speichern? 
+Style	Menus		Stil
 Save	SaveAlert		Speichern
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" enthält ungespeicherte Änderungen.\nZuletzt gespeicherte Version wiederherstellen?
 Default	Open_and_SaveAsPanel		Standard

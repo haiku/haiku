@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Screen	1226202253
+1	thai	x-vnd.Haiku-Screen	107545548
 no	Screen		ไม่
 bits/pixel	Screen		bits/pixel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 colors
@@ -30,11 +30,9 @@ Revert	Screen		เปลี่ยนกลับ
 always	Screen		ตลอด
 Confirm changes	Screen		ยืนยันการเปลี่ยนแปลง
 Warning	Screen		เตือน
-24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Million colors
 Hz	Screen		Hz
 Workspaces	Screen		พื้นที่ทำงาน
 Brightness:	Screen		ความสว่าง:
-32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Million colors
 Done	Screen		เสร็จ
 16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 colors
 Screen preferences by the Haiku team	Screen		การตั้งค่าหน้าจอโดยทีม Haiku

@@ -51,13 +51,13 @@ ACPI Button '%1'	DeviceACPI		ACPI knapp '%1'
 ACPI <unknown>	DeviceACPI		ACPI <ukjent>
 Device name	DevicePCI		Enhetsnavn
 Disk Drive	DeviceSCSI		Diskstasjon
-Report compatibility	DevicesView		Rapporter kompatibilitet
 Other	DeviceSCSI		Annet
+Report compatibility	DevicesView		Rapporter kompatibilitet
 Computer	Device		Datamaskin
 PCI bus	Device		PCI-buss
 Enclosure	DeviceSCSI		Vedlegg
-ACPI Thermal Zone	DeviceACPI		ACPI-temperaturområde
 Order by:	DevicesView		Sorter etter:
+ACPI Thermal Zone	DeviceACPI		ACPI-temperaturområde
 Intelligent controller	Device		Intelligent kontroller
 Multimedia controller	Device		Multimediakontroller
 Quit	DevicesView		Avslutt

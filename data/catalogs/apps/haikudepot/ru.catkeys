@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2108618135
+1	russian	x-vnd.Haiku-HaikuDepot	2384088929
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблемы при загрузке Условий использования
 User ratings loading…	PackageInfoView		Загружаются оценки пользователей…
 Available packages	MainWindow		Доступные пакеты
@@ -45,6 +45,7 @@ Cancel	UserLoginWindow		Отменить
 Rating not possible	MainWindow		Оценка невозможна
 Package update error	MainWindow		Ошибка обновления пакета
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Нажмите здесь
+No screenshot available.	PackageInfoView		Нет доступных снимков экрана.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# процесс} few{# процесса} other{# процессов}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Получение оценок пользователей для пакета (рейтинга)
 Reboot required	PackageManager		Требуется перезагрузка
@@ -153,6 +154,7 @@ Installed packages	MainWindow		Установленные пакеты
 User rating	RatePackageWindow		Пользовательский рейтинг
 Date	PackageListView		Дата
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Пароль должен состоять минимум из %MinPasswordLength% символов. Из них, %MinPasswordUppercaseChar% символов должны быть в ВЕРХНЕМ регистре и %MinPasswordDigitsChar% символов должны быть цифрами.
+Screenshot loading…	PackageInfoView		Загружаются снимки экрана…
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		При загрузке Условий использования возникла ошибка. Ознакомьтесь с подробностями в журнале и повторите попытку. \nИнформация о том, как просматривать журналы, доступна в разделе HaikuDepot руководства пользователя Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		Был получен странный ответ от вебсервера.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Открывается \«%DeskbarLink%\»

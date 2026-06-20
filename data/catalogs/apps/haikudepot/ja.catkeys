@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2108618135
+1	japanese	x-vnd.Haiku-HaikuDepot	2384088929
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 User ratings loading…	PackageInfoView		ユーザー評価読み込み中…
 Available packages	MainWindow		使用可能なパッケージ
@@ -45,6 +45,7 @@ Cancel	UserLoginWindow		中止
 Rating not possible	MainWindow		評価不能
 Package update error	MainWindow		パッケージアップデートエラー
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	ここをクリック
+No screenshot available.	PackageInfoView		スクリーンショットは利用できません。
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# プロセス} other{# プロセス}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		パッケージのユーザー評価を取得中
 Reboot required	PackageManager		再起動が必要です
@@ -153,6 +154,7 @@ Installed packages	MainWindow		インストール済パッケージ
 User rating	RatePackageWindow		ユーザー評価
 Date	PackageListView		日付
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		パスワードは %MinPasswordLength% 文字以上である必要があります。%MinPasswordUppercaseChar% 個の文字は大文字で、%MinPasswordDigitsChar% 個の文字は数字である必要があります。
+Screenshot loading…	PackageInfoView		スクリーンショットを読み込み中…
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		新規ユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
 Opening \"%DeskbarLink%\"	OpenPackageProcess		\"%DeskbarLink%\" を開く

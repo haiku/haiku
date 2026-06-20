@@ -20,7 +20,7 @@ Use proxy server to connect to the internet	Settings Window		Использов�
 Auto-hide interface in full screen mode	Settings Window		Автоматически скрывать интерфейс в полноэкранном режиме
 Delete	Cookie Manager		Удалить
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Произошла ошибка при открытии папки с закладками.\n\nОшибка: %error
-(Finish: %date - Over %duration left)	Download Window		(Окончание: %date - Более %duration осталось)
+(Finish: %date - Over %duration left)	Download Window		(Окончание: %date – Более %duration осталось)
 Open containing folder	Download Window		Открыть папку с файлом
 Find previous	WebPositive Window		Найти ранее
 Full screen	WebPositive Window		Полноэкранный режим

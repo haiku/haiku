@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Screen	2577971458
+1	czech	x-vnd.Haiku-Screen	1459314753
 no	Screen		ne
 bits/pixel	Screen		bitů/pixel
 15 bits/pixel, 32768 colors	Screen		15 bitů/pixel, 32768 barev
@@ -33,11 +33,9 @@ Revert	Screen		Vrátit
 always	Screen		vždy
 Confirm changes	Screen		Potvrdit změny
 Warning	Screen		Varování
-24 bits/pixel, 16 Million colors	Screen		24 bitů/pixel, 16 Milionů barev
 Hz	Screen		Hz
 Workspaces	Screen		Pracovní plochy
 Brightness:	Screen		Jas:
-32 bits/pixel, 16 Million colors	Screen		32 bitů/pixel, 16 Milionů barev
 Done	Screen		Hotovo
 16 bits/pixel, 65536 colors	Screen		16 bitů/pixel, 65536 barev
 Screen preferences by the Haiku team	Screen		Nastavení obrazovky od týmu Haiku

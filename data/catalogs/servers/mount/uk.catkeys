@@ -6,9 +6,9 @@ OK	AutoMounter		ОК
 Unmount error	AutoMounter		Помилка відключення
 The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Файлова система на цьому розділі відмінна від файлової системи Be (BeFS). Рекомендуємо підключити його в режимі «тільки читання» щоб запобігти втраті даних через можливі помилки в Haiku.
 Mount read/write	AutoMounter		Підключити для читання/запису
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Неможливо відключити диск \"%s\":\n\t%s
-Mounting volume '%s'\n\n	AutoMounter		Підключення тому '%s'\n\n
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Неможливо відключити диск \"%s\":\n\t%s\n\nВідключити примусово?\n\nПримітка: Якщо програма продовжить запис на том, можлива втрата даних.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Неможливо відключити диск \«%s\»:\n\t%s
+Mounting volume '%s'\n\n	AutoMounter		Підключення тому «%s»\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Неможливо відключити диск \«%s\»:\n\t%s\n\nВідключити примусово?\n\nПримітка: Якщо програма продовжить запис на том, можлива втрата даних.\n
 Force unmount	AutoMounter		Відключити примусово
 Mount error	AutoMounter		Помилка підключення
 Mount warning	AutoMounter		Попередження при підключенні

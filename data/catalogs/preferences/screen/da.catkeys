@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Screen	1226202253
+1	danish	x-vnd.Haiku-Screen	107545548
 no	Screen		nej
 bits/pixel	Screen		bit/billedpunkt
 15 bits/pixel, 32768 colors	Screen		15 bit/billedpunkt, 32768 farver
@@ -30,11 +30,9 @@ Revert	Screen		Tilbagefør
 always	Screen		altid
 Confirm changes	Screen		Bekræft ændringer
 Warning	Screen		Advarsel
-24 bits/pixel, 16 Million colors	Screen		24 bit/billedpunkt, 16 millioner farver
 Hz	Screen		Hz
 Workspaces	Screen		Arbejdsområder
 Brightness:	Screen		Lysstyrke:
-32 bits/pixel, 16 Million colors	Screen		32 bit/billedpunkt, 16 millioner farver
 Done	Screen		Færdig
 16 bits/pixel, 65536 colors	Screen		16 bit/billedpunkt, 65536 farver
 Screen preferences by the Haiku team	Screen		Skærmindstillinger af Haiku-holdet

@@ -41,7 +41,7 @@ Time	System name		Время
 Show time zone	Time		Показывать часовой пояс
 Synchronize at boot	Time		Синхронизировать при загрузке
 Indian	Time		Индийский океан
-Revert	Time		Вернуть
+Revert	Time		Откатить
 Date and time	Time		Дата и время
 The following error occured while synchronizing:\n%s	Time		При синхронизации произошла следующая ошибка:\n%s
 Synchronize	Time		Синхронизировать

@@ -46,5 +46,5 @@ Design capacity: 	PowerStatus		Паспортна ємність:
 OEM info: 	PowerStatus		Дані OEM: 
 no battery	PowerStatus		батарея відсутня
 Empty battery slot	PowerStatus		Слот підключення батареї пустий
-Install in Deskbar	PowerStatus		Встановити у Deskbar
+Install in Deskbar	PowerStatus		Встановити на панель Deskbar
 charging	PowerStatus		зарядка

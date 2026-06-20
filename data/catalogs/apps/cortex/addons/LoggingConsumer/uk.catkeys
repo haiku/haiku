@@ -4,13 +4,13 @@ Priority	CortexAddOnsLoggingConsumer		Пріоритет
 MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося знайти ноду (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Латентність
 Logged input	CortexAddOnsLoggingConsumer		Вхід реєстратора
-CPU spin percentage	CortexAddOnsLoggingConsumer		Використати CPU (%)
+CPU spin percentage	CortexAddOnsLoggingConsumer		Цикли очікування CPU (%)
 NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Старт
 Thread priority	CortexAddOnsLoggingConsumer		Пріоритет потоку
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Параметри LoggingConsumer
 Latency control	CortexAddOnsLoggingConsumer		Контроль латентності
-CPU percentage	CortexAddOnsLoggingConsumer		Загрузка CPU
+CPU percentage	CortexAddOnsLoggingConsumer		Загрузка CPU (%)
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Стоп
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Нода LoggingConsumer у версії доповнення.\nДивіться Інформаційний бюлетень Be Developer III.18: 5 травня 1999\nадаптував Eric Moon (4 червня 1999)

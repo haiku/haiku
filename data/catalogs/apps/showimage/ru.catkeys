@@ -24,7 +24,7 @@ Image	Menus		Изображение
 Flip top to bottom	Menus		Повернуть сверху вниз
 Zoom in	Menus		Увеличить
 Last page	Menus		Последняя страница
-Cancel	ClosePrompt		Отмена
+Cancel	ClosePrompt		Отменить
 Attributes	Menus		Атрибуты
 High-quality zooming	Menus		Высококачественное масштабирование
 Close	Menus		Закрыть
@@ -36,7 +36,7 @@ Show tool bar	Menus		Показать панель иструментов
 First page	Menus		Первая страница
 OK	SaveToFile		ОК
 Print…	Menus		Печать…
-The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
+The file '%s' could not be written.	SaveToFile		Невозможно записать файл «%s».
 Quit	Menus		Выход
 Get info	Menus		Информация
 Rating	Menus		Рейтинг
@@ -53,7 +53,7 @@ Fit to window	Menus		Подогнать под размер окна
 Go to page	Menus		Перейти к странице
 Browse	Menus		Просмотр
 Progress monitor	ProgressWindow		Монитор состояния
-Edit	Menus		Изменить
+Edit	Menus		Правка
 Move to Trash	Menus		Переместить в корзину
 Use as background…	Menus		Сделать фоном рабочего стола…
 Open…	Menus		Открыть…

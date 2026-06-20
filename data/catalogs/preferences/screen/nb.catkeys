@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Screen	2577971458
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Screen	1459314753
 no	Screen		nei
 bits/pixel	Screen		bits/piksel
 15 bits/pixel, 32768 colors	Screen		15-bits/piksel, 32768 farger
@@ -33,11 +33,9 @@ Revert	Screen		Tilbakestill
 always	Screen		alltid
 Confirm changes	Screen		Bekreft endringene
 Warning	Screen		Advarsel
-24 bits/pixel, 16 Million colors	Screen		24-bits/piksel, 16 Millioner farger
 Hz	Screen		Hz
 Workspaces	Screen		Arbeidsområder
 Brightness:	Screen		Lysstyrke:
-32 bits/pixel, 16 Million colors	Screen		32-bits/piksel, 16 Millioner farger
 Done	Screen		Ferdig
 16 bits/pixel, 65536 colors	Screen		16-bits/piksel, 65536 farger
 Screen preferences by the Haiku team	Screen		Skjerminnstillinger av Haiku-teamet

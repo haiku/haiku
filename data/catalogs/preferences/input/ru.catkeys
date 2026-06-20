@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Input	1746072289
+1	russian	x-vnd.Haiku-Input	3371770123
 Defaults	InputMouse		По умолчанию
 Scrolling	TouchpadPrefView		Прокрутка
 Long	KeyboardView		Длинная
@@ -6,10 +6,13 @@ Cancel	TouchpadPrefView		Отменить
 Slow	TouchpadPrefView		Медленно
 Device List	InputWindow		Список устройств
 Double-click speed	SettingsView		Скорость двойного клика
+On tap-drag only	TouchpadPrefView		Только при перетаскивании касанием
+Edge motion:	TouchpadPrefView		Движение при достижении края панели:
 5-Button	SettingsView		Пятикнопочная
 Typing test area	KeyboardView		Тестовая область
 Fast	KeyboardView		Быстро
 Always	TouchpadPrefView		Всегда
+Software button areas	TouchpadPrefView		Области софт-клавиш
 Please confirm	TouchpadPrefView		Пожалуйста, подтвердите
 Trackpad speed	TouchpadPrefView		Скорость трекпада
 Mouse speed	SettingsView		Скорость курсора
@@ -24,6 +27,7 @@ Revert	InputMouse		Откатить
 Slow	KeyboardView		Медленно
 2-Button	SettingsView		Двухкнопочная
 Click to focus and raise	SettingsView		Кликнуть для фокуса и поднятия окна
+Natural scrolling	TouchpadPrefView		Естественная прокрутка (по типу смартфона)
 Vertical	TouchpadPrefView		Вертикальная
 Low	TouchpadPrefView		Медленно
 Focus follows mouse	SettingsView		Фокус следует за курсором
@@ -33,6 +37,7 @@ Revert	TouchpadPrefView		Откатить
 When dragging	TouchpadPrefView		При перетаскивании
 4-Button	SettingsView		Четырёхкнопочная
 Tapping sensitivity	TouchpadPrefView		Отклик на постукивание
+Disabled	TouchpadPrefView		Отключено
 Revert	InputKeyboard		Откатить
 Mouse type:	SettingsView		Тип мыши:
 Off	TouchpadPrefView		Отключить
@@ -49,6 +54,7 @@ Mouse acceleration	SettingsView		Ускорение мыши
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Выбранная область прокрутки слишком большая и может затруднить обычные операции с мышью. Вы действительно хотите изменить её?
 High	TouchpadPrefView		Быстро
 Defaults	TouchpadPrefView		По умолчанию
+Finger click	TouchpadPrefView		Жесты касания (симуляция кнопок)
 1-Button	SettingsView		Однокнопочная
 Defaults	InputKeyboard		По умолчанию
 Key repeat rate	KeyboardView		Скорость повтора клавиши

@@ -10,10 +10,10 @@ Could not create %s.	People		Не вдалося створити %s.
 Quit	People		Вийти
 Company	People		Компанія
 Name	People		Ім'я
-The file '%name%' could not be written.	People		Файл '%name%' не може бути записаний.
+The file '%name%' could not be written.	People		Файл «%name%» неможливо записати.
 Contact name	People		Контактне ім'я
 Cancel	People		Скасувати
-Edit	People		Редагувати
+Edit	People		Коректив
 Save changes before closing?	People		Зберегти зміни перед закриттям?
 People	System name		People
 Error	People		Помилка

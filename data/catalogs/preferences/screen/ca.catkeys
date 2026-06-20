@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Screen	2577971458
+1	catalan; valencian	x-vnd.Haiku-Screen	1459314753
 no	Screen		no
 bits/pixel	Screen		bits/píxel
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colors
@@ -33,11 +33,9 @@ Revert	Screen		Reverteix
 always	Screen		sempre
 Confirm changes	Screen		Confirmeu els canvis
 Warning	Screen		Avís
-24 bits/pixel, 16 Million colors	Screen		24 bits/píxel, 16 Milions de colors
 Hz	Screen		Hz
 Workspaces	Screen		Espais de treball
 Brightness:	Screen		Brillantor:
-32 bits/pixel, 16 Million colors	Screen		32 bits/píxel, 16 Milions de colors
 Done	Screen		Fet
 16 bits/pixel, 65536 colors	Screen		16 bits/píxel, 65536 colors
 Screen preferences by the Haiku team	Screen		Preferències de la pantalla, de l'equip del Haiku

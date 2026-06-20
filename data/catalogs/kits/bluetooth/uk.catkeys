@@ -68,7 +68,7 @@ Telephony	DeviceClass		Телефонія
 Game	DeviceClass		Гра
 Video display and loudspeaker	DeviceClass		Відео дисплей і гучномовець
 Wrist watch	DeviceClass		Наручний годинник
-Sensing device	DeviceClass		Чутливий пристрій
+Sensing device	DeviceClass		Сенсорний пристрій
 Pointing device	DeviceClass		Вказівний пристрій
 (reserved)	DeviceClass		(зарезервовано)
 Rendering	DeviceClass		Рендерінг

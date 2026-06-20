@@ -33,7 +33,7 @@ Password:	E-Mail		Пароль:
 Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
 The filter could not be moved. Deleting filter.	Config Views		Фильтр не может быть перемещен. Удаление фильтра.
 OK	Config Views		ОК
-Revert	Config Window		Вернуть
+Revert	Config Window		Откатить
 Incoming	Config Window		Входящие
 Finish	AutoConfigWindow		Завершить
 Add filter	Config Views		Добавить фильтр

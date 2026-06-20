@@ -38,8 +38,8 @@ Display controller	Device		Upravljač zaslona
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Ime uređaja
 Disk Drive	DeviceSCSI		Pogon diska
-Report compatibility	DevicesView		Izvještaj o kompatibilnosti
 Other	DeviceSCSI		Ostalo
+Report compatibility	DevicesView		Izvještaj o kompatibilnosti
 Computer	Device		Računalo
 PCI bus	Device		PCI bus
 Order by:	DevicesView		Poredaj po:

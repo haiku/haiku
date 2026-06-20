@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2108618135
+1	swedish	x-vnd.Haiku-HaikuDepot	2384088929
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 User ratings loading…	PackageInfoView		Användarbetyg laddas...
 Available packages	MainWindow		Tillgängliga paket
@@ -45,6 +45,7 @@ Cancel	UserLoginWindow		Avbryt
 Rating not possible	MainWindow		Betyg ej möjligt
 Package update error	MainWindow		Paketuppdateringsfel
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Klicka här
+No screenshot available.	PackageInfoView		Ingen skärmdump tillgänglig.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processer}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Hämta användarbetyg för paket
 Reboot required	PackageManager		Omstart krävs
@@ -153,6 +154,7 @@ Installed packages	MainWindow		Installerade paket
 User rating	RatePackageWindow		Användarbetyg
 Date	PackageListView		Datum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Lösenordet måste vara minst %MinPasswordLength% tecken. %MinPasswordUppercaseChar% -tecken måste vara versaler och %MinPasswordDigitsChar% -tecken måste vara siffror.
+Screenshot loading…	PackageInfoView		Skärmdump laddas...
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Ett fel har uppstått vid nedladdning av användningsvillkoren. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
 There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Öppnar \"%DeskbarLink%\"

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Screen	1226202253
+1	dutch; flemish	x-vnd.Haiku-Screen	107545548
 no	Screen		nee
 bits/pixel	Screen		bits/pixel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 kleuren
@@ -30,11 +30,9 @@ Revert	Screen		Omkeren
 always	Screen		altijd
 Confirm changes	Screen		Wijzigingen bevestigen
 Warning	Screen		Waarschuwing
-24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 miljoen kleuren
 Hz	Screen		Hz
 Workspaces	Screen		Werkplekken
 Brightness:	Screen		Helderheid:
-32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 miljoen kleuren
 Done	Screen		Klaar
 16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 kleuren
 Screen preferences by the Haiku team	Screen		Schermvoorkeuren door het Haiku-team

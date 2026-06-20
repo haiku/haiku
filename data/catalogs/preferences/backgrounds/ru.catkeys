@@ -10,7 +10,7 @@ Folder: %path	Main View		Папка: %path
 Manual	Main View		Вручную
 Set background image error	Main View		Ошибка установки фона
 Default folder	Main View		Папка по умолчанию
-Revert	Main View		Вернуть
+Revert	Main View		Откатить
 None	Main View		Не выбрано
 All workspaces	Main View		Все рабочие столы
 Icon label outline	Main View		Контурный текст значков

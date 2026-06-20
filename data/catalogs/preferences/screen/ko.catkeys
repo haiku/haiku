@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Screen	2577971458
+1	korean	x-vnd.Haiku-Screen	1459314753
 no	Screen		아니오
 bits/pixel	Screen		비트/픽셀
 15 bits/pixel, 32768 colors	Screen		15 비트/픽셀, 32768 색상
@@ -33,11 +33,9 @@ Revert	Screen		되돌리기
 always	Screen		항상
 Confirm changes	Screen		변경사항 확인
 Warning	Screen		주의
-24 bits/pixel, 16 Million colors	Screen		24 비트/픽셀, 1600 만 색상
 Hz	Screen		24 비트/픽셀, 1600 만 색상
 Workspaces	Screen		작업공간
 Brightness:	Screen		밝기:
-32 bits/pixel, 16 Million colors	Screen		32 비트/픽셀, 1600 만 색상
 Done	Screen		완료
 16 bits/pixel, 65536 colors	Screen		16 비트/픽셀, 65536 색상
 Screen preferences by the Haiku team	Screen		Haiku 팀에 위한 화면 환경설정

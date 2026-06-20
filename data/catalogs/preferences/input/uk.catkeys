@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Input	1794165409
+1	ukrainian	x-vnd.Haiku-Input	3371770123
 Defaults	InputMouse		Типові настройки
 Scrolling	TouchpadPrefView		Прокрутка
 Long	KeyboardView		Більше
@@ -6,10 +6,13 @@ Cancel	TouchpadPrefView		Скасувати
 Slow	TouchpadPrefView		Повільно
 Device List	InputWindow		Список пристроїв
 Double-click speed	SettingsView		Швидкість подвійного натискання
+On tap-drag only	TouchpadPrefView		Тільки під час перетягування натисканням
+Edge motion:	TouchpadPrefView		Рух після досягнення краю панелі:
 5-Button	SettingsView		5 кнопок
 Typing test area	KeyboardView		Поле для перевірки набору тексту
 Fast	KeyboardView		Більше
 Always	TouchpadPrefView		Завжди
+Software button areas	TouchpadPrefView		Зони програмних кнопок
 Please confirm	TouchpadPrefView		Будь ласка підтвердіть
 Trackpad speed	TouchpadPrefView		Швидкість Trackpad
 Mouse speed	SettingsView		Швидкість миші
@@ -24,14 +27,17 @@ Revert	InputMouse		Відкат змін
 Slow	KeyboardView		Меньше
 2-Button	SettingsView		2 кнопки
 Click to focus and raise	SettingsView		Натиснути для фокусу та підняти
+Natural scrolling	TouchpadPrefView		Звичайна прокрутка (на зразок смартфона)
 Vertical	TouchpadPrefView		Вертикальна
 Low	TouchpadPrefView		Низький
 Focus follows mouse	SettingsView		Фокус слідує за мишею
 Focus mode:	SettingsView		Режим фокусу:
 Double-click test area	SettingsView		Тестова зона подвійного натискання
 Revert	TouchpadPrefView		Відкат змін
+When dragging	TouchpadPrefView		Під час перетягування
 4-Button	SettingsView		4 кнопки
 Tapping sensitivity	TouchpadPrefView		Чутливість дотику
+Disabled	TouchpadPrefView		Відключено
 Revert	InputKeyboard		Відкат змін
 Mouse type:	SettingsView		Тип миші:
 Off	TouchpadPrefView		Вимкнути
@@ -48,6 +54,7 @@ Mouse acceleration	SettingsView		Прискорення миші
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Нова область прокрутки дуже велика і може перешкоджати нормальній роботі миші. Ви дійсно хочете це змінити?
 High	TouchpadPrefView		Висока
 Defaults	TouchpadPrefView		Типові настройки
+Finger click	TouchpadPrefView		Жести торкання (симуляція кнопок)
 1-Button	SettingsView		1 кнопка
 Defaults	InputKeyboard		Типові настройки
 Key repeat rate	KeyboardView		Швидкість повтору

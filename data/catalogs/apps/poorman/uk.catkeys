@@ -1,14 +1,15 @@
-1	ukrainian	x-vnd.Haiku-PoorMan	3006224482
+1	ukrainian	x-vnd.Haiku-PoorMan	3080340918
 Select web folder	PoorMan		Вибрати веб-папку
 Console logging	PoorMan		Консольний лог-файл
 Create Log File	PoorMan		Створити лог-файл
 File logging	PoorMan		Файл журналу роботи
-Website options	PoorMan		Налаштування веб-сайту
+Website options	PoorMan		Налаштування вебсайту
 Log to file	PoorMan		Зберегти журнал в файл
 Shutting down.	PoorMan		Вимкнути
-Web folder:	PoorMan		Веб-папка:
+Web folder:	PoorMan		Вебпапка:
 Log To Console	PoorMan		Виводити лог в консоль
 File Name	PoorMan		Назва файлу
+Error folder	PoorMan		Папка помилок
 Starting up... 	PoorMan		Запускаєтся… 
 Select	PoorMan		Вибрати
 Logging view	PoorMan		Перегляд журналу
@@ -24,6 +25,7 @@ Select all	PoorMan		Вибрати все
 Send file listing if there's no start page	PoorMan		Відправити список файлів, якщо немає домашньої сторінки
 Max. simultaneous connections:	PoorMan		Максимум одночасних підключень:
 Done	PoorMan		Готово
+Please choose the folder to publish on the web.\n\nYou can have %appname% create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь ласка, виберіть папку для публікації в мережі Інтернет.\n\nЗа замовчуванням, %appname% створює папку \«public_html\»  у вашому домашньому каталозі.\nАбо виберіть іншу папку, наприклад, з вашим сайтом.
 Site	PoorMan		Сайт
 Cannot start the server	PoorMan		Не вдалося запустити сервер
 Create log file	PoorMan		Очистити лог-файл
@@ -54,7 +56,7 @@ File Logging	PoorMan		Файл журналу роботи
 Log file name:	PoorMan		Назва лог-файлу:
 Status: Running	PoorMan		Стан: Працює
 Directory: (none)	PoorMan		Каталог: (пусто)
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб-папка була створена в \«/boot/home/public_html\».\nПеревірте наявність у цій папці HTML-файлу з назвою \«index.html\».
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна вебпапка була створена в \«/boot/home/public_html\».\nПеревірте наявність у цій папці HTML-файлу з назвою \«index.html\».
 Dir Created	PoorMan		Каталог створено
 Save console selections as…	PoorMan		Зберегти вибране з консолі як…
 Quit	PoorMan		Вийти

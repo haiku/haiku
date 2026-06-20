@@ -1,14 +1,14 @@
 1	ukrainian	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Всі права захищені.
 gold master	AboutWindow		золотий майстер
-Undo	TextView		Відмінити
+Undo	TextView		Вікат дії
 OK	PrintJob		ОК
 OK	Dragger		ОК
 gamma	AboutWindow		гамма
 development	AboutWindow		розробка
 {0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{(%s байт/с)} few{(%s байти/с)} other{%s (байтів/с)}}
 Print Server is not responding.	PrintJob		Принт-сервер недоступний.
-About %app%	AboutMenuItem		Про %app%
+About %app%	AboutMenuItem		Про програму %app%
 Warning	Dragger		Попередження
 Green:	ColorControl		Зелений:
 Redo	TextView		Повтор дії
@@ -37,8 +37,8 @@ Select all	TextView		Вибрати все
 alpha	AboutWindow		альфа
 Error	PrintJob		Помилка
 %s TiB/s	StringForRate	units per second	%s TБ/с
-About %app…	Dragger		Про %app…
-About %app%	AboutWindow		Про %app%
+About %app…	Dragger		Про програму %app…
+About %app%	AboutWindow		Про програму %app%
 {0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{(%s байт)} few{(%s байти)} other{%s (байтів)}}
 %s GiB/s	StringForRate	units per second	%s ГБ/с
 Version history:	AboutWindow		Історія версій:

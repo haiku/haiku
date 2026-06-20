@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2108618135
+1	hungarian	x-vnd.Haiku-HaikuDepot	2384088929
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 User ratings loading…	PackageInfoView		Felhasználói értékelések betöltése…
 Available packages	MainWindow		Elérhető csomagok
@@ -45,6 +45,7 @@ Cancel	UserLoginWindow		Mégse
 Rating not possible	MainWindow		Nem értékelhető
 Package update error	MainWindow		Csomag frissítési hiba
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Kattints ide
+No screenshot available.	PackageInfoView		Képernyőkép nem érhető el.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# folyamat} other{# folyamat}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Felhasználói értékelések lekérése a csomaghoz
 Reboot required	PackageManager		Újraindítás szükséges
@@ -153,6 +154,7 @@ Installed packages	MainWindow		Telepített csomagok
 User rating	RatePackageWindow		Felhasználói értékelés
 Date	PackageListView		Dátum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		A jelszónak legalább %MinPasswordLength% karakter hosszúnak kell lennie és tartalmaznia kell legalább %MinPasswordUppercaseChar% kis- és nagybetűt illetve %MinPasswordDigitsChar% számot.
+Screenshot loading…	PackageInfoView		Képernyőkép betöltése…
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Hiba történt a használati feltételek letöltése során. Nézd meg a naplót a részletekért, és próbáld újra. \nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot részében találhatók.
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		\"%DeskbarLink%\" megnyitása

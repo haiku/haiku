@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Screen	1226202253
+1	esperanto	x-vnd.Haiku-Screen	107545548
 no	Screen		ne
 bits/pixel	Screen		bitoj/bildero
 15 bits/pixel, 32768 colors	Screen		15 bitoj/bildero, 32768 koloroj
@@ -30,11 +30,9 @@ Revert	Screen		Malfari
 always	Screen		ĉiam
 Confirm changes	Screen		Konfirmi ŝanĝojn
 Warning	Screen		Averto
-24 bits/pixel, 16 Million colors	Screen		24 bitoj/bildero, 16 milionoj da koloroj
 Hz	Screen		Hz
 Workspaces	Screen		Laborspacoj
 Brightness:	Screen		Heleco:
-32 bits/pixel, 16 Million colors	Screen		32 bitoj/bildero, 16 milionoj da koloroj
 Done	Screen		Farite
 16 bits/pixel, 65536 colors	Screen		16 bitoj/bildero, 65536 koloroj
 Screen preferences by the Haiku team	Screen		Ekarana agordo de la Taĉmento de Haiku

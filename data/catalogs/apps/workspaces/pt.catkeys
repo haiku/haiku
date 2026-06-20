@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-WORK	3927737357
+1	portuguese	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Sair
 Invalid argument: %s\n	Workspaces		Argumento inválido: %s\n
 Change workspace count…	Workspaces		Alterar o número de áreas de trabalho…
@@ -8,6 +8,5 @@ Show window tab	Workspaces		Mostrar aba da janela
 Auto-raise	Workspaces		Elevar automaticamente
 Remove replicant	Workspaces		Remover replicante
 Live in the Deskbar	Workspaces		Residir na Deskbar
-Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Utilização: %s [opções] [área de trabalho]\nem que as \"opções\" são:\n  --notitle\t\tremover barra de título, mantendo bordas e controlo de redimensionamento\n  --noborder\t\tremover barra de título, bordas e controlo de redimensionamento\n  --avoidfocus\t\timpedir a janela de ser alvo de eventos do teclado\n  --alwaysontop\t\tmantém a janela por cima\n  --notmovable\t\ta janela não pode ser movida\n  --autoraise\t\televar a janela de áreas de trabalho quando se encontra no limite do ecrã\n  --help\t\tmostrar esta ajuda e sair\ne \"área de trabalho\" é o número da Área de Trabalho para a qual mudar (0-31)\n
 Switch on mouse wheel	Workspaces		Alternar com a roda do rato
 Workspaces	System name		Áreas de Trabalho

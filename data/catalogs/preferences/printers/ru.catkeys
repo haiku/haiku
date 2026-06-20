@@ -14,7 +14,7 @@ Failed	JobListView		Неудача
 Blue	TestPageView		Синий
 Waiting	JobListView		Ожидание
 Processing	JobListView		Обрабатывается
-Cancel	AddPrinterDialog		Отмена
+Cancel	AddPrinterDialog		Отменить
 Unknown status	JobListView		Состояние неизвестно
 Print jobs for %printer_name%	PrintersWindow		Задания печати для %printer_name%
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? страниц}=1{# страница}few{# страницы}other{# страниц}}

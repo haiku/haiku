@@ -46,13 +46,13 @@ Card Reader	DeviceSCSI		Čítačka kariet
 Display controller	Device		Radič zobrazovania
 Device name	DevicePCI		Názov zariadenia
 Disk Drive	DeviceSCSI		Disková jednotka
-Report compatibility	DevicesView		Nahlásiť kompatibilitu
 Other	DeviceSCSI		Iné
+Report compatibility	DevicesView		Nahlásiť kompatibilitu
 Computer	Device		Počítač
 PCI bus	Device		Zbernica PCI
 Enclosure	DeviceSCSI		Skrinka
-ACPI Thermal Zone	DeviceACPI		Tepelná oblasť ACPI
 Order by:	DevicesView		Zoradiť podľa:
+ACPI Thermal Zone	DeviceACPI		Tepelná oblasť ACPI
 Intelligent controller	Device		Inteligentný radič
 Multimedia controller	Device		Radič multimédií
 Quit	DevicesView		Ukončiť

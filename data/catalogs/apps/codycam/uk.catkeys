@@ -1,6 +1,6 @@
-1	ukrainian	x-vnd.Haiku-CodyCam	2786669505
+1	ukrainian	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		вкажіть каталог призначення
-reply: '%s'\n	SftpClient		відповідь: '%s'\n
+reply: '%s'\n	SftpClient		відповідь: «%s»\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (відіслано справжній пароль)
 JPEG image	CodyCam		Зображення JPEG
 Remote host has closed the connection.\n	FtpClient		Сервер закрив з’єднання.\n
@@ -50,6 +50,7 @@ server address expected	CodyCam		вкажіть адресу сервера
 Cannot start the video window	CodyCam		Неможливо запустити вікно відео
 reply: %d, %d\n	FtpClient		відповідь: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Неможливо встановити лічильник для вікна відео
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		Не знайдено джерело відео.\nДля роботи %appname% потрібна вебкамера.
 Every 15 minutes	CodyCam		Кожні 15 хвилин
 Every 24 hours	CodyCam		Кожні 24 години
 Image Format Menu	CodyCam		Меню формата зображення
@@ -58,7 +59,7 @@ File upload failed	VideoConsumer.cpp		Невдале вивантаження ф
 Format:	CodyCam		Формат:
 Start video	CodyCam		Запустити відео
 Connected…	VideoConsumer.cpp		Підключення…
-upload client name expected	CodyCam		вкажіть ім’я клієнта вивантаження
+upload client name expected	CodyCam		вкажіть назву клієнта вивантаження
 Every 15 seconds	CodyCam		Кожні 15 секунд
 Error getting initial latency for the capture node	CodyCam		Помилка при отриманні затримки для ноди захоплення
 password	CodyCam		пароль

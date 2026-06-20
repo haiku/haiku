@@ -48,13 +48,13 @@ ACPI Button '%1'	DeviceACPI		ACPI Button '%1'
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		ชืออุปกรณ์
 Disk Drive	DeviceSCSI		Disk Drive
-Report compatibility	DevicesView		รายงานความเข้ากันได้
 Other	DeviceSCSI		อื่นๆ
+Report compatibility	DevicesView		รายงานความเข้ากันได้
 Computer	Device		คอมพิวเตอร์
 PCI bus	Device		PCI bus
 Enclosure	DeviceSCSI		ปิด
-ACPI Thermal Zone	DeviceACPI		ACPI Thermal Zone
 Order by:	DevicesView		สั่งโดย:
+ACPI Thermal Zone	DeviceACPI		ACPI Thermal Zone
 Intelligent controller	Device		ตัวควบคุมอัจฉริยะ
 Multimedia controller	Device		ตัวควบคุมมัลติมีเดีย
 Quit	DevicesView		ปิด

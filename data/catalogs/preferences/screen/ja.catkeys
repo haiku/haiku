@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Screen	2577971458
+1	japanese	x-vnd.Haiku-Screen	1459314753
 no	Screen		いいえ
 bits/pixel	Screen		ビット/ピクセル
 15 bits/pixel, 32768 colors	Screen		15 ビット/ピクセル, 32768 色
@@ -33,11 +33,9 @@ Revert	Screen		戻す
 always	Screen		常に
 Confirm changes	Screen		変更の確認
 Warning	Screen		警告
-24 bits/pixel, 16 Million colors	Screen		24 ビット/ピクセル, 1600 万色
 Hz	Screen		Hz
 Workspaces	Screen		ワークスペース
 Brightness:	Screen		明度:
-32 bits/pixel, 16 Million colors	Screen		32 ビット/ピクセル, 1600 万色
 Done	Screen		完了
 16 bits/pixel, 65536 colors	Screen		16 ビット/ピクセル, 65536 色
 Screen preferences by the Haiku team	Screen		Haiku チームによる画面プレファレンス

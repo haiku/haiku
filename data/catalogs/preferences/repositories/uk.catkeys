@@ -11,7 +11,7 @@ Cancel task	TaskTimer	Button label	Скасувати завдання
 Changes completed	RepositoriesView	Status view text	Зміни проведені
 Details	TaskLooper	Job log details header	Деталі
 Enabled	RepoRow	Tag in the Status column	Під'єднано
-Remove	Constants	Button label	Вилучити
+Remove	Constants	Button label	Прибрати
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Сталася помилка при підключенні репозитарія %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Прибрати цей репозитарій?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Завдання репозитарію %name% потребує багато часу для завершення.
@@ -33,7 +33,7 @@ Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Appl
 This repository URL already exists.	RepositoriesView	Error message	URL-адреса цього репозитарія вже є.
 Repositories	System name		Repositories
 Changes pending:	RepositoriesView	Status view text	Очікування змін:
-Remove	RepositoriesView	Button label	Вилучити
+Remove	RepositoriesView	Button label	Прибрати
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Прибрати ці репозитарії?
 Keep trying	TaskTimer	Button label	Спробувати ще
 Cancel	Constants	Button label	Скасувати

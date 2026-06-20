@@ -6,10 +6,10 @@ package %source% requires %dependency%, but none of the providers can be install
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		пакет %source% має застарілі залежності %dependency% від %target%
 nothing provides requested %dependency%	SolverProblem		відсутній запит %dependency%
 do not keep %source% installed	SolverProblemSolution		не зберігати %source% встановленим
-do not deinstall \"%selection%\"	SolverProblemSolution		не перевстановлювати \"%selection%\"
+do not deinstall \"%selection%\"	SolverProblemSolution		не видаляти \«%selection%\»
 install %source% despite its inferior architecture	SolverProblemSolution		встановити %source% не зважаючи на нижчу архітектуру
 conflicting requests	SolverProblem		конфліктуючі запити
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		не встановлюйте найновішу версію \"%selection%\"
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		не встановлюйте найновішу версію \«%selection%\»
 allow replacement of %source% with %target%	SolverProblemSolution		дозволити заміну %source% з %target%
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		пакет %source% виводить з ужитку %dependency% який надав %target%
 do not forbid installation of %source%	SolverProblemSolution		не забороняйте встановлення %source%
@@ -31,8 +31,8 @@ keep %source% from excluded repository	SolverProblemSolution		зберегти %
 keep old %source%	SolverProblemSolution		зберегти старий %source%
 package %source% conflicts with %dependency% provided by itself	SolverProblem		пакет %source% конфліктує з %dependency% наданими самому собі
 allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		дозволити зміну постачальника з \«%sourceVendor%\» (%source%) на \«%targetVendor%\» (%target%)
-do not lock \"%selection%\"	SolverProblemSolution		не блокувати \"%selection%\"
-do not install \"%selection%\"	SolverProblemSolution		не встановлювати \"%selection%\"
+do not lock \"%selection%\"	SolverProblemSolution		не блокувати \«%selection%\»
+do not install \"%selection%\"	SolverProblemSolution		не встановлювати \«%selection%\»
 nothing provides %dependency% needed by %source%	SolverProblem		не забезпечено залежності %dependency% потрібні для %source%
 %source% has inferior architecture	SolverProblem		%source% має низьку архітектуру
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		не проводити деінсталяцію всіх зв'зків \"%selection%\"
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		не проводити деінсталяцію всіх зв'зків \«%selection%\»

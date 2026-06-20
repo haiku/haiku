@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.Be-TSKB	1763402521
+1	ukrainian	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Ховати автоматично
 Show all	WindowMenu		Показати все
 Edit in Tracker…	PreferencesWindow		Змінити меню у Tracker…
 Menu	PreferencesWindow		Меню
+Location	PreferencesWindow		Розташування
 Tracker always first	PreferencesWindow		Tracker завжди перший
 Hide clock	TimeView		Сховати годинник
 Large	PreferencesWindow		Великі

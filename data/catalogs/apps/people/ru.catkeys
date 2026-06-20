@@ -10,14 +10,14 @@ Could not create %s.	People		Невозможно создать %s.
 Quit	People		Выход
 Company	People		Компания
 Name	People		Имя
-The file '%name%' could not be written.	People		Невозможно записать файл '%name%'.
+The file '%name%' could not be written.	People		Невозможно записать файл «%name%».
 Contact name	People		Имя контакта
 Cancel	People		Отмена
-Edit	People		Изменить
+Edit	People		Правка
 Save changes before closing?	People		Сохранить изменения перед выходом?
 People	System name		Контакты
 Error	People		Ошибка
-Revert	People		Вернуть
+Revert	People		Откатить
 Country	People		Страна
 Person	Short mimetype description		Персона
 New person	People		Новая персона
@@ -32,7 +32,7 @@ Cut	People		Вырезать
 Contact information for a person.	Long mimetype description		Контактная информация для человека.
 Remove image	People		Удалить рисунок
 City	People		Город
-Undo	People		Отменить
+Undo	People		Отмена
 Don't save	People		Не сохранять
 Configure attributes	People		Выбрать атрибуты
 Work phone	People		Рабочий телефон
@@ -40,7 +40,7 @@ State	People		Штат
 Nickname	People		Прозвище
 OK	People		ОК
 File	People		Файл
-Redo	People		Отменить
+Redo	People		Повторить
 Close	People		Закрыть
 Copy	People		Копировать
 Paste	People		Вставить

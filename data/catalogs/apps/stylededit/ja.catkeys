@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	2777022576
+1	japanese	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		ドキュメント統計
 Cut	Menus		切り取り
 Center	Menus		中央揃え
@@ -39,6 +39,7 @@ Strikeout	Menus		取り消し線
 Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
 Error saving \"%filename%\":\n%error%	SaveAlert		\"%filename%\" の保存中にエラー:\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		ドキュメント \"%title%\" への変更を保存しますか?
+Style	Menus		スタイル
 Save	SaveAlert		保存
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" には保存されていない変更があります。\n最後に保存されたバージョンに戻しますか?
 Default	Open_and_SaveAsPanel		デフォルト

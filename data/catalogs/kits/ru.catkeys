@@ -1,7 +1,7 @@
 1	russian	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Все права защищены.
 gold master	AboutWindow		золотая
-Undo	TextView		Отменить
+Undo	TextView		Отмена
 OK	PrintJob		ОК
 OK	Dragger		ОК
 gamma	AboutWindow		гамма
@@ -46,5 +46,5 @@ Cannot locate the application for the replicant. No application signature suppli
 %s KiB/s	StringForRate	units per second	%s Кбайт/с
 Blue:	ColorControl		Синий:
 Special thanks:	AboutWindow		Особая благодарность:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \«%description\».\n%error
 Written by:	AboutWindow		Разработан:

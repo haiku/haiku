@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	2777022576
+1	ukrainian	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Статистика документу
 Cut	Menus		Вирізати
 Center	Menus		Центр
@@ -39,6 +39,7 @@ Strikeout	Menus		Закреслений
 Replace in all windows	FindandReplaceWindow		Замінити у всіх вікнах
 Error saving \"%filename%\":\n%error%	SaveAlert		Помилка збереження \«%filename%\»:\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		Зберегти зміни в документі \«%title%\»?
+Style	Menus		Стиль
 Save	SaveAlert		Зберегти
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\«%title%\» має незбережені зміни.\nВідновити останню збережену версію?
 Default	Open_and_SaveAsPanel		За замовчуванням

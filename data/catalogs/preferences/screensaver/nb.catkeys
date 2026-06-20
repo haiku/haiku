@@ -1,12 +1,14 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ScreenSaver	3775157518
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Signal for strømstyring av skjerm er ikke tilgjengelig
 Blackness	ScreenSaver		Svart skjerm
+Fade now when mouse is here	ScreenSaver		Ton ut når musepekeren er her
 Screensavers	ScreenSaver		Skjermsparere
 Enable screensaver	ScreenSaver		Aktiver skjermsparer
 Passwords don't match. Please try again.	ScreenSaver		Passordene passer ikke. Prøv igjen.
 30 seconds	ScreenSaver		30 sekunder
 No options available	ScreenSaver		Ingen valg tilgjengelig
 ScreenSaver	System name		Skjermsparer
+Don't fade when mouse is here	ScreenSaver		Ikke ton ut når musepekeren er her
 Cancel	ScreenSaver		Avbryt
 Password:	ScreenSaver		Passord:
 Screensaver settings	ScreenSaver		Skjermsparer-innstillinger

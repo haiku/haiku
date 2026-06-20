@@ -52,13 +52,13 @@ Bus	DevicesView		BUS
 ACPI <unknown>	DeviceACPI		ACPI <desconegut>
 Device name	DevicePCI		Nom del dispositiu
 Disk Drive	DeviceSCSI		Unitat de disc
-Report compatibility	DevicesView		Informe de compatibilitat
 Other	DeviceSCSI		Altres
+Report compatibility	DevicesView		Informe de compatibilitat
 Computer	Device		Ordinador
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Annex
-ACPI Thermal Zone	DeviceACPI		Zona tèrmica ACPI
 Order by:	DevicesView		Ordena per:
+ACPI Thermal Zone	DeviceACPI		Zona tèrmica ACPI
 Intelligent controller	Device		Controlador intel·ligent
 Multimedia controller	Device		Controlador multimèdia
 Quit	DevicesView		Surt

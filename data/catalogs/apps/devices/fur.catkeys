@@ -51,13 +51,13 @@ ACPI Button '%1'	DeviceACPI		Boton ACPI '%1'
 ACPI <unknown>	DeviceACPI		ACPI <no cognossût>
 Device name	DevicePCI		Non dal dispositîf
 Disk Drive	DeviceSCSI		Unitât disc
-Report compatibility	DevicesView		Segnale compatibilitât
 Other	DeviceSCSI		Altri
+Report compatibility	DevicesView		Segnale compatibilitât
 Computer	Device		Computer
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Cente
-ACPI Thermal Zone	DeviceACPI		Zone termiche ACPI
 Order by:	DevicesView		Ordene par:
+ACPI Thermal Zone	DeviceACPI		Zone termiche ACPI
 Intelligent controller	Device		Controlôr inteligjent
 Multimedia controller	Device		Controlôr multimediâl
 Quit	DevicesView		Jes

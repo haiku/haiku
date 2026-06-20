@@ -48,13 +48,13 @@ ACPI Button '%1'	DeviceACPI		ACPI Butono '%1'
 ACPI <unknown>	DeviceACPI		ACPI <nekonata>
 Device name	DevicePCI		Aparata nomo
 Disk Drive	DeviceSCSI		Diskingo
-Report compatibility	DevicesView		Raporto pri kongruo
 Other	DeviceSCSI		Alia
+Report compatibility	DevicesView		Raporto pri kongruo
 Computer	Device		Komputilo
 PCI bus	Device		Buso de PCI
 Enclosure	DeviceSCSI		Kunigaĵo
-ACPI Thermal Zone	DeviceACPI		Temperatura intervalo de ACPI
 Order by:	DevicesView		Ordigi laŭ:
+ACPI Thermal Zone	DeviceACPI		Temperatura intervalo de ACPI
 Intelligent controller	Device		Inteligenta adaptilo
 Multimedia controller	Device		Plurmedia adaptilo
 Quit	DevicesView		Ĉesi

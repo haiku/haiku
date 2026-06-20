@@ -19,7 +19,7 @@ Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou c
 No type editor available	AttributeWindow		Відсутній доступний редактор типу
 Print…	ProbeView		Друк…
 New…	FileWindow		Новий…
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: «%.4s»\n\n
 OK	DiskProbe		ОК
 DiskProbe	System name		DiskProbe
 Back	ProbeView		Назад
@@ -122,7 +122,7 @@ Save changes before closing?	ProbeView		Зберегти зміни перед �
 %s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG формат
 Number	TypeEditors	This is the type of editor	Число
-Edit	ProbeView		Редагувати
+Edit	ProbeView		Коректив
 String editor	TypeEditors		Редактор рядків
 Boolean editor	TypeEditors		Булевий редактор
 Device offset: 	ProbeView		Зміщення пристрою: 

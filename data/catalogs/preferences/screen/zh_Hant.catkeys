@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Screen	2577971458
+1	english	x-vnd.Haiku-Screen	1459314753
 no	Screen		無
 bits/pixel	Screen		位元/像素
 15 bits/pixel, 32768 colors	Screen		15 位元/像素，32768 色
@@ -33,11 +33,9 @@ Revert	Screen		恢復
 always	Screen		總是
 Confirm changes	Screen		確認更改
 Warning	Screen		警告
-24 bits/pixel, 16 Million colors	Screen		24 位元/像素，1600 萬色
 Hz	Screen		Hz
 Workspaces	Screen		工作空間
 Brightness:	Screen		亮度：
-32 bits/pixel, 16 Million colors	Screen		32 位元/像素，1600 萬色
 Done	Screen		完畢
 16 bits/pixel, 65536 colors	Screen		16 位元/像素，65536 色
 Screen preferences by the Haiku team	Screen		Haiku團隊提供的屏幕偏好設定

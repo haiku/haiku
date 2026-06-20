@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-BootManager	884186136
+1	ukrainian	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	Збій резервного копіювання старого MBR
 At least one partition must be selected!	BootManagerController		Принаймні один розділ треба вибрати!
 No space available!	DrivesPage	Cannot install	Немає доступного простору!
@@ -31,6 +31,7 @@ USB Drive	DrivesPage	Default disk name	Пристрій USB
 Restore MBR	BootManagerController	Button	Відновлення MBR
 Hard Drive	DrivesPage	Default disk name	Жорсткий диск
 Drives	DrivesPage	Title	Пристрої
+%appname% is unable to read the partition table!	BootManagerController		%appname% не може прочитати таблицю розділів!
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Були знайдені наступні розділи. Відмітьте які з них треба включити до меню загрузки. Також можна визначити імена розділів за Вашим розумінням, які буде видно при відображенні цього меню на екрані.
 After five seconds	DefaultPartitionPage		п'ять секунд
 Timeout: %s	DefaultPartitionPage		Затримка: %s
@@ -47,6 +48,7 @@ Previous	WizardView	Button	Назад
 Uninstallation of boot menu failed	BootManagerController	Title	Збій деінсталяції меню загрузки
 Incompatible format!	DrivesPage	Cannot install	Несумісний формат!
 Old Master Boot Record saved	BootManagerController	Title	Попередній MBR збережено
+The partition table of the first hard disk is not compatible.\n%appname% only works with IBM PC MBR partitions.	BootManagerController		Таблиця розділів першого диска не підтримується.\n%appname% працює лише з розділами IBM PC MBR.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Визначте розділ за замовчуванням і затримку.\nМеню загрузки передасть управління розділу за замовчуванням після затримки, якщо Ви не вкажете інший розділ. Ви також можете встановити невизначене очікування для вибраного Вами розділу.\nУтримуйте клавішу «ALT» щоб відключити затримку під час завантаження.
 Partitions	PartitionsPage	Title	Розділи
 Uninstallation of boot menu completed	BootManagerController	Title	Деінсталяція меню загрузки завершена

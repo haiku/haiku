@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2108618135
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2384088929
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 User ratings loading…	PackageInfoView		Es carreguen les valoracions dels usuaris...
 Available packages	MainWindow		Paquets disponibles
@@ -45,6 +45,7 @@ Cancel	UserLoginWindow		Cancel·la
 Rating not possible	MainWindow		La puntuació no és possible.
 Package update error	MainWindow		Error d'actualització de paquet
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Cliqueu aquí
+No screenshot available.	PackageInfoView		No hi ha cap captura de pantalla disponible.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procés} other{# processos}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		S'obtenen les valoracions dels usuaris per al paquet.
 Reboot required	PackageManager		Cal reiniciar
@@ -153,6 +154,7 @@ Installed packages	MainWindow		Paquets instal·lats
 User rating	RatePackageWindow		Puntuació de l'usuari
 Date	PackageListView		Data
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		La contrasenya ha de tenir un mínim de %MinPasswordLength% caràcters. Els caràcters %MinPasswordUppercaseChar% han de ser majúscules i els caràcters %MinPasswordDigitsChar% han de ser dígits.
+Screenshot loading…	PackageInfoView		Es carrega la captura de pantalla...
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		S'ha produït un error en baixar les condicions d'ús. Comproveu el registre per obtenir-ne més informació i torneu-ho a provar. \nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari del Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		Hi ha hagut una resposta desconcertant del servei web.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		S'obre \"%DeskbarLink%\"

@@ -52,13 +52,13 @@ Bus	DevicesView		Veri yolu
 ACPI <unknown>	DeviceACPI		ACPI <bilinmiyor>
 Device name	DevicePCI		Aygıt adı
 Disk Drive	DeviceSCSI		Disk sürücüsü
-Report compatibility	DevicesView		Uyumluluğu bildir
 Other	DeviceSCSI		Diğer
+Report compatibility	DevicesView		Uyumluluğu bildir
 Computer	Device		Bilgisayar
 PCI bus	Device		PCI veri yolu
 Enclosure	DeviceSCSI		Koruncak
-ACPI Thermal Zone	DeviceACPI		ACPI ısıl bölgesi
 Order by:	DevicesView		Sıralama:
+ACPI Thermal Zone	DeviceACPI		ACPI ısıl bölgesi
 Intelligent controller	Device		Akıllı denetleyici
 Multimedia controller	Device		Çoklu ortam denetleyici
 Quit	DevicesView		Çık

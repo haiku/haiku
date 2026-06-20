@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Input	993392905
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Input	1794165409
 Defaults	InputMouse		Standarder
 Scrolling	TouchpadPrefView		Rulling
 Long	KeyboardView		Lang
@@ -9,6 +9,7 @@ Double-click speed	SettingsView		Hastighet på dobbelt-klikk
 5-Button	SettingsView		5-knapper
 Typing test area	KeyboardView		Felt for skrivetesting
 Fast	KeyboardView		Rask
+Always	TouchpadPrefView		Alltid
 Please confirm	TouchpadPrefView		Vennligst bekreft
 Trackpad speed	TouchpadPrefView		Styreflate-hastighet
 Mouse speed	SettingsView		Musens hastighet

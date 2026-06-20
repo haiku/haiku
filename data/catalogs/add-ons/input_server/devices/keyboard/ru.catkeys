@@ -8,4 +8,4 @@ Force reboot	Team monitor		Перезагрузить принудительно
 Team monitor	Team monitor		Монитор процессов
 Kill application	Team monitor		Убить приложение
 Cancel	Team monitor		Отмена
-(This team is a system component)	Team monitor		(Этот процесс - компонент системы)
+(This team is a system component)	Team monitor		(Этот процесс – компонент системы)

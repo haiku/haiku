@@ -46,13 +46,13 @@ Card Reader	DeviceSCSI		Kortelių skaitytuvas
 Display controller	Device		Ekranų valdiklis
 Device name	DevicePCI		Įrenginio pavadinimas
 Disk Drive	DeviceSCSI		Standusis diskas
-Report compatibility	DevicesView		Pranešti apie suderinamumą
 Other	DeviceSCSI		Kita
+Report compatibility	DevicesView		Pranešti apie suderinamumą
 Computer	Device		Kompiuteris
 PCI bus	Device		PCI magistralė
 Enclosure	DeviceSCSI		Kasetė
-ACPI Thermal Zone	DeviceACPI		ACPI temperatūros zona
 Order by:	DevicesView		Rūšiuoti pagal:
+ACPI Thermal Zone	DeviceACPI		ACPI temperatūros zona
 Intelligent controller	Device		Išmanusis valdiklis
 Multimedia controller	Device		Įvairialypės terpės valdiklis
 Quit	DevicesView		Baigti darbą

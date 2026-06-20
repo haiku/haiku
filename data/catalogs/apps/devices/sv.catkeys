@@ -52,13 +52,13 @@ Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Enhetsnamn
 Disk Drive	DeviceSCSI		Diskenhet
-Report compatibility	DevicesView		Rapportera kompatibilitet
 Other	DeviceSCSI		Annan
+Report compatibility	DevicesView		Rapportera kompatibilitet
 Computer	Device		Dator
 PCI bus	Device		PCI-buss
 Enclosure	DeviceSCSI		Hölje
-ACPI Thermal Zone	DeviceACPI		ACPI termisk zon
 Order by:	DevicesView		Sortera efter:
+ACPI Thermal Zone	DeviceACPI		ACPI termisk zon
 Intelligent controller	Device		Intelligent styrenhet
 Multimedia controller	Device		Multimediakontroller
 Quit	DevicesView		Avsluta

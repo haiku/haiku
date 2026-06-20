@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Screen	887840758
+1	slovak	x-vnd.Haiku-Screen	4064151349
 no	Screen		nie
 bits/pixel	Screen		bitov/pixel
 15 bits/pixel, 32768 colors	Screen		15 bitov/pixel, 32768 farieb
@@ -29,10 +29,8 @@ Revert	Screen		Vrátiť
 always	Screen		vždy
 Confirm changes	Screen		Potvrdiť zmeny
 Warning	Screen		Upozornenie
-24 bits/pixel, 16 Million colors	Screen		24 bitov/pixel, 16 miliónov farieb
 Hz	Screen		Hz
 Workspaces	Screen		Pracovné plochy
-32 bits/pixel, 16 Million colors	Screen		32 bitov/pixel, 16 miliónov farieb
 Done	Screen		Hotovo
 16 bits/pixel, 65536 colors	Screen		16 bitov/pixel, 65536 farieb
 Screen preferences by the Haiku team	Screen		Nastavenie obrazovky, vytvoril tím Haiku

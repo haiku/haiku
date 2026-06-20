@@ -18,7 +18,7 @@ Real name:	Config Views		Справжнє ім'я:
 Outgoing	E-Mail		Вихідні
 Accounts	Config Window		Облікові записи
 Outgoing	Config Window		Вихідні
-Remove	Config Views		Вилучити
+Remove	Config Views		Прибрати
 Show notifications:	Config Window		Показати сповіщення:
 Settings	Config Window		Налаштування
 Never	Config Window	show status window	Ніколи
@@ -45,7 +45,7 @@ Create a new account with the Add button.\n\nRemove an account with the Remove b
 Account name:	E-Mail		Назва акаунта:
 Edit mailbox menu…	Config Window		Редагувати меню скриньки…
 Server Name:	E-Mail		Назва сервера:
-Remove	Config Window		Вилучити
+Remove	Config Window		Прибрати
 Login name:	E-Mail		Ім'я для авторизації:
 While sending	Config Window		Поки йде відправка
 OK	Config Window		ОК

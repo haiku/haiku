@@ -24,7 +24,7 @@ file transfer progress	SerialWindow		прогрес передачі файла
 CRC requested	XModemStatus		Запит на CRC
 Data bits	SerialWindow		Бітів даних
 Both	SerialWindow	Flowcontrol	Обидва
-Edit	SerialWindow		Редагувати
+Edit	SerialWindow		Коректив
 XModem send…	SerialWindow		Передати через XModem…
 Baudrate:	Custom baudrate window		Швидкість:
 OK	Custom baudrate window		ОК

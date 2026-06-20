@@ -47,7 +47,7 @@ A1	ConfigWindow	ISO 216 paper size	A1
 Retrieve a specific transport	PrintServerApp Scripting		Запросить указанный транспорт
 Get name of printer	Printer Scripting		Получить имя принтера
 A3	ConfigWindow	ISO 216 paper size	A3
-Get name of transport	Transport Scripting		Получить имя транспорта
+Get name of transport	Transport Scripting		Получить название транспорта
 A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Таблоид

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Screen	3410763711
+1	lithuanian	x-vnd.Haiku-Screen	2292107006
 no	Screen		ne
 bits/pixel	Screen		bitų
 15 bits/pixel, 32768 colors	Screen		15 bitų spalvos, iš viso 32768
@@ -31,11 +31,9 @@ Revert	Screen		Atšaukti pakeitimus
 always	Screen		visuomet
 Confirm changes	Screen		Patvirtinti pakeitimus
 Warning	Screen		Įspėjimas
-24 bits/pixel, 16 Million colors	Screen		24 bitų spalvos, iš viso virš 16 milijonų
 Hz	Screen		Hz
 Workspaces	Screen		Darbalaukiai
 Brightness:	Screen		Skaistis:
-32 bits/pixel, 16 Million colors	Screen		32 bitų spalvos, iš viso virš 16 milijonų
 Done	Screen		Atlikta
 16 bits/pixel, 65536 colors	Screen		16 bitų spalvos, iš viso 65536
 Screen preferences by the Haiku team	Screen		Ekrano nuostatos, sukurtos „Haiku“ komandos

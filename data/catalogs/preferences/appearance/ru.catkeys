@@ -24,7 +24,7 @@ Arrow style	DecorSettingsView		Стиль стрелок
 On	AntialiasingSettingsView		Включить
 Decorator:	DecorSettingsView		Декоратор:
 Menu background	Colors tab		Фон меню
-Revert	APRWindow		Вернуть
+Revert	APRWindow		Откатить
 List item text	Colors tab		Текст списка
 OK	DecorSettingsView		ОК
 Control text	Colors tab		Текст элемента

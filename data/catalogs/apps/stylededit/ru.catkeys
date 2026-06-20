@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	2777022576
+1	russian	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Статистика документа
 Cut	Menus		Вырезать
 Center	Menus		По центру
@@ -39,6 +39,7 @@ Strikeout	Menus		Зачёркнутый
 Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
 Error saving \"%filename%\":\n%error%	SaveAlert		Ошибка сохранения \«%filename%\»:\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		Сохранить изменения в документе \«%title%\»?
+Style	Menus		Стиль
 Save	SaveAlert		Сохранить
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\«%title%\» содержит несохранённые изменения.\nВернуться к последней сохранённой версии?
 Default	Open_and_SaveAsPanel		По умолчанию

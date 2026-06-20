@@ -51,13 +51,13 @@ ACPI Button '%1'	DeviceACPI		ACPI 按鈕 '%1'
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		設備名稱
 Disk Drive	DeviceSCSI		磁碟機
-Report compatibility	DevicesView		報告相容性
 Other	DeviceSCSI		其他
+Report compatibility	DevicesView		報告相容性
 Computer	Device		電腦
 PCI bus	Device		PCI 匯流排
 Enclosure	DeviceSCSI		外殼
-ACPI Thermal Zone	DeviceACPI		ACPI 熱區
 Order by:	DevicesView		排序以：
+ACPI Thermal Zone	DeviceACPI		ACPI 熱區
 Intelligent controller	Device		智慧型控制器
 Multimedia controller	Device		多媒體控制器
 Quit	DevicesView		Quit

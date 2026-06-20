@@ -14,15 +14,15 @@ Communications	DeviceSCSI		Устройства связи
 Mass storage controller	Device		Контроллер накопителей
 Connection	DevicesView		подключению
 Printer	DeviceSCSI		Принтер
-ACPI Processor Namespace '%2'	DeviceACPI		Пространство имен процессора ACPI '%2'
+ACPI Processor Namespace '%2'	DeviceACPI		Пространство имен процессора ACPI «%2»
 Manufacturer	Device		Производитель
 Scanner	DeviceSCSI		Сканер
 Memory controller	Device		Контроллер памяти
 Unknown device	DevicesView		Неизвестное устройство
 Unknown	DevicePCI		Неизвестное
-ACPI node '%1'	DeviceACPI		ACPI нода '%1'
+ACPI node '%1'	DeviceACPI		ACPI нода «%1»
 Optical Drive	DeviceSCSI		Оптический привод
-Name	PropertyList		Имя
+Name	PropertyList		Название
 Manufacturer	DeviceSCSI		Производитель
 Device name	Device		Название устройства
 Satellite communications controller	Device		Контроллер спутниковой связи
@@ -47,18 +47,18 @@ Devices	DevicesView		Устройства
 Device name	DeviceACPI		Название устройства
 Card Reader	DeviceSCSI		Кардридер
 Display controller	Device		Контроллер дисплея
-ACPI Button '%1'	DeviceACPI		ACPI кнопка '%1'
+ACPI Button '%1'	DeviceACPI		ACPI кнопка «%1»
 Bus	DevicesView		Шина
 ACPI <unknown>	DeviceACPI		ACPI <неизвестно>
 Device name	DevicePCI		Название устройства
 Disk Drive	DeviceSCSI		Дисковод
-Report compatibility	DevicesView		Отчёт о совместимости
 Other	DeviceSCSI		Другие
+Report compatibility	DevicesView		Отчёт о совместимости
 Computer	Device		Компьютер
 PCI bus	Device		Шина PCI
 Enclosure	DeviceSCSI		Enclosure
-ACPI Thermal Zone	DeviceACPI		Термодатчик ACPI
 Order by:	DevicesView		Сортировать по:
+ACPI Thermal Zone	DeviceACPI		Термодатчик ACPI
 Intelligent controller	Device		Интеллектуальный контроллер
 Multimedia controller	Device		Мультимедийный контроллер
 Quit	DevicesView		Выход

@@ -5,7 +5,7 @@ Devices	System name		Devices
 USB bus	DevicesView		Шина USB
 Graphics Peripheral	DeviceSCSI		Графічна периферія
 Processor	Device		Процесор
-Generate system information	DevicesView		Створення інформації про систему
+Generate system information	DevicesView		Зібрати інформацію про систему
 Unknown	DeviceACPI		Невідомо
 Class info	DevicePCI		Інфо про клас
 USB bus	Device		Шина USB
@@ -14,13 +14,13 @@ Communications	DeviceSCSI		Комунікації
 Mass storage controller	Device		Контролер накопичувачів
 Connection	DevicesView		Підключення
 Printer	DeviceSCSI		Принтер
-ACPI Processor Namespace '%2'	DeviceACPI		Простір імен процесора ACPI '%2'
+ACPI Processor Namespace '%2'	DeviceACPI		Простір імен процесора ACPI «%2»
 Manufacturer	Device		Виробник
 Scanner	DeviceSCSI		Сканер
 Memory controller	Device		Контролер пам’яті
 Unknown device	DevicesView		Невідомий пристрій
 Unknown	DevicePCI		Невідомий
-ACPI node '%1'	DeviceACPI		Вузол ACPI '%1'
+ACPI node '%1'	DeviceACPI		Вузол ACPI «%1»
 Optical Drive	DeviceSCSI		Оптичний привід
 Name	PropertyList		Назва
 Manufacturer	DeviceSCSI		Виробник
@@ -47,18 +47,18 @@ Devices	DevicesView		Пристрої
 Device name	DeviceACPI		Назва пристрою
 Card Reader	DeviceSCSI		Кардрідер
 Display controller	Device		Контролер дисплея
-ACPI Button '%1'	DeviceACPI		Кнопка ACPI '%1'
+ACPI Button '%1'	DeviceACPI		Кнопка ACPI «%1»
 Bus	DevicesView		Шина
 ACPI <unknown>	DeviceACPI		ACPI <невідомо>
 Device name	DevicePCI		Назва пристрою
 Disk Drive	DeviceSCSI		Дисковий привід
-Report compatibility	DevicesView		Звіт про сумісність
 Other	DeviceSCSI		Інше
+Report compatibility	DevicesView		Звіт про сумісність
 Computer	Device		Комп’ютер
 PCI bus	Device		Шина PCI
 Enclosure	DeviceSCSI		Enclosure
-ACPI Thermal Zone	DeviceACPI		Теплова зона ACPI
 Order by:	DevicesView		Сортувати по:
+ACPI Thermal Zone	DeviceACPI		Теплова зона ACPI
 Intelligent controller	Device		Інтелектуальний контролер
 Multimedia controller	Device		Контролер мультимедіа
 Quit	DevicesView		Вийти

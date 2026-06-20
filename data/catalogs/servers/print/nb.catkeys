@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-PSRV	273685920
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Udefinert
 Return the number of available transports	PrintServerApp Scripting		Returner antall tilgjengelige transporter
 Return the number of available printers	PrintServerApp Scripting		Returner antall tilgjengelige skrivere
@@ -8,6 +8,7 @@ Cancel	PrintServerApp		Avbryt
 Retrieve a specific printer	PrintServerApp Scripting		Hent en bestemt skriver
 Page %1 to %2	ConfigWindow		Side %1 til %2
 Get name of the printer add-on used for this printer	Printer Scripting		Hent navnet på skrivertillegget som brukes for denne skriveren
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Avbryt
 Printer server	ConfigWindow		Skriverserver
@@ -16,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Ja
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
 Would you like to set one up now?	PrintServerApp		Ønsker du å installere en nå?
+Print job setup:	ConfigWindow		Oppsett av utskriftsjobb:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Stående
 All pages	ConfigWindow		Alle sider

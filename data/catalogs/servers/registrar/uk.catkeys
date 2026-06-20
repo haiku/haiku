@@ -4,10 +4,10 @@ OK	ShutdownProcess		ОК
 Do you really want to shut down the system?	ShutdownProcess		Ви справді бажаєте вимкнути систему?
 Shutdown status	ShutdownProcess		Стан вимкнення
 Shut down	ShutdownProcess		Вимкнути
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Програма \"%appName%\" може бути заблокована на модальній панелі.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Програма \«%appName%\» може бути заблокована на модальній панелі.
 System is shut down	ShutdownProcess		Система вимикається
 Restart system	ShutdownProcess		Перезапустити систему
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Програма \"%appName%\" перервала процес вимкнення.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Програма \«%appName%\» перервала процес вимкнення.
 Asking background applications to quit.	ShutdownProcess		Опитування фонових програм про вихід.
 Do you really want to restart the system?	ShutdownProcess		Ви справді бажаєте перезапустити систему?
 Restart	ShutdownProcess		Перезапустити
@@ -20,4 +20,4 @@ Tidying things up a bit.	ShutdownProcess		Ще деякі дрібниці.
 Kill application	ShutdownProcess		Знищити програму
 Shutdown aborted	ShutdownProcess		Вимкнення перервано
 Shutting down…	ShutdownProcess		Вимкнення...
-Asking \"%appName%\" to quit.	ShutdownProcess		Опитування \"%appName%\" про вихід.
+Asking \"%appName%\" to quit.	ShutdownProcess		Опитування \«%appName%\» про вихід.

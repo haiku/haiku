@@ -10,7 +10,7 @@ Right Option	Keyboard Layout View		Правый Option
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Дворак
 Option:	Modifier keys window	Option key role name	Option:
-Cancel	Modifier keys window		Отмена
+Cancel	Modifier keys window		Отменить
 Sample and clipboard:	Keymap window		Пример и буфер обмена:
 Polish	KeymapNames		Польская
 Right Shift	Keyboard Layout View		Правый Shift
@@ -28,7 +28,7 @@ Spanish (Dvorak)	KeymapNames		Испанская (Дворак)
 Option	Keyboard Layout View	Option key	Option
 US-International	KeymapNames		США-международная
 Turkish (Type-Q)	KeymapNames		Турецкая (тип Q)
-Revert	Modifier keys window		Вернуть
+Revert	Modifier keys window		Откатить
 Slovak	KeymapNames		Словацкая
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -118,7 +118,7 @@ Belarusian (Latin)	KeymapNames		Беларуская (латиница)
 Hebrew	KeymapNames		Ивритская
 Layout	Keymap window		Макет
 Greek	KeymapNames		Греческая
-Revert	Keymap window		Вернуть
+Revert	Keymap window		Откатить
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		Апостроф
 Menu	Keyboard Layout View	Menu key	Меню

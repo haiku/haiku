@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Screen	2481295967
+1	belarusian	x-vnd.Haiku-Screen	1362639262
 no	Screen		не
 bits/pixel	Screen		бітаў на піксель
 15 bits/pixel, 32768 colors	Screen		15 бітаў на піксель, 32768 колераў
@@ -27,10 +27,8 @@ Swap displays:	Screen		Паменяць экраны месцамі:
 Revert	Screen		Вярнуць
 always	Screen		заўсёды
 Warning	Screen		Увага
-24 bits/pixel, 16 Million colors	Screen		24 біта на піксель, 16 мільёнаў колераў
 Hz	Screen		Гц
 Workspaces	Screen		Рабочыя сталы
-32 bits/pixel, 16 Million colors	Screen		32 біта на піксель, 16 мільёнаў колераў
 Done	Screen		Гатова
 16 bits/pixel, 65536 colors	Screen		16 бітаў на піксель, 65536 колераў
 Screen preferences by the Haiku team	Screen		Наладкі экрана, каманда Haiku

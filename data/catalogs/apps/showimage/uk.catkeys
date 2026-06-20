@@ -36,7 +36,7 @@ Show tool bar	Menus		Показати панель інструментів
 First page	Menus		Перша сторінка
 OK	SaveToFile		ОК
 Print…	Menus		Друк…
-The file '%s' could not be written.	SaveToFile		Файл «%s» не може бути записаний.
+The file '%s' could not be written.	SaveToFile		Файл «%s» неможливо записати.
 Quit	Menus		Вийти
 Get info	Menus		Дивитись інфо
 Rating	Menus		Оцінка

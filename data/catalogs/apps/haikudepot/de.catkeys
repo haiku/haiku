@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2108618135
+1	german	x-vnd.Haiku-HaikuDepot	2384088929
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 User ratings loading…	PackageInfoView		Bewertungen werden geladen …
 Available packages	MainWindow		Verfügbare Pakete
@@ -45,6 +45,7 @@ Cancel	UserLoginWindow		Abbrechen
 Rating not possible	MainWindow		Bewertung nicht möglich
 Package update error	MainWindow		Fehler bei Paketaktualisierung
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Hier klicken
+No screenshot available.	PackageInfoView		Kein Screenshot verfügbar.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# Prozess} other{# Prozesse}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Bewertungen des Pakets werden geladen
 Reboot required	PackageManager		Neustart erforderlich
@@ -153,6 +154,7 @@ Installed packages	MainWindow		Installierte Pakete
 User rating	RatePackageWindow		Bewertung
 Date	PackageListView		Datum
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Das Kennwort muss mindestens %MinPasswordLength% Zeichen lang sein. Es muss zumindest %MinPasswordUppercaseChar% Großbuchstaben und %MinPasswordDigitsChar% Ziffern enthalten.
+Screenshot loading…	PackageInfoView		Screenshot wird geladen …
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Beim Herunterladen der Nutzungsbedingungen ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logdateien angezeigt werden können, steht im Kapitel 'HaikuDepot' des Haiku User Guide.
 There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		\"%DeskbarLink%\" wird geöffnet

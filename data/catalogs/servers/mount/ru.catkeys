@@ -1,14 +1,14 @@
 1	russian	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Только чтение
 Error mounting volume:\n\n%s	AutoMounter		Ошибка подключения раздела:\n\n%s
-Cancel	AutoMounter		Отмена
+Cancel	AutoMounter		Отменить
 OK	AutoMounter		ОК
 Unmount error	AutoMounter		Ошибка отключения
 The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Файловая система на этом разделе не является файловой системой Be (BeFS). Рекомендуется монтировать его в режиме только для чтения, чтобы предотвратить непреднамеренную потерю данных из-за возможных ошибок в Haiku.
 Mount read/write	AutoMounter		Чтение и запись
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Невозможно отключить диск \"%s\":\n\t%s
-Mounting volume '%s'\n\n	AutoMounter		Подключение раздела '%s'\n\n
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Невозможно отключить диск \"%s\":\n\t%s\n\nОтключить этот диск принудительно?\n\nВнимание: если какое-нибудь приложение в данный момент записывает данные на этот раздел, то отключение диска может привести к потере данных.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Невозможно отключить диск \«%s\»:\n\t%s
+Mounting volume '%s'\n\n	AutoMounter		Подключение раздела «%s»\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Невозможно отключить диск \«%s\»:\n\t%s\n\nОтключить этот диск принудительно?\n\nВнимание: если какое-нибудь приложение в данный момент записывает данные на этот раздел, то отключение диска может привести к потере данных.\n
 Force unmount	AutoMounter		Отключить принудительно
 Mount error	AutoMounter		Ошибка подключения
 Mount warning	AutoMounter		Предупреждение при подключении

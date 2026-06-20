@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	2777022576
+1	hungarian	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Statisztika
 Cut	Menus		Kivágás
 Center	Menus		Középre
@@ -39,6 +39,7 @@ Strikeout	Menus		Áthúzás
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
 Error saving \"%filename%\":\n%error%	SaveAlert		Nem tudom menteni: \"%filename%\":\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		Mentsük a változásokat: \"%title%\"?
+Style	Menus		Stílus
 Save	SaveAlert		Mentés
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" nem mentett módosításokat tartalmaz.\nVisszaállítod a legutóbbi mentett változatra?
 Default	Open_and_SaveAsPanel		Alapérték

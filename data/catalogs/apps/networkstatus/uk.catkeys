@@ -1,18 +1,20 @@
-1	ukrainian	x-vnd.Haiku-NetworkStatus	1860540945
+1	ukrainian	x-vnd.Haiku-NetworkStatus	3050452699
 IPv6 address:	NetworkStatusView		Адреса IPv6:
 Quit	NetworkStatusView		Вийти
 Unknown	NetworkStatusView		Невідомий
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Збій запуску префлета параметрів мережі.\n\nПомилка: 
-Install in Deskbar	NetworkStatus		Встановити у Deskbar
+Install in Deskbar	NetworkStatus		Встановити на панель Deskbar
 Open network preferences…	NetworkStatusView		Відкрити налаштування мережі…
 NetworkStatus	System name		NetworkStatus
 Broadcast:	NetworkStatusView		Широкомовна передача:
 OK	NetworkStatusView		ОК
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Параметри запуску %appname%:\n\t--deskbar\tавтоматично додавати реплікант на панель Deskbar\n\t--help\t\tпоказати довідку і вийти
 No link	NetworkStatusView		З'єднання відсутнє
 Connected	NetworkStatusView		Під'єднано
 Could not join wireless network:\n	NetworkStatusView		Не вдалося під'єднатися до безпровідної мережі:\n
 Network Status	NetworkStatusView		Стан мережі
 Deskbar is not running, giving up.	NetworkStatus		Облиште, Deskbar не працює.
+You can run %appname% in a window or install it in the Deskbar.	NetworkStatus		Ви можете запустити %appname% у вікні або встановити на Deskbar.
 Netmask:	NetworkStatusView		Маска підмережі:
 No stateful configuration	NetworkStatusView		Немає стабільної конфігурації
 IPv4 address:	NetworkStatusView		Адреса IPv4:

@@ -51,13 +51,13 @@ ACPI Button '%1'	DeviceACPI		ACPI-painike '%1'
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Laitenimi
 Disk Drive	DeviceSCSI		Levyasema
-Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
 Other	DeviceSCSI		Muu
+Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
 Computer	Device		Tietokone
 PCI bus	Device		PCI-väylä
 Enclosure	DeviceSCSI		Kotelo
-ACPI Thermal Zone	DeviceACPI		ACPI-lämpöalue
 Order by:	DevicesView		Järjestys:
+ACPI Thermal Zone	DeviceACPI		ACPI-lämpöalue
 Intelligent controller	Device		Älyohjain
 Multimedia controller	Device		Multimediaohjain
 Quit	DevicesView		Poistu

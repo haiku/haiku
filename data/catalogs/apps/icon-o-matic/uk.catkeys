@@ -59,7 +59,7 @@ SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey 
 Assign style	Icon-O-Matic-AssignStyleCmd		Визначити стиль
 Saving your document failed!	Icon-O-Matic-Exporter		Збій при збереженні документу!
 Snap to grid	Icon-O-Matic-Menu-Settings		Припасувати до сітки
-Opening the document failed!	Icon-O-Matic-Main		Збій при відкритті документу!
+Opening the document failed!	Icon-O-Matic-Main		Збій під час відкриття документу!
 SVG export	Icon-O-Matic-SVGExport		Експорт SVG
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Прибрати {0, plural, one{стиль} few{стилі} other{стилів}}
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Один або декілька контурів мають забагато точок. HVIF підтримує максимум 255 точок у контурі.

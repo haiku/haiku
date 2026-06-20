@@ -51,13 +51,13 @@ ACPI Button '%1'	DeviceACPI		ACPI tlačítko '%1'
 ACPI <unknown>	DeviceACPI		ACPI <neznámé>
 Device name	DevicePCI		Název zařízení
 Disk Drive	DeviceSCSI		Disková jednotka
-Report compatibility	DevicesView		Nahlásit kompatibilitu
 Other	DeviceSCSI		Ostatní
+Report compatibility	DevicesView		Nahlásit kompatibilitu
 Computer	Device		Počítač
 PCI bus	Device		Sběrnice PCI
 Enclosure	DeviceSCSI		Skříňka
-ACPI Thermal Zone	DeviceACPI		ACPI Tepelná Zóna
 Order by:	DevicesView		Seřadit podle:
+ACPI Thermal Zone	DeviceACPI		ACPI Tepelná Zóna
 Intelligent controller	Device		Inteligentní řadič
 Multimedia controller	Device		Kontroler multimédií
 Quit	DevicesView		Ukončit

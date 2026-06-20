@@ -4,7 +4,7 @@ Priority	CortexAddOnsLoggingConsumer		Приоритет
 MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не найден узел (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Задержка
 Logged input	CortexAddOnsLoggingConsumer		Вход регистратора
-CPU spin percentage	CortexAddOnsLoggingConsumer		Процент спин-блокировок ЦПУ
+CPU spin percentage	CortexAddOnsLoggingConsumer		Циклы ожидания ЦПУ (%)
 NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Старт
 Thread priority	CortexAddOnsLoggingConsumer		Приоритет потока

@@ -2,7 +2,7 @@
 Error saving file	ProcessController		Ошибка при сохранении файла
 Display priority	ProcessController		Приоритет отображения
 That's no Fun!	ProcessController		Это не смешно!
-What do you want to do with the team \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
+What do you want to do with the team \"%s\"?	ProcessController		Что вы хотите сделать с потоком \«%s\»?
 Your setting file could not be saved!\n(%s)	ProcessController		Невозможно сохранить настройки!\n(%s)
 Processor %d	ProcessController		Процессор %d
 Live in the Deskbar	ProcessController		Отображать в Deskbar

@@ -51,13 +51,13 @@ ACPI Button '%1'	DeviceACPI		ACPI 버튼 '%1'
 ACPI <unknown>	DeviceACPI		ACPI <알수없음>
 Device name	DevicePCI		장치 이름
 Disk Drive	DeviceSCSI		디스크 드라이브
-Report compatibility	DevicesView		호환성 보고서
 Other	DeviceSCSI		기타
+Report compatibility	DevicesView		호환성 보고서
 Computer	Device		컴퓨터
 PCI bus	Device		PCI 버스
 Enclosure	DeviceSCSI		인클로저
-ACPI Thermal Zone	DeviceACPI		ACPI 터미널 지역
 Order by:	DevicesView		정렬:
+ACPI Thermal Zone	DeviceACPI		ACPI 터미널 지역
 Intelligent controller	Device		지능형 컨트롤러
 Multimedia controller	Device		멀티미디어 컨트롤러
 Quit	DevicesView		종료

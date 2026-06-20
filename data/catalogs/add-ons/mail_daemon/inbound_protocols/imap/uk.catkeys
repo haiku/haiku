@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-IMAP	1343128980
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Не вдалося під'єднатися до сервера \«%server%\»:\n%error%
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Оновлення підписки на папки IMAP, треба трохи зачекати…
-Failed to fetch available storage.	IMAPFolderConfig		Збій запиту доступних масивів.
+Failed to fetch available storage.	IMAPFolderConfig		Збій запиту доступних сховищ.
 Cancel	IMAPFolderConfig		Скасувати
 OK	IMAPFolderConfig		ОК
 Server storage: %s / %s used.	IMAPFolderConfig		Сховище на сервері: %s / %s використано.

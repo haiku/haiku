@@ -52,13 +52,13 @@ Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unbekannt>
 Device name	DevicePCI		Gerätename
 Disk Drive	DeviceSCSI		Laufwerk
-Report compatibility	DevicesView		Kompatibilität anzeigen
 Other	DeviceSCSI		Andere
+Report compatibility	DevicesView		Kompatibilität anzeigen
 Computer	Device		Computer
 PCI bus	Device		PCI-Bus
 Enclosure	DeviceSCSI		Gehäuse
-ACPI Thermal Zone	DeviceACPI		ACPI Temperaturzone
 Order by:	DevicesView		Sortieren nach:
+ACPI Thermal Zone	DeviceACPI		ACPI Temperaturzone
 Intelligent controller	Device		Intelligenter Controller
 Multimedia controller	Device		Multimedia-Controller
 Quit	DevicesView		Beenden

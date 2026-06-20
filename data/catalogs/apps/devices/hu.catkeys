@@ -52,13 +52,13 @@ Bus	DevicesView		Busz
 ACPI <unknown>	DeviceACPI		ACPI <ismeretlen>
 Device name	DevicePCI		Eszköznév
 Disk Drive	DeviceSCSI		Lemezmeghajtó
-Report compatibility	DevicesView		Kompatibilitás jelentése
 Other	DeviceSCSI		Egyéb
+Report compatibility	DevicesView		Kompatibilitás jelentése
 Computer	Device		Számítógép
 PCI bus	Device		PCI port
 Enclosure	DeviceSCSI		Doboz
-ACPI Thermal Zone	DeviceACPI		ACPI hőzóna
 Order by:	DevicesView		Rendezés alapja:
+ACPI Thermal Zone	DeviceACPI		ACPI hőzóna
 Intelligent controller	Device		Intelligens vezérlő
 Multimedia controller	Device		Multimedia vezérlő
 Quit	DevicesView		Kilépés

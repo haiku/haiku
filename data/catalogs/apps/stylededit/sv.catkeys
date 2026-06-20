@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	2777022576
+1	swedish	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Dokumentstatistik
 Cut	Menus		Klipp ut
 Center	Menus		Mitten
@@ -39,6 +39,7 @@ Strikeout	Menus		Överstrykning
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
 Error saving \"%filename%\":\n%error%	SaveAlert		Fel vid sparning av \"%filename%\":\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		Spara ändringar i dokumentet \"%title%\"?
+Style	Menus		Stil
 Save	SaveAlert		Spara
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" har osparade ändringar.\nÅterställ till den senast sparade versionen?
 Default	Open_and_SaveAsPanel		Standard

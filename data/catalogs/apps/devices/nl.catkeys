@@ -51,13 +51,13 @@ ACPI Button '%1'	DeviceACPI		ACPI Knop '%1'
 ACPI <unknown>	DeviceACPI		ACPI <onbekend>
 Device name	DevicePCI		Apparaatnaam
 Disk Drive	DeviceSCSI		Schijf
-Report compatibility	DevicesView		Rapporteer compatibiliteit
 Other	DeviceSCSI		Andere
+Report compatibility	DevicesView		Rapporteer compatibiliteit
 Computer	Device		Computer
 PCI bus	Device		PCI-bus
 Enclosure	DeviceSCSI		Behuizing
-ACPI Thermal Zone	DeviceACPI		ACPI Thermische zone
 Order by:	DevicesView		Rangschik op:
+ACPI Thermal Zone	DeviceACPI		ACPI Thermische zone
 Intelligent controller	Device		Intelligente controller
 Multimedia controller	Device		Multimedia-controller
 Quit	DevicesView		Afsluiten
