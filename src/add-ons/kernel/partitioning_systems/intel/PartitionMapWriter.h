@@ -56,6 +56,7 @@ public:
 
 			status_t			ClearExtendedHead(
 									const PrimaryPartition* primary);
+			status_t			ClearIsoHeader();
 
 private:
 			status_t			_ReadBlock(off_t offset,

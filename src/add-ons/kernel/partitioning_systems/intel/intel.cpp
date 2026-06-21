@@ -140,14 +140,13 @@ pm_identify_partition(int fd, partition_data* partition, void** cookie)
 	bool hasParent = (get_parent_partition(partition->id) != NULL);
 
 	if (!hasParent) {
-		if (hasChildren) {
-			// This value overrides BFS.
-			return 0.81;
-		}
+		if (hasChildren)
+			return 0.81f;
 
 		// No children -- might be a freshly initialized disk. But it could
 		// also be an image file. So we give BFS a chance to override us.
-		return 0.5;
+		// This value also overrides iso9660
+		return 0.61f;
 	}
 
 // NOTE: It seems supporting nested partition maps makes more trouble than it

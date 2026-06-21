@@ -23,6 +23,8 @@
 #	include <KernelExport.h>
 #endif
 
+#include <AutoDeleter.h>
+
 #include "PartitionMap.h"
 
 using std::nothrow;
@@ -252,6 +254,30 @@ PartitionMapWriter::ClearExtendedHead(const PrimaryPartition* primary)
 	status_t error = _WriteBlock(primary->Offset(), partitionTable);
 	if (error != B_OK)
 		return error;
+
+	return B_OK;
+}
+
+
+status_t
+PartitionMapWriter::ClearIsoHeader()
+{
+	// Check if an iso9660 header exists and if so remove it
+	// This can be present if we are initializing a device previously used as a hybrid iso/image
+	char isoCheck[5];
+	ssize_t bytesRead = read_pos(fDeviceFD, 0x8001, (void*)&isoCheck, 5);
+
+	if (bytesRead == 5 && strncmp(isoCheck, "CD001", 5) == 0) {
+		void* zeroBuf = malloc(2048);
+		if (zeroBuf == NULL)
+			return B_NO_MEMORY;
+
+		MemoryDeleter blockDeleter(zeroBuf);
+
+		memset(zeroBuf, 0, 2048);
+		if (write_pos(fDeviceFD, 0x8000, zeroBuf, 2048) < 0)
+			return errno;
+	}
 
 	return B_OK;
 }

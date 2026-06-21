@@ -1353,6 +1353,11 @@ pm_initialize(int fd, partition_id partitionID, const char* name,
 	if (error != B_OK)
 		return error;
 
+	// Clear the iso header (present if initializing a device containing a hybrid iso/image)
+	error = writer.ClearIsoHeader();
+	if (error != B_OK)
+		return error;
+
 	// rescan partition
 	error = scan_partition(partitionID);
 	if (error != B_OK)

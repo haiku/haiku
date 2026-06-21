@@ -249,6 +249,9 @@ Header::Write(int fd)
 	writer.WriteMBR(&partitionMap, true);
 		// We also write the bootcode, so we can boot GPT disks from BIOS
 
+	// Clear the iso header (present if initializing a device containing a hybrid iso/image)
+	writer.ClearIsoHeader();
+
 	status_t status = _Write(fd, fHeader.EntriesBlock() * fBlockSize, fEntries,
 		_EntryArraySize());
 	if (status != B_OK)
