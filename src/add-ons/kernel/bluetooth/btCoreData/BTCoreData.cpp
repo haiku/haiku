@@ -6,6 +6,7 @@
 
 
 #include <bluetooth/bdaddrUtils.h>
+#include <bluetooth/bluetooth_error.h>
 #include <bluetooth/HCI/btHCI_transport.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
@@ -49,6 +50,9 @@ PostEvent(bluetooth_device* ndev, void* event, size_t size)
 				= (struct hci_ev_conn_complete*)(outgoingEvent + 1);
 
 			// TODO: XXX parse handle field
+			if (data->status != BT_OK)
+				break;
+
 			HciConnection* conn = AddConnection(data->handle, BT_ACL,
 				data->bdaddr, ndev->index);
 

@@ -94,6 +94,27 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 			.AddGlue()
 		.End()
 	.End();
+
+	StartWatchingServer();
+	be_roster->StartWatching(this, B_REQUEST_LAUNCHED);
+}
+
+
+void
+BluetoothWindow::StartWatchingServer()
+{
+	BMessage watchReq = BMessage(BT_START_WATCHING_CONNECTIONS);
+	watchReq.AddMessenger("messenger", BMessenger(this));
+	BMessenger(BLUETOOTH_SIGNATURE).SendMessage(&watchReq);
+}
+
+
+void
+BluetoothWindow::StopWatchingServer()
+{
+	BMessage stopWatchReq = BMessage(BT_STOP_WATCHING_CONNECTIONS);
+	stopWatchReq.AddMessenger("messenger", BMessenger(this));
+	BMessenger(BLUETOOTH_SIGNATURE).SendMessage(&stopWatchReq);
 }
 
 
@@ -102,6 +123,24 @@ BluetoothWindow::MessageReceived(BMessage* message)
 {
 	//message->PrintToStream();
 	switch (message->what) {
+		case BT_MSG_CONN_COMPLETED:
+		case BT_MSG_CONN_FAILED:
+		case BT_MSG_DISCONN_COMPLETED:
+		{
+			fRemoteDevices->MessageReceived(message);
+			break;
+		}
+
+		case B_SOME_APP_LAUNCHED:
+		{
+			const char* signature;
+			if (message->FindString("signature", &signature) == B_OK
+				&& strcmp(signature, BLUETOOTH_SIGNATURE) == 0)
+				StartWatchingServer();
+
+			break;
+		}
+
 		case kMsgSetConnectionPolicy:
 		case kMsgSetDeviceClass:
 		case kMsgSetFriendlyName:
@@ -139,9 +178,11 @@ BluetoothWindow::MessageReceived(BMessage* message)
 		case kMsgAddToRemoteList:
 			PostMessage(message, fRemoteDevices);
 			break;
+
 		case kMsgRefresh:
 			fSettingsView->MessageReceived(message);
 			break;
+
 		case B_ABOUT_REQUESTED:
 			be_app->PostMessage(message);
 			break;
@@ -155,6 +196,7 @@ BluetoothWindow::MessageReceived(BMessage* message)
 bool
 BluetoothWindow::QuitRequested()
 {
+	StopWatchingServer();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }

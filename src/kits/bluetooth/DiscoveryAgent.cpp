@@ -81,21 +81,18 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener,
 		PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
 
 	// For getting each discovered message
-    request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_RESULT);
+	request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_RESULT);
 	request.AddInt16("eventExpected", HCI_EVENT_INQUIRY_RESULT_WITH_RSSI);
 	request.AddInt16("eventExpected", HCI_EVENT_EXTENDED_INQUIRY_RESULT);
 
 	// For finishing each discovered message
-    request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_COMPLETE);
+	request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_COMPLETE);
 
 
-    if (fMessenger->SendMessage(&request, listener) == B_OK)
-    {
-    	return B_OK;
-    }
-	
+	if (fMessenger->SendMessage(&request, listener) == B_OK)
+		return B_OK;
+
 	return B_ERROR;
-
 }
 
 

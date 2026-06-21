@@ -63,6 +63,7 @@ BluetoothServer::BluetoothServer()
 {
 	fDeviceManager = new DeviceManager();
 	fLocalDevicesList.MakeEmpty();
+	fWatchersList.MakeEmpty();
 
 	fEventListener2 = new BluetoothPortListener(BT_USERLAND_PORT_NAME,
 		(BluetoothPortListener::port_listener_func)&DispatchEvent);
@@ -129,8 +130,7 @@ void BluetoothServer::MessageReceived(BMessage* message)
 	BMessage reply;
 	status_t status = B_WOULD_BLOCK; // mark somehow to do not reply anything
 
-	switch (message->what)
-	{
+	switch (message->what) {
 		case BT_MSG_ADD_DEVICE:
 		{
 			BString str;
@@ -198,18 +198,79 @@ void BluetoothServer::MessageReceived(BMessage* message)
 			return;
 		}
 
+		case BT_REQ_CREATE_CONN:
+		{
+			LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+			if (lDeviceImpl == NULL)
+				break;
+
+			lDeviceImpl->CreateConnection(message);
+			break;
+		}
+
+		case BT_REQ_CANCEL_CONN:
+		{
+			LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+			if (lDeviceImpl == NULL)
+				break;
+
+			lDeviceImpl->CancelConnection(message);
+			break;
+		}
+
+		case BT_REQ_DISCONNECT:
+		{
+			LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+			if (lDeviceImpl == NULL)
+				break;
+
+			lDeviceImpl->Disconnect(message);
+			break;
+		}
+
+		case BT_START_WATCHING_CONNECTIONS:
+		{
+			BMessenger* messenger = new BMessenger();
+			if (message->FindMessenger("messenger", messenger) == B_OK)
+				fWatchersList.AddItem(messenger);
+			break;
+		}
+
+		case BT_STOP_WATCHING_CONNECTIONS:
+		{
+			BMessenger* messenger = new BMessenger();
+			if (message->FindMessenger("messenger", messenger) == B_OK)
+				fWatchersList.RemoveItem(messenger);
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			break;
 	}
 
 	// Can we reply right now?
-	// TOD: review this condition
+	// TODO: review this condition
 	if (status != B_WOULD_BLOCK) {
 		reply.AddInt32("status", status);
 		message->SendReply(&reply);
 //		printf("Sending reply message for->\n");
 //		message->PrintToStream();
+	}
+}
+
+
+void
+BluetoothServer::NotifyWatchers(BMessage* notice)
+{
+	for (int32 i = 0; i < fWatchersList.CountItems(); i++) {
+		BMessenger* messenger = fWatchersList.ItemAt(i);
+		if (!messenger->IsValid()) {
+			fWatchersList.RemoveItemAt(i);
+			i--;
+			continue;
+		}
+		messenger->SendMessage(notice);
 	}
 }
 

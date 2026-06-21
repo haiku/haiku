@@ -20,7 +20,8 @@ namespace Bluetooth {
 DeviceListItem::DeviceListItem(RemoteDevice* bDevice)
 	:
 	BListItem(),
-	fDevice(bDevice)
+	fDevice(bDevice),
+	fConnState(RD_DISCONNECTED)
 {
 	fAddress = bDevice->GetBluetoothAddress();
 	fClass = bDevice->GetDeviceClass();
@@ -155,6 +156,20 @@ RemoteDevice*
 DeviceListItem::Device() const
 {
 	return fDevice;
+}
+
+
+void
+DeviceListItem::SetConnState(DeviceConnState connState)
+{
+	fConnState = connState;
+}
+
+
+DeviceConnState
+DeviceListItem::GetConnState()
+{
+	return fConnState;
 }
 
 

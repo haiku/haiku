@@ -113,13 +113,23 @@ struct hci_command_header {
 	} __attribute__ ((packed));
 
 	#define OCF_READ_CA_TIMEOUT			0x0015
+	struct hci_rp_read_conn_accept_timeout {
+		uint8		status;
+		uint16		conn_accept_timeout;
+	} __attribute__ ((packed));
 	#define OCF_WRITE_CA_TIMEOUT		0x0016
+	struct hci_cp_write_conn_accept_timeout {
+		uint16		conn_accept_timeout;
+	} __attribute__ ((packed));
 	#define OCF_READ_PG_TIMEOUT			0x0017
 	struct hci_rp_read_page_timeout {
 		uint8		status;
 		uint16		page_timeout;
 	} __attribute__ ((packed));
 	#define OCF_WRITE_PG_TIMEOUT		0x0018
+	struct hci_cp_write_page_timeout {
+		uint16		page_timeout;
+	} __attribute__ ((packed));
 
 	#define OCF_READ_SCAN_ENABLE		0x0019
 	struct hci_read_scan_enable {
@@ -248,6 +258,11 @@ struct hci_command_header {
 	struct hci_cp_add_sco {
 		uint16		handle;
 		uint16		pkt_type;
+	} __attribute__ ((packed));
+
+	#define OCF_CREATE_CONN_CANCEL		0x0008
+	struct hci_cp_create_conn_cancel {
+		bdaddr_t bdaddr;
 	} __attribute__ ((packed));
 
 	#define OCF_ACCEPT_CONN_REQ			0x0009

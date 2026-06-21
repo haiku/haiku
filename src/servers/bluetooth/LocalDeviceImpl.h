@@ -31,7 +31,14 @@ public:
 	void HandleEvent(struct hci_event_header* event);
 
 	// Request handling
-	status_t ProcessSimpleRequest(BMessage* request);
+	status_t 	ProcessSimpleRequest(BMessage* request);
+
+	void		NotifyWatchers(BMessage* notice);
+
+	// Connection
+	void CreateConnection(BMessage* message);
+	void CancelConnection(BMessage* message);
+	void Disconnect(BMessage* message);
 
 private:
 	void HandleUnexpectedEvent(struct hci_event_header* event);
@@ -56,10 +63,10 @@ private:
 		remotename, BMessage* request);
 
 	// Connection
-	void ConnectionComplete(struct hci_ev_conn_complete* event, BMessage* request);
+	void Authenticate(uint16 handle);
+	void ConnectionComplete(struct hci_ev_conn_complete* event);
 	void ConnectionRequest(struct hci_ev_conn_request* event, BMessage* request);
-	void DisconnectionComplete(struct hci_ev_disconnection_complete_reply* event,
-		BMessage* request);
+	void DisconnectionComplete(struct hci_ev_disconnection_complete_reply* event);
 
 	// Pairing
 	void PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* request);

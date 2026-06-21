@@ -9,7 +9,7 @@
 #include <bluetooth/bluetooth_error.h>
 #include <bluetooth/BluetoothDevice.h>
 
-#include <String.h>
+#include <support/String.h>
 
 #define B_BT_WAIT 0x00
 #define B_BT_SUCCEEDED 0x01
@@ -26,33 +26,39 @@ public:
 	static const int WAIT = B_BT_WAIT;
 	static const int SUCCEEDED = B_BT_SUCCEEDED;
 
-	virtual ~RemoteDevice();
+	virtual 		~RemoteDevice();
 
-	bool IsTrustedDevice();
-	BString GetFriendlyName(bool alwaysAsk); /* Throwing */
-	BString GetFriendlyName(void); /* Throwing */
-	BString GetCachedFriendlyName();
-	bdaddr_t GetBluetoothAddress();
-	DeviceClass GetDeviceClass();
+	bool 			IsTrustedDevice();
+	BString 		GetFriendlyName(bool alwaysAsk); /* Throwing */
+	BString 		GetFriendlyName(void); /* Throwing */
+	BString 		GetCachedFriendlyName();
+	bdaddr_t 		GetBluetoothAddress();
+	uint8 			GetPageRepetitionMode();
+	uint8 			GetScanMode();
+	uint8 			GetClockOffset();
+	DeviceClass 	GetDeviceClass();
 
-	bool Equals(RemoteDevice* obj);
+	bool 			Equals(RemoteDevice* obj);
+
+	status_t		Connect();
+	status_t		CancelConnection();
+	status_t		Disconnect();
 
 	/*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
-	bool		Authenticate(); /* Throwing */
-	status_t	Disconnect(int8 reason = BT_REMOTE_USER_ENDED_CONNECTION);
 	/* bool Authorize(Connection conn);  Throwing */
 	/*bool Encrypt(Connection conn, bool on);  Throwing */
-	bool IsAuthenticated(); /* Throwing */
 	/*bool IsAuthorized(Connection conn);  Throwing */
-	bool IsEncrypted(); /* Throwing */
+	bool 			IsAuthenticated(); /* Throwing */
+	bool 			IsEncrypted(); /* Throwing */
 
-	BString GetProperty(const char* property); /* Throwing */
-	status_t GetProperty(const char* property, uint32* value); /* Throwing */
+	BString 		GetProperty(const char* property); /* Throwing */
+	status_t 		GetProperty(const char* property, uint32* value); /* Throwing */
 
-	LocalDevice* GetLocalDeviceOwner();
+	LocalDevice* 	GetLocalDeviceOwner();
 
-	RemoteDevice(const BString& address);
-	RemoteDevice(const bdaddr_t address, uint8 record[3]);
+					RemoteDevice(const BString& address);
+					RemoteDevice(const bdaddr_t address, uint8 record[3]);
+
 
 protected:
 	/* called by Discovery[Listener|Agent] */
@@ -61,17 +67,17 @@ protected:
 
 private:
 
-	LocalDevice* fDiscovererLocalDevice;
-	BMessenger*	 fMessenger;
+	LocalDevice* 	fDiscovererLocalDevice;
+	BMessenger*	 	fMessenger;
 
-	uint16		fHandle;
-	uint8		fPageRepetitionMode;
-	uint8		fScanPeriodMode;
-	uint8		fScanMode;
-	uint16		fClockOffset;
-	int8        fRSSI;
-	BString     fFriendlyName;
-	bool        fFriendlyNameIsComplete;
+	uint16			fHandle;
+	uint8			fPageRepetitionMode;
+	uint8			fScanPeriodMode;
+	uint8			fScanMode;
+	uint16			fClockOffset;
+	int8        	fRSSI;
+	BString     	fFriendlyName;
+	bool        	fFriendlyNameIsComplete;
 };
 
 }

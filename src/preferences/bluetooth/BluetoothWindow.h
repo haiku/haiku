@@ -24,6 +24,9 @@ public:
 	void	MessageReceived(BMessage *message);
 
 private:
+	void	StartWatchingServer();
+	void	StopWatchingServer();
+
 			RemoteDevicesView*		fRemoteDevices;
 			BButton*				fDefaultsButton;
 			BButton*				fRevertButton;

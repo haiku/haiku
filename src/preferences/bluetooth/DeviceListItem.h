@@ -12,6 +12,14 @@
 
 namespace Bluetooth {
 
+
+enum DeviceConnState {
+	RD_CONNECTED,
+	RD_CONNECTING,
+	RD_DISCONNECTED
+};
+
+
 class DeviceListItem : public BListItem
 {
 	public:
@@ -19,20 +27,24 @@ class DeviceListItem : public BListItem
 
 		~DeviceListItem();
 
-		void DrawItem(BView*, BRect, bool = false);
-		void Update(BView* owner, const BFont* font);
+		void 			DrawItem(BView*, BRect, bool = false);
+		void 			Update(BView* owner, const BFont* font);
 
-		static int Compare(const void* firstArg, const void* secondArg);
-		void SetDevice(RemoteDevice* bDevice);
-		RemoteDevice* Device() const;
+		static int 		Compare(const void* firstArg, const void* secondArg);
+		void 			SetDevice(RemoteDevice* bDevice);
+		RemoteDevice* 	Device() const;
+
+		void 			SetConnState(DeviceConnState connState);
+		DeviceConnState GetConnState();
 
 	private:
 		RemoteDevice*	fDevice;
-		bdaddr_t			fAddress;
-		DeviceClass			fClass;
-		BString				fName;
-		int32				fRSSI;
+		bdaddr_t		fAddress;
+		DeviceClass		fClass;
+		BString			fName;
+		int32			fRSSI;
 
+		DeviceConnState	fConnState;
 };
 
 }

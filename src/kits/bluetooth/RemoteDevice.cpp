@@ -133,6 +133,27 @@ RemoteDevice::GetBluetoothAddress()
 }
 
 
+uint8
+RemoteDevice::GetClockOffset()
+{
+	return fClockOffset;
+}
+
+
+uint8
+RemoteDevice::GetScanMode()
+{
+	return fScanMode;
+}
+
+
+uint8
+RemoteDevice::GetPageRepetitionMode()
+{
+	return fPageRepetitionMode;
+}
+
+
 bool
 RemoteDevice::Equals(RemoteDevice* obj)
 {
@@ -141,130 +162,70 @@ RemoteDevice::Equals(RemoteDevice* obj)
 }
 
 
-//  static RemoteDevice* GetRemoteDevice(Connection conn);
-
-
-bool
-RemoteDevice::Authenticate()
+status_t
+RemoteDevice::Connect()
 {
 	CALLED();
-	int8 btStatus = BT_ERROR;
-
-	if (fMessenger == NULL || fDiscovererLocalDevice == NULL)
-		return false;
-
-	BluetoothCommand<typed_command(hci_cp_create_conn)>
-		createConnection(OGF_LINK_CONTROL, OCF_CREATE_CONN);
-
-	bdaddrUtils::Copy(createConnection->bdaddr, fBdaddr);
-	createConnection->pscan_rep_mode = fPageRepetitionMode;
-	createConnection->pscan_mode = fScanMode; // Reserved in spec 2.1
-	createConnection->clock_offset = fClockOffset | 0x8000; // substract!
-
-	uint32 roleSwitch;
-	fDiscovererLocalDevice->GetProperty("role_switch_capable", &roleSwitch);
-	createConnection->role_switch = (uint8)roleSwitch;
-
-	uint32 packetType;
-	fDiscovererLocalDevice->GetProperty("packet_type", &packetType);
-	createConnection->pkt_type = (uint16)packetType & ACL_PTYPE_MASK;
-
-	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
-	BMessage reply;
+	BMessage request(BT_REQ_CREATE_CONN);
 
 	request.AddInt32("hci_id", fDiscovererLocalDevice->ID());
-	request.AddData("raw command", B_ANY_TYPE,
-		createConnection.Data(), createConnection.Size());
 
-	// First we get the status about the starting of the connection
-	request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL,
-		OCF_CREATE_CONN));
+	bdaddr_t bdaddr = GetBluetoothAddress();
+	request.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
 
-	request.AddInt16("eventExpected", HCI_EVENT_LINK_KEY_REQ);
-	request.AddInt16("eventExpected", HCI_EVENT_ROLE_CHANGE);
-	request.AddInt16("eventExpected", HCI_EVENT_CONN_COMPLETE);
+	uint16 packetType;
+	fDiscovererLocalDevice->GetProperty("packet_type", (uint32*)&packetType);
+	request.AddUInt16("packet type", packetType);
 
-	if (fMessenger->SendMessage(&request, &reply) == B_OK)
-		reply.FindInt8("status", &btStatus);
+	request.AddUInt8("pscan_rep_mode", fPageRepetitionMode);
+	request.AddUInt8("pscan_mode", fScanMode);
+	request.AddUInt16("clock_offset", fClockOffset);
 
-	if (btStatus != BT_OK)
-		return false;
+	uint8 roleSwitch;
+	fDiscovererLocalDevice->GetProperty("role_switch_capable", (uint32*)&roleSwitch);
+	request.AddUInt8("role_switch", roleSwitch);
 
-	reply.FindInt16("handle", (int16*)&fHandle);
-
-	BluetoothCommand<typed_command(hci_cp_auth_requested)> authRequest(OGF_LINK_CONTROL,
-		OCF_AUTH_REQUESTED);
-
-	authRequest->handle = fHandle;
-
-	BMessage authRequestMsg(BT_MSG_HANDLE_SIMPLE_REQUEST);
-	BMessage authReply;
-
-	authRequestMsg.AddInt32("hci_id", fDiscovererLocalDevice->ID());
-	authRequestMsg.AddData("raw command", B_ANY_TYPE, authRequest.Data(), authRequest.Size());
-
-	authRequestMsg.AddInt16("eventExpected", HCI_EVENT_CMD_STATUS);
-	authRequestMsg.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_AUTH_REQUESTED));
-
-	authRequestMsg.AddInt16("eventExpected", HCI_EVENT_AUTH_COMPLETE);
-
-	int8 authStatus = BT_ERROR;
-	if (fMessenger->SendMessage(&authRequestMsg, &authReply) == B_OK)
-		authReply.FindInt8("status", &authStatus);
-
-	if (authStatus == BT_OK)
-		return true;
-	else
-		return false;
-}
-
-
-status_t
-RemoteDevice::Disconnect(int8 reason)
-{
-	CALLED();
-	if (fHandle != invalidConnectionHandle) {
-
-		int8 btStatus = BT_ERROR;
-
-		if (fMessenger == NULL || fDiscovererLocalDevice == NULL)
-			return false;
-
-		BluetoothCommand<typed_command(struct hci_disconnect)>
-			disconnect(OGF_LINK_CONTROL, OCF_DISCONNECT);
-
-		disconnect->reason = reason;
-		disconnect->handle = fHandle;
-
-		BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
-		BMessage reply;
-
-
-		request.AddInt32("hci_id", fDiscovererLocalDevice->ID());
-		request.AddData("raw command", B_ANY_TYPE,
-			disconnect.Data(), disconnect.Size());
-
-		request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
-		request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL,
-			OCF_DISCONNECT));
-
-		request.AddInt16("eventExpected",  HCI_EVENT_DISCONNECTION_COMPLETE);
-
-		if (fMessenger->SendMessage(&request, &reply) == B_OK)
-			reply.FindInt8("status", &btStatus);
-
-		if (btStatus == BT_OK)
-			fHandle = invalidConnectionHandle;
-
-		return btStatus;
-
-	}
-
+	if (fMessenger->SendMessage(&request) == B_OK)
+		return B_OK;
 	return B_ERROR;
 }
 
 
+status_t
+RemoteDevice::CancelConnection()
+{
+	CALLED();
+	BMessage request(BT_REQ_CANCEL_CONN);
+
+	request.AddInt32("hci_id", fDiscovererLocalDevice->ID());
+
+	bdaddr_t bdaddr = GetBluetoothAddress();
+	request.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
+
+	if (fMessenger->SendMessage(&request) == B_OK)
+		return B_OK;
+	return B_ERROR;
+}
+
+
+status_t
+RemoteDevice::Disconnect()
+{
+	CALLED();
+	BMessage request(BT_REQ_DISCONNECT);
+
+	request.AddInt32("hci_id", fDiscovererLocalDevice->ID());
+
+	request.AddUInt16("handle", fHandle);
+	request.AddUInt8("reason", BT_REMOTE_USER_ENDED_CONNECTION);
+
+	if (fMessenger->SendMessage(&request) == B_OK)
+		return B_OK;
+	return B_ERROR;
+}
+
+
+//  static RemoteDevice* GetRemoteDevice(Connection conn);
 //  bool Authorize(Connection conn);
 //  bool Encrypt(Connection conn, bool on);
 
@@ -309,8 +270,7 @@ RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
 RemoteDevice::RemoteDevice(const bdaddr_t address, uint8 record[3])
 	:
 	BluetoothDevice(),
-	fDiscovererLocalDevice(NULL),
-	fHandle(invalidConnectionHandle)
+	fDiscovererLocalDevice(NULL)
 {
 	CALLED();
 	fBdaddr = address;
@@ -322,8 +282,7 @@ RemoteDevice::RemoteDevice(const bdaddr_t address, uint8 record[3])
 RemoteDevice::RemoteDevice(const BString& address)
 	:
 	BluetoothDevice(),
-	fDiscovererLocalDevice(NULL),
-	fHandle(invalidConnectionHandle)
+	fDiscovererLocalDevice(NULL)
 {
 	CALLED();
 	fBdaddr = bdaddrUtils::FromString((const char*)address.String());
