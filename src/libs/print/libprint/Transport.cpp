@@ -3,11 +3,12 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
+#include <DataIO.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
 #include <FindDirectory.h>
 #include <Message.h>
-#include <Directory.h>
-#include <DataIO.h>
-#include <File.h>
 #include <Path.h>
 #include <image.h>
 
@@ -48,11 +49,19 @@ Transport::Transport(const PrinterData *printerData)
 		B_BEOS_ADDONS_DIRECTORY,
 	};
 	BPath path;
+	BEntry entry;
 	for (uint32 i = 0; i < sizeof(paths) / sizeof(paths[0]); ++i) {
 		if (find_directory(paths[i], &path) != B_OK)
 			continue;
 		path.Append("Print/transport");
 		path.Append(printerData->GetTransport().c_str());
+
+		entry.SetTo(path.Path(), true);
+		if (!entry.IsFile()) {
+			// doesn't exists or is not a file
+			continue;
+		}
+
 		DBGMSG(("load_add_on: %s\n", path.Path()));
 		fImage = load_add_on(path.Path());
 		if (fImage >= 0)
