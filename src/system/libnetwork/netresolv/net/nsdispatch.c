@@ -519,7 +519,7 @@ _nsconfigure(void)
 	static time_t	_nsconfmod;
 	struct stat	statbuf;
 
-	char * path = nsswitch_conf_file_path();
+	const char* path = _PATH_NS_CONF;
 
 	pthread_mutex_lock(&_nsconflock);
 
