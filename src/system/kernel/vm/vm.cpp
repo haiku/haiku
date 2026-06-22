@@ -5435,7 +5435,7 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 		if (index < 0 || table[index].address
 				!= physicalAddress - table[index].size) {
 			if ((uint32)++index + 1 > numEntries) {
-				// table to small
+				// table too small
 				break;
 			}
 			table[index].address = physicalAddress;
