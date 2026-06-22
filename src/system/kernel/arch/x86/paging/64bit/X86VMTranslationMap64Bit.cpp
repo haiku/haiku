@@ -239,6 +239,7 @@ X86VMTranslationMap64Bit::Map(addr_t virtualAddress, phys_addr_t physicalAddress
 {
 	TRACE("X86VMTranslationMap64Bit::Map(%#" B_PRIxADDR ", %#" B_PRIxPHYSADDR
 		")\n", virtualAddress, physicalAddress);
+	ASSERT_LOCKED_RECURSIVE(&fLock);
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
