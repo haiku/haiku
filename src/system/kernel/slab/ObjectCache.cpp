@@ -205,7 +205,7 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 
 	ParanoiaChecker _(source);
 
-#if KDEBUG >= 1
+#if KDEBUG
 	uint8* objectsStart = (uint8*)source->pages + source->offset;
 	if (object < objectsStart
 		|| object >= objectsStart + source->size * object_size
@@ -213,7 +213,7 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 		panic("object_cache: tried to free invalid object pointer %p", object);
 		return;
 	}
-#endif // KDEBUG
+#endif
 
 	slab_queue_link* link = object_to_link(object, object_size);
 
