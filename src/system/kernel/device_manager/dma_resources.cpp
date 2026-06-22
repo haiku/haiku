@@ -437,6 +437,8 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 		offset, request->RemainingBytes(), fBlockSize, partialBegin);
 
 	if (buffer->IsVirtual()) {
+		ASSERT(buffer->IsMemoryLocked());
+
 		// Unless we need the bounce buffer anyway, we have to translate the
 		// virtual addresses to physical addresses, so we can check the DMA
 		// restrictions.
@@ -460,8 +462,10 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 						< fRestrictions.max_segment_count) {
 					physical_entry entry;
 					uint32 count = 1;
-					get_memory_map_etc(request->TeamID(), (void*)base, size,
-						&entry, &count);
+					get_memory_map_etc(request->TeamID(),
+						(void*)base, size, &entry, &count);
+					if (count != 1)
+						return B_ERROR;
 
 					vecs[segmentCount].base = entry.address;
 					vecs[segmentCount].length = entry.size;
