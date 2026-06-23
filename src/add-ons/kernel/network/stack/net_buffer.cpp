@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2016, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2026, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,7 +13,6 @@
 #include <net_buffer.h>
 #include <slab/Slab.h>
 #include <tracing.h>
-#include <util/list.h>
 
 #include <ByteOrder.h>
 #include <debug.h>
@@ -72,8 +71,7 @@ struct data_header {
 	uint16			tail_space;
 };
 
-struct data_node {
-	struct list_link link;
+struct data_node : public DoublyLinkedListLinkImpl<data_node> {
 	struct data_header* header;
 	struct data_header* located;
 	size_t			offset;		// the net_buffer-wide offset of this node
@@ -133,7 +131,7 @@ struct data_node {
 // data itself via associated data or something like this. Or this
 // structure as a whole, too...
 struct net_buffer_private : net_buffer {
-	struct list					buffers;
+	DoublyLinkedList<data_node>	buffers;
 	data_header*				allocation_header;
 		// the current place where we allocate header space (nodes, ...)
 	ancillary_data_container*	ancillary_data;
@@ -617,9 +615,8 @@ dump_buffer(net_buffer* _buffer)
 	dump_address("source", buffer->source, buffer->interface_address);
 	dump_address("destination", buffer->destination, buffer->interface_address);
 
-	data_node* node = NULL;
-	while ((node = (data_node*)list_get_next_item(&buffer->buffers, node))
-			!= NULL) {
+	data_node* node = buffer->buffers.First();
+	while (node != NULL) {
 		dprintf("  node %p, offset %lu, used %u, header %u, tail %u, "
 			"header %p\n", node, node->offset, node->used, node->HeaderSpace(),
 			node->TailSpace(), node->header);
@@ -629,6 +626,8 @@ dump_buffer(net_buffer* _buffer)
 				min_c(buffer->stored_header_length, 64), "  s ");
 		}
 		dump_block((char*)node->start, min_c(node->used, 64), "    ");
+
+		node = buffer->buffers.GetNext(node);
 	}
 }
 
@@ -674,7 +673,7 @@ check_buffer(net_buffer* _buffer)
 	// sum up the size of all nodes
 	size_t size = 0;
 
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	data_node* node = buffer->buffers.First();
 	while (node != NULL) {
 		if (node->offset != size) {
 			panic("net_buffer %p: bad node %p offset (%lu vs. %lu)",
@@ -682,7 +681,7 @@ check_buffer(net_buffer* _buffer)
 			return;
 		}
 		size += node->used;
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 	}
 
 	if (size != buffer->size) {
@@ -1013,9 +1012,9 @@ remove_data_node(data_node* node)
 static inline data_node*
 get_node_at_offset(net_buffer_private* buffer, size_t offset)
 {
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	data_node* node = buffer->buffers.First();
 	while (node != NULL && node->offset + node->used <= offset)
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 
 	return node;
 }
@@ -1039,7 +1038,7 @@ append_data_from_buffer(net_buffer* to, const net_buffer* from, size_t size)
 	if (nodeTo == NULL)
 		return B_BAD_VALUE;
 
-	data_node* node = (data_node*)list_get_first_item(&source->buffers);
+	data_node* node = source->buffers.First();
 	if (node == NULL) {
 		CHECK_BUFFER(source);
 		return B_ERROR;
@@ -1051,7 +1050,7 @@ append_data_from_buffer(net_buffer* to, const net_buffer* from, size_t size)
 			return B_ERROR;
 		}
 
-		node = (data_node*)list_get_next_item(&source->buffers, node);
+		node = source->buffers.GetNext(node);
 	}
 
 	int32 diff = node->offset + node->used - size;
@@ -1114,8 +1113,8 @@ create_buffer(size_t headerSpace)
 
 	data_node* node = add_first_data_node(header);
 
-	list_init(&buffer->buffers);
-	list_add_item(&buffer->buffers, node);
+	memset((void*)&buffer->buffers, 0, sizeof(buffer->buffers));
+	buffer->buffers.Add(node);
 
 	buffer->ancillary_data = NULL;
 	buffer->stored_header_length = 0;
@@ -1154,10 +1153,8 @@ free_buffer(net_buffer* _buffer)
 	CHECK_BUFFER(buffer);
 	DELETE_PARANOIA_CHECK_SET(buffer);
 
-	while (data_node* node
-			= (data_node*)list_remove_head_item(&buffer->buffers)) {
+	while (data_node* node = buffer->buffers.RemoveHead())
 		remove_data_node(node);
-	}
 
 	delete_ancillary_data_container(buffer->ancillary_data);
 
@@ -1193,7 +1190,7 @@ duplicate_buffer(net_buffer* _buffer)
 
 	// copy the data from the source buffer
 
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	data_node* node = buffer->buffers.First();
 	while (node != NULL) {
 		if (append_data(duplicate, node->start, node->used) < B_OK) {
 			free_buffer(duplicate);
@@ -1201,7 +1198,7 @@ duplicate_buffer(net_buffer* _buffer)
 			return NULL;
 		}
 
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 	}
 
 	copy_metadata(duplicate, buffer);
@@ -1397,22 +1394,20 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 
 	if (!after) {
 		// change offset of all nodes already in the buffer
-		data_node* node = NULL;
-		while (true) {
-			node = (data_node*)list_get_next_item(&buffer->buffers, node);
-			if (node == NULL)
-				break;
-
+		data_node* node = buffer->buffers.First();
+		while (node != NULL) {
 			node->offset += with->size;
 			if (before == NULL)
 				before = node;
+
+			node = buffer->buffers.GetNext(node);
 		}
 	}
 
 	data_node* last = NULL;
 
 	while (true) {
-		data_node* node = (data_node*)list_get_next_item(&with->buffers, last);
+		data_node* node = (last != NULL) ? with->buffers.GetNext(last) : with->buffers.First();
 		if (node == NULL)
 			break;
 
@@ -1420,7 +1415,7 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 			&& (uint8*)node < (uint8*)node->header + BUFFER_SIZE) {
 			// The node is already in the buffer, we can just move it
 			// over to the new owner
-			list_remove_item(&with->buffers, node);
+			with->buffers.Remove(node);
 			with->size -= node->used;
 		} else {
 			// we need a new place for this node
@@ -1437,10 +1432,10 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 		}
 
 		if (after) {
-			list_add_item(&buffer->buffers, node);
+			buffer->buffers.Add(node);
 			node->offset = buffer->size;
 		} else
-			list_insert_item_before(&buffer->buffers, before, node);
+			buffer->buffers.InsertBefore(before, node);
 
 		buffer->size += node->used;
 	}
@@ -1499,7 +1494,7 @@ write_data(net_buffer* _buffer, size_t offset, const void* data, size_t size)
 		offset = 0;
 		data = (void*)((uint8*)data + written);
 
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 		if (node == NULL)
 			return B_BAD_VALUE;
 	}
@@ -1546,7 +1541,7 @@ read_data(net_buffer* _buffer, size_t offset, void* data, size_t size)
 		offset = 0;
 		data = (void*)((uint8*)data + bytesRead);
 
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 		if (node == NULL)
 			return B_BAD_VALUE;
 	}
@@ -1561,7 +1556,7 @@ static status_t
 prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	data_node* node = buffer->buffers.First();
 	if (node == NULL) {
 		node = add_first_data_node(buffer->allocation_header);
 		if (node == NULL)
@@ -1601,7 +1596,7 @@ prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 
 				node = (data_node*)add_first_data_node(header);
 
-				list_insert_item_before(&buffer->buffers, previous, node);
+				buffer->buffers.InsertBefore(previous, node);
 
 				// Release the initial reference to the header, so that it will
 				// be deleted when the node is removed.
@@ -1620,11 +1615,11 @@ prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 		// correct data offset in all nodes
 
 		size_t offset = 0;
-		node = NULL;
-		while ((node = (data_node*)list_get_next_item(&buffer->buffers,
-				node)) != NULL) {
+		node = buffer->buffers.First();
+		while (node != NULL) {
 			node->offset = offset;
 			offset += node->used;
+			node = buffer->buffers.GetNext(node);
 		}
 
 		if (_contiguousBuffer)
@@ -1639,10 +1634,8 @@ prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 			*_contiguousBuffer = node->start;
 
 		// adjust offset of following nodes
-		while ((node = (data_node*)list_get_next_item(&buffer->buffers, node))
-				!= NULL) {
+		while ((node = buffer->buffers.GetNext(node)) != NULL)
 			node->offset += size;
-		}
 	}
 
 	buffer->size += size;
@@ -1685,7 +1678,7 @@ static status_t
 append_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	data_node* node = (data_node*)list_get_last_item(&buffer->buffers);
+	data_node* node = buffer->buffers.Last();
 	if (node == NULL) {
 		node = add_first_data_node(buffer->allocation_header);
 		if (node == NULL)
@@ -1743,7 +1736,7 @@ append_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 			SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
 				sizeof(buffer->size));
 
-			list_add_item(&buffer->buffers, node);
+			buffer->buffers.Add(node);
 
 			// Release the initial reference to the header, so that it will
 			// be deleted when the node is removed.
@@ -1824,7 +1817,7 @@ remove_header(net_buffer* _buffer, size_t bytes)
 	data_node* node = NULL;
 
 	while (true) {
-		node = (data_node*)list_get_first_item(&buffer->buffers);
+		node = buffer->buffers.First();
 		if (node == NULL) {
 			if (left == 0)
 				break;
@@ -1836,7 +1829,7 @@ remove_header(net_buffer* _buffer, size_t bytes)
 			break;
 
 		// node will be removed completely
-		list_remove_item(&buffer->buffers, node);
+		buffer->buffers.Remove(node);
 		left -= node->used;
 		remove_data_node(node);
 		node = NULL;
@@ -1855,13 +1848,13 @@ remove_header(net_buffer* _buffer, size_t bytes)
 			node->AddHeaderSpace(cut);
 		node->used -= cut;
 
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 	}
 
 	// adjust offset of following nodes
 	while (node != NULL) {
 		node->offset -= bytes;
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 	}
 
 	buffer->size -= bytes;
@@ -1915,11 +1908,11 @@ trim_data(net_buffer* _buffer, size_t newSize)
 	node->used -= diff;
 
 	if (node->used > 0)
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 
 	while (node != NULL) {
-		data_node* next = (data_node*)list_get_next_item(&buffer->buffers, node);
-		list_remove_item(&buffer->buffers, node);
+		data_node* next = buffer->buffers.GetNext(node);
+		buffer->buffers.Remove(node);
 		remove_data_node(node);
 
 		node = next;
@@ -1981,20 +1974,20 @@ append_cloned_data(net_buffer* _buffer, net_buffer* _source, uint32 offset,
 		clone->offset = buffer->size;
 		clone->start = node->start + offset;
 		clone->used = min_c(bytes, node->used - offset);
-		if (list_is_empty(&buffer->buffers)) {
+		if (buffer->buffers.IsEmpty()) {
 			// take over stored offset
 			buffer->stored_header_length = source->stored_header_length;
 			clone->flags = node->flags | DATA_NODE_READ_ONLY;
 		} else
 			clone->flags = DATA_NODE_READ_ONLY;
 
-		list_add_item(&buffer->buffers, clone);
+		buffer->buffers.Add(clone);
 
 		offset = 0;
 		bytes -= clone->used;
 		buffer->size += clone->used;
 		sizeAppended += clone->used;
-		node = (data_node*)list_get_next_item(&source->buffers, node);
+		node = source->buffers.GetNext(node);
 	}
 
 	if (bytes != 0)
@@ -2071,7 +2064,7 @@ status_t
 store_header(net_buffer* _buffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	data_node* node = buffer->buffers.First();
 	if (node == NULL)
 		return B_ERROR;
 
@@ -2096,7 +2089,7 @@ ssize_t
 stored_header_length(net_buffer* _buffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	data_node* node = buffer->buffers.First();
 	if (node == NULL || (node->flags & DATA_NODE_STORED_HEADER) == 0)
 		return B_BAD_VALUE;
 
@@ -2114,7 +2107,7 @@ restore_header(net_buffer* _buffer, uint32 offset, void* data, size_t bytes)
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	if (offset < buffer->stored_header_length) {
-		data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+		data_node* node = buffer->buffers.First();
 		if (node == NULL
 			|| offset + bytes > buffer->stored_header_length + buffer->size)
 			return B_BAD_VALUE;
@@ -2150,7 +2143,7 @@ append_restored_header(net_buffer* buffer, net_buffer* _source, uint32 offset,
 	net_buffer_private* source = (net_buffer_private*)_source;
 
 	if (offset < source->stored_header_length) {
-		data_node* node = (data_node*)list_get_first_item(&source->buffers);
+		data_node* node = source->buffers.First();
 		if (node == NULL
 			|| offset + bytes > source->stored_header_length + source->size)
 			return B_BAD_VALUE;
@@ -2245,7 +2238,7 @@ checksum_data(net_buffer* _buffer, uint32 offset, size_t size, bool finalize)
 
 		offset = 0;
 
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 		if (node == NULL)
 			return B_ERROR;
 	}
@@ -2265,7 +2258,7 @@ static uint32
 get_iovecs(net_buffer* _buffer, struct iovec* iovecs, uint32 vecCount)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	data_node* node = buffer->buffers.First();
 	uint32 count = 0;
 
 	while (node != NULL && count < vecCount) {
@@ -2275,7 +2268,7 @@ get_iovecs(net_buffer* _buffer, struct iovec* iovecs, uint32 vecCount)
 			count++;
 		}
 
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 	}
 
 	return count;
@@ -2286,14 +2279,14 @@ static uint32
 count_iovecs(net_buffer* _buffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	data_node* node = buffer->buffers.First();
 	uint32 count = 0;
 
 	while (node != NULL) {
 		if (node->used > 0)
 			count++;
 
-		node = (data_node*)list_get_next_item(&buffer->buffers, node);
+		node = buffer->buffers.GetNext(node);
 	}
 
 	return count;
