@@ -120,7 +120,7 @@ HWInterface::SetCursor(ServerCursor* cursor)
 	if (!fFloatingOverlaysLock.Lock())
 		return;
 
-	if (fCursor.Get() != cursor) {
+	if (fCursor.Get() != cursor && LockParallelAccess()) {
 		BRect oldFrame = _CursorFrame();
 
 		fCursor.SetTo(cursor);
@@ -129,6 +129,8 @@ HWInterface::SetCursor(ServerCursor* cursor)
 
 		_AdoptDragBitmap();
 		Invalidate(_CursorFrame());
+
+		UnlockParallelAccess();
 	}
 	fFloatingOverlaysLock.Unlock();
 }
@@ -162,7 +164,7 @@ HWInterface::SetCursorVisible(bool visible)
 	if (!fFloatingOverlaysLock.Lock())
 		return;
 
-	if (fCursorVisible != visible) {
+	if (fCursorVisible != visible && LockParallelAccess()) {
 		// NOTE: _CursorFrame() will
 		// return an invalid rect if
 		// fCursorVisible == false!
@@ -180,6 +182,8 @@ HWInterface::SetCursorVisible(bool visible)
 			_RestoreCursorArea();
 			Invalidate(r);
 		}
+
+		UnlockParallelAccess();
 	}
 	fFloatingOverlaysLock.Unlock();
 }
@@ -220,12 +224,11 @@ HWInterface::MoveCursorTo(float x, float y)
 	BPoint p(x, y);
 	if (p != fCursorLocation) {
 		// unhide cursor if it is obscured only
-		if (fCursorObscured) {
+		if (fCursorObscured)
 			SetCursorVisible(true);
-		}
 		IntRect oldFrame = _CursorFrame();
 		fCursorLocation = p;
-		if (fCursorVisible) {
+		if (fCursorVisible && LockParallelAccess()) {
 			// Invalidate and _DrawCursor would not draw
 			// anything if the cursor is hidden
 			// (invalid cursor frame), but explicitly
@@ -242,6 +245,8 @@ HWInterface::MoveCursorTo(float x, float y)
 				Invalidate(oldFrame);
 				Invalidate(newFrame);
 			}
+
+			UnlockParallelAccess();
 		}
 	}
 	fFloatingOverlaysLock.Unlock();
