@@ -166,10 +166,15 @@ NetworkAddressTest::TestEquals()
 		B_UNCONFIGURED_ADDRESS_FAMILIES);
 	BNetworkAddress v6AddressB("feed::dead:beef", (uint16)0,
 		B_UNCONFIGURED_ADDRESS_FAMILIES);
+	BNetworkAddress l2AddressA(AF_LINK, "01:23:45:67:89:ab");
+	BNetworkAddress l2AddressB(AF_LINK, "01:23:45:67:89:ab");
+	BNetworkAddress l2AddressC(AF_LINK, "01:23:45:67:89:00");
 
 	CPPUNIT_ASSERT(v4AddressA.Equals(v4AddressB));
 	CPPUNIT_ASSERT(v6AddressA.Equals(v6AddressB));
 	CPPUNIT_ASSERT(!v4AddressA.Equals(v6AddressA));
+	CPPUNIT_ASSERT(l2AddressA.Equals(l2AddressB));
+	CPPUNIT_ASSERT(!l2AddressA.Equals(l2AddressC));
 }
 
 

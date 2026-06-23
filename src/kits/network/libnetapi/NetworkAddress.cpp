@@ -1095,7 +1095,7 @@ BNetworkAddress::Equals(const BNetworkAddress& other, bool includePort) const
 			if (fAddress.ss_len != other.fAddress.ss_len)
 				return false;
 
-			return memcmp(&fAddress, &other.fAddress, fAddress.ss_len);
+			return memcmp(&fAddress, &other.fAddress, fAddress.ss_len) == 0;
 	}
 }
 
