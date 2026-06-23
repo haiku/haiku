@@ -69,7 +69,6 @@ public:
 
 	BFilePanelPoseView* PoseView() const;
 
-	virtual void Show();
 	virtual bool QuitRequested();
 	virtual void MenusBeginning();
 	virtual void MenusEnded();

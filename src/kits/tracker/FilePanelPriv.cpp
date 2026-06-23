@@ -188,7 +188,6 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target, const BEntry* s
 	fIsTrackingMenu(false),
 	fDefaultStateRestored(false)
 {
-	Lock();
 	InitIconPreloader();
 
 	fIsSavePanel = (mode == B_SAVE_PANEL);
@@ -287,7 +286,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target, const BEntry* s
 	if (StateNeedsSaving())
 		SaveState(false);
 
-	Unlock();
+	Run();
 }
 
 
@@ -467,20 +466,6 @@ TFilePanel::PoseView() const
 	ASSERT(dynamic_cast<BFilePanelPoseView*>(fPoseView) != NULL);
 
 	return static_cast<BFilePanelPoseView*>(fPoseView);
-}
-
-
-void
-TFilePanel::Show()
-{
-	// BLooper expects Run() to be called with the lock held. But since
-	// we released the initial lock in the constructor, we have to acquire
-	// it again before invoking Show(), in case this is the first invocation.
-	if (Lock()) {
-		_inherited::Show();
-		if (IsLocked())
-			Unlock();
-	}
 }
 
 
