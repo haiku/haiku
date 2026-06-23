@@ -470,6 +470,20 @@ TFilePanel::PoseView() const
 }
 
 
+void
+TFilePanel::Show()
+{
+	// BLooper expects Run() to be called with the lock held. But since
+	// we released the initial lock in the constructor, we have to acquire
+	// it again before invoking Show(), in case this is the first invocation.
+	if (Lock()) {
+		_inherited::Show();
+		if (IsLocked())
+			Unlock();
+	}
+}
+
+
 bool
 TFilePanel::QuitRequested()
 {
