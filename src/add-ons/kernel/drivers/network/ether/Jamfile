@@ -5,6 +5,7 @@ HaikuSubInclude etherpci ;
 HaikuSubInclude virtio ;
 HaikuSubInclude usb_davicom ;
 HaikuSubInclude usb_ecm ;
+HaikuSubInclude usb_ncm ;
 HaikuSubInclude usb_rndis ;
 HaikuSubInclude wb840 ;
 

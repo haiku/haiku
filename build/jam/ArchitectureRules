@@ -712,6 +712,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel drivers network ether usb_asix ;
 	EnableWerror src add-ons kernel drivers network ether usb_davicom ;
 	EnableWerror src add-ons kernel drivers network ether usb_ecm ;
+	EnableWerror src add-ons kernel drivers network ether usb_ncm ;
 	EnableWerror src add-ons kernel drivers network ether usb_rndis ;
 	EnableWerror src add-ons kernel drivers network ether via_rhine ;
 	EnableWerror src add-ons kernel drivers network ether virtio ;

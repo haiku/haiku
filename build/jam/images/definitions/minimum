@@ -340,6 +340,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 
 	etherpci
 	usb_davicom
+	usb_ncm
 	usb_rndis
 	wb840
 ] ;
