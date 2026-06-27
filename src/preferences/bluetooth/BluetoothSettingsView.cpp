@@ -83,7 +83,7 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 		B_TRANSLATE("Local devices found on system:"),
 		fLocalDevicesMenu);
 
-	fFriendlyName = new BTextControl("FriendlyName", B_TRANSLATE("Friendly Name:"), NULL,
+	fFriendlyName = new BTextControl("FriendlyName", B_TRANSLATE("Friendly name:"), NULL,
 		new BMessage(kMsgSetFriendlyName));
 
 	if (ActiveLocalDevice != NULL) {
