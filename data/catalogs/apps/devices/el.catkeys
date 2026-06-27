@@ -1,12 +1,10 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Devices	911816421
+1	greek, modern (1453-)	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Δίαυλος ACPI
 Encryption controller	Device		Ελεγκτής κρυπτογράφησης
 Devices	System name		Συσκευές
 USB bus	DevicesView		Θύρα USB
-Graphics Peripheral	DeviceSCSI		Περιφερειακή Συσκευή Γραφικών
 Processor	Device		Επεξεργαστής
 Generate system information	DevicesView		Πληροφορίες συστήματος
-Unknown	DeviceACPI		Άγνωστο
 Class info	DevicePCI		Πληροφορίες κατηγορίας
 USB bus	Device		Θύρα USB
 Computer	DevicesView		Υπολογιστής
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Επικοινωνίες
 Mass storage controller	Device		Ελεγκτής μαζικής αποθήκευσης
 Connection	DevicesView		Σύνδεση
 Printer	DeviceSCSI		Εκτυπωτής
-ACPI Processor Namespace '%2'	DeviceACPI		Επεξεργαστής ACPI Namespace '%2'
 Manufacturer	Device		Κατασκευαστής
 Scanner	DeviceSCSI		Σαρωτής
 Memory controller	Device		Ελεγκτής μνήμης
 Unknown device	DevicesView		Άγνωστη συσκευή
-Unknown	DevicePCI		Άγνωστο
 ACPI node '%1'	DeviceACPI		Μονάδα ACPI '%1'
-Optical Drive	DeviceSCSI		Οπτικός Οδηγός
 Name	PropertyList		Όνομα
 Manufacturer	DeviceSCSI		Κατασκευαστής
 Device name	Device		Όνομα συσκευής
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Κατηγορία συσκευής
 Device	Device		Συσκευή
 Input device controller	Device		Ελεγκτής εισαγώμενης συσκευής
 PCI bus	DevicesView		Δίαυλος PCI
-ACPI System Indicator	DeviceACPI		Δείκτης Συστήματος ACPI
-ACPI System Bus	DeviceACPI		Δίαυλος Συστήματος ACPI
-Tape Drive	DeviceSCSI		Κασέτα
 Changer	DeviceSCSI		Αλλαγή
 Serial bus controller	Device		Ελεγκτής σειριακού διαύλου
 Refresh devices	DevicesView		Ανανέωση συσκευών
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Τυπική περιφερειακή συσκ
 Value	PropertyList		Τιμή
 Devices	DevicesView		Συσκευές
 Device name	DeviceACPI		Όνομα συσκευής
-Card Reader	DeviceSCSI		Μονάδα ανάγνωσης καρτών
 Display controller	Device		Ελεγκτής γραφικών
-ACPI Button '%1'	DeviceACPI		Κουμπί ACPI '%1'
 ACPI <unknown>	DeviceACPI		ACPI <άγνωστο>
 Device name	DevicePCI		Όνομα συσκευής
-Disk Drive	DeviceSCSI		Οδηγός Δίσκου
 Other	DeviceSCSI		Άλλο
 Report compatibility	DevicesView		Αναφορά συμβατότητας
 Computer	Device		Υπολογιστής
 PCI bus	Device		Δίαυλος PCI
 Enclosure	DeviceSCSI		Περίβλημα δίσκου
 Order by:	DevicesView		Κατανομή κατά:
-ACPI Thermal Zone	DeviceACPI		Θερμική Ζώνη ACPI
 Intelligent controller	Device		Έξυπνος ελεγκτής
 Multimedia controller	Device		Ελεγκτής πολυμέσων
 Quit	DevicesView		Έξοδος

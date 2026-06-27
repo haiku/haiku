@@ -1,12 +1,10 @@
-1	catalan; valencian	x-vnd.Haiku-Devices	1667967532
+1	catalan; valencian	x-vnd.Haiku-Devices	542483980
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlador del xifratge
 Devices	System name		Dispositius
 USB bus	DevicesView		Bus USB
-Graphics Peripheral	DeviceSCSI		Perifèric gràfic
 Processor	Device		Processador
 Generate system information	DevicesView		Genera la informació del sistema
-Unknown	DeviceACPI		Desconegut
 Class info	DevicePCI		Informació de la classe
 USB bus	Device		Bus USB
 Computer	DevicesView		Ordinador
@@ -14,14 +12,13 @@ Communications	DeviceSCSI		Comunicacions
 Mass storage controller	Device		Controlador d'emmagatzematge massiu
 Connection	DevicesView		Connexió
 Printer	DeviceSCSI		Impressora
-ACPI Processor Namespace '%2'	DeviceACPI		Espai de noms de processador ACPI "%2'"
+Driver used	DevicesView		Controlador usat
 Manufacturer	Device		Fabricant
 Scanner	DeviceSCSI		Escànner
 Memory controller	Device		Controlador de la memòria
+Device paths	DevicesView		Camins del dispositiu
 Unknown device	DevicesView		El dispositiu és desconegut
-Unknown	DevicePCI		Desconegut
 ACPI node '%1'	DeviceACPI		Node d'ACPI %1
-Optical Drive	DeviceSCSI		Unitat òptica
 Name	PropertyList		Nom
 Manufacturer	DeviceSCSI		Fabricant
 Device name	Device		Nom del dispositiu
@@ -30,9 +27,6 @@ Device class	DeviceSCSI		Classe de dispositiu
 Device	Device		Dispositiu
 Input device controller	Device		Controlador de dispositiu d'entrada
 PCI bus	DevicesView		Bus PCI
-ACPI System Indicator	DeviceACPI		Indicador de Sistema ACPI
-ACPI System Bus	DeviceACPI		Bus del sistema ACPI
-Tape Drive	DeviceSCSI		Unitat de cinta
 Changer	DeviceSCSI		Canviador
 Serial bus controller	Device		Controlador del bus de sèrie
 Refresh devices	DevicesView		Actualitza la llista de dispositius
@@ -45,27 +39,25 @@ Generic system peripheral	Device		Perifèric genèric del sistema
 Value	PropertyList		Valor
 Devices	DevicesView		Dispositius
 Device name	DeviceACPI		Nom del dispositiu
-Card Reader	DeviceSCSI		Lector de targetes
 Display controller	Device		Controlador de la pantalla
-ACPI Button '%1'	DeviceACPI		Botó d'ACPI %1
 Bus	DevicesView		BUS
 ACPI <unknown>	DeviceACPI		ACPI <desconegut>
 Device name	DevicePCI		Nom del dispositiu
-Disk Drive	DeviceSCSI		Unitat de disc
 Other	DeviceSCSI		Altres
 Report compatibility	DevicesView		Informe de compatibilitat
 Computer	Device		Ordinador
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Annex
 Order by:	DevicesView		Ordena per:
-ACPI Thermal Zone	DeviceACPI		Zona tèrmica ACPI
 Intelligent controller	Device		Controlador intel·ligent
 Multimedia controller	Device		Controlador multimèdia
 Quit	DevicesView		Surt
 ISA bus	Device		Bus ISA
 ISA bus	DevicesView		Bus ISA
+Basic information	PropertyList		Informació bàsica
 Processor	DeviceSCSI		Processador
 Bridge	Device		Pont
+Attributes	PropertyList		Atributs
 Worm	DeviceSCSI		Cuc
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Fabricant

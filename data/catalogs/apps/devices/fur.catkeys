@@ -1,12 +1,10 @@
-1	friulian	x-vnd.Haiku-Devices	911816421
+1	friulian	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlôr di cifradure
 Devices	System name		Dispositîfs
 USB bus	DevicesView		Bus USB
-Graphics Peripheral	DeviceSCSI		Periferiche grafiche
 Processor	Device		Processôr
 Generate system information	DevicesView		Gjenere informazions di sisteme
-Unknown	DeviceACPI		No cognossût
 Class info	DevicePCI		Informazions classe
 USB bus	Device		Bus USB
 Computer	DevicesView		Computer
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Comunicazions
 Mass storage controller	Device		Controlôr memorie di masse
 Connection	DevicesView		Conession
 Printer	DeviceSCSI		Stampadore
-ACPI Processor Namespace '%2'	DeviceACPI		Spazi dai nons '%2' dal processôr ACPI
 Manufacturer	Device		Fabricant
 Scanner	DeviceSCSI		Scansionadôr
 Memory controller	Device		Controlôr de memorie
 Unknown device	DevicesView		Dispositîf no cognossût
-Unknown	DevicePCI		No cognossût
 ACPI node '%1'	DeviceACPI		Grop ACPI '%1'
-Optical Drive	DeviceSCSI		Unitât otiche
 Name	PropertyList		Non
 Manufacturer	DeviceSCSI		Fabricant
 Device name	Device		Non dal dispositîf
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Classe dispositîf
 Device	Device		Dispositîf
 Input device controller	Device		Controlôr dispositîfs di input
 PCI bus	DevicesView		Bus PCI
-ACPI System Indicator	DeviceACPI		Indicadôr di sisteme ACPI
-ACPI System Bus	DeviceACPI		Bus di Sisteme ACPI
-Tape Drive	DeviceSCSI		Unitât a curdele magnetiche
 Changer	DeviceSCSI		Modificadôr
 Serial bus controller	Device		Controlôr bus seriâl
 Refresh devices	DevicesView		Inzorne dispositîfs
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Periferiche gjeneriche di sisteme
 Value	PropertyList		Valôr
 Devices	DevicesView		Dispositîfs
 Device name	DeviceACPI		Non dal dispositîf
-Card Reader	DeviceSCSI		Letôr di schedis
 Display controller	Device		Controlôr dal visôr
-ACPI Button '%1'	DeviceACPI		Boton ACPI '%1'
 ACPI <unknown>	DeviceACPI		ACPI <no cognossût>
 Device name	DevicePCI		Non dal dispositîf
-Disk Drive	DeviceSCSI		Unitât disc
 Other	DeviceSCSI		Altri
 Report compatibility	DevicesView		Segnale compatibilitât
 Computer	Device		Computer
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Cente
 Order by:	DevicesView		Ordene par:
-ACPI Thermal Zone	DeviceACPI		Zone termiche ACPI
 Intelligent controller	Device		Controlôr inteligjent
 Multimedia controller	Device		Controlôr multimediâl
 Quit	DevicesView		Jes

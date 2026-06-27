@@ -1,12 +1,10 @@
-1	japanese	x-vnd.Haiku-Devices	1667967532
+1	japanese	x-vnd.Haiku-Devices	542483980
 ACPI bus	DevicesView		ACPI バス
 Encryption controller	Device		暗号化コントローラー
 Devices	System name		デバイス
 USB bus	DevicesView		USB バス
-Graphics Peripheral	DeviceSCSI		グラフィック装置
 Processor	Device		プロセッサ
 Generate system information	DevicesView		システム情報の作成
-Unknown	DeviceACPI		不明
 Class info	DevicePCI		クラス情報
 USB bus	Device		USB バス
 Computer	DevicesView		コンピューター
@@ -14,14 +12,13 @@ Communications	DeviceSCSI		通信
 Mass storage controller	Device		大容量記憶域コントローラー
 Connection	DevicesView		接続順
 Printer	DeviceSCSI		プリンター
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI プロセッサネームスペース '%2'
+Driver used	DevicesView		使用されているドライバー
 Manufacturer	Device		製造元
 Scanner	DeviceSCSI		スキャナー
 Memory controller	Device		メモリコントローラー
+Device paths	DevicesView		デバイスパス
 Unknown device	DevicesView		不明なデバイス
-Unknown	DevicePCI		不明
 ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
-Optical Drive	DeviceSCSI		光学ドライブ
 Name	PropertyList		名前
 Manufacturer	DeviceSCSI		製造元
 Device name	Device		デバイス名
@@ -30,9 +27,6 @@ Device class	DeviceSCSI		デバイスクラス
 Device	Device		デバイス
 Input device controller	Device		入力デバイスコントローラー
 PCI bus	DevicesView		PCI バス
-ACPI System Indicator	DeviceACPI		ACPI システムインジケーター 
-ACPI System Bus	DeviceACPI		ACPI システムバス
-Tape Drive	DeviceSCSI		テープドライブ
 Changer	DeviceSCSI		チェンジャー
 Serial bus controller	Device		シリアルバスコントローラー
 Refresh devices	DevicesView		デバイスの更新
@@ -45,27 +39,25 @@ Generic system peripheral	Device		汎用システム周辺機器
 Value	PropertyList		値
 Devices	DevicesView		デバイス
 Device name	DeviceACPI		デバイス名
-Card Reader	DeviceSCSI		カードリーダー
 Display controller	Device		ディスプレイコントローラー
-ACPI Button '%1'	DeviceACPI		ACPI ボタン '%1'
 Bus	DevicesView		バス
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		デバイス名
-Disk Drive	DeviceSCSI		ディスクドライブ
 Other	DeviceSCSI		その他
 Report compatibility	DevicesView		互換性レポート
 Computer	Device		コンピューター
 PCI bus	Device		PCI バス
 Enclosure	DeviceSCSI		格納装置
 Order by:	DevicesView		並び順:
-ACPI Thermal Zone	DeviceACPI		ACPI 温度管理ゾーン
 Intelligent controller	Device		インテリジェントコントローラー
 Multimedia controller	Device		マルチメディアコントローラー
 Quit	DevicesView		終了
 ISA bus	Device		ISA バス
 ISA bus	DevicesView		ISA バス
+Basic information	PropertyList		基本情報
 Processor	DeviceSCSI		プロセッサ
 Bridge	Device		ブリッジ
+Attributes	PropertyList		属性
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		製造元

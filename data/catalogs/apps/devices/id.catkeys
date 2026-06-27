@@ -1,8 +1,7 @@
-1	indonesian	x-vnd.Haiku-Devices	907968852
+1	indonesian	x-vnd.Haiku-Devices	4197922366
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Pengontrol enkripsi
 Devices	System name		Perangkat
-Graphics Peripheral	DeviceSCSI		Perangkat Grafis
 Processor	Device		Prosesor
 Generate system information	DevicesView		Hasilkan informasi sistem
 Class info	DevicePCI		Info kelas
@@ -11,14 +10,11 @@ Communications	DeviceSCSI		Komunikasi
 Mass storage controller	Device		Pengontrol penyimpanan massal
 Connection	DevicesView		Koneksi
 Printer	DeviceSCSI		Pencetak
-ACPI Processor Namespace '%2'	DeviceACPI		Namespace Prosesor ACPI '%2'
 Manufacturer	Device		Pabrikan
 Scanner	DeviceSCSI		Pemindai
 Memory controller	Device		Pengendali memori
 Unknown device	DevicesView		Perangkat tak dikenal
-Unknown	DevicePCI		Tidak diketahui
 ACPI node '%1'	DeviceACPI		Titik ACPI '%1'
-Optical Drive	DeviceSCSI		Drive Optik
 Name	PropertyList		Nama
 Manufacturer	DeviceSCSI		Pabrikan
 Device name	Device		Nama perangkat
@@ -27,9 +23,6 @@ Device class	DeviceSCSI		Kelas perangkat
 Device	Device		Perangkat
 Input device controller	Device		Pengontrol perangkat input
 PCI bus	DevicesView		Bus PCI
-ACPI System Indicator	DeviceACPI		Indikator Sistem ACPI
-ACPI System Bus	DeviceACPI		Sistem Bus ACPI
-Tape Drive	DeviceSCSI		Drive Pita
 Changer	DeviceSCSI		Pengalih
 Serial bus controller	Device		Pengontrol serial bus
 Refresh devices	DevicesView		Segarkan perangkat
@@ -42,19 +35,15 @@ Generic system peripheral	Device		Periferal sistem generik
 Value	PropertyList		Nilai
 Devices	DevicesView		Perangkat
 Device name	DeviceACPI		Nama perangkat
-Card Reader	DeviceSCSI		Pembaca kartu
 Display controller	Device		Pengontrol display
-ACPI Button '%1'	DeviceACPI		Tombol ACPI '%1'
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nama perangkat
-Disk Drive	DeviceSCSI		Disk Drive
 Other	DeviceSCSI		Lain
 Report compatibility	DevicesView		Laporkan kompatibilitas
 Computer	Device		Komputer
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Enklosur
 Order by:	DevicesView		Urutkan berdasarkan:
-ACPI Thermal Zone	DeviceACPI		Zona Suhu ACPI
 Intelligent controller	Device		Pengontrol cerdas
 Multimedia controller	Device		Pengontrol multimedia
 Quit	DevicesView		Berhenti

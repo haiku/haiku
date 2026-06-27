@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Screen	1459314753
+1	german	x-vnd.Haiku-Screen	677808371
 no	Screen		nein
 bits/pixel	Screen		Bits/Pixel
 15 bits/pixel, 32768 colors	Screen		15 Bits/Pixel, 32768 Farben
@@ -21,6 +21,7 @@ Use laptop panel:	Screen		Laptop-Panel verwenden:
 Unknown	Screen		Unbekannt
 Could not write VESA mode settings file:\n\t	Screen		Die VESA-Modus-Datei konnte nicht gespeichert werden:\n\t
 Display info	Screen		Bildschirminfo
+30 bits/pixel, 1 billion colors	Screen		30 Bits/Pixel, 1 Milliarde Farben
 Settings will revert in %seconds.	Screen		Die Einstellungen werden in %seconds zurückgesetzt.
 Cancel	Screen		Abbrechen
 Other…	Screen		Andere …
@@ -50,6 +51,7 @@ Apply	Screen		Anwenden
 horizontally	Screen		horizontal
 disable	Screen		ausschalten
 Set background…	Screen		Hintergrund einstellen …
+24 bits/pixel, 16 million colors	Screen		24 Bits/Pixel, 16 Millionen Farben
 Type or use the left and right arrow keys.	Screen		Wert eingeben oder Pfeiltasten links/rechts benutzen.
 Screen	System name		Bildschirm
 Do you wish to keep these settings?	Screen		Sollen diese Einstellungen beibehalten werden?

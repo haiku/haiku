@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Devices	2103278039
+1	croatian	x-vnd.Haiku-Devices	3001748741
 ACPI bus	DevicesView		ACPI bus
 Encryption controller	Device		Kontroler enkripcije
 Devices	System name		Uređaji
@@ -13,9 +13,7 @@ Manufacturer	Device		Proizvođač
 Scanner	DeviceSCSI		Skener
 Memory controller	Device		Mrežni upravljač
 Unknown device	DevicesView		Nepoznati uređaj
-Unknown	DevicePCI		Nepoznato
 ACPI node '%1'	DeviceACPI		ACPI čvor '%1'
-Optical Drive	DeviceSCSI		Optički pogon
 Name	PropertyList		Ime
 Manufacturer	DeviceSCSI		Proizvođač
 Device name	Device		Ime uređaja
@@ -33,11 +31,9 @@ Wireless controller	Device		Bežični kontroler
 Value	PropertyList		Vrijednost
 Devices	DevicesView		Uređaji
 Device name	DeviceACPI		Ime uređaja
-Card Reader	DeviceSCSI		Čitač kartica
 Display controller	Device		Upravljač zaslona
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Ime uređaja
-Disk Drive	DeviceSCSI		Pogon diska
 Other	DeviceSCSI		Ostalo
 Report compatibility	DevicesView		Izvještaj o kompatibilnosti
 Computer	Device		Računalo

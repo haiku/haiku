@@ -1,12 +1,10 @@
-1	swedish	x-vnd.Haiku-Devices	1667967532
+1	swedish	x-vnd.Haiku-Devices	542483980
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringsstyrenhet
 Devices	System name		Enheter
 USB bus	DevicesView		USB-buss
-Graphics Peripheral	DeviceSCSI		Grafisk kringutrustning
 Processor	Device		Processor
 Generate system information	DevicesView		Generera systeminformation
-Unknown	DeviceACPI		Okänd
 Class info	DevicePCI		Klass information
 USB bus	Device		USB-buss
 Computer	DevicesView		Dator
@@ -14,14 +12,13 @@ Communications	DeviceSCSI		Kommunikations
 Mass storage controller	Device		Lagringskontroller
 Connection	DevicesView		Anslutning
 Printer	DeviceSCSI		Skrivare
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor-namnrymd '%2'
+Driver used	DevicesView		Enhet används
 Manufacturer	Device		Tillverkare
 Scanner	DeviceSCSI		Skanner
 Memory controller	Device		Minneskontroller
+Device paths	DevicesView		Enhetsvägar
 Unknown device	DevicesView		Okänd enhet
-Unknown	DevicePCI		Okänt
 ACPI node '%1'	DeviceACPI		ACPI nod '%1'
-Optical Drive	DeviceSCSI		Optisk enhet
 Name	PropertyList		Namn
 Manufacturer	DeviceSCSI		Tillverkare
 Device name	Device		Enhetsnamn
@@ -30,9 +27,6 @@ Device class	DeviceSCSI		Enhetsklass
 Device	Device		Enhet
 Input device controller	Device		Indataenhetskontroller
 PCI bus	DevicesView		PCI-buss
-ACPI System Indicator	DeviceACPI		ACPI systemindikator
-ACPI System Bus	DeviceACPI		ACPI systembuss
-Tape Drive	DeviceSCSI		Bandenhet
 Changer	DeviceSCSI		Växlare
 Serial bus controller	Device		Seriell kontroller
 Refresh devices	DevicesView		Uppdatera enheter
@@ -45,27 +39,25 @@ Generic system peripheral	Device		Allmänt systemtillbehör
 Value	PropertyList		Värde
 Devices	DevicesView		Enheter
 Device name	DeviceACPI		Enhetsnamn
-Card Reader	DeviceSCSI		Kortläsare
 Display controller	Device		Skärmkontroller
-ACPI Button '%1'	DeviceACPI		ACPI Knapp '%1'
 Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Enhetsnamn
-Disk Drive	DeviceSCSI		Diskenhet
 Other	DeviceSCSI		Annan
 Report compatibility	DevicesView		Rapportera kompatibilitet
 Computer	Device		Dator
 PCI bus	Device		PCI-buss
 Enclosure	DeviceSCSI		Hölje
 Order by:	DevicesView		Sortera efter:
-ACPI Thermal Zone	DeviceACPI		ACPI termisk zon
 Intelligent controller	Device		Intelligent styrenhet
 Multimedia controller	Device		Multimediakontroller
 Quit	DevicesView		Avsluta
 ISA bus	Device		ISA-buss
 ISA bus	DevicesView		ISA-buss
+Basic information	PropertyList		Grundläggande information
 Processor	DeviceSCSI		Processor
 Bridge	Device		Brygga
+Attributes	PropertyList		Attribut
 Worm	DeviceSCSI		Mask
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Tillverkare

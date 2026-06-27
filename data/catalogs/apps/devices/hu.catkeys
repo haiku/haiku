@@ -1,12 +1,10 @@
-1	hungarian	x-vnd.Haiku-Devices	1667967532
+1	hungarian	x-vnd.Haiku-Devices	2130736270
 ACPI bus	DevicesView		ACPI port
 Encryption controller	Device		Titkosító vezérlő
 Devices	System name		Eszközök
 USB bus	DevicesView		USB busz
-Graphics Peripheral	DeviceSCSI		Grafikus periféria
 Processor	Device		Processzor
 Generate system information	DevicesView		Rendszerinformáció létrehozása
-Unknown	DeviceACPI		Ismeretlen
 Class info	DevicePCI		Osztály-információk
 USB bus	Device		USB busz
 Computer	DevicesView		Számítógép
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Kommunikáció
 Mass storage controller	Device		Háttértároló vezérlő
 Connection	DevicesView		Csatlakozás
 Printer	DeviceSCSI		Nyomtató
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI processzor névtér '%2'
 Manufacturer	Device		Gyártó
 Scanner	DeviceSCSI		Lapolvasó
 Memory controller	Device		Memóriavezérlő
 Unknown device	DevicesView		Ismeretlen eszköz
-Unknown	DevicePCI		Ismeretlen
 ACPI node '%1'	DeviceACPI		ACPI csomópont '%1'
-Optical Drive	DeviceSCSI		Optikai meghajtó
 Name	PropertyList		Név
 Manufacturer	DeviceSCSI		Gyártó
 Device name	Device		Eszköznév
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Eszközosztály
 Device	Device		Eszközök
 Input device controller	Device		Beviteli eszköz vezérlő
 PCI bus	DevicesView		PCI port
-ACPI System Indicator	DeviceACPI		ACPI rendszerjelző
-ACPI System Bus	DeviceACPI		ACPI rendszerbusz
-Tape Drive	DeviceSCSI		Szalagos meghajtó
 Changer	DeviceSCSI		Cserélő
 Serial bus controller	Device		Soros busz vezérlő
 Refresh devices	DevicesView		Eszközök frissítése
@@ -45,20 +37,16 @@ Generic system peripheral	Device		Általános rendszer periféria
 Value	PropertyList		Érték
 Devices	DevicesView		Eszközök
 Device name	DeviceACPI		Eszköznév
-Card Reader	DeviceSCSI		Kártyaolvasó
 Display controller	Device		Kijelző vezérlő
-ACPI Button '%1'	DeviceACPI		ACPI gomb '%1'
 Bus	DevicesView		Busz
 ACPI <unknown>	DeviceACPI		ACPI <ismeretlen>
 Device name	DevicePCI		Eszköznév
-Disk Drive	DeviceSCSI		Lemezmeghajtó
 Other	DeviceSCSI		Egyéb
 Report compatibility	DevicesView		Kompatibilitás jelentése
 Computer	Device		Számítógép
 PCI bus	Device		PCI port
 Enclosure	DeviceSCSI		Doboz
 Order by:	DevicesView		Rendezés alapja:
-ACPI Thermal Zone	DeviceACPI		ACPI hőzóna
 Intelligent controller	Device		Intelligens vezérlő
 Multimedia controller	Device		Multimedia vezérlő
 Quit	DevicesView		Kilépés

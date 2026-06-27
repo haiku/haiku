@@ -1,12 +1,10 @@
-1	finnish	x-vnd.Haiku-Devices	911816421
+1	finnish	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		ACPI-väylä
 Encryption controller	Device		Salausohjain
 Devices	System name		Laitteet
 USB bus	DevicesView		USB-väylä
-Graphics Peripheral	DeviceSCSI		Grafiikkaoheislaite
 Processor	Device		Suoritin
 Generate system information	DevicesView		Tuota järjestelmätiedot
-Unknown	DeviceACPI		Tuntematon
 Class info	DevicePCI		Luokkatiedot
 USB bus	Device		USB-väylä
 Computer	DevicesView		Tietokone
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Viestinnät
 Mass storage controller	Device		Massamuistilaiteohjain
 Connection	DevicesView		Yhteys
 Printer	DeviceSCSI		Tulostin
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessorinimiavaruus ’%2’
 Manufacturer	Device		Valmistaja
 Scanner	DeviceSCSI		Skanneri
 Memory controller	Device		Muistiohjain
 Unknown device	DevicesView		Tuntematon laite
-Unknown	DevicePCI		Tuntematon
 ACPI node '%1'	DeviceACPI		ACPI-solmu ’%1’
-Optical Drive	DeviceSCSI		Optinen laite
 Name	PropertyList		Nimi
 Manufacturer	DeviceSCSI		Valmistaja
 Device name	Device		Laitenimi
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Laiteluokka
 Device	Device		Laite
 Input device controller	Device		Syötelaiteohjain
 PCI bus	DevicesView		PCI-väylä
-ACPI System Indicator	DeviceACPI		ACPI-järjestelmäindikaattori
-ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
-Tape Drive	DeviceSCSI		Nauha-asema
 Changer	DeviceSCSI		Vaihtaja
 Serial bus controller	Device		Sarjaväyläohjain
 Refresh devices	DevicesView		Verestä laitteita
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Yleinen järjestelmän oheislaite
 Value	PropertyList		Arvo
 Devices	DevicesView		Laitteet
 Device name	DeviceACPI		Laitenimi
-Card Reader	DeviceSCSI		Korttilukija
 Display controller	Device		Näyttöohjain
-ACPI Button '%1'	DeviceACPI		ACPI-painike '%1'
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Laitenimi
-Disk Drive	DeviceSCSI		Levyasema
 Other	DeviceSCSI		Muu
 Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
 Computer	Device		Tietokone
 PCI bus	Device		PCI-väylä
 Enclosure	DeviceSCSI		Kotelo
 Order by:	DevicesView		Järjestys:
-ACPI Thermal Zone	DeviceACPI		ACPI-lämpöalue
 Intelligent controller	Device		Älyohjain
 Multimedia controller	Device		Multimediaohjain
 Quit	DevicesView		Poistu

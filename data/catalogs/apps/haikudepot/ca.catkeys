@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2384088929
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	4230673291
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 User ratings loading…	PackageInfoView		Es carreguen les valoracions dels usuaris...
 Available packages	MainWindow		Paquets disponibles
@@ -50,6 +50,7 @@ No screenshot available.	PackageInfoView		No hi ha cap captura de pantalla dispo
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		S'obtenen les valoracions dels usuaris per al paquet.
 Reboot required	PackageManager		Cal reiniciar
 All packages	PackageListView		Tots els paquets
+Checking server information	ServerRuntimeInformationVerifierProcess		Es comprova la informació del servidor.
 Send	RatePackageWindow		Envia
 Creating package list…	FeaturedPackagesView		Es crea la llista de paquets...
 Start package daemon	App		Inicia el dimoni de paquets
@@ -83,6 +84,7 @@ Continue	App		Continua
 A password is required.	UserLoginWindow		Cal una contrasenya.
 Language	RatePackageWindow		Llengua
 Open %DeskbarLink%	PackageAction		Obre %DeskbarLink%
+Login disabled	MainWindow		Entrada inhabilitada
 Status	PackageListView		Estat
 Network transport error	ServerHelper		Error de transport de xarxa
 Cancel	PackageResult		Cancel·la
@@ -141,6 +143,7 @@ Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 No, quit	App		No, tanca't
 Show	MainWindow		Mostra...
+Timestamp discrepancy	ServerRuntimeInformationVerifierProcess		Discrepància de marca de temps
 No contents available.	PackageInfoView		No hi ha contingut disponible.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aquesta aplicació escriu i llegeix alguns fitxers de treball de l'ordinador per tal de funcionar. Sembla que hi ha problemes per escriure un fitxer de prova a [%TestFilePath%]. Comproveu que no hi ha cap problema amb el disc local o els permisos que pugui evitar que aquesta aplicació escrigui fitxers a la ubicació del directori. Podeu optar per reconèixer aquest problema i continuar, però és possible que alguna funcionalitat estigui inhabilitada.
 Settings…	MainWindow		Paràmetres...
@@ -221,6 +224,7 @@ The nickname is required.	UserLoginWindow		Cal el sobrenom.
 Apply changes	PackageResult		Aplica els canvis
 Server error	ServerHelper		Error de servidor
 Rate package	RatePackageWindow		Puntueu el paquet
+The server and this computer have a discrepancy in the current timestamp of around %DiscrepancySeconds% seconds. This may cause issues for HaikuDepot communicating with the server. Check your computer's clock settings and correct the current time if necessary.	ServerRuntimeInformationVerifierProcess		El servidor i aquest ordinador tenen una discrepància de marca de temps actual d'uns %DiscrepancySeconds% segons. Això pot causar problemes per a la comunicació de del Dipòsit del Haiku amb el servidor. Comproveu la configuració del rellotge de l'ordinador i corregiu-ne l'hora actual si cal.
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Es registra la vista de paquet \"%PackageName%\"
 Sending anonymous usage data	MainWindow		S'envien dades d'ús anònimes
 Log in	UserLoginWindow		Entreu

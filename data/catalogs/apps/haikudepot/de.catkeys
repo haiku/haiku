@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2384088929
+1	german	x-vnd.Haiku-HaikuDepot	4230673291
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 User ratings loading…	PackageInfoView		Bewertungen werden geladen …
 Available packages	MainWindow		Verfügbare Pakete
@@ -50,6 +50,7 @@ No screenshot available.	PackageInfoView		Kein Screenshot verfügbar.
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Bewertungen des Pakets werden geladen
 Reboot required	PackageManager		Neustart erforderlich
 All packages	PackageListView		Alle Pakete
+Checking server information	ServerRuntimeInformationVerifierProcess		Prüfen der Server-Informationen
 Send	RatePackageWindow		Senden
 Creating package list…	FeaturedPackagesView		Erzeuge Paketliste…
 Start package daemon	App		Paket-Daemon starten
@@ -83,6 +84,7 @@ Continue	App		Weiter
 A password is required.	UserLoginWindow		Es wird ein Kennwort benötigt.
 Language	RatePackageWindow		Sprache
 Open %DeskbarLink%	PackageAction		%DeskbarLink% öffnen
+Login disabled	MainWindow		Login deaktiviert
 Status	PackageListView		Status
 Network transport error	ServerHelper		Netzwerk-Transportfehler
 Cancel	PackageResult		Abbrechen
@@ -141,6 +143,7 @@ Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisiere Icons
 No, quit	App		Nein, Beenden
 Show	MainWindow		Anzeigen
+Timestamp discrepancy	ServerRuntimeInformationVerifierProcess		Zeitstempel stimmen nicht überein
 No contents available.	PackageInfoView		Paketinhalt nicht verfügbar.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Diese Anwendung schreibt und liest einige Arbeitsdateien auf diesem Computer, um richtig zu funktionieren. Eine Testdatei konnte jedoch nicht nach [%TestFilePath%] geschrieben werden. Bitte prüfen, ob es Probleme mit der lokalen Festplatte gibt oder ob für diesen Ordner nötige Schreibrechte fehlen. Dieses Problem kann zwar ignoriert werden, allerdings wird die Anwendung dann nur eingeschränkt funktionieren.
 Settings…	MainWindow		Einstellungen …
@@ -221,6 +224,7 @@ The nickname is required.	UserLoginWindow		Der Benutzername wird benötigt.
 Apply changes	PackageResult		Änderungen übernehmen
 Server error	ServerHelper		Server-Fehler
 Rate package	RatePackageWindow		Paket bewerten
+The server and this computer have a discrepancy in the current timestamp of around %DiscrepancySeconds% seconds. This may cause issues for HaikuDepot communicating with the server. Check your computer's clock settings and correct the current time if necessary.	ServerRuntimeInformationVerifierProcess		Die Zeitstempel von Server und diesem Computer unterscheiden sich um etwa %DiscrepancySeconds%. Dadurch kann es zu Problemen bei der Kommunikation zwischen HaikuDepot und dem Server kommen.  Die Zeiteinstellungen des Computers sollten überprüft und ggf. korrigiert werden.
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Seitenaufruf von \"%PackageName%\" zählen
 Sending anonymous usage data	MainWindow		Sende anonyme Nutzungsdaten
 Log in	UserLoginWindow		Anmelden

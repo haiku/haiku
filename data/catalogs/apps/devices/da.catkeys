@@ -1,12 +1,10 @@
-1	danish	x-vnd.Haiku-Devices	911816421
+1	danish	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		ACPI-bus
 Encryption controller	Device		Krypteringsstyreenhed
 Devices	System name		Enheder
 USB bus	DevicesView		USB-bus
-Graphics Peripheral	DeviceSCSI		Ekstern grafikenhed
 Processor	Device		Processor
 Generate system information	DevicesView		Opbyg systemoplysninger
-Unknown	DeviceACPI		Ukendt
 Class info	DevicePCI		Klasseoplysninger
 USB bus	Device		USB-bus
 Computer	DevicesView		Computer
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Kommunikation
 Mass storage controller	Device		Lagringsstyreenhed
 Connection	DevicesView		Forbindelse
 Printer	DeviceSCSI		Printer
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI-processornavnerum '%2'
 Manufacturer	Device		Producent
 Scanner	DeviceSCSI		Skanner
 Memory controller	Device		Hukommelsesstyreenhed
 Unknown device	DevicesView		Ukendt enhed
-Unknown	DevicePCI		Ukendt
 ACPI node '%1'	DeviceACPI		ACPI-knudepunkt '%1'
-Optical Drive	DeviceSCSI		Optisk drev
 Name	PropertyList		Navn
 Manufacturer	DeviceSCSI		Producent
 Device name	Device		Enhedsnavn
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Enhedsklasse
 Device	Device		Enhed
 Input device controller	Device		Styreenhed for inddataenhed
 PCI bus	DevicesView		PCI-bus
-ACPI System Indicator	DeviceACPI		ACPI-systemindikator
-ACPI System Bus	DeviceACPI		ACPI-systembus
-Tape Drive	DeviceSCSI		Båndstation
 Changer	DeviceSCSI		Skifter
 Serial bus controller	Device		Styreenhed for seriel bus
 Refresh devices	DevicesView		Genopfrisk enheder
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Almen systemenhed
 Value	PropertyList		Værdi
 Devices	DevicesView		Enheder
 Device name	DeviceACPI		Enhedsnavn
-Card Reader	DeviceSCSI		Kortlæser
 Display controller	Device		Skærmstyring
-ACPI Button '%1'	DeviceACPI		ACPI-knap '%1'
 ACPI <unknown>	DeviceACPI		ACPI <ukendt>
 Device name	DevicePCI		Enhedsnavn
-Disk Drive	DeviceSCSI		Diskdrev
 Other	DeviceSCSI		Andet
 Report compatibility	DevicesView		Indberet kompatibilitet
 Computer	Device		Computer
 PCI bus	Device		PCI-bus
 Enclosure	DeviceSCSI		Indpakning
 Order by:	DevicesView		Sortér efter:
-ACPI Thermal Zone	DeviceACPI		ACPI-temperaturområde
 Intelligent controller	Device		Intelligent styreenhed
 Multimedia controller	Device		Multimediestyreenhed
 Quit	DevicesView		Afslut

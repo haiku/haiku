@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2384088929
+1	swedish	x-vnd.Haiku-HaikuDepot	681075858
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 User ratings loading…	PackageInfoView		Användarbetyg laddas...
 Available packages	MainWindow		Tillgängliga paket
@@ -50,6 +50,7 @@ No screenshot available.	PackageInfoView		Ingen skärmdump tillgänglig.
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Hämta användarbetyg för paket
 Reboot required	PackageManager		Omstart krävs
 All packages	PackageListView		Alla paket
+Checking server information	ServerRuntimeInformationVerifierProcess		Kontrollerar serverinformation
 Send	RatePackageWindow		Skicka
 Creating package list…	FeaturedPackagesView		Skapar paketlista...
 Start package daemon	App		Starta paket-servicen
@@ -83,6 +84,7 @@ Continue	App		Fortsätt
 A password is required.	UserLoginWindow		Ett lösenord krävs.
 Language	RatePackageWindow		Språk
 Open %DeskbarLink%	PackageAction		Öppna %DeskbarLink%
+Login disabled	MainWindow		Inloggning avaktiverad
 Status	PackageListView		Status
 Network transport error	ServerHelper		Nättransportfel
 Cancel	PackageResult		Avbryt

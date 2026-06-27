@@ -1,12 +1,10 @@
-1	romanian	x-vnd.Haiku-Devices	911816421
+1	romanian	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Magistrală ACPI
 Encryption controller	Device		Controlor de criptare
 Devices	System name		Dispozitive
 USB bus	DevicesView		Magistrală USB
-Graphics Peripheral	DeviceSCSI		Periferice grafice
 Processor	Device		Procesor
 Generate system information	DevicesView		Generează informațiile de sistem
-Unknown	DeviceACPI		Necunoscut
 Class info	DevicePCI		Informații clasă
 USB bus	Device		Magistrală USB
 Computer	DevicesView		Calculator
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Comunicații
 Mass storage controller	Device		Controlor de stocare în masă
 Connection	DevicesView		Conexiune
 Printer	DeviceSCSI		Imprimantă
-ACPI Processor Namespace '%2'	DeviceACPI		Spațiu de nume de procesor ACPI „%2”
 Manufacturer	Device		Producător
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Controlor de memorie
 Unknown device	DevicesView		Dispozitiv necunoscut
-Unknown	DevicePCI		Necunoscut
 ACPI node '%1'	DeviceACPI		Nod ACPI „%1”
-Optical Drive	DeviceSCSI		Unitate optică
 Name	PropertyList		Nume
 Manufacturer	DeviceSCSI		Producător
 Device name	Device		Nume dispozitiv
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Clasă de dispozitive
 Device	Device		Dispozitiv
 Input device controller	Device		Controlor de dispozitiv de intrare
 PCI bus	DevicesView		Magistrală PCI
-ACPI System Indicator	DeviceACPI		Indicator de sistem ACPI
-ACPI System Bus	DeviceACPI		Magistrală de sistem ACPI
-Tape Drive	DeviceSCSI		Unitate de bandă magnetică
 Changer	DeviceSCSI		Schimbător
 Serial bus controller	Device		Controlor de magistrală serială
 Refresh devices	DevicesView		Reîmprospătează dispozitivele
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Periferice generice de sistem
 Value	PropertyList		Valoare
 Devices	DevicesView		Dispozitive
 Device name	DeviceACPI		Nume dispozitiv
-Card Reader	DeviceSCSI		Cititor de carduri
 Display controller	Device		Controlor de afișaj
-ACPI Button '%1'	DeviceACPI		Buton ACPI „%1”
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nume dispozitiv
-Disk Drive	DeviceSCSI		Unitate disc
 Other	DeviceSCSI		Altele
 Report compatibility	DevicesView		Raportează compatibilitatea
 Computer	Device		Calculator
 PCI bus	Device		Magistrală PCI
 Enclosure	DeviceSCSI		Incintă
 Order by:	DevicesView		Ordonare după:
-ACPI Thermal Zone	DeviceACPI		Zonă termală ACPI
 Intelligent controller	Device		Controlor inteligent
 Multimedia controller	Device		Controlor multimedia
 Quit	DevicesView		Ieșire

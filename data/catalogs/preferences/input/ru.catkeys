@@ -27,7 +27,7 @@ Revert	InputMouse		Откатить
 Slow	KeyboardView		Медленно
 2-Button	SettingsView		Двухкнопочная
 Click to focus and raise	SettingsView		Кликнуть для фокуса и поднятия окна
-Natural scrolling	TouchpadPrefView		Естественная прокрутка (по типу смартфона)
+Natural scrolling	TouchpadPrefView		Естественная (по типу смартфона)
 Vertical	TouchpadPrefView		Вертикальная
 Low	TouchpadPrefView		Медленно
 Focus follows mouse	SettingsView		Фокус следует за курсором

@@ -1,12 +1,10 @@
-1	polish	x-vnd.Haiku-Devices	911816421
+1	polish	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Magistrala ACPI
 Encryption controller	Device		Kontroler szyfrowania
 Devices	System name		Urządzenia
 USB bus	DevicesView		Szyna USB
-Graphics Peripheral	DeviceSCSI		Grafika obwodowa
 Processor	Device		Procesor
 Generate system information	DevicesView		Wygeneruj informacje systemowe
-Unknown	DeviceACPI		Nieznane
 Class info	DevicePCI		Informacja klasy
 USB bus	Device		Szyna USB
 Computer	DevicesView		Komputer
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Komunikacja
 Mass storage controller	Device		Kontroler pamięci masowej
 Connection	DevicesView		Połączenie
 Printer	DeviceSCSI		Drukarka
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor Namespace „%2”
 Manufacturer	Device		Producent
 Scanner	DeviceSCSI		Skaner
 Memory controller	Device		Kontroler pamięci
 Unknown device	DevicesView		Nieznane urządzenie
-Unknown	DevicePCI		Nieznane
 ACPI node '%1'	DeviceACPI		Węzeł ACPI „%1”
-Optical Drive	DeviceSCSI		Napęd optyczny
 Name	PropertyList		Nazwa
 Manufacturer	DeviceSCSI		Producent
 Device name	Device		Nazwa urządzenia
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Klasa urządzenia
 Device	Device		Urządzenie
 Input device controller	Device		Kontroler urządzenia wejścia
 PCI bus	DevicesView		Magistrala PCI
-ACPI System Indicator	DeviceACPI		Wskaźnik systemowy ACPI
-ACPI System Bus	DeviceACPI		ACPI Szyna Systemowa
-Tape Drive	DeviceSCSI		Napęd taśmowy
 Changer	DeviceSCSI		Zmieniarka
 Serial bus controller	Device		Kontroler magistrali szeregowej
 Refresh devices	DevicesView		Odśwież urządzenia
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Generyczne urządzenie peryferyjne
 Value	PropertyList		Wartość
 Devices	DevicesView		Urządzenia
 Device name	DeviceACPI		Nazwa urządzenia
-Card Reader	DeviceSCSI		Czytnik kart
 Display controller	Device		Kontroler ekranu
-ACPI Button '%1'	DeviceACPI		Przycisk ACPI „%1”
 ACPI <unknown>	DeviceACPI		ACPI <nieznany>
 Device name	DevicePCI		Nazwa urządzenia
-Disk Drive	DeviceSCSI		Dysk
 Other	DeviceSCSI		Inne
 Report compatibility	DevicesView		Raport zgodności
 Computer	Device		Komputer
 PCI bus	Device		Magistrala PCI
 Enclosure	DeviceSCSI		Załącznik
 Order by:	DevicesView		Sortuj według:
-ACPI Thermal Zone	DeviceACPI		Strefa termalna ACPI
 Intelligent controller	Device		Kontroler inteligentny
 Multimedia controller	Device		Kontroler multimediów
 Quit	DevicesView		Zakończ

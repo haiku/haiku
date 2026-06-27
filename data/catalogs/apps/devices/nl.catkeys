@@ -1,12 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-Devices	911816421
+1	dutch; flemish	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		ACPI-bus
 Encryption controller	Device		Encryptie-controller
 Devices	System name		Devices
 USB bus	DevicesView		USB-bus
-Graphics Peripheral	DeviceSCSI		Graphics randapparaat
 Processor	Device		Processor
 Generate system information	DevicesView		Genereer systeeminformatie
-Unknown	DeviceACPI		Onbekend
 Class info	DevicePCI		Klasse info
 USB bus	Device		USB-bus
 Computer	DevicesView		Computer
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Communicaties
 Mass storage controller	Device		Massa-opslagcontroller
 Connection	DevicesView		Verbinding
 Printer	DeviceSCSI		Printer
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor Naamruimte '%2'
 Manufacturer	Device		Fabrikant
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Geheugencontroller
 Unknown device	DevicesView		Onbekend apparaat
-Unknown	DevicePCI		Onbekend
 ACPI node '%1'	DeviceACPI		ACPI-node '%1'
-Optical Drive	DeviceSCSI		Optische schijf
 Name	PropertyList		Naam
 Manufacturer	DeviceSCSI		Fabrikant
 Device name	Device		Apparaatnaam
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Apparaatklasse
 Device	Device		Apparaat
 Input device controller	Device		Inputapparaat-controller
 PCI bus	DevicesView		PCI-bus
-ACPI System Indicator	DeviceACPI		ACPI-systeemindicator
-ACPI System Bus	DeviceACPI		ACPI-systeembus
-Tape Drive	DeviceSCSI		Tape-station
 Changer	DeviceSCSI		Wisselaar
 Serial bus controller	Device		Seriële-bus-controller
 Refresh devices	DevicesView		Apparaten her-initialiseren
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Generiek systeem-randapparaat
 Value	PropertyList		Waarde
 Devices	DevicesView		Devices
 Device name	DeviceACPI		Apparaatnaam
-Card Reader	DeviceSCSI		Kaartlezer
 Display controller	Device		Displaycontroller
-ACPI Button '%1'	DeviceACPI		ACPI Knop '%1'
 ACPI <unknown>	DeviceACPI		ACPI <onbekend>
 Device name	DevicePCI		Apparaatnaam
-Disk Drive	DeviceSCSI		Schijf
 Other	DeviceSCSI		Andere
 Report compatibility	DevicesView		Rapporteer compatibiliteit
 Computer	Device		Computer
 PCI bus	Device		PCI-bus
 Enclosure	DeviceSCSI		Behuizing
 Order by:	DevicesView		Rangschik op:
-ACPI Thermal Zone	DeviceACPI		ACPI Thermische zone
 Intelligent controller	Device		Intelligente controller
 Multimedia controller	Device		Multimedia-controller
 Quit	DevicesView		Afsluiten

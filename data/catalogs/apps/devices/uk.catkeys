@@ -1,27 +1,24 @@
-1	ukrainian	x-vnd.Haiku-Devices	1667967532
+1	ukrainian	x-vnd.Haiku-Devices	542483980
 ACPI bus	DevicesView		Шина ACPI
 Encryption controller	Device		Контроллер шифрування
 Devices	System name		Devices
 USB bus	DevicesView		Шина USB
-Graphics Peripheral	DeviceSCSI		Графічна периферія
 Processor	Device		Процесор
 Generate system information	DevicesView		Зібрати інформацію про систему
-Unknown	DeviceACPI		Невідомо
 Class info	DevicePCI		Інфо про клас
 USB bus	Device		Шина USB
 Computer	DevicesView		Комп'ютер
 Communications	DeviceSCSI		Комунікації
 Mass storage controller	Device		Контролер накопичувачів
-Connection	DevicesView		Підключення
+Connection	DevicesView		підключенням
 Printer	DeviceSCSI		Принтер
-ACPI Processor Namespace '%2'	DeviceACPI		Простір імен процесора ACPI «%2»
+Driver used	DevicesView		Поточний драйвер
 Manufacturer	Device		Виробник
 Scanner	DeviceSCSI		Сканер
 Memory controller	Device		Контролер пам’яті
+Device paths	DevicesView		Шлях до пристрою
 Unknown device	DevicesView		Невідомий пристрій
-Unknown	DevicePCI		Невідомий
 ACPI node '%1'	DeviceACPI		Вузол ACPI «%1»
-Optical Drive	DeviceSCSI		Оптичний привід
 Name	PropertyList		Назва
 Manufacturer	DeviceSCSI		Виробник
 Device name	Device		Назва пристрою
@@ -30,13 +27,10 @@ Device class	DeviceSCSI		Клас пристрою
 Device	Device		Пристрій
 Input device controller	Device		Контролер пристроїв вводу
 PCI bus	DevicesView		Шина PCI
-ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
-ACPI System Bus	DeviceACPI		Шина системи ACPI
-Tape Drive	DeviceSCSI		Стример
 Changer	DeviceSCSI		Чейнджер
 Serial bus controller	Device		Контроллер послідовної шини
 Refresh devices	DevicesView		Оновити список пристроїв
-Category	DevicesView		Категорії
+Category	DevicesView		категорією
 RBC	DeviceSCSI		RBC
 Device paths	Device		Шлях до пристрою
 Unknown device	Device		Невідомий пристрій
@@ -45,27 +39,25 @@ Generic system peripheral	Device		Загальна системна перифе
 Value	PropertyList		Значення
 Devices	DevicesView		Пристрої
 Device name	DeviceACPI		Назва пристрою
-Card Reader	DeviceSCSI		Кардрідер
 Display controller	Device		Контролер дисплея
-ACPI Button '%1'	DeviceACPI		Кнопка ACPI «%1»
-Bus	DevicesView		Шина
+Bus	DevicesView		типом шини
 ACPI <unknown>	DeviceACPI		ACPI <невідомо>
 Device name	DevicePCI		Назва пристрою
-Disk Drive	DeviceSCSI		Дисковий привід
 Other	DeviceSCSI		Інше
 Report compatibility	DevicesView		Звіт про сумісність
 Computer	Device		Комп’ютер
 PCI bus	Device		Шина PCI
 Enclosure	DeviceSCSI		Enclosure
-Order by:	DevicesView		Сортувати по:
-ACPI Thermal Zone	DeviceACPI		Теплова зона ACPI
+Order by:	DevicesView		Сортувати за:
 Intelligent controller	Device		Інтелектуальний контролер
 Multimedia controller	Device		Контролер мультимедіа
 Quit	DevicesView		Вийти
 ISA bus	Device		Шина ISA
 ISA bus	DevicesView		Шина ISA
+Basic information	PropertyList		Загальна інформація
 Processor	DeviceSCSI		Процесор
 Bridge	Device		Міст
+Attributes	PropertyList		Атрибути
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Виробник

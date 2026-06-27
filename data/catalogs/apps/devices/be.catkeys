@@ -1,8 +1,7 @@
-1	belarusian	x-vnd.Haiku-Devices	2347806408
+1	belarusian	x-vnd.Haiku-Devices	1509979255
 ACPI bus	DevicesView		Шына ACPI
 Encryption controller	Device		Кантролер шыфравання
 Devices	System name		Прылады
-Graphics Peripheral	DeviceSCSI		Графічная перыферыя
 Processor	Device		Працэсар
 Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
 Class info	DevicePCI		Інфа класа
@@ -11,14 +10,11 @@ Communications	DeviceSCSI		Камунікацыі
 Mass storage controller	Device		Кантролер прылад захавання даных
 Connection	DevicesView		Спалучэнне
 Printer	DeviceSCSI		Друкарка
-ACPI Processor Namespace '%2'	DeviceACPI		Абшар '%2' працэсара ACPI
 Manufacturer	Device		Вытворца
 Scanner	DeviceSCSI		Сканэр
 Memory controller	Device		Кантролер памяці
 Unknown device	DevicesView		Невядомая прылада
-Unknown	DevicePCI		Невядомы
 ACPI node '%1'	DeviceACPI		Вузел ACPI '%1'
-Optical Drive	DeviceSCSI		Аптычны дыск
 Name	PropertyList		Імя
 Manufacturer	DeviceSCSI		Вытворца
 Device name	Device		Імя прылады
@@ -27,9 +23,6 @@ Device class	DeviceSCSI		Клас прылады
 Device	Device		Прылада
 Input device controller	Device		Кантролер прылад уводу
 PCI bus	DevicesView		Шына PCI
-ACPI System Indicator	DeviceACPI		Сістэмны індыкатар ACPI
-ACPI System Bus	DeviceACPI		Сістэмная шына ACPI
-Tape Drive	DeviceSCSI		Прывад ленты
 Changer	DeviceSCSI		Чэйнджэр
 Serial bus controller	Device		Кантролер серыйнай шыны
 Refresh devices	DevicesView		Абнавіць прылады
@@ -42,17 +35,14 @@ Generic system peripheral	Device		Агульная перыферыя
 Value	PropertyList		Велічыня
 Devices	DevicesView		Прылады
 Device name	DeviceACPI		Імя прылады
-Card Reader	DeviceSCSI		Чытальнік картак
 Display controller	Device		Кантролер экрану
 Device name	DevicePCI		Імя прылады
-Disk Drive	DeviceSCSI		Прывад дыскау
 Other	DeviceSCSI		Іншы(я)
 Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
 Computer	Device		Кампутар
 PCI bus	Device		Шына PCI
 Enclosure	DeviceSCSI		Уключэнне
 Order by:	DevicesView		Парадкаваць па:
-ACPI Thermal Zone	DeviceACPI		Тэрмальная зона ACPI
 Intelligent controller	Device		Інтэлектуальны кантролер
 Multimedia controller	Device		Кантролер мультымедыя
 Quit	DevicesView		Выйсці

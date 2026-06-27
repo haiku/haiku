@@ -1,6 +1,6 @@
-1	ukrainian	x-vnd.Haiku-Screen	1459314753
+1	ukrainian	x-vnd.Haiku-Screen	677808371
 no	Screen		ні
-bits/pixel	Screen		бітів/піксель
+bits/pixel	Screen		біти/піксель
 15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
 Rows:	Screen		Рядки:
 %.1f Hz	Screen		%.1f Гц
@@ -21,6 +21,7 @@ Use laptop panel:	Screen		Використовувати панель ноутб
 Unknown	Screen		Невідомий
 Could not write VESA mode settings file:\n\t	Screen		Не вдалося записати файл налаштувань режиму VESA :\n\t
 Display info	Screen		Інфо про дісплей
+30 bits/pixel, 1 billion colors	Screen		30 біт/піксель, 1 мільярд кольорів
 Settings will revert in %seconds.	Screen		Відкат налаштувань через %seconds.
 Cancel	Screen		Скасувати
 Other…	Screen		Інше…
@@ -28,7 +29,7 @@ Screen	Screen		Екран
 Colors:	Screen		Кольори:
 yes	Screen		так
 Swap displays:	Screen		Поміняти дисплеї:
-8 bits/pixel, 256 colors	Screen		8 бітів/піксель, 256 кольорів
+8 bits/pixel, 256 colors	Screen		8 біт/піксель, 256 кольорів
 Revert	Screen		Відкат змін
 always	Screen		завжди
 Confirm changes	Screen		Підтвердити зміни
@@ -50,6 +51,7 @@ Apply	Screen		Застосувати
 horizontally	Screen		горизонтально
 disable	Screen		вимкнути
 Set background…	Screen		Встановити фон…
+24 bits/pixel, 16 million colors	Screen		24 біти/піксель, 16 мільйонів кольорів
 Type or use the left and right arrow keys.	Screen		Введіть або використовуйте ліву/праву стрілку.
 Screen	System name		Screen
 Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?

@@ -1,12 +1,10 @@
-1	french	x-vnd.Haiku-Devices	911816421
+1	french	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Contrôleur de chiffrement
 Devices	System name		Périphériques
 USB bus	DevicesView		Bus USB
-Graphics Peripheral	DeviceSCSI		Périphérique graphique
 Processor	Device		Microprocesseur
 Generate system information	DevicesView		Générer les informations systèmes
-Unknown	DeviceACPI		Inconnu
 Class info	DevicePCI		Information de classe
 USB bus	Device		Bus USB
 Computer	DevicesView		Ordinateur
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Communications
 Mass storage controller	Device		Contrôleur de mémoire de masse
 Connection	DevicesView		Connexion
 Printer	DeviceSCSI		Imprimante
-ACPI Processor Namespace '%2'	DeviceACPI		Espace de nom ACPI du processeur « %2 »
 Manufacturer	Device		Fabricant
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Contrôleur mémoire
 Unknown device	DevicesView		Périphérique inconnu
-Unknown	DevicePCI		Inconnu
 ACPI node '%1'	DeviceACPI		Noeud ACPI « %1 »
-Optical Drive	DeviceSCSI		Lecteur optique
 Name	PropertyList		Nom
 Manufacturer	DeviceSCSI		Fabricant
 Device name	Device		Nom du périphérique
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Classe de périphérique
 Device	Device		Périphérique
 Input device controller	Device		Contrôleur de périphérique d’entrée
 PCI bus	DevicesView		Bus PCI
-ACPI System Indicator	DeviceACPI		Indicateur système ACPI
-ACPI System Bus	DeviceACPI		Bus système ACPI
-Tape Drive	DeviceSCSI		Lecteur de bandes
 Changer	DeviceSCSI		Changeur de disques
 Serial bus controller	Device		Contrôleur de bus série
 Refresh devices	DevicesView		Rafraichir les périphériques
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Périphérique système générique
 Value	PropertyList		Valeur
 Devices	DevicesView		Périphériques
 Device name	DeviceACPI		Nom du périphérique
-Card Reader	DeviceSCSI		Lecteur de cartes
 Display controller	Device		Contrôleur d’affichage
-ACPI Button '%1'	DeviceACPI		ACPI Bouton « %1 »
 ACPI <unknown>	DeviceACPI		ACPI <inconnu>
 Device name	DevicePCI		Nom du périphérique
-Disk Drive	DeviceSCSI		Unité de disque
 Other	DeviceSCSI		Autre
 Report compatibility	DevicesView		Rapport de compatibilité
 Computer	Device		Ordinateur
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Zone de stockage
 Order by:	DevicesView		Trier par :
-ACPI Thermal Zone	DeviceACPI		Zone thermique ACPI
 Intelligent controller	Device		Contrôleur intelligent
 Multimedia controller	Device		Contrôleur multimédia
 Quit	DevicesView		Quitter

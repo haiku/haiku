@@ -1,12 +1,10 @@
-1	czech	x-vnd.Haiku-Devices	911816421
+1	czech	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Sběrnice ACPI
 Encryption controller	Device		Řadič šifrování
 Devices	System name		Zařízení
 USB bus	DevicesView		Sběrnice USB
-Graphics Peripheral	DeviceSCSI		Grafické periferie
 Processor	Device		Procesor
 Generate system information	DevicesView		Generovat systémové informace
-Unknown	DeviceACPI		Neznámé
 Class info	DevicePCI		Informace o třídě
 USB bus	Device		Sběrnice USB
 Computer	DevicesView		Počítač
@@ -14,14 +12,11 @@ Communications	DeviceSCSI		Komunikace
 Mass storage controller	Device		Řadič velkokapacitního úložiště
 Connection	DevicesView		Připojení
 Printer	DeviceSCSI		Tiskárna
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI Namespace Processoru '%2'
 Manufacturer	Device		Výrobce
 Scanner	DeviceSCSI		Skener
 Memory controller	Device		Kontroler paměti
 Unknown device	DevicesView		Neznámé zařízení
-Unknown	DevicePCI		Neznámý
 ACPI node '%1'	DeviceACPI		Uzel ACPI '%1'
-Optical Drive	DeviceSCSI		Optická mechanika
 Name	PropertyList		Název
 Manufacturer	DeviceSCSI		Výrobce
 Device name	Device		Název zařízení
@@ -30,9 +25,6 @@ Device class	DeviceSCSI		Třída zařízení
 Device	Device		Zařízení
 Input device controller	Device		Kontroler vstupních zařízení
 PCI bus	DevicesView		Sběrnice PCI
-ACPI System Indicator	DeviceACPI		ACPI Systémový Indikátor
-ACPI System Bus	DeviceACPI		ACPI Systémová Sběrnice
-Tape Drive	DeviceSCSI		Pásková mechanika
 Changer	DeviceSCSI		Měnič
 Serial bus controller	Device		Řadič sériové sběrnice
 Refresh devices	DevicesView		Obnovit zařízení
@@ -45,19 +37,15 @@ Generic system peripheral	Device		Periferie generického systému
 Value	PropertyList		Hodnota
 Devices	DevicesView		Zařízení
 Device name	DeviceACPI		Název zařízení
-Card Reader	DeviceSCSI		Čtečka karet
 Display controller	Device		Kontroler obrazovky
-ACPI Button '%1'	DeviceACPI		ACPI tlačítko '%1'
 ACPI <unknown>	DeviceACPI		ACPI <neznámé>
 Device name	DevicePCI		Název zařízení
-Disk Drive	DeviceSCSI		Disková jednotka
 Other	DeviceSCSI		Ostatní
 Report compatibility	DevicesView		Nahlásit kompatibilitu
 Computer	Device		Počítač
 PCI bus	Device		Sběrnice PCI
 Enclosure	DeviceSCSI		Skříňka
 Order by:	DevicesView		Seřadit podle:
-ACPI Thermal Zone	DeviceACPI		ACPI Tepelná Zóna
 Intelligent controller	Device		Inteligentní řadič
 Multimedia controller	Device		Kontroler multimédií
 Quit	DevicesView		Ukončit
