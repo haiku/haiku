@@ -223,10 +223,9 @@ arch_thread_context_switch(Thread* from, Thread* to)
 		toPagingStructures->AddReference();
 		cpuData->arch.active_paging_structures = toPagingStructures;
 
-		// set the page directory, if it changes
+		// set the new page directory
 		addr_t newPageDirectory = toPagingStructures->pgdir_phys;
-		if (newPageDirectory != activePagingStructures->pgdir_phys)
-			x86_swap_pgdir(newPageDirectory);
+		x86_swap_pgdir(newPageDirectory);
 
 		// This CPU no longer uses the previous paging structures.
 		activePagingStructures->RemoveReference();
