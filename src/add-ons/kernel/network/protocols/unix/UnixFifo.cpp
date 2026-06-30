@@ -651,10 +651,11 @@ UnixFifo::_Write(UnixRequest& request, bigtime_t timeout)
 		return 0;
 
 	status_t error = B_OK;
+	const size_t minimumWrite = _MinimumWritableSize(request);
 
 	while (error == B_OK && request.BytesRemaining() > 0) {
 		// wait for any space to become available
-		while (error == B_OK && fBuffer.Writable() < _MinimumWritableSize(request)
+		while (error == B_OK && fBuffer.Writable() < minimumWrite
 				&& !IsWriteShutdown() && !IsReadShutdown()) {
 			ConditionVariableEntry entry;
 			fWriteCondition.Add(&entry);
@@ -676,10 +677,8 @@ UnixFifo::_Write(UnixRequest& request, bigtime_t timeout)
 		// write as much as we can
 		error = fBuffer.Write(request);
 
-		if (error == B_OK) {
-// TODO: Whenever we've successfully written a part, we should reset the
-// timeout!
-		}
+		if (request.BytesTransferred() >= (ssize_t)minimumWrite)
+			break;
 	}
 
 	RETURN_ERROR(error);
