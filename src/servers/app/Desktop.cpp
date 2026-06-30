@@ -848,9 +848,10 @@ Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
 	if (workspace < 0 || workspace >= kMaxWorkspaces)
 		return B_BAD_VALUE;
 
+	Screen* screen = fVirtualScreen.ScreenByID(id);
+
 	if (workspace == fCurrentWorkspace) {
 		// retrieve from current screen
-		Screen* screen = fVirtualScreen.ScreenByID(id);
 		if (screen == NULL)
 			return B_NAME_NOT_FOUND;
 
@@ -861,6 +862,13 @@ Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
 	// retrieve from settings
 	screen_configuration* configuration
 		= fWorkspaces[workspace].CurrentScreenConfiguration().GetByID(id);
+	if (configuration == NULL && screen != NULL) {
+		monitor_info info;
+		bool hasInfo = (screen->GetMonitorInfo(info) == B_OK);
+		configuration = fWorkspaces[workspace]
+			.StoredScreenConfiguration().BestFit(screen->ID(),
+				hasInfo ? &info : NULL);
+	}
 	if (configuration == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -880,9 +888,10 @@ Desktop::GetScreenFrame(int32 workspace, int32 id, BRect& frame)
 	if (workspace < 0 || workspace >= kMaxWorkspaces)
 		return B_BAD_VALUE;
 
+	Screen* screen = fVirtualScreen.ScreenByID(id);
+
 	if (workspace == fCurrentWorkspace) {
 		// retrieve from current screen
-		Screen* screen = fVirtualScreen.ScreenByID(id);
 		if (screen == NULL)
 			return B_NAME_NOT_FOUND;
 
@@ -893,6 +902,13 @@ Desktop::GetScreenFrame(int32 workspace, int32 id, BRect& frame)
 	// retrieve from settings
 	screen_configuration* configuration
 		= fWorkspaces[workspace].CurrentScreenConfiguration().GetByID(id);
+	if (configuration == NULL && screen != NULL) {
+		monitor_info info;
+		bool hasInfo = (screen->GetMonitorInfo(info) == B_OK);
+		configuration = fWorkspaces[workspace]
+			.StoredScreenConfiguration().BestFit(screen->ID(),
+				hasInfo ? &info : NULL);
+	}
 	if (configuration == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -3725,7 +3741,7 @@ Desktop::_SetCurrentWorkspaceConfiguration()
 
 	uint32 changedScreens;
 	fVirtualScreen.SetConfiguration(*this,
-		fWorkspaces[fCurrentWorkspace].CurrentScreenConfiguration(),
+		fWorkspaces[fCurrentWorkspace].StoredScreenConfiguration(),
 		fWorkspaces[fCurrentWorkspace].CurrentScreenConfiguration(),
 		&changedScreens);
 
