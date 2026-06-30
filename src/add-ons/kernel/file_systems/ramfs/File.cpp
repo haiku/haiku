@@ -54,16 +54,23 @@ File::WriteAt(off_t offset, const void *buffer, size_t size,
 status_t
 File::SetSize(off_t newSize)
 {
-	status_t error = B_OK;
 	off_t oldSize = DataContainer::GetSize();
-	if (newSize != oldSize) {
-		error = DataContainer::Resize(newSize);
-		MarkModified(B_STAT_SIZE);
-		// update the size index
-		if (SizeIndex *index = GetVolume()->GetSizeIndex())
-			index->Changed(this, oldSize);
+	if (newSize == oldSize) {
+		// Update times (as per POSIX) even if the size stays the same.
+		MarkModified(B_STAT_MODIFICATION_TIME | B_STAT_CHANGE_TIME);
+		return B_OK;
 	}
-	return error;
+
+	status_t status = DataContainer::Resize(newSize);
+	if (status != B_OK)
+		return status;
+
+	MarkModified(B_STAT_SIZE);
+
+	// update the size index
+	if (SizeIndex *index = GetVolume()->GetSizeIndex())
+		index->Changed(this, oldSize);
+	return B_OK;
 }
 
 
