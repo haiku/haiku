@@ -336,7 +336,7 @@ Thread::~Thread()
 	if (user_stack_area >= 0)
 		delete_area(user_stack_area);
 
-	ASSERT(fUserTimers.IsEmpty());
+	DeleteUserTimers(false);
 
 	// delete the resources, that may remain in either case
 
