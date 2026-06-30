@@ -40,19 +40,24 @@
 // #pragma mark - helper macros
 
 
+#define FETCH_SOURCE_NODE(PREFIX, SOURCE_VOLUME, NODE_ID)			\
+	vnode* PREFIX##Vnode;											\
+	error = vfs_get_vnode(SOURCE_VOLUME->id,						\
+		NODE_ID, true, &PREFIX##Vnode);								\
+	if (error != B_OK)												\
+		RETURN_ERROR(error);										\
+	VnodePutter PREFIX##VnodePutterutter(PREFIX##Vnode);			\
+	fs_vnode* PREFIX##Node = vfs_fsnode_for_vnode(PREFIX##Vnode);	\
+	if (PREFIX##Node == NULL)										\
+		RETURN_ERROR(B_ERROR);
+
+
 #define FETCH_SOURCE_VOLUME_AND_NODE(volume, nodeID)				\
 	fs_volume* sourceVolume = volume->SourceFSVolume();				\
 	if (sourceVolume == NULL)										\
 		RETURN_ERROR(B_ERROR);										\
-	vnode* sourceVnode;												\
-	status_t error = vfs_get_vnode(volume->SourceFSVolume()->id,	\
-		nodeID, true, &sourceVnode);								\
-	if (error != B_OK)												\
-		RETURN_ERROR(error);										\
-	VnodePutter putter(sourceVnode);								\
-	fs_vnode* sourceNode = vfs_fsnode_for_vnode(sourceVnode);		\
-	if (sourceNode == NULL)											\
-		RETURN_ERROR(B_ERROR);
+	status_t error;													\
+	FETCH_SOURCE_NODE(source, sourceVolume, nodeID);
 
 
 // #pragma mark - Volume
@@ -507,20 +512,22 @@ bindfs_unlink(fs_volume* fsVolume, fs_vnode* fsNode, const char* name)
 
 
 static status_t
-bindfs_rename(fs_volume* fsVolume, fs_vnode* fsNode, const char* fromName,
+bindfs_rename(fs_volume* fsVolume, fs_vnode* fromDir, const char* fromName,
 	fs_vnode* toDir, const char* toName)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	Node* node = (Node*)fsNode->private_node;
+	Node* fromNode = (Node*)fromDir->private_node;
+	Node* toNode = (Node*)toDir->private_node;
 
-	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), "
+	FUNCTION("volume: %p, fromDir: %p (%" B_PRIdINO "), "
 			"from: %s, toDir: %p, to: %s\n",
-		volume, node, node->ID(), fromName, toDir, toName);
+		volume, fromDir, fromNode->ID(), fromName, toDir, toName);
 
-	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
+	FETCH_SOURCE_VOLUME_AND_NODE(volume, fromNode->ID());
+	FETCH_SOURCE_NODE(toSource, sourceVolume, toNode->ID());
 
-	return sourceNode->ops->rename(sourceVolume, sourceNode, fromName, toDir,
-		toName);
+	return sourceNode->ops->rename(sourceVolume, sourceNode, fromName,
+		toSourceNode, toName);
 }
 
 
