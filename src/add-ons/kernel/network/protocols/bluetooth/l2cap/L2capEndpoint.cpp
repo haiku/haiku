@@ -398,7 +398,7 @@ L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 }
 
 
-ssize_t
+status_t
 L2capEndpoint::SendData(net_buffer* buffer)
 {
 	CALLED();
@@ -410,36 +410,17 @@ L2capEndpoint::SendData(net_buffer* buffer)
 	if (fState != OPEN)
 		return ENOTCONN;
 
-	ssize_t sent = 0;
-	while (buffer != NULL) {
-		net_buffer* current = buffer;
-		buffer = NULL;
-		if (current->size > fChannelConfig.outgoing_mtu) {
-			// Break up into MTU-sized chunks.
-			buffer = gBufferModule->split(current, fChannelConfig.outgoing_mtu);
-			if (buffer == NULL) {
-				if (sent > 0) {
-					gBufferModule->free(current);
-					return sent;
-				}
-				return ENOMEM;
-			}
-		}
+	if (buffer->size > fChannelConfig.outgoing_mtu)
+		return EMSGSIZE;
 
-		const size_t bufferSize = current->size;
-		status_t status = gStackModule->fifo_enqueue_buffer(&fSendQueue, current);
-		if (status != B_OK) {
-			gBufferModule->free(current);
-			return sent;
-		}
-
-		sent += bufferSize;
-	}
+	status_t status = gStackModule->fifo_enqueue_buffer(&fSendQueue, buffer);
+	if (status != B_OK)
+		return status;
 
 	if (!gStackModule->is_timer_active(&fSendTimer))
 		gStackModule->set_timer(&fSendTimer, 0);
 
-	return sent;
+	return B_OK;
 }
 
 

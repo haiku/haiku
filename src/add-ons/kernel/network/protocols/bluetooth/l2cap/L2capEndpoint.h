@@ -41,7 +41,7 @@ public:
 			uint16		ChannelID() const { return fChannelID; }
 
 			ssize_t		ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer);
-			ssize_t		SendData(net_buffer* buffer);
+			status_t	SendData(net_buffer* buffer);
 			status_t	ReceiveData(net_buffer* buffer);
 			ssize_t		Sendable();
 			ssize_t		Receivable();
