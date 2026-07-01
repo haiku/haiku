@@ -301,6 +301,7 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 {
 	vesa_shared_info& sharedInfo = *info.shared_info;
 	addr_t frameBuffer = info.frame_buffer;
+	bool updated = false;
 
 	if (!info.complete_frame_buffer_mapped) {
 		addr_t base = physicalBase;
@@ -323,6 +324,7 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 
 			frame_buffer_update(frameBuffer, width, height, depth,
 				bytesPerRow);
+			updated = true;
 
 			vm_change_clones_to_null_areas(info.frame_buffer_area);
 			delete_area(info.frame_buffer_area);
@@ -338,11 +340,11 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 		}
 	}
 
-	if (info.complete_frame_buffer_mapped)
-		frameBuffer += physicalBase - info.physical_frame_buffer;
-
 	// Update shared frame buffer information
 	sharedInfo.bytes_per_row = bytesPerRow;
+
+	if (!updated)
+		frame_buffer_update(frameBuffer, width, height, depth, bytesPerRow);
 
 	return B_OK;
 }
