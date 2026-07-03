@@ -118,8 +118,7 @@ ExtendedLocalDeviceView::MessageReceived(BMessage* message)
 
 	}
 
-	switch (message->what)
-	{
+	switch (message->what) {
 		case SET_DISCOVERABLE:
 		case SET_VISIBLE:
 			fScanMode = 0;

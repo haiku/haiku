@@ -21,7 +21,7 @@ DeviceListItem::DeviceListItem(RemoteDevice* bDevice)
 	:
 	BListItem(),
 	fDevice(bDevice),
-	fConnState(RD_DISCONNECTED)
+	fConnectionState(RemoteDevice::DISCONNECTED)
 {
 	fAddress = bDevice->GetBluetoothAddress();
 	fClass = bDevice->GetDeviceClass();
@@ -160,16 +160,16 @@ DeviceListItem::Device() const
 
 
 void
-DeviceListItem::SetConnState(DeviceConnState connState)
+DeviceListItem::SetConnectionState(RemoteDevice::ConnectionState connectionState)
 {
-	fConnState = connState;
+	fConnectionState = connectionState;
 }
 
 
-DeviceConnState
-DeviceListItem::GetConnState()
+RemoteDevice::ConnectionState
+DeviceListItem::GetConnectionState()
 {
-	return fConnState;
+	return fConnectionState;
 }
 
 

@@ -40,6 +40,8 @@ public:
 	void	LoadSettings(void);
 	bool	IsDefaultable(void);
 
+	void	LoadRemoteDevices();
+
 protected:
 
 	void	SetCurrentColor(rgb_color color);

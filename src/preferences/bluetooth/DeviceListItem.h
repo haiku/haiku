@@ -7,17 +7,11 @@
 
 #include <ListItem.h>
 #include <String.h>
+#include <bluetoothserver_p.h>
 
 #include "bluetooth/RemoteDevice.h"
 
 namespace Bluetooth {
-
-
-enum DeviceConnState {
-	RD_CONNECTED,
-	RD_CONNECTING,
-	RD_DISCONNECTED
-};
 
 
 class DeviceListItem : public BListItem
@@ -34,8 +28,8 @@ class DeviceListItem : public BListItem
 		void 			SetDevice(RemoteDevice* bDevice);
 		RemoteDevice* 	Device() const;
 
-		void 			SetConnState(DeviceConnState connState);
-		DeviceConnState GetConnState();
+		void 			SetConnectionState(RemoteDevice::ConnectionState connectionState);
+		RemoteDevice::ConnectionState 	GetConnectionState();
 
 	private:
 		RemoteDevice*	fDevice;
@@ -44,7 +38,7 @@ class DeviceListItem : public BListItem
 		BString			fName;
 		int32			fRSSI;
 
-		DeviceConnState	fConnState;
+		RemoteDevice::ConnectionState		fConnectionState;
 };
 
 }

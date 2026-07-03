@@ -143,14 +143,13 @@ PincodeWindow::InitUI()
 void
 PincodeWindow::MessageReceived(BMessage* msg)
 {
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case skMessageAcceptButton:
 		{
 			BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 			BMessage reply;
 			size_t size;
-			int8 bt_status = BT_ERROR;
+			uint8 bt_status = BT_ERROR;
 
 			void* command = buildPinCodeRequestReply(fBdaddr,
 				strlen(fPincodeText->Text()),
@@ -168,7 +167,7 @@ PincodeWindow::MessageReceived(BMessage* msg)
 
 			// we reside in the server
 			if (be_app_messenger.SendMessage(&request, &reply) == B_OK) {
-				if (reply.FindInt8("status", &bt_status ) == B_OK) {
+				if (reply.FindUInt8("status", &bt_status ) == B_OK) {
 					PostMessage(B_QUIT_REQUESTED);
 				}
 				// TODO: something failed here
@@ -181,7 +180,7 @@ PincodeWindow::MessageReceived(BMessage* msg)
 			BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 			BMessage reply;
 			size_t size;
-			int8 bt_status = BT_ERROR;
+			uint8 bt_status = BT_ERROR;
 
 			void* command = buildPinCodeRequestNegativeReply(fBdaddr, &size);
 
@@ -196,7 +195,7 @@ PincodeWindow::MessageReceived(BMessage* msg)
 				OCF_PIN_CODE_NEG_REPLY));
 
 			if (be_app_messenger.SendMessage(&request, &reply) == B_OK) {
-				if (reply.FindInt8("status", &bt_status ) == B_OK ) {
+				if (reply.FindUInt8("status", &bt_status ) == B_OK ) {
 					PostMessage(B_QUIT_REQUESTED);
 				}
 				// TODO: something failed here

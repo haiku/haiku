@@ -280,7 +280,7 @@ struct hci_command_header {
 	#define OCF_LINK_KEY_REPLY			0x000B
 	struct hci_cp_link_key_reply {
 		bdaddr_t	bdaddr;
-		uint8		link_key[16];
+		linkkey_t	link_key;
 	} __attribute__ ((packed));
 
 	#define OCF_LINK_KEY_NEG_REPLY		0x000C

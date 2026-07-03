@@ -79,8 +79,7 @@ public:
 	InquiryResponse(int discType)
 	{
 		BMessage* message;
-		switch (discType)
-		{
+		switch (discType) {
 			case BT_INQUIRY_COMPLETED:
 				message = new BMessage(kMsgFinish);
 				fInquiryPanel->PostMessage(message);

@@ -145,6 +145,11 @@ const char* BluetoothError(uint8 error);
 #define HCI_LM_RELIABLE 0x0010
 #define HCI_LM_SECURE   0x0020
 
+// Link Types
+#define HCI_SCO_CONN	0x00
+#define HCI_ACL_CONN	0x01
+#define HCI_ESCO_CONN	0x02
+
 
 #endif // _BTHCI_H_
 

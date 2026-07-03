@@ -9,7 +9,9 @@
 #include <bluetooth/bluetooth_error.h>
 #include <bluetooth/BluetoothDevice.h>
 
+#include <bluetoothserver_p.h>
 #include <support/String.h>
+#include <ObjectList.h>
 
 #define B_BT_WAIT 0x00
 #define B_BT_SUCCEEDED 0x01
@@ -26,6 +28,14 @@ public:
 	static const int WAIT = B_BT_WAIT;
 	static const int SUCCEEDED = B_BT_SUCCEEDED;
 
+	enum ConnectionState {
+		CONNECTED,
+		CONNECTING,
+		DISCONNECTED
+	};
+
+	static BObjectList<RemoteDevice> GetRemoteDevices(LocalDevice* localDevice);
+
 	virtual 		~RemoteDevice();
 
 	bool 			IsTrustedDevice();
@@ -34,21 +44,20 @@ public:
 	BString 		GetCachedFriendlyName();
 	bdaddr_t 		GetBluetoothAddress();
 	uint8 			GetPageRepetitionMode();
-	uint8 			GetScanMode();
-	uint8 			GetClockOffset();
+	uint16 			GetClockOffset();
 	DeviceClass 	GetDeviceClass();
 
 	bool 			Equals(RemoteDevice* obj);
 
 	status_t		Connect();
 	status_t		CancelConnection();
-	status_t		Disconnect();
+	status_t		Disconnect(bool removeDevice);
 
 	/*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
 	/* bool Authorize(Connection conn);  Throwing */
 	/*bool Encrypt(Connection conn, bool on);  Throwing */
 	/*bool IsAuthorized(Connection conn);  Throwing */
-	bool 			IsAuthenticated(); /* Throwing */
+	RemoteDevice::ConnectionState 	GetConnectionState();
 	bool 			IsEncrypted(); /* Throwing */
 
 	BString 		GetProperty(const char* property); /* Throwing */
@@ -62,7 +71,7 @@ public:
 
 protected:
 	/* called by Discovery[Listener|Agent] */
-	void SetLocalDeviceOwner(LocalDevice* ld);
+	void 			SetLocalDeviceOwner(LocalDevice* ld);
 	friend class DiscoveryListener;
 
 private:
@@ -70,7 +79,6 @@ private:
 	LocalDevice* 	fDiscovererLocalDevice;
 	BMessenger*	 	fMessenger;
 
-	uint16			fHandle;
 	uint8			fPageRepetitionMode;
 	uint8			fScanPeriodMode;
 	uint8			fScanMode;

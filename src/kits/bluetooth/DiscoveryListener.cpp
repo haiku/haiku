@@ -68,7 +68,7 @@ void
 DiscoveryListener::MessageReceived(BMessage* message)
 {
 	CALLED();
-	int8 status;
+	uint8 status;
 
 	switch (message->what) {
 		case BT_MSG_INQUIRY_DEVICE:
@@ -149,7 +149,7 @@ DiscoveryListener::MessageReceived(BMessage* message)
 		}
 
 		case BT_MSG_INQUIRY_STARTED:
-			if (message->FindInt8("status", &status) == B_OK) {
+			if (message->FindUInt8("status", &status) == B_OK) {
 				fRemoteDevicesList.MakeEmpty();
 				InquiryStarted(status);
 			}

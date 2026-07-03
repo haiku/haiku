@@ -134,8 +134,31 @@ RemoteDevicesView::AttachedToWindow(void)
 //	blockButton->SetTarget(this);
 //	availButton->SetTarget(this);
 
+	LoadRemoteDevices();
 	LoadSettings();
 	fDeviceList->Select(0);
+}
+
+
+void
+RemoteDevicesView::LoadRemoteDevices()
+{
+	BObjectList<RemoteDevice> rdList = RemoteDevice::GetRemoteDevices(ActiveLocalDevice);
+
+	if (rdList.IsEmpty())
+		return;
+
+	BMessage device;
+	for (int32 i = 0; i < rdList.CountItems(); i++) {
+		RemoteDevice* remote = rdList.ItemAt(i);
+
+		DeviceListItem* deviceItem = new DeviceListItem(remote);
+		deviceItem->SetConnectionState(remote->GetConnectionState());
+
+		BMessage message(kMsgAddToRemoteList);
+		message.AddPointer("device", deviceItem);
+		MessageReceived(&message);
+	}
 }
 
 
@@ -152,8 +175,24 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 		}
 
 		case kMsgRemoveDevice:
+		{
+			RemoteDevice* remote = NULL;
+			DeviceListItem* device = static_cast<DeviceListItem*>(fDeviceList
+				->ItemAt(fDeviceList->CurrentSelection(0)));
+
+			if (device != NULL)
+				remote = dynamic_cast<RemoteDevice*>(device->Device());
+
 			fDeviceList->RemoveItem(fDeviceList->CurrentSelection(0));
+
+			if (remote == NULL)
+				break;
+
+			remote->Disconnect(true);
+
 			break;
+		}
+
 		case kMsgAddToRemoteList:
 		{
 			DeviceListItem* device = NULL;
@@ -194,7 +233,7 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 				break;
 
 			fConnectingDeviceItem = device;
-			fConnectingDeviceItem->SetConnState(RD_CONNECTING);
+			fConnectingDeviceItem->SetConnectionState(RemoteDevice::CONNECTING);
 			DeviceSelected();
 
 			remote->Connect();
@@ -206,9 +245,9 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 			uint8 status;
 			message->FindUInt8("status", &status);
 			if (status == BT_OK)
-				fConnectingDeviceItem->SetConnState(RD_CONNECTED);
+				fConnectingDeviceItem->SetConnectionState(RemoteDevice::CONNECTED);
 			else
-				fConnectingDeviceItem->SetConnState(RD_DISCONNECTED);
+				fConnectingDeviceItem->SetConnectionState(RemoteDevice::DISCONNECTED);
 
 			DeviceSelected();
 
@@ -227,7 +266,7 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 			if (remote == NULL)
 				break;
 			fConnectingDeviceItem = device;
-			remote->Disconnect();
+			remote->Disconnect(false);
 
 			break;
 		}
@@ -235,10 +274,24 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 		case BT_MSG_CONN_FAILED:
 		case BT_MSG_DISCONN_COMPLETED:
 		{
-			fConnectingDeviceItem->SetConnState(RD_DISCONNECTED);
-			DeviceSelected();
+			if (fConnectingDeviceItem != NULL) {
+				fConnectingDeviceItem->SetConnectionState(RemoteDevice::DISCONNECTED);
+				fConnectingDeviceItem = NULL;
+			} else {
+				// Remote Disconnection
+				bdaddr_t* bdaddr;
+				ssize_t size;
+				message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size);
 
-			fConnectingDeviceItem = NULL;
+				for (int32 i = 0; i < fDeviceList->CountItems(); i++) {
+				DeviceListItem* item = static_cast<DeviceListItem*>(fDeviceList->ItemAt(i));
+
+				if (bdaddrUtils::Compare(item->Device()->GetBluetoothAddress(), *bdaddr)) {
+						item->SetConnectionState(RemoteDevice::DISCONNECTED);
+					}
+				}
+			}
+			DeviceSelected();
 			break;
 		}
 
@@ -263,18 +316,18 @@ RemoteDevicesView::DeviceSelected()
 	if (device == NULL)
 		return;
 
-	switch (device->GetConnState()) {
-		case RD_CONNECTING:
+	switch (device->GetConnectionState()) {
+		case RemoteDevice::CONNECTING:
 			pairButton->SetEnabled(false);
 			disconnectButton->SetEnabled(false);
 			cancelButton->SetEnabled(true);
 			break;
-		case RD_CONNECTED:
+		case RemoteDevice::CONNECTED:
 			pairButton->SetEnabled(false);
 			disconnectButton->SetEnabled(true);
 			cancelButton->SetEnabled(false);
 			break;
-		case RD_DISCONNECTED:
+		case RemoteDevice::DISCONNECTED:
 			pairButton->SetEnabled(true);
 			disconnectButton->SetEnabled(false);
 			cancelButton->SetEnabled(false);

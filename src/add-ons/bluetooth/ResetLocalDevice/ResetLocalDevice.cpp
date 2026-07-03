@@ -48,19 +48,19 @@ ResetLocalDeviceAddOn::TakeAction(LocalDevice* lDevice)
 
 	if (fMessenger == NULL || !fMessenger->IsValid())
 		return B_ERROR;
-	
+
 	BluetoothCommand<> Reset(OGF_CONTROL_BASEBAND, OCF_RESET);
-	
+
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
-	
+
 	request.AddInt32("hci_id", lDevice->ID());
 	request.AddData("raw command", B_ANY_TYPE, Reset.Data(), Reset.Size());
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
 	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET));
 
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)
-		reply.FindInt8("status", &btStatus);
+		reply.FindUInt8("status", &btStatus);
 
 	return btStatus;
 }
@@ -96,7 +96,7 @@ ResetLocalDeviceAddOn::OverridenProperties(LocalDevice* lDevice, const char* pro
 	//BMessage* newProperties = new BMessage();
 	//newProperties->AddInt8("max_sco", 10);
 	//return newProperties;
-	
+
 	return NULL;
 }
 

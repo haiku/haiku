@@ -49,7 +49,7 @@ NonParameterCommandRequest(uint8 ofg, uint8 ocf, int32* result, hci_id hId,
 	BMessenger* messenger)
 {
 	CALLED();
-	int8 bt_status = BT_ERROR;
+	uint8 bt_status = BT_ERROR;
 
 	BluetoothCommand<> simpleCommand(ofg, ocf);
 
@@ -63,7 +63,7 @@ NonParameterCommandRequest(uint8 ofg, uint8 ocf, int32* result, hci_id hId,
 	request.AddInt16("opcodeExpected", PACK_OPCODE(ofg, ocf));
 
 	if (messenger->SendMessage(&request, &reply) == B_OK) {
-		reply.FindInt8("status", &bt_status);
+		reply.FindUInt8("status", &bt_status);
 		if (result != NULL)
 			reply.FindInt32("result", result);
 	}

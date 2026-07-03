@@ -21,7 +21,6 @@
 #include <Catalog.h>
 #include <CommandManager.h>
 #include <Locale.h>
-#include <bluetoothserver_p.h>
 
 #include "KitSupport.h"
 
@@ -32,16 +31,45 @@
 
 namespace Bluetooth {
 
-
-// TODO: Check headers for valid/reserved ranges
-static const uint16 invalidConnectionHandle = 0xF000;
-
-
 bool
 RemoteDevice::IsTrustedDevice(void)
 {
 	CALLED();
 	return true;
+}
+
+
+BObjectList<RemoteDevice>
+RemoteDevice::GetRemoteDevices(LocalDevice* localDevice)
+{
+	BMessage requestRemoteDevices(BT_MSG_GET_REMOTE_DEVICES);
+	BObjectList<RemoteDevice> rdList;
+
+	BMessage devices;
+	requestRemoteDevices.AddInt32("hci_id", localDevice->ID());
+	if (BMessenger(BLUETOOTH_SIGNATURE).SendMessage(&requestRemoteDevices,
+		&devices) != B_OK)
+		return rdList;
+
+	BMessage device;
+	for (int32 i = 0; devices.FindMessage("remote", i, &device) == B_OK; i++) {
+		bdaddr_t* bdaddr;
+		uint8* classOfDevice;
+		ssize_t size;
+
+		device.FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size);
+		device.FindData("cod", B_ANY_TYPE, (const void**)&classOfDevice, &size);
+		RemoteDevice* rd = new RemoteDevice(*bdaddr, classOfDevice);
+
+		rd->fDiscovererLocalDevice = localDevice;
+		device.FindString("name", &rd->fFriendlyName);
+		device.FindUInt16("clock_offset", &rd->fClockOffset);
+		device.FindUInt8("pscan_rep_mode", &rd->fPageRepetitionMode);
+
+		rdList.AddItem(rd);
+	}
+
+	return rdList;
 }
 
 
@@ -84,9 +112,9 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 
 	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
 		BString name;
-		int8 status;
+		uint8 status;
 
-		if ((reply.FindInt8("status", &status) == B_OK) && (status == BT_OK)) {
+		if ((reply.FindUInt8("status", &status) == B_OK) && (status == BT_OK)) {
 
 			if ((reply.FindString("friendlyname", &name) == B_OK )) {
 				fFriendlyName = name;
@@ -133,17 +161,10 @@ RemoteDevice::GetBluetoothAddress()
 }
 
 
-uint8
+uint16
 RemoteDevice::GetClockOffset()
 {
 	return fClockOffset;
-}
-
-
-uint8
-RemoteDevice::GetScanMode()
-{
-	return fScanMode;
 }
 
 
@@ -172,6 +193,9 @@ RemoteDevice::Connect()
 
 	bdaddr_t bdaddr = GetBluetoothAddress();
 	request.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
+
+	request.AddString("name", GetFriendlyName());
+	request.AddUInt32("record", fDeviceClass.Record());
 
 	uint16 packetType;
 	fDiscovererLocalDevice->GetProperty("packet_type", (uint32*)&packetType);
@@ -209,14 +233,17 @@ RemoteDevice::CancelConnection()
 
 
 status_t
-RemoteDevice::Disconnect()
+RemoteDevice::Disconnect(bool removeDevice)
 {
 	CALLED();
 	BMessage request(BT_REQ_DISCONNECT);
+	if (removeDevice)
+		request.what = BT_REQ_REMOVE_DEVICE;
 
 	request.AddInt32("hci_id", fDiscovererLocalDevice->ID());
 
-	request.AddUInt16("handle", fHandle);
+	bdaddr_t bdaddr = GetBluetoothAddress();
+	request.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
 	request.AddUInt8("reason", BT_REMOTE_USER_ENDED_CONNECTION);
 
 	if (fMessenger->SendMessage(&request) == B_OK)
@@ -230,11 +257,22 @@ RemoteDevice::Disconnect()
 //  bool Encrypt(Connection conn, bool on);
 
 
-bool
-RemoteDevice::IsAuthenticated()
+RemoteDevice::ConnectionState
+RemoteDevice::GetConnectionState()
 {
 	CALLED();
-	return true;
+	BMessage request(BT_REQ_CONN_STATE);
+	BMessage reply;
+
+	bdaddr_t bdaddr = GetBluetoothAddress();
+	request.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
+
+	if (fMessenger->SendMessage(&request, &reply) != B_OK)
+		return RemoteDevice::DISCONNECTED;
+
+	uint8 conn_state;
+	reply.FindUInt8("conn state", &conn_state);
+	return static_cast<RemoteDevice::ConnectionState>(conn_state);
 }
 
 
@@ -270,7 +308,8 @@ RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
 RemoteDevice::RemoteDevice(const bdaddr_t address, uint8 record[3])
 	:
 	BluetoothDevice(),
-	fDiscovererLocalDevice(NULL)
+	fDiscovererLocalDevice(NULL),
+	fScanMode(0)
 {
 	CALLED();
 	fBdaddr = address;
@@ -282,7 +321,8 @@ RemoteDevice::RemoteDevice(const bdaddr_t address, uint8 record[3])
 RemoteDevice::RemoteDevice(const BString& address)
 	:
 	BluetoothDevice(),
-	fDiscovererLocalDevice(NULL)
+	fDiscovererLocalDevice(NULL),
+	fScanMode(0)
 {
 	CALLED();
 	fBdaddr = bdaddrUtils::FromString((const char*)address.String());

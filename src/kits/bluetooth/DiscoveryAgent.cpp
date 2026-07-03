@@ -106,7 +106,7 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
     	return B_ERROR;
 
     void* cancelInquiryCommand = NULL;
-    int8  bt_status = BT_ERROR;
+    uint8 bt_status = BT_ERROR;
 
     /* Issue inquiry command */
     BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
@@ -121,7 +121,7 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
 		PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL));
 
     if (fMessenger->SendMessage(&request, &reply) == B_OK) {
-        if (reply.FindInt8("status", &bt_status ) == B_OK ) {
+        if (reply.FindUInt8("status", &bt_status ) == B_OK ) {
 			return bt_status;
 		}
     }

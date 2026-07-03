@@ -135,9 +135,10 @@ BluetoothWindow::MessageReceived(BMessage* message)
 		{
 			const char* signature;
 			if (message->FindString("signature", &signature) == B_OK
-				&& strcmp(signature, BLUETOOTH_SIGNATURE) == 0)
+				&& strcmp(signature, BLUETOOTH_SIGNATURE) == 0) {
 				StartWatchingServer();
-
+				fRemoteDevices->LoadRemoteDevices();
+			}
 			break;
 		}
 

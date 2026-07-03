@@ -15,13 +15,12 @@
 #include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/bluetooth_error.h>
 #include <bluetooth/LinkKeyUtils.h>
-#include <bluetooth/RemoteDevice.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
-#include <bluetoothserver_p.h>
 #include <ConnectionIncoming.h>
 #include <PincodeWindow.h>
 
+#include <FindDirectory.h>
 #include <stdio.h>
 #include <new>
 
@@ -68,13 +67,13 @@ LocalDeviceImpl::CreateTransportAccessor(BPath* path)
 
 LocalDeviceImpl::LocalDeviceImpl(HCIDelegate* hd) : LocalDeviceHandler(hd)
 {
-
+	LoadRemoteDevices();
 }
 
 
 LocalDeviceImpl::~LocalDeviceImpl()
 {
-
+	SaveRemoteDevices();
 }
 
 
@@ -89,6 +88,116 @@ LocalDeviceImpl::Unregister()
 		fHCIDelegate->Id());
 
 	be_app_messenger.SendMessage(msg);
+}
+
+
+void
+LocalDeviceImpl::SaveRemoteDevices()
+{
+	BMessage devices;
+
+	for (int32 i = 0; i < fRemoteDevicesList.CountItems(); i++) {
+		ServerRemoteDevice* rd = fRemoteDevicesList.ItemAt(i);
+		BMessage device;
+		bdaddr_t bdaddr = rd->bdaddr;
+		linkkey_t link_key = rd->link_key;
+		device.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
+		device.AddString("name", rd->friendly_name);
+		device.AddUInt16("clock_offset", rd->clock_offset);
+		device.AddUInt8("pscan_rep_mode", rd->pscan_rep_mode);
+		device.AddData("cod", B_RAW_TYPE, rd->classOfDevice, sizeof(rd->classOfDevice));
+		device.AddData("link key", B_ANY_TYPE, &link_key, sizeof(linkkey_t));
+		device.AddUInt8("link type", rd->link_type);
+
+		devices.AddMessage("remote", &device);
+	}
+
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append("Bluetooth_paired_devices");
+		BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+		if (file.InitCheck()==B_OK)
+			devices.Flatten(&file);
+	}
+}
+
+
+void
+LocalDeviceImpl::LoadRemoteDevices()
+{
+	BPath path;
+	BMessage devices;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append("Bluetooth_paired_devices");
+		BFile file(path.Path(), B_READ_ONLY);
+		if (file.InitCheck()==B_OK)
+			devices.Unflatten(&file);
+	}
+
+	BMessage device;
+	for (int32 i = 0; devices.FindMessage("remote", i, &device) == B_OK; i++) {
+		ServerRemoteDevice* rd = new ServerRemoteDevice();
+		ssize_t size;
+		bdaddr_t* bdaddr;
+		device.FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size);
+		rd->bdaddr = *bdaddr;
+		device.FindString("name", &rd->friendly_name);
+		device.FindUInt16("clock_offset", &rd->clock_offset);
+		device.FindUInt8("pscan_rep_mode", &rd->pscan_rep_mode);
+		device.FindUInt8("cod", 0, &rd->classOfDevice[0]);
+		device.FindUInt8("cod", 1, &rd->classOfDevice[1]);
+		device.FindUInt8("cod", 2, &rd->classOfDevice[2]);
+		device.FindData("link key", B_ANY_TYPE, (const void**)&rd->link_key, &size);
+		device.FindUInt8("link type", &rd->link_type);
+		rd->conn_state = RemoteDevice::DISCONNECTED;
+
+		fRemoteDevicesList.AddItem(rd);
+	}
+}
+
+
+ServerRemoteDevice*
+LocalDeviceImpl::RemoteDeviceByAddr(bdaddr_t bdaddr)
+{
+	for (int32 i = 0; i < fRemoteDevicesList.CountItems(); i++) {
+		ServerRemoteDevice* rd = fRemoteDevicesList.ItemAt(i);
+		if (bdaddrUtils::Compare(rd->bdaddr, bdaddr))
+			return rd;
+	}
+	return NULL;
+}
+
+
+ServerRemoteDevice*
+LocalDeviceImpl::RemoteDeviceByHandle(uint16 handle)
+{
+	for (int32 i = 0; i < fRemoteDevicesList.CountItems(); i++) {
+		ServerRemoteDevice* rd = fRemoteDevicesList.ItemAt(i);
+		if (rd->handle == handle)
+			return rd;
+	}
+	return NULL;
+}
+
+
+void
+LocalDeviceImpl::AddRemoteDevice(ServerRemoteDevice* rd)
+{
+	fRemoteDevicesList.AddItem(rd);
+}
+
+
+void
+LocalDeviceImpl::RemoveRemoteDevice(ServerRemoteDevice* rd)
+{
+	fRemoteDevicesList.RemoveItem(rd);
+}
+
+
+RemoteDevicesList*
+LocalDeviceImpl::GetRemoteDevicesList()
+{
+	return &fRemoteDevicesList;
 }
 
 
@@ -402,7 +511,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 			TRACE_BT("LocalDeviceImpl: Reply for Local Version %x\n", version->status);
 
-			reply.AddInt8("status", version->status);
+			reply.AddUInt8("status", version->status);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -425,7 +534,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				TRACE_BT("LocalDeviceImpl: Page Timeout=%x\n", pageTimeout->page_timeout);
 			}
 
-			reply.AddInt8("status", pageTimeout->status);
+			reply.AddUInt8("status", pageTimeout->status);
 			reply.AddInt32("result", pageTimeout->page_timeout);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
@@ -479,7 +588,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 			TRACE_BT("LocalDeviceImpl: Reply for Local Features %x\n", features->status);
 
-			reply.AddInt8("status", features->status);
+			reply.AddUInt8("status", features->status);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -514,7 +623,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 			TRACE_BT("LocalDeviceImpl: Reply for Read Buffer Size %x\n", buffer->status);
 
 
-			reply.AddInt8("status", buffer->status);
+			reply.AddUInt8("status", buffer->status);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -541,7 +650,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 			TRACE_BT("LocalDeviceImpl: Reply for Supported Commands %x\n",
 				supported_commands->status);
 
-			reply.AddInt8("status", supported_commands->status);
+			reply.AddUInt8("status", supported_commands->status);
 			status = request->SendReply(&reply);
 			// printf("Sending reply... %d\n", status);
 			// debug reply.PrintToStream();
@@ -564,7 +673,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 			TRACE_BT("LocalDeviceImpl: Read bdaddr status = %x\n", readbdaddr->status);
 
-			reply.AddInt8("status", readbdaddr->status);
+			reply.AddUInt8("status", readbdaddr->status);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -590,7 +699,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				classDev->dev_class[1], classDev->dev_class[2]);
 
 
-			reply.AddInt8("status", classDev->status);
+			reply.AddUInt8("status", classDev->status);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -614,7 +723,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 			TRACE_BT("LocalDeviceImpl: Friendly name status %x\n", readLocalName->status);
 
-			reply.AddInt8("status", readLocalName->status);
+			reply.AddUInt8("status", readLocalName->status);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -631,7 +740,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 			// TODO: This reply has to match the BDADDR of the outgoing message
 			TRACE_BT("LocalDeviceImpl: pincode accept status %x\n", *statusReply);
 
-			reply.AddInt8("status", *statusReply);
+			reply.AddUInt8("status", *statusReply);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -650,7 +759,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 			// => FindPetition should be expanded....
 			TRACE_BT("LocalDeviceImpl: pincode reject status %x\n", *statusReply);
 
-			reply.AddInt8("status", *statusReply);
+			reply.AddUInt8("status", *statusReply);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -671,7 +780,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				linkKeyRetrieval->max_num_keys,
 				linkKeyRetrieval->num_keys_read);
 
-			reply.AddInt8("status", linkKeyRetrieval->status);
+			reply.AddUInt8("status", linkKeyRetrieval->status);
 			status = request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -706,7 +815,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				TRACE_BT("LocalDeviceImpl: enable = %x\n", scanEnable->enable);
 			}
 
-			reply.AddInt8("status", scanEnable->status);
+			reply.AddUInt8("status", scanEnable->status);
 			reply.AddInt8("scan_enable", scanEnable->enable);
 			status = request->SendReply(&reply);
 			printf("Sending reply. scan_enable = %d\n", scanEnable->enable);
@@ -730,7 +839,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL):
 		{
-			reply.AddInt8("status", *(uint8*)(event + 1));
+			reply.AddUInt8("status", *(uint8*)(event + 1));
 
 			TRACE_BT("LocalDeviceImpl: %s for %s status %x\n", __FUNCTION__,
 				BluetoothCommandOpcode(opcodeExpected), *(uint8*)(event + 1));
@@ -759,7 +868,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_LOCAL_NAME):
 		case PACK_OPCODE(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR):
 		{
-			reply.AddInt8("status", *(uint8*)(event + 1));
+			reply.AddUInt8("status", *(uint8*)(event + 1));
 
 			TRACE_BT("LocalDeviceImpl: %s for %s status %x\n", __FUNCTION__,
 				BluetoothCommandOpcode(opcodeExpected), *(uint8*)(event + 1));
@@ -802,7 +911,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 
 			TRACE_BT("LocalDeviceImpl: Inquiry status %x\n", event->status);
 
-			reply.AddInt8("status", event->status);
+			reply.AddUInt8("status", event->status);
 			request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
@@ -864,7 +973,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 			if (event->status == BT_NO_CONNECTION) {
 				reply.what = BT_MSG_DISCONN_COMPLETED;
 
-				reply.AddInt8("status", event->status);
+				reply.AddUInt8("status", event->status);
 				((BluetoothServer*)be_app)->NotifyWatchers(&reply);
 
 				ClearWantedEvent(request);
@@ -1128,7 +1237,7 @@ LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
 {
 	BMessage reply(BT_MSG_INQUIRY_COMPLETED);
 
-	reply.AddInt8("status", *status);
+	reply.AddUInt8("status", *status);
 
 	printf("%s: Sending reply...\n", __func__);
 	status_t stat = request->SendReply(&reply);
@@ -1150,7 +1259,7 @@ LocalDeviceImpl::RemoteNameRequestComplete(
 		reply.AddString("friendlyname", (const char*)remotename->remote_name );
 	}
 
-	reply.AddInt8("status", remotename->status);
+	reply.AddUInt8("status", remotename->status);
 
 	TRACE_BT("LocalDeviceImpl: %s for %s with status %s\n",
 		BluetoothEvent(HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE),
@@ -1220,15 +1329,39 @@ LocalDeviceImpl::CreateConnection(BMessage* message)
 	TRACE_BT("LocalDeviceImpl: Create Connection to %s...\n",
 		bdaddrUtils::ToString(*bdaddr).String());
 
+	ServerRemoteDevice* rdConn;
+	rdConn = RemoteDeviceByAddr(*bdaddr);
+
+	if (rdConn == NULL) {
+		rdConn = new ServerRemoteDevice();
+		rdConn->bdaddr = *bdaddr;
+		rdConn->link_key = LinkKeyUtils::NullKey();
+	}
+
+	message->FindString("name", &rdConn->friendly_name);
+	message->FindUInt8("pscan_rep_mode", &rdConn->pscan_rep_mode);
+	message->FindUInt16("clock_offset", &rdConn->clock_offset);
+
+	uint32 record;
+	message->FindUInt32("record", &record);
+	rdConn->classOfDevice[0] = (record & 0x000000FF);
+	rdConn->classOfDevice[1] = (record & 0x0000FF00) >> 8;
+	rdConn->classOfDevice[2] = (record & 0x00FF0000) >> 16;
+
+	rdConn->conn_state = RemoteDevice::CONNECTING;
+	rdConn->link_type = HCI_ACL_CONN;
+
+	AddRemoteDevice(rdConn);
+
 	BluetoothCommand<typed_command(hci_cp_create_conn)>
 		command(OGF_LINK_CONTROL, OCF_CREATE_CONN);
 
 	command->bdaddr = *bdaddr;
 	message->FindUInt16("packet type", &command->pkt_type);
 	command->pkt_type &= ACL_PTYPE_MASK;
-	message->FindUInt8("pscan_rep_mode", &command->pscan_rep_mode);
+	command->pscan_rep_mode = rdConn->pscan_rep_mode;
 	message->FindUInt8("pscan_mode", &command->pscan_mode); // Reserved in spec 2.1
-	message->FindUInt16("clock_offset", &command->clock_offset);
+	command->clock_offset = rdConn->clock_offset;
 	command->clock_offset |= 0x8000; // substract!
 	message->FindUInt8("role_switch", &command->role_switch);
 
@@ -1294,7 +1427,12 @@ LocalDeviceImpl::Disconnect(BMessage* message)
 	BluetoothCommand<typed_command(hci_disconnect)> command(OGF_LINK_CONTROL,
 		OCF_DISCONNECT);
 
-	message->FindUInt16("handle", &command->handle);
+	const bdaddr_t* bdaddr;
+	ssize_t addr_size;
+	message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &addr_size);
+
+	ServerRemoteDevice* rd = RemoteDeviceByAddr(*bdaddr);
+	command->handle = rd->handle;
 	message->FindUInt8("reason", &command->reason);
 
 
@@ -1349,12 +1487,17 @@ void
 LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event)
 {
 	BMessage reply;
+	ServerRemoteDevice* rd = RemoteDeviceByAddr(event->bdaddr);
+
 	reply.AddUInt8("status", event->status);
 	if (event->status == BT_OK) {
-		uint8 cod[3] = {0, 0, 0};
+		rd->handle = event->handle;
+		rd->link_type = event->link_type;
+		rd->conn_state = RemoteDevice::CONNECTED;
+
 		// TODO: Review, this rDevice is leaked
 		ConnectionIncoming* iConnection = new ConnectionIncoming(
-			new RemoteDevice(event->bdaddr, cod));
+			new RemoteDevice(event->bdaddr, rd->classOfDevice));
 		iConnection->Show();
 
 		TRACE_BT("LocalDeviceImpl: %s: Address %s handle=%#x type=%d encrypt=%d\n", __FUNCTION__,
@@ -1373,6 +1516,12 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event)
 
 		reply.what = BT_MSG_CONN_COMPLETED;
 	} else {
+		linkkey_t nullLinkKey = LinkKeyUtils::NullKey();
+		if (LinkKeyUtils::Compare(&rd->link_key, &nullLinkKey))
+			RemoveRemoteDevice(rd);
+		else
+			rd->conn_state = RemoteDevice::DISCONNECTED;
+
 		TRACE_BT("LocalDeviceImpl: %s: failed with error %s\n", __FUNCTION__,
 			BluetoothError(event->status));
 
@@ -1389,8 +1538,18 @@ LocalDeviceImpl::DisconnectionComplete(hci_ev_disconnection_complete_reply* even
 	TRACE_BT("LocalDeviceImpl: %s: Handle=%#x, reason=%s status=%x\n", __FUNCTION__, event->handle,
 		BluetoothError(event->reason), event->status);
 
+	ServerRemoteDevice* rd;
+	rd = RemoteDeviceByHandle(event->handle);
 	BMessage reply(BT_MSG_DISCONN_COMPLETED);
-	reply.AddInt8("status", event->status);
+	reply.AddUInt8("status", event->status);
+
+	if (event->status != BT_OK || rd == NULL) {
+		((BluetoothServer*)be_app)->NotifyWatchers(&reply);
+		return;
+	}
+
+	reply.AddData("bdaddr", B_ANY_TYPE, &rd->bdaddr, sizeof(bdaddr_t));
+	rd->conn_state = RemoteDevice::DISCONNECTED;
 
 	((BluetoothServer*)be_app)->NotifyWatchers(&reply);
 }
@@ -1429,12 +1588,19 @@ void
 LocalDeviceImpl::LinkKeyNotify(hci_ev_link_key_notify* event,
 	BMessage* request)
 {
-	// TODO: Here we are supposed to save the link key in the Database
 	TRACE_BT("LocalDeviceImpl: %s: Address %s, key=%s, type=%d\n", __FUNCTION__,
 		bdaddrUtils::ToString(event->bdaddr).String(),
 		LinkKeyUtils::ToString(event->link_key).String(), event->key_type);
+
 	if (request != NULL)
 		ClearWantedEvent(request);
+
+	ServerRemoteDevice* rd = RemoteDeviceByAddr(event->bdaddr);
+	if (rd == NULL)
+		return;
+
+	rd->link_key = event->link_key;
+	rd->link_type = event->key_type;
 }
 
 
@@ -1445,31 +1611,48 @@ LocalDeviceImpl::LinkKeyRequested(struct hci_ev_link_key_req* keyRequested,
 	TRACE_BT("LocalDeviceImpl: %s: Address %s\n", __FUNCTION__,
 		bdaddrUtils::ToString(keyRequested->bdaddr).String());
 
-	// TODO:
-	// Here we are supposed to check the BDADDR received, look into the server
-	// (RemoteDevice Database) if we have any pas link key interchanged with
-	// the given address if we have we are to accept it will "Link key Request
-	// Reply". As we dont not have such database yet, we will always deny it
-	// forcing the remote device to start a pairing.
+	ServerRemoteDevice* rd = RemoteDeviceByAddr(keyRequested->bdaddr);
+	linkkey_t nullLinkKey = LinkKeyUtils::NullKey();
+	if (rd == NULL || LinkKeyUtils::Compare(&rd->link_key, &nullLinkKey)) {
+		BluetoothCommand<typed_command(hci_cp_link_key_neg_reply)>
+			linkKeyNegativeReply(OGF_LINK_CONTROL, OCF_LINK_KEY_NEG_REPLY);
 
-	BluetoothCommand<typed_command(hci_cp_link_key_neg_reply)>
-		linkKeyNegativeReply(OGF_LINK_CONTROL, OCF_LINK_KEY_NEG_REPLY);
+		BMessage* newrequest = new BMessage;
+		newrequest->AddInt16("eventExpected", HCI_EVENT_CMD_COMPLETE);
+		newrequest->AddInt16("opcodeExpected",
+			PACK_OPCODE(OGF_LINK_CONTROL, OCF_LINK_KEY_NEG_REPLY));
+		// on neg reply we expect this
+		newrequest->AddInt16("eventExpected", HCI_EVENT_PIN_CODE_REQ);
+		AddWantedEvent(newrequest);
+		bdaddrUtils::Copy(linkKeyNegativeReply->bdaddr, keyRequested->bdaddr);
 
-	BMessage* newrequest = new BMessage;
-	newrequest->AddInt16("eventExpected", HCI_EVENT_CMD_COMPLETE);
-	newrequest->AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_LINK_KEY_NEG_REPLY));
-	// on neg reply we expect this
-	newrequest->AddInt16("eventExpected", HCI_EVENT_PIN_CODE_REQ);
-	AddWantedEvent(newrequest);
-	bdaddrUtils::Copy(linkKeyNegativeReply->bdaddr, keyRequested->bdaddr);
-
-	if ((fHCIDelegate)->IssueCommand(linkKeyNegativeReply.Data(),
-		linkKeyNegativeReply.Size()) == B_ERROR) {
-		TRACE_BT("LocalDeviceImpl: Command issued error for reply %s\n", __FUNCTION__);
+		if ((fHCIDelegate)->IssueCommand(linkKeyNegativeReply.Data(),
+			linkKeyNegativeReply.Size()) == B_ERROR) {
+			TRACE_BT("LocalDeviceImpl: Command issued error for neg reply %s\n", __FUNCTION__);
+		} else {
+			TRACE_BT("LocalDeviceImpl: Command issued in neg reply of  %s\n", __FUNCTION__);
+		}
 	} else {
-		TRACE_BT("LocalDeviceImpl: Command issued in reply of  %s\n", __FUNCTION__);
-	}
 
+		BluetoothCommand<typed_command(hci_cp_link_key_reply)>
+			linkKeyReply(OGF_LINK_CONTROL, OCF_LINK_KEY_REPLY);
+
+		BMessage* newrequest = new BMessage;
+		newrequest->AddInt16("eventExpected", HCI_EVENT_CMD_COMPLETE);
+		newrequest->AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_LINK_KEY_REPLY));
+		// on neg reply we expect this
+		newrequest->AddInt16("eventExpected", HCI_EVENT_PIN_CODE_REQ);
+		AddWantedEvent(newrequest);
+
+		bdaddrUtils::Copy(linkKeyReply->bdaddr, keyRequested->bdaddr);
+		linkKeyReply->link_key = rd->link_key;
+
+		if ((fHCIDelegate)->IssueCommand(linkKeyReply.Data(), linkKeyReply.Size()) == B_ERROR) {
+			TRACE_BT("LocalDeviceImpl: Command issued error for reply %s\n", __FUNCTION__);
+		} else {
+			TRACE_BT("LocalDeviceImpl: Command issued in reply of  %s\n", __FUNCTION__);
+		}
+	}
 	if (request != NULL)
 		ClearWantedEvent(request, HCI_EVENT_LINK_KEY_REQ);
 
@@ -1629,6 +1812,16 @@ LocalDeviceImpl::AuthComplete(struct hci_ev_auth_complete* eventData, BMessage* 
 	} else {
 		TRACE_BT("LocalDeviceImpl: Authentication Failed for handle %d with status 0x%02x\n",
 			handle, status);
+
+		ServerRemoteDevice* rd = RemoteDeviceByHandle(eventData->handle);
+		rd->link_key = LinkKeyUtils::NullKey();
+		if (rd != NULL) {
+			BMessage disconnReq;
+			bdaddr_t bdaddr = rd->bdaddr;
+			disconnReq.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
+			disconnReq.AddUInt8("reason", BT_AUTHENTICATION_FAILURE);
+			Disconnect(&disconnReq);
+		}
 	}
 
 	if (request != NULL) {

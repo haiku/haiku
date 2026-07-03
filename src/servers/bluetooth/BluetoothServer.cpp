@@ -228,6 +228,23 @@ void BluetoothServer::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case BT_REQ_REMOVE_DEVICE:
+		{
+			LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+			if (lDeviceImpl == NULL)
+				break;
+
+			lDeviceImpl->Disconnect(message);
+
+			const bdaddr_t* bdaddr;
+			ssize_t addr_size;
+			message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &addr_size);
+
+			ServerRemoteDevice* rd = lDeviceImpl->RemoteDeviceByAddr(*bdaddr);
+			lDeviceImpl->RemoveRemoteDevice(rd);
+			break;
+		}
+
 		case BT_START_WATCHING_CONNECTIONS:
 		{
 			BMessenger* messenger = new BMessenger();
@@ -241,6 +258,48 @@ void BluetoothServer::MessageReceived(BMessage* message)
 			BMessenger* messenger = new BMessenger();
 			if (message->FindMessenger("messenger", messenger) == B_OK)
 				fWatchersList.RemoveItem(messenger);
+			break;
+		}
+
+		case BT_MSG_GET_REMOTE_DEVICES:
+		{
+			LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+			if (lDeviceImpl == NULL)
+				break;
+
+			RemoteDevicesList* rdList = lDeviceImpl->GetRemoteDevicesList();
+
+			for (int32 i = 0; i < rdList->CountItems(); i++) {
+				ServerRemoteDevice* rd = rdList->ItemAt(i);
+				BMessage device;
+				bdaddr_t bdaddr = rd->bdaddr;
+				device.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
+				device.AddString("name", rd->friendly_name);
+				device.AddData("cod", B_RAW_TYPE, rd->classOfDevice, sizeof(rd->classOfDevice));
+				device.AddUInt16("clock_offset", rd->clock_offset);
+				device.AddUInt8("pscan_rep_mode", rd->pscan_rep_mode);
+
+				reply.AddMessage("remote", &device);
+			}
+
+			message->SendReply(&reply);
+			break;
+		}
+
+		case BT_REQ_CONN_STATE:
+		{
+			LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+			if (lDeviceImpl == NULL)
+				break;
+
+			const bdaddr_t* bdaddr;
+			ssize_t addr_size;
+			message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &addr_size);
+
+			ServerRemoteDevice* rd = lDeviceImpl->RemoteDeviceByAddr(*bdaddr);
+			reply.AddUInt8("conn state", static_cast<uint8>(rd->conn_state));
+
+			message->SendReply(&reply);
 			break;
 		}
 

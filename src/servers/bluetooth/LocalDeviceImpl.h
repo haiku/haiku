@@ -8,12 +8,33 @@
 #include <String.h>
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/L2CAP/btL2CAP.h>
+#include <bluetoothserver_p.h>
+#include <bluetooth/RemoteDevice.h>
+#include <ObjectList.h>
 
 #include "LocalDeviceHandler.h"
 
 #include "HCIDelegate.h"
 #include "HCIControllerAccessor.h"
 #include "HCITransportAccessor.h"
+
+
+struct ServerRemoteDevice
+{
+	bdaddr_t			bdaddr;
+	BString     		friendly_name;
+	uint16				clock_offset;
+	uint8				pscan_rep_mode;
+	uint8				classOfDevice[3];
+	linkkey_t			link_key;
+	uint8				link_type;
+
+	uint16				handle;
+	RemoteDevice::ConnectionState			conn_state;
+};
+
+typedef BObjectList<ServerRemoteDevice> RemoteDevicesList;
 
 class LocalDeviceImpl : public LocalDeviceHandler {
 
@@ -33,14 +54,24 @@ public:
 	// Request handling
 	status_t 	ProcessSimpleRequest(BMessage* request);
 
-	void		NotifyWatchers(BMessage* notice);
-
 	// Connection
 	void CreateConnection(BMessage* message);
 	void CancelConnection(BMessage* message);
 	void Disconnect(BMessage* message);
 
+	ServerRemoteDevice*	RemoteDeviceByAddr(bdaddr_t bdaddr);
+	ServerRemoteDevice*	RemoteDeviceByHandle(uint16 handle);
+	void				AddRemoteDevice(ServerRemoteDevice* rd);
+	void				RemoveRemoteDevice(ServerRemoteDevice* rd);
+	RemoteDevicesList*	GetRemoteDevicesList();
+
 private:
+
+	RemoteDevicesList	fRemoteDevicesList;
+
+	void SaveRemoteDevices();
+	void LoadRemoteDevices();
+
 	void HandleUnexpectedEvent(struct hci_event_header* event);
 	void HandleExpectedRequest(struct hci_event_header* event,
 		BMessage* request);
