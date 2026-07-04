@@ -1,11 +1,10 @@
-SubDir HAIKU_TOP src add-ons kernel network protocols l2cap ;
+SubDir HAIKU_TOP src add-ons kernel network protocols bluetooth l2cap ;
 
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net bluetooth ;
 
 KernelAddon l2cap :
 	l2cap.cpp
-	l2cap_address.cpp
 	l2cap_command.cpp
 	l2cap_signal.cpp
 	L2capEndpoint.cpp

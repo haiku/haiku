@@ -11,7 +11,6 @@
 
 #include <new>
 
-#include "l2cap_address.h"
 #include "l2cap_command.h"
 #include "l2cap_internal.h"
 #include "l2cap_signal.h"
@@ -32,8 +31,7 @@ bt_hci_module_info* btDevices;
 net_buffer_module_info* gBufferModule;
 net_stack_module_info* gStackModule;
 net_socket_module_info* gSocketModule;
-
-static struct net_domain* sDomain;
+module_info* gBluetoothModuleInfo;
 
 
 net_protocol*
@@ -196,7 +194,7 @@ l2cap_read_avail(net_protocol* protocol)
 struct net_domain*
 l2cap_get_domain(net_protocol* protocol)
 {
-	return sDomain;
+	return gStackModule->get_domain(AF_BLUETOOTH);
 }
 
 
@@ -342,12 +340,13 @@ l2cap_std_ops(int32 op, ...)
 
 			error = gStackModule->register_domain_protocols(AF_BLUETOOTH,
 				SOCK_SEQPACKET, BLUETOOTH_PROTO_L2CAP,
-				NET_BLUETOOTH_L2CAP_NAME, NULL);
+				NET_BLUETOOTH_L2CAP_NAME,
+				NULL);
 			if (error != B_OK)
 				return error;
 
-			error = gStackModule->register_domain(AF_BLUETOOTH, "l2cap",
-				&gL2CAPModule, &gL2capAddressModule, &sDomain);
+			error = gStackModule->register_domain_receiving_protocol(AF_BLUETOOTH,
+				BLUETOOTH_PROTO_L2CAP, NET_BLUETOOTH_L2CAP_NAME);
 			if (error != B_OK)
 				return error;
 
@@ -356,7 +355,6 @@ l2cap_std_ops(int32 op, ...)
 
 		case B_MODULE_UNINIT:
 			gL2capEndpointManager.~L2capEndpointManager();
-			gStackModule->unregister_domain(sDomain);
 			return B_OK;
 
 		default:
@@ -411,6 +409,7 @@ module_dependency module_dependencies[] = {
 	{NET_SOCKET_MODULE_NAME, (module_info**)&gSocketModule},
 	{BT_CORE_DATA_MODULE_NAME, (module_info**)&btCoreData},
 	{BT_HCI_MODULE_NAME, (module_info**)&btDevices},
+	{NET_BLUETOOTH_CORE_NAME, &gBluetoothModuleInfo},
 	{}
 };
 

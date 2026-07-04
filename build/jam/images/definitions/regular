@@ -163,6 +163,7 @@ SYSTEM_SERVERS += [ FFilterByBuildFeatures
 
 # Bluetooth stack + drivers
 SYSTEM_NETWORK_PROTOCOLS +=
+	bluetooth
 	l2cap
 ;
 SYSTEM_BT_STACK =

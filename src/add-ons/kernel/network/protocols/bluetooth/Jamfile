@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel network protocols bluetooth ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net bluetooth ;
+
+KernelAddon bluetooth :
+	bluetooth_address.cpp
+	bluetooth.cpp
+;
+
+SubInclude HAIKU_TOP src add-ons kernel network protocols bluetooth l2cap ;

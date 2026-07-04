@@ -6,8 +6,7 @@
 
 #include <AutoDeleter.h>
 
-#include <bluetooth/bdaddrUtils.h>
-
+#include <string.h>
 
 L2capEndpointManager gL2capEndpointManager;
 
@@ -32,7 +31,8 @@ status_t
 L2capEndpointManager::Bind(L2capEndpoint* endpoint, const sockaddr_l2cap& address)
 {
 	// TODO: Support binding to specific addresses?
-	if (!Bluetooth::bdaddrUtils::Compare(address.l2cap_bdaddr, BDADDR_ANY))
+	const bdaddr_t anyAddr = BDADDR_ANY;
+	if (memcmp(&address.l2cap_bdaddr, &anyAddr, sizeof(bdaddr_t)) != 0)
 		return EINVAL;
 
 	// PSM values must be odd.
@@ -132,6 +132,9 @@ L2capEndpointManager::Disconnected(HciConnection* connection)
 
 		endpoint->fConnection = NULL;
 		endpoint->fState = L2capEndpoint::CLOSED;
+
+		endpoint->socket->error = ENOTCONN;
+		gSocketModule->notify(endpoint->socket, B_SELECT_ERROR, ENOTCONN);
 	}
 }
 
