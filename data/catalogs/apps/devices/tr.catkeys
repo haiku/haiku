@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Devices	2130736270
+1	turkish	x-vnd.Haiku-Devices	2994036512
 ACPI bus	DevicesView		ACPI veri yolu
 Encryption controller	Device		Şifreleme denetleyicisi
 Devices	System name		Aygıtlar
@@ -8,18 +8,23 @@ Generate system information	DevicesView		Sistem bilgisi üret
 Class info	DevicePCI		Sınıf bilgisi
 USB bus	Device		USB veri yolu
 Computer	DevicesView		Bilgisayar
+ACPI thermal zone	DeviceACPI		ACPI termal bölgesi
 Communications	DeviceSCSI		İletişim
 Mass storage controller	Device		Yığın depolama denetleyicisi
 Connection	DevicesView		Bağlantı
 Printer	DeviceSCSI		Yazıcı
+Driver used	DevicesView		Kullanılan sürücü
 Manufacturer	Device		Üretici
 Scanner	DeviceSCSI		Tarayıcı
 Memory controller	Device		Bellek denetleyicisi
+Device paths	DevicesView		Aygıt yolları
 Unknown device	DevicesView		Bilinmeyen aygıt
 ACPI node '%1'	DeviceACPI		ACPI düğümü “%1”
 Name	PropertyList		Ad
 Manufacturer	DeviceSCSI		Üretici
+Graphics peripheral	DeviceSCSI		Grafik çevre birimi
 Device name	Device		Aygıt adı
+unknown	DeviceACPI		bilinmeyen
 Satellite communications controller	Device		Uydu iletişimi denetleyicisi
 Device class	DeviceSCSI		Aygıt sınıfı
 Device	Device		Aygıt
@@ -27,6 +32,7 @@ Input device controller	Device		Giriş aygıtı denetleyicisi
 PCI bus	DevicesView		PCI veri yolu
 Changer	DeviceSCSI		Değiştirici
 Serial bus controller	Device		Seri veri yolu denetleyicisi
+unknown	DevicesView		bilinmeyen
 Refresh devices	DevicesView		Aygıtları yenile
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
@@ -36,7 +42,10 @@ Wireless controller	Device		Kablosuz denetleyicisi
 Generic system peripheral	Device		Genel sistem çevre birimi
 Value	PropertyList		Değer
 Devices	DevicesView		Aygıtlar
+none	DevicesView		yok
 Device name	DeviceACPI		Aygıt adı
+unknown	DevicePCI		bilinmeyen
+Optical drive	DeviceSCSI		Optik sürücü
 Display controller	Device		Görüntü denetleyicisi
 Bus	DevicesView		Veri yolu
 ACPI <unknown>	DeviceACPI		ACPI <bilinmiyor>
@@ -46,18 +55,27 @@ Report compatibility	DevicesView		Uyumluluğu bildir
 Computer	Device		Bilgisayar
 PCI bus	Device		PCI veri yolu
 Enclosure	DeviceSCSI		Koruncak
+Tape drive	DeviceSCSI		Kaset sürücüsü
 Order by:	DevicesView		Sıralama:
 Intelligent controller	Device		Akıllı denetleyici
+ACPI processor namespace '%2'	DeviceACPI		ACPI işlemci ad alanı “%2”
 Multimedia controller	Device		Çoklu ortam denetleyici
 Quit	DevicesView		Çık
 ISA bus	Device		ISA veri yolu
 ISA bus	DevicesView		ISA veri yolu
+Basic information	PropertyList		Temel bilgiler
 Processor	DeviceSCSI		İşlemci
+Card reader	DeviceSCSI		Kart okuyucusu
 Bridge	Device		Köprü
+ACPI button '%1'	DeviceACPI		ACPI düğmesi “%1”
+Attributes	PropertyList		Öznitelikler
+Disk drive	DeviceSCSI		Disk sürücüsü
 Worm	DeviceSCSI		Solucan
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Üretici
 Bridge	DeviceSCSI		Köprü
+ACPI system indicator	DeviceACPI		ACPI sistem göstergesi
+ACPI system bus	DeviceACPI		ACPI sistem veri yolu
 Signal processing controller	Device		Sinyal işleme denetleyicisi
 Device name	DeviceSCSI		Aygıt adı
 Docking station	Device		Takma istasyonu

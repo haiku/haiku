@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2108618135
+1	turkish	x-vnd.Haiku-HaikuDepot	4230673291
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 User ratings loading…	PackageInfoView		Kullanıcı derecelendirmeleri yükleniyor…
 Available packages	MainWindow		Kullanılabilir paketler
@@ -45,10 +45,12 @@ Cancel	UserLoginWindow		Vazgeç
 Rating not possible	MainWindow		Derecelendirme olanaklı değil
 Package update error	MainWindow		Paket güncelleme hatası
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Tüm paketlerde arama yapmak için
+No screenshot available.	PackageInfoView		Kullanılabilir ekran görüntüsü yok
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# süreç}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Paket için olan kullanıcı derecelendirmeleri getiriliyor…
 Reboot required	PackageManager		Yeniden başlatma gerekli
 All packages	PackageListView		Tüm paketler
+Checking server information	ServerRuntimeInformationVerifierProcess		Sunucu bilgisi denetleniyor…
 Send	RatePackageWindow		Gönder
 Creating package list…	FeaturedPackagesView		Paket listesi oluşturuluyor…
 Start package daemon	App		Paket hizmetini başlat
@@ -82,6 +84,7 @@ Continue	App		Sürdür
 A password is required.	UserLoginWindow		Bir parola gerekli.
 Language	RatePackageWindow		Dil
 Open %DeskbarLink%	PackageAction		Aç: %DeskbarLink%
+Login disabled	MainWindow		Oturum açma devre dışı
 Status	PackageListView		Durum
 Network transport error	ServerHelper		Ağ ulaşım hatası
 Cancel	PackageResult		Vazgeç
@@ -140,6 +143,7 @@ Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşzamanlanıyor…
 No, quit	App		Hayır, çık
 Show	MainWindow		Göster
+Timestamp discrepancy	ServerRuntimeInformationVerifierProcess		Zaman damgası farkı
 No contents available.	PackageInfoView		Kullanılabilir içerik yok.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Bu uygulama çalışabilmek için bilgisayarınızda dosya işlemleri yapmaya gereksinim duyar. Görünüşe göre [%TestFilePath%] konumuna bir sınama dosyası yazımında sorunlar var. Lütfen bu uygulamanın dosya yazmasına engel olabilecek disk veya dosya izinleri sıkıntıları olup olmadığını denetleyin. Bu sorunu göz ardı edip işlemi sürdürebilirsiniz; ancak bazı işlevler devre dışı kalabilir.
 Settings…	MainWindow		Ayarlar…
@@ -153,6 +157,7 @@ Installed packages	MainWindow		Kurulu paketler
 User rating	RatePackageWindow		Kullanıcı oyları
 Date	PackageListView		Tarih
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Parola en az %MinPasswordLength% karakter olmalıdır. %MinPasswordUppercaseChar% karakter BÜYÜK harf ve %MinPasswordDigitsChar% sayı zorunluluğu vardır.
+Screenshot loading…	PackageInfoView		Ekran görüntüsü yükleniyor…
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu’nun Haiku Depo bölümünden erişilebilir.
 There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		“%DeskbarLink%” açılıyor…
@@ -219,6 +224,7 @@ The nickname is required.	UserLoginWindow		Takma ad gerekli.
 Apply changes	PackageResult		Değişiklikleri uygula
 Server error	ServerHelper		Sunucu hatası
 Rate package	RatePackageWindow		Paketi derecelendir
+The server and this computer have a discrepancy in the current timestamp of around %DiscrepancySeconds% seconds. This may cause issues for HaikuDepot communicating with the server. Check your computer's clock settings and correct the current time if necessary.	ServerRuntimeInformationVerifierProcess		Sunucu ve bu bilgisayar arasındaki geçerli zaman damgasında yaklaşık %DiscrepancySeconds% saniyelik bir fark bulunmaktadır. Bu durum, Haiku Depo’nun sunucuyla iletişiminde sorunlara neden olabilir. Bilgisayarınızın zaman ayarlarını denetleyin ve gerekirse geçerli zamanı düzeltin.
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		“%PackageName%” görüntülemesinin kaydı yazılıyor…
 Sending anonymous usage data	MainWindow		Anonim kullanım verisi gönder
 Log in	UserLoginWindow		Giriş yap

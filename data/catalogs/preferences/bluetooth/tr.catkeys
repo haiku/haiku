@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-BluetoothPrefs	3945807779
+1	turkish	x-vnd.Haiku-BluetoothPrefs	801341821
 Laptop	Settings view		Dizüstü
 Only from trusted devices	Settings view		Yalnızca güvenilir aygıtlardan
 15 secs	Settings view		15 saniye
@@ -18,10 +18,12 @@ There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		S
 Revert	Window		Eski haline döndür
 Refresh local devices…	Window		Yerel aygıtları yenile…
 Disconnect	Remote devices		Bağlantıyı kes
+Canceling Inquiry…	Inquiry panel		İstekten vazgeçiliyor…
 Defaults	Window		Saptanmışlar
 From all devices	Settings view		Tüm aygıtlardan
 Start bluetooth services…	Window		Bluetooth hizmetlerini başlat…
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Uzak aygıtınızın Bluetooth özelliğinin açık olduğundan emin olun. “Tara”ya basıp taramayı başlatın. Aygıt adlarının getirilme süresi tam bilinememekle birlikte, aygıt başına 3 saniyeyi genelde aşmaz. Bundan sonra aygıtları ana listenize ekleyip bağlanma kısmına geçebilirsiniz.
+Cancel	Inquiry panel		Vazgeç
 Scanning progress	Inquiry panel		Tarama ilerlemesi
 Launch now	main		Şimdi çalıştır
 Bluetooth	System name		Bluetooth
@@ -31,6 +33,7 @@ Always ask	Settings view		Her zaman sor
 With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Yardımda bulunanlar:\n — Mika Lindqvist\n — Adrien Destugues\n — Maksym Yevmenkin\n\nYardımda bulunan herkese çok teşekkürler…\n\nDonanım gönderenler/bağışta bulunanlar:\n — Henry Jair Abril Florez (el Colombian)\n\tve Stefanie Bartolich\n — Edwin Erik Amsler\n — Dennis d’Entremont\n — Luroh\n — Pieter Panman\n\nFinansal olarak yardımda bulunanlar:\n — Karl vom Dorff, Andrea Bernardi (OSDrawer),\n — Matt M, Doug F, Hubert H,\n — Sebastian B, Andrew M, Jared E,\n — Frederik H, Tom S, Ferry B,\n — Greg G, David F, Richard S, Martin W:\n\nKod katkısında bulunanlar:\n — Michael Weirauch\n — Fredrik Ekdahl\n — Raynald Lesieur\n — Andreas Färber\n — Joerg Meyer\nSınamada bulunanlar:\n — Petter H. Juliussen\nBildiğim her şeyi öğretenler:\n — yellowTAB takımı
 Help	Window		Yardım
 Pair…	Remote devices		Eşleştir…
+Friendly Name:	Settings view		Anlaşılır adı:
 Retrieving name of %1	Inquiry panel		%1 adı alınıyor
 Inquiry	Inquiry panel		Tara
 Incoming connections policy:	Settings view		Gelen bağlantılar ilkesi:

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Devices	542483980
+1	german	x-vnd.Haiku-Devices	2994036512
 ACPI bus	DevicesView		ACPI-Bus
 Encryption controller	Device		Verschlüsselungscontroller
 Devices	System name		Geräte
@@ -8,6 +8,7 @@ Generate system information	DevicesView		Systeminformationen erstellen
 Class info	DevicePCI		Klassen-Info
 USB bus	Device		USB-Bus
 Computer	DevicesView		Computer
+ACPI thermal zone	DeviceACPI		ACPI Temperaturzone
 Communications	DeviceSCSI		Kommunikation
 Mass storage controller	Device		Massenspeicher-Controller
 Connection	DevicesView		Verbindung
@@ -21,7 +22,9 @@ Unknown device	DevicesView		Unbekanntes Gerät
 ACPI node '%1'	DeviceACPI		ACPI Node '%1'
 Name	PropertyList		Name
 Manufacturer	DeviceSCSI		Hersteller
+Graphics peripheral	DeviceSCSI		Grafik-Peripheriegerät
 Device name	Device		Gerätename
+unknown	DeviceACPI		unbekannt
 Satellite communications controller	Device		Satellitenkommunikations-Controller
 Device class	DeviceSCSI		Geräteklasse
 Device	Device		Gerät
@@ -29,6 +32,7 @@ Input device controller	Device		Eingabegeräte-Kontroller
 PCI bus	DevicesView		PCI-Bus
 Changer	DeviceSCSI		Wechsler
 Serial bus controller	Device		Serieller Bus-Controller
+unknown	DevicesView		unbekannt
 Refresh devices	DevicesView		Geräte aktualisieren
 Category	DevicesView		Kategorie
 RBC	DeviceSCSI		RBC
@@ -38,7 +42,10 @@ Wireless controller	Device		Funknetzwerk-Controller
 Generic system peripheral	Device		Peripheriegeräte
 Value	PropertyList		Wert
 Devices	DevicesView		Geräte
+none	DevicesView		keine
 Device name	DeviceACPI		Gerätename
+unknown	DevicePCI		unbekannt
+Optical drive	DeviceSCSI		Optisches Laufwerk
 Display controller	Device		Anzeige-Controller
 Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unbekannt>
@@ -48,20 +55,27 @@ Report compatibility	DevicesView		Kompatibilität anzeigen
 Computer	Device		Computer
 PCI bus	Device		PCI-Bus
 Enclosure	DeviceSCSI		Gehäuse
+Tape drive	DeviceSCSI		Bandlaufwerk
 Order by:	DevicesView		Sortieren nach:
 Intelligent controller	Device		Intelligenter Controller
+ACPI processor namespace '%2'	DeviceACPI		ACPI Prozessor-Namespace '%2'
 Multimedia controller	Device		Multimedia-Controller
 Quit	DevicesView		Beenden
 ISA bus	Device		ISA-Bus
 ISA bus	DevicesView		ISA-Bus
 Basic information	PropertyList		Basisdaten
 Processor	DeviceSCSI		Prozessor
+Card reader	DeviceSCSI		Kartenleser
 Bridge	Device		Schnittstellen
+ACPI button '%1'	DeviceACPI		ACPI Button '%1'
 Attributes	PropertyList		Attribute
+Disk drive	DeviceSCSI		Laufwerk
 Worm	DeviceSCSI		WORM
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Hersteller
 Bridge	DeviceSCSI		Schnittstellen
+ACPI system indicator	DeviceACPI		ACPI System-Indikator
+ACPI system bus	DeviceACPI		ACPI Systembus
 Signal processing controller	Device		Signalverarbeitungscontroller
 Device name	DeviceSCSI		Gerätename
 Docking station	Device		Andockstation

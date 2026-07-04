@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	2074921536
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	801341821
 Laptop	Settings view		Laptop
 Only from trusted devices	Settings view		Csak biztonságos eszközöktől
 15 secs	Settings view		15 mp
@@ -18,6 +18,7 @@ There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		N
 Revert	Window		Visszaállít
 Refresh local devices…	Window		Helyi eszközök frissítése…
 Disconnect	Remote devices		Kapcsolatbontás
+Canceling Inquiry…	Inquiry panel		Felderítés leállítása…
 Defaults	Window		Alapértékek
 From all devices	Settings view		Minden eszköztől
 Start bluetooth services…	Window		Bluetooth-szolgáltatások elindítása…

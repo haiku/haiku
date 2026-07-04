@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-StyledEdit	2777022576
+1	turkish	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Belge istatistikleri
 Cut	Menus		Kes
 Center	Menus		Orta
@@ -39,6 +39,7 @@ Strikeout	Menus		Üzeri çizili
 Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
 Error saving \"%filename%\":\n%error%	SaveAlert		“%filename%” dosyası kaydedilirken hata:\n\t%error%
 Save changes to the document \"%title%\"?	QuitAlert		“%title%” belgesine yapılan değişiklikler kaydedilsin mi?
+Style	Menus		Biçem
 Save	SaveAlert		Kaydet
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		“%title%” belgesinde kaydedilmemiş değişiklikler var.\nSon kaydedilmiş sürüme geri dönülsün mü?
 Default	Open_and_SaveAsPanel		Saptanmış

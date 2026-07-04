@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2384088929
+1	hungarian	x-vnd.Haiku-HaikuDepot	4230673291
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 User ratings loading…	PackageInfoView		Felhasználói értékelések betöltése…
 Available packages	MainWindow		Elérhető csomagok
@@ -50,6 +50,7 @@ No screenshot available.	PackageInfoView		Képernyőkép nem érhető el.
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Felhasználói értékelések lekérése a csomaghoz
 Reboot required	PackageManager		Újraindítás szükséges
 All packages	PackageListView		Minden csomag
+Checking server information	ServerRuntimeInformationVerifierProcess		Kiszolgáló-információk ellenőrzése
 Send	RatePackageWindow		Küldés
 Creating package list…	FeaturedPackagesView		Csomaglista készítése…
 Start package daemon	App		Csomag démon indítása
@@ -83,6 +84,7 @@ Continue	App		Folytatás
 A password is required.	UserLoginWindow		Jelszó szükséges.
 Language	RatePackageWindow		Nyelv
 Open %DeskbarLink%	PackageAction		%DeskbarLink% megnyitása
+Login disabled	MainWindow		Bejelentkezés letiltva
 Status	PackageListView		Állapot
 Network transport error	ServerHelper		Hálózati átviteli hiba
 Cancel	PackageResult		Mégse
@@ -141,6 +143,7 @@ Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
 No, quit	App		Nem, kilépés.
 Show	MainWindow		Megjelenítés
+Timestamp discrepancy	ServerRuntimeInformationVerifierProcess		Időbélyeg-eltérés
 No contents available.	PackageInfoView		Tartalom nem érhető el.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ezen alkalmazás működéséhez a számítógépen szükséges néhány fájt írása/olvasása. Úgy tűnik, hogy problémák vannak egy tesztfájl írásával [%TestFilePath%] útvonalon. Ellenőrizd, hogy a helyi lemezzel vagy az engedélyekkel kapcsolatban nincsenek-e olyan problémák, amelyek megakadályozhatják, hogy az alkalmazás fájlokat írjon az adott mappába. Tudomásul veheted ezt a problémát és folytathatod, de egyes funkciók nem lesznek elérhetők.
 Settings…	MainWindow		Beállítások…
@@ -221,6 +224,7 @@ The nickname is required.	UserLoginWindow		Felhasználói név szükséges.
 Apply changes	PackageResult		Változtatások alkalmazása
 Server error	ServerHelper		Mentési hiba
 Rate package	RatePackageWindow		Csomag értékelése
+The server and this computer have a discrepancy in the current timestamp of around %DiscrepancySeconds% seconds. This may cause issues for HaikuDepot communicating with the server. Check your computer's clock settings and correct the current time if necessary.	ServerRuntimeInformationVerifierProcess		A kiszolgáló és a számítógép jelenlegi időbélyegében körülbelül %DiscrepancySeconds% másodperc közötti eltérés van. Ez problémákat okozhat a Raktár kommunikációjában a kiszolgálóval. Ellenőrizd a számítógéped óráját, és ha szükséges, korrigáld az aktuális időt.
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		\"%PackageName%\" felvételi nézete
 Sending anonymous usage data	MainWindow		Névtelen felhasználási adatok küldése
 Log in	UserLoginWindow		Bejelentkezés

@@ -1,7 +1,8 @@
-1	hungarian	x-vnd.Be-WORK	1255000335
+1	hungarian	x-vnd.Be-WORK	1851878724
 Quit	Workspaces		Kilépés
 Invalid argument: %s\n	Workspaces		Érvénytelen paraméter: %s\n
 Change workspace count…	Workspaces		Munkaasztalok számának megváltoztatása…
+Usage: %s [options] [workspace|direction]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when mouse is at the screen edge\n  --help\t\tdisplay this help and exit\n  -i\t\t\tdisplay workspace layout and exit\n\"workspace\" is the number of the Workspace to which to switch (+|-|0-31)\nand \"direction\" is the direction of the Workspace to switch to (left|right|up|down)\n	Workspaces		Hasnálat: %s [opciók] [munkaasztal|irány]\nahol az \"opciók\" lehetnek:\n--notitle\t\tablak-fül elrejtve, de a keret és a méretező megmarad\n--noborder\t\ta teljes ablakkeret elrejtve\n--avoidfocus\t\tmegakadályozza azt, hogy az ablak elvegye az egér- és billetnyűzet-vezérlést\n--alwaysontop\t\tmindig felül\n--notmovable\t\taz ablak nem mozgatható\n--autoraise\t\ta munkaasztal-ablak automatikus előtérbe hozása, amikor az egér az ablak szélénél van\n--help\t\tez a leírás\n-i\t\t\ta munkaasztal információinak megjelenítése\nA \"munkaasztal\" a Munkaasztal azonosító-száma, amelyikre váltani szeretnél (+|-|0-31)\nés az \"irány\" az átváltandó Munkaasztal iránya (left|right|up|down)\n
 Always on top	Workspaces		Mindig felül
 Show window border	Workspaces		Ablakkeret megjelenítése
 Show window tab	Workspaces		Ablakfül megjelenítése

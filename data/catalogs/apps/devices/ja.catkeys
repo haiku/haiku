@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Devices	542483980
+1	japanese	x-vnd.Haiku-Devices	2994036512
 ACPI bus	DevicesView		ACPI バス
 Encryption controller	Device		暗号化コントローラー
 Devices	System name		デバイス
@@ -8,6 +8,7 @@ Generate system information	DevicesView		システム情報の作成
 Class info	DevicePCI		クラス情報
 USB bus	Device		USB バス
 Computer	DevicesView		コンピューター
+ACPI thermal zone	DeviceACPI		ACPI サーマルゾーン
 Communications	DeviceSCSI		通信
 Mass storage controller	Device		大容量記憶域コントローラー
 Connection	DevicesView		接続順
@@ -21,7 +22,9 @@ Unknown device	DevicesView		不明なデバイス
 ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
 Name	PropertyList		名前
 Manufacturer	DeviceSCSI		製造元
+Graphics peripheral	DeviceSCSI		グラフィック装置
 Device name	Device		デバイス名
+unknown	DeviceACPI		不明
 Satellite communications controller	Device		衛星通信コントローラー
 Device class	DeviceSCSI		デバイスクラス
 Device	Device		デバイス
@@ -29,6 +32,7 @@ Input device controller	Device		入力デバイスコントローラー
 PCI bus	DevicesView		PCI バス
 Changer	DeviceSCSI		チェンジャー
 Serial bus controller	Device		シリアルバスコントローラー
+unknown	DevicesView		不明
 Refresh devices	DevicesView		デバイスの更新
 Category	DevicesView		カテゴリー順
 RBC	DeviceSCSI		RBC
@@ -38,7 +42,10 @@ Wireless controller	Device		ワイヤレスコントローラー
 Generic system peripheral	Device		汎用システム周辺機器
 Value	PropertyList		値
 Devices	DevicesView		デバイス
+none	DevicesView		無し
 Device name	DeviceACPI		デバイス名
+unknown	DevicePCI		不明
+Optical drive	DeviceSCSI		光学ドライブ
 Display controller	Device		ディスプレイコントローラー
 Bus	DevicesView		バス
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
@@ -48,20 +55,27 @@ Report compatibility	DevicesView		互換性レポート
 Computer	Device		コンピューター
 PCI bus	Device		PCI バス
 Enclosure	DeviceSCSI		格納装置
+Tape drive	DeviceSCSI		テープドライブ
 Order by:	DevicesView		並び順:
 Intelligent controller	Device		インテリジェントコントローラー
+ACPI processor namespace '%2'	DeviceACPI		ACPI プロセッサネームスペース '%2'
 Multimedia controller	Device		マルチメディアコントローラー
 Quit	DevicesView		終了
 ISA bus	Device		ISA バス
 ISA bus	DevicesView		ISA バス
 Basic information	PropertyList		基本情報
 Processor	DeviceSCSI		プロセッサ
+Card reader	DeviceSCSI		カードリーダー
 Bridge	Device		ブリッジ
+ACPI button '%1'	DeviceACPI		ACPI ボタン '%1'
 Attributes	PropertyList		属性
+Disk drive	DeviceSCSI		ディスクドライブ
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		製造元
 Bridge	DeviceSCSI		ブリッジ
+ACPI system indicator	DeviceACPI		ACPI システムインジケーター
+ACPI system bus	DeviceACPI		ACPI システムバス
 Signal processing controller	Device		シグナル処理コントローラー
 Device name	DeviceSCSI		デバイス名
 Docking station	Device		ドッキングステーション

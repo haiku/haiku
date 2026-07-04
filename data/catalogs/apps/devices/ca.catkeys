@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Devices	542483980
+1	catalan; valencian	x-vnd.Haiku-Devices	2994036512
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlador del xifratge
 Devices	System name		Dispositius
@@ -8,6 +8,7 @@ Generate system information	DevicesView		Genera la informació del sistema
 Class info	DevicePCI		Informació de la classe
 USB bus	Device		Bus USB
 Computer	DevicesView		Ordinador
+ACPI thermal zone	DeviceACPI		Zona tèrmica ACPI
 Communications	DeviceSCSI		Comunicacions
 Mass storage controller	Device		Controlador d'emmagatzematge massiu
 Connection	DevicesView		Connexió
@@ -21,7 +22,9 @@ Unknown device	DevicesView		El dispositiu és desconegut
 ACPI node '%1'	DeviceACPI		Node d'ACPI %1
 Name	PropertyList		Nom
 Manufacturer	DeviceSCSI		Fabricant
+Graphics peripheral	DeviceSCSI		Perifèric de gràfics
 Device name	Device		Nom del dispositiu
+unknown	DeviceACPI		desconegut
 Satellite communications controller	Device		Controlador de les comunicacions per satèl·lit
 Device class	DeviceSCSI		Classe de dispositiu
 Device	Device		Dispositiu
@@ -29,6 +32,7 @@ Input device controller	Device		Controlador de dispositiu d'entrada
 PCI bus	DevicesView		Bus PCI
 Changer	DeviceSCSI		Canviador
 Serial bus controller	Device		Controlador del bus de sèrie
+unknown	DevicesView		desconegut
 Refresh devices	DevicesView		Actualitza la llista de dispositius
 Category	DevicesView		Categoria
 RBC	DeviceSCSI		RBC
@@ -38,7 +42,10 @@ Wireless controller	Device		Controlador de xarxa sense fil
 Generic system peripheral	Device		Perifèric genèric del sistema
 Value	PropertyList		Valor
 Devices	DevicesView		Dispositius
+none	DevicesView		cap
 Device name	DeviceACPI		Nom del dispositiu
+unknown	DevicePCI		desconegut
+Optical drive	DeviceSCSI		Unitat òptica
 Display controller	Device		Controlador de la pantalla
 Bus	DevicesView		BUS
 ACPI <unknown>	DeviceACPI		ACPI <desconegut>
@@ -48,20 +55,27 @@ Report compatibility	DevicesView		Informe de compatibilitat
 Computer	Device		Ordinador
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Annex
+Tape drive	DeviceSCSI		Unitat de cinta
 Order by:	DevicesView		Ordena per:
 Intelligent controller	Device		Controlador intel·ligent
+ACPI processor namespace '%2'	DeviceACPI		Espai de noms del processador ACPI %2
 Multimedia controller	Device		Controlador multimèdia
 Quit	DevicesView		Surt
 ISA bus	Device		Bus ISA
 ISA bus	DevicesView		Bus ISA
 Basic information	PropertyList		Informació bàsica
 Processor	DeviceSCSI		Processador
+Card reader	DeviceSCSI		Lector de targetes
 Bridge	Device		Pont
+ACPI button '%1'	DeviceACPI		Botó ACPI %1
 Attributes	PropertyList		Atributs
+Disk drive	DeviceSCSI		Unitat de disc
 Worm	DeviceSCSI		Cuc
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Fabricant
 Bridge	DeviceSCSI		Pont
+ACPI system indicator	DeviceACPI		Indicador del sistema ACPI
+ACPI system bus	DeviceACPI		Bus del sistema ACPI
 Signal processing controller	Device		Controlador de processament de senyals
 Device name	DeviceSCSI		Nom del dispositiu
 Docking station	Device		Base d'acoblament

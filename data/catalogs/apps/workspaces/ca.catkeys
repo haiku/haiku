@@ -1,7 +1,8 @@
-1	catalan; valencian	x-vnd.Be-WORK	1255000335
+1	catalan; valencian	x-vnd.Be-WORK	1851878724
 Quit	Workspaces		Surt
 Invalid argument: %s\n	Workspaces		Argument no vàlid: %s\n
 Change workspace count…	Workspaces		Canvia el recompte de l'espai de treball...
+Usage: %s [options] [workspace|direction]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when mouse is at the screen edge\n  --help\t\tdisplay this help and exit\n  -i\t\t\tdisplay workspace layout and exit\n\"workspace\" is the number of the Workspace to which to switch (+|-|0-31)\nand \"direction\" is the direction of the Workspace to switch to (left|right|up|down)\n	Workspaces		Ús: %s [opcions] [espai de treball|direcció]\non \"opcions\" són aquestes:\n--notitle\t\tbarra de títol suprimida, vora i canvi de mida mantinguts\n--noborder\t\ttítol, vora i canvi de mida suprimits\n--avoidfocus\t\timpedeix que la finestra sigui l'objectiu dels esdeveniments del teclat\n--alwaysontop\t\tmanté la finestra a la part superior\n--notmovable\t\tno es pot moure la finestra\n--autoraise\t\taugmenta automàticament la finestra de l'espai de treball quan el ratolí és a la vora de la pantalla\n--help\t\tmostra aquesta ajuda i surt\n-i\t\t\tmostra la disposició de l'espai de treball i surt\n\"espai de treball\" és el número de l'espai de treball al qual canviar (+|-|0-31)\ni \"direcció\" és la direcció de l'espai de treball a la qual canviar (esquerra|dreta|amunt|avall)\n
 Always on top	Workspaces		Sempre en primer pla
 Show window border	Workspaces		Mostra la vora de la finestra
 Show window tab	Workspaces		Mostra la pestanya de la finestra
