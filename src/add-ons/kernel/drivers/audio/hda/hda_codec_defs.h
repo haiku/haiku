@@ -47,11 +47,6 @@ enum pin_dev_type {
 	PIN_DEV_OTHER
 };
 
-// SET_DIGITAL_CONVERTER_CONTROL1 values
-enum {
-	DIGITAL_CONVERTER_DIGEN = 1L << 0,
-	DIGITAL_CONVERTER_NONAUDIO = 1L << 5
-};
 
 /* Verb Helper Macro */
 #define MAKE_VERB(cad, nid, vid, payload) \
