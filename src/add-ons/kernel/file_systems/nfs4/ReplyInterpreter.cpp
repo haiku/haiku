@@ -902,11 +902,10 @@ ReplyInterpreter::_OperationError(Opcode op)
 #if DEBUG
 		ERROR("NFS Error: %s\n", strerror(result));
 #else
-		// Lookup failures are routine. Reporting them could obscure more important error messages.
+		// Lookup failures are routine. Reporting could obscure important error messages.
 		if (op != OpLookUp || result != B_ENTRY_NOT_FOUND)
 			ERROR("NFS Error: %s\n", strerror(result));
 #endif
-		fDecodeError = true;
 	}
 	return result;
 }
