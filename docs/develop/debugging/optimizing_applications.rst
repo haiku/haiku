@@ -24,7 +24,7 @@ This is basically a three steps process:
 Measure
 -------
 
-profile is a `sample-based profiler<https://nikhilism.com/post/2018/sampling-profiler-internals-introduction/>`_: this tool stops the measured process at regular intervals, and looks at the call stack at this point. The more you stop in a specified function, the more likely this function eats CPU.
+profile is a `sample-based profiler <https://nikhilism.com/post/2018/sampling-profiler-internals-introduction/>`_: this tool stops the measured process at regular intervals, and looks at the call stack at this point. The more you stop in a specified function, the more likely this function eats CPU.
 
 All data is consolidated and written in the output directory.
 
@@ -53,7 +53,7 @@ More options in profile are available. See profile --help
 Tips
 ----
 
-Haiku is mainly written in C++. Function names in C++ binaries are encoded using a specific scheme. This process is called `mangling<https://en.wikipedia.org/wiki/Name_mangling>`_.
+Haiku is mainly written in C++. Function names in C++ binaries are encoded using a specific scheme. This process is called `mangling <https://en.wikipedia.org/wiki/Name_mangling>`_.
 In order to have more readable functions name in the analysis, you can use C++filt to pre-process result’s files.
 
 ::

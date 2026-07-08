@@ -98,7 +98,7 @@ Insight into the code and future tasks
 --------------------------------------
 
 MMC Bus drivers (src/add-ons/kernel/busses/mmc)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The bus driver provides the low level aspects: interrupts management,
 DMA transfer, accessing the hardware registers. It acts as a platform
@@ -122,7 +122,7 @@ then work independently of each other. This setup seems pretty uncommon
 in real hardware, however.
 
 The Bus Manager (src/add-ons/kernel/bus_managers/mmc)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The bus manager is responsible for enumerating devices on the bus,
 assigning them addresses, and keeping track of which card is active at
@@ -133,14 +133,14 @@ multiple MMC devices, as well as things that are not specific to a
 device type (common to SDIO, SD and MMC cards, for example)
 
 Disk Driver (src/add-ons/kernel/drivers/disk/mmc)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is a mass storage driver for MMC, SD and SDHC cards. Currently only
 SD and SDHC are tested, MMC and eMMC will have to be added (they are
 similar but there are some differences).
 
 Wiring the driver in the device manager (src/system/kernel/device_manager/device_manager.cpp)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 (note: possibly not accurate documentation, I did not check how things
 in the device manager are actually implemented, but this is my
@@ -165,11 +165,8 @@ non-standard ones (for example, Ricoh provides SDHCI implenmentations
 that are conform to the spec, except they don’t have the right device
 type in the PCI registers).
 
-Insight into the code
-~~~~~~~~~~~~~~~~~~~~~
-
 MMC Bus management overview
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
 
 The device tree for MMC support looks like this:
 
@@ -217,7 +214,7 @@ could be added if sending raw SD/MMC commands to SD cards from userland
 is considered desirable.
 
 SDHCI driver
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 The SDHCI driver is the lowest level of the MMC stack. It provides
 abstraction of the SDHCI device. Later on, different way to access an SD
@@ -247,7 +244,7 @@ SDHCI level. It will be responsible for executing SD commands on that
 bus, and dealing with the resulting interrupts.
 
 The Bus Manager
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
 The MMC bus manager manages the MMC bus (duh). Its tasks are:
 
@@ -260,7 +257,7 @@ The MMC bus manager manages the MMC bus (duh). Its tasks are:
 -  publish device nodes for each card
 
 Disk Driver
-^^^^^^^^^^^
+~~~~~~~~~~~
 
 The disk driver is attached to devices implementing SDSC or SDHC/SDXC
 commands. There will be other drivers for non-storage (SDIO) cards.
@@ -276,7 +273,7 @@ the usual interface for disk devices. From this point on, the device can
 be used just like any other mass storage device.
 
 Tasks to be completed
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 The SDHCI driver is able to send and receive commands. However it does
 not handle card insertion and removal interrupts yet, so the card must
