@@ -941,7 +941,7 @@ BPose::CalcRect(const BPoseView* poseView) const
 	BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 	BPoint location = Location(poseView);
 	BRect rect(_IconRect(poseView, location));
-	float textWidth = (widget != NULL ? widget->TextWidth(poseView) : 0);
+	float textWidth = (widget != NULL ? widget->TextWidth(poseView) + 4 : 0);
 
 	if (poseView->ViewMode() == kIconMode) {
 		// icon mode
@@ -949,14 +949,13 @@ BPose::CalcRect(const BPoseView* poseView) const
 			rect.left += roundf((rect.Width() - textWidth) / 2.f);
 			rect.right = rect.left + ceilf(textWidth);
 		}
+		rect.bottom = rect.top + ceilf(poseView->IconPoseHeight()) + 3;
 	} else {
 		// mini icon mode
 		if (widget != NULL)
 			rect.right += kMiniIconSeparator + ceilf(textWidth);
+		rect.bottom = rect.top + ceilf(poseView->IconPoseHeight()) + 1;
 	}
-
-	rect.bottom = rect.top + ceilf(poseView->IconPoseHeight());
-
 	return rect;
 }
 

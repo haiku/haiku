@@ -150,15 +150,18 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 	BRect rect;
 	float viewWidth;
 
+	poseLoc.x = roundf(poseLoc.x);
+	poseLoc.y = roundf(poseLoc.y);
+
 	if (view->ViewMode() == kListMode) {
-		viewWidth = ceilf(std::min(column->Width(), textWidth));
+		viewWidth = roundf(std::min(column->Width(), textWidth));
 
 		poseLoc.x += column->Offset();
 
 		switch (fAlignment) {
 			case B_ALIGN_LEFT:
 				rect.left = poseLoc.x;
-				rect.right = rect.left + viewWidth;
+				rect.right = rect.left + viewWidth - 1;
 				break;
 
 			case B_ALIGN_CENTER:
@@ -166,12 +169,12 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 				if (rect.left < 0)
 					rect.left = 0;
 
-				rect.right = rect.left + viewWidth;
+				rect.right = rect.left + viewWidth - 1;
 				break;
 
 			case B_ALIGN_RIGHT:
 				rect.right = poseLoc.x + column->Width();
-				rect.left = rect.right - viewWidth;
+				rect.left = rect.right - viewWidth + 1;
 				if (rect.left < 0)
 					rect.left = 0;
 				break;
@@ -182,29 +185,25 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 		}
 
 		rect.bottom = poseLoc.y + roundf((view->ListElemHeight() + view->FontHeight()) / 2.f);
-		rect.top = rect.bottom - view->FontHeight();
+		rect.top = rect.bottom - view->FontHeight() + 1;
 	} else {
 		float iconSize = (float)view->IconSizeInt();
-		textWidth = floorf(textWidth);
-			// prevent drawing artifacts from selection rect drawing an extra pixel
-
 		if (view->ViewMode() == kIconMode) {
 			// icon mode
-			viewWidth = ceilf(std::min(view->StringWidth("M") * 30, textWidth));
+			viewWidth = roundf(std::min(view->StringWidth("M") * 30, textWidth));
 
 			rect.left = poseLoc.x + roundf((iconSize - viewWidth) / 2.f);
 			rect.bottom = poseLoc.y + ceilf(view->IconPoseHeight());
-			rect.top = rect.bottom - view->FontHeight();
 		} else {
 			// mini icon mode
-			viewWidth = ceilf(textWidth);
+			viewWidth = roundf(textWidth);
 
 			rect.left = poseLoc.x + iconSize + kMiniIconSeparator;
 			rect.bottom = poseLoc.y + roundf((iconSize + view->FontHeight()) / 2.f);
-			rect.top = poseLoc.y;
 		}
 
-		rect.right = rect.left + viewWidth;
+		rect.top = rect.bottom - view->FontHeight() + 1;
+		rect.right = rect.left + viewWidth - 1;
 	}
 
 	return rect;
@@ -667,12 +666,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, BPoseView* view, BView* drawV
 			drawView->SetDrawingMode(B_OP_COPY);
 		}
 
-		BRect invertRect(textRect);
-		invertRect.left = ceilf(invertRect.left);
-		invertRect.top = ceilf(invertRect.top);
-		invertRect.right = floorf(invertRect.right);
-		invertRect.bottom = floorf(invertRect.bottom);
-		drawView->FillRect(invertRect, B_SOLID_LOW);
+		drawView->FillRect(textRect, B_SOLID_LOW);
 
 		// High color is set to inverted low, then the whole thing is
 		// inverted again so that the background color "shines through".

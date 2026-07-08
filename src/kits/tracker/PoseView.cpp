@@ -1049,12 +1049,12 @@ BPoseView::SetIconPoseHeight()
 	switch (ViewMode()) {
 		case kIconMode:
 			// IconSize should already be set in MessageReceived()
-			fIconPoseHeight = IconSizeInt() + sFontHeight + 1;
+			fIconPoseHeight = IconSizeInt() + sFontHeight;
 			break;
 
 		case kMiniIconMode:
 			fViewState->SetIconSize(B_MINI_ICON);
-			fIconPoseHeight = std::max((float)IconSizeInt(), sFontHeight + 1);
+			fIconPoseHeight = std::max((float)IconSizeInt(), sFontHeight);
 			break;
 
 		case kListMode:
