@@ -82,10 +82,6 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fScrollView = new BScrollView("scrollview", fListView, B_WILL_DRAW,
 		false, true);
 
-	fDetailsCheckbox = new BCheckBox("detailscheckbox",
-		B_TRANSLATE("Show more details"),
-		new BMessage(kMsgMoreDetailsToggle));
-
 	BFont font;
 	fHeaderView->GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
@@ -106,9 +102,8 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 			.End()
 			.AddStrut(B_USE_SMALL_SPACING)
 			.AddGroup(new BGroupView(B_HORIZONTAL))
-				.Add(fDetailsCheckbox)
-				.AddGlue()
 				.Add(fSettingsButton)
+				.AddGlue()
 				.Add(fCancelButton)
 				.Add(fUpdateButton)
 				.Add(fRebootButton)
@@ -123,11 +118,12 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fCancelButtonLayoutItem = layout_item_for(fCancelButton);
 	fUpdateButtonLayoutItem = layout_item_for(fUpdateButton);
 	fRebootButtonLayoutItem = layout_item_for(fRebootButton);
-	fDetailsCheckboxLayoutItem = layout_item_for(fDetailsCheckbox);
 
 	_SetState(STATE_DISPLAY_STATUS);
 	CenterOnScreen();
 	SetFlags(Flags() ^ B_AUTO_UPDATE_SIZE_LIMITS);
+
+	AddShortcut(',', B_COMMAND_KEY, new BMessage(kMsgSettings));
 
 	// Prevent resizing for now
 	fDefaultRect = Bounds();
@@ -141,6 +137,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 		fSettingsReadStatus = _ReadSettings(fInitialSettings);
 	}
 	fAutoCleanUpAdminDirectory = fInitialSettings.GetBool(kKeyAutoCleanUpAdminDirectory, true);
+	fShowMoreDetails = fInitialSettings.GetBool(kKeyShowDetails, true);
 
 	if (fSettingsReadStatus == B_OK) {
 		// Move to saved setting position
@@ -390,7 +387,8 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgMoreDetailsToggle:
-			fListView->SetMoreDetails(fDetailsCheckbox->Value() != 0);
+			fShowMoreDetails = (message->GetInt32("be:value", 0) != 0);
+			fListView->SetMoreDetails(fShowMoreDetails);
 			PostMessage(kMsgSetZoomLimits);
 			_WriteSettings();
 			break;
@@ -407,8 +405,7 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 			float controlHeight;
 			if (fUpdateButtonLayoutItem->IsVisible())
 				fUpdateButton->GetPreferredSize(NULL, &controlHeight);
-			else
-				fDetailsCheckbox->GetPreferredSize(NULL, &controlHeight);
+
 			// Calculate height and width values
 			float zoomHeight = fZoomHeightBaseline + zoomPoint.y
 				+ controlHeight;
@@ -613,7 +610,6 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 		fProgressLayoutItem->SetVisible(false);
 		fPackagesLayoutItem->SetVisible(false);
 		fSettingsButtonLayoutItem->SetVisible(false);
-		fDetailsCheckboxLayoutItem->SetVisible(false);
 		fCancelButtonLayoutItem->SetVisible(false);
 		fRebootButtonLayoutItem->SetVisible(false);
 	}
@@ -631,31 +627,18 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	if (fCurrentState == STATE_GET_CONFIRMATION) {
 		fPackagesLayoutItem->SetVisible(true);
 		fSettingsButtonLayoutItem->SetVisible(true);
-		fDetailsCheckboxLayoutItem->SetVisible(true);
-		if (fSettingsReadStatus == B_OK) {
-			bool showMoreDetails;
-			status_t result = fInitialSettings.FindBool(kKeyShowDetails,
-				&showMoreDetails);
-			if (result == B_OK) {
-				fDetailsCheckbox->SetValue(showMoreDetails ? 1 : 0);
-				fListView->SetMoreDetails(showMoreDetails);
-			}
-		}
+		if (fSettingsReadStatus == B_OK)
+			fListView->SetMoreDetails(fShowMoreDetails);
 	} else if (fCurrentState == STATE_FINAL_MESSAGE) {
 		fPackagesLayoutItem->SetVisible(false);
 		fSettingsButtonLayoutItem->SetVisible(false);
-		fDetailsCheckboxLayoutItem->SetVisible(false);
 	}
 
 	// Progress bar and string view
-	// Hide detail text while showing status bar
-	if (fCurrentState == STATE_DISPLAY_PROGRESS) {
-		fDetailsLayoutItem->SetVisible(false);
+	if (fCurrentState == STATE_DISPLAY_PROGRESS)
 		fProgressLayoutItem->SetVisible(true);
-	} else {
+	else
 		fProgressLayoutItem->SetVisible(false);
-		fDetailsLayoutItem->SetVisible(true);
-	}
 
 	// Resizing and zooming
 	if (fCurrentState == STATE_GET_CONFIRMATION) {
@@ -727,14 +710,18 @@ SoftwareUpdaterWindow::_ShowSettingsDialog()
 		B_TRANSLATE("Settings"), B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_CLOSE_ON_ESCAPE);
 
+	BCheckBox* showDetails = new BCheckBox(B_TRANSLATE("Show more details"),
+		new BMessage(kMsgMoreDetailsToggle));
+	showDetails->SetValue(fShowMoreDetails);
+	showDetails->SetTarget(this);
 	BCheckBox* autoCleanUp = new BCheckBox(B_TRANSLATE(
-		"Automatically clean up old install states"));
+		"Automatically clean up old install states"), new BMessage(kSettingMsgAutoCleanUp));
 	autoCleanUp->SetValue(fAutoCleanUpAdminDirectory);
-	autoCleanUp->SetMessage(new BMessage(kSettingMsgAutoCleanUp));
 	autoCleanUp->SetTarget(this);
 
 	BLayoutBuilder::Group<>(window, B_VERTICAL, B_USE_ITEM_SPACING)
 		.SetInsets(B_USE_ITEM_INSETS)
+		.Add(showDetails)
 		.Add(autoCleanUp)
 	.End();
 
@@ -751,7 +738,7 @@ SoftwareUpdaterWindow::_WriteSettings()
 		B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if (status == B_OK) {
 		BMessage settings;
-		settings.AddBool(kKeyShowDetails, fDetailsCheckbox->Value() != 0);
+		settings.AddBool(kKeyShowDetails, fShowMoreDetails);
 		settings.AddRect(kKeyWindowFrame, Frame());
 		settings.AddBool(kKeyAutoCleanUpAdminDirectory, fAutoCleanUpAdminDirectory);
 		status = settings.Flatten(&file);

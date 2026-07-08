@@ -189,7 +189,6 @@ private:
 			BStatusBar*			fStatusBar;
 			PackageListView*	fListView;
 			BScrollView*		fScrollView;
-			BCheckBox*			fDetailsCheckbox;
 			BLayoutItem*		fDetailsLayoutItem;
 			BLayoutItem*		fPackagesLayoutItem;
 			BLayoutItem*		fProgressLayoutItem;
@@ -197,7 +196,6 @@ private:
 			BLayoutItem*		fCancelButtonLayoutItem;
 			BLayoutItem*		fUpdateButtonLayoutItem;
 			BLayoutItem*		fRebootButtonLayoutItem;
-			BLayoutItem*		fDetailsCheckboxLayoutItem;
 
 			uint32				fCurrentState;
 			sem_id				fWaitingSem;
@@ -209,6 +207,7 @@ private:
 			int32				fWarningAlertCount;
 			BInvoker			fWarningAlertDismissed;
 			bool				fAutoCleanUpAdminDirectory;
+			bool				fShowMoreDetails;
 			BPath				fSettingsPath;
 			status_t			fSettingsReadStatus;
 			BMessage			fInitialSettings;
