@@ -269,7 +269,7 @@ EventQueue::Select(int32 object, uint16 type, int32* _events, void* userData)
 
 	eventDeleter.Detach();
 
-	*_events &= event->selected_events;
+	*_events &= event->selected_events | event->behavior;
 	atomic_and(&event->events, ~B_EVENT_SELECTING);
 	fEventCondition.NotifyAll();
 
