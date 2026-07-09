@@ -664,27 +664,24 @@ _user_event_queue_select(int queue, event_wait_info* userInfos, int numInfos)
 		if (infos[i].events > 0) {
 			error = eventQueue->Select(infos[i].object, infos[i].type,
 				&infos[i].events, infos[i].user_data);
-			if (error == B_OK) {
-				error = user_memcpy(&userInfos[i].events,
-					&infos[i].events, sizeof(userInfos[i].events));
-			}
 		} else if (infos[i].events < 0) {
 			uint32 selectedEvents = 0;
 			error = eventQueue->Query(infos[i].object, infos[i].type,
 				&selectedEvents, &infos[i].user_data);
-			if (error == B_OK) {
+			if (error == B_OK)
 				infos[i].events = selectedEvents;
-				error = user_memcpy(&userInfos[i], &infos[i], sizeof(event_wait_info));
-			}
 		} else /* == 0 */ {
 			error = eventQueue->Deselect(infos[i].object, infos[i].type);
 		}
 
 		if (error != B_OK) {
-			user_memcpy(&userInfos[i].events, &error, sizeof(userInfos[i].events));
+			infos[i].events = error;
 			result = B_ERROR;
 		}
 	}
+
+	if (user_memcpy(userInfos, infos, sizeof(event_wait_info) * numInfos) != B_OK)
+		return B_BAD_ADDRESS;
 
 	return result;
 }
