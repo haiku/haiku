@@ -91,6 +91,7 @@ struct kevent {
 /* flags */
 #define EV_ONESHOT	0x0010		/* only report one occurrence */
 #define EV_CLEAR	0x0020		/* clear event state after reporting */
+#define EV_RECEIPT	0x0040		/* force EV_ERROR on success, data=0 */
 
 /* returned values */
 #define EV_EOF		0x8000		/* EOF detected */

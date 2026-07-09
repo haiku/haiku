@@ -48,9 +48,11 @@ kevent(int kq,
 	const struct timespec *tspec)
 {
 	BStackOrHeapArray<event_wait_info, 16> waitInfos(max_c(nchanges, nevents));
+	BStackOrHeapArray<int32, 16> requestedEvents(nchanges);
 
 	event_wait_info* waitInfo = waitInfos;
-	int changedInfos = 0;
+	int32* requestedEvent = requestedEvents;
+	int changedInfos = 0, receiptCount = 0;
 
 	for (int i = 0; i < nchanges; i++) {
 		waitInfo->object = changelist[i].ident;
@@ -147,39 +149,82 @@ kevent(int kq,
 		if (waitInfo->events != 0)
 			waitInfo->events |= behavior;
 
+		*requestedEvent = waitInfo->events;
+
+		if ((changelist[i].flags & EV_RECEIPT) != 0) {
+			receiptCount++;
+
+			// Use sign bit to indicate EV_RECEIPT.
+			*requestedEvent |= (1 << 31);
+		}
+
 		changedInfos++;
 		waitInfo++;
+		requestedEvent++;
+
+		if (receiptCount >= nevents)
+			break;
 	}
 	if (changedInfos != 0) {
 		status_t status = _kern_event_queue_select(kq, waitInfos, changedInfos);
-		if (status != B_OK) {
-			if (nchanges == 1 && nevents == 0) {
-				// Special case: return the lone error directly.
-				__set_errno(waitInfos[0].events);
-				return -1;
+		if (status != B_OK && nchanges == 1 && nevents == 0) {
+			// Special case: return the lone error directly.
+			__set_errno(waitInfos[0].events);
+			return -1;
+		}
+
+		// Report problems (or successes, if EV_RECEIPT is set) as error events.
+		int errors = 0;
+		for (int i = 0; i < changedInfos; i++) {
+			int64_t data = waitInfos[i].events;
+			if (data > 0) {
+				if (requestedEvents[i] > 0)
+					continue;
+
+				// Always generate an "error" event for EV_RECEIPT.
+				data = 0;
 			}
 
-			// Report problems as error events.
-			int errors = 0;
-			for (int i = 0; i < changedInfos; i++) {
-				if (waitInfos[i].events > 0)
-					continue;
-				if (nevents == 0) {
-					errors = -1;
-					break;
-				}
+			if (nevents == 0) {
+				errors = -1;
+				break;
+			}
 
-				short filter = filter_from_info(waitInfos[i]);
-				int64_t data = waitInfos[i].events;
+			short filter = filter_from_info(waitInfos[i]);
+			if ((requestedEvents[i] & (B_EVENT_READ | B_EVENT_WRITE))
+					== (B_EVENT_READ | B_EVENT_WRITE)) {
+				// We need to generate two errors for this case.
+				filter = EVFILT_READ;
+				int64_t readData = data;
+				if (data == 0 && (waitInfos[i].events & B_EVENT_READ) == 0)
+					readData = -1;
+
 				EV_SET(eventlist, waitInfos[i].object,
-					filter, EV_ERROR, 0, data, waitInfos[i].user_data);
+					filter, EV_ERROR, 0, readData, waitInfos[i].user_data);
 				eventlist++;
 				nevents--;
 				errors++;
+
+				filter = EVFILT_WRITE;
+				if (data == 0 && (waitInfos[i].events & B_EVENT_WRITE) == 0)
+					data = -1;
 			}
 
-			if (errors > 0)
-				return errors;
+			if (nevents == 0) {
+				errors = -1;
+				break;
+			}
+
+			EV_SET(eventlist, waitInfos[i].object,
+				filter, EV_ERROR, 0, data, waitInfos[i].user_data);
+			eventlist++;
+			nevents--;
+			errors++;
+		}
+
+		if (errors > 0)
+			return errors;
+		if (status != B_OK) {
 			__set_errno(status);
 			return -1;
 		}
