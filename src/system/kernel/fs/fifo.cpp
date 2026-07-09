@@ -878,6 +878,9 @@ Inode::Close(file_cookie* cookie)
 status_t
 Inode::Select(uint8 event, selectsync* sync, int openMode)
 {
+	if (event > B_SELECT_ERROR && event != B_SELECT_DISCONNECTED)
+		return B_NOT_SUPPORTED;
+
 	WriteLocker locker(ChangeLock());
 
 	bool writer = true;
