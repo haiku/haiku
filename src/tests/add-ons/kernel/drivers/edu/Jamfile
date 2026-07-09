@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src tests add-ons kernel drivers edu ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers ;
+SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
+
+KernelAddon edu :
+	edu.cpp
+;

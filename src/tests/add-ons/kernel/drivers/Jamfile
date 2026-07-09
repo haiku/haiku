@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src tests add-ons kernel drivers ;
 
 SubInclude HAIKU_TOP src tests add-ons kernel drivers audio ;
+SubInclude HAIKU_TOP src tests add-ons kernel drivers edu ;
 SubInclude HAIKU_TOP src tests add-ons kernel drivers hpet ;
 SubInclude HAIKU_TOP src tests add-ons kernel drivers nvmm ;
 SubInclude HAIKU_TOP src tests add-ons kernel drivers random ;
