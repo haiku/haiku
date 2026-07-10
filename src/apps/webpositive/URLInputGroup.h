@@ -16,10 +16,10 @@ public:
 								URLInputGroup(BMessage* goMessage);
 	virtual						~URLInputGroup();
 
-	virtual	void				AttachedToWindow();
-	virtual	void				WindowActivated(bool active);
-	virtual	void				Draw(BRect updateRect);
-	virtual	void				MakeFocus(bool focus = true);
+	virtual	void				AttachedToWindow() override;
+	virtual	void				WindowActivated(bool active) override;
+	virtual	void				DrawAfterChildren(BRect updateRect) override;
+	virtual	void				MakeFocus(bool focus = true) override;
 
 
 			BTextView*			TextView() const;

@@ -593,7 +593,8 @@ URLInputGroup::URLInputGroup(BMessage* goMessage)
 	fWindowActive(false),
 	fURLLocked(false)
 {
-	GroupLayout()->SetInsets(2, 2, 2, 2);
+	GroupLayout()->SetInsets(2, 0, 0, 0);
+	GroupLayout()->SetSpacing(-2);
 
 	fIconView = new PageIconView();
 	GroupLayout()->AddView(fIconView, 0.0f);
@@ -604,12 +605,12 @@ URLInputGroup::URLInputGroup(BMessage* goMessage)
 	AddChild(new BSeparatorView(B_VERTICAL, B_PLAIN_BORDER));
 
 	fGoButton = new BButton("⏎", goMessage);
-	fGoButton->SetExplicitMaxSize(BSize(StringWidth("⏎") * 3, StringWidth("⏎") * 2));
 	fGoButton->SetExplicitMinSize(BSize(StringWidth("⏎") * 3, StringWidth("⏎") * 2));
-	fGoButton->SetExplicitPreferredSize(BSize(StringWidth("⏎") * 3, B_SIZE_UNLIMITED));
+	fGoButton->SetExplicitMaxSize(BSize(StringWidth("⏎") * 3, B_SIZE_UNLIMITED));
+	fGoButton->SetExplicitPreferredSize(BSize(StringWidth("⏎") * 3, B_SIZE_UNSET));
 	GroupLayout()->AddView(fGoButton, 0.0f);
 
-	SetFlags(Flags() | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
+	SetFlags(Flags() | B_WILL_DRAW | B_DRAW_ON_CHILDREN | B_FULL_UPDATE_ON_RESIZE);
 	SetLowColor(ViewColor());
 	SetViewColor(fTextView->ViewColor());
 
@@ -651,7 +652,7 @@ URLInputGroup::MarkAsInvalid(bool invalid)
 
 
 void
-URLInputGroup::Draw(BRect updateRect)
+URLInputGroup::DrawAfterChildren(BRect updateRect)
 {
 	BRect bounds(Bounds());
 	rgb_color base(LowColor());
