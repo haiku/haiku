@@ -530,10 +530,6 @@ BKeymap::Offset(uint32 keyCode, uint32 modifiers, uint32* _table) const
 			offset = fKeys.caps_shift_map[keyCode];
 			table = B_CAPS_SHIFT_TABLE;
 			break;
-		case B_CONTROL_KEY:
-			offset = fKeys.control_map[keyCode];
-			table = B_CONTROL_TABLE;
-			break;
 		case B_OPTION_KEY:
 			offset = fKeys.option_map[keyCode];
 			table = B_OPTION_TABLE;
@@ -551,8 +547,13 @@ BKeymap::Offset(uint32 keyCode, uint32 modifiers, uint32* _table) const
 			table = B_OPTION_CAPS_SHIFT_TABLE;
 			break;
 		default:
-			offset = fKeys.normal_map[keyCode];
-			table = B_NORMAL_TABLE;
+			if ((modifiers & B_CONTROL_KEY) != 0) {
+				offset = fKeys.control_map[keyCode];
+				table = B_CONTROL_TABLE;
+			} else {
+				offset = fKeys.normal_map[keyCode];
+				table = B_NORMAL_TABLE;
+			}
 			break;
 	}
 
