@@ -41,20 +41,27 @@
 
 
 /* Protocol/Service Multiplexer (PSM) values */
-#define L2CAP_PSM_ANY		0x0000	/* Any/Invalid PSM */
-#define L2CAP_PSM_SDP		0x0001	/* Service Discovery Protocol */
-#define L2CAP_PSM_RFCOMM	0x0003	/* RFCOMM protocol */
-#define L2CAP_PSM_TCS_BIN	0x0005	/* Telephony Control Protocol */
-#define L2CAP_PSM_TCS_BIN_CORDLESS 0x0007 /* TCS cordless */
-#define L2CAP_PSM_BNEP		0x000F	/* BNEP */
-#define L2CAP_PSM_HID_CTRL	0x0011	/* HID control */
-#define L2CAP_PSM_HID_INT	0x0013	/* HID interrupt */
-#define L2CAP_PSM_UPnP		0x0015	/* UPnP (ESDP) */
-#define L2CAP_PSM_AVCTP		0x0017	/* AVCTP */
-#define L2CAP_PSM_AVDTP		0x0019	/* AVDTP */
+#define L2CAP_PSM_ANY				0x0000	/* Any/Invalid PSM */
+#define L2CAP_PSM_SDP				0x0001	/* Service Discovery Protocol */
+#define L2CAP_PSM_RFCOMM			0x0003	/* RFCOMM protocol */
+#define L2CAP_PSM_TCS_BIN			0x0005	/* Telephony Control Protocol */
+#define L2CAP_PSM_TCS_BIN_CORDLESS 	0x0007 	/* TCS cordless */
+#define L2CAP_PSM_BNEP				0x000F	/* BNEP */
+#define L2CAP_PSM_HID_CTRL			0x0011	/* HID control */
+#define L2CAP_PSM_HID_INT			0x0013	/* HID interrupt */
+#define L2CAP_PSM_UPnP				0x0015	/* UPnP (ESDP) */
+#define L2CAP_PSM_AVCTP				0x0017	/* AVCTP */
+#define L2CAP_PSM_AVDTP				0x0019	/* AVDTP */
+#define L2CAP_PSM_AVCTP_BROWSING 	0x001B
+#define L2CAP_PSM_UDI_C_PLANE 		0x001D
+#define L2CAP_PSM_ATT 				0x001F
+#define L2CAP_PSM_3DSP 				0x0021
+#define L2CAP_PSM_OTS 				0x0025
+#define L2CAP_PSM_EATT 				0x0027
 	/* < 0x1000: reserved */
 	/* >= 0x1000: dynamically assigned */
 
+#if __GNUC__ > 2
 
 typedef struct {
 	uint16	length;	/* payload size */
@@ -224,5 +231,6 @@ typedef union {
 	uint32 extended_features;
 } _PACKED l2cap_information_rsp_data;
 
+#endif
 
 #endif /* _L2CAP_H_ */

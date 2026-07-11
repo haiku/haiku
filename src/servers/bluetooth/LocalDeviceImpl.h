@@ -32,6 +32,7 @@ struct ServerRemoteDevice
 
 	uint16				handle;
 	RemoteDevice::ConnectionState			conn_state;
+	BMessage			services;
 };
 
 typedef BObjectList<ServerRemoteDevice> RemoteDevicesList;

@@ -31,6 +31,7 @@
 #include "DeskbarReplicant.h"
 #include "LocalDeviceImpl.h"
 #include "SDPServer.h"
+#include "SDPClient.h"
 
 
 status_t
@@ -155,8 +156,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 			status = B_WOULD_BLOCK;
 			/* TODO: This should be by user request only! */
 			lDeviceImpl->Launch();
-			break;
 		}
+		break;
 
 		case BT_MSG_REMOVE_DEVICE:
 		{
@@ -165,8 +166,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 				fLocalDevicesList.RemoveItem(lDeviceImpl);
 				delete lDeviceImpl;
 			}
-			break;
 		}
+		break;
 
 		case BT_MSG_COUNT_LOCAL_DEVICES:
 			status = HandleLocalDevicesCount(message, &reply);
@@ -195,8 +196,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 
 				}
 			}
-			return;
 		}
+		return;
 
 		case BT_REQ_CREATE_CONN:
 		{
@@ -215,8 +216,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 				break;
 
 			lDeviceImpl->CancelConnection(message);
-			break;
 		}
+		break;
 
 		case BT_REQ_DISCONNECT:
 		{
@@ -225,8 +226,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 				break;
 
 			lDeviceImpl->Disconnect(message);
-			break;
 		}
+		break;
 
 		case BT_REQ_REMOVE_DEVICE:
 		{
@@ -242,24 +243,24 @@ void BluetoothServer::MessageReceived(BMessage* message)
 
 			ServerRemoteDevice* rd = lDeviceImpl->RemoteDeviceByAddr(*bdaddr);
 			lDeviceImpl->RemoveRemoteDevice(rd);
-			break;
 		}
+		break;
 
 		case BT_START_WATCHING_CONNECTIONS:
 		{
 			BMessenger* messenger = new BMessenger();
 			if (message->FindMessenger("messenger", messenger) == B_OK)
 				fWatchersList.AddItem(messenger);
-			break;
 		}
+		break;
 
 		case BT_STOP_WATCHING_CONNECTIONS:
 		{
 			BMessenger* messenger = new BMessenger();
 			if (message->FindMessenger("messenger", messenger) == B_OK)
 				fWatchersList.RemoveItem(messenger);
-			break;
 		}
+		break;
 
 		case BT_MSG_GET_REMOTE_DEVICES:
 		{
@@ -284,8 +285,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 			}
 
 			message->SendReply(&reply);
-			break;
 		}
+		break;
 
 		case BT_REQ_CONN_STATE:
 		{
@@ -301,8 +302,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 			reply.AddUInt8("conn state", static_cast<uint8>(rd->conn_state));
 
 			message->SendReply(&reply);
-			break;
 		}
+		break;
 
 		default:
 			BApplication::MessageReceived(message);
@@ -332,6 +333,35 @@ BluetoothServer::NotifyWatchers(BMessage* notice)
 		}
 		messenger->SendMessage(notice);
 	}
+}
+
+
+void
+BluetoothServer::DiscoverServices(ServerRemoteDevice* rd)
+{
+	TRACE_BT("BluetoothServer: Discovering Services for %s\n", rd->friendly_name.String());
+	SDPClient sdpClient(rd);
+	sdpClient.Start();
+	if (sdpClient.RequestServiceRecords() == B_OK)
+		TRACE_BT("SDP: Service records loaded successfully\n");
+	else
+		TRACE_BT("SDP: Error service records could not be loaded\n");
+
+	// rd->services.PrintToStream();
+}
+
+
+void
+BluetoothServer::NotifyServices(ServerRemoteDevice* rd)
+{
+	TRACE_BT("BluetoothServer: Notifying Services for %s\n", rd->friendly_name.String());
+	SDPClient sdpClient(rd);
+
+	if (sdpClient.NotifyProfiles() == B_OK)
+		TRACE_BT("SDP: Notified the dedicated profile successfully\n");
+	else
+		TRACE_BT("SDP: Error could not notify the dedicated profile\n");
+
 }
 
 

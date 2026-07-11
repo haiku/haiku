@@ -1834,6 +1834,8 @@ LocalDeviceImpl::AuthComplete(struct hci_ev_auth_complete* eventData, BMessage* 
 
 	if (status == BT_OK) {
 		TRACE_BT("LocalDeviceImpl: Authentication Successful for handle %d\n", handle);
+		ServerRemoteDevice* rd = RemoteDeviceByHandle(eventData->handle);
+		((BluetoothServer*)be_app)->DiscoverServices(rd);
 	} else {
 		TRACE_BT("LocalDeviceImpl: Authentication Failed for handle %d with status 0x%02x\n",
 			handle, status);

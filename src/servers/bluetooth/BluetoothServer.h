@@ -20,6 +20,7 @@
 #include "HCIDelegate.h"
 #include "LocalDeviceImpl.h"
 #include "SDPServer.h"
+#include "SDPClient.h"
 
 #include <PortListener.h>
 
@@ -67,6 +68,8 @@ public:
 	status_t    HandleSimpleRequest(BMessage* message, BMessage* reply);
 
 	void		NotifyWatchers(BMessage* notice);
+	void		DiscoverServices(ServerRemoteDevice* rd);
+	void		NotifyServices(ServerRemoteDevice* rd);
 
     LocalDeviceImpl*    LocateLocalDeviceImpl(hci_id hid);
 	
@@ -90,7 +93,8 @@ private:
 	
 	BPoint 					fCenter;
 	
-	SDPServer*               fSDPServer;
+	SDPServer*              fSDPServer;
+	SDPClient*				fSDPClient;
 };
 
 #endif
