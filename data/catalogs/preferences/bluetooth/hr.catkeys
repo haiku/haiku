@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-BluetoothPrefs	1699674584
+1	croatian	x-vnd.Haiku-BluetoothPrefs	2898383870
 Laptop	Settings view		Prijenosno računalo
 Only from trusted devices	Settings view		Samo sa sigurnih uređaja
 15 secs	Settings view		15 sekunda
@@ -14,14 +14,12 @@ Settings	Window		Postavke
 Stop bluetooth services…	Window		Prekini bluetooth servise
 61 secs	Settings view		61 sekunda
 Add…	Remote devices		Dodaj...
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nema Bluetooth lokalnog uređaja redistriranog u sustavu.
 Revert	Window		Obrnuto
 Refresh local devices…	Window		Osvježi lokalne uređaje…
 Disconnect	Remote devices		Odspoji
 Defaults	Window		Zadano
 From all devices	Settings view		Sa svih uređaja
 Start bluetooth services…	Window		Pokreni bluetooth servise....
-Scanning progress	Inquiry panel		Napredak pregledavanja
 Launch now	main		Pokreni sada
 Bluetooth	System name		Bluetooth
 Remove	Remote devices		Ukloni
@@ -31,9 +29,7 @@ Help	Window		Pomoć
 Pair…	Remote devices		Par...
 Show name	Extended local device view		Pokaži ime
 Add device to list	Inquiry panel		Dodaj uređaj na listu
-Remaining %1 seconds	Inquiry panel		Preostalo %1 sekunda
 Smart phone	Settings view		Pametnin telefon
-Scanning completed.	Inquiry panel		Pretraga dovršena.
 Server	Settings view		Poslužitelj
  packets: 	Device View		 paketi: 
 About Bluetooth…	Window		O Bluetooth-u...

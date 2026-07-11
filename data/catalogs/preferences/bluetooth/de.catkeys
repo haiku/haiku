@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	801341821
+1	german	x-vnd.Haiku-BluetoothPrefs	420387731
 Laptop	Settings view		Laptop
 Only from trusted devices	Settings view		Nur vertraute Geräte
 15 secs	Settings view		15 s
@@ -14,17 +14,13 @@ Settings	Window		Einstellungen
 Stop bluetooth services…	Window		Bluetooth-Dienste beenden …
 61 secs	Settings view		61 s
 Add…	Remote devices		Hinzu …
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Es konnte kein Bluetooth-Gerät auf diesem System gefunden werden.
 Revert	Window		Anfangswerte
 Refresh local devices…	Window		Lokale Geräte aktualisieren …
 Disconnect	Remote devices		Trennen
-Canceling Inquiry…	Inquiry panel		Abbrechen der Anfrage…
 Defaults	Window		Standardwerte
 From all devices	Settings view		Von allen Geräten
 Start bluetooth services…	Window		Bluetooth-Dienste starten
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Bitte sicherstellen, dass Bluetooth auf dem zu findenden Gerät aktiviert ist. Auf 'Suchen' klicken, um Bluetooth-Geräte zu finden. Für gewöhnlich dauert das Ermitteln des Namens pro Gerät max. 3 Sekunden. Gefundene Bluetooth-Geräte können anschließend der Geräteliste hinzugefügt werden, in der sie verbunden werden können.
 Cancel	Inquiry panel		Abbrechen
-Scanning progress	Inquiry panel		Suchfortschritt
 Launch now	main		Jetzt starten
 Bluetooth	System name		Bluetooth
 Remove	Remote devices		Entfernen
@@ -33,19 +29,14 @@ Always ask	Settings view		Immer fragen
 With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Mit Unterstützung von:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nDanke an alle die geholfen haben …\n\nVersand/Spende von Hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nFinanziell:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nDurch Patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesten:\n - Petter H. Juliussen\nFür mein gesamtes Wissen:\n - das yellowTAB Team
 Help	Window		Hilfe
 Pair…	Remote devices		Pair …
-Friendly Name:	Settings view		Anwenderfreundlicher Name:
-Retrieving name of %1	Inquiry panel		Name für %1 wird abgerufen
-Inquiry	Inquiry panel		Suchen
 Incoming connections policy:	Settings view		Verbindungen annehmen:
 Retrieving names…	Inquiry panel		Abrufen von Namen …
 Show name	Extended local device view		Namen anzeigen
 Add device to list	Inquiry panel		Gerät zur Liste hinzufügen
-Remaining %1 seconds	Inquiry panel		Es verbleiben %1 Sekunden
 The Bluetooth services are not currently running on this system.	main		Im System laufen derzeit keine Bluetooth-Dienste.
 Discoverable	Extended local device view		Sichtbar
 Authenticate	Extended local device view		Authentifizieren
 Smart phone	Settings view		Smartphone
-Scanning completed.	Inquiry panel		Suche abgeschlossen.
 Default inquiry time:	Settings view		Suchdauer:
 Server	Settings view		Server
 Handheld	Settings view		Handheld

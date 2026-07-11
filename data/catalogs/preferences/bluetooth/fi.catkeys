@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BluetoothPrefs	3945807779
+1	finnish	x-vnd.Haiku-BluetoothPrefs	305903693
 Laptop	Settings view		Kannettava
 Only from trusted devices	Settings view		Vain luotetuista laitteista
 15 secs	Settings view		15 sekuntia
@@ -14,15 +14,12 @@ Settings	Window		Asetukset
 Stop bluetooth services…	Window		Pysäytä bluetooth-palvelut…
 61 secs	Settings view		61 sekuntia
 Add…	Remote devices		Lisää…
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Järjestelmästä ei löytynyt paikallisia Bluetooth-laitteita.
 Revert	Window		Palauta
 Refresh local devices…	Window		Verestä paikallisia laitteita...
 Disconnect	Remote devices		Katkaise yhteys
 Defaults	Window		Oletusasetukset
 From all devices	Settings view		Kaikista laitteista
 Start bluetooth services…	Window		Käynnistä bluetooth-palvelut…
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Tarkista, että etälaitteen bluetooth-ominaisuudet on aktivoitu. Paina ’Kysely’ haun käynnistämiseksi. Nimien noutoon tarvittavan ajan määrä ei ole tiedossa, mutta sen ei pitäisi viedä yli 3 sekuntia per laite. Myöhemmin voit lisätä ne pääluetteloosi, jossa pystyt yhdistämään ne toisiinsa.
-Scanning progress	Inquiry panel		Etsinnän edistyminen
 Launch now	main		Käynnistä nyt
 Bluetooth	System name		Bluetooth-asetukset
 Remove	Remote devices		Poista
@@ -31,18 +28,14 @@ Always ask	Settings view		Kysy joka kerta
 With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Tukihenkilöt:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nKiitokset henkilöille, jotka auttoivat…\n\nLähettäen/lahjoittaen laitteistoa:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nTaloudellisesti:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nKorjausversioilla:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestauksella:\n - Petter H. Juliussen\nJotka kertoivat minulla kaiken tietämänsä:\n - yellowTAB-ryhmä
 Help	Window		Opaste
 Pair…	Remote devices		Parita…
-Retrieving name of %1	Inquiry panel		Noudetaan %1-nimi
-Inquiry	Inquiry panel		Kysely
 Incoming connections policy:	Settings view		Saapuvien yhteyksien sääntö:
 Retrieving names…	Inquiry panel		Haetaan nimiä...
 Show name	Extended local device view		Näytä nimi
 Add device to list	Inquiry panel		Lisää laite luetteloon
-Remaining %1 seconds	Inquiry panel		Jäljellä %1 sekuntia
 The Bluetooth services are not currently running on this system.	main		Bluetooth-palvelut eivät nykyisin toimi tässä järjestelmässä.
 Discoverable	Extended local device view		Paljastettava
 Authenticate	Extended local device view		Todenna
 Smart phone	Settings view		Älypuhelin
-Scanning completed.	Inquiry panel		Etsintä valmis.
 Default inquiry time:	Settings view		Oletuskyselyn pituus:
 Server	Settings view		Palvelin
 Handheld	Settings view		Kädessäpidettävät
