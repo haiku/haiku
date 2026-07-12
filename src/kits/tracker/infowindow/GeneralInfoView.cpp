@@ -199,8 +199,7 @@ GeneralInfoView::GeneralInfoView(Model* model)
 	GetFont(&currentFont);
 	currentFont.SetSize(currentFont.Size() - 2);
 
-	// The widest string depends on the locale. We should check them all, this
-	// is only an approximation that works for English and French.
+	// The widest string depends on the locale.
 	float width = 0;
 	for (int i = 0; fieldNames[i] != 0; i++)
 		width = std::max(width, StringWidth(fieldNames[i]));
@@ -829,6 +828,7 @@ GeneralInfoView::Draw(BRect)
 	font_height fontMetrics;
 	float lineHeight = 0;
 	float lineBase = 0;
+	float maxTextWidth = Bounds().Width() - (fDivider + sBorderMargin);
 	// Draw the attribute font stuff
 	SetFont(be_plain_font);
 	GetFontHeight(&fontMetrics);
@@ -838,35 +838,33 @@ GeneralInfoView::Draw(BRect)
 	lineBase = lineHeight;
 
 	// Capacity/size
+	const char* sizeLabel;
+	if (fModel->IsVolume() || fModel->IsRoot())
+		sizeLabel = B_TRANSLATE("Capacity:");
+	else
+		sizeLabel = B_TRANSLATE("Size:");
+
+	MovePenTo(BPoint(fDivider - (StringWidth(sizeLabel)), lineBase));
 	SetHighColor(labelColor);
-	if (fModel->IsVolume() || fModel->IsRoot()) {
-		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Capacity:"))),
-			lineBase));
-		DrawString(B_TRANSLATE("Capacity:"));
-	} else {
-		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Size:"))),
-			lineBase));
-		fSizeRect.left = fDivider + 2;
-		fSizeRect.top = lineBase - fontMetrics.ascent;
-		fSizeRect.bottom = lineBase + fontMetrics.descent;
-		DrawString(B_TRANSLATE("Size:"));
-	}
+	DrawString(sizeLabel);
 
 	MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 	SetHighColor(attributeColor);
+
 	// Check for possible need of truncation
-	if (StringWidth(fSizeString.String())
-			> (Bounds().Width() - (fDivider + sBorderMargin))) {
+	if (StringWidth(fSizeString.String()) > maxTextWidth) {
 		BString tmpString(fSizeString.String());
-		TruncateString(&tmpString, B_TRUNCATE_MIDDLE,
-			Bounds().Width() - (fDivider + sBorderMargin));
+		TruncateString(&tmpString, B_TRUNCATE_MIDDLE, maxTextWidth);
 		DrawString(tmpString.String());
-		fSizeRect.right = fSizeRect.left + StringWidth(tmpString.String())
-			+ 3;
 	} else {
 		DrawString(fSizeString.String());
-		fSizeRect.right = fSizeRect.left + StringWidth(fSizeString.String()) + 3;
 	}
+
+	fSizeRect.top = lineBase - fontMetrics.ascent;
+	fSizeRect.bottom = ceilf(lineBase + fontMetrics.descent);
+	fSizeRect.left = fDivider + 2;
+	fSizeRect.right = ceilf(fSizeRect.left + StringWidth(fSizeString.String()) + 3);
+
 	lineBase += lineHeight;
 
 	// Created
@@ -899,9 +897,6 @@ GeneralInfoView::Draw(BRect)
 	DrawString(fKindStr.String());
 	lineBase += lineHeight;
 
-	BFont normalFont;
-	GetFont(&normalFont);
-
 	// Path
 	MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Location:"))),
 		lineBase));
@@ -912,20 +907,19 @@ GeneralInfoView::Draw(BRect)
 	SetHighUIColor(fCurrentPathColorWhich);
 
 	// Check for truncation
-	if (StringWidth(fPathStr.String()) > (Bounds().Width()
-			- (fDivider + sBorderMargin))) {
+	if (StringWidth(fPathStr.String()) > maxTextWidth) {
 		BString nameString(fPathStr.String());
-		TruncateString(&nameString, B_TRUNCATE_MIDDLE,
-			Bounds().Width() - (fDivider + sBorderMargin));
+		TruncateString(&nameString, B_TRUNCATE_MIDDLE, maxTextWidth);
 		DrawString(nameString.String());
-	} else
+	} else {
 		DrawString(fPathStr.String());
+	}
 
 	// Cache the position of the path
 	fPathRect.top = lineBase - fontMetrics.ascent;
-	fPathRect.bottom = lineBase + fontMetrics.descent;
+	fPathRect.bottom = ceilf(lineBase + fontMetrics.descent);
 	fPathRect.left = fDivider + 2;
-	fPathRect.right = fPathRect.left + StringWidth(fPathStr.String()) + 3;
+	fPathRect.right = ceilf(fPathRect.left + StringWidth(fPathStr.String()) + 3);
 
 	lineBase += lineHeight;
 
@@ -939,21 +933,19 @@ GeneralInfoView::Draw(BRect)
 		SetHighUIColor(fCurrentLinkColorWhich);
 
 		// Check for truncation
-		if (StringWidth(fLinkToStr.String()) > (Bounds().Width()
-				- (fDivider + sBorderMargin))) {
+		if (StringWidth(fLinkToStr.String()) > maxTextWidth) {
 			BString nameString(fLinkToStr.String());
-			TruncateString(&nameString, B_TRUNCATE_MIDDLE,
-				Bounds().Width() - (fDivider + sBorderMargin));
+			TruncateString(&nameString, B_TRUNCATE_MIDDLE, maxTextWidth);
 			DrawString(nameString.String());
-		} else
+		} else {
 			DrawString(fLinkToStr.String());
+		}
 
 		// Cache the position of the link field
 		fLinkRect.top = lineBase - fontMetrics.ascent;
-		fLinkRect.bottom = lineBase + fontMetrics.descent;
+		fLinkRect.bottom = ceilf(lineBase + fontMetrics.descent);
 		fLinkRect.left = fDivider + 2;
-		fLinkRect.right = fLinkRect.left + StringWidth(fLinkToStr.String())
-			+ 3;
+		fLinkRect.right = ceilf(fLinkRect.left + StringWidth(fLinkToStr.String()) + 3);
 
 		// No description field
 		fDescRect = BRect(-1, -1, -1, -1);
@@ -980,20 +972,19 @@ GeneralInfoView::Draw(BRect)
 		MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 		SetHighColor(attributeColor);
 		// Check for truncation
-		if (StringWidth(fDescStr.String()) > (Bounds().Width()
-				- (fDivider + sBorderMargin))) {
+		if (StringWidth(fDescStr.String()) > maxTextWidth) {
 			BString nameString(fDescStr.String());
-			TruncateString(&nameString, B_TRUNCATE_MIDDLE,
-				Bounds().Width() - (fDivider + sBorderMargin));
+			TruncateString(&nameString, B_TRUNCATE_MIDDLE, maxTextWidth);
 			DrawString(nameString.String());
-		} else
+		} else {
 			DrawString(fDescStr.String());
+		}
 
 		// Cache the position of the description field
 		fDescRect.top = lineBase - fontMetrics.ascent;
-		fDescRect.bottom = lineBase + fontMetrics.descent;
+		fDescRect.bottom = ceilf(lineBase + fontMetrics.descent);
 		fDescRect.left = fDivider + 2;
-		fDescRect.right = fDescRect.left + StringWidth(fDescStr.String()) + 3;
+		fDescRect.right = ceilf(fDescRect.left + StringWidth(fDescStr.String()) + 3);
 
 		// No link field
 		fLinkRect = BRect(-1, -1, -1, -1);
@@ -1006,14 +997,13 @@ GeneralInfoView::Draw(BRect)
 		MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 		SetHighColor(attributeColor);
 		// Check for truncation
-		if (StringWidth(fFileSystemStr.String()) > (Bounds().Width()
-				- (fDivider + sBorderMargin))) {
+		if (StringWidth(fFileSystemStr.String()) > maxTextWidth) {
 			BString nameString(fFileSystemStr.String());
-			TruncateString(&nameString, B_TRUNCATE_MIDDLE,
-				Bounds().Width() - (fDivider + sBorderMargin));
+			TruncateString(&nameString, B_TRUNCATE_MIDDLE, maxTextWidth);
 			DrawString(nameString.String());
-		} else
+		} else {
 			DrawString(fFileSystemStr.String());
+		}
 
 		// No description field or link field
 		fDescRect = BRect(-1, -1, -1, -1);
@@ -1076,8 +1066,8 @@ GeneralInfoView::SetSizeString(const char* sizeString)
 {
 	fSizeString = sizeString;
 
-	float lineHeight = CurrentFontHeight() + 6;
-	BRect bounds(fDivider, 0, Bounds().right, lineHeight);
+	BRect bounds(fSizeRect);
+	bounds.right = Bounds().right;
 	Invalidate(bounds);
 }
 
