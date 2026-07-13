@@ -105,7 +105,7 @@ BCountView::TrySpinningBarberPole()
 	// After this the text needs no updating since only the pole changes.
 	if (fStartSpinningAfter) {
 		fStartSpinningAfter = 0;
-		Invalidate(TextAndBarberPoleRect());
+		Invalidate();
 	} else
 		Invalidate(BarberPoleInnerRect());
 }
@@ -163,24 +163,14 @@ BCountView::BarberPoleOuterRect() const
 
 
 BRect
-BCountView::TextInvalRect() const
-{
-	BRect result = TextAndBarberPoleRect();
-
-	// if the barber pole is not present, use its space for text
-	if (fShowingBarberPole)
-		result.right -= 10;
-
-	return result;
-}
-
-
-BRect
-BCountView::TextAndBarberPoleRect() const
+BCountView::TextRect() const
 {
 	BRect result = Bounds();
 	result.InsetBy(be_control_look->ComposeSpacing(B_USE_SMALL_SPACING) / 2,
 		floorf(result.Height() * 0.25f));
+
+	if (fShowingBarberPole)
+		result.right -= 10;
 
 	return result;
 }
@@ -201,12 +191,8 @@ BCountView::CheckCount()
 		invalidate = true;
 	}
 
-	// invalidate the count text area if necessary
 	if (invalidate)
-		Invalidate(TextInvalRect());
-
-	// invalidate barber pole area if necessary
-	TrySpinningBarberPole();
+		Invalidate();
 }
 
 
@@ -263,7 +249,7 @@ BCountView::Draw(BRect updateRect)
 		}
 	}
 
-	BRect textRect(TextInvalRect());
+	BRect textRect(TextRect());
 
 	// leave room for pop up indicator
 	float popUpWidth = be_control_look->DefaultItemSpacing();
