@@ -169,7 +169,8 @@ btrfs_read_fs_info(fs_volume* _volume, struct fs_info* info)
 	info->io_size = BTRFS_IO_SIZE;
 	info->block_size = volume->BlockSize();
 	info->total_blocks = volume->SuperBlock().TotalSize() / volume->BlockSize();
-	info->free_blocks = 0; // volume->NumFreeBlocks();
+	info->free_blocks = (volume->SuperBlock().TotalSize() - volume->SuperBlock().UsedSize())
+		/ volume->BlockSize();
 
 	// Volume name
 	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));

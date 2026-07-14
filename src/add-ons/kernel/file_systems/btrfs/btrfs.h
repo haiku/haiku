@@ -258,6 +258,7 @@ struct btrfs_super_block {
 	void Initialize(const char* name, off_t numBlocks,
 			uint32 blockSize, uint32 sectorSize);
 	uint64 TotalSize() const { return B_LENDIAN_TO_HOST_INT64(total_size); }
+	uint64 UsedSize() const { return B_LENDIAN_TO_HOST_INT64(used_size); }
 	uint32 BlockSize() const { return B_LENDIAN_TO_HOST_INT32(node_size); }
 	uint32 SectorSize() const { return B_LENDIAN_TO_HOST_INT32(sector_size); }
 	uint64 RootDirObjectID() const
