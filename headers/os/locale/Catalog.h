@@ -200,6 +200,10 @@ private:
 #define B_TRANSLATE_NOCOLLECT(string) \
 	B_TRANSLATE(string)
 
+#undef B_TRANSLATE_NOCOLLECT_CONTEXT
+#define B_TRANSLATE_NOCOLLECT_CONTEXT(string, context) \
+	B_TRANSLATE_CONTEXT(string, context)
+
 #undef B_TRANSLATE_NOCOLLECT_COMMENT
 #define B_TRANSLATE_NOCOLLECT_COMMENT(string, comment) \
 	B_TRANSLATE_COMMENT(string, comment)

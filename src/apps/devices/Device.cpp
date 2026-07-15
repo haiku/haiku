@@ -61,10 +61,10 @@ Device::Device(Device* physicalParent, BusType busType, Category category,
 	fCategory(category),
 	fPhysicalParent(physicalParent)
 {
-	SetAttribute(B_TRANSLATE("Device name"), B_TRANSLATE(name));
-	SetAttribute(B_TRANSLATE("Manufacturer"), B_TRANSLATE(manufacturer));
-	SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE(driverUsed));
-	SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE(devPathsPublished));
+	SetAttribute(B_TRANSLATE("Device name"), B_TRANSLATE_NOCOLLECT(name));
+	SetAttribute(B_TRANSLATE("Manufacturer"), B_TRANSLATE_NOCOLLECT(manufacturer));
+	SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE_NOCOLLECT(driverUsed));
+	SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE_NOCOLLECT(devPathsPublished));
 }
 
 
@@ -89,7 +89,7 @@ Device::GetManufacturer() const
 	AttributeMapIterator it = fAttributeMap.find(B_TRANSLATE("Manufacturer"));
 	if (it != fAttributeMap.end())
 		return it->second;
-	return BString("Unknown");
+	return BString("unknown");
 }
 
 
@@ -99,7 +99,7 @@ Device::GetDriverUsed() const
 	AttributeMapIterator it = fAttributeMap.find(B_TRANSLATE("Driver used"));
 	if (it != fAttributeMap.end())
 		return it->second;
-	return BString("Unknown");
+	return BString("unknown");
 }
 
 
@@ -109,7 +109,7 @@ Device::GetDevPathsPublished() const
 	AttributeMapIterator it = fAttributeMap.find(B_TRANSLATE("Device paths"));
 	if (it != fAttributeMap.end())
 		return it->second;
-	return BString("Unknown");
+	return BString("unknown");
 }
 
 

@@ -64,9 +64,6 @@ private:
 									const char* style,
 									const char* size);
 
-	static	BPopUpMenu*			_MakeMenu(uint32 msg, const char** items,
-										const char* defaultItem);
-
 			void				_MarkSelectedFont(const char* family,
 									const char* style, const char* size);
 

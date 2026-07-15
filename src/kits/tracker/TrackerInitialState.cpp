@@ -225,7 +225,7 @@ mkColumnsBits(BMallocIO& stream, const ColumnData* src, int32 nelm,
 {
 	for (int32 i = 0; i < nelm; i++) {
 		BColumn c(
-			B_TRANSLATE_CONTEXT(src[i].title, context),
+			B_TRANSLATE_NOCOLLECT_CONTEXT(src[i].title, context),
 			src[i].width, src[i].align, src[i].attributeName,
 			src[i].attrType, src[i].statField, src[i].editable);
 		c.SetOffset(src[i].offset);
@@ -660,6 +660,10 @@ TTracker::InstallDefaultTemplates()
 		{ B_TRANSLATE_MARK("Status"), 468, 50, B_ALIGN_RIGHT, "MAIL:status",
 			B_STRING_TYPE, false, true }
 	};
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TrackerInitialState"
 
 
 	BNode node;

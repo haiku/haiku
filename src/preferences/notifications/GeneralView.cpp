@@ -98,9 +98,7 @@ GeneralView::GeneralView(SettingsHost* host)
 	minLabel << kMinimumTimeout;
 	BString maxLabel;
 	maxLabel << kMaximumTimeout;
-	fDurationSlider->SetLimitLabels(
-		B_TRANSLATE_COMMENT(minLabel.String(), "Slider low text"),
-		B_TRANSLATE_COMMENT(maxLabel.String(), "Slider high text"));
+	fDurationSlider->SetLimitLabels(minLabel.String(), maxLabel.String());
 
 	// Notification Position
 	fPositionMenu = new BPopUpMenu(B_TRANSLATE("Follow Deskbar"));

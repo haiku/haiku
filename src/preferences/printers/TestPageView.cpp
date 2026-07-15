@@ -281,9 +281,8 @@ TestPageView::AttachedToWindow()
 	gradients.View()->SetViewColor(B_TRANSPARENT_COLOR);
 
 	for (int i = 0; i < kNumColorGradients; ++i) {
-		BStringView* label = new BStringView(
-			kColorGradients[i].name,
-			B_TRANSLATE(kColorGradients[i].name));
+		BStringView* label = new BStringView(kColorGradients[i].name,
+			B_TRANSLATE_NOCOLLECT(kColorGradients[i].name));
 		// label->SetAlignment(B_ALIGN_RIGHT);
 		gradients.Add(label, 0, i);
 		gradients.Add(new ColorGradientView(kColorGradients[i].color), 1, i);

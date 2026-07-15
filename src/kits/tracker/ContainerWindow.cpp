@@ -1820,14 +1820,13 @@ BContainerWindow::AddIconSizeMenu(BMenu* menu)
 	static const uint32 kIconSizes[] = { 32, 40, 48, 64, 96, 128 };
 
 	BString label;
-	const char* format;
-	const char* comment = "The '×' is the Unicode multiplication sign U+00D7";
+	const char* format = B_TRANSLATE_COMMENT("%" B_PRId32 " × %" B_PRId32,
+		"The '×' is the Unicode multiplication sign U+00D7");
 	uint32 iconSize;
 	for (uint32 i = 0; i < sizeof(kIconSizes) / sizeof(uint32); ++i) {
 		iconSize = kIconSizes[i];
 		message = new BMessage(kIconMode);
 		message->AddInt32("size", iconSize);
-		format = B_TRANSLATE_COMMENT("%" B_PRId32 " × %" B_PRId32, comment);
 		label.SetToFormat(format, iconSize, iconSize);
 		item = new BMenuItem(label, message);
 		item->SetTarget(PoseView());

@@ -553,14 +553,11 @@ BAboutWindow::AddExtraInfo(const char* extraInfo)
 	if (extraInfo == NULL)
 		return;
 
-	const char* appExtraInfo = B_TRANSLATE_MARK(extraInfo);
-	appExtraInfo = gSystemCatalog.GetString(extraInfo, "AboutWindow");
-
 	BString extra("");
 	if (fAboutView->InfoView()->TextLength() > 0)
 		extra << "\n\n";
 
-	extra << appExtraInfo;
+	extra << extraInfo;
 
 	fAboutView->InfoView()->Insert(extra.String());
 }

@@ -123,7 +123,7 @@ BRow*
 CapabilitiesView::_CreateCapabilitiesRow(GLenum capability, const char* name)
 {
 	BRow* row = new BRow();
-	row->SetField(new BStringField(B_TRANSLATE(name)), 0);
+	row->SetField(new BStringField(name), 0);
 
 	int value = 0;
 	glGetIntegerv(capability, &value);

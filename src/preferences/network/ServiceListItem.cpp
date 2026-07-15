@@ -56,8 +56,8 @@ ServiceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 		owner->FillRect(bounds);
 	}
 
-	const char* stateText = fEnabled ? B_TRANSLATE(kEnabledState)
-		: B_TRANSLATE(kDisabledState);
+	const char* stateText
+		= fEnabled ? B_TRANSLATE_NOCOLLECT(kEnabledState) : B_TRANSLATE_NOCOLLECT(kDisabledState);
 
 	// Set the initial bounds of item contents
 	BPoint statePoint = bounds.RightTop() + BPoint(0, fLineOffset)
@@ -101,8 +101,8 @@ ServiceListItem::Update(BView* owner, const BFont* font)
 
 	fLineOffset = 2 + ceilf(height.ascent + height.leading / 2);
 
-	float maxStateWidth = std::max(font->StringWidth(B_TRANSLATE(kEnabledState)),
-		font->StringWidth(B_TRANSLATE(kDisabledState)));
+	float maxStateWidth = std::max(font->StringWidth(B_TRANSLATE_NOCOLLECT(kEnabledState)),
+		font->StringWidth(B_TRANSLATE_NOCOLLECT(kDisabledState)));
 	SetWidth(font->StringWidth(fLabel)
 		+ 3 * be_control_look->DefaultLabelSpacing() + maxStateWidth);
 	SetHeight(4 + ceilf(height.ascent + height.leading + height.descent));

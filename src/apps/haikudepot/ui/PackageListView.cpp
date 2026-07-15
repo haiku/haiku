@@ -47,13 +47,13 @@ package_state_to_string(PackageInfoRef package)
 
 	switch (PackageUtils::State(package)) {
 		case NONE:
-			return B_TRANSLATE(skPackageStateAvailable);
+			return B_TRANSLATE_NOCOLLECT(skPackageStateAvailable);
 		case INSTALLED:
-			return B_TRANSLATE(skPackageStateInactive);
+			return B_TRANSLATE_NOCOLLECT(skPackageStateInactive);
 		case ACTIVATED:
-			return B_TRANSLATE(skPackageStateActive);
+			return B_TRANSLATE_NOCOLLECT(skPackageStateActive);
 		case UNINSTALLED:
-			return B_TRANSLATE(skPackageStateUninstalled);
+			return B_TRANSLATE_NOCOLLECT(skPackageStateUninstalled);
 		case DOWNLOADING:
 		{
 			BString data;
@@ -65,7 +65,7 @@ package_state_to_string(PackageInfoRef package)
 			return data;
 		}
 		case PENDING:
-			return B_TRANSLATE(skPackageStatePending);
+			return B_TRANSLATE_NOCOLLECT(skPackageStatePending);
 	}
 
 	return B_TRANSLATE("Unknown");

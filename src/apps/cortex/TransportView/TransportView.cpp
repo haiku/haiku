@@ -729,8 +729,7 @@ void TransportView::_populateRunModeMenu(
 		m = new BMessage(NodeGroup::M_SET_RUN_MODE);
 		m->AddInt32("runMode", n+1);
 
-		BMenuItem* i = new BMenuItem(
-			B_TRANSLATE(_run_mode_strings[n]), m);
+		BMenuItem* i = new BMenuItem(B_TRANSLATE_NOCOLLECT(_run_mode_strings[n]), m);
 		menu->AddItem(i);
 		_addGroupTarget(i);
 	}

@@ -16,7 +16,6 @@
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <CheckBox.h>
-#include <ColorControl.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
@@ -26,7 +25,6 @@
 #include <TextControl.h>
 #include <View.h>
 
-#include "Colors.h"
 #include "Globals.h"
 #include "PrefHandler.h"
 #include "TermConst.h"
@@ -428,31 +426,6 @@ AppearancePrefView::_MakeFontSizeMenu(const char* label, uint32 command,
 				break;
 			}
 		}
-	}
-
-	return menu;
-}
-
-
-/*static*/ BPopUpMenu*
-AppearancePrefView::_MakeMenu(uint32 msg, const char** items,
-	const char* defaultItemName)
-{
-	BPopUpMenu* menu = new BPopUpMenu("");
-
-	while (*items) {
-		if (strcmp((*items), "") == 0)
-			menu->AddSeparatorItem();
-		else {
-			BMessage* message = new BMessage(msg);
-			message->AddString("label", *items);
-			BMenuItem* item = new BMenuItem(B_TRANSLATE(*items), message);
-			menu->AddItem(item);
-			if (strcmp(*items, defaultItemName) == 0)
-				item->SetMarked(true);
-		}
-
-		items++;
 	}
 
 	return menu;

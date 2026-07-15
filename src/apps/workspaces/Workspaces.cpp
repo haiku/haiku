@@ -410,13 +410,11 @@ WorkspacesView::_AboutRequested()
 		NULL
 	};
 
-	const char* extraInfo = "Send windows behind using the Option key. "
-		"Move windows to front using the Control key.\n";
-
 	window->AddCopyright(2002, "Haiku, Inc.",
 			extraCopyrights);
 	window->AddAuthors(authors);
-	window->AddExtraInfo(extraInfo);
+	window->AddExtraInfo(B_TRANSLATE("Send windows behind using the Option key. "
+		"Move windows to front using the Control key.\n"));
 
 	window->Show();
 }
