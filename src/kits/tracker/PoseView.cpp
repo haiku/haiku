@@ -3130,7 +3130,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	uint32 lastIconMode = fViewState->LastIconMode();
 	if (newMode != kListMode) {
 		fViewState->SetLastIconMode(newMode);
-		if (oldMode == kIconMode)
+		if (newMode == kIconMode)
 			fViewState->SetLastIconSize(fViewState->IconSize());
 	}
 
