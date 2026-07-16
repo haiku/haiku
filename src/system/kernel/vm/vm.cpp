@@ -5078,7 +5078,7 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 
 	// compute the page protection that is required
 	bool isUser = IS_USER_ADDRESS(address);
-	bool writable = (flags & B_READ_DEVICE) == 0;
+	bool writable = (flags & B_READ_DEVICE) != 0;
 	uint32 requiredProtection = PAGE_PRESENT
 		| B_KERNEL_READ_AREA | (isUser ? B_READ_AREA : 0);
 	if (writable)
@@ -5237,7 +5237,7 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 
 	// compute the page protection that is required
 	bool isUser = IS_USER_ADDRESS(address);
-	bool writable = (flags & B_READ_DEVICE) == 0;
+	bool writable = (flags & B_READ_DEVICE) != 0;
 	uint32 requiredProtection = PAGE_PRESENT
 		| B_KERNEL_READ_AREA | (isUser ? B_READ_AREA : 0);
 	if (writable)
