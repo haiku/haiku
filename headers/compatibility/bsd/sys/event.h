@@ -41,6 +41,10 @@
 #define EVFILT_WRITE		(-2)
 #define EVFILT_PROC			(-5)
 
+#define EVFILT_HAIKU_SEM			(-11)
+#define EVFILT_HAIKU_PORT_READ		(-12)
+
+
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 #define	EV_SET(kevp_, a, b, c, d, e, f) do {	\
 	*(kevp_) = (struct kevent){		\

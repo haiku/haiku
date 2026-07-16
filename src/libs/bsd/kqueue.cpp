@@ -1,7 +1,8 @@
 /*
- * Copyright 2023, Haiku, Inc. All rights reserved.
+ * Copyright 2023-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 #include <sys/event.h>
 
 #include <StackOrHeapArray.h>
@@ -35,6 +36,12 @@ filter_from_info(const event_wait_info& info)
 
 		case B_OBJECT_TYPE_THREAD:
 			return EVFILT_PROC;
+
+		case B_OBJECT_TYPE_SEMAPHORE:
+			return EVFILT_HAIKU_SEM;
+
+		case B_OBJECT_TYPE_PORT:
+			return EVFILT_HAIKU_PORT_READ;
 	}
 
 	return 0;
@@ -75,6 +82,16 @@ kevent(int kq,
 				waitInfo->type = B_OBJECT_TYPE_THREAD;
 				if ((changelist[i].fflags & NOTE_EXIT) != 0)
 					events |= B_EVENT_INVALID;
+				break;
+
+			case EVFILT_HAIKU_SEM:
+				waitInfo->type = B_OBJECT_TYPE_SEMAPHORE;
+				events = B_EVENT_ACQUIRE_SEMAPHORE;
+				break;
+
+			case EVFILT_HAIKU_PORT_READ:
+				waitInfo->type = B_OBJECT_TYPE_PORT;
+				events = B_EVENT_READ;
 				break;
 
 			default:
@@ -255,10 +272,6 @@ kevent(int kq,
 					data = waitInfos[i].events;
 				} else if ((waitInfos[i].events & B_EVENT_INVALID) != 0) {
 					switch (waitInfos[i].type) {
-						case B_OBJECT_TYPE_FD:
-							// File descriptor was closed. Silently discard the event.
-							continue;
-
 						case B_OBJECT_TYPE_THREAD: {
 							fflags |= NOTE_EXIT;
 
@@ -270,6 +283,10 @@ kevent(int kq,
 								data = -1;
 							break;
 						}
+
+						default:
+							// Object was closed. Silently discard the event.
+							continue;
 					}
 				} else if ((waitInfos[i].events & B_EVENT_DISCONNECTED) != 0) {
 					flags |= EV_EOF;
