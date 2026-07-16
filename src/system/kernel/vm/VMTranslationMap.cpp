@@ -302,6 +302,7 @@ VMTranslationMap::UnaccessedPageUnmapped(VMArea* area, page_num_t pageNumber)
 	// get the page
 	vm_page* page = vm_lookup_page(pageNumber);
 	ASSERT_PRINT(page != NULL, "page number: %#" B_PRIxPHYSADDR, pageNumber);
+	DEBUG_PAGE_ACCESS_CHECK(page);
 
 	// remove the mapping object/decrement the wired_count of the page
 	vm_page_mapping* mapping = NULL;
