@@ -269,7 +269,7 @@ public:
 		BButton("close button", NULL, message),
 		fOverCloseRect(false)
 	{
-		SetExplicitMinSize(BSize(15, 15));
+		SetExplicitSize(BControlLook::ComposeIconSize(16));
 	}
 
 	virtual bool HasHeightForWidth()
@@ -290,7 +290,8 @@ public:
 	virtual void Draw(BRect updateRect)
 	{
 		BRect frame = Bounds();
-		BRect closeRect(frame.InsetByCopy(4, 4));
+		int inset = BControlLook::ComposeSpacing(B_USE_SMALL_SPACING) / 2;
+		BRect closeRect(frame.InsetByCopy(inset, inset));
 		rgb_color base = ui_color(B_CONTROL_BACKGROUND_COLOR);
 
 		if (Value() == B_CONTROL_ON && fOverCloseRect) {
