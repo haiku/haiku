@@ -42,10 +42,13 @@ RemoteDevice::IsTrustedDevice(void)
 BObjectList<RemoteDevice>
 RemoteDevice::GetRemoteDevices(LocalDevice* localDevice)
 {
-	BMessage requestRemoteDevices(BT_MSG_GET_REMOTE_DEVICES);
 	BObjectList<RemoteDevice> rdList;
 
+	if (localDevice == NULL)
+		return rdList;
+
 	BMessage devices;
+	BMessage requestRemoteDevices(BT_MSG_GET_REMOTE_DEVICES);
 	requestRemoteDevices.AddInt32("hci_id", localDevice->ID());
 	if (BMessenger(BLUETOOTH_SIGNATURE).SendMessage(&requestRemoteDevices,
 		&devices) != B_OK)
