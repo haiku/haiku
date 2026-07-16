@@ -229,7 +229,7 @@ IOBuffer::FreeVirtualVecCookie(void* _cookie)
 
 
 status_t
-IOBuffer::LockMemory(team_id team, bool isWrite)
+IOBuffer::LockMemory(team_id team, bool forWriteRequest)
 {
 	if (fMemoryLocked) {
 		panic("memory already locked!");
@@ -238,9 +238,9 @@ IOBuffer::LockMemory(team_id team, bool isWrite)
 
 	for (uint32 i = 0; i < fVecCount; i++) {
 		status_t status = lock_memory_etc(team, (void*)(addr_t)fVecs[i].base,
-			fVecs[i].length, isWrite ? 0 : B_READ_DEVICE);
+			fVecs[i].length, forWriteRequest ? 0 : B_READ_DEVICE);
 		if (status != B_OK) {
-			_UnlockMemory(team, i, isWrite);
+			_UnlockMemory(team, i, forWriteRequest);
 			return status;
 		}
 	}
@@ -251,11 +251,11 @@ IOBuffer::LockMemory(team_id team, bool isWrite)
 
 
 void
-IOBuffer::_UnlockMemory(team_id team, size_t count, bool isWrite)
+IOBuffer::_UnlockMemory(team_id team, size_t count, bool forWriteRequest)
 {
 	for (uint32 i = 0; i < count; i++) {
 		unlock_memory_etc(team, (void*)(addr_t)fVecs[i].base, fVecs[i].length,
-			isWrite ? 0 : B_READ_DEVICE);
+			forWriteRequest ? 0 : B_READ_DEVICE);
 	}
 }
 

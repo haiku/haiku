@@ -61,8 +61,8 @@ public:
 			status_t			GetNextVirtualVec(void*& cookie, iovec& vector);
 			void				FreeVirtualVecCookie(void* cookie);
 
-			status_t			LockMemory(team_id team, bool isWrite);
-			void				UnlockMemory(team_id team, bool isWrite);
+			status_t			LockMemory(team_id team, bool forWriteRequest);
+			void				UnlockMemory(team_id team, bool forWriteRequest);
 			bool				IsMemoryLocked() const
 									{ return fMemoryLocked; }
 
