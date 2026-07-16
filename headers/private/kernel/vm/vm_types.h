@@ -113,9 +113,9 @@ struct VMCacheRef {
 
 
 struct vm_page {
-	DoublyLinkedListLink<vm_page> queue_link;
+	const page_num_t		physical_page_number;
 
-	page_num_t				physical_page_number;
+	DoublyLinkedListLink<vm_page> queue_link;
 
 private:
 	VMCacheRef*				cache_ref;
@@ -153,7 +153,7 @@ public:
 
 	uint8					usage_count;
 
-	inline void Init(page_num_t pageNumber);
+	inline vm_page(page_num_t pageNumber);
 
 	VMCacheRef* CacheRef() const			{ return cache_ref; }
 	void SetCacheRef(VMCacheRef* cacheRef)	{ this->cache_ref = cacheRef; }
@@ -199,10 +199,11 @@ enum {
 #define VM_PAGE_ALLOC_BUSY	0x00000020
 
 
-inline void
-vm_page::Init(page_num_t pageNumber)
+inline
+vm_page::vm_page(page_num_t pageNumber)
+	:
+	physical_page_number(pageNumber)
 {
-	physical_page_number = pageNumber;
 	new(&mappings) vm_page_mappings();
 	SetCacheRef(NULL);
 

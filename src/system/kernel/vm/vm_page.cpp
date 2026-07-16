@@ -1876,7 +1876,7 @@ free_cached_page(vm_page *page, bool dontWait)
 static uint32
 free_cached_pages(uint32 pagesToFree, bool dontWait)
 {
-	vm_page marker;
+	vm_page marker(-1);
 	init_page_marker(marker);
 	forbid_page_faults();
 
@@ -2007,7 +2007,7 @@ full_scan_inactive_pages(page_stats& pageStats, int32 despairLevel)
 	// scale only when things get desperate.
 	uint32 maxToFlush = despairLevel <= 1 ? 32 : 10000;
 
-	vm_page marker;
+	vm_page marker(-1);
 	init_page_marker(marker);
 
 	VMPageQueue& queue = sInactivePageQueue;
@@ -2124,7 +2124,7 @@ full_scan_inactive_pages(page_stats& pageStats, int32 despairLevel)
 static void
 full_scan_active_pages(page_stats& pageStats, int32 despairLevel)
 {
-	vm_page marker;
+	vm_page marker(-1);
 	init_page_marker(marker);
 
 	VMPageQueue& queue = sActivePageQueue;
@@ -2453,7 +2453,7 @@ vm_page_init(kernel_args *args)
 
 	// initialize the free page table
 	for (uint32 i = 0; i < sNumPages; i++) {
-		sPages[i].Init(sPhysicalPageOffset + i);
+		new(&sPages[i]) vm_page(sPhysicalPageOffset + i);
 		sFreePageQueue.Append(&sPages[i]);
 
 #if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
