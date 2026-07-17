@@ -1257,6 +1257,8 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			bool writable = !partition->IsReadOnly()
 				&& partition->Device()->HasMedia();
 			bool notMountedAndWritable = !partition->IsMounted() && writable;
+			bool canChangeParameters = partition->CanEditParameters()
+				|| partition->CanSetType() || partition->CanSetName();
 
 			fFormatMenu->SetEnabled(writable && fFormatMenu->CountItems() > 0);
 
@@ -1264,10 +1266,8 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 				&& partition->IsDevice()
 				&& fDiskInitMenu->CountItems() > 0);
 
-			fChangeMenuItem->SetEnabled(writable
-				&& partition->CanEditParameters());
-			fChangeContextMenuItem->SetEnabled(writable
-				&& partition->CanEditParameters());
+			fChangeMenuItem->SetEnabled(writable && canChangeParameters);
+			fChangeContextMenuItem->SetEnabled(writable && canChangeParameters);
 
 			fDeleteMenuItem->SetEnabled(notMountedAndWritable
 				&& !partition->IsDevice());

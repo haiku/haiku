@@ -1219,8 +1219,7 @@ pm_set_type(int fd, partition_id partitionID, const char* type, disk_job_id job)
 	ptype.SetType(type);
 	// this is impossible
 	if (!ptype.IsValid() || ptype.IsEmpty())
-		return false;
-	// TODO: Incompatible return value!
+		return B_BAD_VALUE;
 
 	// setting type to the partition
 	update_disk_device_job_progress(job, 0.0);
@@ -2086,7 +2085,8 @@ ep_set_type(int fd, partition_id partitionID, const char* type, disk_job_id job)
 	// get partition, child and LogicalPartition structure
 	partition_data* partition = get_parent_partition(partitionID);
 	partition_data* child = get_partition(partitionID);
-	if (!partition || !child)
+	disk_device_data* disk = get_disk_device(partitionID);
+	if (!partition || !child || !disk)
 		return B_BAD_VALUE;
 	LogicalPartition* logical = (LogicalPartition*)child->cookie;
 	PrimaryPartition* primary = (PrimaryPartition*)partition->cookie;
@@ -2105,16 +2105,22 @@ ep_set_type(int fd, partition_id partitionID, const char* type, disk_job_id job)
 	ptype.SetType(type);
 	// this is impossible
 	if (!ptype.IsValid() || ptype.IsEmpty() || ptype.IsExtended())
-		return false;
+		return B_BAD_VALUE;
 
 	// setting type to the partition
 	update_disk_device_job_progress(job, 0.0);
 	uint8 oldType = logical->Type();
 	logical->SetType(ptype.Type());
 
-	PartitionMapWriter writer(fd, partition->block_size);
+	int parentFD = open_partition(disk->id, O_RDWR);
+	if (parentFD < 0)
+		return B_IO_ERROR;
+
+	PartitionMapWriter writer(parentFD, partition->block_size);
 	// TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteLogical(logical, primary, false);
+	close(parentFD);
+
 	if (error != B_OK) {
 		// something went wrong - putting into previous state
 		logical->SetType(oldType);

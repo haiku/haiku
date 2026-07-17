@@ -220,7 +220,8 @@ uint32
 ExtendedPartitionHandle::SupportedChildOperations(
 	const BMutablePartition* child, uint32 mask)
 {
-	return B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD;
+	return B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE;
 }
 
 
@@ -282,6 +283,21 @@ ExtendedPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 	}
 
 	return B_OK;
+}
+
+
+status_t
+ExtendedPartitionHandle::ValidateSetType(const BMutablePartition* child,
+	const char* type)
+{
+	return B_OK;
+}
+
+
+status_t
+ExtendedPartitionHandle::SetType(BMutablePartition* child, const char* type)
+{
+	return child->SetType(type);
 }
 
 

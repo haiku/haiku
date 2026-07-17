@@ -214,6 +214,7 @@ PartitionMapHandle::SupportedChildOperations(const BMutablePartition* child,
 {
 	return B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
 		| B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS
 		| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD;
 }
@@ -269,6 +270,21 @@ PartitionMapHandle::GetPartitioningInfo(BPartitioningInfo* info)
 	}
 
 	return B_OK;
+}
+
+
+status_t
+PartitionMapHandle::ValidateSetType(const BMutablePartition* child,
+	const char* type)
+{
+	return B_OK;
+}
+
+
+status_t
+PartitionMapHandle::SetType(BMutablePartition* child, const char* type)
+{
+	return child->SetType(type);
 }
 
 

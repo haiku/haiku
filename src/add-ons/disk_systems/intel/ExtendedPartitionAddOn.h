@@ -49,6 +49,11 @@ public:
 
 	virtual	status_t			GetPartitioningInfo(BPartitioningInfo* info);
 
+	virtual	status_t			ValidateSetType(const BMutablePartition* child,
+									const char* type);
+	virtual	status_t			SetType(BMutablePartition* child,
+									const char* type);
+
 	virtual	status_t			GetParameterEditor(
 									B_PARAMETER_EDITOR_TYPE type,
 									BPartitionParameterEditor** editor);

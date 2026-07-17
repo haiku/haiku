@@ -433,7 +433,7 @@ DiskDeviceJobGenerator::_GenerateRemainingJobs(BPartition* parent,
 			// partition not (re-)initialized, set content properties
 
 			// content name
-			if ((changeFlags & B_PARTITION_CHANGED_NAME)
+			if ((changeFlags & B_PARTITION_CHANGED_CONTENT_NAME)
 				|| compare_string(partition->RawContentName(),
 					partitionData->content_name)) {
 				status_t error = _GenerateSetContentNameJob(partition);
