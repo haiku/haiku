@@ -272,6 +272,15 @@ kevent(int kq,
 					data = waitInfos[i].events;
 				} else if ((waitInfos[i].events & B_EVENT_INVALID) != 0) {
 					switch (waitInfos[i].type) {
+						case B_OBJECT_TYPE_FD:
+							// File descriptor was closed. Silently discard the event.
+							continue;
+
+						case B_OBJECT_TYPE_SEMAPHORE:
+						case B_OBJECT_TYPE_PORT:
+							flags |= EV_EOF;
+							break;
+
 						case B_OBJECT_TYPE_THREAD: {
 							fflags |= NOTE_EXIT;
 
@@ -283,10 +292,6 @@ kevent(int kq,
 								data = -1;
 							break;
 						}
-
-						default:
-							// Object was closed. Silently discard the event.
-							continue;
 					}
 				} else if ((waitInfos[i].events & B_EVENT_DISCONNECTED) != 0) {
 					flags |= EV_EOF;
