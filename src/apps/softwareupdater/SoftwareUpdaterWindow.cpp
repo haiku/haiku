@@ -635,10 +635,13 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	}
 
 	// Progress bar and string view
-	if (fCurrentState == STATE_DISPLAY_PROGRESS)
+	if (fCurrentState == STATE_DISPLAY_PROGRESS) {
+		fDetailsLayoutItem->SetVisible(false);
 		fProgressLayoutItem->SetVisible(true);
-	else
+	} else {
+		fDetailsLayoutItem->SetVisible(true);
 		fProgressLayoutItem->SetVisible(false);
+	}
 
 	// Resizing and zooming
 	if (fCurrentState == STATE_GET_CONFIRMATION) {
