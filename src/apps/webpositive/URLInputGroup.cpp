@@ -662,6 +662,11 @@ URLInputGroup::DrawAfterChildren(BRect updateRect)
 	if (fInvalid)
 		flags |= BControlLook::B_INVALID;
 
+	// Do not overwrite the focus rectangle of the Go button if it is focused
+	if (fGoButton->IsFocus())
+		ClipToInverseRect(fGoButton->Frame());
+		
+
 	be_control_look->DrawTextControlBorder(this, bounds, updateRect, base,
 		flags);
 }
