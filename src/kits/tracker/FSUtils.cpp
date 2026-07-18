@@ -1486,10 +1486,6 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 					throw (status_t)B_ERROR;
 				}
 
-				result = destFile.Sync();
-				if (result != B_OK)
-					throw (status_t)result;
-
 				loopControl->UpdateStatus(NULL, ref, bytes - updateBytes, true);
 			} else if (bytes < 0) {
 				// read error
