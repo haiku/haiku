@@ -16,7 +16,7 @@
 
 // Enables kernel ASSERT()s and various checks, locking primitives aren't
 // benaphore-style.
-#define KDEBUG							KDEBUG_LEVEL_2
+#define KDEBUG							KDEBUG_LEVEL_1
 
 // Size of the heap used by the kernel debugger.
 #define KDEBUG_HEAP						(64 * 1024)
