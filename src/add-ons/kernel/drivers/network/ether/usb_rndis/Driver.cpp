@@ -24,13 +24,13 @@ usb_rndis_device_added(usb_device device, void **cookie)
 {
 	*cookie = NULL;
 
-	// check if this is a replug of an existing device first
 	mutex_lock(&gDriverLock);
 
-	// no such device yet, create a new one
+	// create the device
 	RNDISDevice *rndisDevice = new RNDISDevice(device);
 	status_t status = rndisDevice->InitCheck();
 	if (status < B_OK) {
+		TRACE_ALWAYS("Failed to initialize RNDIS device: %s\n", strerror(status));
 		delete rndisDevice;
 		mutex_unlock(&gDriverLock);
 		return status;
@@ -110,13 +110,17 @@ init_driver()
 		&usb_rndis_device_removed
 	};
 
-	static usb_support_descriptor supportDescriptor = {
-		0xE0, /* CDC - Wireless device */
-		0x01, 0x03, /* RNDIS subclass/protocol */
-		0, 0 /* no specific vendor or device */
+	static usb_support_descriptor supportDescriptors[] = {
+		{
+			.dev_class = USB_COMMUNICATION_WIRELESS_DEVICE_CLASS,
+			.dev_subclass = 0x01, /* RNDIS subclass/protocol as specified by Microsoft */
+			.dev_protocol = 0x03,
+			0, 0 /* no specific vendor or device */
+		}
 	};
 
-	gUSBModule->register_driver(DRIVER_NAME, &supportDescriptor, 1, NULL);
+	gUSBModule->register_driver(DRIVER_NAME, supportDescriptors, B_COUNT_OF(supportDescriptors),
+		NULL);
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	return B_OK;
 }
