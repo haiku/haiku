@@ -1292,15 +1292,19 @@ pm_set_parameters(int fd, partition_id partitionID, const char* parameters,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	// set the active flags to false for other partitions
+	bool oldActive = primary->Active();
+	bool prevActiveState[4] = {false, false, false, false};
+
+	// There can only be one active partition so check and set any existing ones to false
 	if (active) {
 		for (int i = 0; i < 4; i++) {
 			PrimaryPartition* partition = map->PrimaryPartitionAt(i);
+
+			prevActiveState[i] = partition->Active();
 			partition->SetActive(false);
 		}
 	}
 
-	bool oldActive = primary->Active();
 	primary->SetActive(active);
 
 	// TODO: The partition is not supposed to be locked at this point!
@@ -1311,9 +1315,38 @@ pm_set_parameters(int fd, partition_id partitionID, const char* parameters,
 		TRACE(("intel: pm_set_parameters: Failed to rewrite MBR: %s\n",
 			strerror(error)));
 		// something went wrong - putting into previous state
-		primary->SetType(oldActive);
+		primary->SetActive(oldActive);
+
+		// Restore all partitions to their previous states
+		if (active) {
+			for (int i = 0; i < 4; i++) {
+				if (prevActiveState[i]) {
+					PrimaryPartition* partition = map->PrimaryPartitionAt(i);
+					partition->SetActive(true);
+				}
+			}
+		}
+
 		return error;
 	}
+
+	if (active) {
+		for (int i = 0; i < 4; i++) {
+			partition_data* partitionData = get_child_partition(partition->id, i);
+			if (partitionData != NULL && partitionData != child
+				&& (partitionData->parameters == NULL || partitionData->parameters[0] != '\0')) {
+				free(partitionData->parameters);
+				partitionData->parameters = strdup("");
+				if (partitionData->parameters == NULL)
+					return B_NO_MEMORY;
+			}
+		}
+	}
+
+	free(child->parameters);
+	child->parameters = strdup(parameters);
+	if (child->parameters == NULL)
+		return B_NO_MEMORY;
 
 	// all changes applied
 	update_disk_device_job_progress(job, 1.0);
@@ -1456,10 +1489,14 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	bool active = get_driver_boolean_parameter(handle, "active", false, true);
 	unload_driver_settings(handle);
 
-	// set the active flags to false
+	bool prevActiveState[4] = {false, false, false, false};
+
+	// There can only be one active partition so check and set any existing ones to false
 	if (active) {
 		for (int i = 0; i < 4; i++) {
 			PrimaryPartition* partition = map->PrimaryPartitionAt(i);
+
+			prevActiveState[i] = partition->Active();
 			partition->SetActive(false);
 		}
 	}
@@ -1479,7 +1516,31 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 		// putting into previous state
 		primary->Unset();
 		delete_partition(child->id);
+
+		// Restore all partitions to their previous states
+		if (active) {
+			for (int i = 0; i < 4; i++) {
+				if (prevActiveState[i]) {
+					PrimaryPartition* partition = map->PrimaryPartitionAt(i);
+					partition->SetActive(true);
+				}
+			}
+		}
+
 		return error;
+	}
+
+	if (active) {
+		for (int i = 0; i < 4; i++) {
+			partition_data* partitionData = get_child_partition(partition->id, i);
+			if (partitionData != NULL && partitionData != child
+				&& (partitionData->parameters == NULL || partitionData->parameters[0] != '\0')) {
+				free(partitionData->parameters);
+				partitionData->parameters = strdup("");
+				if (partitionData->parameters == NULL)
+					return B_NO_MEMORY;
+			}
+		}
 	}
 
 	*childID = child->id;
