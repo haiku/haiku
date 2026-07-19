@@ -5,10 +5,10 @@ resource app_version {
 
 	variety = B_APPV_BETA,
 
-	internal = 9,
+	internal = 10,
 
 	short_info = "Walter",
-	long_info = "©2001-2021 Haiku Inc."
+	long_info = "©2001-2026 Haiku Inc."
 };
 
 resource app_signature "application/x-vnd.Haiku-libbe" ;
