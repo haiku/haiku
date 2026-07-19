@@ -5,7 +5,7 @@
 */
 #include <ether_driver.h>
 #include <net/if_media.h>
-#include <string.h>
+#include <sys/sockio.h>
 #include <stdlib.h>
 
 #include "RNDISDevice.h"
@@ -256,7 +256,7 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 		return B_DEVICE_NOT_FOUND;
 	}
 
-	// The read funcion can return only one packet at a time, but we can receive multiple ones in
+	// The read function can return only one packet at a time, but we can receive multiple ones in
 	// a single USB transfer. So we need to buffer them, and check if we have something in our
 	// buffer for each Read() call before scheduling a new USB transfer. This would be more
 	// efficient if the network stack had a way to read multiple frames at once.
@@ -431,7 +431,7 @@ RNDISDevice::Write(const uint8 *buffer, size_t *numBytes)
 	if ((fStatusWrite != B_OK) && !fRemoved) {
 		TRACE_ALWAYS("device write status error 0x%08" B_PRIx32 "\n", fStatusWrite);
 
-		gUSBModule->cancel_queued_transfers(fReadEndpoint);
+		gUSBModule->cancel_queued_transfers(fWriteEndpoint);
 
 		result = gUSBModule->clear_feature(fWriteEndpoint, USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK) {
@@ -482,6 +482,13 @@ RNDISDevice::Control(uint32 op, void *buffer, size_t length)
 		case ETHER_RECEIVE_NET_BUFFER:
 			// Ignored for now, we use the old read/write interface instead
 			return B_DEV_INVALID_IOCTL;
+
+		case SIOCGIFSTATS:
+			// Parameter is a struct ifreq, fill in request.ifr_stats
+			// Number of received and sent packets and number of collisions
+			// Not needed since there are no collisions and the network stack can already keep
+			// track of sent/received packets on its own.
+			break;
 
 		default:
 			TRACE_ALWAYS("unsupported ioctl %" B_PRIu32 "\n", op);
