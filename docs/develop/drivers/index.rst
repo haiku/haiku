@@ -5,6 +5,7 @@ Device drivers
    :maxdepth: 2
 
    /drivers/disk/ioctls
+   /drivers/network
    /drivers/intel_extreme/generations
 
 Bus drivers
