@@ -167,12 +167,12 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* source,
 					// warp from Trash to Desktop
 			}
 
+			BEntry rootEntry("/");
 			if (desktopIsRoot) {
-				BEntry rootEntry("/");
 				if (entry == rootEntry) {
 					// Disks appears to be on Desktop
 					if (showDisksIcon)
-						AddDisksIconToMenu(reverse);
+						AddItemToDirMenu(&rootEntry, source, reverse, addShortcuts, navMenuEntries);
 					entry = desktopEntry;
 						// warp from "/" to Desktop
 				}
@@ -188,7 +188,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* source,
 
 			if (hitRoot) {
 				if (!desktopIsRoot && showDisksIcon && *startEntry != "/")
-					AddDisksIconToMenu(reverse);
+					AddItemToDirMenu(&rootEntry, source, reverse, addShortcuts, navMenuEntries);
 				break;
 			}
 
@@ -272,32 +272,4 @@ BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* source,
 			item->SetMarked(true);
 		}
 	}
-}
-
-
-void
-BDirMenu::AddDisksIconToMenu(bool atEnd)
-{
-	BEntry entry("/");
-	Model model(&entry);
-	if (model.InitCheck() != B_OK)
-		return;
-
-	entry_ref ref;
-	entry.GetRef(&ref);
-	BMessage* message = new BMessage(fCommand);
-	message->AddRef(fEntryName.String(), &ref);
-
-	BNavMenu* subMenu = new BNavMenu(model.Name(), fCommand, fTarget);
-	subMenu->SetNavDir(&ref);
-	ModelMenuItem* item = new ModelMenuItem(&model, subMenu);
-	item->SetLabel(model.Name());
-	item->SetMessage(message);
-
-	if (atEnd)
-		AddItem(item);
-	else
-		AddItem(item, 0);
-
-	item->SetTarget(fTarget);
 }
