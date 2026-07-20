@@ -90,10 +90,12 @@ BBufferIO::ReadAt(off_t pos, void* buffer, size_t size)
 		}
 	}
 
-	size = min_c(size, fBufferUsed);
+	// position in buffer
+	pos -= fBufferStart;
+	size = min_c(size, fBufferUsed - (size_t)pos);
 
 	// copy data from the cache to the given buffer
-	memcpy(buffer, fBuffer + pos - fBufferStart, size);
+	memcpy(buffer, fBuffer + pos, size);
 
 	return size;
 }
@@ -136,10 +138,12 @@ BBufferIO::WriteAt(off_t pos, const void* buffer, size_t size)
 		}
 	}
 
-	memcpy(fBuffer + pos - fBufferStart, buffer, size);
+	// position in buffer
+	pos -= fBufferStart;
+	memcpy(fBuffer + pos, buffer, size);
 
 	fBufferIsDirty = true;
-	fBufferUsed = max_c((size + pos), fBufferUsed);
+	fBufferUsed = max_c(size + pos, fBufferUsed);
 
 	return size;
 }
