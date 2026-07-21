@@ -195,6 +195,9 @@ usb_disk_reset_recovery(disk_device *device, err_act *_action)
 	TRACE("reset recovery\n");
 	ASSERT_LOCKED_RECURSIVE(&device->io_lock);
 
+	if (device->removed)
+		return;
+
 	usb_disk_mass_storage_reset(device);
 	usb_disk_clear_halt(device->bulk_in);
 	usb_disk_clear_halt(device->bulk_out);
@@ -728,6 +731,8 @@ usb_disk_test_unit_ready(device_lun *lun, err_act *_action)
 	// if unsupported we assume the unit is fixed and therefore always ok
 	if (lun->device->is_ufi || !lun->device->tur_supported)
 		return B_OK;
+	if (lun->device->removed)
+		return B_DEV_NOT_READY;
 
 	status_t result = B_OK;
 	uint8 commandBlock[12];
