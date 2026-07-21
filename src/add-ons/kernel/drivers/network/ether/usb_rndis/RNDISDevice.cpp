@@ -3,10 +3,12 @@
 	Copyright (C) 2022 Adrien Destugues <pulkomandy@pulkomandy.tk>
 	Distributed under the terms of the MIT license.
 */
+
 #include <ether_driver.h>
 #include <net/if_media.h>
 #include <sys/sockio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "RNDISDevice.h"
 #include "Driver.h"
