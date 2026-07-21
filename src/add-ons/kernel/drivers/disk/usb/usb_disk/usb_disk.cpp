@@ -132,6 +132,7 @@ void
 usb_disk_free_device_and_luns(disk_device *device)
 {
 	ASSERT_LOCKED_MUTEX(&device->lock);
+	dprintf("usb_disk_free_device_and_luns\n");
 
 	for (uint8 i = 0; i < device->lun_count; i++) {
 		delete device->luns[i]->io_scheduler;
@@ -1256,12 +1257,8 @@ usb_disk_device_removed(void *cookie)
 	disk_device *device = (disk_device *)cookie;
 	mutex_lock(&device->lock);
 
-	for (uint8 i = 0; i < device->lun_count; i++) {
-		// unpublish_device() can call close().
-		mutex_unlock(&device->lock);
-		gDeviceManager->unpublish_device(device->node, device->luns[i]->name);
-		mutex_lock(&device->lock);
-	}
+	for (uint8 i = 0; i < device->lun_count; i++)
+		device->luns[i]->media_present = false;
 
 	device->removed = true;
 	gUSBModule->cancel_queued_transfers(device->bulk_in);
@@ -1269,11 +1266,7 @@ usb_disk_device_removed(void *cookie)
 	if (device->is_ufi)
 		gUSBModule->cancel_queued_transfers(device->interrupt);
 
-	// At this point, open_count should always be 0 anyway.
-	if (device->open_count == 0)
-		usb_disk_free_device_and_luns(device);
-	else
-		mutex_unlock(&device->lock);
+	mutex_unlock(&device->lock);
 }
 
 
@@ -1503,16 +1496,10 @@ usb_disk_free(void *cookie)
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
 	mutex_lock(&device->lock);
-
 	device->open_count--;
-	if (device->open_count == 0 && device->removed) {
-		// we can simply free the device here as it has been removed from
-		// the device list in the device removed notification hook
-		usb_disk_free_device_and_luns(device);
-	} else {
-		mutex_unlock(&device->lock);
-	}
+	mutex_unlock(&device->lock);
 
+	// The device will actually be freed by uninit_driver.
 	return B_OK;
 }
 
@@ -1956,7 +1943,11 @@ static void
 usb_disk_uninit_driver(void *_cookie)
 {
 	CALLED();
-	// Nothing to do.
+	disk_device *device = (disk_device *)_cookie;
+	mutex_lock(&device->lock);
+
+	ASSERT(device->open_count == 0 && device->removed);
+	usb_disk_free_device_and_luns(device);
 }
 
 
@@ -1978,6 +1969,24 @@ usb_disk_register_child_devices(void* _cookie)
 	}
 
 	return status;
+}
+
+
+static void
+usb_disk_removed(void* _cookie)
+{
+	CALLED();
+	disk_device *device = (disk_device *)_cookie;
+	mutex_lock(&device->lock);
+
+	for (uint8 i = 0; i < device->lun_count; i++) {
+		// unpublish_device() can call close().
+		mutex_unlock(&device->lock);
+		gDeviceManager->unpublish_device(device->node, device->luns[i]->name);
+		mutex_lock(&device->lock);
+	}
+
+	mutex_unlock(&device->lock);
 }
 
 
@@ -2026,7 +2035,7 @@ struct driver_module_info sUsbDiskDriver = {
 	usb_disk_uninit_driver,
 	usb_disk_register_child_devices,
 	NULL,	// rescan
-	NULL,	// removed
+	usb_disk_removed,
 };
 
 module_info* modules[] = {
