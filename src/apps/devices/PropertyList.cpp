@@ -67,7 +67,7 @@ PropertyList::PropertyList(const char* name)
 
 PropertyList::~PropertyList()
 {
-	RemoveAll();
+	Clear();
 }
 
 
@@ -150,7 +150,7 @@ AddExpandedRows(PropertyList* list, PropertyRow* parent, BString path,
 void
 PropertyList::AddAttributes(const Attributes& attributes)
 {
-	RemoveAll();
+	Clear();
 
 	PropertyRow* basicRoot = new PropertyRow(B_TRANSLATE("Basic information"), "");
 	PropertyRow* advancedRoot = new PropertyRow(B_TRANSLATE("Attributes"), "");
@@ -179,13 +179,9 @@ PropertyList::AddAttributes(const Attributes& attributes)
 
 
 void
-PropertyList::RemoveAll()
+PropertyList::Clear()
 {
-	BRow *row;
-	while ((row = RowAt((int32)0, NULL))!=NULL) {
-		RemoveRow(row);
-		delete row;
-	}
+	BColumnListView::Clear();
 }
 
 

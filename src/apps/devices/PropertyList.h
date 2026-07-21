@@ -41,7 +41,7 @@ class PropertyList : public BColumnListView {
 public:
 					PropertyList(const char* name);
 	virtual			~PropertyList();
-			void	RemoveAll();
+			void	Clear();
 			void	AddAttributes(const Attributes& attributes);
 
 			void	MessageReceived(BMessage* msg);

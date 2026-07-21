@@ -479,7 +479,7 @@ DevicesView::MessageReceived(BMessage *msg)
 
 		case kMsgRefresh:
 		{
-			fAttributesView->RemoveAll();
+			fAttributesView->Clear();
 			RescanDevices();
 			RebuildDevicesOutline();
 			break;
