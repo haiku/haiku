@@ -655,9 +655,7 @@ BPoseView::ViewStateAttributeName() const
 	if (IsDesktopView())
 		return kAttrDesktopViewState;
 	else if (TargetModel()->IsRoot())
-		return kAttrDisksPoseInfo;
-	else if (TargetModel()->IsTrash())
-		return kAttrTrashPoseInfo;
+		return kAttrDisksViewState;
 	else
 		return kAttrViewState;
 }
@@ -669,9 +667,7 @@ BPoseView::ForeignViewStateAttributeName() const
 	if (IsDesktopView())
 		return kAttrDesktopViewStateForeign;
 	else if (TargetModel()->IsRoot())
-		return kAttrDisksPoseInfoForeign;
-	else if (TargetModel()->IsTrash())
-		return kAttrTrashPoseInfoForeign;
+		return kAttrDisksViewStateForeign;
 	else
 		return kAttrViewStateForeign;
 }
@@ -5274,10 +5270,6 @@ BPoseView::MoveSelectionTo(Model* model, BPoint dropPoint, BContainerWindow* src
 	// use this directory unless we were passed a directory
 	if (!(model->IsDirectory() || model->IsVirtualDirectory()))
 		model = TargetModel();
-
-	// don't allow dropping files onto root
-	if (model->IsRoot())
-		return;
 
 	// make sure this window is a legal drop target
 	if (srcWindow != window && !model->IsDropTarget())
