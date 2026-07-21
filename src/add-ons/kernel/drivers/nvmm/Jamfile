@@ -12,7 +12,7 @@ DEFINES += _KERNEL=1 ;
 # TranslationMaps
 UseHeaders [ FDirName $(HAIKU_TOP) src system kernel arch x86 ] : true ;
 
-# VMUserAddressSpace
+# VMUserAddressSpace, VMAnonymousCache
 UseHeaders [ FDirName $(HAIKU_TOP) src system kernel ] : true ;
 
 KernelAddon nvmm :
