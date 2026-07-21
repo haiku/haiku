@@ -15,6 +15,7 @@
 #include <safemode.h>
 #include <string.h>
 #include <stdio.h>
+#include <cpu.h>
 
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_int.h>
