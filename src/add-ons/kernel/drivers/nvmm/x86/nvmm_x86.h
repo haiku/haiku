@@ -908,8 +908,10 @@ void x86_curthread_restore_dbregs(uint64_t *drs);
 		fpurstor((union savefpu *)(a), m);	\
 	})
 #elif defined(__HAIKU__)
-#define x86_curthread_save_fpu()	// Haiku allows FPU usage in the kernel, thus
-#define x86_curthread_restore_fpu()	// save/restore of thread FPU state not needed.
+void haiku_curthread_save_fpu();
+void haiku_curthread_restore_fpu();
+#define x86_curthread_save_fpu haiku_curthread_save_fpu
+#define x86_curthread_restore_fpu haiku_curthread_restore_fpu
 
 void haiku_save_fpu(void* area, uint64_t xsave_features);
 void haiku_restore_fpu(const void* area, uint64_t xsave_features);

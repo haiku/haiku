@@ -1387,7 +1387,7 @@ svm_vcpu_guest_fpu_enter(struct nvmm_cpu *vcpu)
 {
 	struct svm_cpudata *cpudata = vcpu->cpudata;
 
-#if defined(__NetBSD__)
+#if defined(__NetBSD__) || defined(__HAIKU__)
 	x86_curthread_save_fpu();
 #elif defined(__DragonFly__)
 	/*
@@ -1413,7 +1413,7 @@ svm_vcpu_guest_fpu_leave(struct nvmm_cpu *vcpu)
 	}
 	x86_save_fpu(&cpudata->gxsave, svm_xcr0_mask);
 
-#if defined(__NetBSD__)
+#if defined(__NetBSD__) || defined(__HAIKU__)
 	x86_curthread_restore_fpu();
 #elif defined(__DragonFly__)
 	npxpop(&cpudata->hstate.hmctx);

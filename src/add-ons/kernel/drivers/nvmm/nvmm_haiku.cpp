@@ -69,6 +69,32 @@ haiku_get_xsave_mask()
 
 
 extern "C" void
+haiku_curthread_save_fpu()
+{
+#if KDEBUG
+	uint32 sseControl;
+	asm volatile("stmxcsr %0" : "=m" (sseControl));
+	if ((sseControl & ~0x3F) != 0x1F80) {
+		cpu_status status = disable_interrupts();
+		dprintf("nvmm: curthread_save_fpu: non-default MXCSR\n");
+		restore_interrupts(status);
+	}
+#endif
+}
+
+
+extern "C" void
+haiku_curthread_restore_fpu()
+{
+	// Haiku allows FPU usage in the kernel, so saving/restoring the overall
+	// FPU state isn't needed. However, on x86, MXCSR is callee-saved, so we
+	// have to reset it when "restoring" state.
+	uint32 sseControl = 0x1F80;
+	asm volatile("ldmxcsr %0" : : "m" (sseControl));
+}
+
+
+extern "C" void
 haiku_save_fpu(void* area, uint64_t xsave_features)
 {
 	switch (xsave_features) {
