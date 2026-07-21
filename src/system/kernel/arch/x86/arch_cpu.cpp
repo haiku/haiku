@@ -380,6 +380,15 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 	char features[768];
 	features[0] = 0;
 
+	if (currentCPU > 0) {
+		// skip if the non-boot cpu features are same as the boot cpu ones
+		bool sameAsBoot = true;
+		for (int i = 0; i < FEATURE_NUM; i++)
+			sameAsBoot &= (cpu->arch.feature[i] == gCPU[0].arch.feature[i]);
+		if (sameAsBoot)
+			return;
+	}
+
 	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
 		strlcat(features, "fpu ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_VME)
@@ -1930,6 +1939,8 @@ arch_cpu_init_post_vm(kernel_args* args)
 			FEATURE_D_1_EAX);
 
 		call_all_cpus_sync(&enable_osxsave, NULL);
+		// also enable the cached boot cpu feature bit
+		gCPU[0].arch.feature[FEATURE_EXT] |= IA32_FEATURE_EXT_OSXSAVE;
 		gXsaveMask = IA32_XCR0_X87 | IA32_XCR0_SSE;
 		cpuid_info cpuid;
 		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_XSTATE, 0);
