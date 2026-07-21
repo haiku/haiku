@@ -2057,7 +2057,7 @@ vmx_vcpu_guest_fpu_enter(struct nvmm_cpu *vcpu)
 {
 	struct vmx_cpudata *cpudata = vcpu->cpudata;
 
-#if defined(__NetBSD__)
+#if defined(__NetBSD__) || defined(__HAIKU__)
 	x86_curthread_save_fpu();
 #elif defined(__DragonFly__)
 	/*
@@ -2065,12 +2065,6 @@ vmx_vcpu_guest_fpu_enter(struct nvmm_cpu *vcpu)
 	 *       FPU or not.  Need to use npxpush()/npxpop() to handle this.
 	 */
 	npxpush(&cpudata->hstate.hmctx);
-#elif defined(__HAIKU__)
-	/*
-	 * Haiku allows floating point on kernel and it handles save and restore
-	 * FPU state on context switches (see commit 396b742). The only thing
-	 * we need to save and restore manually is the XCR0 register.
-	 */
 #endif
 
 	x86_restore_fpu(&cpudata->gxsave, vmx_xcr0_mask);
@@ -2089,7 +2083,7 @@ vmx_vcpu_guest_fpu_leave(struct nvmm_cpu *vcpu)
 	}
 	x86_save_fpu(&cpudata->gxsave, vmx_xcr0_mask);
 
-#if defined(__NetBSD__)
+#if defined(__NetBSD__) || defined(__HAIKU__)
 	x86_curthread_restore_fpu();
 #elif defined(__DragonFly__)
 	npxpop(&cpudata->hstate.hmctx);
