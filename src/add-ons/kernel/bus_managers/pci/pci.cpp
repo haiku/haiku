@@ -9,14 +9,17 @@
 #include <debug.h>
 #include <string.h>
 #include <KernelExport.h>
+#include <util/kernel_cpp.h>
+#include <util/AutoLock.h>
+
 #define __HAIKU_PCI_BUS_MANAGER_TESTING 1
 #include <PCI.h>
 #include <arch/generic/msi.h>
 #if defined(__i386__) || defined(__x86_64__)
 #include <arch/x86/msi.h>
+#include "../../busses/pci/x86/PCI_x86.h"
 #endif
 
-#include "util/kernel_cpp.h"
 #include "pci_fixup.h"
 #include "pci_info.h"
 #include "pci_private.h"
@@ -29,6 +32,10 @@
 
 
 PCI *gPCI;
+
+#if defined(__i386__) || defined(__x86_64__)
+static spinlock sEarlyConfigAccessLock = B_SPINLOCK_INITIALIZER;
+#endif
 
 
 // #pragma mark bus manager exports
@@ -45,16 +52,38 @@ uint32
 pci_read_config(uint8 virtualBus, uint8 device, uint8 function, uint16 offset,
 	uint8 size)
 {
+#if defined(__i386__) || defined(__x86_64__)
+	// On some x86 machines, ACPI initialization accesses PCI configuration space,
+	// but PCI won't be initialized then, as ECAM depends on ACPI being initialized.
+	// To break the circular dependency, access config space directly.
+	if (gPCI->_GetDomainData(0) == NULL) {
+		if (offset > 0xff)
+			return (uint32)-1;
+
+		InterruptsSpinLocker _(sEarlyConfigAccessLock);
+		pci_write_io_32(PCI_MECH1_REQ_PORT,
+			PCI_MECH1_REQ_DATA(virtualBus, device, function, offset));
+		switch (size) {
+			case 1:
+				return pci_read_io_8(PCI_MECH1_DATA_PORT + (offset & 3));
+			case 2:
+				return pci_read_io_16(PCI_MECH1_DATA_PORT + (offset & 3));
+			case 4:
+				return pci_read_io_32(PCI_MECH1_DATA_PORT);
+		}
+		return (uint32)-1;
+	}
+#endif
+
 	uint8 bus;
 	uint8 domain;
 	uint32 value;
-
 	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
-		return 0xffffffff;
+		return (uint32)-1;
 
 	if (gPCI->ReadConfig(domain, bus, device, function, offset, size,
 			&value) != B_OK)
-		return 0xffffffff;
+		return (uint32)-1;
 
 	return value;
 }
@@ -64,6 +93,29 @@ void
 pci_write_config(uint8 virtualBus, uint8 device, uint8 function, uint16 offset,
 	uint8 size, uint32 value)
 {
+#if defined(__i386__) || defined(__x86_64__)
+	if (gPCI->_GetDomainData(0) == NULL) {
+		if (offset > 0xff)
+			return;
+
+		InterruptsSpinLocker _(sEarlyConfigAccessLock);
+		pci_write_io_32(PCI_MECH1_REQ_PORT,
+			PCI_MECH1_REQ_DATA(virtualBus, device, function, offset));
+		switch (size) {
+			case 1:
+				pci_write_io_8(PCI_MECH1_DATA_PORT + (offset & 3), value);
+				break;
+			case 2:
+				pci_write_io_16(PCI_MECH1_DATA_PORT + (offset & 3), value);
+				break;
+			case 4:
+				pci_write_io_32(PCI_MECH1_DATA_PORT, value);
+				break;
+		}
+		return;
+	}
+#endif
+
 	uint8 bus;
 	uint8 domain;
 	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
