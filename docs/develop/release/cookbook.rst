@@ -36,14 +36,14 @@ Branch
 
 **Time:** ~ 1 week
 
-* Update the version constants in master (`example: hrev52295 <https://git.haiku-os.org/haiku/commit/?h=hrev52295>`_)
-* Branch haiku and buildtools (git push origin master:r1beta1)
-    * Update the version constants in the branch (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=b5c9e6620ee731bd33d8cb3ef6ac01749122b6b3>`_)
+* Update the version constants in master (`example: hrev59866 <https://git.haiku-os.org/haiku/commit/?h=hrev59866>`_)
+* Branch haiku and buildtools (``git push origin master:r1beta1``)
+    * Update the version constants in the branch (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta6&id=86e70e9a62422e7a4ecdadf413b444bbd9bd6fab>`_)
     * Update copyright years in the `bootloader menu <https://git.haiku-os.org/haiku/tree/src/system/boot/platform/generic/text_menu.cpp#n212>`_
-    * Disable serial debug output in bootloader and kernel config file (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta5&id=9d0312eb00a75051275accf9967ddc1c64154334>`_)
+    * Disable serial debug output in bootloader and kernel config file (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta6&id=32edc757b010710685ea87fa873ca7d676258fba>`_)
     * Turn KDEBUG_LEVEL down to 1, for performance reasons (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=6db6c0b275f684d0b25d49e87d5183e40c7cd4ec>`_)
-    * Enable ``HAIKU_OFFICIAL_RELEASE`` (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=ff2059f2bd001bba84b980617e9bdf4dc6a46799>`_), and update logos
-    * Update both package repos to use the branch's repos (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta4&id=b9c0fea70a1fd7edc396e0e6992b77a7c5a3b4f8>`_)
+    * Enable ``HAIKU_OFFICIAL_RELEASE`` (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta6&id=04fcdf7756fcb25a10c4a805e8a8026662e3710d>`_), and update logos
+    * Update both package repos to use the branch's repos (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta6&id=779d43514971ebf345dad1bd268402fd31f9f79f>`_)
 
 Configure CI/CD Pipelines
 -------------------------
