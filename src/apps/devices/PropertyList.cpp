@@ -110,7 +110,7 @@ UpdateTree(const BString& name, const BString& value,
 
 
 void
-AddCollapsedRows(PropertyList* list, PropertyRow* parent, BString path,
+AddExpandedRows(PropertyList* list, PropertyRow* parent, BString path,
 	HashMap<HashString, std::set<BString> >& tree, HashMap<HashString, BString>& values)
 {
 	std::set<BString>* children = NULL;
@@ -139,9 +139,10 @@ AddCollapsedRows(PropertyList* list, PropertyRow* parent, BString path,
 
 		PropertyRow* newRow = new PropertyRow(displayName.String(), value.String());
 		list->AddRow(newRow, parent);
+		list->ExpandOrCollapse(newRow, true);
 
 		if (tree.ContainsKey(currentPath.String()))
-			AddCollapsedRows(list, newRow, currentPath, tree, values);
+			AddExpandedRows(list, newRow, currentPath, tree, values);
 	}
 }
 
@@ -170,7 +171,7 @@ PropertyList::AddAttributes(const Attributes& attributes)
 			AddRow(new PropertyRow(name.String(), value.String()), basicRoot);
 	}
 
-	AddCollapsedRows(this, advancedRoot, "", tree, values);
+	AddExpandedRows(this, advancedRoot, "", tree, values);
 
 	ExpandOrCollapse(basicRoot, true);
 	ExpandOrCollapse(advancedRoot, true);
