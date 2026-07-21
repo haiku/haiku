@@ -130,10 +130,6 @@
 #	include <boot_item.h>
 #	include <kernel.h>
 #	include <vm/vm.h>
-
-#	if defined(__i386__) || defined(__x86_64__)
-#		include "../../busses/pci/x86/PCI_x86.h"
-#	endif
 #endif
 
 __BEGIN_DECLS
@@ -943,34 +939,6 @@ AcpiOsReadPciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg, UINT64 *value,
 {
 #ifdef _KERNEL_MODE
 	DEBUG_FUNCTION();
-
-#if defined(__i386__) || defined(__x86_64__)
-	// On some x86 machines, ACPI initialization accesses PCI configuration space,
-	// but PCI won't be initialized yet, as ECAM depends on ACPI being initialized.
-	// To break the circular dependency, we access config space directly during early boot.
-	if (gKernelStartup) {
-		if (reg > 0xff)
-			return AE_ERROR;
-
-		out32(PCI_MECH1_REQ_DATA(pciId->Bus, pciId->Device, pciId->Function, reg),
-			PCI_MECH1_REQ_PORT);
-		switch (width / 8) {
-			case 1:
-				*value = in8(PCI_MECH1_DATA_PORT + (reg & 3));
-				break;
-			case 2:
-				*value = in16(PCI_MECH1_DATA_PORT + (reg & 3));
-				break;
-			case 4:
-				*value = in32(PCI_MECH1_DATA_PORT);
-				break;
-			default:
-				return AE_ERROR;
-		}
-		return AE_OK;
-	}
-#endif
-
 	switch (width) {
 		case 8:
 		case 16:
@@ -1008,31 +976,6 @@ AcpiOsWritePciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg,
 {
 #ifdef _KERNEL_MODE
 	DEBUG_FUNCTION();
-#if defined(__i386__) || defined(__x86_64__)
-	if (gKernelStartup) {
-		if (reg > 0xff)
-			return AE_ERROR;
-
-		out32(PCI_MECH1_REQ_DATA(pciId->Bus, pciId->Device, pciId->Function, reg),
-			PCI_MECH1_REQ_PORT);
-		switch (width / 8) {
-			case 1:
-				out8((uint8)value, (uint16)(PCI_MECH1_DATA_PORT + (reg & 3)));
-				break;
-			case 2:
-				out16((uint16)value, (uint16)(PCI_MECH1_DATA_PORT + (reg & 3)));
-				break;
-			case 4:
-				out32((uint32)value, (uint16)PCI_MECH1_DATA_PORT);
-				break;
-			default:
-				return AE_ERROR;
-		}
-
-		return AE_OK;
-	}
-#endif
-
 	gPCIManager->write_pci_config(
 		pciId->Bus, pciId->Device, pciId->Function, reg, width / 8, value);
 	return AE_OK;
