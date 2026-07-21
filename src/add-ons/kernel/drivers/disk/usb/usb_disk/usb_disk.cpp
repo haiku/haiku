@@ -132,7 +132,7 @@ void
 usb_disk_free_device_and_luns(disk_device *device)
 {
 	ASSERT_LOCKED_MUTEX(&device->lock);
-	dprintf("usb_disk_free_device_and_luns\n");
+	CALLED();
 
 	for (uint8 i = 0; i < device->lun_count; i++) {
 		delete device->luns[i]->io_scheduler;
