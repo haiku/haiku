@@ -571,11 +571,13 @@ dump_guarded_heap_chunk(int argc, char** argv)
 
 	const char* state = NULL;
 	const char* prefix = "last ";
+	const char* last = "allocating";
 	GuardedHeapChunk* chunk = guarded_heap_find_chunk(sGuardedHeap.live_chunks, address);
 	if (chunk != NULL) {
 		state = "live";
 		prefix = "";
 	} else {
+		last = "freeing";
 		chunk = guarded_heap_find_chunk(sGuardedHeap.free_chunks, address);
 		if (chunk != NULL) {
 			state = "free";
@@ -598,8 +600,8 @@ dump_guarded_heap_chunk(int argc, char** argv)
 	kprintf("%sallocation size: %" B_PRIuSIZE "\n", prefix, chunk->allocation_size);
 	kprintf("%sallocation base: %p\n", prefix, (void*)chunk->allocation_base);
 	kprintf("%salignment: %" B_PRIuSIZE "\n", prefix, chunk->alignment);
-	kprintf("%sallocating team: %" B_PRId32 "\n", prefix, chunk->team);
-	kprintf("%sallocating thread: %" B_PRId32 "\n", prefix, chunk->thread);
+	kprintf("%s%s team: %" B_PRId32 "\n", prefix, last, chunk->team);
+	kprintf("%s%s thread: %" B_PRId32 "\n", prefix, last, chunk->thread);
 
 	dump_guarded_heap_stack_trace(*chunk);
 	return 0;
