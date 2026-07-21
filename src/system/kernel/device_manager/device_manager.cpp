@@ -2168,7 +2168,7 @@ device_node::DeviceRemoved()
 	fFlags |= NODE_FLAG_DEVICE_REMOVED;
 
 	if (IsInitialized() && DriverModule()->device_removed != NULL)
-		DriverModule()->device_removed(this);
+		DriverModule()->device_removed(DriverData());
 
 	if ((fFlags & B_KEEP_DRIVER_LOADED) != 0) {
 		// There is no point in keeping this driver loaded when its device
