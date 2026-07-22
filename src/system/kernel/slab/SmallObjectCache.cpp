@@ -48,7 +48,7 @@ SmallObjectCache::Create(const char* name, size_t object_size,
 	if ((flags & CACHE_LARGE_SLAB) != 0)
 		cache->slab_size = 1024 * object_size;
 	else
-		cache->slab_size = SLAB_CHUNK_SIZE_SMALL;
+		cache->slab_size = 64 * object_size;
 
 	cache->slab_size = MemoryManager::AcceptableChunkSize(cache->slab_size);
 
