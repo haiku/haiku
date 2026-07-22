@@ -199,8 +199,6 @@ public:
 		fModel(model),
 		fSelectedIndex(-1)
 	{
-		SetEventMask(B_POINTER_EVENTS);
-
 		fTitleFont = StackedFeaturedPackagesView::CreateTitleFont();
 		fMetadataFont = StackedFeaturedPackagesView::CreateMetadataFont();
 		fSummaryFont = StackedFeaturedPackagesView::CreateSummaryFont();
@@ -387,20 +385,6 @@ public:
 	}
 
 
-	static int _CmpProminences(int64 a, int64 b)
-	{
-		if (a <= 0)
-			a = PROMINANCE_ORDERING_MAX;
-		if (b <= 0)
-			b = PROMINANCE_ORDERING_MAX;
-		if (a == b)
-			return 0;
-		if (a > b)
-			return 1;
-		return -1;
-	}
-
-
 	/*! This method will return true if the packageA is ordered before
 		packageB.
 	*/
@@ -477,9 +461,16 @@ public:
 
 	void RetainPackages(const std::vector<PackageInfoRef>& packages)
 	{
+		PackageInfoRef selectedPackage;
+
+		if (-1 != fSelectedIndex && fSelectedIndex < static_cast<int32>(fPackages.size()))
+			selectedPackage = fPackages[fSelectedIndex];
+
 		int32 lowestIndexAddedOrRemoved = _IndexOfFirstDifference(packages);
 		fPackages = packages;
 		_InvalidateFromIndex(lowestIndexAddedOrRemoved);
+
+		SelectPackage(selectedPackage);
 	}
 
 
@@ -567,6 +558,9 @@ public:
 
 	int32 _IndexOfPackage(PackageInfoRef package) const
 	{
+		if (!package.IsSet())
+			return -1;
+
 		std::vector<PackageInfoRef>::const_iterator it
 			= std::lower_bound(fPackages.begin(), fPackages.end(), package, &_IsPackageBefore);
 
@@ -574,19 +568,6 @@ public:
 			return -1;
 
 		return it - fPackages.begin();
-	}
-
-
-	int32 _IndexOfName(const BString& name) const
-	{
-		// TODO; slow linear search.
-		// the fPackages is not sorted on name and for this reason it is not
-		// possible to do a binary search.
-		for (uint32 i = 0; i < fPackages.size(); i++) {
-			if (fPackages[i]->Name() == name)
-				return i;
-		}
-		return -1;
 	}
 
 
@@ -846,7 +827,7 @@ public:
 
 	void _EnsureIndexVisible(int32 index)
 	{
-		if (!_IsIndexEntirelyVisible(index)) {
+		if (index >= 0 && !_IsIndexEntirelyVisible(index)) {
 			BRect bounds = Bounds();
 			int32 indexOfCentreVisible = _IndexOfY(bounds.top + bounds.Height() / 2);
 			if (index < indexOfCentreVisible) {

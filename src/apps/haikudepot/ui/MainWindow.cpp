@@ -1227,6 +1227,10 @@ MainWindow::_AdoptModelControls()
 	switch (fModel.PackageListViewMode()) {
 		case PROMINENT:
 			fListTabs->Select(TAB_PROMINENT_PACKAGES);
+			// if the currently selected package is not in the prominent list then it should
+			// be removed.
+			if (!PackageUtils::IsProminent(fModel.SelectedPackage()))
+				fModel.ClearSelectedPackage();
 			break;
 		case ALL:
 			fListTabs->Select(TAB_ALL_PACKAGES);
@@ -1285,7 +1289,10 @@ MainWindow::_AdoptModel()
 	if (fSinglePackageMode)
 		return;
 
-	// This list will contain all of the packages that are under consideration.
+	bool retainSelectedPackage = false;
+	PackageInfoRef selectedPackage = fModel.SelectedPackage();
+
+	// This list will contain all the packages that are under consideration.
 	// Create a new list which only contains the featured packages.
 
 	const std::vector<PackageInfoRef> packages = _CreateSnapshotOfFilteredPackages();
@@ -1294,8 +1301,26 @@ MainWindow::_AdoptModel()
 
 	for (it = packages.begin(); it != packages.end(); it++) {
 		PackageInfoRef package = *it;
+
 		if (PackageUtils::IsProminent(package))
 			featuredPackages.push_back(package);
+
+		// The fact that it is prominent or not also determines if it should
+		// remain selected, but this is handled in _AdoptModelControls() rather
+		// than here.
+
+		if (!retainSelectedPackage && selectedPackage.IsSet()
+			&& selectedPackage->Name() == package->Name()) {
+			retainSelectedPackage = true;
+		}
+	}
+
+	// If the selected package is not in the filtered packages then drop the
+	// selection.
+
+	if (!retainSelectedPackage && selectedPackage.IsSet()) {
+		HDINFO("selected package not in filtered list; will unset.");
+		fModel.ClearSelectedPackage();
 	}
 
 	// Now get the UI elements which display those packages to only remain the

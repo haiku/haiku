@@ -349,6 +349,9 @@ public:
 			case MSG_MOUSE_EXITED_RATING:
 				fRatingLayout->SetVisibleItem((int32)0);
 				break;
+
+			default:
+				BGroupView::MessageReceived(message);
 		}
 	}
 
