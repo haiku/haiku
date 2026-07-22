@@ -18,6 +18,7 @@
 #define BT_MSG_REMOVE_DEVICE            'btrD'
 #define BT_MSG_GET_PROPERTY             'btgP'
 #define BT_MSG_GET_REMOTE_DEVICES       'btgD'
+#define BT_MSG_NEW_REMOTE_DEVICE        'btnD'
 
 // Discovery
 #define BT_MSG_INQUIRY_STARTED          'IqSt'

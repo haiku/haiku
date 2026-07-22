@@ -41,6 +41,7 @@ public:
 	bool	IsDefaultable(void);
 
 	void	LoadRemoteDevices();
+	void	AddRemoteDevice(BMessage* device);
 
 protected:
 

@@ -57,12 +57,12 @@ RemoteDevice::GetRemoteDevices(LocalDevice* localDevice)
 	BMessage device;
 	for (int32 i = 0; devices.FindMessage("remote", i, &device) == B_OK; i++) {
 		bdaddr_t* bdaddr;
-		uint8* classOfDevice;
+		uint8* class_of_device;
 		ssize_t size;
 
 		device.FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size);
-		device.FindData("cod", B_ANY_TYPE, (const void**)&classOfDevice, &size);
-		RemoteDevice* rd = new RemoteDevice(*bdaddr, classOfDevice);
+		device.FindData("class_of_device", B_ANY_TYPE, (const void**)&class_of_device, &size);
+		RemoteDevice* rd = new RemoteDevice(*bdaddr, class_of_device);
 
 		rd->fDiscovererLocalDevice = localDevice;
 		device.FindString("name", &rd->fFriendlyName);
@@ -73,6 +73,24 @@ RemoteDevice::GetRemoteDevices(LocalDevice* localDevice)
 	}
 
 	return rdList;
+}
+
+
+RemoteDevice*
+RemoteDevice::ParseRemoteDevice(LocalDevice* localDevice, BMessage* message)
+{
+	bdaddr_t* bdaddr;
+	uint8* class_of_device;
+	ssize_t size;
+
+	message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size);
+	message->FindData("class_of_device", B_ANY_TYPE, (const void**)&class_of_device, &size);
+	RemoteDevice* rd = new RemoteDevice(*bdaddr, class_of_device);
+
+	// TODO: we should request the remote device's name and other parameters.
+	rd->fDiscovererLocalDevice = localDevice;
+
+	return rd;
 }
 
 

@@ -137,6 +137,21 @@ RemoteDevicesView::AttachedToWindow(void)
 	LoadRemoteDevices();
 	LoadSettings();
 	fDeviceList->Select(0);
+	fConnectingDeviceItem = NULL;
+}
+
+
+void
+RemoteDevicesView::AddRemoteDevice(BMessage* device)
+{
+	RemoteDevice* rd = RemoteDevice::ParseRemoteDevice(ActiveLocalDevice, device);
+
+	DeviceListItem* deviceItem = new DeviceListItem(rd);
+	deviceItem->SetConnectionState(rd->GetConnectionState());
+
+	BMessage message(kMsgAddToRemoteList);
+	message.AddPointer("device", deviceItem);
+	MessageReceived(&message);
 }
 
 
@@ -243,7 +258,26 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 		case BT_MSG_CONN_COMPLETED:
 		{
 			uint8 status;
+			bdaddr_t* bdaddr;
+			ssize_t size;
+
 			message->FindUInt8("status", &status);
+
+			// Remote Connection
+			if (fConnectingDeviceItem == NULL &&
+				message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size) == B_OK) {
+
+				for (int32 i = 0; i < fDeviceList->CountItems(); i++) {
+					DeviceListItem* item = static_cast<DeviceListItem*>(fDeviceList->ItemAt(i));
+
+					if (bdaddrUtils::Compare(item->Device()->GetBluetoothAddress(), *bdaddr))
+						fConnectingDeviceItem = item;
+				}
+			}
+
+			if (fConnectingDeviceItem == NULL)
+				break;
+
 			if (status == BT_OK)
 				fConnectingDeviceItem->SetConnectionState(RemoteDevice::CONNECTED);
 			else
@@ -274,23 +308,27 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 		case BT_MSG_CONN_FAILED:
 		case BT_MSG_DISCONN_COMPLETED:
 		{
-			if (fConnectingDeviceItem != NULL) {
-				fConnectingDeviceItem->SetConnectionState(RemoteDevice::DISCONNECTED);
-				fConnectingDeviceItem = NULL;
-			} else {
-				// Remote Disconnection
-				bdaddr_t* bdaddr;
-				ssize_t size;
-				message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size);
+			bdaddr_t* bdaddr;
+			ssize_t size;
+
+			// Remote Disconnection
+			if (fConnectingDeviceItem == NULL &&
+				message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size) == B_OK) {
 
 				for (int32 i = 0; i < fDeviceList->CountItems(); i++) {
-				DeviceListItem* item = static_cast<DeviceListItem*>(fDeviceList->ItemAt(i));
+					DeviceListItem* item = static_cast<DeviceListItem*>(fDeviceList->ItemAt(i));
 
-				if (bdaddrUtils::Compare(item->Device()->GetBluetoothAddress(), *bdaddr)) {
-						item->SetConnectionState(RemoteDevice::DISCONNECTED);
-					}
+					if (bdaddrUtils::Compare(item->Device()->GetBluetoothAddress(), *bdaddr))
+						fConnectingDeviceItem = item;
 				}
 			}
+
+			if (fConnectingDeviceItem == NULL)
+				break;
+
+			fConnectingDeviceItem->SetConnectionState(RemoteDevice::DISCONNECTED);
+			fConnectingDeviceItem = NULL;
+
 			DeviceSelected();
 			break;
 		}

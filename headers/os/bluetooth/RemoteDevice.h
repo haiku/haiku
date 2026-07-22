@@ -35,6 +35,7 @@ public:
 	};
 
 	static BObjectList<RemoteDevice> GetRemoteDevices(LocalDevice* localDevice);
+	static RemoteDevice* ParseRemoteDevice(LocalDevice* localDevice, BMessage* message);
 
 	virtual 		~RemoteDevice();
 

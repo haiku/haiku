@@ -123,13 +123,19 @@ BluetoothWindow::MessageReceived(BMessage* message)
 {
 	//message->PrintToStream();
 	switch (message->what) {
+		case BT_MSG_NEW_REMOTE_DEVICE:
+		{
+			fRemoteDevices->AddRemoteDevice(message);
+		}
+		break;
+
 		case BT_MSG_CONN_COMPLETED:
 		case BT_MSG_CONN_FAILED:
 		case BT_MSG_DISCONN_COMPLETED:
 		{
 			fRemoteDevices->MessageReceived(message);
-			break;
 		}
+		break;
 
 		case B_SOME_APP_LAUNCHED:
 		{
@@ -139,8 +145,8 @@ BluetoothWindow::MessageReceived(BMessage* message)
 				StartWatchingServer();
 				fRemoteDevices->LoadRemoteDevices();
 			}
-			break;
 		}
+		break;
 
 		case kMsgSetConnectionPolicy:
 		case kMsgSetDeviceClass:

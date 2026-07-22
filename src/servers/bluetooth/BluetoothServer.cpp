@@ -275,7 +275,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 				bdaddr_t bdaddr = rd->bdaddr;
 				device.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
 				device.AddString("name", rd->friendly_name);
-				device.AddData("cod", B_RAW_TYPE, rd->classOfDevice, sizeof(rd->classOfDevice));
+				device.AddData("class_of_device", B_RAW_TYPE, rd->classOfDevice,
+					sizeof(rd->classOfDevice));
 				device.AddUInt16("clock_offset", rd->clock_offset);
 				device.AddUInt8("pscan_rep_mode", rd->pscan_rep_mode);
 
