@@ -269,6 +269,7 @@ VMKernelAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
 {
 	TRACE("VMKernelAddressSpace::ResizeArea(%p, %#" B_PRIxSIZE ")\n", _area,
 		newSize);
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 	Range* range = area->Range();
@@ -337,6 +338,7 @@ VMKernelAddressSpace::ShrinkAreaHead(VMArea* _area, size_t newSize,
 {
 	TRACE("VMKernelAddressSpace::ShrinkAreaHead(%p, %#" B_PRIxSIZE ")\n", _area,
 		newSize);
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 	Range* range = area->Range();
@@ -394,6 +396,7 @@ VMKernelAddressSpace::ReserveAddressRange(size_t size,
 	TRACE("VMKernelAddressSpace::ReserveAddressRange(%p, %" B_PRIu32 ", %#"
 		B_PRIxSIZE ", %#" B_PRIx32 ")\n", addressRestrictions->address,
 		addressRestrictions->address_specification, size, flags);
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 
 	// Don't allow range reservations, if the address space is about to be
 	// deleted.
@@ -425,6 +428,7 @@ VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
 {
 	TRACE("VMKernelAddressSpace::UnreserveAddressRange(%#" B_PRIxADDR ", %#"
 		B_PRIxSIZE ")\n", address, size);
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 
 	// Don't allow range unreservations, if the address space is about to be
 	// deleted. UnreserveAllAddressRanges() must be used.
@@ -458,6 +462,8 @@ VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
 void
 VMKernelAddressSpace::UnreserveAllAddressRanges(uint32 allocationFlags)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	Range* range = fRangeList.Head();
 	while (range != NULL) {
 		// Get the next range for the iteration -- we need to skip free ranges,
