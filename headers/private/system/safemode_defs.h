@@ -14,6 +14,7 @@
 #define B_SAFEMODE_DISABLE_ACPI				"disable_acpi"
 #define B_SAFEMODE_DISABLE_APIC				"disable_apic"
 #define B_SAFEMODE_DISABLE_APM				"disable_apm"
+#define B_SAFEMODE_DISABLE_BIOS_CALLS		"disable_bios_calls"
 #define B_SAFEMODE_DISABLE_HYPER_THREADING	"disable_hyperthreading"
 #define B_SAFEMODE_DISABLE_IDE_DMA			"disable_ide_dma"
 #define B_SAFEMODE_DISABLE_IOAPIC			"disable_ioapic"

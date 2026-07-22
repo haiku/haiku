@@ -22,8 +22,8 @@
 
 #ifndef _BOOT_MODE
 #include <vesa_info.h>
-
 #include <edid.h>
+#include <safemode.h>
 #else
 #define mutex_lock(...)
 #define mutex_unlock(...)
@@ -509,6 +509,12 @@ frame_buffer_console_init_post_vm(kernel_args* args)
 
 	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo,
 		sizeof(frame_buffer_boot_info));
+
+	if (get_safemode_boolean(B_SAFEMODE_DISABLE_BIOS_CALLS, false)) {
+		// If BIOS calls are disabled, then the VESA driver can't work.
+		// So, don't report any VESA information in this case.
+		return B_OK;
+	}
 
 	sVesaModes = (vesa_mode*)malloc(args->vesa_modes_size);
 	if (sVesaModes != NULL && args->vesa_modes_size > 0) {
