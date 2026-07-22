@@ -27,6 +27,9 @@ struct AttributeIndexTreeKey {
 	size_t		length;
 
 	AttributeIndexTreeKey()
+		:
+		data(NULL),
+		length(0)
 	{
 	}
 
