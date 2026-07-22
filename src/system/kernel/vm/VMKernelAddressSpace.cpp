@@ -92,7 +92,7 @@ VMKernelAddressSpace::InitObject()
 		return B_NO_MEMORY;
 
 	fRangesObjectCache = create_object_cache("kernel address ranges",
-		sizeof(Range), 0);
+		sizeof(Range), CACHE_NO_DEPOT);
 	if (fRangesObjectCache == NULL)
 		return B_NO_MEMORY;
 
