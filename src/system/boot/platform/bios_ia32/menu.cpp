@@ -67,9 +67,10 @@ platform_add_menus(Menu* menu)
 			item = new(std::nothrow) MenuItem("Don't call the BIOS");
 			if (item != NULL) {
 				menu->AddItem(item);
+				item->SetType(MENU_ITEM_MARKABLE);
+				item->SetData(B_SAFEMODE_DISABLE_BIOS_CALLS);
 				item->SetHelpText("Stops the system from calling BIOS "
 					"functions.");
-				item->SetType(MENU_ITEM_MARKABLE);
 			}
 
 			item = new(std::nothrow) MenuItem("Disable APM");

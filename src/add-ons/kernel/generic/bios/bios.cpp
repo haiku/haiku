@@ -7,6 +7,7 @@
 #include <drivers/bios.h>
 
 #include <KernelExport.h>
+#include <safemode.h>
 
 #include <AutoDeleter.h>
 
@@ -339,6 +340,11 @@ std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+			if (get_safemode_boolean(B_SAFEMODE_DISABLE_BIOS_CALLS, false)) {
+				dprintf("BIOS calls disabled\n");
+				return ENOSYS;
+			}
+
 			sBIOSLock = create_sem(1, "bios lock");
 			if (sBIOSLock < B_OK)
 				return sBIOSLock;
