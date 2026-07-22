@@ -250,11 +250,11 @@ static uint32 sPageMappingsMask;
 static rw_lock sAreaCacheLock = RW_LOCK_INITIALIZER("area->cache");
 
 static rw_spinlock sAvailableMemoryLock = B_RW_SPINLOCK_INITIALIZER;
-static off_t sAvailableMemory;
+static int64 sAvailableMemory;
 #if ENABLE_SWAP_SUPPORT
-static off_t sAvailableMemoryAndSwap;
+static int64 sAvailableMemoryAndSwap;
 #endif
-static off_t sNeededMemory;
+static int64 sNeededMemory;
 
 static uint32 sPageFaults;
 static VMPhysicalPageMapper* sPhysicalPageMapper;
@@ -4432,20 +4432,20 @@ vm_unreserve_memory_or_swap(size_t amount)
 
 
 static status_t
-vm_try_reserve_internal(off_t& pool, uint32 resource,
-	size_t amount, int priority, bigtime_t absoluteTimeout)
+vm_try_reserve_internal(int64& pool, uint32 resource,
+	int64 amount, int priority, bigtime_t absoluteTimeout)
 {
 	ASSERT((amount % B_PAGE_SIZE) == 0);
 	ASSERT(priority >= 0 && priority < (int)B_COUNT_OF(kMemoryReserveForPriority));
 	TRACE(("try to reserve %lu bytes, %Lu left\n", amount, pool));
 
 	const size_t reserve = kMemoryReserveForPriority[priority];
-	const off_t amountPlusReserve = amount + reserve;
+	const int64 amountPlusReserve = amount + reserve;
 
 	// Try with a read-lock and atomics first, but only if there's more than double
 	// the amount of memory we're trying to reserve available, to avoid races.
 	InterruptsReadSpinLocker readLocker(sAvailableMemoryLock);
-	if (atomic_get64(&pool) > (off_t)(amountPlusReserve + amount)) {
+	if (atomic_get64(&pool) > (amountPlusReserve + amount)) {
 		if (atomic_add64(&pool, -amount) >= amountPlusReserve)
 			return B_OK;
 
