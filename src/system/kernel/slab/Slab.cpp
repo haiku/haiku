@@ -308,7 +308,7 @@ dump_cache_info(int argc, char* argv[])
 	kprintf("resize entry don't wait: %p\n", cache->resize_entry_dont_wait);
 	kprintf("resize entry can wait:   %p\n", cache->resize_entry_can_wait);
 
-	kprintf("  %-*s    %-*s      size   used offset  free\n",
+	kprintf("  %-*s    %-*s      size   free offset  head\n",
 		B_PRINTF_POINTER_WIDTH, "slab", B_PRINTF_POINTER_WIDTH, "chunk");
 
 	SlabList::Iterator iterator = cache->empty.GetIterator();
