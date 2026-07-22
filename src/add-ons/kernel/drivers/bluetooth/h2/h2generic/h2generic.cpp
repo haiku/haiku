@@ -722,7 +722,10 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 			snb_put(snbuf, _params, size);
 
 			err = submit_tx_command(bdev, snbuf);
-			TRACE("%s: command launched\n", __func__);
+			if (err != B_OK)
+				ERROR("%s: Queing failed at submit_tx_command()\n", __func__);
+			else
+				TRACE("%s: command launched\n", __func__);
 			break;
 		}
 
@@ -731,7 +734,7 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 			err = submit_rx_event(bdev);
 			if (err != B_OK) {
 				bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
-				ERROR("%s: Queuing failed device stops running\n", __func__);
+				ERROR("%s: Queuing failed at submit_rx_event()\n", __func__);
 				break;
 			}
 
@@ -741,7 +744,7 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 				if (err != B_OK && i == 0) {
 					bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
 						// Set the flaq in the HCI world
-					ERROR("%s: Queuing failed device stops running\n",
+					ERROR("%s: Queuing failed at submit_rx_acl()\n",
 						__func__);
 					break;
 				}
@@ -754,13 +757,13 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 					err = submit_rx_sco(bdev);
 					if (err != B_OK && i == 0) {
 						bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
-						ERROR("%s: Queuing failed device stops running\n", __func__);
+						ERROR("%s: Queuing failed at submit_rx_sco()\n", __func__);
 						break;
 					}
 				}
 			}
 
-			bdev->state = SET_BIT(bdev->state, RUNNING);
+			bdev->state |= RUNNING;
 
 			ERROR("%s: Device online\n", __func__);
 		break;
