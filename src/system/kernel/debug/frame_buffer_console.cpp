@@ -510,7 +510,7 @@ frame_buffer_console_init_post_vm(kernel_args* args)
 	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo,
 		sizeof(frame_buffer_boot_info));
 
-	if (get_safemode_boolean(B_SAFEMODE_DISABLE_BIOS_CALLS, false)) {
+	if (get_safemode_boolean_early(args, B_SAFEMODE_DISABLE_BIOS_CALLS, false)) {
 		// If BIOS calls are disabled, then the VESA driver can't work.
 		// So, don't report any VESA information in this case.
 		return B_OK;
