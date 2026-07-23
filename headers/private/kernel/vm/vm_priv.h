@@ -42,11 +42,11 @@ status_t vm_map_cache(VMAddressSpace* addressSpace,
 status_t vm_unmap_address_range(VMAddressSpace* addressSpace,
 	addr_t address, addr_t size, bool kernel);
 
-void vm_unreserve_memory(size_t bytes);
-status_t vm_try_reserve_memory(size_t bytes, int priority, bigtime_t timeout);
+void vm_unreserve_memory(uint64 bytes);
+status_t vm_try_reserve_memory(uint64 bytes, int priority, bigtime_t timeout);
 
-void vm_unreserve_memory_or_swap(size_t bytes);
-status_t vm_try_reserve_memory_or_swap(size_t bytes, int priority, bigtime_t timeout);
+void vm_unreserve_memory_or_swap(uint64 bytes);
+status_t vm_try_reserve_memory_or_swap(uint64 bytes, int priority, bigtime_t timeout);
 
 void vm_debug_init();
 void vm_kernel_args_init_post_area(kernel_args* args);
