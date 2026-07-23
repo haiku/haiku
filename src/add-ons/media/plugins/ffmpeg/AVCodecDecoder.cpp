@@ -1671,9 +1671,9 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 	fDecodedDataSizeInBytes = fHeader.size_used;
 
 	if (fDecodedData == NULL) {
-		const size_t kOptimalAlignmentForColorConversion = 32;
+		const size_t kOptimalAlignmentForColorConversion = 64;
 		posix_memalign(reinterpret_cast<void**>(&fDecodedData),
-			kOptimalAlignmentForColorConversion, fDecodedDataSizeInBytes);
+			kOptimalAlignmentForColorConversion, fDecodedDataSizeInBytes + 63);
 	}
 	if (fDecodedData == NULL)
 		return B_NO_MEMORY;
