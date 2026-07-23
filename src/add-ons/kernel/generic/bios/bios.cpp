@@ -50,10 +50,17 @@ static const uint32 kBDASize = 0x1000;
 static const uint32 kRAMBase = 0x1000;
 static const uint32 kRAMSize = 0x8f000;
 
-// Upper part of address space: a bit of RAM, the video RAM, then the ROMs
-// Copied to the memory area as well, so the BIOS can be patched if needed.
+// Extended BIOS Data Area: at the end of the RAM
 static const uint32 kEBDABase = 0x90000;
-static const uint32 kEBDASize = 0x70000;
+static const uint32 kEBDASize = 0x10000;
+
+// Video RAM (left uninitialized, should be unused)
+static const uint32 kVRAMBase = 0xA0000;
+static const uint32 kVRAMSize = 0x20000;
+
+// BIOS and VGA BIOS
+static const uint32 kROMBase = 0xC0000;
+static const uint32 kROMSize = 0x40000;
 
 // Total size of the above
 static const uint32 kTotalSize = 0x100000;
@@ -245,9 +252,13 @@ bios_prepare(bios_state** _state)
 		return status;
 	}
 
-	// Map the extended BIOS data area and VGA memory.
+	// Copy the extended BIOS data area
 	void* address = (void*)(state->mapped_address + kEBDABase);
 	status = vm_memcpy_from_physical(address, kEBDABase, kEBDASize, false);
+
+	// Copy the BIOS and VGA BIOS ROM code
+	address = (void*)(state->mapped_address + kROMBase);
+	status = vm_memcpy_from_physical(address, kROMBase, kROMSize, false);
 
 	if (status != B_OK) {
 		vm_unreserve_address_range(VMAddressSpace::KernelID(),
