@@ -582,12 +582,8 @@ os_vmobj_map(os_vmmap_t *map, vaddr_t *addr, vsize_t size, os_vmobj_t *vmobj,
 		return status;
 
 	uint32 wiring = B_LAZY_LOCK;
-	if (!wired && dynamic_cast<VMAnonymousCache*>(vmobj->cache) != NULL) {
+	if (!wired && dynamic_cast<VMAnonymousCache*>(vmobj->cache) != NULL)
 		wiring = B_NO_LOCK;
-	} else if (vmobj->cache->page_count == ((vmobj->cache->virtual_end
-			- vmobj->cache->virtual_base + B_PAGE_SIZE - 1) / B_PAGE_SIZE)) {
-		wiring = B_FULL_LOCK;
-	}
 
 	uint32 flags = fixed ? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0;
 	bool kernel = false;
