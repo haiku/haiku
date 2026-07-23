@@ -4401,7 +4401,7 @@ vm_kernel_address_space_left(void)
 
 
 void
-vm_unreserve_memory(size_t amount)
+vm_unreserve_memory(uint64 amount)
 {
 	ASSERT((amount % B_PAGE_SIZE) == 0);
 
@@ -4418,7 +4418,7 @@ vm_unreserve_memory(size_t amount)
 
 #if ENABLE_SWAP_SUPPORT
 void
-vm_unreserve_memory_or_swap(size_t amount)
+vm_unreserve_memory_or_swap(uint64 amount)
 {
 	ASSERT((amount % B_PAGE_SIZE) == 0);
 
@@ -4489,7 +4489,7 @@ vm_try_reserve_internal(int64& pool, uint32 resource,
 
 
 status_t
-vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
+vm_try_reserve_memory(uint64 amount, int priority, bigtime_t timeout)
 {
 	timeout += system_time();
 
@@ -4515,7 +4515,7 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 
 #if ENABLE_SWAP_SUPPORT
 status_t
-vm_try_reserve_memory_or_swap(size_t amount, int priority, bigtime_t timeout)
+vm_try_reserve_memory_or_swap(uint64 amount, int priority, bigtime_t timeout)
 {
 	timeout += system_time();
 
