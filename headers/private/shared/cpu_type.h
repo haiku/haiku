@@ -70,8 +70,14 @@ parse_intel(const char* name)
 				sizeof(buffer) - outIndex);
 			index += 3;
 		} else if (!strncmp(&name[index], " CPU", 4)) {
-			// Cut out the CPU string
+			// Cut out the "CPU" string
 			index += 3;
+		} else if (!strncmp(&name[index], " processor", 10)) {
+			// Cut out the "processor" string
+			index += 9;
+		} else if (!strncmp(&name[index], "  ", 2)) {
+			// Skip duplicate spaces
+			index++;
 		} else if (!strncmp(&name[index], " @", 2)) {
 			// Cut off the remainder
 			break;
@@ -347,7 +353,7 @@ get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor,
 		// we can use that Brand ID to determine the CPU
 		brandIdName = get_intel_brand_id_string(get_intel_brand_id(), cpuModel);
 		if (brandIdName != NULL)
-			return brandIdName;
+			return parse_intel(brandIdName);
 
 		// Even older CPUs do not return a Brand ID or a Brand String, so we
 		// need to look at Model and Family
