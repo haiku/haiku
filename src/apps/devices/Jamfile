@@ -77,17 +77,19 @@ rule ACPIPnPHeaderGen
 
 actions ACPIPnPHeaderGen1
 {
-	$(HOST_AWK) -f $(2[1]) $(2[2-]) > $(1) ;
+	$(HOST_PYTHON) $(2[1]) $(2[2-]) > $(1) ;
 }
 
-# files can be updated so:
-# curl --fail -L -o acpi_id_registry.html 'https://uefi.org/uefi-acpi-export'
-# curl --fail -L -o pnp_id_registry.html 'https://uefi.org/uefi-pnp-export'
-local acpiidsFiles = acpi_id_registry.html pnp_id_registry.html ;
+# files can be downloaded from:
+# - acpi_id_registry.csv: https://uefi.org/uefi-acpi-export
+# - pnp_id_registry.csv: https://uefi.org/uefi-pnp-export
+# Note that they are protected by CloudFlare so you have to download through a browser and pass a
+# robot protection check.
+local acpiidsFiles = acpi_id_registry.csv pnp_id_registry.csv ;
 SEARCH on $(acpiidsFiles) = [ FDirName $(HAIKU_TOP) src data ids ] ;
 
 ACPIPnPHeaderGen [ FGristFiles acpipnpids.h ]
-	:  acpipnplist2h.awk : $(acpiidsFiles) ;
+	:  acpipnplist2h.py : $(acpiidsFiles) ;
 
 Application Devices :
 	DevicesApplication.cpp
