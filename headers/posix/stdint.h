@@ -138,6 +138,8 @@ typedef uint64_t uintmax_t;
 #define WINT_MIN 	0
 #define WINT_MAX 	((wint_t)-1)
 
+#define WCHAR_MIN      0x00000000UL
+#define WCHAR_MAX      0x7FFFFFFFUL
 
 /* Macros of Integer Constant Expressions */
 #define INT8_C(value) 	value

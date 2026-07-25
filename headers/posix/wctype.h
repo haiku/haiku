@@ -7,7 +7,7 @@
 
 
 #include <locale_t.h>
-#include <wchar.h>
+#include <_wint_t.h>
 
 typedef int wctrans_t;
 
