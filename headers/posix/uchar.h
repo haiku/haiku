@@ -7,16 +7,19 @@
 
 
 #include <stdint.h>
-#include <wchar.h>
+#include <wchar_t.h>
+#include <_mbstate_t.h>
+
+
+#if !defined(__cplusplus) || __cplusplus < 201103L
+typedef uint_least32_t char32_t;
+typedef uint_least16_t char16_t;
+#endif
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-typedef uint_least32_t char32_t;
-typedef uint_least16_t char16_t;
 
 
 #define __STD_UTF_32__ 1
@@ -26,26 +29,9 @@ typedef uint_least16_t char16_t;
 // TODO implement mbrtoc16
 
 
-static __inline size_t
-c16rtomb(char *dest, char32_t wc, mbstate_t *mbState)
-{
-	wchar_t tmp = (wchar_t)wc;
-	return wcrtomb(dest, tmp, mbState);
-}
-
-
-static __inline size_t
-mbrtoc32(char32_t *dest, const char *src, size_t srcLength, mbstate_t *mbState)
-{
-	return mbrtowc((wchar_t*)dest, src, srcLength, mbState);
-}
-
-
-static __inline size_t
-c32rtomb(char *dest, char32_t wc, mbstate_t *mbState)
-{
-	return wcrtomb(dest, (wchar_t)wc, mbState);
-}
+size_t c16rtomb(char *dest, char32_t wc, mbstate_t *mbState);
+size_t mbrtoc32(char32_t *dest, const char *src, size_t srcLength, mbstate_t *mbState);
+size_t c32rtomb(char *dest, char32_t wc, mbstate_t *mbState);
 
 
 #ifdef __cplusplus

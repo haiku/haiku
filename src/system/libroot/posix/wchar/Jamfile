@@ -12,6 +12,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		MergeObject <$(architecture)>posix_wchar.o :
 			btowc.c
+			uchar.cpp
 			mblen.c
 			mbrlen.c
 			mbrtowc.cpp

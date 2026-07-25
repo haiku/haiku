@@ -12,34 +12,14 @@
 #include <stdio.h>
 #include <time.h>
 
-
-/* stddef.h is not supposed to define wint_t, but gcc 2.95.3's one does.
- * In all other cases we will do that. */
-#ifndef _WINT_T
-#define _WINT_T
-
-#ifndef __WINT_TYPE__
-#define __WINT_TYPE__ unsigned int
-#endif
-
-typedef __WINT_TYPE__ wint_t;
-
-#endif	/* _WINT_T */
-
-typedef int wctype_t;
-
-typedef struct {
-	void* converter;
-	char charset[64];
-	unsigned int count;
-	char data[1024 + 8];	/* 1024 bytes for data, 8 for alignment space */
-} mbstate_t;
+#include <_mbstate_t.h>
+#include <_wint_t.h>
 
 
-#define WEOF		((wint_t)(-1))
-
+#ifndef WCHAR_MIN
 #define WCHAR_MIN	0x00000000UL
 #define WCHAR_MAX	0x7FFFFFFFUL
+#endif
 
 /*
  * Haiku is always using UTF32 in wchars, other encodings can be handled
