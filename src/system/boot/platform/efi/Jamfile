@@ -41,6 +41,7 @@ local platform_src =
 	quirks.cpp
 	smp.cpp
 	serial.cpp
+	load_options.cpp
 
 	decode_edid.c
 	;
