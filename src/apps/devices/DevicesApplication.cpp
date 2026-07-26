@@ -66,6 +66,8 @@ DevicesWindow::MessageReceived(BMessage* message)
 		case kMsgOrderBus:
 		case kMsgOrderCategory:
 		case kMsgOrderConnection:
+		case kMsgReboot:
+		case kMsgToggleDriver:
 			fDevicesView->MessageReceived(message);
 			break;
 

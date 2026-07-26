@@ -1,18 +1,29 @@
 /*
- * Copyright 2008-2009 Haiku Inc. All rights reserved.
+ * Copyright 2008-2026 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Pieter Panman
+ *		Leo Rouleau
  */
 
 
+#include <Alert.h>
 #include <Application.h>
+#include <Button.h>
 #include <Catalog.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <LayoutBuilder.h>
+#include <Menu.h>
 #include <MenuBar.h>
+#include <Path.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <StringView.h>
+
+#include <RosterPrivate.h>
+
 
 #include <iostream>
 
@@ -24,17 +35,27 @@
 #include <unistd.h>
 
 #include "DevicesView.h"
+#include "DriverUtils.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DevicesView"
 
+
 DevicesView::DevicesView()
 	:
-	BView("DevicesView", B_WILL_DRAW | B_FRAME_EVENTS)
+	BView("DevicesView", B_WILL_DRAW | B_FRAME_EVENTS),
+	fHasShownDisableAlert(false),
+	fRebootNeeded(false)
 {
 	CreateLayout();
 	RescanDevices();
 	RebuildDevicesOutline();
+}
+
+
+DevicesView::~DevicesView()
+{
+	DeleteDevices();
 }
 
 
@@ -85,16 +106,37 @@ DevicesView::CreateLayout()
 	orderByPopupMenu->AddItem(byConnection);
 	fOrderByMenu = new BMenuField(B_TRANSLATE("Order by:"), orderByPopupMenu);
 	fAttributesView = new PropertyList("attributesView");
+	fBlockButton
+		= new BButton("blockButton", B_TRANSLATE("Disable driver"), new BMessage(kMsgToggleDriver));
+	fBlockButton->SetEnabled(false);
+	fRebootNotice = new BStringView("rebootNotice", "");
+
+	fActionMenuBar = new BMenuBar("Action Menu");
+	BMenu* rebootMenu = new BMenu(B_TRANSLATE("Reboot needed"));
+	rebootMenu->AddItem(new BMenuItem(B_TRANSLATE("Restart computer"), new BMessage(kMsgReboot)));
+	rebootMenu->SetTargetForItems(this);
+	fActionMenuBar->AddItem(rebootMenu);
+	fActionMenuBar->Hide();
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.Add(menuBar)
+		.AddGroup(B_HORIZONTAL, 0.0f)
+			.Add(menuBar, 1.0f)
+			.Add(fActionMenuBar, 0.0f)
+			.End()
 		.AddSplit(B_HORIZONTAL)
 			.SetInsets(B_USE_WINDOW_SPACING)
 			.AddGroup(B_VERTICAL)
 				.Add(fOrderByMenu, 1)
 				.Add(scrollView, 2)
 				.End()
-			.Add(fAttributesView, 2);
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING, 2.0f)
+				.Add(fAttributesView, 2)
+				.AddGroup(B_HORIZONTAL)
+					.Add(fBlockButton)
+					.Add(fRebootNotice)
+					.AddGlue()
+					.End()
+				.End();
 }
 
 
@@ -401,7 +443,8 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 	// Add its attributes to the device, initialize it and add to the list.
 	for (unsigned int i = 0; i < attributes.size(); i++) {
 		if (attributes[i].fName == B_DEVICE_PUBLISHED_PATH) {
-			newDevice->SetAttribute(B_TRANSLATE("Device paths"), attributes[i].fValue);
+			newDevice->SetAttribute(B_TRANSLATE_CONTEXT("Device paths", "Device"),
+				attributes[i].fValue);
 			hasPublishedPath = true;
 			continue;
 		}
@@ -410,11 +453,14 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 	}
 
 	if (driverAttrInfo.value.string[0] != '\0')
-		newDevice->SetAttribute(B_TRANSLATE("Driver used"), driverAttrInfo.value.string);
+		newDevice->SetAttribute(B_TRANSLATE_CONTEXT("Driver used", "Device"),
+			driverAttrInfo.value.string);
 	else
-		newDevice->SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE("unknown"));
+		newDevice->SetAttribute(B_TRANSLATE_CONTEXT("Driver used", "Device"),
+			B_TRANSLATE_CONTEXT("unknown", "Device"));
 	if (!hasPublishedPath)
-		newDevice->SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE("none"));
+		newDevice->SetAttribute(B_TRANSLATE_CONTEXT("Device paths", "Device"),
+			B_TRANSLATE_CONTEXT("none", "Device"));
 
 	newDevice->InitFromAttributes();
 	fDevices.push_back(newDevice);
@@ -432,9 +478,126 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 }
 
 
-DevicesView::~DevicesView()
+void
+DevicesView::_ShowInfoAlert(const BString& message)
 {
-	DeleteDevices();
+	BAlert* alert = new BAlert("infoAlert", message, B_TRANSLATE("OK"), NULL, NULL,
+		B_WIDTH_AS_USUAL, B_INFO_ALERT);
+	alert->Go();
+}
+
+
+void
+DevicesView::_ShowDisableDriverAlert(const BPath& settingsPath, const BString& relativePath)
+{
+	if (fHasShownDisableAlert)
+		return;
+
+	fHasShownDisableAlert = true;
+
+	BString alertText;
+	alertText << B_TRANSLATE("The driver has been disabled. A reboot is required "
+							 "for the change to take effect.\n\n"
+							 "After rebooting, this device may no longer appear "
+							 "in the device list as the system will not be able to identify "
+							 "it without its driver.\n\n"
+							 "To re-enable the driver, find the device in the "
+							 "Devices application and click \"Enable driver\". If the "
+							 "device is no longer visible, remove the corresponding "
+							 "blocked entry from the packages settings file:\n")
+			  << settingsPath.Path() << "\n\n"
+			  << B_TRANSLATE("Blocked entry:\n")
+			  << relativePath;
+
+	BAlert* alert = new BAlert(B_TRANSLATE("Driver disabled"), alertText, B_TRANSLATE("OK"), NULL,
+		NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+	alert->Go();
+}
+
+
+void
+DevicesView::_ToggleDriverState(bool disable)
+{
+	int32 selected = fDevicesOutline->CurrentSelection(0);
+	if (selected < 0)
+		return;
+
+	Device* device = (Device*)fDevicesOutline->ItemAt(selected);
+	BString driver = device->GetDriverUsed();
+
+	if (disable && DriverUtils::IsCriticalDriver(device))
+		return;
+
+	BString packageName;
+	if (!DriverUtils::IsPackagedDriver(driver, &packageName))
+		return;
+
+	BPath settingsPath;
+	BString relativePath;
+	status_t status = DriverUtils::GetDriverPackageSettings(driver, settingsPath, relativePath);
+	if (status != B_OK) {
+		if (disable) {
+			BString errorMsg = B_TRANSLATE("The driver path is not in a package volume: ");
+			errorMsg << driver;
+			_ShowInfoAlert(errorMsg);
+		}
+		return;
+	}
+
+	if (DriverUtils::UpdatePackageBlockedEntry(settingsPath.Path(), packageName.String(),
+			relativePath.String(), disable)
+		!= B_OK) {
+		_ShowInfoAlert(B_TRANSLATE("Failed to write to the settings file."));
+		return;
+	}
+
+	_UpdateBlockButton(device);
+	fRebootNeeded = true;
+	fActionMenuBar->Show();
+
+	if (disable)
+		_ShowDisableDriverAlert(settingsPath, relativePath);
+}
+
+
+void
+DevicesView::_UpdateBlockButton(Device* device)
+{
+	fBlockButton->SetTarget(this);
+
+	if (device == NULL) {
+		fBlockButton->SetEnabled(false);
+		fBlockButton->SetLabel(B_TRANSLATE("Disable driver"));
+		fRebootNotice->SetText("");
+		return;
+	}
+
+	BString driver = device->GetDriverUsed();
+	bool hasDriver = !driver.IsEmpty() && driver != B_TRANSLATE_CONTEXT("unknown", "Device")
+		&& driver != B_TRANSLATE_CONTEXT("none", "Device");
+
+	if (!hasDriver) {
+		fBlockButton->SetEnabled(false);
+		fBlockButton->SetLabel(B_TRANSLATE("Disable driver"));
+		fRebootNotice->SetText("");
+	} else if (DriverUtils::IsCriticalDriver(device)) {
+		fBlockButton->SetEnabled(false);
+		fBlockButton->SetLabel(B_TRANSLATE("Disable driver"));
+		fRebootNotice->SetHighUIColor(B_PANEL_TEXT_COLOR);
+		fRebootNotice->SetText(B_TRANSLATE("Disabling critical system drivers is not allowed."));
+	} else if (!DriverUtils::IsPackagedDriver(driver)) {
+		fBlockButton->SetEnabled(false);
+		fBlockButton->SetLabel(B_TRANSLATE("Disable driver"));
+		fRebootNotice->SetHighUIColor(B_PANEL_TEXT_COLOR);
+		fRebootNotice->SetText(B_TRANSLATE("Disabling non-packaged drivers is not supported."));
+	} else {
+		fBlockButton->SetEnabled(true);
+		fRebootNotice->SetText("");
+		if (DriverUtils::IsDriverEnabled(driver))
+			fBlockButton->SetLabel(B_TRANSLATE("Disable driver"));
+		else
+			fBlockButton->SetLabel(B_TRANSLATE("Enable driver"));
+	}
 }
 
 
@@ -442,14 +605,29 @@ void
 DevicesView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
+		case kMsgReboot:
+		{
+			BRoster roster;
+			BRoster::Private rosterPrivate(roster);
+			status_t error = rosterPrivate.ShutDown(true, false, false);
+			if (error != B_OK) {
+				BString errorMsg;
+				errorMsg << B_TRANSLATE("ShutDown failed with error: ") << strerror(error);
+				BAlert* errorAlert = new BAlert(B_TRANSLATE("Error"), errorMsg.String(),
+					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+				errorAlert->Go();
+			}
+			break;
+		}
 		case kMsgSelectionChanged:
 		{
 			int32 selected = fDevicesOutline->CurrentSelection(0);
-			if (selected >= 0) {
-				Device* device = (Device*)fDevicesOutline->ItemAt(selected);
+			Device* device = (selected >= 0) ? (Device*)fDevicesOutline->ItemAt(selected) : NULL;
+			if (device != NULL) {
 				fAttributesView->AddAttributes(device->GetAllAttributes());
 				fAttributesView->Invalidate();
 			}
+			_UpdateBlockButton(device);
 			break;
 		}
 
@@ -497,6 +675,16 @@ DevicesView::MessageReceived(BMessage *msg)
 			break;
 		}
 
+		case kMsgToggleDriver:
+		{
+			int32 selected = fDevicesOutline->CurrentSelection(0);
+			if (selected >= 0) {
+				Device* device = (Device*)fDevicesOutline->ItemAt(selected);
+				BString driver = device->GetDriverUsed();
+				_ToggleDriverState(DriverUtils::IsDriverEnabled(driver));
+			}
+			break;
+		}
 		default:
 			BView::MessageReceived(msg);
 			break;

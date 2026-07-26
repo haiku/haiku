@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src apps devices ;
 
 UsePrivateHeaders shared ;
 UsePrivateHeaders interface ;
+UsePrivateHeaders app ;
 UsePrivateKernelHeaders ;
 UsePrivateSystemHeaders ;
 
@@ -94,6 +95,7 @@ ACPIPnPHeaderGen [ FGristFiles acpipnpids.h ]
 Application Devices :
 	DevicesApplication.cpp
 	DevicesView.cpp
+	DriverUtils.cpp
 	dm_wrapper.c
 	DeviceACPI.cpp
 	DevicePCI.cpp
@@ -101,7 +103,7 @@ Application Devices :
 	DeviceUSB.cpp
 	Device.cpp
 	PropertyList.cpp
-	: be device libcolumnlistview.a tracker shared [ TargetLibsupc++ ]
+	: be device libcolumnlistview.a tracker shared package [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ]	localestub
 	: Devices.rdef
 ;

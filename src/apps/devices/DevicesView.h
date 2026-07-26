@@ -1,9 +1,10 @@
 /*
- * Copyright 2008-2009 Haiku Inc. All rights reserved.
+ * Copyright 2008-2026 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Pieter Panman
+ *		Leo Rouleau
  */
 #ifndef DEVICESVIEW_H
 #define DEVICESVIEW_H
@@ -25,6 +26,10 @@
 #include "DeviceUSB.h"
 #include "PropertyList.h"
 
+class BButton;
+class BStringView;
+class BMenuBar;
+
 static const uint32 kMsgRefresh				= 'refr';
 static const uint32 kMsgReportCompatibility	= 'repo';
 static const uint32 kMsgGenerateSysInfo		= 'sysi';
@@ -32,6 +37,8 @@ static const uint32 kMsgSelectionChanged	= 'selc';
 static const uint32 kMsgOrderBus			= 'obus';
 static const uint32 kMsgOrderCategory		= 'ocat';
 static const uint32 kMsgOrderConnection		= 'ocon';
+static const uint32 kMsgToggleDriver		= 'disd';
+static const uint32 kMsgReboot				= 'rebt';
 
 typedef enum {
 	ORDER_BY_BUS,
@@ -64,13 +71,24 @@ class DevicesView : public BView {
 		static int   SortItemsCompare(const BListItem*, const BListItem*);
 
 	private:
+		void				_ToggleDriverState(bool disable);
+		void				_ShowInfoAlert(const BString& message);
+		void				_ShowDisableDriverAlert(const BPath& settingsPath,
+								const BString& relativePath);
+
+		void				_UpdateBlockButton(Device* device);
+
 		BOutlineListView*	fDevicesOutline;
 		PropertyList*		fAttributesView;
 		BMenuField*			fOrderByMenu;
 		Devices				fDevices;
 		OrderByType			fOrderBy;
 		CategoryMap			fCategoryMap;
-
+		BButton*			fBlockButton;
+		BStringView*		fRebootNotice;
+		BMenuBar*			fActionMenuBar;
+		bool				fHasShownDisableAlert;
+		bool				fRebootNeeded;
 };
 
 #endif /* DEVICESVIEW_H */

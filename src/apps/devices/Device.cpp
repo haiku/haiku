@@ -43,6 +43,7 @@ const int kCategoryStringLength	= sizeof(kCategoryString)/sizeof(char *);
 
 // This list is only used to translate Device properties
 B_TRANSLATE_MARK_VOID("unknown");
+B_TRANSLATE_MARK_VOID("none");
 B_TRANSLATE_MARK_VOID("Device");
 B_TRANSLATE_MARK_VOID("Computer");
 B_TRANSLATE_MARK_VOID("ACPI bus");
