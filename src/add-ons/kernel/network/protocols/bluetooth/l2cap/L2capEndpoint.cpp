@@ -394,6 +394,7 @@ L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	if (fState == CLOSED)
 		flags |= MSG_DONTWAIT;
 
+	timeout -= system_time();
 	return gStackModule->fifo_dequeue_buffer(&fReceiveQueue, flags, timeout, _buffer);
 }
 
@@ -427,6 +428,7 @@ L2capEndpoint::SendData(net_buffer* buffer)
 status_t
 L2capEndpoint::ReceiveData(net_buffer* buffer)
 {
+	CALLED();
 	// FIXME: Check address specified in net_buffer!
 	return gStackModule->fifo_enqueue_buffer(&fReceiveQueue, buffer);
 }
