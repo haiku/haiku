@@ -664,7 +664,7 @@ L2capEndpoint::_HandleConfigurationReq(uint8 ident, uint16 flags,
 	if (fState != CONFIGURATION && fState != OPEN) {
 		ERROR("l2cap: unexpected configuration req: invalid channel state (cid=%d, state=%d)\n",
 			fChannelID, fState);
-		send_l2cap_configuration_rsp(fConnection, ident, fChannelID, 0,
+		send_l2cap_configuration_rsp(fConnection, ident, fDestinationChannelID, 0,
 			l2cap_configuration_rsp::RESULT_REJECTED, NULL);
 		return;
 	}
@@ -684,7 +684,7 @@ L2capEndpoint::_HandleConfigurationReq(uint8 ident, uint16 flags,
 	if (flow != NULL)
 		fChannelConfig.incoming_flow = *flow;
 
-	send_l2cap_configuration_rsp(fConnection, ident, fChannelID, 0,
+	send_l2cap_configuration_rsp(fConnection, ident, fDestinationChannelID, 0,
 		l2cap_configuration_rsp::RESULT_SUCCESS, NULL);
 
 	if ((flags & L2CAP_CFG_FLAG_CONTINUATION) != 0) {
