@@ -37,7 +37,7 @@ glyph_length(uint32 glyph)
 	@return If the input is not an initial UTF-8 byte, returns 1.
 */
 static inline size_t
-encoded_glyph_length(u_char c)
+encoded_glyph_length(uint8 c)
 {
 	if (c < 0xC0)
 		return 1;
@@ -87,7 +87,7 @@ encode_glyph(uint32 glyph, size_t glyphLength, char* buffer)
 	left in its initial state (therefore, the client should zero it beforehand).
 */
 static size_t
-decode_glyph(const u_char* utf8, size_t glyphLength, uint16* utf16)
+decode_glyph(const uint8* utf8, size_t glyphLength, uint16* utf16)
 {
 	size_t utf8Advance = glyphLength;
 
@@ -289,7 +289,7 @@ utf8_to_utf16(const char* source, size_t* sourceLength, uint16* target, size_t t
 		uint16 utf16[2] = {0, 0};
 
 		if (sourceCount + glyphLength <= *sourceLength) {
-			glyphLength = decode_glyph(reinterpret_cast<const u_char*>(source + sourceCount),
+			glyphLength = decode_glyph(reinterpret_cast<const uint8*>(source + sourceCount),
 				glyphLength, utf16);
 		} else {
 			// malformed input - claimed glyph length exceeds remaining source length
