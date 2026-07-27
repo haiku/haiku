@@ -177,6 +177,7 @@ const struct supported_device {
 	{0x5af0, 0x5a85, INTEL_MODEL_KBYM, "Apollo Lake GT1"},
 	{0x5904, 0x5906, INTEL_MODEL_KBY,  "Kabylake ULT GT1"},
 	{0x590f, 0x5902, INTEL_MODEL_KBY,  "Kabylake DT GT1"},
+	{0x590f, 0x5912, INTEL_MODEL_KBY,  "Kabylake DT GT2"},
 	{0x5904, 0x5916, INTEL_MODEL_KBYM, "Kabylake ULT GT2"},
 	{0x590c, 0x5916, INTEL_MODEL_KBYM, "Kabylake ULT GT2"},
 	{0x5904, 0x5921, INTEL_MODEL_KBYM, "Kabylake ULT GT2F"},
@@ -236,6 +237,7 @@ const struct supported_device {
 	{0x4e26, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
 	{0x4e28, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
 
+	{0x9a12, 0x9a40, INTEL_MODEL_TGLM, "TigerLake-UP4 GT2"},
 	{0x9a12, 0x9a49, INTEL_MODEL_TGLM, "TigerLake-LP GT2"},
 	{0x9a12, 0x9a78, INTEL_MODEL_TGLM, "TigerLake-LP GT2"},
 	{0x9a02, 0x9a49, INTEL_MODEL_TGLM, "TigerLake-LP GT2"},
