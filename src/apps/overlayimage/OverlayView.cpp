@@ -126,7 +126,7 @@ OverlayView::MessageReceived(BMessage* msg)
 		case B_COLORS_UPDATED:
 		{
 			rgb_color color;
-			if (msg->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &color) == B_OK)
+			if (fText != NULL && msg->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &color) == B_OK)
 				fText->SetFontAndColor(be_plain_font, B_FONT_ALL, &color);
 			break;
 		}
