@@ -2,13 +2,19 @@ int _IO_2_1_stderr_;
 int _IO_2_1_stdin_;
 int _IO_2_1_stdout_;
 int _IO_file_jumps;
+int _IO_file_jumps_maybe_mmap;
+int _IO_file_jumps_mmap;
 int _IO_list_all;
 int _IO_stderr;
 int _IO_stdin;
 int _IO_stdout;
 int _IO_str_jumps;
+int _IO_strn_jumps;
 int _IO_wfile_jumps;
+int _IO_wfile_jumps_maybe_mmap;
+int _IO_wfile_jumps_mmap;
 int _IO_wstr_jumps;
+int _IO_wstrn_jumps;
 int __bb;
 int __ctype_b;
 int __ctype_mb_cur_max;
@@ -210,6 +216,7 @@ void _IO_fgets() {}
 void _IO_file_attach() {}
 void _IO_file_close() {}
 void _IO_file_close_it() {}
+void _IO_file_close_mmap() {}
 void _IO_file_doallocate() {}
 void _IO_file_finish() {}
 void _IO_file_fopen() {}
@@ -225,6 +232,8 @@ void _IO_file_setbuf_mmap() {}
 void _IO_file_stat() {}
 void _IO_file_sync() {}
 void _IO_file_underflow() {}
+void _IO_file_underflow_maybe_mmap() {}
+void _IO_file_underflow_mmap() {}
 void _IO_file_write() {}
 void _IO_file_xsgetn() {}
 void _IO_file_xsputn() {}
@@ -290,6 +299,7 @@ void _IO_new_popen() {}
 void _IO_new_proc_close() {}
 void _IO_new_proc_open() {}
 void _IO_no_init() {}
+void _IO_old_init() {}
 void _IO_padn() {}
 void _IO_peekc_locked() {}
 void _IO_popen() {}
@@ -317,6 +327,7 @@ void _IO_str_count() {}
 void _IO_str_finish() {}
 void _IO_str_init_readonly() {}
 void _IO_str_init_static() {}
+void _IO_str_init_static_internal() {}
 void _IO_str_overflow() {}
 void _IO_str_pbackfail() {}
 void _IO_str_seekoff() {}
@@ -336,7 +347,9 @@ void _IO_unsave_wmarkers() {}
 void _IO_vasprintf() {}
 void _IO_vdprintf() {}
 void _IO_vfprintf() {}
+void _IO_vfprintf_internal() {}
 void _IO_vfscanf() {}
+void _IO_vfscanf_internal() {}
 void _IO_vfwprintf() {}
 void _IO_vfwscanf() {}
 void _IO_vscanf() {}
@@ -363,7 +376,6 @@ void _IO_wpadn() {}
 void _IO_wsetb() {}
 void _IO_wstr_count() {}
 void _IO_wstr_finish() {}
-void _IO_wstr_init_readonly() {}
 void _IO_wstr_init_static() {}
 void _IO_wstr_overflow() {}
 void _IO_wstr_pbackfail() {}
@@ -396,6 +408,7 @@ void __Q38BPrivate7Libroot23LocaleNumericDataBridgeb() {}
 void __Q38BPrivate7Libroot24LocaleMessagesDataBridge() {}
 void __Q38BPrivate7Libroot24LocaleMonetaryDataBridge() {}
 void __Q38BPrivate7Libroot24TimeConversionDataBridgeb() {}
+void ___vfscanf() {}
 void __adjust_heap__H3ZPQ217EnvironmentFilter5EntryZlZQ217EnvironmentFilter5Entry_X01X11X11X21_v() {}
 void __allocate_pages() {}
 void __allocate_pthread() {}
@@ -515,7 +528,6 @@ void __flbf() {}
 void __floatdidf() {}
 void __floatdisf() {}
 void __floatdixf() {}
-void __floatscan() {}
 void __fopen_internal() {}
 void __fopen_maybe_mmap() {}
 void __fpclassify() {}
@@ -535,6 +547,8 @@ void __fsetlocking() {}
 void __fwprintf() {}
 void __fwritable() {}
 void __fwriting() {}
+void __fwscanf() {}
+void __fxprintf() {}
 void __gcc_bcmp() {}
 void __gconv_get_builtin_trans() {}
 void __gconv_transform_ascii_internal() {}
@@ -584,7 +598,6 @@ void __init_time() {}
 void __initstate_r() {}
 void __insertion_sort__H1ZPQ217EnvironmentFilter5Entry_X01X01_v() {}
 void __introsort_loop__H3ZPQ217EnvironmentFilter5EntryZQ217EnvironmentFilter5EntryZl_X01X01PX11X21_v() {}
-void __intscan() {}
 void __ioctl() {}
 void __is_pointer__FPv() {}
 void __isinf() {}
@@ -663,11 +676,14 @@ void __overflow() {}
 void __pages_allocator_after_fork() {}
 void __pages_allocator_before_fork() {}
 void __parse_invoke_line() {}
+void __parse_one_specmb() {}
+void __parse_one_specwc() {}
 void __partial_sort__H2ZPQ217EnvironmentFilter5EntryZQ217EnvironmentFilter5Entry_X01X01X01PX11_v() {}
 void __posix_locale_t() {}
 void __ppoll() {}
 void __printf_fp() {}
 void __printf_fphex() {}
+void __printf_size() {}
 void __pselect() {}
 void __pselect_beos() {}
 void __pthread_attr_get_np() {}
@@ -696,6 +712,7 @@ void __register_frame_info() {}
 void __register_frame_info_table() {}
 void __register_frame_table() {}
 void __register_printf_function() {}
+void __register_printf_specifier() {}
 void __reinit_pwd_backend_after_fork() {}
 void __rethrow() {}
 void __rtti_array() {}
@@ -720,8 +737,6 @@ void __set_scheduler_mode() {}
 void __set_stack_protection() {}
 void __setjmp_save_sigs() {}
 void __setstate_r() {}
-void __shgetc() {}
-void __shlim() {}
 void __sigaction() {}
 void __sigaction_beos() {}
 void __sigaddset() {}
@@ -785,6 +800,8 @@ void __swap_float() {}
 void __swap_int16() {}
 void __swap_int32() {}
 void __swap_int64() {}
+void __swprintf() {}
+void __swscanf() {}
 void __sysconf() {}
 void __sysconf_beos() {}
 void __tens() {}
@@ -854,9 +871,13 @@ void __vfwprintf() {}
 void __vfwscanf() {}
 void __vn__FUlPv() {}
 void __vn__FUlRC9nothrow_t() {}
+void __vprintf() {}
 void __vsnprintf() {}
 void __vsscanf() {}
 void __vswprintf() {}
+void __vswscanf() {}
+void __vwprintf() {}
+void __vwscanf() {}
 void __wcpcpy() {}
 void __wcpncpy() {}
 void __wcrtomb() {}
@@ -909,6 +930,8 @@ void __wmemmove() {}
 void __wmempcpy() {}
 void __wmemset() {}
 void __woverflow() {}
+void __wprintf() {}
+void __wscanf() {}
 void __wuflow() {}
 void __wunderflow() {}
 void __x86_setup_system_time() {}
@@ -923,6 +946,8 @@ void _debuggerAssert() {}
 void _errnop() {}
 void _exit() {}
 void _fini() {}
+void _fitoa() {}
+void _fitoa_word() {}
 void _flushlbf() {}
 void _fpioconst_pow10() {}
 void _fseek() {}
@@ -956,6 +981,7 @@ void _itoa() {}
 void _itoa_base_table() {}
 void _itoa_lower_digits() {}
 void _itoa_upper_digits() {}
+void _itoa_word() {}
 void _itowa() {}
 void _itowa_lower_digits() {}
 void _itowa_upper_digits() {}
@@ -974,6 +1000,7 @@ void _kern_clear_debugger_breakpoint() {}
 void _kern_clone_area() {}
 void _kern_close() {}
 void _kern_close_port() {}
+void _kern_close_range() {}
 void _kern_connect() {}
 void _kern_cpu_enabled() {}
 void _kern_create_area() {}
@@ -1034,6 +1061,7 @@ void _kern_get_disk_system_info() {}
 void _kern_get_extended_team_info() {}
 void _kern_get_file_disk_device_path() {}
 void _kern_get_image_info() {}
+void _kern_get_loadavg() {}
 void _kern_get_memory_properties() {}
 void _kern_get_next_area_info() {}
 void _kern_get_next_disk_device_id() {}
@@ -1060,13 +1088,13 @@ void _kern_get_thread_info() {}
 void _kern_get_timer() {}
 void _kern_get_timezone() {}
 void _kern_getcwd() {}
-void _kern_getgid() {}
 void _kern_getgroups() {}
 void _kern_getpeername() {}
+void _kern_getresgid() {}
+void _kern_getresuid() {}
 void _kern_getrlimit() {}
 void _kern_getsockname() {}
 void _kern_getsockopt() {}
-void _kern_getuid() {}
 void _kern_has_data() {}
 void _kern_image_relocated() {}
 void _kern_initialize_partition() {}
@@ -1180,8 +1208,8 @@ void _kern_set_timezone() {}
 void _kern_setcwd() {}
 void _kern_setgroups() {}
 void _kern_setpgid() {}
-void _kern_setregid() {}
-void _kern_setreuid() {}
+void _kern_setresgid() {}
+void _kern_setresuid() {}
 void _kern_setrlimit() {}
 void _kern_setsid() {}
 void _kern_setsockopt() {}
@@ -1340,6 +1368,8 @@ void brk() {}
 void bsearch() {}
 void btowc() {}
 void bzero() {}
+void c16rtomb() {}
+void c32rtomb() {}
 void cabs() {}
 void cabsf() {}
 void cabsl() {}
@@ -1557,6 +1587,7 @@ void fcloseall() {}
 void fcntl() {}
 void fcrypt__FPCcT0() {}
 void fcvt() {}
+void fdatasync() {}
 void fdim() {}
 void fdimf() {}
 void fdiml() {}
@@ -1576,6 +1607,8 @@ void feupdateenv() {}
 void fflush() {}
 void fflush_unlocked() {}
 void ffs() {}
+void ffsl() {}
+void ffsll() {}
 void fgetc() {}
 void fgetc_unlocked() {}
 void fgetpos() {}
@@ -1744,6 +1777,7 @@ void getgroups() {}
 void gethostname() {}
 void getitimer() {}
 void getline() {}
+void getlocalename_l() {}
 void getlogin() {}
 void getlogin_r() {}
 void getopt() {}
@@ -1761,6 +1795,8 @@ void getpwnam() {}
 void getpwnam_r() {}
 void getpwuid() {}
 void getpwuid_r() {}
+void getresgid() {}
+void getresuid() {}
 void getrlimit() {}
 void gets() {}
 void getsid() {}
@@ -1953,6 +1989,7 @@ void malloc() {}
 void malloc_usable_size() {}
 void mblen() {}
 void mbrlen() {}
+void mbrtoc32() {}
 void mbrtowc() {}
 void mbsinit() {}
 void mbsnrtowcs() {}
@@ -2242,6 +2279,7 @@ void regerror() {}
 void regexec() {}
 void regfree() {}
 void register_printf_function() {}
+void register_printf_specifier() {}
 void release_sem() {}
 void release_sem_etc() {}
 void remainder() {}
@@ -2304,7 +2342,6 @@ void send_authentication_request_to_registrar__8BPrivateRQ28BPrivate8KMessageT1(
 void send_data() {}
 void send_request_to_launch_daemon__8BPrivateRQ28BPrivate8KMessageT1() {}
 void send_signal() {}
-void setMbCurMax__Q38BPrivate7Libroot21LocaleCtypeDataBridgeUs() {}
 void set_alarm() {}
 void set_area_protection() {}
 void set_dateformats() {}
@@ -2343,6 +2380,8 @@ void setpgrp() {}
 void setpriority() {}
 void setpwent() {}
 void setregid() {}
+void setresgid() {}
+void setresuid() {}
 void setreuid() {}
 void setrlimit() {}
 void setsid() {}
@@ -2603,15 +2642,15 @@ void wcsspn() {}
 void wcsstr() {}
 void wcstod() {}
 void wcstof() {}
-void wcstoimax() {}
 void wcstok() {}
 void wcstol() {}
 void wcstold() {}
 void wcstoll() {}
 void wcstombs() {}
+void wcstoq() {}
 void wcstoul() {}
 void wcstoull() {}
-void wcstoumax() {}
+void wcstouq() {}
 void wcswcs() {}
 void wcswidth() {}
 void wcsxfrm() {}
