@@ -5376,18 +5376,14 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 	uint32 numEntries = *_numEntries;
 	*_numEntries = 0;
 
-	addr_t virtualAddress = (addr_t)address;
-	addr_t pageOffset = virtualAddress & (B_PAGE_SIZE - 1);
-	status_t status = B_OK;
-	int32 index = -1;
-	addr_t offset = 0;
-	bool interrupts = are_interrupts_enabled();
-
 	TRACE(("get_memory_map_etc(%" B_PRId32 ", %p, %lu bytes, %" B_PRIu32 " "
 		"entries)\n", team, address, numBytes, numEntries));
 
 	if (numEntries == 0 || numBytes == 0)
 		return B_BAD_VALUE;
+
+	addr_t virtualAddress = (addr_t)address;
+	addr_t pageOffset = virtualAddress % B_PAGE_SIZE;
 
 	// get the address space
 	VMAddressSpace* addressSpace;
@@ -5404,19 +5400,20 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 	VMAddressSpacePutter addressSpacePutter(addressSpace);
 
 	VMTranslationMap* map = addressSpace->TranslationMap();
+	const bool interrupts = are_interrupts_enabled();
 	if (interrupts)
 		map->Lock();
 
-	while (offset < numBytes) {
-		addr_t bytes = min_c(numBytes - offset, B_PAGE_SIZE);
-		uint32 flags;
-
+	status_t status = B_OK;
+	int32 index = -1;
+	while (numBytes > 0) {
 		phys_addr_t physicalAddress;
+		uint32 flags;
 		if (interrupts) {
-			status = map->Query((addr_t)address + offset, &physicalAddress,
-				&flags);
+			status = map->Query(virtualAddress - pageOffset,
+				&physicalAddress, &flags);
 		} else {
-			status = map->QueryInterrupt((addr_t)address + offset,
+			status = map->QueryInterrupt(virtualAddress - pageOffset,
 				&physicalAddress, &flags);
 		}
 		if (status < B_OK)
@@ -5426,10 +5423,10 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 			return B_BAD_ADDRESS;
 		}
 
-		if (index < 0 && pageOffset > 0) {
+		addr_t bytes = min_c(numBytes, B_PAGE_SIZE - pageOffset);
+		if (pageOffset > 0) {
 			physicalAddress += pageOffset;
-			if (bytes > B_PAGE_SIZE - pageOffset)
-				bytes = B_PAGE_SIZE - pageOffset;
+			pageOffset = 0;
 		}
 
 		// need to switch to the next physical_entry?
@@ -5446,7 +5443,8 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 			table[index].size += bytes;
 		}
 
-		offset += bytes;
+		virtualAddress += bytes;
+		numBytes -= bytes;
 	}
 
 	if (interrupts)
