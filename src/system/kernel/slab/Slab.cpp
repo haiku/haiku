@@ -364,6 +364,17 @@ dump_object_info(int argc, char* argv[])
 			: cache->full.Contains(slab) ? "full" : NULL;
 
 		kprintf("\tobject is in %s slab: %p\n", slabType, slab);
+
+		slab_queue_link* itemLink = slab != NULL ? slab->free.head : NULL;
+		while (itemLink != NULL) {
+			void* item = link_to_object(itemLink, cache->object_size);
+			if ((addr_t)object >= (addr_t)item
+					&& (addr_t)object < ((addr_t)item + cache->object_size)) {
+				kprintf("\tobject is free: %p\n", item);
+				break;
+			}
+			itemLink = itemLink->next;
+		}
 	}
 
 	return 0;
