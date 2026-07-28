@@ -28,13 +28,13 @@
 	\brief A buffered adapter for BPositionIO objects.
 
 	This class differs from other classes derived from BPositionIO in a sense
-	that it does not actually provide an actual entity to be read or written 
+	that it does not actually provide an actual entity to be read or written
 	to, but rather acts like a "frontend" to a stream. This class especially
 	comes in handy when working with files that are constantly written and
 	rewritten and where you want do this writing buffered so that the hard
 	disk or the network will not have to be accessed so frequently.
 
-	This class works as follows. After constructing a BBufferIO object that
+	This class works as follows. After constructing a BPositionIO object that
 	you want to be buffered, you can create this object. The constructor
 	takes a \a stream parameter that points to the object to be buffered.
 
@@ -67,9 +67,9 @@
 	and associate the object with the given BPositionIO stream.
 
 	\param stream A pointer to a BPositionIO object.
-	\param bufferSize The size of the buffer that the object will allocate and 
+	\param bufferSize The size of the buffer that the object will allocate and
 	       use.
-	\param ownsStream Specifies if the object will delete the stream on 
+	\param ownsStream Specifies if the object will delete the stream on
 	       destruction.
 
 	\since Haiku R1
