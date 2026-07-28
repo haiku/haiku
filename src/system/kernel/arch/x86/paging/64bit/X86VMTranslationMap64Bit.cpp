@@ -469,6 +469,8 @@ status_t
 X86VMTranslationMap64Bit::Query(addr_t virtualAddress,
 	phys_addr_t* _physicalAddress, uint32* _flags)
 {
+	ASSERT((virtualAddress % B_PAGE_SIZE) == 0);
+
 	*_flags = 0;
 	*_physicalAddress = 0;
 
