@@ -36,7 +36,7 @@ sched_tx_processing(bt_usb_dev* bdev)
 			/* Do while this bit is on... so someone should set it before we
 			 * stop the iterations
 			 */
-			bdev->state = CLEAR_BIT(bdev->state, SENDING);
+			bdev->state &= ~SENDING;
 			// check Commands
 	#ifdef EMPTY_COMMAND_QUEUE
 			while (!list_is_empty(&bdev->nbuffersTx[BT_COMMAND])) {
@@ -85,13 +85,13 @@ sched_tx_processing(bt_usb_dev* bdev)
 				}
 			}
 
-		} while (GET_BIT(bdev->state, SENDING));
+		} while ((bdev->state & SENDING) != 0);
 
-		bdev->state = CLEAR_BIT(bdev->state, PROCESSING);
+		bdev->state &= ~PROCESSING;
 
 	} else {
 		// We are processing so MARK that we need to still go on with that
-		bdev->state = SET_BIT(bdev->state, SENDING);
+		bdev->state |= SENDING;
 	}
 }
 

@@ -733,7 +733,7 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 			//  EVENTS
 			err = submit_rx_event(bdev);
 			if (err != B_OK) {
-				bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
+				bdev->state &= ~ANCILLYANT;
 				ERROR("%s: Queuing failed at submit_rx_event()\n", __func__);
 				break;
 			}
@@ -742,7 +742,7 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 			for (i = 0; i < MAX_ACL_IN_WINDOW; i++) {
 				err = submit_rx_acl(bdev);
 				if (err != B_OK && i == 0) {
-					bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
+					bdev->state &= ~ANCILLYANT;
 						// Set the flaq in the HCI world
 					ERROR("%s: Queuing failed at submit_rx_acl()\n",
 						__func__);
@@ -756,7 +756,7 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 				for (i = 0; i < MAX_SCO_IN_WINDOW; i++) {
 					err = submit_rx_sco(bdev);
 					if (err != B_OK && i == 0) {
-						bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
+						bdev->state &= ~ANCILLYANT;
 						ERROR("%s: Queuing failed at submit_rx_sco()\n", __func__);
 						break;
 					}

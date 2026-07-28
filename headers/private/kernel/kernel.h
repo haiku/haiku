@@ -89,10 +89,6 @@ is_user_address_range(const void* addr, size_t size)
 
 
 #define CHECK_BIT(a, b) ((a) & (1 << (b)))
-#define SET_BIT(a, b) ((a) | (1 << (b)))
-#define CLEAR_BIT(a, b) ((a) & (~(1 << (b))))
-#define GET_BIT(a, b) ((a & b) != 0)
-#define TOGGLE_BIT(a, b) (a ^= b)
 
 
 /* during kernel startup, interrupts are disabled (among other things) */

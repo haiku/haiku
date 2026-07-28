@@ -50,8 +50,6 @@
 
 
 #define CHECK_BIT(a, b) ((a) & (1 << (b)))
-#define SET_BIT(a, b) ((a) | (1 << (b)))
-#define CLEAR_BIT(a, b) ((a) & (~(1 << (b))))
 
 
 #endif	/* _FSSH_KERNEL_H */

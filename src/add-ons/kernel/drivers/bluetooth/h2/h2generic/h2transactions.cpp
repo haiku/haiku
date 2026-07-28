@@ -371,7 +371,7 @@ submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 	uint16 wLength = B_HOST_TO_LENDIAN_INT16(snb_size(snbuf));
 	status_t error;
 
-	if (!GET_BIT(bdev->state, RUNNING)) {
+	if ((bdev->state & RUNNING) == 0) {
 		return B_DEV_NOT_READY;
 	}
 
@@ -402,7 +402,7 @@ submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
 	// set cookie
 	SET_DEVICE(nbuf, bdev->hdev);
 
-	if (!GET_BIT(bdev->state, RUNNING)) {
+	if ((bdev->state & RUNNING) == 0) {
 		return B_DEV_NOT_READY;
 	}
 	/*
@@ -430,7 +430,7 @@ submit_tx_sco(bt_usb_dev* bdev, net_buffer* nbuf)
 {
 	status_t error;
 
-	if (!GET_BIT(bdev->state, RUNNING))
+	if ((bdev->state & RUNNING) == 0)
 		return B_DEV_NOT_READY;
 
 	SET_DEVICE(nbuf, bdev->hdev);
