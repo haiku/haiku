@@ -36,6 +36,7 @@ VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 	address_space(addressSpace)
 {
 	new (&mappings) VMAreaMappings;
+	address_space->Get();
 }
 
 
@@ -43,6 +44,7 @@ VMArea::~VMArea()
 {
 	free_etc(page_protections, address_space == VMAddressSpace::Kernel()
 		? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0);
+	address_space->Put();
 }
 
 

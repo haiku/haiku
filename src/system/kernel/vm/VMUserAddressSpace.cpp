@@ -283,7 +283,6 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
 			if (next->Size() <= offset) {
 				VMUserArea* nextNext = fAreas.Next(next);
 				RemoveArea(next, allocationFlags);
-				Put();
 				next->~VMUserArea();
 				free_etc(next, allocationFlags);
 				next = nextNext;
@@ -376,7 +375,6 @@ VMUserAddressSpace::ReserveAddressRange(size_t size,
 	area->cache_offset = area->Base();
 		// we cache the original base address here
 
-	Get();
 	return B_OK;
 }
 
@@ -407,7 +405,6 @@ VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
 		if (area->id == RESERVED_AREA_ID) {
 			// remove reserved range
 			RemoveArea(area, allocationFlags);
-			Put();
 			area->~VMUserArea();
 			free_etc(area, allocationFlags);
 		}
@@ -426,7 +423,6 @@ VMUserAddressSpace::UnreserveAllAddressRanges(uint32 allocationFlags)
 			VMUserArea* area = it.Next();) {
 		if (area->id == RESERVED_AREA_ID) {
 			RemoveArea(area, allocationFlags);
-			Put();
 			area->~VMUserArea();
 			free_etc(area, allocationFlags);
 		}
@@ -515,8 +511,7 @@ VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 
 		if (size == reserved->Size()) {
 			// the new area fully covers the reserved range
-			fAreas.Remove(reserved);
-			Put();
+			RemoveArea(reserved, allocationFlags);
 			reserved->~VMUserArea();
 			free_etc(reserved, allocationFlags);
 		} else {
@@ -535,8 +530,6 @@ VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 			reserved->protection, allocationFlags);
 		if (newReserved == NULL)
 			return B_NO_MEMORY;
-
-		Get();
 
 		// resize regions
 		newReserved->SetBase(start + size);
@@ -730,8 +723,7 @@ second_chance:
 					if (next->Base() == alignedBase && next->Size() == size) {
 						// The reserved area is entirely covered, and thus,
 						// removed
-						fAreas.Remove(next);
-
+						RemoveArea(next, allocationFlags);
 						foundSpot = true;
 						area->SetBase(alignedBase);
 						next->~VMUserArea();

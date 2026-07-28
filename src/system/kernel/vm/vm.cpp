@@ -1340,9 +1340,6 @@ vm_map_cache(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	if (status != B_OK)
 		goto err3;
 
-	// grab a ref to the address space (the area holds this)
-	addressSpace->Get();
-
 //	ktrace_printf("vm_map_cache: cache: %p (source: %p), \"%s\" -> %p",
 //		cache, sourceCache, areaName, area);
 
@@ -2783,7 +2780,6 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area,
 
 	arch_vm_unset_memory_type(area);
 	addressSpace->RemoveArea(area, allocationFlags);
-	addressSpace->Put();
 
 	area->cache->RemoveArea(area);
 	area->cache->ReleaseRef();
