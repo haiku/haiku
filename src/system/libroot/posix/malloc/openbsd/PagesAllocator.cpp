@@ -55,6 +55,7 @@ public:
 		mutex_init(&fLock, "PagesAllocator lock");
 		fUsed = fFree = 0;
 		fLastArea = -1;
+		memset(fCachedAreaInfos, 0, sizeof(fCachedAreaInfos));
 	}
 
 	~PagesAllocator()
@@ -92,6 +93,7 @@ public:
 				locker.Lock();
 				fUsed += allocate;
 				cleared = true;
+				_CacheAreaInfo((addr_t)address, allocate);
 				return B_OK;
 			}
 			return area;
@@ -222,12 +224,12 @@ public:
 		if (!_InLastArea(freedChunk) && freedChunk->size < kMinimumFreeAreaSize) {
 			// If this chunk covers a whole area, or is at the head or tail of one
 			// that's smaller than kMinimumFreeAreaSize, we unmap it immediately.
-			// TODO: Find a way to avoid invoking syscalls here, at least in some cases?
-			area_info info = {};
-			get_area_info(area_for(freedChunk), &info);
-			if (info.size == size || (info.size < kMinimumFreeAreaSize
-					&& (info.address == freedChunk
-						|| ((addr_t)info.address + info.size) == freedChunk->NextAddress()))) {
+			addr_t areaAddress = 0;
+			size_t areaSize = 0;
+			_GetAreaInfoFor(freedChunk, &areaAddress, &areaSize);
+			if (areaSize == size || (areaSize < kMinimumFreeAreaSize
+					&& (areaAddress == (addr_t)freedChunk
+						|| (areaAddress + areaSize) == freedChunk->NextAddress()))) {
 				locker.Detach();
 				return _UnlockingRemoveAndUnmap(freedChunk, false);
 			}
@@ -372,7 +374,7 @@ private:
 		return B_OK;
 	}
 
-	bool _InLastArea(const FreeChunk* chunk) const
+	bool _InLastArea(const void* chunk) const
 	{
 		return ((addr_t)chunk < fLastAreaTop
 			&& (addr_t)chunk >= (fLastAreaTop - fLastAreaSize));
@@ -457,12 +459,62 @@ private:
 			return B_OK;
 		} else {
 			// Not in the last area.
+			for (size_t i = 0; i < B_COUNT_OF(fCachedAreaInfos); i++) {
+				if (address >= fCachedAreaInfos[i].base && address < fCachedAreaInfos[i].top) {
+					fCachedAreaInfos[i].base = fCachedAreaInfos[i].top = 0;
+					break;
+				}
+			}
 			locker.Unlock();
 		}
 
 		if (munmap(chunk, size) != 0)
 			return errno;
 		return B_OK;
+	}
+
+private:
+	void _GetAreaInfoFor(void* address, addr_t* areaBase, size_t* areaSize)
+	{
+		if (_InLastArea(address))
+			debugger(NULL);
+
+		for (size_t i = 0; i < B_COUNT_OF(fCachedAreaInfos); i++) {
+			if ((addr_t)address < fCachedAreaInfos[i].base
+					|| (addr_t)address >= fCachedAreaInfos[i].top)
+				continue;
+
+			*areaBase = fCachedAreaInfos[i].base;
+			*areaSize = fCachedAreaInfos[i].top - fCachedAreaInfos[i].base;
+
+			if (i != 0) {
+				// Move to the front of the cache.
+				memmove(&fCachedAreaInfos[1], &fCachedAreaInfos[0],
+					sizeof(CachedAreaInfo) * i);
+				fCachedAreaInfos[0].base = *areaBase;
+				fCachedAreaInfos[0].top = *areaBase + *areaSize;
+			}
+			return;
+		}
+
+		// Not in the cache. Fetch and store it.
+		area_info info = {};
+		status_t status = get_area_info(area_for(address), &info);
+		if (status != B_OK)
+			debugger(NULL);
+
+		*areaBase = (addr_t)info.address;
+		*areaSize = info.size;
+		_CacheAreaInfo((addr_t)info.address, info.size);
+	}
+
+	void _CacheAreaInfo(addr_t areaBase, size_t areaSize)
+	{
+		memmove(&fCachedAreaInfos[1], &fCachedAreaInfos[0],
+			sizeof(fCachedAreaInfos) - sizeof(fCachedAreaInfos[0]));
+
+		fCachedAreaInfos[0].base = areaBase;
+		fCachedAreaInfos[0].top = areaBase + areaSize;
 	}
 
 private:
@@ -554,6 +606,11 @@ private:
 	addr_t		fLastAreaTop;
 	size_t		fLastAreaSize;
 	size_t		fLastAreaReservedTop;
+
+	struct CachedAreaInfo {
+		addr_t base;
+		addr_t top;
+	} fCachedAreaInfos[8];
 };
 
 } // namespace
