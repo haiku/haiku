@@ -7,6 +7,7 @@
  */
 
 
+#include "ac_monitor.h"
 #include "lid_monitor.h"
 #include "power_button_monitor.h"
 
@@ -24,7 +25,7 @@ private:
 	static	status_t			_EventLooper(void *arg);
 
 			thread_id			fEventThread;
-			PowerMonitor*		fPowerMonitors[2];
+			PowerMonitor*		fPowerMonitors[3];
 			uint32				fMonitorCount;
 
 			bool				fQuitRequested;
@@ -58,6 +59,12 @@ PowerManagementDaemon::PowerManagementDaemon()
 		fPowerMonitors[fMonitorCount++] = lidMonitor;
 	else
 		delete lidMonitor;
+
+	PowerMonitor* acMonitor = new ACMonitor;
+	if (acMonitor->FDs().size() > 0)
+		fPowerMonitors[fMonitorCount++] = acMonitor;
+	else
+		delete acMonitor;
 
 	fEventThread = spawn_thread(_EventLooper, "_power_daemon_event_loop_",
 		B_NORMAL_PRIORITY, this);
