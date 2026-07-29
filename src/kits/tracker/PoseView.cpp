@@ -84,6 +84,7 @@ All rights reserved.
 #include "DeskWindow.h"
 #include "DesktopPoseView.h"
 #include "FSClipboard.h"
+#include "FSUndoRedo.h"
 #include "FSUtils.h"
 #include "FilePanelPriv.h"
 #include "FunctionObject.h"
@@ -3431,7 +3432,7 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 	Model* targetModel = TargetModel();
 	ThrowOnAssert(targetModel != NULL);
 
-	entry_ref destEntryRef;
+	entry_ref fileRef, templateRef;
 	node_ref destNodeRef;
 
 	BDirectory destDir(targetModel->NodeRef());
@@ -3445,53 +3446,50 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 	suffix << B_TRANSLATE_COMMENT("copy", "filename copy");
 	FSMakeOriginalName(fileName, &destDir, suffix);
 
-	entry_ref srcRef;
-	message->FindRef("refs_template", &srcRef);
+	message->FindRef("refs_template", &templateRef);
+	BDirectory templateDir(&templateRef);
 
-	BDirectory dir(&srcRef);
-
-	if (dir.InitCheck() == B_OK) {
+	if (templateDir.InitCheck() == B_OK) {
 		// special handling of directories
-		if (FSCreateNewFolderIn(targetModel->NodeRef(), &destEntryRef,
-				&destNodeRef) == B_OK) {
-			BEntry destEntry(&destEntryRef);
+		entry_ref destRef;
+		if (FSCreateNewFolderIn(targetModel->NodeRef(), &destRef, &destNodeRef) == B_OK) {
+			BEntry destEntry(&destRef);
 			destEntry.Rename(fileName);
 		}
 	} else {
-		BFile srcFile(&srcRef, B_READ_ONLY);
+		BFile templateFile(&templateRef, B_READ_ONLY);
 		BFile destFile(&destDir, fileName, B_READ_WRITE | B_CREATE_FILE);
 
 		// copy the data from the template file
-		char* buffer = new char[1024];
-		ssize_t result;
+		char buffer[1024];
+		ssize_t readResult, writeResult;
 		do {
-			result = srcFile.Read(buffer, 1024);
-
-			if (result > 0) {
-				ssize_t written = destFile.Write(buffer, (size_t)result);
-				if (written != result)
-					result = written < B_OK ? written : B_ERROR;
+			readResult = templateFile.Read(buffer, 1024);
+			if (readResult > 0) {
+				writeResult = destFile.Write(buffer, (size_t)readResult);
+				if (writeResult != readResult)
+					readResult = writeResult < B_OK ? writeResult : B_ERROR;
 			}
-		} while (result > 0);
-		delete[] buffer;
+		} while (readResult > 0);
 	}
 
-	// todo: create an UndoItem
-
 	// copy the attributes from the template file
-	BNode srcNode(&srcRef);
+	BNode templateNode(&templateRef);
 	BNode destNode(&destDir, fileName);
-	FSCopyAttributesAndStats(&srcNode, &destNode, false);
+	FSCopyAttributesAndStats(&templateNode, &destNode, false);
 
-	BEntry entry(&destDir, fileName);
-	entry.GetRef(&destEntryRef);
+	BEntry fileEntry(&destDir, fileName);
+	fileEntry.GetRef(&fileRef);
+
+	// create the UndoItem
+	NewFileTemplateUndo undo(fileRef, templateRef);
 
 	// try to place new item at click point or under mouse if possible
-	PlaceFolder(&destEntryRef, message);
+	PlaceFolder(&fileRef, message);
 
 	// start renaming the entry
 	int32 index;
-	BPose* pose = EntryCreated(targetModel->NodeRef(), &destNodeRef, destEntryRef.name, &index);
+	BPose* pose = EntryCreated(targetModel->NodeRef(), &destNodeRef, fileRef.name, &index);
 
 	if (pose != NULL) {
 		WatchNewNode(pose->TargetModel()->NodeRef());

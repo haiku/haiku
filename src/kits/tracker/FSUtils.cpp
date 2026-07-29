@@ -3239,6 +3239,56 @@ FSCreateTrashDirs()
 
 
 status_t
+FSCreateNewFileTemplate(entry_ref* fileRef, entry_ref* templateRef)
+{
+	if (fileRef == NULL || templateRef == NULL)
+		return B_BAD_VALUE;
+
+	node_ref dirNode;
+	dirNode.device = fileRef->device;
+	dirNode.node = fileRef->directory;
+	BDirectory destDir(&dirNode);
+	status_t result = destDir.InitCheck();
+	if (result != B_OK)
+		return result; // directory deleted
+
+	char name[B_FILE_NAME_LENGTH];
+	strlcpy(name, fileRef->name, B_FILE_NAME_LENGTH);
+	FSMakeOriginalName(name, &destDir, " -", 2);
+	fileRef->set_name(name); // update ref in case file got renamed
+
+	BFile destFile(&destDir, name, B_READ_WRITE | B_CREATE_FILE | B_FAIL_IF_EXISTS);
+	result = destFile.InitCheck();
+	if (result != B_OK)
+		return result; // file already exists
+
+	BFile templateFile(templateRef, B_READ_ONLY);
+	result = templateFile.InitCheck();
+	if (result != B_OK)
+		return result; // template file deleted
+
+	// copy the data from the template file
+	char buffer[1024];
+	ssize_t readResult, writeResult;
+	do {
+		readResult = templateFile.Read(buffer, 1024);
+		if (readResult > 0) {
+			writeResult = destFile.Write(buffer, (size_t)readResult);
+			if (writeResult != readResult)
+				readResult = writeResult < B_OK ? writeResult : B_ERROR;
+		}
+	} while (readResult > 0);
+
+	// copy the attributes from the template file
+	BNode srcNode(templateRef);
+	BNode destNode(&destDir, name);
+	FSCopyAttributesAndStats(&srcNode, &destNode, false);
+
+	return B_OK;
+}
+
+
+status_t
 FSCreateNewFolder(entry_ref* ref)
 {
 	node_ref node;

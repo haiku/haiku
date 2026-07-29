@@ -64,6 +64,12 @@ class MoveCopyUndo : public Undo {
 };
 
 
+class NewFileTemplateUndo : public Undo {
+	public:
+		NewFileTemplateUndo(const entry_ref &fileRef, const entry_ref &templateRef);
+};
+
+
 class NewFolderUndo : public Undo {
 	public:
 		NewFolderUndo(const entry_ref &ref);
