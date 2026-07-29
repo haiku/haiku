@@ -30,12 +30,6 @@ arch_debug_remove_interrupt_handler(uint32 line)
 }
 
 
-void
-arch_debug_install_interrupt_handlers(void)
-{
-}
-
-
 int
 arch_debug_blue_screen_try_getchar(void)
 {

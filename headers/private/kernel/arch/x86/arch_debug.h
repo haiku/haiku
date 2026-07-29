@@ -14,4 +14,7 @@ struct arch_debug_registers {
 };
 
 
+void x86_debug_install_interrupt_handler();
+
+
 #endif	// _KERNEL_ARCH_X86_DEBUG_H

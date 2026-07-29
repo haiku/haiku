@@ -27,7 +27,6 @@ void arch_debug_serial_puts(const char *s);
 void arch_debug_serial_early_boot_message(const char *string);
 
 void arch_debug_remove_interrupt_handler(uint32 line);
-void arch_debug_install_interrupt_handlers(void);
 
 status_t arch_debug_console_init(struct kernel_args *args);
 status_t arch_debug_console_init_settings(struct kernel_args *args);

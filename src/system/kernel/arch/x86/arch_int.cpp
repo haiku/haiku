@@ -22,6 +22,7 @@
 
 #include <arch/cpu.h>
 #include <arch/int.h>
+#include <arch/debug.h>
 
 #include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
@@ -489,6 +490,7 @@ arch_int_init_io(kernel_args* args)
 {
 	msi_init(args);
 	ioapic_init(args);
+	x86_debug_install_interrupt_handler();
 	return B_OK;
 }
 

@@ -181,7 +181,7 @@ arch_debug_remove_interrupt_handler(uint32 line)
 
 
 void
-arch_debug_install_interrupt_handlers(void)
+x86_debug_install_interrupt_handler()
 {
 	install_io_interrupt_handler(INT_PS2_KEYBOARD, &debug_keyboard_interrupt,
 		NULL, 0);

@@ -237,8 +237,6 @@ interrupts_init_io(kernel_args* args)
 status_t
 interrupts_init_post_device_manager(kernel_args* args)
 {
-	arch_debug_install_interrupt_handlers();
-
 	return arch_int_init_post_device_manager(args);
 }
 
