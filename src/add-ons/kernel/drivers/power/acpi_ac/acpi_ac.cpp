@@ -7,6 +7,8 @@
 
 #include <ACPI.h>
 
+#include <fs/select_sync_pool.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,6 +17,8 @@
 #define ACPI_AC_MODULE_NAME "drivers/power/acpi_ac/driver_v1"
 
 #define ACPI_AC_DEVICE_MODULE_NAME "drivers/power/acpi_ac/device_v1"
+
+#define ACPI_NOTIFY_STATUS_CHANGED		0x80
 
 /* Base Namespace devices are published to */
 #define ACPI_AC_BASENAME "power/acpi_ac/%d"
@@ -38,6 +42,8 @@ typedef struct acpi_ns_device_info {
 	acpi_device_module_info *acpi;
 	acpi_device acpi_cookie;
 	uint8 last_status;
+	bool updated;
+	select_sync_pool* select_pool;
 } acpi_ac_device_info;
 
 
@@ -55,6 +61,7 @@ acpi_ac_update_status(acpi_ac_device_info* device)
 	} else {
 		acpi_object_type* object = (acpi_object_type*)buf.pointer;
 		device->last_status = object->integer.integer;
+		device->updated = true;
 		TRACE("status %d\n", device->last_status);
 	}
 	free(buf.pointer);
@@ -62,15 +69,18 @@ acpi_ac_update_status(acpi_ac_device_info* device)
 
 
 static void
-acpi_ac_notify_handler(acpi_handle device, uint32 value, void *context)
+acpi_ac_notify_handler(acpi_handle _device, uint32 value, void *context)
 {
-	if (value != 0x80) {
+	if (value != ACPI_NOTIFY_STATUS_CHANGED) {
 		dprintf("acpi_ac: unknown notification (%d)\n", value);
 		return;
 	}
 
-	acpi_ac_device_info* dev = (acpi_ac_device_info*) context;
-	acpi_ac_update_status(dev);
+	acpi_ac_device_info* device = (acpi_ac_device_info*) context;
+	acpi_ac_update_status(device);
+
+	if (device->select_pool != NULL)
+		notify_select_event_pool(device->select_pool, B_SELECT_READ);
 }
 
 
@@ -108,15 +118,11 @@ acpi_ac_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 	if (*num_bytes < 1)
 		return B_IO_ERROR;
 
-	if (position > 0) {
-		*num_bytes = 0;
-		return B_OK;
-	}
-
 	if (user_memcpy(buf, &device->last_status, sizeof(uint8)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	*num_bytes = 1;
+	device->updated = false;
 	return B_OK;
 }
 
@@ -134,6 +140,40 @@ acpi_ac_control(void* _cookie, uint32 op, void* arg, size_t len)
 	return B_ERROR;
 }
 
+
+static status_t
+acpi_ac_select(void *_cookie, uint8 event, selectsync *sync)
+{
+	acpi_ac_device_info* device = (acpi_ac_device_info*)_cookie;
+
+	if (event != B_SELECT_READ)
+		return B_BAD_VALUE;
+
+	// add the event to the pool
+	status_t error = add_select_sync_pool_entry(&device->select_pool, sync,
+		event);
+	if (error != B_OK) {
+		ERROR("add_select_sync_pool_entry() failed: %#" B_PRIx32 "\n", error);
+		return error;
+	}
+
+	if (device->updated)
+		notify_select_event(sync, event);
+
+	return B_OK;
+}
+
+
+static status_t
+acpi_ac_deselect(void *_cookie, uint8 event, selectsync *sync)
+{
+	acpi_ac_device_info* device = (acpi_ac_device_info*)_cookie;
+
+	if (event != B_SELECT_READ)
+		return B_BAD_VALUE;
+
+	return remove_select_sync_pool_entry(&device->select_pool, sync, event);
+}
 
 static status_t
 acpi_ac_close (void* cookie)
@@ -223,8 +263,8 @@ acpi_ac_init_driver(device_node *node, void **_driverCookie)
 	}
 
 	device->last_status = 0;
-
-	acpi_ac_update_status(device);
+	device->updated = false;
+	device->select_pool = NULL;
 
 	*_driverCookie = device;
 	return B_OK;
@@ -304,9 +344,8 @@ struct device_module_info acpi_ac_device_module = {
 	acpi_ac_write,
 	NULL,
 	acpi_ac_control,
-
-	NULL,
-	NULL
+	acpi_ac_select,
+	acpi_ac_deselect
 };
 
 module_info *modules[] = {
