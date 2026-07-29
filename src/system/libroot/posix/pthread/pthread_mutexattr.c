@@ -150,7 +150,7 @@ pthread_mutexattr_getprotocol(const pthread_mutexattr_t *_mutexAttr,
 		return B_BAD_VALUE;
 	}
 
-	*_protocol = 0;
+	*_protocol = PTHREAD_PRIO_NONE;
 		// not implemented
 
 	return B_OK;
@@ -165,6 +165,8 @@ pthread_mutexattr_setprotocol(pthread_mutexattr_t *_mutexAttr, int protocol)
 	if (_mutexAttr == NULL || (attr = *_mutexAttr) == NULL)
 		return B_BAD_VALUE;
 
+	if (protocol != PTHREAD_PRIO_NONE)
+		return ENOTSUP;
 	// not implemented
-	return B_NOT_ALLOWED;
+	return B_OK;
 }
