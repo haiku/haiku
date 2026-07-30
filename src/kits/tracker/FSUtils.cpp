@@ -3085,27 +3085,40 @@ _DeleteTask(BObjectList<entry_ref, true>* list, bool confirm)
 	int32 totalItems = 0;
 	int64 totalSize = 0;
 
-	status_t status = CalcItemsAndSize(&loopControl, list, 0, &totalItems,
-		&totalSize);
-	if (status == B_OK) {
+	status_t result = CalcItemsAndSize(&loopControl, list, 0, &totalItems, &totalSize);
+	if (result == B_OK) {
 		loopControl.Init(totalItems, totalItems);
 
+		entry_ref* ref;
+		BEntry entry;
 		int32 numItems = list->CountItems();
 		for (int32 index = 0; index < numItems; index++) {
-			entry_ref ref(*list->ItemAt(index));
-			BEntry entry(&ref);
-			loopControl.UpdateStatus(ref.name, ref, 1, true);
-			if (entry.IsDirectory())
-				status = FSDeleteFolder(&entry, &loopControl, true, true, true);
-			else
-				status = entry.Remove();
+			ref = list->ItemAt(index);
+			if (ref != NULL) {
+				entry.SetTo(ref);
+				result = entry.InitCheck();
+				if (result == B_OK) {
+					if (entry.IsDirectory()) {
+						result = FSDeleteFolder(&entry, &loopControl, true, true, true);
+					} else {
+						loopControl.UpdateStatus(ref->name, *ref, 1, true);
+						result = entry.Remove();
+					}
+				}
+				entry.Unset();
+			} else {
+				result = B_BAD_VALUE;
+			}
+
+			if (result != B_OK)
+				break;
 		}
 
-		if (status != kTrashCanceled && status != kUserCanceled
-			&& status != B_OK) {
-			BAlert* alert = new BAlert("", B_TRANSLATE("Error deleting items"),
-				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT);
+		if (result != kTrashCanceled && result != kUserCanceled && result != B_OK) {
+			BString buffer(B_TRANSLATE("Error deleting items: %error"));
+			buffer.ReplaceFirst("%error", strerror(result));
+			BAlert* alert = new BAlert("", buffer.String(),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
