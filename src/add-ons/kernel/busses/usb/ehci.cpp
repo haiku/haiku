@@ -1256,9 +1256,8 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 			"\n", currentPhy);
 		for (int32 i = 0; i < 8 && dataLength > 0; i++) {
 			size_t length = min_c(dataLength, packetSize);
-			itd->token[i] = (EHCI_ITD_STATUS_ACTIVE << EHCI_ITD_STATUS_SHIFT)
-				| (length << EHCI_ITD_TLENGTH_SHIFT) | (pg << EHCI_ITD_PG_SHIFT)
-				| (offset << EHCI_ITD_TOFFSET_SHIFT);
+			itd->token[i] = EHCI_ITD_STATUS(EHCI_ITD_STATUS_ACTIVE)
+				| EHCI_ITD_TLENGTH(length) | EHCI_ITD_PG(pg) | EHCI_ITD_TOFFSET(offset);
 			itd->last_token = i;
 			TRACE("isochronous filled slot %" B_PRId32 " 0x%" B_PRIx32 "\n", i,
 				itd->token[i]);
@@ -1276,15 +1275,12 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 
 		currentPhy += (offset & 0xfff) - (currentPhy & 0xfff);
 
-		itd->buffer_phy[0]
-			|= (pipe->EndpointAddress() << EHCI_ITD_ENDPOINT_SHIFT)
-				| (pipe->DeviceAddress() << EHCI_ITD_ADDRESS_SHIFT);
-		itd->buffer_phy[1]
-			|= (pipe->MaxPacketSize() & EHCI_ITD_MAXPACKETSIZE_MASK)
-				| (directionIn << EHCI_ITD_DIR_SHIFT);
+		itd->buffer_phy[0] |= EHCI_ITD_ENDPOINT(pipe->EndpointAddress())
+			| EHCI_ITD_ADDRESS(pipe->DeviceAddress());
+		itd->buffer_phy[1] |= EHCI_ITD_MAXPACKETSIZE(pipe->MaxPacketSize())
+				| EHCI_ITD_DIR(directionIn);
 		itd->buffer_phy[2]
-			|= ((((pipe->MaxPacketSize() >> EHCI_ITD_MAXPACKETSIZE_LENGTH) + 1)
-				& EHCI_ITD_MUL_MASK) << EHCI_ITD_MUL_SHIFT);
+			|= EHCI_ITD_MUL((pipe->MaxPacketSize() >> EHCI_ITD_MAXPACKETSIZE_LENGTH) + 1);
 
 		TRACE("isochronous filled itd buffer_phy[0,1,2] 0x%" B_PRIx32 ", 0x%"
 			B_PRIx32 " 0x%" B_PRIx32 "\n",
@@ -2167,7 +2163,7 @@ EHCI::FinishIsochronousTransfers()
 					" 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx32 "\n",
 					itd->token[0], itd->token[1], itd->token[2], itd->token[3],
 					itd->token[4], itd->token[5], itd->token[6], itd->token[7]);
-				if (((itd->token[itd->last_token] >> EHCI_ITD_STATUS_SHIFT)
+				if ((EHCI_ITD_STATUS_GET(itd->token[itd->last_token])
 					& EHCI_ITD_STATUS_ACTIVE) == EHCI_ITD_STATUS_ACTIVE) {
 					TRACE("FinishIsochronousTransfers unprocessed active itd\n");
 				}
@@ -2184,7 +2180,7 @@ EHCI::FinishIsochronousTransfers()
 					TRACE("FinishIsochronousTransfers active transfer\n");
 					size_t actualLength = 0;
 					status_t status = B_OK;
-					if (((itd->buffer_phy[1] >> EHCI_ITD_DIR_SHIFT) & 1) != 0) {
+					if (EHCI_ITD_DIR_GET(itd->buffer_phy[1]) != 0) {
 						status = transfer->transfer->PrepareKernelAccess();
 						if (status == B_OK)
 							actualLength = ReadIsochronousDescriptorChain(transfer);
@@ -3063,12 +3059,9 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 		for (uint32 j = 0; j <= itd->last_token
 			&& packet < isochronousData->packet_count; j++) {
 
-			size_t bufferSize = (itd->token[j] >> EHCI_ITD_TLENGTH_SHIFT)
-				& EHCI_ITD_TLENGTH_MASK;
-			if (((itd->token[j] >> EHCI_ITD_STATUS_SHIFT)
-				& EHCI_ITD_STATUS_MASK) != 0) {
+			size_t bufferSize = EHCI_ITD_TLENGTH_GET(itd->token[j]);
+			if (EHCI_ITD_STATUS_GET(itd->token[j]) != 0)
 				bufferSize = 0;
-			}
 			isochronousData->packet_descriptors[packet].actual_length
 				= bufferSize;
 
