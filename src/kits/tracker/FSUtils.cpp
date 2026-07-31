@@ -572,10 +572,9 @@ FSDelete(entry_ref* ref, bool async, bool confirm)
 void
 FSDeleteRefList(BObjectList<entry_ref, true>* list, bool async, bool confirm)
 {
-	if (async) {
-		LaunchInNewThread("DeleteTask", B_NORMAL_PRIORITY, _DeleteTask, list,
-			confirm);
-	} else
+	if (async)
+		LaunchInNewThread("DeleteTask", B_NORMAL_PRIORITY, _DeleteTask, list, confirm);
+	else
 		_DeleteTask(list, confirm);
 }
 
@@ -583,10 +582,9 @@ FSDeleteRefList(BObjectList<entry_ref, true>* list, bool async, bool confirm)
 void
 FSRestoreRefList(BObjectList<entry_ref, true>* list, bool async)
 {
-	if (async) {
-		LaunchInNewThread("RestoreTask", B_NORMAL_PRIORITY, _RestoreTask,
-			list);
-	} else
+	if (async)
+		LaunchInNewThread("RestoreTask", B_NORMAL_PRIORITY, _RestoreTask, list);
+	else
 		_RestoreTask(list);
 }
 
@@ -2537,8 +2535,7 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix, size_t s
 	fnum = 1;
 	strlcpy(tempName, name, sizeof(tempName));
 	while (destDir->Contains(tempName)) {
-		snprintf(tempName, sizeof(tempName), "%s %" B_PRId32, copybase,
-			++fnum);
+		snprintf(tempName, sizeof(tempName), "%s %" B_PRId32, copybase, ++fnum);
 
 		if (strlen(tempName) > (B_FILE_NAME_LENGTH - 1)) {
 			// The name has grown too long. Maybe we just went from
@@ -2547,8 +2544,7 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix, size_t s
 			// truncate the 'root' name and continue.
 			// ??? should we reset fnum or not ???
 			root[strlen(root) - 1] = '\0';
-			snprintf(tempName, sizeof(tempName), "%s%s %" B_PRId32, root,
-				suffix, fnum);
+			snprintf(tempName, sizeof(tempName), "%s%s %" B_PRId32, root, suffix, fnum);
 		}
 	}
 
@@ -2755,8 +2751,7 @@ FSGetBootDeskDir(BDirectory* deskDir)
 	BVolumeRoster().GetBootVolume(&bootVolume);
 	BPath path;
 
-	status_t result = find_directory(B_DESKTOP_DIRECTORY, &path, true,
-		&bootVolume);
+	status_t result = find_directory(B_DESKTOP_DIRECTORY, &path, true, &bootVolume);
 	if (result != B_OK)
 		return result;
 
@@ -2927,8 +2922,7 @@ DirectoryMatches(const BEntry* entry, directory_which which)
 
 
 bool
-DirectoryMatches(const BEntry* entry, const char* additionalPath,
-	directory_which which)
+DirectoryMatches(const BEntry* entry, const char* additionalPath, directory_which which)
 {
 	BPath path;
 	if (find_directory(which, &path, false, NULL) != B_OK)
@@ -3122,6 +3116,7 @@ _DeleteTask(BObjectList<entry_ref, true>* list, bool confirm)
 	return B_OK;
 }
 
+
 status_t
 FSRecursiveCreateFolder(BPath path)
 {
@@ -3148,6 +3143,7 @@ FSRecursiveCreateFolder(BPath path)
 	return B_OK;
 }
 
+
 status_t
 _RestoreTask(BObjectList<entry_ref, true>* list)
 {
@@ -3157,8 +3153,7 @@ _RestoreTask(BObjectList<entry_ref, true>* list)
 	int32 totalItems = 0;
 	int64 totalSize = 0;
 
-	status_t err = CalcItemsAndSize(&loopControl, list, 0, &totalItems,
-		&totalSize);
+	status_t err = CalcItemsAndSize(&loopControl, list, 0, &totalItems, &totalSize);
 	if (err == B_OK) {
 		loopControl.Init(totalItems, totalItems);
 
@@ -3178,6 +3173,7 @@ _RestoreTask(BObjectList<entry_ref, true>* list)
 			err = originalPath.GetParent(&parentPath);
 			if (err != B_OK)
 				continue;
+
 			BEntry parentEntry(parentPath.Path());
 
 			if (parentEntry.InitCheck() != B_OK || !parentEntry.Exists()) {
@@ -3210,6 +3206,7 @@ _RestoreTask(BObjectList<entry_ref, true>* list)
 
 	return err;
 }
+
 
 void
 FSCreateTrashDirs()

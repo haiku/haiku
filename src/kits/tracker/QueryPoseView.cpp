@@ -259,8 +259,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		oldPoseList->AddList(fPoseList);
 	}
 
-	fQueryListContainer = new QueryEntryListCollection(&sourceModel, this,
-		oldPoseList);
+	fQueryListContainer = new QueryEntryListCollection(&sourceModel, this, oldPoseList);
 	if (fQueryListContainer->InitCheck() != B_OK) {
 		delete fQueryListContainer;
 		fQueryListContainer = NULL;
@@ -786,11 +785,11 @@ QueryEntryListCollection::PathFilter(const entry_ref* ref) const
 	BPath path(ref);
 	if (path.InitCheck() != B_OK)
 		return false;
-	const char* pathStr = path.Path();
 
+	const char* pathString = path.Path();
 	for (int32 i = 0; i < fQueryListRep->fPathFilters.CountStrings(); i++) {
 		BString filterPath = fQueryListRep->fPathFilters.StringAt(i);
-		if (strncmp(filterPath.String(), pathStr, filterPath.Length()) == 0)
+		if (strncmp(filterPath.String(), pathString, filterPath.Length()) == 0)
 			return true;
 	}
 

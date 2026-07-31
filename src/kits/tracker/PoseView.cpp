@@ -6215,13 +6215,10 @@ BPoseView::MoveListToTrash(BObjectList<entry_ref, true>* list, bool selectNext,
 		// new owning list of tasks
 
 	// first move selection to trash,
-	if (deleteDirectly) {
-		taskList->AddItem(NewFunctionObject(FSDeleteRefList, list,
-			false, true));
-	} else {
-		taskList->AddItem(NewFunctionObject(FSMoveToTrash, list,
-			(BList*)NULL, false));
-	}
+	if (deleteDirectly)
+		taskList->AddItem(NewFunctionObject(FSDeleteRefList, list, false, true));
+	else
+		taskList->AddItem(NewFunctionObject(FSMoveToTrash, list, (BList*)NULL, false));
 
 	if (selectNext && ViewMode() == kListMode) {
 		// next, if in list view mode try selecting the next item after
