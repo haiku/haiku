@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1792277746
+1	japanese	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		フォル�
 (unknown)	InfoWindow		(不明)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# 日>}}
 Trailing \\.	libtracker		行末に \\ があります。
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		%func にて\nfind_directory() が失敗。\nエラー: %error
 Handles any file	OpenWithWindow		すべてのファイルに対応
 save text	FilePanelPriv		テキストの保存
 Raw data	AttributesView		生データ
@@ -145,7 +144,6 @@ Disks	Model		ディスク
 Create a Query template	FindPanel		クエリテンプレートの作成
 Size	FindPanel		サイズ
 New submenu	ContainerWindow	Folder name of New-template submenu	新規サブメニュー
-OK	Email Query Columns		OK
 Location	QueryPoseView		場所
 Edit query	ContainerWindow		クエリの編集
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# バイト)} other{(# バイト)}}
@@ -198,8 +196,8 @@ Media parameter web	AttributesView		メディアパラメーターウェブ
 Sorry, you can't save things at the root of your system.	FilePanelPriv		システムのルートフォルダーへの保存は許可されていません。
 Restore	ContainerWindow		元に戻す
 Location	ContainerWindow		場所
-Skip	FSUtils		スキップ
 Warning space color	SettingsView		空き容量警告の色
+Skip	FSUtils		スキップ
 Text list	AttributesView		テキストリスト
 Used space color	SettingsView		使用済容量の色
 Cancel	FSUtils		中止
@@ -325,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ア�
 Create %s clipping	PoseView		%s クリップの作成
 Error moving \"%name\"	FSUtils		\"%name\" の移動中にエラーが発生
 To: %dir	StatusWindow		%dir
-Cancel	Tracker		中止
 Paste layout	ContainerWindow		レイアウトを貼り付け
+Cancel	Tracker		中止
 yes	AttributesView		はい
 Make active printer	ContainerWindow		プリンターを有効にする
 Copy to	ContainerWindow		次へコピー

@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-softwareupdater	1377379822
+1	czech	x-vnd.haiku-softwareupdater	2012285635
 Updating version	SoftwareUpdaterWindow	List item text	Aktualizuji verzi
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klikněte zde pro instalaci {0, plural, one{# aktualizovaného balíčku} other{# aktualizovaných balíčků}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Balíčky k odinstalování
@@ -8,6 +8,7 @@ There were no updates found.	CheckManager		Žádné aktualizace nebyly nalezeny.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Instalace aktualizací nebyla dokončena, opravdu ji chcete ukončit?
 Updates found	SoftwareUpdaterWindow		Nalezeny aktualizace
 Update now	SoftwareUpdaterWindow		Aktualizovat nyní
+Settings	SoftwareUpdaterWindow		Nastavení
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Z nějakého důvodu se nepodařilo restartovat váš počítač.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Nerozpoznaný argument
@@ -16,7 +17,9 @@ No updates available	UpdateAction		Nejsou dostupné žádné aktualizace
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Nové balíčky k instalaci
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Balíčky k aktualizaci
 to	SoftwareUpdaterWindow	List item text	do
+Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		Klikněte zde pro spuštění %appname%. U některých aktualizací bude potřeba zvolit řešení problémů.
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Pokouším se o zrušení aktualizací…
+Automatically clean up old install states	SoftwareUpdaterWindow		Automaticky čistit staré stavy
 Contacting software repositories to check for package updates.	CheckManager		Připojování k softwarovým repozitářum na kontrolu aktualizací balíčku.
 Available updates found	CheckManager		Nalezeny dostupné aktualizace
 from repository	SoftwareUpdaterWindow	List item text	z repozitáře
@@ -54,6 +57,7 @@ Update	SoftwareUpdaterWindow	Alert button label	Aktualizace
 Updates did not complete	UpdateAction		Instalace aktualizací nebyla dokončena
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Otevřít repozitáře
 Invalid update type, cannot continue with updates	UpdateAction		Chybný typ aktualizace, nelze pokračovat
+Settings…	SoftwareUpdaterWindow		Nastavení…
 Uninstalling version	SoftwareUpdaterWindow	List item text	Odinstalace verze
 %i of %i	UpdateManager	Do not translate %i	%i z %i
 Quit	SoftwareUpdaterWindow		Ukončit

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	1792277746
+1	ukrainian	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Ви не �
 (unknown)	InfoWindow		(невідомо)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# дати>}}
 Trailing \\.	libtracker		Змінний \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		В %func \nзбій find_directory(). \nПричина: %error
 Handles any file	OpenWithWindow		Обробляє усі файли
 save text	FilePanelPriv		зберегти текст
 Raw data	AttributesView		Raw-дані
@@ -145,7 +144,6 @@ Disks	Model		Диски
 Create a Query template	FindPanel		Створення шаблону запиту
 Size	FindPanel		Розмір
 New submenu	ContainerWindow	Folder name of New-template submenu	Нове підменю
-OK	Email Query Columns		ОК
 Location	QueryPoseView		Розташування
 Edit query	ContainerWindow		Редагувати запит
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# байт)} few{(# байти)} other{# (байтів)}}
@@ -198,8 +196,8 @@ Media parameter web	AttributesView		Медіа параметри веб
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Дійсно, Ви не можете зберігати у кореневому каталозі системи.
 Restore	ContainerWindow		Відновити
 Location	ContainerWindow		Розташування
-Skip	FSUtils		Пропустити
 Warning space color	SettingsView		Колір області повідомлень
+Skip	FSUtils		Пропустити
 Text list	AttributesView		Текстовий список
 Used space color	SettingsView		Колір використаної області
 Cancel	FSUtils		Скасувати
@@ -325,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не 
 Create %s clipping	PoseView		Зберегти фрагмент як %s
 Error moving \"%name\"	FSUtils		Помилка переміщення \«%name\»
 To: %dir	StatusWindow		До: %dir
-Cancel	Tracker		Скасувати
 Paste layout	ContainerWindow		Вставити макет
+Cancel	Tracker		Скасувати
 yes	AttributesView		так
 Make active printer	ContainerWindow		Зробити принтер активним
 Copy to	ContainerWindow		Копіювати до

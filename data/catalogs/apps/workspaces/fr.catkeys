@@ -1,12 +1,12 @@
 1	french	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Quitter
+Show window tab	Workspaces		Afficher l’onglet de la fenêtre
+Live in the Deskbar	Workspaces		Loger dans la Deskbar
+Switch on mouse wheel	Workspaces		Basculer avec la molette de souris
 Invalid argument: %s\n	Workspaces		Argument invalide : %s\n
 Change workspace count…	Workspaces		Changer le nombre de bureaux virtuels…
 Always on top	Workspaces		Toujours au dessus
 Show window border	Workspaces		Montrer la bordure de fenêtre
-Show window tab	Workspaces		Afficher l’onglet de la fenêtre
 Auto-raise	Workspaces		Auto-montée
 Remove replicant	Workspaces		Enlever le réplicant
-Live in the Deskbar	Workspaces		Loger dans la Deskbar
-Switch on mouse wheel	Workspaces		Basculer avec la molette de souris
 Workspaces	System name		Bureaux

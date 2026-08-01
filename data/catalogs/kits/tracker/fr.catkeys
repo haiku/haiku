@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2012592487
+1	french	x-vnd.Haiku-libtracker	2901759957
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Vous ne pou
 (unknown)	InfoWindow		(inconnu)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, one{<# date>} other{<# dates>}}
 Trailing \\.	libtracker		Les \\ à la fin.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Dans %func\nfind_directory() a échoué.\nMotif : %error
 Handles any file	OpenWithWindow		Manipule n’importe quel fichier
 save text	FilePanelPriv		sauvegarder le texte
 Raw data	AttributesView		Données brutes
@@ -141,7 +140,6 @@ Cut	ContainerWindow		Couper
 Disks	Model		Disques
 Create a Query template	FindPanel		Créer un modèle de requête
 Size	FindPanel		Taille
-OK	Email Query Columns		OK
 Location	QueryPoseView		Emplacement
 Edit query	ContainerWindow		Éditer la requète
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# octet)} other{(# octets)}}
@@ -190,8 +188,8 @@ by name	FindPanel		par nom
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Désolé, vous ne pouvez rien sauvegarder à la racine de votre système.
 Restore	ContainerWindow		Restaurer
 Location	ContainerWindow		Emplacement
-Skip	FSUtils		Passer
 Warning space color	SettingsView		Couleur d’espace faible
+Skip	FSUtils		Passer
 Text list	AttributesView		Liste de textes
 Used space color	SettingsView		Couleur de l’espace utilisé
 Cancel	FSUtils		Annuler
@@ -313,8 +311,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impos
 Create %s clipping	PoseView		Créer un extrait de %s
 Error moving \"%name\"	FSUtils		Erreur lors du déplacement de « %name »
 To: %dir	StatusWindow		Vers : %dir
-Cancel	Tracker		Annuler
 Paste layout	ContainerWindow		Coller la disposition
+Cancel	Tracker		Annuler
 yes	AttributesView		oui
 Make active printer	ContainerWindow		Activer l’imprimante
 Copy to	ContainerWindow		Copier vers

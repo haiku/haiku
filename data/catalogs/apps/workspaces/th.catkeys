@@ -1,12 +1,12 @@
 1	thai	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		ออก
+Show window tab	Workspaces		แสดงแท็บหน้าต่าง
+Live in the Deskbar	Workspaces		แสดงอยู่ในเดสก์บาร์
+Switch on mouse wheel	Workspaces		สลับโดยใช้ล้อเลื่อนของเมาส์
 Invalid argument: %s\n	Workspaces		อาร์กิวเมนต์ไม่ถูกต้อง: %s\n
 Change workspace count…	Workspaces		เปลี่ยนจำนวนพื้นที่ทำงาน
 Always on top	Workspaces		อยู่ด้านบนเสมอ
 Show window border	Workspaces		แสดงกรอบหน้าต่าง
-Show window tab	Workspaces		แสดงแท็บหน้าต่าง
 Auto-raise	Workspaces		ยกขึ้นอัตโนมัติ
 Remove replicant	Workspaces		ลบแบบจำลอง
-Live in the Deskbar	Workspaces		แสดงอยู่ในเดสก์บาร์
-Switch on mouse wheel	Workspaces		สลับโดยใช้ล้อเลื่อนของเมาส์
 Workspaces	System name		พื้นที่ทำงาน

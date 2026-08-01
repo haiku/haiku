@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1792277746
+1	catalan; valencian	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		No podeu re
 (unknown)	InfoWindow		(desconegut)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dates>}}
 Trailing \\.	libtracker		Final \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		A %func \nha fallat find_directory(). \nRaó: %error
 Handles any file	OpenWithWindow		Gestiona qualsevol fitxer
 save text	FilePanelPriv		desa el text
 Raw data	AttributesView		Dades en cru
@@ -145,7 +144,6 @@ Disks	Model		Discs
 Create a Query template	FindPanel		Crea una plantilla de consulta
 Size	FindPanel		Mida
 New submenu	ContainerWindow	Folder name of New-template submenu	Submenú nou
-OK	Email Query Columns		D'acord
 Location	QueryPoseView		Ubicació
 Edit query	ContainerWindow		Edita la consulta
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -198,8 +196,8 @@ Media parameter web	AttributesView		Paràmetre web multimèdia
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Disculpeu, no podeu desar fitxers a la carpeta d'arrel del sistema.
 Restore	ContainerWindow		Restaura
 Location	ContainerWindow		Ubicació
-Skip	FSUtils		Omet
 Warning space color	SettingsView		L'espai de color és feble
+Skip	FSUtils		Omet
 Text list	AttributesView		Llista de text
 Used space color	SettingsView		Espai de color usat
 Cancel	FSUtils		Cancel·la
@@ -325,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No s'
 Create %s clipping	PoseView		Crea un retall de %s
 Error moving \"%name\"	FSUtils		Error en moure \"%name\"
 To: %dir	StatusWindow		A: %dir
-Cancel	Tracker		Cancel·la
 Paste layout	ContainerWindow		Enganxa la disposició
+Cancel	Tracker		Cancel·la
 yes	AttributesView		sí
 Make active printer	ContainerWindow		Estableix com a impressora activa
 Copy to	ContainerWindow		Copia a

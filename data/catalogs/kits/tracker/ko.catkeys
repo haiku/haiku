@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-libtracker	3981496960
+1	korean	x-vnd.Haiku-libtracker	575697134
 Created	ContainerWindow		생성일
 Icon	AttributesView		아이콘
 Open and make preferred	OpenWithWindow		열고 연결 프로그램으로 지정
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		폴더나 �
 (unknown)	InfoWindow		(알 수 없음)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<#일>}}
 Trailing \\.	libtracker		\\ 추적 중.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		%func \nfind_directory() 실패함. \n이유: %erro
 Handles any file	OpenWithWindow		모든 파일 핸들링
 save text	FilePanelPriv		텍스트 저장
 Raw data	AttributesView		원본 데이터
@@ -144,7 +143,6 @@ Disks	Model		디스크
 Create a Query template	FindPanel		쿼리 템플릿 만들기
 Size	FindPanel		크기
 New submenu	ContainerWindow	Folder name of New-template submenu	새 하위 메뉴
-OK	Email Query Columns		확인
 Location	QueryPoseView		위치
 Edit query	ContainerWindow		쿼리 편집
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# 바이트)} other{(# 바이트)}}
@@ -195,8 +193,8 @@ Media parameter web	AttributesView		미디어 매개변수 웹
 Sorry, you can't save things at the root of your system.	FilePanelPriv		시스템의 루트에는 저장할 수 없습니다.
 Restore	ContainerWindow		복원
 Location	ContainerWindow		위치
-Skip	FSUtils		건너뛰기
 Warning space color	SettingsView		경고 공간 색상
+Skip	FSUtils		건너뛰기
 Text list	AttributesView		텍스트 목록
 Used space color	SettingsView		사용된 공간 색상
 Cancel	FSUtils		취소
@@ -318,8 +316,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%do
 Create %s clipping	PoseView		%s 클립보드 만들기
 Error moving \"%name\"	FSUtils		\"%name\" 이동 중 오류가 발생했습니다.
 To: %dir	StatusWindow		목적지: %dir
-Cancel	Tracker		취소
 Paste layout	ContainerWindow		배치 붙여넣기
+Cancel	Tracker		취소
 yes	AttributesView		네
 Make active printer	ContainerWindow		활성 프린터 만들기
 Copy to	ContainerWindow		다음으로 복사

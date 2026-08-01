@@ -1,14 +1,16 @@
-1	czech	x-vnd.Be-TSKB	3780974715
+1	czech	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Automaticky skrývat
 Show all	WindowMenu		Ukázat vše
 Edit in Tracker…	PreferencesWindow		Upravit v Trackeru…
 Menu	PreferencesWindow		Nabídka
+Location	PreferencesWindow		Umístění
 Tracker always first	PreferencesWindow		Tracker vždy první
 Hide clock	TimeView		Skrýt hodiny
 Large	PreferencesWindow		Velké
 <Deskbar folder is empty>	DeskbarMenu		<složka Panel je prázdná>
 Recent documents	DeskbarMenu		Nedávné dokumenty
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikace
+%appname% preferences	PreferencesWindow		Předvolby %appname%
 Always on top	PreferencesWindow		Vždy na vrchu
 Restart system	DeskbarMenu		Restartovat systém
 Recent documents:	PreferencesWindow		Nedávné dokumenty:
@@ -28,12 +30,14 @@ Close all	WindowMenu		Zavřít vše
 About this system	DeskbarMenu		O tomto systému
 Quit application	WindowMenu		Ukončit aplikaci
 Hide application names	PreferencesWindow		Skrýt názvy aplikací
+Deskbar	System name		Panel
 Applications	PreferencesWindow		Aplikace
 Show application expander	PreferencesWindow		Zobrazit aplikační rozšíření
 Suspend	DeskbarMenu		Režim spánku
 Shutdown…	DeskbarMenu		Vypnout…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema
 Expand new applications	PreferencesWindow		Rozbalit nové aplikace
+%appname% preferences…	DeskbarMenu		Předvolby %appname%…
 Recent applications:	PreferencesWindow		Časté aplikace:
 Recent folders:	PreferencesWindow		Nedávné adresáře:
 Recent folders	DeskbarMenu		Nedávné adresáře

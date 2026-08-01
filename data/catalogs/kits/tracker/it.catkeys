@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	2992119353
+1	italian	x-vnd.Haiku-libtracker	3881286823
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Non è poss
 (unknown)	InfoWindow		(sconosciuto)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# date>}}
 Trailing \\.	libtracker		\\ alla fine.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Su %func\nErrore su find_directory().\nMotivo: %error
 Handles any file	OpenWithWindow		Gestisce qualsiasi file
 save text	FilePanelPriv		salva testo
 Raw data	AttributesView		Dati grezzi
@@ -144,7 +143,6 @@ Disks	Model		Dischi
 Create a Query template	FindPanel		Crea un modello di interrogazione
 Size	FindPanel		Dimensione
 New submenu	ContainerWindow	Folder name of New-template submenu	Nuovo sottomenu
-OK	Email Query Columns		OK
 Location	QueryPoseView		Posizione
 Edit query	ContainerWindow		Modifica interrogazione
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# byte)}}
@@ -196,8 +194,8 @@ Media parameter web	AttributesView		Parametro multimediale web
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Non è possibile salvare nulla sulla directory principale (root) del sistema.
 Restore	ContainerWindow		Ripristina
 Location	ContainerWindow		Posizione
-Skip	FSUtils		Salta
 Warning space color	SettingsView		Colore area di avvertimento
+Skip	FSUtils		Salta
 Text list	AttributesView		Lista di testo
 Used space color	SettingsView		Colore spazio utilizzato
 Cancel	FSUtils		Annulla
@@ -320,8 +318,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Non �
 Create %s clipping	PoseView		Crea l'appunto %s
 Error moving \"%name\"	FSUtils		Errore nello spostamento di \"%name\"
 To: %dir	StatusWindow		A: %dir
-Cancel	Tracker		Annulla
 Paste layout	ContainerWindow		Incolla layout
+Cancel	Tracker		Annulla
 yes	AttributesView		si
 Make active printer	ContainerWindow		Rendi la stampante attiva
 Copy to	ContainerWindow		Copia in

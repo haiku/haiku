@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	2373940262
+1	slovak	x-vnd.Haiku-libtracker	3263107732
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Open with…	ContainerWindow		Otvoriť pomocou…
@@ -30,7 +30,6 @@ Error in regular expression:\n\n'%errstring'	PoseView		Chyba v regulárnom výra
 Would you like to find a suitable application to open the file?	FSUtils		Chcete nájsť vhodnú aplikáciu na otvorenie súboru?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nemôžete nahradiť priečinok alebo symbolický odkaz súborom.
 Trailing \\.	libtracker		\\ na konci.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		V %func \nfind_directory() zlyhalo. \nDôvod: %error
 Handles any file	OpenWithWindow		Pracuje s ľubovoľným súborom
 save text	FilePanelPriv		uložiť text
 Preparing to move items…	StatusWindow		Pripravuje sa presunutie položiek…
@@ -112,7 +111,6 @@ Cut	ContainerWindow		Vystrihnúť
 Disks	Model		Disky
 Create a Query template	FindPanel		Vytvoriť šablónu Požiadavky
 Size	FindPanel		Veľkosť
-OK	Email Query Columns		OK
 Location	QueryPoseView		Umiestnenie
 Edit query	ContainerWindow		Upraviť Požiadavku
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{# bajt} few{# bajty} other{# bajtov}}
@@ -154,8 +152,8 @@ by name	FindPanel		podľa názvu
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Ľutujeme, nemôžete ukladať veci do koreňového adresára systému.
 Restore	ContainerWindow		Obnoviť
 Location	ContainerWindow		Umiestnenie
-Skip	FSUtils		Preskočiť
 Warning space color	SettingsView		Farba priestoru upozornenia
+Skip	FSUtils		Preskočiť
 Used space color	SettingsView		Farba využitého miesta
 Cancel	FSUtils		Zrušiť
 Original name	ContainerWindow		Pôvodný názov
@@ -252,8 +250,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nebol
 Create %s clipping	PoseView		Vytvoriť orezanie %s
 Error moving \"%name\"	FSUtils		Chyba pri presúvaní „%name“
 To: %dir	StatusWindow		Do: %dir
-Cancel	Tracker		Zrušiť
 Paste layout	ContainerWindow		Vložiť rozloženie
+Cancel	Tracker		Zrušiť
 Make active printer	ContainerWindow		Urobiť tlačiareň aktívnou
 Copy to	ContainerWindow		Kopírovať do
 Name	SelectionWindow		Názov

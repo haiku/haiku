@@ -1,7 +1,8 @@
-1	friulian	x-vnd.Haiku-Media	4055972908
+1	friulian	x-vnd.Haiku-Media	2686142259
 Couldn't add volume control in Deskbar: %s\n	Media views		Impussibil zontâ il control dal volum tal Deskbar: %s\n
 Restart media services	Media views		Torne a inviâ i servizis multimediâi
 Quit	Media Window		Jes
+Quitting %prefname% now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Cumò, la jessude di %prefname% no fasarà tornâ a inviâ i servizis multimediâi. Il risultât probabil al è chel di vê une funzionalitât multimediâl instabile o no disponibile. 
 <none>	VideoInputMenu	Used when no video input is available	<nissune>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Impussibil gjavâ il control dal volum dal Deskbar: %s\n
 Video output:	Media views		Jessude video:

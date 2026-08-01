@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	180772908
+1	polish	x-vnd.Haiku-libtracker	1069940378
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Nie możesz
 (unknown)	InfoWindow		(nieznany)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, few{<# daty>} many{<# dat>} other{<# daty>}}
 Trailing \\.	libtracker		Końcowe \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		W %func \nfind_directory() nie powiódł się. \nPowód: %error
 Handles any file	OpenWithWindow		Obsługuje każdy plik
 save text	FilePanelPriv		zapisz tekst
 Raw data	AttributesView		Surowe dane
@@ -141,7 +140,6 @@ Cut	ContainerWindow		Wytnij
 Disks	Model		Dyski
 Create a Query template	FindPanel		Stwórz szablon Zapytania
 Size	FindPanel		Rozmiar
-OK	Email Query Columns		OK
 Location	QueryPoseView		Ścieżka
 Edit query	ContainerWindow		Edytuj zapytanie
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# bajt)} few{(# bajty)} many{(# bajtów)} other{(# bajta)}}
@@ -191,8 +189,8 @@ Media parameter web	AttributesView		Sieć parametrów mediów
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Przepraszamy, nie możesz zapisywać w katalogu głównym systemu.
 Restore	ContainerWindow		Przywróć
 Location	ContainerWindow		Ścieżka
-Skip	FSUtils		Pomiń
 Warning space color	SettingsView		Błąd przestrzeni kolorów
+Skip	FSUtils		Pomiń
 Text list	AttributesView		Lista tekstów
 Used space color	SettingsView		Kolor zajętego miejsca
 Cancel	FSUtils		Anuluj
@@ -313,8 +311,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nie m
 Create %s clipping	PoseView		Utwórz wycinek %s
 Error moving \"%name\"	FSUtils		Błąd przy przenoszeniu „%name”
 To: %dir	StatusWindow		Do: %dir
-Cancel	Tracker		Anuluj
 Paste layout	ContainerWindow		Wklej układ
+Cancel	Tracker		Anuluj
 yes	AttributesView		tak
 Make active printer	ContainerWindow		Ustaw jako aktywną drukarkę
 Copy to	ContainerWindow		Kopiuj do

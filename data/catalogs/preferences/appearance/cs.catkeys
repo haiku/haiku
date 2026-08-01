@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Appearance	3146871853
+1	czech	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Okraj ovládacího prvku
 Control mark	Colors tab		Označení ovládacího prvku
 Off	AntialiasingSettingsView		Vypnuto
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		Automaticky vybrat náhradní ba
 Window tab text	Colors tab		Text záložky okna
 Navigation pulse	Colors tab		Navigační puls
 LCD subpixel	AntialiasingSettingsView		LCD subpixelové
+Progress bar	Colors tab		Proužek průběhu
 Window tab	Colors tab		Záložka okna
 Link text	Colors tab		Text odkazu
 Tooltip background	Colors tab		Pozadí nápovědy

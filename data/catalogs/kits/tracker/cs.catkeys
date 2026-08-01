@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	2992119353
+1	czech	x-vnd.Haiku-libtracker	659207416
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Nelze nahra
 (unknown)	InfoWindow		(neznámo)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, one{<# datum>} other{<# datumy>}}
 Trailing \\.	libtracker		\\ na konci.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		V %func \nfind_directory() selhalo. \nDůvod: %error
 Handles any file	OpenWithWindow		Obstarává jakýkoliv soubor
 save text	FilePanelPriv		uložit text
 Raw data	AttributesView		Surová data
@@ -103,6 +102,7 @@ Affine transform	AttributesView		Afinní transformace
 Window	ContainerWindow		Okno
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Odebrat
+You cannot create a link to the %trash% directory.	FSUtils		Nelze vytvořit odkaz na složku %trash%.
 Company	Person Query Columns		Společnost
 Select folders…	FindPanel		Vybrat adresáře…
 Recent documents	FavoritesMenu		Nedávné dokumenty
@@ -144,7 +144,6 @@ Disks	Model		Disky
 Create a Query template	FindPanel		Vytvořit šablonu Dotazu
 Size	FindPanel		Velikost
 New submenu	ContainerWindow	Folder name of New-template submenu	Nová podnabídka
-OK	Email Query Columns		OK
 Location	QueryPoseView		Umístnění
 Edit query	ContainerWindow		Změnit dotaz
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{# bajt} few{# bajty} other{# bajtů}}
@@ -164,6 +163,7 @@ Could not open \"%name\" (%error). 	FSUtils		Nelze otevřít \"%name\" (%error).
 Media parameter group	AttributesView		Skupina multimediálních parametrů
 %name info	InfoWindow	InfoWindow Title	%name info
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Pokud přesunete domovskou složku, %osName se může chovat nekorektně!\n\nOpravdu to chcete udělat?\n\nPokud trváte na přesunu domovské složky, podržte klávesu Shift a klikněte na \"Přesunout\".
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural,one{#/%total vybrán}few{#/%total vybrány}other{#/%total vybráno}}
 Property info	AttributesView		Vlastnost
 Sorry, you can't create links in the Trash.	PoseView		Bohužel, nelze vytvářet odkazy v koši.
 From	Email Query Columns		Od
@@ -196,8 +196,8 @@ Media parameter web	AttributesView		Adresa médií
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Bohužel, nelze ukládat do kořenu systému.
 Restore	ContainerWindow		Obnovit
 Location	ContainerWindow		Umístnění
-Skip	FSUtils		Přeskočit
 Warning space color	SettingsView		Barva upozornění
+Skip	FSUtils		Přeskočit
 Text list	AttributesView		Textový seznam
 Used space color	SettingsView		Barva použitého místa
 Cancel	FSUtils		Zrušit
@@ -261,6 +261,7 @@ New folder %d	FSUtils		Nový adresář %d
 Extended attribute	AttributesView		Rozšířený atribut
 Error %error loading Add-On %name.	ContainerWindow		Chyba %error při načítání doplňku %name.
 Unmatched brackets.	libtracker		Nepárové závorky.
+You cannot copy or move the 'printers' directory.	FSUtils		Nelze kopírovat ani přesunout složku 'tiskárny'.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Pokoušíte se nahradit položku:\n\t%name%dest\npoložkou:\n\t%name%src\n\nPřejete si ji nahradit tou, kterou právě %movemode?
 Empty Trash	ContainerWindow		Vysypat koš
 no supporting apps	OpenWithWindow		žádná vhodná aplikace
@@ -273,6 +274,7 @@ label too long	PoseView		štítek je příliš dlouhý
 Error creating link to \"%name\".	FSUtils		Chyba při vytváření odkazu na \"%name\".
 Unknown	FilePermissionsView		Neznámý
 Paste links	ContainerWindow		Vložit odkazy
+You cannot copy or move the %trash% directory.	FSUtils		Nelze kopírovat ani přesunout složku %trash%.
 Restoring: 	StatusWindow		Obnovuji: 
 The Tracker must be running to set the default printer.	PoseView		Pro nastavení výchozí tiskárny musí běžet Tracker.
 calculating…	InfoWindow		počítání…
@@ -320,8 +322,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nelze
 Create %s clipping	PoseView		Vytvořit %s výstřižek
 Error moving \"%name\"	FSUtils		Chyba přesunu \"%name\"
 To: %dir	StatusWindow		Do: %dir
-Cancel	Tracker		Zrušit
 Paste layout	ContainerWindow		Vložit rozložení
+Cancel	Tracker		Zrušit
 yes	AttributesView		ano
 Make active printer	ContainerWindow		Aktivovat tiskárnu
 Copy to	ContainerWindow		Kopírovat do
@@ -341,11 +343,13 @@ The entered file name is too long.	FSUtils		Zvolené jméno souboru je příliš
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Některé vybrané položky nemohou být přesunuty do Koše. Přejete si je místo toho odstranit? (Tato operace je nevratná.)
 Add printer…	ContainerWindow		Přidat tiskárnu…
 Permissions	ContainerWindow		Oprávnění
+Trash	FSUtils		Koš
 Size:	InfoWindow		Velikost:
 Copy	ContainerWindow		Kopírovat
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Vybraná položka nemůže být přesunuta do Koše. Přejete si ji místo toho odstranit? (Tato operace je nevratná.)
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Bohužel, atribut 'Písmeno' nemůže uchovávat vícebajtové znaky.
 And	FindPanel		a
+copy	PoseView	filename copy	kopie
 Palette-indexed picture	AttributesView		Obrázek s indexovanou paletou
 Drawing pattern	AttributesView		Výkresový vzor
 File offset	AttributesView		Ofset souboru

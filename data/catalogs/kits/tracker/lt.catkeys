@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	2477921595
+1	lithuanian	x-vnd.Haiku-libtracker	3367089065
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Open with…	ContainerWindow		Atverti naudojant…
@@ -28,7 +28,6 @@ Prompt	FSUtils		Klausti
 Error in regular expression:\n\n'%errstring'	PoseView		Klaida reguliariąjame reiškinyje:\n\n„%errstring“
 Would you like to find a suitable application to open the file?	FSUtils		Ar norite paieškoti tinkamos programos šiam failui atverti?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Aplanko arba simbolinės nuorodos pakeisti failu negalima.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ties %func \nnepavyko įvykdyti find_directory(). \nPriežastis: %error
 Handles any file	OpenWithWindow		Palaiko visus failus
 save text	FilePanelPriv		įrašyti tekstą
 Preparing to move items…	StatusWindow		Rengiamasi perkelti objektus…
@@ -97,7 +96,6 @@ Cut	ContainerWindow		Iškirpti
 Disks	Model		Tomai
 Create a Query template	FindPanel		Sukurti užklausos šabloną
 Size	FindPanel		Dydis
-OK	Email Query Columns		Gerai
 Location	QueryPoseView		Vieta
 Edit query	ContainerWindow		Taisyti užklausą
 Previously mounted disks	AutoMounterSettings		Praėjusį kartą prijungtus tomus
@@ -131,8 +129,8 @@ by name	FindPanel		pagal vardą
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Apgailestaujame, tačiau į šakninį failų sistemos aplanką nieko rašyti neleidžiama.
 Restore	ContainerWindow		Atkurti
 Location	ContainerWindow		Vieta
-Skip	FSUtils		Praleisti
 Warning space color	SettingsView		Užpildytos vietos spalva (įspėjant)
+Skip	FSUtils		Praleisti
 Used space color	SettingsView		Užpildytos vietos spalva
 Cancel	FSUtils		Atsisakyti
 Original name	ContainerWindow		Tikras vardas
@@ -223,8 +221,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo
 Create %s clipping	PoseView		Sukurti „%s“ tipo iškarpą
 Error moving \"%name\"	FSUtils		Klaida perkeliant „%name“
 To: %dir	StatusWindow		Į: %dir
-Cancel	Tracker		Atsisakyti
 Paste layout	ContainerWindow		Pritaikyti nukopijuotą išdėstymą
+Cancel	Tracker		Atsisakyti
 Make active printer	ContainerWindow		Laikyti numatytuoju spausdintuvu
 Copy to	ContainerWindow		Kopijuoti į
 Name	SelectionWindow		Vardas

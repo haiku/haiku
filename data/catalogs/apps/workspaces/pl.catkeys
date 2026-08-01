@@ -1,12 +1,12 @@
 1	polish	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Zakończ
+Show window tab	Workspaces		Pokaż kartę okna
+Live in the Deskbar	Workspaces		Rezyduje w Deskbarze
+Switch on mouse wheel	Workspaces		Przełącz kółkiem myszy
 Invalid argument: %s\n	Workspaces		Nieprawidłowy argument: %s\n
 Change workspace count…	Workspaces		Zmień liczbę przestrzeni roboczych…
 Always on top	Workspaces		Zawsze na wierzchu
 Show window border	Workspaces		Pokaż ramkę okna
-Show window tab	Workspaces		Pokaż kartę okna
 Auto-raise	Workspaces		Autoaktywacja
 Remove replicant	Workspaces		Usuń replikant
-Live in the Deskbar	Workspaces		Rezyduje w Deskbarze
-Switch on mouse wheel	Workspaces		Przełącz kółkiem myszy
 Workspaces	System name		Obszary robocze

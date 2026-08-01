@@ -1,15 +1,20 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	420387731
+1	german	x-vnd.Haiku-BluetoothPrefs	530464078
+Cancel	Remote devices		Abbrechen
 Laptop	Settings view		Laptop
 Only from trusted devices	Settings view		Nur vertraute Geräte
 15 secs	Settings view		15 s
 Quit	main		Beenden
+Scan finished	Inquiry panel		Scan abgeschlossen
 Manufacturer: 	Device View		Hersteller:
+Scan	Inquiry panel		Scan
+%secs% remaining	Inquiry panel		noch %secs%
 Desktop	Settings view		Desktop
 Server	Window		Server
 Identify host as:	Settings view		Agieren als:
 Local devices found on system:	Settings view		Verwendbare Geräte:
 Service classes: 	Device View		Gerätedienste:
 Remote devices	Window		Bekannte Geräte
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Dieser Rechner scheint kein (unterstütztes) Bluetooth zu haben.
 Settings	Window		Einstellungen
 Stop bluetooth services…	Window		Bluetooth-Dienste beenden …
 61 secs	Settings view		61 s
@@ -17,12 +22,14 @@ Add…	Remote devices		Hinzu …
 Revert	Window		Anfangswerte
 Refresh local devices…	Window		Lokale Geräte aktualisieren …
 Disconnect	Remote devices		Trennen
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Vor dem Scan muss die Bluetooth-Funktion des externen Geräts aktiviert sein.
 Defaults	Window		Standardwerte
 From all devices	Settings view		Von allen Geräten
 Start bluetooth services…	Window		Bluetooth-Dienste starten
 Cancel	Inquiry panel		Abbrechen
 Launch now	main		Jetzt starten
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		Name von '%1' wird abgerufen
 Remove	Remote devices		Entfernen
 Pick device…	Settings view		Gerät wählen …
 Always ask	Settings view		Immer fragen
@@ -31,13 +38,16 @@ Help	Window		Hilfe
 Pair…	Remote devices		Pair …
 Incoming connections policy:	Settings view		Verbindungen annehmen:
 Retrieving names…	Inquiry panel		Abrufen von Namen …
+Canceling scan…	Inquiry panel		Scan wird abgebrochen…
 Show name	Extended local device view		Namen anzeigen
 Add device to list	Inquiry panel		Gerät zur Liste hinzufügen
+Scanning progress:	Inquiry panel		Scan-Fortschritt:
 The Bluetooth services are not currently running on this system.	main		Im System laufen derzeit keine Bluetooth-Dienste.
 Discoverable	Extended local device view		Sichtbar
 Authenticate	Extended local device view		Authentifizieren
 Smart phone	Settings view		Smartphone
 Default inquiry time:	Settings view		Suchdauer:
+Friendly name:	Settings view		Name:
 Server	Settings view		Server
 Handheld	Settings view		Handheld
  packets: 	Device View		Pakete:

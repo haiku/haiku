@@ -1,15 +1,20 @@
-1	turkish	x-vnd.Haiku-BluetoothPrefs	420387731
+1	turkish	x-vnd.Haiku-BluetoothPrefs	530464078
+Cancel	Remote devices		Vazgeç
 Laptop	Settings view		Dizüstü
 Only from trusted devices	Settings view		Yalnızca güvenilir aygıtlardan
 15 secs	Settings view		15 saniye
 Quit	main		Çık
+Scan finished	Inquiry panel		Tarama bitti
 Manufacturer: 	Device View		Üretici: 
+Scan	Inquiry panel		Tara
+%secs% remaining	Inquiry panel		%secs% kaldı
 Desktop	Settings view		Masaüstü
 Server	Window		Sunucu
 Identify host as:	Settings view		Anamakineyi şöyle tanımla:
 Local devices found on system:	Settings view		Sistemde bulunan yerel aygıtlar
 Service classes: 	Device View		Hizmet sınıfları: 
 Remote devices	Window		Uzak aygıtlar
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Bu bilgisayarda Bluetooth desteği yok gibi görünüyor.
 Settings	Window		Ayarlar
 Stop bluetooth services…	Window		Bluetooth hizmetlerini durdur…
 61 secs	Settings view		61 saniye
@@ -17,12 +22,14 @@ Add…	Remote devices		Ekle…
 Revert	Window		Eski haline döndür
 Refresh local devices…	Window		Yerel aygıtları yenile…
 Disconnect	Remote devices		Bağlantıyı kes
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Taramayı başlatmadan önce uzak aygıtın Bluetooth yeteneklerinin etkinleştirilmiş olduğundan emin olun.
 Defaults	Window		Saptanmışlar
 From all devices	Settings view		Tüm aygıtlardan
 Start bluetooth services…	Window		Bluetooth hizmetlerini başlat…
 Cancel	Inquiry panel		Vazgeç
 Launch now	main		Şimdi çalıştır
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		“%1” adı alınıyor…
 Remove	Remote devices		Kaldır
 Pick device…	Settings view		Aygıt seç…
 Always ask	Settings view		Her zaman sor
@@ -31,13 +38,16 @@ Help	Window		Yardım
 Pair…	Remote devices		Eşleştir…
 Incoming connections policy:	Settings view		Gelen bağlantılar ilkesi:
 Retrieving names…	Inquiry panel		Adlar alınıyor…
+Canceling scan…	Inquiry panel		Tarama iptal ediliyor…
 Show name	Extended local device view		Adını göster
 Add device to list	Inquiry panel		Aygıtı listeye ekle
+Scanning progress:	Inquiry panel		Tarama ilerlemesi:
 The Bluetooth services are not currently running on this system.	main		Bluetooth hizmetleri şu anda bu sistemde çalışır durumda değil.
 Discoverable	Extended local device view		Bulunabilir
 Authenticate	Extended local device view		Kimlik doğrula
 Smart phone	Settings view		Akıllı telefon
 Default inquiry time:	Settings view		Saptanmış tarama süresi:
+Friendly name:	Settings view		Okunabilir ad:
 Server	Settings view		Sunucu
 Handheld	Settings view		Elde taşınabilir
  packets: 	Device View		 paketler: 

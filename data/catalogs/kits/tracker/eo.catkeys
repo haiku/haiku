@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	2965305097
+1	esperanto	x-vnd.Haiku-libtracker	3854472567
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -38,7 +38,6 @@ Would you like to find a suitable application to open the file?	FSUtils		Ĉu vi 
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Vi ne povas anstataŭigi dosierujon aŭ simbolan ligilon per dosiero.
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datoj>}}
 Trailing \\.	libtracker		Vosta \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Je %func \nfind_directory() malsukcesis. \nKaŭzo: %error
 Handles any file	OpenWithWindow		Taŭgas ajna dosiero
 save text	FilePanelPriv		konservi tekston
 Raw data	AttributesView		Kruda datumo
@@ -131,7 +130,6 @@ Cut	ContainerWindow		Tondi
 Disks	Model		Diskoj
 Create a Query template	FindPanel		Krei serĉmendan ŝablonon
 Size	FindPanel		Grando
-OK	Email Query Columns		Bone
 Location	QueryPoseView		Loko
 Edit query	ContainerWindow		Redakti serĉmendon
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# bitoko)} other{(# bitokoj)}}
@@ -180,8 +178,8 @@ Media parameter web	AttributesView		Plurmediaj parametroj de reto
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Pardonu, vi ne povas konservi elementojn en la radikan dosierujon de via sistemo.
 Restore	ContainerWindow		Restaŭri
 Location	ContainerWindow		Loko
-Skip	FSUtils		Transsalti
 Warning space color	SettingsView		Koloro de averto pri manko de spaco
+Skip	FSUtils		Transsalti
 Text list	AttributesView		Tekstolisto
 Used space color	SettingsView		Uzita kolorspaco
 Cancel	FSUtils		Nuligi
@@ -298,8 +296,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Malsu
 Create %s clipping	PoseView		Krei %s tondado
 Error moving \"%name\"	FSUtils		Eraris movante \"%name\"
 To: %dir	StatusWindow		Al: %dir
-Cancel	Tracker		Nuligi
 Paste layout	ContainerWindow		Alglui aranĝon
+Cancel	Tracker		Nuligi
 yes	AttributesView		jes
 Make active printer	ContainerWindow		Fari kiel akvita presilo
 Copy to	ContainerWindow		Kopii al

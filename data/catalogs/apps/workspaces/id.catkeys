@@ -1,12 +1,12 @@
 1	indonesian	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Keluar
+Show window tab	Workspaces		Tampilkan tab jendela
+Live in the Deskbar	Workspaces		Langsung di Deskbar
+Switch on mouse wheel	Workspaces		Berpindah dengan roda mouse
 Invalid argument: %s\n	Workspaces		Argumen tidak valid: %s\n
 Change workspace count…	Workspaces		Ubah hitungan workspace...
 Always on top	Workspaces		Selalu di atas
 Show window border	Workspaces		Tampilkan batas jendela
-Show window tab	Workspaces		Tampilkan tab jendela
 Auto-raise	Workspaces		Muncul otomatis
 Remove replicant	Workspaces		Buang replicant
-Live in the Deskbar	Workspaces		Langsung di Deskbar
-Switch on mouse wheel	Workspaces		Berpindah dengan roda mouse
 Workspaces	System name		Area kerja

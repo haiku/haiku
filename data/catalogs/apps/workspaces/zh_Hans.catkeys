@@ -1,12 +1,12 @@
 1	english	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		退出
+Show window tab	Workspaces		显示窗口标签
+Live in the Deskbar	Workspaces		驻留桌面栏
+Switch on mouse wheel	Workspaces		使用鼠标滚轮切换
 Invalid argument: %s\n	Workspaces		无效参数：%s\n
 Change workspace count…	Workspaces		修改工作区数量... 
 Always on top	Workspaces		总在最前
 Show window border	Workspaces		显示窗口边框
-Show window tab	Workspaces		显示窗口标签
 Auto-raise	Workspaces		自动
 Remove replicant	Workspaces		删除克隆控件
-Live in the Deskbar	Workspaces		驻留桌面栏
-Switch on mouse wheel	Workspaces		使用鼠标滚轮切换
 Workspaces	System name		工作区

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Input	993392905
+1	friulian	x-vnd.Haiku-Input	3371770123
 Defaults	InputMouse		Predefinîts
 Scrolling	TouchpadPrefView		Scoriment
 Long	KeyboardView		Lunc
@@ -6,9 +6,13 @@ Cancel	TouchpadPrefView		Anule
 Slow	TouchpadPrefView		Lente
 Device List	InputWindow		Liste dispositîfs
 Double-click speed	SettingsView		Velocitât dopli-clic
+On tap-drag only	TouchpadPrefView		Nome su tocje-e-strissine
+Edge motion:	TouchpadPrefView		Moviment tal ôr:
 5-Button	SettingsView		5-Botons
 Typing test area	KeyboardView		Aree di prove batidure
 Fast	KeyboardView		Svelte
+Always	TouchpadPrefView		Simpri
+Software button areas	TouchpadPrefView		Areis dai botons software
 Please confirm	TouchpadPrefView		Par plasê conferme
 Trackpad speed	TouchpadPrefView		Velocitât trackpad
 Mouse speed	SettingsView		Velocitât dal mouse
@@ -23,14 +27,17 @@ Revert	InputMouse		Ripristine
 Slow	KeyboardView		Lente
 2-Button	SettingsView		2-Botons
 Click to focus and raise	SettingsView		Clic par meti a fûc e parâ denant
+Natural scrolling	TouchpadPrefView		Scoriment naturâl
 Vertical	TouchpadPrefView		Verticâl
 Low	TouchpadPrefView		Basse
 Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
 Focus mode:	SettingsView		Mût par meti a fûc:
 Double-click test area	SettingsView		Aree di prove dopli-clic
 Revert	TouchpadPrefView		Ripristine
+When dragging	TouchpadPrefView		Cuant che si strissine
 4-Button	SettingsView		4-Botons
 Tapping sensitivity	TouchpadPrefView		Sensibilitât dal batuçâ
+Disabled	TouchpadPrefView		Disativât
 Revert	InputKeyboard		Ripristine
 Mouse type:	SettingsView		Gjenar di mouse:
 Off	TouchpadPrefView		Distudât
@@ -47,6 +54,7 @@ Mouse acceleration	SettingsView		Acelerazion dal mouse
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La gnove aree di scorimetn e je une vore largje e e podarès impedî il normâl funzionament dal mouse. Cambiâle pardabon?
 High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Predefinîts
+Finger click	TouchpadPrefView		Clic cul dêt
 1-Button	SettingsView		1-Boton
 Defaults	InputKeyboard		Predefinîts
 Key repeat rate	KeyboardView		Velocitât ripetizion tast

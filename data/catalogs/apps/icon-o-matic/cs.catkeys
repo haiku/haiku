@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-icon_o_matic	2321853629
+1	czech	x-vnd.haiku-icon_o_matic	1029251628
 None	Icon-O-Matic-Properties		Žádný
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Vyčistit cestu
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -55,10 +55,12 @@ OK	Icon-O-Matic-ColorPicker		OK
 Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Více možností %property%
 Error: 	Icon-O-Matic-Main		Chyba: 
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Vynulovat {0, plural, one{přeměnu} few{# přeměny} other{# přeměn}}
+SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey will be exported as linear approximations and may look different in other viewers.	Icon-O-Matic-SVGExport		SVG nepodporuje některé typy přechodů (kuželový, kosočtvercový, xy, odmocněný xy).\n\nBude vytvořeno jako přibližný lineární přechod a může vypadat všelijak v různých prohlížečích.
 Assign style	Icon-O-Matic-AssignStyleCmd		Přiřadit styl
 Saving your document failed!	Icon-O-Matic-Exporter		Uložení vašeho dokumentu selhalo!
 Snap to grid	Icon-O-Matic-Menu-Settings		Přichytit k mřížce
 Opening the document failed!	Icon-O-Matic-Main		Otevření dokumentu selhalo!
+SVG export	Icon-O-Matic-SVGExport		Vytvoření SVG
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Odebrat {0, plural, one{styl} few{# styly} other{# stylů}}
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Jedna či více cest má moc vrcholů. Formát HVIF podporuje jen 255 vrcholů na cestu.
 Add with path & style	Icon-O-Matic-ShapesList		Přidat s cestou a stylem
@@ -76,6 +78,7 @@ Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Přidat {0,
 Remove	Icon-O-Matic-PathManipulator		Odstranit
 Duplicate	Icon-O-Matic-ShapesList		Duplikovat
 Alpha	Icon-O-Matic-PropertyNames		Neprůhlednost
+OK	Icon-O-Matic-SVGExport		OK
 Contour	Transformation		Obrys
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Přidat {0, plural, one{transformátor} few{# transformátory} other{# transformátorů}}
 Miter limit	Icon-O-Matic-PropertyNames		Limit ostrosti
@@ -93,6 +96,7 @@ Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCm
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Odebrat {0, plural, one{tvar} few{# tvary} other{# tvarů}}
 Undo: %action%	Icon-O-Matic-Main		Zpět: %action%
 Diamond	Icon-O-Matic-StyleTypes		Kosočtverec
+%appname% might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		%appname% nemuselo načíst správně všechna data z SVG obrázku. Přepsáním původního souboru se informace ztratí.
 Don't save	Icon-O-Matic-Menu-Settings		Neukládat
 Add shape with path	Icon-O-Matic-Menu-Shape		Přidat tvar s cestou
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Průšvih
@@ -157,6 +161,7 @@ Untitled	Icon-O-Matic-Main		Bezejmenný
 Max LOD	Icon-O-Matic-PropertyNames		Maximální úroveň detailů
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Uložit před zavřením změny v aktualní ikoně?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nepodařilo se otevřít '%s' jako SVG dokument.\n\n
+<unknown property>	Icon-O-Matic-PropertyNames		<neznámá vlastnost>
 Save as…	Icon-O-Matic-Menu-File		Uložit jako…
 Swatches	Icon-O-Matic-Menus		Vzorky
 <modify path>	Icon-O-Matic-PathCmd		<změnit cestu>

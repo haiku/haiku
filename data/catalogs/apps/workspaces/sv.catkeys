@@ -1,12 +1,13 @@
-1	swedish	x-vnd.Be-WORK	1255000335
+1	swedish	x-vnd.Be-WORK	1851878724
 Quit	Workspaces		Avsluta
-Invalid argument: %s\n	Workspaces		Felaktigt argument: %s\n
-Change workspace count…	Workspaces		Ändra antalet arbetsytor...
-Always on top	Workspaces		Alltid överst
-Show window border	Workspaces		Visa fönsterkant
 Show window tab	Workspaces		Visa fönsterflik
-Auto-raise	Workspaces		Höj upp automatiskt
-Remove replicant	Workspaces		Ta bort replicant
 Live in the Deskbar	Workspaces		Kör i Deskbaren
 Switch on mouse wheel	Workspaces		Använd scrollhjul
+Invalid argument: %s\n	Workspaces		Felaktigt argument: %s\n
+Change workspace count…	Workspaces		Ändra antalet arbetsytor...
+Usage: %s [options] [workspace|direction]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when mouse is at the screen edge\n  --help\t\tdisplay this help and exit\n  -i\t\t\tdisplay workspace layout and exit\n\"workspace\" is the number of the Workspace to which to switch (+|-|0-31)\nand \"direction\" is the direction of the Workspace to switch to (left|right|up|down)\n	Workspaces		Användning: %s [flaggor] [arbetsyta|riktning]\ndär \"flaggor\" är:\n  --notitle\t\ttitellist tas bort, men ram och storleksändring behålls\n  --noborder\t\ttitel, ram och storleksändring tas bort\n  --avoidfocus\t\tförhindrar att fönstret tar emot tangentbordshändelser\n  --alwaysontop\t\thåller fönstret överst\n  --notmovable\t\tfönstret kan inte flyttas\n  --autoraise\t\tlyfter automatiskt upp arbetsytans fönster när muspekaren är vid skärmkanten\n  --help\t\tvisar denna hjälptext och avslutar\n  -i\t\t\tvisar layouten för arbetsytor och avslutar\n\"arbetsyta\" är numret på den arbetsyta som ska växlas till (+|-|0-31)\noch \"riktning\" är riktningen till arbetsytan som ska växlas till (left|right|up|down)\n
+Always on top	Workspaces		Alltid överst
+Show window border	Workspaces		Visa fönsterkant
+Auto-raise	Workspaces		Höj upp automatiskt
+Remove replicant	Workspaces		Ta bort replicant
 Workspaces	System name		Arbetsytor

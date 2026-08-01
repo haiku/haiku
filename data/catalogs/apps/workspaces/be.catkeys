@@ -1,11 +1,11 @@
 1	belarusian	x-vnd.Be-WORK	941685153
 Quit	Workspaces		Выйсці
+Show window tab	Workspaces		Паказваць закладкі вакон
+Live in the Deskbar	Workspaces		Жыць у Deskbar-ы
 Invalid argument: %s\n	Workspaces		Няправільны аргумент: %s\n
 Change workspace count…	Workspaces		Змяніць колькасць рабочых сталоў…
 Always on top	Workspaces		Заўсёды ў фокусе
 Show window border	Workspaces		Паказваць межы вокнаў
-Show window tab	Workspaces		Паказваць закладкі вакон
 Auto-raise	Workspaces		Аўта-выплыванне
 Remove replicant	Workspaces		Выдаліць дуплікант
-Live in the Deskbar	Workspaces		Жыць у Deskbar-ы
 Workspaces	System name		Рабочыя сталы

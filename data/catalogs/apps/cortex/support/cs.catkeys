@@ -1,4 +1,4 @@
-1	czech	application/x-vnd.Cortex.support	3450110595
+1	czech	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Hlavička má příznaky
 32 bit HLS	MediaString		32 bitů HLS
 Recording	MediaString		Nahrávám
@@ -46,6 +46,7 @@ Right	MediaString		Pravý
 System mixer	MediaString		Systémový směšovač
 Physical output	MediaString		Fyzický výstup
 Top-Back-center	MediaString		Horní-zadní-prostřední
+(unknown video orientation)	MediaString		(neznámé otočení obrazu)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Shora dolů. zleva doprava
 (unknown run mode)	MediaString		(neznámý mód běhu)

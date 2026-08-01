@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-StyledEdit	3212551798
+1	czech	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Statistika dokumentu
 Cut	Menus		Vystřihnout
 Center	Menus		Na střed
@@ -13,6 +13,8 @@ Search backwards	FindandReplaceWindow		Hledat zpětně
 Find again	Menus		Najít další
 Read-only	StatusView		Pouze pro čtení
 Save	Menus		Uložit
+Untitled %d	Window title		Bezejmenný %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Nelze zvrátit, soubor nenalezen: \"%filename%\".
 Cancel	QuitAlert		Zrušit
 Copy	Menus		Kopírovat
 Reload	NodeMonitorAlerts		Obnovit
@@ -20,11 +22,13 @@ line %d, column %d	StatusView		řádek %d, sloupec %d
 Words:	Statistics		Slova:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Obnovit
+Unable to unlock file\n\t%error%	QuitAlert		Nelze odemknout soubor\n\t%error%
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Odemknout soubor
 Italic	Menus		Kurzíva
 Can't undo	Menus		Nelze vrátit zpět
 Replace…	Menus		Nahradit…
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Soubor označen jen pro čtení. Uložit změny do dokumentu \"%filename%\"? 
 File	Menus		Soubor
 Paste	Menus		Vložit
 Bold	Menus		Tučně
@@ -33,7 +37,11 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Řádky:
 Strikeout	Menus		Přeškrtnutí
 Replace in all windows	FindandReplaceWindow		Nahradit ve všech oknech
+Error saving \"%filename%\":\n%error%	SaveAlert		Chyba uložení \"%filename%\":\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Uložit změny dokumentu \"%title%\"?
+Style	Menus		Styl
 Save	SaveAlert		Uložit
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" má neuložené změny.\nVrátit k poslední uložené verzi?
 Default	Open_and_SaveAsPanel		Původní
 Cancel	RevertToSavedAlert		Zrušit
 Cancel	FindandReplaceWindow		Zrušit
@@ -76,8 +84,10 @@ Open…	Menus		Otevřít…
 Save as…	Menus		Uložit jako…
 Replace	FindandReplaceWindow		Nahradit
 Characters:	Statistics		Znaky:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		Chyba čtení \"%filename%\":\n\tNepodporovaný formát
 Don't save	QuitAlert		Neukládat
 Align	Menus		Zarovnání
 Font	Menus		Písmo
 Select all	Menus		Vybrat vše
 Right	Menus		Vpravo
+Error loading \"%filename%\":\n\t%error%	LoadAlert		Chyba čtení \"%filename%\":\n\t%error%

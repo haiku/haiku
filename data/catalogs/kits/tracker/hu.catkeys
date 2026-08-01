@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1792277746
+1	hungarian	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Nem lehet m
 (unknown)	InfoWindow		(ismeretlen)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dátum>}}
 Trailing \\.	libtracker		Záró \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ennél: %func \nsikertelen volt a find_directory(). \nOka: %error
 Handles any file	OpenWithWindow		Bármilyen fájlt kezel
 save text	FilePanelPriv		szöveg mentése
 Raw data	AttributesView		Nyers adat
@@ -145,7 +144,6 @@ Disks	Model		Lemezek
 Create a Query template	FindPanel		Keresési sablon készítése
 Size	FindPanel		Méret
 New submenu	ContainerWindow	Folder name of New-template submenu	Új almenü
-OK	Email Query Columns		Rendben
 Location	QueryPoseView		Hely
 Edit query	ContainerWindow		Keresés szerkesztése
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# bájt)} other{(# bájt)}}
@@ -198,8 +196,8 @@ Media parameter web	AttributesView		Média paraméter web
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Sajnos nem lehet a rendszer gyökérmappájába menteni.
 Restore	ContainerWindow		Visszaállítás
 Location	ContainerWindow		Hely
-Skip	FSUtils		Kihagy
 Warning space color	SettingsView		Veszély jelzőszíne
+Skip	FSUtils		Kihagy
 Text list	AttributesView		Szöveg lista
 Used space color	SettingsView		Használt terület színe
 Cancel	FSUtils		Mégse
@@ -325,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nem s
 Create %s clipping	PoseView		%s kivágás készítése
 Error moving \"%name\"	FSUtils		Hiba történt a mozgatás közben: \"%name\"
 To: %dir	StatusWindow		Ide: %dir
-Cancel	Tracker		Mégse
 Paste layout	ContainerWindow		Elrendezés beillesztése
+Cancel	Tracker		Mégse
 yes	AttributesView		igen
 Make active printer	ContainerWindow		Beállítás aktív nyomtatónak
 Copy to	ContainerWindow		Másolás

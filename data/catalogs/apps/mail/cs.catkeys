@@ -1,4 +1,4 @@
-1	czech	x-vnd.Be-MAIL	236508096
+1	czech	x-vnd.Be-MAIL	1977644174
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Zpráva obsahuje %ld nedefinované znaky. Možná by jiné sady znaků fungovaly lépe? Stiskněte tlačítko Odeslat, chcete-li zprávu přesto odeslat (místo původního znaku se použije náhradní znak), nebo zvolte Zrušit, chcete-li se vrátit a opravit.
 Text wrapping:	Mail		Zalamování textu:
 Show icons & labels	Mail		Zobrazit ikony a štítky
@@ -26,17 +26,20 @@ Save changes to this signature?	Mail		Uložit změny v tomto podpisu?
 Save attachment…	Mail		Uložit přílohu…
 Paste	Mail		Vložit
 E-mail draft could not be saved!	Mail		Koncept nelze uložit!
+Next message, keep status	Mail		Další zpráva, ponechat stav
 Don't send	Mail		Neodesílat
 sent	B_USER_DIRECTORY/mail/sent		odesláno
 Only files can be added as attachments.	Mail		Jako přílohy lze přidat pouze soubory.
 Close	Mail		Zavřít
 Untitled	Mail		Nepojmenováno
+%appname% couldn't find its dictionary.	Mail		%appname% nemůže najít adresář.
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Odstraňování příloh z předávané pošty ještě není implementováno!\nJeště to nebude fungovat správně.
 Same recipient	Mail		Stejný příjemnce
 Previous message	Mail		Předchozí zpráva
 (Address unavailable)	Mail		(Adresa není k dispozici)
 Mail	System name		Pošta
 Copy link location	Mail		Kopírovat umístění odkazu
+%appname% settings	Mail		%appname% nastavení
 Add attachment…	Mail		Přidat přílohu…
 Next	Mail		Další
 Attachments:	Mail		Přílohy:
@@ -44,6 +47,7 @@ Show icons only	Mail		Zobrazit pouze ikony
 Subject:	Mail		Předmět:
 OK	Mail		OK
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+All people	AddressTextControl		Všechny osoby
 Quit	Mail		Ukončit
 Title:	Mail		Název:
 Account from mail	Mail		Poštovní účet
@@ -68,6 +72,7 @@ Cancel	Mail		Zrušit
 Off	Mail		Vypnout
 Signature:	Mail		Podpis:
 Forward without attachments	Mail		Přeposlat bez příloh
+None	Settings		Nic
 queries	B_USER_DIRECTORY/mail/queries		dotazy
 View	Mail		Zobrazit
 Signatures	Mail		Podpisy
@@ -88,13 +93,16 @@ Open draft	Mail		Otevřít koncept
 Random	Mail		Náhodný
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Nechat jako 'Nový'
 Attach attributes:	Mail		Připojit atributy:
+Remove label	Mail		Odebrat štítek
 Find again	Mail		Znovu najít
 Size:	Mail		Velikost:
+New label:	LabelWindow		Nový štítek:
 To:	Mail		Komu:
 Need Tracker to move items to trash	Mail		Na přesun položek do koše je potřeba Tracker
 The mail_daemon could not be started:\n\t	Mail		Službu mail_daemon nelze spustit:\n\t
 <no account found>	Mail		<žádný účet nenalezen>
 helpful message	Mail		užitečná zpráva
+Label as…	Mail		Oštítkovat jako…
  Read 	Mail		 Číst 
 Font:	Mail		Písmo:
 Accounts…	Mail		Účty…
@@ -102,6 +110,7 @@ Previous	Mail		Předchozí
 Include file attributes in attachments	Mail		Zahrnout atributy souborů do příloh
 Start now	Mail		Začít teď
 (Name unavailable)	Mail		(Jméno není k dispozici)
+Cancel	LabelWindow		Zrušit
 Move to trash	Mail		Přesunout do koše
 <none>	Mail		<není>
 %d - Date	Mail		%d - Datum
@@ -129,6 +138,7 @@ Hide	Mail		Skrýt
 From:	Mail		Od:
 No file attributes, just plain data	Mail		Žádný typ souboru, pouze data
 Add	Mail		Přidat
+Same label	Mail		Stejný štítek
 out	B_USER_DIRECTORY/mail/out		odchozí
 Send this message before closing?	Mail		Odeslat tuto zprávu před zavřením?
 in	B_USER_DIRECTORY/mail/in		přijato
@@ -151,12 +161,16 @@ Remove attachment	Mail		Odstranit příponu
 Edit	Mail		Editovat
 Page setup…	Mail		Nastavení stránky…
 An error occurred trying to save this signature.	Mail		Při pokusu o uložení podpisu došlo k chybě.
+Set label	Mail		Nastavit štítek
 Beginner	Mail		Začátečník
+Previous message, keep status	Mail		Předchozí zpráva, ponechat stav
 Send message	Mail		Poslat zprávu
 Delete	Mail		Smazat
 Put your favorite e-mail queries and query templates in this folder.	Mail		Zde vložte své oblíbené e-mailové dotazy a šablony dotazů.
+Manage labels…	Mail		Spravovat štítky…
 Spam	Mail		Nevyžádaná pošta
 Couldn't open this signature. Sorry.	Mail		Nelze otevřít tento podpis. Pardon.
+OK	LabelWindow		OK
 Revert	Mail		Vrátit
 Unknown	Mail		Neznámý
 Increase quote level	Mail		Zvýšit odsazení citace

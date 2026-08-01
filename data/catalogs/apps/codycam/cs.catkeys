@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-CodyCam	2786669505
+1	czech	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		očekáván cílový adresář
 reply: '%s'\n	SftpClient		odpověď: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <utajeno>  (reálné heslo odesláno)
@@ -50,6 +50,7 @@ server address expected	CodyCam		očekávána adresa serveru
 Cannot start the video window	CodyCam		Nemohu spustit okno videa
 reply: %d, %d\n	FtpClient		odpovědět: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Nemohu nastavit zdroj času pro okno videa
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		Nelze najít zdroj videa.\nPro %appname% potřebujete webkameru.
 Every 15 minutes	CodyCam		Každých 15 minut
 Every 24 hours	CodyCam		Každých 24 hodin
 Image Format Menu	CodyCam		Menu formátu souboru

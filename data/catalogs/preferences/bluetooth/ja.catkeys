@@ -1,15 +1,20 @@
-1	japanese	x-vnd.Haiku-BluetoothPrefs	420387731
+1	japanese	x-vnd.Haiku-BluetoothPrefs	530464078
+Cancel	Remote devices		キャンセル
 Laptop	Settings view		ラップトップ
 Only from trusted devices	Settings view		信用されているデバイスのみ
 15 secs	Settings view		15 秒
 Quit	main		終了
+Scan finished	Inquiry panel		スキャン終了
 Manufacturer: 	Device View		製造元:
+Scan	Inquiry panel		スキャン
+%secs% remaining	Inquiry panel		残り %secs%
 Desktop	Settings view		デスクトップ
 Server	Window		サーバー
 Identify host as:	Settings view		ホスト名:
 Local devices found on system:	Settings view		認識されたローカルデバイス :
 Service classes: 	Device View		サービスクラス:
 Remote devices	Window		リモートデバイス
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		このコンピューターには Bluetooth サポートが無いようです。
 Settings	Window		設定
 Stop bluetooth services…	Window		Bluetooth サービスの停止...
 61 secs	Settings view		61 秒
@@ -17,12 +22,14 @@ Add…	Remote devices		追加...
 Revert	Window		戻す
 Refresh local devices…	Window		ローカルデバイスの更新...
 Disconnect	Remote devices		切断
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		スキャンを始める前にリモートデバイスの Bluetooth 機能を有効にしていることを確認ください。
 Defaults	Window		デフォルト
 From all devices	Settings view		すべてのデバイスから
 Start bluetooth services…	Window		Bluetooth サービスの開始...
 Cancel	Inquiry panel		キャンセル
 Launch now	main		ただちに起動
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		'%1'の名前を取得しています
 Remove	Remote devices		削除
 Pick device…	Settings view		デバイスの選択...
 Always ask	Settings view		常に確認する
@@ -31,13 +38,16 @@ Help	Window		ヘルプ
 Pair…	Remote devices		ペアリング...
 Incoming connections policy:	Settings view		着信接続ポリシー:
 Retrieving names…	Inquiry panel		名前の取得中...
+Canceling scan…	Inquiry panel		スキャンをキャンセル中…
 Show name	Extended local device view		名前の表示
 Add device to list	Inquiry panel		デバイスを一覧に追加
+Scanning progress:	Inquiry panel		スキャン進行中:
 The Bluetooth services are not currently running on this system.	main		Bluetooth サービスは現在システム上で動作していません。
 Discoverable	Extended local device view		検出可能
 Authenticate	Extended local device view		認証
 Smart phone	Settings view		スマートフォン
 Default inquiry time:	Settings view		デフォルトの問い合わせ時間:
+Friendly name:	Settings view		フレンドリ名:
 Server	Settings view		サーバー
 Handheld	Settings view		ハンドヘルド機器
  packets: 	Device View		 パケット: 

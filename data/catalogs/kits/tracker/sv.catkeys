@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1792277746
+1	swedish	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan inte
 (unknown)	InfoWindow		(okänd)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datum>}}
 Trailing \\.	libtracker		Efterföljande \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		I %func \nfind_directory() misslyckades. \nOrsak: %error
 Handles any file	OpenWithWindow		Hanterar alla filtyper
 save text	FilePanelPriv		spara text
 Raw data	AttributesView		Rådata
@@ -145,7 +144,6 @@ Disks	Model		Volymer
 Create a Query template	FindPanel		Skapa en sökmall
 Size	FindPanel		Storlek
 New submenu	ContainerWindow	Folder name of New-template submenu	Ny undermeny
-OK	Email Query Columns		OK
 Location	QueryPoseView		Plats
 Edit query	ContainerWindow		Redigera sökning
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -198,8 +196,8 @@ Media parameter web	AttributesView		Mediaparameter väv
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Du kan inte spara i roten på filsystemet.
 Restore	ContainerWindow		Återställ
 Location	ContainerWindow		Plats
-Skip	FSUtils		Hoppa över
 Warning space color	SettingsView		Färg för utrymmesvarning
+Skip	FSUtils		Hoppa över
 Text list	AttributesView		Textlista
 Used space color	SettingsView		Färg för diskanvändning
 Cancel	FSUtils		Avbryt
@@ -325,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde
 Create %s clipping	PoseView		Skapa %s förkortning
 Error moving \"%name\"	FSUtils		Fel vid flyttande av \"%name\"
 To: %dir	StatusWindow		Till: %dir
-Cancel	Tracker		Avbryt
 Paste layout	ContainerWindow		Klistra in layout
+Cancel	Tracker		Avbryt
 yes	AttributesView		ja
 Make active printer	ContainerWindow		Gör till aktiv skrivare
 Copy to	ContainerWindow		Kopiera till

@@ -1,8 +1,9 @@
-1	friulian	x-vnd.Be-TSKB	1763402521
+1	friulian	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Plate in automatic
 Show all	WindowMenu		Mostre dut
 Edit in Tracker…	PreferencesWindow		Modifiche in Tracker…
 Menu	PreferencesWindow		Menù
+Location	PreferencesWindow		Posizion
 Tracker always first	PreferencesWindow		Tracker simpri par prin
 Hide clock	TimeView		Plate orloi
 Large	PreferencesWindow		Grandis

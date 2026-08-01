@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	2315388090
+1	thai	x-vnd.Haiku-libtracker	3204555560
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -36,7 +36,6 @@ Small bitmap icon	AttributesView		ไอคอน bitmap ขนาดเล็�
 Would you like to find a suitable application to open the file?	FSUtils		คุณต้องการค้นหาแอปพลิเคชั่นที่เหมาะสมในการเปิดไฟล์หรือไม่?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		คุณไม่สามารถแทนที่โฟลเดอร์หรือลิงก์สัญลักษณ์ด้วยไฟล์
 Trailing \\.	libtracker		กำลังลากตามรอย \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		ที่ %func \nfind_directory() ล้มเหลว\nเหตุผล: %error
 Handles any file	OpenWithWindow		จัดการไฟล์ใด ๆ
 save text	FilePanelPriv		บันทึกข้อความ
 Raw data	AttributesView		ข้อมูลเดิม
@@ -127,7 +126,6 @@ Cut	ContainerWindow		ตัด
 Disks	Model		ดิสก์
 Create a Query template	FindPanel		สร้างแม่แบบ Query
 Size	FindPanel		ขนาด
-OK	Email Query Columns		ตกลง
 Location	QueryPoseView		สถานที่
 Edit query	ContainerWindow		แก้ไข query
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} อื่นๆ{(# bytes)}}
@@ -175,8 +173,8 @@ Media parameter web	AttributesView		เว็บพารามิเตอร�
 Sorry, you can't save things at the root of your system.	FilePanelPriv		ขออภัยคุณไม่สามารถบันทึกสิ่งต่าง ๆ ที่รูทของระบบของคุณ
 Restore	ContainerWindow		คือค่า
 Location	ContainerWindow		สถานที่
-Skip	FSUtils		ข้าม
 Warning space color	SettingsView		เตือนเฉดสี
+Skip	FSUtils		ข้าม
 Text list	AttributesView		รายการข้อความ
 Used space color	SettingsView		ใช้เฉดสี
 Cancel	FSUtils		ยกเลิก
@@ -291,8 +289,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ไ�
 Create %s clipping	PoseView		สร้าง %s การตัด
 Error moving \"%name\"	FSUtils		เกิดข้อผิดพลาดในการย้าย \"%name\"
 To: %dir	StatusWindow		ไปที่: %dir
-Cancel	Tracker		ยกเลิก
 Paste layout	ContainerWindow		วางเลย์เอาต์
+Cancel	Tracker		ยกเลิก
 yes	AttributesView		ใช่
 Make active printer	ContainerWindow		สร้างเครื่องพิมพ์ที่ใช้งานอยู่
 Copy to	ContainerWindow		คัดลอกไปที่

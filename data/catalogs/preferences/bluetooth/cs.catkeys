@@ -1,15 +1,20 @@
-1	czech	x-vnd.Haiku-BluetoothPrefs	305903693
+1	czech	x-vnd.Haiku-BluetoothPrefs	1750795842
+Cancel	Remote devices		Zrušit
 Laptop	Settings view		Notebook
 Only from trusted devices	Settings view		Jen od důvěryhodných zařízení
 15 secs	Settings view		15 sekund
 Quit	main		Konec
+Scan finished	Inquiry panel		Hledání hotovo
 Manufacturer: 	Device View		Výrobce: 
+Scan	Inquiry panel		Hledání
+%secs% remaining	Inquiry panel		zbývá %secs%
 Desktop	Settings view		Stolní počítač
 Server	Window		Server
 Identify host as:	Settings view		Identifikovat hosta jako:
 Local devices found on system:	Settings view		Lokální zařízení nalezená v systému:
 Service classes: 	Device View		Třídy služeb: 
 Remote devices	Window		Vzdálená zařízení
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Tento počítač asi nemá Bluetooth.
 Settings	Window		Nastavení
 Stop bluetooth services…	Window		Zastavit zařízení Bluetooth…
 61 secs	Settings view		61 sekund
@@ -20,6 +25,7 @@ Disconnect	Remote devices		Odpojit
 Defaults	Window		Původní
 From all devices	Settings view		Ze všech zařízení
 Start bluetooth services…	Window		Zapnout služby bluetooth…
+Cancel	Inquiry panel		Zrušit
 Launch now	main		Spustit nyní
 Bluetooth	System name		Bluetooth
 Remove	Remote devices		Odstranit
@@ -30,13 +36,16 @@ Help	Window		Nápověda
 Pair…	Remote devices		Spárovat…
 Incoming connections policy:	Settings view		Politika pro příchozí spojení:
 Retrieving names…	Inquiry panel		Načítání jmen…
+Canceling scan…	Inquiry panel		Ruším hledání…
 Show name	Extended local device view		Zobrazit jméno
 Add device to list	Inquiry panel		Přidat zařízení do seznamu
+Scanning progress:	Inquiry panel		Postup hledání:
 The Bluetooth services are not currently running on this system.	main		Služby Bluetooth na tomto systému nyní neběží.
 Discoverable	Extended local device view		Zjistitelný
 Authenticate	Extended local device view		Autentifikovat
 Smart phone	Settings view		Smartphone
 Default inquiry time:	Settings view		Implicitní čas pro průzkum:
+Friendly name:	Settings view		Pohledné jméno:
 Server	Settings view		Server
 Handheld	Settings view		Handheld
  packets: 	Device View		 pakety: 

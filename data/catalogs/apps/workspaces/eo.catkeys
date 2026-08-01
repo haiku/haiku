@@ -1,12 +1,12 @@
 1	esperanto	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Ĉesi
+Show window tab	Workspaces		Montri fenestran titiollangeton
+Live in the Deskbar	Workspaces		Loĝi ĉe la Laborstrio
+Switch on mouse wheel	Workspaces		Ŝanĝi per musa rado
 Invalid argument: %s\n	Workspaces		Nevalida argumento: %s\n
 Change workspace count…	Workspaces		Ŝanĝi nombron de laborspacoj…
 Always on top	Workspaces		Ĉiam videbla
 Show window border	Workspaces		Montri fenestran borderon
-Show window tab	Workspaces		Montri fenestran titiollangeton
 Auto-raise	Workspaces		Aŭtomate suprenigi
 Remove replicant	Workspaces		Forigi replikilon
-Live in the Deskbar	Workspaces		Loĝi ĉe la Laborstrio
-Switch on mouse wheel	Workspaces		Ŝanĝi per musa rado
 Workspaces	System name		Laborspacoj

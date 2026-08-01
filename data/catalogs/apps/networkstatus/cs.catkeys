@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-NetworkStatus	2510618206
+1	czech	x-vnd.Haiku-NetworkStatus	3050452699
 IPv6 address:	NetworkStatusView		Adresa IPv6:
 Quit	NetworkStatusView		Zavřít
 Unknown	NetworkStatusView		Neznámý
@@ -8,10 +8,13 @@ Open network preferences…	NetworkStatusView		Otevřít volby sítě…
 NetworkStatus	System name		Stav sítě
 Broadcast:	NetworkStatusView		Všesměrové:
 OK	NetworkStatusView		OK
+%appname% options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		%appname% volby:\n\t--deskbar\tautomaticky přidat replikanta na Panel\n\t--help\t\tjen vypsat tuto nápovědu
 No link	NetworkStatusView		Odpojeno
+Connected	NetworkStatusView		Spojeno
 Could not join wireless network:\n	NetworkStatusView		Nemohu se připojit do bezdrátové sítě:\n
 Network Status	NetworkStatusView		Stav sítě
 Deskbar is not running, giving up.	NetworkStatus		Panel není spuštěn, vzdávám to.
+You can run %appname% in a window or install it in the Deskbar.	NetworkStatus		Můžete %appname% spustit v okně nebo instalovat do Panelu.
 Netmask:	NetworkStatusView		Maska sítě:
 No stateful configuration	NetworkStatusView		Žádná uvedená konfigurace
 IPv4 address:	NetworkStatusView		Adresa IPv4:

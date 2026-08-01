@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1293260283
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2182427753
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Δεν μπ
 (unknown)	InfoWindow		(άγνωστο)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# ημερομηνίες>}}
 Trailing \\.	libtracker		Περισσευούμενο \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Στην %func \nαπέτυχε η find_directory(). \nΑιτία: %error
 Handles any file	OpenWithWindow		Χειρίζεται κάθε αρχείο
 save text	FilePanelPriv		αποθήκευση κειμένου
 Raw data	AttributesView		Ανεπεξέργαστα δεδομένα
@@ -144,7 +143,6 @@ Disks	Model		Δίσκοι
 Create a Query template	FindPanel		Δημιουργία ενός προτύπου Ερωτημάτος
 Size	FindPanel		Μέγεθος
 New submenu	ContainerWindow	Folder name of New-template submenu	Νέο υπομενού
-OK	Email Query Columns		Εντάξει
 Location	QueryPoseView		Τοποθεσία
 Edit query	ContainerWindow		Επεξεργασία ερωτήματος
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -197,8 +195,8 @@ Media parameter web	AttributesView		Πολυμεσική παράμετρος ι
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Λυπούμαστε, αλλά δεν μπορείτε να αποθηκεύσετε αντικείμενα στη ρίζα του συστήματός σας.
 Restore	ContainerWindow		Επαναφορά
 Location	ContainerWindow		Τοποθεσία
-Skip	FSUtils		Παράλειψη
 Warning space color	SettingsView		Χρώμα διαστήματος προειδοποίησης
+Skip	FSUtils		Παράλειψη
 Text list	AttributesView		Λίστα κειμένου
 Used space color	SettingsView		Χρώμα χρησιμοποιημένου χώρου
 Cancel	FSUtils		Άκυρο
@@ -322,8 +320,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Αδ�
 Create %s clipping	PoseView		Δημιουργία %s αποκόμματος
 Error moving \"%name\"	FSUtils		Σφάλμα κατά τη μετακίνηση του \"%name\"
 To: %dir	StatusWindow		Στο: %dir
-Cancel	Tracker		Άκυρο
 Paste layout	ContainerWindow		Επικόλληση διάταξης
+Cancel	Tracker		Άκυρο
 yes	AttributesView		ναι
 Make active printer	ContainerWindow		Δημιουργία ενεργού εκτυπωτή
 Copy to	ContainerWindow		Αντιγραφή στο

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2992119353
+1	romanian	x-vnd.Haiku-libtracker	3881286823
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Nu puteți 
 (unknown)	InfoWindow		(necunoscut)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dates>}}
 Trailing \\.	libtracker		În urmă \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		La %func \nfind_directory() a eșuat. \nMotiv: %error
 Handles any file	OpenWithWindow		Gestionează orice fișier
 save text	FilePanelPriv		salvează textul
 Raw data	AttributesView		Date brute
@@ -144,7 +143,6 @@ Disks	Model		Discuri
 Create a Query template	FindPanel		Creează un șablon de interogare
 Size	FindPanel		Dimensiune
 New submenu	ContainerWindow	Folder name of New-template submenu	Submeniu nou
-OK	Email Query Columns		OK
 Location	QueryPoseView		Locație
 Edit query	ContainerWindow		Editează interogarea
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -196,8 +194,8 @@ Media parameter web	AttributesView		Web parametri media
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Nu puteți salva lucruri la root-ul sistemului.
 Restore	ContainerWindow		Restaurează
 Location	ContainerWindow		Locație
-Skip	FSUtils		Omite
 Warning space color	SettingsView		Culoare spațiu de avertisment
+Skip	FSUtils		Omite
 Text list	AttributesView		Listă de text
 Used space color	SettingsView		Culoare spațiu utilizat
 Cancel	FSUtils		Anulează
@@ -320,8 +318,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nu s-
 Create %s clipping	PoseView		Creează tăierea %s
 Error moving \"%name\"	FSUtils		Eroare la mutarea \„%name\”
 To: %dir	StatusWindow		La: %dir
-Cancel	Tracker		Anulează
 Paste layout	ContainerWindow		Lipește aranjamentul
+Cancel	Tracker		Anulează
 yes	AttributesView		da
 Make active printer	ContainerWindow		Stabilește ca imprimantă activă
 Copy to	ContainerWindow		Copiază la

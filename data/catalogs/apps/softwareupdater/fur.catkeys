@@ -1,4 +1,4 @@
-1	friulian	x-vnd.haiku-softwareupdater	3021634705
+1	friulian	x-vnd.haiku-softwareupdater	2012285635
 Updating version	SoftwareUpdaterWindow	List item text	Inzornament de version
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Fâs clic achì par instalâ {0, plural, one{# pachet inzornât} other{# pachets inzornâts}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachets di disinstalâ
@@ -8,6 +8,7 @@ There were no updates found.	CheckManager		Nissun inzornament cjatât.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		I inzornaments no son stâts completâts, sigûrs di jessî?
 Updates found	SoftwareUpdaterWindow		Inzornaments cjatâts
 Update now	SoftwareUpdaterWindow		Inzorne cumò
+Settings	SoftwareUpdaterWindow		Impostazions
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Par cualchi reson, no ven podût tornâ a inviâ il computer.
 OK	UpdateManager		Va ben
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argoment no ricognossût
@@ -18,6 +19,7 @@ Packages to be updated	SoftwareUpdaterWindow	List super item label	Pachets di in
 to	SoftwareUpdaterWindow	List item text	a
 Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		Fâs clic achì par eseguî %appname%. Par cualchi inzornament e coventarà la selezion di une risoluzion pai problemis.
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Daûr a cirî di anulâ i inzornaments…
+Automatically clean up old install states	SoftwareUpdaterWindow		Nete in automatic i stâts des vecjis instalazions
 Contacting software repositories to check for package updates.	CheckManager		Daûr a contatâ i dipuesits dal software par verificâ la presince di pachets inzornâts.
 Available updates found	CheckManager		Inzornaments disponibii cjatâts
 from repository	SoftwareUpdaterWindow	List item text	dal dipuesit
@@ -55,6 +57,7 @@ Update	SoftwareUpdaterWindow	Alert button label	Inzorne
 Updates did not complete	UpdateAction		I inzornaments no son stâts completâts
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Vierç dipuesits
 Invalid update type, cannot continue with updates	UpdateAction		Gjenar di inzornament no valit, impussibil continuâ cui inzornaments
+Settings…	SoftwareUpdaterWindow		Impostazions…
 Uninstalling version	SoftwareUpdaterWindow	List item text	Disinstalazion de version
 %i of %i	UpdateManager	Do not translate %i	%i di %i
 Quit	SoftwareUpdaterWindow		Jes

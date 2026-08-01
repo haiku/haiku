@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	2992119353
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	3881286823
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan ikke
 (unknown)	InfoWindow		(ukjent)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datoer>}}
 Trailing \\.	libtracker		Etterfølgende \.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ved %func \nfind_directory() mislyktes. \nGrunn: %error
 Handles any file	OpenWithWindow		Håndterer alle filer
 save text	FilePanelPriv		lagre tekst
 Raw data	AttributesView		Rå data
@@ -144,7 +143,6 @@ Disks	Model		Disker
 Create a Query template	FindPanel		Lag en søkemal
 Size	FindPanel		Størrelse
 New submenu	ContainerWindow	Folder name of New-template submenu	Ny undermeny
-OK	Email Query Columns		OK
 Location	QueryPoseView		Sted
 Edit query	ContainerWindow		Rediger søk
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -196,8 +194,8 @@ Media parameter web	AttributesView		Medieparameter web
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Beklager, du kan ikke lagre noe i systemets rotkatalog.
 Restore	ContainerWindow		Gjenopprett
 Location	ContainerWindow		Sted
-Skip	FSUtils		Hopp over
 Warning space color	SettingsView		Farge på advarselområde
+Skip	FSUtils		Hopp over
 Text list	AttributesView		Tekstliste
 Used space color	SettingsView		Farge på plassindikator
 Cancel	FSUtils		Avbryt
@@ -320,8 +318,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunne
 Create %s clipping	PoseView		Lag %s utklipp
 Error moving \"%name\"	FSUtils		Feil ved flytting av \"%name\"
 To: %dir	StatusWindow		Til %dir
-Cancel	Tracker		Avbryt
 Paste layout	ContainerWindow		Lim inn layout
+Cancel	Tracker		Avbryt
 yes	AttributesView		ja
 Make active printer	ContainerWindow		Sett som aktiv skriver
 Copy to	ContainerWindow		Kopier til

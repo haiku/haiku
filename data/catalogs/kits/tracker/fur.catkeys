@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2992119353
+1	friulian	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		No tu puedi
 (unknown)	InfoWindow		(no cognossût)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datis>}}
 Trailing \\.	libtracker		\\ ae fin.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Su %func\nal è falît find_directory().\nMotîf: %error
 Handles any file	OpenWithWindow		Al gjestìs cualsisei file
 save text	FilePanelPriv		salve test
 Raw data	AttributesView		Dâts grês
@@ -103,6 +102,7 @@ Affine transform	AttributesView		Trasformazion simile
 Window	ContainerWindow		Barcon
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Gjave
+You cannot create a link to the %trash% directory.	FSUtils		No tu puedis creâ un colegament ae cartele %trash%.
 Company	Person Query Columns		Aziende
 Select folders…	FindPanel		Selezione cartelis…
 Recent documents	FavoritesMenu		Documents resints
@@ -144,7 +144,6 @@ Disks	Model		Discs
 Create a Query template	FindPanel		Cree un model di interogazion
 Size	FindPanel		Dimension
 New submenu	ContainerWindow	Folder name of New-template submenu	Gnûf sot-menù
-OK	Email Query Columns		Va ben
 Location	QueryPoseView		Posizion
 Edit query	ContainerWindow		Modifiche interogazion
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# byte)}}
@@ -164,6 +163,7 @@ Could not open \"%name\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%nam
 Media parameter group	AttributesView		Grup di parametris multimediâi
 %name info	InfoWindow	InfoWindow Title	Informazions su %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Se si sposte la cartele home (chê personâl), %osName al podarès funzionâ mâl!\n\nContinuâ pardabon?\n\nPar spostâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"Sposte\".
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%total selezionâts}}
 Property info	AttributesView		Informazions de proprietât
 Sorry, you can't create links in the Trash.	PoseView		No tu puedis creâ un colegament te Scovacere.
 From	Email Query Columns		Di
@@ -196,8 +196,8 @@ Media parameter web	AttributesView		Parametri multimediâl web
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Mi displâs, ma no tu puedis salvâ robis te lidrîs dal sisteme.
 Restore	ContainerWindow		Ripristine
 Location	ContainerWindow		Posizion
-Skip	FSUtils		Salte
 Warning space color	SettingsView		Colôr aree di avertiment
+Skip	FSUtils		Salte
 Text list	AttributesView		Liste di test
 Used space color	SettingsView		Colôr dal spazi doprât
 Cancel	FSUtils		Anule
@@ -261,6 +261,7 @@ New folder %d	FSUtils		Gnove cartele %d
 Extended attribute	AttributesView		Atribût estês
 Error %error loading Add-On %name.	ContainerWindow		Erôr %error cjariant il component adizionâl %name.
 Unmatched brackets.	libtracker		Parentesis no imbinadis.
+You cannot copy or move the 'printers' directory.	FSUtils		No tu puedis copiâ o spostâ la cartele des stampadoris 'printers'.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Si sta cirint di sostituî l'element:\n\t%name%dest\ncun:\n\t%name%src\n\nSostituîlu cun chel che tu stâs %movemode?
 Empty Trash	ContainerWindow		Disvuede la scovacere
 no supporting apps	OpenWithWindow		nissune aplicazion supuartade
@@ -273,6 +274,7 @@ label too long	PoseView		etichete masse lungje
 Error creating link to \"%name\".	FSUtils		Erôr tal creâ il colegament a \"%name\".
 Unknown	FilePermissionsView		No cognossût
 Paste links	ContainerWindow		Tache colegaments
+You cannot copy or move the %trash% directory.	FSUtils		No tu puedis copiâ o spostâ la cartele %trash%.
 Restoring: 	StatusWindow		Ripristinament: 
 The Tracker must be running to set the default printer.	PoseView		Al è necessari che il Tracker al sedi in esecuzion par stabilî la stampadore predefinide.
 calculating…	InfoWindow		daûr a calcolâ…
@@ -288,6 +290,7 @@ Show volumes on Desktop	SettingsView		Mostre volums sul Scritori
 Recent folders	ContainerWindow		Cartelis resintis
 Desktop	Model		Scritori
 Select all	ContainerWindow		Selezione ducj
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
 apps	B_APPS_DIRECTORY		aplicazions
 Error calculating folder size.	InfoWindow		Erôr tal calcolâ la dimension de cartele.
 Delete	FSUtils		Elimine
@@ -320,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nol �
 Create %s clipping	PoseView		Cree ritai %s
 Error moving \"%name\"	FSUtils		Erôr tal spostâ \"%name\"
 To: %dir	StatusWindow		A: %dir
-Cancel	Tracker		Anule
 Paste layout	ContainerWindow		Tache disposizion
+Cancel	Tracker		Anule
 yes	AttributesView		sì
 Make active printer	ContainerWindow		Rint ative la stampadore
 Copy to	ContainerWindow		Copie su
@@ -341,11 +344,13 @@ The entered file name is too long.	FSUtils		Il non dal file inserît al è masse
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Nol è pussibil spostâ te Scovacere cualchidun dai elements selezionâts. Eliminâju dal dut? (Cheste operazion e sarà permanente.)
 Add printer…	ContainerWindow		Zonte stampadore…
 Permissions	ContainerWindow		Permès
+Trash	FSUtils		Scovacere
 Size:	InfoWindow		Dimension:
 Copy	ContainerWindow		Copie
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Nol è pussibil spostâ te Scovacere l'element selezionât. Eliminâlu dal dut? (Cheste operazion e sarà permanente.)
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Mi displâs, l'atribût 'Character' nol pues contignî un glif a plui byte.
 And	FindPanel		E
+copy	PoseView	filename copy	copie
 Palette-indexed picture	AttributesView		Imagjin cun palete intabelade
 Drawing pattern	AttributesView		Trame
 File offset	AttributesView		Deviazion file

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ActivityMonitor	1159274874
+1	friulian	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Teams
 Temp	DataSource		Temp
 Block cache memory	DataSource		Memorie cache a blocs
@@ -10,6 +10,7 @@ ActivityMonitor	System name		VisôrAtivitâts
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval di inzornament:
 Settings…	ActivityWindow		Impostazions…
+Unknown thermal sensor	SystemInfoHandler		Sensôr termic no cognossût
 Block cache	DataSource		Bloche cache
 Memory	DataSource		Memorie
 No thermal sensor	SystemInfoHandler		Nissun sensôr di temperadure

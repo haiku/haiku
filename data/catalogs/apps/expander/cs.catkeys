@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Expander	2040688293
+1	czech	x-vnd.Haiku-Expander	2735024965
 Destination	ExpanderWindow		Cíl
 Other	ExpanderPreferences		Ostatní
 Automatically show contents listing	ExpanderPreferences		Automaticky zobrazit výpis obsahu
@@ -6,12 +6,14 @@ Expander	System name		Rozbalovač
 Set source…	ExpanderMenu		Nastavit zdroj…
 OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Cíl není adresář.
+%appname%: Choose destination	DirectoryFilePanel		%appname%: Zvolit cíl
 The folder was either moved, renamed or not supported.	ExpanderWindow		Adresář byl přesunut, přejmenován nebo není podporován.
 Close window when done expanding	ExpanderPreferences		Zavřít okno po skončení rozbalování
 Close	ExpanderMenu		Zavřít
 Create	ExpanderWindow		Vytvořit
 Creating listing for '%s'…	ExpanderWindow		Vytvářím seznam souborů pro '%s'…
 Show contents	ExpanderMenu		Zobrazit obsah
+%appname% settings	ExpanderPreferences		%appname% nastavení
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Opravdu chcete přerušit rozbalování tohoto archívu? Rozbalené položky nemusí být úplné.
 Settings	ExpanderMenu		Nastavení
 Expand	ExpanderWindow		Rozbalit
@@ -45,5 +47,6 @@ The file doesn't exist	ExpanderWindow		Soubor neexistuje
 Hide contents	ExpanderWindow		Skrýt obsah
 Source	ExpanderWindow		Zdroj
 The destination is read only.	ExpanderWindow		Cíl je určen pouze pro čtení.
+%appname%: Open	ExpanderWindow		%appname%: Otevřít
 Select	ExpanderPreferences		Vybrat
 File	ExpanderMenu		Soubor
